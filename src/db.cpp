@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.182 2008/12/12 07:39:02 jhhudso Exp $ */
+/* $Id: db.cpp,v 1.183 2008/12/12 08:04:41 kkoons Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -2316,15 +2316,13 @@ void read_one_zone(FILE * fl, int zon)
   int reset_top, i, tmp;
   char * skipper = NULL;
   int version = 1;
+  bool modified = false;
 
   ch = fread_char (fl);
   if (ch == 'V') {
       version = fread_int (fl, 0, 64000);
       ch = fread_char (fl);
-  } else {
-      // Old revision detected. We will set the altered flag so
-      // this zone will be saved with new format soon
-      SET_BIT(zone_table[zon].zone_flags, ZONE_MODIFIED);
+      modified = true;
   }
 
   tmp = fread_int (fl, 0, 64000);
@@ -2368,6 +2366,12 @@ void read_one_zone(FILE * fl, int zon)
   zone_table[zon].lifespan   = fread_int (fl, 0, 64000);
   zone_table[zon].reset_mode = fread_int (fl, 0, 64000);
   zone_table[zon].zone_flags = fread_bitvector (fl, 0, LONG_MAX);
+
+  // if its old version set the altered flag so that
+  // this zone will be saved with new format soon
+  if(modified == true)   
+    SET_BIT(zone_table[zon].zone_flags, ZONE_MODIFIED);
+
   if (version > 1) {
       zone_table[zon].continent = fread_int (fl, 0, 64000);
   }
