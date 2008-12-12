@@ -8431,6 +8431,7 @@ int cast_ventriloquate( ubyte level, CHAR_DATA *ch, char *arg, int type,
 		 if (tmp_ch == tar_ch)
 		send_to_char(buf3, tar_ch);
 	}
+        send_to_char(buf1, ch);
 	 }
   return eSUCCESS;
 }
