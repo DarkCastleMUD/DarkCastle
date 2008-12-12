@@ -17,10 +17,13 @@
 #include <returnvals.h>
 #include <spells.h>
 #include <race.h>
+#include <vector>
+#include <string>
 
 extern struct room_data ** world_array;
 void save_corpses(void);
 extern char *obj_types[];
+extern std::vector<std::string> continent_names;
 extern struct active_object active_head;
 
 
@@ -337,14 +340,20 @@ int show_zone_commands(struct char_data *ch, int i, int start = 0)
     send_to_char("There is no such zone.\r\n", ch);
     return eFAILURE;
   }
+  string continent_name;
+  if (zone_table[i].continent && zone_table[i].continent < continent_names.size())
+    continent_name = continent_names.at(zone_table[i].continent);
+    
+
 
   sprintf(buf, "$3Name$R: %s\r\n"
-               "$3Starts$R:   %6d $3Ends$R:  %13d\r\n"
+               "$3Starts$R:   %6d $3Ends$R:  %13d     $3Continent:$R %s\n\r"
                "$3Lifetime$R: %6d $3Age$R:   %13d     $3Left$R:   %6d\r\n" 
                "$3PC'sInZone$R: %4d $3Mode$R: %-18s $3Flags$R: ",
                     zone_table[i].name, 
                     (i ? (zone_table[i - 1].top + 1) : 0), 
                     zone_table[i].top,
+                    continent_name.c_str(),
                     zone_table[i].lifespan,
                     zone_table[i].age,  
                     zone_table[i].lifespan - zone_table[i].age,
