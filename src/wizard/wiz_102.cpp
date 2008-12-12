@@ -39,6 +39,8 @@ extern "C"
 #include <vector>
 using namespace std;
 
+extern vector<string> continent_names;
+
 // Urizen's rebuild rnum references to enable additions to mob/obj arrays w/out screwing everything up.
 // A hack of renum_zone_tables *yawns*
 // type 1 = mobs, type 2 = objs. Simple as that.
@@ -649,7 +651,7 @@ int do_zedit(struct char_data *ch, char *argument, int cmd)
   char * zedit_values[] = {
     "remove", "add", "edit", "list", "name", 
     "lifetime", "mode", "flags", "help", "search", 
-    "swap", "copy",
+    "swap", "copy", "continent",
     "\n"
   };
 
@@ -1089,6 +1091,30 @@ int do_zedit(struct char_data *ch, char *argument, int cmd)
       send_to_char(buf, ch);
       break;
     }
+    case 12:
+    
+      argument = one_argumentnolow(argument, text);
+      if(!*text)
+      {   
+        send_to_char("$3Usage$R: zedit continent <continent number>\r\n", ch);
+        for(i = SORPIGAL_CONTINENT; i != MAX_CONTINENTS; i++)
+        {
+      
+          csendf(ch, "%d) %s\n\r", i, continent_names.at(i).c_str());
+        }
+          //csendf(ch, (char*)(continent_names.at(i).c_str()));
+        return eFAILURE;
+      }
+      
+      if(!(i = atoi(text)) || i >= MAX_CONTINENTS )
+      {
+        csendf(ch, "You much choose between 1 and %d.\r\n", MAX_CONTINENTS-1);
+        return eFAILURE;
+      }
+      csendf(ch, "Success. Continent changed to %s\n\r", continent_names.at(i).c_str());
+      zone_table[zone].continent = i;
+    break;
+
     default: 
       send_to_char("Error:  Couldn't find item in switch.\r\n", ch);
       break;
