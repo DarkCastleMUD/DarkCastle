@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: db.h,v 1.27 2008/11/20 00:51:19 dcastle Exp $ */
+/* $Id: db.h,v 1.28 2008/12/12 06:54:29 kkoons Exp $ */
 #ifndef DB_H_
 #define DB_H_
 
@@ -75,6 +75,14 @@ struct ban_list_element {
    struct ban_list_element *next;
 };
 
+enum Continents 
+{
+  SORPIGAL_CONTINENT = 1,
+  FAR_REACH,
+  THE_UNDERDARK,
+  BEHIND_THE_MIRROR,
+  MAX_CONTINENTS //for iteration
+};
 
 /* public procedures in db.c */
 void set_zone_modified_zone(long room);
@@ -198,6 +206,7 @@ struct zone_data
     int died_this_tick;      // number of mobs that have died in this zone this pop
     int clanowner;
     int gold;	// gold (possibly the most descriptive comment of all time)
+    int continent;	     // what continent the zone belongs to
 };
 
 
