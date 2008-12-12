@@ -1097,7 +1097,7 @@ int do_zedit(struct char_data *ch, char *argument, int cmd)
       if(!*text)
       {   
         send_to_char("$3Usage$R: zedit continent <continent number>\r\n", ch);
-        for(i = SORPIGAL_CONTINENT; i != MAX_CONTINENTS; i++)
+        for(i = NO_CONTINENT; i != continent_names.size(); i++)
         {
       
           csendf(ch, "%d) %s\n\r", i, continent_names.at(i).c_str());
