@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: db.h,v 1.28 2008/12/12 06:54:29 kkoons Exp $ */
+/* $Id: db.h,v 1.29 2008/12/12 17:29:57 dcastle Exp $ */
 #ifndef DB_H_
 #define DB_H_
 
@@ -77,10 +77,12 @@ struct ban_list_element {
 
 enum Continents 
 {
-  SORPIGAL_CONTINENT = 1,
+  NO_CONTINENT = 1,
+  SORPIGAL_CONTINENT,
   FAR_REACH,
+  DIAMOND_ISLE,
   THE_UNDERDARK,
-  BEHIND_THE_MIRROR,
+  OTHER_CONTINENT,
   MAX_CONTINENTS //for iteration
 };
 
