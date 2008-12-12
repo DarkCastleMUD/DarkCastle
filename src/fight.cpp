@@ -20,7 +20,7 @@
  * 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead *
  * of just race stuff                                                     *
  **************************************************************************
- * $Id: fight.cpp,v 1.517 2008/12/11 17:30:17 kkoons Exp $               *
+ * $Id: fight.cpp,v 1.518 2008/12/12 04:51:31 kkoons Exp $               *
  **************************************************************************/
 
 extern "C"
@@ -5698,62 +5698,120 @@ void do_pkill(CHAR_DATA *ch, CHAR_DATA *victim, int type)
             GET_NAME(victim), GET_NAME(ch));
         break;
     }
-
+    int level_spread = GET_LEVEL(ch) - GET_LEVEL(victim);
     // have to be level 20 and linkalive to count as a pkill and not yourself
     // (we check earlier to make sure victim isn't a mob)
     // now with tav/meta pkilling not adding to your score
-    if(!IS_MOB(ch) && GET_LEVEL(victim) > PKILL_COUNT_LIMIT && victim->desc && ch != victim && ch->in_room != real_room(START_ROOM) && ch->in_room != real_room(SECOND_START_ROOM))
+    if(!IS_MOB(ch) 
+      // && GET_LEVEL(victim) > PKILL_COUNT_LIMIT 
+       && victim->desc 
+       && ch != victim 
+       && ch->in_room != real_room(START_ROOM) 
+       && ch->in_room != real_room(SECOND_START_ROOM))
     {
-      GET_PDEATHS(victim) += 1;
-      GET_PDEATHS_LOGIN(victim) += 1;
+      if(level_spread > 20 && !IS_AFFECTED(victim, AFF_CANTQUIT))
+      {
+        if(GET_PKILLS(ch) > 0)
+          GET_PKILLS(ch) -= 1;
+        if(GET_PKILLS_LOGIN(ch) > 0)
+          GET_PKILLS_LOGIN(ch)       -= 1;
+      }
+      else if (GET_LEVEL(victim) > PKILL_COUNT_LIMIT)
+      {
+        GET_PDEATHS(victim) += 1;
+        GET_PDEATHS_LOGIN(victim) += 1;
 
-      GET_PKILLS(ch)             += 1;
-      GET_PKILLS_LOGIN(ch)       += 1;
-      GET_PKILLS_TOTAL(ch)       += GET_LEVEL(victim);
-      GET_PKILLS_TOTAL_LOGIN(ch) += GET_LEVEL(victim);
+        GET_PKILLS(ch)             += 1;
+        GET_PKILLS_LOGIN(ch)       += 1;
+        GET_PKILLS_TOTAL(ch)       += GET_LEVEL(victim);
+        GET_PKILLS_TOTAL_LOGIN(ch) += GET_LEVEL(victim);
+      
 
-      if(IS_AFFECTED(ch, AFF_GROUP)) {
+        if(IS_AFFECTED(ch, AFF_GROUP)) 
+        {
           char_data * master   = ch->master ? ch->master : ch;
-          if(!IS_MOB(master)) {
-            master->pcdata->grplvl      += GET_LEVEL(victim);
-            master->pcdata->group_kills += 1;
+          if(!IS_MOB(master)) 
+          {
+              master->pcdata->grplvl      += GET_LEVEL(victim);
+              master->pcdata->group_kills += 1;
+          }
+        }
+      }
+    }
+
+    if(IS_AFFECTED(ch, AFF_CHARM) 
+       && ch->master 
+     //  && GET_LEVEL(victim) > PKILL_COUNT_LIMIT 
+       && victim->desc 
+       && ch->master != victim 
+       && ch->in_room != real_room(START_ROOM) 
+       && ch->in_room != real_room(SECOND_START_ROOM)) 
+    {
+       if(level_spread > 20 && !IS_AFFECTED(victim, AFF_CANTQUIT))
+       {
+        if(GET_PKILLS(ch) > 0)
+          GET_PKILLS(ch) -= 1;
+        if(GET_PKILLS_LOGIN(ch) > 0)
+          GET_PKILLS_LOGIN(ch)       -= 1;
+       }
+       else if (GET_LEVEL(victim) > PKILL_COUNT_LIMIT)
+       {
+         GET_PDEATHS(victim) += 1;
+         GET_PDEATHS_LOGIN(victim) += 1;
+
+         GET_PKILLS(ch->master)             += 1;
+         GET_PKILLS_LOGIN(ch->master)       += 1;
+         GET_PKILLS_TOTAL(ch->master)       += GET_LEVEL(victim);
+         GET_PKILLS_TOTAL_LOGIN(ch->master) += GET_LEVEL(victim);
+
+        if(ch->master->master)
+          if(IS_AFFECTED(ch->master->master, AFF_GROUP)) 
+          {
+            char_data * master   = ch->master->master ? ch->master->master : ch->master;
+            if(!IS_MOB(master)) 
+            {
+              master->pcdata->grplvl      += GET_LEVEL(victim);
+              master->pcdata->group_kills += 1;
+            }
           }
        }
     }
-    if(IS_AFFECTED(ch, AFF_CHARM) && ch->master && GET_LEVEL(victim) > PKILL_COUNT_LIMIT && victim->desc && ch->master != victim && ch->in_room != real_room(START_ROOM) && ch->in_room != real_room(SECOND_START_ROOM)) {
-       GET_PDEATHS(victim) += 1;
-       GET_PDEATHS_LOGIN(victim) += 1;
+    if(IS_AFFECTED(ch, AFF_FAMILIAR) 
+       && ch->master 
+      // && GET_LEVEL(victim) > PKILL_COUNT_LIMIT 
+       && victim->desc 
+       && ch->master != victim 
+       && ch->in_room != real_room(START_ROOM) 
+       && ch->in_room != real_room(SECOND_START_ROOM)) 
+    {
+       if(level_spread > 20 && !IS_AFFECTED(victim, AFF_CANTQUIT))
+       {
+        if(GET_PKILLS(ch) > 0)
+          GET_PKILLS(ch) -= 1;
+        if(GET_PKILLS_LOGIN(ch) > 0)
+          GET_PKILLS_LOGIN(ch)       -= 1;
+       }
+      else if (GET_LEVEL(victim) > PKILL_COUNT_LIMIT)
+       {
+         
+         GET_PDEATHS(victim) += 1;
+         GET_PDEATHS_LOGIN(victim) += 1;
 
-       GET_PKILLS(ch->master)             += 1;
-       GET_PKILLS_LOGIN(ch->master)       += 1;
-       GET_PKILLS_TOTAL(ch->master)       += GET_LEVEL(victim);
-       GET_PKILLS_TOTAL_LOGIN(ch->master) += GET_LEVEL(victim);
+         GET_PKILLS(ch->master)             += 1;
+         GET_PKILLS_LOGIN(ch->master)       += 1;
+         GET_PKILLS_TOTAL(ch->master)       += GET_LEVEL(victim);
+         GET_PKILLS_TOTAL_LOGIN(ch->master) += GET_LEVEL(victim);
 
-       if(ch->master->master)
-        if(IS_AFFECTED(ch->master->master, AFF_GROUP)) {
-          char_data * master   = ch->master->master ? ch->master->master : ch->master;
-          if(!IS_MOB(master)) {
-            master->pcdata->grplvl      += GET_LEVEL(victim);
-            master->pcdata->group_kills += 1;
-          }
-        }
-    }
-    if(IS_AFFECTED(ch, AFF_FAMILIAR) && ch->master && GET_LEVEL(victim) > PKILL_COUNT_LIMIT && victim->desc && ch->master != victim && ch->in_room != real_room(START_ROOM) && ch->in_room != real_room(SECOND_START_ROOM)) {
-       GET_PDEATHS(victim) += 1;
-       GET_PDEATHS_LOGIN(victim) += 1;
-
-       GET_PKILLS(ch->master)             += 1;
-       GET_PKILLS_LOGIN(ch->master)       += 1;
-       GET_PKILLS_TOTAL(ch->master)       += GET_LEVEL(victim);
-       GET_PKILLS_TOTAL_LOGIN(ch->master) += GET_LEVEL(victim);
-
-       if(ch->master->master)
-        if(IS_AFFECTED(ch->master->master, AFF_GROUP)) {
-          char_data * master   = ch->master->master ? ch->master->master : ch->master;
-          if(!IS_MOB(master)) {
-             master->pcdata->grplvl      += GET_LEVEL(victim);
-             master->pcdata->group_kills += 1;
-          }
+         if(ch->master->master)
+           if(IS_AFFECTED(ch->master->master, AFF_GROUP)) 
+           {
+             char_data * master   = ch->master->master ? ch->master->master : ch->master;
+             if(!IS_MOB(master)) 
+             {
+               master->pcdata->grplvl      += GET_LEVEL(victim);
+               master->pcdata->group_kills += 1;
+             }
+           }
         }
     }
  // if (ch && ch != victim)
