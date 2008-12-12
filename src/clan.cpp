@@ -1,4 +1,4 @@
-/* $Id: clan.cpp,v 1.70 2008/10/06 22:06:29 kkoons Exp $ */
+/* $Id: clan.cpp,v 1.71 2008/12/12 18:33:28 kkoons Exp $ */
 
 /***********************************************************************/
 /* Revision History                                                    */
@@ -3157,6 +3157,11 @@ int do_clanarea(CHAR_DATA *ch, char *argument, int cmd)
   } else if (!str_cmp(arg, "challenge")) {
     if (affected_by_spell(ch, SKILL_CLANAREA_CHALLENGE)) {
       send_to_char("You need to wait before you can attempt to challenge an area.\n\r", ch);
+      return eFAILURE;
+    }
+    if( GET_LEVEL(ch) < 40)
+    {
+      send_to_char("You must be level 40 to issue a challenge.\n\r", ch);
       return eFAILURE;
     }
 
