@@ -41,7 +41,6 @@ struct obj_data *get_obj(int vnum);
 void item_remove(obj_data *obj, struct vault_data *vault);
 void item_add(int vnum, struct vault_data *vault);
 
-void vault_log(const char *message, char *name);
 struct char_data *find_owner(char *name);
 void show_vault_log(CHAR_DATA *ch, char *owner);
 int class_restricted(struct char_data *ch, struct obj_data *obj);
@@ -54,7 +53,7 @@ extern struct obj_data * search_char_for_item(char_data * ch, int16 item_number,
 extern struct obj_data  *object_list;
 extern char *item_condition(struct obj_data *obj);
 
-struct vault_data *has_vault(char *name) {
+struct vault_data *has_vault(const char *name) {
   struct vault_data *vault;
 
   for (vault = vault_table;vault;vault = vault->next)
@@ -1829,7 +1828,7 @@ void show_vault_log(CHAR_DATA *ch, char *owner)
   page_string(ch->desc, const_cast<char *>(buffer.str().c_str()), 1);
 }
 
-void vault_log(const char *message, char *name) {
+void vault_log(const char *message, const char *name) {
   struct tm *tm = NULL;
   long ct;
   FILE *ofile, *nfile;
