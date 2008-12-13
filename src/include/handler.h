@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.h,v 1.30 2008/11/18 14:39:40 kkoons Exp $ */
+/* $Id: handler.h,v 1.31 2008/12/13 23:55:53 kkoons Exp $ */
 
 #ifndef HANDLER_H_
 #define HANDLER_H_
@@ -45,7 +45,7 @@ affected_type * affected_by_random(CHAR_DATA *ch);
 
 /* utility */
 struct obj_data *create_money( int amount );
-int isname(char *str, char *namelist);
+int isname(const char *str, const char *namelist);
 char *fname(char *namelist);
 int get_max_stat(char_data * ch, ubyte stat);
 //TIMERS
@@ -94,7 +94,7 @@ int  char_to_room(CHAR_DATA *ch, int room);
 
 /* find if character can see */
 CHAR_DATA *get_active_pc_vis(CHAR_DATA *ch, char *name);
-CHAR_DATA *get_active_pc(char *name);
+CHAR_DATA *get_active_pc(const char *name);
 CHAR_DATA *get_all_pc(char *name);
 CHAR_DATA *get_char_room_vis(CHAR_DATA *ch, char *name);
 CHAR_DATA *get_rand_other_char_room_vis(CHAR_DATA *ch);

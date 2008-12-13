@@ -1,3 +1,5 @@
+#include <utility.h>
+
 #define VAULT_UPGRADE_COST 100 // plats
 #define VAULT_BASE_SIZE 10  // weight
 #define VAULT_MAX_SIZE  10000 // weight
@@ -5,7 +7,7 @@
 #define VAULT_MAX_DEPWITH 2000000000 // 2 bil max to add/remove from bank at a time
 
 extern struct vault_data *vault_table;
-struct vault_data *has_vault(char *name);
+struct vault_data *has_vault(const char *name);
 
 void vault_stats(CHAR_DATA *ch, char *name);
 void vault_withdraw(CHAR_DATA *ch, unsigned int amount, char *owner);
@@ -28,6 +30,7 @@ void access_remove(char *name, struct vault_data *vault);
 void remove_vault_accesses(char *name);
 void vault_sell(CHAR_DATA *ch, char *object, char *arg);
 int vault_log_to_string(const char *name, char *buf);
+void vault_log(const char *message, const char *name);
 struct vault_data *get_vault_in_all_vaults(char *object, int num);
 
 struct obj_data *get_obj_in_vault(struct vault_data *vault, char *object, int num);

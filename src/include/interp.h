@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: interp.h,v 1.92 2008/11/25 20:53:57 kkoons Exp $ */
+/* $Id: interp.h,v 1.93 2008/12/13 23:55:53 kkoons Exp $ */
 
 #ifndef INTERP_H_
 #define INTERP_H_
@@ -532,6 +532,7 @@ DO_FUN  do_unlock;
 DO_FUN  do_use;
 DO_FUN  do_varstat;
 DO_FUN  do_vault;
+DO_FUN  do_vend;
 DO_FUN  do_visible;
 DO_FUN  do_vitalstrike;
 DO_FUN  do_vt100;

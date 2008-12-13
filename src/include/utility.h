@@ -16,7 +16,7 @@
  *  10/21/2003   Onager    Changed IS_ANONYMOUS() to handle mobs without   *
  *                         crashing                                        *
  ***************************************************************************/
-/* $Id: utility.h,v 1.78 2008/12/04 04:31:18 jhhudso Exp $ */
+/* $Id: utility.h,v 1.79 2008/12/13 23:55:53 kkoons Exp $ */
 
 #ifndef UTILITY_H_
 #define UTILITY_H_
@@ -379,7 +379,7 @@ void	gain_exp_regardless	(CHAR_DATA *ch, int gain);
 void	advance_level	(CHAR_DATA *ch, int is_conversion);
 int	close_socket	(struct descriptor_data *d);
 char *	one_argument	(char *argument, char *first_arg);
-int	isname		(char *arg, char *arg2);
+int	isname		(const char *arg, const char *arg2);
 void	page_string	(struct descriptor_data *d, const char *str,
 			    int keep_internal);
 void	gain_exp	(CHAR_DATA *ch, int64 gain);
