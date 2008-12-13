@@ -891,6 +891,7 @@ void game_loop(unsigned mother_desc, unsigned other_desc, unsigned third_desc, u
 }
 
 extern void pulse_hunts(); 
+extern void auction_expire();
 void init_heartbeat()
 {
   pulse_mobile    = PULSE_MOBILE;
@@ -945,6 +946,7 @@ void heartbeat()
   {
     pulse_weather = PULSE_WEATHER;
     weather_update();
+    auction_expire();
   }
 
   if (--pulse_regen < 1)
