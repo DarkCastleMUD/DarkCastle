@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: db.h,v 1.29 2008/12/12 17:29:57 dcastle Exp $ */
+/* $Id: db.h,v 1.30 2008/12/13 01:38:07 kkoons Exp $ */
 #ifndef DB_H_
 #define DB_H_
 
@@ -24,6 +24,8 @@ extern "C" {
 #include <character.h>
 #include <weather.h>
 #include <handler.h>
+#include <string>
+#include <vector>
 
 extern struct obj_data  *object_list;
 
@@ -75,15 +77,18 @@ struct ban_list_element {
    struct ban_list_element *next;
 };
 
+extern std::vector<std::string> continent_names;
+
 enum Continents 
 {
-  NO_CONTINENT = 1,
-  SORPIGAL_CONTINENT,
-  FAR_REACH,
-  DIAMOND_ISLE,
-  THE_UNDERDARK,
-  OTHER_CONTINENT,
-  MAX_CONTINENTS //for iteration
+  NO_CONTINENT = 1,	//1
+  SORPIGAL_CONTINENT,	//2
+  FAR_REACH,		//3	
+  DIAMOND_ISLE,		//4
+  THE_UNDERDARK,	//5
+  OCEAN,		//6
+  OTHER_CONTINENT,	//7
+  MAX_CONTINENTS 	//for iteration
 };
 
 /* public procedures in db.c */
