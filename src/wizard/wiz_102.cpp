@@ -1106,9 +1106,9 @@ int do_zedit(struct char_data *ch, char *argument, int cmd)
         return eFAILURE;
       }
       
-      if(!(i = atoi(text)) || i >= MAX_CONTINENTS )
+      if(!(i = atoi(text)) || i > continent_names.size()-1 )
       {
-        csendf(ch, "You much choose between 1 and %d.\r\n", MAX_CONTINENTS-1);
+        csendf(ch, "You much choose between 1 and %d.\r\n", continent_names.size()-1);
         return eFAILURE;
       }
       csendf(ch, "Success. Continent changed to %s\n\r", continent_names.at(i).c_str());
