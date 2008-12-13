@@ -170,6 +170,7 @@ void assign_non_combat_procs() {
     assign_one_mob_non(207,  adept);
     assign_one_mob_non(208,  adept);
     assign_one_mob_non(214,  fido);
+    assign_one_mob_non(17812,  fido);
     assign_one_mob_non(7134,  francis_guard);
     assign_one_mob_non(222,  newbie_zone_guard);
     assign_one_mob_non(1334, generic_doorpick_blocker);
@@ -256,6 +257,7 @@ void assign_non_combat_procs() {
     assign_one_mob_non(27871,  poet);
     assign_one_mob_non(32045,  repair_guy);
     assign_one_mob_non(32046,  super_repair_guy);
+    assign_one_mob_non(17805,  super_repair_guy);
     assign_one_mob_non(32047,  repair_shop);
 
 
