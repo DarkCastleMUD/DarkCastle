@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.175 2008/12/12 08:04:08 kkoons Exp $ */
+/* $Id: handler.cpp,v 1.176 2008/12/13 23:56:48 kkoons Exp $ */
     
 extern "C"
 {
@@ -129,9 +129,9 @@ char *fname(char *namelist)
 
 // TODO - figure out how this is different from isname() and comment why
 // we need it.  Neither of them are case-sensitive....
-int isname2(char *str, char *namel)
+int isname2(const char *str, const char *namel)
 {
-   char* s = namel;
+   const char* s = namel;
 
    if (strlen(str) == 0)
       return 0;
@@ -155,9 +155,9 @@ int isname2(char *str, char *namel)
 | Side Effects: None
 | Returns: One if it's in the namelist, zero otherwise
 */
-int isname(char *str, char *namelist)
+int isname(const char *str, const char *namelist)
 {
-   char *curname, *curstr;
+   const char *curname, *curstr;
 
    if(!str || !namelist) {
      return(0);
@@ -3670,7 +3670,7 @@ CHAR_DATA *get_pc(char *name)
   return 0;
 }
 
-CHAR_DATA *get_active_pc(char *name)
+CHAR_DATA *get_active_pc(const char *name)
 {
    CHAR_DATA *i;
    CHAR_DATA *partial_match;
