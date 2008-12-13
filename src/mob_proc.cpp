@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.184 2008/12/11 16:54:49 apocalypse Exp $ */
+/* $Id: mob_proc.cpp,v 1.185 2008/12/13 17:18:14 apocalypse Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -1645,7 +1645,7 @@ static char *dethSayText [ ] =
   "Of all the Daliesque tourist traps in the world, we had to walk into this one.",
   "Ahh yes, the good old days of the Internet...when men were men, women were men, and children were FBI agents.",
   "I think Bush's foreign policy is quite reasonable.",
-  "Remember, arguing on the Internet is like entering the Special Olympics...even if you win, you're still a retard.",
+  "Remember, arguing on the internet is like entering the Special Olympics...even if you win, you're still a retard.",
   "Sorry guys, I have to step down as Implementor so I can pass my PhD.",
   "Chuck Norris doesn't teabag the ladies, he potato sacks them!",
   "Chuck Norris' tears could cure cancer except he's never cried.",
