@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.106 2008/12/08 01:22:54 kkoons Exp $
+| $Id: inventory.cpp,v 1.107 2008/12/13 23:56:27 kkoons Exp $
 | inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
@@ -53,7 +53,7 @@ extern int rev_dir[];
 /* extern functions */
 void save_corpses(void);
 char *fname(char *namelist);
-int isname(char *arg, char *arg2);
+int isname(const char *arg, const char *arg2);
 struct obj_data *create_money( int amount );
 int palm  (struct char_data *ch, struct obj_data *obj_object, struct obj_data *sub_object, bool has_consent);
 void special_log(char *arg);
