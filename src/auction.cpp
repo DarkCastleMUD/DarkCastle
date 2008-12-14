@@ -325,7 +325,7 @@ void AuctionHouse::ListItems(CHAR_DATA *ch, ListOptions options)
   string output_buf;
   char buf[MAX_STRING_LENGTH];
   
-  send_to_char("Ticket-Seller---------Price-------Status---Item---------------------------\n\r", ch);
+  send_to_char("Ticket-Seller-------Price-------Status---Item---------------------------\n\r", ch);
   for(i = 0, Item_it = Items_For_Sale.begin(); (i < 50) && (Item_it != Items_For_Sale.end()); Item_it++)
   {
     if(
@@ -336,7 +336,7 @@ void AuctionHouse::ListItems(CHAR_DATA *ch, ListOptions options)
       )
     {
       i++;
-      sprintf(buf, "\n\r%05d) %-14s $5%-11d$R %s  %-30s\n\r", 
+      sprintf(buf, "\n\r%05d) %-12s $5%-11d$R %s  %-30s\n\r", 
                Item_it->first, Item_it->second.seller.c_str(), Item_it->second.price,
                (Item_it->second.state == AUC_EXPIRED)?"$4EXPIRED$R": "$2ACTIVE$R ", 
                Item_it->second.item_name.c_str());
