@@ -629,5 +629,6 @@ int do_vend(CHAR_DATA *ch, char *argument, int cmd)
     return eSUCCESS;    
   }
 
+  send_to_char("Do what?\n\rSyntax: vend <buy | sell | list | cancel | collect>\n\r", ch);
   return eSUCCESS;
 }
