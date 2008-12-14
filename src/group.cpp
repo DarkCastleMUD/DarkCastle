@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: group.cpp,v 1.27 2007/03/27 15:22:44 dcastle Exp $
+| $Id: group.cpp,v 1.28 2008/12/14 05:29:55 kkoons Exp $
 | group.C
 | Description:  Group related commands; join, abandon, follow, etc..
 */
@@ -674,7 +674,7 @@ int do_autojoin(CHAR_DATA *ch, char *argument, int cmd)
 	strcat(buf, "\r\n");
 	send_to_char(buf,ch);
 
-	send_to_char("Syntax: autojoin <player1> <player2> <player3> ...\r\nExample: autojoin Urizen Apocalypse Wendy Scyld\r\n",ch);
+	send_to_char("\n\r\n\rSyntax: autojoin <player1> <player2> <player3> ...\r\nExample: autojoin Urizen Apocalypse Wendy Scyld\r\n",ch);
 	
 	return eFAILURE;
   }
