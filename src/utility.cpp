@@ -17,7 +17,7 @@
  *                         except Pir and Valk                             *
  * 10/19/2003   Onager     Took out super-secret hidey code from CAN_SEE() *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.95 2008/12/08 03:22:38 kkoons Exp $ */
+/* $Id: utility.cpp,v 1.96 2008/12/14 05:21:44 jhhudso Exp $ */
 
 extern "C"
 {
@@ -59,6 +59,8 @@ extern "C"
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <fcntl.h>
+#include <errno.h>
 
 #include <iostream>
 #include <sstream>
@@ -1781,23 +1783,23 @@ int get_line(FILE * fl, char *buf)
 
 
 void init_random()
-{ // Initial values.
-  FILE * the_file;
-  unsigned int seed;
-  char buf[MAX_STRING_LENGTH];
-  the_file = dc_fopen("/dev/urandom", "r");
-  if(!the_file)
-  {
-    log("Unable to open /dev/urandom to seed random number generation!!", 0, LOG_MISC);
-    srand(time(NULL));
+{ 
+    int urandom_fd;
+    unsigned int seed = time(0); //In case getting data from /dev/urandom fails
+    
+    if ((urandom_fd = open("/dev/urandom", O_RDONLY)) == -1) {
+	logf(0, LOG_MISC, "Unable to open /dev/urandom: %s", strerror(errno));
+    } else {
+	if (read(urandom_fd, &seed, sizeof(seed)) == -1) {
+	    logf(0, LOG_MISC, "Read error: %s", strerror(errno));
+	}
+
+	close(urandom_fd);
+    }
+    
+    logf(0, LOG_MISC, "Seeding random numbers with %u", seed);
+    srand(seed);
     return;
-  }
-  fscanf(the_file, "%u", &seed);
-  sprintf(buf, "Seeding random numbers with %u", seed);
-  log(buf, 0, LOG_MISC);
-  srand(seed);
-  dc_fclose(the_file);
-  return;
 }
 
 
