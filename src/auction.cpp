@@ -52,7 +52,7 @@ enum AuctionStates
 
 struct AuctionTicket
 {
-  int ritem;
+  int vitem;
   string item_name;
   unsigned int price;
   string seller;
@@ -199,14 +199,23 @@ void AuctionHouse::BuyItem(CHAR_DATA *ch, unsigned int ticket)
   sprintf(buf, "Added %d gold from sale of %s.", 
       Item_it->second.price - fee, Item_it->second.item_name.c_str());
   vault_log(buf, Item_it->second.seller.c_str());
+  int rnum = real_object(Item_it->second.vitem);
 
-  obj = clone_object(Item_it->second.ritem);
+  if(rnum < 0)
+  {
+    char buf[MAX_STRING_LENGTH];
+    sprintf(buf, "Major screw up in auction(buy)! Item %s[VNum %d] belonging to %s could not be created!", 
+                    Item_it->second.item_name.c_str(), Item_it->second.vitem, Item_it->second.seller.c_str());
+    log(buf, IMMORTAL, LOG_BUG);
+    return;
+  }  
+  obj = clone_object(rnum);
 
   if(!obj)
   {
     char buf[MAX_STRING_LENGTH];
     sprintf(buf, "Major screw up in auction(buy)! Item %s[RNum %d] belonging to %s could not be created!", 
-                    Item_it->second.item_name.c_str(), Item_it->second.ritem, Item_it->second.seller.c_str());
+                    Item_it->second.item_name.c_str(), rnum, Item_it->second.seller.c_str());
     log(buf, IMMORTAL, LOG_BUG);
     return;
   }
@@ -243,13 +252,25 @@ void AuctionHouse::CancelItem(CHAR_DATA *ch, unsigned int ticket)
     csendf(ch, "Ticket number %d doesn't belong to you.\n\r", ticket);
     return;
   }
-  obj = clone_object(Item_it->second.ritem);
+
+  int rnum = real_object(Item_it->second.vitem);
+
+  if(rnum < 0)
+  {
+    char buf[MAX_STRING_LENGTH];
+    sprintf(buf, "Major screw up in auction(cancel)! Item %s[VNum %d] belonging to %s could not be created!", 
+                    Item_it->second.item_name.c_str(), Item_it->second.vitem, Item_it->second.seller.c_str());
+    log(buf, IMMORTAL, LOG_BUG);
+    return;
+  }
+
+  obj = clone_object(rnum);
    
   if(!obj)
   {
     char buf[MAX_STRING_LENGTH];
     sprintf(buf, "Major screw up in auction(cancel)! Item %s[RNum %d] belonging to %s could not be created!", 
-                    Item_it->second.item_name.c_str(), Item_it->second.ritem, Item_it->second.seller.c_str());
+                    Item_it->second.item_name.c_str(), rnum, Item_it->second.seller.c_str());
     log(buf, IMMORTAL, LOG_BUG);
     return;
   }
@@ -291,6 +312,9 @@ void AuctionHouse::ListItems(CHAR_DATA *ch, ListOptions options)
     }
   }
 
+  if(i == 0)
+    send_to_char("There is nothing for sale!\n\r", ch);
+
   if(i >= 50)
    send_to_char("Maximum number of results reached.\n\r", ch);
 
@@ -315,7 +339,7 @@ void AuctionHouse::AddItem(CHAR_DATA *ch, OBJ_DATA *obj, unsigned int price)
   }
   
   AuctionTicket NewTicket;
-  NewTicket.ritem = obj->item_number;
+  NewTicket.vitem = obj_index[obj->item_number].virt;
   NewTicket.price = price;
   NewTicket.state = AUC_FOR_SALE;
   NewTicket.end_time = time(0) + auction_duration;
