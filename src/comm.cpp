@@ -511,7 +511,8 @@ void init_game(int port, int port2, int port3, int port4)
 
   unlink("died_in_bootup");
 
-  do_not_save_corpses = 0;
+  if (!bport)
+      do_not_save_corpses = 0;
   game_loop(mother_desc, other_desc, third_desc, fourth_desc);
   do_not_save_corpses = 1;
 

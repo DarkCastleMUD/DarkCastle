@@ -164,7 +164,7 @@ int write_corpse_to_disk(FILE *fp, struct obj_data *obj, int locate)
               "%s~\n"
               "%s~\n"
               "%s~\n"
-              "%d %d %d %d\n", 
+              "%d %d %d %d %d\n", 
               obj->name ? obj->name : "undefined",
               obj->short_description ? obj->short_description : "undefined",
               obj->description ? obj->description : "undefined",
@@ -172,7 +172,7 @@ int write_corpse_to_disk(FILE *fp, struct obj_data *obj, int locate)
               GET_OBJ_TYPE(obj),
               GET_OBJ_WEAR(obj),
               (GET_OBJ_WEIGHT(obj) < 0 ? 0 : GET_OBJ_WEIGHT(obj)),
-              GET_OBJ_COST(obj)
+	       GET_OBJ_COST(obj), obj->num_affects
         );
       /* Do we have affects? */   
       for (counter = 0; counter < obj->num_affects; counter++)
@@ -213,7 +213,7 @@ void save_corpses(void)
    FILE *fp;
    struct obj_data *i, *next;
    int location = 0;
-   char buf1[256];
+   char buf1[256] = { 0 };
    extern int do_not_save_corpses;
 
    if (do_not_save_corpses == 1) return;
@@ -258,17 +258,17 @@ void load_corpses(void)
   /* Oh, and a bunch of this code is from Patricks XAP obj's code    */
 
   FILE *fp;
-  char line[256];
+  char line[256] = { 0 };
   int t[15],zwei=0;
   int locate=0, j, k, nr, num_objs=0;
   struct obj_data *temp = NULL, *obj = NULL, *next_obj = NULL;
   struct extra_descr_data *new_descr;
-  char buf1[256], buf2[256], buf3[256];
+  char buf1[256] = {0}, buf2[256] = {0}, buf3[256] = {0};
   bool end = FALSE;
   int number = -1;
   struct obj_data *money;
   int debug = 0;
-
+  int alloc_num_affects = 0;
 
   if (!(fp = dc_fopen(CORPSE_FILE, "r"))) {
     sprintf(buf1, "SYSERR: READING CORPSE FILE %s in load_corpses", CORPSE_FILE);
@@ -372,8 +372,8 @@ void load_corpses(void)
           }
         }
         if (!get_line_new(fp, line) ||
-           (sscanf(line, "%d %d %d %d", t,t+1,t+2,t+3) != 4)) {
-           log ("load_corpses: Format error in first numeric line (expecting 4 args)", 0, LOG_MISC);
+	    (sscanf(line, "%d %d %d %d %d", t,t+1,t+2,t+3,t+4) != 5)) {
+           log ("load_corpses: Format error in first numeric line (expecting 5 args)", 0, LOG_MISC);
         } else {
           if (debug == 1) {
             sprintf(buf3, "   -FLAGS: %s", line);
@@ -384,7 +384,10 @@ void load_corpses(void)
         temp->obj_flags.wear_flags = t[1];
         temp->obj_flags.weight = (t[2] > 0 ? t[2] : 0);
         temp->obj_flags.cost = t[3];
-        
+        alloc_num_affects = t[4];
+
+	temp->affected = (obj_affected_type *) calloc(alloc_num_affects, sizeof(obj_affected_type));
+
         /* buf2 is error codes pretty much */
         sprintf(buf2, ", after numeric constants (expecting E/#xxx)");
       
@@ -433,6 +436,11 @@ void load_corpses(void)
               break;
           }
         }      /* exit our for loop */
+	if (alloc_num_affects != temp->num_affects) {
+	    logf(0, LOG_BUG, "alloc_num_affects: %d != temp->num_affects: %d",
+		 alloc_num_affects, temp->num_affects);
+	}
+
       } else {  /* exit our xap loop */
          if (nr == -1) {
            if (debug == 1) sprintf(buf3, "GOLD FOUND: %d total", t[1]);
@@ -482,13 +490,15 @@ void load_corpses(void)
 
 int get_line_new(FILE * fl, char *buf)
 {
-  char temp[256];
+  char temp[256] = {0};
   int lines = 0,a=0;
 
   while (!feof(fl))
   {
     switch ((temp[a++] = fgetc(fl)))
     {
+	case EOF:
+	    return 0;
 	case '|':
 	case '\n':
 	case '\0':
@@ -537,7 +547,7 @@ struct obj_data *read_object_new(int nr, int type)
 {
   struct obj_data *obj;
   int i;
-  char buf[256];
+  char buf[256] = { 0 };
 
   if (nr < 0) {
     perror("SYSERR: trying to create obj with negative num!");
