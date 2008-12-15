@@ -1,5 +1,4 @@
 /***************************************************************************
-  char buf[MAX_STRING_LENGTH];
 *	file: act_info.c , Implementation of commands.		 Part of DIKUMUD *
 *	Usage : Informative commands. 						*
 *	Copyright (C) 1990, 1991 - see 'license.doc' for complete information. *
@@ -13,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.174 2008/12/07 23:02:56 shane Exp $ */
+/* $Id: info.cpp,v 1.175 2008/12/15 06:09:30 jhhudso Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -366,64 +365,58 @@ void list_obj_to_char(struct obj_data *list, struct char_data *ch, int mode,
 
 void show_spells(char_data * i, char_data * ch)
 {
-   char send_buf[MAX_STRING_LENGTH];
-   char buffer[MAX_STRING_LENGTH];
-   int has_spells = 0;
+    string strbuf;
+    
+    if (IS_AFFECTED(i,AFF_SANCTUARY)) {
+	strbuf = strbuf + "$7aura! ";
+    }
+    
+    if (affected_by_spell(i,SPELL_PROTECT_FROM_EVIL)) {
+	strbuf = strbuf + "$R$6pulsing! ";
+    } else if (affected_by_spell(i, SPELL_PROTECT_FROM_GOOD)) {
+	strbuf = strbuf + "$R$6$Bpulsing! ";
+    }
 
-   if(IS_MOB(i))
-     sprintf(send_buf, "$B$7-$1%s has: ", GET_SHORT(i));
-   else sprintf(send_buf, "$B$7-$1%s has: ", i->name);
+    if (IS_AFFECTED(i,AFF_FIRESHIELD)) {
+	strbuf = strbuf + "$B$4flames! ";
+    }
+
+    if (IS_AFFECTED(i,AFF_FROSTSHIELD)) {
+	strbuf = strbuf + "$B$3frost! ";
+    }
+
+    if (IS_AFFECTED(i, AFF_ACID_SHIELD)) {
+	strbuf = strbuf + "$B$2acid! ";
+    }
+
+    if (affected_by_spell(i, SPELL_BARKSKIN)) {
+	strbuf = strbuf + "$R$5woody! ";
+    }
+
+    if (IS_AFFECTED(i,AFF_LIGHTNINGSHIELD)) {
+	strbuf = strbuf + "$B$5energy! ";
+    }
+
+    if (IS_AFFECTED(i,AFF_PARALYSIS)) {
+	strbuf = strbuf + "$R$2paralyze! ";
+    }
+
+    if (affected_by_spell(i, SPELL_STONE_SHIELD) || affected_by_spell(i, SPELL_GREATER_STONE_SHIELD)) {
+	strbuf = strbuf + "$B$0stones! ";
+    }
+
+    if (IS_AFFECTED(i, AFF_FLYING)) {
+	strbuf = strbuf + "$B$1flying!";
+    }
          
-   if (IS_AFFECTED(i,AFF_SANCTUARY)) {
-      sprintf(send_buf, "%s$7aura! ", send_buf);
-      has_spells = 1;
-   }
-   if (affected_by_spell(i,SPELL_PROTECT_FROM_EVIL)) {
-      sprintf(send_buf, "%s$R$6pulsing! ", send_buf);
-      has_spells = 1;
-   }
-   else if (affected_by_spell(i, SPELL_PROTECT_FROM_GOOD)) {
-       snprintf(buffer, MAX_STRING_LENGTH, "%s$R$6$Bpulsing! ", send_buf);
-       strncpy(send_buf, buffer, MAX_STRING_LENGTH);
-      has_spells = 1;
-   }
-   if (IS_AFFECTED(i,AFF_FIRESHIELD)) {
-      sprintf(send_buf, "%s$B$4flames! ", send_buf);
-      has_spells = 1;
-   }
-   if (IS_AFFECTED(i,AFF_FROSTSHIELD)) {
-      sprintf(send_buf, "%s$B$3frost! ", send_buf);
-      has_spells = 1;
-   }
-   if (IS_AFFECTED(i, AFF_ACID_SHIELD)) {
-      sprintf(send_buf, "%s$B$2acid! ", send_buf);
-      has_spells = 1;
-   }
-   if (affected_by_spell(i, SPELL_BARKSKIN)) {
-      sprintf(send_buf, "%s$R$5woody! ", send_buf);
-      has_spells = 1;
-   }
-   if (IS_AFFECTED(i,AFF_LIGHTNINGSHIELD)) {
-      sprintf(send_buf, "%s$B$5energy! ", send_buf);
-      has_spells = 1;
-   }
-   if (IS_AFFECTED(i,AFF_PARALYSIS)) {
-      sprintf(send_buf,"%s$R$2paralyze! ", send_buf);
-      has_spells = 1;
-   }
-   if (affected_by_spell(i, SPELL_STONE_SHIELD) || affected_by_spell(i, SPELL_GREATER_STONE_SHIELD)) {
-      sprintf(send_buf, "%s$B$0stones! ", send_buf);
-      has_spells = 1;
-   }
-   if (IS_AFFECTED(i, AFF_FLYING)) {
-      sprintf(send_buf, "%s$B$1flying!", send_buf);
-      has_spells = 1;
-   }
-         
-   if(has_spells) {
-      sprintf(send_buf, "%s$R\r\n", send_buf);
-      send_to_char(send_buf, ch);
-   }
+    if (!strbuf.empty()) {
+	if(IS_MOB(i))
+	    strbuf = string("$B$7-$1") + GET_SHORT(i) + " has: " + strbuf + "$R\r\n";
+	else
+	    strbuf = string("$B$7-$1") + GET_NAME(i) + " has: " + strbuf + "$R\r\n";
+
+	send_to_char(strbuf.c_str(), ch);
+    }
 }
 
 void show_char_to_char(struct char_data *i, struct char_data *ch, int mode)
