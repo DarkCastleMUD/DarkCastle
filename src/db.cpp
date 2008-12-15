@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.183 2008/12/12 08:04:41 kkoons Exp $ */
+/* $Id: db.cpp,v 1.184 2008/12/15 11:10:35 kkoons Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -64,6 +64,7 @@ extern "C"
 
 int load_new_help(FILE *fl, int reload, struct char_data *ch);
 void load_vaults();
+void load_auction_tickets();
 void load_corpses(void);
 extern int fflush(FILE *);
 extern int _filbuf(FILE *);
@@ -700,6 +701,9 @@ void boot_db(void)
 
     log ("Loading player hints.", 0, LOG_MISC);
     load_hints();
+
+    log ("Loading auction tickets.", 0, LOG_MISC);
+    load_auction_tickets();
 
     mud_is_booting = FALSE;
 }
