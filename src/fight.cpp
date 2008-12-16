@@ -20,7 +20,7 @@
  * 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead *
  * of just race stuff                                                     *
  **************************************************************************
- * $Id: fight.cpp,v 1.520 2008/12/12 18:36:31 kkoons Exp $               *
+ * $Id: fight.cpp,v 1.521 2008/12/16 05:22:55 kkoons Exp $               *
  **************************************************************************/
 
 extern "C"
@@ -5719,8 +5719,6 @@ void do_pkill(CHAR_DATA *ch, CHAR_DATA *victim, int type, bool vict_is_attacker)
       {
         if(GET_PKILLS(ch) > 0)
           GET_PKILLS(ch) -= 1;
-        if(GET_PKILLS_LOGIN(ch) > 0)
-          GET_PKILLS_LOGIN(ch)       -= 1;
       }
       else if (GET_LEVEL(victim) > PKILL_COUNT_LIMIT)
       {
@@ -5757,8 +5755,6 @@ void do_pkill(CHAR_DATA *ch, CHAR_DATA *victim, int type, bool vict_is_attacker)
        {
         if(GET_PKILLS(ch) > 0)
           GET_PKILLS(ch) -= 1;
-        if(GET_PKILLS_LOGIN(ch) > 0)
-          GET_PKILLS_LOGIN(ch)       -= 1;
        }
        else if (GET_LEVEL(victim) > PKILL_COUNT_LIMIT)
        {
@@ -5794,8 +5790,6 @@ void do_pkill(CHAR_DATA *ch, CHAR_DATA *victim, int type, bool vict_is_attacker)
        {
         if(GET_PKILLS(ch) > 0)
           GET_PKILLS(ch) -= 1;
-        if(GET_PKILLS_LOGIN(ch) > 0)
-          GET_PKILLS_LOGIN(ch)       -= 1;
        }
       else if (GET_LEVEL(victim) > PKILL_COUNT_LIMIT)
        {
