@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: db.h,v 1.30 2008/12/13 01:38:07 kkoons Exp $ */
+/* $Id: db.h,v 1.31 2008/12/17 10:47:47 kkoons Exp $ */
 #ifndef DB_H_
 #define DB_H_
 
@@ -85,9 +85,11 @@ enum Continents
   SORPIGAL_CONTINENT,	//2
   FAR_REACH,		//3	
   DIAMOND_ISLE,		//4
-  THE_UNDERDARK,	//5
-  OCEAN,		//6
-  OTHER_CONTINENT,	//7
+  UNDERDARK,    	//5
+  BEHIND_THE_MIRROR,	//6
+  PLANES_OF_EXISTANCE,	//7
+  FORBIDDEN_ISLAND,	//8
+  OTHER_CONTINENT,	//9
   MAX_CONTINENTS 	//for iteration
 };
 
