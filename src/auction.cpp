@@ -31,6 +31,7 @@ using namespace std;
 
 struct obj_data * search_char_for_item(char_data * ch, int16 item_number, bool wearingonly = FALSE);
 extern struct index_data *obj_index;
+extern struct index_data *mob_index;
 extern CWorld world;
 //extern struct descriptor_data *descriptor_list;
 
@@ -833,6 +834,7 @@ void AuctionHouse::AddItem(CHAR_DATA *ch, OBJ_DATA *obj, unsigned int price, str
   strncpy(buf, buyer.c_str(), 19);
   buf[19] = '\0';
   unsigned int fee;
+  bool advertise = false;
 
   //taken from linkload, formatting of player name
   char *c;
@@ -920,7 +922,10 @@ void AuctionHouse::AddItem(CHAR_DATA *ch, OBJ_DATA *obj, unsigned int price, str
   NewTicket.end_time = time(0) + auction_duration;
   NewTicket.seller = GET_NAME(ch);
   NewTicket.item_name = obj->short_description;
-  NewTicket.buyer = buf;
+  if(!strcmp(buf, "advertise"))
+    NewTicket.buyer = buf;
+  else
+    advertise = true;
 
   Items_For_Sale[cur_index] = NewTicket;
   Save();
@@ -933,32 +938,29 @@ void AuctionHouse::AddItem(CHAR_DATA *ch, OBJ_DATA *obj, unsigned int price, str
     csendf(ch, "You are now selling %s to %s for %d coins.\n\r", 
               obj->short_description, buyer.c_str(), price);
   }
-/*
-  char auc_buf[MAX_STRING_LENGTH];
-  snprintf(auc_buf, MAX_STRING_LENGTH, "%s is now selling %s for %d coins.",
-                         GET_NAME(ch), obj->short_description, price);
-
-
-  act(auc_buf, ch, 0, 0, TO_CHAR, 0);
-
-  bool silence = FALSE;
-  struct descriptor_data *i;
-  OBJ_DATA *tmp_obj;
-  for(i = descriptor_list; i; i = i->next)
-    if(i->character != ch && !i->connected &&
-        (IS_SET(i->character->misc, CHANNEL_AUCTION)) &&
-             !is_ignoring(i->character, ch)) 
+ 
+  if(advertise)
+  {
+    char_data * find_mob_in_room(struct char_data *ch, int iFriendId);
+    char auc_buf[MAX_STRING_LENGTH];
+    CHAR_DATA *Broker = find_mob_in_room(ch, 5258);
+    if(Broker)
     {
-       for(tmp_obj = world[i->character->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
-         if(obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER) 
-         {
-            silence = TRUE;
-            break;
-         }
-         if(!silence) act(auc_buf, ch, 0, i->character, TO_VICT, 0);
+      if(GET_GOLD(ch) > 200000)
+      {
+        GET_GOLD(ch) -= 200000;
+        send_to_char("You pay the 200000 gold to advertise your item.\n\r", ch);
+        snprintf(auc_buf, MAX_STRING_LENGTH, "$7$B%s$6$B has just posted %s $6$Bfor sale for $R$5%d$6$B coins.",
+                         GET_NAME(ch), obj->short_description, price);
+        do_auction(Broker, auc_buf, 9);
+      }
+      else
+        send_to_char("You need 200000 gold to advertise an item.\n\r", ch);
     }
-*/
-
+    else
+      send_to_char("The Consignment Broker couldn't auction. Contact an imm.\n\r", ch);
+  }
+ 
   extract_obj(obj);
   do_save(ch, "", 9);
   return;
