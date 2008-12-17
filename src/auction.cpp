@@ -9,19 +9,18 @@ extern "C"
 #include <ctype.h>
 #include <string.h>
 }
-//#include <room.h>
 #include <obj.h>
 #include <spells.h>
 #include <player.h> 
-#include <vault.h>
-//#include <connect.h> 
 #include <terminal.h> 
 #include <levels.h> 
 #include <character.h> 
 #include <utility.h> 
 #include <assert.h>
 #include <db.h>
+#include <vault.h>
 #include <returnvals.h>
+#include <interp.h>
 #include <string>
 #include <map>
 #include <queue>
@@ -33,7 +32,7 @@ using namespace std;
 struct obj_data * search_char_for_item(char_data * ch, int16 item_number, bool wearingonly = FALSE);
 extern struct index_data *obj_index;
 extern CWorld world;
-extern struct descriptor_data *descriptor_list;
+//extern struct descriptor_data *descriptor_list;
 
 enum ListOptions
 {
@@ -47,7 +46,9 @@ enum ListOptions
 enum AuctionStates
 {
   AUC_FOR_SALE = 0,
-  AUC_EXPIRED
+  AUC_EXPIRED,
+  AUC_SOLD,
+  AUC_DELETED
 };
 
 /*
@@ -73,12 +74,14 @@ public:
   AuctionHouse(string in_file);
   AuctionHouse();
   ~AuctionHouse();
-  void CollectExpired(CHAR_DATA *ch, unsigned int ticket = 0);
+  void CollectTickets(CHAR_DATA *ch, unsigned int ticket = 0);
+  void CancelAll(CHAR_DATA *ch);
   void AddItem(CHAR_DATA *ch, OBJ_DATA *obj, unsigned int price, string buyer);
-  void CancelItem(CHAR_DATA *ch, unsigned int ticket);
+  void RemoveTicket(CHAR_DATA *ch, unsigned int ticket);
   void BuyItem(CHAR_DATA *ch, unsigned int ticket);
   void ListItems(CHAR_DATA *ch, ListOptions options, string name, unsigned int to, unsigned int from);
   void CheckExpire();
+  void Identify(CHAR_DATA *ch, unsigned int ticket);
   void AddRoom(CHAR_DATA *ch, int room);
   void RemoveRoom(CHAR_DATA *ch, int room);
   void ListRooms(CHAR_DATA *ch);
@@ -86,6 +89,11 @@ public:
   void Save();
   void Load();  
 private:
+  bool CanSellMore(CHAR_DATA *ch);
+  bool IsOkToSell(OBJ_DATA *obj);
+  bool IsWearable(CHAR_DATA *ch, int vnum);
+  bool IsNoTrade(int vnum);
+  bool IsExist(string name, int vnum);
   bool IsName(string name, int vnum);
   bool IsLevel(unsigned int to, unsigned int from, int vnum);
   map<int, int> auction_rooms;
@@ -93,6 +101,154 @@ private:
   string file_name;
   map<unsigned int, AuctionTicket> Items_For_Sale;
 };
+
+/*
+Is the player selling the max # of items already?
+*/
+bool AuctionHouse::CanSellMore(CHAR_DATA *ch)
+{
+  struct vault_data *vault;
+  int max_items;
+  int items_sold = 0;
+
+  if (!(vault = has_vault(GET_NAME(ch)))) 
+    return false;
+
+  max_items = vault->size / 100;
+
+  map<unsigned int, AuctionTicket>::iterator Item_it;
+  
+  for(Item_it = Items_For_Sale.begin(); Item_it != Items_For_Sale.end(); Item_it++)
+  {
+    if(!Item_it->second.seller.compare(GET_NAME(ch)))
+      items_sold++;
+  }
+
+  return (items_sold < max_items);
+}
+
+/*
+Is item type ok to sell?
+*/
+bool AuctionHouse::IsOkToSell(OBJ_DATA *obj)
+{
+  switch(obj->obj_flags.type_flag)
+  {
+    case ITEM_LIGHT:
+    case ITEM_SCROLL:
+    case ITEM_WAND:
+    case ITEM_STAFF:
+    case ITEM_WEAPON:
+    case ITEM_FIREWEAPON:
+    case ITEM_MISSILE:
+    case ITEM_TREASURE:
+    case ITEM_ARMOR:
+    case ITEM_POTION:
+    case ITEM_CONTAINER:
+    case ITEM_DRINKCON:
+    case ITEM_INSTRUMENT:
+    case ITEM_LOCKPICK:
+    case ITEM_BOAT:
+    return true;
+    break;
+    default:
+    return false;
+    break;
+  }
+
+  return false;
+}
+
+
+/*
+Identify an item.
+*/
+void AuctionHouse::Identify(CHAR_DATA *ch, unsigned int ticket)
+{
+  int spell_identify(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill);
+  map<unsigned int, AuctionTicket>::iterator Item_it;
+
+  if((Item_it = Items_For_Sale.find(ticket)) == Items_For_Sale.end())
+  {
+    csendf(ch, "Ticket number %d doesn't seem to exist.\n\r", ticket);
+    return;
+  }
+
+  if(!Item_it->second.buyer.empty() && Item_it->second.buyer.compare(GET_NAME(ch)))
+  {
+    csendf(ch, "Ticket number %d is private.\n\r", ticket);
+    return;
+  }
+
+  if(GET_GOLD(ch) < 6000)
+  {
+    send_to_char("The broker charges 6000 gold to identify items.\n\r", ch);
+    return;
+  }
+
+  int nr = real_object(Item_it->second.vitem);
+  if(nr < 0)
+  {
+    csendf(ch, "There is a problem with ticket %d. Please tell an imm.\n\r", ticket);
+    return;
+  }
+
+  OBJ_DATA *obj = (struct obj_data *)(obj_index[nr].item);
+
+  GET_GOLD(ch) -= 6000;
+  send_to_char("You pay the broker 6000 gold to identify the item.\n\r", ch);
+
+  spell_identify(60, ch, NULL, obj, 100);
+
+  return;
+ 
+}
+
+
+/*
+Is the item wearable by the player?
+*/
+bool AuctionHouse::IsWearable(CHAR_DATA *ch, int vnum)
+{
+  int class_restricted(struct char_data *ch, struct obj_data *obj);
+  int size_restricted(struct char_data *ch, struct obj_data *obj);
+  int nr = real_object(vnum);
+
+  if(nr < 0)
+    return true;
+ 
+  OBJ_DATA *obj = (struct obj_data *)(obj_index[nr].item);
+  return !(class_restricted(ch, obj) || size_restricted(ch, obj));
+}
+
+
+
+/*
+Is the player already selling the unique item?
+*/
+bool AuctionHouse::IsExist(string name, int vnum)
+{
+  map<unsigned int, AuctionTicket>::iterator Item_it;
+  for(Item_it = Items_For_Sale.begin(); Item_it != Items_For_Sale.end(); Item_it++)
+  {
+    if(Item_it->second.vitem == vnum)
+      return true;
+  }  
+  return false;
+}
+
+/*
+Is the item no_trade?
+*/
+bool AuctionHouse::IsNoTrade(int vnum)
+{
+  int nr = real_object(vnum);
+  if(nr < 0)
+    return false;
+  return IS_SET(((struct obj_data *)(obj_index[nr].item))->obj_flags.more_flags, ITEM_NO_TRADE);;
+  
+}
+
 
 /*
 SEARCY BY LEVEL
@@ -148,9 +304,8 @@ void AuctionHouse::ListRooms(CHAR_DATA *ch)
   send_to_char("Auction Rooms:", ch);
 
   for(room_it = auction_rooms.begin(); room_it != auction_rooms.end(); room_it++)
-  {
     csendf(ch, " %d", room_it->first); 
-  }
+  
   send_to_char("\n", ch);
   return;
 }
@@ -227,15 +382,15 @@ void AuctionHouse::Load()
     fscanf(the_file, "%d\n", &InTicket.vitem);
     fgets(buf, MAX_STRING_LENGTH, the_file);
     nl = strrchr(buf, '\n');
-    if(nl) *nl = '\0';
+    if(nl) *nl = '\0'; //fgets grabs newline too, removing it here
     InTicket.item_name = buf;
     fgets(buf, MAX_STRING_LENGTH, the_file);
     nl = strrchr(buf, '\n');
-    if(nl) *nl = '\0';
+    if(nl) *nl = '\0'; //fgets grabs newline too, removing it here
     InTicket.seller = buf;
     fgets(buf, MAX_STRING_LENGTH, the_file);
     nl = strrchr(buf, '\n');
-    if(nl) *nl = '\0';
+    if(nl) *nl = '\0'; //fgets grabs newline too, removing it here
     InTicket.buyer = buf; 
     fscanf(the_file, "%u\n", &state);
     InTicket.state = (AuctionStates)state;
@@ -321,10 +476,37 @@ AuctionHouse::AuctionHouse(string in_file)
   file_name = in_file;
 }
 
+
+/*
+CANCEL ALL
+*/
+void AuctionHouse::CancelAll(CHAR_DATA *ch)
+{
+  map<unsigned int, AuctionTicket>::iterator Item_it;
+  queue<unsigned int> tickets_to_cancel;
+  for(Item_it = Items_For_Sale.begin(); Item_it != Items_For_Sale.end(); Item_it++)
+  {
+    if(!Item_it->second.seller.compare(GET_NAME(ch)))
+      tickets_to_cancel.push(Item_it->first);    
+  }
+  if(tickets_to_cancel.empty())
+  {
+    send_to_char("You have no tickets to cancel!\n\r", ch);
+    return;
+  }
+  while(!tickets_to_cancel.empty())
+  {  
+      RemoveTicket(ch, tickets_to_cancel.front());
+      tickets_to_cancel.pop();
+  }
+  return;
+
+}
+
 /*
 COLLECT EXPIRED
 */
-void AuctionHouse::CollectExpired(CHAR_DATA *ch, unsigned int ticket)
+void AuctionHouse::CollectTickets(CHAR_DATA *ch, unsigned int ticket)
 {
   map<unsigned int, AuctionTicket>::iterator Item_it;
   if(ticket > 0)
@@ -337,25 +519,32 @@ void AuctionHouse::CollectExpired(CHAR_DATA *ch, unsigned int ticket)
          csendf(ch, "Ticket %d doesn't seem to belong to you.\n\r", ticket);
          return;
        }
-       if(Item_it->second.state != AUC_EXPIRED)
+       if(Item_it->second.state != AUC_EXPIRED && Item_it->second.state != AUC_SOLD)
        {
-         csendf(ch, "Ticket %d doesn't seem to be expired.\n\r", ticket);
+         csendf(ch, "Ticket %d isn't collectible!.\n\r", ticket);
          return;
        }
      }
-     CancelItem(ch, ticket);
+     RemoveTicket(ch, ticket);
      return;
   }
-  queue<unsigned int> tickets_to_cancel;
+
+  queue<unsigned int> tickets_to_remove;
   for(Item_it = Items_For_Sale.begin(); Item_it != Items_For_Sale.end(); Item_it++)
   {
-    if(Item_it->second.state == AUC_EXPIRED && !Item_it->second.seller.compare(GET_NAME(ch)))
-      tickets_to_cancel.push(Item_it->first);    
+    if((Item_it->second.state == AUC_EXPIRED || Item_it->second.state == AUC_SOLD)
+       && !Item_it->second.seller.compare(GET_NAME(ch)))
+      tickets_to_remove.push(Item_it->first);    
   }
-  while(!tickets_to_cancel.empty())
+  if(tickets_to_remove.empty())
+  {
+    send_to_char("You have nothing to collect!\n\r", ch);
+    return;
+  }
+  while(!tickets_to_remove.empty())
   {  
-      CancelItem(ch, tickets_to_cancel.front());
-      tickets_to_cancel.pop();
+      RemoveTicket(ch, tickets_to_remove.front());
+      tickets_to_remove.pop();
   }
   return;
 }
@@ -395,9 +584,6 @@ void AuctionHouse::BuyItem(CHAR_DATA *ch, unsigned int ticket)
   map<unsigned int, AuctionTicket>::iterator Item_it;
   OBJ_DATA *obj;
   CHAR_DATA *vict;
-  struct vault_data *vault;
-  unsigned int fee;
-  char buf[MAX_STRING_LENGTH];
 
   Item_it = Items_For_Sale.find(ticket);
   if(Item_it == Items_For_Sale.end())
@@ -440,51 +626,49 @@ void AuctionHouse::BuyItem(CHAR_DATA *ch, unsigned int ticket)
     return;
   }
 
-  if (IS_SET(obj->obj_flags.more_flags, ITEM_UNIQUE) && search_char_for_item(ch, obj->item_number)) { 
+  if (IS_SET(obj->obj_flags.more_flags, ITEM_UNIQUE) && search_char_for_item(ch, obj->item_number)) 
+  { 
     send_to_char("Why would you want another one of those?\r\n", ch);
     return;
-  } 
-
-
-  fee = (unsigned int)((double)Item_it->second.price * 0.025);
-
-  if (!(vault = has_vault(Item_it->second.seller.c_str()))) 
-  { 
-    sprintf(buf, "Major screw up in auction! Couldn't find %s's vault to deposit %d coins!", 
-                  Item_it->second.seller.c_str(), Item_it->second.price-fee);
-    log(buf, IMMORTAL, LOG_BUG);
-    return;
   }
-  
+ 
+  if (IS_SET(obj->obj_flags.more_flags, ITEM_NO_TRADE))
+  {
+    OBJ_DATA *no_trade_obj;
+    int nr = real_object(27909);
+
+    no_trade_obj = search_char_for_item(ch, nr);
+
+    if(!no_trade_obj) 
+    { //27909 == wingding right now (notrade transfer token)
+      if(nr > 0)
+        csendf(ch, "You need to have \"%s\" to buy a no_trade item.\r\n", ((struct obj_data *)(obj_index[nr].item))->short_description);
+      return;
+    }
+    else
+    {
+      csendf(ch, "You give your %s to the broker.\n\r", no_trade_obj->short_description);
+      extract_obj(no_trade_obj);
+    }
+  } 
    
   GET_GOLD(ch) -= Item_it->second.price;
-  vault->gold += (Item_it->second.price - fee);
 
   if((vict = get_active_pc(Item_it->second.seller.c_str()))) 
-      csendf(vict, "Your auction of %s has been purchased.\n\r", Item_it->second.item_name.c_str());
+      csendf(vict, "%s just purchased your %s for %u coins.\n\r", GET_NAME(ch), Item_it->second.item_name.c_str(), Item_it->second.price);
 
-  sprintf(buf, "Added %d gold from sale of %s.", 
-        Item_it->second.price - fee, Item_it->second.item_name.c_str());
-  vault_log(buf, Item_it->second.seller.c_str());
- 
+  csendf(ch, "You have purchased %s for %u coins.\n\r", obj->short_description, Item_it->second.price);
 
-  csendf(ch, "You have purchased %s.\n\r", obj->short_description);
-
-  if(1 != Items_For_Sale.erase(ticket))
-  {
-    char buf[MAX_STRING_LENGTH];
-    sprintf(buf, "Major screw up in auction(buy)! Ticket %d belonging to %s could not be removed!", 
-                    ticket, Item_it->second.seller.c_str());
-    log(buf, IMMORTAL, LOG_BUG);
-    return;
-  }
-  obj_to_char(obj, ch); 
+  Item_it->second.state = AUC_SOLD;
+  Save(); 
+  obj_to_char(obj, ch);
+  do_save(ch, "", 9);
 }
 
 /*
 CANCEL ITEM
 */
-void AuctionHouse::CancelItem(CHAR_DATA *ch, unsigned int ticket)
+void AuctionHouse::RemoveTicket(CHAR_DATA *ch, unsigned int ticket)
 {
   map<unsigned int, AuctionTicket>::iterator Item_it;
   OBJ_DATA *obj;
@@ -501,46 +685,63 @@ void AuctionHouse::CancelItem(CHAR_DATA *ch, unsigned int ticket)
     return;
   }
 
-  int rnum = real_object(Item_it->second.vitem);
-
-  if(rnum < 0)
+  switch(Item_it->second.state)
   {
-    char buf[MAX_STRING_LENGTH];
-    sprintf(buf, "Major screw up in auction(cancel)! Item %s[VNum %d] belonging to %s could not be created!", 
-                    Item_it->second.item_name.c_str(), Item_it->second.vitem, Item_it->second.seller.c_str());
-    log(buf, IMMORTAL, LOG_BUG);
-    return;
-  }
-
-  obj = clone_object(rnum);
-   
-  if(!obj)
-  {
-    char buf[MAX_STRING_LENGTH];
-    sprintf(buf, "Major screw up in auction(cancel)! Item %s[RNum %d] belonging to %s could not be created!", 
-                    Item_it->second.item_name.c_str(), rnum, Item_it->second.seller.c_str());
-    log(buf, IMMORTAL, LOG_BUG);
-    return;
-  }
-
-  csendf(ch, "You are returned your %s.\n\r", obj->short_description);
-
-  if(IS_SET(obj->obj_flags.more_flags, ITEM_NO_TRADE))
-  {
-    int rwingding = real_object(27909); //wingding
-    OBJ_DATA *wingding = clone_object(rwingding);
-    if(!wingding)
+    case AUC_SOLD:
     {
-      char buf[MAX_STRING_LENGTH];
-      sprintf(buf, "Major screw up in auction(cancel)! A Wingding for %s could not be created!", 
-                    Item_it->second.seller.c_str());
-      log(buf, IMMORTAL, LOG_BUG);
-      return;
+      unsigned int fee = (unsigned int)((double)Item_it->second.price * 0.025);
+      csendf(ch, "The Broker hands you %u gold coins from your sale of %s.\n\r"
+               "He pockets %u gold as a brokers fee.\n\r", 
+          (Item_it->second.price - fee), Item_it->second.item_name.c_str(), fee);
+      GET_GOLD(ch) += (Item_it->second.price - fee);
     }
-    obj_to_char(wingding, ch);
-    csendf(ch, "You are returned your %s.\n\r", wingding->short_description);
-  }
-  
+    break;
+    case AUC_EXPIRED: //intentional fallthrough
+    case AUC_FOR_SALE:
+    {
+      int rnum = real_object(Item_it->second.vitem);
+
+      if(rnum < 0)
+      {
+        char buf[MAX_STRING_LENGTH];
+        sprintf(buf, "Major screw up in auction(cancel)! Item %s[VNum %d] belonging to %s could not be created!", 
+                    Item_it->second.item_name.c_str(), Item_it->second.vitem, Item_it->second.seller.c_str());
+        log(buf, IMMORTAL, LOG_BUG);
+        return;
+      }
+
+      obj = clone_object(rnum);
+   
+      if(!obj)
+      {
+        char buf[MAX_STRING_LENGTH];
+        sprintf(buf, "Major screw up in auction(cancel)! Item %s[RNum %d] belonging to %s could not be created!", 
+                    Item_it->second.item_name.c_str(), rnum, Item_it->second.seller.c_str());
+        log(buf, IMMORTAL, LOG_BUG);
+        return;
+      }
+
+      csendf(ch, "You are returned your %s.\n\r", obj->short_description);
+      obj_to_char(obj, ch); 
+     }
+     break;
+     case AUC_DELETED:
+     {
+       char buf[MAX_STRING_LENGTH];
+       sprintf(buf, "%s just tried to cheat and collect ticket %u which didn't get erased properly!", GET_NAME(ch), ticket);
+       log(buf, IMMORTAL, LOG_BUG);
+       Items_For_Sale.erase(ticket);
+       return;
+     }
+     break;
+     default: 
+       log("Default case reached in Removeticket, contact a coder!", IMMORTAL, LOG_BUG);
+     break;
+   }
+
+  Item_it->second.state = AUC_DELETED; //just a safety precaution
+  do_save(ch, "", 9);
+
   if(1 != Items_For_Sale.erase(ticket))
   {
     char buf[MAX_STRING_LENGTH];
@@ -549,8 +750,9 @@ void AuctionHouse::CancelItem(CHAR_DATA *ch, unsigned int ticket)
     log(buf, IMMORTAL, LOG_BUG);
     return;
   }
-  obj_to_char(obj, ch); 
+
   Save();
+  return;
 }
 
 /*
@@ -561,9 +763,10 @@ void AuctionHouse::ListItems(CHAR_DATA *ch, ListOptions options, string name, un
   map<unsigned int, AuctionTicket>::iterator Item_it;
   int i;
   string output_buf;
+  string state_output;
   char buf[MAX_STRING_LENGTH];
   
-  send_to_char("Ticket-Seller-------Price-------Status---Item---------------------------\n\r", ch);
+  send_to_char("Ticket-Seller-------Price------Status--T--Item---------------------------\n\r", ch);
   for(i = 0, Item_it = Items_For_Sale.begin(); (i < 50) && (Item_it != Items_For_Sale.end()); Item_it++)
   {
     if(
@@ -578,10 +781,25 @@ void AuctionHouse::ListItems(CHAR_DATA *ch, ListOptions options, string name, un
       if(Item_it->second.state == AUC_EXPIRED && options != LIST_MINE)
         continue;
       i++;
-      sprintf(buf, "\n\r%05d) %-12s $5%-11d$R %s  %-30s\n\r", 
+      switch(Item_it->second.state)
+      {
+        case AUC_SOLD:
+          state_output = "$1SOLD$R   ";
+        break;
+        case AUC_FOR_SALE:
+          state_output = "$2ACTIVE$R ";
+        break;
+        case AUC_EXPIRED:
+          state_output = "$4EXPIRED$R";
+        break;
+        default:
+          state_output = "$7ERROR$R  ";
+        break; 
+      }
+      sprintf(buf, "\n\r%05d) $7$B%-12s$R $5%-10d$R %s %s %s%-30s\n\r", 
                Item_it->first, Item_it->second.seller.c_str(), Item_it->second.price,
-               (Item_it->second.state == AUC_EXPIRED)?"$4EXPIRED$R": "$2ACTIVE$R ", 
-               Item_it->second.item_name.c_str());
+               state_output.c_str(), IsNoTrade(Item_it->second.vitem) ? "$4N$R" : " ",
+               IsWearable(ch, Item_it->second.vitem) ? " " : "$4*$R", Item_it->second.item_name.c_str());
       output_buf += buf;
     }
   }
@@ -592,7 +810,18 @@ void AuctionHouse::ListItems(CHAR_DATA *ch, ListOptions options, string name, un
   if(i >= 50)
    send_to_char("Maximum number of results reached.\n\r", ch);
 
+
   page_string(ch->desc, output_buf.c_str(), 1);
+  if(options == LIST_MINE)
+  {
+    struct vault_data *vault;
+    if ((vault = has_vault(GET_NAME(ch)))) 
+    {
+       int max_items = vault->size / 100;
+       csendf(ch, "You using %d of your %d available tickets.\n\r", i, max_items);
+    }
+  }
+  return;
 }
 
 /*
@@ -621,7 +850,24 @@ void AuctionHouse::AddItem(CHAR_DATA *ch, OBJ_DATA *obj, unsigned int price, str
     return;
   }
 
-  if (IS_SET(obj->obj_flags.extra_flags, ITEM_NOSAVE))
+  if(!IsOkToSell(obj))
+  {
+    send_to_char("You can't sell that type of item here!\n\r", ch);
+    return;
+  }
+
+  if(!CanSellMore(ch))
+  {
+    struct vault_data *vault;
+    if ((vault = has_vault(GET_NAME(ch)))) 
+    {
+       int max_items = vault->size / 100;
+       csendf(ch, "You cannot list more than %d items!\n\r", max_items);
+    }
+    return;
+  }
+
+  if(IS_SET(obj->obj_flags.extra_flags, ITEM_NOSAVE))
   {
     send_to_char("You can't sell that item!\n\r", ch);
     return;
@@ -658,17 +904,10 @@ void AuctionHouse::AddItem(CHAR_DATA *ch, OBJ_DATA *obj, unsigned int price, str
     return;
   }
 
-  if(IS_SET(obj->obj_flags.more_flags, ITEM_NO_TRADE))
+  if (IS_SET(obj->obj_flags.more_flags, ITEM_UNIQUE) && IsExist(GET_NAME(ch), obj_index[obj->item_number].virt))
   {
-    OBJ_DATA *wingding = get_obj_in_list_vis(ch, "wingding", ch->carrying);
-
-    if(!wingding)
-    {
-      send_to_char("You need a wingding to sell no_trade items!\n\r", ch);
-      return;
-    }
-    csendf(ch, "You turn in your %s to the Broker.\n\r", wingding->short_description);
-    extract_obj(wingding);
+    csendf(ch, "You're selling one %s already!\n\r", obj->short_description);
+    return;
   }
 
   GET_GOLD(ch) -= fee;
@@ -721,6 +960,7 @@ void AuctionHouse::AddItem(CHAR_DATA *ch, OBJ_DATA *obj, unsigned int price, str
 */
 
   extract_obj(obj);
+  do_save(ch, "", 9);
   return;
 
 }
@@ -836,12 +1076,12 @@ int do_vend(CHAR_DATA *ch, char *argument, int cmd)
     }
     if(!strcmp(buf, "all"))
     {
-      TheAuctionHouse.CollectExpired(ch);
+      TheAuctionHouse.CollectTickets(ch);
       return eSUCCESS;
     }
     if(atoi(buf) > 0)
     {
-      TheAuctionHouse.CollectExpired(ch, atoi(buf));
+      TheAuctionHouse.CollectTickets(ch, atoi(buf));
       return eSUCCESS;
     }
     
@@ -871,7 +1111,12 @@ int do_vend(CHAR_DATA *ch, char *argument, int cmd)
       send_to_char("Cancel what?\n\rSyntax: vend cancel <ticket#>\n\r", ch);
       return eSUCCESS;
     }
-    TheAuctionHouse.CancelItem(ch, atoi(buf));
+    if(!strcmp(buf, "all")) //stupid cancel all didn't fit my design, but the boss wanted it
+    {
+      TheAuctionHouse.CancelAll(ch);
+      return eSUCCESS;
+    }
+    TheAuctionHouse.RemoveTicket(ch, atoi(buf));
     return eSUCCESS;
   }
  
@@ -936,6 +1181,20 @@ int do_vend(CHAR_DATA *ch, char *argument, int cmd)
     TheAuctionHouse.AddItem(ch, obj, price, buf);
     return eSUCCESS;    
   }
+
+  /*IDENTIFY*/
+  if(!strcmp(buf, "identify"))
+  {
+    argument = one_argument(argument, buf);
+    if(!*buf)
+    {
+       send_to_char("Identify what?\n\rSyntax: vend identify <ticket>\n\r", ch);
+       return eSUCCESS;
+    }
+    TheAuctionHouse.Identify(ch, atoi(buf));
+    return eSUCCESS;
+  }
+
 
   /*ADD ROOM*/
   if(GET_LEVEL(ch) >= 108 && !strcmp(buf, "addroom"))
