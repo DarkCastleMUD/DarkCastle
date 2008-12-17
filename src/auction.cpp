@@ -1015,7 +1015,7 @@ int do_vend(CHAR_DATA *ch, char *argument, int cmd)
 
   if(!*buf)
   {
-    send_to_char("Syntax: vend <buy | sell | list | cancel | collect>\n\r", ch);
+    send_to_char("Syntax: vend <buy | sell | list | cancel | collect | identify>\n\r", ch);
     return eSUCCESS;       
 
   }
@@ -1108,7 +1108,7 @@ int do_vend(CHAR_DATA *ch, char *argument, int cmd)
     argument = one_argument(argument, buf);
     if(!*buf)
     {
-      send_to_char("Cancel what?\n\rSyntax: vend cancel <ticket#>\n\r", ch);
+      send_to_char("Cancel what?\n\rSyntax: vend cancel <all | ticket#>\n\r", ch);
       return eSUCCESS;
     }
     if(!strcmp(buf, "all")) //stupid cancel all didn't fit my design, but the boss wanted it
@@ -1230,6 +1230,6 @@ int do_vend(CHAR_DATA *ch, char *argument, int cmd)
   }
 
 
-  send_to_char("Do what?\n\rSyntax: vend <buy | sell | list | cancel | collect>\n\r", ch);
+  send_to_char("Do what?\n\rSyntax: vend <buy | sell | list | cancel | collect | identify>\n\r", ch);
   return eSUCCESS;
 }
