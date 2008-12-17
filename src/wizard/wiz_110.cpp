@@ -36,6 +36,7 @@ extern "C" {
 #endif
 extern short bport;
 int get_max(CHAR_DATA *, int);
+void AuctionHandleRenames(CHAR_DATA *ch, string old_name, string new_name);
 
 int get_max_stat_bonus(CHAR_DATA *ch, int attrs)
 {
@@ -555,6 +556,9 @@ int do_rename_char(struct char_data *ch, char *arg, int cmd)
 
   sprintf(name, "%s renamed to %s.", GET_NAME(victim), newname);
   log(name, GET_LEVEL(ch), LOG_GOD);
+
+  //handle the renames
+  AuctionHandleRenames(ch, GET_NAME(victim), newname);
 
   // Get rid of the existing one
   do_zap(ch, GET_NAME(victim), 10);

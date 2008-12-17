@@ -28,6 +28,8 @@
   #include <bandwidth.h>
 #endif
 
+void AuctionHandleDelete(string name);
+
 int do_linkload(struct char_data *ch, char *arg, int cmd)
 {
   struct descriptor_data d;
@@ -329,7 +331,8 @@ int do_zap(struct char_data *ch, char *argument, int cmd)
     if(ch->clan)
       remove_clan_member(ch->clan, ch);
 
-    snprintf(buf, 500, "%s has deleted %s.", ch->name, victim->name);
+    AuctionHandleDelete(GET_NAME(victim));
+    snprintf(buf, 500, "%s has deleted %s.\n\r", ch->name, victim->name);
     remove_character(victim->name, ZAPPED);
 
     do_quit(victim, "", 666);
