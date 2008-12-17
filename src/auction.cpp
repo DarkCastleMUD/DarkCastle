@@ -922,11 +922,10 @@ void AuctionHouse::AddItem(CHAR_DATA *ch, OBJ_DATA *obj, unsigned int price, str
   NewTicket.end_time = time(0) + auction_duration;
   NewTicket.seller = GET_NAME(ch);
   NewTicket.item_name = obj->short_description;
-  if(!strcmp(buf, "advertise"))
+  if(!strcmp(buf, "Advertise"))
     advertise = true;
   else
     NewTicket.buyer = buf;
-    advertise = true;
 
   Items_For_Sale[cur_index] = NewTicket;
   Save();
