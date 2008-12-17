@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.178 2008/11/21 23:00:14 kkoons Exp $ */
+/* $Id: nanny.cpp,v 1.179 2008/12/17 23:31:48 kkoons Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -60,6 +60,8 @@ extern "C" {
 #include <queue>
 
 #define STATE(d)    ((d)->connected)
+
+void AuctionHandleDelete(string name);
 
 char menu[] = "\n\rWelcome to Dark Castle Mud\n\r\n\r"
               "0) Exit Dark Castle.\n\r"
@@ -1569,6 +1571,7 @@ is_race_eligible(ch,7)?'*':' ',is_race_eligible(ch,8)?'*':' ',is_race_eligible(c
           sprintf(buf, "%s just deleted themself.  Their visit here must have sucked.", d->character->name);
           log(buf, IMMORTAL, LOG_MORTAL);
 
+          AuctionHandleDelete(d->character->name);
 	  // To remove the vault from memory
 	  remove_familiars(d->character->name, SELFDELETED);
 	  remove_vault(d->character->name, SELFDELETED);
