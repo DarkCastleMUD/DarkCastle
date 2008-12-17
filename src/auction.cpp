@@ -15,6 +15,7 @@ extern "C"
 #include <terminal.h> 
 #include <levels.h> 
 #include <character.h> 
+#include <room.h>
 #include <utility.h> 
 #include <assert.h>
 #include <db.h>
@@ -86,6 +87,8 @@ public:
   void AddRoom(CHAR_DATA *ch, int room);
   void RemoveRoom(CHAR_DATA *ch, int room);
   void ListRooms(CHAR_DATA *ch);
+  void HandleRename(CHAR_DATA *ch, string old_name, string new_name);
+  void HandleDelete(string name);
   bool IsAuctionHouse(int room);
   void Save();
   void Load();  
@@ -102,6 +105,59 @@ private:
   string file_name;
   map<unsigned int, AuctionTicket> Items_For_Sale;
 };
+
+/*
+Handle deletes/zaps
+*/
+void AuctionHouse::HandleDelete(string name)
+{
+  map<unsigned int, AuctionTicket>::iterator Item_it;
+  queue<unsigned int> tickets_to_delete;
+  for(Item_it = Items_For_Sale.begin(); Item_it != Items_For_Sale.end(); Item_it++)
+  {
+    if(!Item_it->second.seller.compare(name))
+    {
+      Item_it->second.state = AUC_DELETED;
+      tickets_to_delete.push(Item_it->first);    
+    }
+  }
+  
+  char buf[MAX_STRING_LENGTH];
+  sprintf(buf, "%u auctions belonging to %s have been deleted.", 
+                tickets_to_delete.size(), name.c_str());
+  log(buf, ANGEL, LOG_GOD);
+
+  while(!tickets_to_delete.empty())
+  {  
+      Items_For_Sale.erase(tickets_to_delete.front());
+      tickets_to_delete.pop();
+  }
+  Save();
+  return;
+}
+
+/*
+Handle Renames
+*/
+void AuctionHouse::HandleRename(CHAR_DATA *ch, string old_name, string new_name)
+{
+  map<unsigned int, AuctionTicket>::iterator Item_it;
+  unsigned int i = 0;
+
+  for(Item_it = Items_For_Sale.begin(); Item_it != Items_For_Sale.end(); Item_it++)
+  {
+    if(!Item_it->second.seller.compare(old_name))
+    {
+      i++;
+      Item_it->second.seller = new_name;
+    }
+  }
+  char buf[MAX_STRING_LENGTH];
+  sprintf(buf, "%u auctions have been converted from %s to %s.", i, old_name.c_str(), new_name.c_str());
+  log(buf, GET_LEVEL(ch), LOG_GOD);
+  Save();
+  return;
+}
 
 /*
 Is the player selling the max # of items already?
@@ -334,9 +390,8 @@ REMOVE ROOM
 */
 void AuctionHouse::RemoveRoom(CHAR_DATA *ch, int room)
 {
-  if(auction_rooms.end() == auction_rooms.find(room))
+  if(1 == auction_rooms.erase(room))
   {
-    auction_rooms.erase(room);
     csendf(ch, "Done. Room %d has been removed from auction houses.\n\r", room);
     logf(GET_LEVEL(ch), LOG_GOD, "%s just removed room %d from auction houses.", GET_NAME(ch), room);
     Save();
@@ -643,7 +698,7 @@ void AuctionHouse::BuyItem(CHAR_DATA *ch, unsigned int ticket)
     if(!no_trade_obj) 
     { //27909 == wingding right now (notrade transfer token)
       if(nr > 0)
-        csendf(ch, "You need to have \"%s\" to buy a no_trade item.\r\n", ((struct obj_data *)(obj_index[nr].item))->short_description);
+        csendf(ch, "You need to have \"%s\" to buy a NO_TRADE item.\r\n", ((struct obj_data *)(obj_index[nr].item))->short_description);
       return;
     }
     else
@@ -656,9 +711,14 @@ void AuctionHouse::BuyItem(CHAR_DATA *ch, unsigned int ticket)
   GET_GOLD(ch) -= Item_it->second.price;
 
   if((vict = get_active_pc(Item_it->second.seller.c_str()))) 
-      csendf(vict, "%s just purchased your %s for %u coins.\n\r", GET_NAME(ch), Item_it->second.item_name.c_str(), Item_it->second.price);
+      csendf(vict, "%s just purchased your ticket of  %s for %u coins.\n\r", GET_NAME(ch), Item_it->second.item_name.c_str(), Item_it->second.price);
 
   csendf(ch, "You have purchased %s for %u coins.\n\r", obj->short_description, Item_it->second.price);
+
+  CHAR_DATA *tmp;
+  for(tmp = world[ch->in_room].people; tmp; tmp = tmp->next_in_room)
+    if(vict != ch)
+      csendf(tmp, "%s just purchased %s's %s\n\r", GET_NAME(ch), GET_NAME(vict), obj->short_description);
 
   Item_it->second.state = AUC_SOLD;
   Save(); 
@@ -692,7 +752,7 @@ void AuctionHouse::RemoveTicket(CHAR_DATA *ch, unsigned int ticket)
     {
       unsigned int fee = (unsigned int)((double)Item_it->second.price * 0.025);
       csendf(ch, "The Broker hands you %u gold coins from your sale of %s.\n\r"
-               "He pockets %u gold as a brokers fee.\n\r", 
+               "He pockets %u gold as a broker's fee.\n\r", 
           (Item_it->second.price - fee), Item_it->second.item_name.c_str(), fee);
       GET_GOLD(ch) += (Item_it->second.price - fee);
     }
@@ -722,7 +782,7 @@ void AuctionHouse::RemoveTicket(CHAR_DATA *ch, unsigned int ticket)
         return;
       }
 
-      csendf(ch, "You are returned your %s.\n\r", obj->short_description);
+      csendf(ch, "The Consignment Broker retrieves %s and returns it to you.\n\r", obj->short_description);
       obj_to_char(obj, ch); 
      }
      break;
@@ -785,7 +845,7 @@ void AuctionHouse::ListItems(CHAR_DATA *ch, ListOptions options, string name, un
       switch(Item_it->second.state)
       {
         case AUC_SOLD:
-          state_output = "$1SOLD$R   ";
+          state_output = "$0$BSOLD$R   ";
         break;
         case AUC_FOR_SALE:
           state_output = "$2ACTIVE$R ";
@@ -822,6 +882,11 @@ void AuctionHouse::ListItems(CHAR_DATA *ch, ListOptions options, string name, un
        csendf(ch, "You using %d of your %d available tickets.\n\r", i, max_items);
     }
   }
+  int nr = real_object(27909);
+  if(nr >= 0)
+    csendf(ch, "\n\r'$4N$R' indicates an item is NO_TRADE and requires %s to purchase.\n\r",
+                ((struct obj_data *)(obj_index[nr].item))->short_description);
+  send_to_char("'$4*$R' indicates you are unable to use this item.\n\r", ch);
   return;
 }
 
@@ -906,6 +971,15 @@ void AuctionHouse::AddItem(CHAR_DATA *ch, OBJ_DATA *obj, unsigned int price, str
     return;
   }
 
+  if(!strcmp(buf, "Advertise"))
+    advertise = true;
+
+  if(advertise == true && (GET_GOLD(ch) < (200000 + fee)))
+  {
+    csendf(ch, "You need 200000 gold plus the %u gold fee to advertise an item.\n\r", fee);
+    return;
+  }
+
   if (IS_SET(obj->obj_flags.more_flags, ITEM_UNIQUE) && IsExist(GET_NAME(ch), obj_index[obj->item_number].virt))
   {
     csendf(ch, "You're selling one %s already!\n\r", obj->short_description);
@@ -922,9 +996,7 @@ void AuctionHouse::AddItem(CHAR_DATA *ch, OBJ_DATA *obj, unsigned int price, str
   NewTicket.end_time = time(0) + auction_duration;
   NewTicket.seller = GET_NAME(ch);
   NewTicket.item_name = obj->short_description;
-  if(!strcmp(buf, "Advertise"))
-    advertise = true;
-  else
+  if(advertise == false)
     NewTicket.buyer = buf;
 
   Items_For_Sale[cur_index] = NewTicket;
@@ -946,16 +1018,11 @@ void AuctionHouse::AddItem(CHAR_DATA *ch, OBJ_DATA *obj, unsigned int price, str
     CHAR_DATA *Broker = find_mob_in_room(ch, 5258);
     if(Broker)
     {
-      if(GET_GOLD(ch) > 200000)
-      {
-        GET_GOLD(ch) -= 200000;
-        send_to_char("You pay the 200000 gold to advertise your item.\n\r", ch);
-        snprintf(auc_buf, MAX_STRING_LENGTH, "$7$B%s$6$B has just posted %s $6$Bfor sale for $R$5%d$6$B coins.",
-                         GET_NAME(ch), obj->short_description, price);
-        do_auction(Broker, auc_buf, 9);
-      }
-      else
-        send_to_char("You need 200000 gold to advertise an item.\n\r", ch);
+      GET_GOLD(ch) -= 200000;
+      send_to_char("You pay the 200000 gold to advertise your item.\n\r", ch);
+      snprintf(auc_buf, MAX_STRING_LENGTH, "$7$B%s has just posted $R%s $7$Bfor sale.",
+                         GET_NAME(ch), obj->short_description);
+      do_auction(Broker, auc_buf, 9); 
     }
     else
       send_to_char("The Consignment Broker couldn't auction. Contact an imm.\n\r", ch);
@@ -983,6 +1050,27 @@ void auction_expire()
   TheAuctionHouse.CheckExpire();
   return;
 }
+
+/*
+HANDLE RENAMES
+Called externally in wiz_110 (do_rename)
+*/
+void AuctionHandleDelete(string name)
+{
+  TheAuctionHouse.HandleDelete(name);
+  return;
+}
+
+/*
+HANDLE RENAMES
+Called externally in wiz_110 (do_rename)
+*/
+void AuctionHandleRenames(CHAR_DATA *ch, string old_name, string new_name)
+{
+  TheAuctionHouse.HandleRename(ch, old_name, new_name);
+  return;
+}
+
 
 /*
 LOAD AUCTION TICKETS
@@ -1017,7 +1105,7 @@ int do_vend(CHAR_DATA *ch, char *argument, int cmd)
 
   if(!*buf)
   {
-    send_to_char("Syntax: vend <buy | sell | list | cancel | collect | identify>\n\r", ch);
+    send_to_char("Syntax: vend <buy | sell | list | cancel | collect | search | identify>\n\r", ch);
     return eSUCCESS;       
 
   }
@@ -1029,7 +1117,7 @@ int do_vend(CHAR_DATA *ch, char *argument, int cmd)
     argument = one_argument(argument, buf);
     if(!*buf)
     {
-      send_to_char("Search by what?\n\rSyntax: vend search <name | level>\n\r", ch);
+      send_to_char("Search by what?\n\rSyntax: vend search <keywords | level>\n\r", ch);
       return eSUCCESS;
     }
     if(!strcmp(buf, "name"))
@@ -1037,7 +1125,7 @@ int do_vend(CHAR_DATA *ch, char *argument, int cmd)
       argument = one_argument(argument, buf);
       if(!*buf)
       {
-        send_to_char("What name do you want to search for?\n\rSyntax: vend search name <name>\n\r", ch);
+        send_to_char("What name do you want to search for?\n\rSyntax: vend search name <keywords>\n\r", ch);
         return eSUCCESS;
       }
       TheAuctionHouse.ListItems(ch, LIST_BY_NAME, buf, 0, 0);
@@ -1051,7 +1139,7 @@ int do_vend(CHAR_DATA *ch, char *argument, int cmd)
       argument = one_argument(argument, buf);
       if(!*buf)
       {
-        send_to_char("What level?\n\rSyntax: vend search level <level> [level]\n\r", ch);
+        send_to_char("What level?\n\rSyntax: vend search level <min_level> [max_level]\n\r", ch);
         return eSUCCESS;
       }
       level = atoi(buf);
@@ -1157,19 +1245,19 @@ int do_vend(CHAR_DATA *ch, char *argument, int cmd)
     argument = one_argument(argument, buf);
     if(!*buf)
     {
-      send_to_char("Sell what?\n\rSyntax: vend sell <item> <price> [person]\n\r", ch);
+      send_to_char("Sell what?\n\rSyntax: vend sell <item> <price> [person | advertise]\n\r", ch);
       return eSUCCESS;
     }  
     obj = get_obj_in_list_vis(ch, buf, ch->carrying);
     if(!obj)
     {
-      send_to_char("You don't seem to have that item.\n\r", ch);
+      send_to_char("You don't seem to have that item.\n\rSyntax: vend sell <item> <price> [person | advertise]\n\r", ch);
       return eSUCCESS;
     }
     argument = one_argument(argument, buf);
     if(!*buf)
     {
-       send_to_char("How much do you want to sell it for?\n\r", ch);
+       send_to_char("How much do you want to sell it for?\n\rSyntax: vend sell <item> <price> [person | advertise]\n\r", ch);
        return eSUCCESS;
     }
     price = atoi(buf);
@@ -1232,6 +1320,6 @@ int do_vend(CHAR_DATA *ch, char *argument, int cmd)
   }
 
 
-  send_to_char("Do what?\n\rSyntax: vend <buy | sell | list | cancel | collect | identify>\n\r", ch);
+  send_to_char("Do what?\n\rSyntax: vend <buy | sell | list | cancel | collect | search | identify>\n\r", ch);
   return eSUCCESS;
 }
