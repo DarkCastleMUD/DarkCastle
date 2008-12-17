@@ -931,6 +931,8 @@ void AuctionHouse::AddItem(CHAR_DATA *ch, OBJ_DATA *obj, unsigned int price, str
        int max_items = vault->size / 100;
        csendf(ch, "You cannot list more than %d items!\n\r", max_items);
     }
+    else
+      send_to_char("You have to be level 10 and own a vault to sell items!\n\r", ch);
     return;
   }
 
