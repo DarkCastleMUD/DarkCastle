@@ -27,7 +27,7 @@ extern "C"
 
 using namespace std;
 
-#define auction_duration 300 //1209600
+#define auction_duration 1209600
 
 struct obj_data * search_char_for_item(char_data * ch, int16 item_number, bool wearingonly = FALSE);
 extern struct index_data *obj_index;
