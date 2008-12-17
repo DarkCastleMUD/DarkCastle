@@ -923,8 +923,9 @@ void AuctionHouse::AddItem(CHAR_DATA *ch, OBJ_DATA *obj, unsigned int price, str
   NewTicket.seller = GET_NAME(ch);
   NewTicket.item_name = obj->short_description;
   if(!strcmp(buf, "advertise"))
-    NewTicket.buyer = buf;
+    advertise = true;
   else
+    NewTicket.buyer = buf;
     advertise = true;
 
   Items_For_Sale[cur_index] = NewTicket;
@@ -939,7 +940,7 @@ void AuctionHouse::AddItem(CHAR_DATA *ch, OBJ_DATA *obj, unsigned int price, str
               obj->short_description, buyer.c_str(), price);
   }
  
-  if(advertise)
+  if(advertise == true)
   {
     char_data * find_mob_in_room(struct char_data *ch, int iFriendId);
     char auc_buf[MAX_STRING_LENGTH];
