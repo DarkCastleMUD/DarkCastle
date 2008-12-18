@@ -728,6 +728,10 @@ void AuctionHouse::BuyItem(CHAR_DATA *ch, unsigned int ticket)
 
   Item_it->second.state = AUC_SOLD;
   Save(); 
+  char log_buf[MAX_STRING_LENGTH];
+  sprintf(log_buf, "VEND: %s bought %s's %s for %u coins.\n\r", 
+              GET_NAME(ch), GET_NAME(vict), Item_it->second.item_name.c_str(),Item_it->second.price);
+  log(log_buf, IMP, LOG_OBJECTS);
   obj_to_char(obj, ch);
   do_save(ch, "", 9);
 }
@@ -761,6 +765,10 @@ void AuctionHouse::RemoveTicket(CHAR_DATA *ch, unsigned int ticket)
                "He pockets %u gold as a broker's fee.\n\r", 
           (Item_it->second.price - fee), Item_it->second.item_name.c_str(), fee);
       GET_GOLD(ch) += (Item_it->second.price - fee);
+      char log_buf[MAX_STRING_LENGTH];
+      sprintf(log_buf, "VEND: %s just collected %u coins from their sale of %s (ticket %u).\n\r", 
+                         GET_NAME(ch), Item_it->second.price, Item_it->second.item_name.c_str(), ticket);
+      log(log_buf, IMP, LOG_OBJECTS);
     }
     break;
     case AUC_EXPIRED: //intentional fallthrough
@@ -789,6 +797,10 @@ void AuctionHouse::RemoveTicket(CHAR_DATA *ch, unsigned int ticket)
       }
 
       csendf(ch, "The Consignment Broker retrieves %s and returns it to you.\n\r", obj->short_description);
+      char log_buf[MAX_STRING_LENGTH];
+      sprintf(log_buf, "VEND: %s cancelled or collected ticket # %u (%s) that was for sale for %u coins.\n\r", 
+                       GET_NAME(ch), ticket, Item_it->second.item_name.c_str(), Item_it->second.price);
+      log(log_buf, IMP, LOG_OBJECTS);
       obj_to_char(obj, ch); 
      }
      break;
@@ -1048,6 +1060,10 @@ void AuctionHouse::AddItem(CHAR_DATA *ch, OBJ_DATA *obj, unsigned int price, str
       send_to_char("The Consignment Broker couldn't auction. Contact an imm.\n\r", ch);
   }
  
+  char log_buf[MAX_STRING_LENGTH];
+  sprintf(log_buf, "VEND: %s just listed %s for sale for %u coins.\n\r", 
+               GET_NAME(ch), obj->short_description, price);
+  log(log_buf, IMP, LOG_OBJECTS);
   extract_obj(obj);
   do_save(ch, "", 9);
   return;
