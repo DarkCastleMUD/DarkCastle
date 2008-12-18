@@ -382,7 +382,8 @@ bool AuctionHouse::IsWearable(CHAR_DATA *ch, int vnum)
     return true;
  
   OBJ_DATA *obj = (struct obj_data *)(obj_index[nr].item);
-  return !(class_restricted(ch, obj) || size_restricted(ch, obj));
+  return !(class_restricted(ch, obj) || size_restricted(ch, obj) || (obj->obj_flags.eq_level > GET_LEVEL(ch)));
+    
 }
 
 
