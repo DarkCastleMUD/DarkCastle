@@ -42,7 +42,8 @@ enum ListOptions
   LIST_MINE,
   LIST_PRIVATE,
   LIST_BY_NAME,
-  LIST_BY_LEVEL
+  LIST_BY_LEVEL,
+  LIST_BY_SLOT
 };
 
 enum AuctionStates
@@ -99,12 +100,14 @@ private:
   bool IsNoTrade(int vnum);
   bool IsExist(string name, int vnum);
   bool IsName(string name, int vnum);
+  bool IsSlot(string slot, int vnum);
   bool IsLevel(unsigned int to, unsigned int from, int vnum);
   map<int, int> auction_rooms;
   unsigned int cur_index;
   string file_name;
   map<unsigned int, AuctionTicket> Items_For_Sale;
 };
+
 
 /*
 Handle deletes/zaps
@@ -261,6 +264,110 @@ void AuctionHouse::Identify(CHAR_DATA *ch, unsigned int ticket)
  
 }
 
+/*
+Is item of type slot?
+*/
+bool AuctionHouse::IsSlot(string slot, int vnum)
+{
+  int keyword;
+  char buf[MAX_STRING_LENGTH];
+  strncpy(buf, slot.c_str(), MAX_STRING_LENGTH);
+
+  static char *keywords[] = 
+  {
+        "finger",//0
+        "neck",//1
+        "body",//2
+        "head",//3
+        "legs",//4
+        "feet",//5
+        "hands",//6
+        "arms",//7
+        "about",//8
+        "waist",//9
+        "wrist",//10
+        "face",//11
+        "wield",//12
+        "shield",//13
+        "hold",//14
+        "ear",//15
+        "light",//16
+        "\n"
+  };
+
+  keyword = search_block(buf, keywords, FALSE);
+  if (keyword == -1) 
+    return false;
+  
+ //   char out_buf[MAX_STRING_LENGTH];
+  //  sprintf(out_buf, "%s is an unknown body location.\n\r", buf);
+   // send_to_char(out_buf, ch);
+ 
+  int nr = real_object(vnum);
+
+  if(nr < 0)
+    return true;
+ 
+  OBJ_DATA *obj = (struct obj_data *)(obj_index[nr].item);
+  switch(keyword)
+  {
+    case 0:
+    return CAN_WEAR(obj, ITEM_WEAR_FINGER);
+    break;
+    case 1:
+    return CAN_WEAR(obj, ITEM_WEAR_NECK);
+    break;
+    case 2:
+    return CAN_WEAR(obj, ITEM_WEAR_BODY);
+    break;
+    case 3:
+    return CAN_WEAR(obj, ITEM_WEAR_HEAD);
+    break;
+    case 4:
+    return CAN_WEAR(obj, ITEM_WEAR_LEGS);
+    break;
+    case 5:
+    return CAN_WEAR(obj, ITEM_WEAR_FEET);
+    break;
+    case 6:
+    return CAN_WEAR(obj, ITEM_WEAR_HANDS);
+    break;
+    case 7:
+    return CAN_WEAR(obj, ITEM_WEAR_ARMS);
+    break;
+    case 8:
+    return CAN_WEAR(obj, ITEM_WEAR_ABOUT);
+    break;
+    case 9:
+    return CAN_WEAR(obj, ITEM_WEAR_WAISTE);
+    break;
+    case 10:
+    return CAN_WEAR(obj, ITEM_WEAR_WRIST);
+    break;
+    case 11:
+    return CAN_WEAR(obj, ITEM_WEAR_FACE);
+    break;
+    case 12:
+    return CAN_WEAR(obj, ITEM_WIELD);
+    break;
+    case 13:
+    return CAN_WEAR(obj, ITEM_WEAR_SHIELD);
+    break;
+    case 14:
+    return CAN_WEAR(obj, ITEM_HOLD);
+    break;
+    case 15:
+    return CAN_WEAR(obj, ITEM_WEAR_EAR);
+    break;
+    case 16:
+    return CAN_WEAR(obj, ITEM_LIGHT);
+    break;
+    default:
+    return false;
+    break;
+  }
+  return false;;
+}
 
 /*
 Is the item wearable by the player?
@@ -855,6 +962,7 @@ void AuctionHouse::ListItems(CHAR_DATA *ch, ListOptions options, string name, un
        || (options == LIST_PRIVATE && !Item_it->second.buyer.compare(GET_NAME(ch)))
        || (options == LIST_BY_NAME && IsName(name, Item_it->second.vitem))
        || (options == LIST_BY_LEVEL && IsLevel(to, from, Item_it->second.vitem))
+       || (options == LIST_BY_SLOT && IsSlot(name, Item_it->second.vitem))
       )
     {
       if(Item_it->second.state == AUC_EXPIRED && options != LIST_MINE)
@@ -884,8 +992,13 @@ void AuctionHouse::ListItems(CHAR_DATA *ch, ListOptions options, string name, un
   }
 
   if(i == 0)
-    send_to_char("There is nothing for sale!\n\r", ch);
-
+  {
+    if(options == LIST_BY_SLOT)
+      csendf(ch, "There are no %s items currently posted.\n\r", name.c_str());
+    else
+      send_to_char("There is nothing for sale!\n\r", ch);
+  }
+ 
   if(i >= 50)
    send_to_char("Maximum number of results reached.\n\r", ch);
 
@@ -1153,7 +1266,7 @@ int do_vend(CHAR_DATA *ch, char *argument, int cmd)
     argument = one_argument(argument, buf);
     if(!*buf)
     {
-      send_to_char("Search by what?\n\rSyntax: vend search <name | level>\n\r", ch);
+      send_to_char("Search by what?\n\rSyntax: vend search <name | level | slot>\n\r", ch);
       return eSUCCESS;
     }
     if(!strcmp(buf, "name"))
@@ -1168,6 +1281,23 @@ int do_vend(CHAR_DATA *ch, char *argument, int cmd)
 
       return eSUCCESS;
     }
+
+    if(!strcmp(buf, "slot"))
+    {
+      argument = one_argument(argument, buf);
+      if(!*buf)
+      {
+        send_to_char("What slot do you want to search for?\n\r"
+                     "finger, neck, body, head, legs, feet, hands, arms, shield,\n\r"
+                     "about, waist, wrist, wield, hold, throw, light, face, ear\n\r"
+                     "\n\rSyntax: vend search slot <keyword>\n\r", ch);
+        return eSUCCESS;
+      }
+      TheAuctionHouse.ListItems(ch, LIST_BY_SLOT, buf, 0, 0);
+
+      return eSUCCESS;
+    }
+ 
  
     if(!strcmp(buf, "level"))
     {
@@ -1187,7 +1317,7 @@ int do_vend(CHAR_DATA *ch, char *argument, int cmd)
       return eSUCCESS;
     }
 
-    send_to_char("Search by what?\n\rSyntax: vend search <name | level>\n\r", ch);
+    send_to_char("Search by what?\n\rSyntax: vend search <name | level | slot>\n\r", ch);
     return eSUCCESS;
   }  
 
