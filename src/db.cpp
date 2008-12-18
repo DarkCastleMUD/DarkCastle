@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.184 2008/12/15 11:10:35 kkoons Exp $ */
+/* $Id: db.cpp,v 1.185 2008/12/18 15:59:13 apocalypse Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -423,7 +423,7 @@ char * funnybootmessages[] =
   "Error saving file! Format drive now? (Y/Y)\r\n",
   "User Error: Replace user.\r\n",
   "Windows found. Delete? (Y/N)\r\n",
-  "Hard Drive scan indicates pirated software! The police have been nodified.\r\n"
+  "Hard Drive scan indicates pirated software! The police have been notified.\r\n"
 };
 
 void funny_boot_message()
