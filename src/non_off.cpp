@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: non_off.cpp,v 1.55 2008/12/12 18:33:53 kkoons Exp $
+| $Id: non_off.cpp,v 1.56 2008/12/18 03:01:21 kkoons Exp $
 | non_off.C
 | Description:  Implementation of generic, non-offensive commands.
 */
@@ -356,7 +356,7 @@ char * toggle_txt[] = {
   "ansi",
   "vt100",
   "wimpy",
-  "pager-off",
+  "pager",
   "bard-songs",
   "auto-eat",
   "summonable",
@@ -426,7 +426,7 @@ int do_toggle(struct char_data * ch, char * arg, int cmd)
 	 
          case 7:
 	 sprintf(buf + strlen(buf), "%s\n\r",
-	   IS_SET(ch->pcdata->toggles, PLR_PAGER) ? "$B$2on$R" : "$B$4off$R");
+	   IS_SET(ch->pcdata->toggles, PLR_PAGER) ? "$B$4off$R" : "$B$2on$R");
 	 break;
 	 
          case 8:
