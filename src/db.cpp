@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.185 2008/12/18 15:59:13 apocalypse Exp $ */
+/* $Id: db.cpp,v 1.186 2008/12/18 18:34:46 kkoons Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -470,6 +470,7 @@ int do_write_skillquest(struct char_data *ch, char *argument, int cmd)
    }
    fprintf(fl,"0\n");
    dc_fclose(fl);
+   send_to_char("Skill quests saved.\n\r", ch);
    return eSUCCESS;	
 }
 
