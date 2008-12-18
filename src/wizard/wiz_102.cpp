@@ -2051,7 +2051,7 @@ int do_oedit(struct char_data *ch, char *argument, int cmd)
           send_to_char("$3Syntax$R: oedit [item_num] weight <>\n\r", ch);
           return eFAILURE;
         }
-        if(!check_range_valid_and_convert(intval, buf4, 1, 99999)) {
+        if(!check_range_valid_and_convert(intval, buf4, 0, 99999)) {
           send_to_char("Value out of valid range.\r\n", ch);
           return eFAILURE;
         }
