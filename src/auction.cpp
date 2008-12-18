@@ -653,6 +653,12 @@ void AuctionHouse::BuyItem(CHAR_DATA *ch, unsigned int ticket)
     csendf(ch, "Ticket number %d is private.\n\r", ticket);
     return;
   }
+
+  if(!Item_it->second.seller.compare(GET_NAME(ch)))
+  {
+    send_to_char("That's your own item you're selling, dumbass!\n\r", ch);
+    return;
+  }
   
   if(GET_GOLD(ch) < Item_it->second.price)
   {
@@ -988,6 +994,18 @@ void AuctionHouse::AddItem(CHAR_DATA *ch, OBJ_DATA *obj, unsigned int price, str
     return;
   }
 
+  if(strcmp(obj->short_description, ((struct obj_data *)(obj_index[obj->item_number].item))->short_description))
+  {
+    send_to_char("The Consignment broker informs you that he does not handle items that have been restrung.\n\r", ch);
+    return;
+  }
+
+  if(eq_current_damage(obj) > 0)
+  {
+    send_to_char("The Consignment Broker curtly informs you that all items sold must be in $B$2Excellent Condition$R.\n\r", ch);
+    return;
+  }
+
   GET_GOLD(ch) -= fee;
   csendf(ch, "You pay the %d coin tax to auction the item.\n\r", fee);
  
@@ -1119,7 +1137,7 @@ int do_vend(CHAR_DATA *ch, char *argument, int cmd)
     argument = one_argument(argument, buf);
     if(!*buf)
     {
-      send_to_char("Search by what?\n\rSyntax: vend search <keywords | level>\n\r", ch);
+      send_to_char("Search by what?\n\rSyntax: vend search <name | level>\n\r", ch);
       return eSUCCESS;
     }
     if(!strcmp(buf, "name"))
@@ -1127,7 +1145,7 @@ int do_vend(CHAR_DATA *ch, char *argument, int cmd)
       argument = one_argument(argument, buf);
       if(!*buf)
       {
-        send_to_char("What name do you want to search for?\n\rSyntax: vend search name <keywords>\n\r", ch);
+        send_to_char("What name do you want to search for?\n\rSyntax: vend search name <keyword>\n\r", ch);
         return eSUCCESS;
       }
       TheAuctionHouse.ListItems(ch, LIST_BY_NAME, buf, 0, 0);
