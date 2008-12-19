@@ -831,14 +831,14 @@ void AuctionHouse::BuyItem(CHAR_DATA *ch, unsigned int ticket)
 
   CHAR_DATA *tmp;
   for(tmp = world[ch->in_room].people; tmp; tmp = tmp->next_in_room)
-    if(vict != ch)
-      csendf(tmp, "%s just purchased %s's %s\n\r", GET_NAME(ch), GET_NAME(vict), obj->short_description);
+    if(vict != ch) //vict can be null
+      csendf(tmp, "%s just purchased %s's %s\n\r", GET_NAME(ch), Item_it->second.seller.c_str(), obj->short_description);
 
   Item_it->second.state = AUC_SOLD;
   Save(); 
   char log_buf[MAX_STRING_LENGTH];
   sprintf(log_buf, "VEND: %s bought %s's %s for %u coins.\n\r", 
-              GET_NAME(ch), GET_NAME(vict), Item_it->second.item_name.c_str(),Item_it->second.price);
+              GET_NAME(ch), Item_it->second.seller.c_str(), Item_it->second.item_name.c_str(),Item_it->second.price);
   log(log_buf, IMP, LOG_OBJECTS);
   obj_to_char(obj, ch);
   do_save(ch, "", 9);
