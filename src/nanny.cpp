@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.179 2008/12/17 23:31:48 kkoons Exp $ */
+/* $Id: nanny.cpp,v 1.180 2008/12/19 05:07:20 dcastle Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -62,6 +62,7 @@ extern "C" {
 #define STATE(d)    ((d)->connected)
 
 void AuctionHandleDelete(string name);
+void check_for_sold_items(CHAR_DATA *ch);
 
 char menu[] = "\n\rWelcome to Dark Castle Mud\n\r\n\r"
               "0) Exit Dark Castle.\n\r"
@@ -1059,6 +1060,7 @@ void nanny(struct descriptor_data *d, char *arg)
          sprintf(buf, "\r\n\r\n$4$BYou have had %d wrong passwords entered since your last complete login.$R\r\n\r\n", d->character->pcdata->bad_pw_tries);
          SEND_TO_Q(buf, d);
       }
+      check_for_sold_items(d->character);
       STATE(d) = CON_READ_MOTD;
       break;
       
