@@ -869,6 +869,8 @@ void AuctionHouse::RemoveTicket(CHAR_DATA *ch, unsigned int ticket)
     case AUC_SOLD:
     {
       unsigned int fee = (unsigned int)((double)Item_it->second.price * 0.025);
+      if(fee > 500000)
+        fee = 500000;
       csendf(ch, "The Broker hands you %u gold coins from your sale of %s.\n\r"
                "He pockets %u gold as a broker's fee.\n\r", 
           (Item_it->second.price - fee), Item_it->second.item_name.c_str(), fee);
@@ -966,7 +968,8 @@ void AuctionHouse::ListItems(CHAR_DATA *ch, ListOptions options, string name, un
        || (options == LIST_BY_SLOT && IsSlot(name, Item_it->second.vitem))
       )
     {
-      if(Item_it->second.state == AUC_EXPIRED && options != LIST_MINE)
+      if((Item_it->second.state == AUC_EXPIRED || Item_it->second.state == AUC_SOLD) 
+          && options != LIST_MINE)
         continue;
       i++;
       switch(Item_it->second.state)
@@ -1099,6 +1102,8 @@ void AuctionHouse::AddItem(CHAR_DATA *ch, OBJ_DATA *obj, unsigned int price, str
   }
 
   fee = (unsigned int)((double)price * 0.025); //2.5% fee to list, then 2.5% fee during sale
+  if(fee > 500000)
+    fee = 500000;
   if(GET_GOLD(ch) < fee)
   {
     csendf(ch, "You don't have enough gold to pay the %d coin auction fee.\n\r", fee);
