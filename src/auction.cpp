@@ -90,6 +90,7 @@ public:
   void ListRooms(CHAR_DATA *ch);
   void HandleRename(CHAR_DATA *ch, string old_name, string new_name);
   void HandleDelete(string name);
+  void CheckForSoldItems(CHAR_DATA *ch);
   bool IsAuctionHouse(int room);
   void Save();
   void Load();  
@@ -108,6 +109,26 @@ private:
   map<unsigned int, AuctionTicket> Items_For_Sale;
 };
 
+/*
+check for sold items
+*/
+void AuctionHouse::CheckForSoldItems(CHAR_DATA *ch)
+{
+  map<unsigned int, AuctionTicket>::iterator Item_it;
+  bool has_sold_items = false;
+  for(Item_it = Items_For_Sale.begin(); Item_it != Items_For_Sale.end(); Item_it++)
+  {
+    if((!Item_it->second.seller.compare(GET_NAME(ch))) && (Item_it->second.state == AUC_SOLD))
+    {
+      has_sold_items = true;
+      csendf(ch, "Your auction of %s has sold to %s for %u coins.\n\r", 
+             Item_it->second.item_name.c_str(), Item_it->second.buyer.c_str(), Item_it->second.price);
+    }
+  }
+  if(has_sold_items)
+    send_to_char("Please stop by a Consignment House to collect your gold.\n\r", ch);
+  return;
+}
 
 /*
 Handle deletes/zaps
@@ -752,13 +773,19 @@ void AuctionHouse::BuyItem(CHAR_DATA *ch, unsigned int ticket)
   Item_it = Items_For_Sale.find(ticket);
   if(Item_it == Items_For_Sale.end())
   {
-    csendf(ch, "Ticket number %d doesn't seem to exist.\n\r", ticket);
+    csendf(ch, "Ticket number %u doesn't seem to exist.\n\r", ticket);
     return;
   }
 
   if(!Item_it->second.buyer.empty() && Item_it->second.buyer.compare(GET_NAME(ch)))
   {
-    csendf(ch, "Ticket number %d is private.\n\r", ticket);
+    csendf(ch, "Ticket number %u is private.\n\r", ticket);
+    return;
+  }
+  
+  if(Item_it->second.state != AUC_FOR_SALE)
+  {
+    csendf(ch, "Ticket number %u has already been sold\n\r.", ticket);
     return;
   }
 
@@ -835,6 +862,7 @@ void AuctionHouse::BuyItem(CHAR_DATA *ch, unsigned int ticket)
       csendf(tmp, "%s just purchased %s's %s\n\r", GET_NAME(ch), Item_it->second.seller.c_str(), obj->short_description);
 
   Item_it->second.state = AUC_SOLD;
+  Item_it->second.buyer = GET_NAME(ch);
   Save(); 
   char log_buf[MAX_STRING_LENGTH];
   sprintf(log_buf, "VEND: %s bought %s's %s for %u coins.\n\r", 
@@ -1203,6 +1231,15 @@ Called externally from heartbeat
 void auction_expire()
 {
   TheAuctionHouse.CheckExpire();
+  return;
+}
+
+/*
+check if the player has gold items
+*/
+void check_for_sold_items(CHAR_DATA *ch)
+{
+  TheAuctionHouse.CheckForSoldItems(ch);
   return;
 }
 
