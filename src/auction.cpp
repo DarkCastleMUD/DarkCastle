@@ -29,6 +29,8 @@ extern "C"
 using namespace std;
 
 #define auction_duration 1209600
+#define AUC_MIN_PRICE 1000
+#define AUC_MAX_PRICE 2000000000
 
 struct obj_data * search_char_for_item(char_data * ch, int16 item_number, bool wearingonly = FALSE);
 extern struct index_data *obj_index;
@@ -92,6 +94,7 @@ public:
   void HandleDelete(string name);
   void CheckForSoldItems(CHAR_DATA *ch);
   bool IsAuctionHouse(int room);
+  void DoModify(CHAR_DATA *ch, unsigned int ticket, unsigned int new_price);
   void Save();
   void Load();  
 private:
@@ -109,6 +112,58 @@ private:
   map<unsigned int, AuctionTicket> Items_For_Sale;
 };
 
+/*
+DO MODIFY
+modify an existing tickets price
+*/
+void AuctionHouse::DoModify(CHAR_DATA *ch, unsigned int ticket, unsigned int new_price)
+{
+  map<unsigned int, AuctionTicket>::iterator Item_it;
+  if(new_price < AUC_MIN_PRICE || new_price > AUC_MAX_PRICE)
+  {
+    csendf(ch, "Price must be between %u and %u.\n\r", AUC_MIN_PRICE, AUC_MAX_PRICE);
+    return;
+    
+  }
+  if((Item_it = Items_For_Sale.find(ticket)) == Items_For_Sale.end())
+  {
+    csendf(ch, "Ticket number %u doesn't seem to exist.\n\r", ticket);
+    return;
+  }
+  
+  if(Item_it->second.seller.compare(GET_NAME(ch)))
+  {
+    csendf(ch, "Ticket number %u doesn't belong to you.\n\r", ticket);
+    return;
+  }
+
+  if(new_price > Item_it->second.price)
+  {
+    unsigned int difference = new_price - Item_it->second.price;
+    unsigned int fee = (unsigned int)((double)difference * 0.025);
+    if(GET_GOLD(ch) < fee)
+    {
+      csendf(ch, "Increasing the items price by %u costs %u, you don't have enough.\n\r", difference, fee);
+      return;
+    }
+    GET_GOLD(ch) -= fee;
+    csendf(ch, "The broker collects %u coins for increasing the price by %u.\n\r", fee, difference);
+    do_save(ch, "", 9);
+  }
+
+  csendf(ch, "The new price of ticket %u (%s) is now %u.\n\r", 
+                ticket, Item_it->second.item_name.c_str(), new_price);
+
+  CHAR_DATA *tmp;
+  for(tmp = world[ch->in_room].people; tmp; tmp = tmp->next_in_room)
+    if(tmp != ch) 
+      csendf(tmp, "%s has just modified the price of one of %s items.\n\r", 
+                 GET_NAME(ch), (GET_SEX(ch) == SEX_MALE) ? "his" : "her");
+
+  Item_it->second.price = new_price;
+  Save();
+  return;
+}
 /*
 check for sold items
 */
@@ -278,6 +333,7 @@ void AuctionHouse::Identify(CHAR_DATA *ch, unsigned int ticket)
 
   GET_GOLD(ch) -= 6000;
   send_to_char("You pay the broker 6000 gold to identify the item.\n\r", ch);
+  do_save(ch, "", 9);
 
   spell_identify(60, ch, NULL, obj, 100);
 
@@ -852,13 +908,13 @@ void AuctionHouse::BuyItem(CHAR_DATA *ch, unsigned int ticket)
   GET_GOLD(ch) -= Item_it->second.price;
 
   if((vict = get_active_pc(Item_it->second.seller.c_str()))) 
-      csendf(vict, "%s just purchased your ticket of  %s for %u coins.\n\r", GET_NAME(ch), Item_it->second.item_name.c_str(), Item_it->second.price);
+      csendf(vict, "%s just purchased your ticket of %s for %u coins.\n\r", GET_NAME(ch), Item_it->second.item_name.c_str(), Item_it->second.price);
 
   csendf(ch, "You have purchased %s for %u coins.\n\r", obj->short_description, Item_it->second.price);
 
   CHAR_DATA *tmp;
   for(tmp = world[ch->in_room].people; tmp; tmp = tmp->next_in_room)
-    if(vict != ch) //vict can be null
+    if(tmp != ch) 
       csendf(tmp, "%s just purchased %s's %s\n\r", GET_NAME(ch), Item_it->second.seller.c_str(), obj->short_description);
 
   Item_it->second.state = AUC_SOLD;
@@ -1111,9 +1167,9 @@ void AuctionHouse::AddItem(CHAR_DATA *ch, OBJ_DATA *obj, unsigned int price, str
     return;
   }
 
-  if(price > 2000000000)
+  if(price > AUC_MAX_PRICE)
   {
-    send_to_char("Price must be between 1000 and 2000000000.\n\r", ch);
+    csendf(ch, "Price must be between %u and %u.\n\r", AUC_MIN_PRICE, AUC_MAX_PRICE);
     return;
   }
   
@@ -1297,13 +1353,33 @@ int do_vend(CHAR_DATA *ch, char *argument, int cmd)
 
   if(!*buf)
   {
-    send_to_char("Syntax: vend <buy | sell | list | cancel | collect | search | identify>\n\r", ch);
+    send_to_char("Syntax: vend <buy | sell | list | cancel | modify | collect | search | identify>\n\r", ch);
     return eSUCCESS;       
 
   }
 
+  /*MODIFY*/
+  if(!strcmp(buf, "modify"))
+  {
+    unsigned int ticket;
+    argument = one_argument(argument, buf);
+    if(!*buf)
+    {
+      send_to_char("Modify what ticket?\n\rSyntax: vend modify <ticket> <new_price>\n\r", ch);
+      return eSUCCESS;
+    }
+    ticket = atoi(buf);
+    argument = one_argument(argument, buf);
+    if(!*buf)
+    {
+      send_to_char("What price do you want it?\n\rSyntax: vend modify <ticket> <new_price>\n\r", ch);
+      return eSUCCESS;
+    }
+    TheAuctionHouse.DoModify(ch, ticket, atoi(buf));
+    return eSUCCESS;
+  }
 
-  /*BUY*/
+  /*SEARCH*/
   if(!strcmp(buf, "search"))
   {
     argument = one_argument(argument, buf);
@@ -1529,6 +1605,6 @@ int do_vend(CHAR_DATA *ch, char *argument, int cmd)
   }
 
 
-  send_to_char("Do what?\n\rSyntax: vend <buy | sell | list | cancel | collect | search | identify>\n\r", ch);
+  send_to_char("Do what?\n\rSyntax: vend <buy | sell | list | cancel | modify | collect | search | identify>\n\r", ch);
   return eSUCCESS;
 }
