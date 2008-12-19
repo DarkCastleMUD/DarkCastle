@@ -20,7 +20,7 @@
  * 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead *
  * of just race stuff                                                     *
  **************************************************************************
- * $Id: fight.cpp,v 1.521 2008/12/16 05:22:55 kkoons Exp $               *
+ * $Id: fight.cpp,v 1.522 2008/12/19 14:33:54 kkoons Exp $               *
  **************************************************************************/
 
 extern "C"
@@ -5715,7 +5715,7 @@ void do_pkill(CHAR_DATA *ch, CHAR_DATA *victim, int type, bool vict_is_attacker)
        && ch->in_room != real_room(START_ROOM) 
        && ch->in_room != real_room(SECOND_START_ROOM))
     {
-      if(level_spread > 20 && !IS_AFFECTED(victim, AFF_CANTQUIT) && !vict_is_attacker)
+      if(level_spread > 20 && !(IS_AFFECTED(victim, AFF_CANTQUIT)|| IS_AFFECTED(victim, AFF_CHAMPION)) && !vict_is_attacker)
       {
         if(GET_PKILLS(ch) > 0)
           GET_PKILLS(ch) -= 1;
@@ -5751,7 +5751,7 @@ void do_pkill(CHAR_DATA *ch, CHAR_DATA *victim, int type, bool vict_is_attacker)
        && ch->in_room != real_room(START_ROOM) 
        && ch->in_room != real_room(SECOND_START_ROOM)) 
     {
-       if(level_spread > 20 && !IS_AFFECTED(victim, AFF_CANTQUIT) && !vict_is_attacker)
+       if(level_spread > 20 && !(IS_AFFECTED(victim, AFF_CANTQUIT) || IS_AFFECTED(victim, AFF_CHAMPION)) && !vict_is_attacker)
        {
         if(GET_PKILLS(ch) > 0)
           GET_PKILLS(ch) -= 1;
@@ -5786,7 +5786,7 @@ void do_pkill(CHAR_DATA *ch, CHAR_DATA *victim, int type, bool vict_is_attacker)
        && ch->in_room != real_room(START_ROOM) 
        && ch->in_room != real_room(SECOND_START_ROOM)) 
     {
-       if(level_spread > 20 && !IS_AFFECTED(victim, AFF_CANTQUIT) && !vict_is_attacker)
+       if(level_spread > 20 && !(IS_AFFECTED(victim, AFF_CANTQUIT)||IS_AFFECTED(victim, AFF_CHAMPION)) && !vict_is_attacker)
        {
         if(GET_PKILLS(ch) > 0)
           GET_PKILLS(ch) -= 1;
