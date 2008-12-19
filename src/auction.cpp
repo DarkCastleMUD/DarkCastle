@@ -417,7 +417,7 @@ bool AuctionHouse::IsExist(string name, int vnum)
   map<unsigned int, AuctionTicket>::iterator Item_it;
   for(Item_it = Items_For_Sale.begin(); Item_it != Items_For_Sale.end(); Item_it++)
   {
-    if(Item_it->second.vitem == vnum)
+    if((Item_it->second.vitem == vnum) && !Item_it->second.seller.compare(name))
       return true;
   }  
   return false;
@@ -1149,7 +1149,7 @@ void AuctionHouse::AddItem(CHAR_DATA *ch, OBJ_DATA *obj, unsigned int price, str
 
   if (IS_SET(obj->obj_flags.more_flags, ITEM_UNIQUE) && IsExist(GET_NAME(ch), obj_index[obj->item_number].virt))
   {
-    csendf(ch, "You're selling one %s already!\n\r", obj->short_description);
+    csendf(ch, "You're selling %s already and it's unique!\n\r", obj->short_description);
     return;
   }
 
