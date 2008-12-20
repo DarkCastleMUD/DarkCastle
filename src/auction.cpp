@@ -45,7 +45,9 @@ enum ListOptions
   LIST_PRIVATE,
   LIST_BY_NAME,
   LIST_BY_LEVEL,
-  LIST_BY_SLOT
+  LIST_BY_SLOT,
+  LIST_BY_SELLER,
+  LIST_BY_CLASS
 };
 
 enum AuctionStates
@@ -102,7 +104,9 @@ private:
   bool IsOkToSell(OBJ_DATA *obj);
   bool IsWearable(CHAR_DATA *ch, int vnum);
   bool IsNoTrade(int vnum);
+  bool IsSeller(string in_name, string seller);
   bool IsExist(string name, int vnum);
+  bool IsClass(int vnum, string isclass);
   bool IsName(string name, int vnum);
   bool IsSlot(string slot, int vnum);
   bool IsLevel(unsigned int to, unsigned int from, int vnum);
@@ -111,6 +115,85 @@ private:
   string file_name;
   map<unsigned int, AuctionTicket> Items_For_Sale;
 };
+
+/*
+IS CLASS
+Checks to see if the passed in vnum is wearable by the passed in class
+*/
+bool AuctionHouse::IsClass(int vnum, string isclass)
+{
+  int nr = real_object(vnum);
+  if(nr < 0)
+    return false;
+
+  OBJ_DATA *obj = (struct obj_data *)(obj_index[nr].item);
+
+  if(!obj)
+   return false;
+
+  for(unsigned int i = 0; i < isclass.size(); i++)
+    isclass[i] = LOWER(isclass[i]);
+ 
+  if(IS_OBJ_STAT(obj, ITEM_ANY_CLASS))
+    return true;
+ 
+  if(!strncmp(isclass.c_str(), "warrior", isclass.size()))
+    return IS_OBJ_STAT(obj, ITEM_WARRIOR);
+
+  if(!strncmp(isclass.c_str(), "mage", isclass.size()))
+     return IS_OBJ_STAT(obj, ITEM_MAGE);
+
+  if(!strncmp(isclass.c_str(), "thief", isclass.size()))
+     return IS_OBJ_STAT(obj, ITEM_THIEF);
+   
+  if(!strncmp(isclass.c_str(), "cleric", isclass.size()))
+     return IS_OBJ_STAT(obj, ITEM_CLERIC);
+
+  if(!strncmp(isclass.c_str(), "paladin", isclass.size()))
+     return IS_OBJ_STAT(obj, ITEM_PAL);
+
+  if(!strncmp(isclass.c_str(), "anti", isclass.size()))
+     return IS_OBJ_STAT(obj, ITEM_ANTI);
+
+  if(!strncmp(isclass.c_str(), "barbarian", isclass.size()))
+     return IS_OBJ_STAT(obj, ITEM_BARB);
+
+  if(!strncmp(isclass.c_str(), "ranger", isclass.size()))
+     return IS_OBJ_STAT(obj, ITEM_RANGER);
+
+  if(!strncmp(isclass.c_str(), "bard", isclass.size()))
+     return IS_OBJ_STAT(obj, ITEM_BARD);
+
+  if(!strncmp(isclass.c_str(), "druid", isclass.size()))
+     return IS_OBJ_STAT(obj, ITEM_DRUID);
+
+  if(!strncmp(isclass.c_str(), "monk", isclass.size()))
+     return IS_OBJ_STAT(obj, ITEM_MONK);
+
+  return false;
+}
+
+/*
+IS SELLER
+checks to see if the passed in name is equal to the seller
+*/
+bool AuctionHouse::IsSeller(string in_name, string seller)
+{
+  char buf[20];
+  strncpy(buf, in_name.c_str(), 19);
+  buf[19] = '\0';
+
+  //taken from linkload, formatting of player name
+  char *c;
+  c = buf;
+  *c = UPPER(*c);
+  c++;
+  while(*c) { 
+    *c = LOWER(*c);
+    c++;
+  }
+  return !seller.compare(buf);
+}
 
 /*
 DO MODIFY
@@ -1038,23 +1121,42 @@ void AuctionHouse::ListItems(CHAR_DATA *ch, ListOptions options, string name, un
   string output_buf;
   string state_output;
   char buf[MAX_STRING_LENGTH];
-  
-  send_to_char("Ticket-Seller-------Price------Status--T--Item---------------------------\n\r", ch);
+ 
+  if(options == LIST_MINE)
+    send_to_char("Ticket-Buyer--------Price------Status--T--Item---------------------------\n\r", ch);
+  else
+    send_to_char("Ticket-Seller-------Price------Status--T--Item---------------------------\n\r", ch);
+
   for(i = 0, Item_it = Items_For_Sale.begin(); (i < 50) && (Item_it != Items_For_Sale.end()); Item_it++)
   {
     if(
        (options == LIST_MINE && !Item_it->second.seller.compare(GET_NAME(ch)))
-       || (options == LIST_ALL 
-           && (Item_it->second.buyer.empty() || !Item_it->second.buyer.compare(GET_NAME(ch))))
+       || (options == LIST_ALL)
        || (options == LIST_PRIVATE && !Item_it->second.buyer.compare(GET_NAME(ch)))
        || (options == LIST_BY_NAME && IsName(name, Item_it->second.vitem))
        || (options == LIST_BY_LEVEL && IsLevel(to, from, Item_it->second.vitem))
        || (options == LIST_BY_SLOT && IsSlot(name, Item_it->second.vitem))
+       || (options == LIST_BY_SELLER && IsSeller(name, Item_it->second.seller))
+       || (options == LIST_BY_CLASS && IsClass(Item_it->second.vitem, name))
       )
     {
+      //don't show it if its expired or sold and its not the searchers item
       if((Item_it->second.state == AUC_EXPIRED || Item_it->second.state == AUC_SOLD) 
           && options != LIST_MINE)
         continue;
+
+      /*
+      Things guaranteed at this point:
+      Auction is being actively sold. (or the searcher is viewing their expired/sold items)
+      Search parameters are met.
+      */
+
+      if(!Item_it->second.buyer.empty()) //if its a private auction
+      {
+        if(Item_it->second.buyer.compare(GET_NAME(ch)) //if the buyer isn't the searcher
+           && Item_it->second.seller.compare(GET_NAME(ch))) //and isn't the seller
+        continue;
+      }
       i++;
       switch(Item_it->second.state)
       {
@@ -1062,7 +1164,10 @@ void AuctionHouse::ListItems(CHAR_DATA *ch, ListOptions options, string name, un
           state_output = "$0$BSOLD$R   ";
         break;
         case AUC_FOR_SALE:
-          state_output = "$2ACTIVE$R ";
+          if(Item_it->second.buyer.empty())
+            state_output = "$2PUBLIC$R ";
+          else
+            state_output = "$2PRIVATE$R";
         break;
         case AUC_EXPIRED:
           state_output = "$4EXPIRED$R";
@@ -1072,7 +1177,8 @@ void AuctionHouse::ListItems(CHAR_DATA *ch, ListOptions options, string name, un
         break; 
       }
       sprintf(buf, "\n\r%05d) $7$B%-12s$R $5%-10d$R %s %s %s%-30s\n\r", 
-               Item_it->first, Item_it->second.seller.c_str(), Item_it->second.price,
+               Item_it->first, (Item_it->second.buyer.empty()) ? Item_it->second.seller.c_str() : Item_it->second.buyer.c_str(), 
+               Item_it->second.price,
                state_output.c_str(), IsNoTrade(Item_it->second.vitem) ? "$4N$R" : " ",
                IsWearable(ch, Item_it->second.vitem) ? " " : "$4*$R", Item_it->second.item_name.c_str());
       output_buf += buf;
@@ -1083,6 +1189,13 @@ void AuctionHouse::ListItems(CHAR_DATA *ch, ListOptions options, string name, un
   {
     if(options == LIST_BY_SLOT)
       csendf(ch, "There are no %s items currently posted.\n\r", name.c_str());
+    else if (options == LIST_BY_SELLER)
+      csendf(ch, "\"%s\" doesn't seem to be selling any public items.\n\r"
+                 "To view private items, use \"vend list private\".\n\r", name.c_str());
+    else if (options == LIST_BY_CLASS)
+      csendf(ch, "There are no \"%s\" wearable public items for sale.\n\r", name.c_str());
+    else if (options == LIST_MINE)
+      send_to_char("You do not have any tickets.\n\r", ch);
     else
       send_to_char("There is nothing for sale!\n\r", ch);
   }
@@ -1098,7 +1211,7 @@ void AuctionHouse::ListItems(CHAR_DATA *ch, ListOptions options, string name, un
     if ((vault = has_vault(GET_NAME(ch)))) 
     {
        int max_items = vault->size / 100;
-       csendf(ch, "You using %d of your %d available tickets.\n\r", i, max_items);
+       csendf(ch, "\n\rYou are using %d of your %d available tickets.\n\r", i, max_items);
     }
   }
   int nr = real_object(27909);
@@ -1191,6 +1304,12 @@ void AuctionHouse::AddItem(CHAR_DATA *ch, OBJ_DATA *obj, unsigned int price, str
   if(GET_GOLD(ch) < fee)
   {
     csendf(ch, "You don't have enough gold to pay the %d coin auction fee.\n\r", fee);
+    return;
+  }
+
+  if(!strcmp(buf, GET_NAME(ch)))
+  {
+    send_to_char("Why would you want to privately sell something to yourself?\n\r", ch);
     return;
   }
 
@@ -1338,7 +1457,7 @@ int do_vend(CHAR_DATA *ch, char *argument, int cmd)
 
 
 
-  if(!TheAuctionHouse.IsAuctionHouse(ch->in_room) && GET_LEVEL(ch) < 108)
+  if(!TheAuctionHouse.IsAuctionHouse(ch->in_room) && GET_LEVEL(ch) < 105)
   {
     send_to_char("You must be in an auction house to do this!\n\r", ch);
     return eFAILURE;
@@ -1385,7 +1504,7 @@ int do_vend(CHAR_DATA *ch, char *argument, int cmd)
     argument = one_argument(argument, buf);
     if(!*buf)
     {
-      send_to_char("Search by what?\n\rSyntax: vend search <name | level | slot>\n\r", ch);
+      send_to_char("Search by what?\n\rSyntax: vend search <name | level | slot | seller>\n\r", ch);
       return eSUCCESS;
     }
     if(!strcmp(buf, "name"))
@@ -1416,6 +1535,40 @@ int do_vend(CHAR_DATA *ch, char *argument, int cmd)
 
       return eSUCCESS;
     }
+
+    if(!strcmp(buf, "class"))
+    {
+      argument = one_argument(argument, buf);
+      if(!*buf)
+      {
+        send_to_char("What class do you want to search for?\n\r"
+                     "\n\rSyntax: vend search class <class_name>\n\r", ch);
+        return eSUCCESS;
+      }
+      if(strlen(buf) < 4)
+      {
+        send_to_char("Class name needs to be at least 4 letters to search!\n\r", ch);
+        return eSUCCESS;
+      }
+      TheAuctionHouse.ListItems(ch, LIST_BY_CLASS, buf, 0, 0);
+
+      return eSUCCESS;
+    } 
+ 
+
+    if(!strcmp(buf, "seller"))
+    {
+      argument = one_argument(argument, buf);
+      if(!*buf)
+      {
+        send_to_char("What person are you looking for?\n\r"
+                     "\n\rSyntax: vend search seller <name>\n\r", ch);
+        return eSUCCESS;
+      }
+      TheAuctionHouse.ListItems(ch, LIST_BY_SELLER, buf, 0, 0);
+
+      return eSUCCESS;
+    }
  
  
     if(!strcmp(buf, "level"))
@@ -1436,7 +1589,7 @@ int do_vend(CHAR_DATA *ch, char *argument, int cmd)
       return eSUCCESS;
     }
 
-    send_to_char("Search by what?\n\rSyntax: vend search <name | level | slot>\n\r", ch);
+    send_to_char("Search by what?\n\rSyntax: vend search <name | level | slot | seller>\n\r", ch);
     return eSUCCESS;
   }  
 
