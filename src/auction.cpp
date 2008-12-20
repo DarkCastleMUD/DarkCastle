@@ -1177,7 +1177,7 @@ void AuctionHouse::ListItems(CHAR_DATA *ch, ListOptions options, string name, un
         break; 
       }
       sprintf(buf, "\n\r%05d) $7$B%-12s$R $5%-10d$R %s %s %s%-30s\n\r", 
-               Item_it->first, (Item_it->second.buyer.empty()) ? Item_it->second.seller.c_str() : Item_it->second.buyer.c_str(), 
+               Item_it->first, (options == LIST_MINE) ? Item_it->second.buyer.c_str() : Item_it->second.seller.c_str(), 
                Item_it->second.price,
                state_output.c_str(), IsNoTrade(Item_it->second.vitem) ? "$4N$R" : " ",
                IsWearable(ch, Item_it->second.vitem) ? " " : "$4*$R", Item_it->second.item_name.c_str());
