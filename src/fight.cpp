@@ -20,7 +20,7 @@
  * 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead *
  * of just race stuff                                                     *
  **************************************************************************
- * $Id: fight.cpp,v 1.523 2008/12/21 01:24:51 kkoons Exp $               *
+ * $Id: fight.cpp,v 1.524 2008/12/21 05:03:57 dcastle Exp $               *
  **************************************************************************/
 
 extern "C"
@@ -5704,7 +5704,7 @@ void do_pkill(CHAR_DATA *ch, CHAR_DATA *victim, int type, bool vict_is_attacker)
             GET_NAME(victim), GET_NAME(ch));
         break;
     }
-    int level_spread = GET_LEVEL(ch) - GET_LEVEL(victim);
+    int level_spread;
     // have to be level 20 and linkalive to count as a pkill and not yourself
     // (we check earlier to make sure victim isn't a mob)
     // now with tav/meta pkilling not adding to your score
@@ -5715,6 +5715,7 @@ void do_pkill(CHAR_DATA *ch, CHAR_DATA *victim, int type, bool vict_is_attacker)
        && ch->in_room != real_room(START_ROOM) 
        && ch->in_room != real_room(SECOND_START_ROOM))
     {
+      level_spread = GET_LEVEL(ch) - GET_LEVEL(victim);
       if(level_spread > 20 && !(IS_AFFECTED(victim, AFF_CANTQUIT)|| IS_AFFECTED(victim, AFF_CHAMPION)) && !vict_is_attacker)
       {
         if(GET_PKILLS(ch) > 0)
@@ -5751,10 +5752,11 @@ void do_pkill(CHAR_DATA *ch, CHAR_DATA *victim, int type, bool vict_is_attacker)
        && ch->in_room != real_room(START_ROOM) 
        && ch->in_room != real_room(SECOND_START_ROOM)) 
     {
+       level_spread = GET_LEVEL(ch->master) - GET_LEVEL(victim);
        if(level_spread > 20 && !(IS_AFFECTED(victim, AFF_CANTQUIT) || IS_AFFECTED(victim, AFF_CHAMPION)) && !vict_is_attacker)
        {
-        if(GET_PKILLS(ch) > 0)
-          GET_PKILLS(ch) -= 1;
+        if(GET_PKILLS(ch->master) > 0)
+          GET_PKILLS(ch->master) -= 1;
        }
        else if (GET_LEVEL(victim) > PKILL_COUNT_LIMIT)
        {
@@ -5786,10 +5788,11 @@ void do_pkill(CHAR_DATA *ch, CHAR_DATA *victim, int type, bool vict_is_attacker)
        && ch->in_room != real_room(START_ROOM) 
        && ch->in_room != real_room(SECOND_START_ROOM)) 
     {
+       level_spread = GET_LEVEL(ch->master) - GET_LEVEL(victim);
        if(level_spread > 20 && !(IS_AFFECTED(victim, AFF_CANTQUIT)||IS_AFFECTED(victim, AFF_CHAMPION)) && !vict_is_attacker)
        {
-        if(GET_PKILLS(ch) > 0)
-          GET_PKILLS(ch) -= 1;
+        if(GET_PKILLS(ch->master) > 0)
+          GET_PKILLS(ch->master) -= 1;
        }
       else if (GET_LEVEL(victim) > PKILL_COUNT_LIMIT)
        {
