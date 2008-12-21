@@ -20,7 +20,7 @@
  * 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead *
  * of just race stuff                                                     *
  **************************************************************************
- * $Id: fight.cpp,v 1.522 2008/12/19 14:33:54 kkoons Exp $               *
+ * $Id: fight.cpp,v 1.523 2008/12/21 01:24:51 kkoons Exp $               *
  **************************************************************************/
 
 extern "C"
@@ -5023,7 +5023,7 @@ void group_gain(CHAR_DATA * ch, CHAR_DATA * victim)
        continue;
     }
     
-    if(GET_LEVEL(tmp_ch) - GET_LEVEL(highest) <= -20 && !IS_NPC(tmp_ch)) {
+    if(GET_LEVEL(tmp_ch) - GET_LEVEL(highest) <= -21 && !IS_NPC(tmp_ch)) {
        act("You are too low for this group.  You gain no experience.", tmp_ch, 0, 0, TO_CHAR, 0);
 
        tmp_ch = loop_followers(&f);
