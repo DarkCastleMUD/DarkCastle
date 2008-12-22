@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_monk.cpp,v 1.37 2008/11/18 14:41:36 kkoons Exp $
+| $Id: cl_monk.cpp,v 1.38 2008/12/22 14:21:00 kkoons Exp $
 | cl_monk.C
 | Description:  Monk skills.
 */
@@ -265,7 +265,7 @@ int do_stun(struct char_data *ch, char *argument, int cmd)
 //     WAIT_STATE(ch, PULSE_VIOLENCE*4);
 	return eSUCCESS;     
   }
-  if(!skill_success(ch,victim, SKILL_STUN) && GET_POS(victim) != POSITION_SLEEPING
+  if((!skill_success(ch,victim, SKILL_STUN) && GET_POS(victim) != POSITION_SLEEPING)
      || do_frostshield(ch, victim)) 
   {
     act("$n attempts to hit you in your solar plexus!  You block $s attempt.", ch, NULL, victim, TO_VICT , 0);
