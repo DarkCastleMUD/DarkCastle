@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.187 2008/12/12 06:36:55 kkoons Exp $
+| $Id: cl_thief.cpp,v 1.188 2008/12/22 18:59:35 kkoons Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -1374,7 +1374,7 @@ int do_pocket(CHAR_DATA *ch, char *argument, int cmd)
   if(IS_MOB(ch))
      return eFAILURE;
 
-  if((GET_LEVEL(ch) < (GET_LEVEL(victim) - 10))) {
+  if((GET_LEVEL(ch) < (GET_LEVEL(victim) - 19))) {
     send_to_char("That person is far too experienced to steal from.\r\n", ch);
     return eFAILURE;
   }
