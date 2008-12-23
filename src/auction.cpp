@@ -47,7 +47,8 @@ enum ListOptions
   LIST_BY_LEVEL,
   LIST_BY_SLOT,
   LIST_BY_SELLER,
-  LIST_BY_CLASS
+  LIST_BY_CLASS,
+  LIST_BY_RACE
 };
 
 enum AuctionStates
@@ -107,6 +108,7 @@ private:
   bool IsSeller(string in_name, string seller);
   bool IsExist(string name, int vnum);
   bool IsClass(int vnum, string isclass);
+  bool IsRace(int vnum, string israce);
   bool IsName(string name, int vnum);
   bool IsSlot(string slot, int vnum);
   bool IsLevel(unsigned int to, unsigned int from, int vnum);
@@ -115,6 +117,58 @@ private:
   string file_name;
   map<unsigned int, AuctionTicket> Items_For_Sale;
 };
+
+/*
+IS RACE
+Lists all items wearable by the inputted race
+*/
+bool AuctionHouse::IsRace(int vnum, string israce)
+{
+  int nr = real_object(vnum);
+
+  if(nr < 0)
+    return false;
+
+  OBJ_DATA *obj = (struct obj_data *)(obj_index[nr].item);
+
+  if(!obj)
+   return false;
+
+  if(IS_SET(obj->obj_flags.size, SIZE_ANY))
+    return true;
+
+  for(unsigned int i = 0; i < israce.size(); i++)
+    israce[i] = LOWER(israce[i]);
+
+  if(!strncmp(israce.c_str(), "human", israce.size()))
+    return true;
+
+  if(!strncmp(israce.c_str(), "ogre", israce.size()))
+    return IS_SET(obj->obj_flags.size, SIZE_LARGE);
+
+  if(!strncmp(israce.c_str(), "troll", israce.size()))
+    return IS_SET(obj->obj_flags.size, SIZE_LARGE);
+
+  if(!strncmp(israce.c_str(), "elf", israce.size()))
+    return (IS_SET(obj->obj_flags.size, SIZE_MEDIUM) || IS_SET(obj->obj_flags.size, SIZE_LARGE));
+  
+  if(!strncmp(israce.c_str(), "orc", israce.size()))
+    return (IS_SET(obj->obj_flags.size, SIZE_MEDIUM) || IS_SET(obj->obj_flags.size, SIZE_LARGE));
+
+  if(!strncmp(israce.c_str(), "dwarf", israce.size()))
+    return (IS_SET(obj->obj_flags.size, SIZE_MEDIUM) || IS_SET(obj->obj_flags.size, SIZE_SMALL));
+
+  if(!strncmp(israce.c_str(), "gnome", israce.size()))
+    return (IS_SET(obj->obj_flags.size, SIZE_MEDIUM) || IS_SET(obj->obj_flags.size, SIZE_SMALL));
+
+  if(!strncmp(israce.c_str(), "pixie", israce.size()))
+    return IS_SET(obj->obj_flags.size, SIZE_SMALL);
+
+  if(!strncmp(israce.c_str(), "hobbit", israce.size()))
+    return IS_SET(obj->obj_flags.size, SIZE_SMALL);
+
+  return false;
+}
 
 /*
 IS CLASS
@@ -243,6 +297,10 @@ void AuctionHouse::DoModify(CHAR_DATA *ch, unsigned int ticket, unsigned int new
       csendf(tmp, "%s has just modified the price of one of %s items.\n\r", 
                  GET_NAME(ch), (GET_SEX(ch) == SEX_MALE) ? "his" : "her");
 
+  char log_buf[MAX_STRING_LENGTH];
+  sprintf(log_buf, "VEND: %s modified ticket %u (%s): old price %u, new price %u.\n\r", 
+               GET_NAME(ch), Item_it->first, Item_it->second.item_name.c_str(), Item_it->second.price, new_price);
+  log(log_buf, IMP, LOG_OBJECTS);
   Item_it->second.price = new_price;
   Save();
   return;
@@ -1138,6 +1196,7 @@ void AuctionHouse::ListItems(CHAR_DATA *ch, ListOptions options, string name, un
        || (options == LIST_BY_SLOT && IsSlot(name, Item_it->second.vitem))
        || (options == LIST_BY_SELLER && IsSeller(name, Item_it->second.seller))
        || (options == LIST_BY_CLASS && IsClass(Item_it->second.vitem, name))
+       || (options == LIST_BY_RACE && IsRace(Item_it->second.vitem, name))
       )
     {
       //don't show it if its expired or sold and its not the searchers item
@@ -1188,16 +1247,18 @@ void AuctionHouse::ListItems(CHAR_DATA *ch, ListOptions options, string name, un
   if(i == 0)
   {
     if(options == LIST_BY_SLOT)
-      csendf(ch, "There are no %s items currently posted.\n\r", name.c_str());
+      csendf(ch, "\n\rThere are no %s items currently posted.\n\r", name.c_str());
     else if (options == LIST_BY_SELLER)
-      csendf(ch, "\"%s\" doesn't seem to be selling any public items.\n\r"
-                 "To view private items, use \"vend list private\".\n\r", name.c_str());
+      csendf(ch, "\n\r\"%s\" doesn't seem to be selling any public items.\n\r"
+                 "\n\rTo view private items, use \"vend list private\".\n\r", name.c_str());
     else if (options == LIST_BY_CLASS)
-      csendf(ch, "There are no \"%s\" wearable public items for sale.\n\r", name.c_str());
+      csendf(ch, "\n\rThere are no \"%s\" wearable public items for sale.\n\r", name.c_str());
     else if (options == LIST_MINE)
-      send_to_char("You do not have any tickets.\n\r", ch);
+      send_to_char("\n\rYou do not have any tickets.\n\r", ch);
+    else if (options == LIST_BY_RACE)
+      csendf(ch, "\n\rThere is nothing for sale that would fit a \"%s\".\n\r", name.c_str());
     else
-      send_to_char("There is nothing for sale!\n\r", ch);
+      send_to_char("\n\rThere is nothing for sale!\n\r", ch);
   }
  
   if(i >= 50)
@@ -1214,11 +1275,15 @@ void AuctionHouse::ListItems(CHAR_DATA *ch, ListOptions options, string name, un
        csendf(ch, "\n\rYou are using %d of your %d available tickets.\n\r", i, max_items);
     }
   }
-  int nr = real_object(27909);
-  if(nr >= 0)
-    csendf(ch, "\n\r'$4N$R' indicates an item is NO_TRADE and requires %s to purchase.\n\r",
+
+  if(i > 0) //only display this if there was at least 1 item listed
+  {
+    int nr = real_object(27909);
+    if(nr >= 0)
+      csendf(ch, "\n\r'$4N$R' indicates an item is NO_TRADE and requires %s to purchase.\n\r",
                 ((struct obj_data *)(obj_index[nr].item))->short_description);
-  send_to_char("'$4*$R' indicates you are unable to use this item.\n\r", ch);
+    send_to_char("'$4*$R' indicates you are unable to use this item.\n\r", ch);
+  }
   return;
 }
 
@@ -1535,6 +1600,23 @@ int do_vend(CHAR_DATA *ch, char *argument, int cmd)
 
       return eSUCCESS;
     }
+
+    if(!strcmp(buf, "race"))
+    {
+      argument = one_argument(argument, buf);
+      if(!*buf)
+      {
+        send_to_char("What race do you want to search for?\n\r"
+                     "Human, Elf, Dwarf, Hobbit, Pixie, Gnome, Orc, Troll\n\r"
+                     "\n\rSyntax: vend search race <race>\n\r", ch);
+        return eSUCCESS;
+      }
+      TheAuctionHouse.ListItems(ch, LIST_BY_RACE, buf, 0, 0);
+
+      return eSUCCESS;
+    }
+
+    
 
     if(!strcmp(buf, "class"))
     {
