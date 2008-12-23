@@ -1263,6 +1263,19 @@ void make_prompt(struct descriptor_data *d, char *prompt)
     }
 }
 
+int calc_charmie_hp(CHAR_DATA *ch)
+{
+  if(!ch) return 0;
+
+  struct follow_type *k;
+  if(ch->followers)
+    for(k = ch->followers; k && k != (follow_type *)0x95959595; k = k->next)
+      if(IS_AFFECTED(k->follower, AFF_CHARM))
+        return ((GET_HIT(k->follower) * 100)/GET_MAX_HIT(k->follower));
+
+  return 0;
+}
+
 void generate_prompt(CHAR_DATA *ch, char *prompt)
 {
   char gprompt[MAX_STRING_LENGTH];
@@ -1284,13 +1297,13 @@ void generate_prompt(CHAR_DATA *ch, char *prompt)
      }
      ++source;
      if(*source == '\0') {
-       strcpy(prompt, "There is a fucked up code in your prompt> ");
+       strcpy(prompt, "1There is a fucked up code in your prompt> ");
        return;
      }
 
      switch(*source) {
        default:
-         strcat(prompt, "There is a fucked up code in your prompt> ");
+         strcat(prompt, "2There is a fucked up code in your prompt> ");
          return;
         case 'p':
 	  if (ch->fighting && ch->fighting->fighting) {
@@ -1374,17 +1387,20 @@ void generate_prompt(CHAR_DATA *ch, char *prompt)
          sprintf(pro, "%s%d%s", calc_color(GET_MOVE(ch), GET_MAX_MOVE(ch)),
                  GET_MOVE(ch), NTEXT);
          break;
+       case 'Y':
+         sprintf(pro, "%d", calc_charmie_hp(ch));
+         break;
        case 'I':
-         sprintf(pro, "%d", (int) (100*((float)GET_HIT(ch)/(float)GET_MAX_HIT(ch))));
+         sprintf(pro, "%d", ((GET_HIT(ch) * 100)/GET_MAX_HIT(ch)));
          break;
        case 'N':
-         sprintf(pro, "%d", (int) (100*((float)GET_MANA(ch)/(float)GET_MAX_MANA(ch))));
+         sprintf(pro, "%d", ((GET_MANA(ch) * 100)/GET_MAX_MANA(ch)));
          break;
        case 'W':
-         sprintf(pro, "%d", (int) (100*((float)GET_MOVE(ch)/(float)GET_MAX_MOVE(ch))));
+         sprintf(pro, "%d", ((GET_MOVE(ch) * 100)/GET_MAX_MOVE(ch)));
          break;
        case 'L':
-         sprintf(pro, "%d", (int) (100*((float)GET_KI(ch)/(float)GET_MAX_KI(ch))));
+         sprintf(pro, "%d", ((GET_KI(ch) * 100)/GET_MAX_KI(ch)));
          break;
        case 'x':
          sprintf(pro, "%lld", GET_EXP(ch));
