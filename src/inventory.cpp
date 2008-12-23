@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.107 2008/12/13 23:56:27 kkoons Exp $
+| $Id: inventory.cpp,v 1.108 2008/12/23 09:45:30 kkoons Exp $
 | inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
@@ -1417,11 +1417,13 @@ int do_give(struct char_data *ch, char *argument, int cmd)
       send_to_char("To whom?\n\r",ch);
       return eFAILURE;
     }
+
+      if (!(vict = get_char_room_vis(ch, vict_name))) 
+      {
+        send_to_char("To whom?\n\r",ch);
+        return eFAILURE;
+      }
     
-      if (!(vict = get_char_room_vis(ch, vict_name))) {
-	 send_to_char("To whom?\n\r",ch);
-	 return eFAILURE;
-	 }
       
       if(ch == vict) {
          send_to_char("Umm okay, you give it to yourself.\r\n", ch);
@@ -1481,10 +1483,36 @@ int do_give(struct char_data *ch, char *argument, int cmd)
 	return eFAILURE;
     }
 
-    if (!(vict = get_char_room_vis(ch, vict_name)))
+    if(!strcmp(vict_name, "follower"))
     {
+      bool found = false;
+      struct follow_type *k;
+      int org_room = ch->in_room;
+      if(ch->followers)
+        for (k = ch->followers; k && k != (follow_type *)0x95959595; k = k->next) 
+        {
+          if (org_room == k->follower->in_room)
+            if (IS_AFFECTED(k->follower, AFF_CHARM)) 
+            {
+              vict = k->follower;
+              found = true;
+	    }
+        }
+
+      if(!found)
+      {
+	send_to_char("Nobody here are loyal subjects of yours!\n\r", ch);
+        return eFAILURE;
+      }
+    }
+    else
+    {
+      if (!(vict = get_char_room_vis(ch, vict_name)))
+      {
+        csendf(ch, "Yer lookin for \"%s\"\n\r", vict_name);
 	send_to_char("No one by that name around here.\n\r", ch);
 	return eFAILURE;
+      }
     }
 
     if (ch == vict)
