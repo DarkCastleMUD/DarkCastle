@@ -20,7 +20,7 @@
  * 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead *
  * of just race stuff                                                     *
  **************************************************************************
- * $Id: fight.cpp,v 1.524 2008/12/21 05:03:57 dcastle Exp $               *
+ * $Id: fight.cpp,v 1.525 2008/12/23 19:29:37 kkoons Exp $               *
  **************************************************************************/
 
 extern "C"
@@ -4345,7 +4345,7 @@ int do_skewer(CHAR_DATA *ch, CHAR_DATA *vict, int dam, int wt, int wt2, int weap
   if(affected_by_spell(ch, SKILL_DEFENDERS_STANCE)) return 0;
 
   int type = get_weapon_damage_type(ch->equipment[weapon]);
-  if( ! ( type == TYPE_PIERCE || type == TYPE_SLASH ))  return 0;
+  if( ! ( type == TYPE_PIERCE || type == TYPE_SLASH || type == TYPE_STING))  return 0;
   if(!skill_success(ch,vict, SKILL_SKEWER))                          return 0;
 
   if (number(0, 100) < 25) {
