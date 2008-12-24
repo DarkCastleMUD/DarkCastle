@@ -1569,7 +1569,7 @@ int do_vend(CHAR_DATA *ch, char *argument, int cmd)
     argument = one_argument(argument, buf);
     if(!*buf)
     {
-      send_to_char("Search by what?\n\rSyntax: vend search <name | level | slot | seller>\n\r", ch);
+      send_to_char("Search by what?\n\rSyntax: vend search <name | level | slot | seller | race | class>\n\r", ch);
       return eSUCCESS;
     }
     if(!strcmp(buf, "name"))
@@ -1671,7 +1671,7 @@ int do_vend(CHAR_DATA *ch, char *argument, int cmd)
       return eSUCCESS;
     }
 
-    send_to_char("Search by what?\n\rSyntax: vend search <name | level | slot | seller>\n\r", ch);
+    send_to_char("Search by what?\n\rSyntax: vend search <name | level | slot | seller | race | class>\n\r", ch);
     return eSUCCESS;
   }  
 
