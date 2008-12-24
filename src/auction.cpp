@@ -1261,8 +1261,6 @@ void AuctionHouse::ListItems(CHAR_DATA *ch, ListOptions options, string name, un
       send_to_char("\n\rThere is nothing for sale!\n\r", ch);
   }
  
-  if(i >= 50)
-   send_to_char("Maximum number of results reached.\n\r", ch);
 
 
   page_string(ch->desc, output_buf.c_str(), 1);
@@ -1275,6 +1273,9 @@ void AuctionHouse::ListItems(CHAR_DATA *ch, ListOptions options, string name, un
        csendf(ch, "\n\rYou are using %d of your %d available tickets.\n\r", i, max_items);
     }
   }
+
+  if(i >= 50)
+   send_to_char("Maximum number of results reached.\n\r", ch);
 
   if(i > 0) //only display this if there was at least 1 item listed
   {
