@@ -257,9 +257,10 @@ int spell_chill_touch(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
   int weap_spell = obj?WIELD:0;
   int retval = damage(ch, victim, dam, TYPE_COLD, SPELL_CHILL_TOUCH, weap_spell);
 
+  if(SOMEONE_DIED(retval)) return retval;
+
   bool hasSpellcraft = spellcraft(ch, SPELL_CHILL_TOUCH);
 
-  if(SOMEONE_DIED(retval)) return retval;
   if(IS_SET(retval,eEXTRA_VAL2)) victim = ch;
   if(IS_SET(retval,eEXTRA_VALUE)) return retval;
 
@@ -6038,6 +6039,7 @@ int cast_call_lightning( ubyte level, CHAR_DATA *ch, char *arg, int type,
 int cast_chill_touch( ubyte level, CHAR_DATA *ch, char *arg, int type,
   CHAR_DATA *victim, struct obj_data *tar_obj, int skill )
 {
+
   switch (type) {
   case SPELL_TYPE_SPELL:
 	 return spell_chill_touch(level, ch, victim, 0, skill);
