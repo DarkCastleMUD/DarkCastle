@@ -53,7 +53,8 @@ extern struct obj_data * search_char_for_item(char_data * ch, int16 item_number,
 extern struct obj_data  *object_list;
 extern char *item_condition(struct obj_data *obj);
 
-struct vault_data *has_vault(const char *name) {
+struct vault_data *has_vault(const char *name) 
+{
   struct vault_data *vault;
 
   for (vault = vault_table;vault;vault = vault->next)
@@ -80,6 +81,14 @@ bool fullSave(obj_data *obj)
     return 1;
 
   obj_data *tmp_obj = get_obj(GET_OBJ_VNUM(obj));
+  if(!tmp_obj)
+  {
+    char buf[MAX_STRING_LENGTH];
+    sprintf(buf, "crash bug! vault.cpp, tmp_obj was null! %s is obj", obj->name);
+    log(buf, IMMORTAL, LOG_BUG);
+    return 0;
+  }
+  
   if (strcmp(GET_OBJ_SHORT(obj), GET_OBJ_SHORT(tmp_obj)))
     return 1;
 
@@ -1646,7 +1655,9 @@ void show_vault(CHAR_DATA *ch, char *owner) {
   if (!has_vault_access(GET_NAME(ch), vault)) {
     csendf(ch, "You don't have access to %s's vault.\r\n", owner);
     return;
-  }
+  } 
+  csendf(ch, "This vault is %d lbs.\n\r", vault->weight);
+
 
   if (self)
       snprintf(sectionbuf, sizeof(sectionbuf), "Your vault is at %d of %d maximum pounds and contains:\r\n", vault->weight, vault->size);
