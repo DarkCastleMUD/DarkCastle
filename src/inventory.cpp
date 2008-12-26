@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.108 2008/12/23 09:45:30 kkoons Exp $
+| $Id: inventory.cpp,v 1.109 2008/12/26 04:19:32 kkoons Exp $
 | inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
@@ -2163,6 +2163,8 @@ int do_unlock(CHAR_DATA *ch, char *argument, int cmd)
                         REMOVE_BIT(back->exit_info, EX_LOCKED);
         }
     }
+    else
+      send_to_char("You don't see anything like that.\n\r", ch);
     return eSUCCESS;
 }
 
