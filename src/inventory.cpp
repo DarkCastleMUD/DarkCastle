@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.109 2008/12/26 04:19:32 kkoons Exp $
+| $Id: inventory.cpp,v 1.110 2008/12/26 04:20:49 dcastle Exp $
 | inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
@@ -1509,7 +1509,6 @@ int do_give(struct char_data *ch, char *argument, int cmd)
     {
       if (!(vict = get_char_room_vis(ch, vict_name)))
       {
-        csendf(ch, "Yer lookin for \"%s\"\n\r", vict_name);
 	send_to_char("No one by that name around here.\n\r", ch);
 	return eFAILURE;
       }
