@@ -131,6 +131,7 @@ void assign_non_combat_procs() {
     SPEC_FUN    newbie_zone_guard;
     SPEC_FUN    humaneater;
     SPEC_FUN    pir_slut;
+    SPEC_FUN    stupid_button;
     SPEC_FUN    generic_guard;
     SPEC_FUN    portal_guard;
     SPEC_FUN    doorcloser;
@@ -166,6 +167,7 @@ void assign_non_combat_procs() {
    assign_one_mob_non(90, druid_elemental);
    assign_one_mob_non(91, druid_elemental);
     assign_one_mob_non(70,  pir_slut);
+    assign_one_mob_non(72,  stupid_button);
     assign_one_mob_non(200,  mud_school_adept);
     assign_one_mob_non(207,  adept);
     assign_one_mob_non(208,  adept);
