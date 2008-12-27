@@ -131,7 +131,6 @@ void assign_non_combat_procs() {
     SPEC_FUN    newbie_zone_guard;
     SPEC_FUN    humaneater;
     SPEC_FUN    pir_slut;
-    SPEC_FUN    stupid_button;
     SPEC_FUN    generic_guard;
     SPEC_FUN    portal_guard;
     SPEC_FUN    doorcloser;
@@ -167,7 +166,6 @@ void assign_non_combat_procs() {
    assign_one_mob_non(90, druid_elemental);
    assign_one_mob_non(91, druid_elemental);
     assign_one_mob_non(70,  pir_slut);
-    assign_one_mob_non(72,  stupid_button);
     assign_one_mob_non(200,  mud_school_adept);
     assign_one_mob_non(207,  adept);
     assign_one_mob_non(208,  adept);
@@ -405,6 +403,7 @@ void assign_objects(void)
   SPEC_FUN portal_word;
   SPEC_FUN full_heal_word;
   SPEC_FUN mana_box;
+  SPEC_FUN stupid_button;
   SPEC_FUN fireshield_word;
   SPEC_FUN teleport_word;
   SPEC_FUN alignment_word;
@@ -470,6 +469,7 @@ void assign_objects(void)
 
     assign_one_obj_non(29204, angie_proc);
     assign_one_obj_non(70, blackjack_table);
+    assign_one_obj_non(72,  stupid_button);
     assign_one_obj_non(21900, blackjack_table);
     assign_one_obj_non(21901, blackjack_table);
     assign_one_obj_non(21902, blackjack_table);
