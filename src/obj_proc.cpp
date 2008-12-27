@@ -846,6 +846,33 @@ int gem_assembler(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
    obj_to_char(reward, ch);
    return eSUCCESS;
 }
+
+int stupid_button(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
+		   CHAR_DATA *invoker)
+{
+  if(cmd != CMD_PUSH) return eFAILURE;
+
+  char vict[MAX_STRING_LENGTH];
+
+  one_argument(arg, vict);
+  if(strcmp(vict, "button") && strcmp(vict, "red") && strcmp(vict, "big"))
+  {
+    send_to_char("Push what?\n\r", ch);
+    return eFAILURE;
+  }
+
+  send_to_char("You couldn't help but push the $4$Bbutton$R, could you?\n\r", ch);
+  send_to_char("The floor drops out beneath you and you find yourself.. er.. somewhere.\n\r", ch);
+  int retval = move_char(ch, real_room(48));
+
+  if(!IS_SET(retval, eSUCCESS)) 
+  {
+    send_to_char("You try very hard to push it, but you fail.\n\r", ch);
+    act("$n tries to push the button, but fails miserably!", ch, 0, 0, TO_ROOM, 0);
+  }
+  return eSUCCESS;
+}
+
 // Fear gaze.
 int gazeofgaiot(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
 		   CHAR_DATA *invoker)
