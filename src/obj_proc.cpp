@@ -863,7 +863,7 @@ int stupid_button(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
 
   send_to_char("You couldn't help but push the $4$Bbutton$R, could you?\n\r", ch);
   send_to_char("The floor drops out beneath you and you find yourself.. er.. somewhere.\n\r", ch);
-  int retval = move_char(ch, real_room(48));
+  int retval = move_char(ch, real_room(49));
 
   if(!IS_SET(retval, eSUCCESS)) 
   {
