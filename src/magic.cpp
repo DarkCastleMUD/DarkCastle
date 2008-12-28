@@ -2667,7 +2667,7 @@ int spell_locate_object(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim
       room = i->in_obj->in_room;
 
     // If owner, PC, with desc and not con_playing or wizinvis,
-    if (owner && is_in_game(owner) &&
+    if (owner && owner->pcdata && is_in_game(owner) &&
 	(owner->pcdata->wizinvis > GET_LEVEL(ch)))
       continue;
 
