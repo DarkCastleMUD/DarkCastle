@@ -1211,7 +1211,7 @@ void AuctionHouse::ListItems(CHAR_DATA *ch, ListOptions options, string name, un
       Search parameters are met.
       */
 
-      if(!Item_it->second.buyer.empty()) //if its a private auction
+      if(!Item_it->second.buyer.empty() && GET_LEVEL(ch) < OVERSEER) //if its a private auction
       {
         if(Item_it->second.buyer.compare(GET_NAME(ch)) //if the buyer isn't the searcher
            && Item_it->second.seller.compare(GET_NAME(ch))) //and isn't the seller
