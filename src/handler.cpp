@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.176 2008/12/13 23:56:48 kkoons Exp $ */
+/* $Id: handler.cpp,v 1.177 2008/12/28 18:14:26 kkoons Exp $ */
     
 extern "C"
 {
@@ -1654,6 +1654,10 @@ void affect_remove( CHAR_DATA *ch, struct affected_type *af, int flags)
          if (!(flags & SUPPRESS_MESSAGES))
          send_to_char("You feel capable of studying a new enemy of choice.\n\r", ch);
          break;
+       case LIST_TIMER:
+	   if (!(flags & SUPPRESS_MESSAGES))
+	       send_to_char("The broker is ready to show you another list of items.\n\r", ch);
+	   break;
        case SKILL_DECEIT_TIMER:
 	   if (!(flags & SUPPRESS_MESSAGES))
 	       send_to_char("You feel like you could be deceitful again.\n\r", ch);
