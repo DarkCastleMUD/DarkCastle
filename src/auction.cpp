@@ -1185,7 +1185,7 @@ void AuctionHouse::ListItems(CHAR_DATA *ch, ListOptions options, string name, un
   else
     send_to_char("Ticket-Seller-------Price------Status--T--Item---------------------------\n\r", ch);
 
-  for(i = 0, Item_it = Items_For_Sale.begin(); (i < 50) && (Item_it != Items_For_Sale.end()); Item_it++)
+  for(Item_it = Items_For_Sale.begin(); Item_it != Items_For_Sale.end(); Item_it++)
   {
     if(
        (options == LIST_MINE && !Item_it->second.seller.compare(GET_NAME(ch)))
@@ -1201,7 +1201,8 @@ void AuctionHouse::ListItems(CHAR_DATA *ch, ListOptions options, string name, un
     {
       //don't show it if its expired or sold and its not the searchers item
       if((Item_it->second.state == AUC_EXPIRED || Item_it->second.state == AUC_SOLD) 
-          && options != LIST_MINE)
+          && options != LIST_MINE
+          && GET_LEVEL(ch) < OVERSEER)
         continue;
 
       /*
@@ -1216,7 +1217,7 @@ void AuctionHouse::ListItems(CHAR_DATA *ch, ListOptions options, string name, un
            && Item_it->second.seller.compare(GET_NAME(ch))) //and isn't the seller
         continue;
       }
-      i++;
+     
       switch(Item_it->second.state)
       {
         case AUC_SOLD:
@@ -1274,9 +1275,6 @@ void AuctionHouse::ListItems(CHAR_DATA *ch, ListOptions options, string name, un
     }
   }
 
-  if(i >= 50)
-   send_to_char("Maximum number of results reached.\n\r", ch);
-
   if(i > 0) //only display this if there was at least 1 item listed
   {
     int nr = real_object(27909);
@@ -1285,6 +1283,14 @@ void AuctionHouse::ListItems(CHAR_DATA *ch, ListOptions options, string name, un
                 ((struct obj_data *)(obj_index[nr].item))->short_description);
     send_to_char("'$4*$R' indicates you are unable to use this item.\n\r", ch);
   }
+
+  struct affected_type af;
+  af.type      = LIST_TIMER;
+  af.duration  = 1;
+  af.modifier  = 0;
+  af.location  = 0;
+  af.bitvector = -1;
+  affect_to_char(ch, &af);
   return;
 }
 
@@ -1743,6 +1749,11 @@ int do_vend(CHAR_DATA *ch, char *argument, int cmd)
 
     if(!strcmp(buf, "all"))
     {
+      if(affected_by_spell(ch, LIST_TIMER)) 
+      {
+        send_to_char("You have to wait a little between listing!\r\n", ch);
+        return eFAILURE;
+      }   
       TheAuctionHouse.ListItems(ch, LIST_ALL, "", 0, 0);
     }
     else if (!strcmp(buf, "mine"))
