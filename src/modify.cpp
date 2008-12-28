@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: modify.cpp,v 1.19 2008/11/21 00:37:43 kkoons Exp $ */
+/* $Id: modify.cpp,v 1.20 2008/12/28 18:14:09 kkoons Exp $ */
 
 extern "C"
 {
@@ -38,6 +38,8 @@ extern "C"
 #include <spells.h>
 #include <handler.h>
 #include <db.h>
+#include <string>
+using namespace std;
 
 // TODO - what does this do?  Nothing that I can see....let's remove it....
 #define REBOOT_AT    10  /* 0-23, time of optional reboot if -e lib/reboot */
@@ -48,6 +50,7 @@ extern "C"
 
 void show_string(struct descriptor_data *d, char *input);
 void check_for_awaymsgs(char_data *ch);
+void page_string_dep(struct descriptor_data *d, const char *str, int keep_internal);
 
 extern char menu[];
 
@@ -635,8 +638,25 @@ void paginate_string(char *str, struct descriptor_data *d)
 }
 
 
-/* The call that gets the paging ball rolling... */
 void page_string(struct descriptor_data *d, const char *str, int keep_internal)
+{
+  char buf[MAX_STRING_LENGTH];
+  string print_me = str;
+  string tmp;
+
+  int call_count = (print_me.size() / MAX_STRING_LENGTH) + 1;
+
+  for(int i = 0; i < call_count; i++)
+  {
+    tmp = print_me.substr(i * MAX_STRING_LENGTH, MAX_STRING_LENGTH);
+    page_string_dep(d, tmp.c_str(), keep_internal);
+  }
+  return;
+}
+
+
+/* The deprecated call that gets the paging ball rolling... */
+void page_string_dep(struct descriptor_data *d, const char *str, int keep_internal)
 {
   if (!d)
     return;
@@ -651,9 +671,7 @@ void page_string(struct descriptor_data *d, const char *str, int keep_internal)
      send_to_char(str, d->character);
      return;
   }
-
   char buf[MAX_STRING_LENGTH];
-
   strncpy(buf, str, MAX_STRING_LENGTH);
 
   CREATE(d->showstr_vector, char *, d->showstr_count = count_pages(buf));
