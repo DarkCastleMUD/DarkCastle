@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: modify.cpp,v 1.20 2008/12/28 18:14:09 kkoons Exp $ */
+/* $Id: modify.cpp,v 1.21 2008/12/29 02:22:29 kkoons Exp $ */
 
 extern "C"
 {
@@ -644,12 +644,15 @@ void page_string(struct descriptor_data *d, const char *str, int keep_internal)
   string print_me = str;
   string tmp;
 
-  int call_count = (print_me.size() / MAX_STRING_LENGTH) + 1;
-
+  int call_count = (print_me.size() / 4000) + 1;
   for(int i = 0; i < call_count; i++)
   {
-    tmp = print_me.substr(i * MAX_STRING_LENGTH, MAX_STRING_LENGTH);
-    page_string_dep(d, tmp.c_str(), keep_internal);
+    tmp = print_me.substr(i * 4000, 4000);
+    // if they don't want things paginated
+    if(!IS_MOB(d->character) && IS_SET(d->character->pcdata->toggles, PLR_PAGER))
+      send_to_char(tmp.c_str(), d->character);
+    else
+      page_string_dep(d, tmp.c_str(), keep_internal);
   }
   return;
 }
@@ -665,12 +668,6 @@ void page_string_dep(struct descriptor_data *d, const char *str, int keep_intern
     return;
   }
 
-  // if they don't want things paginated
-  if(!IS_MOB(d->character) && IS_SET(d->character->pcdata->toggles, PLR_PAGER))
-  {
-     send_to_char(str, d->character);
-     return;
-  }
   char buf[MAX_STRING_LENGTH];
   strncpy(buf, str, MAX_STRING_LENGTH);
 
