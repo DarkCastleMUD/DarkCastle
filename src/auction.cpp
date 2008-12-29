@@ -1284,13 +1284,6 @@ void AuctionHouse::ListItems(CHAR_DATA *ch, ListOptions options, string name, un
     send_to_char("'$4*$R' indicates you are unable to use this item.\n\r", ch);
   }
 
-  struct affected_type af;
-  af.type      = LIST_TIMER;
-  af.duration  = 1;
-  af.modifier  = 0;
-  af.location  = 0;
-  af.bitvector = -1;
-  affect_to_char(ch, &af);
   return;
 }
 
@@ -1749,11 +1742,6 @@ int do_vend(CHAR_DATA *ch, char *argument, int cmd)
 
     if(!strcmp(buf, "all"))
     {
-      if(affected_by_spell(ch, LIST_TIMER)) 
-      {
-        send_to_char("You have to wait a little between listing!\r\n", ch);
-        return eFAILURE;
-      }   
       TheAuctionHouse.ListItems(ch, LIST_ALL, "", 0, 0);
     }
     else if (!strcmp(buf, "mine"))
