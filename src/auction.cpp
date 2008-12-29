@@ -1542,6 +1542,8 @@ int do_vend(CHAR_DATA *ch, char *argument, int cmd)
 
   }
 
+  add_command_lag(ch, cmd, PULSE_VIOLENCE);
+
   /*MODIFY*/
   if(!strcmp(buf, "modify"))
   {
