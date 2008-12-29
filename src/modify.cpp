@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: modify.cpp,v 1.23 2008/12/29 15:23:13 dcastle Exp $ */
+/* $Id: modify.cpp,v 1.24 2008/12/29 15:56:16 dcastle Exp $ */
 
 extern "C"
 {
@@ -641,6 +641,7 @@ void paginate_string(char *str, struct descriptor_data *d)
 void page_string(struct descriptor_data *d, const char *str, int keep_internal)
 {
   if(!d) return;
+  if(!(d->character)) return;
   if (!str || !*str) {
     send_to_char("", d->character);
     return;
