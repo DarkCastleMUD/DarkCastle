@@ -1656,7 +1656,6 @@ void show_vault(CHAR_DATA *ch, char *owner) {
     csendf(ch, "You don't have access to %s's vault.\r\n", owner);
     return;
   } 
-  csendf(ch, "This vault is %d lbs.\n\r", vault->weight);
 
 
   if (self)
