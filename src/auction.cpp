@@ -1185,7 +1185,7 @@ void AuctionHouse::ListItems(CHAR_DATA *ch, ListOptions options, string name, un
   else
     send_to_char("Ticket-Seller-------Price------Status--T--Item---------------------------\n\r", ch);
 
-  for(Item_it = Items_For_Sale.begin(); Item_it != Items_For_Sale.end(); Item_it++)
+  for(i = 0, Item_it = Items_For_Sale.begin(); Item_it != Items_For_Sale.end(); Item_it++)
   {
     if(
        (options == LIST_MINE && !Item_it->second.seller.compare(GET_NAME(ch)))
@@ -1236,6 +1236,7 @@ void AuctionHouse::ListItems(CHAR_DATA *ch, ListOptions options, string name, un
           state_output = "$7ERROR$R  ";
         break; 
       }
+      i++;
       sprintf(buf, "\n\r%05d) $7$B%-12s$R $5%-10d$R %s %s %s%-30s\n\r", 
                Item_it->first, (options == LIST_MINE) ? Item_it->second.buyer.c_str() : Item_it->second.seller.c_str(), 
                Item_it->second.price,
