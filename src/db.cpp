@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.186 2008/12/18 18:34:46 kkoons Exp $ */
+/* $Id: db.cpp,v 1.187 2008/12/29 14:29:18 jhhudso Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -70,6 +70,7 @@ extern int fflush(FILE *);
 extern int _filbuf(FILE *);
 int count_hash_records(FILE * fl);
 void load_hints();
+void find_unordered_objects(void);
 
 /* load stuff */
 char* curr_type;
@@ -633,11 +634,16 @@ void boot_db(void)
     
     log("renumbering zone table", 0, LOG_MISC);
     renum_zone_table();
-     extern short bport;
+
+    log("Looking for unordered objects...", 0, LOG_MISC);
+    find_unordered_objects();
+
+    extern short bport;
     if (!bport) {
       log("Loading Corpses.", 0, LOG_MISC);
       load_corpses();
     }
+
     log("Loading messages.", 0, LOG_MISC);
     load_messages(MESS_FILE);
     load_messages(MESS2_FILE,2000);
@@ -5179,3 +5185,16 @@ void mprog_read_programs( FILE *fp, long i, bool zz)
 }
 
 // * --- End MOBProgs stuff --- *
+
+void find_unordered_objects(void) {
+  int cur_vnum, last_vnum = 0;
+
+  for(int rnum = 0; rnum <= top_of_objt; rnum++, last_vnum = cur_vnum) {
+    cur_vnum = obj_index[rnum].virt;
+    
+    if (cur_vnum < last_vnum) {
+      logf(0, LOG_MISC, "Out of order vnum found. Vnum: %d Rnum: %d",
+	   cur_vnum, rnum);
+    }
+  }
+}
