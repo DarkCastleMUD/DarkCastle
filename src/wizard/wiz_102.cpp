@@ -2184,7 +2184,7 @@ int do_oedit(struct char_data *ch, char *argument, int cmd)
       // new
       case 18: {
         if(!*buf4) {
-          send_to_char("$3Syntax$R: oedit [item_num] new\n\r", ch);
+          send_to_char("$3Syntax$R: oedit new [item number]\n\r", ch);
           return eFAILURE;
         }
         if(!check_range_valid_and_convert(intval, buf4, 0, 35000)) {
