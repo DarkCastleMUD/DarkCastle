@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.176 2008/12/28 18:14:33 kkoons Exp $ */
+/* $Id: info.cpp,v 1.177 2008/12/29 02:30:59 kkoons Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -1571,9 +1571,6 @@ int do_score(struct char_data *ch, char *argument, int cmd)
              break;
 	    case SKILL_DECEIT_TIMER:
              aff_name = "deceit reuse timer";
-             break;
-           case LIST_TIMER:
-             aff_name = "list timer";
              break;
            case SKILL_TACTICS_TIMER:
              aff_name = "tactics reuse timer";
