@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: board.cpp,v 1.38 2008/11/25 01:48:49 kkoons Exp $
+| $Id: board.cpp,v 1.39 2008/12/30 03:44:59 kkoons Exp $
 | board.C
 | Description:  This file contains the implementation for the board
 |   code.  It's old and should be rewritten --Morc XXX
@@ -569,7 +569,36 @@ std::map<std::string, BOARD_INFO> populate_boards()
 
 std::map<std::string,BOARD_INFO> board_db = populate_boards();
 
- 
+int save_boards()
+{
+  std::map<std::string, BOARD_INFO>::iterator board_it;
+
+  FILE * the_file;
+
+  the_file = dc_fopen("board/index", "w");
+
+  if(!the_file) 
+  {
+      log("Unable to open/create save file for bulletin board index", ANGEL,
+          LOG_BUG);
+      return eFAILURE;
+  }
+
+  for(board_it = board_db.begin(); board_it != board_db.end(); board_it++)
+  {
+    
+    fprintf(the_file," %d ", board_it->second.min_read_level);
+    fprintf(the_file," %d ", board_it->second.min_write_level);
+    fprintf(the_file," %d ", board_it->second.min_remove_level);
+    fprintf(the_file," %d ", board_it->second.type);
+    fprintf(the_file," %d ", board_it->second.owner);
+    fwrite_string((char*)board_it->second.save_file.c_str(), the_file);
+    fwrite_string((char*)board_it->first.c_str(), the_file);
+    
+  }
+  dc_fclose(the_file);
+  return eSUCCESS;
+} 
 
 
 /*
@@ -769,7 +798,7 @@ void board_write_msg(CHAR_DATA *ch, char *arg, std::map<string,BOARD_INFO>::iter
 
 int board_remove_msg(CHAR_DATA *ch, char *arg, std::map<std::string, BOARD_INFO>::iterator board) 
 {
-  int ind, tmessage;
+  unsigned int ind, tmessage;
   char buf[256], number[MAX_INPUT_LENGTH+1];
   
   one_argument(arg, number);
@@ -787,7 +816,8 @@ int board_remove_msg(CHAR_DATA *ch, char *arg, std::map<std::string, BOARD_INFO>
     return eSUCCESS;
   }
 
-  if (tmessage < 0 || tmessage >= board->second.msgs.size()) 
+  if (tmessage == 0 
+      || tmessage >= board->second.msgs.size()) 
   {
     send_to_char("That message exists only in your imagination..\n\r",
 		 ch);
@@ -892,10 +922,10 @@ void board_load_board() {
     for (ind = 0; ind < number; ind++)
     {
       
-      curr_msg.title = fread_string (the_file, 0);
-      curr_msg.author = fread_string (the_file, 0);
-      curr_msg.date = fread_string (the_file, 0);
-      curr_msg.text = fread_string (the_file, 0);
+      curr_msg.title = fread_string (the_file, 27);
+      curr_msg.author = fread_string (the_file, 27);
+      curr_msg.date = fread_string (the_file, 27);
+      curr_msg.text = fread_string (the_file, 27);
       map_it->second.msgs.push_back(curr_msg);
     }
 
@@ -909,7 +939,7 @@ int board_display_msg(CHAR_DATA *ch, char *arg, std::map<std::string, BOARD_INFO
   char buf[MAX_STRING_LENGTH], number[MAX_INPUT_LENGTH+1];
   std::string board_msg;
   one_argument(arg, number);
-  int tmessage;
+  unsigned int tmessage;
 
   if(IS_MOB(ch)) 
   {
@@ -969,7 +999,7 @@ int board_display_msg(CHAR_DATA *ch, char *arg, std::map<std::string, BOARD_INFO
     return eSUCCESS;
   }
   
-  if (tmessage < 0 || tmessage >= board->second.msgs.size()) 
+  if (tmessage == 0 || tmessage >= board->second.msgs.size()) 
   {
     send_to_char("That message doesn't exist, moron.\n\r",ch);
     return eSUCCESS;
@@ -1048,7 +1078,7 @@ int board_show_board(CHAR_DATA *ch, char *arg, std::map<std::string, BOARD_INFO>
     csendf(ch, "Board Topic:\n\r%s------------\n\r", board->second.msgs[0].text.c_str());
     std::vector<message>::reverse_iterator msg_it;
     i = board->second.msgs.size()-1;
-    for (msg_it = board->second.msgs.rbegin(); msg_it < board->second.msgs.rend(); ++msg_it ) 
+    for (msg_it = board->second.msgs.rbegin(); (i > 0) && (msg_it < board->second.msgs.rend()); ++msg_it ) 
        if(IS_MOB(ch) || IS_SET(ch->pcdata->toggles, PLR_ANSI))
        {
          snprintf(buf, MAX_STRING_LENGTH, "(%s) "YELLOW"%-14s "RED"%2d: "GREEN"%.47s"NTEXT"\n\r", 
@@ -1073,6 +1103,6 @@ int board_show_board(CHAR_DATA *ch, char *arg, std::map<std::string, BOARD_INFO>
 
 int fwrite_string (char *buf, FILE *fl)
 {
-  return (fprintf(fl, "%s~\n", buf));
+  return (fprintf(fl, "%s~\n\r", buf));
 }
 
