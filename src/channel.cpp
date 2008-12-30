@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: channel.cpp,v 1.21 2008/11/14 03:49:43 kkoons Exp $
+| $Id: channel.cpp,v 1.22 2008/12/30 04:17:39 jhhudso Exp $
 | channel.C
 | Description:  All of the channel - type commands; do_say, gossip, etc..
 */
@@ -469,16 +469,15 @@ int do_trivia(struct char_data *ch, char *argument, int cmd)
   }
 
   if(GET_LEVEL(ch) >= 102) {
-    sprintf(buf1, "$3$BQuestion $R$3(%s)$B: '%s'$R\n\r", GET_SHORT(ch), argument);
-    sprintf(buf2, "$3$BYou ask, $R$3'%s'$R\n\r", argument); 
+    sprintf(buf1, "$3$BQuestion $R$3(%s)$B: '%s'$R", GET_SHORT(ch), argument);
+    sprintf(buf2, "$3$BYou ask, $R$3'%s'$R", argument); 
   }
   else {
-    sprintf(buf1, "$3$B%s answers '%s'$R\n\r", GET_SHORT(ch), argument);
-    sprintf(buf2, "$3$BYou answer '%s'$R\n\r", argument);
+    sprintf(buf1, "$3$B%s answers '%s'$R", GET_SHORT(ch), argument);
+    sprintf(buf2, "$3$BYou answer '%s'$R", argument);
   }
+  act(buf2, ch, 0, 0, TO_CHAR, 0);
     
-  send_to_char(buf2, ch);
-
   for(i = descriptor_list; i; i = i->next)
     if(i->character != ch && !i->connected && 
        (IS_SET(i->character->misc, CHANNEL_TRIVIA)) &&
@@ -929,9 +928,9 @@ int do_newbie(struct char_data *ch, char *argument, int cmd)
         GET_MOVE(ch) += 5;
         return eSUCCESS;
       }
-      sprintf(buf1, "$5%s newbies '$R$B%s$R$5'$R\n\r", GET_SHORT(ch), argument);
-      sprintf(buf2, "$5You newbie '$R$B%s$R$5'$R\n\r", argument);
-      send_to_char(buf2, ch);
+      sprintf(buf1, "$5%s newbies '$R$B%s$R$5'$R", GET_SHORT(ch), argument);
+      sprintf(buf2, "$5You newbie '$R$B%s$R$5'$R", argument);
+      act(buf2, ch, 0, 0, TO_CHAR, 0);
 
       for(i = descriptor_list; i; i = i->next)
 	 if(i->character != ch && !i->connected && 
