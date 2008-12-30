@@ -12,32 +12,31 @@
 /*                      skills                                               */
 /*****************************************************************************/
 
-extern "C"
-{
-  #include <ctype.h> // isspace
-}
-
-#include "wizard.h"
-#include <utility.h>
-#include <connect.h>
-#include <player.h>
-#include <room.h>
-#include <obj.h>
-#include <mobile.h>
-#include <levels.h>
-#include <interp.h>
-#include <obj.h>
-#include <handler.h>
-#include <db.h>
-#include <spells.h>
-#include <race.h>
-#include <returnvals.h>
-#include <vault.h>
-#include <set.h>
-#include <structs.h>
+#include <ctype.h> // isspace
 #include <string>
 #include <vector>
-using namespace std;
+
+#include "wizard.h"
+#include "utility.h"
+#include "connect.h"
+#include "player.h"
+#include "room.h"
+#include "obj.h"
+#include "mobile.h"
+#include "levels.h"
+#include "interp.h"
+#include "obj.h"
+#include "handler.h"
+#include "db.h"
+#include "spells.h"
+#include "race.h"
+#include "returnvals.h"
+#include "vault.h"
+#include "set.h"
+#include "structs.h"
+
+using std::vector;
+using std::string;
 
 extern vector<string> continent_names;
 
@@ -1097,22 +1096,22 @@ int do_zedit(struct char_data *ch, char *argument, int cmd)
       if(!*text)
       {   
         send_to_char("$3Usage$R: zedit continent <continent number>\r\n", ch);
-        for(i = NO_CONTINENT; i != continent_names.size(); i++)
+        for(unsigned cont = NO_CONTINENT; cont != continent_names.size(); i++)
         {
       
-          csendf(ch, "%d) %s\n\r", i, continent_names.at(i).c_str());
+          csendf(ch, "%d) %s\n\r", cont, continent_names.at(cont).c_str());
         }
-          //csendf(ch, (char*)(continent_names.at(i).c_str()));
         return eFAILURE;
       }
       
-      if(!(i = atoi(text)) || i > continent_names.size()-1 )
+      unsigned int cont;
+      if(!(cont = atoi(text)) || cont > continent_names.size()-1 )
       {
         csendf(ch, "You much choose between 1 and %d.\r\n", continent_names.size()-1);
         return eFAILURE;
       }
-      csendf(ch, "Success. Continent changed to %s\n\r", continent_names.at(i).c_str());
-      zone_table[zone].continent = i;
+      csendf(ch, "Success. Continent changed to %s\n\r", continent_names.at(cont).c_str());
+      zone_table[zone].continent = cont;
     break;
 
     default: 
@@ -4716,7 +4715,7 @@ int do_sockets(struct char_data *ch, char *argument, int cmd)
 	}
       num_can_see++;
       
-      sprintf(buf + strlen(buf), "%s%3d : %-30s | %-16s$R |", duplicate? 
+      sprintf(buf + strlen(buf), "%s%3d : %-15s | %-16s$R |", duplicate? 
 "$B$4":"", d->descriptor, d->host, (d->character ? (d->character->name ? d->character->name : "NONE") : "NONE"));
 
       if ((pStr = constindex(d->connected, connected_states)))
