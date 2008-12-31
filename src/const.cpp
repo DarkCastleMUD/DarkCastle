@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.283 2008/12/17 10:47:57 kkoons Exp $ */
+/* $Id: const.cpp,v 1.284 2008/12/31 04:32:19 shane Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1009,6 +1009,7 @@ char *equipment_types[] =
     "Wielded",
     "Secondary Wield",
     "Held",
+    "Held 2",
     "Worn Face",
     "Worn Right Ear",
     "Worn Left Ear",
