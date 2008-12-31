@@ -1093,10 +1093,11 @@ int do_zedit(struct char_data *ch, char *argument, int cmd)
     case 12:
     
       argument = one_argumentnolow(argument, text);
+      unsigned int cont;
       if(!*text)
       {   
         send_to_char("$3Usage$R: zedit continent <continent number>\r\n", ch);
-        for(unsigned cont = NO_CONTINENT; cont != continent_names.size(); i++)
+        for(cont = NO_CONTINENT; cont != continent_names.size(); cont++)
         {
       
           csendf(ch, "%d) %s\n\r", cont, continent_names.at(cont).c_str());
@@ -1104,7 +1105,6 @@ int do_zedit(struct char_data *ch, char *argument, int cmd)
         return eFAILURE;
       }
       
-      unsigned int cont;
       if(!(cont = atoi(text)) || cont > continent_names.size()-1 )
       {
         csendf(ch, "You much choose between 1 and %d.\r\n", continent_names.size()-1);
