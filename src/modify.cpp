@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: modify.cpp,v 1.24 2008/12/29 15:56:16 dcastle Exp $ */
+/* $Id: modify.cpp,v 1.25 2008/12/31 22:11:47 kkoons Exp $ */
 
 extern "C"
 {
@@ -648,11 +648,22 @@ void page_string(struct descriptor_data *d, const char *str, int keep_internal)
   }
   string print_me = str;
   string tmp;
+  size_t pagebreak;
 
-  int call_count = (print_me.size() / 4000) + 1;
-  for(int i = 0; i < call_count; i++)
+  while(!print_me.empty())
   {
-    tmp = print_me.substr(i * 4000, 4000);
+    pagebreak = print_me.find_first_of('\n', 3800); //find the first endline after 3800 chars
+    
+    if(string::npos == pagebreak) 
+      pagebreak = print_me.size(); //if one doesn't exist (string < 3800) just set to max string length
+    else
+      if(print_me.at(pagebreak) == '\r') 
+        pagebreak++; //if its a \r, go 1 greater.
+
+
+    tmp = print_me.substr(0, pagebreak);
+    print_me = print_me.substr(pagebreak, MAX_STRING_LENGTH);
+
     // if they don't want things paginated
     if(!IS_MOB(d->character) && IS_SET(d->character->pcdata->toggles, PLR_PAGER))
       send_to_char(tmp.c_str(), d->character);
