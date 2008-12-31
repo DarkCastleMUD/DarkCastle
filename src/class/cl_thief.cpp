@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.189 2008/12/31 00:53:25 kkoons Exp $
+| $Id: cl_thief.cpp,v 1.190 2008/12/31 21:03:03 dcastle Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -246,7 +246,7 @@ int do_eyegouge(CHAR_DATA *ch, char *argument, int cmd)
   }
 
   if(!SOMEONE_DIED(retval) || (!IS_NPC(ch) && IS_SET(ch->pcdata->toggles, PLR_WIMPY)))
-     WAIT_STATE(ch, PULSE_VIOLENCE*3);
+     WAIT_STATE(ch, PULSE_VIOLENCE*2);
   return retval | eSUCCESS;
 }
 
