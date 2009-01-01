@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_monk.cpp,v 1.38 2008/12/22 14:21:00 kkoons Exp $
+| $Id: cl_monk.cpp,v 1.39 2009/01/01 18:31:07 kkoons Exp $
 | cl_monk.C
 | Description:  Monk skills.
 */
@@ -162,7 +162,7 @@ int do_quivering_palm(struct char_data *ch, char *argument, int cmd)
     duration = 6;
   }
   else {
-    dam = GET_MAX_HIT(victim) /2;
+    dam = GET_HIT(victim) /2;
     if (dam > 2000) dam = 2000;
     retval = damage(ch, victim, dam, TYPE_UNDEFINED, SKILL_QUIVERING_PALM, 0);
     duration = 12;
