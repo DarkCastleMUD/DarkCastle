@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: who.cpp,v 1.49 2007/09/12 04:34:20 jhhudso Exp $
+| $Id: who.cpp,v 1.50 2009/01/02 01:36:50 kkoons Exp $
 | who.C
 | Commands for who, maybe? :P
 */
@@ -602,23 +602,28 @@ int do_whoarena(struct char_data *ch, char *argument, int cmd)
 
    send_to_char("\n\rPlayers in the Arena:\n\r--------------------------\n\r", ch);
 
-   if (GET_LEVEL(ch) <= MORTAL) {
-      for(tmp = character_list; tmp; tmp = tmp->next) {
-         if (CAN_SEE(ch, tmp)) {
-            if (IS_SET(world[tmp->in_room].room_flags, ARENA)) {
+   if (GET_LEVEL(ch) <= MORTAL) 
+   {
+      for(tmp = character_list; tmp; tmp = tmp->next) 
+      {
+         if (CAN_SEE(ch, tmp)) 
+         {
+            if (IS_SET(world[tmp->in_room].room_flags, ARENA) 
+                && !IS_SET(world[tmp->in_room].room_flags, NO_WHERE)) 
+            {
                if((tmp->clan) && (clan = get_clan(tmp)) && GET_LEVEL(tmp) < IMMORTAL)
                  csendf(ch, "%-20s - [%s$R]\n\r", GET_NAME(tmp), clan->name);
                else csendf(ch, "%-20s\n\r", GET_NAME(tmp));
                count++;
-               }
             }
          }
+      }
 	 
       if (count == 0)
 	csendf(ch, "\n\rThere are no visible players in the arena.\n\r");
       
-      return eSUCCESS;
-      }
+    return eSUCCESS;
+   }
       
    // If they're here that means they're a god
    for(tmp = character_list; tmp; tmp = tmp->next) {
