@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: modify.cpp,v 1.26 2009/01/03 01:14:50 kkoons Exp $ */
+/* $Id: modify.cpp,v 1.27 2009/01/03 02:40:51 kkoons Exp $ */
 
 extern "C"
 {
@@ -649,7 +649,7 @@ void page_string(struct descriptor_data *d, const char *str, int keep_internal)
     send_to_char("", d->character);
     return;
   }
-  if(!IS_MOB(d->character) && IS_SET(d->character->pcdata->toggles, PLR_PAGER))
+  if(IS_MOB(d->character) && IS_SET(d->character->pcdata->toggles, PLR_PAGER))
   {
     page_string_dep(d, str, keep_internal);
     return;
