@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: modify.cpp,v 1.25 2008/12/31 22:11:47 kkoons Exp $ */
+/* $Id: modify.cpp,v 1.26 2009/01/03 01:14:50 kkoons Exp $ */
 
 extern "C"
 {
@@ -291,12 +291,15 @@ int do_string(CHAR_DATA *ch, char *arg, int cmd)
     }
 
     if(IS_SET(obj->obj_flags.more_flags, ITEM_NO_RESTRING))
+    {
       if(GET_LEVEL(ch) < IMP)
       {
          send_to_char("That item is not restringable.\r\n", ch);
          return 1;
       }
-      else send_to_char("That item is NO_RESTRING btw.\r\n", ch);
+      else 
+        send_to_char("That item is NO_RESTRING btw.\r\n", ch);
+    }
 
     switch(field) {
       case 1:
@@ -646,6 +649,12 @@ void page_string(struct descriptor_data *d, const char *str, int keep_internal)
     send_to_char("", d->character);
     return;
   }
+  if(!IS_MOB(d->character) && IS_SET(d->character->pcdata->toggles, PLR_PAGER))
+  {
+    page_string_dep(d, str, keep_internal);
+    return;
+  }
+
   string print_me = str;
   string tmp;
   size_t pagebreak;
@@ -665,10 +674,7 @@ void page_string(struct descriptor_data *d, const char *str, int keep_internal)
     print_me = print_me.substr(pagebreak, MAX_STRING_LENGTH);
 
     // if they don't want things paginated
-    if(!IS_MOB(d->character) && IS_SET(d->character->pcdata->toggles, PLR_PAGER))
-      send_to_char(tmp.c_str(), d->character);
-    else
-      page_string_dep(d, tmp.c_str(), keep_internal);
+    send_to_char(tmp.c_str(), d->character);
   }
   return;
 }
