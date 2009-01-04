@@ -1,5 +1,5 @@
 /************************************************************************
- * $Id: cl_barbarian.cpp,v 1.94 2008/11/21 19:29:55 kkoons Exp $
+ * $Id: cl_barbarian.cpp,v 1.95 2009/01/04 18:43:10 jhhudso Exp $
  * cl_barbarian.cpp
  * Description: Commands for the barbarian class.
  *************************************************************************/
@@ -105,7 +105,7 @@ int do_rage(struct char_data *ch, char *argument, int cmd)
 
 int do_battlecry(struct char_data *ch, char *argument, int cmd)
 {
-  struct follow_type *f;
+  struct follow_type *f = 0;
   if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL)
     ;
   else if(!has_skill(ch, SKILL_BATTLECRY)) {
@@ -136,7 +136,8 @@ int do_battlecry(struct char_data *ch, char *argument, int cmd)
      act ("You give a battlecry, sounding your defiance!", ch, 0, 0, TO_CHAR, 0);
      act ("$n yells 'They can take our lives, but they'll never take OUR FREEDOM!'", ch, 0, 0, TO_ROOM, 0);
 
-     if (ch->followers) f = ch->followers;
+     if (ch->followers)
+       f = ch->followers;
 
      for(; f; f = f->next) {
         if (!IS_AFFECTED(f->follower, AFF_GROUP) ||
