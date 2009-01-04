@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.190 2008/12/31 21:03:03 dcastle Exp $
+| $Id: cl_thief.cpp,v 1.191 2009/01/04 19:30:37 jhhudso Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -379,8 +379,8 @@ int do_backstab(CHAR_DATA *ch, char *argument, int cmd)
           && ((!IS_NPC(ch) && GET_LEVEL(ch) >= IMMORTAL) || itemp > 95 || 
                ( !IS_NPC(victim) && IS_SET(victim->pcdata->punish, PUNISH_UNLUCKY) )
              )
-          && (ch->equipment[WIELD]->obj_flags.value[3] == 11 && !IS_SET(victim->immune, ISR_PIERCE) ||
-              ch->equipment[WIELD]->obj_flags.value[3] == 9 && !IS_SET(victim->immune, ISR_STING)
+          && ((ch->equipment[WIELD]->obj_flags.value[3] == 11 && !IS_SET(victim->immune, ISR_PIERCE)) ||
+              (ch->equipment[WIELD]->obj_flags.value[3] == 9 && !IS_SET(victim->immune, ISR_STING))
              )
          ) 
   { 
@@ -1533,72 +1533,85 @@ int do_pick(CHAR_DATA *ch, char *argument, int cmd)
       return eFAILURE;
    }
 
-   if (!*type)
+   if (!*type) {
       send_to_char("Pick what?\n\r", ch);
-   else if (generic_find(argument, (FIND_OBJ_INV | FIND_OBJ_ROOM), ch, &victim, &obj))
+   } else if (generic_find(argument, (FIND_OBJ_INV | FIND_OBJ_ROOM), ch, &victim, &obj)) {
+     // this is an object
 
-  // this is an object
+     if (obj->obj_flags.type_flag != ITEM_CONTAINER)
+       send_to_char("That's not a container.\n\r", ch);
+     else if (!IS_SET(obj->obj_flags.value[1], CONT_CLOSED))
+       send_to_char("Silly, it's not even closed!\n\r", ch);
+     else if (obj->obj_flags.value[2] < 0)
+       send_to_char("Odd, you can't seem to find a keyhole.\n\r", ch);
+     else if (!IS_SET(obj->obj_flags.value[1], CONT_LOCKED))
+       send_to_char("Oh-ho! This thing is not even locked!\n\r", ch);
+     else if (IS_SET(obj->obj_flags.value[1], CONT_PICKPROOF))
+       send_to_char("The lock resists even your best attempts to pick it.\n\r", ch);
+     else {
+       if (!charge_moves(ch, SKILL_PICK_LOCK)) return eSUCCESS;
+    
+       if (!skill_success(ch,NULL,SKILL_PICK_LOCK)) {
+	 send_to_char("You failed to pick the lock.\n\r", ch);
+	 WAIT_STATE(ch, PULSE_VIOLENCE);
+	 return eFAILURE;
+       }
+       
+       REMOVE_BIT(obj->obj_flags.value[1], CONT_LOCKED);
+       send_to_char("*Click*\n\r", ch);
+       act("$n fiddles with $p.", ch, obj, 0, TO_ROOM, 0);
+     }
+   } else if ((door = find_door(ch, type, dir)) >= 0) {
+     // this is a door
 
-  if (obj->obj_flags.type_flag != ITEM_CONTAINER)
-      send_to_char("That's not a container.\n\r", ch);
-  else if (!IS_SET(obj->obj_flags.value[1], CONT_CLOSED))
-      send_to_char("Silly, it's not even closed!\n\r", ch);
-  else if (obj->obj_flags.value[2] < 0)
-      send_to_char("Odd, you can't seem to find a keyhole.\n\r", ch);
-  else if (!IS_SET(obj->obj_flags.value[1], CONT_LOCKED))
-      send_to_char("Oh-ho! This thing is not even locked!\n\r", ch);
-  else if (IS_SET(obj->obj_flags.value[1], CONT_PICKPROOF))
-      send_to_char("The lock resists even your best attempts to pick it.\n\r", ch);
-  else
-  {
-   if (!charge_moves(ch, SKILL_PICK_LOCK)) return eSUCCESS;
+     if (!IS_SET(EXIT(ch, door)->exit_info, EX_ISDOOR)) {
+       send_to_char("That's absurd.\n\r", ch);
+     } else if (!IS_SET(EXIT(ch, door)->exit_info, EX_CLOSED)) {
+       send_to_char("You realize that the door is already open!\n\r", ch);
+     } else if (EXIT(ch, door)->key < 0) {
+       send_to_char("You can't seem to spot any lock to pick.\n\r", ch);
+     } else if (!IS_SET(EXIT(ch, door)->exit_info, EX_LOCKED)) {
+       send_to_char("Oh...it wasn't locked at all.\n\r", ch);
+     } else if (IS_SET(EXIT(ch, door)->exit_info, EX_PICKPROOF)) {
+       send_to_char("You seem to be unable to pick this lock.\n\r", ch);
+     } else {
+       if (!charge_moves(ch, SKILL_PICK_LOCK)) {
+	 return eSUCCESS;
+       }
 
-   if (!skill_success(ch,NULL,SKILL_PICK_LOCK)) {
-      send_to_char("You failed to pick the lock.\n\r", ch);
-      WAIT_STATE(ch, PULSE_VIOLENCE);
-      return eFAILURE;
-    }
+       //skill_increase_check(ch, SKILL_PICK_LOCK, has_skill(ch,SKILL_PICK_LOCK), SKILL_INCREASE_MEDIUM);
+       if (!skill_success(ch,NULL,SKILL_PICK_LOCK)) {
+	 send_to_char("You failed to pick the lock.\n\r", ch);
+	 WAIT_STATE(ch, PULSE_VIOLENCE);
 
-      REMOVE_BIT(obj->obj_flags.value[1], CONT_LOCKED);
-      send_to_char("*Click*\n\r", ch);
-      act("$n fiddles with $p.", ch, obj, 0, TO_ROOM, 0);
-  }
-    else if ((door = find_door(ch, type, dir)) >= 0)
-  if (!IS_SET(EXIT(ch, door)->exit_info, EX_ISDOOR))
-      send_to_char("That's absurd.\n\r", ch);
-  else if (!IS_SET(EXIT(ch, door)->exit_info, EX_CLOSED))
-      send_to_char("You realize that the door is already open!\n\r", ch);
-  else if (EXIT(ch, door)->key < 0)
-      send_to_char("You can't seem to spot any lock to pick.\n\r", ch);
-  else if (!IS_SET(EXIT(ch, door)->exit_info, EX_LOCKED))
-      send_to_char("Oh...it wasn't locked at all.\n\r", ch);
-  else if (IS_SET(EXIT(ch, door)->exit_info, EX_PICKPROOF))
-      send_to_char("You seem to be unable to pick this lock.\n\r", ch);
-  else
-  {
-   if (!charge_moves(ch, SKILL_PICK_LOCK)) return eSUCCESS;
-      //skill_increase_check(ch, SKILL_PICK_LOCK, has_skill(ch,SKILL_PICK_LOCK), SKILL_INCREASE_MEDIUM);
-   if (!skill_success(ch,NULL,SKILL_PICK_LOCK)) {
-      send_to_char("You failed to pick the lock.\n\r", ch);
-      WAIT_STATE(ch, PULSE_VIOLENCE);
-      return eFAILURE;
-    }
+	 return eFAILURE;
+       }
+     
+       REMOVE_BIT(EXIT(ch, door)->exit_info, EX_LOCKED);
+       if (EXIT(ch, door)->keyword) {
+	 act("$n skillfully picks the lock of the $F.", ch, 0,
+	     EXIT(ch, door)->keyword, TO_ROOM, 0);
+       } else {
+	 act("$n picks the lock of the.", ch, 0, 0, TO_ROOM,
+	     INVIS_NULL);
+       }
 
-      REMOVE_BIT(EXIT(ch, door)->exit_info, EX_LOCKED);
-      if (EXIT(ch, door)->keyword)
-    act("$n skillfully picks the lock of the $F.", ch, 0,
-        EXIT(ch, door)->keyword, TO_ROOM, 0);
-      else
-    act("$n picks the lock of the.", ch, 0, 0, TO_ROOM,
-      INVIS_NULL);
-      send_to_char("The lock quickly yields to your skills.\n\r", ch);
-      /* now for unlocking the other side, too */
-      if ((other_room = EXIT(ch, door)->to_room) != NOWHERE)
-      if ( ( back = world[other_room].dir_option[rev_dir[door]] ) != 0 )
-        if (back->to_room == ch->in_room)
-      REMOVE_BIT(back->exit_info, EX_LOCKED);
-  }
-  return eSUCCESS;
+       send_to_char("The lock quickly yields to your skills.\n\r", ch);
+
+       /* now for unlocking the other side, too */
+       if ((other_room = EXIT(ch, door)->to_room) != NOWHERE) {
+	 if ( ( back = world[other_room].dir_option[rev_dir[door]] ) != 0 ) {
+	   if (back->to_room == ch->in_room) {
+	     REMOVE_BIT(back->exit_info, EX_LOCKED);
+	   }
+	 }
+       }
+     }
+   } else {
+     send_to_char("Pick what?\n\r", ch);
+   }
+   
+   return eSUCCESS;
 }
 
 
@@ -1740,13 +1753,14 @@ int do_slip(struct char_data *ch, char *argument, int cmd)
       return eFAILURE;
    }
  
-   if (IS_SET(obj->obj_flags.extra_flags, ITEM_NODROP))
+   if (IS_SET(obj->obj_flags.extra_flags, ITEM_NODROP)) {
       if (GET_LEVEL(ch) < DEITY) {
          send_to_char("You can't let go of it! Yeech!!\n\r", ch);
          return eFAILURE;
-         }
-      else
+      } else {
          send_to_char("This item is NODROP btw.\n\r", ch);
+      }
+   }
 
    if(GET_ITEM_TYPE(obj) == ITEM_CONTAINER)
    {
@@ -2002,7 +2016,7 @@ int do_deceit(struct char_data *ch, char *argument, int cmd)
 
 int do_blackjack(struct char_data *ch, char *argument, int cmd)
 {
-  int retval, learned;
+  int retval = eFAILURE, learned;
 
   if (!(learned = has_skill(ch, SKILL_BLACKJACK))) {
     send_to_char("You don't know how to blackjack.\r\n",ch);
@@ -2131,7 +2145,7 @@ int do_appraise(CHAR_DATA *ch, char *argument, int cmd)
    OBJ_DATA *obj;
    char name[MAX_STRING_LENGTH], buf[MAX_STRING_LENGTH];
    char item[MAX_STRING_LENGTH];
-   int appraised, bits, learned;
+   int appraised = 0, bits, learned;
    bool found = FALSE, weight = FALSE;
 
    argument = one_argument(argument,name);
