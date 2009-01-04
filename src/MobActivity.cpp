@@ -558,8 +558,7 @@ char *findPath(int from, int to, char_data *ch = NULL)
 
 int do_findpath(char_data *ch, char *argument, int cmd)
 {
-  char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
-  class Path *p;
+  Path *p;
   for (p = mPathList; p; p = p->next)
     for( map<int, int>::iterator iter = p->begin(); iter != p->end(); iter++ )
 	csendf(ch, "Hmm: %d\r\n", (*iter).first);
@@ -576,8 +575,7 @@ int do_findpath(char_data *ch, char *argument, int cmd)
 
 void save_paths()
 { //mkay..
-  class Path *p;
-  bool found = FALSE;
+  Path *p;
   for (p = mPathList;p; p=p->next)
   {
      // Save pathname
