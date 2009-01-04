@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: move.cpp,v 1.90 2008/06/03 06:14:15 jhhudso Exp $
+| $Id: move.cpp,v 1.91 2009/01/04 01:38:15 jhhudso Exp $
 | move.C
 | Movement commands and stuff.
 *************************************************************************
@@ -575,7 +575,7 @@ int do_simple_move(CHAR_DATA *ch, int cmd, int following)
   if (GET_LEVEL(ch) < IMMORTAL) {
     bool classRestrictions = FALSE;
     // Determine if any class restrictions are in place
-    for (int c_class=1; c_class <= CLASS_MAX; c_class++) {
+    for (int c_class=1; c_class < CLASS_MAX; c_class++) {
       if (rm->allow_class[c_class] == TRUE) {
 	classRestrictions = TRUE;
       }

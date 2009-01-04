@@ -405,7 +405,7 @@ int do_guild(struct char_data *ch, char *argument, int cmd)
 
       csendf(ch, "Allow list for room #%d: ", room);
       bool found = FALSE;
-      for(c_class=1; c_class <= CLASS_MAX; c_class++) {
+      for(c_class=1; c_class < CLASS_MAX; c_class++) {
 	if (world_array[room]->allow_class[c_class] == TRUE) {
 	  found = TRUE;
 	  csendf(ch, "%s ", pc_clss_types[c_class]);

@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: save.cpp,v 1.56 2008/05/18 03:35:08 jhhudso Exp $ */
+/* $Id: save.cpp,v 1.57 2009/01/04 01:38:15 jhhudso Exp $ */
 
 extern "C"
 {
@@ -42,6 +42,7 @@ extern "C"
 #include <handler.h>
 #include <race.h>
 #include <vault.h>
+#include "const.h"
 
 #ifdef USE_SQL
 #include <iostream>
@@ -1063,10 +1064,9 @@ struct obj_data *  obj_store_to_char(CHAR_DATA *ch, FILE *fpsave, struct obj_dat
     extract_obj(obj);
     return last_cont;
   }
-  extern int wear_corr[];
   // Handle worn EQ
   if ( (wear_pos > -1) && (wear_pos < MAX_WEAR) && (!ch->equipment[wear_pos])
-	&&CAN_WEAR(obj, wear_corr[wear_pos]))
+	&& CAN_WEAR(obj, wear_corr[wear_pos]))
   {
     equip_char (ch, obj, wear_pos, 1);
     return obj;
@@ -1486,7 +1486,7 @@ void char_to_store(CHAR_DATA *ch, struct char_file_u *st, struct time_data & tmp
   st->clan      = ch->clan;
 
   // make sure rest of unused are set to 0
-  for(x = 0; x < 5; x++)
+  for(x = 0; x < 3; x++)
     st->extra_ints[x] = 0;
 
   if(IS_MOB(ch)) {

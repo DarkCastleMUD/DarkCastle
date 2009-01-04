@@ -47,7 +47,7 @@ void load_banned(void)
     strncpy(next_node->site, site_name, BANNED_SITE_LENGTH);
     next_node->site[BANNED_SITE_LENGTH] = '\0';
     strncpy(next_node->name, name, 100);
-    next_node->name[100] = '\0';
+    next_node->name[99] = '\0';
     next_node->date = date;
 
     for (i = BAN_NOT; i <= BAN_ALL; i++)
@@ -182,7 +182,7 @@ int do_ban(CHAR_DATA *ch, char *argument, int cmd)
     *nextchar = LOWER(*nextchar);
   ban_node->site[BANNED_SITE_LENGTH] = '\0';
   strncpy(ban_node->name, GET_NAME(ch), 100);
-  ban_node->name[100] = '\0';
+  ban_node->name[99] = '\0';
   ban_node->date = time(0);
 
   for (i = BAN_NEW; i <= BAN_ALL; i++)
