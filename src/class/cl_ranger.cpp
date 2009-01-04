@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id: cl_ranger.cpp,v 1.92 2008/11/18 14:41:02 kkoons Exp $ | cl_ranger.C  *
+ * $Id: cl_ranger.cpp,v 1.93 2009/01/04 18:54:39 jhhudso Exp $ | cl_ranger.C  *
  * Description: Ranger skills/spells                                          *
  *                                                                            *
  * Revision History                                                           *
@@ -753,7 +753,7 @@ int do_forage(CHAR_DATA *ch, char *arg, int cmd)
 
   int pick = number(1, 100);
   int ovnum;
-  int lgroup;
+  int lgroup = 0;
 
   if (learned >= 1 && learned <= 30) {
     lgroup = 0;
@@ -1003,10 +1003,13 @@ int mob_arrow_response(struct char_data *ch, struct char_data *victim,
             return do_flee(victim, "", 0); 
         }
     }    
-      if(number(1, 5) == 1)
-       if(number(0,1))
-        do_shout(victim, "Where the fuck are these arrows coming from?!", 9);
-        else do_shout(victim, "Quit shooting me dammit!", 9);
+    if (number(1, 5) == 1) {
+      if (number(0,1)) {
+	do_shout(victim, "Where the fuck are these arrows coming from?!", 9);
+      } else {
+	do_shout(victim, "Quit shooting me dammit!", 9);
+      }
+    }
   }
   return eSUCCESS;
 }
@@ -1106,7 +1109,7 @@ int do_fire(struct char_data *ch, char *arg, int cmd)
   struct char_data *victim;
   int dam, dir = -1, artype, cost, retval, victroom;
   struct obj_data *found;
-  unsigned cur_room, new_room;
+  unsigned cur_room, new_room = 0;
   char direct[MAX_STRING_LENGTH], arrow[MAX_STRING_LENGTH], 
        target[MAX_STRING_LENGTH], buf[MAX_STRING_LENGTH], 
        buf2[MAX_STRING_LENGTH], victname[MAX_STRING_LENGTH],
@@ -1255,7 +1258,8 @@ int do_fire(struct char_data *ch, char *arg, int cmd)
               victim = get_char_room_vis(ch, target);
            }
         }
-        if(!victim && artype == 3 && dir >= 0) {
+
+        if(!victim && new_room && artype == 3 && dir >= 0) {
            if(world[new_room].dir_option[dir] && 
             !(world[new_room].dir_option[dir]->to_room == NOWHERE) && 
             !IS_SET(world[new_room].dir_option[dir]->exit_info, EX_CLOSED))
@@ -1276,7 +1280,8 @@ int do_fire(struct char_data *ch, char *arg, int cmd)
               victim = get_char_room_vis(ch, target);
            }
         }
-        if(!victim && artype == 3 && affected_by_spell(ch, SPELL_FARSIGHT) && dir >= 0) {
+
+        if(!victim && new_room && artype == 3 && affected_by_spell(ch, SPELL_FARSIGHT) && dir >= 0) {
            if(world[new_room].dir_option[dir] && 
             !(world[new_room].dir_option[dir]->to_room == NOWHERE) && 
             !IS_SET(world[new_room].dir_option[dir]->exit_info, EX_CLOSED))
