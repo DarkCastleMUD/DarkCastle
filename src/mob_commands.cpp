@@ -275,6 +275,13 @@ int do_mphit( CHAR_DATA *ch, char *argument, int cmd )
 	return eFAILURE|eINTERNAL_ERROR;
     }
 
+    if (GET_POS(victim) == POSITION_DEAD)
+    {
+	logf( IMMORTAL, LOG_WORLD, "MpHit - Victim already dead: vnum %d.",
+	    mob_index[ch->mobdata->nr].virt );
+	return eFAILURE|eINTERNAL_ERROR;
+    }
+
     if ( victim == ch )
     {
 	logf( IMMORTAL, LOG_WORLD, "MpHit - Bad victim to attack: vnum %d.",
