@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: who.cpp,v 1.50 2009/01/02 01:36:50 kkoons Exp $
+| $Id: who.cpp,v 1.51 2009/01/04 18:33:00 jhhudso Exp $
 | who.C
 | Commands for who, maybe? :P
 */
@@ -145,7 +145,7 @@ int do_whogroup(struct char_data *ch, char *argument, int cmd)
             foundtarget = 1;
 
          // First, if they're not anonymous
-         if (!IS_MOB(ch) && hasholylight || (!IS_ANONYMOUS(k) || (k->clan == ch->clan && ch->clan))) 
+         if ((!IS_MOB(ch) && hasholylight) || (!IS_ANONYMOUS(k) || (k->clan == ch->clan && ch->clan))) 
          {
              sprintf(tempbuffer,
                  "   $B%-18s %-10s %-14s   Level %2d      $1($7Leader$1)$R \n\r",
@@ -303,294 +303,311 @@ int do_who(struct char_data *ch, char *argument, int cmd)
     charname[0] = '\0';
     immbuf[0] = '\0';
     char* immortFields[] = {
-        "   Immortal  ",
-        "  Architect  ",
-        "    Deity    ",
-        "   Overseer  ",
-        "   --------  ",
-        "   --------  ",
-        "   Divinity  ",
-        "   --------  ",
-        " Implementor "
+      "   Immortal  ",
+      "  Architect  ",
+      "    Deity    ",
+      "   Overseer  ",
+      "   --------  ",
+      "   --------  ",
+      "   Divinity  ",
+      "   --------  ",
+      " Implementor "
     };
     char *clss_types[] = {
-        "mage",
-        "cleric",
-        "thief",
-        "warrior",
-        "antipaladin",
-        "paladin",
-        "barbarian",
-        "monk",
-        "ranger",
-        "bard",
-        "druid",
-        "psionicist",
-        "\n"
+      "mage",
+      "cleric",
+      "thief",
+      "warrior",
+      "antipaladin",
+      "paladin",
+      "barbarian",
+      "monk",
+      "ranger",
+      "bard",
+      "druid",
+      "psionicist",
+      "\n"
     };
     char *race_types[] = {
-        "human",
-        "elf",
-        "dwarf",
-        "hobbit",
-        "pixie",
-        "ogre",
-        "gnome",
-        "orc",
-        "troll",
-        "\n"
+      "human",
+      "elf",
+      "dwarf",
+      "hobbit",
+      "pixie",
+      "ogre",
+      "gnome",
+      "orc",
+      "troll",
+      "\n"
     };
     
     hasholylight = IS_MOB(ch) ? 0 : ch->pcdata->holyLite;
 
     //  Loop through all our arguments
-    for(half_chop(argument, oneword, arg);  strlen(oneword);  half_chop(arg, oneword, arg))
-    {
-        if((levelarg = atoi(oneword))) {
-          if(!lowlevel) lowlevel = levelarg;
-          else if(lowlevel > levelarg) {
-            highlevel = lowlevel;
-            lowlevel = levelarg;
-          } else {
-            highlevel = levelarg;
-          }
-            continue;        
-        }
+    for (half_chop(argument, oneword, arg);  strlen(oneword);  half_chop(arg, oneword, arg)) {
+      if ((levelarg = atoi(oneword))) {
+	if (!lowlevel) {
+	  lowlevel = levelarg;
+	} else if (lowlevel > levelarg) {
+	  highlevel = lowlevel;
+	  lowlevel = levelarg;
+	} else {
+	  highlevel = levelarg;
+	}
+	continue;        
+      }
 
-        currentmatch = 0;
+      currentmatch = 0;
 
-        // note that for all these, we don't 'continue' cause we want
-        // to check for a name match at the end in case some annoying mortal
-        // named himself "Anonymous" or "Penis", etc.        
-        if(is_abbrev(oneword, "anonymous")) {
-            anoncheck = 1;
-            currentmatch = 1;
-        }
-        else if(is_abbrev(oneword, "penis")) {
-            sexcheck = 1;
-            sextype = SEX_MALE;
-            currentmatch = 1;
-        }
-        else if(is_abbrev(oneword, "guide")) {
-            guidecheck = 1;
-            currentmatch = 1;
-        }
-        else if(is_abbrev(oneword, "vagina")) {
-            sexcheck = 1;
-            sextype = SEX_FEMALE;
-            currentmatch = 1;
-        }
-        else if(is_abbrev(oneword, "other")) {
-            sexcheck = 1;
-            sextype = SEX_NEUTRAL;
-            currentmatch = 1;
-        }
-        else if(is_abbrev(oneword, "lfg")) {
-            lfgcheck = 1;
-            currentmatch = 1;
-        }
-        else {
-           for(clss = 0; clss <= 12; clss++)  {
-            if(clss == 12) {
-                clss = 0;
-                break;
-            }
-            else if(is_abbrev(oneword, clss_types[clss])) {
-                clss++;
-                currentmatch = 1;
-                break;
-            }
-           }
-           for(race = 0; race <= 9; race++)  {
-            if(race == 9) {
-               race = 0;
-               break;
-            } else if(is_abbrev(oneword, race_types[race])) {
-               race++;
-               currentmatch = 1;
-               break;
-            }
-           }
-        }
-        // if there's anything left, we'll assume it's a partial name.
-        // and we only take the "last" one in the list, so 'who warrior thief' only matches thief
-        // This is consistant with how the class stuff works too
-        strcpy(charname, oneword);
-        charmatch = 1;
+      // note that for all these, we don't 'continue' cause we want
+      // to check for a name match at the end in case some annoying mortal
+      // named himself "Anonymous" or "Penis", etc.        
+      if (is_abbrev(oneword, "anonymous")) {
+	anoncheck = 1;
+	currentmatch = 1;
+      } else if (is_abbrev(oneword, "penis")) {
+	sexcheck = 1;
+	sextype = SEX_MALE;
+	currentmatch = 1;
+      } else if (is_abbrev(oneword, "guide")) {
+	guidecheck = 1;
+	currentmatch = 1;
+      } else if (is_abbrev(oneword, "vagina")) {
+	sexcheck = 1;
+	sextype = SEX_FEMALE;
+	currentmatch = 1;
+      } else if (is_abbrev(oneword, "other")) {
+	sexcheck = 1;
+	sextype = SEX_NEUTRAL;
+	currentmatch = 1;
+      } else if (is_abbrev(oneword, "lfg")) {
+	lfgcheck = 1;
+	currentmatch = 1;
+      } else {
+	for (clss = 0; clss <= 12; clss++)  {
+	  if (clss == 12) {
+	    clss = 0;
+	    break;
+	  } else if (is_abbrev(oneword, clss_types[clss])) {
+	    clss++;
+	    currentmatch = 1;
+	    break;
+	  }
+	}
 
-    } // while strlen(oneword)
+	for (race = 0; race <= 9; race++)  {
+	  if (race == 9) {
+	    race = 0;
+	    break;
+	  } else if (is_abbrev(oneword, race_types[race])) {
+	    race++;
+	    currentmatch = 1;
+	    break;
+	  }
+	}
+      }
+
+      // if there's anything left, we'll assume it's a partial name.
+      // and we only take the "last" one in the list, so 'who warrior thief' only matches thief
+      // This is consistant with how the class stuff works too
+      strcpy(charname, oneword);
+      charmatch = 1;
+
+    } // end of for loop
     
     // Display the actual stuff
-    send_to_char(
-        "[$4:$R]===================================[$4:$R]\n\r"
-        "|$5/$R|      $BDenizens of Dark Castle$R      |$5/$R|\n\r"
-        "[$4:$R]===================================[$4:$R]\n\r\n\r", ch);
+    send_to_char("[$4:$R]===================================[$4:$R]\n\r"
+		 "|$5/$R|      $BDenizens of Dark Castle$R      |$5/$R|\n\r"
+		 "[$4:$R]===================================[$4:$R]\n\r\n\r", ch);
     
     clear_who_buffer();
     w = 0; 
     
-    for(d = descriptor_list; d; d = d->next) 
-    {
-        // we have an invalid match arg, so nothing is going to match
-        if(nomatch)
-            break;
+    for (d = descriptor_list; d; d = d->next) {
+      // we have an invalid match arg, so nothing is going to match
+      if (nomatch) {
+	break;
+      }
         
-        if((d->connected) && (d->connected) != CON_WRITE_BOARD && (d->connected) != CON_EDITING
-                          && (d->connected) != CON_EDIT_MPROG)
-            continue;
+      if ((d->connected) && (d->connected) != CON_WRITE_BOARD && (d->connected) != CON_EDITING
+	  && (d->connected) != CON_EDIT_MPROG) {
+	continue;
+      }
         
-        if(d->original)
-            i = d->original;
-        else i = d->character;
+      if (d->original) {
+	i = d->original;
+      } else {
+	i = d->character;
+      }
         
-        if(IS_NPC(i))
+      if (IS_NPC(i)) {
+	continue;
+      }
+      if (!CAN_SEE(ch, i) && strcmp(GET_NAME(ch), "Apocalypse")
+	  && strcmp(GET_NAME(ch), "Urizen")) {
+	continue;
+      }
+      // Level checks.  These happen no matter what
+      if (GET_LEVEL(i) < lowlevel || (!strcmp(GET_NAME(i), "Pirahna") && lowlevel > PIRAHNA_FAKE_LVL )) {
+	continue;
+      }
+
+      if (GET_LEVEL(i) > highlevel) {
+	continue;
+      }
+
+      if (clss && !hasholylight && (!i->clan || i->clan != ch->clan) && IS_ANONYMOUS(i) && GET_LEVEL(i) < MIN_GOD) {
+	continue;
+      }
+      if (lowlevel > 0 && IS_ANONYMOUS(i) && !hasholylight) {
+	continue;
+      }
+
+      // Skip string based checks if our name matches
+      if (!charmatch || !is_abbrev(charname, GET_NAME(i))) {
+	if (clss && GET_CLASS(i) != clss && !charmatchistrue) {
 	  continue;
-        if(!CAN_SEE(ch, i) && strcmp(GET_NAME(ch), "Apocalypse")
-	   && strcmp(GET_NAME(ch), "Urizen"))
-	  continue;
-        // Level checks.  These happen no matter what
-        if(GET_LEVEL(i) < lowlevel || 
-            (!strcmp(GET_NAME(i), "Pirahna") && lowlevel > PIRAHNA_FAKE_LVL )
-          )                                                                     continue;
-        if(GET_LEVEL(i) > highlevel)                                            continue;
-        if(clss && !hasholylight && (!i->clan || i->clan != ch->clan) && IS_ANONYMOUS(i) && GET_LEVEL(i) < MIN_GOD)  continue;
-        if(lowlevel > 0 && IS_ANONYMOUS(i) && !hasholylight)                    continue;
-
-        // Skip string based checks if our name matches
-        if(!charmatch || !is_abbrev(charname, GET_NAME(i))) 
-        {
-           if(clss && GET_CLASS(i) != clss && !charmatchistrue)                 continue;
-           if(anoncheck && !IS_ANONYMOUS(i) && !charmatchistrue)                continue;
-           if(sexcheck && ( GET_SEX(i) != sextype || 
-                            ( IS_ANONYMOUS(i) && !hasholylight) 
-                          ) && !charmatchistrue
-             )                                                                  continue;
-           if(lfgcheck && !IS_SET(i->pcdata->toggles, PLR_LFG))                 continue;
-           if(guidecheck && !IS_SET(i->pcdata->toggles, PLR_GUIDE_TOG))         continue;
-           if(race && GET_RACE(i) != race && !charmatchistrue)                  continue;
-        }
-
-        // At this point, we either pass a filter or our name matches.
-        if( ! ( clss || anoncheck || sexcheck || lfgcheck ||guidecheck || race ) )
-        {
-            // If there were no filters, the it's only a name match so filter out
-            // anyone that doesn't match the filters
-            if(charmatch && !is_abbrev(charname, GET_NAME(i)))
-                continue;
-        }
-        
-        infoField = infoBuf;
-        extraBuf[0] = '\0';
-        buf[0]      = '\0';
-        addimmbuf = FALSE;
-        if(GET_LEVEL(i) > MORTAL) {
-            /* Immortals can't be anonymous */
-            infoField = immortFields[GET_LEVEL(i) - IMMORTAL];
-	     if (!str_cmp(GET_NAME(i), "Urizen")) {
-		infoField = infoBuf;
-		sprintf(infoBuf, "   Meatball  ");
-	     }
-	     if (!str_cmp(GET_NAME(i), "Julian")) {
-		infoField = infoBuf;
-		sprintf(infoBuf, "   $B$7S$4a$7l$4m$7o$4n$R    ");
-	     }
-	     if (!str_cmp(GET_NAME(i), "Dasein")) {
-		infoField = infoBuf;
-		sprintf(infoBuf, "    Logos    ");
-	     }
-	   if (!strcmp(GET_NAME(i), "Apocalypse"))
-	{
-                infoField = infoBuf;
-                sprintf(infoBuf, "    $5Moose$R    ");
-
 	}
-	   if (!strcmp(GET_NAME(i),"Wendy"))
-	   {
-                infoField = infoBuf;
-                sprintf(infoBuf, " $B$5Swedish $1Chef$R");
-   	    }
-	   if (!strcmp(GET_NAME(i),"Monkey"))
-	   {
-                infoField = infoBuf;
-                sprintf(infoBuf, "    $R$5Simian   $R");
-   	    }
-            if(!strcmp(GET_NAME(i), "Pirahna")) {
-                infoField = infoBuf;
-                sprintf(infoBuf, "   $B$4>$5<$1($2($1($5:$4>$R   ");
-            }
-            if(!strcmp(GET_NAME(i), "Wynn")) {
-                infoField = infoBuf;
-                sprintf(infoBuf, "  $1$B//\\$4o.o$1/\\\\$R  ");
-            }
-            if(!strcmp(GET_NAME(i), "Scyld")) {
-                infoField = infoBuf;
-                sprintf(infoBuf, "    $B$4H$5i$2p$3p$1i$6e$R   ");
-            }
-            
-            if(GET_LEVEL(ch) >= IMMORTAL && !IS_MOB(i) && i->pcdata->wizinvis > 0) {
-                if(!IS_MOB(i) && i->pcdata->incognito == TRUE)
-                    sprintf(extraBuf," (Incognito / WizInvis %ld)", i->pcdata->wizinvis);
-                else sprintf(extraBuf," (WizInvis %ld)", i->pcdata->wizinvis);
-            }
-            numImmort++;
-            addimmbuf = TRUE;
-        }
-        else {
-            if(!IS_ANONYMOUS(i) || (ch->clan && ch->clan == i->clan) || hasholylight) {
-                sprintf(infoBuf, " $B$5%2d$7-$1%s  $2%s$R$7 ",
-                    GET_LEVEL(i), pc_clss_abbrev[(int)GET_CLASS(i)], race_abbrev[(int)GET_RACE(i)]);
-            }
-            else
-                sprintf(infoBuf, "  $6-==-   $B$2%s$R ", race_abbrev[(int)GET_RACE(i)]);
-            numPC++;
-        }
-        
-        if((d->connected) == CON_WRITE_BOARD || (d->connected) == CON_EDITING ||
-           (d->connected) == CON_EDIT_MPROG)
-        {
-            strcpy(tailBuf, "$1$B(writing) ");
-        }
-        else *tailBuf = '\0'; // clear it
+	if (anoncheck && !IS_ANONYMOUS(i) && !charmatchistrue) {
+	  continue;
+	}
+	if (sexcheck && ( GET_SEX(i) != sextype || ( IS_ANONYMOUS(i) && !hasholylight ) ) && !charmatchistrue) {
+	  continue;
+	}
+	if (lfgcheck && !IS_SET(i->pcdata->toggles, PLR_LFG)) {
+	  continue;
+	}
+	if (guidecheck && !IS_SET(i->pcdata->toggles, PLR_GUIDE_TOG)) {
+	  continue;
+	}
+	if (race && GET_RACE(i) != race && !charmatchistrue) {
+	  continue;
+	}
+      }
 
-        if(IS_SET(i->pcdata->toggles, PLR_GUIDE_TOG))
-           strcpy(preBuf, "$7$B(Guide)$R ");
-        else *preBuf = '\0';
+      // At this point, we either pass a filter or our name matches.
+      if ( ! ( clss || anoncheck || sexcheck || lfgcheck ||guidecheck || race ) ) {
+	// If there were no filters, the it's only a name match so filter out
+	// anyone that doesn't match the filters
+	if (charmatch && !is_abbrev(charname, GET_NAME(i))) {
+	  continue;
+	}
+      }
         
-        if(IS_SET(i->pcdata->toggles, PLR_LFG))
-           strcat(tailBuf, "$3(LFG) ");
-
-        if(IS_AFFECTED(i, AFF_CHAMPION))
-           strcat(tailBuf, "$B$4(Champion)$R");
-
-        if(i->clan && (clan = get_clan(i)) && GET_LEVEL(i) < OVERSEER) 
-           sprintf(buf,"[%s] %s$3%s %s %s $2[%s$R$2] %s$R\n\r",
-                infoField,   preBuf,   GET_SHORT(i),   i->title,
-                extraBuf,    clan->name,     tailBuf);
-        else
-            sprintf(buf,"[%s] %s$3%s %s$R$3 %s %s$R\n\r",
-                infoField,   preBuf, GET_SHORT(i),   i->title,
-                extraBuf,    tailBuf);
-        
-        if(addimmbuf) strcat(immbuf, buf);
-        else add_to_who(buf);
+      infoField = infoBuf;
+      extraBuf[0] = '\0';
+      buf[0]      = '\0';
+      addimmbuf = FALSE;
+      if (GET_LEVEL(i) > MORTAL) {
+	/* Immortals can't be anonymous */
+	if (!str_cmp(GET_NAME(i), "Urizen")) {
+	  infoField = infoBuf;
+	  sprintf(infoBuf, "   Meatball  ");
+	} else if (!str_cmp(GET_NAME(i), "Julian")) {
+	  infoField = infoBuf;
+	  sprintf(infoBuf, "    $B$7S$4a$7l$4m$7o$4n$R   ");
+	} else if (!strcmp(GET_NAME(i), "Apocalypse")) {
+	  infoField = infoBuf;
+	  sprintf(infoBuf, "    $5Moose$R    ");
+	} else if (!strcmp(GET_NAME(i),"Wendy")) {
+	  infoField = infoBuf;
+	  sprintf(infoBuf, " $B$5Swedish $1Chef$R");
+	} else if (!strcmp(GET_NAME(i),"Monkey")) {
+	  infoField = infoBuf;
+	  sprintf(infoBuf, "    $R$5Simian   $R");
+	} else if (!strcmp(GET_NAME(i), "Pirahna")) {
+	  infoField = infoBuf;
+	  sprintf(infoBuf, "   $B$4>$5<$1($2($1($5:$4>$R   ");
+	} else if (!strcmp(GET_NAME(i), "Wynn")) {
+	  infoField = infoBuf;
+	  sprintf(infoBuf, "  $1$B//\\$4o.o$1/\\\\$R  ");
+	} else if (!strcmp(GET_NAME(i), "Scyld")) {
+	  infoField = infoBuf;
+	  sprintf(infoBuf, "    $B$4H$5i$2p$3p$1i$6e$R   ");
+	} else {
+	  infoField = immortFields[GET_LEVEL(i) - IMMORTAL];
+	}
+	
+	if (GET_LEVEL(ch) >= IMMORTAL && !IS_MOB(i) && i->pcdata->wizinvis > 0) {
+	  if(!IS_MOB(i) && i->pcdata->incognito == TRUE) {
+	    sprintf(extraBuf," (Incognito / WizInvis %ld)", i->pcdata->wizinvis);
+	  } else {
+	    sprintf(extraBuf," (WizInvis %ld)", i->pcdata->wizinvis);
+	  }
+	}
+	numImmort++;
+	addimmbuf = TRUE;
+      } else {
+	if (!IS_ANONYMOUS(i) || (ch->clan && ch->clan == i->clan) || hasholylight) {
+	  sprintf(infoBuf, " $B$5%2d$7-$1%s  $2%s$R$7 ",
+		  GET_LEVEL(i), pc_clss_abbrev[(int)GET_CLASS(i)], race_abbrev[(int)GET_RACE(i)]);
+	} else {
+	  sprintf(infoBuf, "  $6-==-   $B$2%s$R ", race_abbrev[(int)GET_RACE(i)]);
+	}
+	numPC++;
+      }
+      
+      if ((d->connected) == CON_WRITE_BOARD || (d->connected) == CON_EDITING ||
+	  (d->connected) == CON_EDIT_MPROG) {
+	strcpy(tailBuf, "$1$B(writing) ");
+      } else {
+	*tailBuf = '\0'; // clear it
+      }
+      
+      if (IS_SET(i->pcdata->toggles, PLR_GUIDE_TOG)) {
+	strcpy(preBuf, "$7$B(Guide)$R ");
+      } else {
+	*preBuf = '\0';
+      }
+      
+      if (IS_SET(i->pcdata->toggles, PLR_LFG)) {
+	strcat(tailBuf, "$3(LFG) ");
+      }
+      
+      if (IS_AFFECTED(i, AFF_CHAMPION)) {
+	strcat(tailBuf, "$B$4(Champion)$R");
+      }
+      
+      if (i->clan && (clan = get_clan(i)) && GET_LEVEL(i) < OVERSEER) {
+	sprintf(buf,"[%s] %s$3%s %s %s $2[%s$R$2] %s$R\n\r",
+		infoField,   preBuf,   GET_SHORT(i),   i->title,
+		extraBuf,    clan->name,     tailBuf);
+      } else {
+	sprintf(buf,"[%s] %s$3%s %s$R$3 %s %s$R\n\r",
+		infoField,   preBuf, GET_SHORT(i),   i->title,
+		extraBuf,    tailBuf);
+      }
+      
+      if (addimmbuf) {
+	strcat(immbuf, buf);
+      } else {
+	add_to_who(buf);
+      }
     }
-
-    if(numPC && numImmort) add_to_who("\n\r");
-    if(numImmort) add_to_who(immbuf);
     
-    if ((numPC + numImmort) > max_who)
-        max_who = numPC + numImmort;
-
+    if (numPC && numImmort) {
+      add_to_who("\n\r");
+    }
+    
+    if (numImmort) {
+      add_to_who(immbuf);
+    }
+    
+    if ((numPC + numImmort) > max_who) {
+      max_who = numPC + numImmort;
+    }
+    
     sprintf(buf, "\n\r"
-        "    Visible Players Connected:   %d\n\r"
-        "    Visible Immortals Connected: %d\n\r"
-        "    (Max this boot is %d)\n\r",
-        numPC, numImmort, max_who);
+	    "    Visible Players Connected:   %d\n\r"
+	    "    Visible Immortals Connected: %d\n\r"
+	    "    (Max this boot is %d)\n\r",
+	    numPC, numImmort, max_who);
     
     add_to_who(buf);
     
-   // page it to the player.  the 1 tells page_string to make it's own copy of the data
+    // page it to the player.  the 1 tells page_string to make it's own copy of the data
     page_string(ch->desc, gWhoBuffer, 1);
+    
     return eSUCCESS;
 }
 
