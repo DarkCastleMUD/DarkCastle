@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.284 2008/12/31 04:32:19 shane Exp $ */
+/* $Id: const.cpp,v 1.285 2009/01/04 01:39:58 jhhudso Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -34,86 +34,6 @@ extern "C"
 #include <spells.h>
 #include <levels.h>
 #include <mobile.h>
-
-bestowable_god_commands_type bestowable_god_commands[] =
-{
-{ "impchan",	COMMAND_IMP_CHAN, false },
-{ "snoop",	COMMAND_SNOOP, false },
-{ "restore",	COMMAND_RESTORE, false },
-{ "purloin",	COMMAND_PURLOIN, false },
-{ "possess",	COMMAND_POSSESS, false},
-{ "arena",	COMMAND_ARENA, false },
-{ "set",	COMMAND_SET, false },
-{ "load",	COMMAND_LOAD, false },
-{ "shutdown",   COMMAND_SHUTDOWN, false },
-{ "procedit",	COMMAND_MP_EDIT, false },
-{ "range",      COMMAND_RANGE, false },
-{ "procstat",	COMMAND_MPSTAT, false },
-{ "sedit",      COMMAND_SEDIT, false },
-{ "punish",     COMMAND_PUNISH, false },
-{ "sqedit",     COMMAND_SQEDIT, false },
-{ "hedit",      COMMAND_HEDIT, false },
-{ "opstat",	COMMAND_OPSTAT, false },
-{ "opedit",	COMMAND_OPEDIT, false },
-{ "eqmax",	COMMAND_EQMAX, true },
-{ "force",	COMMAND_FORCE, false },
-{ "string",	COMMAND_STRING, false },
-{ "stat",	COMMAND_STAT, false },
-{ "sqsave",	COMMAND_SQSAVE, false },
-{ "whattonerf",	COMMAND_WHATTONERF, true },
-{ "find",	COMMAND_FIND, false },
-{ "log",	COMMAND_LOG, false },
-{ "addnews",	COMMAND_ADDNEWS, false },
-{ "prize",	COMMAND_PRIZE, false },
-{ "sockets",	COMMAND_SOCKETS, false },
-{ "qedit",	COMMAND_QEDIT, false },
-{ "rename",	COMMAND_RENAME, false },
-{ "findpath",   COMMAND_FINDPATH, true },
-{ "findpath2",  COMMAND_FINDPATH2, true },
-{ "addroom",    COMMAND_ADDROOM, true },
-{ "newpath",    COMMAND_NEWPATH, true },
-{ "listpathsbyzone", COMMAND_LISTPATHSBYZONE, true },
-{ "listallpaths",    COMMAND_LISTALLPATHS, true },
-{ "testhand",   COMMAND_TESTHAND, true },
-{ "dopathpath", COMMAND_DOPATHPATH, true },
-{ "do_the_thing", COMMAND_DO_THE_THING, true },
-{ "testport", COMMAND_TESTPORT, false },
-{ "remort", COMMAND_REMORT, true },
-{ "testhit", COMMAND_TESTHIT, true },
-{ "\n",		-1 }
-};
-
-// WEAR, ITEM_WEAR correspondances
-int wear_corr[] =
-{
-  ITEM_LIGHT_SOURCE, //0
-  ITEM_WEAR_FINGER,
-  ITEM_WEAR_FINGER,
-  ITEM_WEAR_NECK,
-  ITEM_WEAR_NECK,
-  ITEM_WEAR_BODY, // 5
-  ITEM_WEAR_HEAD,
-  ITEM_WEAR_LEGS,
-  ITEM_WEAR_FEET,
-  ITEM_WEAR_HANDS, 
-  ITEM_WEAR_ARMS, // 10
-  ITEM_WEAR_SHIELD,
-  ITEM_WEAR_ABOUT,
-  ITEM_WEAR_WAISTE,
-  ITEM_WEAR_WRIST,
-  ITEM_WEAR_WRIST, //15
-  ITEM_WIELD,
-  ITEM_WIELD,
-  ITEM_HOLD,
-  ITEM_HOLD,
-  ITEM_WEAR_FACE,//20
-  ITEM_WEAR_EAR, 
-  ITEM_WEAR_EAR,
-  0
-};
-
-   
-
 
 std::map<int,int> fill_skill_cost()
 {
@@ -169,9 +89,6 @@ std::map<int,int> fill_skill_cost()
   skill_cost_map[SKILL_HEADBUTT] = 15;
   return skill_cost_map;
 }
-
-std::map<int, int> skill_cost = fill_skill_cost();
-
 
 std::map<int, int> fill_scribe_recipes()
 {
@@ -231,7 +148,7 @@ std::map<int, int> fill_scribe_recipes()
   return tmp_scribe_recipes;
 }
 
-std::map<int, int> scribe_recipes = fill_scribe_recipes();
+const std::map<int, int> scribe_recipes = fill_scribe_recipes();
 
 
 // Obj proc types
@@ -251,7 +168,7 @@ char *obj_types[] = {
 };
 
 // every spell needs an entry in here
-char *spell_wear_off_msg[] =
+const char *spell_wear_off_msg[] =
 {
   "RESERVED DB.C",                                             /* 0 */
   "Your magical armour fades to nothing.",

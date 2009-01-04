@@ -473,6 +473,7 @@ int do_sing(CHAR_DATA *ch, char *arg, int cmd)
     /* Locate targets */
     target_ok = FALSE;
 	
+
     if(!IS_SET(song_info[spl].targets, TAR_IGNORE)) {
       one_argument(argument, name);
       if(*name) {
@@ -917,7 +918,7 @@ int song_disrupt( ubyte level, CHAR_DATA *ch, char
       return eFAILURE|eINTERNAL_ERROR;
       }
 
-   int learned = has_skill(ch, song_info[SKILL_SONG_DISARMING_LIMERICK].skill_num);
+   int learned = has_skill(ch, song_info[SKILL_SONG_DISARMING_LIMERICK-SKILL_SONG_BASE].skill_num);
 
    act("$n sings a witty little limerick to you!\r\nYour laughing makes it hard to concentrate on keeping your spells up!", 
        ch, 0, victim, TO_VICT, 0);
@@ -1500,7 +1501,7 @@ int song_stop( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int ski
    }
  
    skill_increase_check(ch, SKILL_SONG_STOP,
-			has_skill(ch, song_info[SKILL_SONG_STOP].skill_num), SKILL_INCREASE_EASY);
+			has_skill(ch, song_info[SKILL_SONG_STOP-SKILL_SONG_BASE].skill_num), SKILL_INCREASE_EASY);
 
    send_to_char("You finish off your song with a flourish...\n\r", ch);
    act("$n finishes $s song in a flourish and a bow.", ch, 0, 0, TO_ROOM, 0);

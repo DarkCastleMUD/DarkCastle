@@ -17,6 +17,7 @@
 #include <connect.h>
 #include <returnvals.h>
 #include <spells.h>
+#include "const.h"
 
 #define MAX_MESSAGE_LENGTH      4096
 
@@ -33,7 +34,6 @@ int do_wizhelp(struct char_data *ch, char *argument, int cmd_arg)
   int no = 6;
   int no2 = 6;
   int no3 = 6;
-  extern bestowable_god_commands_type bestowable_god_commands[];
 
   if(IS_NPC(ch))
     return eFAILURE;

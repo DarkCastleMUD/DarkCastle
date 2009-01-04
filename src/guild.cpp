@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: guild.cpp,v 1.123 2008/11/18 16:43:16 kkoons Exp $
+| $Id: guild.cpp,v 1.124 2009/01/04 01:39:58 jhhudso Exp $
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
@@ -402,9 +402,9 @@ void output_praclist(struct char_data *ch, class_skill_defines *skilllist)
       {
         csendf(ch, "Mana: $B%3d$R ", 40);
       }
-      else if(skill_cost[skilllist[i].skillnum])
+      else if(skill_cost.find(skilllist[i].skillnum) != skill_cost.end())
       {
-        csendf(ch, "Move: $B%3d$R ", skill_cost[skilllist[i].skillnum]);
+        csendf(ch, "Move: $B%3d$R ", skill_cost.find(skilllist[i].skillnum)->second);
       }
       else send_to_char("          ", ch);
       if (skilllist[i].attrs)

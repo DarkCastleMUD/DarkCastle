@@ -24,7 +24,7 @@ extern "C"
 #include <returnvals.h>
 #include <spells.h>
 #include <interp.h>
-
+#include "const.h"
 
 #ifdef WIN32
 char *crypt(const char *key, const char *salt);
@@ -134,7 +134,6 @@ int do_bestow(struct char_data *ch, char *arg, int cmd)
    char buf[MAX_INPUT_LENGTH];
    char command[MAX_INPUT_LENGTH];
    int i;
-   extern bestowable_god_commands_type bestowable_god_commands[];
    int learn_skill(char_data * ch, int skill, int amount, int maximum);
 
    half_chop(arg, arg, command);
@@ -215,7 +214,6 @@ int do_bestow(struct char_data *ch, char *arg, int cmd)
 int do_revoke(struct char_data *ch, char *arg, int cmd)
 {
    char_data * vict = NULL;
-   extern bestowable_god_commands_type bestowable_god_commands[];
    char buf[MAX_INPUT_LENGTH];
    char command[MAX_INPUT_LENGTH];
    int i;

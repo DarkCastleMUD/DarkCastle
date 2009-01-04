@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.178 2008/12/29 02:30:51 kkoons Exp $ */
+/* $Id: handler.cpp,v 1.179 2009/01/04 01:39:58 jhhudso Exp $ */
     
 extern "C"
 {
@@ -4216,7 +4216,7 @@ void add_memory(CHAR_DATA *ch, char *victim, char type)
 bool charge_moves(char_data *ch, int skill, double modifier)
 {
   int i = 0;
-  int amt = int(skill_cost[skill] * modifier);
+  int amt = skill_cost.find(skill)->second * modifier;
 
   if ((i = has_skill(ch, SKILL_VIGOR)) && skill_success(ch, NULL, SKILL_VIGOR))
      amt -= MAX(1,number(i/4, i/8));

@@ -14,14 +14,13 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: spells.h,v 1.115 2008/12/29 02:31:11 kkoons Exp $ */
+/* $Id: spells.h,v 1.116 2009/01/04 01:39:58 jhhudso Exp $ */
 #include <structs.h> // ubyte, int16
 
 #include <map>
 #define MAX_BUF_LENGTH               240
 
-extern std::map<int,int> skill_cost;
-
+const std::map<int,int> skill_cost;
 
 void extractFamiliar(CHAR_DATA *ch);
 
