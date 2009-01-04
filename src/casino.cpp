@@ -2136,7 +2136,7 @@ int slot_machine(CHAR_DATA *ch, OBJ_DATA *obj, int cmd, char *arg, CHAR_DATA *in
       if(obj->slot->button) {
          if(obj->slot->prch == ch) {
             if(is_abbrev(buf, "red") || is_abbrev(buf, "black")) {
-               if(obj->slot->gold && GET_GOLD(ch) < obj->slot->lastwin || !obj->slot->gold && GET_PLATINUM(ch) < obj->slot->lastwin) {
+	      if((obj->slot->gold && (GET_GOLD(ch) < obj->slot->lastwin)) || (!obj->slot->gold && (GET_PLATINUM(ch) < obj->slot->lastwin))) {
                   send_to_char("You don't have enough money to try to double your last win.\n\r", ch);
                } else if(number(0,1)) {
                   send_to_char("$BWinner!!$R The button lights up and the room is filled with whirring noises!\n\r", ch);
@@ -2155,7 +2155,7 @@ int slot_machine(CHAR_DATA *ch, OBJ_DATA *obj, int cmd, char *arg, CHAR_DATA *in
       return eSUCCESS;
    }
 
-   if(obj->slot->gold && GET_GOLD(ch) < obj->slot->cost * obj->slot->bet || !obj->slot->gold && GET_PLATINUM(ch) < obj->slot->cost * obj->slot->bet) {
+   if((obj->slot->gold && (GET_GOLD(ch) < (obj->slot->cost * obj->slot->bet))) || (!obj->slot->gold && (GET_PLATINUM(ch) < (obj->slot->cost * obj->slot->bet)))) {
       send_to_char("You don't have enough money to start the machine.\n\r", ch);
       return eSUCCESS;
    }
