@@ -20,7 +20,7 @@
  * 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead *
  * of just race stuff                                                     *
  **************************************************************************
- * $Id: fight.cpp,v 1.525 2008/12/23 19:29:37 kkoons Exp $               *
+ * $Id: fight.cpp,v 1.526 2009/01/05 01:10:27 kevin Exp $               *
  **************************************************************************/
 
 extern "C"
@@ -74,6 +74,7 @@ extern struct index_data *mob_index;
 extern struct index_data *obj_index;
 extern struct zone_data *zone_table;
 
+void getAreaData(unsigned int zone, int mob, unsigned int xps, unsigned int gold);
 /* functions that nobody else should be calling */
 void save_corpses(void); 
 int act_poisonous(CHAR_DATA *ch);
@@ -4984,7 +4985,7 @@ void group_gain(CHAR_DATA * ch, CHAR_DATA * victim)
 {
   char buf[256];
   long no_members = 0, total_levels = 0;
-  int64 share;
+  int64 share, total_share = 0;
   int64 base_xp = 0, bonus_xp = 0;
   CHAR_DATA *leader, *highest, *tmp_ch;
   struct follow_type *f;
@@ -5046,12 +5047,14 @@ void group_gain(CHAR_DATA * ch, CHAR_DATA * victim)
     sprintf(buf, "You receive %lld exps of %lld total.\n\r", share, base_xp + bonus_xp);
     send_to_char(buf, tmp_ch);
     gain_exp(tmp_ch, share);
+    total_share += share;
     change_alignment(tmp_ch, victim);
 
     // this loops the followers (cut and pasted above)
     tmp_ch = loop_followers(&f);
   }
   while(tmp_ch);
+  getAreaData( world[victim->in_room].zone ,mob_index[victim->mobdata->nr].virt, total_share,GET_GOLD(victim));
 }
 
 /* find the highest level present at the kill */
