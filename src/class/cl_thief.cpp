@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.191 2009/01/04 19:30:37 jhhudso Exp $
+| $Id: cl_thief.cpp,v 1.192 2009/01/05 06:05:17 kevin Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -26,12 +26,14 @@
 
 extern int rev_dir[];
 extern CWorld world;
- 
+
 extern struct index_data *mob_index;
 extern struct index_data *obj_index;
 extern int top_of_world;
 extern struct zone_data *zone_table;
 
+void gold_from_player(CHAR_DATA *ch, CHAR_DATA *victim, unsigned int amount);
+void item_from_player(CHAR_DATA *ch, CHAR_DATA *victim, int item);
 int find_door(CHAR_DATA *ch, char *type, char *dir);
 struct obj_data * search_char_for_item(char_data * ch, int16 item_number, bool wearonly = FALSE);
 
@@ -1094,6 +1096,7 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
           obj_from_char(obj);
           has_item = search_char_for_item(ch, obj->item_number);
           obj_to_char(obj, ch);
+          item_from_player(ch,victim,obj_index[obj->item_number].virt);
         }
           if(IS_SET(obj->obj_flags.more_flags, ITEM_NO_TRADE) ||
                 ( IS_SET(obj->obj_flags.more_flags, ITEM_UNIQUE) && has_item )
@@ -1242,6 +1245,7 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
         act("You remove $p and steal it.", ch, obj ,0, TO_CHAR, 0);
         act("$n steals $p from $N.",ch,obj,victim,TO_ROOM, NOTVICT);
         obj_to_char(unequip_char(victim, eq_pos), ch);
+        item_from_player(ch,victim,obj_index[obj->item_number].virt);
         if(!IS_NPC(victim) || (ISSET(victim->mobdata->actflags,ACT_NICE_THIEF)))
           _exp = GET_OBJ_WEIGHT(obj);
         else
@@ -1290,6 +1294,8 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
         obj_from_char(obj);
         has_item = search_char_for_item(ch, obj->item_number);
         obj_to_char(obj, ch);
+        item_from_player(ch,victim,obj_index[obj->item_number].virt);
+
         if(IS_SET(obj->obj_flags.more_flags, ITEM_NO_TRADE) ||
             ( IS_SET(obj->obj_flags.more_flags, ITEM_UNIQUE) && has_item )
           )
@@ -1453,7 +1459,11 @@ int do_pocket(CHAR_DATA *ch, char *argument, int cmd)
       if(GET_POS(victim) <= POSITION_SLEEPING || IS_AFFECTED(victim, AFF_PARALYSIS)) _exp = 0;
 
       sprintf(buf, "Nice work! You pilfered %d gold coins.\n\r", gold);
-      send_to_char(buf, ch);
+//stat shit 
+      if(!IS_NPC(victim)) 
+        gold_from_player(ch, victim, gold);
+//stat shit  
+     send_to_char(buf, ch);
       if(_exp && _exp > 1) {
          GET_EXP(ch) += _exp; /* exp for stealing :) */
          sprintf(buf,"You receive %d experience.\n\r", _exp);
