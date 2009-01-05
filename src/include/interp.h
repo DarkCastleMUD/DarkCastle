@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: interp.h,v 1.93 2008/12/13 23:55:53 kkoons Exp $ */
+/* $Id: interp.h,v 1.94 2009/01/05 01:05:15 kevin Exp $ */
 
 #ifndef INTERP_H_
 #define INTERP_H_
@@ -173,6 +173,7 @@ DO_FUN  do_action;
 DO_FUN  do_addnews;
 DO_FUN  do_addRoom;
 DO_FUN  do_advance;
+DO_FUN  do_areastats;
 DO_FUN  do_awaymsgs;
 DO_FUN  do_guide;
 DO_FUN  do_alias;
@@ -473,6 +474,7 @@ DO_FUN do_showhunt;
 DO_FUN  do_skills;
 DO_FUN  do_social;
 DO_FUN  do_songs;
+DO_FUN  do_stolen;
 DO_FUN  do_stromboli;
 DO_FUN  do_summon_toggle;
 DO_FUN  do_headbutt;
