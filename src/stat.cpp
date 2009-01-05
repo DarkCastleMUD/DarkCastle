@@ -300,6 +300,7 @@ void AreaData::DisplayAreaData(CHAR_DATA *ch)
 
 	for(i=0;i<=top_of_zone_table;i++)
 	{
+		if(areaStats[i].xps ==0) continue;
 		sprintf(buf, "%d)%s -- $5%d$R xps -- $5%d$R gold\n\r", i, zone_table[i].name, areaStats[i].xps, areaStats[i].gold);
 		output_buf += buf; 	
 	}
