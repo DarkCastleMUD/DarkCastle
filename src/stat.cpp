@@ -1,4 +1,4 @@
-
+#
 extern "C"
 {
 #include <ctype.h>
@@ -21,8 +21,12 @@ extern "C"
 #include <map>
 #include <queue>
 #include <algorithm>
+#include <list>
 
 using namespace std;
+
+
+
 
 /******************* Area start **************************************/
 enum SortState
@@ -40,8 +44,9 @@ struct MobKills
 
 struct AreaStats
 {
-	unsigned int xps;
-	unsigned int gold;
+	unsigned int area;
+	int64 xps;
+	int64 gold;
 	vector<MobKills> mobKills;
 };
 
@@ -50,7 +55,7 @@ class AreaData
 	public:
 		AreaData();
 		~AreaData() {}
-		void GetAreaData(unsigned int zone, int mob, unsigned int xps, unsigned int gold);
+		void GetAreaData(unsigned int zone, int mob, int64 xps, int64 gold);
 		void DisplaySingleArea(CHAR_DATA *ch, int area);
 		void DisplayAreaData(CHAR_DATA *ch);
 		void SortAreaData(CHAR_DATA *ch, SortState state);
@@ -64,33 +69,57 @@ AreaData::AreaData()
 {
 
 }
+bool CompareAreaXPStats( struct AreaStats first, struct AreaStats second)
+{
+	return first.xps > second.xps;
+}
+
+bool CompareAreaGoldStats( struct AreaStats first, struct AreaStats second)
+{
+	return first.xps > second.xps;
+}
+
 void AreaData::SortAreaData(CHAR_DATA *ch, SortState state)
 {
-	vector< vector<int> > v2dArray;
+	extern struct zone_data *zone_table;
+	list<AreaStats> lAreaStats;
 	map<unsigned int,AreaStats>::iterator it;
+	AreaStats aStats;
+	char buf2[MAX_STRING_LENGTH];
+	string output_buf;
+	int i=0;
 
-	switch(state)
+	for(it = areaStats.begin(); it!=areaStats.end(); it++)
 	{
-		case SORT_XP:
-		for(it=areaStats.begin(); it!=areaStats.end();it++)
-		{
-			if(it->second.xps == 0) continue;
-			
-		}				
-		return;
-		break;
-		case SORT_MOB:
-		return;
-		break;
-		case SORT_GOLD:
-		return;
-		break;
-		default:
-		return;
-		break;
+		if ( (state==SORT_XP) && (it->second.xps <1) ) continue; 
+		if ( (state==SORT_GOLD) && (it->second.gold <1) ) continue; 
+			lAreaStats.push_back(it->second);
 	}
-	return;
+	if(state==SORT_XP)
+	{
+		lAreaStats.sort(CompareAreaXPStats);
+		for(list<AreaStats>::iterator lit = lAreaStats.begin(); lit!=lAreaStats.end();lit++)
+		{
+			i++;
+			snprintf(buf2,MAX_STRING_LENGTH,"%%d)%%-%ds $5%%15lld$R xps\r\n", 
+			60+(strlen(zone_table[lit->area].name)-nocolor_strlen(zone_table[lit->area].name)));
+			csendf(ch, buf2,i,zone_table[lit->area].name,lit->xps);
+		}
+	}
+	if(state==SORT_GOLD)
+	{
+		lAreaStats.sort(CompareAreaGoldStats);
+		for(list<AreaStats>::iterator lit = lAreaStats.begin(); lit!=lAreaStats.end();lit++)
+		{
+			i++;
+			snprintf(buf2,MAX_STRING_LENGTH,"%%d)%%-%ds $5%%15lld$R gold\r\n", 
+			60+(strlen(zone_table[lit->area].name)-nocolor_strlen(zone_table[lit->area].name)));
+			csendf(ch, buf2,i,zone_table[lit->area].name,lit->gold);
+		}
+	}
+	return;	
 }
+
 void AreaData::DisplaySingleArea(CHAR_DATA *ch, int area)
 {
 	
@@ -107,7 +136,7 @@ void AreaData::DisplaySingleArea(CHAR_DATA *ch, int area)
 		send_to_char("Area number is outside the limits\r\n",ch);
 		return;
 	}
-	sprintf(buf, "%d)%s -- $5%d$R xps -- $5%d$R gold\n\r", area, zone_table[area].name, areaStats[area].xps, areaStats[area].gold);
+	sprintf(buf, "%d)%30s -- $5%15lld$R xps -- $5%15lld$R gold\n\r", area, zone_table[area].name, areaStats[area].xps, areaStats[area].gold);
 	output_buf += buf;
 	sprintf(buf, "%-30s %-5s\r\n","Mob Name","Killed");
 	output_buf += buf;
@@ -129,31 +158,35 @@ void AreaData::DisplayAreaData(CHAR_DATA *ch)
 {
 	int i;
 	char buf[MAX_STRING_LENGTH];
+	char buf2[MAX_STRING_LENGTH];
 	string output_buf;
 	extern struct zone_data *zone_table;
 	extern int top_of_zone_table;
-
+	
+	output_buf+=buf;
 	for(i=0;i<=top_of_zone_table;i++)
 	{
 		if(areaStats[i].xps ==0) continue;
-		sprintf(buf, "%d)%s -- $5%d$R xps -- $5%d$R gold\n\r", i, zone_table[i].name, areaStats[i].xps, areaStats[i].gold);
-		output_buf += buf; 	
+		snprintf(buf2,MAX_STRING_LENGTH, "%%3d)%%-%ds|$5%%15lld$R xps|$5%%15lld$R gold|\n\r", 
+		60+(strlen(zone_table[i].name)-nocolor_strlen(zone_table[i].name)));
+		csendf(ch, buf2,i,zone_table[i].name, areaStats[i].xps, areaStats[i].gold);
 	}
-	page_string(ch->desc, output_buf.c_str(), 1);
 	return;
 }
-void AreaData::GetAreaData(unsigned int zone, int mob, unsigned int xps, unsigned int gold)
+void AreaData::GetAreaData(unsigned int zone, int mob, int64 xps, int64 gold)
 {
 	struct MobKills mobObj;
         vector<MobKills>::iterator mobs;
 
 	if(areaStats.end() == areaStats.find(zone))
 	{
+		areaStats[zone].area = zone;
 		areaStats[zone].xps  = xps;
 		areaStats[zone].gold = gold;
 	}	
 	else
 	{
+		areaStats[zone].area = zone;
 		areaStats[zone].gold += gold;
 		areaStats[zone].xps  += xps;
 	}
@@ -180,7 +213,11 @@ int do_areastats(CHAR_DATA *ch, char *argument, int cmd)
 	argument = one_argument(argument , buf);
 	if(!*buf)
 	{
-		areaData.DisplayAreaData(ch);
+		send_to_char("$BUsage:$R \r\n",ch);
+		send_to_char("$Bareastats$R \r\n",ch);
+		send_to_char("$Bareastats area #$R\r\n",ch);
+		send_to_char("$Bareastats topxps$R\r\n",ch);
+		send_to_char("$Bareastats topgold$R\r\n",ch);
 		return eSUCCESS;
 	}
 	if(!strcmp(buf, "area"))
@@ -194,7 +231,21 @@ int do_areastats(CHAR_DATA *ch, char *argument, int cmd)
 		areaData.DisplaySingleArea(ch, atoi(buf));
 		return eSUCCESS; 
 	}
-	send_to_char("areastats or areastats area #\r\n",ch);
+	if(!strcmp(buf, "all"))
+	{
+		areaData.DisplayAreaData(ch);
+		return eSUCCESS;
+	}
+	if(!strcmp(buf, "topxps"))
+	{
+		areaData.SortAreaData(ch ,SORT_XP);
+		return eSUCCESS;
+	}
+	if(!strcmp(buf, "topgold"))
+	{
+		areaData.SortAreaData(ch ,SORT_GOLD);
+		return eSUCCESS;
+	}
 	return eSUCCESS;
 }
 
