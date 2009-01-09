@@ -123,7 +123,7 @@ extern char *sky_look[];
 extern struct room_data ** world_array;
 extern struct char_data *character_list;
 void check_leaderboard(void);
-void check_champion(void);
+void check_champion_and_website_who_list(void);
 void save_slot_machines(void);
 void check_silence_beacons(void);
 
@@ -968,9 +968,11 @@ void heartbeat()
     affect_update(PULSE_TIME);
     update_corpses_and_portals();
     check_idle_passwords();
-    check_leaderboard(); //good place to put this
     quest_update();
-    check_champion();
+    if(!bport) {
+      check_leaderboard(); //good place to put this
+      check_champion_and_website_who_list();
+    }
     save_slot_machines();
     pulse_hunts();
     if(!number(0,47))
@@ -2607,7 +2609,7 @@ void send_to_zone(char *messg, int zone)
    }
 }
 
-void send_to_room(char *messg, int room, bool awakeonly, CHAR_DATA *nta)
+void send_to_room(const char *messg, int room, bool awakeonly, CHAR_DATA *nta)
 {
     CHAR_DATA *i = NULL;
 

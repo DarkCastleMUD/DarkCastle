@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.177 2008/12/29 02:30:59 kkoons Exp $ */
+/* $Id: info.cpp,v 1.178 2009/01/09 06:55:56 shane Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -44,7 +44,8 @@ extern "C"
 #include <returnvals.h>
 #include <fileinfo.h>
 #include <map>
-
+#include <sstream>
+#include <fstream>
 using namespace std;
 
 /* extern variables */
@@ -87,6 +88,7 @@ extern int mana_gain(CHAR_DATA*ch);
 extern int ki_gain(CHAR_DATA *ch);
 extern int move_gain(CHAR_DATA *ch, int extra);
 extern int getRealSpellDamage(CHAR_DATA *ch);
+void string_to_file(FILE *, char *);
 
 /* intern functions */
 
@@ -3405,13 +3407,20 @@ int do_show_exp(CHAR_DATA *ch, char *arg, int cmd)
    return eSUCCESS;
 }
 
-void check_champion()
+void check_champion_and_website_who_list()
 {
    CHAR_DATA *ch = character_list, *nextch;
    OBJ_DATA *obj;
+   stringstream buf, buf2;
+   int addminute=0;
+   string name;
 
    for(;ch;ch = nextch) {
       nextch = ch->next;
+
+      if(!IS_NPC(ch) && ch->desc && ch->pcdata && ch->pcdata->wizinvis <= 0) {
+        buf << GET_SHORT(ch) << endl;
+      }
 
       if((IS_NPC(ch) || !ch->desc) && (obj = get_obj_in_list_num(real_object(CHAMPION_ITEM), ch->carrying))) {
          obj_from_char(obj);
@@ -3422,7 +3431,11 @@ void check_champion()
          REMBIT(ch->affected_by, AFF_CHAMPION);
       }
 
+
    }
+
+   buf << "endminutenobodywillhavethisnameever" << endl;
+   addminute++;
 
    if(!(obj = get_obj_num(real_object(CHAMPION_ITEM)))) {
      if ((obj = clone_object(real_object(CHAMPION_ITEM)))) {
@@ -3431,6 +3444,28 @@ void check_champion()
        log("CHAMPION_ITEM obj not found. Please create one.", 0, LOG_MISC);
      }
    }
+
+   ifstream fl (LOCAL_WHO_FILE);
+
+   while(getline(fl,name)) {
+     if(addminute <= 9)
+       buf << name << endl;
+     else
+       buf2 << name << endl;
+     if(name == "endminutenobodywillhavethisnameever")
+       addminute++;
+   }   
+
+   fl.close();
+
+   ofstream flo(LOCAL_WHO_FILE);
+   flo << buf.str();
+   flo.close();
+
+   ofstream flwo(WEB_WHO_FILE);
+   flwo << buf2.str();
+   flwo.close();
+
 }
 
 int do_sector(CHAR_DATA *ch, char *arg, int cmd)

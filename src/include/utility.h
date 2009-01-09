@@ -16,7 +16,7 @@
  *  10/21/2003   Onager    Changed IS_ANONYMOUS() to handle mobs without   *
  *                         crashing                                        *
  ***************************************************************************/
-/* $Id: utility.h,v 1.79 2008/12/13 23:55:53 kkoons Exp $ */
+/* $Id: utility.h,v 1.80 2009/01/09 06:55:59 shane Exp $ */
 
 #ifndef UTILITY_H_
 #define UTILITY_H_
@@ -434,7 +434,7 @@ void send_to_all(char *messg);
 void ansi_color(char *txt, CHAR_DATA *ch);
 void send_to_char(const char *messg, CHAR_DATA *ch);
 void send_to_char_nosp(char *messg, CHAR_DATA *ch);
-void send_to_room(char *messg, int room, bool awakeonly = FALSE, CHAR_DATA *nta = NULL);
+void send_to_room(const char *messg, int room, bool awakeonly = FALSE, CHAR_DATA *nta = NULL);
 void record_track_data(CHAR_DATA *ch, int cmd); 
 int write_to_descriptor(int desc, char *txt);
 int write_to_descriptor_fd(int desc, char *txt);
