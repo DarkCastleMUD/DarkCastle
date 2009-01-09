@@ -4,34 +4,37 @@ extern "C"
 #include <ctype.h>
 #include <string.h>
 }
-#include <obj.h>
-#include <spells.h>
-#include <player.h> 
-#include <terminal.h> 
-#include <levels.h> 
-#include <character.h> 
-#include <room.h>
-#include <utility.h> 
-#include <assert.h>
-#include <db.h>
-#include <vault.h>
-#include <returnvals.h>
-#include <interp.h>
 #include <string>
 #include <map>
 #include <queue>
 #include <algorithm>
 #include <list>
 
+#include "obj.h"
+#include "spells.h"
+#include "player.h"
+#include "terminal.h"
+#include "levels.h"
+#include "character.h"
+#include "room.h"
+#include "utility.h"
+#include "assert.h"
+#include "db.h"
+#include "vault.h"
+#include "returnvals.h"
+#include "interp.h"
+
 using namespace std;
 
 
+extern int top_of_zone_table;
+extern zone_data *zone_table;
 
 
 /******************* Area start **************************************/
 enum SortState
 {
-	SORT_XP=0,
+	SORT_XP,
 	SORT_GOLD,
 	SORT_MOB
 };
@@ -45,8 +48,8 @@ struct MobKills
 struct AreaStats
 {
 	unsigned int area;
-	int64 xps;
-	int64 gold;
+	int64_t xps;
+	int64_t gold;
 	vector<MobKills> mobKills;
 };
 
@@ -55,7 +58,7 @@ class AreaData
 	public:
 		AreaData();
 		~AreaData() {}
-		void GetAreaData(unsigned int zone, int mob, int64 xps, int64 gold);
+		void GetAreaData(unsigned int zone, int mob, int64_t xps, int64_t gold);
 		void DisplaySingleArea(CHAR_DATA *ch, int area);
 		void DisplayAreaData(CHAR_DATA *ch);
 		void SortAreaData(CHAR_DATA *ch, SortState state);
@@ -69,19 +72,18 @@ AreaData::AreaData()
 {
 
 }
-bool CompareAreaXPStats( struct AreaStats first, struct AreaStats second)
+bool CompareAreaXPStats( AreaStats first, AreaStats second)
 {
 	return first.xps > second.xps;
 }
 
-bool CompareAreaGoldStats( struct AreaStats first, struct AreaStats second)
+bool CompareAreaGoldStats( AreaStats first, AreaStats second)
 {
 	return first.xps > second.xps;
 }
 
 void AreaData::SortAreaData(CHAR_DATA *ch, SortState state)
 {
-	extern struct zone_data *zone_table;
 	list<AreaStats> lAreaStats;
 	map<unsigned int,AreaStats>::iterator it;
 	AreaStats aStats;
@@ -126,8 +128,6 @@ void AreaData::DisplaySingleArea(CHAR_DATA *ch, int area)
 	char buf[MAX_STRING_LENGTH];
 	string output_buf;
 	vector<MobKills>::iterator mobs;
-	extern int top_of_zone_table;
-	extern struct zone_data *zone_table;
 	CHAR_DATA *get_mob_vnum(int vnum);
 	CHAR_DATA *tmpchar;
 
@@ -160,8 +160,6 @@ void AreaData::DisplayAreaData(CHAR_DATA *ch)
 	char buf[MAX_STRING_LENGTH];
 	char buf2[MAX_STRING_LENGTH];
 	string output_buf;
-	extern struct zone_data *zone_table;
-	extern int top_of_zone_table;
 	
 	output_buf+=buf;
 	for(i=0;i<=top_of_zone_table;i++)
@@ -173,9 +171,9 @@ void AreaData::DisplayAreaData(CHAR_DATA *ch)
 	}
 	return;
 }
-void AreaData::GetAreaData(unsigned int zone, int mob, int64 xps, int64 gold)
+void AreaData::GetAreaData(unsigned int zone, int mob, int64_t xps, int64_t gold)
 {
-	struct MobKills mobObj;
+	MobKills mobObj;
         vector<MobKills>::iterator mobs;
 
 	if(areaStats.end() == areaStats.find(zone))
