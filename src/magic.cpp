@@ -1313,23 +1313,27 @@ int spell_firestorm(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
   act("$n makes $B$4fire$R fall from the heavens!\n\r",
 		ch, 0, 0, TO_ROOM, 0);
 
-  for(tmp_victim = character_list; tmp_victim; tmp_victim = temp)
-  {
-	 temp = tmp_victim->next;
-	 if ( (ch->in_room == tmp_victim->in_room) && (ch != tmp_victim) &&
-		(!ARE_GROUPED(ch,tmp_victim)) && can_be_attacked(ch, tmp_victim)){
+  for (tmp_victim = character_list; tmp_victim; tmp_victim = temp) {
+    temp = tmp_victim->next;
 
-	  dam = 250;
-	  retval = damage(ch, tmp_victim, dam,TYPE_FIRE, SPELL_FIRESTORM, 0);
-          if(IS_SET(retval, eCH_DIED))
-            return retval;
-	 }
-	 else
-	{
-   	if (world[ch->in_room].zone == world[tmp_victim->in_room].zone)
- 	  send_to_char("You feel a HOT blast of air.\n\r", tmp_victim);
-	 }
+    if ((ch->in_room == tmp_victim->in_room) &&
+	(ch != tmp_victim) &&
+	(!ARE_GROUPED(ch, tmp_victim)) &&
+	can_be_attacked(ch, tmp_victim)) {
+      
+      dam = 250;
+
+      retval = damage(ch, tmp_victim, dam, TYPE_FIRE, SPELL_FIRESTORM, 0);
+      if (SOMEONE_DIED(retval)) {
+	return retval;
+      }
+    } else {
+      if (world[ch->in_room].zone == world[tmp_victim->in_room].zone) {
+	send_to_char("You feel a HOT blast of air.\n\r", tmp_victim);
+      }
+    }
   }
+
   return retval;
 }
 
@@ -4371,7 +4375,7 @@ int spell_fire_breath(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
   //      dam >>= 1;
 
       retval = damage(ch, tmp_victim, dam, TYPE_FIRE, SPELL_FIRE_BREATH, 0);
-      if(IS_SET(retval, eCH_DIED))
+      if(SOMEONE_DIED(retval))
         return retval;
     } else
         if (world[ch->in_room].zone == world[tmp_victim->in_room].zone)
