@@ -79,7 +79,7 @@ bool CompareAreaXPStats( AreaStats first, AreaStats second)
 
 bool CompareAreaGoldStats( AreaStats first, AreaStats second)
 {
-	return first.xps > second.xps;
+	return first.gold > second.gold;
 }
 
 void AreaData::SortAreaData(CHAR_DATA *ch, SortState state)
@@ -87,6 +87,7 @@ void AreaData::SortAreaData(CHAR_DATA *ch, SortState state)
 	list<AreaStats> lAreaStats;
 	map<unsigned int,AreaStats>::iterator it;
 	AreaStats aStats;
+	char buf[MAX_STRING_LENGTH];
 	char buf2[MAX_STRING_LENGTH];
 	string output_buf;
 	int i=0;
@@ -103,9 +104,11 @@ void AreaData::SortAreaData(CHAR_DATA *ch, SortState state)
 		for(list<AreaStats>::iterator lit = lAreaStats.begin(); lit!=lAreaStats.end();lit++)
 		{
 			i++;
-			snprintf(buf2,MAX_STRING_LENGTH,"%%d)%%-%ds $5%%15lld$R xps\r\n", 
-			60+(strlen(zone_table[lit->area].name)-nocolor_strlen(zone_table[lit->area].name)));
-			csendf(ch, buf2,i,zone_table[lit->area].name,lit->xps);
+			snprintf(buf,35+(strlen(zone_table[lit->area].name)-nocolor_strlen(zone_table[lit->area].name)),"%s",
+			zone_table[lit->area].name);
+			snprintf(buf2,MAX_STRING_LENGTH,"%%3d)%%-%ds $5%%15lld$R xps\r\n", 
+			35+(strlen(zone_table[lit->area].name)-nocolor_strlen(zone_table[lit->area].name)));
+			csendf(ch, buf2,i,buf,lit->xps);
 		}
 	}
 	if(state==SORT_GOLD)
@@ -114,9 +117,11 @@ void AreaData::SortAreaData(CHAR_DATA *ch, SortState state)
 		for(list<AreaStats>::iterator lit = lAreaStats.begin(); lit!=lAreaStats.end();lit++)
 		{
 			i++;
-			snprintf(buf2,MAX_STRING_LENGTH,"%%d)%%-%ds $5%%15lld$R gold\r\n", 
-			60+(strlen(zone_table[lit->area].name)-nocolor_strlen(zone_table[lit->area].name)));
-			csendf(ch, buf2,i,zone_table[lit->area].name,lit->gold);
+			snprintf(buf,35+(strlen(zone_table[lit->area].name)-nocolor_strlen(zone_table[lit->area].name)),"%s",
+			zone_table[lit->area].name);
+			snprintf(buf2,MAX_STRING_LENGTH,"%%3d)%%-%ds $5%%15lld$R gold\r\n", 
+			35+(strlen(zone_table[lit->area].name)-nocolor_strlen(zone_table[lit->area].name)));
+			csendf(ch, buf2,i,buf,lit->gold);
 		}
 	}
 	return;	
@@ -136,10 +141,11 @@ void AreaData::DisplaySingleArea(CHAR_DATA *ch, int area)
 		send_to_char("Area number is outside the limits\r\n",ch);
 		return;
 	}
-	sprintf(buf, "%d)%30s -- $5%15lld$R xps -- $5%15lld$R gold\n\r", area, zone_table[area].name, areaStats[area].xps, areaStats[area].gold);
-	output_buf += buf;
-	sprintf(buf, "%-30s %-5s\r\n","Mob Name","Killed");
-	output_buf += buf;
+	snprintf(buf,MAX_STRING_LENGTH, "%d)%30s -- $5%12lld$R xps -- $5%12lld$R gold\n\r", area, 
+	zone_table[area].name, areaStats[area].xps, areaStats[area].gold);
+	csendf(ch, buf);
+	snprintf(buf,MAX_STRING_LENGTH, "%-30s %-5s\r\n","Mob Name","Killed");
+	csendf(ch,buf);
 	for(mobs = areaStats[area].mobKills.begin(); mobs != areaStats[area].mobKills.end(); mobs++)	
 	{
 		tmpchar = get_mob_vnum(mobs->name);
@@ -148,8 +154,9 @@ void AreaData::DisplaySingleArea(CHAR_DATA *ch, int area)
 			send_to_char("Shit a mob is missing from game!!!\n\r",ch);
 			continue;
 		}
-		sprintf(buf, "%-30s %-5d %s\r\n",get_mob_vnum(mobs->name)->short_desc ,mobs->howmany, mobs->howmany < 2 ? "time":"times");
-		output_buf += buf;
+		snprintf(buf,MAX_STRING_LENGTH, "%-30s %-5d %s\r\n",get_mob_vnum(mobs->name)->short_desc ,
+		mobs->howmany, mobs->howmany < 2 ? "time":"times");
+		csendf(ch,buf);
 	}
 	page_string(ch->desc, output_buf.c_str(), 1);
 	return;	
@@ -161,13 +168,14 @@ void AreaData::DisplayAreaData(CHAR_DATA *ch)
 	char buf2[MAX_STRING_LENGTH];
 	string output_buf;
 	
-	output_buf+=buf;
 	for(i=0;i<=top_of_zone_table;i++)
 	{
 		if(areaStats[i].xps ==0) continue;
-		snprintf(buf2,MAX_STRING_LENGTH, "%%3d)%%-%ds|$5%%15lld$R xps|$5%%15lld$R gold|\n\r", 
-		60+(strlen(zone_table[i].name)-nocolor_strlen(zone_table[i].name)));
-		csendf(ch, buf2,i,zone_table[i].name, areaStats[i].xps, areaStats[i].gold);
+		snprintf(buf,35+(strlen(zone_table[i].name)-nocolor_strlen(zone_table[i].name)),
+		"%s",zone_table[i].name);
+		snprintf(buf2,MAX_STRING_LENGTH, "%%3d)%%-%ds|$5%%12lld$R xps|$5%%12lld$R gold|\n\r",
+		35+(strlen(zone_table[i].name)-nocolor_strlen(zone_table[i].name)));
+		csendf(ch, buf2,i,buf, areaStats[i].xps, areaStats[i].gold);
 	}
 	return;
 }
