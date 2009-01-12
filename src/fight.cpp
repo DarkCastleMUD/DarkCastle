@@ -20,7 +20,7 @@
  * 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead *
  * of just race stuff                                                     *
  **************************************************************************
- * $Id: fight.cpp,v 1.526 2009/01/05 01:10:27 kevin Exp $               *
+ * $Id: fight.cpp,v 1.527 2009/01/12 02:38:26 jhhudso Exp $               *
  **************************************************************************/
 
 extern "C"
@@ -512,16 +512,25 @@ int attack(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
   if (!ch || !vict) { 
     log("NULL Victim or Ch sent to attack!  This crashes us!", -1, LOG_BUG);
     produce_coredump();
+
     return eINTERNAL_ERROR;
   }
 
-  assert(GET_POS(ch) != POSITION_DEAD);
-  //assert(GET_POS(vict) != POSITION_DEAD);
-  if (GET_POS(vict) == POSITION_DEAD)
-  {
-    log("Dead victim sent to attack. Wtf ;)", -1, LOG_BUG);
+  if (GET_POS(ch) != POSITION_DEAD) {
+    log("Dead ch sent to attack. Wtf ;)", -1, LOG_BUG);
+    produce_coredump();
+    stop_fighting(ch);
+
     return eINTERNAL_ERROR;
   }
+
+  if (GET_POS(vict) == POSITION_DEAD) {
+    log("Dead victim sent to attack. Wtf ;)", -1, LOG_BUG);
+    produce_coredump();
+    
+    return eINTERNAL_ERROR;
+  }
+
   if (!can_attack(ch))                          return eFAILURE;
   if (!can_be_attacked(ch, vict))               return eFAILURE;
 
