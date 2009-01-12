@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.188 2009/01/10 20:31:42 jhhudso Exp $ */
+/* $Id: db.cpp,v 1.189 2009/01/12 02:38:58 jhhudso Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -5197,8 +5197,7 @@ void find_unordered_objects(void) {
     cur_vnum = obj_index[rnum].virt;
     
     if (cur_vnum < last_vnum) {
-      logf(0, LOG_MISC, "Out of order vnum found. Vnum: %d Rnum: %d",
-	   cur_vnum, rnum);
+      logf(0, LOG_MISC, "Out of order vnum found. Vnum: %d Last Vnum: %d Rnum: %d", cur_vnum, last_vnum, rnum);
     }
   }
 }
@@ -5210,8 +5209,7 @@ void find_unordered_mobiles(void) {
     cur_vnum = mob_index[rnum].virt;
     
     if (cur_vnum < last_vnum) {
-      logf(0, LOG_MISC, "Out of order vnum found. Vnum: %d Rnum: %d",
-	   cur_vnum, rnum);
+      logf(0, LOG_MISC, "Out of order vnum found. Vnum: %d Last Vnum: %d Rnum: %d", cur_vnum, last_vnum, rnum);
     }
   }
 }
