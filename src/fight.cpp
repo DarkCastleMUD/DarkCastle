@@ -20,7 +20,7 @@
  * 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead *
  * of just race stuff                                                     *
  **************************************************************************
- * $Id: fight.cpp,v 1.527 2009/01/12 02:38:26 jhhudso Exp $               *
+ * $Id: fight.cpp,v 1.528 2009/01/14 23:38:35 dcastle Exp $               *
  **************************************************************************/
 
 extern "C"
@@ -516,7 +516,7 @@ int attack(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
     return eINTERNAL_ERROR;
   }
 
-  if (GET_POS(ch) != POSITION_DEAD) {
+  if (GET_POS(ch) == POSITION_DEAD) {
     log("Dead ch sent to attack. Wtf ;)", -1, LOG_BUG);
     produce_coredump();
     stop_fighting(ch);
