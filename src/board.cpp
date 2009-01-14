@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: board.cpp,v 1.39 2008/12/30 03:44:59 kkoons Exp $
+| $Id: board.cpp,v 1.40 2009/01/14 21:45:13 kkoons Exp $
 | board.C
 | Description:  This file contains the implementation for the board
 |   code.  It's old and should be rewritten --Morc XXX
@@ -867,9 +867,27 @@ int board_remove_msg(CHAR_DATA *ch, char *arg, std::map<std::string, BOARD_INFO>
   return eSUCCESS;
   }
 
+string remove_slashr(string unformatted)
+{
+  if(unformatted.empty())
+    return "";
+
+  string write_me = unformatted;
+  string::iterator slashr;
+ 
+  for(slashr = write_me.end(); slashr != write_me.begin(); slashr--)
+    if(*slashr == '\r') write_me.erase(slashr);
+ 
+  if(*slashr == '\r') write_me.erase(slashr);
+  return write_me; 
+}
+
+
+
 void board_save_board(std::map<string, BOARD_INFO>::iterator board) {
 
   FILE * the_file;
+  string write_me;
   unsigned int ind;
 
   the_file = dc_fopen(board->second.save_file.c_str(), "w");
@@ -884,14 +902,36 @@ void board_save_board(std::map<string, BOARD_INFO>::iterator board) {
   fprintf(the_file," %d ", board->second.msgs.size());
   for (ind = 0; ind < board->second.msgs.size(); ind++) 
   {
-    fwrite_string((char*)board->second.msgs[ind].title.c_str(), the_file);
-    fwrite_string((char*)board->second.msgs[ind].author.c_str(), the_file);
-    fwrite_string((char*)board->second.msgs[ind].date.c_str(), the_file);
-    fwrite_string((char*)board->second.msgs[ind].text.c_str(), the_file);
+    write_me = remove_slashr(board->second.msgs[ind].title);
+    fwrite_string((char*)write_me.c_str(), the_file);
+
+    write_me = remove_slashr(board->second.msgs[ind].author);
+    fwrite_string((char*)write_me.c_str(), the_file);
+
+    write_me = remove_slashr(board->second.msgs[ind].date);
+    fwrite_string((char*)write_me.c_str(), the_file);
+
+    write_me = remove_slashr(board->second.msgs[ind].text);
+    fwrite_string((char*)write_me.c_str(), the_file);
   }
   dc_fclose(the_file);
   return;
 }
+
+string check_returns(string in_str)
+{
+  string check_me = in_str;
+  string::iterator checker;
+  for(checker = check_me.begin(); checker != check_me.end(); checker++)
+    if(*checker == '\n')
+    {
+      if(checker+1 != check_me.end() && *(checker+1) != '\r')
+        check_me.insert(checker+1, '\r');
+    }
+  
+  return check_me;
+}
+
 
 void board_load_board() {
 
@@ -923,16 +963,23 @@ void board_load_board() {
     {
       
       curr_msg.title = fread_string (the_file, 27);
+      curr_msg.title = check_returns(curr_msg.title);
+
       curr_msg.author = fread_string (the_file, 27);
+      curr_msg.author = check_returns(curr_msg.author);
+
       curr_msg.date = fread_string (the_file, 27);
+      curr_msg.date = check_returns(curr_msg.date);
+
       curr_msg.text = fread_string (the_file, 27);
+      curr_msg.text = check_returns(curr_msg.text);
+
       map_it->second.msgs.push_back(curr_msg);
     }
 
     dc_fclose(the_file);
   }
 }
-
 
 int board_display_msg(CHAR_DATA *ch, char *arg, std::map<std::string, BOARD_INFO>::iterator board)
 {
@@ -1103,6 +1150,6 @@ int board_show_board(CHAR_DATA *ch, char *arg, std::map<std::string, BOARD_INFO>
 
 int fwrite_string (char *buf, FILE *fl)
 {
-  return (fprintf(fl, "%s~\n\r", buf));
+  return (fprintf(fl, "%s~\n", buf));
 }
 
