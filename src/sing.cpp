@@ -195,7 +195,7 @@ NULL,   SKILL_INCREASE_HARD
 }, 
 
 { /* 20 */
-	20, POSITION_RESTING, 10, SKILL_SONG_ASTRAL_CHANTY, 
+	30, POSITION_RESTING, 10, SKILL_SONG_ASTRAL_CHANTY, 
         TAR_CHAR_WORLD, 
         song_astral_chanty, execute_song_astral_chanty,
 	pulse_song_astral_chanty, NULL, SKILL_INCREASE_HARD
@@ -1518,8 +1518,7 @@ int song_astral_chanty( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim
   send_to_char("You begin to sing an astral chanty...\n\r", ch);
   act("$n starts quietly in a sea chanty...", ch, 0, 0, TO_ROOM, 0);
 
-  ch->song_timer = song_info[ch->song_number].beats;
-
+  ch->song_timer = song_info[ch->song_number].beats - (3 + skill / 8);
   return eSUCCESS;
 }
 
@@ -1579,7 +1578,7 @@ void do_astral_chanty_movement(CHAR_DATA *victim, CHAR_DATA *target)
     }
 
   do_look(victim, "", 9);
-  WAIT_STATE(victim, PULSE_VIOLENCE*2);
+  WAIT_STATE(victim, PULSE_VIOLENCE);
   act("$n appears out of nowhere in a chorus of light and song.", victim, 0, 0, TO_ROOM, 0);
 }
 
