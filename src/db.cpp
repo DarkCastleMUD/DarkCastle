@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.189 2009/01/12 02:38:58 jhhudso Exp $ */
+/* $Id: db.cpp,v 1.190 2009/01/19 16:49:02 kkoons Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -2019,6 +2019,7 @@ void setup_dir(FILE *fl, int room, int dir)
 
     tmp = fread_bitvector (fl, -1, 300); /* tjs hack - not the right range */
     world[room].dir_option[dir]->exit_info = tmp;
+    world[room].dir_option[dir]->bracee = NULL;
  
     world[room].dir_option[dir]->key = fread_int (fl,-62000, 62000);
     world[room].dir_option[dir]->to_room = fread_int (fl, -62000, 62000);
