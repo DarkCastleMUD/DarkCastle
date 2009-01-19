@@ -1,7 +1,7 @@
 #ifndef __ROOM_H__
 #define __ROOM_H__
 /************************************************************************
-| $Id: room.h,v 1.18 2008/10/27 22:53:57 kkoons Exp $
+| $Id: room.h,v 1.19 2009/01/19 16:47:53 kkoons Exp $
 | room.h
 | Description:  This file contains all of the room header file/constant
 |   information.  It also contains information about the 'world' structs.
@@ -97,9 +97,10 @@
 
 struct room_direction_data
 {
-    char *general_description;       /* When look DIR.                  */ 
-    char *keyword;                   /* for open/close                  */  
+    char *general_description;      /* When look DIR.                  */ 
+    char *keyword;                  /* for open/close                  */  
     int16 exit_info;                /* Exit info                       */
+    CHAR_DATA *bracee;		    /* This is who is bracing the door */
     int16 key;                      /* Key's number (-1 for no key)    */
     int16 to_room;                  /* Where direction leeds (NOWHERE) */
 };
