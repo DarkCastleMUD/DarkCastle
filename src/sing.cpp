@@ -222,9 +222,9 @@ NULL,   SKILL_INCREASE_HARD
 	NULL, NULL, SKILL_INCREASE_MEDIUM
 },
 { /* 24 */
-        8, POSITION_RESTING, 4, SKILL_SONG_FANATICAL_FANFARE,
-       TAR_IGNORE, song_fanatical_fanfare, execute_song_fanatical_fanfare,pulse_song_fanatical_fanfare,
-       intrp_song_fanatical_fanfare, SKILL_INCREASE_MEDIUM
+        12, POSITION_RESTING, 8, SKILL_SONG_FANATICAL_FANFARE,
+       TAR_IGNORE, song_fanatical_fanfare, execute_song_fanatical_fanfare,NULL,
+       NULL, SKILL_INCREASE_MEDIUM
 
 },
 { /* 25 */
@@ -2135,11 +2135,25 @@ int execute_song_fanatical_fanfare(ubyte level, CHAR_DATA *ch, char *arg, CHAR_D
 {
    char_data * master = NULL;
    follow_type * fvictim = NULL;
+   struct affected_type af1, af2, af3;
 
-   if(GET_KI(ch) < (has_skill(ch,SKILL_SONG_FANATICAL_FANFARE) > 60?1:2)) // we don't have the ki to keep the song going
-   {
-     return intrp_song_fanatical_fanfare(level, ch, arg, victim, -1);
-   }
+   af1.type      = SKILL_SONG_FANATICAL_FANFARE;
+   af1.duration  = skill/30;
+   af1.modifier  = 0;
+   af1.location  = 0;
+   af1.bitvector = AFF_INSOMNIA;
+
+   af2.type      = SKILL_SONG_FANATICAL_FANFARE;
+   af2.duration  = skill/30;
+   af2.modifier  = 0;
+   af2.location  = 0;
+   af2.bitvector = AFF_FEARLESS;
+
+   af3.type      = SKILL_SONG_FANATICAL_FANFARE;
+   af3.duration  = skill/30;
+   af3.modifier  = 0;
+   af3.location  = 0;
+   af3.bitvector = AFF_NO_PARA;
 
    if(ch->master && ch->master->in_room == ch->in_room && 
                     ISSET(ch->affected_by, AFF_GROUP))
@@ -2152,64 +2166,51 @@ int execute_song_fanatical_fanfare(ubyte level, CHAR_DATA *ch, char *arg, CHAR_D
 //         continue;
 
       if(!ISSET(fvictim->follower->affected_by, AFF_GROUP))
-         continue;
+        continue;
 
-      if(ch->in_room != fvictim->follower->in_room)
-      {
-         if(ISSET(fvictim->follower->affected_by, AFF_INSOMNIA) &&
-            !affected_by_spell(fvictim->follower, SPELL_INSOMNIA))         {
-            REMBIT(fvictim->follower->affected_by, AFF_INSOMNIA);
-            send_to_char("Your mind returns to its normal state.\n\r", fvictim->follower);
-         }
-         if(IS_AFFECTED(fvictim->follower, AFF_FEARLESS))
-            REMBIT(fvictim->follower->affected_by, AFF_FEARLESS);
-         if(IS_AFFECTED(fvictim->follower, AFF_NO_PARA))
-            REMBIT(fvictim->follower->affected_by, AFF_NO_PARA);
-         continue;
+      if(affected_by_spell(fvictim->follower, SKILL_SONG_FANATICAL_FANFARE))
+      {  
+        send_to_char("You manage to get far enough away to avoid being poked again!\r\n", fvictim->follower);
+	continue;
       }
+
       if(affected_by_spell(fvictim->follower, SPELL_INSOMNIA))
       {
          affect_from_char(fvictim->follower, SPELL_INSOMNIA);
          send_to_char("Your mind returns to its normal state.\n\r", fvictim->follower);
       }
-      SETBIT(fvictim->follower->affected_by, AFF_INSOMNIA);
-      if (skill > 85) SETBIT(fvictim->follower->affected_by, AFF_FEARLESS);
-      if (skill > 90) SETBIT(fvictim->follower->affected_by, AFF_NO_PARA);
+
+
+      affect_to_char(fvictim->follower, &af1);
+      if (skill > 85) 
+	affect_to_char(fvictim->follower, &af2);
+      if (skill > 90) 
+	affect_to_char(fvictim->follower, &af3);
       send_to_char("Your mind races at a thousand miles an hour, following the beat of the song!\r\n", fvictim->follower);
    }
 
-   if(ch->in_room == master->in_room) 
+   if(ch->in_room == master->in_room)
    {
-      SETBIT(master->affected_by, AFF_INSOMNIA);
-      if (skill > 85) SETBIT(master->affected_by, AFF_FEARLESS);
-      if (skill > 90) SETBIT(master->affected_by, AFF_NO_PARA);
-      send_to_char("Your song causes your mind to race at a thousand miles an hour!\r\n", master);
-   }
-   else
-   {
-      if(ISSET(master->affected_by, AFF_INSOMNIA) &&
-         !affected_by_spell(master, SPELL_INSOMNIA))
+      if(!affected_by_spell(master, SKILL_SONG_FANATICAL_FANFARE))
       {
-         REMBIT(master->affected_by, AFF_INSOMNIA);
-         send_to_char("Your mind returns to its normal state.\n\r", master);
+        affect_to_char(master, &af1);
+        if (skill > 85) 
+          affect_to_char(master, &af2);
+        if (skill > 90) 
+         affect_to_char(master, &af3);
+        if(ch == master)
+          send_to_char("Your song causes your mind to race at a thousand miles an hour!\r\n", master);
+        else
+          csendf(master, "%s's song causes your mind to race at a thousand miles an hour!\r\n", GET_NAME(ch));
       }
-      if(IS_AFFECTED(master, AFF_FEARLESS))
-         REMBIT(master->affected_by, AFF_FEARLESS);
-      if(IS_AFFECTED(master, AFF_NO_PARA))
-         REMBIT(master->affected_by, AFF_NO_PARA);
+      else
+      {
+        if(ch == master)
+          send_to_char("Your mind is already racing!\n\r", master);
+        else
+          send_to_char("You manage to get far enough away to avoid being poked again!\r\n", master);
+      }
    }
-
-
-   if (!skill_success(ch, NULL, SKILL_SONG_FANATICAL_FANFARE))
-   {
-      
-   }
-
-   GET_KI(ch) -= (has_skill(ch,SKILL_SONG_FANATICAL_FANFARE) > 60?1:2);
-
-   ch->song_timer = song_info[ch->song_number].beats + 
-                             (GET_LEVEL(ch) > 33) +
-                             (GET_LEVEL(ch) > 43);
    return eSUCCESS;
 }
 
@@ -2238,8 +2239,6 @@ else af.bitvector = -1;
 
    for(fvictim = master->followers; fvictim; fvictim = fvictim->next)
    {
-//      if(ch == fvictim->follower)
-//         continue;
 
       if(!ISSET(fvictim->follower->affected_by, AFF_GROUP))
          continue;
@@ -2293,12 +2292,12 @@ else af.bitvector = -1;
    return eSUCCESS;
 }
 
-int pulse_song_fanatical_fanfare(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
+/*int pulse_song_fanatical_fanfare(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {
   if (number(1,5) == 2)
       act("$n combines singing and poking the people with a stick, getting people worked up.", ch, 0, 0, TO_ROOM,0);
   return eSUCCESS;
-}
+}*/
 
 int pulse_mking_charge(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {
