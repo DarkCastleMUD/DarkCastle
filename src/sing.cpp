@@ -116,7 +116,7 @@ NULL,   SKILL_INCREASE_MEDIUM
 },
 
 { /* 9 */
-	10, POSITION_RESTING, 2, SKILL_SONG_HEALING_MELODY, 
+	10, POSITION_RESTING, 4, SKILL_SONG_HEALING_MELODY, 
 	TAR_IGNORE, 
 	song_healing_melody, execute_song_healing_melody, NULL, NULL,
         SKILL_INCREASE_MEDIUM
@@ -168,7 +168,7 @@ NULL,   SKILL_INCREASE_HARD
 },
 
 { /* 16 */
-	10, POSITION_RESTING, 4, SKILL_SONG_SOOTHING_REMEM, 
+	10, POSITION_RESTING, 6, SKILL_SONG_SOOTHING_REMEM, 
         TAR_IGNORE, 
         song_soothing_remembrance, execute_song_soothing_remembrance,
         NULL, NULL, SKILL_INCREASE_MEDIUM
@@ -705,22 +705,27 @@ void update_bard_singing()
         REMBIT(i->affected_by, AFF_HIDE);
         send_to_char("Your singing ruins your hiding place.\r\n", i);
       }
-      if (GET_LEVEL(i) < IMP && (IS_SET(world[i->in_room].room_flags, NO_KI) ||
-            IS_SET(world[i->in_room].room_flags, SAFE) && (
-            i->song_number == SKILL_SONG_WHISTLE_SHARP - SKILL_SONG_BASE ||
-            i->song_number == SKILL_SONG_UNRESIST_DITTY - SKILL_SONG_BASE ||
-            i->song_number == SKILL_SONG_GLITTER_DUST - SKILL_SONG_BASE ||
-            i->song_number == SKILL_SONG_STICKY_LULL - SKILL_SONG_BASE ||
-            i->song_number == SKILL_SONG_REVEAL_STACATO - SKILL_SONG_BASE ||
-            i->song_number == SKILL_SONG_TERRIBLE_CLEF - SKILL_SONG_BASE ||
-            i->song_number == SKILL_SONG_DISCHORDANT_DIRGE - SKILL_SONG_BASE ||
-            i->song_number == SKILL_SONG_INSANE_CHANT - SKILL_SONG_BASE ||
-            i->song_number == SKILL_SONG_JIG_OF_ALACRITY - SKILL_SONG_BASE ||
-            i->song_number == SKILL_SONG_DISARMING_LIMERICK - SKILL_SONG_BASE ||
-            i->song_number == SKILL_SONG_CRUSHING_CRESCENDO - SKILL_SONG_BASE ||
-            i->song_number == SKILL_SONG_SHATTERING_RESO - SKILL_SONG_BASE ||
-            i->song_number == SKILL_SONG_MKING_CHARGE - SKILL_SONG_BASE ||
-            i->song_number == SKILL_SONG_HYPNOTIC_HARMONY - SKILL_SONG_BASE)))
+      if (GET_LEVEL(i) < IMP 
+          && (
+              (IS_SET(world[i->in_room].room_flags, NO_KI) || IS_SET(world[i->in_room].room_flags, SAFE)) 
+              && (
+                  i->song_number == SKILL_SONG_WHISTLE_SHARP - SKILL_SONG_BASE ||
+                  i->song_number == SKILL_SONG_UNRESIST_DITTY - SKILL_SONG_BASE ||
+                  i->song_number == SKILL_SONG_GLITTER_DUST - SKILL_SONG_BASE ||
+                  i->song_number == SKILL_SONG_STICKY_LULL - SKILL_SONG_BASE ||
+                  i->song_number == SKILL_SONG_REVEAL_STACATO - SKILL_SONG_BASE ||
+                  i->song_number == SKILL_SONG_TERRIBLE_CLEF - SKILL_SONG_BASE ||
+                  i->song_number == SKILL_SONG_DISCHORDANT_DIRGE - SKILL_SONG_BASE ||
+                  i->song_number == SKILL_SONG_INSANE_CHANT - SKILL_SONG_BASE ||
+                  i->song_number == SKILL_SONG_JIG_OF_ALACRITY - SKILL_SONG_BASE ||
+                  i->song_number == SKILL_SONG_DISARMING_LIMERICK - SKILL_SONG_BASE ||
+                  i->song_number == SKILL_SONG_CRUSHING_CRESCENDO - SKILL_SONG_BASE ||
+                  i->song_number == SKILL_SONG_SHATTERING_RESO - SKILL_SONG_BASE ||
+                  i->song_number == SKILL_SONG_MKING_CHARGE - SKILL_SONG_BASE ||
+                  i->song_number == SKILL_SONG_HYPNOTIC_HARMONY - SKILL_SONG_BASE
+                 )
+             )
+         )
       {
          send_to_char("In this room, your song quiety fades away.\r\n", i);
          if((song_info[i->song_number].intrp_pointer))
@@ -731,20 +736,25 @@ void update_bard_singing()
             i->song_data = 0;
          }
          i->song_timer = 0;
-      } else if(( (GET_POS(i) < song_info[i->song_number].minimum_position) && !IS_NPC(i))
-         || IS_SET(i->combat, COMBAT_STUNNED)
-         || IS_SET(i->combat, COMBAT_STUNNED2)
-         || IS_SET(i->combat, COMBAT_SHOCKED) 
-         || IS_SET(i->combat, COMBAT_SHOCKED2)
-         || (IS_SET(i->combat, COMBAT_BASH1) || IS_SET(i->combat, COMBAT_BASH2)) &&
-            (i->song_number == SKILL_SONG_TRAVELING_MARCH - SKILL_SONG_BASE ||
+      } else if( (
+                  ( (GET_POS(i) < song_info[i->song_number].minimum_position) && !IS_NPC(i))
+                   || IS_SET(i->combat, COMBAT_STUNNED)
+                   || IS_SET(i->combat, COMBAT_STUNNED2)
+                   || IS_SET(i->combat, COMBAT_SHOCKED) 
+                   || IS_SET(i->combat, COMBAT_SHOCKED2)
+                   || (IS_SET(i->combat, COMBAT_BASH1) || IS_SET(i->combat, COMBAT_BASH2))
+                 ) 
+                 && (
+             i->song_number == SKILL_SONG_TRAVELING_MARCH - SKILL_SONG_BASE ||
              i->song_number == SKILL_SONG_BOUNT_SONNET - SKILL_SONG_BASE ||
              i->song_number == SKILL_SONG_HEALING_MELODY - SKILL_SONG_BASE ||
              i->song_number == SKILL_SONG_SYNC_CHORD - SKILL_SONG_BASE ||
              i->song_number == SKILL_SONG_NOTE_OF_KNOWLEDGE - SKILL_SONG_BASE ||
              i->song_number == SKILL_SONG_SOOTHING_REMEM - SKILL_SONG_BASE ||
              i->song_number == SKILL_SONG_SEARCHING_SONG - SKILL_SONG_BASE ||
-             i->song_number == SKILL_SONG_FORGETFUL_RHYTHM - SKILL_SONG_BASE) )
+             i->song_number == SKILL_SONG_FORGETFUL_RHYTHM - SKILL_SONG_BASE
+                    ) 
+               )
       {
            send_to_char("You can't keep singing in this position!\r\n", i); 
            i->song_timer = 0;
@@ -1047,14 +1057,18 @@ int song_healing_melody( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victi
 
 int execute_song_healing_melody( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {
-   int heal, healtmp = 0;
-
-   heal = 3*(GET_LEVEL(ch)/5);
+   int heal = 0;
 
    int combat, non_combat;
    get_instrument_bonus(ch, combat, non_combat);
 
-   heal += non_combat;
+   if(GET_KI(ch) < 2)
+   {
+      send_to_char("You don't have enough ki to continue singing.\r\n", ch);
+      return eSUCCESS;
+   }
+   GET_KI(ch) -= 2;
+
 
    for(char_data * tmp_char = world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
    {
@@ -1063,19 +1077,20 @@ int execute_song_healing_melody( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DAT
        if(IS_UNDEAD(tmp_char))
 	   continue;
        
-      healtmp = number(skill/4, heal);
+      heal = skill/2 + ((GET_MAX_HIT(tmp_char)*2) / 100) + (number(0, 20) - 10) + non_combat;
+      if(heal < 5) heal = 5;
       
       if (IS_PC(tmp_char) && IS_SET(tmp_char->pcdata->toggles, PLR_DAMAGE)) {  
 	  if (tmp_char == ch) {
-	      csendf(ch, "You feel your Healing Melody soothing %d point%sof your health.\r\n", healtmp, (healtmp>1?"s ":" ") );
+	      csendf(ch, "You feel your Healing Melody soothing %d points of your health.\r\n", heal);
 	  } else {
-	      csendf(tmp_char, "You feel %s's Healing Melody soothing %d point%sof your health.\r\n", GET_NAME(ch), healtmp, (healtmp>1?"s ":" "));
+	      csendf(tmp_char, "You feel %s's Healing Melody soothing %d points of your health.\r\n", GET_NAME(ch), heal);
 	  }
       } else {
 	  csendf(tmp_char, "You feel a little better.\r\n");
       }
 
-      GET_HIT(tmp_char) += healtmp;
+      GET_HIT(tmp_char) += heal;
 
       if (GET_HIT(tmp_char) > GET_MAX_HIT(tmp_char)) {
 	  GET_HIT(tmp_char) = GET_MAX_HIT(tmp_char);
@@ -1312,17 +1327,20 @@ int song_soothing_remembrance( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA 
 
 int execute_song_soothing_remembrance( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {
-   int heal, healtmp = 0;
+   int heal = 0;
    char_data * master = NULL;
    follow_type * fvictim = NULL;
    char buf[MAX_STRING_LENGTH];
 
-   heal = GET_LEVEL(ch)/5;
+   if(GET_KI(ch) < 3)
+   {
+      send_to_char("You don't have enough ki to continue singing.\r\n", ch);
+      return eSUCCESS;
+   }
+   GET_KI(ch) -= 3;
 
    int combat, non_combat;
    get_instrument_bonus(ch, combat, non_combat);
-
-   heal += non_combat;
 
    if(ch->master && ch->master->in_room == ch->in_room && 
                     ISSET(ch->affected_by, AFF_GROUP))
@@ -1331,47 +1349,58 @@ int execute_song_soothing_remembrance( ubyte level, CHAR_DATA *ch, char *arg, CH
 
    for(fvictim = master->followers; fvictim; fvictim = fvictim->next)
    {
-      if(!ISSET(fvictim->follower->affected_by, AFF_GROUP) || 
-         fvictim->follower->in_room != ch->in_room)
+      if(!ISSET(fvictim->follower->affected_by, AFF_GROUP) 
+         || fvictim->follower->in_room != ch->in_room)
          continue;
 
-      healtmp = number(skill/15, heal);
+      heal = skill/2 + ((GET_MAX_MANA(fvictim->follower)*2) / 100) + (number(0, 20) - 10) + non_combat;
+      if(heal < 5) heal = 5;
 
       if (IS_PC(fvictim->follower) && IS_SET(fvictim->follower->pcdata->toggles, PLR_DAMAGE))
       {
-        sprintf(buf, "You feel %s's Soothing Rememberance revitalize %d point%sof your mana.\r\n", 
-GET_NAME(master),healtmp, (healtmp>1?"s ":" "));
+        sprintf(buf, "You feel %s's Soothing Rememberance revitalize %d points of your mana.\r\n", 
+                GET_NAME(ch), heal);
         send_to_char(buf,fvictim->follower);
       }
       else
         send_to_char("You feel soothed.\r\n", fvictim->follower);
  
-     GET_MANA(fvictim->follower) += healtmp;
+      GET_MANA(fvictim->follower) += heal;
       if(GET_MANA(fvictim->follower) > GET_MAX_MANA(fvictim->follower))
          GET_MANA(fvictim->follower) = GET_MAX_MANA(fvictim->follower);
    }
+
    if(ch->in_room == master->in_room)
    {
-      healtmp = number(skill/15, heal);
+      heal = skill/2 + ((GET_MAX_MANA(master)*2) / 100) + (number(0, 20) - 10) + non_combat;
+      if(heal < 5) heal = 5;
 
       if (IS_PC(master) && IS_SET(master->pcdata->toggles, PLR_DAMAGE))
       {
-        sprintf(buf, "You feel your Soothing Rememberance revitalize %d point%sof your mana.\r\n", healtmp, 
-(healtmp>1?"s ":" "));
-        send_to_char(buf,master);
+        if(master == ch)
+          sprintf(buf, "You feel your Soothing Rememberance revitalize %d points of your mana.\r\n", heal);
+        else
+          sprintf(buf, "You feel %s's Soothing Rememberance revitalize %d points of your mana.\r\n", 
+                   GET_NAME(ch),heal);
+        send_to_char(buf, master);
       }
       else
         send_to_char("You feel soothed.\r\n", master);
-      GET_MANA(master) += healtmp;
+
+      GET_MANA(master) += heal;
       if(GET_MANA(master) > GET_MAX_MANA(master))
          GET_MANA(master) = GET_MAX_MANA(master);
    }
+
    if(ch->followers)  // handle the bards charmies
-     for(fvictim = ch->followers; fvictim; fvictim = fvictim->next) {
+     for(fvictim = ch->followers; fvictim; fvictim = fvictim->next) 
+     {
        if(IS_AFFECTED(fvictim->follower, AFF_CHARM) && IS_MOB(fvictim->follower) &&
-           ch->in_room == fvictim->follower->in_room) {
+           ch->in_room == fvictim->follower->in_room) 
+       {
          send_to_char("You feel soothed.\r\n", fvictim->follower);
-         GET_MANA(fvictim->follower) += number(skill/15 + 1, heal);
+         heal = skill/2 + ((GET_MAX_MANA(fvictim->follower)*2) / 100) + (number(0, 20) - 10) + non_combat;
+         GET_MANA(fvictim->follower) += heal;
          if(GET_MANA(fvictim->follower) > GET_MAX_MANA(fvictim->follower))
            GET_MANA(fvictim->follower) = GET_MAX_MANA(fvictim->follower);
        }
@@ -1401,18 +1430,22 @@ int song_traveling_march( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict
 
 int execute_song_traveling_march( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {
-   int heal, healtmp;
+   int heal;
    char_data * master = NULL;
    follow_type * fvictim = NULL;
    struct affected_type af;
    char buf[MAX_STRING_LENGTH];
 
-   heal = ((GET_LEVEL(ch)/3)+1)*2;
-
    int combat, non_combat;
    get_instrument_bonus(ch, combat, non_combat);
 
-   heal += non_combat;
+   if(GET_KI(ch) == 0)
+   {
+      send_to_char("You don't have enough ki to continue singing.\r\n", ch);
+      return eSUCCESS;
+   }
+
+   GET_KI(ch) -= 1; 
 
    if(ch->master && ch->master->in_room == ch->in_room && 
                     ISSET(ch->affected_by, AFF_GROUP))
@@ -1431,17 +1464,17 @@ int execute_song_traveling_march( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DA
          fvictim->follower->in_room != ch->in_room)
          continue;
 
-     healtmp = number(1, heal);
+      heal = skill/2 + ((GET_MAX_MOVE(fvictim->follower)*2) / 100) + (number(0, 20) - 10) + non_combat;
+      if(heal < 5) heal = 5;
 
       if (IS_PC(fvictim->follower) && IS_SET(fvictim->follower->pcdata->toggles, PLR_DAMAGE))
       {
-        sprintf(buf, "You feel %s's Travelling March recovering %d move%sfor you.\r\n", GET_NAME(master),healtmp, 
-(healtmp>1?"s ":" "));
+        sprintf(buf, "You feel %s's Travelling March recovering %d moves for you.\r\n", GET_NAME(ch), heal);
         send_to_char(buf,fvictim->follower);
       }
       else
         send_to_char("Your feet feel lighter.\r\n", fvictim->follower);
-      GET_MOVE(fvictim->follower) += healtmp;
+      GET_MOVE(fvictim->follower) += heal;
       if(GET_MOVE(fvictim->follower) > GET_MAX_MOVE(fvictim->follower))
          GET_MOVE(fvictim->follower) = GET_MAX_MOVE(fvictim->follower);
 
@@ -1449,16 +1482,21 @@ int execute_song_traveling_march( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DA
    }
    if(ch->in_room == master->in_room)
    {
-      healtmp = number(1, heal);
+
+      heal = skill/2 + ((GET_MAX_MOVE(master)*2) / 100) + (number(0, 20) - 10) + non_combat;
+      if(heal < 5) heal = 5;
 
       if ( IS_PC(master) && IS_SET(master->pcdata->toggles, PLR_DAMAGE))
       {
-        sprintf(buf, "You feel your Travelling March recover %d move%sfor you.\r\n", healtmp, (healtmp>1?"s ":" "));
-        send_to_char(buf,master);
+        if(master == ch)
+          csendf(master, "You feel your Travelling March recover %d moves for you.\r\n", heal);
+        else
+          csendf(master, "You feel %s's Travelling March recovering %d moves for you.\r\n", GET_NAME(ch), heal);
+
       }
       else      
         send_to_char("Your feet feel lighter.\r\n", master);
-      GET_MOVE(master) += healtmp;
+      GET_MOVE(master) += heal;
       if(GET_MOVE(master) > GET_MAX_MOVE(master))
          GET_MOVE(master) = GET_MAX_MOVE(master);
    }
@@ -1467,7 +1505,7 @@ int execute_song_traveling_march( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DA
        if(IS_AFFECTED(fvictim->follower, AFF_CHARM) && IS_MOB(fvictim->follower) &&
            ch->in_room == fvictim->follower->in_room) {
          send_to_char("Your feet feel lighter.\r\n", fvictim->follower);
-         GET_MOVE(fvictim->follower) += number(1, heal);
+         GET_MOVE(fvictim->follower) += skill/2 + ((GET_MAX_MOVE(fvictim->follower)*2) / 100) + (number(0, 20) - 10) + non_combat;
          if(GET_MOVE(fvictim->follower) > GET_MAX_MOVE(fvictim->follower))
            GET_MOVE(fvictim->follower) = GET_MAX_MOVE(fvictim->follower);
        }
