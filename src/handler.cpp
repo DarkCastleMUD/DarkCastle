@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.179 2009/01/04 01:39:58 jhhudso Exp $ */
+/* $Id: handler.cpp,v 1.180 2009/01/22 07:07:56 kkoons Exp $ */
     
 extern "C"
 {
@@ -1551,6 +1551,10 @@ void affect_remove( CHAR_DATA *ch, struct affected_type *af, int flags)
       case SKILL_VITAL_STRIKE:
          if (!(flags & SUPPRESS_MESSAGES))
             send_to_char("The internal strength and speed from your vital strike has returned.\r\n", ch);
+         break;
+      case SKILL_SONG_FANATICAL_FANFARE:
+         if (!(flags & SUPPRESS_MESSAGES))
+            send_to_char("Your mind no longer races.\r\n", ch);
          break;
       case SPELL_WATER_BREATHING:
          if(!(flags & SUPPRESS_CONSEQUENCES) && world[ch->in_room].sector_type == SECT_UNDERWATER) // uh oh
