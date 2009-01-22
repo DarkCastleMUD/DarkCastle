@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.286 2009/01/05 02:55:14 dcastle Exp $ */
+/* $Id: const.cpp,v 1.287 2009/01/22 07:08:11 kkoons Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1570,6 +1570,7 @@ struct class_skill_defines d_skills[] = { // bard skills
 { "shattering resonance",  SKILL_SONG_SHATTERING_RESO,     48,    100,  0,   CONINT },
 { "mountain king's charge",SKILL_SONG_MKING_CHARGE,        49,    100,  0,   DEXCON },
 { "hypnotic harmony",      SKILL_SONG_HYPNOTIC_HARMONY,    50,    100,  0,   CONINT },
+{ "summoning song",        SKILL_SONG_SUMMONING_SONG,      50,    100,  0,   INTWIS },
 { "\n",                    0,                              1,      0,   0,   0 }
 };
 
