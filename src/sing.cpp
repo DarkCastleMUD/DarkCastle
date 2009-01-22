@@ -133,7 +133,7 @@ NULL,   SKILL_INCREASE_MEDIUM
 	1, POSITION_RESTING, 1, SKILL_SONG_REVEAL_STACATO, 
 	TAR_IGNORE, 
 	song_revealing_stacato, execute_song_revealing_stacato, NULL, 
-NULL,   SKILL_INCREASE_HARD
+	NULL,   SKILL_INCREASE_HARD
 },
 
 { /* 12 */
@@ -222,16 +222,16 @@ NULL,   SKILL_INCREASE_HARD
 	NULL, NULL, SKILL_INCREASE_MEDIUM
 },
 { /* 24 */
-        12, POSITION_RESTING, 8, SKILL_SONG_FANATICAL_FANFARE,
+        8, POSITION_RESTING, 8, SKILL_SONG_FANATICAL_FANFARE,
        TAR_IGNORE, song_fanatical_fanfare, execute_song_fanatical_fanfare,NULL,
        NULL, SKILL_INCREASE_MEDIUM
 
 },
 { /* 25 */
         9, POSITION_FIGHTING, 7, SKILL_SONG_DISCHORDANT_DIRGE,
-	        TAR_CHAR_ROOM|TAR_FIGHT_VICT,
+	TAR_CHAR_ROOM|TAR_FIGHT_VICT,
         song_dischordant_dirge, execute_song_dischordant_dirge, NULL, 
-NULL,    SKILL_INCREASE_HARD
+	NULL,    SKILL_INCREASE_HARD
 },
 { /* 26 */
         2, POSITION_SITTING, 6, SKILL_SONG_CRUSHING_CRESCENDO, 
@@ -239,13 +239,13 @@ NULL,    SKILL_INCREASE_HARD
         NULL, NULL, SKILL_INCREASE_HARD
 }, 
 { /* 27 */
-         15, POSITION_STANDING, 20, SKILL_SONG_HYPNOTIC_HARMONY,
-	 TAR_CHAR_ROOM, song_hypnotic_harmony, 
-         execute_song_hypnotic_harmony, NULL, NULL, SKILL_INCREASE_HARD
+        15, POSITION_STANDING, 20, SKILL_SONG_HYPNOTIC_HARMONY,
+	TAR_CHAR_ROOM, song_hypnotic_harmony, 
+        execute_song_hypnotic_harmony, NULL, NULL, SKILL_INCREASE_HARD
 },
 { /* 28 */
-         12, POSITION_SITTING, 6, SKILL_SONG_MKING_CHARGE,
-         TAR_IGNORE, song_mking_charge, execute_mking_charge, pulse_mking_charge,
+        12, POSITION_SITTING, 6, SKILL_SONG_MKING_CHARGE,
+        TAR_IGNORE, song_mking_charge, execute_mking_charge, pulse_mking_charge,
 	intrp_mking_charge, SKILL_INCREASE_MEDIUM
 
 },
@@ -255,7 +255,12 @@ NULL,    SKILL_INCREASE_HARD
         song_submariners_chorus, execute_song_submariners_chorus,
         pulse_submariners_chorus, intrp_submariners_chorus,
         SKILL_INCREASE_MEDIUM
-}
+},
+{ /* 30 */
+        20, POSITION_STANDING, 20, SKILL_SONG_SUMMONING_SONG,
+        TAR_IGNORE, song_summon_song, execute_song_summon_song, NULL,
+	NULL, SKILL_INCREASE_MEDIUM
+},
 };
 
 char *songs[] = {
@@ -288,6 +293,7 @@ char *songs[] = {
         "hypnotic harmony",
 	"mountain king's charge",
         "submariner's chorus",
+        "summoning song",
 	"\n"
 };
 
@@ -2048,8 +2054,39 @@ int song_fanatical_fanfare(ubyte level, CHAR_DATA *ch, char *Aag, CHAR_DATA *vic
 {
    send_to_char("You begin to sing loudly, and poke everyone in your surroundings with a stick..\r\n",ch);
    act("$n starts singing loudly, and begins to poke everyone around $m with a stick. Hey!", ch, 0, 0, TO_ROOM, 0);
-   ch->song_timer = 1;
+   ch->song_timer = song_info[ch->song_number].beats;
    return eSUCCESS;
+}
+int song_summon_song(ubyte level, CHAR_DATA *ch, char *Aag, CHAR_DATA *victim, int skill)
+{
+   send_to_char("You begin an inappropriately bawdy tune of your intimacy with pets.\r\n",ch);
+   act("$n begins an inappropriately bawdy tune of $s intimacy with pets.", ch, 0, 0, TO_ROOM, 0);
+   ch->song_timer = song_info[ch->song_number].beats - (1 + skill/10);
+  return eSUCCESS;
+}
+int execute_song_summon_song( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
+{
+   bool summoned = false;
+   follow_type * fvictim = NULL;
+   if(ch->followers)  
+     for(fvictim = ch->followers; fvictim; fvictim = fvictim->next) 
+     {
+       if(IS_AFFECTED(fvictim->follower, AFF_CHARM) 
+          && IS_MOB(fvictim->follower) 
+          && ch->in_room != fvictim->follower->in_room) 
+       {
+         summoned = true;
+         do_emote(fvictim->follower, "disappears in a flash of $B$6m$4u$1l$7t$4i$7-$6c$4o$1l$6o$7r$4e$1d$R (disco?) light.\r\n", 9);
+         move_char(fvictim->follower, ch->in_room);
+         act("With a $B$6m$4u$1l$7t$4i$7-$6c$4o$1l$6o$7r$4e$1d$R flash of (disco?) light $n appears!", fvictim->follower, 0, 0, TO_ROOM, 0);
+       }
+     }
+  if(false == summoned)
+  {
+    send_to_char("You don't have any followers to summon. You are sad. :(\n\r", ch);
+    act("$n hangs $s head in disappointment and surreptitiously wipes away a tear.", ch, 0, 0, TO_ROOM, 0);
+  } 
+  return eSUCCESS;
 }
 int song_mking_charge(ubyte level, CHAR_DATA *ch, char *Aag, CHAR_DATA *victim, int skill)
 {
