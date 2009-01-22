@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: wizard.cpp,v 1.68 2008/06/10 20:17:13 jhhudso Exp $
+| $Id: wizard.cpp,v 1.69 2009/01/22 06:46:51 dcastle Exp $
 | wizard.C
 | Description:  Utility functions necessary for wiz commands.
 */
@@ -1420,12 +1420,6 @@ int do_restore(struct char_data *ch, char *argument, int cmd)
             if(GET_LEVEL(victim) >= IMMORTAL) {
               GET_COND(victim, FULL)   = -1;
               GET_COND(victim, THIRST) = -1;
-            }
-            else {
-       if (GET_COND(victim, FULL) != -1) {
-              GET_COND(victim, FULL)   = 25;
-              GET_COND(victim, THIRST) = 25;
-               }
             }
      
             update_pos( victim );
