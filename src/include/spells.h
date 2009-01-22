@@ -14,7 +14,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: spells.h,v 1.118 2009/01/19 16:48:13 kkoons Exp $ */
+/* $Id: spells.h,v 1.119 2009/01/22 07:06:55 kkoons Exp $ */
 #include <structs.h> // ubyte, int16
 
 #include <map>
@@ -406,7 +406,8 @@ void check_maxes(CHAR_DATA *ch);
 #define SKILL_SONG_HYPNOTIC_HARMONY  551
 #define SKILL_SONG_MKING_CHARGE      552
 #define SKILL_SONG_SUBMARINERS_CHORUS 553
-#define SKILL_SONG_MAX               553
+#define SKILL_SONG_SUMMONING_SONG    554
+#define SKILL_SONG_MAX               554
 // if you add a song, make sure you update "songs[]" in sing.C
 // as well as SKILL_SONG_MAX
 
