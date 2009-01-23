@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.181 2009/01/23 19:31:44 kkoons Exp $ */
+/* $Id: handler.cpp,v 1.182 2009/01/23 22:53:43 kkoons Exp $ */
     
 extern "C"
 {
@@ -3406,18 +3406,26 @@ CHAR_DATA *get_char_room_vis(CHAR_DATA *ch, char *name)
 {
    CHAR_DATA *i;
    CHAR_DATA *partial_match;
+   CHAR_DATA *rnd;
    int j, number;
    char tmpname[MAX_INPUT_LENGTH];
    char *tmp;
 
-   if (IS_AFFECTED(ch, AFF_BLACKJACK)) {
+   if (IS_AFFECTED(ch, AFF_BLACKJACK)) 
+   {
      struct affected_type *af = affected_by_spell(ch, SKILL_BLACKJACK);
-     if (af) {
-       if (af->modifier == 1 && get_rand_other_char_room_vis(ch)) {
-	// Added get_rand.. check above 'cause ch->fighting would get set to NULL.
-	 send_to_char("You're so dizzy you don't know who you're hitting.\n\r", ch);
-	 ch->fighting = get_rand_other_char_room_vis(ch);
-	 return ch->fighting;
+     if (af) 
+     {
+       if (af->modifier == 1)
+       {
+         rnd = get_rand_other_char_room_vis(ch);
+         if(rnd)
+         { 
+	   // Added get_rand.. check above 'cause ch->fighting would get set to NULL.
+	   send_to_char("You're so dizzy you don't know who you're hitting.\n\r", ch);
+	   ch->fighting = rnd;
+	   return ch->fighting;
+         }
        }
      }
    }
