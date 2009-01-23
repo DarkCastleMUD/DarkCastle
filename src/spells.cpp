@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.246 2009/01/04 01:39:58 jhhudso Exp $ */
+/* $Id: spells.cpp,v 1.247 2009/01/23 19:31:22 kkoons Exp $ */
 
 extern "C"
 {
@@ -945,6 +945,9 @@ void affect_update( int32 duration_type )
 	else if(af->duration == 1) {
           // warnings for certain spells
           switch(af->type) {
+            case SKILL_SONG_SUBMARINERS_ANTHEM:
+              send_to_char("Your musical ability to breath water weakens.\r\n", i);
+              break;
             case SPELL_WATER_BREATHING:
               send_to_char("You feel the magical hold of your gills about to give way.\r\n", i);
               break;
