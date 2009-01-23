@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.288 2009/01/23 01:27:26 apocalypse Exp $ */
+/* $Id: const.cpp,v 1.289 2009/01/23 19:32:27 kkoons Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1559,6 +1559,7 @@ struct class_skill_defines d_skills[] = { // bard skills
 { "whipping",              SKILL_WHIPPING_WEAPONS,         30,     85,  0,   STRDEX },
 { "soothing rememberance", SKILL_SONG_SOOTHING_REMEM,      31,    100,  0,   CONWIS },
 { "searching song",        SKILL_SONG_SEARCHING_SONG,      32,    100,  0,   INTWIS },
+{ "submariner's anthem",   SKILL_SONG_SUBMARINERS_ANTHEM,  33,    100,  0,   CONINT },
 { "dischordant dirge",     SKILL_SONG_DISCHORDANT_DIRGE,   34,    100,  0,   CONINT },
 { "insane chant",          SKILL_SONG_INSANE_CHANT,        35,    100,  0,   CONINT },
 { "jig of alacrity",       SKILL_SONG_JIG_OF_ALACRITY,     38,    100,  0,   CONWIS },
