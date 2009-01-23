@@ -2071,6 +2071,9 @@ int execute_song_summon_song( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *
 {
    bool summoned = false;
    follow_type * fvictim = NULL;
+
+   dc_free(ch->song_data);
+   ch->song_data = 0;
    if(ch->followers)  
      for(fvictim = ch->followers; fvictim; fvictim = fvictim->next) 
      {
@@ -3125,6 +3128,9 @@ int execute_song_submariners_anthem( ubyte level, CHAR_DATA *ch, char *arg, CHAR
    af.modifier  = 0;
    af.location  = APPLY_NONE;
    af.bitvector = -1;
+
+   dc_free(ch->song_data);
+   ch->song_data = 0;
 
    if(ch->master && ch->master->in_room == ch->in_room && 
                     ISSET(ch->affected_by, AFF_GROUP))
