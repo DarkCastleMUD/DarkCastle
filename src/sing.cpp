@@ -250,11 +250,10 @@ NULL,   SKILL_INCREASE_MEDIUM
 
 },
 { /* 29 */
-	7, POSITION_RESTING, 8, SKILL_SONG_SUBMARINERS_CHORUS, 
+	20, POSITION_RESTING, 8, SKILL_SONG_SUBMARINERS_ANTHEM, 
         TAR_IGNORE, 
-        song_submariners_chorus, execute_song_submariners_chorus,
-        pulse_submariners_chorus, intrp_submariners_chorus,
-        SKILL_INCREASE_MEDIUM
+        song_submariners_anthem, execute_song_submariners_anthem,
+        NULL, NULL, SKILL_INCREASE_MEDIUM
 },
 { /* 30 */
         20, POSITION_STANDING, 20, SKILL_SONG_SUMMONING_SONG,
@@ -292,7 +291,7 @@ char *songs[] = {
         "crushing crescendo",
         "hypnotic harmony",
 	"mountain king's charge",
-        "submariner's chorus",
+        "submariner's anthem",
         "summoning song",
 	"\n"
 };
@@ -619,6 +618,7 @@ int do_sing(CHAR_DATA *ch, char *arg, int cmd)
       learned = has_skill(ch, song_info[spl].skill_num);
 
       if(spl == SKILL_SONG_HYPNOTIC_HARMONY - SKILL_SONG_BASE ||
+         spl == SKILL_SONG_SUMMONING_SONG - SKILL_SONG_BASE ||
          spl == SKILL_SONG_DISARMING_LIMERICK - SKILL_SONG_BASE ||
          spl == SKILL_SONG_SHATTERING_RESO - SKILL_SONG_BASE ||
          spl == SKILL_SONG_SEARCHING_SONG - SKILL_SONG_BASE ||
@@ -724,6 +724,8 @@ void update_bard_singing()
                   i->song_number == SKILL_SONG_DISCHORDANT_DIRGE - SKILL_SONG_BASE ||
                   i->song_number == SKILL_SONG_INSANE_CHANT - SKILL_SONG_BASE ||
                   i->song_number == SKILL_SONG_JIG_OF_ALACRITY - SKILL_SONG_BASE ||
+                  i->song_number == SKILL_SONG_SUBMARINERS_ANTHEM - SKILL_SONG_BASE ||
+                  i->song_number == SKILL_SONG_SUMMONING_SONG - SKILL_SONG_BASE ||
                   i->song_number == SKILL_SONG_DISARMING_LIMERICK - SKILL_SONG_BASE ||
                   i->song_number == SKILL_SONG_CRUSHING_CRESCENDO - SKILL_SONG_BASE ||
                   i->song_number == SKILL_SONG_SHATTERING_RESO - SKILL_SONG_BASE ||
@@ -758,6 +760,7 @@ void update_bard_singing()
              i->song_number == SKILL_SONG_NOTE_OF_KNOWLEDGE - SKILL_SONG_BASE ||
              i->song_number == SKILL_SONG_SOOTHING_REMEM - SKILL_SONG_BASE ||
              i->song_number == SKILL_SONG_SEARCHING_SONG - SKILL_SONG_BASE ||
+             i->song_number == SKILL_SONG_STICKY_LULL - SKILL_SONG_BASE ||
              i->song_number == SKILL_SONG_FORGETFUL_RHYTHM - SKILL_SONG_BASE
                     ) 
                )
@@ -3104,18 +3107,24 @@ int execute_song_crushing_crescendo( ubyte level, CHAR_DATA *ch, char *arg, CHAR
    return eSUCCESS;
 }
 
-int song_submariners_chorus( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
+int song_submariners_anthem( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {
    send_to_char("You begin to sing about the shining sea and her terrible ways...\n\r", ch);
    act("$n sings a surly number about $s fickle mistress, the briny deep.", ch, 0, 0, TO_ROOM, 0);
-   ch->song_timer = song_info[ch->song_number].beats;
+   ch->song_timer = song_info[ch->song_number].beats - (1 + skill/10);
    return eSUCCESS;
 }
 
-int execute_song_submariners_chorus( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
+int execute_song_submariners_anthem( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {
    char_data * master = NULL;
    follow_type * fvictim = NULL;
+   struct affected_type af;
+   af.type      = SKILL_SONG_SUBMARINERS_ANTHEM;
+   af.duration  = 1 + (skill/10);
+   af.modifier  = 0;
+   af.location  = APPLY_NONE;
+   af.bitvector = -1;
 
    if(ch->master && ch->master->in_room == ch->in_room && 
                     ISSET(ch->affected_by, AFF_GROUP))
@@ -3128,81 +3137,24 @@ int execute_song_submariners_chorus( ubyte level, CHAR_DATA *ch, char *arg, CHAR
          continue;
 
       if(ch->in_room != fvictim->follower->in_room)
-      {
-         if(ISSET(fvictim->follower->affected_by, AFF_WATER_BREATHING) &&
-            !affected_by_spell(fvictim->follower, SPELL_WATER_BREATHING))
-         {
-            REMBIT(fvictim->follower->affected_by, AFF_WATER_BREATHING);
-            send_to_char("Your musical ability to breath water ends.\n\r", fvictim->follower);
-         }
          continue;
-      }
+  
       if(affected_by_spell(fvictim->follower, SPELL_WATER_BREATHING))
       {
          affect_from_char(fvictim->follower, SPELL_WATER_BREATHING);
          send_to_char("Your magical gills disappear.", fvictim->follower);
       }
-      SETBIT(fvictim->follower->affected_by, AFF_WATER_BREATHING);
+
+      affect_to_char(fvictim->follower, &af);
       send_to_char("Your lungs absorb oxygen from any fluid!\r\n", fvictim->follower);
    }
+
    if(ch->in_room == master->in_room)
    {
-      SETBIT(master->affected_by, AFF_WATER_BREATHING);
+      affect_to_char(master, &af);
       send_to_char("Your lungs absorb oxygen from any fluid!\r\n", master);
    }
-   else
-   {
-      if(ISSET(master->affected_by, AFF_WATER_BREATHING) &&
-         !affected_by_spell(master, SPELL_WATER_BREATHING))
-      {
-         REMBIT(master->affected_by, AFF_WATER_BREATHING);
-         send_to_char("Your musical ability to breath water ends.\n\r", master);
-      }
-   }
 
-   if(!skill_success(ch, NULL, SKILL_SONG_SUBMARINERS_CHORUS)) {
-      ch->song_timer = -1;
-      return eSUCCESS;
-   }
-
-   ch->song_timer = song_info[ch->song_number].beats;
-   return eSUCCESS;
-}
-
-int pulse_submariners_chorus( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
-{
-   if(number(1, 5) == 3)
-      act("$n breathes in with surprising ease.", ch, 0, 0, TO_ROOM, 0);
-   return eSUCCESS;
-}
-
-int intrp_submariners_chorus( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
-{
-   char_data * master = NULL;
-   follow_type * fvictim = NULL;
-
-   if(ch->master && ISSET(ch->affected_by, AFF_GROUP))
-      master = ch->master;
-   else master = ch;
-
-   for(fvictim = master->followers; fvictim; fvictim = fvictim->next)
-   {
-      if (origsing && origsing != fvictim->follower) continue;
-      if(ISSET(fvictim->follower->affected_by, AFF_WATER_BREATHING) &&
-         !affected_by_spell(fvictim->follower, SPELL_WATER_BREATHING))
-      {
-         REMBIT(fvictim->follower->affected_by, AFF_WATER_BREATHING);
-         send_to_char("Your musical ability to breath water ends.\n\r", fvictim->follower);
-      }
-   }
-
-  if (!origsing || origsing == master)
-   if(ISSET(master->affected_by, AFF_WATER_BREATHING) &&
-      !affected_by_spell(master, SPELL_WATER_BREATHING))
-   {
-      REMBIT(master->affected_by, AFF_WATER_BREATHING);
-      send_to_char("Your musical ability to breath water ends.\r\n", master);
-   }
    return eSUCCESS;
 }
 
