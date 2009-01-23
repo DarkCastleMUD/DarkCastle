@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.180 2009/01/22 07:07:56 kkoons Exp $ */
+/* $Id: handler.cpp,v 1.181 2009/01/23 19:31:44 kkoons Exp $ */
     
 extern "C"
 {
@@ -1555,6 +1555,17 @@ void affect_remove( CHAR_DATA *ch, struct affected_type *af, int flags)
       case SKILL_SONG_FANATICAL_FANFARE:
          if (!(flags & SUPPRESS_MESSAGES))
             send_to_char("Your mind no longer races.\r\n", ch);
+         break;
+      case SKILL_SONG_SUBMARINERS_ANTHEM:
+         if(!(flags & SUPPRESS_CONSEQUENCES))
+         {
+           send_to_char("Your musical ability to breathe water ends.\n\r", ch);
+           if(world[ch->in_room].sector_type == SECT_UNDERWATER) // uh oh
+           {
+             act("$n begins to choke on the water, a look of panic filling $s eyes as it fill $s lungs.\n\r", ch, 0, 0, TO_ROOM, 0);
+             send_to_char("The water rushes into your lungs and the light fades with your oxygen.\n\r", ch);
+           } 
+         }
          break;
       case SPELL_WATER_BREATHING:
          if(!(flags & SUPPRESS_CONSEQUENCES) && world[ch->in_room].sector_type == SECT_UNDERWATER) // uh oh
