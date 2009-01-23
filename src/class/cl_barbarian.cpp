@@ -1,5 +1,5 @@
 /************************************************************************
- * $Id: cl_barbarian.cpp,v 1.95 2009/01/04 18:43:10 jhhudso Exp $
+ * $Id: cl_barbarian.cpp,v 1.96 2009/01/23 19:33:12 kkoons Exp $
  * cl_barbarian.cpp
  * Description: Commands for the barbarian class.
  *************************************************************************/
@@ -24,6 +24,20 @@ extern struct index_data *obj_index;
 extern bool str_prefix(const char *astr, const char *bstr);
 extern CWorld world;
 int attempt_move(CHAR_DATA *ch, int cmd, int is_retreat = 0);
+
+int do_brace(struct char_data *ch, char *argument, int cmd)
+{
+  if(!has_skill(ch, SKILL_BATTERBRACE)) 
+  {
+    send_to_char("You could accidentally hurt someone if you try this untrained...\r\n", ch);
+    return eFAILURE;
+  }
+  
+  
+
+  return eSUCCESS;
+}
+
 
 int do_rage(struct char_data *ch, char *argument, int cmd)
 {
