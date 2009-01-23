@@ -314,15 +314,24 @@ void AuctionHouse::CheckForSoldItems(CHAR_DATA *ch)
   bool has_sold_items = false;
   for(Item_it = Items_For_Sale.begin(); Item_it != Items_For_Sale.end(); Item_it++)
   {
-    if((!Item_it->second.seller.compare(GET_NAME(ch))) && (Item_it->second.state == AUC_SOLD))
-    {
-      has_sold_items = true;
-      csendf(ch, "Your auction of %s has sold to %s for %u coins.\n\r", 
+    if(!Item_it->second.seller.compare(GET_NAME(ch)))
+    {    
+      if(Item_it->second.state == AUC_SOLD)
+      {
+        has_sold_items = true;
+        csendf(ch, "Your auction of %s has $2SOLD$R to %s for %u coins.\n\r", 
              Item_it->second.item_name.c_str(), Item_it->second.buyer.c_str(), Item_it->second.price);
+      }
+      if(Item_it->second.state == AUC_EXPIRED)
+      {
+        has_sold_items = true;
+        csendf(ch, "Your auction of %s has $4EXPIRED$R.\n\r", 
+             Item_it->second.item_name.c_str());
+      }
     }
   }
   if(has_sold_items)
-    send_to_char("Please stop by a Consignment House to collect your gold.\n\r", ch);
+    send_to_char("Please stop by your local Consignment House.\n\r", ch);
   return;
 }
 
