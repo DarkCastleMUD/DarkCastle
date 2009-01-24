@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: non_off.cpp,v 1.56 2008/12/18 03:01:21 kkoons Exp $
+| $Id: non_off.cpp,v 1.57 2009/01/24 19:21:13 kkoons Exp $
 | non_off.C
 | Description:  Implementation of generic, non-offensive commands.
 */
@@ -1202,42 +1202,74 @@ void CVoteData::DisplayVote(struct char_data *ch)
   csendf(ch, "\n\r");
 }
 
-void CVoteData::RemoveAnswer(int answer)
+void CVoteData::RemoveAnswer(struct char_data *ch, unsigned int answer)
 {
   if(active)
+  {
+    send_to_char("You have to end the current vote before you can remove answers.\n\r", ch);
     return;
+  }
+  if(answers.empty())
+  {
+    send_to_char("That answer doesn't exist!\n\r", ch);
+    return;
+  }
+  if(answer > answers.size())
+  {
+    send_to_char("That answer doesn't exist!\n\r", ch);
+    return;
+  }
   std::vector<SVoteData>::iterator answer_it = answers.begin();
   answers.erase(answer_it+answer-1);//need to offset by 1
+  send_to_char("Answer removed!\n\r", ch);
 }
 
-bool CVoteData::StartVote()
+void CVoteData::StartVote(struct char_data *ch)
 {
   if(active)
-    return false;
+  {
+    send_to_char("There is already an active vote, you can't start another\n\r", ch);
+    return;
+  }
   if(vote_question.empty())
-    return false;
+  {
+    send_to_char("You can't start a vote without a topic to vote on!\n\r", ch);
+    return;
+  }
   if(answers.empty())
-    return false;
+  {
+    send_to_char("You can't start a vote without any answers!\n\r", ch);
+    return;
+  }
+
+  send_info("\n\r##Attention! There is now a vote in progress!\n\r##Type Vote for more information!\n\r");
 
   active = true;
   this->OutToFile();
-  return true;
+  return;
 }
 
-bool CVoteData::EndVote()
+void CVoteData::EndVote(struct char_data *ch)
 {
   if(!active)
-   return false;
+  {
+    send_to_char("Can't end a vote if there isn't one started.\n\r", ch);
+    return;
+  }
 
   active = false;
   this->OutToFile();
-  return true;
+  send_info("\n\r##The vote has ended! Type \"Vote Results\" to see the results!\n\r");
 }
 
-void CVoteData::AddAnswer(std::string answer)
+void CVoteData::AddAnswer(struct char_data *ch, std::string answer)
 {
   if(active)
+  {
+    send_to_char("You can't add answers during an active vote!\n\r", ch);
     return;
+  }
+  send_to_char("Answer added.\n\r", ch);
   SVoteData tmp;
   tmp.votes = 0;
   tmp.answer = answer;
@@ -1250,7 +1282,7 @@ bool CVoteData::HasVoted(struct char_data *ch)
 
 }
 
-bool CVoteData::Vote(struct char_data *ch, int vote)
+bool CVoteData::Vote(struct char_data *ch, unsigned int vote)
 {
   if(!ch->desc)
   {
@@ -1264,7 +1296,7 @@ bool CVoteData::Vote(struct char_data *ch, int vote)
     return false;
   }
 
-  if(vote < 1 || (unsigned int)vote > answers.size())
+  if(vote > answers.size())
   {
     send_to_char("That answer doesn't exist.\n\r", ch);
     return false;
@@ -1314,10 +1346,16 @@ void CVoteData::DisplayResults(struct char_data *ch)
   
 }
 
-void CVoteData::Reset()
+void CVoteData::Reset(struct char_data *ch)
 {
   if(active)
+  {
+    if(ch) //this can be called with null
+      send_to_char("Can't reset a vote while one is active.\n\r", ch);
     return;
+  }
+  if(ch)
+    send_to_char("Ok. Vote cleared.\n\r", ch);
 
   total_votes = 0;
   vote_question.clear();
@@ -1375,10 +1413,14 @@ void CVoteData::OutToFile()
   return;
 }
 
-void CVoteData::SetQuestion(std::string question)
+void CVoteData::SetQuestion(struct char_data *ch, std::string question)
 {
   if(active)
+  {
+    send_to_char("Can't change the question while the vote is active.\n\r", ch);
     return;
+  }
+  send_to_char("Ok. Question changed.\n\r", ch);
   vote_question = question;
 }
 
@@ -1387,24 +1429,24 @@ CVoteData::CVoteData()
   char buf[MAX_STRING_LENGTH];
   FILE * the_file = NULL;;
   int num = 0;
+  int is_active = 0;
   int i = 0;
   SVoteData tmp_vote_data;
  
   the_file = dc_fopen("../lib/vote_data", "r");
   if (!the_file) 
   {
-    this->Reset();
+    this->Reset(NULL);
     return;
   }
 
-
-  fscanf( the_file, "%d\n", &num);
-  active = (bool) num;
+  //save is_active for later
+  fscanf( the_file, "%d\n", &is_active);
 
   if (feof(the_file)) 
   {
     dc_fclose(the_file);
-    this->Reset();
+    this->Reset(NULL);
     return;
   }
 
@@ -1414,7 +1456,7 @@ CVoteData::CVoteData()
   if(!fgets(buf, MAX_STRING_LENGTH, the_file))
   {
     dc_fclose(the_file);
-    this->Reset();
+    this->Reset(NULL);
     log("Error reading question from vote file.", 0, LOG_MISC);
     return;
   }
@@ -1430,7 +1472,7 @@ CVoteData::CVoteData()
     {
       dc_fclose(the_file);
       log("Error reading answers from vote file.", 0, LOG_MISC);
-      this->Reset();
+      this->Reset(NULL);
       return;
     }
 
@@ -1448,7 +1490,7 @@ CVoteData::CVoteData()
     {
       dc_fclose(the_file);
       log("Error reading ip addresses from vote file.", 0, LOG_MISC);
-      this->Reset();
+      this->Reset(NULL);
       return;
     }
     buf[strlen(buf)-1] = 0;
@@ -1463,15 +1505,15 @@ CVoteData::CVoteData()
     {
       dc_fclose(the_file);
       log("Error reading char names from vote file.", 0, LOG_MISC);
-      this->Reset();
+      this->Reset(NULL);
       return;
     }
     buf[strlen(buf)-1] = 0;
     char_voted[buf] = true;   
   }      
 
-
-
+  //everything must have been correct, activate it here
+  active = (bool) is_active;
 
   dc_fclose(the_file);
 }
