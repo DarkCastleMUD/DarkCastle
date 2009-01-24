@@ -1907,6 +1907,9 @@ int execute_song_flight_of_bee( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA
       if(!ISSET(fvictim->follower->affected_by, AFF_GROUP))
          continue;
 
+      if(ch->in_room != fvictim->follower->in_room)
+        continue;
+ 
       if(affected_by_spell(fvictim->follower, SPELL_FLY))
       {
          affect_from_char(fvictim->follower, SPELL_FLY);
