@@ -724,7 +724,6 @@ void update_bard_singing()
                   i->song_number == SKILL_SONG_DISCHORDANT_DIRGE - SKILL_SONG_BASE ||
                   i->song_number == SKILL_SONG_INSANE_CHANT - SKILL_SONG_BASE ||
                   i->song_number == SKILL_SONG_JIG_OF_ALACRITY - SKILL_SONG_BASE ||
-                  i->song_number == SKILL_SONG_SUBMARINERS_ANTHEM - SKILL_SONG_BASE ||
                   i->song_number == SKILL_SONG_SUMMONING_SONG - SKILL_SONG_BASE ||
                   i->song_number == SKILL_SONG_DISARMING_LIMERICK - SKILL_SONG_BASE ||
                   i->song_number == SKILL_SONG_CRUSHING_CRESCENDO - SKILL_SONG_BASE ||
