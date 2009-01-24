@@ -137,7 +137,7 @@ NULL,   SKILL_INCREASE_MEDIUM
 },
 
 { /* 12 */
-	4, POSITION_RESTING, 5, SKILL_SONG_FLIGHT_OF_BEE, 
+	5, POSITION_RESTING, 5, SKILL_SONG_FLIGHT_OF_BEE, 
         TAR_IGNORE, 
         song_flight_of_bee, execute_song_flight_of_bee,
         NULL, NULL,
