@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.194 2009/01/24 06:53:39 kkoons Exp $
+| $Id: cl_thief.cpp,v 1.195 2009/01/24 07:26:37 kkoons Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -2089,14 +2089,9 @@ int do_jab(struct char_data *ch, char *argument, int cmd)
     
   if(!skill_success(ch, victim, SKILL_JAB)) 
   {
-    send_to_char("You try to jab the blunt part of your weapon at your opponents head, but miss!\n\r", ch);
-    act("$n jabs $s weapon at your head, but you manage to dodge it.", ch, 0, victim, TO_VICT, 0);
-    act("$n jabs $s weapon at $N's head, but misses.", ch, 0, victim, TO_ROOM, NOTVICT);
+    retval = damage(ch, victim, 0, TYPE_BLUDGEON, SKILL_JAB, 0);
     return eSUCCESS;
   }
-  send_to_char("You jab the blunt part of your weapon into your opponents head!\n\r", ch);
-  act("$n jabs $s weapon into your temple, making you feel very dizzy.", ch, 0, victim, TO_VICT, 0);
-  act("$n jabs $s weapon at $N's head, and connects with a hollow thud.", ch, 0, victim, TO_ROOM, NOTVICT);
 
   if(number(0, 1))
   {
