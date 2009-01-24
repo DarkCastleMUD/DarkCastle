@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: channel.cpp,v 1.23 2009/01/24 03:19:47 kkoons Exp $
+| $Id: channel.cpp,v 1.24 2009/01/24 06:32:11 dcastle Exp $
 | channel.C
 | Description:  All of the channel - type commands; do_say, gossip, etc..
 */
@@ -275,6 +275,10 @@ int do_gossip(struct char_data *ch, char *argument, int cmd)
         return eSUCCESS;
       }
       sprintf(buf1, "$5$B%s gossips '%s'$R", GET_NAME(ch), argument);
+      char *c;
+      c = buf1;
+      if(c) *c = UPPER(*c);
+
       sprintf(buf2, "$5$BYou gossip '%s'$R", argument);
       act(buf2, ch, 0, 0, TO_CHAR, 0);
 
