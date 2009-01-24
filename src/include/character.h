@@ -1,7 +1,7 @@
 #ifndef CHARACTER_H_
 #define CHARACTER_H_
 /******************************************************************************
-| $Id: character.h,v 1.71 2008/07/14 18:27:21 dcastle Exp $
+| $Id: character.h,v 1.72 2009/01/24 02:03:12 kkoons Exp $
 | Description: This file contains the header information for the character
 |   class implementation.
 */
@@ -20,6 +20,7 @@
 #include <quest.h>
 #include <map>
 #include <sys/time.h>
+#include <string>
 
 #define ASIZE 32
 #define MAX_GOLEMS           2 // amount of golems above +1
@@ -155,7 +156,7 @@ struct affected_type
     int32  modifier;       /* This is added to apropriate ability     */
     int32  location;       /* Tells which ability to change(APPLY_XXX)*/
     int32 bitvector;      /* Tells which bits to set (AFF_XXX)       */
-
+    std::string caster;
     struct affected_type *next;
 };
 
