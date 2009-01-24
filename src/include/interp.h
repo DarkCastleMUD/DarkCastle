@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: interp.h,v 1.95 2009/01/06 17:31:11 kkoons Exp $ */
+/* $Id: interp.h,v 1.96 2009/01/24 06:53:30 kkoons Exp $ */
 
 #ifndef INTERP_H_
 #define INTERP_H_
@@ -186,7 +186,7 @@ DO_FUN  do_anonymous;
 DO_FUN  do_ansi;
 DO_FUN  do_appraise;
 DO_FUN  do_release;
-DO_FUN  do_blackjack;
+DO_FUN  do_jab;
 DO_FUN  do_areas;
 DO_FUN  do_arena;
 DO_FUN  do_ask;
