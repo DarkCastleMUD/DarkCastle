@@ -2030,8 +2030,6 @@ int execute_song_summon_song( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *
    bool summoned = false;
    follow_type * fvictim = NULL;
 
-   dc_free(ch->song_data);
-   ch->song_data = 0;
    if(ch->followers)  
      for(fvictim = ch->followers; fvictim; fvictim = fvictim->next) 
      {
