@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: structs.h,v 1.18 2008/11/22 00:48:14 kkoons Exp $
+| $Id: structs.h,v 1.19 2009/01/24 19:21:29 kkoons Exp $
 | structs.h
 | Description:  This file should go away someday - it's stuff that I
 |   wasn't sure how to break up.  --Morc XXX
@@ -99,15 +99,15 @@ struct SVoteData
 class CVoteData
 {
 public:
-  void SetQuestion(std::string question);
-  void AddAnswer(std::string answer);
-  void RemoveAnswer(int answer);
-  bool StartVote();
-  bool EndVote();
-  void Reset();
+  void SetQuestion(struct char_data *ch, std::string question);
+  void AddAnswer(struct char_data *ch, std::string answer);
+  void RemoveAnswer(struct char_data *ch, unsigned int answer);
+  void StartVote(struct char_data *ch);
+  void EndVote(struct char_data *ch);
+  void Reset(struct char_data *ch);
   void OutToFile();
   bool HasVoted(struct char_data *ch);
-  bool Vote(struct char_data *ch, int vote);
+  bool Vote(struct char_data *ch, unsigned int vote);
   void DisplayVote(struct char_data *ch);
   void DisplayResults(struct char_data *ch);
   bool IsActive() {return active;}
