@@ -4754,25 +4754,19 @@ int do_setvote(struct char_data *ch, char *arg, int cmd)
 
   if(!strcmp(buf, "start"))
   {
-    if(!DCVote.StartVote())
-      send_to_char("Unable to start vote.", ch);
-    else
-      send_info("\n\r##Attention! There is now a vote in progress!\n\r##Type Vote for more information!\n\r");
-      return eSUCCESS;
+    DCVote.StartVote(ch);
+    return eSUCCESS;
   }
 
   if(!strcmp(buf, "clear"))
   {
-    DCVote.Reset();
+    DCVote.Reset(ch);
     return eSUCCESS;
   }
 
   if(!strcmp(buf, "end"))
   {
-    if(!DCVote.EndVote())
-      send_to_char("Unable to end vote.", ch);
-    else
-      send_info("\n\r##The vote has ended! Type \"Vote Results\" to see the results!\n\r");
+    DCVote.EndVote(ch);
     return eSUCCESS;
   } 
 
@@ -4785,20 +4779,17 @@ int do_setvote(struct char_data *ch, char *arg, int cmd)
 
   if(!strcmp(buf, "question"))
   {
-    DCVote.SetQuestion(buf2);
-    send_to_char("\n\rQuestion set!\n\r", ch);
+    DCVote.SetQuestion(ch, buf2);
     return eSUCCESS;
   }
   if(!strcmp(buf, "add"))
   {
-    DCVote.AddAnswer(buf2);
-    send_to_char("\n\rAnswer added!\n\r", ch);
+    DCVote.AddAnswer(ch, buf2);
     return eSUCCESS;
   }  
   if(!strcmp(buf, "remove"))
   {
-    DCVote.RemoveAnswer(atoi(buf2));
-    send_to_char("\n\rAnswer removed!\n\r", ch);
+    DCVote.RemoveAnswer(ch, (unsigned int)atoi(buf2));
     return eSUCCESS;
   }
  
