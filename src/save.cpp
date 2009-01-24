@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: save.cpp,v 1.57 2009/01/04 01:38:15 jhhudso Exp $ */
+/* $Id: save.cpp,v 1.58 2009/01/24 04:50:38 kkoons Exp $ */
 
 extern "C"
 {
@@ -631,7 +631,7 @@ int store_to_char_variable_data(CHAR_DATA * ch, FILE * fpsave)
     ch->affected = NULL;
     for(int16 i = 0; i < aff_count; i++)
     {
-       affected_type * af = (affected_type *)calloc(sizeof(affected_type), 1);
+       affected_type * af = new (nothrow) affected_type;
        af->next = ch->affected;
        ch->affected = af;
 
