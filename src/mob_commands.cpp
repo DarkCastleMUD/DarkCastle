@@ -834,7 +834,7 @@ int do_mpxpreward( CHAR_DATA *ch, char *argument, int cmd )
     int              reward;
     char_data *      vict;
     
-    CHAR_DATA *get_pc_room_vis_exact(CHAR_DATA *ch, char *name);
+    CHAR_DATA *get_pc_room_vis_exact(CHAR_DATA *ch, const char *name);
 
     if ( !IS_NPC( ch ) )
     {
