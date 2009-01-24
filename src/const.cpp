@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.290 2009/01/23 20:14:25 dcastle Exp $ */
+/* $Id: const.cpp,v 1.291 2009/01/24 06:55:23 kkoons Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -56,7 +56,7 @@ std::map<int,int> fill_skill_cost()
   skill_cost_map[SKILL_DISARM] = 20;
   skill_cost_map[SKILL_VITAL_STRIKE] = 15;
   skill_cost_map[SKILL_EYEGOUGE] = 12;
-  skill_cost_map[SKILL_BLACKJACK] = 4;
+  skill_cost_map[SKILL_JAB] = 4;
   skill_cost_map[SKILL_CRIPPLE] = 30;
   skill_cost_map[SKILL_PALM] = 2;
   skill_cost_map[SKILL_SLIP] = 2;
@@ -992,7 +992,7 @@ char *affected_bits[] =
     "FOCUS",
     "ILLUSION",
     "KNOW_ALIGN",
-    "BLACKJACK_ALERT",
+    "JAB_ALERT",
     "WATERBREATHING",
     "AMBUSH_ALERT",
     "FEARLESS",
@@ -1006,7 +1006,7 @@ char *affected_bits[] =
     "BULLRUSHCD",
     "CRIPPLE",
     "CHAMPION",
-    "BLACKJACK",
+    "JAB",
     "NO_REGEN",
     "ACID_SHIELD",
     "PRIMAL_FURY",
@@ -1302,7 +1302,7 @@ struct class_skill_defines t_skills[] = { // thief skills
 {    "palm",            SKILL_PALM,             12,    100,  0,  DEXWIS },  
 {    "slip",            SKILL_SLIP,             13,    100,  0,  DEXWIS },  
 {    "dodge",           SKILL_DODGE,            15,     90,  0,  DEXWIS },
-{    "blackjack",       SKILL_BLACKJACK,        17,    100,  0,  STRDEX },
+{    "jab",             SKILL_JAB,              17,    100,  0,  STRDEX },
 {    "pocket",          SKILL_POCKET,           20,    100,  0,  DEXINT },
 {    "appraise",        SKILL_APPRAISE,         21,    100,  0,  DEXWIS },
 {    "pick",            SKILL_PICK_LOCK,        22,    100,  0,  DEXWIS },  
