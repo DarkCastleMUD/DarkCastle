@@ -1898,9 +1898,6 @@ int execute_song_flight_of_bee( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA
    af.caster	= GET_NAME(ch); 
    af.bitvector = AFF_FLYING;
 
-   dc_free(ch->song_data);
-   ch->song_data = 0;
-
    if(ch->master && ch->master->in_room == ch->in_room && 
                     ISSET(ch->affected_by, AFF_GROUP))
       master = ch->master;
@@ -3073,9 +3070,6 @@ int execute_song_submariners_anthem( ubyte level, CHAR_DATA *ch, char *arg, CHAR
    af.caster	= GET_NAME(ch);
    af.location  = APPLY_NONE;
    af.bitvector = -1;
-
-   dc_free(ch->song_data);
-   ch->song_data = 0;
 
    if(ch->master && ch->master->in_room == ch->in_room && 
                     ISSET(ch->affected_by, AFF_GROUP))
