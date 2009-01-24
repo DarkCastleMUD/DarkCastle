@@ -14,7 +14,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: spells.h,v 1.120 2009/01/23 19:30:49 kkoons Exp $ */
+/* $Id: spells.h,v 1.121 2009/01/24 06:53:22 kkoons Exp $ */
 #include <structs.h> // ubyte, int16
 
 #include <map>
@@ -335,7 +335,7 @@ void check_maxes(CHAR_DATA *ch);
 #define SKILL_DEFENSE 		     374 // MArtial defense
 #define SKILL_KNOCKBACK              375
 #define SKILL_STINGING_WEAPONS       376
-#define SKILL_BLACKJACK		     377
+#define SKILL_JAB		     377
 #define SKILL_APPRAISE               378
 #define SKILL_NATURES_LORE           379
 #define SKILL_FIRE_ARROW             380
