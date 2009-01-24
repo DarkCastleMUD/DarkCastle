@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.248 2009/01/24 02:03:35 kkoons Exp $ */
+/* $Id: spells.cpp,v 1.249 2009/01/24 07:37:01 dcastle Exp $ */
 
 extern "C"
 {
@@ -525,7 +525,7 @@ struct skill_stuff skill_info[] =
 /* 75 */     { "martial defense", SKILL_INCREASE_HARD},
 /* 76 */           { "knockback", SKILL_INCREASE_HARD},
 /* 77 */    { "stinging_weapons", SKILL_INCREASE_MEDIUM },
-/* 78 */           { "blackjack", SKILL_INCREASE_HARD},
+/* 78 */           { "jab", SKILL_INCREASE_HARD},
 /* 79 */            { "appraise", SKILL_INCREASE_MEDIUM},
 /* 80 */        { "natures lore", SKILL_INCREASE_MEDIUM},
 /* 81 */         { "fire arrows", SKILL_INCREASE_HARD},
@@ -641,7 +641,7 @@ char *skills[]=
   "martial_defense",
   "knockback",
   "stinging_weapons",
-  "blackjack",
+  "jab",
   "appraise",
   "natures lore",
   "fire arrows",
