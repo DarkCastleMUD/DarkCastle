@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.247 2009/01/23 19:31:22 kkoons Exp $ */
+/* $Id: spells.cpp,v 1.248 2009/01/24 02:03:35 kkoons Exp $ */
 
 extern "C"
 {
@@ -941,7 +941,20 @@ void affect_update( int32 duration_type )
 	if ((af->type == FUCK_PTHIEF || af->type == FUCK_CANTQUIT || af->type == FUCK_GTHIEF) && !i->desc)
 	  continue;
 	if (af->duration > 1)
+        {
 	  af->duration--;
+          if(!(af->caster).empty()) //means bard song
+          {
+            CHAR_DATA *get_pc_room_vis_exact(CHAR_DATA *ch, const char *name);
+            CHAR_DATA *bard = get_pc_room_vis_exact(i, (af->caster).c_str());
+            if(!bard || !ARE_GROUPED(i, bard))
+            {
+              send_to_char("Away from the music, the effect weakens...\n\r", i);
+              af->duration = 1;
+              (af->caster).clear();
+            } 
+          }
+        }
 	else if(af->duration == 1) {
           // warnings for certain spells
           switch(af->type) {
