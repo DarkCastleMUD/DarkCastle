@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.183 2009/01/24 02:02:45 kkoons Exp $ */
+/* $Id: handler.cpp,v 1.184 2009/01/24 06:55:12 kkoons Exp $ */
     
 extern "C"
 {
@@ -1549,6 +1549,10 @@ void affect_remove( CHAR_DATA *ch, struct affected_type *af, int flags)
          REMOVE_BIT(ch->combat, COMBAT_REPELANCE);
          if (!(flags & SUPPRESS_MESSAGES))
             send_to_char("Your mind recovers from the repelance.\n\r", ch);
+         break;
+      case SKILL_JAB:
+         if (!(flags & SUPPRESS_MESSAGES))
+            send_to_char("You feel ready to jab some poor sucker again.\r\n", ch);
          break;
       case SKILL_VITAL_STRIKE:
          if (!(flags & SUPPRESS_MESSAGES))
@@ -3419,7 +3423,7 @@ CHAR_DATA *get_char_room_vis(CHAR_DATA *ch, char *name)
 
    if (IS_AFFECTED(ch, AFF_BLACKJACK)) 
    {
-     struct affected_type *af = affected_by_spell(ch, SKILL_BLACKJACK);
+     struct affected_type *af = affected_by_spell(ch, SKILL_JAB);
      if (af) 
      {
        if (af->modifier == 1)
