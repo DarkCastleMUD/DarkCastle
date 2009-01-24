@@ -12283,6 +12283,7 @@ int spell_holy_aura(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
 int cast_holy_aura( ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *tar_ch, struct obj_data *tar_obj, int skill )
 {
 
+  struct affected_type af;
   switch (type) 
   {
     case SPELL_TYPE_SPELL:
@@ -12308,7 +12309,6 @@ int cast_holy_aura( ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *
 	ch->mana += spell_info[SPELL_HOLY_AURA].min_usesmana;	
 	return eFAILURE;
 	}
-  struct affected_type af;
 
   if(affected_by_spell(ch, SPELL_HOLY_AURA_TIMER)) {
      send_to_char("Your god is not so foolish as to grant that power to you so soon again.\r\n", ch);
