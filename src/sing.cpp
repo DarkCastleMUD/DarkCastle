@@ -88,7 +88,7 @@ struct song_info_type song_info [ ] = {
 },
 
 { /* 4 */
-	10, POSITION_RESTING, 9, SKILL_SONG_BOUNT_SONNET, 
+	10, POSITION_RESTING, 6, SKILL_SONG_BOUNT_SONNET, 
         TAR_IGNORE, 
         song_bountiful_sonnet, execute_song_bountiful_sonnet,
 	NULL, NULL, SKILL_INCREASE_EASY
@@ -137,10 +137,10 @@ NULL,   SKILL_INCREASE_MEDIUM
 },
 
 { /* 12 */
-	4, POSITION_RESTING, 3, SKILL_SONG_FLIGHT_OF_BEE, 
+	4, POSITION_RESTING, 5, SKILL_SONG_FLIGHT_OF_BEE, 
         TAR_IGNORE, 
         song_flight_of_bee, execute_song_flight_of_bee,
-        pulse_flight_of_bee, intrp_flight_of_bee,
+        NULL, NULL,
         SKILL_INCREASE_MEDIUM
 },
 
@@ -1880,7 +1880,7 @@ int song_flight_of_bee( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim
 {
    send_to_char("You begin to sing a lofty song...\n\r", ch);
    act("$n raises $s voice in an flighty quick march...", ch, 0, 0, TO_ROOM, 0);
-   ch->song_timer = 1;
+   ch->song_timer = song_info[ch->song_number].beats;
    return eSUCCESS;
 }
 
@@ -1888,6 +1888,18 @@ int execute_song_flight_of_bee( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA
 {
    char_data * master = NULL;
    follow_type * fvictim = NULL;
+
+   struct affected_type af;
+
+   af.type      = SKILL_SONG_FLIGHT_OF_BEE;
+   af.duration  = 1+skill/10;
+   af.modifier  = 0;
+   af.location  = 0;
+   af.caster	= GET_NAME(ch); 
+   af.bitvector = AFF_FLYING;
+
+   dc_free(ch->song_data);
+   ch->song_data = 0;
 
    if(ch->master && ch->master->in_room == ch->in_room && 
                     ISSET(ch->affected_by, AFF_GROUP))
@@ -1899,84 +1911,33 @@ int execute_song_flight_of_bee( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA
       if(!ISSET(fvictim->follower->affected_by, AFF_GROUP))
          continue;
 
-      if(ch->in_room != fvictim->follower->in_room)
-      {
-         if(ISSET(fvictim->follower->affected_by, AFF_FLYING) &&
-            !affected_by_spell(fvictim->follower, SPELL_FLY))
-         {
-            REMBIT(fvictim->follower->affected_by, AFF_FLYING);
-            send_to_char("Your musical flight ends.\n\r", fvictim->follower);
-         }
-         continue;
-      }
       if(affected_by_spell(fvictim->follower, SPELL_FLY))
       {
          affect_from_char(fvictim->follower, SPELL_FLY);
-         send_to_char("Your fly spells dissipates.", fvictim->follower);
+         send_to_char("Your fly spell dissipates.", fvictim->follower);
       }
-      SETBIT(fvictim->follower->affected_by, AFF_FLYING);
+      if(affected_by_spell(fvictim->follower, SKILL_SONG_FLIGHT_OF_BEE))
+         affect_from_char(fvictim->follower, SKILL_SONG_FLIGHT_OF_BEE);
+      affect_to_char(fvictim->follower, &af);
       send_to_char("Your feet feel like air.\r\n", fvictim->follower);
    }
+
    if(ch->in_room == master->in_room)
    {
-      SETBIT(master->affected_by, AFF_FLYING);
+      if(affected_by_spell(master, SPELL_FLY))
+      {
+         affect_from_char(master, SPELL_FLY);
+         send_to_char("Your fly spell dissipates.", master);
+      }
+      if(affected_by_spell(master, SKILL_SONG_FLIGHT_OF_BEE))
+         affect_from_char(master, SKILL_SONG_FLIGHT_OF_BEE);
+      affect_to_char(master, &af);
       send_to_char("Your feet feel like air.\r\n", master);
    }
-   else
-   {
-      if(ISSET(master->affected_by, AFF_FLYING) &&
-         !affected_by_spell(master, SPELL_FLY))
-      {
-         REMBIT(master->affected_by, AFF_FLYING);
-         send_to_char("Your musical flight ends.\n\r", master);
-      }
-   }
 
-   if (!skill_success(ch, 0, SKILL_SONG_FLIGHT_OF_BEE)) {
-      ch->song_timer = -1;
-      return eSUCCESS;
-   }
-
-   ch->song_timer = song_info[ch->song_number].beats;
    return eSUCCESS;
 }
 
-int pulse_flight_of_bee( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
-{
-   if(number(1, 5) == 3)
-      act("$n prances around like a fairy.", ch, 0, 0, TO_ROOM, 0);   
-   return eSUCCESS;
-}
-
-int intrp_flight_of_bee( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
-{
-   char_data * master = NULL;
-   follow_type * fvictim = NULL;
-
-   if(ch->master && ISSET(ch->affected_by, AFF_GROUP))
-      master = ch->master;
-   else master = ch;
-
-   for(fvictim = master->followers; fvictim; fvictim = fvictim->next)
-   {
-      if (origsing && origsing != fvictim->follower) continue;
-      if(ISSET(fvictim->follower->affected_by, AFF_FLYING) &&
-         !affected_by_spell(fvictim->follower, SPELL_FLY))
-      {
-         REMBIT(fvictim->follower->affected_by, AFF_FLYING);
-         send_to_char("Your musical flight ends.\n\r", fvictim->follower);
-      }
-   }
-
-  if (!origsing || origsing == master)
-   if(ISSET(master->affected_by, AFF_FLYING) &&
-      !affected_by_spell(master, SPELL_FLY))
-   {
-      REMBIT(master->affected_by, AFF_FLYING);
-      send_to_char("Your musical flight ends.\r\n", master);
-   }
-   return eSUCCESS;
-}
 
 int song_searching_song( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {
@@ -2530,16 +2491,11 @@ int execute_song_bountiful_sonnet( ubyte level, CHAR_DATA *ch, char *arg, CHAR_D
 {
    char_data * master = NULL;
    follow_type * fvictim = NULL;
-   struct affected_type af;
 
    if(ch->master && ch->master->in_room == ch->in_room && 
                     ISSET(ch->affected_by, AFF_GROUP))
       master = ch->master;
    else master = ch;
-
-   af.type      = SKILL_SONG_BOUNT_SONNET;
-   af.duration  = skill / 4;
-   af.modifier  = 0;
 
    for(fvictim = master->followers; fvictim; fvictim = fvictim->next)
    {
@@ -2549,32 +2505,20 @@ int execute_song_bountiful_sonnet( ubyte level, CHAR_DATA *ch, char *arg, CHAR_D
 
       send_to_char("Your appetite has been completely satiated.\r\n", fvictim->follower);
       if(GET_COND(fvictim->follower, FULL) != -1 && GET_LEVEL(fvictim->follower) < 60) {
-         af.location  = APPLY_BOUNT_SONNET_HUNGER;
-         af.bitvector  = AFF_BOUNT_SONNET_HUNGER;
-         GET_COND(fvictim->follower, FULL) = -1;
-         affect_to_char(fvictim->follower, &af);
+         GET_COND(fvictim->follower, FULL) = 24;
       }
       if(GET_COND(fvictim->follower, THIRST) != -1 && GET_LEVEL(fvictim->follower) < 60) {
-         af.location  = APPLY_BOUNT_SONNET_THIRST;
-         af.bitvector  = AFF_BOUNT_SONNET_THIRST;
-         GET_COND(fvictim->follower, THIRST) = -1;
-         affect_to_char(fvictim->follower, &af);
+         GET_COND(fvictim->follower, THIRST) = 24;
       }
    }
    if(ch->in_room == master->in_room)
    {
       send_to_char("Your appetite has been completely satiated.\r\n", master);
       if(GET_COND(master, FULL) != -1 && GET_LEVEL(master) < 60) {
-         af.location  = APPLY_BOUNT_SONNET_HUNGER;
-         af.bitvector  = AFF_BOUNT_SONNET_HUNGER;
-         GET_COND(master, FULL) = -1;
-         affect_to_char(master, &af);
+         GET_COND(master, FULL) = 24;
       }
       if(GET_COND(master, THIRST) != -1 && GET_LEVEL(master) < 60) {
-         af.location  = APPLY_BOUNT_SONNET_THIRST;
-         af.bitvector  = AFF_BOUNT_SONNET_THIRST;
-         GET_COND(master, THIRST) = -1;
-         affect_to_char(master, &af);
+         GET_COND(master, THIRST) = 24;
       }
    }
    return eSUCCESS;
@@ -3126,6 +3070,7 @@ int execute_song_submariners_anthem( ubyte level, CHAR_DATA *ch, char *arg, CHAR
    af.type      = SKILL_SONG_SUBMARINERS_ANTHEM;
    af.duration  = 1 + (skill/10);
    af.modifier  = 0;
+   af.caster	= GET_NAME(ch);
    af.location  = APPLY_NONE;
    af.bitvector = -1;
 
@@ -3151,12 +3096,17 @@ int execute_song_submariners_anthem( ubyte level, CHAR_DATA *ch, char *arg, CHAR
          send_to_char("Your magical gills disappear.", fvictim->follower);
       }
 
+      if(affected_by_spell(fvictim->follower, SKILL_SONG_SUBMARINERS_ANTHEM))
+         affect_from_char(fvictim->follower, SKILL_SONG_SUBMARINERS_ANTHEM);
+
       affect_to_char(fvictim->follower, &af);
       send_to_char("Your lungs absorb oxygen from any fluid!\r\n", fvictim->follower);
    }
 
    if(ch->in_room == master->in_room)
    {
+      if(affected_by_spell(master, SKILL_SONG_SUBMARINERS_ANTHEM))
+         affect_from_char(master, SKILL_SONG_SUBMARINERS_ANTHEM);
       affect_to_char(master, &af);
       send_to_char("Your lungs absorb oxygen from any fluid!\r\n", master);
    }
