@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.182 2009/01/23 22:53:43 kkoons Exp $ */
+/* $Id: handler.cpp,v 1.183 2009/01/24 02:02:45 kkoons Exp $ */
     
 extern "C"
 {
@@ -1317,10 +1317,12 @@ void affect_to_char( CHAR_DATA *ch, struct affected_type *af, int32 duration_typ
     struct affected_type *affected_alloc;
     if (af->location >= 1000) return; // Skill aff;
 #ifdef LEAK_CHECK
-    affected_alloc = (struct affected_type *) calloc(1, sizeof(struct affected_type));
+    affected_alloc = new (nothrow) affected_type;
 #else
-    affected_alloc = (struct affected_type *) dc_alloc(1, sizeof(struct affected_type));
+    affected_alloc = new (nothrow) affected_type;
+   // affected_alloc = (struct affected_type *) dc_alloc(1, sizeof(struct affected_type));
 #endif
+
     *affected_alloc = *af;
     affected_alloc->duration_type = duration_type;
     affected_alloc->next = ch->affected;
@@ -1552,6 +1554,10 @@ void affect_remove( CHAR_DATA *ch, struct affected_type *af, int flags)
          if (!(flags & SUPPRESS_MESSAGES))
             send_to_char("The internal strength and speed from your vital strike has returned.\r\n", ch);
          break;
+      case SKILL_SONG_FLIGHT_OF_BEE:
+         if (!(flags & SUPPRESS_MESSAGES))
+            send_to_char("Your feet touch the ground once more.\r\n", ch);
+         break;
       case SKILL_SONG_FANATICAL_FANFARE:
          if (!(flags & SUPPRESS_MESSAGES))
             send_to_char("Your mind no longer races.\r\n", ch);
@@ -1736,7 +1742,7 @@ void affect_remove( CHAR_DATA *ch, struct affected_type *af, int flags)
    }
 
    if (!char_died) {
-      dc_free ( af );
+      delete ( af );
       affect_total( ch ); // this must be here to take care of anything we might
                           // have just removed that is still given by equipment
    }
@@ -3522,7 +3528,7 @@ CHAR_DATA *get_mob_room_vis(CHAR_DATA *ch, char *name)
    return(partial_match);
 }
 
-CHAR_DATA *get_pc_room_vis_exact(CHAR_DATA *ch, char *name)
+CHAR_DATA *get_pc_room_vis_exact(CHAR_DATA *ch, const char *name)
 {
    CHAR_DATA *i;
 
