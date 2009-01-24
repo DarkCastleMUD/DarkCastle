@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.193 2009/01/06 17:30:57 kkoons Exp $
+| $Id: cl_thief.cpp,v 1.194 2009/01/24 06:53:39 kkoons Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -534,22 +534,19 @@ int do_circle(CHAR_DATA *ch, char *argument, int cmd)
 
    if (!charge_moves(ch, SKILL_CIRCLE)) return eSUCCESS;
 
-   bool blackjack = FALSE;
    switch (get_weapon_damage_type(ch->equipment[WIELD])) {
    case TYPE_PIERCE:
    case TYPE_STING:
      break;
-   case TYPE_BLUDGEON:
-     if (has_skill(ch, SKILL_BLACKJACK))
-       blackjack = TRUE;
      break;
    default:
-     send_to_char("Only certain weapons can be used for backstabbing or blackjacking, this is not one of them.\n\r", ch);
+     send_to_char("Only certain weapons can be used for backstabbing, this is not one of them.\n\r", ch);
      return eFAILURE;
      break;
    }
    
-   if (ch == victim->fighting) {
+   if (ch == victim->fighting && !IS_AFFECTED(victim, AFF_BLACKJACK))
+   {
       send_to_char("You can't break away while that person is hitting you!\n\r", ch);
       return eFAILURE;
    }
@@ -562,9 +559,6 @@ int do_circle(CHAR_DATA *ch, char *argument, int cmd)
    sprintf(buffer, "%s", GET_NAME(victim));
 
    if (AWAKE(victim) && !skill_success(ch,victim,SKILL_CIRCLE))
-     if (blackjack)
-       retval = damage(ch, victim, 0,TYPE_UNDEFINED, SKILL_BLACKJACK, FIRST);
-     else
        retval = damage(ch, victim, 0,TYPE_UNDEFINED, SKILL_BACKSTAB, FIRST);
    else if(affected_by_spell(victim, SKILL_BATTLESENSE) &&
              number(1, 100) < affected_by_spell(victim, SKILL_BATTLESENSE)->modifier)
@@ -572,19 +566,12 @@ int do_circle(CHAR_DATA *ch, char *argument, int cmd)
      act("$N's heightened battlesense sees your circle coming from a mile away.", ch, 0, victim, TO_CHAR, 0);
      act("Your heightened battlesense sees $n's circle coming from a mile away.", ch, 0, victim, TO_VICT, 0);
      act("$N's heightened battlesense sees $n's circle coming from a mile away.", ch, 0, victim, TO_ROOM, NOTVICT);
-     if (blackjack)
-       retval = damage(ch, victim, 0,TYPE_UNDEFINED, SKILL_BLACKJACK, FIRST);
-     else
        retval = damage(ch, victim, 0,TYPE_UNDEFINED, SKILL_BACKSTAB, FIRST);
    }
    else 
    {
       SET_BIT(ch->combat, COMBAT_CIRCLE);
-
-      if (blackjack)
-	return do_blackjack(ch, buffer, cmd);
-      else
-	retval = one_hit(ch, victim, SKILL_BACKSTAB, FIRST);
+      retval = one_hit(ch, victim, SKILL_BACKSTAB, FIRST);
 
       if(SOMEONE_DIED(retval))
         return retval;
@@ -653,9 +640,9 @@ int do_trip(CHAR_DATA *ch, char *argument, int cmd)
     send_to_char( "Trip whom?\n\r", ch );
     return eFAILURE;
   }
-  else
-
-  if(ch->in_room != victim->in_room) {
+  
+  if(ch->in_room != victim->in_room) 
+  {
     send_to_char("That person seems to have left.\n\r", ch);
     return eFAILURE;
   }
@@ -2015,19 +2002,24 @@ int do_deceit(struct char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_blackjack(struct char_data *ch, char *argument, int cmd)
+int do_jab(struct char_data *ch, char *argument, int cmd)
 {
   int retval = eFAILURE, learned;
 
-  if (!(learned = has_skill(ch, SKILL_BLACKJACK))) {
-    send_to_char("You don't know how to blackjack.\r\n",ch);
+  if(affected_by_spell(ch, SKILL_JAB) && GET_LEVEL(ch) < IMMORTAL) 
+  {
+    send_to_char("Your arm is still sore from your last attempt.\r\n", ch);
     return eFAILURE;
   }
 
-  if (!ch->equipment[WIELD] ||
-      get_weapon_damage_type(ch->equipment[WIELD]) != TYPE_BLUDGEON)
+  if (!(learned = has_skill(ch, SKILL_JAB))) {
+    send_to_char("You don't know how to jab.\r\n",ch);
+    return eFAILURE;
+  }
+
+  if (!ch->equipment[WIELD])
     {
-      send_to_char("Your primary weapon must bludgeon to make it a success.\r\n",ch);
+      send_to_char("Your must be wielding a weapon to make it a success.\r\n",ch);
       return eFAILURE;
     }
 
@@ -2035,103 +2027,113 @@ int do_blackjack(struct char_data *ch, char *argument, int cmd)
   one_argument(argument,arg);
   struct char_data *victim;
 
-  if (!(victim = get_char_room_vis(ch, arg)))
+  if(!*arg && ch->fighting) 
+      victim = ch->fighting;
+  else
+    victim = get_char_room_vis(ch, arg);
+
+  if(!victim)
   {
-    send_to_char("Blackjack whom?\r\n",ch);
+    send_to_char( "Jab whom?\n\r", ch );
     return eFAILURE;
   }
+  
+  if(ch->in_room != victim->in_room) 
+  {
+    send_to_char("That person seems to have left.\n\r", ch);
+    return eFAILURE;
+  }
+  
   if (victim == ch)
   {
     send_to_char("Why are you trying to hit yourself on the head???.\r\n",ch);
     return eFAILURE;
   }
-  if(IS_AFFECTED(victim, AFF_ALERT)) {
-    act("$E is too alert and nervous looking and you are unable to sneak behind!", ch,0,victim, TO_CHAR, 0);
-    return eFAILURE;
-  }  
 
-  if(IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_HUGE)) {
-    send_to_char("You cannot blackjack someone that HUGE!\r\n", ch);
+  if(IS_MOB(victim) 
+     && (ISSET(victim->mobdata->actflags, ACT_HUGE) && learned < 81)) 
+  {
+    send_to_char("You cannot jab someone that HUGE!\r\n", ch);
     return eFAILURE;
   }
 
-  if(IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_SWARM)) {
-    send_to_char("You cannot target just one to blackjack!\r\n", ch);
+  if(IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_SWARM) && learned < 81) 
+  {
+    send_to_char("You cannot target just one to jab!\r\n", ch);
     return eFAILURE;
   }
 
-  if(IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_TINY)) {
-    send_to_char("You cannot target someone that tiny to blackjack!\r\n", ch);
+  if(IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_TINY) && learned < 81)  
+  {
+    send_to_char("You cannot target someone that tiny to jab!\r\n", ch);
     return eFAILURE;
   }
 
-  if((GET_LEVEL(ch) < G_POWER) || IS_NPC(ch)) {
+  if((GET_LEVEL(ch) < G_POWER) || IS_NPC(ch)) 
+  {
       if(!can_attack(ch) || !can_be_attacked(ch, victim))
       return eFAILURE;
   }
 
-  if (!charge_moves(ch, SKILL_BLACKJACK)) return eSUCCESS;
+  if (!charge_moves(ch, SKILL_JAB)) return eSUCCESS;
 
   set_cantquit(ch, victim);
-  WAIT_STATE(ch, PULSE_VIOLENCE*3);
-  if ( AWAKE(victim) ) { 
-    int fail_percentage = (int)((((33.0-10.0) / 100.0) * learned) + 10.0);
-    int work_percentage = (int)((((33.0-80.0) / 100.0) * learned) + 80.0);
-    int rand_percentage = (int)((((33.0-10.0) / 100.0) * learned) + 10.0);
+  WAIT_STATE(ch, PULSE_VIOLENCE);
 
-    struct affected_type af;
-    af.type      = SKILL_BLACKJACK;
-    af.duration  = 2;
-    af.duration_type  = PULSE_VIOLENCE;
-    af.location  = APPLY_NONE;
-    af.bitvector = AFF_BLACKJACK;
+  struct affected_type af;
+  af.type      = SKILL_JAB;
+  af.duration  = 2;
+  af.duration_type  = PULSE_VIOLENCE;
+  af.location  = APPLY_NONE;
+  af.bitvector = AFF_BLACKJACK;
     
-    int value = number(1, 100);
+  if(!skill_success(ch, victim, SKILL_JAB)) 
+  {
+    send_to_char("You try to jab the blunt part of your weapon at your opponents head, but miss!\n\r", ch);
+    act("$n jabs $s weapon at your head, but you manage to dodge it.", ch, 0, victim, TO_VICT, 0);
+    act("$n jabs $s weapon at $N's head, but misses.", ch, 0, victim, TO_ROOM, NOTVICT);
+    return eSUCCESS;
+  }
+  send_to_char("You jab the blunt part of your weapon into your opponents head!\n\r", ch);
+  act("$n jabs $s weapon into your temple, making you feel very dizzy.", ch, 0, victim, TO_VICT, 0);
+  act("$n jabs $s weapon at $N's head, and connects with a hollow thud.", ch, 0, victim, TO_ROOM, NOTVICT);
 
-    //    fprintf(stderr, "l:%d f:%d w:%d r:%d v:%d\n\r", learned, fail_percentage, work_percentage, rand_percentage, value);
-    
-    skill_increase_check (ch, SKILL_BLACKJACK, has_skill(ch, SKILL_BLACKJACK),
-			  SKILL_INCREASE_MEDIUM);
-
-    if ((fail_percentage+work_percentage) < value &&
-	value <= (fail_percentage+work_percentage+rand_percentage)) {
-      // victim's next target will be random
-      af.modifier = 1;     
-      affect_to_char(victim, &af, PULSE_VIOLENCE);
-      af.location = APPLY_AC;
-      af.modifier = learned*1.5;
-      affect_to_char(victim, &af, PULSE_VIOLENCE);
-      retval = damage(ch, victim, 25, TYPE_BLUDGEON, SKILL_BLACKJACK, 0);
-    } else if ( fail_percentage < value &&
-		value <= (fail_percentage+work_percentage)) {
-      // ch failed to blackjack victim
-      retval = damage(ch, victim, 0, TYPE_BLUDGEON, SKILL_BLACKJACK, 0);
-    } else if (0 < value && value <= fail_percentage) {
-      af.modifier = 2;
-      GET_POS(victim) = POSITION_SITTING;
-      SET_BIT(victim->combat, COMBAT_BASH1);
-      affect_to_char(victim, &af, PULSE_VIOLENCE);
-      af.location = APPLY_AC;
-      af.modifier = learned*1.5;
-      affect_to_char(victim, &af, PULSE_VIOLENCE);
-      retval = damage(ch, victim, 25, TYPE_BLUDGEON, SKILL_BLACKJACK, 0);
-      // victim's next attack will fail
-    }
-  } else {
-    retval = attack(ch, victim, SKILL_BLACKJACK, FIRST);
+  if(number(0, 1))
+  {
+     // victim's next target will be random
+    af.modifier = 1;     
+    affect_to_char(victim, &af, PULSE_VIOLENCE);
+  }
+  else 
+  {
+    af.modifier = 2;
+    GET_POS(victim) = POSITION_SITTING;
+    SET_BIT(victim->combat, COMBAT_BASH1);
+    affect_to_char(victim, &af, PULSE_VIOLENCE);
+    // victim's next attack will fail
   }
 
-  if (retval & eVICT_DIED && !retval & eCH_DIED)
+  af.location = APPLY_AC;
+  af.modifier = learned*1.5;
+  affect_to_char(victim, &af, PULSE_VIOLENCE);
+
+  af.type = SKILL_JAB;
+  af.duration  = 1;
+  af.modifier  = 0;
+  af.location  = APPLY_NONE;
+  af.bitvector = -1;
+  affect_to_char(ch, &af);
+
+  retval = damage(ch, victim, 100, TYPE_BLUDGEON, SKILL_JAB, 0);
+
+  if (retval & eVICT_DIED && !(retval & eCH_DIED))
   {
     if(!IS_NPC(ch) && IS_SET(ch->pcdata->toggles, PLR_WIMPY))
-       WAIT_STATE(ch, PULSE_VIOLENCE *2);
-    else
        WAIT_STATE(ch, PULSE_VIOLENCE);
     return retval;
   }
 
   if (retval & eCH_DIED) return retval;
-  WAIT_STATE(ch, PULSE_VIOLENCE*2);
 
   if (retval & eVICT_DIED)
      return retval;
