@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: channel.cpp,v 1.22 2008/12/30 04:17:39 jhhudso Exp $
+| $Id: channel.cpp,v 1.23 2009/01/24 03:19:47 kkoons Exp $
 | channel.C
 | Description:  All of the channel - type commands; do_say, gossip, etc..
 */
@@ -26,6 +26,13 @@ extern "C"
 #include <act.h>
 #include <db.h>
 #include <returnvals.h>
+#include <string>
+using namespace std;
+
+queue<string> gossip_history;
+queue<string> auction_history;
+queue<string> newbie_history;
+queue<string> trivia_history;
 
 extern CWorld world;
 extern struct descriptor_data *descriptor_list;
@@ -250,17 +257,29 @@ int do_gossip(struct char_data *ch, char *argument, int cmd)
     for (; *argument == ' '; argument++);
 
     if (!(*argument))
-	send_to_char("It must not have been that great!!\n\r", ch);
-    else {
+    {
+      queue<string> tmp = gossip_history;
+      send_to_char("Here are the last 10 gossips:\n\r", ch);
+      while(!tmp.empty())
+      {
+	  act((tmp.front()).c_str(), ch, 0, ch, TO_VICT, 0);
+          tmp.pop();
+      }
+    }
+    else 
+    {
       GET_MOVE(ch) -= 5;
       if(GET_MOVE(ch) < 0) {
         send_to_char("You're too out of breath!\n\r", ch);
         GET_MOVE(ch) += 5;
         return eSUCCESS;
       }
-      sprintf(buf1, "$5$B$n gossips '%s'$R", argument);
+      sprintf(buf1, "$5$B%s gossips '%s'$R", GET_NAME(ch), argument);
       sprintf(buf2, "$5$BYou gossip '%s'$R", argument);
       act(buf2, ch, 0, 0, TO_CHAR, 0);
+
+      gossip_history.push(buf1);
+      if(gossip_history.size() > 10) gossip_history.pop();
 
       for(i = descriptor_list; i; i = i->next)
 	 if(i->character != ch && !i->connected && 
@@ -321,7 +340,15 @@ int do_auction(struct char_data *ch, char *argument, int cmd)
     for (; *argument == ' '; argument++);
 
     if (!(*argument))
-	send_to_char("AUCTION WHAT??\n\r", ch);
+    {
+      queue<string> tmp = auction_history;
+      send_to_char("Here are the last 10 auctions:\n\r", ch);
+      while(!tmp.empty())
+      {
+	  act((tmp.front()).c_str(), ch, 0, ch, TO_VICT, 0);
+          tmp.pop();
+      }
+    }
     else {
       GET_MOVE(ch) -= 5;
       if(GET_MOVE(ch) < 0) {
@@ -329,9 +356,12 @@ int do_auction(struct char_data *ch, char *argument, int cmd)
         GET_MOVE(ch) += 5;
         return eSUCCESS;
       }
-      sprintf(buf1, "$6$B$n auctions '%s'$R", argument);
+      sprintf(buf1, "$6$B%s auctions '%s'$R", GET_NAME(ch), argument);
       sprintf(buf2, "$6$BYou auction '%s'$R", argument);
       act(buf2, ch, 0, 0, TO_CHAR, 0);
+
+      auction_history.push(buf1);
+      if(auction_history.size() > 10) auction_history.pop();
 
       for(i = descriptor_list; i; i = i->next)
 	 if(i->character != ch && !i->connected &&
@@ -457,7 +487,15 @@ int do_trivia(struct char_data *ch, char *argument, int cmd)
     ;
 
   if (!(*argument)) {
-    send_to_char("It must not have been that great!!\n\r", ch);
+    {
+      queue<string> tmp = trivia_history;
+      send_to_char("Here are the last 10 messages:\n\r", ch);
+      while(!tmp.empty())
+      {
+	  act((tmp.front()).c_str(), ch, 0, ch, TO_VICT, 0);
+          tmp.pop();
+      }
+    }
     return eSUCCESS;
   }
 
@@ -477,6 +515,9 @@ int do_trivia(struct char_data *ch, char *argument, int cmd)
     sprintf(buf2, "$3$BYou answer '%s'$R", argument);
   }
   act(buf2, ch, 0, 0, TO_CHAR, 0);
+
+  trivia_history.push(buf1);
+  if(trivia_history.size() > 10) trivia_history.pop();
     
   for(i = descriptor_list; i; i = i->next)
     if(i->character != ch && !i->connected && 
@@ -920,7 +961,15 @@ int do_newbie(struct char_data *ch, char *argument, int cmd)
     for (; *argument == ' '; argument++);
 
     if (!(*argument))
-	send_to_char("Say what over the newbie channel?\n\r", ch);
+    {
+      queue<string> tmp = newbie_history;
+      send_to_char("Here are the last 10 messages:\n\r", ch);
+      while(!tmp.empty())
+      {
+	  act((tmp.front()).c_str(), ch, 0, ch, TO_VICT, 0);
+          tmp.pop();
+      }
+    }
     else {
       GET_MOVE(ch) -= 5;
       if(GET_MOVE(ch) < 0) {
@@ -931,6 +980,9 @@ int do_newbie(struct char_data *ch, char *argument, int cmd)
       sprintf(buf1, "$5%s newbies '$R$B%s$R$5'$R", GET_SHORT(ch), argument);
       sprintf(buf2, "$5You newbie '$R$B%s$R$5'$R", argument);
       act(buf2, ch, 0, 0, TO_CHAR, 0);
+
+      newbie_history.push(buf1);
+      if(newbie_history.size() > 10) newbie_history.pop();
 
       for(i = descriptor_list; i; i = i->next)
 	 if(i->character != ch && !i->connected && 
