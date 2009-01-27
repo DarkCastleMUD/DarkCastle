@@ -25,6 +25,7 @@ extern "C"
 #include <string>
 #include <map>
 #include <queue>
+#include <fileinfo.h>
 
 using namespace std;
 
@@ -975,6 +976,9 @@ void AuctionHouse::BuyItem(CHAR_DATA *ch, unsigned int ticket)
   map<unsigned int, AuctionTicket>::iterator Item_it;
   OBJ_DATA *obj;
   CHAR_DATA *vict;
+  FILE *fl;
+  char *buf[10];
+  int i = 0;
 
   Item_it = Items_For_Sale.find(ticket);
   if(Item_it == Items_For_Sale.end())
@@ -1076,6 +1080,35 @@ void AuctionHouse::BuyItem(CHAR_DATA *ch, unsigned int ticket)
   log(log_buf, IMP, LOG_OBJECTS);
   obj_to_char(obj, ch);
   do_save(ch, "", 9);
+
+
+  extern short bport;
+ if(!bport) {
+  if (!(fl = dc_fopen(WEB_AUCTION_FILE,"r"))) {
+    perror(WEB_AUCTION_FILE);
+    abort();
+  }
+
+  while(!feof(fl) && i<=9) {
+   buf[i] = fread_string(fl, 0);
+   i++;
+  }
+
+  dc_fclose(fl);
+
+  if (!(fl = dc_fopen(WEB_AUCTION_FILE,"w"))) {
+    perror(WEB_AUCTION_FILE);
+    abort();
+  }
+
+  fprintf(fl, "%s purchased %s's %s~\n", GET_NAME(ch), Item_it->second.seller.c_str(), obj->short_description);
+  
+  for(int j=0;j<i;j++)
+   fprintf(fl, "%s~\n", buf[j]);
+
+  dc_fclose(fl);
+ } else log("Cannot save auction file to web dir.", 0, LOG_MISC);
+
 }
 
 /*

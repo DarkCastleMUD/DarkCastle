@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.190 2009/01/19 16:49:02 kkoons Exp $ */
+/* $Id: db.cpp,v 1.191 2009/01/27 03:30:17 shane Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -823,6 +823,12 @@ void update_wizlist(CHAR_DATA *ch)
        fprintf(fl, "%s %d\n", wizlist[x].name, wizlist[x].level);
   }
   dc_fclose(fl);
+
+  if(system(0) && !bport)
+     system("cp ../lib/wizlist.txt /srv/www/www.dcastle.org/htdocs/wizlist.txt");
+  else log("Cannot save wizlist file to web dir.", 0, LOG_MISC);
+
+
 }
 
 int do_wizlist(CHAR_DATA *ch, char *argument, int cmd)

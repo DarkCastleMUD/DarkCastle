@@ -1,7 +1,7 @@
 #ifndef FILEINFO_H_
 #define FILEINFO_H_
 /*
-| $Id: fileinfo.h,v 1.29 2009/01/09 06:55:59 shane Exp $
+| $Id: fileinfo.h,v 1.30 2009/01/27 03:30:19 shane Exp $
 | fileinfo.h
 | Description:  Contains information for loading files, ie "../lib", etc..
 */
@@ -51,12 +51,14 @@
 #define  LOCAL_WHO_FILE     "onlinewho.txt"
 
 #define  WEB_WHO_FILE        "/srv/www/www.dcastle.org/htdocs/onlinewho.txt"
+#define  WEB_AUCTION_FILE    "/srv/www/www.dcastle.org/htdocs/auctions.txt"
 #define  NEW_HELP_FILE	     "new_help.txt"
 #define  WEB_HELP_FILE       "/srv/www/www.dcastle.org/htdocs/webhelp.txt"
 #define  NEW_HELP_PAGE_FILE  "new_help_screen.txt"
 #define  NEW_IHELP_PAGE_FILE "new_ihelp_screen.txt"
 #define  LEADERBOARD_FILE    "leaderboard.txt"
 #define  QUEST_FILE         "quests.txt"
+#define  WEB_CLANS_LIST      "/srv/www/www.dcastle.org/htdocs/webclanslist.txt"
 
 #define BUG_LOG            "../log/bug.log"
 #define GOD_LOG            "../log/god.log"

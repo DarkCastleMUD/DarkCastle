@@ -1,4 +1,4 @@
-/* $Id: clan.cpp,v 1.71 2008/12/12 18:33:28 kkoons Exp $ */
+/* $Id: clan.cpp,v 1.72 2009/01/27 03:30:17 shane Exp $ */
 
 /***********************************************************************/
 /* Revision History                                                    */
@@ -32,6 +32,7 @@ extern "C"
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include <fileinfo.h>
 
 extern CHAR_DATA *character_list;
 extern struct descriptor_data *descriptor_list;
@@ -320,6 +321,30 @@ void save_clans(void)
   }  
   fprintf(fl, "~\n");
   dc_fclose(fl);
+
+extern short bport;
+ if(!bport) {
+  if(!(fl = dc_fopen(WEB_CLANS_LIST, "w"))) {
+    fprintf(stderr, "Unable to open web clan file for writing.\n");
+    abort();
+  }
+
+  for(pclan = clan_list; pclan; pclan = pclan->next) {
+    fprintf(fl, "%s %s %d\n", pclan->name, pclan->leader, pclan->number);
+    fprintf(fl, 
+               "$3Contact Email$R:  %s\n"
+               "$3Clan Hall$R:      %s\n"
+               "$3Clan info$R:\n"
+               "$3----------$R\n",
+                   pclan->email ? pclan->email : "(No Email)",
+                   pclan->rooms ? "Yes" : "No");
+  // This has to be separate, or if the leader uses $'s, it comes out funky
+    fprintf(fl, "%s\n",
+               pclan->description ? pclan->description : "(No Description)\r\n");
+  }
+  dc_fclose(fl);
+ } else log("Cannot save clans info file to web dir.", 0, LOG_MISC);
+
 }
 
 void free_clans_from_memory()
