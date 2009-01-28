@@ -881,9 +881,10 @@ int spell_earthquake(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
       capsize = true;
 	  break;
 	case SECT_UNDERWATER:
+          underwater = true;
 	  send_to_char("The earth trembles below you, the water pressure nearly makes you lose consciousness.\n\r", ch);
 	  act("$n's earthquake nearly makes you implode from the water pressure.", ch, 0, 0, TO_ROOM, 0);
-
+          break;
 	default:
 	  send_to_char("The earth trembles beneath your feet!\n\r", ch);
       act("$n makes the earth tremble and shiver.\n\r", ch, 0, 0, TO_ROOM, 0);
@@ -895,15 +896,17 @@ int spell_earthquake(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
    {
 	 temp = tmp_victim->next;
 	 if ( (ch->in_room == tmp_victim->in_room) 
-           && (ch != tmp_victim) 
+               && (ch != tmp_victim) 
 	       && (!ARE_GROUPED(ch,tmp_victim))
-	       && can_be_attacked(ch, tmp_victim) )
-     {
-       if(IS_NPC(ch) && IS_NPC(tmp_victim)) // mobs don't earthquake each other
-         continue;
-       if( !underwater &&
-	       (IS_AFFECTED(tmp_victim, AFF_FREEFLOAT) 
-		   || IS_AFFECTED(tmp_victim, AFF_FLYING)) ) 
+	       && can_be_attacked(ch, tmp_victim) 
+            )
+         {
+           if(IS_NPC(ch) && IS_NPC(tmp_victim)) // mobs don't earthquake each other
+             continue;
+           if( !underwater 
+               && (IS_AFFECTED(tmp_victim, AFF_FREEFLOAT) 
+		   || IS_AFFECTED(tmp_victim, AFF_FLYING)) 
+             ) 
 	   {
          send_to_char("The shaking ground has no effect on you.\n\r", tmp_victim);
 		 dam = 0;
@@ -935,7 +938,8 @@ int spell_earthquake(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
 		 }
 	   }	   
 		int retval2 = 0;
-		retval2 = damage(ch, tmp_victim, dam, TYPE_MAGIC, SPELL_EARTHQUAKE, weap_spell);
+                if (dam > 0)
+		  retval2 = damage(ch, tmp_victim, dam, TYPE_MAGIC, SPELL_EARTHQUAKE, weap_spell);
 
 		if (victim == tmp_victim && IS_SET(retval2, eVICT_DIED))
 			SET_BIT(retval, eVICT_DIED);
