@@ -865,7 +865,6 @@ int spell_earthquake(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
   bool capsize = false;
   bool underwater = false;
   CHAR_DATA *tmp_victim, *temp;
-  dam = 150;
 
   switch(world[ch->in_room].sector_type)
   {
@@ -887,7 +886,7 @@ int spell_earthquake(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
           break;
 	default:
 	  send_to_char("The earth trembles beneath your feet!\n\r", ch);
-      act("$n makes the earth tremble and shiver.\n\r", ch, 0, 0, TO_ROOM, 0);
+          act("$n makes the earth tremble and shiver.\n\r", ch, 0, 0, TO_ROOM, 0);
 	  break;
   }
   
@@ -903,13 +902,15 @@ int spell_earthquake(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
          {
            if(IS_NPC(ch) && IS_NPC(tmp_victim)) // mobs don't earthquake each other
              continue;
+           dam = 150;
+
            if( !underwater 
                && (IS_AFFECTED(tmp_victim, AFF_FREEFLOAT) 
 		   || IS_AFFECTED(tmp_victim, AFF_FLYING)) 
              ) 
 	   {
-         send_to_char("The shaking ground has no effect on you.\n\r", tmp_victim);
-		 dam = 0;
+             send_to_char("Debris from the earthquake flies in every direction and strikes you.\n\r", tmp_victim);
+             dam = 1;
 	   }
        else
        {
@@ -937,14 +938,16 @@ int spell_earthquake(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
 
 		 }
 	   }	   
-		int retval2 = 0;
                 if (dam > 0)
+                {
+		  int retval2 = 0;
 		  retval2 = damage(ch, tmp_victim, dam, TYPE_MAGIC, SPELL_EARTHQUAKE, weap_spell);
 
-		if (victim == tmp_victim && IS_SET(retval2, eVICT_DIED))
+		  if (victim == tmp_victim && IS_SET(retval2, eVICT_DIED))
 			SET_BIT(retval, eVICT_DIED);
-		else if (IS_SET(retval2, eCH_DIED))
+		  else if (IS_SET(retval2, eCH_DIED))
 		  	{ SET_BIT(retval, eCH_DIED); break; }
+                }
 		  
 	 } 
          else if (world[ch->in_room].zone == world[tmp_victim->in_room].zone)
@@ -1311,30 +1314,39 @@ int spell_firestorm(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
 {
   int dam;
   int retval = eSUCCESS;
+  int retval2;
   CHAR_DATA *tmp_victim, *temp;
 
   send_to_char("$B$4Fire$R falls from the heavens!\n\r", ch);
   act("$n makes $B$4fire$R fall from the heavens!\n\r",
 		ch, 0, 0, TO_ROOM, 0);
 
-  for (tmp_victim = character_list; tmp_victim; tmp_victim = temp) {
+  for (tmp_victim = character_list; tmp_victim; tmp_victim = temp) 
+  {
     temp = tmp_victim->next;
 
-    if ((ch->in_room == tmp_victim->in_room) &&
-	(ch != tmp_victim) &&
-	(!ARE_GROUPED(ch, tmp_victim)) &&
-	can_be_attacked(ch, tmp_victim)) {
+    if ((ch->in_room == tmp_victim->in_room) 
+        && (ch != tmp_victim) 
+        && (!ARE_GROUPED(ch, tmp_victim)) 
+        && can_be_attacked(ch, tmp_victim)) 
+    {
       
       dam = 250;
+         
+      retval2 = damage(ch, tmp_victim, dam, TYPE_FIRE, SPELL_FIRESTORM, 0);
 
-      retval = damage(ch, tmp_victim, dam, TYPE_FIRE, SPELL_FIRESTORM, 0);
-      if (SOMEONE_DIED(retval)) {
-	return retval;
+      if (IS_SET(retval2, eVICT_DIED))
+        SET_BIT(retval, eVICT_DIED);
+      else if (IS_SET(retval2, eCH_DIED))
+      { 
+        SET_BIT(retval, eCH_DIED); 
+        break; 
       }
-    } else {
-      if (world[ch->in_room].zone == world[tmp_victim->in_room].zone) {
-	send_to_char("You feel a HOT blast of air.\n\r", tmp_victim);
-      }
+    } 
+    else 
+    {
+      if (world[ch->in_room].zone == world[tmp_victim->in_room].zone) 
+        send_to_char("You feel a HOT blast of air.\n\r", tmp_victim);
     }
   }
 
