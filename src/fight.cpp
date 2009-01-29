@@ -20,7 +20,7 @@
  * 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead *
  * of just race stuff                                                     *
  **************************************************************************
- * $Id: fight.cpp,v 1.529 2009/01/24 06:53:45 kkoons Exp $               *
+ * $Id: fight.cpp,v 1.530 2009/01/29 21:30:37 kkoons Exp $               *
  **************************************************************************/
 
 extern "C"
@@ -1960,7 +1960,7 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
   if (IS_SET(victim->immune, weapon_bit))
    imm = TRUE;
 
-  if (attacktype < MAX_SPL_LIST && ch)
+  if (attacktype < MAX_SPL_LIST && ch && dam > 1)
   {
      if (attacktype != SPELL_MAGIC_MISSILE &&
 	 attacktype != SPELL_BEE_STING &&
