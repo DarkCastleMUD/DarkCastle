@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.184 2009/01/24 06:55:12 kkoons Exp $ */
+/* $Id: handler.cpp,v 1.185 2009/01/30 06:42:06 kkoons Exp $ */
     
 extern "C"
 {
@@ -1551,8 +1551,8 @@ void affect_remove( CHAR_DATA *ch, struct affected_type *af, int flags)
             send_to_char("Your mind recovers from the repelance.\n\r", ch);
          break;
       case SKILL_JAB:
-         if (!(flags & SUPPRESS_MESSAGES))
-            send_to_char("You feel ready to jab some poor sucker again.\r\n", ch);
+         if (!(flags & SUPPRESS_MESSAGES) && af->bitvector != AFF_BLACKJACK)
+           send_to_char("You feel ready to jab some poor sucker again.\r\n", ch);
          break;
       case SKILL_VITAL_STRIKE:
          if (!(flags & SUPPRESS_MESSAGES))
