@@ -12,7 +12,7 @@ struct player_shop_item {
    uint32 price;                   // asking price of item
    player_shop_item * next;     // next item in list
 };
-#define MAX_SHOP 64
+#define MAX_SHOP 70
 #define MAX_TRADE 5
 #define PC_SHOP_OWNER_SIZE      20
 #define PC_SHOP_SELL_MESS_SIZE  120
