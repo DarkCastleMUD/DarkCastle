@@ -1987,73 +1987,82 @@ int spell_curse(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *
   int retval;
 
   if (obj && obj != ch->equipment[WIELD] && obj != ch->equipment[SECOND_WIELD]) {  //hack for weapon spells
-	 SET_BIT(obj->obj_flags.extra_flags, ITEM_NODROP);
-         act("$p glows $4red$R momentarily, before returning to its original color.", ch, obj, 0, TO_CHAR, 0);
-	 /* LOWER ATTACK DICE BY -1 */
-	  if(obj->obj_flags.type_flag == ITEM_WEAPON)  {
-		 if (obj->obj_flags.value[2] > 1) {
-		  obj->obj_flags.value[2]--;
-		 }
+    SET_BIT(obj->obj_flags.extra_flags, ITEM_NODROP);
+    act("$p glows $4red$R momentarily, before returning to its original color.", ch, obj, 0, TO_CHAR, 0);
+    /* LOWER ATTACK DICE BY -1 */
+    if (obj->obj_flags.type_flag == ITEM_WEAPON)  {
+      if (obj->obj_flags.value[2] > 1) {
+	obj->obj_flags.value[2]--;
+      }
 //		 else {
 //		  send_to_char("Your curse has failed.\n\r", ch);
 //		 }
-	  }
+    }
   } else {
-        if(!ch || !victim)
-          return eFAILURE;
-	int duration =0, save = 0;
-        set_cantquit(ch, victim);
-	if (skill < 41)      { duration = 1; save =  -5;}
-	else if (skill < 51) { duration = 2; save = -10;}
-	else if (skill < 61) { duration = 3; save = -15;}
-        else if (skill < 71) { duration = 4; save = -20;}
-        else if (skill < 81) { duration = 5; save = -25;}
-	else                 { duration = 6; save = -30;}
+    if (!ch || !victim)
+      return eFAILURE;
 
-	if (!IS_NPC(victim) && GET_LEVEL(victim) < 11)
-	{
-	  send_to_char("The curse fizzles!\r\n",ch);
- 	  return eSUCCESS;
-	}
-
- set_cantquit( ch, victim );
-
-   if (malediction_res(ch, victim, SPELL_CURSE) || 
-       (!IS_NPC(victim) && GET_LEVEL(victim) >= IMMORTAL)
-      ) {
-	act("$N resists your attempt to curse $M!", ch, NULL, victim, TO_CHAR,0);
-	act("$N resists $n's attempt to curse $M!", ch, NULL, victim, TO_ROOM,NOTVICT);
-	act("You resist $n's attempt to curse you!",ch,NULL,victim,TO_VICT,0);
-   } else {
-
-
-	 if (affected_by_spell(victim, SPELL_CURSE))
-		return eFAILURE;
-
-	 af.type      = SPELL_CURSE;
-	 af.duration  = duration;
-	 af.modifier  = save;
-	 af.location  = APPLY_SAVES;
-	if (skill > 70)
-         af.bitvector = AFF_CURSE;
-	else af.bitvector = -1;
-	 affect_to_char(victim, &af);
-	 act("$n briefly reveals a $4red$R aura!", victim, 0, 0, TO_ROOM, 0);
-	 act("You feel very uncomfortable as a curse takes hold of you.",victim,0,0,TO_CHAR, 0);
-     
+    // Curse in a prize arena follows rules of offensive spells
+    if (IS_SET(world[ch->in_room].room_flags, ARENA) && (arena.type == PRIZE || arena.type == CHAOS)) {
+      if(!can_be_attacked(ch, victim) || !can_attack(ch))
+	return eFAILURE;
     }
 
-  if(IS_NPC(victim) && !victim->fighting)
-  {
-    mob_suprised_sayings(victim, ch);
-    retval = attack(victim, ch, 0);
-    SWAP_CH_VICT(retval);
-    return retval;
-  }
-  
-  }
 
+    int duration =0, save = 0;
+    set_cantquit(ch, victim);
+    if (skill < 41)      { duration = 1; save =  -5;}
+    else if (skill < 51) { duration = 2; save = -10;}
+    else if (skill < 61) { duration = 3; save = -15;}
+    else if (skill < 71) { duration = 4; save = -20;}
+    else if (skill < 81) { duration = 5; save = -25;}
+    else                 { duration = 6; save = -30;}
+
+    if (!IS_NPC(victim) && GET_LEVEL(victim) < 11) {
+      send_to_char("The curse fizzles!\r\n",ch);
+      return eSUCCESS;
+    }
+
+    set_cantquit( ch, victim );
+
+    if (malediction_res(ch, victim, SPELL_CURSE) || (!IS_NPC(victim) && GET_LEVEL(victim) >= IMMORTAL)) {
+      act("$N resists your attempt to curse $M!", ch, NULL, victim, TO_CHAR,0);
+      act("$N resists $n's attempt to curse $M!", ch, NULL, victim, TO_ROOM,NOTVICT);
+      act("You resist $n's attempt to curse you!",ch,NULL,victim,TO_VICT,0);
+    } else {
+      if (affected_by_spell(victim, SPELL_CURSE))
+	return eFAILURE;
+
+      af.type      = SPELL_CURSE;
+      af.duration  = duration;
+      af.modifier  = save;
+      af.location  = APPLY_SAVES;
+      if (skill > 70)
+	af.bitvector = AFF_CURSE;
+      else
+	af.bitvector = -1;
+
+      affect_to_char(victim, &af);
+      act("$n briefly reveals a $4red$R aura!", victim, 0, 0, TO_ROOM, 0);
+      act("You feel very uncomfortable as a curse takes hold of you.",victim,0,0,TO_CHAR, 0);
+    }
+
+    if (IS_NPC(victim) && !victim->fighting) {
+      mob_suprised_sayings(victim, ch);
+      retval = attack(victim, ch, 0);
+      SWAP_CH_VICT(retval);
+      return retval;
+    }
   
+    // Curse in a prize arena follows rules of offensive spells
+    if (IS_SET(world[ch->in_room].room_flags, ARENA) && (arena.type == PRIZE || arena.type == CHAOS)) {
+      if (!can_be_attacked(ch, victim) || !can_attack(ch))
+	return eFAILURE;
+
+      retval = attack(ch, victim, 0);
+      return retval;
+    }
+  }
   return eSUCCESS;
 }
 
