@@ -2163,20 +2163,20 @@ int do_mpsetmath(char_data *ch, char *arg, int cmd)
   if (lvali)
   {
     *lvali = i;
-    logf( IMMORTAL, LOG_WORLD, "Mpsetmath - %s set to %d: vnum %d.",
-  	r, i, mob_index[ch->mobdata->nr].virt );
+    //    logf( IMMORTAL, LOG_WORLD, "Mpsetmath - %s set to %d: vnum %d.",
+    //  	r, i, mob_index[ch->mobdata->nr].virt );
   }
   if (lvalb)
   {
     *lvalb = (sbyte)i;
-    logf( IMMORTAL, LOG_WORLD, "Mpsetmath - %s set to %d: vnum %d.",
-  	r, i, mob_index[ch->mobdata->nr].virt );
+    //    logf( IMMORTAL, LOG_WORLD, "Mpsetmath - %s set to %d: vnum %d.",
+    //  	r, i, mob_index[ch->mobdata->nr].virt );
   }
   if (lvalui)
   {
     *lvalui = (unsigned int)i;
-    logf( IMMORTAL, LOG_WORLD, "Mpsetmath - %s set to %d: vnum %d.",
-  	r, i, mob_index[ch->mobdata->nr].virt );
+    //    logf( IMMORTAL, LOG_WORLD, "Mpsetmath - %s set to %d: vnum %d.",
+    //  	r, i, mob_index[ch->mobdata->nr].virt );
   }
 
 
