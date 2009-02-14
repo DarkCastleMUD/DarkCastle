@@ -1793,10 +1793,14 @@ int do_opstat(char_data *ch, char *argument, int cmd)
 {
   char buf[MAX_STRING_LENGTH];
   char buf2[MAX_STRING_LENGTH];
-  sprintf(buf, "%s \n\r",argument);
-  send_to_char(buf,ch);
   int vnum = -1;
+
+  if(!*argument) {
+	send_to_char("Usage: opstat <vnum>\r\n ",ch);
+	return eFAILURE;
+  }
   one_argument(argument, buf2);
+
   if(!has_skill(ch, COMMAND_OPSTAT)) {
         send_to_char("Huh?\r\n", ch);
         return eFAILURE;
