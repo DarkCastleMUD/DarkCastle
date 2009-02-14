@@ -33,6 +33,9 @@ extern "C" {
 #include <mobile.h>
 #include <token.h>
 #include <spells.h>
+#include <string>
+
+using namespace std;
 
 extern CWorld world;
 extern struct descriptor_data *descriptor_list;
@@ -41,6 +44,11 @@ extern bool MOBtrigger;
 void send_message(TokenList * tokens, CHAR_DATA *ch, OBJ_DATA * obj, void * vch, int flags, CHAR_DATA *to);
 void send_message(const char *str, CHAR_DATA *to);
 
+
+void act(const string &str, CHAR_DATA *ch, OBJ_DATA *obj, void *vict_obj, int16 destination, int16 flags)
+{
+  act(str.c_str(), ch, obj, vict_obj, destination, flags);
+}
 
 void act
 (

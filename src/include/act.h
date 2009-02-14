@@ -7,14 +7,18 @@
 | Description:  This file contains the header information for the new
 |   act() function
 */
-#include <character.h>
-#include <obj.h>
+#include <string>
+#include "character.h"
+#include "obj.h"
 
 //--
 // Function interface
 //--
 void act(const char *str, CHAR_DATA *ch, OBJ_DATA *obj, void *vict_obj,
           int16 destination, int16 flags);
+
+void act(const std::string &str, CHAR_DATA *ch, OBJ_DATA *obj, void *vict_obj,
+	 int16 destination, int16 flags);
 
 //--
 // Constants

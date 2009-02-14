@@ -1,35 +1,95 @@
 /************************************************************************
-| $Id: channel.cpp,v 1.25 2009/01/24 06:37:20 kkoons Exp $
+| $Id: channel.cpp,v 1.26 2009/02/14 23:05:59 jhhudso Exp $
 | channel.C
 | Description:  All of the channel - type commands; do_say, gossip, etc..
 */
-extern "C"
-{
-  #include <ctype.h>
-  #include <string.h> //strstr()
-}
+
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
 
-#include <structs.h>
-#include <player.h>
-#include <room.h>
-#include <character.h>
-#include <utility.h>
-#include <levels.h>
-#include <connect.h>
-#include <mobile.h>
-#include <handler.h>
-#include <interp.h>
-#include <terminal.h>
-#include <act.h>
-#include <db.h>
-#include <returnvals.h>
+#include <string.h> //strstr()
+#include <cctype>
 #include <string>
+#include <sstream>
+
+#include "structs.h"
+#include "player.h"
+#include "room.h"
+#include "character.h"
+#include "utility.h"
+#include "levels.h"
+#include "connect.h"
+#include "mobile.h"
+#include "handler.h"
+#include "interp.h"
+#include "terminal.h"
+#include "act.h"
+#include "db.h"
+#include "returnvals.h"
+
 using namespace std;
 
-queue<string> gossip_history;
+class channel_msg {
+public:
+  channel_msg(const char_data *sender, const int32_t type, const char *msg) 
+    : type(type), msg(string(msg))
+  { 
+    set_wizinvis(sender);
+    set_name(sender);
+  }
+
+  channel_msg(const char_data *sender, const int32_t type, const string &msg) 
+    : type(type), msg(msg)
+  { 
+    set_wizinvis(sender);
+    set_name(sender);
+  }
+
+  string get_msg(const int receiver_level) {
+    stringstream output;
+    string sender;
+
+    if (receiver_level < wizinvis) {
+      sender = "Someone";
+    } else {
+      sender = name;
+    }
+
+    switch(type) {
+    case CHANNEL_GOSSIP:
+      output << "$5$B" << sender << " gossips '" << msg << "$5$B'$R'";
+      break;
+    }
+
+    return output.str();
+  }
+
+  inline void set_wizinvis(const char_data *sender) {
+    if (sender && IS_PC(sender)) {
+      wizinvis = sender->pcdata->wizinvis;
+    } else {
+      wizinvis = 0;
+    }
+  }
+
+  inline void set_name(const char_data *sender) {
+    if (sender) {
+      name = string(GET_SHORT(sender));
+    } else {
+      name = string("Unknown");
+      logf(IMMORTAL, LOG_BUG, "channel_msg::set_name: sender is NULL. type: %d msg: %s", type, msg.c_str());
+    }
+  }
+
+private:
+  string name;
+  long wizinvis;
+  int32_t type;
+  string msg;
+};
+
+queue<channel_msg> gossip_history;
 queue<string> auction_history;
 queue<string> newbie_history;
 queue<string> trivia_history;
@@ -211,7 +271,6 @@ int do_pray(struct char_data *ch, char *arg, int cmd)
 
 int do_gossip(struct char_data *ch, char *argument, int cmd)
 {
-    char buf1[MAX_STRING_LENGTH];
     char buf2[MAX_STRING_LENGTH];
     struct descriptor_data *i;
     OBJ_DATA *tmp_obj;
@@ -258,12 +317,12 @@ int do_gossip(struct char_data *ch, char *argument, int cmd)
 
     if (!(*argument))
     {
-      queue<string> tmp = gossip_history;
+      queue<channel_msg> msgs = gossip_history;
       send_to_char("Here are the last 10 gossips:\n\r", ch);
-      while(!tmp.empty())
+      while(!msgs.empty())
       {
-	  act((tmp.front()).c_str(), ch, 0, ch, TO_VICT, 0);
-          tmp.pop();
+	act(msgs.front().get_msg(ch->level), ch, 0, ch, TO_VICT, 0);
+	msgs.pop();
       }
     }
     else 
@@ -274,26 +333,31 @@ int do_gossip(struct char_data *ch, char *argument, int cmd)
         GET_MOVE(ch) += 5;
         return eSUCCESS;
       }
-      sprintf(buf1, "$5$B%s gossips '%s'$R", GET_NAME(ch), argument);
-      buf1[4] = toupper(buf1[4]);
+
+      channel_msg msg(ch, CHANNEL_GOSSIP, argument);
 
       sprintf(buf2, "$5$BYou gossip '%s'$R", argument);
       act(buf2, ch, 0, 0, TO_CHAR, 0);
 
-      gossip_history.push(buf1);
-      if(gossip_history.size() > 10) gossip_history.pop();
+      gossip_history.push(msg);
+      if(gossip_history.size() > 10) {
+	gossip_history.pop();
+      }
 
-      for(i = descriptor_list; i; i = i->next)
-	 if(i->character != ch && !i->connected && 
-    	   (IS_SET(i->character->misc, CHANNEL_GOSSIP)) &&
-            !is_ignoring(i->character, ch)) {
-          for(tmp_obj = world[i->character->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
-            if(obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER) {
-              silence = TRUE;
-              break;
-            }
-	  if(!silence) act(buf1, ch, 0, i->character, TO_VICT, 0);
-        }
+      for(i = descriptor_list; i; i = i->next) {
+	 if(i->character != ch && !i->connected && (IS_SET(i->character->misc, CHANNEL_GOSSIP)) && !is_ignoring(i->character, ch)) {
+	   for(tmp_obj = world[i->character->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content) {
+	     if(obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER) {
+	       silence = TRUE;
+	       break;
+	     }
+	   }
+
+	   if(!silence) {
+	     act(msg.get_msg(i->character->level), ch, 0, i->character, TO_VICT, 0);
+	   }
+	 }
+      }
     }
     return eSUCCESS;
 }
