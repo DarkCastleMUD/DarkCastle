@@ -1791,15 +1791,23 @@ void opstat(char_data *ch, int vnum)
 
 int do_opstat(char_data *ch, char *argument, int cmd)
 {
+  char buf[MAX_STRING_LENGTH];
+  char buf2[MAX_STRING_LENGTH];
+  sprintf(buf, "%s \n\r",argument);
+  send_to_char(buf,ch);
   int vnum = -1;
+  one_argument(argument, buf2);
   if(!has_skill(ch, COMMAND_OPSTAT)) {
         send_to_char("Huh?\r\n", ch);
         return eFAILURE;
   }
-  if (isdigit(*argument))
+  if (isdigit(*buf2))
   {
      vnum = atoi(argument);
-  } else vnum = ch->pcdata->last_obj_edit;
+
+  } 
+  else vnum = ch->pcdata->last_obj_edit;
+
   opstat(ch,vnum);
   return eSUCCESS;
 }
