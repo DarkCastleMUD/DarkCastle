@@ -1,11 +1,7 @@
-/*
- * sing.c - implementation of bard songs
- * Pirahna
- *
- */
 /**************************************************************************
- *  Revision History                                                      *
- *  10/23/2003  Onager  Changed do_sing() to allow non-bard imms to sing  *
+ * sing.cpp - implementation of bard songs                                *
+ * Pirahna                                                                *
+ *                                                                        *
  **************************************************************************/
 
 extern "C"
@@ -1336,8 +1332,6 @@ int song_soothing_remembrance( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA 
 int execute_song_soothing_remembrance( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {
    int heal = 0;
-   char_data * master = NULL;
-   follow_type * fvictim = NULL;
    char buf[MAX_STRING_LENGTH];
 
    if(GET_KI(ch) < 3)
@@ -1350,70 +1344,32 @@ int execute_song_soothing_remembrance( ubyte level, CHAR_DATA *ch, char *arg, CH
    int combat, non_combat;
    get_instrument_bonus(ch, combat, non_combat);
 
-   if(ch->master && ch->master->in_room == ch->in_room && 
-                    ISSET(ch->affected_by, AFF_GROUP))
-      master = ch->master;
-   else master = ch;
+   for(char_data * tmp_char = world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
+     {
+       if(!ARE_GROUPED(ch, tmp_char))
+	 continue;
+       if(IS_UNDEAD(tmp_char))
+	 continue;
 
-   for(fvictim = master->followers; fvictim; fvictim = fvictim->next)
-   {
-      if(!ISSET(fvictim->follower->affected_by, AFF_GROUP) 
-         || fvictim->follower->in_room != ch->in_room)
-         continue;
-
-      heal = skill/2 + ((GET_MAX_MANA(fvictim->follower)*2) / 100) + (number(0, 20) - 10) + non_combat;
+      heal = skill/2 + ((GET_MAX_MANA(tmp_char)*2) / 100) + (number(0, 20) - 10) + non_combat;
       if(heal < 5) heal = 5;
 
-      if (IS_PC(fvictim->follower) && IS_SET(fvictim->follower->pcdata->toggles, PLR_DAMAGE))
+      if (IS_PC(tmp_char) && IS_SET(tmp_char->pcdata->toggles, PLR_DAMAGE))
       {
-        sprintf(buf, "You feel %s's Soothing Rememberance revitalize %d points of your mana.\r\n", 
-                GET_NAME(ch), heal);
-        send_to_char(buf,fvictim->follower);
-      }
-      else
-        send_to_char("You feel soothed.\r\n", fvictim->follower);
- 
-      GET_MANA(fvictim->follower) += heal;
-      if(GET_MANA(fvictim->follower) > GET_MAX_MANA(fvictim->follower))
-         GET_MANA(fvictim->follower) = GET_MAX_MANA(fvictim->follower);
-   }
-
-   if(ch->in_room == master->in_room)
-   {
-      heal = skill/2 + ((GET_MAX_MANA(master)*2) / 100) + (number(0, 20) - 10) + non_combat;
-      if(heal < 5) heal = 5;
-
-      if (IS_PC(master) && IS_SET(master->pcdata->toggles, PLR_DAMAGE))
-      {
-        if(master == ch)
+        if(tmp_char == ch)
           sprintf(buf, "You feel your Soothing Rememberance revitalize %d points of your mana.\r\n", heal);
         else
-          sprintf(buf, "You feel %s's Soothing Rememberance revitalize %d points of your mana.\r\n", 
-                   GET_NAME(ch),heal);
-        send_to_char(buf, master);
+	  sprintf(buf, "You feel %s's Soothing Rememberance revitalize %d points of your mana.\r\n", 
+		  GET_NAME(ch), heal);
+        send_to_char(buf, tmp_char);
       }
       else
-        send_to_char("You feel soothed.\r\n", master);
-
-      GET_MANA(master) += heal;
-      if(GET_MANA(master) > GET_MAX_MANA(master))
-         GET_MANA(master) = GET_MAX_MANA(master);
-   }
-
-   if(ch->followers)  // handle the bards charmies
-     for(fvictim = ch->followers; fvictim; fvictim = fvictim->next) 
-     {
-       if(IS_AFFECTED(fvictim->follower, AFF_CHARM) && IS_MOB(fvictim->follower) &&
-           ch->in_room == fvictim->follower->in_room) 
-       {
-         send_to_char("You feel soothed.\r\n", fvictim->follower);
-         heal = skill/2 + ((GET_MAX_MANA(fvictim->follower)*2) / 100) + (number(0, 20) - 10) + non_combat;
-         GET_MANA(fvictim->follower) += heal;
-         if(GET_MANA(fvictim->follower) > GET_MAX_MANA(fvictim->follower))
-           GET_MANA(fvictim->follower) = GET_MAX_MANA(fvictim->follower);
-       }
+        send_to_char("You feel soothed.\r\n", tmp_char);
+ 
+      GET_MANA(tmp_char) += heal;
+      if(GET_MANA(tmp_char) > GET_MAX_MANA(tmp_char))
+         GET_MANA(tmp_char) = GET_MAX_MANA(tmp_char);
      }
-       
 
   if(!skill_success(ch, NULL, SKILL_SONG_SOOTHING_REMEM)  ) {
       send_to_char("You run out of lyrics and end the song.\r\n", ch);
@@ -1439,8 +1395,6 @@ int song_traveling_march( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict
 int execute_song_traveling_march( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {
    int heal;
-   char_data * master = NULL;
-   follow_type * fvictim = NULL;
    struct affected_type af;
    char buf[MAX_STRING_LENGTH];
 
@@ -1455,68 +1409,36 @@ int execute_song_traveling_march( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DA
 
    GET_KI(ch) -= 1; 
 
-   if(ch->master && ch->master->in_room == ch->in_room && 
-                    ISSET(ch->affected_by, AFF_GROUP))
-      master = ch->master;
-   else master = ch;
-
    af.type = SKILL_SONG_TRAVELING_MARCH;
    af.modifier  = -10 - has_skill(ch, SKILL_SONG_TRAVELING_MARCH)/3;
    af.duration  = 1;
    af.location  = APPLY_AC;
    af.bitvector = -1;
 
-   for(fvictim = master->followers; fvictim; fvictim = fvictim->next)
-   {
-      if(!ISSET(fvictim->follower->affected_by, AFF_GROUP) || 
-         fvictim->follower->in_room != ch->in_room)
-         continue;
+   for(char_data * tmp_char = world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
+     {
+       if(!ARE_GROUPED(ch, tmp_char))
+	 continue;
+       if(IS_UNDEAD(tmp_char))
+	 continue;
 
-      heal = skill/2 + ((GET_MAX_MOVE(fvictim->follower)*2) / 100) + (number(0, 20) - 10) + non_combat;
+      heal = skill/2 + ((GET_MAX_MOVE(tmp_char)*2) / 100) + (number(0, 20) - 10) + non_combat;
       if(heal < 5) heal = 5;
 
-      if (IS_PC(fvictim->follower) && IS_SET(fvictim->follower->pcdata->toggles, PLR_DAMAGE))
+      if (IS_PC(tmp_char) && IS_SET(tmp_char->pcdata->toggles, PLR_DAMAGE))
       {
-        sprintf(buf, "You feel %s's Travelling March recovering %d moves for you.\r\n", GET_NAME(ch), heal);
-        send_to_char(buf,fvictim->follower);
+        if(tmp_char == ch) {
+          csendf(tmp_char, "You feel your Travelling March recover %d moves for you.\r\n", heal);
+	} else {
+	  sprintf(buf, "You feel %s's Travelling March recovering %d moves for you.\r\n", GET_NAME(ch), heal);
+	  send_to_char(buf, tmp_char);
+	}
       }
       else
-        send_to_char("Your feet feel lighter.\r\n", fvictim->follower);
-      GET_MOVE(fvictim->follower) += heal;
-      if(GET_MOVE(fvictim->follower) > GET_MAX_MOVE(fvictim->follower))
-         GET_MOVE(fvictim->follower) = GET_MAX_MOVE(fvictim->follower);
-
-      
-   }
-   if(ch->in_room == master->in_room)
-   {
-
-      heal = skill/2 + ((GET_MAX_MOVE(master)*2) / 100) + (number(0, 20) - 10) + non_combat;
-      if(heal < 5) heal = 5;
-
-      if ( IS_PC(master) && IS_SET(master->pcdata->toggles, PLR_DAMAGE))
-      {
-        if(master == ch)
-          csendf(master, "You feel your Travelling March recover %d moves for you.\r\n", heal);
-        else
-          csendf(master, "You feel %s's Travelling March recovering %d moves for you.\r\n", GET_NAME(ch), heal);
-
-      }
-      else      
-        send_to_char("Your feet feel lighter.\r\n", master);
-      GET_MOVE(master) += heal;
-      if(GET_MOVE(master) > GET_MAX_MOVE(master))
-         GET_MOVE(master) = GET_MAX_MOVE(master);
-   }
-   if(ch->followers)  // handle the bards charmies
-     for(fvictim = ch->followers; fvictim; fvictim = fvictim->next) {
-       if(IS_AFFECTED(fvictim->follower, AFF_CHARM) && IS_MOB(fvictim->follower) &&
-           ch->in_room == fvictim->follower->in_room) {
-         send_to_char("Your feet feel lighter.\r\n", fvictim->follower);
-         GET_MOVE(fvictim->follower) += skill/2 + ((GET_MAX_MOVE(fvictim->follower)*2) / 100) + (number(0, 20) - 10) + non_combat;
-         if(GET_MOVE(fvictim->follower) > GET_MAX_MOVE(fvictim->follower))
-           GET_MOVE(fvictim->follower) = GET_MAX_MOVE(fvictim->follower);
-       }
+        send_to_char("Your feet feel lighter.\r\n", tmp_char);
+      GET_MOVE(tmp_char) += heal;
+      if(GET_MOVE(tmp_char) > GET_MAX_MOVE(tmp_char))
+         GET_MOVE(tmp_char) = GET_MAX_MOVE(tmp_char);
      }
 
   if(!skill_success(ch, NULL, SKILL_SONG_TRAVELING_MARCH)  ) {
@@ -1885,9 +1807,6 @@ int song_flight_of_bee( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim
 
 int execute_song_flight_of_bee( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {
-   char_data * master = NULL;
-   follow_type * fvictim = NULL;
-
    struct affected_type af;
 
    af.type      = SKILL_SONG_FLIGHT_OF_BEE;
@@ -1897,41 +1816,22 @@ int execute_song_flight_of_bee( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA
    af.caster	= GET_NAME(ch); 
    af.bitvector = AFF_FLYING;
 
-   if(ch->master && ch->master->in_room == ch->in_room && 
-                    ISSET(ch->affected_by, AFF_GROUP))
-      master = ch->master;
-   else master = ch;
+   for(char_data * tmp_char = world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
+     {
+       if(!ARE_GROUPED(ch, tmp_char))
+	 continue;
+       if(IS_UNDEAD(tmp_char))
+	 continue;
 
-   for(fvictim = master->followers; fvictim; fvictim = fvictim->next)
-   {
-      if(!ISSET(fvictim->follower->affected_by, AFF_GROUP))
-         continue;
-
-      if(ch->in_room != fvictim->follower->in_room)
-        continue;
- 
-      if(affected_by_spell(fvictim->follower, SPELL_FLY))
+      if(affected_by_spell(tmp_char, SPELL_FLY))
       {
-         affect_from_char(fvictim->follower, SPELL_FLY);
-         send_to_char("Your fly spell dissipates.", fvictim->follower);
+         affect_from_char(tmp_char, SPELL_FLY);
+         send_to_char("Your fly spell dissipates.", tmp_char);
       }
-      if(affected_by_spell(fvictim->follower, SKILL_SONG_FLIGHT_OF_BEE))
-         affect_from_char(fvictim->follower, SKILL_SONG_FLIGHT_OF_BEE);
-      affect_to_char(fvictim->follower, &af);
-      send_to_char("Your feet feel like air.\r\n", fvictim->follower);
-   }
-
-   if(ch->in_room == master->in_room)
-   {
-      if(affected_by_spell(master, SPELL_FLY))
-      {
-         affect_from_char(master, SPELL_FLY);
-         send_to_char("Your fly spell dissipates.", master);
-      }
-      if(affected_by_spell(master, SKILL_SONG_FLIGHT_OF_BEE))
-         affect_from_char(master, SKILL_SONG_FLIGHT_OF_BEE);
-      affect_to_char(master, &af);
-      send_to_char("Your feet feel like air.\r\n", master);
+      if(affected_by_spell(tmp_char, SKILL_SONG_FLIGHT_OF_BEE))
+         affect_from_char(tmp_char, SKILL_SONG_FLIGHT_OF_BEE);
+      affect_to_char(tmp_char, &af);
+      send_to_char("Your feet feel like air.\r\n", tmp_char);
    }
 
    return eSUCCESS;
@@ -2061,230 +1961,156 @@ int song_mking_charge(ubyte level, CHAR_DATA *ch, char *Aag, CHAR_DATA *victim, 
 }
 int execute_song_jig_of_alacrity( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {
-   char_data * master = NULL;
-   follow_type * fvictim = NULL;
+  // Note, the jig effects everyone in the group BUT the bard.
+  
+  if(GET_KI(ch) < 2) { // we don't have the ki to keep the song going
+    return intrp_jig_of_alacrity(level, ch, arg, victim, -1);
+  }
 
-   // Note, the jig effects everyone in the group BUT the bard.
+  affected_type af;
+  af.type      = SKILL_SONG_JIG_OF_ALACRITY;
+  af.duration  = 1;
+  af.modifier  = 0;
+  af.location  = 0;
+  af.caster    = GET_NAME(ch);
+  af.bitvector = AFF_HASTE;
 
-   if(GET_KI(ch) < 2) // we don't have the ki to keep the song going
-   {
-     return intrp_jig_of_alacrity(level, ch, arg, victim, -1);
-   }
+  for(char_data * tmp_char = world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room) {
+    if (!ARE_GROUPED(ch, tmp_char))
+      continue;
+    if (IS_UNDEAD(tmp_char))
+      continue;
+    if (tmp_char == ch)
+      continue;
 
-   if(ch->master && ch->master->in_room == ch->in_room && 
-                    ISSET(ch->affected_by, AFF_GROUP))
-      master = ch->master;
-   else master = ch;
+    if (affected_by_spell(tmp_char, SPELL_HASTE)) {
+      affect_from_char(tmp_char, SPELL_HASTE);
+      send_to_char("Your limbs slow back to normal.\n\r", tmp_char);
+    }
+    
+    if (affected_by_spell(tmp_char, SKILL_SONG_JIG_OF_ALACRITY)) {
+      affect_from_char(tmp_char, SKILL_SONG_JIG_OF_ALACRITY);
+    }
+    
+    if (!affected_by_spell(tmp_char, SKILL_SONG_JIG_OF_ALACRITY)) {
+      affect_to_char(tmp_char, &af);
+      send_to_char("Your dance quickens your pulse!\r\n", tmp_char);
+    }
+  }
 
-   for(fvictim = master->followers; fvictim; fvictim = fvictim->next)
-   {
-//      if(ch == fvictim->follower) This affects singer.
-  //       continue;
+  if (!skill_success(ch, NULL, SKILL_SONG_JIG_OF_ALACRITY)) {
+    ch->song_timer = -1;
+    return eSUCCESS;
+  }
 
-      if(!ISSET(fvictim->follower->affected_by, AFF_GROUP))
-         continue;
+  GET_KI(ch) -= 2;
+  
+  ch->song_timer = song_info[ch->song_number].beats + 
+    (GET_LEVEL(ch) > 33) +
+    (GET_LEVEL(ch) > 43);
 
-      if(ch->in_room != fvictim->follower->in_room)
-      {
-         if(ISSET(fvictim->follower->affected_by, AFF_HASTE) &&
-            !affected_by_spell(fvictim->follower, SPELL_HASTE))
-         {
-            REMBIT(fvictim->follower->affected_by, AFF_HASTE);
-            send_to_char("Your limbs slow back to normal.\n\r", fvictim->follower);
-         }
-         continue;
-      }
-      if(affected_by_spell(fvictim->follower, SPELL_HASTE))
-      {
-         affect_from_char(fvictim->follower, SPELL_HASTE);
-         send_to_char("Your limbs slow back to normal.\n\r", fvictim->follower);
-      }
-      SETBIT(fvictim->follower->affected_by, AFF_HASTE);
-      send_to_char("Your dance quickens your pulse!\r\n", fvictim->follower);
-   }
-
-//  if(ch != master)
-   if(ch->in_room == master->in_room)
-   {
-      SETBIT(master->affected_by, AFF_HASTE);
-      send_to_char("Your dance quickens your pulse!\r\n", master);
-   }
-   else
-   {
-      if(ISSET(master->affected_by, AFF_HASTE) &&
-         !affected_by_spell(master, SPELL_HASTE))
-      {
-         REMBIT(master->affected_by, AFF_HASTE);
-         send_to_char("Your limbs slow back to normal.\n\r", fvictim->follower);
-      }
-   }
-
-   if(!skill_success(ch, NULL, SKILL_SONG_JIG_OF_ALACRITY)) {
-      ch->song_timer = -1;
-      return eSUCCESS;
-   }
-
-   GET_KI(ch) -= 2;
-
-   ch->song_timer = song_info[ch->song_number].beats + 
-                             (GET_LEVEL(ch) > 33) +
-                             (GET_LEVEL(ch) > 43);
-   return eSUCCESS;
+  return eSUCCESS;
 }
 
 int execute_song_fanatical_fanfare(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {
-   char_data * master = NULL;
-   follow_type * fvictim = NULL;
-   struct affected_type af1, af2, af3;
+  struct affected_type af1, af2, af3;
 
-   af1.type      = SKILL_SONG_FANATICAL_FANFARE;
-   af1.duration  = skill/30;
-   af1.modifier  = 0;
-   af1.location  = 0;
-   af1.bitvector = AFF_INSOMNIA;
+  af1.type      = SKILL_SONG_FANATICAL_FANFARE;
+  af1.duration  = skill/30;
+  af1.modifier  = 0;
+  af1.location  = 0;
+  af1.bitvector = AFF_INSOMNIA;
 
-   af2.type      = SKILL_SONG_FANATICAL_FANFARE;
-   af2.duration  = skill/30;
-   af2.modifier  = 0;
-   af2.location  = 0;
-   af2.bitvector = AFF_FEARLESS;
+  af2.type      = SKILL_SONG_FANATICAL_FANFARE;
+  af2.duration  = skill/30;
+  af2.modifier  = 0;
+  af2.location  = 0;
+  af2.bitvector = AFF_FEARLESS;
+  
+  af3.type      = SKILL_SONG_FANATICAL_FANFARE;
+  af3.duration  = skill/30;
+  af3.modifier  = 0;
+  af3.location  = 0;
+  af3.bitvector = AFF_NO_PARA;
 
-   af3.type      = SKILL_SONG_FANATICAL_FANFARE;
-   af3.duration  = skill/30;
-   af3.modifier  = 0;
-   af3.location  = 0;
-   af3.bitvector = AFF_NO_PARA;
+  for(char_data * tmp_char = world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room) {
+    if (!ARE_GROUPED(ch, tmp_char))
+      continue;
+    if (IS_UNDEAD(tmp_char))
+      continue;
 
-   if(ch->master && ch->master->in_room == ch->in_room && 
-                    ISSET(ch->affected_by, AFF_GROUP))
-      master = ch->master;
-   else master = ch;
+    if (affected_by_spell(tmp_char, SKILL_SONG_FANATICAL_FANFARE)) {  
+      send_to_char("You manage to get far enough away to avoid being poked again!\r\n", tmp_char);
+      continue;
+    }
 
-   for(fvictim = master->followers; fvictim; fvictim = fvictim->next)
-   {
-//      if(ch == fvictim->follower)
-//         continue;
+    if(affected_by_spell(tmp_char, SPELL_INSOMNIA)) {
+      affect_from_char(tmp_char, SPELL_INSOMNIA);
+      send_to_char("Your mind returns to its normal state.\n\r", tmp_char);
+    }
 
-      if(!ISSET(fvictim->follower->affected_by, AFF_GROUP))
-        continue;
-
-      if(affected_by_spell(fvictim->follower, SKILL_SONG_FANATICAL_FANFARE))
-      {  
-        send_to_char("You manage to get far enough away to avoid being poked again!\r\n", fvictim->follower);
-	continue;
-      }
-
-      if(affected_by_spell(fvictim->follower, SPELL_INSOMNIA))
-      {
-         affect_from_char(fvictim->follower, SPELL_INSOMNIA);
-         send_to_char("Your mind returns to its normal state.\n\r", fvictim->follower);
-      }
-
-
-      affect_to_char(fvictim->follower, &af1);
-      if (skill > 85) 
-	affect_to_char(fvictim->follower, &af2);
-      if (skill > 90) 
-	affect_to_char(fvictim->follower, &af3);
-      send_to_char("Your mind races at a thousand miles an hour, following the beat of the song!\r\n", fvictim->follower);
-   }
-
-   if(ch->in_room == master->in_room)
-   {
-      if(!affected_by_spell(master, SKILL_SONG_FANATICAL_FANFARE))
-      {
-        affect_to_char(master, &af1);
-        if (skill > 85) 
-          affect_to_char(master, &af2);
-        if (skill > 90) 
-         affect_to_char(master, &af3);
-        if(ch == master)
-          send_to_char("Your song causes your mind to race at a thousand miles an hour!\r\n", master);
-        else
-          csendf(master, "%s's song causes your mind to race at a thousand miles an hour!\r\n", GET_NAME(ch));
-      }
-      else
-      {
-        if(ch == master)
-          send_to_char("Your mind is already racing!\n\r", master);
-        else
-          send_to_char("You manage to get far enough away to avoid being poked again!\r\n", master);
-      }
-   }
-   return eSUCCESS;
+    affect_to_char(tmp_char, &af1);
+    if (skill > 85) 
+      affect_to_char(tmp_char, &af2);
+    if (skill > 90) 
+      affect_to_char(tmp_char, &af3);
+    
+    if(ch == tmp_char)
+      send_to_char("Your song causes your mind to race at a thousand miles an hour!\r\n", tmp_char);
+    else
+      csendf(tmp_char, "%s's song causes your mind to race at a thousand miles an hour!\r\n", GET_NAME(ch));
+  }
+  
+  return eSUCCESS;
 }
 
 int execute_mking_charge(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {
-   char_data * master = NULL;
-   follow_type * fvictim = NULL;
-
    if(GET_KI(ch) < 5) // we don't have the ki to keep the song going
    {
      return intrp_mking_charge(level, ch, arg, victim, -1);
    }
-    struct affected_type af;
-  af.type      = SKILL_SONG_MKING_CHARGE;
-  af.duration  = 1;
-  af.modifier  = 0;
-  af.location  = 0;
- if (skill > 80)
-  af.bitvector = AFF_HASTE;
-else af.bitvector = -1;
 
-   if(ch->master && ch->master->in_room == ch->in_room && 
-                    ISSET(ch->affected_by, AFF_GROUP))
-      master = ch->master;
-   else master = ch;
+   struct affected_type af;
+   af.type      = SKILL_SONG_MKING_CHARGE;
+   af.duration  = 1;
+   af.modifier  = 0;
+   af.location  = 0;
 
-   for(fvictim = master->followers; fvictim; fvictim = fvictim->next)
-   {
-
-      if(!ISSET(fvictim->follower->affected_by, AFF_GROUP))
-         continue;
-
-      if(ch->in_room != fvictim->follower->in_room)
-      {
-	if (affected_by_spell(fvictim->follower, SKILL_SONG_MKING_CHARGE))
-	{
-         affect_from_char(fvictim->follower, SKILL_SONG_MKING_CHARGE);
-	 send_to_char("You lose the inspiration.\r\n",fvictim->follower);
-        }
-         continue;
-      }
-	
-	if (!affected_by_spell(fvictim->follower, SKILL_SONG_MKING_CHARGE))
-	affect_to_char(fvictim->follower, &af);
-     act("$n's songs and tales of your ancestors' struggles fuel you with rage, sending you into a temporary frenzy!  To arms!", ch, 0, fvictim->follower, TO_VICT, 0); 
-   }
-
-   if(ch->in_room == master->in_room) 
-   {
-	if (!affected_by_spell(master, SKILL_SONG_MKING_CHARGE))
-	affect_to_char(master, &af);
-     if (ch != master)
-     act("$n's songs and tales of your ancestors' struggles fuel you with rage, sending you into a temporary frenzy!  To arms!", ch, 0, master, TO_VICT, 0); 
-    else
-      send_to_char("Your songs and tales fuel you with rage, sending you into a temporary frenzy!  To arms!\r\n", master);
-   }
+   if (skill > 80)
+     af.bitvector = AFF_HASTE;
    else
-   {
-      if (affected_by_spell(master, SKILL_SONG_MKING_CHARGE))
-      {
-	affect_from_char(master, SKILL_SONG_MKING_CHARGE);
-	 send_to_char("You lose the inspiration.\r\n",master);
-      }
-   }
-   if (af.bitvector == AFF_HASTE)
-   {
-     send_to_char("Weaving the jig of alacrity into your song of battle, your allies move faster.\r\n",ch);
+     af.bitvector = -1;
+
+   for (char_data * tmp_char = world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room) {
+     if (!ARE_GROUPED(ch, tmp_char))
+       continue;
+     if (IS_UNDEAD(tmp_char))
+       continue;
+
+     if (affected_by_spell(tmp_char, SKILL_SONG_MKING_CHARGE))	{
+         affect_from_char(tmp_char, SKILL_SONG_MKING_CHARGE);
+	 send_to_char("You lose the inspiration.\r\n", tmp_char);
+     }
+
+     if (!affected_by_spell(tmp_char, SKILL_SONG_MKING_CHARGE)) {
+       affect_to_char(tmp_char, &af);
+
+       if (ch == tmp_char) {
+	 send_to_char("Your songs and tales fuel you with rage, sending you into a temporary frenzy!  To arms!\r\n", tmp_char);
+	 if (af.bitvector == AFF_HASTE) {
+	   send_to_char("Weaving the jig of alacrity into your song of battle, your allies move faster.\r\n",ch);
+	 }
+       } else {
+	 act("$n's songs and tales of your ancestors' struggles fuel you with rage, sending you into a temporary frenzy!  To arms!", ch, 0, tmp_char, TO_VICT, 0); 
+       }
+     }
    }
 
-   if (!skill_success(ch, NULL, SKILL_SONG_MKING_CHARGE))
-   {
-      ch->song_timer = -1;
-      return eSUCCESS;
+   if (!skill_success(ch, NULL, SKILL_SONG_MKING_CHARGE)) {
+     ch->song_timer = -1;
+     return eSUCCESS;
    }
 
    GET_KI(ch) -= 5;
