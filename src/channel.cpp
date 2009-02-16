@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: channel.cpp,v 1.26 2009/02/14 23:05:59 jhhudso Exp $
+| $Id: channel.cpp,v 1.27 2009/02/16 07:05:15 jhhudso Exp $
 | channel.C
 | Description:  All of the channel - type commands; do_say, gossip, etc..
 */
@@ -58,7 +58,7 @@ public:
 
     switch(type) {
     case CHANNEL_GOSSIP:
-      output << "$5$B" << sender << " gossips '" << msg << "$5$B'$R'";
+      output << "$5$B" << sender << " gossips '" << msg << "$5$B'$R";
       break;
     }
 
