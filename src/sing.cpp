@@ -1078,8 +1078,6 @@ int execute_song_healing_melody( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DAT
    {
        if(!ARE_GROUPED(ch, tmp_char))
 	   continue;
-       if(IS_UNDEAD(tmp_char))
-	   continue;
        
       heal = skill/2 + ((GET_MAX_HIT(tmp_char)*2) / 100) + (number(0, 20) - 10) + non_combat;
       if(heal < 5) heal = 5;
@@ -1348,8 +1346,6 @@ int execute_song_soothing_remembrance( ubyte level, CHAR_DATA *ch, char *arg, CH
      {
        if(!ARE_GROUPED(ch, tmp_char))
 	 continue;
-       if(IS_UNDEAD(tmp_char))
-	 continue;
 
       heal = skill/2 + ((GET_MAX_MANA(tmp_char)*2) / 100) + (number(0, 20) - 10) + non_combat;
       if(heal < 5) heal = 5;
@@ -1414,12 +1410,11 @@ int execute_song_traveling_march( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DA
    af.duration  = 1;
    af.location  = APPLY_AC;
    af.bitvector = -1;
+   af.caster	= GET_NAME(ch);
 
    for(char_data * tmp_char = world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
      {
        if(!ARE_GROUPED(ch, tmp_char))
-	 continue;
-       if(IS_UNDEAD(tmp_char))
 	 continue;
 
       heal = skill/2 + ((GET_MAX_MOVE(tmp_char)*2) / 100) + (number(0, 20) - 10) + non_combat;
@@ -1775,6 +1770,7 @@ int execute_song_insane_chant( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA 
    af.modifier  = 0;
    af.location  = APPLY_INSANE_CHANT;
    af.bitvector = -1;
+   af.caster	= GET_NAME(ch);
 
    act("$n's singing starts to drive you INSANE!!!", ch, 0, 0, TO_ROOM, 0);
    send_to_char("Your singing drives everyone around you INSANE!!!\r\n", ch);
@@ -1819,8 +1815,6 @@ int execute_song_flight_of_bee( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA
    for(char_data * tmp_char = world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
      {
        if(!ARE_GROUPED(ch, tmp_char))
-	 continue;
-       if(IS_UNDEAD(tmp_char))
 	 continue;
 
       if(affected_by_spell(tmp_char, SPELL_FLY))
@@ -1978,8 +1972,6 @@ int execute_song_jig_of_alacrity( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DA
   for(char_data * tmp_char = world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room) {
     if (!ARE_GROUPED(ch, tmp_char))
       continue;
-    if (IS_UNDEAD(tmp_char))
-      continue;
     if (tmp_char == ch)
       continue;
 
@@ -2021,23 +2013,24 @@ int execute_song_fanatical_fanfare(ubyte level, CHAR_DATA *ch, char *arg, CHAR_D
   af1.modifier  = 0;
   af1.location  = 0;
   af1.bitvector = AFF_INSOMNIA;
+  af1.caster	= GET_NAME(ch);
 
   af2.type      = SKILL_SONG_FANATICAL_FANFARE;
   af2.duration  = skill/30;
   af2.modifier  = 0;
   af2.location  = 0;
   af2.bitvector = AFF_FEARLESS;
-  
+  af2.caster	= GET_NAME(ch);
+     
   af3.type      = SKILL_SONG_FANATICAL_FANFARE;
   af3.duration  = skill/30;
   af3.modifier  = 0;
   af3.location  = 0;
   af3.bitvector = AFF_NO_PARA;
+  af3.caster	= GET_NAME(ch);
 
   for(char_data * tmp_char = world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room) {
     if (!ARE_GROUPED(ch, tmp_char))
-      continue;
-    if (IS_UNDEAD(tmp_char))
       continue;
 
     if (affected_by_spell(tmp_char, SKILL_SONG_FANATICAL_FANFARE)) {  
@@ -2077,6 +2070,7 @@ int execute_mking_charge(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victi
    af.duration  = 1;
    af.modifier  = 0;
    af.location  = 0;
+   af.caster	= GET_NAME(ch);
 
    if (skill > 80)
      af.bitvector = AFF_HASTE;
@@ -2085,8 +2079,6 @@ int execute_mking_charge(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victi
 
    for (char_data * tmp_char = world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room) {
      if (!ARE_GROUPED(ch, tmp_char))
-       continue;
-     if (IS_UNDEAD(tmp_char))
        continue;
 
      if (affected_by_spell(tmp_char, SKILL_SONG_MKING_CHARGE))	{
@@ -2255,12 +2247,14 @@ int execute_song_glitter_dust( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA 
    af.modifier  = 0;
    af.location  = APPLY_GLITTER_DUST;
    af.bitvector = -1;
+   af.caster	= GET_NAME(ch);
 
-   af2.type = SKILL_GLITTER_DUST;
-   af2.duration = (GET_LEVEL(ch) > 25) ? 2 : 1;
-   af2.modifier = 10 + has_skill(ch, SKILL_SONG_GLITTER_DUST)/3;
-   af2.location = APPLY_AC;
+   af2.type      = SKILL_GLITTER_DUST;
+   af2.duration  = (GET_LEVEL(ch) > 25) ? 2 : 1;
+   af2.modifier  = 10 + has_skill(ch, SKILL_SONG_GLITTER_DUST)/3;
+   af2.location  = APPLY_AC;
    af2.bitvector = -1;
+   af2.caster	 = GET_NAME(ch);
 
    act("The dust in the air clings to you, and begins to shine!", ch, 0, 0, TO_ROOM, 0);
    send_to_char("Your dust clings to everyone, showing where they are!\r\n", ch);
@@ -2588,58 +2582,47 @@ int song_vigilant_siren( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victi
 
 int execute_song_vigilant_siren( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {
-   char_data * master = NULL;
-   follow_type * fvictim = NULL;
-
    if(GET_KI(ch) < 2) // we don't have the ki to keep the song going
    {
      return intrp_vigilant_siren(level, ch, arg, victim, -1);
    }
 
-   if(ch->master && ch->master->in_room == ch->in_room && 
-                    ISSET(ch->affected_by, AFF_GROUP))
-      master = ch->master;
-   else master = ch;
+   struct affected_type af1, af2, af3;
 
-   for(fvictim = master->followers; fvictim; fvictim = fvictim->next)
-   {
-      if(!ISSET(fvictim->follower->affected_by, AFF_GROUP))
-         continue;
+   af1.type      = SKILL_SONG_VIGILANT_SIREN;
+   af1.duration  = 1;
+   af1.modifier  = 0;
+   af1.location  = 0;
+   af1.bitvector = AFF_ALERT;
+   af1.caster	 = GET_NAME(ch);
 
-      if(ch->in_room != fvictim->follower->in_room) {
-         if(ISSET(fvictim->follower->affected_by, AFF_ALERT)) {
-            REMBIT(fvictim->follower->affected_by, AFF_ALERT);
-            send_to_char("You stop watching your back so closely.\r\n", fvictim->follower);
-         }
-         if(IS_AFFECTED(fvictim->follower, AFF_NO_CIRCLE))
-            REMBIT(fvictim->follower->affected_by, AFF_NO_CIRCLE);
-         if(IS_AFFECTED(fvictim->follower, AFF_NO_BEHEAD))
-            REMBIT(fvictim->follower->affected_by, AFF_NO_BEHEAD);
-         continue;
-      }
-      if (ch->in_room != fvictim->follower->in_room) continue;
-      SETBIT(fvictim->follower->affected_by, AFF_ALERT);
-      if(skill > 85) SETBIT(fvictim->follower->affected_by, AFF_NO_CIRCLE);
-      if(skill > 90) SETBIT(fvictim->follower->affected_by, AFF_NO_BEHEAD);
-      send_to_char("You nervously watch your surroundings with magical speed!\r\n", fvictim->follower);
-   }
+   af2.type      = SKILL_SONG_VIGILANT_SIREN;
+   af2.duration  = 1;
+   af2.modifier  = 0;
+   af2.location  = 0;
+   af2.bitvector = AFF_NO_CIRCLE;
+   af2.caster	 = GET_NAME(ch);
 
-   if(ch->in_room == master->in_room)
-   {
-      SETBIT(master->affected_by, AFF_ALERT);
-      if(skill > 85) SETBIT(master->affected_by, AFF_NO_CIRCLE);
-      if(skill > 90) SETBIT(master->affected_by, AFF_NO_BEHEAD);
-      send_to_char("You nervously watch your surroundings with magical speed!\r\n", master);
-   }
-   else {
-      if(ISSET(master->affected_by, AFF_ALERT)) {
-         REMBIT(master->affected_by, AFF_ALERT);
-         send_to_char("You stop watching your back so closely.\r\n", master);
-      }
-      if(IS_AFFECTED(master, AFF_NO_CIRCLE))
-         REMBIT(master->affected_by, AFF_NO_CIRCLE);
-      if(IS_AFFECTED(master, AFF_NO_BEHEAD))
-         REMBIT(master->affected_by, AFF_NO_BEHEAD);
+   af3.type      = SKILL_SONG_VIGILANT_SIREN;
+   af3.duration  = 1;
+   af3.modifier  = 0;
+   af3.location  = 0;
+   af3.bitvector = AFF_NO_BEHEAD;
+   af3.caster	 = GET_NAME(ch);
+
+   for (char_data * tmp_char = world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room) {
+     if (!ARE_GROUPED(ch, tmp_char))
+       continue;
+
+     affect_to_char(tmp_char, &af1);
+
+     if(skill > 85)
+       affect_to_char(tmp_char, &af2);
+
+     if(skill > 90)
+       affect_to_char(tmp_char, &af3);
+
+     send_to_char("You nervously watch your surroundings with magical speed!\r\n", tmp_char);
    }
 
    if(!skill_success(ch, NULL, SKILL_SONG_VIGILANT_SIREN)) {
