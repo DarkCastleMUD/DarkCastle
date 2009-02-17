@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: non_off.cpp,v 1.57 2009/01/24 19:21:13 kkoons Exp $
+| $Id: non_off.cpp,v 1.58 2009/02/17 21:15:41 kkoons Exp $
 | non_off.C
 | Description:  Implementation of generic, non-offensive commands.
 */
@@ -1289,14 +1289,14 @@ bool CVoteData::Vote(struct char_data *ch, unsigned int vote)
     send_to_char("Monsters don't get to vote!\n\r", ch);
     return false;
   }
-
+  
   if(this->HasVoted(ch))
   {
     send_to_char("You have already voted!\n\r", ch);
     return false;
   }
 
-  if(vote > answers.size())
+  if(vote > answers.size() || vote == 0)
   {
     send_to_char("That answer doesn't exist.\n\r", ch);
     return false;
