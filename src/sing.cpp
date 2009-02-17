@@ -1775,18 +1775,21 @@ int execute_song_insane_chant( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA 
    act("$n's singing starts to drive you INSANE!!!", ch, 0, 0, TO_ROOM, 0);
    send_to_char("Your singing drives everyone around you INSANE!!!\r\n", ch);
 
-   for(victim = world[ch->in_room].people; victim && victim != ch; victim = victim->next_in_room)
-   {
+   for(victim = world[ch->in_room].people; victim && victim != ch; victim = victim->next_in_room) {
      // don't effect gods unless it was a higher level god singing
      if(GET_LEVEL(victim) >= IMMORTAL && GET_LEVEL(ch) <= GET_LEVEL(victim))
        continue;
-   if (number(1,100) < get_saves(victim, SAVE_TYPE_POISON))
-   {
-     act("$N resists your insane chant!", ch, NULL, victim, TO_CHAR,0);
-     act("$N resists $n's insane chant!", ch, NULL, victim, TO_ROOM,NOTVICT);
-     act("You resist $n's insane chant!",ch,NULL,victim,TO_VICT,0);
-     continue;
-   }
+
+     if (number(1,100) < get_saves(victim, SAVE_TYPE_POISON)) {
+       act("$N resists your insane chant!", ch, NULL, victim, TO_CHAR,0);
+       act("$N resists $n's insane chant!", ch, NULL, victim, TO_ROOM,NOTVICT);
+       act("You resist $n's insane chant!",ch,NULL,victim,TO_VICT,0);
+       continue;
+     }
+
+     if (affected_by_spell(victim, SKILL_INSANE_CHANT)) {
+       affect_from_char(victim, SKILL_INSANE_CHANT);
+     }
 
      affect_to_char(victim, &af);
    }
@@ -1812,22 +1815,23 @@ int execute_song_flight_of_bee( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA
    af.caster	= GET_NAME(ch); 
    af.bitvector = AFF_FLYING;
 
-   for(char_data * tmp_char = world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
-     {
-       if(!ARE_GROUPED(ch, tmp_char))
-	 continue;
+   for(char_data * tmp_char = world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room) {
+     if(!ARE_GROUPED(ch, tmp_char))
+       continue;
+     
+     if(affected_by_spell(tmp_char, SPELL_FLY)) {
+       affect_from_char(tmp_char, SPELL_FLY);
+       send_to_char("Your fly spell dissipates.", tmp_char);
+     }
 
-      if(affected_by_spell(tmp_char, SPELL_FLY))
-      {
-         affect_from_char(tmp_char, SPELL_FLY);
-         send_to_char("Your fly spell dissipates.", tmp_char);
-      }
-      if(affected_by_spell(tmp_char, SKILL_SONG_FLIGHT_OF_BEE))
-         affect_from_char(tmp_char, SKILL_SONG_FLIGHT_OF_BEE);
-      affect_to_char(tmp_char, &af);
-      send_to_char("Your feet feel like air.\r\n", tmp_char);
+     if (affected_by_spell(tmp_char, SKILL_SONG_FLIGHT_OF_BEE)) {
+       affect_from_char(tmp_char, SKILL_SONG_FLIGHT_OF_BEE);
+     }
+     affect_to_char(tmp_char, &af);
+
+     send_to_char("Your feet feel like air.\r\n", tmp_char);
    }
-
+   
    return eSUCCESS;
 }
 
@@ -1870,7 +1874,7 @@ int execute_song_searching_song( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DAT
 	return eFAILURE;
    }
 
-   sprintf(buf, "Your song finds %s ", GET_SHORT(target));
+   snprintf(buf, 200, "Your song finds %s ", GET_SHORT(target));
 
    switch(GET_POS(target)) {
       case POSITION_STUNNED  :
@@ -2613,6 +2617,10 @@ int execute_song_vigilant_siren( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DAT
    for (char_data * tmp_char = world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room) {
      if (!ARE_GROUPED(ch, tmp_char))
        continue;
+
+     if (affected_by_spell(tmp_char, SKILL_SONG_VIGILANT_SIREN)) {
+       affect_from_char(tmp_char, SKILL_SONG_VIGILANT_SIREN);
+     }
 
      affect_to_char(tmp_char, &af1);
 
