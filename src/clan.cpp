@@ -1,4 +1,4 @@
-/* $Id: clan.cpp,v 1.72 2009/01/27 03:30:17 shane Exp $ */
+/* $Id: clan.cpp,v 1.73 2009/02/17 21:37:25 kkoons Exp $ */
 
 /***********************************************************************/
 /* Revision History                                                    */
@@ -3254,6 +3254,7 @@ int do_clanarea(CHAR_DATA *ch, char *argument, int cmd)
 		"clanarea list         (lists areas currently claimed by your clan)\r\n"
 		"clanarea claim        (claim the area you are currently in for your clan)\r\n"
 		"clanarea challenge    (challenge for control of the area you are currently in)\r\n"
+		"clanarea withdraw     (withdraw a recently issued challenge)\r\n"
 		"clanarea yield        (yield an area your clan controls that you are currently in)\r\n"
 		"clanarea collect      (collect bounty from an area you are currently in that your clan controls)\r\n",ch);
   return eSUCCESS;
