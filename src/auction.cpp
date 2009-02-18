@@ -1388,6 +1388,11 @@ void AuctionHouse::AddItem(CHAR_DATA *ch, OBJ_DATA *obj, unsigned int price, str
     return;
   }
 
+  if (obj->obj_flags.type_flag == ITEM_CONTAINER && obj->contains)  { // non-empty containers
+    csendf(ch, "%s needs to be emptied first.\r\n", GET_OBJ_SHORT(obj));
+    return;
+  }
+
   if(price > AUC_MAX_PRICE)
   {
     csendf(ch, "Price must be between %u and %u.\n\r", AUC_MIN_PRICE, AUC_MAX_PRICE);
