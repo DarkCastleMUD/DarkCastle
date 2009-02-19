@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.191 2009/01/27 03:30:17 shane Exp $ */
+/* $Id: db.cpp,v 1.192 2009/02/19 01:43:40 jhhudso Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -453,11 +453,6 @@ int do_write_skillquest(struct char_data *ch, char *argument, int cmd)
 {
    struct skill_quest *curr;
    FILE *fl;
-  if (ch)
-  if(!has_skill(ch, COMMAND_SQSAVE)) {
-        send_to_char("Huh?\r\n", ch);
-        return eFAILURE;
-  }
 
    if (!(fl = dc_fopen(SKILL_QUEST_FILE,"w")))
    {

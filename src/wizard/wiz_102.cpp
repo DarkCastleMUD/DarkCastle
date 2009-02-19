@@ -4667,10 +4667,6 @@ int do_sockets(struct char_data *ch, char *argument, int cmd)
    descriptor_data * d = 0, *ad = 0;
 
    extern char *connected_states[];
-  if(!has_skill(ch, COMMAND_SOCKETS)) {
-        send_to_char("Huh?\r\n", ch);
-        return eFAILURE;
-  }
 
    if (IS_NPC(ch)) {
       send_to_char( "Monsters don't care who's logged in.\n\r", ch );
@@ -4816,11 +4812,6 @@ int do_punish(struct char_data *ch, char *arg, int cmd)
    char_data *vict;
 
    int i;
-
-   if(!has_skill(ch, COMMAND_PUNISH)) {
-      send_to_char("Huh?\r\n", ch);
-      return eFAILURE;
-   }
 
    if(IS_MOB(ch)) {
       send_to_char("Punish yourself!  Bad mob!\r\n", ch);

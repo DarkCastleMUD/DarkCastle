@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: who.cpp,v 1.51 2009/01/04 18:33:00 jhhudso Exp $
+| $Id: who.cpp,v 1.52 2009/02/19 01:43:40 jhhudso Exp $
 | who.C
 | Commands for who, maybe? :P
 */
@@ -307,9 +307,9 @@ int do_who(struct char_data *ch, char *argument, int cmd)
       "  Architect  ",
       "    Deity    ",
       "   Overseer  ",
-      "   --------  ",
-      "   --------  ",
       "   Divinity  ",
+      "   --------  ",
+      " Coordinator ",
       "   --------  ",
       " Implementor "
     };

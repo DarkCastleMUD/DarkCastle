@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: modify.cpp,v 1.28 2009/01/04 22:47:27 dcastle Exp $ */
+/* $Id: modify.cpp,v 1.29 2009/02/19 01:43:40 jhhudso Exp $ */
 
 extern "C"
 {
@@ -196,10 +196,6 @@ int do_string(CHAR_DATA *ch, char *arg, int cmd)
   CHAR_DATA *mob;
   struct obj_data *obj;
   struct extra_descr_data *ed, *tmp;
-  if(!has_skill(ch, COMMAND_STRING)) {
-        send_to_char("Huh?\r\n", ch);
-        return 1;
-  }
 
   if(IS_NPC(ch))
     return 1;

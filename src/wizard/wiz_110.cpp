@@ -77,10 +77,6 @@ int do_maxes(struct char_data *ch, char *argument, int cmd)
   argument = one_argument(argument, arg);
   one_argument(argument, arg2);
   int oclass = GET_CLASS(ch); // old class.
-  if(!has_skill(ch, COMMAND_WHATTONERF)) {
-        send_to_char("Huh?\r\n", ch);
-        return eFAILURE;
-  }
  
   // get_skill_list uses a char argument, and so to keep upkeep
    // at a min I'm just modifying this here.
@@ -405,12 +401,6 @@ int do_rename_char(struct char_data *ch, char *arg, int cmd)
   arg = one_argument(arg, oldname);
   arg = one_argument(arg, newname);
   arg = one_argument(arg, arg3);
-
-  if (!has_skill(ch, COMMAND_RENAME))
-  {
-    send_to_char("Huh?\r\n",ch);
-    return eFAILURE;
-  }
 
   if(!(*oldname) || !(*newname)) {
     send_to_char("Usage: rename <oldname> <newname> [takeplats]\n\r", ch);
@@ -787,14 +777,14 @@ extern long long mana_plats_spent(char_data * ch);
 
 
 
-int do_thing(CHAR_DATA *ch, char *argument, int cmd)
+int do_metastat(CHAR_DATA *ch, char *argument, int cmd)
 {
   char arg[MAX_INPUT_LENGTH];
   CHAR_DATA *victim;
   argument = one_argument(argument, arg);
   if (arg[0] == '\0' || !(victim = get_pc_vis(ch, arg)))
   {
-     send_to_char("Do_the_thing who?\r\n",ch);
+     send_to_char("metastat who?\r\n",ch);
      return eFAILURE;
   }
   char buf[MAX_STRING_LENGTH];

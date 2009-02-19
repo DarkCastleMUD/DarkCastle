@@ -322,6 +322,7 @@ int do_sqedit(struct char_data *ch, char *argument, int cmd)
     "class",
     "show",
     "list",
+    "save",
     "\n"
   };
   if (!has_skill(ch, COMMAND_SQEDIT))
@@ -351,6 +352,7 @@ int do_sqedit(struct char_data *ch, char *argument, int cmd)
      send_to_char("$3Syntax:$R sqedit <message/level/class> <skill> <value> OR\r\n"
                   "$3Syntax:$R sqedit <show/new/delete> <skillname> OR\r\n",ch);
      send_to_char("$3Syntax:$R sqedit list <class>.\r\n",ch);
+     send_to_char("$3Syntax:$R sqedit save.\r\n",ch);
     return eFAILURE;
   }
   char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH],arg3[MAX_INPUT_LENGTH*2];
@@ -500,6 +502,9 @@ int do_sqedit(struct char_data *ch, char *argument, int cmd)
       if (!done)
 	send_to_char("    No skill quests.\r\n",ch);
       break;
+  case 7: // save
+    do_write_skillquest(ch, argument, cmd);
+    break;
     default:
       log("Incorrect -i- in do_sqedit", 0, LOG_WORLD);
       return eFAILURE;
