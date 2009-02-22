@@ -1,4 +1,4 @@
-/* $Id: clan.cpp,v 1.73 2009/02/17 21:37:25 kkoons Exp $ */
+/* $Id: clan.cpp,v 1.74 2009/02/22 07:34:14 jhhudso Exp $ */
 
 /***********************************************************************/
 /* Revision History                                                    */
@@ -992,6 +992,7 @@ int do_outcast(CHAR_DATA *ch, char *arg, int cmd)
     sprintf(buf, "%s just quit clan [%s].", GET_NAME(victim), clan->name);
     log(buf, 110, LOG_CLAN);
     send_to_char("You quit your clan.\n\r", ch);
+    remove_totem_stats(victim);
     victim->clan = 0;
     remove_clan_member(clan, ch);
     save_clans();
@@ -1003,6 +1004,7 @@ int do_outcast(CHAR_DATA *ch, char *arg, int cmd)
     return eFAILURE;
   }
 
+  remove_totem_stats(victim);
   victim->clan = 0;
   remove_clan_member(clan, victim);
   save_clans();
