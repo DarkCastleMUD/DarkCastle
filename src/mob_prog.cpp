@@ -319,6 +319,11 @@ void translate_value(char *leftptr, char *rightptr, int16 **vali, uint32 **valui
   int val = 0;
   bool valset = FALSE; // done like that to determine if value is set, since it can be 0 
   struct tempvariable *eh = mob->tempVariable;
+
+  // Used to store return pointer from getTemp(). Do not use more than
+  // once in this function.
+  char *targetTemp = 0;
+
   
   activeTarget = NULL;
   char *tmp,half[MAX_INPUT_LENGTH];
@@ -796,8 +801,13 @@ void translate_value(char *leftptr, char *rightptr, int16 **vali, uint32 **valui
 	case 't':
 		if (!str_cmp(right,"temp"))
 		{
-		  if (!half[0] || !target) tError = TRUE;
-		  else { char  *tmp = getTemp(target, half); stringval = &tmp; }
+		  if (!half[0] || !target) {
+		    tError = TRUE;
+		  } else {
+		    targetTemp = getTemp(target, half);
+		  }
+
+		  stringval = &targetTemp;
 		}
 		else if (!str_cmp(right, "title"))
 		{
@@ -1096,8 +1106,6 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
   bool ye = FALSE;
   if (arg[0] == '$' && arg[1] == 'v')
   {
-    if (mob && mob_index[mob->mobdata->nr].virt == 12603) debugpoint();
-
     struct tempvariable *eh = mob->tempVariable;
     char buf1[MAX_STRING_LENGTH];
     buf1[0] = '\0';
