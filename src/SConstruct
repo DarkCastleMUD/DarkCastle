@@ -1,8 +1,8 @@
 import glob
 
 env = Environment()
-env.Append(CCFLAGS = '-ggdb3 -O -Wall -Wno-write-strings -m32')
-env.Append(LINKFLAGS = '-ggdb3 -O -Wall -Wno-write-strings -m32')
+env.Append(CCFLAGS = '-ggdb3 -Wall -Wno-write-strings -m32')
+env.Append(LINKFLAGS = '-ggdb3 -Wall -Wno-write-strings -m32')
 
 base_src = glob.glob('*.cpp')
 wizard_src = glob.glob('wizard/*.cpp')
