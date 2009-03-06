@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: board.cpp,v 1.41 2009/01/22 05:51:10 jhhudso Exp $
+| $Id: board.cpp,v 1.42 2009/03/06 06:23:46 jhhudso Exp $
 | board.C
 | Description:  This file contains the implementation for the board
 |   code.  It's old and should be rewritten --Morc XXX
@@ -123,7 +123,7 @@ extern CWorld world;
 #define CLAN_DARKENED 		4
 #define CLAN_DCGUARD 		5
 #define CLAN_TIMEWARP		6
-#define CLAN_CAREBEAR		7
+#define CLAN_CONTINUUM      	7
 #define CLAN_MERC		8
 #define CLAN_NAZGUL		9
 #define CLAN_BLACKAXE		10
@@ -434,6 +434,14 @@ std::map<std::string, BOARD_INFO> populate_boards()
   board_struct.owner = CLAN_SOLARIS;
   board_struct.save_file = "board/solaris";
   board_tmp["board golden bulletin solaris"] = board_struct;
+
+  board_struct.min_read_level = 1;
+  board_struct.min_write_level = 1;
+  board_struct.min_remove_level = 1;
+  board_struct.type = CLAN_BOARD;
+  board_struct.owner = CLAN_CONTINUUM;
+  board_struct.save_file = "board/continuum";
+  board_tmp["board clan continuum"] = board_struct;
 
   board_struct.min_read_level = IMMORTAL;
   board_struct.min_write_level = IMMORTAL;

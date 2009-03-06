@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.185 2008/12/13 17:18:14 apocalypse Exp $ */
+/* $Id: mob_proc.cpp,v 1.186 2009/03/06 06:23:46 jhhudso Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -916,24 +916,25 @@ int clan_guard(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     // 3 = south, 2 = east, 5 = up
     // 1 = north, 4  = west, 6 = down
 
-    if ((in_room == real_room(2300) && cmd != CMD_UP) || // up
-        (in_room == real_room(2310) && cmd != CMD_EAST) || // east
+    if ((in_room == real_room(2300) && cmd != CMD_UP) ||    // up
+        (in_room == real_room(2310) && cmd != CMD_EAST) ||  // east
         (in_room == real_room(2320) && cmd != CMD_SOUTH) || // south
-        (in_room == real_room(2390) && cmd != CMD_SOUTH) || // south
         (in_room == real_room(2330) && cmd != CMD_SOUTH) || // south
         (in_room == real_room(2340) && cmd != CMD_SOUTH) || // south
         (in_room == real_room(2350) && cmd != CMD_SOUTH) || // south
         (in_room == real_room(2360) && cmd != CMD_SOUTH) || // south
-        (in_room == real_room(2370) && cmd != CMD_DOWN) || // down
-        (in_room == real_room(2410) && cmd != CMD_UP) || // up
-        (in_room == real_room(2420) && cmd != CMD_SOUTH) || // south
+        (in_room == real_room(2370) && cmd != CMD_DOWN) ||  // down
         (in_room == real_room(2380) && cmd != CMD_NORTH) || // north
-        (in_room == real_room(2400) && cmd != CMD_WEST) || // west
+        (in_room == real_room(2390) && cmd != CMD_SOUTH) || // south
+        (in_room == real_room(2400) && cmd != CMD_WEST) ||  // west
+        (in_room == real_room(2410) && cmd != CMD_UP) ||    // up
+        (in_room == real_room(2420) && cmd != CMD_SOUTH) || // south
         (in_room == real_room(2430) && cmd != CMD_SOUTH) || // south
         (in_room == real_room(2440) && cmd != CMD_NORTH) || // north
+        (in_room == real_room(2450) && cmd != CMD_WEST) ||  // west
 	(in_room == real_room(2460) && cmd != CMD_NORTH) || // north
-        (in_room == real_room(2450) && cmd != CMD_WEST) || // west
-	(in_room == real_room(2500) && cmd != CMD_NORTH)) //north
+	(in_room == real_room(2470) && cmd != CMD_WEST) ||  // west
+	(in_room == real_room(2500) && cmd != CMD_NORTH))   // north
         return eFAILURE;
 
     int clan_num = ch->clan;
@@ -965,20 +966,21 @@ int clan_guard(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     if ( (clan_num != 14 && in_room == real_room(2300))  // black_axe
     ||   (clan_num !=  4 && in_room == real_room(2310))  // dc_guard
     ||   (clan_num != 18 && in_room == real_room(2320))  // anarchist
-    ||   (clan_num != 20 && in_room == real_room(2390))  // sindicate
     ||   (clan_num !=  1 && in_room == real_room(2330))  // uln'hyrr
     ||   (clan_num != 10 && in_room == real_room(2340))  // moor
     ||   (clan_num !=  9 && in_room == real_room(2350))  // eclipse
     ||   (clan_num !=  3 && in_room == real_room(2360))  // arcana
     ||   (clan_num != 17 && in_room == real_room(2370))  // voodoo
     ||   (clan_num != 13 && in_room == real_room(2380))  // slackers
+    ||   (clan_num != 20 && in_room == real_room(2390))  // sindicate
+    ||   (clan_num !=  8 && in_room == real_room(2400))  // merc
     ||   (clan_num !=  6 && in_room == real_room(2410))  // timewarp
     ||   (clan_num != 19 && in_room == real_room(2420))  // solaris
-    ||   (clan_num !=  8 && in_room == real_room(2400))  // merc
     ||   (clan_num != 15 && in_room == real_room(2430))  // askan'i
     ||   (clan_num !=  2 && in_room == real_room(2440))  // tengu
     ||   (clan_num != 16 && in_room == real_room(2450))  // houseless_rogues
     ||   (clan_num != 12 && in_room == real_room(2460))  // ko'bal
+    ||   (clan_num !=  7 && in_room == real_room(2470))  // Continuum
     ||   (clan_num != 11 && in_room == real_room(2500))  // triad
   
 	)

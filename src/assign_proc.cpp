@@ -222,6 +222,7 @@ void assign_non_combat_procs() {
     assign_one_mob_non(2317,  clan_guard);
     assign_one_mob_non(2399,  clan_guard);
     assign_one_mob_non(2500,  clan_guard);
+    assign_one_mob_non(2321,  clan_guard);
     assign_one_mob_non(9511,  bodyguard);
     assign_one_mob_non(9531,  bodyguard);
     assign_one_mob_non(9532,  bodyguard);
@@ -531,6 +532,7 @@ void assign_objects(void)
   assign_one_obj_non(2349, board);
   assign_one_obj_non(2339, board);
   assign_one_obj_non(2410, board);
+  assign_one_obj_non(2471, board); // Continuum board
   assign_one_obj_non(2406, board); /*Urukhai Board */
   assign_one_obj_non(2370,  board); /* Quest Board */
   assign_one_obj_non(25,  mob_summoner);
