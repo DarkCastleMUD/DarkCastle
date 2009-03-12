@@ -3,7 +3,7 @@
  * Morcallen 12/18
  *
  */
-/* $Id: ki.cpp,v 1.77 2008/11/27 09:17:12 kkoons Exp $ */
+/* $Id: ki.cpp,v 1.78 2009/03/12 00:20:22 kkoons Exp $ */
 
 extern "C"
 {
@@ -499,6 +499,7 @@ int ki_punch( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
 //		  ch, 0, vict, TO_CHAR, 0);
 //         act("$n makes a killer move, which you luckily dodge.", 
 //		  ch, 0, vict, TO_VICT, INVIS_VISIBLE);
+	 int retval = damage(ch,vict,0, TYPE_UNDEFINED, KI_OFFSET+KI_PUNCH,0);
          GET_HIT(ch) -= 1/8 * (GET_MAX_HIT(ch));
 	 WAIT_STATE(ch, PULSE_VIOLENCE);
          if (!vict->fighting)
