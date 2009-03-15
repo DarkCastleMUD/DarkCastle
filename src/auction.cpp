@@ -26,6 +26,7 @@ extern "C"
 #include <map>
 #include <queue>
 #include <fileinfo.h>
+#include <errno.h>
 
 using namespace std;
 
@@ -1084,9 +1085,10 @@ void AuctionHouse::BuyItem(CHAR_DATA *ch, unsigned int ticket)
 
   extern short bport;
  if(!bport) {
+  errno = 0;
   if (!(fl = dc_fopen(WEB_AUCTION_FILE,"r"))) {
-    perror(WEB_AUCTION_FILE);
-    abort();
+    logf(IMMORTAL, LOG_BUG, "%s: %s", WEB_AUCTION_FILE, strerror(errno));
+    return;
   }
 
   while(!feof(fl) && i<=9) {
@@ -1096,9 +1098,10 @@ void AuctionHouse::BuyItem(CHAR_DATA *ch, unsigned int ticket)
 
   dc_fclose(fl);
 
+  errno = 0;
   if (!(fl = dc_fopen(WEB_AUCTION_FILE,"w"))) {
-    perror(WEB_AUCTION_FILE);
-    abort();
+    logf(IMMORTAL, LOG_BUG, "%s: %s", WEB_AUCTION_FILE, strerror(errno));
+    return;
   }
 
   fprintf(fl, "%s purchased %s's %s~\n", GET_NAME(ch), Item_it->second.seller.c_str(), obj->short_description);
@@ -1107,7 +1110,9 @@ void AuctionHouse::BuyItem(CHAR_DATA *ch, unsigned int ticket)
    fprintf(fl, "%s~\n", buf[j]);
 
   dc_fclose(fl);
- } else log("Cannot save auction file to web dir.", 0, LOG_MISC);
+ } else {
+   log("bport mode: Not saving auction file to web dir.", 0, LOG_MISC);
+ }
 
 }
 
