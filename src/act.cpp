@@ -17,23 +17,25 @@ extern "C" {
 #include <dmalloc.h>
 #endif
 
-#include <comm.h>
-#include <character.h>
-#include <levels.h>
-#include <db.h>
-#include <room.h>
-#include <utility.h>
-#include <player.h>
-#include <terminal.h>
-#include <handler.h>
-#include <obj.h>
-#include <machine.h>
-#include <connect.h>
-#include <act.h>
-#include <mobile.h>
-#include <token.h>
-#include <spells.h>
 #include <string>
+
+#include "comm.h"
+#include "character.h"
+#include "levels.h"
+#include "db.h"
+#include "room.h"
+#include "utility.h"
+#include "player.h"
+#include "terminal.h"
+#include "handler.h"
+#include "obj.h"
+#include "machine.h"
+#include "connect.h"
+#include "act.h"
+#include "mobile.h"
+#include "token.h"
+#include "spells.h"
+#include "returnvals.h"
 
 using namespace std;
 
@@ -41,16 +43,16 @@ extern CWorld world;
 extern struct descriptor_data *descriptor_list;
 extern bool MOBtrigger;
 
-void send_message(TokenList * tokens, CHAR_DATA *ch, OBJ_DATA * obj, void * vch, int flags, CHAR_DATA *to);
+int send_message(TokenList * tokens, CHAR_DATA *ch, OBJ_DATA * obj, void * vch, int flags, CHAR_DATA *to);
 void send_message(const char *str, CHAR_DATA *to);
 
 
-void act(const string &str, CHAR_DATA *ch, OBJ_DATA *obj, void *vict_obj, int16 destination, int16 flags)
+int act(const string &str, CHAR_DATA *ch, OBJ_DATA *obj, void *vict_obj, int16 destination, int16 flags)
 {
-  act(str.c_str(), ch, obj, vict_obj, destination, flags);
+  return act(str.c_str(), ch, obj, vict_obj, destination, flags);
 }
 
-void act
+int act
 (
   const char *str,          // Buffer
   CHAR_DATA *ch,      // Character from
@@ -61,7 +63,8 @@ void act
 )
 {
   struct descriptor_data *i;
-  
+  int retval = 0;
+
   TokenList *tokens;
   
   tokens = new TokenList(str);
@@ -70,7 +73,7 @@ void act
   if (ch == 0) {
     log("Error in act(), character equal to 0", OVERSEER, LOG_BUG);
     delete tokens;
-    return;
+    return eFAILURE;
     }
 
   if ((IS_AFFECTED(ch, AFF_HIDE) || ISSET(ch->affected_by, AFF_FOREST_MELD)) &&
@@ -80,10 +83,10 @@ void act
     }
     
   if (destination == TO_VICT) {
-    send_message(tokens, ch, obj, vict_obj, flags, (CHAR_DATA *)vict_obj);
-    }
+    retval |= send_message(tokens, ch, obj, vict_obj, flags, (CHAR_DATA *)vict_obj);
+  }
   else if(destination == TO_CHAR) {
-    send_message(tokens, ch, obj, vict_obj, flags, ch);
+    retval |= send_message(tokens, ch, obj, vict_obj, flags, ch);
     }
   else if(destination == TO_ROOM) {
     char_data * tmp_char, *next_tmp_char;
@@ -93,7 +96,7 @@ void act
       if (tmp_char == ch)
         continue;
       if (tmp_char->position > POSITION_SLEEPING || IS_SET(flags, ASLEEP))
-        send_message(tokens, ch, obj, vict_obj, flags, tmp_char);
+        retval |= send_message(tokens, ch, obj, vict_obj, flags, tmp_char);
       }
     }
   // TO_ZONE, TO_WORLD
@@ -101,7 +104,7 @@ void act
     if (destination != TO_ZONE && destination != TO_WORLD) {
       log("Error in act(), invalid value sent as 'destination'", OVERSEER, LOG_BUG);
       delete tokens;
-      return;
+      return eFAILURE;
       }
     for (i = descriptor_list; i; i = i->next) {
       // Dropped link or they're not really playing and no force flag, don't send.
@@ -109,11 +112,13 @@ void act
         continue;
       if ((destination == TO_ZONE) && world[i->character->in_room].zone != world[ch->in_room].zone)
         continue;
-      send_message(tokens, ch, obj, vict_obj, flags, i->character);
+      retval |= send_message(tokens, ch, obj, vict_obj, flags, i->character);
       }
     }
       
    delete tokens;
+
+   return retval;
 }
 
 
@@ -133,18 +138,20 @@ void send_message(const char *str, CHAR_DATA *to)
 }
 
 
-void send_message(TokenList * tokens, CHAR_DATA *ch, OBJ_DATA * obj, void * vict_obj, int flags, CHAR_DATA *to)
+int send_message(TokenList * tokens, CHAR_DATA *ch, OBJ_DATA * obj, void * vict_obj, int flags, CHAR_DATA *to)
 {
+  int retval = 0;
   char * buf = tokens->Interpret(ch, obj, vict_obj, to, flags);
-
+  
   send_message(buf, to);
   
   if (MOBtrigger && buf)
-    mprog_act_trigger( buf, to, ch, obj, vict_obj );
+    retval |= mprog_act_trigger( buf, to, ch, obj, vict_obj );
   if (MOBtrigger && buf)
-    oprog_act_trigger( buf, ch);
+    retval |= oprog_act_trigger( buf, ch);
     
   MOBtrigger = TRUE;
+  return retval;
 }
 
 

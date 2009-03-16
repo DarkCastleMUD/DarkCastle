@@ -16,7 +16,7 @@
  *  10/21/2003   Onager    Changed IS_ANONYMOUS() to handle mobs without   *
  *                         crashing                                        *
  ***************************************************************************/
-/* $Id: utility.h,v 1.80 2009/01/09 06:55:59 shane Exp $ */
+/* $Id: utility.h,v 1.81 2009/03/16 00:56:53 jhhudso Exp $ */
 
 #ifndef UTILITY_H_
 #define UTILITY_H_
@@ -470,7 +470,7 @@ int     mprog_wordlist_check    ( const char * arg, CHAR_DATA *mob,
 void    mprog_percent_check     ( CHAR_DATA *mob, CHAR_DATA* actor,
 					OBJ_DATA* object, void* vo,
 					int type );
-void    mprog_act_trigger       ( const char* buf, CHAR_DATA* mob,
+int     mprog_act_trigger       ( const char* buf, CHAR_DATA* mob,
 		                        CHAR_DATA* ch, OBJ_DATA* obj,
 					void* vo );
 int     mprog_bribe_trigger     ( CHAR_DATA* mob, CHAR_DATA* ch,

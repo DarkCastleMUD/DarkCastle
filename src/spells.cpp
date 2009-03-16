@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.250 2009/01/24 10:22:04 dcastle Exp $ */
+/* $Id: spells.cpp,v 1.251 2009/03/16 00:56:53 jhhudso Exp $ */
 
 extern "C"
 {
@@ -1230,7 +1230,7 @@ void say_spell( CHAR_DATA *ch, int si, int room )
     char buf[MAX_STRING_LENGTH], splwd[MAX_BUF_LENGTH];
     char buf2[MAX_STRING_LENGTH];
 
-    int j, offs;
+    int j, offs, retval = 0;
     CHAR_DATA *temp_char;
 
 
@@ -1300,10 +1300,16 @@ void say_spell( CHAR_DATA *ch, int si, int room )
 	temp_char;
 	temp_char = temp_char->next_in_room)
 	if(temp_char != ch) {
-	    if (GET_CLASS(ch) == GET_CLASS(temp_char))
-		act(buf, ch, 0, temp_char, TO_VICT, 0);
-	    else
-		act(buf2, ch, 0, temp_char, TO_VICT, 0);
+	  if (GET_CLASS(ch) == GET_CLASS(temp_char)) {
+	      retval = act(buf, ch, 0, temp_char, TO_VICT, 0);
+	  } else {
+	      retval = act(buf2, ch, 0, temp_char, TO_VICT, 0);
+	  }
+
+	  // Need better solution, but this will keep DC from crashing when a act_prog trigger kills a mob in the room
+	  if (SOMEONE_DIED(retval)) {
+	    return;
+	  }
 	}
 }
 

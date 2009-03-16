@@ -3124,16 +3124,17 @@ void mprog_percent_check( CHAR_DATA *mob, CHAR_DATA *actor, OBJ_DATA *obj,
  * make sure you remember to modify the variable names to the ones in the
  * trigger calls.
  */
-void mprog_act_trigger( const char *buf, CHAR_DATA *mob, CHAR_DATA *ch,
+int mprog_act_trigger( const char *buf, CHAR_DATA *mob, CHAR_DATA *ch,
 		       OBJ_DATA *obj, void *vo)
 {
 
 //  MPROG_ACT_LIST * tmp_act;
   //MPROG_ACT_LIST * curr;
 //  MPROG_DATA *mprg;
- 
+  mprog_cur_result = eSUCCESS;
+
   if(!MOBtrigger)
-    return;
+    return mprog_cur_result;
 
   if ( IS_NPC( mob )
       && ( mob_index[mob->mobdata->nr].progtypes & ACT_PROG ) )
@@ -3168,7 +3169,7 @@ void mprog_act_trigger( const char *buf, CHAR_DATA *mob, CHAR_DATA *ch,
       mob->mobdata->mpactnum++;
 
     }
-*/  return;
+*/  return mprog_cur_result;
 
 }
 
