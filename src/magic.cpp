@@ -1080,7 +1080,7 @@ int spell_solar_gate(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
 
   // we also now use .people instead of the character_list -pir 12/26
 
-  for(tmp_victim = world[orig_room].people; tmp_victim; tmp_victim = temp) 
+  for(tmp_victim = world[orig_room].people; tmp_victim && tmp_victim != (char_data *)0x95959595; tmp_victim = temp) 
   {
      temp = tmp_victim->next_in_room;
      if((orig_room == tmp_victim->in_room) && (tmp_victim != ch) &&
