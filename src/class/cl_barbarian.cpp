@@ -1,5 +1,5 @@
 /************************************************************************
- * $Id: cl_barbarian.cpp,v 1.96 2009/01/23 19:33:12 kkoons Exp $
+ * $Id: cl_barbarian.cpp,v 1.97 2009/03/19 02:30:16 jhhudso Exp $
  * cl_barbarian.cpp
  * Description: Commands for the barbarian class.
  *************************************************************************/
@@ -247,8 +247,12 @@ int do_berserk(struct char_data *ch, char *argument, int cmd)
   }
   else {
     act ("You start FOAMING at the mouth, and you go BERSERK on $N!", ch, 0, victim, TO_CHAR, 0);
-    act ("$n starts FOAMING at the mouth, and goes BERSERK on you!", ch, 0, victim, TO_VICT, 0);
     act ("$n starts FOAMING at the mouth, as $e goes BERSERK on $N!", ch, 0, victim, TO_ROOM, NOTVICT);
+    retval = act ("$n starts FOAMING at the mouth, and goes BERSERK on you!", ch, 0, victim, TO_VICT, 0);
+    if (IS_SET(retval, eVICT_DIED)) {
+      return retval;
+    }
+
     bSuccess = 1;
   }
 
