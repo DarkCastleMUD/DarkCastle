@@ -34,7 +34,7 @@ void parse_action(int command, char *string, struct descriptor_data *d) {
    int indent = 0, rep_all = 0, flags = 0, total_len, replaced;
    register int j = 0;
    int i, line_low, line_high;
-   char *s, *t, temp, buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH];
+   char *s, *t, temp, buf[32768], buf2[32768];
    
    switch (command) { 
     case PARSE_HELP: 
@@ -234,10 +234,10 @@ void parse_action(int command, char *string, struct descriptor_data *d) {
       if (s)  {
        temp = *s;
        *s = '\0';
-       strcat(buf, t);
+       strncat(buf, t, 32768-strlen(buf)-1);
        *s = temp;
       }
-      else strcat(buf, t);
+      else strncat(buf, t, 32768-strlen(buf)-1);
       /* this is kind of annoying.. will have to take a poll and see..
       sprintf(buf, "%s\r\n%d line%sshown.\r\n", buf, total_len,
             ((total_len != 1)?"s ":" "));
@@ -295,17 +295,17 @@ void parse_action(int command, char *string, struct descriptor_data *d) {
          temp = *s;
          *s = '\0';
          sprintf(buf, "%s%4d: ", buf, (i-1));
-         strcat(buf, t);
+         strncat(buf, t, 32768-strlen(buf)-1);
          *s = temp;
          t = s;
       }
       if (s && t) {
        temp = *s;
        *s = '\0';
-       strcat(buf, t);
+       strncat(buf, t, 32768-strlen(buf)-1);
        *s = temp;
       }
-      else if (t) strcat(buf, t);
+      else if (t) strncat(buf, t, 32768-strlen(buf)-1);
       /* this is kind of annoying .. seeing as the lines are #ed
       sprintf(buf, "%s\r\n%d numbered line%slisted.\r\n", buf, total_len,
             ((total_len != 1)?"s ":" "));
@@ -321,7 +321,7 @@ void parse_action(int command, char *string, struct descriptor_data *d) {
        return;
       }
       line_low = atoi(buf);
-      strcat(buf2, "\r\n");
+      strncat(buf2, "\r\n", 32768-strlen(buf2)-1);
       
       i = 1;
       *buf = '\0';
@@ -346,10 +346,10 @@ void parse_action(int command, char *string, struct descriptor_data *d) {
           SEND_TO_Q("Insert text pushes buffer over maximum size, insert aborted.\r\n", d);
           return;
        }
-       if (*d->strnew && (**d->strnew != '\0')) strcat(buf, *d->strnew);
+       if (*d->strnew && (**d->strnew != '\0')) strncat(buf, *d->strnew, 32768-strlen(buf)-1);
        *s = temp;
-       strcat(buf, buf2);
-       if (s && (*s != '\0')) strcat(buf, s);
+       strncat(buf, buf2, 32768-strlen(buf)-1);
+       if (s && (*s != '\0')) strncat(buf, s, 32768-strlen(buf)-1);
        RECREATE(*d->strnew, char, strlen(buf) + 3);
        strcpy(*d->strnew, buf);
        SEND_TO_Q("Line inserted.\r\n", d);
@@ -367,7 +367,7 @@ void parse_action(int command, char *string, struct descriptor_data *d) {
        return;
       }
       line_low = atoi(buf);
-      strcat(buf2, "\r\n");
+      strncat(buf2, "\r\n", 32768-strlen(buf2)-1);
       
       i = 1;
       *buf = '\0';
@@ -394,18 +394,18 @@ void parse_action(int command, char *string, struct descriptor_data *d) {
           temp = *s;
           *s = '\0';
           /* put the first 'good' half of the text into storage */
-          strcat(buf, *d->strnew);
+          strncat(buf, *d->strnew, 32768-strlen(buf)-1);
           *s = temp;
        }
        /* put the new 'good' line into place. */
-       strcat(buf, buf2);
+       strncat(buf, buf2, 32768-strlen(buf)-1);
        if ((s = strchr(s, '\n')) != NULL) {
           /* this means that we are at the END of the line we want outta there. */
           /* BUT we want s to point to the beginning of the line AFTER
            * the line we want edited */
           s++;
           /* now put the last 'good' half of buffer into storage */
-          strcat(buf, s);
+          strncat(buf, s, 32768-strlen(buf)-1);
        }
        /* check for buffer overflow */
        if ((int)strlen(buf) > d->max_str) {
