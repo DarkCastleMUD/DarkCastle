@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.186 2009/03/06 06:23:46 jhhudso Exp $ */
+/* $Id: mob_proc.cpp,v 1.187 2009/03/22 23:52:54 apocalypse Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -1769,7 +1769,10 @@ static char *dethSayText [ ] =
   "Drill baby! Drill!",
   "Ch-ch-ch-ch-changes!",
   "The beatings will continue until morale improves.",
-  "If they removed all porn from the internet there would be only one site left, and it would be called 'Bring Back the Porn'."
+  "If they removed all porn from the internet there would be only one site left, and it would be called 'Bring Back the Porn'.",
+  "Are you okay?",
+  "Hey boy, do you like me?",
+  "Son."
  };
 
 // ENDOFCHAIN
