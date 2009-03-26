@@ -1,4 +1,4 @@
-/* $Id: clan.cpp,v 1.74 2009/02/22 07:34:14 jhhudso Exp $ */
+/* $Id: clan.cpp,v 1.75 2009/03/26 23:48:20 kkoons Exp $ */
 
 /***********************************************************************/
 /* Revision History                                                    */
@@ -2336,6 +2336,35 @@ int needs_clan_command(char_data * ch)
 int do_clans(CHAR_DATA *ch, char *arg, int cmd)
 {
   struct clan_data * clan = 0;
+  char * tmparg;
+
+  char buf[MAX_STRING_LENGTH];
+  tmparg = one_argument(arg, buf);
+
+  if(!strcmp(buf, "rights"))
+  {
+    tmparg = one_argument(tmparg, buf);
+
+    if(!*buf) //only do this if they want clan rights on themselves
+    {
+      int bit = -1;
+      struct clan_member_data * pmember = NULL;
+
+      if(!(pmember = get_member(ch->name, ch->clan)))
+      {
+        send_to_char("You don't seem to be in a clan.\r\n", ch);
+        return eSUCCESS;
+      }
+
+      sprintf(buf, "Rights for %s:\n\r-------------\n\r", pmember->member_name);
+      send_to_char(buf, ch);
+      for(bit = 0; *clan_rights[bit] != '\n'; bit++) {
+        sprintf(buf, "  %-15s %s\n\r", clan_rights[bit], (IS_SET(pmember->member_rights, 1<<bit) ? "on" : "off"));
+        send_to_char(buf, ch);
+      }
+    }
+    return eSUCCESS;
+  }
 
   if(!IS_NPC(ch) && (GET_LEVEL(ch) == IMP)) {
     do_god_clans(ch, arg, cmd);
@@ -2350,7 +2379,8 @@ int do_clans(CHAR_DATA *ch, char *arg, int cmd)
     return eSUCCESS;
   }
 
-  do_clan_list(ch);
+    do_clan_list(ch);
+    
   return eSUCCESS;
 }
 
