@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: interp.h,v 1.97 2009/02/19 01:43:40 jhhudso Exp $ */
+/* $Id: interp.h,v 1.98 2009/03/27 21:53:00 kkoons Exp $ */
 
 #ifndef INTERP_H_
 #define INTERP_H_
@@ -276,6 +276,7 @@ DO_FUN do_follow;
 DO_FUN do_forage;
 DO_FUN do_force;
 DO_FUN do_found;
+DO_FUN do_free_animal;
 DO_FUN do_freeze;
 DO_FUN do_fsave;
 DO_FUN do_get;
