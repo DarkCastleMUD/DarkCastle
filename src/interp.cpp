@@ -16,7 +16,7 @@
 /* 12/08/2003   Onager   Added chop_half() to work like half_chop() but    */
 /*                       chopping off the last word.                       */
 /***************************************************************************/
-/* $Id: interp.cpp,v 1.173 2009/03/27 20:31:40 jhhudso Exp $ */
+/* $Id: interp.cpp,v 1.174 2009/03/27 21:53:27 kkoons Exp $ */
 
 extern "C"
 {
@@ -306,6 +306,7 @@ struct command_info cmd_info[] =
     { "quit",		do_quit,	POSITION_DEAD, 0, CMD_QUIT, 0, 1 },
     { "return",		do_return,	POSITION_DEAD, 0, CMD_DEFAULT, COM_CHARMIE_OK, 1 },
     { "tame",		do_tame,	POSITION_RESTING, 0, CMD_DEFAULT, 0, 0 },
+    { "free animal",    do_free_animal, POSITION_RESTING, 0, CMD_DEFAULT, 0, 0 },
     { "prompt",		do_prompt,	POSITION_DEAD, 0, CMD_DEFAULT, 0, 1 },
     { "lastprompt",	do_lastprompt,	POSITION_DEAD, 0, CMD_DEFAULT, 0, 1 },
     { "save",		do_save,	POSITION_DEAD, 0, CMD_DEFAULT, 0, 1 },
@@ -604,10 +605,10 @@ void free_command_radix_nodes(struct cmd_hash_info * curr)
 
 void add_command_to_radix(struct command_info *cmd)
 {
-  struct cmd_hash_info *curr;
-  struct cmd_hash_info *temp;
-  struct cmd_hash_info *next;
-  int whichway;
+  struct cmd_hash_info *curr = NULL;
+  struct cmd_hash_info *temp = NULL;
+  struct cmd_hash_info *next = NULL;
+  int whichway = 0;
 
   // At the end of this loop, temp will contain the parent of
   // the new node.  Whether it is the left or right node depends
