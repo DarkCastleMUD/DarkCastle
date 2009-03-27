@@ -1,4 +1,4 @@
-/* $Id: clan.cpp,v 1.75 2009/03/26 23:48:20 kkoons Exp $ */
+/* $Id: clan.cpp,v 1.76 2009/03/27 00:01:07 kkoons Exp $ */
 
 /***********************************************************************/
 /* Revision History                                                    */
@@ -2362,8 +2362,8 @@ int do_clans(CHAR_DATA *ch, char *arg, int cmd)
         sprintf(buf, "  %-15s %s\n\r", clan_rights[bit], (IS_SET(pmember->member_rights, 1<<bit) ? "on" : "off"));
         send_to_char(buf, ch);
       }
+      return eSUCCESS;
     }
-    return eSUCCESS;
   }
 
   if(!IS_NPC(ch) && (GET_LEVEL(ch) == IMP)) {
