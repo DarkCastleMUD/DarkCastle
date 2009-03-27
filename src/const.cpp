@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.291 2009/01/24 06:55:23 kkoons Exp $ */
+/* $Id: const.cpp,v 1.292 2009/03/27 21:53:40 kkoons Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -88,6 +88,7 @@ std::map<int,int> fill_skill_cost()
   skill_cost_map[SKILL_GUARD] = 5;
   skill_cost_map[SKILL_PRIMAL_FURY] = 40;
   skill_cost_map[SKILL_HEADBUTT] = 15;
+  skill_cost_map[SKILL_FREE_ANIMAL] = 13;
   return skill_cost_map;
 }
 
@@ -1498,6 +1499,7 @@ struct class_skill_defines r_skills[] = { // ranger skills
 {    "dodge",    	SKILL_DODGE,    	 10,     60,  0,   CONWIS },
 {    "tame",            SKILL_TAME,              11,    100,  0,   STRCON },
 {    "double",          SKILL_SECOND_ATTACK,     12,     85,  0,   STRDEX },
+{    "free animal",     SKILL_FREE_ANIMAL,       13,    100,  0,   STRCON },
 {    "feline agility",  SPELL_FELINE_AGILITY,    14,    100,  0,   STRCON },
 {    "bee swarm",       SPELL_BEE_SWARM,         15,    100,  0,   STRCON },
 {    "forage",          SKILL_FORAGE,            16,     85,  0,   INTWIS },
