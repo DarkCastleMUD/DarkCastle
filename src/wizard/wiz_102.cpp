@@ -3196,10 +3196,10 @@ mob_index[mob_num].virt);
                        "$3Current$R: ", ch);
           sprintf(buf, "%lld\n", ((char_data *)mob_index[mob_num].item)->gold);
           send_to_char(buf, ch);
-          send_to_char("$3Valid Range$R: 0 to 5000000\r\n", ch);
+          send_to_char("$3Valid Range$R: 0 to 10000000\r\n", ch);
           return eFAILURE;
         }
-        if(!check_range_valid_and_convert(intval, buf4, 0, 5000000)) {
+        if(!check_range_valid_and_convert(intval, buf4, 0, 10000000)) {
           send_to_char("Value out of valid range.\r\n", ch);
           return eFAILURE;
         }
