@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id: cl_ranger.cpp,v 1.93 2009/01/04 18:54:39 jhhudso Exp $ | cl_ranger.C  *
+ * $Id: cl_ranger.cpp,v 1.94 2009/03/27 21:53:15 kkoons Exp $ | cl_ranger.C  *
  * Description: Ranger skills/spells                                          *
  *                                                                            *
  * Revision History                                                           *
@@ -68,6 +68,55 @@ int charm_levels(CHAR_DATA *ch)
 	}
   if (z <= 0) return -1;
   return i;
+}
+
+int do_free_animal(CHAR_DATA *ch, char *arg, int cmd)
+{
+  CHAR_DATA *victim = NULL;
+  char buf[MAX_INPUT_LENGTH];
+  void stop_follower(CHAR_DATA *ch, int cmd);
+
+  if(!has_skill(ch, SKILL_FREE_ANIMAL)) {
+    send_to_char("Try learning HOW to free an animal first.\r\n", ch);
+    return eFAILURE;
+  }
+
+  arg = one_argument(arg, buf);
+
+  for(struct follow_type *k = ch->followers; k; k = k->next)
+    if(IS_MOB(k->follower) 
+       && ISSET(k->follower->affected_by, AFF_CHARM)
+       && isname(buf, GET_NAME(k->follower)))
+    {
+      victim = k->follower;
+      break;
+    }
+
+  if(!victim)
+  {
+    send_to_char("They aren't even here!\r\n", ch);
+    return eSUCCESS;
+  }
+
+  if (!charge_moves(ch, SKILL_FREE_ANIMAL)) return eSUCCESS;
+
+  if(!skill_success(ch, victim, SKILL_FREE_ANIMAL))
+  {
+    act("You give $N a gentle pat to the head, but $E seems unwilling to leave your side.", 
+        ch, NULL, victim, TO_CHAR, 0);
+    act("$n gives $N a gentle pat to the head, but $E seems unwilling to leave $s side.", 
+        ch, NULL, victim, TO_ROOM, INVIS_NULL); 
+    return eSUCCESS;
+  }
+
+  act("With a gentle pat to the head, you set $N free to roam the wilds again.", 
+      ch, NULL, victim, TO_CHAR, 0);
+  act("With a gentle pat to the head, $n sets $N free to roam the wilds again.", 
+      ch, NULL, victim, TO_ROOM, INVIS_NULL); 
+
+  stop_follower(victim, 0);
+
+  return eSUCCESS;
 }
 
 int do_tame(CHAR_DATA *ch, char *arg, int cmd)
