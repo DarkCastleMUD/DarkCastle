@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: non_off.cpp,v 1.58 2009/02/17 21:15:41 kkoons Exp $
+| $Id: non_off.cpp,v 1.59 2009/03/27 22:02:30 kkoons Exp $
 | non_off.C
 | Description:  Implementation of generic, non-offensive commands.
 */
@@ -1242,6 +1242,7 @@ void CVoteData::StartVote(struct char_data *ch)
     return;
   }
 
+  send_to_char("$4**MAKE SURE YOU VOTESET CLEAR IF THIS IS A NEW VOTE!**$R\r\n", ch);
   send_info("\n\r##Attention! There is now a vote in progress!\n\r##Type Vote for more information!\n\r");
 
   active = true;
