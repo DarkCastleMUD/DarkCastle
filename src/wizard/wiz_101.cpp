@@ -87,6 +87,11 @@ int do_wizhelp(struct char_data *ch, char *argument, int cmd_arg)
      }
      if (cmd_info[cmd].minimum_level != v || cmd_info[cmd].minimum_level == GIFTED_COMMAND) continue;
 
+     // ignore these 2 duplicates of other commands
+     if( !strcmp(cmd_info[cmd].command_name, "colours") ||
+	 !strcmp(cmd_info[cmd].command_name, ";"))
+       continue;
+
      sprintf(buf + strlen(buf), "[%2d]%-11s",
              cmd_info[cmd].minimum_level,
              cmd_info[cmd].command_name);
