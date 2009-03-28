@@ -3677,6 +3677,13 @@ int spell_word_of_recall(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct o
      }
      return eFAILURE;
   }
+
+  if(victim->fighting && !IS_NPC(victim->fighting)) //PvP fight?
+  {
+     send_to_char("The fight distracts you from casting word of recall!\r\n",victim);
+     return eFAILURE;
+  }
+
   if (affected_by_spell(victim, FUCK_PTHIEF))
   {
     send_to_char("Your attempt to transport stolen goods through planes of magic fails!\r\n",victim);
