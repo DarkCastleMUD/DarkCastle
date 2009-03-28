@@ -16,7 +16,7 @@
 /* 12/08/2003   Onager   Added chop_half() to work like half_chop() but    */
 /*                       chopping off the last word.                       */
 /***************************************************************************/
-/* $Id: interp.cpp,v 1.174 2009/03/27 21:53:27 kkoons Exp $ */
+/* $Id: interp.cpp,v 1.175 2009/03/28 22:16:14 jhhudso Exp $ */
 
 extern "C"
 {
@@ -423,7 +423,6 @@ struct command_info cmd_info[] =
     { "snoop",		do_snoop,	POSITION_DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1 },
     { "pview",		do_pview,	POSITION_DEAD, 104, CMD_DEFAULT, 0, 1 },
     { "/",		do_wiz,		POSITION_DEAD, GIFTED_COMMAND, CMD_BELLOW, 0, 1 },
-    { "impchan",	do_wiz,		POSITION_DEAD, GIFTED_COMMAND, CMD_BELLOW, 0, 1 },
     { "arena",		do_arena,	POSITION_DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1 },
     { "load",		do_load,	POSITION_DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1 },
     { "prize",		do_load,	POSITION_DEAD, GIFTED_COMMAND, CMD_PRIZE, 0, 1 },
@@ -490,6 +489,7 @@ struct command_info cmd_info[] =
     { "poof",		do_poof,	POSITION_DEAD, IMMORTAL, CMD_DEFAULT, 0, 1 },
     { "wizhelp",	do_wizhelp,	POSITION_DEAD, IMMORTAL, CMD_DEFAULT, 0, 1 },
     { "imotd",		do_imotd,	POSITION_DEAD, IMMORTAL, CMD_DEFAULT, 0, 1 },
+    { "impchan",	do_wiz,		POSITION_DEAD, GIFTED_COMMAND, CMD_BELLOW, 0, 1 },
     { "mhelp",		do_mortal_help,	POSITION_DEAD, IMMORTAL, CMD_DEFAULT, 0, 1 },
     { "testhand",       do_testhand,    POSITION_DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1},    
     { "varstat",	do_varstat,	POSITION_DEAD, 104, CMD_DEFAULT, 0, 1 },
