@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.188 2009/03/22 23:57:02 apocalypse Exp $ */
+/* $Id: mob_proc.cpp,v 1.189 2009/03/30 19:07:56 kkoons Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -3153,7 +3153,6 @@ int druid_elemental(struct char_data *ch, struct obj_data *obj,
 {
   if (cmd) return eFAILURE;
   if(!ch->master) {
-    log("Elemental without a master.", IMMORTAL, LOG_BUG);
     extract_char(ch, TRUE);
     return (eCH_DIED | eSUCCESS);
   }
