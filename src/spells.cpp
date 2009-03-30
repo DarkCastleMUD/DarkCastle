@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.254 2009/03/30 18:20:42 kkoons Exp $ */
+/* $Id: spells.cpp,v 1.255 2009/03/30 18:27:52 apocalypse Exp $ */
 
 extern "C"
 {
@@ -183,9 +183,9 @@ struct spell_info_type spell_info [] =
 
  { /* 41 */ 12, POSITION_FIGHTING,  5, TAR_CHAR_ROOM|TAR_OBJ_ROOM|TAR_SELF_NONO, cast_ventriloquate, SKILL_INCREASE_EASY },
 
- { /* 42 */ 12, POSITION_FIGHTING, 40, TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_word_of_recall, SKILL_INCREASE_MEDIUM },
+ { /* 42 */  9, POSITION_STANDING, 40, TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_word_of_recall, SKILL_INCREASE_MEDIUM },
 
- { /* 43 */ 9, POSITION_FIGHTING, 12, TAR_CHAR_ROOM|TAR_OBJ_INV|TAR_OBJ_ROOM|TAR_SELF_DEFAULT, cast_remove_poison, SKILL_INCREASE_MEDIUM },
+ { /* 43 */  9, POSITION_FIGHTING, 12, TAR_CHAR_ROOM|TAR_OBJ_INV|TAR_OBJ_ROOM|TAR_SELF_DEFAULT, cast_remove_poison, SKILL_INCREASE_MEDIUM },
 
  { /* 44 */ 12, POSITION_STANDING, 15, TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_sense_life, SKILL_INCREASE_EASY },
 
