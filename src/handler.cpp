@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.185 2009/01/30 06:42:06 kkoons Exp $ */
+/* $Id: handler.cpp,v 1.186 2009/03/30 19:03:04 kkoons Exp $ */
     
 extern "C"
 {
@@ -1244,6 +1244,8 @@ void affect_modify(CHAR_DATA *ch, int32 loc, int32 mod, long bitv, bool add, int
            if(add) SETBIT(ch->affected_by, AFF_DETECT_MAGIC);
            else REMBIT(ch->affected_by, AFF_DETECT_MAGIC);
            break;
+
+        case WEP_WILD_MAGIC: break;
 
 	default:
           sprintf(log_buf, "Unknown apply adjust attempt: %d. (handler.c, "
