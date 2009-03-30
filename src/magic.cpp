@@ -11078,6 +11078,13 @@ int do_beacon(struct char_data *ch, char *argument, int cmd)
       return eFAILURE;
    }
 
+   if (IS_SET(world[ch->in_room].room_flags, SAFE)
+       || IS_SET(world[ch->in_room].room_flags, NOLEARN))
+   {
+     send_to_char("You may not place your beacon in an area protected by the gods.\r\n", ch);
+     return eFAILURE;
+   }
+
    if (IS_AFFECTED(ch, AFF_CHAMPION) && IS_SET(world[ch->in_room].room_flags, CLAN_ROOM))
    {
 	send_to_char("You cannot set a beacon in a clan hall whilst Champion.\r\n",ch);
