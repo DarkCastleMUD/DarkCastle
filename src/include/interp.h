@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: interp.h,v 1.98 2009/03/27 21:53:00 kkoons Exp $ */
+/* $Id: interp.h,v 1.99 2009/03/31 23:03:10 kkoons Exp $ */
 
 #ifndef INTERP_H_
 #define INTERP_H_
@@ -202,6 +202,7 @@ DO_FUN do_battlesense;
 DO_FUN do_beacon;
 DO_FUN do_beep;
 DO_FUN do_beep_set;
+DO_FUN do_behead;
 DO_FUN do_berserk;
 DO_FUN do_bestow;
 DO_FUN do_bladeshield;
