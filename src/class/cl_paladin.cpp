@@ -36,7 +36,7 @@ int do_harmtouch(struct char_data *ch, char *argument, int cmd)
    // struct char_data *tmp_ch;
    char victim_name[MAX_INPUT_LENGTH];
    struct affected_type af;
-   int retval, dam;
+   int retval = eSUCCESS, dam;
 
    one_argument(argument, victim_name);
 
@@ -247,6 +247,8 @@ int do_behead(struct char_data *ch, char *argument, int cmd)
 
 
   if (!charge_moves(ch, SKILL_BEHEAD)) return eSUCCESS;
+
+  WAIT_STATE(ch, (int)(PULSE_VIOLENCE*1.5));
  
   if(!skill_success(ch,vict,SKILL_BEHEAD))
   {
@@ -261,7 +263,7 @@ int do_behead(struct char_data *ch, char *argument, int cmd)
   enemy_hp /= 100; //range 0-1;
 
   if(enemy_hp <= 0)
-    enemy_hp == 0.01;
+    enemy_hp = 0.01;
 
   chance = (int)(modifier / (enemy_hp * enemy_hp));  
 
