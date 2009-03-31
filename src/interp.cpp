@@ -16,7 +16,7 @@
 /* 12/08/2003   Onager   Added chop_half() to work like half_chop() but    */
 /*                       chopping off the last word.                       */
 /***************************************************************************/
-/* $Id: interp.cpp,v 1.175 2009/03/28 22:16:14 jhhudso Exp $ */
+/* $Id: interp.cpp,v 1.176 2009/03/31 23:04:05 kkoons Exp $ */
 
 extern "C"
 {
@@ -228,6 +228,7 @@ struct command_info cmd_info[] =
     { "circle",		do_circle,	POSITION_FIGHTING, 1, CMD_DEFAULT, 0, 0 },
     { "kick",		do_kick,	POSITION_FIGHTING, 0, CMD_DEFAULT, 0, 0 },
     { "battlecry",	do_battlecry,	POSITION_FIGHTING, 1, CMD_DEFAULT, 0, 0 },
+    { "behead",		do_behead,	POSITION_FIGHTING, 1, CMD_DEFAULT, 0, 0 },
     { "rage",		do_rage,	POSITION_FIGHTING, 1, CMD_DEFAULT, 0, 0 },
     { "berserk",	do_berserk,	POSITION_FIGHTING, 1, CMD_DEFAULT, 0, 0 },
     { "golemscore",	do_golem_score,	POSITION_DEAD, 1, CMD_DEFAULT, 0, 1 },
@@ -391,7 +392,7 @@ struct command_info cmd_info[] =
     { "huntstart",      do_huntstart,   POSITION_DEAD, 105, CMD_DEFAULT, 0, 1 },
     { "revoke",		do_revoke,	POSITION_DEAD, IMP, CMD_DEFAULT, 0, 1 },
     { "chpwd",		do_chpwd,	POSITION_DEAD, IMP, CMD_DEFAULT, 0, 1 },
-    { "advance",	do_advance,	POSITION_DEAD, IMP, CMD_DEFAULT, 0, 1 },
+    { "advance",	do_advance,	POSITION_DEAD, 108, CMD_DEFAULT, 0, 1 },
     { "skillmax",	do_maxes,	POSITION_DEAD, 105, CMD_DEFAULT, 0, 1 },
     { "affclear",	do_clearaff,	POSITION_DEAD, 104, CMD_DEFAULT, 0, 1 },
     { "guide",		do_guide,	POSITION_DEAD, 106, CMD_DEFAULT, 0, 1 },
