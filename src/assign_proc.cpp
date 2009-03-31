@@ -616,16 +616,11 @@ void assign_objects(void)
 
   assign_one_obj_non(22399,  board);  // quests2do Board
 
- // assign_one_obj_com(740,    magic_missile_boots);
   assign_one_obj_com(2715,   shield_combat_procs);
   assign_one_obj_com(8208,   shield_combat_procs);
   assign_one_obj_com(9520,   dk_rend);
   assign_one_obj_com(9565, hooktippedsteelhalberd);
-//  assign_one_obj_com(21718, glove_combat_procs);
-//  assign_one_obj_com(9806,   glove_combat_procs);
-  assign_one_obj_com(10000,  holyavenger);
   assign_one_obj_com(10001,  holyavenger);
-//  assign_one_obj_com(19503,  glove_combat_procs);
   assign_one_obj_com(26807,  goldenbatleth);
   assign_one_obj_com(30627,  eliara_combat);
   assign_one_obj_com(570,  godload_jaelgreth);
