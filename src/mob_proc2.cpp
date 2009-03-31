@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc2.cpp,v 1.82 2008/04/09 21:55:42 dcastle Exp $ */
+/* $Id: mob_proc2.cpp,v 1.83 2009/03/31 23:03:38 kkoons Exp $ */
 #include <room.h>
 #include <obj.h>
 #include <connect.h>
@@ -132,7 +132,6 @@ int repair_guy(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
   act("\n\r$N examines $p...", ch, obj, owner, TO_ROOM, INVIS_NULL);
 
   if(IS_OBJ_STAT(obj, ITEM_NOREPAIR)                     ||
-     IS_SET(obj->obj_flags.extra_flags, ITEM_ENCHANTED)  ||
      obj->obj_flags.type_flag != ITEM_ARMOR || 
      IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL)
     ) 
@@ -156,7 +155,6 @@ int repair_guy(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
   cost = obj->obj_flags.cost;
   value0 = eq_max_damage(obj);
   percent = ((100* eqdam) / value0);
-  x = (100 - percent);          // now we know what percent to repair ..  
   price = ((cost * x) / 100);   // now we know what to charge them fuckers! 
 
   if (price < 100)
@@ -226,13 +224,13 @@ int super_repair_guy(struct char_data *ch, struct obj_data *obj, int cmd, char *
 
   cost = obj->obj_flags.cost;
   value0 = eq_max_damage(obj);
+  value2 = obj->obj_flags.value[2];
 
   if (obj->obj_flags.type_flag == ITEM_ARMOR ||
       obj->obj_flags.type_flag == ITEM_CONTAINER ||
 		obj->obj_flags.type_flag == ITEM_LIGHT && !IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL))
   {
-    percent = ((100* eqdam) / value0);
-    x = (100 - percent);               /* now we know what percent to repair ..  */
+    percent = ((100* eqdam) / value0); /* now we know what percent to repair ..  */
     price = ((cost * x) / 100);        /* now we know what to charge */
     price *= 2;                        /* he likes to charge more..  */
                                        /*  for armor... cuz he can.. */
@@ -244,8 +242,7 @@ int super_repair_guy(struct char_data *ch, struct obj_data *obj, int cmd, char *
 		obj->obj_flags.type_flag == ITEM_WAND &&
      !IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL)) 
   {
-    percent = ((100* eqdam) / (value0 + value2));
-    x = (100 - percent);               /* now we know what percent to repair ..  */
+    percent = ((100* eqdam) / (value0 + value2)); /* now we know what percent to repair ..  */
     price = ((cost * x) / 100);        /* now we know what to charge */
   }
   else {
@@ -255,9 +252,6 @@ int super_repair_guy(struct char_data *ch, struct obj_data *obj, int cmd, char *
     act("$N gives $n $p.", ch, obj, owner, TO_ROOM, INVIS_NULL);
 	return eSUCCESS;
   }
-
-  if (IS_SET(obj->obj_flags.extra_flags, ITEM_ENCHANTED))
-    price *= 2;
 
   if (price < 1000)
     price = 1000;                      // Minimum price
@@ -330,14 +324,14 @@ int repair_shop(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
 
   cost = obj->obj_flags.cost;
   value0 = eq_max_damage(obj);
+  value2 = obj->obj_flags.value[2];
 
   if (obj->obj_flags.type_flag == ITEM_ARMOR ||
 	obj->obj_flags.type_flag == ITEM_LIGHT &&
      !IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL)) 
   {
 
-    percent = ((100* eqdam) / value0);
-    x = (100 - percent);          /* now we know what percent to repair ..  */
+    percent = ((100* eqdam) / value0); /* now we know what percent to repair ..  */
     price = ((cost * x) / 100);   /* now we know what to charge them fuckers! */
     price *= 4;                   /* he likes to charge more..  */
                                   /*  for armor... cuz he's a crook..  */
@@ -363,9 +357,6 @@ int repair_shop(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     act("$N gives $n $p.", ch, obj, owner, TO_ROOM, INVIS_NULL);
     return eSUCCESS;
   }
-
-  if (IS_SET(obj->obj_flags.extra_flags, ITEM_ENCHANTED))
-    price *= 2;
 
   if (price < 5000)
     price = 5000;     /* Welp.. Repair Guy needs to feed the kids somehow.. :) */
@@ -860,9 +851,6 @@ int gl_repair_shop(struct char_data *ch, struct obj_data *obj, int cmd, char *ar
     act("$N gives $n $p.", ch, obj, owner, TO_ROOM, INVIS_NULL);
     return eSUCCESS;
   }
-
-  if (IS_SET(obj->obj_flags.extra_flags, ITEM_ENCHANTED))
-    price *= 2;
 
   if (price < 50000)
     price = 50000;     /* Welp.. Repair Guy needs to feed the kids somehow.. :) */
