@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: interp.h,v 1.99 2009/03/31 23:03:10 kkoons Exp $ */
+/* $Id: interp.h,v 1.100 2009/03/31 23:39:52 kkoons Exp $ */
 
 #ifndef INTERP_H_
 #define INTERP_H_
@@ -248,6 +248,7 @@ DO_FUN do_defenders_stance;
 DO_FUN do_disarm;
 DO_FUN do_disband;
 DO_FUN do_disconnect;
+DO_FUN do_dmg_eq;
 DO_FUN do_donate;
 DO_FUN do_dream;
 DO_FUN do_drink;
