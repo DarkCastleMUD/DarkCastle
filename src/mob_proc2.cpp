@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc2.cpp,v 1.83 2009/03/31 23:03:38 kkoons Exp $ */
+/* $Id: mob_proc2.cpp,v 1.84 2009/03/31 23:40:27 kkoons Exp $ */
 #include <room.h>
 #include <obj.h>
 #include <connect.h>
@@ -178,7 +178,7 @@ int super_repair_guy(struct char_data *ch, struct obj_data *obj, int cmd, char *
           struct char_data *owner)
 {
   char item[256];
-  int value0, value2, cost, price, x;
+  int value0, value2, cost, price;
   int percent, eqdam;
 
   if ((cmd != 66) && (cmd != 65)) return eFAILURE;
@@ -231,7 +231,7 @@ int super_repair_guy(struct char_data *ch, struct obj_data *obj, int cmd, char *
 		obj->obj_flags.type_flag == ITEM_LIGHT && !IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL))
   {
     percent = ((100* eqdam) / value0); /* now we know what percent to repair ..  */
-    price = ((cost * x) / 100);        /* now we know what to charge */
+    price = ((cost * percent) / 100);        /* now we know what to charge */
     price *= 2;                        /* he likes to charge more..  */
                                        /*  for armor... cuz he can.. */
   } 
@@ -243,7 +243,7 @@ int super_repair_guy(struct char_data *ch, struct obj_data *obj, int cmd, char *
      !IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL)) 
   {
     percent = ((100* eqdam) / (value0 + value2)); /* now we know what percent to repair ..  */
-    price = ((cost * x) / 100);        /* now we know what to charge */
+    price = ((cost * percent) / 100);        /* now we know what to charge */
   }
   else {
     // Dunno how to repair non-weapons/armor
@@ -278,7 +278,7 @@ int repair_shop(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
           struct char_data *owner)
 {
   char item[256];
-  int value0, value2, cost, price, x;
+  int value0, value2, cost, price;
   int percent, eqdam;
 
   if ((cmd != 66) && (cmd != 65)) return eFAILURE;
@@ -332,7 +332,7 @@ int repair_shop(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
   {
 
     percent = ((100* eqdam) / value0); /* now we know what percent to repair ..  */
-    price = ((cost * x) / 100);   /* now we know what to charge them fuckers! */
+    price = ((cost * percent) / 100);   /* now we know what to charge them fuckers! */
     price *= 4;                   /* he likes to charge more..  */
                                   /*  for armor... cuz he's a crook..  */
   } else if (obj->obj_flags.type_flag == ITEM_WEAPON ||
@@ -345,8 +345,8 @@ int repair_shop(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
   {
 
     percent = ((100* eqdam) / (value0 + value2));
-    x = (100 - percent);          /* now we know what percent to repair ..  */
-    price = ((cost * x) / 100);   /* now we know what to charge them fuckers! */
+  //  x = (100 - percent);          /* now we know what percent to repair ..  */
+    price = ((cost * percent) / 100);   /* now we know what to charge them fuckers! */
     price *= 3;
   }
   else
