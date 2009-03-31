@@ -270,6 +270,41 @@ int do_pardon(struct char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
+int do_dmg_eq(struct char_data *ch, char *argument, int cmd)
+{
+  char buf[MAX_STRING_LENGTH];
+  struct obj_data *obj_object;
+  int eqdam;
+
+  one_argument(argument, buf);
+
+  if(!*buf)
+  {
+    send_to_char("Syntax: damage <item>\r\n", ch);
+    return eFAILURE;
+  }
+
+  obj_object = get_obj_in_list_vis(ch, buf, ch->carrying);
+
+  if(!obj_object)
+  {
+    send_to_char("You don't seem to have that item.\r\n", ch);
+    return eFAILURE;
+  }
+  eqdam = damage_eq_once(obj_object);
+
+  if(eqdam >= eq_max_damage(obj_object))
+    eq_destroyed(ch, obj_object, -1);
+  else 
+  {
+    act("$p is damaged.", ch, obj_object, 0, TO_CHAR, 0);
+    act("$p carried by $n is damaged.", ch, obj_object, 0, TO_ROOM, 0);
+  }
+
+  return eSUCCESS;
+}
+
+
 char *print_classes(int bitv)
 {
   static char buf[512];
@@ -543,7 +578,7 @@ int do_eqmax(struct char_data *ch, char *argument, int cmd)
 {
   CHAR_DATA *vict;
   char arg[MAX_INPUT_LENGTH];
-  int a,o;
+  int a = 0,o;
   argument = one_argument(argument, arg);
 extern int class_restricted(struct char_data *ch, struct obj_data *obj);
 extern  int size_restricted(struct char_data *ch, struct obj_data *obj);
