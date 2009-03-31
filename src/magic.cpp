@@ -3643,7 +3643,7 @@ int spell_ventriloquate(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct ob
 int spell_word_of_recall(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
   int location;
-  char buf[100];
+  char buf[200];
   struct clan_data * clan;
   struct clan_room_data * room;
   int found = 0; 
@@ -3756,13 +3756,7 @@ int spell_word_of_recall(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct o
 	    }
 	}
   }
-	 /* a location has been found. */
-  if (skill < 110) {
-    if( number(1, 100) > (80 + skill / 10) ) {
-      send_to_char("Your recall magic sputters and fails.\r\n", ch);
-      return eFAILURE;
-    }
-  }
+  /* a location has been found. */
   act("$n disappears.", victim, 0, 0, TO_ROOM, INVIS_NULL);
   move_char(victim, location);
   act("$n appears out of nowhere.", victim, 0, 0, TO_ROOM, INVIS_NULL);
