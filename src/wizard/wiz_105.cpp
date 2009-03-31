@@ -394,15 +394,15 @@ int do_sqedit(struct char_data *ch, char *argument, int cmd)
   bool done = FALSE;
   argument = one_argument(argument,arg1);
   struct skill_quest * skill=NULL;
-  if (argument && *argument) {
+  if (argument && *argument) 
+  {
     argument = one_argument(argument,arg2);
     strcpy(arg3,arg1);
     strcat(arg3, " ");
     strcat(arg3,arg2);
     if ((skill = find_sq(arg3))!=NULL);
-//      argument = one_argument(argument,arg2);
   }
-  if (skill==NULL && (skill = find_sq(arg1))==NULL && i!=0 && i!=6)
+  if (skill==NULL && (skill = find_sq(arg1))==NULL && i!=0 && i!=6 && i!=7)
   {
     send_to_char("Unknown skill.\r\n",ch);
     return eFAILURE;
