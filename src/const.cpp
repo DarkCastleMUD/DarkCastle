@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.293 2009/03/28 00:51:34 dcastle Exp $ */
+/* $Id: const.cpp,v 1.294 2009/03/31 23:04:12 kkoons Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -89,6 +89,7 @@ std::map<int,int> fill_skill_cost()
   skill_cost_map[SKILL_PRIMAL_FURY] = 40;
   skill_cost_map[SKILL_HEADBUTT] = 15;
   skill_cost_map[SKILL_FREE_ANIMAL] = 25;
+  skill_cost_map[SKILL_BEHEAD] = 40;
   return skill_cost_map;
 }
 
@@ -1411,8 +1412,8 @@ struct class_skill_defines p_skills[] = { // paladin skills
 {    "protection from evil", SPELL_PROTECT_FROM_EVIL,  45,     85,  0,   CONWIS },
 {    "resist cold",          SPELL_RESIST_COLD,        46,     70,  0,   STRWIS },
 {    "divine fury",          SPELL_DIVINE_FURY,        48,    100,  0,   STRCON },
+{    "behead",               SKILL_BEHEAD,             30,    100,  0,   DEXINT },
 {    "holy aura",            SPELL_HOLY_AURA,          50,    100,  0,   CONWIS },
-//{    "behead",               SKILL_BEHEAD,             51,    100,  0,   STRCON },
 //{    "spirit shield",        SPELL_SPIRIT_SHIELD,      55,    100,  0,   INTWIS },
 {    "\n",                   0,                        1,      0,   0,   0 }
 };
