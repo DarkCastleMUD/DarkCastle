@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.296 2009/04/01 02:53:48 kkoons Exp $ */
+/* $Id: const.cpp,v 1.297 2009/04/01 04:32:31 kkoons Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1412,7 +1412,7 @@ struct class_skill_defines p_skills[] = { // paladin skills
 {    "protection from evil", SPELL_PROTECT_FROM_EVIL,  45,     85,  0,   CONWIS },
 {    "resist cold",          SPELL_RESIST_COLD,        46,     70,  0,   STRWIS },
 {    "divine fury",          SPELL_DIVINE_FURY,        48,    100,  0,   STRCON },
-{    "behead",               SKILL_BEHEAD,             49,    200,  0,   DEXINT },
+{    "behead",               SKILL_BEHEAD,             49,    100,  0,   DEXINT },
 {    "holy aura",            SPELL_HOLY_AURA,          50,    100,  0,   CONWIS },
 //{    "spirit shield",        SPELL_SPIRIT_SHIELD,      55,    100,  0,   INTWIS },
 {    "\n",                   0,                        1,      0,   0,   0 }
@@ -1589,8 +1589,8 @@ struct class_skill_defines u_skills[] = { // druid skills
 {    "eyes of the owl",      SPELL_EYES_OF_THE_OWL,      2,      90,  0,   DEXWIS },
 {    "cure light",           SPELL_CURE_LIGHT,           3,      85,  0,   INTWIS },
 {    "create water",         SPELL_CREATE_WATER,         5,      90,  0,   DEXWIS },
-{    "attrition",            SPELL_ATTRITION,            6,     200,  0,   CONWIS },
-{    "natures lore",         SKILL_NATURES_LORE,         7,     200,  0,   DEXWIS },
+{    "attrition",            SPELL_ATTRITION,            6,     100,  0,   CONWIS },
+{    "natures lore",         SKILL_NATURES_LORE,         7,     100,  0,   DEXWIS },
 {    "create food",          SPELL_CREATE_FOOD,          8,      90,  0,   DEXWIS },
 {    "sense life",           SPELL_SENSE_LIFE,           10,     90,  0,   DEXWIS },
 {    "weaken",               SPELL_WEAKEN,               11,    100,  0,   CONWIS },
