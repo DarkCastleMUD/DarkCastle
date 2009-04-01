@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc2.cpp,v 1.84 2009/03/31 23:40:27 kkoons Exp $ */
+/* $Id: mob_proc2.cpp,v 1.85 2009/04/01 04:51:55 kkoons Exp $ */
 #include <room.h>
 #include <obj.h>
 #include <connect.h>
@@ -155,7 +155,7 @@ int repair_guy(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
   cost = obj->obj_flags.cost;
   value0 = eq_max_damage(obj);
   percent = ((100* eqdam) / value0);
-  price = ((cost * x) / 100);   // now we know what to charge them fuckers! 
+  price = ((cost * percent) / 100);   // now we know what to charge them fuckers! 
 
   if (price < 100)
     price = 100;     // Welp.. Repair Guy needs to feed the kids somehow.. :)
@@ -815,6 +815,7 @@ int gl_repair_shop(struct char_data *ch, struct obj_data *obj, int cmd, char *ar
 
   cost = obj->obj_flags.cost;
   value0 = eq_max_damage(obj);
+  value2 = obj->obj_flags.value[2];
   
   if (!IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL))
   {
@@ -828,8 +829,7 @@ int gl_repair_shop(struct char_data *ch, struct obj_data *obj, int cmd, char *ar
   {
 
     percent = ((100* eqdam) / value0);
-    x = (100 - percent);          /* now we know what percent to repair ..  */
-    price = ((cost * x) / 100);   /* now we know what to charge them fuckers! */
+    price = ((cost * percent) / 100);   /* now we know what to charge them fuckers! */
     price *= 4;                   /* he likes to charge more..  */
                                   /*  for armor... cuz he's a crook..  */
   } else if (obj->obj_flags.type_flag == ITEM_WEAPON ||
@@ -839,8 +839,7 @@ int gl_repair_shop(struct char_data *ch, struct obj_data *obj, int cmd, char *ar
   {
 
     percent = ((100* eqdam) / (value0 + value2));
-    x = (100 - percent);          /* now we know what percent to repair ..  */
-    price = ((cost * x) / 100);   /* now we know what to charge them fuckers! */
+    price = ((cost * percent) / 100);   /* now we know what to charge them fuckers! */
     price *= 5;
   }
   else
