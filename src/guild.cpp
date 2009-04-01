@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: guild.cpp,v 1.124 2009/01/04 01:39:58 jhhudso Exp $
+| $Id: guild.cpp,v 1.125 2009/04/01 02:53:35 kkoons Exp $
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
@@ -81,9 +81,9 @@ char *per_col(int percent)
     return ( "$B$3");
   if (percent <= 90)
     return ("$B$3");
-
-  return ("$B$7");
-  
+  if (percent <= 100)
+    return ("$B$7");
+  return ("$B$1");
 }
 
 char *how_good(int percent)
@@ -114,8 +114,10 @@ char *how_good(int percent)
     return ( " excellent$R");
   if (percent <= 90)
     return (" superb$R");
+  if (percent <= 100)
+    return (" Masterful$R");
 
-  return (" Masterful$R");
+  return (" Transcendent$R");
 }
 	
 // return a 1 if I just learned skill for first time
@@ -348,7 +350,7 @@ void output_praclist(struct char_data *ch, class_skill_defines *skilllist)
       if(!known && GET_LEVEL(ch) < skilllist[i].levelavailable)
           continue;
 //      known = known % 100;
-      sprintf(buf, " %c%-24s%s%14s $B$0($R%c%s%3d$B$0)$R   $B%2d$R   ", UPPER(*skilllist[i].skillname), (skilllist[i].skillname+1),
+      sprintf(buf, " %c%-24s%s%15s $B$0($R%c%s%3d$B$0)$R   $B%2d$R   ", UPPER(*skilllist[i].skillname), (skilllist[i].skillname+1),
                    per_col(known), how_good(known),charthing(ch, known,skilllist[i].skillnum, skilllist[i].maximum), per_col(known), known,
 		skilllist[i].levelavailable);
       send_to_char(buf, ch);
