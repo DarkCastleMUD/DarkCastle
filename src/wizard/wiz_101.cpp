@@ -18,6 +18,13 @@
 #include <returnvals.h>
 #include <spells.h>
 #include "const.h"
+#include <queue>
+#include <string>
+
+using namespace std;
+
+queue<string> imm_history;
+queue<string> imp_history;
 
 #define MAX_MESSAGE_LENGTH      4096
 
@@ -544,13 +551,46 @@ int do_wiz(struct char_data *ch, char *argument, int cmd)
     for (; *argument == ' '; argument++);
 
     if (!(*argument))
-        send_to_char(
-            "What do you want to tell all gods and immortals?\n\r", ch);
-    else {
+    {
+      queue<string> tmp;
+      if(cmd == 9)
+      {
+        tmp = imm_history;
+        send_to_char("Here are the last 10 imp messages:r\n", ch);
+      }
+      else if(cmd == 8)
+      {
+        tmp = imp_history;
+        send_to_char("Here are the last 10 imm messages:r\n", ch);
+      }
+      else
+      {
+        send_to_char("What? How did you get here?? Contact a coder.\r\n", ch);
+        return eSUCCESS;
+      }
+
+      while(!tmp.empty())
+      {
+        send_to_char((tmp.front()).c_str(), ch);
+        tmp.pop();
+      }
+        //send_to_char(
+        //    "What do you want to tell all gods and immortals?\n\r", ch);
+    }
+    else 
+    {
         if(cmd == 9)
+        {
           sprintf(buf1, "$B$4%s$7: $7$B%s$R\n\r", GET_SHORT(ch), argument);
+          imm_history.push(buf1);
+          if(imm_history.size() > 10) imm_history.pop();
+        }
         else
+        {
           sprintf(buf1, "$B$7%s> %s$R\n\r", GET_SHORT(ch), argument);
+          imp_history.push(buf1);
+          if(imp_history.size() > 10) imp_history.pop();
+        }
 
 	send_to_char(buf1, ch);
         ansi_color( NTEXT, ch);
