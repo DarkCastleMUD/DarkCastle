@@ -248,7 +248,7 @@ int do_behead(struct char_data *ch, char *argument, int cmd)
 
   if (!charge_moves(ch, SKILL_BEHEAD)) return eSUCCESS;
 
-  WAIT_STATE(ch, (int)(PULSE_VIOLENCE*1.5));
+  WAIT_STATE(ch, (int)(PULSE_VIOLENCE));
  
   if(!skill_success(ch,vict,SKILL_BEHEAD))
   {
@@ -259,7 +259,7 @@ int do_behead(struct char_data *ch, char *argument, int cmd)
     return retval;
   }
 
-  modifier = 25 + skill / 2 + GET_ALIGNMENT(ch) / 100;
+  modifier = 50 + skill / 2 + GET_ALIGNMENT(ch) / 100;
   modifier /= 100; //range .15-1.0
   enemy_hp = (GET_HIT(vict)* 100) / GET_MAX_HIT(vict);
   enemy_hp /= 100; //range 0-1;
