@@ -20,7 +20,7 @@
  * 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead *
  * of just race stuff                                                     *
  **************************************************************************
- * $Id: fight.cpp,v 1.531 2009/02/16 19:54:09 jhhudso Exp $               *
+ * $Id: fight.cpp,v 1.532 2009/04/01 01:00:34 dcastle Exp $               *
  **************************************************************************/
 
 extern "C"
@@ -1490,12 +1490,6 @@ int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
       else dam *= 25;
     }
   }
-
-  if(wielded && IS_SET(wielded->obj_flags.extra_flags, ITEM_TWO_HANDED) && has_skill(ch, SKILL_BEHEAD))
-    if(w_type == TYPE_SLASH && GET_HIT(vict) < 3500 && GET_HIT(vict) * 100 / GET_MAX_HIT(vict) < 30) {
-      retval = do_behead_skill(ch, vict);
-      if(SOMEONE_DIED(retval)) return debug_retval(ch, vict, retval);
-    }
 
   if(wielded && IS_SET(wielded->obj_flags.extra_flags, ITEM_TWO_HANDED) && has_skill(ch, SKILL_EXECUTE))
     if(GET_HIT(vict) < 3500 && GET_HIT(vict) * 100 / GET_MAX_HIT(vict) < 15) {
