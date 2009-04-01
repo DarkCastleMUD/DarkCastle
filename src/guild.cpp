@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: guild.cpp,v 1.125 2009/04/01 02:53:35 kkoons Exp $
+| $Id: guild.cpp,v 1.126 2009/04/01 17:56:48 kkoons Exp $
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
@@ -119,7 +119,7 @@ char *how_good(int percent)
 
   return (" Transcendent$R");
 }
-	
+
 // return a 1 if I just learned skill for first time
 // else 0
 int learn_skill(char_data * ch, int skill, int amount, int maximum)
@@ -180,22 +180,6 @@ int search_skills(char * arg, class_skill_defines * list_skills)
   return -1;
 }
 
-int default_master[] = {
-  -1,        // no class 0
-   1937,     // CLASS_MAGIC_USER   1
-   1930,     // CLASS_CLERIC       2   
-   1928,     // CLASS_THIEF        3   
-   1926,     // CLASS_WARRIOR      4   
-   1920,     // CLASS_ANTI_PAL     5   
-   1935,     // CLASS_PALADIN      6   
-   1922,     // CLASS_BARBARIAN    7   
-   1932,     // CLASS_MONK         8   
-   1924,     // CLASS_RANGER       9   
-   1939,     // CLASS_BARD        10   
-   1941,     // CLASS_DRUID       11
-   0,        // CLASS_PSIONIC     12
-   0         // CLASS_NECROMANCER 13
-};
 
 class_skill_defines * get_skill_list(char_data * ch)
 {
@@ -503,7 +487,8 @@ int skills_guild(struct char_data *ch, char *arg, struct char_data *owner)
   // we can only train them if they already know it, or if we're the trainer for that skill
   if (!known)
   {
-   if (default_master[GET_CLASS(ch)] != mob_index[owner->mobdata->nr].virt) {
+   if (GET_CLASS(ch) != GET_CLASS(owner))
+   {
 	do_say(owner, "I am sorry, I cannot teach you that.  You will have to find another trainer.",9);
        return eSUCCESS;
    }
