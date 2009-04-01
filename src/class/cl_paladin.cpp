@@ -253,6 +253,8 @@ int do_behead(struct char_data *ch, char *argument, int cmd)
   if(!skill_success(ch,vict,SKILL_BEHEAD))
   {
     send_to_char("Your mighty swing goes wild!\r\n", ch);
+    act("$n takes a mighty swing at your head, but it goes wild!", ch, 0, vict, TO_VICT, 0);
+    act("$n takes a mighty swing at $n's head, but it goes wild!", ch, 0, vict, TO_ROOM, NOTVICT);
     retval = one_hit(ch, vict, SKILL_BEHEAD, FIRST);
     return retval;
   }
