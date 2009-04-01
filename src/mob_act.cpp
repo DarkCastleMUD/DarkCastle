@@ -19,7 +19,7 @@
 /* 12/06/2003   Onager   Modified mobile_activity() to prevent charmie    */
 /*                       scavenging                                       */
 /**************************************************************************/
-/* $Id: mob_act.cpp,v 1.47 2008/07/11 14:44:01 dcastle Exp $ */
+/* $Id: mob_act.cpp,v 1.48 2009/04/01 16:33:59 kkoons Exp $ */
 
 extern "C"
 {
@@ -512,14 +512,23 @@ void mobile_activity(void)
             IS_SET(race_info[(int)GET_RACE(ch)].hate_fear, tmp_bitv))
           {
             tmp_race = GET_RACE(tmp_ch);
-            if(GET_LEVEL(ch) >= GET_LEVEL(tmp_ch)) {
+            bool wimpy = ISSET(ch->mobdata->actflags, ACT_WIMPY);
+
+
+            //if mob isn't wimpy, always attack
+            //if mob is wimpy, but is equal or greater, attack
+            //if mob is wimpy, and lower level.. flee
+            if(!wimpy || (wimpy && GET_LEVEL(ch) >= GET_LEVEL(tmp_ch)))
+            {
               sprintf(buf, "$n screams 'Oooo, I HATE %s!'", race_info[tmp_race].plural_name);
               act(buf, ch, 0, 0, TO_ROOM, 0);
               retval = mprog_attack_trigger( ch, tmp_ch );
               if(SOMEONE_DIED(retval))
                 break;
               attack(ch, tmp_ch, 0);
-            } else {
+            } 
+            else 
+            {
               sprintf(buf, "$n screams 'Eeeeek, I HATE %s!'", race_info[tmp_race].plural_name);
               act(buf,  ch, 0, 0, TO_ROOM, 0);
               do_flee(ch, "", 9);
