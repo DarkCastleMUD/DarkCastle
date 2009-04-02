@@ -233,6 +233,30 @@ void assign_non_combat_procs() {
     assign_one_mob_non(1925,  guild_guard);
     assign_one_mob_non(1927,  guild_guard); 
     assign_one_mob_non(1929,  guild_guard);
+    assign_one_mob_non(1600, guild);
+    assign_one_mob_non(1604, guild);
+    assign_one_mob_non(1609, guild);
+    assign_one_mob_non(1612, guild);
+    assign_one_mob_non(1616, guild);
+    assign_one_mob_non(1620, guild);
+    assign_one_mob_non(1624, guild);
+    assign_one_mob_non(1628, guild);
+    assign_one_mob_non(1632, guild);
+    assign_one_mob_non(1636, guild);
+    assign_one_mob_non(1640, guild);
+
+    assign_one_mob_non(5223, guild);
+    assign_one_mob_non(5228, guild);
+    assign_one_mob_non(5229, guild);
+    assign_one_mob_non(5230, guild);
+    assign_one_mob_non(5231, guild);
+    assign_one_mob_non(5233, guild);
+    assign_one_mob_non(5234, guild);
+    assign_one_mob_non(5235, guild);
+    assign_one_mob_non(5236, guild);
+    assign_one_mob_non(5237, guild);
+    assign_one_mob_non(5242, guild);
+
     assign_one_mob_non(1920,  guild);
     assign_one_mob_non(1922,  guild);
     assign_one_mob_non(5431,  guild);
