@@ -34,6 +34,7 @@ int act(const std::string &str, CHAR_DATA *ch, OBJ_DATA *obj, void *vict_obj,
 #define TO_CHAR   2   // Just ch
 #define TO_ZONE   3   // Everyone in ch's zone except ch
 #define TO_WORLD  4   // Everyone in the world except ch
+#define TO_GROUP  5   // Everyone in the ch's group except ch
 
 // These constants go in the flags part (optional -- 0 for none)
 #define DEFAULT       0    // "someone" if invisible, sleepers skipped
