@@ -259,23 +259,31 @@ int do_behead(struct char_data *ch, char *argument, int cmd)
     return retval;
   }
 
-  modifier = 50 + skill / 2 + GET_ALIGNMENT(ch) / 100;
-  modifier /= 100; //range .15-1.0
-  enemy_hp = (GET_HIT(vict)* 100) / GET_MAX_HIT(vict);
-  enemy_hp /= 100; //range 0-1;
+  modifier = 50.0 + skill / 2.0 + GET_ALIGNMENT(ch) / 100.0;
+  modifier /= 100.0; //range .15-1.0
+
+  enemy_hp = (GET_HIT(vict)* 100.0) / GET_MAX_HIT(vict);
+  enemy_hp /= 100.0; //range 0-1;
 
   if(enemy_hp <= 0)
     enemy_hp = 0.01;
 
   chance = (int)(modifier / (enemy_hp * enemy_hp));  
 
-  if(chance > 90) 
-    chance = 90;
+
+  if(enemy_hp < 0.26) //covered is 0.3
+  {
+    chance += (has_skill(ch, SKILL_TWO_HANDED_WEAPONS) / 6);
+    //csendf(ch, "BEHEAD chance increased by %d\r\n", has_skill(ch, SKILL_TWO_HANDED_WEAPONS) / 6);
+  }
+   
+  if(chance > 85) 
+    chance = 85;
 
   if(chance < 0)
     chance = 0;
 
-  //csendf(ch, "mod: %f, enemy_hp: %f, chance: %d\r\n", modifier, enemy_hp, chance);
+  //csendf(ch, "behead chance: %d, enemy hp%: %f\r\n", chance, enemy_hp);
 
   if((number(0,99) < chance) && !IS_SET(vict->immune, ISR_SLASH)) 
   {
