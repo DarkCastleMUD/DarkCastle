@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.256 2009/03/30 18:30:09 apocalypse Exp $ */
+/* $Id: spells.cpp,v 1.257 2009/04/03 23:12:18 kkoons Exp $ */
 
 extern "C"
 {
@@ -1655,6 +1655,36 @@ skillnum <= SKILL_SONG_MAX) || (skillnum >= KI_OFFSET && skillnum <= (KI_OFFSET+
   }
 }
 
+void set_conc_loss(CHAR_DATA *ch, int spl)
+{
+  struct affected_type af;
+  af.type      = CONC_LOSS_FIXER;
+  af.duration  = 1;
+  af.modifier  = spl;
+  af.location  = 0;
+  af.bitvector = -1;
+
+  affect_to_char(ch, &af);
+  return;
+  
+}
+bool check_conc_loss(CHAR_DATA *ch, int spl)
+{
+  struct affected_type *af;
+  int afspl;
+  if(!(af = affected_by_spell(ch, CONC_LOSS_FIXER)))
+    return false;
+
+  afspl = af->modifier;
+
+  affect_from_char(ch, CONC_LOSS_FIXER);
+
+  if(afspl != spl)
+    return false;
+ 
+  return true;
+}
+
 // Assumes that *argument does start with first letter of chopped string 
 int do_cast(CHAR_DATA *ch, char *argument, int cmd)
 {
@@ -2094,21 +2124,21 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
           chance += wis_app[GET_WIS(ch)].conc_bonus;
 	extern int get_max(CHAR_DATA *ch, int skill);
 
-//	chance = MIN(get_max(ch, spl), chance);
         if (GET_RACE(ch) == RACE_HUMAN)
   	  chance = MIN(95, chance);
 	else
 	  chance = MIN(97, chance);
-//	int o = GET_LEVEL(ch)*2+1;
- //       if (chance > o) o = chance + 1;
-//	if (o > 101) o = 101; // imms/mobs
-//        if ((float)((float)chance/(float)o) < 0.4) chance = (int)(o*0.4);
 
 	if (GET_LEVEL(ch) == 1) chance++;
+
+        if (check_conc_loss(ch, spl)) chance = 99;
+
         if(IS_AFFECTED(ch, AFF_CRIPPLE) && affected_by_spell(ch, SKILL_CRIPPLE))
            chance -= 1 + affected_by_spell(ch, SKILL_CRIPPLE)->modifier/10;
+
         if(GET_LEVEL(ch) < IMMORTAL && number(1,100) > chance && !IS_AFFECTED(ch,AFF_FOCUS) && !IS_SET(world[ch->in_room].room_flags, SAFE) )
         {
+          set_conc_loss(ch, spl);
           csendf(ch, "You lost your concentration and are unable to cast %s!\n\r", spells[spl-1]);
           GET_MANA(ch) -= (use_mana(ch, spl) >> 1);
           act("$n loses $s concentration and is unable to complete $s spell.", ch, 0, 0, TO_ROOM, 0);
