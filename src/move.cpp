@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: move.cpp,v 1.91 2009/01/04 01:38:15 jhhudso Exp $
+| $Id: move.cpp,v 1.92 2009/04/03 22:35:30 kkoons Exp $
 | move.C
 | Movement commands and stuff.
 *************************************************************************
@@ -656,6 +656,7 @@ int do_simple_move(CHAR_DATA *ch, int cmd, int following)
       }
     else {
       sprintf(tmp, "$n sneaks %s.", dirs[cmd]);
+      act(tmp, ch, 0, 0, TO_GROUP, INVIS_NULL);
       act(tmp, ch, 0, 0, TO_ROOM, GODS);
       }
     }
@@ -734,7 +735,10 @@ int do_simple_move(CHAR_DATA *ch, int cmd, int following)
 
   if (IS_AFFECTED(ch, AFF_SNEAK) ||
     (IS_AFFECTED(ch, AFF_FOREST_MELD) && world[ch->in_room].sector_type == SECT_FOREST))
+  {
     act("$n sneaks into the room.", ch, 0, 0, TO_ROOM, GODS);
+    act("$n sneaks into the room.", ch, 0, 0, TO_GROUP, INVIS_NULL);
+  }
   else
     act("$n has arrived.", ch, 0,0, TO_ROOM, INVIS_NULL);
 
