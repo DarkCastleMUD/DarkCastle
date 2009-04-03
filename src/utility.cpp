@@ -17,7 +17,7 @@
  *                         except Pir and Valk                             *
  * 10/19/2003   Onager     Took out super-secret hidey code from CAN_SEE() *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.97 2009/04/01 02:46:56 kkoons Exp $ */
+/* $Id: utility.cpp,v 1.98 2009/04/03 22:35:46 kkoons Exp $ */
 
 extern "C"
 {
@@ -781,11 +781,18 @@ bool CAN_SEE( struct char_data *sub, struct char_data *obj, bool noprog )
 	   if (IS_AFFECTED(sub, AFF_TRUE_SIGHT))
       		return TRUE;
 
-      if (is_hiding(obj, sub)) return FALSE;
+           if (ARE_GROUPED(sub, obj))
+           {
+             if ( !IS_AFFECTED( obj, AFF_INVISIBLE ) )
+               return TRUE; //if they're not invis.. they can always see
 
-//      if ( has_skill(obj,SKILL_HIDE) && skill_success(obj, NULL, 
-//SKILL_HIDE))
-  //       return FALSE;
+             if ( IS_AFFECTED( sub, AFF_DETECT_INVISIBLE ) )
+               return TRUE; //if they have det invis.. they can see
+
+              return FALSE; //else they can't
+           }
+
+      if (is_hiding(obj, sub)) return FALSE;
    }
 
    if ( !IS_AFFECTED( obj, AFF_INVISIBLE ) )
