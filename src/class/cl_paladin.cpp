@@ -271,7 +271,7 @@ int do_behead(struct char_data *ch, char *argument, int cmd)
   chance = (int)(modifier / (enemy_hp * enemy_hp));  
 
 
-  if(enemy_hp < 0.26) //covered is 0.3
+  if(enemy_hp < 0.3) //covered is 0.3
   {
     chance += (has_skill(ch, SKILL_TWO_HANDED_WEAPONS) / 6);
     //csendf(ch, "BEHEAD chance increased by %d\r\n", has_skill(ch, SKILL_TWO_HANDED_WEAPONS) / 6);
