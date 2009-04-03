@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.178 2009/01/09 06:55:56 shane Exp $ */
+/* $Id: info.cpp,v 1.179 2009/04/03 22:35:59 kkoons Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -514,7 +514,7 @@ void show_char_to_char(struct char_data *i, struct char_data *ch, int mode)
          }
          if ( IS_AFFECTED(i,AFF_INVISIBLE))
             strcat(buffer," $1(invisible)");
-	 if (IS_AFFECTED(i, AFF_HIDE) && ( IS_AFFECTED(ch, AFF_TRUE_SIGHT) && has_skill(ch, SPELL_TRUE_SIGHT) > 80 || GET_LEVEL(ch) > IMMORTAL ))
+	 if (IS_AFFECTED(i, AFF_HIDE) && ( IS_AFFECTED(ch, AFF_TRUE_SIGHT) && has_skill(ch, SPELL_TRUE_SIGHT) > 80 || GET_LEVEL(ch) > IMMORTAL  || ARE_GROUPED(i, ch) ))
             strcat(buffer, "$4 (hidden)");
          if ((IS_AFFECTED(ch, AFF_DETECT_EVIL) || IS_AFFECTED(ch, AFF_KNOW_ALIGN)) && IS_EVIL(i)) 
             strcat(buffer, "$B$4(Red Halo) ");
