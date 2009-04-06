@@ -76,11 +76,16 @@ int act
     return eFAILURE;
     }
 
-  if ((IS_AFFECTED(ch, AFF_HIDE) || ISSET(ch->affected_by, AFF_FOREST_MELD)) &&
-    (destination != TO_CHAR) && !(flags & GODS) && !(flags & STAYHIDE)) {
+  if (
+      (IS_AFFECTED(ch, AFF_HIDE) || ISSET(ch->affected_by, AFF_FOREST_MELD)) 
+       && (destination != TO_CHAR) 
+       && (destination != TO_GROUP)
+       && !(flags & GODS) 
+       && !(flags & STAYHIDE)) 
+  {
     REMBIT(ch->affected_by, AFF_HIDE);
     affect_from_char(ch, SPELL_FOREST_MELD);
-    }
+  }
     
   if (destination == TO_VICT) {
     retval |= send_message(tokens, ch, obj, vict_obj, flags, (CHAR_DATA *)vict_obj);
