@@ -1684,6 +1684,7 @@ int do_vend(CHAR_DATA *ch, char *argument, int cmd)
   if(!*buf)
   {
     send_to_char("Syntax: vend <buy | sell | list | cancel | modify | collect | search | identify>\n\r", ch);
+    if(GET_LEVEL(ch) >= 108) send_to_char("Also: <addroom | removeroom | listroom | stats>\r\n", ch);
     return eSUCCESS;       
 
   }
@@ -1993,7 +1994,8 @@ int do_vend(CHAR_DATA *ch, char *argument, int cmd)
     return eSUCCESS;
   }
 
-
+  
   send_to_char("Do what?\n\rSyntax: vend <buy | sell | list | cancel | modify | collect | search | identify>\n\r", ch);
+  if(GET_LEVEL(ch) >= 108) send_to_char("Also: <addroom | removeroom | listroom | stats>\r\n", ch);
   return eSUCCESS;
 }
