@@ -100,9 +100,18 @@ public:
   void CheckForSoldItems(CHAR_DATA *ch);
   bool IsAuctionHouse(int room);
   void DoModify(CHAR_DATA *ch, unsigned int ticket, unsigned int new_price);
+  void ShowStats(CHAR_DATA *ch);
   void Save();
   void Load();  
 private:
+  unsigned int  ItemsPosted;
+  unsigned int  ItemsExpired;
+  unsigned int  ItemsSold;
+  unsigned int  TaxCollected;
+  unsigned int  Revenue;
+  unsigned int  UncollectedGold;
+  unsigned int  ItemsActive;
+  void ParseStats();
   bool CanSellMore(CHAR_DATA *ch);
   bool IsOkToSell(OBJ_DATA *obj);
   bool IsWearable(CHAR_DATA *ch, int vnum);
@@ -119,6 +128,19 @@ private:
   string file_name;
   map<unsigned int, AuctionTicket> Items_For_Sale;
 };
+
+void AuctionHouse::ShowStats(CHAR_DATA *ch)
+{
+  send_to_char("Vendor Statistics:\r\n", ch);
+  csendf(ch, "Items Posted:     %d\r\n", ItemsPosted);
+  csendf(ch, "Items For Sale:   %d\r\n", ItemsActive);
+  csendf(ch, "Items Sold:       %d\r\n", ItemsSold);
+  csendf(ch, "Items Expired:    %d\r\n", ItemsExpired);
+  csendf(ch, "Total Revenue:    %d\r\n", Revenue);
+  csendf(ch, "Tax Collected:    %d\r\n", TaxCollected);
+  csendf(ch, "Uncollected Gold: %d\r\n", UncollectedGold);
+  return;
+}
 
 /*
 IS RACE
@@ -482,7 +504,7 @@ void AuctionHouse::Identify(CHAR_DATA *ch, unsigned int ticket)
   }
 
   OBJ_DATA *obj = (struct obj_data *)(obj_index[nr].item);
-
+  TaxCollected += 6000;
   GET_GOLD(ch) -= 6000;
   send_to_char("You pay the broker 6000 gold to identify the item.\n\r", ch);
   do_save(ch, "", 9);
@@ -739,6 +761,37 @@ void AuctionHouse::RemoveRoom(CHAR_DATA *ch, int room)
   return;
 }
 
+void AuctionHouse::ParseStats()
+{
+  map<unsigned int, AuctionTicket>::iterator Item_it;
+  ItemsPosted = Items_For_Sale.size();
+  unsigned int fee;
+
+  for(Item_it = Items_For_Sale.begin(); Item_it != Items_For_Sale.end(); Item_it++)
+  {
+    fee = (unsigned int)((double)Item_it->second.price * 0.025);
+    if (fee > 500000)
+      fee = 500000;
+
+    TaxCollected += fee;
+    if(Item_it->second.state == AUC_SOLD)
+    {
+      Revenue += Item_it->second.price;
+      UncollectedGold += Item_it->second.price;
+      ItemsSold++;
+    }
+       
+    if(Item_it->second.state == AUC_EXPIRED)
+      ItemsExpired++;
+
+    if(Item_it->second.state == AUC_FOR_SALE)
+      ItemsActive++;
+  }
+  Save();
+  return; 
+}
+
+
 /*
 LOAD
 */
@@ -791,6 +844,19 @@ void AuctionHouse::Load()
     fscanf(the_file, "%u\n", &InTicket.price);
     Items_For_Sale[ticket] = InTicket;
   }
+  if(feof(the_file)) //this means the stat info was lost somehow
+    ParseStats();
+  else
+  {
+    fscanf(the_file, "%u\n", &ItemsPosted);
+    fscanf(the_file, "%u\n", &ItemsExpired);
+    fscanf(the_file, "%u\n", &ItemsSold);
+    fscanf(the_file, "%u\n", &TaxCollected);
+    fscanf(the_file, "%u\n", &Revenue);
+    fscanf(the_file, "%u\n", &ItemsActive);
+    fscanf(the_file, "%u\n", &UncollectedGold);
+  }
+  dc_fclose(the_file);
   return;
 }
 
@@ -838,6 +904,13 @@ void AuctionHouse::Save()
     fprintf(the_file, "%u\n", Item_it->second.end_time);
     fprintf(the_file, "%u\n", Item_it->second.price);
   }
+  fprintf(the_file, "%u\n", ItemsPosted);
+  fprintf(the_file, "%u\n", ItemsExpired);
+  fprintf(the_file, "%u\n", ItemsSold);
+  fprintf(the_file, "%u\n", TaxCollected);
+  fprintf(the_file, "%u\n", Revenue);
+  fprintf(the_file, "%u\n", ItemsActive);
+  fprintf(the_file, "%u\n", UncollectedGold);
 
   dc_fclose(the_file);
   return;
@@ -865,6 +938,13 @@ Constructor with file name
 */
 AuctionHouse::AuctionHouse(string in_file)
 {
+  ItemsPosted = 0;
+  ItemsActive = 0;
+  ItemsExpired = 0;
+  ItemsSold = 0;
+  TaxCollected = 0;
+  UncollectedGold = 0;
+  Revenue = 0;
   cur_index = 0;
   file_name = in_file;
 }
@@ -957,6 +1037,8 @@ void AuctionHouse::CheckExpire()
   {
     if(Item_it->second.state == AUC_FOR_SALE && cur_time >= Item_it->second.end_time)
     {
+      ItemsActive -= 1;
+      ItemsExpired += 1;
       if((ch = get_active_pc(Item_it->second.seller.c_str()))) 
         csendf(ch, "Your auction of %s has expired.\n\r", Item_it->second.item_name.c_str());
       Item_it->second.state = AUC_EXPIRED;
@@ -1059,7 +1141,10 @@ void AuctionHouse::BuyItem(CHAR_DATA *ch, unsigned int ticket)
       extract_obj(no_trade_obj);
     }
   } 
-   
+  ItemsSold += 1;
+  ItemsActive -= 1;
+  Revenue += Item_it->second.price; 
+  UncollectedGold += Item_it->second.price;
   GET_GOLD(ch) -= Item_it->second.price;
 
   if((vict = get_active_pc(Item_it->second.seller.c_str()))) 
@@ -1123,6 +1208,7 @@ void AuctionHouse::RemoveTicket(CHAR_DATA *ch, unsigned int ticket)
 {
   map<unsigned int, AuctionTicket>::iterator Item_it;
   OBJ_DATA *obj;
+  bool expired = false;
 
   Item_it = Items_For_Sale.find(ticket);
   if(Item_it == Items_For_Sale.end())
@@ -1146,6 +1232,9 @@ void AuctionHouse::RemoveTicket(CHAR_DATA *ch, unsigned int ticket)
       csendf(ch, "The Broker hands you %u gold coins from your sale of %s.\n\r"
                "He pockets %u gold as a broker's fee.\n\r", 
           (Item_it->second.price - fee), Item_it->second.item_name.c_str(), fee);
+      TaxCollected += fee;
+      Revenue -= fee;
+      UncollectedGold -= Item_it->second.price;
       GET_GOLD(ch) += (Item_it->second.price - fee);
       char log_buf[MAX_STRING_LENGTH];
       sprintf(log_buf, "VEND: %s just collected %u coins from their sale of %s (ticket %u).\n\r", 
@@ -1154,10 +1243,11 @@ void AuctionHouse::RemoveTicket(CHAR_DATA *ch, unsigned int ticket)
     }
     break;
     case AUC_EXPIRED: //intentional fallthrough
+      expired = true;
     case AUC_FOR_SALE:
     {
       int rnum = real_object(Item_it->second.vitem);
-
+      if (!expired) ItemsActive -= 1; //this is removed during expiration check
       if(rnum < 0)
       {
         char buf[MAX_STRING_LENGTH];
@@ -1457,7 +1547,9 @@ void AuctionHouse::AddItem(CHAR_DATA *ch, OBJ_DATA *obj, unsigned int price, str
     send_to_char("The Consignment Broker curtly informs you that all items sold must be in $B$2Excellent Condition$R.\n\r", ch);
     return;
   }
-
+  ItemsPosted += 1;
+  ItemsActive += 1;
+  TaxCollected += fee;
   GET_GOLD(ch) -= fee;
   csendf(ch, "You pay the %d coin tax to auction the item.\n\r", fee);
  
@@ -1490,6 +1582,7 @@ void AuctionHouse::AddItem(CHAR_DATA *ch, OBJ_DATA *obj, unsigned int price, str
     CHAR_DATA *Broker = find_mob_in_room(ch, 5258);
     if(Broker)
     {
+      TaxCollected += 200000;
       GET_GOLD(ch) -= 200000;
       send_to_char("You pay the 200000 gold to advertise your item.\n\r", ch);
       snprintf(auc_buf, MAX_STRING_LENGTH, "$7$B%s has just posted $R%s $7$Bfor sale.",
@@ -1860,6 +1953,12 @@ int do_vend(CHAR_DATA *ch, char *argument, int cmd)
     return eSUCCESS;
   }
 
+  /*SHOW STATS*/
+  if(GET_LEVEL(ch) >= 101 && !strcmp(buf, "stats"))
+  {
+    TheAuctionHouse.ShowStats(ch);
+    return eSUCCESS;
+  }
 
   /*ADD ROOM*/
   if(GET_LEVEL(ch) >= 108 && !strcmp(buf, "addroom"))
