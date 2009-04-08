@@ -1668,7 +1668,7 @@ int do_vend(CHAR_DATA *ch, char *argument, int cmd)
 
 
 
-  if(!TheAuctionHouse.IsAuctionHouse(ch->in_room) && GET_LEVEL(ch) < 105)
+  if(!TheAuctionHouse.IsAuctionHouse(ch->in_room) && GET_LEVEL(ch) < 104)
   {
     send_to_char("You must be in an auction house to do this!\n\r", ch);
     return eFAILURE;
@@ -1684,7 +1684,7 @@ int do_vend(CHAR_DATA *ch, char *argument, int cmd)
   if(!*buf)
   {
     send_to_char("Syntax: vend <buy | sell | list | cancel | modify | collect | search | identify>\n\r", ch);
-    if(GET_LEVEL(ch) >= 108) send_to_char("Also: <addroom | removeroom | listroom | stats>\r\n", ch);
+    if(GET_LEVEL(ch) >= 104) send_to_char("Also: <addroom | removeroom | listroom | stats>\r\n", ch);
     return eSUCCESS;       
 
   }
@@ -1955,14 +1955,14 @@ int do_vend(CHAR_DATA *ch, char *argument, int cmd)
   }
 
   /*SHOW STATS*/
-  if(GET_LEVEL(ch) >= 101 && !strcmp(buf, "stats"))
+  if(GET_LEVEL(ch) >= 104 && !strcmp(buf, "stats"))
   {
     TheAuctionHouse.ShowStats(ch);
     return eSUCCESS;
   }
 
   /*ADD ROOM*/
-  if(GET_LEVEL(ch) >= 108 && !strcmp(buf, "addroom"))
+  if(GET_LEVEL(ch) >= 104 && !strcmp(buf, "addroom"))
   {
     argument = one_argument(argument, buf);
     if(!*buf)
@@ -1975,7 +1975,7 @@ int do_vend(CHAR_DATA *ch, char *argument, int cmd)
   }
 
   /*REMOVE ROOM*/
-  if(GET_LEVEL(ch) >= 108 && !strcmp(buf, "removeroom"))
+  if(GET_LEVEL(ch) >= 104 && !strcmp(buf, "removeroom"))
   {
     argument = one_argument(argument, buf);
     if(!*buf)
@@ -1988,7 +1988,7 @@ int do_vend(CHAR_DATA *ch, char *argument, int cmd)
   }
 
   /*LIST ROOMS*/
-  if(GET_LEVEL(ch) >= 108 && !strcmp(buf, "listrooms"))
+  if(GET_LEVEL(ch) >= 104 && !strcmp(buf, "listrooms"))
   {
     TheAuctionHouse.ListRooms(ch);
     return eSUCCESS;
@@ -1996,6 +1996,6 @@ int do_vend(CHAR_DATA *ch, char *argument, int cmd)
 
   
   send_to_char("Do what?\n\rSyntax: vend <buy | sell | list | cancel | modify | collect | search | identify>\n\r", ch);
-  if(GET_LEVEL(ch) >= 108) send_to_char("Also: <addroom | removeroom | listroom | stats>\r\n", ch);
+  if(GET_LEVEL(ch) >= 104) send_to_char("Also: <addroom | removeroom | listroom | stats>\r\n", ch);
   return eSUCCESS;
 }
