@@ -194,7 +194,12 @@ int do_showbits(struct char_data *ch, char *argument, int cmd)
 
     if(IS_SET(victim->combat, COMBAT_CRUSH_BLOW))
         send_to_char("COMBAT_CRUSH_BLOW\n\r", ch);
+
+    if(IS_SET(victim->combat, COMBAT_CRUSH_BLOW2))
+        send_to_char("COMBAT_CRUSH_BLOW2\n\r", ch);
    
+    if(IS_SET(victim->combat, COMBAT_ATTACKER))
+        send_to_char("COMBAT_ATTACKER\n\r", ch);
 
     send_to_char("--------------------\n\r\n\r", ch);
 
