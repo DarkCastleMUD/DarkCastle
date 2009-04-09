@@ -20,7 +20,7 @@
  * 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead *
  * of just race stuff                                                     *
  **************************************************************************
- * $Id: fight.cpp,v 1.533 2009/04/09 20:50:35 kkoons Exp $               *
+ * $Id: fight.cpp,v 1.534 2009/04/09 21:34:40 kkoons Exp $               *
  **************************************************************************/
 
 extern "C"
@@ -719,6 +719,10 @@ void update_flags(CHAR_DATA *vict)
 
   if (IS_SET(vict->combat, COMBAT_CRUSH_BLOW)) {
       REMOVE_BIT(vict->combat, COMBAT_CRUSH_BLOW);
+      SET_BIT(vict->combat, COMBAT_CRUSH_BLOW2);
+  }
+  else if (IS_SET(vict->combat, COMBAT_CRUSH_BLOW2)) {
+      REMOVE_BIT(vict->combat, COMBAT_CRUSH_BLOW2);
       act("$n shrugs off $s weakness!", vict, 0, 0, TO_ROOM, 0);
       act("You shrug off your weakness.!", vict, 0, 0, TO_CHAR, 0);
   }
@@ -1510,7 +1514,7 @@ int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
       dam += 15 + has_skill(ch, SKILL_NAT_SELECT)/10;
   
   do_combatmastery(ch, vict, weapon);
-  if (IS_SET(ch->combat, COMBAT_CRUSH_BLOW))
+  if (IS_SET(ch->combat, COMBAT_CRUSH_BLOW2))
      dam >>= 1; //dam = dam / 2;
 
   if (w_type == TYPE_HIT && IS_NPC(ch))
@@ -3706,6 +3710,8 @@ void stop_fighting(CHAR_DATA * ch, int clearlag)
     REMOVE_BIT(ch->combat, COMBAT_STUNNED2);
   if (IS_SET(ch->combat, COMBAT_CRUSH_BLOW))
       REMOVE_BIT(ch->combat, COMBAT_CRUSH_BLOW);
+  if (IS_SET(ch->combat, COMBAT_CRUSH_BLOW2))
+      REMOVE_BIT(ch->combat, COMBAT_CRUSH_BLOW2);
   
   return;
 }
