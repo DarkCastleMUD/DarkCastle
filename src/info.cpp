@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.179 2009/04/03 22:35:59 kkoons Exp $ */
+/* $Id: info.cpp,v 1.180 2009/04/09 23:18:42 kkoons Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -2641,10 +2641,10 @@ void check_leaderboard()
    struct descriptor_data *d;
    FILE  *fl;
    int   i, j, k;
-   char  *hpactivename[5], *mnactivename[5], *kiactivename[5], *pkactivename[5], *pdactivename[5], *rdactivename[5];
-   int   hpactive[5], mnactive[5], kiactive[5], pkactive[5], pdactive[5], rdactive[5];
-   char  *hpactiveclassname[CLASS_MAX-2][5], *mnactiveclassname[CLASS_MAX-2][5], *kiactiveclassname[CLASS_MAX-2][5], *pkactiveclassname[CLASS_MAX-2][5], *pdactiveclassname[CLASS_MAX-2][5], *rdactiveclassname[CLASS_MAX-2][5];
-   int   hpactiveclass[CLASS_MAX-2][5], mnactiveclass[CLASS_MAX-2][5], kiactiveclass[CLASS_MAX-2][5], pkactiveclass[CLASS_MAX-2][5], pdactiveclass[CLASS_MAX-2][5], rdactiveclass[CLASS_MAX-2][5];
+   char  *hpactivename[5], *mnactivename[5], *kiactivename[5], *pkactivename[5], *pdactivename[5], *rdactivename[5], *mvactivename[5];
+   int   hpactive[5], mnactive[5], kiactive[5], pkactive[5], pdactive[5], rdactive[5], mvactive[5];
+   char  *hpactiveclassname[CLASS_MAX-2][5], *mnactiveclassname[CLASS_MAX-2][5], *kiactiveclassname[CLASS_MAX-2][5], *pkactiveclassname[CLASS_MAX-2][5], *pdactiveclassname[CLASS_MAX-2][5], *rdactiveclassname[CLASS_MAX-2][5], *mvactiveclassname[CLASS_MAX-2][5];
+   int   hpactiveclass[CLASS_MAX-2][5], mnactiveclass[CLASS_MAX-2][5], kiactiveclass[CLASS_MAX-2][5], pkactiveclass[CLASS_MAX-2][5], pdactiveclass[CLASS_MAX-2][5], rdactiveclass[CLASS_MAX-2][5], mvactiveclass[CLASS_MAX-2][5];
    extern short bport;
    if (bport) return;
 
@@ -2676,6 +2676,10 @@ void check_leaderboard()
       rdactivename[i] = fread_string(fl, 0);
       rdactive[i] = fread_int(fl, 0, LONG_MAX);
    }
+   for(i=0;i<5;i++) {
+      mvactivename[i] = fread_string(fl, 0);
+      mvactive[i] = fread_int(fl, 0, LONG_MAX);
+   }
    for(j=0;j<CLASS_MAX-2;j++) {
       for(i=0;i<5;i++) {
          hpactiveclassname[j][i] = fread_string(fl, 0);
@@ -2700,6 +2704,10 @@ void check_leaderboard()
       for(i=0;i<5;i++) {
          rdactiveclassname[j][i] = fread_string(fl, 0);
          rdactiveclass[j][i] = fread_int(fl, 0, LONG_MAX);
+      }
+      for(i=0;i<5;i++) {
+         mvactiveclassname[j][i] = fread_string(fl, 0);
+         mvactiveclass[j][i] = fread_int(fl, 0, LONG_MAX);
       }
    }
    dc_fclose(fl);
@@ -2774,6 +2782,16 @@ void check_leaderboard()
             dc_free(rdactivename[4]);
             rdactivename[4] = str_dup(" ");		
          }
+         if(!strcmp(mvactivename[i],GET_NAME(d->character))) {
+            for(j=i;j<4;j++) {
+               mvactive[j] = mvactive[j+1];
+               dc_free(mvactivename[j]);
+               mvactivename[j] = str_dup(mvactivename[j+1]);
+            }
+            mvactive[4] = 0;
+            dc_free(mvactivename[4]);
+            mvactivename[4] = str_dup(" ");		
+         }
       }
 
       for(i=0;i<5;i++) {
@@ -2836,6 +2854,16 @@ void check_leaderboard()
             rdactiveclass[k][4] = 0;
             dc_free(rdactiveclassname[k][4]);
             rdactiveclassname[k][4] = str_dup(" ");		
+         }
+         if(!strcmp(mvactiveclassname[k][i],GET_NAME(d->character))) {
+            for(j=i;j<4;j++) {
+               mvactiveclass[k][j] = mvactiveclass[k][j+1];
+               dc_free(mvactiveclassname[k][j]);
+               mvactiveclassname[k][j] = str_dup(mvactiveclassname[k][j+1]);
+            }
+            mvactiveclass[k][4] = 0;
+            dc_free(mvactiveclassname[k][4]);
+            mvactiveclassname[k][4] = str_dup(" ");		
          }
       }      
 
@@ -2918,7 +2946,20 @@ void check_leaderboard()
             break;
          }
       }
-
+      for(i=0;i<5;i++) {
+         if(GET_LEVEL(d->character) < MAX_MORTAL) break;
+         if(GET_MAX_MOVE(d->character) > mvactive[i]) {
+            for(j=4;j>i;j--) {
+               mvactive[j] = mvactive[j-1];
+               dc_free(mvactivename[j]);
+               mvactivename[j] = str_dup(mvactivename[j-1]);
+            }
+            mvactive[i] = GET_MAX_MOVE(d->character);
+            dc_free(mvactivename[i]);
+            mvactivename[i] = str_dup(GET_NAME(d->character));
+            break;
+         }
+      }
       for(i=0;i<5;i++) {
          if(GET_MAX_HIT(d->character) > hpactiveclass[k][i]) {
             for(j=4;j>i;j--) {
@@ -2998,6 +3039,20 @@ void check_leaderboard()
             break;
          }
       }
+      for(i=0;i<5;i++) {
+         if(GET_LEVEL(d->character) < MAX_MORTAL) break;
+         if(GET_MAX_MOVE(d->character) > mvactiveclass[k][i]) {
+            for(j=4;j>i;j--) {
+               mvactiveclass[k][j] = mvactiveclass[k][j-1];
+               dc_free(mvactiveclassname[k][j]);
+               mvactiveclassname[k][j] = str_dup(mvactiveclassname[k][j-1]);
+            }
+            mvactiveclass[k][i] = GET_MAX_MOVE(d->character);
+            dc_free(mvactiveclassname[k][i]);
+            mvactiveclassname[k][i] = str_dup(GET_NAME(d->character));
+            break;
+         }
+      }
 
    }
 
@@ -3011,6 +3066,7 @@ void check_leaderboard()
    for(i=0;i<5;i++) fprintf(fl, "%s~ %d\n", pkactivename[i], pkactive[i]);
    for(i=0;i<5;i++) fprintf(fl, "%s~ %d\n", pdactivename[i], pdactive[i]);
    for(i=0;i<5;i++) fprintf(fl, "%s~ %d\n", rdactivename[i], rdactive[i]);
+   for(i=0;i<5;i++) fprintf(fl, "%s~ %d\n", mvactivename[i], mvactive[i]);
    for(j=0;j<CLASS_MAX-2;j++) {
       for(i=0;i<5;i++) fprintf(fl, "%s~ %d\n", hpactiveclassname[j][i], hpactiveclass[j][i]);
       for(i=0;i<5;i++) fprintf(fl, "%s~ %d\n", mnactiveclassname[j][i], mnactiveclass[j][i]);
@@ -3018,6 +3074,7 @@ void check_leaderboard()
       for(i=0;i<5;i++) fprintf(fl, "%s~ %d\n", pkactiveclassname[j][i], pkactiveclass[j][i]);
       for(i=0;i<5;i++) fprintf(fl, "%s~ %d\n", pdactiveclassname[j][i], pdactiveclass[j][i]);
       for(i=0;i<5;i++) fprintf(fl, "%s~ %d\n", rdactiveclassname[j][i], rdactiveclass[j][i]);
+      for(i=0;i<5;i++) fprintf(fl, "%s~ %d\n", mvactiveclassname[j][i], mvactiveclass[j][i]);
    }
    dc_fclose(fl);
    for(i=0;i<5;i++) dc_free(hpactivename[i]);
@@ -3026,6 +3083,7 @@ void check_leaderboard()
    for(i=0;i<5;i++) dc_free(pkactivename[i]);
    for(i=0;i<5;i++) dc_free(pdactivename[i]);
    for(i=0;i<5;i++) dc_free(rdactivename[i]);
+   for(i=0;i<5;i++) dc_free(mvactivename[i]);
    for(j=0;j<CLASS_MAX-2;j++) {
       for(i=0;i<5;i++) dc_free(hpactiveclassname[j][i]);
       for(i=0;i<5;i++) dc_free(mnactiveclassname[j][i]);
@@ -3033,6 +3091,7 @@ void check_leaderboard()
       for(i=0;i<5;i++) dc_free(pkactiveclassname[j][i]);
       for(i=0;i<5;i++) dc_free(pdactiveclassname[j][i]);
       for(i=0;i<5;i++) dc_free(rdactiveclassname[j][i]);
+      for(i=0;i<5;i++) dc_free(mvactiveclassname[j][i]);
    }
    if(std::system(0))
       std::system("cp ../lib/leaderboard.txt /srv/www/www.dcastle.org/htdocs/leaderboard.txt");
@@ -3046,10 +3105,11 @@ int do_leaderboard(struct char_data *ch, char *argument, int cmd)
    FILE  *fl;
    char  buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH];
    int   i, j, k, validclass = 0;
-   char  *hponlinename[5], *mnonlinename[5], *kionlinename[5], *pkonlinename[5], *pdonlinename[5], *rdonlinename[5];
-   int   hponline[] = {0,0,0,0,0}, mnonline[] = {0,0,0,0,0}, kionline[] = {0,0,0,0,0}, pkonline[] = {0,0,0,0,0}, pdonline[] = {0,0,0,0,0}, rdonline[] = {0,0,0,0,0};
-   char  *hpactivename[5], *mnactivename[5], *kiactivename[5], *pkactivename[5], *pdactivename[5], *rdactivename[5];
-   int   hpactive[5], mnactive[5], kiactive[5], pkactive[5], pdactive[5], rdactive[5];
+   char  *hponlinename[5], *mnonlinename[5], *kionlinename[5], *pkonlinename[5], *pdonlinename[5], *rdonlinename[5], *mvonlinename[5];
+   int   hponline[] = {0,0,0,0,0}, mnonline[] = {0,0,0,0,0}, kionline[] = {0,0,0,0,0}, 
+         pkonline[] = {0,0,0,0,0}, pdonline[] = {0,0,0,0,0}, rdonline[] = {0,0,0,0,0}, mvonline[] = {0,0,0,0,0};
+   char  *hpactivename[5], *mnactivename[5], *kiactivename[5], *pkactivename[5], *pdactivename[5], *rdactivename[5], *mvactivename[5];
+   int   hpactive[5], mnactive[5], kiactive[5], pkactive[5], pdactive[5], rdactive[5], mvactive[5];
    int   placea=1,placeb=1,placec=1,placed=1;
    int   skippeda=0,skippedb=0,skippedc=0,skippedd=0;
    char *clss_types[] = {
@@ -3075,6 +3135,7 @@ int do_leaderboard(struct char_data *ch, char *argument, int cmd)
    for(i=0;i<5;i++) pkonlinename[i] = str_dup(" ");
    for(i=0;i<5;i++) pdonlinename[i] = str_dup(" ");
    for(i=0;i<5;i++) rdonlinename[i] = str_dup(" ");
+   for(i=0;i<5;i++) mvonlinename[i] = str_dup(" ");
 
    one_argument(argument,buf);
    for(k=0;k<11;k++)  {
@@ -3112,6 +3173,10 @@ int do_leaderboard(struct char_data *ch, char *argument, int cmd)
       rdactivename[i] = fread_string(fl, 0);
       rdactive[i] = fread_int(fl, 0, LONG_MAX);
    }
+   for(i=0;i<5;i++) {
+      mvactivename[i] = fread_string(fl, 0);
+      mvactive[i] = fread_int(fl, 0, LONG_MAX);
+   }
    if(validclass) {
       for(j=0;j<k+1;j++) {
          for(i=0;i<5;i++) dc_free(hpactivename[i]);
@@ -3120,6 +3185,7 @@ int do_leaderboard(struct char_data *ch, char *argument, int cmd)
          for(i=0;i<5;i++) dc_free(pkactivename[i]);
          for(i=0;i<5;i++) dc_free(pdactivename[i]);
          for(i=0;i<5;i++) dc_free(rdactivename[i]);
+         for(i=0;i<5;i++) dc_free(mvactivename[i]);
          for(i=0;i<5;i++) {
             hpactivename[i] = fread_string(fl, 0);
             hpactive[i] = fread_int(fl, 0, LONG_MAX);
@@ -3143,6 +3209,10 @@ int do_leaderboard(struct char_data *ch, char *argument, int cmd)
          for(i=0;i<5;i++) {
             rdactivename[i] = fread_string(fl, 0);
             rdactive[i] = fread_int(fl, 0, LONG_MAX);
+         }
+         for(i=0;i<5;i++) {
+            mvactivename[i] = fread_string(fl, 0);
+            mvactive[i] = fread_int(fl, 0, LONG_MAX);
          }
       }
    }
@@ -3238,8 +3308,20 @@ int do_leaderboard(struct char_data *ch, char *argument, int cmd)
             break;
          }
       }
+      for(i=0;i<5;i++) {
+         if(GET_MAX_MOVE(d->character) > mvonline[i]) {
+            for(j=4;j>i;j--) {
+               mvonline[j] = mvonline[j-1];
+               dc_free(mvonlinename[j]);
+               mvonlinename[j] = str_dup(mvonlinename[j-1]);
+            }
+            mvonline[i] = GET_MAX_MOVE(d->character);
+            dc_free(mvonlinename[i]);
+            mvonlinename[i] = str_dup(GET_NAME(d->character));
+            break;
+         }
+      }
    }
-
    sprintf(buf,"(*)***************************************************************************(*)\n");
    strcat(buf, "(*)                          $BDark Castle Leaderboard$R                          (*)\n");
    if(validclass) {
@@ -3332,9 +3414,42 @@ int do_leaderboard(struct char_data *ch, char *argument, int cmd)
          skippedd = 0;
       }
       else skippedd++;
-      sprintf(buf2, "(*) %d) $B%-12s$R%d) $B%-12s$R-%-4d   %d) $B%-12s$R%d) $B%-12s$R-%-4d (*)\n",placea,pdonlinename[i],placeb,pdactivename[i],pdactive[0]-pdactive[i],placec,rdonlinename[i],placed,rdactivename[i],rdactive[0]-rdactive[i]);
+      sprintf(buf2, "(*) %d) $B%-12s$R%d) $B%-12s$R-%-4d   %d) $B%-12s$R%d) $B%-12s$R-%-4d (*)\n"
+               ,placea,pdonlinename[i],placeb,pdactivename[i],pdactive[0]-pdactive[i],placec,rdonlinename[i],placed,rdactivename[i],rdactive[0]-rdactive[i]);
       strcat(buf, buf2);
    }
+//FROM HERE
+   placea=1;placeb=1;placec=1;placed=1;skippeda=0;skippedb=0;skippedc=0;skippedd=0;
+   strcat(buf, "(*)                                                                           (*)\n");
+   strcat(buf, "(*)           $2$B Movement                                                $R       (*)\n");
+   sprintf(buf2, "(*) 1) $5$B%-12s$R1) $5$B%-12s$R                                            (*)\n",mvonlinename[0],mvactivename[0]);
+   strcat(buf,buf2);
+   for(i=1;i<5;i++) {
+      if(mvonline[i] != mvonline[i-1]) {
+         placea += ++skippeda;
+         skippeda = 0;
+      }
+      else skippeda++;
+      if(mvactive[i] != mvactive[i-1]) {
+         placeb += ++skippedb;
+         skippedb = 0;
+      }
+      else skippedb++;
+     //   if(rdonline[i] != rdonline[i-1]) {
+     //    placec += ++skippedc;
+     //    skippedc = 0;
+     // }
+     // else skippedc++;
+    //  if(rdactive[i] != rdactive[i-1]) {
+   //      placed += ++skippedd;
+  //       skippedd = 0;
+ //     }
+//      else skippedd++;
+      sprintf(buf2, "(*) %d) $B%-12s$R%d) $B%-12s$R-%-4d                                       (*)\n",placea,mvonlinename[i],placeb,mvactivename[i],mvactive[0]-mvactive[i]);
+      strcat(buf, buf2);
+   }
+
+//TO HERE
    strcat(buf, "(*)                                                                           (*)\n");
    strcat(buf, "(*)---------------------------------------------------------------------------(*)\n");
    strcat(buf, "(*)***************************************************************************(*)\n");
@@ -3345,12 +3460,14 @@ int do_leaderboard(struct char_data *ch, char *argument, int cmd)
    for(i=0;i<5;i++) dc_free(pkonlinename[i]);
    for(i=0;i<5;i++) dc_free(pdonlinename[i]);
    for(i=0;i<5;i++) dc_free(rdonlinename[i]);
+   for(i=0;i<5;i++) dc_free(mvonlinename[i]);
    for(i=0;i<5;i++) dc_free(hpactivename[i]);
    for(i=0;i<5;i++) dc_free(mnactivename[i]);
    for(i=0;i<5;i++) dc_free(kiactivename[i]);
    for(i=0;i<5;i++) dc_free(pkactivename[i]);
    for(i=0;i<5;i++) dc_free(pdactivename[i]);
    for(i=0;i<5;i++) dc_free(rdactivename[i]);
+   for(i=0;i<5;i++) dc_free(mvactivename[i]);
 
    return eSUCCESS;
 }
