@@ -20,7 +20,7 @@
  * 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead *
  * of just race stuff                                                     *
  **************************************************************************
- * $Id: fight.cpp,v 1.532 2009/04/01 01:00:34 dcastle Exp $               *
+ * $Id: fight.cpp,v 1.533 2009/04/09 20:50:35 kkoons Exp $               *
  **************************************************************************/
 
 extern "C"
@@ -1466,9 +1466,9 @@ int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
   dam += weapon_skill_dam_bonus;
   dam += calculate_paladin_damage_bonus(ch, vict);
   
-  // Bonus for hitting weak opponents
-  if(GET_POS(vict) < POSITION_FIGHTING)
-    dam *= 1 + (2 * (POSITION_FIGHTING - GET_POS(vict))) / 10;
+  // Bonus for hitting weak opponents (Weak positions no longer exist)
+//  if(GET_POS(vict) < POSITION_FIGHTING)
+//    dam *= 1 + (2 * (POSITION_FIGHTING - GET_POS(vict))) / 10;
   
   // BACKSTAB GOES IN HERE!
   if(type == SKILL_BACKSTAB && dam < 10000) {  // Bingo not affected.
