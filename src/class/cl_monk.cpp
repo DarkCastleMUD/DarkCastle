@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_monk.cpp,v 1.40 2009/01/02 18:11:04 dcastle Exp $
+| $Id: cl_monk.cpp,v 1.41 2009/04/09 20:44:18 kkoons Exp $
 | cl_monk.C
 | Description:  Monk skills.
 */
@@ -79,10 +79,13 @@ int do_eagle_claw(struct char_data *ch, char *argument, int cmd)
 
   if (!skill_success(ch,victim, SKILL_EAGLE_CLAW))
     retval = damage(ch, victim, 0, TYPE_UNDEFINED, SKILL_EAGLE_CLAW, 0);
-  else {
+  else 
+  {
     dam = (GET_STR(ch) * 3) + (GET_DEX(ch) * 2) + dice(2, GET_LEVEL(ch)) + 100;
+    if (number(1, 100) == 1 && GET_LEVEL(victim) < IMMORTAL) 
+      dam = GET_HIT(victim)*5 + 20;//1% bingo chance same as drown
     retval = damage(ch, victim, dam, TYPE_UNDEFINED, SKILL_EAGLE_CLAW, 0);
-    }
+  }
 
   return retval;
 }
