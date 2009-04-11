@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.181 2009/04/11 05:57:05 dcastle Exp $ */
+/* $Id: info.cpp,v 1.182 2009/04/11 06:06:15 dcastle Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -3099,6 +3099,13 @@ void check_leaderboard()
 
 }
 
+
+/*
+If you add anything to this function (more displays) make sure you change
+the lines = ## * (CLASS_MAX-1) to equal the number of added leaderboard
+things, otherwise renames will crash the server hard.
+*/
+
 int do_leaderboard(struct char_data *ch, char *argument, int cmd)
 {
    struct descriptor_data *d;
@@ -3475,6 +3482,8 @@ int do_leaderboard(struct char_data *ch, char *argument, int cmd)
 void rename_leaderboard(char *oldname, char *newname)
 {
    FILE  *fl;
+   //lines is the number of lines rewritten back to leaderboard file
+   //after a rename.. must sync up with # of outputs
    int lines = 35*(CLASS_MAX-1);
    int value[lines], i;
    char *name[lines];
