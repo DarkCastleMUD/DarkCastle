@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.180 2009/04/09 23:18:42 kkoons Exp $ */
+/* $Id: info.cpp,v 1.181 2009/04/11 05:57:05 dcastle Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -3475,7 +3475,7 @@ int do_leaderboard(struct char_data *ch, char *argument, int cmd)
 void rename_leaderboard(char *oldname, char *newname)
 {
    FILE  *fl;
-   int lines = 30*(CLASS_MAX-1);
+   int lines = 35*(CLASS_MAX-1);
    int value[lines], i;
    char *name[lines];
 
