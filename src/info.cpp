@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.182 2009/04/11 06:06:15 dcastle Exp $ */
+/* $Id: info.cpp,v 1.183 2009/04/15 21:14:17 kkoons Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -2947,7 +2947,6 @@ void check_leaderboard()
          }
       }
       for(i=0;i<5;i++) {
-         if(GET_LEVEL(d->character) < MAX_MORTAL) break;
          if(GET_MAX_MOVE(d->character) > mvactive[i]) {
             for(j=4;j>i;j--) {
                mvactive[j] = mvactive[j-1];
@@ -3040,7 +3039,6 @@ void check_leaderboard()
          }
       }
       for(i=0;i<5;i++) {
-         if(GET_LEVEL(d->character) < MAX_MORTAL) break;
          if(GET_MAX_MOVE(d->character) > mvactiveclass[k][i]) {
             for(j=4;j>i;j--) {
                mvactiveclass[k][j] = mvactiveclass[k][j-1];
