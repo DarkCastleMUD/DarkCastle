@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.183 2009/04/15 21:14:17 kkoons Exp $ */
+/* $Id: info.cpp,v 1.184 2009/04/17 03:52:13 kkoons Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -2624,11 +2624,12 @@ int do_tick( struct char_data *ch, char *argument, int cmd )
   return eSUCCESS;
 }
 
+/*
 int do_pkscore(CHAR_DATA * ch)
 {
    if(ch->pcdata->pkills == 0) return 0;
    else return (int)(ch->pcdata->pklvl / ch->pcdata->pkills / 50.0 * 1000.0 + ch->pcdata->pkills);
-}
+}*/
 
 int do_pdscore(CHAR_DATA * ch)
 {
@@ -2907,13 +2908,13 @@ void check_leaderboard()
          }
       }
       for(i=0;i<5;i++) {
-         if(do_pkscore(d->character) > pkactive[i]) {
+         if(GET_PKILLS(d->character) > pkactive[i]) {
             for(j=4;j>i;j--) {
                pkactive[j] = pkactive[j-1];
                dc_free(pkactivename[j]);
                pkactivename[j] = str_dup(pkactivename[j-1]);
             }
-            pkactive[i] = do_pkscore(d->character);
+            pkactive[i] = GET_PKILLS(d->character);
             dc_free(pkactivename[i]);
             pkactivename[i] = str_dup(GET_NAME(d->character));
             break;
@@ -2999,13 +3000,13 @@ void check_leaderboard()
          }
       }
       for(i=0;i<5;i++) {
-         if(do_pkscore(d->character) > pkactiveclass[k][i]) {
+         if(GET_PKILLS(d->character) > pkactiveclass[k][i]) {
             for(j=4;j>i;j--) {
                pkactiveclass[k][j] = pkactiveclass[k][j-1];
                dc_free(pkactiveclassname[k][j]);
                pkactiveclassname[k][j] = str_dup(pkactiveclassname[k][j-1]);
             }
-            pkactiveclass[k][i] = do_pkscore(d->character);
+            pkactiveclass[k][i] = GET_PKILLS(d->character);
             dc_free(pkactiveclassname[k][i]);
             pkactiveclassname[k][i] = str_dup(GET_NAME(d->character));
             break;
@@ -3133,6 +3134,8 @@ int do_leaderboard(struct char_data *ch, char *argument, int cmd)
    };
 
    check_leaderboard();
+
+csendf(ch, "%d %d \r\n", ch->pcdata->pklvl, ch->pcdata->pkills);
 
    for(i=0;i<5;i++) hponlinename[i] = str_dup(" ");
    for(i=0;i<5;i++) mnonlinename[i] = str_dup(" ");
@@ -3274,13 +3277,13 @@ int do_leaderboard(struct char_data *ch, char *argument, int cmd)
          }
       }
       for(i=0;i<5;i++) {
-         if(do_pkscore(d->character) > pkonline[i]) {
+         if(GET_PKILLS(d->character) > pkonline[i]) {
             for(j=4;j>i;j--) {
                pkonline[j] = pkonline[j-1];
                dc_free(pkonlinename[j]);
                pkonlinename[j] = str_dup(pkonlinename[j-1]);
             }
-            pkonline[i] = do_pkscore(d->character);
+            pkonline[i] = GET_PKILLS(d->character);
             dc_free(pkonlinename[i]);
             pkonlinename[i] = str_dup(GET_NAME(d->character));
             break;
@@ -3366,8 +3369,8 @@ int do_leaderboard(struct char_data *ch, char *argument, int cmd)
    }
    placea=1;placeb=1;placec=1;placed=1;skippeda=0;skippedb=0;skippedc=0;skippedd=0;
    strcat(buf, "(*)                                                                           (*)\n");
-   strcat(buf, "(*)                $2$BKi                               Player Kill Score$R         (*)\n");
-   sprintf(buf2, "(*) 1) $5$B%-12s$R1) $5$B%-12s$R        1) $5$B%-12s$R1) $5$B%-12s$R      (*)\n",kionlinename[0],kiactivename[0],pkonlinename[0],pkactivename[0]);
+   strcat(buf, "(*)                $2$BKi                                Movement        $R         (*)\n");
+   sprintf(buf2, "(*) 1) $5$B%-12s$R1) $5$B%-12s$R        1) $5$B%-12s$R1) $5$B%-12s$R      (*)\n",kionlinename[0],kiactivename[0],mvonlinename[0],mvactivename[0]);
    strcat(buf,buf2);
    for(i=1;i<5;i++) {
       if(kionline[i] != kionline[i-1]) {
@@ -3380,62 +3383,62 @@ int do_leaderboard(struct char_data *ch, char *argument, int cmd)
          skippedb = 0;
       }
       else skippedb++;
-      if(pkonline[i] != pkonline[i-1]) {
+      if(mvonline[i] != mvonline[i-1]) {
          placec += ++skippedc;
          skippedc = 0;
       }
       else skippedc++;
-      if(pkactive[i] != pkactive[i-1]) {
+      if(mvactive[i] != mvactive[i-1]) {
          placed += ++ skippedd;
          skippedd = 0;
       }
       else skippedd++;
-      sprintf(buf2, "(*) %d) $B%-12s$R%d) $B%-12s$R-%-4d   %d) $B%-12s$R%d) $B%-12s$R-%-4d (*)\n",placea,kionlinename[i],placeb,kiactivename[i],kiactive[0]-kiactive[i],placec,pkonlinename[i],placed,pkactivename[i],pkactive[0]-pkactive[i]);
+      sprintf(buf2, "(*) %d) $B%-12s$R%d) $B%-12s$R-%-4d   %d) $B%-12s$R%d) $B%-12s$R-%-4d (*)\n",placea,kionlinename[i],placeb,kiactivename[i],kiactive[0]-kiactive[i],placec,mvonlinename[i],placed,mvactivename[i],mvactive[0]-mvactive[i]);
       strcat(buf, buf2);
    }
    placea=1;placeb=1;placec=1;placed=1;skippeda=0;skippedb=0;skippedc=0;skippedd=0;
    strcat(buf, "(*)                                                                           (*)\n");
-   strcat(buf, "(*)        $2$BPlayer Death Score                    Real Deaths (Level 60)$R       (*)\n");
-   sprintf(buf2, "(*) 1) $5$B%-12s$R1) $5$B%-12s$R        1) $5$B%-12s$R1) $5$B%-12s$R      (*)\n",pdonlinename[0],pdactivename[0],rdonlinename[0],rdactivename[0]);
+   strcat(buf, "(*)         $2$BPlayer Kill Score                   Player Death Score       $R     (*)\n");
+   sprintf(buf2, "(*) 1) $5$B%-12s$R1) $5$B%-12s$R        1) $5$B%-12s$R1) $5$B%-12s$R      (*)\n",pkonlinename[0],pkactivename[0],pdonlinename[0],pdactivename[0]);
    strcat(buf,buf2);
    for(i=1;i<5;i++) {
-      if(pdonline[i] != pdonline[i-1]) {
+      if(pkonline[i] != pkonline[i-1]) {
          placea += ++skippeda;
          skippeda = 0;
       }
       else skippeda++;
-      if(pdactive[i] != pdactive[i-1]) {
+      if(pkactive[i] != pkactive[i-1]) {
          placeb += ++skippedb;
          skippedb = 0;
       }
       else skippedb++;
-      if(rdonline[i] != rdonline[i-1]) {
+      if(pdonline[i] != pdonline[i-1]) {
          placec += ++skippedc;
          skippedc = 0;
       }
       else skippedc++;
-      if(rdactive[i] != rdactive[i-1]) {
+      if(pdactive[i] != pdactive[i-1]) {
          placed += ++skippedd;
          skippedd = 0;
       }
       else skippedd++;
       sprintf(buf2, "(*) %d) $B%-12s$R%d) $B%-12s$R-%-4d   %d) $B%-12s$R%d) $B%-12s$R-%-4d (*)\n"
-               ,placea,pdonlinename[i],placeb,pdactivename[i],pdactive[0]-pdactive[i],placec,rdonlinename[i],placed,rdactivename[i],rdactive[0]-rdactive[i]);
+               ,placea,pkonlinename[i],placeb,pkactivename[i],pkactive[0]-pkactive[i],placec,pdonlinename[i],placed,pdactivename[i],pdactive[0]-pdactive[i]);
       strcat(buf, buf2);
    }
 //FROM HERE
    placea=1;placeb=1;placec=1;placed=1;skippeda=0;skippedb=0;skippedc=0;skippedd=0;
    strcat(buf, "(*)                                                                           (*)\n");
-   strcat(buf, "(*)           $2$B Movement                                                $R       (*)\n");
-   sprintf(buf2, "(*) 1) $5$B%-12s$R1) $5$B%-12s$R                                            (*)\n",mvonlinename[0],mvactivename[0]);
+   strcat(buf, "(*)        $2$BReal Deaths (Level 60)                                      $R       (*)\n");
+   sprintf(buf2, "(*) 1) $5$B%-12s$R1) $5$B%-12s$R                                            (*)\n",rdonlinename[0],rdactivename[0]);
    strcat(buf,buf2);
    for(i=1;i<5;i++) {
-      if(mvonline[i] != mvonline[i-1]) {
+      if(rdonline[i] != rdonline[i-1]) {
          placea += ++skippeda;
          skippeda = 0;
       }
       else skippeda++;
-      if(mvactive[i] != mvactive[i-1]) {
+      if(rdactive[i] != rdactive[i-1]) {
          placeb += ++skippedb;
          skippedb = 0;
       }
@@ -3450,7 +3453,7 @@ int do_leaderboard(struct char_data *ch, char *argument, int cmd)
   //       skippedd = 0;
  //     }
 //      else skippedd++;
-      sprintf(buf2, "(*) %d) $B%-12s$R%d) $B%-12s$R-%-4d                                       (*)\n",placea,mvonlinename[i],placeb,mvactivename[i],mvactive[0]-mvactive[i]);
+      sprintf(buf2, "(*) %d) $B%-12s$R%d) $B%-12s$R-%-4d                                       (*)\n",placea,rdonlinename[i],placeb,rdactivename[i],rdactive[0]-rdactive[i]);
       strcat(buf, buf2);
    }
 
