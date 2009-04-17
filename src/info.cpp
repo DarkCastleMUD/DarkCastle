@@ -12,7 +12,7 @@
 *	This is free software and you are benefitting.	We hope that you	  *
 *	share your changes too.  What goes around, comes around. 		  *
 ***************************************************************************/
-/* $Id: info.cpp,v 1.184 2009/04/17 03:52:13 kkoons Exp $ */
+/* $Id: info.cpp,v 1.185 2009/04/17 03:54:45 dcastle Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -2908,13 +2908,13 @@ void check_leaderboard()
          }
       }
       for(i=0;i<5;i++) {
-         if(GET_PKILLS(d->character) > pkactive[i]) {
+         if((int)GET_PKILLS(d->character) > pkactive[i]) {
             for(j=4;j>i;j--) {
                pkactive[j] = pkactive[j-1];
                dc_free(pkactivename[j]);
                pkactivename[j] = str_dup(pkactivename[j-1]);
             }
-            pkactive[i] = GET_PKILLS(d->character);
+            pkactive[i] = (int)GET_PKILLS(d->character);
             dc_free(pkactivename[i]);
             pkactivename[i] = str_dup(GET_NAME(d->character));
             break;
@@ -3000,13 +3000,13 @@ void check_leaderboard()
          }
       }
       for(i=0;i<5;i++) {
-         if(GET_PKILLS(d->character) > pkactiveclass[k][i]) {
+         if((int)GET_PKILLS(d->character) > pkactiveclass[k][i]) {
             for(j=4;j>i;j--) {
                pkactiveclass[k][j] = pkactiveclass[k][j-1];
                dc_free(pkactiveclassname[k][j]);
                pkactiveclassname[k][j] = str_dup(pkactiveclassname[k][j-1]);
             }
-            pkactiveclass[k][i] = GET_PKILLS(d->character);
+            pkactiveclass[k][i] = (int)GET_PKILLS(d->character);
             dc_free(pkactiveclassname[k][i]);
             pkactiveclassname[k][i] = str_dup(GET_NAME(d->character));
             break;
@@ -3277,13 +3277,13 @@ csendf(ch, "%d %d \r\n", ch->pcdata->pklvl, ch->pcdata->pkills);
          }
       }
       for(i=0;i<5;i++) {
-         if(GET_PKILLS(d->character) > pkonline[i]) {
+         if((int)GET_PKILLS(d->character) > pkonline[i]) {
             for(j=4;j>i;j--) {
                pkonline[j] = pkonline[j-1];
                dc_free(pkonlinename[j]);
                pkonlinename[j] = str_dup(pkonlinename[j-1]);
             }
-            pkonline[i] = GET_PKILLS(d->character);
+            pkonline[i] = (int)GET_PKILLS(d->character);
             dc_free(pkonlinename[i]);
             pkonlinename[i] = str_dup(GET_NAME(d->character));
             break;
