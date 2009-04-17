@@ -1257,6 +1257,13 @@ void AuctionHouse::RemoveTicket(CHAR_DATA *ch, unsigned int ticket)
         return;
       }
 
+      if (IS_SET(( (struct obj_data *)(obj_index[rnum].item))->obj_flags.more_flags, ITEM_UNIQUE) 
+          && search_char_for_item(ch, rnum))
+      { 
+        send_to_char("Why would you want another one of those?\r\n", ch);
+        return;
+      }
+
       obj = clone_object(rnum);
    
       if(!obj)
