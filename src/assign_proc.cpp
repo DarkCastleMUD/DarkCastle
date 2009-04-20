@@ -575,6 +575,7 @@ void assign_objects(void)
 //  assign_one_obj_non(557,  hornoplenty);
   assign_one_obj_non(3090,  TOHS_locator);
   assign_one_obj_non(3099,  board); /* Mortal Board */ 
+  assign_one_obj_non(70,  board); /* Broker Board */ 
   assign_one_obj_non(3611,  pfe_word);
   assign_one_obj_non(9529,  pull_proc);
   assign_one_obj_non(29203,  pull_proc);
