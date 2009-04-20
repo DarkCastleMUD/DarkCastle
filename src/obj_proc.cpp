@@ -3574,20 +3574,29 @@ int godload_jaelgreth(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
    send_to_char("You thrust your sacrificial blade into your victim, leeching their lifeforce!\r\n", ch);
    act("$n's dagger sinks into your flesh, and you feel your life force being drained!", 
               ch, obj, ch->fighting, TO_VICT, 0);
-   int dam = 50;
    CHAR_DATA *victim = ch->fighting;
-   if (GET_HIT(victim) < 100) dam = GET_HIT(victim)+1;
-   else dam = 100;
-   if(affected_by_spell(victim, SPELL_DIVINE_INTER) && dam > affected_by_spell(victim, SPELL_DIVINE_INTER)->modifier)
+
+   int dam = 100;
+
+   if(affected_by_spell(victim, SPELL_DIVINE_INTER) 
+      && dam > affected_by_spell(victim, SPELL_DIVINE_INTER)->modifier)
       dam = affected_by_spell(victim, SPELL_DIVINE_INTER)->modifier;
+
    GET_HIT(victim) -= dam;
    GET_HIT(ch) += dam;
-   if (GET_HIT(ch) > GET_MAX_HIT(ch)) GET_HIT(ch) = GET_MAX_HIT(ch);
-   if (GET_MANA(victim) < 100) dam = GET_MANA(victim);
-   else dam = 100;
+
+   if (GET_HIT(ch) > GET_MAX_HIT(ch)) 
+     GET_HIT(ch) = GET_MAX_HIT(ch);
+
+   dam = MIN(100, GET_MANA(victim));
+   if(dam < 0) 
+     dam = 0;
+
    GET_MANA(victim) -= dam;
    GET_MANA(ch) += dam;
-   if (GET_MANA(ch) > GET_MAX_MANA(ch)) GET_MANA(ch) = GET_MAX_MANA(ch);
+
+   if (GET_MANA(ch) > GET_MAX_MANA(ch)) 
+     GET_MANA(ch) = GET_MAX_MANA(ch);
 
    update_pos(victim);
 
@@ -3616,7 +3625,7 @@ int godload_foecrusher(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
       return eFAILURE;
 
 
-   int dam;
+   int dam = 80;
    switch (number(1,2))
    {
      case 1:
