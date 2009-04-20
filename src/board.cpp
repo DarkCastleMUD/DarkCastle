@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: board.cpp,v 1.42 2009/03/06 06:23:46 jhhudso Exp $
+| $Id: board.cpp,v 1.43 2009/04/20 17:29:22 kkoons Exp $
 | board.C
 | Description:  This file contains the implementation for the board
 |   code.  It's old and should be rewritten --Morc XXX
@@ -570,6 +570,14 @@ std::map<std::string, BOARD_INFO> populate_boards()
   board_struct.owner = NO_OWNER;
   board_struct.save_file = "board/punish";
   board_tmp["board punishment mortal"] = board_struct;
+
+  board_struct.min_read_level = 1;
+  board_struct.min_write_level = 10;
+  board_struct.min_remove_level = 10;
+  board_struct.type = ANY_BOARD;
+  board_struct.owner = NO_OWNER;
+  board_struct.save_file = "board/vend";
+  board_tmp["board bulletin vend"] = board_struct;
 
   return board_tmp;
 }
