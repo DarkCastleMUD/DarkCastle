@@ -276,6 +276,8 @@ int do_behead(struct char_data *ch, char *argument, int cmd)
     chance += (has_skill(ch, SKILL_TWO_HANDED_WEAPONS) / 6);
     //csendf(ch, "BEHEAD chance increased by %d\r\n", has_skill(ch, SKILL_TWO_HANDED_WEAPONS) / 6);
   }
+  else
+    chance >>= 1; //halving the chance if less than covered (nerf)
    
   if(chance > 85) 
     chance = 85;
