@@ -323,6 +323,20 @@ int do_purge(struct char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
+char* dirNumToChar(int dir)
+{
+  switch(dir)
+  {
+    case 0: return "North"; break;
+    case 1: return "East"; break;
+    case 2: return "South"; break;
+    case 3: return "West"; break;
+    case 4: return "Up"; break;
+    case 5: return "Down"; break;
+    default: return "ERROR"; break;
+  }
+}
+
 int show_zone_commands(struct char_data *ch, int i, int start = 0)
 {
   char buf[MAX_STRING_LENGTH];
@@ -471,9 +485,9 @@ int show_zone_commands(struct char_data *ch, int i, int start = 0)
            equipment_types[zone_table[i].cmd[j].arg3]);
       break;
     case 'D':
-      sprintf(buf, "%s $3Room [%5d] Dir: [%d]", buf,
+      sprintf(buf, "%s $3Room [%5d] Dir: [%s]", buf,
         zone_table[i].cmd[j].arg1,
-        zone_table[i].cmd[j].arg2);
+        dirNumToChar(zone_table[i].cmd[j].arg2));
 
         switch(zone_table[i].cmd[j].arg3) {
         case 0:
@@ -1136,7 +1150,7 @@ char_data *)(mob_index[nr].item))->level,
 	continue;
      }
   }
-  else if (is_abbrev(type, "search") && has_range)
+  else if (is_abbrev(type, "search"))
   {  // Object search.
     char arg1[MAX_STRING_LENGTH];
     int affect = 0, size = 0, extra = 0, more = 0, wear = 0,type = 0;
