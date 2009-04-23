@@ -248,6 +248,7 @@ int do_behead(struct char_data *ch, char *argument, int cmd)
   if (!can_attack(ch) || !can_be_attacked(ch, vict))
     return eFAILURE;
 
+
   if (IS_SET(vict->combat, COMBAT_BLADESHIELD1) || IS_SET(vict->combat, COMBAT_BLADESHIELD2)) {
         send_to_char("You can't behead a bladeshielded opponent!\n\r", ch);
         return eFAILURE;
@@ -294,7 +295,9 @@ int do_behead(struct char_data *ch, char *argument, int cmd)
 
   //csendf(ch, "behead chance: %d, enemy hp%: %f\r\n", chance, enemy_hp);
 
-  if((number(0,99) < chance) && !IS_SET(vict->immune, ISR_SLASH)) 
+  if((number(0,99) < chance) 
+     && !IS_SET(vict->immune, ISR_SLASH)
+     && !IS_SET(vict->immune, ISR_PHYSICAL))
   {
     if ((
           (vict->equipment[WEAR_NECK_1] && obj_index[vict->equipment[WEAR_NECK_1]->item_number].virt == 518)
