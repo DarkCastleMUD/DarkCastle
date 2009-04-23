@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.111 2008/12/28 18:13:26 kkoons Exp $
+| $Id: inventory.cpp,v 1.112 2009/04/23 21:30:30 kkoons Exp $
 | inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
@@ -2012,6 +2012,9 @@ int has_key(CHAR_DATA *ch, int key)
 {
     struct obj_data *o;
     
+    if(!key) 
+     return 0; //if key vnum is 0, there is no key
+
     if (ch->equipment[HOLD]) {
         if (obj_index[ch->equipment[HOLD]->item_number].virt == key)
             return(1);
