@@ -245,6 +245,13 @@ int do_behead(struct char_data *ch, char *argument, int cmd)
   }
 
 
+  if (!can_attack(ch) || !can_be_attacked(ch, vict))
+    return eFAILURE;
+
+  if (IS_SET(vict->combat, COMBAT_BLADESHIELD1) || IS_SET(vict->combat, COMBAT_BLADESHIELD2)) {
+        send_to_char("You can't behead a bladeshielded opponent!\n\r", ch);
+        return eFAILURE;
+  }
 
   if (!charge_moves(ch, SKILL_BEHEAD)) return eSUCCESS;
 
