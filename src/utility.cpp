@@ -17,7 +17,7 @@
  *                         except Pir and Valk                             *
  * 10/19/2003   Onager     Took out super-secret hidey code from CAN_SEE() *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.98 2009/04/03 22:35:46 kkoons Exp $ */
+/* $Id: utility.cpp,v 1.99 2009/04/23 22:38:53 kkoons Exp $ */
 
 extern "C"
 {
@@ -69,6 +69,11 @@ using namespace std;
 #ifndef GZIP
   #define GZIP "gzip"
 #endif
+
+#include <map>
+
+using namespace std;
+extern struct index_data *obj_index;
 
 // extern vars
 extern struct time_data time_info;
@@ -2131,5 +2136,84 @@ void update_make_camp_and_leadership(void)
     if(i->curLeadBonus != bonus)
       i->changeLeadBonus = TRUE;
   }
+}
+
+void unique_scan(struct char_data *victim)
+{
+  if(!victim) return;
+
+  struct obj_data *i = NULL;
+  struct obj_data *j = NULL;
+  int k;
+  map<int, int> virtnums;
+  queue<OBJ_DATA *> found_items;
+
+  for (k=0; k< MAX_WEAR; k++) 
+  {
+    if (victim->equipment[k])
+    {
+      if(IS_SET(victim->equipment[k]->obj_flags.more_flags, ITEM_UNIQUE))
+      {
+        if(virtnums.end() == virtnums.find(obj_index[victim->equipment[k]->item_number].virt))
+          virtnums[obj_index[victim->equipment[k]->item_number].virt] = 1;
+        else
+          found_items.push(victim->equipment[k]);
+      }
+      if(GET_ITEM_TYPE(victim->equipment[k]) == ITEM_CONTAINER)
+      { // search inside
+        for(j = victim->equipment[k]->contains; j ; j = j->next_content) 
+        {
+          if(IS_SET(victim->equipment[k]->obj_flags.more_flags, ITEM_UNIQUE))
+          {
+            if(virtnums.end() == virtnums.find(obj_index[victim->equipment[k]->item_number].virt))
+              virtnums[obj_index[victim->equipment[k]->item_number].virt] = 1;
+            else
+              found_items.push(victim->equipment[k]); 
+          }
+        }
+      }
+    }
+  }
+
+  for(i = victim->carrying; i ; i = i->next_content) 
+  {
+    if(IS_SET(i->obj_flags.more_flags, ITEM_UNIQUE))
+    {
+      if(virtnums.end() == virtnums.find(obj_index[i->item_number].virt))
+        virtnums[obj_index[i->item_number].virt] = 1;
+      else
+        found_items.push(i);
+    }
+
+    // does not support containers inside containers
+    if(GET_ITEM_TYPE(i) == ITEM_CONTAINER) 
+    { // search inside
+      for(j = i->contains; j ; j = j->next_content) 
+      {
+        if(IS_SET(j->obj_flags.more_flags, ITEM_UNIQUE))
+        {
+          if(virtnums.end() == virtnums.find(obj_index[j->item_number].virt))
+            virtnums[obj_index[j->item_number].virt] = 1;
+          else
+            found_items.push(j);
+        }
+      }
+    }
+  }
+
+  if(!found_items.empty())
+  {
+    char log_buf[MAX_STRING_LENGTH];
+    sprintf(log_buf, "Player %s has duplicate unique items.", GET_NAME(victim));
+    log( log_buf, 100, LOG_WARNINGS );
+    while(!found_items.empty())
+    {
+      sprintf(log_buf, "%s", found_items.front()->short_description);
+      log( log_buf, 100, LOG_WARNINGS );
+      found_items.pop();
+    }
+  }
+
+  return;
 }
 
