@@ -17,7 +17,7 @@
  *                         except Pir and Valk                             *
  * 10/19/2003   Onager     Took out super-secret hidey code from CAN_SEE() *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.99 2009/04/23 22:38:53 kkoons Exp $ */
+/* $Id: utility.cpp,v 1.100 2009/04/23 23:11:34 kkoons Exp $ */
 
 extern "C"
 {
@@ -2203,13 +2203,10 @@ void unique_scan(struct char_data *victim)
 
   if(!found_items.empty())
   {
-    char log_buf[MAX_STRING_LENGTH];
-    sprintf(log_buf, "Player %s has duplicate unique items.", GET_NAME(victim));
-    log( log_buf, 100, LOG_WARNINGS );
+    logf(IMMORTAL, LOG_WARNINGS, "Player %s has duplicate unique items.", GET_NAME(victim));
     while(!found_items.empty())
     {
-      sprintf(log_buf, "%s", found_items.front()->short_description);
-      log( log_buf, 100, LOG_WARNINGS );
+      logf(IMMORTAL, LOG_WARNINGS, "%s", found_items.front()->short_description);
       found_items.pop();
     }
   }
