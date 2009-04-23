@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.181 2009/01/23 19:31:31 kkoons Exp $ */
+/* $Id: nanny.cpp,v 1.182 2009/04/23 22:39:04 kkoons Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -1460,6 +1460,7 @@ is_race_eligible(ch,7)?'*':' ',is_race_eligible(ch,8)?'*':' ',is_race_eligible(c
 		break;
 	     }
           }
+          unique_scan(ch);
 	  if  (GET_GOLD(ch) > 1000000000)
           {
              sprintf(log_buf, "%s has more than a billion gold. Bugged?", GET_NAME(ch));
