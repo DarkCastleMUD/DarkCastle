@@ -3,7 +3,7 @@
  * Morcallen 12/18
  *
  */
-/* $Id: ki.cpp,v 1.78 2009/03/12 00:20:22 kkoons Exp $ */
+/* $Id: ki.cpp,v 1.79 2009/04/24 21:51:09 shane Exp $ */
 
 extern "C"
 {
@@ -419,6 +419,7 @@ int ki_blast( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
             add_memory(vict, GET_NAME(ch), 'h');
             remove_memory(vict, 'f');
             }
+         stop_fighting(vict);
 //         if (IS_NPC(ch)) /* This shouldn't ever happen */
   //          add_memory(ch, GET_NAME(vict), 't');
          if (ch->fighting == vict)
