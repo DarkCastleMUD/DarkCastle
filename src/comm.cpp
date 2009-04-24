@@ -1265,7 +1265,7 @@ void make_prompt(struct descriptor_data *d, char *prompt)
     }
 }
 
-int calc_charmie_hp(CHAR_DATA *ch)
+CHAR_DATA* get_charmie(CHAR_DATA *ch)
 {
   if(!ch) return 0;
 
@@ -1273,13 +1273,14 @@ int calc_charmie_hp(CHAR_DATA *ch)
   if(ch->followers)
     for(k = ch->followers; k && k != (follow_type *)0x95959595; k = k->next)
       if(IS_AFFECTED(k->follower, AFF_CHARM))
-        return ((GET_HIT(k->follower) * 100)/GET_MAX_HIT(k->follower));
+        return k->follower;
 
-  return 0;
+  return NULL;
 }
 
 void generate_prompt(CHAR_DATA *ch, char *prompt)
 {
+  CHAR_DATA *charmie;
   char gprompt[MAX_STRING_LENGTH];
   char *source;
   char *pro;
@@ -1389,8 +1390,20 @@ void generate_prompt(CHAR_DATA *ch, char *prompt)
          sprintf(pro, "%s%d%s", calc_color(GET_MOVE(ch), GET_MAX_MOVE(ch)),
                  GET_MOVE(ch), NTEXT);
          break;
+       case 'y':
+         charmie = get_charmie(ch);
+         if(charmie != NULL)
+           sprintf(pro, "%d", (GET_HIT(charmie)*100)/GET_MAX_HIT(charmie));
+         else
+           sprintf(pro, " ");
+         break;
        case 'Y':
-         sprintf(pro, "%d", calc_charmie_hp(ch));
+         charmie = get_charmie(ch);
+         if(charmie != NULL)
+           sprintf(pro, "%s%d%s", calc_color(GET_HIT(charmie), GET_MAX_HIT(charmie)), 
+                     (GET_HIT(charmie)*100)/GET_MAX_HIT(charmie), NTEXT);
+         else
+           sprintf(pro, " ");
          break;
        case 'I':
          sprintf(pro, "%d", ((GET_HIT(ch) * 100)/GET_MAX_HIT(ch)));
