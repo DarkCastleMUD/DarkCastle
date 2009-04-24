@@ -17,7 +17,7 @@
  *                         except Pir and Valk                             *
  * 10/19/2003   Onager     Took out super-secret hidey code from CAN_SEE() *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.100 2009/04/23 23:11:34 kkoons Exp $ */
+/* $Id: utility.cpp,v 1.101 2009/04/24 00:30:41 kkoons Exp $ */
 
 extern "C"
 {
@@ -2163,12 +2163,12 @@ void unique_scan(struct char_data *victim)
       { // search inside
         for(j = victim->equipment[k]->contains; j ; j = j->next_content) 
         {
-          if(IS_SET(victim->equipment[k]->obj_flags.more_flags, ITEM_UNIQUE))
+          if(IS_SET(j->obj_flags.more_flags, ITEM_UNIQUE))
           {
-            if(virtnums.end() == virtnums.find(obj_index[victim->equipment[k]->item_number].virt))
-              virtnums[obj_index[victim->equipment[k]->item_number].virt] = 1;
+            if(virtnums.end() == virtnums.find(obj_index[j->item_number].virt))
+              virtnums[obj_index[j->item_number].virt] = 1;
             else
-              found_items.push(victim->equipment[k]); 
+              found_items.push(j); 
           }
         }
       }
