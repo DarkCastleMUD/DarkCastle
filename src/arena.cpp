@@ -7,7 +7,7 @@
 /* Revision History                                                          */
 /* 12/09/2003   Onager   Tweaked do_join() to remove combat-related bits     */
 /*****************************************************************************/
-/* $Id: arena.cpp,v 1.16 2008/12/08 01:33:34 jhhudso Exp $ */
+/* $Id: arena.cpp,v 1.17 2009/04/24 21:50:43 shane Exp $ */
 
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
@@ -35,7 +35,7 @@ struct _arena arena;
 
 int do_arena(CHAR_DATA *ch, char *argument, int cmd)
 {
-  char arg1[256], arg2[256], arg3[256], arg4[256], buf[256];
+  char arg1[256], arg2[256], arg3[256], arg4[256], arg5[256], buf[256];
   int low, high;
 
   if(!has_skill(ch, COMMAND_ARENA)) {
@@ -47,12 +47,13 @@ int do_arena(CHAR_DATA *ch, char *argument, int cmd)
   argument = one_argument(argument, arg2);
   argument = one_argument(argument, arg3);
   argument = one_argument(argument, arg4);
+  argument = one_argument(argument, arg5);
 
   if(!*arg1 || !*arg2) {
     sprintf(buf, "Currently open for levels: %d %d\n\r", arena.low, arena.high);
     send_to_char(buf, ch);
-    send_to_char("Syntax: arena <lowest level> <highest level> [num mortals] [type]\n\r"
-		 "Valid types: chaos, potato, prize\n\r"
+    send_to_char("Syntax: arena <lowest level> <highest level> [num mortals] [type] [hp limit if applicable]\n\r"
+		 "Valid types: chaos, potato, prize, hp\n\r"
 		 "Use -1 for no limit on number of mortals.\n\r"
                  "Use arena 0 0 to close the arena.\n\r"
                  "Do *NOT* leave the arena open, people will be stuck there forever!\n\r"
@@ -108,6 +109,17 @@ int do_arena(CHAR_DATA *ch, char *argument, int cmd)
       sprintf(buf, "##$4$B Prize Arena!!$R\r\n");
       send_info(buf);
     }    
+
+    if(!strcmp(arg4, "hp")) {
+     if(*arg5) {
+      arena.hplimit = atoi(arg5);
+      if(arena.hplimit <= 0) arena.hplimit=1000;
+     } else arena.hplimit=1000;
+
+      arena.type = HP; // -4
+      sprintf(buf, "##$4$B HP LIMIT Arena!!$R  Any more than %d raw hps, and you have to sit this one out!!\r\n", arena.hplimit);
+      send_info(buf);
+    }    
   } else {
     arena.type = NORMAL;
   }
@@ -146,6 +158,10 @@ int do_joinarena(CHAR_DATA *ch, char *arg, int cmd)
   }
   if(arena.cur_num >= arena.num && arena.num > 0) {
     send_to_char("The arena is already full!\n\r", ch);
+    return eFAILURE;
+  }
+  if(arena.type == HP && GET_RAW_HIT(ch) > arena.hplimit) {
+    send_to_char("You are too strong for this arena!\n\r", ch);
     return eFAILURE;
   }
   if(ch->fighting) {
