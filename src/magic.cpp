@@ -1591,6 +1591,11 @@ int spell_paralyze(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
  set_cantquit( ch, victim );
   if (affected_by_spell(victim, SPELL_PARALYZE))
          return eFAILURE;
+  if(affected_by_spell(victim, SPELL_VILLAINY) && affected_by_spell(victim, SPELL_VILLAINY)->modifier >= 70) {
+   act("$N seems unaffected.", ch, 0, victim, TO_CHAR, 0);
+   act("Your gods protect you from $N's spell.", ch, 0, victim, TO_VICT, 0);
+   return eFAILURE;
+  }
 
   if(affected_by_spell(victim, SPELL_SLEEP)) {
      if (number(1,6)<5)
@@ -1709,6 +1714,12 @@ int spell_blindness(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
   struct affected_type af;
   int retval;
   set_cantquit( ch, victim );
+
+  if(affected_by_spell(victim, SPELL_VILLAINY) && affected_by_spell(victim, SPELL_VILLAINY)->modifier >= 90) {
+   act("$N seems unaffected.", ch, 0, victim, TO_CHAR, 0);
+   act("Your gods protect you from $N's spell.", ch, 0, victim, TO_VICT, 0);
+   return eFAILURE;
+  }
 
    if (malediction_res(ch, victim, SPELL_BLINDNESS)) {
       act("$N resists your attempt to blind $M!", ch, NULL, victim, TO_CHAR,0);
@@ -13560,5 +13571,53 @@ int cast_spirit_shield(ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DAT
       log("Serious screw-up in spirit shield!", ANGEL, LOG_BUG);
       break;
   }
+  return eFAILURE;
+}
+
+/* VILLAINY */
+
+int spell_villainy(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
+{
+  struct affected_type af;
+
+  if(affected_by_spell(victim, SPELL_VILLAINY))
+   affect_from_char(victim, SPELL_VILLAINY);
+
+  af.type      = SPELL_VILLAINY;
+  af.duration  = 3;
+  af.modifier  = skill;
+  af.location  = 0;
+  af.bitvector = -1;
+
+  affect_to_char(victim, &af);
+
+  send_to_char("You call upon the gods to grant you the magic and skill to defeat all that is good!\n\r", victim);
+  act("$n calls upon the gods to grant $m magic	and skill in $s fight for evil!", victim, 0, 0, TO_ROOM, INVIS_NULL);
+  return eSUCCESS;
+}
+
+int cast_villainy( ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *tar_ch, struct obj_data *tar_obj, int skill )
+{
+  switch (type) {
+	case SPELL_TYPE_SPELL:
+		 return spell_villainy(level,ch,tar_ch,0, skill);
+		 break;
+	case SPELL_TYPE_POTION:
+		 return spell_villainy(level,ch,tar_ch,0, skill);
+		 break;
+	case SPELL_TYPE_SCROLL:
+		 if (tar_obj) return eFAILURE;
+		 if (!tar_ch) tar_ch = ch;
+		 return spell_villainy(level,ch,ch,0, skill);
+		 break;
+	case SPELL_TYPE_WAND:
+		 if (tar_obj) return eFAILURE;
+		 if (!tar_ch) tar_ch = ch;
+		 return spell_villainy(level,ch,tar_ch,0, skill);
+		 break;
+		default :
+	 log("Serious screw-up in villainy!", ANGEL, LOG_BUG);
+	 break;
+	 }
   return eFAILURE;
 }

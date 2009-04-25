@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_warrior.cpp,v 1.76 2009/04/25 00:55:03 shane Exp $
+| $Id: cl_warrior.cpp,v 1.77 2009/04/25 17:54:23 shane Exp $
 | cl_warrior.C
 | Description:  This file declares implementation for warrior-specific
 |   skills.
@@ -1499,6 +1499,64 @@ int do_defenders_stance(struct char_data *ch, char *argument, int cmd)
     af.bitvector = -1;
 
     affect_to_char(ch, &af, PULSE_VIOLENCE);
+  }
+  return eSUCCESS;
+}
+
+int do_onslaught(struct char_data *ch, char *argument, int cmd)
+{
+  CHAR_DATA *vict = NULL;
+  int learned = has_skill(ch, SKILL_ONSLAUGHT);
+  struct affected_type af;
+
+  if(!IS_MOB(ch) && GET_LEVEL(ch) <= ARCHANGEL && !learned) {
+    send_to_char("You do not know how to use this to your advantage.\n\r", ch);
+    return eFAILURE;
+  }
+
+  if(affected_by_spell(ch, SKILL_ONSLAUGHT_TIMER)) {
+   send_to_char("You have not yet recovered from your previous onslaught attempt.\n\r", ch);
+   return eFAILURE;
+  }
+
+  if (!charge_moves(ch, SKILL_ONSLAUGHT)) {
+   send_to_char("You do not have enough energy to attempt this onslaught.\n\r", ch);
+   return eSUCCESS;
+  }
+
+  WAIT_STATE(ch, PULSE_VIOLENCE);
+
+  if(!skill_success(ch, 0, SKILL_ONSLAUGHT)) {
+    act("Obviously you have a bit more to learn about battle...slowass.", ch, 0, 0, TO_CHAR, 0);
+    act("$n waves $s weapon in the air in a futile attempt to look skillful.", ch, 0, 0, TO_ROOM, 0);
+
+    af.type = SKILL_ONSLAUGHT_TIMER;
+    af.location = 0;
+    af.modifier = 0;
+    af.duration = 2 + learned/9;
+    af.bitvector = -1;
+
+    affect_to_char(ch, &af);
+
+  } else {
+    act("Your attacks come fast and furious as you harness your battle expertise.", ch, 0, 0, TO_CHAR, 0);
+    act("$n's attacks come fast and furious as $e harnesses $s battle expertise.", ch, 0, 0, TO_ROOM, 0);
+
+    af.type = SKILL_ONSLAUGHT;
+    af.location = 0;
+    af.modifier = 0;
+    af.duration = 1 + learned/9;
+    af.bitvector = -1;
+
+    affect_to_char(ch, &af);
+
+    af.type = SKILL_ONSLAUGHT_TIMER;
+    af.location = 0;
+    af.modifier = 0;
+    af.duration = 3 + learned/9;
+    af.bitvector = -1;
+
+    affect_to_char(ch, &af);
   }
   return eSUCCESS;
 }

@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.258 2009/04/25 00:54:54 shane Exp $ */
+/* $Id: spells.cpp,v 1.259 2009/04/25 17:54:20 shane Exp $ */
 
 extern "C"
 {
@@ -443,6 +443,8 @@ struct spell_info_type spell_info [] =
 
  { /* 171 */ 12, POSITION_FIGHTING, 125, TAR_IGNORE, cast_spirit_shield, SKILL_INCREASE_HARD },
 
+ { /* 172 */ 18, POSITION_STANDING, 80, TAR_CHAR_ROOM|TAR_SELF_DEFAULT|TAR_SELF_ONLY, cast_villainy, SKILL_INCREASE_HARD },
+
 };
 
 
@@ -559,6 +561,7 @@ struct skill_stuff skill_info[] =
 /* 109 */        { "batterbrace", SKILL_INCREASE_MEDIUM},
 /* 110 */        { "free_animal", SKILL_INCREASE_EASY},
 /* 111 */     { "offhand double", SKILL_INCREASE_HARD},
+/* 112 */          { "onslaught", SKILL_INCREASE_HARD},
 
 /*    */                  { "\n", 0 },
 };
@@ -678,6 +681,7 @@ char *skills[]=
   "batterbrace",
   "free animal",
   "offhand double",
+  "onslaught",
   "\n"
 };
 
@@ -854,6 +858,7 @@ char *spells[]=
    "release elemental",
    "wild magic",
    "spirit shield",
+   "villainy",
    "\n"
 };
 

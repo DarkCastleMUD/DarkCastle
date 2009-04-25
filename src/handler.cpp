@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.186 2009/03/30 19:03:04 kkoons Exp $ */
+/* $Id: handler.cpp,v 1.187 2009/04/25 17:54:20 shane Exp $ */
     
 extern "C"
 {
@@ -1743,6 +1743,10 @@ void affect_remove( CHAR_DATA *ch, struct affected_type *af, int flags)
       case SKILL_PERSEVERANCE:
         affect_from_char(ch, SKILL_PERSEVERANCE_BONUS);
         break;
+      case SKILL_ONSLAUGHT_TIMER:
+         if(!(flags & SUPPRESS_MESSAGES))
+           send_to_char("You feel ready to begin another onslaught.\n\r", ch);
+         break;
       default:
          break;
    }

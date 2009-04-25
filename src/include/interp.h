@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: interp.h,v 1.100 2009/03/31 23:39:52 kkoons Exp $ */
+/* $Id: interp.h,v 1.101 2009/04/25 17:54:26 shane Exp $ */
 
 #ifndef INTERP_H_
 #define INTERP_H_
@@ -404,6 +404,7 @@ DO_FUN do_oedit;
 DO_FUN do_offer;
 DO_FUN do_olocate;
 DO_FUN do_oneway;
+DO_FUN do_onslaught;
 DO_FUN do_open;
 DO_FUN do_order;
 DO_FUN do_osave;

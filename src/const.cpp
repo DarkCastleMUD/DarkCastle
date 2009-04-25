@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.300 2009/04/25 00:57:23 shane Exp $ */
+/* $Id: const.cpp,v 1.301 2009/04/25 17:54:20 shane Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -91,6 +91,7 @@ std::map<int,int> fill_skill_cost()
   skill_cost_map[SKILL_FREE_ANIMAL] = 25;
   skill_cost_map[SKILL_BEHEAD] = 25;
   skill_cost_map[SKILL_MAKE_CAMP] = 50;
+  skill_cost_map[SKILL_ONSLAUGHT] = 50;
   return skill_cost_map;
 }
 
@@ -344,7 +345,9 @@ const char *spell_wear_off_msg[] =
   "!BONESHIELD!",
   "!CHANNEL!",
   "!RELEASEELEMENTAL!",
-  "!WILDMAGIC!"
+  "!WILDMAGIC!",
+  "!SPIRITSHIELD!",
+  "You no longer feel villianous."
 };
 
 
@@ -1014,6 +1017,7 @@ char *affected_bits[] =
     "ACID_SHIELD",
     "PRIMAL_FURY",
     "IS_ELEMENTAL",
+    "ONSLAUGHT",
     "\n"
 };
 
@@ -1279,6 +1283,7 @@ struct class_skill_defines w_skills[] = { // warrior skills
 {    "skewer",          SKILL_SKEWER,             45,  100,  0,   STRDEX },
 {    "blade shield",    SKILL_BLADESHIELD,        47,  100,  0,   STRCON },
 {    "combat mastery",  SKILL_COMBAT_MASTERY,     50,  100,  0,   DEXINT },
+//{    "onslaught",       SKILL_ONSLAUGHT,          51,  100,  0,   DEXINT },
 //{    "battlesense",     SKILL_BATTLESENSE,        53,  100,  1,   STRCON },
 //{    "perseverance",    SKILL_PERSEVERANCE,       53,  100,  2,   CONWIS },
 //{    "triage",          SKILL_TRIAGE,             55,  100,  0,   DEXINT },
@@ -1369,6 +1374,8 @@ struct class_skill_defines a_skills[] = { // anti-paladin skills
 {    "resist acid",          SPELL_RESIST_ACID,       46,     70,  0,   STRINT },
 {    "acid blast",           SPELL_ACID_BLAST,        48,    100,  0,   STRINT },
 {    "vampiric aura",        SPELL_VAMPIRIC_AURA,     50,    100,  0,   CONWIS },
+//{    "villainy",             SPELL_VILLAINY,          51,    100,  0,   STRINT },
+//{    "desecrate",            SPELL_DESECRATE,         55,    100,  0,   CONINT },
 {    "\n",                   0,                       1,      0,   0,   0 }
 };
 
