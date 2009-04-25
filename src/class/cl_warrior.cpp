@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_warrior.cpp,v 1.77 2009/04/25 17:54:23 shane Exp $
+| $Id: cl_warrior.cpp,v 1.78 2009/04/25 18:47:46 shane Exp $
 | cl_warrior.C
 | Description:  This file declares implementation for warrior-specific
 |   skills.
@@ -1505,7 +1505,6 @@ int do_defenders_stance(struct char_data *ch, char *argument, int cmd)
 
 int do_onslaught(struct char_data *ch, char *argument, int cmd)
 {
-  CHAR_DATA *vict = NULL;
   int learned = has_skill(ch, SKILL_ONSLAUGHT);
   struct affected_type af;
 

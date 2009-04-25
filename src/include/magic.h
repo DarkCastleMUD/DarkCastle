@@ -5,7 +5,7 @@
  *                                                                           *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-/* $Id: magic.h,v 1.36 2009/04/25 17:54:26 shane Exp $ */
+/* $Id: magic.h,v 1.37 2009/04/25 18:47:50 shane Exp $ */
 #ifndef MAGIC_H_
 #define MAGIC_H_
 
@@ -705,6 +705,11 @@ int cast_spirit_shield(ubyte level, CHAR_DATA * ch, char *arg, int type,
 int spell_villainy(ubyte level, CHAR_DATA * ch,
    CHAR_DATA * victim, struct obj_data * obj, int skill);
 int cast_villainy(ubyte level, CHAR_DATA * ch, char *arg, int type,
+   CHAR_DATA * victim, struct obj_data * tar_obj, int skill);
+
+int spell_heroism(ubyte level, CHAR_DATA * ch,
+   CHAR_DATA * victim, struct obj_data * obj, int skill);
+int cast_heroism(ubyte level, CHAR_DATA * ch, char *arg, int type,
    CHAR_DATA * victim, struct obj_data * tar_obj, int skill);
 
 #endif

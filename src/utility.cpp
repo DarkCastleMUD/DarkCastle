@@ -17,7 +17,7 @@
  *                         except Pir and Valk                             *
  * 10/19/2003   Onager     Took out super-secret hidey code from CAN_SEE() *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.102 2009/04/25 17:54:20 shane Exp $ */
+/* $Id: utility.cpp,v 1.103 2009/04/25 18:47:44 shane Exp $ */
 
 extern "C"
 {
@@ -1517,6 +1517,9 @@ int has_skill (CHAR_DATA *ch, int16 skill)
 
   if(affected_by_spell(ch, SPELL_VILLAINY))
    bonus += affected_by_spell(ch, SPELL_VILLAINY)->modifier / 5;
+
+  if(affected_by_spell(ch, SPELL_HEROISM))
+   bonus += affected_by_spell(ch, SPELL_HEROISM)->modifier / 5;
 
   while(curr) {
     if(curr->skillnum == skill)

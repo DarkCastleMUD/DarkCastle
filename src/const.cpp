@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.301 2009/04/25 17:54:20 shane Exp $ */
+/* $Id: const.cpp,v 1.302 2009/04/25 18:47:44 shane Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -347,7 +347,8 @@ const char *spell_wear_off_msg[] =
   "!RELEASEELEMENTAL!",
   "!WILDMAGIC!",
   "!SPIRITSHIELD!",
-  "You no longer feel villianous."
+  "You no longer feel especially villianous."
+  "You no longer feel especially heroic."
 };
 
 
@@ -1421,7 +1422,9 @@ struct class_skill_defines p_skills[] = { // paladin skills
 {    "divine fury",          SPELL_DIVINE_FURY,        48,    100,  0,   STRCON },
 {    "behead",               SKILL_BEHEAD,             49,    100,  0,   DEXINT },
 {    "holy aura",            SPELL_HOLY_AURA,          50,    100,  0,   CONWIS },
-//{    "spirit shield",        SPELL_SPIRIT_SHIELD,      55,    100,  0,   INTWIS },
+//{    "heroism",              SPELL_HEROISM,            51,    100,  0,   CONWIS },
+//{    "consecrate",           SPELL_CONSECRATE,         55,    100,  0,   STRWIS },
+//{    "spirit shield",        SPELL_SPIRIT_SHIELD,      57,    100,  0,   INTWIS },
 {    "\n",                   0,                        1,      0,   0,   0 }
 };
 
@@ -2564,4 +2567,5 @@ char *reserved[] = {
     "deceit reuse timer",
     "ferocity reuse timer",
     "tactics reuse timer",
+    "onslaught reuse timer",
 };

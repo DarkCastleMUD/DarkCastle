@@ -1594,7 +1594,7 @@ int spell_paralyze(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
   if(affected_by_spell(victim, SPELL_VILLAINY) && affected_by_spell(victim, SPELL_VILLAINY)->modifier >= 70) {
    act("$N seems unaffected.", ch, 0, victim, TO_CHAR, 0);
    act("Your gods protect you from $N's spell.", ch, 0, victim, TO_VICT, 0);
-   return eFAILURE;
+   return eSUCCESS;
   }
 
   if(affected_by_spell(victim, SPELL_SLEEP)) {
@@ -1718,7 +1718,7 @@ int spell_blindness(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
   if(affected_by_spell(victim, SPELL_VILLAINY) && affected_by_spell(victim, SPELL_VILLAINY)->modifier >= 90) {
    act("$N seems unaffected.", ch, 0, victim, TO_CHAR, 0);
    act("Your gods protect you from $N's spell.", ch, 0, victim, TO_VICT, 0);
-   return eFAILURE;
+   return eSUCCESS;
   }
 
    if (malediction_res(ch, victim, SPELL_BLINDNESS)) {
@@ -2024,9 +2024,15 @@ int spell_curse(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *
 	return eFAILURE;
     }
 
+    set_cantquit(ch, victim);
+
+  if(affected_by_spell(victim, SPELL_HEROISM) && affected_by_spell(victim, SPELL_HEROISM)->modifier >= 90) {
+   act("$N seems unaffected.", ch, 0, victim, TO_CHAR, 0);
+   act("Your gods protect you from $N's spell.", ch, 0, victim, TO_VICT, 0);
+   return eSUCCESS;
+  }
 
     int duration =0, save = 0;
-    set_cantquit(ch, victim);
     if (skill < 41)      { duration = 1; save =  -5;}
     else if (skill < 51) { duration = 2; save = -10;}
     else if (skill < 61) { duration = 3; save = -15;}
@@ -4514,6 +4520,12 @@ int spell_fear(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *o
 
   set_cantquit( ch, victim );
   
+  if(affected_by_spell(victim, SPELL_HEROISM) && affected_by_spell(victim, SPELL_HEROISM)->modifier >= 70) {
+   act("$N seems unaffected.", ch, 0, victim, TO_CHAR, 0);
+   act("Your gods protect you from $N's spell.", ch, 0, victim, TO_VICT, 0);
+   return eFAILURE;
+  }
+
   int retval = 0;
 
   if (malediction_res(ch, victim, SPELL_FEAR)) {
@@ -5706,6 +5718,14 @@ int spell_weaken(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data 
         return eFAILURE;
     }
 
+    set_cantquit (ch, victim);
+
+  if(affected_by_spell(victim, SPELL_HEROISM) && affected_by_spell(victim, SPELL_HEROISM)->modifier >= 50) {
+   act("$N seems unaffected.", ch, 0, victim, TO_CHAR, 0);
+   act("Your gods protect you from $N's spell.", ch, 0, victim, TO_VICT, 0);
+   return eSUCCESS;
+  }
+
      if (skill < 40) { 
        duration = 2; 
        str = -4; 
@@ -5724,7 +5744,6 @@ int spell_weaken(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data 
        con = -4;
      }
    
-    set_cantquit (ch, victim);
    if (malediction_res(ch, victim, SPELL_WEAKEN)) {
 	act("$N resists your attempt to weaken $M!", ch, NULL, victim, TO_CHAR,0);
 	act("$N resists $n's attempt to weaken $M!", ch, NULL, victim, TO_ROOM,NOTVICT);
@@ -13592,7 +13611,7 @@ int spell_villainy(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
   affect_to_char(victim, &af);
 
   send_to_char("You call upon the gods to grant you the magic and skill to defeat all that is good!\n\r", victim);
-  act("$n calls upon the gods to grant $m magic	and skill in $s fight for evil!", victim, 0, 0, TO_ROOM, INVIS_NULL);
+  act("$n calls upon the gods to grant $m magic and skill in $s fight for evil!", victim, 0, 0, TO_ROOM, INVIS_NULL);
   return eSUCCESS;
 }
 
@@ -13617,6 +13636,55 @@ int cast_villainy( ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *t
 		 break;
 		default :
 	 log("Serious screw-up in villainy!", ANGEL, LOG_BUG);
+	 break;
+	 }
+  return eFAILURE;
+}
+
+
+/* HEROISM */
+
+int spell_heroism(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
+{
+  struct affected_type af;
+
+  if(affected_by_spell(victim, SPELL_HEROISM))
+   affect_from_char(victim, SPELL_HEROISM);
+
+  af.type      = SPELL_HEROISM;
+  af.duration  = 3;
+  af.modifier  = skill;
+  af.location  = 0;
+  af.bitvector = -1;
+
+  affect_to_char(victim, &af);
+
+  send_to_char("You call upon the gods to grant you courage and skill in your fight for justice!\n\r", victim);
+  act("$n calls upon the gods to grant $m courage and skill in $s fight for justice!", victim, 0, 0, TO_ROOM, INVIS_NULL);
+  return eSUCCESS;
+}
+
+int cast_heroism( ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *tar_ch, struct obj_data *tar_obj, int skill )
+{
+  switch (type) {
+	case SPELL_TYPE_SPELL:
+		 return spell_heroism(level,ch,tar_ch,0, skill);
+		 break;
+	case SPELL_TYPE_POTION:
+		 return spell_heroism(level,ch,tar_ch,0, skill);
+		 break;
+	case SPELL_TYPE_SCROLL:
+		 if (tar_obj) return eFAILURE;
+		 if (!tar_ch) tar_ch = ch;
+		 return spell_heroism(level,ch,ch,0, skill);
+		 break;
+	case SPELL_TYPE_WAND:
+		 if (tar_obj) return eFAILURE;
+		 if (!tar_ch) tar_ch = ch;
+		 return spell_heroism(level,ch,tar_ch,0, skill);
+		 break;
+		default :
+	 log("Serious screw-up in heroism!", ANGEL, LOG_BUG);
 	 break;
 	 }
   return eFAILURE;
