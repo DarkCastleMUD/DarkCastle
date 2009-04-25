@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.299 2009/04/25 00:54:54 shane Exp $ */
+/* $Id: const.cpp,v 1.300 2009/04/25 00:57:23 shane Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1531,7 +1531,7 @@ struct class_skill_defines r_skills[] = { // ranger skills
 {    "creeping death",  SPELL_CREEPING_DEATH,    48,    100,  0,   STRCON },
 { "natural selection",	SKILL_NAT_SELECT,	 50,	100,  0,   DEXINT },
 //{    "make camp",       SKILL_MAKE_CAMP,          51,  100,  0,   CONWIS },
-//{    "offhand double",  SKILL_MAKE_CAMP,         51,    100,  0,   STRDEX },
+//{    "offhand double",  SKILL_OFFHAND_DOUBLE,    55,    100,  0,   STRDEX },
 {      "\n",            0,                       1,      0,   0,   0 }
 };
 
