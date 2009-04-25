@@ -20,7 +20,7 @@
  * 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead *
  * of just race stuff                                                     *
  **************************************************************************
- * $Id: fight.cpp,v 1.534 2009/04/09 21:34:40 kkoons Exp $               *
+ * $Id: fight.cpp,v 1.535 2009/04/25 00:54:54 shane Exp $               *
  **************************************************************************/
 
 extern "C"
@@ -693,6 +693,17 @@ int attack(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
       result = one_hit(ch, vict, type, SECOND);
       if(SOMEONE_DIED(result))       return result;
     }
+
+    int lrn = has_skill(ch, SKILL_OFFHAND_DOUBLE);
+    if(gets_dual_wield_attack(ch) && lrn) {
+     skill_increase_check(ch, SKILL_OFFHAND_DOUBLE, lrn, SKILL_INCREASE_HARD);
+     int p = lrn/2 + GET_HIT(ch) * 10 / GET_MAX_HIT(ch) - (10 - has_skill(ch, SKILL_SECOND_ATTACK)/10);
+     if(number(1,100) <= p) {
+      result = one_hit(ch, vict, type, SECOND);
+      if(SOMEONE_DIED(result))       return result;
+     }
+    }
+
   }	
 
   return eSUCCESS;

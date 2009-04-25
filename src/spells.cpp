@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.257 2009/04/03 23:12:18 kkoons Exp $ */
+/* $Id: spells.cpp,v 1.258 2009/04/25 00:54:54 shane Exp $ */
 
 extern "C"
 {
@@ -552,12 +552,13 @@ struct skill_stuff skill_info[] =
 /* 102*/             { "execute", SKILL_INCREASE_HARD },
 /* 103*/    { "defenders stance", SKILL_INCREASE_HARD },
 /* 104*/              { "behead", SKILL_INCREASE_HARD },
-/* 105 */   { "primal fury", SKILL_INCREASE_EASY},
-/* 106 */   { "vigor", SKILL_INCREASE_MEDIUM},
-/* 107 */   { "escape", SKILL_INCREASE_HARD},
-/* 108 */   { "critical hit", SKILL_INCREASE_HARD},
-/* 108 */   { "batterbrace", SKILL_INCREASE_MEDIUM},
-/* 108 */   { "free_animal", SKILL_INCREASE_EASY},
+/* 105 */        { "primal fury", SKILL_INCREASE_EASY},
+/* 106 */              { "vigor", SKILL_INCREASE_MEDIUM},
+/* 107 */             { "escape", SKILL_INCREASE_HARD},
+/* 108 */       { "critical hit", SKILL_INCREASE_HARD},
+/* 109 */        { "batterbrace", SKILL_INCREASE_MEDIUM},
+/* 110 */        { "free_animal", SKILL_INCREASE_EASY},
+/* 111 */     { "offhand double", SKILL_INCREASE_HARD},
 
 /*    */                  { "\n", 0 },
 };
@@ -676,6 +677,7 @@ char *skills[]=
   "critical hit",
   "batterbrace",
   "free animal",
+  "offhand double",
   "\n"
 };
 

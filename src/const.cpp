@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.298 2009/04/01 16:11:21 kkoons Exp $ */
+/* $Id: const.cpp,v 1.299 2009/04/25 00:54:54 shane Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -90,6 +90,7 @@ std::map<int,int> fill_skill_cost()
   skill_cost_map[SKILL_HEADBUTT] = 15;
   skill_cost_map[SKILL_FREE_ANIMAL] = 25;
   skill_cost_map[SKILL_BEHEAD] = 25;
+  skill_cost_map[SKILL_MAKE_CAMP] = 50;
   return skill_cost_map;
 }
 
@@ -1278,7 +1279,6 @@ struct class_skill_defines w_skills[] = { // warrior skills
 {    "skewer",          SKILL_SKEWER,             45,  100,  0,   STRDEX },
 {    "blade shield",    SKILL_BLADESHIELD,        47,  100,  0,   STRCON },
 {    "combat mastery",  SKILL_COMBAT_MASTERY,     50,  100,  0,   DEXINT },
-//{    "make camp",       SKILL_MAKE_CAMP,          51,  100,  0,   DEXINT },
 //{    "battlesense",     SKILL_BATTLESENSE,        53,  100,  1,   STRCON },
 //{    "perseverance",    SKILL_PERSEVERANCE,       53,  100,  2,   CONWIS },
 //{    "triage",          SKILL_TRIAGE,             55,  100,  0,   DEXINT },
@@ -1530,6 +1530,8 @@ struct class_skill_defines r_skills[] = { // ranger skills
 {    "camouflage",      SPELL_CAMOUFLAGE,        46,     85,  0,   INTWIS },
 {    "creeping death",  SPELL_CREEPING_DEATH,    48,    100,  0,   STRCON },
 { "natural selection",	SKILL_NAT_SELECT,	 50,	100,  0,   DEXINT },
+//{    "make camp",       SKILL_MAKE_CAMP,          51,  100,  0,   CONWIS },
+//{    "offhand double",  SKILL_MAKE_CAMP,         51,    100,  0,   STRDEX },
 {      "\n",            0,                       1,      0,   0,   0 }
 };
 

@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_warrior.cpp,v 1.75 2008/11/18 14:40:24 kkoons Exp $
+| $Id: cl_warrior.cpp,v 1.76 2009/04/25 00:55:03 shane Exp $
 | cl_warrior.C
 | Description:  This file declares implementation for warrior-specific
 |   skills.
@@ -1157,7 +1157,8 @@ int do_make_camp(struct char_data *ch, char *argument, int cmd)
   if(IS_SET(world[ch->in_room].room_flags, SAFE) || IS_SET(world[ch->in_room].room_flags, UNSTABLE) ||
      IS_SET(world[ch->in_room].room_flags, FALL_NORTH) || IS_SET(world[ch->in_room].room_flags, FALL_SOUTH) ||
      IS_SET(world[ch->in_room].room_flags, FALL_EAST) || IS_SET(world[ch->in_room].room_flags, FALL_WEST) ||
-     IS_SET(world[ch->in_room].room_flags, FALL_UP) || IS_SET(world[ch->in_room].room_flags, FALL_DOWN) )
+     IS_SET(world[ch->in_room].room_flags, FALL_UP) || IS_SET(world[ch->in_room].room_flags, FALL_DOWN) ||
+     world[ch->in_room].sector_type == SECT_CITY || world[ch->in_room].sector_type == SECT_PAVED_ROAD )
   {
     send_to_char("Something about this area inherently prohibits a rugged camp.\n\r", ch);
     return eFAILURE;
@@ -1175,6 +1176,11 @@ int do_make_camp(struct char_data *ch, char *argument, int cmd)
   if(affected_by_spell(ch, SKILL_MAKE_CAMP_TIMER)) {
     send_to_char("You cannot make another camp so soon.\n\r", ch);
     return eFAILURE;
+  }
+
+  if(!charge_moves(ch, SKILL_MAKE_CAMP)) {
+   send_to_char("You are unable to muster the strength to make a camp.\n\r", ch);
+   return eFAILURE;
   }
 
   WAIT_STATE(ch, (int)(PULSE_VIOLENCE * 2.5));
