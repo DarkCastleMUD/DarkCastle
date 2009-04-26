@@ -556,12 +556,12 @@ int do_wiz(struct char_data *ch, char *argument, int cmd)
       if(cmd == 9)
       {
         tmp = imm_history;
-        send_to_char("Here are the last 10 imp messages:r\n", ch);
+        send_to_char("Here are the last 10 imm messages:\r\n", ch);
       }
       else if(cmd == 8)
       {
         tmp = imp_history;
-        send_to_char("Here are the last 10 imm messages:r\n", ch);
+        send_to_char("Here are the last 10 imp messages:\r\n", ch);
       }
       else
       {
