@@ -1452,7 +1452,11 @@ int spell_divine_fury(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
 {
   int dam;
   set_cantquit( ch, victim );
+
   dam = 100 + GET_ALIGNMENT(ch) / 4;
+  if (dam < 0) {
+    dam = 0;
+  }
 
   return damage(ch, victim, dam, TYPE_MAGIC, SPELL_DIVINE_FURY, 0);
 }
