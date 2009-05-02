@@ -20,7 +20,7 @@
  * 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead *
  * of just race stuff                                                     *
  **************************************************************************
- * $Id: fight.cpp,v 1.536 2009/04/25 17:54:20 shane Exp $               *
+ * $Id: fight.cpp,v 1.537 2009/05/02 22:41:31 shane Exp $               *
  **************************************************************************/
 
 extern "C"
@@ -2552,6 +2552,12 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
      if (SOMEONE_DIED(retval2)) return damage_retval(ch, victim, retval2);
   }
 
+  if (typeofdamage == DAMAGE_TYPE_PHYSICAL && ch != victim)
+  { // Martial Defense Counter Strike..
+     int retval2 = checkCounterStrike(ch, victim);
+     if (SOMEONE_DIED(retval2)) return damage_retval(ch, victim, retval2);
+  }
+
   if(typeofdamage == DAMAGE_TYPE_PHYSICAL 
      && dam > 0 
      && ch != victim 
@@ -3061,6 +3067,64 @@ int isHit(CHAR_DATA *ch, CHAR_DATA *victim, int attacktype, int &type, int &redu
 }
 
 
+// check counter strike never returns eSUCCESS because that would
+// get returned from damage as a successful damage, which it's
+// not.
+int checkCounterStrike(CHAR_DATA * ch, CHAR_DATA * victim)
+{
+  int retval, lvl = has_skill(victim, SKILL_COUNTER_STRIKE);
+
+  if((IS_SET(victim->combat, COMBAT_STUNNED)) ||
+     (victim->equipment[WIELD] != NULL) ||
+     (IS_SET(victim->combat, COMBAT_STUNNED2)) ||
+     (IS_SET(victim->combat, COMBAT_BASH1)) ||
+     (IS_SET(victim->combat, COMBAT_BASH2)) ||
+     (IS_AFFECTED(victim, AFF_PARALYSIS)) ||
+     (IS_SET(victim->combat, COMBAT_BLADESHIELD1)) ||
+     (IS_SET(victim->combat, COMBAT_BLADESHIELD2)) ||
+     (IS_SET(ch->combat, COMBAT_BLADESHIELD1)) || 
+     (IS_SET(ch->combat, COMBAT_BLADESHIELD2)))
+    return eFAILURE;
+
+  int p = lvl/2 - (100 - has_skill(victim, SKILL_DEFENSE)) - GET_DEX(ch) + GET_HIT(victim) * 10 / GET_MAX_HIT(victim);
+
+  skill_increase_check(victim, SKILL_COUNTER_STRIKE, lvl, SKILL_INCREASE_HARD);
+      
+  if(number(1, 100) > p) return eFAILURE;
+
+  switch(number(1,4)) {
+   case 1:
+    act("Upon blocking $N's blow, you counter with a hard strike of your palm!", victim, NULL, ch, TO_CHAR, 0);
+    act("Upon blocking your blow, $n counters with a hard strike of $s palm!", victim, NULL, ch, TO_VICT, 0);
+    act("Upon blocking $N's blow, $n counters with a hard strike of $s palm!", victim, NULL, ch, TO_ROOM, NOTVICT);
+    break;
+   case 2:
+    act("Upon blocking $N's blow, you counter with a sharp kick of your heel!", victim, NULL, ch, TO_CHAR, 0);
+    act("Upon blocking your blow, $n counters with a sharp kick of $s heel!", victim, NULL, ch, TO_VICT, 0);
+    act("Upon blocking $N's blow, $n counters with a sharp kick of $s heel!", victim, NULL, ch, TO_ROOM, NOTVICT);
+    break;
+   case 3:
+    act("Upon blocking $N's blow, you spin and land a short, hard strike with your elbow!", victim, NULL, ch, TO_CHAR, 0);
+    act("Upon blocking your blow, $n spins and lands a short, hard strike with $s elbow!", victim, NULL, ch, TO_VICT, 0);
+    act("Upon blocking $N's blow, $n spins and lands a short, hard strike with $s elbow!", victim, NULL, ch, TO_ROOM, NOTVICT);
+    break;
+   case 4:
+    act("Upon blocking $N's blow, you spin and land a solid strike with your knee!", victim, NULL, ch, TO_CHAR, 0);
+    act("Upon blocking your blow, $n spins and lands a solid strike with $s knee!", victim, NULL, ch, TO_VICT, 0);
+    act("Upon blocking $N's blow, $n spins and lands a solid strike with $s knee!", victim, NULL, ch, TO_ROOM, NOTVICT);
+    break;
+   default:
+    log("Serious screw-up in counter strike!", ANGEL, LOG_BUG);
+  }
+
+  retval = one_hit(victim, ch, TYPE_HIT, FIRST);
+  retval = SWAP_CH_VICT(retval);
+
+  REMOVE_BIT(retval, eSUCCESS);
+  SET_BIT(retval, eFAILURE);
+
+  return debug_retval(ch, victim, retval);  
+}
 
 // check riposte never returns eSUCCESS because that would
 // get returned from damage as a successful damage, which it's

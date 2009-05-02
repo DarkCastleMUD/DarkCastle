@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.303 2009/05/02 03:09:38 jhhudso Exp $ */
+/* $Id: const.cpp,v 1.304 2009/05/02 22:41:31 shane Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1492,6 +1492,8 @@ struct class_skill_defines k_skills[] = { // monk skills
 {    "blast",           KI_BLAST+KI_OFFSET,     45,    100,  0,   CONINT },
 {    "disrupt",         KI_DISRUPT+KI_OFFSET,   47,    100,  0,   CONINT },
 {    "meditation",      KI_MEDITATION+KI_OFFSET,50,    100,  0,   CONWIS },
+//{    "transfer",        KI_TRANSFER+KI_OFFSET,  51,    100,  0,   CONWIS },
+//{    "counter strike",  SKILL_COUNTER_STRIKE,   55,    100,  0,   STRDEX },
 {    "\n",              0,                      1,      0,   0,   0 }
 };
 

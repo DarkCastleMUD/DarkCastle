@@ -3,7 +3,7 @@
  * Morcallen 12/18
  *
  */
-/* $Id: ki.cpp,v 1.79 2009/04/24 21:51:09 shane Exp $ */
+/* $Id: ki.cpp,v 1.80 2009/05/02 22:41:31 shane Exp $ */
 
 extern "C"
 {
@@ -94,6 +94,11 @@ struct ki_info_type ki_info [ ] = {
 { /* 9 */
 	12, POSITION_RESTING, 15,
         TAR_IGNORE, ki_meditation, SKILL_INCREASE_HARD
+},
+
+{ /* 10 */
+	12, POSITION_STANDING, 1,
+        TAR_CHAR_ROOM|TAR_SELF_NONO, ki_transfer, SKILL_INCREASE_HARD
 }
 
 };
@@ -109,6 +114,7 @@ char *ki[] = {
         "stance",
         "agility",
         "meditation",
+	"transfer",
 	"\n"
 };
 void update_pos(CHAR_DATA *victim);
@@ -1019,4 +1025,56 @@ int ki_meditation( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
    GET_HIT(ch)  = MIN(GET_HIT(ch) + gain,  hit_limit(ch));
 
    return eSUCCESS;
+}
+
+int ki_transfer( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim)
+{
+  char amt[MAX_STRING_LENGTH], type[MAX_STRING_LENGTH];
+  int amount, temp=0;
+
+  arg = one_argument(arg, amt);
+  arg = one_argument(arg, type);
+
+  amount = atoi(amt) - 1;
+
+  if(amount < 0) {
+   send_to_char("Trying to be a funny guy?\r\n", ch);
+   return eFAILURE;
+  }
+
+  if(amount > GET_KI(ch)) {
+   send_to_char("You do not have that much energy to transfer.\r\n", ch);
+   return eFAILURE;
+  }
+
+  if(type[0] == 'k') {
+   GET_KI(ch) -= amount;
+   amount++;
+   temp = amount/2 + level/10;
+   if(GET_KI(victim) + temp > GET_MAX_KI(victim)) temp = GET_MAX_KI(victim) - GET_KI(victim);
+   GET_KI(victim) += temp;
+   sprintf(amt, "%d", amount);
+   send_damage("You focus intently, bonding briefly with $N's spirit, transferring | ki of your essence to $M.", ch,  0, victim, amt, "You focus intently, bonding briefly with $N's spirit,  transferring a portion of your essence to $M.", TO_CHAR);
+   sprintf(amt, "%d", temp);
+   send_damage("$n focuses intently, bonding briefly with your spirit, replenishing | ki of your essence with $s own.", ch, 0, victim, amt, "$n focuses intently, bonding briefly with your spirit, replenishing your essence with $s own.", TO_VICT);
+   act("$n focuses intently upon $N as though briefly bonding with $S spirit.", ch, 0, victim, TO_ROOM, NOTVICT);
+  }
+  else if(type[0] == 'm') {
+   GET_KI(ch) -= amount;
+   amount++;
+   temp += amount*2 + level/2;
+   if(GET_MANA(victim) + temp > GET_MAX_MANA(victim)) temp = GET_MAX_MANA(victim) - GET_MANA(victim);
+   GET_MANA(victim) += temp;
+   sprintf(amt, "%d", amount);
+   send_damage("You focus intently, bonding briefly with $N's spirit, transferring | ki of your essence to $M.", ch, 0, victim, amt, "You focus intently, bonding briefly with $N's spirit, transferring a portion of your essence to $M.", TO_CHAR);
+   sprintf(amt, "%d", temp);
+   send_damage("$n focuses intently, bonding briefly with your spirit, replenishing | magic with a portion of $s essence.", ch, 0, victim, amt, "$n focuses intently, bonding briefly with your spirit, replenishing your magic with a portion of $s essence.", TO_VICT);
+   act("$n focuses intently upon $N as though briefly bonding with $S spirit.", ch, 0, victim, TO_ROOM, NOTVICT);
+  }
+  else {
+   send_to_char("You do not know of that essense.\r\n", ch);
+   return eFAILURE;
+  }
+
+  return eSUCCESS;
 }
