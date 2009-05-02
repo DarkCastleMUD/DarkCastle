@@ -12,7 +12,7 @@
  * This is free software and you are benefitting.	We hope that you    *
  * share your changes too.  What goes around, comes around. 		    *
  ****************************************************************************/
-/* $Id: info.cpp,v 1.186 2009/05/02 02:58:51 jhhudso Exp $ */
+/* $Id: info.cpp,v 1.187 2009/05/02 03:09:39 jhhudso Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -1594,6 +1594,9 @@ int do_score(struct char_data *ch, char *argument, int cmd)
            case SKILL_NAT_SELECT:
              aff_name = "natural selection";
              modifyOutput = TRUE;
+             break;
+           case CONC_LOSS_FIXER:
+	     aff_name = 0; // We don't want this showing up in score
              break;
            default: break;
          }

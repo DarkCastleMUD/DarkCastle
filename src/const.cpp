@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.302 2009/04/25 18:47:44 shane Exp $ */
+/* $Id: const.cpp,v 1.303 2009/05/02 03:09:38 jhhudso Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -2567,5 +2567,6 @@ char *reserved[] = {
     "deceit reuse timer",
     "ferocity reuse timer",
     "tactics reuse timer",
+    "concentration loss fixer",
     "onslaught reuse timer",
 };
