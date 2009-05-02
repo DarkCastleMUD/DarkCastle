@@ -1,18 +1,18 @@
-/***************************************************************************
-*	file: act_info.c , Implementation of commands.		 Part of DIKUMUD *
-*	Usage : Informative commands. 						*
-*	Copyright (C) 1990, 1991 - see 'license.doc' for complete information. *
-*									  	*
-*	Copyright (C) 1992, 1993 Michael Chastain, Michael Quan, Mitchell Tse  *
-*	Performance optimization and bug fixes by MERC Industries.		  *
-*	You can use our stuff in any way you like whatsoever so long as ths	 *
-*	copyright notice remains intact.  If you like it please drop a line	  *
-*	to mec@garnet.berkeley.edu.						  *
-*										  *
-*	This is free software and you are benefitting.	We hope that you	  *
-*	share your changes too.  What goes around, comes around. 		  *
-***************************************************************************/
-/* $Id: info.cpp,v 1.185 2009/04/17 03:54:45 dcastle Exp $ */
+/****************************************************************************
+ * file: act_info.c , Implementation of commands.	 Part of DIKUMUD    *
+ * Usage : Informative commands. 					    *
+ * Copyright (C) 1990, 1991 - see 'license.doc' for complete information.   *
+ *                                                                          *
+ * Copyright (C) 1992, 1993 Michael Chastain, Michael Quan, Mitchell Tse    *
+ * Performance optimization and bug fixes by MERC Industries.		    *
+ * You can use our stuff in any way you like whatsoever so long as ths	    *
+ * copyright notice remains intact.  If you like it please drop a line	    *
+ * to mec@garnet.berkeley.edu.						    *
+ * 									    *
+ * This is free software and you are benefitting.	We hope that you    *
+ * share your changes too.  What goes around, comes around. 		    *
+ ****************************************************************************/
+/* $Id: info.cpp,v 1.186 2009/05/02 02:58:51 jhhudso Exp $ */
 extern "C"
 {
 #include <ctype.h>
