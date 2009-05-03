@@ -5,7 +5,7 @@
  *                                                                           *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-/* $Id: magic.h,v 1.37 2009/04/25 18:47:50 shane Exp $ */
+/* $Id: magic.h,v 1.38 2009/05/03 18:42:30 shane Exp $ */
 #ifndef MAGIC_H_
 #define MAGIC_H_
 
@@ -598,9 +598,9 @@ int spell_eyes_of_the_eagle(ubyte level, CHAR_DATA * ch,
 int cast_eyes_of_the_eagle(ubyte level, CHAR_DATA * ch, char *arg, int type,
    CHAR_DATA * victim, struct obj_data * tar_obj, int skill);
 
-int spell_ice_shards(ubyte level, CHAR_DATA * ch,
+int spell_icestorm(ubyte level, CHAR_DATA * ch,
    CHAR_DATA * victim, struct obj_data * obj, int skill);
-int cast_ice_shards(ubyte level, CHAR_DATA * ch, char *arg, int type,
+int cast_icestorm(ubyte level, CHAR_DATA * ch, char *arg, int type,
    CHAR_DATA * victim, struct obj_data * tar_obj, int skill);
 
 int spell_lightning_shield(ubyte level, CHAR_DATA * ch,

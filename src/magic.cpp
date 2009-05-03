@@ -11851,28 +11851,80 @@ int cast_eyes_of_the_eagle( ubyte level, CHAR_DATA *ch, char *arg, int type, CHA
   return eFAILURE;
 }
 
-/* ICE SHARDS */
+/* ICESTORM */
 
-int spell_ice_shards(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
+int spell_icestorm(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
   int dam;
- // int save;
+  int retval = eSUCCESS;
+  int retval2;
+  CHAR_DATA *tmp_victim, *temp;
+  struct affected_type af;
+  char buf[MAX_STRING_LENGTH];
 
-  set_cantquit( ch, victim );
+  dam = 50+level*3;
 
-  dam = dice(2,level/2);
+  if(world[ch->in_room].sector_type == SECT_FROZEN_TUNDRA)
+       dam = dam * 5 / 4;
+  else if(world[ch->in_room].sector_type == SECT_ARCTIC)
+       dam = dam * 3 / 2;
+  else if(world[ch->in_room].sector_type == SECT_UNDERWATER)
+       dam = dam * 3 / 4;
+  else if(world[ch->in_room].sector_type == SECT_DESERT)
+       dam = dam * 1 / 2;
 
-//  save =saves_spell(ch, victim, (level/2), SAVE_TYPE_COLD);
+  sprintf(buf, "%d", dam);
 
-  // modify the damage by how much they resisted
-  //dam += (int) (dam * (save/100));
-  
-  return damage(ch, victim, dam, TYPE_COLD, SPELL_ICE_SHARDS, 0);
+  send_damage("Your voice raises to a crescendo as you call forth nature's $B$3icy wrath$R to engulf your enemies, dealing | damage!", ch, 0, 0, buf, "Your voice raises to a crescendo as you call forth nature's $B$3icy wrath$R to engulf your enemies!", TO_CHAR);
+  send_damage("$n raises $s voice mightily as $e calls forth nature's $B$3icy wrath$R to engulf $s enemies, dealing | damage!", ch, 0, 0, buf, "$n raises $s voice mightily as $e calls forth nature's $B$3icy wrath$R to engulf $s enemies!", TO_ROOM);
+
+  for (tmp_victim = character_list; tmp_victim; tmp_victim = temp) 
+  {
+    temp = tmp_victim->next;
+
+    if ((ch->in_room == tmp_victim->in_room) 
+        && (ch != tmp_victim) 
+        && (!ARE_GROUPED(ch, tmp_victim)) 
+        && can_be_attacked(ch, tmp_victim)) 
+    {
+      
+
+      if(number(1, 100) < level / 2 && saves_spell(ch, tmp_victim, 0, SAVE_TYPE_COLD) < 0) {
+       af.type      = SPELL_ICESTORM;
+       af.duration  = 5;
+       af.modifier  = -5;
+       af.location  = APPLY_STR;
+       af.bitvector = -1;
+       affect_to_char(tmp_victim, &af);
+
+       act("$N shivers and looks very $B$3chilled$R as $E suffers the affects of your storm.", ch, 0, tmp_victim, TO_CHAR, 0);
+       act("You shiver and feel very $B$3chilled$R as you suffer the affects of $n's storm.", ch, 0, tmp_victim, TO_VICT, 0);
+       act("$N shivers and looks very $B$3chilled$R as $E suffers the affects of $n's storm.", ch, 0, tmp_victim, TO_ROOM, NOTVICT);
+      }
+
+      retval2 = damage(ch, tmp_victim, dam, TYPE_COLD, SPELL_ICESTORM, 0);
+
+      if (IS_SET(retval2, eVICT_DIED))
+        SET_BIT(retval, eVICT_DIED);
+      else if (IS_SET(retval2, eCH_DIED))
+      { 
+        SET_BIT(retval, eCH_DIED); 
+        break; 
+      }
+    } 
+    else 
+    {
+      if (world[ch->in_room].zone == world[tmp_victim->in_room].zone) 
+        send_to_char("You feel a BLAST of $B$3cold$R air.\n\r", tmp_victim);
+    }
+  }
+
+  return retval;
 }
 
-/* ICE SHARDS (potions, scrolls, wands, staves) */
+/* ICESTORM (potions, scrolls, wands, staves) */
 
-int cast_ice_shards( ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *tar_ch, struct obj_data *tar_obj, int skill )
+int cast_icestorm( ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *tar_ch, struct obj_data *tar_obj, int skill )
 {
   char_data * next_v;
   int retval;
@@ -11880,16 +11932,16 @@ int cast_ice_shards( ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA 
   switch (type) 
   {
     case SPELL_TYPE_SPELL:
-       return spell_ice_shards(level, ch, tar_ch, 0, skill);
+       return spell_icestorm(level, ch, tar_ch, 0, skill);
        break;
     case SPELL_TYPE_POTION:
-       return spell_ice_shards(level, ch, ch, 0, skill);
+       return spell_icestorm(level, ch, ch, 0, skill);
        break;
     case SPELL_TYPE_SCROLL:
        if(tar_obj)
           return eFAILURE;
        if(!tar_ch) tar_ch = ch;
-          return spell_ice_shards(level, ch, tar_ch, 0, skill);
+          return spell_icestorm(level, ch, tar_ch, 0, skill);
        break;
     case SPELL_TYPE_STAFF:
       for (tar_ch = world[ch->in_room].people ; tar_ch ; tar_ch = next_v )
@@ -11898,7 +11950,7 @@ int cast_ice_shards( ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA 
          
         if ( !ARE_GROUPED(ch, tar_ch) )
         {  
-          retval = spell_ice_shards(level, ch, tar_ch, 0, skill); 
+          retval = spell_icestorm(level, ch, tar_ch, 0, skill); 
           if(IS_SET(retval, eCH_DIED))
             return retval;
         }  
@@ -11906,7 +11958,7 @@ int cast_ice_shards( ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA 
       return eSUCCESS;
       break;
     default :
-       log("Serious screw-up in ice_shards!", ANGEL, LOG_BUG);
+       log("Serious screw-up in icestorm!", ANGEL, LOG_BUG);
        break;
   }
   return eFAILURE;

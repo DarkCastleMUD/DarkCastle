@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.261 2009/05/02 22:41:31 shane Exp $ */
+/* $Id: spells.cpp,v 1.262 2009/05/03 18:42:25 shane Exp $ */
 
 extern "C"
 {
@@ -363,7 +363,7 @@ struct spell_info_type spell_info [] =
 
  { /* 131 */ /* 12, POSITION_STANDING,  0, TAR_CHAR_ROOM, NULL */ 0, 0, 0, 0, 0, 0 },
 
- { /* 132 */ /* 12, POSITION_FIGHTING, 25, TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, cast_ice_shards */ 0, 0, 0, 0, 0, 0 },
+ { /* 132 */ 12, POSITION_FIGHTING, 90, TAR_IGNORE, cast_icestorm, SKILL_INCREASE_HARD },
 
  { /* 133 */ 18, POSITION_STANDING, 65, TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_lightning_shield, SKILL_INCREASE_HARD },
 
@@ -686,6 +686,7 @@ char *skills[]=
   "offhand double",
   "onslaught",
   "counter strike",
+  "imbue",
   "\n"
 };
 
@@ -822,7 +823,7 @@ char *spells[]=
    "iron roots",
    "eyes of the eagle",
    "unused",
-   "ice shards",
+   "icestorm",
    "lightning shield",
    "blue bird",
    "debility",
@@ -959,6 +960,7 @@ void affect_update( int32 duration_type )
 	if (af->duration > 1)
         {
 	  af->duration--;
+          if(af->type == SPELL_ICESTORM) af->modifier = 0 - af->duration;
           if(!(af->caster).empty()) //means bard song
           {
             CHAR_DATA *get_pc_room_vis_exact(CHAR_DATA *ch, const char *name);
@@ -983,7 +985,8 @@ void affect_update( int32 duration_type )
             default: break;
           }
           af->duration--;
-        }
+          if(af->type == SPELL_ICESTORM) af->modifier = 0 - af->duration;
+      }
 	else if (af->duration == -1)
 	  /* No action */
           ;

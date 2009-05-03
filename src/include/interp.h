@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: interp.h,v 1.101 2009/04/25 17:54:26 shane Exp $ */
+/* $Id: interp.h,v 1.102 2009/05/03 18:42:30 shane Exp $ */
 
 #ifndef INTERP_H_
 #define INTERP_H_
@@ -310,6 +310,7 @@ DO_FUN do_home;
 DO_FUN do_idea;
 DO_FUN do_ignore;
 DO_FUN do_imotd;
+DO_FUN do_imbue;
 DO_FUN do_incognito;
 DO_FUN do_index;
 DO_FUN do_info;

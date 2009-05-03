@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.304 2009/05/02 22:41:31 shane Exp $ */
+/* $Id: const.cpp,v 1.305 2009/05/03 18:42:25 shane Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -92,6 +92,7 @@ std::map<int,int> fill_skill_cost()
   skill_cost_map[SKILL_BEHEAD] = 25;
   skill_cost_map[SKILL_MAKE_CAMP] = 50;
   skill_cost_map[SKILL_ONSLAUGHT] = 50;
+  skill_cost_map[SKILL_IMBUE] = 50;
   return skill_cost_map;
 }
 
@@ -1774,6 +1775,8 @@ struct class_skill_defines m_skills[] = { // mage skills
 {    "paralyze",            SPELL_PARALYZE,          48,    100,  0,   DEXINT },
 {    "solar gate",          SPELL_SOLAR_GATE,        49,    100,  0,   STRINT },
 {    "spellcraft",          SKILL_SPELLCRAFT,        50,    100,  0,   INTWIS },
+//{    "imbue",               SKILL_IMBUE,             51,    100,  0,   INTWIS },
+//{    "elemental filter",    SKILL_ELEMENTAL_FILTER,  55,    100,  0,   DEXWIS },
 {    "\n",                  0,                       1,      0,   0,   0 }
 };
 

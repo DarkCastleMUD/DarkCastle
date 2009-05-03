@@ -570,7 +570,7 @@ int do_scribe(struct char_data *ch, char *argument, int cmd)
     case SPELL_IRON_ROOTS:
     case SPELL_EYES_OF_THE_EAGLE:
     case SPELL_MISANRA_QUIVER:
-    case SPELL_ICE_SHARDS:
+    case SPELL_ICESTORM:
     case SPELL_LIGHTNING_SHIELD:
     case SPELL_BLUE_BIRD:
     case SPELL_DEBILITY:

@@ -14,7 +14,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: spells.h,v 1.127 2009/05/02 22:41:34 shane Exp $ */
+/* $Id: spells.h,v 1.128 2009/05/03 18:42:30 shane Exp $ */
 #include <structs.h> // ubyte, int16
 
 #include <map>
@@ -187,8 +187,8 @@ void check_maxes(CHAR_DATA *ch);
 #define SPELL_GREATER_STONE_SHIELD  128
 #define SPELL_IRON_ROOTS            129
 #define SPELL_EYES_OF_THE_EAGLE     130
-#define SPELL_MISANRA_QUIVER           131
-#define SPELL_ICE_SHARDS            132
+#define SPELL_MISANRA_QUIVER        131
+#define SPELL_ICESTORM              132
 #define SPELL_LIGHTNING_SHIELD      133
 #define SPELL_BLUE_BIRD             134
 #define SPELL_DEBILITY              135
@@ -375,7 +375,8 @@ void check_maxes(CHAR_DATA *ch);
 #define SKILL_OFFHAND_DOUBLE	     410
 #define SKILL_ONSLAUGHT		     411
 #define SKILL_COUNTER_STRIKE	     412
-#define SKILL_MAX                    412
+#define SKILL_IMBUE		     413
+#define SKILL_MAX                    413
 
 
 

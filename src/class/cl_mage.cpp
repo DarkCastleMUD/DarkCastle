@@ -15,6 +15,12 @@
 #include <act.h>
 #include <interp.h>
 #include <returnvals.h>
+#include <room.h>
+#include <db.h>
+
+extern CWorld world;
+extern struct spell_info_type spell_info[MAX_SPL_LIST];
+
 
 int spellcraft(struct char_data *ch, int spell)
 {
@@ -118,5 +124,105 @@ int do_focused_repelance(struct char_data *ch, char *argument, int cmd)
 
   affect_to_char(ch, &af);
 
+  return eSUCCESS;
+}
+
+
+int do_imbue(struct char_data *ch, char *argument, int cmd)
+{
+  char buf[MAX_STRING_LENGTH];
+  int lvl = has_skill(ch, SKILL_IMBUE);
+  int charges = 0, manacost = 0;
+  OBJ_DATA *wand;
+  struct affected_type af;
+
+  *buf = '\0';
+
+  argument = one_argument(argument, buf);
+
+  if(!lvl) {
+   send_to_char("Huh?\r\n", ch);
+   return eFAILURE;
+  }
+  if(affected_by_spell(ch, SKILL_IMBUE)) {
+   send_to_char("Your mind has not yet recovered from the previous imbuement.\r\n", ch);
+   return eFAILURE;
+  }
+  if(*buf == '\0') {
+   send_to_char("Imbue what?\r\n", ch);
+   return eFAILURE;
+  }
+  if(ch->in_room && IS_SET(world[ch->in_room].room_flags, NO_MAGIC)) {
+   send_to_char("Something about this room prohibits your magical imbuement.\r\n", ch);
+   return eFAILURE;
+  }
+  if(!(wand = get_obj_in_list_vis(ch, buf, ch->carrying))) {
+   wand = ch->equipment[HOLD];
+   if((wand == 0) || !isname(buf, wand->name)) {
+    wand = ch->equipment[HOLD2];
+    if((wand == 0) || !isname(buf, wand->name)) {
+     send_to_char("You do not have that wand.\r\n", ch);
+     return eFAILURE;
+    }
+   }
+  }
+  if(GET_LEVEL(ch) < wand->obj_flags.value[0]) {
+   send_to_char("This wand is too powerful for you to imbue.\r\n", ch);
+   return eFAILURE;
+  }
+
+  manacost = 4 + (10 - lvl/10) * spell_info[wand->obj_flags.value[3]].min_usesmana;
+
+  if(GET_MANA(ch) < manacost) {
+   send_to_char("You do not have enough magical energy to imbue this wand.\r\n", ch);
+   return eFAILURE;
+  }
+  if(!charge_moves(ch, SKILL_IMBUE)) return eFAILURE;
+   
+  GET_MANA(ch) -= manacost;
+
+  charges = number(1, 1 + lvl / 20);
+
+  if(skill_success(ch, 0, SKILL_IMBUE, SKILL_INCREASE_HARD)) {
+   wand->obj_flags.value[2] += charges;
+   if(wand->obj_flags.value[2] >= wand->obj_flags.value[1]) {
+    wand->obj_flags.value[2] = wand->obj_flags.value[1];
+    act("You focus your arcane powers and imbue them into $p restoring its full charge!", ch, wand, 0, TO_CHAR, 0);
+   } else {
+    sprintf(buf, "You focus your arcane powers and imbue them into $p restoring %d charges!", charges);
+    act(buf, ch, wand, 0, TO_CHAR, 0);
+   }
+   send_to_char("As you finish, the tip of the freshly charged wand $Bglows$R briefly and returns to normal.\r\n", ch);
+   act("$n focuses $s arcane powers and imbues them into $p!", ch, wand, 0, TO_ROOM, 0);
+   act("As $e finishes, the tip of the freshly charged wand $Bglows$R briefly and returns to normal.", ch, wand, 0, TO_ROOM, 0);
+  }
+  else {
+   act("You focus your arcane powers on $p but fail to restore its powers.", ch, wand, 0, TO_CHAR, 0);
+   act("$n focuses $s arcane powers on $p to no effect.", ch, wand, 0, TO_ROOM, 0);
+   if(wand->obj_flags.value[2] == 0) {
+    act("Unable to bear the strain, $p splits asunder with a sharp crack!", ch, wand, 0, TO_CHAR, 0);
+    act("Unable to bear the strain, $n's $p splits asunder with a sharp crack!", ch, wand, 0, TO_ROOM, 0);
+    make_scraps(ch, wand);
+   }
+   else {
+    wand->obj_flags.value[2] -= charges;
+    if(wand->obj_flags.value[2] <= 0) {
+     wand->obj_flags.value[2] = 0;
+     act("The energy in $p has been completely lost!", ch, wand, 0, TO_CHAR, 0);
+    }
+    act("Some of the energy in $p has been lost!", ch, wand, 0, TO_CHAR, 0);
+   }
+  }
+
+  WAIT_STATE(ch, PULSE_VIOLENCE * 2.5);
+
+  af.type      = SKILL_IMBUE;
+  af.duration  = 2;
+  af.modifier  = 0;
+  af.location  = 0;
+  af.bitvector = -1;
+
+  affect_to_char(ch, &af);
+  
   return eSUCCESS;
 }
