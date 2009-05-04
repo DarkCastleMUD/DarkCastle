@@ -12,7 +12,7 @@
  * This is free software and you are benefitting.	We hope that you    *
  * share your changes too.  What goes around, comes around. 		    *
  ****************************************************************************/
-/* $Id: info.cpp,v 1.187 2009/05/02 03:09:39 jhhudso Exp $ */
+/* $Id: info.cpp,v 1.188 2009/05/04 00:36:10 shane Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -3138,7 +3138,7 @@ int do_leaderboard(struct char_data *ch, char *argument, int cmd)
 
    check_leaderboard();
 
-csendf(ch, "%d %d \r\n", ch->pcdata->pklvl, ch->pcdata->pkills);
+//csendf(ch, "%d %d \r\n", ch->pcdata->pklvl, ch->pcdata->pkills);
 
    for(i=0;i<5;i++) hponlinename[i] = str_dup(" ");
    for(i=0;i<5;i++) mnonlinename[i] = str_dup(" ");
