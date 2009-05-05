@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.262 2009/05/03 18:42:25 shane Exp $ */
+/* $Id: spells.cpp,v 1.263 2009/05/05 19:01:33 shane Exp $ */
 
 extern "C"
 {
@@ -143,7 +143,7 @@ struct spell_info_type spell_info [] =
 
  { /* 21 */ 12, POSITION_STANDING,  5, TAR_CHAR_ROOM|TAR_SELF_DEFAULT|TAR_OBJ_INV|TAR_OBJ_ROOM, cast_detect_poison, SKILL_INCREASE_EASY },
 
- { /* 22 */ 12, POSITION_FIGHTING, 20, TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, cast_dispel_evil, SKILL_INCREASE_MEDIUM },
+ { /* 22 */ 12, POSITION_FIGHTING, 20, TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO|TAR_OBJ_ROOM, cast_dispel_evil, SKILL_INCREASE_MEDIUM },
 
  { /* 23 */ 12, POSITION_FIGHTING, 25, TAR_IGNORE, cast_earthquake, SKILL_INCREASE_HARD },
 
@@ -249,7 +249,7 @@ struct spell_info_type spell_info [] =
 
  { /* 74 */ 12, POSITION_STANDING, 33, TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_haste, SKILL_INCREASE_MEDIUM },
 
- { /* 75 */ 12, POSITION_FIGHTING, 20, TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, cast_dispel_good, SKILL_INCREASE_MEDIUM },
+ { /* 75 */ 12, POSITION_FIGHTING, 20, TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO|TAR_OBJ_ROOM, cast_dispel_good, SKILL_INCREASE_MEDIUM },
 
  { /* 76 */ 12, POSITION_FIGHTING, 80, TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, cast_hellstream, SKILL_INCREASE_HARD },
 
@@ -446,6 +446,10 @@ struct spell_info_type spell_info [] =
  { /* 172 */ 18, POSITION_STANDING, 80, TAR_CHAR_ROOM|TAR_SELF_DEFAULT|TAR_SELF_ONLY, cast_villainy, SKILL_INCREASE_HARD },
 
  { /* 173 */ 18, POSITION_STANDING, 80, TAR_CHAR_ROOM|TAR_SELF_DEFAULT|TAR_SELF_ONLY, cast_heroism, SKILL_INCREASE_HARD },
+
+ { /* 174 */ 18, POSITION_STANDING, 100, TAR_IGNORE, cast_consecrate, SKILL_INCREASE_HARD },
+
+ { /* 175 */ 18, POSITION_STANDING, 100, TAR_IGNORE, cast_consecrate, SKILL_INCREASE_HARD },
 
 };
 
@@ -865,6 +869,8 @@ char *spells[]=
    "spirit shield",
    "villainy",
    "heroism",
+   "consecrate",
+   "desecrate",
    "\n"
 };
 

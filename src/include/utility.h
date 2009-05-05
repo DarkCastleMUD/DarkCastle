@@ -16,7 +16,7 @@
  *  10/21/2003   Onager    Changed IS_ANONYMOUS() to handle mobs without   *
  *                         crashing                                        *
  ***************************************************************************/
-/* $Id: utility.h,v 1.82 2009/04/23 22:38:43 kkoons Exp $ */
+/* $Id: utility.h,v 1.83 2009/05/05 19:01:36 shane Exp $ */
 
 #ifndef UTILITY_H_
 #define UTILITY_H_
@@ -75,6 +75,9 @@ bool is_hiding(CHAR_DATA *ch, CHAR_DATA *vict);
 
 #define SILENCE_OBJ_NUMBER 407
 #define SPIRIT_SHIELD_OBJ_NUMBER 408
+#define CONSECRATE_OBJ_NUMBER 409
+#define CONSECRATE_COMP_OBJ_NUMBER 3094
+#define DESECRATE_COMP_OBJ_NUMBER 303
 
 #define REMOVE_FROM_LIST(item, head, next)      \
    if ((item) == (head))                \

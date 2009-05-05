@@ -146,6 +146,7 @@ int pulse_timer;
 int pulse_mobile;
 int pulse_bard;
 int pulse_violence;
+int pulse_tensec;
 int pulse_weather;
 int pulse_regen;
 int pulse_time;
@@ -200,6 +201,7 @@ void time_update();
 void weather_update();
 void send_hint();
 extern void pulse_command_lag();
+void checkConsecrate(int);
 
 //extern char greetings1[MAX_STRING_LENGTH];
 //extern char greetings2[MAX_STRING_LENGTH];
@@ -899,6 +901,7 @@ void init_heartbeat()
   pulse_timer	  = PULSE_TIMER;
   pulse_bard      = PULSE_BARD;   
   pulse_violence  = PULSE_VIOLENCE;
+  pulse_tensec    = PULSE_TENSEC;
   pulse_weather   = PULSE_WEATHER;
   pulse_regen     = PULSE_REGEN;
   pulse_time      = PULSE_TIME;
@@ -943,6 +946,12 @@ void heartbeat()
     check_silence_beacons();
   }
 
+  if (--pulse_tensec < 1) 
+  {
+    pulse_tensec = PULSE_TENSEC;
+    checkConsecrate(PULSE_TENSEC);
+  }
+
   if(--pulse_weather < 1)
   {
     pulse_weather = PULSE_WEATHER;
@@ -957,6 +966,7 @@ void heartbeat()
     point_update();
     pulse_takeover();
     affect_update(PULSE_REGEN);
+    checkConsecrate(PULSE_REGEN);
     if(!number(0,2)) send_hint();
   }
 

@@ -14,7 +14,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: spells.h,v 1.128 2009/05/03 18:42:30 shane Exp $ */
+/* $Id: spells.h,v 1.129 2009/05/05 19:01:36 shane Exp $ */
 #include <structs.h> // ubyte, int16
 
 #include <map>
@@ -230,7 +230,9 @@ void check_maxes(CHAR_DATA *ch);
 #define SPELL_SPIRIT_SHIELD	    171
 #define SPELL_VILLAINY		    172
 #define SPELL_HEROISM		    173
-#define MAX_SPL_LIST                172
+#define SPELL_CONSECRATE	    174
+#define SPELL_DESECRATE		    175
+#define MAX_SPL_LIST                175
 
 // if you add a spell, make sure you update "spells[]" in spells.C
 

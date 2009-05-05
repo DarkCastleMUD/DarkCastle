@@ -20,7 +20,7 @@
  * 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead *
  * of just race stuff                                                     *
  **************************************************************************
- * $Id: fight.cpp,v 1.537 2009/05/02 22:41:31 shane Exp $               *
+ * $Id: fight.cpp,v 1.538 2009/05/05 19:01:33 shane Exp $               *
  **************************************************************************/
 
 extern "C"
@@ -5733,6 +5733,10 @@ void do_pkill(CHAR_DATA *ch, CHAR_DATA *victim, int type, bool vict_is_attacker)
     else if (type == KILL_BINGO)
       sprintf(killer_message,"\n\r##%s was just BINGOED by %s!\n\r", 
             GET_NAME(victim), GET_NAME(ch));
+    else if (type == SPELL_CONSECRATE)
+      sprintf(killer_message,"\n\r##%s was just slain by %s's CONSECRATION!\n\r", GET_NAME(victim), GET_NAME(ch));
+    else if (type == SPELL_DESECRATE)
+      sprintf(killer_message,"\n\r##%s was just slain by %s's DESECRATION!\n\r", GET_NAME(victim), GET_NAME(ch));
     else switch(GET_CLASS(ch))
     {
       case CLASS_MAGIC_USER:

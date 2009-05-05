@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.182 2009/04/23 22:39:04 kkoons Exp $ */
+/* $Id: nanny.cpp,v 1.183 2009/05/05 19:01:33 shane Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -382,6 +382,7 @@ void do_on_login_stuff(char_data * ch)
 
     ch->curLeadBonus = 0;
     ch->changeLeadBonus = FALSE;
+    ch->cRooms = 0;
     REMBIT(ch->affected_by, AFF_BLACKJACK_ALERT);
     for(int i=0;i<QUEST_MAX;i++) {
        ch->pcdata->quest_current[i] = 0;
@@ -1953,11 +1954,144 @@ void check_silence_beacons(void)
 
   for(obj = object_list; obj; obj = tmp_obj) {
     tmp_obj = obj->next;
-    if(obj_index[obj->item_number].virt == SILENCE_OBJ_NUMBER)
+    if(obj_index[obj->item_number].virt == SILENCE_OBJ_NUMBER) {
       if(obj->obj_flags.value[0] == 0) extract_obj(obj);
       else obj->obj_flags.value[0]--;
+    }
   }
 
+  return;
+}
+
+void checkConsecrate(int pulseType)
+{
+  OBJ_DATA *obj, *tmp_obj;
+  CHAR_DATA *ch = NULL, *tmp_ch, *next_ch;
+  int align, amount, spl=0;
+  char buf[MAX_STRING_LENGTH];
+
+  if(pulseType == PULSE_REGEN) {
+   for(obj = object_list; obj; obj = tmp_obj) {
+    tmp_obj = obj->next;
+    if(obj_index[obj->item_number].virt == CONSECRATE_OBJ_NUMBER) {
+     spl = obj->obj_flags.value[0];
+     obj->obj_flags.value[1]--;
+     if(obj->obj_flags.value[1] <= 0) {
+      if( (ch = get_char((char *)(obj->obj_flags.value[3]))) ){
+       ch->cRooms--;
+       if(ch->desc) {
+        if(spl == SPELL_CONSECRATE) {
+         if(ch->in_room != obj->in_room)
+          csendf(ch, "You sense your consecration of %s has ended.\r\n", world[obj->in_room].name);
+         else
+          send_to_char("Runes upon the ground glow brightly, then fade to nothing.\r\nYour holy consecration has ended.\r\n", ch);
+        } else {
+         if(ch->in_room != obj->in_room)
+          csendf(ch, "You sense your desecration of %s has ended.\r\n", world[obj->in_room].name);
+         else
+          send_to_char("The runes upon the ground shatter with a burst of magic!\r\nYour unholy desecration has ended.\r\n", ch);
+        }
+       }
+      }
+      for(tmp_ch = world[obj->in_room].people; tmp_ch; tmp_ch = next_ch) {
+       next_ch = tmp_ch->next_in_room;
+       if(tmp_ch == ch) continue;
+       if(spl == SPELL_CONSECRATE) {
+        if(affected_by_spell(tmp_ch, SPELL_DETECT_GOOD) && affected_by_spell(tmp_ch, SPELL_DETECT_GOOD)->modifier >= 80)
+         send_to_char("Runes upon the ground glow brightly, then fade to nothing.\r\nThe holy consecration here has ended.\n\r", tmp_ch);
+       } else {
+        if(affected_by_spell(tmp_ch, SPELL_DETECT_EVIL) && affected_by_spell(tmp_ch, SPELL_DETECT_EVIL)->modifier >= 80)
+         send_to_char("The runes upon the ground shatter with a burst of magic!\r\nThe unholy desecration has ended.\n\r", tmp_ch);
+       }
+      }
+      extract_obj(obj);
+     }
+    }
+   }
+  }
+  else if(pulseType == PULSE_TENSEC) {
+   for(obj = object_list; obj; obj = tmp_obj) {
+    tmp_obj = obj->next;
+    if(obj_index[obj->item_number].virt == CONSECRATE_OBJ_NUMBER) {
+     spl = obj->obj_flags.value[0];
+     ch = get_char((char *)(obj->obj_flags.value[3]));
+     for(tmp_ch = world[obj->in_room].people; tmp_ch; tmp_ch = next_ch) {
+      next_ch = tmp_ch->next_in_room;
+      align = GET_ALIGNMENT(tmp_ch);
+      if(align > 0) {
+       amount = obj->obj_flags.value[2] + 10 + align/10;
+       if(spl == SPELL_CONSECRATE) {
+        if(GET_HIT(tmp_ch) + amount > GET_MAX_HIT(tmp_ch)) amount = GET_MAX_HIT(tmp_ch) - GET_HIT(tmp_ch);
+        sprintf(buf, "%d", amount);
+        GET_HIT(tmp_ch) += amount;
+        if(tmp_ch == ch)
+         send_damage("The runes upon the ground glow softly as your holy consecration heals you of | damage.", tmp_ch, 0, 0, buf, "The runes upon the ground glow softly as your holy consecration heals you. ", TO_CHAR);
+        else if(affected_by_spell(tmp_ch, SPELL_DETECT_GOOD) && affected_by_spell(tmp_ch, SPELL_DETECT_GOOD)->modifier >= 80)
+         send_damage("Runes upon the ground glow softly as $n's holy consecration heals you of | damage.", tmp_ch, 0, 0, buf, "Runes upon the ground glow softly as $n's holy consecration heals you.", TO_CHAR);
+        else
+         send_damage("Runes upon the ground glow softly as a holy consecration heals you of | damage.", tmp_ch, 0, 0, buf, "Runes upon the ground glow softly as a holy consecration heals you.", TO_CHAR);
+       } else {
+        if(GET_HIT(tmp_ch) - amount < 0) {
+         act("The strength of $N's desecration proves to powerful for $n to overcome and $e drops dead!", tmp_ch, 0, ch, TO_ROOM, NOTVICT);
+         act("The strength of your desecration proves to powerful for $n to overcome and $e drops dead!", tmp_ch, 0, ch, TO_VICT, 0);
+         if(!IS_NPC(tmp_ch)) {
+          act("The strength of $N's desecration proves fatal and the world fades to black...", tmp_ch, 0, ch, TO_CHAR, 0);
+          send_to_char("You have been KILLED!!\n\r\n\r", tmp_ch);
+         }
+         group_gain(ch, tmp_ch);
+         fight_kill(ch, tmp_ch, TYPE_CHOOSE, SPELL_DESECRATE);
+         continue;
+        }
+        sprintf(buf, "%d", amount);
+        GET_HIT(tmp_ch) -= amount;
+        if(tmp_ch == ch)
+         send_damage("The runes upon the ground hum ominously as your unholy desecration injures you, dealing | damage.", tmp_ch, 0, 0, buf, "The runes upon the ground hum ominously as your unholy desecration injures you. ", TO_CHAR);
+        else if(affected_by_spell(tmp_ch, SPELL_DETECT_GOOD) && affected_by_spell(tmp_ch, SPELL_DETECT_GOOD)->modifier >= 80)
+         send_damage("Runes upon the ground hum ominously as $n's unholy desecration injures you, dealing | damage.", tmp_ch, 0, 0, buf, "Runes upon the ground hum ominously as $n's unholy desecration injures you.", TO_CHAR);
+        else
+         send_damage("Runes upon the ground hum ominously as an unholy desecration injures you, dealing | damage.", tmp_ch, 0, 0, buf, "Runes upon the ground hum ominously as an unholy desecration injures you.", TO_CHAR);
+       }
+      }
+      else if(align < 0) {
+       amount = obj->obj_flags.value[2] + 10 - align/10;
+       if(spl == SPELL_DESECRATE) {
+        if(GET_HIT(tmp_ch) + amount > GET_MAX_HIT(tmp_ch)) amount = GET_MAX_HIT(tmp_ch) - GET_HIT(tmp_ch);
+        sprintf(buf, "%d", amount);
+        GET_HIT(tmp_ch) += amount;
+        if(tmp_ch == ch)
+         send_damage("The runes upon the ground hum ominously as your unholy desecration heals you of | damage.", tmp_ch, 0, 0, buf, "The runes upon the ground hum ominously as your unholy desecration heals you. ", TO_CHAR);
+        else if(affected_by_spell(tmp_ch, SPELL_DETECT_EVIL) && affected_by_spell(tmp_ch, SPELL_DETECT_EVIL)->modifier >= 80)
+         send_damage("Runes upon the ground hum ominously as $n's unholy desecration heals you of | damage.", tmp_ch, 0, 0, buf, "Runes upon the ground hum ominously as $n's unholy desecration heals you.", TO_CHAR);
+        else
+         send_damage("Runes upon the ground hum ominously as an unholy desecration heals you of | damage.", tmp_ch, 0, 0, buf, "Runes upon the ground hum ominously as an unholy desecration heals you.", TO_CHAR);
+       } else {
+        if(GET_HIT(tmp_ch) - amount < 0) {
+         act("The strength of $N's consecration proves to powerful for $n to overcome and $e drops dead!", tmp_ch, 0, ch, TO_ROOM, NOTVICT);
+         act("The strength of your consecration proves to powerful for $n to overcome and $e drops dead!", tmp_ch, 0, ch, TO_VICT, 0);
+         if(!IS_NPC(tmp_ch)) {
+          act("The strength of $N's consecration proves fatal and the world fades to black...", tmp_ch, 0, ch, TO_CHAR, 0);
+          send_to_char("You have been KILLED!!\n\r\n\r", tmp_ch);
+         }
+         group_gain(ch, tmp_ch);
+         fight_kill(ch, tmp_ch, TYPE_CHOOSE, SPELL_CONSECRATE);
+         continue;
+        }
+        sprintf(buf, "%d", amount);
+        GET_HIT(tmp_ch) -= amount;
+        if(tmp_ch == ch)
+         send_damage("The runes upon the ground glow softly as your holy consecration injures you, dealing | damage.", tmp_ch, 0, 0, buf, "The runes upon the ground glow softly as your holy consecration injures you. ", TO_CHAR);
+        else if(affected_by_spell(tmp_ch, SPELL_DETECT_GOOD) && affected_by_spell(tmp_ch, SPELL_DETECT_GOOD)->modifier >= 80)
+         send_damage("Runes upon the ground glow softly as $n's holy consecration injures you, dealing | damage.", tmp_ch, 0, 0, buf, "Runes upon the ground glow softly as $n's holy consecration injures you.", TO_CHAR);
+        else
+         send_damage("Runes upon the ground glow softly as a holy consecration injures you, dealing | damage.", tmp_ch, 0, 0, buf, "Runes upon the ground glow softly as a holy consecration injures you.", TO_CHAR);
+       }
+      }
+     }
+     break;
+    }
+   }
+  }
+  
   return;
 }
 

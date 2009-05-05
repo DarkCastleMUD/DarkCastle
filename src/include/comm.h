@@ -29,6 +29,7 @@ typedef int socket_t;
 #define PULSE_OBJECT    (4 * PASSES_PER_SEC)
 #define PULSE_VIOLENCE  (2 * PASSES_PER_SEC)
 #define PULSE_BARD      (1 * PASSES_PER_SEC)
+#define PULSE_TENSEC	(10 * PASSES_PER_SEC)
 #define PULSE_WEATHER   (45 * PASSES_PER_SEC)
 #define PULSE_TIME      (60 * PASSES_PER_SEC)
 #define PULSE_REGEN     (15 * PASSES_PER_SEC)

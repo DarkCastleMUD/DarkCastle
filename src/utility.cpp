@@ -17,7 +17,7 @@
  *                         except Pir and Valk                             *
  * 10/19/2003   Onager     Took out super-secret hidey code from CAN_SEE() *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.103 2009/04/25 18:47:44 shane Exp $ */
+/* $Id: utility.cpp,v 1.104 2009/05/05 19:01:33 shane Exp $ */
 
 extern "C"
 {
@@ -838,9 +838,8 @@ bool CAN_SEE_OBJ( struct char_data *sub, struct obj_data *obj, bool blindfightin
      if (!IS_AFFECTED(sub, AFF_DETECT_MAGIC)) {
        return FALSE;
      } else {
-       if (skill < 50) {
-         return FALSE;
-       }
+       if (skill < 50)
+        return FALSE;
      }
    }
 
@@ -852,6 +851,19 @@ bool CAN_SEE_OBJ( struct char_data *sub, struct obj_data *obj, bool blindfightin
 
    if( IS_DARK(sub->in_room) && !IS_AFFECTED(sub, AFF_INFRARED) && !IS_OBJ_STAT(obj, ITEM_GLOW) )
       return FALSE;
+
+   skill = 0;
+   if ((cur_af = affected_by_spell(sub, SPELL_DETECT_GOOD)))
+     skill = (int)cur_af->modifier;
+   if (skill >= 80 && isname("consecrateitem", GET_OBJ_NAME(obj)) && obj->obj_flags.value[0] == SPELL_CONSECRATE)
+        return TRUE;
+
+   skill = 0;
+   if ((cur_af = affected_by_spell(sub, SPELL_DETECT_EVIL)))
+     skill = (int)cur_af->modifier;
+   if (skill >= 80 && isname("consecrateitem", GET_OBJ_NAME(obj)) && obj->obj_flags.value[0] == SPELL_DESECRATE)
+        return TRUE;
+
 
     return TRUE;
 }
@@ -1218,6 +1230,7 @@ int do_quit(struct char_data *ch, char *argument, int cmd)
    struct clan_room_data * room;
    int found = 0;
   char buf[MAX_STRING_LENGTH];
+  OBJ_DATA *obj, *tmp_obj;
 
   void find_and_remove_player_portal(char_data * ch);
 
@@ -1335,6 +1348,15 @@ mob_index[fol->follower->mobdata->nr].virt == 8)
 
   if(ch->beacon)
     extract_obj(ch->beacon);
+
+  if(ch->cRooms) {
+   for(obj = object_list; obj; obj = tmp_obj) {
+    tmp_obj = obj->next;
+    if(obj_index[obj->item_number].virt == CONSECRATE_OBJ_NUMBER)
+      if(ch == get_char((char *)(obj->obj_flags.value[3])))
+       extract_obj(obj);
+   }
+  }
 
   if(IS_AFFECTED(ch, AFF_CHAMPION)) {
      REMBIT(ch->affected_by, AFF_CHAMPION);

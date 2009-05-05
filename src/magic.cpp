@@ -1358,21 +1358,40 @@ int spell_firestorm(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
 
 int spell_dispel_evil(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
-  int dam, align;
-  int weap_spell = obj?WIELD:0;
-  set_cantquit( ch, victim );
-  if (IS_EVIL(ch))
+  if(obj && obj->in_room && obj->obj_flags.value[0] == SPELL_DESECRATE) { // desecrate object
+   CHAR_DATA *pal=NULL;
+   if( (pal = get_char((char *)(obj->obj_flags.value[3]))) ) {
+    pal->cRooms--;
+    if(pal->in_room == obj->in_room) {
+     send_to_char("The runes upon the ground shatter with a burst of magic!\r\nYour unholy desecration has been destroyed!\r\n", pal);
+     victim = pal;
+    }
+    else csendf(pal, "You sense your desecration of %s has been destroyed!", world[obj->in_room].name);
+   }
+   send_to_char("The runes upon the ground shatter with a burst of magic!\r\nThe unholy desecration has been destroyed!\r\n", ch);
+   act("The runes upon the ground shatter with a burst of magic!\n\r$n has destroyed the unholy desecration here!", ch, 0, victim, TO_ROOM, NOTVICT);
+   extract_obj(obj);
+   return eSUCCESS;
+  } else if(obj && !victim) { //targetting a random object
+   send_to_char("Nothing happens.\r\n", ch);
+   return eSUCCESS;
+  } else { //possible weapon spell
+   int dam, align;
+   int weap_spell = obj?WIELD:0;
+   set_cantquit( ch, victim );
+   if (IS_EVIL(ch)) 
 	 victim = ch;
-  if (IS_NEUTRAL(victim) || IS_GOOD(victim))
-  {
+   if (IS_NEUTRAL(victim) || IS_GOOD(victim))
+   {
 	act("$N does not seem to be affected.", ch, 0, victim, TO_CHAR, 0);
 	return eFAILURE;
-  }
-  align = GET_ALIGNMENT(victim);
-  if(align < 0) align = 0-align;
-  dam = 350 + align / 10;
+   }
+   align = GET_ALIGNMENT(victim);
+   if(align < 0) align = 0-align;
+   dam = 350 + align / 10;
 
-  return damage(ch, victim, dam, TYPE_COLD, SPELL_DISPEL_EVIL, weap_spell);
+   return damage(ch, victim, dam, TYPE_COLD, SPELL_DISPEL_EVIL, weap_spell);
+  }
 }
 
 
@@ -1380,20 +1399,39 @@ int spell_dispel_evil(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
 
 int spell_dispel_good(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
-  int dam, align;  int weap_spell = obj?WIELD:0;
-  set_cantquit( ch, victim );
-  if (IS_GOOD(ch))
-	 victim = ch;
-  if (IS_NEUTRAL(victim) || IS_EVIL(victim))
-  {
+  if(obj && obj->in_room && obj->obj_flags.value[0] == SPELL_CONSECRATE) { // consecrate object
+   CHAR_DATA *pal=NULL;
+   if( (pal = get_char((char *)(obj->obj_flags.value[3]))) ) {
+    pal->cRooms--;
+    if(pal->in_room == obj->in_room) {
+     send_to_char("The runes upon the ground glow brightly, then fade to nothing.\r\nYour holy consecration has been destroyed!\r\n", pal);
+     victim = pal;
+    }
+    else csendf(pal, "You sense your consecration of %s has been destroyed!", world[obj->in_room].name);
+   }
+   send_to_char("Runes upon the ground glow brightly, then fade to nothing.\r\nThe holy consecration has been destroyed!\r\n", ch);
+   act("Runes upon the ground glow brightly, then fade to nothing.\n\r$n has destroyed the holy consecration here!", ch, 0, victim, TO_ROOM, NOTVICT);
+   extract_obj(obj);
+   return eSUCCESS;
+  } else if(obj && !victim) { //targetting a random object
+   send_to_char("Nothing happens.\r\n", ch);
+   return eSUCCESS;
+  } else { //possible weapon spell
+   int dam, align;  int weap_spell = obj?WIELD:0;
+   set_cantquit( ch, victim );
+   if (IS_GOOD(ch)) 
+ 	 victim = ch;
+   if (IS_NEUTRAL(victim) || IS_EVIL(victim))
+   {
 	act("$N does not seem to be affected.", ch, 0, victim, TO_CHAR, 0);
 	return eFAILURE;
-  }
-  align = GET_ALIGNMENT(victim);
-  if(align < 0) align = 0-align;
-  dam = 350 + align / 10;
+   }
+   align = GET_ALIGNMENT(victim);
+   if(align < 0) align = 0-align;
+   dam = 350 + align / 10;
 
-  return damage(ch, victim, dam, TYPE_COLD, SPELL_DISPEL_GOOD, weap_spell);
+   return damage(ch, victim, dam, TYPE_COLD, SPELL_DISPEL_GOOD, weap_spell);
+  }
 }
 
 
@@ -7808,22 +7846,23 @@ int cast_dispel_evil( ubyte level, CHAR_DATA *ch, char *arg, int type,
 {
   int retval;
   char_data * next_v;
+  OBJ_DATA * next_o;
 
   switch (type) {
   case SPELL_TYPE_SPELL:
-	 return spell_dispel_evil(level, ch, tar_ch,0, skill);
+	 return spell_dispel_evil(level, ch, tar_ch,tar_obj, skill);
 	 break;
   case SPELL_TYPE_POTION:
-	 return spell_dispel_evil(level,ch,ch,0, skill);
+	 return spell_dispel_evil(level,ch,ch,tar_obj, skill);
 	 break;
   case SPELL_TYPE_SCROLL:
 	 if (tar_obj) return eFAILURE;
 	 if (!tar_ch) tar_ch = ch;
-	 return spell_dispel_evil(level, ch, tar_ch,0, skill);
+	 return spell_dispel_evil(level, ch, tar_ch,tar_obj, skill);
 	 break;
   case SPELL_TYPE_WAND:
 	 if (tar_obj) return eFAILURE;
-	 return spell_dispel_evil(level, ch, tar_ch,0, skill);
+	 return spell_dispel_evil(level, ch, tar_ch,tar_obj, skill);
 	 break;
   case SPELL_TYPE_STAFF:
     for (tar_ch = world[ch->in_room].people ; tar_ch ; tar_ch = next_v )
@@ -7832,10 +7871,18 @@ int cast_dispel_evil( ubyte level, CHAR_DATA *ch, char *arg, int type,
    
       if ( !ARE_GROUPED(ch, tar_ch) )
       {
-        retval = spell_dispel_evil(level, ch, tar_ch, 0, skill);
+        retval = spell_dispel_evil(level, ch, tar_ch, tar_obj, skill);
         if(IS_SET(retval, eCH_DIED))
           return retval;
       }
+    }
+    for (tar_obj = world[ch->in_room].contents ; tar_obj ; tar_obj = next_o )
+    {
+      next_o = tar_obj->next;
+   
+        retval = spell_dispel_evil(level, ch, 0, tar_obj, skill);
+        if(IS_SET(retval, eCH_DIED))
+          return retval;
     }
     return eSUCCESS;
     break;
@@ -7855,22 +7902,23 @@ int cast_dispel_good( ubyte level, CHAR_DATA *ch, char *arg, int type,
 {
   int retval;
   char_data * next_v;
+  OBJ_DATA * next_o;
 
   switch (type) {
   case SPELL_TYPE_SPELL:
-	 return spell_dispel_good(level, ch, tar_ch,0, skill);
+	 return spell_dispel_good(level, ch, tar_ch,tar_obj, skill);
 	 break;
   case SPELL_TYPE_POTION:
-	 return spell_dispel_good(level,ch,ch,0, skill);
+	 return spell_dispel_good(level,ch,ch,tar_obj, skill);
 	 break;
   case SPELL_TYPE_SCROLL:
 	 if (tar_obj) return eFAILURE;
 	 if (!tar_ch) tar_ch = ch;
-	 return spell_dispel_good(level, ch, tar_ch,0, skill);
+	 return spell_dispel_good(level, ch, tar_ch,tar_obj, skill);
 	 break;
   case SPELL_TYPE_WAND:
 	 if (tar_obj) return eFAILURE;
-	 return spell_dispel_good(level, ch, tar_ch,0, skill);
+	 return spell_dispel_good(level, ch, tar_ch,tar_obj, skill);
 	 break;
   case SPELL_TYPE_STAFF:
     for (tar_ch = world[ch->in_room].people ; tar_ch ; tar_ch = next_v )
@@ -7879,10 +7927,18 @@ int cast_dispel_good( ubyte level, CHAR_DATA *ch, char *arg, int type,
   
       if ( !ARE_GROUPED(ch, tar_ch) )
       {
-        retval = spell_dispel_good(level, ch, tar_ch, 0, skill);
+        retval = spell_dispel_good(level, ch, tar_ch, tar_obj, skill);
         if(IS_SET(retval, eCH_DIED))
           return retval;
       }
+    }
+    for (tar_obj = world[ch->in_room].contents ; tar_obj ; tar_obj = next_o )
+    {
+      next_o = tar_obj->next;
+  
+        retval = spell_dispel_good(level, ch, 0, tar_obj, skill);
+        if(IS_SET(retval, eCH_DIED))
+          return retval;
     }
     return eSUCCESS;
     break;
@@ -13743,5 +13799,135 @@ int cast_heroism( ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *ta
 	 log("Serious screw-up in heroism!", ANGEL, LOG_BUG);
 	 break;
 	 }
+  return eFAILURE;
+}
+
+/* CONSERATE/DESECRATE */
+
+int spell_consecrate(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
+{
+  int spl = (GET_CLASS(ch)==CLASS_PALADIN ? SPELL_CONSECRATE : SPELL_DESECRATE);
+  int compNum;
+  char buf[MAX_STRING_LENGTH];
+  OBJ_DATA *cItem = NULL;
+
+  if(spl == SPELL_CONSECRATE) compNum = CONSECRATE_COMP_OBJ_NUMBER;
+  else compNum = DESECRATE_COMP_OBJ_NUMBER;
+
+  if(!(cItem = get_obj_in_list_vis(ch, compNum, ch->carrying))) {
+   cItem = ch->equipment[HOLD];
+   if((cItem == 0) || (compNum != obj_index[cItem->item_number].virt)) {
+    cItem = ch->equipment[HOLD2];
+    if((cItem == 0) || (compNum != obj_index[cItem->item_number].virt)) {
+     send_to_char("You do not have the required components.\r\n", ch);
+     return eFAILURE;
+    }
+   }
+  }
+  if(cItem->obj_flags.value[1] <= 0) {
+   send_to_char("There is nothing left in the container.\r\n", ch);
+   return eFAILURE;
+  }
+  if(cItem->obj_flags.value[2] != 13 && cItem->obj_flags.value[2] != 17) {
+   send_to_char("You do not have the required components,\r\n", ch);
+   return eFAILURE;
+  }
+
+  if(GET_MOVE(ch) < 100) {
+   send_to_char("You do not have enough energy to complete the incantation.\r\n", ch);
+   return eFAILURE;
+  }
+
+  cItem->obj_flags.value[1]--;
+  GET_MOVE(ch) -= 100;
+
+  if(spl == SPELL_CONSECRATE) {
+   act("You chant softy, etching runes upon the ground in a large circle and sprinkle them with holy water.", ch, 0, 0, TO_CHAR, 0);
+   act("$n chants softy, etching runes upon the ground in a large circle and sprinkling them with holy water.", ch, 0, 0, TO_ROOM, 0);
+  } else {
+   act("You chant darkly, etching a large circle of runes upon the ground in blood.", ch, 0, 0, TO_CHAR, 0);
+   act("$n chants darkly, etching a large circle of runes upon the ground in blood.", ch, 0, 0, TO_ROOM, 0);
+  }
+
+  if(ch->cRooms >= 1 + skill/25) {
+   if(spl == SPELL_CONSECRATE) send_to_char("You cannot keep up this many consecrated areas.\r\n", ch);
+   else send_to_char("You cannot keep up this many desecrated areas.\r\n", ch);
+   return eSUCCESS;
+  }
+
+  if( IS_SET(world[ch->in_room].room_flags, CLAN_ROOM) || IS_SET(world[ch->in_room].room_flags, SAFE) || 
+	IS_SET(world[ch->in_room].room_flags, NOLEARN) ) {
+   send_to_char("Something about this room prohibits your incantation from being completed.\r\n", ch);
+   return eSUCCESS;
+  }
+
+  cItem = NULL;
+
+  if( (cItem = get_obj_in_list_vis(ch,"consecrateitem",world[ch->in_room].contents)) ) {
+   if(ch==get_char((char *)(cItem->obj_flags.value[3])) && spl == SPELL_CONSECRATE) {
+    send_to_char("You have already consecrated the ground here!\r\n", ch);
+    return eSUCCESS;
+   }
+   if(ch==get_char((char *)(cItem->obj_flags.value[3])) && spl == SPELL_DESECRATE) {
+    send_to_char("You have already desecrated the ground here!\r\n", ch);
+    return eSUCCESS;
+   }
+
+   if(spl == SPELL_CONSECRATE && cItem->obj_flags.value[0] == SPELL_DESECRATE) {
+    send_to_char("A foul taint prevents you from consecrating the ground here!", ch);
+    return eSUCCESS;
+   }
+   if(spl == SPELL_DESECRATE && cItem->obj_flags.value[0] == SPELL_CONSECRATE) {
+    send_to_char("A powerful aura of goodness prevents you from desecrating the ground here!", ch);
+    return eSUCCESS;
+   }
+  }
+
+  if(spl == SPELL_CONSECRATE)
+   send_to_room("The runes begin to glow brightly upon the ground, then softly fade from view.\r\n", ch->in_room);
+  else
+   send_to_room("The runes begin to hum ominously, then softly fade from view.\r\n", ch->in_room);
+
+  WAIT_STATE(ch, PULSE_VIOLENCE*2);
+
+  ch->cRooms++;
+
+  cItem = clone_object(real_object(CONSECRATE_OBJ_NUMBER));
+  if(spl == SPELL_DESECRATE) {
+   sprintf(buf, "%s", "A circle of ominously humming blood runes are etched upon the ground here.");
+   cItem->description = str_hsh(buf);
+  }
+  cItem->obj_flags.value[0] = spl;
+  cItem->obj_flags.value[1] = 1 + skill/50;
+  cItem->obj_flags.value[2] = skill;
+  cItem->obj_flags.value[3] = (int)(ch->name);
+
+  obj_to_room(cItem, ch->in_room);
+
+  return eSUCCESS;
+}
+
+int cast_consecrate( ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *tar_ch, struct obj_data *tar_obj, int skill )
+{
+  switch (type) {
+	case SPELL_TYPE_SPELL:
+		 return spell_consecrate(level,ch,0,0, skill);
+		 break;
+	case SPELL_TYPE_POTION:
+		 return spell_consecrate(level,ch,0,0, skill);
+		 break;
+	case SPELL_TYPE_SCROLL:
+		 if (tar_obj) return eFAILURE;
+		 return spell_consecrate(level,ch,0,0, skill);
+		 break;
+	case SPELL_TYPE_WAND:
+		 if (tar_obj) return eFAILURE;
+		 return spell_consecrate(level,ch,0,0, skill);
+		 break;
+	default :
+		 log("Serious screw-up in consecrate!", ANGEL, LOG_BUG);
+		 break;
+  }
+
   return eFAILURE;
 }

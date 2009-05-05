@@ -1,7 +1,7 @@
 #ifndef CHARACTER_H_
 #define CHARACTER_H_
 /******************************************************************************
-| $Id: character.h,v 1.72 2009/01/24 02:03:12 kkoons Exp $
+| $Id: character.h,v 1.73 2009/05/05 19:01:36 shane Exp $
 | Description: This file contains the header information for the character
 |   class implementation.
 */
@@ -423,6 +423,7 @@ struct char_data
     int32 spellcraftglyph;               // Used for spellcraft glyphs
     bool  changeLeadBonus;
     int32 curLeadBonus;
+    int   cRooms;			// number of rooms consecrated/desecrated
 
 // TODO - see if we can move the "wait" timer from desc to char
 // since we need something to lag mobs too
