@@ -20,7 +20,7 @@
  * 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead *
  * of just race stuff                                                     *
  **************************************************************************
- * $Id: fight.cpp,v 1.538 2009/05/05 19:01:33 shane Exp $               *
+ * $Id: fight.cpp,v 1.539 2009/05/13 22:45:19 shane Exp $               *
  **************************************************************************/
 
 extern "C"
@@ -83,7 +83,7 @@ int do_lightning_shield(CHAR_DATA *ch, CHAR_DATA *vict, int dam);
 int do_fireshield(CHAR_DATA *ch, CHAR_DATA *vict, int dam);
 int do_vampiric_aura(CHAR_DATA *ch, CHAR_DATA *vict);
 int do_boneshield(CHAR_DATA *ch, CHAR_DATA *vict, int dam);
-void do_dam_msgs(CHAR_DATA *ch, CHAR_DATA *victim, int dam, int attacktype, int weapon);
+void do_dam_msgs(CHAR_DATA *ch, CHAR_DATA *victim, int dam, int attacktype, int weapon, int filter = 0);
 void inform_victim(CHAR_DATA *ch, CHAR_DATA *vict, int dam);
 void update_stuns(CHAR_DATA *ch);
 int is_fighting_mob(CHAR_DATA *ch);
@@ -2311,6 +2311,7 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
       act("Your strike at $N lands with lethal accuracy and inflicts additional damage!", ch, 0, victim, TO_CHAR, 0);
       act("$n's strike lands with lethal accuracy and inflicts additional damage!", ch, 0, victim, TO_VICT, 0);
       act("$n's strike at $N lands with lethal accuracy and inflicts additional damage!", ch, 0, victim, TO_ROOM, NOTVICT);
+      skill_increase_check(ch, SKILL_CRIT_HIT, learned, SKILL_INCREASE_HARD);
     }
 
   }
@@ -2519,7 +2520,7 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
 
     GET_HIT(victim) -= dam;
     update_pos(victim);
-    do_dam_msgs(ch, victim, dam, attacktype, weapon);
+    do_dam_msgs(ch, victim, dam, attacktype, weapon, weapon_type);
   }
 
   mprog_damage_trigger( victim, ch, dam );
@@ -2755,12 +2756,34 @@ void send_damage(char *buf, CHAR_DATA *ch, OBJ_DATA *obj, CHAR_DATA *victim, cha
 
 
 
-void do_dam_msgs(CHAR_DATA *ch, CHAR_DATA *victim, int dam, int attacktype, int weapon)
+void do_dam_msgs(CHAR_DATA *ch, CHAR_DATA *victim, int dam, int attacktype, int weapon, int filter)
 {
   extern struct message_list fight_messages[MAX_MESSAGES];
   struct message_type *messages,*messages2;
-  int i,j,  nr;
+  int i,j, nr;
+  string find, replace;
+
   if (is_bingo(dam, weapon, attacktype)) return;
+
+  if(filter > TYPE_HIT && (attacktype == SPELL_BURNING_HANDS || attacktype == SPELL_FIREBALL || attacktype == SPELL_FIRESTORM || attacktype == SPELL_HELLSTREAM 
+	|| attacktype == SPELL_MAGIC_MISSILE || attacktype == SPELL_METEOR_SWARM || attacktype == SPELL_LIGHTNING_BOLT || attacktype == SPELL_CHILL_TOUCH) )
+  {
+   if(attacktype == SPELL_CHILL_TOUCH) find = "$B$3";
+   else if(attacktype == SPELL_LIGHTNING_BOLT) find = "$B$5";
+   else if(attacktype == SPELL_MAGIC_MISSILE || attacktype == SPELL_METEOR_SWARM) find = "$B$7";
+   else find = "$B$4";
+
+   switch(filter) {
+    case TYPE_FIRE: replace =  "$B$4"; break;
+    case TYPE_COLD: replace = "$B$3"; break;
+    case TYPE_ENERGY: replace = "$B$5"; break;
+    case TYPE_ACID: replace = "$B$2"; break;
+    case TYPE_POISON: replace = "$2"; break;
+    case TYPE_MAGIC: replace = "$B$7"; break;
+    default: replace = find;
+   }
+  }
+
   for (i = 0; i < MAX_MESSAGES; i++)
   {
     if (fight_messages[i].a_type != attacktype)
@@ -2780,49 +2803,41 @@ void do_dam_msgs(CHAR_DATA *ch, CHAR_DATA *victim, int dam, int attacktype, int 
     if (!messages) return;
     if (!IS_NPC(victim) && GET_LEVEL(victim) >= IMMORTAL)
     {
-      act(messages->god_msg.attacker_msg,
+      act(replaceString(messages->god_msg.attacker_msg, find, replace),
         ch, ch->equipment[weapon], victim, TO_CHAR, 0);
-      act(messages->god_msg.victim_msg,
+      act(replaceString(messages->god_msg.victim_msg, find, replace),
         ch, ch->equipment[weapon], victim, TO_VICT, 0);
-      act(messages->god_msg.room_msg,
+      act(replaceString(messages->god_msg.room_msg, find, replace),
         ch, ch->equipment[weapon], victim, TO_ROOM, NOTVICT);
     }
     else
       if (dam == 0)
       {
-        act(messages->miss_msg.attacker_msg,
+        act(replaceString(messages->miss_msg.attacker_msg, find, replace),
           ch, ch->equipment[weapon], victim, TO_CHAR, 0);
-        act(messages->miss_msg.victim_msg,
+        act(replaceString(messages->miss_msg.victim_msg, find, replace),
           ch, ch->equipment[weapon], victim, TO_VICT, 0);
-        act(messages->miss_msg.room_msg,
+        act(replaceString(messages->miss_msg.room_msg, find, replace),
           ch, ch->equipment[weapon], victim, TO_ROOM, NOTVICT);
       }
       else
         if (GET_POS(victim) == POSITION_DEAD)
         {
-	send_damage(messages2->die_msg.victim_msg, ch, ch->equipment[weapon],
-		victim, dmgmsg, messages->die_msg.victim_msg, TO_VICT);
-	send_damage(messages2->die_msg.attacker_msg, ch, ch->equipment[weapon],
-		victim, dmgmsg, messages->die_msg.attacker_msg, TO_CHAR);
-	send_damage(messages2->die_msg.room_msg, ch, ch->equipment[weapon],
-		victim, dmgmsg, messages->die_msg.room_msg, TO_ROOM);
-//          act(messages->die_msg.room_msg,
-  //          ch, ch->equipment[weapon], victim, TO_ROOM, NOTVICT);
+	send_damage((char *)replaceString(messages2->die_msg.victim_msg, find, replace).c_str(), ch, ch->equipment[weapon],
+		victim, dmgmsg, (char *)replaceString(messages->die_msg.victim_msg, find, replace).c_str(), TO_VICT);
+	send_damage((char *)replaceString(messages2->die_msg.attacker_msg, find, replace).c_str(), ch, ch->equipment[weapon],
+		victim, dmgmsg, (char *)replaceString(messages->die_msg.attacker_msg, find, replace).c_str(), TO_CHAR);
+	send_damage((char *)replaceString(messages2->die_msg.room_msg, find, replace).c_str(), ch, ch->equipment[weapon],
+		victim, dmgmsg, (char *)replaceString(messages->die_msg.room_msg, find, replace).c_str(), TO_ROOM);
         }
         else
         {
-/*          act(messages->hit_msg.attacker_msg,
-            ch, ch->equipment[weapon], victim, TO_CHAR, 0);
-          act(messages->hit_msg.victim_msg,
-            ch, ch->equipment[weapon], victim, TO_VICT, 0);*/
-	send_damage(messages2->hit_msg.victim_msg, ch, ch->equipment[weapon],
-		victim, dmgmsg, messages->hit_msg.victim_msg, TO_VICT);
-	send_damage(messages2->hit_msg.attacker_msg, ch, ch->equipment[weapon],
-		victim, dmgmsg, messages->hit_msg.attacker_msg, TO_CHAR);
-	send_damage(messages2->hit_msg.room_msg, ch, ch->equipment[weapon],
-		victim, dmgmsg, messages->hit_msg.room_msg, TO_ROOM);
-//          act(messages->hit_msg.room_msg,
-  //          ch, ch->equipment[weapon], victim, TO_ROOM, NOTVICT);
+	send_damage((char *)replaceString(messages2->hit_msg.victim_msg, find, replace).c_str(), ch, ch->equipment[weapon],
+		victim, dmgmsg, (char *)replaceString(messages->hit_msg.victim_msg, find, replace).c_str(), TO_VICT);
+	send_damage((char *)replaceString(messages2->hit_msg.attacker_msg, find, replace).c_str(), ch, ch->equipment[weapon],
+		victim, dmgmsg, (char *)replaceString(messages->hit_msg.attacker_msg, find, replace).c_str(), TO_CHAR);
+	send_damage((char *)replaceString(messages2->hit_msg.room_msg, find, replace).c_str(), ch, ch->equipment[weapon],
+		victim, dmgmsg, (char *)replaceString(messages->hit_msg.room_msg, find, replace).c_str(), TO_ROOM);
         }
   }
 }

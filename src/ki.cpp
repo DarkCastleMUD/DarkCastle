@@ -3,7 +3,7 @@
  * Morcallen 12/18
  *
  */
-/* $Id: ki.cpp,v 1.80 2009/05/02 22:41:31 shane Exp $ */
+/* $Id: ki.cpp,v 1.81 2009/05/13 22:45:19 shane Exp $ */
 
 extern "C"
 {
@@ -1031,6 +1031,7 @@ int ki_transfer( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim)
 {
   char amt[MAX_STRING_LENGTH], type[MAX_STRING_LENGTH];
   int amount, temp=0;
+  struct affected_type af;
 
   arg = one_argument(arg, amt);
   arg = one_argument(arg, type);
@@ -1047,10 +1048,25 @@ int ki_transfer( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim)
    return eFAILURE;
   }
 
+  if(affected_by_spell(victim, SPELL_KI_TRANS_TIMER)) {
+   act("$N cannot receive a transfer right now due to the stress $S mind has been recently been through.", ch, 0, victim, TO_CHAR, 0);
+   return eFAILURE;
+  }
+
+  if(affected_by_spell(ch, SPELL_KI_TRANS_TIMER)) affect_from_char(ch, SPELL_KI_TRANS_TIMER);
+
+  af.type      = SPELL_KI_TRANS_TIMER;
+  af.duration  = 1;
+  af.modifier  = 0;
+  af.location  = 0;
+  af.bitvector = -1;
+
+  affect_to_char(ch, &af);
+
   if(type[0] == 'k') {
    GET_KI(ch) -= amount;
    amount++;
-   temp = amount/2 + level/10;
+   temp = amount + level/10;
    if(GET_KI(victim) + temp > GET_MAX_KI(victim)) temp = GET_MAX_KI(victim) - GET_KI(victim);
    GET_KI(victim) += temp;
    sprintf(amt, "%d", amount);

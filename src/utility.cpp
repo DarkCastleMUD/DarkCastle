@@ -17,7 +17,7 @@
  *                         except Pir and Valk                             *
  * 10/19/2003   Onager     Took out super-secret hidey code from CAN_SEE() *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.104 2009/05/05 19:01:33 shane Exp $ */
+/* $Id: utility.cpp,v 1.105 2009/05/13 22:45:19 shane Exp $ */
 
 extern "C"
 {
@@ -72,7 +72,6 @@ using namespace std;
 
 #include <map>
 
-using namespace std;
 extern struct index_data *obj_index;
 
 // extern vars
@@ -2242,3 +2241,16 @@ void unique_scan(struct char_data *victim)
   return;
 }
 
+string replaceString( string message, string find, string replace)
+{
+ size_t j;
+
+ if(find.empty()) return message;
+ if(replace.empty()) return message;
+ if(find == replace) return message;
+
+ for ( ; (j = message.find( find )) != string::npos ; ) {
+  message.replace( j, find.length(), replace );
+ }
+ return message;
+}

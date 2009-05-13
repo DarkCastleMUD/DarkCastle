@@ -16,7 +16,7 @@
  *  10/21/2003   Onager    Changed IS_ANONYMOUS() to handle mobs without   *
  *                         crashing                                        *
  ***************************************************************************/
-/* $Id: utility.h,v 1.83 2009/05/05 19:01:36 shane Exp $ */
+/* $Id: utility.h,v 1.84 2009/05/13 22:45:22 shane Exp $ */
 
 #ifndef UTILITY_H_
 #define UTILITY_H_
@@ -31,6 +31,7 @@ extern "C" {
 #include "weather.h"
 #include "memory.h"
 #include "player.h"
+#include <string>
 
 extern struct weather_data weather_info;
 extern char log_buf[MAX_STRING_LENGTH];
@@ -556,5 +557,7 @@ int handle_poisoned_weapon_attack(char_data * ch, char_data * vict, int percent)
 enum BACKUP_TYPE { NONE, SELFDELETED, CONDEATH, ZAPPED };
 void remove_character(char *name, BACKUP_TYPE backup = NONE);
 void remove_familiars(char *name, BACKUP_TYPE backup = NONE);
+
+std::string replaceString(std::string message, std::string find, std::string replace);
 
 #endif /* UTILITY_H_ */

@@ -240,7 +240,9 @@ int spell_magic_missile(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct ob
 
     while(!SOMEONE_DIED(retval) && count--)
     {
-    retval = damage(ch, victim, dam, TYPE_MAGIC, SPELL_MAGIC_MISSILE, weap_spell);
+    if(level > 200)
+     retval = damage(ch, victim, dam, TYPE_HIT + level-200, SPELL_MAGIC_MISSILE, weap_spell);
+    else retval = damage(ch, victim, dam, TYPE_MAGIC, SPELL_MAGIC_MISSILE, weap_spell);
     if (dam > 50) dam = 50; // spelldamage only applies to 1st missile
     }
   return retval;
@@ -255,7 +257,10 @@ int spell_chill_touch(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
   int dam = 250;
   int save;
   int weap_spell = obj?WIELD:0;
-  int retval = damage(ch, victim, dam, TYPE_COLD, SPELL_CHILL_TOUCH, weap_spell);
+  int retval;
+
+  if(level > 200) retval = damage(ch, victim, dam, TYPE_HIT + level - 200, SPELL_CHILL_TOUCH, weap_spell);
+  else  retval = damage(ch, victim, dam, TYPE_COLD, SPELL_CHILL_TOUCH, weap_spell);
 
   if(SOMEONE_DIED(retval)) return retval;
 
@@ -294,7 +299,8 @@ int spell_burning_hands(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct ob
   int dam;
   set_cantquit( ch, victim );
   dam = 150;
-  return damage(ch, victim, dam, TYPE_FIRE, SPELL_BURNING_HANDS, 0);
+  if(level > 200) return damage(ch, victim, dam, TYPE_HIT + level - 200, SPELL_BURNING_HANDS, 0);
+  else return damage(ch, victim, dam, TYPE_FIRE, SPELL_BURNING_HANDS, 0);
 }
 
 
@@ -316,7 +322,8 @@ int spell_lightning_bolt(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct o
   int weap_spell = obj?WIELD:0;
   set_cantquit( ch, victim );
   dam = 200;
-  return damage(ch, victim, dam, TYPE_ENERGY, SPELL_LIGHTNING_BOLT, weap_spell);
+  if(level > 200) return damage(ch, victim, dam, TYPE_HIT + level - 200, SPELL_LIGHTNING_BOLT, weap_spell);
+  else return damage(ch, victim, dam, TYPE_ENERGY, SPELL_LIGHTNING_BOLT, weap_spell);
 }
 
 
@@ -505,7 +512,9 @@ int spell_meteor_swarm(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
   set_cantquit( ch, victim );
   dam = 500;
   int retval;
-  retval = damage(ch, victim, dam,TYPE_PHYSICAL_MAGIC, SPELL_METEOR_SWARM, weap_spell);
+
+  if(level > 200) retval = damage(ch, victim, dam,TYPE_HIT + level - 200, SPELL_METEOR_SWARM, weap_spell);
+  else retval = damage(ch, victim, dam,TYPE_MAGIC, SPELL_METEOR_SWARM, weap_spell);
 
 	/* Spellcraft Effect */
   if (!SOMEONE_DIED(retval) && spellcraft(ch, SPELL_METEOR_SWARM)
@@ -529,7 +538,10 @@ int spell_fireball(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
    int weap_spell = obj?WIELD:0;
    set_cantquit( ch, victim );
    dam = 300;
-   int retval = damage(ch, victim, dam, TYPE_FIRE, SPELL_FIREBALL, weap_spell);
+   int retval;
+
+   if(level > 200) retval = damage(ch, victim, dam, TYPE_HIT + level - 200, SPELL_FIREBALL, weap_spell);
+   else retval = damage(ch, victim, dam, TYPE_FIRE, SPELL_FIREBALL, weap_spell);
 
    if(SOMEONE_DIED(retval) || ch->in_room != victim->in_room)
      return retval;
@@ -1332,8 +1344,9 @@ int spell_firestorm(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
     {
       
       dam = 250;
-         
-      retval2 = damage(ch, tmp_victim, dam, TYPE_FIRE, SPELL_FIRESTORM, 0);
+      
+      if(level > 200)  retval2 = damage(ch, tmp_victim, dam, TYPE_HIT + level - 200, SPELL_FIRESTORM, 0);
+      else retval2 = damage(ch, tmp_victim, dam, TYPE_FIRE, SPELL_FIRESTORM, 0);
 
       if (IS_SET(retval2, eVICT_DIED))
         SET_BIT(retval, eVICT_DIED);
@@ -5893,7 +5906,8 @@ int spell_hellstream(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
 
    set_cantquit (ch, victim);
    dam = 800;
-   return damage(ch, victim, dam,TYPE_FIRE, SPELL_HELLSTREAM, 0);
+   if(level > 200) return damage(ch, victim, dam,TYPE_HIT + level - 200, SPELL_HELLSTREAM, 0);
+   else return damage(ch, victim, dam,TYPE_FIRE, SPELL_HELLSTREAM, 0);
 }
 
 

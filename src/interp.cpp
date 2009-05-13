@@ -16,7 +16,7 @@
 /* 12/08/2003   Onager   Added chop_half() to work like half_chop() but    */
 /*                       chopping off the last word.                       */
 /***************************************************************************/
-/* $Id: interp.cpp,v 1.182 2009/05/10 20:33:43 kkoons Exp $ */
+/* $Id: interp.cpp,v 1.183 2009/05/13 22:45:19 shane Exp $ */
 
 extern "C"
 {
@@ -258,7 +258,6 @@ struct command_info cmd_info[] =
     { "leadership",		do_leadership,	POSITION_RESTING, 0, CMD_DEFAULT, 0, 0 },
     { "triage",		do_triage,	POSITION_RESTING, 0, CMD_DEFAULT, 0, 0 },
     { "onslaught",	do_onslaught,	POSITION_RESTING, 0, CMD_DEFAULT, 0, 0 },
-    { "imbue",		do_imbue,	POSITION_STANDING, 0, CMD_DEFAULT, 0, 0 },
 
     // Position commands
     { "sit",	do_sit,		POSITION_RESTING, 0, CMD_DEFAULT, COM_CHARMIE_OK, 0 },
@@ -517,6 +516,8 @@ struct command_info cmd_info[] =
 
     // Bug way down here after 'buy'
     { "bug",	do_bug,	POSITION_DEAD, 0, CMD_DEFAULT, 0, 1 },
+    // imbue after 'im' for us lazy immortal types :)
+    { "imbue",		do_imbue,	POSITION_STANDING, 0, CMD_DEFAULT, 0, 0 },
     
     // MOBprogram commands
     { "mpasound",		do_mpasound,	POSITION_DEAD, 0, CMD_DEFAULT, 0, 1 },
