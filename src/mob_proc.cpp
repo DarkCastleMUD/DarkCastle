@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.189 2009/03/30 19:07:56 kkoons Exp $ */
+/* $Id: mob_proc.cpp,v 1.190 2009/05/14 20:27:16 apocalypse Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -1615,7 +1615,7 @@ static char *dethSayText [ ] =
   "Ever get the urge to call the operator and say 'I need an exit fast!'",
   "The thing that attracts me to fat chicks the most is probably the gravitational pull.",
     // Sneaky repeating of messages to make the fuckers vote.
-  "I've lost 3 girlfriends to voting for Dark Castle on Mudconnect (through www.dcastle.net), but it was worth it.",
+  "I've lost 3 girlfriends to voting for Dark Castle on Mudconnect (through www.dcastle.org), but it was worth it.",
   "Good: Your wife meets you naked at the door. Bad: She's coming home.",
   "Good: Your boyfriend's exercising. Bad: So he'll fit in your clothes.",
   "What do you have when 100 lawyers are buried up to their neck in sand?  Not enough sand",
