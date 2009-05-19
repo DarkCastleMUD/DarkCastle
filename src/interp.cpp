@@ -16,7 +16,7 @@
 /* 12/08/2003   Onager   Added chop_half() to work like half_chop() but    */
 /*                       chopping off the last word.                       */
 /***************************************************************************/
-/* $Id: interp.cpp,v 1.183 2009/05/13 22:45:19 shane Exp $ */
+/* $Id: interp.cpp,v 1.184 2009/05/19 17:03:39 kkoons Exp $ */
 
 extern "C"
 {
@@ -176,6 +176,8 @@ struct command_info cmd_info[] =
 
     // Object manipulation
     { "slip",		do_slip,	POSITION_STANDING, 0,  CMD_SLIP, 0, 1 },
+    { "batter",		do_batter,	POSITION_STANDING, 0, CMD_DEFAULT, 0, 0 },
+    { "brace",		do_brace,	POSITION_STANDING, 0, CMD_DEFAULT, 0, 0 },
     { "close",		do_close,	POSITION_RESTING, 0, CMD_DEFAULT, COM_CHARMIE_OK, 25 },
     { "donate",		do_donate,	POSITION_RESTING, 0, CMD_DONATE, COM_CHARMIE_OK, 1 },
     { "drink",		do_drink,	POSITION_RESTING, 0, CMD_DEFAULT, COM_CHARMIE_OK, 25 },
