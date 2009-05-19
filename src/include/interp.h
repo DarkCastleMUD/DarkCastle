@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: interp.h,v 1.103 2009/05/10 20:34:05 kkoons Exp $ */
+/* $Id: interp.h,v 1.104 2009/05/19 17:03:48 kkoons Exp $ */
 
 #ifndef INTERP_H_
 #define INTERP_H_
@@ -198,6 +198,7 @@ DO_FUN do_ban;
 DO_FUN do_bandwidth;
 DO_FUN do_bard_song_toggle;
 DO_FUN do_bash;
+DO_FUN do_batter;
 DO_FUN do_battlecry;
 DO_FUN do_battlesense;
 DO_FUN do_beacon;
@@ -210,6 +211,7 @@ DO_FUN do_bladeshield;
 DO_FUN do_bloodfury;
 DO_FUN do_boot;
 DO_FUN do_boss;
+DO_FUN do_brace;
 DO_FUN do_brief;
 DO_FUN do_news_toggle;
 DO_FUN do_ascii_toggle;
