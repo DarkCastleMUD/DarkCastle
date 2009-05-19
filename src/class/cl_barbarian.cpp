@@ -1,5 +1,5 @@
 /************************************************************************
- * $Id: cl_barbarian.cpp,v 1.98 2009/04/09 19:13:32 kkoons Exp $
+ * $Id: cl_barbarian.cpp,v 1.99 2009/05/19 17:04:11 kkoons Exp $
  * cl_barbarian.cpp
  * Description: Commands for the barbarian class.
  *************************************************************************/
@@ -24,16 +24,54 @@ extern struct index_data *obj_index;
 extern bool str_prefix(const char *astr, const char *bstr);
 extern CWorld world;
 int attempt_move(CHAR_DATA *ch, int cmd, int is_retreat = 0);
+int find_door(CHAR_DATA *ch, char *type, char *dir);
 
-int do_brace(struct char_data *ch, char *argument, int cmd)
+int do_batter(struct char_data *ch, char *argument, int cmd)
 {
   if(!has_skill(ch, SKILL_BATTERBRACE)) 
   {
     send_to_char("You could accidentally hurt someone if you try this untrained...\r\n", ch);
     return eFAILURE;
   }
+  return eSUCCESS;
+}
+
+int do_brace(struct char_data *ch, char *argument, int cmd)
+{
+  int door;
+  char type[MAX_INPUT_LENGTH], dir[MAX_INPUT_LENGTH];
+
+  argument_interpreter(argument, type, dir);
+
+  if(!has_skill(ch, SKILL_BATTERBRACE)) 
+  {
+    send_to_char("You could accidentally hurt someone if you try this untrained...\r\n", ch);
+    return eFAILURE;
+  }
   
-  
+  if ((door = find_door(ch, type, dir)) >= 0) 
+  {
+    if (!IS_SET(EXIT(ch, door)->exit_info, EX_CLOSED))
+    {
+      send_to_char("You have to close it first!\r\n", ch);
+      return eFAILURE;
+    }
+    if (EXIT(ch, door)->bracee != NULL) 
+    {
+      send_to_char("This door is already barred from the other side!\r\n", ch);
+      return eFAILURE;
+    }
+
+    //add 1.5 rounds of lag 
+    //charge moves here
+    //skill check here
+    csendf(ch, "You lean heavily on the %s, bracing your shoulder solidly against it...\r\n", 
+                                       fname(EXIT(ch, door)->keyword));
+    send_to_char("The passage now appears firmly blocked.\r\n", ch);
+
+    //send something to everyone else
+    EXIT(ch, door)->bracee = ch;
+  }
 
   return eSUCCESS;
 }
