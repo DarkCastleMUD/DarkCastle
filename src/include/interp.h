@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: interp.h,v 1.104 2009/05/19 17:03:48 kkoons Exp $ */
+/* $Id: interp.h,v 1.105 2009/05/20 00:07:08 kkoons Exp $ */
 
 #ifndef INTERP_H_
 #define INTERP_H_
@@ -24,7 +24,7 @@ int command_interpreter(CHAR_DATA *ch, char *argument, bool procced = 0 );
 int search_block(char *arg, char **list, bool exact);
 int old_search_block(char *argument,int begin,int length,char **list,int mode);
 char lower( char c );
-void argument_interpreter(char *argument, char *first_arg, char *second_arg);
+void argument_interpreter(const char *argument, char *first_arg, char *second_arg);
 char *one_argument(char *argument,char *first_arg);
 char *one_argument_long(char *argument,char *first_arg);
 char *one_argumentnolow(char *argument,char *first_arg);
