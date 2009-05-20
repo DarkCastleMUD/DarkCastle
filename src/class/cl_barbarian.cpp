@@ -1,5 +1,5 @@
 /************************************************************************
- * $Id: cl_barbarian.cpp,v 1.100 2009/05/20 00:07:51 kkoons Exp $
+ * $Id: cl_barbarian.cpp,v 1.101 2009/05/20 21:31:18 kkoons Exp $
  * cl_barbarian.cpp
  * Description: Commands for the barbarian class.
  *************************************************************************/
@@ -29,12 +29,155 @@ int find_door(CHAR_DATA *ch, char *type, char *dir);
 
 int do_batter(struct char_data *ch, char *argument, int cmd)
 {
-  if(!has_skill(ch, SKILL_BATTERBRACE)) 
+  char type[MAX_INPUT_LENGTH], dir[MAX_INPUT_LENGTH];
+  char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH], dammsg[20];
+  struct room_direction_data *exit, *back;
+  int other_room, door, dam, skill, retval;
+
+  if(!(skill = has_skill(ch, SKILL_BATTERBRACE))) 
   {
     send_to_char("You could accidentally hurt someone if you try this untrained...\r\n", ch);
     return eFAILURE;
   }
-  return eSUCCESS;
+
+  argument_interpreter(argument, type, dir);
+
+  if (!*type) 
+  {
+    send_to_char("Batter what??\r\n", ch);
+    send_to_char("batter <door> <direction>\r\n", ch);
+    return eFAILURE;
+  }
+
+  if (!*dir)
+  {
+    send_to_char("What direction?\r\n", ch);
+    return eFAILURE;
+  }
+
+  if ((door = find_door(ch, type, dir)) >= 0) 
+  {
+    exit = EXIT(ch, door);
+
+    //check to make sure door is in right state
+    if (!IS_SET(exit->exit_info, EX_ISDOOR))
+    {
+      send_to_char("You can't figure out how to break it down.\r\n", ch);
+      return eFAILURE;
+    }
+
+    if (!IS_SET(exit->exit_info, EX_CLOSED))
+    {
+      send_to_char("You can't break down an open door!\r\n", ch);
+      return eFAILURE;
+    }
+
+    if(IS_SET(EXIT(ch, door)->exit_info, EX_PICKPROOF)) 
+    {
+      send_to_char("It seems far too sturdy for you to break down.\r\n", ch);
+      return eFAILURE;
+    }
+
+    //check for brace
+
+    WAIT_STATE(ch, PULSE_VIOLENCE * 1.5);
+    if (!charge_moves(ch, SKILL_BATTERBRACE)) return eSUCCESS;
+
+    dam = number(100, 200) + 3 * (100 - skill);
+
+
+    csendf(ch, "You take a deep breath, let loose a mighty bellow, and charge blindly at the %s in your path...\r\n", 
+                         fname(exit->keyword));
+    act("$n takes a deep breath, lets loose a mighty bellow, and charges blindly at the $F in $s path...", 
+                       ch, 0, exit->keyword, TO_ROOM, 0);
+
+    if (!skill_success(ch,NULL,SKILL_BATTERBRACE)) 
+    {
+
+      sprintf(dammsg, "$B%d$R", dam);
+      sprintf(buf2, "With a resounding crash, you bounce off the %s and fall to the ground, receiving | damage!", fname(exit->keyword));
+      sprintf(buf, "With a resounding crash, you bounce off the %s and fall to the ground!", fname(exit->keyword));
+      send_damage(buf2, ch, 0, 0, dammsg, buf, TO_CHAR);
+      sprintf(buf, "With a resounding crash, $e bounces off the %s and falls to the ground!", fname(exit->keyword));
+      send_damage(buf, ch, 0, 0,dammsg, buf, TO_ROOM);
+
+      sprintf(buf, "The %s survived, but you didn't...\r\n", fname(exit->keyword));
+      sprintf(buf2, "The %s survived, but $n didn't...", fname(exit->keyword));
+      retval = noncombat_damage(ch, dam, buf, buf2, 0, KILL_BATTER);
+
+
+      if(SOMEONE_DIED(retval))
+      {
+        return retval;
+      }
+
+      GET_POS(ch) = POSITION_SITTING;
+      update_pos(ch);
+      return eFAILURE;
+    }
+    else
+    {
+      REMOVE_BIT(exit->exit_info, EX_CLOSED); //break this side of door
+      SET_BIT(exit->exit_info, EX_BROKEN);
+
+      if ((other_room = exit->to_room) != NOWHERE)
+        if ((back = world[other_room].dir_option[rev_dir[door]]) != 0)
+          if (back->to_room == ch->in_room)
+          {
+            REMOVE_BIT(back->exit_info, EX_CLOSED); //break other side of door
+            SET_BIT(back->exit_info, EX_BROKEN);
+          }
+
+
+
+      sprintf(dammsg, "$B%d$R", dam);
+      sprintf(buf2, "With a resounding crash, the %s gives way and bursts open, receiving | damage!.", fname(exit->keyword));
+      sprintf(buf, "With a resounding crash, the %s gives way and bursts open!\r\n", fname(exit->keyword));
+      send_damage(buf2, ch, 0, 0, dammsg, buf, TO_CHAR);
+      sprintf(buf, "With a resounding crash, the %s gives way and bursts open!", fname(exit->keyword));
+      send_damage(buf, ch, 0, 0,dammsg, buf, TO_ROOM);
+
+
+      sprintf(buf, "Your heroic efforts managed to slay both the %s... and yourself. Nice going.\r\n", fname(exit->keyword));
+      sprintf(buf2, "$n's heroic efforts manage to slay both the %s... and $mself. Oops.", fname(exit->keyword));
+
+      retval = noncombat_damage(ch, dam, buf, buf2, 0, KILL_BATTER);
+
+      if(SOMEONE_DIED(retval))
+      {
+        return retval;
+      }
+
+      if(number(1,100) > (40-GET_DEX(ch))+(100-skill))
+      {
+        send_to_char("You manage to maintain your balance and admire your handywork.\r\n", ch);
+        act("$n manages to maintain $h balance and admires $s handywork.", ch, 0, exit->keyword, TO_ROOM, 0);
+      }
+      else
+      {
+        if(CAN_GO(ch, door))
+        {
+          send_to_char("You are unable to maintain your balance and sail into the adjacent room! Ouch!\r\n", ch);
+          act("$n is unable to maintain $h balance and sails into the adjacent room!", ch, 0, exit->keyword, TO_ROOM, 0);
+          move_char(ch, exit->to_room);
+          act("The $F suddenly bursts apart and $n tumbles headlong through!", ch, 0, exit->keyword, TO_ROOM, 0);
+        }
+        else
+        {
+          send_to_char("You are unable to maintain your balance and sail towards the adjacent room, but some force keeps you out!\r\n", ch);
+          act("$n is unable to maintain $h balance and sails towards the adjacent room, but some force keeps $h out!", 
+                                      ch, 0, exit->keyword, TO_ROOM, 0);
+        }
+        GET_POS(ch) = POSITION_SITTING;
+        update_pos(ch);
+      }
+      return eSUCCESS;
+    }
+
+
+  }
+  send_to_char("You don't see anything like that to batter.\r\n", ch);
+  return eFAILURE;
 }
 
 
@@ -87,6 +230,13 @@ int do_brace(struct char_data *ch, char *argument, int cmd)
   {
 
     exit = EXIT(ch, door);
+
+    if (!IS_SET(exit->exit_info, EX_ISDOOR))
+    {
+      send_to_char("You can't figure out how to hold it shut.\r\n", ch);
+      return eFAILURE;
+    }
+
     if (!IS_SET(exit->exit_info, EX_CLOSED))
     {
       send_to_char("You have to close it first!\r\n", ch);
