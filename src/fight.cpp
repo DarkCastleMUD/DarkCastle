@@ -20,7 +20,7 @@
  * 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead *
  * of just race stuff                                                     *
  **************************************************************************
- * $Id: fight.cpp,v 1.539 2009/05/13 22:45:19 shane Exp $               *
+ * $Id: fight.cpp,v 1.540 2009/05/20 00:08:19 kkoons Exp $               *
  **************************************************************************/
 
 extern "C"
@@ -110,17 +110,23 @@ CHAR_DATA *combat_list = NULL, *combat_next_dude = NULL;
 int isHit(CHAR_DATA *ch, CHAR_DATA *victim, int attacktype, int &type, int &reduce);
 
 
-#define MAX_CHAMP_DEATH_MESSAGE		8
+#define MAX_CHAMP_DEATH_MESSAGE		14
 char *champ_death_messages[] = 
 {
-/*0*/	"\n\r##Somewhere a village has been deprived of their idiot.\n\r",
+/*1*/	"\n\r##Somewhere a village has been deprived of their idiot.\n\r",
   	"\n\r##Don't feel bad %s. A lot of people have no talent!\n\r",
 	"\n\r##If at first you don't succeed, failure may be your style.\n\r",
 	"\n\r##%s just found the cure for stupidity. Death.\n\r",
-	"\n\r##%s just succumbed to a fatal case of stupidity.\n\r",
-/*5*/	"\n\r##%s: About as useful as a windshield wiper on a goat's ass.\n\r",
+/*5*/	"\n\r##%s just succumbed to a fatal case of stupidity.\n\r",
+	"\n\r##%s: About as useful as a windshield wiper on a goat's ass.\n\r",
 	"\n\r##Proof of reincarnation. Nobody could be as stupid as %s in one lifetime.\n\r",
-	"\n\r##%s: The poster child for birth control.\n\r"
+	"\n\r##%s: The poster child for birth control.\n\r",
+	"\n\r##Someone... we're not saying who... but someone is an unmitigated moron.\n\r",
+/*10*/	"\n\r##%s wasn't ready.\n\r",
+	"\n\r##EPIC FAIL\n\r",
+	"\n\r##%s wants a do-over.\n\r",
+	"\n\r##%s prays, 'THIS GAME SUCKS'\n\r",
+	"\n\r##DarkCastle: Helping people like %s to die since 1991.\n\r"
 };
 
 
