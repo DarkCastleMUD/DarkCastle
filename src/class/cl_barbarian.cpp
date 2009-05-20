@@ -1,5 +1,5 @@
 /************************************************************************
- * $Id: cl_barbarian.cpp,v 1.102 2009/05/20 22:03:10 kkoons Exp $
+ * $Id: cl_barbarian.cpp,v 1.103 2009/05/20 22:05:16 kkoons Exp $
  * cl_barbarian.cpp
  * Description: Commands for the barbarian class.
  *************************************************************************/
@@ -158,6 +158,8 @@ int do_batter(struct char_data *ch, char *argument, int cmd)
           csendf(exit->bracee, "The %s bursts open with a resounding crash and you are hurld to the ground!\r\n", fname(exit->keyword));
           act("The $F bursts open with a resounding crash and $n is hurled to the ground!", exit->bracee, 0, exit->keyword, TO_ROOM, 0);
           do_brace(exit->bracee, "", 0); //unbrace
+          GET_POS(exit->bracee) = POSITION_SITTING;
+          update_pos(exit->bracee);
         }
         else
         { //brace wins
