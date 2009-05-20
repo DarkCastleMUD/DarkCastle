@@ -1,5 +1,5 @@
 /************************************************************************
- * $Id: cl_barbarian.cpp,v 1.101 2009/05/20 21:31:18 kkoons Exp $
+ * $Id: cl_barbarian.cpp,v 1.102 2009/05/20 22:03:10 kkoons Exp $
  * cl_barbarian.cpp
  * Description: Commands for the barbarian class.
  *************************************************************************/
@@ -29,6 +29,8 @@ int find_door(CHAR_DATA *ch, char *type, char *dir);
 
 int do_batter(struct char_data *ch, char *argument, int cmd)
 {
+  bool battervbrace = false;
+  bool batterwins = false;
   char type[MAX_INPUT_LENGTH], dir[MAX_INPUT_LENGTH];
   char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH], dammsg[20];
   struct room_direction_data *exit, *back;
@@ -72,13 +74,12 @@ int do_batter(struct char_data *ch, char *argument, int cmd)
       return eFAILURE;
     }
 
-    if(IS_SET(EXIT(ch, door)->exit_info, EX_PICKPROOF)) 
+    if(IS_SET(exit->exit_info, EX_PICKPROOF)) 
     {
       send_to_char("It seems far too sturdy for you to break down.\r\n", ch);
       return eFAILURE;
     }
 
-    //check for brace
 
     WAIT_STATE(ch, PULSE_VIOLENCE * 1.5);
     if (!charge_moves(ch, SKILL_BATTERBRACE)) return eSUCCESS;
@@ -117,6 +118,27 @@ int do_batter(struct char_data *ch, char *argument, int cmd)
     }
     else
     {
+      //check for brace
+      if(exit->bracee != NULL)
+      {
+        battervbrace = true;
+        int batterer = GET_STR(ch) + GET_CON(ch) + GET_DEX(ch) + number(1, 10);
+        int bracee = GET_STR(exit->bracee) + GET_CON(exit->bracee) + GET_DEX(exit->bracee) + number(1, 10);
+        if(batterer < bracee) //batterer fails (ch fails)
+        {
+          GET_MOVE(ch) -= 100;
+          if(GET_MOVE(ch) < 0)
+            GET_MOVE(ch) = 0;
+        }
+        else
+        {
+          batterwins = true;
+          GET_MOVE(exit->bracee) -= 100;
+          if(GET_MOVE(exit->bracee) < 0)
+            GET_MOVE(exit->bracee) = 0;
+        }
+      }
+ 
       REMOVE_BIT(exit->exit_info, EX_CLOSED); //break this side of door
       SET_BIT(exit->exit_info, EX_BROKEN);
 
@@ -129,14 +151,28 @@ int do_batter(struct char_data *ch, char *argument, int cmd)
           }
 
 
-
-      sprintf(dammsg, "$B%d$R", dam);
-      sprintf(buf2, "With a resounding crash, the %s gives way and bursts open, receiving | damage!.", fname(exit->keyword));
-      sprintf(buf, "With a resounding crash, the %s gives way and bursts open!\r\n", fname(exit->keyword));
-      send_damage(buf2, ch, 0, 0, dammsg, buf, TO_CHAR);
-      sprintf(buf, "With a resounding crash, the %s gives way and bursts open!", fname(exit->keyword));
-      send_damage(buf, ch, 0, 0,dammsg, buf, TO_ROOM);
-
+      if(battervbrace)
+      {
+        if(batterwins)
+        {
+          csendf(exit->bracee, "The %s bursts open with a resounding crash and you are hurld to the ground!\r\n", fname(exit->keyword));
+          act("The $F bursts open with a resounding crash and $n is hurled to the ground!", exit->bracee, 0, exit->keyword, TO_ROOM, 0);
+          do_brace(exit->bracee, "", 0); //unbrace
+        }
+        else
+        { //brace wins
+          csendf(exit->bracee, "The %s shakes dangerously as a powerful blow strikes it from the other side!\r\n", fname(exit->keyword));
+        }
+      }
+      else
+      {
+        sprintf(dammsg, "$B%d$R", dam);
+        sprintf(buf2, "With a resounding crash, the %s gives way and bursts open, receiving | damage!.", fname(exit->keyword));
+        sprintf(buf, "With a resounding crash, the %s gives way and bursts open!\r\n", fname(exit->keyword));
+        send_damage(buf2, ch, 0, 0, dammsg, buf, TO_CHAR);
+        sprintf(buf, "With a resounding crash, the %s gives way and bursts open!", fname(exit->keyword));
+        send_damage(buf, ch, 0, 0,dammsg, buf, TO_ROOM);
+      }
 
       sprintf(buf, "Your heroic efforts managed to slay both the %s... and yourself. Nice going.\r\n", fname(exit->keyword));
       sprintf(buf2, "$n's heroic efforts manage to slay both the %s... and $mself. Oops.", fname(exit->keyword));
