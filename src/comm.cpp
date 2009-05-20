@@ -157,7 +157,7 @@ XmlRpcServer *xmlrpc_s;
 /* functions in this file */
 void update_mprog_throws(void);
 void update_bard_singing(void);
-void update_command_lag_and_poison(void);
+void update_characters(void);
 void short_activity();
 void skip_spaces(char **string);
 char *any_one_arg(char *argument, char *first_arg);
@@ -893,6 +893,9 @@ void game_loop(unsigned mother_desc, unsigned other_desc, unsigned third_desc, u
   }
 }
 
+
+
+
 extern void pulse_hunts(); 
 extern void auction_expire();
 void init_heartbeat()
@@ -941,7 +944,7 @@ void heartbeat()
   {
     pulse_violence = PULSE_VIOLENCE;
     perform_violence();
-    update_command_lag_and_poison();
+    update_characters();
     affect_update(PULSE_VIOLENCE);
     check_silence_beacons();
   }

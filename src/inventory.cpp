@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.112 2009/04/23 21:30:30 kkoons Exp $
+| $Id: inventory.cpp,v 1.113 2009/05/20 00:10:20 kkoons Exp $
 | inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
@@ -96,7 +96,7 @@ void get(struct char_data *ch, struct obj_data *obj_object, struct obj_data *sub
     if (sub_object) {
 			sprintf(buffer,"%s_consent",GET_NAME(ch));
 		      if (has_consent && obj_object->obj_flags.type_flag != ITEM_MONEY) {
-                                if ((cmd==195 && isname("lootable",sub_object->name)) && !isname(buffer,sub_object->name))
+                                if ((cmd==CMD_LOOT && isname("lootable",sub_object->name)) && !isname(buffer,sub_object->name))
                                 {
 				  SET_BIT(sub_object->obj_flags.more_flags, ITEM_PC_CORPSE_LOOTED);;
                                   struct affected_type pthiefaf;
@@ -126,7 +126,7 @@ void get(struct char_data *ch, struct obj_data *obj_object, struct obj_data *sub
 
                                 }
 		      } else if (has_consent && obj_object->obj_flags.type_flag == ITEM_MONEY && !isname(buffer,sub_object->name)) {
-                                if (cmd==195 && isname("lootable",sub_object->name))
+                                if (cmd==CMD_LOOT && isname("lootable",sub_object->name))
                                 {
                                   struct affected_type pthiefaf;
 
@@ -342,7 +342,7 @@ int do_get(struct char_data *ch, char *argument, int cmd)
       return eFAILURE; 
     }
 
-    if (cmd == 195 && type != 0 && type != 6) {
+    if (cmd == CMD_LOOT && type != 0 && type != 6) {
       send_to_char("You can only loot 1 item from a non-consented corpse.\n\r", ch);
       return eFAILURE;
     }
@@ -354,7 +354,7 @@ int do_get(struct char_data *ch, char *argument, int cmd)
 	  case 10:
 	    send_to_char("Palm what?\n\r", ch); 
 	    break;
-	  case 195:
+	  case CMD_LOOT:
 	    send_to_char("Loot what?\n\r", ch); 
 	    break;
 	  default:
@@ -714,7 +714,7 @@ fname(obj_object->name));
 	  sub_object = get_obj_in_list_vis(ch, arg2, 
 			   world[ch->in_room].contents);
 	  if (!sub_object){
-	    if (cmd==195) {
+	    if (cmd==CMD_LOOT) {
 	      send_to_char("You can only loot 1 item from a non-consented corpse.\n\r", ch);
 	      return eFAILURE;
 	    }
@@ -728,12 +728,25 @@ fname(obj_object->name));
 	       isname("pc", sub_object->name)) || isname("thiefcorpse",sub_object->name))) 
             {
                sprintf(buffer, "%s_consent", GET_NAME(ch));
-	       if(cmd != 195 && (isname("thiefcorpse", sub_object->name) && !isname(GET_NAME(ch), sub_object->name)) || isname(buffer, sub_object->name))
+
+	       if(cmd != CMD_LOOT 
+                  && (isname("thiefcorpse", sub_object->name) 
+                      && !isname(GET_NAME(ch), sub_object->name)
+                     ) 
+                  || isname(buffer, sub_object->name)
+                 )
                  has_consent = TRUE;
-               if (!isname(GET_NAME(ch), sub_object->name) && (cmd==195 && isname("lootable", sub_object->name)) && !IS_SET(sub_object->obj_flags.more_flags, ITEM_PC_CORPSE_LOOTED) &&
-			!IS_SET(world[ch->in_room].room_flags, SAFE) && GET_LEVEL(ch) >= 50)
+               if (!isname(GET_NAME(ch), sub_object->name) 
+                   && (cmd==CMD_LOOT 
+                       && isname("lootable", sub_object->name)
+                      ) 
+                   && !IS_SET(sub_object->obj_flags.more_flags, ITEM_PC_CORPSE_LOOTED) 
+                   &&  !IS_SET(world[ch->in_room].room_flags, SAFE) 
+                   && GET_LEVEL(ch) >= 50
+                  )
 		 has_consent = TRUE;
-	       if(!has_consent && !isname(GET_NAME(ch), sub_object->name)) {
+	       if(!has_consent && !isname(GET_NAME(ch), sub_object->name)) 
+               {
 		 send_to_char("You don't have consent to touch the "
 		               "corpse.\n\r", ch);
 	         return eFAILURE;
@@ -786,7 +799,7 @@ fname(obj_object->name));
                   // to pick up no_trade items because it is someone else's corpse.  If I am
                   // the other of the corpse, has_consent will be false.
                       if (GET_LEVEL(ch) < IMMORTAL) {
-			  if (isname("thiefcorpse",sub_object->name) || (cmd==195 && isname("lootable",sub_object->name)))
+			  if (isname("thiefcorpse",sub_object->name) || (cmd==CMD_LOOT && isname("lootable",sub_object->name)))
 			  {
 			      csendf(ch, "Whoa!  The %s poofed into thin air!\r\n", obj_object->short_description);
 
@@ -800,7 +813,7 @@ fname(obj_object->name));
 			      fail = TRUE;
 			      sprintf(buffer,"%s_consent",GET_NAME(ch));
 
-			      if ((cmd==195 && isname("lootable",sub_object->name)) && !isname(buffer, sub_object->name))
+			      if ((cmd==CMD_LOOT && isname("lootable",sub_object->name)) && !isname(buffer, sub_object->name))
 			      {
 				  SET_BIT(sub_object->obj_flags.more_flags, ITEM_PC_CORPSE_LOOTED);
 				  struct affected_type pthiefaf;
@@ -1803,6 +1816,32 @@ int find_door(CHAR_DATA *ch, char *type, char *dir)
     }
 }
 
+/*
+in_room == exit->in_room
+
+*/
+bool is_bracing(CHAR_DATA *bracee, struct room_direction_data *exit)
+{
+  //has to be standing
+  if(GET_POS(bracee) < POSITION_STANDING)
+    return false;
+
+  //if neither the spot bracee is at, nor remote spot, is equal to teh exit
+  if(bracee->brace_at != exit && bracee->brace_exit != exit) 
+    return false;
+
+  for(int i = 0; i < 6; i++)  
+    if(world[bracee->in_room].dir_option[i] == exit)
+      return true;
+
+  if(bracee->in_room == exit->to_room)
+  {
+    if(exit == bracee->brace_at || exit == bracee->brace_exit)
+      return true;
+  }
+
+  return false;
+}
 
 int do_open(CHAR_DATA *ch, char *argument, int cmd)
 {
@@ -1834,8 +1873,22 @@ int do_open(CHAR_DATA *ch, char *argument, int cmd)
          send_to_char("It seems to be locked.\n\r", ch);  
       else if (IS_SET(EXIT(ch, door)->exit_info, EX_BROKEN)) 
          send_to_char("It's already been broken open!\n\r", ch);  
-      else if (IS_SET(EXIT(ch, door)->exit_info, EX_BRACED))
-         send_to_char("It seems to be braced from the other side.\n\r", ch);   
+      else if (EXIT(ch, door)->bracee != NULL)
+      {
+         if(is_bracing(EXIT(ch, door)->bracee, EXIT(ch, door)))
+         {
+           if(EXIT(ch, door)->bracee->in_room == ch->in_room)
+             csendf(ch, "%s is holding the %s shut.\r\n", 
+                          EXIT(ch, door)->bracee->name, fname(EXIT(ch, door)->keyword));
+           else
+             csendf(ch, "The %s seems to be barred from the other side.\n\r", fname(EXIT(ch, door)->keyword));   
+         }
+         else
+         {
+           do_brace(EXIT(ch, door)->bracee, "", 0);
+           return do_open(ch, argument, cmd);
+         }
+      }
       else if (IS_SET(EXIT(ch, door)->exit_info, EX_IMM_ONLY) && GET_LEVEL(ch) < IMMORTAL)
          send_to_char("It seems to slither and resist your attempt to touch it.\n\r", ch);
       else

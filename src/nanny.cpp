@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.183 2009/05/05 19:01:33 shane Exp $ */
+/* $Id: nanny.cpp,v 1.184 2009/05/20 00:10:20 kkoons Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -62,6 +62,7 @@ extern "C" {
 #define STATE(d)    ((d)->connected)
 
 void AuctionHandleDelete(string name);
+bool is_bracing(CHAR_DATA *bracee, struct room_direction_data *exit);
 void check_for_sold_items(CHAR_DATA *ch);
 
 char menu[] = "\n\rWelcome to Dark Castle Mud\n\r\n\r"
@@ -1852,7 +1853,7 @@ void remove_command_lag(CHAR_DATA * ch)
    ch->timer = 0;
 }
 
-void update_command_lag_and_poison()
+void update_characters()
 {
    CHAR_DATA *i, *next_dude;
    int tmp, retval;
@@ -1863,13 +1864,33 @@ void update_command_lag_and_poison()
    {
       next_dude = i->next;
 
-      if (IS_AFFECTED(i, AFF_POISON) && !(affected_by_spell(i, SPELL_POISON))) {
-	logf(IMMORTAL, LOG_BUG, "Player %s affected by poison but not under poison spell. Removing poison affect.", i->name);
+      if(i->brace_at) //if character is bracing
+      {
+        if (!charge_moves(i, SKILL_BATTERBRACE, 0.5)
+            || !is_bracing(i, i->brace_at)) 
+        {
+          do_brace(i, "", 0);
+        }
+        else
+        {
+          csendf(i, "You strain your muscles keeping the %s closed.\r\n", fname(i->brace_at->keyword));
+          act("$n strains $s muscles keeping the $F blocked.", 
+                                       i, 0, i->brace_at->keyword, TO_ROOM, 0);
+        }
+      }
+      if (IS_AFFECTED(i, AFF_POISON) && !(affected_by_spell(i, SPELL_POISON))) 
+      {
+	logf(IMMORTAL, LOG_BUG, 
+              "Player %s affected by poison but not under poison spell. Removing poison affect.", i->name);
 	REMBIT(i->affected_by, AFF_POISON);
       }
 
       // handle poison
-      if(IS_AFFECTED(i, AFF_POISON) && !i->fighting && affected_by_spell(i, SPELL_POISON) && affected_by_spell(i, SPELL_POISON)->location == APPLY_NONE) {
+      if(IS_AFFECTED(i, AFF_POISON) 
+         && !i->fighting 
+         && affected_by_spell(i, SPELL_POISON) 
+         && affected_by_spell(i, SPELL_POISON)->location == APPLY_NONE) 
+      {
         int tmp = number(1,2) + affected_by_spell(i, SPELL_POISON)->duration;
         if(get_saves(i, SAVE_TYPE_POISON) > number(1,101)) {
            tmp *= get_saves(i, SAVE_TYPE_POISON) / 100;
@@ -1930,7 +1951,8 @@ void update_command_lag_and_poison()
       affect_from_char(i, SKILL_COMBAT_MASTERY);
 
       //perseverance stuff
-      if(affected_by_spell(i, SKILL_PERSEVERANCE)) {
+      if(affected_by_spell(i, SKILL_PERSEVERANCE)) 
+      {
         affect_from_char(i, SKILL_PERSEVERANCE_BONUS);
         af.type = SKILL_PERSEVERANCE_BONUS;
         af.duration = -1;
@@ -1941,7 +1963,8 @@ void update_command_lag_and_poison()
         af.bitvector = -1;
         affect_to_char(i, &af);
 
-        GET_MOVE(i) += 5 * (1 + affected_by_spell(i, SKILL_PERSEVERANCE)->modifier/11 - affected_by_spell(i, SKILL_PERSEVERANCE)->duration);
+        GET_MOVE(i) += 5 * (1 + affected_by_spell(i, SKILL_PERSEVERANCE)->modifier/11 
+                              - affected_by_spell(i, SKILL_PERSEVERANCE)->duration);
         GET_MOVE(i) = MIN(GET_MOVE(i), GET_MAX_MOVE(i));
       }
 
@@ -1962,6 +1985,7 @@ void check_silence_beacons(void)
 
   return;
 }
+
 
 void checkConsecrate(int pulseType)
 {

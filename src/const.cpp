@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.306 2009/05/13 22:45:19 shane Exp $ */
+/* $Id: const.cpp,v 1.307 2009/05/20 00:10:19 kkoons Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -93,6 +93,7 @@ std::map<int,int> fill_skill_cost()
   skill_cost_map[SKILL_MAKE_CAMP] = 50;
   skill_cost_map[SKILL_ONSLAUGHT] = 50;
   skill_cost_map[SKILL_IMBUE] = 50;
+  skill_cost_map[SKILL_BATTERBRACE] = 60;
   return skill_cost_map;
 }
 

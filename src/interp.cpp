@@ -16,7 +16,7 @@
 /* 12/08/2003   Onager   Added chop_half() to work like half_chop() but    */
 /*                       chopping off the last word.                       */
 /***************************************************************************/
-/* $Id: interp.cpp,v 1.184 2009/05/19 17:03:39 kkoons Exp $ */
+/* $Id: interp.cpp,v 1.185 2009/05/20 00:10:20 kkoons Exp $ */
 
 extern "C"
 {
@@ -968,7 +968,7 @@ int old_search_block(char *argument,int begin,int length,char **list,int mode)
 }
 
 
-void argument_interpreter(char *argument,char *first_arg,char *second_arg )
+void argument_interpreter(const char *argument,char *first_arg,char *second_arg )
 {
   int look_at, found, begin;
   

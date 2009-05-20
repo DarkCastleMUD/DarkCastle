@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: move.cpp,v 1.92 2009/04/03 22:35:30 kkoons Exp $
+| $Id: move.cpp,v 1.93 2009/05/20 00:10:20 kkoons Exp $
 | move.C
 | Movement commands and stuff.
 *************************************************************************
@@ -842,6 +842,12 @@ int attempt_move(CHAR_DATA *ch, int cmd, int is_retreat = 0)
   int  return_val;
   int  was_in = ch->in_room;
   struct follow_type *k, *next_dude;
+
+  if(ch->brace_at)
+  {
+    csendf(ch, "You can't move and brace the %s at the same time!\r\n", fname(ch->brace_at->keyword));
+    return eFAILURE;
+  }
 
   --cmd;
 
