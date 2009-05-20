@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.307 2009/05/20 00:10:19 kkoons Exp $ */
+/* $Id: const.cpp,v 1.308 2009/05/20 17:07:31 apocalypse Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -1304,7 +1304,7 @@ struct class_skill_defines t_skills[] = { // thief skills
 //   ------------       ------------          -----    ---  -----  ----------
 {    "backstab",        SKILL_BACKSTAB,         1,      90,  0,  STRDEX },  
 {    "sneak",           SKILL_SNEAK,            2,      90,  0,  DEXINT },  
-{    "shield block",    SKILL_SHIELDBLOCK,      4,      40,  0,  CONINT },  
+{    "parry",           SKILL_PARRY,            4,      40,  0,  CONINT },
 {    "stalk",           SKILL_STALK,            6,     100,  0,  DEXINT },
 {    "hide",            SKILL_HIDE,             7,      90,  0,  DEXINT },  
 {    "dual wield",      SKILL_DUAL_WIELD,       10,     90,  0,  CONINT },  
@@ -1511,7 +1511,7 @@ struct class_skill_defines r_skills[] = { // ranger skills
 {    "redirect",        SKILL_REDIRECT,          7,      80,  0,   CONWIS },
 {    "eyes of the owl", SPELL_EYES_OF_THE_OWL,   8,      85,  0,   STRCON },
 {    "sense life",      SPELL_SENSE_LIFE,        9,      85,  0,   CONWIS },
-{    "dodge",    	SKILL_DODGE,    	 10,     60,  0,   CONWIS },
+{    "dodge",    	SKILL_DODGE,    	 10,     70,  0,   CONWIS },
 {    "tame",            SKILL_TAME,              11,    100,  0,   STRCON },
 {    "double",          SKILL_SECOND_ATTACK,     12,     85,  0,   STRDEX },
 {    "free animal",     SKILL_FREE_ANIMAL,       13,    100,  0,   STRCON },
@@ -1604,9 +1604,10 @@ struct class_skill_defines u_skills[] = { // druid skills
 {    "blue bird",            SPELL_BLUE_BIRD,            1,     100,  0,   STRDEX },  
 {    "eyes of the owl",      SPELL_EYES_OF_THE_OWL,      2,      90,  0,   DEXWIS },
 {    "cure light",           SPELL_CURE_LIGHT,           3,      85,  0,   INTWIS },
-{    "create water",         SPELL_CREATE_WATER,         5,      90,  0,   DEXWIS },
+{    "shield block",         SKILL_SHIELDBLOCK,          5,      50,  0,   STRCON },
 {    "attrition",            SPELL_ATTRITION,            6,     100,  0,   CONWIS },
 {    "natures lore",         SKILL_NATURES_LORE,         7,     100,  0,   DEXWIS },
+{    "create water",         SPELL_CREATE_WATER,         8,      90,  0,   DEXWIS },
 {    "create food",          SPELL_CREATE_FOOD,          8,      90,  0,   DEXWIS },
 {    "sense life",           SPELL_SENSE_LIFE,           10,     90,  0,   DEXWIS },
 {    "weaken",               SPELL_WEAKEN,               11,    100,  0,   CONWIS },
@@ -1677,7 +1678,7 @@ struct class_skill_defines c_skills[] = { // cleric skills
 {    "detect invisibility",  SPELL_DETECT_INVISIBLE,  12,     85,  0,   DEXINT },
 {    "remove poison",        SPELL_REMOVE_POISON,     13,     90,  0,   INTWIS },
 {    "dispel minor",         SPELL_DISPEL_MINOR,      14,     90,  0,   STRCON },
-{    "dual wield",           SKILL_DUAL_WIELD,        15,     40,  0,   STRINT },
+{    "dual wield",           SKILL_DUAL_WIELD,        15,     50,  0,   STRINT },
 {    "remove blind",         SPELL_REMOVE_BLIND,      16,    100,  0,   INTWIS },
 {    "sense life",           SPELL_SENSE_LIFE,        17,     85,  0,   DEXINT },
 {    "sanctuary",            SPELL_SANCTUARY,         18,     90,  0,   CONWIS },
