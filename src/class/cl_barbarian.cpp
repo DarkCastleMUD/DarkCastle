@@ -1,5 +1,5 @@
 /************************************************************************
- * $Id: cl_barbarian.cpp,v 1.99 2009/05/19 17:04:11 kkoons Exp $
+ * $Id: cl_barbarian.cpp,v 1.100 2009/05/20 00:07:51 kkoons Exp $
  * cl_barbarian.cpp
  * Description: Commands for the barbarian class.
  *************************************************************************/
@@ -21,6 +21,7 @@
 #include <db.h>
 
 extern struct index_data *obj_index;
+extern int rev_dir[];
 extern bool str_prefix(const char *astr, const char *bstr);
 extern CWorld world;
 int attempt_move(CHAR_DATA *ch, int cmd, int is_retreat = 0);
@@ -36,9 +37,11 @@ int do_batter(struct char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
+
 int do_brace(struct char_data *ch, char *argument, int cmd)
 {
-  int door;
+  int door, other_room;
+  struct room_direction_data *back, *exit;
   char type[MAX_INPUT_LENGTH], dir[MAX_INPUT_LENGTH];
 
   argument_interpreter(argument, type, dir);
@@ -49,31 +52,90 @@ int do_brace(struct char_data *ch, char *argument, int cmd)
     return eFAILURE;
   }
   
+  if (!*type) 
+  {
+    if(ch->brace_at != NULL)
+    {
+      if(cmd == 0)
+      {
+        csendf(ch, "You are no longer able to brace the %s.\r\n", fname(ch->brace_at->keyword));
+      }
+      else
+      {
+        csendf(ch, "You stop holding the %s shut.\r\n", fname(ch->brace_at->keyword));
+        act("$n stops holding the $F shut.", ch, 0, ch->brace_at->keyword, TO_ROOM, 0);
+      }
+      ch->brace_at->bracee = NULL;
+      ch->brace_at = NULL;
+      if(ch->brace_exit != NULL) //incase it's a weird exit area
+        ch->brace_exit->bracee = NULL;
+      ch->brace_exit = NULL;
+      return eSUCCESS;
+    }
+    send_to_char("Brace what??\r\n", ch);
+    send_to_char("brace <door> <direction>\r\n", ch);
+    return eFAILURE;
+  }
+
+  if (!*dir)
+  {
+    send_to_char("What direction?\r\n", ch);
+    return eFAILURE;
+  }
+
   if ((door = find_door(ch, type, dir)) >= 0) 
   {
-    if (!IS_SET(EXIT(ch, door)->exit_info, EX_CLOSED))
+
+    exit = EXIT(ch, door);
+    if (!IS_SET(exit->exit_info, EX_CLOSED))
     {
       send_to_char("You have to close it first!\r\n", ch);
       return eFAILURE;
     }
-    if (EXIT(ch, door)->bracee != NULL) 
+    if (exit->bracee != NULL) 
     {
-      send_to_char("This door is already barred from the other side!\r\n", ch);
+      if(exit->bracee->in_room == ch->in_room)
+        csendf(ch, "%s is already holding the %s shut!\r\n", exit->bracee, fname(exit->keyword));
+      else
+        csendf(ch, "The %s is already being braced from the other side!\r\n", fname(exit->keyword));
+
       return eFAILURE;
     }
 
-    //add 1.5 rounds of lag 
-    //charge moves here
-    //skill check here
-    csendf(ch, "You lean heavily on the %s, bracing your shoulder solidly against it...\r\n", 
-                                       fname(EXIT(ch, door)->keyword));
-    send_to_char("The passage now appears firmly blocked.\r\n", ch);
+    WAIT_STATE(ch, PULSE_VIOLENCE * 1.5);
+    if (!charge_moves(ch, SKILL_BATTERBRACE, 0.5)) return eSUCCESS;
 
-    //send something to everyone else
-    EXIT(ch, door)->bracee = ch;
+    csendf(ch, "You lean heavily on the %s, bracing your shoulder solidly against it...\r\n", 
+                                       fname(exit->keyword));
+    act("$n leans heavily on the $F, bracing $s shoulder solidly against it...", 
+                                       ch, 0, exit->keyword, TO_ROOM, 0);
+
+    if (!skill_success(ch,NULL,SKILL_BATTERBRACE)) 
+    {
+      send_to_char("Your attempt to block the passage fails.\r\n", ch);
+      act("$s attempt to block the passage fails!", ch, 0, exit->keyword, TO_ROOM, 0);
+      return eFAILURE;
+    }
+    else
+    {
+      send_to_char("The passage now appears firmly blocked.\r\n", ch);
+      act("The passage now appears firmly blocked.", ch, 0, exit->keyword, TO_ROOM, 0);
+      exit->bracee = ch;
+      ch->brace_at = exit;
+      if ((other_room = exit->to_room) != NOWHERE)
+        if ((back = world[other_room].dir_option[rev_dir[door]]) != 0)
+          if (back->to_room == ch->in_room)
+          {
+            ch->brace_exit = back;
+            back->bracee = ch;
+          }
+
+      return eSUCCESS;
+    }
   }
 
-  return eSUCCESS;
+  send_to_char("You don't see anything like that to block.\r\n", ch);
+  return eFAILURE;
 }
 
 
