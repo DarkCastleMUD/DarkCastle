@@ -1,7 +1,7 @@
 #ifndef CHARACTER_H_
 #define CHARACTER_H_
 /******************************************************************************
-| $Id: character.h,v 1.73 2009/05/05 19:01:36 shane Exp $
+| $Id: character.h,v 1.74 2009/05/20 00:07:27 kkoons Exp $
 | Description: This file contains the header information for the character
 |   class implementation.
 */
@@ -440,6 +440,8 @@ struct char_data
     int player_id;
 #endif
     int spec;
+
+    struct room_direction_data *brace_at, *brace_exit; //exits affected by brace
 };
 
 
