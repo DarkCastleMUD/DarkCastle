@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.113 2009/05/20 00:10:20 kkoons Exp $
+| $Id: inventory.cpp,v 1.114 2009/05/20 22:02:47 kkoons Exp $
 | inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
@@ -1878,10 +1878,18 @@ int do_open(CHAR_DATA *ch, char *argument, int cmd)
          if(is_bracing(EXIT(ch, door)->bracee, EXIT(ch, door)))
          {
            if(EXIT(ch, door)->bracee->in_room == ch->in_room)
+           {
              csendf(ch, "%s is holding the %s shut.\r\n", 
                           EXIT(ch, door)->bracee->name, fname(EXIT(ch, door)->keyword));
+             csendf(EXIT(ch, door)->bracee, "The %s quivers slightly but holds as %s attempts to force their way through.\r\n",
+                                     fname(EXIT(ch, door)->keyword), ch);
+           }
            else
+           {
              csendf(ch, "The %s seems to be barred from the other side.\n\r", fname(EXIT(ch, door)->keyword));   
+             csendf(EXIT(ch, door)->bracee, "The %s quivers slightly but holds as someone attempts to force their way through.\r\n", 
+                              fname(EXIT(ch, door)->keyword));
+           }
          }
          else
          {
