@@ -20,7 +20,7 @@
  * 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead *
  * of just race stuff                                                     *
  **************************************************************************
- * $Id: fight.cpp,v 1.540 2009/05/20 00:08:19 kkoons Exp $               *
+ * $Id: fight.cpp,v 1.541 2009/05/20 21:31:04 kkoons Exp $               *
  **************************************************************************/
 
 extern "C"
@@ -2647,6 +2647,8 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
 int noncombat_damage(CHAR_DATA * ch, int dam, char *char_death_msg,
                      char *room_death_msg, char *death_log_msg, int type)
 {
+  int kill_type = TYPE_CHOOSE;
+
   if(IS_AFFECTED(ch, AFF_EAS)) dam /= 4;
   if (IS_AFFECTED(ch, AFF_SANCTUARY)) {
      int mod = affected_by_spell(ch, SPELL_SANCTUARY)? affected_by_spell(ch, SPELL_SANCTUARY)->modifier:35;
@@ -2670,7 +2672,9 @@ int noncombat_damage(CHAR_DATA * ch, int dam, char *char_death_msg,
         act(room_death_msg, ch, 0, 0, TO_ROOM, 0);
      if (death_log_msg)
         log(death_log_msg, IMMORTAL, LOG_MORTAL);
-     fight_kill(NULL, ch, TYPE_CHOOSE, type);
+     if(type == KILL_BATTER)
+       kill_type = TYPE_PKILL;
+     fight_kill(NULL, ch, kill_type, type);
      return eSUCCESS|eCH_DIED;
   } else {
      return eSUCCESS;
@@ -2936,7 +2940,7 @@ void fight_kill(CHAR_DATA *ch, CHAR_DATA *vict, int type, int spec_type)
   {
     case TYPE_CHOOSE:
       /* if it's a mob then it can't be pkilled */
-      if(IS_NPC(vict) || spec_type == KILL_POISON && affected_by_spell(vict, SPELL_POISON)->modifier == -123)
+      if(IS_NPC(vict) || (spec_type == KILL_POISON && affected_by_spell(vict, SPELL_POISON)->modifier == -123))
         raw_kill(ch, vict);
       else if(IS_ARENA(vict->in_room))
         arena_kill(ch, vict, spec_type);
@@ -5933,6 +5937,8 @@ void do_pkill(CHAR_DATA *ch, CHAR_DATA *victim, int type, bool vict_is_attacker)
       sprintf(killer_message,"\n\r##%s has perished from POISON!\n\r", GET_NAME(victim));
     else if (type == KILL_FALL)
       sprintf(killer_message,"\n\r##%s has FALLEN to death!\n\r", GET_NAME(victim));
+    else if (type == KILL_BATTER)
+      sprintf(killer_message,"\n\r##That's using your head! %s just died attempting to batter a door!\n\r", GET_NAME(victim));
     else
     sprintf(killer_message,"\n\r##%s just DIED!\n\r", GET_NAME(victim));
   }
