@@ -1,7 +1,7 @@
 #ifndef __ROOM_H__
 #define __ROOM_H__
 /************************************************************************
-| $Id: room.h,v 1.19 2009/01/19 16:47:53 kkoons Exp $
+| $Id: room.h,v 1.20 2009/05/20 00:06:46 kkoons Exp $
 | room.h
 | Description:  This file contains all of the room header file/constant
 |   information.  It also contains information about the 'world' structs.
@@ -71,8 +71,7 @@
 #define EX_HIDDEN       8
 #define EX_IMM_ONLY    16
 #define EX_PICKPROOF   32
-#define EX_BRACED      64
-#define EX_BROKEN     128
+#define EX_BROKEN      64
 
 /* For 'Sector types' */
 
