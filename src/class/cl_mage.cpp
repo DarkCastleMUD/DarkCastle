@@ -183,7 +183,7 @@ int do_imbue(struct char_data *ch, char *argument, int cmd)
 
   charges = number(1, 1 + lvl / 20);
 
-  if(skill_success(ch, 0, SKILL_IMBUE, SKILL_INCREASE_HARD)) {
+  if(skill_success(ch, 0, SKILL_IMBUE)) {
    wand->obj_flags.value[2] += charges;
    if(wand->obj_flags.value[2] >= wand->obj_flags.value[1]) {
     wand->obj_flags.value[2] = wand->obj_flags.value[1];
