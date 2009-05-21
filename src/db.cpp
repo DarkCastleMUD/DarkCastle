@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.193 2009/02/19 01:59:13 jhhudso Exp $ */
+/* $Id: db.cpp,v 1.194 2009/05/21 22:46:18 kkoons Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -4117,12 +4117,18 @@ void reset_zone(int zone)
 	    case 0:
             REMOVE_BIT(
                 world[ZCMD.arg1].dir_option[ZCMD.arg2]->exit_info,
+                EX_BROKEN);
+            REMOVE_BIT(
+                world[ZCMD.arg1].dir_option[ZCMD.arg2]->exit_info,
                 EX_LOCKED);
             REMOVE_BIT(
                 world[ZCMD.arg1].dir_option[ZCMD.arg2]->exit_info,
                 EX_CLOSED);
             break;
             case 1:
+            REMOVE_BIT(
+                world[ZCMD.arg1].dir_option[ZCMD.arg2]->exit_info,
+                EX_BROKEN);
             SET_BIT(
                 world[ZCMD.arg1].dir_option[ZCMD.arg2]->exit_info,
                 EX_CLOSED);
@@ -4131,6 +4137,9 @@ void reset_zone(int zone)
                 EX_LOCKED);
             break;
             case 2:
+            REMOVE_BIT(
+                world[ZCMD.arg1].dir_option[ZCMD.arg2]->exit_info,
+                EX_BROKEN);
             SET_BIT(
                 world[ZCMD.arg1].dir_option[ZCMD.arg2]->exit_info,
                 EX_LOCKED);
