@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.114 2009/05/20 22:02:47 kkoons Exp $
+| $Id: inventory.cpp,v 1.115 2009/05/21 22:58:52 kkoons Exp $
 | inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
@@ -1822,6 +1822,14 @@ in_room == exit->in_room
 */
 bool is_bracing(CHAR_DATA *bracee, struct room_direction_data *exit)
 {
+  //this could happen on a repop of the zone
+  if(!IS_SET(exit->exit_info, EX_CLOSED))
+    return false;
+
+  //this could happen from some sort of bug
+  if(IS_SET(exit->exit_info, EX_BROKEN))
+    return false;
+
   //has to be standing
   if(GET_POS(bracee) < POSITION_STANDING)
     return false;
