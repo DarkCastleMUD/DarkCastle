@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.264 2009/05/13 22:45:19 shane Exp $ */
+/* $Id: spells.cpp,v 1.265 2009/05/21 22:45:17 kkoons Exp $ */
 
 extern "C"
 {
@@ -1852,7 +1852,7 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
       int oldroom = 0;
       int dir = -1;
       bool group_spell = FALSE;
-      if (spl == SPELL_LIGHTNING_BOLT && has_skill(ch, SKILL_SPELLCRAFT))
+      if (spl == SPELL_LIGHTNING_BOLT && has_skill(ch, SKILL_SPELLCRAFT) && cmd != CMD_FILTER)
       { // Oh the special cases of spellcraft.
 
 	 name[0] = '\0';
@@ -1929,20 +1929,26 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
 
 	   // Reduce timer on paralyze even the victim is hit by a lightning bolt
 	   affected_type *af;
-	   if ((af = affected_by_spell(tar_char, SPELL_PARALYZE)) != NULL) {
+	   if ((af = affected_by_spell(tar_char, SPELL_PARALYZE)) != NULL) 
+           {
 	     af->duration--;
-	     if (af->duration <= 0) {
+	     if (af->duration <= 0) 
+             {
 	       affect_remove(tar_char, af, 0);
 	     }
 	   }
 	 }
 	 spellcraft(ch, SPELL_LIGHTNING_BOLT);
-      }
-      if(spl == SPELL_IMMUNITY) {
+      } //end lightning bolt
+
+      if(spl == SPELL_IMMUNITY) 
+      {
         argument = skip_spaces(argument);
 
-        for(int i = 0;i<MAX_SPL_LIST;i++) {
-          if(!strcmp(spells[i], argument)) {
+        for(int i = 0;i<MAX_SPL_LIST;i++) 
+        {
+          if(!strcmp(spells[i], argument)) 
+          {
             ok_self = TRUE;
             tar_char = ch;
             target_ok = TRUE;
@@ -1950,91 +1956,112 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
             break;
           }
         }
-        if(!target_ok) {
+        if(!target_ok) 
+        {
           send_to_char("There is no such known spell in the realms to protect yourself against.\n\r", ch);
           return eFAILURE;
         }
-      }
+      } //end spell immunity
       int fil = 0;
       float rel = 1;
-      if(!target_ok && has_skill(ch, SKILL_ELEMENTAL_FILTER)) { //possible filtered spell
-       if(spl == SPELL_BURNING_HANDS || spl == SPELL_FIREBALL || spl == SPELL_FIRESTORM || spl == SPELL_HELLSTREAM || 
-          spl == SPELL_MAGIC_MISSILE || spl == SPELL_METEOR_SWARM || spl == SPELL_LIGHTNING_BOLT || spl == SPELL_CHILL_TOUCH)
-       {
-        name[0] = '\0';
-        filter[0] = '\0';
-        half_chop(argument, filter, name);
-
-        if (*filter && *name) {
-
-         if(*filter == 'f') fil = 1;
-         else if(*filter == 'a') fil = 2;
-         else if(*filter == 'c') fil = 3;
-         else if(*filter == 'e') fil = 4;
-         else if(*filter == 'm') fil = 5;
-         else if(*filter == 'p') fil = 6;
-
-         if(!fil) {
-          send_to_char("You do not know how to filter your spell through that.\r\n", ch);
-          return eFAILURE;
-         }
-	 if (!(tar_char = get_char_room_vis(ch, name))) {
-          send_to_char("Nobody here by that name.\r\n", ch);
-          return eFAILURE;
-         }
-
-         skill_increase_check(ch, SKILL_ELEMENTAL_FILTER, has_skill(ch, SKILL_ELEMENTAL_FILTER), SKILL_INCREASE_HARD);
-
-         if(spl == SPELL_BURNING_HANDS || spl == SPELL_FIREBALL || spl == SPELL_FIRESTORM || spl == SPELL_HELLSTREAM) {
-          if(fil == 5) rel = 1.5;
-          else if(fil == 4 || fil == 2 || fil == 6) rel = 2;
-          else if(fil == 3) rel = 2.5;
-          else fil = 0;
-         }
-         else if(spl == SPELL_MAGIC_MISSILE || spl == SPELL_METEOR_SWARM) {
-          if(fil == 1) rel = 1.5;
-          else if(fil == 4 || fil == 2 || fil == 3) rel = 2;
-          else if(fil == 6) rel = 2.5;
-          else fil = 0;
-         }
-         else if(spl == SPELL_LIGHTNING_BOLT) {
-          if(fil == 3) rel = 1.5;
-          else if(fil == 1 || fil == 5 || fil == 6) rel = 2;
-          else if(fil == 2) rel = 2.5;
-          else fil = 0;
-         }
-         else if(spl == SPELL_CHILL_TOUCH) {
-          if(fil == 4) rel = 1.5;
-          else if(fil == 5 || fil == 2 || fil == 6) rel = 2;
-          else if(fil == 1) rel = 2.5;
-          else fil = 0;
-         }
-         target_ok = TRUE;
-        }
-        else
-         strcpy(name, filter);
-       }
-      }
+      if(cmd == CMD_FILTER && has_skill(ch, SKILL_ELEMENTAL_FILTER)) 
+      {
+        if(spl == SPELL_BURNING_HANDS || spl == SPELL_FIREBALL || spl == SPELL_FIRESTORM || spl == SPELL_HELLSTREAM || 
+           spl == SPELL_MAGIC_MISSILE || spl == SPELL_METEOR_SWARM || spl == SPELL_LIGHTNING_BOLT || spl == SPELL_CHILL_TOUCH)
+        {
+          name[0] = '\0';
+          filter[0] = '\0';
+          argument = argument = one_argument(argument, filter);
+ 
+          if (*filter) 
+          {
+ 
+            if(*filter == 'f') fil = FILTER_FIRE;
+            else if(*filter == 'm') fil = FILTER_MAGIC;
+            else if(*filter == 'c') fil = FILTER_COLD;
+            else if(*filter == 'e') fil = FILTER_ENERGY;
+ 
+            if(!fil) 
+            {
+              send_to_char("You do not know how to filter your spell through that.\r\n", ch);
+              return eFAILURE;
+            }
+ 
+            skill_increase_check(ch, SKILL_ELEMENTAL_FILTER, has_skill(ch, SKILL_ELEMENTAL_FILTER), SKILL_INCREASE_HARD);
+ 
+            if(spl == SPELL_BURNING_HANDS || spl == SPELL_FIREBALL || spl == SPELL_FIRESTORM || spl == SPELL_HELLSTREAM) 
+            {
+              if(fil == FILTER_MAGIC) rel = 1.5;
+              else if(fil == FILTER_ENERGY) rel = 2;
+              else if(fil == FILTER_COLD) rel = 2.5;
+              else fil = 0;
+            }
+            else if(spl == SPELL_MAGIC_MISSILE || spl == SPELL_METEOR_SWARM) 
+            {
+              if(fil == FILTER_FIRE) rel = 1.5;
+              else if(fil == FILTER_COLD) rel = 2;
+              else if(fil == FILTER_ENERGY) rel = 2.5;
+              else fil = 0;
+            }
+            else if(spl == SPELL_LIGHTNING_BOLT) 
+            {
+              if(fil == FILTER_COLD) rel = 1.5;
+              else if(fil == FILTER_FIRE) rel = 2;
+              else if(fil == FILTER_MAGIC) rel = 2.5;
+              else fil = 0;
+            }
+            else if(spl == SPELL_CHILL_TOUCH) 
+            {
+              if(fil == FILTER_ENERGY) rel = 1.5;
+              else if(fil == FILTER_MAGIC) rel = 2;
+              else if(fil == FILTER_FIRE) rel = 2.5;
+              else fil = 0;
+            }
+          }
+          else
+          {
+            send_to_char("You need to specify a filter type.\r\n", ch);
+            return eFAILURE;
+          }
+            
+        } //end if filterable spell
+      } //end filter
       if (!target_ok && !IS_SET(spell_info[spl].targets, TAR_IGNORE)) 
       {
         argument = one_argument(argument, name);
 
         if (*name) 
         {
-          if (IS_SET(spell_info[spl].targets, TAR_CHAR_ROOM)) {
+          if (IS_SET(spell_info[spl].targets, TAR_CHAR_ROOM)) 
+          {
             if ( ( tar_char = get_char_room_vis(ch, name) ) != NULL )
               target_ok = TRUE;
-            if(!str_cmp(name, "group") && has_skill(ch, SKILL_COMMUNE)) {
-              if( (has_skill(ch, SKILL_COMMUNE) >= 90 && (spl == SPELL_PROTECT_FROM_EVIL || spl == SPELL_PROTECT_FROM_GOOD)) || 
-                  (has_skill(ch, SKILL_COMMUNE) >= 70 && (spl == SPELL_CURE_CRITIC || spl == SPELL_SANCTUARY || spl == SPELL_IRIDESCENT_AURA)) ||
-                  (has_skill(ch, SKILL_COMMUNE) >= 40 && (spl == SPELL_ARMOR || spl == SPELL_REFRESH || spl == SPELL_CURE_SERIOUS || spl == SPELL_BLESS || spl == SPELL_FLY)) || 
-                  (spl == SPELL_DETECT_INVISIBLE || spl == SPELL_DETECT_MAGIC || spl == SPELL_DETECT_POISON || spl == SPELL_CURE_LIGHT))
+            if(!str_cmp(name, "group") && has_skill(ch, SKILL_COMMUNE)) 
+            {
+              if((has_skill(ch, SKILL_COMMUNE) >= 90 
+                    && (spl == SPELL_PROTECT_FROM_EVIL 
+                        || spl == SPELL_PROTECT_FROM_GOOD)) 
+                 ||(has_skill(ch, SKILL_COMMUNE) >= 70 
+                    && (spl == SPELL_CURE_CRITIC 
+                        || spl == SPELL_SANCTUARY 
+                        || spl == SPELL_IRIDESCENT_AURA)) 
+                 ||(has_skill(ch, SKILL_COMMUNE) >= 40 
+                    && (spl == SPELL_ARMOR 
+                        || spl == SPELL_REFRESH 
+                        || spl == SPELL_CURE_SERIOUS 
+                        || spl == SPELL_BLESS 
+                        || spl == SPELL_FLY))
+                 ||(spl == SPELL_DETECT_INVISIBLE 
+                    || spl == SPELL_DETECT_MAGIC 
+                    || spl == SPELL_DETECT_POISON 
+                    || spl == SPELL_CURE_LIGHT))
               {
                 skill_increase_check(ch, SKILL_COMMUNE, has_skill(ch, SKILL_COMMUNE), SKILL_INCREASE_HARD);
                 target_ok = TRUE;
                 group_spell = TRUE;
                 tar_char = ch;
-              } else {
+              } else 
+              {
                 send_to_char("You cannot cast this spell on your entire group at once.\n\r", ch);
                 return eFAILURE;
               }          
@@ -2367,42 +2394,44 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
           act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_char, TO_ROOM, NOTVICT);
           return eSUCCESS;
         }
-        else if(fil) {
-         switch(fil) {
-          case 1:
-           csendf(ch, "Upon casting, your %s filters through a $B$4blast of flame$R!\r\n", spells[spl-1] );
-           act("Upon casting, $n filters $s magic through a $B$4blast of flame$R!", ch, 0, 0, TO_ROOM, 0 );
-           level = 200 + TYPE_FIRE - TYPE_HIT;
-           break;
-          case 2:
-           csendf(ch, "Upon casting, your %s filters through $B$2sizzling acid$R!\r\n", spells[spl-1] );
-           act("Upon casting, $n filters $s magic through $B$2sizzling acid$R!", ch, 0, 0, TO_ROOM, 0 );
-           level = 200 + TYPE_ACID - TYPE_HIT;
-           break;
-          case 3:
-           csendf(ch, "Upon casting, your %s filters through $B$3shards of ice$R!\r\n", spells[spl-1] );
-           act("Upon casting, $n filters $s magic through $B$3shards of ice$R!", ch, 0, 0, TO_ROOM, 0 );
-           level = 200 + TYPE_COLD - TYPE_HIT;
-           break;
-          case 4:
-           csendf(ch, "Upon casting, your %s filters through $B$5crackling energy$R!\r\n", spells[spl-1] );
-           act("Upon casting, $n filters $s magic through $B$4crackling energy$R!", ch, 0, 0, TO_ROOM, 0 );
-           level = 200 + TYPE_ENERGY - TYPE_HIT;
-           break;
-          case 5:
-           csendf(ch, "Upon casting, your %s filters through a $B$7burst of magic$R!\r\n", spells[spl-1] );
-           act("Upon casting, $n filters $s magic through a $B$4burst of magic$R!", ch, 0, 0, TO_ROOM, 0 );
-           level = 200 + TYPE_MAGIC - TYPE_HIT;
-           break;
-          case 6:
-           csendf(ch, "Upon casting, your %s filters through $2poisonous fumes$R!\r\n", spells[spl-1] );
-           act("Upon casting, $n filters $s magic through $2poisonous fumes$R!", ch, 0, 0, TO_ROOM, 0 );
-           level = 200 + TYPE_POISON - TYPE_HIT;
-           break;
-          default:
-           send_to_char("WTF?!?!?!?!, tell an immortal about this.\r\n", ch);
-           break;
-         }
+        else if(fil) 
+        {
+          switch(fil) 
+          {
+            case 1:
+             csendf(ch, "Upon casting, your %s filters through a $B$4blast of flame$R!\r\n", spells[spl-1] );
+             act("Upon casting, $n filters $s magic through a $B$4blast of flame$R!", ch, 0, 0, TO_ROOM, 0 );
+             level = 200 + TYPE_FIRE - TYPE_HIT;
+            break;
+            case 2:
+             csendf(ch, "Upon casting, your %s filters through $B$2sizzling acid$R!\r\n", spells[spl-1] );
+             act("Upon casting, $n filters $s magic through $B$2sizzling acid$R!", ch, 0, 0, TO_ROOM, 0 );
+             level = 200 + TYPE_ACID - TYPE_HIT;
+            break;
+            case 3:
+             csendf(ch, "Upon casting, your %s filters through $B$3shards of ice$R!\r\n", spells[spl-1] );
+             act("Upon casting, $n filters $s magic through $B$3shards of ice$R!", ch, 0, 0, TO_ROOM, 0 );
+             level = 200 + TYPE_COLD - TYPE_HIT;
+            break;
+            case 4:
+             csendf(ch, "Upon casting, your %s filters through $B$5crackling energy$R!\r\n", spells[spl-1] );
+             act("Upon casting, $n filters $s magic through $B$4crackling energy$R!", ch, 0, 0, TO_ROOM, 0 );
+             level = 200 + TYPE_ENERGY - TYPE_HIT;
+            break;
+            case 5:
+             csendf(ch, "Upon casting, your %s filters through a $B$7burst of magic$R!\r\n", spells[spl-1] );
+             act("Upon casting, $n filters $s magic through a $B$4burst of magic$R!", ch, 0, 0, TO_ROOM, 0 );
+             level = 200 + TYPE_MAGIC - TYPE_HIT;
+            break;
+            case 6:
+             csendf(ch, "Upon casting, your %s filters through $2poisonous fumes$R!\r\n", spells[spl-1] );
+             act("Upon casting, $n filters $s magic through $2poisonous fumes$R!", ch, 0, 0, TO_ROOM, 0 );
+             level = 200 + TYPE_POISON - TYPE_HIT;
+            break;
+            default:
+             send_to_char("WTF?!?!?!?!, tell an immortal about this.\r\n", ch);
+            break;
+          }
         }
 
 	int retval = ((*spell_info[spl].spell_pointer) (level, ch, argument, SPELL_TYPE_SPELL, tar_char, tar_obj, learned));
