@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: interp.h,v 1.105 2009/05/20 00:07:08 kkoons Exp $ */
+/* $Id: interp.h,v 1.106 2009/05/21 22:44:13 kkoons Exp $ */
 
 #ifndef INTERP_H_
 #define INTERP_H_
@@ -111,6 +111,7 @@ void add_command_lag(CHAR_DATA *ch, int cmdnum, int lag);
 #define CMD_SETVOTE	202
 #define CMD_VOTE	203
 #define CMD_VEND	204
+#define CMD_FILTER	205
 #define CMD_PRIZE	999
 #define CMD_GAZE	1820
 

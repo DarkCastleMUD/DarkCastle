@@ -14,7 +14,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: spells.h,v 1.130 2009/05/13 22:45:22 shane Exp $ */
+/* $Id: spells.h,v 1.131 2009/05/21 22:44:13 kkoons Exp $ */
 #include <structs.h> // ubyte, int16
 
 #include <map>
@@ -645,7 +645,12 @@ struct attack_hit_type
 #define GENERIC_DUST	1<<19
 //#define FREE_SLOT	1<<20
 
-
+#define FILTER_FIRE	1
+#define	FILTER_MAGIC	2
+#define FILTER_COLD	3
+#define	FILTER_ENERGY	4
+#define FILTER_ACID	5
+#define FILTER_POISON	6
 
 /*
  * reasons for stopping following
