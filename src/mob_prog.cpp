@@ -924,7 +924,9 @@ enum mprog_ifs
   eISOBJVNUMINROOM,
   eCANSEE,
   eHASDONEQUEST1,
-  eINSAMEZONE
+  eINSAMEZONE,
+  eCLAN,
+  eISDAYTIME
 };
 
 
@@ -969,6 +971,9 @@ std::map<std::string,mprog_ifs> load_ifchecks()
   ifcheck_tmp["cansee"] = eCANSEE;
 
   ifcheck_tmp["insamezone"] = eINSAMEZONE;
+  ifcheck_tmp["clan"] = eCLAN;
+
+  ifcheck_tmp["isdaytime"] = eISDAYTIME;
 
   return ifcheck_tmp;
 }
@@ -2150,6 +2155,33 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
 	  return -1;
       }
   break;
+
+  case eCLAN:
+    if(fvict)
+      return fvict->clan; 
+      switch( arg[1] )
+      {
+        case 'i': return mob->clan ; //always in the same zone as itself
+        case 'n': if ( actor )
+            return actor->clan;
+            else return -1;
+        case 'r':
+        case 't': if ( vict )
+            return vict->clan;
+            else return -1;
+	default:
+	  logf( IMMORTAL, LOG_WORLD, "Mob: %d bad argument to 'clan'", mob_index[mob->mobdata->nr].virt ); 
+	  return -1;
+      }
+  break;
+
+
+  case eISDAYTIME:
+    if(weather_info.sunlight == SUN_DARK)
+      return false;
+    return true;
+  break;
+
   default:
   /* Ok... all the ifchcks are done, so if we didnt find ours then something
    * odd happened.  So report the bug and abort the MOBprogram (return error)
