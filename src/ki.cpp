@@ -3,7 +3,7 @@
  * Morcallen 12/18
  *
  */
-/* $Id: ki.cpp,v 1.81 2009/05/13 22:45:19 shane Exp $ */
+/* $Id: ki.cpp,v 1.82 2009/05/22 06:08:55 kkoons Exp $ */
 
 extern "C"
 {
@@ -507,6 +507,7 @@ int ki_punch( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
 //         act("$n makes a killer move, which you luckily dodge.", 
 //		  ch, 0, vict, TO_VICT, INVIS_VISIBLE);
 	 int retval = damage(ch,vict,0, TYPE_UNDEFINED, KI_OFFSET+KI_PUNCH,0);
+ 
          GET_HIT(ch) -= 1/8 * (GET_MAX_HIT(ch));
 	 WAIT_STATE(ch, PULSE_VIOLENCE);
          if (!vict->fighting)
@@ -1033,24 +1034,30 @@ int ki_transfer( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim)
   int amount, temp=0;
   struct affected_type af;
 
-  arg = one_argument(arg, amt);
-  arg = one_argument(arg, type);
+  argument_interpreter(arg, amt, type);
+  //arg = one_argument(arg, amt);
+  //arg = one_argument(arg, type);
 
-  amount = atoi(amt) - 1;
+  amount = atoi(amt);
 
-  if(amount < 0) {
-   send_to_char("Trying to be a funny guy?\r\n", ch);
-   return eFAILURE;
+  if(amount < 0) 
+  {
+    send_to_char("Trying to be a funny guy?\r\n", ch);
+    return eFAILURE;
   }
 
-  if(amount > GET_KI(ch)) {
-   send_to_char("You do not have that much energy to transfer.\r\n", ch);
-   return eFAILURE;
+  if(amount > GET_KI(ch)) 
+  {
+    send_to_char("You do not have that much energy to transfer.\r\n", ch);
+    return eFAILURE;
   }
 
-  if(affected_by_spell(victim, SPELL_KI_TRANS_TIMER)) {
-   act("$N cannot receive a transfer right now due to the stress $S mind has been recently been through.", ch, 0, victim, TO_CHAR, 0);
-   return eFAILURE;
+  int learned = has_skill(ch, KI_TRANSFER+KI_OFFSET);
+
+  if(affected_by_spell(victim, SPELL_KI_TRANS_TIMER)) 
+  {
+    act("$N cannot receive a transfer right now due to the stress $S mind has been recently been through.", ch, 0, victim, TO_CHAR, 0);
+    return eFAILURE;
   }
 
   if(affected_by_spell(ch, SPELL_KI_TRANS_TIMER)) affect_from_char(ch, SPELL_KI_TRANS_TIMER);
@@ -1063,33 +1070,51 @@ int ki_transfer( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim)
 
   affect_to_char(ch, &af);
 
-  if(type[0] == 'k') {
-   GET_KI(ch) -= amount;
-   amount++;
-   temp = amount + level/10;
-   if(GET_KI(victim) + temp > GET_MAX_KI(victim)) temp = GET_MAX_KI(victim) - GET_KI(victim);
-   GET_KI(victim) += temp;
-   sprintf(amt, "%d", amount);
-   send_damage("You focus intently, bonding briefly with $N's spirit, transferring | ki of your essence to $M.", ch,  0, victim, amt, "You focus intently, bonding briefly with $N's spirit,  transferring a portion of your essence to $M.", TO_CHAR);
-   sprintf(amt, "%d", temp);
-   send_damage("$n focuses intently, bonding briefly with your spirit, replenishing | ki of your essence with $s own.", ch, 0, victim, amt, "$n focuses intently, bonding briefly with your spirit, replenishing your essence with $s own.", TO_VICT);
-   act("$n focuses intently upon $N as though briefly bonding with $S spirit.", ch, 0, victim, TO_ROOM, NOTVICT);
+  if(type[0] == 'k') 
+  {
+    GET_KI(ch) -= amount;
+    temp = number(amount-amount/10, amount+amount/10);  //+-10%
+    temp = (temp * learned) / 100;
+    csendf(ch, "DEBUG: You healed them for %d ki\r\n", temp);
+    GET_KI(victim) += temp;
+    if(GET_KI(victim) > GET_MAX_KI(victim)) 
+      GET_KI(victim) = GET_MAX_KI(victim);
+
+    sprintf(amt, "%d", amount);
+    send_damage("You focus intently, bonding briefly with $N's spirit, transferring | ki of your essence to $M.", 
+            ch,  0, victim, amt, 
+            "You focus intently, bonding briefly with $N's spirit,  transferring a portion of your essence to $M.", TO_CHAR);
+    sprintf(amt, "%d", temp);
+    send_damage("$n focuses intently, bonding briefly with your spirit, replenishing | ki of your essence with $s own.", 
+                 ch, 0, victim, amt, 
+                "$n focuses intently, bonding briefly with your spirit, replenishing your essence with $s own.", TO_VICT);
+    act("$n focuses intently upon $N as though briefly bonding with $S spirit.", ch, 0, victim, TO_ROOM, NOTVICT);
   }
-  else if(type[0] == 'm') {
-   GET_KI(ch) -= amount;
-   amount++;
-   temp += amount*2 + level/2;
-   if(GET_MANA(victim) + temp > GET_MAX_MANA(victim)) temp = GET_MAX_MANA(victim) - GET_MANA(victim);
-   GET_MANA(victim) += temp;
-   sprintf(amt, "%d", amount);
-   send_damage("You focus intently, bonding briefly with $N's spirit, transferring | ki of your essence to $M.", ch, 0, victim, amt, "You focus intently, bonding briefly with $N's spirit, transferring a portion of your essence to $M.", TO_CHAR);
+  else if(type[0] == 'm') 
+  {
+    GET_KI(ch) -= amount;
+    
+    temp = number(amount-amount/10, amount+amount/10) * 2;
+    temp = (temp * learned) / 100;
+    csendf(ch, "DEBUG: You healed them for %d mana\r\n", temp);
+    GET_MANA(victim) += temp;
+    if(GET_MANA(victim) > GET_MAX_MANA(victim)) 
+      GET_MANA(victim) = GET_MAX_MANA(victim);
+
+    sprintf(amt, "%d", amount);
+    send_damage("You focus intently, bonding briefly with $N's spirit, transferring | ki of your essence to $M.", 
+                 ch, 0, victim, amt, 
+                 "You focus intently, bonding briefly with $N's spirit, transferring a portion of your essence to $M.", TO_CHAR);
    sprintf(amt, "%d", temp);
-   send_damage("$n focuses intently, bonding briefly with your spirit, replenishing | magic with a portion of $s essence.", ch, 0, victim, amt, "$n focuses intently, bonding briefly with your spirit, replenishing your magic with a portion of $s essence.", TO_VICT);
-   act("$n focuses intently upon $N as though briefly bonding with $S spirit.", ch, 0, victim, TO_ROOM, NOTVICT);
+   send_damage("$n focuses intently, bonding briefly with your spirit, replenishing | magic with a portion of $s essence.", 
+                ch, 0, victim, amt, 
+               "$n focuses intently, bonding briefly with your spirit, replenishing your magic with a portion of $s essence.", TO_VICT);
+    act("$n focuses intently upon $N as though briefly bonding with $S spirit.", ch, 0, victim, TO_ROOM, NOTVICT);
   }
-  else {
-   send_to_char("You do not know of that essense.\r\n", ch);
-   return eFAILURE;
+  else 
+  {
+    send_to_char("You do not know of that essense.\r\n", ch);
+    return eFAILURE;
   }
 
   return eSUCCESS;
