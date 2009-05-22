@@ -923,7 +923,8 @@ enum mprog_ifs
   eISMOBVNUMINROOM,
   eISOBJVNUMINROOM,
   eCANSEE,
-  eHASDONEQUEST1
+  eHASDONEQUEST1,
+  eINSAMEZONE
 };
 
 
@@ -966,6 +967,8 @@ std::map<std::string,mprog_ifs> load_ifchecks()
   ifcheck_tmp["ismobvnuminroom"] = eISMOBVNUMINROOM;
   ifcheck_tmp["isobjvnuminroom"] = eISOBJVNUMINROOM;
   ifcheck_tmp["cansee"] = eCANSEE;
+
+  ifcheck_tmp["insamezone"] = eINSAMEZONE;
 
   return ifcheck_tmp;
 }
@@ -2129,6 +2132,24 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
 	}
   break;
 
+  case eINSAMEZONE:
+    if(fvict)
+      return (GET_ZONE(fvict) == GET_ZONE(mob)); 
+      switch( arg[1] )
+      {
+        case 'i': return 1; //always in the same zone as itself
+        case 'n': if ( actor )
+            return (GET_ZONE(actor) == GET_ZONE(mob));
+            else return -1;
+        case 'r':
+        case 't': if ( vict )
+            return (GET_ZONE(vict) == GET_ZONE(mob));
+            else return -1;
+	default:
+	  logf( IMMORTAL, LOG_WORLD, "Mob: %d bad argument to 'insamezone'", mob_index[mob->mobdata->nr].virt ); 
+	  return -1;
+      }
+  break;
   default:
   /* Ok... all the ifchcks are done, so if we didnt find ours then something
    * odd happened.  So report the bug and abort the MOBprogram (return error)
