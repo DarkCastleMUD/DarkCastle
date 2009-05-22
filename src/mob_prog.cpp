@@ -2138,8 +2138,11 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
   break;
 
   case eINSAMEZONE:
-    if(fvict)
-      return (GET_ZONE(fvict) == GET_ZONE(mob)); 
+      if(fvict)
+        return (GET_ZONE(fvict) == GET_ZONE(mob)); 
+      else if((fvict = get_pc(arg)) != NULL) 
+        return (GET_ZONE(fvict) == GET_ZONE(mob)); 
+
       switch( arg[1] )
       {
         case 'i': return 1; //always in the same zone as itself
