@@ -1,7 +1,7 @@
 /*
 
 Item Selling System
-Written by: Keith Koons
+Written by: Rubicon
 December 13, 2008
 
 Objects:
