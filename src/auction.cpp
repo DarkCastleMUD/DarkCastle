@@ -1,6 +1,18 @@
 /*
 
-Brand new auction file!
+Item Selling System
+Written by: Keith Koons
+December 13, 2008
+
+Objects:
+Auction Class
+
+External: (explained more below)
+void auction_expire()
+void check_for_sold_items(CHAR_DATA *ch)
+void AuctionHandleDelete(string name)
+void AuctionHandleRenames(CHAR_DATA *ch, string old_name, string new_name)
+void load_auction_tickets()
 
 */
 
