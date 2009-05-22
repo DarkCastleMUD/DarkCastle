@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.266 2009/05/22 03:34:26 kkoons Exp $ */
+/* $Id: spells.cpp,v 1.267 2009/05/22 03:40:38 kkoons Exp $ */
 
 extern "C"
 {
@@ -1974,7 +1974,7 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
         {
           name[0] = '\0';
           filter[0] = '\0';
-          argument = argument = one_argument(argument, filter);
+          argument = one_argument(argument, filter);
  
           if (*filter) 
           {
