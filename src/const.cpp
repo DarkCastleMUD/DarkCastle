@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.308 2009/05/20 17:07:31 apocalypse Exp $ */
+/* $Id: const.cpp,v 1.309 2009/05/22 01:12:20 kkoons Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -870,7 +870,6 @@ char *exit_bits[] =
     "HIDDEN",
     "IMM_ONLY",
     "PICKPROOF",
-    "BRACED",
     "BROKEN",
     "\n"
 };
