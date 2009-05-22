@@ -142,7 +142,7 @@ int do_imbue(struct char_data *ch, char *argument, int cmd)
 
   if(!lvl) 
   {
-    send_to_char("Huh?\r\n", ch);
+    send_to_char("The best you can do to a wand is polish it.\r\n", ch);
     return eFAILURE;
   }
 
@@ -158,7 +158,8 @@ int do_imbue(struct char_data *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if(ch->in_room && IS_SET(world[ch->in_room].room_flags, NO_MAGIC)) 
+  if(ch->in_room && (IS_SET(world[ch->in_room].room_flags, NO_MAGIC) 
+                     || IS_SET(world[ch->in_room].room_flags, SAFE))) 
   {
     send_to_char("Something about this room prohibits your magical imbuement.\r\n", ch);
     return eFAILURE;
@@ -176,6 +177,12 @@ int do_imbue(struct char_data *ch, char *argument, int cmd)
         return eFAILURE;
       }
     }
+  }
+
+  if(GET_ITEM_TYPE(wand) != ITEM_WAND)
+  {
+    send_to_char("That \"wand\" doesn't seem very wand-like.\r\n", ch);
+    return eFAILURE;
   }
 
   if(GET_LEVEL(ch) < wand->obj_flags.value[0]) 
