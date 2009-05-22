@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.265 2009/05/21 22:45:17 kkoons Exp $ */
+/* $Id: spells.cpp,v 1.266 2009/05/22 03:34:26 kkoons Exp $ */
 
 extern "C"
 {
@@ -1650,6 +1650,9 @@ send_to_char("got here", ch);
   if (skillnum != SKILL_THIRD_ATTACK && skillnum != SKILL_SECOND_ATTACK && skillnum != SKILL_DUAL_WIELD)
     i = MIN(96, i);
   else i = MIN(98,i);
+  
+  if (skillnum == SKILL_IMBUE)
+    i = MIN(90, i); //max 90% success rate for imbue
 
   i = skillmax(ch, skillnum, i);
   if (IS_AFFECTED(ch, AFF_FOCUS) && 
@@ -1663,7 +1666,7 @@ skillnum <= SKILL_SONG_MAX) || (skillnum >= KI_OFFSET && skillnum <= (KI_OFFSET+
   if (i > o) o = i+1;
 */
 
-  if (i > number(1,101) || GET_LEVEL(ch) >= IMMORTAL)
+  if (i > number(1,100) || GET_LEVEL(ch) >= IMMORTAL)
   {
     if(skillnum != SKILL_ENHANCED_REGEN || ( skillnum == SKILL_ENHANCED_REGEN && GET_HIT(ch) + 50 < GET_MAX_HIT(ch) && ( GET_POS(ch) == POSITION_RESTING || GET_POS(ch) == POSITION_SLEEPING ) ) )
       skill_increase_check(ch,skillnum,learned,a+500);
