@@ -184,7 +184,7 @@ int do_imbue(struct char_data *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  manacost = 4 + (10 - lvl/10) * spell_info[wand->obj_flags.value[3]].min_usesmana;  
+  manacost = 4 + (11 - lvl/10) * spell_info[wand->obj_flags.value[3]].min_usesmana;  
 
   if(GET_MANA(ch) < manacost) 
   {
@@ -197,49 +197,6 @@ int do_imbue(struct char_data *ch, char *argument, int cmd)
   GET_MANA(ch) -= manacost;
 
   charges = number(1, 1 + lvl / 20);
-  //value[2] == current charges
-  //value[1] == total charges
-
-  if(skill_success(ch, 0, SKILL_IMBUE)) 
-  {//success
-    wand->obj_flags.value[2] += charges;
-    if(wand->obj_flags.value[2] >= wand->obj_flags.value[1]) 
-    {
-      wand->obj_flags.value[2] = wand->obj_flags.value[1];
-      act("You focus your arcane powers and imbue them into $p restoring its full charge!", ch, wand, 0, TO_CHAR, 0);
-    } 
-    else 
-    {
-      sprintf(buf, "You focus your arcane powers and imbue them into $p restoring %d charges!", charges);
-      act(buf, ch, wand, 0, TO_CHAR, 0);
-    }
-    send_to_char("As you finish, the tip of the freshly charged wand $Bglows$R briefly and returns to normal.\r\n", ch);
-    act("$n focuses $s arcane powers and imbues them into $p!", ch, wand, 0, TO_ROOM, 0);
-    act("As $e finishes, the tip of the freshly charged wand $Bglows$R briefly and returns to normal.", ch, wand, 0, TO_ROOM, 0);
-  }
-  else 
-  {//failure
-    act("You focus your arcane powers on $p but fail to restore its powers.", ch, wand, 0, TO_CHAR, 0);
-    act("$n focuses $s arcane powers on $p to no effect.", ch, wand, 0, TO_ROOM, 0);
-
-    if(wand->obj_flags.value[1] == 0) 
-    {
-      act("Unable to bear the strain, $p splits asunder with a sharp crack!", ch, wand, 0, TO_CHAR, 0);
-      act("Unable to bear the strain, $n's $p splits asunder with a sharp crack!", ch, wand, 0, TO_ROOM, 0);
-      make_scraps(ch, wand);
-      extract_obj(wand);
-    }
-    else 
-    {
-      wand->obj_flags.value[2] -= charges;
-      if(wand->obj_flags.value[2] <= 0) 
-      {
-        wand->obj_flags.value[2] = 0;
-        act("The energy in $p has been completely lost!", ch, wand, 0, TO_CHAR, 0);
-      }
-     act("Some of the energy in $p has been lost!", ch, wand, 0, TO_CHAR, 0);
-    }
-  }
 
   WAIT_STATE(ch, PULSE_VIOLENCE * 2.5);
 
@@ -250,6 +207,61 @@ int do_imbue(struct char_data *ch, char *argument, int cmd)
   af.bitvector = -1;
 
   affect_to_char(ch, &af);
-  
+
+  //value[2] == current charges
+  //value[1] == total charges
+
+  if(skill_success(ch, 0, SKILL_IMBUE)) 
+  {//success
+    wand->obj_flags.value[1] -= 1; //reduce total by 1
+
+    if(wand->obj_flags.value[1] == 0) //no total charges left
+    {
+      act("Unable to bear the strain, $p splits asunder with a sharp crack!", ch, wand, 0, TO_CHAR, 0);
+      act("Unable to bear the strain, $n's $p splits asunder with a sharp crack!", ch, wand, 0, TO_ROOM, 0);
+      make_scraps(ch, wand);
+      extract_obj(wand);
+      return eSUCCESS;
+    }
+    
+    wand->obj_flags.value[2] += charges; //refill charges
+    if(wand->obj_flags.value[2] >= wand->obj_flags.value[1]) 
+    {
+      wand->obj_flags.value[2] = wand->obj_flags.value[1];
+      act("You focus your arcane powers and imbue them into $p restoring its full charge!", ch, wand, 0, TO_CHAR, 0);
+    } 
+    else 
+    {
+      sprintf(buf, "You focus your arcane powers and imbue them into $p restoring %d charges!", charges);
+      act(buf, ch, wand, 0, TO_CHAR, 0);
+    }
+
+    send_to_char("As you finish, the tip of the freshly charged wand $Bglows$R briefly and returns to normal.\r\n", ch);
+    act("$n focuses $s arcane powers and imbues them into $p!", ch, wand, 0, TO_ROOM, 0);
+    act("As $e finishes, the tip of the freshly charged wand $Bglows$R briefly and returns to normal.", ch, wand, 0, TO_ROOM, 0);
+  }
+  else 
+  {//failure
+    act("You focus your arcane powers on $p but fail to restore its powers.", ch, wand, 0, TO_CHAR, 0);
+    act("$n focuses $s arcane powers on $p to no effect.", ch, wand, 0, TO_ROOM, 0);
+
+    if(wand->obj_flags.value[2] == 0) //no current charges left
+    {
+      act("Unable to bear the strain, $p splits asunder with a sharp crack!", ch, wand, 0, TO_CHAR, 0);
+      act("Unable to bear the strain, $n's $p splits asunder with a sharp crack!", ch, wand, 0, TO_ROOM, 0);
+      make_scraps(ch, wand);
+      extract_obj(wand);
+      return eSUCCESS;
+    }
+
+    wand->obj_flags.value[2] -= charges;
+    if(wand->obj_flags.value[2] <= 0) 
+    {
+      wand->obj_flags.value[2] = 0;
+      act("The energy in $p has been completely lost!", ch, wand, 0, TO_CHAR, 0);
+    }
+    else
+     act("Some of the energy in $p has been lost!", ch, wand, 0, TO_CHAR, 0);
+  }
   return eSUCCESS;
 }
