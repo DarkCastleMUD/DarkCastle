@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.267 2009/05/22 03:40:38 kkoons Exp $ */
+/* $Id: spells.cpp,v 1.268 2009/05/22 06:08:48 kkoons Exp $ */
 
 extern "C"
 {
@@ -1967,7 +1967,8 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
       } //end spell immunity
       int fil = 0;
       float rel = 1;
-      if(cmd == CMD_FILTER && has_skill(ch, SKILL_ELEMENTAL_FILTER)) 
+      int fillvl = has_skill(ch, SKILL_ELEMENTAL_FILTER);
+      if(cmd == CMD_FILTER && fillvl) 
       {
         if(spl == SPELL_BURNING_HANDS || spl == SPELL_FIREBALL || spl == SPELL_FIRESTORM || spl == SPELL_HELLSTREAM || 
            spl == SPELL_MAGIC_MISSILE || spl == SPELL_METEOR_SWARM || spl == SPELL_LIGHTNING_BOLT || spl == SPELL_CHILL_TOUCH)
@@ -1994,30 +1995,30 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
  
             if(spl == SPELL_BURNING_HANDS || spl == SPELL_FIREBALL || spl == SPELL_FIRESTORM || spl == SPELL_HELLSTREAM) 
             {
-              if(fil == FILTER_MAGIC) rel = 1.5;
-              else if(fil == FILTER_ENERGY) rel = 2;
-              else if(fil == FILTER_COLD) rel = 2.5;
+              if(fil == FILTER_MAGIC && fillvl > 50) rel = 1.5;
+              else if(fil == FILTER_ENERGY && fillvl > 70) rel = 2;
+              else if(fil == FILTER_COLD && fillvl > 90) rel = 2.5;
               else fil = 0;
             }
             else if(spl == SPELL_MAGIC_MISSILE || spl == SPELL_METEOR_SWARM) 
             {
-              if(fil == FILTER_FIRE) rel = 1.5;
-              else if(fil == FILTER_COLD) rel = 2;
-              else if(fil == FILTER_ENERGY) rel = 2.5;
+              if(fil == FILTER_FIRE && fillvl > 50) rel = 1.5;
+              else if(fil == FILTER_COLD && fillvl > 70) rel = 2;
+              else if(fil == FILTER_ENERGY && fillvl > 90) rel = 2.5;
               else fil = 0;
             }
             else if(spl == SPELL_LIGHTNING_BOLT) 
             {
-              if(fil == FILTER_COLD) rel = 1.5;
-              else if(fil == FILTER_FIRE) rel = 2;
-              else if(fil == FILTER_MAGIC) rel = 2.5;
+              if(fil == FILTER_COLD && fillvl > 50) rel = 1.5;
+              else if(fil == FILTER_FIRE && fillvl > 70) rel = 2;
+              else if(fil == FILTER_MAGIC && fillvl > 90) rel = 2.5;
               else fil = 0;
             }
             else if(spl == SPELL_CHILL_TOUCH) 
             {
-              if(fil == FILTER_ENERGY) rel = 1.5;
-              else if(fil == FILTER_MAGIC) rel = 2;
-              else if(fil == FILTER_FIRE) rel = 2.5;
+              if(fil == FILTER_ENERGY && fillvl > 50) rel = 1.5;
+              else if(fil == FILTER_MAGIC && fillvl > 70) rel = 2;
+              else if(fil == FILTER_FIRE && fillvl > 90) rel = 2.5;
               else fil = 0;
             }
           }
@@ -2401,32 +2402,32 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
         {
           switch(fil) 
           {
-            case 1:
+            case FILTER_FIRE:
              csendf(ch, "Upon casting, your %s filters through a $B$4blast of flame$R!\r\n", spells[spl-1] );
              act("Upon casting, $n filters $s magic through a $B$4blast of flame$R!", ch, 0, 0, TO_ROOM, 0 );
              level = 200 + TYPE_FIRE - TYPE_HIT;
             break;
-            case 2:
+            case FILTER_ACID:
              csendf(ch, "Upon casting, your %s filters through $B$2sizzling acid$R!\r\n", spells[spl-1] );
              act("Upon casting, $n filters $s magic through $B$2sizzling acid$R!", ch, 0, 0, TO_ROOM, 0 );
              level = 200 + TYPE_ACID - TYPE_HIT;
             break;
-            case 3:
+            case FILTER_COLD:
              csendf(ch, "Upon casting, your %s filters through $B$3shards of ice$R!\r\n", spells[spl-1] );
              act("Upon casting, $n filters $s magic through $B$3shards of ice$R!", ch, 0, 0, TO_ROOM, 0 );
              level = 200 + TYPE_COLD - TYPE_HIT;
             break;
-            case 4:
+            case FILTER_ENERGY:
              csendf(ch, "Upon casting, your %s filters through $B$5crackling energy$R!\r\n", spells[spl-1] );
              act("Upon casting, $n filters $s magic through $B$4crackling energy$R!", ch, 0, 0, TO_ROOM, 0 );
              level = 200 + TYPE_ENERGY - TYPE_HIT;
             break;
-            case 5:
+            case FILTER_MAGIC:
              csendf(ch, "Upon casting, your %s filters through a $B$7burst of magic$R!\r\n", spells[spl-1] );
              act("Upon casting, $n filters $s magic through a $B$4burst of magic$R!", ch, 0, 0, TO_ROOM, 0 );
              level = 200 + TYPE_MAGIC - TYPE_HIT;
             break;
-            case 6:
+            case FILTER_POISON:
              csendf(ch, "Upon casting, your %s filters through $2poisonous fumes$R!\r\n", spells[spl-1] );
              act("Upon casting, $n filters $s magic through $2poisonous fumes$R!", ch, 0, 0, TO_ROOM, 0 );
              level = 200 + TYPE_POISON - TYPE_HIT;
