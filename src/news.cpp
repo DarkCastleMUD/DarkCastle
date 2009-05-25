@@ -1,17 +1,18 @@
-/***************************************************************************
-*       file: news.cpp , Implementation of commands.           Part of DIKUMUD *
-*       Usage : Informative commands.                                           *
-*       Copyright (C) 1990, 1991 - see 'license.doc' for complete information. *
-*                                                                               *
-*       Copyright (C) 1992, 1993 Michael Chastain, Michael Quan, Mitchell Tse  *
-*       Performance optimization and bug fixes by MERC Industries.                *
-*       You can use our stuff in any way you like whatsoever so long as ths      *
-*       copyright notice remains intact.  If you like it please drop a line       *
-*       to mec@garnet.berkeley.edu.                                               *
-*                                                                                 *
-*       This is free software and you are benefitting.  We hope that you          *
-*       share your changes too.  What goes around, comes around.                  *
-***************************************************************************/
+/****************************************************************************
+ *  file: news.cpp , Implementation of commands.           Part of DIKUMUD  *
+ *   Usage : Informative commands.                                          *
+ *   Copyright (C) 1990, 1991 - see 'license.doc' for complete information. *
+ *                                                                          *
+ *   Copyright (C) 1992, 1993 Michael Chastain, Michael Quan, Mitchell Tse  *
+ *   Performance optimization and bug fixes by MERC Industries.             *
+ *   You can use our stuff in any way you like whatsoever so long as ths    * 
+ *   copyright notice remains intact.  If you like it please drop a line    *
+ *   to mec@garnet.berkeley.edu.                                            *
+ *                                                                          *
+ *   This is free software and you are benefitting.  We hope that you       *
+ *   share your changes too.  What goes around, comes around.               *
+ ****************************************************************************/
+
 extern "C"
 {
 #include <ctype.h>
@@ -42,6 +43,8 @@ extern "C"
 #include <set.h>
 #include <returnvals.h>
 #include <news.h>
+
+void string_to_file(FILE *, char *);
 
 struct news_data *thenews = NULL;
 void addnews(struct news_data *newnews)
@@ -84,8 +87,8 @@ void savenews()
   for (tmpnews = thenews; tmpnews; tmpnews = tmpnews->next)
   {
     // This should be %ld but we need to through the existing news files 1st
-    fprintf(fl, "%d %s~\n",(int)tmpnews->time,tmpnews->addedby);
-    fprintf(fl, "%s~\n",tmpnews->news);
+    fprintf(fl, "%d %s~\n", (int)tmpnews->time, tmpnews->addedby);
+    string_to_file(fl, tmpnews->news);
   }
    fprintf(fl,"0\n");
   dc_fclose(fl);
