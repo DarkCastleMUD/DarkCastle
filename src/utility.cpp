@@ -17,7 +17,7 @@
  *                         except Pir and Valk                             *
  * 10/19/2003   Onager     Took out super-secret hidey code from CAN_SEE() *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.105 2009/05/13 22:45:19 shane Exp $ */
+/* $Id: utility.cpp,v 1.106 2009/05/26 01:46:01 jhhudso Exp $ */
 
 extern "C"
 {
@@ -1898,25 +1898,25 @@ bool is_in_game(char_data *ch)
 
 void produce_coredump(void)
 {
-    static int counter = 0;
+  static int counter = 0;
 
-    if (++counter > COREDUMP_MAX) {
-	logf(IMMORTAL, LOG_BUG, "Error detected: Unable to produce coredump. Limit of %d reached.", COREDUMP_MAX);
-	return;
-    }
-
-    pid_t pid = fork();
-    if (pid == 0) {
-	//Child process
-	logf(IMMORTAL, LOG_BUG, "Error detected: Producing coredump %d of %d.", counter, COREDUMP_MAX);
-	abort();
-    } else if (pid > 0) {
-	//Parent process
-    } else {
-	logf(IMMORTAL, LOG_BUG, "Error detected: Unable to fork process.");
-    }
-    
+  if (++counter > COREDUMP_MAX) {
+    logf(IMMORTAL, LOG_BUG, "Error detected: Unable to produce coredump. Limit of %d reached.", COREDUMP_MAX);
     return;
+  }
+
+  pid_t pid = fork();
+  if (pid == 0) {
+    //Child process
+    abort();
+  } else if (pid > 0) {
+    //Parent process
+    logf(IMMORTAL, LOG_BUG, "Error detected: Producing coredump %d of %d.", counter, COREDUMP_MAX);
+  } else {
+    logf(IMMORTAL, LOG_BUG, "Error detected: Unable to fork process.");
+  }
+    
+  return;
 }
 
 char *pluralize(int qty, char *ending)
