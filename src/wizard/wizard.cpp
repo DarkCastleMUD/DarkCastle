@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: wizard.cpp,v 1.69 2009/01/22 06:46:51 dcastle Exp $
+| $Id: wizard.cpp,v 1.70 2009/05/26 01:55:17 shane Exp $
 | wizard.C
 | Description:  Utility functions necessary for wiz commands.
 */
@@ -1099,10 +1099,11 @@ extern char * strs_damage_types[];
              case 0: strcat(buf, "0-Player-Portal");         break;
              case 1: strcat(buf, "1-Permanent-Game-Portal"); break;
              case 2: strcat(buf, "2-Temp-Game-portal");      break;
-             case 3: strcat(buf, "3-Look-only-poral");       break;
+             case 3: strcat(buf, "3-Look-only-portal");       break;
+             case 4: strcat(buf, "4-Perm-No-Look-portal");       break;
              default: strcat(buf, "Unknown!!!");         break;
           }
-          sprintf(buf2, "(can be 0-3)\r\n"
+          sprintf(buf2, "(can be 0-4)\r\n"
                       "$3Zone   (v3)$R : %d (can 'leave' anywhere from this zone (set to -1 otherwise))\r\n"
                       "$3Flags  (v4)$R : ", j->obj_flags.value[2] );
           strcat(buf, buf2);
