@@ -2068,33 +2068,37 @@ int do_oclone(struct char_data *ch, char *argument, int cmd)
   one_argument(argument, arg2);
   if (!arg1[0] || !arg2[0] || !is_number(arg1) || !is_number(arg2))
   {
-    send_to_char("Syntax: oclone <destination vnum> <source vnum>\r\n",ch);
+    send_to_char("Syntax: oclone <source vnum> <destination vnum>\n\r",ch);
     return eFAILURE;
   }
   OBJ_DATA *obj,*otmp;
   int v1 = atoi(arg1), v2 = atoi(arg2);
   int r1 = real_object(v1), r2 = real_object(v2);
-  if (r2 < 0)
+  if (r1 < 0)
   {
     send_to_char("Source vnum does not exist.\r\n",ch);
     return eFAILURE;
   }
 
-  if(!can_modify_object(ch, v1)) {
+  if(!can_modify_object(ch, v2)) {
     send_to_char("You are unable to work creation outside of your range.\n\r",
 		 ch);
     return eFAILURE;
   }
 
-  if (r1 < 0) {
+  if (r2 < 0) {
     char buf[30];
-    sprintf(buf, "new %d", v1);
+    sprintf(buf, "new %d", v2);
     int retval = do_oedit(ch, buf, 9);
     if (!IS_SET(retval, eSUCCESS)) return eFAILURE;
     r1 = real_object(v1);
-    r2 = real_object(v2); // oedit new changes it
+    r2 = real_object(v2);
+    if (r2 == -1) {
+      send_to_char("Something failed. Possibly your destination vnum was too high.\n\r", ch);
+      return eFAILURE;
+    }
   }
-  obj = clone_object(r2);
+  obj = clone_object(r1);
   extern bool has_random(OBJ_DATA *obj);
   if (!obj) {csendf(ch, "Failure. Unable to clone item.\r\n"); return eFAILURE; }
   struct active_object *active_obj = NULL,*last_active = NULL;
@@ -2118,20 +2122,25 @@ int do_oclone(struct char_data *ch, char *argument, int cmd)
         }
   }
 
-
+  csendf(ch, "Ok.\n\rYou copied item %d (%s) and replaced item %d (%s).\n\r",
+	 v1, ((OBJ_DATA*)obj_index[real_object(v1)].item)->short_description,
+	 v2, ((OBJ_DATA*)obj_index[real_object(v2)].item)->short_description);
 
   object_list = object_list->next;
-  otmp = (OBJ_DATA*)obj_index[r1].item;
-  obj->item_number = r1;
-  obj_index[r1].item = (void*)obj;
-  obj_index[r1].non_combat_func = 0;
-  obj_index[r1].number = 0;
-  obj_index[r1].virt = v1;
-  obj_index[r1].mobprogs = NULL;
-  obj_index[r1].combat_func = 0;
-  obj_index[r1].mobspec = 0;
+  otmp = (OBJ_DATA*)obj_index[r2].item;
+  obj->item_number = r2;
+  obj_index[r2].item = (void*)obj;
+  obj_index[r2].non_combat_func = 0;
+  obj_index[r2].number = 0;
+  obj_index[r2].virt = v2;
+  obj_index[r2].mobprogs = NULL;
+  obj_index[r2].combat_func = 0;
+  obj_index[r2].mobspec = 0;
   extract_obj(otmp);
-  send_to_char("Done!\r\n",ch);
+
+  ch->pcdata->last_obj_edit = r2;
+  set_zone_modified_obj(v2);
+
   return eSUCCESS;
 }
 
@@ -2142,11 +2151,11 @@ int do_mclone(struct char_data *ch, char *argument, int cmd)
   one_argument(argument, arg2);
   if (!arg1[0] || !arg2[0] || !is_number(arg1) || !is_number(arg2))
   {
-    send_to_char("Syntax: mclone <destination vnum> <source vnum>\r\n",ch);
+    send_to_char("Syntax: mclone <source vnum> <destination vnum>\n\r",ch);
     return eFAILURE;
   }
   CHAR_DATA *mob;
-  int vdst = atoi(arg1), vsrc = atoi(arg2);
+  int vdst = atoi(arg2), vsrc = atoi(arg1);
   int dst = real_mobile(vdst), src = real_mobile(vsrc);
   if (src < 0)
   {
@@ -2166,7 +2175,11 @@ int do_mclone(struct char_data *ch, char *argument, int cmd)
     int retval = do_medit(ch, buf, 9);
     if (!IS_SET(retval, eSUCCESS)) return eFAILURE;
     dst = real_mobile(vdst);
-    src = real_mobile(vsrc); // medit new changes it
+    src = real_mobile(vsrc);
+    if (dst == -1) {
+      send_to_char("Something failed. Possibly your destination vnum was too high.\n\r", ch);
+      return eFAILURE;
+    }
   }
   mob = clone_mobile(src);
   if (!mob) {csendf(ch, "Failure. Unable to copy mobile.\r\n"); return eFAILURE;}
@@ -2188,6 +2201,10 @@ int do_mclone(struct char_data *ch, char *argument, int cmd)
         if (old_mob->mobdata->nr == tmpch->mobdata->nr) extract_char(tmpch, TRUE);
      }
   }
+
+  csendf(ch, "Ok.\n\rYou copied mob %d (%s) and replaced mob %d (%s).\n\r",
+	 vsrc, ((CHAR_DATA*)mob_index[src].item)->short_desc,
+	 vdst, ((CHAR_DATA*)mob_index[dst].item)->short_desc);
 
   // Overwrite old mob with new mob
   mob_index[dst].item = (void*)mob;
@@ -2211,7 +2228,9 @@ int do_mclone(struct char_data *ch, char *argument, int cmd)
     send_to_char("Warning: mob program found. This will need to be copied manually.\n\r", ch);
   }
 
-  send_to_char("Done!\r\n",ch);
+  ch->pcdata->last_mob_edit = dst;
+  set_zone_modified_mob(vdst);
+
   return eSUCCESS;
 }
 
