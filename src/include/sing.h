@@ -3,12 +3,14 @@
  * singing bard powers, although the sing structure is in
  * spells.h, so that must be included
  */
-/* $Id: sing.h,v 1.15 2009/01/23 19:30:56 kkoons Exp $ */
+/* $Id: sing.h,v 1.16 2009/05/26 06:29:27 shane Exp $ */
 
 #ifndef SING_H_
 #define SING_H_
 
 #include <structs.h> // ubyte, ubyte, etc..
+
+#define BARD_MAX_RATING 3
 
 typedef int	SING_FUN		( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill);
 
@@ -19,11 +21,19 @@ struct song_info_type
 	ubyte min_useski;	/* minimum ki used */
         int16 skill_num;       /* skill number of the song */
 	int16 targets;		/* Legal targets */
+        int16 rating;		/* Rating for orchestrate */
 	SING_FUN *song_pointer;	/* function to call */
         SING_FUN *exec_pointer; /* other function to call */
         SING_FUN *song_pulse;    /* other other function to call */
         SING_FUN *intrp_pointer; /* other other function to call */
         int difficulty;
+};
+
+struct songInfo
+{
+	int16 song_timer; /* status for songs being sung */
+	int16 song_number; /* number of song being sung */
+	char * song_data; 
 };
 
 /************************************************************************

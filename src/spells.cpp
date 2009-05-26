@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.268 2009/05/22 06:08:48 kkoons Exp $ */
+/* $Id: spells.cpp,v 1.269 2009/05/26 06:29:21 shane Exp $ */
 
 extern "C"
 {
@@ -692,6 +692,7 @@ char *skills[]=
   "counter strike",
   "imbue",
   "elemental filter",
+  "orchestrate",
   "\n"
 };
 

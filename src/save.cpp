@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: save.cpp,v 1.59 2009/01/24 09:56:06 kkoons Exp $ */
+/* $Id: save.cpp,v 1.60 2009/05/26 06:29:20 shane Exp $ */
 
 extern "C"
 {
@@ -1409,11 +1409,12 @@ void store_to_char(struct char_file_u *st, CHAR_DATA *ch)
     // make the actual call to "char_to_room" using this data later
     ch->in_room = real_room(st->load_room);
 
-    if(ch->in_room == (-1))
+    if(ch->in_room == (-1)) {
       if(GET_LEVEL(ch) >= IMMORTAL)
         ch->in_room = real_room(17);
       else
         ch->in_room = real_room(START_ROOM);
+    }
 }
 
 

@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: interp.h,v 1.106 2009/05/21 22:44:13 kkoons Exp $ */
+/* $Id: interp.h,v 1.107 2009/05/26 06:29:27 shane Exp $ */
 
 #ifndef INTERP_H_
 #define INTERP_H_
@@ -52,6 +52,7 @@ void add_command_lag(CHAR_DATA *ch, int cmdnum, int lag);
 #define CMD_LOOK	12
 #define CMD_BACKSTAB	13
 #define CMD_SBS		14
+#define CMD_ORCHESTRATE 15
 #define CMD_GLANCE	20
 #define CMD_FLEE	28
 #define CMD_ESCAPE	29
@@ -412,6 +413,7 @@ DO_FUN do_oneway;
 DO_FUN do_onslaught;
 DO_FUN do_open;
 DO_FUN do_order;
+DO_FUN do_orchestrate;
 DO_FUN do_osave;
 DO_FUN do_outcast;
 DO_FUN do_pager;

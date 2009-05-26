@@ -16,7 +16,7 @@
  *  10/21/2003   Onager    Changed IS_ANONYMOUS() to handle mobs without   *
  *                         crashing                                        *
  ***************************************************************************/
-/* $Id: utility.h,v 1.85 2009/05/22 00:32:29 kkoons Exp $ */
+/* $Id: utility.h,v 1.86 2009/05/26 06:29:27 shane Exp $ */
 
 #ifndef UTILITY_H_
 #define UTILITY_H_
@@ -337,7 +337,7 @@ inline const short IS_ANONYMOUS(CHAR_DATA *ch)
 #define IS_GOOD(ch)    (GET_ALIGNMENT(ch) >= 350)
 #define IS_EVIL(ch)    (GET_ALIGNMENT(ch) <= -350)
 #define IS_NEUTRAL(ch) (!IS_GOOD(ch) && !IS_EVIL(ch))
-#define IS_SINGING(ch) ((ch)->song_timer != 0)
+#define IS_SINGING(ch) (!((ch)->songs.empty()))
 
 char *str_hsh(char *);
 bool ishashed(char *);
@@ -561,5 +561,7 @@ void remove_character(char *name, BACKUP_TYPE backup = NONE);
 void remove_familiars(char *name, BACKUP_TYPE backup = NONE);
 
 std::string replaceString(std::string message, std::string find, std::string replace);
+
+char * numToStringTH(int);
 
 #endif /* UTILITY_H_ */

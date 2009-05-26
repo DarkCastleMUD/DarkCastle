@@ -1,7 +1,7 @@
 #ifndef CHARACTER_H_
 #define CHARACTER_H_
 /******************************************************************************
-| $Id: character.h,v 1.76 2009/05/26 02:10:45 dcastle Exp $
+| $Id: character.h,v 1.77 2009/05/26 06:29:27 shane Exp $
 | Description: This file contains the header information for the character
 |   class implementation.
 */
@@ -390,10 +390,10 @@ struct char_data
 
     obj_data * beacon;       /* pointer to my beacon */
 
-//     std::vector<songInfo> songs;          // Song list
-     int16 song_timer;       /* status for songs being sung */
-     int16 song_number;      /* number of song being sung */
-     char * song_data;        /* args for the songs */
+     std::vector<songInfo> songs;          // Song list
+//     int16 song_timer;       /* status for songs being sung */
+//     int16 song_number;      /* number of song being sung */
+//     char * song_data;        /* args for the songs */
 
     struct obj_data *equipment[MAX_WEAR]; // Equipment List
 

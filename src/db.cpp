@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.194 2009/05/21 22:46:18 kkoons Exp $ */
+/* $Id: db.cpp,v 1.195 2009/05/26 06:29:20 shane Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -4779,9 +4779,7 @@ void reset_char(CHAR_DATA *ch)
     default: GET_AC(ch) = 100; break;
   }
 
-  ch->song_data = NULL;
-  ch->song_number = 0;
-  ch->song_timer = 0;
+  if(IS_SINGING(ch)) ch->songs.clear();
 
   if(GET_HIT(ch) < 1)
     GET_HIT(ch) = 1;

@@ -17,7 +17,7 @@
  *                         except Pir and Valk                             *
  * 10/19/2003   Onager     Took out super-secret hidey code from CAN_SEE() *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.106 2009/05/26 01:46:01 jhhudso Exp $ */
+/* $Id: utility.cpp,v 1.107 2009/05/26 06:29:21 shane Exp $ */
 
 extern "C"
 {
@@ -2253,4 +2253,22 @@ string replaceString( string message, string find, string replace)
   message.replace( j, find.length(), replace );
  }
  return message;
+}
+
+char * numToStringTH(int number)
+{
+ switch(number) {
+  case 1: return "first";
+  case 2: return "second";
+  case 3: return "third";
+  case 4: return "fourth";
+  case 5: return "fifth";
+  case 6: return "sixth";
+  case 7: return "seventh";
+  case 8: return "eighth";
+  case 9: return "ninth";
+  case 10: return "tenth";
+  case 11: return "eleventh";
+  default: return '\0';
+ }
 }
