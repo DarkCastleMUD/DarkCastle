@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: limits.cpp,v 1.96 2008/12/12 18:33:41 kkoons Exp $ */
+/* $Id: limits.cpp,v 1.97 2009/05/26 01:58:06 shane Exp $ */
 
 extern "C"
 {
@@ -839,6 +839,7 @@ void update_corpses_and_portals(void)
     next_thing = j->next; /* Next in object list */
     /* Type 1 is a permanent game portal, and type 3 is a look_only
     |  object.  Type 0 is the spell portal and type 2 is a game_portal
+    |  Type 4 is a no look permanent game portal
     */
 
     if((GET_ITEM_TYPE(j) == ITEM_PORTAL) && (j->obj_flags.value[1] == 0

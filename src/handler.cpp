@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.188 2009/05/21 20:07:29 kkoons Exp $ */
+/* $Id: handler.cpp,v 1.189 2009/05/26 01:58:06 shane Exp $ */
     
 extern "C"
 {
@@ -2082,7 +2082,7 @@ int equip_char(CHAR_DATA *ch, struct obj_data *obj, int pos, int flag)
     if (!IS_NPC(ch))
     if ((IS_OBJ_STAT(obj, ITEM_ANTI_EVIL) && IS_EVIL(ch)) ||
 	(IS_OBJ_STAT(obj, ITEM_ANTI_GOOD) && IS_GOOD(ch)) ||
-	(IS_OBJ_STAT(obj, ITEM_ANTI_NEUTRAL) && IS_NEUTRAL(ch))&& !IS_NPC(ch)) 
+	(IS_OBJ_STAT(obj, ITEM_ANTI_NEUTRAL) && IS_NEUTRAL(ch)) && !IS_NPC(ch)) 
     {
 	if(IS_SET(obj->obj_flags.more_flags, ITEM_NO_TRADE) ||
 	   affected_by_spell(ch, FUCK_PTHIEF) || contains_no_trade_item(obj)) {
@@ -3240,6 +3240,10 @@ void extract_char(CHAR_DATA *ch, bool pull)
     if ( !pull && !isGolem) {
       if (world[was_in].number == START_ROOM)
    	   char_to_room(ch, real_room(SECOND_START_ROOM));
+      else if (zone_table[world[GET_HOME(ch)].zone].continent == FAR_REACH || zone_table[world[GET_HOME(ch)].zone].continent == UNDERDARK)
+   	   char_to_room(ch, real_room(FARREACH_START_ROOM));
+      else if (zone_table[world[GET_HOME(ch)].zone].continent == DIAMOND_ISLE || zone_table[world[GET_HOME(ch)].zone].continent == FORBIDDEN_ISLAND)
+   	   char_to_room(ch, real_room(THALOS_START_ROOM));
       else
          char_to_room(ch, real_room(START_ROOM));
       }

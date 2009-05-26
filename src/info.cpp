@@ -12,7 +12,7 @@
  * This is free software and you are benefitting.	We hope that you    *
  * share your changes too.  What goes around, comes around. 		    *
  ****************************************************************************/
-/* $Id: info.cpp,v 1.188 2009/05/04 00:36:10 shane Exp $ */
+/* $Id: info.cpp,v 1.189 2009/05/26 01:58:06 shane Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -1230,7 +1230,7 @@ int weight_in(struct obj_data *obj);
                      {
                         if(tmp_object->obj_flags.type_flag == ITEM_PORTAL)
                         {
-                           if(tmp_object->obj_flags.value[1] == 0)
+                           if(tmp_object->obj_flags.value[1] == 0 || tmp_object->obj_flags.value[1] == 4)
                            {
                               sprintf(tmpbuf,"You look through %s but it seems to be opaque.\n\r",
                                  tmp_object->short_description);
