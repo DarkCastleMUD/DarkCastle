@@ -1,7 +1,7 @@
 #ifndef CHARACTER_H_
 #define CHARACTER_H_
 /******************************************************************************
-| $Id: character.h,v 1.74 2009/05/20 00:07:27 kkoons Exp $
+| $Id: character.h,v 1.75 2009/05/26 02:00:12 shane Exp $
 | Description: This file contains the header information for the character
 |   class implementation.
 */
@@ -16,11 +16,13 @@
 #include <isr.h>   // SAVE_TYPE_MAX
 #include <utility.h>
 #include <mobile.h>
+#include <sing.h>
 #include <queue>
 #include <quest.h>
 #include <map>
 #include <sys/time.h>
 #include <string>
+#include <vector>
 
 #define ASIZE 32
 #define MAX_GOLEMS           2 // amount of golems above +1
@@ -28,6 +30,8 @@
 #define START_ROOM        3001 // Where you login
 #define CFLAG_HOME        3014 // Where the champion flag normally rests
 #define SECOND_START_ROOM 3059 // Where you go if killed in start room
+#define FARREACH_START_ROOM 17868
+#define THALOS_START_ROOM 5317
 
 #define PASSWORD_LEN    20
 #define DESC_LENGTH     80
@@ -195,6 +199,8 @@ struct player_vault
   struct vault_access_data *acc;
 };
 */
+
+
 
 // DO NOT change most of these types without checking the save files
 // first, or you will probably end up corrupting all the pfiles
@@ -384,9 +390,10 @@ struct char_data
 
     obj_data * beacon;       /* pointer to my beacon */
 
+     std::vector<songInfo> songs;          // Song list
      int16 song_timer;       /* status for songs being sung */
      int16 song_number;      /* number of song being sung */
-    char * song_data;        /* args for the songs */
+     char * song_data;        /* args for the songs */
 
     struct obj_data *equipment[MAX_WEAR]; // Equipment List
 
