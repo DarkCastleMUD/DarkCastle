@@ -1,4 +1,4 @@
-/* $Id: clan.cpp,v 1.76 2009/03/27 00:01:07 kkoons Exp $ */
+/* $Id: clan.cpp,v 1.77 2009/05/26 01:50:40 jhhudso Exp $ */
 
 /***********************************************************************/
 /* Revision History                                                    */
@@ -774,7 +774,7 @@ void clan_death (char_data *ch, char_data *killer)
   }
 
   *curr = '\0';
-  sprintf(buf, "%s%s%s", clan->death_message, GET_NAME(ch), curr+1);
+  sprintf(buf, "%s%s%s", clan->death_message, GET_SHORT(ch), curr+1);
   *curr = '%';
 
   if(!(curr = strstr(buf, "#")))
