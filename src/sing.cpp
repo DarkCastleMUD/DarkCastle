@@ -440,6 +440,10 @@ int do_sing(CHAR_DATA *ch, char *arg, int cmd)
     send_to_char("You are already in the middle of another song!\n\r", ch);
    return eFAILURE;
   }
+  else if(spl == 2 && !IS_SINGING(ch)) {
+   send_to_char("You are not even singing a song to stop!\r\n", ch);
+   return eFAILURE;
+  }
 
   for( i = ch->songs.begin(); i != ch->songs.end(); ++i )
    if((*i).song_number == spl) {
@@ -518,8 +522,11 @@ int do_sing(CHAR_DATA *ch, char *arg, int cmd)
     /* Locate targets */
     target_ok = FALSE;
 
+    one_argument(argument, name);
+
+    
+
     if(!IS_SET(song_info[spl].targets, TAR_IGNORE)) {
-      one_argument(argument, name);
       if(*name) {
         if(IS_SET(song_info[spl].targets, TAR_CHAR_ROOM))
           if((tar_char = get_char_room_vis(ch, name)) != NULL)
@@ -700,7 +707,25 @@ int do_sing(CHAR_DATA *ch, char *arg, int cmd)
       if(cmd != CMD_ORCHESTRATE && IS_SINGING(ch)) // I'm singing
       {
 	if (!origsing) {
-         if(ch->songs.size() > 1) send_to_char("You stop orchestrating all of your music.\r\n", ch);
+         if(ch->songs.size() > 1 && !*name) send_to_char("You stop orchestrating all of your music.\r\n", ch);
+         else if(ch->songs.size() > 1 && *name) {
+          int hold = old_search_block(name, 0, strlen(name), songs, 0);
+          bool found = FALSE;
+          if(--hold < 0) {
+           send_to_char("You do not know of that song.\r\n", ch);
+           return eFAILURE;
+          }
+          for(i = ch->songs.begin(); i != ch->songs.end(); ++i)
+           if((*i).song_number == hold) {found = TRUE; break;}
+          if(!found) {
+           send_to_char("You are not singing that song.\r\n", ch);
+           return eFAILURE;
+          } else {
+           send_to_char("You stop singing ", ch);
+           send_to_char(songs[(*i).song_number], ch);
+           send_to_char(".\r\n", ch);
+          }
+         }
          else {
           send_to_char("You stop singing ", ch);
           send_to_char(songs[(*ch->songs.begin()).song_number], ch);
