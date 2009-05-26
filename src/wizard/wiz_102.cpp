@@ -2969,7 +2969,7 @@ mob_index[mob_num].virt);
           send_to_char(buf, ch);
           return eFAILURE;
         }
-        if(!check_range_valid_and_convert(intval, buf4, 0, GET_LEVEL(ch))) {
+        if(!check_range_valid_and_convert(intval, buf4, 0, 110)) {
           send_to_char("Value out of valid range.\r\n", ch);
           return eFAILURE;
         }
