@@ -20,7 +20,7 @@
  * 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead *
  * of just race stuff                                                     *
  **************************************************************************
- * $Id: fight.cpp,v 1.541 2009/05/20 21:31:04 kkoons Exp $               *
+ * $Id: fight.cpp,v 1.542 2009/05/27 08:19:05 jhhudso Exp $               *
  **************************************************************************/
 
 extern "C"
@@ -286,6 +286,9 @@ void perform_violence(void)
           retval = ((*mob_index[ch->mobdata->nr].combat_func)(ch, NULL, 0, "", ch));
           if(SOMEONE_DIED(retval))
             continue;
+	  // Check if we're still fighting someone
+	  if (ch->fighting == 0)
+	    continue;
         }
         else if(!IS_AFFECTED(ch, AFF_CHARM)) 
         {
@@ -1559,7 +1562,7 @@ int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
   }  
   
   // Was last hit a success?
-  if(IS_SET(retval, eSUCCESS)) 
+  if(IS_SET(retval, eSUCCESS)) {
     // If they're wielding a weapon check for weapon spells, otherwise check for hand spells
     if (wielded) {
       retval = weapon_spells(ch, vict, weapon);     
@@ -1614,6 +1617,7 @@ int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
         }        
       }          
     }
+  }
   
     if(act_poisonous(ch)) 
     {
@@ -2211,7 +2215,7 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
       dam = (int)(dam * 1.75);
     if (IS_AFFECTED(ch, AFF_PRIMAL_FURY))
 	dam = dam * 5;
-    if (IS_SET(ch->combat, COMBAT_RAGE1) || IS_SET(ch->combat, COMBAT_RAGE2) && attacktype != SKILL_BACKSTAB)
+    if (IS_SET(ch->combat, COMBAT_RAGE1) || (IS_SET(ch->combat, COMBAT_RAGE2) && attacktype != SKILL_BACKSTAB))
       dam = (int)(dam * 1.4);
     if (IS_SET(ch->combat, COMBAT_HITALL))
       dam = (int)(dam * 2);
@@ -2690,19 +2694,21 @@ int is_pkill(CHAR_DATA *ch, CHAR_DATA *vict)
 
   if(!ch) return TRUE;
 
-  for(tmp_ch = ch; tmp_ch; tmp_ch = tmp_ch->master) 
-  { 
-    if(!IS_NPC(tmp_ch))
-      if(IS_NPC(vict)) 
-      { 
-        if(vict->master) /* Attacking someone's charmie */
-          if(!IS_NPC(vict->master))
-            if(vict->master != ch) /* Can't pkill your own charmie */
+  for(tmp_ch = ch; tmp_ch; tmp_ch = tmp_ch->master) { 
+    if(!IS_NPC(tmp_ch)) {
+      if(IS_NPC(vict)) { 
+        if(vict->master) { /* Attacking someone's charmie */
+          if(!IS_NPC(vict->master)) {
+            if(vict->master != ch) { /* Can't pkill your own charmie */
               return TRUE;
+	    }
             return FALSE; /* Standard mob kill */
-      }
-      else /* vict is a pc */
+	  }
+	}
+      } else { /* vict is a pc */
         return TRUE;
+      }
+    }
   }
   
   /* Still here?  The killer is an uncharmed mob, definitely not a pkill! */
@@ -4658,19 +4664,19 @@ void do_combatmastery(CHAR_DATA *ch, CHAR_DATA *vict, int weapon)
      }
   }
   if(type == TYPE_BLUDGEON || type == TYPE_CRUSH) {
-     if(GET_LEVEL(vict) >= 90 || IS_MOB(vict) && ISSET(vict->mobdata->actflags, ACT_HUGE)) {
+    if(GET_LEVEL(vict) >= 90 || (IS_MOB(vict) && ISSET(vict->mobdata->actflags, ACT_HUGE))) {
         act("$N shakes off your crushing blow!", ch, 0, vict, TO_CHAR, 0);
         act("$N shakes off $n's crushing blow!", ch, 0, vict, TO_ROOM, NOTVICT);
         act("You shake off $n's crushing blow!", ch, 0, vict, TO_VICT, 0);
         return;
      }
-     if(GET_LEVEL(vict) >= 90 || IS_MOB(vict) && ISSET(vict->mobdata->actflags, ACT_SWARM)) {
+    if(GET_LEVEL(vict) >= 90 || (IS_MOB(vict) && ISSET(vict->mobdata->actflags, ACT_SWARM))) {
         act("$N swarms around your crushing blow!", ch, 0, vict, TO_CHAR, 0);
         act("$N swarms around $n's crushing blow!", ch, 0, vict, TO_ROOM, NOTVICT);
         act("You swarm around $n's crushing blow!", ch, 0, vict, TO_VICT, 0);
         return;
      }
-     if(GET_LEVEL(vict) >= 90 || IS_MOB(vict) && ISSET(vict->mobdata->actflags, ACT_TINY)) {
+    if(GET_LEVEL(vict) >= 90 || (IS_MOB(vict) && ISSET(vict->mobdata->actflags, ACT_TINY))) {
         act("$N is so small, $E easily avoids your crushing blow!", ch, 0, vict, TO_CHAR, 0);
         act("$N easily avoids $n's slow, crushing blow!", ch, 0, vict, TO_ROOM, NOTVICT);
         act("You easily avoid $n's slow, crushing blow!", ch, 0, vict, TO_VICT, 0);
@@ -6616,7 +6622,7 @@ int do_flee(struct char_data *ch, char *argument, int cmd)
           act("$n quickly ducks your attack and attempts to make good a stealthy escape!", ch, 0, vict, TO_VICT, 0);
           act("$n quickly ducks $N's attack and attempts to make good a stealthy escape!", ch, 0, vict, TO_ROOM, INVIS_NULL|NOTVICT);
          }
-          // The flee has succeded
+          // The flee has succeeded
           int was_fighting = (int)ch->fighting;
           GET_POS(ch) = POSITION_STANDING;
 
@@ -6634,12 +6640,11 @@ int do_flee(struct char_data *ch, char *argument, int cmd)
 	  REMOVE_BIT(ch->combat, COMBAT_FLEEING);
           if (IS_SET(retval, eSUCCESS)) 
           {
-            
             // They got away.  Stop fighting for everyone not in the new room from fighting
             for (chTemp = combat_list; chTemp; chTemp = loop_ch) 
             {
               loop_ch = chTemp->next_fighting;
-              if (chTemp->fighting == ch && chTemp->in_room != ch->in_room) 
+              if (chTemp->fighting == ch && chTemp->in_room != ch->in_room)
                 stop_fighting(chTemp);
             } // for
             
