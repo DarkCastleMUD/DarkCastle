@@ -20,7 +20,7 @@
  * 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead *
  * of just race stuff                                                     *
  **************************************************************************
- * $Id: fight.cpp,v 1.542 2009/05/27 08:19:05 jhhudso Exp $               *
+ * $Id: fight.cpp,v 1.543 2009/05/27 17:51:10 shane Exp $               *
  **************************************************************************/
 
 extern "C"
@@ -2283,11 +2283,12 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
 	{
 		case 0: return eFAILURE; // Dodge or parry
 
+                case 4:
 		case 1:
 		case 2:	SET_BIT(modifier, COMBAT_MOD_REDUCED);
 			dam -= (int) ((float)dam  *((float)reduce/100));
 			break;
-			// Shield block or Mdefense
+			// Shield block or Mdefense or tumbling partial avoid
 
 		case 3:
 			dam = 0; // Miss!
@@ -2563,7 +2564,7 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
      if (SOMEONE_DIED(retval2)) return damage_retval(ch, victim, retval2);
   }
 
-  if (typeofdamage == DAMAGE_TYPE_PHYSICAL && ch != victim)
+  if (typeofdamage == DAMAGE_TYPE_PHYSICAL && type == 2 && reduce > 0 && dam > 0 && ch != victim)
   { // Martial Defense Counter Strike..
      int retval2 = checkCounterStrike(ch, victim);
      if (SOMEONE_DIED(retval2)) return damage_retval(ch, victim, retval2);
@@ -3041,6 +3042,7 @@ int isHit(CHAR_DATA *ch, CHAR_DATA *victim, int attacktype, int &type, int &redu
   int dodge = IS_NPC(victim)?ISSET(victim->mobdata->actflags, ACT_DODGE)?GET_LEVEL(victim)/2:0:has_skill(victim, SKILL_DODGE);
   int block = has_skill(victim, SKILL_SHIELDBLOCK);
   int martial = has_skill(victim, SKILL_DEFENSE);
+  int tumbling = has_skill(victim, SKILL_TUMBLING);
 
   if(victim->equipment[WIELD] == NULL) parry = 0;
 
@@ -3048,7 +3050,7 @@ int isHit(CHAR_DATA *ch, CHAR_DATA *victim, int attacktype, int &type, int &redu
   else if (IS_NPC(victim)) block = GET_LEVEL(victim)/2;
 
   // Modify defense rate accordingly
-  int amt = parry + dodge + block + martial;
+  int amt = parry + dodge + block + martial + tumbling;
 
   float scale = (float)amt / (196.0); // Mobs can get a bonus if they can perform 3+.
 
@@ -3059,6 +3061,7 @@ int isHit(CHAR_DATA *ch, CHAR_DATA *victim, int attacktype, int &type, int &redu
   if (dodge) skill_increase_check(victim, SKILL_DODGE, dodge, SKILL_INCREASE_HARD+500);
   if (block) skill_increase_check(victim, SKILL_SHIELDBLOCK, block, SKILL_INCREASE_HARD+500);
   if (martial) skill_increase_check(victim, SKILL_DEFENSE, martial, SKILL_INCREASE_HARD+500);
+  if (tumbling) skill_increase_check(victim, SKILL_TUMBLING, tumbling, SKILL_INCREASE_HARD+500);
 
   // Ze random stuff.
   if (number(1,100) < (int)percent && !IS_SET(victim->combat, COMBAT_BLADESHIELD1) && !IS_SET(victim->combat, COMBAT_BLADESHIELD2)) return eFAILURE;
@@ -3068,24 +3071,52 @@ int isHit(CHAR_DATA *ch, CHAR_DATA *victim, int attacktype, int &type, int &redu
   amt += 8; // Chance for a pure miss.
 
   int what = number(0,amt);
-  
+  int retval = 0;
+
   if (what < parry || IS_SET(victim->combat, COMBAT_BLADESHIELD1) || IS_SET(victim->combat, COMBAT_BLADESHIELD2))
   { // Parry. Riposte-check goes here.
     act("$n parries $N's attack.", victim, NULL, ch, TO_ROOM, NOTVICT);
     act("$n parries your attack.", victim, NULL, ch, TO_VICT, 0);
     act("You parry $N's attack.", victim, NULL, ch, TO_CHAR, 0);
-    int retval = check_riposte(ch, victim, attacktype);
+    retval = check_riposte(ch, victim, attacktype);
     if (SOMEONE_DIED(retval)) return debug_retval(ch, victim, retval);
-  } else if (what < (parry+dodge))
+  } else if (what < (parry+tumbling))
+  { // Tumbling
+    switch(number(0, 2)) {
+     case 0: //full avoid
+      if(number(0,1)) {
+       act("You spin adroitly to the side, watching in amusement as $N's swing passes by harmlessly.", victim, 0, ch, TO_CHAR, 0);
+       act("$n spins adroitly to the side, watching in amusement as your swing passes by harmlessly.", victim, 0, ch, TO_VICT, 0);
+       act("$n spins adroitly to the side, watching in amusement as $N's swing passes by harmlessly.", victim, 0, ch, TO_ROOM, NOTVICT);
+      }
+      else {
+       act("You jump quickly and execute a full backflip, landing nimbly on your feet as $N's blow misses completely.", victim, 0, ch, TO_CHAR, 0);
+       act("$n jumps quickly and executes a full backflip, landing nimbly on $s feet as your blow misses completely.", victim, 0, ch, TO_VICT, 0);
+       act("$n jumps quickly and executes a full backflip, landing nimbly on $s feet as $N's blow misses completely.", victim, 0, ch, TO_ROOM, NOTVICT);
+      }
+      break;
+     case 1: //shieldblock style damage
+      type = 4;
+      reduce = has_skill(victim, SKILL_TUMBLING);
+      break;
+     case 2: //riposte style damage
+      retval = doTumblingCounterStrike(ch, victim);
+      if (SOMEONE_DIED(retval)) return debug_retval(ch, victim, retval);      
+      break;
+     default:
+      send_to_char("Messed up tumbling. tell somebody, whore!\r\n", ch);
+      break;
+     }
+  } else if (what < (parry+tumbling+dodge))
   { // Dodge
     act("$n dodges $N's attack.", victim, NULL, ch, TO_ROOM, NOTVICT);
     act("$n dodges your attack.", victim, NULL, ch, TO_VICT, 0);
     act("You dodge $N's attack.", victim, NULL, ch, TO_CHAR, 0);
-  } else if (what < (parry+dodge+block))
+  } else if (what < (parry+tumbling+dodge+block))
   { // Shieldblock
      type = 1;
      reduce = has_skill(victim, SKILL_SHIELDBLOCK);
-  } else if (what < (parry+dodge+block+martial))
+  } else if (what < (parry+tumbling+dodge+block+martial))
   { // Mdefense
      type = 2;
      reduce = 100 * has_skill(victim, SKILL_DEFENSE) / 125;
@@ -3143,6 +3174,49 @@ int checkCounterStrike(CHAR_DATA * ch, CHAR_DATA * victim)
     act("Upon blocking $N's blow, you spin and land a solid strike with your knee!", victim, NULL, ch, TO_CHAR, 0);
     act("Upon blocking your blow, $n spins and lands a solid strike with $s knee!", victim, NULL, ch, TO_VICT, 0);
     act("Upon blocking $N's blow, $n spins and lands a solid strike with $s knee!", victim, NULL, ch, TO_ROOM, NOTVICT);
+    break;
+   default:
+    log("Serious screw-up in counter strike!", ANGEL, LOG_BUG);
+  }
+
+  retval = one_hit(victim, ch, TYPE_HIT, FIRST);
+  retval = SWAP_CH_VICT(retval);
+
+  REMOVE_BIT(retval, eSUCCESS);
+  SET_BIT(retval, eFAILURE);
+
+  return debug_retval(ch, victim, retval);  
+}
+
+// check counter strike never returns eSUCCESS because that would
+// get returned from damage as a successful damage, which it's
+// not.
+int doTumblingCounterStrike(CHAR_DATA * ch, CHAR_DATA * victim)
+{
+  int retval;
+
+  if((IS_SET(victim->combat, COMBAT_STUNNED)) ||
+     (victim->equipment[WIELD] != NULL) ||
+     (IS_SET(victim->combat, COMBAT_STUNNED2)) ||
+     (IS_SET(victim->combat, COMBAT_BASH1)) ||
+     (IS_SET(victim->combat, COMBAT_BASH2)) ||
+     (IS_AFFECTED(victim, AFF_PARALYSIS)) ||
+     (IS_SET(victim->combat, COMBAT_BLADESHIELD1)) ||
+     (IS_SET(victim->combat, COMBAT_BLADESHIELD2)) ||
+     (IS_SET(ch->combat, COMBAT_BLADESHIELD1)) || 
+     (IS_SET(ch->combat, COMBAT_BLADESHIELD2)))
+    return eFAILURE;
+
+  switch(number(1,2)) {
+   case 1:
+    act("$N overextends $Mself as $E strikes you, leaving $M open to your counterattack!", victim, NULL, ch, TO_CHAR, 0);
+    act("You overextend yourself as you strike $n, leaving yourself open to $s counterattack!", victim, NULL, ch, TO_VICT, 0);
+    act("$N overextends $Mself as $E strikes $n, leaving $M open to a counterattack!", victim, NULL, ch, TO_ROOM, NOTVICT);
+    break;
+   case 2:
+    act("You find an opening in $N's defenses as $E swings, and land a quick counterattack!", victim, NULL, ch, TO_CHAR, 0);
+    act("$n finds an opening in your defenses as you swing, and lands a quick counterattack!", victim, NULL, ch, TO_VICT, 0);
+    act("$n finds an opening in $N's defenses as $E swings, and lands a quick counterattack!", victim, NULL, ch, TO_ROOM, NOTVICT);
     break;
    default:
     log("Serious screw-up in counter strike!", ANGEL, LOG_BUG);
@@ -5489,7 +5563,7 @@ void dam_message(int dam, CHAR_DATA * ch, CHAR_DATA * victim,
 	default: sprintf(shield,"error");break;
       }
    }
-   else
+   else if(victim->equipment[WEAR_SHIELD])
       sprintf(shield, "%s",victim->equipment[WEAR_SHIELD]->short_description);
 
      if (GET_CLASS(victim) == CLASS_MONK) {
@@ -5510,6 +5584,18 @@ PLR_DAMAGE)?dammsg:"", attack, shield, punct);
 PLR_DAMAGE)?dammsg:"", shield, attack, punct);
          sprintf(buf3, "$n %s you%s%s as you deflect $s %s with your %s%c", vp, vx, !IS_NPC(victim) && IS_SET(victim->pcdata->toggles, 
 PLR_DAMAGE)?dammsg:"", attack, shield, punct);
+       }
+     } else if(has_skill(victim, SKILL_TUMBLING)) {
+       if(number(0,1)) {
+        sprintf(buf1, "$N leaps away from $n's strike, managing to avoid all but a scratch|.");
+	sprintf(dammsg, " for $B%d$R damage", dam);
+        sprintf(buf2, "$N leaps away from your strike, managing to avoid all but a scratch%s.", !IS_NPC(ch) && IS_SET(ch->pcdata->toggles,PLR_DAMAGE)?dammsg:"");
+        sprintf(buf3, "You leap away from $n's strike, managing to avoid all but a scratch%s.", !IS_NPC(victim) && IS_SET(victim->pcdata->toggles,PLR_DAMAGE)?dammsg:"");
+       } else {
+        sprintf(buf1, "$N's roll to the side comes a moment too late as $n still manages to land a glancing blow|.");
+	sprintf(dammsg, ", dealing $B%d$R damage", dam);
+        sprintf(buf2, "$N's roll to the side comes a moment too late as you still manages to land a glancing blow%s.", !IS_NPC(ch) && IS_SET(ch->pcdata->toggles,PLR_DAMAGE)?dammsg:"");
+        sprintf(buf3, "Your roll to the side comes a moment too late as $n still manages to land a glancing blow%s.", !IS_NPC(victim) && IS_SET(victim->pcdata->toggles,PLR_DAMAGE)?dammsg:"");
        }
      } else {
        if (w_type == 0)

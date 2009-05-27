@@ -2,7 +2,7 @@
 #define FIGHT_H_
 
 /************************************************************************
-| $Id: fight.h,v 1.42 2009/05/20 21:30:52 kkoons Exp $
+| $Id: fight.h,v 1.43 2009/05/27 17:51:13 shane Exp $
 | fight.h
 | This file defines the header information for fight.
 */
@@ -66,6 +66,7 @@ bool check_dodge(CHAR_DATA *ch, CHAR_DATA *vict, int attacktype, bool display_re
 void disarm(CHAR_DATA *ch, CHAR_DATA *vict);
 void trip(CHAR_DATA *ch, CHAR_DATA *vict);
 int checkCounterStrike(CHAR_DATA *, CHAR_DATA *);
+int doTumblingCounterStrike(CHAR_DATA *, CHAR_DATA *);
 
 int one_hit(CHAR_DATA*ch, CHAR_DATA *vict, int type, int weapon);
 int do_skewer(CHAR_DATA *ch, CHAR_DATA *vict, int dam, int wt, int wt2, int weapon);

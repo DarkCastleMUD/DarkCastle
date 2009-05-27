@@ -14,7 +14,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: spells.h,v 1.132 2009/05/26 06:29:27 shane Exp $ */
+/* $Id: spells.h,v 1.133 2009/05/27 17:51:13 shane Exp $ */
 #include <structs.h> // ubyte, int16
 
 #include <map>
@@ -380,7 +380,8 @@ void check_maxes(CHAR_DATA *ch);
 #define SKILL_IMBUE		     413
 #define SKILL_ELEMENTAL_FILTER	     414
 #define SKILL_ORCHESTRATE	     415
-#define SKILL_MAX                    415
+#define SKILL_TUMBLING		     416
+#define SKILL_MAX                    416
 
 
 
