@@ -1073,13 +1073,10 @@ act("You resist $n's disarming limerick!",ch,NULL,victim,TO_VICT,0);
 int song_whistle_sharp( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {
    int dam = 0;
-   int retval;
+   int retval, wait;
    vector<songInfo>::iterator i;
 
-   for( i = ch->songs.begin(); i != ch->songs.end(); ++i ) {
-    if((*i).song_number == SKILL_SONG_WHISTLE_SHARP - SKILL_SONG_BASE)
-    break;
-   }
+   wait = song_info[SKILL_SONG_WHISTLE_SHARP - SKILL_SONG_BASE].beats - (skill /10);
 
    if (!victim) {
       log("No vict send to song whistle sharp!", ANGEL, LOG_BUG);
@@ -1130,7 +1127,6 @@ int song_whistle_sharp( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim
       return retval;
    }
 
-   int wait = song_info[(*i).song_number].beats - (skill / 10);
    wait = MAX(wait, 2);
 
    WAIT_STATE(ch, wait);
