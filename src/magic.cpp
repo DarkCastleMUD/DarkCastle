@@ -5263,7 +5263,7 @@ int spell_dispel_magic(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
            if (IS_AFFECTED(victim, AFF_SANCTUARY))
            {
               REMBIT(victim->affected_by, AFF_SANCTUARY);
-              act("You don't feel so invunerable anymore.", ch, 0,victim, TO_VICT, 0);
+              act("You don't feel so invulnerable anymore.", ch, 0,victim, TO_VICT, 0);
               act("The $B$7white glow$R around $n's body fades.", victim, 0, 0, TO_ROOM, 0);
               done = TRUE;
            }
