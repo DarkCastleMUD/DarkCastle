@@ -13877,7 +13877,8 @@ int spell_consecrate(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
 
   cItem = NULL;
 
-  if( (cItem = get_obj_in_list_vis(ch,"consecrateitem",world[ch->in_room].contents)) ) {
+  if( (cItem = get_obj_in_list_vis(ch,"consecrateitem",world[ch->in_room].contents)) ) 
+  {
    if(ch==get_char((char *)(cItem->obj_flags.value[3])) && spl == SPELL_CONSECRATE) {
     send_to_char("You have already consecrated the ground here!\r\n", ch);
     return eSUCCESS;
@@ -13907,7 +13908,13 @@ int spell_consecrate(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
   ch->cRooms++;
 
   cItem = clone_object(real_object(CONSECRATE_OBJ_NUMBER));
-  if(spl == SPELL_DESECRATE) {
+  if(!cItem)
+  {
+    send_to_char("Consecrate item doesn't exist. Tell an imm.\r\n", ch);
+    return eFAILURE;
+  }
+  if(spl == SPELL_DESECRATE) 
+  {
    sprintf(buf, "%s", "A circle of ominously humming blood runes are etched upon the ground here.");
    cItem->description = str_hsh(buf);
   }
