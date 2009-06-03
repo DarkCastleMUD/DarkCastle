@@ -17,7 +17,7 @@
 /* 12/09/2003   Onager   Added protection from good to cleric and anti    */
 /*                       spell list                                       */
 /**************************************************************************/
-/* $Id: const.cpp,v 1.310 2009/05/26 06:29:20 shane Exp $ */
+/* $Id: const.cpp,v 1.311 2009/06/03 02:53:14 kkoons Exp $ */
 /* I KNOW THESE SHOULD BE SOMEWHERE ELSE -- Morc XXX */
 
 extern "C"
@@ -349,8 +349,9 @@ const char *spell_wear_off_msg[] =
   "!RELEASEELEMENTAL!",
   "!WILDMAGIC!",
   "!SPIRITSHIELD!",
-  "You no longer feel especially villianous."
-  "You no longer feel especially heroic."
+  "You no longer feel especially villianous.",
+  "You no longer feel especially heroic.",
+  "BUG DETECTED: Tell an Imm. (Spell Wear Off Message)"
 };
 
 
