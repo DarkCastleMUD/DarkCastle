@@ -17,7 +17,7 @@
  *                         except Pir and Valk                             *
  * 10/19/2003   Onager     Took out super-secret hidey code from CAN_SEE() *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.107 2009/05/26 06:29:21 shane Exp $ */
+/* $Id: utility.cpp,v 1.108 2009/06/05 04:37:26 jhhudso Exp $ */
 
 extern "C"
 {
@@ -127,6 +127,16 @@ size_t nocolor_strlen(const char *s)
     }
 
     return len;
+}
+
+// This function is like str_dup except it returns 0 if passed 0
+char *str_dup0(const char *str)
+{
+  if (str == 0) {
+    return 0;
+  }
+
+  return str_dup(str);
 }
 
 // duplicate a string with it's own memory

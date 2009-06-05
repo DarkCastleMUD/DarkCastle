@@ -16,7 +16,7 @@
  *  10/21/2003   Onager    Changed IS_ANONYMOUS() to handle mobs without   *
  *                         crashing                                        *
  ***************************************************************************/
-/* $Id: utility.h,v 1.86 2009/05/26 06:29:27 shane Exp $ */
+/* $Id: utility.h,v 1.87 2009/06/05 04:37:26 jhhudso Exp $ */
 
 #ifndef UTILITY_H_
 #define UTILITY_H_
@@ -354,6 +354,7 @@ int	str_nosp_cmp	(char *arg1, char *arg2);
 int     str_n_nosp_cmp  (char *arg1, char *arg2, int size);
 char *  str_nospace     (char *stri);
 char *	str_dup		(const char *str);
+char *	str_dup0	(const char *str);
 void    log		(const char *str, int god_level, long type, char_data *vict = 0);
 void    logf            (int level, long type, char *arg, ...);
 int     send_to_gods    (const char * str, int god_level, long type);
