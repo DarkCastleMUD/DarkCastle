@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: db.h,v 1.31 2008/12/17 10:47:47 kkoons Exp $ */
+/* $Id: db.h,v 1.32 2009/06/05 04:36:41 jhhudso Exp $ */
 #ifndef DB_H_
 #define DB_H_
 
@@ -28,6 +28,9 @@ extern "C" {
 #include <vector>
 
 extern struct obj_data  *object_list;
+
+struct error_eof {};
+struct error_negative_int {};
 
 #define WORLD_MAX_ROOM        50000  // should never get this high...
                                      // it's just to keep builders/imps from 

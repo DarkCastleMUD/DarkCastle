@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.195 2009/05/26 06:29:20 shane Exp $ */
+/* $Id: db.cpp,v 1.196 2009/06/05 04:36:41 jhhudso Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -4307,7 +4307,7 @@ char *fread_string(FILE *fl, int hasher)
            // end of ~ case
        case EOF:
            perror( "fread_string: EOF" );
-           abort();
+           throw error_eof();
            break;
        } // switch
     } // for
@@ -4487,7 +4487,7 @@ int fread_int(FILE *fl, long beg_range, long end_range)
         {
         printf ("Reading %s: %s, %d\n", curr_type, curr_name, curr_virtno);
         perror ("fread_int: Bad value - < 0 on positive only num");
-        abort ();
+        throw error_negative_int();
         }
     else if (ch == '-')
         {
