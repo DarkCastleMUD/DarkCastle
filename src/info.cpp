@@ -12,7 +12,7 @@
  * This is free software and you are benefitting.	We hope that you    *
  * share your changes too.  What goes around, comes around. 		    *
  ****************************************************************************/
-/* $Id: info.cpp,v 1.189 2009/05/26 01:58:06 shane Exp $ */
+/* $Id: info.cpp,v 1.190 2009/06/05 04:57:13 jhhudso Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -75,6 +75,12 @@ extern char *spells[];
 
 /* Used for "who" */
 extern int max_who;
+
+/* Used by check_leaderboard */
+extern char* curr_type;
+extern char* curr_name;
+extern int   curr_virtno;
+
 
 /* extern functions */
 
@@ -514,7 +520,7 @@ void show_char_to_char(struct char_data *i, struct char_data *ch, int mode)
          }
          if ( IS_AFFECTED(i,AFF_INVISIBLE))
             strcat(buffer," $1(invisible)");
-	 if (IS_AFFECTED(i, AFF_HIDE) && ( IS_AFFECTED(ch, AFF_TRUE_SIGHT) && has_skill(ch, SPELL_TRUE_SIGHT) > 80 || GET_LEVEL(ch) > IMMORTAL  || ARE_GROUPED(i, ch) ))
+	 if (IS_AFFECTED(i, AFF_HIDE) && ((IS_AFFECTED(ch, AFF_TRUE_SIGHT) && has_skill(ch, SPELL_TRUE_SIGHT) > 80) || GET_LEVEL(ch) > IMMORTAL  || ARE_GROUPED(i, ch) ))
             strcat(buffer, "$4 (hidden)");
          if ((IS_AFFECTED(ch, AFF_DETECT_EVIL) || IS_AFFECTED(ch, AFF_KNOW_ALIGN)) && IS_EVIL(i)) 
             strcat(buffer, "$B$4(Red Halo) ");
@@ -2645,76 +2651,86 @@ void check_leaderboard()
    struct descriptor_data *d;
    FILE  *fl;
    int   i, j, k;
-   char  *hpactivename[5], *mnactivename[5], *kiactivename[5], *pkactivename[5], *pdactivename[5], *rdactivename[5], *mvactivename[5];
-   int   hpactive[5], mnactive[5], kiactive[5], pkactive[5], pdactive[5], rdactive[5], mvactive[5];
-   char  *hpactiveclassname[CLASS_MAX-2][5], *mnactiveclassname[CLASS_MAX-2][5], *kiactiveclassname[CLASS_MAX-2][5], *pkactiveclassname[CLASS_MAX-2][5], *pdactiveclassname[CLASS_MAX-2][5], *rdactiveclassname[CLASS_MAX-2][5], *mvactiveclassname[CLASS_MAX-2][5];
+   char  *hpactivename[5] = { 0 }, *mnactivename[5] = { 0 }, *kiactivename[5] = { 0 }, *pkactivename[5] = { 0 }, *pdactivename[5] = { 0 }, *rdactivename[5] = { 0 }, *mvactivename[5] = { 0 };
+   int   hpactive[5] = { 0 }, mnactive[5] = { 0 }, kiactive[5] = { 0 }, pkactive[5] = { 0 }, pdactive[5] = { 0 }, rdactive[5] = { 0 }, mvactive[5] = { 0 };
+   char  *hpactiveclassname[CLASS_MAX-2][5] = { { 0 } }, *mnactiveclassname[CLASS_MAX-2][5] = { { 0 } }, *kiactiveclassname[CLASS_MAX-2][5] = { { 0 } }, *pkactiveclassname[CLASS_MAX-2][5] = { { 0 } }, *pdactiveclassname[CLASS_MAX-2][5] = { { 0 } }, *rdactiveclassname[CLASS_MAX-2][5] = { { 0 } }, *mvactiveclassname[CLASS_MAX-2][5] = { { 0 } };
    int   hpactiveclass[CLASS_MAX-2][5], mnactiveclass[CLASS_MAX-2][5], kiactiveclass[CLASS_MAX-2][5], pkactiveclass[CLASS_MAX-2][5], pdactiveclass[CLASS_MAX-2][5], rdactiveclass[CLASS_MAX-2][5], mvactiveclass[CLASS_MAX-2][5];
    extern short bport;
    if (bport) return;
 
+   curr_type = "leaderboard";
+   curr_name = "NA";
+   curr_virtno = 0;
+
    if (!(fl = dc_fopen(LEADERBOARD_FILE, "r"))) {
       log("Cannot open leaderboard file.", 0, LOG_MISC);
-      abort();
+   } else {
+     try {
+       for(i=0;i<5;i++) {
+	 hpactivename[i] = fread_string(fl, 0);
+	 hpactive[i] = fread_int(fl, 0, LONG_MAX);
+       }
+       for(i=0;i<5;i++) {
+	 mnactivename[i] = fread_string(fl, 0);
+	 mnactive[i] = fread_int(fl, 0, LONG_MAX);
+       }
+       for(i=0;i<5;i++) {
+	 kiactivename[i] = fread_string(fl, 0);
+	 kiactive[i] = fread_int(fl, 0, LONG_MAX);
+       }
+       for(i=0;i<5;i++) {
+	 pkactivename[i] = fread_string(fl, 0);
+	 pkactive[i] = fread_int(fl, 0, LONG_MAX);
+       }
+       for(i=0;i<5;i++) {
+	 pdactivename[i] = fread_string(fl, 0);
+	 pdactive[i] = fread_int(fl, 0, LONG_MAX);
+       }
+       for(i=0;i<5;i++) {
+	 rdactivename[i] = fread_string(fl, 0);
+	 rdactive[i] = fread_int(fl, 0, LONG_MAX);
+       }
+       for(i=0;i<5;i++) {
+	 mvactivename[i] = fread_string(fl, 0);
+	 mvactive[i] = fread_int(fl, 0, LONG_MAX);
+       }
+       for(j=0;j<CLASS_MAX-2;j++) {
+	 for(i=0;i<5;i++) {
+	   hpactiveclassname[j][i] = fread_string(fl, 0);
+	   hpactiveclass[j][i] = fread_int(fl, 0, LONG_MAX);
+	 }
+	 for(i=0;i<5;i++) {
+	   mnactiveclassname[j][i] = fread_string(fl, 0);
+	   mnactiveclass[j][i] = fread_int(fl, 0, LONG_MAX);
+	 }
+	 for(i=0;i<5;i++) {
+	   kiactiveclassname[j][i] = fread_string(fl, 0);
+	   kiactiveclass[j][i] = fread_int(fl, 0, LONG_MAX);
+	 }
+	 for(i=0;i<5;i++) {
+	   pkactiveclassname[j][i] = fread_string(fl, 0);
+	   pkactiveclass[j][i] = fread_int(fl, 0, LONG_MAX);
+	 }
+	 for(i=0;i<5;i++) {
+	   pdactiveclassname[j][i] = fread_string(fl, 0);
+	   pdactiveclass[j][i] = fread_int(fl, 0, LONG_MAX);
+	 }
+	 for(i=0;i<5;i++) {
+	   rdactiveclassname[j][i] = fread_string(fl, 0);
+	   rdactiveclass[j][i] = fread_int(fl, 0, LONG_MAX);
+	 }
+	 for(i=0;i<5;i++) {
+	   mvactiveclassname[j][i] = fread_string(fl, 0);
+	   mvactiveclass[j][i] = fread_int(fl, 0, LONG_MAX);
+	 }
+       }
+       dc_fclose(fl);
+     } catch (error_eof) {
+       log("Corrupt leaderboard file: eof reached prematurely.", 0, LOG_MISC);
+     } catch (error_negative_int) {
+       log("Corrupt leaderboard file: negative int found where positive expected.", 0, LOG_MISC);
+     }
    }
-   for(i=0;i<5;i++) {
-      hpactivename[i] = fread_string(fl, 0);
-      hpactive[i] = fread_int(fl, 0, LONG_MAX);
-   }
-   for(i=0;i<5;i++) {
-      mnactivename[i] = fread_string(fl, 0);
-      mnactive[i] = fread_int(fl, 0, LONG_MAX);
-   }
-   for(i=0;i<5;i++) {
-      kiactivename[i] = fread_string(fl, 0);
-      kiactive[i] = fread_int(fl, 0, LONG_MAX);
-   }
-   for(i=0;i<5;i++) {
-      pkactivename[i] = fread_string(fl, 0);
-      pkactive[i] = fread_int(fl, 0, LONG_MAX);
-   }
-   for(i=0;i<5;i++) {
-      pdactivename[i] = fread_string(fl, 0);
-      pdactive[i] = fread_int(fl, 0, LONG_MAX);
-   }
-   for(i=0;i<5;i++) {
-      rdactivename[i] = fread_string(fl, 0);
-      rdactive[i] = fread_int(fl, 0, LONG_MAX);
-   }
-   for(i=0;i<5;i++) {
-      mvactivename[i] = fread_string(fl, 0);
-      mvactive[i] = fread_int(fl, 0, LONG_MAX);
-   }
-   for(j=0;j<CLASS_MAX-2;j++) {
-      for(i=0;i<5;i++) {
-         hpactiveclassname[j][i] = fread_string(fl, 0);
-         hpactiveclass[j][i] = fread_int(fl, 0, LONG_MAX);
-      }
-      for(i=0;i<5;i++) {
-         mnactiveclassname[j][i] = fread_string(fl, 0);
-         mnactiveclass[j][i] = fread_int(fl, 0, LONG_MAX);
-      }
-      for(i=0;i<5;i++) {
-         kiactiveclassname[j][i] = fread_string(fl, 0);
-         kiactiveclass[j][i] = fread_int(fl, 0, LONG_MAX);
-      }
-      for(i=0;i<5;i++) {
-         pkactiveclassname[j][i] = fread_string(fl, 0);
-         pkactiveclass[j][i] = fread_int(fl, 0, LONG_MAX);
-      }
-      for(i=0;i<5;i++) {
-         pdactiveclassname[j][i] = fread_string(fl, 0);
-         pdactiveclass[j][i] = fread_int(fl, 0, LONG_MAX);
-      }
-      for(i=0;i<5;i++) {
-         rdactiveclassname[j][i] = fread_string(fl, 0);
-         rdactiveclass[j][i] = fread_int(fl, 0, LONG_MAX);
-      }
-      for(i=0;i<5;i++) {
-         mvactiveclassname[j][i] = fread_string(fl, 0);
-         mvactiveclass[j][i] = fread_int(fl, 0, LONG_MAX);
-      }
-   }
-   dc_fclose(fl);
 
    for(d=descriptor_list;d;d=d->next) {
 
@@ -2726,71 +2742,71 @@ void check_leaderboard()
       k = MIN(CLASS_DRUID - 1,GET_CLASS(d->character) - 1);
 
       for(i=0;i<5;i++) {
-         if(!strcmp(hpactivename[i],GET_NAME(d->character))) {
+         if(hpactivename[i] && !strcmp(hpactivename[i],GET_NAME(d->character))) {
             for(j=i;j<4;j++) {
                hpactive[j] = hpactive[j+1];
                dc_free(hpactivename[j]);
-               hpactivename[j] = str_dup(hpactivename[j+1]);		
+               hpactivename[j] = str_dup0(hpactivename[j+1]);		
             }
             hpactive[4] = 0;
             dc_free(hpactivename[4]);
             hpactivename[4] = str_dup(" ");		
          }
-         if(!strcmp(mnactivename[i],GET_NAME(d->character))) {
+         if(mnactivename[i] && !strcmp(mnactivename[i],GET_NAME(d->character))) {
             for(j=i;j<4;j++) {
                mnactive[j] = mnactive[j+1];
                dc_free(mnactivename[j]);
-               mnactivename[j] = str_dup(mnactivename[j+1]);		
+               mnactivename[j] = str_dup0(mnactivename[j+1]);		
             }
             mnactive[4] = 0;
             dc_free(mnactivename[4]);
             mnactivename[4] = str_dup(" ");		
          }
-         if(!strcmp(kiactivename[i],GET_NAME(d->character))) {
+         if(kiactivename[i] && !strcmp(kiactivename[i],GET_NAME(d->character))) {
             for(j=i;j<4;j++) {
                kiactive[j] = kiactive[j+1];
                dc_free(kiactivename[j]);
-               kiactivename[j] = str_dup(kiactivename[j+1]);		
+               kiactivename[j] = str_dup0(kiactivename[j+1]);		
             }
             kiactive[4] = 0;
             dc_free(kiactivename[4]);
             kiactivename[4] = str_dup(" ");		
          }
-         if(!strcmp(pkactivename[i],GET_NAME(d->character))) {
+         if(pkactivename[i] && !strcmp(pkactivename[i],GET_NAME(d->character))) {
             for(j=i;j<4;j++) {
                pkactive[j] = pkactive[j+1];
                dc_free(pkactivename[j]);
-               pkactivename[j] = str_dup(pkactivename[j+1]);		
+               pkactivename[j] = str_dup0(pkactivename[j+1]);		
             }
             pkactive[4] = 0;
             dc_free(pkactivename[4]);
             pkactivename[4] = str_dup(" ");		
          }
-         if(!strcmp(pdactivename[i],GET_NAME(d->character))) {
+         if(pdactivename[i] && !strcmp(pdactivename[i],GET_NAME(d->character))) {
             for(j=i;j<4;j++) {
                pdactive[j] = pdactive[j+1];
                dc_free(pdactivename[j]);
-               pdactivename[j] = str_dup(pdactivename[j+1]);
+               pdactivename[j] = str_dup0(pdactivename[j+1]);
             }
             pdactive[4] = 0;
             dc_free(pdactivename[4]);
             pdactivename[4] = str_dup(" ");		
          }
-         if(!strcmp(rdactivename[i],GET_NAME(d->character))) {
+         if(rdactivename[i] && !strcmp(rdactivename[i],GET_NAME(d->character))) {
             for(j=i;j<4;j++) {
                rdactive[j] = rdactive[j+1];
                dc_free(rdactivename[j]);
-               rdactivename[j] = str_dup(rdactivename[j+1]);
+               rdactivename[j] = str_dup0(rdactivename[j+1]);
             }
             rdactive[4] = 0;
             dc_free(rdactivename[4]);
             rdactivename[4] = str_dup(" ");		
          }
-         if(!strcmp(mvactivename[i],GET_NAME(d->character))) {
+         if(mvactivename[i] && !strcmp(mvactivename[i],GET_NAME(d->character))) {
             for(j=i;j<4;j++) {
                mvactive[j] = mvactive[j+1];
                dc_free(mvactivename[j]);
-               mvactivename[j] = str_dup(mvactivename[j+1]);
+               mvactivename[j] = str_dup0(mvactivename[j+1]);
             }
             mvactive[4] = 0;
             dc_free(mvactivename[4]);
@@ -2799,71 +2815,71 @@ void check_leaderboard()
       }
 
       for(i=0;i<5;i++) {
-         if(!strcmp(hpactiveclassname[k][i],GET_NAME(d->character))) {
+         if(hpactiveclassname[k][i] && !strcmp(hpactiveclassname[k][i],GET_NAME(d->character))) {
             for(j=i;j<4;j++) {
                hpactiveclass[k][j] = hpactiveclass[k][j+1];
                dc_free(hpactiveclassname[k][j]);
-               hpactiveclassname[k][j] = str_dup(hpactiveclassname[k][j+1]);
+               hpactiveclassname[k][j] = str_dup0(hpactiveclassname[k][j+1]);
             }
             hpactiveclass[k][4] = 0;
             dc_free(hpactiveclassname[k][4]);
             hpactiveclassname[k][4] = str_dup(" ");		
          }
-         if(!strcmp(mnactiveclassname[k][i],GET_NAME(d->character))) {
+         if(mnactiveclassname[k][i] && !strcmp(mnactiveclassname[k][i],GET_NAME(d->character))) {
             for(j=i;j<4;j++) {
                mnactiveclass[k][j] = mnactiveclass[k][j+1];
                dc_free(mnactiveclassname[k][j]);
-               mnactiveclassname[k][j] = str_dup(mnactiveclassname[k][j+1]);		
+               mnactiveclassname[k][j] = str_dup0(mnactiveclassname[k][j+1]);		
             }
             mnactiveclass[k][4] = 0;
             dc_free(mnactiveclassname[k][4]);
             mnactiveclassname[k][4] = str_dup(" ");		
          }
-         if(!strcmp(kiactiveclassname[k][i],GET_NAME(d->character))) {
+         if(kiactiveclassname[k][i] && !strcmp(kiactiveclassname[k][i],GET_NAME(d->character))) {
             for(j=i;j<4;j++) {
                kiactiveclass[k][j] = kiactiveclass[k][j+1];
                dc_free(kiactiveclassname[k][j]);
-               kiactiveclassname[k][j] = str_dup(kiactiveclassname[k][j+1]);		
+               kiactiveclassname[k][j] = str_dup0(kiactiveclassname[k][j+1]);		
             }
             kiactiveclass[k][4] = 0;
             dc_free(kiactiveclassname[k][4]);
             kiactiveclassname[k][4] = str_dup(" ");		
          }
-         if(!strcmp(pkactiveclassname[k][i],GET_NAME(d->character))) {
+         if(pkactiveclassname[k][i] && !strcmp(pkactiveclassname[k][i],GET_NAME(d->character))) {
             for(j=i;j<4;j++) {
                pkactiveclass[k][j] = pkactiveclass[k][j+1];
                dc_free(pkactiveclassname[k][j]);
-               pkactiveclassname[k][j] = str_dup(pkactiveclassname[k][j+1]);		
+               pkactiveclassname[k][j] = str_dup0(pkactiveclassname[k][j+1]);		
             }
             pkactiveclass[k][4] = 0;
             dc_free(pkactiveclassname[k][4]);
             pkactiveclassname[k][4] = str_dup(" ");		
          }
-         if(!strcmp(pdactiveclassname[k][i],GET_NAME(d->character))) {
+         if(pdactiveclassname[k][i] && !strcmp(pdactiveclassname[k][i],GET_NAME(d->character))) {
             for(j=i;j<4;j++) {
                pdactiveclass[k][j] = pdactiveclass[k][j+1];
                dc_free(pdactiveclassname[k][j]);
-               pdactiveclassname[k][j] = str_dup(pdactiveclassname[k][j+1]);
+               pdactiveclassname[k][j] = str_dup0(pdactiveclassname[k][j+1]);
             }
             pdactiveclass[k][4] = 0;
             dc_free(pdactiveclassname[k][4]);
             pdactiveclassname[k][4] = str_dup(" ");		
          }
-         if(!strcmp(rdactiveclassname[k][i],GET_NAME(d->character))) {
+         if(rdactiveclassname[k][i] && !strcmp(rdactiveclassname[k][i],GET_NAME(d->character))) {
             for(j=i;j<4;j++) {
                rdactiveclass[k][j] = rdactiveclass[k][j+1];
                dc_free(rdactiveclassname[k][j]);
-               rdactiveclassname[k][j] = str_dup(rdactiveclassname[k][j+1]);
+               rdactiveclassname[k][j] = str_dup0(rdactiveclassname[k][j+1]);
             }
             rdactiveclass[k][4] = 0;
             dc_free(rdactiveclassname[k][4]);
             rdactiveclassname[k][4] = str_dup(" ");		
          }
-         if(!strcmp(mvactiveclassname[k][i],GET_NAME(d->character))) {
+         if(mvactiveclassname[k][i] && !strcmp(mvactiveclassname[k][i],GET_NAME(d->character))) {
             for(j=i;j<4;j++) {
                mvactiveclass[k][j] = mvactiveclass[k][j+1];
                dc_free(mvactiveclassname[k][j]);
-               mvactiveclassname[k][j] = str_dup(mvactiveclassname[k][j+1]);
+               mvactiveclassname[k][j] = str_dup0(mvactiveclassname[k][j+1]);
             }
             mvactiveclass[k][4] = 0;
             dc_free(mvactiveclassname[k][4]);
@@ -2876,7 +2892,7 @@ void check_leaderboard()
             for(j=4;j>i;j--) {
                hpactive[j] = hpactive[j-1];
                dc_free(hpactivename[j]);
-               hpactivename[j] = str_dup(hpactivename[j-1]);
+               hpactivename[j] = str_dup0(hpactivename[j-1]);
             }
             hpactive[i] = GET_MAX_HIT(d->character);
             dc_free(hpactivename[i]);
@@ -2889,7 +2905,7 @@ void check_leaderboard()
             for(j=4;j>i;j--) {
                mnactive[j] = mnactive[j-1];
                dc_free(mnactivename[j]);
-               mnactivename[j] = str_dup(mnactivename[j-1]);
+               mnactivename[j] = str_dup0(mnactivename[j-1]);
             }
             mnactive[i] = GET_MAX_MANA(d->character);
             dc_free(mnactivename[i]);
@@ -2902,7 +2918,7 @@ void check_leaderboard()
             for(j=4;j>i;j--) {
                kiactive[j] = kiactive[j-1];
                dc_free(kiactivename[j]);
-               kiactivename[j] = str_dup(kiactivename[j-1]);
+               kiactivename[j] = str_dup0(kiactivename[j-1]);
             }
             kiactive[i] = GET_MAX_KI(d->character);
             dc_free(kiactivename[i]);
@@ -2915,7 +2931,7 @@ void check_leaderboard()
             for(j=4;j>i;j--) {
                pkactive[j] = pkactive[j-1];
                dc_free(pkactivename[j]);
-               pkactivename[j] = str_dup(pkactivename[j-1]);
+               pkactivename[j] = str_dup0(pkactivename[j-1]);
             }
             pkactive[i] = (int)GET_PKILLS(d->character);
             dc_free(pkactivename[i]);
@@ -2928,7 +2944,7 @@ void check_leaderboard()
             for(j=4;j>i;j--) {
                pdactive[j] = pdactive[j-1];
                dc_free(pdactivename[j]);
-               pdactivename[j] = str_dup(pdactivename[j-1]);
+               pdactivename[j] = str_dup0(pdactivename[j-1]);
             }
             pdactive[i] = do_pdscore(d->character);
             dc_free(pdactivename[i]);
@@ -2942,7 +2958,7 @@ void check_leaderboard()
             for(j=4;j>i;j--) {
                rdactive[j] = rdactive[j-1];
                dc_free(rdactivename[j]);
-               rdactivename[j] = str_dup(rdactivename[j-1]);
+               rdactivename[j] = str_dup0(rdactivename[j-1]);
             }
             rdactive[i] = (int)GET_RDEATHS(d->character);
             dc_free(rdactivename[i]);
@@ -2955,7 +2971,7 @@ void check_leaderboard()
             for(j=4;j>i;j--) {
                mvactive[j] = mvactive[j-1];
                dc_free(mvactivename[j]);
-               mvactivename[j] = str_dup(mvactivename[j-1]);
+               mvactivename[j] = str_dup0(mvactivename[j-1]);
             }
             mvactive[i] = GET_MAX_MOVE(d->character);
             dc_free(mvactivename[i]);
@@ -2968,7 +2984,7 @@ void check_leaderboard()
             for(j=4;j>i;j--) {
                hpactiveclass[k][j] = hpactiveclass[k][j-1];
                dc_free(hpactiveclassname[k][j]);
-               hpactiveclassname[k][j] = str_dup(hpactiveclassname[k][j-1]);
+               hpactiveclassname[k][j] = str_dup0(hpactiveclassname[k][j-1]);
             }
             hpactiveclass[k][i] = GET_MAX_HIT(d->character);
             dc_free(hpactiveclassname[k][i]);
@@ -2981,7 +2997,7 @@ void check_leaderboard()
             for(j=4;j>i;j--) {
                mnactiveclass[k][j] = mnactiveclass[k][j-1];
                dc_free(mnactiveclassname[k][j]);
-               mnactiveclassname[k][j] = str_dup(mnactiveclassname[k][j-1]);
+               mnactiveclassname[k][j] = str_dup0(mnactiveclassname[k][j-1]);
             }
             mnactiveclass[k][i] = GET_MAX_MANA(d->character);
             dc_free(mnactiveclassname[k][i]);
@@ -2994,7 +3010,7 @@ void check_leaderboard()
             for(j=4;j>i;j--) {
                kiactiveclass[k][j] = kiactiveclass[k][j-1];
                dc_free(kiactiveclassname[k][j]);
-               kiactiveclassname[k][j] = str_dup(kiactiveclassname[k][j-1]);
+               kiactiveclassname[k][j] = str_dup0(kiactiveclassname[k][j-1]);
             }
             kiactiveclass[k][i] = GET_MAX_KI(d->character);
             dc_free(kiactiveclassname[k][i]);
@@ -3007,7 +3023,7 @@ void check_leaderboard()
             for(j=4;j>i;j--) {
                pkactiveclass[k][j] = pkactiveclass[k][j-1];
                dc_free(pkactiveclassname[k][j]);
-               pkactiveclassname[k][j] = str_dup(pkactiveclassname[k][j-1]);
+               pkactiveclassname[k][j] = str_dup0(pkactiveclassname[k][j-1]);
             }
             pkactiveclass[k][i] = (int)GET_PKILLS(d->character);
             dc_free(pkactiveclassname[k][i]);
@@ -3020,7 +3036,7 @@ void check_leaderboard()
             for(j=4;j>i;j--) {
                pdactiveclass[k][j] = pdactiveclass[k][j-1];
                dc_free(pdactiveclassname[k][j]);
-               pdactiveclassname[k][j] = str_dup(pdactiveclassname[k][j-1]);
+               pdactiveclassname[k][j] = str_dup0(pdactiveclassname[k][j-1]);
             }
             pdactiveclass[k][i] = do_pdscore(d->character);
             dc_free(pdactiveclassname[k][i]);
@@ -3034,7 +3050,7 @@ void check_leaderboard()
             for(j=4;j>i;j--) {
                rdactiveclass[k][j] = rdactiveclass[k][j-1];
                dc_free(rdactiveclassname[k][j]);
-               rdactiveclassname[k][j] = str_dup(rdactiveclassname[k][j-1]);
+               rdactiveclassname[k][j] = str_dup0(rdactiveclassname[k][j-1]);
             }
             rdactiveclass[k][i] = (int)GET_RDEATHS(d->character);
             dc_free(rdactiveclassname[k][i]);
@@ -3047,7 +3063,7 @@ void check_leaderboard()
             for(j=4;j>i;j--) {
                mvactiveclass[k][j] = mvactiveclass[k][j-1];
                dc_free(mvactiveclassname[k][j]);
-               mvactiveclassname[k][j] = str_dup(mvactiveclassname[k][j-1]);
+               mvactiveclassname[k][j] = str_dup0(mvactiveclassname[k][j-1]);
             }
             mvactiveclass[k][i] = GET_MAX_MOVE(d->character);
             dc_free(mvactiveclassname[k][i]);
