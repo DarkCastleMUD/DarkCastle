@@ -506,9 +506,10 @@ int do_sing(CHAR_DATA *ch, char *arg, int cmd)
         }
     }
 
-    if((getTotalRating(ch) + song_info[spl].rating > BARD_MAX_RATING) ||
-     (spl == SKILL_SONG_GLITTER_DUST - SKILL_SONG_BASE) ||
-     (spl == SKILL_SONG_ASTRAL_CHANTY - SKILL_SONG_BASE) )
+    if(IS_SINGING(ch) &&
+       ((getTotalRating(ch) + song_info[spl].rating > BARD_MAX_RATING) ||
+	(spl == SKILL_SONG_GLITTER_DUST - SKILL_SONG_BASE) ||
+	(spl == SKILL_SONG_ASTRAL_CHANTY - SKILL_SONG_BASE)))
     {
      send_to_char("You are unable to orchestrate such a complicated melody!\r\n", ch);
      return eFAILURE;
