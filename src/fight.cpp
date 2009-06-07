@@ -20,7 +20,7 @@
  * 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead *
  * of just race stuff                                                     *
  **************************************************************************
- * $Id: fight.cpp,v 1.543 2009/05/27 17:51:10 shane Exp $               *
+ * $Id: fight.cpp,v 1.544 2009/06/07 06:18:27 jhhudso Exp $               *
  **************************************************************************/
 
 extern "C"
@@ -275,9 +275,9 @@ void perform_violence(void)
    }
    if (SOMEONE_DIED(retval)) continue;
 
-  // Fix for null fighty thing. Charmie joins, enemy wimpies. Fighting has stopped, but no code here, until now, detected it.
-  if (!ch->fighting || !ch->fighting->in_room == ch->in_room) continue;
-
+   if (!ch->fighting || ch->fighting->in_room != ch->in_room) {
+     continue;
+   }
 
     if(can_attack(ch)) {
       is_mob = IS_MOB(ch);
@@ -316,26 +316,7 @@ void perform_violence(void)
       if(SOMEONE_DIED(retval)) // no point in going anymore
         continue;
 
-/*	if (ch->equipment[WIELD]) {
-        if (obj_index[ch->equipment[WIELD]->item_number].combat_func) {
-	   retval = ((*obj_index[ch->equipment[WIELD]->item_number].combat_func)
-	             (ch, ch->equipment[WIELD], 0, "", ch));
-	   if (SOMEONE_DIED(retval))
-	      continue;
-        }
-
-        if(ch->equipment[SECOND_WIELD]) {
-          if(obj_index[ch->equipment[SECOND_WIELD]->item_number].combat_func) {
-            retval = ((*obj_index[ch->equipment[SECOND_WIELD]->item_number].combat_func)
-                     (ch, ch->equipment[SECOND_WIELD], 0, "", ch));
-            if(SOMEONE_DIED(retval))
-              continue;
-          }
-        }
-      }
-      if (SOMEONE_DIED(retval))
-          continue;    // Fix for procs beng called on dead chars. 
-  */    // MOB Progs
+      // MOB Progs
       retval = mprog_hitprcnt_trigger( ch, ch->fighting );
       if(SOMEONE_DIED(retval))
         continue;
