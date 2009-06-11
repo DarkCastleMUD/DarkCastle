@@ -506,10 +506,7 @@ int do_sing(CHAR_DATA *ch, char *arg, int cmd)
         }
     }
 
-    if(IS_SINGING(ch) &&
-       ((getTotalRating(ch) + song_info[spl].rating > BARD_MAX_RATING) ||
-	(spl == SKILL_SONG_GLITTER_DUST - SKILL_SONG_BASE) ||
-	(spl == SKILL_SONG_ASTRAL_CHANTY - SKILL_SONG_BASE)))
+    if( getTotalRating(ch) + song_info[spl].rating > BARD_MAX_RATING )
     {
      send_to_char("You are unable to orchestrate such a complicated melody!\r\n", ch);
      return eFAILURE;
@@ -915,10 +912,16 @@ void update_bard_singing()
       (*j).song_timer = 0;
 
       int learned = has_skill(i, ( (*j).song_number + SKILL_SONG_BASE ) );
+      int retval;
 
       if((song_info[(*j).song_number].exec_pointer))
-        ((*song_info[(*j).song_number].exec_pointer) (GET_LEVEL(i), i, NULL, NULL, learned));
+        retval = ((*song_info[(*j).song_number].exec_pointer) (GET_LEVEL(i), i, NULL, NULL, learned));
       else send_to_char("Bad exec pointer on the song you sang.  Tell a god.\r\n", i);
+
+      if(retval == eEXTRA_VALUE) { //the song killed itself
+        --j;
+      }
+
     }
     else if((*j).song_timer == 0) {
      i->songs.erase(j);
@@ -1202,7 +1205,8 @@ int execute_song_healing_melody( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DAT
    
    if(!skill_success(ch, NULL, SKILL_SONG_HEALING_MELODY)  ) {
       send_to_char("You run out of lyrics and end the song.\r\n", ch);
-      return eSUCCESS;
+      ch->songs.erase(i);
+      return eEXTRA_VALUE;
    }
    if(ch->songs.size() > 1 && !skill_success(ch, NULL, SKILL_ORCHESTRATE)) {
     csendf(ch, "You miss a note, ruining your orchestration of %s!\r\n", songs[(*i).song_number]);
@@ -1303,7 +1307,8 @@ int execute_song_revealing_stacato( ubyte level, CHAR_DATA *ch, char *arg, CHAR_
 
    if( !skill_success(ch,NULL,  SKILL_SONG_REVEAL_STACATO)  ) {
       send_to_char("You run out of lyrics and end the song.\r\n", ch);
-      return eSUCCESS;
+      ch->songs.erase(k);
+      return eEXTRA_VALUE;
    }
    if(ch->songs.size() > 1 && !skill_success(ch, NULL, SKILL_ORCHESTRATE)) {
     csendf(ch, "You miss a note, ruining your orchestration of %s!\r\n", songs[(*k).song_number]);
@@ -1432,7 +1437,8 @@ int execute_song_terrible_clef( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA
 
   if(!skill_success(ch, victim, SKILL_SONG_TERRIBLE_CLEF)  ) {
       send_to_char("You run out of lyrics and end the song.\r\n", ch);
-      return eSUCCESS;
+      ch->songs.erase(i);
+      return eEXTRA_VALUE;
    }
 
    if(ch->songs.size() > 1 && !skill_success(ch, NULL, SKILL_ORCHESTRATE)) {
@@ -1526,7 +1532,8 @@ int execute_song_soothing_remembrance( ubyte level, CHAR_DATA *ch, char *arg, CH
 
   if(!skill_success(ch, NULL, SKILL_SONG_SOOTHING_REMEM)  ) {
       send_to_char("You run out of lyrics and end the song.\r\n", ch);
-      return eSUCCESS;
+      ch->songs.erase(i);
+      return eEXTRA_VALUE;
    }
    if(ch->songs.size() > 1 && !skill_success(ch, NULL, SKILL_ORCHESTRATE)) {
     csendf(ch, "You miss a note, ruining your orchestration of %s!\r\n", songs[(*i).song_number]);
@@ -1618,7 +1625,8 @@ int execute_song_traveling_march( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DA
 
   if(!skill_success(ch, NULL, SKILL_SONG_TRAVELING_MARCH)  ) {
       send_to_char("You run out of lyrics and end the song.\r\n", ch);
-      return eSUCCESS;
+      ch->songs.erase(i);
+      return eEXTRA_VALUE;
    }
    if(ch->songs.size() > 1 && !skill_success(ch, NULL, SKILL_ORCHESTRATE)) {
     csendf(ch, "You miss a note, ruining your orchestration of %s!\r\n", songs[(*i).song_number]);
@@ -3295,8 +3303,8 @@ int execute_song_crushing_crescendo( ubyte level, CHAR_DATA *ch, char *arg, CHAR
   if((int)(*i).song_data > has_skill(ch,SKILL_SONG_CRUSHING_CRESCENDO) /20 || (int)(*i).song_data > 3) 
   {
       send_to_char("You run out of lyrics and end the song.\r\n", ch);
-      (*i).song_data = 0;
-      return eSUCCESS;
+      ch->songs.erase(i);
+      return eEXTRA_VALUE;
    }
 
   if (((int)(*i).song_data) != 3) {
