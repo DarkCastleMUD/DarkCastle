@@ -144,13 +144,13 @@ private:
 void AuctionHouse::ShowStats(CHAR_DATA *ch)
 {
   send_to_char("Vendor Statistics:\r\n", ch);
-  csendf(ch, "Items Posted:     %d\r\n", ItemsPosted);
-  csendf(ch, "Items For Sale:   %d\r\n", ItemsActive);
-  csendf(ch, "Items Sold:       %d\r\n", ItemsSold);
-  csendf(ch, "Items Expired:    %d\r\n", ItemsExpired);
-  csendf(ch, "Total Revenue:    %d\r\n", Revenue);
-  csendf(ch, "Tax Collected:    %d\r\n", TaxCollected);
-  csendf(ch, "Uncollected Gold: %d\r\n", UncollectedGold);
+  csendf(ch, "Items Posted:     %u\r\n", ItemsPosted);
+  csendf(ch, "Items For Sale:   %u\r\n", ItemsActive);
+  csendf(ch, "Items Sold:       %u\r\n", ItemsSold);
+  csendf(ch, "Items Expired:    %u\r\n", ItemsExpired);
+  csendf(ch, "Total Revenue:    %u\r\n", Revenue);
+  csendf(ch, "Tax Collected:    %u\r\n", TaxCollected);
+  csendf(ch, "Uncollected Gold: %u\r\n", UncollectedGold);
   return;
 }
 
