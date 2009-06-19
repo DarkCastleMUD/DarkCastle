@@ -19,11 +19,16 @@ one liner quest shit
 #include <spells.h>
 #include <vector>
 #include <string.h>
+#include <room.h>
 
 using namespace std;
 
 typedef vector<quest_info *> quest_list_t;
 quest_list_t quest_list;
+
+extern int top_of_mobt;
+extern CWorld world;
+extern zone_data *zone_table;
 
 char *valid_fields[] = {
     "name",
@@ -304,7 +309,7 @@ void show_quest_header(CHAR_DATA *ch)
    csendf(ch,"  .-------------------------------------------------------------------------.\n\r"
              " /.-.                                                                     .-.\\\n\r"
              "[/   \\                                                                   /   \\]\n\r"
-             "[\\__. !                    $B$2Dark Castle Quest System$R                     ! .__/]\n\r"
+             "[\\__. !                    $B$2Dark Castle Quest System$R                     ! ._/]\n\r"
              "[\\  ! /                                                                 \\ !  /]\n\r"
              "[ `--'                                                                   `--' ]\n\r"
 	     "[-----------------------------------------------------------------------------]\n\r\n\r"
@@ -510,7 +515,7 @@ int start_quest(CHAR_DATA *ch, struct quest_info *quest)
    }
 
    while(count < QUEST_MAX) {
-      if(!ch->pcdata->quest_current[count])
+      if(ch->pcdata->quest_current[count] == -1)
          break;
       count++;
       if(count == QUEST_MAX) {
@@ -533,7 +538,24 @@ int start_quest(CHAR_DATA *ch, struct quest_info *quest)
        }
    }
 
-   if((mob = get_mob_vnum(quest->mobnum))) {
+   int dontwannabeinthisforever = 0;
+
+   if(!quest->number) { //recurring quest
+    while( ++dontwannabeinthisforever < 100 ) {
+     mob = get_mob_vnum(number(1, 34000));
+     if( mob && (GET_LEVEL(mob) < 90) && !IS_SET(zone_table[world[mob->in_room].zone].zone_flags, ZONE_NOHUNT) && (strlen(mob->description) > 80) )
+      break;
+    }
+    quest->hint1 = str_hsh(mob->description);
+   }
+   else 
+    mob = get_mob_vnum(quest->mobnum);
+
+   if(!mob) {
+     send_to_char("This quest is temporarily unavailable.\n\r", ch);
+     return eFAILURE;
+   }
+
       obj = clone_object(real_object(quest->objnum));
       obj->short_description = str_hsh(quest->objshort);
       obj->description = str_hsh(quest->objlong);
@@ -548,14 +570,11 @@ int start_quest(CHAR_DATA *ch, struct quest_info *quest)
       wear(mob, obj, keywordfind(obj));
 
       logf(IMMORTAL, LOG_QUEST, "%s started quest %d (%s) costing %d plats %d brownie(s).", GET_NAME(ch), quest->number, quest->name, quest->cost, quest->brownie);
-   } else {
-     send_to_char("This quest is temporarily unavailable.\n\r", ch);
-     return eFAILURE;
-   }
 
    ch->pcdata->quest_current[count] = quest->number;     
    ch->pcdata->quest_current_ticksleft[count] = quest->timer;
-   quest->active = TRUE;
+   if(quest->number)
+    quest->active = TRUE;
    count = 0;
    while(count < QUEST_CANCEL) {
       if(ch->pcdata->quest_cancel[count] == quest->number) {
@@ -623,9 +642,10 @@ int complete_quest(CHAR_DATA *ch, struct quest_info *quest)
 
    obj_from_char(obj);
    ch->pcdata->quest_points += quest->reward;
-   ch->pcdata->quest_current[count] = 0;
+   ch->pcdata->quest_current[count] = -1;
    ch->pcdata->quest_current_ticksleft[count] = 0;
-   SETBIT(ch->pcdata->quest_complete, quest->number);
+   if(quest->number) //quest 0 is recurring auto quest
+    SETBIT(ch->pcdata->quest_complete, quest->number);
    quest->active = FALSE;
    
    logf(IMMORTAL, LOG_QUEST, "%s completed quest %d (%s) and won %d qpoints.", GET_NAME(ch), quest->number, quest->name, quest->reward);
@@ -649,7 +669,7 @@ int stop_current_quest(CHAR_DATA *ch, struct quest_info *quest)
          return eFAILURE;
       }
    }
-   ch->pcdata->quest_current[count] = 0;
+   ch->pcdata->quest_current[count] = -1;
    ch->pcdata->quest_current_ticksleft[count] = 0;
    quest->active = FALSE;
    sprintf(buf, "q%d", quest->number);
@@ -765,12 +785,22 @@ int quest_handler(CHAR_DATA *ch, CHAR_DATA *qmaster, int cmd, char *name)
       case 3:
          retval = start_quest(ch, quest);
          if(IS_SET(retval, eSUCCESS)) {
+           if(quest->number) {
             sprintf(buf, "%s Excellent!  Let me write down the quest information for you.", GET_NAME(ch));
             do_psay(qmaster, buf, 9);
             do_emote(qmaster, "gives up the scroll.", 9);
             show_quest_header(ch);
             show_one_quest(ch, quest, 0);
             show_quest_footer(ch);
+           } else {
+            sprintf(buf, "%s I have placed a token of Phire upon a creature somewhere within the realms.", GET_NAME(ch));
+            do_psay(qmaster, buf, 9);
+            sprintf(buf, "%s Retrieve it for me within 12 hours for a reward!", GET_NAME(ch));
+            do_psay(qmaster, buf, 9);
+            show_quest_header(ch);
+            show_one_quest(ch, quest, 0);
+            show_quest_footer(ch);
+           }
          }
          else if(IS_SET(retval, eEXTRA_VALUE)) {
             sprintf(buf, "%s You cannot start any more quests without completing some first.", GET_NAME(ch));

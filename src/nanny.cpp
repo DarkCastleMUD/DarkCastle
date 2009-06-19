@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.184 2009/05/20 00:10:20 kkoons Exp $ */
+/* $Id: nanny.cpp,v 1.185 2009/06/19 00:51:37 shane Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -386,7 +386,7 @@ void do_on_login_stuff(char_data * ch)
     ch->cRooms = 0;
     REMBIT(ch->affected_by, AFF_BLACKJACK_ALERT);
     for(int i=0;i<QUEST_MAX;i++) {
-       ch->pcdata->quest_current[i] = 0;
+       ch->pcdata->quest_current[i] = -1;
        ch->pcdata->quest_current_ticksleft[i] = 0;
     }
     struct vault_data *vault = has_vault(GET_NAME(ch));
