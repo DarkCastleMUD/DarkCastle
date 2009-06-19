@@ -175,42 +175,6 @@ int do_zoneexits(struct char_data *ch, char *argument, int cmd)
 }
 
 
-
-int do_atob(struct char_data *ch, char *argument, int cmd)
-{
-   char buffer[MAX_INPUT_LENGTH];
-   int start, end;
-   bool stayzone;
-
-   one_argument(argument, buffer);
-   if(!*buffer)
-   {
-     send_to_char("atob start end <true|false>\r\n", ch);
-     return eFAILURE;
-   } 
-   start = atoi(buffer);
-
-   one_argument(argument, buffer);
-   if(!*buffer)
-   {
-   } 
- 
-   end = atoi(buffer);
-
-   one_argument(argument, buffer);
-   if(!*buffer)
-   {
-   } 
-   if(buffer[0] == 't')
-     stayzone = true;
-   else if(buffer[0] == 'f')
-     stayzone = false;
-   else
-   {//bad args
-   }
-}
-
-
 int do_purloin(struct char_data *ch, char *argument, int cmd)
 {
    char bufName[200], *pBuf;
