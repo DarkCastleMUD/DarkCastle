@@ -11,10 +11,205 @@
 #include <handler.h>
 #include <returnvals.h>
 #include <spells.h>
+#include <string>
+#include <game_portal.h>
+
+using namespace std;
 
 extern struct obj_data *object_list;
+extern struct room_data ** world_array;
+extern char *dirs[];
 
 int get_number(char **name);
+
+
+int do_zoneexits(struct char_data *ch, char *argument, int cmd)
+{
+//  try
+ // {
+    char buf[MAX_STRING_LENGTH];
+    string output = "";
+    struct room_direction_data *curExits;
+    int curZone = GET_ZONE(ch);
+    int curRoom = ch->in_room;
+    OBJ_DATA *portal;
+    int i, dir;
+    int low, high;
+    int last_good = curRoom;
+
+    if(!can_modify_room(ch, ch->in_room)) 
+    {
+      send_to_char("You are unable to do this outside of your range.\n\r", ch);
+      return eFAILURE;
+    }
+
+    csendf(ch, "Searching Zone: %d - %s\r\n", curZone, zone_table[world[curRoom].zone].name);
+    for(low = curRoom; low > 0; low--)
+    {
+      if(!world_array[low-1]) continue;
+      last_good = low;
+      if(world[low-1].zone != curZone) break;
+    }
+    low = last_good;
+    last_good = curRoom;
+    for(high = curRoom; high < top_of_world; high++)
+    {
+      if(!world_array[high+1]) continue;
+      last_good = high;
+      if(world[high+1].zone != curZone) break;
+    }
+    high = last_good;
+    
+    for(i = low; i < high; i++)
+    {
+      if(!world_array[i]) continue;
+      for(dir = 0; dir < 6; dir++)
+      {
+        if ((curExits = world[i].dir_option[dir]) != 0)
+        {
+          if(curExits->to_room > 0 && world[curExits->to_room].zone != curZone)
+          {
+            sprintf(buf, "Room %5d - %5s to Room %5d, zone %3d (%s)\r\n",
+                     i, dirs[dir], curExits->to_room, world[curExits->to_room].zone,
+                     zone_table[world[curExits->to_room].zone].name);
+
+            output += buf;
+          }
+        }
+      }
+      for(portal = world[i].contents; portal; portal = portal->next_content)
+      {
+        if(portal->obj_flags.type_flag == ITEM_CLIMBABLE) 
+        {
+          if(portal->obj_flags.value[0] < 0)
+          {
+            sprintf(buf, "Room %5d - climb to Room %5d (ERROR)\r\n",
+                     i, real_room(portal->obj_flags.value[0]));
+
+            output += buf;
+          }
+          else if(!world_array[portal->obj_flags.value[0]])
+          {
+            sprintf(buf, "Room %5d - climb to Room %5d (DOES NOT EXIST)\r\n",
+                     i, real_room(portal->obj_flags.value[0]));
+
+            output += buf;
+          }
+          else if (world[real_room(portal->obj_flags.value[0])].zone != curZone)
+          {
+            sprintf(buf, "Room %5d - climb to Room %5d, zone %3d (%s)\r\n",
+                     i, real_room(portal->obj_flags.value[0]), 
+                     world[real_room(portal->obj_flags.value[0])].zone,
+                     zone_table[world[real_room(portal->obj_flags.value[0])].zone].name);
+
+            output += buf;
+          }
+        }
+
+        if (portal->obj_flags.type_flag == ITEM_PORTAL
+            && !IS_SET(portal->obj_flags.value[3], PORTAL_NO_ENTER)
+            && (portal->obj_flags.value[1] == 1 || portal->obj_flags.value[1] == 2)
+           ) 
+        {
+          if (real_room(portal->obj_flags.value[0]) < 0) 
+          {
+            sprintf(buf, "Room %5d - enter to Room %5d (ERROR)\r\n",
+                     i,real_room(portal->obj_flags.value[0]));
+
+            output += buf;
+          }
+          else if (!world_array[real_room(portal->obj_flags.value[0])]) 
+          {
+            sprintf(buf, "Room %5d - enter to Room %5d (DOES NOT EXIST)\r\n",
+                     i,real_room(portal->obj_flags.value[0]));
+
+            output += buf;
+          }
+          else if (world[real_room(portal->obj_flags.value[0])].zone != curZone)
+          {
+            sprintf(buf, "Room %5d - enter to Room %5d, zone %3d (%s)\r\n",
+                     i, real_room(portal->obj_flags.value[0]), 
+                     world[real_room(portal->obj_flags.value[0])].zone,
+                     zone_table[world[real_room(portal->obj_flags.value[0])].zone].name);
+
+            output += buf;
+          } 
+        }
+      }
+
+      for(portal = object_list; portal; portal = portal->next) 
+      {
+        if((portal->obj_flags.type_flag == ITEM_PORTAL) 
+            && (portal->obj_flags.value[1] == 1 || (portal->obj_flags.value[1] == 2)) 
+            && (portal->in_room > -1) 
+            && !IS_SET(portal->obj_flags.value[3], PORTAL_NO_LEAVE)) 
+        {
+          if((portal->obj_flags.value[0] == world[i].number) 
+              ||(portal->obj_flags.value[2] == world[i].zone)) 
+          {
+            if(world[real_room(portal->in_room)].zone != curZone)
+            {
+              sprintf(buf, "Room %5d - leave to Room %5d, zone %3d (%s)\r\n",
+                     i, real_room(portal->in_room), 
+                     world[real_room(portal->in_room)].zone,
+                     zone_table[world[real_room(portal->in_room)].zone].name);
+
+              output += buf;
+            }
+
+          }
+        }
+      }
+    }
+
+  send_to_char(output.c_str(), ch);
+ // }
+ // catch(char *errmsg)
+ // {
+ //   csendf(ch, "Error encountered while finding zone exits:\r\n%s\r\n", errmsg);
+ //   send_to_char("Ask Rubicon if it needs fixed...\r\n", ch);
+ //   return eFAILURE;
+  //}
+
+  return eSUCCESS;
+}
+
+
+
+int do_atob(struct char_data *ch, char *argument, int cmd)
+{
+   char buffer[MAX_INPUT_LENGTH];
+   int start, end;
+   bool stayzone;
+
+   one_argument(argument, buffer);
+   if(!*buffer)
+   {
+     send_to_char("atob start end <true|false>\r\n", ch);
+     return eFAILURE;
+   } 
+   start = atoi(buffer);
+
+   one_argument(argument, buffer);
+   if(!*buffer)
+   {
+   } 
+ 
+   end = atoi(buffer);
+
+   one_argument(argument, buffer);
+   if(!*buffer)
+   {
+   } 
+   if(buffer[0] == 't')
+     stayzone = true;
+   else if(buffer[0] == 'f')
+     stayzone = false;
+   else
+   {//bad args
+   }
+}
+
 
 int do_purloin(struct char_data *ch, char *argument, int cmd)
 {
