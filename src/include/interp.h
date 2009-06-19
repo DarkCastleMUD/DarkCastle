@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: interp.h,v 1.107 2009/05/26 06:29:27 shane Exp $ */
+/* $Id: interp.h,v 1.108 2009/06/19 21:17:24 kkoons Exp $ */
 
 #ifndef INTERP_H_
 #define INTERP_H_
@@ -570,6 +570,7 @@ DO_FUN do_write_skillquest;
 DO_FUN do_write;
 DO_FUN do_zap;
 DO_FUN do_zedit;
+DO_FUN do_zoneexits;
 DO_FUN do_zsave;
 DO_FUN do_editor;
 
