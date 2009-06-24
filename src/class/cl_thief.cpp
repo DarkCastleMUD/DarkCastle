@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.196 2009/05/26 06:29:23 shane Exp $
+| $Id: cl_thief.cpp,v 1.197 2009/06/24 01:34:34 shane Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -534,14 +534,16 @@ int do_circle(CHAR_DATA *ch, char *argument, int cmd)
 
    if (!charge_moves(ch, SKILL_CIRCLE)) return eSUCCESS;
 
+   bool stabbingCircle = FALSE;
+
    switch (get_weapon_damage_type(ch->equipment[WIELD])) {
    case TYPE_PIERCE:
    case TYPE_STING:
-     break;
+     stabbingCircle = TRUE;
      break;
    default:
-     send_to_char("Only certain weapons can be used for backstabbing, this is not one of them.\n\r", ch);
-     return eFAILURE;
+//     send_to_char("Only certain weapons can be used for backstabbing, this is not one of them.\n\r", ch);
+//     return eFAILURE;
      break;
    }
    
@@ -571,28 +573,32 @@ int do_circle(CHAR_DATA *ch, char *argument, int cmd)
    else 
    {
       SET_BIT(ch->combat, COMBAT_CIRCLE);
-      retval = one_hit(ch, victim, SKILL_BACKSTAB, FIRST);
+      if(stabbingCircle) retval = one_hit(ch, victim, SKILL_BACKSTAB, FIRST);
+      else retval = one_hit(ch, victim, SKILL_CIRCLE, FIRST);
 
       if(SOMEONE_DIED(retval))
         return retval;
 
       // Now go for dual backstab
-      if (has_skill(ch, SKILL_DUAL_BACKSTAB) &&
-          ((GET_CLASS(ch) == CLASS_THIEF) || (GET_LEVEL(ch) >= ARCHANGEL)))
-         if (ch->equipment[SECOND_WIELD])
-            if ((ch->equipment[SECOND_WIELD]->obj_flags.value[3] == 11) ||
-                (ch->equipment[SECOND_WIELD]->obj_flags.value[3] == 9)) {
-	               WAIT_STATE(ch, PULSE_VIOLENCE);
+      if (ch->equipment[SECOND_WIELD] && ( has_skill(ch, SKILL_DUAL_BACKSTAB) || (GET_LEVEL(ch) >= ARCHANGEL) )  )
+      {
+        WAIT_STATE(ch, PULSE_VIOLENCE);
+        if ( AWAKE(victim) && !skill_success(ch,victim,SKILL_DUAL_BACKSTAB) )
+         retval = damage(ch, victim, 0, TYPE_UNDEFINED, SKILL_BACKSTAB, SECOND);
+        else {
+         SET_BIT(ch->combat, COMBAT_CIRCLE);
 
-               if (AWAKE(victim) && !skill_success(ch,victim,SKILL_DUAL_BACKSTAB))
-                  retval = damage(ch, victim, 0, TYPE_UNDEFINED, SKILL_BACKSTAB,
-                         SECOND);
-               else {
-                  SET_BIT(ch->combat, COMBAT_CIRCLE);
-                  retval = one_hit(ch, victim, SKILL_BACKSTAB, SECOND);
-                  }
-               } // end of if that checks weapon's validity
-   //} // end of else
+         switch (get_weapon_damage_type(ch->equipment[SECOND_WIELD])) {
+          case TYPE_PIERCE:
+          case TYPE_STING:
+            retval = one_hit(ch, victim, SKILL_BACKSTAB, SECOND);
+            break;
+          default:
+            retval = one_hit(ch, victim, SKILL_CIRCLE, SECOND);
+            break;
+         }
+        }
+      }
    }
 
   if (!SOMEONE_DIED(retval)) {
