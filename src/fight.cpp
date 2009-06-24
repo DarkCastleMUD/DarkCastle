@@ -20,7 +20,7 @@
  * 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead *
  * of just race stuff                                                     *
  **************************************************************************
- * $Id: fight.cpp,v 1.544 2009/06/07 06:18:27 jhhudso Exp $               *
+ * $Id: fight.cpp,v 1.545 2009/06/24 01:34:17 shane Exp $               *
  **************************************************************************/
 
 extern "C"
@@ -1339,15 +1339,12 @@ int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
   struct obj_data *wielded;	/* convenience */
   int w_type;			/* Holds type info for damage() */
   int weapon_type;
-//  int victim_ac, calc_thaco;	/* Holders for Calculation */
   int dam = 0;			/* Self explan. */
-//  int diceroll;			/* ... */
   int retval = 0;
   int weapon_skill_hit_bonus = 0;
   int weapon_skill_dam_bonus = 0;  
 
  
-//  extern int thaco[8][61];
   extern ubyte backstab_mult[];
   
   int do_say(struct char_data *ch, char *argument, int cmd);
@@ -1391,69 +1388,6 @@ int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
   if(type == SKILL_JAB)
     w_type = SKILL_JAB;
   
-  /* Calculate thac0 vs. armor clss.  Thac0 for mobs is in hitroll */
-//  if(!IS_NPC(ch))
-//    calc_thaco = thaco[(int)GET_CLASS(ch) - 1][(int)GET_LEVEL(ch)];
-//  else /* ch is a mob */
-//    calc_thaco = 20;
-  
-//  calc_thaco -= str_app[STRENGTH_APPLY_INDEX(ch)].tohit;
-//  calc_thaco -= GET_HITROLL(ch);
-  
-  /* Calculate victim's ac */
-//  victim_ac = GET_AC(vict) / 10;
-//  victim_ac = MAX(-20, victim_ac);
-  
-  /* Roll the dice! */
-//  diceroll = number(1, 20);
-  
-  /* Can't miss a victim with these effects! */
-//  if(IS_AFFECTED(vict, AFF_PARALYSIS) || !AWAKE(vict) ||
-//    IS_SET(vict->combat, COMBAT_STUNNED) ||
-//    IS_SET(vict->combat, COMBAT_STUNNED2) ||
-//    IS_SET(vict->combat, COMBAT_SHOCKED2) ||
-//    IS_SET(vict->combat, COMBAT_SHOCKED))
-//    diceroll = 20;
-  
-  /* miss! */
-//  if(diceroll < 20 && AWAKE(vict) &&
-//    (diceroll == 1 || diceroll < calc_thaco - victim_ac)) { 
-//    return damage(ch, vict, 0, w_type, w_type, weapon);
-//  }
-
-/*  if(IS_AFFECTED(vict, AFF_PARALYSIS) || !AWAKE(vict) || is_stunned(vict))
-    chance = 102; // can't miss
-  else {
-    chance = 45;
-    if (IS_NPC(vict)) chance += 25;
-    chance += (GET_LEVEL(ch) - GET_LEVEL(vict))/2;
-    chance += GET_REAL_HITROLL(ch);
-    if(has_skill(ch, SKILL_NAT_SELECT) && affected_by_spell(ch, SKILL_NAT_SELECT))
-      if(affected_by_spell(ch, SKILL_NAT_SELECT)->modifier == GET_RACE(vict))
-        chance += 15 + has_skill(ch, SKILL_NAT_SELECT)/10;
-  //  chance += dex_app[GET_DEX(ch)].tohit;
-    chance += ( GET_ARMOR(vict) / 10 );  // (positive ac hurts you, negative helps)
-    if(has_skill(vict, SKILL_NAT_SELECT) && affected_by_spell(vict, SKILL_NAT_SELECT))
-      if(affected_by_spell(vict, SKILL_NAT_SELECT)->modifier == GET_RACE(ch))
-        chance -= 40 - has_skill(vict, SKILL_NAT_SELECT) / 5;
-    chance += weapon_skill_hit_bonus;
-
-    if(IS_SET(vict->combat, COMBAT_BASH1) ||
-       IS_SET(vict->combat, COMBAT_BASH2))
-      chance += 10;
-
-    if(IS_NPC(ch))
-      chance += 15;
-
-   if (w_type >= TYPE_HIT) {
-    chance = MIN(90, chance);  // 10 - 90
-    chance = MAX(10, chance);  // 10 - 90
-   }
-  }
-
-  if(number(0, 101) > chance) 
-    return damage(ch, vict, 0, w_type, w_type, weapon); // miss
-*/
   if(wielded)  {
     if(affected_by_spell(ch, SKILL_SMITE) && affected_by_spell(ch, SKILL_SMITE)->modifier == (int)vict)
       for(int i = 0; i < wielded->obj_flags.value[1]; i++)
@@ -1477,15 +1411,13 @@ int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
   dam += weapon_skill_dam_bonus;
   dam += calculate_paladin_damage_bonus(ch, vict);
   
-  // Bonus for hitting weak opponents (Weak positions no longer exist)
-//  if(GET_POS(vict) < POSITION_FIGHTING)
-//    dam *= 1 + (2 * (POSITION_FIGHTING - GET_POS(vict))) / 10;
   
   // BACKSTAB GOES IN HERE!
-  if(type == SKILL_BACKSTAB && dam < 10000) {  // Bingo not affected.
+  if( (type == SKILL_BACKSTAB || type == SKILL_CIRCLE ) && dam < 10000) {  // Bingo not affected.
     if(IS_SET(ch->combat, COMBAT_CIRCLE)) {
       if(GET_LEVEL(ch) <= MORTAL)
-         dam *= ((backstab_mult[(int)GET_LEVEL(ch)]) / 2);
+        if(type == SKILL_CIRCLE) dam = dam * 3 / 2; // non stabbing weapons
+        else dam *= ((backstab_mult[(int)GET_LEVEL(ch)]) / 2);
       else dam *= 25;
       REMOVE_BIT(ch->combat, COMBAT_CIRCLE);
     }
@@ -1494,8 +1426,6 @@ int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
     {
       if(GET_LEVEL(ch) <= MORTAL)
       {
-//         if(GET_CLASS(ch) == CLASS_ANTI_PAL)
- //          dam *= (backstab_mult[(int)GET_LEVEL(ch)]+1);
          dam *= backstab_mult[(int)GET_LEVEL(ch)];
       }
       else dam *= 25;
@@ -6638,7 +6568,7 @@ int is_fighting_mob(CHAR_DATA *ch)
 int do_flee(struct char_data *ch, char *argument, int cmd)
 {
   int i, attempt, retval, escape=0;
-  struct char_data * chTemp, * loop_ch, *vict;
+  struct char_data * chTemp, * loop_ch, *vict = NULL;
   
   if (is_stunned(ch))
     return eFAILURE;
