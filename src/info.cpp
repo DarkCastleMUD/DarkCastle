@@ -12,7 +12,7 @@
  * This is free software and you are benefitting.	We hope that you    *
  * share your changes too.  What goes around, comes around. 		    *
  ****************************************************************************/
-/* $Id: info.cpp,v 1.190 2009/06/05 04:57:13 jhhudso Exp $ */
+/* $Id: info.cpp,v 1.191 2009/06/26 00:49:08 shane Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -1984,7 +1984,7 @@ int do_olocate(struct char_data *ch, char *name, int cmd)
    struct obj_data *k;
    int in_room = -1, count = 0;
    int vnum = 0;
-   int searchnum;
+   int searchnum = 0;
    
    buf2[0] = '\0';
    if(isdigit(*name))
@@ -2094,7 +2094,7 @@ int do_mlocate(struct char_data *ch, char *name, int cmd)
    struct char_data * i;
    int count = 0;
    int vnum = 0;
-   int searchnum;
+   int searchnum = 0;
 
    if(isdigit(*name))
    {

@@ -631,7 +631,7 @@ int do_findfix(char_data *ch, char *argument, int cmd)
        for (z = 0; zone_table[i].cmd[z].command != 'S'; z++)
        {
          if (zone_table[i].cmd[z].command != 'M') continue;
-	 if (zone_table[i].cmd[z].arg1 != zone_table[i].cmd[j].arg1) continue;
+	 if (zone_table[i].cmd[z].arg1 != vnum) continue;
 	 if (z == j && found) { first = FALSE; break; }
 	 found = TRUE;
          if (zone_table[i].cmd[z].arg2 > max) max = zone_table[i].cmd[z].arg2;

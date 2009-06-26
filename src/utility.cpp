@@ -17,7 +17,7 @@
  *                         except Pir and Valk                             *
  * 10/19/2003   Onager     Took out super-secret hidey code from CAN_SEE() *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.108 2009/06/05 04:37:26 jhhudso Exp $ */
+/* $Id: utility.cpp,v 1.109 2009/06/26 00:49:08 shane Exp $ */
 
 extern "C"
 {
@@ -836,11 +836,12 @@ bool CAN_SEE_OBJ( struct char_data *sub, struct obj_data *obj, bool blindfightin
    if (IS_OBJ_STAT(obj, ITEM_NOSEE))
       return FALSE;
 
-   if ( IS_AFFECTED( sub, AFF_BLIND ) )
+   if ( IS_AFFECTED( sub, AFF_BLIND ) ) {
       if(blindfighting && skill_success(sub, NULL, SKILL_BLINDFIGHTING))
          return TRUE;
       else
          return FALSE;
+   }
 
    // only see beacons if you have detect magic up
    if (GET_ITEM_TYPE(obj) == ITEM_BEACON && IS_SET(obj->obj_flags.extra_flags, ITEM_INVISIBLE)) {
@@ -1157,7 +1158,7 @@ int do_recall( CHAR_DATA *ch, char *argument, int cmd )
 
     // make sure they arne't recalling into someone's chall
 
-    if(IS_SET(world[location].room_flags, CLAN_ROOM)) 
+    if(IS_SET(world[location].room_flags, CLAN_ROOM)) {
        if(!victim->clan || !(clan = get_clan(victim))) {
          send_to_char("The gods frown on you, and reset your home.\r\n", ch);
          location = real_room(START_ROOM);
@@ -1174,6 +1175,7 @@ int do_recall( CHAR_DATA *ch, char *argument, int cmd )
              GET_HOME(victim) = START_ROOM;
           }
        }
+    }
   }
 
   if(location == -1) {
@@ -1291,9 +1293,9 @@ int do_quit(struct char_data *ch, char *argument, int cmd)
       return eFAILURE;
     }
 
-    if(IS_AFFECTED(ch, AFF_CANTQUIT) && cmd!=666 ||
+    if( (IS_AFFECTED(ch, AFF_CANTQUIT) && cmd!=666 ) ||
 	affected_by_spell(ch, FUCK_PTHIEF) ||
-	affected_by_spell(ch, FUCK_GTHIEF)) {
+	affected_by_spell(ch, FUCK_GTHIEF) ) {
       send_to_char("You can't quit, because you are still wanted!\n\r", ch);
       return eFAILURE;
     }

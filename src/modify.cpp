@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: modify.cpp,v 1.29 2009/02/19 01:43:40 jhhudso Exp $ */
+/* $Id: modify.cpp,v 1.30 2009/06/26 00:49:08 shane Exp $ */
 
 extern "C"
 {
@@ -193,7 +193,7 @@ int do_string(CHAR_DATA *ch, char *arg, int cmd)
   char name[MAX_STRING_LENGTH], string[MAX_STRING_LENGTH];
   char message[100];
   int field, type, ctr;
-  CHAR_DATA *mob;
+  CHAR_DATA *mob = NULL;
   struct obj_data *obj;
   struct extra_descr_data *ed, *tmp;
 

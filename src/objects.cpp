@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: objects.cpp,v 1.107 2008/11/19 17:33:36 kkoons Exp $
+| $Id: objects.cpp,v 1.108 2009/06/26 00:49:08 shane Exp $
 | objects.C
 | Description:  Implementation of the things you can do with objects:
 |   wear them, wield them, grab them, drink them, eat them, etc..
@@ -1369,25 +1369,29 @@ int size_restricted(struct char_data *ch, struct obj_data *obj)
   if(IS_MOB(ch))  // mobs (ie charmies) can wear all sizes
     return FALSE;
 
-  if(GET_HEIGHT(ch) < 42)
+  if(GET_HEIGHT(ch) < 42) {
     if(IS_SET(obj->obj_flags.size, SIZE_SMALL))
       return FALSE;
     else return TRUE;
+  }
 
-  if(GET_HEIGHT(ch) < 66)
+  if(GET_HEIGHT(ch) < 66) {
     if(IS_SET(obj->obj_flags.size, SIZE_SMALL) || IS_SET(obj->obj_flags.size, SIZE_MEDIUM))
       return FALSE;
     else return TRUE;
+  }
 
-  if(GET_HEIGHT(ch) < 79)
+  if(GET_HEIGHT(ch) < 79) {
     if(IS_SET(obj->obj_flags.size, SIZE_MEDIUM))
       return FALSE;
     else return TRUE;
+  }
 
-  if(GET_HEIGHT(ch) < 103)
+  if(GET_HEIGHT(ch) < 103) {
     if(IS_SET(obj->obj_flags.size, SIZE_LARGE) || IS_SET(obj->obj_flags.size, SIZE_MEDIUM))
       return FALSE;
     else return TRUE;
+  }
 
   if(IS_SET(obj->obj_flags.size, SIZE_LARGE))
       return FALSE;

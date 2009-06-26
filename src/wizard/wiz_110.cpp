@@ -358,7 +358,7 @@ int do_fakelog(struct char_data *ch, char *argument, int cmd)
 {
    char command [MAX_INPUT_LENGTH];
    char lev_str [MAX_INPUT_LENGTH];
-   int lev_nr;
+   int lev_nr = 110;
 
    if (IS_NPC(ch))
            return eFAILURE;

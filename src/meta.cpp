@@ -244,7 +244,7 @@ long long mana_plats_spent(char_data * ch)
 int meta_get_stat_exp_cost(char_data * ch, ubyte stat)
 {
     int xp_price;
-    int curr_stat;
+    int curr_stat = 0;
     switch(stat) {
       case CONSTITUTION:
         curr_stat = ch->raw_con;
@@ -523,11 +523,11 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
   int stat;
   int choice;
   int increase;
-  int hit_cost, mana_cost, move_cost, ki_cost, hit_exp, move_exp, mana_exp, ki_exp;
-  int statplatprice, max_stat;
+  int hit_cost, mana_cost, move_cost, ki_cost = 0, hit_exp, move_exp, mana_exp, ki_exp = 0;
+  int statplatprice = 0, max_stat = 0;
 
-  sbyte *pstat;
-  int pprice;
+  sbyte *pstat = '\0';
+  int pprice = 0;
 
   if((cmd != 59) && (cmd != 56))
     return eFAILURE;

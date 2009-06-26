@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_warrior.cpp,v 1.78 2009/04/25 18:47:46 shane Exp $
+| $Id: cl_warrior.cpp,v 1.79 2009/06/26 00:49:09 shane Exp $
 | cl_warrior.C
 | Description:  This file declares implementation for warrior-specific
 |   skills.
@@ -669,7 +669,7 @@ int do_disarm( struct char_data *ch, char *argument, int cmd )
 
     char name[256];
     struct obj_data *obj;
-    int retval;
+    int retval = 0;
 
     int is_fighting_mob(struct char_data *ch);
 
@@ -1316,11 +1316,13 @@ int do_smite(struct char_data *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if(!*argument)
+  if(!*argument) {
     if(!ch->fighting) {
       send_to_char("Smite whom?\n\r", ch);
       return eFAILURE;
-    } else vict = ch->fighting;
+    }
+    else vict = ch->fighting;
+  }
 
   one_argument(argument, name);
 

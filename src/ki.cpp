@@ -3,7 +3,7 @@
  * Morcallen 12/18
  *
  */
-/* $Id: ki.cpp,v 1.82 2009/05/22 06:08:55 kkoons Exp $ */
+/* $Id: ki.cpp,v 1.83 2009/06/26 00:49:08 shane Exp $ */
 
 extern "C"
 {
@@ -473,6 +473,8 @@ int ki_punch( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
 
    set_cantquit(ch, vict);
    int dam = GET_HIT(vict) / 4, manadam = GET_MANA(vict) / 4;
+   int retval;
+
 
    dam = MAX(350, dam);
    dam = MIN(1000,dam);
@@ -483,30 +485,12 @@ int ki_punch( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
            GET_LEVEL(ch)/5 + has_skill(ch, KI_OFFSET+KI_PUNCH)/2 - GET_LEVEL(vict)/5)
 
       {
-//         act("$n punches $s fist RIGHT INTO $N!", ch, 0, vict,
-//             TO_ROOM, NOTVICT);
-//         act("The blood gushes as you put your fist into $N's chest!",
-//             ch, 0, vict, TO_CHAR, 0);
-//         act("$n shoves $s hand into your chest, and your lifeblood "
-//	     "ebbs away.", ch, 0, vict, TO_VICT, INVIS_VISIBLE);
  	 GET_MANA(vict) -= manadam;
-	 int retval = damage(ch,vict,dam, TYPE_UNDEFINED, KI_OFFSET+KI_PUNCH,0);
-//         group_gain(ch, vict);
-//         fight_kill(ch, vict, TYPE_CHOOSE, 0);
-//         GET_HIT(ch) -= 1/10 * (GET_MAX_HIT(ch));
-//         if (GET_HIT(ch) <= 0)
-//	    GET_HIT(ch) = 1;
- //        return eSUCCESS|eVICT_DIED;
-	return retval;
+	 retval = damage(ch,vict,dam, TYPE_UNDEFINED, KI_OFFSET+KI_PUNCH,0);
+	 return retval;
       }
       else {
-//         act("$N narrowly avoids $n's deadly thrust!", ch, 0, vict,
-//		TO_ROOM, NOTVICT);
-//         act("$N dodges out of your way, barely saving $S life!", 
-//		  ch, 0, vict, TO_CHAR, 0);
-//         act("$n makes a killer move, which you luckily dodge.", 
-//		  ch, 0, vict, TO_VICT, INVIS_VISIBLE);
-	 int retval = damage(ch,vict,0, TYPE_UNDEFINED, KI_OFFSET+KI_PUNCH,0);
+	 retval = damage(ch,vict,0, TYPE_UNDEFINED, KI_OFFSET+KI_PUNCH,0);
  
          GET_HIT(ch) -= 1/8 * (GET_MAX_HIT(ch));
 	 WAIT_STATE(ch, PULSE_VIOLENCE);

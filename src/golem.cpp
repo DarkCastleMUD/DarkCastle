@@ -256,7 +256,7 @@ void load_golem_data(CHAR_DATA *ch, int golemtype)
   for ( ; level > 1; level--)
      advance_golem_level(golem); // Level it up again.
   fread(&(golem->exp),   sizeof(golem->exp),  1, fpfile);
-   struct obj_data *last_cont; // Last container.
+   struct obj_data *last_cont = NULL; // Last container.
   while(!feof(fpfile)) {
     last_cont = obj_store_to_char( golem, fpfile, last_cont );
   }
