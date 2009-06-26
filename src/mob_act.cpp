@@ -19,7 +19,7 @@
 /* 12/06/2003   Onager   Modified mobile_activity() to prevent charmie    */
 /*                       scavenging                                       */
 /**************************************************************************/
-/* $Id: mob_act.cpp,v 1.48 2009/04/01 16:33:59 kkoons Exp $ */
+/* $Id: mob_act.cpp,v 1.49 2009/06/26 01:33:50 shane Exp $ */
 
 extern "C"
 {
@@ -421,9 +421,11 @@ void mobile_activity(void)
 
         if((!IS_NPC(tmp_ch) && !tmp_ch->fighting && CAN_SEE(ch, tmp_ch) &&
            !IS_SET(world[ch->in_room].room_flags, SAFE) &&
-           !IS_SET(tmp_ch->pcdata->toggles, PLR_NOHASSLE) ||
-	  (IS_NPC(tmp_ch) && tmp_ch->desc && tmp_ch->desc->original && CAN_SEE(ch, tmp_ch)
-		&& !IS_SET(tmp_ch->desc->original->pcdata->toggles, PLR_NOHASSLE))) // this is safe, cause we checked !IS_NPC first
+           !IS_SET(tmp_ch->pcdata->toggles, PLR_NOHASSLE) 
+           ) ||
+	   (IS_NPC(tmp_ch) && tmp_ch->desc && tmp_ch->desc->original && CAN_SEE(ch, tmp_ch)
+		&& !IS_SET(tmp_ch->desc->original->pcdata->toggles, PLR_NOHASSLE)  // this is safe, cause we checked !IS_NPC first
+           )
           )
         { 
 	int i=0;
@@ -632,9 +634,9 @@ void scavenge(struct char_data *ch)
     keyword = keywordfind(obj);
     
     if(keyword != -2) {
-      if (hands_are_free(ch, 1))
+      if (hands_are_free(ch, 1)) {
        if (CAN_WEAR(obj, ITEM_WIELD))
-      {
+       {
         if(GET_OBJ_WEIGHT(obj) < GET_STR(ch)) 
         {
           if(!ch->equipment[WIELD]) 
@@ -658,7 +660,7 @@ void scavenge(struct char_data *ch)
           }
         } // GET_OBJ_WEIGHT()
        continue;
-      } /* if hands are free and can wear */            
+      } /* if can wear */            
       else 
       {
         if(((keyword == 13) || (keyword == 14)) && !hands_are_free(ch, 1)) 
@@ -890,7 +892,8 @@ void scavenge(struct char_data *ch)
           break;
         else
             continue;
-      } 
+      } // else can wear
+     } // if hands are free 
     } /* if keyword != -2 */ 
   } /* for obj */
 }

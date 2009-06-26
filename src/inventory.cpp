@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.115 2009/05/21 22:58:52 kkoons Exp $
+| $Id: inventory.cpp,v 1.116 2009/06/26 01:33:50 shane Exp $
 | inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
@@ -729,10 +729,10 @@ fname(obj_object->name));
             {
                sprintf(buffer, "%s_consent", GET_NAME(ch));
 
-	       if(cmd != CMD_LOOT 
+	       if((cmd != CMD_LOOT 
                   && (isname("thiefcorpse", sub_object->name) 
                       && !isname(GET_NAME(ch), sub_object->name)
-                     ) 
+                     ) )
                   || isname(buffer, sub_object->name)
                  )
                  has_consent = TRUE;

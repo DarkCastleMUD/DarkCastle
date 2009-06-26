@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: wizard.cpp,v 1.70 2009/05/26 01:55:17 shane Exp $
+| $Id: wizard.cpp,v 1.71 2009/06/26 01:33:52 shane Exp $
 | wizard.C
 | Description:  Utility functions necessary for wiz commands.
 */
@@ -85,7 +85,7 @@ int number_or_name(char **name, int *num)
 
 void do_mload(struct char_data *ch, int rnum, int cnt)
 {      
-  struct char_data *mob;
+  struct char_data *mob = NULL;
   char buf[MAX_STRING_LENGTH];
   int i; 
  
@@ -124,7 +124,7 @@ void do_mload(struct char_data *ch, int rnum, int cnt)
 
 void do_oload(struct char_data *ch, int rnum, int cnt)
 {    
-  struct obj_data *obj;
+  struct obj_data *obj = NULL;
   char buf[MAX_STRING_LENGTH];
   int i;
      
@@ -462,8 +462,8 @@ void boro_mob_stat(struct char_data *ch, struct char_data *k)
       "OFF"));
     send_to_char(buf, ch);
 
-    if (k->pcdata->buildLowVnum == k->pcdata->buildMLowVnum == k->pcdata->buildOLowVnum  &&
-	k->pcdata->buildHighVnum == k->pcdata->buildMHighVnum == k->pcdata->buildOHighVnum)
+    if ( (k->pcdata->buildLowVnum == k->pcdata->buildMLowVnum) == k->pcdata->buildOLowVnum  &&
+	(k->pcdata->buildHighVnum == k->pcdata->buildMHighVnum) == k->pcdata->buildOHighVnum )
    {
     sprintf(buf, "$3Creation Range$R:  %d-%d  \r\n", k->pcdata->buildLowVnum, k->pcdata->buildHighVnum);
     send_to_char(buf,ch);
@@ -786,8 +786,8 @@ void mob_stat(struct char_data *ch, struct char_data *k)
     send_to_char(buf, ch);
     sprintf(buf, "$3Stealth$R:  %s\n\r", ((k->pcdata->stealth) ? "ON"  : "OFF"));
     send_to_char(buf, ch);
-    if (k->pcdata->buildLowVnum == k->pcdata->buildMLowVnum == k->pcdata->buildOLowVnum  &&
-        k->pcdata->buildHighVnum == k->pcdata->buildMHighVnum == k->pcdata->buildOHighVnum)
+    if ((k->pcdata->buildLowVnum == k->pcdata->buildMLowVnum) == k->pcdata->buildOLowVnum  &&
+        (k->pcdata->buildHighVnum == k->pcdata->buildMHighVnum) == k->pcdata->buildOHighVnum)
    {
     sprintf(buf, "$3Creation Range$R:  %d-%d  \r\n", k->pcdata->buildLowVnum, k->pcdata->buildHighVnum);
     send_to_char(buf,ch);
@@ -1280,7 +1280,7 @@ int do_clear(struct char_data *ch, char *argument, int cmd)
         for(tmp_vict = character_list; tmp_vict; tmp_vict = next_vict)
         {
                 next_vict = tmp_vict->next;
-                if(world[tmp_vict->in_room].zone == zone)
+                if(world[tmp_vict->in_room].zone == zone) {
                         if(IS_NPC(tmp_vict)) {
                                 for (int l = 0; l < MAX_WEAR; l++ )
                                 {
@@ -1293,6 +1293,7 @@ int do_clear(struct char_data *ch, char *argument, int cmd)
                         }
                         else 
                                 send_to_char("You hear unmatched screams of terror as all mobs are summarily executed!\n\r", tmp_vict);
+                }
         }
         send_to_char("You have just caused the destruction of countless creatures in ths area!\n\r",ch);
         sprintf(buf, "%s just CLEARED zone #%d!", GET_NAME(ch), zone);
@@ -1638,7 +1639,6 @@ char * last_hunt_time(char * last_hunt)
 void begin_hunt(int item, int duration, int amount, char *huntname)
 { // time, itme, item
   struct hunt_data *n;
-  char buf[MAX_STRING_LENGTH];
   char *tmp;
   struct tm *pTime = NULL;
   long ct;  

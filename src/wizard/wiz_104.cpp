@@ -355,7 +355,7 @@ int show_zone_commands(struct char_data *ch, int i, int start = 0)
     return eFAILURE;
   }
   string continent_name;
-  if (zone_table[i].continent && zone_table[i].continent < continent_names.size())
+  if (zone_table[i].continent && (unsigned)zone_table[i].continent < continent_names.size())
     continent_name = continent_names.at(zone_table[i].continent);
     
 
@@ -1094,7 +1094,7 @@ int do_show(struct char_data *ch, char *argument, int cmd)
 	return eSUCCESS;
      }
      int c,nr;
-	if (!act && !clas && !levlow && !levhigh && !affect && !immune && !race && !align)
+	if (!*act && !clas && !levlow && !levhigh && !*affect && !immune && !race && !align)
 	{
 	   send_to_char("No valid search supplied.\r\n",ch);
 	   return eFAILURE;
@@ -1126,12 +1126,12 @@ int do_show(struct char_data *ch, char *argument, int cmd)
       if (levhigh!=-555)
 	if (((struct char_data *)(mob_index[nr].item))->level > levhigh)
 	  continue;
-      if(act)
+      if(*act)
 	for (i = 0; i < ACT_MAX; i++)
            if (ISSET(act,i))
       if (!ISSET(((struct char_data *)(mob_index[nr].item))->mobdata->actflags, i+1))
          goto eheh;
-      if(affect)
+      if(*affect)
 	for (i = 0; i < AFF_MAX; i++)
            if (ISSET(affect,i))
       		if (!ISSET(((struct char_data *)(mob_index[nr].item))->affected_by, i+1))
@@ -1166,7 +1166,7 @@ char_data *)(mob_index[nr].item))->level,
     extern char *strs_damage_types[];
     bool fo = FALSE;
     int item_type = 0;
-    int its;
+    int its = 0;
     int spellnum = -1;
     while ( ( argument = one_argument(argument, arg1) ) )
     {
@@ -1806,20 +1806,19 @@ void opstat(char_data *ch, int vnum)
 int do_opstat(char_data *ch, char *argument, int cmd)
 {
   char buf[MAX_STRING_LENGTH];
-  char buf2[MAX_STRING_LENGTH];
   int vnum = -1;
 
   if(!*argument) {
 	send_to_char("Usage: opstat <vnum>\r\n ",ch);
 	return eFAILURE;
   }
-  one_argument(argument, buf2);
+  one_argument(argument, buf);
 
   if(!has_skill(ch, COMMAND_OPSTAT)) {
         send_to_char("Huh?\r\n", ch);
         return eFAILURE;
   }
-  if (isdigit(*buf2))
+  if (isdigit(*buf))
   {
      vnum = atoi(argument);
 

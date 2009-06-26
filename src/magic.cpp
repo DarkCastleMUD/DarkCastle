@@ -758,21 +758,24 @@ int cast_iridescent_aura( ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_
          struct follow_type *k;
          for(k = leader->followers; k; k = k->next) {
            tar_ch = k->follower;
-           if(ch->in_room == tar_ch->in_room) 
+           if(ch->in_room == tar_ch->in_room) {
              if(affected_by_spell(tar_ch, SPELL_IMMUNITY) && affected_by_spell(tar_ch, SPELL_IMMUNITY)->modifier == SPELL_IRIDESCENT_AURA-1) {
                act("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_CHAR, 0);
                act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, TO_VICT, 0);
                act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_ROOM, NOTVICT);
              }
              else retval &= spell_iridescent_aura(level, ch, tar_ch, 0, skill);
+           }
          }
-         if(ch->in_room == leader->in_room) 
+         if(ch->in_room == leader->in_room) {
            if(affected_by_spell(tar_ch, SPELL_IMMUNITY) && affected_by_spell(tar_ch, SPELL_IMMUNITY)->modifier == SPELL_IRIDESCENT_AURA-1) {
              act("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_CHAR, 0);
              act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, TO_VICT, 0);
              act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_ROOM, NOTVICT);
            }
            else retval &= spell_iridescent_aura(level, ch, leader, 0, skill);
+         }
+
          return retval;
         }
 		 return spell_iridescent_aura(level,ch,tar_ch,0, skill);
@@ -1189,7 +1192,7 @@ int spell_solar_gate(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
 int spell_group_recall(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
   CHAR_DATA *tmp_victim, *temp;
-  int chance;
+  int chance = 0;
 
   if (skill < 40) {
     chance = 5;
@@ -1576,8 +1579,8 @@ int spell_teleport(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
                     (IS_SET(zone_table[world[to_room].zone].zone_flags, ZONE_IS_TOWN)) :
                     FALSE
                ) ||
-              ( IS_AFFECTED(victim, AFF_CHAMPION) && (IS_SET(world[to_room].room_flags, CLAN_ROOM) ||
-                to_room >= 1900 && to_room <= 1999)
+              ( IS_AFFECTED(victim, AFF_CHAMPION) && ( IS_SET(world[to_room].room_flags, CLAN_ROOM) ||
+                ( to_room >= 1900 && to_room <= 1999 ) )
               )
              );
   }
@@ -1655,7 +1658,7 @@ int spell_paralyze(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
   if(affected_by_spell(victim, SPELL_SLEEP)) {
      if (number(1,6)<5)
      {
-       int retval;
+       int retval = 0;
        if (number(0,1)) {
           send_to_char("The combined magics fizzle!\r\n",ch);
 	if (GET_POS(victim) == POSITION_SLEEPING) {
@@ -3360,21 +3363,24 @@ int cast_sanctuary( ubyte level, CHAR_DATA *ch, char *arg, int type,
          struct follow_type *k;
          for(k = leader->followers; k; k = k->next) {
            tar_ch = k->follower;
-           if(ch->in_room == tar_ch->in_room) 
+           if(ch->in_room == tar_ch->in_room) {
              if(affected_by_spell(tar_ch, SPELL_IMMUNITY) && affected_by_spell(tar_ch, SPELL_IMMUNITY)->modifier == SPELL_SANCTUARY-1) {
                act("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_CHAR, 0);
                act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, TO_VICT, 0);
                act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_ROOM, NOTVICT);
              }
              else retval &= spell_sanctuary(level, ch, tar_ch, 0, skill);
+           }
          }
-         if(ch->in_room == leader->in_room) 
+         if(ch->in_room == leader->in_room) {
            if(affected_by_spell(tar_ch, SPELL_IMMUNITY) && affected_by_spell(tar_ch, SPELL_IMMUNITY)->modifier == SPELL_SANCTUARY-1) {
              act("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_CHAR, 0);
              act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, TO_VICT, 0);
              act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_ROOM, NOTVICT);
            }
            else retval &= spell_sanctuary(level, ch, leader, 0, skill);
+         }
+
          return retval;
         }
       return spell_sanctuary(level, ch, tar_ch, 0, skill);
@@ -3777,7 +3783,7 @@ int spell_word_of_recall(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct o
       location = real_room(GET_HOME(victim));
 
 	    // make sure they aren't recalling into someone's chall
-    if(IS_SET(world[location].room_flags, CLAN_ROOM))
+    if(IS_SET(world[location].room_flags, CLAN_ROOM)) {
        if(!victim->clan || !(clan = get_clan(victim))) {
          send_to_char("The gods frown on you, and reset your home.\r\n", victim);
          location = real_room(START_ROOM);
@@ -3794,6 +3800,7 @@ int spell_word_of_recall(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct o
              GET_HOME(victim) = START_ROOM;
           }
        }
+    }
   }
 
   if ( location == -1 )
@@ -3981,7 +3988,7 @@ int spell_summon(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data 
     return eFAILURE;
   }
 
-  if(IS_AFFECTED(victim, AFF_CHAMPION) && ( IS_SET(world[ch->in_room].room_flags, CLAN_ROOM) || ch->in_room >= 1900 && ch->in_room <= 1999) ) {
+  if(IS_AFFECTED(victim, AFF_CHAMPION) && ( IS_SET(world[ch->in_room].room_flags, CLAN_ROOM) || (ch->in_room >= 1900 && ch->in_room <= 1999)) ) {
     send_to_char("You cannot summon a Champion here.\n\r", ch);
     return eFAILURE;
   }
@@ -4848,7 +4855,7 @@ int spell_animate_dead(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
 
 int spell_know_alignment(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
-  int duration;
+  int duration = 0;
   struct affected_type af, *cur_af;
 
   if(!ch) {
@@ -7022,7 +7029,7 @@ int cast_bless( ubyte level, CHAR_DATA *ch, char *arg, int type,
          struct follow_type *k;
          for(k = leader->followers; k; k = k->next) {
            tar_ch = k->follower;
-           if(ch->in_room == tar_ch->in_room)
+           if(ch->in_room == tar_ch->in_room) {
              if(affected_by_spell(tar_ch, SPELL_IMMUNITY) && affected_by_spell(tar_ch, SPELL_IMMUNITY)->modifier == SPELL_BLESS-1) {
                act("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_CHAR, 0);
                act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, TO_VICT, 0);
@@ -7031,8 +7038,9 @@ int cast_bless( ubyte level, CHAR_DATA *ch, char *arg, int type,
 	     else if(GET_POS(tar_ch) == POSITION_FIGHTING)
 	          send_to_char("Nothing seems to happen.\n\r", ch);
              else retval &= spell_bless(level, ch, tar_ch, 0, skill);
+           }
          }
-         if(ch->in_room == leader->in_room) 
+         if(ch->in_room == leader->in_room) {
            if(affected_by_spell(tar_ch, SPELL_IMMUNITY) && affected_by_spell(tar_ch, SPELL_IMMUNITY)->modifier == SPELL_BLESS-1) {
              act("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_CHAR, 0);
              act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, TO_VICT, 0);
@@ -7041,6 +7049,8 @@ int cast_bless( ubyte level, CHAR_DATA *ch, char *arg, int type,
 	   else if(GET_POS(leader) == POSITION_FIGHTING)
 	     send_to_char("Nothing seems to happen.\n\r", ch);
            else retval &= spell_bless(level, ch, leader, 0, skill);
+         }
+
          return retval;
         }
 	if(GET_POS(tar_ch) == POSITION_FIGHTING) {
@@ -7411,21 +7421,24 @@ int cast_cure_critic( ubyte level, CHAR_DATA *ch, char *arg, int type,
          struct follow_type *k;
          for(k = leader->followers; k; k = k->next) {
            tar_ch = k->follower;
-           if(ch->in_room == tar_ch->in_room) 
+           if(ch->in_room == tar_ch->in_room) {
              if(affected_by_spell(tar_ch, SPELL_IMMUNITY) && affected_by_spell(tar_ch, SPELL_IMMUNITY)->modifier == SPELL_CURE_CRITIC-1) {
                act("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_CHAR, 0);
                act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, TO_VICT, 0);
                act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_ROOM, NOTVICT);
              }
              else retval &= spell_cure_critic(level, ch, tar_ch, 0, skill);
+           }
          }
-         if(ch->in_room == leader->in_room) 
+         if(ch->in_room == leader->in_room) {
            if(affected_by_spell(tar_ch, SPELL_IMMUNITY) && affected_by_spell(tar_ch, SPELL_IMMUNITY)->modifier == SPELL_CURE_CRITIC-1) {
              act("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_CHAR, 0);
              act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, TO_VICT, 0);
              act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_ROOM, NOTVICT);
            }
            else retval &= spell_cure_critic(level, ch, leader, 0, skill);
+         }
+
          return retval;
         }
 	 return spell_cure_critic(level,ch,tar_ch,0, skill);
@@ -7468,21 +7481,24 @@ int cast_cure_light( ubyte level, CHAR_DATA *ch, char *arg, int type,
          struct follow_type *k;
          for(k = leader->followers; k; k = k->next) {
            tar_ch = k->follower;
-           if(ch->in_room == tar_ch->in_room) 
+           if(ch->in_room == tar_ch->in_room) {
              if(affected_by_spell(tar_ch, SPELL_IMMUNITY) && affected_by_spell(tar_ch, SPELL_IMMUNITY)->modifier == SPELL_CURE_LIGHT-1) {
                act("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_CHAR, 0);
                act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, TO_VICT, 0);
                act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_ROOM, NOTVICT);
              }
              else retval &= spell_cure_light(level, ch, tar_ch, 0, skill);
+           }
          }
-         if(ch->in_room == leader->in_room) 
+         if(ch->in_room == leader->in_room) {
            if(affected_by_spell(tar_ch, SPELL_IMMUNITY) && affected_by_spell(tar_ch, SPELL_IMMUNITY)->modifier == SPELL_CURE_LIGHT-1) {
              act("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_CHAR, 0);
              act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, TO_VICT, 0);
              act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_ROOM, NOTVICT);
            }
            else retval &= spell_cure_light(level, ch, leader, 0, skill);
+         }
+
          return retval;
         }
 	 return spell_cure_light(level,ch,tar_ch,0, skill);
@@ -7669,21 +7685,24 @@ int cast_detect_invisibility( ubyte level, CHAR_DATA *ch, char *arg, int type,
          struct follow_type *k;
          for(k = leader->followers; k; k = k->next) {
            tar_ch = k->follower;
-           if(ch->in_room == tar_ch->in_room) 
+           if(ch->in_room == tar_ch->in_room) {
              if(affected_by_spell(tar_ch, SPELL_IMMUNITY) && affected_by_spell(tar_ch, SPELL_IMMUNITY)->modifier == SPELL_DETECT_INVISIBLE-1) {
                act("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_CHAR, 0);
                act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, TO_VICT, 0);
                act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_ROOM, NOTVICT);
              }
              else retval &= spell_detect_invisibility(level, ch, tar_ch, 0, skill);
+           }
          }
-         if(ch->in_room == leader->in_room) 
+         if(ch->in_room == leader->in_room) {
            if(affected_by_spell(tar_ch, SPELL_IMMUNITY) && affected_by_spell(tar_ch, SPELL_IMMUNITY)->modifier == SPELL_DETECT_INVISIBLE-1) {
              act("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_CHAR, 0);
              act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, TO_VICT, 0);
              act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_ROOM, NOTVICT);
            }
            else retval &= spell_detect_invisibility(level, ch, leader, 0, skill);
+         }
+
          return retval;
         }
 	 return spell_detect_invisibility(level,ch,tar_ch,0, skill);
@@ -7727,21 +7746,24 @@ int cast_detect_magic( ubyte level, CHAR_DATA *ch, char *arg, int type,
          struct follow_type *k;
          for(k = leader->followers; k; k = k->next) {
            tar_ch = k->follower;
-           if(ch->in_room == tar_ch->in_room) 
+           if(ch->in_room == tar_ch->in_room) {
              if(affected_by_spell(tar_ch, SPELL_IMMUNITY) && affected_by_spell(tar_ch, SPELL_IMMUNITY)->modifier == SPELL_DETECT_MAGIC-1) {
                act("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_CHAR, 0);
                act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, TO_VICT, 0);
                act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_ROOM, NOTVICT);
              }
              else retval &= spell_detect_magic(level, ch, tar_ch, 0, skill);
+           }
          }
-         if(ch->in_room == leader->in_room) 
+         if(ch->in_room == leader->in_room) {
            if(affected_by_spell(tar_ch, SPELL_IMMUNITY) && affected_by_spell(tar_ch, SPELL_IMMUNITY)->modifier == SPELL_DETECT_MAGIC-1) {
              act("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_CHAR, 0);
              act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, TO_VICT, 0);
              act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_ROOM, NOTVICT);
            }
            else retval &= spell_detect_magic(level, ch, leader, 0, skill);
+         }
+
          return retval;
         }
 	 return spell_detect_magic(level,ch,tar_ch,0, skill);
@@ -7817,21 +7839,24 @@ int cast_detect_poison( ubyte level, CHAR_DATA *ch, char *arg, int type,
          struct follow_type *k;
          for(k = leader->followers; k; k = k->next) {
            tar_ch = k->follower;
-           if(ch->in_room == tar_ch->in_room) 
+           if(ch->in_room == tar_ch->in_room) {
              if(affected_by_spell(tar_ch, SPELL_IMMUNITY) && affected_by_spell(tar_ch, SPELL_IMMUNITY)->modifier == SPELL_DETECT_POISON-1) {
                act("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_CHAR, 0);
                act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, TO_VICT, 0);
                act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_ROOM, NOTVICT);
              }
              else retval &= spell_detect_poison(level, ch, tar_ch, 0, skill);
+           }
          }
-         if(ch->in_room == leader->in_room) 
+         if(ch->in_room == leader->in_room) {
            if(affected_by_spell(tar_ch, SPELL_IMMUNITY) && affected_by_spell(tar_ch, SPELL_IMMUNITY)->modifier == SPELL_DETECT_POISON-1) {
              act("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_CHAR, 0);
              act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, TO_VICT, 0);
              act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_ROOM, NOTVICT);
            }
            else retval &= spell_detect_poison(level, ch, leader, 0, skill);
+         }
+
          return retval;
         }
 	 return spell_detect_poison(level, ch, tar_ch,tar_obj, skill);
@@ -8254,21 +8279,24 @@ int cast_protection_from_evil( ubyte level, CHAR_DATA *ch, char *arg, int type,
          struct follow_type *k;
          for(k = leader->followers; k; k = k->next) {
            tar_ch = k->follower;
-           if(ch->in_room == tar_ch->in_room) 
+           if(ch->in_room == tar_ch->in_room) {
              if(affected_by_spell(tar_ch, SPELL_IMMUNITY) && affected_by_spell(tar_ch, SPELL_IMMUNITY)->modifier == SPELL_PROTECT_FROM_EVIL-1) {
                act("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_CHAR, 0);
                act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, TO_VICT, 0);
                act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_ROOM, NOTVICT);
              }
              else retval &= spell_protection_from_evil(level, ch, tar_ch, 0, skill);
+           }
          }
-         if(ch->in_room == leader->in_room) 
+         if(ch->in_room == leader->in_room) {
            if(affected_by_spell(tar_ch, SPELL_IMMUNITY) && affected_by_spell(tar_ch, SPELL_IMMUNITY)->modifier == SPELL_PROTECT_FROM_EVIL-1) {
              act("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_CHAR, 0);
              act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, TO_VICT, 0);
              act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_ROOM, NOTVICT);
            }
            else retval &= spell_protection_from_evil(level, ch, leader, 0, skill);
+         }
+
          return retval;
         }
 
@@ -8321,21 +8349,24 @@ int cast_protection_from_good( ubyte level, CHAR_DATA *ch, char *arg, int type,
          struct follow_type *k;
          for(k = leader->followers; k; k = k->next) {
            tar_ch = k->follower;
-           if(ch->in_room == tar_ch->in_room) 
+           if(ch->in_room == tar_ch->in_room) {
              if(affected_by_spell(tar_ch, SPELL_IMMUNITY) && affected_by_spell(tar_ch, SPELL_IMMUNITY)->modifier == SPELL_PROTECT_FROM_GOOD-1) {
                act("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_CHAR, 0);
                act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, TO_VICT, 0);
                act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_ROOM, NOTVICT);
              }
              else retval &= spell_protection_from_good(level, ch, tar_ch, 0, skill);
+           }
          }
-         if(ch->in_room == leader->in_room) 
+         if(ch->in_room == leader->in_room) {
            if(affected_by_spell(tar_ch, SPELL_IMMUNITY) && affected_by_spell(tar_ch, SPELL_IMMUNITY)->modifier == SPELL_PROTECT_FROM_EVIL-1) {
              act("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_CHAR, 0);
              act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, TO_VICT, 0);
              act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_ROOM, NOTVICT);
            }
            else retval &= spell_protection_from_good(level, ch, leader, 0, skill);
+         }
+
          return retval;
         }
 
@@ -8890,21 +8921,23 @@ int cast_refresh( ubyte level, CHAR_DATA *ch, char *arg, int type,
          struct follow_type *k;
          for(k = leader->followers; k; k = k->next) {
            tar_ch = k->follower;
-           if(ch->in_room == tar_ch->in_room) 
+           if(ch->in_room == tar_ch->in_room) {
              if(affected_by_spell(tar_ch, SPELL_IMMUNITY) && affected_by_spell(tar_ch, SPELL_IMMUNITY)->modifier == SPELL_REFRESH-1) {
                act("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_CHAR, 0);
                act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, TO_VICT, 0);
                act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_ROOM, NOTVICT);
              }
              else retval &= spell_refresh(level, ch, tar_ch, 0, skill);
+           }
          }
-         if(ch->in_room == leader->in_room) 
+         if(ch->in_room == leader->in_room) {
            if(affected_by_spell(tar_ch, SPELL_IMMUNITY) && affected_by_spell(tar_ch, SPELL_IMMUNITY)->modifier == SPELL_REFRESH-1) {
              act("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_CHAR, 0);
              act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, TO_VICT, 0);
              act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_ROOM, NOTVICT);
            }
            else retval &= spell_refresh(level, ch, leader, 0, skill);
+         }
          return retval;
         }
     return spell_refresh(level, ch, tar_ch, 0, skill);
@@ -8950,21 +8983,24 @@ int cast_fly( ubyte level, CHAR_DATA *ch, char *arg, int type,
          struct follow_type *k;
          for(k = leader->followers; k; k = k->next) {
            tar_ch = k->follower;
-           if(ch->in_room == tar_ch->in_room) 
+           if(ch->in_room == tar_ch->in_room) {
              if(affected_by_spell(tar_ch, SPELL_IMMUNITY) && affected_by_spell(tar_ch, SPELL_IMMUNITY)->modifier == SPELL_FLY-1) {
                act("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_CHAR, 0);
                act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, TO_VICT, 0);
                act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_ROOM, NOTVICT);
              }
              else retval &= spell_fly(level, ch, tar_ch, 0, skill);
+           }
          }
-         if(ch->in_room == leader->in_room) 
+         if(ch->in_room == leader->in_room) {
            if(affected_by_spell(tar_ch, SPELL_IMMUNITY) && affected_by_spell(tar_ch, SPELL_IMMUNITY)->modifier == SPELL_FLY-1) {
              act("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_CHAR, 0);
              act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, TO_VICT, 0);
              act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_ROOM, NOTVICT);
            }
            retval &= spell_fly(level, ch, leader, 0, skill);
+         }
+
          return retval;
         }
     return spell_fly(level, ch, tar_ch, 0, skill);
@@ -9321,21 +9357,24 @@ int cast_cure_serious( ubyte level, CHAR_DATA *ch, char *arg, int type,
          struct follow_type *k;
          for(k = leader->followers; k; k = k->next) {
            tar_ch = k->follower;
-           if(ch->in_room == tar_ch->in_room) 
+           if(ch->in_room == tar_ch->in_room) {
              if(affected_by_spell(tar_ch, SPELL_IMMUNITY) && affected_by_spell(tar_ch, SPELL_IMMUNITY)->modifier == SPELL_CURE_SERIOUS-1) {
                act("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_CHAR, 0);
                act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, TO_VICT, 0);
                act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_ROOM, NOTVICT);
              }
              else retval &= spell_cure_serious(level, ch, tar_ch, 0, skill);
+           }
          }
-         if(ch->in_room == leader->in_room) 
+         if(ch->in_room == leader->in_room) {
            if(affected_by_spell(tar_ch, SPELL_IMMUNITY) && affected_by_spell(tar_ch, SPELL_IMMUNITY)->modifier == SPELL_CURE_SERIOUS-1) {
              act("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_CHAR, 0);
              act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, TO_VICT, 0);
              act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_ROOM, NOTVICT);
            }
            else retval &= spell_cure_serious(level, ch, leader, 0, skill);
+         }
+
          return retval;
         }
      return spell_cure_serious(level, ch, tar_ch, 0, skill);
