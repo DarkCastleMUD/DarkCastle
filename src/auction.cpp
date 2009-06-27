@@ -1566,6 +1566,15 @@ void AuctionHouse::AddItem(CHAR_DATA *ch, OBJ_DATA *obj, unsigned int price, str
     send_to_char("The Consignment Broker curtly informs you that all items sold must be in $B$2Excellent Condition$R.\n\r", ch);
     return;
   }
+
+  if((obj->obj_flags.type_flag == ITEM_WAND
+     || obj->obj_flags.type_flag ==  ITEM_STAFF)
+     && obj->obj_flags.value[1] != obj->obj_flags.value[2])
+  {
+    send_to_char("The Consignment Broker curtly informs you that it needs to have full charges.\n\r", ch);
+    return;
+  } 
+
   ItemsPosted += 1;
   ItemsActive += 1;
   TaxCollected += fee;
