@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: non_off.cpp,v 1.59 2009/03/27 22:02:30 kkoons Exp $
+| $Id: non_off.cpp,v 1.60 2009/06/27 19:26:20 kkoons Exp $
 | non_off.C
 | Description:  Implementation of generic, non-offensive commands.
 */
@@ -119,6 +119,13 @@ int do_tap(struct char_data *ch, char *argument, int cmd)
 
   if(IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL) && GET_LEVEL(ch) < ANGEL) {
     send_to_char("God, what a stupid fucking thing for you to do.\n\r", ch);
+    return eFAILURE;
+  }
+
+   
+  if(obj_index[obj->item_number].virt == CHAMPION_ITEM)
+  {
+    send_to_char("In soviet russia, champion flag sacrifice YOU!\r\n", ch);
     return eFAILURE;
   }
 
