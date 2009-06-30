@@ -13422,7 +13422,7 @@ SPELL_POINTER get_wild_magic_offensive(ubyte level, CHAR_DATA *ch, CHAR_DATA *vi
 {
   const int MAX_OFFENSIVE = 25;
   SPELL_POINTER spell_to_cast = NULL;
-  switch(number(1, MAX_OFFENSIVE))
+  switch(number(1, MAX_OFFENSIVE+1)) //+1 causes a chance of defensive
   {
     case 1: spell_to_cast = cast_blindness; break;
     case 2: spell_to_cast = cast_fear; break;
@@ -13617,7 +13617,7 @@ SPELL_POINTER get_wild_magic_defensive(ubyte level, CHAR_DATA *ch, CHAR_DATA *vi
   const int MAX_DEFENSIVE = 50;
   SPELL_POINTER spell_to_cast = NULL;
 
-  switch(number(1, MAX_DEFENSIVE))
+  switch(number(1, MAX_DEFENSIVE+1)) //+1 to allow for a random chance
   {
     case 1: spell_to_cast = cast_armor; break;
     case 2: spell_to_cast = cast_water_breathing; break;
