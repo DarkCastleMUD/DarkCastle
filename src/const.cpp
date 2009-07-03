@@ -12,7 +12,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: const.cpp,v 1.313 2009/06/03 20:21:28 apocalypse Exp $ */
+/* $Id: const.cpp,v 1.314 2009/07/03 22:30:25 kkoons Exp $ */
 
 extern "C"
 {
@@ -149,8 +149,36 @@ std::map<int, int> fill_scribe_recipes()
   return tmp_scribe_recipes;
 }
 
-const std::map<int, int> scribe_recipes = fill_scribe_recipes();
+std::map<int, int> scribe_recipes = fill_scribe_recipes();
 
+std::map<int, int> fill_scribe_ingredients()
+{
+  std::map<int, int> tmp_scribe_ingredients;
+  tmp_scribe_ingredients[0] = RARE1_PAPER;
+  tmp_scribe_ingredients[0] = RARE2_PAPER;
+  tmp_scribe_ingredients[0] = RARE3_PAPER;
+  tmp_scribe_ingredients[0] = RARE4_PAPER;
+  tmp_scribe_ingredients[0] = RARE5_PAPER;
+
+  tmp_scribe_ingredients[0] = CLERIC_PEN;
+  tmp_scribe_ingredients[0] = MAGE_PEN;
+  tmp_scribe_ingredients[0] = DRUID_PEN;
+  tmp_scribe_ingredients[0] = ANTI_PEN;
+  tmp_scribe_ingredients[0] = RANGER_PEN;
+  tmp_scribe_ingredients[0] = NONE_PEN;
+
+  tmp_scribe_ingredients[0] = MAGIC_INK;
+  tmp_scribe_ingredients[0] = FIRE_INK;
+  tmp_scribe_ingredients[0] = EVIL_INK;
+
+  tmp_scribe_ingredients[0] = FLASHY_DUST;
+  tmp_scribe_ingredients[0] = EXPLOSIVE_DUST;
+  tmp_scribe_ingredients[0] = GENERIC_DUST;
+
+  return tmp_scribe_ingredients;
+}
+
+std::map<int, int> scribe_ingredients = fill_scribe_ingredients();
 
 // Obj proc types
 char *obj_types[] = {
