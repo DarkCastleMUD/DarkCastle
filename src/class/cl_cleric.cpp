@@ -13,32 +13,32 @@
 #include <act.h>
 #include <interp.h>
 #include <returnvals.h>
+#include <map>
+
+using namespace std;
 
 extern struct index_data *obj_index;
+extern map<int, int> scribe_recipes;
 
-int find_ingredient(CHAR_DATA *ch, char *arg, char *type)
+OBJ_DATA * find_ingredient(CHAR_DATA *ch, char *arg, char *type)
 {
   if(!arg[0])
-    return 0;
+    return NULL;
 
   OBJ_DATA *obj = get_obj_in_list_vis(ch, arg, ch->carrying);
   if (!obj)
-  {
-    csendf(ch, "You don't seem to have %s\r\n", arg);
-    return 0;
-  }
+    csendf(ch, "You don't seem to have any %s\r\n", arg);
 
-  int virt = obj_index[obj->item_number].virt;
+  //int virt = obj_index[obj->item_number].virt;
   
-
-
-  return eSUCCESS;
+  return obj;
 }
 
 int do_scribe_scroll(struct char_data *ch, char *argument, int cmd)
 {
   int learned;
   int recipe = 0;
+  OBJ_DATA * paper, *pen, *ink, *dust;
   int ingredient = 0;
   if(IS_MOB(ch))
     ;
@@ -56,37 +56,58 @@ int do_scribe_scroll(struct char_data *ch, char *argument, int cmd)
 
 //find components here
 
-  if (!skill_success(ch,NULL,SKILL_SCRIBE_SCROLL)) 
-  {
-    
-    return eFAILURE;
-  }
 
   char arg1[MAX_INPUT_LENGTH];
   one_argument(argument, arg1);
-  ingredient = find_ingredient(ch, arg1, "paper");
+  paper = find_ingredient(ch, arg1, "paper");
+  if(!paper)
+    return eFAILURE;
+  ingredient = obj_index[paper->item_number].virt;
   if(!ingredient)
     return eFAILURE;
   recipe |= ingredient;
 
   one_argument(argument, arg1);
-  ingredient = find_ingredient(ch, arg1, "pen");
+  pen = find_ingredient(ch, arg1, "pen");
+  if(!pen)
+    return eFAILURE;
+  ingredient = obj_index[pen->item_number].virt;
   if(!ingredient)
     return eFAILURE;
   recipe |= ingredient;
 
   one_argument(argument, arg1);
-  ingredient = find_ingredient(ch, arg1, "ink");
+  ink = find_ingredient(ch, arg1, "ink");
+  if(!ink)
+    return eFAILURE;
+  ingredient = obj_index[ink->item_number].virt;
   if(!ingredient)
     return eFAILURE;
   recipe |= ingredient;
   
   one_argument(argument, arg1);
-  ingredient = find_ingredient(ch, arg1, "dust");
+  dust = find_ingredient(ch, arg1, "dust");
+  if(!dust)
+    return eFAILURE;
+  ingredient = obj_index[dust->item_number].virt;
   if(!ingredient)
     return eFAILURE;
   recipe |= ingredient;
 
+  extract_obj(paper);
+  extract_obj(pen);
+  extract_obj(ink);
+  extract_obj(dust);
+
+  if (!skill_success(ch,NULL,SKILL_SCRIBE_SCROLL)) 
+  {
+    send_to_char("Your attempt to scribe the scroll has failed!\r\n", ch);
+    //TODO: if(!number(0,1)) cast_wild_magic_at_yourself 
+    return eFAILURE;
+  }
+
+
+  csendf(ch, "You get a scroll, yippee. recipe %d, spell %d\r\n", recipe, scribe_recipes[recipe]);
 
   return eSUCCESS; 
 }
