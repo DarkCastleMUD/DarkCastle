@@ -1,5 +1,5 @@
 /************************************************************************
- * $Id: cl_barbarian.cpp,v 1.104 2009/05/21 22:44:57 kkoons Exp $
+ * $Id: cl_barbarian.cpp,v 1.105 2009/07/06 21:35:49 kkoons Exp $
  * cl_barbarian.cpp
  * Description: Commands for the barbarian class.
  *************************************************************************/
@@ -1149,8 +1149,8 @@ int do_knockback(struct char_data *ch, char *argument, int cmd)
 	extern bool selfpurge;
 	if (selfpurge)
 		return eSUCCESS|eVICT_DIED;	
-       sprintf(buf2, "%s smashes into %s for | damage and sends $S reeling to the %s.", GET_NAME(ch), GET_SHORT(victim), dirs[dir]);
-       sprintf(buf, "%s smashes into %s and sends $S reeling to the %s.", GET_NAME(ch), GET_SHORT(victim), dirs[dir]);
+       sprintf(buf2, "%s smashes into %s for | damage and sends $S ass reeling to the %s.", GET_NAME(ch), GET_SHORT(victim), dirs[dir]);
+       sprintf(buf, "%s smashes into %s and sends $S ass reeling to the %s.", GET_NAME(ch), GET_SHORT(victim), dirs[dir]);
        send_damage(buf2, ch, 0, victim, dammsg, buf, TO_ROOM);
        if(victim->fighting) {
           if(IS_NPC(victim)) {
