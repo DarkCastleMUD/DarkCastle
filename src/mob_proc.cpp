@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.190 2009/05/14 20:27:16 apocalypse Exp $ */
+/* $Id: mob_proc.cpp,v 1.191 2009/07/10 20:11:53 dcastle Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -976,7 +976,7 @@ int clan_guard(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     ||   (clan_num !=  8 && in_room == real_room(2400))  // merc
     ||   (clan_num !=  6 && in_room == real_room(2410))  // timewarp
     ||   (clan_num != 19 && in_room == real_room(2420))  // solaris
-    ||   (clan_num != 15 && in_room == real_room(2430))  // askan'i
+    ||   (clan_num != 10 && in_room == real_room(2430))  // askan'i
     ||   (clan_num !=  2 && in_room == real_room(2440))  // tengu
     ||   (clan_num != 16 && in_room == real_room(2450))  // houseless_rogues
     ||   (clan_num != 12 && in_room == real_room(2460))  // ko'bal
