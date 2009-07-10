@@ -10703,7 +10703,7 @@ int cast_clarity(ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA  *vi
 
 int cast_forest_meld(ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *victim, struct obj_data * tar_obj, int skill)
 {
-	if(!(world[ch->in_room].sector_type == SECT_FOREST))
+	if(!(world[ch->in_room].sector_type == SECT_FOREST || world[ch->in_room].sector_type == SECT_SWAMP))
 	{
 		send_to_char("You are not in a forest!!\n\r", ch);
 		return eFAILURE;
