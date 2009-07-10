@@ -1004,13 +1004,16 @@ struct vault_items_data *get_unique_item_in_vault(struct vault_data *vault, char
   struct obj_data *obj;
   int i = 1;
   
-  for (items = vault->items;items;items = items->next) {
+  for (items = vault->items;items;items = items->next) 
+  {
     obj = items->obj?items->obj:get_obj(items->item_vnum);
     if (obj && isname(object, GET_OBJ_NAME(obj)))
+    {
       if (i == num) 
         return items;
       else 
         i++;
+    }
   } 
     
   return 0;
@@ -1026,10 +1029,12 @@ struct obj_data *get_unique_obj_in_vault(struct vault_data *vault, char *object,
     obj = items->obj?items->obj:get_obj(items->item_vnum);
 //    obj = get_obj(items->item_vnum);
     if (obj && isname(object, GET_OBJ_NAME(obj)))
+    {
       if (i == num) 
         return obj;
       else
         i++;
+    }
   }
 
   return 0;
@@ -1045,15 +1050,21 @@ struct vault_items_data *get_item_in_vault(struct vault_data *vault, char *objec
     obj = items->obj?items->obj:get_obj(items->item_vnum);
 //    obj = get_obj(items->item_vnum);
     if (obj && isname(object, GET_OBJ_NAME(obj)))
+    {
       if (i == num) 
         return items;
       else
+      {
         for (j = 1; j <= items->count; j++)
           if (isname(object, GET_OBJ_NAME(obj)))
+          {
             if (i == num) 
               return items;
             else 
               i++;
+          }
+      }
+   }
   }
 
   return 0;
@@ -1069,14 +1080,18 @@ struct obj_data *get_obj_in_vault(struct vault_data *vault, char *object, int nu
     obj = items->obj?items->obj:get_obj(items->item_vnum);
 //    obj = get_obj(items->item_vnum);
     if (obj && isname(object, GET_OBJ_NAME(obj))) 
+    {
       if (i == num) 
         return obj;
        else 
+       {
         for (j = 1; j <= items->count; j++)  
           if (i == num) 
             return obj;
            else 
             i++;
+       }
+    }
   }
 
   return 0;
@@ -1238,6 +1253,7 @@ void get_from_vault(CHAR_DATA *ch, char *object, char *owner) {
     }
 
     std::stringstream ssin;
+    ssin << GET_OBJ_VNUM(obj);
 
     if (GET_LEVEL(ch) < IMMORTAL)
     {
@@ -1250,7 +1266,6 @@ void get_from_vault(CHAR_DATA *ch, char *object, char *owner) {
     }
     else
     {
-      ssin << GET_OBJ_VNUM(obj);
       sbuf = GET_NAME(ch);
       sbuf += " removed ";
       sbuf += GET_OBJ_SHORT(obj);
@@ -1260,11 +1275,10 @@ void get_from_vault(CHAR_DATA *ch, char *object, char *owner) {
       sbuf += owner;
       sbuf += "'s vault.";
     }
+
     vault_log(sbuf.c_str(), owner);
     csendf(ch, "%s has been removed from the vault.\r\n", GET_OBJ_SHORT(obj));
   
-    ssin << GET_OBJ_VNUM(obj);
-
     sbuf = GET_NAME(ch);
     sbuf += " removed ";
     sbuf += GET_OBJ_SHORT(obj);
@@ -1275,7 +1289,7 @@ void get_from_vault(CHAR_DATA *ch, char *object, char *owner) {
     sbuf += "'s vault.";
 
 
-    act(sbuf.c_str(), ch, 0, ch, TO_ROOM, GODS);
+    act(sbuf.c_str(), ch, 0, 0, TO_ROOM, GODS);
 
     item_remove(obj, vault);
    
@@ -1566,9 +1580,20 @@ void put_in_vault(CHAR_DATA *ch, char *object, char *owner) {
       vault_log(buf, owner);
       csendf(ch, "%s has been placed in the vault.\r\n", GET_OBJ_SHORT(obj));
 
-      snprintf(buf, MAX_INPUT_LENGTH, "%s has placed %s[%d] in %s's vault.", 
-                  GET_NAME(ch), GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj), owner);
-      act(buf, ch, 0, ch, TO_ROOM, GODS);
+    std::string sbuf;
+    std::stringstream ssin;
+    ssin << GET_OBJ_VNUM(obj);
+
+    sbuf = GET_NAME(ch);
+    sbuf += " added ";
+    sbuf += GET_OBJ_SHORT(obj);
+    sbuf += "[";
+    sbuf += ssin.str();
+    sbuf += "] to ";
+    sbuf += owner;
+    sbuf += "'s vault.";
+
+      act(sbuf.c_str(), ch, 0, 0, TO_ROOM, GODS);
 
       if (!fullSave(obj))
          { item_add(GET_OBJ_VNUM(obj), vault); extract_obj(obj); }
