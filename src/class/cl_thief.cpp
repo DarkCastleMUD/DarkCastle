@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.197 2009/06/24 01:34:34 shane Exp $
+| $Id: cl_thief.cpp,v 1.198 2009/07/25 03:32:41 shane Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -625,7 +625,8 @@ int do_trip(CHAR_DATA *ch, char *argument, int cmd)
   }
 
   one_argument(argument, name);
-  if (GET_CLASS(ch) == CLASS_BARD && IS_SINGING(ch))
+
+/*  if (GET_CLASS(ch) == CLASS_BARD && IS_SINGING(ch))
   {
     vector<songInfo>::iterator i;
 
@@ -636,7 +637,8 @@ int do_trip(CHAR_DATA *ch, char *argument, int cmd)
      }
     }
   }
-
+taken out!!  if we really don't want it, we can delete this block later.
+*/
   if(!*name && ch->fighting) 
   {
       victim = ch->fighting;
