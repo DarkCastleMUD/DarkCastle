@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.191 2009/07/10 20:11:53 dcastle Exp $ */
+/* $Id: mob_proc.cpp,v 1.192 2009/07/25 03:31:56 shane Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -188,11 +188,11 @@ char_data * find_random_player_in_room(char_data * ch)
 
     // Find the "count" player and return them
     for (vict = world[ch->in_room].people; vict; vict = vict->next_in_room)
-       if(!IS_NPC(vict))
+       if(!IS_NPC(vict)) {
           if(count > 1)
              count--;
           else return vict;
-
+       }
     // we should never get here
     return NULL;     
 }
@@ -821,7 +821,7 @@ int brass_dragon(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
 
     vict = ch->fighting;
 
-    if (!vict)
+    if (!vict) {
 	if (number(0,2) == 0)
 	{
 	    vict = ch->fighting;
@@ -830,6 +830,7 @@ int brass_dragon(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
 	}
 	else
 	    return eFAILURE;
+    }
 
     act("$n breathes lightning.", ch, 0, 0, TO_ROOM, 0);
     return cast_lightning_breath(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0, GET_LEVEL(ch));
