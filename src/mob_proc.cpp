@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.192 2009/07/25 03:31:56 shane Exp $ */
+/* $Id: mob_proc.cpp,v 1.193 2009/08/12 14:08:28 apocalypse Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -1773,7 +1773,9 @@ static char *dethSayText [ ] =
   "If they removed all porn from the internet there would be only one site left, and it would be called 'Bring Back the Porn'.",
   "Are you okay?",
   "Do you like me?",
-  "I wish I had a son, but I'm really just a boy. :("
+  "I wish I had a son, but I'm really just a boy. :(",
+  "If I was a robot, I'd name myself Hugh Mann so people would accept me more readily.",
+  "I like to leave a legacy, even if it doesn't last that long.  Yeah, I fart in the elevator."
  };
 
 // ENDOFCHAIN
