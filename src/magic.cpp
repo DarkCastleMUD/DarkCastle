@@ -1336,7 +1336,7 @@ int spell_firestorm(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
   act("$n makes $B$4fire$R fall from the heavens!\n\r",
 		ch, 0, 0, TO_ROOM, 0);
 
-  for (tmp_victim = character_list; tmp_victim; tmp_victim = temp) 
+  for (tmp_victim = character_list; tmp_victim && tmp_victim != (CHAR_DATA *)0x95959595; tmp_victim = temp) 
   {
     temp = tmp_victim->next;
 
