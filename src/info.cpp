@@ -12,7 +12,7 @@
  * This is free software and you are benefitting.	We hope that you    *
  * share your changes too.  What goes around, comes around. 		    *
  ****************************************************************************/
-/* $Id: info.cpp,v 1.191 2009/06/26 00:49:08 shane Exp $ */
+/* $Id: info.cpp,v 1.192 2009/08/21 15:48:17 jhhudso Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -972,6 +972,14 @@ int weight_in(struct obj_data *obj);
                      {
                         temp=((tmp_object->obj_flags.value[1]*3)
                            /tmp_object->obj_flags.value[0]);
+			if (temp > 3) {
+			  logf(IMMORTAL, LOG_WORLD, "Bug in object %d. v2: %d > v1: %d. Resetting.",
+			       obj_index[tmp_object->item_number].virt, tmp_object->obj_flags.value[1],
+			       tmp_object->obj_flags.value[0]);
+			  tmp_object->obj_flags.value[1] = tmp_object->obj_flags.value[0];
+			  temp = 3;
+			}
+
                         sprintf(buffer,
                            "It's %sfull of a %s liquid.\n\r",
                            fullness[temp],
