@@ -40,6 +40,7 @@ const bestowable_god_commands_type bestowable_god_commands[] =
 { "testhand",   COMMAND_TESTHAND, true },
 { "dopathpath", COMMAND_DOPATHPATH, true },
 { "testport", COMMAND_TESTPORT, false },
+{ "testuser", COMMAND_TESTUSER, false },
 { "remort", COMMAND_REMORT, true },
 { "testhit", COMMAND_TESTHIT, true },
 { "\n",		-1 }

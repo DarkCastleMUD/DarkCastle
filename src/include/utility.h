@@ -16,7 +16,7 @@
  *  10/21/2003   Onager    Changed IS_ANONYMOUS() to handle mobs without   *
  *                         crashing                                        *
  ***************************************************************************/
-/* $Id: utility.h,v 1.87 2009/06/05 04:37:26 jhhudso Exp $ */
+/* $Id: utility.h,v 1.88 2009/08/30 06:39:54 jhhudso Exp $ */
 
 #ifndef UTILITY_H_
 #define UTILITY_H_
@@ -468,6 +468,7 @@ int contents_cause_unique_problem(obj_data * obj, char_data * vict);
 bool check_make_camp(int);
 int get_leadership_bonus(CHAR_DATA *);
 void update_make_camp_and_leadership(void);
+int _parse_name(char *arg, char *name);
 
 void mob_suprised_sayings(char_data * ch, char_data * aggressor);
 

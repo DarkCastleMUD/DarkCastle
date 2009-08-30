@@ -584,6 +584,70 @@ int do_testport(char_data *ch, char *argument, int cmd)
     return eSUCCESS;
 }
 
+int do_testuser(char_data *ch, char *argument, int cmd)
+{
+    char arg1[MAX_INPUT_LENGTH];
+    char arg2[MAX_INPUT_LENGTH];
+    char savefile[255];
+    char bsavefile[255];
+    char command[512];
+    char username[20];
+
+    if (ch == NULL) {
+	return eFAILURE;
+    }
+
+    if (IS_MOB(ch) || !has_skill(ch, COMMAND_TESTUSER)) {
+        send_to_char("Huh?\r\n", ch);
+        return eFAILURE;
+    }  
+
+    argument = one_argument(argument, arg1);
+    one_argument(argument, arg2);
+
+    if (*arg1 == 0 || *arg2 == 0) {
+	send_to_char("testuser <user> <on|off>\n\r\n\r", ch);
+	return eFAILURE;
+    }
+
+    if (strlen(arg1) > 19 || _parse_name(arg1, username)) {
+      send_to_char("Invalid username passed.\n\r", ch);
+      return eFAILURE;
+    }
+
+    username[0] = UPPER(username[0]);
+    for(unsigned int i=1; i < strlen(username); i++) {
+      username[i] = LOWER(username[i]);
+    }
+
+    snprintf(savefile, 255, "../save/%c/%s", UPPER(username[0]), username);
+    snprintf(bsavefile, 255, "../bsave/%c/%s", UPPER(username[0]), username);
+
+    if (!file_exists(savefile)) {
+      send_to_char("Player file not found.\n\r", ch);
+      return eFAILURE;
+    }
+
+    if (!str_cmp(arg2, "on")) {
+      sprintf(command, "cp %s %s", savefile, bsavefile);
+    } else if (!str_cmp(arg2, "off")) {
+      sprintf(command, "rm %s", bsavefile);
+    } else {
+      send_to_char("Only on or off are valid second arguments to this command.\n\r", ch);
+      return eFAILURE;
+    }
+    
+    logf(110, LOG_GOD, "testuser: %s initiated %s", ch->name, command);
+
+    if (system(command)) {
+      send_to_char("Error occurred.\n\r", ch);
+    } else {
+      send_to_char("Ok.\n\r", ch);
+    }
+
+    return eSUCCESS;
+}
+
 #ifdef BANDWIDTH
 int do_bandwidth(struct char_data *ch, char *argument, int cmd)
 {
