@@ -12139,11 +12139,12 @@ int spell_blue_bird(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
   set_cantquit( ch, victim );
   switch(world[ch->in_room].sector_type) {
 
-     case SECT_SWAMP:     count = 2;   break;
-     case SECT_FOREST:    count = 4;   break;
-
-     case SECT_HILLS:     count = 3;   break;
-     case SECT_MOUNTAIN:  count = 2;   break;
+     case SECT_SWAMP:     count = 3;   break;
+     case SECT_FOREST:    count = 5;   break;
+     case SECT_AIR:       count = 4;   break;
+     case SECT_HILLS:     count = 4;   break;
+     case SECT_MOUNTAIN:  count = 3;   break;
+     case SECT_FIELD:     count = 3;   break;
      case SECT_WATER_SWIM:
      case SECT_WATER_NOSWIM:
      case SECT_BEACH:     count = 3;   break;
@@ -12152,7 +12153,7 @@ int spell_blue_bird(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
         send_to_char("But you're underwater!  Your poor birdie would drown:(\r\n", ch);
         return eFAILURE;
 
-     default:             count = 1;   break;
+     default:             count = 2;   break;
 
   }
   
