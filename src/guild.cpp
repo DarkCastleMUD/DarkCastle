@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: guild.cpp,v 1.126 2009/04/01 17:56:48 kkoons Exp $
+| $Id: guild.cpp,v 1.127 2009/09/05 07:44:59 jhhudso Exp $
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
@@ -519,7 +519,7 @@ int skills_guild(struct char_data *ch, char *arg, struct char_data *owner)
       }
    }
 
-//if they have a class tree set, let them only practice skils within that class tree
+//if they have a class tree set, let them only practice skills within that class tree
    if(IS_SET(ch->pcdata->toggles, PLR_CLS_TREE_A) && skilllist[skillnumber].group != 1) {
      csendf(ch, "You may only practice within the %s profession.\n\r", class_tree_name[GET_CLASS(ch)-1][0]);
      return eSUCCESS;
@@ -985,7 +985,11 @@ int get_stat_bonus(CHAR_DATA *ch, int stat)
 void skill_increase_check(char_data * ch, int skill, int learned, int difficulty)
 {
    int chance, maximum;
-if (ch->in_room && IS_SET(world[ch->in_room].room_flags, NOLEARN))
+
+   if(IS_MOB(ch))
+      return;
+
+   if (ch->in_room && IS_SET(world[ch->in_room].room_flags, NOLEARN))
 	return;
 
    if (!difficulty) 
@@ -1002,8 +1006,6 @@ if (ch->in_room && IS_SET(world[ch->in_room].room_flags, NOLEARN))
    if(learned >= ( GET_LEVEL(ch) * 2 ))
       return;
 
-   if(IS_MOB(ch))
-      return;
    if (IS_SET(world[ch->in_room].room_flags, SAFE)) return;
    class_skill_defines * skilllist = get_skill_list(ch);
    if(!skilllist)

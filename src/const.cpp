@@ -12,7 +12,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: const.cpp,v 1.314 2009/07/03 22:30:25 kkoons Exp $ */
+/* $Id: const.cpp,v 1.315 2009/09/05 07:44:59 jhhudso Exp $ */
 
 extern "C"
 {
@@ -88,6 +88,7 @@ std::map<int,int> fill_skill_cost()
   skill_cost_map[SKILL_ONSLAUGHT] = 50;
   skill_cost_map[SKILL_IMBUE] = 50;
   skill_cost_map[SKILL_BATTERBRACE] = 60;
+  skill_cost_map[SKILL_TRIAGE] = 40;
   return skill_cost_map;
 }
 

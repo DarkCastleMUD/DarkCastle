@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_warrior.cpp,v 1.79 2009/06/26 00:49:09 shane Exp $
+| $Id: cl_warrior.cpp,v 1.80 2009/09/05 07:44:59 jhhudso Exp $
 | cl_warrior.C
 | Description:  This file declares implementation for warrior-specific
 |   skills.
@@ -19,6 +19,9 @@
 #include <db.h>
 #include <returnvals.h>
 #include <race.h>
+#include <iostream>
+
+using namespace std;
 
 extern CWorld world;
 extern struct index_data *obj_index;
@@ -1231,7 +1234,7 @@ int do_triage(struct char_data *ch, char *argument, int cmd)
   int learned = has_skill(ch, SKILL_TRIAGE);
   struct affected_type af;
 
-  if(!IS_MOB(ch) && GET_LEVEL(ch) <= ARCHANGEL && !learned) {
+  if(IS_PC(ch) && GET_LEVEL(ch) < IMMORTAL && !learned) {
     send_to_char("You do not know how to aid your regeneration in that way.\n\r", ch);
     return eFAILURE;
   }
@@ -1241,6 +1244,17 @@ int do_triage(struct char_data *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
+  if(affected_by_spell(ch, SKILL_TRIAGE_TIMER)) {
+    send_to_char("You cannot take care of your battle wounds again so soon.\n\r", ch);
+    return eFAILURE;
+  }
+
+  if (GET_MOVE(ch) - skill_cost.find(SKILL_TRIAGE)->second < 0) {
+    send_to_char("You're too tired to use this skill.\n\r", ch);
+    return eFAILURE;
+  }
+
+  GET_MOVE(ch) -= skill_cost.find(SKILL_TRIAGE)->second;
   WAIT_STATE(ch, PULSE_VIOLENCE * 2);
 
   af.type = SKILL_TRIAGE_TIMER;
@@ -1253,18 +1267,18 @@ int do_triage(struct char_data *ch, char *argument, int cmd)
   if(!skill_success(ch, 0, SKILL_TRIAGE)) {
     send_to_char("You pause to clean and bandage some of your more painful injuries but feel little improvement in your health.\n\r", ch);
     act("$n pauses to try and bandage some of $s more painful injuries.", ch, 0, 0, TO_ROOM, 0);
-  } else {
-    send_to_char("You pause to clean and bandage some of your more painful injuries and speed the healing process.\n\r", ch);
-    act("$n pauses to try and bandage some of $s more painful injuries.", ch, 0, 0, TO_ROOM, 0);
-
-    af.type = SKILL_TRIAGE;
-    af.modifier = learned/3;
-    af.duration = 2;
-    af.location = APPLY_HP_REGEN;
-    af.bitvector = -1;
-
-    affect_to_char(ch, &af);
+    return eSUCCESS;
   }
+  
+  af.type = SKILL_TRIAGE;
+  af.modifier = learned/3;
+  af.duration = 2;
+  af.location = APPLY_HP_REGEN;
+  af.bitvector = -1;
+  affect_to_char(ch, &af);
+
+  send_to_char("You pause to clean and bandage some of your more painful injuries and speed the healing process.\n\r", ch);
+  act("$n pauses to try and bandage some of $s more painful injuries.", ch, 0, 0, TO_ROOM, 0);
 
   return eSUCCESS;
 }
