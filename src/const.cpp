@@ -12,7 +12,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: const.cpp,v 1.315 2009/09/05 07:44:59 jhhudso Exp $ */
+/* $Id: const.cpp,v 1.316 2009/09/08 19:00:57 apocalypse Exp $ */
 
 extern "C"
 {
@@ -316,7 +316,7 @@ const char *spell_wear_off_msg[] =
   "!Souldrain!",
   "!Sparks!",     // 114
   "Your $2c$7a$0$Bmo$Ru$2fl$7a$0$Bg$R$7e$R has worn off.",
-  "!FarSight!",
+  "Your farsight ability has expired.",
   "You slowly float down to the ground.",
   "You are able to sleep once again.",
   "You step out of the shadows.",
