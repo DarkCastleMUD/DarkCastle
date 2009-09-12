@@ -1856,7 +1856,8 @@ int do_oedit(struct char_data *ch, char *argument, int cmd)
       send_to_char("$3Syntax$R:  oedit new [obj vnum]           -- Create new object\n\r"
 		   "         oedit [obj vnum]               -- Stat object\n\r"
 		   "         oedit [obj vnum] [field]       -- Help info for that field\n\r"
-		   "         oedit [obj vnum] [field] [arg] -- Change that field\n\r\n\r"
+		   "         oedit [obj vnum] [field] [arg] -- Change that field\n\r"
+		   "         oedit [field] [arg]            -- Change that field, using last edited vnum\n\r\n\r"
                    "The field must be one of the following:\n\r", ch);
       display_string_list(fields, ch);
       return eFAILURE;
