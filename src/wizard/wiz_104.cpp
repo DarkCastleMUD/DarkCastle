@@ -2138,7 +2138,7 @@ int do_oclone(struct char_data *ch, char *argument, int cmd)
   extract_obj(otmp);
 
   ch->pcdata->last_obj_edit = r2;
-  set_zone_modified_obj(v2);
+  set_zone_modified_obj(r2);
 
   return eSUCCESS;
 }
@@ -2228,7 +2228,7 @@ int do_mclone(struct char_data *ch, char *argument, int cmd)
   }
 
   ch->pcdata->last_mob_edit = dst;
-  set_zone_modified_mob(vdst);
+  set_zone_modified_mob(dst);
 
   return eSUCCESS;
 }
