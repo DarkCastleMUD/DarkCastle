@@ -1853,9 +1853,10 @@ int do_oedit(struct char_data *ch, char *argument, int cmd)
     // buf4 = args[1-+]
   
     if(!*buf) {
-      send_to_char("$3Syntax$R:  oedit [item_num] [field] [arg]\r\n"
-                   "  Edit a item_num with no field or arg to view the item.\r\n"
-                   "  Edit a field with no args for help on that field.\r\n\r\n"
+      send_to_char("$3Syntax$R:  oedit new [obj vnum]           -- Create new object\n\r"
+		   "             oedit [obj vnum]               -- Stat object\n\r"
+		   "             oedit [obj vnum] [field]       -- Help info for that field\n\r"
+		   "             oedit [obj vnum] [field] [arg] -- Change that field\n\r\n\r"
                    "The field must be one of the following:\n\r", ch);
       display_string_list(fields, ch);
       return eFAILURE;
