@@ -12,7 +12,7 @@
  * This is free software and you are benefitting.	We hope that you    *
  * share your changes too.  What goes around, comes around. 		    *
  ****************************************************************************/
-/* $Id: info.cpp,v 1.192 2009/08/21 15:48:17 jhhudso Exp $ */
+/* $Id: info.cpp,v 1.193 2009/09/13 09:20:57 jhhudso Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -2732,12 +2732,13 @@ void check_leaderboard()
 	   mvactiveclass[j][i] = fread_int(fl, 0, LONG_MAX);
 	 }
        }
-       dc_fclose(fl);
      } catch (error_eof) {
        log("Corrupt leaderboard file: eof reached prematurely.", 0, LOG_MISC);
      } catch (error_negative_int) {
        log("Corrupt leaderboard file: negative int found where positive expected.", 0, LOG_MISC);
      }
+
+     dc_fclose(fl);
    }
 
    for(d=descriptor_list;d;d=d->next) {
