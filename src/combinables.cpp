@@ -685,6 +685,10 @@ int do_brew(char_data *ch, char *argument, int cmd)
   }
 
   argument = one_argument(argument, liquid);
+  if (!*liquid) {
+    send_to_char("", ch);
+  }
+
   argument = one_argument(argument, container);
 
   return eSUCCESS;
@@ -797,7 +801,7 @@ int Brew::add(char_data *ch, char *argument) {
     return eFAILURE;
   }
 
-  switch(liquid_type-1) {
+  switch(liquid_type) {
   case LIQ_MILK:
   case LIQ_WINE:
   case LIQ_SALTWATER:
