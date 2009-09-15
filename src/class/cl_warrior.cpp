@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_warrior.cpp,v 1.80 2009/09/05 07:44:59 jhhudso Exp $
+| $Id: cl_warrior.cpp,v 1.81 2009/09/15 02:39:08 jhhudso Exp $
 | cl_warrior.C
 | Description:  This file declares implementation for warrior-specific
 |   skills.
@@ -1524,19 +1524,19 @@ int do_onslaught(struct char_data *ch, char *argument, int cmd)
   int learned = has_skill(ch, SKILL_ONSLAUGHT);
   struct affected_type af;
 
-  if(!IS_MOB(ch) && GET_LEVEL(ch) <= ARCHANGEL && !learned) {
+  if(IS_PC(ch) && GET_LEVEL(ch) < IMMORTAL && !learned) {
     send_to_char("You do not know how to use this to your advantage.\n\r", ch);
     return eFAILURE;
   }
 
   if(affected_by_spell(ch, SKILL_ONSLAUGHT_TIMER)) {
-   send_to_char("You have not yet recovered from your previous onslaught attempt.\n\r", ch);
-   return eFAILURE;
+    send_to_char("You have not yet recovered from your previous onslaught attempt.\n\r", ch);
+    return eFAILURE;
   }
 
   if (!charge_moves(ch, SKILL_ONSLAUGHT)) {
    send_to_char("You do not have enough energy to attempt this onslaught.\n\r", ch);
-   return eSUCCESS;
+   return eFAILURE;
   }
 
   WAIT_STATE(ch, PULSE_VIOLENCE);
@@ -1550,7 +1550,6 @@ int do_onslaught(struct char_data *ch, char *argument, int cmd)
     af.modifier = 0;
     af.duration = 2 + learned/9;
     af.bitvector = -1;
-
     affect_to_char(ch, &af);
 
   } else {
