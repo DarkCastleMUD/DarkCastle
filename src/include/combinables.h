@@ -11,9 +11,9 @@ namespace Combinables {
     class recipe {
     public:
       bool operator<(const recipe& r2) const { return (this->container < r2.container) || (this->liquid < r2.liquid) || (this->herb < r2.herb); }
-      int32_t container;
-      int32_t liquid;
       int32_t herb;
+      int32_t liquid;
+      int32_t container;
     };
 
     Brew();

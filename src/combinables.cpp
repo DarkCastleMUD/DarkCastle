@@ -871,9 +871,9 @@ int Brew::remove(char_data *ch, char *argument) {
   int i = 0;
   int target = atoi(argument);
 
-  for (map<recipe, int>::iterator iter = recipes.begin(); iter != recipes.end(); ++iter) {
+  for (map<recipe, int>::reverse_iterator iter = recipes.rbegin(); iter != recipes.rend(); ++iter) {
     if (++i == target) {
-      recipes.erase(iter);
+      recipes.erase((*iter).first);
       csendf(ch, "Recipe # %d has been removed.\n\r", target);
 
       return eSUCCESS;
