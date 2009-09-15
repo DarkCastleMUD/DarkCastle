@@ -656,7 +656,7 @@ int do_brew(char_data *ch, char *argument, int cmd)
       if (GET_LEVEL(ch) >= 108) {
 	send_to_char("        brew load\n\r"
 		     "        brew save\n\r"
-		     "        brew list\b\r"
+		     "        brew list\n\r"
 		     "        brew add [herb_vnum] [liquid_type] [container_vnum] [spell_num]\n\r"
 		     "        brew remove [recipe_num]\n\r\n\r", ch);
     }
