@@ -791,7 +791,33 @@ int Brew::add(char_data *ch, char *argument) {
   herb_vnum = atoi(arg1);
   liquid_type = atoi(arg2);
   bottle_vnum = atoi(arg3);
-  spell = atoi(arg4);
+
+  if (herb_vnum < 6301 || herb_vnum > 6312) {
+    send_to_char("Only vnums 6301-6312 are valid herbs.\n\r", ch);
+    return eFAILURE;
+  }
+
+  switch(liquid_type-1) {
+  case LIQ_MILK:
+  case LIQ_WINE:
+  case LIQ_SALTWATER:
+    break;
+  default:
+    csendf(ch, "Invalid liquid type. Only Milk (%d), Wine (%d), Salt Water (%d) allowed.\n\r",
+	   LIQ_MILK, LIQ_WINE, LIQ_SALTWATER);
+    return eFAILURE;
+    break;
+  }
+
+  if (bottle_vnum < 6320 || bottle_vnum > 6324) {
+    send_to_char("Only vnums 6320-6324 are valid bottles.\n\r", ch);
+    return eFAILURE;
+  }
+
+  if((spell = find_skill_num(arg4)) < 0) {
+    csendf(ch, "Cannot find spell '%s' in master spell list.\r\n", arg4);
+    return eFAILURE;
+  }
 
   recipe r = { herb_vnum, liquid_type, bottle_vnum }; 
   recipes.insert(make_pair(r, spell));
