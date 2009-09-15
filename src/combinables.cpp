@@ -664,8 +664,6 @@ int do_brew(char_data *ch, char *argument, int cmd)
   }
 
   argument = one_argument(argument, arg1);
-  argument = one_argument(argument, liquid);
-  one_argument(argument, container);
 
   if (IS_PC(ch) && GET_LEVEL(ch) >= 108) {
     if (!str_cmp(arg1, "load")) {
@@ -685,6 +683,9 @@ int do_brew(char_data *ch, char *argument, int cmd)
       return b.remove(ch, argument);
     }
   }
+
+  argument = one_argument(argument, liquid);
+  one_argument(argument, container);
 
   if (!*liquid) {
     send_to_char("You'll need to choose a liquid type and container.\n\r"
