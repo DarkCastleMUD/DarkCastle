@@ -12,7 +12,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: const.cpp,v 1.316 2009/09/08 19:00:57 apocalypse Exp $ */
+/* $Id: const.cpp,v 1.317 2009/09/15 03:03:49 jhhudso Exp $ */
 
 extern "C"
 {
@@ -1678,6 +1678,7 @@ struct class_skill_defines u_skills[] = { // druid skills
 {    "summon",               SPELL_SUMMON,               49,    100,  0,   STRCON },
 {    "conjure elemental",    SPELL_CONJURE_ELEMENTAL,    50,    100,  0,   CONINT },
 {    "release elemental",    SPELL_RELEASE_ELEMENTAL,    50,    100,  0,   CONINT },
+{    "brew",                 SKILL_BREW,                 61,    100,  0,   CONINT },
 {    "\n",                   0,                          1,      0,   0,   0 }
 };
 
@@ -1741,7 +1742,7 @@ struct class_skill_defines c_skills[] = { // cleric skills
 //{    "commune",              SKILL_COMMUNE,           51,    100,  0,   DEXWIS },
 //{    "boneshield", 	     SPELL_BONESHIELD,        53,    100,  2,   STRCON },
 //{    "silence", 	     SPELL_SILENCE,           53,    100,  1,   CONWIS },
-//{    "scribe scroll",        SKILL_SCRIBE_SCROLL,     55,    100,  0,   DEXINT },
+{    "scribe scroll",        SKILL_SCRIBE_SCROLL,     61,    100,  0,   DEXINT }, //lvl 55
 //{    "immunity", 	     SPELL_IMMUNITY,          57,    100,  2,   CONWIS },
 //{    "atonement", 	     SPELL_ATONEMENT,         57,    100,  1,   STRCON },
 //{    "channel", 	     SPELL_CHANNEL,           60,    100,  2,   INTWIS },

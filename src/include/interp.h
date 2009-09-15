@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: interp.h,v 1.109 2009/08/30 06:39:54 jhhudso Exp $ */
+/* $Id: interp.h,v 1.110 2009/09/15 03:03:49 jhhudso Exp $ */
 
 #ifndef INTERP_H_
 #define INTERP_H_
@@ -215,6 +215,7 @@ DO_FUN do_boot;
 DO_FUN do_boss;
 DO_FUN do_brace;
 DO_FUN do_brief;
+DO_FUN do_brew;
 DO_FUN do_news_toggle;
 DO_FUN do_ascii_toggle;
 DO_FUN do_damage_toggle;

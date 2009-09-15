@@ -20,13 +20,23 @@
 #include <spells.h>
 #include <string.h> // strstr()
 #include <returnvals.h>
+#include "combinables.h"
 
 #include <vector>
 #include <algorithm>
+#include <iostream>
+#include <fstream>
+#include <iterator>
+#include <utility>
+#include <string>
+
 using namespace std;
+using namespace Combinables;
 
 extern CWorld world;
 extern struct index_data *obj_index; 
+extern char *drinks[];
+extern char *spells[];
 
 int saves_spell(CHAR_DATA *ch, CHAR_DATA *vict, int spell_base, int16 save_type);
 
@@ -626,7 +636,197 @@ int do_scribe(struct char_data *ch, char *argument, int cmd)
     act("As $e finishes, the letters on the newly minted scroll $Bglow$R briefly and return to normal.", ch, 0, 0, TO_ROOM, 0);
   }
 
+  return eSUCCESS;
+}
+
+int do_brew(char_data *ch, char *argument, int cmd)
+{
+  char arg1[MAX_STRING_LENGTH] = {0}, liquid[MAX_STRING_LENGTH] = {0}, container[MAX_STRING_LENGTH] = {0};
+  OBJ_DATA *herbobj, *liquidobj, *containerobj;
+
+  if(IS_PC(ch) && GET_LEVEL(ch) < IMMORTAL && !has_skill(ch, SKILL_BREW)) {
+    send_to_char("You just don't have the mind for potion brewing.\r\n", ch);
+    return eFAILURE;
+  }
   
+  if (!*argument) {
+      send_to_char("Brew what?\n\r"
+		   "$3Syntax:$R brew [herb] [liquid] [container]\n\r", ch);
+      if (GET_LEVEL(ch) >= 108) {
+	send_to_char("        brew load\n\r"
+		     "        brew save\n\r"
+		     "        brew add [herb_vnum] [liquid_type] [bottle_vnum] [spell_num]\n\r"
+		     "        brew remove [recipe_num]\n\r\n\r", ch);
+    }
+    return eFAILURE;
+  }
+
+  argument = one_argument(argument, arg1);
+
+  Brew b;
+
+  if (IS_PC(ch) && GET_LEVEL(ch) >= 108) {
+    if (!str_cmp(arg1, "load")) {
+      b.load();
+      logf(108, LOG_WORLD, "Loaded %d brew recipes.", b.size());
+      return eSUCCESS;
+    } else if (!str_cmp(arg1, "save")) {
+      b.save();
+      logf(108, LOG_WORLD, "Saved %d brew recipes.", b.size());
+      return eSUCCESS;
+    } else if (!str_cmp(arg1, "list")) {
+      b.list(ch);
+      return eSUCCESS;
+    } else if (!str_cmp(arg1, "add")) {
+      return b.add(ch, argument);
+    } else if (!str_cmp(arg1, "remove")) {
+      return b.remove(ch, argument);
+    }
+  }
+
+  argument = one_argument(argument, liquid);
+  argument = one_argument(argument, container);
 
   return eSUCCESS;
+}
+
+Brew::Brew(void) {
+  if (initialized == false) {
+    load();
+    initialized = true;
+  }
+}
+
+Brew::~Brew() {
+
+}
+
+void Brew::load(void) {
+  ifstream ifs(RECIPES_FILENAME, ios_base::in);
+  if (!ifs.is_open()) {
+    logf(IMMORTAL, LOG_BUG, "Unable to open %s.", RECIPES_FILENAME);
+    return;
+  }
+
+  recipes.empty();
+  
+  try {
+    while(!ifs.eof()) {
+      int spell = 0;
+      recipe r = {0, 0, 0};
+      
+      ifs >> r.herb;
+      ifs >> r.liquid;
+      ifs >> r.bottle;
+      ifs >> spell;
+      
+      // Don't insert empty entries
+      if (r.bottle && r.liquid && r.herb && spell) {
+	recipes.insert(make_pair(r, spell));
+      }
+    }
+  } catch(loadError) {
+    logf(IMMORTAL, LOG_BUG, "Error loading %s.", RECIPES_FILENAME);
+  }
+}
+
+void Brew::save(void) {
+  ofstream ofs(RECIPES_FILENAME, ios_base::trunc);
+  if (!ofs.is_open()) {
+    logf(IMMORTAL, LOG_BUG, "Unable to open %s.", RECIPES_FILENAME);
+    return;
+  }  
+
+  try {
+    for (map<recipe, int>::iterator iter = recipes.begin(); iter != recipes.end(); ++iter) {
+      pair<recipe, int> p = *iter;
+      recipe r = p.first;
+      int spell = p.second;
+      
+      ofs << r.herb << " " << r.liquid << " " << r.bottle << " " << spell << endl;
+    }
+  } catch(...) {
+    logf(IMMORTAL, LOG_BUG, "Error saving %s.", RECIPES_FILENAME);
+  }
+}
+
+void Brew::list(char_data *ch) {
+  char buffer[MAX_STRING_LENGTH];
+  int i = 0;
+
+  if (ch == 0) {
+    return;
+  }
+
+  send_to_char( "[# ] [herb #] [liquid] [bottle] Spell Name\n\r\n\r", ch);
+  for (map<recipe, int>::iterator iter = recipes.begin(); iter != recipes.end(); ++iter) {
+    pair<recipe, int> p = *iter;
+    recipe r = p.first;
+    int spell = p.second;
+
+    sprinttype(spell-1, spells, buffer);
+    csendf(ch, "[%2d] [%6d] [%6d] [%6d] %s (%d)\n\r", ++i, r.herb, r.liquid, r.bottle, buffer, spell);
+  }
+
+}
+
+int Brew::add(char_data *ch, char *argument) {
+  int herb_vnum, liquid_type, bottle_vnum, spell;
+  char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH], arg4[MAX_INPUT_LENGTH];
+  
+  if (!ch) {
+    return eFAILURE;
+  }
+
+  argument = one_argument(argument, arg1);
+  argument = one_argument(argument, arg2);
+  argument = one_argument(argument, arg3);
+  argument = one_argument(argument, arg4);
+
+  if (!*arg1 || !*arg2 || !*arg3 || !*arg4) {
+    send_to_char("Syntax: brew add [herb_vnum] [liquid_type] [bottle_vnum] [spell_num]\n\r", ch);
+    return eFAILURE;
+  }
+
+  herb_vnum = atoi(arg1);
+  liquid_type = atoi(arg2);
+  bottle_vnum = atoi(arg3);
+  spell = atoi(arg4);
+
+  recipe r = { herb_vnum, liquid_type, bottle_vnum }; 
+  recipes.insert(make_pair(r, spell));
+
+  send_to_char("New brew recipe added.\n\r", ch);
+
+  return eSUCCESS;
+}
+
+int Brew::remove(char_data *ch, char *argument) {
+  if (!ch)  {
+    return eFAILURE;
+  }
+
+  if (!*argument) {
+    send_to_char("Syntax: brew remove [recipe_num]\n\r", ch);
+    return eFAILURE;
+  }
+
+  int i = 0;
+  int target = atoi(argument);
+
+  for (map<recipe, int>::iterator iter = recipes.begin(); iter != recipes.end(); ++iter) {
+    if (++i == target) {
+      recipes.erase(iter);
+      csendf(ch, "Recipe # %d has been removed.\n\r", target);
+
+      return eSUCCESS;
+    }
+  }
+
+  csendf(ch, "Recipe # %d not found.\n\r", target);
+  return eFAILURE;
+}
+
+int Brew::size(void) {
+  return recipes.size();
 }
