@@ -1,7 +1,7 @@
 #ifndef CONNECT_H_
 #define CONNECT_H_
 /************************************************************************
-| $Id: connect.h,v 1.12 2008/11/18 14:40:00 kkoons Exp $
+| $Id: connect.h,v 1.13 2009/09/15 03:04:30 jhhudso Exp $
 | connect.h
 | Description: State of connectedness information.
 */
@@ -35,6 +35,10 @@
 #define CON_EDIT_MPROG                     23 
 #define CON_DISPLAY_ENTRANCE               24 
 #define CON_PRE_DISPLAY_ENTRANCE           25
+#define CON_SELECT_RECOVERY_MENU           26
+#define CON_GET_NEW_RECOVERY_QUESTION      27
+#define CON_GET_NEW_RECOVERY_ANSWER        28
+#define CON_GET_NEW_RECOVERY_EMAIL         29
 
 // if you change, make sure you update char *connected_states[] in const.C
 // also update connected_types[]
