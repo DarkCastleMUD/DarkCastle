@@ -790,7 +790,7 @@ void Brew::list(char_data *ch) {
   }
 
   send_to_char( "[# ] [herb #] [liquid] [container] Spell Name\n\r\n\r", ch);
-  for (map<recipe, int>::iterator iter = recipes.begin(); iter != recipes.end(); ++iter) {
+  for (map<recipe, int>::reverse_iterator iter = recipes.rbegin(); iter != recipes.rend(); ++iter) {
     pair<recipe, int> p = *iter;
     recipe r = p.first;
     int spell = p.second;
