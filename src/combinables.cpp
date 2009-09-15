@@ -643,6 +643,7 @@ int do_brew(char_data *ch, char *argument, int cmd)
 {
   char arg1[MAX_STRING_LENGTH] = {0}, liquid[MAX_STRING_LENGTH] = {0}, container[MAX_STRING_LENGTH] = {0};
   OBJ_DATA *herbobj, *liquidobj, *containerobj;
+  Brew b;
 
   if(IS_PC(ch) && GET_LEVEL(ch) < IMMORTAL && !has_skill(ch, SKILL_BREW)) {
     send_to_char("You just don't have the mind for potion brewing.\r\n", ch);
@@ -655,15 +656,16 @@ int do_brew(char_data *ch, char *argument, int cmd)
       if (GET_LEVEL(ch) >= 108) {
 	send_to_char("        brew load\n\r"
 		     "        brew save\n\r"
-		     "        brew add [herb_vnum] [liquid_type] [bottle_vnum] [spell_num]\n\r"
+		     "        brew list\b\r"
+		     "        brew add [herb_vnum] [liquid_type] [container_vnum] [spell_num]\n\r"
 		     "        brew remove [recipe_num]\n\r\n\r", ch);
     }
     return eFAILURE;
   }
 
   argument = one_argument(argument, arg1);
-
-  Brew b;
+  argument = one_argument(argument, liquid);
+  one_argument(argument, container);
 
   if (IS_PC(ch) && GET_LEVEL(ch) >= 108) {
     if (!str_cmp(arg1, "load")) {
@@ -684,12 +686,36 @@ int do_brew(char_data *ch, char *argument, int cmd)
     }
   }
 
-  argument = one_argument(argument, liquid);
   if (!*liquid) {
-    send_to_char("", ch);
+    send_to_char("You'll need to choose a liquid type and container.\n\r"
+		 "$3Syntax:$R brew [herb] [liquid] [container]\n\r", ch);
+    return eFAILURE;
   }
 
-  argument = one_argument(argument, container);
+  if (!*container) {
+    send_to_char("You'll need to select a container.\n\r"
+		 "$3Syntax:$R brew [herb] [liquid] [container]\n\r", ch);
+    return eFAILURE;
+  }
+
+  herbobj = get_obj_in_list_vis(ch, arg1, ch->carrying);
+  liquidobj = get_obj_in_list_vis(ch, liquid, ch->carrying);
+  containerobj = get_obj_in_list_vis(ch, container, ch->carrying);
+
+  if(!herbobj) {
+    send_to_char("You do not have that type of herb.\n\r", ch);
+    return eFAILURE;
+  }
+
+  if(!liquidobj) {
+    send_to_char("You do not have that type of liquid.\n\r", ch);
+    return eFAILURE;
+  }
+
+  if(!containerobj) {
+    send_to_char("You do not have that type of container.\n\r", ch);
+    return eFAILURE;
+  }
 
   return eSUCCESS;
 }
@@ -721,11 +747,11 @@ void Brew::load(void) {
       
       ifs >> r.herb;
       ifs >> r.liquid;
-      ifs >> r.bottle;
+      ifs >> r.container;
       ifs >> spell;
       
       // Don't insert empty entries
-      if (r.bottle && r.liquid && r.herb && spell) {
+      if (r.container && r.liquid && r.herb && spell) {
 	recipes.insert(make_pair(r, spell));
       }
     }
@@ -747,7 +773,7 @@ void Brew::save(void) {
       recipe r = p.first;
       int spell = p.second;
       
-      ofs << r.herb << " " << r.liquid << " " << r.bottle << " " << spell << endl;
+      ofs << r.herb << " " << r.liquid << " " << r.container << " " << spell << endl;
     }
   } catch(...) {
     logf(IMMORTAL, LOG_BUG, "Error saving %s.", RECIPES_FILENAME);
@@ -762,20 +788,20 @@ void Brew::list(char_data *ch) {
     return;
   }
 
-  send_to_char( "[# ] [herb #] [liquid] [bottle] Spell Name\n\r\n\r", ch);
+  send_to_char( "[# ] [herb #] [liquid] [container] Spell Name\n\r\n\r", ch);
   for (map<recipe, int>::iterator iter = recipes.begin(); iter != recipes.end(); ++iter) {
     pair<recipe, int> p = *iter;
     recipe r = p.first;
     int spell = p.second;
 
     sprinttype(spell-1, spells, buffer);
-    csendf(ch, "[%2d] [%6d] [%6d] [%6d] %s (%d)\n\r", ++i, r.herb, r.liquid, r.bottle, buffer, spell);
+    csendf(ch, "[%2d] [%6d] [%6d] [%9d] %s (%d)\n\r", ++i, r.herb, r.liquid, r.container, buffer, spell);
   }
 
 }
 
 int Brew::add(char_data *ch, char *argument) {
-  int herb_vnum, liquid_type, bottle_vnum, spell;
+  int herb_vnum, liquid_type, container_vnum, spell;
   char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH], arg4[MAX_INPUT_LENGTH];
   
   if (!ch) {
@@ -788,13 +814,13 @@ int Brew::add(char_data *ch, char *argument) {
   argument = one_argument(argument, arg4);
 
   if (!*arg1 || !*arg2 || !*arg3 || !*arg4) {
-    send_to_char("Syntax: brew add [herb_vnum] [liquid_type] [bottle_vnum] [spell_num]\n\r", ch);
+    send_to_char("Syntax: brew add [herb_vnum] [liquid_type] [container_vnum] [spell_num]\n\r", ch);
     return eFAILURE;
   }
 
   herb_vnum = atoi(arg1);
   liquid_type = atoi(arg2);
-  bottle_vnum = atoi(arg3);
+  container_vnum = atoi(arg3);
 
   if (herb_vnum < 6301 || herb_vnum > 6312) {
     send_to_char("Only vnums 6301-6312 are valid herbs.\n\r", ch);
@@ -813,8 +839,8 @@ int Brew::add(char_data *ch, char *argument) {
     break;
   }
 
-  if (bottle_vnum < 6320 || bottle_vnum > 6324) {
-    send_to_char("Only vnums 6320-6324 are valid bottles.\n\r", ch);
+  if (container_vnum < 6320 || container_vnum > 6324) {
+    send_to_char("Only vnums 6320-6324 are valid containers.\n\r", ch);
     return eFAILURE;
   }
 
@@ -823,7 +849,7 @@ int Brew::add(char_data *ch, char *argument) {
     return eFAILURE;
   }
 
-  recipe r = { herb_vnum, liquid_type, bottle_vnum }; 
+  recipe r = { herb_vnum, liquid_type, container_vnum }; 
   recipes.insert(make_pair(r, spell));
 
   send_to_char("New brew recipe added.\n\r", ch);
