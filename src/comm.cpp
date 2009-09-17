@@ -461,12 +461,6 @@ void init_game(int port, int port2, int port3, int port4)
   extern struct cmd_hash_info * cmd_radix;
 #endif
 
-#ifndef WIN32
-  srandom(time(0));
-#else
-  srand(time(0));
-#endif
-
   FILE * fp;
   // create boot'ing lockfile
   if((fp = fopen("died_in_bootup","w")))
