@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.191 2009/09/10 05:16:03 jhhudso Exp $ */
+/* $Id: handler.cpp,v 1.192 2009/09/20 10:30:23 jhhudso Exp $ */
     
 extern "C"
 {
@@ -1754,7 +1754,12 @@ void affect_remove( CHAR_DATA *ch, struct affected_type *af, int flags)
       case SKILL_ONSLAUGHT:
 	 if (!(flags & SUPPRESS_MESSAGES))
 	   send_to_char ("You don't feel as fast and furious as you once did...\n\r", ch);
-	 break;                      
+	 break;
+   case SKILL_BREW_TIMER:
+     if (!(flags & SUPPRESS_MESSAGES)) {
+       send_to_char("You feel ready to brew something again.\n\r", ch);
+     }
+     break;
       default:
          break;
    }
@@ -2087,10 +2092,9 @@ int equip_char(CHAR_DATA *ch, struct obj_data *obj, int pos, int flag)
 	return 0;
     }
 
-    if (!IS_NPC(ch))
-    if ((IS_OBJ_STAT(obj, ITEM_ANTI_EVIL) && IS_EVIL(ch)) ||
-	(IS_OBJ_STAT(obj, ITEM_ANTI_GOOD) && IS_GOOD(ch)) ||
-	(IS_OBJ_STAT(obj, ITEM_ANTI_NEUTRAL) && IS_NEUTRAL(ch)) && !IS_NPC(ch)) 
+    if (((IS_OBJ_STAT(obj, ITEM_ANTI_EVIL) && IS_EVIL(ch)) ||
+	 (IS_OBJ_STAT(obj, ITEM_ANTI_GOOD) && IS_GOOD(ch)) ||
+	 (IS_OBJ_STAT(obj, ITEM_ANTI_NEUTRAL) && IS_NEUTRAL(ch))) && IS_PC(ch))
     {
 	if(IS_SET(obj->obj_flags.more_flags, ITEM_NO_TRADE) ||
 	   affected_by_spell(ch, FUCK_PTHIEF) || contains_no_trade_item(obj)) {
@@ -3147,18 +3151,21 @@ void update_char_objects( CHAR_DATA *ch )
                 }
             }
 
-    for(i = 0;i < MAX_WEAR;i++) 
-	if (ch->equipment[i])
-	    if(obj_index[ch->equipment[i]->item_number].virt == SPIRIT_SHIELD_OBJ_NUMBER) {
-              update_object(ch->equipment[i],1);
-              if(ch->equipment[i]->obj_flags.timer < 1) {
-                send_to_room("The spirit shield shimmers brightly and then fades away.\n\r", ch->in_room);
-                extract_obj(ch->equipment[i]);
-              }
-            }
-            else
-              update_object(ch->equipment[i],2);
+    for(i = 0; i < MAX_WEAR; i++) {
+      if (ch->equipment[i]) {
+	if (obj_index[ch->equipment[i]->item_number].virt == SPIRIT_SHIELD_OBJ_NUMBER) {
+	  update_object(ch->equipment[i], 1);
 
+	  if(ch->equipment[i]->obj_flags.timer < 1) {
+	    send_to_room("The spirit shield shimmers brightly and then fades away.\n\r", ch->in_room);
+	    extract_obj(ch->equipment[i]);
+	  }
+	} else {
+	  update_object(ch->equipment[i], 2);
+	}
+      }
+    }
+    
     if (ch->carrying) update_object(ch->carrying,1);
 }
 
@@ -3382,11 +3389,15 @@ CHAR_DATA *get_rand_other_char_room_vis(CHAR_DATA *ch)
   count = number(1, count);
 
   // Find the "count" player and return them
-  for (vict = world[ch->in_room].people; vict; vict = vict->next_in_room)
-    if (CAN_SEE(ch, vict) && ch != vict)
-      if(count > 1)
+  for (vict = world[ch->in_room].people; vict; vict = vict->next_in_room) {
+    if (CAN_SEE(ch, vict) && ch != vict) {
+      if(count > 1) {
 	count--;
-      else return vict;
+      } else {
+	return vict;
+      }
+    }
+  }
 
   // we should never get here
   return NULL;
