@@ -14,7 +14,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: spells.h,v 1.135 2009/09/15 03:03:49 jhhudso Exp $ */
+/* $Id: spells.h,v 1.136 2009/09/20 12:02:38 jhhudso Exp $ */
 #include <structs.h> // ubyte, int16
 
 #include <map>
@@ -557,7 +557,8 @@ void check_maxes(CHAR_DATA *ch);
 #define CONC_LOSS_FIXER              4014
 #define SKILL_ONSLAUGHT_TIMER        4015
 #define SPELL_KI_TRANS_TIMER         4016
-#define RESERVED_MAX                 4016
+#define SKILL_BREW_TIMER             4017
+#define RESERVED_MAX                 4017
 ///////////////////////////////////////////////////////////////////////
 
 #define TAR_IGNORE         1
