@@ -20,7 +20,7 @@
  * 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead *
  * of just race stuff                                                     *
  **************************************************************************
- * $Id: fight.cpp,v 1.545 2009/06/24 01:34:17 shane Exp $               *
+ * $Id: fight.cpp,v 1.546 2009/09/20 12:06:00 jhhudso Exp $               *
  **************************************************************************/
 
 extern "C"
@@ -2627,7 +2627,7 @@ int is_pkill(CHAR_DATA *ch, CHAR_DATA *vict)
   return FALSE;
 }
 
-void send_damage(char *buf, CHAR_DATA *ch, OBJ_DATA *obj, CHAR_DATA *victim, char *dmg, char *buf2, int to)
+void send_damage(char const *buf, CHAR_DATA *ch, OBJ_DATA *obj, CHAR_DATA *victim, char const *dmg, char const *buf2, int to)
 {
  void send_message(TokenList * tokens, CHAR_DATA *ch, OBJ_DATA * obj, void * vch, int flags, CHAR_DATA *to);
   CHAR_DATA *tmpch;
@@ -2751,21 +2751,21 @@ void do_dam_msgs(CHAR_DATA *ch, CHAR_DATA *victim, int dam, int attacktype, int 
       else
         if (GET_POS(victim) == POSITION_DEAD)
         {
-	send_damage((char *)replaceString(messages2->die_msg.victim_msg, find, replace).c_str(), ch, ch->equipment[weapon],
-		victim, dmgmsg, (char *)replaceString(messages->die_msg.victim_msg, find, replace).c_str(), TO_VICT);
-	send_damage((char *)replaceString(messages2->die_msg.attacker_msg, find, replace).c_str(), ch, ch->equipment[weapon],
-		victim, dmgmsg, (char *)replaceString(messages->die_msg.attacker_msg, find, replace).c_str(), TO_CHAR);
-	send_damage((char *)replaceString(messages2->die_msg.room_msg, find, replace).c_str(), ch, ch->equipment[weapon],
-		victim, dmgmsg, (char *)replaceString(messages->die_msg.room_msg, find, replace).c_str(), TO_ROOM);
+	send_damage(replaceString(messages2->die_msg.victim_msg, find, replace).c_str(), ch, ch->equipment[weapon],
+		victim, dmgmsg, replaceString(messages->die_msg.victim_msg, find, replace).c_str(), TO_VICT);
+	send_damage(replaceString(messages2->die_msg.attacker_msg, find, replace).c_str(), ch, ch->equipment[weapon],
+		victim, dmgmsg, replaceString(messages->die_msg.attacker_msg, find, replace).c_str(), TO_CHAR);
+	send_damage(replaceString(messages2->die_msg.room_msg, find, replace).c_str(), ch, ch->equipment[weapon],
+		victim, dmgmsg, replaceString(messages->die_msg.room_msg, find, replace).c_str(), TO_ROOM);
         }
         else
         {
-	send_damage((char *)replaceString(messages2->hit_msg.victim_msg, find, replace).c_str(), ch, ch->equipment[weapon],
-		victim, dmgmsg, (char *)replaceString(messages->hit_msg.victim_msg, find, replace).c_str(), TO_VICT);
-	send_damage((char *)replaceString(messages2->hit_msg.attacker_msg, find, replace).c_str(), ch, ch->equipment[weapon],
-		victim, dmgmsg, (char *)replaceString(messages->hit_msg.attacker_msg, find, replace).c_str(), TO_CHAR);
-	send_damage((char *)replaceString(messages2->hit_msg.room_msg, find, replace).c_str(), ch, ch->equipment[weapon],
-		victim, dmgmsg, (char *)replaceString(messages->hit_msg.room_msg, find, replace).c_str(), TO_ROOM);
+	send_damage(replaceString(messages2->hit_msg.victim_msg, find, replace).c_str(), ch, ch->equipment[weapon],
+		victim, dmgmsg, replaceString(messages->hit_msg.victim_msg, find, replace).c_str(), TO_VICT);
+	send_damage(replaceString(messages2->hit_msg.attacker_msg, find, replace).c_str(), ch, ch->equipment[weapon],
+		victim, dmgmsg, replaceString(messages->hit_msg.attacker_msg, find, replace).c_str(), TO_CHAR);
+	send_damage(replaceString(messages2->hit_msg.room_msg, find, replace).c_str(), ch, ch->equipment[weapon],
+		victim, dmgmsg, replaceString(messages->hit_msg.room_msg, find, replace).c_str(), TO_ROOM);
         }
   }
 }
