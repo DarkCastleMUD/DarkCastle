@@ -27,9 +27,11 @@
 #include <returnvals.h>
 #include <set.h>
 #include <arena.h>
+#include <race.h>
+
 #include <vector>
 #include <string>
-#include <race.h>
+#include <sstream>
 
 #define EMOTING_FILE "emoting-objects.txt"
 
@@ -3678,39 +3680,45 @@ int godload_hydratail(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
       return eFAILURE;
 
    int damtype = 0;
+   char dammsg[MAX_STRING_LENGTH];
+   int dam = number(50,100);
+   string damtypeStr;
+   sprintf(dammsg, "$B%d$R", dam);
+
    switch (number(1,4))
    {
      case 1:
-      act("A head on $n's whip lashes out of its own accord unleashing a $4$Bfiery$R blast at you!", 
-              ch, obj, ch->fighting, TO_VICT, 0);
-      act("A head on your whip lashes out of its own accord unleashing a $4$Bfiery$R blast at $N!", 
-              ch, obj, ch->fighting, TO_CHAR, 0);
-	damtype = TYPE_FIRE;
-	break;
+       damtypeStr = "$4$Bfiery$R";
+       damtype = TYPE_FIRE;
+       break;
      case 2:
-      act("A head on $n's whip lashes out of its own accord unleashing a $3$Bchilling$R blast at you!", 
-              ch, obj, ch->fighting, TO_VICT, 0);
-      act("A head on your whip lashes out of its own accord unleashing a $3$Bchilling$R blast at $N!", 
-              ch, obj, ch->fighting, TO_CHAR, 0);
-	damtype = TYPE_COLD;
-	break;
+       damtypeStr = "$3$Bchilling$R";
+       damtype = TYPE_COLD;
+       break;
      case 3:
-      act("A head on $n's whip lashes out of its own accord unleashing a $2$Bacidic$R blast at you!", 
-              ch, obj, ch->fighting, TO_VICT, 0);
-      act("A head on your whip lashes out of its own accord unleashing a $2$Bacidic$R blast at $N!", 
-              ch, obj, ch->fighting, TO_CHAR, 0);
-	damtype = TYPE_ACID;
-	break;
+       damtypeStr = "$2$Bacidic$R";
+       damtype = TYPE_ACID;
+       break;
      case 4:
-      act("A head on $n's whip lashes out of its own accord unleashing a $5$Bshocking$R blast at you!", 
-              ch, obj, ch->fighting, TO_VICT, 0);
-      act("A head on your whip lashes out of its own accord unleashing a $5$Bshocking$R blast at $N!", 
-              ch, obj, ch->fighting, TO_CHAR, 0);
-	damtype = TYPE_ENERGY;
-	break;
+       damtypeStr = "$5$Bshocking$R"; 
+       damtype = TYPE_ENERGY;
+       break;
    }
    CHAR_DATA *victim = ch->fighting;
-   int dam;
-   dam = number(50,100);
+
+   stringstream strwithdam;
+   stringstream strwithoutdam;
+
+   strwithdam << "A head on $n's whip lashes out of its own accord unleashing a " << damtypeStr << " blast at you for | damage!";
+   strwithoutdam << "A head on $n's whip lashes out of its own accord unleashing a " << damtypeStr << " blast at you!";
+   send_damage(strwithdam.str().c_str(), ch, obj, ch->fighting, dammsg, strwithoutdam.str().c_str(), TO_VICT);
+
+   strwithdam.str("");
+   strwithoutdam.str("");
+
+   strwithdam << "A head on your whip lashes out of its own accord unleashing a " << damtypeStr << " blast at $N for | damage!";
+   strwithoutdam << "A head on your whip lashes out of its own accord unleashing a " << damtypeStr << " blast at $N!";
+   send_damage(strwithdam.str().c_str(), ch, obj, ch->fighting, dammsg, strwithoutdam.str().c_str(), TO_CHAR);
+
    return damage(ch, victim, dam, damtype, 0, 0);
 }
