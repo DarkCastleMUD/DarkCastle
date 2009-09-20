@@ -641,15 +641,28 @@ int do_scribe(struct char_data *ch, char *argument, int cmd)
 
 int do_brew(char_data *ch, char *argument, int cmd)
 {
-  char arg1[MAX_STRING_LENGTH] = {0}, liquid[MAX_STRING_LENGTH] = {0}, container[MAX_STRING_LENGTH] = {0};
+  char arg1[MAX_STRING_LENGTH], liquid[MAX_STRING_LENGTH], container[MAX_STRING_LENGTH], buffer[MAX_STRING_LENGTH];
   OBJ_DATA *herbobj, *liquidobj, *containerobj;
+  affected_type af;
   Brew b;
 
-  if(IS_PC(ch) && GET_LEVEL(ch) < IMMORTAL && !has_skill(ch, SKILL_BREW)) {
+  int learned = has_skill(ch, SKILL_BREW);
+
+  if (IS_PC(ch) && GET_LEVEL(ch) < IMMORTAL && !learned) {
     send_to_char("You just don't have the mind for potion brewing.\r\n", ch);
     return eFAILURE;
   }
   
+  if (affected_by_spell(ch, SKILL_BREW_TIMER)) {
+    send_to_char("You aren't ready to brew anything again.\n\r", ch);
+    return eFAILURE;
+  }
+
+  if (!charge_moves(ch, SKILL_BREW)) {
+    send_to_char("You do not have enough energy to attempt to brew anything.\n\r", ch);
+    return eFAILURE;
+  }
+
   if (!*argument) {
       send_to_char("Brew what?\n\r"
 		   "$3Syntax:$R brew [herb] [liquid] [container]\n\r", ch);
@@ -703,19 +716,40 @@ int do_brew(char_data *ch, char *argument, int cmd)
   liquidobj = get_obj_in_list_vis(ch, liquid, ch->carrying);
   containerobj = get_obj_in_list_vis(ch, container, ch->carrying);
 
-  if(!herbobj) {
+  if (!herbobj) {
     send_to_char("You do not have that type of herb.\n\r", ch);
     return eFAILURE;
   }
 
-  if(!liquidobj) {
+  if (!liquidobj) {
     send_to_char("You do not have that type of liquid.\n\r", ch);
     return eFAILURE;
   }
 
-  if(!containerobj) {
+  if (!containerobj) {
     send_to_char("You do not have that type of container.\n\r", ch);
     return eFAILURE;
+  }
+  
+  WAIT_STATE(ch, PULSE_VIOLENCE * 2.5);
+
+  af.type = SKILL_BREW_TIMER;
+  af.location = 0;
+  af.modifier = 0;
+  af.duration = 24;
+  af.bitvector = -1;
+  affect_to_char(ch, &af);
+
+  if (skill_success(ch, 0, SKILL_BREW)) {
+    act("You sit down and carefully pour the ingredients into $o and give it a gentle shake to mix them.", ch, 0, containerobj, TO_CHAR, 0);
+
+    snprintf(buffer, MAX_STRING_LENGTH, "As the $o disolves, the liquid turns a (red/dark red, blue/dark blue, green/dark green, etc).");
+    act(buffer, ch, 0, herbobj, TO_CHAR, 0);
+
+    act("", ch, 0, 0, TO_ROOM, 0);
+  } else {
+    act("", ch, 0, 0, TO_CHAR, 0);
+    act("", ch, 0, 0, TO_ROOM, 0);   
   }
 
   return eSUCCESS;
@@ -739,7 +773,7 @@ void Brew::load(void) {
     return;
   }
 
-  recipes.empty();
+  recipes.clear();
   
   try {
     while(!ifs.eof()) {
@@ -791,9 +825,8 @@ void Brew::list(char_data *ch) {
 
   send_to_char( "[# ] [herb #] [liquid] [container] Spell Name\n\r\n\r", ch);
   for (map<recipe, int>::reverse_iterator iter = recipes.rbegin(); iter != recipes.rend(); ++iter) {
-    pair<recipe, int> p = *iter;
-    recipe r = p.first;
-    int spell = p.second;
+    recipe r = iter->first;
+    int spell = iter->second;
 
     sprinttype(spell-1, spells, buffer);
     csendf(ch, "[%2d] [%6d] [%6d] [%9d] %s (%d)\n\r", ++i, r.herb, r.liquid, r.container, buffer, spell);
