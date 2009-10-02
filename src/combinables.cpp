@@ -653,16 +653,6 @@ int do_brew(char_data *ch, char *argument, int cmd)
     return eFAILURE;
   }
   
-  if (affected_by_spell(ch, SKILL_BREW_TIMER)) {
-    send_to_char("You aren't ready to brew anything again.\n\r", ch);
-    return eFAILURE;
-  }
-
-  if (!charge_moves(ch, SKILL_BREW)) {
-    send_to_char("You do not have enough energy to attempt to brew anything.\n\r", ch);
-    return eFAILURE;
-  }
-
   if (!*argument) {
       send_to_char("Brew what?\n\r"
 		   "$3Syntax:$R brew [herb] [liquid] [container]\n\r", ch);
@@ -695,6 +685,11 @@ int do_brew(char_data *ch, char *argument, int cmd)
     } else if (!str_cmp(arg1, "remove")) {
       return b.remove(ch, argument);
     }
+  }
+
+  if (affected_by_spell(ch, SKILL_BREW_TIMER)) {
+    send_to_char("You aren't ready to brew anything again.\n\r", ch);
+    return eFAILURE;
   }
 
   argument = one_argument(argument, liquid);
@@ -731,20 +726,24 @@ int do_brew(char_data *ch, char *argument, int cmd)
     return eFAILURE;
   }
   
+  if (!charge_moves(ch, SKILL_BREW)) {
+    return eFAILURE;
+  }
+
   WAIT_STATE(ch, PULSE_VIOLENCE * 2.5);
 
   af.type = SKILL_BREW_TIMER;
-  af.location = 0;
+  af.location = APPLY_NONE;
   af.modifier = 0;
   af.duration = 24;
   af.bitvector = -1;
   affect_to_char(ch, &af);
 
   if (skill_success(ch, 0, SKILL_BREW)) {
-    act("You sit down and carefully pour the ingredients into $o and give it a gentle shake to mix them.", ch, 0, containerobj, TO_CHAR, 0);
+    act("You sit down and carefully pour the ingredients into $o and give it a gentle shake to mix them.", ch, containerobj, 0, TO_CHAR, 0);
 
     snprintf(buffer, MAX_STRING_LENGTH, "As the $o disolves, the liquid turns a (red/dark red, blue/dark blue, green/dark green, etc).");
-    act(buffer, ch, 0, herbobj, TO_CHAR, 0);
+    act(buffer, ch, herbobj, 0, TO_CHAR, 0);
 
     act("", ch, 0, 0, TO_ROOM, 0);
   } else {

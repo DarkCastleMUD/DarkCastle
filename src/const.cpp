@@ -12,7 +12,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: const.cpp,v 1.317 2009/09/15 03:03:49 jhhudso Exp $ */
+/* $Id: const.cpp,v 1.318 2009/10/02 04:15:22 jhhudso Exp $ */
 
 extern "C"
 {
@@ -89,6 +89,7 @@ std::map<int,int> fill_skill_cost()
   skill_cost_map[SKILL_IMBUE] = 50;
   skill_cost_map[SKILL_BATTERBRACE] = 60;
   skill_cost_map[SKILL_TRIAGE] = 40;
+  skill_cost_map[SKILL_BREW] = 100;
   return skill_cost_map;
 }
 
@@ -2603,4 +2604,5 @@ char *reserved[] = {
     "concentration loss fixer",
     "onslaught reuse timer",
     "ki transfer receive timer",
+    "brew reuse timer",
 };

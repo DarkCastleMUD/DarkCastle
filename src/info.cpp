@@ -12,7 +12,7 @@
  * This is free software and you are benefitting.	We hope that you    *
  * share your changes too.  What goes around, comes around. 		    *
  ****************************************************************************/
-/* $Id: info.cpp,v 1.193 2009/09/13 09:20:57 jhhudso Exp $ */
+/* $Id: info.cpp,v 1.194 2009/10/02 04:15:22 jhhudso Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -1609,6 +1609,9 @@ int do_score(struct char_data *ch, char *argument, int cmd)
              aff_name = "natural selection";
              modifyOutput = TRUE;
              break;
+	 case SKILL_BREW_TIMER:
+	   aff_name = "brew timer";
+	   break;
            case CONC_LOSS_FIXER:
 	     aff_name = 0; // We don't want this showing up in score
              break;
