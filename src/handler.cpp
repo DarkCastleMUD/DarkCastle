@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.192 2009/09/20 10:30:23 jhhudso Exp $ */
+/* $Id: handler.cpp,v 1.193 2009/10/02 02:58:32 jhhudso Exp $ */
     
 extern "C"
 {
@@ -4294,6 +4294,95 @@ bool charge_moves(char_data *ch, int skill, double modifier)
   }
   GET_MOVE(ch) -= amt;
   return TRUE;
+}
+
+int find_skill_num(char * name)
+{
+  extern char * skills[];
+  extern char * spells[];
+  extern char * songs[];
+  extern char * ki[];
+  int i;
+  unsigned int name_length = strlen(name);
+
+  // try ki
+  for(i = 0; *ki[i] != '\n'; i++)
+    if (name_length <= strlen(ki[i]) && !str_n_nosp_cmp(name, ki[i],name_length))
+      return (i + KI_OFFSET);
+
+  // try spells
+  for(i = 0; *spells[i] != '\n'; i++)
+    if (name_length <= strlen(spells[i]) && !str_n_nosp_cmp(name, spells[i], name_length ))
+      return (i + 1);
+
+  // try skills
+  for(i = 0; *skills[i] != '\n'; i++)
+    if (name_length <= strlen(skills[i]) && !str_n_nosp_cmp(name, skills[i], name_length ))
+      return (i + SKILL_BASE);
+
+  // try songs
+  for(i = 0; *songs[i] != '\n'; i++)
+    if (name_length <= strlen(songs[i]) && !str_n_nosp_cmp(name, songs[i], name_length))
+      return (i + SKILL_SONG_BASE);
+
+  // sets?
+  for (i = 0; *set_list[i].SetName != '\n'; i++)
+    if (name_length <= strlen(set_list[i].SetName) && !str_n_nosp_cmp(name, set_list[i].SetName, name_length))
+      return (i + BASE_SETS);
+  // timers/other stuff
+  switch (LOWER(*name))
+  {
+    case 'b':
+      if (name_length <= strlen("blood fury reuse timer") && !str_n_nosp_cmp(name, "blood fury reuse timer", name_length))
+        return SKILL_BLOOD_FURY;
+	break;
+    case 'c':
+      if (name_length <= strlen("CANT_QUIT") && !str_n_nosp_cmp(name, "CANT_QUIT", name_length))
+        return FUCK_CANTQUIT;
+      if (name_length <= strlen("clanarea claim timer") && !str_n_nosp_cmp(name, "clanarea claim timer", name_length))
+        return SKILL_CLANAREA_CLAIM;
+      if (name_length <= strlen("clanarea challenge timer") && !str_n_nosp_cmp(name, "clanarea claim timer", name_length))
+        return SKILL_CLANAREA_CHALLENGE;
+      if (name_length <= strlen("cannot cast timer") && !str_n_nosp_cmp(name, "cannot cast timer", name_length))
+        return SPELL_NO_CAST_TIMER;
+      if (name_length <= strlen("crazed assault reuse timer") && !str_n_nosp_cmp(name, "crazed assault reuse timer", name_length))
+        return SKILL_CRAZED_ASSAULT;
+      break;
+    case 'd':
+      if (name_length <= strlen("DIRTY_THIEF/CANT_QUIT") && !str_n_nosp_cmp(name, "DIRTY_THIEF/CANT_QUIT", name_length))
+        return FUCK_PTHIEF;
+      if (name_length <= strlen("divine intervention timer") && !str_n_nosp_cmp(name, "divine intervention timer", name_length))
+        return SPELL_DIV_INT_TIMER;
+      break;
+    case 'g':
+      if (name_length <= strlen("GOLD_THIEF/CANT_QUIT") && !str_n_nosp_cmp(name, "GOLD_THIEF/CANT_QUIT", name_length))
+        return FUCK_GTHIEF;
+      break;
+    case 'h':
+      if (name_length <= strlen("harmtouch reuse timer") && !str_n_nosp_cmp(name, "harmtouch reuse timer", name_length))
+        return SKILL_HARM_TOUCH;
+      if (name_length <= strlen("holy aura timer") && !str_n_nosp_cmp(name, "holy aura timer", name_length))
+        return SPELL_HOLY_AURA_TIMER;
+      break;
+    case 'l':
+      if (name_length <= strlen("layhands reuse timer") && !str_n_nosp_cmp(name, "layhands reuse timer", name_length))
+        return SKILL_LAY_HANDS;
+     break;       
+    case 'n':
+      if (name_length <= strlen("natural selection") && !str_n_nosp_cmp(name, "natural selection", name_length))
+        return SKILL_NAT_SELECT;
+      if (name_length <= strlen("natural select timer") && !str_n_nosp_cmp(name, "natural select timer", name_length))
+        return SPELL_NAT_SELECT_TIMER;
+      break;
+     case 'q':
+      if (name_length <= strlen("quiver reuse timer") && !str_n_nosp_cmp(name, "quiver reuse timer", name_length))
+        return SKILL_QUIVERING_PALM;
+      break;
+    default: break;
+  };
+
+
+  return -1;    
 }
 
 
