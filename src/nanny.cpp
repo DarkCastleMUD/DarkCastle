@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.185 2009/06/19 00:51:37 shane Exp $ */
+/* $Id: nanny.cpp,v 1.186 2009/10/14 02:53:07 jhhudso Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -401,10 +401,11 @@ void do_on_login_stuff(char_data * ch)
     }
 
     if(vault) {
-      if (GET_LEVEL(ch) < 50)
+      if (vault->size < (unsigned)(GET_LEVEL(ch) * 10)) {
+	logf(IMMORTAL, LOG_BUG, "%s's vault reset from %d to %d during login.", GET_NAME(ch), vault->size, GET_LEVEL(ch) * 10);
 	vault->size = GET_LEVEL(ch) * 10;
-      else if (vault->size < (unsigned)(GET_LEVEL(ch)*10))
-	vault->size = GET_LEVEL(ch) * 10;
+      }
+
       save_vault(vault->owner);
     }
     
