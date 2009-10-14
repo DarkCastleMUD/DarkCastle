@@ -739,16 +739,59 @@ int do_brew(char_data *ch, char *argument, int cmd)
   af.bitvector = -1;
   affect_to_char(ch, &af);
 
+  const char *potion_color;
+  // Determine color to use in message based on herb used
+  switch (obj_index[herbobj->item_number].virt) {
+  case 6301:
+    potion_color = "$B$2green$R and $B$4red$R";
+    break;
+  case 6302:
+    potion_color = "$B$2green$R and $6purple$R";
+    break;
+  case 6303:
+    potion_color = "$B$1blue$R";
+    break;
+  case 6304:
+    potion_color = "$5brown$Rt";
+    break;
+  case 6305:
+    potion_color = "$Bcrystalline$R";
+    break;
+  case 6306:
+    potion_color = "$2dark green$R";
+    break;
+  case 6307:
+    potion_color = "$B$5bright yellow$R";
+    break;
+  case 6308:
+    potion_color = "$B$6pink$R";
+    break;
+  case 6309:
+    potion_color = "$4vermillion$R";
+    break;
+  case 6310:
+    potion_color = "fuschia";
+    break;
+  case 6311:
+    potion_color = "$B$0jet black$R";
+    break;
+  case 6312:
+    potion_color = "$6indigo$R";
+    break;
+  default:
+    potion_color = "dark and murky";
+  }
+
   if (skill_success(ch, 0, SKILL_BREW)) {
     act("You sit down and carefully pour the ingredients into $o and give it a gentle shake to mix them.", ch, containerobj, 0, TO_CHAR, 0);
-
-    snprintf(buffer, MAX_STRING_LENGTH, "As the $o disolves, the liquid turns a (red/dark red, blue/dark blue, green/dark green, etc).");
+    snprintf(buffer, MAX_STRING_LENGTH, "As the $o disolves, the liquid turns %s.", potion_color);
     act(buffer, ch, herbobj, 0, TO_CHAR, 0);
 
-    act("", ch, 0, 0, TO_ROOM, 0);
+    act("$n sits down and carefully pours ingredients into $o and gives it a gentle shake to mix them.", ch, containerobj, 0, TO_ROOM, 0);
+    snprintf(buffer, MAX_STRING_LENGTH, "As $e finishes, the liquid turns %s.", potion_color);
+    act(buffer, ch, containerobj, 0, TO_ROOM, 0);
   } else {
-    act("", ch, 0, 0, TO_CHAR, 0);
-    act("", ch, 0, 0, TO_ROOM, 0);   
+
   }
 
   return eSUCCESS;
