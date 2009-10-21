@@ -29,6 +29,7 @@
 #include <iterator>
 #include <utility>
 #include <string>
+#include <sstream>
 
 using namespace std;
 using namespace Combinables;
@@ -715,9 +716,17 @@ int do_brew(char_data *ch, char *argument, int cmd)
     send_to_char("You do not have that type of herb.\n\r", ch);
     return eFAILURE;
   }
+  if (herbobj->obj_flags.type_flag != ITEM_OTHER) {
+    send_to_char("That is not an herb.\n\r", ch);
+    return eFAILURE;
+  }
 
   if (!liquidobj) {
     send_to_char("You do not have that type of liquid.\n\r", ch);
+    return eFAILURE;
+  }
+  if (liquidobj->obj_flags.type_flag != ITEM_DRINKCON) {
+    send_to_char("That is not a liquid container.\n\r", ch);
     return eFAILURE;
   }
 
@@ -725,7 +734,21 @@ int do_brew(char_data *ch, char *argument, int cmd)
     send_to_char("You do not have that type of container.\n\r", ch);
     return eFAILURE;
   }
+  if (containerobj->obj_flags.type_flag != ITEM_POTION && containerobj->obj_flags.type_flag != ITEM_DRINKCON) {
+    send_to_char("That is not a target container.\n\r", ch);
+    return eFAILURE;
+  }
   
+  if (containerobj == liquidobj) {
+    send_to_char("Your liquid and target container cannot be the same object!\n\r", ch);
+    return eFAILURE;
+  }
+
+  if (liquidobj->obj_flags.value[1] < 1) {
+    send_to_char("There is no liquid left in that container.\n\r", ch);
+    return eFAILURE;
+  }
+
   if (!charge_moves(ch, SKILL_BREW)) {
     return eFAILURE;
   }
@@ -782,7 +805,18 @@ int do_brew(char_data *ch, char *argument, int cmd)
     potion_color = "dark and murky";
   }
 
-  if (skill_success(ch, 0, SKILL_BREW)) {
+  // Search for the current combination as a recipe
+  Brew::recipe r = { obj_index[herbobj->item_number].virt,
+		     liquidobj->obj_flags.value[2],
+		     obj_index[containerobj->item_number].virt };
+  int spell = b.find(r);
+
+  csendf(ch, "Searching for herb: %d(%s)\nliquid: %d(%s)\ncontainer: %d(%s).....%d\n",
+	 obj_index[herbobj->item_number].virt, GET_OBJ_SHORT(herbobj),
+	 liquidobj->obj_flags.value[2], GET_OBJ_SHORT(liquidobj),
+	 obj_index[containerobj->item_number].virt, GET_OBJ_SHORT(containerobj), spell);
+  
+  if (skill_success(ch, 0, SKILL_BREW) && spell > 0) {
     act("You sit down and carefully pour the ingredients into $o and give it a gentle shake to mix them.", ch, containerobj, 0, TO_CHAR, 0);
     snprintf(buffer, MAX_STRING_LENGTH, "As the $o disolves, the liquid turns %s.", potion_color);
     act(buffer, ch, herbobj, 0, TO_CHAR, 0);
@@ -790,8 +824,58 @@ int do_brew(char_data *ch, char *argument, int cmd)
     act("$n sits down and carefully pours ingredients into $o and gives it a gentle shake to mix them.", ch, containerobj, 0, TO_ROOM, 0);
     snprintf(buffer, MAX_STRING_LENGTH, "As $e finishes, the liquid turns %s.", potion_color);
     act(buffer, ch, containerobj, 0, TO_ROOM, 0);
-  } else {
 
+    // Find container key (crude, plain, etc)
+    char container_key[MAX_STRING_LENGTH];
+    char *conargs = one_argument(containerobj->name, container_key);
+    conargs = one_argument(conargs, container_key);
+    one_argument(conargs, container_key);
+    
+    // Find liquid key (salty, milk, strong)
+    const char *liquid_key;
+    switch(liquidobj->obj_flags.value[2]) {
+    case LIQ_MILK:
+      liquid_key = "milky";
+      break;
+    case LIQ_WINE:
+      liquid_key = "strong";
+      break;
+    case LIQ_SALTWATER:
+      liquid_key = "salty";
+      break;
+    default:
+      liquid_key = "unknown";
+      break;
+    }
+    
+    // Put it all together into the new name
+    stringstream potionname, potionshort, potionlong;
+    potionname << "potion " << container_key << " " << liquid_key;
+    potionshort << "a " << container_key << " " << liquid_key << " " << potion_color << " potion";
+    potionlong << "a " << container_key << " " << liquid_key << " " << potion_color << " potion lies here.";
+
+    containerobj->obj_flags.type_flag=ITEM_POTION;
+    containerobj->obj_flags.value[0] = (learned/2 - 5) + GET_WIS(ch)/2 + GET_INT(ch)/2;
+    containerobj->obj_flags.value[1] = spell;
+    containerobj->obj_flags.value[2] = 0;
+    containerobj->obj_flags.value[3] = 0;
+    containerobj->name = str_dup(potionname.str().c_str());
+    GET_OBJ_SHORT(containerobj) = str_dup(potionshort.str().c_str());
+    containerobj->description = str_dup(potionlong.str().c_str());
+
+    extract_obj(herbobj);
+  } else {
+    act("You sit down and carefully pour the ingredients into $o and give it a gentle shake to mix them.", ch, containerobj, 0, TO_CHAR, 0);
+    act("As you finish, the liquid begins to bubble furiously, cracking the $o and rendering your work useless!", ch, containerobj, 0, TO_CHAR, 0);
+
+    act("$n sits down and carefully pours ingredients into $o and gives it a gentle shake to mix them.", ch, containerobj, 0, TO_ROOM, 0);
+    act("As $e finishes, the liquid begins to bubble furiously, cracking the $o and rendering $s work useless!", ch, containerobj, 0, TO_ROOM, 0);
+
+    extract_obj(containerobj);
+    extract_obj(herbobj);
+    if (liquidobj->obj_flags.value[1] > 0) {
+      liquidobj->obj_flags.value[1]--;
+    }
   }
 
   return eSUCCESS;
@@ -961,4 +1045,15 @@ int Brew::remove(char_data *ch, char *argument) {
 
 int Brew::size(void) {
   return recipes.size();
+}
+
+int Brew::find(Brew::recipe r) {
+  int spell = 0;
+
+  map<recipe, int>::iterator result = recipes.find(r);
+  if (result != recipes.end()) {
+    spell = result->second;
+  }
+
+  return spell;
 }

@@ -24,6 +24,7 @@ namespace Combinables {
     int add(char_data *ch, char *argument);
     int remove(char_data *ch, char *argument);
     int size(void);
+    int find(Brew::recipe);
   private:
     static map<recipe, int32_t> recipes;
     struct loadError {};
