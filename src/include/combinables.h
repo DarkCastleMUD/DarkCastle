@@ -60,14 +60,18 @@ namespace Combinables {
     class recipe {
     public:
       bool operator<(const recipe& r2) const { 
-	if (container < r2.container) {
+	if (ink < r2.ink) {
 	  return true;
-	} else if (container == r2.container) {
-	  if (liquid < r2.liquid) {
+	} else if (ink == r2.ink) {
+	  if (dust < r2.dust) {
 	    return true;
-	  } else if (liquid == r2.liquid) {
-	    if (herb < r2.herb) {
+	  } else if (dust == r2.dust) {
+	    if (pen < r2.pen) {
 	      return true;
+	    } else if (pen == r2.pen) {
+	      if (paper < r2.paper) {
+		return true;
+	      }
 	    }
 	  }
 	}
