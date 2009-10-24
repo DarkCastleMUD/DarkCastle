@@ -404,242 +404,6 @@ int handle_poisoned_weapon_attack(char_data * ch, char_data * vict, int type)
    return retval;
 }
 
-int do_scribe(struct char_data *ch, char *argument, int cmd)
-{
-  char ink[MAX_STRING_LENGTH], pen[MAX_STRING_LENGTH], paper[MAX_STRING_LENGTH];
-  OBJ_DATA *inkobj, *penobj, *paperobj;
-  int spellnum = 0;
-  bool scrollok = FALSE;
-
-  if(!*argument) {
-    send_to_char("Scribe what?\n\rsyntax: scribe <ink> <pen> <paper>\n\r", ch);
-    return eFAILURE;
-  }
-
-  argument = one_argument(argument, ink);
-  argument = one_argument(argument, pen);
-  argument = one_argument(argument, paper);
-
-  if(!*pen) {
-    send_to_char("You must choose a pen and paper.\n\rsyntax: scribe <ink> <pen> <paper>\n\r", ch);
-    return eFAILURE;
-  }
-
-  if(!*paper) {
-    send_to_char("You must choose a piece of paper on which to scribe.\n\rsyntax: scribe <ink> <pen> <paper>\n\r", ch);
-    return eFAILURE;
-  }
-
-  inkobj = get_obj_in_list_vis(ch, ink, ch->carrying);
-  penobj = get_obj_in_list_vis(ch, pen, ch->carrying);
-  paperobj = get_obj_in_list_vis(ch, paper, ch->carrying);
-
-  if(!inkobj) {
-    send_to_char("You do not have that type of ink.\n\r", ch);
-    return eFAILURE;
-  }
-  if(!penobj) {
-    send_to_char("You do not have that type of pen.\n\r", ch);
-    return eFAILURE;
-  }
-  if(!paperobj) {
-    send_to_char("You do not have that type of paper.\n\r", ch);
-    return eFAILURE;
-  }
-
-  spellnum = inkobj->obj_flags.value[0] + penobj->obj_flags.value[0] + paperobj->obj_flags.value[0];
-
-  switch(spellnum) {
-    case SPELL_ARMOR:
-    case SPELL_TELEPORT:
-    case SPELL_BLESS:
-    case SPELL_BLINDNESS:
-    case SPELL_BURNING_HANDS:
-    case SPELL_IRIDESCENT_AURA:
-    case SPELL_CHARM_PERSON:
-    case SPELL_CHILL_TOUCH:
-    case SPELL_CLONE:
-    case SPELL_COLOUR_SPRAY:
-    case SPELL_CONTROL_WEATHER:
-    case SPELL_CREATE_FOOD:
-    case SPELL_CREATE_WATER:
-    case SPELL_REMOVE_BLIND:
-    case SPELL_CURE_CRITIC:
-    case SPELL_CURE_LIGHT:
-    case SPELL_CURSE:
-    case SPELL_DETECT_EVIL:
-    case SPELL_DETECT_INVISIBLE:
-    case SPELL_DETECT_MAGIC:
-    case SPELL_DETECT_POISON:
-    case SPELL_DISPEL_EVIL:
-    case SPELL_EARTHQUAKE:
-    case SPELL_ENCHANT_WEAPON:
-    case SPELL_ENERGY_DRAIN:
-    case SPELL_FIREBALL:
-    case SPELL_HARM:
-    case SPELL_HEAL:
-    case SPELL_INVISIBLE:
-    case SPELL_LIGHTNING_BOLT:
-    case SPELL_LOCATE_OBJECT:
-    case SPELL_MAGIC_MISSILE:
-    case SPELL_POISON:
-    case SPELL_PROTECT_FROM_EVIL:
-    case SPELL_REMOVE_CURSE:
-    case SPELL_SANCTUARY:
-    case SPELL_SHOCKING_GRASP:
-    case SPELL_SLEEP:
-    case SPELL_STRENGTH:
-    case SPELL_SUMMON:
-    case SPELL_VENTRILOQUATE:
-    case SPELL_WORD_OF_RECALL:
-    case SPELL_REMOVE_POISON:
-    case SPELL_SENSE_LIFE:
-    case SPELL_SUMMON_FAMILIAR:
-    case SPELL_LIGHTED_PATH:
-    case SPELL_RESIST_ACID:
-    case SPELL_SUN_RAY:
-    case SPELL_RAPID_MEND:
-    case SPELL_ACID_SHIELD:
-    case SPELL_WATER_BREATHING:
-    case SPELL_GLOBE_OF_DARKNESS:
-    case SPELL_IDENTIFY:
-    case SPELL_ANIMATE_DEAD:
-    case SPELL_FEAR:
-    case SPELL_FLY:
-    case SPELL_CONT_LIGHT:
-    case SPELL_KNOW_ALIGNMENT:
-    case SPELL_DISPEL_MAGIC:
-    case SPELL_CONJURE_ELEMENTAL:
-    case SPELL_CURE_SERIOUS:
-    case SPELL_CAUSE_LIGHT:
-    case SPELL_CAUSE_CRITICAL:
-    case SPELL_CAUSE_SERIOUS:
-    case SPELL_FLAMESTRIKE:
-    case SPELL_STONE_SKIN:
-    case SPELL_SHIELD:
-    case SPELL_WEAKEN:
-    case SPELL_MASS_INVISIBILITY:
-    case SPELL_ACID_BLAST:
-    case SPELL_PORTAL:
-    case SPELL_INFRAVISION:
-    case SPELL_REFRESH:
-    case SPELL_HASTE:
-    case SPELL_DISPEL_GOOD:
-    case SPELL_HELLSTREAM:
-    case SPELL_POWER_HEAL:
-    case SPELL_FULL_HEAL:
-    case SPELL_FIRESTORM:
-    case SPELL_POWER_HARM:
-    case SPELL_DETECT_GOOD:
-    case SPELL_VAMPIRIC_TOUCH:
-    case SPELL_LIFE_LEECH:
-    case SPELL_PARALYZE:
-    case SPELL_REMOVE_PARALYSIS:
-    case SPELL_FIRESHIELD:
-    case SPELL_METEOR_SWARM:
-    case SPELL_WIZARD_EYE:
-    case SPELL_TRUE_SIGHT:
-    case SPELL_MANA:
-    case SPELL_SOLAR_GATE:
-    case SPELL_HEROES_FEAST:
-    case SPELL_HEAL_SPRAY:
-    case SPELL_GROUP_SANC:
-    case SPELL_GROUP_RECALL:
-    case SPELL_GROUP_FLY:
-    case SPELL_ENCHANT_ARMOR:
-    case SPELL_RESIST_FIRE:
-    case SPELL_RESIST_COLD:
-    case SPELL_BEE_STING:
-    case SPELL_BEE_SWARM:
-    case SPELL_CREEPING_DEATH:
-    case SPELL_BARKSKIN:
-    case SPELL_HERB_LORE:
-    case SPELL_CALL_FOLLOWER:
-    case SPELL_ENTANGLE:
-    case SPELL_EYES_OF_THE_OWL:
-    case SPELL_FELINE_AGILITY:
-    case SPELL_FOREST_MELD:
-    case SPELL_COMPANION:
-    case SPELL_DROWN:
-    case SPELL_HOWL:
-    case SPELL_SOULDRAIN:
-    case SPELL_SPARKS:
-    case SPELL_CAMOUFLAGE:
-    case SPELL_FARSIGHT:
-    case SPELL_FREEFLOAT:
-    case SPELL_INSOMNIA:
-    case SPELL_SHADOWSLIP:
-    case SPELL_RESIST_ENERGY:
-    case SPELL_STAUNCHBLOOD:
-    case SPELL_CREATE_GOLEM:
-    case SPELL_REFLECT:
-    case SPELL_DISPEL_MINOR:
-    case SPELL_RELEASE_GOLEM:
-    case SPELL_BEACON:
-    case SPELL_STONE_SHIELD:
-    case SPELL_GREATER_STONE_SHIELD:
-    case SPELL_IRON_ROOTS:
-    case SPELL_EYES_OF_THE_EAGLE:
-    case SPELL_MISANRA_QUIVER:
-    case SPELL_ICESTORM:
-    case SPELL_LIGHTNING_SHIELD:
-    case SPELL_BLUE_BIRD:
-    case SPELL_DEBILITY:
-    case SPELL_ATTRITION:
-    case SPELL_VAMPIRIC_AURA:
-    case SPELL_HOLY_AURA:
-    case SPELL_DISMISS_FAMILIAR:
-    case SPELL_DISMISS_CORPSE:
-    case SPELL_BLESSED_HALO:
-    case SPELL_VISAGE_OF_HATE:
-    case SPELL_PROTECT_FROM_GOOD:
-    case SPELL_OAKEN_FORTITUDE:
-    case SPELL_FROSTSHIELD:
-    case SPELL_STABILITY:
-    case SPELL_KILLER:
-    case SPELL_CANTQUIT:
-    case SPELL_SOLIDITY:
-    case SPELL_EAS:
-    case SPELL_ALIGN_GOOD:
-    case SPELL_ALIGN_EVIL:
-    case SPELL_AEGIS:
-    case SPELL_U_AEGIS:
-    case SPELL_RESIST_MAGIC:
-    case SPELL_EAGLE_EYE:
-    case SPELL_CALL_LIGHTNING:
-    case SPELL_DIVINE_FURY:
-    case SPELL_GHOSTWALK:
-    case SPELL_MEND_GOLEM:
-    case SPELL_CLARITY:
-    case SPELL_RELEASE_ELEMENTAL:
-    case SPELL_DIVINE_INTER:
-      scrollok = TRUE;
-      break;
-    default:
-      scrollok = FALSE;
-  }
-
-  send_to_char("You sit down and carefully inscribe the words of the gods onto the parchment.\n\r", ch);
-  act("$n sits down and carefully inscribes the words of the gods onto some parchment.", ch, 0, 0, TO_ROOM, 0);
-
-  //do something to the paper object to make it the scroll
-  
-
-  if(!scrollok) {
-    send_to_char("As you finish, nothing special seems to happen.\n\r", ch);
-    act("As $e finishes, nothing special seems to happen.", ch, 0, 0, TO_ROOM, 0);
-  } else if(!skill_success(ch, 0, SKILL_SCRIBE_SCROLL)) {
-    send_to_char("As you finish, the letters on the newly minted scroll burst into $B$4flame$R leaving nothing but ash!", ch);
-    act("As $e finishes, the letters on the newly minted scroll burst into $B$4flame$R leaving nothing but ash!", ch, 0, 0, TO_ROOM, 0);
-    extract_obj(paperobj);
-  } else {
-    send_to_char("As you finish, the letters on the newly minted scroll $Bglow$R briefly and return to normal.\n\r", ch);
-    act("As $e finishes, the letters on the newly minted scroll $Bglow$R briefly and return to normal.", ch, 0, 0, TO_ROOM, 0);
-  }
-
-  return eSUCCESS;
-}
-
 int do_brew(char_data *ch, char *argument, int cmd)
 {
   char arg1[MAX_STRING_LENGTH], liquid[MAX_STRING_LENGTH], container[MAX_STRING_LENGTH], buffer[MAX_STRING_LENGTH];
@@ -656,7 +420,7 @@ int do_brew(char_data *ch, char *argument, int cmd)
   
   if (!*argument) {
       send_to_char("Brew what?\n\r"
-		   "$3Syntax:$R brew [herb] [liquid] [container]\n\r", ch);
+		   "$3Syntax:$R brew <herb> <liquid> <container>\n\r", ch);
       if (GET_LEVEL(ch) >= 108) {
 	send_to_char("        brew load\n\r"
 		     "        brew save\n\r"
@@ -698,13 +462,13 @@ int do_brew(char_data *ch, char *argument, int cmd)
 
   if (!*liquid) {
     send_to_char("You'll need to choose a liquid type and container.\n\r"
-		 "$3Syntax:$R brew [herb] [liquid] [container]\n\r", ch);
+		 "$3Syntax:$R brew <herb> <liquid> <container>\n\r", ch);
     return eFAILURE;
   }
 
   if (!*container) {
     send_to_char("You'll need to select a container.\n\r"
-		 "$3Syntax:$R brew [herb] [liquid] [container]\n\r", ch);
+		 "$3Syntax:$R brew <herb> <liquid> <container>\n\r", ch);
     return eFAILURE;
   }
 
@@ -811,10 +575,10 @@ int do_brew(char_data *ch, char *argument, int cmd)
 		     obj_index[containerobj->item_number].virt };
   int spell = b.find(r);
 
-  csendf(ch, "Searching for herb: %d(%s)\nliquid: %d(%s)\ncontainer: %d(%s).....%d\n",
-	 obj_index[herbobj->item_number].virt, GET_OBJ_SHORT(herbobj),
-	 liquidobj->obj_flags.value[2], GET_OBJ_SHORT(liquidobj),
-	 obj_index[containerobj->item_number].virt, GET_OBJ_SHORT(containerobj), spell);
+  //  csendf(ch, "Searching for herb: %d(%s)\nliquid: %d(%s)\ncontainer: %d(%s).....%d\n",
+  //	 obj_index[herbobj->item_number].virt, GET_OBJ_SHORT(herbobj),
+  //	 liquidobj->obj_flags.value[2], GET_OBJ_SHORT(liquidobj),
+  //	 obj_index[containerobj->item_number].virt, GET_OBJ_SHORT(containerobj), spell);
   
   if (skill_success(ch, 0, SKILL_BREW) && spell > 0) {
     act("You sit down and carefully pour the ingredients into $o and give it a gentle shake to mix them.", ch, containerobj, 0, TO_CHAR, 0);
@@ -1048,6 +812,365 @@ int Brew::size(void) {
 }
 
 int Brew::find(Brew::recipe r) {
+  int spell = 0;
+
+  map<recipe, int>::iterator result = recipes.find(r);
+  if (result != recipes.end()) {
+    spell = result->second;
+  }
+
+  return spell;
+}
+
+int do_scribe(char_data *ch, char *argument, int cmd)
+{
+  char arg1[MAX_STRING_LENGTH], dust[MAX_STRING_LENGTH], pen[MAX_STRING_LENGTH], paper[MAX_STRING_LENGTH], buffer[MAX_STRING_LENGTH];
+  OBJ_DATA *inkobj, *dustobj, *penobj, *paperobj;
+  affected_type af;
+  Scribe s;
+
+  int learned = has_skill(ch, SKILL_SCRIBE);
+
+  if (IS_PC(ch) && GET_LEVEL(ch) < IMMORTAL && !learned) {
+    send_to_char("You just don't have the mind for scribing.\r\n", ch);
+    return eFAILURE;
+  }
+  
+  if (!*argument) {
+      send_to_char("Scribe what?\n\r"
+		   "$3Syntax:$R scribe <ink> <dust> <pen> <paper>\n\r", ch);
+      if (GET_LEVEL(ch) >= 108) {
+	send_to_char("        scribe load\n\r"
+		     "        scribe save\n\r"
+		     "        scribe list\n\r"
+		     "        scribe add <ink_vnum> <dust_vnum> <pen_vnum> <paper_vnum> <spell_num>\n\r"
+		     "        scribe remove [recipe_num]\n\r\n\r", ch);
+    }
+    return eFAILURE;
+  }
+
+  argument = one_argument(argument, arg1);
+
+  if (IS_PC(ch) && GET_LEVEL(ch) >= 108) {
+    if (!str_cmp(arg1, "load")) {
+      s.load();
+      logf(108, LOG_WORLD, "Loaded %d scribe recipes.", s.size());
+      return eSUCCESS;
+    } else if (!str_cmp(arg1, "save")) {
+      s.save();
+      logf(108, LOG_WORLD, "Saved %d scribe recipes.", s.size());
+      return eSUCCESS;
+    } else if (!str_cmp(arg1, "list")) {
+      s.list(ch);
+      return eSUCCESS;
+    } else if (!str_cmp(arg1, "add")) {
+      return s.add(ch, argument);
+    } else if (!str_cmp(arg1, "remove")) {
+      return s.remove(ch, argument);
+    }
+  }
+
+  if (affected_by_spell(ch, SKILL_SCRIBE_TIMER)) {
+    send_to_char("You aren't ready to scribe anything again.\n\r", ch);
+    return eFAILURE;
+  }
+
+  argument = one_argument(argument, dust);
+  argument = one_argument(argument, pen);
+  one_argument(argument, paper);
+
+  if (!*dust) {
+    send_to_char("You'll need to choose a dust, pen and paper.\n\r"
+		 "$3Syntax:$R scribe <ink> <dust> <pen> <paper>\n\r", ch);
+    return eFAILURE;
+  }
+
+  if (!*pen) {
+    send_to_char("You'll need to choose a pen and paper.\n\r"
+		 "$3Syntax:$R scribe <ink> <dust> <pen> <paper>\n\r", ch);
+    return eFAILURE;
+  }
+
+  if (!*paper) {
+    send_to_char("You'll need to select a paper.\n\r"
+		 "$3Syntax:$R scribe <ink> <dust> <pen> <paper>\n\r", ch);
+    return eFAILURE;
+  }
+
+  inkobj = get_obj_in_list_vis(ch, arg1, ch->carrying);
+  dustobj = get_obj_in_list_vis(ch, dust, ch->carrying);
+  penobj = get_obj_in_list_vis(ch, pen, ch->carrying);
+  paperobj = get_obj_in_list_vis(ch, paper, ch->carrying);
+
+  if (!inkobj) {
+    send_to_char("You do not have that type of ink.\n\r", ch);
+    return eFAILURE;
+  }
+  if (inkobj->obj_flags.type_flag != ITEM_UTILITY) {
+    send_to_char("That is not ink.\n\r", ch);
+    return eFAILURE;
+  }
+
+  if (!dustobj) {
+    send_to_char("You do not have that type of dust.\n\r", ch);
+    return eFAILURE;
+  }
+  if (dustobj->obj_flags.type_flag != ITEM_OTHER) {
+    send_to_char("That is not dust.\n\r", ch);
+    return eFAILURE;
+  }
+
+  if (!penobj) {
+    send_to_char("You do not have that type of pen.\n\r", ch);
+    return eFAILURE;
+  }
+  if (penobj->obj_flags.type_flag != ITEM_PEN) {
+    send_to_char("That is not a pen.\n\r", ch);
+    return eFAILURE;
+  }
+
+  if (!paperobj) {
+    send_to_char("You do not have that type of paper.\n\r", ch);
+    return eFAILURE;
+  }
+  if (paperobj->obj_flags.type_flag != ITEM_SCROLL) {
+    send_to_char("That is not paper.\n\r", ch);
+    return eFAILURE;
+  }
+  
+  if (inkobj->obj_flags.value[1] < 1) {
+    send_to_char("There is no liquid left in that ink container.\n\r", ch);
+    return eFAILURE;
+  }
+
+  if (!charge_moves(ch, SKILL_SCRIBE)) {
+    return eFAILURE;
+  }
+
+  WAIT_STATE(ch, PULSE_VIOLENCE * 2.5);
+
+  af.type = SKILL_SCRIBE_TIMER;
+  af.location = APPLY_NONE;
+  af.modifier = 0;
+  af.duration = 24;
+  af.bitvector = -1;
+  affect_to_char(ch, &af);
+
+  const char *potion_color;
+
+  // Search for the current combination as a recipe
+  Scribe::recipe r = { obj_index[inkobj->item_number].virt,
+		       obj_index[dustobj->item_number].virt,
+		       obj_index[penobj->item_number].virt,
+		       obj_index[paperobj->item_number].virt };
+  int spell = s.find(r);
+  
+  act("You sit down and carefully inscribe the words of the gods onto the parchment.", ch, 0, 0, TO_CHAR, 0);
+  act("$n sits down and carefully inscribes the words of the gods onto some parchment.", ch, 0, 0, TO_ROOM, 0);
+
+  if (inkobj->obj_flags.value[1] > 0) {
+    inkobj->obj_flags.value[1]--;
+  }
+
+  if (spell == 0) {
+    act("As you finish, nothing special seems to happen.", ch, 0, 0, TO_CHAR, 0);
+    act("As $e finishes, nothing special seems to happen.", ch, 0, 0, TO_ROOM, 0);
+  } else if (!skill_success(ch, 0, SKILL_SCRIBE)) {
+    act("As you finish, the letters on the newly minted scroll burst into $B$4flame$R leaving nothing but ash!", ch, 0, 0, TO_CHAR, 0);
+    act("As $e finishes, the letters on the newly minted scroll burst into $B$4flame$R leaving nothing but ash!", ch, 0, 0, TO_ROOM, 0);
+    extract_obj(paperobj);
+  } else {
+    act("As you finish, the letters on the newly minted scroll $Bglow$R briefly and return to normal.\n\r", ch, 0, 0, TO_CHAR, 0);
+    act("As $e finishes, the letters on the newly minted scroll $Bglow$R briefly and return to normal.", ch, 0, 0, TO_ROOM, 0);
+
+    // Put it all together into the new name
+    stringstream scrollname, scrollshort, scrolllong;
+    sprinttype(spell-1, spells, buffer);
+
+    scrollname << "scroll " << GET_NAME(ch) << " " << buffer;
+    scrollshort << GET_NAME(ch) << "'s scroll of " << buffer;
+    scrolllong << GET_NAME(ch) << "'s scroll of " << buffer << "lies here.";
+
+    paperobj->obj_flags.type_flag=ITEM_SCROLL;
+    paperobj->obj_flags.value[0] = learned/4 + GET_LEVEL(ch)/2;
+    paperobj->obj_flags.value[1] = spell;
+    paperobj->obj_flags.value[2] = 0;
+    paperobj->obj_flags.value[3] = 0;
+    paperobj->name = str_dup(scrollname.str().c_str());
+    GET_OBJ_SHORT(paperobj) = str_dup(scrollshort.str().c_str());
+    paperobj->description = str_dup(scrolllong.str().c_str());
+  }
+
+  return eSUCCESS;
+}
+
+Scribe::Scribe(void) {
+  if (initialized == false) {
+    load();
+    initialized = true;
+  }
+}
+
+Scribe::~Scribe() {
+
+}
+
+void Scribe::load(void) {
+  ifstream ifs(RECIPES_FILENAME, ios_base::in);
+  if (!ifs.is_open()) {
+    logf(IMMORTAL, LOG_BUG, "Unable to open %s.", RECIPES_FILENAME);
+    return;
+  }
+
+  recipes.clear();
+  
+  try {
+    while(!ifs.eof()) {
+      int spell = 0;
+      recipe r = {0, 0, 0, 0};
+      
+      ifs >> r.ink;
+      ifs >> r.dust;
+      ifs >> r.pen;
+      ifs >> r.paper;
+      ifs >> spell;
+      
+      // Don't insert empty entries
+      if (r.ink && r.dust && r.pen && r.paper && spell) {
+	recipes.insert(make_pair(r, spell));
+      }
+    }
+  } catch(loadError) {
+    logf(IMMORTAL, LOG_BUG, "Error loading %s.", RECIPES_FILENAME);
+  }
+}
+
+void Scribe::save(void) {
+  ofstream ofs(RECIPES_FILENAME, ios_base::trunc);
+  if (!ofs.is_open()) {
+    logf(IMMORTAL, LOG_BUG, "Unable to open %s.", RECIPES_FILENAME);
+    return;
+  }  
+
+  try {
+    for (map<recipe, int>::iterator iter = recipes.begin(); iter != recipes.end(); ++iter) {
+      pair<recipe, int> p = *iter;
+      recipe r = p.first;
+      int spell = p.second;
+      
+      ofs << r.ink << " " << r.dust << " " << r.pen << " " << r.paper << " " << spell << endl;
+    }
+  } catch(...) {
+    logf(IMMORTAL, LOG_BUG, "Error saving %s.", RECIPES_FILENAME);
+  }
+}
+
+void Scribe::list(char_data *ch) {
+  char buffer[MAX_STRING_LENGTH];
+  int i = 0;
+
+  if (ch == 0) {
+    return;
+  }
+
+  send_to_char( "[# ] [ink #] [dust #] [pen #] [paper #] Spell Name\n\r\n\r", ch);
+  for (map<recipe, int>::reverse_iterator iter = recipes.rbegin(); iter != recipes.rend(); ++iter) {
+    recipe r = iter->first;
+    int spell = iter->second;
+
+    sprinttype(spell-1, spells, buffer);
+    csendf(ch, "[%2d] [%5d] [%6d] [%5d] [%7d] %s (%d)\n\r", ++i, r.ink, r.dust, r.pen, r.paper, buffer, spell);
+  }
+}
+
+int Scribe::add(char_data *ch, char *argument) {
+  int ink_vnum, dust_vnum, pen_vnum, paper_vnum, spell;
+  char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH], arg4[MAX_INPUT_LENGTH], arg5[MAX_INPUT_LENGTH];
+  
+  if (!ch) {
+    return eFAILURE;
+  }
+
+  argument = one_argument(argument, arg1);
+  argument = one_argument(argument, arg2);
+  argument = one_argument(argument, arg3);
+  argument = one_argument(argument, arg4);
+  argument = one_argument(argument, arg5);
+
+  if (!*arg1 || !*arg2 || !*arg3 || !*arg4 || !*arg5) {
+    send_to_char("Syntax: scribe add [ink_vnum] [dust_vnum] [pen_vnum] [paper_vnum] [spell_num]\n\r", ch);
+    return eFAILURE;
+  }
+
+  ink_vnum = atoi(arg1);
+  dust_vnum = atoi(arg2);
+  pen_vnum = atoi(arg3);
+  paper_vnum = atoi(arg4);
+
+  if (ink_vnum < 6326 || ink_vnum > 6328) {
+    send_to_char("Only vnums 6326-6328 are valid inks.\n\r", ch);
+    return eFAILURE;
+  }
+
+  if (dust_vnum < 6335 || dust_vnum > 6337) {
+    send_to_char("Only vnums 6335-6337 are valid dusts.\n\r", ch);
+    return eFAILURE;
+  }
+
+  if (pen_vnum < 6329 || pen_vnum > 6334) {
+    send_to_char("Only vnums 6329-6334 are valid pens.\n\r", ch);
+    return eFAILURE;
+  }
+
+  if (paper_vnum < 6338 || paper_vnum > 6342) {
+    send_to_char("Only vnums 6338-6342 are valid papers.\n\r", ch);
+    return eFAILURE;
+  }
+
+  if((spell = find_skill_num(arg5)) < 0) {
+    csendf(ch, "Cannot find spell '%s' in master spell list.\r\n", arg4);
+    return eFAILURE;
+  }
+
+  recipe r = { ink_vnum, dust_vnum, pen_vnum, paper_vnum }; 
+  recipes.insert(make_pair(r, spell));
+
+  send_to_char("New scribe recipe added.\n\r", ch);
+
+  return eSUCCESS;
+}
+
+int Scribe::remove(char_data *ch, char *argument) {
+  if (!ch)  {
+    return eFAILURE;
+  }
+
+  if (!*argument) {
+    send_to_char("Syntax: scribe remove [recipe_num]\n\r", ch);
+    return eFAILURE;
+  }
+
+  int i = 0;
+  int target = atoi(argument);
+
+  for (map<recipe, int>::reverse_iterator iter = recipes.rbegin(); iter != recipes.rend(); ++iter) {
+    if (++i == target) {
+      recipes.erase((*iter).first);
+      csendf(ch, "Recipe # %d has been removed.\n\r", target);
+
+      return eSUCCESS;
+    }
+  }
+
+  csendf(ch, "Recipe # %d not found.\n\r", target);
+  return eFAILURE;
+}
+
+int Scribe::size(void) {
+  return recipes.size();
+}
+
+int Scribe::find(Scribe::recipe r) {
   int spell = 0;
 
   map<recipe, int>::iterator result = recipes.find(r);

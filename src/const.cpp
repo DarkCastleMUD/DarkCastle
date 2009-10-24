@@ -12,7 +12,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: const.cpp,v 1.318 2009/10/02 04:15:22 jhhudso Exp $ */
+/* $Id: const.cpp,v 1.319 2009/10/24 23:05:04 jhhudso Exp $ */
 
 extern "C"
 {
@@ -1743,7 +1743,7 @@ struct class_skill_defines c_skills[] = { // cleric skills
 //{    "commune",              SKILL_COMMUNE,           51,    100,  0,   DEXWIS },
 //{    "boneshield", 	     SPELL_BONESHIELD,        53,    100,  2,   STRCON },
 //{    "silence", 	     SPELL_SILENCE,           53,    100,  1,   CONWIS },
-{    "scribe scroll",        SKILL_SCRIBE_SCROLL,     61,    100,  0,   DEXINT }, //lvl 55
+{    "scribe",               SKILL_SCRIBE,            61,    100,  0,   DEXINT }, //lvl 55
 //{    "immunity", 	     SPELL_IMMUNITY,          57,    100,  2,   CONWIS },
 //{    "atonement", 	     SPELL_ATONEMENT,         57,    100,  1,   STRCON },
 //{    "channel", 	     SPELL_CHANNEL,           60,    100,  2,   INTWIS },
