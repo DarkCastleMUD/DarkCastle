@@ -906,7 +906,7 @@ int do_scribe(char_data *ch, char *argument, int cmd)
     send_to_char("You do not have that type of ink.\n\r", ch);
     return eFAILURE;
   }
-  if (inkobj->obj_flags.type_flag != ITEM_UTILITY) {
+  if (inkobj->obj_flags.type_flag != ITEM_DRINKCON || inkobj->obj_flags.value[2] != LIQ_INK) {
     send_to_char("That is not ink.\n\r", ch);
     return eFAILURE;
   }

@@ -12,7 +12,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: const.cpp,v 1.320 2009/10/25 08:44:18 jhhudso Exp $ */
+/* $Id: const.cpp,v 1.321 2009/10/25 08:55:23 jhhudso Exp $ */
 
 extern "C"
 {
@@ -571,6 +571,7 @@ char *drinks[] =
     "coca cola",
     "gatorade",
     "holy water",
+    "ink"
     "\n"
 };
 

@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: obj.h,v 1.29 2008/05/17 22:19:52 jhhudso Exp $ */
+/* $Id: obj.h,v 1.30 2009/10/25 08:55:23 jhhudso Exp $ */
 #ifndef OBJ_H_
 #define OBJ_H_
 
@@ -172,6 +172,7 @@ int recheck_height_wears(char_data *ch);
 #define LIQ_COKE        15
 #define LIQ_GATORADE    16
 #define LIQ_HOLYWATER   17
+#define LIQ_INK         18
 
 /* for containers  - value[1] */
 
