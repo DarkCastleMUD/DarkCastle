@@ -12,7 +12,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: const.cpp,v 1.322 2009/10/25 09:06:09 jhhudso Exp $ */
+/* $Id: const.cpp,v 1.323 2009/10/25 16:58:54 jhhudso Exp $ */
 
 extern "C"
 {
@@ -832,6 +832,7 @@ char *more_obj_bits[] =
     "NPC_CORPSE",
     "PC_CORPSE_LOOTED",
     "NO_SCRAP",
+    "CUSTOM",
     "\n"
 };
 

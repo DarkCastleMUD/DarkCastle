@@ -580,7 +580,10 @@ int do_brew(char_data *ch, char *argument, int cmd)
   //	 liquidobj->obj_flags.value[2], GET_OBJ_SHORT(liquidobj),
   //	 obj_index[containerobj->item_number].virt, GET_OBJ_SHORT(containerobj), spell);
   
-  if (skill_success(ch, 0, SKILL_BREW) && spell > 0) {
+  if (spell == 0) {
+    act("As you finish, nothing special seems to happen.", ch, 0, 0, TO_CHAR, 0);
+    act("As $e finishes, nothing special seems to happen.", ch, 0, 0, TO_ROOM, 0);
+  } else if (skill_success(ch, 0, SKILL_BREW)) {
     act("You sit down and carefully pour the ingredients into $o and give it a gentle shake to mix them.", ch, containerobj, 0, TO_CHAR, 0);
     snprintf(buffer, MAX_STRING_LENGTH, "As the $o disolves, the liquid turns %s.", potion_color);
     act(buffer, ch, herbobj, 0, TO_CHAR, 0);
@@ -626,6 +629,8 @@ int do_brew(char_data *ch, char *argument, int cmd)
     containerobj->name = str_dup(potionname.str().c_str());
     GET_OBJ_SHORT(containerobj) = str_dup(potionshort.str().c_str());
     containerobj->description = str_dup(potionlong.str().c_str());
+    // We set the item to custom so that it will save everytime uniquely
+    SET_BIT(containerobj->obj_flags.more_flags, ITEM_CUSTOM);
 
     extract_obj(herbobj);
   } else {
@@ -979,8 +984,14 @@ int do_scribe(char_data *ch, char *argument, int cmd)
     act("As you finish, the letters on the newly minted scroll burst into $B$4flame$R leaving nothing but ash!", ch, 0, 0, TO_CHAR, 0);
     act("As $e finishes, the letters on the newly minted scroll burst into $B$4flame$R leaving nothing but ash!", ch, 0, 0, TO_ROOM, 0);
     extract_obj(paperobj);
+
+    // 50% of a failure causing 'wild magic' to be cast on self
+    if (number(1,100) > 50) {
+      cast_wild_magic(GET_LEVEL(ch), ch, "offense", 0, ch, 0, 0);
+    }
+
   } else {
-    act("As you finish, the letters on the newly minted scroll $Bglow$R briefly and return to normal.\n\r", ch, 0, 0, TO_CHAR, 0);
+    act("As you finish, the letters on the newly minted scroll $Bglow$R briefly and return to normal.", ch, 0, 0, TO_CHAR, 0);
     act("As $e finishes, the letters on the newly minted scroll $Bglow$R briefly and return to normal.", ch, 0, 0, TO_ROOM, 0);
 
     // Put it all together into the new name
@@ -999,6 +1010,9 @@ int do_scribe(char_data *ch, char *argument, int cmd)
     paperobj->name = str_dup(scrollname.str().c_str());
     GET_OBJ_SHORT(paperobj) = str_dup(scrollshort.str().c_str());
     paperobj->description = str_dup(scrolllong.str().c_str());
+
+    // We set the item to custom so that it will save uniquely every time
+    SET_BIT(paperobj->obj_flags.more_flags, ITEM_CUSTOM);
   }
 
   return eSUCCESS;

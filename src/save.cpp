@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: save.cpp,v 1.60 2009/05/26 06:29:20 shane Exp $ */
+/* $Id: save.cpp,v 1.61 2009/10/25 16:58:54 jhhudso Exp $ */
 
 extern "C"
 {
@@ -1207,7 +1207,21 @@ obj->obj_flags.value[2]    != standard_obj->obj_flags.value[2])
   {
     fwrite("EXF", sizeof(char), 3, fpsave);
     fwrite(&obj->obj_flags.extra_flags, sizeof(obj->obj_flags.extra_flags), 1, fpsave);
-  }/*
+  }
+
+  if (IS_SET(obj->obj_flags.more_flags, ITEM_CUSTOM)) {
+    fwrite("VA0", sizeof(char), 3, fpsave);
+    fwrite(&obj->obj_flags.value[0], sizeof(obj->obj_flags.value[2]), 1, fpsave);
+    fwrite("VA1", sizeof(char), 3, fpsave);
+    fwrite(&obj->obj_flags.value[1], sizeof(obj->obj_flags.value[2]), 1, fpsave);
+    fwrite("VA2", sizeof(char), 3, fpsave);
+    fwrite(&obj->obj_flags.value[2], sizeof(obj->obj_flags.value[2]), 1, fpsave);
+    fwrite("VA3", sizeof(char), 3, fpsave);
+    fwrite(&obj->obj_flags.value[3], sizeof(obj->obj_flags.value[2]), 1, fpsave);
+    fwrite("MOF", sizeof(char), 3, fpsave);
+    fwrite(&obj->obj_flags.more_flags, sizeof(obj->obj_flags.more_flags), 1, fpsave);   
+  }
+/*
   if(obj->obj_flags.more_flags != standard_obj->obj_flags.more_flags)
   {
     fwrite("MOF", sizeof(char), 3, fpsave);
