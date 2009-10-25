@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.198 2009/07/25 03:32:41 shane Exp $
+| $Id: cl_thief.cpp,v 1.199 2009/10/25 19:56:07 jhhudso Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -949,6 +949,11 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
     return eFAILURE;
   }
     
+  if (check_make_camp(ch->in_room)) {
+    send_to_char("You can't steal inside of a camp!\n\r", ch);
+    return eFAILURE;
+  }
+    
   if(IS_SET(world[ch->in_room].room_flags, ARENA)) {
      send_to_char("Do what!? This is an Arena, go kill someone!\n\r", ch);
      return eFAILURE;
@@ -1385,6 +1390,11 @@ int do_pocket(CHAR_DATA *ch, char *argument, int cmd)
 
   if(IS_SET(world[ch->in_room].room_flags, SAFE)) {
     send_to_char("No stealing permitted in safe areas!\n\r", ch);
+    return eFAILURE;
+  }
+
+  if (check_make_camp(ch->in_room)) {
+    send_to_char("You can't pocket gold while inside of a camp!\n\r", ch);
     return eFAILURE;
   }
     

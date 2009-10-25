@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_warrior.cpp,v 1.81 2009/09/15 02:39:08 jhhudso Exp $
+| $Id: cl_warrior.cpp,v 1.82 2009/10/25 19:56:07 jhhudso Exp $
 | cl_warrior.C
 | Description:  This file declares implementation for warrior-specific
 |   skills.
@@ -1186,10 +1186,20 @@ int do_make_camp(struct char_data *ch, char *argument, int cmd)
    return eFAILURE;
   }
 
+  for(i = world[ch->in_room].people; i; i = next_i) {
+    next_i = i->next_in_room;
+    
+    if(affected_by_spell(i, SKILL_MAKE_CAMP)) {
+      send_to_char("There is already a camp setup here.\n\r", ch);
+      return eFAILURE;
+    }
+  }
+
   WAIT_STATE(ch, (int)(PULSE_VIOLENCE * 2.5));
 
   send_to_char("You scan about for signs of danger as you clear an area to make camp...\n\r", ch);
   act("$n scans about for signs of danger and clears an area to make camp...", ch, 0, 0, TO_ROOM, 0);
+
   if(!skill_success(ch, 0, SKILL_MAKE_CAMP)) {
     send_to_room("The area does not yet feel secure enough to rest.\n\r", ch->in_room);
   } else {
