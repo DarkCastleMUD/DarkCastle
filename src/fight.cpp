@@ -20,7 +20,7 @@
  * 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead *
  * of just race stuff                                                     *
  **************************************************************************
- * $Id: fight.cpp,v 1.546 2009/09/20 12:06:00 jhhudso Exp $               *
+ * $Id: fight.cpp,v 1.547 2009/10/26 21:21:54 jhhudso Exp $               *
  **************************************************************************/
 
 extern "C"
@@ -857,22 +857,13 @@ int do_lightning_shield(CHAR_DATA *ch, CHAR_DATA *vict, int dam)
      ) {
     dam = 0;
   } else {
-    dam = 15;
    if ((cur_af = affected_by_spell(ch, SPELL_LIGHTNING_SHIELD)))
      learned = (int)cur_af->modifier;
 
     if (learned == 0) // mob
       learned = 81;
 
-    dam = learned / 4;
-
-    if (dam < 10)
-      dam = 10;
-    else if (dam > 25)
-      dam = 25;
-
-    if (learned > 80)
-      dam = 25;
+    dam *= ((learned / 3)/100);
 
     if (IS_AFFECTED(ch, AFF_EAS))
       dam /= 4;
@@ -889,15 +880,6 @@ int do_lightning_shield(CHAR_DATA *ch, CHAR_DATA *vict, int dam)
     }
   }
 
-  if ((learned = has_skill(ch, SKILL_DODGE))) {
-    if (learned/3 > number(0,99)) {
-      act("$n steps quickly aside, avoiding the burst of $B$5lightning$R from your shield!", ch, 0, vict, TO_VICT, 0);
-      act("You step quickly aside, avoiding the burst of $B$5lightning$R from $N's shield!", ch, 0, vict, TO_CHAR, 0);
-      act("$n steps quickly aside, avoiding the burst of $B$5lightning$R from $N's shield!", ch, 0, vict, TO_ROOM, NOTVICT);
-      return eFAILURE;
-    }
-  }
-  
 /*  if ((learned = has_skill(ch, SKILL_SHIELDBLOCK)) && ch->equipment[WEAR_SHIELD] && GET_CLASS(ch) != CLASS_ANTI_PAL && GET_CLASS(ch) != CLASS_THIEF) 
 {
     if (learned/3 > number(0,99)) {
@@ -976,23 +958,13 @@ int do_fireshield(CHAR_DATA *ch, CHAR_DATA *vict, int dam)
       IS_SET(ch->immune, ISR_FIRE))
     dam = 0;
   else {
-    dam = 50;
-
    if ((cur_af = affected_by_spell(ch, SPELL_FIRESHIELD)))
      learned = (int)cur_af->modifier;
 
     if (learned == 0) // mob
       learned = 81;
 
-    dam = learned / 2;
-
-    if (dam < 20)
-      dam = 20;
-    else if (dam > 50) 
-      dam = 50;
-        
-    if (learned > 80)
-      dam = 50;
+    dam *= ((learned / 2)/100);
 
     if (IS_AFFECTED(ch, AFF_EAS))
       dam /= 4;
@@ -1009,14 +981,6 @@ int do_fireshield(CHAR_DATA *ch, CHAR_DATA *vict, int dam)
     }
   }
     
-  if ((learned = has_skill(ch, SKILL_DODGE))) {
-    if (learned/3 > number(0,99)) {
-      act("$n steps quickly aside, avoiding the burst of $B$4flame$R from your shield!", ch, 0, vict, TO_VICT, 0);
-      act("You step quickly aside, avoiding the burst of $B$4flame$R from $N's shield!", ch, 0, vict, TO_CHAR, 0);
-      act("$n steps quickly aside, avoiding the burst of $B$4flame$R from $N's shield!", ch, 0, vict, TO_ROOM, NOTVICT);
-      return eFAILURE;
-    }
-  }
 /*
   if ((learned = has_skill(ch, SKILL_SHIELDBLOCK)) && ch->equipment[WEAR_SHIELD] && GET_CLASS(ch) != CLASS_ANTI_PAL && GET_CLASS(ch) != CLASS_THIEF) {
     if (learned/3 > number(0,99)) {
@@ -1067,22 +1031,13 @@ int do_acidshield(CHAR_DATA *ch, CHAR_DATA *vict, int dam)
      )
     dam = 0;
   else {
-    dam = 20;
    if ((cur_af = affected_by_spell(ch, SPELL_ACID_SHIELD)))
      learned = (int)cur_af->modifier;
 
     if (learned == 0) // mob
       learned = 81;
 
-    dam = learned / 3;
-
-    if (dam < 10)
-      dam = 10;
-    else if (dam > 40)
-      dam = 40;
-
-    if (learned > 80)
-      dam = 40;
+    dam *= ((learned / 4)/100);
 
     if (IS_AFFECTED(ch, AFF_EAS))
       dam /= 4;
@@ -1099,14 +1054,6 @@ int do_acidshield(CHAR_DATA *ch, CHAR_DATA *vict, int dam)
     }
   }
 
-  if ((learned = has_skill(ch, SKILL_DODGE))) {
-    if (learned/3 > number(0,99)) {
-      act("$n steps quickly aside, avoiding the burst of $B$2acid$R from your shield!", ch, 0, vict, TO_VICT, 0);
-      act("You step quickly aside, avoiding the burst of $B$2acid$R from $N's shield!", ch, 0, vict, TO_CHAR, 0);
-      act("$n steps quickly aside, avoiding the burst of $B$2acid$R from $N's shield!", ch, 0, vict, TO_ROOM, NOTVICT);
-      return eFAILURE;
-    }
-  }
 /*
   if ((learned = has_skill(ch, SKILL_SHIELDBLOCK)) && ch->equipment[WEAR_SHIELD] && GET_CLASS(ch) != CLASS_ANTI_PAL && GET_CLASS(ch) != CLASS_THIEF) {
     if (learned/3 > number(0,99)) {
