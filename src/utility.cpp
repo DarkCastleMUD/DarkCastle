@@ -17,7 +17,7 @@
  *                         except Pir and Valk                             *
  * 10/19/2003   Onager     Took out super-secret hidey code from CAN_SEE() *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.109 2009/06/26 00:49:08 shane Exp $ */
+/* $Id: utility.cpp,v 1.110 2009/10/27 04:37:32 jhhudso Exp $ */
 
 extern "C"
 {
@@ -1849,7 +1849,8 @@ void init_random()
     }
     
     logf(0, LOG_MISC, "Seeding random numbers with %u", seed);
-    srand(seed);
+    char *state = (char *)malloc(256);
+    initstate(seed, state, 256);
     return;
 }
 
@@ -1872,7 +1873,7 @@ int number( int from, int to )
     }
     int number = (to+1) - from;
 
-    number = from + (int)((double)number * ((double)rand() / ((double)RAND_MAX + 1.0)));
+    number = from + (int)((double)number * ((double)random() / ((double)RAND_MAX + 1.0)));
     return number;
 }
 
