@@ -20,7 +20,7 @@
  * 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead *
  * of just race stuff                                                     *
  **************************************************************************
- * $Id: fight.cpp,v 1.547 2009/10/26 21:21:54 jhhudso Exp $               *
+ * $Id: fight.cpp,v 1.548 2009/10/27 00:25:31 jhhudso Exp $               *
  **************************************************************************/
 
 extern "C"
@@ -863,7 +863,7 @@ int do_lightning_shield(CHAR_DATA *ch, CHAR_DATA *vict, int dam)
     if (learned == 0) // mob
       learned = 81;
 
-    dam *= ((learned / 3)/100);
+    dam *= ((learned / 3)/100.0);
 
     if (IS_AFFECTED(ch, AFF_EAS))
       dam /= 4;
@@ -964,7 +964,7 @@ int do_fireshield(CHAR_DATA *ch, CHAR_DATA *vict, int dam)
     if (learned == 0) // mob
       learned = 81;
 
-    dam *= ((learned / 2)/100);
+    dam *= ((learned / 2)/100.0);
 
     if (IS_AFFECTED(ch, AFF_EAS))
       dam /= 4;
@@ -1037,7 +1037,7 @@ int do_acidshield(CHAR_DATA *ch, CHAR_DATA *vict, int dam)
     if (learned == 0) // mob
       learned = 81;
 
-    dam *= ((learned / 4)/100);
+    dam *= ((learned / 4)/100.0);
 
     if (IS_AFFECTED(ch, AFF_EAS))
       dam /= 4;
