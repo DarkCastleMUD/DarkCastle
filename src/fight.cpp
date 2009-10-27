@@ -20,7 +20,7 @@
  * 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead *
  * of just race stuff                                                     *
  **************************************************************************
- * $Id: fight.cpp,v 1.549 2009/10/27 03:04:50 jhhudso Exp $               *
+ * $Id: fight.cpp,v 1.550 2009/10/27 19:08:07 jhhudso Exp $               *
  **************************************************************************/
 
 extern "C"
@@ -863,7 +863,14 @@ int do_lightning_shield(CHAR_DATA *ch, CHAR_DATA *vict, int dam)
     if (learned == 0) // mob
       learned = 81;
 
-    dam *= ((learned / 3)/100.0);
+    // Close to 50% damage returned for a fully learned lightning shield
+    dam *= ((learned/100.0)*53.0)/100.0;
+
+    // Make it fluctuate between 475-525
+    if (dam > 500) {
+      dam = 475;
+      dam += number(0,50);
+    }
 
     if (IS_AFFECTED(ch, AFF_EAS))
       dam /= 4;
@@ -955,16 +962,23 @@ int do_fireshield(CHAR_DATA *ch, CHAR_DATA *vict, int dam)
   if(!IS_AFFECTED(vict, AFF_FIRESHIELD))        return eFAILURE;
 
   if (IS_SET(race_info[(int)GET_RACE(ch)].immune, ISR_FIRE) ||
-      IS_SET(ch->immune, ISR_FIRE))
+      IS_SET(ch->immune, ISR_FIRE)) {
     dam = 0;
-  else {
+  } else {
    if ((cur_af = affected_by_spell(vict, SPELL_FIRESHIELD)))
      learned = (int)cur_af->modifier;
 
     if (learned == 0) // mob
       learned = 81;
 
-    dam *= ((learned / 2)/100.0);
+    // Close to 75% damage returned for a fully learned fireshield
+    dam *= ((learned/100.0)*79.0)/100.0;
+
+    // Make it fluctuate between 475-525
+    if (dam > 500) {
+      dam = 475;
+      dam += number(0,50);
+    }
 
     if (IS_AFFECTED(ch, AFF_EAS))
       dam /= 4;
@@ -1037,7 +1051,14 @@ int do_acidshield(CHAR_DATA *ch, CHAR_DATA *vict, int dam)
     if (learned == 0) // mob
       learned = 81;
 
-    dam *= ((learned / 4)/100.0);
+    // Close to 30% damage returned for a fully learned acidshield
+    dam *= ((learned/100.0)*32.0)/100.0;
+
+    // Make it fluctuate between 475-525
+    if (dam > 500) {
+      dam = 475;
+      dam += number(0,50);
+    }
 
     if (IS_AFFECTED(ch, AFF_EAS))
       dam /= 4;
