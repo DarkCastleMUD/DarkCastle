@@ -20,7 +20,7 @@
  * 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead *
  * of just race stuff                                                     *
  **************************************************************************
- * $Id: fight.cpp,v 1.548 2009/10/27 00:25:31 jhhudso Exp $               *
+ * $Id: fight.cpp,v 1.549 2009/10/27 03:04:50 jhhudso Exp $               *
  **************************************************************************/
 
 extern "C"
@@ -857,7 +857,7 @@ int do_lightning_shield(CHAR_DATA *ch, CHAR_DATA *vict, int dam)
      ) {
     dam = 0;
   } else {
-   if ((cur_af = affected_by_spell(ch, SPELL_LIGHTNING_SHIELD)))
+   if ((cur_af = affected_by_spell(vict, SPELL_LIGHTNING_SHIELD)))
      learned = (int)cur_af->modifier;
 
     if (learned == 0) // mob
@@ -958,7 +958,7 @@ int do_fireshield(CHAR_DATA *ch, CHAR_DATA *vict, int dam)
       IS_SET(ch->immune, ISR_FIRE))
     dam = 0;
   else {
-   if ((cur_af = affected_by_spell(ch, SPELL_FIRESHIELD)))
+   if ((cur_af = affected_by_spell(vict, SPELL_FIRESHIELD)))
      learned = (int)cur_af->modifier;
 
     if (learned == 0) // mob
@@ -1031,7 +1031,7 @@ int do_acidshield(CHAR_DATA *ch, CHAR_DATA *vict, int dam)
      )
     dam = 0;
   else {
-   if ((cur_af = affected_by_spell(ch, SPELL_ACID_SHIELD)))
+   if ((cur_af = affected_by_spell(vict, SPELL_ACID_SHIELD)))
      learned = (int)cur_af->modifier;
 
     if (learned == 0) // mob
