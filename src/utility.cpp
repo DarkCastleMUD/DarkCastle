@@ -17,7 +17,7 @@
  *                         except Pir and Valk                             *
  * 10/19/2003   Onager     Took out super-secret hidey code from CAN_SEE() *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.110 2009/10/27 04:37:32 jhhudso Exp $ */
+/* $Id: utility.cpp,v 1.111 2009/10/28 05:39:07 jhhudso Exp $ */
 
 extern "C"
 {
@@ -823,27 +823,39 @@ bool CAN_SEE_OBJ( struct char_data *sub, struct obj_data *obj, bool blindfightin
    int skill = 0;
    struct affected_type * cur_af;
 
-   if ((cur_af = affected_by_spell(sub, SPELL_DETECT_MAGIC)))
-     skill = (int)cur_af->modifier;
-
-    if ( !IS_MOB(sub) && sub->pcdata->holyLite )
+   if ( !IS_MOB(sub) && sub->pcdata->holyLite )
 	return TRUE;
 
    int prog = oprog_can_see_trigger(sub,obj);
    if (IS_SET(prog, eEXTRA_VALUE)) return TRUE;
     else if (IS_SET(prog, eEXTRA_VAL2)) return FALSE;
    
+   skill = 0;
+   if ((cur_af = affected_by_spell(sub, SPELL_DETECT_GOOD)))
+     skill = (int)cur_af->modifier;
+   if ((skill >= 80 || GET_LEVEL(sub) >= IMMORTAL) && isname("consecrateitem", GET_OBJ_NAME(obj)) && obj->obj_flags.value[0] == SPELL_CONSECRATE)
+     return TRUE;
+
+   skill = 0;
+   if ((cur_af = affected_by_spell(sub, SPELL_DETECT_EVIL)))
+     skill = (int)cur_af->modifier;
+   if ((skill >= 80 || GET_LEVEL(sub) >= IMMORTAL) && isname("consecrateitem", GET_OBJ_NAME(obj)) && obj->obj_flags.value[0] == SPELL_DESECRATE)
+     return TRUE;
+
    if (IS_OBJ_STAT(obj, ITEM_NOSEE))
       return FALSE;
 
    if ( IS_AFFECTED( sub, AFF_BLIND ) ) {
-      if(blindfighting && skill_success(sub, NULL, SKILL_BLINDFIGHTING))
-         return TRUE;
-      else
-         return FALSE;
+     if(blindfighting && skill_success(sub, NULL, SKILL_BLINDFIGHTING))
+       return TRUE;
+     else
+       return FALSE;
    }
 
    // only see beacons if you have detect magic up
+   if ((cur_af = affected_by_spell(sub, SPELL_DETECT_MAGIC)))
+     skill = (int)cur_af->modifier;
+
    if (GET_ITEM_TYPE(obj) == ITEM_BEACON && IS_SET(obj->obj_flags.extra_flags, ITEM_INVISIBLE)) {
      if (!IS_AFFECTED(sub, AFF_DETECT_MAGIC)) {
        return FALSE;
@@ -861,19 +873,6 @@ bool CAN_SEE_OBJ( struct char_data *sub, struct obj_data *obj, bool blindfightin
 
    if( IS_DARK(sub->in_room) && !IS_AFFECTED(sub, AFF_INFRARED) && !IS_OBJ_STAT(obj, ITEM_GLOW) )
       return FALSE;
-
-   skill = 0;
-   if ((cur_af = affected_by_spell(sub, SPELL_DETECT_GOOD)))
-     skill = (int)cur_af->modifier;
-   if (skill >= 80 && isname("consecrateitem", GET_OBJ_NAME(obj)) && obj->obj_flags.value[0] == SPELL_CONSECRATE)
-        return TRUE;
-
-   skill = 0;
-   if ((cur_af = affected_by_spell(sub, SPELL_DETECT_EVIL)))
-     skill = (int)cur_af->modifier;
-   if (skill >= 80 && isname("consecrateitem", GET_OBJ_NAME(obj)) && obj->obj_flags.value[0] == SPELL_DESECRATE)
-        return TRUE;
-
 
     return TRUE;
 }
