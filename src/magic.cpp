@@ -13932,8 +13932,17 @@ int spell_consecrate(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
     send_to_char("A foul taint prevents you from consecrating the ground here!", ch);
     return eSUCCESS;
    }
+   if(spl == SPELL_CONSECRATE && cItem->obj_flags.value[0] == SPELL_CONSECRATE) {
+    send_to_char("The ground here has already been consecrated!", ch);
+    return eSUCCESS;
+   }
+
    if(spl == SPELL_DESECRATE && cItem->obj_flags.value[0] == SPELL_CONSECRATE) {
     send_to_char("A powerful aura of goodness prevents you from desecrating the ground here!", ch);
+    return eSUCCESS;
+   }
+   if(spl == SPELL_DESECRATE && cItem->obj_flags.value[0] == SPELL_DESECRATE) {
+    send_to_char("The ground here has already been desecrated!", ch);
     return eSUCCESS;
    }
   }
