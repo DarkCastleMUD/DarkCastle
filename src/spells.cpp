@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.271 2009/10/02 04:15:22 jhhudso Exp $ */
+/* $Id: spells.cpp,v 1.272 2009/10/28 23:34:36 dcastle Exp $ */
 
 extern "C"
 {
@@ -550,7 +550,7 @@ struct skill_stuff skill_info[] =
 /* 92 */         {  "ignoreclan", 0 },
 /* 93 */         { "ignoreclan2", 0 },
 /* 94 */             { "commune", SKILL_INCREASE_HARD },
-/* 95 */       { "scribe scroll", SKILL_INCREASE_HARD },
+/* 95 */              { "scribe", SKILL_INCREASE_HARD },
 /* 96 */           { "make camp", SKILL_INCREASE_HARD },
 /* 97 */         { "battlesense", SKILL_INCREASE_HARD },
 /* 98 */        { "perseverance", SKILL_INCREASE_HARD },
@@ -569,7 +569,11 @@ struct skill_stuff skill_info[] =
 /* 111 */     { "offhand double", SKILL_INCREASE_HARD},
 /* 112 */          { "onslaught", SKILL_INCREASE_HARD},
 /* 113 */     { "counter strike", SKILL_INCREASE_HARD},
-
+/* 114 */              { "imbue", SKILL_INCREASE_HARD},
+/* 115 */   { "elemental filter", SKILL_INCREASE_HARD},
+/* 116 */        { "orchestrate", SKILL_INCREASE_HARD},
+/* 117 */            {"tumbling", SKILL_INCREASE_HARD},
+/* 118 */                {"brew", SKILL_INCREASE_HARD},
 /*    */                  { "\n", 0 },
 };
 
