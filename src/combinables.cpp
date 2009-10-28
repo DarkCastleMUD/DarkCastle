@@ -829,7 +829,7 @@ int Brew::find(Brew::recipe r) {
 
 int do_scribe(char_data *ch, char *argument, int cmd)
 {
-  char arg1[MAX_STRING_LENGTH], dust[MAX_STRING_LENGTH], pen[MAX_STRING_LENGTH], paper[MAX_STRING_LENGTH], buffer[MAX_STRING_LENGTH];
+  char arg1[MAX_STRING_LENGTH], dust[MAX_STRING_LENGTH], pen[MAX_STRING_LENGTH], paper[MAX_STRING_LENGTH];
   OBJ_DATA *inkobj, *dustobj, *penobj, *paperobj;
   affected_type af;
   Scribe s;
@@ -961,8 +961,6 @@ int do_scribe(char_data *ch, char *argument, int cmd)
   af.bitvector = -1;
   affect_to_char(ch, &af);
 
-  const char *potion_color;
-
   // Search for the current combination as a recipe
   Scribe::recipe r = { obj_index[inkobj->item_number].virt,
 		       obj_index[dustobj->item_number].virt,
@@ -984,7 +982,8 @@ int do_scribe(char_data *ch, char *argument, int cmd)
     act("As you finish, the letters on the newly minted scroll burst into $B$4flame$R leaving nothing but ash!", ch, 0, 0, TO_CHAR, 0);
     act("As $e finishes, the letters on the newly minted scroll burst into $B$4flame$R leaving nothing but ash!", ch, 0, 0, TO_ROOM, 0);
     extract_obj(paperobj);
-
+    extract_obj(penobj);
+    extract_obj(dustobj);
     // 50% of a failure causing 'wild magic' to be cast on self
     if (number(1,100) > 50) {
       cast_wild_magic(GET_LEVEL(ch), ch, "offense", 0, ch, 0, 0);
@@ -994,13 +993,31 @@ int do_scribe(char_data *ch, char *argument, int cmd)
     act("As you finish, the letters on the newly minted scroll $Bglow$R briefly and return to normal.", ch, 0, 0, TO_CHAR, 0);
     act("As $e finishes, the letters on the newly minted scroll $Bglow$R briefly and return to normal.", ch, 0, 0, TO_ROOM, 0);
 
+    char ink_key[MAX_STRING_LENGTH], dust_key[MAX_STRING_LENGTH],
+      pen_key[MAX_STRING_LENGTH], paper_key[MAX_STRING_LENGTH];
+    char *args;
+
+    args = one_argument(inkobj->name, ink_key);
+    args = one_argument(args, ink_key);
+    args = one_argument(args, ink_key);
+
+    args = one_argument(dustobj->name, dust_key);
+    args = one_argument(args, dust_key);
+    args = one_argument(args, dust_key);
+
+    args = one_argument(penobj->name, pen_key);
+    args = one_argument(args, pen_key);
+    args = one_argument(args, pen_key);
+
+    args = one_argument(paperobj->name, paper_key);
+    args = one_argument(args, paper_key);
+    args = one_argument(args, paper_key);
+
     // Put it all together into the new name
     stringstream scrollname, scrollshort, scrolllong;
-    sprinttype(spell-1, spells, buffer);
-
-    scrollname << "scroll " << GET_NAME(ch) << " " << buffer;
-    scrollshort << GET_NAME(ch) << "'s scroll of " << buffer;
-    scrolllong << GET_NAME(ch) << "'s scroll of " << buffer << "lies here.";
+    scrollname << "scroll " << paper_key << " " << dust_key << " " << pen_key << " " << ink_key;
+    scrollshort << "a " << paper_key << " $B" << dust_key << "$R scroll " << pen_key << " in " << ink_key << " ink";
+    scrolllong << "a " << paper_key << " " << dust_key << " scroll " << pen_key << " in " << ink_key << "ink lies here";
 
     paperobj->obj_flags.type_flag=ITEM_SCROLL;
     paperobj->obj_flags.value[0] = learned/4 + GET_LEVEL(ch)/2;
@@ -1013,6 +1030,9 @@ int do_scribe(char_data *ch, char *argument, int cmd)
 
     // We set the item to custom so that it will save uniquely every time
     SET_BIT(paperobj->obj_flags.more_flags, ITEM_CUSTOM);
+
+    extract_obj(penobj);
+    extract_obj(dustobj);
   }
 
   return eSUCCESS;
