@@ -11971,7 +11971,8 @@ int spell_icestorm(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
   struct affected_type af;
   char buf[MAX_STRING_LENGTH];
 
-  dam = 50+level*3;
+  int learned = has_skill(ch, SPELL_ICESTORM);
+  dam = 25+learned*4;
 
   if(world[ch->in_room].sector_type == SECT_FROZEN_TUNDRA)
        dam = dam * 5 / 4;

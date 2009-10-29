@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_warrior.cpp,v 1.82 2009/10/25 19:56:07 jhhudso Exp $
+| $Id: cl_warrior.cpp,v 1.83 2009/10/29 03:50:06 jhhudso Exp $
 | cl_warrior.C
 | Description:  This file declares implementation for warrior-specific
 |   skills.
@@ -1558,7 +1558,7 @@ int do_onslaught(struct char_data *ch, char *argument, int cmd)
     af.type = SKILL_ONSLAUGHT_TIMER;
     af.location = 0;
     af.modifier = 0;
-    af.duration = 2 + learned/9;
+    af.duration = 7 + learned/15;
     af.bitvector = -1;
     affect_to_char(ch, &af);
 
@@ -1569,7 +1569,7 @@ int do_onslaught(struct char_data *ch, char *argument, int cmd)
     af.type = SKILL_ONSLAUGHT;
     af.location = 0;
     af.modifier = 0;
-    af.duration = 1 + learned/9;
+    af.duration = 1 + learned/15;
     af.bitvector = -1;
 
     affect_to_char(ch, &af);
@@ -1577,7 +1577,7 @@ int do_onslaught(struct char_data *ch, char *argument, int cmd)
     af.type = SKILL_ONSLAUGHT_TIMER;
     af.location = 0;
     af.modifier = 0;
-    af.duration = 3 + learned/9;
+    af.duration = 7 + learned/15;
     af.bitvector = -1;
 
     affect_to_char(ch, &af);

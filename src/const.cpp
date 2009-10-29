@@ -12,7 +12,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: const.cpp,v 1.323 2009/10/25 16:58:54 jhhudso Exp $ */
+/* $Id: const.cpp,v 1.324 2009/10/29 03:50:06 jhhudso Exp $ */
 
 extern "C"
 {
@@ -1313,10 +1313,10 @@ struct class_skill_defines w_skills[] = { // warrior skills
 {    "skewer",          SKILL_SKEWER,             45,  100,  0,   STRDEX },
 {    "blade shield",    SKILL_BLADESHIELD,        47,  100,  0,   STRCON },
 {    "combat mastery",  SKILL_COMBAT_MASTERY,     50,  100,  0,   DEXINT },
-//{    "onslaught",       SKILL_ONSLAUGHT,          51,  100,  0,   DEXINT },
+{    "onslaught",       SKILL_ONSLAUGHT,          51,  100,  0,   DEXINT },
 //{    "battlesense",     SKILL_BATTLESENSE,        53,  100,  1,   STRCON },
 //{    "perseverance",    SKILL_PERSEVERANCE,       53,  100,  2,   CONWIS },
-//{    "triage",          SKILL_TRIAGE,             55,  100,  0,   DEXINT },
+{    "triage",          SKILL_TRIAGE,             55,  100,  0,   DEXINT },
 //{    "smite",           SKILL_SMITE,              57,  100,  1,   STRDEX },
 //{    "leadership",      SKILL_LEADERSHIP,         57,  100,  2,   STRDEX },
 //{    "execute",         SKILL_EXECUTE,            60,  100,  1,   CONWIS },
@@ -1356,8 +1356,8 @@ struct class_skill_defines t_skills[] = { // thief skills
 {    "eyegouge",        SKILL_EYEGOUGE,         42,    100,  0,  STRDEX },  
 {    "vitalstrike",     SKILL_VITAL_STRIKE,     45,    100,  0,  STRDEX },  
 {    "cripple",		SKILL_CRIPPLE,		50,    100,  0,  STRDEX },
-//{    "escape",		SKILL_ESCAPE,		51,    100,  0,  DEXWIS },
-//{    "critical hit",		SKILL_CRIT_HIT,		55,    100,  0,  CONINT },
+{    "escape",		SKILL_ESCAPE,		51,    100,  0,  DEXWIS },
+{    "critical hit",	SKILL_CRIT_HIT,		55,    100,  0,  CONINT },
 {    "\n",              0,                      1,      0,   0,  0 }
 };
 
@@ -1404,8 +1404,8 @@ struct class_skill_defines a_skills[] = { // anti-paladin skills
 {    "resist acid",          SPELL_RESIST_ACID,       46,     70,  0,   STRINT },
 {    "acid blast",           SPELL_ACID_BLAST,        48,    100,  0,   STRINT },
 {    "vampiric aura",        SPELL_VAMPIRIC_AURA,     50,    100,  0,   CONWIS },
-//{    "villainy",             SPELL_VILLAINY,          51,    100,  0,   STRINT },
-//{    "desecrate",            SPELL_DESECRATE,         55,    100,  0,   CONINT },
+{    "villainy",             SPELL_VILLAINY,          51,    100,  0,   STRINT },
+{    "desecrate",            SPELL_DESECRATE,         55,    100,  0,   CONINT },
 {    "\n",                   0,                       1,      0,   0,   0 }
 };
 
@@ -1451,8 +1451,8 @@ struct class_skill_defines p_skills[] = { // paladin skills
 {    "divine fury",          SPELL_DIVINE_FURY,        48,    100,  0,   STRCON },
 {    "behead",               SKILL_BEHEAD,             49,    100,  0,   DEXINT },
 {    "holy aura",            SPELL_HOLY_AURA,          50,    100,  0,   CONWIS },
-//{    "heroism",              SPELL_HEROISM,            51,    100,  0,   CONWIS },
-//{    "consecrate",           SPELL_CONSECRATE,         55,    100,  0,   STRWIS },
+{    "heroism",              SPELL_HEROISM,            51,    100,  0,   CONWIS },
+{    "consecrate",           SPELL_CONSECRATE,         55,    100,  0,   STRWIS },
 //{    "spirit shield",        SPELL_SPIRIT_SHIELD,      57,    100,  0,   INTWIS },
 {    "\n",                   0,                        1,      0,   0,   0 }
 };
@@ -1490,6 +1490,8 @@ struct class_skill_defines b_skills[] = { // barbarian skills
 {    "magic resistance", SKILL_MAGIC_RESIST,      47,  100,  0,  DEXCON },
 {    "knockback",       SKILL_KNOCKBACK,          48,  100,  0,  STRINT },
 {    "bullrush",        SKILL_BULLRUSH,           50,  100,  0,  STRCON },
+{    "batterbrace",     SKILL_BATTERBRACE,        51,  100,  0,  DEXWIS },
+{    "vigor",           SKILL_VIGOR,              55,  100,  0,  DEXCON },
 {    "\n",              0,                        1,    0,   0,  0 }
 };
 
@@ -1521,8 +1523,8 @@ struct class_skill_defines k_skills[] = { // monk skills
 {    "blast",           KI_BLAST+KI_OFFSET,     45,    100,  0,   CONINT },
 {    "disrupt",         KI_DISRUPT+KI_OFFSET,   47,    100,  0,   CONINT },
 {    "meditation",      KI_MEDITATION+KI_OFFSET,50,    100,  0,   CONWIS },
-//{    "transfer",        KI_TRANSFER+KI_OFFSET,  51,    100,  0,   CONWIS },
-//{    "counter strike",  SKILL_COUNTER_STRIKE,   55,    100,  0,   STRDEX },
+{    "transfer",        KI_TRANSFER+KI_OFFSET,  51,    100,  0,   CONWIS },
+{    "counter strike",  SKILL_COUNTER_STRIKE,   55,    100,  0,   STRDEX },
 {    "\n",              0,                      1,      0,   0,   0 }
 };
 
@@ -1571,8 +1573,8 @@ struct class_skill_defines r_skills[] = { // ranger skills
 {    "camouflage",      SPELL_CAMOUFLAGE,        46,     85,  0,   INTWIS },
 {    "creeping death",  SPELL_CREEPING_DEATH,    48,    100,  0,   STRCON },
 { "natural selection",	SKILL_NAT_SELECT,	 50,	100,  0,   DEXINT },
-//{    "make camp",       SKILL_MAKE_CAMP,          51,  100,  0,   CONWIS },
-//{    "offhand double",  SKILL_OFFHAND_DOUBLE,    55,    100,  0,   STRDEX },
+{    "make camp",       SKILL_MAKE_CAMP,          51,  100,  0,   CONWIS },
+{    "offhand double",  SKILL_OFFHAND_DOUBLE,    55,    100,  0,   STRDEX },
 {      "\n",            0,                       1,      0,   0,   0 }
 };
 
@@ -1619,8 +1621,8 @@ struct class_skill_defines d_skills[] = { // bard skills
 { "mountain king's charge",SKILL_SONG_MKING_CHARGE,        49,    100,  0,   DEXCON },
 { "hypnotic harmony",      SKILL_SONG_HYPNOTIC_HARMONY,    50,    100,  0,   CONINT },
 { "summoning song",        SKILL_SONG_SUMMONING_SONG,      50,    100,  0,   INTWIS },
-//{ "orchestrate",           SKILL_ORCHESTRATE,              51,    100,  0,   CONWIS },
-//{ "tumbling",              SKILL_TUMBLING,                 55,    100,  0,   STRDEX },
+{ "orchestrate",           SKILL_ORCHESTRATE,              51,    100,  0,   CONWIS },
+{ "tumbling",              SKILL_TUMBLING,                 55,    100,  0,   STRDEX },
 { "\n",                    0,                              1,      0,   0,   0 }
 };
 
@@ -1682,7 +1684,8 @@ struct class_skill_defines u_skills[] = { // druid skills
 {    "summon",               SPELL_SUMMON,               49,    100,  0,   STRCON },
 {    "conjure elemental",    SPELL_CONJURE_ELEMENTAL,    50,    100,  0,   CONINT },
 {    "release elemental",    SPELL_RELEASE_ELEMENTAL,    50,    100,  0,   CONINT },
-{    "brew",                 SKILL_BREW,                 61,    100,  0,   CONINT },
+{    "icestorm",             SPELL_ICESTORM,             51,    100,  0,   STRDEX },
+{    "brew",                 SKILL_BREW,                 55,    100,  0,   CONINT },
 {    "\n",                   0,                          1,      0,   0,   0 }
 };
 
@@ -1743,10 +1746,10 @@ struct class_skill_defines c_skills[] = { // cleric skills
 {    "heal spray",           SPELL_HEAL_SPRAY,        48,    100,  0,   STRCON },
 {    "group sanctuary",      SPELL_GROUP_SANC,        49,    100,  0,   CONWIS },
 {    "divine intervention",  SPELL_DIVINE_INTER,      50,    100,  0,   CONWIS },
-//{    "commune",              SKILL_COMMUNE,           51,    100,  0,   DEXWIS },
+{    "commune",              SKILL_COMMUNE,           51,    100,  0,   DEXWIS },
 //{    "boneshield", 	     SPELL_BONESHIELD,        53,    100,  2,   STRCON },
 //{    "silence", 	     SPELL_SILENCE,           53,    100,  1,   CONWIS },
-{    "scribe",               SKILL_SCRIBE,            61,    100,  0,   DEXINT }, //lvl 55
+{    "scribe",               SKILL_SCRIBE,            55,    100,  0,   DEXINT }, 
 //{    "immunity", 	     SPELL_IMMUNITY,          57,    100,  2,   CONWIS },
 //{    "atonement", 	     SPELL_ATONEMENT,         57,    100,  1,   STRCON },
 //{    "channel", 	     SPELL_CHANNEL,           60,    100,  2,   INTWIS },
@@ -1807,8 +1810,8 @@ struct class_skill_defines m_skills[] = { // mage skills
 {    "paralyze",            SPELL_PARALYZE,          48,    100,  0,   DEXINT },
 {    "solar gate",          SPELL_SOLAR_GATE,        49,    100,  0,   STRINT },
 {    "spellcraft",          SKILL_SPELLCRAFT,        50,    100,  0,   INTWIS },
-//{    "imbue",               SKILL_IMBUE,             51,    100,  0,   INTWIS },
-//{    "elemental filter",    SKILL_ELEMENTAL_FILTER,  55,    100,  0,   DEXWIS },
+{    "imbue",               SKILL_IMBUE,             51,    100,  0,   INTWIS },
+{    "elemental filter",    SKILL_ELEMENTAL_FILTER,  55,    100,  0,   DEXWIS },
 {    "\n",                  0,                       1,      0,   0,   0 }
 };
 
