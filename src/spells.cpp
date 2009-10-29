@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.272 2009/10/28 23:34:36 dcastle Exp $ */
+/* $Id: spells.cpp,v 1.273 2009/10/29 17:03:51 jhhudso Exp $ */
 
 extern "C"
 {
@@ -1998,8 +1998,6 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
               return eFAILURE;
             }
  
-            skill_increase_check(ch, SKILL_ELEMENTAL_FILTER, has_skill(ch, SKILL_ELEMENTAL_FILTER), SKILL_INCREASE_HARD);
- 
             if(spl == SPELL_BURNING_HANDS || spl == SPELL_FIREBALL || spl == SPELL_FIRESTORM || spl == SPELL_HELLSTREAM) 
             {
               if(fil == FILTER_MAGIC && fillvl > 50) rel = 1.5;
@@ -2219,9 +2217,13 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
       if (spl != SPELL_VENTRILOQUATE) /* :-) */
 	say_spell(ch, spl, oldroom);
 
-	if (!spellcraft(ch, spl) || (spl != SPELL_MAGIC_MISSILE && spl != SPELL_FIREBALL) )
-      WAIT_STATE(ch, spell_info[spl].beats);
-	else 
+      if (rel > 1) {
+	skill_increase_check(ch, SKILL_ELEMENTAL_FILTER, has_skill(ch, SKILL_ELEMENTAL_FILTER), SKILL_INCREASE_HARD);
+      }
+
+      if (!spellcraft(ch, spl) || (spl != SPELL_MAGIC_MISSILE && spl != SPELL_FIREBALL) )
+	WAIT_STATE(ch, spell_info[spl].beats);
+      else 
 	WAIT_STATE(ch, (int)(spell_info[spl].beats/1.5));
       
       if ((spell_info[spl].spell_pointer == 0) && spl>0)
