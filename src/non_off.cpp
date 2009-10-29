@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: non_off.cpp,v 1.60 2009/06/27 19:26:20 kkoons Exp $
+| $Id: non_off.cpp,v 1.61 2009/10/29 16:48:29 jhhudso Exp $
 | non_off.C
 | Description:  Implementation of generic, non-offensive commands.
 */
@@ -1047,7 +1047,9 @@ int do_sleep(CHAR_DATA *ch, char *argument, int cmd)
        return eFAILURE;
     }
     if (!IS_SET(world[ch->in_room].room_flags, SAFE))
-      send_to_char ("Be careful sleeping out here!  This isn't a safe room, so people can steal your equipment while you sleep!\r\n", ch);
+      if (! check_make_camp(ch->in_room)) {
+	send_to_char ("Be careful sleeping out here!  This isn't a safe room, so people can steal your equipment while you sleep!\r\n", ch);
+      }
 
     if ((paf = affected_by_spell(ch, SPELL_SLEEP)) && 
 		paf->modifier == 1 && GET_POS(ch) != POSITION_SLEEPING)
