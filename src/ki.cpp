@@ -3,7 +3,7 @@
  * Morcallen 12/18
  *
  */
-/* $Id: ki.cpp,v 1.83 2009/06/26 00:49:08 shane Exp $ */
+/* $Id: ki.cpp,v 1.84 2009/10/29 14:32:47 jhhudso Exp $ */
 
 extern "C"
 {
@@ -1059,7 +1059,7 @@ int ki_transfer( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim)
     GET_KI(ch) -= amount;
     temp = number(amount-amount/10, amount+amount/10);  //+-10%
     temp = (temp * learned) / 100;
-    csendf(ch, "DEBUG: You healed them for %d ki\r\n", temp);
+
     GET_KI(victim) += temp;
     if(GET_KI(victim) > GET_MAX_KI(victim)) 
       GET_KI(victim) = GET_MAX_KI(victim);
