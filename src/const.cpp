@@ -12,7 +12,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: const.cpp,v 1.324 2009/10/29 03:50:06 jhhudso Exp $ */
+/* $Id: const.cpp,v 1.325 2009/10/29 19:34:44 jhhudso Exp $ */
 
 extern "C"
 {
@@ -2609,6 +2609,6 @@ char *reserved[] = {
     "tactics reuse timer",
     "concentration loss fixer",
     "onslaught reuse timer",
-    "ki transfer receive timer",
+    "ki transfer reuse timer",
     "brew reuse timer",
 };
