@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.274 2009/10/29 21:01:48 jhhudso Exp $ */
+/* $Id: spells.cpp,v 1.275 2009/10/30 22:49:54 kkoons Exp $ */
 
 extern "C"
 {
@@ -2049,20 +2049,25 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
             {
               if((has_skill(ch, SKILL_COMMUNE) >= 90 
                     && (spl == SPELL_PROTECT_FROM_EVIL 
+                        || spl == SPELL_RESIST_MAGIC
                         || spl == SPELL_PROTECT_FROM_GOOD)) 
                  ||(has_skill(ch, SKILL_COMMUNE) >= 70 
                     && (spl == SPELL_CURE_CRITIC 
                         || spl == SPELL_SANCTUARY 
+                        || spl == SPELL_REMOVE_POISON 
+                        || spl == SPELL_REMOVE_BLIND
                         || spl == SPELL_IRIDESCENT_AURA)) 
                  ||(has_skill(ch, SKILL_COMMUNE) >= 40 
                     && (spl == SPELL_ARMOR 
                         || spl == SPELL_REFRESH 
+                        || spl == SPELL_REMOVE_PARALYSIS
                         || spl == SPELL_CURE_SERIOUS 
                         || spl == SPELL_BLESS 
                         || spl == SPELL_FLY))
                  ||(spl == SPELL_DETECT_INVISIBLE 
                     || spl == SPELL_DETECT_MAGIC 
                     || spl == SPELL_DETECT_POISON 
+                    || spl == SPELL_SENSE_LIFE
                     || spl == SPELL_CURE_LIGHT))
               {
                 skill_increase_check(ch, SKILL_COMMUNE, has_skill(ch, SKILL_COMMUNE), SKILL_INCREASE_HARD);
