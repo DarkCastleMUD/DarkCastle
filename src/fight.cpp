@@ -20,7 +20,7 @@
  * 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead *
  * of just race stuff                                                     *
  **************************************************************************
- * $Id: fight.cpp,v 1.550 2009/10/27 19:08:07 jhhudso Exp $               *
+ * $Id: fight.cpp,v 1.551 2009/11/04 22:52:53 kkoons Exp $               *
  **************************************************************************/
 
 extern "C"
@@ -3909,6 +3909,83 @@ void make_corpse(CHAR_DATA * ch)
       obj_to_obj(money, corpse);
     }
   
+    if(IS_MOB(ch) && GET_LEVEL(ch) > 60 && number(1, 100) == 42) //1%
+    {
+      struct obj_data *recipeitem = NULL;
+      int rarity = number(1, 100);
+      bool itemtype = number(0, 1);
+      if(rarity > 95) //96-100 5%
+      {
+        switch(itemtype)
+        {
+          case 0: //bottle
+          recipeitem = clone_object(real_object(6324));
+          break;
+          case 1:
+          recipeitem = clone_object(real_object(6338));
+          break;
+        }
+      }
+      else if(rarity > 85)//85-95 10%
+      {
+        switch(itemtype)
+        {
+          case 0: //bottle
+          recipeitem = clone_object(real_object(6323));
+          break;
+          case 1:
+          recipeitem = clone_object(real_object(6339));
+          break;
+        }
+      }
+      else if(rarity > 65) //65-85 20%
+      {
+        switch(itemtype)
+        {
+          case 0: //bottle
+          recipeitem = clone_object(real_object(6322));
+          break;
+          case 1:
+          recipeitem = clone_object(real_object(6340));
+          break;
+        }
+      }
+      else if(rarity > 40) //41-65 25%
+      {
+        switch(itemtype)
+        {
+          case 0: //bottle
+          recipeitem = clone_object(real_object(6321));
+          break;
+          case 1:
+          recipeitem = clone_object(real_object(6341));
+          break;
+        }
+      }
+      else //1-40 40%
+      {
+        switch(itemtype)
+        {
+          case 0: //bottle
+          recipeitem = clone_object(real_object(6320));
+          break;
+          case 1:
+          recipeitem = clone_object(real_object(6342));
+          break;
+        }
+      }
+      if(recipeitem > 0)
+      {
+        obj_to_obj(recipeitem, corpse);
+      }
+      else
+      {
+        char bugmsg[MAX_STRING_LENGTH];
+        sprintf(bugmsg, "%s was supposed to drop a paper/bottle but was unable to create the item", GET_NAME(ch));
+        log(bugmsg, IMMORTAL, LOG_BUG);
+      }
+    } 
+ 
     for(o = ch->carrying; o; o = next_obj) 
     {
       next_obj = o->next_content;
