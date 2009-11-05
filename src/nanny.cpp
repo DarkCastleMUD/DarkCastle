@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.186 2009/10/14 02:53:07 jhhudso Exp $ */
+/* $Id: nanny.cpp,v 1.187 2009/11/05 22:50:15 jhhudso Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -993,7 +993,7 @@ void nanny(struct descriptor_data *d, char *arg)
       if (allow_imp_password && allowed_host(d->host)) {
 	for (descriptor_data *ad = descriptor_list; ad && ad != (descriptor_data *)0x95959595; ad = ad->next) {
 	  if (ad != d && !str_cmp(d->host, ad->host)) {
-	    if (GET_LEVEL(ad->character) == IMP && IS_PC(ad->character)) {
+	    if (ad->character && GET_LEVEL(ad->character) == IMP && IS_PC(ad->character)) {
 	      password = ad->character->pcdata->pwd;
 	      logf(OVERSEER, LOG_SOCKET, "Using %s's password for authentication.", GET_NAME(ad->character));
 	      break;
