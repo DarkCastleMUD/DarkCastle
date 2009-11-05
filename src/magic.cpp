@@ -9682,6 +9682,35 @@ int cast_resist_magic( ubyte level, CHAR_DATA *ch, char *arg,
 {
   switch (type) {
   case SPELL_TYPE_SPELL:
+	if(!strcmp(arg,"communegroupspell") && has_skill(ch, SKILL_COMMUNE)) {
+         int retval = eFAILURE;
+         CHAR_DATA *leader;
+         if(ch->master) leader = ch->master;
+         else leader = ch;
+
+         struct follow_type *k;
+         for(k = leader->followers; k; k = k->next) {
+           tar_ch = k->follower;
+           if(ch->in_room == tar_ch->in_room) {
+             if(affected_by_spell(tar_ch, SPELL_IMMUNITY) && affected_by_spell(tar_ch, SPELL_IMMUNITY)->modifier == SPELL_RESIST_MAGIC-1) {
+               act("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_CHAR, 0);
+               act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, TO_VICT, 0);
+               act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_ROOM, NOTVICT);
+             }
+             else retval &= spell_resist_magic(level, ch, tar_ch, 0, skill);
+           }
+         }
+         if(ch->in_room == leader->in_room) {
+           if(affected_by_spell(tar_ch, SPELL_IMMUNITY) && affected_by_spell(tar_ch, SPELL_IMMUNITY)->modifier == SPELL_RESIST_MAGIC-1) {
+             act("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_CHAR, 0);
+             act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_ch, TO_VICT, 0);
+             act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_ROOM, NOTVICT);
+           }
+           else retval &= spell_resist_magic(level, ch, leader, 0, skill);
+         }
+
+         return retval;
+        }
 	 return spell_resist_magic(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_POTION:
