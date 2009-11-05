@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.275 2009/10/30 22:49:54 kkoons Exp $ */
+/* $Id: spells.cpp,v 1.276 2009/11/05 23:28:21 jhhudso Exp $ */
 
 extern "C"
 {
@@ -84,7 +84,7 @@ int do_fall(CHAR_DATA *ch, short dir);
 void remove_memory(CHAR_DATA *ch, char type);
 void add_memory(CHAR_DATA *ch, char *victim, char type);
 void make_dust(CHAR_DATA * ch);
-void say_spell( CHAR_DATA *ch, int si, int room = 0);
+int say_spell( CHAR_DATA *ch, int si, int room = 0);
 extern struct index_data *mob_index;
 
 #if(0)
@@ -1258,7 +1258,7 @@ void add_follower(CHAR_DATA *ch, CHAR_DATA *leader, int cmd)
 }
 
 
-void say_spell( CHAR_DATA *ch, int si, int room )
+int say_spell( CHAR_DATA *ch, int si, int room )
 {
     char buf[MAX_STRING_LENGTH], splwd[MAX_BUF_LENGTH];
     char buf2[MAX_STRING_LENGTH];
@@ -1341,7 +1341,7 @@ void say_spell( CHAR_DATA *ch, int si, int room )
 
 	  // Need better solution, but this will keep DC from crashing when a act_prog trigger kills a mob in the room
 	  if (SOMEONE_DIED(retval)) {
-	    return;
+	    return retval;
 	  }
 	}
 }
@@ -2219,8 +2219,15 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
 	  }
      }
 
-      if (spl != SPELL_VENTRILOQUATE) /* :-) */
-	say_spell(ch, spl, oldroom);
+     int retval = 0;
+     if (spl != SPELL_VENTRILOQUATE) { /* :-) */
+       retval = say_spell(ch, spl, oldroom);
+
+       // Someone died, most likely the mob due to an act_trigger program
+       if (SOMEONE_DIED(retval)) {
+	 return eSUCCESS;
+       }
+     }
 
       if (cmd == CMD_FILTER && fillvl) {
 	skill_increase_check(ch, SKILL_ELEMENTAL_FILTER, fillvl, SKILL_INCREASE_HARD);
