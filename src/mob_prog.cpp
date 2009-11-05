@@ -3107,7 +3107,8 @@ int mprog_wordlist_check( const char *arg, CHAR_DATA *mob, CHAR_DATA *actor,
 		{
                   retval = 1;
 		  mprog_driver( mprg->comlist, mob, actor, obj, vo, NULL, NULL );
-		if (selfpurge) return retval;
+		  if (selfpurge || IS_SET(mprog_cur_result, eCH_DIED))
+		    return retval;
 		  break;
 		}
 	      else
@@ -3131,7 +3132,8 @@ int mprog_wordlist_check( const char *arg, CHAR_DATA *mob, CHAR_DATA *actor,
 		  {
                     retval = 1;
 		    mprog_driver( mprg->comlist, mob, actor, obj, vo, NULL, NULL );
-		if (selfpurge) return retval;
+		    if (selfpurge || IS_SET(mprog_cur_result, eCH_DIED))
+		      return retval;
 		    break;
 		  }
 		else
