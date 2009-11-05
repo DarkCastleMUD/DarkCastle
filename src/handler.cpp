@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.193 2009/10/02 02:58:32 jhhudso Exp $ */
+/* $Id: handler.cpp,v 1.194 2009/11/05 03:18:56 jhhudso Exp $ */
     
 extern "C"
 {
@@ -2254,7 +2254,7 @@ int get_number(char **name)
   unsigned i;
   char *ppos = NULL;
   char number[MAX_INPUT_LENGTH];
-
+  char buffer[MAX_INPUT_LENGTH];
 
   if((ppos = index(*name, '.')) != NULL) {
     *ppos++ = '\0';
@@ -2262,7 +2262,8 @@ int get_number(char **name)
     // \0 between the number and the name as they appear in the string. 
     strcpy(number, *name);
     // now number contains the number as a string 
-    strcpy(*name, ppos);
+    strncpy(buffer, ppos, MAX_INPUT_LENGTH);
+    strcpy(*name, buffer);
     // now the pointer that was passed into the function
     // points to the name only.
 
