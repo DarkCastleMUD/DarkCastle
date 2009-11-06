@@ -12,7 +12,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: const.cpp,v 1.325 2009/10/29 19:34:44 jhhudso Exp $ */
+/* $Id: const.cpp,v 1.326 2009/11/06 07:28:34 jhhudso Exp $ */
 
 extern "C"
 {
@@ -376,6 +376,8 @@ const char *spell_wear_off_msg[] =
   "!SPIRITSHIELD!",
   "You no longer feel especially villianous.",
   "You no longer feel especially heroic.",
+  "!CONSECRATE!",
+  "!DESECRATE!",
   "BUG DETECTED: Tell an Imm. (Spell Wear Off Message)"
 };
 

@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.196 2009/06/05 04:36:41 jhhudso Exp $ */
+/* $Id: db.cpp,v 1.197 2009/11/06 07:28:34 jhhudso Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -1795,6 +1795,9 @@ void free_world_from_memory()
 
   for(int i = 0; i <= top_of_world; i++)
   {
+    if (world_array[i] == 0)
+      continue;
+
     if(world[i].name)
       dc_free(world[i].name);
 
