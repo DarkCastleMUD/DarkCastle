@@ -9,11 +9,6 @@
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 ************************************************************************ */
 
-#ifdef LEAK_CHECK
-#include <dmalloc.h>
-#endif
-
-
 #include <errno.h>
 #include <terminal.h>
 #include <string.h>
@@ -454,7 +449,6 @@ void init_game(int port, int port2, int port3, int port4)
   void free_zones_from_memory();
   void free_shops_from_memory();
   void free_emoting_objects_from_memory();
-  void free_boards_from_memory();
   void free_command_radix_nodes(struct cmd_hash_info * curr);
   void free_ban_list_from_memory();
   void free_buff_pool_from_memory();
@@ -551,8 +545,6 @@ void init_game(int port, int port2, int port3, int port4)
   free_emoting_objects_from_memory();
   log("Freeing game portals from memory.", 0, LOG_MISC);
   free_game_portals_from_memory();
-  log("Freeing boards from memory.", 0, LOG_MISC);
-  free_boards_from_memory();
   log("Freeing command radix from memory.", 0, LOG_MISC);
   free_command_radix_nodes(cmd_radix);
   log("Freeing ban list from memory.", 0, LOG_MISC);
@@ -562,11 +554,6 @@ void init_game(int port, int port2, int port3, int port4)
 #endif
 
   log("Goodbye.", 0, LOG_MISC);
-
-#ifdef LEAK_CHECK
-  dmalloc_shutdown();
-#endif
-
   log("Normal termination of game.", 0, LOG_MISC);
 }
 
