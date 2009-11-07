@@ -1303,8 +1303,10 @@ void get_from_vault(CHAR_DATA *ch, char *object, char *owner) {
       if (verify_item(&tmp_obj))
 	copySaveData(tmp_obj,obj);
 
-      if (!exists_in_vault(vault, obj))
-	extract_obj(obj);
+      // Jared: Removed for the time being because the item is still
+      // used elsewhere
+      //      if (!exists_in_vault(vault, obj))
+      // extract_obj(obj);
     }
     obj_to_char(tmp_obj, ch);
   }
