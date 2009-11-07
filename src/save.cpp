@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: save.cpp,v 1.61 2009/10/25 16:58:54 jhhudso Exp $ */
+/* $Id: save.cpp,v 1.62 2009/11/07 07:41:28 jhhudso Exp $ */
 
 extern "C"
 {
@@ -693,6 +693,9 @@ void save_char_obj_db(CHAR_DATA *ch)
   
   char_file_u uchar;
   time_data tmpage;
+  memset(&uchar, 0, sizeof(uchar));
+  memset(&tmpage, 0, sizeof(tmpage));
+
   char_to_store(ch, &uchar, tmpage);
 
   // if they're in a safe room, save them there.
@@ -742,12 +745,14 @@ void save_char_obj_db(CHAR_DATA *ch)
 // maybe modify it to save mobs for quest purposes too
 void save_char_obj (CHAR_DATA *ch)
 {
-  struct  char_file_u uchar;
-  FILE *  fpsave  = NULL;
-  char    strsave[MAX_INPUT_LENGTH];
-  char    name[200];
-  //  int     safe = START_ROOM;
-  struct time_data tmpage;
+  char_file_u uchar;
+  time_data tmpage;
+  FILE * fpsave  = 0;
+  char strsave[MAX_INPUT_LENGTH] = {0};
+  char name[200] = {0};
+
+  memset(&uchar, 0, sizeof(uchar));
+  memset(&tmpage, 0, sizeof(tmpage));
 
   if(IS_NPC(ch) || GET_LEVEL(ch) < 2)
     return;
@@ -1006,8 +1011,8 @@ struct obj_data *  obj_store_to_char(CHAR_DATA *ch, FILE *fpsave, struct obj_dat
   if (!strcmp("RPR",mod_type))
   {
     struct obj_affected_type *a;
-    #ifdef LEAK_CHECK
-    a = (obj_affected_type *) calloc(obj->num_affects+1, sizeof(obj_affected_type))
+#ifdef LEAK_CHECK
+    a = (obj_affected_type *) calloc(obj->num_affects+1, sizeof(obj_affected_type));
 #else
     a = (obj_affected_type *) dc_alloc(obj->num_affects+1, sizeof(obj_affected_type));
 #endif
@@ -1133,13 +1138,11 @@ bool obj_to_store (struct obj_data *obj, CHAR_DATA *ch, FILE *fpsave, int wear_p
 // write one object to file
 bool put_obj_in_store (struct obj_data *obj, CHAR_DATA *ch, FILE *fpsave, int wear_pos)
 {
-  struct obj_data *standard_obj;
-  //struct obj_data *loop_obj;
-  //int    iAffect, iAff2;
-  //int    change;
-  uint16 length;  // do not change this type
-  struct obj_file_elem object;
-  //int16 tmp_weight = 0; // do not change this type
+  obj_file_elem object;
+  obj_data *standard_obj = 0;
+  uint16 length = 0;  // do not change this type
+
+  memset(&object, 0, sizeof(object));
 
   if (GET_ITEM_TYPE(obj) == ITEM_KEY)
     return TRUE;
@@ -1211,13 +1214,13 @@ obj->obj_flags.value[2]    != standard_obj->obj_flags.value[2])
 
   if (IS_SET(obj->obj_flags.more_flags, ITEM_CUSTOM)) {
     fwrite("VA0", sizeof(char), 3, fpsave);
-    fwrite(&obj->obj_flags.value[0], sizeof(obj->obj_flags.value[2]), 1, fpsave);
+    fwrite(&obj->obj_flags.value[0], sizeof(obj->obj_flags.value[0]), 1, fpsave);
     fwrite("VA1", sizeof(char), 3, fpsave);
-    fwrite(&obj->obj_flags.value[1], sizeof(obj->obj_flags.value[2]), 1, fpsave);
+    fwrite(&obj->obj_flags.value[1], sizeof(obj->obj_flags.value[1]), 1, fpsave);
     fwrite("VA2", sizeof(char), 3, fpsave);
     fwrite(&obj->obj_flags.value[2], sizeof(obj->obj_flags.value[2]), 1, fpsave);
     fwrite("VA3", sizeof(char), 3, fpsave);
-    fwrite(&obj->obj_flags.value[3], sizeof(obj->obj_flags.value[2]), 1, fpsave);
+    fwrite(&obj->obj_flags.value[3], sizeof(obj->obj_flags.value[3]), 1, fpsave);
     fwrite("MOF", sizeof(char), 3, fpsave);
     fwrite(&obj->obj_flags.more_flags, sizeof(obj->obj_flags.more_flags), 1, fpsave);   
   }
