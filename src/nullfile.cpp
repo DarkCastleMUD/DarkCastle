@@ -7,7 +7,7 @@
  *
  * -Sadus
  */
-/* $Id: nullfile.cpp,v 1.2 2002/06/13 04:41:08 dcastle Exp $ */
+/* $Id: nullfile.cpp,v 1.3 2009/11/07 07:44:46 jhhudso Exp $ */
 
 extern "C"
 {
@@ -35,7 +35,7 @@ int fclose(FILE *);
 #define LOG_PLAYER        1<<6
 #endif
 
-FILE * NULL_FILE;
+FILE * NULL_FILE = 0;
 
 FILE * dc_fopen(const char *f, const char *type)
 {
@@ -52,23 +52,23 @@ FILE * dc_fopen(const char *f, const char *type)
 	  }
   }
 #endif
-  FILE *x;
+  FILE *x = 0;
 
   if(NULL_FILE) {
     fclose(NULL_FILE);
     NULL_FILE = 0;
   }
   
-  if(!(x = fopen(filename, type)))
+  if((x = fopen(filename, type)) == NULL) {
 #ifndef WIN32
     if(!(NULL_FILE = fopen("../lib/whassup", "w"))) {
 #else
-	if(!(NULL_FILE = fopen("..\\..\\lib\\whassup", "w"))) {
+    if(!(NULL_FILE = fopen("..\\..\\lib\\whassup", "w"))) {
 #endif
-      //log("Unable to open NULL_FILE in dc_fopen.", ANGEL, LOG_BUG);
       perror("Unable to open NULL_FILE in dc_fopen.");
     }
-    
+  }
+
   return x;
 }
 
@@ -80,7 +80,7 @@ int dc_fclose(FILE * fl)
 
   x = fclose(fl);
   
-  if(!(NULL_FILE))
+  if (!(NULL_FILE))
 #ifndef WIN32
     if(!(NULL_FILE = fopen("../lib/whassup", "w"))) {
 #else
