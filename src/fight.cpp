@@ -20,7 +20,7 @@
  * 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead *
  * of just race stuff                                                     *
  **************************************************************************
- * $Id: fight.cpp,v 1.551 2009/11/04 22:52:53 kkoons Exp $               *
+ * $Id: fight.cpp,v 1.552 2009/11/10 04:00:08 jhhudso Exp $               *
  **************************************************************************/
 
 extern "C"
@@ -6856,12 +6856,12 @@ int debug_retval(CHAR_DATA *ch, CHAR_DATA *victim, int retval)
     static int dumped = 0;
     bool bugged = FALSE;
 
-    if (ch && ch->name == (char *)0x95959595 && !IS_SET(retval, eCH_DIED)) {
+    if (!IS_SET(retval, eCH_DIED) && ch && ch->name == (char *)0x95959595) {
 	log("ch->name == 0x95959595 && !eCH_DIED", IMMORTAL, LOG_BUG);
 	bugged = TRUE;
     }
 	
-    if (victim && victim->name == (char *)0x95959595 && !IS_SET(retval, eVICT_DIED)) {
+    if (!IS_SET(retval, eVICT_DIED) && victim && victim->name == (char *)0x95959595) {
 	log("victim->name == 0x95959595 && !eVICT_DIED", IMMORTAL, LOG_BUG);
 	bugged = TRUE;
     }
