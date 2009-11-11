@@ -519,13 +519,6 @@ int do_brew(char_data *ch, char *argument, int cmd)
 
   WAIT_STATE(ch, PULSE_VIOLENCE * 2.5);
 
-  af.type = SKILL_BREW_TIMER;
-  af.location = APPLY_NONE;
-  af.modifier = 0;
-  af.duration = 24;
-  af.bitvector = -1;
-  affect_to_char(ch, &af);
-
   const char *potion_color;
   // Determine color to use in message based on herb used
   switch (obj_index[herbobj->item_number].virt) {
@@ -584,6 +577,13 @@ int do_brew(char_data *ch, char *argument, int cmd)
     act("As you finish, nothing special seems to happen.", ch, 0, 0, TO_CHAR, 0);
     act("As $e finishes, nothing special seems to happen.", ch, 0, 0, TO_ROOM, 0);
   } else if (skill_success(ch, 0, SKILL_BREW)) {
+    af.type = SKILL_BREW_TIMER;
+    af.location = APPLY_NONE;
+    af.modifier = 0;
+    af.duration = 24;
+    af.bitvector = -1;
+    affect_to_char(ch, &af);
+
     act("You sit down and carefully pour the ingredients into $o and give it a gentle shake to mix them.", ch, containerobj, 0, TO_CHAR, 0);
     snprintf(buffer, MAX_STRING_LENGTH, "As the $o disolves, the liquid turns %s.", potion_color);
     act(buffer, ch, herbobj, 0, TO_CHAR, 0);
@@ -634,6 +634,13 @@ int do_brew(char_data *ch, char *argument, int cmd)
 
     extract_obj(herbobj);
   } else {
+    af.type = SKILL_BREW_TIMER;
+    af.location = APPLY_NONE;
+    af.modifier = 0;
+    af.duration = 24;
+    af.bitvector = -1;
+    affect_to_char(ch, &af);
+
     act("You sit down and carefully pour the ingredients into $o and give it a gentle shake to mix them.", ch, containerobj, 0, TO_CHAR, 0);
     act("As you finish, the liquid begins to bubble furiously, cracking the $o and rendering your work useless!", ch, containerobj, 0, TO_CHAR, 0);
 
