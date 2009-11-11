@@ -20,7 +20,7 @@
  * 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead *
  * of just race stuff                                                     *
  **************************************************************************
- * $Id: fight.cpp,v 1.552 2009/11/10 04:00:08 jhhudso Exp $               *
+ * $Id: fight.cpp,v 1.553 2009/11/11 05:16:29 jhhudso Exp $               *
  **************************************************************************/
 
 extern "C"
@@ -1792,6 +1792,7 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
   int ethereal = 0;
   bool reflected = FALSE;
   char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH], buf3[MAX_STRING_LENGTH];
+  int pre_stoneshield_dam = 0;
 
   bool bingo;
   if (is_bingo(dam, weapon_type, attacktype)) {
@@ -2251,6 +2252,7 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
     
     if (dam > pspell->modifier)
     {
+      pre_stoneshield_dam = dam;
       dam -= pspell->modifier;
       pspell->duration -= pspell->modifier;
     }
@@ -2456,13 +2458,13 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
      && !is_death_prog)
   {
     int retval2;
-    retval2 = do_fireshield(ch, victim, dam);
+    retval2 = do_fireshield(ch, victim, MAX(pre_stoneshield_dam, dam));
     if(SOMEONE_DIED(retval2))
       return damage_retval(ch, victim, retval2);
-    retval2 = do_acidshield(ch, victim, dam);
+    retval2 = do_acidshield(ch, victim, MAX(pre_stoneshield_dam, dam));
     if(SOMEONE_DIED(retval2))
       return damage_retval(ch, victim, retval2);
-    retval2 = do_lightning_shield(ch, victim, dam);
+    retval2 = do_lightning_shield(ch, victim, MAX(pre_stoneshield_dam, dam));
     if(SOMEONE_DIED(retval2))
       return damage_retval(ch, victim, retval2);
     retval2 = do_vampiric_aura(ch, victim);
