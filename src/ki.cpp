@@ -3,7 +3,7 @@
  * Morcallen 12/18
  *
  */
-/* $Id: ki.cpp,v 1.86 2009/11/14 07:39:03 jhhudso Exp $ */
+/* $Id: ki.cpp,v 1.87 2009/11/14 08:23:19 jhhudso Exp $ */
 
 extern "C"
 {
@@ -412,7 +412,8 @@ int ki_blast( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
    if (CAN_GO(vict, exit) &&
        !IS_SET(world[EXIT(vict, exit)->to_room].room_flags, IMP_ONLY) &&
        !IS_SET(world[EXIT(vict, exit)->to_room].room_flags, NO_TRACK) &&
-       (!IS_AFFECTED(vict, AFF_CHAMPION) || champion_can_go(EXIT(vict, exit)->to_room)))
+       (!IS_AFFECTED(vict, AFF_CHAMPION) || champion_can_go(EXIT(vict, exit)->to_room)) &&
+       class_can_go(GET_CLASS(vict), EXIT(vict, exit)->to_room))
    {
       sprintf(buf, "$N is blasted out of the room %s by $n!", dirswards[exit]);
       act(buf, ch, 0, vict, TO_ROOM, NOTVICT);

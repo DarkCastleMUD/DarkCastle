@@ -1,5 +1,5 @@
 /************************************************************************
- * $Id: cl_barbarian.cpp,v 1.106 2009/11/14 07:43:32 jhhudso Exp $
+ * $Id: cl_barbarian.cpp,v 1.107 2009/11/14 08:23:19 jhhudso Exp $
  * cl_barbarian.cpp
  * Description: Commands for the barbarian class.
  *************************************************************************/
@@ -1126,7 +1126,9 @@ int do_knockback(struct char_data *ch, char *argument, int cmd)
        !affected_by_spell(victim, SPELL_IRON_ROOTS) &&
        !IS_SET(world[EXIT(victim, dir)->to_room].room_flags, IMP_ONLY) &&
        !IS_SET(world[EXIT(victim, dir)->to_room].room_flags, NO_TRACK) &&
-       (!IS_AFFECTED(victim, AFF_CHAMPION) || champion_can_go(EXIT(victim, dir)->to_room))) {
+       (!IS_AFFECTED(victim, AFF_CHAMPION) || champion_can_go(EXIT(victim, dir)->to_room)) &&
+       class_can_go(GET_CLASS(victim), EXIT(victim, dir)->to_room))
+    {
 //need to do more checks on if the victim can actually be knocked into 
 //the room?
     char temp[256];  // what did my innocent bugfix ever do to you?
