@@ -1323,9 +1323,10 @@ int spell_heal_spray(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
 
 int spell_firestorm(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
-  int dam;
+  int dam = 0;
   int retval = eSUCCESS;
-  int retval2;
+  int retval2 = 0;
+  int ch_zone = 0, tmp_vict_zone = 0;
   CHAR_DATA *tmp_victim, *temp;
 
   send_to_char("$B$4Fire$R falls from the heavens!\n\r", ch);
@@ -1335,6 +1336,14 @@ int spell_firestorm(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
   for (tmp_victim = character_list; tmp_victim && tmp_victim != (CHAR_DATA *)0x95959595; tmp_victim = temp) 
   {
     temp = tmp_victim->next;
+
+    try {
+      ch_zone = world[ch->in_room].zone;
+      tmp_vict_zone = world[tmp_victim->in_room].zone;
+    } catch(...) {
+      produce_coredump();
+      return eFAILURE;
+    }
 
     if ((ch->in_room == tmp_victim->in_room) 
         && (ch != tmp_victim) 
@@ -1357,7 +1366,7 @@ int spell_firestorm(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
     } 
     else 
     {
-      if (world[ch->in_room].zone == world[tmp_victim->in_room].zone) 
+      if (ch_zone == tmp_vict_zone) 
         send_to_char("You feel a HOT blast of air.\n\r", tmp_victim);
     }
   }
