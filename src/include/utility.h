@@ -16,7 +16,7 @@
  *  10/21/2003   Onager    Changed IS_ANONYMOUS() to handle mobs without   *
  *                         crashing                                        *
  ***************************************************************************/
-/* $Id: utility.h,v 1.88 2009/08/30 06:39:54 jhhudso Exp $ */
+/* $Id: utility.h,v 1.89 2009/11/14 07:44:08 jhhudso Exp $ */
 
 #ifndef UTILITY_H_
 #define UTILITY_H_
@@ -565,5 +565,6 @@ void remove_familiars(char *name, BACKUP_TYPE backup = NONE);
 std::string replaceString(std::string message, std::string find, std::string replace);
 
 char * numToStringTH(int);
+bool champion_can_go(int room);
 
 #endif /* UTILITY_H_ */
