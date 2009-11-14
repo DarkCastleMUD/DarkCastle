@@ -17,7 +17,7 @@
  *                         except Pir and Valk                             *
  * 10/19/2003   Onager     Took out super-secret hidey code from CAN_SEE() *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.111 2009/10/28 05:39:07 jhhudso Exp $ */
+/* $Id: utility.cpp,v 1.112 2009/11/14 07:44:21 jhhudso Exp $ */
 
 extern "C"
 {
@@ -2283,4 +2283,25 @@ char * numToStringTH(int number)
   case 11: return "eleventh";
   default: return '\0';
  }
+}
+
+bool champion_can_go(int room)
+{
+  try {
+    // Champions can't enter class restricted rooms
+    for (int c_class=1; c_class < CLASS_MAX; c_class++) {
+      if (world[room].allow_class[c_class] == TRUE) {
+	return false;
+      }
+    }
+
+    // Champions can't enter clan rooms
+    if (IS_SET(world[room].room_flags, CLAN_ROOM)) {
+      return false;
+    }
+  } catch(...) {
+    return false;
+  }
+
+  return true;
 }
