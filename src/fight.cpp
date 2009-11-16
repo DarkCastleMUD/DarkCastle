@@ -20,7 +20,7 @@
  * 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead *
  * of just race stuff                                                     *
  **************************************************************************
- * $Id: fight.cpp,v 1.553 2009/11/11 05:16:29 jhhudso Exp $               *
+ * $Id: fight.cpp,v 1.554 2009/11/16 08:16:31 jhhudso Exp $               *
  **************************************************************************/
 
 extern "C"
@@ -3740,6 +3740,9 @@ void stop_fighting(CHAR_DATA * ch, int clearlag)
     REMOVE_BIT(ch->combat, COMBAT_THI_EYEGOUGE2);
     REMBIT(ch->affected_by, AFF_BLIND);
   }
+
+  affect_from_char(ch, KI_DISRUPT + KI_OFFSET);
+
   GET_POS(ch) = POSITION_STANDING;
   update_pos(ch);
   

@@ -3,7 +3,7 @@
  * Morcallen 12/18
  *
  */
-/* $Id: ki.cpp,v 1.87 2009/11/14 08:23:19 jhhudso Exp $ */
+/* $Id: ki.cpp,v 1.88 2009/11/16 08:16:31 jhhudso Exp $ */
 
 extern "C"
 {
@@ -30,6 +30,9 @@ extern "C"
 #include <act.h>
 #include <db.h>
 #include <returnvals.h>
+#include <vector>
+
+using namespace std;
 
 extern CWorld world;
  
@@ -716,21 +719,55 @@ int ki_disrupt( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim)
   }
 
    int savebonus = 0;
+   if (learned < 41) {
+     savebonus = 35;
+   } else if (learned < 61) {
+     savebonus = 30;
+   } else if (learned < 81) {
+     savebonus = 25;
+   } else {
+     savebonus = 20;
+   }
 
-   if (learned < 41) savebonus = 10;
-   else if (learned < 61) savebonus = 5;
-   else if (learned < 81) savebonus = 0;
-   else savebonus = -5;
+   // Players are easier to disrupt
+   if (IS_PC(victim)) {
+     savebonus -= 10;
+   }
+
+   // Check if caster gets a bonus against this victim
+   affected_type *af = affected_by_spell(victim, KI_DISRUPT + KI_OFFSET);
+   if (af) {
+     // We've KI_DISRUPTED the victim and failed before so we get a bonus
+     if (af->caster == string(GET_NAME(ch))) {
+       savebonus -= af->modifier;
+     } else {
+       // Some other caster's KI_DISRUPT was on the victim, removing it
+       affect_from_char(victim, KI_DISRUPT + KI_OFFSET);
+       af = 0;
+     }
+   }
 
 
-   if (IS_NPC(victim))
-     success_chance = 100 - get_saves(victim, SAVE_TYPE_MAGIC) - savebonus - (GET_LEVEL(victim)/4);
-   else
-     success_chance = 90 - get_saves(victim, SAVE_TYPE_MAGIC) - savebonus;
-     
    int retval = 0;
 
-   if (number(1,100) > success_chance) {
+   if (number(1, 100) <= get_saves(victim, SAVE_TYPE_MAGIC) + savebonus && level != GET_LEVEL(ch)-1) {
+     // We've failed this time, so we'll make it easier for next time
+     if (af) {
+       // We've failed before
+       af->modifier += 1+(learned/20);
+     } else {
+       // This is the first time we've failed
+       affected_type newaf;
+       newaf.type      = KI_DISRUPT + KI_OFFSET;
+       newaf.duration  = -1;
+       newaf.modifier  = 1+(learned/20);
+       newaf.location  = APPLY_NONE;
+       newaf.bitvector = -1;
+       newaf.caster = string(GET_NAME(ch));
+
+       affect_to_char(victim, &newaf);
+     }
+
      act("$N resists your attempt to disrupt magic!", ch, NULL, victim,
 	  TO_CHAR,0);
      act("$N resists $n's attempt to disrupt magic!", ch, NULL, victim, TO_ROOM,
@@ -746,6 +783,12 @@ int ki_disrupt( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim)
      }
 
      return eFAILURE;
+   }
+
+   // We have success so if af is set then the victim had a ki_disupt
+   // bonus set. We will remove it.
+   if (af) {
+     affect_from_char(victim, KI_DISRUPT + KI_OFFSET);
    }
 
    // Disrupt bingo chance
@@ -821,23 +864,72 @@ int ki_disrupt( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim)
        }       
    }
 
-   affected_type *af = affected_by_random(victim);
-   affected_type local_af;
-   // If no spell affects found, look for AFF_ only affects
-   if (af == 0) {
-     af = &local_af;
-     af->type = 0;
-     af->bitvector = 0;
-     
-     if (IS_AFFECTED(victim, AFF_FROSTSHIELD))
-       af->bitvector = AFF_FROSTSHIELD;
-     if (IS_AFFECTED(victim, AFF_FIRESHIELD))
-       af->bitvector = AFF_FIRESHIELD;
-     if (IS_AFFECTED(victim, AFF_SANCTUARY))
-       af->bitvector = AFF_SANCTUARY;
+   // This section of code looks for specific spells or affects and
+   // adds them to a list called aff_list. Then a random element of
+   // the list will be chosen for removal. This ensures we pick a random
+   // affect only out of those that the player is using.
+   vector<affected_type> aff_list;
+
+   // Since we're looking for either these 3 affects OR the spells that cause them
+   // we're keeping a track of which is found so we don't mark them twice
+   bool frostshieldFound = false, fireshieldFound = false, sanctuaryFound = false;
+
+   for(affected_type *curr = victim->affected; curr; curr = curr->next) {
+     switch(curr->type) {
+     case SPELL_FROSTSHIELD:
+       frostshieldFound = true;
+       aff_list.push_back(*curr);
+       break;
+     case SPELL_FIRESHIELD:
+       fireshieldFound = true;
+       aff_list.push_back(*curr);
+       break;
+     case SPELL_SANCTUARY:
+       sanctuaryFound = true;
+       aff_list.push_back(*curr);
+       break; 
+     case SPELL_PROTECT_FROM_EVIL:
+     case SPELL_HASTE:
+     case SPELL_STONE_SHIELD:
+     case SPELL_GREATER_STONE_SHIELD:
+     case SPELL_LIGHTNING_SHIELD:
+     case SPELL_ACID_SHIELD:
+     case SPELL_PROTECT_FROM_GOOD:
+       aff_list.push_back(*curr);
+       break;
+     }
    }
 
-   if (af->type == SPELL_SANCTUARY || af->bitvector == AFF_SANCTUARY) {
+   // For these 3 affects, if they weren't caused by a spell we'll
+   // add them to our list as if they were a spell to be removed
+   affected_type localaff;
+
+   if (IS_AFFECTED(victim, AFF_FROSTSHIELD) && !frostshieldFound) {
+     localaff.type = SPELL_FROSTSHIELD;
+     aff_list.push_back(localaff);
+   }
+
+   if (IS_AFFECTED(victim, AFF_FIRESHIELD) && !fireshieldFound) {
+     localaff.type = SPELL_FIRESHIELD;
+     aff_list.push_back(localaff);
+   }
+
+   if (IS_AFFECTED(victim, AFF_SANCTUARY) && !sanctuaryFound) {
+     localaff.type = SPELL_SANCTUARY;
+     aff_list.push_back(localaff);
+   }
+
+   // Nothing applicable found to be removed
+   if (aff_list.size() < 1) {
+     return eFAILURE;
+   }
+
+   // Pick the lucky spell/affect to be removed
+   int i = number(0, aff_list.size()-1);
+
+   try { af = &aff_list.at(i); } catch(...) { return eFAILURE; }
+
+   if (af->type == SPELL_SANCTUARY) {
      affect_from_char(victim, SPELL_SANCTUARY);
      REMBIT(victim->affected_by, AFF_SANCTUARY);
      act("You don't feel so invulnerable anymore.", ch, 0, victim, TO_VICT, 0);
@@ -868,7 +960,7 @@ int ki_disrupt( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim)
      act("The shield of stones swirling about $n's body falls to the ground!", victim, 0, 0, TO_ROOM, 0);
    }
    
-   if (af->type == SPELL_FROSTSHIELD || af->bitvector == AFF_FROSTSHIELD) {
+   if (af->type == SPELL_FROSTSHIELD) {
      affect_from_char(victim, SPELL_FROSTSHIELD);
      REMBIT(victim->affected_by, AFF_FROSTSHIELD);
      act("Your shield of $B$3frost$R melts into nothing!.", ch, 0,victim, TO_VICT, 0);
@@ -881,7 +973,7 @@ int ki_disrupt( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim)
      act("The $B$5electricity$R crackling around $n's body fades away.", victim, 0, 0, TO_ROOM, 0);
    }
 
-   if (af->type == SPELL_FIRESHIELD || af->bitvector == AFF_FIRESHIELD) {
+   if (af->type == SPELL_FIRESHIELD) {
      REMBIT(victim->affected_by, AFF_FIRESHIELD);
      affect_from_char(victim, SPELL_FIRESHIELD);
      act("Your $B$4flames$R have been extinguished!", ch, 0,victim, TO_VICT, 0);
