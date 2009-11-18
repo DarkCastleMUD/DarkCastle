@@ -1,5 +1,5 @@
 /************************************************************************
- * $Id: cl_barbarian.cpp,v 1.108 2009/11/18 05:33:38 jhhudso Exp $
+ * $Id: cl_barbarian.cpp,v 1.109 2009/11/18 05:46:28 jhhudso Exp $
  * cl_barbarian.cpp
  * Description: Commands for the barbarian class.
  *************************************************************************/
@@ -19,6 +19,7 @@
 #include <returnvals.h>
 #include <room.h>
 #include <db.h>
+#include <clan.h>
 
 extern struct index_data *obj_index;
 extern int rev_dir[];
@@ -197,22 +198,22 @@ int do_batter(struct char_data *ch, char *argument, int cmd)
       }
       else
       {
-        if(CAN_GO(ch, door) && !IS_SET(world[EXIT(ch, door)->to_room].room_flags, IMP_ONLY) &&
-	   !IS_SET(world[EXIT(ch, door)->to_room].room_flags, NO_TRACK) &&
-	   (!IS_AFFECTED(ch, AFF_CHAMPION) || champion_can_go(EXIT(ch, door)->to_room)) &&
-	   class_can_go(GET_CLASS(ch), EXIT(ch, door)->to_room)) {
-          send_to_char("You are unable to maintain your balance and sail into the adjacent room! Ouch!\r\n\r\n", ch);
-          act("$n is unable to maintain $h balance and sails into the adjacent room!", ch, 0, exit->keyword, TO_ROOM, 0);
-          move_char(ch, exit->to_room);
-          act("The $F suddenly bursts apart and $n tumbles headlong through!", ch, 0, exit->keyword, TO_ROOM, 0);
+        if (CAN_GO(ch, door) &&
+	    !IS_SET(world[EXIT(ch, door)->to_room].room_flags, IMP_ONLY) &&
+	    (!IS_AFFECTED(ch, AFF_CHAMPION) || champion_can_go(EXIT(ch, door)->to_room)) &&
+	    class_can_go(GET_CLASS(ch), EXIT(ch, door)->to_room) &&
+	    !others_clan_room(ch, &world[EXIT(ch, door)->to_room])) {
+	  send_to_char("You are unable to maintain your balance and sail into the adjacent room! Ouch!\r\n\r\n", ch);
+	  act("$n is unable to maintain $h balance and sails into the adjacent room!", ch, 0, exit->keyword, TO_ROOM, 0);
+	  move_char(ch, exit->to_room);
+	  act("The $F suddenly bursts apart and $n tumbles headlong through!", ch, 0, exit->keyword, TO_ROOM, 0);
 	  do_look(ch, "", CMD_LOOK);
-        }
-        else
-        {
-          send_to_char("You are unable to maintain your balance and sail towards the adjacent room, but some force keeps you out!\r\n", ch);
-          act("$n is unable to maintain $h balance and sails towards the adjacent room, but some force keeps $h out!", 
-                                      ch, 0, exit->keyword, TO_ROOM, 0);
-        }
+	} else {
+	  send_to_char("You are unable to maintain your balance and sail towards the adjacent room, but some force keeps you out!\r\n", ch);
+	  act("$n is unable to maintain $h balance and sails towards the adjacent room, but some force keeps $h out!", 
+	      ch, 0, exit->keyword, TO_ROOM, 0);
+	}
+
         GET_POS(ch) = POSITION_SITTING;
         update_pos(ch);
       }
