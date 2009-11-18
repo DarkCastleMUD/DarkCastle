@@ -75,7 +75,6 @@ struct multiplayer {
 };
 
 using namespace std;
-using namespace XmlRpc;
 
 #ifndef INVALID_SOCKET
 #define INVALID_SOCKET -1
@@ -147,7 +146,7 @@ int pulse_regen;
 int pulse_time;
 int pulse_short; // short timer, for archery
 
-XmlRpcServer *xmlrpc_s;
+XmlRpc::XmlRpcServer *xmlrpc_s;
 
 /* functions in this file */
 void update_mprog_throws(void);
