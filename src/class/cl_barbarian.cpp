@@ -1,5 +1,5 @@
 /************************************************************************
- * $Id: cl_barbarian.cpp,v 1.107 2009/11/14 08:23:19 jhhudso Exp $
+ * $Id: cl_barbarian.cpp,v 1.108 2009/11/18 05:33:38 jhhudso Exp $
  * cl_barbarian.cpp
  * Description: Commands for the barbarian class.
  *************************************************************************/
@@ -80,6 +80,10 @@ int do_batter(struct char_data *ch, char *argument, int cmd)
       return eFAILURE;
     }
 
+    if (exit->bracee == ch) {
+      send_to_char("You can't batter a door you're bracing shut!\n\r", ch);
+      return eFAILURE;
+    }
 
     WAIT_STATE(ch, PULSE_VIOLENCE * 1.5);
     if (!charge_moves(ch, SKILL_BATTERBRACE)) return eSUCCESS;
@@ -193,12 +197,15 @@ int do_batter(struct char_data *ch, char *argument, int cmd)
       }
       else
       {
-        if(CAN_GO(ch, door))
-        {
-          send_to_char("You are unable to maintain your balance and sail into the adjacent room! Ouch!\r\n", ch);
+        if(CAN_GO(ch, door) && !IS_SET(world[EXIT(ch, door)->to_room].room_flags, IMP_ONLY) &&
+	   !IS_SET(world[EXIT(ch, door)->to_room].room_flags, NO_TRACK) &&
+	   (!IS_AFFECTED(ch, AFF_CHAMPION) || champion_can_go(EXIT(ch, door)->to_room)) &&
+	   class_can_go(GET_CLASS(ch), EXIT(ch, door)->to_room)) {
+          send_to_char("You are unable to maintain your balance and sail into the adjacent room! Ouch!\r\n\r\n", ch);
           act("$n is unable to maintain $h balance and sails into the adjacent room!", ch, 0, exit->keyword, TO_ROOM, 0);
           move_char(ch, exit->to_room);
           act("The $F suddenly bursts apart and $n tumbles headlong through!", ch, 0, exit->keyword, TO_ROOM, 0);
+	  do_look(ch, "", CMD_LOOK);
         }
         else
         {
@@ -282,9 +289,13 @@ int do_brace(struct char_data *ch, char *argument, int cmd)
     }
     if (exit->bracee != NULL) 
     {
-      if(exit->bracee->in_room == ch->in_room)
-        csendf(ch, "%s is already holding the %s shut!\r\n", exit->bracee, fname(exit->keyword));
-      else
+      if(exit->bracee->in_room == ch->in_room) {
+	if (exit->bracee == ch) {
+	  csendf(ch, "You are already bracing the %s shut!\n\r", fname(exit->keyword));
+	} else {
+	  csendf(ch, "%s is already holding the %s shut!\r\n", GET_NAME(exit->bracee), fname(exit->keyword));
+	}
+      } else
         csendf(ch, "The %s is already being braced from the other side!\r\n", fname(exit->keyword));
 
       return eFAILURE;
