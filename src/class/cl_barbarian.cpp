@@ -1,5 +1,5 @@
 /************************************************************************
- * $Id: cl_barbarian.cpp,v 1.109 2009/11/18 05:46:28 jhhudso Exp $
+ * $Id: cl_barbarian.cpp,v 1.110 2009/11/27 20:20:08 jhhudso Exp $
  * cl_barbarian.cpp
  * Description: Commands for the barbarian class.
  *************************************************************************/
@@ -341,6 +341,7 @@ int do_brace(struct char_data *ch, char *argument, int cmd)
 
 int do_rage(struct char_data *ch, char *argument, int cmd)
 {
+  int retval = 0;
   char_data *victim;
   char name[256];
 
@@ -385,11 +386,15 @@ int do_rage(struct char_data *ch, char *argument, int cmd)
 
   if (!skill_success(ch,victim,SKILL_RAGE)) {
     act ("You start advancing towards $N, but trip over your own feet!", 
-         ch, 0, victim, TO_CHAR, 0);
-    act ("$n starts advancing toward you, but trips over $s own feet!",
-         ch, 0, victim, TO_VICT, 0);
+	 ch, 0, victim, TO_CHAR, 0);
     act ("$n starts advancing towards $N, but trips over $s own feet!",
          ch, 0, victim, TO_ROOM, NOTVICT);
+    retval = act ("$n starts advancing toward you, but trips over $s own feet!",
+		  ch, 0, victim, TO_VICT, 0);
+    if (IS_SET(retval, eVICT_DIED)) {
+      return retval;
+    }
+
      
     GET_POS(ch) = POSITION_SITTING;
     SET_BIT(ch->combat, COMBAT_BASH1);
@@ -397,10 +402,13 @@ int do_rage(struct char_data *ch, char *argument, int cmd)
   else {
     act ("You advance confidently towards $N, and fly into a rage!",
         ch, 0, victim, TO_CHAR, 0);
-    act ("$n advances confidently towards you, and flies into a rage!",
-        ch, 0, victim, TO_VICT, 0);
     act ("$n advances confidently towards $N, and flies into a rage!",
             ch, 0, victim, TO_ROOM, NOTVICT);
+    retval = act ("$n advances confidently towards you, and flies into a rage!",
+		  ch, 0, victim, TO_VICT, 0);
+    if (IS_SET(retval, eVICT_DIED)) {
+      return retval;
+    }
 
     SET_BIT(ch->combat, COMBAT_RAGE1);
   }
@@ -532,8 +540,12 @@ int do_berserk(struct char_data *ch, char *argument, int cmd)
 
   if (!skill_success(ch,victim,SKILL_BERSERK)) {
     act ("You start freaking out on $N, but trip over your own feet!", ch, 0, victim, TO_CHAR, 0);
-    act ("$n starts freaking out on you, but trips over $s own feet!", ch, 0, victim, TO_VICT, 0);
     act ("$n starts freaking out on $N, but trips over $s own feet!", ch, 0, victim, TO_ROOM, NOTVICT);
+    retval = act ("$n starts freaking out on you, but trips over $s own feet!", ch, 0, victim, TO_VICT, 0);
+    if (IS_SET(retval, eVICT_DIED)) {
+      return retval;
+    }
+
     GET_POS(ch) = POSITION_SITTING;
     if(has_skill(ch,SKILL_BERSERK) > 50 && !number(0, 5)) {
        SET_BIT(ch->combat, COMBAT_BASH2);
@@ -588,7 +600,7 @@ int do_headbutt(struct char_data *ch, char *argument, int cmd)
 {
   struct char_data *victim;
   char name[256];
-  int retval;
+  int retval = 0;
 
   if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL)
     ;
@@ -645,10 +657,10 @@ int do_headbutt(struct char_data *ch, char *argument, int cmd)
 
   if (IS_SET(victim->combat, COMBAT_BERSERK) && (IS_NPC(victim) || has_skill(victim, SKILL_BERSERK) > 80))
   {
-     act("In your enraged state, you shake off $n's attempt to immobilize you.", ch, NULL, victim, TO_VICT, 
-0);
      act("$N shakes off $n's attempt to immobilize them.",ch, NULL, victim, TO_ROOM, NOTVICT);
      act("$N shakes off your attempt to immobilize them.",ch, NULL, victim, TO_CHAR, NOTVICT);
+     act("In your enraged state, you shake off $n's attempt to immobilize you.", ch, NULL, victim, TO_VICT, 0);
+
      WAIT_STATE(ch, PULSE_VIOLENCE*3);
         return eSUCCESS;
   }
@@ -683,8 +695,12 @@ int do_headbutt(struct char_data *ch, char *argument, int cmd)
     if(affected_by_spell(victim, SKILL_BATTLESENSE) &&
              number(1, 100) < affected_by_spell(victim, SKILL_BATTLESENSE)->modifier) {
       act("$N's heightened battlesense sees your headbutt coming from a mile away.", ch, 0, victim, TO_CHAR, 0);
-      act("Your heightened battlesense sees $n's headbutt coming from a mile away.", ch, 0, victim, TO_VICT, 0);
-      act("$N's heightened battlesense sees $n's headbutt coming from a mile away.", ch, 0, victim, TO_ROOM, NOTVICT);  
+      act("$N's heightened battlesense sees $n's headbutt coming from a mile away.", ch, 0, victim, TO_ROOM, NOTVICT);
+      retval = act("Your heightened battlesense sees $n's headbutt coming from a mile away.", ch, 0, victim, TO_VICT, 0);
+      if (IS_SET(retval, eVICT_DIED)) {
+	return retval;
+      }
+  
       WAIT_STATE(ch, PULSE_VIOLENCE*3);
       retval = damage (ch, victim, 0, TYPE_CRUSH, SKILL_HEADBUTT, 0);
       // the damage call here takes care of starting combat and such
@@ -1079,8 +1095,8 @@ int do_knockback(struct char_data *ch, char *argument, int cmd)
       
       if(IS_AFFECTED(victim, AFF_STABILITY) && number(0,3) == 0) {
 	  act("You bounce off of $N and crash into the ground.", ch, 0, victim, TO_CHAR, 0);
-	  act("$n bounces off of you and crashes into the ground.", ch, 0, victim, TO_VICT, 0);
 	  act("$n bounces off of $N and crashes into the ground.", ch, 0, victim, TO_ROOM, NOTVICT);
+	  act("$n bounces off of you and crashes into the ground.", ch, 0, victim, TO_VICT, 0);
 	  WAIT_STATE(ch, PULSE_VIOLENCE);
 	  return eFAILURE;
       }
@@ -1120,8 +1136,12 @@ int do_knockback(struct char_data *ch, char *argument, int cmd)
 
   if(!victim_paralyzed && !skill_success(ch, victim, SKILL_KNOCKBACK, 0-(learned/4 * 3))) {
     act("You lunge forward in an attempt to smash $N but fall, missing $M completely.", ch, 0, victim, TO_CHAR, 0);
-    act("$n lunges forward in an attempt to smash into you but falls flat on $s face, missing completely.", ch, 0, victim, TO_VICT, 0);
     act("$n lunges forward in an attempt to smash into $N but falls flat on $s face.", ch, 0, victim, TO_ROOM, NOTVICT);
+    retval = act("$n lunges forward in an attempt to smash into you but falls flat on $s face, missing completely.", ch, 0, victim, TO_VICT, 0);
+    if (IS_SET(retval, eVICT_DIED)) {
+      return retval;
+    }
+
     GET_POS(ch) = POSITION_SITTING;
     WAIT_STATE(ch, PULSE_VIOLENCE);
     retval = damage(ch, victim, 0, TYPE_CRUSH, SKILL_KNOCKBACK, 0);
@@ -1129,8 +1149,12 @@ int do_knockback(struct char_data *ch, char *argument, int cmd)
   } else if(!victim_paralyzed && affected_by_spell(victim, SKILL_BATTLESENSE) &&
              number(1, 100) < affected_by_spell(victim, SKILL_BATTLESENSE)->modifier) {
     act("$N's heightened battlesense sees your smash coming from a mile away and $E easily sidesteps it.", ch, 0, victim, TO_CHAR, 0);
-    act("Your heightened battlesense sees $n's smash coming from a mile away and you easily sidestep it.", ch, 0, victim, TO_VICT, 0);
     act("$N's heightened battlesense sees $n's smash coming from a mile away and $N easily sidesteps it.", ch, 0, victim, TO_ROOM, NOTVICT);  
+    retval = act("Your heightened battlesense sees $n's smash coming from a mile away and you easily sidestep it.", ch, 0, victim, TO_VICT, 0);
+    if (IS_SET(retval, eVICT_DIED)) {
+      return retval;
+    }
+
     GET_POS(ch) = POSITION_SITTING;
     WAIT_STATE(ch, PULSE_VIOLENCE);
     return eFAILURE;
