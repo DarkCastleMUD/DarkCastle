@@ -53,6 +53,7 @@ extern "C"
 #include <innate.h>
 #include <arena.h>
 #include <race.h>
+#include <stdarg.h>
 
 // external vars
 
@@ -71,6 +72,9 @@ extern void *activeVo;
 extern struct zone_data *zone_table;
 extern int top_of_world;     
 extern room_data ** world_array;
+extern struct index_data *obj_index;
+extern int mprog_line_num; // From mob_prog.cpp
+extern int mprog_command_num; // From mob_prog.cpp
 
 struct obj_data *get_object_in_equip_vis(struct char_data *ch, char *arg, struct obj_data *equipment[], int *j, bool blindfighting);
 
@@ -79,6 +83,7 @@ struct obj_data *get_object_in_equip_vis(struct char_data *ch, char *arg, struct
  */
 
 char *			mprog_type_to_name	( int type );
+void prog_error(char_data *ch, char *format, ...);
 
 /* This routine transfers between alpha and numeric forms of the
  *  mob_prog bitvector types. It allows the words to show up in mpstat to
@@ -170,7 +175,7 @@ int do_mpasound( CHAR_DATA *ch, char *argument, int cmd )
 
     if ( argument[0] == '\0' )
     {
-        logf( IMMORTAL, LOG_WORLD, "Mpasound - No argument: vnum %d.", mob_index[ch->mobdata->nr].virt );
+      prog_error(ch, "Mpasound - No argument.");
 	return eFAILURE|eINTERNAL_ERROR;
     }
 
@@ -211,36 +216,31 @@ int do_mpkill( CHAR_DATA *ch, char *argument, int cmd )
 
     if ( arg[0] == '\0' )
     {
-	logf( IMMORTAL, LOG_WORLD, "MpKill - no argument: vnum %d.",
-		mob_index[ch->mobdata->nr].virt );
+      prog_error(ch, "MpKill - no argument.");
 	return eFAILURE|eINTERNAL_ERROR;
     }
 
     if ( ( victim = get_char_room_vis( ch, arg ) ) == NULL )
     {
-	logf( IMMORTAL, LOG_WORLD, "MpKill - Victim not in room: vnum %d.",
-	    mob_index[ch->mobdata->nr].virt );
+	prog_error(ch, "MpKill - Victim not in room.");
 	return eFAILURE|eINTERNAL_ERROR;
     }
 
     if ( victim == ch )
     {
-	logf( IMMORTAL, LOG_WORLD, "MpKill - Bad victim to attack: vnum %d.",
-	    mob_index[ch->mobdata->nr].virt );
+	prog_error(ch, "MpKill - Bad victim to attack.");
 	return eFAILURE|eINTERNAL_ERROR;
     }
 
     if ( IS_AFFECTED( ch, AFF_CHARM ) && ch->master == victim )
     {
-	logf( IMMORTAL, LOG_WORLD, "MpKill - Charmed mob attacking master: vnum %d.",
-	    mob_index[ch->mobdata->nr].virt );
+	prog_error(ch, "MpKill - Charmed mob attacking master.");
 	return eFAILURE|eINTERNAL_ERROR;
     }
 
     if ( ch->position == POSITION_FIGHTING )
     {	
-	logf( IMMORTAL, LOG_WORLD, "MpKill - Already fighting: vnum %d",
-	    mob_index[ch->mobdata->nr].virt );
+	prog_error(ch, "MpKill - Already fighting");
 	return eFAILURE|eINTERNAL_ERROR;
     }
 
@@ -263,36 +263,31 @@ int do_mphit( CHAR_DATA *ch, char *argument, int cmd )
 
     if ( arg[0] == '\0' )
     {
-	logf( IMMORTAL, LOG_WORLD, "MpHit - no argument: vnum %d.",
-		mob_index[ch->mobdata->nr].virt );
+	prog_error(ch, "MpHit - no argument.");
 	return eFAILURE|eINTERNAL_ERROR;
     }
 
     if ( ( victim = get_char_room_vis( ch, arg ) ) == NULL )
     {
-	logf( IMMORTAL, LOG_WORLD, "MpHit - Victim not in room: vnum %d.",
-	    mob_index[ch->mobdata->nr].virt );
+	prog_error(ch, "MpHit - Victim not in room.");
 	return eFAILURE|eINTERNAL_ERROR;
     }
 
     if (GET_POS(victim) == POSITION_DEAD)
     {
-	logf( IMMORTAL, LOG_WORLD, "MpHit - Victim already dead: vnum %d.",
-	    mob_index[ch->mobdata->nr].virt );
+	prog_error(ch, "MpHit - Victim already dead.");
 	return eFAILURE|eINTERNAL_ERROR;
     }
 
     if ( victim == ch )
     {
-	logf( IMMORTAL, LOG_WORLD, "MpHit - Bad victim to attack: vnum %d.",
-	    mob_index[ch->mobdata->nr].virt );
+	prog_error(ch, "MpHit - Bad victim to attack.");
 	return eFAILURE|eINTERNAL_ERROR;
     }
 
     if ( IS_AFFECTED( ch, AFF_CHARM ) && ch->master == victim )
     {
-	logf( IMMORTAL, LOG_WORLD, "MpHit - Charmed mob attacking master: vnum %d.",
-	    mob_index[ch->mobdata->nr].virt );
+	prog_error(ch, "MpHit - Charmed mob attacking master.");
 	return eFAILURE|eINTERNAL_ERROR;
     }
 
@@ -316,21 +311,18 @@ int do_mpaddlag( CHAR_DATA *ch, char *argument, int cmd )
 
     if ( arg[0] == '\0' )
     {
-	logf( IMMORTAL, LOG_WORLD, "MpAddlag - no argument: vnum %d.",
-		mob_index[ch->mobdata->nr].virt );
+	prog_error(ch, "MpAddlag - no argument.");
 	return eFAILURE|eINTERNAL_ERROR;
     }
 
     if ( ( victim = get_char_room_vis( ch, arg ) ) == NULL )
     {
-	logf( IMMORTAL, LOG_WORLD, "MpAddlag - Victim not in room: vnum %d.",
-	    mob_index[ch->mobdata->nr].virt );
+	prog_error(ch, "MpAddlag - Victim not in room.");
 	return eFAILURE|eINTERNAL_ERROR;
     }
     if (!arg1[0] || !is_number(arg1))
     {
-	logf( IMMORTAL, LOG_WORLD, "MpAddlag - Invalid duration: vnum %d.",
-	    mob_index[ch->mobdata->nr].virt );
+	prog_error(ch, "MpAddlag - Invalid duration.");
 	return eFAILURE|eINTERNAL_ERROR;
     }
     WAIT_STATE(victim, atoi(arg1));
@@ -359,7 +351,7 @@ int do_mpjunk( CHAR_DATA *ch, char *argument, int cmd )
 
     if ( arg[0] == '\0')
     {
-        logf( IMMORTAL, LOG_WORLD, "Mpjunk - No argument: vnum %d.", mob_index[ch->mobdata->nr].virt );
+        prog_error(ch, "Mpjunk - No argument.");
 	return eFAILURE|eINTERNAL_ERROR;
     }
     
@@ -418,14 +410,13 @@ int do_mpechoaround( CHAR_DATA *ch, char *argument, int cmd )
 
     if ( arg[0] == '\0' )
     {
-       logf( IMMORTAL, LOG_WORLD, "Mpechoaround - No argument:  vnum %d.", mob_index[ch->mobdata->nr].virt );
+      prog_error(ch, "Mpechoaround - No argument.");
        return eFAILURE|eINTERNAL_ERROR;
     }
 
     if ( !( victim=get_char_room( arg,ch->in_room, TRUE ) ) )
     {
-        logf( IMMORTAL, LOG_WORLD, "Mpechoaround - victim does not exist: vnum %d.",
-	    mob_index[ch->mobdata->nr].virt );
+        prog_error(ch, "Mpechoaround - victim does not exist.");
 	return eFAILURE|eINTERNAL_ERROR;
     }
      if (CAN_SEE(ch,victim))
@@ -448,20 +439,18 @@ int do_mpechoaroundnotbad( CHAR_DATA *ch, char *argument, int cmd )
     argument = one_argument(argument,arg1);
     if ( arg[0] == '\0' || arg1[0] == '\0')
     {
-       logf( IMMORTAL, LOG_WORLD, "Mpechoaroundnotbad - No argument:  vnum %d.", mob_index[ch->mobdata->nr].virt );
+      prog_error(ch, "Mpechoaroundnotbad - No argument.");
        return eFAILURE|eINTERNAL_ERROR;
     }
   
     if ( !( victim=get_char_room( arg,ch->in_room ) ) )
     {
-        logf( IMMORTAL, LOG_WORLD, "Mpechoaroundnotbad - victim does not exist: vnum %d.",
-	    mob_index[ch->mobdata->nr].virt );
+        prog_error(ch, "Mpechoaroundnotbad - victim does not exist.");
 	return eFAILURE|eINTERNAL_ERROR;
     }
     if ( !( victim2=get_char_room( arg1,ch->in_room ) ) )
     {
-        logf( IMMORTAL, LOG_WORLD, "Mpechoaroundnotbad - victim does not exist: vnum %d.",
-	    mob_index[ch->mobdata->nr].virt );
+        prog_error(ch, "Mpechoaroundnotbad - victim does not exist.");
 	return eFAILURE|eINTERNAL_ERROR;
     }
 
@@ -488,15 +477,13 @@ int do_mpechoat( CHAR_DATA *ch, char *argument, int cmd )
 
     if ( arg[0] == '\0' || argument[0] == '\0' )
     {
-       logf( IMMORTAL, LOG_WORLD, "Mpechoat - No argument:  vnum %d.",
-	   mob_index[ch->mobdata->nr].virt );
+      prog_error(ch, "Mpechoat - No argument.");
        return eFAILURE|eINTERNAL_ERROR;
     }
 
     if ( !( victim = get_char_room( arg, ch->in_room, TRUE ) ) )
     {
-        logf( IMMORTAL, LOG_WORLD, "Mpechoat - victim does not exist: vnum %d.",
-	    mob_index[ch->mobdata->nr].virt );
+        prog_error(ch, "Mpechoat - victim does not exist.");
 	return eFAILURE|eINTERNAL_ERROR;
     }
 
@@ -516,8 +503,7 @@ int do_mpecho( CHAR_DATA *ch, char *argument, int cmd )
 
     if ( argument[0] == '\0' )
     {
-        logf( IMMORTAL, LOG_WORLD, "Mpecho - called w/o argument: vnum %d.",
-	    mob_index[ch->mobdata->nr].virt );
+        prog_error(ch, "Mpecho - called w/o argument.");
         return eFAILURE|eINTERNAL_ERROR;
     }
 
@@ -545,13 +531,13 @@ int do_mpmload( CHAR_DATA *ch, char *argument, int cmd )
 
     if ( arg[0] == '\0' || !is_number(arg) )
     {
-	logf( IMMORTAL, LOG_WORLD, "Mpmload - Bad vnum as arg: vnum %d.", mob_index[ch->mobdata->nr].virt );
+	prog_error(ch, "Mpmload - Bad vnum as arg.");
 	return eFAILURE|eINTERNAL_ERROR;
     }
 
     if ( ( realnum = real_mobile( atoi( arg ) ) ) < 0 )
     {
-	logf( IMMORTAL, LOG_WORLD, "Mpmload - Bad mob vnum: vnum %d.", mob_index[ch->mobdata->nr].virt );
+	prog_error(ch, "Mpmload - Bad mob vnum.");
 	return eFAILURE|eINTERNAL_ERROR;
     }
 
@@ -578,14 +564,13 @@ int do_mpoload( CHAR_DATA *ch, char *argument, int cmd )
  
     if ( arg1[0] == '\0' || !is_number( arg1 ) )
     {
-        logf( IMMORTAL, LOG_WORLD, "Mpoload - Bad syntax: vnum %d.",
-	    mob_index[ch->mobdata->nr].virt );
+        prog_error(ch, "Mpoload - Bad syntax.");
         return eFAILURE|eINTERNAL_ERROR;
     }
  
     if ( ( realnum = real_object( atoi( arg1 ) ) ) < 0 )
     {
-	logf( IMMORTAL, LOG_WORLD, "Mpoload - Bad vnum arg: vnum %d.", mob_index[ch->mobdata->nr].virt );
+	prog_error(ch, "Mpoload - Bad vnum arg.");
 	return eFAILURE|eINTERNAL_ERROR;
     }
     obj = clone_object( realnum );
@@ -661,7 +646,7 @@ int do_mppurge( CHAR_DATA *ch, char *argument, int cmd )
 //      from our inventory if the player already had one.  It may or may not be there.
 //	else
 //	{
-//	    logf( IMMORTAL, LOG_WORLD, "Mppurge - Bad argument: vnum %d.", mob_index[ch->mobdata->nr].virt );
+//	    prog_error(ch, "Mppurge - Bad argument.");
 //            return eFAILURE|eINTERNAL_ERROR;
 //	}
 	return eSUCCESS;
@@ -669,7 +654,7 @@ int do_mppurge( CHAR_DATA *ch, char *argument, int cmd )
 
     if ( !IS_NPC( victim ) )
     {
-	logf( IMMORTAL, LOG_WORLD, "Mppurge - Purging a PC: vnum %d.", mob_index[ch->mobdata->nr].virt );
+	prog_error(ch, "Mppurge - Purging a PC.");
 	return eFAILURE|eINTERNAL_ERROR;
     }
 
@@ -706,7 +691,7 @@ int do_mpgoto( CHAR_DATA *ch, char *argument, int cmd )
     argument = one_argument( argument, arg );
     if ( arg[0] == '\0' )
     {
-	logf( IMMORTAL, LOG_WORLD, "Mpgoto - No argument: vnum %d.", mob_index[ch->mobdata->nr].virt );
+	prog_error(ch, "Mpgoto - No argument."); 
 	return eFAILURE|eINTERNAL_ERROR;
     }
 
@@ -718,7 +703,7 @@ int do_mpgoto( CHAR_DATA *ch, char *argument, int cmd )
       one_argument(argument, arg);
       if (arg[0] == '\0' || !is_number(arg))
       {
-	logf( IMMORTAL, LOG_WORLD, "Mpgoto - Missing vnum after 'mob' argument: vnum %d.", mob_index[ch->mobdata->nr].virt );
+	prog_error(ch, "Mpgoto - Missing vnum after 'mob' argument."); 
 	return eFAILURE|eINTERNAL_ERROR;
       }
       vict = get_mob_vnum(atoi(arg));
@@ -729,7 +714,7 @@ int do_mpgoto( CHAR_DATA *ch, char *argument, int cmd )
       one_argument(argument, arg);
       if (arg[0] == '\0')
       {
-	logf( IMMORTAL, LOG_WORLD, "Mpgoto - Missing arg after 'pc' argument: vnum %d.", mob_index[ch->mobdata->nr].virt );
+	prog_error(ch, "Mpgoto - Missing arg after 'pc' argument.");
 	return eFAILURE|eINTERNAL_ERROR;
       }
       extern CHAR_DATA *get_pc(char *name);
@@ -750,7 +735,7 @@ int do_mpgoto( CHAR_DATA *ch, char *argument, int cmd )
     }
     if ( location < 0 )
     {
-	logf( IMMORTAL, LOG_WORLD, "Mpgoto - No such location: vnum %d.", mob_index[ch->mobdata->nr].virt );
+	prog_error(ch, "Mpgoto - No such location.");
 	return eFAILURE|eINTERNAL_ERROR;
     }
     if (location == ch->in_room)
@@ -788,7 +773,7 @@ int do_mpat( CHAR_DATA *ch, char *argument, int cmd )
 
     if ( arg[0] == '\0' || argument[0] == '\0' )
     {
-	logf( IMMORTAL, LOG_WORLD, "Mpat - Bad argument: vnum %d.", mob_index[ch->mobdata->nr].virt );
+	prog_error(ch, "Mpat - Bad argument.");
 	return eFAILURE|eINTERNAL_ERROR;
     }
 
@@ -804,7 +789,7 @@ int do_mpat( CHAR_DATA *ch, char *argument, int cmd )
 
     if ( location < 0 )
     {
-	logf( IMMORTAL, LOG_WORLD, "Mpat - No such location: vnum %d.", mob_index[ch->mobdata->nr].virt );
+	prog_error(ch, "Mpat - No such location.");
 	return eFAILURE|eINTERNAL_ERROR;
     }
     extern room_data ** world_array;
@@ -846,13 +831,13 @@ int do_mpxpreward( CHAR_DATA *ch, char *argument, int cmd )
 
     if ( arg[0] == '\0' || !(vict = get_pc_room_vis_exact(ch, arg)))
     {
-	logf( IMMORTAL, LOG_WORLD, "Mpxpreward - Bad argument: vnum %d.", mob_index[ch->mobdata->nr].virt );
+	prog_error(ch, "Mpxpreward - Bad argument.");
 	return eFAILURE|eINTERNAL_ERROR;
     }
 
     if(!check_valid_and_convert(reward, buf)) 
     {
-	logf( IMMORTAL, LOG_WORLD, "Mpxpreward - Bad argument: vnum %d.", mob_index[ch->mobdata->nr].virt );
+	prog_error(ch, "Mpxpreward - Bad argument.");
 	return eFAILURE|eINTERNAL_ERROR;
     }
 
@@ -889,7 +874,7 @@ int do_mptransfer( CHAR_DATA *ch, char *argument, int cmd )
 
     if ( arg1[0] == '\0' )
     {
-	logf( IMMORTAL, LOG_WORLD, "Mptransfer - Bad syntax: vnum %d.", mob_index[ch->mobdata->nr].virt );
+        prog_error(ch, "Mptransfer - Bad syntax");
 	return eFAILURE|eINTERNAL_ERROR;
     }
 
@@ -924,30 +909,26 @@ int do_mptransfer( CHAR_DATA *ch, char *argument, int cmd )
 
 	if ( location < 0 )
 	{
-	    logf( IMMORTAL, LOG_WORLD, "Mptransfer - No such location: vnum %d.",
-	        mob_index[ch->mobdata->nr].virt );
+	    prog_error(ch, "Mptransfer - No such location.");
 	    return eFAILURE|eINTERNAL_ERROR;
 	}
 
 	if ( IS_SET(world[location].room_flags, PRIVATE))
 	{
-	    logf( IMMORTAL, LOG_WORLD, "Mptransfer - Private room: vnum %d.",
-		mob_index[ch->mobdata->nr].virt );
+	    prog_error(ch, "Mptransfer - Private room.");
 	    return eFAILURE|eINTERNAL_ERROR;
 	}
     }
 
     if ( ( victim = get_char_vis( ch, arg1 ) ) == NULL )
     {
-	logf( IMMORTAL, LOG_WORLD, "Mptransfer - No such person: vnum %d.",
-	    mob_index[ch->mobdata->nr].virt );
+        prog_error(ch, "Mptransfer - No such person.");
 	return eFAILURE|eINTERNAL_ERROR;
     }
 
     if ( victim->in_room < 0)
     {
-	logf( IMMORTAL, LOG_WORLD, "Mptransfer - Victim in Limbo: vnum %d.",
-	    mob_index[ch->mobdata->nr].virt );
+        prog_error(ch, "Mptransfer - Victim in Limbo.");
 	return eFAILURE|eINTERNAL_ERROR;
     }
 
@@ -977,7 +958,7 @@ int do_mpforce( CHAR_DATA *ch, char *argument, int cmd )
 
     if ( arg[0] == '\0' || argument[0] == '\0' )
     {
-	logf( IMMORTAL, LOG_WORLD, "Mpforce - Bad syntax: vnum %d.", mob_index[ch->mobdata->nr].virt );
+      prog_error(ch, "Mpforce - Bad syntax");
 	return eFAILURE|eINTERNAL_ERROR;
     }
 
@@ -1006,15 +987,13 @@ int do_mpforce( CHAR_DATA *ch, char *argument, int cmd )
 
 	if ( ( victim = get_char_room_vis( ch, arg ) ) == NULL )
 	{
-	    logf( IMMORTAL, LOG_WORLD, "Mpforce - No such victim: vnum %d.",
-	  	mob_index[ch->mobdata->nr].virt );
+	  prog_error(ch, "Mpforce - No such victim.");
 	    return eFAILURE|eINTERNAL_ERROR;
 	}
 
 	if ( victim == ch )
     	{
-	    logf( IMMORTAL, LOG_WORLD, "Mpforce - Forcing oneself: vnum %d.",
-	    	mob_index[ch->mobdata->nr].virt );
+	  prog_error(ch, "Mpforce - Forcing oneself");
 	    return eFAILURE|eINTERNAL_ERROR;
 	}
 
@@ -1022,8 +1001,10 @@ int do_mpforce( CHAR_DATA *ch, char *argument, int cmd )
 	{
             if(GET_LEVEL( victim ) < IMMORTAL)
 	        command_interpreter( victim, argument );
-            else csendf(victim, "Mob %d just tried to MOBProg force you to '%s'.\r\n", 
-                            mob_index[ch->mobdata->nr].virt, argument);
+            else {
+	      prog_error(ch, "Tried to MOBProg force %s to '%s'.",
+			       GET_NAME(victim), argument);
+	    }
         }
     }
 
@@ -1054,29 +1035,25 @@ int do_mpthrow( CHAR_DATA *ch, char *argument, int cmd )
 
   if(isdigit(*first)) {
     if(!check_valid_and_convert(mob_num, first) || (real_mobile(mob_num) < 0)) {
-      logf( IMMORTAL, LOG_WORLD, "Mpthrow - Invalid mobnum: vnum %d.",
-	  	mob_index[ch->mobdata->nr].virt );
+      prog_error(ch, "Mpthrow - Invalid mobnum.");
       return eFAILURE;
     }
     *first = '\0';
   }
   else {
     if(strlen(first) >= MAX_THROW_NAME) {
-      logf( IMMORTAL, LOG_WORLD, "Mpthrow - Name too long: vnum %d.",
-	  	mob_index[ch->mobdata->nr].virt );
+      prog_error(ch, "Mpthrow - Name too long.");
       return eFAILURE;
     }
   }
 
   if(!check_range_valid_and_convert(catch_num, second, MPROG_CATCH_MIN, MPROG_CATCH_MAX)) {
-    logf( IMMORTAL, LOG_WORLD, "Mpthrow - Invalid catch_num: vnum %d.",
-	  	mob_index[ch->mobdata->nr].virt );
+    prog_error(ch, "Mpthrow - Invalid catch_num.");
     return eFAILURE;
   }
 
   if(!check_range_valid_and_convert(delay, third, 0, 500000)) {
-    logf( IMMORTAL, LOG_WORLD, "Mpthrow - Invalid delay: vnum %d.",
-	  	mob_index[ch->mobdata->nr].virt );
+    prog_error(ch, "Mpthrow - Invalid delay.");
     return eFAILURE;
   }
 
@@ -1128,7 +1105,7 @@ int do_mpteachskill( CHAR_DATA *ch, char *argument, int cmd )
 
     if ( arg[0] == '\0' || skill[0] == '\0' )
     {
-	logf( IMMORTAL, LOG_WORLD, "Mpteachskill - Bad syntax: vnum %d.", mob_index[ch->mobdata->nr].virt );
+	prog_error(ch, "Mpteachskill - Bad syntax.");
 	return eFAILURE|eINTERNAL_ERROR;
     }
 
@@ -1136,14 +1113,14 @@ int do_mpteachskill( CHAR_DATA *ch, char *argument, int cmd )
 
     if ( ( victim = get_char_room( arg, ch->in_room ) ) == NULL )
     {
-        logf( IMMORTAL, LOG_WORLD, "Mpteachskill - No such victim: vnum %d.", mob_index[ch->mobdata->nr].virt );
+        prog_error(ch, "Mpteachskill - No such victim.");
         return eFAILURE|eINTERNAL_ERROR;
     }
 
     int skillnum;
     if(!(check_range_valid_and_convert(skillnum, skill, 0, SKILL_SONG_MAX)))
     {
-        logf( IMMORTAL, LOG_WORLD, "Mpteachskill - No such skill: vnum %d", mob_index[ch->mobdata->nr].virt);
+        prog_error(ch, "Mpteachskill - No such skill");
         return eFAILURE|eINTERNAL_ERROR;
     }
 
@@ -1156,7 +1133,7 @@ int do_mpteachskill( CHAR_DATA *ch, char *argument, int cmd )
 
     class_skill_defines * skilllist = get_skill_list(victim);
     if(!skilllist) {
-      logf( IMMORTAL, LOG_WORLD, "Mpteachskill - (%s) %s had no skill list?", GET_SHORT(ch), GET_NAME(victim));
+      prog_error(ch, "Mpteachskill - %s had no skill list?", GET_NAME(victim));
       return eFAILURE;  // no skills to train
     }
 
@@ -1170,7 +1147,7 @@ int do_mpteachskill( CHAR_DATA *ch, char *argument, int cmd )
        sprintf(skill, "$BYou have learned the basics of %s.$R\n\r", skillname);
     else {
        send_to_char("I just tried to teach you an invalid skill.  Tell a god.\r\n", victim);
-       logf( IMMORTAL, LOG_WORLD, "Mpteachskill - invalid skill number");
+       prog_error(ch, "Mpteachskill - invalid skill number");
        return eFAILURE|eINTERNAL_ERROR;
     }
 
@@ -1382,7 +1359,7 @@ int do_mpdamage( CHAR_DATA *ch, char *argument, int cmd )
 
     if ( arg[0] == '\0' )
     {
-	logf( IMMORTAL, LOG_WORLD, "Mpdamage - Bad syntax: Missing victim - vnum %d.", mob_index[ch->mobdata->nr].virt );
+      prog_error(ch, "Mpdamage - Bad syntax: Missing victim.");
 	return eFAILURE|eINTERNAL_ERROR;
     }
 
@@ -1433,7 +1410,7 @@ int do_mpdamage( CHAR_DATA *ch, char *argument, int cmd )
       }
       if(!numdice || !sizedice)
       {
-        logf( IMMORTAL, LOG_WORLD, "Mpdamage - Invalid damroll: vnum %d", mob_index[ch->mobdata->nr].virt);
+        prog_error(ch, "Mpdamage - Invalid damroll");
         return eFAILURE|eINTERNAL_ERROR;
       }
 
@@ -1441,7 +1418,7 @@ int do_mpdamage( CHAR_DATA *ch, char *argument, int cmd )
       int damtype = determine_attack_type(attacktype);
       if(!damtype)
       {
-        logf( IMMORTAL, LOG_WORLD, "Mpdamage - Invalid damtype: vnum %d", mob_index[ch->mobdata->nr].virt);
+        prog_error(ch, "Mpdamage - Invalid damtype");
         return eFAILURE|eINTERNAL_ERROR;
       }
       int dam = 0;
@@ -1459,7 +1436,7 @@ int do_mpdamage( CHAR_DATA *ch, char *argument, int cmd )
 	else if (!str_cmp(temp, "move"))
 	  data = &GET_MOVE(victim);
 	else {
-           logf( IMMORTAL, LOG_WORLD, "Mpdamage - Must damage either ki,mana,hitpoints or move: vnum %d", mob_index[ch->mobdata->nr].virt);
+           prog_error(ch, "Mpdamage - Must damage either ki,mana,hitpoints or move");
            return eFAILURE|eINTERNAL_ERROR;
 	}
 	if (perc)
@@ -1492,7 +1469,7 @@ int do_mpdamage( CHAR_DATA *ch, char *argument, int cmd )
    	   GET_MOVE(victim) -= dam;
 	   if (GET_MOVE(victim) < 0) GET_MOVE(victim) = 0;
        } else {
-           logf( IMMORTAL, LOG_WORLD, "Mpdamage - Must damage either ki,mana,hitpoints or move: vnum %d", mob_index[ch->mobdata->nr].virt);
+           prog_error(ch, "Mpdamage - Must damage either ki,mana,hitpoints or move");
            return eFAILURE|eINTERNAL_ERROR;
        }*/
 	continue;
@@ -1517,7 +1494,7 @@ int do_mpdamage( CHAR_DATA *ch, char *argument, int cmd )
         else if (!str_cmp(temp, "move"))
           data = &GET_MOVE(victim);
         else {
-           logf( IMMORTAL, LOG_WORLD, "Mpdamage - Must damage either ki,mana,hitpoints or move: vnum %d", mob_index[ch->mobdata->nr].virt);
+           prog_error(ch, "Mpdamage - Must damage either ki,mana,hitpoints or move");
            return eFAILURE|eINTERNAL_ERROR;
         }
         if (perc)
@@ -1565,7 +1542,7 @@ int do_mpdamage( CHAR_DATA *ch, char *argument, int cmd )
            GET_MOVE(victim) -= dam;
            if (GET_MOVE(victim) < 0) GET_MOVE(victim) = 0;
         } else {
-           logf( IMMORTAL, LOG_WORLD, "Mpdamage - Must damage either ki,mana,hitpoints or move: vnum %d", mob_index[ch->mobdata->nr].virt);
+           prog_error(ch, "Mpdamage - Must damage either ki,mana,hitpoints or move");
            return eFAILURE|eINTERNAL_ERROR;
         }*/
         if (SOMEONE_DIED(retval))
@@ -1598,30 +1575,26 @@ int do_mpothrow( CHAR_DATA *ch, char *argument, int cmd )
   if(isdigit(*first)) {
     if(!check_valid_and_convert(mob_num, first) ||
 (real_object(mob_num) < 0)) {
-      logf( IMMORTAL, LOG_WORLD, "Mpothrow - Invalid objnum: vnum %d.",
-                mob_index[ch->mobdata->nr].virt );
+      prog_error(ch, "Mpothrow - Invalid objnum.");
       return eFAILURE;
     }
     *first = '\0';
   }
   else {
     if(strlen(first) >= MAX_THROW_NAME) {
-      logf( IMMORTAL, LOG_WORLD, "Mpthrow - Name too long: vnum %d.",
-                mob_index[ch->mobdata->nr].virt );
+      prog_error(ch, "Mpthrow - Name too long.");
       return eFAILURE;
     }
   }
 
   if(!check_range_valid_and_convert(catch_num, second, MPROG_CATCH_MIN,
 MPROG_CATCH_MAX)) {
-    logf( IMMORTAL, LOG_WORLD, "Mpthrow - Invalid catch_num: vnum %d.",
-                mob_index[ch->mobdata->nr].virt );
+    prog_error(ch, "Mpthrow - Invalid catch_num.");
     return eFAILURE;
   }
 
   if(!check_range_valid_and_convert(delay, third, 0, 500)) {
-    logf( IMMORTAL, LOG_WORLD, "Mpthrow - Invalid delay: vnum %d.",
-                mob_index[ch->mobdata->nr].virt );
+    prog_error(ch, "Mpthrow - Invalid delay.");
     return eFAILURE;
   }
 
@@ -1676,8 +1649,7 @@ int do_mpbestow(CHAR_DATA *ch, char *argument, int cmd)
     if ( ( victim = get_char_room(arg,ch->in_room,TRUE ) ) == NULL && 
       str_cmp(arg, "all") && str_cmp(arg,"allpc"))
     {
-        logf( IMMORTAL, LOG_WORLD, "Mpbestow - No such person: vnum %d.",
-            mob_index[ch->mobdata->nr].virt );
+        prog_error(ch, "Mpbestow - No such person.");
         return eFAILURE|eINTERNAL_ERROR;
     }
   int i,o=0;
@@ -1750,8 +1722,7 @@ int do_mppause( CHAR_DATA *ch, char *argument, int cmd )
   argument = one_argument(argument, first);
 
   if(!check_range_valid_and_convert(delay, first, 0, 65536)) {
-    logf( IMMORTAL, LOG_WORLD, "Mppause - Invalid delay: vnum %d.",
-	  	mob_index[ch->mobdata->nr].virt );
+    prog_error(ch, "Mppause - Invalid delay.");
     return eFAILURE;
   }
 
@@ -1854,7 +1825,7 @@ int do_mpteleport(struct char_data *ch, char *argument, int cmd)
 	   ( (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_STAY_NO_TOWN)) ? 
 	     (IS_SET(zone_table[world[to_room].zone].zone_flags, ZONE_IS_TOWN)) : FALSE ) ||
 	   ( IS_AFFECTED(victim, AFF_CHAMPION) && (IS_SET(world[to_room].room_flags, CLAN_ROOM) ||
-						   to_room >= 1900 && to_room <= 1999) ) );
+						   (to_room >= 1900 && to_room <= 1999)) ) );
 
   act("$n slowly fades out of existence.", victim, 0, 0, TO_ROOM, 0);
   move_char(victim, to_room);
@@ -1879,8 +1850,7 @@ int do_mppeace( struct char_data *ch, char *argument, int cmd )
     if (arg[0]) {
       vict = get_char_room(arg,ch->in_room);
       if (!vict) {
-	    logf( IMMORTAL, LOG_WORLD, "Mppeace - Vict not found: vnum %d.",
-	  	mob_index[ch->mobdata->nr].virt );
+	    prog_error(ch, "Mppeace - Vict not found.");
 	    return eFAILURE;
       }
       if ( IS_MOB(vict) && vict->mobdata->hatred != NULL )
@@ -1965,8 +1935,7 @@ int process_math(char_data *ch, char *string)
 	  lastsign = *string;
 	  break;
 	default:
-	    logf( IMMORTAL, LOG_WORLD, "Mpsetmath - Unknown symbol: %c: vnum %d.",
-	  	*string, mob_index[ch->mobdata->nr].virt );
+	  prog_error(ch, "Mpsetmath - Unknown symbol: '%c'.", *string);
 	    return result;
 	  break;
     };
@@ -2037,8 +2006,7 @@ char *expand_data(char_data *ch, char *orig)
 
     if (!lvali && !lvalui && !lvalb)
     {
-	    logf( IMMORTAL, LOG_WORLD, "Mpsetmath - Expand_data - Accessing unknown data: vnum %d.",
-	  	mob_index[ch->mobdata->nr].virt );
+	    prog_error(ch, "Mpsetmath - Expand_data - Accessing unknown data.");
 	    return NULL;
     }
 
@@ -2097,8 +2065,7 @@ int do_mpsetmath(char_data *ch, char *arg, int cmd)
   }
   if (!r || !*r || !*arg1)
   {
-	    logf( IMMORTAL, LOG_WORLD, "Mpsetmath - Invalid primary data: vnum %d.",
-	  	mob_index[ch->mobdata->nr].virt );
+	    prog_error(ch, "Mpsetmath - Invalid primary data.");
 	     return eFAILURE;
   }
   bool allowed = FALSE;
@@ -2113,8 +2080,7 @@ int do_mpsetmath(char_data *ch, char *arg, int cmd)
   vict = activeTarget;
   if (!vict)
   {
-//	    logf( IMMORTAL, LOG_WORLD, "Mpsetmath - No target: vnum %d.",
-//	  	mob_index[ch->mobdata->nr].virt );
+//	    prog_error(ch, "Mpsetmath - No target.");
 //	    return eFAILURE;
   }
   if (vict && IS_NPC(vict)) allowed = TRUE;
@@ -2125,8 +2091,7 @@ int do_mpsetmath(char_data *ch, char *arg, int cmd)
 
   if (!allowed && vict)
   {
-	    logf( IMMORTAL, LOG_WORLD, "Mpsetmath - Accessing unallowed data: vnum %d.",
-	  	mob_index[ch->mobdata->nr].virt );
+	    prog_error(ch, "Mpsetmath - Accessing unallowed data.");
 	    return eFAILURE;
   }
 
@@ -2136,8 +2101,7 @@ int do_mpsetmath(char_data *ch, char *arg, int cmd)
     arg = one_argument_long(arg,nw);
     if (!nw[0])
     {
-	    logf( IMMORTAL, LOG_WORLD, "Mpsetmath - Invalid string: vnum %d.",
-	  	mob_index[ch->mobdata->nr].virt );
+	    prog_error(ch, "Mpsetmath - Invalid string.");
 	    return eFAILURE;
     }
     *lvalstr = str_dup(nw);    
@@ -2145,8 +2109,7 @@ int do_mpsetmath(char_data *ch, char *arg, int cmd)
   }
   if (!lvalui && !lvali && !lvalb)
   {
-	    logf( IMMORTAL, LOG_WORLD, "Mpsetmath - Accessing unknown data: vnum %d.",
-	  	mob_index[ch->mobdata->nr].virt );
+	    prog_error(ch, "Mpsetmath - Accessing unknown data.");
 	    return eFAILURE;
   }
 
@@ -2156,26 +2119,25 @@ int do_mpsetmath(char_data *ch, char *arg, int cmd)
 
   if (i == -9839)
   {
-    logf( IMMORTAL, LOG_WORLD, "Mpsetmath - Invalid math-string: vnum %d.",
-  	mob_index[ch->mobdata->nr].virt );
+    prog_error(ch, "Mpsetmath - Invalid math-string.");
     return eFAILURE;
   }
   if (lvali)
   {
     *lvali = i;
-    //    logf( IMMORTAL, LOG_WORLD, "Mpsetmath - %s set to %d: vnum %d.",
+    //    prog_error(ch, "Mpsetmath - %s set to %d.");
     //  	r, i, mob_index[ch->mobdata->nr].virt );
   }
   if (lvalb)
   {
     *lvalb = (sbyte)i;
-    //    logf( IMMORTAL, LOG_WORLD, "Mpsetmath - %s set to %d: vnum %d.",
+    //    prog_error(ch, "Mpsetmath - %s set to %d.");
     //  	r, i, mob_index[ch->mobdata->nr].virt );
   }
   if (lvalui)
   {
     *lvalui = (unsigned int)i;
-    //    logf( IMMORTAL, LOG_WORLD, "Mpsetmath - %s set to %d: vnum %d.",
+    //    prog_error(ch, "Mpsetmath - %s set to %d.");
     //  	r, i, mob_index[ch->mobdata->nr].virt );
   }
 
@@ -2187,4 +2149,26 @@ int do_mpsetmath(char_data *ch, char *arg, int cmd)
 		process_math(ch, "1+101-34+5*10*2/8")
 		);
   */return eSUCCESS;
+}
+
+void prog_error(char_data *ch, char *format, ...)
+{
+  va_list ap;
+  char buffer[MAX_STRING_LENGTH];
+
+  va_start(ap, format);
+  vsnprintf(buffer, MAX_STRING_LENGTH, format, ap);
+  va_end(ap);
+
+  if (ch && IS_OBJ(ch)) {
+    logf(IMMORTAL, LOG_WORLD, "Obj %d, com %d, line %d: %s",
+	 obj_index[ch->objdata->item_number].virt, mprog_command_num,
+	 mprog_line_num, buffer);
+  } else if (ch && IS_MOB(ch)) {
+    logf(IMMORTAL, LOG_WORLD, "Mob %d, com %d, line %d: %s",
+	 mob_index[ch->mobdata->nr].virt, mprog_command_num, mprog_line_num,
+	 buffer);
+  } else {
+    logf(IMMORTAL, LOG_WORLD, "Unknown prog: %s", buffer);
+  }
 }

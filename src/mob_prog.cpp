@@ -77,6 +77,11 @@ bool selfpurge = FALSE;
 int cIfs[256]; // for MPPAUSE
 int ifpos;
 
+// This 2 variables keep track of what command and line number a mprog script
+// is on for error logging purposes.
+int mprog_command_num = 0;
+int mprog_line_num = 0;
+
 /*
  * Local function prototypes
  */
@@ -127,6 +132,7 @@ char *mprog_next_command( char *clist )
   if ( *pointer == '\r' )
     *pointer++ = '\0';*/
 
+  mprog_line_num++;
   return ( pointer );
 
 }
@@ -2950,7 +2956,7 @@ void mprog_driver ( char *com_list, CHAR_DATA *mob, CHAR_DATA *actor,
    return;
  selfpurge = FALSE;
  mprog_cur_result = eSUCCESS;
-
+ mprog_line_num = 0;
 
  //int cIfs[256]; // for MPPAUSE
  //int ifpos;
@@ -3073,8 +3079,10 @@ int mprog_wordlist_check( const char *arg, CHAR_DATA *mob, CHAR_DATA *actor,
  mprg = mob_index[mob->mobdata->nr].mobprogs;
  if (!mprg) { done = TRUE; mprg = mob_index[mob->mobdata->nr].mobspec; }
 
+ mprog_command_num = 0;
  for ( ; mprg != NULL; mprg = next )
   {
+    mprog_command_num++;
     next = mprg->next;
     if ( mprg->type & type )
       {
@@ -3647,6 +3655,9 @@ CHAR_DATA *initiate_oproc(CHAR_DATA *ch, OBJ_DATA *obj)
    { buf[i] = '\0'; break; }
   temp->name = str_hsh(buf);
   
+  SET_BIT(temp->misc, MISC_IS_OBJ);
+  temp->objdata = obj;
+
   return temp;
 }
 

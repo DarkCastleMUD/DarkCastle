@@ -1,7 +1,7 @@
 #ifndef CHARACTER_H_
 #define CHARACTER_H_
 /******************************************************************************
-| $Id: character.h,v 1.77 2009/05/26 06:29:27 shane Exp $
+| $Id: character.h,v 1.78 2009/11/27 07:09:58 jhhudso Exp $
 | Description: This file contains the header information for the character
 |   class implementation.
 */
@@ -311,7 +311,8 @@ struct char_data
 {
     struct mob_data * mobdata;
     struct pc_data * pcdata;
-    
+    struct obj_data * objdata;
+
     struct descriptor_data *desc;       // NULL normally for mobs 
 
     char *name;         // Keyword 'kill X'
