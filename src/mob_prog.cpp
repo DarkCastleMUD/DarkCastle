@@ -2589,19 +2589,20 @@ void mprog_translate( char ch, char *t, CHAR_DATA *mob, CHAR_DATA *actor,
       break;
 
      case 'R':
-         if ( rndm ) 
-            if ( CAN_SEE( mob, rndm ) )
-	       if ( IS_NPC( rndm ) )
-		 strcpy(t,rndm->short_desc);
-	       else
-	       {
-		 strcpy( t, rndm->name );
-		 strcat( t, " " );
-		 strcat( t, rndm->title );
-	       }
-	    else
-	      strcpy( t, "someone" );
-	 break;
+       if ( rndm ) {
+	 if ( CAN_SEE( mob, rndm ) ) {
+	   if ( IS_NPC( rndm ) ) {
+	     strcpy(t,rndm->short_desc);
+	   } else {
+	     strcpy( t, rndm->name );
+	     strcat( t, " " );
+	     strcat( t, rndm->title );
+	   }
+	 } else {
+	   strcpy( t, "someone" );
+	 }
+       }
+       break;
 
      case 'e':
          if ( actor )
@@ -3165,8 +3166,11 @@ void mprog_percent_check( CHAR_DATA *mob, CHAR_DATA *actor, OBJ_DATA *obj,
  bool done = FALSE;
  mprg = mob_index[mob->mobdata->nr].mobprogs;
  if (!mprg) { done = TRUE; mprg = mob_index[mob->mobdata->nr].mobspec; }
+
+ mprog_command_num = 0;
  for ( ; mprg != NULL; mprg = next )
  {
+   mprog_command_num++;
   next = mprg->next;
    if ( ( mprg->type & type )
        && ( number(0, 99) < atoi( mprg->arglist ) ) )
@@ -3242,50 +3246,63 @@ int mprog_act_trigger( const char *buf, CHAR_DATA *mob, CHAR_DATA *ch,
 int mprog_bribe_trigger( CHAR_DATA *mob, CHAR_DATA *ch, int amount )
 {
 
-  MPROG_DATA *mprg;
-  MPROG_DATA *next;
-  OBJ_DATA   *obj;
+  MPROG_DATA *mprg = 0;
+  MPROG_DATA *next = 0;
+  OBJ_DATA   *obj = 0;
   bool done = FALSE;
-  if ( IS_NPC( mob )
-      && ( mob_index[mob->mobdata->nr].progtypes & BRIBE_PROG ) )
-    {
-      mob->gold -= amount;
 
-	 mprg = mob_index[mob->mobdata->nr].mobprogs;
-	 if (!mprg) { done = TRUE; mprg = mob_index[mob->mobdata->nr].mobspec; }
-	 for ( ; mprg != NULL; mprg = next )
-	{
-	next = mprg->next;
-	if ( ( mprg->type & BRIBE_PROG )
-	    && ( amount >= atoi( mprg->arglist ) ) )
-	  {
-	    mprog_driver( mprg->comlist, mob, ch, obj, NULL, NULL, NULL );
-		if (selfpurge) return mprog_cur_result;
-	    break;
-	  }
-	   if (!next && !done) { next = mob_index[mob->mobdata->nr].mobspec; done = TRUE;}
-	}
+  if ( IS_NPC( mob ) && ( mob_index[mob->mobdata->nr].progtypes & BRIBE_PROG ) ) {
+    mob->gold -= amount;
+    
+    mprg = mob_index[mob->mobdata->nr].mobprogs;
+    if (!mprg) {
+      done = TRUE;
+      mprg = mob_index[mob->mobdata->nr].mobspec;
     }
+
+    mprog_command_num = 0;
+    for ( ; mprg != NULL; mprg = next )	{
+      mprog_command_num++;
+      next = mprg->next;
+
+      if ( ( mprg->type & BRIBE_PROG ) && ( amount >= atoi( mprg->arglist ) ) ) {
+	mprog_driver( mprg->comlist, mob, ch, obj, NULL, NULL, NULL );
+	if (selfpurge)
+	  return mprog_cur_result;
+	break;
+      }
+
+      if (!next && !done) {
+	next = mob_index[mob->mobdata->nr].mobspec;
+	done = TRUE;
+      }
+    }
+  }
   
   return mprog_cur_result;
-
 }
 
 int mprog_damage_trigger( CHAR_DATA *mob, CHAR_DATA *ch, int amount )
 {
 
-  MPROG_DATA *mprg;
-  MPROG_DATA *next;
-  OBJ_DATA   *obj;
+  MPROG_DATA *mprg = 0;
+  MPROG_DATA *next = 0;
+  OBJ_DATA   *obj = 0;
   bool done = FALSE;
-  if ( IS_NPC( mob )
-      && ( mob_index[mob->mobdata->nr].progtypes & DAMAGE_PROG ) )
+  if ( IS_NPC( mob ) && ( mob_index[mob->mobdata->nr].progtypes & DAMAGE_PROG ) )
     {
-	 mprg = mob_index[mob->mobdata->nr].mobprogs;
-	 if (!mprg) { done = TRUE; mprg = mob_index[mob->mobdata->nr].mobspec; }
-	 for ( ; mprg != NULL; mprg = next )
-	{
+      mprg = mob_index[mob->mobdata->nr].mobprogs;
+
+      if (!mprg) {
+	done = TRUE;
+	mprg = mob_index[mob->mobdata->nr].mobspec;
+      }
+
+      mprog_command_num = 0;
+      for ( ; mprg != NULL; mprg = next ) {
+	mprog_command_num++;
 	next = mprg->next;
+
 	if ( ( mprg->type & DAMAGE_PROG )
 	    && ( amount >= atoi( mprg->arglist ) ) )
 	  {
@@ -3359,36 +3376,39 @@ int mprog_give_trigger( CHAR_DATA *mob, CHAR_DATA *ch, OBJ_DATA *obj )
  if ( IS_NPC( mob )
      && ( mob_index[mob->mobdata->nr].progtypes & GIVE_PROG ) )
 {
- mprg = mob_index[mob->mobdata->nr].mobprogs;
- if (!mprg) { done = TRUE; mprg = mob_index[mob->mobdata->nr].mobspec; }
- for ( ; mprg != NULL; mprg = next )
-     {
-	next = mprg->next;
-       one_argument( mprg->arglist, buf );
-       if ( ( mprg->type & GIVE_PROG )
-	   && ( ( !str_cmp( obj->name, mprg->arglist ) )
-	       || ( !str_cmp( "all", buf ) ) ) )
-	 {
-	   okay = TRUE;
-	   mprog_driver( mprg->comlist, mob, ch, obj, NULL, NULL, NULL );
-		if (selfpurge) return mprog_cur_result;
-	   break;
-	 }
-     if (!next && !done) { done = TRUE; next = mob_index[mob->mobdata->nr].mobspec;}
-     }
+  mprg = mob_index[mob->mobdata->nr].mobprogs;
+  if (!mprg) { done = TRUE; mprg = mob_index[mob->mobdata->nr].mobspec; }
+
+  mprog_command_num = 0;
+  for ( ; mprg != NULL; mprg = next ) {
+    mprog_command_num++;
+
+    next = mprg->next;
+    one_argument( mprg->arglist, buf );
+    if ( ( mprg->type & GIVE_PROG )
+	 && ( ( !str_cmp( obj->name, mprg->arglist ) )
+	      || ( !str_cmp( "all", buf ) ) ) )
+      {
+	okay = TRUE;
+	mprog_driver( mprg->comlist, mob, ch, obj, NULL, NULL, NULL );
+	if (selfpurge) return mprog_cur_result;
+	break;
+      }
+
+    if (!next && !done) { done = TRUE; next = mob_index[mob->mobdata->nr].mobspec;}
+  }
  }
- if (okay && !SOMEONE_DIED(mprog_cur_result))
- {
+
+ if (okay && !SOMEONE_DIED(mprog_cur_result)) {
    OBJ_DATA *a;
    SET_BIT(mprog_cur_result, eEXTRA_VALUE);
    for (a = mob->carrying; a; a = a->next_content)
-     if (a == obj)
-	{
-	   REMOVE_BIT(mprog_cur_result, eEXTRA_VALUE);
-	}  
- }
- return mprog_cur_result;
+     if (a == obj) {
+       REMOVE_BIT(mprog_cur_result, eEXTRA_VALUE);
+     }  
+   }
 
+ return mprog_cur_result;
 }
 
 int mprog_greet_trigger( CHAR_DATA *ch )
@@ -3420,32 +3440,38 @@ int mprog_greet_trigger( CHAR_DATA *ch )
 
 int mprog_hitprcnt_trigger( CHAR_DATA *mob, CHAR_DATA *ch)
 {
-
- MPROG_DATA *mprg;
- MPROG_DATA *next;
+  MPROG_DATA *mprg;
+  MPROG_DATA *next;
   bool done = FALSE;
- if ( IS_NPC( mob )
- 	&& MOB_WAIT_STATE(mob) <= 0
-      && ( 
-mob_index[mob->mobdata->nr].progtypes & HITPRCNT_PROG ) )
-  {
- mprg = mob_index[mob->mobdata->nr].mobprogs;
- if (!mprg) { done = TRUE; mprg = mob_index[mob->mobdata->nr].mobspec; }
- for ( ; mprg != NULL; mprg = next )
-   {
-     next = mprg->next;
-     if ( ( mprg->type & HITPRCNT_PROG )
-	 && ( ( 100*mob->hit / mob->max_hit ) < atoi( mprg->arglist ) ) )
-       {
-	 mprog_driver( mprg->comlist, mob, ch, NULL, NULL, NULL, NULL );
-		if (selfpurge) return mprog_cur_result;
-	 break;
-       }
-    if (!next && !done){done = TRUE; next = mob_index[mob->mobdata->nr].mobspec; }
- }
-}
- return mprog_cur_result;
 
+  if ( IS_NPC( mob )
+       && MOB_WAIT_STATE(mob) <= 0
+       && (mob_index[mob->mobdata->nr].progtypes & HITPRCNT_PROG ) )
+    {
+      mprg = mob_index[mob->mobdata->nr].mobprogs;
+      if (!mprg) { done = TRUE; mprg = mob_index[mob->mobdata->nr].mobspec; }
+      
+      mprog_command_num = 0;
+      for ( ; mprg != NULL; mprg = next ) {
+	mprog_command_num++;
+	next = mprg->next;
+
+	if ( ( mprg->type & HITPRCNT_PROG )
+	     && ( ( 100*mob->hit / mob->max_hit ) < atoi( mprg->arglist ) ) )
+	  {
+	    mprog_driver( mprg->comlist, mob, ch, NULL, NULL, NULL, NULL );
+	    if (selfpurge) return mprog_cur_result;
+	    break;
+	  }
+
+	if (!next && !done){
+	  done = TRUE;
+	  next = mob_index[mob->mobdata->nr].mobspec;
+	}
+      }
+    }
+  
+  return mprog_cur_result;
 }
 
 int mprog_random_trigger( CHAR_DATA *mob )
@@ -3517,8 +3543,10 @@ int mprog_catch_trigger(char_data * mob, int catch_num, char *var, int opt, char
  mprg = mob_index[mob->mobdata->nr].mobprogs;
  if (!mprg || opt & 1) { done = TRUE; mprg = mob_index[mob->mobdata->nr].mobspec; }
 
+ mprog_command_num = 0;
  for ( ; mprg != NULL; mprg = next )
      {
+       mprog_command_num++;
 	next = mprg->next;
        if ( mprg->type & CATCH_PROG )
        {
@@ -3749,11 +3777,15 @@ int oprog_catch_trigger(obj_data *obj, int catch_num, char *var, int opt, char_d
  int curr_catch;
  mprog_cur_result = eFAILURE;
  CHAR_DATA *vmob;
+
  if ( obj_index[obj->item_number].progtypes & CATCH_PROG ) 
  {
     mprg = obj_index[obj->item_number].mobprogs;
+    mprog_command_num = 0;
     for ( ; mprg != NULL; mprg = mprg->next )
      {
+       mprog_command_num++;
+
        if ( mprg->type & CATCH_PROG )
        {
          if(!check_range_valid_and_convert(curr_catch, mprg->arglist, MPROG_CATCH_MIN, MPROG_CATCH_MAX)) {
