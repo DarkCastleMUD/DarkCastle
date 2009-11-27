@@ -8437,26 +8437,47 @@ int cast_remove_poison( ubyte level, CHAR_DATA *ch, char *arg, int type,
   CHAR_DATA *tar_ch, struct obj_data *tar_obj, int skill )
 {
   switch (type) {
-	 case SPELL_TYPE_SPELL:
-		 return spell_remove_poison(level, ch, tar_ch, tar_obj, skill);
-		 break;
-	 case SPELL_TYPE_WAND:
-	         if(!tar_ch) return eFAILURE;
-         return spell_remove_poison(level, ch, tar_ch, 0, skill);
-	break;
-	 case SPELL_TYPE_POTION:
-	 return spell_remove_poison(level, ch, ch, 0, skill);
-	 break;
-	 case SPELL_TYPE_STAFF:
-	 for (tar_ch = world[ch->in_room].people ;
-			tar_ch ; tar_ch = tar_ch->next_in_room)
+  case SPELL_TYPE_SPELL:
+    if (!strcmp(arg, "communegroupspell") && has_skill(ch, SKILL_COMMUNE)) {
+      int retval = eFAILURE;
+      for (char_data *tmp_char = world[ch->in_room].people; tmp_char;
+	   tmp_char = tmp_char->next_in_room)
+	{
+	  if (!ARE_GROUPED(ch, tmp_char))
+	    continue;
 
-		  spell_remove_poison(level,ch,tar_ch,0, skill);
-	 break;
-	 default :
-	 log("Serious screw-up in remove poison!", ANGEL, LOG_BUG);
-	 break;
-	 }
+	  retval &= spell_remove_poison(level, ch, tmp_char, tar_obj, skill);
+	  if (IS_SET(retval, eCH_DIED)) {
+	    return retval;
+	  }
+	}
+
+      return retval;
+    }
+
+    return spell_remove_poison(level, ch, tar_ch, tar_obj, skill);
+    break;
+
+  case SPELL_TYPE_WAND:
+    if(!tar_ch) return eFAILURE;
+    return spell_remove_poison(level, ch, tar_ch, 0, skill);
+    break;
+
+  case SPELL_TYPE_POTION:
+    return spell_remove_poison(level, ch, ch, 0, skill);
+    break;
+
+  case SPELL_TYPE_STAFF:
+    for (tar_ch = world[ch->in_room].people ;
+	 tar_ch ; tar_ch = tar_ch->next_in_room)
+      
+      spell_remove_poison(level,ch,tar_ch,0, skill);
+    break;
+  default :
+    log("Serious screw-up in remove poison!", ANGEL, LOG_BUG);
+    break;
+  }
+
   return eFAILURE;
 }
 
