@@ -9,6 +9,7 @@
 #include <levels.h>
 
 using namespace std;
+using namespace XmlRpc;
 
 class common {
 protected:
