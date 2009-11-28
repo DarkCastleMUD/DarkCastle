@@ -699,11 +699,13 @@ void load_vaults(void) {
   struct vault_access_data *access;
   struct vault_items_data *items;
   struct obj_data *obj;
+  struct stat statbuf;
   FILE *fl, *index;
   int vnum, full, count;
   long long unsigned int gold = 0;
   char value[128], line[128], buf[MAX_STRING_LENGTH], fname[MAX_INPUT_LENGTH], type[128], tmp[10];
   bool saveChanges = FALSE;
+  char src_filename[256];
 
   if(!(index = dc_fopen(VAULT_INDEX_FILE, "r"))) {
     log ("boot_vaults: could not open vault index file, probably doesn't exist.", IMMORTAL, LOG_BUG);
@@ -840,12 +842,23 @@ void load_vaults(void) {
 	  break;
         case 'A':
           sscanf(type, "%s %s", tmp, value);
-          CREATE(access, struct vault_access_data, 1);
-          access->name  = str_dup(value);
-          access->next  = vault->access;
-          vault->access = access;
-          sprintf(buf, "boot_vaults: got access [%s] from file [%s].", access->name, fname);
-  //        log(buf, IMMORTAL, LOG_BUG);
+
+	  // Confirm if the character exists before giving it access to this vault
+	  snprintf(src_filename, 256, "%s/%c/%s", SAVE_DIR, value[0], value);
+
+	  if (0 == stat(src_filename, &statbuf)) {
+	    CREATE(access, struct vault_access_data, 1);
+	    access->name  = str_dup(value);
+	    access->next  = vault->access;
+	    vault->access = access;
+	    sprintf(buf, "boot_vaults: got access [%s] from file [%s].", access->name, fname);
+	    //        log(buf, IMMORTAL, LOG_BUG);
+	  } else {
+	    sprintf(buf, "Invalid access entry found. Removing %s's access to %s.", value, vault->owner);
+	    vault_log(buf, vault->owner);
+	    saveChanges = true;
+	  }
+
           break;
         default:
           sprintf(buf, "boot_vaults: unknown type in file [%s].", fname);
