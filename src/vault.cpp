@@ -641,6 +641,8 @@ void remove_vault(char *name, BACKUP_TYPE backup) {
     }
   }
 
+  remove_vault_accesses(name);
+
   struct vault_data *vault, *next_vault, *prev_vault;
   struct vault_items_data *items, *titems;
   struct vault_access_data *access, *taccess;
