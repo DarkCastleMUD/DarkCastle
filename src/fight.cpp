@@ -20,7 +20,7 @@
  * 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead *
  * of just race stuff                                                     *
  **************************************************************************
- * $Id: fight.cpp,v 1.554 2009/11/16 08:16:31 jhhudso Exp $               *
+ * $Id: fight.cpp,v 1.555 2009/11/29 21:26:40 jhhudso Exp $               *
  **************************************************************************/
 
 extern "C"
@@ -3077,7 +3077,6 @@ int doTumblingCounterStrike(CHAR_DATA * ch, CHAR_DATA * victim)
   int retval;
 
   if((IS_SET(victim->combat, COMBAT_STUNNED)) ||
-     (victim->equipment[WIELD] != NULL) ||
      (IS_SET(victim->combat, COMBAT_STUNNED2)) ||
      (IS_SET(victim->combat, COMBAT_BASH1)) ||
      (IS_SET(victim->combat, COMBAT_BASH2)) ||
