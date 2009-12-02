@@ -20,7 +20,7 @@
  * 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead *
  * of just race stuff                                                     *
  **************************************************************************
- * $Id: fight.cpp,v 1.555 2009/11/29 21:26:40 jhhudso Exp $               *
+ * $Id: fight.cpp,v 1.556 2009/12/02 02:23:56 kkoons Exp $               *
  **************************************************************************/
 
 extern "C"
@@ -1792,7 +1792,6 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
   int ethereal = 0;
   bool reflected = FALSE;
   char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH], buf3[MAX_STRING_LENGTH];
-  int pre_stoneshield_dam = 0;
 
   bool bingo;
   if (is_bingo(dam, weapon_type, attacktype)) {
@@ -2241,6 +2240,8 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
   } // spellblock
 
   } // can_miss
+
+  int pre_stoneshield_dam = 0;
   struct affected_type * pspell = NULL;
   if(GET_LEVEL(victim) < IMMORTAL && dam > 0 && typeofdamage == DAMAGE_TYPE_PHYSICAL &&
      (
@@ -2249,10 +2250,10 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
      )
     )
   {
+    pre_stoneshield_dam = dam;
     
     if (dam > pspell->modifier)
     {
-      pre_stoneshield_dam = dam;
       dam -= pspell->modifier;
       pspell->duration -= pspell->modifier;
     }
