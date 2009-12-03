@@ -69,7 +69,7 @@ struct song_info_type song_info [ ] = {
 
 { /* 1 */
 	1, POSITION_FIGHTING, 1, SKILL_SONG_WHISTLE_SHARP, 
-	TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, 0,
+	TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, 1,
 	song_whistle_sharp, NULL, NULL, NULL,
 	SKILL_INCREASE_MEDIUM
 },
@@ -446,7 +446,7 @@ int do_sing(CHAR_DATA *ch, char *arg, int cmd)
   }
 
   for( i = ch->songs.begin(); i != ch->songs.end(); ++i )
-   if((*i).song_number == spl && song_info[spl].rating > 0) {
+   if((*i).song_number == spl) {
     send_to_char("You are already singing this song!\r\n", ch);
     return eFAILURE;
    }
@@ -754,7 +754,7 @@ int do_sing(CHAR_DATA *ch, char *arg, int cmd)
 
       // There's no sense adding a song to the list if it's a 1-time song with no stop function
       // like stop, whistle sharp or listsongs
-      if (song_info[spl].rating > 0) {
+      if (song_info[spl].rating > 0 && spl != SKILL_SONG_WHISTLE_SHARP - SKILL_SONG_BASE) {
 	struct songInfo data;
 	data.song_number = spl;
 	data.song_timer = 0;
