@@ -634,7 +634,7 @@ int do_sing(CHAR_DATA *ch, char *arg, int cmd)
        return eFAILURE|eINTERNAL_ERROR;
      }
 
-    if (IS_SET(world[ch->in_room].room_flags, NO_KI)) {
+    if (spl != SKILL_SONG_STOP - SKILL_SONG_BASE && IS_SET(world[ch->in_room].room_flags, NO_KI)) {
       send_to_char("You find yourself unable to use energy based chants here.\n\r", ch);
       return eFAILURE;
     }
