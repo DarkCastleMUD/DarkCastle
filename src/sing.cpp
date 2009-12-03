@@ -69,7 +69,7 @@ struct song_info_type song_info [ ] = {
 
 { /* 1 */
 	1, POSITION_FIGHTING, 1, SKILL_SONG_WHISTLE_SHARP, 
-	TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, 1,
+	TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, 0,
 	song_whistle_sharp, NULL, NULL, NULL,
 	SKILL_INCREASE_MEDIUM
 },
@@ -433,7 +433,7 @@ int do_sing(CHAR_DATA *ch, char *arg, int cmd)
     return eFAILURE;
    }
   }
-  else if(spl != 2 && IS_SINGING(ch)) {
+  else if(song_info[spl].rating > 0 && IS_SINGING(ch)) {
    if(has_skill(ch, SKILL_ORCHESTRATE))
     send_to_char("You are already in the middle of another song!  Try using orchestrate.\r\n", ch);
    else
@@ -446,7 +446,7 @@ int do_sing(CHAR_DATA *ch, char *arg, int cmd)
   }
 
   for( i = ch->songs.begin(); i != ch->songs.end(); ++i )
-   if((*i).song_number == spl) {
+   if((*i).song_number == spl && song_info[spl].rating > 0) {
     send_to_char("You are already singing this song!\r\n", ch);
     return eFAILURE;
    }
@@ -752,11 +752,15 @@ int do_sing(CHAR_DATA *ch, char *arg, int cmd)
 
       GET_KI(ch) -= use_song(ch, spl);
 
-      struct songInfo data;
-      data.song_number = spl;
-      data.song_timer = 0;
-      data.song_data = '\0';
-      ch->songs.push_back(data);
+      // There's no sense adding a song to the list if it's a 1-time song with no stop function
+      // like stop, whistle sharp or listsongs
+      if (song_info[spl].rating > 0) {
+	struct songInfo data;
+	data.song_number = spl;
+	data.song_timer = 0;
+	data.song_data = '\0';
+	ch->songs.push_back(data);
+      }
 
       return ((*song_info[spl].song_pointer) (GET_LEVEL(ch), ch, argument, tar_char, learned));
     }
