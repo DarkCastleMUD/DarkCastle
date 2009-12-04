@@ -312,11 +312,12 @@ void show_vault_balance(CHAR_DATA *ch, char *owner) {
     csendf(ch, "There are %llu gold coins in %s's vault.\r\n", vault->gold, owner);
 }
 
-char *vault_usage = "Syntax: vault <list | balance> [name of vault owner]\r\n"
-                    "        vault <put | get> <object> [name of vault owner]\r\n"
+char *vault_usage = "Syntax: vault <list | balance> [vault owner]\r\n"
+                    "        vault <put | get> <object> [vault owner]\r\n"
                     "        vault <deposit | withdraw> <amount>\r\n"
                     "        vault <access | myaccess> [name to add/remove access]\r\n"
-                    "        vault log <clan>\r\n";
+                    "        vault log [vault owner]\r\n"
+                    "        vault search <keyword>\r\n";
 
 char *imm_vault_usage =  "        vault <stats> [name]\r\n";
 
@@ -392,6 +393,13 @@ int do_vault(CHAR_DATA *ch, char *argument, int cmd)
     } else {
       sprintf(arg1, "%s", GET_NAME(ch));
       show_vault_log(ch, arg1);
+    }
+  } else if (!strcmp(arg, "search")) {
+    if (*arg1) {
+      return vault_search(ch, arg1);
+    } else {
+      send_to_char("Syntax: vault search <keyword>\n\r", ch);
+      return eFAILURE;
     }
   // putting this here so that anything below it requires you to be in a safe room.
   } else if (!IS_SET(world[ch->in_room].room_flags, SAFE)) {
@@ -2089,4 +2097,104 @@ int sleazy_vault_guy(struct char_data *ch, struct obj_data *obj, int cmd, char *
      }
   }
   return eFAILURE;
+}
+
+int vault_search(CHAR_DATA *ch, char *object)
+{
+  struct vault_items_data *items;
+  struct obj_data *obj;
+  char sectionbuf[MAX_STRING_LENGTH*4];
+  char linebuf[MAX_INPUT_LENGTH];
+  char buf[MAX_INPUT_LENGTH];
+  int objects = 0;
+  int diff_len = 0;
+  int sectionbuf_len = 0;
+  int linebuf_len = 0;
+  bool owner_shown = false;
+  int vaults_searched = 0;
+  int objects_found = 0;
+
+  for (vault_data *vault = vault_table; vault; vault = vault->next) {
+    if (vault && vault->owner && has_vault_access(GET_NAME(ch), vault)) {
+      vaults_searched++;
+      objects = 0;
+      diff_len = 0;
+      sectionbuf_len = 0;
+      linebuf_len = 0;
+      sectionbuf[0] = '\0';
+      linebuf[0] = '\0';
+      buf[0] = '\0';
+      owner_shown = false;
+
+      for (items = vault->items;items;items = items->next) {
+	linebuf[0] = '\0';
+	obj = items->obj ? items->obj : get_obj(items->item_vnum);
+
+	if (obj == NULL || !isname(object, GET_OBJ_NAME(obj))) {
+	  continue;
+	} else if (!owner_shown) {
+	  owner_shown = true;
+	  csendf(ch, "\n\r%s:\n\r", vault->owner);
+      	}
+	
+	if (items->count > 1) {
+	  snprintf(linebuf, sizeof(linebuf), "[$5%d$R] ", items->count);
+
+	  sectionbuf_len = strlen(sectionbuf);
+	  linebuf_len = strlen(linebuf);
+	  diff_len = sizeof(sectionbuf) - (sectionbuf_len + linebuf_len + 1 + 2);
+
+	  if (diff_len > 0) {
+            strncat(sectionbuf, linebuf, diff_len);
+	  }
+	}
+	
+	objects_found += items->count;
+
+	snprintf(linebuf, sizeof(linebuf), "%s ", GET_OBJ_SHORT(obj));
+	
+	if (obj->obj_flags.type_flag == ITEM_ARMOR ||
+	    obj->obj_flags.type_flag == ITEM_WEAPON ||
+	    obj->obj_flags.type_flag == ITEM_FIREWEAPON ||
+	    obj->obj_flags.type_flag == ITEM_CONTAINER ||
+	    obj->obj_flags.type_flag == ITEM_INSTRUMENT ||
+	    obj->obj_flags.type_flag == ITEM_STAFF ||
+	    obj->obj_flags.type_flag == ITEM_WAND ||
+	    obj->obj_flags.type_flag == ITEM_LIGHT)
+	  {
+	    strncpy(buf, linebuf, sizeof(buf));
+	    snprintf(linebuf, MAX_INPUT_LENGTH, "%s %s $3Lvl: %d$R", buf,
+		     item_condition(obj), obj->obj_flags.eq_level);
+	  }
+	
+	if (GET_LEVEL(ch) > IMMORTAL) {
+	  strncpy(buf, linebuf, sizeof(buf));
+	  snprintf(linebuf, sizeof(linebuf), "%s [%d]", buf, items->item_vnum);
+	}
+	
+	objects = 1;
+	linebuf_len = strlen(linebuf);
+	diff_len = sizeof(linebuf) - (linebuf_len + 2 + 1);
+
+	if (diff_len > 0) {
+	  strncat(linebuf,"\r\n", diff_len);
+	}
+
+	if (strlen(linebuf) + strlen(sectionbuf) < MAX_STRING_LENGTH*4 - 200) {
+	  strncat(sectionbuf, linebuf, MAX_STRING_LENGTH*4);
+	} else {
+	  strcat(sectionbuf, "Overflow!!!\r\n");
+	  break;
+	}
+      }
+
+      if (objects) {
+	page_string(ch->desc, sectionbuf, 1);
+      }
+    }
+  }
+
+  csendf(ch, "\n\rSearched %d vaults and found %d objects.\n\r", vaults_searched, objects_found);
+  
+  return eSUCCESS;
 }

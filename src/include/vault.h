@@ -43,7 +43,7 @@ struct obj_data *get_obj_in_all_vaults(char *object, int num);
 struct vault_items_data *get_items_in_all_vaults(char *object, int num);
 
 int has_vault_access(char *owner, struct vault_data *vault);
-
+int vault_search(CHAR_DATA *ch, char *keyword);
 
 struct vault_data {
    char *owner;
