@@ -1656,7 +1656,7 @@ int spell_paralyze(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
          return eFAILURE;
   if(affected_by_spell(victim, SPELL_VILLAINY) && affected_by_spell(victim, SPELL_VILLAINY)->modifier >= 70) {
    act("$N seems unaffected.", ch, 0, victim, TO_CHAR, 0);
-   act("Your gods protect you from $N's spell.", ch, 0, victim, TO_VICT, 0);
+   act("Your gods protect you from $n's spell.", ch, 0, victim, TO_VICT, 0);
    return eSUCCESS;
   }
 
@@ -1780,7 +1780,7 @@ int spell_blindness(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
 
   if(affected_by_spell(victim, SPELL_VILLAINY) && affected_by_spell(victim, SPELL_VILLAINY)->modifier >= 90) {
    act("$N seems unaffected.", ch, 0, victim, TO_CHAR, 0);
-   act("Your gods protect you from $N's spell.", ch, 0, victim, TO_VICT, 0);
+   act("Your gods protect you from $n's spell.", ch, 0, victim, TO_VICT, 0);
    return eSUCCESS;
   }
 
@@ -2091,7 +2091,7 @@ int spell_curse(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *
 
   if(affected_by_spell(victim, SPELL_HEROISM) && affected_by_spell(victim, SPELL_HEROISM)->modifier >= 90) {
    act("$N seems unaffected.", ch, 0, victim, TO_CHAR, 0);
-   act("Your gods protect you from $N's spell.", ch, 0, victim, TO_VICT, 0);
+   act("Your gods protect you from $n's spell.", ch, 0, victim, TO_VICT, 0);
    return eSUCCESS;
   }
 
@@ -4589,7 +4589,7 @@ int spell_fear(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *o
   
   if(affected_by_spell(victim, SPELL_HEROISM) && affected_by_spell(victim, SPELL_HEROISM)->modifier >= 70) {
    act("$N seems unaffected.", ch, 0, victim, TO_CHAR, 0);
-   act("Your gods protect you from $N's spell.", ch, 0, victim, TO_VICT, 0);
+   act("Your gods protect you from $n's spell.", ch, 0, victim, TO_VICT, 0);
    return eFAILURE;
   }
 
@@ -5789,7 +5789,7 @@ int spell_weaken(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data 
 
   if(affected_by_spell(victim, SPELL_HEROISM) && affected_by_spell(victim, SPELL_HEROISM)->modifier >= 50) {
    act("$N seems unaffected.", ch, 0, victim, TO_CHAR, 0);
-   act("Your gods protect you from $N's spell.", ch, 0, victim, TO_VICT, 0);
+   act("Your gods protect you from $n's spell.", ch, 0, victim, TO_VICT, 0);
    return eSUCCESS;
   }
 
