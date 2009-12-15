@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: move.cpp,v 1.93 2009/05/20 00:10:20 kkoons Exp $
+| $Id: move.cpp,v 1.94 2009/12/15 10:52:38 kkoons Exp $
 | move.C
 | Movement commands and stuff.
 *************************************************************************
@@ -661,18 +661,22 @@ int do_simple_move(CHAR_DATA *ch, int cmd, int following)
       }
     }
   // Forest melded
-  else {
-    if(world[world[ch->in_room].dir_option[cmd]->to_room].sector_type != SECT_FOREST) {
+  else 
+  {
+    if(world[world[ch->in_room].dir_option[cmd]->to_room].sector_type != SECT_FOREST 
+       && world[world[ch->in_room].dir_option[cmd]->to_room].sector_type != SECT_SWAMP) 
+    {
       sprintf(tmp, "$n leaves %s.", dirs[cmd]);
       REMBIT(ch->affected_by, AFF_FOREST_MELD);
       send_to_char("You detach yourself from the forest.\r\n", ch);
       act(tmp, ch, 0, 0, TO_ROOM, INVIS_NULL);
-      }
-    else {
+    }
+    else 
+    {
       sprintf(tmp, "$n sneaks %s.", dirs[cmd]); 
       act(tmp, ch, 0, 0, TO_ROOM, GODS);
-      }
     }
+  }
 
   was_in = ch->in_room;
   record_track_data(ch, cmd);
@@ -734,7 +738,10 @@ int do_simple_move(CHAR_DATA *ch, int cmd, int following)
     }
 
   if (IS_AFFECTED(ch, AFF_SNEAK) ||
-    (IS_AFFECTED(ch, AFF_FOREST_MELD) && world[ch->in_room].sector_type == SECT_FOREST))
+    (IS_AFFECTED(ch, AFF_FOREST_MELD) 
+     && (world[ch->in_room].sector_type == SECT_FOREST
+         || world[ch->in_room].sector_type == SECT_SWAMP)
+    ))
   {
     act("$n sneaks into the room.", ch, 0, 0, TO_ROOM, GODS);
     act("$n sneaks into the room.", ch, 0, 0, TO_GROUP, INVIS_NULL);
@@ -1095,10 +1102,16 @@ int do_enter(CHAR_DATA *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (!IS_MOB(ch) &&
-      (affected_by_spell(ch, FUCK_PTHIEF) || affected_by_spell(ch, FUCK_GTHIEF) || IS_AFFECTED(ch, AFF_CHAMPION)) &&
-      (IS_SET(world[real_room(portal->obj_flags.value[0])].room_flags, CLAN_ROOM) ||
-        portal->obj_flags.value[0] >= 1900 && portal->obj_flags.value[0] <= 1999 && !portal->obj_flags.value[1])) {
+  if (!IS_MOB(ch) 
+      && (affected_by_spell(ch, FUCK_PTHIEF) 
+          || affected_by_spell(ch, FUCK_GTHIEF) 
+          || IS_AFFECTED(ch, AFF_CHAMPION)
+         ) 
+      && (IS_SET(world[real_room(portal->obj_flags.value[0])].room_flags, CLAN_ROOM) 
+          || (portal->obj_flags.value[0] >= 1900 && portal->obj_flags.value[0] <= 1999 && !portal->obj_flags.value[1])
+         )
+     ) 
+    {
     send_to_char("The portal's destination rebels against you.\r\n", ch);
     act("$n finds $mself unable to enter!", ch, 0, 0, TO_ROOM, 0);
     return eFAILURE;
