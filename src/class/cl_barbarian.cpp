@@ -1,5 +1,5 @@
 /************************************************************************
- * $Id: cl_barbarian.cpp,v 1.110 2009/11/27 20:20:08 jhhudso Exp $
+ * $Id: cl_barbarian.cpp,v 1.111 2009/12/20 11:59:38 kkoons Exp $
  * cl_barbarian.cpp
  * Description: Commands for the barbarian class.
  *************************************************************************/
@@ -1191,14 +1191,20 @@ int do_knockback(struct char_data *ch, char *argument, int cmd)
        sprintf(buf2, "%s smashes into %s for | damage and sends $S ass reeling to the %s.", GET_NAME(ch), GET_SHORT(victim), dirs[dir]);
        sprintf(buf, "%s smashes into %s and sends $S ass reeling to the %s.", GET_NAME(ch), GET_SHORT(victim), dirs[dir]);
        send_damage(buf2, ch, 0, victim, dammsg, buf, TO_ROOM);
-       if(victim->fighting) {
-          if(IS_NPC(victim)) {
+
+       if(victim->fighting) 
+       {
+          if(IS_NPC(victim)) 
+          {
              add_memory(victim, GET_NAME(ch), 'h');
              remove_memory(victim, 'f');
           }
-          stop_fighting(victim);
-          if(ch->fighting == victim)
-             stop_fighting(ch);
+
+         CHAR_DATA *tmp;
+         for(tmp = world[ch->in_room].people;tmp;tmp = tmp->next_in_room)
+           if (tmp->fighting == victim)
+             stop_fighting(tmp);
+         stop_fighting(victim);
        }
        move_char(victim, (world[(ch)->in_room].dir_option[dir])->to_room);
     }
