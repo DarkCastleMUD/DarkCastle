@@ -578,7 +578,7 @@ void load_hints()
 {
    FILE *fl;
    int num;
-   char *buf;
+   char *buf = NULL;
 
    if(!(fl = dc_fopen(HINTS_FILE, "r"))) {
       log("Error opening the hint file", IMMORTAL, LOG_MISC);
