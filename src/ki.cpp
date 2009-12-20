@@ -3,7 +3,7 @@
  * Morcallen 12/18
  *
  */
-/* $Id: ki.cpp,v 1.88 2009/11/16 08:16:31 jhhudso Exp $ */
+/* $Id: ki.cpp,v 1.89 2009/12/20 11:59:50 kkoons Exp $ */
 
 extern "C"
 {
@@ -424,18 +424,22 @@ int ki_blast( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
       act(buf, ch, 0, vict, TO_CHAR, 0);
       act("$n's vicious blast throws you out of the room!", ch, 0,
          vict, TO_VICT, 0);
+
 	 
-      if (vict->fighting) {
-         if (IS_NPC(vict)) {
-            add_memory(vict, GET_NAME(ch), 'h');
-            remove_memory(vict, 'f');
-            }
-         stop_fighting(vict);
-//         if (IS_NPC(ch)) /* This shouldn't ever happen */
-  //          add_memory(ch, GET_NAME(vict), 't');
-         if (ch->fighting == vict)
-            stop_fighting(ch);
-         }
+      if (vict->fighting) 
+      {
+        if (IS_NPC(vict)) 
+        {
+          add_memory(vict, GET_NAME(ch), 'h');
+          remove_memory(vict, 'f');
+        }
+        CHAR_DATA *tmp;
+        for(tmp = world[ch->in_room].people;tmp;tmp = tmp->next_in_room)
+          if (tmp->fighting == vict)
+            stop_fighting(tmp);
+        stop_fighting(vict);
+      }
+
       move_char(vict, (world[(ch)->in_room].dir_option[exit])->to_room);
       GET_POS(vict) = POSITION_SITTING;
       return eSUCCESS;
