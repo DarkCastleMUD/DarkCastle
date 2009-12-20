@@ -20,7 +20,7 @@
  * 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead *
  * of just race stuff                                                     *
  **************************************************************************
- * $Id: fight.cpp,v 1.556 2009/12/02 02:23:56 kkoons Exp $               *
+ * $Id: fight.cpp,v 1.557 2009/12/20 12:00:40 kkoons Exp $               *
  **************************************************************************/
 
 extern "C"
@@ -3670,7 +3670,7 @@ void stop_fighting(CHAR_DATA * ch, int clearlag)
   
   if (!ch->fighting)
     return;
-  
+ 
   // This is in the command interpreter now, so berserk lasts
   // until you are totally done fighting.
   // -Sadus
@@ -6282,7 +6282,16 @@ int can_be_attacked(CHAR_DATA *ch, CHAR_DATA *vict)
       send_to_char("There is no safe haven from an angry IMP!\n\r", vict);
       return TRUE;
     }
-    
+   
+    if(vict->fighting == ch)
+    {
+      /*
+      This happens when someone with CQ is defending himself from people without CQ,
+      if they are already in combat, a riposte or similar will cause this. 
+      */
+      return TRUE; 
+    }
+
     send_to_char("No fighting permitted in a safe room.\n\r", ch);
     stop_fighting(ch);
     return FALSE;
