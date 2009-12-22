@@ -20,7 +20,7 @@
  * 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead *
  * of just race stuff                                                     *
  **************************************************************************
- * $Id: fight.cpp,v 1.558 2009/12/22 07:38:13 kkoons Exp $               *
+ * $Id: fight.cpp,v 1.559 2009/12/22 22:07:25 kkoons Exp $               *
  **************************************************************************/
 
 extern "C"
@@ -3672,23 +3672,6 @@ void stop_fighting(CHAR_DATA * ch, int clearlag)
     return;
 
 
-  if(IS_SET(world[ch->in_room].room_flags, SAFE))
-  {
-    CHAR_DATA *dbgch = NULL;
-    if(NULL != (dbgch = get_active_pc("Rubicon"))) 
-    {
-       char fightin[MAX_STRING_LENGTH];
-       if(!ch->fighting)
-         strcpy(fightin, "Nobody");
-       else
-         strcpy(fightin, GET_NAME(ch->fighting));
-
-       csendf(dbgch, "Stop_Fighting(%s) -> fighting (%s)\r\n", GET_NAME(ch), fightin);
-       sprintf(fightin, "0.%s", GET_NAME(ch));
-       do_showbits(dbgch, fightin, 9); 
-    }
-    dbgch = NULL; 
-  }
   // This is in the command interpreter now, so berserk lasts
   // until you are totally done fighting.
   // -Sadus
@@ -6311,7 +6294,18 @@ int can_be_attacked(CHAR_DATA *ch, CHAR_DATA *vict)
     }
 
     send_to_char("No fighting permitted in a safe room.\n\r", ch);
-    stop_fighting(ch);
+
+    if(ch->fighting == vict)
+    {
+      /*
+      This check is to only stop fighting if the person the ch is trying to fight
+      is not the person they're currently fighting.
+      Otherwise they can trigger a stop_fighting just by trying to attack someone
+      that they can't attack while attacking someone else.
+      */
+      stop_fighting(ch);
+    }
+
     return FALSE;
   }
   return TRUE;
