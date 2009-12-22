@@ -20,7 +20,7 @@
  * 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead *
  * of just race stuff                                                     *
  **************************************************************************
- * $Id: fight.cpp,v 1.557 2009/12/20 12:00:40 kkoons Exp $               *
+ * $Id: fight.cpp,v 1.558 2009/12/22 07:38:13 kkoons Exp $               *
  **************************************************************************/
 
 extern "C"
@@ -3670,7 +3670,25 @@ void stop_fighting(CHAR_DATA * ch, int clearlag)
   
   if (!ch->fighting)
     return;
- 
+
+
+  if(IS_SET(world[ch->in_room].room_flags, SAFE))
+  {
+    CHAR_DATA *dbgch = NULL;
+    if(NULL != (dbgch = get_active_pc("Rubicon"))) 
+    {
+       char fightin[MAX_STRING_LENGTH];
+       if(!ch->fighting)
+         strcpy(fightin, "Nobody");
+       else
+         strcpy(fightin, GET_NAME(ch->fighting));
+
+       csendf(dbgch, "Stop_Fighting(%s) -> fighting (%s)\r\n", GET_NAME(ch), fightin);
+       sprintf(fightin, "0.%s", GET_NAME(ch));
+       do_showbits(dbgch, fightin, 9); 
+    }
+    dbgch = NULL; 
+  }
   // This is in the command interpreter now, so berserk lasts
   // until you are totally done fighting.
   // -Sadus
