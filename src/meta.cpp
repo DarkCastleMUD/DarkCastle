@@ -529,7 +529,7 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
   sbyte *pstat = '\0';
   int pprice = 0;
 
-  if((cmd != 59) && (cmd != 56))
+  if((cmd != CMD_LIST) && (cmd != CMD_BUY))
     return eFAILURE;
 
   if (IS_AFFECTED(ch, AFF_BLIND))
