@@ -8,6 +8,10 @@
 #include <connect.h>
 #include <levels.h>
 
+#ifdef __CYGWIN__
+#include <crypt.h>
+#endif
+
 using namespace std;
 using namespace XmlRpc;
 

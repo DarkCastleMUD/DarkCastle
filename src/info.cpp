@@ -12,7 +12,7 @@
  * This is free software and you are benefitting.	We hope that you    *
  * share your changes too.  What goes around, comes around. 		    *
  ****************************************************************************/
-/* $Id: info.cpp,v 1.196 2009/11/05 04:37:57 jhhudso Exp $ */
+/* $Id: info.cpp,v 1.197 2009/12/24 07:25:14 jhhudso Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -1762,6 +1762,14 @@ int do_time(struct char_data *ch, char *argument, int cmd)
    if(!pTime)
       return eFAILURE;
 
+#ifdef __CYGWIN__
+   sprintf(buf, "The system time is %d/%d/%d (%d:%02d)\n\r",
+	   pTime->tm_mon+1,
+	   pTime->tm_mday,
+	   pTime->tm_year+1900,
+	   pTime->tm_hour,
+	   pTime->tm_min);
+#else
    sprintf(buf, "The system time is %d/%d/%d (%d:%02d) %s\n\r",
 	   pTime->tm_mon+1,
 	   pTime->tm_mday,
@@ -1769,6 +1777,7 @@ int do_time(struct char_data *ch, char *argument, int cmd)
 	   pTime->tm_hour,
 	   pTime->tm_min,
 	   pTime->tm_zone);
+#endif
    send_to_char(buf, ch);
 
    ct -= start_time;

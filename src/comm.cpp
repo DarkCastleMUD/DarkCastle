@@ -66,7 +66,7 @@
 #include <sstream>
 #include <iostream>
 #include <list>
-#include <xmlrpc.h>
+#include <dc_xmlrpc.h>
 
 struct multiplayer {
   char *host;
@@ -1698,7 +1698,7 @@ int new_descriptor(int s)
 {
   socket_t desc;
 #ifndef WIN32
-  unsigned int i;
+  socklen_t i;
 #else
   int i;
 #endif

@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: wizard.cpp,v 1.71 2009/06/26 01:33:52 shane Exp $
+| $Id: wizard.cpp,v 1.72 2009/12/24 07:25:14 jhhudso Exp $
 | wizard.C
 | Description:  Utility functions necessary for wiz commands.
 */
@@ -1660,15 +1660,24 @@ void begin_hunt(int item, int duration, int amount, char *huntname)
 
   if(NULL != pTime)
   {
-     
-     snprintf(tmp, strlen(tmp)+1, "%d/%d/%d (%d:%02d) %s\n\r",
+#ifdef __CYGWIN__  
+     snprintf(tmp, strlen(tmp)+1, "%d/%d/%d (%d:%02d)\n\r",
+           pTime->tm_mon+1,
+	   pTime->tm_mday,
+	   pTime->tm_year+1900,
+	   pTime->tm_hour,
+	   pTime->tm_min);
+#else
+	 snprintf(tmp, strlen(tmp)+1, "%d/%d/%d (%d:%02d) %s\n\r",
            pTime->tm_mon+1,
 	   pTime->tm_mday,
 	   pTime->tm_year+1900,
 	   pTime->tm_hour,
 	   pTime->tm_min,
 	   pTime->tm_zone);
+#endif
   }
+
   
   
   if (item == 76) init_random_hunt_items(n);

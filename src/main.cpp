@@ -34,6 +34,7 @@ void boot_world(void);
 
 int main(int argc, char **argv)
 {
+#ifndef __CYGWIN__
   // Make a copy of our executable so that in the event of a crash we have a
   // known good copy to debug with.
   stringstream cmd;
@@ -42,6 +43,7 @@ int main(int argc, char **argv)
     cerr << "Unable to make backup of executable due to system error: "
 	 << retval << endl;
   }
+#endif
 
   fprintf(stderr, "Arguments: ");
   orig_argv = argv;
