@@ -1,6 +1,6 @@
 #include <iostream>
 #include <unistd.h>
-#include <xmlrpc.h>
+#include <dc_xmlrpc.h>
 #include <string.h>
 
 #include <character.h>
