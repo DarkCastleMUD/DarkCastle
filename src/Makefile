@@ -16,6 +16,7 @@ PROF_FLAGS = $(DEBUG_FLAGS) -pg
 #Changed when we switched to Linux Mandrake - Pir
 #LDFLAGS = -lstdc++ -lcrypt -lgcc -lm -lc -lg -lWiz -lClass
 LDFLAGS = -L/emul/linux/x86/lib -L/usr/local/lib32 -lcrypt -lmcheck -lz -lpq -lXmlRpc
+CYGWIN_LDFLAGS = -L/emul/linux/x86/lib -L/usr/local/lib32 -lcrypt -lz -lpq /usr/local/lib/libXmlRpc.a
 IN_CXXFLAGS = -Wall -I./include -DLINUX -m32 -Wno-write-strings -I/usr/include/pgsql/
 
 BASENAME = research# Base product name -- NO SPACES
@@ -29,6 +30,7 @@ default:
 	@echo "Type make followed by one of:"
 	@echo ""
 	@echo "debug	Make with debug libraries/flags"
+	@echo "cygwin     Make with debug libraries/flags on cygwin"
 	@echo "simple	Make with no libraries/flags"
 	@echo "fast	Make with optimization flags"
 	@echo "profile  Make with debug & profile libraries/flags"
@@ -36,8 +38,12 @@ default:
 
 profile:
 	@$(MAKE) darkcastle PROGNAME=$(BASENAME).prof CXXFLAGS="$(IN_CXXFLAGS) $(PROF_FLAGS)"
+
 debug:
 	@$(MAKE) darkcastle PROGNAME=$(BASENAME).debug CXXFLAGS="$(IN_CXXFLAGS) $(DEBUG_FLAGS)"
+
+cygwin:
+	@$(MAKE) cygwin_darkcastle PROGNAME=$(BASENAME)_debug.exe CXXFLAGS="$(IN_CXXFLAGS) $(DEBUG_FLAGS) -fpack-struct=4"
 
 simple:
 	@$(MAKE) darkcastle PROGNAME=$(BASENAME).simple CXXFLAGS=$(IN_CXXFLAGS)
@@ -48,6 +54,9 @@ fast:
 
 darkcastle: $(OBJS)
 	$(CXX) $(CXXFLAGS) $(LIBDIRS) -o $(PROGNAME) $(OBJS) $(LDFLAGS)
+
+cygwin_darkcastle: $(OBJS)
+	$(CXX) $(CXXFLAGS) $(LIBDIRS) -o $(PROGNAME) $(OBJS) $(CYGWIN_LDFLAGS)
 
 # Now for the library makefile calls
 #WizLib:
