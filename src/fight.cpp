@@ -20,7 +20,7 @@
  * 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead *
  * of just race stuff                                                     *
  **************************************************************************
- * $Id: fight.cpp,v 1.559 2009/12/22 22:07:25 kkoons Exp $               *
+ * $Id: fight.cpp,v 1.560 2009/12/27 23:25:41 jhhudso Exp $               *
  **************************************************************************/
 
 extern "C"
@@ -5263,37 +5263,10 @@ int64 scale_char_xp(CHAR_DATA *ch, CHAR_DATA *killer, CHAR_DATA *victim,
                   int64 base_xp, int64 *bonus_xp)
 {
     long scaled_share;
-    long levelmod;
-    long bonus_multiplier, bonus_percentage;
+    *bonus_xp = 0;
 
-    if(no_killers < 2) {
-       /* solo kill */
-       levelmod = GET_LEVEL(ch) - GET_LEVEL(victim);
-//       if (levelmod <= 15)
-          scaled_share = base_xp;
-  /*     else if (levelmod <= 25)
-          scaled_share = (base_xp * 75) / 100;
-       else
-          scaled_share = (base_xp * 50) / 100;*/
-       *bonus_xp = 0;
-    } else {
-       /* group kill */
-       if (no_killers > 6)
-          /* no extra bonus for more than 6 killers */
-          no_killers = 6;
-       bonus_percentage = 5 * (no_killers - 1);
-       if (highest_level - GET_LEVEL(victim) <= 0)
-          *bonus_xp = (base_xp * no_killers * bonus_percentage) / 100;
-       else {
-          bonus_multiplier = bonus_percentage - ((highest_level - GET_LEVEL(victim)) * (no_killers - 1)) / 3;
-          if (bonus_multiplier < 0)
-             bonus_multiplier = 0;
-          *bonus_xp = (base_xp * no_killers * bonus_multiplier) / 100;
-       }
-
-       scaled_share = ((base_xp + *bonus_xp) * GET_LEVEL(ch)) / total_levels;
-    }
-
+	scaled_share = ((base_xp + *bonus_xp) * GET_LEVEL(ch)) / total_levels;
+ 
     if (scaled_share > (GET_LEVEL(ch) * 8000))
        scaled_share = GET_LEVEL(ch) * 8000;
 
