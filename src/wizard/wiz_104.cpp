@@ -361,9 +361,9 @@ int show_zone_commands(struct char_data *ch, int i, int start = 0)
 
 
   sprintf(buf, "$3Name$R: %s\r\n"
-               "$3Starts$R:   %6d $3Ends$R:  %13d     $3Continent:$R %s\n\r"
-               "$3Lifetime$R: %6d $3Age$R:   %13d     $3Left$R:   %6d\r\n" 
-               "$3PC'sInZone$R: %4d $3Mode$R: %-18s $3Flags$R: ",
+               "$3Starts$R:    %6d $3Ends$R:  %13d     $3Continent:$R %s\n\r"
+               "$3Lifetime$R:  %6d $3Age$R:   %13d     $3Left$R:   %6d\r\n" 
+               "$3PC'sInZone$R:  %4d $3Mode$R: %-18s $3Flags$R: ",
                     zone_table[i].name, 
                     (i ? (zone_table[i - 1].top + 1) : 0), 
                     zone_table[i].top,
@@ -377,12 +377,13 @@ int show_zone_commands(struct char_data *ch, int i, int start = 0)
   sprintbit(zone_table[i].zone_flags, zone_bits, buf);
   send_to_char(buf, ch);
   sprintf(buf,"\r\n"
-               "$3MobsLastPop$R: %3d $3DeathCounter$R: %6d     $3ReduceCounter$R: %d\r\n"
-               "$3DiedThisTick$R: %d\r\n",
+               "$3MobsLastPop$R:  %3d $3DeathCounter$R: %6d     $3ReduceCounter$R: %d\r\n"
+               "$3DiedThisTick$R: %3d $3Repops Without Deaths$R: %d\r\n",
                     zone_table[i].num_mob_on_repop,
                     zone_table[i].death_counter,
                     zone_table[i].counter_mod,
-                    zone_table[i].died_this_tick);
+                    zone_table[i].died_this_tick,
+                    zone_table[i].repops_without_deaths);
   send_to_char(buf, ch);
   send_to_char("\r\n", ch);
 
