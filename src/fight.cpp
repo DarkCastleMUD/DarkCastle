@@ -20,7 +20,7 @@
  * 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead *
  * of just race stuff                                                     *
  **************************************************************************
- * $Id: fight.cpp,v 1.560 2009/12/27 23:25:41 jhhudso Exp $               *
+ * $Id: fight.cpp,v 1.561 2009/12/28 00:22:51 jhhudso Exp $               *
  **************************************************************************/
 
 extern "C"
@@ -5198,7 +5198,7 @@ void group_gain(CHAR_DATA * ch, CHAR_DATA * victim)
     tmp_ch = loop_followers(&f);
   }
   while(tmp_ch);
-  getAreaData( world[victim->in_room].zone ,mob_index[victim->mobdata->nr].virt, total_share,GET_GOLD(victim));
+  getAreaData( world[victim->in_room].zone, mob_index[victim->mobdata->nr].virt, total_share, GET_GOLD(victim));
 }
 
 /* find the highest level present at the kill */
