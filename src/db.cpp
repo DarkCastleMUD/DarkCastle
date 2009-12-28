@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.198 2009/12/28 01:21:11 jhhudso Exp $ */
+/* $Id: db.cpp,v 1.199 2009/12/28 02:08:51 jhhudso Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -4256,8 +4256,7 @@ int is_empty(int zone_nr)
     struct descriptor_data *i;
 
     for (i = descriptor_list; i; i = i->next)
-    if (!i->connected)
-        if (world[i->character->in_room].zone == zone_nr)
+    if (STATE(i) == CON_PLAYING && i->character && world[i->character->in_room].zone == zone_nr)
         return(0);
 
     return(1);
