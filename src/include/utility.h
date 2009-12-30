@@ -16,7 +16,7 @@
  *  10/21/2003   Onager    Changed IS_ANONYMOUS() to handle mobs without   *
  *                         crashing                                        *
  ***************************************************************************/
-/* $Id: utility.h,v 1.91 2009/11/27 07:09:58 jhhudso Exp $ */
+/* $Id: utility.h,v 1.92 2009/12/30 23:44:36 kkoons Exp $ */
 
 #ifndef UTILITY_H_
 #define UTILITY_H_
@@ -32,6 +32,7 @@ extern "C" {
 #include "memory.h"
 #include "player.h"
 #include <string>
+#include <vector>
 
 extern struct weather_data weather_info;
 extern char log_buf[MAX_STRING_LENGTH];
@@ -408,6 +409,8 @@ void do_start(CHAR_DATA *ch);
 void update_pos( CHAR_DATA *victim );
 void clear_object(struct obj_data *obj);
 void death_cry( CHAR_DATA *ch );
+std::vector<std::string> splitstring(std::string splitme, std::string delims, bool ignore_empty = false);
+std::string joinstring(std::vector<std::string> joinme, std::string delims, bool ignore_empty = false);
 
 void add_follower( CHAR_DATA *ch, CHAR_DATA *leader, int cmd);
 void send_to_outdoor( char *messg );
