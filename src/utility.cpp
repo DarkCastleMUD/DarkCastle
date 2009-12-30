@@ -17,7 +17,7 @@
  *                         except Pir and Valk                             *
  * 10/19/2003   Onager     Took out super-secret hidey code from CAN_SEE() *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.113 2009/11/14 08:22:28 jhhudso Exp $ */
+/* $Id: utility.cpp,v 1.114 2009/12/30 23:44:21 kkoons Exp $ */
 
 extern "C"
 {
@@ -55,7 +55,6 @@ extern "C"
 #include <fight.h>
 #include <returnvals.h>
 #include <set.h>
-
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -2304,6 +2303,66 @@ bool champion_can_go(int room)
   }
 
   return true;
+}
+
+/*
+splitstring
+This function does NOT ignore empty strings unless you tell it to.
+example:
+splitstring("string  with 2 spaces", " ")
+returns:
+"string"
+""
+"with"
+"2"
+"spaces"
+
+If you do not want this behavior, include a third argument as true.
+splitstring("string  with 2 spaces", " ", true)
+*/
+vector<string> splitstring(string splitme, string delims, bool ignore_empty)
+{
+  vector<std::string> result;
+  unsigned int splitter;
+  while( (splitter = splitme.find_first_of(delims)) != splitme.npos)
+  {
+    if(ignore_empty && splitter > 0)
+      result.push_back(splitme.substr(0,splitter));
+    splitme = splitme.substr(splitter+1);
+  }
+  if(ignore_empty && splitme.length() > 0)
+    result.push_back(splitme);
+  return result;
+}
+
+/*
+joinstring
+This function does NOT ignore empty strings unless you tell it to.
+example:
+joinstring("hi" "im" "" "some" "vector", ",")
+returns:
+"hi,im,,some,vector"
+
+If you do not want this behavior, include a third argument as true.
+joinstring(somevectorofstrings, ",", true)
+*/
+string joinstring(vector<string> joinme, string delims, bool ignore_empty)
+{
+  string result;
+  unsigned int i = 0;
+  unsigned int joined = 0;
+  for(i = 0; i < joinme.size(); i++)
+  {
+    if(ignore_empty && joinme[i].empty())
+      continue;
+
+    if(joined > 0)
+      result += delims;
+
+    result += joinme[i];
+    joined++;
+  }
+  return result;
 }
 
 bool class_can_go(int ch_class, int room)
