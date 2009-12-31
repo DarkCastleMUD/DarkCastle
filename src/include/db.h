@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: db.h,v 1.33 2009/12/28 01:21:11 jhhudso Exp $ */
+/* $Id: db.h,v 1.34 2009/12/31 05:00:42 jhhudso Exp $ */
 #ifndef DB_H_
 #define DB_H_
 
@@ -219,7 +219,8 @@ struct zone_data
     int clanowner;
     int gold;	// gold (possibly the most descriptive comment of all time)
     int continent;	     // what continent the zone belongs to
-    int repops_without_deaths;
+  int repops_without_deaths; // Number of repops in a row with no deaths
+  int repops_with_bonus;     // Number of repops where a 10% bonus occurred.
 };
 
 

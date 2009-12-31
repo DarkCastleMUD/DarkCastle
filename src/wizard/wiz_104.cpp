@@ -378,12 +378,13 @@ int show_zone_commands(struct char_data *ch, int i, int start = 0)
   send_to_char(buf, ch);
   sprintf(buf,"\r\n"
                "$3MobsLastPop$R:  %3d $3DeathCounter$R: %6d     $3ReduceCounter$R: %d\r\n"
-               "$3DiedThisTick$R: %3d $3Repops Without Deaths$R: %d\r\n",
-                    zone_table[i].num_mob_on_repop,
-                    zone_table[i].death_counter,
-                    zone_table[i].counter_mod,
-                    zone_table[i].died_this_tick,
-                    zone_table[i].repops_without_deaths);
+               "$3DiedThisTick$R: %3d $3Repops without Deaths$R: %d Repops with bonus: %d\r\n",
+	  zone_table[i].num_mob_on_repop,
+	  zone_table[i].death_counter,
+	  zone_table[i].counter_mod,
+	  zone_table[i].died_this_tick,
+	  zone_table[i].repops_without_deaths,
+	  zone_table[i].repops_with_bonus);
   send_to_char(buf, ch);
   send_to_char("\r\n", ch);
 
