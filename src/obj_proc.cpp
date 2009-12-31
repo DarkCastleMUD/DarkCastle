@@ -418,9 +418,15 @@ int hooktippedsteelhalberd(CHAR_DATA *ch, struct obj_data *obj, int cmd,
    if (i >= eq_max_damage(victim->equipment[which]))
      eq_destroyed(victim, victim->equipment[which], which);
    else {
+     if(obj_index[obj->item_number].virt == 17904) {
+      act("$n's diamond war club cracks your $p!", ch, victim->equipment[which], victim, TO_VICT, 0 );
+      act("$n smashes $m diamond war club into $N's $p and cracks it!",ch,victim->equipment[which],victim, TO_ROOM, NOTVICT);
+      act("You smash your club into $N's $p, and manage to crack it!",ch,victim->equipment[which],victim,TO_CHAR,0);
+     } else {
       act("$n's hook-tipped steel halberd tears your $p!", ch, victim->equipment[which], victim, TO_VICT, 0 );
       act("$n latches $m hook-tipped steel halberd into $N's $p and tears it!",ch,victim->equipment[which],victim, TO_ROOM, NOTVICT);
       act("You latch your halberd into $N's $p, and manage to tear it!",ch,victim->equipment[which],victim,TO_CHAR,0);
+     }
     }
    return eSUCCESS;
 }

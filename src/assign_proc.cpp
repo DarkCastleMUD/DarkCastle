@@ -645,6 +645,7 @@ void assign_objects(void)
   assign_one_obj_com(8208,   shield_combat_procs);
   assign_one_obj_com(9520,   dk_rend);
   assign_one_obj_com(9565, hooktippedsteelhalberd);
+  assign_one_obj_com(17904, hooktippedsteelhalberd);
   assign_one_obj_com(10001,  holyavenger);
   assign_one_obj_com(26807,  goldenbatleth);
   assign_one_obj_com(30627,  eliara_combat);
