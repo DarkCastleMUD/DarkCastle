@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.202 2009/12/31 05:26:35 jhhudso Exp $ */
+/* $Id: db.cpp,v 1.203 2010/01/01 03:03:14 jhhudso Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -4239,13 +4239,13 @@ void reset_zone(int zone)
     zone_table[zone].age = 0;
 
     if (zone_table[zone].repops_without_deaths > 2 && zone_table[zone].repops_without_deaths < 7 && zone_table[zone].repops_with_bonus < 4) {
-	zone_table[zone].repops_with_bonus++;
+      zone_table[zone].repops_with_bonus++;
 
-	for (char_data *tmp_victim = character_list; tmp_victim && tmp_victim != (char_data *)0x95959595; tmp_victim = tmp_victim->next) {
-	  if (IS_NPC(tmp_victim) && world[tmp_victim->in_room].zone == zone) {
-	    tmp_victim->gold *= 1.10;
-	  }
-	}
+      for (char_data *tmp_victim = character_list; tmp_victim && tmp_victim != (char_data *)0x95959595; tmp_victim = tmp_victim->next) {
+        if (IS_NPC(tmp_victim) && ! ISSET(tmp_victim->mobdata->actflags, ACT_NO_GOLD_BONUS) && world[tmp_victim->in_room].zone == zone) {
+          tmp_victim->gold *= 1.10;
+        }
+      }
     }
 }
 

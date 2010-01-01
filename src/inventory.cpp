@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.116 2009/06/26 01:33:50 shane Exp $
+| $Id: inventory.cpp,v 1.117 2010/01/01 03:03:14 jhhudso Exp $
 | inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
@@ -253,6 +253,13 @@ void get(struct char_data *ch, struct obj_data *obj_object, struct obj_data *sub
 	  save_clans();
 	} else
 	GET_GOLD(ch) += obj_object->obj_flags.value[0];
+
+  // If a mob gets gold, we disable its ability to receive a gold bonus. This keeps
+  // the mob from turning into an interest bearing savings account. :)
+  if (IS_NPC(ch)) {
+    SETBIT(ch->mobdata->actflags, ACT_NO_GOLD_BONUS);
+  }
+
 	if (tax)
 	 sprintf(buffer, "%s. %d gold remaining.\r\n",buffer, obj_object->obj_flags.value[0]);
 	else sprintf(buffer, "%s\r\n",buffer);
@@ -1480,6 +1487,14 @@ int do_give(struct char_data *ch, char *argument, int cmd)
          }
       }
       GET_GOLD(vict) += amount;
+
+      // If a mob is given gold, we disable its ability to receive a gold bonus. This keeps
+      // the mob from turning into an interest bearing savings account. :)
+      if (IS_NPC(vict)) {
+        SETBIT(vict->mobdata->actflags, ACT_NO_GOLD_BONUS);
+      }
+
+
       do_save(ch, "", 10);
       do_save(vict, "", 10);
       // bribe trigger automatically removes any gold given to mob

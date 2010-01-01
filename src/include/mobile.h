@@ -1,7 +1,7 @@
 #ifndef MOBILE_H_
 #define MOBILE_H_
 /************************************************************************
-| $Id: mobile.h,v 1.31 2008/07/11 14:43:08 dcastle Exp $
+| $Id: mobile.h,v 1.32 2010/01/01 03:03:14 jhhudso Exp $
 | mobile.h
 | Description:  This file contains the header information for mobile
 |   control.
@@ -52,20 +52,21 @@ char *getTemp(CHAR_DATA *ch, char *name);
 #define ACT_RACIST          21
 #define ACT_FRIENDLY        22
 #define ACT_STAY_NO_TOWN    23
-#define ACT_NOMAGIC 	    24
+#define ACT_NOMAGIC         24
 #define ACT_DRAINY          25
-#define ACT_BARDCHARM	    26
-#define ACT_NOKI	    27
-#define ACT_NOMATRIX	    28
-#define ACT_BOSS 	    29
+#define ACT_BARDCHARM       26
+#define ACT_NOKI            27
+#define ACT_NOMATRIX        28
+#define ACT_BOSS            29
 #define ACT_NOHEADBUTT      30
 #define ACT_NOATTACK        31
 //#define CHECKTHISACT      32 //Do not change unless ASIZE changes
 #define ACT_SWARM           33
 #define ACT_TINY            34
-#define ACT_NODISPEL	    35
+#define ACT_NODISPEL        35
 #define ACT_POISONOUS       36
-#define ACT_MAX             36
+#define ACT_NO_GOLD_BONUS   37
+#define ACT_MAX             37
 //#define CHECKTHISACT      64 //Do not chance unless ASIZE changes
 
 struct race_shit

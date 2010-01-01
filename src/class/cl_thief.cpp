@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.199 2009/10/25 19:56:07 jhhudso Exp $
+| $Id: cl_thief.cpp,v 1.200 2010/01/01 03:03:14 jhhudso Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -1733,6 +1733,13 @@ int do_slip(struct char_data *ch, char *argument, int cmd)
             GET_GOLD(ch) -= amount;
       
          GET_GOLD(vict) += amount;
+
+         // If a mob is given gold, we disable its ability to receive a gold bonus. This keeps
+         // the mob from turning into an interest bearing savings account. :)
+         if (IS_NPC(vict)) {
+           SETBIT(vict->mobdata->actflags, ACT_NO_GOLD_BONUS);
+         }
+
          do_save(ch, "", 9);
          save_char_obj(vict);
          }

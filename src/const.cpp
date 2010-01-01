@@ -12,7 +12,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: const.cpp,v 1.326 2009/11/06 07:28:34 jhhudso Exp $ */
+/* $Id: const.cpp,v 1.327 2010/01/01 03:03:13 jhhudso Exp $ */
 
 extern "C"
 {
@@ -2024,6 +2024,7 @@ char
     "IS_TINY",
     "NODISPEL",
     "POISONOUS",
+    "NO_GOLD_BONUS",
     "\n"
 };
 
