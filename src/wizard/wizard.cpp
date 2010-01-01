@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: wizard.cpp,v 1.72 2009/12/24 07:25:14 jhhudso Exp $
+| $Id: wizard.cpp,v 1.73 2010/01/01 02:53:16 jhhudso Exp $
 | wizard.C
 | Description:  Utility functions necessary for wiz commands.
 */
@@ -1466,7 +1466,7 @@ struct hunt_data
 };
 
 struct hunt_items
-{ // Bleh, don't wanna make it go through every item in the game everyone someone checks the list
+{ // Bleh, don't wanna make it go through every item in the game everytime someone checks the list
    struct hunt_items *next;
    struct hunt_data *hunt;
    struct obj_data *obj;
