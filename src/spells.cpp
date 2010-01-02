@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.276 2009/11/05 23:28:21 jhhudso Exp $ */
+/* $Id: spells.cpp,v 1.277 2010/01/02 15:29:31 shane Exp $ */
 
 extern "C"
 {
@@ -2198,7 +2198,7 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
       }
 
       if (GET_LEVEL(ch) < ARCHANGEL && !IS_MOB(ch)) {
-        if (GET_MANA(ch) < use_mana(ch, spl)) {
+        if (GET_MANA(ch) < use_mana(ch, spl) * rel) {
 	  if (oldroom) {
 		char_from_room(ch); 
 		char_to_room(ch, oldroom);
