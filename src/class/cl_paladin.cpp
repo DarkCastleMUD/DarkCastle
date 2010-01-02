@@ -227,7 +227,7 @@ int do_behead(struct char_data *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if(!ch->equipment[WIELD] ||!IS_SET(ch->equipment[WIELD]->obj_flags.extra_flags, ITEM_TWO_HANDED))
+  if(!ch->equipment[WIELD] || !IS_SET(ch->equipment[WIELD]->obj_flags.extra_flags, ITEM_TWO_HANDED) || (ch->equipment[WIELD]->obj_flags.value[3] != 3)) //TYPE_SLASH
   {
     send_to_char("You need to be wielding a two handed sword to behead!\r\n", ch);
     return eFAILURE;
