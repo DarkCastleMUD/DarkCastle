@@ -5,6 +5,7 @@
 #include <iostream>
 #include <map>
 #include <vector>
+#include <queue>
 #include <string>
 #include <libpq-fe.h>
 #include "character.h"
@@ -12,7 +13,7 @@
 
 using namespace std;
 
-#define CONN_OPTS "host=127.0.0.1 dbname=dcastle user=dcastle password=wm42LyP1"
+const char CONN_OPTS[]="host=127.0.0.1 dbname=dcastle user=dcastle password=wm42LyP1";
 
 typedef vector<pair<string, string> > PrepareVector;
 
@@ -51,6 +52,7 @@ class Prepare {
 class Database : public Backend {
  private:
   static PGconn *conn;
+  queue<Prepare> execqueue;
  protected:
 
  public:
@@ -60,6 +62,7 @@ class Database : public Backend {
   Prepare createPrepare(string prepare_id);
   int lookupPlayerID(const char *name);
   int createPlayerID(char *name);  
+  void processqueue(void);
 };
 
 

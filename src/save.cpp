@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: save.cpp,v 1.63 2010/01/04 08:53:21 jhhudso Exp $ */
+/* $Id: save.cpp,v 1.64 2010/01/04 12:49:23 jhhudso Exp $ */
 
 extern "C"
 {
@@ -48,8 +48,11 @@ extern "C"
 #include <iostream>
 #include <libpq-fe.h>
 #include "Backend/Database.h"
-using namespace std;
+
+extern Database db;
 #endif
+
+using namespace std;
 
 extern struct index_data *obj_index;
 extern CWorld world;
@@ -709,7 +712,6 @@ void save_char_obj_db(CHAR_DATA *ch)
   timeval start, finish;
 
   gettimeofday(&start, NULL);
-  Database db;
   db.save(ch, &uchar);
   gettimeofday(&finish, NULL);
 

@@ -16,19 +16,20 @@ Database::Database()
   :Backend()
 {
   if (conn == 0 || PQstatus(conn) != CONNECTION_OK) {
-//    cerr << "Connecting to database..." << endl;
     conn = PQconnectdb(CONN_OPTS);
     if (PQstatus(conn) != CONNECTION_OK) {
       stringstream errormsg;
-      errormsg << "Unable to connect to database in save_char_obj_db: " << PQerrorMessage(conn);
-
-      cerr << errormsg << endl;
+      errormsg << "Unable to connect to database in Database::Database(): " << PQerrorMessage(conn);
       log(errormsg.str().c_str(), ANGEL, LOG_DATABASE);
       return;
     }
-//  } else {
-//    cerr << "Reconnecting..." << endl;
+
+    if (PQsetnonblocking(conn, 1) == 0) {
+      stringstream errormsg;
+      errormsg << "Unable to set database connection non-blocking: " << PQerrorMessage(conn);
+      log(errormsg.str().c_str(), ANGEL, LOG_DATABASE);
     }
+  }
 }
 
   /* PQprepare(conn, "char_file_u_INSERT", "UPDATE players 
@@ -187,10 +188,10 @@ void Database::save(CHAR_DATA *ch, char_file_u *st)
 
 
   p.where("player_id", ch->player_id);
-  p.exec();
+  execqueue.push(p);
   
   // If unable to UPDATE then INSERT a new entry
-  if (p.lastResult) {
+  if (false && p.lastResult) {
     char *buffer = PQcmdTuples(p.lastResult);
     if (buffer && !strcmp("0", buffer)) {
       Prepare p2 = createPrepare("char_file_u_insert");
@@ -218,6 +219,35 @@ CHAR_DATA *Database::load(void)
 
   return 0;
 }
+
+void Database::processqueue(void)
+{
+  PQconsumeInput(conn);
+
+  if (PQisBusy(conn) == false) {
+    PGresult *res = PQgetResult(conn);
+    if (res == NULL) {
+      // We're ready to process a new SQL statement
+      
+      if (execqueue.size() > 0) {
+	Prepare p = execqueue.front();
+	execqueue.pop();
+
+	p.exec();
+      }
+    } else {
+      int status = PQresultStatus(res);
+      if (status != PGRES_COMMAND_OK) {
+	stringstream errormsg;
+	errormsg << "Error in result found in Database::processqueue(): " << status;
+	log(errormsg.str().c_str(), ANGEL, LOG_DATABASE);
+      }
+
+      PQclear(res);
+    }
+  }
+}
+
 
 Prepare Database::createPrepare(string prepareID)
 {
@@ -295,7 +325,7 @@ void Prepare::where(string ws, char *wd)
 void Prepare::exec(void)
 {
   // Number of parameters in the current prepare
-	int nParams = current_prepare.size();
+  int nParams = current_prepare.size();
   if (whereString.size() > 0) {
     nParams++;
   }
@@ -303,8 +333,8 @@ void Prepare::exec(void)
   // Check if prepare exists already
   PGresult *res = Prepare::existing_prepares[prepareID];
 
-	// If not or existing one is bad, create a new one
-	if ((res == 0) || (PQresultStatus(res) != PGRES_COMMAND_OK)) {
+  // If not or existing one is bad, create a new one
+  if ((res == 0) || (PQresultStatus(res) != PGRES_COMMAND_OK)) {
     // Perform update
     string query;
     if (whereString.size() > 0) {
@@ -313,12 +343,12 @@ void Prepare::exec(void)
       query = generateInsertQuery();
     }
     
-		res = PQprepare(conn, prepareID.c_str(), query.c_str(), nParams, NULL);    
-		if (PQresultStatus(res) != PGRES_COMMAND_OK) {
-			cerr << "Error occured trying to prepare SQL: "	<< PQresultErrorMessage(res) << endl;
+    res = PQprepare(conn, prepareID.c_str(), query.c_str(), nParams, NULL);    
+    if (PQresultStatus(res) != PGRES_COMMAND_OK) {
+      cerr << "Error occured trying to prepare SQL: "	<< PQresultErrorMessage(res) << endl;
       PQclear(res);
-			return;
-		}
+      return;
+    }
     
     Prepare::existing_prepares[prepareID] = res;
   }
@@ -326,7 +356,7 @@ void Prepare::exec(void)
   const char * *paramValues = new const char *[nParams];
   int i = 0;
   for(PrepareVector::iterator j=current_prepare.begin(); j != current_prepare.end(); j++) {   	
-		paramValues[i++] = j->second.c_str();
+    paramValues[i++] = j->second.c_str();
   }
   
   // Perform update
@@ -337,11 +367,10 @@ void Prepare::exec(void)
   if (lastResult)
     PQclear(lastResult);
   
-  lastResult = res = PQexecPrepared(this->conn, prepareID.c_str(), nParams, paramValues, NULL, NULL, 0);
-  if (PQresultStatus(res) != PGRES_COMMAND_OK) {
+  //lastResult = res = PQexecPrepared(this->conn, prepareID.c_str(), nParams, paramValues, NULL, NULL, 0);
+  int status = PQsendQueryPrepared(this->conn, prepareID.c_str(), nParams, paramValues, NULL, NULL, 0);
+  if (status == 0) {
     cerr << "Error occured trying to prepare SQL: " << PQresultErrorMessage(res) << endl;
-    delete paramValues;
-	  return;
   }
   
   delete paramValues;

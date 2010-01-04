@@ -63,6 +63,10 @@
 #include <quest.h>
 #include <shop.h>
 
+#ifdef USE_SQL
+#include "Backend/Database.h"
+#endif
+
 #include <sstream>
 #include <iostream>
 #include <list>
@@ -147,6 +151,10 @@ int pulse_time;
 int pulse_short; // short timer, for archery
 
 XmlRpc::XmlRpcServer *xmlrpc_s;
+
+#ifdef USE_SQL
+Database db;
+#endif
 
 /* functions in this file */
 void update_mprog_throws(void);
@@ -801,6 +809,10 @@ void game_loop(unsigned mother_desc, unsigned other_desc, unsigned third_desc, u
 
     // do what needs to be done.  violence, repoping, regen, etc.
     heartbeat();
+
+#ifdef USE_SQL
+    db.processqueue();
+#endif
 
 //gettimeofday(&debugtimer2, NULL);
 //logf(110, LOG_BUG, "Done heartbeat.  Time %dsec %dusec.", 
