@@ -3,6 +3,7 @@
 #include <vector>
 #include <iostream>
 #include <sstream>
+#include <cstring>
 #include "levels.h"
 #include "Database.h"
 
