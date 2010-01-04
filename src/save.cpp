@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: save.cpp,v 1.62 2009/11/07 07:41:28 jhhudso Exp $ */
+/* $Id: save.cpp,v 1.63 2010/01/04 08:53:21 jhhudso Exp $ */
 
 extern "C"
 {
@@ -706,8 +706,17 @@ void save_char_obj_db(CHAR_DATA *ch)
   else
     uchar.load_room = real_room(GET_HOME(ch));
 
+  timeval start, finish;
+
+  gettimeofday(&start, NULL);
   Database db;
   db.save(ch, &uchar);
+  gettimeofday(&finish, NULL);
+
+  int msec = finish.tv_sec*1000 + finish.tv_usec/1000;
+  msec -= start.tv_sec*1000 + start.tv_usec/1000;
+  csendf(ch, "Save took %dms\n\r", msec);
+
 
   /*
   if((fwrite(&uchar, sizeof(uchar), 1, fpsave))               &&
