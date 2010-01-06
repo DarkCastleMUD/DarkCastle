@@ -1586,8 +1586,11 @@ int spell_teleport(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
                ) ||
               ( IS_AFFECTED(victim, AFF_CHAMPION) && ( IS_SET(world[to_room].room_flags, CLAN_ROOM) ||
                 ( to_room >= 1900 && to_room <= 1999 ) )
-              )
-             );
+		) ||
+	      // NPCs can only teleport within the same continent
+	      ( IS_NPC(victim) &&
+		zone_table[world[victim->in_room].zone].continent != zone_table[world[to_room].zone].continent)
+	      );
   }
 
   if((IS_MOB(victim)) && (!IS_MOB(ch)))
@@ -3823,6 +3826,17 @@ int spell_word_of_recall(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct o
      location = real_room(START_ROOM);
   }
 
+  if (zone_table[world[victim->in_room].zone].continent != zone_table[world[location].zone].continent) {
+    if (GET_MANA(victim) < use_mana(victim, skill)) {
+      send_to_char("You don't posses the energy to travel that far.\n\r", victim);
+      return eFAILURE;
+    } else {
+      send_to_char("The long distance drains additional mana from you.\n\r", ch);
+      GET_MANA(victim) -= use_mana(victim, skill);
+    }
+
+  }
+
   if (!IS_NPC(victim) && victim->pcdata->golem && victim->pcdata->golem->in_room == victim->in_room)
   {
 	if (victim->mana < 50)
@@ -3998,6 +4012,11 @@ int spell_summon(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data 
     return eFAILURE;
   }
     
+  if (zone_table[world[ch->in_room].zone].continent != zone_table[world[victim->in_room].zone].continent) {
+    send_to_char("Your magic is not powerful enough for such a distance.\n\r", ch);
+    return eFAILURE;
+  }
+
   act("$n disappears suddenly as a magical summoning draws their being.",victim,0,0,TO_ROOM, INVIS_NULL);
 
   target = ch->in_room;
@@ -6041,6 +6060,11 @@ int spell_portal(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data 
   {
     send_to_char("A portal shimmers into view but is unstable and immediately fades to nothing.\n\r",ch);
     act("A portal shimmers into view but is unstable and immediately fades to nothing.", ch, 0, 0, TO_ROOM, 0);
+    return eFAILURE;
+  }
+  
+  if (zone_table[world[ch->in_room].zone].continent != zone_table[world[victim->in_room].zone].continent) {
+    send_to_char("Your magic is not powerful enough for such a distance.\n\r", ch);
     return eFAILURE;
   }
 
@@ -11224,6 +11248,10 @@ int spell_beacon(ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *vic
      }
    }
 
+   if (zone_table[world[ch->in_room].zone].continent != zone_table[world[ch->beacon->in_room].zone].continent) {
+     send_to_char("Your beacon is not powerful enough for such a distance.\n\r", ch);
+     return eFAILURE;
+   }
 
    if (others_clan_room(ch, &world[ch->beacon->in_room]) == true) {
      send_to_char("You cannot beacon into another clan's hall.\n\r", ch);

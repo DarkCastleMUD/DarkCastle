@@ -17,7 +17,7 @@
  *                         except Pir and Valk                             *
  * 10/19/2003   Onager     Took out super-secret hidey code from CAN_SEE() *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.114 2009/12/30 23:44:21 kkoons Exp $ */
+/* $Id: utility.cpp,v 1.115 2010/01/06 04:54:11 jhhudso Exp $ */
 
 extern "C"
 {
@@ -71,16 +71,17 @@ using namespace std;
 
 #include <map>
 
-extern struct index_data *obj_index;
+extern index_data *obj_index;
 
 // extern vars
-extern struct time_data time_info;
+extern time_data time_info;
 extern CWorld world;
 
 // extern funcs
-struct clan_data * get_clan(struct char_data *);
+clan_data * get_clan(char_data *);
 
-extern struct index_data *mob_index;
+extern index_data *mob_index;
+extern zone_data *zone_table;
 
 void release_message(CHAR_DATA *ch);
 
@@ -1063,7 +1064,7 @@ int do_bug(struct char_data *ch, char *argument, int cmd)
 
 int do_recall( CHAR_DATA *ch, char *argument, int cmd )
 {
-  int location, percent, level, cost, x;
+  int location, percent, level, cost = 0, x;
   CHAR_DATA *victim;
   CHAR_DATA *loop_ch;
   float cf;
@@ -1075,20 +1076,6 @@ int do_recall( CHAR_DATA *ch, char *argument, int cmd )
   int is_mob;
 
   act( "$n prays to $s God for transportation!", ch, 0, 0, TO_ROOM , INVIS_NULL);
-
-  if(!IS_NPC(ch))
-  {
-    x = GET_WIS(ch);
-    percent = number(1, 100);
-    if (percent > x) {
-      percent -= x;
-    }
-
-    if(percent > 50) {
-      send_to_char( "You failed in your recall!\n\r", ch );
-      return eFAILURE;
-    }
-  }
 
   if(IS_AFFECTED(ch, AFF_CHARM))
     return eFAILURE;
@@ -1118,6 +1105,27 @@ int do_recall( CHAR_DATA *ch, char *argument, int cmd )
      send_to_char( "Whom do you want to recall?\n\r", ch );
      return eFAILURE;
   }
+
+  if(!IS_NPC(ch))
+  {
+    x = GET_WIS(ch);
+    percent = number(1, 100);
+    if (percent > x) {
+      percent -= x;
+    }
+
+    // Additional 5% chance of failure when recalling across continents
+    location = GET_HOME(victim);
+    if (location > 0 && zone_table[world[victim->in_room].zone].continent != zone_table[world[location].zone].continent) {
+      percent += 5;
+    }
+
+    if(percent > 50) {
+      send_to_char( "You failed in your recall!\n\r", ch );
+      return eFAILURE;
+    }
+  }
+
 
   if(victim->fighting && !IS_NPC(victim->fighting)) //PvP fight?
   {
@@ -1197,13 +1205,21 @@ int do_recall( CHAR_DATA *ch, char *argument, int cmd )
   {
     cf   = 1 + ((level - 11) * .347f);
     cost = (int)(3440 * cf);
+
+    if (zone_table[world[victim->in_room].zone].continent != zone_table[world[location].zone].continent) {
+      // Cross-continent recalling costs twice as much
+      cost *= 2;
+    }
+
     if (GET_GOLD(ch) < (uint32)cost)
     {
          csendf(ch, "You don't have %d gold!\n\r", cost);
          return eFAILURE;
     }
+
     GET_GOLD(ch) -= cost;
   }
+
    if (IS_AFFECTED(victim, AFF_CURSE) || IS_AFFECTED(victim, AFF_SOLIDITY))
    {
 	send_to_char("Something blocks it.\r\n",ch);

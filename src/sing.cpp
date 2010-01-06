@@ -1741,16 +1741,19 @@ void do_astral_chanty_movement(CHAR_DATA *victim, CHAR_DATA *target)
     return;
   }
 
-
   if (affected_by_spell(victim, FUCK_PTHIEF))
   {
     send_to_char("Your attempt to transport stolen goods through the astral planes fails!\r\n",victim);
     return;
   }
 
+  if (zone_table[world[victim->in_room].zone].continent != zone_table[world[target->in_room].zone].continent) {
+    send_to_char("Your song is not powerful enough for such a distance.\n\r", victim);
+    return;
+  }  
 
   CHAR_DATA *tmpch;
- extern struct obj_data * search_char_for_item(char_data * ch, int16 item_number, bool wearonly = FALSE);
+  extern struct obj_data * search_char_for_item(char_data * ch, int16 item_number, bool wearonly = FALSE);
 
   for (tmpch = world[target->in_room].people; tmpch; tmpch = tmpch->next_in_room)
      if (search_char_for_item(tmpch, real_object(76)) || search_char_for_item(tmpch, real_object(51)))
