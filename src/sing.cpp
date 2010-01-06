@@ -1748,8 +1748,14 @@ void do_astral_chanty_movement(CHAR_DATA *victim, CHAR_DATA *target)
   }
 
   if (zone_table[world[victim->in_room].zone].continent != zone_table[world[target->in_room].zone].continent) {
-    send_to_char("Your song is not powerful enough for such a distance.\n\r", victim);
-    return;
+    if (GET_KI(victim) < use_song(victim, SKILL_SONG_ASTRAL_CHANTY - SKILL_SONG_BASE)) {
+      send_to_char("You don't posses the energy to travel that far.\n\r", victim);
+      GET_KI(victim) += use_song(victim, SKILL_SONG_ASTRAL_CHANTY - SKILL_SONG_BASE);
+      return;
+    } else {
+      send_to_char("The long distance drains additional ki from you.\n\r", victim);
+      GET_KI(victim) -= use_song(victim, SKILL_SONG_ASTRAL_CHANTY - SKILL_SONG_BASE);
+    }
   }  
 
   CHAR_DATA *tmpch;

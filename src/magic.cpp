@@ -3829,12 +3829,12 @@ int spell_word_of_recall(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct o
   if (zone_table[world[victim->in_room].zone].continent != zone_table[world[location].zone].continent) {
     if (GET_MANA(victim) < use_mana(victim, skill)) {
       send_to_char("You don't posses the energy to travel that far.\n\r", victim);
+      GET_MANA(victim) += use_mana(victim, skill);
       return eFAILURE;
     } else {
       send_to_char("The long distance drains additional mana from you.\n\r", ch);
       GET_MANA(victim) -= use_mana(victim, skill);
     }
-
   }
 
   if (!IS_NPC(victim) && victim->pcdata->golem && victim->pcdata->golem->in_room == victim->in_room)
@@ -4013,8 +4013,14 @@ int spell_summon(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data 
   }
     
   if (zone_table[world[ch->in_room].zone].continent != zone_table[world[victim->in_room].zone].continent) {
-    send_to_char("Your magic is not powerful enough for such a distance.\n\r", ch);
-    return eFAILURE;
+    if (GET_MANA(ch) < use_mana(ch, skill)) {
+      send_to_char("You don't posses the energy to travel that far.\n\r", ch);
+      GET_MANA(ch) += use_mana(ch, skill);
+      return eFAILURE;
+    } else {
+      send_to_char("The long distance drains additional mana from you.\n\r", ch);
+      GET_MANA(ch) -= use_mana(ch, skill);
+    }
   }
 
   act("$n disappears suddenly as a magical summoning draws their being.",victim,0,0,TO_ROOM, INVIS_NULL);
@@ -6064,8 +6070,14 @@ int spell_portal(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data 
   }
   
   if (zone_table[world[ch->in_room].zone].continent != zone_table[world[victim->in_room].zone].continent) {
-    send_to_char("Your magic is not powerful enough for such a distance.\n\r", ch);
-    return eFAILURE;
+    if (GET_MANA(ch) < use_mana(ch, skill)) {
+      send_to_char("You don't posses the energy to portal that far.\n\r", ch);
+      GET_MANA(ch) += use_mana(ch, skill);
+      return eFAILURE;
+    } else {
+      send_to_char("The long distance drains additional mana from you.\n\r", ch);
+      GET_MANA(ch) -= use_mana(ch, skill);
+    }
   }
 
   for(portal = world[ch->in_room].contents; portal;
@@ -11249,8 +11261,14 @@ int spell_beacon(ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *vic
    }
 
    if (zone_table[world[ch->in_room].zone].continent != zone_table[world[ch->beacon->in_room].zone].continent) {
-     send_to_char("Your beacon is not powerful enough for such a distance.\n\r", ch);
-     return eFAILURE;
+     if (GET_MANA(ch) < use_mana(ch, skill)) {
+       send_to_char("You don't posses the energy to travel that far.\n\r", ch);
+       GET_MANA(ch) += use_mana(ch, skill);
+       return eFAILURE;
+     } else {
+       send_to_char("The long distance drains additional mana from you.\n\r", ch);
+       GET_MANA(ch) -= use_mana(ch, skill);
+     }
    }
 
    if (others_clan_room(ch, &world[ch->beacon->in_room]) == true) {
