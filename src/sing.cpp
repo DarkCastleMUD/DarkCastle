@@ -1747,17 +1747,6 @@ void do_astral_chanty_movement(CHAR_DATA *victim, CHAR_DATA *target)
     return;
   }
 
-  if (zone_table[world[victim->in_room].zone].continent != zone_table[world[target->in_room].zone].continent) {
-    if (GET_KI(victim) < use_song(victim, SKILL_SONG_ASTRAL_CHANTY - SKILL_SONG_BASE)) {
-      send_to_char("You don't posses the energy to travel that far.\n\r", victim);
-      GET_KI(victim) += use_song(victim, SKILL_SONG_ASTRAL_CHANTY - SKILL_SONG_BASE);
-      return;
-    } else {
-      send_to_char("The long distance drains additional ki from you.\n\r", victim);
-      GET_KI(victim) -= use_song(victim, SKILL_SONG_ASTRAL_CHANTY - SKILL_SONG_BASE);
-    }
-  }  
-
   CHAR_DATA *tmpch;
   extern struct obj_data * search_char_for_item(char_data * ch, int16 item_number, bool wearonly = FALSE);
 
@@ -1820,18 +1809,37 @@ int execute_song_astral_chanty( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA
           }
 
 	if (status != eFAILURE) {
-   	        char_data *next_char = 0;
-  		for (char_data * tmp_char = world[ch->in_room].people; tmp_char; tmp_char = next_char) {
-	    	  next_char = tmp_char->next_in_room;
-	    	  if (!ARE_GROUPED(ch, tmp_char))
-			continue;
+	  // Additional costs for astral chanty across continents
+	  if (zone_table[world[ch->in_room].zone].continent != zone_table[world[victim->in_room].zone].continent) {
+	    if (GET_KI(ch) < use_song(ch, SKILL_SONG_ASTRAL_CHANTY - SKILL_SONG_BASE)) {
+	      send_to_char("You don't posses the energy to travel that far.\n\r", ch);
+	      GET_KI(ch) += use_song(ch, SKILL_SONG_ASTRAL_CHANTY - SKILL_SONG_BASE);
 
-	    	  do_astral_chanty_movement(tmp_char, victim);
-		}
+	      // free our stored char name
+	      if ((*i).song_data) {
+		dc_free((*i).song_data);
+		(*i).song_data = 0;
+	      }
 
-		send_to_char("Your song completes, and your vision fades.\r\n", ch);
-		act("$n's voice fades off into the ether.", ch, 0, 0, TO_ROOM, 0);
-		status = eSUCCESS;
+	      return eFAILURE;
+	    } else {
+	      send_to_char("The long distance drains additional ki from you.\n\r", ch);
+	      GET_KI(ch) -= use_song(ch, SKILL_SONG_ASTRAL_CHANTY - SKILL_SONG_BASE);
+	    }
+	  }  
+
+	  char_data *next_char = 0;
+	  for (char_data * tmp_char = world[ch->in_room].people; tmp_char; tmp_char = next_char) {
+	    next_char = tmp_char->next_in_room;
+	    if (!ARE_GROUPED(ch, tmp_char))
+	      continue;
+	    
+	    do_astral_chanty_movement(tmp_char, victim);
+	  }
+	  
+	  send_to_char("Your song completes, and your vision fades.\r\n", ch);
+	  act("$n's voice fades off into the ether.", ch, 0, 0, TO_ROOM, 0);
+	  status = eSUCCESS;
 	}
     }
 
