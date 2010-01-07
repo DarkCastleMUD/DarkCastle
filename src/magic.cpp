@@ -6070,6 +6070,11 @@ int spell_portal(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data 
   }
   
   if (zone_table[world[ch->in_room].zone].continent != zone_table[world[victim->in_room].zone].continent) {
+    if (number(1,100) < 6) {
+      send_to_char("You lost your concentration!\n\r", ch);
+      return eFAILURE;
+    }
+
     if (GET_MANA(ch) < use_mana(ch, skill)) {
       send_to_char("You don't posses the energy to portal that far.\n\r", ch);
       GET_MANA(ch) += use_mana(ch, skill);
