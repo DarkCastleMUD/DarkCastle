@@ -5812,11 +5812,17 @@ int spell_weaken(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data 
 
     set_cantquit (ch, victim);
 
-    if ((affected_by_spell(victim, SPELL_HEROISM) && affected_by_spell(victim, SPELL_HEROISM)->modifier >= 50) || affected_by_spell(victim, SPELL_PARALYZE) ) {
-   act("$N seems unaffected.", ch, 0, victim, TO_CHAR, 0);
-   act("Your gods protect you from $n's spell.", ch, 0, victim, TO_VICT, 0);
-   return eSUCCESS;
-  }
+    if (affected_by_spell(victim, SPELL_PARALYZE)) {
+      act("$N's paralyzed muscles are too rigid to be affected by this enchantment!", ch, 0, victim, TO_CHAR, 0);
+      act("Your gods protect you from $n's spell.", ch, 0, victim, TO_VICT, 0);
+      return eSUCCESS;
+    }
+
+    if (affected_by_spell(victim, SPELL_HEROISM) && affected_by_spell(victim, SPELL_HEROISM)->modifier >= 50 ) {
+      act("$N seems unaffected.", ch, 0, victim, TO_CHAR, 0);
+      act("Your gods protect you from $n's spell.", ch, 0, victim, TO_VICT, 0);
+      return eSUCCESS;
+    }
 
      if (skill < 40) { 
        duration = 2; 
