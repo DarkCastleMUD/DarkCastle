@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: shop.cpp,v 1.28 2008/11/25 20:53:48 kkoons Exp $ */
+/* $Id: shop.cpp,v 1.29 2010/02/08 07:05:35 jhhudso Exp $ */
 
 extern "C"
 {
@@ -39,6 +39,7 @@ extern "C"
 #include <returnvals.h>
 #include <shop.h>
 #include <spells.h>
+#include "inventory.h"
 
 extern struct index_data *mob_index;
 
@@ -1525,3 +1526,131 @@ void redo_shop_profit()
       break;
   }
 }
+
+struct obj_exchange {
+  int item_qty;
+  int item_vnum;
+  int cost_qty;
+  int cost_vnum;
+};
+
+const int OBJ_APOCALYPSE=27905;
+const int OBJ_BROWNIE=27906;
+const int OBJ_MEATBALL=27908;
+const int OBJ_WINGDING=27909;
+const int OBJ_CLOVERLEAF=27910;
+
+const int MAX_EDDIE_ITEMS = 12;
+
+obj_exchange eddie[MAX_EDDIE_ITEMS] = {
+  {1, OBJ_CLOVERLEAF,  2, OBJ_WINGDING}, 
+  {1, OBJ_CLOVERLEAF,  2, OBJ_MEATBALL}, 
+  {1, OBJ_CLOVERLEAF,  2, OBJ_APOCALYPSE},
+  {1, OBJ_WINGDING,    3, OBJ_CLOVERLEAF},
+  {1, OBJ_WINGDING,    2, OBJ_MEATBALL},
+  {1, OBJ_WINGDING,    2, OBJ_APOCALYPSE},
+  {1, OBJ_MEATBALL,    3, OBJ_CLOVERLEAF},
+  {1, OBJ_MEATBALL,    2, OBJ_WINGDING},
+  {1, OBJ_MEATBALL,    2, OBJ_APOCALYPSE},
+  {1, OBJ_APOCALYPSE,  2, OBJ_WINGDING},
+  {1, OBJ_APOCALYPSE,  2, OBJ_MEATBALL},
+  {1, OBJ_BROWNIE,    10, OBJ_CLOVERLEAF}
+};
+
+int eddie_shopkeeper(struct char_data *ch, struct obj_data *obj, int cmd, char *arg, struct char_data *owner)
+{
+  if (cmd != CMD_LIST && cmd != CMD_BUY)
+    return eFAILURE;
+
+  if (IS_AFFECTED(ch, AFF_BLIND))
+    return eFAILURE;
+
+  if (IS_NPC(ch))
+    return eFAILURE;
+
+  if (cmd == CMD_LIST) {
+    csendf(ch, "$B$2%s tells you, 'This is what I can do for you...\n\r$R", GET_SHORT(owner));
+    send_to_char(" $B$31)$R Cloverleaf Token      Cost: 2 Wingding tokens.\n\r", ch);
+    send_to_char(" $B$32)$R Cloverleaf Token      Cost: 2 Meatball tokens.\n\r", ch);
+    send_to_char(" $B$33)$R Cloverleaf Token      Cost: 2 Apocalypse tokens.\n\r", ch);
+
+    send_to_char(" $B$34)$R Wingding Token        Cost: 3 Cloverleaf tokens.\n\r", ch);
+    send_to_char(" $B$35)$R Wingding Token        Cost: 2 Meatball tokens.\n\r", ch);
+    send_to_char(" $B$36)$R Wingding Token        Cost: 2 Apocalypse tokens.\n\r", ch);
+
+    send_to_char(" $B$37)$R Meatball Token        Cost: 3 Cloverleaf tokens.\n\r", ch);
+    send_to_char(" $B$38)$R Meatball Token        Cost: 2 Wingding tokens.\n\r", ch);
+    send_to_char(" $B$39)$R Meatball Token        Cost: 2 Apocalypse tokens.\n\r", ch);
+
+    send_to_char("$B$310)$R Apocalypse Token      Cost: 2 Wingding tokens.\n\r", ch);
+    send_to_char("$B$311)$R Apocalypse Token      Cost: 2 Meatball tokens.\n\r", ch);
+
+    send_to_char("$B$312)$R Brownie Point         Cost: 10 Cloverleaf tokens.\n\r", ch);
+
+    return eSUCCESS;
+  } else if (cmd == CMD_BUY) {
+    char arg1[MAX_STRING_LENGTH];
+    char buf[MAX_STRING_LENGTH];
+
+    one_argument(arg, arg1);
+
+    if (*arg1 == 0) {
+      send_to_char("Buy what?\n\r", ch);
+      return eSUCCESS;
+    }
+
+    int choice = atoi(arg1);
+    if (choice < 1 || choice > MAX_EDDIE_ITEMS) {
+      csendf(ch, "Invalid number. Choose between 1 and %d.\n\r", MAX_EDDIE_ITEMS);
+      return eSUCCESS;
+    }
+
+    int count = search_char_for_item_count(ch, real_object(eddie[choice-1].cost_vnum));
+
+    if (count < eddie[choice-1].cost_qty) {
+      send_to_char("You don't have enough to trade.\n\r", ch);
+      return eSUCCESS;
+    }
+
+    for (int i=0; i < eddie[choice-1].cost_qty; i++) {
+      obj_data *obj = search_char_for_item(ch, real_object(eddie[choice-1].cost_vnum));
+      if (obj != 0) {
+	obj_from_char(obj);
+
+	act("$n gives $p to $N.", ch, obj, owner, TO_ROOM, INVIS_NULL|NOTVICT);
+	act("$n gives you $p.", ch, obj, owner, TO_VICT, 0);
+	act("You give $p to $N.", ch, obj, owner, TO_CHAR, 0);
+
+	sprintf(buf, "%s gives %s to %s (removed)", GET_NAME(ch), obj->name,
+                GET_NAME(owner));
+	log(buf, IMP, LOG_OBJECTS);
+      } else {
+	csendf(ch, "An error occured.\n\r");
+	do_save(ch, "", 666);
+	return eSUCCESS;
+      }
+    }
+
+    obj_data *item = clone_object(real_object(eddie[choice-1].item_vnum));
+    if (item != 0) {
+      obj_to_char(item, ch);
+
+      act("$n gives $p to $N.", owner, item, ch, TO_ROOM, INVIS_NULL|NOTVICT);
+      act("$n gives you $p.", owner, item, ch, TO_VICT, 0);
+      act("You give $p to $N.", owner, item, ch, TO_CHAR, 0);
+      
+      sprintf(buf, "%s gives %s to %s (created)", GET_NAME(owner), item->name,
+	      GET_NAME(ch));
+      log(buf, IMP, LOG_OBJECTS);
+    } else {
+      csendf(ch, "An error occured.\n\r");
+      do_save(ch, "", 666);
+      return eSUCCESS;
+    }
+
+    do_save(ch, "", 0);
+  }
+
+  return eSUCCESS;
+}
+

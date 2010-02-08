@@ -138,10 +138,10 @@ void assign_non_combat_procs() {
     SPEC_FUN    iasenko_non_combat;
     SPEC_FUN    koban_non_combat;
     SPEC_FUN    arena_only;
-    SPEC_FUN mage_golem;
-    SPEC_FUN druid_elemental;
-    SPEC_FUN druid_familiar_owl_non;
-    SPEC_FUN mage_familiar_gremlin_non;
+    SPEC_FUN    mage_golem;
+    SPEC_FUN    druid_elemental;
+    SPEC_FUN    druid_familiar_owl_non;
+    SPEC_FUN    mage_familiar_gremlin_non;
     SPEC_FUN    mage_familiar_imp_non;
     SPEC_FUN    druid_familiar_chipmunk_non;
     SPEC_FUN    bodyguard;
@@ -149,6 +149,7 @@ void assign_non_combat_procs() {
     SPEC_FUN    generic_doorpick_blocker;
     SPEC_FUN    startrek_miles;
     SPEC_FUN    cardinal;
+    SPEC_FUN    eddie_shopkeeper;
 
     assign_one_mob_non(3071, cardinal);
 
@@ -158,13 +159,13 @@ void assign_non_combat_procs() {
     assign_one_mob_non(8, mage_golem);
     assign_one_mob_non(1,  deth);
     assign_one_mob_non(5,  mage_familiar_imp_non);
-   assign_one_mob_non(4, mage_familiar_gremlin_non);
+    assign_one_mob_non(4, mage_familiar_gremlin_non);
     assign_one_mob_non(6,  druid_familiar_chipmunk_non);
-   assign_one_mob_non(7, druid_familiar_owl_non);
-   assign_one_mob_non(88, druid_elemental);
-   assign_one_mob_non(89, druid_elemental);
-   assign_one_mob_non(90, druid_elemental);
-   assign_one_mob_non(91, druid_elemental);
+    assign_one_mob_non(7, druid_familiar_owl_non);
+    assign_one_mob_non(88, druid_elemental);
+    assign_one_mob_non(89, druid_elemental);
+    assign_one_mob_non(90, druid_elemental);
+    assign_one_mob_non(91, druid_elemental);
     assign_one_mob_non(70,  pir_slut);
     assign_one_mob_non(200,  mud_school_adept);
     assign_one_mob_non(207,  adept);
@@ -284,7 +285,7 @@ void assign_non_combat_procs() {
     assign_one_mob_non(32046,  super_repair_guy);
     assign_one_mob_non(17805,  super_repair_guy);
     assign_one_mob_non(32047,  repair_shop);
-
+    assign_one_mob_non(10031,  eddie_shopkeeper);
 
     return;
 }

@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.117 2010/01/01 03:03:14 jhhudso Exp $
+| $Id: inventory.cpp,v 1.118 2010/02/08 07:05:35 jhhudso Exp $
 | inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
@@ -1766,6 +1766,44 @@ struct obj_data * search_char_for_item(char_data * ch, int16 item_number, bool w
     }
   }
   return NULL;
+}
+
+// Find out how many of an item exists on character
+int search_char_for_item_count(char_data * ch, int16 item_number, bool wearonly)
+{
+  struct obj_data *i = NULL;
+  struct obj_data *j = NULL;
+  int k;
+  int count = 0;
+  
+  for (k=0; k< MAX_WEAR; k++) {
+    if (ch->equipment[k]) {
+      if(ch->equipment[k]->item_number == item_number)
+	count++;
+      if(GET_ITEM_TYPE(ch->equipment[k]) == ITEM_CONTAINER) { // search inside
+        for(j = ch->equipment[k]->contains; j ; j = j->next_content) {
+          if(j->item_number == item_number)
+	    count++;
+        }
+      }
+    }
+  }
+  
+  if (!wearonly)
+    for(i = ch->carrying; i ; i = i->next_content) {
+      if(i->item_number == item_number)
+	count++;
+
+      // does not support containers inside containers
+      if(GET_ITEM_TYPE(i) == ITEM_CONTAINER) { // search inside
+	for(j = i->contains; j ; j = j->next_content) {
+	  if(j->item_number == item_number) 
+	    count++;
+	}
+      }
+    }
+
+  return count;
 }
 
 bool search_container_for_item(obj_data * obj, int item_number)
