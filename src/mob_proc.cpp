@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.194 2009/12/17 19:05:54 kkoons Exp $ */
+/* $Id: mob_proc.cpp,v 1.195 2010/02/08 15:47:19 apocalypse Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -1775,7 +1775,10 @@ static char *dethSayText [ ] =
   "Do you like me?",
   "I wish I had a son, but I'm really just a boy. :(",
   "If I was a robot, I'd name myself Hugh Mann so people would accept me more readily.",
-  "I like to leave a legacy, even if it doesn't last that long.  Yeah, I fart in the elevator."
+  "I like to leave a legacy, even if it doesn't last that long.  Yeah, I fart in the elevator.",
+  "Hey, does this rag smell like chloroform to you?",
+  "God made semen taste like bleach so she'd remember to do the laundry.",
+  "If it's an \"eye for an eye and a tooth for a tooth\", why is there no Eye Fairy?" 
  };
 
 // ENDOFCHAIN
