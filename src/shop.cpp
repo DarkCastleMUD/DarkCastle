@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: shop.cpp,v 1.29 2010/02/08 07:05:35 jhhudso Exp $ */
+/* $Id: shop.cpp,v 1.30 2010/02/11 06:03:00 jhhudso Exp $ */
 
 extern "C"
 {
@@ -1540,7 +1540,7 @@ const int OBJ_MEATBALL=27908;
 const int OBJ_WINGDING=27909;
 const int OBJ_CLOVERLEAF=27910;
 
-const int MAX_EDDIE_ITEMS = 12;
+const int MAX_EDDIE_ITEMS = 13;
 
 obj_exchange eddie[MAX_EDDIE_ITEMS] = {
   {1, OBJ_CLOVERLEAF,  2, OBJ_WINGDING}, 
@@ -1552,6 +1552,7 @@ obj_exchange eddie[MAX_EDDIE_ITEMS] = {
   {1, OBJ_MEATBALL,    3, OBJ_CLOVERLEAF},
   {1, OBJ_MEATBALL,    2, OBJ_WINGDING},
   {1, OBJ_MEATBALL,    2, OBJ_APOCALYPSE},
+  {1, OBJ_APOCALYPSE,  3, OBJ_CLOVERLEAF},
   {1, OBJ_APOCALYPSE,  2, OBJ_WINGDING},
   {1, OBJ_APOCALYPSE,  2, OBJ_MEATBALL},
   {1, OBJ_BROWNIE,    10, OBJ_CLOVERLEAF}
@@ -1570,6 +1571,32 @@ int eddie_shopkeeper(struct char_data *ch, struct obj_data *obj, int cmd, char *
 
   if (cmd == CMD_LIST) {
     csendf(ch, "$B$2%s tells you, 'This is what I can do for you...\n\r$R", GET_SHORT(owner));
+    csendf(ch, "  | Item                              | Cost                                   |\n\r");
+    csendf(ch, "--------------------------------------------------------------------------------\n\r");
+    int last_vnum=0;
+    for (int i=0; i < MAX_EDDIE_ITEMS; i++) {
+      char buf[1024];
+      char item_buf[1024];
+      char cost_buf[1024];
+      strncpy(item_buf, ((obj_data *)obj_index[real_object(eddie[i].item_vnum)].item)->short_description, 1024);
+      strncpy(cost_buf, ((obj_data *)obj_index[real_object(eddie[i].cost_vnum)].item)->short_description, 1024);
+
+      if (last_vnum != 0 && last_vnum != eddie[i].item_vnum) {
+	csendf(ch, "--------------------------------------------------------------------------------\n\r");
+      }
+
+      last_vnum = eddie[i].item_vnum;
+      snprintf(buf, 1024, "$B$3%%2d$R|%%-%ds|%%2d x %%-%ds|\n\r",
+	       35+(strlen(item_buf) - nocolor_strlen(item_buf)),
+	       35+(strlen(cost_buf) - nocolor_strlen(cost_buf)));
+      csendf(ch, buf, i+1,
+	     ((obj_data *)obj_index[real_object(eddie[i].item_vnum)].item)->short_description,
+	     eddie[i].cost_qty,
+	     ((obj_data *)obj_index[real_object(eddie[i].cost_vnum)].item)->short_description);
+    }
+    csendf(ch, "--------------------------------------------------------------------------------\n\r");
+
+    /*
     send_to_char(" $B$31)$R Cloverleaf Token      Cost: 2 Wingding tokens.\n\r", ch);
     send_to_char(" $B$32)$R Cloverleaf Token      Cost: 2 Meatball tokens.\n\r", ch);
     send_to_char(" $B$33)$R Cloverleaf Token      Cost: 2 Apocalypse tokens.\n\r", ch);
@@ -1586,7 +1613,7 @@ int eddie_shopkeeper(struct char_data *ch, struct obj_data *obj, int cmd, char *
     send_to_char("$B$311)$R Apocalypse Token      Cost: 2 Meatball tokens.\n\r", ch);
 
     send_to_char("$B$312)$R Brownie Point         Cost: 10 Cloverleaf tokens.\n\r", ch);
-
+    */
     return eSUCCESS;
   } else if (cmd == CMD_BUY) {
     char arg1[MAX_STRING_LENGTH];
