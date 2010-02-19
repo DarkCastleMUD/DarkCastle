@@ -16,7 +16,7 @@
 /* 12/08/2003   Onager   Added chop_half() to work like half_chop() but    */
 /*                       chopping off the last word.                       */
 /***************************************************************************/
-/* $Id: interp.cpp,v 1.190 2009/09/15 03:03:49 jhhudso Exp $ */
+/* $Id: interp.cpp,v 1.191 2010/02/19 06:10:41 jhhudso Exp $ */
 
 extern "C"
 {
@@ -259,10 +259,11 @@ struct command_info cmd_info[] =
     { "deceit",		do_deceit,	POSITION_STANDING, 1, CMD_DEFAULT, 0, 0 },
     { "knockback",	do_knockback,	POSITION_FIGHTING, 1, CMD_DEFAULT, 0, 0 },
     { "appraise",	do_appraise,	POSITION_STANDING, 1, CMD_DEFAULT, 0, 1 },
-    { "make camp",		do_make_camp,	POSITION_RESTING, 0, CMD_DEFAULT, 0, 0 },
-    { "leadership",		do_leadership,	POSITION_RESTING, 0, CMD_DEFAULT, 0, 0 },
+    { "make camp",	do_make_camp,	POSITION_RESTING, 0, CMD_DEFAULT, 0, 0 },
+    { "leadership",	do_leadership,	POSITION_RESTING, 0, CMD_DEFAULT, 0, 0 },
     { "triage",		do_triage,	POSITION_RESTING, 0, CMD_DEFAULT, 0, 0 },
     { "onslaught",	do_onslaught,	POSITION_RESTING, 0, CMD_DEFAULT, 0, 0 },
+    { "pursue", 	do_pursue,	POSITION_STANDING, 0, CMD_DEFAULT, 0, 0 },
 
     // Position commands
     { "sit",	do_sit,		POSITION_RESTING, 0, CMD_DEFAULT, COM_CHARMIE_OK, 0 },

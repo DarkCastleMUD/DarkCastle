@@ -1,25 +1,26 @@
 /************************************************************************
- * $Id: cl_barbarian.cpp,v 1.111 2009/12/20 11:59:38 kkoons Exp $
+ * $Id: cl_barbarian.cpp,v 1.112 2010/02/19 06:10:41 jhhudso Exp $
  * cl_barbarian.cpp
  * Description: Commands for the barbarian class.
  *************************************************************************/
-#include <structs.h>
-#include <player.h>
-#include <levels.h>
-#include <character.h>
-#include <spells.h>
-#include <utility.h>
-#include <fight.h>
-#include <mobile.h>
-#include <magic.h>
-#include <connect.h>
-#include <handler.h>
-#include <act.h>
-#include <interp.h>
-#include <returnvals.h>
-#include <room.h>
-#include <db.h>
-#include <clan.h>
+#include "structs.h"
+#include "player.h"
+#include "levels.h"
+#include "character.h"
+#include "spells.h"
+#include "utility.h"
+#include "fight.h"
+#include "mobile.h"
+#include "magic.h"
+#include "connect.h"
+#include "handler.h"
+#include "act.h"
+#include "interp.h"
+#include "returnvals.h"
+#include "room.h"
+#include "db.h"
+#include "clan.h"
+#include "utility.h"
 
 extern struct index_data *obj_index;
 extern int rev_dir[];
@@ -1299,6 +1300,30 @@ int do_primalfury(CHAR_DATA *ch, char *argument, int cmd)
   act("$n lets forth a primal scream of anger and begins to fight with terrible fury!", ch, NULL, NULL, TO_ROOM, 0);
   send_to_char("You let forth a primal scream of anger and fall upon your enemies with a terrible fury!\r\n",ch);
 
+  return eSUCCESS;
+}
+
+int do_pursue(char_data *ch, char *argument, int cmd)
+{
+  if (!has_skill(ch, SKILL_PURSUIT)) {
+    send_to_char("You don't know how to.\n\r", ch);
+    return eFAILURE;
+  }
+  
+  if (affected_by_spell(ch, SKILL_PURSUIT)) {
+    send_to_char("You will no longer pursue your victims.\n\r", ch);
+    affect_from_char(ch, SKILL_PURSUIT);
+  } else {
+    send_to_char("You will pursue your victims.\n\r", ch);
+    affected_type af;
+    af.type = SKILL_PURSUIT;
+    af.duration  = -1;
+    af.modifier  = 0;
+    af.location  = 0;
+    af.bitvector = -1;
+    affect_to_char(ch, &af);
+  }
+   
   return eSUCCESS;
 }
 

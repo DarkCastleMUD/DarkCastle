@@ -1,5 +1,3 @@
-#ifndef SPELLS_H_
-#define SPELLS_H_
 /***************************************************************************
  *  file: spells.h , Implementation of magic spells.       Part of DIKUMUD *
  *  Usage : Spells                                                         *
@@ -14,10 +12,15 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: spells.h,v 1.137 2009/10/24 23:05:05 jhhudso Exp $ */
+/* $Id: spells.h,v 1.138 2010/02/19 06:10:41 jhhudso Exp $ */
+
+#ifndef SPELLS_H_
+#define SPELLS_H_
+
 #include <structs.h> // ubyte, int16
 
 #include <map>
+
 #define MAX_BUF_LENGTH               240
 
 std::map<int,int> fill_skill_cost();
@@ -382,7 +385,8 @@ void check_maxes(CHAR_DATA *ch);
 #define SKILL_ORCHESTRATE	     415
 #define SKILL_TUMBLING		     416
 #define SKILL_BREW                   417
-#define SKILL_MAX                    417
+#define SKILL_PURSUIT		     418
+#define SKILL_MAX                    418
 
 
 
