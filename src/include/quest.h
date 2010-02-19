@@ -4,8 +4,6 @@ one liner quest shit
 #ifndef QUEST_H_
 #define QUEST_H_
 
-#include <character.h>
-
 #define QUEST_MAX    1     //max quests at a time
 #define QUEST_SHOW   10    //max quests shown at a time
 #define QUEST_CANCEL 15    //max quests canceled at a time
