@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: save.cpp,v 1.64 2010/01/04 12:49:23 jhhudso Exp $ */
+/* $Id: save.cpp,v 1.65 2010/02/19 06:09:18 jhhudso Exp $ */
 
 extern "C"
 {
@@ -323,7 +323,10 @@ void save_pc_data(struct pc_data * i, FILE * fpsave, struct time_data tmpage)
     fwrite("BOI", sizeof(char), 3, fpsave);
     fwrite(&(i->buildOHighVnum), sizeof(i->buildOHighVnum), 1, fpsave);
   }
-   
+  if (i->profession) {
+    fwrite("PRO", sizeof(char), 3, fpsave);
+    fwrite(&(i->profession), sizeof(i->profession), 1, fpsave);
+  }
 
   // Any future additions to this save file will need to be placed LAST here with a 3 letter code
   // and appropriate strcmp statement in the read_mob_data object
@@ -456,7 +459,12 @@ void read_pc_data(struct char_data *ch, FILE* fpsave)
     fread(&i->buildOHighVnum, sizeof(i->buildOHighVnum), 1, fpsave);
     fread(&typeflag, sizeof(char), 3, fpsave);
   }
-
+  if (!strcmp("PRO", typeflag))
+  {
+    fread(&i->profession, sizeof(i->profession), 1, fpsave);
+    fread(&typeflag, sizeof(char), 3, fpsave);
+  }
+  
   i->skillchange = 0;
   // Add new items in this format
 //  if(!strcmp(typeflag, "XXX"))
@@ -471,7 +479,8 @@ int save_pc_or_mob_data(CHAR_DATA *ch, FILE * fpsave, struct time_data tmpage)
 {
   if(IS_MOB(ch))
     save_mob_data(ch->mobdata, fpsave);
-  else save_pc_data(ch->pcdata, fpsave, tmpage);
+  else
+    save_pc_data(ch->pcdata, fpsave, tmpage);
 
   return 1;
 }

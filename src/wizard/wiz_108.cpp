@@ -286,7 +286,7 @@ int do_set(struct char_data *ch, char *argument, int cmd)
         "int","wis","dex","con","gold","exp","mana","hit","move",
         "sessions","alignment","thirst","drunk","full","race",
         "bank", "platinum", "ki", "clan", "saves_base", "hpmeta",
-	"manameta","movemeta", "armor", "\n"
+	"manameta","movemeta", "armor", "profession", "\n"
     };
     struct char_data *vict;
     char name[100], buf2[100], buf[100], help[MAX_STRING_LENGTH];
@@ -748,7 +748,28 @@ int do_set(struct char_data *ch, char *argument, int cmd)
               log(buf2, GET_LEVEL(ch), LOG_GOD); 
 	}
 	break;
+	case 32:
+	{
+	      if(!*buf) {
+                csendf(ch, "Syntax: set <vict> profession <0-%d>\r\n", MAX_PROFESSIONS);
+                return eFAILURE;
+              }
 
+              if(IS_NPC(vict)) {
+                send_to_char("You cannot set profession on mobs.\r\n", ch);
+                return eFAILURE; 
+              }
+
+              if(!check_range_valid_and_convert(value, buf, 0, MAX_PROFESSIONS)) {
+                csendf(ch, "Save type be from 0 to %d.\r\n", MAX_PROFESSIONS);
+                return eFAILURE;
+              }
+
+	      vict->pcdata->profession = value;
+	      log(buf2, GET_LEVEL(ch), LOG_GOD);
+	}
+	break;
+	
         }
     
   send_to_char("Ok.\n\r", ch);

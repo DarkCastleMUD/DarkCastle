@@ -1,7 +1,7 @@
 #ifndef CHARACTER_H_
 #define CHARACTER_H_
 /******************************************************************************
-| $Id: character.h,v 1.78 2009/11/27 07:09:58 jhhudso Exp $
+| $Id: character.h,v 1.79 2010/02/19 06:09:18 jhhudso Exp $
 | Description: This file contains the header information for the character
 |   class implementation.
 */
@@ -17,10 +17,15 @@
 #include <utility.h>
 #include <mobile.h>
 #include <sing.h>
-#include <queue>
 #include <quest.h>
-#include <map>
+
+extern "C" {
 #include <sys/time.h>
+#include <stdint.h>
+}
+
+#include <queue>
+#include <map>
 #include <string>
 #include <vector>
 
@@ -147,7 +152,7 @@ struct class_skill_defines
     int16  skillnum;          // ID # of skill
     int16  levelavailable;    // what level class can get it
     int16  maximum;           // maximum value PC can train it to (1-100)
-    int16  group;             // which class tree group it is assigned
+    uint8_t group;             // which class tree group it is assigned
     int16  attrs;	      // What attributes the skill is based on
 };
 
@@ -278,6 +283,7 @@ struct pc_data
     uint32 quest_complete[QUEST_TOTAL/ASIZE+1];
     char *last_prompt;
     std::multimap<int, std::pair<timeval, timeval> > *lastseen;
+    uint8_t profession;
 };
 
 struct mob_data

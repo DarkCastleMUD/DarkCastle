@@ -1,7 +1,7 @@
 #ifndef PLAYER_H_
 #define PLAYER_H_
 /************************************************************************
-| $Id: player.h,v 1.43 2009/11/27 07:09:58 jhhudso Exp $
+| $Id: player.h,v 1.44 2010/02/19 06:09:18 jhhudso Exp $
 | player.h
 | Description: This file defines the player vectors..punishment, specials,
 |   etc...
@@ -270,6 +270,7 @@
 #define CONWIS 9
 #define INTWIS 10
 
+#define MAX_PROFESSIONS 2
 
 // Constructor commented out for const.C initialization purposes
 struct str_app_type

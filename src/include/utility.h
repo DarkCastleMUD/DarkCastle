@@ -16,7 +16,7 @@
  *  10/21/2003   Onager    Changed IS_ANONYMOUS() to handle mobs without   *
  *                         crashing                                        *
  ***************************************************************************/
-/* $Id: utility.h,v 1.92 2009/12/30 23:44:36 kkoons Exp $ */
+/* $Id: utility.h,v 1.93 2010/02/19 06:09:18 jhhudso Exp $ */
 
 #ifndef UTILITY_H_
 #define UTILITY_H_
@@ -24,15 +24,16 @@
 extern "C" {
 #include <time.h>
 #include <stdlib.h>
+#include <stdint.h>
 }
 
+#include <string>
+#include <vector>
+
 #include "structs.h"
-#include "character.h"
 #include "weather.h"
 #include "memory.h"
 #include "player.h"
-#include <string>
-#include <vector>
 
 extern struct weather_data weather_info;
 extern char log_buf[MAX_STRING_LENGTH];
@@ -571,5 +572,7 @@ std::string replaceString(std::string message, std::string find, std::string rep
 char * numToStringTH(int);
 bool champion_can_go(int room);
 bool class_can_go(int ch_class, int room);
+
+const char *find_profession(int c_class, uint8_t profession);
 
 #endif /* UTILITY_H_ */

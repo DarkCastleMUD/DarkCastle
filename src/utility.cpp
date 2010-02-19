@@ -17,7 +17,7 @@
  *                         except Pir and Valk                             *
  * 10/19/2003   Onager     Took out super-secret hidey code from CAN_SEE() *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.115 2010/01/06 04:54:11 jhhudso Exp $ */
+/* $Id: utility.cpp,v 1.116 2010/02/19 06:09:18 jhhudso Exp $ */
 
 extern "C"
 {
@@ -29,66 +29,66 @@ extern "C"
 #include <ctype.h>
 #include <stdlib.h>
 #include <sys/time.h>
-}
-#ifdef LEAK_CHECK
-#include <dmalloc.h>
-#endif
-
-#include <innate.h>
-#include <structs.h>
-#include <levels.h>
-#include <player.h>
-#include <timeinfo.h>
-#include <character.h>
-#include <utility.h>
-#include <room.h>
-#include <obj.h>
-#include <interp.h>
-#include <fileinfo.h>
-#include <mobile.h>
-#include <handler.h>
-#include <db.h>
-#include <connect.h>
-#include <act.h>
-#include <spells.h>
-#include <clan.h>
-#include <fight.h>
-#include <returnvals.h>
-#include <set.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <errno.h>
+}
+
+#ifdef LEAK_CHECK
+#include <dmalloc.h>
+#endif
 
 #include <iostream>
 #include <sstream>
+#include <map>
+
+#include "innate.h"
+#include "structs.h"
+#include "levels.h"
+#include "player.h"
+#include "timeinfo.h"
+#include "character.h"
+#include "utility.h"
+#include "room.h"
+#include "obj.h"
+#include "interp.h"
+#include "fileinfo.h"
+#include "mobile.h"
+#include "handler.h"
+#include "db.h"
+#include "connect.h"
+#include "act.h"
+#include "spells.h"
+#include "clan.h"
+#include "fight.h"
+#include "returnvals.h"
+#include "set.h"
+
 using namespace std;
 
 #ifndef GZIP
   #define GZIP "gzip"
 #endif
 
-#include <map>
-
-extern index_data *obj_index;
-
 // extern vars
+extern index_data *obj_index;
 extern time_data time_info;
 extern CWorld world;
+extern index_data *mob_index;
+extern zone_data *zone_table;
+extern std::map<int, std::map<uint8_t, std::string> > professions;
 
 // extern funcs
 clan_data * get_clan(char_data *);
-
-extern index_data *mob_index;
-extern zone_data *zone_table;
-
 void release_message(CHAR_DATA *ch);
 
-// vars
+// local vars
 char    log_buf[MAX_STRING_LENGTH];
 struct timer_data *timer_list = NULL;
-// funcs
+
+// local funcs
 void update_wizlist(CHAR_DATA *ch);
 
 
@@ -2403,4 +2403,17 @@ bool class_can_go(int ch_class, int room)
   }
 
   return true;
+}
+
+const char *find_profession(int c_class, uint8_t profession)
+{
+  map<uint8_t, string> profession_list = professions[c_class];
+  
+  if (profession == 0) {
+    return "None";
+  } else if (profession_list[profession].empty()) {
+    return "Unknown";
+  } else {
+    return profession_list[profession].c_str();
+  }
 }

@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: guild.cpp,v 1.127 2009/09/05 07:44:59 jhhudso Exp $
+| $Id: guild.cpp,v 1.128 2010/02/19 06:09:18 jhhudso Exp $
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
@@ -326,14 +326,25 @@ char charthing(struct char_data *ch, int known, int skill, int maximum)
 
 void output_praclist(struct char_data *ch, class_skill_defines *skilllist)
 {
-  int known;
+  int known, last_profession = 0;
   char buf[MAX_STRING_LENGTH];
      for(int i=0; *skilllist[i].skillname != '\n';i++) 
     {
       known = has_skill(ch, skilllist[i].skillnum);
       if(!known && GET_LEVEL(ch) < skilllist[i].levelavailable)
           continue;
-//      known = known % 100;
+     
+      if (IS_PC(ch) && skilllist[i].group > 0 && skilllist[i].group != ch->pcdata->profession) {
+	continue;
+      } else {
+	if (last_profession != skilllist[i].group) {
+	  last_profession = skilllist[i].group;
+	  csendf(ch, "\n\r$B%s Profession Skills:$R\n\r", find_profession(ch->c_class, skilllist[i].group));
+          send_to_char ( " Ability:                  Expertise:          Lvl:  Cost:      Ability Group:\r\n", ch );
+	  send_to_char ( "--------------------------------------------------------------------------------\r\n", ch );
+	}
+      }
+
       sprintf(buf, " %c%-24s%s%15s $B$0($R%c%s%3d$B$0)$R   $B%2d$R   ", UPPER(*skilllist[i].skillname), (skilllist[i].skillname+1),
                    per_col(known), how_good(known),charthing(ch, known,skilllist[i].skillnum, skilllist[i].maximum), per_col(known), known,
 		skilllist[i].levelavailable);
@@ -425,47 +436,56 @@ void output_praclist(struct char_data *ch, class_skill_defines *skilllist)
     }
 
 }
-int skills_guild(struct char_data *ch, char *arg, struct char_data *owner)
+int skills_guild ( struct char_data *ch, char *arg, struct char_data *owner )
 {
   char buf[160];
   int known, x;
   int skillnumber;
   int percent;
 
-  if (IS_NPC(ch)) return eFAILURE;
-    class_skill_defines * skilllist = get_skill_list(ch);
-    if(!skilllist)
-      return eFAILURE;  // no skills to train
+  if ( IS_NPC ( ch ) ) return eFAILURE;
 
-  if (!*arg) // display skills that can be learned
-  {
-    sprintf(buf,"You have %d practice sessions left.\n\r", ch->pcdata->practices);
-    send_to_char(buf, ch);
-    send_to_char("You can practice any of these skills:\n\r\r\n", ch);
+  class_skill_defines * skilllist = get_skill_list ( ch );
 
-    send_to_char("$BUniversal skills:$R\r\n",ch);
-    send_to_char(" Ability:                  Expertise:          Lvl:  Cost:      Ability Group:\r\n",ch);
-    send_to_char("--------------------------------------------------------------------------------\r\n",ch);
-    output_praclist(ch, g_skills);
-     extern char *pc_clss_types[];
-    sprintf(buf, "\r\n$B%c%s skills:$R\r\n", UPPER(*pc_clss_types[GET_CLASS(ch)]), (1+pc_clss_types[GET_CLASS(ch)]));
-    send_to_char(buf, ch);
-    if (GET_CLASS(ch) != CLASS_MONK)
-    send_to_char(" Ability:                  Expertise:          Lvl:  Cost:      Ability Group:\r\n",ch);
-    else
-    send_to_char(" Ability:                  Expertise:          Lvl:  Cost:      Style:\r\n",ch);
-    send_to_char("--------------------------------------------------------------------------------\r\n",ch);
-    output_praclist(ch, skilllist);
-     send_to_char("\r\n",ch);
-    if(GET_CLASS(ch) == CLASS_BARD)
-       send_to_char("$B#$R denotes a song which requires an instrument.\n\r", ch);
-    send_to_char("$B*$R indicates this skill is at its maximum for your race and class.\r\n"
-		"$B+$R indicates you can still use practice sessions to improve this skill.\r\n"
-		"$B=$R indicates you must use this skill to continue improving.\r\n",ch);
-    
-    return eSUCCESS;
- 
-  }
+  if ( !skilllist )
+    return eFAILURE;  // no skills to train
+
+  if ( !*arg )   // display skills that can be learned
+    {
+      sprintf ( buf, "You have %d practice sessions left.\n\r", ch->pcdata->practices );
+      send_to_char ( buf, ch );
+      send_to_char ( "You can practice any of these skills:\n\r\r\n", ch );
+
+      send_to_char ( "$BUniversal skills:$R\r\n", ch );
+      send_to_char ( " Ability:                  Expertise:          Lvl:  Cost:      Ability Group:\r\n", ch );
+      send_to_char ( "--------------------------------------------------------------------------------\r\n", ch );
+      output_praclist ( ch, g_skills );
+      extern char *pc_clss_types[];
+      sprintf ( buf, "\r\n$B%c%s skills:$R\r\n", UPPER ( *pc_clss_types[GET_CLASS ( ch ) ] ), ( 1 + pc_clss_types[GET_CLASS ( ch ) ] ) );
+      send_to_char ( buf, ch );
+
+      if ( GET_CLASS ( ch ) != CLASS_MONK )
+        send_to_char ( " Ability:                  Expertise:          Lvl:  Cost:      Ability Group:\r\n", ch );
+      else
+        send_to_char ( " Ability:                  Expertise:          Lvl:  Cost:      Style:\r\n", ch );
+
+      send_to_char ( "--------------------------------------------------------------------------------\r\n", ch );
+
+      output_praclist ( ch, skilllist );
+
+      send_to_char ( "\r\n", ch );
+
+      if ( GET_CLASS ( ch ) == CLASS_BARD )
+        send_to_char ( "$B#$R denotes a song which requires an instrument.\n\r", ch );
+
+      send_to_char ( "$B*$R indicates this skill is at its maximum for your race and class.\r\n"
+                     "$B+$R indicates you can still use practice sessions to improve this skill.\r\n"
+                     "$B=$R indicates you must use this skill to continue improving.\r\n", ch );
+
+      return eSUCCESS;
+
+    }
+
   if (GET_POS(ch) == POSITION_SLEEPING) {
    send_to_char("You cannot practice in your sleep.\r\n",ch);
    return eSUCCESS;
@@ -519,17 +539,12 @@ int skills_guild(struct char_data *ch, char *arg, struct char_data *owner)
       }
    }
 
-//if they have a class tree set, let them only practice skills within that class tree
-   if(IS_SET(ch->pcdata->toggles, PLR_CLS_TREE_A) && skilllist[skillnumber].group != 1) {
-     csendf(ch, "You may only practice within the %s profession.\n\r", class_tree_name[GET_CLASS(ch)-1][0]);
-     return eSUCCESS;
-   } else if(IS_SET(ch->pcdata->toggles, PLR_CLS_TREE_B) && skilllist[skillnumber].group != 2) {
-     csendf(ch, "You may only practice within the %s profession.\n\r", class_tree_name[GET_CLASS(ch)-1][1]);
-     return eSUCCESS;
-   } else if(IS_SET(ch->pcdata->toggles, PLR_CLS_TREE_C) && skilllist[skillnumber].group != 3) {
-     csendf(ch, "You may only practice within the %s profession.\n\r", class_tree_name[GET_CLASS(ch)-1][2]);
-     return eSUCCESS;
-   }
+  // If this is a profession-specific skill and we are a mortal without that profession, disallow
+  if ( skilllist[skillnumber].group && IS_PC ( ch ) && skilllist[skillnumber].group != ch->pcdata->profession )
+  {
+    csendf ( ch, "You must join the %s profession in order to learn that.\n\r", find_profession (ch->c_class, skilllist[skillnumber].group) );
+    return eSUCCESS;
+  }
 
   }
   if (ch->pcdata->practices <= 0) {
@@ -577,13 +592,6 @@ int skills_guild(struct char_data *ch, char *arg, struct char_data *owner)
 
 	return eFAILURE;
       default: break;
-  }
-
-  if(!IS_SET(ch->pcdata->toggles, PLR_CLS_TREE_A) && !IS_SET(ch->pcdata->toggles, PLR_CLS_TREE_B) && !IS_SET(ch->pcdata->toggles, PLR_CLS_TREE_C)) {
-    if(skilllist[skillnumber].group) {
-      SET_BIT(ch->pcdata->toggles, PLR_CLS_TREE_A + skilllist[skillnumber].group - 1);
-      csendf(ch, "You have chosen the %s profession for your class.\n\r", class_tree_name[GET_CLASS(ch)-1][skilllist[skillnumber].group-1]);
-    }
   }
 
    if (!known)
