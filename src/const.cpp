@@ -12,22 +12,26 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: const.cpp,v 1.327 2010/01/01 03:03:13 jhhudso Exp $ */
+/* $Id: const.cpp,v 1.328 2010/02/19 06:10:26 jhhudso Exp $ */
 
 extern "C"
 {
 #include <stdio.h>
 }
+
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
 
-#include <obj.h>
-#include <player.h> // *app_type
-#include <character.h>
-#include <spells.h>
-#include <levels.h>
-#include <mobile.h>
+#include <map>
+#include <string>
+
+#include "obj.h"
+#include "player.h" // *app_type
+#include "character.h"
+#include "spells.h"
+#include "levels.h"
+#include "mobile.h"
 
 std::map<int,int> fill_skill_cost()
 {
@@ -91,6 +95,7 @@ std::map<int,int> fill_skill_cost()
   skill_cost_map[SKILL_TRIAGE] = 40;
   skill_cost_map[SKILL_BREW] = 100;
   skill_cost_map[SKILL_SCRIBE] = 100;
+  skill_cost_map[SKILL_PURSUIT] = 20;
   return skill_cost_map;
 }
 
@@ -182,6 +187,71 @@ std::map<int, int> fill_scribe_ingredients()
 }
 
 std::map<int, int> scribe_ingredients = fill_scribe_ingredients();
+
+std::map<int, std::map<uint8_t, std::string> > fill_professions(void)
+{
+  std::map<int, std::map<uint8_t, std::string> > tmp_classes;
+  std::map<uint8_t, std::string> tmp_professions;
+  
+  tmp_professions[1] = "Legionnaire";
+  tmp_professions[2] = "Gladiator";
+  tmp_classes[CLASS_WARRIOR] = tmp_professions;
+  tmp_professions.clear();  
+
+  tmp_professions[1] = "Battlerager";
+  tmp_professions[2] = "Chieftan";
+  tmp_classes[CLASS_BARBARIAN] = tmp_professions;
+  tmp_professions.clear();  
+
+  tmp_professions[1] = "Pilferer";
+  tmp_professions[2] = "Assassin";
+  tmp_classes[CLASS_THIEF] = tmp_professions;
+  tmp_professions.clear();  
+
+  tmp_professions[1] = "Warmage";
+  tmp_professions[2] = "Spellbinder";
+  tmp_classes[CLASS_MAGE] = tmp_professions;
+  tmp_professions.clear();  
+
+  tmp_professions[1] = "Zealot";
+  tmp_professions[2] = "Ritualist";
+  tmp_classes[CLASS_CLERIC] = tmp_professions;
+  tmp_professions.clear();  
+
+  tmp_professions[1] = "Elementalist";
+  tmp_professions[2] = "Shapeshifter";
+  tmp_classes[CLASS_DRUID] = tmp_professions;
+  tmp_professions.clear();  
+
+  tmp_professions[1] = "Cultist";
+  tmp_professions[2] = "Reaver";
+  tmp_classes[CLASS_ANTI_PAL] = tmp_professions;
+  tmp_professions.clear();  
+
+  tmp_professions[1] = "Templar";
+  tmp_professions[2] = "Inquisitor";
+  tmp_classes[CLASS_PALADIN] = tmp_professions;
+  tmp_professions.clear();  
+
+  tmp_professions[1] = "Scout";
+  tmp_professions[2] = "Tracker";
+  tmp_classes[CLASS_RANGER] = tmp_professions;
+  tmp_professions.clear();  
+
+  tmp_professions[1] = "Sensei";
+  tmp_professions[2] = "Spiritualist";
+  tmp_classes[CLASS_MONK] = tmp_professions;
+  tmp_professions.clear();  
+
+  tmp_professions[1] = "Troubadour";
+  tmp_professions[2] = "Minstrel";
+  tmp_classes[CLASS_BARD] = tmp_professions;
+  tmp_professions.clear();  
+
+  return tmp_classes;
+}
+
+std::map<int, std::map<uint8_t, std::string> > professions = fill_professions();
 
 // Obj proc types
 char *obj_types[] = {
@@ -1494,6 +1564,7 @@ struct class_skill_defines b_skills[] = { // barbarian skills
 {    "bullrush",        SKILL_BULLRUSH,           50,  100,  0,  STRCON },
 {    "batterbrace",     SKILL_BATTERBRACE,        51,  100,  0,  DEXWIS },
 {    "vigor",           SKILL_VIGOR,              55,  100,  0,  DEXCON },
+{    "pursuit",         SKILL_PURSUIT,            55,  100,  1,  DEXCON },
 {    "\n",              0,                        1,    0,   0,  0 }
 };
 
