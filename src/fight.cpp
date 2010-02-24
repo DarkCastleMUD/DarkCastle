@@ -20,7 +20,7 @@
  * 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead *
  * of just race stuff                                                     *
  **************************************************************************
- * $Id: fight.cpp,v 1.561 2009/12/28 00:22:51 jhhudso Exp $               *
+ * $Id: fight.cpp,v 1.562 2010/02/24 03:19:52 jhhudso Exp $               *
  **************************************************************************/
 
 extern "C"
@@ -108,7 +108,7 @@ CHAR_DATA *combat_list = NULL, *combat_next_dude = NULL;
 
 
 int isHit(CHAR_DATA *ch, CHAR_DATA *victim, int attacktype, int &type, int &reduce);
-
+int check_pursuit(char_data* ch, char_data* victim, char* dircommand);
 
 #define MAX_CHAMP_DEATH_MESSAGE		14
 char *champ_death_messages[] = 
@@ -6622,12 +6622,16 @@ int do_flee(struct char_data *ch, char *argument, int cmd)
       send_to_char("Huh?\n\r", ch);
       return eFAILURE;
     }
+    
     if(!ch->fighting) {
       send_to_char("But there is nobody from whom to escape!\n\r", ch);
       return eFAILURE;
-    } else vict=ch->fighting;
+    } else {
+      vict=ch->fighting;
+    }
 
-    if(!charge_moves(ch, SKILL_ESCAPE)) return eFAILURE;
+    if(!charge_moves(ch, SKILL_ESCAPE))
+      return eFAILURE;
 
     skill_increase_check(ch, SKILL_ESCAPE, escape, SKILL_INCREASE_HARD);
     if(number(1,101) > MIN((GET_INT(ch) + GET_DEX(ch) + (float)escape/1.5 - GET_INT(vict)/2 - GET_WIS(vict)/2), 100))
@@ -6639,21 +6643,24 @@ int do_flee(struct char_data *ch, char *argument, int cmd)
     affect_from_char(ch, SKILL_SNEAK);
     REMBIT(ch->affected_by, AFF_SNEAK); // Mobs don't always have the affect
   }
+  
   if(GET_CLASS(ch) == CLASS_BARD && IS_SINGING(ch))
      do_sing(ch, "stop", 9);
 
   if(IS_AFFECTED(ch, AFF_NO_FLEE)) {
      if(affected_by_spell(ch, SPELL_IRON_ROOTS))
        send_to_char("The roots bracing your legs make it impossible to run!\r\n", ch);
-     else send_to_char("Your legs are too tired for running away!\r\n", ch);
+     else
+       send_to_char("Your legs are too tired for running away!\r\n", ch);
      return eFAILURE;
   }
   
   for(i = 0; i < 3; i++) {
     attempt = number(0, 5);  // Select a random direction
+    
     // keep mobs from fleeing into a no_track room
     if(CAN_GO(ch, attempt))
-      if(!IS_NPC(ch) || !IS_SET(world[EXIT(ch, attempt)->to_room].room_flags, NO_TRACK))
+      if(IS_PC(ch) || !IS_SET(world[EXIT(ch, attempt)->to_room].room_flags, NO_TRACK))
       {
          if(!escape) {
           act("$n panics, and attempts to flee.", ch, 0, 0, TO_ROOM, INVIS_NULL);
@@ -6664,40 +6671,50 @@ int do_flee(struct char_data *ch, char *argument, int cmd)
           act("$n quickly ducks $N's attack and attempts to make good a stealthy escape!", ch, 0, vict, TO_ROOM, INVIS_NULL|NOTVICT);
          }
           // The flee has succeeded
-          int was_fighting = (int)ch->fighting;
+          char_data *last_fighting = ch->fighting;
           GET_POS(ch) = POSITION_STANDING;
 
-          char tempcommand[32];
+          char tempcommand[32] = { 0 };
           extern char *dirs[];
-          strcpy(tempcommand, dirs[attempt]);
+          strncpy(tempcommand, dirs[attempt], 31);
           // we do this so that any spec procs overriding movement can take effect
-	  bool ispc = !IS_NPC(ch);
 	  SET_BIT(ch->combat, COMBAT_FLEEING);
           retval = command_interpreter(ch, tempcommand);
-	  if (ispc) REMOVE_BIT(ch->combat, COMBAT_FLEEING);
-		// so that a player doesn't keep the flag afte rdying
-          if(IS_SET(retval, eCH_DIED))
+	  // so that a player doesn't keep the flag afte rdying
+	  if (IS_PC(ch))
+	      REMOVE_BIT(ch->combat, COMBAT_FLEEING);
+
+          if (IS_SET(retval, eCH_DIED))
 	      return retval;
 	  REMOVE_BIT(ch->combat, COMBAT_FLEEING);
           if (IS_SET(retval, eSUCCESS)) 
           {
-            // They got away.  Stop fighting for everyone not in the new room from fighting
+            stop_fighting(ch);
+	    
+	    // Since the move stops the fight between ch and ch->fighting we have to check_pursuit
+	    // against it separate than the combat_list loop
+	    if (cmd == CMD_FLEE)
+	      check_pursuit(last_fighting, ch, tempcommand);
+	    
+            // They got away.  Stop fighting for everyone not in the new room from fighting    
             for (chTemp = combat_list; chTemp; chTemp = loop_ch) 
             {
               loop_ch = chTemp->next_fighting;
-              if (chTemp->fighting == ch && chTemp->in_room != ch->in_room)
+              if (chTemp->fighting == ch && chTemp->in_room != ch->in_room) {
                 stop_fighting(chTemp);
+		if (cmd == CMD_FLEE)
+		  check_pursuit(chTemp, ch, tempcommand);
+	      }
             } // for
-            
-            stop_fighting(ch);
+	    
             return eSUCCESS;
-          } // do_simple_move
-          
-          else {
+          } else {
             if (!IS_SET(retval, eCH_DIED)) 
               act("$n tries to flee, but is too exhausted!", ch, 0, 0, TO_ROOM, INVIS_NULL);
-            if(was_fighting)
+	    
+            if (last_fighting)
                GET_POS(ch) = POSITION_FIGHTING;
+	    
             return retval;
           }
       } // if CAN_GO
@@ -6708,6 +6725,40 @@ int do_flee(struct char_data *ch, char *argument, int cmd)
   return eFAILURE;
 }
 
+int check_pursuit(char_data *ch, char_data *victim, char *dircommand)
+{
+  // Handle pursuit skill
+  if (ch == 0 || victim == 0 || IS_NPC ( ch ) || !affected_by_spell ( ch, SKILL_PURSUIT ) )
+    return eFAILURE;
+
+  int pursuit = has_skill ( ch, SKILL_PURSUIT );
+  if ( number ( 1, 100 ) > pursuit ) {
+    // failure
+    act ( "$N fled quickly before you were able to pursue $m!", ch, 0, victim, TO_CHAR, 0 );
+    WAIT_STATE ( ch, PULSE_VIOLENCE );
+  } else {
+    // succeeded
+    stop_fighting ( victim );
+    if ( !charge_moves ( ch, SKILL_PURSUIT ) )
+      return eFAILURE;
+
+    act ( "Upon seeing $N flee, you bellow in rage and charge blindly after $m!", ch, 0, victim, TO_CHAR, 0 );
+    act ( "Upon seeing $N flee, $n bellows in rage and charges blindly after $m!", ch, 0, victim, TO_ROOM, NOTVICT );
+
+    int retval = command_interpreter(ch, dircommand);
+    if (IS_SET(retval, eCH_DIED))
+      return eSUCCESS;
+
+    act ( "Spotting $N nearby, you rush in towards $m and furiously attack!", ch, 0, victim, TO_CHAR, 0 );
+    act ( "$n charges in with a bellow of rage, cutting of your escape and attacks you furiously!", ch, 0, victim, TO_VICT, 0 );
+    act ( "$n charges in with a bellow of rage, cutting of $N's escape and attacks $m furiously!", ch, 0, victim, TO_ROOM, NOTVICT );
+    attack ( ch, victim, TYPE_UNDEFINED );
+    WAIT_STATE ( ch, PULSE_VIOLENCE );
+  }
+
+  return eSUCCESS;
+}
+  
 
 long int get_weapon_bit(int weapon_type)
 {
