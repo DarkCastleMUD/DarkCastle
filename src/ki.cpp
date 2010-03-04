@@ -3,7 +3,7 @@
  * Morcallen 12/18
  *
  */
-/* $Id: ki.cpp,v 1.89 2009/12/20 11:59:50 kkoons Exp $ */
+/* $Id: ki.cpp,v 1.90 2010/03/04 21:32:00 kkoons Exp $ */
 
 extern "C"
 {
@@ -866,6 +866,13 @@ int ki_disrupt( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim)
 	 act("Your protection from good has been disrupted!", ch, 0,victim, TO_VICT, 0);
 	 act("The light, $B$6pulsing$R aura surrounding $n has been disrupted!", victim, 0, 0, TO_ROOM, 0);
        }       
+
+     if(IS_NPC(victim) && !victim->fighting)
+     {
+       retval = attack(victim, ch, 0);
+       SWAP_CH_VICT(retval);
+       return retval;
+     }
    }
 
    // This section of code looks for specific spells or affects and
