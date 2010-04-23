@@ -21,7 +21,7 @@ typedef int socket_t;
 #define NUM_RESERVED_DESCS      8
 //#define OPT_USEC                250000  
 //#define PASSES_PER_SEC         (1000000 / OPT_USEC)
-#define PASSES_PER_SEC          4
+#define PASSES_PER_SEC          10
 #define HOST_LENGTH             30
 
 #define PULSE_TIMER	(1 * PASSES_PER_SEC)
