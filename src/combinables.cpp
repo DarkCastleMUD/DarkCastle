@@ -576,6 +576,14 @@ int do_brew(char_data *ch, char *argument, int cmd)
   if (spell == 0) {
     act("As you finish, nothing special seems to happen.", ch, 0, 0, TO_CHAR, 0);
     act("As $e finishes, nothing special seems to happen.", ch, 0, 0, TO_ROOM, 0);
+
+    af.type = SKILL_BREW_TIMER;
+    af.location = APPLY_NONE;
+    af.modifier = 0;
+    af.duration = 24;
+    af.bitvector = -1;
+    affect_to_char(ch, &af);
+
   } else if (skill_success(ch, 0, SKILL_BREW)) {
     af.type = SKILL_BREW_TIMER;
     af.location = APPLY_NONE;
@@ -971,6 +979,14 @@ int do_scribe(char_data *ch, char *argument, int cmd)
   if (spell == 0) {
     act("As you finish, nothing special seems to happen.", ch, 0, 0, TO_CHAR, 0);
     act("As $e finishes, nothing special seems to happen.", ch, 0, 0, TO_ROOM, 0);
+
+    af.type = SKILL_SCRIBE_TIMER;
+    af.location = APPLY_NONE;
+    af.modifier = 0;
+    af.duration = 24;
+    af.bitvector = -1;
+    affect_to_char(ch, &af);
+
   } else if (!skill_success(ch, 0, SKILL_SCRIBE)) {
     act("As you finish, the letters on the newly minted scroll burst into $B$4flame$R leaving nothing but ash!", ch, 0, 0, TO_CHAR, 0);
     act("As $e finishes, the letters on the newly minted scroll burst into $B$4flame$R leaving nothing but ash!", ch, 0, 0, TO_ROOM, 0);
