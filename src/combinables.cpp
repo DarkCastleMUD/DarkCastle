@@ -634,13 +634,6 @@ int do_brew(char_data *ch, char *argument, int cmd)
 
     extract_obj(herbobj);
   } else {
-    af.type = SKILL_BREW_TIMER;
-    af.location = APPLY_NONE;
-    af.modifier = 0;
-    af.duration = 24;
-    af.bitvector = -1;
-    affect_to_char(ch, &af);
-
     act("You sit down and carefully pour the ingredients into $o and give it a gentle shake to mix them.", ch, containerobj, 0, TO_CHAR, 0);
     act("As you finish, the liquid begins to bubble furiously, cracking the $o and rendering your work useless!", ch, containerobj, 0, TO_CHAR, 0);
 
@@ -961,13 +954,6 @@ int do_scribe(char_data *ch, char *argument, int cmd)
 
   WAIT_STATE(ch, PULSE_VIOLENCE * 2.5);
 
-  af.type = SKILL_SCRIBE_TIMER;
-  af.location = APPLY_NONE;
-  af.modifier = 0;
-  af.duration = 24;
-  af.bitvector = -1;
-  affect_to_char(ch, &af);
-
   // Search for the current combination as a recipe
   Scribe::recipe r = { obj_index[inkobj->item_number].virt,
 		       obj_index[dustobj->item_number].virt,
@@ -999,6 +985,13 @@ int do_scribe(char_data *ch, char *argument, int cmd)
   } else {
     act("As you finish, the letters on the newly minted scroll $Bglow$R briefly and return to normal.", ch, 0, 0, TO_CHAR, 0);
     act("As $e finishes, the letters on the newly minted scroll $Bglow$R briefly and return to normal.", ch, 0, 0, TO_ROOM, 0);
+
+    af.type = SKILL_SCRIBE_TIMER;
+    af.location = APPLY_NONE;
+    af.modifier = 0;
+    af.duration = 24;
+    af.bitvector = -1;
+    affect_to_char(ch, &af);
 
     char ink_key[MAX_STRING_LENGTH], dust_key[MAX_STRING_LENGTH],
       pen_key[MAX_STRING_LENGTH], paper_key[MAX_STRING_LENGTH];
