@@ -3678,17 +3678,21 @@ int spell_strength(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
   int mod = 4 + (skill>20) + (skill>40) + (skill>60) + (skill>80);
 
   if((cur_af = affected_by_spell(victim, SPELL_WEAKEN)))
-  {
-    cur_af->modifier += mod;
-    send_to_char("You feel the magical weakness leave your body.\r\n", victim);
+  {    
     af.type      = cur_af->type;
     af.duration  = cur_af->duration;
-    af.modifier  = cur_af->modifier;
+    af.modifier  = cur_af->modifier + mod;
     af.location  = cur_af->location;
     af.bitvector = cur_af->bitvector;
     affect_from_char( victim, SPELL_WEAKEN );  // this makes cur_af invalid
-    if( af.modifier < 0 ) // it's not out yet
+    
+    if( af.modifier < 0 ) { // it's not out yet, so put some back
+       send_to_char("You feel most of the magical weakness leave your body.\r\n", victim);
        affect_to_char( victim, &af );
+    } else {
+       send_to_char("You feel the magical weakness leave your body.\r\n", victim);
+    }
+    
     return eSUCCESS;
   }
 
