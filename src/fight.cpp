@@ -20,7 +20,7 @@
  * 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead *
  * of just race stuff                                                     *
  **************************************************************************
- * $Id: fight.cpp,v 1.562 2010/02/24 03:19:52 jhhudso Exp $               *
+ * $Id: fight.cpp,v 1.563 2010/04/29 01:38:45 jhhudso Exp $               *
  **************************************************************************/
 
 extern "C"
@@ -3915,7 +3915,7 @@ void make_corpse(CHAR_DATA * ch)
       obj_to_obj(money, corpse);
     }
   
-    if(IS_MOB(ch) && GET_LEVEL(ch) > 60 && number(1, 100) == 42) //1%
+    if(IS_MOB(ch) && GET_LEVEL(ch) > 60 && number(1, 100) > 90) //10%
     {
       struct obj_data *recipeitem = NULL;
       int rarity = number(1, 100);
