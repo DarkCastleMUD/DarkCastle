@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: shop.cpp,v 1.30 2010/02/11 06:03:00 jhhudso Exp $ */
+/* $Id: shop.cpp,v 1.31 2010/05/03 00:36:18 jhhudso Exp $ */
 
 extern "C"
 {
@@ -1642,7 +1642,11 @@ int eddie_shopkeeper(struct char_data *ch, struct obj_data *obj, int cmd, char *
     for (int i=0; i < eddie[choice-1].cost_qty; i++) {
       obj_data *obj = search_char_for_item(ch, real_object(eddie[choice-1].cost_vnum));
       if (obj != 0) {
-	obj_from_char(obj);
+	if (obj->in_obj) {
+	  obj_from_obj(obj);
+	} else {
+	  obj_from_char(obj);
+	}
 
 	act("$n gives $p to $N.", ch, obj, owner, TO_ROOM, INVIS_NULL|NOTVICT);
 	act("$n gives you $p.", ch, obj, owner, TO_VICT, 0);
