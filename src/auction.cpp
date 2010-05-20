@@ -1614,7 +1614,7 @@ void AuctionHouse::AddItem(CHAR_DATA *ch, OBJ_DATA *obj, unsigned int price, str
       GET_GOLD(ch) -= 200000;
       send_to_char("You pay the 200000 gold to advertise your item.\n\r", ch);
       snprintf(auc_buf, MAX_STRING_LENGTH, "$7$B%s has just posted $R%s $7$Bfor sale.",
-                         GET_NAME(ch), obj->short_description);
+                         GET_SHORT(ch), obj->short_description);
       do_auction(Broker, auc_buf, 9); 
     }
     else
