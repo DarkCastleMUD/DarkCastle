@@ -19,7 +19,7 @@
 /* 12/06/2003   Onager   Modified mobile_activity() to prevent charmie    */
 /*                       scavenging                                       */
 /**************************************************************************/
-/* $Id: mob_act.cpp,v 1.49 2009/06/26 01:33:50 shane Exp $ */
+/* $Id: mob_act.cpp,v 1.50 2010/05/23 16:05:21 jhhudso Exp $ */
 
 extern "C"
 {
@@ -290,11 +290,16 @@ void mobile_activity(void)
 
       if(!ISSET(ch->mobdata->actflags, ACT_STUPID))
       {
-        if(!IS_AFFECTED(ch, AFF_BLIND) && ch->hunting) {
-          retval = do_track(ch, ch->hunting, 9);
-          if(SOMEONE_DIED(retval))
-             continue;
-        }
+	if (GET_POS(ch) > POSITION_SITTING) {
+	  if(!IS_AFFECTED(ch, AFF_BLIND) && ch->hunting) {
+	    retval = do_track(ch, ch->hunting, 9);
+	    if(SOMEONE_DIED(retval))
+	      continue;
+	  }
+	} else if (GET_POS(ch) < POSITION_FIGHTING) {
+	  do_stand(ch, "", CMD_DEFAULT);
+	  continue;
+	}
       }
     }  //  end FIRST hatred IF statement 
   
