@@ -3054,7 +3054,7 @@ char*arg,
      send_to_char("The robe glows, but nothing happens.\r\n",ch);
      return eSUCCESS;
   }
-  addTimer(ch, SPELL_MANA, 24);
+  addTimer(ch, SPELL_MANA, 6);
   send_to_char("Your robes glow brightly!\r\n",ch);
   return spell_mana(50, ch, ch, 0, 100);
 }
