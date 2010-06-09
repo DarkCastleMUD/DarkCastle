@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.196 2010/03/18 07:07:40 shane Exp $ */
+/* $Id: mob_proc.cpp,v 1.197 2010/06/09 13:28:42 apocalypse Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -1779,7 +1779,8 @@ static char *dethSayText [ ] =
   "Hey, does this rag smell like chloroform to you?",
   "God made semen taste like bleach so she'd remember to do the laundry.",
   "If it's an \"eye for an eye and a tooth for a tooth\", why is there no Eye Fairy?",
-  "Necrophilia - putting the fun back in funeral."
+  "Necrophilia - putting the fun back in funeral.",
+  "Monopolies are like children on an airplane, you complain about them until you have one."
  };
 
 // ENDOFCHAIN
