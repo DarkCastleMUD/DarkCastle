@@ -1135,8 +1135,7 @@ int song_whistle_sharp( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim
       return retval;
    }
 
-   wait = MAX(wait, 2);
-
+   wait = MAX(wait, 1*PULSE_VIOLENCE);
    WAIT_STATE(ch, wait);
    return eSUCCESS;
 }
