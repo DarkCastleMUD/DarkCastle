@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: modify.cpp,v 1.30 2009/06/26 00:49:08 shane Exp $ */
+/* $Id: modify.cpp,v 1.31 2011/01/24 01:23:02 jhhudso Exp $ */
 
 extern "C"
 {
@@ -39,6 +39,7 @@ extern "C"
 #include <handler.h>
 #include <db.h>
 #include <string>
+#include <iostream>
 using namespace std;
 
 // TODO - what does this do?  Nothing that I can see....let's remove it....
@@ -686,8 +687,13 @@ void page_string_dep(struct descriptor_data *d, const char *str, int keep_intern
     return;
   }
 
-  char buf[MAX_STRING_LENGTH];
-  strncpy(buf, str, MAX_STRING_LENGTH);
+  char buf[MAX_STRING_LENGTH] = { 0 };
+  strncpy(buf, str, MAX_STRING_LENGTH-1);
+
+  if (strlen(buf) < strlen(str)) {
+    cerr << "page_string_dep() error buf(" << strlen(buf) << ") less than str("
+	 << strlen(str) << ")" << endl;
+  }
 
   CREATE(d->showstr_vector, char *, d->showstr_count = count_pages(buf));
 
