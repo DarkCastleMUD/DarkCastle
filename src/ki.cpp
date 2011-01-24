@@ -3,7 +3,7 @@
  * Morcallen 12/18
  *
  */
-/* $Id: ki.cpp,v 1.91 2011/01/23 23:56:16 jhhudso Exp $ */
+/* $Id: ki.cpp,v 1.92 2011/01/24 00:03:10 jhhudso Exp $ */
 
 extern "C"
 {
@@ -313,6 +313,8 @@ int do_ki(CHAR_DATA *ch, char *argument, int cmd)
          && !IS_SET(world[ch->in_room].room_flags, SAFE)) {
         send_to_char("You lost your concentration!\n\r", ch);
         GET_KI(ch) -= use_ki(ch, spl)/2;
+	WAIT_STATE(ch, ki_info[spl].beats/2);
+
         return eSUCCESS;
       }
 
