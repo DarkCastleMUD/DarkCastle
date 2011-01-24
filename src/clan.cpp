@@ -1,4 +1,4 @@
-/* $Id: clan.cpp,v 1.77 2009/05/26 01:50:40 jhhudso Exp $ */
+/* $Id: clan.cpp,v 1.78 2011/01/24 01:21:03 jhhudso Exp $ */
 
 /***********************************************************************/
 /* Revision History                                                    */
@@ -33,6 +33,7 @@ extern "C"
 #include <iostream>
 #include <sstream>
 #include <fileinfo.h>
+#include <stack>
 
 extern CHAR_DATA *character_list;
 extern struct descriptor_data *descriptor_list;
@@ -2309,15 +2310,35 @@ void log_clan(CHAR_DATA *ch, char *buf)
 
 void show_clan_log(CHAR_DATA *ch)
 {
+  string s;
+  ifstream fin;
   stringstream fname;
+  stack<string> logstack;
 
   fname << "../lib/clans/clan" << ch->clan << ".log";
 
-  ifstream fin;
-  fin.open(fname.str().c_str());
+  fin.open(fname.str().c_str()); 
+  while (getline(fin,s)) {
+    // Remove \r at the end of the line, if applicable
+    if (s.size() && *s.rbegin() == '\r') {
+      s.resize(s.size()-1);
+    }
+    logstack.push(s);
+  }
+  fin.close();
+
   stringstream buffer;
-  buffer << "The following are your clan's most recent log entries (Times are UTC):\n\r";
-  buffer << fin.rdbuf();
+  buffer << "The following are your clan's most recent 5 pages of log entries:\n\r";
+  int line = 1;
+  while(logstack.size()) {
+    buffer << logstack.top() << "\n\r";
+    logstack.pop();
+
+    // 5 pages, 21 lines each
+    if (line++ > 21*5) {
+      break;
+    }
+  }
 
   page_string(ch->desc, const_cast<char *>(buffer.str().c_str()), 1);
 }
