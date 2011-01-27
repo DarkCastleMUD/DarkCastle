@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: limits.cpp,v 1.97 2009/05/26 01:58:06 shane Exp $ */
+/* $Id: limits.cpp,v 1.98 2011/01/27 03:43:58 jhhudso Exp $ */
 
 extern "C"
 {
@@ -169,7 +169,11 @@ int mana_gain(CHAR_DATA *ch)
     if(GET_CLASS(ch) == CLASS_MAGIC_USER ||
        GET_CLASS(ch) == CLASS_ANTI_PAL || GET_CLASS(ch) == CLASS_RANGER)
     {
-      modifier = int_app[GET_INT(ch)].mana_regen;
+      if (GET_INT(ch) < 0)
+	modifier = int_app[0].mana_regen;
+      else
+	modifier = int_app[GET_INT(ch)].mana_regen;
+
       modifier += GET_INT(ch);
     }
     else {
@@ -249,8 +253,12 @@ int hit_gain(CHAR_DATA *ch, int position)
     if(GET_CLASS(ch) == CLASS_MAGIC_USER || GET_CLASS(ch) == CLASS_CLERIC || GET_CLASS(ch) == CLASS_DRUID)
       gain = (int)((float)gain * 0.7);*/
 
-     gain += con_app[GET_CON(ch)].hp_regen;
-      gain += GET_CON(ch);
+    if (GET_CON(ch) < 0)
+	gain += con_app[0].hp_regen;
+      else
+	gain += con_app[GET_CON(ch)].hp_regen;
+
+    gain += GET_CON(ch);
   }
   if (ISSET(ch->affected_by, AFF_REGENERATION))
     gain += (gain/2);
@@ -306,7 +314,11 @@ int move_gain(CHAR_DATA *ch, int extra)
 	    default:                divisor = 3; break;
 	}
 	gain += GET_DEX(ch);
-	gain += con_app[GET_CON(ch)].move_regen;
+
+	if (GET_CON(ch) < 0)
+	  gain += con_app[0].move_regen;
+	else
+	  gain += con_app[GET_CON(ch)].move_regen;
 
         if((af = affected_by_spell(ch, SPELL_RAPID_MEND)))
           gain += (int)(af->modifier * 1.5);
@@ -543,8 +555,16 @@ void advance_level(CHAR_DATA *ch, int is_conversion)
 	     GET_CLASS(ch) == CLASS_PALADIN)
        add_mana += wis_app[GET_WIS(ch)].mana_gain;
 */
-    add_hp += con_app[GET_CON(ch)].hp_gain;
-    add_moves += dex_app[GET_DEX(ch)].move_gain;
+    if (GET_CON(ch) < 0)
+      add_hp += con_app[0].hp_gain;
+    else
+      add_hp += con_app[GET_CON(ch)].hp_gain;
+
+    if (GET_DEX(ch) < 0)
+      add_moves += dex_app[0].move_gain;
+    else
+      add_moves += dex_app[GET_DEX(ch)].move_gain;
+
     add_hp			 = MAX( 1, add_hp);
     add_mana			 = MAX( 0, add_mana);
     add_moves			 = MAX( 1, add_moves);

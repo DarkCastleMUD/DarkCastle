@@ -3,7 +3,7 @@
  * Morcallen 12/18
  *
  */
-/* $Id: ki.cpp,v 1.92 2011/01/24 00:03:10 jhhudso Exp $ */
+/* $Id: ki.cpp,v 1.93 2011/01/27 03:43:58 jhhudso Exp $ */
 
 extern "C"
 {
@@ -370,11 +370,22 @@ int ki_gain(CHAR_DATA *ch)
         /* gain 1 - 7 depedant on level */
         gain = GET_CLASS(ch) == CLASS_MONK?(int)(ch->max_ki * 0.04):(int)(ch->max_ki * 0.05);/*(GET_LEVEL(ch) / 8) + 1;*/
         gain += ch->ki_regen;
-	if (GET_CLASS(ch) == CLASS_MONK) gain += wis_app[GET_WIS(ch)].ki_regen;
-        else if (GET_CLASS(ch) == CLASS_BARD) gain += int_app[GET_INT(ch)].ki_regen;
+
+	// Normalize these so we dont underun the array below
+	int norm_wis = MAX(0, GET_WIS(ch));
+        int norm_int = MAX(0, GET_INT(ch));
+
+	if (GET_CLASS(ch) == CLASS_MONK) {
+	  gain += wis_app[norm_wis].ki_regen;
+	} else if (GET_CLASS(ch) == CLASS_BARD) {
+	  gain += int_app[norm_int].ki_regen;
+	}
+
         gain += age(ch).year / 25;
+
 	if ( IS_SET(world[ch->in_room].room_flags, SAFE) || check_make_camp(ch->in_room))
-		gain = (int)(gain * 1.25);
+	  gain = (int)(gain * 1.25);
+
 	return MAX(gain, 1);
 }
 
