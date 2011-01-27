@@ -1,5 +1,5 @@
 /************************************************************************
- * $Id: cl_barbarian.cpp,v 1.112 2010/02/19 06:10:41 jhhudso Exp $
+ * $Id: cl_barbarian.cpp,v 1.113 2011/01/27 05:55:44 jhhudso Exp $
  * cl_barbarian.cpp
  * Description: Commands for the barbarian class.
  *************************************************************************/
@@ -977,7 +977,7 @@ int do_ferocity(struct char_data *ch, char *argument, int cmd)
   }
   else {
     act ("$n lets out a deafening roar!", ch, 0, 0, TO_ROOM, 0);
-    send_to_char("Your heart beats adrenaline though your body and you roar with ferocity!\r\n", ch);
+    send_to_char("Your heart beats adrenaline through your body and you roar with ferocity!\r\n", ch);
 
      af.type     = SKILL_FEROCITY_TIMER;
      af.duration = 1 + has_skill(ch,SKILL_FEROCITY) / 10;
