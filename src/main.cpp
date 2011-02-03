@@ -17,7 +17,7 @@ extern char **orig_argv;
 extern short code_testing_mode;
 extern short code_testing_mode_mob;
 extern short code_testing_mode_world;
-extern bool verbose_mode = FALSE;
+bool verbose_mode = FALSE;
 extern short bport;
 extern bool allow_imp_password;
 
@@ -38,20 +38,14 @@ int main(int argc, char **argv)
   // Make a copy of our executable so that in the event of a crash we have a
   // known good copy to debug with.
   stringstream cmd;
-  cmd << "cp " << argv[0] << " " << argv[0] << ".`/sbin/pidof " << argv[0] << "`";
+  cmd << "/bin/cp " << argv[0] << " " << argv[0] << "." << getpid();
   if (int retval = system(cmd.str().c_str()) != 0) {
     cerr << "Unable to make backup of executable due to system error: "
 	 << retval << endl;
   }
 #endif
 
-  fprintf(stderr, "Arguments: ");
   orig_argv = argv;
-  int index=0;
-  do {
-    fprintf(stderr, "[%s] ", orig_argv[index++]);
-  } while (orig_argv[index] != 0);
-  fprintf(stderr, "\n");
 
   char buf[512];
   int pos = 1;
