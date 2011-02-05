@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.279 2010/04/23 04:55:46 jhhudso Exp $ */
+/* $Id: spells.cpp,v 1.280 2011/02/05 10:37:09 jhhudso Exp $ */
 
 extern "C"
 {
@@ -2244,17 +2244,14 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
         send_to_char("Sorry, this magic has not yet been implemented :(\n\r", ch);
       else 
       {
-	int chance;
+	int chance = 50;
 
-        if(IS_MOB(ch)) {
-          learned = GET_LEVEL(ch);
-          chance = 50;
-        }
-        else
-	chance = 40;
-	
+	if (IS_MOB(ch))
+	  {
+	    learned = GET_LEVEL(ch);
+	  }
 
-	chance += learned / 2;
+	chance += learned / 1.5;
 
 	if (GET_CLASS(ch) == CLASS_MAGIC_USER || GET_CLASS(ch) == CLASS_ANTI_PAL)
 	  chance += int_app[GET_INT(ch)].conc_bonus;
