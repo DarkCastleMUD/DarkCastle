@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.194 2009/11/05 03:18:56 jhhudso Exp $ */
+/* $Id: handler.cpp,v 1.195 2011/08/19 22:55:03 jhhudso Exp $ */
     
 extern "C"
 {
@@ -2030,7 +2030,14 @@ int char_to_room(CHAR_DATA *ch, int room)
 	SET_BIT(world[room].room_flags, NO_TRACK);
     }
   }
-    return(1);
+
+  if ((GET_CLASS(ch) == CLASS_BARD) &&
+      IS_SET(world[ch->in_room].room_flags, NO_KI) &&
+      !(ch->songs.empty())) {
+    do_sing(ch, "stop", 9);
+  }
+
+  return(1);
 }
 
 
