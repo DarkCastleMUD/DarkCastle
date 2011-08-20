@@ -738,13 +738,16 @@ void game_loop(unsigned mother_desc, unsigned other_desc, unsigned third_desc, u
     /* process descriptors with input pending */
     for (d = descriptor_list; d; d = next_d) {
       next_d = d->next;
-      if (FD_ISSET(d->descriptor, &input_set))
+      if (FD_ISSET(d->descriptor, &input_set)) {
 	if (process_input(d) < 0) {
-    sprintf(buf, "Connection attempt bailed from %s", d->host);
-    printf(buf);
-	   log(buf, OVERSEER, LOG_SOCKET);
+	  if (strcmp(d->host, "127.0.0.1")) {
+	    sprintf(buf, "Connection attempt bailed from %s", d->host);
+	    printf(buf);
+	    log(buf, OVERSEER, LOG_SOCKET);
+	  }
 	  close_socket(d);
 	}
+      }
     }
 
     /* process commands we just read from process_input */
@@ -1933,7 +1936,9 @@ int process_input(struct descriptor_data *t)
 	return 0;		/* the read would have blocked: just means no
 				 * data there but everything's okay */
     } else if (bytes_read == 0) {
-      log("EOF on socket read (connection broken by peer)", ANGEL, LOG_SOCKET);
+	  if (strcmp(t->host, "127.0.0.1")) {
+	    log("EOF on socket read (connection broken by peer)", ANGEL, LOG_SOCKET);
+	  }
       return -1;
     }
     /* at this point, we know we got some data from the read */
