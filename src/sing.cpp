@@ -783,8 +783,12 @@ void update_bard_singing()
     for( j = i->songs.begin(); j != i->songs.end(); ++j ) {
      if((*j).song_timer == -1) {
        send_to_char("You run out of lyrics and end the song.\n\r", i);
-       if((song_info[(*j).song_number].intrp_pointer))
+       if((song_info[(*j).song_number].intrp_pointer)) {
           ((*song_info[(*j).song_number].intrp_pointer) (GET_LEVEL(i), i, NULL, NULL, -1));      
+	  if (i->songs.empty()) {
+	    break;
+	  }
+       }
        (*j).song_timer = 0;
        if((*j).song_data) {
           if ((int)(*j).song_data > 10) // Otherwise it's a temp variable.
@@ -826,8 +830,12 @@ void update_bard_singing()
          )
       {
          send_to_char("In this room, your song quiety fades away.\r\n", i);
-         if((song_info[(*j).song_number].intrp_pointer))
+         if((song_info[(*j).song_number].intrp_pointer)) {
             ((*song_info[(*j).song_number].intrp_pointer) (GET_LEVEL(i), i, NULL, NULL, -1));
+	    if (i->songs.empty()) {
+	      break;
+	    }
+	 }
          if((*j).song_data) {
 	    if ((int)(*j).song_data > 10) // Otherwise it's a temp variable.
               dc_free((*j).song_data);
@@ -860,8 +868,12 @@ void update_bard_singing()
       {
            send_to_char("You can't keep singing in this position!\r\n", i); 
            (*j).song_timer = 0;
-           if((song_info[(*j).song_number].intrp_pointer))
+           if((song_info[(*j).song_number].intrp_pointer)) {
              ((*song_info[(*j).song_number].intrp_pointer) (GET_LEVEL(i), i, NULL, NULL, -1));
+	     if (i->songs.empty()) {
+	       break;
+	     }
+	   }
            if((*j).song_data) {
               if ((int)(*j).song_data > 10) // Otherwise it's a temp variable.
                  dc_free((*j).song_data);
@@ -881,8 +893,12 @@ void update_bard_singing()
       {
          if((!i->equipment[HOLD] || GET_ITEM_TYPE(i->equipment[HOLD]) != ITEM_INSTRUMENT) && (!i->equipment[HOLD2] || GET_ITEM_TYPE(i->equipment[HOLD2]) != ITEM_INSTRUMENT)) {
             send_to_char("Without an instrument, your song dies away.\r\n", i);
-            if((song_info[(*j).song_number].intrp_pointer))
+            if((song_info[(*j).song_number].intrp_pointer)) {
                ((*song_info[(*j).song_number].intrp_pointer) (GET_LEVEL(i), i, NULL, NULL, -1));
+	       if (i->songs.empty()) {
+		 break;
+	       }
+	    }
             (*j).song_timer = 0;
             if((*j).song_data) {
 	       if ((int)(*j).song_data > 10) // Otherwise it's a temp variable.
@@ -918,9 +934,14 @@ void update_bard_singing()
       int learned = has_skill(i, ( (*j).song_number + SKILL_SONG_BASE ) );
       int retval;
 
-      if((song_info[(*j).song_number].exec_pointer))
+      if((song_info[(*j).song_number].exec_pointer)) {
         retval = ((*song_info[(*j).song_number].exec_pointer) (GET_LEVEL(i), i, NULL, NULL, learned));
-      else send_to_char("Bad exec pointer on the song you sang.  Tell a god.\r\n", i);
+	if (i->songs.empty()) {
+	  break;
+	}
+      } else {
+	send_to_char("Bad exec pointer on the song you sang.  Tell a god.\r\n", i);
+      }
 
       if(retval == eEXTRA_VALUE) { //the song killed itself
         --j;
@@ -1722,8 +1743,7 @@ void do_astral_chanty_movement(CHAR_DATA *victim, CHAR_DATA *target)
 
   if(IS_SET(world[target->in_room].room_flags, PRIVATE) ||
      IS_SET(world[target->in_room].room_flags, IMP_ONLY) ||
-     IS_SET(world[target->in_room].room_flags, NO_PORTAL) ||
-     IS_SET(world[target->in_room].room_flags, NO_KI)) {
+     IS_SET(world[target->in_room].room_flags, NO_PORTAL)) {
     send_to_char ("Your astral travels fail to find your destination.\n\r", victim);
     return;
   }
@@ -1789,8 +1809,7 @@ int execute_song_astral_chanty( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA
 	status = eFAILURE;
     } else if (IS_SET(world[victim->in_room].room_flags, NO_PORTAL) || 
 	       IS_SET(zone_table[world[victim->in_room].zone].zone_flags, ZONE_NO_TELEPORT) ||
-	       IS_SET(world[victim->in_room].room_flags, ARENA) ||
-	       IS_SET(world[victim->in_room].room_flags, NO_KI)) {
+	       IS_SET(world[victim->in_room].room_flags, ARENA)) {
 	send_to_char("A mystical force seems to be keeping you out.\r\n", ch);
 	status = eFAILURE;
     } else {
