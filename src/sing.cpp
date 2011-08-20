@@ -1722,7 +1722,8 @@ void do_astral_chanty_movement(CHAR_DATA *victim, CHAR_DATA *target)
 
   if(IS_SET(world[target->in_room].room_flags, PRIVATE) ||
      IS_SET(world[target->in_room].room_flags, IMP_ONLY) ||
-     IS_SET(world[target->in_room].room_flags, NO_PORTAL) )  {
+     IS_SET(world[target->in_room].room_flags, NO_PORTAL) ||
+     IS_SET(world[target->in_room].room_flags, NO_KI)) {
     send_to_char ("Your astral travels fail to find your destination.\n\r", victim);
     return;
   }
@@ -1788,7 +1789,8 @@ int execute_song_astral_chanty( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA
 	status = eFAILURE;
     } else if (IS_SET(world[victim->in_room].room_flags, NO_PORTAL) || 
 	       IS_SET(zone_table[world[victim->in_room].zone].zone_flags, ZONE_NO_TELEPORT) ||
-	       IS_SET(world[victim->in_room].room_flags, ARENA)) {
+	       IS_SET(world[victim->in_room].room_flags, ARENA) ||
+	       IS_SET(world[victim->in_room].room_flags, NO_KI)) {
 	send_to_char("A mystical force seems to be keeping you out.\r\n", ch);
 	status = eFAILURE;
     } else {
