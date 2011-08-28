@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: non_off.cpp,v 1.61 2009/10/29 16:48:29 jhhudso Exp $
+| $Id: non_off.cpp,v 1.62 2011/08/28 18:24:54 jhhudso Exp $
 | non_off.C
 | Description:  Implementation of generic, non-offensive commands.
 */
@@ -40,7 +40,8 @@ extern "C"
 
 extern CWorld world;
 extern struct index_data *obj_index;
- 
+extern CVoteData *DCVote;
+   
 void log_sacrifice(CHAR_DATA *ch, OBJ_DATA *obj, bool decay = FALSE)
 { //decay variable means it's from a decaying corpse, not a player
   FILE *fl;
@@ -1531,29 +1532,26 @@ CVoteData::CVoteData()
 CVoteData::~CVoteData()
 {}
  
-CVoteData DCVote;
-
 int do_vote(struct char_data *ch, char *arg, int cmd)
 {
-  extern CVoteData DCVote;
   char buf[MAX_STRING_LENGTH];
   int vote;
   arg = one_argument(arg, buf);
  
   if(!strcmp(buf, "results"))
   {
-    DCVote.DisplayResults(ch);
+    DCVote->DisplayResults(ch);
     return eSUCCESS;
   }
 
-  if(!DCVote.IsActive())
+  if(!DCVote->IsActive())
   {
     send_to_char("Sorry, there is nothing to vote on right now.\n\r", ch);
     return eSUCCESS;
   }
   if(!strlen(buf))
   {
-    DCVote.DisplayVote(ch);
+    DCVote->DisplayVote(ch);
     return eSUCCESS;  
   }
 
@@ -1564,7 +1562,7 @@ int do_vote(struct char_data *ch, char *arg, int cmd)
   }
 
   vote = atoi(buf);
-  if(true == DCVote.Vote(ch, vote))
+  if(true == DCVote->Vote(ch, vote))
     logf(IMMORTAL, LOG_PLAYER, "%s just voted %d\n\r", GET_NAME(ch), vote);
 
   return eSUCCESS;
