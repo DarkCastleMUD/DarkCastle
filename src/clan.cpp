@@ -1,4 +1,4 @@
-/* $Id: clan.cpp,v 1.78 2011/01/24 01:21:03 jhhudso Exp $ */
+/* $Id: clan.cpp,v 1.79 2011/08/28 03:45:00 jhhudso Exp $ */
 
 /***********************************************************************/
 /* Revision History                                                    */
@@ -918,7 +918,7 @@ int do_accept(CHAR_DATA *ch, char *arg, int cmd)
   send_to_char(buf, victim); 
 
   sprintf(buf, "%s just joined clan [%s].", GET_NAME(victim), clan->name);
-  log(buf, 110, LOG_CLAN);
+  log(buf, IMP, LOG_CLAN);
 
   add_totem_stats(victim);
     
@@ -991,7 +991,7 @@ int do_outcast(CHAR_DATA *ch, char *arg, int cmd)
 
   if(victim == ch) {
     sprintf(buf, "%s just quit clan [%s].", GET_NAME(victim), clan->name);
-    log(buf, 110, LOG_CLAN);
+    log(buf, IMP, LOG_CLAN);
     send_to_char("You quit your clan.\n\r", ch);
     remove_totem_stats(victim);
     victim->clan = 0;
@@ -1015,7 +1015,7 @@ int do_outcast(CHAR_DATA *ch, char *arg, int cmd)
   send_to_char(buf, victim); 
 
   sprintf(buf, "%s was outcasted from clan [%s].", GET_NAME(victim), clan->name);
-  log(buf, 110, LOG_CLAN);
+  log(buf, IMP, LOG_CLAN);
 
   do_save(victim,"",666);
   if(!connected) free_char(victim);
@@ -1075,7 +1075,7 @@ int do_cpromote(CHAR_DATA *ch, char *arg, int cmd)
   send_to_char(buf, victim); 
 
   sprintf(buf, "%s just cpromoted by %s as leader of clan [%s].", GET_NAME(victim), GET_NAME(ch), clan->name);
-  log(buf, 110, LOG_CLAN);
+  log(buf, IMP, LOG_CLAN);
   return eSUCCESS;
 }
 
@@ -2387,7 +2387,7 @@ int do_clans(CHAR_DATA *ch, char *arg, int cmd)
     }
   }
 
-  if(!IS_NPC(ch) && (GET_LEVEL(ch) == IMP)) {
+  if(IS_PC(ch) && (GET_LEVEL(ch) == COORDINATOR)) {
     do_god_clans(ch, arg, cmd);
     return eSUCCESS;
   }
@@ -2974,7 +2974,7 @@ void check_quitter(void *arg1, void *arg2,void *arg3)
 
 void check_quitter(CHAR_DATA *ch)
 {
-  if (!ch->clan || GET_LEVEL(ch) > 100) return;
+  if (!ch->clan || GET_LEVEL(ch) >= 100) return;
   
           struct timer_data *timer;
  #ifdef LEAK_CHECK
