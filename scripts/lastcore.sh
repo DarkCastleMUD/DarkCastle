@@ -13,4 +13,5 @@ then
 fi
 
 echo "Debugging $FILENAME with corefile $CORE"
+echo gdb $FILENAME $CORE
 gdb $FILENAME $CORE

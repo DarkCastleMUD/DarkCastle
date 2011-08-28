@@ -75,12 +75,13 @@ int main(int argc, char **argv)
     return 1;
 
   struct descriptor_data *d = new descriptor_data;
+  memset(d, 0, sizeof(descriptor_data));
 
   /* Create 1 blank obj to be used when playerfile loads */
   create_blank_item(1);
 
   my_load_char_obj(d, argv[1]);
-  cout << "Gold: " << d->character->gold << " Plat: " << d->character->plat << " XP: " << d->character->exp << " HP: " << d->character->raw_hit << " hpmeta: " << d->character->hpmetas << endl;
+  cout << "Gold: " << d->character->gold << " Plat: " << d->character->plat << " XP: " << d->character->exp << " HP: " << d->character->raw_hit << " hpmeta: " << d->character->hpmetas << " Con: " << d->character->con << d->character->raw_con << ", " << d->character->con_bonus << endl;
   
   return 0;
 }
