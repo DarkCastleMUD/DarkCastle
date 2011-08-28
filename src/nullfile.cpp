@@ -7,7 +7,7 @@
  *
  * -Sadus
  */
-/* $Id: nullfile.cpp,v 1.3 2009/11/07 07:44:46 jhhudso Exp $ */
+/* $Id: nullfile.cpp,v 1.4 2011/08/28 03:44:19 jhhudso Exp $ */
 
 extern "C"
 {
@@ -62,10 +62,11 @@ FILE * dc_fopen(const char *f, const char *type)
   if((x = fopen(filename, type)) == NULL) {
 #ifndef WIN32
     if(!(NULL_FILE = fopen("../lib/whassup", "w"))) {
+      perror("dc_fopen: cannot access '../lib/whassup': ");
 #else
     if(!(NULL_FILE = fopen("..\\..\\lib\\whassup", "w"))) {
+      perror("dc_fopen: cannot access '..\\..\\lib\\whassup': ");
 #endif
-      perror("Unable to open NULL_FILE in dc_fopen.");
     }
   }
 
