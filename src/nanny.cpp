@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.187 2009/11/05 22:50:15 jhhudso Exp $ */
+/* $Id: nanny.cpp,v 1.188 2011/08/28 18:28:59 jhhudso Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -91,7 +91,8 @@ extern char *nonew_new_list[30];
 extern CWorld world;
 extern short bport;
 extern bool allow_imp_password;
-
+extern CVoteData *DCVote;
+            
 extern int learn_skill(char_data * ch, int skill, int amount, int maximum);
 
 
@@ -1502,9 +1503,7 @@ is_race_eligible(ch,7)?'*':' ',is_race_eligible(ch,8)?'*':' ',is_race_eligible(c
           }
 	  do_look( ch, "", 8 );
           {
-            extern CVoteData DCVote;
-
-            if(GET_LEVEL(ch) >= 40 && DCVote.IsActive() && !DCVote.HasVoted(ch))
+            if(GET_LEVEL(ch) >= 40 && DCVote->IsActive() && !DCVote->HasVoted(ch))
             {
                send_to_char("\n\rThere is an active vote in which you have not yet voted.\n\r"
                             "Enter \"vote\" to see details\n\r\n\r", ch);
