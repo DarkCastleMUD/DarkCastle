@@ -20,6 +20,7 @@ extern short code_testing_mode_world;
 bool verbose_mode = FALSE;
 extern short bport;
 extern bool allow_imp_password;
+CVoteData *DCVote;
 
 int scheck = 0;			/* for syntax checking mode */
 
@@ -169,6 +170,8 @@ int main(int argc, char **argv)
   sprintf(buf, "Using %s as data directory.", dir);
   log(buf, 0, LOG_MISC);
 
+  DCVote = new CVoteData();
+
   if (scheck) {
     boot_world();
     log("Done.", 0, LOG_MISC);
@@ -178,6 +181,9 @@ int main(int argc, char **argv)
     log(buf, 0, LOG_MISC);
     init_game(port, port2, port3, port4);
   }
+
+  delete DCVote;
+
   return 0;
 }
 
