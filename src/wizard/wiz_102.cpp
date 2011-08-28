@@ -39,6 +39,7 @@ using std::vector;
 using std::string;
 
 extern vector<string> continent_names;
+extern CVoteData *DCVote;
 
 // Urizen's rebuild rnum references to enable additions to mob/obj arrays w/out screwing everything up.
 // A hack of renum_zone_tables *yawns*
@@ -4648,7 +4649,6 @@ int do_sockets(struct char_data *ch, char *argument, int cmd)
 
 int do_setvote(struct char_data *ch, char *arg, int cmd)
 {
-  extern CVoteData DCVote;
   char buf[MAX_STRING_LENGTH];
   char buf2[MAX_STRING_LENGTH];
   void send_info(char*);
@@ -4664,19 +4664,19 @@ int do_setvote(struct char_data *ch, char *arg, int cmd)
 
   if(!strcmp(buf, "start"))
   {
-    DCVote.StartVote(ch);
+    DCVote->StartVote(ch);
     return eSUCCESS;
   }
 
   if(!strcmp(buf, "clear"))
   {
-    DCVote.Reset(ch);
+    DCVote->Reset(ch);
     return eSUCCESS;
   }
 
   if(!strcmp(buf, "end"))
   {
-    DCVote.EndVote(ch);
+    DCVote->EndVote(ch);
     return eSUCCESS;
   } 
 
@@ -4689,17 +4689,17 @@ int do_setvote(struct char_data *ch, char *arg, int cmd)
 
   if(!strcmp(buf, "question"))
   {
-    DCVote.SetQuestion(ch, buf2);
+    DCVote->SetQuestion(ch, buf2);
     return eSUCCESS;
   }
   if(!strcmp(buf, "add"))
   {
-    DCVote.AddAnswer(ch, buf2);
+    DCVote->AddAnswer(ch, buf2);
     return eSUCCESS;
   }  
   if(!strcmp(buf, "remove"))
   {
-    DCVote.RemoveAnswer(ch, (unsigned int)atoi(buf2));
+    DCVote->RemoveAnswer(ch, (unsigned int)atoi(buf2));
     return eSUCCESS;
   }
  
