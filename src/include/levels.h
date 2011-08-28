@@ -1,4 +1,4 @@
-/* $Id: levels.h,v 1.8 2007/03/09 06:08:04 jhhudso Exp $ */
+/* $Id: levels.h,v 1.9 2011/08/28 03:43:42 jhhudso Exp $ */
 /* This is purely to define god levels as #defines. */
 #ifndef LEVELS_H_
 #define LEVELS_H_
@@ -27,6 +27,7 @@
 #define ANGEL 103
 #define DEITY 104
 #define OVERSEER 105
+#define COORDINATOR 108
 #define IMP 110
 
 #define ARCHITECT ANGEL
