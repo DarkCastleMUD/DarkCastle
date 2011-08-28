@@ -1,4 +1,4 @@
-/* $Id: clan.cpp,v 1.79 2011/08/28 03:45:00 jhhudso Exp $ */
+/* $Id: clan.cpp,v 1.80 2011/08/28 04:02:20 jhhudso Exp $ */
 
 /***********************************************************************/
 /* Revision History                                                    */
@@ -2387,7 +2387,7 @@ int do_clans(CHAR_DATA *ch, char *arg, int cmd)
     }
   }
 
-  if(IS_PC(ch) && (GET_LEVEL(ch) == COORDINATOR)) {
+  if(IS_PC(ch) && (GET_LEVEL(ch) >= COORDINATOR)) {
     do_god_clans(ch, arg, cmd);
     return eSUCCESS;
   }
