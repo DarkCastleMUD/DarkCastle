@@ -1,7 +1,7 @@
 #ifndef CONNECT_H_
 #define CONNECT_H_
 /************************************************************************
-| $Id: connect.h,v 1.13 2009/09/15 03:04:30 jhhudso Exp $
+| $Id: connect.h,v 1.14 2011/08/28 18:29:45 jhhudso Exp $
 | connect.h
 | Description: State of connectedness information.
 */
@@ -60,7 +60,7 @@ struct descriptor_data
     int         web_connected;
     int		wait;			/* wait for how many loops	*/
     char *	showstr_head;		/* for paging through texts	*/
-    char **     showstr_vector;
+    const char **     showstr_vector;
     int         showstr_count;
     int         showstr_page;
     bool	new_newline;		/* prepend newline in output	*/

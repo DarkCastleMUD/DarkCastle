@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: modify.cpp,v 1.31 2011/01/24 01:23:02 jhhudso Exp $ */
+/* $Id: modify.cpp,v 1.32 2011/08/28 18:29:45 jhhudso Exp $ */
 
 extern "C"
 {
@@ -550,10 +550,10 @@ struct help_index_element *build_help_index(FILE *fl, int *num)
 #define PAGE_LENGTH     22
 #define PAGE_WIDTH      80
 
-/* Traverse down the string until the begining of the next page has been
+/* Traverse down the string until the beginning of the next page has been
  * reached.  Return NULL if this is the last page of the string.
  */
-char *next_page(char *str)
+const char *next_page(const char *str)
 {
   int col = 1, line = 1, spec_code = FALSE;
   int chars = 0;
@@ -567,7 +567,7 @@ char *next_page(char *str)
     else if (*str == '$') {
       if(*(str+1) == '\0') { // this should never happen
         log("String ended in $ in next_page", ANGEL, LOG_BUG);
-        *str = '\0'; // overwrite the $ so it doesn't mess up anything
+        //*str = '\0'; // overwrite the $ so it doesn't mess up anything
         return NULL;
       }
       str++; // skip the $
@@ -611,7 +611,7 @@ char *next_page(char *str)
 }
 
 // Function that returns the number of pages in the string. 
-int count_pages(char *str)
+int count_pages(const char *str)
 {
   int pages;
 
@@ -624,7 +624,7 @@ int count_pages(char *str)
  * page_string function, after showstr_vector has been allocated and
  * showstr_count set.
  */
-void paginate_string(char *str, struct descriptor_data *d)
+void paginate_string(const char *str, struct descriptor_data *d)
 {
   int i;
 
@@ -640,13 +640,15 @@ void paginate_string(char *str, struct descriptor_data *d)
 
 void page_string(struct descriptor_data *d, const char *str, int keep_internal)
 {
-  if(!d) return;
-  if(!(d->character)) return;
+  if(!d || !(d->character))
+	  return;
+
   if (!str || !*str) {
     send_to_char("", d->character);
     return;
   }
-  if(!IS_MOB(d->character) && !IS_SET(d->character->pcdata->toggles, PLR_PAGER))
+
+  if(IS_PC(d->character) && !IS_SET(d->character->pcdata->toggles, PLR_PAGER))
   {
     page_string_dep(d, str, keep_internal);
     return;
@@ -668,7 +670,7 @@ void page_string(struct descriptor_data *d, const char *str, int keep_internal)
 
 
     tmp = print_me.substr(0, pagebreak);
-    print_me = print_me.substr(pagebreak, MAX_STRING_LENGTH);
+    print_me = print_me.substr(pagebreak, string::npos);
 
     // if they don't want things paginated
     send_to_char(tmp.c_str(), d->character);
@@ -677,7 +679,7 @@ void page_string(struct descriptor_data *d, const char *str, int keep_internal)
 }
 
 
-/* The deprecated call that gets the paging ball rolling... */
+/* The depreciated call that gets the paging ball rolling... */
 void page_string_dep(struct descriptor_data *d, const char *str, int keep_internal)
 {
   if (!d)
@@ -687,21 +689,13 @@ void page_string_dep(struct descriptor_data *d, const char *str, int keep_intern
     return;
   }
 
-  char buf[MAX_STRING_LENGTH] = { 0 };
-  strncpy(buf, str, MAX_STRING_LENGTH-1);
-
-  if (strlen(buf) < strlen(str)) {
-    cerr << "page_string_dep() error buf(" << strlen(buf) << ") less than str("
-	 << strlen(str) << ")" << endl;
-  }
-
-  CREATE(d->showstr_vector, char *, d->showstr_count = count_pages(buf));
+  CREATE(d->showstr_vector, const char *, d->showstr_count = count_pages(str));
 
   if (keep_internal) {
-    d->showstr_head = str_dup(buf);
+    d->showstr_head = str_dup(str);
     paginate_string(d->showstr_head, d);
   } else
-    paginate_string(buf, d);
+    paginate_string(str, d);
 
   show_string(d, "");
 }
