@@ -1,0 +1,12 @@
+define p_character_list
+ set $list = ($arg0)
+ while ((char_data *)$list->next != 0 && (char_data *)$list->next != 0x95959595)
+   set $list = (char_data *)$list->next
+   if (char_data *)$list->next == 0xc279798
+      p (char *)(char_data *)$list->name
+   end
+ end
+end
+document p_character_list
+p_character_list <list>: Dumps the strings
+end
