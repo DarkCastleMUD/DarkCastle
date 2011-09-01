@@ -129,7 +129,6 @@ int do_goto(struct char_data *ch, char *argument, int cmd)
     struct follow_type *k, *next_dude;
     struct obj_data *target_obj;
     extern int top_of_world;
-    extern room_data ** world_array;
 
     if (IS_NPC(ch))
         return eFAILURE;
