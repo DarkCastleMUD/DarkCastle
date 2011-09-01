@@ -1,4 +1,4 @@
-/* $Id: clan.cpp,v 1.80 2011/08/28 04:02:20 jhhudso Exp $ */
+/* $Id: clan.cpp,v 1.81 2011/09/01 03:05:01 jhhudso Exp $ */
 
 /***********************************************************************/
 /* Revision History                                                    */
@@ -602,18 +602,26 @@ void delete_clan(struct clan_data * dead_clan)
   while(curr) 
     if(curr == dead_clan) {
       last->next = curr->next;
+
       if((curr = end_clan_list))
          end_clan_list = last;
+
       if(dead_clan->rooms) {
         room = dead_clan->rooms;
         nextroom = room->next;
+		if(real_room(room->room_number) != -1)
+			if(IS_SET(world[real_room(room->room_number)].room_flags, CLAN_ROOM))
+				REMOVE_BIT(world[real_room(room->room_number)].room_flags, CLAN_ROOM);
+
         dc_free(room);
+
         while(nextroom) {
           room = nextroom;
           nextroom = room->next;
           dc_free(room);
         }
       }
+
       if(dead_clan->email)
         dc_free(dead_clan->email);
       if(dead_clan->login_message)
@@ -1477,7 +1485,7 @@ int do_ctell(CHAR_DATA *ch, char *arg, int cmd)
 void do_clan_list(CHAR_DATA *ch)
 {
   struct clan_data * clan = 0;
-  char buf[MAX_STRING_LENGTH];
+  char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH];
 
   send_to_char("Clan                 Leader\n\r", ch);
   
@@ -1486,11 +1494,11 @@ void do_clan_list(CHAR_DATA *ch)
            clan->number);
      if (GET_LEVEL(ch) > 103)
      {
-       sprintf(buf,"%s  Balance: %ld Tax: %d\r\n",buf,clan->balance, clan->tax);
+    	 sprintf(buf2, "%s  Balance: %ld Tax: %d\r\n", buf, clan->balance, clan->tax);
      } else {
-	sprintf(buf,"%s\r\n",buf);
+    	 sprintf(buf2, "%s\r\n", buf);
      }
-     send_to_char(buf, ch);
+     send_to_char(buf2, ch);
   }
 }
 
@@ -1499,7 +1507,7 @@ void do_clan_member_list(CHAR_DATA *ch)
   struct clan_member_data * pmember = 0;
   struct clan_data * pclan = 0;
   int column = 1;
-  char buf[200];
+  char buf[200], buf2[200];
 
   if(!(pclan = get_clan(ch->clan))) {
     send_to_char("Error:  Not in clan.  Contact a god.\n\r", ch);
@@ -1510,9 +1518,9 @@ void do_clan_member_list(CHAR_DATA *ch)
   sprintf(buf, "  ");
 
   for(pmember = pclan->members; pmember; pmember = pmember->next) {
-    sprintf(buf, "%s%-20s  ", buf, pmember->member_name);
+    sprintf(buf2, "%s%-20s  ", buf, pmember->member_name);
     if(0 == (column % 3)) {
-      send_to_char(buf, ch);
+      send_to_char(buf2, ch);
       send_to_char("\n\r", ch);
       sprintf(buf, "  ");
       column = 0;
@@ -1521,7 +1529,7 @@ void do_clan_member_list(CHAR_DATA *ch)
   }
 
   if(column != 0) {
-    send_to_char(buf, ch);
+    send_to_char(buf2, ch);
     send_to_char("\n\r", ch);
   }
 }
@@ -1612,6 +1620,7 @@ void do_god_clans(CHAR_DATA *ch, char *arg, int cmd)
   struct clan_room_data * lastroom = 0;
 
   char buf[MAX_STRING_LENGTH];
+  char buf2[MAX_STRING_LENGTH];
   char select[MAX_INPUT_LENGTH];
   char text[MAX_INPUT_LENGTH];
   char last[MAX_INPUT_LENGTH];
@@ -1833,13 +1842,17 @@ void do_god_clans(CHAR_DATA *ch, char *arg, int cmd)
       }
 
       send_to_char("Rooms\r\n-----\r\n", ch);
-      strcpy(buf, "\r\n");
-      for(newroom = tarclan->rooms; newroom; newroom = newroom->next)
-         if(newroom->room_number)
-           sprintf(buf, "%s%d\r\n", buf, newroom->room_number);
-         else sprintf(buf, "%sRoom Data without number.  PROBLEM.\r\n", buf);
+      strcpy(buf2, "\r\n");
+      for(newroom = tarclan->rooms; newroom; newroom = newroom->next) {
+         if (newroom->room_number) {
+        	 sprintf(buf, "%d\r\n", newroom->room_number);
+         } else {
+        	 strcpy(buf, "Room Data without number.  PROBLEM.\r\n");
+         }
+    	 strncat(buf2, buf, sizeof(buf2));
+      }
 
-      send_to_char(buf, ch);
+      send_to_char(buf2, ch);
       break;
     }
     case 8: /* killroom */
@@ -2301,7 +2314,7 @@ void log_clan(CHAR_DATA *ch, char *buf)
     fout.open(fname.str().c_str(), ios_base::app);
     fout << buf;
     fout.close();
-  } catch (ofstream::failure e) {
+  } catch (ofstream::failure &e) {
     stringstream errormsg;
     errormsg << "Exception while writing to " << fname.str() << ".";
     log(errormsg.str().c_str(), 108, LOG_MISC);
