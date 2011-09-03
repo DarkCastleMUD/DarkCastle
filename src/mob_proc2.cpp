@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc2.cpp,v 1.85 2009/04/01 04:51:55 kkoons Exp $ */
+/* $Id: mob_proc2.cpp,v 1.86 2011/09/03 04:18:26 jhhudso Exp $ */
 #include <room.h>
 #include <obj.h>
 #include <connect.h>
@@ -36,23 +36,18 @@
 
 /*   external vars  */
 
-extern CWorld world;
 extern struct obj_data * search_char_for_item(char_data * ch, int16 
 item_number, bool wearonly = FALSE);
  
 extern struct obj_data *object_list;
-extern struct descriptor_data *descriptor_list;
 extern struct index_data *obj_index;
-extern struct time_info_data time_info;
- extern int class_restricted(char_data *ch, struct obj_data *obj);
- extern int size_restricted(char_data *ch, struct obj_data *obj);
+extern int class_restricted(char_data *ch, struct obj_data *obj);
+extern int size_restricted(char_data *ch, struct obj_data *obj);
 
 
 /* extern procedures */
 
 void save_corpses(void);
-void hit(struct char_data *ch, struct char_data *victim, int type);
-void gain_exp(struct char_data *ch, int gain);
 
 
 void repair_shop_fix_eq(char_data * ch, char_data * owner, int price,
@@ -101,7 +96,7 @@ int repair_guy(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
           struct char_data *owner)
 {
   char item[256];
-  int value0, cost, price, x;
+  int value0, cost, price;
   int percent, eqdam;
 
   if ((cmd != 66) && (cmd != 65)) return eFAILURE;
@@ -226,20 +221,20 @@ int super_repair_guy(struct char_data *ch, struct obj_data *obj, int cmd, char *
   value0 = eq_max_damage(obj);
   value2 = obj->obj_flags.value[2];
 
-  if (obj->obj_flags.type_flag == ITEM_ARMOR ||
+  if ((obj->obj_flags.type_flag == ITEM_ARMOR ||
       obj->obj_flags.type_flag == ITEM_CONTAINER ||
-		obj->obj_flags.type_flag == ITEM_LIGHT && !IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL))
+		obj->obj_flags.type_flag == ITEM_LIGHT) && !IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL))
   {
     percent = ((100* eqdam) / value0); /* now we know what percent to repair ..  */
     price = ((cost * percent) / 100);        /* now we know what to charge */
     price *= 2;                        /* he likes to charge more..  */
                                        /*  for armor... cuz he can.. */
   } 
-  else if (obj->obj_flags.type_flag == ITEM_WEAPON ||
+  else if ((obj->obj_flags.type_flag == ITEM_WEAPON ||
            obj->obj_flags.type_flag == ITEM_FIREWEAPON ||
 		obj->obj_flags.type_flag == ITEM_INSTRUMENT ||
 		obj->obj_flags.type_flag == ITEM_STAFF ||
-		obj->obj_flags.type_flag == ITEM_WAND &&
+		obj->obj_flags.type_flag == ITEM_WAND) &&
      !IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL)) 
   {
     percent = ((100* eqdam) / (value0 + value2)); /* now we know what percent to repair ..  */
@@ -326,8 +321,8 @@ int repair_shop(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
   value0 = eq_max_damage(obj);
   value2 = obj->obj_flags.value[2];
 
-  if (obj->obj_flags.type_flag == ITEM_ARMOR ||
-	obj->obj_flags.type_flag == ITEM_LIGHT &&
+  if ((obj->obj_flags.type_flag == ITEM_ARMOR ||
+	obj->obj_flags.type_flag == ITEM_LIGHT) &&
      !IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL)) 
   {
 
@@ -335,11 +330,11 @@ int repair_shop(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     price = ((cost * percent) / 100);   /* now we know what to charge them fuckers! */
     price *= 4;                   /* he likes to charge more..  */
                                   /*  for armor... cuz he's a crook..  */
-  } else if (obj->obj_flags.type_flag == ITEM_WEAPON ||
+  } else if ((obj->obj_flags.type_flag == ITEM_WEAPON ||
              obj->obj_flags.type_flag == ITEM_FIREWEAPON ||
              obj->obj_flags.type_flag == ITEM_CONTAINER ||
 		obj->obj_flags.type_flag == ITEM_STAFF ||
-		obj->obj_flags.type_flag == ITEM_WAND &&
+		obj->obj_flags.type_flag == ITEM_WAND) &&
      !IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL)) 
 
   {
@@ -768,7 +763,7 @@ int gl_repair_shop(struct char_data *ch, struct obj_data *obj, int cmd, char *ar
           struct char_data *owner)
 {
   char item[256];
-  int value0, value2, cost, price, x;
+  int value0, value2, cost, price;
   int percent, eqdam;
 
   if ((cmd != 66) && (cmd != 65)) return eFAILURE;
