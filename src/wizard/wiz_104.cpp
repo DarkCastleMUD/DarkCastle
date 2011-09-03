@@ -333,8 +333,9 @@ char* dirNumToChar(int dir)
     case 3: return "West"; break;
     case 4: return "Up"; break;
     case 5: return "Down"; break;
-    default: return "ERROR"; break;
   }
+
+  return "ERROR";
 }
 
 int show_zone_commands(struct char_data *ch, int i, int start = 0)

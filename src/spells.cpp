@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.280 2011/02/05 10:37:09 jhhudso Exp $ */
+/* $Id: spells.cpp,v 1.281 2011/09/03 04:20:22 jhhudso Exp $ */
 
 extern "C"
 {
@@ -69,10 +69,8 @@ extern struct class_skill_defines k_skills[];
 extern struct class_skill_defines u_skills[];
 extern struct class_skill_defines c_skills[];
 extern struct class_skill_defines m_skills[];
-extern char * attrstring(int);
 extern CHAR_DATA *character_list;
 extern struct song_info_type song_info[];
-extern struct ki_info_type ki_info[];
 extern char *spell_wear_off_msg[];
 extern struct index_data *obj_index;
 
@@ -80,9 +78,6 @@ extern struct index_data *obj_index;
 int spl_lvl(int lev);
 
 // Extern procedures 
-int do_fall(CHAR_DATA *ch, short dir);
-void remove_memory(CHAR_DATA *ch, char type);
-void add_memory(CHAR_DATA *ch, char *victim, char type);
 void make_dust(CHAR_DATA * ch);
 int say_spell( CHAR_DATA *ch, int si, int room = 0);
 extern struct index_data *mob_index;
@@ -1002,10 +997,7 @@ void affect_update( int32 duration_type )
           af->duration--;
           if(af->type == SPELL_ICESTORM) af->modifier = 0 - af->duration;
       }
-	else if (af->duration == -1)
-	  /* No action */
-          ;
-	else {
+	else if (af->duration != -1){
 	  if ((af->type > 0) && (af->type <= MAX_SPL_LIST)) // only spells for this part
 	     if (*spell_wear_off_msg[af->type]) {
 		int z;
@@ -1624,8 +1616,9 @@ bool skill_success(CHAR_DATA *ch, CHAR_DATA *victim, int skillnum, int mod )
 	break;
      case SKILL_STALK:
 	stat = CON;
+	break;
      case SKILL_CONSIDER:
-        stat = WIS;
+    stat = WIS;
 	break;
      case SKILL_EYEGOUGE: 
 	stat = CON;

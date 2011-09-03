@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.203 2010/01/01 03:03:14 jhhudso Exp $ */
+/* $Id: db.cpp,v 1.204 2011/09/03 04:20:22 jhhudso Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -66,8 +66,6 @@ int load_new_help(FILE *fl, int reload, struct char_data *ch);
 void load_vaults();
 void load_auction_tickets();
 void load_corpses(void);
-extern int fflush(FILE *);
-extern int _filbuf(FILE *);
 int count_hash_records(FILE * fl);
 void load_hints();
 void find_unordered_objects(void);
@@ -77,8 +75,6 @@ void find_unordered_mobiles(void);
 char* curr_type;
 char* curr_name;
 int   curr_virtno;
-
-extern bool str_prefix(const char *astr, const char *bstr);
 
 extern bool verbose_mode;
 
@@ -187,7 +183,6 @@ void boot_world(void);
 void do_godlist();
 void half_chop(char *string, char *arg1, char *arg2);
 void remove_memory(CHAR_DATA *ch, char type);
-void remove_memory(CHAR_DATA *ch, char type, CHAR_DATA *vict);
 world_file_list_item * new_mob_file_item(char * temp, long room_nr);
 world_file_list_item * new_obj_file_item(char * temp, long room_nr);
 
@@ -196,10 +191,7 @@ int fread_int(FILE *fl, long minval, long maxval);
 int fread_bitvector(FILE *fl, long minval, long maxval);
 void fread_new_newline (FILE *fl) {}
 char fread_char (FILE *fl);
-int is_abbrev(char *arg1, char *arg2);
 void string_to_file(FILE *f, char *string);
-int fwrite_string (char *buf, FILE *fl);
-int fgetc(FILE *stream);
 struct index_data *generate_mob_indices(int *top, struct index_data *index);
 struct index_data *generate_obj_indices(int *top, struct index_data *index);
 int is_empty(int zone_nr);
@@ -210,11 +202,9 @@ void renum_world(void);
 void renum_zone_table(void);
 void reset_time(void);
 void clear_char(CHAR_DATA *ch);
-void load_site_lists(void);
 
 // MOBprogram locals
 int 		mprog_name_to_type	( char* name );
-MPROG_DATA *	mprog_file_read 	( char* f, MPROG_DATA* mprg, long i );
 //void		load_mobprogs           ( FILE* fp );
 void   		mprog_read_programs     ( FILE* fp, long i, bool zz);
 
@@ -3769,7 +3759,7 @@ void write_object(obj_data * obj, FILE *fl)
 bool has_random(OBJ_DATA *obj)
 {
  
-      return (obj_index[obj->item_number].progtypes & RAND_PROG || obj_index[obj->item_number].progtypes & ARAND_PROG);
+      return ((obj_index[obj->item_number].progtypes & RAND_PROG) || (obj_index[obj->item_number].progtypes & ARAND_PROG));
 }
 
 
@@ -3796,7 +3786,8 @@ struct obj_data *clone_object(int nr)
     memcpy(obj, old, sizeof(struct obj_data));
   } else {
     fprintf(stderr, "clone_object(%d): Obj not found in obj_index.\n", nr);
-    return 0;
+    dc_free(obj);
+    return NULL;
   }
 
   /* *** extra descriptions *** */
@@ -4973,6 +4964,8 @@ int real_mobile(int virt)
     else
         bot = mid + 1;
     }
+
+    return -1;
 }
 
 
@@ -4998,6 +4991,8 @@ int real_object(int virt)
     else
         bot = mid + 1;
     }
+
+    return -1;
 }
 
 

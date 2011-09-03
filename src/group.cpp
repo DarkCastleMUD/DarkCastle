@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: group.cpp,v 1.28 2008/12/14 05:29:55 kkoons Exp $
+| $Id: group.cpp,v 1.29 2011/09/03 04:20:22 jhhudso Exp $
 | group.C
 | Description:  Group related commands; join, abandon, follow, etc..
 */
@@ -216,7 +216,7 @@ int do_split(CHAR_DATA *ch, char *argument, int cmd)
     send_to_char(buf, k);
     int lost = 0;
     if (k->clan && get_clan(k)->tax && !IS_SET(GET_TOGGLES(k), PLR_NOTAX) &&
-          (k->clan != ch->clan || k->clan == ch->clan && IS_SET(GET_TOGGLES(ch), PLR_NOTAX)) )
+          (k->clan != ch->clan || (k->clan == ch->clan && IS_SET(GET_TOGGLES(ch), PLR_NOTAX))) )
       {
 	lost = (int)((float)share*(float)((float)get_clan(k)->tax/100));
 	sprintf(buf2,"Your clan taxes %d gold of your share.\r\n",lost);
@@ -236,7 +236,7 @@ int do_split(CHAR_DATA *ch, char *argument, int cmd)
       send_to_char( buf, f->follower );
       int lost = 0;
       if (f->follower->clan && get_clan(f->follower)->tax && !IS_SET(GET_TOGGLES(f->follower), PLR_NOTAX) &&
-            (f->follower->clan != ch->clan || f->follower->clan == ch->clan && IS_SET(GET_TOGGLES(ch), PLR_NOTAX)) )
+            (f->follower->clan != ch->clan || (f->follower->clan == ch->clan && IS_SET(GET_TOGGLES(ch), PLR_NOTAX))) )
       {
 	lost = (int)((float)share*(float)((float)get_clan(f->follower)->tax/100));
 	sprintf(buf2,"Your clan taxes %d gold of your share.\r\n",lost);

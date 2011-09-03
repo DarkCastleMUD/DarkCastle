@@ -43,10 +43,7 @@ extern bool MOBtrigger;
 
 /* extern functions */
 int is_busy(struct char_data *ch);
-struct char_data *get_pc_vis(struct char_data *ch, char *name);
-void send_to_char_regardless(char *messg, struct char_data *ch);
 int is_ignoring(struct char_data *ch, struct char_data *i);
-char *str_str(char *first, char *second);
 
 
 int do_report(struct char_data *ch, char *argument, int cmd)
@@ -176,11 +173,12 @@ int send_to_gods(const char *str, int god_level, long type)
       continue;
     if(is_busy(i->character))
       continue;
-    if(!i->connected && GET_LEVEL(i->character) >= god_level)
+    if(!i->connected && GET_LEVEL(i->character) >= god_level) {
       if (IS_MOB(i->character) || IS_SET(i->character->pcdata->toggles, PLR_ANSI))
         send_to_char(buf1, i->character);
       else 
         send_to_char(buf, i->character);
+    }
   }
   return(1);
 }
@@ -297,7 +295,7 @@ int do_channel(struct char_data *ch, char *arg, int cmd)
   }
 
   if(GET_LEVEL(ch) < IMMORTAL &&
-      ( x < 7 || x > 14 && x < 22) ) {
+      ( x < 7 || (x > 14 && x < 22)) ) {
     send_to_char("That type was not found.\n\r", ch);
     return eSUCCESS;
   }

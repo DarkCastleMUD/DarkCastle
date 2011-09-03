@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: alias.cpp,v 1.6 2006/01/13 16:49:14 dcastle Exp $
+| $Id: alias.cpp,v 1.7 2011/09/03 04:20:22 jhhudso Exp $
 | alias.C
 | Description:  Commands for the alias processor.
 */
@@ -143,6 +143,8 @@ int do_alias(struct char_data *ch, char *arg, int cmd)
 
       if(count > 24) {
         send_to_char("You can only have 25 aliases, sorry.  Go get tintin or something.\r\n", ch);
+        dc_free(buf);
+        dc_free(buf1);
         return eSUCCESS;
       }
 
