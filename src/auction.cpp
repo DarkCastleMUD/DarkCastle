@@ -62,7 +62,8 @@ enum ListOptions
   LIST_BY_SLOT,
   LIST_BY_SELLER,
   LIST_BY_CLASS,
-  LIST_BY_RACE
+  LIST_BY_RACE,
+  LIST_RECENT
 };
 
 enum AuctionStates
@@ -1331,6 +1332,7 @@ LIST ITEMS
 void AuctionHouse::ListItems(CHAR_DATA *ch, ListOptions options, string name, unsigned int to, unsigned int from)
 {
   map<unsigned int, AuctionTicket>::iterator Item_it;
+  queue<string> recent;
   int i;
   string output_buf;
   string state_output;
@@ -1346,6 +1348,7 @@ void AuctionHouse::ListItems(CHAR_DATA *ch, ListOptions options, string name, un
     if(
        (options == LIST_MINE && !Item_it->second.seller.compare(GET_NAME(ch)))
        || (options == LIST_ALL)
+       || (options == LIST_RECENT)
        || (options == LIST_PRIVATE && !Item_it->second.buyer.compare(GET_NAME(ch)))
        || (options == LIST_BY_NAME && IsName(name, Item_it->second.vitem))
        || (options == LIST_BY_LEVEL && IsLevel(to, from, Item_it->second.vitem))
@@ -1398,8 +1401,21 @@ void AuctionHouse::ListItems(CHAR_DATA *ch, ListOptions options, string name, un
                Item_it->second.price,
                state_output.c_str(), IsNoTrade(Item_it->second.vitem) ? "$4N$R" : " ",
                IsWearable(ch, Item_it->second.vitem) ? " " : "$4*$R", Item_it->second.item_name.c_str());
-      output_buf += buf;
+      if (options == LIST_RECENT) {
+    	  recent.push(buf);
+    	  if (recent.size() > 50)
+    		  recent.pop();
+      } else {
+    	  output_buf += buf;
+      }
     }
+  }
+
+  if (options == LIST_RECENT) {
+	  while (recent.size() > 0) {
+		  output_buf += recent.front();
+		  recent.pop();
+	  }
   }
 
   if(i == 0)
@@ -1914,7 +1930,7 @@ int do_vend(CHAR_DATA *ch, char *argument, int cmd)
     argument = one_argument(argument, buf);
     if(!*buf)
     {
-      send_to_char("List what?\n\rSyntax: vend list <all | mine | private>\n\r", ch);
+      send_to_char("List what?\n\rSyntax: vend list <all | mine | private | recent>\n\r", ch);
       return eSUCCESS;
     }
 
@@ -1929,6 +1945,10 @@ int do_vend(CHAR_DATA *ch, char *argument, int cmd)
     else if (!strcmp(buf, "private"))
     {
       TheAuctionHouse.ListItems(ch, LIST_PRIVATE, "", 0, 0);
+    }
+    else if (!strcmp(buf, "recent"))
+    {
+    	TheAuctionHouse.ListItems(ch, LIST_RECENT, "", 0, 0);
     }
     else
     {
