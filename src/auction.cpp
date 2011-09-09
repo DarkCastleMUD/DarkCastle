@@ -1419,9 +1419,6 @@ void AuctionHouse::ListItems(CHAR_DATA *ch, ListOptions options, string name, un
       send_to_char("\n\rThere is nothing for sale!\n\r", ch);
   }
  
-
-
-  page_string(ch->desc, output_buf.c_str(), 1);
   if(options == LIST_MINE)
   {
     struct vault_data *vault;
@@ -1435,11 +1432,15 @@ void AuctionHouse::ListItems(CHAR_DATA *ch, ListOptions options, string name, un
   if(i > 0) //only display this if there was at least 1 item listed
   {
     int nr = real_object(27909);
-    if(nr >= 0)
-      csendf(ch, "\n\r'$4N$R' indicates an item is NO_TRADE and requires %s to purchase.\n\r",
+    if(nr >= 0) {
+      sprintf(buf, "\n\r'$4N$R' indicates an item is NO_TRADE and requires %s to purchase.\n\r",
                 ((struct obj_data *)(obj_index[nr].item))->short_description);
-    send_to_char("'$4*$R' indicates you are unable to use this item.\n\r", ch);
+      output_buf += buf;
+    }
+    output_buf += "'$4*$R' indicates you are unable to use this item.\n\r";
   }
+
+  page_string(ch->desc, output_buf.c_str(), 1);
 
   return;
 }
