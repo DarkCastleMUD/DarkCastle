@@ -1,4 +1,4 @@
-/* $Id: clan.cpp,v 1.81 2011/09/01 03:05:01 jhhudso Exp $ */
+/* $Id: clan.cpp,v 1.82 2011/09/18 21:06:44 jhhudso Exp $ */
 
 /***********************************************************************/
 /* Revision History                                                    */
@@ -1518,12 +1518,14 @@ void do_clan_member_list(CHAR_DATA *ch)
   sprintf(buf, "  ");
 
   for(pmember = pclan->members; pmember; pmember = pmember->next) {
-    sprintf(buf2, "%s%-20s  ", buf, pmember->member_name);
+    sprintf(buf2, "%-20s  ", pmember->member_name);
+    send_to_char(buf2, ch);
+
     if(0 == (column % 3)) {
-      send_to_char(buf2, ch);
       send_to_char("\n\r", ch);
-      sprintf(buf, "  ");
       column = 0;
+    } else {
+	  send_to_char(" ", ch);
     }
     column++;
   }
