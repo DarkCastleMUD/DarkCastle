@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_warrior.cpp,v 1.83 2009/10/29 03:50:06 jhhudso Exp $
+| $Id: cl_warrior.cpp,v 1.84 2011/09/18 23:41:21 jhhudso Exp $
 | cl_warrior.C
 | Description:  This file declares implementation for warrior-specific
 |   skills.
@@ -473,6 +473,11 @@ int do_bash(struct char_data *ch, char *argument, int cmd)
        return eFAILURE;
     }
 
+    if (!charge_moves(ch, SKILL_BASH)) return eSUCCESS;
+
+    if(!can_attack(ch) || !can_be_attacked(ch, victim))
+      return eFAILURE;
+
     if (IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_HUGE)) {
       send_to_char("You cannot bash something that HUGE!\n\r", ch);
          return eFAILURE;
@@ -493,15 +498,12 @@ int do_bash(struct char_data *ch, char *argument, int cmd)
 	return eFAILURE;
     }
 
+    set_cantquit(ch, victim);
+
     if (IS_SET(victim->combat, COMBAT_BLADESHIELD1) || IS_SET(victim->combat, COMBAT_BLADESHIELD2)) {
         send_to_char("Bashing a bladeshielded opponent would be suicide!\n\r", ch);
         return eFAILURE;
     }
-
-    if(!can_attack(ch) || !can_be_attacked(ch, victim))
-      return eFAILURE;
-
-    if (!charge_moves(ch, SKILL_BASH)) return eSUCCESS;
 
     if(affected_by_spell(victim, SPELL_IRON_ROOTS)) {
         act("You try to bash $N but tree roots around $S legs keep him upright.", ch, 0, victim, TO_CHAR, 0);
