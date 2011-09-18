@@ -348,7 +348,7 @@ char *vault_usage = "Syntax: vault <list | balance> [vault owner]\r\n"
                     "        vault <deposit | withdraw> <amount>\r\n"
                     "        vault <access | myaccess> [name to add/remove access]\r\n"
                     "        vault log [vault owner]\r\n"
-                    "        vault search <keyword>\r\n";
+                    "        vault search [ keyword <keyword> ] | [ level <levels> ] | ...\r\n";
 
 char *imm_vault_usage =  "        vault <stats> [name]\r\n";
 
