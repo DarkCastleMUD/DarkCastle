@@ -29,8 +29,38 @@ extern "C"
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <list>
 
 using namespace std;
+
+enum vault_search_type {
+  UNDEFINED,
+  KEYWORD,
+  LEVEL,
+  MIN_LEVEL,
+  MAX_LEVEL
+};
+
+class vault_search_parameter {
+public:
+  vault_search_parameter();
+  ~vault_search_parameter();
+  vault_search_type type;
+  union {
+  char *str_argument;
+  int int_argument;
+  };
+};
+
+vault_search_parameter::vault_search_parameter()
+  : type(UNDEFINED) {
+}
+
+vault_search_parameter::~vault_search_parameter() {
+  if (type == KEYWORD && str_argument != NULL) {
+    free(str_argument);
+  }
+}
 
 extern CWorld world;
 int total_vaults = 0;
@@ -2099,12 +2129,27 @@ int sleazy_vault_guy(struct char_data *ch, struct obj_data *obj, int cmd, char *
   return eFAILURE;
 }
 
-int vault_search(CHAR_DATA *ch, char *object)
+void
+show_vault_search_usage(CHAR_DATA *ch)
+{
+  send_to_char("Usage: vault search [ keyword <keyword> ] | [ level <levels> ] | ...\r\n", ch);
+  send_to_char("keyword <keyword>  -  Single word keyword. Can be used multiple times.\r\n", ch);
+  send_to_char("level <levels>     -  Single object level or range of levels.\r\n\r\n", ch);
+  send_to_char("Examples:\r\n", ch);
+  send_to_char("vault search keyword staff\r\n", ch);
+  send_to_char("vault search level 55\r\n", ch);
+  send_to_char("vault search keyword staff level 55.\r\n", ch);
+  send_to_char("vault search keyword staff level 40-60.\r\n\r\n", ch);
+}
+
+
+int
+vault_search(CHAR_DATA *ch, char *args)
 {
   struct vault_items_data *items;
   struct obj_data *obj;
-  char sectionbuf[MAX_STRING_LENGTH*4];
-  char linebuf[MAX_INPUT_LENGTH];
+  char sectionbuf[MAX_STRING_LENGTH * 4];char
+  linebuf[MAX_INPUT_LENGTH];
   char buf[MAX_INPUT_LENGTH];
   int objects = 0;
   int diff_len = 0;
@@ -2113,7 +2158,95 @@ int vault_search(CHAR_DATA *ch, char *object)
   bool owner_shown = false;
   int vaults_searched = 0;
   int objects_found = 0;
+  char argument[MAX_INPUT_LENGTH];
+  list<vault_search_parameter>::iterator p;
+  bool nomatch;
 
+  args = one_argument(args, argument);
+  if (argument[0] == '\0') {
+    show_vault_search_usage(ch);
+    return eFAILURE;
+  }
+
+  list<vault_search_parameter> search;
+  vault_search_parameter parameter;
+
+  //parse our arguments and setup a list of the things we want to search for
+  do {
+    if (!strcmp(argument, "keyword")) {
+      args = one_argument(args, argument);
+      if (argument[0] == '\0') {
+        send_to_char("Missing keyword parameter.\r\n\r\n", ch);
+        show_vault_search_usage(ch);
+        return eFAILURE;
+      } else {
+        parameter.type = KEYWORD;
+        parameter.str_argument = str_dup(argument);
+        search.push_back(parameter);
+        // We need
+        parameter.type = UNDEFINED;
+      }
+
+    } else if (!strcmp(argument, "level")) {
+      args = one_argument(args, argument);
+      if (argument[0] == '\0') {
+        send_to_char("Missing level parameter.\r\n\r\n", ch);
+        show_vault_search_usage(ch);
+        return eFAILURE;
+      } else {
+        //start parsing level and level ranges
+        size_t pos;
+        string level_string(argument);
+
+        //if a '-' is not found then assume a single number is specified
+        if ((pos = level_string.find('-')) == string::npos) {
+          parameter.int_argument = atoi(argument);
+          // Check if a non numeric value is passed
+          if (parameter.int_argument == 0 && level_string != "0") {
+            send_to_char("Invalid level specified.\r\n\r\n", ch);
+            show_vault_search_usage(ch);
+            return eFAILURE;
+          }
+
+          parameter.type = LEVEL;
+          search.push_back(parameter);
+        } else {
+          // Get the first half of a level range
+          string min_level_string = level_string.substr(0, pos);
+          parameter.int_argument = atoi(min_level_string.c_str());
+          // Check if a non numeric value is passed
+          if (parameter.int_argument == 0 && min_level_string != "0") {
+            send_to_char("Invalid minimum level specified.\r\n\r\n", ch);
+            show_vault_search_usage(ch);
+            return eFAILURE;
+          }
+
+          parameter.type = MIN_LEVEL;
+          search.push_back(parameter);
+
+          // Get the second half of a level range
+          string max_level_string = level_string.substr(pos+1);
+          parameter.int_argument = atoi(max_level_string.c_str());
+          // Check if a non numeric value is passed
+          if (parameter.int_argument == 0 && max_level_string != "0") {
+            send_to_char("Invalid maximum level specified.\r\n\r\n", ch);
+            show_vault_search_usage(ch);
+            return eFAILURE;
+          }
+
+          parameter.type = MAX_LEVEL;
+          search.push_back(parameter);
+        } // end of level range parsing
+      } // end of level parsing
+    } else {
+      send_to_char("Invalid argument.\r\n\r\n", ch);
+      show_vault_search_usage(ch);
+      return eFAILURE;
+    }
+    args = one_argument(args, argument);
+  } while (argument[0] != '\0');
+
+  //now that we know what we're looking for, let's search through all the vaults to find it
   for (vault_data *vault = vault_table; vault; vault = vault->next) {
     if (vault && vault->owner && has_vault_access(GET_NAME(ch), vault)) {
       vaults_searched++;
@@ -2126,75 +2259,119 @@ int vault_search(CHAR_DATA *ch, char *object)
       buf[0] = '\0';
       owner_shown = false;
 
-      for (items = vault->items;items;items = items->next) {
-	linebuf[0] = '\0';
-	obj = items->obj ? items->obj : get_obj(items->item_vnum);
+      for (items = vault->items; items; items = items->next) {
+        linebuf[0] = '\0';
+        obj = items->obj ? items->obj : get_obj(items->item_vnum);
 
-	if (obj == NULL || !isname(object, GET_OBJ_NAME(obj))) {
-	  continue;
-	} else if (!owner_shown) {
-	  owner_shown = true;
-	  csendf(ch, "\n\r%s:\n\r", vault->owner);
-      	}
-	
-	if (items->count > 1) {
-	  snprintf(linebuf, sizeof(linebuf), "[$5%d$R] ", items->count);
+        if (obj == NULL)
+          continue;
 
-	  sectionbuf_len = strlen(sectionbuf);
-	  linebuf_len = strlen(linebuf);
-	  diff_len = sizeof(sectionbuf) - (sectionbuf_len + linebuf_len + 1 + 2);
+        nomatch = false;
+        //look through each search parameter to see if any of them don't match the current object
+        for (p=search.begin(); p != search.end(); ++p) {
+          switch((*p).type) {
+          case UNDEFINED:
+            break;
+          case KEYWORD:
+            if (!isname((*p).str_argument, GET_OBJ_NAME(obj))) {
+              nomatch = true;
+            }
+            break;
+          case LEVEL:
+            if (obj->obj_flags.eq_level != (*p).int_argument) {
+              nomatch = true;
+            }
+            break;
+          case MIN_LEVEL:
+            if (obj->obj_flags.eq_level < (*p).int_argument) {
+              nomatch = true;
+            }
+            break;
+          case MAX_LEVEL:
+            if (obj->obj_flags.eq_level > (*p).int_argument) {
+              nomatch = true;
+            }
+            break;
+          }
 
-	  if (diff_len > 0) {
+          // if something didn't match break out of the parameter search so we can move on to another object
+          if (nomatch) {
+            break;
+          }
+        } // end of parameter for loop
+
+        // something did't match so move on to another object
+        if (nomatch) {
+          continue;
+        }
+
+        if (!owner_shown) {
+          owner_shown = true;
+          csendf(ch, "\n\r%s:\n\r", vault->owner);
+        }
+
+        if (items->count > 1) {
+          snprintf(linebuf, sizeof(linebuf), "[$5%d$R] ", items->count);
+
+          sectionbuf_len = strlen(sectionbuf);
+          linebuf_len = strlen(linebuf);
+          diff_len = sizeof(sectionbuf)
+              - (sectionbuf_len + linebuf_len + 1 + 2);
+
+          if (diff_len > 0) {
             strncat(sectionbuf, linebuf, diff_len);
-	  }
-	}
-	
-	objects_found += items->count;
+          }
+        }
 
-	snprintf(linebuf, sizeof(linebuf), "%s ", GET_OBJ_SHORT(obj));
-	
-	if (obj->obj_flags.type_flag == ITEM_ARMOR ||
-	    obj->obj_flags.type_flag == ITEM_WEAPON ||
-	    obj->obj_flags.type_flag == ITEM_FIREWEAPON ||
-	    obj->obj_flags.type_flag == ITEM_CONTAINER ||
-	    obj->obj_flags.type_flag == ITEM_INSTRUMENT ||
-	    obj->obj_flags.type_flag == ITEM_STAFF ||
-	    obj->obj_flags.type_flag == ITEM_WAND ||
-	    obj->obj_flags.type_flag == ITEM_LIGHT)
-	  {
-	    strncpy(buf, linebuf, sizeof(buf));
-	    snprintf(linebuf, MAX_INPUT_LENGTH, "%s %s $3Lvl: %d$R", buf,
-		     item_condition(obj), obj->obj_flags.eq_level);
-	  }
-	
-	if (GET_LEVEL(ch) > IMMORTAL) {
-	  strncpy(buf, linebuf, sizeof(buf));
-	  snprintf(linebuf, sizeof(linebuf), "%s [%d]", buf, items->item_vnum);
-	}
-	
-	objects = 1;
-	linebuf_len = strlen(linebuf);
-	diff_len = sizeof(linebuf) - (linebuf_len + 2 + 1);
+        objects_found += items->count;
 
-	if (diff_len > 0) {
-	  strncat(linebuf,"\r\n", diff_len);
-	}
+        snprintf(linebuf, sizeof(linebuf), "%s ", GET_OBJ_SHORT(obj));
 
-	if (strlen(linebuf) + strlen(sectionbuf) < MAX_STRING_LENGTH*4 - 200) {
-	  strncat(sectionbuf, linebuf, MAX_STRING_LENGTH*4);
-	} else {
-	  strcat(sectionbuf, "Overflow!!!\r\n");
-	  break;
-	}
-      }
+        if (obj->obj_flags.type_flag == ITEM_ARMOR
+            || obj->obj_flags.type_flag == ITEM_WEAPON
+            || obj->obj_flags.type_flag == ITEM_FIREWEAPON
+            || obj->obj_flags.type_flag == ITEM_CONTAINER
+            || obj->obj_flags.type_flag == ITEM_INSTRUMENT
+            || obj->obj_flags.type_flag == ITEM_STAFF
+            || obj->obj_flags.type_flag == ITEM_WAND
+            || obj->obj_flags.type_flag == ITEM_LIGHT)
+            {
+          strncpy(buf, linebuf, sizeof(buf));
+          snprintf(linebuf, MAX_INPUT_LENGTH, "%s %s $3Lvl: %d$R", buf,
+              item_condition(obj), obj->obj_flags.eq_level);
+        }
+
+        if (GET_LEVEL(ch) > IMMORTAL)
+        {
+          strncpy(buf, linebuf, sizeof(buf));
+          snprintf(linebuf, sizeof(linebuf), "%s [%d]", buf, items->item_vnum);
+        }
+
+        objects = 1;
+        linebuf_len = strlen(linebuf);
+        diff_len = sizeof(linebuf) - (linebuf_len + 2 + 1);
+
+        if (diff_len > 0) {
+          strncat(linebuf, "\r\n", diff_len);
+        }
+
+        if (strlen(linebuf) + strlen(sectionbuf)
+            < MAX_STRING_LENGTH * 4 - 200) {
+          strncat(sectionbuf, linebuf, MAX_STRING_LENGTH * 4);
+        } else {
+          strcat(sectionbuf, "Overflow!!!\r\n");
+          break;
+        }
+      } // for loop of objects
 
       if (objects) {
-	page_string(ch->desc, sectionbuf, 1);
+        page_string(ch->desc, sectionbuf, 1);
       }
-    }
-  }
+    } // if we have access to vault
+  } // for loop of vaults
 
-  csendf(ch, "\n\rSearched %d vaults and found %d objects.\n\r", vaults_searched, objects_found);
-  
+  csendf(ch, "\n\rSearched %d vaults and found %d objects.\n\r",
+      vaults_searched, objects_found);
+
   return eSUCCESS;
 }
