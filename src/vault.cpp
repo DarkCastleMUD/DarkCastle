@@ -77,6 +77,7 @@ int class_restricted(struct char_data *ch, struct obj_data *obj);
 int size_restricted(struct char_data *ch, struct obj_data *obj);
 int spell_identify(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill);
 char *clanVName(int c);
+void show_vault_search_usage(CHAR_DATA *ch);
 
 extern struct index_data *obj_index;
 extern struct obj_data * search_char_for_item(char_data * ch, int16 item_number, bool wearOnly = FALSE);
@@ -428,7 +429,7 @@ int do_vault(CHAR_DATA *ch, char *argument, int cmd)
     if (*arg1) {
       return vault_search(ch, arg1);
     } else {
-      send_to_char("Syntax: vault search <keyword>\n\r", ch);
+      show_vault_search_usage(ch);
       return eFAILURE;
     }
   // putting this here so that anything below it requires you to be in a safe room.
