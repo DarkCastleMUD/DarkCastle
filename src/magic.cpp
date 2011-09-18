@@ -2090,7 +2090,7 @@ int spell_curse(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *
 	return eFAILURE;
     }
 
-    set_cantquit(ch, victim);
+  set_cantquit(ch, victim);
 
   if(affected_by_spell(victim, SPELL_HEROISM) && affected_by_spell(victim, SPELL_HEROISM)->modifier >= 90) {
    act("$N seems unaffected.", ch, 0, victim, TO_CHAR, 0);
@@ -2110,8 +2110,6 @@ int spell_curse(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *
       send_to_char("The curse fizzles!\r\n",ch);
       return eSUCCESS;
     }
-
-    set_cantquit( ch, victim );
 
     if (malediction_res(ch, victim, SPELL_CURSE) || (!IS_NPC(victim) && GET_LEVEL(victim) >= IMMORTAL)) {
       act("$N resists your attempt to curse $M!", ch, NULL, victim, TO_CHAR,0);
