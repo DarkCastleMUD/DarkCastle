@@ -329,27 +329,44 @@ int spell_lightning_bolt(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct o
 
 /* COLOUR SPRAY */
 
-int spell_colour_spray(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
+int
+spell_colour_spray(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim,
+    struct obj_data *obj, int skill)
 {
-   int dam;
-   int weap_spell = obj?WIELD:0;
-   set_cantquit( ch, victim );
-   dam = 350;
-   int retval = damage(ch, victim, dam, TYPE_MAGIC, SPELL_COLOUR_SPRAY, weap_spell);
+  bool victim_dazzled = false;
+  int dam;
+  int weap_spell = obj ? WIELD : 0;
+  set_cantquit(ch, victim);
+  dam = 350;
 
-   if(SOMEONE_DIED(retval))
-     return retval;
+  if (number(1, 100) > get_saves(victim, SAVE_TYPE_MAGIC) + 40
+      && (skill > 50 || IS_NPC(ch))) {
+    SET_BIT(victim->combat, COMBAT_SHOCKED2);
+    victim_dazzled = true;
+  }
 
-   if(IS_SET(retval,eEXTRA_VAL2)) victim = ch;
-   if(IS_SET(retval,eEXTRA_VALUE)) return retval;
-	/*  Dazzle Effect */
-   if(number(1,100) > get_saves(victim, SAVE_TYPE_MAGIC) + 40 && (skill > 50 || IS_NPC(ch)) ) {
-     act("$N blinks in confusion from the distraction of the colour spray.", ch, 0, victim, TO_ROOM, NOTVICT);
-     act("Brilliant streams of colour streak from $n's fingers!  WHOA!  Cool!", ch, 0, victim, TO_VICT, 0 );
-     act("Your colours of brilliance dazzle the simpleminded $N.", ch, 0, victim, TO_CHAR, 0 );
-     SET_BIT(victim->combat, COMBAT_SHOCKED2);
-   }
-   return retval;
+  int retval = damage(ch, victim, dam, TYPE_MAGIC, SPELL_COLOUR_SPRAY,
+      weap_spell);
+
+  if (SOMEONE_DIED(retval))
+    return retval;
+
+  if (IS_SET(retval,eEXTRA_VAL2))
+    victim = ch;
+  if (IS_SET(retval,eEXTRA_VALUE))
+    return retval;
+
+  /*  Dazzle Effect */
+  if (victim_dazzled && ch->in_room == victim->in_room) {
+    act("$N blinks in confusion from the distraction of the colour spray.", ch,
+        0, victim, TO_ROOM, NOTVICT);
+    act("Brilliant streams of colour streak from $n's fingers!  WHOA!  Cool!",
+        ch, 0, victim, TO_VICT, 0);
+    act("Your colours of brilliance dazzle the simpleminded $N.", ch, 0, victim,
+        TO_CHAR, 0);
+  }
+
+  return retval;
 }
 
 
