@@ -1,4 +1,4 @@
-/* $Id: clan.cpp,v 1.82 2011/09/18 21:06:44 jhhudso Exp $ */
+/* $Id: clan.cpp,v 1.83 2011/11/25 23:37:01 jhhudso Exp $ */
 
 /***********************************************************************/
 /* Revision History                                                    */
@@ -1531,7 +1531,6 @@ void do_clan_member_list(CHAR_DATA *ch)
   }
 
   if(column != 0) {
-    send_to_char(buf2, ch);
     send_to_char("\n\r", ch);
   }
 }
