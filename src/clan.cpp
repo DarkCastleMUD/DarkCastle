@@ -1,4 +1,4 @@
-/* $Id: clan.cpp,v 1.83 2011/11/25 23:37:01 jhhudso Exp $ */
+/* $Id: clan.cpp,v 1.84 2011/11/25 23:52:31 jhhudso Exp $ */
 
 /***********************************************************************/
 /* Revision History                                                    */
@@ -326,8 +326,8 @@ void save_clans(void)
 extern short bport;
  if(!bport) {
   if(!(fl = dc_fopen(WEB_CLANS_LIST, "w"))) {
-    fprintf(stderr, "Unable to open web clan file for writing.\n");
-    abort();
+    log("Unable to open web clan file for writing.\n", 0, LOG_MISC);
+    return;
   }
 
   for(pclan = clan_list; pclan; pclan = pclan->next) {
