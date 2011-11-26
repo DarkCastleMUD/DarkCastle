@@ -62,7 +62,7 @@ int max_who = 0;
 struct char_data *get_pc_vis(struct char_data *ch, char *name);
 struct time_info_data age(struct char_data *ch);
 void page_string(struct descriptor_data *d, const char *str, int keep_internal);
-struct clan_data * get_clan(struct char_data *);
+clan_data * get_clan(struct char_data *);
 char *str_str(char *first, char *second);
 
 /* intern functions */
