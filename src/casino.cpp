@@ -181,13 +181,16 @@ void send_to_table(char *msg, struct table_data *tbl, struct player_data *plrSil
 if (tbl->obj->in_room)
   send_to_room(msg, tbl->obj->in_room, TRUE, plrSilent?plrSilent->ch:0);
 }
+
 bool charExists(CHAR_DATA *ch)
 {
-  CHAR_DATA *tch;
+  CHAR_DATA *tch = character_list;
 
-  for (tch = character_list;tch;tch=tch->next)
-    if (tch ==ch) break;
-  if (tch) return TRUE;
+  do {
+	  if (tch == ch)
+		  return TRUE;
+  } while ((tch=tch->next));
+
   return FALSE;
 }
 
