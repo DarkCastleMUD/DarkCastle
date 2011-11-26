@@ -16,7 +16,7 @@
  *  10/21/2003   Onager    Changed IS_ANONYMOUS() to handle mobs without   *
  *                         crashing                                        *
  ***************************************************************************/
-/* $Id: utility.h,v 1.93 2010/02/19 06:09:18 jhhudso Exp $ */
+/* $Id: utility.h,v 1.94 2011/11/26 03:33:57 jhhudso Exp $ */
 
 #ifndef UTILITY_H_
 #define UTILITY_H_
@@ -359,7 +359,7 @@ char *  str_nospace     (char *stri);
 char *	str_dup		(const char *str);
 char *	str_dup0	(const char *str);
 void    log		(const char *str, int god_level, long type, char_data *vict = 0);
-void    logf            (int level, long type, char *arg, ...);
+void    logf            (int level, long type, const char *arg, ...);
 int     send_to_gods    (const char * str, int god_level, long type);
 void	sprintbit	(uint value[], char *names[], char *result);
 void    sprintbit	(unsigned long vektor, char *names[], char *result);
@@ -388,7 +388,6 @@ char *  get_skill_name  (int skillnum);
 void	gain_exp_regardless	(CHAR_DATA *ch, int gain);
 void	advance_level	(CHAR_DATA *ch, int is_conversion);
 int	close_socket	(struct descriptor_data *d);
-char *	one_argument	(char *argument, char *first_arg);
 int	isname		(const char *arg, const char *arg2);
 void	page_string	(struct descriptor_data *d, const char *str,
 			    int keep_internal);
