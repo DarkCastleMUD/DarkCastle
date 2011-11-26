@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_warrior.cpp,v 1.84 2011/09/18 23:41:21 jhhudso Exp $
+| $Id: cl_warrior.cpp,v 1.85 2011/11/26 03:24:38 jhhudso Exp $
 | cl_warrior.C
 | Description:  This file declares implementation for warrior-specific
 |   skills.
@@ -20,6 +20,7 @@
 #include <returnvals.h>
 #include <race.h>
 #include <iostream>
+#include <interp.h>
 
 using namespace std;
 
