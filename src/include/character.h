@@ -1,7 +1,7 @@
 #ifndef CHARACTER_H_
 #define CHARACTER_H_
 /******************************************************************************
-| $Id: character.h,v 1.79 2010/02/19 06:09:18 jhhudso Exp $
+| $Id: character.h,v 1.80 2011/11/26 03:27:28 jhhudso Exp $
 | Description: This file contains the header information for the character
 |   class implementation.
 */
@@ -387,7 +387,7 @@ struct char_data
      int16 song_mitigation;     // modifies song damage
      int16 spell_reflect;
 
-     int16 clan;                       /* Clan the char is in */
+     intptr_t clan;                       /* Clan the char is in */
 
      int16 armor;                 // Armor class
      int16 hitroll;               // Any bonus or penalty to the hit roll
