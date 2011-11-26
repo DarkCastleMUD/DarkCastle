@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.204 2011/09/03 04:20:22 jhhudso Exp $ */
+/* $Id: db.cpp,v 1.205 2011/11/26 03:20:47 jhhudso Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -187,7 +187,6 @@ world_file_list_item * new_mob_file_item(char * temp, long room_nr);
 world_file_list_item * new_obj_file_item(char * temp, long room_nr);
 
 char * read_next_worldfile_name(FILE * flWorldIndex);
-int fread_int(FILE *fl, long minval, long maxval);
 int fread_bitvector(FILE *fl, long minval, long maxval);
 void fread_new_newline (FILE *fl) {}
 char fread_char (FILE *fl);
@@ -3580,7 +3579,6 @@ void delete_item_from_index(int nr)
 struct obj_data *read_object(int nr, FILE *fl, bool zz)
     {
     struct obj_data *obj;
-    int tmpp;
     int loc, mod;
 
     char chk;
@@ -3626,8 +3624,6 @@ struct obj_data *read_object(int nr, FILE *fl, bool zz)
     curr_type = "Object";
 
     /* *** numeric data *** */
-
-    tmpp = 0;
 
     obj->obj_flags.type_flag   = fread_int (fl, -1000, LONG_MAX);
     obj->obj_flags.extra_flags = fread_bitvector (fl, 0, LONG_MAX);
@@ -4470,86 +4466,147 @@ if(curr_virtno == 22019)
     return( 0 );
 }
 
+uint64_t fread_uint(FILE *fl, uint64_t beg_range, uint64_t end_range)
+{
+	char buf[MAX_STRING_LENGTH];
+	char * pBufLast;
+	int ch;
+	uint64_t i;
+
+	while ((ch = getc (fl))) {
+		if (ch == EOF) {
+			printf("Reading %s: %s, %d\n", curr_type, curr_name, curr_virtno);
+			perror("fread_int: premature EOF");
+			abort();
+		}
+
+		if (ch != ' ' && ch != '\n') /* eat the white space */
+			break;
+	}
+
+	pBufLast = buf;
+
+	if (ch == '-' && beg_range >= 0) {
+		printf("Reading %s: %s, %d\n", curr_type, curr_name, curr_virtno);
+		perror("fread_int: Bad value - < 0 on positive only num");
+		while (isdigit(getc(fl))) { }
+		throw error_negative_int();
+	} else if (ch == '-') {
+		*pBufLast = ch;
+		pBufLast++;
+		ch = getc (fl);
+	}
+
+	*pBufLast = ch;
+	pBufLast++;
+
+	for (; pBufLast < &buf[sizeof(buf) - 4];) {
+		switch (ch = getc (fl)) {
+		default:
+			if (isdigit(ch)) {
+				*pBufLast = ch;
+				pBufLast++;
+			} else {
+				*pBufLast = 0;
+				i = atoll(buf);
+				if (i >= beg_range && i <= end_range) {
+					return i;
+				} else {
+					printf("Buffer: '%s'\n", buf);
+					printf("Reading %s: %s, %d\n", curr_type, curr_name,
+							curr_virtno);
+					printf("fread_int: Bad value for range %lld - %lld: %lld\n",
+							beg_range, end_range, i);
+					perror("fread_int: Value range error");
+					throw error_range_int();
+				}
+			}
+			break;
+
+		case EOF:
+			perror("fread_int: EOF");
+			abort();
+			break;
+		}
+	}
+
+	perror("fread_int: something went wrong");
+	abort();
+	return (0);
+}
+
+
 /*
     fread_int has the nasty habit of reading on white
     space char after the int it reads.  This can goof
     up stuff like comments in the zone file.
 */
-int fread_int(FILE *fl, long beg_range, long end_range)
-{
-    char    buf[MAX_STRING_LENGTH];
-    char *  pBufLast;
-    int ch; 
-    long i;
+int64_t fread_int(FILE *fl, int64_t beg_range, int64_t end_range) {
+	char buf[MAX_STRING_LENGTH];
+	char * pBufLast;
+	int ch;
+	int64_t i;
 
-    while ((ch = getc (fl))) {
-   if (ch == EOF) {
-        printf ("Reading %s: %s, %d\n", curr_type, curr_name, curr_virtno);
-           perror ("fread_int: premature EOF");
-           abort();
-        }
+	while ((ch = getc (fl))) {
+		if (ch == EOF) {
+			printf("Reading %s: %s, %d\n", curr_type, curr_name, curr_virtno);
+			perror("fread_int: premature EOF");
+			abort();
+		}
 
-        if (ch != ' ' && ch != '\n') /* eat the white space */
-            break;
-    }
+		if (ch != ' ' && ch != '\n') /* eat the white space */
+			break;
+	}
 
-    pBufLast  = buf;
+	pBufLast = buf;
 
-    if (ch == '-' && beg_range >= 0)
-        {
-        printf ("Reading %s: %s, %d\n", curr_type, curr_name, curr_virtno);
-        perror ("fread_int: Bad value - < 0 on positive only num");
-        throw error_negative_int();
-        }
-    else if (ch == '-')
-        {
-        *pBufLast = ch;
-        pBufLast++;
-        ch = getc (fl);
-        }
+	if (ch == '-' && beg_range >= 0) {
+		printf("Reading %s: %s, %d\n", curr_type, curr_name, curr_virtno);
+		perror("fread_int: Bad value - < 0 on positive only num");
+		while (isdigit(getc(fl))) { }
+		throw error_negative_int();
+	} else if (ch == '-') {
+		*pBufLast = ch;
+		pBufLast++;
+		ch = getc (fl);
+	}
 
-    *pBufLast = ch;
-    pBufLast++;
+	*pBufLast = ch;
+	pBufLast++;
 
+	for (; pBufLast < &buf[sizeof(buf) - 4];) {
+		switch (ch = getc (fl)) {
+		default:
+			if (isdigit(ch)) {
+				*pBufLast = ch;
+				pBufLast++;
+			} else {
+				*pBufLast = 0;
+				i = atoll(buf);
+				if (i >= beg_range && i <= end_range) {
+					return i;
+				} else {
+					printf("Buffer: '%s'\n", buf);
+					printf("Reading %s: %s, %d\n", curr_type, curr_name,
+							curr_virtno);
+					printf("fread_int: Bad value for range %lld - %lld: %lld\n",
+							beg_range, end_range, i);
+					perror("fread_int: Value range error");
+					throw error_range_int();
+				}
+			}
+			break;
 
-    for ( ; pBufLast < &buf[sizeof(buf)-4]; )
-        {
-        switch (ch = getc (fl))
-        {
-        default:
-            if (isdigit (ch))
-                {
-                *pBufLast = ch;
-                pBufLast++;
-                }
-            else
-                {
-                *pBufLast = 0;
-                i = atoi (buf);
-                if (i >= beg_range && i <= end_range) {
-                   return i;
-                   }
-                else
-                   {
-                   printf ("Buffer: '%s'\n", buf);
-                   printf ("Reading %s: %s, %d\n", curr_type, curr_name, curr_virtno);
-                   printf ("fread_int: Bad value for range %ld - %ld: %ld\n" , beg_range, end_range, i);
-                   perror ("fread_int: Value range error");
-                   abort ();
-                   }
-                }
-            break;
+		case EOF:
+			perror("fread_int: EOF");
+			abort();
+			break;
+		}
+	}
 
-        case EOF:
-            perror( "fread_int: EOF" );
-            abort();
-            break;
-        }
-    }
-
-    perror( "fread_int: something went wrong" );
-    abort();
-    return( 0 );
+	perror("fread_int: something went wrong");
+	abort();
+	return (0);
 }
 
 
