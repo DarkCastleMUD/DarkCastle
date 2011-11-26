@@ -19,6 +19,7 @@
 #include <act.h>
 #include <db.h>
 #include <returnvals.h>
+#include <interp.h>
 
 extern CWorld world;
  
