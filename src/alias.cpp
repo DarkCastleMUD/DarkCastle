@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: alias.cpp,v 1.7 2011/09/03 04:20:22 jhhudso Exp $
+| $Id: alias.cpp,v 1.8 2011/11/26 03:35:36 jhhudso Exp $
 | alias.C
 | Description:  Commands for the alias processor.
 */
@@ -16,6 +16,7 @@ extern "C"
 #include <levels.h>
 #include <player.h>
 #include <returnvals.h>
+#include <interp.h>
 
 int do_alias(struct char_data *ch, char *arg, int cmd)
 {
