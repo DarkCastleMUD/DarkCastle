@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: db.h,v 1.34 2009/12/31 05:00:42 jhhudso Exp $ */
+/* $Id: db.h,v 1.35 2011/11/26 03:21:09 jhhudso Exp $ */
 #ifndef DB_H_
 #define DB_H_
 
@@ -31,6 +31,7 @@ extern struct obj_data  *object_list;
 
 struct error_eof {};
 struct error_negative_int {};
+struct error_range_int {};
 
 #define WORLD_MAX_ROOM        50000  // should never get this high...
                                      // it's just to keep builders/imps from 
@@ -131,7 +132,8 @@ void delete_item_from_index(int nr);
 void delete_mob_from_index(int nr);
 int  real_object(int virt);
 int  real_mobile(int virt);
-int  fread_int(FILE *fl, long minval, long maxval);
+int64_t fread_int(FILE *fl, int64_t minval, int64_t maxval);
+uint64_t fread_uint(FILE *fl, uint64_t minval, uint64_t maxval);
 char fread_char (FILE *fl);
 void add_mobspec(int i);
 extern struct skill_quest *skill_list; 
