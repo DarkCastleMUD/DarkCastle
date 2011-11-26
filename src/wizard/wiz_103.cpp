@@ -23,7 +23,6 @@ extern struct room_data ** world_array;
 int do_boot(struct char_data *ch, char *arg, int cmd)
 {
   struct char_data *victim;
-  int room;
   char name[MAX_INPUT_LENGTH], type[MAX_INPUT_LENGTH], buf[500];
 
   half_chop(arg,name,type);
@@ -68,8 +67,6 @@ int do_boot(struct char_data *ch, char *arg, int cmd)
              GET_SHORT(ch));
       send_to_char(buf, victim);
     }
-
-    room = victim->in_room;
 
     act("A stream of fire arcs down from the heavens, striking "
         "$n between the eyes.\r\n$n has been removed from the world "
@@ -240,10 +237,10 @@ int do_fighting(struct char_data *ch, char *argument, int cmd)
   int countFighters = 0;
   char buf[80];
   char arg[MAX_STRING_LENGTH];
-  struct clan_data *ch_clan = 0;
+  clan_data *ch_clan = 0;
   char ch_clan_name[CLANTAG_LEN];
   ch_clan_name[0] = 0;
-  struct clan_data *victim_clan = 0;
+  clan_data *victim_clan = 0;
   char victim_clan_name[CLANTAG_LEN];
   victim_clan_name[0] = 0;
   
