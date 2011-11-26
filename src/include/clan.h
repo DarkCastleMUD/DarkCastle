@@ -2,31 +2,10 @@
 #define CLAN_H_
 
 /************************************************************************
-| $Id: clan.h,v 1.25 2007/12/24 01:58:59 jhhudso Exp $
+| $Id: clan.h,v 1.26 2011/11/26 03:32:34 jhhudso Exp $
 | clan.h
 | Description:  Header information for clans.
 */
-
-void clan_login(char_data * ch);
-void clan_logout(char_data * ch);
-int has_right(char_data * ch, uint32 bit);
-struct clan_data * get_clan(int nClan);
-struct clan_data * get_clan(CHAR_DATA *ch);
-char *get_clan_name(int nClan);
-char *get_clan_name(CHAR_DATA *ch);
-char *get_clan_name(clan_data *clan);
-void save_clans();
-int plr_rights(struct char_data * ch);
-
-void add_clan(struct clan_data * new_new_clan);
-void add_clan_member(struct clan_data * theClan, struct clan_member_data * new_new_member);
-void add_clan_member(struct clan_data * theClan, struct char_data * ch);
-void remove_clan_member(struct clan_data * theClan, struct char_data * ch);
-void remove_clan_member(int clannumber, struct char_data * ch);
-void free_member(struct clan_member_data * member);
-struct clan_member_data * get_member(char * strName, int nClanId);
-void show_clan_log(CHAR_DATA *ch);
-void log_clan(CHAR_DATA *ch, char *buffer);
 
 #define MAX_CLAN_LEN             15
 #define CLAN_RIGHTS_ACCEPT       1
@@ -45,9 +24,6 @@ void log_clan(CHAR_DATA *ch, char *buffer);
 #define CLAN_RIGHTS_VAULT        1<<13
 #define CLAN_RIGHTS_VAULTLOG     1<<14
 #define CLAN_RIGHTS_LOG          1<<15
-
-// if you add to the clan rights, update clan_rights[] in clan.C
-
 
 struct clan_room_data
 {
@@ -72,8 +48,9 @@ struct clan_member_data
   struct clan_member_data * next;
 };
 
-struct clan_data
+class clan_data
 {
+public:
   char *leader;
   char *founder;
   char *name;
@@ -83,20 +60,46 @@ struct clan_data
   char * death_message;
   char * logout_message;
   char * clanmotd;
-  long balance;
   uint16 tax;
   uint16 number;
   uint16 amt;
   clan_room_data * rooms;
   clan_member_data * members;
-  struct clan_data * next;
+  clan_data * next;
   struct vault_access_data *acc;
+  clan_data(void);
+  void cdeposit(const uint64_t &deposit);
+  void cwithdraw(const uint64_t &withdraw);
+  uint64_t getBalance(void);
+  void setBalance(const uint64_t &value);
+private:
+  uint64_t balance;
 };
+// if you add to the clan rights, update clan_rights[] in clan.C
 
 void add_totem(OBJ_DATA *altar, OBJ_DATA *totem);
 void remove_totem(OBJ_DATA *altar, OBJ_DATA *totem);
 void add_totem_stats(CHAR_DATA *ch, int stat = 0);
 void remove_totem_stats(CHAR_DATA *ch, int stat = 0);
 bool others_clan_room(char_data *ch, room_data *room);
+void clan_login(char_data * ch);
+void clan_logout(char_data * ch);
+int has_right(char_data * ch, uint32 bit);
+clan_data * get_clan(int nClan);
+clan_data * get_clan(CHAR_DATA *ch);
+char *get_clan_name(int nClan);
+char *get_clan_name(CHAR_DATA *ch);
+char *get_clan_name(clan_data *clan);
+void save_clans();
+int plr_rights(struct char_data * ch);
+void add_clan(clan_data * new_new_clan);
+void add_clan_member(clan_data * theClan, struct clan_member_data * new_new_member);
+void add_clan_member(clan_data * theClan, struct char_data * ch);
+void remove_clan_member(clan_data * theClan, struct char_data * ch);
+void remove_clan_member(int clannumber, struct char_data * ch);
+void free_member(struct clan_member_data * member);
+struct clan_member_data * get_member(char * strName, int nClanId);
+void show_clan_log(CHAR_DATA *ch);
+void log_clan(CHAR_DATA *ch, char *buffer);
 
 #endif /* CLAN_H_ */
