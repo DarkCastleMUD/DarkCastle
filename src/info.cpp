@@ -12,7 +12,7 @@
  * This is free software and you are benefitting.	We hope that you    *
  * share your changes too.  What goes around, comes around. 		    *
  ****************************************************************************/
-/* $Id: info.cpp,v 1.197 2009/12/24 07:25:14 jhhudso Exp $ */
+/* $Id: info.cpp,v 1.198 2011/11/29 02:24:00 jhhudso Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -87,7 +87,7 @@ extern int   curr_virtno;
 struct char_data *get_pc_vis(struct char_data *ch, char *name);
 struct time_info_data age(struct char_data *ch);
 void page_string(struct descriptor_data *d, const char *str, int keep_internal);
-struct clan_data * get_clan(struct char_data *);
+clan_data * get_clan(struct char_data *);
 char *str_str(char *first, char *second);
 extern int hit_gain(CHAR_DATA *ch, int position);
 extern int mana_gain(CHAR_DATA*ch);
@@ -433,7 +433,7 @@ void show_char_to_char(struct char_data *i, struct char_data *ch, int mode)
    int j, found, percent;
    struct obj_data *tmp_obj;
    char buf2[MAX_STRING_LENGTH];
-   struct clan_data * clan;
+   clan_data * clan;
    char buf[200];
 
    if(mode == 0) {
@@ -2738,9 +2738,9 @@ void check_leaderboard()
 	   mvactiveclass[j][i] = fread_int(fl, 0, LONG_MAX);
 	 }
        }
-     } catch (error_eof) {
+     } catch (error_eof &) {
        log("Corrupt leaderboard file: eof reached prematurely.", 0, LOG_MISC);
-     } catch (error_negative_int) {
+     } catch (error_negative_int &) {
        log("Corrupt leaderboard file: negative int found where positive expected.", 0, LOG_MISC);
      }
 
