@@ -8,7 +8,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: fount.cpp,v 1.4 2006/06/23 22:37:28 shane Exp $ */
+/* $Id: fount.cpp,v 1.5 2011/11/29 02:19:31 jhhudso Exp $ */
 
 extern "C"
 {
@@ -27,6 +27,7 @@ extern "C"
 #include <act.h>
 #include <db.h>
 #include <handler.h>
+#include <interp.h>
 
 extern CWorld world;
 int real_object(int i);
