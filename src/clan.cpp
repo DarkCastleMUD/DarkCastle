@@ -1,9 +1,12 @@
-/* $Id: clan.cpp,v 1.84 2011/11/25 23:52:31 jhhudso Exp $ */
+/* $Id: clan.cpp,v 1.85 2011/11/29 02:09:28 jhhudso Exp $ */
 
 /***********************************************************************/
 /* Revision History                                                    */
 /* 11/10/2003    Onager     Removed clan size limit                    */
 /***********************************************************************/
+#define __STDC_LIMIT_MACROS
+#include <stdint.h>
+uint64_t i= UINT64_MAX;
 
 extern "C"
 {
@@ -36,14 +39,16 @@ extern "C"
 #include <stack>
 
 extern CHAR_DATA *character_list;
-extern struct descriptor_data *descriptor_list;
-extern struct index_data *obj_index;
+extern descriptor_data *descriptor_list;
+extern index_data *obj_index;
 extern CWorld world;
-extern struct zone_data *zone_table;
-extern void send_info(char *messg);
+extern zone_data *zone_table;
 
-struct clan_data * clan_list = 0;
-struct clan_data * end_clan_list = 0;
+void send_info(char *messg);
+void addtimer(struct timer_data *timer);
+
+clan_data * clan_list = 0;
+clan_data * end_clan_list = 0;
 
 #define MAX_CLAN_DESC_LENGTH 1022
 
@@ -72,9 +77,9 @@ void boot_clans(void)
 {
   FILE * fl;
   char buf[1024];
-  struct clan_data * new_new_clan = NULL;
-  struct clan_room_data * new_new_room = NULL;
-  struct clan_member_data * new_new_member = NULL;
+  clan_data * new_new_clan = NULL;
+  clan_room_data * new_new_room = NULL;
+  clan_member_data * new_new_member = NULL;
   int tempint;
 
   if(!(fl = dc_fopen("../lib/clan.txt", "r"))) {
@@ -89,13 +94,12 @@ void boot_clans(void)
   while((a = fread_char(fl)) != '~') {
    ungetc(a, fl);
 #ifdef LEAK_CHECK
-    new_new_clan = (struct clan_data *)calloc(1, sizeof(struct clan_data));
+    new_new_clan = (clan_data *)calloc(1, sizeof(clan_data));
 #else
-    new_new_clan = (struct clan_data *)dc_alloc(1, sizeof(struct clan_data));
+    new_new_clan = (clan_data *)dc_alloc(1, sizeof(clan_data));
 #endif
     new_new_clan->next = 0;
     new_new_clan->tax = 0;
-    new_new_clan->balance = 0;
     new_new_clan->email = NULL;
     new_new_clan->description = NULL;
     new_new_clan->login_message = NULL;
@@ -155,7 +159,17 @@ void boot_clans(void)
           break;
         }
 	case 'B': { // Account balance
-	   new_new_clan->balance = fread_int(fl,0,LONG_MAX);
+		try {
+			new_new_clan->setBalance(fread_uint(fl,0,UINT64_MAX));
+		} catch (error_negative_int &e) {
+			fprintf(stderr, "negative clan balance read for clan %d.\n", new_new_clan->number);
+			fprintf(stderr, "Setting clan %d's balance to 0.\n", new_new_clan->number);
+			new_new_clan->setBalance(0);
+		} catch (...) {
+			fprintf(stderr, "unknown error reading clan balance for clan %d.\n", new_new_clan->number);
+			fprintf(stderr, "Setting clan %d's balance to 0.\n", new_new_clan->number);
+			new_new_clan->setBalance(0);
+		}
 	   break;
 	}
 	case 'T': { // Tax
@@ -207,7 +221,7 @@ void boot_clans(void)
 void save_clans(void)
 {
   FILE * fl;
-  struct clan_data * pclan = NULL;
+  clan_data * pclan = NULL;
   struct clan_room_data * proom = NULL;
   struct clan_member_data * pmember = NULL;
   char buf[MAX_STRING_LENGTH];
@@ -274,8 +288,8 @@ void save_clans(void)
      if (pclan->tax)
 	fprintf(fl, "T\n%d\n", pclan->tax);
 
-     if (pclan->balance)
-	fprintf(fl, "B\n%ld\n", pclan->balance);
+     if (pclan->getBalance())
+	fprintf(fl, "B\n%llu\n", pclan->getBalance());
 
      // BLAH TEMP CODE HERE
      targ = buf;
@@ -350,8 +364,8 @@ extern short bport;
 
 void free_clans_from_memory()
 {
-  struct clan_data * currclan = NULL;
-  struct clan_data * nextclan = NULL;
+  clan_data * currclan = NULL;
+  clan_data * nextclan = NULL;
   struct clan_room_data * curr_room = NULL;
   struct clan_room_data * next_room = NULL;
   struct clan_member_data * curr_member = NULL;
@@ -388,7 +402,7 @@ void free_clans_from_memory()
 
 void assign_clan_rooms()
 {
-   struct clan_data * clan = 0;
+   clan_data * clan = 0;
    struct clan_room_data * room = 0;
 
    for(clan = clan_list; clan; clan = clan->next)
@@ -401,7 +415,7 @@ void assign_clan_rooms()
 
 struct clan_member_data * get_member(char * strName, int nClanId)
 {
-  struct clan_data * theClan = NULL;
+  clan_data * theClan = NULL;
 
   if(!(theClan = get_clan(nClanId)) || !strName)
     return NULL;
@@ -414,7 +428,7 @@ struct clan_member_data * get_member(char * strName, int nClanId)
   return pcurr;    
 }
 
-int is_in_clan(struct clan_data * theClan, struct char_data * ch) 
+int is_in_clan(clan_data * theClan, struct char_data * ch)
 {
   struct clan_member_data * pcurr = theClan->members;
 
@@ -429,7 +443,7 @@ int is_in_clan(struct clan_data * theClan, struct char_data * ch)
 
 void remove_clan_member(int clannumber, struct char_data * ch)
 {
-   struct clan_data * pclan = NULL;
+   clan_data * pclan = NULL;
    
    if(!(pclan = get_clan(clannumber)))
      return;
@@ -437,7 +451,7 @@ void remove_clan_member(int clannumber, struct char_data * ch)
    remove_clan_member(pclan, ch);
 }
 
-void remove_clan_member(struct clan_data * theClan, struct char_data * ch)
+void remove_clan_member(clan_data * theClan, struct char_data * ch)
 {
    struct clan_member_data * pcurr = NULL;
    struct clan_member_data * plast = NULL;
@@ -461,7 +475,7 @@ void remove_clan_member(struct clan_data * theClan, struct char_data * ch)
 }
 
 // Add someone.  Just makes the struct, fills it, then calls the other add_clan_member
-void add_clan_member(struct clan_data * theClan, struct char_data * ch) 
+void add_clan_member(clan_data * theClan, struct char_data * ch)
 {
   struct clan_member_data * pmember = NULL;
 
@@ -491,7 +505,7 @@ void add_clan_member(struct clan_data * theClan, struct char_data * ch)
 
 // This should really be done as a binary tree, but I'm lazy, and this doesn't get used
 // very often, so it's just a linked list sorted by member name
-void add_clan_member(struct clan_data * theClan, struct clan_member_data * new_new_member)
+void add_clan_member(clan_data * theClan, struct clan_member_data * new_new_member)
 {
   struct clan_member_data * pcurr = NULL;
   struct clan_member_data * plast = NULL;
@@ -542,10 +556,10 @@ void add_clan_member(struct clan_data * theClan, struct clan_member_data * new_n
   plast->next = new_new_member;
 }
 
-void add_clan(struct clan_data * new_new_clan)
+void add_clan(clan_data * new_new_clan)
 {
-  struct clan_data * pcurr = NULL;
-  struct clan_data * plast = NULL;
+  clan_data * pcurr = NULL;
+  clan_data * plast = NULL;
 
   if(!clan_list) {
     clan_list = new_new_clan;
@@ -579,10 +593,10 @@ void free_member(struct clan_member_data * member)
   dc_free(member);
 }
 
-void delete_clan(struct clan_data * dead_clan)
+void delete_clan(clan_data * dead_clan)
 {
-  struct clan_data * last = 0;
-  struct clan_data * curr = 0;
+  clan_data * last = 0;
+  clan_data * curr = 0;
   struct clan_room_data * room = 0;
   struct clan_room_data * nextroom = 0;
 
@@ -662,7 +676,7 @@ int has_right(struct char_data * ch, uint32 bit)
   return IS_SET(pmember->member_rights, bit);  
 }
 
-int num_clan_members(struct clan_data * clan)
+int num_clan_members(clan_data * clan)
 {
   int i = 0;
   for(struct clan_member_data * pmem = clan->members;
@@ -673,9 +687,9 @@ int num_clan_members(struct clan_data * clan)
   return i;
 }
 
-struct clan_data * get_clan(int nClan)
+clan_data * get_clan(int nClan)
 {
-  struct clan_data *clan = NULL;
+  clan_data *clan = NULL;
 
   if (nClan == 0)
     return 0;
@@ -687,13 +701,13 @@ struct clan_data * get_clan(int nClan)
   return 0;
 }
 
-struct clan_data * get_clan(CHAR_DATA *ch)
+clan_data * get_clan(CHAR_DATA *ch)
 {
   if (ch == 0) {
     return 0;
   }
 
-  struct clan_data *clan;
+  clan_data *clan;
 
   for(clan = clan_list; clan; clan = clan->next)
      if(ch->clan == clan->number)
@@ -880,7 +894,7 @@ void clan_logout (char_data *ch)
 int do_accept(CHAR_DATA *ch, char *arg, int cmd)
 {
   CHAR_DATA *victim;
-  struct clan_data *clan;
+  clan_data *clan;
   char buf[MAX_STRING_LENGTH];
 
   while(isspace(*arg))
@@ -937,7 +951,7 @@ int do_accept(CHAR_DATA *ch, char *arg, int cmd)
 int do_outcast(CHAR_DATA *ch, char *arg, int cmd)
 {
   CHAR_DATA *victim;
-  struct clan_data *clan;
+  clan_data *clan;
   struct descriptor_data d;
   char buf[MAX_STRING_LENGTH], tmp_buf[MAX_STRING_LENGTH];
   bool connected = TRUE;
@@ -1034,7 +1048,7 @@ int do_outcast(CHAR_DATA *ch, char *arg, int cmd)
 int do_cpromote(CHAR_DATA *ch, char *arg, int cmd)
 {
   CHAR_DATA *victim;
-  struct clan_data *clan;
+  clan_data *clan;
   char buf[MAX_STRING_LENGTH];
 
   while(isspace(*arg))
@@ -1089,7 +1103,7 @@ int do_cpromote(CHAR_DATA *ch, char *arg, int cmd)
 
 int clan_desc(CHAR_DATA *ch, char *arg)
 {
-  struct clan_data * clan = 0;
+  clan_data * clan = 0;
 
   char buf[MAX_STRING_LENGTH];
   char text[MAX_INPUT_LENGTH];
@@ -1140,7 +1154,7 @@ int clan_desc(CHAR_DATA *ch, char *arg)
 
 int clan_motd(CHAR_DATA *ch, char *arg)
 {
-  struct clan_data * clan = 0;
+  clan_data * clan = 0;
 
   char buf[MAX_STRING_LENGTH];
   char text[MAX_INPUT_LENGTH];
@@ -1192,7 +1206,7 @@ int clan_motd(CHAR_DATA *ch, char *arg)
 
 int clan_death_message(CHAR_DATA *ch, char *arg)
 {
-  struct clan_data * clan = 0;
+  clan_data * clan = 0;
 
   char buf[MAX_STRING_LENGTH];
 
@@ -1260,7 +1274,7 @@ int clan_death_message(CHAR_DATA *ch, char *arg)
 
 int clan_logout_message(CHAR_DATA *ch, char *arg)
 {
-  struct clan_data * clan = 0;
+  clan_data * clan = 0;
 
   char buf[MAX_STRING_LENGTH];
 
@@ -1316,7 +1330,7 @@ int clan_logout_message(CHAR_DATA *ch, char *arg)
 
 int clan_login_message(CHAR_DATA *ch, char *arg)
 {
-  struct clan_data * clan = 0;
+  clan_data * clan = 0;
 
   char buf[MAX_STRING_LENGTH];
 
@@ -1372,7 +1386,7 @@ int clan_login_message(CHAR_DATA *ch, char *arg)
 
 int clan_email(CHAR_DATA *ch, char *arg)
 {
-  struct clan_data * clan = 0;
+  clan_data * clan = 0;
 
   char buf[MAX_STRING_LENGTH];
   char text[MAX_INPUT_LENGTH];
@@ -1484,7 +1498,7 @@ int do_ctell(CHAR_DATA *ch, char *arg, int cmd)
 
 void do_clan_list(CHAR_DATA *ch)
 {
-  struct clan_data * clan = 0;
+  clan_data * clan = 0;
   char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH];
 
   send_to_char("Clan                 Leader\n\r", ch);
@@ -1494,7 +1508,7 @@ void do_clan_list(CHAR_DATA *ch)
            clan->number);
      if (GET_LEVEL(ch) > 103)
      {
-    	 sprintf(buf2, "%s  Balance: %ld Tax: %d\r\n", buf, clan->balance, clan->tax);
+    	 sprintf(buf2, "%s  Balance: %llu Tax: %d\r\n", buf, clan->getBalance(), clan->tax);
      } else {
     	 sprintf(buf2, "%s\r\n", buf);
      }
@@ -1505,7 +1519,7 @@ void do_clan_list(CHAR_DATA *ch)
 void do_clan_member_list(CHAR_DATA *ch)
 {
   struct clan_member_data * pmember = 0;
-  struct clan_data * pclan = 0;
+  clan_data * pclan = 0;
   int column = 1;
   char buf[200], buf2[200];
 
@@ -1537,7 +1551,7 @@ void do_clan_member_list(CHAR_DATA *ch)
 
 int is_clan_leader(CHAR_DATA * ch)
 {
-  struct clan_data * pclan = NULL;
+  clan_data * pclan = NULL;
 
   if(!ch || !(pclan = get_clan(ch->clan))) 
     return 0;
@@ -1615,8 +1629,8 @@ void do_clan_rights(CHAR_DATA * ch, char * arg)
 
 void do_god_clans(CHAR_DATA *ch, char *arg, int cmd)
 {
-  struct clan_data * clan = 0;
-  struct clan_data * tarclan = 0;
+  clan_data * clan = 0;
+  clan_data * tarclan = 0;
   struct clan_room_data * newroom = 0;
   struct clan_room_data * lastroom = 0;
 
@@ -1681,9 +1695,9 @@ void do_god_clans(CHAR_DATA *ch, char *arg, int cmd)
       }
       x = atoi(last);
 #ifdef LEAK_CHECK
-      clan = (struct clan_data *)calloc(1, sizeof(clan_data));
+      clan = (clan_data *)calloc(1, sizeof(clan_data));
 #else
-      clan = (struct clan_data *)dc_alloc(1, sizeof(clan_data));
+      clan = (clan_data *)dc_alloc(1, sizeof(clan_data));
 #endif
       clan->leader = str_dup(GET_NAME(ch));
       clan->amt = 0;
@@ -2118,7 +2132,7 @@ void do_god_clans(CHAR_DATA *ch, char *arg, int cmd)
 void do_leader_clans(CHAR_DATA *ch, char *arg, int cmd)
 {
   struct clan_member_data * pmember = 0;
-//  struct clan_data * tarclan = 0;
+//  clan_data * tarclan = 0;
 //  struct clan_room_data * newroom = 0;
 //  struct clan_room_data * lastroom = 0;
 
@@ -2370,7 +2384,7 @@ int needs_clan_command(char_data * ch)
 
 int do_clans(CHAR_DATA *ch, char *arg, int cmd)
 {
-  struct clan_data * clan = 0;
+  clan_data * clan = 0;
   char * tmparg;
 
   char buf[MAX_STRING_LENGTH];
@@ -2421,7 +2435,7 @@ int do_clans(CHAR_DATA *ch, char *arg, int cmd)
 
 int do_cinfo(CHAR_DATA *ch, char *arg, int cmd)
 {
-  struct clan_data *clan;
+  clan_data *clan;
   int nClan;
   char buf[MAX_STRING_LENGTH];
 
@@ -2471,7 +2485,7 @@ int do_cinfo(CHAR_DATA *ch, char *arg, int cmd)
         ( nClan == ch->clan && has_right(ch, CLAN_RIGHTS_MEMBER_LIST) )
     )
   {
-     sprintf(buf, "$3Balance$R:         %ld coins\r\n", clan->balance);
+     sprintf(buf, "$3Balance$R:         %llu coins\r\n", clan->getBalance());
      send_to_char(buf,ch);
   }
   return eSUCCESS;
@@ -2479,7 +2493,7 @@ int do_cinfo(CHAR_DATA *ch, char *arg, int cmd)
 
 int do_whoclan(CHAR_DATA *ch, char *arg, int cmd)
 {
-  struct clan_data *clan;
+  clan_data *clan;
   struct descriptor_data *desc;
   CHAR_DATA *pch;
   char buf[100];
@@ -2524,7 +2538,7 @@ clan->leader) ? "$3($RLeader$3)$R" : ""));
 
 int do_cmotd(CHAR_DATA *ch, char *arg, int cmd)
 {
-  struct clan_data *clan;
+  clan_data *clan;
 
   if(!ch->clan || !(clan = get_clan(ch))) {
     send_to_char("You aren't the member of any clan!\n\r", ch);
@@ -2610,7 +2624,7 @@ int do_cdeposit(CHAR_DATA *ch, char *arg, int cmd)
 
   }
   GET_GOLD(ch) -= dep;
-  get_clan(ch)->balance += dep;
+  get_clan(ch)->cdeposit(dep);
   if (dep == 1) {
     csendf(ch,"You deposit 1 gold coin into your clan's account.\r\n");
   } else {
@@ -2638,7 +2652,7 @@ int do_cwithdraw(CHAR_DATA *ch, char *arg, int cmd)
      send_to_char("You not a member of a clan.\r\n",ch);
      return eFAILURE;
   }
-  if (!has_right(ch, CLAN_RIGHTS_WITHDRAW))
+  if (!has_right(ch, CLAN_RIGHTS_WITHDRAW) && GET_LEVEL(ch) < 108)
   {
      send_to_char("You don't have the right to withdraw gold from your clan's account.\r\n",ch);
      return eFAILURE;
@@ -2655,14 +2669,14 @@ int do_cwithdraw(CHAR_DATA *ch, char *arg, int cmd)
     send_to_char("How much do you want to withdraw?\r\n",ch);
     return eFAILURE;
   }
-  long wdraw = atoi(arg1);
-  if (get_clan(ch)->balance < wdraw || wdraw < 0)
+  uint64_t wdraw = atoi(arg1);
+  if (get_clan(ch)->getBalance() < wdraw || wdraw < 0)
   {
      send_to_char("Your clan lacks the funds.\r\n",ch);
      return eFAILURE;
   }
   GET_GOLD(ch) += (int)wdraw;
-  get_clan(ch)->balance -= wdraw;
+  get_clan(ch)->cwithdraw(wdraw);
   if (wdraw == 1) {
     csendf(ch,"You withdraw 1 gold coin.\r\n",wdraw);
   } else {
@@ -2675,7 +2689,7 @@ int do_cwithdraw(CHAR_DATA *ch, char *arg, int cmd)
   if (wdraw == 1) {
     snprintf(buf, MAX_INPUT_LENGTH, "%s withdrew 1 gold coin from the clan bank account.\r\n", ch->name);
   } else {
-    snprintf(buf, MAX_INPUT_LENGTH, "%s withdrew %ld gold coins from the clan bank account.\r\n", ch->name, wdraw);
+    snprintf(buf, MAX_INPUT_LENGTH, "%s withdrew %llu gold coins from the clan bank account.\r\n", ch->name, wdraw);
   }
   log_clan(ch, buf);
 
@@ -2701,7 +2715,7 @@ int do_cbalance(CHAR_DATA *ch, char *arg, int cmd)
      return eFAILURE;
   }
 
-  csendf(ch, "Your clan has %d gold coins in the bank.\r\n",get_clan(ch)->balance);
+  csendf(ch, "Your clan has %d gold coins in the bank.\r\n", get_clan(ch)->getBalance());
   return eSUCCESS;
 }
 
@@ -2986,22 +3000,20 @@ void check_quitter(void *arg1, void *arg2,void *arg3)
   }
 }
 
-void check_quitter(CHAR_DATA *ch)
-{
-  if (!ch->clan || GET_LEVEL(ch) >= 100) return;
-  
-          struct timer_data *timer;
- #ifdef LEAK_CHECK
-          timer = (struct timer_data *)calloc(1, sizeof(struct timer_data));
- #else
-          timer = (struct timer_data *)dc_alloc(1, sizeof(struct timer_data));
- #endif
-          timer->arg1 = (void*)ch->clan;
-          timer->function = check_quitter;
-          timer->timeleft = 30;
-	  extern void addtimer(struct timer_data *timer);
-          addtimer(timer);
+void check_quitter(CHAR_DATA *ch) {
+	if (!ch->clan || GET_LEVEL(ch) >= 100)
+		return;
 
+	struct timer_data *timer;
+#ifdef LEAK_CHECK
+	timer = (struct timer_data *)calloc(1, sizeof(struct timer_data));
+#else
+	timer = (struct timer_data *) dc_alloc(1, sizeof(struct timer_data));
+#endif
+	timer->arg1 = (void*) ch->clan;
+	timer->function = check_quitter;
+	timer->timeleft = 30;
+	addtimer(timer);
 }
 
 
@@ -3223,7 +3235,7 @@ int do_clanarea(CHAR_DATA *ch, char *argument, int cmd)
 	send_to_char("There is currently an active challenge for this area, and collecting is not possible.\r\n",ch);
 	return eFAILURE;
     }
-    get_clan(ch)->balance += zone_table[world[ch->in_room].zone].gold;
+    get_clan(ch)->cdeposit(zone_table[world[ch->in_room].zone].gold);
     csendf(ch, "You collect %d gold for your clan's treasury.\r\n",
 	    zone_table[world[ch->in_room].zone].gold);
     zone_table[world[ch->in_room].zone].gold = 0;
@@ -3354,4 +3366,25 @@ bool others_clan_room(char_data *ch, room_data *room)
 
   // Room was a clan room, we are in a clan, but this room is not ours
   return true;
+}
+
+clan_data::clan_data(void) : balance(0) {
+
+}
+
+void clan_data::cdeposit(const uint64_t &deposit) {
+	balance += deposit;
+	return;
+}
+
+uint64_t clan_data::getBalance(void) {
+	return balance;
+}
+
+void clan_data::cwithdraw(const uint64_t &withdraw) {
+	balance -= withdraw;
+}
+
+void clan_data::setBalance(const uint64_t &value) {
+	balance = value;
 }
