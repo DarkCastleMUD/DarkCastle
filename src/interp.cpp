@@ -16,7 +16,7 @@
 /* 12/08/2003   Onager   Added chop_half() to work like half_chop() but    */
 /*                       chopping off the last word.                       */
 /***************************************************************************/
-/* $Id: interp.cpp,v 1.192 2011/08/28 03:53:22 jhhudso Exp $ */
+/* $Id: interp.cpp,v 1.193 2011/11/29 02:38:54 jhhudso Exp $ */
 
 extern "C"
 {
@@ -1061,9 +1061,48 @@ char *one_argument_long(char *argument, char *first_arg )
   *(first_arg+look_at) = '\0';
   begin += look_at;
   
-  return (argument+begin);
+  return argument+begin;
 }
 
+const char *one_argument_long(const char *argument, char *first_arg )
+{
+  int found, begin, look_at;
+  bool end = FALSE;
+  found = begin = 0;
+
+  /* Find first non blank */
+  for ( ;isspace(*(argument + begin)); begin++);
+    if (*(argument+begin) == '{') {
+      end = TRUE;
+      begin++;
+      }
+
+  if (*(argument+begin) == '{') {
+   end = TRUE;
+   begin++;
+  }
+  /* Find length of first word */
+  for (look_at=0; ; look_at++)
+    if (!end && *(argument+begin+look_at) <= ' ')
+      break;
+    else if (end && (*(argument+begin+look_at) == '}' ||
+      *(argument+begin+look_at) == '\0')) {
+      begin++;
+      break;
+      }
+    else {
+      if (!end)
+        *(first_arg + look_at) = LOWER(*(argument + begin + look_at));
+      else
+        *(first_arg + look_at) = *(argument + begin + look_at);
+      }
+
+  /* Make all letters lower case, and copy them to first_arg */
+  *(first_arg+look_at) = '\0';
+  begin += look_at;
+
+  return argument+begin;
+}
 
 /* find the first sub-argument of a string, return pointer to first char in
    primary argument, following the sub-arg                      */
@@ -1087,6 +1126,11 @@ char *one_argument(char *argument, char *first_arg )
     while (fill_word(first_arg));
 
   return(argument+begin);
+}
+
+const char *one_argument(const char *argument, char *first_arg )
+{
+  return one_argument_long(argument, first_arg);
 }
 
 

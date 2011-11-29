@@ -12,13 +12,14 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: spells.h,v 1.138 2010/02/19 06:10:41 jhhudso Exp $ */
+/* $Id: spells.h,v 1.139 2011/11/29 02:38:55 jhhudso Exp $ */
 
 #ifndef SPELLS_H_
 #define SPELLS_H_
 
 #include <structs.h> // ubyte, int16
-
+#include <handler.h>
+#include <obj.h>
 #include <map>
 
 #define MAX_BUF_LENGTH               240
@@ -52,6 +53,7 @@ struct skill_quest *find_sq(int sq);
 struct skill_quest *find_sq(char *);
 int dam_percent(int learned, int damage);
 void check_maxes(CHAR_DATA *ch);
+
 /*
  * Spell numbers are well known.
  * They appear in tinyworld files attached to magical items.
@@ -683,5 +685,46 @@ struct attack_hit_type
   #define INSOMNIA_VNUM 6311
   #define HASTE_VNUM 6312
   #define TRUE_VNUM 6305
+
+// search through a character's list to see if they have a particular skill
+// if so, return their level of knowledge
+// if not, return 0
+inline int has_skill(CHAR_DATA *ch, int16 skill) {
+	struct char_skill_data * curr = ch->skills;
+	struct obj_data *o;
+	int bonus = 0;
+
+	if (IS_MOB(ch))
+		return 0;
+
+	if (affected_by_spell(ch, SKILL_DEFENDERS_STANCE) && skill == SKILL_DODGE)
+		return affected_by_spell(ch, SKILL_DEFENDERS_STANCE)->modifier;
+
+	if (affected_by_spell(ch, SPELL_VILLAINY))
+		bonus += affected_by_spell(ch, SPELL_VILLAINY)->modifier / 5;
+
+	if (affected_by_spell(ch, SPELL_HEROISM))
+		bonus += affected_by_spell(ch, SPELL_HEROISM)->modifier / 5;
+
+	while (curr) {
+		if (curr->skillnum == skill) {
+			if (!IS_NPC(ch))
+				for (o = ch->pcdata->skillchange; o; o = o->next_skill) {
+					int a;
+					for (a = 0; a < o->num_affects; a++) {
+						if (o->affected[a].location == skill * 1000) {
+							bonus += o->affected[a].modifier;
+							if ((int) curr->learned + bonus > 150)
+								bonus = 150 - curr->learned;
+						}
+					}
+				}
+			return ((int) curr->learned) + bonus;
+		}
+		curr = curr->next;
+	}
+	return 0;
+}
+
 
 #endif

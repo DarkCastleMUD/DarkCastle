@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: who.cpp,v 1.52 2009/02/19 01:43:40 jhhudso Exp $
+| $Id: who.cpp,v 1.53 2011/11/29 02:38:55 jhhudso Exp $
 | who.C
 | Commands for who, maybe? :P
 */
@@ -40,7 +40,7 @@ extern CWorld world;
 extern int max_who;
 
 struct char_data *get_pc_vis(struct char_data *ch, char *name);
-struct clan_data * get_clan(struct char_data *);
+clan_data * get_clan(struct char_data *);
 
 //#define GWHOBUFFERSIZE   (MAX_STRING_LENGTH*2)
 //char gWhoBuffer[GWHOBUFFERSIZE];
@@ -271,7 +271,7 @@ int do_who(struct char_data *ch, char *argument, int cmd)
 {
     struct descriptor_data *d;
     struct char_data *i, *w;
-    struct clan_data * clan;
+    clan_data * clan;
     int   numPC = 0;
     int   numImmort = 0;
     char* infoField;
@@ -615,7 +615,7 @@ int do_whoarena(struct char_data *ch, char *argument, int cmd)
 {
    int count = 0;
    char_data *tmp;
-   struct clan_data * clan;
+   clan_data * clan;
 
    send_to_char("\n\rPlayers in the Arena:\n\r--------------------------\n\r", ch);
 

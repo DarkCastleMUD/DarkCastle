@@ -76,7 +76,7 @@ extern bool str_prefix(const char *astr, const char *bstr);
 /* Extern Procedures */
 
 int saves_spell(CHAR_DATA *ch, CHAR_DATA *vict, int spell_base, int16 save_type);
-struct clan_data * get_clan(struct char_data *);
+clan_data * get_clan(struct char_data *);
 
 int dice(int number, int size);
 void update_pos( CHAR_DATA *victim );
@@ -3749,7 +3749,7 @@ int spell_word_of_recall(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct o
 {
   int location;
   char buf[200];
-  struct clan_data * clan;
+  clan_data * clan;
   struct clan_room_data * room;
   int found = 0; 
 
@@ -10230,11 +10230,11 @@ int spell_bee_swarm(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
 	  send_to_char("You hear the buzzing of hundreds of bees.\n\r",
 		       tmp_victim);
 	}
-      } catch(CWorld::underrun) {
+      } catch(CWorld::underrun &) {
 	log("Underrun exception occurred in spell_bee_swarm.", IMMORTAL, LOG_BUG);
 	produce_coredump();
 	return eFAILURE;
-      } catch(CWorld::overrun) {
+      } catch(CWorld::overrun &) {
 	log("Overrun exception occurred in spell_bee_swarm.", IMMORTAL, LOG_BUG);
 	produce_coredump();
 	return eFAILURE;

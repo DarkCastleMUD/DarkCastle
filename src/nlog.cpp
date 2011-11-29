@@ -1,4 +1,4 @@
-/* $Id: nlog.cpp,v 1.9 2008/11/21 00:37:34 kkoons Exp $ */
+/* $Id: nlog.cpp,v 1.10 2011/11/29 02:38:54 jhhudso Exp $ */
 
 extern "C"
 {
@@ -109,7 +109,7 @@ char *str_hsh(char *arg)
 
 
 /* logf(GET_LEVEL(ch), LOG_GOD, "%s restored all!", GET_NAME(ch)); */
-void logf(int level, long type, char *arg, ...)
+void logf(int level, long type, const char *arg, ...)
 { 
   va_list args;
   char s[MAX_STRING_LENGTH];

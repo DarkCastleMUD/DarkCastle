@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: objects.cpp,v 1.108 2009/06/26 00:49:08 shane Exp $
+| $Id: objects.cpp,v 1.109 2011/11/29 02:38:54 jhhudso Exp $
 | objects.C
 | Description:  Implementation of the things you can do with objects:
 |   wear them, wield them, grab them, drink them, eat them, etc..
@@ -36,7 +36,7 @@ extern "C"
 extern char *drinks[];
 extern int drink_aff[][3];
 extern CWorld world;
-extern struct clan_data * clan_list;
+extern clan_data * clan_list;
 
 extern struct spell_info_type spell_info[MAX_SPL_LIST];
 extern struct active_object active_head;
@@ -2370,7 +2370,7 @@ void freeVault(struct player_vault *v)
 
 void write_clan_vaults()
 {
-  struct clan_data *clan;
+  clan_data *clan;
   FILE *fl;
   if(!(fl = dc_fopen("../vault/clan/clan.txt", "w"))) {
     fprintf(stderr, "Unable to open clan VAULT file...\n");

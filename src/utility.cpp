@@ -17,7 +17,7 @@
  *                         except Pir and Valk                             *
  * 10/19/2003   Onager     Took out super-secret hidey code from CAN_SEE() *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.116 2010/02/19 06:09:18 jhhudso Exp $ */
+/* $Id: utility.cpp,v 1.117 2011/11/29 02:38:54 jhhudso Exp $ */
 
 extern "C"
 {
@@ -1069,7 +1069,7 @@ int do_recall( CHAR_DATA *ch, char *argument, int cmd )
   CHAR_DATA *loop_ch;
   float cf;
   char name[256] = "";
-  struct clan_data * clan;
+  clan_data * clan;
   struct clan_room_data * room;
   int found = 0;
   int retval;
@@ -1251,7 +1251,7 @@ int do_quit(struct char_data *ch, char *argument, int cmd)
 {
   int iWear;
   struct follow_type *k;
-   struct clan_data * clan;
+   clan_data * clan;
    struct clan_room_data * room;
    int found = 0;
   char buf[MAX_STRING_LENGTH];
@@ -1474,7 +1474,7 @@ int do_save(struct char_data *ch, char *argument, int cmd)
 
 int do_home(struct char_data *ch, char *argument, int cmd)
 {
-   struct clan_data * clan;
+   clan_data * clan;
    struct clan_room_data * room;
    int found = 0;
    
@@ -1550,46 +1550,6 @@ int do_beep(struct char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-// search through a character's list to see if they have a particular skill
-// if so, return their level of knowledge
-// if not, return 0
-int has_skill (CHAR_DATA *ch, int16 skill)
-{
-  struct char_skill_data * curr = ch->skills;
-  struct obj_data *o;
-  int bonus = 0;
-
-  if(affected_by_spell(ch, SKILL_DEFENDERS_STANCE) && skill == SKILL_DODGE)
-    return affected_by_spell(ch, SKILL_DEFENDERS_STANCE)->modifier;
-
-  if(affected_by_spell(ch, SPELL_VILLAINY))
-   bonus += affected_by_spell(ch, SPELL_VILLAINY)->modifier / 5;
-
-  if(affected_by_spell(ch, SPELL_HEROISM))
-   bonus += affected_by_spell(ch, SPELL_HEROISM)->modifier / 5;
-
-  while(curr) {
-    if(curr->skillnum == skill)
-    {
-	if (!IS_NPC(ch))
-      for (o = ch->pcdata->skillchange;o;o=o->next_skill)
-      {
-	int a;
-	for (a = 0; a < o->num_affects;a++)
-	{
-	  if (o->affected[a].location == skill*1000)
-	  {
-	    bonus += o->affected[a].modifier;
-	    if ((int)curr->learned+bonus > 150) bonus = 150 - curr->learned;
-	  }
-	}	
-       }  
-       return ((int)curr->learned)+bonus; 
-    }
-    curr = curr->next;
-  }
-  return 0;
-}
 
 // if a skill has a valid name, return it, else NULL
 char * get_skill_name(int skillnum)
@@ -2073,8 +2033,10 @@ bool check_make_camp(int room)
   for(i = world[room].people; i; i = next_i) {
     next_i = i->next_in_room;
 
-    if(i->fighting) return FALSE;
-    if(IS_MOB(i) && !(IS_AFFECTED(i, AFF_CHARM) || IS_AFFECTED(i, AFF_FAMILIAR)) ) return FALSE;
+    if(i->fighting)
+    	return FALSE;
+    if(IS_MOB(i) && !IS_AFFECTED(i, AFF_CHARM) && !IS_AFFECTED(i, AFF_FAMILIAR))
+    	return FALSE;
     if(affected_by_spell(i, SKILL_MAKE_CAMP) && affected_by_spell(i, SKILL_MAKE_CAMP)->modifier == room)
       campok = TRUE;
   }
@@ -2091,8 +2053,8 @@ int get_leadership_bonus(CHAR_DATA *ch)
   if(ch->master) leader = ch->master;
   else leader = ch;
 
-  if(!affected_by_spell(leader, SKILL_LEADERSHIP)) return 0;
   if(IS_MOB(ch) || ch->in_room != leader->in_room) return 0;
+  if(!affected_by_spell(leader, SKILL_LEADERSHIP)) return 0;
 
   if(affected_by_spell(ch, SKILL_LEADERSHIP) && ch->master)
     affect_from_char(ch, SKILL_LEADERSHIP);

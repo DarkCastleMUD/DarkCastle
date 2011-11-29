@@ -397,7 +397,7 @@ int do_vault(CHAR_DATA *ch, char *argument, int cmd)
   } else if (!strncmp(arg, "log", strlen(arg))) {
     if (*arg1) {
       if (!strcasecmp(arg1, clanVName(ch->clan))) {
-	struct clan_data *clan = get_clan(ch);
+	clan_data *clan = get_clan(ch);
 	if (clan == false) {
 	  send_to_char("You are not a member of any clan.\n\r", ch);
 	  return eFAILURE;

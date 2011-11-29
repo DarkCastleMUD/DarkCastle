@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.281 2011/09/03 04:20:22 jhhudso Exp $ */
+/* $Id: spells.cpp,v 1.282 2011/11/29 02:38:54 jhhudso Exp $ */
 
 extern "C"
 {
@@ -932,7 +932,7 @@ void affect_update( int32 duration_type )
     static struct affected_type *af, *next_af_dude;
     static CHAR_DATA *i, * i_next;
     void update_char_objects( CHAR_DATA *ch ); /* handler.c */
-    unsigned int faded_spells[20];
+    unsigned int faded_spells[20] = { 0 };
     int a =0;
 
     if (duration_type != PULSE_REGEN &&
@@ -951,10 +951,6 @@ void affect_update( int32 duration_type )
         // That way we don't have to traverse the entire list all over again
         if(duration_type == PULSE_TIME && !IS_NPC(i))
           update_char_objects(i);
-
-      for (a=0; a < 20; a++)
-	faded_spells[a] = 0;
-      a=0;
 
       for (af = i->affected; af; af = next_af_dude) {
 	next_af_dude = af->next;

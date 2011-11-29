@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.188 2011/08/28 18:28:59 jhhudso Exp $ */
+/* $Id: nanny.cpp,v 1.189 2011/11/29 02:38:54 jhhudso Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -292,7 +292,7 @@ void do_inate_race_abilities(char_data * ch)
 
 OBJ_DATA *clan_altar(char_data *ch)
 {
-  struct clan_data *clan;
+  clan_data *clan;
   struct clan_room_data *room;
    extern clan_data *clan_list;
 
@@ -1046,7 +1046,7 @@ void nanny(struct descriptor_data *d, char *arg)
         send_to_char(motd, d->character);
       else send_to_char(imotd, d->character);
 
-      struct clan_data * clan;
+      clan_data * clan;
       if((clan = get_clan(ch->clan)) && clan->clanmotd)
       {
          send_to_char("$B----------------------------------------------------------------------$R\r\n", ch);
