@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: group.cpp,v 1.29 2011/09/03 04:20:22 jhhudso Exp $
+| $Id: group.cpp,v 1.30 2011/11/29 02:21:54 jhhudso Exp $
 | group.C
 | Description:  Group related commands; join, abandon, follow, etc..
 */
@@ -220,7 +220,7 @@ int do_split(CHAR_DATA *ch, char *argument, int cmd)
       {
 	lost = (int)((float)share*(float)((float)get_clan(k)->tax/100));
 	sprintf(buf2,"Your clan taxes %d gold of your share.\r\n",lost);
-	get_clan(k)->balance += lost;
+	get_clan(k)->cdeposit(lost);
 	save_clans();
       send_to_char(buf2, k);
       }
@@ -240,7 +240,7 @@ int do_split(CHAR_DATA *ch, char *argument, int cmd)
       {
 	lost = (int)((float)share*(float)((float)get_clan(f->follower)->tax/100));
 	sprintf(buf2,"Your clan taxes %d gold of your share.\r\n",lost);
-	get_clan(f->follower)->balance += lost;
+	get_clan(f->follower)->cdeposit(lost);
 	save_clans();
       send_to_char(buf2, f->follower);
       }
