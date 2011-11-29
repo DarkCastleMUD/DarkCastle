@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: offense.cpp,v 1.26 2008/11/25 21:14:38 kkoons Exp $
+| $Id: offense.cpp,v 1.27 2011/11/29 02:54:06 jhhudso Exp $
 | offense.C
 | Description:  Commands that are generically offensive - that is, the
 |   victim should retaliate.  The class-specific offensive commands are
@@ -25,6 +25,7 @@ extern "C"
 #include <returnvals.h>
 #include <room.h>
 #include <db.h>
+#include <interp.h>
 
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
