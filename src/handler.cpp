@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.195 2011/08/19 22:55:03 jhhudso Exp $ */
+/* $Id: handler.cpp,v 1.196 2011/11/29 02:23:08 jhhudso Exp $ */
     
 extern "C"
 {
@@ -157,7 +157,18 @@ int isname2(const char *str, const char *namel)
 */
 int isname(const char *str, const char *namelist)
 {
-   const char *curname, *curstr;
+#if 0
+	string haystack(namelist);
+	if (haystack.find(str) != string::npos) {
+		return 1;
+	}
+
+	return 0;
+
+
+#endif
+	const char *curname, *curstr;
+
 
    if(!str || !namelist) {
      return(0);
