@@ -1,4 +1,4 @@
-/* $Id: clan.cpp,v 1.85 2011/11/29 02:09:28 jhhudso Exp $ */
+/* $Id: clan.cpp,v 1.86 2011/11/29 03:51:51 jhhudso Exp $ */
 
 /***********************************************************************/
 /* Revision History                                                    */
@@ -2715,7 +2715,7 @@ int do_cbalance(CHAR_DATA *ch, char *arg, int cmd)
      return eFAILURE;
   }
 
-  csendf(ch, "Your clan has %d gold coins in the bank.\r\n", get_clan(ch)->getBalance());
+  csendf(ch, "Your clan has %llu gold coins in the bank.\r\n", get_clan(ch)->getBalance());
   return eSUCCESS;
 }
 
