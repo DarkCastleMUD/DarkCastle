@@ -20,7 +20,7 @@
  * 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead *
  * of just race stuff                                                     *
  **************************************************************************
- * $Id: fight.cpp,v 1.563 2010/04/29 01:38:45 jhhudso Exp $               *
+ * $Id: fight.cpp,v 1.564 2011/11/29 02:19:11 jhhudso Exp $               *
  **************************************************************************/
 
 extern "C"
@@ -6002,8 +6002,8 @@ void arena_kill(CHAR_DATA *ch, CHAR_DATA *victim, int type)
   char killer_message[MAX_STRING_LENGTH];
 //  CHAR_DATA *i;
   CHAR_DATA * tmp = NULL;
-  struct clan_data * ch_clan = NULL;
-  struct clan_data * victim_clan = NULL;
+  clan_data * ch_clan = NULL;
+  clan_data * victim_clan = NULL;
   int eliminated = 1;
   void move_player_home(CHAR_DATA *victim);
   
