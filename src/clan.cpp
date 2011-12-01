@@ -1,4 +1,4 @@
-/* $Id: clan.cpp,v 1.86 2011/11/29 03:51:51 jhhudso Exp $ */
+/* $Id: clan.cpp,v 1.87 2011/12/01 05:00:16 jhhudso Exp $ */
 
 /***********************************************************************/
 /* Revision History                                                    */
@@ -93,11 +93,7 @@ void boot_clans(void)
   char a;
   while((a = fread_char(fl)) != '~') {
    ungetc(a, fl);
-#ifdef LEAK_CHECK
-    new_new_clan = (clan_data *)calloc(1, sizeof(clan_data));
-#else
-    new_new_clan = (clan_data *)dc_alloc(1, sizeof(clan_data));
-#endif
+    new_new_clan = new clan_data;
     new_new_clan->next = 0;
     new_new_clan->tax = 0;
     new_new_clan->email = NULL;
@@ -396,7 +392,7 @@ void free_clans_from_memory()
     if(currclan->death_message)
       dc_free(currclan->death_message);
 
-    dc_free(currclan);
+    delete currclan;
   }
 }
 
@@ -607,7 +603,7 @@ void delete_clan(clan_data * dead_clan)
     if(dead_clan == end_clan_list) // Only 1 clan total
       end_clan_list = 0;
     clan_list = dead_clan->next;
-    dc_free(dead_clan);
+    delete dead_clan;
     return;
   }
 
@@ -646,7 +642,7 @@ void delete_clan(clan_data * dead_clan)
         dc_free(dead_clan->death_message);
       if(dead_clan->description)
         dc_free(dead_clan->description);
-      dc_free(dead_clan);
+      delete dead_clan;
       return;
     } 
     else {
@@ -1694,11 +1690,7 @@ void do_god_clans(CHAR_DATA *ch, char *arg, int cmd)
         return;
       }
       x = atoi(last);
-#ifdef LEAK_CHECK
-      clan = (clan_data *)calloc(1, sizeof(clan_data));
-#else
-      clan = (clan_data *)dc_alloc(1, sizeof(clan_data));
-#endif
+      clan = new clan_data;
       clan->leader = str_dup(GET_NAME(ch));
       clan->amt = 0;
       clan->founder = str_dup(GET_NAME(ch));
