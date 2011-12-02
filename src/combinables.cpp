@@ -560,6 +560,7 @@ int do_brew(char_data *ch, char *argument, int cmd)
     break;
   default:
     potion_color = "dark and murky";
+    break;
   }
 
   // Search for the current combination as a recipe
@@ -693,7 +694,7 @@ void Brew::load(void) {
 	recipes.insert(make_pair(r, spell));
       }
     }
-  } catch(loadError) {
+  } catch(loadError &) {
     logf(IMMORTAL, LOG_BUG, "Error loading %s.", RECIPES_FILENAME);
   }
 }
@@ -1090,7 +1091,7 @@ void Scribe::load(void) {
 	recipes.insert(make_pair(r, spell));
       }
     }
-  } catch(loadError) {
+  } catch(loadError &) {
     logf(IMMORTAL, LOG_BUG, "Error loading %s.", RECIPES_FILENAME);
   }
 }
