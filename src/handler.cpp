@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.196 2011/11/29 02:23:08 jhhudso Exp $ */
+/* $Id: handler.cpp,v 1.197 2011/12/02 23:10:29 jhhudso Exp $ */
     
 extern "C"
 {
@@ -70,8 +70,6 @@ int strncasecmp(char *s1, const char *s2, int len);
 
 /* External procedures */
 void save_corpses(void);
-int str_cmp(char *arg1, char *arg2);
-void remove_follower(CHAR_DATA *ch);
 int do_fall(CHAR_DATA *ch, short dir);
 
 /* internal procedures */
@@ -146,6 +144,8 @@ int isname2(const char *str, const char *namel)
          return(0);
       s++;          /* first char of new_new name */
    }
+
+   return 0;
 }
 
 /************************************************************************
@@ -205,6 +205,8 @@ int isname(const char *str, const char *namelist)
 		   return(0);
 	   curname++;          /* first char of new_new name */
       }
+
+   return 0;
 }
 
 int isname_exact(char *str, char *namelist)
@@ -241,6 +243,7 @@ int isname_exact(char *str, char *namelist)
 		   return(0);
 	   curname++;          /* first char of new_new name */
       }
+   return 0;
 }
 
 int get_max_stat(char_data * ch, ubyte stat)
@@ -254,7 +257,7 @@ int get_max_stat(char_data * ch, ubyte stat)
           case WISDOM:        return 24;
           case CONSTITUTION:  return 23;
         }
-
+        break;
     case RACE_TROLL:
 	switch(stat) {
 	  case STRENGTH:     return 28;
@@ -263,6 +266,7 @@ int get_max_stat(char_data * ch, ubyte stat)
 	  case WISDOM: 	     return 22;
 	  case CONSTITUTION: return 30;
 	}
+	break;
 
   case RACE_DWARVEN:
         switch(stat) {
@@ -272,6 +276,7 @@ int get_max_stat(char_data * ch, ubyte stat)
           case WISDOM:        return 26;
           case CONSTITUTION:  return 28;
         }
+        break;
 
       case RACE_HOBBIT:
         switch(stat) {
@@ -281,6 +286,7 @@ int get_max_stat(char_data * ch, ubyte stat)
           case WISDOM:        return 25;
           case CONSTITUTION:  return 23;
         }
+        break;
 
       case RACE_PIXIE:
         switch(stat) {
@@ -290,6 +296,7 @@ int get_max_stat(char_data * ch, ubyte stat)
           case WISDOM:        return 27;
           case CONSTITUTION:  return 20;
         }
+        break;
 
       case RACE_GIANT:
         switch(stat) {
@@ -299,6 +306,7 @@ int get_max_stat(char_data * ch, ubyte stat)
           case WISDOM:        return 23;
           case CONSTITUTION:  return 27;
         }
+        break;
 
       case RACE_GNOME:
         switch(stat) {
@@ -308,6 +316,7 @@ int get_max_stat(char_data * ch, ubyte stat)
           case WISDOM:        return 30;
           case CONSTITUTION:  return 24;
         }
+        break;
 
       case RACE_ORC:
         switch(stat) {
@@ -317,11 +326,15 @@ int get_max_stat(char_data * ch, ubyte stat)
           case WISDOM:        return 23;
           case CONSTITUTION:  return 26;
         }
+        break;
 
       case RACE_HUMAN:
       default:
         return 25;
+        break;
     }
+
+    return 0;
 }
 
 bool still_affected_by_poison(CHAR_DATA * ch)
@@ -3348,7 +3361,7 @@ void extract_char(CHAR_DATA *ch, bool pull)
       case CLASS_PALADIN: GET_AC(ch) = 40; break;
       case CLASS_WARRIOR: GET_AC(ch) = 20; break;
       case CLASS_MONK: GET_AC(ch) = 0; break;
-      default: GET_AC(ch) = 100;
+      default: GET_AC(ch) = 100; break;
     }
 
     GET_AC(ch) -= GET_AC_METAS(ch);
