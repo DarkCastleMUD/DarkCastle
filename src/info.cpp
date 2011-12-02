@@ -12,7 +12,7 @@
  * This is free software and you are benefitting.	We hope that you    *
  * share your changes too.  What goes around, comes around. 		    *
  ****************************************************************************/
-/* $Id: info.cpp,v 1.198 2011/11/29 02:24:00 jhhudso Exp $ */
+/* $Id: info.cpp,v 1.199 2011/12/02 23:13:59 jhhudso Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -1222,7 +1222,7 @@ int weight_in(struct obj_data *obj);
                   return eFAILURE;
                }
             }
-
+            break;
          case 9:
             {
                if(found != TRUE)
@@ -1259,7 +1259,7 @@ int weight_in(struct obj_data *obj);
                   return eFAILURE;
                }
             }
-
+            break;
 
 
             /* look ''		*/
