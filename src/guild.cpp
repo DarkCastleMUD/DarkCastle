@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: guild.cpp,v 1.128 2010/02/19 06:09:18 jhhudso Exp $
+| $Id: guild.cpp,v 1.129 2011/12/02 23:12:34 jhhudso Exp $
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
@@ -978,7 +978,7 @@ int get_stat_bonus(CHAR_DATA *ch, int stat)
       bonus = MAX(0,get_stat(ch,CONSTITUTION)-15) + MAX(0,get_stat(ch, WISDOM)-15);break;
     case INTWIS:
       bonus = MAX(0,get_stat(ch,INTELLIGENCE)-15) + MAX(0,get_stat(ch, WISDOM)-15);break;
-    default: bonus = 0;
+    default: bonus = 0; break;
   }
   
   return bonus;
