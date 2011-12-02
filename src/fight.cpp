@@ -20,7 +20,7 @@
  * 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead *
  * of just race stuff                                                     *
  **************************************************************************
- * $Id: fight.cpp,v 1.564 2011/11/29 02:19:11 jhhudso Exp $               *
+ * $Id: fight.cpp,v 1.565 2011/12/02 23:08:09 jhhudso Exp $               *
  **************************************************************************/
 
 extern "C"
@@ -2672,15 +2672,29 @@ void do_dam_msgs(CHAR_DATA *ch, CHAR_DATA *victim, int dam, int attacktype, int 
    else if(attacktype == SPELL_MAGIC_MISSILE || attacktype == SPELL_METEOR_SWARM) find = "$B$7";
    else find = "$B$4";
 
-   switch(filter) {
-    case TYPE_FIRE: replace =  "$B$4"; break;
-    case TYPE_COLD: replace = "$B$3"; break;
-    case TYPE_ENERGY: replace = "$B$5"; break;
-    case TYPE_ACID: replace = "$B$2"; break;
-    case TYPE_POISON: replace = "$2"; break;
-    case TYPE_MAGIC: replace = "$B$7"; break;
-    default: replace = find;
-   }
+   switch (filter) {
+		case TYPE_FIRE:
+			replace = "$B$4";
+			break;
+		case TYPE_COLD:
+			replace = "$B$3";
+			break;
+		case TYPE_ENERGY:
+			replace = "$B$5";
+			break;
+		case TYPE_ACID:
+			replace = "$B$2";
+			break;
+		case TYPE_POISON:
+			replace = "$2";
+			break;
+		case TYPE_MAGIC:
+			replace = "$B$7";
+			break;
+		default:
+			replace = find;
+			break;
+		}
   }
 
   for (i = 0; i < MAX_MESSAGES; i++)
@@ -3059,6 +3073,7 @@ int checkCounterStrike(CHAR_DATA * ch, CHAR_DATA * victim)
     break;
    default:
     log("Serious screw-up in counter strike!", ANGEL, LOG_BUG);
+    break;
   }
 
   retval = one_hit(victim, ch, TYPE_HIT, FIRST);
@@ -3101,6 +3116,7 @@ int doTumblingCounterStrike(CHAR_DATA * ch, CHAR_DATA * victim)
     break;
    default:
     log("Serious screw-up in counter strike!", ANGEL, LOG_BUG);
+    break;
   }
 
   retval = one_hit(victim, ch, TYPE_HIT, FIRST);
@@ -5476,14 +5492,23 @@ void dam_message(int dam, CHAR_DATA * ch, CHAR_DATA * victim,
    char shield[MAX_INPUT_LENGTH];
    char dammsg[MAX_INPUT_LENGTH];
    dammsg[0] = '\0';
-   if (dam > 0)
-   switch (number(0,3))
-   {
-	case 0: sprintf(dammsg, " causing $B%d $Rdamage", dam);
-	case 1: sprintf(dammsg, " delivering $B%d$R damage", dam);
-	case 2: sprintf(dammsg, " inflicting $B%d$R damage", dam);
-	case 3: sprintf(dammsg, " dealing $B%d$R damage", dam);
-   }
+
+   if (dam > 0) {
+		switch (number(0, 3)) {
+		case 0:
+			sprintf(dammsg, " causing $B%d $Rdamage", dam);
+			break;
+		case 1:
+			sprintf(dammsg, " delivering $B%d$R damage", dam);
+			break;
+		case 2:
+			sprintf(dammsg, " inflicting $B%d$R damage", dam);
+			break;
+		case 3:
+			sprintf(dammsg, " dealing $B%d$R damage", dam);
+			break;
+		}
+	}
 
    if (IS_SET(modifier, COMBAT_MOD_REDUCED))
    {
