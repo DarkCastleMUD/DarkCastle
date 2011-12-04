@@ -1,4 +1,4 @@
-/* $Id: clan.cpp,v 1.87 2011/12/01 05:00:16 jhhudso Exp $ */
+/* $Id: clan.cpp,v 1.88 2011/12/04 22:27:00 jhhudso Exp $ */
 
 /***********************************************************************/
 /* Revision History                                                    */
@@ -3360,8 +3360,21 @@ bool others_clan_room(char_data *ch, room_data *room)
   return true;
 }
 
-clan_data::clan_data(void) : balance(0) {
-
+clan_data::clan_data(void) {
+	balance = 0;
+	leader = NULL;
+	founder = NULL;
+	name = NULL;
+	email = NULL;
+	description = NULL;
+	login_message = NULL;
+	death_message = NULL;
+	logout_message = NULL;
+	clanmotd = NULL;
+	rooms = NULL;
+	members = NULL;
+	next = NULL;
+	acc = NULL;
 }
 
 void clan_data::cdeposit(const uint64_t &deposit) {
