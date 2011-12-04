@@ -16,7 +16,7 @@
 /* 12/08/2003   Onager   Added chop_half() to work like half_chop() but    */
 /*                       chopping off the last word.                       */
 /***************************************************************************/
-/* $Id: interp.cpp,v 1.193 2011/11/29 02:38:54 jhhudso Exp $ */
+/* $Id: interp.cpp,v 1.194 2011/12/04 19:45:20 jhhudso Exp $ */
 
 extern "C"
 {
@@ -24,6 +24,7 @@ extern "C"
 #include <string.h>
 #include <ctype.h>
 #include <stdio.h>
+#include <assert.h>
 /*#include <memory.h>*/
 }
 #ifdef LEAK_CHECK
@@ -906,27 +907,24 @@ int search_block(char *arg, char **list, bool exact)
 }
 
 
-int search_blocknolow(char *arg, char **list, bool exact)
-{
-  int i,l;
+int search_blocknolow(char *arg, char **list, bool exact) {
+	int i;
+	unsigned int l = strlen(arg);
 
-  // Make into lower case and get length of string
-  for(l=0; *(arg+l); l++)*(arg+l)=*(arg+l);
-    if (exact) {
-      for(i=0; **(list+i) != '\n'; i++)
-        if (!strcmp(arg, *(list+i)))
-          return(i);
-      }
-    else {
-      if (!l)
-        // Avoid "" to match the first available string
-        l=1;
-      for(i=0; **(list+i) != '\n'; i++)
-        if (!strncmp(arg, *(list+i), l))
-          return(i);
-      }
+	if (exact) {
+		for (i = 0; **(list + i) != '\n'; i++)
+			if (!strcmp(arg, *(list + i)))
+				return (i);
+	} else {
+		if (!l)
+			// Avoid "" to match the first available string
+			l = 1;
+		for (i = 0; **(list + i) != '\n'; i++)
+			if (!strncmp(arg, *(list + i), l))
+				return (i);
+	}
 
-  return(-1);
+	return (-1);
 }
 
 
@@ -976,9 +974,9 @@ int old_search_block(char *argument,int begin,int length,char **list,int mode)
 
 void argument_interpreter(const char *argument,char *first_arg,char *second_arg )
 {
-  int look_at, found, begin;
+  int look_at, begin;
   
-  found = begin = 0;
+  begin = 0;
   
   do {
     /* Find first non blank */
@@ -1026,9 +1024,9 @@ int is_number(char *str)
 // Multiline arguments, used for mobprogs
 char *one_argument_long(char *argument, char *first_arg )
 {
-  int found, begin, look_at;
+  int begin, look_at;
   bool end = FALSE;
-  found = begin = 0;
+  begin = 0;
   
   /* Find first non blank */
   for ( ;isspace(*(argument + begin)); begin++);
@@ -1066,9 +1064,9 @@ char *one_argument_long(char *argument, char *first_arg )
 
 const char *one_argument_long(const char *argument, char *first_arg )
 {
-  int found, begin, look_at;
+  int begin, look_at;
   bool end = FALSE;
-  found = begin = 0;
+  begin = 0;
 
   /* Find first non blank */
   for ( ;isspace(*(argument + begin)); begin++);
@@ -1109,9 +1107,9 @@ const char *one_argument_long(const char *argument, char *first_arg )
 char *one_argument(char *argument, char *first_arg )
 {
   return one_argument_long(argument, first_arg);
-  int found, begin, look_at;
+  int begin, look_at;
   
-  found = begin = 0;
+  begin = 0;
   
   do {
     /* Find first non blank */
@@ -1142,8 +1140,8 @@ int fill_wordnolow(char *argument)
 
 char *one_argumentnolow(char *argument, char *first_arg )
 {
-  int found, begin, look_at;
-  found = begin = 0;
+  int begin, look_at;
+  begin = 0;
   
   do {
     /* Find first non blank */
