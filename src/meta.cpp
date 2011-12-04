@@ -664,7 +664,7 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
              statplatprice = meta_get_stat_plat_cost(ch, WISDOM);
              max_stat = get_max_stat(ch, WISDOM);
              break;
-      default: stat = 0;
+      default: stat = 0; break;
     }
 
     if(choice < 6) {
