@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.189 2011/11/29 02:38:54 jhhudso Exp $ */
+/* $Id: nanny.cpp,v 1.190 2011/12/04 19:01:13 jhhudso Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -1321,6 +1321,7 @@ is_race_eligible(ch,7)?'*':' ',is_race_eligible(ch,8)?'*':' ',is_race_eligible(c
             GET_RAW_WIS(ch) += RACE_TROLL_WIS_MOD;
             GET_RAW_DEX(ch) += RACE_TROLL_DEX_MOD;
             GET_RAW_CON(ch) += RACE_TROLL_CON_MOD;
+            break;
          }
 
 	 set_hw(ch);         
