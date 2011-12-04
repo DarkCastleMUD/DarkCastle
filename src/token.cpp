@@ -334,8 +334,10 @@ char * TokenList::Interpret(CHAR_DATA *from, OBJ_DATA *obj,
 			case 'y':
 			case 'Y':
 				strcat(interp, "an");
+				break;
 			default:
 				strcat(interp, "a");
+				break;
 			}
 			break;
         case 'A':
