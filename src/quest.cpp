@@ -876,6 +876,7 @@ int quest_master(CHAR_DATA *ch, OBJ_DATA *obj, int cmd, char *arg, CHAR_DATA *ow
          default:
             sprintf(buf, "%s I don't offer that service.", GET_NAME(ch));
             do_tell(owner, buf, 9);
+            break;
       }
    }
 
