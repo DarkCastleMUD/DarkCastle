@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.197 2010/06/09 13:28:42 apocalypse Exp $ */
+/* $Id: mob_proc.cpp,v 1.198 2011/12/04 18:53:57 jhhudso Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -959,6 +959,7 @@ int clan_guard(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
 		case 22397:
 		case 22398:
 			if (ch->master) clan_num = ch->master->clan;
+			break;
 		default:
 		break;
 	}
