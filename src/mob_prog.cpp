@@ -322,7 +322,6 @@ void translate_value(char *leftptr, char *rightptr, int16 **vali, uint32 **valui
   CHAR_DATA *target = NULL;
   OBJ_DATA *otarget = NULL;
   int rtarget = -1, ztarget = -1;
-  int val = 0;
   bool valset = FALSE; // done like that to determine if value is set, since it can be 0 
   struct tempvariable *eh = mob->tempVariable;
 
@@ -442,7 +441,7 @@ void translate_value(char *leftptr, char *rightptr, int16 **vali, uint32 **valui
 			if (buf[0] != '\0')
 			{
 		   	  if (!is_number(buf)) target = get_char_room(buf, mob->in_room);
-  		 	  else { val = atoi(buf); valset = TRUE; }
+  		 	  else { valset = TRUE; }
 			}
 			break;
 		default:
@@ -450,7 +449,7 @@ void translate_value(char *leftptr, char *rightptr, int16 **vali, uint32 **valui
 	}
   } else {
    	if (!is_number(left)) target = get_char_room(left, mob->in_room);
-   	else { val = atoi(left); valset = TRUE; }
+   	else { valset = TRUE; }
   }
 
   if ( !target && !otarget && ztarget == -1 && rtarget == -1 && !valset && str_cmp(right,"numpcs"))
@@ -1015,7 +1014,7 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
   /* skip leading spaces */
   while ( *point == ' ' )
     point++;
-  bool traditional = FALSE, traditional2 = TRUE;
+  bool traditional = FALSE;
 
   /* get whatever comes before the left paren.. ignore spaces */
   while ( *point )
@@ -1094,7 +1093,7 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
 	point++;
       for( ; ; )
 	{
-	  if (*point == '.') { *valpt = '\0'; valpt = val2; traditional2 = FALSE; point++;}
+	  if (*point == '.') { *valpt = '\0'; valpt = val2; point++;}
 	  else if ( ( *point != ' ' ) && ( *point == '\0' ) )
 	    break;
 	  else
@@ -1185,7 +1184,7 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
     int64 *rvali64 = 0;
     sbyte *rvalb = 0; 
     translate_value(val,val2,&rvali,&rvalui, &rvalstr,&rvali64, &rvalb,mob,actor, obj, vo, rndm);
-    int64 rval;
+    int64 rval = 0;
     if (rvalstr || rvali || rvalui || rvali64 || rvalb)
     {
       if (rvalstr && lvalstr) return mprog_seval(*lvalstr, opr, *rvalstr);
@@ -1498,7 +1497,7 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
 
     case eISWORN:
     {
-        OBJ_DATA *o;
+        OBJ_DATA *o = NULL;
 	if ((unsigned int)mob->mobdata->last_room > 50000) // an object
 	 o = (OBJ_DATA*) mob->mobdata->last_room;
 	if (fvict)
@@ -2793,15 +2792,12 @@ int mprog_process_cmnd( char *cmnd, CHAR_DATA *mob, CHAR_DATA *actor,
 {
   char buf[ MAX_INPUT_LENGTH*2 ];
   char tmp[ MAX_INPUT_LENGTH*2 ];
-  char left[ MAX_INPUT_LENGTH*2 ];
-  char right[ MAX_INPUT_LENGTH*2 ];
   char *str;
   char *i;
   char *point;
 
   point   = buf;
   str     = cmnd;
-  left[0] = right[0] = '\0';
   while ( *str == ' ' )
     str++;
 /*
@@ -2892,7 +2888,7 @@ int mprog_process_cmnd( char *cmnd, CHAR_DATA *mob, CHAR_DATA *actor,
 	while (*str != ']' && *str!='\0')
 	  *tmp1++ = *str++;
         *tmp1 = '\0';
-        CHAR_DATA *who;
+        CHAR_DATA *who = NULL;
 	if (a == 'v') who = mob;
 	else if (a == 'V') who = actor;
 	else if (a == 'w') who = (CHAR_DATA*)vo;
