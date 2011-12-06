@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: move.cpp,v 1.96 2011/12/06 04:12:14 jhhudso Exp $
+| $Id: move.cpp,v 1.97 2011/12/06 04:14:51 jhhudso Exp $
 | move.C
 | Movement commands and stuff.
 *************************************************************************
@@ -68,9 +68,8 @@ void move_player_home(CHAR_DATA *victim)
 {
   int was_in = victim->in_room;
   int found = 0;
-  struct clan_data * clan = NULL;
-  struct clan_room_data * room = NULL;
-  struct clan_data * get_clan(CHAR_DATA *ch);
+  clan_data * clan = NULL;
+  clan_room_data * room = NULL;
   
   // check for homes that don't exist
   if(real_room(GET_HOME(victim) < 1))
@@ -938,10 +937,7 @@ int attempt_move(CHAR_DATA *ch, int cmd, int is_retreat = 0)
         if (is_retreat && k->follower->fighting && GET_LEVEL(k->follower->fighting) > 90 && 
 		IS_NPC(k->follower->fighting))
         {
-		int chance = 0;
-	 	if(ISSET(k->follower->fighting->mobdata->actflags, ACT_BOSS))
-			chance = GET_LEVEL(k->follower->fighting) / 2;
-		else chance = GET_LEVEL(k->follower->fighting) / 8;
+
 		act("$n notices your intent and moves quickly to block your retreat!", k->follower->fighting, NULL, k->follower,  TO_VICT, 0);
 		act("$n notices $N's intent and moves quickly to block $S retreat!", k->follower->fighting, NULL, k->follower, TO_ROOM, NOTVICT);
 		WAIT_STATE(k->follower, 8);
@@ -993,7 +989,6 @@ int do_move(CHAR_DATA *ch, char *argument, int cmd)
 int do_leave(struct char_data *ch, char *arguement, int cmd)
 {
   struct obj_data *k;
-  int origination;
   char buf[200];
   int retval;
   
@@ -1006,7 +1001,6 @@ int do_leave(struct char_data *ch, char *arguement, int cmd)
         (k->obj_flags.value[2] == world[ch->in_room].zone)) {
         send_to_char("You exit the area.\r\n", ch);
         act("$n has left the area.",  ch, 0, 0, TO_ROOM, INVIS_NULL|STAYHIDE);
-        origination = ch->in_room;
         retval = move_char(ch, real_room(world[k->in_room].number));
         if(!IS_SET(retval, eSUCCESS)) {
           send_to_char("You attempt to leave, but the door slams in your face!\r\n", ch);
