@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.197 2011/12/02 23:10:29 jhhudso Exp $ */
+/* $Id: handler.cpp,v 1.198 2011/12/06 04:18:53 jhhudso Exp $ */
     
 extern "C"
 {
@@ -1989,7 +1989,10 @@ int char_to_room(CHAR_DATA *ch, int room)
     if (room == NOWHERE)
       return(0);
 
-    assert( world[room].people != ch );
+    if (world[room].people == ch ) {
+    	log("Error: world[room].people == ch in char_to_room().", ANGEL, LOG_BUG);
+    	return 0;
+    }
 
     ch->next_in_room = world[room].people;
     world[room].people = ch;
