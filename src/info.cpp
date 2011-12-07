@@ -12,7 +12,7 @@
  * This is free software and you are benefitting.	We hope that you    *
  * share your changes too.  What goes around, comes around. 		    *
  ****************************************************************************/
-/* $Id: info.cpp,v 1.199 2011/12/02 23:13:59 jhhudso Exp $ */
+/* $Id: info.cpp,v 1.200 2011/12/07 02:08:23 jhhudso Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -871,7 +871,7 @@ int weight_in(struct obj_data *obj);
       else
       {
          argument_split_3(argument,arg1,arg2,arg3);
-         keyword_no = search_block(arg1, keywords, FALSE); /* Partiel Match */
+         keyword_no = search_block(arg1, keywords, FALSE); /* Partial Match */
 
          if ((keyword_no == -1) && *arg1)
          {
@@ -1222,7 +1222,6 @@ int weight_in(struct obj_data *obj);
                   return eFAILURE;
                }
             }
-            break;
          case 9:
             {
                if(found != TRUE)
@@ -1259,8 +1258,6 @@ int weight_in(struct obj_data *obj);
                   return eFAILURE;
                }
             }
-            break;
-
 
             /* look ''		*/
          case 10:
