@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.282 2011/11/29 02:38:54 jhhudso Exp $ */
+/* $Id: spells.cpp,v 1.283 2011/12/12 02:01:27 jhhudso Exp $ */
 
 extern "C"
 {
@@ -596,17 +596,17 @@ char *skills[]=
   "stun",
   "scan",
   "consider",
-  "switch",
+  "switch", // a20
   "redirect",
   "ambush",
   "forage",
   "tame",
-  "track", // 25
+  "track",
   "skewer",
   "slip",
   "retreat",
-  "rage", // 29
-  "battlecry",
+  "rage",
+  "battlecry", // 30
   "archery",
   "riposte",
   "lay hands",
@@ -636,7 +636,7 @@ char *skills[]=
   "bludgeoning_weapons",
   "piercing_weapons",
   "slashing_weapons",
-  "whipping_weapons",
+  "whipping_weapons", // 60
   "crushing_weapons",
   "two_handed_weapons",
   "hand_to_hand",
@@ -646,7 +646,7 @@ char *skills[]=
   "deceit",
   "release",
   "fear_gaze",
-  "eyegouge",
+  "eyegouge", // 70
   "magic resist",
   "ignorethis",
   "spellcraft",
@@ -656,7 +656,7 @@ char *skills[]=
   "jab",
   "appraise",
   "natures lore",
-  "fire arrows",
+  "fire arrows", // 80
   "ice arrows",
   "tempest arrows",
   "granite arrows",
@@ -666,7 +666,7 @@ char *skills[]=
   "rapid join",
   "enhanced regeneration",
   "cripple",
-  "natural selection",
+  "natural selection", // 90
   "ignoreclan",
   "ignoreclan2",
   "commune",
@@ -676,7 +676,7 @@ char *skills[]=
   "perseverance",
   "triage",
   "smite",
-  "leadership",
+  "leadership", // 100
   "execute",
   "defenders stance",
   "behead",
@@ -686,7 +686,7 @@ char *skills[]=
   "critical hit",
   "batterbrace",
   "free animal",
-  "offhand double",
+  "offhand double", //110
   "onslaught",
   "counter strike",
   "imbue",
@@ -695,6 +695,29 @@ char *skills[]=
   "tumbling",
   "brew",
   "pursuit",
+  "profession",
+  "legionnaire", //120
+  "gladiator",
+  "battlerager",
+  "chieftan",
+  "pilferer",
+  "assassin",
+  "warmage",
+  "spellbinder",
+  "zealot",
+  "ritualist",
+  "elementalist", //130
+  "shapeshifter",
+  "cultist",
+  "reaver",
+  "templar",
+  "inquisitor",
+  "scout",
+  "tracker",
+  "sensei",
+  "spiritualist",
+  "troubadour", //140
+  "ministrel"
   "\n"
 };
 
