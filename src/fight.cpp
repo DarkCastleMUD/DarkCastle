@@ -20,7 +20,7 @@
  * 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead *
  * of just race stuff                                                     *
  **************************************************************************
- * $Id: fight.cpp,v 1.565 2011/12/02 23:08:09 jhhudso Exp $               *
+ * $Id: fight.cpp,v 1.566 2011/12/12 23:06:13 opticon Exp $               *
  **************************************************************************/
 
 extern "C"
@@ -64,6 +64,7 @@ extern "C"
 #include <token.h>
 #include <vault.h>
 #include <arena.h>
+#include <sstream>
 
 extern bool selfpurge;
 extern int top_of_world;
@@ -2242,6 +2243,7 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
   } // can_miss
 
   int pre_stoneshield_dam = 0;
+  stringstream string1;
   struct affected_type * pspell = NULL;
   if(GET_LEVEL(victim) < IMMORTAL && dam > 0 && typeofdamage == DAMAGE_TYPE_PHYSICAL &&
      (
@@ -2250,17 +2252,30 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
      )
     )
   {
-    pre_stoneshield_dam = dam;
-    
-    if (dam > pspell->modifier)
+    pre_stoneshield_dam = dam;    
+   if (dam > pspell->modifier)
     {
       dam -= pspell->modifier;
       pspell->duration -= pspell->modifier;
+      csendf(victim, "Your stones absorb %d damage allowing %d through.\n\r", pspell->modifier, dam);
+      string1 << "Your attack hits $N's stones for " << pspell->modifier << " damage allowing " << dam << " through.";
+      act(string1.str().c_str(), ch, 0, victim, TO_CHAR, 0);
+      string1.clear();
+      string1.str("");
+      string1 << "$n's attack hits $N's stones for " << pspell->modifier << " damage allowing " << dam << " through.";
+      act(string1.str().c_str(), ch, 0, victim, TO_ROOM, NOTVICT);
     }
     else
     {
       pspell->duration -= dam;
-      dam = 1;
+      csendf(victim, "Your stones absorb %d damage from the attack and change its direction slightly.\n\r", dam);
+      string1 << "$N's stones absorb " << dam << " damage of your attack and cause your blow to change direction slightly.";
+      act(string1.str().c_str(), ch, 0, victim, TO_CHAR, 0);
+      string1.clear();
+      string1.str("");
+      string1 << "$N's stones completely absorbed $n's attack of " << dam << " damage changing its direction slightly.";
+      act(string1.str().c_str(), ch, 0, victim, TO_ROOM, NOTVICT);
+      dam = 0;
     } 
     
     if(0 >= pspell->duration) {
