@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: guild.cpp,v 1.129 2011/12/02 23:12:34 jhhudso Exp $
+| $Id: guild.cpp,v 1.130 2011/12/12 01:58:51 jhhudso Exp $
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
@@ -51,6 +51,16 @@ int do_practice(CHAR_DATA *ch, char *arg, int cmd)
     guild(ch, 0, cmd, "", ch);
   }
   return eSUCCESS;
+}
+
+int do_profession(char_data *ch, char *args, int cmdnum)
+{
+	if (!has_skill(ch, SKILL_PROFESSION)) {
+		send_to_char("Huh?\n\r", ch);
+		return eFAILURE;
+	}
+
+	return eSUCCESS;
 }
 
 char *per_col(int percent)
