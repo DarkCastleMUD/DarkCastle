@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: move.cpp,v 1.97 2011/12/06 04:14:51 jhhudso Exp $
+| $Id: move.cpp,v 1.98 2011/12/12 02:00:35 jhhudso Exp $
 | move.C
 | Movement commands and stuff.
 *************************************************************************
@@ -502,7 +502,7 @@ int do_simple_move(CHAR_DATA *ch, int cmd, int following)
           has_boat = TRUE;
       // See if char is wearing a boat (boat ring, etc)
       if(!has_boat)
-        for(int x = 0; x <= MAX_WEAR; x++)
+        for(int x = 0; x < MAX_WEAR; x++)
           if(ch->equipment[x])
             if(ch->equipment[x]->obj_flags.type_flag == ITEM_BOAT)
               has_boat = TRUE;
