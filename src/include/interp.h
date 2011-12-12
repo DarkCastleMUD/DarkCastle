@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: interp.h,v 1.112 2011/11/26 03:31:36 jhhudso Exp $ */
+/* $Id: interp.h,v 1.113 2011/12/12 01:56:39 jhhudso Exp $ */
 
 #ifndef INTERP_H_
 #define INTERP_H_
@@ -82,15 +82,15 @@ void add_command_lag(CHAR_DATA *ch, int cmdnum, int lag);
 #define CMD_OPEN	98
 #define CMD_EDITOR	100
 #define CMD_WRITE	128
-#define CMD_HIT		194
 #define CMD_WATCH	155
 #define CMD_PRACTICE	164
 #define CMD_TRAIN	165
+#define CMD_PROFESSION 166
 #define CMD_GAIN	171
 #define CMD_BALANCE	172
 #define CMD_DEPOSIT	173
 #define CMD_WITHDRAW	174
-#define CMD_CLEAN	177
+#define CMD_CLEAN	    177
 #define CMD_PLAY        178
 #define CMD_FINISH      179
 #define CMD_VETERNARIAN 180
@@ -100,13 +100,14 @@ void add_command_lag(CHAR_DATA *ch, int cmdnum, int lag);
 #define CMD_RESTRING    184
 #define CMD_PUSH        185
 #define CMD_PULL        186
-#define CMD_LEAVE	187
+#define CMD_LEAVE	    187
 #define CMD_TREMOR      188
 #define CMD_BET         189
 #define CMD_INSURANCE   190
 #define CMD_DOUBLE      191
 #define CMD_STAY        192
-#define CMD_SPLIT	193
+#define CMD_SPLIT	    193
+#define CMD_HIT		    194
 #define CMD_LOOT        195
 #define CMD_GTELL       200
 #define CMD_CTELL       201
@@ -432,6 +433,7 @@ DO_FUN do_poof;
 DO_FUN do_possess;
 DO_FUN do_practice;
 DO_FUN do_pray;
+DO_FUN do_profession;
 DO_FUN do_primalfury;
 DO_FUN do_promote;
 DO_FUN do_prompt;
