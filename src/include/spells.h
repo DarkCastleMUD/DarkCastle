@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: spells.h,v 1.139 2011/11/29 02:38:55 jhhudso Exp $ */
+/* $Id: spells.h,v 1.140 2011/12/12 01:55:56 jhhudso Exp $ */
 
 #ifndef SPELLS_H_
 #define SPELLS_H_
@@ -388,7 +388,42 @@ void check_maxes(CHAR_DATA *ch);
 #define SKILL_TUMBLING		     416
 #define SKILL_BREW                   417
 #define SKILL_PURSUIT		     418
-#define SKILL_MAX                    418
+#define SKILL_PROFESSION			 419
+//warrior
+#define SKILL_LEGIONNAIRE			420
+#define SKILL_GLADIATOR				421
+// Barbarian
+#define SKILL_BATTLERAGER			422
+#define SKILL_CHIEFTAN				423
+//thief
+#define SKILL_PILFERER				424
+#define SKILL_ASSASSIN				425
+//mage
+#define SKILL_WARMAGE				426
+#define SKILL_SPELLBINDER			427
+//cleric
+#define SKILL_ZEALOT				428
+#define SKILL_RITUALIST				429
+//druid
+#define SKILL_ELEMENTALIST			430
+#define SKILL_SHAPESHIFTER			431
+//anti-paladin
+#define SKILL_CULTIST				432
+#define SKILL_REAVER				433
+//paladin
+#define SKILL_TEMPLAR				434
+#define SKILL_INQUISITOR			435
+//ranger
+#define SKILL_SCOUT					436
+#define SKILL_TRACKER				437
+//monk
+#define SKILL_SENSEI				438
+#define SKILL_SPIRITUALIST			439
+//bard
+#define SKILL_TROUBADOUR			440
+#define SKILL_MINISTREL				441
+
+#define SKILL_MAX                   441
 
 
 
