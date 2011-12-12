@@ -1209,9 +1209,9 @@ int do_sedit(struct char_data *ch, char *argument, int cmd)
 
       learn_skill(vict, skillnum, 1, 1);
 
-      sprintf(buf, "'%s' has been given skill '%s' by %s.", GET_NAME(vict), text, GET_NAME(ch));
+      sprintf(buf, "'%s' has been given skill '%s' (%d) by %s.", GET_NAME(vict), text, skillnum, GET_NAME(ch));
       log(buf, GET_LEVEL(ch), LOG_GOD);
-      sprintf(buf, "'%s' has been given skill '%s'.\r\n", GET_NAME(vict), text);
+      sprintf(buf, "'%s' has been given skill '%s' (%d) by %s.\r\n", GET_NAME(vict), text, skillnum, GET_NAME(ch));
       send_to_char(buf, ch);
       break;
     }
@@ -1299,9 +1299,11 @@ int do_sedit(struct char_data *ch, char *argument, int cmd)
       {
         char * skillname = get_skill_name(skill->skillnum);
 
-        if(skillname)
+        if(skillname) {
           sprintf(buf, "  %-15s%d\r\n", skillname, skill->learned);
-        else continue;
+        } else {
+          sprintf(buf, "  unknown (%d)  %d\r\n", skill->skillnum, skill->learned);
+        }
 
         send_to_char(buf, ch);
         i = 1;
