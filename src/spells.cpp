@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.283 2011/12/12 02:01:27 jhhudso Exp $ */
+/* $Id: spells.cpp,v 1.284 2011/12/13 04:00:12 dcastle Exp $ */
 
 extern "C"
 {
@@ -717,7 +717,7 @@ char *skills[]=
   "sensei",
   "spiritualist",
   "troubadour", //140
-  "ministrel"
+  "ministrel",
   "\n"
 };
 
