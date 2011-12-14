@@ -20,7 +20,7 @@
  * 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead *
  * of just race stuff                                                     *
  **************************************************************************
- * $Id: fight.cpp,v 1.566 2011/12/12 23:06:13 opticon Exp $               *
+ * $Id: fight.cpp,v 1.567 2011/12/14 03:06:14 opticon Exp $               *
  **************************************************************************/
 
 extern "C"
@@ -2275,7 +2275,7 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
       string1.str("");
       string1 << "$N's stones completely absorbed $n's attack of " << dam << " damage changing its direction slightly.";
       act(string1.str().c_str(), ch, 0, victim, TO_ROOM, NOTVICT);
-      dam = 0;
+      dam = 1;
     } 
     
     if(0 >= pspell->duration) {
