@@ -13,6 +13,11 @@ extern "C"
 #include <assert.h>
 }
 
+#include <fstream>
+#include <iostream>
+#include <sstream>
+
+
 #include "wizard.h"
 #include <utility.h>
 #include <levels.h>
@@ -25,6 +30,7 @@ extern "C"
 #include <spells.h>
 #include <interp.h>
 #include "const.h"
+#include "db.h"
 
 #ifdef WIN32
 char *crypt(const char *key, const char *salt);
@@ -37,6 +43,8 @@ extern "C" {
 extern short bport;
 int get_max(CHAR_DATA *, int);
 void AuctionHandleRenames(CHAR_DATA *ch, string old_name, string new_name);
+
+extern world_file_list_item * obj_file_list;
 
 int get_max_stat_bonus(CHAR_DATA *ch, int attrs)
 {
@@ -908,4 +916,45 @@ int do_testhit(char_data *ch, char *argument, int cmd)
   }
   return eSUCCESS;
 
+}
+
+int do_export(char_data *ch, char *args, int cmdnum)
+{
+	char export_type[MAX_INPUT_LENGTH], filename[MAX_INPUT_LENGTH];
+	world_file_list_item * curr = obj_file_list;
+
+	args = one_argument(args, export_type);
+	one_argument(args, filename);
+
+	if (*export_type == 0 || *filename == 0) {
+		send_to_char("Syntax: export obj <filename>\n\r\n\r", ch);
+		return eFAILURE;
+	}
+
+	ofstream fout;
+	fout.exceptions(ofstream::failbit | ofstream::badbit);
+
+	try {
+		fout.open(filename, ios_base::out);
+
+		fout << "vnum,name,short_description,description,action_description,type,extra_flags,"
+				"wear_flags,size,value[0],value[1],value[2],value[3],level,weight,cost,more_flags,affects...,mprogs" << endl;
+
+		while(curr) {
+			for(int x = curr->firstnum; x <= curr->lastnum; x++) {
+				write_object_csv((obj_data *)obj_index[x].item, fout);
+			}
+			curr = curr->next;
+		}
+
+		fout.close();
+	} catch (ofstream::failure &e) {
+	    stringstream errormsg;
+	    errormsg << "Exception while writing to " << filename << ".";
+	    log(errormsg.str().c_str(), 108, LOG_MISC);
+	}
+
+	logf(110, LOG_GOD, "Exported objects as %s.", filename);
+
+	return eSUCCESS;
 }

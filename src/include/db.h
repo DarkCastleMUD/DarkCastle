@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: db.h,v 1.35 2011/11/26 03:21:09 jhhudso Exp $ */
+/* $Id: db.h,v 1.36 2011/12/15 05:29:56 jhhudso Exp $ */
 #ifndef DB_H_
 #define DB_H_
 
@@ -26,6 +26,11 @@ extern "C" {
 #include <handler.h>
 #include <string>
 #include <vector>
+#include <fstream>
+#include <iostream>
+#include <sstream>
+
+using namespace std;
 
 extern struct obj_data  *object_list;
 
@@ -136,6 +141,8 @@ int64_t fread_int(FILE *fl, int64_t minval, int64_t maxval);
 uint64_t fread_uint(FILE *fl, uint64_t minval, uint64_t maxval);
 char fread_char (FILE *fl);
 void add_mobspec(int i);
+void write_object_csv(obj_data * obj, ofstream &fout);
+
 extern struct skill_quest *skill_list; 
 #define REAL 0
 #define VIRTUAL 1

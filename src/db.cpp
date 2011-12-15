@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.205 2011/11/26 03:20:47 jhhudso Exp $ */
+/* $Id: db.cpp,v 1.206 2011/12/15 05:29:56 jhhudso Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -32,6 +32,7 @@ extern "C"
 #include <time.h>
 #include <stdlib.h>
 }
+
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -77,6 +78,11 @@ char* curr_name;
 int   curr_virtno;
 
 extern bool verbose_mode;
+extern char *item_types[];
+extern char *wear_bits[];
+extern char *size_bitfields[];
+extern char *extra_bits[];
+extern char *more_obj_bits[];
 
 /**************************************************************************
 *  declarations of most of the 'global' variables                         *
@@ -3752,6 +3758,59 @@ void write_object(obj_data * obj, FILE *fl)
 
     fprintf(fl, "S\n");
 }
+
+void write_object_csv(obj_data * obj, ofstream &fout)
+{
+	//struct extra_descr_data * currdesc;
+	char buffer[MAX_INPUT_LENGTH];
+
+	try {
+			fout << obj_index[obj->item_number].virt << ",";
+			fout << "\"" << obj->name << "\",";
+			fout << "\"" << obj->short_description << "\",";
+			fout << "\"" << obj->description << "\",";
+			fout << "\"" << obj->action_description << "\",";
+			fout << item_types[obj->obj_flags.type_flag] << ",";
+			sprintbit(obj->obj_flags.extra_flags, extra_bits, buffer);
+			fout << buffer << ",";
+			sprintbit(obj->obj_flags.wear_flags, wear_bits, buffer);
+			fout << buffer << ",";
+			fout << obj->obj_flags.size << ",";
+			fout << obj->obj_flags.value[0] << ",";
+			fout << obj->obj_flags.value[1] << ",";
+			fout << obj->obj_flags.value[2] << ",";
+			fout << obj->obj_flags.value[3] << ",";
+			fout << obj->obj_flags.eq_level << ",";
+			fout << obj->obj_flags.weight << ",";
+			fout << obj->obj_flags.cost << ",";
+			sprintbit(obj->obj_flags.more_flags, more_obj_bits, buffer);
+			fout << buffer << ",";
+
+			/*
+			currdesc = obj->ex_description;
+			while(currdesc)  {
+				fout << currdesc->keyword << ":" << currdesc->description << " ";
+				currdesc = currdesc->next;
+			}
+			fout << ",";
+			*/
+
+			for(int i = 0; i < obj->num_affects; i++)
+				fout << obj->affected[i].location << ":" << obj->affected[i].modifier << ",";
+
+			if(obj_index[obj->item_number].mobprogs) {
+			  fout << obj_index[obj->item_number].mobprogs << ",";
+			}
+
+		} catch (ofstream::failure &e) {
+			stringstream errormsg;
+			errormsg << "Exception while writing in write_obj_csv.";
+			log(errormsg.str().c_str(), 108, LOG_MISC);
+		}
+
+		fout << endl;
+}
+
 bool has_random(OBJ_DATA *obj)
 {
  
