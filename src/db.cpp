@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.206 2011/12/15 05:29:56 jhhudso Exp $ */
+/* $Id: db.cpp,v 1.207 2011/12/22 01:10:04 jhhudso Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -83,6 +83,7 @@ extern char *wear_bits[];
 extern char *size_bitfields[];
 extern char *extra_bits[];
 extern char *more_obj_bits[];
+extern char *apply_types[];
 
 /**************************************************************************
 *  declarations of most of the 'global' variables                         *
@@ -3759,22 +3760,52 @@ void write_object(obj_data * obj, FILE *fl)
     fprintf(fl, "S\n");
 }
 
+string quotequotes(string &s1);
+
+string quotequotes(const char *str)
+{
+	string s1(str);
+
+	return quotequotes(s1);
+}
+
+
+string quotequotes(string &s1)
+{
+  size_t pos = s1.find('\"');
+  while(pos != string::npos) {
+    s1.insert(pos, 1, '\"');
+    pos = s1.find('\"', pos+2);
+  }
+
+  return s1;
+}
+
+void write_bitvector_csv(unsigned long vector, char * const *array, ofstream &fout)
+{
+    int nr=0;
+    while(*array[nr] != '\n') {
+    	if (IS_SET(1, vector)) {
+    		fout << array[nr];
+		}
+
+    	fout << ",";
+    	vector >>= 1;
+    	nr++;
+    }
+
+	return;
+}
+
 void write_object_csv(obj_data * obj, ofstream &fout)
 {
-	//struct extra_descr_data * currdesc;
-	char buffer[MAX_INPUT_LENGTH];
-
 	try {
 			fout << obj_index[obj->item_number].virt << ",";
 			fout << "\"" << obj->name << "\",";
-			fout << "\"" << obj->short_description << "\",";
-			fout << "\"" << obj->description << "\",";
-			fout << "\"" << obj->action_description << "\",";
+			fout << "\"" << quotequotes(obj->short_description) << "\",";
+			fout << "\"" << quotequotes(obj->description) << "\",";
+			fout << "\"" << quotequotes(obj->action_description) << "\",";
 			fout << item_types[obj->obj_flags.type_flag] << ",";
-			sprintbit(obj->obj_flags.extra_flags, extra_bits, buffer);
-			fout << buffer << ",";
-			sprintbit(obj->obj_flags.wear_flags, wear_bits, buffer);
-			fout << buffer << ",";
 			fout << obj->obj_flags.size << ",";
 			fout << obj->obj_flags.value[0] << ",";
 			fout << obj->obj_flags.value[1] << ",";
@@ -3783,24 +3814,25 @@ void write_object_csv(obj_data * obj, ofstream &fout)
 			fout << obj->obj_flags.eq_level << ",";
 			fout << obj->obj_flags.weight << ",";
 			fout << obj->obj_flags.cost << ",";
-			sprintbit(obj->obj_flags.more_flags, more_obj_bits, buffer);
-			fout << buffer << ",";
 
-			/*
-			currdesc = obj->ex_description;
-			while(currdesc)  {
-				fout << currdesc->keyword << ":" << currdesc->description << " ";
-				currdesc = currdesc->next;
-			}
-			fout << ",";
-			*/
+			write_bitvector_csv(obj->obj_flags.wear_flags, wear_bits, fout);
+			write_bitvector_csv(obj->obj_flags.extra_flags, extra_bits, fout);
+			write_bitvector_csv(obj->obj_flags.more_flags, more_obj_bits, fout);
 
-			for(int i = 0; i < obj->num_affects; i++)
-				fout << obj->affected[i].location << ":" << obj->affected[i].modifier << ",";
+			char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH];
+			for(int i = 0; i < obj->num_affects; i++) {
+				if (obj->affected[i].location < 1000)
+					sprinttype(obj->affected[i].location, apply_types, buf2);
+				else if (get_skill_name(obj->affected[i].location/1000))
+					strcpy(buf2, get_skill_name(obj->affected[i].location/1000));
+				else
+					strcpy(buf2, "Invalid");
 
-			if(obj_index[obj->item_number].mobprogs) {
-			  fout << obj_index[obj->item_number].mobprogs << ",";
-			}
+				sprintf(buf, "%s by %d, ", buf2, obj->affected[i].modifier);
+				fout << buf;
+		    }
+
+
 
 		} catch (ofstream::failure &e) {
 			stringstream errormsg;

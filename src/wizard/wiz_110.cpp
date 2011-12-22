@@ -40,11 +40,15 @@ extern "C" {
   char *crypt(const char *key, const char *salt);
 }
 #endif
-extern short bport;
-int get_max(CHAR_DATA *, int);
+
+
 void AuctionHandleRenames(CHAR_DATA *ch, string old_name, string new_name);
 
+extern short bport;
 extern world_file_list_item * obj_file_list;
+extern char *extra_bits[];
+extern char *wear_bits[];
+extern char *more_obj_bits[];
 
 int get_max_stat_bonus(CHAR_DATA *ch, int attrs)
 {
@@ -918,6 +922,15 @@ int do_testhit(char_data *ch, char *argument, int cmd)
 
 }
 
+void write_array_csv(char * const *array, ofstream &fout) {
+	int index = 0;
+	const char *ptr = array[index];
+	while (*ptr != '\n') {
+		fout << ptr << ",";
+		ptr = array[++index];
+	}
+}
+
 int do_export(char_data *ch, char *args, int cmdnum)
 {
 	char export_type[MAX_INPUT_LENGTH], filename[MAX_INPUT_LENGTH];
@@ -937,8 +950,15 @@ int do_export(char_data *ch, char *args, int cmdnum)
 	try {
 		fout.open(filename, ios_base::out);
 
-		fout << "vnum,name,short_description,description,action_description,type,extra_flags,"
-				"wear_flags,size,value[0],value[1],value[2],value[3],level,weight,cost,more_flags,affects...,mprogs" << endl;
+		fout << "vnum,name,short_description,description,action_description,type,";
+		fout <<	"size,value[0],value[1],value[2],value[3],level,weight,cost,";
+
+		// Print individual array values as columns
+		write_array_csv(wear_bits, fout);
+		write_array_csv(extra_bits, fout);
+		write_array_csv(more_obj_bits, fout);
+
+		fout << "affects" << endl;
 
 		while(curr) {
 			for(int x = curr->firstnum; x <= curr->lastnum; x++) {
