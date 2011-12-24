@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.200 2010/01/01 03:03:14 jhhudso Exp $
+| $Id: cl_thief.cpp,v 1.201 2011/12/24 21:09:08 jhhudso Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -34,14 +34,10 @@ extern struct zone_data *zone_table;
 
 int find_door(CHAR_DATA *ch, char *type, char *dir);
 struct obj_data * search_char_for_item(char_data * ch, int16 item_number, bool wearonly = FALSE);
-
 int get_weapon_damage_type(struct obj_data * wielded);
-
-
-
-extern int check_autojoiners(CHAR_DATA *ch, int skill = 0);
-extern int check_joincharmie(CHAR_DATA *ch, int skill = 0);
-
+int check_autojoiners(CHAR_DATA *ch, int skill = 0);
+int check_joincharmie(CHAR_DATA *ch, int skill = 0);
+bool charExists(char_data *ch);
 
 int palm(CHAR_DATA *ch, struct obj_data *obj_object,
           struct obj_data *sub_object, bool has_consent)
@@ -358,7 +354,7 @@ int do_backstab(CHAR_DATA *ch, char *argument, int cmd)
 	perform_dual_backstab = true;
       }
     }
-  WAIT_STATE(ch, PULSE_VIOLENCE*2);
+  WAIT_STATE(ch, PULSE_VIOLENCE*1.5);
   // failure
   if(AWAKE(victim) && !skill_success(ch,victim,SKILL_BACKSTAB)) {
     // If this is stab 1 of 2 for a dual backstab, we dont want people autojoining on the first stab
@@ -391,8 +387,7 @@ int do_backstab(CHAR_DATA *ch, char *argument, int cmd)
     act("BINGO! You brutally assassinate $N, and $S body crumples "
         "before you.", ch, 0, victim, TO_CHAR, 0);
     return damage(ch, victim, 9999999, TYPE_UNDEFINED, SKILL_BACKSTAB, 0); 
-  }
-  else {
+  } else {
     // If this is stab 1 of 2 for a dual backstab, we dont want people autojoining on the first stab
     if (perform_dual_backstab && IS_PC(ch)) {
       ch->pcdata->unjoinable = true;
@@ -403,29 +398,25 @@ int do_backstab(CHAR_DATA *ch, char *argument, int cmd)
     }
   }
 
-  if (retval & eVICT_DIED && !retval & eCH_DIED)
-  {
-    if(!IS_NPC(ch) && IS_SET(ch->pcdata->toggles, PLR_WIMPY))
-      WAIT_STATE(ch, PULSE_VIOLENCE * 2);
-    else
-      add_command_lag(ch, cmd, PULSE_VIOLENCE*1.5); 
-    return retval;
+  if (IS_SET(retval, eCH_DIED)) {
+	  return retval;
   }
 
-  if (retval & eCH_DIED) return retval;
-
-  if (retval & eVICT_DIED)
-  {
-    add_command_lag(ch, cmd, PULSE_VIOLENCE *1.5); 
-    return retval;
+  if (IS_SET(retval, eVICT_DIED)) {
+	if (IS_PC(ch) && IS_SET(ch->pcdata->toggles, PLR_WIMPY)) {
+		WAIT_STATE(ch, PULSE_VIOLENCE * 1.5);
+	} else {
+		add_command_lag(ch, cmd, PULSE_VIOLENCE*1);
+	}
+	return retval;
   }
-  extern bool charExists(char_data *ch);
+
   if (!charExists(victim))// heh
   {
-    add_command_lag(ch, cmd, PULSE_VIOLENCE *1.5); 
+    add_command_lag(ch, cmd, PULSE_VIOLENCE *1);
       return eSUCCESS|eVICT_DIED;
   }
-  WAIT_STATE(ch, PULSE_VIOLENCE*2);
+  WAIT_STATE(ch, PULSE_VIOLENCE*1.5);
 
   // If we're intended to have a dual backstab AND we still can
   if (perform_dual_backstab == true && charge_moves(ch, SKILL_BACKSTAB)) {
@@ -436,12 +427,12 @@ int do_backstab(CHAR_DATA *ch, char *argument, int cmd)
 	retval = attack(ch, victim, SKILL_BACKSTAB, SECOND);
       }
       
-      if (retval & eVICT_DIED && !retval & eCH_DIED) {
-	if(!IS_NPC(ch) && IS_SET(ch->pcdata->toggles, PLR_WIMPY)) {
-	  WAIT_STATE(ch, PULSE_VIOLENCE * 2);
-	} else {
-	  WAIT_STATE(ch, PULSE_VIOLENCE);
-	}
+      if (IS_SET(retval, eVICT_DIED) && !IS_SET(retval,eCH_DIED)) {
+		if(!IS_NPC(ch) && IS_SET(ch->pcdata->toggles, PLR_WIMPY)) {
+		  WAIT_STATE(ch, PULSE_VIOLENCE * 1.5);
+		} else {
+		  WAIT_STATE(ch, PULSE_VIOLENCE);
+		}
       }
     } else {
       // We were intended to have a dual backstab so we were unjoinable
@@ -452,14 +443,19 @@ int do_backstab(CHAR_DATA *ch, char *argument, int cmd)
     }
   }
 
-  if (!SOMEONE_DIED(retval)) {
-    SET_BIT(retval, check_autojoiners(ch,1));
-    if (!SOMEONE_DIED(retval))
+  if (SOMEONE_DIED(retval)) {
+    add_command_lag(ch, cmd, (int)((double)PULSE_VIOLENCE ));
+    return retval;
+  }
 
-    if (IS_AFFECTED(ch, AFF_CHARM)) SET_BIT(retval, check_joincharmie(ch,1));
-    if (SOMEONE_DIED(retval)) return retval;
-  } else
-    add_command_lag(ch, cmd, (int)((double)PULSE_VIOLENCE )); 
+  SET_BIT(retval, check_autojoiners(ch, 1));
+  if (SOMEONE_DIED(retval)) {
+	return retval;
+  }
+
+  if (IS_AFFECTED(ch, AFF_CHARM)) {
+	SET_BIT(retval, check_joincharmie(ch, 1));
+  }
 
   return retval;
 }
