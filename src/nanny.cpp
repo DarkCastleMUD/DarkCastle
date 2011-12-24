@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.190 2011/12/04 19:01:13 jhhudso Exp $ */
+/* $Id: nanny.cpp,v 1.191 2011/12/24 21:31:49 jhhudso Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -705,11 +705,11 @@ void roll_and_display_stats(CHAR_DATA * ch)
   char buf[MAX_STRING_LENGTH];
 
          for(x = 0; x <= 4; x++) {
-            a=dice(3, 6); b=dice(6, 3); ch->desc->stats->str[x] = ((a > b) ? a : b);
-            a=dice(3, 6); b=dice(6, 3); ch->desc->stats->dex[x] = ((a > b) ? a : b);
-            a=dice(3, 6); b=dice(6, 3); ch->desc->stats->con[x] = ((a > b) ? a : b);
-            a=dice(3, 6); b=dice(6, 3); ch->desc->stats->tel[x] = ((a > b) ? a : b);
-            a=dice(3, 6); b=dice(6, 3); ch->desc->stats->wis[x] = ((a > b) ? a : b);
+            a=dice(3, 6); b=dice(6, 3); ch->desc->stats->str[x] = MAX(12+number(0,1), MAX(a, b));
+            a=dice(3, 6); b=dice(6, 3); ch->desc->stats->dex[x] = MAX(12+number(0,1), MAX(a, b));
+            a=dice(3, 6); b=dice(6, 3); ch->desc->stats->con[x] = MAX(12+number(0,1), MAX(a, b));
+            a=dice(3, 6); b=dice(6, 3); ch->desc->stats->tel[x] = MAX(12+number(0,1), MAX(a, b));
+            a=dice(3, 6); b=dice(6, 3); ch->desc->stats->wis[x] = MAX(12+number(0,1), MAX(a, b));
          }
 
          SEND_TO_Q("\n\r  Choose from any of the following groups of abilities...     \n\r", ch->desc);
