@@ -12119,7 +12119,7 @@ int spell_icestorm(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
   send_damage("Your voice raises to a crescendo as you call forth nature's $B$3icy wrath$R to engulf your enemies, dealing | damage!", ch, 0, 0, buf, "Your voice raises to a crescendo as you call forth nature's $B$3icy wrath$R to engulf your enemies!", TO_CHAR);
   send_damage("$n raises $s voice mightily as $e calls forth nature's $B$3icy wrath$R to engulf $s enemies, dealing | damage!", ch, 0, 0, buf, "$n raises $s voice mightily as $e calls forth nature's $B$3icy wrath$R to engulf $s enemies!", TO_ROOM);
 
-  for (tmp_victim = character_list; tmp_victim; tmp_victim = temp) 
+  for (tmp_victim = character_list; tmp_victim && tmp_victim->next != reinterpret_cast<char_data *>(0x95959595); tmp_victim = temp)
   {
     temp = tmp_victim->next;
 
