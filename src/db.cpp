@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.207 2011/12/22 01:10:04 jhhudso Exp $ */
+/* $Id: db.cpp,v 1.208 2011/12/25 21:28:52 jhhudso Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -3828,8 +3828,12 @@ void write_object_csv(obj_data * obj, ofstream &fout)
 				else
 					strcpy(buf2, "Invalid");
 
-				sprintf(buf, "%s by %d, ", buf2, obj->affected[i].modifier);
+				sprintf(buf, "%s by %d", buf2, obj->affected[i].modifier);
 				fout << buf;
+
+				if (i+1 < obj->num_affects) {
+					fout << " ";
+				}
 		    }
 
 
