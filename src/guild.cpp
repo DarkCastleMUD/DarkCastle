@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: guild.cpp,v 1.130 2011/12/12 01:58:51 jhhudso Exp $
+| $Id: guild.cpp,v 1.131 2011/12/25 21:28:40 jhhudso Exp $
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
@@ -20,6 +20,8 @@
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
+#include <handler.h>
+
 extern CWorld world;
 extern struct class_skill_defines g_skills[];
 extern struct class_skill_defines w_skills[];
@@ -35,9 +37,10 @@ extern struct class_skill_defines c_skills[];
 extern struct class_skill_defines m_skills[];
 extern struct index_data *mob_index;
 extern char * class_tree_name[11][3];
+extern char *pc_clss_types3[];
+extern vector<profession> professions;
 
 int get_max(CHAR_DATA *ch, int skill);
-
 int guild(struct char_data *ch, struct obj_data *obj, int cmd, char *arg, struct char_data *owner);
 
 int do_practice(CHAR_DATA *ch, char *arg, int cmd)
@@ -53,10 +56,60 @@ int do_practice(CHAR_DATA *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
+
 int do_profession(char_data *ch, char *args, int cmdnum)
 {
+	// Command is enabled by giving someone the profession skill
 	if (!has_skill(ch, SKILL_PROFESSION)) {
 		send_to_char("Huh?\n\r", ch);
+		return eFAILURE;
+	}
+
+	// You can only use the command in the same room of a mob named guildmaster
+	char_data *victim = get_mob_room_vis(ch, "guildmaster");
+	if (victim == NULL) {
+		csendf(ch, "You can't pick a profession here. You need to find a Guild Master.\n\r");
+		return eFAILURE;
+	}
+
+	char arg1[MAX_INPUT_LENGTH];
+	one_argument(args, arg1);
+
+	// Show syntax if no argument is given
+	if (arg1[0] == '\0') {
+		// Show list of available professions based on player's class type
+		csendf(ch, "As a %s you can pick from the following professions:\n\r", pc_clss_types3[GET_CLASS(ch)]);
+
+		for(vector<profession>::iterator i = professions.begin(); i != professions.end(); ++i) {
+			if ((*i).c_class == GET_CLASS(ch)) {
+				csendf(ch, "%s\n\r", (*i).Name.c_str());
+			}
+		}
+
+		csendf(ch, "\n\r"
+				   "Syntax: profession [profession name]\n\r"
+				   "        profession reset\n\r"
+				   "\n\r"
+				   "Resetting your profession costs 10000 platinum.\n\r");
+
+		return eSUCCESS;
+	}
+
+	bool found = false;
+	for(vector<profession>::iterator i = professions.begin(); i != professions.end(); ++i) {
+		if ((*i).name == string(arg1)) {
+			if ((*i).c_class == GET_CLASS(ch)) {
+				found = true;
+				break;
+			} else {
+				csendf(ch, "That profession is not available to your class.\n\r");
+				return eFAILURE;
+			}
+		}
+	}
+
+	if (found == false) {
+		csendf(ch, "%s not a valid profession.\n\r", arg1);
 		return eFAILURE;
 	}
 
@@ -703,8 +756,6 @@ int guild(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
       csendf(ch, "You need %d experience to level.\n\r", x);
       return eSUCCESS;
     }
-
-    extern char *pc_clss_types3[];
 
     send_to_char ("You raise a level!\n\r", ch);
     logf(IMMORTAL, LOG_MORTAL, "%s (%s) just gained level %d.", GET_NAME(ch), pc_clss_types3[(int)GET_CLASS(ch)], GET_LEVEL(ch)+1);
