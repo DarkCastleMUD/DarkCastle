@@ -1350,8 +1350,11 @@ int spell_firestorm(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
   act("$n makes $B$4fire$R fall from the heavens!\n\r",
 		ch, 0, 0, TO_ROOM, 0);
 
-  for (tmp_victim = character_list; tmp_victim && tmp_victim != (CHAR_DATA *)0x95959595; tmp_victim = temp) 
+  for (tmp_victim = character_list; tmp_victim && tmp_victim != reinterpret_cast<char_data *>(0x95959595); tmp_victim = temp)
   {
+    if (!charExists(tmp_victim)) {
+    	return retval;
+    }
     temp = tmp_victim->next;
 
     try {
@@ -1359,7 +1362,7 @@ int spell_firestorm(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
       tmp_vict_zone = world[tmp_victim->in_room].zone;
     } catch(...) {
       produce_coredump();
-      return eFAILURE;
+      return eFAILURE|retval;
     }
 
     if ((ch->in_room == tmp_victim->in_room) 
