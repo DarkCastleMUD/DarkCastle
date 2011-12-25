@@ -1,7 +1,7 @@
 #ifndef CHARACTER_H_
 #define CHARACTER_H_
 /******************************************************************************
-| $Id: character.h,v 1.80 2011/11/26 03:27:28 jhhudso Exp $
+| $Id: character.h,v 1.81 2011/12/25 21:29:49 jhhudso Exp $
 | Description: This file contains the header information for the character
 |   class implementation.
 */
@@ -28,6 +28,7 @@ extern "C" {
 #include <map>
 #include <string>
 #include <vector>
+#include <string>
 
 #define ASIZE 32
 #define MAX_GOLEMS           2 // amount of golems above +1
@@ -518,6 +519,13 @@ struct char_file_u
     uint32 acmetas;
     int32 agemetas;
     int32 extra_ints[3];             // available just in case
+};
+
+struct profession {
+	std::string name;
+	std::string Name;
+	uint16_t skillno;
+	uint8_t c_class;
 };
 
 
