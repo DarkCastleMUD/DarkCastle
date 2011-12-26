@@ -17,7 +17,7 @@
  *                         except Pir and Valk                             *
  * 10/19/2003   Onager     Took out super-secret hidey code from CAN_SEE() *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.117 2011/11/29 02:38:54 jhhudso Exp $ */
+/* $Id: utility.cpp,v 1.118 2011/12/26 12:54:25 jhhudso Exp $ */
 
 extern "C"
 {
@@ -2369,6 +2369,9 @@ bool class_can_go(int ch_class, int room)
 
 const char *find_profession(int c_class, uint8_t profession)
 {
+	//TODO Fix
+  return "Unknown";
+
   map<uint8_t, string> profession_list = professions[c_class];
   
   if (profession == 0) {
