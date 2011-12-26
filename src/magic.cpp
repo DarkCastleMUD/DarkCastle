@@ -10394,7 +10394,7 @@ int cast_herb_lore(ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *v
   }
 
   if (can_heal(ch,victim, SPELL_HERB_LORE)) {
-     healamount = dam_percent(skill,180);
+     healamount = dam_percent(skill,250);
      healamount = number(healamount-(healamount/10), healamount+(healamount/10));
      if(OUTSIDE(ch))    GET_HIT(victim) += healamount;   
      else { /* if not outside */
