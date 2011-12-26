@@ -498,7 +498,7 @@ int start_quest(CHAR_DATA *ch, struct quest_info *quest)
 {
    int count = 0;
    uint16 price;
-   OBJ_DATA *obj, *brownie;
+   OBJ_DATA *obj, *brownie = 0;
    CHAR_DATA *mob;
    char buf[MAX_STRING_LENGTH];
    CHAR_DATA *qmaster = get_mob_vnum(QUEST_MASTER);
@@ -703,7 +703,6 @@ void quest_update()
    CHAR_DATA *i, *next_dude, *mob;
    OBJ_DATA *obj;
    struct quest_info *quest;
-   int retval;
 
    for(i = character_list; i; i = next_dude) {
       next_dude = i->next;
@@ -717,7 +716,7 @@ void quest_update()
             for(int j=0;j<QUEST_MAX;j++)
                if(i->pcdata->quest_current[j] == quest->number) {
                   if(i->pcdata->quest_current_ticksleft[j] <= 0) {
-                     retval = stop_current_quest(i, quest);
+                     stop_current_quest(i, quest);
 
 		     logf(IMMORTAL, LOG_QUEST, "%s ran out of time on quest %d (%s).", GET_NAME(i), quest->number, quest->name);
 
@@ -885,7 +884,7 @@ int quest_master(CHAR_DATA *ch, OBJ_DATA *obj, int cmd, char *arg, CHAR_DATA *ow
 
 int do_quest(CHAR_DATA *ch, char *arg, int cmd)
 {
-   int retval;
+   int retval = 0;
    char name[MAX_STRING_LENGTH];
    CHAR_DATA *qmaster = get_mob_vnum(QUEST_MASTER);
 
@@ -923,8 +922,45 @@ int do_quest(CHAR_DATA *ch, char *arg, int cmd)
          send_to_char("You may only finish quests in the presence of the Quest Master.\n\r", ch);
       else retval = quest_handler(ch, qmaster, 4, name);
       return retval;
-   }
-   else {
+   } else if(is_abbrev(arg, "reset")) {
+	   if (!qmaster) {
+    	   return eFAILURE;
+       }
+
+       if (ch->in_room != qmaster->in_room) {
+    	   send_to_char("You may only reset all quests in the presence of the Quest Master.\n\r", ch);
+    	   return eFAILURE;
+       }
+
+       if (ch->pcdata->quest_points < 500) {
+    	   csendf(ch, "You need at least 500 quest points in order to reset all quests.\n\r");
+    	   return eFAILURE;
+       }
+
+       if (GET_PLATINUM(ch) < 2000) {
+    	   csendf(ch, "You need 2000 platinum coins to reset all quests, which you don't have!\n\r");
+    	   return eEXTRA_VAL2;
+       }
+
+       obj_data *brownie = get_obj_in_list_num(real_object(27906), ch->carrying);
+       if (!brownie) {
+    	   csendf(ch, "You need a brownie point to reset all quests!\n\r");
+    	   return eFAILURE;
+       }
+
+       csendf(ch, "%s takes 2000 platinum from you.\n\r", GET_SHORT(qmaster));
+       GET_PLATINUM(ch) -= 2000;
+       csendf(ch, "%s takes a brownie point from you.\n\r", GET_SHORT(qmaster));
+       obj_from_char(brownie);
+
+       stop_all_quests(ch);
+       memset(ch->pcdata->quest_current, 0, sizeof(ch->pcdata->quest_current));
+       memset(ch->pcdata->quest_cancel, 0, sizeof(ch->pcdata->quest_cancel));
+       memset(ch->pcdata->quest_complete, 0, sizeof(ch->pcdata->quest_complete));
+       memset(ch->pcdata->quest_current_ticksleft, 0, sizeof(ch->pcdata->quest_current_ticksleft));
+       send_to_char("All quests have been reset.\n\r", ch);
+       return retval;
+   } else {
       csendf(ch, "Usage: quest current       (lists current quests)\n\r"
                  "       quest completed     (lists completed quests)\n\r"
                  "       quest canceled      (lists canceled quests)\n\r\n\r"
@@ -933,6 +969,7 @@ int do_quest(CHAR_DATA *ch, char *arg, int cmd)
                  "       quest cancel <name> (cancel the current quest)\n\r"
                  "       quest start <name>  (starts a new quest)\n\r"
                  "       quest finish <name> (finishes a current quest)\n\r"
+    		     "       quest reset         (reset all quests)\n\r"
                  "\n\r");
       return eFAILURE;
    }
