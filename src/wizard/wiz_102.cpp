@@ -2585,7 +2585,7 @@ int do_mpedit(struct char_data *ch, char *argument, int cmd)
     return eSUCCESS;
 }
 
-int do_boro(struct char_data *ch, char *argument, int cmd)
+int do_mscore(struct char_data *ch, char *argument, int cmd)
 {
     char buf[MAX_INPUT_LENGTH];
     int  mob_num = -1;
@@ -2598,7 +2598,7 @@ int do_boro(struct char_data *ch, char *argument, int cmd)
     one_argument(argument, buf);
   
     if(!*buf) {
-      send_to_char("$3Syntax$R:  boro <mob_num>\r\n", ch);
+      send_to_char("$3Syntax$R:  mscore <mob_num>\r\n", ch);
       return eFAILURE;
     }
 

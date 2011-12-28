@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: interp.h,v 1.114 2011/12/15 05:29:56 jhhudso Exp $ */
+/* $Id: interp.h,v 1.115 2011/12/28 01:26:50 jhhudso Exp $ */
 
 #ifndef INTERP_H_
 #define INTERP_H_
@@ -163,7 +163,7 @@ struct command_lag
 
 #define COM_CHARMIE_OK       1
 
-DO_FUN do_boro;
+DO_FUN do_mscore;
 DO_FUN do_clanarea;
 DO_FUN do_huntstart;
 DO_FUN do_huntclear;
