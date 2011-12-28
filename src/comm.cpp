@@ -71,6 +71,9 @@
 #include <iostream>
 #include <list>
 #include <dc_xmlrpc.h>
+#ifdef USE_TIMING
+#include <Timer.h>
+#endif
 
 struct multiplayer {
   char *host;
@@ -109,7 +112,6 @@ int restrict = 0;
 extern int restrict;
 //extern int mini_mud;
 //extern int no_rent_check;
-extern FILE *player_fl;
 
 extern CWorld world;	/* In db.c */
 extern int top_of_world;	/* In db.c */
@@ -120,6 +122,9 @@ extern char *time_look[];
 extern char *sky_look[];
 extern struct room_data ** world_array;
 extern struct char_data *character_list;
+extern char last_char_name[MAX_INPUT_LENGTH];
+extern char last_processed_cmd[MAX_INPUT_LENGTH];
+
 void check_leaderboard(void);
 void check_champion_and_website_who_list(void);
 void save_slot_machines(void);
@@ -649,6 +654,10 @@ int init_socket(int port)
 // used in game_loop.  It has to be global so that "close_socket" can increment
 // it if we are closing the socket that is next to be processed.
 struct descriptor_data * next_d;
+#ifdef USE_TIMING
+stringstream timingDebugStr;
+unsigned long long pulseavg = 0;
+#endif
 
 /*
  * game_loop contains the main loop which drives the entire MUD.  It
@@ -658,234 +667,264 @@ struct descriptor_data * next_d;
  */
 void game_loop(unsigned mother_desc, unsigned other_desc, unsigned third_desc, unsigned fourth_desc)
 {
- 
-  fd_set input_set, output_set, exc_set, null_set;
-  struct timeval last_time, delay_time, now_time;
-  long secDelta, usecDelta;
 
-//struct timeval debugtimer1, debugtimer2;
+	fd_set input_set, output_set, exc_set, null_set;
+	struct timeval last_time, delay_time, now_time;
+	long secDelta, usecDelta;
 
-  // comm must be much longer than MAX_INPUT_LENGTH since we allow aliases in-game
-  // otherwise an alias'd command could easily overrun the buffer
-  char comm[MAX_STRING_LENGTH];
-  char buf[128];
-  struct descriptor_data *d;
-  unsigned maxdesc;
-  int aliased;
+#ifdef USE_TIMING
+	static Timer gameloopTimer, commandTimer;
+#endif
 
-  null_time.tv_sec = 0;
-  null_time.tv_usec = 0;
-  FD_ZERO(&null_set);
-  init_heartbeat();
+	// comm must be much longer than MAX_INPUT_LENGTH since we allow aliases in-game
+	// otherwise an alias'd command could easily overrun the buffer
+	char comm[MAX_STRING_LENGTH];
+	char buf[128];
+	struct descriptor_data *d;
+	unsigned maxdesc;
+	int aliased;
 
-  gettimeofday(&last_time, NULL);
+	null_time.tv_sec = 0;
+	null_time.tv_usec = 0;
+	FD_ZERO(&null_set);
+	init_heartbeat();
 
-  /* The Main Loop.  The Big Cheese.  The Top Dog.  The Head Honcho.  The.. */
-  while (!_shutdown) {
+	gettimeofday(&last_time, NULL);
 
-//logf(110, LOG_BUG, "Startloop");
-//gettimeofday(&debugtimer1, NULL);
-	extern bool selfpurge;
-	selfpurge = FALSE;
-    // Set up the input, output, and exception sets for select().
-    FD_ZERO(&input_set);
-    FD_ZERO(&output_set);
-    FD_ZERO(&exc_set);
-    FD_SET(mother_desc, &input_set);
-    FD_SET(other_desc, &input_set);
-    FD_SET(third_desc, &input_set);
-    FD_SET(fourth_desc, &input_set);
+	/* The Main Loop.  The Big Cheese.  The Top Dog.  The Head Honcho.  The.. */
+	while (!_shutdown) {
+#ifdef USE_TIMING
+		timingDebugStr.str("");
+		gameloopTimer.start();
+#endif
+		extern bool selfpurge;
+		selfpurge = FALSE;
+		// Set up the input, output, and exception sets for select().
+		FD_ZERO(&input_set);
+		FD_ZERO(&output_set);
+		FD_ZERO(&exc_set);
+		FD_SET(mother_desc, &input_set);
+		FD_SET(other_desc, &input_set);
+		FD_SET(third_desc, &input_set);
+		FD_SET(fourth_desc, &input_set);
 
-    maxdesc = ((mother_desc > other_desc) ? mother_desc : other_desc);
-    maxdesc = ((maxdesc > third_desc) ? maxdesc : third_desc);
-    maxdesc = ((maxdesc > fourth_desc) ? maxdesc : fourth_desc);
-    //maxdesc = mother_desc;   
- 
-    for (d = descriptor_list; d; d = d->next) {
-      if(d->descriptor > maxdesc) 
-          maxdesc = d->descriptor;
-      FD_SET(d->descriptor, &input_set);
-      FD_SET(d->descriptor, &output_set);
-      FD_SET(d->descriptor, &exc_set);
-    }
+		maxdesc = ((mother_desc > other_desc) ? mother_desc : other_desc);
+		maxdesc = ((maxdesc > third_desc) ? maxdesc : third_desc);
+		maxdesc = ((maxdesc > fourth_desc) ? maxdesc : fourth_desc);
+		//maxdesc = mother_desc;
 
-    // poll (without blocking) for new input, output, and exceptions
-    if (select(maxdesc + 1, &input_set, &output_set, &exc_set, &null_time) < 0) {
-      perror("game_loop : select : poll");
-      return;
-    }
+		for (d = descriptor_list; d; d = d->next) {
+			if(d->descriptor > maxdesc)
+				maxdesc = d->descriptor;
+			FD_SET(d->descriptor, &input_set);
+			FD_SET(d->descriptor, &output_set);
+			FD_SET(d->descriptor, &exc_set);
+		}
 
-    // If new connection waiting, accept it
-    if (FD_ISSET(mother_desc, &input_set))
-      new_descriptor(mother_desc);
-    if (FD_ISSET(other_desc, &input_set))
-      new_descriptor(other_desc);
-    if (FD_ISSET(third_desc, &input_set))
-      new_descriptor(third_desc);
-    if (FD_ISSET(fourth_desc, &input_set))
-      new_descriptor(fourth_desc);
+		// poll (without blocking) for new input, output, and exceptions
+		if (select(maxdesc + 1, &input_set, &output_set, &exc_set, &null_time) < 0) {
+			perror("game_loop : select : poll");
+			return;
+		}
 
-    // close the weird descriptors in the exception set 
-    for (d = descriptor_list; d; d = next_d) {
-      next_d = d->next;
-      if (FD_ISSET(d->descriptor, &exc_set)) {
-	FD_CLR(d->descriptor, &input_set);
-	FD_CLR(d->descriptor, &output_set);
-	close_socket(d);
-      }
-    }
+		// If new connection waiting, accept it
+		if (FD_ISSET(mother_desc, &input_set))
+			new_descriptor(mother_desc);
+		if (FD_ISSET(other_desc, &input_set))
+			new_descriptor(other_desc);
+		if (FD_ISSET(third_desc, &input_set))
+			new_descriptor(third_desc);
+		if (FD_ISSET(fourth_desc, &input_set))
+			new_descriptor(fourth_desc);
 
-    /* process descriptors with input pending */
-    for (d = descriptor_list; d; d = next_d) {
-      next_d = d->next;
-      if (FD_ISSET(d->descriptor, &input_set)) {
-	if (process_input(d) < 0) {
-	  if (strcmp(d->host, "127.0.0.1")) {
-	    sprintf(buf, "Connection attempt bailed from %s", d->host);
-	    printf(buf);
-	    log(buf, OVERSEER, LOG_SOCKET);
-	  }
-	  close_socket(d);
-	}
-      }
-    }
+		// close the weird descriptors in the exception set
+		for (d = descriptor_list; d; d = next_d) {
+			next_d = d->next;
+			if (FD_ISSET(d->descriptor, &exc_set)) {
+				FD_CLR(d->descriptor, &input_set);
+				FD_CLR(d->descriptor, &output_set);
+				close_socket(d);
+			}
+		}
 
-    /* process commands we just read from process_input */
-    for (d = descriptor_list; d; d = next_d) {
-      next_d = d->next;
-      d->wait = MAX(d->wait, 1);
-	if (d->connected == CON_CLOSE)
-	{  close_socket(d); // So they don't have to type a command.
-		continue; }
-	//debugpoint();
-      if ((--(d->wait) <= 0) && get_from_q(&d->input, comm, &aliased)) {
-	  /* reset the idle timer & pull char back from void if necessary */
-	d->wait = 1;
-	d->prompt_mode = 1;
+		/* process descriptors with input pending */
+		for (d = descriptor_list; d; d = next_d) {
+			next_d = d->next;
+			if (FD_ISSET(d->descriptor, &input_set)) {
+				if (process_input(d) < 0) {
+					if (strcmp(d->host, "127.0.0.1")) {
+						sprintf(buf, "Connection attempt bailed from %s", d->host);
+						printf(buf);
+						log(buf, OVERSEER, LOG_SOCKET);
+					}
+					close_socket(d);
+				}
+			}
+		}
 
-	if (d->showstr_count)	/* reading something w/ pager     */
-	  show_string(d, comm);
-//	else if (d->str)		/* writing boards, mail, etc.     */
-//	  string_add(d, comm);
-        else if (d->strnew && STATE(d) == CON_EXDSCR)
-          new_string_add(d, comm);
-        else if(d->hashstr)
-          string_hash_add(d, comm);
-        else if(d->strnew && (IS_MOB(d->character) || !IS_SET(d->character->pcdata->toggles, PLR_EDITOR_WEB)))
-          new_string_add(d, comm);
-	else if (d->connected != CON_PLAYING)	/* in menus, etc. */
-	  nanny(d, comm);
-	else {			/* else: we're playing normally */
-	  if (aliased)		/* to prevent recursive aliases */
-	    d->prompt_mode = 0;
-	  else {
-	    if (perform_alias(d, comm))
-	      get_from_q(&d->input, comm, &aliased);
-	  }
-          // Azrack's a chode.  Don't forget to check
-          // ->snooping before you check snooping->char:P
-          if(*comm == '%' && d->snooping && d->snooping->character) {
-             command_interpreter(d->snooping->character, comm + 1);
-          } else { 
-	     command_interpreter(d->character, comm);	/* send it to interpreter */
-          }
-	} // else if input
-      } // if input
-      // the below two if-statements are used to allow the mud to detect and respond
-      // to web-browsers attempting to connect to the game on port 80
-      // this line processes a "get" or "post" if available.  Otherwise it prints the
-      // entrance screen.  If a player has already entered their name, it processes
-      // that too.
-      else if (d->connected == CON_DISPLAY_ENTRANCE)
-        nanny(d, "");
-      // this line allows the mud to skip this descriptor until next pulse
-      else if (d->connected == CON_PRE_DISPLAY_ENTRANCE)
-        d->connected = CON_DISPLAY_ENTRANCE;
-      else d->idle_time++;
-    } // for
+		/* process commands we just read from process_input */
+		for (d = descriptor_list; d; d = next_d) {
+			next_d = d->next;
+			d->wait = MAX(d->wait, 1);
+			if (d->connected == CON_CLOSE)
+			{  close_socket(d); // So they don't have to type a command.
+			continue; }
+			//debugpoint();
+			if ((--(d->wait) <= 0) && get_from_q(&d->input, comm, &aliased)) {
+				/* reset the idle timer & pull char back from void if necessary */
+				d->wait = 1;
+				d->prompt_mode = 1;
 
-//gettimeofday(&debugtimer2, NULL);
-//logf(110, LOG_BUG, "Done socketprocessing.  Time %dsec %dusec.", 
-//       (((int) debugtimer2.tv_sec) - ((int) debugtimer1.tv_sec)),
-//       (((int) debugtimer2.tv_usec) - ((int) debugtimer1.tv_usec)));
-//gettimeofday(&debugtimer1, NULL);
+				if (d->showstr_count)	/* reading something w/ pager     */
+					show_string(d, comm);
+				//	else if (d->str)		/* writing boards, mail, etc.     */
+				//	  string_add(d, comm);
+				else if (d->strnew && STATE(d) == CON_EXDSCR)
+					new_string_add(d, comm);
+				else if(d->hashstr)
+					string_hash_add(d, comm);
+				else if(d->strnew && (IS_MOB(d->character) || !IS_SET(d->character->pcdata->toggles, PLR_EDITOR_WEB)))
+					new_string_add(d, comm);
+				else if (d->connected != CON_PLAYING)	/* in menus, etc. */
+					nanny(d, comm);
+				else {			/* else: we're playing normally */
+					if (aliased)		/* to prevent recursive aliases */
+						d->prompt_mode = 0;
+					else {
+						if (perform_alias(d, comm))
+							get_from_q(&d->input, comm, &aliased);
+					}
+#ifdef USE_TIMING				
+					commandTimer.start();
+#endif
+					// Azrack's a chode.  Don't forget to check
+					// ->snooping before you check snooping->char:P
+					if(*comm == '%' && d->snooping && d->snooping->character) {
+						command_interpreter(d->snooping->character, comm + 1);
+					} else {
+						command_interpreter(d->character, comm);	/* send it to interpreter */
+					}
+#ifdef USE_TIMING					
+					commandTimer.stop();
 
-    // do what needs to be done.  violence, repoping, regen, etc.
-    heartbeat();
+					timingDebugStr <<  last_char_name << ":" << comm << " took "
+								<< commandTimer << endl;
+#endif
+				} // else if input
+			} // if input
+			// the below two if-statements are used to allow the mud to detect and respond
+			// to web-browsers attempting to connect to the game on port 80
+			// this line processes a "get" or "post" if available.  Otherwise it prints the
+			// entrance screen.  If a player has already entered their name, it processes
+			// that too.
+			else if (d->connected == CON_DISPLAY_ENTRANCE)
+				nanny(d, "");
+			// this line allows the mud to skip this descriptor until next pulse
+			else if (d->connected == CON_PRE_DISPLAY_ENTRANCE)
+				d->connected = CON_DISPLAY_ENTRANCE;
+			else d->idle_time++;
+		} // for
 
+		// do what needs to be done.  violence, repoping, regen, etc.
+#ifdef USE_TIMING		
+		static Timer hbTimer;
+		hbTimer.start();
+#endif		
+		heartbeat();
+#ifdef USE_TIMING		
+		hbTimer.stop();
+		timingDebugStr << "heartbeat: " << hbTimer << endl;
+
+		static Timer dbProcTimer;
+		dbProcTimer.start();
+#endif
+	
 #ifdef USE_SQL
-    db.processqueue();
+		db.processqueue();
 #endif
 
-//gettimeofday(&debugtimer2, NULL);
-//logf(110, LOG_BUG, "Done heartbeat.  Time %dsec %dusec.", 
-//       (((int) debugtimer2.tv_sec) - ((int) debugtimer1.tv_sec)),
-//       (((int) debugtimer2.tv_usec) - ((int) debugtimer1.tv_usec)));
-//gettimeofday(&debugtimer1, NULL);
+#ifdef USE_TIMING
+		dbProcTimer.stop();
+		timingDebugStr << "db.processqueue: " << dbProcTimer << endl;
 
-    /* send queued output out to the operating system (ultimately to user) */
-    for (d = descriptor_list; d; d = next_d) {
-      next_d = d->next;
-      if ((FD_ISSET(d->descriptor, &output_set) && *(d->output)) || d->prompt_mode)
-	if (process_output(d) < 0)
-	  close_socket(d);
-	// else
-	  // d->prompt_mode = 1;
-    }
+		static Timer outputTimer;
+		outputTimer.start();
+#endif
+		
+		/* send queued output out to the operating system (ultimately to user) */
+		for (d = descriptor_list; d; d = next_d) {
+			next_d = d->next;
+			if ((FD_ISSET(d->descriptor, &output_set) && *(d->output)) || d->prompt_mode)
+				if (process_output(d) < 0)
+					close_socket(d);
+			// else
+			// d->prompt_mode = 1;
+		}
+#ifdef USE_TIMING		
+		outputTimer.stop();
+		timingDebugStr << "output: " << outputTimer << endl;
+		
+		static Timer xmlrpcTimer;
+		xmlrpcTimer.start();
+#endif
+			
+		xmlrpc_s->work(0);
+		
+#ifdef USE_TIMING		
+		xmlrpcTimer.stop();
+		timingDebugStr << "xmlrpc: " << xmlrpcTimer << endl;
+#endif
+		// we're done with this pulse.  Now calculate the time until the next pulse and sleep until then
+		// we want to pulse PASSES_PER_SEC times a second (duh).  This is currently 4.
 
-    xmlrpc_s->work(0);
+		gettimeofday( &now_time, NULL );
+		usecDelta   = ((int) last_time.tv_usec) - ((int) now_time.tv_usec);
+		secDelta    = ((int) last_time.tv_sec ) - ((int) now_time.tv_sec );
+#ifdef USE_TIMING
+		if (now_time.tv_sec-last_time.tv_sec > 0 || now_time.tv_usec-last_time.tv_usec > 20000) {
+			timingDebugStr <<  "Time since last pulse is "
+					<< (((int) now_time.tv_sec) - ((int) last_time.tv_sec)) << "sec "
+					<< (((int) now_time.tv_usec) - ((int) last_time.tv_usec)) << "usec.\r\n";
+			//logf(110, LOG_BUG, timingDebugStr.str().c_str());
+		}
+#endif
+		usecDelta   += (1000000 / PASSES_PER_SEC);
+		while ( usecDelta < 0 )
+		{
+			usecDelta += 1000000;
+			secDelta  -= 1;
+		}
+		while ( usecDelta >= 1000000 )
+		{
+			usecDelta -= 1000000;
+			secDelta  += 1;
+		}
+		//logf(110, LOG_BUG, "secD : %d  usecD: %d", secDelta, usecDelta);
 
-//gettimeofday(&debugtimer2, NULL);
-//logf(110, LOG_BUG, "Done output.  Time %dsec %dusec.", 
-//       (((int) debugtimer2.tv_sec) - ((int) debugtimer1.tv_sec)),
-//       (((int) debugtimer2.tv_usec) - ((int) debugtimer1.tv_usec)));
-//gettimeofday(&debugtimer1, NULL);
-//    debugpoint();
-    // we're done with this pulse.  Now calculate the time until the next pulse and sleep until then
-    // we want to pulse PASSES_PER_SEC times a second (duh).  This is currently 4.
-
-    gettimeofday( &now_time, NULL );
-    usecDelta   = ((int) last_time.tv_usec) - ((int) now_time.tv_usec);
-    secDelta    = ((int) last_time.tv_sec ) - ((int) now_time.tv_sec );
-//    usecDelta = ((int) now_time.tv_usec) - ((int) last_time.tv_usec);
-//    secDelta = ((int) now_time.tv_sec) - ((int) last_time.tv_sec);
-//logf(110, LOG_BUG, "Time since last pulse: %dsec %dusec.", 
-//       (((int) now_time.tv_sec) - ((int) now_time.tv_sec)),
-//       (((int) last_time.tv_usec) - ((int) last_time.tv_usec)));
-//logf(110, LOG_BUG, "secD : %d  usecD: %d", secDelta, usecDelta);
-
-    usecDelta   += (1000000 / PASSES_PER_SEC);
-    while ( usecDelta < 0 )
-    {
-       usecDelta += 1000000;
-       secDelta  -= 1;
-    }
-    while ( usecDelta >= 1000000 )
-    {
-       usecDelta -= 1000000;
-       secDelta  += 1;
-    }
-//logf(110, LOG_BUG, "secD : %d  usecD: %d", secDelta, usecDelta);
-    
-    if ( secDelta > 0 || ( secDelta == 0 && usecDelta > 0 ) )
-    {
-       delay_time.tv_usec = usecDelta;
-       delay_time.tv_sec  = secDelta;
-//logf(110, LOG_BUG, "Pausing for  %dsec %dusec.", secDelta, usecDelta);
+		if ( secDelta > 0 || ( secDelta == 0 && usecDelta > 0 ) )
+		{
+			delay_time.tv_usec = usecDelta;
+			delay_time.tv_sec  = secDelta;
+			//logf(110, LOG_BUG, "Pausing for  %dsec %dusec.", secDelta, usecDelta);
 #ifndef WIN32
-       if ( select( 0, NULL, NULL, NULL, &delay_time ) < 0 && errno != EINTR)
-       {
-          perror( "game_loop: select: delay" );
-          exit( 1 );
-       }
+			if ( select( 0, NULL, NULL, NULL, &delay_time ) < 0 && errno != EINTR)
+			{
+				perror( "game_loop: select: delay" );
+				exit( 1 );
+			}
 #else
-	   Sleep(delay_time.tv_sec * 1000 + delay_time.tv_usec / 1000);
+			Sleep(delay_time.tv_sec * 1000 + delay_time.tv_usec / 1000);
 #endif
-    }
-    // temp removing this since it's spamming the crap out of us
-    //else logf(110, LOG_BUG, "0 delay on pulse");
-    gettimeofday(&last_time, NULL);
-  }
+		}
+		// temp removing this since it's spamming the crap out of us
+		//else logf(110, LOG_BUG, "0 delay on pulse");
+		gettimeofday(&last_time, NULL);
+#ifdef USE_TIMING
+		if (timingDebugStr.str().length() > 0) {
+			cerr << timingDebugStr.str();
+		}
+#endif		
+	}
 }
 
 
@@ -908,10 +947,21 @@ void init_heartbeat()
 
 void heartbeat()
 {
+#ifdef USE_TIMING
+  static Timer mobileTimer;
+#endif
+
   if (--pulse_mobile < 1) 
   {
     pulse_mobile = PULSE_MOBILE;
+#ifdef USE_TIMING
+	mobileTimer.start();
+#endif
     mobile_activity();
+#ifdef USE_TIMING
+	mobileTimer.stop();
+	timingDebugStr << "mobile_activity: " << mobileTimer << endl;
+#endif
     object_activity();
   }
   if (--pulse_timer < 1)
@@ -1892,7 +1942,7 @@ int write_to_descriptor(socket_t desc, char *txt)
  */
 int process_input(struct descriptor_data *t)
 {
-  int buf_length, bytes_read, space_left, failed_subst, doublesign;
+  int buf_length, bytes_read, space_left, failed_subst;
   char *ptr = NULL;
   char *read_point = NULL;
   char *write_point = NULL;
@@ -1900,8 +1950,6 @@ int process_input(struct descriptor_data *t)
   char *tmp_ptr = NULL;
   char tmp[MAX_INPUT_LENGTH + 8];
 
-  /* initialize doublesign */
-  doublesign = 0;
   t->idle_time = 0;
   /* first, find the point where we left off reading data */
   buf_length = strlen(t->inbuf);
@@ -2291,7 +2339,6 @@ void check_idle_passwords(void)
 
 void checkpointing(int sig)
 {
-  sig = sig;
   if (!tics) {
     log("SYSERR: CHECKPOINT shutdown: tics not updated", ANGEL, LOG_BUG);
     abort();
@@ -2301,8 +2348,6 @@ void checkpointing(int sig)
 
 void report_debug_logging()
 {
-  extern char last_processed_cmd[MAX_INPUT_LENGTH];
-  extern char last_char_name[MAX_INPUT_LENGTH];
   extern int  last_char_room;
 
   log("Last cmd:", ANGEL, LOG_BUG);
@@ -2347,7 +2392,6 @@ void crash_hotboot()
 
 void crashill(int sig)
 {
-  sig = sig;
   report_debug_logging();
   log("Recieved SIGFPE (Illegal Instruction)", ANGEL, LOG_BUG);
   crash_hotboot();
@@ -2357,7 +2401,6 @@ void crashill(int sig)
 
 void crashfpe(int sig)
 {
-  sig = sig;
   report_debug_logging();
   log("Recieved SIGFPE (Arithmetic Error)", ANGEL, LOG_BUG);
   crash_hotboot();
@@ -2368,7 +2411,6 @@ void crashfpe(int sig)
 void crashsig(int sig)
 {
   extern int died_from_sigsegv;
-  sig = sig;
   died_from_sigsegv++;
   if(died_from_sigsegv > 3) { // panic! error is in log...lovely  just give up
     exit(0);
@@ -2386,7 +2428,6 @@ void crashsig(int sig)
 
 void unrestrict_game(int sig)
 {
-  sig = sig;
   extern struct ban_list_element *ban_list;
   extern int num_invalid;
 
@@ -2400,7 +2441,6 @@ void unrestrict_game(int sig)
 
 void hupsig(int sig)
 {
-  sig = sig;
   log("Received SIGHUP, SIGINT, or SIGTERM.  Shutting down...", 0, LOG_MISC);
   abort();			/* perhaps something more elegant should
 				 * substituted */
