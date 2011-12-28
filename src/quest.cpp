@@ -954,10 +954,12 @@ int do_quest(CHAR_DATA *ch, char *arg, int cmd)
        obj_from_char(brownie);
 
        stop_all_quests(ch);
-       memset(ch->pcdata->quest_current, 0, sizeof(ch->pcdata->quest_current));
+       for(int i=0;i<QUEST_MAX;i++) {
+          ch->pcdata->quest_current[i] = -1;
+          ch->pcdata->quest_current_ticksleft[i] = 0;
+       }
        memset(ch->pcdata->quest_cancel, 0, sizeof(ch->pcdata->quest_cancel));
        memset(ch->pcdata->quest_complete, 0, sizeof(ch->pcdata->quest_complete));
-       memset(ch->pcdata->quest_current_ticksleft, 0, sizeof(ch->pcdata->quest_current_ticksleft));
        send_to_char("All quests have been reset.\n\r", ch);
        return retval;
    } else {
