@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: save.cpp,v 1.65 2010/02/19 06:09:18 jhhudso Exp $ */
+/* $Id: save.cpp,v 1.66 2011/12/28 01:51:08 jhhudso Exp $ */
 
 extern "C"
 {
@@ -327,7 +327,10 @@ void save_pc_data(struct pc_data * i, FILE * fpsave, struct time_data tmpage)
     fwrite("PRO", sizeof(char), 3, fpsave);
     fwrite(&(i->profession), sizeof(i->profession), 1, fpsave);
   }
-
+  if (i->wizinvis) {
+	fwrite("WIZ", sizeof(char), 3, fpsave);
+	fwrite(&(i->wizinvis), sizeof(i->wizinvis), 1, fpsave);
+  }
   // Any future additions to this save file will need to be placed LAST here with a 3 letter code
   // and appropriate strcmp statement in the read_mob_data object
 
@@ -464,7 +467,11 @@ void read_pc_data(struct char_data *ch, FILE* fpsave)
     fread(&i->profession, sizeof(i->profession), 1, fpsave);
     fread(&typeflag, sizeof(char), 3, fpsave);
   }
-  
+  if (!strcmp("WIZ", typeflag))
+  {
+	  fread(&i->wizinvis, sizeof(i->wizinvis), 1, fpsave);
+	  fread(&typeflag, sizeof(char), 3, fpsave);
+  }
   i->skillchange = 0;
   // Add new items in this format
 //  if(!strcmp(typeflag, "XXX"))

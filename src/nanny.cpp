@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.191 2011/12/24 21:31:49 jhhudso Exp $ */
+/* $Id: nanny.cpp,v 1.192 2011/12/28 01:51:08 jhhudso Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -371,8 +371,6 @@ void do_on_login_stuff(char_data * ch)
     
     if(!IS_MOB(ch) && GET_LEVEL(ch) >= IMMORTAL) {
        ch->pcdata->holyLite   = TRUE;
-	if (!bport)
-       ch->pcdata->wizinvis = GET_LEVEL(ch);
        GET_COND(ch, THIRST) = -1;
        GET_COND(ch, FULL) = -1;
     }
