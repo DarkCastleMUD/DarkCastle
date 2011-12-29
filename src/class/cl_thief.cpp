@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.201 2011/12/24 21:09:08 jhhudso Exp $
+| $Id: cl_thief.cpp,v 1.202 2011/12/29 05:12:22 jhhudso Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -398,22 +398,26 @@ int do_backstab(CHAR_DATA *ch, char *argument, int cmd)
     }
   }
 
-  if (IS_SET(retval, eCH_DIED)) {
-	  return retval;
+if (retval & eVICT_DIED && !retval & eCH_DIED)
+  {
+    if(!IS_NPC(ch) && IS_SET(ch->pcdata->toggles, PLR_WIMPY))
+      WAIT_STATE(ch, PULSE_VIOLENCE * 1.5);
+    else
+      add_command_lag(ch, cmd, PULSE_VIOLENCE*1.0);
+    return retval;
   }
 
-  if (IS_SET(retval, eVICT_DIED)) {
-	if (IS_PC(ch) && IS_SET(ch->pcdata->toggles, PLR_WIMPY)) {
-		WAIT_STATE(ch, PULSE_VIOLENCE * 1.5);
-	} else {
-		add_command_lag(ch, cmd, PULSE_VIOLENCE*1);
-	}
-	return retval;
-  }
+ if (retval & eCH_DIED) return retval;
 
+  if (retval & eVICT_DIED)
+  {
+    add_command_lag(ch, cmd, PULSE_VIOLENCE *1.0);
+    return retval;
+  }
+  extern bool charExists(char_data *ch);
   if (!charExists(victim))// heh
   {
-    add_command_lag(ch, cmd, PULSE_VIOLENCE *1);
+    add_command_lag(ch, cmd, PULSE_VIOLENCE *1.0);
       return eSUCCESS|eVICT_DIED;
   }
   WAIT_STATE(ch, PULSE_VIOLENCE*1.5);
@@ -427,12 +431,12 @@ int do_backstab(CHAR_DATA *ch, char *argument, int cmd)
 	retval = attack(ch, victim, SKILL_BACKSTAB, SECOND);
       }
       
-      if (IS_SET(retval, eVICT_DIED) && !IS_SET(retval,eCH_DIED)) {
-		if(!IS_NPC(ch) && IS_SET(ch->pcdata->toggles, PLR_WIMPY)) {
-		  WAIT_STATE(ch, PULSE_VIOLENCE * 1.5);
-		} else {
-		  WAIT_STATE(ch, PULSE_VIOLENCE);
-		}
+  if (retval & eVICT_DIED && !retval & eCH_DIED) {
+	if(!IS_NPC(ch) && IS_SET(ch->pcdata->toggles, PLR_WIMPY)) {
+	  WAIT_STATE(ch, PULSE_VIOLENCE * 1.5);
+	} else {
+	  WAIT_STATE(ch, PULSE_VIOLENCE*0.5);
+	}
       }
     } else {
       // We were intended to have a dual backstab so we were unjoinable
@@ -443,19 +447,15 @@ int do_backstab(CHAR_DATA *ch, char *argument, int cmd)
     }
   }
 
-  if (SOMEONE_DIED(retval)) {
-    add_command_lag(ch, cmd, (int)((double)PULSE_VIOLENCE ));
-    return retval;
-  }
+ if (!SOMEONE_DIED(retval)) {
+    SET_BIT(retval, check_autojoiners(ch,1));
+    if (!SOMEONE_DIED(retval))
 
-  SET_BIT(retval, check_autojoiners(ch, 1));
-  if (SOMEONE_DIED(retval)) {
-	return retval;
-  }
+    if (IS_AFFECTED(ch, AFF_CHARM)) SET_BIT(retval, check_joincharmie(ch,1));
+    if (SOMEONE_DIED(retval)) return retval;
+  } else
+    add_command_lag(ch, cmd, (int)((double)PULSE_VIOLENCE)); 
 
-  if (IS_AFFECTED(ch, AFF_CHARM)) {
-	SET_BIT(retval, check_joincharmie(ch, 1));
-  }
 
   return retval;
 }
