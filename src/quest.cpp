@@ -689,7 +689,7 @@ int stop_current_quest(CHAR_DATA *ch, int number)
 
 int stop_all_quests(CHAR_DATA *ch)
 {
-   int retval;
+   int retval = 0;
 
    for(int i = 0;i < QUEST_MAX; i++) {
       retval &= stop_current_quest(ch, ch->pcdata->quest_current[i]);
@@ -747,7 +747,7 @@ void quest_update()
 
 int quest_handler(CHAR_DATA *ch, CHAR_DATA *qmaster, int cmd, char *name)
 {
-   int retval;
+   int retval = 0;
    char buf[MAX_STRING_LENGTH];
    struct quest_info *quest;
 
@@ -923,17 +923,42 @@ int do_quest(CHAR_DATA *ch, char *arg, int cmd)
       else retval = quest_handler(ch, qmaster, 4, name);
       return retval;
    } else if(is_abbrev(arg, "reset")) {
-	   if (!qmaster) {
-    	   return eFAILURE;
-       }
+		if (!qmaster) {
+		   return eFAILURE;
+		}
 
-       if (ch->in_room != qmaster->in_room) {
-    	   send_to_char("You may only reset all quests in the presence of the Quest Master.\n\r", ch);
-    	   return eFAILURE;
-       }
+		if (ch->in_room != qmaster->in_room) {
+		   send_to_char("You may only reset all quests in the presence of the Quest Master.\n\r", ch);
+		   return eFAILURE;
+		}
 
-       if (ch->pcdata->quest_points < 500) {
-    	   csendf(ch, "You need at least 500 quest points in order to reset all quests.\n\r");
+		quest_info *quest;
+		int attempting=0;
+		int completed=0;
+		int total=0;
+		for (quest_list_t::iterator node = quest_list.begin(); node != quest_list.end(); node++) {
+			quest = *node;
+
+			if (GET_LEVEL(ch) >= quest->level) {
+				if (check_quest_current(ch, quest->number)) {
+					// We are attempting this quest currently
+					attempting++;
+				}
+
+				if (check_quest_complete(ch, quest->number)) {
+					// We did this quest already
+					completed++;
+				}
+
+				if (!quest->active || check_quest_current(ch, quest->number)) {
+					// No other person is doing this quest right now
+					total++;
+				}
+			}
+		}
+
+       if (completed < 100) {
+    	   csendf(ch, "You need will need to complete at least 100 quests.\n\r");
     	   return eFAILURE;
        }
 
@@ -971,7 +996,7 @@ int do_quest(CHAR_DATA *ch, char *arg, int cmd)
                  "       quest cancel <name> (cancel the current quest)\n\r"
                  "       quest start <name>  (starts a new quest)\n\r"
                  "       quest finish <name> (finishes a current quest)\n\r"
-    		     "       quest reset         (reset all quests)\n\r"
+    		     "       quest reset         (reset all quests. costs 2k plats, 1 brownie)\n\r"
                  "\n\r");
       return eFAILURE;
    }
