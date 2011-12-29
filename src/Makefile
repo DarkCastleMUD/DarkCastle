@@ -19,7 +19,7 @@ LDFLAGS = -L/emul/linux/x86/lib -L/usr/local/lib32 -lcrypt -lmcheck -lz -lpq -lX
 CYGWIN_LDFLAGS = -L/emul/linux/x86/lib -L/usr/local/lib32 -lcrypt -lz -lpq /usr/local/lib/libXmlRpc.a
 IN_CXXFLAGS = -Wall -I./include -DLINUX -m32 -Wno-write-strings -I/usr/include/pgsql/
 
-BASENAME = research# Base product name -- NO SPACES
+BASENAME = dcastle# Base product name -- NO SPACES
 
 .SUFFIXES: .C
 
