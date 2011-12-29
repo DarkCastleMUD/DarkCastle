@@ -546,9 +546,9 @@ int do_testport(char_data *ch, char *argument, int cmd)
 		    }
 		}
 
-		char *myargv[] = {"./research1", "-P", "-b", "7000", NULL};
+		char *myargv[] = {"./dcastle", "-P", "-b", "7000", NULL};
 		errno = 0;
-		execv("./research1", myargv);
+		execv("./dcastle", myargv);
 	    }
 	    exit(0);
 	}
