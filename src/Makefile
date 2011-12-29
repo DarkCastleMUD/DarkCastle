@@ -15,7 +15,7 @@ PROF_FLAGS = $(DEBUG_FLAGS) -pg
 #LDFLAGS = -lg++ -lgcc -lm -lc -lg -lWiz -lClass
 #Changed when we switched to Linux Mandrake - Pir
 #LDFLAGS = -lstdc++ -lcrypt -lgcc -lm -lc -lg -lWiz -lClass
-LDFLAGS = -L/emul/linux/x86/lib -L/usr/local/lib32 -lcrypt -lmcheck -lz -lpq -lXmlRpc
+LDFLAGS = -L/emul/linux/x86/lib -L/usr/local/lib -lcrypt -lmcheck -lz -lpq -lxmlrpc++
 CYGWIN_LDFLAGS = -L/emul/linux/x86/lib -L/usr/local/lib32 -lcrypt -lz -lpq /usr/local/lib/libXmlRpc.a
 IN_CXXFLAGS = -Wall -I./include -DLINUX -m32 -Wno-write-strings -I/usr/include/pgsql/
 
@@ -35,6 +35,10 @@ default:
 	@echo "fast	Make with optimization flags"
 	@echo "profile  Make with debug & profile libraries/flags"
 	@echo ""
+
+install:
+	mv /srv/dcastle/bin/$(BASENAME) /srv/dcastle/bin/$(BASENAME).old
+	cp $(BASENAME).debug /srv/dcastle/bin/$(BASENAME)
 
 all:	debug
 
