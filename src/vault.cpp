@@ -9,7 +9,7 @@ extern "C"
 
 #include <structs.h>
 #include <db.h>
-#include <utility.h>
+#include "utility.h"
 #include <vault.h>
 #include <room.h>
 #include <player.h>
@@ -682,7 +682,7 @@ void remove_vault(char *name, BACKUP_TYPE backup) {
 
   remove_vault_accesses(name);
 
-  struct vault_data *vault, *next_vault, *prev_vault;
+  struct vault_data *vault, *next_vault, *prev_vault = NULL;
   struct vault_items_data *items, *titems;
   struct vault_access_data *access, *taccess;
 
@@ -1003,7 +1003,7 @@ void remove_vault_accesses(char *name) {
 }
 
 void access_remove(char *name, struct vault_data *vault) {
-  struct vault_access_data *access, *next_access, *prev_access;
+  struct vault_access_data *access, *next_access, *prev_access = NULL;
 
   for (access = vault->access; access ; access = next_access) {
     next_access = access->next;
@@ -1011,8 +1011,10 @@ void access_remove(char *name, struct vault_data *vault) {
     if (!strcmp(access->name, name)) {
       if (access == vault->access)
         vault->access = access->next;
-      else 
+      else if (prev_access != NULL) {
         prev_access->next = access->next;
+      }
+
       free(access);
       access = NULL;
       break;
@@ -1414,7 +1416,7 @@ void item_add(obj_data *obj, struct vault_data *vault) {
 }
 
 void item_remove(obj_data *obj, struct vault_data *vault) {
-  struct vault_items_data *item, *next_item, *prev_item;
+  struct vault_items_data *item, *next_item, *prev_item = NULL;
   int vnum = GET_OBJ_VNUM(obj);
 
   for (item = vault->items; item ; item = next_item) {
@@ -1426,8 +1428,10 @@ void item_remove(obj_data *obj, struct vault_data *vault) {
         return;  
       } else if (item == vault->items)
         vault->items = item->next;
-      else 
+      else if (prev_item != NULL) {
         prev_item->next = item->next;
+      }
+
       free(item);
       item = NULL;
       vault->weight -= GET_OBJ_WEIGHT(get_obj(vnum));
