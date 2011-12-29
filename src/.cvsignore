@@ -2,3 +2,4 @@ research*
 .sconsign*
 *.kdev*
 callgrind.out.*
+dcastle.debug
