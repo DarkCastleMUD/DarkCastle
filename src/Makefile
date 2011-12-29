@@ -36,6 +36,8 @@ default:
 	@echo "profile  Make with debug & profile libraries/flags"
 	@echo ""
 
+all:	debug
+
 profile:
 	@$(MAKE) darkcastle PROGNAME=$(BASENAME).prof CXXFLAGS="$(IN_CXXFLAGS) $(PROF_FLAGS)"
 
