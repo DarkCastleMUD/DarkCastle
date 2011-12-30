@@ -525,7 +525,7 @@ int do_testport(char_data *ch, char *argument, int cmd)
 	child = fork();
 	// inside of child of process
 	if (child == 0) {
-	    chdir("../src/");
+	    chdir("../bin/");
 
 	    // Find next available fd
 	    FILE *testportlog = fopen("../log/testport.log", "w");
