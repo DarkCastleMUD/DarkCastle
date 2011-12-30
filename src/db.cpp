@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.210 2011/12/30 05:01:19 jhhudso Exp $ */
+/* $Id: db.cpp,v 1.211 2011/12/30 05:10:31 jhhudso Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -3946,6 +3946,23 @@ void randomize_object(obj_data *obj)
 		obj->obj_flags.weight = random_percent_change(-33, 33, obj->obj_flags.weight);
 		obj->obj_flags.cost = random_percent_change(-33, 33, obj->obj_flags.cost);
 		obj->obj_flags.value[1] = random_percent_change(-25, 25, obj->obj_flags.value[1]);
+
+		for(int i = 0; i < obj->num_affects; i++)
+		  {
+		    switch(obj->affected[i].location) {
+		    case APPLY_LIGHTNING_SHIELD:
+		    case SPELL_BURNING_HANDS:
+		    case SPELL_FIREBALL:
+		    case SPELL_FIRESTORM:
+		    case SPELL_HELLSTREAM:
+		    case SPELL_MAGIC_MISSILE:
+		    case SPELL_METEOR_SWARM:
+		    case SPELL_LIGHTNING_BOLT:
+		    case SPELL_CHILL_TOUCH:
+		    	obj->affected[i].modifier = random_percent_change(-33, 33, obj->affected[i].modifier);
+		    	break;
+		    }
+		  }
 		break;
 
 	case ITEM_WAND:
