@@ -623,7 +623,7 @@ int do_install(struct char_data *ch, char *arg, int cmd)
     return eFAILURE;
   }
 
-  if (!(numrooms = atoi(arg1))) {
+  if (!(numrooms = atoi(arg2))) {
     sprintf(err, "Usage: install <range #> <# of rooms> <world|obj|mob|zone|all>\n\r"
                  "  ie.. install 291 100 m = installs mob range 29100-29199.\n\r");
     send_to_char(err, ch);
