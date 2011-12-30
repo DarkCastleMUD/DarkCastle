@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: db.h,v 1.36 2011/12/15 05:29:56 jhhudso Exp $ */
+/* $Id: db.h,v 1.37 2011/12/30 05:00:21 jhhudso Exp $ */
 #ifndef DB_H_
 #define DB_H_
 
@@ -151,8 +151,9 @@ struct obj_data  *read_object(int nr, FILE *fl, bool zz);
 CHAR_DATA *read_mobile(int nr, FILE *fl);
 struct obj_data  *clone_object(int nr);
 CHAR_DATA *clone_mobile(int nr);
-extern int top_of_objt;
+void randomize_object(obj_data *obj);
 
+extern int top_of_objt;
 extern time_t start_time; /* mud start time */
 
 struct pulse_data { /* list for keeping tract of 'pulsing' chars */

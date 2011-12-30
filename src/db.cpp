@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.208 2011/12/25 21:28:52 jhhudso Exp $ */
+/* $Id: db.cpp,v 1.209 2011/12/30 05:00:21 jhhudso Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -3926,6 +3926,38 @@ struct obj_data *clone_object(int nr)
   return obj;  
 }
 
+void randomize_object(obj_data *obj)
+{
+	if (obj == NULL) {
+		return;
+	}
+
+	SET_BIT(obj->obj_flags.more_flags, ITEM_CUSTOM);
+
+	switch (obj->obj_flags.type_flag) {
+	case ITEM_WEAPON:
+		fprintf(stderr, "%d:weight ", obj_index[obj->item_number].virt);
+		obj->obj_flags.weight = random_percent_change(-33, 33, obj->obj_flags.weight);
+		obj->obj_flags.cost = random_percent_change(-33, 33, obj->obj_flags.cost);
+		obj->obj_flags.value[1] = random_percent_change(-20, 20, obj->obj_flags.value[1]);
+		obj->obj_flags.value[2] = random_percent_change(-20, 20, obj->obj_flags.value[2]);
+		break;
+	case ITEM_ARMOR:
+		obj->obj_flags.weight = random_percent_change(-33, 33, obj->obj_flags.weight);
+		obj->obj_flags.cost = random_percent_change(-33, 33, obj->obj_flags.cost);
+		obj->obj_flags.value[1] = random_percent_change(-20, 20, obj->obj_flags.value[1]);
+		break;
+
+	case ITEM_WAND:
+		obj->obj_flags.cost = random_percent_change(-33, 33, obj->obj_flags.cost);
+		obj->obj_flags.value[2] = random_percent_change(-20, 20, obj->obj_flags.value[2]);
+		obj->obj_flags.value[3] = obj->obj_flags.value[2];
+		break;
+	}
+
+
+}
+
 
 void zone_update(void)
 {
@@ -4148,6 +4180,7 @@ void reset_zone(int zone)
 //        if((ZCMD.arg2 == -1 || obj_index[ZCMD.arg1].number < ZCMD.arg2 || !number(0,5)) 
           if((obj = clone_object(ZCMD.arg1))) 
         { 
+        	  randomize_object(obj);
           if(!equip_char(mob, obj, ZCMD.arg3)) {
              sprintf(buf, "Bad equip_char zone %d cmd %d", zone, cmd_no);
              log(buf, IMMORTAL, LOG_WORLD);

@@ -16,7 +16,7 @@
  *  10/21/2003   Onager    Changed IS_ANONYMOUS() to handle mobs without   *
  *                         crashing                                        *
  ***************************************************************************/
-/* $Id: utility.h,v 1.94 2011/11/26 03:33:57 jhhudso Exp $ */
+/* $Id: utility.h,v 1.95 2011/12/30 05:00:21 jhhudso Exp $ */
 
 #ifndef UTILITY_H_
 #define UTILITY_H_
@@ -352,6 +352,7 @@ int     move_char       (CHAR_DATA *ch, int dest);
 int     move_char       (CHAR_DATA *ch, int dest, bool stop_all_fighting);
 int	number		(int from, int to);
 int 	dice		(int number, int size);
+int random_percent_change(int from, int to, int value);
 int	str_cmp		(char *arg1, char *arg2);
 int	str_nosp_cmp	(char *arg1, char *arg2);
 int     str_n_nosp_cmp  (char *arg1, char *arg2, int size);

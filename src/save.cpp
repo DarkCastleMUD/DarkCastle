@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: save.cpp,v 1.66 2011/12/28 01:51:08 jhhudso Exp $ */
+/* $Id: save.cpp,v 1.67 2011/12/30 05:00:21 jhhudso Exp $ */
 
 extern "C"
 {
@@ -1089,6 +1089,11 @@ struct obj_data *  obj_store_to_char(CHAR_DATA *ch, FILE *fpsave, struct obj_dat
     obj->action_description = str_hsh(buf);
     fread(&mod_type, sizeof(char), 3, fpsave);
   }
+  if(!strcmp("COS", mod_type))
+  {
+    fread(&obj->obj_flags.cost, sizeof(obj->obj_flags.cost), 1, fpsave);
+    fread(&mod_type, sizeof(char), 3, fpsave);
+  }
 
   // TODO - put extra desc support here
   // NEW READS GO HERE
@@ -1251,6 +1256,8 @@ obj->obj_flags.value[2]    != standard_obj->obj_flags.value[2])
     fwrite("MOF", sizeof(char), 3, fpsave);
     fwrite(&obj->obj_flags.more_flags, sizeof(obj->obj_flags.more_flags), 1, fpsave);   
   }
+
+
 /*
   if(obj->obj_flags.more_flags != standard_obj->obj_flags.more_flags)
   {
@@ -1272,6 +1279,13 @@ obj->obj_flags.value[2]    != standard_obj->obj_flags.value[2])
     fwrite("SZE", sizeof(char), 3, fpsave);
     fwrite(&obj->obj_flags.size, sizeof(obj->obj_flags.size), 1, fpsave);
   }
+*/
+  if(obj->obj_flags.weight != standard_obj->obj_flags.weight)
+    {
+      fwrite("WEI", sizeof(char), 3, fpsave);
+      fwrite(&obj->obj_flags.weight, sizeof(obj->obj_flags.weight), 1, fpsave);
+    }
+/*
 
   tmp_weight = obj->obj_flags.weight;
   if(GET_ITEM_TYPE(obj) == ITEM_CONTAINER && (loop_obj = obj->contains)
@@ -1346,6 +1360,13 @@ obj->obj_flags.value[2]    != standard_obj->obj_flags.value[2])
     fwrite(&length, sizeof(length), 1, fpsave);
     fwrite(obj->action_description, sizeof(char), length, fpsave);
   }
+
+  if(obj->obj_flags.cost != standard_obj->obj_flags.cost)
+  {
+    fwrite("COS", sizeof(char), 3, fpsave);
+    fwrite(&obj->obj_flags.cost, sizeof(obj->obj_flags.cost), 1, fpsave);
+  }
+
   // extra descs are a little strange...it's a pointer to a list of them
   // I don't really want to handle this right now, so I'm going to just ignore them now
   // TODO - figure out a way to save extra descs later.  I'll just make them impossible

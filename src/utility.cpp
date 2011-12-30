@@ -17,7 +17,7 @@
  *                         except Pir and Valk                             *
  * 10/19/2003   Onager     Took out super-secret hidey code from CAN_SEE() *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.118 2011/12/26 12:54:25 jhhudso Exp $ */
+/* $Id: utility.cpp,v 1.119 2011/12/30 05:00:21 jhhudso Exp $ */
 
 extern "C"
 {
@@ -1849,6 +1849,13 @@ int number( int from, int to )
 
     number = from + (int)((double)number * ((double)random() / ((double)RAND_MAX + 1.0)));
     return number;
+}
+
+int random_percent_change(int from, int to, int value) {
+	fprintf(stderr, "%d changed to ", value);
+	int ret = ((number(from, to) / 100.0) * value)+value;
+	fprintf(stderr, "%d\n", ret);
+	return ret;
 }
 
 
