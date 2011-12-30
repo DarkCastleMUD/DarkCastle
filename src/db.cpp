@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.209 2011/12/30 05:00:21 jhhudso Exp $ */
+/* $Id: db.cpp,v 1.210 2011/12/30 05:01:19 jhhudso Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -3945,12 +3945,12 @@ void randomize_object(obj_data *obj)
 	case ITEM_ARMOR:
 		obj->obj_flags.weight = random_percent_change(-33, 33, obj->obj_flags.weight);
 		obj->obj_flags.cost = random_percent_change(-33, 33, obj->obj_flags.cost);
-		obj->obj_flags.value[1] = random_percent_change(-20, 20, obj->obj_flags.value[1]);
+		obj->obj_flags.value[1] = random_percent_change(-25, 25, obj->obj_flags.value[1]);
 		break;
 
 	case ITEM_WAND:
 		obj->obj_flags.cost = random_percent_change(-33, 33, obj->obj_flags.cost);
-		obj->obj_flags.value[2] = random_percent_change(-20, 20, obj->obj_flags.value[2]);
+		obj->obj_flags.value[2] = random_percent_change(-10, 10, obj->obj_flags.value[2]);
 		obj->obj_flags.value[3] = obj->obj_flags.value[2];
 		break;
 	}
