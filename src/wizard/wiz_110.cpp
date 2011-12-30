@@ -606,14 +606,14 @@ int do_install(struct char_data *ch, char *arg, int cmd)
 
   if (!*arg1 || !*type || !*arg2) {
     sprintf(err, "Usage: install <range #> <# of rooms> <world|obj|mob|zone|all>\n\r"
-                 "  ie.. install 291 100 m = installs mob range 29100-29199.\n\r");
+                 "  ie.. install 29100 100 m = installs mob range 29100-29199.\n\r");
     send_to_char(err, ch);
     return eFAILURE;
   }
 
   if (!(range = atoi(arg1))) {
     sprintf(err, "Usage: install <range #> <# of rooms> <world|obj|mob|zone|all>\n\r"
-                 "  ie.. install 291 100 m = installs mob range 29100-29199.\n\r");
+                 "  ie.. install 29100 100 m = installs mob range 29100-29199.\n\r");
     send_to_char(err, ch);
     return eFAILURE;
   }
@@ -625,7 +625,7 @@ int do_install(struct char_data *ch, char *arg, int cmd)
 
   if (!(numrooms = atoi(arg2))) {
     sprintf(err, "Usage: install <range #> <# of rooms> <world|obj|mob|zone|all>\n\r"
-                 "  ie.. install 291 100 m = installs mob range 29100-29199.\n\r");
+                 "  ie.. install 29100 100 m = installs mob range 29100-29199.\n\r");
     send_to_char(err, ch);
     return eFAILURE;
   }
@@ -655,7 +655,7 @@ int do_install(struct char_data *ch, char *arg, int cmd)
 
   if (type_ok != 1) {
     sprintf(err, "Usage: install <range #> <# of rooms> <world|obj|mob|zone|all>\n\r"
-                 "  ie.. install 291 100 m = installs mob range 29100-29199.\n\r");
+                 "  ie.. install 29100 100 m = installs mob range 29100-29199.\n\r");
     send_to_char(err, ch);
     return eFAILURE;
   }
@@ -672,7 +672,7 @@ int do_install(struct char_data *ch, char *arg, int cmd)
   } else {
     sprintf(err, "Error Code: %d\r\n"
                  "Usage: install <range #> <# of rooms> <world|obj|mob|zone|all>\n\r"
-                 "  ie.. install 291 100 m = installs mob range 29100-29199.\n\r", ret);
+                 "  ie.. install 29100 100 m = installs mob range 29100-29199.\n\r", ret);
   }
   send_to_char(err, ch);
   return eSUCCESS;
