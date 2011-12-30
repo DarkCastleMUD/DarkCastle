@@ -17,7 +17,7 @@
  *                         except Pir and Valk                             *
  * 10/19/2003   Onager     Took out super-secret hidey code from CAN_SEE() *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.119 2011/12/30 05:00:21 jhhudso Exp $ */
+/* $Id: utility.cpp,v 1.120 2011/12/30 22:25:40 jhhudso Exp $ */
 
 extern "C"
 {
@@ -1852,10 +1852,7 @@ int number( int from, int to )
 }
 
 int random_percent_change(int from, int to, int value) {
-	fprintf(stderr, "%d changed to ", value);
-	int ret = ((number(from, to) / 100.0) * value)+value;
-	fprintf(stderr, "%d\n", ret);
-	return ret;
+	return ((number(from, to) / 100.0) * value)+value;
 }
 
 
@@ -1884,10 +1881,10 @@ bool is_in_game(char_data *ch)
   case CON_EDITING:
   case CON_SEND_MAIL:
     return true;
-  default:
-    return false;
     break;
   }
+
+  return false;
 }
 
 void produce_coredump(void)

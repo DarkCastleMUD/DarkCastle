@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.211 2011/12/30 05:10:31 jhhudso Exp $ */
+/* $Id: db.cpp,v 1.212 2011/12/30 22:25:40 jhhudso Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -3926,6 +3926,46 @@ struct obj_data *clone_object(int nr)
   return obj;  
 }
 
+void randomize_object_affects(obj_data *obj) {
+	if (obj == NULL) {
+		return;
+	}
+
+	// Don't alter godload
+	if (IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL)) {
+		return;
+	}
+
+	for(int i = 0; i < obj->num_affects; i++) {
+	    switch(obj->affected[i].location) {
+	    case APPLY_STR:
+	    case APPLY_DEX:
+	    case APPLY_INT:
+	    case APPLY_WIS:
+	    case APPLY_CON:
+	    	if (number(1,100) <= 33) {
+	    		obj->affected[i].modifier += number(-1,1);
+	    	}
+	    	break;
+	    case APPLY_LIGHTNING_SHIELD:
+	    case WEP_FIREBALL:
+	    case WEP_FLAMESTRIKE:
+	    case WEP_DISPEL_EVIL:
+	    case WEP_MAGIC_MISSILE:
+	    case WEP_METEOR_SWARM:
+	    case APPLY_HIT:
+	    case APPLY_MOVE:
+	    case APPLY_MANA:
+	    case APPLY_KI:
+	    case APPLY_HIT_N_DAM:
+	    case APPLY_HITROLL:
+	    case APPLY_DAMROLL:
+	    	obj->affected[i].modifier = random_percent_change(-33, 33, obj->affected[i].modifier);
+	    	break;
+	    }
+	}
+}
+
 void randomize_object(obj_data *obj)
 {
 	if (obj == NULL) {
@@ -3936,43 +3976,27 @@ void randomize_object(obj_data *obj)
 
 	switch (obj->obj_flags.type_flag) {
 	case ITEM_WEAPON:
-		fprintf(stderr, "%d:weight ", obj_index[obj->item_number].virt);
 		obj->obj_flags.weight = random_percent_change(-33, 33, obj->obj_flags.weight);
 		obj->obj_flags.cost = random_percent_change(-33, 33, obj->obj_flags.cost);
 		obj->obj_flags.value[1] = random_percent_change(-20, 20, obj->obj_flags.value[1]);
 		obj->obj_flags.value[2] = random_percent_change(-20, 20, obj->obj_flags.value[2]);
+		randomize_object_affects(obj);
 		break;
 	case ITEM_ARMOR:
 		obj->obj_flags.weight = random_percent_change(-33, 33, obj->obj_flags.weight);
 		obj->obj_flags.cost = random_percent_change(-33, 33, obj->obj_flags.cost);
+		// AC-apply
 		obj->obj_flags.value[1] = random_percent_change(-25, 25, obj->obj_flags.value[1]);
-
-		for(int i = 0; i < obj->num_affects; i++)
-		  {
-		    switch(obj->affected[i].location) {
-		    case APPLY_LIGHTNING_SHIELD:
-		    case SPELL_BURNING_HANDS:
-		    case SPELL_FIREBALL:
-		    case SPELL_FIRESTORM:
-		    case SPELL_HELLSTREAM:
-		    case SPELL_MAGIC_MISSILE:
-		    case SPELL_METEOR_SWARM:
-		    case SPELL_LIGHTNING_BOLT:
-		    case SPELL_CHILL_TOUCH:
-		    	obj->affected[i].modifier = random_percent_change(-33, 33, obj->affected[i].modifier);
-		    	break;
-		    }
-		  }
+		randomize_object_affects(obj);
 		break;
-
 	case ITEM_WAND:
 		obj->obj_flags.cost = random_percent_change(-33, 33, obj->obj_flags.cost);
+		// total charges
 		obj->obj_flags.value[2] = random_percent_change(-10, 10, obj->obj_flags.value[2]);
+		// current charges
 		obj->obj_flags.value[3] = obj->obj_flags.value[2];
 		break;
 	}
-
-
 }
 
 
