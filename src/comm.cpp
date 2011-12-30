@@ -292,7 +292,7 @@ int write_hotboot_file(char **new_argv)
   log("Shutting down xmlrpc server.", 0, LOG_MISC);
   xmlrpc_s->shutdown();
 
-  chdir("../src/");
+  chdir("../bin/");
 
   char **argv;
   if (new_argv) {
@@ -308,8 +308,9 @@ int write_hotboot_file(char **new_argv)
     argv_string << argv[index++];
     argv_string << " ";
   }
-
-  logf(108, LOG_GOD, "Hotbooting %s.", argv_string.str().c_str());
+  char *buffer = new char[100];
+  getcwd(buffer, 99);
+  logf(108, LOG_GOD, "Hotbooting %s at [%s]", argv_string.str().c_str(), buffer);
 
   if(-1 == execv(argv[0], argv)) {
     log("Hotboot execv call failed.", 0, LOG_MISC);
