@@ -3,3 +3,4 @@ research*
 *.kdev*
 callgrind.out.*
 dcastle.debug
+dcastle.*
