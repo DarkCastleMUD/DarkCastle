@@ -5893,9 +5893,20 @@ int spell_weaken(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data 
 	  af.modifier = str;
 	  af.location = APPLY_STR;
 	  af.bitvector = -1;
+	  // Modify the affect's strength modifier if it would cause the victim to go negative
+	  int possible_str = GET_STR_BONUS(victim) + af.modifier + GET_RAW_STR(victim);
+	  if (possible_str < 0) {
+		  af.modifier -= possible_str;
+	  }
 	  affect_to_char(victim, &af);
+
 	  af.modifier = con;
 	  af.location = APPLY_CON;
+	  // Modify the affect's constitution modifier if it would cause the victim to go negative
+	  int possible_con = GET_CON_BONUS(victim) + af.modifier + GET_RAW_CON(victim);
+	  if (possible_con < 0) {
+		  af.modifier -= possible_con;
+	  }
 	  affect_to_char(victim, &af);
 
 	  check_weapon_weights(victim);
