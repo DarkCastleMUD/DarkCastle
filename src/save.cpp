@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: save.cpp,v 1.68 2011/12/31 00:49:31 jhhudso Exp $ */
+/* $Id: save.cpp,v 1.69 2011/12/31 01:18:20 jhhudso Exp $ */
 
 extern "C"
 {
@@ -1279,13 +1279,13 @@ obj->obj_flags.value[2]    != standard_obj->obj_flags.value[2])
     fwrite("SZE", sizeof(char), 3, fpsave);
     fwrite(&obj->obj_flags.size, sizeof(obj->obj_flags.size), 1, fpsave);
   }
-*/
+
   if(obj->obj_flags.weight != standard_obj->obj_flags.weight)
     {
       fwrite("WEI", sizeof(char), 3, fpsave);
       fwrite(&obj->obj_flags.weight, sizeof(obj->obj_flags.weight), 1, fpsave);
     }
-/*
+
 
   tmp_weight = obj->obj_flags.weight;
   if(GET_ITEM_TYPE(obj) == ITEM_CONTAINER && (loop_obj = obj->contains)
