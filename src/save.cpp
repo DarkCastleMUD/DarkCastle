@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: save.cpp,v 1.67 2011/12/30 05:00:21 jhhudso Exp $ */
+/* $Id: save.cpp,v 1.68 2011/12/31 00:49:31 jhhudso Exp $ */
 
 extern "C"
 {
@@ -1297,8 +1297,6 @@ obj->obj_flags.value[2]    != standard_obj->obj_flags.value[2])
     fwrite("WEI", sizeof(char), 3, fpsave);
     fwrite(&tmp_weight, sizeof(tmp_weight), 1, fpsave);
   }
-
-
   change = (obj->num_affects != standard_obj->num_affects);
   // since they aren't always in the same order (builder might have swapped them in an
   // rsave or something) we have to search through for each one to see if they are there,
@@ -1312,16 +1310,17 @@ obj->obj_flags.value[2]    != standard_obj->obj_flags.value[2])
           (obj->affected[iAffect].modifier == standard_obj->affected[iAff2].modifier))
         change = 0;
   }
-  if(change) {
-    fwrite("AFF", sizeof(char), 3, fpsave);
-    fwrite(&obj->num_affects, sizeof(obj->num_affects), 1, fpsave);
-    for (iAffect = 0; iAffect < obj->num_affects; iAffect++)
-    {
-      fwrite(&obj->affected[iAffect].location, sizeof(obj->affected[iAffect].location), 1, fpsave);
-      fwrite(&obj->affected[iAffect].modifier, sizeof(obj->affected[iAffect].modifier), 1, fpsave);
-    }
+  */
+  if (IS_SET(obj->obj_flags.more_flags, ITEM_CUSTOM)) {
+	  fwrite("AFF", sizeof(char), 3, fpsave);
+	  fwrite(&obj->num_affects, sizeof(obj->num_affects), 1, fpsave);
+	  for (int iAffect = 0; iAffect < obj->num_affects; iAffect++)
+	  {
+		fwrite(&obj->affected[iAffect].location, sizeof(obj->affected[iAffect].location), 1, fpsave);
+		fwrite(&obj->affected[iAffect].modifier, sizeof(obj->affected[iAffect].modifier), 1, fpsave);
+	  }
   }
-*/
+
   int i;
   for (i = 0; i < obj->num_affects; i++)
   {

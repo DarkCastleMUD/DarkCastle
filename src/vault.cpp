@@ -120,6 +120,10 @@ bool fullSave(obj_data *obj)
     return 0;
   }
   
+  if (IS_SET(obj->obj_flags.more_flags, ITEM_CUSTOM)) {
+	  return 1;
+  }
+
   if (strcmp(GET_OBJ_SHORT(obj), GET_OBJ_SHORT(tmp_obj)))
     return 1;
 
@@ -185,11 +189,43 @@ void copySaveData(obj_data *new_obj, obj_data *obj)
   if (obj->obj_flags.type_flag == ITEM_STAFF && obj->obj_flags.value[2] != new_obj->obj_flags.value[2])
   	new_obj->obj_flags.value[2] = obj->obj_flags.value[2];
 
-  if (obj->obj_flags.type_flag == ITEM_WAND && obj->obj_flags.value[2] != new_obj->obj_flags.value[2])
+  if (obj->obj_flags.type_flag == ITEM_WAND && obj->obj_flags.value[2] != new_obj->obj_flags.value[2]) {
   	new_obj->obj_flags.value[2] = obj->obj_flags.value[2];
+  	if (IS_SET(obj->obj_flags.more_flags, ITEM_CUSTOM)) {
+  		new_obj->obj_flags.value[3] = obj->obj_flags.value[3];
+  	}
+  }
 
   if (obj->obj_flags.type_flag == ITEM_DRINKCON && obj->obj_flags.value[1] != new_obj->obj_flags.value[1])
   	new_obj->obj_flags.value[1] = obj->obj_flags.value[1];
+
+  if (obj->obj_flags.type_flag == ITEM_WEAPON && IS_SET(obj->obj_flags.more_flags, ITEM_CUSTOM)) {
+	  new_obj->obj_flags.weight = obj->obj_flags.weight;
+	  new_obj->obj_flags.cost = obj->obj_flags.cost;
+	  new_obj->obj_flags.value[1] = obj->obj_flags.value[1];
+	  new_obj->obj_flags.value[2] = obj->obj_flags.value[2];
+
+	  if (obj->num_affects == new_obj->num_affects) {
+		  for(int i=0; i < obj->num_affects; ++i) {
+			  new_obj->affected[i].location = obj->affected[i].location;
+			  new_obj->affected[i].modifier = obj->affected[i].modifier;
+		  }
+	  }
+  }
+
+  if (obj->obj_flags.type_flag == ITEM_ARMOR && IS_SET(obj->obj_flags.more_flags, ITEM_CUSTOM)) {
+	  new_obj->obj_flags.weight = obj->obj_flags.weight;
+	  new_obj->obj_flags.cost = obj->obj_flags.cost;
+	  new_obj->obj_flags.value[1] = obj->obj_flags.value[1];
+	  new_obj->obj_flags.value[2] = obj->obj_flags.value[2];
+	  if (obj->num_affects == new_obj->num_affects) {
+		  for(int i=0; i < obj->num_affects; ++i) {
+			  new_obj->affected[i].location = obj->affected[i].location;
+			  new_obj->affected[i].modifier = obj->affected[i].modifier;
+		  }
+	  }
+  }
+
 
   return;
 }
@@ -1133,7 +1169,7 @@ struct obj_data *get_obj_in_vault(struct vault_data *vault, char *object, int nu
   int i = 1, j;
 
   for (items = vault->items;items;items = items->next) {
-    obj = items->obj?items->obj:get_obj(items->item_vnum);
+    obj = items->obj ? items->obj : get_obj(items->item_vnum);
 //    obj = get_obj(items->item_vnum);
     if (obj && isname(object, GET_OBJ_NAME(obj))) 
     {
@@ -1421,7 +1457,8 @@ void item_remove(obj_data *obj, struct vault_data *vault) {
 
   for (item = vault->items; item ; item = next_item) {
     next_item = item->next;
-    if ((!fullSave(obj) && (!item->obj || !fullSave(item->obj)) && item->item_vnum == vnum) || (item->obj && fullItemMatch(obj, item->obj))) {
+    if ( (!fullSave(obj) && (!item->obj || !fullSave(item->obj)) && item->item_vnum == vnum) ||
+    	 (item->obj && fullItemMatch(obj, item->obj)) ) {
       if (item->count > 1) {
         item->count--;
         vault->weight -= GET_OBJ_WEIGHT(get_obj(vnum));
