@@ -1,7 +1,3 @@
-#---
-# New makefile for DC
-# 11/24/95
-#---
 CXX = g++
 SRC_DIR=.
 SRCS = $(shell find $(SRC_DIR) -maxdepth 2 -name "*.cpp")
@@ -9,15 +5,12 @@ SRCS = $(shell find $(SRC_DIR) -maxdepth 2 -name "*.cpp")
 OBJS = $(SRCS:.cpp=.o)
 
 #FAST_FLAGS  = -02
-DEBUG_FLAGS = -g3 -O3 -ggdb3
+DEBUG_FLAGS = -O3 -ggdb3
 PROF_FLAGS = $(DEBUG_FLAGS) -pg
 
-#LDFLAGS = -lg++ -lgcc -lm -lc -lg -lWiz -lClass
-#Changed when we switched to Linux Mandrake - Pir
-#LDFLAGS = -lstdc++ -lcrypt -lgcc -lm -lc -lg -lWiz -lClass
-LDFLAGS = -L/emul/linux/x86/lib -L/usr/local/lib -lcrypt -lmcheck -lz -lpq -lxmlrpc++
+LDFLAGS = -L/usr/local/lib -lcrypt -lmcheck -lz -lpq -lxmlrpc++
 CYGWIN_LDFLAGS = -L/emul/linux/x86/lib -L/usr/local/lib32 -lcrypt -lz -lpq /usr/local/lib/libXmlRpc.a
-IN_CXXFLAGS = -Wall -I./include -DLINUX -m32 -Wno-write-strings -I/usr/include/pgsql/
+IN_CXXFLAGS = -Wall -Wno-write-strings -DLINUX -m32 -Iinclude -I/usr/include/pgsql/
 
 BASENAME = dcastle# Base product name -- NO SPACES
 
