@@ -4,3 +4,4 @@ research*
 callgrind.out.*
 dcastle.debug
 dcastle.*
+*.os
