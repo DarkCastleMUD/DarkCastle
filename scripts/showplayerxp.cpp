@@ -1,4 +1,5 @@
 #include <iostream>
+#include <string.h>
 #include "connect.h"
 #include "utility.h"
 #include "db.h"
@@ -9,6 +10,9 @@ void store_to_char(struct char_file_u *st, CHAR_DATA *ch);
 int store_to_char_variable_data(CHAR_DATA * ch, FILE * fpsave);
 int read_pc_or_mob_data(CHAR_DATA *ch, FILE *fpsave);
 struct obj_data *  obj_store_to_char(CHAR_DATA *ch, FILE *fpsave, struct obj_data * last_cont );
+
+CVoteData *DCVote;
+bool verbose_mode = FALSE;
 
 bool my_load_char_obj( struct descriptor_data *d, char *name )
 {
@@ -81,7 +85,19 @@ int main(int argc, char **argv)
   create_blank_item(1);
 
   my_load_char_obj(d, argv[1]);
-  cout << "Gold: " << d->character->gold << " Plat: " << d->character->plat << " XP: " << d->character->exp << " HP: " << d->character->raw_hit << " hpmeta: " << d->character->hpmetas << " Con: " << d->character->con << d->character->raw_con << ", " << d->character->con_bonus << endl;
+  cout << "Gold: " << d->character->gold << " Plat: " << d->character->plat << " XP: " << d->character->exp << " HP: " << d->character->raw_hit << " hpmeta: " << d->character->hpmetas << " Con: " << int(d->character->con) << "," << int(d->character->raw_con) << "," << int(d->character->con_bonus) << endl;
+
+  int equip_count = 0;
+  char_data *ch = d->character;
+  for (int iWear = 0; iWear < MAX_WEAR; iWear++)
+    {
+      if (ch->equipment[iWear])
+      {
+        //obj_data *obj = ch->equipment[iWear];
+        equip_count++;
+      }
+    }
   
+  cout << "Equipped count: " << equip_count << endl;
   return 0;
 }
