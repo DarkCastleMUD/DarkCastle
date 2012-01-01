@@ -1,14 +1,22 @@
 import glob
 
 env = Environment()
-env.Append(CCFLAGS = '-ggdb3 -Wall -Wno-write-strings -m32')
-env.Append(LINKFLAGS = '-ggdb3 -Wall -Wno-write-strings -m32')
+env.Append(CCFLAGS = '-ggdb3 -Wall -m32 -O3 -Wno-write-strings')
+env.Append(LINKFLAGS = '-ggdb3 -Wall -m32 -O3 -Wno-write-strings' )
 
-base_src = glob.glob('*.cpp')
+base_src = glob.glob('[a-l]*.cpp') + glob.glob('[n-z]*.cpp') + glob.glob('mo*.cpp') + ['magic.cpp','memory.cpp','meta.cpp','MobActivity.cpp']
 wizard_src = glob.glob('wizard/*.cpp')
 class_src = glob.glob('class/*.cpp')
 backend_src = glob.glob('Backend/*.cpp')
 
-env.Program('dcastle.debug', [base_src,wizard_src,class_src,backend_src],
+env.Program('dcastle.debug', ['main.cpp'],
+CPPPATH = ['include'], CPPDEFINES=['LINUX'],
+LIBS=['dcastle','crypt', 'mcheck', 'z', 'pq', 'XmlRpc'], LIBPATH=['.']);
+
+env.Program('showplayer', ['../scripts/showplayerxp.cpp'],
+CPPPATH = ['include'], CPPDEFINES=['LINUX'],
+LIBS=['dcastle','crypt', 'mcheck', 'z', 'pq', 'XmlRpc'], LIBPATH=['.']);
+
+env.StaticLibrary('dcastle', [base_src,wizard_src,class_src,backend_src],
 CPPPATH = ['include','/usr/include/pgsql/'], CPPDEFINES=['LINUX'],
-LIBS=['crypt', 'mcheck', 'z', 'pq', 'XmlRpc'], LIBPATH=['/emul/linux/x86/lib', '/usr/local/lib32']);
+LIBS=[], LIBPATH=['/emul/linux/x86/lib', '/usr/local/lib32']);
