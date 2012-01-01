@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.198 2011/12/04 18:53:57 jhhudso Exp $ */
+/* $Id: mob_proc.cpp,v 1.199 2012/01/01 22:16:49 jhhudso Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -1560,7 +1560,7 @@ static char *dethSayText [ ] =
   "Our f@th3r, wh0 0wnz heaven, j00 r0ck! May @11 0ur base som3day b310ng 2 u! 4m3n.",
   "Trojan Condoms?  Wasn't the Trojan horse just a trick to get men inside so they could burst out and go everywhere?",
   "Roses are red, violets are blue.  All of my base, are belong to you.",
-  "The 'bishop' came to my church Sunday.  What am impostor!  He never once moved diagonally.",
+  "The 'bishop' came to my church Sunday.  What an impostor!  He never once moved diagonally.",
   "A turtle's weakness is being on its back.  So if you tape 2 together they are unstoppable.",
   "I tried to change my Hotmail password to 'penis' but it said my password was too small.",
   "Real life needs a freaking search function.  I can never find my damn carkeys.",
