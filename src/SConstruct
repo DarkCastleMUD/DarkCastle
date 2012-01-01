@@ -19,4 +19,4 @@ LIBS=['dcastle','crypt', 'mcheck', 'z', 'pq', 'xmlrpc++'], LIBPATH=['.']);
 
 env.StaticLibrary('dcastle', [base_src,wizard_src,class_src,backend_src],
 CPPPATH = ['include','/usr/include/pgsql/'], CPPDEFINES=['LINUX'],
-LIBS=[], LIBPATH=['/emul/linux/x86/lib', '/usr/local/lib32']);
+LIBS=[], LIBPATH=['/usr/local/lib']);
