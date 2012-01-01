@@ -156,10 +156,18 @@ struct quest_info * get_quest_struct(char *name)
    struct quest_info *quest;
 
     for (quest_list_t::iterator node = quest_list.begin(); node != quest_list.end(); node++) {
-	quest = *node;
-	
-	if(!str_nosp_cmp(name, quest->name))
-	    return quest;
+		quest = *node;
+
+		if(!str_nosp_cmp(name, quest->name))
+			return quest;
+
+		if (atoi(name) == 0 && name[0] != '0') {
+			continue;
+		}
+
+		if (quest->number == atoi(name)) {
+			return quest;
+		}
     }
 
     return 0;
@@ -406,8 +414,8 @@ int show_one_available_quest(CHAR_DATA *ch, struct quest_info *quest, int count)
     char buffer[MAX_STRING_LENGTH];
     // Create a format string based on a space offset that takes color codes into account
     snprintf(buffer, MAX_STRING_LENGTH,
-	     " $B$2Name:$7 %%-%ds$R Cost: %%-4d%%1s Reward: %%-4d\n\r",
-	     35 + (strlen(quest->name) - nocolor_strlen(quest->name)));
+	     "$B$7%3d. $2Name:$7 %%-%ds$R Cost: %%-4d%%1s Reward: %%-4d\n\r",
+	     quest->number, 35 + (strlen(quest->name) - nocolor_strlen(quest->name)));
     
     csendf(ch, buffer, quest->name, quest->cost, quest->brownie ? "$5*$R" : "", quest->reward);
    return ++count;
@@ -754,7 +762,7 @@ int quest_handler(CHAR_DATA *ch, CHAR_DATA *qmaster, int cmd, char *name)
    if(cmd != 1) {
      quest = get_quest_struct(name);
      if (quest == 0) {
-       csendf(ch, "That is not a valid quest name.\n\r");
+       csendf(ch, "That is not a valid quest name or number.\n\r");
        return eFAILURE;
      }
    }
@@ -988,15 +996,15 @@ int do_quest(CHAR_DATA *ch, char *arg, int cmd)
        send_to_char("All quests have been reset.\n\r", ch);
        return retval;
    } else {
-      csendf(ch, "Usage: quest current       (lists current quests)\n\r"
-                 "       quest completed     (lists completed quests)\n\r"
-                 "       quest canceled      (lists canceled quests)\n\r\n\r"
+      csendf(ch, "Usage: quest current            (lists current quests)\n\r"
+                 "       quest completed          (lists completed quests)\n\r"
+                 "       quest canceled           (lists canceled quests)\n\r\n\r"
                  "The following commands may only be used at the Quest Master.\n\r"
-                 "       quest list          (lists available quests)\n\r"
-                 "       quest cancel <name> (cancel the current quest)\n\r"
-                 "       quest start <name>  (starts a new quest)\n\r"
-                 "       quest finish <name> (finishes a current quest)\n\r"
-    		     "       quest reset         (reset all quests. costs 2k plats, 1 brownie)\n\r"
+                 "       quest list               (lists available quests)\n\r"
+                 "       quest cancel <name or #> (cancel the current quest)\n\r"
+                 "       quest start <name or #>  (starts a new quest)\n\r"
+                 "       quest finish <name or #> (finishes a current quest)\n\r"
+    		     "       quest reset              (reset all quests. costs 2k plats, 1 brownie)\n\r"
                  "\n\r");
       return eFAILURE;
    }
