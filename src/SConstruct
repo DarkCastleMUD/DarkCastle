@@ -11,11 +11,11 @@ backend_src = glob.glob('Backend/*.cpp')
 
 env.Program('dcastle.debug', ['main.cpp'],
 CPPPATH = ['include'], CPPDEFINES=['LINUX'],
-LIBS=['dcastle','crypt', 'mcheck', 'z', 'pq', 'xmlrpc++'], LIBPATH=['.']);
+LIBS=['dcastle','crypt', 'mcheck', 'z', 'pq', 'xmlrpc++'], LIBPATH=['.','/usr/local/lib']);
 
 env.Program('showplayer', ['../scripts/showplayerxp.cpp'],
 CPPPATH = ['include'], CPPDEFINES=['LINUX'],
-LIBS=['dcastle','crypt', 'mcheck', 'z', 'pq', 'xmlrpc++'], LIBPATH=['.']);
+LIBS=['dcastle','crypt', 'mcheck', 'z', 'pq', 'xmlrpc++'], LIBPATH=['.','/usr/local/lib']);
 
 env.StaticLibrary('dcastle', [base_src,wizard_src,class_src,backend_src],
 CPPPATH = ['include','/usr/include/pgsql/'], CPPDEFINES=['LINUX'],
