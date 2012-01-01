@@ -5,3 +5,6 @@ callgrind.out.*
 dcastle.debug
 dcastle.*
 *.os
+libdcastle.so
+showplayer
+libdcastle.a
