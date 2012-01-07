@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.198 2011/12/06 04:18:53 jhhudso Exp $ */
+/* $Id: handler.cpp,v 1.199 2012/01/07 04:21:53 jhhudso Exp $ */
     
 extern "C"
 {
@@ -2106,7 +2106,8 @@ int equip_char(CHAR_DATA *ch, struct obj_data *obj, int pos, int flag)
     }
     if(ch->equipment[pos])
     {
-       log("Already equipped in equip_char!", ANGEL, LOG_BUG);
+       logf(ANGEL, LOG_BUG, "%s already equipped at position %d in equip_char!", GET_NAME(ch), pos);
+       produce_coredump();
        return 0;
     }
     if (IS_AFFECTED(ch, AFF_CHARM) && (pos == WIELD || pos == SECOND_WIELD))
