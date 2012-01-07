@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: db.h,v 1.38 2012/01/07 04:33:42 jhhudso Exp $ */
+/* $Id: db.h,v 1.39 2012/01/07 23:28:32 jhhudso Exp $ */
 #ifndef DB_H_
 #define DB_H_
 
@@ -34,6 +34,7 @@ using namespace std;
 
 extern struct obj_data  *object_list;
 
+struct index_data;
 struct error_eof {};
 struct error_negative_int {};
 struct error_range_int {};
@@ -142,8 +143,10 @@ uint64_t fread_uint(FILE *fl, uint64_t minval, uint64_t maxval);
 char fread_char (FILE *fl);
 void add_mobspec(int i);
 void write_object_csv(obj_data * obj, ofstream &fout);
+index_data *generate_obj_indices(int *top, index_data *index);
 
 extern struct skill_quest *skill_list; 
+extern index_data mob_index_array[MAX_INDEX];
 #define REAL 0
 #define VIRTUAL 1
 
