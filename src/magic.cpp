@@ -71,7 +71,7 @@ extern struct zone_data *zone_table;
 
 extern struct spell_info_type spell_info [ ];
 extern bool str_prefix(const char *astr, const char *bstr);
-
+extern void wear(struct char_data *ch, struct obj_data *obj_object, int keyword);
 
 /* Extern Procedures */
 
@@ -2984,7 +2984,7 @@ int spell_remove_curse(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
 			SET_BIT(obj->obj_flags.extra_flags, ITEM_HUM);
 		struct char_data *t = obj->equipped_by;
 		int z = -1;
-	extern void wear(struct char_data *ch, struct obj_data *obj_object, int keyword);
+
 		if (t->equipment[WEAR_FINGER_L] == obj)
 			z = WEAR_FINGER_L;
 		else
