@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: db.h,v 1.37 2011/12/30 05:00:21 jhhudso Exp $ */
+/* $Id: db.h,v 1.38 2012/01/07 04:33:42 jhhudso Exp $ */
 #ifndef DB_H_
 #define DB_H_
 
@@ -43,7 +43,7 @@ struct error_range_int {};
                                      // doing a 'goto 1831919131928' and 
                                      // creating it
 
-#define MAX_ZONE    165 
+#define MAX_ZONE    200
 #define MAX_INDEX   6000
 #define MAX_RESET  16383
 #ifndef LONG_MAX
