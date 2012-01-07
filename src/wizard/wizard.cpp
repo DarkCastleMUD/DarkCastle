@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: wizard.cpp,v 1.74 2010/02/19 06:09:18 jhhudso Exp $
+| $Id: wizard.cpp,v 1.75 2012/01/07 04:24:16 jhhudso Exp $
 | wizard.C
 | Description:  Utility functions necessary for wiz commands.
 */
@@ -122,7 +122,7 @@ void do_mload(struct char_data *ch, int rnum, int cnt)
 }    
 
 
-void do_oload(struct char_data *ch, int rnum, int cnt)
+void do_oload(struct char_data *ch, int rnum, int cnt, bool random)
 {    
   struct obj_data *obj = NULL;
   char buf[MAX_STRING_LENGTH];
@@ -132,6 +132,10 @@ void do_oload(struct char_data *ch, int rnum, int cnt)
      
   for (i=1; i<= cnt; i++) {
     obj = clone_object(rnum);
+    if (random == true) {
+    	randomize_object(obj);
+    }
+
     if ( (obj->obj_flags.type_flag == ITEM_MONEY) &&
          (GET_LEVEL(ch) < OVERSEER)) {
        extract_obj(obj);

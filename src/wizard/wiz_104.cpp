@@ -92,6 +92,8 @@ int do_load(struct char_data *ch, char *arg, int cmd)
   char name[MAX_INPUT_LENGTH];
   char arg2[MAX_INPUT_LENGTH];
   char arg3[MAX_INPUT_LENGTH];
+  char qty[MAX_INPUT_LENGTH];
+  char random[MAX_INPUT_LENGTH];
   char buf[MAX_STRING_LENGTH];
 
   char *c;
@@ -119,11 +121,12 @@ int do_load(struct char_data *ch, char *arg, int cmd)
 
   half_chop(arg, type, arg2);
 
-  if(cmd == 9 && (!*type || !*arg2)) {
-    send_to_char("Usage:  load <mob|obj> <name|vnum>\n\r", ch);
+  if(cmd == CMD_DEFAULT && (!*type || !*arg2)) {
+    send_to_char("Usage:  load <mob> <name|vnum> [qty]\n\r", ch);
+    send_to_char("        load <obj> <name|vnum> [qty] [random]\n\r", ch);
     return eFAILURE;
   } 
-  if (cmd == 999 && !*type) {
+  if (cmd == CMD_PRIZE && !*type) {
 
      *buf = '\0';
      send_to_char("[#  ] [OBJ #] OBJECT'S DESCRIPTION\n\n\r", ch);
@@ -150,17 +153,24 @@ int do_load(struct char_data *ch, char *arg, int cmd)
      return eFAILURE;
   }
 
-  if (cmd == 9) {
-  half_chop (arg2, name, arg3);
+  if (cmd == CMD_DEFAULT) {
+	  half_chop(arg2, name, arg3);
 
-  if (arg3[0]) cnt = atoi(arg3);
+	  if (arg3[0]) {
+		  cnt = atoi(arg3);
+		  half_chop(arg3, qty, random);
+	  }
 
-  if(cnt > 50)
-  {
-     send_to_char("Sorry, you can only load at most 50 of something at a time.\r\n", ch);
-     return eFAILURE;
-  } }
-  if (cmd == 9)
+	  if(cnt > 50)
+	  {
+		 send_to_char("Sorry, you can only load at most 50 of something at a time.\r\n", ch);
+		 return eFAILURE;
+	  }
+
+
+  }
+
+  if (cmd == CMD_DEFAULT)
   c = name;
   else
   c = type;
@@ -217,17 +227,17 @@ int do_load(struct char_data *ch, char *arg, int cmd)
           send_to_char("Why would you want to load that?\n\r", ch);
           return eFAILURE;
         }
-        else if (cmd == 999 && !isname("prize",((struct obj_data*)(obj_index[number].item))->name))
+        else if (cmd == CMD_PRIZE && !isname("prize",((struct obj_data*)(obj_index[number].item))->name))
 	{
 	send_to_char("This command can only load prize items.\r\n",ch);
 	return eFAILURE;
         }
-        else if(cmd != 999 && GET_LEVEL(ch) < DEITY && !can_modify_object(ch, num)) {
+        else if(cmd != CMD_PRIZE && GET_LEVEL(ch) < DEITY && !can_modify_object(ch, num)) {
           send_to_char("You may only load objects inside of your range.\n\r", ch);
           return eFAILURE;
         } 
 
-        do_oload(ch, number, cnt);
+        do_oload(ch, number, cnt, (random[0] == 'r'? true : false));
         return eSUCCESS;
       }
       if((num = obj_in_index(c, number)) == -1) {
@@ -247,7 +257,7 @@ int do_load(struct char_data *ch, char *arg, int cmd)
 	return eFAILURE;
         }
 
-      do_oload(ch, num, cnt);
+      do_oload(ch, num, cnt, (random[0] == 'r'? true : false));
       return eSUCCESS;
   }
   return eSUCCESS;

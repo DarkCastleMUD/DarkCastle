@@ -1,7 +1,7 @@
 #ifndef WIZARD_H_
 #define WIZARD_H_
 /************************************************************************
-| $Id: wizard.h,v 1.6 2007/01/13 03:49:26 dcastle Exp $
+| $Id: wizard.h,v 1.7 2012/01/07 04:24:16 jhhudso Exp $
 | wizard.h
 | Description:  This is NOT a global include file, it's used only
 |   for the wiz_1*.C files to consolidate the header files they
@@ -81,7 +81,7 @@ void obj_stat(CHAR_DATA *ch, struct obj_data *j);
 int number_or_name(char **name, int *num);
 int mob_in_index(char *name, int index);
 int obj_in_index(char *name, int index);
-void do_oload(CHAR_DATA *ch, int rnum, int cnt);
+void do_oload(CHAR_DATA *ch, int rnum, int cnt, bool random = false);
 void do_mload(CHAR_DATA *ch, int rnum, int cnt);
 void colorCharSend(char* s, struct char_data* ch);
 
