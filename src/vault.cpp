@@ -72,12 +72,12 @@ void item_remove(obj_data *obj, struct vault_data *vault);
 void item_add(int vnum, struct vault_data *vault);
 
 struct char_data *find_owner(char *name);
-void show_vault_log(CHAR_DATA *ch, char *owner);
+void vault_log(CHAR_DATA *ch, char *owner);
 int class_restricted(struct char_data *ch, struct obj_data *obj);
 int size_restricted(struct char_data *ch, struct obj_data *obj);
 int spell_identify(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill);
 char *clanVName(int c);
-void show_vault_search_usage(CHAR_DATA *ch);
+void vault_search_usage(CHAR_DATA *ch);
 
 extern struct index_data *obj_index;
 extern struct obj_data * search_char_for_item(char_data * ch, int16 item_number, bool wearOnly = FALSE);
@@ -326,7 +326,7 @@ void vault_access(CHAR_DATA *ch, char *who)
     add_vault_access(ch, who, vault);
 }
 
-void my_vault_access(CHAR_DATA *ch, char arg[MAX_INPUT_LENGTH])
+void vault_myaccess(CHAR_DATA *ch, char arg[MAX_INPUT_LENGTH])
 {
   struct vault_data *vault;
 
@@ -353,7 +353,7 @@ void my_vault_access(CHAR_DATA *ch, char arg[MAX_INPUT_LENGTH])
       csendf(ch, "%s\r\n", vault->owner);
 }
 
-void show_vault_balance(CHAR_DATA *ch, char *owner) {
+void vault_balance(CHAR_DATA *ch, char *owner) {
   struct vault_data *vault;
   int self = 0;
 
@@ -411,16 +411,16 @@ int do_vault(CHAR_DATA *ch, char *argument, int cmd)
   // show the contents of your or someone elses vault
   if (!strncmp(arg, "list", strlen(arg))) {
     if (!*arg1) sprintf(arg1, "%s", GET_NAME(ch));
-    show_vault(ch, arg1);
+    vault_list(ch, arg1);
 
   // show how much gold in vault
   } else if (!strncmp(arg, "balance", strlen(arg))) {
     if (!*arg1) sprintf(arg1, "%s", GET_NAME(ch));
-    show_vault_balance(ch, arg1);
+    vault_balance(ch, arg1);
 
   // show what vaults I have access to
   } else if (!strncmp(arg, "myaccess", strlen(arg))) {
-      my_vault_access(ch,arg1);
+      vault_myaccess(ch,arg1);
 
   // show my current access, add access, or remove access
   } else if (!strncmp(arg, "access", strlen(arg))) {
@@ -446,26 +446,26 @@ int do_vault(CHAR_DATA *ch, char *argument, int cmd)
 	  clanName << "clan" << clan->number;
 	  sprintf(arg1, "%s", clanName.str().c_str());
 
-	  show_vault_log(ch, arg1);
+	  vault_log(ch, arg1);
 	} else {
 	  send_to_char("You don't have access to view the clan's vault log.\n\r", ch);
 	  return eFAILURE;	  
 	}
       } else if (GET_LEVEL(ch) >= IMMORTAL) {
-	show_vault_log(ch, arg1);
+	vault_log(ch, arg1);
       } else {
 	send_to_char("Syntax: vault log <clan>\n\r", ch);
 	return eFAILURE;
       }
     } else {
       sprintf(arg1, "%s", GET_NAME(ch));
-      show_vault_log(ch, arg1);
+      vault_log(ch, arg1);
     }
   } else if (!strcmp(arg, "search")) {
     if (*arg1) {
       return vault_search(ch, arg1);
     } else {
-      show_vault_search_usage(ch);
+      vault_search_usage(ch);
       return eFAILURE;
     }
   // putting this here so that anything below it requires you to be in a safe room.
@@ -505,7 +505,7 @@ int do_vault(CHAR_DATA *ch, char *argument, int cmd)
       return eSUCCESS;
     } else if (!*arg2)
       sprintf(arg2, "%s", GET_NAME(ch));
-    put_in_vault(ch, argument, arg2);
+    vault_put(ch, argument, arg2);
 
   // get something from your or someone elses vault
   } else if (!strncmp(arg, "get", strlen(arg))) {
@@ -518,7 +518,7 @@ int do_vault(CHAR_DATA *ch, char *argument, int cmd)
       return eSUCCESS;
     } else if (!*arg2)
       sprintf(arg2, "%s", GET_NAME(ch));
-    get_from_vault(ch, argument, arg2);
+    vault_get(ch, argument, arg2);
 
   } else {
     send_to_char(vault_usage, ch);
@@ -618,7 +618,7 @@ void rename_vault_owner(char *oldname, char *newname) {
     vault->owner = str_dup(newname);
     save_vault(newname);
     sprintf(buf, "Vault owner changed from '%s' to '%s'.", oldname, newname);
-    vault_log(buf, newname);
+    vlog(buf, newname);
   }
 
   if (!vault) return;
@@ -640,7 +640,7 @@ void rename_vault_owner(char *oldname, char *newname) {
     for (access = vault->access;access;access = access->next) {
       if (!strcasecmp(access->name, oldname)) {
         sprintf(buf, "Replaced '%s' with '%s' in %s's vault access list.", access->name, newname, vault->owner);
-        vault_log(buf, vault->owner);
+        vlog(buf, vault->owner);
         free(access->name);
         access->name = str_dup(newname);
         save_vault(vault->owner);
@@ -930,7 +930,7 @@ void load_vaults(void) {
 	    //        log(buf, IMMORTAL, LOG_BUG);
 	  } else {
 	    sprintf(buf, "Invalid access entry found. Removing %s's access to %s.", value, vault->owner);
-	    vault_log(buf, vault->owner);
+	    vlog(buf, vault->owner);
 	    saveChanges = true;
 	  }
 
@@ -1030,7 +1030,7 @@ void remove_vault_accesses(char *name) {
       next_access = access->next;
       if (!strcasecmp(access->name, name)) {
         sprintf(buf, "Removed %s's access to %s's vault.", name, vault->owner);
-        vault_log(buf, vault->owner);
+        vlog(buf, vault->owner);
         access_remove(name, vault);
         save_vault(vault->owner);
       }
@@ -1236,7 +1236,7 @@ bool verify_item(struct obj_data **obj)
   return TRUE;
 }
 
-void get_from_vault(CHAR_DATA *ch, char *object, char *owner) {
+void vault_get(CHAR_DATA *ch, char *object, char *owner) {
   std::string sbuf;
   char obj_list[50][100];
   struct obj_data *obj, *tmp_obj;
@@ -1286,7 +1286,7 @@ void get_from_vault(CHAR_DATA *ch, char *object, char *owner) {
     }
     int amount=i;
     for (i=0;i<amount;i++)
-      get_from_vault(ch, obj_list[i], owner);
+      vault_get(ch, obj_list[i], owner);
     return;
   }
 
@@ -1309,7 +1309,7 @@ void get_from_vault(CHAR_DATA *ch, char *object, char *owner) {
 
      //start at end of the list and get each item all the way back to the first one.
     for (i = num; i > 0; i--) {
-      get_from_vault(ch, object, owner);
+      vault_get(ch, object, owner);
     }
     return;
   } else {
@@ -1368,7 +1368,7 @@ void get_from_vault(CHAR_DATA *ch, char *object, char *owner) {
       sbuf += "'s vault.";
     }
 
-    vault_log(sbuf.c_str(), owner);
+    vlog(sbuf.c_str(), owner);
     csendf(ch, "%s has been removed from the vault.\r\n", GET_OBJ_SHORT(obj));
   
     sbuf = GET_NAME(ch);
@@ -1525,7 +1525,7 @@ void vault_deposit(CHAR_DATA *ch, unsigned int amount, char *owner) {
     save_char_obj(ch);
     save_vault(owner);
     sprintf(buf, "%s added %d gold to %s's vault.", GET_NAME(ch), amount, owner);
-    vault_log(buf, owner);
+    vlog(buf, owner);
     csendf(ch, "Done!  The current balance is now %llu gold.\r\n", vault->gold);
   } else {
     csendf(ch, "But you only have %lld gold coins!\r\n", GET_GOLD(ch));
@@ -1573,7 +1573,7 @@ void vault_withdraw(CHAR_DATA *ch, unsigned int amount, char *owner) {
     save_char_obj(ch);
     save_vault(owner);
     sprintf(buf, "%s removed %d gold from %s's vault.", GET_NAME(ch), amount, owner);
-    vault_log(buf, owner);
+    vlog(buf, owner);
     csendf(ch, "Done!  The current balance is now %llu gold.\r\n", vault->gold);
   } else {
     csendf(ch, "The vault only has %llu gold coins in it!\r\n", vault->gold);
@@ -1636,7 +1636,7 @@ int can_put_in_vault(struct obj_data *obj, int self, struct vault_data *vault, s
   return 1;
 }
 
-void put_in_vault(CHAR_DATA *ch, char *object, char *owner) {
+void vault_put(CHAR_DATA *ch, char *object, char *owner) {
   struct obj_data *obj, *tmp_obj;
   struct vault_data *vault;
   char buf[MAX_INPUT_LENGTH];
@@ -1674,7 +1674,7 @@ void put_in_vault(CHAR_DATA *ch, char *object, char *owner) {
     else
 	snprintf(buf, MAX_INPUT_LENGTH, "%s added %s[%d] to %s's vault.", GET_NAME(ch), GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj), owner);
 
-      vault_log(buf, owner);
+      vlog(buf, owner);
       csendf(ch, "%s has been placed in the vault.\r\n", GET_OBJ_SHORT(obj));
 
     std::string sbuf;
@@ -1714,7 +1714,7 @@ void put_in_vault(CHAR_DATA *ch, char *object, char *owner) {
       else
 	  snprintf(buf, MAX_INPUT_LENGTH, "%s added %s[%d] to %s's vault.", GET_NAME(ch), GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj), owner);
 
-      vault_log(buf, owner);
+      vlog(buf, owner);
       csendf(ch, "%s has been placed in the vault.\r\n", GET_OBJ_SHORT(obj));
       if (!fullSave(obj)) {
         item_add(GET_OBJ_VNUM(obj), vault); extract_obj(obj); }
@@ -1739,7 +1739,7 @@ void put_in_vault(CHAR_DATA *ch, char *object, char *owner) {
     else
 	snprintf(buf, MAX_INPUT_LENGTH, "%s added %s[%d] to %s's vault.", GET_NAME(ch), GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj), owner);
 
-    vault_log(buf, owner);
+    vlog(buf, owner);
     csendf(ch, "%s has been placed in the vault.\r\n", GET_OBJ_SHORT(obj));
   
     if (!fullSave(obj)) {
@@ -1751,7 +1751,7 @@ void put_in_vault(CHAR_DATA *ch, char *object, char *owner) {
 }
 
 
-void show_vault(CHAR_DATA *ch, char *owner) {
+void vault_list(CHAR_DATA *ch, char *owner) {
   struct vault_items_data *items;
   struct vault_data *vault;
   struct obj_data *obj;
@@ -1903,7 +1903,7 @@ void add_new_vault(char *name, int indexonly) {
   dc_fclose(pvfl);
 
   sprintf(buf, "%s bought a vault.", name);
-  vault_log(buf, name);
+  vlog(buf, name);
 
   // files all done, now add it in game
   total_vaults++;
@@ -1941,7 +1941,7 @@ struct obj_data *get_obj(int vnum)
   return ((struct obj_data *)obj_index[num].item); 
 }
 
-void show_vault_log(CHAR_DATA *ch, char *owner)
+void vault_log(CHAR_DATA *ch, char *owner)
 {
   char buf[MAX_STRING_LENGTH];
   char fname[256];
@@ -1964,7 +1964,7 @@ void show_vault_log(CHAR_DATA *ch, char *owner)
   page_string(ch->desc, const_cast<char *>(buffer.str().c_str()), 1);
 }
 
-void vault_log(const char *message, const char *name) {
+void vlog(const char *message, const char *name) {
   struct tm *tm = NULL;
   long ct;
   FILE *ofile, *nfile;
@@ -2172,7 +2172,7 @@ int sleazy_vault_guy(struct char_data *ch, struct obj_data *obj, int cmd, char *
 }
 
 void
-show_vault_search_usage(CHAR_DATA *ch)
+vault_search_usage(CHAR_DATA *ch)
 {
   send_to_char("Usage: vault search [ keyword <keyword> ] | [ level <levels> ] | ...\r\n", ch);
   send_to_char("keyword <keyword>  -  Single word keyword. Can be used multiple times.\r\n", ch);
@@ -2206,7 +2206,7 @@ vault_search(CHAR_DATA *ch, char *args)
 
   args = one_argument(args, argument);
   if (argument[0] == '\0') {
-    show_vault_search_usage(ch);
+    vault_search_usage(ch);
     return eFAILURE;
   }
 
@@ -2219,7 +2219,7 @@ vault_search(CHAR_DATA *ch, char *args)
       args = one_argument(args, argument);
       if (argument[0] == '\0') {
         send_to_char("Missing keyword parameter.\r\n\r\n", ch);
-        show_vault_search_usage(ch);
+        vault_search_usage(ch);
         return eFAILURE;
       } else {
         parameter.type = KEYWORD;
@@ -2233,7 +2233,7 @@ vault_search(CHAR_DATA *ch, char *args)
       args = one_argument(args, argument);
       if (argument[0] == '\0') {
         send_to_char("Missing level parameter.\r\n\r\n", ch);
-        show_vault_search_usage(ch);
+        vault_search_usage(ch);
         return eFAILURE;
       } else {
         //start parsing level and level ranges
@@ -2246,7 +2246,7 @@ vault_search(CHAR_DATA *ch, char *args)
           // Check if a non numeric value is passed
           if (parameter.int_argument == 0 && level_string != "0") {
             send_to_char("Invalid level specified.\r\n\r\n", ch);
-            show_vault_search_usage(ch);
+            vault_search_usage(ch);
             return eFAILURE;
           }
 
@@ -2259,7 +2259,7 @@ vault_search(CHAR_DATA *ch, char *args)
           // Check if a non numeric value is passed
           if (parameter.int_argument == 0 && min_level_string != "0") {
             send_to_char("Invalid minimum level specified.\r\n\r\n", ch);
-            show_vault_search_usage(ch);
+            vault_search_usage(ch);
             return eFAILURE;
           }
 
@@ -2272,7 +2272,7 @@ vault_search(CHAR_DATA *ch, char *args)
           // Check if a non numeric value is passed
           if (parameter.int_argument == 0 && max_level_string != "0") {
             send_to_char("Invalid maximum level specified.\r\n\r\n", ch);
-            show_vault_search_usage(ch);
+            vault_search_usage(ch);
             return eFAILURE;
           }
 
@@ -2282,7 +2282,7 @@ vault_search(CHAR_DATA *ch, char *args)
       } // end of level parsing
     } else {
       send_to_char("Invalid argument.\r\n\r\n", ch);
-      show_vault_search_usage(ch);
+      vault_search_usage(ch);
       return eFAILURE;
     }
     args = one_argument(args, argument);
