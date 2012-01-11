@@ -168,36 +168,46 @@ void remove_from_object_list(obj_data *obj)
 void copySaveData(obj_data *new_obj, obj_data *obj)
 {
   int i;
-  if ((i = eq_current_damage(obj)) > 0)
-  {
+  if ((i = eq_current_damage(obj)) > 0) {
      for (;i>0;i--)
        damage_eq_once(new_obj);
   }
 
-  if (strcmp(GET_OBJ_SHORT(obj), GET_OBJ_SHORT(new_obj)))
-    GET_OBJ_SHORT(new_obj) = str_hsh(GET_OBJ_SHORT(obj));
-
-  if (strcmp(obj->name, new_obj->name))
-    new_obj->name = str_hsh(obj->name);
-
-  if (obj->obj_flags.extra_flags != new_obj->obj_flags.extra_flags)
-	new_obj->obj_flags.extra_flags = obj->obj_flags.extra_flags;
-
-  if (obj->obj_flags.more_flags != new_obj->obj_flags.more_flags)
-	new_obj->obj_flags.more_flags = obj->obj_flags.more_flags;
-
-  if (obj->obj_flags.type_flag == ITEM_STAFF && obj->obj_flags.value[2] != new_obj->obj_flags.value[2])
-  	new_obj->obj_flags.value[2] = obj->obj_flags.value[2];
-
-  if (obj->obj_flags.type_flag == ITEM_WAND && obj->obj_flags.value[2] != new_obj->obj_flags.value[2]) {
-  	new_obj->obj_flags.value[2] = obj->obj_flags.value[2];
-  	if (IS_SET(obj->obj_flags.more_flags, ITEM_CUSTOM)) {
-  		new_obj->obj_flags.value[3] = obj->obj_flags.value[3];
-  	}
+  if (strcmp(GET_OBJ_SHORT(obj), GET_OBJ_SHORT(new_obj))) {
+	  GET_OBJ_SHORT(new_obj) = str_hsh(GET_OBJ_SHORT(obj));
   }
 
-  if (obj->obj_flags.type_flag == ITEM_DRINKCON && obj->obj_flags.value[1] != new_obj->obj_flags.value[1])
-  	new_obj->obj_flags.value[1] = obj->obj_flags.value[1];
+  if (strcmp(obj->name, new_obj->name)) {
+	  new_obj->name = str_hsh(obj->name);
+  }
+
+  if (obj->obj_flags.extra_flags != new_obj->obj_flags.extra_flags) {
+	  new_obj->obj_flags.extra_flags = obj->obj_flags.extra_flags;
+  }
+
+  if (obj->obj_flags.more_flags != new_obj->obj_flags.more_flags) {
+	  new_obj->obj_flags.more_flags = obj->obj_flags.more_flags;
+  }
+
+  if (IS_SET(obj->obj_flags.more_flags, ITEM_CUSTOM)
+		  && obj->obj_flags.value[0] != new_obj->obj_flags.value[0]) {
+	  new_obj->obj_flags.value[0] = obj->obj_flags.value[0];
+  }
+
+  if ( (IS_SET(obj->obj_flags.more_flags, ITEM_CUSTOM) || obj->obj_flags.type_flag == ITEM_DRINKCON)
+		  && obj->obj_flags.value[1] != new_obj->obj_flags.value[1]) {
+	  new_obj->obj_flags.value[1] = obj->obj_flags.value[1];
+  }
+
+  if ( (IS_SET(obj->obj_flags.more_flags, ITEM_CUSTOM) || obj->obj_flags.type_flag == ITEM_STAFF || obj->obj_flags.type_flag == ITEM_WAND)
+		  && obj->obj_flags.value[2] != new_obj->obj_flags.value[2]) {
+	  new_obj->obj_flags.value[2] = obj->obj_flags.value[2];
+  }
+
+  if (IS_SET(obj->obj_flags.more_flags, ITEM_CUSTOM)
+		  && obj->obj_flags.value[3] != new_obj->obj_flags.value[3]) {
+	  new_obj->obj_flags.value[3] = obj->obj_flags.value[3];
+  }
 
   if (obj->obj_flags.type_flag == ITEM_WEAPON && IS_SET(obj->obj_flags.more_flags, ITEM_CUSTOM)) {
 	  new_obj->obj_flags.weight = obj->obj_flags.weight;
@@ -226,35 +236,70 @@ void copySaveData(obj_data *new_obj, obj_data *obj)
 	  }
   }
 
-
   return;
 }
 
 bool fullItemMatch(obj_data *obj, obj_data *obj2)
 {
-  if (eq_current_damage(obj) != eq_current_damage(obj2))
-    return 0;
-
-  if (strcmp(GET_OBJ_SHORT(obj), GET_OBJ_SHORT(obj2)))
-    return 0;
+  if (strcmp(GET_OBJ_SHORT(obj), GET_OBJ_SHORT(obj2))) {
+    return false;
+  }
   
-  if (strcmp(obj->name, obj2->name)) 
-    return 0;
+  if (strcmp(obj->name, obj2->name)) {
+    return false;
+  }
 
-  if (obj->obj_flags.extra_flags != obj2->obj_flags.extra_flags)
-	return 0;
+  if (obj->obj_flags.extra_flags != obj2->obj_flags.extra_flags) {
+	return false;
+  }
 
-  if (obj->obj_flags.more_flags != obj2->obj_flags.more_flags)
-	return 0;
+  if (obj->obj_flags.more_flags != obj2->obj_flags.more_flags) {
+	return false;
+  }
 
-  if (obj->obj_flags.type_flag == ITEM_STAFF && obj->obj_flags.value[2] != obj2->obj_flags.value[2])
-    return 0;
+  if (IS_SET(obj->obj_flags.more_flags, ITEM_CUSTOM)
+		  && obj->obj_flags.cost != obj2->obj_flags.cost) {
+	  return false;
+  }
 
-  if (obj->obj_flags.type_flag == ITEM_WAND && obj->obj_flags.value[2] != obj2->obj_flags.value[2])
-    return 0;
+  if (IS_SET(obj->obj_flags.more_flags, ITEM_CUSTOM)
+		  && obj->obj_flags.value[0] != obj2->obj_flags.value[0]) {
+	  return false;
+  }
 
-  if (obj->obj_flags.type_flag == ITEM_DRINKCON && obj->obj_flags.value[1] != obj2->obj_flags.value[1])
-    return 0;
+  if (obj->obj_flags.type_flag != obj2->obj_flags.type_flag) {
+	  return false;
+  }
+
+  if ( (IS_SET(obj->obj_flags.more_flags, ITEM_CUSTOM) || obj->obj_flags.type_flag == ITEM_DRINKCON)
+		  && obj->obj_flags.value[1] != obj2->obj_flags.value[1]) {
+	  return false;
+  }
+
+  if ( (IS_SET(obj->obj_flags.more_flags, ITEM_CUSTOM) || obj->obj_flags.type_flag == ITEM_STAFF || obj->obj_flags.type_flag == ITEM_WAND)
+		  && (obj->obj_flags.value[2] != obj2->obj_flags.value[2])) {
+    return false;
+  }
+
+  if (IS_SET(obj->obj_flags.more_flags, ITEM_CUSTOM)
+		  && obj->obj_flags.value[3] != obj2->obj_flags.value[3]) {
+	  return false;
+  }
+
+  if (IS_SET(obj->obj_flags.more_flags, ITEM_CUSTOM)
+		  && obj->num_affects != obj2->num_affects) {
+	  return false;
+  }
+
+  // check if any of the affects don't match
+  if (IS_SET(obj->obj_flags.more_flags, ITEM_CUSTOM)) {
+	  for (int i=0; i < obj->num_affects; ++i) {
+		  if ( (obj->affected[i].location != obj2->affected[i].location) ||
+			   (obj->affected[i].modifier != obj2->affected[i].modifier) ) {
+			  return false;
+		  }
+	  }
+  }
 
   return 1;
 }
@@ -1643,7 +1688,9 @@ void vault_put(CHAR_DATA *ch, char *object, char *owner) {
   int self = 0;
 
   owner[0] = UPPER(owner[0]);
-  if (!strcmp(owner, GET_NAME(ch))) self = 1;
+  if (!strcmp(owner, GET_NAME(ch))) {
+	  self = 1;
+  }
 
   if (!(vault = has_vault(owner))) {
     if (self)
@@ -1743,8 +1790,12 @@ void vault_put(CHAR_DATA *ch, char *object, char *owner) {
     csendf(ch, "%s has been placed in the vault.\r\n", GET_OBJ_SHORT(obj));
   
     if (!fullSave(obj)) {
-      item_add(GET_OBJ_VNUM(obj), vault); extract_obj(obj); }
-    else { obj_from_char(obj); item_add(obj, vault);  }
+    	item_add(GET_OBJ_VNUM(obj), vault);
+    	extract_obj(obj);
+    } else {
+    	obj_from_char(obj);
+    	item_add(obj, vault);
+    }
   }
   save_vault(owner);
   save_char_obj(ch);
