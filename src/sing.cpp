@@ -245,7 +245,7 @@ NULL,   SKILL_INCREASE_MEDIUM
 },
 { /* 28 */
         12, POSITION_SITTING, 6, SKILL_SONG_MKING_CHARGE,
-        TAR_IGNORE, 3, song_mking_charge, execute_mking_charge, pulse_mking_charge,
+        TAR_IGNORE, 3, song_mking_charge, execute_song_mking_charge, pulse_mking_charge,
 	intrp_mking_charge, SKILL_INCREASE_MEDIUM
 
 },
@@ -2433,7 +2433,7 @@ int execute_song_fanatical_fanfare(ubyte level, CHAR_DATA *ch, char *arg, CHAR_D
   return eSUCCESS;
 }
 
-int execute_mking_charge(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
+int execute_song_mking_charge(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
 {
    vector<songInfo>::iterator i;
 
