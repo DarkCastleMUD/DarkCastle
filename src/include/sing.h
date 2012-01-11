@@ -3,7 +3,7 @@
  * singing bard powers, although the sing structure is in
  * spells.h, so that must be included
  */
-/* $Id: sing.h,v 1.16 2009/05/26 06:29:27 shane Exp $ */
+/* $Id: sing.h,v 1.17 2012/01/11 03:28:37 jhhudso Exp $ */
 
 #ifndef SING_H_
 #define SING_H_
@@ -105,7 +105,7 @@ SING_FUN(execute_song_crushing_crescendo);
 SING_FUN(song_hypnotic_harmony);
 SING_FUN(execute_song_hypnotic_harmony);
 SING_FUN(song_mking_charge);
-SING_FUN(execute_mking_charge);
+SING_FUN(execute_song_mking_charge);
 SING_FUN(pulse_mking_charge);
 SING_FUN(intrp_mking_charge);
 SING_FUN(song_submariners_anthem);
