@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: wizard.cpp,v 1.75 2012/01/07 04:24:16 jhhudso Exp $
+| $Id: wizard.cpp,v 1.76 2012/01/11 03:47:43 jhhudso Exp $
 | wizard.C
 | Description:  Utility functions necessary for wiz commands.
 */
@@ -147,20 +147,24 @@ void do_oload(struct char_data *ch, int rnum, int cnt, bool random)
   }  
   act("$n makes a strange magical gesture.", ch, 0, 0, TO_ROOM, INVIS_NULL);
   act("$n has created $p!", ch, obj, 0, TO_ROOM, 0);
-  snprintf(buf, MAX_STRING_LENGTH, "You create %i %s.\n\r", cnt, obj->short_description);
+
+  snprintf(buf, MAX_STRING_LENGTH, "You create %i %s%s.\n\r", cnt, random?"randomized ":"", obj->short_description);
+
   send_to_char(buf, ch);
   if (cnt > 1) {
-    snprintf(buf, MAX_STRING_LENGTH, "%s loads %i copies of obj %d (%s) at room %d (%s).",
+    snprintf(buf, MAX_STRING_LENGTH, "%s loads %i %scopies of obj %d (%s) at room %d (%s).",
 	     GET_NAME(ch),
 	     cnt,
+	     random?"randomized ":"",
 	     GET_OBJ_VNUM(obj),
 	     obj->short_description,
 	     world[ch->in_room].number,
 	     world[ch->in_room].name);
   } else {
-    snprintf(buf, MAX_STRING_LENGTH, "%s loads %i copy of obj %d (%s) at room %d (%s).",
+    snprintf(buf, MAX_STRING_LENGTH, "%s loads %i %scopy of obj %d (%s) at room %d (%s).",
 	     GET_NAME(ch),
 	     cnt,
+	     random?"randomized ":"",
 	     GET_OBJ_VNUM(obj),
 	     obj->short_description,
 	     world[ch->in_room].number,
@@ -854,8 +858,6 @@ void obj_stat(struct char_data *ch, struct obj_data *j)
   struct extra_descr_data *desc;
   bool found;
   int i, virt;
-  int value;
-
 
   /* for objects */
   extern char *item_types[];
@@ -929,7 +931,8 @@ void obj_stat(struct char_data *ch, struct obj_data *j)
 
     sprintf(buf,
              "$3Weight$R: %d  $3Value$R: %d  $3Timer$R: %d  $3Eq Level$R: %d\n\r",
-             j->obj_flags.weight,j->obj_flags.cost,
+             j->obj_flags.weight,
+             j->obj_flags.cost,
              j->obj_flags.timer,
              j->obj_flags.eq_level);
              send_to_char(buf, ch);
@@ -1015,7 +1018,6 @@ extern char * strs_damage_types[];
 	          j->obj_flags.value[2]);
 	  break;
       case ITEM_ARMOR :
-          value = j->obj_flags.value[0] - j->obj_flags.value[1];
 	  sprintf(buf, "$3AC-apply(v1)$R: [%d]\n\r"
                        "$3Unused  (v2)$R: [%d] (make 0)\n\r"
                        "$3Unused  (v3)$R: [%d] (make 0)\n\r"
