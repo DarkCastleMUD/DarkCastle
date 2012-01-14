@@ -32,6 +32,8 @@ default:
 install:
 	mv /srv/dcastle/bin/$(BASENAME) /srv/dcastle/bin/$(BASENAME).old
 	cp $(BASENAME).debug /srv/dcastle/bin/$(BASENAME)
+	cp showplayer /srv/dcastle/bin/
+	cp ../scripts/lastcore.sh /srv/dcastle/bin/
 
 all:	debug
 
