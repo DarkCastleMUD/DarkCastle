@@ -142,6 +142,12 @@ private:
   map<unsigned int, AuctionTicket> Items_For_Sale;
 };
 
+/*
+This is the actual auction house creation
+*/
+AuctionHouse TheAuctionHouse("auctionhouse");
+
+
 void AuctionHouse::ShowStats(CHAR_DATA *ch)
 {
   send_to_char("Vendor Statistics:\r\n", ch);
@@ -1648,11 +1654,6 @@ void AuctionHouse::AddItem(CHAR_DATA *ch, OBJ_DATA *obj, unsigned int price, str
 
 }
 
-
-/*
-This is the actual auction house creation
-*/
-AuctionHouse TheAuctionHouse("auctionhouse");
 
 
 /*
