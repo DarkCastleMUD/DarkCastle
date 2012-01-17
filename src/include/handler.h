@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.h,v 1.32 2011/12/25 21:29:36 jhhudso Exp $ */
+/* $Id: handler.h,v 1.33 2012/01/17 01:03:26 jhhudso Exp $ */
 
 #ifndef HANDLER_H_
 #define HANDLER_H_
@@ -73,6 +73,7 @@ struct obj_data *unequip_char(CHAR_DATA *ch, int pos, int flag = 0);
 struct obj_data *get_obj_in_list(char *name, struct obj_data *list);
 struct obj_data *get_obj_in_list_num(int num, struct obj_data *list);
 struct obj_data *get_obj(char *name);
+struct obj_data *get_obj(int vnum);
 struct obj_data *get_obj_num(int nr);
 
 void object_list_new_new_owner(struct obj_data *list, CHAR_DATA *ch);
