@@ -66,7 +66,6 @@ extern CWorld world;
 int total_vaults = 0;
 int get_line(FILE * fl, char *buf);
 char *skip_spaces(char *string);
-struct obj_data *get_obj(int vnum);
 
 void item_remove(obj_data *obj, struct vault_data *vault);
 void item_add(int vnum, struct vault_data *vault);
@@ -102,52 +101,6 @@ struct vault_data *has_vault(const char *name)
   }
   return 0;
 }
-
-bool fullSave(obj_data *obj)
-{
-    if (!obj)
-	return 0;
-
-  if (eq_current_damage(obj))
-    return 1;
-
-  obj_data *tmp_obj = get_obj(GET_OBJ_VNUM(obj));
-  if(!tmp_obj)
-  {
-    char buf[MAX_STRING_LENGTH];
-    sprintf(buf, "crash bug! vault.cpp, tmp_obj was null! %s is obj", obj->name);
-    log(buf, IMMORTAL, LOG_BUG);
-    return 0;
-  }
-  
-  if (IS_SET(obj->obj_flags.more_flags, ITEM_CUSTOM)) {
-	  return 1;
-  }
-
-  if (strcmp(GET_OBJ_SHORT(obj), GET_OBJ_SHORT(tmp_obj)))
-    return 1;
-
-  if (strcmp(obj->name, tmp_obj->name)) // GL. and stuff.
-    return 1;
-  
-  if (obj->obj_flags.extra_flags != tmp_obj->obj_flags.extra_flags)
-	return 1;
-
-  if (obj->obj_flags.more_flags != tmp_obj->obj_flags.more_flags)
-	return 1;
-
-  if (obj->obj_flags.type_flag == ITEM_STAFF && obj->obj_flags.value[1] != obj->obj_flags.value[2])
-    return 1;
-
-  if (obj->obj_flags.type_flag == ITEM_WAND && obj->obj_flags.value[1] != obj->obj_flags.value[2])
-    return 1;
-
-  if (obj->obj_flags.type_flag == ITEM_DRINKCON && obj->obj_flags.value[0] != obj->obj_flags.value[1])
-    return 1;
-
-  return 0;
-}
-
 
 void remove_from_object_list(obj_data *obj)
 {
@@ -1983,13 +1936,6 @@ struct char_data *find_owner(char *name) {
       return ch;
 
   return 0;
-}
-
-struct obj_data *get_obj(int vnum) 
-{
-  int num = real_object(vnum);
-  
-  return ((struct obj_data *)obj_index[num].item); 
 }
 
 void vault_log(CHAR_DATA *ch, char *owner)
