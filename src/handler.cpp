@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.200 2012/01/17 00:48:15 jhhudso Exp $ */
+/* $Id: handler.cpp,v 1.201 2012/01/17 01:04:59 jhhudso Exp $ */
     
 extern "C"
 {
@@ -2379,7 +2379,12 @@ struct obj_data *get_obj(char *name)
   return(0);
 }
 
+struct obj_data *get_obj(int vnum)
+{
+  int num = real_object(vnum);
 
+  return ((struct obj_data *)obj_index[num].item);
+}
 
 /*search the entire world for an object number, and return a pointer  */
 struct obj_data *get_obj_num(int nr)
