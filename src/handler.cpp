@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.199 2012/01/07 04:21:53 jhhudso Exp $ */
+/* $Id: handler.cpp,v 1.200 2012/01/17 00:48:15 jhhudso Exp $ */
     
 extern "C"
 {
@@ -63,6 +63,8 @@ extern struct descriptor_data *descriptor_list;
 extern struct active_object active_head;
 extern struct zone_data *zone_table;
 
+bool has_random(OBJ_DATA *obj);
+void huntclear_item(struct obj_data *obj);
 
 #ifdef WIN32
 int strncasecmp(char *s1, const char *s2, int len);
@@ -3067,10 +3069,6 @@ void extract_obj(struct obj_data *obj)
     struct active_object *active_obj = NULL,
                          *last_active = NULL;
 
-bool has_random(OBJ_DATA *obj);
-
-
-    extern void huntclear_item(struct obj_data *obj);
     huntclear_item(obj);
 
     if(obj_index[obj->item_number].non_combat_func ||
