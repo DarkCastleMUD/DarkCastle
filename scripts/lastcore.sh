@@ -2,16 +2,15 @@
 CORE=`ls ../lib/[0-9]*_core.[0-9]* | tail -n 1`
 PID=`echo $CORE | awk -Fcore. '{print $2}'`
 
-if [ -e research1.$PID ];
+if [ -e dcastle.$PID ];
 then
-    FILENAME=research1.$PID
+    FILENAME=dcastle.$PID
 fi
 
-if [ -e research.debug.$PID ];
+if [ -e dcastle.debug.$PID ];
 then
-    FILENAME=research.debug.$PID
+    FILENAME=dcastle.debug.$PID
 fi
 
-echo "Debugging $FILENAME with corefile $CORE"
 echo gdb $FILENAME $CORE
 gdb $FILENAME $CORE
