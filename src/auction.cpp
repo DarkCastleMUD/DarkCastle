@@ -48,7 +48,6 @@ using namespace std;
 
 struct obj_data * search_char_for_item(char_data * ch, int16 item_number, bool wearingonly = FALSE);
 extern struct index_data *obj_index;
-extern struct index_data *mob_index;
 extern CWorld world;
 //extern struct descriptor_data *descriptor_list;
 
@@ -86,6 +85,7 @@ struct AuctionTicket
   string buyer;
   AuctionStates state;
   unsigned int end_time;
+  obj_data *obj;
 };
 
 /*
@@ -636,7 +636,7 @@ bool AuctionHouse::IsSlot(string slot, int vnum)
     return false;
     break;
   }
-  return false;;
+  return false;
 }
 
 /*
@@ -680,7 +680,7 @@ bool AuctionHouse::IsNoTrade(int vnum)
   int nr = real_object(vnum);
   if(nr < 0)
     return false;
-  return IS_SET(((struct obj_data *)(obj_index[nr].item))->obj_flags.more_flags, ITEM_NO_TRADE);;
+  return IS_SET(((struct obj_data *)(obj_index[nr].item))->obj_flags.more_flags, ITEM_NO_TRADE);
   
 }
 
@@ -861,6 +861,7 @@ void AuctionHouse::Load()
     InTicket.state = (AuctionStates)state;
     fscanf(the_file, "%u\n", &InTicket.end_time);
     fscanf(the_file, "%u\n", &InTicket.price);
+    InTicket.obj = NULL;
     Items_For_Sale[ticket] = InTicket;
   }
   if(feof(the_file)) //this means the stat info was lost somehow
@@ -1123,8 +1124,12 @@ void AuctionHouse::BuyItem(CHAR_DATA *ch, unsigned int ticket)
                     Item_it->second.item_name.c_str(), Item_it->second.vitem, Item_it->second.seller.c_str());
     log(buf, IMMORTAL, LOG_BUG);
     return;
-  }  
-  obj = clone_object(rnum);
+  }
+  if (Item_it->second.obj) {
+	  obj = Item_it->second.obj;
+  } else {
+	  obj = clone_object(rnum);
+  }
 
   if(!obj)
   {
@@ -1611,8 +1616,13 @@ void AuctionHouse::AddItem(CHAR_DATA *ch, OBJ_DATA *obj, unsigned int price, str
   NewTicket.end_time = time(0) + auction_duration;
   NewTicket.seller = GET_NAME(ch);
   NewTicket.item_name = obj->short_description;
+
   if(advertise == false)
     NewTicket.buyer = buf;
+
+  if (fullSave(obj)) {
+	  NewTicket.obj = obj;
+  }
 
   Items_For_Sale[cur_index] = NewTicket;
   Save();
@@ -1648,7 +1658,14 @@ void AuctionHouse::AddItem(CHAR_DATA *ch, OBJ_DATA *obj, unsigned int price, str
   sprintf(log_buf, "VEND: %s just listed %s for sale for %u coins.\n\r", 
                GET_NAME(ch), obj->short_description, price);
   log(log_buf, IMP, LOG_OBJECTS);
-  extract_obj(obj);
+
+  // If this is a custom item we need it to continue existing otherwise we remove the clone
+  if (fullSave(obj)) {
+	  obj_from_char(obj);
+  } else {
+	  extract_obj(obj);
+  }
+
   do_save(ch, "", 9);
   return;
 
