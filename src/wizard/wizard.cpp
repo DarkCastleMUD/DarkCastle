@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: wizard.cpp,v 1.76 2012/01/11 03:47:43 jhhudso Exp $
+| $Id: wizard.cpp,v 1.77 2012/01/19 03:39:11 jhhudso Exp $
 | wizard.C
 | Description:  Utility functions necessary for wiz commands.
 */
@@ -546,7 +546,7 @@ void mob_stat(struct char_data *ch, struct char_data *k)
   extern race_shit race_info[];
   extern char *isr_bits[];
   
-  sprintf(buf, "$3%s$R - $3Name$R: %s  $3VNum$R: %d  $3RNum$R: %d  $3In room:$R %d\n\r",
+  sprintf(buf, "$3%s$R - $3Name$R: [%s]  $3VNum$R: %d  $3RNum$R: %d  $3In room:$R %d\n\r",
           (!IS_NPC(k) ? "PC" : "MOB"),
           GET_NAME(k),
           (IS_NPC(k) ?  mob_index[k->mobdata->nr].virt : 0),
