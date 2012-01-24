@@ -1622,6 +1622,8 @@ void AuctionHouse::AddItem(CHAR_DATA *ch, OBJ_DATA *obj, unsigned int price, str
 
   if (fullSave(obj)) {
 	  NewTicket.obj = obj;
+  } else {
+          NewTicket.obj = NULL;
   }
 
   Items_For_Sale[cur_index] = NewTicket;
