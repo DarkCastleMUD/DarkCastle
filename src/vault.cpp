@@ -162,30 +162,26 @@ void copySaveData(obj_data *new_obj, obj_data *obj)
 	  new_obj->obj_flags.value[3] = obj->obj_flags.value[3];
   }
 
-  if (obj->obj_flags.type_flag == ITEM_WEAPON && IS_SET(obj->obj_flags.more_flags, ITEM_CUSTOM)) {
+  if ((obj->obj_flags.type_flag == ITEM_ARMOR || obj->obj_flags.type_flag == ITEM_WEAPON) && IS_SET(obj->obj_flags.more_flags, ITEM_CUSTOM)) {
 	  new_obj->obj_flags.weight = obj->obj_flags.weight;
 	  new_obj->obj_flags.cost = obj->obj_flags.cost;
 	  new_obj->obj_flags.value[1] = obj->obj_flags.value[1];
 	  new_obj->obj_flags.value[2] = obj->obj_flags.value[2];
 
-	  if (obj->num_affects == new_obj->num_affects) {
-		  for(int i=0; i < obj->num_affects; ++i) {
-			  new_obj->affected[i].location = obj->affected[i].location;
-			  new_obj->affected[i].modifier = obj->affected[i].modifier;
+	  // If new object does not have enough room for affects to be copied then realloc it
+	  if (obj->num_affects != new_obj->num_affects) {
+		  new_obj->affected = (obj_affected_type *) realloc(new_obj->affected,
+                               (sizeof(obj_affected_type) * obj->num_affects));
+		  if (new_obj->affected == NULL) {
+			  perror("realloc");
+			  exit(EXIT_FAILURE);
 		  }
+		  new_obj->num_affects = obj->num_affects;
 	  }
-  }
 
-  if (obj->obj_flags.type_flag == ITEM_ARMOR && IS_SET(obj->obj_flags.more_flags, ITEM_CUSTOM)) {
-	  new_obj->obj_flags.weight = obj->obj_flags.weight;
-	  new_obj->obj_flags.cost = obj->obj_flags.cost;
-	  new_obj->obj_flags.value[1] = obj->obj_flags.value[1];
-	  new_obj->obj_flags.value[2] = obj->obj_flags.value[2];
-	  if (obj->num_affects == new_obj->num_affects) {
-		  for(int i=0; i < obj->num_affects; ++i) {
-			  new_obj->affected[i].location = obj->affected[i].location;
-			  new_obj->affected[i].modifier = obj->affected[i].modifier;
-		  }
+	  for(int i=0; i < obj->num_affects; ++i) {
+		  new_obj->affected[i].location = obj->affected[i].location;
+		  new_obj->affected[i].modifier = obj->affected[i].modifier;
 	  }
   }
 
