@@ -335,6 +335,7 @@ int main(int argc, char **argv)
   chdir(orig_cwd.c_str());
   my_load_char_obj(d, argv[1]);
   cout << "Gold: " << d->character->gold << " Plat: " << d->character->plat << " XP: " << d->character->exp << " HP: " << d->character->raw_hit << " hpmeta: " << d->character->hpmetas << " Con: " << int(d->character->con) << "," << int(d->character->raw_con) << "," << int(d->character->con_bonus) << endl;
+  cout << "Mana: " << d->character->mana << " MetaMana: " << d->character->manametas << endl;
 
   int equip_count = 0;
   char_data *ch = d->character;
