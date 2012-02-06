@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.119 2011/11/29 02:38:54 jhhudso Exp $
+| $Id: inventory.cpp,v 1.120 2012/02/06 02:52:58 jhhudso Exp $
 | inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
@@ -156,16 +156,19 @@ void get(struct char_data *ch, struct obj_data *obj_object, struct obj_data *sub
 
         if (sub_object->in_room && obj_object->obj_flags.type_flag != ITEM_MONEY && sub_object->carried_by != ch)
 	{ // Logging gold gets from corpses would just be too much.
-  	    sprintf(log_buf, "%s gets %s[%d] from %s", GET_NAME(ch), obj_object->name, obj_index[obj_object->item_number].virt,
-                sub_object->name);
+  	    sprintf(log_buf, "%s gets %s[%d] from %s[%d]", 
+		    GET_NAME(ch),
+		    obj_object->name,
+		    obj_index[obj_object->item_number].virt,
+		    sub_object->name,
+		    obj_index[sub_object->item_number].virt);
 	    log(log_buf, 110, LOG_OBJECTS);
  	    for(OBJ_DATA *loop_obj = obj_object->contains; loop_obj; loop_obj = loop_obj->next_content)
-              logf(IMP, LOG_OBJECTS, "The %s contained %s[%d]",
+              logf(IMP, LOG_OBJECTS, "The %s[%d] contained %s[%d]",
                           obj_object->short_description,
+		          obj_index[obj_object->item_number].virt,
                           loop_obj->short_description,
                           obj_index[loop_obj->item_number].virt);
-
-	  
 	}
 	move_obj(obj_object, ch);
 	if (sub_object->carried_by == ch) {
@@ -811,9 +814,12 @@ fname(obj_object->name));
 			      csendf(ch, "Whoa!  The %s poofed into thin air!\r\n", obj_object->short_description);
 
 			      char log_buf[MAX_STRING_LENGTH];
-			      sprintf(log_buf,"%s poofed %s[%d] from %s",
-				      GET_NAME(ch), obj_object->short_description,
-				      obj_index[obj_object->item_number].virt, sub_object->name);
+			      sprintf(log_buf,"%s poofed %s[%d] from %s[%d]",
+				      GET_NAME(ch),
+				      obj_object->short_description,
+				      obj_index[obj_object->item_number].virt, 
+				      sub_object->name,
+				      obj_index[sub_object->item_number].virt);
 			      log(log_buf, ANGEL, LOG_MORTAL);
  
 			      extract_obj(obj_object);
@@ -1324,6 +1330,13 @@ int do_put(struct char_data *ch, char *argument, int cmd)
 		
 		act("$n puts $p in $P.", ch, obj_object, sub_object, TO_ROOM, INVIS_NULL);
                 act("You put $p in $P.",ch,obj_object,sub_object,TO_CHAR,0);
+		logf(IMP, LOG_OBJECTS, "%s puts %s[%d] in %s[%d]",
+		     ch->name,
+		     obj_object->short_description,
+		     obj_index[obj_object->item_number].virt,
+		     sub_object->short_description,
+		     obj_index[sub_object->item_number].virt);
+
                 return eSUCCESS;
 	      }
               else {
@@ -1664,8 +1677,9 @@ int do_give(struct char_data *ch, char *argument, int cmd)
                 GET_NAME(vict));
     log(buf, IMP, LOG_OBJECTS);
     for(OBJ_DATA *loop_obj = obj->contains; loop_obj; loop_obj = loop_obj->next_content)
-              logf(IMP, LOG_OBJECTS, "The %s contained %s[%d]", 
+              logf(IMP, LOG_OBJECTS, "The %s[%d] contained %s[%d]", 
                           obj->short_description,
+		          obj_index[obj->item_number].virt,
                           loop_obj->short_description,
                           obj_index[loop_obj->item_number].virt);
 
