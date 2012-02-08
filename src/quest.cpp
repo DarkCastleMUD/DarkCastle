@@ -48,7 +48,6 @@ char *valid_fields[] = {
     NULL
 };
 
-extern void string_to_file(FILE *, char *);
 extern int keywordfind(OBJ_DATA *);
 extern void wear(CHAR_DATA *, OBJ_DATA *, int);
 extern CHAR_DATA *character_list;
