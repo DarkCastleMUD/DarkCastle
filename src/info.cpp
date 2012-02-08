@@ -12,7 +12,7 @@
  * This is free software and you are benefitting.	We hope that you    *
  * share your changes too.  What goes around, comes around. 		    *
  ****************************************************************************/
-/* $Id: info.cpp,v 1.200 2011/12/07 02:08:23 jhhudso Exp $ */
+/* $Id: info.cpp,v 1.201 2012/02/08 22:52:23 jhhudso Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -94,7 +94,6 @@ extern int mana_gain(CHAR_DATA*ch);
 extern int ki_gain(CHAR_DATA *ch);
 extern int move_gain(CHAR_DATA *ch, int extra);
 extern int getRealSpellDamage(CHAR_DATA *ch);
-void string_to_file(FILE *, char *);
 
 /* intern functions */
 
