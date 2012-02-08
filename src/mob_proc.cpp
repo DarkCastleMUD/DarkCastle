@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.199 2012/01/01 22:16:49 jhhudso Exp $ */
+/* $Id: mob_proc.cpp,v 1.200 2012/02/08 02:13:09 jhhudso Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -1782,6 +1782,7 @@ static char *dethSayText [ ] =
   "If it's an \"eye for an eye and a tooth for a tooth\", why is there no Eye Fairy?",
   "Necrophilia - putting the fun back in funeral.",
   "Monopolies are like children on an airplane, you complain about them until you have one."
+  "Grannies are pernonin' noobs."
  };
 
 // ENDOFCHAIN
