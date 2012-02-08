@@ -16,11 +16,12 @@ void load_auction_tickets()
 
 */
 
-extern "C"
-{
 #include <ctype.h>
 #include <string.h>
-}
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
+
 #include <obj.h>
 #include <spells.h>
 #include <player.h> 
@@ -39,6 +40,8 @@ extern "C"
 #include <queue>
 #include <fileinfo.h>
 #include <errno.h>
+#include <iostream>
+#include <fstream>
 
 using namespace std;
 
@@ -816,6 +819,7 @@ LOAD
 */
 void AuctionHouse::Load()
 {
+
   FILE * the_file;
   unsigned int num_rooms, num_items, ticket, i, state;
   int room;
@@ -862,8 +866,10 @@ void AuctionHouse::Load()
     fscanf(the_file, "%u\n", &InTicket.end_time);
     fscanf(the_file, "%u\n", &InTicket.price);
     InTicket.obj = NULL;
+
     Items_For_Sale[ticket] = InTicket;
-  }
+  } // LOOP
+
   if(feof(the_file)) //this means the stat info was lost somehow
     ParseStats();
   else
@@ -923,6 +929,30 @@ void AuctionHouse::Save()
     fprintf(the_file, "%u\n", Item_it->second.state);
     fprintf(the_file, "%u\n", Item_it->second.end_time);
     fprintf(the_file, "%u\n", Item_it->second.price);
+
+    if (Item_it->second.obj) {
+  	  stringstream obj_filename;
+  	  obj_filename << "../lib/auctions/" << Item_it->first << ".auction_obj";
+
+  	  ofstream auction_obj_file;
+  	  auction_obj_file.exceptions(ofstream::failbit | ofstream::badbit);
+  	  try {
+  		  struct stat statinfo;
+  		  if (stat("../lib/auctions/", &statinfo) != 0) {
+  			  if (mkdir("../lib/auctions/", S_IRWXU) != 0) {
+  				  perror("mkdir");
+  				  throw(0);
+  			  }
+  		  }
+  		  auction_obj_file.open(obj_filename.str().c_str());
+  		  auction_obj_file << Item_it->second.obj << flush;
+  		  auction_obj_file.close();
+  	  } catch (...) {
+  		  logf(IMMORTAL, LOG_BUG, "AuctionHouse::Save(): Ticket %d", Item_it->first);
+  		  perror("AuctionHouse::Save()");
+  	  }
+    }
+
   }
   fprintf(the_file, "%u\n", ItemsPosted);
   fprintf(the_file, "%u\n", ItemsExpired);
@@ -1125,8 +1155,40 @@ void AuctionHouse::BuyItem(CHAR_DATA *ch, unsigned int ticket)
     log(buf, IMMORTAL, LOG_BUG);
     return;
   }
+
+  // If obj is NULL then either we haven't loaded this object yet or it's not custom
+  if (Item_it->second.obj == NULL) {
+	  stringstream obj_filename;
+	  obj_filename << "../lib/auctions/" << ticket << ".auction_obj";
+
+	  ifstream auction_obj_file;
+	  auction_obj_file.open(obj_filename.str().c_str());
+	  if (auction_obj_file.is_open()) {
+		auction_obj_file.exceptions(ifstream::failbit | ifstream::badbit | ifstream::eofbit);
+
+		try {
+			Item_it->second.obj = new obj_data;
+			auction_obj_file >> Item_it->second.obj;
+			auction_obj_file.close();
+		} catch (ifstream::failure &e) {
+			logf(IMMORTAL, LOG_BUG, "AuctionHouse::Load(): could not load obj file for ticket %d due to %s.", ticket, e.what());
+			perror("AuctionHouse::Load");
+		} catch (...) {
+			perror("AuctionHouse::Load");
+		}
+	  }
+  }
+
+  // If load was successful use it as a copy reference for a clone
   if (Item_it->second.obj) {
-	  obj = Item_it->second.obj;
+	  obj_data *reference_obj = Item_it->second.obj;
+
+	  obj = clone_object(rnum);
+	  copySaveData(obj, reference_obj);
+
+	  if (verify_item(&obj)) {
+	  	copySaveData(obj, reference_obj);
+	  }
   } else {
 	  obj = clone_object(rnum);
   }
@@ -1183,16 +1245,26 @@ void AuctionHouse::BuyItem(CHAR_DATA *ch, unsigned int ticket)
 
   Item_it->second.state = AUC_SOLD;
   Item_it->second.buyer = GET_NAME(ch);
+
+  stringstream obj_filename;
+  obj_filename << "../lib/auctions/" << ticket << ".auction_obj";
+  struct stat sbuf;
+  if (stat(obj_filename.str().c_str(), &sbuf) == 0) {
+	  if (unlink(obj_filename.str().c_str()) == -1) {
+		  perror("unlink");
+	  }
+  }
+
   Save(); 
   char log_buf[MAX_STRING_LENGTH];
-  sprintf(log_buf, "VEND: %s bought %s's %s for %u coins.\n\r", 
-              GET_NAME(ch), Item_it->second.seller.c_str(), Item_it->second.item_name.c_str(),Item_it->second.price);
+  sprintf(log_buf, "VEND: %s bought %s's %s[%d] for %u coins.\n\r",
+              GET_NAME(ch), Item_it->second.seller.c_str(), Item_it->second.item_name.c_str(),Item_it->second.vitem, Item_it->second.price);
   log(log_buf, IMP, LOG_OBJECTS);
   obj_to_char(obj, ch);
   do_save(ch, "", 9);
 
 
-  extern short bport;
+ extern short bport;
  if(!bport) {
   errno = 0;
   if (!(fl = dc_fopen(WEB_AUCTION_FILE,"r"))) {
@@ -1288,7 +1360,11 @@ void AuctionHouse::RemoveTicket(CHAR_DATA *ch, unsigned int ticket)
         return;
       }
 
-      obj = clone_object(rnum);
+      if (Item_it->second.obj) {
+    	  obj = Item_it->second.obj;
+      } else {
+    	  obj = clone_object(rnum);
+      }
    
       if(!obj)
       {
@@ -1623,7 +1699,7 @@ void AuctionHouse::AddItem(CHAR_DATA *ch, OBJ_DATA *obj, unsigned int price, str
   if (fullSave(obj)) {
 	  NewTicket.obj = obj;
   } else {
-          NewTicket.obj = NULL;
+	  NewTicket.obj = NULL;
   }
 
   Items_For_Sale[cur_index] = NewTicket;
@@ -1731,8 +1807,6 @@ int do_vend(CHAR_DATA *ch, char *argument, int cmd)
   OBJ_DATA *obj;
   unsigned int price;
 
-
-
   if(!TheAuctionHouse.IsAuctionHouse(ch->in_room) && GET_LEVEL(ch) < 104)
   {
     send_to_char("You must be in an auction house to do this!\n\r", ch);
@@ -1749,12 +1823,10 @@ int do_vend(CHAR_DATA *ch, char *argument, int cmd)
   if(!*buf)
   {
     send_to_char("Syntax: vend <buy | sell | list | cancel | modify | collect | search | identify>\n\r", ch);
-    if(GET_LEVEL(ch) >= 104) send_to_char("Also: <addroom | removeroom | listroom | stats>\r\n", ch);
+    if(GET_LEVEL(ch) >= 104) send_to_char("Also: <addroom | removeroom | listrooms | stats>\r\n", ch);
     return eSUCCESS;       
 
   }
-
-  add_command_lag(ch, cmd, PULSE_VIOLENCE);
 
   /*MODIFY*/
   if(!strcmp(buf, "modify"))
@@ -1774,6 +1846,7 @@ int do_vend(CHAR_DATA *ch, char *argument, int cmd)
       return eSUCCESS;
     }
     TheAuctionHouse.DoModify(ch, ticket, atoi(buf));
+
     return eSUCCESS;
   }
 
@@ -1795,6 +1868,7 @@ int do_vend(CHAR_DATA *ch, char *argument, int cmd)
         return eSUCCESS;
       }
       TheAuctionHouse.ListItems(ch, LIST_BY_NAME, buf, 0, 0);
+      add_command_lag(ch, cmd, PULSE_VIOLENCE);
 
       return eSUCCESS;
     }
@@ -1811,6 +1885,7 @@ int do_vend(CHAR_DATA *ch, char *argument, int cmd)
         return eSUCCESS;
       }
       TheAuctionHouse.ListItems(ch, LIST_BY_SLOT, buf, 0, 0);
+      add_command_lag(ch, cmd, PULSE_VIOLENCE);
 
       return eSUCCESS;
     }
@@ -1826,11 +1901,10 @@ int do_vend(CHAR_DATA *ch, char *argument, int cmd)
         return eSUCCESS;
       }
       TheAuctionHouse.ListItems(ch, LIST_BY_RACE, buf, 0, 0);
+      add_command_lag(ch, cmd, PULSE_VIOLENCE);
 
       return eSUCCESS;
     }
-
-    
 
     if(!strcmp(buf, "class"))
     {
@@ -1847,6 +1921,7 @@ int do_vend(CHAR_DATA *ch, char *argument, int cmd)
         return eSUCCESS;
       }
       TheAuctionHouse.ListItems(ch, LIST_BY_CLASS, buf, 0, 0);
+      add_command_lag(ch, cmd, PULSE_VIOLENCE);
 
       return eSUCCESS;
     } 
@@ -1862,6 +1937,7 @@ int do_vend(CHAR_DATA *ch, char *argument, int cmd)
         return eSUCCESS;
       }
       TheAuctionHouse.ListItems(ch, LIST_BY_SELLER, buf, 0, 0);
+      add_command_lag(ch, cmd, PULSE_VIOLENCE);
 
       return eSUCCESS;
     }
@@ -1882,6 +1958,8 @@ int do_vend(CHAR_DATA *ch, char *argument, int cmd)
         TheAuctionHouse.ListItems(ch, LIST_BY_LEVEL, "", level, 0);
       else
         TheAuctionHouse.ListItems(ch, LIST_BY_LEVEL, "", level, atoi(buf));
+      add_command_lag(ch, cmd, PULSE_VIOLENCE);
+
       return eSUCCESS;
     }
 
@@ -1957,6 +2035,7 @@ int do_vend(CHAR_DATA *ch, char *argument, int cmd)
     if(!strcmp(buf, "all"))
     {
       TheAuctionHouse.ListItems(ch, LIST_ALL, "", 0, 0);
+      add_command_lag(ch, cmd, PULSE_VIOLENCE);
     }
     else if (!strcmp(buf, "mine"))
     {

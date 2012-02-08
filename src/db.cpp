@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.215 2011/12/31 20:48:24 jhhudso Exp $ */
+/* $Id: db.cpp,v 1.216 2012/02/08 23:00:34 jhhudso Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -71,6 +71,7 @@ int count_hash_records(FILE * fl);
 void load_hints();
 void find_unordered_objects(void);
 void find_unordered_mobiles(void);
+char *mprog_type_to_name( int type );
 
 /* load stuff */
 char* curr_type;
@@ -195,9 +196,9 @@ world_file_list_item * new_obj_file_item(char * temp, long room_nr);
 
 char * read_next_worldfile_name(FILE * flWorldIndex);
 int fread_bitvector(FILE *fl, long minval, long maxval);
+int fread_bitvector(ifstream &fl, long minval, long maxval);
 void fread_new_newline (FILE *fl) {}
 char fread_char (FILE *fl);
-void string_to_file(FILE *f, char *string);
 struct index_data *generate_mob_indices(int *top, struct index_data *index);
 struct index_data *generate_obj_indices(int *top, struct index_data *index);
 int is_empty(int zone_nr);
@@ -1346,7 +1347,7 @@ struct index_data *generate_obj_indices(int *top,
          index[i].number = 0;
          index[i].non_combat_func = 0;
          index[i].combat_func = 0;
-	 index[i].progtypes = 0;
+         index[i].progtypes = 0;
          if(!(index[i].item = (struct obj_data *)read_object(i, fl, FALSE))) 
          {
            sprintf(log_buf, "Unable to load object %d!\n\r",
@@ -2787,6 +2788,32 @@ void write_mprog_recur(FILE *fl, MPROG_DATA *mprg, bool mob)
       else string_to_file( fl, "Saved During Edit");
 }
 
+void write_mprog_recur(ofstream &fl, MPROG_DATA *mprg, bool mob)
+{
+	if(mprg->next) {
+		write_mprog_recur(fl, mprg->next,mob);
+	}
+
+	if (mob) {
+		fl << ">" << mprog_type_to_name( mprg->type ) << " ";
+	} else {
+		fl << "\\" << mprog_type_to_name( mprg->type ) << " ";
+	}
+
+	if(mprg->arglist) {
+		string_to_file( fl,  mprg->arglist );
+	} else {
+		string_to_file( fl, "Saved During Edit");
+	}
+
+	if(mprg->comlist) {
+		string_to_file( fl, mprg->comlist );
+	} else {
+		string_to_file( fl, "Saved During Edit");
+	}
+}
+
+
 // Write a mob to file
 // Assume valid mob, and file open for writing
 //
@@ -3707,6 +3734,130 @@ struct obj_data *read_object(int nr, FILE *fl, bool zz)
     return obj;  
 }
 
+ifstream& operator>>(ifstream &in, obj_data *obj)
+{
+    int loc, mod, nr;
+
+    char chk, c;
+    struct extra_descr_data *new_new_descr;
+
+    if (obj == NULL) {
+    	return in;
+    }
+
+    clear_object(obj);
+
+    in >> c;
+    if (c == '#') {
+    	in >> nr;
+    }
+    in >> ws;
+
+
+    obj->name               = fread_string (in, true);
+
+    char *tmpptr;
+
+    tmpptr = fread_string (in, true);
+
+    if (strlen(tmpptr) >= MAX_OBJ_SDESC_LENGTH) {
+    	tmpptr[MAX_OBJ_SDESC_LENGTH-1] = 0;
+
+		obj->short_description = str_dup(tmpptr);
+		free(tmpptr);
+
+		logf( IMMORTAL, LOG_BUG, "read_object: vnum unknown short_description too long.");
+    } else {
+    	obj->short_description = tmpptr;
+    }
+
+    obj->description        = fread_string (in, 1);
+    obj->action_description = fread_string (in, 1);
+    obj->table = 0;
+    curr_virtno = nr;
+    curr_name = obj->name;
+    curr_type = "Object";
+
+    // numeric data
+
+    obj->obj_flags.type_flag   = fread_int(in, -1000, LONG_MAX);
+    
+    obj->obj_flags.extra_flags = fread_bitvector(in, 0, LONG_MAX);
+    obj->obj_flags.wear_flags  = fread_bitvector(in, 0, LONG_MAX);
+    obj->obj_flags.size        = fread_bitvector(in, 0, LONG_MAX);
+
+    obj->obj_flags.value[0]     = fread_int(in, -1000, LONG_MAX);
+    obj->obj_flags.value[1]     = fread_int(in, -1000, LONG_MAX);
+    obj->obj_flags.value[2]     = fread_int(in, -1000, LONG_MAX);
+    obj->obj_flags.value[3]     = fread_int(in, -1000, LONG_MAX);
+    obj->obj_flags.eq_level     = fread_int(in, -1000, IMP);
+    obj->obj_flags.weight       = fread_int(in, -1000, LONG_MAX);
+    obj->obj_flags.cost         = fread_int(in, -1000, LONG_MAX);
+    obj->obj_flags.more_flags   = fread_bitvector(in, -1000, LONG_MAX);
+
+    // currently not stored in object file
+    obj->obj_flags.timer = 0;
+
+    obj->ex_description = NULL;
+    obj->affected = NULL;
+    obj->num_affects = 0;
+    // other flags
+
+    in >> chk;
+
+    while(chk != 'S')
+    {
+      switch(chk) {
+        // skip whitespace
+        case ' ':
+        case '\n':
+          break;
+        case 'E':
+#ifdef LEAK_CHECK
+          new_new_descr = (struct extra_descr_data *) calloc(1, sizeof(struct extra_descr_data));
+#else
+          new_new_descr = (struct extra_descr_data *) dc_alloc(1, sizeof(struct extra_descr_data));
+#endif
+          new_new_descr->keyword     = fread_string (in, 1);
+          new_new_descr->description = fread_string (in, 1);
+          new_new_descr->next        = obj->ex_description;
+          obj->ex_description        = new_new_descr;
+          break;
+
+        case '\\':
+            //ungetc( '\\', in );
+            //mprog_read_programs( in, nr,zz );
+             break;
+
+        case 'A':
+          // these are only two members of obj_affected_type, so nothing else needs initializing
+          loc = fread_int (in, -1000, LONG_MAX);
+          mod = fread_int (in, -1000, 1000);
+          add_obj_affect(obj, loc, mod);
+          break;
+
+        default:
+          sprintf(log_buf, "Illegal obj addon flag %c in obj %s.", chk, obj->name);
+          log(log_buf, IMP, LOG_BUG);
+          break;
+      } // switch
+      // read in next flag
+      in >> chk;
+    }
+
+    obj->in_room      = NOWHERE;
+    obj->next_skill  = 0;
+    obj->next_content = 0;
+    obj->carried_by   = 0;
+    obj->equipped_by  = 0;
+    obj->in_obj       = 0;
+    obj->contains     = 0;
+    obj->item_number  = nr;
+
+	return in;
+}
+
+
 // write an object to file
 // This assumes that the object is valid, and the file is open for writing
 //
@@ -3760,6 +3911,52 @@ void write_object(obj_data * obj, FILE *fl)
     fprintf(fl, "S\n");
 }
 
+ofstream& operator<< (ofstream &out, obj_data *obj) {
+	    out << "#" << obj_index[obj->item_number].virt << "\n";
+	    string_to_file( out, obj->name );
+	    string_to_file( out, obj->short_description );
+	    string_to_file( out, obj->description );
+	    string_to_file( out, obj->action_description );
+
+	    out <<  int(obj->obj_flags.type_flag) << " "
+            <<  obj->obj_flags.extra_flags << " "
+            <<  obj->obj_flags.wear_flags << " "
+            <<  obj->obj_flags.size << "\n";
+
+	    out << obj->obj_flags.value[0] << " "
+	    	<< obj->obj_flags.value[1] << " "
+	    	<< obj->obj_flags.value[2] << " "
+	    	<< obj->obj_flags.value[3] << " "
+	    	<< obj->obj_flags.eq_level << "\n";
+
+	    out << obj->obj_flags.weight << " "
+	    	<< obj->obj_flags.cost << " "
+	    	<< obj->obj_flags.more_flags << "\n";
+
+	    extra_descr_data *currdesc = obj->ex_description;
+	    while(currdesc)  {
+	      out << "E\n";
+	      string_to_file( out, currdesc->keyword );
+	      string_to_file( out, currdesc->description );
+	      currdesc = currdesc->next;
+	    }
+
+	    for(int i = 0; i < obj->num_affects; i++) {
+	    	out << "A\n";
+	    	out << obj->affected[i].location << " "
+	    		<< obj->affected[i].modifier << "\n";
+	    }
+
+	    if (obj_index[obj->item_number].mobprogs) {
+	      write_mprog_recur(out, obj_index[obj->item_number].mobprogs,FALSE);
+	      out << "|\n";
+	    }
+
+	    out << "S\n";
+
+	return out;
+}
+
 string quotequotes(string &s1);
 
 string quotequotes(const char *str)
@@ -3780,6 +3977,19 @@ string quotequotes(string &s1)
 
   return s1;
 }
+
+
+string lf_to_crlf(string &s1)
+{
+  size_t pos = s1.find('\n');
+  while(pos != string::npos) {
+    s1.insert(pos, 1, '\r');
+    pos = s1.find('\n', pos+2);
+  }
+
+  return s1;
+}
+
 
 void write_bitvector_csv(unsigned long vector, char * const *array, ofstream &fout)
 {
@@ -4041,401 +4251,410 @@ void zone_update(void)
 
 
 /* execute the reset command table of a given zone */
-void reset_zone(int zone)
-{
-    extern int top_of_world;
-    extern short code_testing_mode;
-    int cmd_no, last_cmd, last_mob, last_obj, last_percent;
-    int last_no;
-    CHAR_DATA *mob = NULL;
-    struct obj_data *obj, *obj_to;
-    int hrs;
-    last_cmd = last_mob = last_obj = last_percent = -1;
-    int i;
-    float z;
+void reset_zone(int zone) {
+	extern int top_of_world;
+	extern short code_testing_mode;
+	int cmd_no, last_cmd, last_mob, last_obj, last_percent;
+	int last_no;
+	CHAR_DATA *mob = NULL;
+	struct obj_data *obj, *obj_to;
+	int hrs;
+	last_cmd = last_mob = last_obj = last_percent = -1;
+	int i;
+	float z;
 
-    char buf[MAX_STRING_LENGTH];
+	char buf[MAX_STRING_LENGTH];
 
-    if (zone_table[zone].died_this_tick == 0 && is_empty(zone)) {
-      zone_table[zone].repops_without_deaths++;
-    } else {
-      zone_table[zone].repops_without_deaths = 0;
-    }
-
-    // reset number of mobs that have died this tick to 0
-    zone_table[zone].died_this_tick = 0;
-    zone_table[zone].num_mob_on_repop = 0;
-    // find last command in zone
-    last_no = 0;
-    while(zone_table[zone].cmd[last_no].command != 'S')
-      last_no++;
-
-    for (cmd_no = 0; cmd_no <= last_no; cmd_no++)
-      {
-      if ((zone_table[zone].cmd + cmd_no) == 0)
-      {
-         sprintf(buf, "Trapped zone error, Command is null, zone: %d cmd_no: %d",
-	 zone, cmd_no);
-         log(buf, IMMORTAL, LOG_WORLD);
-         break;
-      }
-      if (ZCMD.command == 'S')
-        break;
-   if (ZCMD.active == 0) continue;
-
-    if ( ZCMD.if_flag == 0 ||                            // always
-         (last_cmd==1     && ZCMD.if_flag == 1) ||       // if last command true
-         (last_cmd==0     && ZCMD.if_flag == 2) ||       // if last command false
-         (mud_is_booting  && ZCMD.if_flag == 3) ||       // on reboot
-         (last_mob==1     && ZCMD.if_flag == 4) ||       // if-last-mob-true
-         (last_mob==0     && ZCMD.if_flag == 5) ||       // if-last-mob-false
-         (last_obj==1     && ZCMD.if_flag == 6) ||       // if-last-obj-true
-         (last_obj==0     && ZCMD.if_flag == 7) ||       // if-last-obj-false
-         (last_percent==1 && ZCMD.if_flag == 8) ||       // if-last-percent-true
-         (last_percent==0 && ZCMD.if_flag == 9)          // if-last-percent-false
-       )
-    {
-        switch(ZCMD.command)
-    {
-
-        case 'M': /* read a mobile */
-//        if((ZCMD.arg2 == -1 || ZCMD.lastPop == 0 || !charExists(ZCMD.lastPop) 
-//	|| (charExists(ZCMD.lastPop) && (!IS_NPC(ZCMD.lastPop) || ZCMD.lastPop->mobdata->nr != ZCMD.arg1))) && mob_index[ZCMD.arg1].number < ZCMD.arg2 && (mob = 
-//clone_mobile(ZCMD.arg1)))
-	if ((ZCMD.arg2 == -1 || ZCMD.lastPop == 0) && mob_index[ZCMD.arg1].number < ZCMD.arg2 && (mob = clone_mobile(ZCMD.arg1)))
-        { 
-          char_to_room(mob, ZCMD.arg3);
-	  mob->mobdata->reset = &zone_table[zone].cmd[cmd_no];	
-	  ZCMD.lastPop = mob;
-          GET_HOME(mob) = world_array[ZCMD.arg3]->number;
-          zone_table[zone].num_mob_on_repop++;
-          last_cmd = 1;
-          last_mob = 1;
-		extern bool selfpurge;
-		selfpurge = FALSE;
-	  mprog_load_trigger(mob);
-	  if (selfpurge){ mob = NULL; last_mob = 0; last_cmd = 0;}
-
-        }
-        else
-        {
-            last_cmd = 0;
-            last_mob = 0;
-        }
-        break;
-
-        case 'O': /* read an object */
-        if (ZCMD.arg2 == -1 || obj_index[ZCMD.arg1].number < ZCMD.arg2) 
-        {
-          if (ZCMD.arg3 >= 0)
-          {
-              if(!get_obj_in_list_num(ZCMD.arg1, world[ZCMD.arg3].contents) 
-                  && (obj = clone_object(ZCMD.arg1))) 
-              {
-                obj_to_room(obj, ZCMD.arg3);
-                last_cmd = 1;
-                last_obj = 1;
-              }
-              else
-              {
-                last_cmd = 0;
-                last_obj = 0;
-              }
-          }
-          else { 
-            if(!code_testing_mode) {
-               sprintf(buf, "Obj %d loaded to NOWHERE. Zone %d Cmd %d", obj_index[ZCMD.arg1].virt, zone, cmd_no);
-               log(buf, IMMORTAL, LOG_WORLD);
-            }
-            last_cmd = 0;
-            last_obj = 0;
-          }
-        }
-        else
-        {
-          last_cmd = 0;
-          last_obj = 0;
-        }
-        break;
-
-        case 'P': /* object to object */
-
-
-        if(ZCMD.arg2 == -1 || obj_index[ZCMD.arg1].number < ZCMD.arg2) {
-          obj_to = 0;
-          obj    = 0;
-          if((obj_to = get_obj_num(ZCMD.arg3)) &&
-                     (obj = clone_object(ZCMD.arg1)))
-            obj_to_obj(obj, obj_to);
-          else logf(IMMORTAL, LOG_WORLD, "Null container obj in P command Zone: %d, Cmd: %d", zone, cmd_no);
-
-          last_cmd = 1;
-          last_obj = 1;
-        }
-        else
-        {
-            last_cmd = 0;
-            last_obj = 0;
-        }
-        break;
-
-        case 'G': /* obj_to_char */
-        if ( mob == NULL )
-        {
-            sprintf(buf, "Null mob in G, reseting zone %d cmd %d", zone, cmd_no+1);
-            log(buf, IMMORTAL, LOG_WORLD);
-            last_cmd = 0;
-            last_obj = 0;
-            break;
-        }
-        if((ZCMD.arg2 == -1 || obj_index[ZCMD.arg1].number < ZCMD.arg2 
-|| number(0,1))
-            && (obj =  clone_object(ZCMD.arg1))) 
-        { 
-          obj_to_char(obj, mob);
-          last_cmd = 1;
-          last_obj = 0;
-        }
-        else
-        {
-            last_cmd = 0;
-            last_obj = 0;
-        }
-        break;
-
-        case '%': /* percent chance of next command happening */
-	z = ZCMD.arg1 / ZCMD.arg2;
-	if (z > 0.2) i = ZCMD.arg1;
-	else i = (int)((float)ZCMD.arg1 * 2);
-        
-	hrs = (time(NULL) - ZCMD.last)/3600;
-	if (hrs > 24) i *= 4;
-	else if (hrs > 8) i *= 3;
-	else if (hrs > 2) i *= 2;
-	else if (hrs > 1) i = (int)(i * 1.5);
-
-        if( number(0, ZCMD.arg2) <= i )
-        {
-  	   ZCMD.last = time(NULL);
-           last_percent = 1;
-           last_cmd = 1;
-        }
-        else {
-           last_cmd = 0;
-           last_percent = 0;
-        }
-        break;
-
-        case 'E': /* object to equipment list */
-        if ( mob == NULL )
-        {
-            sprintf(buf, "Null mob in E reseting zone %d cmd %d", zone, cmd_no);
-            log(buf, IMMORTAL, LOG_WORLD);
-            last_cmd = 0;
-            last_obj = 0;
-            break;
-        }
-//        if((ZCMD.arg2 == -1 || obj_index[ZCMD.arg1].number < ZCMD.arg2 || !number(0,5)) 
-          if((obj = clone_object(ZCMD.arg1))) 
-        { 
-        	  randomize_object(obj);
-          if(!equip_char(mob, obj, ZCMD.arg3)) {
-             sprintf(buf, "Bad equip_char zone %d cmd %d", zone, cmd_no);
-             log(buf, IMMORTAL, LOG_WORLD);
-          }
-	  if (ISSET(mob->mobdata->actflags, ACT_BOSS))
-	  {
-//	    mob->level += (obj->obj_flags.eq_level)/10;
-//	    handle_automatic_mob_settings(mob);
-	    mob->max_hit *= (1+obj->obj_flags.eq_level/500);
-            mob->damroll *= (1+obj->obj_flags.eq_level/500);
-            mob->hitroll *= (1+obj->obj_flags.eq_level/500);
-	if (mob->armor > 0)
-            mob->armor *= (1-obj->obj_flags.eq_level/500);
-	else
-             mob->armor *= (1+obj->obj_flags.eq_level/500);
-
-	  }
-          last_obj = 1;
-          last_cmd = 1;
-        }
-        else
-        {
-          last_cmd = 0;
-          last_obj = 0;
-        }
-        break;
-
-        case 'D': /* set state of door */
-	    if(ZCMD.arg1 < 0 || ZCMD.arg1 > top_of_world)
-	    {
-	      sprintf(log_buf,
-	      "Illegal room number Z: %d cmd %d", zone, cmd_no);
-	      log(log_buf, IMMORTAL, LOG_WORLD);
-	      break;
-	    }
-	    if(ZCMD.arg2 < 0 || ZCMD.arg2 >=6)
-	    {
-	      sprintf(log_buf,
-	      "Illegal direction %d doesn't exist Z: %d cmd %d", ZCMD.arg2, zone, cmd_no);
-	      log(log_buf, IMMORTAL, LOG_WORLD);
-	      break;
-	    }
-	    if (!world_array[ZCMD.arg1])
-	    {
-	      sprintf(log_buf,
-	      "Room %d doesn't exist Z: %d cmd %d", ZCMD.arg1, zone, cmd_no);
-	      log(log_buf, IMMORTAL, LOG_WORLD);
-	      break;
-	    }
-
-	    if(world[ZCMD.arg1].dir_option[ZCMD.arg2] == 0)
-	    {
-	      sprintf(log_buf,
-	      "Attempt to reset direction %d on room %d that doesn't exist Z: %d cmd %d"
-	      , ZCMD.arg2, world[ZCMD.arg1].number, zone, cmd_no);
-	      log(log_buf, IMMORTAL, LOG_WORLD);
-	      break;
-	    }
-        switch (ZCMD.arg3)
-        {
-	    case 0:
-            REMOVE_BIT(
-                world[ZCMD.arg1].dir_option[ZCMD.arg2]->exit_info,
-                EX_BROKEN);
-            REMOVE_BIT(
-                world[ZCMD.arg1].dir_option[ZCMD.arg2]->exit_info,
-                EX_LOCKED);
-            REMOVE_BIT(
-                world[ZCMD.arg1].dir_option[ZCMD.arg2]->exit_info,
-                EX_CLOSED);
-            break;
-            case 1:
-            REMOVE_BIT(
-                world[ZCMD.arg1].dir_option[ZCMD.arg2]->exit_info,
-                EX_BROKEN);
-            SET_BIT(
-                world[ZCMD.arg1].dir_option[ZCMD.arg2]->exit_info,
-                EX_CLOSED);
-            REMOVE_BIT(
-                world[ZCMD.arg1].dir_option[ZCMD.arg2]->exit_info,
-                EX_LOCKED);
-            break;
-            case 2:
-            REMOVE_BIT(
-                world[ZCMD.arg1].dir_option[ZCMD.arg2]->exit_info,
-                EX_BROKEN);
-            SET_BIT(
-                world[ZCMD.arg1].dir_option[ZCMD.arg2]->exit_info,
-                EX_LOCKED);
-            SET_BIT(
-                world[ZCMD.arg1].dir_option[ZCMD.arg2]->exit_info,
-                EX_CLOSED);
-            break;
-        }
-        last_cmd = 1;
-        break;
-
-        case 'X':
-          switch(ZCMD.arg1) {
-            case 0:
-              last_cmd     = -1;
-              last_mob     = -1;
-              last_obj     = -1;
-              last_percent = -1;
-              break;
-
-            case 1:
-              last_mob     = -1;
-              break;
-
-            case 2:
-              last_obj     = -1;
-              break;
-
-            case 3:
-              last_percent = -1;
-              break;
-
-            default:
-              last_cmd     = -1;
-              last_mob     = -1;
-              last_obj     = -1;
-              last_percent = -1;
-              break;
-          }
-          break;
-
-        case 'K': // skip
-          cmd_no += ZCMD.arg1;
-          break;
-
-        case '*': // ignore *
-        case 'J': // ignore J
-        break;
-
-        default:
-        sprintf(log_buf, "UNKNOWN COMMAND!!! ZONE %d cmd %d: '%c' Skipping zone..",
-            zone, cmd_no, ZCMD.command);
-        log(log_buf, IMMORTAL, LOG_WORLD);
-        zone_table[zone].age = 0;
-        return;
-        break;
-    }
-    } 
-    else {
-      switch(ZCMD.command)
-      {
-
-        case 'M':
-	  last_mob = 0; last_cmd = 0; break;
-
-        case 'O':
-        case 'G':
-        case 'P':
-        case 'E':
-	  last_obj = 0; last_cmd = 0;  break;
-        case '%':
-	  last_percent = 0; last_cmd = 0;  break;
-        case 'D':
-	   last_cmd = 0;break;
-        case 'X':
-	case 'K':
-	    last_cmd = 0;break;
-	default:
-		break;
+	if (zone_table[zone].died_this_tick == 0 && is_empty(zone)) {
+		zone_table[zone].repops_without_deaths++;
+	} else {
+		zone_table[zone].repops_without_deaths = 0;
 	}
-     }
 
-    }
+	// reset number of mobs that have died this tick to 0
+	zone_table[zone].died_this_tick = 0;
+	zone_table[zone].num_mob_on_repop = 0;
+	// find last command in zone
+	last_no = 0;
+	while (zone_table[zone].cmd[last_no].command != 'S')
+		last_no++;
 
-    zone_table[zone].age = 0;
+	for (cmd_no = 0; cmd_no <= last_no; cmd_no++) {
+		if ((zone_table[zone].cmd + cmd_no) == 0) {
+			sprintf(buf,
+					"Trapped zone error, Command is null, zone: %d cmd_no: %d",
+					zone, cmd_no);
+			log(buf, IMMORTAL, LOG_WORLD);
+			break;
+		}
+		if (ZCMD.command == 'S')
+			break;
+		if (ZCMD.active == 0)
+			continue;
 
-    if (zone_table[zone].repops_without_deaths > 2 && zone_table[zone].repops_without_deaths < 7 && zone_table[zone].repops_with_bonus < 4) {
-      zone_table[zone].repops_with_bonus++;
+		if (ZCMD.if_flag == 0 || // always
+				(last_cmd == 1 && ZCMD.if_flag == 1) || // if last command true
+				(last_cmd == 0 && ZCMD.if_flag == 2) || // if last command false
+				(mud_is_booting && ZCMD.if_flag == 3) || // on reboot
+				(last_mob == 1 && ZCMD.if_flag == 4) || // if-last-mob-true
+				(last_mob == 0 && ZCMD.if_flag == 5) || // if-last-mob-false
+				(last_obj == 1 && ZCMD.if_flag == 6) || // if-last-obj-true
+				(last_obj == 0 && ZCMD.if_flag == 7) || // if-last-obj-false
+				(last_percent == 1 && ZCMD.if_flag == 8) || // if-last-percent-true
+				(last_percent == 0 && ZCMD.if_flag == 9) // if-last-percent-false
+				) {
+			switch (ZCMD.command) {
 
-      for (char_data *tmp_victim = character_list; tmp_victim && tmp_victim != (char_data *)0x95959595; tmp_victim = tmp_victim->next) {
-        if (IS_NPC(tmp_victim) && ! ISSET(tmp_victim->mobdata->actflags, ACT_NO_GOLD_BONUS) && world[tmp_victim->in_room].zone == zone) {
-          tmp_victim->gold *= 1.10;
-        }
-      }
-    }
+			case 'M': /* read a mobile */
+				if ((ZCMD.arg2 == -1 || ZCMD.lastPop == 0)
+						&& mob_index[ZCMD.arg1].number < ZCMD.arg2 && (mob =
+						clone_mobile(ZCMD.arg1))) {
+					char_to_room(mob, ZCMD.arg3);
+					mob->mobdata->reset = &zone_table[zone].cmd[cmd_no];
+					ZCMD.lastPop = mob;
+					GET_HOME(mob) = world_array[ZCMD.arg3]->number;
+					zone_table[zone].num_mob_on_repop++;
+					last_cmd = 1;
+					last_mob = 1;
+					extern bool selfpurge;
+					selfpurge = FALSE;
+					mprog_load_trigger(mob);
+					if (selfpurge) {
+						mob = NULL;
+						last_mob = 0;
+						last_cmd = 0;
+					}
+
+				} else {
+					last_cmd = 0;
+					last_mob = 0;
+				}
+				break;
+
+			case 'O': /* read an object */
+				if (ZCMD.arg2 == -1
+						|| obj_index[ZCMD.arg1].number < ZCMD.arg2) {
+					if (ZCMD.arg3 >= 0) {
+						if (!get_obj_in_list_num(ZCMD.arg1,
+								world[ZCMD.arg3].contents) && (obj =
+								clone_object(ZCMD.arg1))) {
+							obj_to_room(obj, ZCMD.arg3);
+							last_cmd = 1;
+							last_obj = 1;
+						} else {
+							last_cmd = 0;
+							last_obj = 0;
+						}
+					} else {
+						if (!code_testing_mode) {
+							sprintf(buf,
+									"Obj %d loaded to NOWHERE. Zone %d Cmd %d",
+									obj_index[ZCMD.arg1].virt, zone, cmd_no);
+							log(buf, IMMORTAL, LOG_WORLD);
+						}
+						last_cmd = 0;
+						last_obj = 0;
+					}
+				} else {
+					last_cmd = 0;
+					last_obj = 0;
+				}
+				break;
+
+			case 'P': /* object to object */
+
+				if (ZCMD.arg2 == -1
+						|| obj_index[ZCMD.arg1].number < ZCMD.arg2) {
+					obj_to = 0;
+					obj = 0;
+					if ((obj_to = get_obj_num(ZCMD.arg3)) && (obj =
+							clone_object(ZCMD.arg1)))
+						obj_to_obj(obj, obj_to);
+					else
+						logf(
+								IMMORTAL,
+								LOG_WORLD,
+								"Null container obj in P command Zone: %d, Cmd: %d",
+								zone, cmd_no);
+
+					last_cmd = 1;
+					last_obj = 1;
+				} else {
+					last_cmd = 0;
+					last_obj = 0;
+				}
+				break;
+
+			case 'G': /* obj_to_char */
+				if (mob == NULL) {
+					sprintf(buf, "Null mob in G, reseting zone %d cmd %d", zone,
+							cmd_no + 1);
+					log(buf, IMMORTAL, LOG_WORLD);
+					last_cmd = 0;
+					last_obj = 0;
+					break;
+				}
+				if ((ZCMD.arg2 == -1 || obj_index[ZCMD.arg1].number < ZCMD.arg2
+						|| number(0, 1)) && (obj = clone_object(ZCMD.arg1))) {
+					obj_to_char(obj, mob);
+					last_cmd = 1;
+					last_obj = 0;
+				} else {
+					last_cmd = 0;
+					last_obj = 0;
+				}
+				break;
+
+			case '%': /* percent chance of next command happening */
+				z = ZCMD.arg1 / ZCMD.arg2;
+				if (z > 0.2)
+					i = ZCMD.arg1;
+				else
+					i = (int) ((float) ZCMD.arg1 * 2);
+
+				hrs = (time(NULL) - ZCMD.last) / 3600;
+				if (hrs > 24)
+					i *= 4;
+				else if (hrs > 8)
+					i *= 3;
+				else if (hrs > 2)
+					i *= 2;
+				else if (hrs > 1)
+					i = (int) (i * 1.5);
+
+				if (number(0, ZCMD.arg2) <= i) {
+					ZCMD.last = time(NULL);
+					last_percent = 1;
+					last_cmd = 1;
+				} else {
+					last_cmd = 0;
+					last_percent = 0;
+				}
+				break;
+
+			case 'E': /* object to equipment list */
+				if (mob == NULL) {
+					sprintf(buf, "Null mob in E reseting zone %d cmd %d", zone,
+							cmd_no);
+					log(buf, IMMORTAL, LOG_WORLD);
+					last_cmd = 0;
+					last_obj = 0;
+					break;
+				}
+				if ((obj = clone_object(ZCMD.arg1))) {
+					randomize_object(obj);
+
+					// Check if mob and object are safe to be equipped
+					// Some of these checks are redundant compared to equip_char() but
+					// we want to know if the position is filled already before running equip_char()
+					// so we don't see unnecessary errors when a zone reset tries to reequip a mob
+					if (mob == NULL) {
+						log("NULL mob in reset_zone()!", ANGEL, LOG_BUG);
+					} else if (ZCMD.arg3 < 0 || ZCMD.arg3 >= MAX_WEAR) {
+						log("Invalid eq position in reset_zone()!", ANGEL,
+								LOG_BUG);
+					} else if (mob->equipment[ZCMD.arg3] == 0) {
+						if (!equip_char(mob, obj, ZCMD.arg3)) {
+							sprintf(buf, "Bad equip_char zone %d cmd %d", zone,
+									cmd_no);
+							log(buf, IMMORTAL, LOG_WORLD);
+						}
+					}
+
+					if (ISSET(mob->mobdata->actflags, ACT_BOSS)) {
+						mob->max_hit *= (1 + obj->obj_flags.eq_level / 500);
+						mob->damroll *= (1 + obj->obj_flags.eq_level / 500);
+						mob->hitroll *= (1 + obj->obj_flags.eq_level / 500);
+						if (mob->armor > 0)
+							mob->armor *= (1 - obj->obj_flags.eq_level / 500);
+						else
+							mob->armor *= (1 + obj->obj_flags.eq_level / 500);
+
+					}
+					last_obj = 1;
+					last_cmd = 1;
+				} else {
+					last_cmd = 0;
+					last_obj = 0;
+				}
+				break;
+
+			case 'D': /* set state of door */
+				if (ZCMD.arg1 < 0 || ZCMD.arg1 > top_of_world) {
+					sprintf(log_buf, "Illegal room number Z: %d cmd %d", zone,
+							cmd_no);
+					log(log_buf, IMMORTAL, LOG_WORLD);
+					break;
+				}
+				if (ZCMD.arg2 < 0 || ZCMD.arg2 >= 6) {
+					sprintf(log_buf,
+							"Illegal direction %d doesn't exist Z: %d cmd %d",
+							ZCMD.arg2, zone, cmd_no);
+					log(log_buf, IMMORTAL, LOG_WORLD);
+					break;
+				}
+				if (!world_array[ZCMD.arg1]) {
+					sprintf(log_buf, "Room %d doesn't exist Z: %d cmd %d",
+							ZCMD.arg1, zone, cmd_no);
+					log(log_buf, IMMORTAL, LOG_WORLD);
+					break;
+				}
+
+				if (world[ZCMD.arg1].dir_option[ZCMD.arg2] == 0) {
+					sprintf(
+							log_buf,
+							"Attempt to reset direction %d on room %d that doesn't exist Z: %d cmd %d",
+							ZCMD.arg2, world[ZCMD.arg1].number, zone, cmd_no);
+					log(log_buf, IMMORTAL, LOG_WORLD);
+					break;
+				}
+				switch (ZCMD.arg3) {
+				case 0:
+					REMOVE_BIT(
+							world[ZCMD.arg1].dir_option[ZCMD.arg2]->exit_info,
+							EX_BROKEN);
+					REMOVE_BIT(
+							world[ZCMD.arg1].dir_option[ZCMD.arg2]->exit_info,
+							EX_LOCKED);
+					REMOVE_BIT(
+							world[ZCMD.arg1].dir_option[ZCMD.arg2]->exit_info,
+							EX_CLOSED);
+					break;
+				case 1:
+					REMOVE_BIT(
+							world[ZCMD.arg1].dir_option[ZCMD.arg2]->exit_info,
+							EX_BROKEN);
+					SET_BIT( world[ZCMD.arg1].dir_option[ZCMD.arg2]->exit_info,
+							EX_CLOSED);
+					REMOVE_BIT(
+							world[ZCMD.arg1].dir_option[ZCMD.arg2]->exit_info,
+							EX_LOCKED);
+					break;
+				case 2:
+					REMOVE_BIT(
+							world[ZCMD.arg1].dir_option[ZCMD.arg2]->exit_info,
+							EX_BROKEN);
+					SET_BIT( world[ZCMD.arg1].dir_option[ZCMD.arg2]->exit_info,
+							EX_LOCKED);
+					SET_BIT( world[ZCMD.arg1].dir_option[ZCMD.arg2]->exit_info,
+							EX_CLOSED);
+					break;
+				}
+				last_cmd = 1;
+				break;
+
+			case 'X':
+				switch (ZCMD.arg1) {
+				case 0:
+					last_cmd = -1;
+					last_mob = -1;
+					last_obj = -1;
+					last_percent = -1;
+					break;
+
+				case 1:
+					last_mob = -1;
+					break;
+
+				case 2:
+					last_obj = -1;
+					break;
+
+				case 3:
+					last_percent = -1;
+					break;
+
+				default:
+					last_cmd = -1;
+					last_mob = -1;
+					last_obj = -1;
+					last_percent = -1;
+					break;
+				}
+				break;
+
+			case 'K': // skip
+				cmd_no += ZCMD.arg1;
+				break;
+
+			case '*': // ignore *
+			case 'J': // ignore J
+				break;
+
+			default:
+				sprintf(
+						log_buf,
+						"UNKNOWN COMMAND!!! ZONE %d cmd %d: '%c' Skipping zone..",
+						zone, cmd_no, ZCMD.command);
+				log(log_buf, IMMORTAL, LOG_WORLD);
+				zone_table[zone].age = 0;
+				return;
+				break;
+			}
+		} else {
+			switch (ZCMD.command) {
+
+			case 'M':
+				last_mob = 0;
+				last_cmd = 0;
+				break;
+
+			case 'O':
+			case 'G':
+			case 'P':
+			case 'E':
+				last_obj = 0;
+				last_cmd = 0;
+				break;
+			case '%':
+				last_percent = 0;
+				last_cmd = 0;
+				break;
+			case 'D':
+				last_cmd = 0;
+				break;
+			case 'X':
+			case 'K':
+				last_cmd = 0;
+				break;
+			default:
+				break;
+			}
+		}
+
+	}
+
+	zone_table[zone].age = 0;
+
+	if (zone_table[zone].repops_without_deaths > 2
+			&& zone_table[zone].repops_without_deaths < 7
+			&& zone_table[zone].repops_with_bonus < 4) {
+		zone_table[zone].repops_with_bonus++;
+
+		for (char_data *tmp_victim = character_list;
+				tmp_victim && tmp_victim != (char_data *) 0x95959595;
+				tmp_victim = tmp_victim->next) {
+			if (IS_NPC(tmp_victim)
+					&& !ISSET(tmp_victim->mobdata->actflags, ACT_NO_GOLD_BONUS)
+					&& world[tmp_victim->in_room].zone == zone) {
+				tmp_victim->gold *= 1.10;
+			}
+		}
+	}
 }
 
 #undef ZCMD
 
-
-
 /* for use in reset_zone; return TRUE if zone 'nr' is free of PC's  */
-int is_empty(int zone_nr)
-{
-    struct descriptor_data *i;
+int is_empty(int zone_nr) {
+	struct descriptor_data *i;
 
-    for (i = descriptor_list; i; i = i->next)
-    if (STATE(i) == CON_PLAYING && i->character && world[i->character->in_room].zone == zone_nr)
-        return(0);
+	for (i = descriptor_list; i; i = i->next)
+		if (STATE(i) == CON_PLAYING && i->character
+				&& world[i->character->in_room].zone == zone_nr)
+			return (0);
 
-    return(1);
+	return (1);
 }
 
 
@@ -4443,7 +4662,30 @@ int is_empty(int zone_nr)
 /************************************************************************
 *  procs of a (more or less) general utility nature         *
 ********************************************************************** */
+char *fread_string(ifstream &in, int hasher)
+{
+	char buffer[MAX_STRING_LENGTH];
+	in.exceptions(ofstream::badbit);
+	try {
+		in.getline(buffer, MAX_STRING_LENGTH, '~');
+		in >> ws;
+	} catch(...) {
+		logf(IMMORTAL, LOG_BUG, "fread_string() error reading");
+	}
 
+	string orig_str(buffer);
+	// Change \n into \r\n
+	string swapstr = lf_to_crlf(orig_str);
+
+	char *retval;
+	if (hasher) {
+		retval = str_hsh(swapstr.c_str());
+	} else {
+		retval = new char[swapstr.length()];
+		memcpy(retval, swapstr.c_str(), swapstr.length());
+	}
+	return retval;
+}
 
 /* read and allocate space for a '~'-terminated string from a given file */
 char *fread_string(FILE *fl, int hasher)
@@ -4472,11 +4714,12 @@ char *fread_string(FILE *fl, int hasher)
        case '~':
            getc( fl );
            if (pBufLast == buf) {
-             if(hasher)
+             if(hasher) {
                pAlloc = str_hsh("");
-             else pAlloc = str_dup("");
-           }
-           else if(hasher) {
+            } else {
+            	pAlloc = str_dup("");
+            }
+           } else if(hasher) {
              *pBufLast++ = '\0';
 #ifdef LEAK_CHECK
              pAlloc = (char *)calloc(pBufLast - buf, sizeof(char));
@@ -4615,13 +4858,6 @@ int fread_bitvector(FILE *fl, long beg_range, long end_range)
            perror ("fread_bitvector: premature EOF");
            abort();
         }
-/*
-if(curr_virtno == 22019)
-{
-  sprintf(buf, "Reading '%c'(%d)", ch, (int)ch);
-  log(buf, 0, LOG_MISC);
-}
-*/
         if(ch >= 'a' && ch <= 'z')
         {
           i += 1 << (ch-'a');
@@ -4651,6 +4887,73 @@ if(curr_virtno == 22019)
     abort();
     return( 0 );
 }
+
+int fread_bitvector(ifstream &in, long beg_range, long end_range)
+{
+    char buf[200];
+    int ch;
+    long i = 0;
+
+    // eat space till we hit the next one
+    while ((ch = in.get())) {
+        if (ch == EOF) {
+            printf ("Reading %s: %s, %d\n", curr_type, curr_name, curr_virtno);
+            perror ("fread_bitvector: premature EOF");
+            abort();
+        }
+
+        if (ch != ' ' && ch != '\n') /* eat the white space */
+            break;
+    }
+
+    // check if we're dealing with numbers, or letters
+    if(isdigit(ch) || ch == '-')
+    {
+       // It's a digit, so put the char back and let fread_int handle it
+       in.unget();
+       return fread_int(in, beg_range, end_range);
+    }
+
+    // we're dealing with letters now
+    for(;;)
+    {
+        if(ch == EOF)
+        {
+           sprintf(buf, "Reading %s: %s, %d\n", curr_type, curr_name, curr_virtno);
+           log(buf, 0, LOG_MISC);
+           perror ("fread_bitvector: premature EOF");
+           abort();
+        }
+        if(ch >= 'a' && ch <= 'z')
+        {
+          i += 1 << (ch-'a');
+        }
+        else if(ch >= 'A' && ch <= 'G')
+        {
+          i+= 1 << (26 + (ch - 'A'));
+        }
+        else if(ch == ' ' || ch == '\n')
+        {
+          // we hit the end.  Return current i.
+          return i;
+        }
+        else {
+           sprintf(buf, "Reading %s: %s, %d (%c)\n", curr_type, curr_name, curr_virtno, ch);
+           log(buf, 0, LOG_MISC);
+           perror ("fread_bitvector: illegal character");
+           abort();
+        }
+
+        // if we hit here, we had a valid character.  read the next one.
+        ch = in.get();
+
+    } // for ;;
+
+    perror( "fread_bitvector: something went wrong" );
+    abort();
+    return( 0 );
+}
+
 
 uint64_t fread_uint(FILE *fl, uint64_t beg_range, uint64_t end_range)
 {
@@ -4719,6 +5022,23 @@ uint64_t fread_uint(FILE *fl, uint64_t beg_range, uint64_t end_range)
 	perror("fread_int: something went wrong");
 	abort();
 	return (0);
+}
+
+int64_t fread_int(ifstream &in, int64_t beg_range, int64_t end_range) {
+	int64_t number;
+	in >> number;
+
+	if (number < beg_range) {
+		cerr << "fread_int: error " << number << " less than " << beg_range << ". "
+			 <<	"Setting to " << beg_range << endl;
+		number = beg_range;
+	}  else if (number > end_range) {
+		cerr << "fread_int: error " << number << " greater than " << beg_range << ". "
+			 <<	"Setting to " << beg_range << endl;
+		number = end_range;
+	}
+
+	return number;
 }
 
 
@@ -5481,3 +5801,213 @@ void find_unordered_mobiles(void) {
     }
   }
 }
+
+void string_to_file(FILE *f, char *string)
+{
+  char * newbuf = new char[strlen(string)+1];
+  strcpy(newbuf, string);
+
+  // remove all \r's
+  for(char * curr = newbuf; *curr != '\0'; curr++)
+  {
+    if(*curr == '\r') {
+      for(char * blah = curr; *blah != '\0'; blah++) // shift the rest of the string 1 left
+        *blah = *(blah + 1);
+      curr--; // (to check for \r\r cases)
+    }
+  }
+
+  fprintf(f, "%s~\n", newbuf);
+  delete [] newbuf;
+}
+
+void string_to_file(ofstream &f, char *string)
+{
+  char * newbuf = new char[strlen(string)+1];
+  strcpy(newbuf, string);
+
+  // remove all \r's
+  for(char * curr = newbuf; *curr != '\0'; curr++)
+  {
+    if(*curr == '\r') {
+      for(char * blah = curr; *blah != '\0'; blah++) // shift the rest of the string 1 left
+        *blah = *(blah + 1);
+      curr--; // (to check for \r\r cases)
+    }
+  }
+
+  f << newbuf << "~" << endl;
+  delete [] newbuf;
+}
+
+void copySaveData(obj_data *target, obj_data *source)
+{
+  int i;
+  if ((i = eq_current_damage(source)) > 0) {
+     for (;i>0;i--)
+       damage_eq_once(target);
+  }
+
+  if (strcmp(GET_OBJ_SHORT(source), GET_OBJ_SHORT(target))) {
+	  GET_OBJ_SHORT(target) = str_hsh(GET_OBJ_SHORT(source));
+  }
+
+  if (strcmp(source->name, target->name)) {
+	  target->name = str_hsh(source->name);
+  }
+
+  if (source->obj_flags.extra_flags != target->obj_flags.extra_flags) {
+	  target->obj_flags.extra_flags = source->obj_flags.extra_flags;
+  }
+
+  if (source->obj_flags.more_flags != target->obj_flags.more_flags) {
+	  target->obj_flags.more_flags = source->obj_flags.more_flags;
+  }
+
+  if (IS_SET(source->obj_flags.more_flags, ITEM_CUSTOM)
+		  && source->obj_flags.value[0] != target->obj_flags.value[0]) {
+	  target->obj_flags.value[0] = source->obj_flags.value[0];
+  }
+
+  if ( (IS_SET(source->obj_flags.more_flags, ITEM_CUSTOM) || source->obj_flags.type_flag == ITEM_DRINKCON)
+		  && source->obj_flags.value[1] != target->obj_flags.value[1]) {
+	  target->obj_flags.value[1] = source->obj_flags.value[1];
+  }
+
+  if ( (IS_SET(source->obj_flags.more_flags, ITEM_CUSTOM) || source->obj_flags.type_flag == ITEM_STAFF || source->obj_flags.type_flag == ITEM_WAND)
+		  && source->obj_flags.value[2] != target->obj_flags.value[2]) {
+	  target->obj_flags.value[2] = source->obj_flags.value[2];
+  }
+
+  if (IS_SET(source->obj_flags.more_flags, ITEM_CUSTOM)
+		  && source->obj_flags.value[3] != target->obj_flags.value[3]) {
+	  target->obj_flags.value[3] = source->obj_flags.value[3];
+  }
+
+  if ((source->obj_flags.type_flag == ITEM_ARMOR || source->obj_flags.type_flag == ITEM_WEAPON) && IS_SET(source->obj_flags.more_flags, ITEM_CUSTOM)) {
+	  target->obj_flags.weight = source->obj_flags.weight;
+	  target->obj_flags.cost = source->obj_flags.cost;
+	  target->obj_flags.value[1] = source->obj_flags.value[1];
+	  target->obj_flags.value[2] = source->obj_flags.value[2];
+
+	  // If new object does not have enough room for affects to be copied then realloc it
+	  if (source->num_affects != target->num_affects) {
+		  target->affected = (obj_affected_type *) realloc(target->affected,
+                               (sizeof(obj_affected_type) * source->num_affects));
+		  if (target->affected == NULL) {
+			  perror("realloc");
+			  exit(EXIT_FAILURE);
+		  }
+		  target->num_affects = source->num_affects;
+	  }
+
+	  for(int i=0; i < source->num_affects; ++i) {
+		  target->affected[i].location = source->affected[i].location;
+		  target->affected[i].modifier = source->affected[i].modifier;
+	  }
+  }
+
+  return;
+}
+
+bool fullItemMatch(obj_data *obj, obj_data *obj2)
+{
+  if (strcmp(GET_OBJ_SHORT(obj), GET_OBJ_SHORT(obj2))) {
+    return false;
+  }
+
+  if (strcmp(obj->name, obj2->name)) {
+    return false;
+  }
+
+  if (obj->obj_flags.extra_flags != obj2->obj_flags.extra_flags) {
+	return false;
+  }
+
+  if (obj->obj_flags.more_flags != obj2->obj_flags.more_flags) {
+	return false;
+  }
+
+  if (IS_SET(obj->obj_flags.more_flags, ITEM_CUSTOM)
+		  && obj->obj_flags.cost != obj2->obj_flags.cost) {
+	  return false;
+  }
+
+  if (IS_SET(obj->obj_flags.more_flags, ITEM_CUSTOM)
+		  && obj->obj_flags.value[0] != obj2->obj_flags.value[0]) {
+	  return false;
+  }
+
+  if (obj->obj_flags.type_flag != obj2->obj_flags.type_flag) {
+	  return false;
+  }
+
+  if ( (IS_SET(obj->obj_flags.more_flags, ITEM_CUSTOM) || obj->obj_flags.type_flag == ITEM_DRINKCON)
+		  && obj->obj_flags.value[1] != obj2->obj_flags.value[1]) {
+	  return false;
+  }
+
+  if ( (IS_SET(obj->obj_flags.more_flags, ITEM_CUSTOM) || obj->obj_flags.type_flag == ITEM_STAFF || obj->obj_flags.type_flag == ITEM_WAND)
+		  && (obj->obj_flags.value[2] != obj2->obj_flags.value[2])) {
+    return false;
+  }
+
+  if (IS_SET(obj->obj_flags.more_flags, ITEM_CUSTOM)
+		  && obj->obj_flags.value[3] != obj2->obj_flags.value[3]) {
+	  return false;
+  }
+
+  if (IS_SET(obj->obj_flags.more_flags, ITEM_CUSTOM)
+		  && obj->num_affects != obj2->num_affects) {
+	  return false;
+  }
+
+  // check if any of the affects don't match
+  if (IS_SET(obj->obj_flags.more_flags, ITEM_CUSTOM)) {
+	  for (int i=0; i < obj->num_affects; ++i) {
+		  if ( (obj->affected[i].location != obj2->affected[i].location) ||
+			   (obj->affected[i].modifier != obj2->affected[i].modifier) ) {
+			  return false;
+		  }
+	  }
+  }
+
+  return 1;
+}
+
+// Function to ensure an item is not bugged. If it is, replace it with the original.
+bool verify_item(struct obj_data **obj)
+{
+ extern int top_of_objt;
+
+  if (!str_cmp((*obj)->short_description, ((struct obj_data*)obj_index[(*obj)->item_number].item)->short_description))
+    return FALSE;
+
+
+  int newitem = -1;
+  for (int i = 1; ; i++)
+  {
+
+    if ((*obj)->item_number - i < 0 && (*obj)->item_number + i > top_of_objt)
+	break; // No item at all found, it's a restring or deleted.
+
+    if ((*obj)->item_number - i >= 0)
+      if (!str_cmp((*obj)->short_description, ((struct obj_data*)obj_index[(*obj)->item_number - i].item)->short_description))
+      {
+		newitem = (*obj)->item_number - i;
+		break;
+      }
+
+    if ((*obj)->item_number + i <= top_of_objt)
+      if (!str_cmp((*obj)->short_description, ((struct obj_data*)obj_index[(*obj)->item_number + i].item)->short_description))
+      {
+		newitem = (*obj)->item_number + i;
+		break;
+      }
+  }
+  if (newitem == -1) return FALSE;
+
+  *obj = clone_object(newitem); // Fixed!
+  return TRUE;
+}
+
