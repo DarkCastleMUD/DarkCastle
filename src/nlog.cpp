@@ -1,4 +1,4 @@
-/* $Id: nlog.cpp,v 1.10 2011/11/29 02:38:54 jhhudso Exp $ */
+/* $Id: nlog.cpp,v 1.11 2012/02/08 22:57:14 jhhudso Exp $ */
 
 extern "C"
 {
@@ -68,7 +68,7 @@ bool ishashed(char *arg)
   return FALSE;
 }
 
-char *str_hsh(char *arg)
+char *str_hsh(const char *arg)
 {
   int scratch;
   struct hash_info *current = &tree;
