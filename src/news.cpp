@@ -44,8 +44,6 @@ extern "C"
 #include <returnvals.h>
 #include <news.h>
 
-void string_to_file(FILE *, char *);
-
 struct news_data *thenews = NULL;
 void addnews(struct news_data *newnews)
 {
