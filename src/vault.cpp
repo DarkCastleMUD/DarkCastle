@@ -7,6 +7,14 @@ extern "C"
 #include <dmalloc.h>
 #endif
 
+#include <fstream>
+#include <sstream>
+#include <string>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <list>
+
 #include <structs.h>
 #include <db.h>
 #include "utility.h"
@@ -23,13 +31,6 @@ extern "C"
 #include <interp.h>
 #include <spells.h>
 #include <clan.h> // clan right
-#include <fstream>
-#include <sstream>
-#include <string>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <list>
 
 using namespace std;
 
@@ -116,141 +117,6 @@ void remove_from_object_list(obj_data *obj)
     }
     pObj = tObj;
   }
-}
-
-void copySaveData(obj_data *new_obj, obj_data *obj)
-{
-  int i;
-  if ((i = eq_current_damage(obj)) > 0) {
-     for (;i>0;i--)
-       damage_eq_once(new_obj);
-  }
-
-  if (strcmp(GET_OBJ_SHORT(obj), GET_OBJ_SHORT(new_obj))) {
-	  GET_OBJ_SHORT(new_obj) = str_hsh(GET_OBJ_SHORT(obj));
-  }
-
-  if (strcmp(obj->name, new_obj->name)) {
-	  new_obj->name = str_hsh(obj->name);
-  }
-
-  if (obj->obj_flags.extra_flags != new_obj->obj_flags.extra_flags) {
-	  new_obj->obj_flags.extra_flags = obj->obj_flags.extra_flags;
-  }
-
-  if (obj->obj_flags.more_flags != new_obj->obj_flags.more_flags) {
-	  new_obj->obj_flags.more_flags = obj->obj_flags.more_flags;
-  }
-
-  if (IS_SET(obj->obj_flags.more_flags, ITEM_CUSTOM)
-		  && obj->obj_flags.value[0] != new_obj->obj_flags.value[0]) {
-	  new_obj->obj_flags.value[0] = obj->obj_flags.value[0];
-  }
-
-  if ( (IS_SET(obj->obj_flags.more_flags, ITEM_CUSTOM) || obj->obj_flags.type_flag == ITEM_DRINKCON)
-		  && obj->obj_flags.value[1] != new_obj->obj_flags.value[1]) {
-	  new_obj->obj_flags.value[1] = obj->obj_flags.value[1];
-  }
-
-  if ( (IS_SET(obj->obj_flags.more_flags, ITEM_CUSTOM) || obj->obj_flags.type_flag == ITEM_STAFF || obj->obj_flags.type_flag == ITEM_WAND)
-		  && obj->obj_flags.value[2] != new_obj->obj_flags.value[2]) {
-	  new_obj->obj_flags.value[2] = obj->obj_flags.value[2];
-  }
-
-  if (IS_SET(obj->obj_flags.more_flags, ITEM_CUSTOM)
-		  && obj->obj_flags.value[3] != new_obj->obj_flags.value[3]) {
-	  new_obj->obj_flags.value[3] = obj->obj_flags.value[3];
-  }
-
-  if ((obj->obj_flags.type_flag == ITEM_ARMOR || obj->obj_flags.type_flag == ITEM_WEAPON) && IS_SET(obj->obj_flags.more_flags, ITEM_CUSTOM)) {
-	  new_obj->obj_flags.weight = obj->obj_flags.weight;
-	  new_obj->obj_flags.cost = obj->obj_flags.cost;
-	  new_obj->obj_flags.value[1] = obj->obj_flags.value[1];
-	  new_obj->obj_flags.value[2] = obj->obj_flags.value[2];
-
-	  // If new object does not have enough room for affects to be copied then realloc it
-	  if (obj->num_affects != new_obj->num_affects) {
-		  new_obj->affected = (obj_affected_type *) realloc(new_obj->affected,
-                               (sizeof(obj_affected_type) * obj->num_affects));
-		  if (new_obj->affected == NULL) {
-			  perror("realloc");
-			  exit(EXIT_FAILURE);
-		  }
-		  new_obj->num_affects = obj->num_affects;
-	  }
-
-	  for(int i=0; i < obj->num_affects; ++i) {
-		  new_obj->affected[i].location = obj->affected[i].location;
-		  new_obj->affected[i].modifier = obj->affected[i].modifier;
-	  }
-  }
-
-  return;
-}
-
-bool fullItemMatch(obj_data *obj, obj_data *obj2)
-{
-  if (strcmp(GET_OBJ_SHORT(obj), GET_OBJ_SHORT(obj2))) {
-    return false;
-  }
-  
-  if (strcmp(obj->name, obj2->name)) {
-    return false;
-  }
-
-  if (obj->obj_flags.extra_flags != obj2->obj_flags.extra_flags) {
-	return false;
-  }
-
-  if (obj->obj_flags.more_flags != obj2->obj_flags.more_flags) {
-	return false;
-  }
-
-  if (IS_SET(obj->obj_flags.more_flags, ITEM_CUSTOM)
-		  && obj->obj_flags.cost != obj2->obj_flags.cost) {
-	  return false;
-  }
-
-  if (IS_SET(obj->obj_flags.more_flags, ITEM_CUSTOM)
-		  && obj->obj_flags.value[0] != obj2->obj_flags.value[0]) {
-	  return false;
-  }
-
-  if (obj->obj_flags.type_flag != obj2->obj_flags.type_flag) {
-	  return false;
-  }
-
-  if ( (IS_SET(obj->obj_flags.more_flags, ITEM_CUSTOM) || obj->obj_flags.type_flag == ITEM_DRINKCON)
-		  && obj->obj_flags.value[1] != obj2->obj_flags.value[1]) {
-	  return false;
-  }
-
-  if ( (IS_SET(obj->obj_flags.more_flags, ITEM_CUSTOM) || obj->obj_flags.type_flag == ITEM_STAFF || obj->obj_flags.type_flag == ITEM_WAND)
-		  && (obj->obj_flags.value[2] != obj2->obj_flags.value[2])) {
-    return false;
-  }
-
-  if (IS_SET(obj->obj_flags.more_flags, ITEM_CUSTOM)
-		  && obj->obj_flags.value[3] != obj2->obj_flags.value[3]) {
-	  return false;
-  }
-
-  if (IS_SET(obj->obj_flags.more_flags, ITEM_CUSTOM)
-		  && obj->num_affects != obj2->num_affects) {
-	  return false;
-  }
-
-  // check if any of the affects don't match
-  if (IS_SET(obj->obj_flags.more_flags, ITEM_CUSTOM)) {
-	  for (int i=0; i < obj->num_affects; ++i) {
-		  if ( (obj->affected[i].location != obj2->affected[i].location) ||
-			   (obj->affected[i].modifier != obj2->affected[i].modifier) ) {
-			  return false;
-		  }
-	  }
-  }
-
-  return 1;
 }
 
 void save_vault(char *name) {
@@ -1194,41 +1060,6 @@ struct obj_data *exists_in_vault(struct vault_data *vault, obj_data *obj)
   return 0;
 }
 
-// Function to ensure an item is not bugged. If it is, replace it with the original.
-bool verify_item(struct obj_data **obj)
-{
- extern int top_of_objt;
-
-  if (!str_cmp((*obj)->short_description, ((struct obj_data*)obj_index[(*obj)->item_number].item)->short_description))
-    return FALSE;
-
-
-  int newitem = -1;
-  for (int i = 1; ; i++)
-  {
-
-    if ((*obj)->item_number - i < 0 && (*obj)->item_number + i > top_of_objt)
-	break; // No item at all found, it's a restring or deleted.
-
-    if ((*obj)->item_number - i >= 0)
-      if (!str_cmp((*obj)->short_description, ((struct obj_data*)obj_index[(*obj)->item_number - i].item)->short_description))
-      {
-		newitem = (*obj)->item_number - i;
-		break;
-      }
-
-    if ((*obj)->item_number + i <= top_of_objt)
-      if (!str_cmp((*obj)->short_description, ((struct obj_data*)obj_index[(*obj)->item_number + i].item)->short_description))
-      {
-		newitem = (*obj)->item_number + i;
-		break;
-      }
-  }
-  if (newitem == -1) return FALSE;
-
-  *obj = clone_object(newitem); // Fixed!
-  return TRUE;
-}
 
 void vault_get(CHAR_DATA *ch, char *object, char *owner) {
   std::string sbuf;
@@ -1386,8 +1217,9 @@ void vault_get(CHAR_DATA *ch, char *object, char *owner) {
       tmp_obj = clone_object(real_object(GET_OBJ_VNUM(obj)));
       copySaveData(tmp_obj,obj);
 
-      if (verify_item(&tmp_obj))
-	copySaveData(tmp_obj,obj);
+      if (verify_item(&tmp_obj)) {
+    	  copySaveData(tmp_obj,obj);
+      }
 
       // Jared: Removed for the time being because the item is still
       // used elsewhere
