@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: wizard.cpp,v 1.77 2012/01/19 03:39:11 jhhudso Exp $
+| $Id: wizard.cpp,v 1.78 2012/02/08 22:55:55 jhhudso Exp $
 | wizard.C
 | Description:  Utility functions necessary for wiz commands.
 */
@@ -172,37 +172,6 @@ void do_oload(struct char_data *ch, int rnum, int cnt, bool random)
   }
   log(buf, GET_LEVEL(ch), LOG_GOD);
 }    
-
-void string_to_file(FILE *f, char *string)
-{    
-  char * newbuf = new char[strlen(string)+1];
-  strcpy(newbuf, string);
-
-  // remove all \r's
-  for(char * curr = newbuf; *curr != '\0'; curr++)
-  {
-    if(*curr == '\r') {
-      for(char * blah = curr; *blah != '\0'; blah++) // shift the rest of the string 1 left
-        *blah = *(blah + 1);
-      curr--; // (to check for \r\r cases)
-    }
-  }
-   
-  fprintf(f, "%s~\n", newbuf);
-  delete [] newbuf;
-
-/*  the above uses more CPU time, but it MUCH nicer to our HD since it
-    only does 1 write instead of strlen(string) writes.  And since memory
-    operations are faster than file writes, it's actually faster too:)
-    -pir 12/11/01
-
-  while(*string) {
-    if(*string != '\r')
-      fputc(*string, f);
-    string++;
-  }  
-*/
-} 
 
 //
 // (I let him email it to me *wink* -pir)

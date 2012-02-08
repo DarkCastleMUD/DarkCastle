@@ -1,7 +1,7 @@
 #ifndef WIZARD_H_
 #define WIZARD_H_
 /************************************************************************
-| $Id: wizard.h,v 1.7 2012/01/07 04:24:16 jhhudso Exp $
+| $Id: wizard.h,v 1.8 2012/02/08 22:55:55 jhhudso Exp $
 | wizard.h
 | Description:  This is NOT a global include file, it's used only
 |   for the wiz_1*.C files to consolidate the header files they
@@ -62,7 +62,6 @@ CHAR_DATA *get_pc_vis(CHAR_DATA *ch, char *name);
 CHAR_DATA *get_pc_vis_exact(CHAR_DATA *ch, char *name);
 void update_wizlist(CHAR_DATA *ch);
 int real_roomb(int virt);
-void string_to_file(FILE *f, char *string);
 void save_ban_list(void);
 void save_nonew_new_list(void);
 void sprinttype(int type, char *names[], char *result);
