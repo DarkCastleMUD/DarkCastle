@@ -1,3 +1,4 @@
+#include <sys/stat.h>
 #include <sstream>
 #include <iostream>
 #include <stdio.h>
@@ -38,11 +39,15 @@ int main(int argc, char **argv)
 #ifndef __CYGWIN__
   // Make a copy of our executable so that in the event of a crash we have a
   // known good copy to debug with.
-  stringstream cmd;
-  cmd << "/bin/ln " << argv[0] << " " << argv[0] << "." << getpid();
-  if (int retval = system(cmd.str().c_str()) != 0) {
-    cerr << "Unable to make backup of executable due to system error: "
-	 << retval << endl;
+  stringstream backup_filename, cmd;
+  backup_filename << argv[0] << "." << getpid();
+
+  struct stat sbuf;
+  // If backup file does not exist already then link to it
+  if (stat(backup_filename.str().c_str(), &sbuf) == -1) {
+	if (link(argv[0], backup_filename.str().c_str()) == -1) {
+		perror("link");
+	}
   }
 #endif
 
