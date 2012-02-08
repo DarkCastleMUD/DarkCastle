@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: db.h,v 1.39 2012/01/07 23:28:32 jhhudso Exp $ */
+/* $Id: db.h,v 1.40 2012/02/08 22:54:25 jhhudso Exp $ */
 #ifndef DB_H_
 #define DB_H_
 
@@ -131,6 +131,7 @@ void reset_char(CHAR_DATA *ch);
 void free_char(CHAR_DATA *ch);
 int  real_room(int virt);
 char *fread_string(FILE *fl, int hasher);
+char *fread_string(ifstream &in, int hasher);
 char *fread_word(FILE *, int);
 int create_blank_item(int nr);
 int create_blank_mobile(int nr);
@@ -139,6 +140,7 @@ void delete_mob_from_index(int nr);
 int  real_object(int virt);
 int  real_mobile(int virt);
 int64_t fread_int(FILE *fl, int64_t minval, int64_t maxval);
+int64_t fread_int(ifstream &in, int64_t beg_range, int64_t end_range);
 uint64_t fread_uint(FILE *fl, uint64_t minval, uint64_t maxval);
 char fread_char (FILE *fl);
 void add_mobspec(int i);
@@ -155,6 +157,14 @@ CHAR_DATA *read_mobile(int nr, FILE *fl);
 struct obj_data  *clone_object(int nr);
 CHAR_DATA *clone_mobile(int nr);
 void randomize_object(obj_data *obj);
+void string_to_file(FILE *f, char *string);
+void string_to_file(ofstream &f, char *string);
+ofstream& operator<<(ofstream &out, obj_data *obj);
+ifstream& operator>>(ifstream &in, obj_data *obj);
+string lf_to_crlf(string &s1);
+void copySaveData(obj_data *new_obj, obj_data *obj);
+bool verify_item(struct obj_data **obj);
+bool fullItemMatch(obj_data *obj, obj_data *obj2);
 
 extern int top_of_objt;
 extern time_t start_time; /* mud start time */
