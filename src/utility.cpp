@@ -17,7 +17,7 @@
  *                         except Pir and Valk                             *
  * 10/19/2003   Onager     Took out super-secret hidey code from CAN_SEE() *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.121 2011/12/31 01:00:57 jhhudso Exp $ */
+/* $Id: utility.cpp,v 1.122 2012/02/10 08:48:48 jhhudso Exp $ */
 
 extern "C"
 {
@@ -285,14 +285,23 @@ void log( const char *str, int god_level, long type, char_data *vict)
     char *tmstr;
     FILE **f = 0;
     int stream = 1;
+    stringstream logpath;
+    extern short bport;
     
+    if (bport) {
+    	logpath << "../blog/";
+    } else {
+    	logpath << "../log/";
+    }
+
     switch(type) {
       default:
 	stream = 0;
 	break;
       case LOG_BUG:
          f = &bug_log;
-         if(!(*f = dc_fopen(BUG_LOG, "a"))) {
+         logpath << BUG_LOG;
+         if(!(*f = dc_fopen(logpath.str().c_str(), "a"))) {
            fprintf(stderr, "Unable to open bug log.\n");
            exit(1);
          }
@@ -307,37 +316,41 @@ void log( const char *str, int god_level, long type, char_data *vict)
 	break;
       case LOG_GOD:
         f = &god_log;
-        if(!(*f = dc_fopen(GOD_LOG, "a"))) {
+        logpath << BUG_LOG;
+        if(!(*f = dc_fopen(logpath.str().c_str(), "a"))) {
           fprintf(stderr, "Unable to open god log.\n");
           exit(1);
         }
 	break;
       case LOG_MORTAL:
         f = &mortal_log;
-        if(!(*f = dc_fopen(MORTAL_LOG, "a"))) {
+        logpath << MORTAL_LOG;
+        if(!(*f = dc_fopen(logpath.str().c_str(), "a"))) {
           fprintf(stderr, "Unable to open mortal log.\n");
           exit(1);
         }
  	break;
      case LOG_SOCKET:
         f = &socket_log;
-        if(!(*f = dc_fopen(SOCKET_LOG, "a"))) {
-          fprintf(stderr, "Unable to open socket log: %s\n", SOCKET_LOG);
+        logpath << SOCKET_LOG;
+        if(!(*f = dc_fopen(logpath.str().c_str(), "a"))) {
+          fprintf(stderr, "Unable to open socket log: %s\n", logpath.str().c_str());
           exit(1);
         }
 	break;
       case LOG_PLAYER:
         f = &player_log;
+        logpath << PLAYER_LOG;
         if (vict && vict->name) {
-	  stringstream filepath;
-	  filepath << PLAYER_DIR << vict->name;
+        	stringstream filepath;
+        	filepath << PLAYER_DIR << vict->name;
           if(!(*f = dc_fopen(filepath.str().c_str(), "a"))) {
             fprintf(stderr, "Unable to open player log '%s'.\n",
 		    filepath.str().c_str());
             exit(1);
           }
         } else {
-          if(!(*f = dc_fopen(PLAYER_LOG, "a"))) {
+          if(!(*f = dc_fopen(logpath.str().c_str(), "a"))) {
             fprintf(stderr, "Unable to open player log.\n");
             exit(1);
           }
@@ -345,35 +358,40 @@ void log( const char *str, int god_level, long type, char_data *vict)
 	break;
       case LOG_WORLD:
         f = &world_log;
-        if(!(*f = dc_fopen(WORLD_LOG, "a"))) {
+        logpath << WORLD_LOG;
+        if(!(*f = dc_fopen(logpath.str().c_str(), "a"))) {
           fprintf(stderr, "Unable to open world log.\n");
           exit(1);
         }
         break;
       case LOG_ARENA:
         f = &arena_log;
-        if(!(*f = dc_fopen(ARENA_LOG, "a"))) {
+        logpath << ARENA_LOG;
+        if(!(*f = dc_fopen(logpath.str().c_str(), "a"))) {
           fprintf(stderr, "Unable to open arena log.\n");
           exit(1);
         }
         break;
       case LOG_CLAN:
         f = &clan_log;
-        if(!(*f = dc_fopen(CLAN_LOG, "a"))) {
+        logpath << CLAN_LOG;
+        if(!(*f = dc_fopen(logpath.str().c_str(), "a"))) {
           fprintf(stderr, "Unable to open clan log.\n");
           exit(1);
         }
         break;
       case LOG_OBJECTS:
         f = &objects_log;
-        if(!(*f = dc_fopen(OBJECTS_LOG, "a"))) {
+        logpath << OBJECTS_LOG;
+        if(!(*f = dc_fopen(logpath.str().c_str(), "a"))) {
           fprintf(stderr, "Unable to open objects log.\n");
           exit(1);
         }
 	break;
       case LOG_QUEST:
         f = &quest_log;
-        if(!(*f = dc_fopen(QUEST_LOG, "a"))) {
+        logpath << QUEST_LOG;
+        if(!(*f = dc_fopen(logpath.str().c_str(), "a"))) {
           fprintf(stderr, "Unable to open quest log.\n");
           exit(1);
         }

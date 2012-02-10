@@ -29,6 +29,7 @@
 #endif
 
 void AuctionHandleDelete(string name);
+extern short bport;
 
 int do_linkload(struct char_data *ch, char *arg, int cmd)
 {
@@ -528,7 +529,14 @@ int do_testport(char_data *ch, char *argument, int cmd)
 	    chdir("../bin/");
 
 	    // Find next available fd
-	    FILE *testportlog = fopen("../log/testport.log", "w");
+
+	    FILE *testportlog;
+	    if (bport) {
+	    	testportlog = fopen("../blog/testport.log", "w");
+	    } else {
+	    	testportlog = fopen("../log/testport.log", "w");
+	    }
+
 	    if (testportlog != NULL) {
 		int fd = fileno(testportlog);
 
