@@ -17,7 +17,7 @@
  *                         except Pir and Valk                             *
  * 10/19/2003   Onager     Took out super-secret hidey code from CAN_SEE() *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.122 2012/02/10 08:48:48 jhhudso Exp $ */
+/* $Id: utility.cpp,v 1.123 2012/02/10 09:09:15 jhhudso Exp $ */
 
 extern "C"
 {
@@ -342,11 +342,10 @@ void log( const char *str, int god_level, long type, char_data *vict)
         f = &player_log;
         logpath << PLAYER_LOG;
         if (vict && vict->name) {
-        	stringstream filepath;
-        	filepath << PLAYER_DIR << vict->name;
-          if(!(*f = dc_fopen(filepath.str().c_str(), "a"))) {
+        	logpath << PLAYER_DIR << vict->name;
+          if(!(*f = dc_fopen(logpath.str().c_str(), "a"))) {
             fprintf(stderr, "Unable to open player log '%s'.\n",
-		    filepath.str().c_str());
+		    logpath.str().c_str());
             exit(1);
           }
         } else {
