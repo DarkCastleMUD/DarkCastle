@@ -49,10 +49,13 @@ using namespace std;
 #define AUC_MIN_PRICE 1000
 #define AUC_MAX_PRICE 2000000000
 
+struct AuctionTicket;
 struct obj_data * search_char_for_item(char_data * ch, int16 item_number, bool wearingonly = FALSE);
+obj_data * ticket_object_load(map<unsigned int, AuctionTicket>::iterator Item_it, int ticket);
+
 extern struct index_data *obj_index;
 extern CWorld world;
-//extern struct descriptor_data *descriptor_list;
+
 
 enum ListOptions
 {
@@ -525,12 +528,7 @@ void AuctionHouse::Identify(CHAR_DATA *ch, unsigned int ticket)
     return;
   }
 
-  OBJ_DATA *obj;
-  if (Item_it->second.obj) {
-	  obj = Item_it->second.obj;
-  } else {
-	  obj = (struct obj_data *)(obj_index[nr].item);
-  }
+  obj_data *obj = ticket_object_load(Item_it, ticket);
 
   TaxCollected += 6000;
   GET_GOLD(ch) -= 6000;
@@ -1162,42 +1160,7 @@ void AuctionHouse::BuyItem(CHAR_DATA *ch, unsigned int ticket)
     return;
   }
 
-  // If obj is NULL then either we haven't loaded this object yet or it's not custom
-  if (Item_it->second.obj == NULL) {
-	  stringstream obj_filename;
-	  obj_filename << "../lib/auctions/" << ticket << ".auction_obj";
-
-	  ifstream auction_obj_file;
-	  auction_obj_file.open(obj_filename.str().c_str());
-	  if (auction_obj_file.is_open()) {
-		auction_obj_file.exceptions(ifstream::failbit | ifstream::badbit | ifstream::eofbit);
-
-		try {
-			Item_it->second.obj = new obj_data;
-			auction_obj_file >> Item_it->second.obj;
-			auction_obj_file.close();
-		} catch (ifstream::failure &e) {
-			logf(IMMORTAL, LOG_BUG, "AuctionHouse::Load(): could not load obj file for ticket %d due to %s.", ticket, e.what());
-			perror("AuctionHouse::Load");
-		} catch (...) {
-			perror("AuctionHouse::Load");
-		}
-	  }
-  }
-
-  // If load was successful use it as a copy reference for a clone
-  if (Item_it->second.obj) {
-	  obj_data *reference_obj = Item_it->second.obj;
-
-	  obj = clone_object(rnum);
-	  copySaveData(obj, reference_obj);
-
-	  if (verify_item(&obj)) {
-	  	copySaveData(obj, reference_obj);
-	  }
-  } else {
-	  obj = clone_object(rnum);
-  }
+  obj = ticket_object_load(Item_it, ticket);
 
   if(!obj)
   {
@@ -1304,6 +1267,49 @@ void AuctionHouse::BuyItem(CHAR_DATA *ch, unsigned int ticket)
    log("bport mode: Not saving auction file to web dir.", 0, LOG_MISC);
  }
 
+}
+
+obj_data * ticket_object_load(map<unsigned int, AuctionTicket>::iterator Item_it, int ticket) {
+// If obj is NULL then either we haven't loaded this object yet or it's not custom
+  if (Item_it->second.obj == NULL) {
+	  stringstream obj_filename;
+	  obj_filename << "../lib/auctions/" << ticket << ".auction_obj";
+
+	  ifstream auction_obj_file;
+	  auction_obj_file.open(obj_filename.str().c_str());
+	  if (auction_obj_file.is_open()) {
+		auction_obj_file.exceptions(ifstream::failbit | ifstream::badbit | ifstream::eofbit);
+
+		try {
+			Item_it->second.obj = new obj_data;
+			auction_obj_file >> Item_it->second.obj;
+			auction_obj_file.close();
+		} catch (ifstream::failure &e) {
+			logf(IMMORTAL, LOG_BUG, "AuctionHouse::Load(): could not load obj file for ticket %d due to %s.", ticket, e.what());
+			perror("AuctionHouse::Load");
+		} catch (...) {
+			perror("AuctionHouse::Load");
+		}
+	  }
+  }
+
+  obj_data *obj;
+  int rnum = real_object(Item_it->second.vitem);
+  // If load was successful use it as a copy reference for a clone
+  if (Item_it->second.obj) {
+	  obj_data *reference_obj = Item_it->second.obj;
+
+	  obj = clone_object(rnum);
+	  copySaveData(obj, reference_obj);
+
+	  if (verify_item(&obj)) {
+	  	copySaveData(obj, reference_obj);
+	  }
+  } else {
+	  obj = clone_object(rnum);
+  }
+
+  return obj;
 }
 
 /*
