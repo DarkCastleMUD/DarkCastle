@@ -442,24 +442,7 @@ Is the player selling the max # of items already?
 */
 bool AuctionHouse::CanSellMore(CHAR_DATA *ch)
 {
-  struct vault_data *vault;
-  int max_items;
-  int items_sold = 0;
-
-  if (!(vault = has_vault(GET_NAME(ch)))) 
-    return false;
-
-  max_items = vault->size / 100;
-
-  map<unsigned int, AuctionTicket>::iterator Item_it;
-  
-  for(Item_it = Items_For_Sale.begin(); Item_it != Items_For_Sale.end(); Item_it++)
-  {
-    if(!Item_it->second.seller.compare(GET_NAME(ch)))
-      items_sold++;
-  }
-
-  return (items_sold < max_items);
+  return true;
 }
 
 /*
@@ -1571,7 +1554,6 @@ void AuctionHouse::AddItem(CHAR_DATA *ch, OBJ_DATA *obj, unsigned int price, str
   char buf[20];
   strncpy(buf, buyer.c_str(), 19);
   buf[19] = '\0';
-  unsigned int fee;
   bool advertise = false;
 
   //taken from linkload, formatting of player name
@@ -1593,19 +1575,6 @@ void AuctionHouse::AddItem(CHAR_DATA *ch, OBJ_DATA *obj, unsigned int price, str
   if(!IsOkToSell(obj))
   {
     send_to_char("You can't sell that type of item here!\n\r", ch);
-    return;
-  }
-
-  if(!CanSellMore(ch))
-  {
-    struct vault_data *vault;
-    if ((vault = has_vault(GET_NAME(ch)))) 
-    {
-       int max_items = vault->size / 100;
-       csendf(ch, "You cannot list more than %d items!\n\r", max_items);
-    }
-    else
-      send_to_char("You have to be level 10 and own a vault to sell items!\n\r", ch);
     return;
   }
 
@@ -1644,15 +1613,6 @@ void AuctionHouse::AddItem(CHAR_DATA *ch, OBJ_DATA *obj, unsigned int price, str
     }
   }
 
-  fee = (unsigned int)((double)price * 0.025); //2.5% fee to list, then 2.5% fee during sale
-  if(fee > 500000)
-    fee = 500000;
-  if(GET_GOLD(ch) < fee)
-  {
-    csendf(ch, "You don't have enough gold to pay the %d coin auction fee.\n\r", fee);
-    return;
-  }
-
   if(!strcmp(buf, GET_NAME(ch)))
   {
     send_to_char("Why would you want to privately sell something to yourself?\n\r", ch);
@@ -1662,9 +1622,9 @@ void AuctionHouse::AddItem(CHAR_DATA *ch, OBJ_DATA *obj, unsigned int price, str
   if(!strcmp(buf, "Advertise"))
     advertise = true;
 
-  if(advertise == true && (GET_GOLD(ch) < (200000 + fee)))
+  if(advertise == true && (GET_GOLD(ch) < (200000)))
   {
-    csendf(ch, "You need 200000 gold plus the %u gold fee to advertise an item.\n\r", fee);
+    csendf(ch, "You need 200000 gold to advertise an item.\n\r");
     return;
   }
 
@@ -1696,9 +1656,6 @@ void AuctionHouse::AddItem(CHAR_DATA *ch, OBJ_DATA *obj, unsigned int price, str
 
   ItemsPosted += 1;
   ItemsActive += 1;
-  TaxCollected += fee;
-  GET_GOLD(ch) -= fee;
-  csendf(ch, "You pay the %d coin tax to auction the item.\n\r", fee);
  
   AuctionTicket NewTicket;
   NewTicket.vitem = obj_index[obj->item_number].virt;
