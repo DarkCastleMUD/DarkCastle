@@ -1226,7 +1226,19 @@ void AuctionHouse::BuyItem(CHAR_DATA *ch, unsigned int ticket)
       csendf(ch, "You give your %s to the broker.\n\r", no_trade_obj->short_description);
       extract_obj(no_trade_obj);
     }
-  } 
+  }
+  
+  stringstream obj_filename;
+  obj_filename << "../lib/auctions/" << ticket << ".auction_obj";
+  struct stat sbuf;
+  if (stat(obj_filename.str().c_str(), &sbuf) == 0) {
+	  if (unlink(obj_filename.str().c_str()) == -1) {
+		  logf(IMMORTAL, LOG_BUG, "unlink %s: %s", obj_filename.str().c_str(), strerror(errno));
+		  return;
+	  }
+  }
+
+  Item_it->second.obj = NULL;  
   ItemsSold += 1;
   ItemsActive -= 1;
   Revenue += Item_it->second.price; 
@@ -1245,15 +1257,6 @@ void AuctionHouse::BuyItem(CHAR_DATA *ch, unsigned int ticket)
 
   Item_it->second.state = AUC_SOLD;
   Item_it->second.buyer = GET_NAME(ch);
-
-  stringstream obj_filename;
-  obj_filename << "../lib/auctions/" << ticket << ".auction_obj";
-  struct stat sbuf;
-  if (stat(obj_filename.str().c_str(), &sbuf) == 0) {
-	  if (unlink(obj_filename.str().c_str()) == -1) {
-		  perror("unlink");
-	  }
-  }
 
   Save(); 
   char log_buf[MAX_STRING_LENGTH];
