@@ -525,7 +525,13 @@ void AuctionHouse::Identify(CHAR_DATA *ch, unsigned int ticket)
     return;
   }
 
-  OBJ_DATA *obj = (struct obj_data *)(obj_index[nr].item);
+  OBJ_DATA *obj;
+  if (Item_it->second.obj) {
+	  obj = Item_it->second.obj;
+  } else {
+	  obj = (struct obj_data *)(obj_index[nr].item);
+  }
+
   TaxCollected += 6000;
   GET_GOLD(ch) -= 6000;
   send_to_char("You pay the broker 6000 gold to identify the item.\n\r", ch);
