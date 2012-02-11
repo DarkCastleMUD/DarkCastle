@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc2.cpp,v 1.86 2011/09/03 04:18:26 jhhudso Exp $ */
+/* $Id: mob_proc2.cpp,v 1.87 2012/02/11 00:01:08 jhhudso Exp $ */
 #include <room.h>
 #include <obj.h>
 #include <connect.h>
@@ -830,7 +830,8 @@ int gl_repair_shop(struct char_data *ch, struct obj_data *obj, int cmd, char *ar
   } else if (obj->obj_flags.type_flag == ITEM_WEAPON ||
              obj->obj_flags.type_flag == ITEM_CONTAINER ||
 		obj->obj_flags.type_flag == ITEM_STAFF ||
-		obj->obj_flags.type_flag == ITEM_WAND)
+		obj->obj_flags.type_flag == ITEM_WAND ||
+		obj->obj_flags.type_flag == ITEM_INSTRUMENT)
   {
 
     percent = ((100* eqdam) / (value0 + value2));
