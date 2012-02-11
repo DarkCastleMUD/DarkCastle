@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc2.cpp,v 1.87 2012/02/11 00:01:08 jhhudso Exp $ */
+/* $Id: mob_proc2.cpp,v 1.88 2012/02/11 00:02:09 jhhudso Exp $ */
 #include <room.h>
 #include <obj.h>
 #include <connect.h>
@@ -429,7 +429,6 @@ int mortician(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
   int x = 0, cost = 0, which;
   int count = 0;
   char buf[100];
-  bool has_consent = FALSE;
 
   if(cmd != 56 && cmd != 59 && cmd != 58)
     return eFAILURE;
@@ -502,8 +501,6 @@ int mortician(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
      if(!obj->contains)  // skip empty corpses
        continue;
 
-     if(isname(buf, obj->name))
-       has_consent = TRUE;
      if (obj->in_room == ch->in_room) continue; // Skip bought corpses
 
      cost = corpse_cost(obj);
