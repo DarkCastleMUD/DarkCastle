@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.284 2011/12/13 04:00:12 dcastle Exp $ */
+/* $Id: spells.cpp,v 1.285 2012/02/12 04:01:20 jhhudso Exp $ */
 
 extern "C"
 {
@@ -2410,9 +2410,13 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
 
 		  // Ping-pong
 		   if (IS_AFFECTED(tar_char, AFF_REFLECT) && number(0,99) < tar_char->spell_reflect) {
-		     act("The spell harmlessly reflects off you and disperses.", tar_char, 0, 0, TO_CHAR, 0);
-		     act("The spell harmlessly reflects off $n and disperses.", tar_char, 0, 0, TO_ROOM, 0);
-		     return eSUCCESS;
+				 act("The spell harmlessly reflects off you and disperses.", tar_char, 0, 0, TO_CHAR, 0);
+				 act("The spell harmlessly reflects off $n and disperses.", tar_char, 0, 0, TO_ROOM, 0);
+				 if (oldroom) {
+						char_from_room(ch);
+						char_to_room(ch, oldroom);
+				 }
+				 return eSUCCESS;
 	           }
 	    }
         }
