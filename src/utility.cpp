@@ -17,7 +17,7 @@
  *                         except Pir and Valk                             *
  * 10/19/2003   Onager     Took out super-secret hidey code from CAN_SEE() *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.125 2012/02/10 23:39:48 jhhudso Exp $ */
+/* $Id: utility.cpp,v 1.126 2012/02/13 04:32:28 jhhudso Exp $ */
 
 extern "C"
 {
@@ -539,7 +539,7 @@ struct time_info_data age(CHAR_DATA *ch)
     return player_age;
 }
 
-bool file_exists(char *filename)
+bool file_exists(const char *filename)
 {
   FILE *fp;
   bool r;
@@ -550,7 +550,7 @@ bool file_exists(char *filename)
   return(r);
 }
 
-void util_archive(char *char_name, CHAR_DATA *caller)
+void util_archive(const char *char_name, CHAR_DATA *caller)
 {
   char buf[256];
   char buf2[256];

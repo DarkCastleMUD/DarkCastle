@@ -16,7 +16,7 @@
  *  10/21/2003   Onager    Changed IS_ANONYMOUS() to handle mobs without   *
  *                         crashing                                        *
  ***************************************************************************/
-/* $Id: utility.h,v 1.96 2012/02/08 22:54:57 jhhudso Exp $ */
+/* $Id: utility.h,v 1.97 2012/02/13 04:32:28 jhhudso Exp $ */
 
 #ifndef UTILITY_H_
 #define UTILITY_H_
@@ -454,8 +454,8 @@ int write_to_descriptor_fd(int desc, char *txt);
 void write_to_q(char *txt, struct txt_q *queue);
 int use_mana( CHAR_DATA *ch, int sn );
 void automail(char *name);
-bool file_exists(char *);
-void util_archive(char *, CHAR_DATA *);
+bool file_exists(const char *);
+void util_archive(const char *, CHAR_DATA *);
 void util_unarchive(char *, CHAR_DATA *);
 int is_busy(CHAR_DATA *ch);
 int is_ignoring(struct char_data *ch, struct char_data *i);

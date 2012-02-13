@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.192 2011/12/28 01:51:08 jhhudso Exp $ */
+/* $Id: nanny.cpp,v 1.193 2012/02/13 04:32:28 jhhudso Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -823,7 +823,7 @@ void set_hw(char_data *ch)
 void nanny(struct descriptor_data *d, char *arg)
 {
    char    buf[MAX_STRING_LENGTH];
-   char    str_tmp[25];
+   stringstream str_tmp;
    char    tmp_name[20];
    char    *password;
    bool    fOld;
@@ -887,7 +887,7 @@ void nanny(struct descriptor_data *d, char *arg)
         break;
        if (wizlock)
 	{
-	 SEND_TO_Q("The game is current WIZLOCKED, please connect via the new IP listed above.\r\n",d);
+	 SEND_TO_Q("The game is currently WIZLOCKED. Only immortals can connect at this time.\r\n",d);
 	}
       SEND_TO_Q("What name for the roster? ", d);
       STATE(d) = CON_GET_NAME;
@@ -924,8 +924,8 @@ void nanny(struct descriptor_data *d, char *arg)
       // ch is allocated in load_char_obj
       fOld     = load_char_obj( d, tmp_name );
       if(!fOld) {
-         sprintf(str_tmp, "../archive/%s.gz", tmp_name);
-         if(file_exists(str_tmp))
+         str_tmp << "../archive/" << tmp_name << ".gz";
+         if(file_exists(str_tmp.str().c_str()))
          {
             SEND_TO_Q("That character is archived.\n\rPlease mail "
                "Apocalypse with unarchive requests (DC_Apoc@hotmail.com).\n\r", d);
@@ -1558,11 +1558,11 @@ is_race_eligible(ch,7)?'*':' ',is_race_eligible(ch,8)?'*':' ',is_race_eligible(c
    
     case CON_ARCHIVE_CHAR:
        if(!strcmp(arg, "ARCHIVE ME")) {
-          strcpy(str_tmp, GET_NAME(d->character));
+          str_tmp << GET_NAME(d->character);
           SEND_TO_Q("\n\rCharacter Archived.\n\r", d);
           update_wizlist(d->character);
           close_socket(d);
-          util_archive(str_tmp, 0);
+          util_archive(str_tmp.str().c_str(), 0);
        }
        else {
           STATE(d) = CON_SELECT_MENU;
@@ -1680,7 +1680,7 @@ int _parse_name(char *arg, char *name)
    
    for (i = 0; (name[i] = arg[i]) != '\0'; i++)
    {
-      if ( name[i] < 0 || !isalpha(name[i]) || i > MAX_NAME_LENGTH )
+      if ( name[i] < 0 || !isalpha(name[i]) || i >= MAX_NAME_LENGTH )
          return 1;
    }
    
