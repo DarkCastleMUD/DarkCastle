@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.202 2011/12/29 05:12:22 jhhudso Exp $
+| $Id: cl_thief.cpp,v 1.203 2012/02/17 08:01:07 jhhudso Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -2176,6 +2176,11 @@ int do_appraise(CHAR_DATA *ch, char *argument, int cmd)
    if(!(learned = has_skill(ch, SKILL_APPRAISE))) {
       send_to_char("Your estimate would be baseless.\n\r", ch);
       return eFAILURE;
+   }
+
+   if (name[0] == '\0') {
+	     send_to_char("Appraise whom?\n\r", ch);
+	     return eFAILURE;
    }
 
    bits = generic_find(name, FIND_OBJ_INV | FIND_OBJ_ROOM |

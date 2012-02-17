@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.201 2012/01/17 01:04:59 jhhudso Exp $ */
+/* $Id: handler.cpp,v 1.202 2012/02/17 08:01:07 jhhudso Exp $ */
     
 extern "C"
 {
@@ -4070,7 +4070,7 @@ int generic_find(char *arg, int bitvector, CHAR_DATA *ch,
 	"\n" };
     
     int i;
-    char name[256];
+    char name[256] = { '\0' };
     bool found;
 
     found = FALSE;
