@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.216 2012/02/08 23:00:34 jhhudso Exp $ */
+/* $Id: db.cpp,v 1.217 2012/02/24 21:07:45 jhhudso Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -3852,7 +3852,7 @@ ifstream& operator>>(ifstream &in, obj_data *obj)
     obj->equipped_by  = 0;
     obj->in_obj       = 0;
     obj->contains     = 0;
-    obj->item_number  = nr;
+    obj->item_number  = 0;
 
 	return in;
 }
