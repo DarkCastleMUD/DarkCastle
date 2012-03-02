@@ -888,8 +888,8 @@ void AuctionHouse::Save()
     log("Unable to save auction files because this is the testport!", ANGEL, LOG_MISC);
     return;
   }
-
-  the_file = dc_fopen(file_name.c_str(), "w");
+  string temp_file_name = file_name + ".temp";
+  the_file = dc_fopen(temp_file_name.c_str(), "w");
 
   if(!the_file) 
   {
@@ -923,6 +923,7 @@ void AuctionHouse::Save()
 
   	  ofstream auction_obj_file;
   	  auction_obj_file.exceptions(ofstream::failbit | ofstream::badbit);
+  	  errno = 0;
   	  try {
   		  struct stat statinfo;
   		  if (stat("../lib/auctions/", &statinfo) != 0) {
@@ -935,8 +936,8 @@ void AuctionHouse::Save()
   		  auction_obj_file << Item_it->second.obj << flush;
   		  auction_obj_file.close();
   	  } catch (...) {
-  		  logf(IMMORTAL, LOG_BUG, "AuctionHouse::Save(): Ticket %d", Item_it->first);
   		  perror("AuctionHouse::Save()");
+  		  logf(IMMORTAL, LOG_BUG, "AuctionHouse::Save(): Ticket %d", Item_it->first);
   	  }
     }
 
@@ -950,6 +951,11 @@ void AuctionHouse::Save()
   fprintf(the_file, "%u\n", UncollectedGold);
 
   dc_fclose(the_file);
+  if (rename(temp_file_name.c_str(), file_name.c_str()) != 0) {
+	  perror("AuctionHouse::save() rename");
+	  logf(IMMORTAL, LOG_BUG, "AuctionHouse::Save() rename: %s", strerror(errno));
+  }
+
   return;
 } 
 
