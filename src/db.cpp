@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.217 2012/02/24 21:07:45 jhhudso Exp $ */
+/* $Id: db.cpp,v 1.218 2012/03/04 08:03:33 jhhudso Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -3746,18 +3746,15 @@ ifstream& operator>>(ifstream &in, obj_data *obj)
     }
 
     clear_object(obj);
-
     in >> c;
     if (c == '#') {
     	in >> nr;
     }
     in >> ws;
 
-
     obj->name               = fread_string (in, true);
 
     char *tmpptr;
-
     tmpptr = fread_string (in, true);
 
     if (strlen(tmpptr) >= MAX_OBJ_SDESC_LENGTH) {
@@ -3770,7 +3767,6 @@ ifstream& operator>>(ifstream &in, obj_data *obj)
     } else {
     	obj->short_description = tmpptr;
     }
-
     obj->description        = fread_string (in, 1);
     obj->action_description = fread_string (in, 1);
     obj->table = 0;
@@ -4665,13 +4661,18 @@ int is_empty(int zone_nr) {
 char *fread_string(ifstream &in, int hasher)
 {
 	char buffer[MAX_STRING_LENGTH];
-	in.exceptions(ofstream::badbit);
+
+	// Save original exception mask so we can restore it later
+	ios_base::iostate orig_exceptions = in.exceptions();
+	in.exceptions(ifstream::failbit | ifstream::badbit | ifstream::eofbit);
 	try {
 		in.getline(buffer, MAX_STRING_LENGTH, '~');
 		in >> ws;
 	} catch(...) {
 		logf(IMMORTAL, LOG_BUG, "fread_string() error reading");
+		throw;
 	}
+	in.exceptions(orig_exceptions);
 
 	string orig_str(buffer);
 	// Change \n into \r\n
@@ -4890,68 +4891,64 @@ int fread_bitvector(FILE *fl, long beg_range, long end_range)
 
 int fread_bitvector(ifstream &in, long beg_range, long end_range)
 {
-    char buf[200];
     int ch;
     long i = 0;
 
-    // eat space till we hit the next one
-    while ((ch = in.get())) {
-        if (ch == EOF) {
-            printf ("Reading %s: %s, %d\n", curr_type, curr_name, curr_virtno);
-            perror ("fread_bitvector: premature EOF");
-            abort();
-        }
+	// Save original exception mask so we can restore it later
+	ios_base::iostate orig_exceptions = in.exceptions();
+	in.exceptions(ifstream::failbit | ifstream::badbit | ifstream::eofbit);
+    try {
+		// eat space till we hit the next one
+		while ((ch = in.get())) {
+			if (ch != ' ' && ch != '\n') /* eat the white space */
+				break;
+		}
 
-        if (ch != ' ' && ch != '\n') /* eat the white space */
-            break;
+		// check if we're dealing with numbers, or letters
+		if(isdigit(ch) || ch == '-')
+		{
+		   // It's a digit, so put the char back and let fread_int handle it
+		   in.unget();		   
+		   int n = fread_int(in, beg_range, end_range);
+		   in.exceptions(orig_exceptions);
+		   return n;
+		}
+
+		// we're dealing with letters now
+		for(;;)
+		{
+			if(ch >= 'a' && ch <= 'z')
+			{
+			  i += 1 << (ch-'a');
+			}
+			else if(ch >= 'A' && ch <= 'G')
+			{
+			  i+= 1 << (26 + (ch - 'A'));
+			}
+			else if(ch == ' ' || ch == '\n')
+			{
+			  // we hit the end.  Return current i.
+			  in.exceptions(orig_exceptions);
+			  return i;
+			}
+			else {
+				logf(IMMORTAL, LOG_BUG, "fread_bitvector: illegal character");
+				logf(IMMORTAL, LOG_BUG, "Reading %s: %s, %d (%c)\n", curr_type, curr_name, curr_virtno, ch);
+				throw;
+			}
+
+			// if we hit here, we had a valid character.  read the next one.
+			ch = in.get();
+
+		} // for ;;
+    } catch (...) {
+		logf(IMMORTAL, LOG_BUG, "fread_bitvector: unknown error");
+		logf(IMMORTAL, LOG_BUG, "Reading %s: %s, %d", curr_type, curr_name, curr_virtno);
+		throw;
     }
+    in.exceptions(orig_exceptions);
 
-    // check if we're dealing with numbers, or letters
-    if(isdigit(ch) || ch == '-')
-    {
-       // It's a digit, so put the char back and let fread_int handle it
-       in.unget();
-       return fread_int(in, beg_range, end_range);
-    }
-
-    // we're dealing with letters now
-    for(;;)
-    {
-        if(ch == EOF)
-        {
-           sprintf(buf, "Reading %s: %s, %d\n", curr_type, curr_name, curr_virtno);
-           log(buf, 0, LOG_MISC);
-           perror ("fread_bitvector: premature EOF");
-           abort();
-        }
-        if(ch >= 'a' && ch <= 'z')
-        {
-          i += 1 << (ch-'a');
-        }
-        else if(ch >= 'A' && ch <= 'G')
-        {
-          i+= 1 << (26 + (ch - 'A'));
-        }
-        else if(ch == ' ' || ch == '\n')
-        {
-          // we hit the end.  Return current i.
-          return i;
-        }
-        else {
-           sprintf(buf, "Reading %s: %s, %d (%c)\n", curr_type, curr_name, curr_virtno, ch);
-           log(buf, 0, LOG_MISC);
-           perror ("fread_bitvector: illegal character");
-           abort();
-        }
-
-        // if we hit here, we had a valid character.  read the next one.
-        ch = in.get();
-
-    } // for ;;
-
-    perror( "fread_bitvector: something went wrong" );
-    abort();
-    return( 0 );
+    return 0;
 }
 
 
