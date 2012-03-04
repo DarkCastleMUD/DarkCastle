@@ -1274,10 +1274,19 @@ obj_data * ticket_object_load(map<unsigned int, AuctionTicket>::iterator Item_it
 			auction_obj_file >> Item_it->second.obj;
 			auction_obj_file.close();
 		} catch (ifstream::failure &e) {
-			logf(IMMORTAL, LOG_BUG, "AuctionHouse::Load(): could not load obj file for ticket %d due to %s.", ticket, e.what());
-			perror("AuctionHouse::Load");
+			if ((auction_obj_file.rdstate() & ios_base::eofbit) == ios_base::eofbit) {
+				logf(IMMORTAL, LOG_BUG, "ticket_object_load(): could not load obj file for ticket %d due to ios_base::eofbit", ticket);
+			} else if ((auction_obj_file.rdstate() & ios_base::badbit) == ios_base::badbit) {
+				logf(IMMORTAL, LOG_BUG, "ticket_object_load(): could not load obj file for ticket %d due to ios_base::badbit", ticket);
+			} else if ((auction_obj_file.rdstate() & ios_base::failbit) == ios_base::failbit) {
+				logf(IMMORTAL, LOG_BUG, "ticket_object_load(): could not load obj file for ticket %d due to ios_base::failbit", ticket);
+			} else {
+				logf(IMMORTAL, LOG_BUG, "ticket_object_load(): could not load obj file for ticket %d due to reasons unknown", ticket);
+			}
+			Item_it->second.obj = NULL;
 		} catch (...) {
-			perror("AuctionHouse::Load");
+			logf(IMMORTAL, LOG_BUG, "ticket_object_load(): unknown error");
+			Item_it->second.obj = NULL;
 		}
 	  }
   }
