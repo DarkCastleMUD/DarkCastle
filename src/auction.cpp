@@ -523,6 +523,15 @@ void AuctionHouse::Identify(CHAR_DATA *ch, unsigned int ticket)
 
   obj_data *obj = ticket_object_load(Item_it, ticket);
 
+  if(!obj)
+  {
+    char buf[MAX_STRING_LENGTH];
+    sprintf(buf, "Major screw up in auction(identify)! Item %s belonging to %s could not be created!",
+                    Item_it->second.item_name.c_str(), Item_it->second.seller.c_str());
+    log(buf, IMMORTAL, LOG_BUG);
+    return;
+  }
+
   TaxCollected += 6000;
   GET_GOLD(ch) -= 6000;
   send_to_char("You pay the broker 6000 gold to identify the item.\n\r", ch);
@@ -1383,19 +1392,14 @@ void AuctionHouse::RemoveTicket(CHAR_DATA *ch, unsigned int ticket)
         return;
       }
 
-      if (Item_it->second.obj) {
-    	  obj = Item_it->second.obj;
-      } else {
-    	  obj = clone_object(rnum);
-      }
-   
+      obj = ticket_object_load(Item_it, ticket);
       if(!obj)
       {
-        char buf[MAX_STRING_LENGTH];
-        sprintf(buf, "Major screw up in auction(cancel)! Item %s[RNum %d] belonging to %s could not be created!", 
-                    Item_it->second.item_name.c_str(), rnum, Item_it->second.seller.c_str());
-        log(buf, IMMORTAL, LOG_BUG);
-        return;
+    	  char buf[MAX_STRING_LENGTH];
+    	  sprintf(buf, "Major screw up in auction(RemoveTicket)! Item %s[RNum %d] belonging to %s could not be created!",
+					  Item_it->second.item_name.c_str(), rnum, Item_it->second.seller.c_str());
+    	  log(buf, IMMORTAL, LOG_BUG);
+    	  return;
       }
 
       csendf(ch, "The Consignment Broker retrieves %s and returns it to you.\n\r", obj->short_description);
