@@ -17,7 +17,7 @@
  *                         except Pir and Valk                             *
  * 10/19/2003   Onager     Took out super-secret hidey code from CAN_SEE() *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.126 2012/02/13 04:32:28 jhhudso Exp $ */
+/* $Id: utility.cpp,v 1.127 2012/03/22 04:35:18 jhhudso Exp $ */
 
 extern "C"
 {
@@ -316,7 +316,7 @@ void log( const char *str, int god_level, long type, char_data *vict)
 	break;
       case LOG_GOD:
         f = &god_log;
-        logpath << BUG_LOG;
+        logpath << GOD_LOG;
         if(!(*f = dc_fopen(logpath.str().c_str(), "a"))) {
           fprintf(stderr, "Unable to open god log.\n");
           exit(1);
