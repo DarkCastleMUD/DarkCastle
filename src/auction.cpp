@@ -1096,15 +1096,6 @@ void AuctionHouse::CheckExpire()
         csendf(ch, "Your auction of %s has expired.\n\r", Item_it->second.item_name.c_str());
       Item_it->second.state = AUC_EXPIRED;
       something_expired = true;
-
-      stringstream obj_filename;
-	  obj_filename << "../lib/auctions/" << Item_it->first << ".auction_obj";
-	  struct stat sbuf;
-	  if (stat(obj_filename.str().c_str(), &sbuf) == 0) {
-		  if (unlink(obj_filename.str().c_str()) == -1) {
-			  logf(IMMORTAL, LOG_BUG, "unlink %s: %s", obj_filename.str().c_str(), strerror(errno));
-		  }
-	  }
     }
   }
 
