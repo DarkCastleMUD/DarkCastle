@@ -408,6 +408,16 @@ void AuctionHouse::HandleDelete(string name)
   while(!tickets_to_delete.empty())
   {  
       Items_For_Sale.erase(tickets_to_delete.front());
+
+      stringstream obj_filename;
+	  obj_filename << "../lib/auctions/" << tickets_to_delete.front() << ".auction_obj";
+	  struct stat sbuf;
+	  if (stat(obj_filename.str().c_str(), &sbuf) == 0) {
+		  if (unlink(obj_filename.str().c_str()) == -1) {
+			  logf(IMMORTAL, LOG_BUG, "unlink %s: %s", obj_filename.str().c_str(), strerror(errno));
+		  }
+	  }
+
       tickets_to_delete.pop();
   }
   Save();
@@ -1086,6 +1096,15 @@ void AuctionHouse::CheckExpire()
         csendf(ch, "Your auction of %s has expired.\n\r", Item_it->second.item_name.c_str());
       Item_it->second.state = AUC_EXPIRED;
       something_expired = true;
+
+      stringstream obj_filename;
+	  obj_filename << "../lib/auctions/" << Item_it->first << ".auction_obj";
+	  struct stat sbuf;
+	  if (stat(obj_filename.str().c_str(), &sbuf) == 0) {
+		  if (unlink(obj_filename.str().c_str()) == -1) {
+			  logf(IMMORTAL, LOG_BUG, "unlink %s: %s", obj_filename.str().c_str(), strerror(errno));
+		  }
+	  }
     }
   }
 
@@ -1402,6 +1421,16 @@ void AuctionHouse::RemoveTicket(CHAR_DATA *ch, unsigned int ticket)
        sprintf(buf, "%s just tried to cheat and collect ticket %u which didn't get erased properly!", GET_NAME(ch), ticket);
        log(buf, IMMORTAL, LOG_BUG);
        Items_For_Sale.erase(ticket);
+
+       stringstream obj_filename;
+       obj_filename << "../lib/auctions/" << ticket << ".auction_obj";
+       struct stat sbuf;
+       if (stat(obj_filename.str().c_str(), &sbuf) == 0) {
+ 		  if (unlink(obj_filename.str().c_str()) == -1) {
+ 			  logf(IMMORTAL, LOG_BUG, "unlink %s: %s", obj_filename.str().c_str(), strerror(errno));
+ 		  }
+       }
+
        return;
      }
      break;
@@ -1420,6 +1449,15 @@ void AuctionHouse::RemoveTicket(CHAR_DATA *ch, unsigned int ticket)
                     ticket, Item_it->second.seller.c_str());
     log(buf, IMMORTAL, LOG_BUG);
     return;
+  }
+
+  stringstream obj_filename;
+  obj_filename << "../lib/auctions/" << ticket << ".auction_obj";
+  struct stat sbuf;
+  if (stat(obj_filename.str().c_str(), &sbuf) == 0) {
+	  if (unlink(obj_filename.str().c_str()) == -1) {
+		  logf(IMMORTAL, LOG_BUG, "unlink %s: %s", obj_filename.str().c_str(), strerror(errno));
+	  }
   }
 
   Save();
