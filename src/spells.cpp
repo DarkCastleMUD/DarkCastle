@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.285 2012/02/12 04:01:20 jhhudso Exp $ */
+/* $Id: spells.cpp,v 1.286 2012/04/05 14:56:00 jhhudso Exp $ */
 
 extern "C"
 {
@@ -955,8 +955,6 @@ void affect_update( int32 duration_type )
     static struct affected_type *af, *next_af_dude;
     static CHAR_DATA *i, * i_next;
     void update_char_objects( CHAR_DATA *ch ); /* handler.c */
-    unsigned int faded_spells[20] = { 0 };
-    int a =0;
 
     if (duration_type != PULSE_REGEN &&
 	duration_type != PULSE_TIMER &&
@@ -966,10 +964,6 @@ void affect_update( int32 duration_type )
 
     for (i = character_list; i; i = i_next) { 
       i_next = i->next;
-//      if(!IS_NPC(i) ) // && !(i->desc)) Linkdeadness doens't save you 
-//now.
-  //      continue; 
-
         // This doesn't really belong here, but it beats creating an "update" just for it.
         // That way we don't have to traverse the entire list all over again
         if(duration_type == PULSE_TIME && !IS_NPC(i))
@@ -982,7 +976,6 @@ void affect_update( int32 duration_type )
 	} else if (af->duration_type != duration_type) {
 	  continue;
 	}
-//	while (next_af_dude && next_af_dude->type == af->type) next_af_dude = next_af_dude->next;
 
 	if ((af->type == FUCK_PTHIEF || af->type == FUCK_CANTQUIT || af->type == FUCK_GTHIEF) && !i->desc)
 	  continue;
@@ -1019,21 +1012,9 @@ void affect_update( int32 duration_type )
 	else if (af->duration != -1){
 	  if ((af->type > 0) && (af->type <= MAX_SPL_LIST)) // only spells for this part
 	     if (*spell_wear_off_msg[af->type]) {
-		int z;
-		bool fadeit = TRUE;
-		for (z = 0;z < a;z++)
-		{
-		  if (faded_spells[z] == af->type)
-		   fadeit = FALSE;
-		} 
-		if (fadeit) {
-		if (a < 19)
-  		  faded_spells[a++] = af->type;	
 	        send_to_char(spell_wear_off_msg[af->type], i);
 	        send_to_char("\n\r", i);
-		}
 	     }
-//	  affect_from_char(i, af->type);
 	  affect_remove(i, af, 0);
 	}
       }
