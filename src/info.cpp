@@ -12,7 +12,7 @@
  * This is free software and you are benefitting.	We hope that you    *
  * share your changes too.  What goes around, comes around. 		    *
  ****************************************************************************/
-/* $Id: info.cpp,v 1.201 2012/02/08 22:52:23 jhhudso Exp $ */
+/* $Id: info.cpp,v 1.202 2012/04/05 02:39:41 elder Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -2748,7 +2748,7 @@ void check_leaderboard()
       if(!d->character || GET_LEVEL(d->character) >= IMMORTAL || IS_NPC(d->character)) continue;
       if (!d->connected == CON_PLAYING) continue;
       if (!d->character->pcdata) continue;
-      if(GET_MAX_HIT(d->character) > 15000) continue;
+      if(GET_MAX_HIT(d->character) > 20000) continue;
 
       k = MIN(CLASS_DRUID - 1,GET_CLASS(d->character) - 1);
 
@@ -3263,7 +3263,7 @@ int do_leaderboard(struct char_data *ch, char *argument, int cmd)
       if (!d->connected == CON_PLAYING) continue;
       if (!d->character->pcdata) continue;
       if (!CAN_SEE(ch, d->character)) continue;
-      if(GET_MAX_HIT(d->character) > 15000) continue;
+      if(GET_MAX_HIT(d->character) > 20000) continue;
 
       if(validclass && GET_CLASS(d->character) != k + 1) continue;
 
