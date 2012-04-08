@@ -34,6 +34,7 @@
 #include "vault.h"
 #include "set.h"
 #include "structs.h"
+#include "guild.h"
 
 using std::vector;
 using std::string;
@@ -1137,8 +1138,6 @@ int do_sedit(struct char_data *ch, char *argument, int cmd)
   int16 skillnum;
   int16 learned;
   int i;
-
-  int learn_skill(char_data * ch, int skill, int amount, int maximum);
 
   char * sedit_values[] = {
     "add", 
