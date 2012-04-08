@@ -1759,9 +1759,13 @@ void add_new_vault(char *name, int indexonly) {
 struct char_data *find_owner(char *name) {
   extern char_data * character_list;
   struct char_data *ch;
-  for(ch = character_list; ch; ch = ch->next) 
-    if (!strcmp(name, GET_NAME(ch)))
-      return ch;
+  for(ch = character_list; ch; ch = ch->next) {
+	  if (ch->name == NULL) {
+		  produce_coredump(); //Trying to track down bug that causes mob->name to be NULL
+	  } else if (!strcmp(name, GET_NAME(ch))) {
+		  return ch;
+	  }
+  }
 
   return 0;
 }
