@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.218 2012/03/04 08:03:33 jhhudso Exp $ */
+/* $Id: db.cpp,v 1.219 2012/04/09 00:56:34 jhhudso Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -2549,9 +2549,8 @@ void boot_zones(void)
   
     if (!(fl = dc_fopen(endfile, "r")))
     {
-      perror ("dc_fopen");
-      log ("boot_zone: could not open zone file.", 0, LOG_BUG);
-      log (temp, 0, LOG_BUG);
+      perror (endfile);
+      logf (IMMORTAL, LOG_BUG, "boot_zone: could not open zone file: %s", endfile);
       abort();
     }
     //int num = 0;
