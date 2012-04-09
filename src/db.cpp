@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.219 2012/04/09 00:56:34 jhhudso Exp $ */
+/* $Id: db.cpp,v 1.220 2012/04/09 01:00:27 jhhudso Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -1033,8 +1033,8 @@ struct index_data *generate_mob_indices(int *top, struct index_data *index)
 
     if (!(fl = dc_fopen(endfile, "r"))) 
     {
-      log ("generate_mob_indices: could not open mob file.", 0, LOG_BUG);
-      log (temp, 0, LOG_BUG);
+      perror(endfile);
+      logf (IMMORTAL, LOG_BUG, "generate_mob_indices: could not open mob file: %s", endfile);
       abort();
     }
 
