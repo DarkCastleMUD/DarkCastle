@@ -686,7 +686,6 @@ extern  int size_restricted(struct char_data *ch, struct obj_data *obj);
 int do_reload(struct char_data *ch, char *argument, int cmd)
 {
   int do_reload_help(struct char_data *ch, char *argument, int cmd);
-  extern char news[MAX_STRING_LENGTH];
   extern char motd[MAX_STRING_LENGTH];
   extern char imotd[MAX_STRING_LENGTH];
   extern char new_help[MAX_STRING_LENGTH];
@@ -700,7 +699,6 @@ int do_reload(struct char_data *ch, char *argument, int cmd)
   one_argument(argument, arg);
 
   if (!str_cmp(arg, "all")) {
-    file_to_string(NEWS_FILE, news);
     file_to_string(MOTD_FILE, motd);
     file_to_string(IMOTD_FILE, imotd);
     file_to_string(NEW_HELP_PAGE_FILE, new_help);
@@ -717,8 +715,6 @@ int do_reload(struct char_data *ch, char *argument, int cmd)
     file_to_string(WEBPAGE_FILE, webpage);
   else if (!str_cmp(arg, "INFO"))
     file_to_string(INFO_FILE, info);
-  else if (!str_cmp(arg, "news"))
-    file_to_string(NEWS_FILE, news);
   else if (!str_cmp(arg, "motd"))
     file_to_string(MOTD_FILE, motd);
   else if (!str_cmp(arg, "imotd"))
