@@ -91,8 +91,8 @@ int main(int argc, char **argv)
     case 'w':
        code_testing_mode = 1;
        code_testing_mode_world = 1;
-       log("Mud in world checking mode.  TinyTinyworld being used. (WLD)"
-           "\r\nDo NOT have mortals login when in this mode.", 0, LOG_MISC);
+       log("Mud in world checking mode. TinyTinyworld being used. (WLD)", 0, LOG_MISC);
+       log("Do NOT have mortals login when in world checking mode.", 0, LOG_MISC);
        break;
 
     case 'c':
