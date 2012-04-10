@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.202 2012/02/17 08:01:07 jhhudso Exp $ */
+/* $Id: handler.cpp,v 1.203 2012/04/10 01:31:09 jhhudso Exp $ */
     
 extern "C"
 {
@@ -2862,6 +2862,12 @@ int obj_to_room(struct obj_data *object, int room)
   if (!object)
     return 0;
 
+  if (&world[room] == NULL) {
+	  logf(IMMORTAL, LOG_BUG, "obj_to_room: world[%d] == NULL", room);
+	  produce_coredump();
+	  return 0;
+  }
+
   if(object->obj_flags.type_flag == ITEM_PORTAL)
     world[room].light++;
 
@@ -4413,6 +4419,10 @@ int find_skill_num(char * name)
       if (name_length <= strlen("natural select timer") && !str_n_nosp_cmp(name, "natural select timer", name_length))
         return SPELL_NAT_SELECT_TIMER;
       break;
+     case 'p':
+         if (name_length <= strlen("profession") && !str_n_nosp_cmp(name, "profession", name_length))
+           return SKILL_PROFESSION;
+    	 break;
      case 'q':
       if (name_length <= strlen("quiver reuse timer") && !str_n_nosp_cmp(name, "quiver reuse timer", name_length))
         return SKILL_QUIVERING_PALM;
