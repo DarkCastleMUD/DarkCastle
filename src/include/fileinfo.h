@@ -1,7 +1,7 @@
 #ifndef FILEINFO_H_
 #define FILEINFO_H_
 /*
-| $Id: fileinfo.h,v 1.31 2012/02/10 08:48:48 jhhudso Exp $
+| $Id: fileinfo.h,v 1.32 2012/04/10 02:50:59 jhhudso Exp $
 | fileinfo.h
 | Description:  Contains information for loading files, ie "../lib", etc..
 */
@@ -34,8 +34,7 @@
 #define  GREETINGS3_FILE    "greetings4.txt"
 #define  GREETINGS4_FILE    "greetings5.txt"
 #define  CREDITS_FILE       "credits.txt"
-#define  NEWS_FILE          "news.txt"
-#define  MOTD_FILE          "motd.txt"
+#define  MOTD_FILE          "../lib/motd.txt"
 #define  IMOTD_FILE         "motdimm.txt"
 #define  STORY_FILE         "story.txt"
 #define  TIME_FILE          "time.txt"
