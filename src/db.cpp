@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.220 2012/04/09 01:00:27 jhhudso Exp $ */
+/* $Id: db.cpp,v 1.221 2012/04/10 02:51:53 jhhudso Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -143,7 +143,6 @@ char greetings2[MAX_STRING_LENGTH];    /* the other greeting screen    */
 char greetings3[MAX_STRING_LENGTH];
 char greetings4[MAX_STRING_LENGTH];
 char credits[MAX_STRING_LENGTH];      /* the Credits List              */
-char news[MAX_STRING_LENGTH];         /* the news                      */
 char motd[MAX_STRING_LENGTH];         /* the messages of today         */
 char imotd[MAX_STRING_LENGTH];        /* the immortal messages of today*/
 char story[MAX_STRING_LENGTH];        /* the game story                */
@@ -539,7 +538,6 @@ void boot_db(void)
     file_to_string(GREETINGS2_FILE, greetings2);
     file_to_string(GREETINGS3_FILE, greetings3);
     file_to_string(GREETINGS4_FILE, greetings4); 
-    file_to_string(NEWS_FILE, news); 
     file_to_string(CREDITS_FILE, credits);
     file_to_string(MOTD_FILE, motd);
     file_to_string(IMOTD_FILE, imotd);
