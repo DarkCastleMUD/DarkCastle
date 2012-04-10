@@ -722,7 +722,11 @@ int do_zedit(struct char_data *ch, char *argument, int cmd)
         for(char_data *tmp_vict = character_list; tmp_vict; tmp_vict = next_vict) {
 			next_vict = tmp_vict->next;
 			if (IS_MOB(tmp_vict) && tmp_vict->mobdata && tmp_vict->mobdata->reset == &zone_table[zone].cmd[j]) {
-				tmp_vict->mobdata->reset = NULL;
+				if (zone_table[zone].cmd[j+1].command != 'S') {
+					tmp_vict->mobdata->reset = &zone_table[zone].cmd[j+1];
+				} else {
+					tmp_vict->mobdata->reset = NULL;
+				}
 			}
         }
         zone_table[zone].cmd[j] = zone_table[zone].cmd[j+1];
