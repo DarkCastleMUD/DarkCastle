@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: wizard.cpp,v 1.78 2012/02/08 22:55:55 jhhudso Exp $
+| $Id: wizard.cpp,v 1.79 2012/04/10 02:49:11 jhhudso Exp $
 | wizard.C
 | Description:  Utility functions necessary for wiz commands.
 */
@@ -1787,8 +1787,13 @@ void pulse_hunts()
      check_end_of_hunt(h);
   }
 
-  struct obj_data *obj,*onext;
-  for (obj = world[6345].contents;obj;obj = onext)
+  if (&world[6345] == NULL) {
+	  logf(IMMORTAL, LOG_BUG, "pulse_hunts: room 6345 does not exist.");
+	  return;
+  }
+
+  struct obj_data *obj, *onext;
+  for (obj = world[6345].contents; obj; obj = onext)
   {
     onext = obj->next_content;
     extract_obj(obj);
