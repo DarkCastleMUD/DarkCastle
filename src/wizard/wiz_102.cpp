@@ -717,8 +717,16 @@ int do_zedit(struct char_data *ch, char *argument, int cmd)
       }
 
       // j = i-1 because the user sees arrays starting at 1
-      for(j = i-1; zone_table[zone].cmd[j].command != 'S'; j++)
+      for(j = i-1; zone_table[zone].cmd[j].command != 'S'; j++) {
+        char_data *next_vict;
+        for(char_data *tmp_vict = character_list; tmp_vict; tmp_vict = next_vict) {
+			next_vict = tmp_vict->next;
+			if (IS_MOB(tmp_vict) && tmp_vict->mobdata && tmp_vict->mobdata->reset == &zone_table[zone].cmd[j]) {
+				tmp_vict->mobdata->reset = NULL;
+			}
+        }
         zone_table[zone].cmd[j] = zone_table[zone].cmd[j+1];
+      }
 
       sprintf(buf, "Command %d removed.  Table reformatted.\n\r", i);
       send_to_char(buf, ch);
