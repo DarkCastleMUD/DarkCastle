@@ -171,7 +171,7 @@ int do_advance(struct char_data *ch, char *argument, int cmd)
 {
     struct char_data *victim;
     char name[100], level[100], buf[300], passwd[100];
-    int adv, new_newlevel;
+    int new_newlevel;
 
     void gain_exp(struct char_data *ch, int gain);
 
@@ -243,8 +243,6 @@ int do_advance(struct char_data *ch, char *argument, int cmd)
                 advance_level(victim, 0);
                 redo_hitpoints(victim);
       }
-
-        adv = new_newlevel - GET_LEVEL(victim);
 
     send_to_char("You feel generous.\n\r", ch);
     act("$n makes some strange gestures.\n\rA strange feeling comes upon you,"
