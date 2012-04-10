@@ -458,9 +458,10 @@ int do_shutdown(struct char_data *ch, char *argument, int cmd)
     }
     else if(!strcmp(arg1, "crash")) {
         // let's crash the mud!
-        char_data * blahblah = NULL;
-        int chode = blahblah->in_room;
-        chode = 1; // we never get here, but it gets rid of the compile warning
+        char_data * crashus = NULL;
+        if (crashus->in_room == -1) {
+        	return eFAILURE; // this should never be reached
+        }
     }
     else if (!strcmp(arg1, "core")) {
       produce_coredump();
@@ -469,10 +470,12 @@ int do_shutdown(struct char_data *ch, char *argument, int cmd)
     else if(!strcmp(arg1, "die")) {
         fclose(fopen("died_in_bootup", "w"));
         try_to_hotboot_on_crash = 0;
+
         // let's crash the mud!
-        char_data * blahblah = NULL;
-        int chode = blahblah->in_room;
-        chode = 1; // we never get here, but it gets rid of the compile warning
+        char_data * crashus = NULL;
+        if (crashus->in_room == -1) {
+        	return eFAILURE; // this should never be reached
+        }
     }
     else
         send_to_char("Go shut down someone your own size.\n\r", ch);
