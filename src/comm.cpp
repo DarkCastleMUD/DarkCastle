@@ -2471,13 +2471,14 @@ void sigchld(int sig)
 #define my_signal(signo, func) signal(signo, func)
 
 void signal_handler(int signal, siginfo_t *si, void *) {
-	logf(IMMORTAL, LOG_MISC,"signal_handler: signo=%d errno=%d code=%d "
-							"pid=%d uid=%d status=%d utime=%lu stime=%lu value=%d "
-							"int=%d ptr=%d overrun=%d timerid=%d addr=%d band=%d "
-							"fd=%d", si->si_signo, si->si_errno, si->si_code,
-							si->si_pid, si->si_uid, si->si_status, si->si_utime, si->si_stime, si->si_value,
-							si->si_int, si->si_ptr, si->si_overrun, si->si_timerid, si->si_addr, si->si_band,
-							si->si_fd);
+	logf(IMMORTAL, LOG_BUG, "signal_handler: signo=%d errno=%d code=%d "
+			"pid=%d uid=%d status=%d utime=%lu stime=%lu value=%d "
+			"int=%d ptr=%p overrun=%d timerid=%d addr=%p band=%ld "
+			"fd=%d", si->si_signo, si->si_errno, si->si_code,
+			si->si_pid, si->si_uid, si->si_status, si->si_utime, si->si_stime, si->si_value.sival_int,
+			si->si_int, si->si_ptr, si->si_overrun, si->si_timerid, si->si_addr, si->si_band,
+			si->si_fd);
+
 	if (signal == SIGINT || signal == SIGTERM) {
 		abort();
 	}
