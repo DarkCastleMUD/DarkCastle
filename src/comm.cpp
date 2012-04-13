@@ -2470,6 +2470,18 @@ void sigchld(int sig)
 
 #define my_signal(signo, func) signal(signo, func)
 
+void signal_handler(int signal, siginfo_t *si, void *) {
+	logf(IMMORTAL, LOG_MISC,"signal_handler: signo=%d errno=%d code=%d "
+							"pid=%d uid=%d status=%d utime=%lu stime=%lu value=%d "
+							"int=%d ptr=%d overrun=%d timerid=%d addr=%d band=%d "
+							"fd=%d", si->si_signo, si->si_errno, si->si_code,
+							si->si_pid, si->si_uid, si->si_status, si->si_utime, si->si_stime, si->si_value,
+							si->si_int, si->si_ptr, si->si_overrun, si->si_timerid, si->si_addr, si->si_band,
+							si->si_fd);
+	if (signal == SIGINT || signal == SIGTERM) {
+		abort();
+	}
+}
 
 void signal_setup(void)
 {
@@ -2489,8 +2501,14 @@ void signal_setup(void)
    * OS/2.
    */
   /* just to be on the safe side: */
-  my_signal(SIGHUP, hupsig);
-  my_signal(SIGINT, hupsig);
+  struct sigaction sahup;
+  memset(&sahup, 0, sizeof(sahup));
+  sahup.sa_sigaction = signal_handler;
+  sigemptyset(&sahup.sa_mask);
+  sahup.sa_flags = SA_SIGINFO;
+  sahup.sa_restorer = NULL;
+  sigaction(SIGHUP, &sahup, NULL);
+
   my_signal(SIGTERM, hupsig);
   my_signal(SIGPIPE, SIG_IGN);
   my_signal(SIGALRM, SIG_IGN);
