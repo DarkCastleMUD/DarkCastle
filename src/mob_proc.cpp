@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.201 2012/04/05 02:39:41 elder Exp $ */
+/* $Id: mob_proc.cpp,v 1.202 2012/04/16 03:11:25 shane Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -1616,7 +1616,7 @@ static char *dethSayText [ ] =
   "What does God do when a kitten masturbates?",
   "This is great...some guy in Nigeria wants to transfer me a huge sum of money if I help him out!",
   "The truth, like my penis, sometimes slips out at inopportune times.",
-  "I wonder if anyone ever calls Steve Jobs 'Mac Daddy'.",
+  "I wonder if anyone ever called Steve Jobs 'Mac Daddy'.",
   "Ever get the urge to call the operator and say 'I need an exit fast!'",
   "The thing that attracts me to fat chicks the most is probably the gravitational pull.",
     // Sneaky repeating of messages to make the fuckers vote.
