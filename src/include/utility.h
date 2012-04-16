@@ -16,7 +16,7 @@
  *  10/21/2003   Onager    Changed IS_ANONYMOUS() to handle mobs without   *
  *                         crashing                                        *
  ***************************************************************************/
-/* $Id: utility.h,v 1.97 2012/02/13 04:32:28 jhhudso Exp $ */
+/* $Id: utility.h,v 1.98 2012/04/16 03:09:54 shane Exp $ */
 
 #ifndef UTILITY_H_
 #define UTILITY_H_
@@ -574,5 +574,7 @@ bool champion_can_go(int room);
 bool class_can_go(int ch_class, int room);
 
 const char *find_profession(int c_class, uint8_t profession);
+
+char *get_isr_string(uint32, byte);
 
 #endif /* UTILITY_H_ */

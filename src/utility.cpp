@@ -17,7 +17,7 @@
  *                         except Pir and Valk                             *
  * 10/19/2003   Onager     Took out super-secret hidey code from CAN_SEE() *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.127 2012/03/22 04:35:18 jhhudso Exp $ */
+/* $Id: utility.cpp,v 1.128 2012/04/16 03:09:54 shane Exp $ */
 
 extern "C"
 {
@@ -2400,4 +2400,40 @@ const char *find_profession(int c_class, uint8_t profession)
   } else {
     return profession_list[profession].c_str();
   }
+}
+
+
+char *get_isr_string(uint32 isr, byte loc)
+{
+   if(!IS_SET(isr,1<<loc)) {
+      return '\0';
+   }
+
+   switch(loc) {
+	case 0: return "Pierce";
+	case 1: return "Slash";
+	case 2: return "Magic";
+	case 3: return "Charm";
+	case 4: return "Fire";
+	case 5: return "Energy";
+	case 6: return "Acid";
+	case 7: return "Poison";
+	case 8: return "Sleep";
+	case 9: return "Cold";
+	case 10: return "Paralyze";
+	case 11: return "Bludgeon";
+	case 12: return "Whip";
+	case 13: return "Crush";
+	case 14: return "Hit";
+	case 15: return "Bite";
+	case 16: return "Sting";
+	case 17: return "Claw";
+	case 18: return "Physical";
+	case 19: return "Non-Magic";
+	case 20: return "Ki";
+	case 21: return "Song";
+	case 22: return "Water";
+	case 23: return "Fear";
+	default: return "ErCode: Somebodydunfuckedup";
+   }
 }

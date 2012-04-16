@@ -1,7 +1,7 @@
 #ifndef ISR_H_
 #define ISR_H_
 /************************************************************************
-| $Id: isr.h,v 1.3 2006/05/18 07:46:08 shane Exp $
+| $Id: isr.h,v 1.4 2012/04/16 03:09:54 shane Exp $
 | isr.h
 | Description:  This file defines the isr (IMMUNE/SUSCEPTIBLE/RESIST)
 |   vectors for everything.
@@ -31,6 +31,9 @@
 #define ISR_SONG           1<<21
 #define ISR_WATER          1<<22
 #define ISR_FEAR           1<<23
+#define ISR_MAX		   23
+
+// if you add an ISR, add the string to get_isr_string in utility.cpp
 
 
 #define SAVE_TYPE_FIRE     0

@@ -12,7 +12,7 @@
  * This is free software and you are benefitting.	We hope that you    *
  * share your changes too.  What goes around, comes around. 		    *
  ****************************************************************************/
-/* $Id: info.cpp,v 1.202 2012/04/05 02:39:41 elder Exp $ */
+/* $Id: info.cpp,v 1.203 2012/04/16 03:09:54 shane Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -43,6 +43,8 @@ extern "C"
 #include <set.h>
 #include <returnvals.h>
 #include <fileinfo.h>
+#include <utility.h>
+#include <isr.h>
 #include <map>
 #include <sstream>
 #include <fstream>
@@ -1463,6 +1465,8 @@ int do_score(struct char_data *ch, char *argument, int cmd)
    extern char *pc_clss_types[];
 
    int64 exp_needed;
+   uint32 immune=0,suscept=0,resist=0;
+   char *isrString='\0';
    //int i;
 
    sprintf(race, "%s", race_info[(int)GET_RACE(ch)].singular_name);
@@ -1522,6 +1526,55 @@ int do_score(struct char_data *ch, char *argument, int cmd)
    else send_to_char(
       "($5:$7)===================================($5:$7)==================================($5:$7)\n\r", ch);
    int found = FALSE;
+
+   if((immune=ch->immune))
+   {
+      for(int i=0;i<=ISR_MAX;i++) {
+        isrString=get_isr_string(immune, i);
+        if(isrString!='\0') {
+           scratch = frills[level];
+           sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\n\r",
+                   scratch,"Immunity",isrString, scratch);
+           send_to_char(buf, ch);
+           found = TRUE;
+           isrString='\0';
+           if(++level == 4)
+              level = 0;
+        }
+      }
+   }
+   if((suscept=ch->suscept))
+   {
+      for(int i=0;i<=ISR_MAX;i++) {
+        isrString=get_isr_string(suscept, i);
+        if(isrString!='\0') {
+           scratch = frills[level];
+           sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\n\r",
+                   scratch,"Susceptibility",isrString, scratch);
+           send_to_char(buf, ch);
+           found = TRUE;
+           isrString='\0';
+           if(++level == 4)
+              level = 0;
+        }
+      }
+   }
+   if((resist=ch->resist))
+   {
+      for(int i=0;i<=ISR_MAX;i++) {
+        isrString=get_isr_string(resist, i);
+        if(isrString!='\0') {
+           scratch = frills[level];
+           sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\n\r",
+                   scratch,"Resistibility",isrString, scratch);
+           send_to_char(buf, ch);
+           found = TRUE;
+           isrString='\0';
+           if(++level == 4)
+              level = 0;
+        }
+      }
+   }
 
    if((aff = ch->affected))
    {
