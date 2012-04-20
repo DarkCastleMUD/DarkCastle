@@ -20,6 +20,8 @@
 #include <act.h>
 #include <magic.h>
 #include <affect.h>
+#include <utility.h>
+#include <isr.h>
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -335,6 +337,9 @@ int do_golem_score(struct char_data *ch, char *argument, int cmd)
 
    int64 exp_needed;
 
+   uint32 immune=0,suscept=0,resist=0;
+   char *isrString='\0';
+
    sprintf(race, "%s", race_info[(int)GET_RACE(ch)].singular_name);
    exp_needed = (int)(exp_table[(int)GET_LEVEL(ch) + 19] - (int64)GET_EXP(ch));
 
@@ -385,10 +390,73 @@ int do_golem_score(struct char_data *ch, char *argument, int cmd)
    ch->melee_mitigation, ch->spell_mitigation, ch->song_mitigation, 0);
      send_to_char(buf, master);
 
+
+   if((immune=ch->immune))
+   {
+      for(int i=0;i<=ISR_MAX;i++) {
+        isrString=get_isr_string(immune, i);
+        if(isrString!='\0') {
+           scratch = frills[level];
+           sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\n\r",
+                   scratch,"Immunity",isrString, scratch);
+           send_to_char(buf, master);
+           isrString='\0';
+           if(++level == 4)
+              level = 0;
+        }
+      }
+   }
+   if((suscept=ch->suscept))
+   {
+      for(int i=0;i<=ISR_MAX;i++) {
+        isrString=get_isr_string(suscept, i);
+        if(isrString!='\0') {
+           scratch = frills[level];
+           sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\n\r",
+                   scratch,"Susceptibility",isrString, scratch);
+           send_to_char(buf, master);
+           isrString='\0';
+           if(++level == 4)
+              level = 0;
+        }
+      }
+   }
+   if((resist=ch->resist))
+   {
+      for(int i=0;i<=ISR_MAX;i++) {
+        isrString=get_isr_string(resist, i);
+        if(isrString!='\0') {
+           scratch = frills[level];
+           sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\n\r",
+                   scratch,"Resistibility",isrString, scratch);
+           send_to_char(buf, master);
+           isrString='\0';
+           if(++level == 4)
+              level = 0;
+        }
+      }
+   }
+
+
+   sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\n\r",
+           frills[level],"STABILITY","NONE",frills[level]);
+   send_to_char(buf,master);
+   ++level==4?level=0:level;
+   sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\n\r",
+           frills[level],"INFRARED","NONE",frills[level]);
+   send_to_char(buf,master);
+   ++level==4?level=0:level;
+   if (ISSET(ch->affected_by, AFF_LIGHTNINGSHIELD)) {
+      sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\n\r",
+              frills[level],"LIGHTNING SHIELD","NONE",frills[level]);
+      send_to_char(buf,master);
+      ++level==4?level=0:level;
+   }
+
+
+
    if((aff = ch->affected))
    {
-      int found = FALSE;
-
       for( ; aff; aff = aff->next) {
          if(aff->type == SKILL_SNEAK)
             continue;
@@ -426,34 +494,20 @@ int do_golem_score(struct char_data *ch, char *argument, int cmd)
          if(!aff_name) // not one we want displayed
            continue;
 
-         sprintf(buf, "|%c| Affected by %-22s %s Modifier %-16s  |%c|\n\r",
+         sprintf(buf, "|%c| Affected by %-25s %s Modifier %-13s   |%c|\n\r",
                scratch, aff_name,
                ((IS_AFFECTED(ch, AFF_DETECT_MAGIC) && aff->duration < 3) ?
                           "$2(fading)$7" : "        "),
                apply_types[(int)aff->location], scratch);
          send_to_char(buf, master);
-         found = TRUE;
          if(++level == 4)
             level = 0;
       }
-       sprintf(buf, "|%c| Affected by %-22s          Modifier %-16s  |%c|\n\r",
-               frills[level],"STABILITY","NONE",frills[level]);
-	send_to_char(buf,master);
-       sprintf(buf, "|%c| Affected by %-22s          Modifier %-16s  |%c|\n\r",
-               frills[level],"INFRARED","NONE",frills[level]);
-        send_to_char(buf,master);
-       if (ISSET(ch->affected_by, AFF_LIGHTNINGSHIELD))
-       sprintf(buf, "|%c| Affected by %-22s          Modifier %-16s  |%c|\n\r",
-               frills[level],"LIGHTNING SHIELD","NONE",frills[level]);
-        send_to_char(buf,master);
-	if (IS_SET(ch->resist, ISR_PIERCE))
-       sprintf(buf, "|%c| Affected by %-22s          Modifier %-16s  |%c|\n\r",
-               frills[level],"STONE SKIN","NONE",frills[level]);
-        found = TRUE;
-     if(found)
-        send_to_char(
-         "($5:$7)========================================================================($5:$7)\n\r", master);
    }
+
+   send_to_char(
+         "($5:$7)=========================================================================($5:$7)\n\r", master);
+
    return eSUCCESS;
 }
 
