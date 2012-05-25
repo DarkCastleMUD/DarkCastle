@@ -16,7 +16,7 @@
 /* 12/08/2003   Onager   Added chop_half() to work like half_chop() but    */
 /*                       chopping off the last word.                       */
 /***************************************************************************/
-/* $Id: interp.cpp,v 1.197 2011/12/28 01:26:50 jhhudso Exp $ */
+/* $Id: interp.cpp,v 1.198 2012/05/25 02:16:32 jhhudso Exp $ */
 
 extern "C"
 {
@@ -1182,7 +1182,7 @@ int do_spam(CHAR_DATA *ch, char *arg, int cmd)
 
   half_chop(arg, buf, buf2);
 
-  if(!isname(buf, "honeybeesarefucking")) {
+  if(!isname(buf, "peanutsshrimpcoconut")) {
     send_to_char("Huh?\r\n", ch);
     return eFAILURE;
     } 
