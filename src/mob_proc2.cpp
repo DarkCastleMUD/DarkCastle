@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc2.cpp,v 1.88 2012/02/11 00:02:09 jhhudso Exp $ */
+/* $Id: mob_proc2.cpp,v 1.89 2012/05/25 02:15:46 jhhudso Exp $ */
 #include <room.h>
 #include <obj.h>
 #include <connect.h>
@@ -744,6 +744,15 @@ int godload_sales(struct char_data *ch, struct obj_data *obj, int cmd, char *arg
         do_tell(owner, buf, 0); 
         return eSUCCESS;
     }
+
+    // don't allow non-empty containers to be sold
+    if (obj->obj_flags.type_flag == ITEM_CONTAINER && obj->contains)
+    {
+        sprintf(buf, "%s %s$B$2 needs to be emptied first.", GET_NAME(ch), GET_OBJ_SHORT(obj));
+        do_tell(owner, buf, 0);
+        return eSUCCESS;
+    }
+
     int cost = obj->obj_flags.cost/10;
 
     sprintf(buf, "%s I'll give you %d plats for that. Thanks for shoppin'.",GET_NAME(ch),cost);
@@ -825,6 +834,7 @@ int gl_repair_shop(struct char_data *ch, struct obj_data *obj, int cmd, char *ar
     price *= 4;                   /* he likes to charge more..  */
                                   /*  for armor... cuz he's a crook..  */
   } else if (obj->obj_flags.type_flag == ITEM_WEAPON ||
+	     obj->obj_flags.type_flag == ITEM_FIREWEAPON ||
              obj->obj_flags.type_flag == ITEM_CONTAINER ||
 		obj->obj_flags.type_flag == ITEM_STAFF ||
 		obj->obj_flags.type_flag == ITEM_WAND ||

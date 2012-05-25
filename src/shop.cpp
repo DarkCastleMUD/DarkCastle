@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: shop.cpp,v 1.31 2010/05/03 00:36:18 jhhudso Exp $ */
+/* $Id: shop.cpp,v 1.32 2012/05/25 02:15:46 jhhudso Exp $ */
 
 extern "C"
 {
@@ -351,6 +351,15 @@ void shopping_sell( char *arg, CHAR_DATA *ch,
 	do_tell(keeper,buf,0);
         return;
     }
+
+    // don't allow non-empty containers to be sold
+    if (obj->obj_flags.type_flag == ITEM_CONTAINER && obj->contains)
+    {
+        sprintf(buf, "%s %s$B$2 needs to be emptied first.", GET_NAME(ch), GET_OBJ_SHORT(obj));
+        do_tell(keeper,buf,0);     
+        return;
+    }
+
     cost = (int) ( obj->obj_flags.cost * shop_index[shop_nr].profit_sell );
     if ( GET_GOLD(keeper) < cost )
     {
