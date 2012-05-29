@@ -752,7 +752,7 @@ void new_string_add(struct descriptor_data *d, char *str)
     }
   } else {
     if (!action && !((int)(strlen(str) + strlen(*d->strnew) + 2) > d->max_str)) {
-      strcat(*d->strnew, "\n");
+      strcat(*d->strnew, "\r\n");
     }
   }
 }
