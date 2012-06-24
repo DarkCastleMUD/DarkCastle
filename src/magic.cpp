@@ -1338,60 +1338,62 @@ int spell_heal_spray(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
 
 /* FIRESTORM */
 
-int spell_firestorm(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
-{
-  int dam = 0;
-  int retval = eSUCCESS;
-  int retval2 = 0;
-  int ch_zone = 0, tmp_vict_zone = 0;
-  CHAR_DATA *tmp_victim, *temp;
+int spell_firestorm(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill) {
+	int dam = 0;
+	int retval = eSUCCESS;
+	int retval2 = 0;
+	CHAR_DATA *tmp_victim, *temp;
 
-  send_to_char("$B$4Fire$R falls from the heavens!\n\r", ch);
-  act("$n makes $B$4fire$R fall from the heavens!\n\r",
-		ch, 0, 0, TO_ROOM, 0);
+	send_to_char("$B$4Fire$R falls from the heavens!\n\r", ch);
+	act("$n makes $B$4fire$R fall from the heavens!\n\r", ch, 0, 0, TO_ROOM, 0);
 
-  for (tmp_victim = character_list; tmp_victim && tmp_victim != reinterpret_cast<char_data *>(0x95959595); tmp_victim = temp)
-  {
-    if (!charExists(tmp_victim)) {
-    	return retval;
-    }
-    temp = tmp_victim->next;
+	for (char_data * tmp_victim = world[ch->in_room].people; tmp_victim; tmp_victim = tmp_victim->next_in_room) {
+		if (!charExists(tmp_victim)) {
+			return retval;
+		}
+		// skip yourself, your groupies and those who may not be attacked
+		if ((tmp_victim == ch) ||
+			(ARE_GROUPED(ch, tmp_victim)) ||
+			(!can_be_attacked(ch, tmp_victim))) {
+			continue;
+		}
 
-    try {
-      ch_zone = world[ch->in_room].zone;
-      tmp_vict_zone = world[tmp_victim->in_room].zone;
-    } catch(...) {
-      produce_coredump();
-      return eFAILURE|retval;
-    }
+		dam = 250;
 
-    if ((ch->in_room == tmp_victim->in_room) 
-        && (ch != tmp_victim) 
-        && (!ARE_GROUPED(ch, tmp_victim)) 
-        && can_be_attacked(ch, tmp_victim)) 
-    {
-      
-      dam = 250;
-      
-      if(level > 200)  retval2 = damage(ch, tmp_victim, dam, TYPE_HIT + level - 200, SPELL_FIRESTORM, 0);
-      else retval2 = damage(ch, tmp_victim, dam, TYPE_FIRE, SPELL_FIRESTORM, 0);
+		if (level > 200) {
+			retval2 = damage(ch, tmp_victim, dam, TYPE_HIT + level - 200, SPELL_FIRESTORM, 0);
+		} else {
+			retval2 = damage(ch, tmp_victim, dam, TYPE_FIRE, SPELL_FIRESTORM, 0);
+		}
 
-      if (IS_SET(retval2, eVICT_DIED))
-        SET_BIT(retval, eVICT_DIED);
-      else if (IS_SET(retval2, eCH_DIED))
-      { 
-        SET_BIT(retval, eCH_DIED); 
-        break; 
-      }
-    } 
-    else 
-    {
-      if (ch_zone == tmp_vict_zone) 
-        send_to_char("You feel a HOT blast of air.\n\r", tmp_victim);
-    }
-  }
+		if (IS_SET(retval2, eVICT_DIED)) {
+			SET_BIT(retval, eVICT_DIED);
+		} else if (IS_SET(retval2, eCH_DIED)) {
+			SET_BIT(retval, eCH_DIED);
+			break;
+		}
+	}
 
-  return retval;
+	for (tmp_victim = character_list; tmp_victim && tmp_victim != reinterpret_cast<char_data *>(0x95959595); tmp_victim = temp) {
+		temp = tmp_victim->next;
+		if ((tmp_victim->in_room == ch->in_room) ||
+			(tmp_victim == ch) ||
+			(!ARE_GROUPED(ch, tmp_victim)) ||
+			(can_be_attacked(ch, tmp_victim))) {
+			continue;
+		}
+
+		try {
+			if (world[ch->in_room].zone == world[tmp_victim->in_room].zone) {
+				send_to_char("You feel a HOT blast of air.\n\r", tmp_victim);
+			}
+		} catch (...) {
+			produce_coredump();
+			return eFAILURE | retval;
+		}
+	}
+
+	return retval;
 }
 
 
