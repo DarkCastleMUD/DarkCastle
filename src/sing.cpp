@@ -1436,7 +1436,7 @@ int execute_song_terrible_clef( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA
    int combat, non_combat;
    get_instrument_bonus(ch, combat, non_combat);
 
-   dam = 300;
+   dam = ((has_skill(ch, SKILL_SONG_TERRIBLE_CLEF)) * 1.5 + 225);
    if (number(1,100) < get_saves(victim, SAVE_TYPE_MAGIC))
    {
     act("$N resists your terrible clef!", ch, NULL, victim, TO_CHAR,0);
@@ -3268,7 +3268,7 @@ int execute_song_crushing_crescendo( ubyte level, CHAR_DATA *ch, char *arg, CHAR
    get_instrument_bonus(ch, combat, non_combat);
 
    int j;
-   dam = 100;
+   dam = ((has_skill(ch, SKILL_SONG_CRUSHING_CRESCENDO)) + 25);
    for (j = 0; j < (int)(*i).song_data; j++)
       dam = dam * 2;
    dam += combat * 5; // Make it hurt some more.
