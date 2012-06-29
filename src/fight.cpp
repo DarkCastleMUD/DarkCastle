@@ -20,7 +20,7 @@
  * 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead *
  * of just race stuff                                                     *
  **************************************************************************
- * $Id: fight.cpp,v 1.567 2011/12/14 03:06:14 opticon Exp $               *
+ * $Id: fight.cpp,v 1.568 2012/06/29 13:39:45 apocalypse Exp $               *
  **************************************************************************/
 
 extern "C"
@@ -5443,12 +5443,12 @@ void dam_message(int dam, CHAR_DATA * ch, CHAR_DATA * victim,
    vp = "FUCKING DEMOLISHES";
   }
  else if(dam <= 299) {
-   vs = "ABSOLUTELY FUCKING ERADICATE";
-   vp = "ABSOLUTELY FUCKING ERADICATES";
+   vs = "TOTALLY FUCKING DISINTEGRATE";
+   vp = "TOTALLY FUCKING DISINTEGRATES";
   }
  else if(dam <= 999) {
-     vs = "TOTALLY FUCKING DISINTEGRATE";
-     vp = "TOTALLY FUCKING DISINTEGRATES";
+     vs = "ABSOLUTELY FUCKING ERADICATE";
+     vp = "ABSOLUTELY FUCKING ERADICATES";
   }
  else { 
      vs = "nick";
