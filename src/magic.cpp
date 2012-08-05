@@ -1342,28 +1342,28 @@ int spell_firestorm(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
 	int dam = 0;
 	int retval = eSUCCESS;
 	int retval2 = 0;
-	CHAR_DATA *tmp_victim, *temp;
+	CHAR_DATA *temp, *next_victim;
 
 	send_to_char("$B$4Fire$R falls from the heavens!\n\r", ch);
 	act("$n makes $B$4fire$R fall from the heavens!\n\r", ch, 0, 0, TO_ROOM, 0);
 
-	for (char_data * tmp_victim = world[ch->in_room].people; tmp_victim; tmp_victim = tmp_victim->next_in_room) {
-		if (!charExists(tmp_victim)) {
-			return retval;
-		}
+	for (char_data *victim = world[ch->in_room].people; victim; victim = next_victim) {
+	        next_victim = victim->next_in_room;
+
 		// skip yourself, your groupies and those who may not be attacked
-		if ((tmp_victim == ch) ||
-			(ARE_GROUPED(ch, tmp_victim)) ||
-			(!can_be_attacked(ch, tmp_victim))) {
+		if ((!charExists(victim)) ||
+		        (victim == ch) ||
+			(ARE_GROUPED(ch, victim)) ||
+			(!can_be_attacked(ch, victim))) {
 			continue;
 		}
 
 		dam = 250;
 
 		if (level > 200) {
-			retval2 = damage(ch, tmp_victim, dam, TYPE_HIT + level - 200, SPELL_FIRESTORM, 0);
+			retval2 = damage(ch, victim, dam, TYPE_HIT + level - 200, SPELL_FIRESTORM, 0);
 		} else {
-			retval2 = damage(ch, tmp_victim, dam, TYPE_FIRE, SPELL_FIRESTORM, 0);
+			retval2 = damage(ch, victim, dam, TYPE_FIRE, SPELL_FIRESTORM, 0);
 		}
 
 		if (IS_SET(retval2, eVICT_DIED)) {
@@ -1374,7 +1374,7 @@ int spell_firestorm(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
 		}
 	}
 
-	for (tmp_victim = character_list; tmp_victim && tmp_victim != reinterpret_cast<char_data *>(0x95959595); tmp_victim = temp) {
+	for (char_data *tmp_victim = character_list; tmp_victim && tmp_victim != reinterpret_cast<char_data *>(0x95959595); tmp_victim = temp) {
 		temp = tmp_victim->next;
 		if ((tmp_victim->in_room == ch->in_room) ||
 			(tmp_victim == ch) ||
