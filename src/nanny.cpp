@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.193 2012/02/13 04:32:28 jhhudso Exp $ */
+/* $Id: nanny.cpp,v 1.194 2012/08/09 03:23:16 jhhudso Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -1583,7 +1583,8 @@ is_race_eligible(ch,7)?'*':' ',is_race_eligible(ch,8)?'*':' ',is_race_eligible(c
 	    remove_clan_member(d->character->clan, d->character);
 	  }
 	  remove_character(d->character->name, SELFDELETED);
-	  
+
+	  GET_LEVEL(d->character) = 1;
           update_wizlist(d->character);
           close_socket(d); 
           d = NULL;
