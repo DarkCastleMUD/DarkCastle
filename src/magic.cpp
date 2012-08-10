@@ -1347,7 +1347,7 @@ int spell_firestorm(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
 	send_to_char("$B$4Fire$R falls from the heavens!\n\r", ch);
 	act("$n makes $B$4fire$R fall from the heavens!\n\r", ch, 0, 0, TO_ROOM, 0);
 
-	for (char_data *victim = world[ch->in_room].people; victim; victim = next_victim) {
+	for (char_data *victim = world[ch->in_room].people; victim && victim != reinterpret_cast<char_data *>(0x95959595); victim = next_victim) {
 	        next_victim = victim->next_in_room;
 
 		// skip yourself, your groupies and those who may not be attacked
