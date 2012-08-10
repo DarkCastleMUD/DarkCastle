@@ -19,7 +19,7 @@
 /* 12/06/2003   Onager   Modified mobile_activity() to prevent charmie    */
 /*                       scavenging                                       */
 /**************************************************************************/
-/* $Id: mob_act.cpp,v 1.50 2010/05/23 16:05:21 jhhudso Exp $ */
+/* $Id: mob_act.cpp,v 1.51 2012/08/10 03:17:20 jhhudso Exp $ */
 
 extern "C"
 {
@@ -54,7 +54,7 @@ extern struct index_data *obj_index;
 extern CWorld world;
 extern struct zone_data *zone_table;
 
-extern struct race_shit race_info[30];
+extern struct race_shit race_info[33];
 
 extern char doing[500];  /* write to log if we crash */
 

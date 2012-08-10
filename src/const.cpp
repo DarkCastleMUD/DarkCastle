@@ -12,7 +12,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: const.cpp,v 1.329 2011/12/25 21:28:40 jhhudso Exp $ */
+/* $Id: const.cpp,v 1.330 2012/08/10 03:17:20 jhhudso Exp $ */
 
 extern "C"
 {
@@ -2073,6 +2073,7 @@ struct race_shit race_info[] =
 { "Gnome",     "Gnomes",      63,    0,       0,       0,   1<<9|1<<11,    0,   75,   114,    42,    59,    AFF_IGNORE_WEAPON_WEIGHT|AFF_INFRARED, "cuff" },
 { "Orc",       "Orcs",        63,    0,       0,       0,   1<<1|1<<3,     0,  186,   225,    79,    96,    AFF_IGNORE_WEAPON_WEIGHT|AFF_INFRARED, "punch" },
 { "Troll",     "Trolls",      63,    0,     128,      80,   1<<3|1<<4,     0,  226,   265,   109,   126,    AFF_IGNORE_WEAPON_WEIGHT|AFF_INFRARED, "claw" },
+
 { "Goblin",    "Goblins",     63,    0,       0,       0,   1<<6|1<<11,    0,  100,   100,    60,    60,    AFF_IGNORE_WEAPON_WEIGHT|AFF_INFRARED, "jab" }, 
 { "Reptile",   "Reptiles",    59,    0,       0,     520,       0,         0,    0,     0,     0,     0,    AFF_IGNORE_WEAPON_WEIGHT, "strike" },
 { "Dragon",    "Dragons",     91,    0,     268,       0,   1<<6|1<<9,     0,  500,  2000,   144,   240,    AFF_IGNORE_WEAPON_WEIGHT|AFF_INFRARED|AFF_SENSE_LIFE|AFF_DETECT_INVISIBLE|AFF_FLYING|AFF_TRUE_SIGHT|AFF_SOLIDITY, "maul" },
@@ -2083,6 +2084,7 @@ struct race_shit race_info[] =
 { "Fish",      "Fishes",       3,    0, 4194304,       0,   16384,         0,    0,     0,     0,     0,    AFF_IGNORE_WEAPON_WEIGHT, "bite" },
 { "Arachnid",  "Arachnids",   19,    0,     128,       0,  262144,    131072,    0,     0,     0,     0,    AFF_IGNORE_WEAPON_WEIGHT|AFF_INFRARED|AFF_SENSE_LIFE, "bite" },
 { "Insect",    "Insects",     19,    0,       0,       0,  131072,    262144,    0,     0,     0,     0,    AFF_IGNORE_WEAPON_WEIGHT|AFF_INFRARED, "bite" },
+
 { "Slime",     "Slimes",       2,    1,      64,     528,       0,         0,   30,   120,     1,    12,    AFF_IGNORE_WEAPON_WEIGHT, "smother" },
 { "Animal",    "Animals",     27,    0,       0,     128, 8388608,         0,    0,     0,     0,     0,    AFF_IGNORE_WEAPON_WEIGHT|AFF_SENSE_LIFE, "bite" },
 { "Plant",     "Plants",      63,    0, 4194304,      16, 1048576,         0,    0,     0,     0,     0,    AFF_IGNORE_WEAPON_WEIGHT, "choke" },
@@ -2093,6 +2095,7 @@ struct race_shit race_info[] =
 { "Elemental", "Elementals",  63,    0,    1024,      12,       0,  67108864,  100,   400,    84,   120,    AFF_IGNORE_WEAPON_WEIGHT|AFF_SOLIDITY, "punch" },
 { "Planar",    "Planar",      63,   64,       4,      32,       0,         0,    0,     0,     0,     0,    AFF_IGNORE_WEAPON_WEIGHT|AFF_INFRARED|AFF_SENSE_LIFE|AFF_DETECT_INVISIBLE|AFF_SOLIDITY|AFF_REFLECT, "punch" },
 { "Demon",     "Demons",     127,   16,       8, 1048576,    1023,         0,    0,     0,     0,     0,    AFF_IGNORE_WEAPON_WEIGHT|AFF_INFRARED|AFF_SENSE_LIFE, "maul" },
+
 { "Yrnali",    "Yrnali",      63,   16,       8, 1048576,       1, 536870912,  150,   300,    72,    96,    AFF_IGNORE_WEAPON_WEIGHT|AFF_INFRARED|AFF_SENSE_LIFE|AFF_DETECT_INVISIBLE, "maul" },
 { "Immortal",  "Immortals",  127, 1288, 1048576,       0,       0,         0,    0,     0,     0,     0,    AFF_IGNORE_WEAPON_WEIGHT|AFF_INFRARED|AFF_SENSE_LIFE|AFF_DETECT_INVISIBLE|AFF_FLYING|AFF_TRUE_SIGHT|AFF_SOLIDITY|AFF_SANCTUARY, "ethereal strike" },
 { "Feline",    "Felines",     27,    0,       0,     128, 8388608,         0,    0,     0,     0,     0,    AFF_IGNORE_WEAPON_WEIGHT|AFF_INFRARED|AFF_SENSE_LIFE|AFF_SNEAK, "claw" }

@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: who.cpp,v 1.58 2012/08/09 03:25:21 jhhudso Exp $
+| $Id: who.cpp,v 1.59 2012/08/10 03:17:20 jhhudso Exp $
 | who.C
 | Commands for who, maybe? :P
 */
@@ -31,7 +31,7 @@ extern "C"
 
 extern struct char_data *character_list;
 extern struct descriptor_data *descriptor_list;
-extern struct race_shit race_info[30];
+extern struct race_shit race_info[33];
 extern char* pc_clss_abbrev[];
 extern char* race_abbrev[];
 extern char *pc_clss_types[];
