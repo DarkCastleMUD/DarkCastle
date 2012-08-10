@@ -1,8 +1,9 @@
 import glob
 
 env = Environment()
-env.Append(CCFLAGS = '-ggdb3 -Wall -m32 -O3 -Wno-write-strings')
-env.Append(LINKFLAGS = '-ggdb3 -Wall -m32 -O3 -Wno-write-strings' )
+env.Append(CXX = 'g++-4.7')
+env.Append(CCFLAGS = '-ggdb3 -Wall -m32 -O3 -Wno-write-strings -flto')
+env.Append(LINKFLAGS = '-ggdb3 -Wall -m32 -O3 -Wno-write-strings -flto' )
 
 base_src = glob.glob('[a-l]*.cpp') + glob.glob('[n-z]*.cpp') + glob.glob('mo*.cpp') + ['magic.cpp','memory.cpp','meta.cpp','MobActivity.cpp']
 wizard_src = glob.glob('wizard/*.cpp')
