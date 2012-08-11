@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string.h>
+#include <unistd.h>
 #include "spells.h"
 #include "connect.h"
 #include "utility.h"
@@ -343,7 +344,10 @@ int main(int argc, char **argv)
     {
       if (ch->equipment[iWear])
       {
-        //obj_data *obj = ch->equipment[iWear];
+        obj_data *obj = ch->equipment[iWear];
+	if (GET_NAME(obj)) {
+	  cerr << GET_NAME(obj) << endl;
+	}
         equip_count++;
       }
     }
