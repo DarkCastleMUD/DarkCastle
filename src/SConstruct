@@ -1,7 +1,7 @@
 import glob
 
 env = Environment()
-env.Append(CXX = 'g++-4.7')
+env.Append(CXX = '-4.7')
 env.Append(CCFLAGS = '-ggdb3 -Wall -m32 -O3 -Wno-write-strings -flto')
 env.Append(LINKFLAGS = '-ggdb3 -Wall -m32 -O3 -Wno-write-strings -flto' )
 
@@ -12,7 +12,7 @@ backend_src = glob.glob('Backend/*.cpp')
 
 env.Program('dcastle.debug', ['main.cpp'],
 CPPPATH = ['include'], CPPDEFINES=['LINUX'],
-LIBS=['dcastle','crypt', 'mcheck', 'z', 'pq', 'xmlrpc++'], LIBPATH=['.','/usr/local/lib']);
+LIBS=['dcastle', 'twitcurl', 'crypt', 'mcheck', 'z', 'pq', 'xmlrpc++'], LIBPATH=['.','/usr/local/lib']);
 
 env.Program('showplayer', ['../scripts/showplayerxp.cpp'],
 CPPPATH = ['include'], CPPDEFINES=['LINUX'],

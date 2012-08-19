@@ -1,9 +1,11 @@
 /************************************************************************
-| $Id: wizard.cpp,v 1.79 2012/04/10 02:49:11 jhhudso Exp $
+| $Id: wizard.cpp,v 1.80 2012/08/19 16:54:10 shane Exp $
 | wizard.C
 | Description:  Utility functions necessary for wiz commands.
 */
 #include "wizard.h"
+#include "curl.h"
+#include "twitcurl.h"
 #include <character.h>
 #include <utility.h>
 #include <levels.h>
@@ -1850,7 +1852,41 @@ int do_showhunt(CHAR_DATA *ch, char *arg, int cmd)
 
 int do_huntstart(struct char_data *ch, char *argument, int cmd)
 {
-  char arg[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH];
+  char arg[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH], buf[MAX_INPUT_LENGTH];
+
+  twitCurl twitterObj;
+  string authUrl, replyMsg;
+  string myOAuthAccessTokenKey( "" );
+  string myOAuthAccessTokenSecret( "" );
+  string userName ( "" );
+  string passWord ( "" );
+  string message ( "" );
+
+  userName = "DarkCastleMUD";
+  passWord = "$dc2009";
+
+  twitterObj.setTwitterUsername( userName );
+  twitterObj.setTwitterPassword( passWord );
+
+  twitterObj.getOAuth().setConsumerKey( string( "phRZBl2IDCFryRITUNtkw" ) );
+  twitterObj.getOAuth().setConsumerSecret( string( "AK5Uxb6jlgROX79d78mPCyuq85E08DbAmJm94RMyY" ) );
+
+  twitterObj.getOAuth().setOAuthTokenKey( string( "36770859-RMEAZ5jw5hMoVqadRWUS4cMB2VrvK513bck1I61Bz" ) );
+  twitterObj.getOAuth().setOAuthTokenSecret( string( "2TTedhTy6NP1ntHqexsLl4OVWVn5BpZHvZDRp4Fh10" ) );
+
+  if( twitterObj.accountVerifyCredGet() )
+  {
+//    twitterObj.getLastWebResponse( replyMsg );
+    sprintf(buf, "twitterClient:: twitCurl::accountVerifyCredGet web response:\n%s\n", replyMsg.c_str() );
+    log(buf, 100, LOG_GOD);
+  }
+  else
+  {
+    twitterObj.getLastCurlError( replyMsg );
+    sprintf( buf, "twitterClient:: twitCurl::accountVerifyCredGet error:\n%s\n", replyMsg.c_str() );
+    log(buf, 100, LOG_GOD);
+  }
+
   argument = one_argument(argument,arg);
   argument = one_argument(argument,arg2);
   argument = one_argument(argument,arg3);
@@ -1895,8 +1931,32 @@ int do_huntstart(struct char_data *ch, char *argument, int cmd)
 	begin_hunt(vnum,time,num,0);
   }
 
-  char buf[MAX_STRING_LENGTH];
   sprintf(buf,"\r\n## %s has been started! There are a total of %d items and %d minutes to find them all!\r\n## Type 'huntitems' to get the locations!\r\n",huntname,num,time);
   send_info(buf);
+
+  string holding[3] = {
+	"Get your ass to MAHS... err, DC.  There's a hunt!",
+	"You may be wondering why I've gathered you here today.  There's a hunt!",
+	"Aussie Aussie Aussie! Oi Oi Hunt!!"
+	};
+  
+  int pos = rand() % 3;
+
+  message=holding[pos];
+
+  if( twitterObj.statusUpdate( message ) )
+  {
+//    twitterObj.getLastWebResponse( replyMsg );
+    sprintf( buf, "\ntwitterClient:: twitCurl::statusUpdate web response:\n%s\n", replyMsg.c_str() );
+    log( buf, 100, LOG_GOD );
+  }
+  else
+  {
+    twitterObj.getLastCurlError( replyMsg );
+    sprintf( buf, "\ntwitterClient:: twitCurl::statusUpdate error:\n%s\n", replyMsg.c_str() );
+    log( buf, 100, LOG_GOD );
+  }
+
+
   return eSUCCESS;
 }
