@@ -1,11 +1,11 @@
-CXX = g++
+CXX = g++-4.7
 SRC_DIR=.
 SRCS = $(shell find $(SRC_DIR) -maxdepth 2 -name "*.cpp")
 
 OBJS = $(SRCS:.cpp=.o)
 
 #FAST_FLAGS  = -02
-DEBUG_FLAGS = -O3 -ggdb3
+DEBUG_FLAGS = -ggdb3
 PROF_FLAGS = $(DEBUG_FLAGS) -pg
 
 LDFLAGS = -L/usr/local/lib -ltwitcurl -lcrypt -lmcheck -lz -lpq -lxmlrpc++
