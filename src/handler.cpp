@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.203 2012/04/10 01:31:09 jhhudso Exp $ */
+/* $Id: handler.cpp,v 1.204 2012/08/19 20:09:23 jhhudso Exp $ */
     
 extern "C"
 {
@@ -785,6 +785,8 @@ void affect_modify(CHAR_DATA *ch, int32 loc, int32 mod, long bitv, bool add, int
                GET_STR(ch) = MIN(30, GET_STR(ch));
             else
                GET_STR(ch) = MIN(i, GET_STR(ch));
+
+	    GET_STR(ch) = MAX(0, GET_STR(ch));
 
       //      // can only be max naturally.  Eq only gets you to max - 2
         //    if( GET_RAW_STR(ch) > i - 2 && GET_STR(ch) > i - 2 )
