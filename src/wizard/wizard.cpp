@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: wizard.cpp,v 1.80 2012/08/19 16:54:10 shane Exp $
+| $Id: wizard.cpp,v 1.81 2012/09/21 23:08:27 jhhudso Exp $
 | wizard.C
 | Description:  Utility functions necessary for wiz commands.
 */
@@ -1853,7 +1853,7 @@ int do_showhunt(CHAR_DATA *ch, char *arg, int cmd)
 int do_huntstart(struct char_data *ch, char *argument, int cmd)
 {
   char arg[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH], buf[MAX_INPUT_LENGTH];
-
+#ifdef TWITTER
   twitCurl twitterObj;
   string authUrl, replyMsg;
   string myOAuthAccessTokenKey( "" );
@@ -1886,6 +1886,7 @@ int do_huntstart(struct char_data *ch, char *argument, int cmd)
     sprintf( buf, "twitterClient:: twitCurl::accountVerifyCredGet error:\n%s\n", replyMsg.c_str() );
     log(buf, 100, LOG_GOD);
   }
+#endif
 
   argument = one_argument(argument,arg);
   argument = one_argument(argument,arg2);
@@ -1934,12 +1935,13 @@ int do_huntstart(struct char_data *ch, char *argument, int cmd)
   sprintf(buf,"\r\n## %s has been started! There are a total of %d items and %d minutes to find them all!\r\n## Type 'huntitems' to get the locations!\r\n",huntname,num,time);
   send_info(buf);
 
+#ifdef TWITTER
   string holding[3] = {
 	"Get your ass to MAHS... err, DC.  There's a hunt!",
 	"You may be wondering why I've gathered you here today.  There's a hunt!",
 	"Aussie Aussie Aussie! Oi Oi Hunt!!"
 	};
-  
+
   int pos = rand() % 3;
 
   message=holding[pos];
@@ -1956,7 +1958,7 @@ int do_huntstart(struct char_data *ch, char *argument, int cmd)
     sprintf( buf, "\ntwitterClient:: twitCurl::statusUpdate error:\n%s\n", replyMsg.c_str() );
     log( buf, 100, LOG_GOD );
   }
-
+#endif
 
   return eSUCCESS;
 }
