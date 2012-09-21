@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.204 2012/08/19 20:09:23 jhhudso Exp $ */
+/* $Id: handler.cpp,v 1.205 2012/09/21 23:05:46 jhhudso Exp $ */
     
 extern "C"
 {
@@ -722,567 +722,606 @@ GET_OBJ_WEIGHT(ch->equipment[SECOND_WIELD]) > GET_STR(ch)/2
 
 }
 
-void affect_modify(CHAR_DATA *ch, int32 loc, int32 mod, long bitv, bool add, int flag)
-{
-   char log_buf[256];
-   int i;
+void affect_modify(CHAR_DATA *ch, int32 loc, int32 mod, long bitv, bool add, int flag) {
+	char log_buf[256];
+	int i;
 
-   if (add && IS_PC(ch)) {
-     if (loc == APPLY_LIGHTNING_SHIELD) {
-       if (affected_by_spell(ch, SPELL_LIGHTNING_SHIELD)) {
-	 affect_from_char(ch, SPELL_LIGHTNING_SHIELD);
-       }
+	if (add && IS_PC(ch)) {
+		if (loc == APPLY_LIGHTNING_SHIELD) {
+			if (affected_by_spell(ch, SPELL_LIGHTNING_SHIELD)) {
+				affect_from_char(ch, SPELL_LIGHTNING_SHIELD);
+			}
 
-       if (affected_by_spell(ch, SPELL_FIRESHIELD)) {
-	 affect_from_char(ch, SPELL_FIRESHIELD);
+			if (affected_by_spell(ch, SPELL_FIRESHIELD)) {
+				affect_from_char(ch, SPELL_FIRESHIELD);
 
-	 if (!flag) {
-	   send_to_char("The magic of this item clashes with your fire "
-			"shield.\n\r", ch);
-	   act("Your $B$4flames$R have been extinguished!",
-	       ch, 0, ch, TO_VICT, 0);
-	   act("The $B$4flames$R encompassing $n's body are extinguished!",
-	       ch, 0, 0, TO_ROOM, 0);
-	 }
-       }
+				if (!flag) {
+					send_to_char("The magic of this item clashes with your fire "
+							"shield.\n\r", ch);
+					act("Your $B$4flames$R have been extinguished!", ch, 0, ch, TO_VICT, 0);
+					act("The $B$4flames$R encompassing $n's body are extinguished!", ch, 0, 0, TO_ROOM, 0);
+				}
+			}
 
-       if (affected_by_spell(ch, SPELL_ACID_SHIELD)) {
-	 affect_from_char(ch, SPELL_ACID_SHIELD);
+			if (affected_by_spell(ch, SPELL_ACID_SHIELD)) {
+				affect_from_char(ch, SPELL_ACID_SHIELD);
 
-	 if (!flag) {
-	   send_to_char("The magic of this item clashes with your acid "
-			"shield.\n\r", ch);
-	   act("Your shield of $B$2acid$R dissolves to nothing!",
-	       ch, 0, ch, TO_VICT, 0);
-	   act("The $B$2acid$R swirling about $n's body dissolves to nothing!",
-	       ch, 0, 0, TO_ROOM, 0);
-	 }
-       }
-     }
-   }
+				if (!flag) {
+					send_to_char("The magic of this item clashes with your acid "
+							"shield.\n\r", ch);
+					act("Your shield of $B$2acid$R dissolves to nothing!", ch, 0, ch, TO_VICT, 0);
+					act("The $B$2acid$R swirling about $n's body dissolves to nothing!", ch, 0, 0, TO_ROOM, 0);
+				}
+			}
+		}
+	}
 
-   if (loc >= 1000) return;
-   if (bitv != -1 && bitv <= AFF_MAX) {
-   if(add)
-      SETBIT(ch->affected_by, bitv);
-   else {
-      REMBIT(ch->affected_by, bitv);
-   }
-   }
- if (!add)
-      mod = -mod;
+	if (loc >= 1000)
+		return;
+	if (bitv != -1 && bitv <= AFF_MAX) {
+		if (add)
+			SETBIT(ch->affected_by, bitv);
+		else {
+			REMBIT(ch->affected_by, bitv);
+		}
+	}
+	if (!add)
+		mod = -mod;
 
-   switch(loc)
-   {
-      case APPLY_NONE:
-         break;
+	switch (loc) {
+	case APPLY_NONE:
+		break;
 
-      case APPLY_STR: {
-            GET_STR_BONUS(ch) += mod;
-            GET_STR(ch) = GET_RAW_STR(ch) + GET_STR_BONUS(ch);
-            i = get_max_stat(ch, STRENGTH);
-            if(i <= GET_RAW_STR(ch))
-               GET_STR(ch) = MIN(30, GET_STR(ch));
-            else
-               GET_STR(ch) = MIN(i, GET_STR(ch));
+	case APPLY_STR: {
+		GET_STR_BONUS(ch) += mod;
+		GET_STR(ch) = GET_RAW_STR(ch) + GET_STR_BONUS(ch);
+		i = get_max_stat(ch, STRENGTH);
+		if (i <= GET_RAW_STR(ch))
+			GET_STR(ch) = MIN(30, GET_STR(ch));
+		else
+			GET_STR(ch) = MIN(i, GET_STR(ch));
 
 	    GET_STR(ch) = MAX(0, GET_STR(ch));
 
-      //      // can only be max naturally.  Eq only gets you to max - 2
-        //    if( GET_RAW_STR(ch) > i - 2 && GET_STR(ch) > i - 2 )
-          //     GET_STR(ch) = GET_RAW_STR(ch);
-//            GET_STR(ch) = MAX( 1, MIN( (int)GET_STR( ch ), i) ) );
-            if(!ISSET(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT))
-               check_weapon_weights(ch);
-        }  break;
+		if (!ISSET(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT))
+			check_weapon_weights(ch);
+	}
+		break;
 
 	case APPLY_DEX: {
-            GET_DEX_BONUS(ch) += mod;
-            GET_DEX(ch) = GET_RAW_DEX(ch) + GET_DEX_BONUS(ch);
-            i = get_max_stat(ch, DEXTERITY);
-            if(i <= GET_RAW_DEX(ch))
-               GET_DEX(ch) = MIN(30, GET_DEX(ch));
-            else
-		GET_DEX(ch) = MIN(i, GET_DEX(ch));
-  //          // can only be max naturally.  Eq only gets you to max - 2
-    //        if( GET_RAW_DEX(ch) > i - 2 && GET_DEX(ch) > i - 2 )
-      //         GET_DEX(ch) = GET_RAW_DEX(ch);
-        //    else GET_DEX(ch) = MAX( 1, MIN( (int)GET_DEX( ch ), ( i - 2 
-//) ) );
-	}  break;
+		GET_DEX_BONUS(ch) += mod;
+		GET_DEX(ch) = GET_RAW_DEX(ch) + GET_DEX_BONUS(ch);
+		i = get_max_stat(ch, DEXTERITY);
+		if (i <= GET_RAW_DEX(ch))
+			GET_DEX(ch) = MIN(30, GET_DEX(ch));
+		else
+			GET_DEX(ch) = MIN(i, GET_DEX(ch));
+	}
+		break;
 
 	case APPLY_INT: {
-            GET_INT_BONUS(ch) += mod;
-            GET_INT(ch) = GET_RAW_INT(ch) + GET_INT_BONUS(ch);
-            i = get_max_stat(ch, INTELLIGENCE);
-            if(i <= GET_RAW_INT(ch))
-               GET_INT(ch) = MIN(30, GET_INT(ch));
-            else
-	       GET_INT(ch) = MIN(i, GET_INT(ch));
-            // can only be max naturally.  Eq only gets you to max - 2
-           // if( GET_RAW_INT(ch) > i - 2 && GET_INT(ch) > i - 2 )
-            //   GET_INT(ch) = GET_RAW_INT(ch);
-           // else GET_INT(ch) = MAX( 1, MIN( (int)GET_INT( ch ), ( i - 2 
-//) ) );
-        } break;
+		GET_INT_BONUS(ch) += mod;
+		GET_INT(ch) = GET_RAW_INT(ch) + GET_INT_BONUS(ch);
+		i = get_max_stat(ch, INTELLIGENCE);
+		if (i <= GET_RAW_INT(ch))
+			GET_INT(ch) = MIN(30, GET_INT(ch));
+		else
+			GET_INT(ch) = MIN(i, GET_INT(ch));
+	}
+		break;
 
 	case APPLY_WIS: {
-            GET_WIS_BONUS(ch) += mod;
-            GET_WIS(ch) = GET_RAW_WIS(ch) + GET_WIS_BONUS(ch);
-            i = get_max_stat(ch, WISDOM);
-            if(i <= GET_RAW_WIS(ch))
-               GET_WIS(ch) = MIN(30, GET_WIS(ch));
-            else
-	       GET_WIS(ch) = MIN(i, GET_WIS(ch));
-  //          // can only be max naturally.  Eq only gets you to max - 2
-    //        if( GET_RAW_WIS(ch) > i - 2 && GET_WIS(ch) > i - 2 )
-      //         GET_WIS(ch) = GET_RAW_WIS(ch);
-        //    else GET_WIS(ch) = MAX( 1, MIN( (int)GET_WIS( ch ), ( i - 2 
-//) ) );
-        } break;
+		GET_WIS_BONUS(ch) += mod;
+		GET_WIS(ch) = GET_RAW_WIS(ch) + GET_WIS_BONUS(ch);
+		i = get_max_stat(ch, WISDOM);
+		if (i <= GET_RAW_WIS(ch))
+			GET_WIS(ch) = MIN(30, GET_WIS(ch));
+		else
+			GET_WIS(ch) = MIN(i, GET_WIS(ch));
+	}
+		break;
 
 	case APPLY_CON: {
-            GET_CON_BONUS(ch) += mod;
-            GET_CON(ch) = GET_RAW_CON(ch) + GET_CON_BONUS(ch);
-            i = get_max_stat(ch, CONSTITUTION);
-            if(i <= GET_RAW_CON(ch))
-               GET_CON(ch) = MIN(30, GET_CON(ch));
-            else
-	       GET_CON(ch) = MIN(i, GET_CON(ch));
-            // can only be max naturally.  Eq only gets you to max - 2
-    //        if( GET_RAW_CON(ch) > i - 2 && GET_CON(ch) > i - 2 )
-      //         GET_CON(ch) = GET_RAW_CON(ch);
-        //    else GET_CON(ch) = MAX( 1, MIN( (int)GET_CON( ch ), ( i - 2 
-//) ) );
-	}   break;
+		GET_CON_BONUS(ch) += mod;
+		GET_CON(ch) = GET_RAW_CON(ch) + GET_CON_BONUS(ch);
+		i = get_max_stat(ch, CONSTITUTION);
+		if (i <= GET_RAW_CON(ch))
+			GET_CON(ch) = MIN(30, GET_CON(ch));
+		else
+			GET_CON(ch) = MIN(i, GET_CON(ch));
+	}
+		break;
 
 	case APPLY_SEX: {
-            switch(GET_SEX(ch)) {
-              case SEX_MALE:    GET_SEX(ch) = SEX_FEMALE;   break;
-              case SEX_FEMALE:  GET_SEX(ch) = SEX_MALE;     break;
-              default: break;
-            }
-	 }   break;
+		switch (GET_SEX(ch)) {
+		case SEX_MALE:
+			GET_SEX(ch) = SEX_FEMALE;
+			break;
+		case SEX_FEMALE:
+			GET_SEX(ch) = SEX_MALE;
+			break;
+		default:
+			break;
+		}
+	}
+		break;
 
 	case APPLY_CLASS:
-	    /* ??? GET_CLASS(ch) += mod; */
-	    break;
+		/* ??? GET_CLASS(ch) += mod; */
+		break;
 
 	case APPLY_LEVEL:
-	    /* ??? GET_LEVEL(ch) += mod; */
-	    break;
+		/* ??? GET_LEVEL(ch) += mod; */
+		break;
 
 	case APPLY_AGE:
-            if(!IS_MOB(ch))
-	      ch->pcdata->time.birth -= ((long)SECS_PER_MUD_YEAR*(long)mod); 
-	    break;
+		if (!IS_MOB(ch))
+			ch->pcdata->time.birth -= ((long) SECS_PER_MUD_YEAR * (long) mod);
+		break;
 
 	case APPLY_CHAR_WEIGHT:
-	    GET_WEIGHT(ch) += mod;
-	    break;
+		GET_WEIGHT(ch) += mod;
+		break;
 
 	case APPLY_CHAR_HEIGHT:
-	    GET_HEIGHT(ch) += mod;
-	    break;
+		GET_HEIGHT(ch) += mod;
+		break;
 
 	case APPLY_MANA:
-            ch->max_mana += mod;
-	    break;
+		ch->max_mana += mod;
+		break;
 
 	case APPLY_HIT:
-	    ch->max_hit += mod;
-	    break;
+		ch->max_hit += mod;
+		break;
 
 	case APPLY_MOVE:
-	    ch->max_move += mod; 
-	    break;
+		ch->max_move += mod;
+		break;
 
 	case APPLY_GOLD:
-	    break;
+		break;
 
 	case APPLY_EXP:
-	    break;
+		break;
 
 	case APPLY_AC:
-	    GET_AC(ch) += mod;
-	    break;
+		GET_AC(ch) += mod;
+		break;
 
 	case APPLY_HITROLL:
-	    GET_HITROLL(ch) += mod;
-	    break;
+		GET_HITROLL(ch) += mod;
+		break;
 
 	case APPLY_DAMROLL:
-	    GET_DAMROLL(ch) += mod;
-	    break;
+		GET_DAMROLL(ch) += mod;
+		break;
 	case APPLY_SPELLDAMAGE:
-	    ch->spelldamage += mod;
-	    break;
+		ch->spelldamage += mod;
+		break;
 
 	case APPLY_SAVING_FIRE:
-	    ch->saves[SAVE_TYPE_FIRE] += mod;
-	    break;
+		ch->saves[SAVE_TYPE_FIRE] += mod;
+		break;
 	case APPLY_SAVING_COLD:
-	    ch->saves[SAVE_TYPE_COLD] += mod;
-	    break;
+		ch->saves[SAVE_TYPE_COLD] += mod;
+		break;
 
 	case APPLY_SAVING_ENERGY:
-	    ch->saves[SAVE_TYPE_ENERGY] += mod;
-	    break;
+		ch->saves[SAVE_TYPE_ENERGY] += mod;
+		break;
 
 	case APPLY_SAVING_ACID:
-	    ch->saves[SAVE_TYPE_ACID] += mod;
-	    break;
+		ch->saves[SAVE_TYPE_ACID] += mod;
+		break;
 
 	case APPLY_SAVING_MAGIC:
-	    ch->saves[SAVE_TYPE_MAGIC] += mod;
-	    break;
+		ch->saves[SAVE_TYPE_MAGIC] += mod;
+		break;
 
-        case APPLY_SAVING_POISON: 
-	    ch->saves[SAVE_TYPE_POISON] += mod;
-            break;
+	case APPLY_SAVING_POISON:
+		ch->saves[SAVE_TYPE_POISON] += mod;
+		break;
 
-        case APPLY_SAVES:
-	    ch->saves[SAVE_TYPE_FIRE] += mod;
-	    ch->saves[SAVE_TYPE_COLD] += mod;
-	    ch->saves[SAVE_TYPE_MAGIC] += mod;
-	    ch->saves[SAVE_TYPE_ENERGY] += mod;
-	    ch->saves[SAVE_TYPE_ACID] += mod;
-	    ch->saves[SAVE_TYPE_POISON] += mod;
-            break;
-            
-        case APPLY_HIT_N_DAM: {
-            GET_DAMROLL(ch) += mod;
-            GET_HITROLL(ch) += mod;
-              }  break;
-    
-        case APPLY_SANCTUARY: {
-               if (add) {
-                     SETBIT(ch->affected_by, AFF_SANCTUARY);
-               } else {
-                  REMBIT(ch->affected_by, AFF_SANCTUARY);
-               }
-          } break;
-        
-        case APPLY_SENSE_LIFE: {
-            if (add) {
-                     SETBIT(ch->affected_by, AFF_SENSE_LIFE);
-            } else {
-                  REMBIT(ch->affected_by, AFF_SENSE_LIFE);
-            }
-          } break;
-    
-        case APPLY_DETECT_INVIS: {
-               if (add) {
-                     SETBIT(ch->affected_by, AFF_DETECT_INVISIBLE);
-            } else {
-                    REMBIT(ch->affected_by, AFF_DETECT_INVISIBLE);
+	case APPLY_SAVES:
+		ch->saves[SAVE_TYPE_FIRE] += mod;
+		ch->saves[SAVE_TYPE_COLD] += mod;
+		ch->saves[SAVE_TYPE_MAGIC] += mod;
+		ch->saves[SAVE_TYPE_ENERGY] += mod;
+		ch->saves[SAVE_TYPE_ACID] += mod;
+		ch->saves[SAVE_TYPE_POISON] += mod;
+		break;
 
-             }
-          } break;
-    
-        case APPLY_INVISIBLE: {
-               if (add) {
-                     SETBIT(ch->affected_by, AFF_INVISIBLE);
-            } else {
-                  REMBIT(ch->affected_by, AFF_INVISIBLE);
-             }
-          } break;
-    
-        case APPLY_SNEAK: {
-               if (add) {
-                     SETBIT(ch->affected_by, AFF_SNEAK);
-            } else {
-                  REMBIT(ch->affected_by, AFF_SNEAK);
-             }
-          } break;
-    
-        case APPLY_INFRARED: {
-               if (add) {
-                     SETBIT(ch->affected_by, AFF_INFRARED);
-            } else {
-                  REMBIT(ch->affected_by, AFF_INFRARED);
-             }
-          } break;
-    
-        case APPLY_HASTE: {
-               if (add) {
-                     SETBIT(ch->affected_by, AFF_HASTE);
-            } else {
-                  REMBIT(ch->affected_by, AFF_HASTE);
-             }
-          } break;
+	case APPLY_HIT_N_DAM: {
+		GET_DAMROLL(ch) += mod;
+		GET_HITROLL(ch) += mod;
+	}
+		break;
 
-    
-        case APPLY_PROTECT_EVIL: {
-            if (add) {
-                     SETBIT(ch->affected_by, AFF_PROTECT_EVIL);
-            } else {
-                  REMBIT(ch->affected_by, AFF_PROTECT_EVIL);
-            }
-          } break;
+	case APPLY_SANCTUARY: {
+		if (add) {
+			SETBIT(ch->affected_by, AFF_SANCTUARY);
+		} else {
+			REMBIT(ch->affected_by, AFF_SANCTUARY);
+		}
+	}
+		break;
 
-    
-        case APPLY_FLY: {
-               if (add) {
-                     SETBIT(ch->affected_by, AFF_FLYING);
-            } else {
-                  REMBIT(ch->affected_by, AFF_FLYING);
-             }
-          } break;
+	case APPLY_SENSE_LIFE: {
+		if (add) {
+			SETBIT(ch->affected_by, AFF_SENSE_LIFE);
+		} else {
+			REMBIT(ch->affected_by, AFF_SENSE_LIFE);
+		}
+	}
+		break;
 
-        case 36: break;
-        case 37: break;
-	case 38: break;
-	case 39: break;
-	case 40: break;
-	case 41: break;
-	case 42: break;
-	case 43: break;
-	case 44: break;
-	case 45: break;
-	case 46: break;
-	case 47: break;
-	case 48: break;
-	case 49: break;
-	case 50: break;
-	case 51: break;
-	case 52: break;
-        case 53: break;
-        case 54: break;
-        case 55: break;
-        case 56: break;
-        case 57: break;
-        case 58: break;
-        case 59: break;
-        case 60: break;
-        case 61: break;
-        case 62: break;
-        case 63:
-            if(add) {
-                SET_BIT(ch->resist, ISR_SLASH); 
-            } else {
-                REMOVE_BIT(ch->resist, ISR_SLASH); 
-            }
-            break;
-        case 64:
-            if(add) {
-                SET_BIT(ch->resist, ISR_FIRE);
-            } else {
-                REMOVE_BIT(ch->resist, ISR_FIRE); 
-            }
-            break;
-        case 65: 
-            if(add) {
-                SET_BIT(ch->resist, ISR_COLD); 
-            } else {
-                REMOVE_BIT(ch->resist, ISR_COLD); 
-            }
-            break; 
+	case APPLY_DETECT_INVIS: {
+		if (add) {
+			SETBIT(ch->affected_by, AFF_DETECT_INVISIBLE);
+		} else {
+			REMBIT(ch->affected_by, AFF_DETECT_INVISIBLE);
 
-        case 66:
-            ch->max_ki += mod; 
-            break;
+		}
+	}
+		break;
 
-        case 67: 
-            if(add) {
-                SETBIT(ch->affected_by, AFF_CAMOUFLAGUE); 
-            } else {
-                REMBIT(ch->affected_by, AFF_CAMOUFLAGUE); 
-            }
-            break;
-        case 68: 
-            if(add) {
-                SETBIT(ch->affected_by, AFF_FARSIGHT);
-            } else {
-                REMBIT(ch->affected_by, AFF_FARSIGHT); 
-            }
-            break;
-        case 69: 
-            if(add) {
-                SETBIT(ch->affected_by, AFF_FREEFLOAT); 
-            } else {
-                REMBIT(ch->affected_by, AFF_FREEFLOAT); 
-            }
-            break;
-        case 70: 
-             if(add) {
-                 SETBIT(ch->affected_by, AFF_FROSTSHIELD);
-             } else {
-                 REMBIT(ch->affected_by, AFF_FROSTSHIELD);
-             }
-             break;
-        case 71: 
-            if(add) {
-                SETBIT(ch->affected_by, AFF_INSOMNIA); 
-            } else {
-                REMBIT(ch->affected_by, AFF_INSOMNIA); 
-            }
-            break;
-        case 72: 
-            if(add) {
-                SETBIT(ch->affected_by, AFF_LIGHTNINGSHIELD);
-            } else {
-                REMBIT(ch->affected_by, AFF_LIGHTNINGSHIELD);
-            }
-            break;
-        case 73: 
-	    ch->spell_reflect += mod;
+	case APPLY_INVISIBLE: {
+		if (add) {
+			SETBIT(ch->affected_by, AFF_INVISIBLE);
+		} else {
+			REMBIT(ch->affected_by, AFF_INVISIBLE);
+		}
+	}
+		break;
 
-	    if(add) {
-                SETBIT(ch->affected_by, AFF_REFLECT);
-	    } else {
-	      if (ch->spell_reflect <= 0) {
-                REMBIT(ch->affected_by, AFF_REFLECT);
-	      }
-	    }
-            break;
-        case 74: 
-            if(add) {
-                SET_BIT(ch->resist, ISR_ENERGY); 
-            } else {
-                REMOVE_BIT(ch->resist, ISR_ENERGY); 
-            }
-            break;
-        case 75:
-            if(add) {
-                SETBIT(ch->affected_by, AFF_SHADOWSLIP); 
-            } else {
-                REMBIT(ch->affected_by, AFF_SHADOWSLIP); 
-            }
-            break;
-        case 76:
-            if(add) {
-                SETBIT(ch->affected_by, AFF_SOLIDITY);
-            } else {
-                REMBIT(ch->affected_by, AFF_SOLIDITY);
-            }
-            break;
-        case 77:
-            if(add) {
-                SETBIT(ch->affected_by, AFF_STABILITY);
-            } else {
-                REMBIT(ch->affected_by, AFF_STABILITY);
-            }
-            break;
-        case 78: 
-            if(add) {
-                 SET_BIT(ch->immune, ISR_POISON); 
-            } else {
-                 REMOVE_BIT(ch->immune, ISR_POISON); 
-            }
-            break;
-        case 79: break;
-        case 80: break;
-        case 81: break;
-        case 82: break;
-        case 83: break;
-        case 84: break;
-        case 85: break;
-        case 86: break;
+	case APPLY_SNEAK: {
+		if (add) {
+			SETBIT(ch->affected_by, AFF_SNEAK);
+		} else {
+			REMBIT(ch->affected_by, AFF_SNEAK);
+		}
+	}
+		break;
 
-        case APPLY_INSANE_CHANT:
-            if(add) {
-                SETBIT(ch->affected_by, AFF_INSANE);
-            } else {
-                REMBIT(ch->affected_by, AFF_INSANE);
-            }
-            break;
+	case APPLY_INFRARED: {
+		if (add) {
+			SETBIT(ch->affected_by, AFF_INFRARED);
+		} else {
+			REMBIT(ch->affected_by, AFF_INFRARED);
+		}
+	}
+		break;
 
-        case APPLY_GLITTER_DUST:
-            if(add) {
-                SETBIT(ch->affected_by, AFF_GLITTER_DUST);
-            } else {
-                REMBIT(ch->affected_by, AFF_GLITTER_DUST);
-            }
-            break;
+	case APPLY_HASTE: {
+		if (add) {
+			SETBIT(ch->affected_by, AFF_HASTE);
+		} else {
+			REMBIT(ch->affected_by, AFF_HASTE);
+		}
+	}
+		break;
 
-        case APPLY_RESIST_ACID: 
-            if(add) {
-                SET_BIT(ch->resist, ISR_ACID); 
-            } else {
-                REMOVE_BIT(ch->resist, ISR_ACID); 
-            }
-            break;
+	case APPLY_PROTECT_EVIL: {
+		if (add) {
+			SETBIT(ch->affected_by, AFF_PROTECT_EVIL);
+		} else {
+			REMBIT(ch->affected_by, AFF_PROTECT_EVIL);
+		}
+	}
+		break;
 
-        case APPLY_HP_REGEN:
-            ch->hit_regen += mod;
-            break;
+	case APPLY_FLY: {
+		if (add) {
+			SETBIT(ch->affected_by, AFF_FLYING);
+		} else {
+			REMBIT(ch->affected_by, AFF_FLYING);
+		}
+	}
+		break;
 
-        case APPLY_MANA_REGEN:
-            ch->mana_regen += mod;
-            break;
+	case 36:
+		break;
+	case 37:
+		break;
+	case 38:
+		break;
+	case 39:
+		break;
+	case 40:
+		break;
+	case 41:
+		break;
+	case 42:
+		break;
+	case 43:
+		break;
+	case 44:
+		break;
+	case 45:
+		break;
+	case 46:
+		break;
+	case 47:
+		break;
+	case 48:
+		break;
+	case 49:
+		break;
+	case 50:
+		break;
+	case 51:
+		break;
+	case 52:
+		break;
+	case 53:
+		break;
+	case 54:
+		break;
+	case 55:
+		break;
+	case 56:
+		break;
+	case 57:
+		break;
+	case 58:
+		break;
+	case 59:
+		break;
+	case 60:
+		break;
+	case 61:
+		break;
+	case 62:
+		break;
+	case 63:
+		if (add) {
+			SET_BIT(ch->resist, ISR_SLASH);
+		} else {
+			REMOVE_BIT(ch->resist, ISR_SLASH);
+		}
+		break;
+	case 64:
+		if (add) {
+			SET_BIT(ch->resist, ISR_FIRE);
+		} else {
+			REMOVE_BIT(ch->resist, ISR_FIRE);
+		}
+		break;
+	case 65:
+		if (add) {
+			SET_BIT(ch->resist, ISR_COLD);
+		} else {
+			REMOVE_BIT(ch->resist, ISR_COLD);
+		}
+		break;
 
-        case APPLY_MOVE_REGEN:
-            ch->move_regen += mod;
-            break;
+	case 66:
+		ch->max_ki += mod;
+		break;
 
-        case APPLY_KI_REGEN:
-            ch->ki_regen += mod;
-            break;
+	case 67:
+		if (add) {
+			SETBIT(ch->affected_by, AFF_CAMOUFLAGUE);
+		} else {
+			REMBIT(ch->affected_by, AFF_CAMOUFLAGUE);
+		}
+		break;
+	case 68:
+		if (add) {
+			SETBIT(ch->affected_by, AFF_FARSIGHT);
+		} else {
+			REMBIT(ch->affected_by, AFF_FARSIGHT);
+		}
+		break;
+	case 69:
+		if (add) {
+			SETBIT(ch->affected_by, AFF_FREEFLOAT);
+		} else {
+			REMBIT(ch->affected_by, AFF_FREEFLOAT);
+		}
+		break;
+	case 70:
+		if (add) {
+			SETBIT(ch->affected_by, AFF_FROSTSHIELD);
+		} else {
+			REMBIT(ch->affected_by, AFF_FROSTSHIELD);
+		}
+		break;
+	case 71:
+		if (add) {
+			SETBIT(ch->affected_by, AFF_INSOMNIA);
+		} else {
+			REMBIT(ch->affected_by, AFF_INSOMNIA);
+		}
+		break;
+	case 72:
+		if (add) {
+			SETBIT(ch->affected_by, AFF_LIGHTNINGSHIELD);
+		} else {
+			REMBIT(ch->affected_by, AFF_LIGHTNINGSHIELD);
+		}
+		break;
+	case 73:
+		ch->spell_reflect += mod;
 
-        case WEP_CREATE_FOOD:
-            break;
+		if (add) {
+			SETBIT(ch->affected_by, AFF_REFLECT);
+		} else {
+			if (ch->spell_reflect <= 0) {
+				REMBIT(ch->affected_by, AFF_REFLECT);
+			}
+		}
+		break;
+	case 74:
+		if (add) {
+			SET_BIT(ch->resist, ISR_ENERGY);
+		} else {
+			REMOVE_BIT(ch->resist, ISR_ENERGY);
+		}
+		break;
+	case 75:
+		if (add) {
+			SETBIT(ch->affected_by, AFF_SHADOWSLIP);
+		} else {
+			REMBIT(ch->affected_by, AFF_SHADOWSLIP);
+		}
+		break;
+	case 76:
+		if (add) {
+			SETBIT(ch->affected_by, AFF_SOLIDITY);
+		} else {
+			REMBIT(ch->affected_by, AFF_SOLIDITY);
+		}
+		break;
+	case 77:
+		if (add) {
+			SETBIT(ch->affected_by, AFF_STABILITY);
+		} else {
+			REMBIT(ch->affected_by, AFF_STABILITY);
+		}
+		break;
+	case 78:
+		if (add) {
+			SET_BIT(ch->immune, ISR_POISON);
+		} else {
+			REMOVE_BIT(ch->immune, ISR_POISON);
+		}
+		break;
+	case 79:
+		break;
+	case 80:
+		break;
+	case 81:
+		break;
+	case 82:
+		break;
+	case 83:
+		break;
+	case 84:
+		break;
+	case 85:
+		break;
+	case 86:
+		break;
 
-        case APPLY_DAMAGED: // this is for storing damage to the item
-            break;
+	case APPLY_INSANE_CHANT:
+		if (add) {
+			SETBIT(ch->affected_by, AFF_INSANE);
+		} else {
+			REMBIT(ch->affected_by, AFF_INSANE);
+		}
+		break;
 
-        case WEP_THIEF_POISON:
-            break;
+	case APPLY_GLITTER_DUST:
+		if (add) {
+			SETBIT(ch->affected_by, AFF_GLITTER_DUST);
+		} else {
+			REMBIT(ch->affected_by, AFF_GLITTER_DUST);
+		}
+		break;
 
-        case APPLY_PROTECT_GOOD:
-           if (add)
-              SETBIT(ch->affected_by, AFF_PROTECT_GOOD);
-           else
-              REMBIT(ch->affected_by, AFF_PROTECT_GOOD);
-           break;
+	case APPLY_RESIST_ACID:
+		if (add) {
+			SET_BIT(ch->resist, ISR_ACID);
+		} else {
+			REMOVE_BIT(ch->resist, ISR_ACID);
+		}
+		break;
 
- 	case APPLY_MELEE_DAMAGE:
-	   ch->melee_mitigation += mod;
- 	   break;
+	case APPLY_HP_REGEN:
+		ch->hit_regen += mod;
+		break;
 
- 	case APPLY_SPELL_DAMAGE:
-	   ch->spell_mitigation += mod;
- 	   break;
+	case APPLY_MANA_REGEN:
+		ch->mana_regen += mod;
+		break;
 
- 	case APPLY_SONG_DAMAGE:
-	   ch->song_mitigation += mod;
- 	   break;
+	case APPLY_MOVE_REGEN:
+		ch->move_regen += mod;
+		break;
 
-        case APPLY_BOUNT_SONNET_HUNGER:
-           if(add) SETBIT(ch->affected_by, AFF_BOUNT_SONNET_HUNGER);
-           else {REMBIT(ch->affected_by, AFF_BOUNT_SONNET_HUNGER);GET_COND(ch,FULL)=12;}
-           break;
+	case APPLY_KI_REGEN:
+		ch->ki_regen += mod;
+		break;
 
-        case APPLY_BOUNT_SONNET_THIRST:
-           if(add) SETBIT(ch->affected_by, AFF_BOUNT_SONNET_THIRST);
-           else {REMBIT(ch->affected_by, AFF_BOUNT_SONNET_THIRST);GET_COND(ch,THIRST)=12;}
-           break;
+	case WEP_CREATE_FOOD:
+		break;
 
-        case APPLY_BLIND:
-           if(add) SETBIT(ch->affected_by, AFF_BLIND);
-           else REMBIT(ch->affected_by, AFF_BLIND);
-           break;
+	case APPLY_DAMAGED: // this is for storing damage to the item
+		break;
 
-        case APPLY_WATER_BREATHING:
-           if(add) SETBIT(ch->affected_by, AFF_WATER_BREATHING);
-           else REMBIT(ch->affected_by, AFF_WATER_BREATHING);
-           break;
+	case WEP_THIEF_POISON:
+		break;
 
-        case APPLY_DETECT_MAGIC:
-           if(add) SETBIT(ch->affected_by, AFF_DETECT_MAGIC);
-           else REMBIT(ch->affected_by, AFF_DETECT_MAGIC);
-           break;
+	case APPLY_PROTECT_GOOD:
+		if (add)
+			SETBIT(ch->affected_by, AFF_PROTECT_GOOD);
+		else
+			REMBIT(ch->affected_by, AFF_PROTECT_GOOD);
+		break;
 
-        case WEP_WILD_MAGIC: break;
+	case APPLY_MELEE_DAMAGE:
+		ch->melee_mitigation += mod;
+		break;
+
+	case APPLY_SPELL_DAMAGE:
+		ch->spell_mitigation += mod;
+		break;
+
+	case APPLY_SONG_DAMAGE:
+		ch->song_mitigation += mod;
+		break;
+
+	case APPLY_BOUNT_SONNET_HUNGER:
+		if (add)
+			SETBIT(ch->affected_by, AFF_BOUNT_SONNET_HUNGER);
+		else {
+			REMBIT(ch->affected_by, AFF_BOUNT_SONNET_HUNGER);
+			GET_COND(ch,FULL) = 12;
+		}
+		break;
+
+	case APPLY_BOUNT_SONNET_THIRST:
+		if (add)
+			SETBIT(ch->affected_by, AFF_BOUNT_SONNET_THIRST);
+		else {
+			REMBIT(ch->affected_by, AFF_BOUNT_SONNET_THIRST);
+			GET_COND(ch,THIRST) = 12;
+		}
+		break;
+
+	case APPLY_BLIND:
+		if (add)
+			SETBIT(ch->affected_by, AFF_BLIND);
+		else
+			REMBIT(ch->affected_by, AFF_BLIND);
+		break;
+
+	case APPLY_WATER_BREATHING:
+		if (add)
+			SETBIT(ch->affected_by, AFF_WATER_BREATHING);
+		else
+			REMBIT(ch->affected_by, AFF_WATER_BREATHING);
+		break;
+
+	case APPLY_DETECT_MAGIC:
+		if (add)
+			SETBIT(ch->affected_by, AFF_DETECT_MAGIC);
+		else
+			REMBIT(ch->affected_by, AFF_DETECT_MAGIC);
+		break;
+
+	case WEP_WILD_MAGIC:
+		break;
 
 	default:
-          sprintf(log_buf, "Unknown apply adjust attempt: %d. (handler.c, "
-                  "affect_modify.)", loc);
-	  log(log_buf, 0, LOG_BUG); 
-	  //	  strcpy(0,0); /* Why was this here? -Jared */
-	  break;
+		sprintf(log_buf, "Unknown apply adjust attempt: %d. (handler.c, "
+				"affect_modify.)", loc);
+		log(log_buf, 0, LOG_BUG);
+		break;
 
-    } /* switch */
+	} /* switch */
 }
 
 // This updates a character by subtracting everything he is affected by
