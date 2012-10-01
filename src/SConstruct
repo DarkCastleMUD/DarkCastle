@@ -19,7 +19,7 @@ LIBS=['dcastle', 'twitcurl', 'crypt', 'mcheck', 'z', 'pq', 'xmlrpc++'], LIBPATH=
 
 env.Program('showplayer', ['../scripts/showplayerxp.cpp'],
 CPPPATH = ['include'], CPPDEFINES=['LINUX', 'TWITTER'],
-LIBS=['dcastle','crypt', 'mcheck', 'z', 'pq', 'xmlrpc++'], LIBPATH=['.','/usr/local/lib']);
+LIBS=['dcastle', 'twitcurl', 'crypt', 'mcheck', 'z', 'pq', 'xmlrpc++'], LIBPATH=['.','/usr/local/lib']);
 
 env.StaticLibrary('dcastle', [base_src,wizard_src,class_src,backend_src],
 CPPPATH = ['include','/usr/include/pgsql/'], CPPDEFINES=['LINUX', 'TWITTER'],
