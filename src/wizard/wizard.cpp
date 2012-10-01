@@ -1,11 +1,9 @@
 /************************************************************************
-| $Id: wizard.cpp,v 1.81 2012/09/21 23:08:27 jhhudso Exp $
+| $Id: wizard.cpp,v 1.82 2012/10/01 03:12:43 jhhudso Exp $
 | wizard.C
 | Description:  Utility functions necessary for wiz commands.
 */
 #include "wizard.h"
-#include "curl.h"
-#include "twitcurl.h"
 #include <character.h>
 #include <utility.h>
 #include <levels.h>
@@ -19,6 +17,11 @@
 #include <spells.h>
 #include <interp.h>
 #include <returnvals.h>
+
+#ifdef TWITTER
+#include <curl.h>
+#include <twitcurl.h>
+#endif
 
 extern struct obj_data * search_char_for_item(char_data * ch, int16 item_number, bool wearonly = FALSE);
 extern void debug_point();
