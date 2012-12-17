@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.195 2012/12/17 18:27:56 jhhudso Exp $ */
+/* $Id: nanny.cpp,v 1.196 2012/12/17 20:52:29 jhhudso Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -786,25 +786,6 @@ bool allowed_host(char *host)
   return FALSE;
 }
 extern struct race_shit race_info[];
-void heightweight(char_data *ch, bool add)
-{
-  int i, j;
-  for (i=0; i<MAX_WEAR; i++)
-  {
-    if (ch->equipment[i])
-      for (j=0; j<ch->equipment[i]->num_affects; j++)
-      {
-        if (ch->equipment[i]->affected[j].location == APPLY_CHAR_HEIGHT)
-          affect_modify(ch, ch->equipment[i]->affected[j].location,
-                           ch->equipment[i]->affected[j].modifier,
-                           -1, add);
-	else if (ch->equipment[i]->affected[j].location == APPLY_CHAR_WEIGHT)
-          affect_modify(ch, ch->equipment[i]->affected[j].location,
-                           ch->equipment[i]->affected[j].modifier,
-                           -1, add);
-      }
-  }
-}
 
 void check_hw(char_data *ch)
 {

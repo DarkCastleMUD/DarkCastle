@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: objects.cpp,v 1.111 2012/12/17 18:28:50 jhhudso Exp $
+| $Id: objects.cpp,v 1.112 2012/12/17 20:52:29 jhhudso Exp $
 | objects.C
 | Description:  Implementation of the things you can do with objects:
 |   wear them, wield them, grab them, drink them, eat them, etc..
@@ -2374,4 +2374,24 @@ bool fullSave(obj_data *obj)
     return 1;
 
   return 0;
+}
+
+void heightweight(char_data *ch, bool add)
+{
+  int i, j;
+  for (i=0; i<MAX_WEAR; i++)
+  {
+    if (ch->equipment[i])
+      for (j=0; j<ch->equipment[i]->num_affects; j++)
+      {
+        if (ch->equipment[i]->affected[j].location == APPLY_CHAR_HEIGHT)
+          affect_modify(ch, ch->equipment[i]->affected[j].location,
+                           ch->equipment[i]->affected[j].modifier,
+                           -1, add);
+	else if (ch->equipment[i]->affected[j].location == APPLY_CHAR_WEIGHT)
+          affect_modify(ch, ch->equipment[i]->affected[j].location,
+                           ch->equipment[i]->affected[j].modifier,
+                           -1, add);
+      }
+  }
 }
