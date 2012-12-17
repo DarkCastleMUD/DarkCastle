@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: save.cpp,v 1.71 2012/01/29 05:36:43 jhhudso Exp $ */
+/* $Id: save.cpp,v 1.72 2012/12/17 18:29:17 jhhudso Exp $ */
 
 extern "C"
 {
@@ -1429,6 +1429,7 @@ void store_to_char(struct char_file_u *st, CHAR_DATA *ch)
 
     ch->weight  = st->weight;
     ch->height  = st->height;
+    logf(ANGEL, LOG_BUG, "%s's height loaded as %d", GET_NAME(ch), GET_HEIGHT(ch));
     ch->gold    = st->gold;
     ch->plat    = st->plat;
     ch->exp     = st->exp;
