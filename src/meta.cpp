@@ -1330,7 +1330,7 @@ int cardinal(struct char_data *ch, struct obj_data *obj, int cmd, char *argument
     csendf(ch, "$B$3%d)$R %-32s - 50 platinum coins.\r\n", MAX_PC_RACE+2,"A deep red vial of mana");
 
     send_to_char("$BHeight/Weight Change:$R\r\n",ch);
-
+    heightweight(ch, FALSE);
     if (ch->height < race_info[ch->race].max_height) 
 	csendf(ch,"$B$3%d)$R %-32s - 250 platinum coins.\r\n", MAX_PC_RACE+3, "Increase your height by 1");
     else
@@ -1350,7 +1350,7 @@ int cardinal(struct char_data *ch, struct obj_data *obj, int cmd, char *argument
 	csendf(ch,"$B$3%d)$R %-32s - 250 platinum coins.\r\n", MAX_PC_RACE+6, "Decrease your weight by 1");
     else
 	csendf(ch,"$B$3%d)$R %-32s.\r\n", MAX_PC_RACE+6, "You cannot decrease your weight further");
-
+    heightweight(ch, TRUE);
     csendf(ch,"$B$3%d)$R %-32s - 5 quest points.\r\n", MAX_PC_RACE+7, "Increase your age by 1 (500 max)");
     csendf(ch,"$B$3%d)$R %-32s - 5 quest points.\r\n", MAX_PC_RACE+8, "Decrease your age by 1  (18 min)");
 
