@@ -444,14 +444,14 @@ int do_set(struct char_data *ch, char *argument, int cmd)
                 log(buf2, IMP, LOG_GOD);
                 /* set level of victim */
                 vict->level = value;
-		update_wizlist(vict);
+                update_wizlist(vict);
             }
             break;
             case 4: /* height */
             {
                 value = atoi(buf);
                 log(buf2, IMP, LOG_GOD);
-                /* set hieght of victim */
+                /* set height of victim */
                 vict->height = value;
             }       
             break;
