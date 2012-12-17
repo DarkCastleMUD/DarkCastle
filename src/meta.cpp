@@ -1244,7 +1244,8 @@ void set_heightweight(char_data *ch)
             ch->weight = number(240, 280);
  	    break;		
     }
-
+    logf(ANGEL, LOG_MORTAL, "set_heightweight: %s's height set to %d", GET_NAME(ch), GET_HEIGHT(ch));
+    logf(ANGEL, LOG_MORTAL, "set_heightweight: %s's weight set to %d", GET_NAME(ch), GET_WEIGHT(ch));
 }
 
 int changecost(int oldrace, int newrace)
@@ -1500,10 +1501,22 @@ int cardinal(struct char_data *ch, struct obj_data *obj, int cmd, char *argument
       }
       GET_PLATINUM(ch) -= 250;
       send_to_char("Cardinal Thelonius gropes you.\r\n",ch);
-      if (choice == 3) ch->height++;
-      if (choice == 4) ch->height--;
-      if (choice == 5) ch->weight++;
-      if (choice == 6) ch->weight--;
+      if (choice == 3) {
+    	  ch->height++;
+    	  logf(ANGEL, LOG_MORTAL, "%s metas height by 1 = %d", GET_NAME(ch), GET_HEIGHT(ch));
+      }
+      if (choice == 4) {
+    	  ch->height--;
+    	  logf(ANGEL, LOG_MORTAL, "%s metas height by -1 = %d", GET_NAME(ch), GET_HEIGHT(ch));
+      }
+      if (choice == 5) {
+    	  ch->weight++;
+    	  logf(ANGEL, LOG_MORTAL, "%s metas weight by 1 = %d", GET_NAME(ch), GET_WEIGHT(ch));
+      }
+      if (choice == 6) {
+    	  ch->weight--;
+    	  logf(ANGEL, LOG_MORTAL, "%s metas weight by -1 = %d", GET_NAME(ch), GET_WEIGHT(ch));
+      }
       return eSUCCESS;
     } else if (choice == MAX_PC_RACE+7) {
 	if (GET_QPOINTS(ch) < 5) {
