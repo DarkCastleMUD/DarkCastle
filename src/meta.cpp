@@ -1485,13 +1485,13 @@ int cardinal(struct char_data *ch, struct obj_data *obj, int cmd, char *argument
     } else if (choice >= MAX_PC_RACE+3 && choice <= MAX_PC_RACE+6) {
       choice -= MAX_PC_RACE;
 
-      if (choice == 3 && ch->height >= race_info[ch->race].max_height)
+      if (choice == 3 && ch->base_height >= race_info[ch->race].max_height)
       { send_to_char("You cannot increase your height any more.\r\n",ch); return eSUCCESS;}    
-      else if (choice == 4 && ch->height <= race_info[ch->race].min_height)
+      else if (choice == 4 && ch->base_height <= race_info[ch->race].min_height)
       { send_to_char("You cannot decrease your height any more.\r\n",ch); return eSUCCESS;} 
-      else if (choice == 5 && ch->weight >= race_info[ch->race].max_weight)
+      else if (choice == 5 && ch->base_weight >= race_info[ch->race].max_weight)
       { send_to_char("You cannot increase your weight any more.\r\n",ch); return eSUCCESS;}  
-      else if (choice == 6 && ch->weight <= race_info[ch->race].min_weight)
+      else if (choice == 6 && ch->base_weight <= race_info[ch->race].min_weight)
       { send_to_char("You cannot decrease your weight any more.\r\n",ch); return eSUCCESS;}
       
       if (GET_PLATINUM(ch) < 250)
@@ -1503,18 +1503,22 @@ int cardinal(struct char_data *ch, struct obj_data *obj, int cmd, char *argument
       send_to_char("Cardinal Thelonius gropes you.\r\n",ch);
       if (choice == 3) {
     	  ch->height++;
+    	  ch->base_height++;
     	  logf(ANGEL, LOG_MORTAL, "%s metas height by 1 = %d", GET_NAME(ch), GET_HEIGHT(ch));
       }
       if (choice == 4) {
     	  ch->height--;
+    	  ch->base_height--;
     	  logf(ANGEL, LOG_MORTAL, "%s metas height by -1 = %d", GET_NAME(ch), GET_HEIGHT(ch));
       }
       if (choice == 5) {
     	  ch->weight++;
+    	  ch->base_weight++;
     	  logf(ANGEL, LOG_MORTAL, "%s metas weight by 1 = %d", GET_NAME(ch), GET_WEIGHT(ch));
       }
       if (choice == 6) {
     	  ch->weight--;
+    	  ch->base_weight--;
     	  logf(ANGEL, LOG_MORTAL, "%s metas weight by -1 = %d", GET_NAME(ch), GET_WEIGHT(ch));
       }
       return eSUCCESS;
