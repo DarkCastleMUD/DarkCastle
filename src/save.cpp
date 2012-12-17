@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: save.cpp,v 1.72 2012/12/17 18:29:17 jhhudso Exp $ */
+/* $Id: save.cpp,v 1.73 2012/12/17 19:09:04 jhhudso Exp $ */
 
 extern "C"
 {
@@ -908,6 +908,7 @@ bool load_char_obj( struct descriptor_data *d, char *name )
   if(!IS_MOB(ch)) {
     dc_free(GET_NAME(ch));
     GET_NAME(ch) = str_dup(name);
+    logf(ANGEL, LOG_BUG, "%s's height loaded as %d", GET_NAME(ch), GET_HEIGHT(ch));
   }
   
   while(!feof(fpsave)) {
@@ -1429,7 +1430,6 @@ void store_to_char(struct char_file_u *st, CHAR_DATA *ch)
 
     ch->weight  = st->weight;
     ch->height  = st->height;
-    logf(ANGEL, LOG_BUG, "%s's height loaded as %d", GET_NAME(ch), GET_HEIGHT(ch));
     ch->gold    = st->gold;
     ch->plat    = st->plat;
     ch->exp     = st->exp;
