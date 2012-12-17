@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: save.cpp,v 1.73 2012/12/17 19:09:04 jhhudso Exp $ */
+/* $Id: save.cpp,v 1.74 2012/12/17 20:28:15 jhhudso Exp $ */
 
 extern "C"
 {
@@ -1429,7 +1429,9 @@ void store_to_char(struct char_file_u *st, CHAR_DATA *ch)
     GET_CON(ch)       = GET_RAW_CON(ch)   = st->raw_con;
 
     ch->weight  = st->weight;
+    ch->base_weight = st->weight;
     ch->height  = st->height;
+    ch->base_height = st->height;
     ch->gold    = st->gold;
     ch->plat    = st->plat;
     ch->exp     = st->exp;
