@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: objects.cpp,v 1.110 2012/01/17 01:04:16 jhhudso Exp $
+| $Id: objects.cpp,v 1.111 2012/12/17 18:28:50 jhhudso Exp $
 | objects.C
 | Description:  Implementation of the things you can do with objects:
 |   wear them, wield them, grab them, drink them, eat them, etc..
@@ -1417,14 +1417,19 @@ int will_screwup_worn_sizes(char_data * ch, obj_data * obj, int add)
     return FALSE;
 
   // temporarily affect the person's height
-  if(add)
-    GET_HEIGHT(ch) += mod;
-  else GET_HEIGHT(ch) -= mod;
+  if(add) {
+	  logf(ANGEL, LOG_BUG, "will_screwup_worn_sizes: %s height %d by %d = %d", GET_NAME(ch), GET_HEIGHT(ch), mod, GET_HEIGHT(ch)+mod);
+	  GET_HEIGHT(ch) += mod;
+  } else {
+	  logf(ANGEL, LOG_BUG, "will_screwup_worn_sizes: %s height %d by -%d = %d", GET_NAME(ch), GET_HEIGHT(ch), mod, GET_HEIGHT(ch)-mod);
+	  GET_HEIGHT(ch) -= mod;
+  }
 
   if(add == 1 && size_restricted(ch, obj))
   {
     // Only have to check the item itself if we're wearing it, not removing
-    GET_HEIGHT(ch) -= mod;
+	  logf(ANGEL, LOG_BUG, "will_screwup_worn_sizes: %s height %d by -%d = %d", GET_NAME(ch), GET_HEIGHT(ch), mod, GET_HEIGHT(ch)-mod);
+	  GET_HEIGHT(ch) -= mod;
     send_to_char("After modifying your height that item would not fit!\r\n", ch);
     return TRUE;
   }
@@ -1442,9 +1447,13 @@ int will_screwup_worn_sizes(char_data * ch, obj_data * obj, int add)
   }
 
   // fix height back to normal
-  if(add)
-    GET_HEIGHT(ch) -= mod;
-  else GET_HEIGHT(ch) += mod;
+  if(add) {
+	  logf(ANGEL, LOG_BUG, "will_screwup_worn_sizes: %s height %d by -%d = %d", GET_NAME(ch), GET_HEIGHT(ch), mod, GET_HEIGHT(ch)-mod);
+	  GET_HEIGHT(ch) -= mod;
+  } else {
+	  logf(ANGEL, LOG_BUG, "will_screwup_worn_sizes: %s height %d by %d = %d", GET_NAME(ch), GET_HEIGHT(ch), mod, GET_HEIGHT(ch)+mod);
+	  GET_HEIGHT(ch) += mod;
+  }
 
   if(problem)
   {
