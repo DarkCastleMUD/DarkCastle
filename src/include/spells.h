@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: spells.h,v 1.140 2011/12/12 01:55:56 jhhudso Exp $ */
+/* $Id: spells.h,v 1.141 2012/12/17 18:24:03 jhhudso Exp $ */
 
 #ifndef SPELLS_H_
 #define SPELLS_H_
@@ -388,7 +388,7 @@ void check_maxes(CHAR_DATA *ch);
 #define SKILL_TUMBLING		     416
 #define SKILL_BREW                   417
 #define SKILL_PURSUIT		     418
-#define SKILL_PROFESSION			 419
+//			                     419
 //warrior
 #define SKILL_LEGIONNAIRE			420
 #define SKILL_GLADIATOR				421
@@ -600,7 +600,8 @@ void check_maxes(CHAR_DATA *ch);
 #define SPELL_KI_TRANS_TIMER         4016
 #define SKILL_BREW_TIMER             4017
 #define SKILL_SCRIBE_TIMER           4018
-#define RESERVED_MAX                 4018
+#define SKILL_PROFESSION             4019
+#define RESERVED_MAX                 4019
 ///////////////////////////////////////////////////////////////////////
 
 #define TAR_IGNORE         1
