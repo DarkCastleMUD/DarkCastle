@@ -1,7 +1,7 @@
 #ifndef CHARACTER_H_
 #define CHARACTER_H_
 /******************************************************************************
-| $Id: character.h,v 1.81 2011/12/25 21:29:49 jhhudso Exp $
+| $Id: character.h,v 1.82 2012/12/17 20:26:44 jhhudso Exp $
 | Description: This file contains the header information for the character
 |   class implementation.
 */
@@ -344,6 +344,8 @@ struct char_data
 
     ubyte weight;       /* PC/NPC's weight */
     ubyte height;       /* PC/NPC's height */
+    ubyte base_weight;       /* PC/NPC's weight */
+    ubyte base_height;       /* PC/NPC's height */
 
     int16 hometown;      /* PC/NPC home town */
     int64 gold;           /* Money carried                           */
