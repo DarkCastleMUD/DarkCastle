@@ -297,6 +297,7 @@ bool my_load_char_obj( struct descriptor_data *d, char *name )
   if(!IS_MOB(ch)) {
     dc_free(GET_NAME(ch));
     GET_NAME(ch) = str_dup(name);
+    logf(ANGEL, LOG_BUG, "%s's height loaded as %d", GET_NAME(ch), GET_HEIGHT(ch));
   }
   
   while(!feof(fpsave)) {
