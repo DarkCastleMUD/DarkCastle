@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.194 2012/08/09 03:23:16 jhhudso Exp $ */
+/* $Id: nanny.cpp,v 1.195 2012/12/17 18:27:56 jhhudso Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -630,17 +630,22 @@ void do_on_login_stuff(char_data * ch)
  	  struct class_skill_defines *a = get_skill_list(ch);
  	  extern struct class_skill_defines g_skills[];
 
-          while(curr)
-            if(curr->skillnum < 600 && search_skills2(curr->skillnum,a)==-1
-		&& search_skills2(curr->skillnum, g_skills) == -1 &&
-		curr->skillnum != 385)
-	    {
-	    struct char_skill_data *a = curr->next;
-                if (prev) prev->next = curr->next;
-                else ch->skills = curr->next;
-                FREE(curr);
-		curr = a;
-           } else { prev = curr; curr = curr->next; }
+	while (curr) {
+		if (curr->skillnum < 600 && search_skills2(curr->skillnum,a)==-1 && search_skills2(curr->skillnum, g_skills) == -1 && curr->skillnum != 385) {
+			printf("Removing skill %d from %s\n", curr->skillnum, GET_NAME(ch));
+			struct char_skill_data *a = curr->next;
+			if (prev)
+				prev->next = curr->next;
+			else
+				ch->skills = curr->next;
+
+			FREE(curr);
+			curr = a;
+		} else {
+			prev = curr;
+			curr = curr->next;
+		}
+	}
    
    barb_magic_resist(ch, 0, has_skill(ch, SKILL_MAGIC_RESIST));
   /* meta reimbursement */
@@ -804,18 +809,32 @@ void heightweight(char_data *ch, bool add)
 void check_hw(char_data *ch)
 {
   heightweight(ch, FALSE);
-  if (ch->height > race_info[ch->race].max_height) ch->height = race_info[ch->race].max_height;
-  if (ch->height < race_info[ch->race].min_height) ch->height = race_info[ch->race].min_height;
+  if (ch->height > race_info[ch->race].max_height) {
+	  logf(ANGEL, LOG_BUG, "check_hw: %s's height %d > max %d. height set to max.", GET_NAME(ch), GET_HEIGHT(ch), race_info[ch->race].max_height);
+	  ch->height = race_info[ch->race].max_height;
+  }
+  if (ch->height < race_info[ch->race].min_height) {
+	  logf(ANGEL, LOG_BUG, "check_hw: %s's height %d < min %d. height set to min.", GET_NAME(ch), GET_HEIGHT(ch), race_info[ch->race].min_height);
+	  ch->height = race_info[ch->race].min_height;
+  }
 
-  if (ch->weight > race_info[ch->race].max_weight) ch->weight = race_info[ch->race].max_weight;
-  if (ch->weight < race_info[ch->race].min_weight) ch->weight = race_info[ch->race].min_weight;
+  if (ch->weight > race_info[ch->race].max_weight) {
+	  logf(ANGEL, LOG_BUG, "check_hw: %s's weight %d > max %d. weight set to max.", GET_NAME(ch), GET_WEIGHT(ch), race_info[ch->race].max_weight);
+	  ch->weight = race_info[ch->race].max_weight;
+  }
+  if (ch->weight < race_info[ch->race].min_weight) {
+	  logf(ANGEL, LOG_BUG, "check_hw: %s's weight %d < min %d. weight set to min.", GET_NAME(ch), GET_WEIGHT(ch), race_info[ch->race].min_weight);
+	  ch->weight = race_info[ch->race].min_weight;
+  }
   heightweight(ch, TRUE);
 }
 
 void set_hw(char_data *ch)
 {
-  ch->height = number(race_info[ch->race].min_height, race_info[ch->race].max_height);
-  ch->weight = number(race_info[ch->race].min_weight, race_info[ch->race].max_weight);
+	ch->height = number(race_info[ch->race].min_height, race_info[ch->race].max_height);
+	logf(ANGEL, LOG_MORTAL, "%s's height set to %d", GET_NAME(ch), GET_HEIGHT(ch));
+	ch->weight = number(race_info[ch->race].min_weight, race_info[ch->race].max_weight);
+	logf(ANGEL, LOG_MORTAL, "%s's weight set to %d", GET_NAME(ch), GET_WEIGHT(ch));
 }
 
 
