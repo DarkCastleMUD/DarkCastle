@@ -13,7 +13,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: handler.cpp,v 1.207 2012/12/17 19:23:01 jhhudso Exp $ */
+/* $Id: handler.cpp,v 1.208 2013/03/27 03:32:58 jhhudso Exp $ */
     
 extern "C"
 {
@@ -865,9 +865,6 @@ void affect_modify(CHAR_DATA *ch, int32 loc, int32 mod, long bitv, bool add, int
 
 	case APPLY_CHAR_HEIGHT:
 		GET_HEIGHT(ch) += mod;
-		if (IS_PC(ch)) {
-			logf(IMMORTAL, LOG_BUG, "affect_modify: %s apply_char_height by %d = %d", GET_NAME(ch), mod, GET_HEIGHT(ch));
-		}
 		break;
 
 	case APPLY_MANA:
