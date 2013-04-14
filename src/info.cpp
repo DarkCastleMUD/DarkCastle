@@ -12,7 +12,7 @@
  * This is free software and you are benefitting.	We hope that you    *
  * share your changes too.  What goes around, comes around. 		    *
  ****************************************************************************/
-/* $Id: info.cpp,v 1.205 2012/05/28 06:59:02 jhhudso Exp $ */
+/* $Id: info.cpp,v 1.206 2013/04/14 04:24:26 jhhudso Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -1364,7 +1364,6 @@ int do_read(struct char_data *ch, char *arg, int cmd)
 int do_examine(struct char_data *ch, char *argument, int cmd)
 {
    char name[200], buf[200];
-   int bits;
    struct char_data *tmp_char;
    struct obj_data *tmp_object;
 
@@ -1379,8 +1378,8 @@ int do_examine(struct char_data *ch, char *argument, int cmd)
       return eFAILURE;
    }
 
-   bits = generic_find(name, FIND_OBJ_INV | FIND_OBJ_ROOM |
-      FIND_OBJ_EQUIP, ch, &tmp_char, &tmp_object);
+   generic_find(name, FIND_OBJ_INV | FIND_OBJ_ROOM |
+		FIND_OBJ_EQUIP, ch, &tmp_char, &tmp_object);
 
    if (tmp_object) {
       if ((GET_ITEM_TYPE(tmp_object) == ITEM_DRINKCON) ||
@@ -2532,8 +2531,6 @@ int do_scan(struct char_data *ch, char *argument, int cmd)
    struct char_data *vict;
    struct room_data *room;
    long was_in;
-   int percent;
-   int Learned;
 
    char *possibilities[] =
    {
@@ -2550,8 +2547,6 @@ int do_scan(struct char_data *ch, char *argument, int cmd)
      send_to_char("You are to tired to scan right now.\r\n", ch);
      return eSUCCESS;
    }
-
-   Learned = has_skill(ch, SKILL_SCAN);
 
    act("$n carefully searches the surroundings...", ch, 0, 0, TO_ROOM,
       INVIS_NULL|STAYHIDE);
@@ -2639,7 +2634,6 @@ int do_scan(struct char_data *ch, char *argument, int cmd)
                           )
                            continue;
 
-                        percent = number(1,101);
                         if(skill_success(ch,NULL,SKILL_SCAN,-20)) {
                            csendf(ch, "%35s -- extremely far off %s\n\r",
                               GET_SHORT(vict),
