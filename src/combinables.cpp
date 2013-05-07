@@ -498,11 +498,17 @@ int do_brew(char_data *ch, char *argument, int cmd)
     send_to_char("You do not have that type of container.\n\r", ch);
     return eFAILURE;
   }
+
   if (containerobj->obj_flags.type_flag != ITEM_POTION && containerobj->obj_flags.type_flag != ITEM_DRINKCON) {
     send_to_char("That is not a target container.\n\r", ch);
     return eFAILURE;
   }
   
+  if (IS_SET(containerobj->obj_flags.more_flags, ITEM_CUSTOM)) {
+	  send_to_char("That container is already a brewed potion.\n\r", ch);
+	  return eFAILURE;
+  }
+
   if (containerobj == liquidobj) {
     send_to_char("Your liquid and target container cannot be the same object!\n\r", ch);
     return eFAILURE;
