@@ -5,8 +5,8 @@ import os.path
 env = Environment(CCFLAGS = '-ggdb3 -Wall -m32 -O3 -Wno-write-strings',
 				  LINKFLAGS = '-ggdb3 -Wall -m32 -O3 -Wno-write-strings' )
 
-if os.path.exists('/usr/bin/g++-4.7'):
-	env.Replace(CXX = 'g++-4.7')
+if os.path.exists('/usr/bin/g++-4.8'):
+	env.Replace(CXX = 'g++-4.8')
           
 base_src = glob.glob('[a-l]*.cpp') + glob.glob('[n-z]*.cpp') + glob.glob('mo*.cpp') + ['magic.cpp','memory.cpp','meta.cpp','MobActivity.cpp']
 wizard_src = glob.glob('wizard/*.cpp')
