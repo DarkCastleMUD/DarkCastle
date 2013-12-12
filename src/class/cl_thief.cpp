@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.203 2012/02/17 08:01:07 jhhudso Exp $
+| $Id: cl_thief.cpp,v 1.204 2013/12/12 06:01:05 jhhudso Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -335,7 +335,6 @@ int do_backstab(CHAR_DATA *ch, char *argument, int cmd)
         if (GET_MAX_HIT(victim) * 0.40 > GET_MAX_HIT(ch)) itemp--;
     }
   }
-  
 
   // record the room I'm in.  Used to make sure a dual can go off.
   was_in = ch->in_room;
@@ -354,7 +353,9 @@ int do_backstab(CHAR_DATA *ch, char *argument, int cmd)
 	perform_dual_backstab = true;
       }
     }
-  WAIT_STATE(ch, PULSE_VIOLENCE*1.5);
+
+  WAIT_STATE(ch, PULSE_VIOLENCE*1);
+
   // failure
   if(AWAKE(victim) && !skill_success(ch,victim,SKILL_BACKSTAB)) {
     // If this is stab 1 of 2 for a dual backstab, we dont want people autojoining on the first stab
@@ -398,29 +399,22 @@ int do_backstab(CHAR_DATA *ch, char *argument, int cmd)
     }
   }
 
-if (retval & eVICT_DIED && !retval & eCH_DIED)
-  {
-    if(!IS_NPC(ch) && IS_SET(ch->pcdata->toggles, PLR_WIMPY))
-      WAIT_STATE(ch, PULSE_VIOLENCE * 1.5);
-    else
-      add_command_lag(ch, cmd, PULSE_VIOLENCE*1.0);
-    return retval;
-  }
-
- if (retval & eCH_DIED) return retval;
+  if (retval & eVICT_DIED && !retval & eCH_DIED)
+    {
+      return retval;
+    }
+  
+  if (retval & eCH_DIED) return retval;
 
   if (retval & eVICT_DIED)
   {
-    add_command_lag(ch, cmd, PULSE_VIOLENCE *1.0);
     return retval;
   }
   extern bool charExists(char_data *ch);
   if (!charExists(victim))// heh
   {
-    add_command_lag(ch, cmd, PULSE_VIOLENCE *1.0);
       return eSUCCESS|eVICT_DIED;
   }
-  WAIT_STATE(ch, PULSE_VIOLENCE*1.5);
 
   // If we're intended to have a dual backstab AND we still can
   if (perform_dual_backstab == true && charge_moves(ch, SKILL_BACKSTAB)) {
@@ -431,19 +425,9 @@ if (retval & eVICT_DIED && !retval & eCH_DIED)
 	retval = attack(ch, victim, SKILL_BACKSTAB, SECOND);
       }
       
-  if (retval & eVICT_DIED && !retval & eCH_DIED) {
-	if(!IS_NPC(ch) && IS_SET(ch->pcdata->toggles, PLR_WIMPY)) {
-	  WAIT_STATE(ch, PULSE_VIOLENCE * 1.5);
-	} else {
-	  WAIT_STATE(ch, PULSE_VIOLENCE*0.5);
-	}
+      if (!SOMEONE_DIED(retval)) {
+	check_autojoiners(ch, 0);
       }
-    } else {
-      // We were intended to have a dual backstab so we were unjoinable
-      // for the first stab, but apparently we moved, so there will be no
-      // second stab. We will kick off check_autojoiner now since it didnt
-      // run last time.
-      check_autojoiners(ch, 0);
     }
   }
 
@@ -453,8 +437,7 @@ if (retval & eVICT_DIED && !retval & eCH_DIED)
 
     if (IS_AFFECTED(ch, AFF_CHARM)) SET_BIT(retval, check_joincharmie(ch,1));
     if (SOMEONE_DIED(retval)) return retval;
-  } else
-    add_command_lag(ch, cmd, (int)((double)PULSE_VIOLENCE)); 
+ }
 
 
   return retval;
