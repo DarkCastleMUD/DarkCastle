@@ -573,8 +573,6 @@ int do_wiz(struct char_data *ch, char *argument, int cmd)
         send_to_char((tmp.front()).c_str(), ch);
         tmp.pop();
       }
-        //send_to_char(
-        //    "What do you want to tell all gods and immortals?\n\r", ch);
     }
     else 
     {
