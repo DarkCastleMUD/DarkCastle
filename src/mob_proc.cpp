@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.202 2012/04/16 03:11:25 shane Exp $ */
+/* $Id: mob_proc.cpp,v 1.203 2013/12/22 07:48:03 jhhudso Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -1784,7 +1784,7 @@ static char *dethSayText [ ] =
   "God made semen taste like bleach so she'd remember to do the laundry.",
   "If it's an \"eye for an eye and a tooth for a tooth\", why is there no Eye Fairy?",
   "Necrophilia - putting the fun back in funeral.",
-  "Monopolies are like children on an airplane, you complain about them until you have one."
+  "Monopolies are like children on an airplane, you complain about them until you have one.",
   "Grannies are pernonin' noobs."
  };
 
