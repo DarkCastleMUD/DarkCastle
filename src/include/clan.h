@@ -2,7 +2,7 @@
 #define CLAN_H_
 
 /************************************************************************
-| $Id: clan.h,v 1.26 2011/11/26 03:32:34 jhhudso Exp $
+| $Id: clan.h,v 1.27 2013/12/30 22:46:43 jhhudso Exp $
 | clan.h
 | Description:  Header information for clans.
 */
@@ -72,8 +72,10 @@ public:
   void cwithdraw(const uint64_t &withdraw);
   uint64_t getBalance(void);
   void setBalance(const uint64_t &value);
+  std::queue<std::string> ctell_history;
 private:
   uint64_t balance;
+
 };
 // if you add to the clan rights, update clan_rights[] in clan.C
 

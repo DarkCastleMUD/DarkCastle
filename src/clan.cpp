@@ -1,4 +1,4 @@
-/* $Id: clan.cpp,v 1.88 2011/12/04 22:27:00 jhhudso Exp $ */
+/* $Id: clan.cpp,v 1.89 2013/12/30 22:46:43 jhhudso Exp $ */
 
 /***********************************************************************/
 /* Revision History                                                    */
@@ -1456,7 +1456,18 @@ int do_ctell(CHAR_DATA *ch, char *arg, int cmd)
   }
     
   if(!*arg) {
-    send_to_char("Tell your clan members what?\n\r", ch);
+    queue<string> tmp = get_clan(ch)->ctell_history;
+    if (tmp.empty()) {
+      send_to_char("No one has said anything lately.\r\n", ch);
+      return eFAILURE;
+    }
+
+    send_to_char("Here are the last 10 ctells:\r\n", ch);
+    while(!tmp.empty()) {
+      send_to_char((tmp.front()).c_str(), ch);
+      tmp.pop();
+    }
+
     return eFAILURE;
   }
 
@@ -1489,6 +1500,13 @@ int do_ctell(CHAR_DATA *ch, char *arg, int cmd)
      send_to_char(buf, pch);
      ansi_color( NTEXT, pch);
   }
+
+  sprintf(buf, "$2%s tells the clan, '%s'$R\n\r", GET_SHORT(ch), arg);
+  get_clan(ch)->ctell_history.push(buf);
+  if(get_clan(ch)->ctell_history.size() > 10) {
+    get_clan(ch)->ctell_history.pop();
+  }
+
   return eSUCCESS;
 }
 

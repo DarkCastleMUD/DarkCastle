@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: channel.cpp,v 1.27 2009/02/16 07:05:15 jhhudso Exp $
+| $Id: channel.cpp,v 1.28 2013/12/30 22:46:43 jhhudso Exp $
 | channel.C
 | Description:  All of the channel - type commands; do_say, gossip, etc..
 */
@@ -691,7 +691,19 @@ int do_tell(struct char_data *ch, char *argument, int cmd)
     message[199] = '\0';
     
     if(!*name || !*message)  {
-      send_to_char("Who do you wish to tell what??\n\r", ch);
+      if (ch->pcdata->tell_history == 0 || ch->pcdata->tell_history->empty()) {
+	send_to_char("You've not recieved any tell messages.\r\n", ch);
+	return eSUCCESS;
+      }
+
+      send_to_char("Here are the last 10 tell messages you've received:\r\n", ch);
+      queue<string> tmp = *(ch->pcdata->tell_history);
+      while(!tmp.empty())
+	{
+	  send_to_char((tmp.front()).c_str(), ch);
+	  tmp.pop();
+	}
+
       return eSUCCESS;
     }
 
@@ -753,10 +765,24 @@ int do_tell(struct char_data *ch, char *argument, int cmd)
 	if (!IS_NPC(ch) && !IS_NPC(vict))
           vict->pcdata->last_tell = str_dup(GET_NAME(ch));
         }
+
         ansi_color(GREEN, vict);
         ansi_color(BOLD, vict);
         send_to_char_regardless(buf, vict);
         ansi_color(NTEXT, vict);
+
+	if (IS_PC(vict)) {
+          sprintf(buf,"%s tells you, '%s'%c\r\n",
+                PERS(ch, vict), message, IS_SET(vict->pcdata->toggles, PLR_BEEP) ? '\a' : '\0');
+	  if (vict->pcdata->tell_history == 0) {
+	    vict->pcdata->tell_history = new std::queue<string>();
+	  }
+
+	  vict->pcdata->tell_history->push(buf);
+          if(vict->pcdata->tell_history->size() > 10) {
+	    vict->pcdata->tell_history->pop();
+	  }
+	}
 
         sprintf(buf,"$2$BYou tell %s, '%s'$R", PERS(vict, ch), message);
         send_to_char(buf, ch);
@@ -775,8 +801,22 @@ int do_tell(struct char_data *ch, char *argument, int cmd)
 	  vict->pcdata->last_tell = str_dup(GET_NAME(ch));
         }
         act(buf, vict, 0, 0, TO_CHAR, STAYHIDE);
+
+	if (IS_PC(vict)) {
+	  sprintf(buf, "$2$B%s tells you, '%s'$R\r\n", PERS(ch, vict), message);
+	  if (vict->pcdata->tell_history == 0) {
+	    vict->pcdata->tell_history = new std::queue<string>();
+	  }
+
+	  vict->pcdata->tell_history->push(buf);
+          if(vict->pcdata->tell_history->size() > 10) {
+	    vict->pcdata->tell_history->pop();
+	  }
+	}
+
         sprintf(buf,"$2$BYou tell %s, '%s'$R", PERS(vict, ch), message);
         act(buf, ch, 0, 0, TO_CHAR, STAYHIDE);
+
         // Log what I told a logged player under their name
         if(!IS_MOB(vict) && IS_SET(vict->pcdata->punish, PUNISH_LOG)) {
           sprintf( log_buf, "Log %s: %s told them: %s", GET_NAME(vict),

@@ -1,7 +1,7 @@
 #ifndef CHARACTER_H_
 #define CHARACTER_H_
 /******************************************************************************
-| $Id: character.h,v 1.83 2012/12/17 20:52:29 jhhudso Exp $
+| $Id: character.h,v 1.84 2013/12/30 22:46:43 jhhudso Exp $
 | Description: This file contains the header information for the character
 |   class implementation.
 */
@@ -276,6 +276,7 @@ struct pc_data
     bool hide[MAX_HIDE];
     CHAR_DATA *hiding_from[MAX_HIDE];
     std::queue<char *> *away_msgs;
+    std::queue<std::string> *tell_history;
     char *joining;
     uint32 quest_points;
     int16  quest_current[QUEST_MAX];
