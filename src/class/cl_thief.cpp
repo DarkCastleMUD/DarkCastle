@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.204 2013/12/12 06:01:05 jhhudso Exp $
+| $Id: cl_thief.cpp,v 1.205 2014/07/04 22:00:04 jhhudso Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -37,7 +37,6 @@ struct obj_data * search_char_for_item(char_data * ch, int16 item_number, bool w
 int get_weapon_damage_type(struct obj_data * wielded);
 int check_autojoiners(CHAR_DATA *ch, int skill = 0);
 int check_joincharmie(CHAR_DATA *ch, int skill = 0);
-bool charExists(char_data *ch);
 
 int palm(CHAR_DATA *ch, struct obj_data *obj_object,
           struct obj_data *sub_object, bool has_consent)
@@ -399,7 +398,7 @@ int do_backstab(CHAR_DATA *ch, char *argument, int cmd)
     }
   }
 
-  if (retval & eVICT_DIED && !retval & eCH_DIED)
+  if ((retval & eVICT_DIED) && !(retval & eCH_DIED))
     {
       return retval;
     }
@@ -2128,7 +2127,7 @@ int do_jab(struct char_data *ch, char *argument, int cmd)
 
   retval = damage(ch, victim, 100, TYPE_BLUDGEON, SKILL_JAB, 0);
 
-  if (retval & eVICT_DIED && !(retval & eCH_DIED))
+  if ((retval & eVICT_DIED) && !(retval & eCH_DIED))
   {
     if(!IS_NPC(ch) && IS_SET(ch->pcdata->toggles, PLR_WIMPY))
        WAIT_STATE(ch, PULSE_VIOLENCE);

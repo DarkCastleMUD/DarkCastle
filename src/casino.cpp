@@ -129,11 +129,10 @@ void switch_cards(struct cDeck *tDeck, int pos1, int pos2)
 
 void free_player(struct player_data *plr)
 {
-  struct player_data *tmp,*prev = NULL,*pnext;
+  struct player_data *tmp,*prev = NULL;
   struct table_data *tbl = plr->table;
   for (tmp = tbl->plr;tmp;tmp = tmp->next)
   {
-    pnext = tmp->next;
     if (tmp == plr)
     {
 	if (prev) prev->next = plr->next;
@@ -254,7 +253,7 @@ char *suitcol(int card)
   if (card < 14) return BOLD RED;
   else if (card < 27) return BOLD RED;
   else if (card < 40) return BOLD BLACK;
-  else return BOLD BLACK;
+  return BOLD BLACK;
 }
 
 int val(int card)
@@ -1079,296 +1078,299 @@ void blackjack_prompt(CHAR_DATA *ch, char *prompt, bool ascii)
 }
 
 int blackjack_table(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
-                   CHAR_DATA *invoker)
-{
-  char arg1[MAX_INPUT_LENGTH];
-  arg = one_argument(arg, arg1);
-  if (cmd < 189 || cmd > 194)
-  {
-	return eFAILURE;
-  }
-  if (!ch || IS_NPC(ch)) return eFAILURE; // craziness
-  if (obj->in_room <= 0) return eFAILURE;
-  if (!obj->table)
-	create_table(obj);
-  if (IS_AFFECTED(ch, AFF_CANTQUIT) ||
-        affected_by_spell(ch, FUCK_PTHIEF) ||
-        affected_by_spell(ch, FUCK_GTHIEF))
-  {
-           send_to_char("You cannot play blackjack while you are flagged as naughty.\r\n",ch);
-	return eSUCCESS;
-  }
+		CHAR_DATA *invoker) {
+	char arg1[MAX_INPUT_LENGTH];
+	arg = one_argument(arg, arg1);
+	if (cmd < 189 || cmd > 194) {
+		return eFAILURE;
+	}
+	if (!ch || IS_NPC(ch))
+		return eFAILURE; // craziness
+	if (obj->in_room <= 0)
+		return eFAILURE;
+	if (!obj->table)
+		create_table(obj);
+	if (IS_AFFECTED(ch, AFF_CANTQUIT) || affected_by_spell(ch, FUCK_PTHIEF)
+			|| affected_by_spell(ch, FUCK_GTHIEF)) {
+		send_to_char(
+				"You cannot play blackjack while you are flagged as naughty.\r\n",
+				ch);
+		return eSUCCESS;
+	}
 
-  struct player_data *plr = getPlayer(ch, obj->table);  
+	struct player_data *plr = getPlayer(ch, obj->table);
 
-  if (cmd == 189) // bet
-  {
-     if (obj->table->state > 1 || obj->table->cr || obj->table->hand_data[0])
-     {
-	send_to_char("There is a hand in progress. No bets are accepted at the moment.\r\n",ch);
-	return eSUCCESS;
-     }
-     if (playing(ch, obj->table))
-     {
-	send_to_char("You have already made your bet.\r\n",ch);
-	return eSUCCESS;
-     }
-     if (!is_number(arg1))
-     {
-	send_to_char("Bet how much?\r\nSyntax: bet <amount>\r\n",ch);
-	return eSUCCESS;
-     }
-     int amt = atoi(arg1);
-	if (obj->table->gold)
-	{
-	if (amt < 0 || amt > obj->obj_flags.value[1] || amt < obj->obj_flags.value[0]) {
-     
-	csendf(ch, "Minimum bet: %d\r\nMaximum bet: %d\r\n", obj->obj_flags.value[0], obj->obj_flags.value[1]);
-        return eSUCCESS;
-	}
-	} else {
-	if (amt < 0 || amt > obj->obj_flags.value[3] || amt < obj->obj_flags.value[2]) {
-     
-	csendf(ch, "Minimum bet: %d\r\nMaximum bet: %d\r\n", obj->obj_flags.value[2], obj->obj_flags.value[3]);
-        return eSUCCESS;
-	}
-	}
-     if (obj->table->gold && (uint32)amt > GET_GOLD(ch))
-     {
-	send_to_char("You cannot afford that.\r\n$B$7The dealer whispers to you, 'You can find an ATM machine in the lobby, buddy.'$R\r\n",ch);
-	return eSUCCESS;
-     } else if (!obj->table->gold && (uint32)amt > GET_PLATINUM(ch)) {
-	send_to_char("You cannot afford that.\r\n",ch);
-	return eSUCCESS;
-     }
-     if (players(obj->table) > 5)
-     {
-	send_to_char("The table is currently full.\r\n",ch);
-	return eSUCCESS;
-     }
-     plr = createPlayer(ch, obj->table);
-     plr->bet = amt;
-	if (obj->table->gold)
-     GET_GOLD(ch) -= amt;
-	else
-     GET_PLATINUM(ch) -= amt;
-     send_to_char("The dealer accepts your bet.\r\n",ch);
-     char buf[MAX_STRING_LENGTH];
-     sprintf(buf, "%s bets %d.\r\n",GET_NAME(ch), amt);
-     send_to_table(buf, obj->table, plr);
-     if (obj->table->state == 0)
-     {
-	CHAR_DATA *tmpch;
-	int i = 0;
-	for (tmpch = world[ch->in_room].people; tmpch; tmpch = tmpch->next_in_room)
-	if (!IS_NPC(tmpch)) i++;
-	if (i <= players(obj->table))
-        add_timer_bj_dealer2(obj->table,2); // end bets in 1 secs
-	else
-        add_timer_bj_dealer2(obj->table); // end bets in 10 secs
-	obj->table->state = 1;
-     } else {
-	CHAR_DATA *tmpch;
-	int i = 0;
-	for (tmpch = world[ch->in_room].people; tmpch; tmpch = tmpch->next_in_room)
-	if (!IS_NPC(tmpch)) i++;
-	if (i <= players(obj->table))
-	{
-	  struct timer_data *tmr;
-	  for (tmr = timer_list; tmr; tmr = tmr->next)
-		if ((struct table_data*)tmr->arg1 == obj->table)
-		  tmr->timeleft = 1;
-	}
-     }
-     return eSUCCESS;     
-  }
-  else if (cmd == 190) //insurance
-  {
-     if (!plr)
-     {
-	send_to_char("You are not currently playing.\r\n",ch);
-	return eSUCCESS;
-     }
-     if (!canInsurance(plr))
-     {
-	send_to_char("You cannot make an insurance bet at the moment.\r\n",ch);
-	return eSUCCESS;
-     }
-     if (plr->table->gold && GET_GOLD(ch) < (uint32)(plr->bet/2))
-     {
-	send_to_char("You cannot afford an insurance bet right now.\r\n",ch);
-	return eSUCCESS;
-     }
-     if (!plr->table->gold && GET_PLATINUM(ch) < (uint32)(plr->bet/2))
-     {
-	send_to_char("You cannot afford an insurance bet right now.\r\n",ch);
-	return eSUCCESS;
-     }
-     plr->table->handnr++;
-     plr->insurance = TRUE;
-     char buf[MAX_STRING_LENGTH];
-	if (plr->table->gold) GET_GOLD(ch) -= plr->bet/2;
-	else GET_PLATINUM(ch) -= plr->bet/2;
-     sprintf(buf,"%s makes an insurance bet.\r\n",
-		GET_NAME(ch));
-     send_to_table(buf, plr->table, plr);
-     send_to_char("You make an insurance bet.\r\n",ch);
-     return eSUCCESS;
-  }
-  else if (cmd == 191) // doubledown
-  {
-     if (!plr)
-     {
-	send_to_char("You are not currently playing.\r\n",ch);
-	return eSUCCESS;
-     }
-     if (plr->table->cr != plr)
-     {
-	send_to_char("It is not currently your turn.\r\n",ch);
-	return eSUCCESS;
-     }
-     if ((plr->table->gold && GET_GOLD(plr->ch) < (uint32)plr->bet) ||
-	(!plr->table->gold && GET_PLATINUM(plr->ch) < (uint32)plr->bet))
-     {
-	send_to_char("You cannot afford to double your bet.\r\n",ch);
-	return eSUCCESS;
-     }
-     if (plr->hand_data[2] || plr->doubled)
-     {
-	send_to_char("You cannot double right now.\r\n",ch);
-	return eSUCCESS;
-     }
-     if (plr->table->gold) GET_GOLD(plr->ch) -= plr->bet;
-     else GET_PLATINUM(plr->ch) -= plr->bet;
-     plr->bet *= 2;
-     plr->doubled = TRUE;
-     plr->table->handnr++;
-     char buf[MAX_STRING_LENGTH];
-     sprintf(buf,"%s doubles %s bet.\r\n",
-		GET_NAME(ch), HSHR(ch));
-     send_to_table(buf, plr->table, plr);
-     send_to_char("You double your bet.\r\n",ch);
-    
-     plr->hand_data[2] = pickCard(plr->table->deck);
-     sprintf(buf, "%s receives a %s%s%c%s.\r\n",GET_NAME(ch),
-		suitcol(plr->hand_data[2]), valstri(plr->hand_data[2]), suit(plr->hand_data[2]),NTEXT);
-     send_to_table(buf, plr->table,plr);
-     sprintf(buf, "You receive a %s%s%c%s.\r\n",
-		suitcol(plr->hand_data[2]), valstri(plr->hand_data[2]), suit(plr->hand_data[2]),NTEXT);
-     send_to_char(buf, ch);
+	if (cmd == 189) // bet
+			{
+		if (obj->table->state > 1 || obj->table->cr
+				|| obj->table->hand_data[0]) {
+			send_to_char(
+					"There is a hand in progress. No bets are accepted at the moment.\r\n",
+					ch);
+			return eSUCCESS;
+		}
+		if (playing(ch, obj->table)) {
+			send_to_char("You have already made your bet.\r\n", ch);
+			return eSUCCESS;
+		}
+		if (!is_number(arg1)) {
+			send_to_char("Bet how much?\r\nSyntax: bet <amount>\r\n", ch);
+			return eSUCCESS;
+		}
+		int amt = atoi(arg1);
+		if (obj->table->gold) {
+			if (amt < 0 || amt > obj->obj_flags.value[1]
+					|| amt < obj->obj_flags.value[0]) {
 
-     if (hand_strength(plr) > 21) // busted
-     {
-	char buf[MAX_STRING_LENGTH];
-	sprintf(buf, "%s busted.\r\n",GET_NAME(ch));
-	send_to_table(buf, plr->table, plr);
-	send_to_char("$BYou BUSTED!$R\r\nThe dealer takes your bet.\r\n",ch);
-        nextturn(plr->table);
-	if (plr->table->plr == plr && plr->next == NULL) // make dealer show cards..
-	;else	free_player(plr);
-     }else {
-	nextturn(plr->table);
-     }
+				csendf(ch, "Minimum bet: %d\r\nMaximum bet: %d\r\n",
+						obj->obj_flags.value[0], obj->obj_flags.value[1]);
+				return eSUCCESS;
+			}
+		} else {
+			if (amt < 0 || amt > obj->obj_flags.value[3]
+					|| amt < obj->obj_flags.value[2]) {
+
+				csendf(ch, "Minimum bet: %d\r\nMaximum bet: %d\r\n",
+						obj->obj_flags.value[2], obj->obj_flags.value[3]);
+				return eSUCCESS;
+			}
+		}
+		if (obj->table->gold && (uint32) amt > GET_GOLD(ch)) {
+			send_to_char(
+					"You cannot afford that.\r\n$B$7The dealer whispers to you, 'You can find an ATM machine in the lobby, buddy.'$R\r\n",
+					ch);
+			return eSUCCESS;
+		} else if (!obj->table->gold && (uint32) amt > GET_PLATINUM(ch)) {
+			send_to_char("You cannot afford that.\r\n", ch);
+			return eSUCCESS;
+		}
+		if (players(obj->table) > 5) {
+			send_to_char("The table is currently full.\r\n", ch);
+			return eSUCCESS;
+		}
+		plr = createPlayer(ch, obj->table);
+		plr->bet = amt;
+		if (obj->table->gold)
+			GET_GOLD(ch) -= amt;
+		else
+			GET_PLATINUM(ch) -= amt;
+		send_to_char("The dealer accepts your bet.\r\n", ch);
+		char buf[MAX_STRING_LENGTH];
+		sprintf(buf, "%s bets %d.\r\n", GET_NAME(ch), amt);
+		send_to_table(buf, obj->table, plr);
+		if (obj->table->state == 0) {
+			CHAR_DATA *tmpch;
+			int i = 0;
+			for (tmpch = world[ch->in_room].people; tmpch;
+					tmpch = tmpch->next_in_room)
+				if (!IS_NPC(tmpch))
+					i++;
+			if (i <= players(obj->table))
+				add_timer_bj_dealer2(obj->table, 2); // end bets in 1 secs
+			else
+				add_timer_bj_dealer2(obj->table); // end bets in 10 secs
+			obj->table->state = 1;
+		} else {
+			CHAR_DATA *tmpch;
+			int i = 0;
+			for (tmpch = world[ch->in_room].people; tmpch;
+					tmpch = tmpch->next_in_room)
+				if (!IS_NPC(tmpch))
+					i++;
+			if (i <= players(obj->table)) {
+				struct timer_data *tmr;
+				for (tmr = timer_list; tmr; tmr = tmr->next)
+					if ((struct table_data*) tmr->arg1 == obj->table)
+						tmr->timeleft = 1;
+			}
+		}
+		return eSUCCESS;
+	} else if (cmd == 190) //insurance
+			{
+		if (!plr) {
+			send_to_char("You are not currently playing.\r\n", ch);
+			return eSUCCESS;
+		}
+		if (!canInsurance(plr)) {
+			send_to_char("You cannot make an insurance bet at the moment.\r\n",
+					ch);
+			return eSUCCESS;
+		}
+		if (plr->table->gold && GET_GOLD(ch) < (uint32) (plr->bet / 2)) {
+			send_to_char("You cannot afford an insurance bet right now.\r\n",
+					ch);
+			return eSUCCESS;
+		}
+		if (!plr->table->gold && GET_PLATINUM(ch) < (uint32) (plr->bet / 2)) {
+			send_to_char("You cannot afford an insurance bet right now.\r\n",
+					ch);
+			return eSUCCESS;
+		}
+		plr->table->handnr++;
+		plr->insurance = TRUE;
+		char buf[MAX_STRING_LENGTH];
+		if (plr->table->gold)
+			GET_GOLD(ch) -= plr->bet / 2;
+		else
+			GET_PLATINUM(ch) -= plr->bet / 2;
+		sprintf(buf, "%s makes an insurance bet.\r\n", GET_NAME(ch));
+		send_to_table(buf, plr->table, plr);
+		send_to_char("You make an insurance bet.\r\n", ch);
+		return eSUCCESS;
+	} else if (cmd == 191) // doubledown
+			{
+		if (!plr) {
+			send_to_char("You are not currently playing.\r\n", ch);
+			return eSUCCESS;
+		}
+		if (plr->table->cr != plr) {
+			send_to_char("It is not currently your turn.\r\n", ch);
+			return eSUCCESS;
+		}
+		if ((plr->table->gold && GET_GOLD(plr->ch) < (uint32) plr->bet)
+				|| (!plr->table->gold
+						&& GET_PLATINUM(plr->ch) < (uint32) plr->bet)) {
+			send_to_char("You cannot afford to double your bet.\r\n", ch);
+			return eSUCCESS;
+		}
+		if (plr->hand_data[2] || plr->doubled) {
+			send_to_char("You cannot double right now.\r\n", ch);
+			return eSUCCESS;
+		}
+		if (plr->table->gold)
+			GET_GOLD(plr->ch) -= plr->bet;
+		else
+			GET_PLATINUM(plr->ch) -= plr->bet;
+		plr->bet *= 2;
+		plr->doubled = TRUE;
+		plr->table->handnr++;
+		char buf[MAX_STRING_LENGTH];
+		sprintf(buf, "%s doubles %s bet.\r\n", GET_NAME(ch), HSHR(ch));
+		send_to_table(buf, plr->table, plr);
+		send_to_char("You double your bet.\r\n", ch);
+
+		plr->hand_data[2] = pickCard(plr->table->deck);
+		sprintf(buf, "%s receives a %s%s%c%s.\r\n", GET_NAME(ch),
+				suitcol(plr->hand_data[2]), valstri(plr->hand_data[2]),
+				suit(plr->hand_data[2]), NTEXT);
+		send_to_table(buf, plr->table, plr);
+		sprintf(buf, "You receive a %s%s%c%s.\r\n", suitcol(plr->hand_data[2]),
+				valstri(plr->hand_data[2]), suit(plr->hand_data[2]), NTEXT);
+		send_to_char(buf, ch);
+
+		if (hand_strength(plr) > 21) // busted
+				{
+			char buf[MAX_STRING_LENGTH];
+			sprintf(buf, "%s busted.\r\n", GET_NAME(ch));
+			send_to_table(buf, plr->table, plr);
+			send_to_char("$BYou BUSTED!$R\r\nThe dealer takes your bet.\r\n",
+					ch);
+			nextturn(plr->table);
+			if (plr->table->plr == plr && plr->next == NULL) // make dealer show cards..
+				;
+			else
+				free_player(plr);
+		} else {
+			nextturn(plr->table);
+		}
 //     pulse_table_bj(plr->table);
-     return eSUCCESS;
-}
-  else if (cmd == 192) // stand
-  {
-     if (!plr)
-     {
-	send_to_char("You are not currently playing.\r\n",ch);
-	return eSUCCESS;
-     }
-     if (plr->table->cr != plr)
-     {
-	send_to_char("It is not currently your turn.\r\n",ch);
-	return eSUCCESS;
-     }
-     char buf[MAX_STRING_LENGTH];
-     plr->table->handnr++;
-     sprintf(buf, "%s stays.\r\n",GET_NAME(ch));
-     send_to_table(buf, plr->table);
-     nextturn(plr->table);
-     return eSUCCESS;
-  }
-  else if (cmd == 193) // split
-  {
-     if (!plr)
-     {
-	send_to_char("You are not currently playing.\r\n",ch);
-	return eSUCCESS;
-     }
-     if (!canSplit(plr))
-     {
-	send_to_char("You cannot split right now.\r\n",ch);
-	return eSUCCESS;
-     }
-     if ((GET_GOLD(ch) < (uint32)plr->bet && plr->table->gold)
-	|| (GET_PLATINUM(ch) < (uint32)plr->bet && !plr->table->gold))
-     {
-	send_to_char("You cannot afford to split.\r\n",ch);
-	return eSUCCESS;
-     }
-	if (plr->table->gold) GET_GOLD(ch) -= plr->bet;
-	else GET_PLATINUM(ch) -= plr->bet;
-     struct player_data *nw = createPlayer(ch, plr->table, 1);
-     nw->next = plr->next;
-     plr->next = nw;
-     nw->bet = plr->bet;
-     plr->table->handnr++;
-     nw->hand_data[0] = plr->hand_data[1];
-     plr->hand_data[1] = pickCard(plr->table->deck);
-     nw->hand_data[1] = pickCard(plr->table->deck);
-     nw->doubled = plr->doubled;
-     send_to_char("You split your hand.\r\n",ch);
-     char buf[MAX_STRING_LENGTH];
-     sprintf(buf, "%s splits %s hand.\r\n",
-	GET_NAME(ch), HSHR(ch));
-     send_to_table(buf, plr->table, plr);
-     pulse_table_bj(plr->table);
-     return eSUCCESS;
-  }
-  else if (cmd == 194) // hit
-  {
-     if (!plr)
-     {
-	send_to_char("You are not currently playing.\r\n",ch);
-	return eSUCCESS;
-     }
-     if (plr->table->cr != plr)
-     {
-	send_to_char("It is not currently your turn.\r\n",ch);
-	return eSUCCESS;
-     }
-     int i;
-     for (i = 0; i < 21;i++)
-	if (plr->hand_data[i] == 0) break;
-     plr->hand_data[i] = pickCard(plr->table->deck);
-     char buf[MAX_STRING_LENGTH];
-     sprintf(buf, "%s hits and receives a %s%s%c%s.\r\n",GET_NAME(ch),
-		suitcol(plr->hand_data[i]), valstri(plr->hand_data[i]), suit(plr->hand_data[i]),NTEXT);
-     send_to_table(buf, plr->table,plr);
-     sprintf(buf, "You hit and receive a %s%s%c%s.\r\n",
-		suitcol(plr->hand_data[i]), valstri(plr->hand_data[i]), suit(plr->hand_data[i]),NTEXT);
-     send_to_char(buf, ch);
-     if (hand_strength(plr) > 21) // busted
-     {
-	char buf[MAX_STRING_LENGTH];
-	sprintf(buf, "%s busted.\r\n",GET_NAME(ch));
-	send_to_table(buf, plr->table, plr);
-	send_to_char("$BYou BUSTED!$R\r\nThe dealer takes your bet.\r\n",ch);
-        nextturn(plr->table);
-	if (plr->table->plr == plr && plr->next == NULL) // make dealer show cards..
-		;else	free_player(plr);
-     }else {
-	if (plr->doubled) nextturn(plr->table);
-	else {
-  	  pulse_table_bj(plr->table);
+		return eSUCCESS;
+	} else if (cmd == 192) // stand
+			{
+		if (!plr) {
+			send_to_char("You are not currently playing.\r\n", ch);
+			return eSUCCESS;
+		}
+		if (plr->table->cr != plr) {
+			send_to_char("It is not currently your turn.\r\n", ch);
+			return eSUCCESS;
+		}
+		char buf[MAX_STRING_LENGTH];
+		plr->table->handnr++;
+		sprintf(buf, "%s stays.\r\n", GET_NAME(ch));
+		send_to_table(buf, plr->table);
+		nextturn(plr->table);
+		return eSUCCESS;
+	} else if (cmd == 193) // split
+			{
+		if (!plr) {
+			send_to_char("You are not currently playing.\r\n", ch);
+			return eSUCCESS;
+		}
+		if (!canSplit(plr)) {
+			send_to_char("You cannot split right now.\r\n", ch);
+			return eSUCCESS;
+		}
+		if ((GET_GOLD(ch) < (uint32) plr->bet && plr->table->gold)
+				|| (GET_PLATINUM(ch) < (uint32) plr->bet && !plr->table->gold)) {
+			send_to_char("You cannot afford to split.\r\n", ch);
+			return eSUCCESS;
+		}
+		if (plr->table->gold)
+			GET_GOLD(ch) -= plr->bet;
+		else
+			GET_PLATINUM(ch) -= plr->bet;
+		struct player_data *nw = createPlayer(ch, plr->table, 1);
+		nw->next = plr->next;
+		plr->next = nw;
+		nw->bet = plr->bet;
+		plr->table->handnr++;
+		nw->hand_data[0] = plr->hand_data[1];
+		plr->hand_data[1] = pickCard(plr->table->deck);
+		nw->hand_data[1] = pickCard(plr->table->deck);
+		nw->doubled = plr->doubled;
+		send_to_char("You split your hand.\r\n", ch);
+		char buf[MAX_STRING_LENGTH];
+		sprintf(buf, "%s splits %s hand.\r\n", GET_NAME(ch), HSHR(ch));
+		send_to_table(buf, plr->table, plr);
+		pulse_table_bj(plr->table);
+		return eSUCCESS;
+	} else if (cmd == 194) // hit
+			{
+		if (!plr) {
+			send_to_char("You are not currently playing.\r\n", ch);
+			return eSUCCESS;
+		}
+		if (plr->table->cr != plr) {
+			send_to_char("It is not currently your turn.\r\n", ch);
+			return eSUCCESS;
+		}
+		int i;
+		for (i = 0; i < 21; i++)
+			if (plr->hand_data[i] == 0)
+				break;
+		plr->hand_data[i] = pickCard(plr->table->deck);
+		char buf[MAX_STRING_LENGTH];
+		sprintf(buf, "%s hits and receives a %s%s%c%s.\r\n", GET_NAME(ch),
+				suitcol(plr->hand_data[i]), valstri(plr->hand_data[i]),
+				suit(plr->hand_data[i]), NTEXT);
+		send_to_table(buf, plr->table, plr);
+		sprintf(buf, "You hit and receive a %s%s%c%s.\r\n",
+				suitcol(plr->hand_data[i]), valstri(plr->hand_data[i]),
+				suit(plr->hand_data[i]), NTEXT);
+		send_to_char(buf, ch);
+		if (hand_strength(plr) > 21) // busted
+				{
+			char buf[MAX_STRING_LENGTH];
+			sprintf(buf, "%s busted.\r\n", GET_NAME(ch));
+			send_to_table(buf, plr->table, plr);
+			send_to_char("$BYou BUSTED!$R\r\nThe dealer takes your bet.\r\n",
+					ch);
+			nextturn(plr->table);
+			if (plr->table->plr == plr && plr->next == NULL) // make dealer show cards..
+				;
+			else
+				free_player(plr);
+		} else {
+			if (plr->doubled)
+				nextturn(plr->table);
+			else {
+				pulse_table_bj(plr->table);
+			}
+		}
+		return eSUCCESS;
 	}
-     }
-    return eSUCCESS;    
-  }
-  return eSUCCESS;
+	return eSUCCESS;
 }
 
 /* End Blackjack */

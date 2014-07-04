@@ -19,7 +19,7 @@
 /* 12/06/2003   Onager   Modified mobile_activity() to prevent charmie    */
 /*                       scavenging                                       */
 /**************************************************************************/
-/* $Id: mob_act.cpp,v 1.51 2012/08/10 03:17:20 jhhudso Exp $ */
+/* $Id: mob_act.cpp,v 1.52 2014/07/04 22:00:04 jhhudso Exp $ */
 
 extern "C"
 {
@@ -56,13 +56,10 @@ extern struct zone_data *zone_table;
 
 extern struct race_shit race_info[33];
 
-extern char doing[500];  /* write to log if we crash */
-
 int keywordfind(struct obj_data *obj_object);
 int hands_are_free(CHAR_DATA *ch, int number);
 void perform_wear(CHAR_DATA *ch, struct obj_data *obj_object,
                   int keyword);
-char * get_random_hate(CHAR_DATA *ch);
 bool is_protected(struct char_data *vict, struct char_data *ch);
 void scavenge(struct char_data *ch);
 bool is_r_denied(CHAR_DATA *ch, int room)
@@ -621,13 +618,11 @@ bool is_protected(struct char_data *vict, struct char_data *ch)
 
 void scavenge(struct char_data *ch)
 {
-  struct obj_data *obj, *best_obj;
-  int max, done;
+  struct obj_data *obj;
+  int done;
   int keyword;
 
-  max      = 1;
   done     = 0;
-  best_obj = 0;
   if (IS_AFFECTED(ch, AFF_CHARM)) return;
   for(obj = world[ch->in_room].contents; obj; obj = obj->next_content) 
   {

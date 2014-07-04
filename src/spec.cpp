@@ -33,12 +33,6 @@ extern "C"
 #include <returnvals.h>
 #include <timeinfo.h>
 
-extern CHAR_DATA *character_list;
-extern OBJ_DATA *object_list;
-extern CWorld world;
-extern struct index_data *obj_index;
-
-
 struct spec_data
 {
   char *name;
@@ -52,9 +46,6 @@ const struct spec_data spec_list[] =
    { "Blah", "Blehe", 1, {0,0,0,0,0,0,0,0,0,0} },
    { NULL, NULL,      0, {0,0,0,0,0,0,0,0,0,0} }
 };
-
-extern char *class_tree_name[11][3];
-
 
 int do_spec(CHAR_DATA *ch, char *argument, int cmd)
 {

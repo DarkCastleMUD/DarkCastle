@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: modify.cpp,v 1.32 2011/08/28 18:29:45 jhhudso Exp $ */
+/* $Id: modify.cpp,v 1.33 2014/07/04 22:00:04 jhhudso Exp $ */
 
 extern "C"
 {
@@ -52,8 +52,6 @@ using namespace std;
 void show_string(struct descriptor_data *d, char *input);
 void check_for_awaymsgs(char_data *ch);
 void page_string_dep(struct descriptor_data *d, const char *str, int keep_internal);
-
-extern char menu[];
 
 char *string_fields[] =
 {
@@ -433,9 +431,9 @@ int do_string(CHAR_DATA *ch, char *arg, int cmd)
 
 char *one_word(char *argument, char *first_arg )
 {
-    int found, begin, look_at;
+    int begin, look_at;
 
-    found = begin = 0;
+    begin = 0;
 
     do
     {
@@ -608,6 +606,7 @@ const char *next_page(const char *str)
       }
     }
   }
+  return NULL;
 }
 
 // Function that returns the number of pages in the string. 

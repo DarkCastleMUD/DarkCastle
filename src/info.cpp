@@ -12,7 +12,7 @@
  * This is free software and you are benefitting.	We hope that you    *
  * share your changes too.  What goes around, comes around. 		    *
  ****************************************************************************/
-/* $Id: info.cpp,v 1.206 2013/04/14 04:24:26 jhhudso Exp $ */
+/* $Id: info.cpp,v 1.207 2014/07/04 22:00:04 jhhudso Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -61,10 +61,8 @@ extern struct obj_data *object_list;
 extern struct index_data *mob_index;
 extern struct index_data *obj_index;
 extern char credits[MAX_STRING_LENGTH];
-extern char news[MAX_STRING_LENGTH];
 extern char info[MAX_STRING_LENGTH];
 extern char story[MAX_STRING_LENGTH];
-extern char *dirs[];
 extern char *where[];
 extern char *color_liquid[];
 extern char *fullness[];
@@ -72,7 +70,6 @@ extern char *sector_types[];
 extern char *sky_look[];
 extern char *room_bits[];
 extern struct race_shit race_info[];
-extern char *race_types[];
 extern char *spells[];
 
 /* Used for "who" */
@@ -86,11 +83,9 @@ extern int   curr_virtno;
 
 /* extern functions */
 
-struct char_data *get_pc_vis(struct char_data *ch, char *name);
 struct time_info_data age(struct char_data *ch);
 void page_string(struct descriptor_data *d, const char *str, int keep_internal);
 clan_data * get_clan(struct char_data *);
-char *str_str(char *first, char *second);
 extern int hit_gain(CHAR_DATA *ch, int position);
 extern int mana_gain(CHAR_DATA*ch);
 extern int ki_gain(CHAR_DATA *ch);
@@ -826,520 +821,467 @@ void try_to_peek_into_container(struct char_data *vict, struct char_data *ch,
       send_to_char("You don't see anything inside it.\r\n", ch);
 }
 
-int do_look(struct char_data *ch, char *argument, int cmd)
-{
-   char buffer[MAX_STRING_LENGTH];
-   char arg1[MAX_STRING_LENGTH];
-   char arg2[MAX_STRING_LENGTH];
-   char arg3[MAX_STRING_LENGTH];
-   char tmpbuf[MAX_STRING_LENGTH];
-   int keyword_no;
-   int j, bits, temp;
-   int door, original_loc;
-   bool found;
-   struct obj_data *tmp_object, *found_object;
-   struct char_data *tmp_char;
-   char *tmp_desc;
-   static char *keywords[]= {
-      "north",
-      "east",
-      "south",
-      "west",
-      "up",
-      "down",
-      "in",
-      "at",
-      "out",
-      "through",
-      "",  /* Look at '' case */
-      "\n" };
+int do_look(struct char_data *ch, char *argument, int cmd) {
+	char buffer[MAX_STRING_LENGTH];
+	char arg1[MAX_STRING_LENGTH];
+	char arg2[MAX_STRING_LENGTH];
+	char arg3[MAX_STRING_LENGTH];
+	char tmpbuf[MAX_STRING_LENGTH];
+	int keyword_no;
+	int j, bits, temp;
+	int door, original_loc;
+	bool found;
+	struct obj_data *tmp_object, *found_object;
+	struct char_data *tmp_char;
+	char *tmp_desc;
+	static char *keywords[] = { "north", "east", "south", "west", "up", "down",
+			"in", "at", "out", "through", "", /* Look at '' case */
+			"\n" };
 
-int weight_in(struct obj_data *obj);
-      if (!ch->desc)
-         return 1;
-      if (GET_POS(ch) < POSITION_SLEEPING)
-         send_to_char("You can't see anything but stars!\n\r", ch);
-      else if (GET_POS(ch) == POSITION_SLEEPING)
-         send_to_char("You can't see anything, you're sleeping!\n\r", ch);
-      else if ( check_blind(ch) );
-      else if ( IS_DARK(ch->in_room) && (!IS_MOB(ch) && !ch->pcdata->holyLite))
-      {
-         send_to_char("It is pitch black...\n\r", ch);
-         list_char_to_char(world[ch->in_room].people, ch, 0);
-         send_to_char("$R", ch);
-         // TODO - if have blindfighting, list some of the room exits sometimes
-      }
-      else
-      {
-         argument_split_3(argument,arg1,arg2,arg3);
-         keyword_no = search_block(arg1, keywords, FALSE); /* Partial Match */
+	int weight_in(struct obj_data *obj);
+	if (!ch->desc)
+		return 1;
+	if (GET_POS(ch) < POSITION_SLEEPING)
+		send_to_char("You can't see anything but stars!\n\r", ch);
+	else if (GET_POS(ch) == POSITION_SLEEPING)
+		send_to_char("You can't see anything, you're sleeping!\n\r", ch);
+	else if (check_blind(ch))
+		;
+	else if (IS_DARK(ch->in_room) && (!IS_MOB(ch) && !ch->pcdata->holyLite)) {
+		send_to_char("It is pitch black...\n\r", ch);
+		list_char_to_char(world[ch->in_room].people, ch, 0);
+		send_to_char("$R", ch);
+		// TODO - if have blindfighting, list some of the room exits sometimes
+	} else {
+		argument_split_3(argument, arg1, arg2, arg3);
+		keyword_no = search_block(arg1, keywords, FALSE); /* Partial Match */
 
-         if ((keyword_no == -1) && *arg1)
-         {
-            keyword_no = 7;
-            strcpy(arg2, arg1); /* Let arg2 become the target object (arg1) */
-         }
+		if ((keyword_no == -1) && *arg1) {
+			keyword_no = 7;
+			strcpy(arg2, arg1); /* Let arg2 become the target object (arg1) */
+		}
 
-         found = FALSE;
-         tmp_object = 0;
-         tmp_char 	 = 0;
-         tmp_desc 	 = 0;
+		found = FALSE;
+		tmp_object = 0;
+		tmp_char = 0;
+		tmp_desc = 0;
 
-         original_loc = ch->in_room;
-         switch(keyword_no)
-         {
-            /* look <dir> */
-         case 0 :
-         case 1 :
-         case 2 :
-         case 3 :
-         case 4 :
-         case 5 :
-         {
-	 /* Check if there is an extra-desc with "up"(or whatever) and use that instead */
-            tmp_desc = find_ex_description(arg1, world[ch->in_room].ex_description);
-            if (tmp_desc)
-            {
-               page_string(ch->desc, tmp_desc, 0);
-               return eSUCCESS;
-            }
-
-            if (EXIT(ch, keyword_no))
-            {
-               if (EXIT(ch, keyword_no)->general_description &&
-                   strlen(EXIT(ch, keyword_no)->general_description))
-               {
-                  send_to_char(EXIT(ch, keyword_no)->general_description, ch);
-               }
-               else
-               {
-                  send_to_char("You see nothing special.\n\r", ch);
-               }
-
-               if (IS_SET(EXIT(ch, keyword_no)->exit_info, EX_CLOSED) &&
-                  !IS_SET(EXIT(ch, keyword_no)->exit_info, EX_HIDDEN) &&
-                  (EXIT(ch, keyword_no)->keyword)) {
-                  sprintf(buffer, "The %s is closed.\n\r",
-                     fname(EXIT(ch, keyword_no)->keyword));
-                  send_to_char(buffer, ch);
-               }
-               else
-               {
-                  if (IS_SET(EXIT(ch, keyword_no)->exit_info, EX_ISDOOR) &&
-                     !IS_SET(EXIT(ch, keyword_no)->exit_info, EX_HIDDEN) &&
-                     EXIT(ch, keyword_no)->keyword)
-                  {
-                     sprintf(buffer, "The %s is open.\n\r",
-                        fname(EXIT(ch, keyword_no)->keyword));
-                     send_to_char(buffer, ch);
-                  }
-               }
-            }
-            else
-            {
-               send_to_char("You see nothing special.\n\r", ch);
-            }
-         }
-         break;
-
-         /* look 'in'	 */
-         case 6:
-         {
-            if (*arg2)
-            {
-               /* Item carried */
-
-               bits = generic_find(arg2, FIND_OBJ_INV | FIND_OBJ_ROOM |
-                  FIND_OBJ_EQUIP, ch, &tmp_char, &tmp_object);
-
-               if (bits)
-               { /* Found something */
-                  if (GET_ITEM_TYPE(tmp_object)== ITEM_DRINKCON)
-                  {
-                     if (tmp_object->obj_flags.value[1] <= 0)
-                     {
-                        act("It is empty.", ch, 0, 0, TO_CHAR, 0);
-                     }
-                     else
-                     {
-                        temp=((tmp_object->obj_flags.value[1]*3)
-                           /tmp_object->obj_flags.value[0]);
-			if (temp > 3) {
-			  logf(IMMORTAL, LOG_WORLD, "Bug in object %d. v2: %d > v1: %d. Resetting.",
-			       obj_index[tmp_object->item_number].virt, tmp_object->obj_flags.value[1],
-			       tmp_object->obj_flags.value[0]);
-			  tmp_object->obj_flags.value[1] = tmp_object->obj_flags.value[0];
-			  temp = 3;
-			}
-
-                        sprintf(buffer,
-                           "It's %sfull of a %s liquid.\n\r",
-                           fullness[temp],
-                           color_liquid[tmp_object->
-                           obj_flags.value[2]]);
-                        send_to_char(buffer, ch);
-                     }
-                  }
-                  else if (GET_ITEM_TYPE(tmp_object) == ITEM_CONTAINER ||
-			GET_ITEM_TYPE(tmp_object) == ITEM_ALTAR)
-                  {
-                     if (!IS_SET(tmp_object->obj_flags.value[1],
-                        CONT_CLOSED))
-                     {
-                        send_to_char(fname(tmp_object->name), ch);
-                        switch (bits)
-                        {
-                        case FIND_OBJ_INV :
-                           send_to_char(" (carried) ", ch);
-                           break;
-                        case FIND_OBJ_ROOM :
-                           send_to_char(" (here) ", ch);
-                           break;
-                        case FIND_OBJ_EQUIP :
-                           send_to_char(" (used) ", ch);
-                           break;
-                        }
-
-                        if (tmp_object->obj_flags.value[0] && tmp_object->obj_flags.weight)
-                        {
-
-                          int weight_in(struct obj_data *obj);
-			  if (obj_index[tmp_object->item_number].virt == 536)
-                            temp = (3*weight_in(tmp_object)) / tmp_object->obj_flags.value[0];
-                          else
-			    temp = ((tmp_object->obj_flags.weight*3) / tmp_object->obj_flags.value[0]);
-			} else {
-			  temp = 3;
-			}
-
-                        if (temp < 0) {
-			  temp = 0;
-			} else if (temp > 3) {
-			  temp = 3;
-			  logf(IMMORTAL, LOG_WORLD, "Bug in object %d. Weight: %d v1: %d", obj_index[tmp_object->item_number].virt, tmp_object->obj_flags.weight, tmp_object->obj_flags.value[0]);
-			}
-
-                        csendf(ch, "(%sfull) : \n\r", fullness[temp]);
-                        list_obj_to_char(tmp_object->contains,
-                           ch, 2, TRUE);
-                     }
-                     else
-                        send_to_char("It is closed.\n\r", ch);
-                  }
-                  else
-                  {
-                     send_to_char("That is not a container.\n\r", ch);
-                  }
-               } else
-               { /* wrong argument */
-                  send_to_char("You do not see that item here.\n\r", ch);
-               }
-            }
-            else
-            { /* no argument */
-               send_to_char("Look in what?!\n\r", ch);
-            }
-         }
-         break;
-
-         /* look 'at'	 */
-         case 7 :
-         {
-            if (*arg2)
-            {
-
-               bits = generic_find(arg2, FIND_OBJ_INV | FIND_OBJ_ROOM |
-                  FIND_OBJ_EQUIP | FIND_CHAR_ROOM,
-                  ch, &tmp_char, &found_object);
-
-               if (tmp_char)
-               {
-                  if (GET_LEVEL(tmp_char) == IMP && GET_LEVEL(ch) < IMP && !IS_NPC(tmp_char))
-                  {
-                     csendf(ch, "%s has a face like thunder.  A terrible, powerful,"
-                        " apparition.\n\rYou are frightened by the greatness before "
-                        "you!\n\r", GET_SHORT(tmp_char));
-                     csendf (tmp_char, "Heh, %s just tried to look at you.\n\r", GET_NAME(ch));
-                     act("$n starts shaking and SCREAMS in terror!", ch, 0, 0, TO_ROOM, 0);
-                     do_flee(ch, "", 0);
-                     return eSUCCESS;
-                  }
-                  if(*arg3)
-                  {
-                     try_to_peek_into_container(tmp_char, ch, arg3);
-                     return eSUCCESS;
-                  }
-                  if(cmd == 20) show_char_to_char(tmp_char, ch, 3);
-                  else			  show_char_to_char(tmp_char, ch, 1);
-                  if (ch != tmp_char)
-                  {
-                     if (!IS_MOB(ch) && (GET_LEVEL(tmp_char) < ch->pcdata->wizinvis)) {
-                        return eSUCCESS;
-                     }
-                     if((cmd == 20) && !IS_AFFECTED(ch, AFF_HIDE)) {
-                        act("$n glances at you.",
-                           ch, 0, tmp_char, TO_VICT, INVIS_NULL);
-                        act("$n glances at $N.",
-                           ch, 0, tmp_char, TO_ROOM, INVIS_NULL|NOTVICT);
-                     }
-                     else if(!IS_AFFECTED(ch, AFF_HIDE)) {
-                        act("$n looks at you.",
-                           ch, 0, tmp_char, TO_VICT, INVIS_NULL);
-                        act("$n looks at $N.",
-                           ch, 0, tmp_char, TO_ROOM, INVIS_NULL|NOTVICT);
-                     }
-                  }
-                  return eSUCCESS;
-               }
-
-               /* Search for Extra Descriptions in room and items */
-
-               /* Extra description in room?? */
-               if (!found)
-               {
-                  tmp_desc = find_ex_description(arg2,
-                     world[ch->in_room].ex_description);
-                  if (tmp_desc)
-                  {
-                     page_string(ch->desc, tmp_desc, 0);
-                     return eSUCCESS; /* RETURN SINCE IT WAS ROOM DESCRIPTION */
-                     /* Old system was: found = TRUE; */
-                  }
-               }
-
-               /* Search for extra descriptions in items */
-
-               /* Equipment Used */
-
-               if (!found)
-               {
-                  for (j = 0; j< MAX_WEAR && !found; j++)
-                  {
-                     if (ch->equipment[j])
-                     {
-                        if (CAN_SEE_OBJ(ch,ch->equipment[j]))
-                        {
-                           tmp_desc = find_ex_description(arg2,
-                              ch->equipment[j]->ex_description);
-                           if (tmp_desc)
-                           {
-                              page_string(ch->desc, tmp_desc, 1);
+		original_loc = ch->in_room;
+		switch (keyword_no) {
+		/* look <dir> */
+		case 0:
+		case 1:
+		case 2:
+		case 3:
+		case 4:
+		case 5: {
+			/* Check if there is an extra-desc with "up"(or whatever) and use that instead */
+			tmp_desc = find_ex_description(arg1,
+					world[ch->in_room].ex_description);
+			if (tmp_desc) {
+				page_string(ch->desc, tmp_desc, 0);
 				return eSUCCESS;
+			}
+
+			if (EXIT(ch, keyword_no)) {
+				if (EXIT(ch, keyword_no)->general_description
+						&& strlen(EXIT(ch, keyword_no)->general_description)) {
+					send_to_char(EXIT(ch, keyword_no)->general_description, ch);
+				} else {
+					send_to_char("You see nothing special.\n\r", ch);
+				}
+
+				if (IS_SET(EXIT(ch, keyword_no)->exit_info, EX_CLOSED)
+						&& !IS_SET(EXIT(ch, keyword_no)->exit_info, EX_HIDDEN)
+						&& (EXIT(ch, keyword_no)->keyword)) {
+					sprintf(buffer, "The %s is closed.\n\r",
+							fname(EXIT(ch, keyword_no)->keyword));
+					send_to_char(buffer, ch);
+				} else {
+					if (IS_SET(EXIT(ch, keyword_no)->exit_info, EX_ISDOOR)
+							&& !IS_SET(EXIT(ch, keyword_no)->exit_info,
+									EX_HIDDEN) &&
+							EXIT(ch, keyword_no)->keyword) {
+						sprintf(buffer, "The %s is open.\n\r",
+								fname(EXIT(ch, keyword_no)->keyword));
+						send_to_char(buffer, ch);
+					}
+				}
+			} else {
+				send_to_char("You see nothing special.\n\r", ch);
+			}
+		}
+			break;
+
+			/* look 'in'	 */
+		case 6: {
+			if (*arg2) {
+				/* Item carried */
+
+				bits = generic_find(arg2, FIND_OBJ_INV | FIND_OBJ_ROOM |
+				FIND_OBJ_EQUIP, ch, &tmp_char, &tmp_object);
+
+				if (bits) { /* Found something */
+					if (GET_ITEM_TYPE(tmp_object) == ITEM_DRINKCON) {
+						if (tmp_object->obj_flags.value[1] <= 0) {
+							act("It is empty.", ch, 0, 0, TO_CHAR, 0);
+						} else {
+							temp = ((tmp_object->obj_flags.value[1] * 3)
+									/ tmp_object->obj_flags.value[0]);
+							if (temp > 3) {
+								logf(IMMORTAL, LOG_WORLD,
+										"Bug in object %d. v2: %d > v1: %d. Resetting.",
+										obj_index[tmp_object->item_number].virt,
+										tmp_object->obj_flags.value[1],
+										tmp_object->obj_flags.value[0]);
+								tmp_object->obj_flags.value[1] =
+										tmp_object->obj_flags.value[0];
+								temp = 3;
+							}
+
+							sprintf(buffer, "It's %sfull of a %s liquid.\n\r",
+									fullness[temp],
+									color_liquid[tmp_object->obj_flags.value[2]]);
+							send_to_char(buffer, ch);
+						}
+					} else if (GET_ITEM_TYPE(tmp_object) == ITEM_CONTAINER ||
+					GET_ITEM_TYPE(tmp_object) == ITEM_ALTAR) {
+						if (!IS_SET(tmp_object->obj_flags.value[1],
+								CONT_CLOSED)) {
+							send_to_char(fname(tmp_object->name), ch);
+							switch (bits) {
+							case FIND_OBJ_INV:
+								send_to_char(" (carried) ", ch);
+								break;
+							case FIND_OBJ_ROOM:
+								send_to_char(" (here) ", ch);
+								break;
+							case FIND_OBJ_EQUIP:
+								send_to_char(" (used) ", ch);
+								break;
+							}
+
+							if (tmp_object->obj_flags.value[0]
+									&& tmp_object->obj_flags.weight) {
+
+								int weight_in(struct obj_data *obj);
+								if (obj_index[tmp_object->item_number].virt
+										== 536)
+									temp = (3 * weight_in(tmp_object))
+											/ tmp_object->obj_flags.value[0];
+								else
+									temp = ((tmp_object->obj_flags.weight * 3)
+											/ tmp_object->obj_flags.value[0]);
+							} else {
+								temp = 3;
+							}
+
+							if (temp < 0) {
+								temp = 0;
+							} else if (temp > 3) {
+								temp = 3;
+								logf(IMMORTAL, LOG_WORLD,
+										"Bug in object %d. Weight: %d v1: %d",
+										obj_index[tmp_object->item_number].virt,
+										tmp_object->obj_flags.weight,
+										tmp_object->obj_flags.value[0]);
+							}
+
+							csendf(ch, "(%sfull) : \n\r", fullness[temp]);
+							list_obj_to_char(tmp_object->contains, ch, 2, TRUE);
+						} else
+							send_to_char("It is closed.\n\r", ch);
+					} else {
+						send_to_char("That is not a container.\n\r", ch);
+					}
+				} else { /* wrong argument */
+					send_to_char("You do not see that item here.\n\r", ch);
+				}
+			} else { /* no argument */
+				send_to_char("Look in what?!\n\r", ch);
+			}
+		}
+			break;
+
+			/* look 'at'	 */
+		case 7: {
+			if (*arg2) {
+
+				bits = generic_find(arg2, FIND_OBJ_INV | FIND_OBJ_ROOM |
+				FIND_OBJ_EQUIP | FIND_CHAR_ROOM, ch, &tmp_char, &found_object);
+
+				if (tmp_char) {
+					if (GET_LEVEL(tmp_char) == IMP && GET_LEVEL(ch) < IMP
+							&& !IS_NPC(tmp_char)) {
+						csendf(ch,
+								"%s has a face like thunder.  A terrible, powerful,"
+										" apparition.\n\rYou are frightened by the greatness before "
+										"you!\n\r", GET_SHORT(tmp_char));
+						csendf(tmp_char,
+								"Heh, %s just tried to look at you.\n\r",
+								GET_NAME(ch));
+						act("$n starts shaking and SCREAMS in terror!", ch, 0,
+								0, TO_ROOM, 0);
+						do_flee(ch, "", 0);
+						return eSUCCESS;
+					}
+					if (*arg3) {
+						try_to_peek_into_container(tmp_char, ch, arg3);
+						return eSUCCESS;
+					}
+					if (cmd == 20)
+						show_char_to_char(tmp_char, ch, 3);
+					else
+						show_char_to_char(tmp_char, ch, 1);
+					if (ch != tmp_char) {
+						if (!IS_MOB(ch)
+								&& (GET_LEVEL(tmp_char) < ch->pcdata->wizinvis)) {
+							return eSUCCESS;
+						}
+						if ((cmd == 20) && !IS_AFFECTED(ch, AFF_HIDE)) {
+							act("$n glances at you.", ch, 0, tmp_char, TO_VICT,
+									INVIS_NULL);
+							act("$n glances at $N.", ch, 0, tmp_char, TO_ROOM,
+									INVIS_NULL | NOTVICT);
+						} else if (!IS_AFFECTED(ch, AFF_HIDE)) {
+							act("$n looks at you.", ch, 0, tmp_char, TO_VICT,
+									INVIS_NULL);
+							act("$n looks at $N.", ch, 0, tmp_char, TO_ROOM,
+									INVIS_NULL | NOTVICT);
+						}
+					}
+					return eSUCCESS;
+				}
+
+				/* Search for Extra Descriptions in room and items */
+
+				/* Extra description in room?? */
+				if (!found) {
+					tmp_desc = find_ex_description(arg2,
+							world[ch->in_room].ex_description);
+					if (tmp_desc) {
+						page_string(ch->desc, tmp_desc, 0);
+						return eSUCCESS; /* RETURN SINCE IT WAS ROOM DESCRIPTION */
+						/* Old system was: found = TRUE; */
+					}
+				}
+
+				/* Search for extra descriptions in items */
+
+				/* Equipment Used */
+
+				if (!found) {
+					for (j = 0; j < MAX_WEAR && !found; j++) {
+						if (ch->equipment[j]) {
+							if (CAN_SEE_OBJ(ch, ch->equipment[j])) {
+								tmp_desc = find_ex_description(arg2,
+										ch->equipment[j]->ex_description);
+								if (tmp_desc) {
+									page_string(ch->desc, tmp_desc, 1);
+									return eSUCCESS;
 //                              found = TRUE;
-                           }
-                        }
-                     }
-                  }
-               }
+								}
+							}
+						}
+					}
+				}
 
-               /* In inventory */
+				/* In inventory */
 
-               if (!found)
-               {
-                  for(tmp_object = ch->carrying;
-                  tmp_object && !found;
-                  tmp_object = tmp_object->next_content)
-                  {
-                     if (CAN_SEE_OBJ(ch, tmp_object))
-                     {
-                        tmp_desc = find_ex_description(arg2,
-                           tmp_object->ex_description);
-                        if (tmp_desc)
-                        {
-                           page_string(ch->desc, tmp_desc, 1);
-			   return eSUCCESS;
+				if (!found) {
+					for (tmp_object = ch->carrying; tmp_object && !found;
+							tmp_object = tmp_object->next_content) {
+						if (CAN_SEE_OBJ(ch, tmp_object)) {
+							tmp_desc = find_ex_description(arg2,
+									tmp_object->ex_description);
+							if (tmp_desc) {
+								page_string(ch->desc, tmp_desc, 1);
+								return eSUCCESS;
 //                           found = TRUE;
-                        }
-                     }
-                  }
-               }
+							}
+						}
+					}
+				}
 
-               /* Object In room */
+				/* Object In room */
 
-               if (!found)
-               {
-                  for(tmp_object = world[ch->in_room].contents;
-                  tmp_object && !found;
-                  tmp_object = tmp_object->next_content)
-                  {
-                     if (CAN_SEE_OBJ(ch, tmp_object))
-                     {
-                        tmp_desc = find_ex_description(arg2,
-                           tmp_object->ex_description);
-                        if (tmp_desc)
-                        {
-                           page_string(ch->desc, tmp_desc, 1);
-			return eSUCCESS;
+				if (!found) {
+					for (tmp_object = world[ch->in_room].contents;
+							tmp_object && !found;
+							tmp_object = tmp_object->next_content) {
+						if (CAN_SEE_OBJ(ch, tmp_object)) {
+							tmp_desc = find_ex_description(arg2,
+									tmp_object->ex_description);
+							if (tmp_desc) {
+								page_string(ch->desc, tmp_desc, 1);
+								return eSUCCESS;
 //                           found = TRUE;
-                        }
-                     }
-                  }
-               }
-               /* wrong argument */
+							}
+						}
+					}
+				}
+				/* wrong argument */
 
-               if (bits)
-               { /* If an object was found */
-                  if (!found)
-                     /* Show no-description */
-                     show_obj_to_char(found_object, ch, 5);
-                  else
-                     /* Find hum, glow etc */
-                     show_obj_to_char(found_object, ch, 6);
-               }
-               else if (!found)
-               {
-                  send_to_char("You do not see that here.\n\r", ch);
-               }
-            }
-            else
-            {
-               /* no argument */
-               send_to_char("Look at what?\n\r", ch);
-            }
-         }
-         break;
-         case 8:
-            {
-               for(tmp_object = object_list; tmp_object; tmp_object=tmp_object->next)
-               {
-                  if(((tmp_object->obj_flags.type_flag == ITEM_PORTAL) &&
-                     (tmp_object->obj_flags.value[2] == world[ch->in_room].zone) &&
-                     (tmp_object->in_room) &&
-                     (tmp_object->obj_flags.value[1] == 1))
-                     ||
-                     ((tmp_object->obj_flags.type_flag == ITEM_PORTAL) &&
-                     (tmp_object->obj_flags.value[0] == world[ch->in_room].number) &&
-                     (tmp_object->in_room > -1) &&
-                     (tmp_object->obj_flags.value[1] == 1)))
-                  {
-                     ch->in_room = tmp_object->in_room;
-                     found = TRUE;
-                     break;
-                  }
-               }
-               if (found !=TRUE)
-               {
-                  send_to_char("Nothing much to see there.\n\r", ch);
-                  return eFAILURE;
-               }
-            }
-         case 9:
-            {
-               if(found != TRUE)
-               {
-                  // Why is this line here? -pir
-                  // tmp_object = get_obj_in_list_vis(ch, arg2, world[ch->in_room].contents);
-                  if(*arg2)
-                  {
-                     if((tmp_object = get_obj_in_list_vis(ch, arg2, world[ch->in_room].contents)))
-                     {
-                        if(tmp_object->obj_flags.type_flag == ITEM_PORTAL)
-                        {
-                           if(tmp_object->obj_flags.value[1] == 0 || tmp_object->obj_flags.value[1] == 4)
-                           {
-                              sprintf(tmpbuf,"You look through %s but it seems to be opaque.\n\r",
-                                 tmp_object->short_description);
-                              send_to_char(tmpbuf, ch);
-                              return eFAILURE;
-                           }
-                           if(-1 == (ch->in_room = real_room(tmp_object->obj_flags.value[0])))
-                             ch->in_room = original_loc;
-                           else found = TRUE;
-                        }
-                     } else {
-                        send_to_char("Look through what?\n\r", ch);
-                        return eFAILURE;
-                     }
-                  }
-               }
+				if (bits) { /* If an object was found */
+					if (!found)
+						/* Show no-description */
+						show_obj_to_char(found_object, ch, 5);
+					else
+						/* Find hum, glow etc */
+						show_obj_to_char(found_object, ch, 6);
+				} else if (!found) {
+					send_to_char("You do not see that here.\n\r", ch);
+				}
+			} else {
+				/* no argument */
+				send_to_char("Look at what?\n\r", ch);
+			}
+		}
+			break;
+		case 8: { // look out
+			for (tmp_object = object_list; tmp_object;
+					tmp_object = tmp_object->next) {
+				if (((tmp_object->obj_flags.type_flag == ITEM_PORTAL)
+						&& (tmp_object->obj_flags.value[2]
+								== world[ch->in_room].zone)
+						&& (tmp_object->in_room)
+						&& (tmp_object->obj_flags.value[1] == 1))
+						|| ((tmp_object->obj_flags.type_flag == ITEM_PORTAL)
+								&& (tmp_object->obj_flags.value[0]
+										== world[ch->in_room].number)
+								&& (tmp_object->in_room > -1)
+								&& (tmp_object->obj_flags.value[1] == 1))) {
+					ch->in_room = tmp_object->in_room;
+					found = TRUE;
+					break;
+				}
+			}
+			if (found != TRUE) {
+				send_to_char("Nothing much to see there.\n\r", ch);
+				return eFAILURE;
+			}
+		}
+		case 9: { // look through
+			if (found != TRUE) {
+				if (*arg2) {
+					if ((tmp_object = get_obj_in_list_vis(ch, arg2,
+							world[ch->in_room].contents))) {
+						if (tmp_object->obj_flags.type_flag == ITEM_PORTAL) {
+							if (tmp_object->obj_flags.value[1] == 0
+									|| tmp_object->obj_flags.value[1] == 4) {
+								sprintf(tmpbuf,
+										"You look through %s but it seems to be opaque.\n\r",
+										tmp_object->short_description);
+								send_to_char(tmpbuf, ch);
+								return eFAILURE;
+							}
+							if (-1
+									== (ch->in_room = real_room(
+											tmp_object->obj_flags.value[0])))
+								ch->in_room = original_loc;
+							else
+								found = TRUE;
+						}
+					} else {
+						send_to_char("Look through what?\n\r", ch);
+						return eFAILURE;
+					}
+				}
+			}
 
-               if(found != TRUE)
-               {
-                  send_to_char("You can't seem to look through that.\n\r", ch);
-                  return eFAILURE;
-               }
-            }
+			if (found != TRUE) {
+				send_to_char("You can't seem to look through that.\n\r", ch);
+				return eFAILURE;
+			}
+		}
 
-            /* look ''		*/
-         case 10:
-            {
-               char sector_buf[50];
-               char rflag_buf[150];
+			/* look ''		*/
+		case 10: {
+			char sector_buf[50];
+			char rflag_buf[150];
 
-               ansi_color( GREY, ch );
-               ansi_color( BOLD, ch );
-               send_to_char(world[ch->in_room].name, ch);
-               ansi_color( NTEXT, ch );
-               ansi_color( GREY, ch );
+			ansi_color( GREY, ch);
+			ansi_color( BOLD, ch);
+			send_to_char(world[ch->in_room].name, ch);
+			ansi_color( NTEXT, ch);
+			ansi_color( GREY, ch);
 
-               // PUT SECTOR AND ROOMFLAG STUFF HERE
-               if(!IS_MOB(ch) && ch->pcdata->holyLite) {
-                  sprinttype(world[ch->in_room].sector_type, sector_types, sector_buf);
-                  sprintbit((long)world[ch->in_room].room_flags, room_bits, rflag_buf);
-                  csendf(ch, " Light[%d] <%s> [ %s]", DARK_AMOUNT(ch->in_room), sector_buf, rflag_buf);
-               }
+			// PUT SECTOR AND ROOMFLAG STUFF HERE
+			if (!IS_MOB(ch) && ch->pcdata->holyLite) {
+				sprinttype(world[ch->in_room].sector_type, sector_types,
+						sector_buf);
+				sprintbit((long) world[ch->in_room].room_flags, room_bits,
+						rflag_buf);
+				csendf(ch, " Light[%d] <%s> [ %s]", DARK_AMOUNT(ch->in_room),
+						sector_buf, rflag_buf);
+			}
 
-               send_to_char("\n\r", ch);
+			send_to_char("\n\r", ch);
 
-               if (!IS_MOB(ch) && !IS_SET(ch->pcdata->toggles, PLR_BRIEF))
-                  send_to_char(world[ch->in_room].description, ch);
+			if (!IS_MOB(ch) && !IS_SET(ch->pcdata->toggles, PLR_BRIEF))
+				send_to_char(world[ch->in_room].description, ch);
 
-               ansi_color( BLUE, ch );
-               ansi_color( BOLD, ch );
-               list_obj_to_char(world[ch->in_room].contents, ch, 0, FALSE);
+			ansi_color( BLUE, ch);
+			ansi_color( BOLD, ch);
+			list_obj_to_char(world[ch->in_room].contents, ch, 0, FALSE);
 
-               list_char_to_char(world[ch->in_room].people, ch, 0);
+			list_char_to_char(world[ch->in_room].people, ch, 0);
 
-               strcpy(buffer, ""); *buffer = '\0';
-               for(int doorj = 0; doorj <= 5; doorj++) {
+			strcpy(buffer, "");
+			*buffer = '\0';
+			for (int doorj = 0; doorj <= 5; doorj++) {
 
-                  int is_closed;
-                  int is_hidden;
+				int is_closed;
+				int is_hidden;
 
-                  // cheesy way of making it list west before east in 'look'
-		  if(doorj == 1)           door = 3;
-                  else if(doorj == 3)      door = 1;
-                  else                     door = doorj;
+				// cheesy way of making it list west before east in 'look'
+				if (doorj == 1)
+					door = 3;
+				else if (doorj == 3)
+					door = 1;
+				else
+					door = doorj;
 
-                  if(!EXIT(ch, door) || EXIT(ch, door)->to_room == NOWHERE)
-                     continue;
-                  is_closed = IS_SET(EXIT(ch, door)->exit_info, EX_CLOSED);
-                  is_hidden = IS_SET(EXIT(ch, door)->exit_info, EX_HIDDEN);
+				if (!EXIT(ch, door) || EXIT(ch, door)->to_room == NOWHERE)
+					continue;
+				is_closed = IS_SET(EXIT(ch, door)->exit_info, EX_CLOSED);
+				is_hidden = IS_SET(EXIT(ch, door)->exit_info, EX_HIDDEN);
 
-                  if(IS_MOB(ch) || ch->pcdata->holyLite)
-                  {
-                    if (is_closed && is_hidden)
-                      sprintf(buffer + strlen(buffer),"$B($R%s-closed$B)$R ", keywords[door]);
-                    else sprintf(buffer + strlen(buffer),"%s%s ",
-                        keywords[door], is_closed ? "-closed" : "");
-                  }
-                  else if(!(is_closed && is_hidden))
-                      sprintf(buffer + strlen(buffer),"%s%s ",
-                        keywords[door], is_closed ? "-closed" : "");
+				if (IS_MOB(ch) || ch->pcdata->holyLite) {
+					if (is_closed && is_hidden)
+						sprintf(buffer + strlen(buffer), "$B($R%s-closed$B)$R ",
+								keywords[door]);
+					else
+						sprintf(buffer + strlen(buffer), "%s%s ",
+								keywords[door], is_closed ? "-closed" : "");
+				} else if (!(is_closed && is_hidden))
+					sprintf(buffer + strlen(buffer), "%s%s ", keywords[door],
+							is_closed ? "-closed" : "");
 
-               }
-               ansi_color( NTEXT, ch );
-               send_to_char("Exits: ", ch);
-               if (*buffer)
-                  send_to_char(buffer, ch);
-               else
-                  send_to_char("None.", ch);
-               send_to_char("\n\r", ch);
-               if(!IS_NPC(ch) && ch->hunting)
-                  do_track(ch, ch->hunting, 10);
-            }
-            ch->in_room = original_loc;
-            break;
+			}
+			ansi_color( NTEXT, ch);
+			send_to_char("Exits: ", ch);
+			if (*buffer)
+				send_to_char(buffer, ch);
+			else
+				send_to_char("None.", ch);
+			send_to_char("\n\r", ch);
+			if (!IS_NPC(ch) && ch->hunting)
+				do_track(ch, ch->hunting, 10);
+		}
+			ch->in_room = original_loc;
+			break;
 
-            /* wrong arg 	*/
-         case -1 :
-            send_to_char("Sorry, I didn't understand that!\n\r", ch);
-            break;
-   }
+			/* wrong arg 	*/
+		case -1:
+			send_to_char("Sorry, I didn't understand that!\n\r", ch);
+			break;
+		}
 
-   ansi_color( NTEXT, ch);}
-   ansi_color( GREY, ch );
-   return eSUCCESS;
+		ansi_color( NTEXT, ch);
+	}
+	ansi_color( GREY, ch);
+	return eSUCCESS;
 }
 
 /* end of look */

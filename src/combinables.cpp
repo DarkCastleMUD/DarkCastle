@@ -34,12 +34,8 @@
 using namespace std;
 using namespace Combinables;
 
-extern CWorld world;
 extern struct index_data *obj_index; 
-extern char *drinks[];
 extern char *spells[];
-
-int saves_spell(CHAR_DATA *ch, CHAR_DATA *vict, int spell_base, int16 save_type);
 
 ////////////////////////////////////////////////////////////////////////////
 // local function declarations

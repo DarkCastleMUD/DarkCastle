@@ -114,9 +114,6 @@ extern int restrict;
 //extern int no_rent_check;
 
 extern CWorld world;	/* In db.c */
-extern int top_of_world;	/* In db.c */
-extern struct time_info_data time_info;		/* In db.c */
-extern char help[];
 extern char * sector_types[];
 extern char *time_look[];
 extern char *sky_look[];
@@ -155,7 +152,7 @@ int pulse_regen;
 int pulse_time;
 int pulse_short; // short timer, for archery
 
-XmlRpc::XmlRpcServer *xmlrpc_s;
+XmlRpcServer *xmlrpc_s;
 
 #ifdef USE_SQL
 Database db;
@@ -169,7 +166,6 @@ void short_activity();
 void skip_spaces(char **string);
 char *any_one_arg(char *argument, char *first_arg);
 char * calc_color(int hit, int max_hit);
-char * calc_condition(CHAR_DATA , bool );
 void generate_prompt(CHAR_DATA *ch, char *prompt);
 int get_from_q(struct txt_q *queue, char *dest, int *aliased);
 void init_game(int port, int port2, int port3, int port4);
@@ -198,7 +194,6 @@ void food_update(void);		/* In limits.c */
 void mobile_activity(void);
 void object_activity(void);
 void update_corpses_and_portals(void);
-void string_add(struct descriptor_data *d, char *str);
 void new_string_add(struct descriptor_data *d, char *str);
 void string_hash_add(struct descriptor_data *d, char *str);
 void perform_violence(void);

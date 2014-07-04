@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.196 2012/12/17 20:52:29 jhhudso Exp $ */
+/* $Id: nanny.cpp,v 1.197 2014/07/04 22:00:04 jhhudso Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -87,7 +87,6 @@ extern CHAR_DATA *character_list;
 extern struct descriptor_data *descriptor_list;
 extern OBJ_DATA *object_list;
 extern struct index_data *obj_index;
-extern char *nonew_new_list[30];
 extern CWorld world;
 extern short bport;
 extern bool allow_imp_password;

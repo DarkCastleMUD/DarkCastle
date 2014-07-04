@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: limits.cpp,v 1.98 2011/01/27 03:43:58 jhhudso Exp $ */
+/* $Id: limits.cpp,v 1.99 2014/07/04 22:00:04 jhhudso Exp $ */
 
 extern "C"
 {
@@ -58,7 +58,6 @@ extern char *pc_clss_types[];
 
 /* External procedures */
 void save_corpses(void);
-void update_pos( CHAR_DATA *victim );                 /* in fight.c */
 struct time_info_data age(CHAR_DATA *ch);
 
 /* When age < 15 return the value p0 */
@@ -849,7 +848,6 @@ void update_corpses_and_portals(void)
   //char buf[256];
   struct obj_data *j, *next_thing;
   struct obj_data *jj, *next_thing2;
-  struct obj_data *last_thing;
   int proc = 0; // Processed items. Debugging.
   void extract_obj(struct obj_data *obj); /* handler.c */
   /* objects */
@@ -966,7 +964,6 @@ void update_corpses_and_portals(void)
         extract_obj(j);
         save_corpses();
       }
-      last_thing = j;
     }
   }
   //sprintf(buf, "DEBUG: Processed Objects: %d", proc);

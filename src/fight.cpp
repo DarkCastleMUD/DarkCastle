@@ -20,7 +20,7 @@
  * 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead *
  * of just race stuff                                                     *
  **************************************************************************
- * $Id: fight.cpp,v 1.569 2013/12/22 07:52:20 jhhudso Exp $               *
+ * $Id: fight.cpp,v 1.570 2014/07/04 22:00:04 jhhudso Exp $               *
  **************************************************************************/
 
 extern "C"
@@ -69,7 +69,6 @@ extern "C"
 extern bool selfpurge;
 extern int top_of_world;
 extern CHAR_DATA *character_list;
-extern struct descriptor_data *descriptor_list;
 extern CWorld world;
 extern struct index_data *mob_index;
 extern struct index_data *obj_index;
@@ -109,7 +108,7 @@ CHAR_DATA *combat_list = NULL, *combat_next_dude = NULL;
 
 
 int isHit(CHAR_DATA *ch, CHAR_DATA *victim, int attacktype, int &type, int &reduce);
-int check_pursuit(char_data* ch, char_data* victim, char* dircommand);
+int check_pursuit(char_data *ch, char_data *victim, char *dircommand);
 
 #define MAX_CHAMP_DEATH_MESSAGE		14
 char *champ_death_messages[] = 

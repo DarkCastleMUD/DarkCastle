@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: guild.cpp,v 1.131 2011/12/25 21:28:40 jhhudso Exp $
+| $Id: guild.cpp,v 1.132 2014/07/04 22:00:04 jhhudso Exp $
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
@@ -35,8 +35,6 @@ extern struct class_skill_defines k_skills[];
 extern struct class_skill_defines u_skills[];
 extern struct class_skill_defines c_skills[];
 extern struct class_skill_defines m_skills[];
-extern struct index_data *mob_index;
-extern char * class_tree_name[11][3];
 extern char *pc_clss_types3[];
 extern vector<profession> professions;
 

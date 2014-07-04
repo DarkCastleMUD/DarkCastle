@@ -1,4 +1,4 @@
-/* $Id: nlog.cpp,v 1.11 2012/02/08 22:57:14 jhhudso Exp $ */
+/* $Id: nlog.cpp,v 1.12 2014/07/04 22:00:04 jhhudso Exp $ */
 
 extern "C"
 {
@@ -21,7 +21,6 @@ extern "C"
 #include <player.h> // PLR_ANSI
 #include <utility.h>
 
-extern struct descriptor_data* descriptorList;
 void send_to_char(const char *messg, CHAR_DATA *ch);
 
 /*

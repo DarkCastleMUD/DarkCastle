@@ -17,7 +17,7 @@
  *                         except Pir and Valk                             *
  * 10/19/2003   Onager     Took out super-secret hidey code from CAN_SEE() *
  ***************************************************************************/
-/* $Id: utility.cpp,v 1.128 2012/04/16 03:09:54 shane Exp $ */
+/* $Id: utility.cpp,v 1.129 2014/07/04 22:00:04 jhhudso Exp $ */
 
 extern "C"
 {
@@ -74,7 +74,6 @@ using namespace std;
 
 // extern vars
 extern index_data *obj_index;
-extern time_data time_info;
 extern CWorld world;
 extern index_data *mob_index;
 extern zone_data *zone_table;

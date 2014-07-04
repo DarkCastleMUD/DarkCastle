@@ -987,12 +987,19 @@ AuctionHouse::~AuctionHouse()
 /*
 Empty constructor
 */
-AuctionHouse::AuctionHouse()
-{
-  /*
-  In the current implementation this must NEVER be called
-  */
-  assert(0);
+AuctionHouse::AuctionHouse() {
+	/*
+	 In the current implementation this must NEVER be called
+	 */
+	ItemsPosted = 0;
+	ItemsActive = 0;
+	ItemsExpired = 0;
+	ItemsSold = 0;
+	TaxCollected = 0;
+	UncollectedGold = 0;
+	Revenue = 0;
+	cur_index = 0;
+	assert(0);
 }
 
 /*

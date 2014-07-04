@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: shop.cpp,v 1.32 2012/05/25 02:15:46 jhhudso Exp $ */
+/* $Id: shop.cpp,v 1.33 2014/07/04 22:00:04 jhhudso Exp $ */
 
 extern "C"
 {
@@ -47,8 +47,6 @@ struct player_shop * g_playershops;
 
 extern CWorld world;
 extern struct index_data *obj_index;
-extern int top_of_world;
-extern struct room_data ** world_array;
  
 extern struct time_info_data time_info;
 

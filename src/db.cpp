@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.223 2012/08/19 20:09:49 jhhudso Exp $ */
+/* $Id: db.cpp,v 1.224 2014/07/04 22:00:04 jhhudso Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -81,7 +81,6 @@ int   curr_virtno;
 extern bool verbose_mode;
 extern char *item_types[];
 extern char *wear_bits[];
-extern char *size_bitfields[];
 extern char *extra_bits[];
 extern char *more_obj_bits[];
 extern char *apply_types[];
@@ -3649,7 +3648,7 @@ struct obj_data *read_object(int nr, FILE *fl, bool zz)
 
     obj->description        = fread_string (fl, 1);
     obj->action_description = fread_string (fl, 1);
-    if (obj->action_description && obj->action_description[0] < 'A' || obj->action_description[0] > 'z' ) {
+    if (obj->action_description && (obj->action_description[0] < 'A' || obj->action_description[0] > 'z') ) {
       logf( IMMORTAL, LOG_BUG, "read_object: vnum %d action description [ ] removed.", obj_index[nr].virt, obj->action_description);
       obj->action_description[0] = '\0';
     }

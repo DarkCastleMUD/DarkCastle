@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: objects.cpp,v 1.112 2012/12/17 20:52:29 jhhudso Exp $
+| $Id: objects.cpp,v 1.113 2014/07/04 22:00:04 jhhudso Exp $
 | objects.C
 | Description:  Implementation of the things you can do with objects:
 |   wear them, wield them, grab them, drink them, eat them, etc..
@@ -36,13 +36,11 @@ extern "C"
 extern char *drinks[];
 extern int drink_aff[][3];
 extern CWorld world;
-extern clan_data * clan_list;
 
 extern struct spell_info_type spell_info[MAX_SPL_LIST];
 extern struct active_object active_head;
 extern struct index_data *obj_index;
 extern struct index_data *mob_index; 
-int FOUNTAINisPresent (CHAR_DATA *ch);
 int hands_are_free(CHAR_DATA *ch, int number);
 struct obj_data *get_object_in_equip_vis(struct char_data *ch,
     char *arg, struct obj_data *equipment[], int *j, bool blindfighting);
@@ -770,7 +768,6 @@ int do_drink(struct char_data *ch, char *argument, int cmd)
     struct obj_data *temp;
     struct affected_type af;
     int amount;
-    int weight;
 
     if (IS_SET(world[ch->in_room].room_flags, QUIET))
     {
@@ -849,8 +846,7 @@ int do_drink(struct char_data *ch, char *argument, int cmd)
         amount = MIN(amount,temp->obj_flags.value[1]);
 
         /* You can't subtract more than the object weighs */
-        weight = MIN(amount, temp->obj_flags.weight);
-        
+
         gain_condition(ch,DRUNK,(int)((int)drink_aff
                         [temp->obj_flags.value[2]][DRUNK]*amount)/4);
 

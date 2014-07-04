@@ -7,7 +7,7 @@
  *
  * -Sadus
  */
-/* $Id: nullfile.cpp,v 1.4 2011/08/28 03:44:19 jhhudso Exp $ */
+/* $Id: nullfile.cpp,v 1.5 2014/07/04 22:00:04 jhhudso Exp $ */
 
 extern "C"
 {
@@ -22,7 +22,6 @@ extern "C"
 #include <levels.h>
 
 /* External functions */
-void    log             (char * str, int god_level, long type);
 int fclose(FILE *);
 
 #ifndef LOG_BUG

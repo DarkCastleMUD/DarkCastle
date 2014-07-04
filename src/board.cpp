@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: board.cpp,v 1.43 2009/04/20 17:29:22 kkoons Exp $
+| $Id: board.cpp,v 1.44 2014/07/04 22:00:04 jhhudso Exp $
 | board.C
 | Description:  This file contains the implementation for the board
 |   code.  It's old and should be rewritten --Morc XXX
@@ -104,13 +104,7 @@ void board_save_board(std::map<std::string, BOARD_INFO>::iterator board);
 void board_load_board();
 int board_show_board(CHAR_DATA *ch, char *arg, std::map<std::string, BOARD_INFO>::iterator board);
 int fwrite_string(char *buf, FILE *fl);
-void board_unlock_board(CHAR_DATA *ch);
 void new_edit_board_unlock_board(CHAR_DATA *ch, int abort);
-void check_for_awaymsgs(char_data *ch);
-
-extern CHAR_DATA *character_list;
-extern CWorld world;
-
 
 #define ANY_BOARD 	0
 #define CLASS_BOARD 	1

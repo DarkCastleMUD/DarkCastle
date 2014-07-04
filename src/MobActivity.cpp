@@ -105,7 +105,6 @@ void Path::resetPath()
 }
 
 extern const char *dirs[];
-extern int rev_dir[];
 
 bool Path::findRoom(int from, int to, int steps, int leastSteps, char *buf)
 {

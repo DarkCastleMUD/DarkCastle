@@ -85,7 +85,6 @@ bool ARE_GROUPED( CHAR_DATA *sub, CHAR_DATA *obj);
 void add_memory(CHAR_DATA *ch, char *victim, char type);
 extern struct index_data *mob_index;
 extern struct index_data *obj_index;
-extern struct race_shit race_info[];
 extern char* spells[];
 
 

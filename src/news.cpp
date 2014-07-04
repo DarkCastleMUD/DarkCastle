@@ -157,9 +157,8 @@ int do_news(struct char_data *ch, char *argument, int cmd)
    else up = !IS_SET(ch->pcdata->toggles, PLR_NEWS);
    struct news_data *tnews;
    char buf[MAX_STRING_LENGTH*2],old[MAX_STRING_LENGTH*2];
-   char timez[15],otimez[15];
+   char timez[15];
    buf[0] = '\0';
-   otimez[0] = '\0';
    time_t thetime;
    char arg[MAX_INPUT_LENGTH];
    one_argument(argument, arg);

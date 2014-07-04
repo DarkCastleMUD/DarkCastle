@@ -2436,6 +2436,8 @@ char *mprog_process_if( char *ifchck, char *com_list, CHAR_DATA *mob,
 	 morebuf = one_argument( cmnd, buf );
        }
    }
+
+ 	 return NULL;
 }
 
 /* This routine handles the variables for command expansion.
@@ -3537,7 +3539,7 @@ int mprog_catch_trigger(char_data * mob, int catch_num, char *var, int opt, char
      && ( mob_index[mob->mobdata->nr].progtypes & CATCH_PROG ) )
  {
  mprg = mob_index[mob->mobdata->nr].mobprogs;
- if (!mprg || opt & 1) { done = TRUE; mprg = mob_index[mob->mobdata->nr].mobspec; }
+ if (!mprg || (opt & 1)) { done = TRUE; mprg = mob_index[mob->mobdata->nr].mobspec; }
 
  mprog_command_num = 0;
  for ( ; mprg != NULL; mprg = next )

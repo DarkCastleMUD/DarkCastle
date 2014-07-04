@@ -37,7 +37,7 @@ class Path : public map<int, int>
     struct path_data *p;
     char *name;
     int s;
-    Path() { p = 0; name = 0; }
+    Path() : next(0), p(NULL), name(0), s(0) { }
 };
 
 

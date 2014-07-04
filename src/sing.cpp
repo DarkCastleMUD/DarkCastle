@@ -39,11 +39,9 @@ char_data *origsing = NULL;
 
 using namespace std;
 
-extern pulse_data *bard_list;
 extern CHAR_DATA *character_list;
 extern struct zone_data *zone_table;
 void remove_memory(CHAR_DATA *ch, char type);
-void add_memory(CHAR_DATA *ch, char *victim, char type);
 extern bool check_social( CHAR_DATA *ch, char *pcomm, int length, char *arg );
 void check_eq(CHAR_DATA *ch);
 
@@ -296,7 +294,6 @@ char *songs[] = {
 	"\n"
 };
 
-void update_pos(CHAR_DATA *victim);
 int16 use_song(CHAR_DATA *ch, int kn);
 bool ARE_GROUPED(CHAR_DATA *sub, CHAR_DATA *obj);
 
@@ -770,191 +767,249 @@ int do_sing(CHAR_DATA *ch, char *arg, int cmd)
 
 // Go down the list of chars, and update song timers.  If the timer runs
 // out, then activate the effect
-void update_bard_singing()
-{
-  CHAR_DATA *i;
-  vector<songInfo>::iterator j;
+void update_bard_singing() {
+	CHAR_DATA *i;
+	vector<songInfo>::iterator j;
 
-  for(i = character_list; i; i = i->next) 
-  {
-    if (!IS_NPC(i) && GET_CLASS(i) != CLASS_BARD && GET_LEVEL(i) < 100) continue;
-    if(i->songs.empty()) continue;
+	for (i = character_list; i; i = i->next) {
+		if (!IS_NPC(i) && GET_CLASS(i) != CLASS_BARD && GET_LEVEL(i) < 100)
+			continue;
+		if (i->songs.empty())
+			continue;
 
-    for( j = i->songs.begin(); j != i->songs.end(); ++j ) {
-     if((*j).song_timer == -1) {
-       send_to_char("You run out of lyrics and end the song.\n\r", i);
-       if((song_info[(*j).song_number].intrp_pointer)) {
-          ((*song_info[(*j).song_number].intrp_pointer) (GET_LEVEL(i), i, NULL, NULL, -1));      
-	  if (i->songs.empty()) {
-	    break;
-	  }
-       }
-       (*j).song_timer = 0;
-       if((*j).song_data) {
-          if ((int)(*j).song_data > 10) // Otherwise it's a temp variable.
-             dc_free((*j).song_data);
-          (*j).song_data = 0;
-       }
-       i->songs.erase(j);
-       --j;
-       continue;
-     }
-     if((*j).song_timer > 0) 
-     {
-      if(ISSET(i->affected_by, AFF_HIDE))
-      {
-        REMBIT(i->affected_by, AFF_HIDE);
-        send_to_char("Your singing ruins your hiding place.\r\n", i);
-      }
-      if (GET_LEVEL(i) < IMP 
-          && (
-              (IS_SET(world[i->in_room].room_flags, NO_KI) || IS_SET(world[i->in_room].room_flags, SAFE)) 
-              && (
-                  (*j).song_number == SKILL_SONG_WHISTLE_SHARP - SKILL_SONG_BASE ||
-                  (*j).song_number == SKILL_SONG_UNRESIST_DITTY - SKILL_SONG_BASE ||
-                  (*j).song_number == SKILL_SONG_GLITTER_DUST - SKILL_SONG_BASE ||
-                  (*j).song_number == SKILL_SONG_STICKY_LULL - SKILL_SONG_BASE ||
-                  (*j).song_number == SKILL_SONG_REVEAL_STACATO - SKILL_SONG_BASE ||
-                  (*j).song_number == SKILL_SONG_TERRIBLE_CLEF - SKILL_SONG_BASE ||
-                  (*j).song_number == SKILL_SONG_DISCHORDANT_DIRGE - SKILL_SONG_BASE ||
-                  (*j).song_number == SKILL_SONG_INSANE_CHANT - SKILL_SONG_BASE ||
-                  (*j).song_number == SKILL_SONG_JIG_OF_ALACRITY - SKILL_SONG_BASE ||
-                  (*j).song_number == SKILL_SONG_SUMMONING_SONG - SKILL_SONG_BASE ||
-                  (*j).song_number == SKILL_SONG_DISARMING_LIMERICK - SKILL_SONG_BASE ||
-                  (*j).song_number == SKILL_SONG_CRUSHING_CRESCENDO - SKILL_SONG_BASE ||
-                  (*j).song_number == SKILL_SONG_SHATTERING_RESO - SKILL_SONG_BASE ||
-                  (*j).song_number == SKILL_SONG_MKING_CHARGE - SKILL_SONG_BASE ||
-                  (*j).song_number == SKILL_SONG_HYPNOTIC_HARMONY - SKILL_SONG_BASE
-                 )
-             )
-         )
-      {
-         send_to_char("In this room, your song quiety fades away.\r\n", i);
-         if((song_info[(*j).song_number].intrp_pointer)) {
-            ((*song_info[(*j).song_number].intrp_pointer) (GET_LEVEL(i), i, NULL, NULL, -1));
-	    if (i->songs.empty()) {
-	      break;
-	    }
-	 }
-         if((*j).song_data) {
-	    if ((int)(*j).song_data > 10) // Otherwise it's a temp variable.
-              dc_free((*j).song_data);
-            (*j).song_data = 0;
-         }
-         (*j).song_timer = 0;
-         i->songs.erase(j);
-         --j;
-         continue;
-      } else if( (
-                  ( (GET_POS(i) < song_info[(*j).song_number].minimum_position) && !IS_NPC(i))
-                   || IS_SET(i->combat, COMBAT_STUNNED)
-                   || IS_SET(i->combat, COMBAT_STUNNED2)
-                   || IS_SET(i->combat, COMBAT_SHOCKED) 
-                   || IS_SET(i->combat, COMBAT_SHOCKED2)
-                   || (IS_SET(i->combat, COMBAT_BASH1) || IS_SET(i->combat, COMBAT_BASH2))
-                 ) 
-                 && (
-             (*j).song_number == SKILL_SONG_TRAVELING_MARCH - SKILL_SONG_BASE ||
-             (*j).song_number == SKILL_SONG_BOUNT_SONNET - SKILL_SONG_BASE ||
-             (*j).song_number == SKILL_SONG_HEALING_MELODY - SKILL_SONG_BASE ||
-             (*j).song_number == SKILL_SONG_SYNC_CHORD - SKILL_SONG_BASE ||
-             (*j).song_number == SKILL_SONG_NOTE_OF_KNOWLEDGE - SKILL_SONG_BASE ||
-             (*j).song_number == SKILL_SONG_SOOTHING_REMEM - SKILL_SONG_BASE ||
-             (*j).song_number == SKILL_SONG_SEARCHING_SONG - SKILL_SONG_BASE ||
-             (*j).song_number == SKILL_SONG_STICKY_LULL - SKILL_SONG_BASE ||
-             (*j).song_number == SKILL_SONG_FORGETFUL_RHYTHM - SKILL_SONG_BASE
-                    ) 
-               )
-      {
-           send_to_char("You can't keep singing in this position!\r\n", i); 
-           (*j).song_timer = 0;
-           if((song_info[(*j).song_number].intrp_pointer)) {
-             ((*song_info[(*j).song_number].intrp_pointer) (GET_LEVEL(i), i, NULL, NULL, -1));
-	     if (i->songs.empty()) {
-	       break;
-	     }
-	   }
-           if((*j).song_data) {
-              if ((int)(*j).song_data > 10) // Otherwise it's a temp variable.
-                 dc_free((*j).song_data);
-              (*j).song_data = 0;
-           }
-           i->songs.erase(j);
-           --j;
-           continue;
-      } else if((*j).song_number == SKILL_SONG_HYPNOTIC_HARMONY - SKILL_SONG_BASE ||
-         (*j).song_number == SKILL_SONG_DISARMING_LIMERICK - SKILL_SONG_BASE ||
-         (*j).song_number == SKILL_SONG_SHATTERING_RESO - SKILL_SONG_BASE ||
-         (*j).song_number == SKILL_SONG_SEARCHING_SONG - SKILL_SONG_BASE ||
-         (*j).song_number == SKILL_SONG_FANATICAL_FANFARE - SKILL_SONG_BASE ||
-         (*j).song_number == SKILL_SONG_MKING_CHARGE - SKILL_SONG_BASE ||
-         (*j).song_number == SKILL_SONG_VIGILANT_SIREN - SKILL_SONG_BASE ||
-         j != i->songs.begin() )
-      {
-         if((!i->equipment[HOLD] || GET_ITEM_TYPE(i->equipment[HOLD]) != ITEM_INSTRUMENT) && (!i->equipment[HOLD2] || GET_ITEM_TYPE(i->equipment[HOLD2]) != ITEM_INSTRUMENT)) {
-            send_to_char("Without an instrument, your song dies away.\r\n", i);
-            if((song_info[(*j).song_number].intrp_pointer)) {
-               ((*song_info[(*j).song_number].intrp_pointer) (GET_LEVEL(i), i, NULL, NULL, -1));
-	       if (i->songs.empty()) {
-		 break;
-	       }
-	    }
-            (*j).song_timer = 0;
-            if((*j).song_data) {
-	       if ((int)(*j).song_data > 10) // Otherwise it's a temp variable.
-                  dc_free((*j).song_data);
-               (*j).song_data = 0;
-            }
-            i->songs.erase(j);
-            --j;
-            continue;
-         }
-      }
-     
-    }
+		for (j = i->songs.begin(); j != i->songs.end(); ++j) {
+			if ((*j).song_timer == -1) {
+				send_to_char("You run out of lyrics and end the song.\n\r", i);
+				if ((song_info[(*j).song_number].intrp_pointer)) {
+					((*song_info[(*j).song_number].intrp_pointer)(GET_LEVEL(i),
+							i, NULL, NULL, -1));
+					if (i->songs.empty()) {
+						break;
+					}
+				}
+				(*j).song_timer = 0;
+				if ((*j).song_data) {
+					if ((int) (*j).song_data > 10) // Otherwise it's a temp variable.
+						dc_free((*j).song_data);
+					(*j).song_data = 0;
+				}
+				i->songs.erase(j);
+				--j;
+				continue;
+			}
+			if ((*j).song_timer > 0) {
+				if (ISSET(i->affected_by, AFF_HIDE)) {
+					REMBIT(i->affected_by, AFF_HIDE);
+					send_to_char("Your singing ruins your hiding place.\r\n",
+							i);
+				}
+				if (GET_LEVEL(i) < IMP
+						&& ((IS_SET(world[i->in_room].room_flags, NO_KI)
+								|| IS_SET(world[i->in_room].room_flags, SAFE))
+								&& ((*j).song_number
+										== SKILL_SONG_WHISTLE_SHARP
+												- SKILL_SONG_BASE
+										|| (*j).song_number
+												== SKILL_SONG_UNRESIST_DITTY
+														- SKILL_SONG_BASE
+										|| (*j).song_number
+												== SKILL_SONG_GLITTER_DUST
+														- SKILL_SONG_BASE
+										|| (*j).song_number
+												== SKILL_SONG_STICKY_LULL
+														- SKILL_SONG_BASE
+										|| (*j).song_number
+												== SKILL_SONG_REVEAL_STACATO
+														- SKILL_SONG_BASE
+										|| (*j).song_number
+												== SKILL_SONG_TERRIBLE_CLEF
+														- SKILL_SONG_BASE
+										|| (*j).song_number
+												== SKILL_SONG_DISCHORDANT_DIRGE
+														- SKILL_SONG_BASE
+										|| (*j).song_number
+												== SKILL_SONG_INSANE_CHANT
+														- SKILL_SONG_BASE
+										|| (*j).song_number
+												== SKILL_SONG_JIG_OF_ALACRITY
+														- SKILL_SONG_BASE
+										|| (*j).song_number
+												== SKILL_SONG_SUMMONING_SONG
+														- SKILL_SONG_BASE
+										|| (*j).song_number
+												== SKILL_SONG_DISARMING_LIMERICK
+														- SKILL_SONG_BASE
+										|| (*j).song_number
+												== SKILL_SONG_CRUSHING_CRESCENDO
+														- SKILL_SONG_BASE
+										|| (*j).song_number
+												== SKILL_SONG_SHATTERING_RESO
+														- SKILL_SONG_BASE
+										|| (*j).song_number
+												== SKILL_SONG_MKING_CHARGE
+														- SKILL_SONG_BASE
+										|| (*j).song_number
+												== SKILL_SONG_HYPNOTIC_HARMONY
+														- SKILL_SONG_BASE))) {
+					send_to_char(
+							"In this room, your song quiety fades away.\r\n",
+							i);
+					if ((song_info[(*j).song_number].intrp_pointer)) {
+						((*song_info[(*j).song_number].intrp_pointer)(
+								GET_LEVEL(i), i, NULL, NULL, -1));
+						if (i->songs.empty()) {
+							break;
+						}
+					}
+					if ((*j).song_data) {
+						if ((int) (*j).song_data > 10) // Otherwise it's a temp variable.
+							dc_free((*j).song_data);
+						(*j).song_data = 0;
+					}
+					(*j).song_timer = 0;
+					i->songs.erase(j);
+					--j;
+					continue;
+				} else if ((((GET_POS(i)
+						< song_info[(*j).song_number].minimum_position)
+						&& !IS_NPC(i)) || IS_SET(i->combat, COMBAT_STUNNED)
+						|| IS_SET(i->combat, COMBAT_STUNNED2)
+						|| IS_SET(i->combat, COMBAT_SHOCKED)
+						|| IS_SET(i->combat, COMBAT_SHOCKED2)
+						|| (IS_SET(i->combat, COMBAT_BASH1)
+								|| IS_SET(i->combat, COMBAT_BASH2)))
+						&& ((*j).song_number
+								== SKILL_SONG_TRAVELING_MARCH - SKILL_SONG_BASE
+								|| (*j).song_number
+										== SKILL_SONG_BOUNT_SONNET
+												- SKILL_SONG_BASE
+								|| (*j).song_number
+										== SKILL_SONG_HEALING_MELODY
+												- SKILL_SONG_BASE
+								|| (*j).song_number
+										== SKILL_SONG_SYNC_CHORD
+												- SKILL_SONG_BASE
+								|| (*j).song_number
+										== SKILL_SONG_NOTE_OF_KNOWLEDGE
+												- SKILL_SONG_BASE
+								|| (*j).song_number
+										== SKILL_SONG_SOOTHING_REMEM
+												- SKILL_SONG_BASE
+								|| (*j).song_number
+										== SKILL_SONG_SEARCHING_SONG
+												- SKILL_SONG_BASE
+								|| (*j).song_number
+										== SKILL_SONG_STICKY_LULL
+												- SKILL_SONG_BASE
+								|| (*j).song_number
+										== SKILL_SONG_FORGETFUL_RHYTHM
+												- SKILL_SONG_BASE)) {
+					send_to_char("You can't keep singing in this position!\r\n",
+							i);
+					(*j).song_timer = 0;
+					if ((song_info[(*j).song_number].intrp_pointer)) {
+						((*song_info[(*j).song_number].intrp_pointer)(
+								GET_LEVEL(i), i, NULL, NULL, -1));
+						if (i->songs.empty()) {
+							break;
+						}
+					}
+					if ((*j).song_data) {
+						if ((int) (*j).song_data > 10) // Otherwise it's a temp variable.
+							dc_free((*j).song_data);
+						(*j).song_data = 0;
+					}
+					i->songs.erase(j);
+					--j;
+					continue;
+				} else if ((*j).song_number
+						== SKILL_SONG_HYPNOTIC_HARMONY - SKILL_SONG_BASE
+						|| (*j).song_number
+								== SKILL_SONG_DISARMING_LIMERICK
+										- SKILL_SONG_BASE
+						|| (*j).song_number
+								== SKILL_SONG_SHATTERING_RESO - SKILL_SONG_BASE
+						|| (*j).song_number
+								== SKILL_SONG_SEARCHING_SONG - SKILL_SONG_BASE
+						|| (*j).song_number
+								== SKILL_SONG_FANATICAL_FANFARE
+										- SKILL_SONG_BASE
+						|| (*j).song_number
+								== SKILL_SONG_MKING_CHARGE - SKILL_SONG_BASE
+						|| (*j).song_number
+								== SKILL_SONG_VIGILANT_SIREN - SKILL_SONG_BASE
+						|| j != i->songs.begin()) {
+					if ((!i->equipment[HOLD]
+							|| GET_ITEM_TYPE(i->equipment[HOLD])
+									!= ITEM_INSTRUMENT)
+							&& (!i->equipment[HOLD2]
+									|| GET_ITEM_TYPE(i->equipment[HOLD2])
+											!= ITEM_INSTRUMENT)) {
+						send_to_char(
+								"Without an instrument, your song dies away.\r\n",
+								i);
+						if ((song_info[(*j).song_number].intrp_pointer)) {
+							((*song_info[(*j).song_number].intrp_pointer)(
+									GET_LEVEL(i), i, NULL, NULL, -1));
+							if (i->songs.empty()) {
+								break;
+							}
+						}
+						(*j).song_timer = 0;
+						if ((*j).song_data) {
+							if ((int) (*j).song_data > 10) // Otherwise it's a temp variable.
+								dc_free((*j).song_data);
+							(*j).song_data = 0;
+						}
+						i->songs.erase(j);
+						--j;
+						continue;
+					}
+				}
 
-    if((*j).song_timer > 1)
-    {
-      (*j).song_timer--;
+			}
 
-      if(IS_MOB(i) || !IS_SET(i->pcdata->toggles, PLR_BARD_SONG))
-      {
-         send_to_char("Singing [", i);
-         send_to_char(songs[(*j).song_number], i);
-         send_to_char("]: ", i);
-         for(int k = 0; k < (*j).song_timer; k++)
-           send_to_char("* ", i);
-         send_to_char("\r\n", i);
-      }
-    }
-    else if((*j).song_timer == 1)
-    {
-      (*j).song_timer = 0;
+			if ((*j).song_timer > 1) {
+				(*j).song_timer--;
 
-      int learned = has_skill(i, ( (*j).song_number + SKILL_SONG_BASE ) );
-      int retval;
+				if (IS_MOB(i) || !IS_SET(i->pcdata->toggles, PLR_BARD_SONG)) {
+					send_to_char("Singing [", i);
+					send_to_char(songs[(*j).song_number], i);
+					send_to_char("]: ", i);
+					for (int k = 0; k < (*j).song_timer; k++)
+						send_to_char("* ", i);
+					send_to_char("\r\n", i);
+				}
+			} else if ((*j).song_timer == 1) {
+				(*j).song_timer = 0;
 
-      if((song_info[(*j).song_number].exec_pointer)) {
-        retval = ((*song_info[(*j).song_number].exec_pointer) (GET_LEVEL(i), i, NULL, NULL, learned));
-	if (i->songs.empty()) {
-	  break;
+				int learned = has_skill(i,
+						((*j).song_number + SKILL_SONG_BASE));
+				int retval = 0;
+
+				if ((song_info[(*j).song_number].exec_pointer)) {
+					retval = ((*song_info[(*j).song_number].exec_pointer)(
+							GET_LEVEL(i), i, NULL, NULL, learned));
+					if (i->songs.empty()) {
+						break;
+					}
+				} else {
+					send_to_char(
+							"Bad exec pointer on the song you sang.  Tell a god.\r\n",
+							i);
+				}
+
+				if (retval == eEXTRA_VALUE) { //the song killed itself
+					--j;
+				}
+
+			} else if ((*j).song_timer == 0) {
+				i->songs.erase(j);
+				--j;
+				continue;
+			}
+		}
 	}
-      } else {
-	send_to_char("Bad exec pointer on the song you sang.  Tell a god.\r\n", i);
-      }
-
-      if(retval == eEXTRA_VALUE) { //the song killed itself
-        --j;
-      }
-
-    }
-    else if((*j).song_timer == 0) {
-     i->songs.erase(j);
-     --j;
-     continue;
-    }
-   }
-  }
 }
 
 int song_hypnotic_harmony(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)

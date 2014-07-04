@@ -38,7 +38,6 @@ extern "C"
 
 extern CWorld world;
  
-extern struct descriptor_data *descriptor_list;
 
 
 /************************************************************************

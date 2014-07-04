@@ -26,7 +26,6 @@ using namespace std;
 typedef vector<quest_info *> quest_list_t;
 quest_list_t quest_list;
 
-extern int top_of_mobt;
 extern CWorld world;
 extern zone_data *zone_table;
 
@@ -54,8 +53,6 @@ extern CHAR_DATA *character_list;
 extern struct index_data *mob_index;
 extern struct index_data *obj_index;
 extern char *gl_item(OBJ_DATA *obj, int number, CHAR_DATA *ch, bool platinum);
-extern int class_restricted(char_data *ch, struct obj_data *obj);
-extern int size_restricted(char_data *ch, struct obj_data *obj);
 extern struct obj_data * search_char_for_item(char_data * ch, int16 item_number, bool wearonly = FALSE);
 
 int load_quests(void)

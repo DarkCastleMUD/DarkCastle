@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.120 2012/02/06 02:52:58 jhhudso Exp $
+| $Id: inventory.cpp,v 1.121 2014/07/04 22:00:04 jhhudso Exp $
 | inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
@@ -45,7 +45,6 @@ extern "C"
 
 extern CWorld world;
 extern struct index_data *obj_index; 
-extern struct descriptor_data *descriptor_list;
 extern struct index_data *mob_index;
 extern struct obj_data *object_list;
 extern int rev_dir[];

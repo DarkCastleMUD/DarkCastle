@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: wizard.cpp,v 1.82 2012/10/01 03:12:43 jhhudso Exp $
+| $Id: wizard.cpp,v 1.83 2014/07/04 22:00:04 jhhudso Exp $
 | wizard.C
 | Description:  Utility functions necessary for wiz commands.
 */
@@ -24,7 +24,6 @@
 #endif
 
 extern struct obj_data * search_char_for_item(char_data * ch, int16 item_number, bool wearonly = FALSE);
-extern void debug_point();
 extern int getRealSpellDamage(char_data * ch);
 
 int number_or_name(char **name, int *num)

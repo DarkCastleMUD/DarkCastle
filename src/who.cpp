@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: who.cpp,v 1.59 2012/08/10 03:17:20 jhhudso Exp $
+| $Id: who.cpp,v 1.60 2014/07/04 22:00:04 jhhudso Exp $
 | who.C
 | Commands for who, maybe? :P
 */
@@ -39,7 +39,6 @@ extern CWorld world;
  
 extern int max_who;
 
-struct char_data *get_pc_vis(struct char_data *ch, char *name);
 clan_data * get_clan(struct char_data *);
 
 //#define GWHOBUFFERSIZE   (MAX_STRING_LENGTH*2)
@@ -270,7 +269,7 @@ int do_whosolo(struct char_data *ch, char *argument, int cmd)
 int do_who(struct char_data *ch, char *argument, int cmd)
 {
     struct descriptor_data *d;
-    struct char_data *i, *w;
+    struct char_data *i;
     clan_data * clan;
     int   numPC = 0;
     int   numImmort = 0;
@@ -294,7 +293,6 @@ int do_who(struct char_data *ch, char *argument, int cmd)
     int   sexcheck = 0;
     int   sextype = 0;
     int   nomatch = 0;
-    int   currentmatch = 0;
     int   hasholylight = 0;
     int   lfgcheck = 0;
     int   guidecheck = 0;
@@ -357,32 +355,24 @@ int do_who(struct char_data *ch, char *argument, int cmd)
 	continue;        
       }
 
-      currentmatch = 0;
-
       // note that for all these, we don't 'continue' cause we want
       // to check for a name match at the end in case some annoying mortal
       // named himself "Anonymous" or "Penis", etc.        
       if (is_abbrev(oneword, "anonymous")) {
 	anoncheck = 1;
-	currentmatch = 1;
       } else if (is_abbrev(oneword, "penis")) {
 	sexcheck = 1;
 	sextype = SEX_MALE;
-	currentmatch = 1;
       } else if (is_abbrev(oneword, "guide")) {
 	guidecheck = 1;
-	currentmatch = 1;
       } else if (is_abbrev(oneword, "vagina")) {
 	sexcheck = 1;
 	sextype = SEX_FEMALE;
-	currentmatch = 1;
       } else if (is_abbrev(oneword, "other")) {
 	sexcheck = 1;
 	sextype = SEX_NEUTRAL;
-	currentmatch = 1;
       } else if (is_abbrev(oneword, "lfg")) {
 	lfgcheck = 1;
-	currentmatch = 1;
       } else {
 	for (clss = 0; clss <= 12; clss++)  {
 	  if (clss == 12) {
@@ -390,7 +380,6 @@ int do_who(struct char_data *ch, char *argument, int cmd)
 	    break;
 	  } else if (is_abbrev(oneword, clss_types[clss])) {
 	    clss++;
-	    currentmatch = 1;
 	    break;
 	  }
 	}
@@ -401,7 +390,6 @@ int do_who(struct char_data *ch, char *argument, int cmd)
 	    break;
 	  } else if (is_abbrev(oneword, race_types[race])) {
 	    race++;
-	    currentmatch = 1;
 	    break;
 	  }
 	}
@@ -409,7 +397,7 @@ int do_who(struct char_data *ch, char *argument, int cmd)
 
       // if there's anything left, we'll assume it's a partial name.
       // and we only take the "last" one in the list, so 'who warrior thief' only matches thief
-      // This is consistant with how the class stuff works too
+      // This is consistent with how the class stuff works too
       strcpy(charname, oneword);
       charmatch = 1;
 
@@ -421,7 +409,6 @@ int do_who(struct char_data *ch, char *argument, int cmd)
 		 "[$4:$R]===================================[$4:$R]\n\r\n\r", ch);
     
     clear_who_buffer();
-    w = 0; 
     
     for (d = descriptor_list; d; d = d->next) {
       // we have an invalid match arg, so nothing is going to match

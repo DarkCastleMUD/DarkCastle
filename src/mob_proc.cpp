@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.203 2013/12/22 07:48:03 jhhudso Exp $ */
+/* $Id: mob_proc.cpp,v 1.204 2014/07/04 22:00:04 jhhudso Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -45,22 +45,16 @@
 
 extern CWorld world;
  
-extern struct descriptor_data *descriptor_list;
 extern struct index_data *obj_index;
 extern struct index_data *mob_index;
-extern struct time_info_data time_info;
 
 int check_components(CHAR_DATA *ch, int destroy, int item_one = 0,
 	int item_two = 0, int item_three = 0, int item_four = 0,
 	bool silent = FALSE);
 /* extern procedures */
 
-int saves_spell(CHAR_DATA *ch, CHAR_DATA *vict, int spell_base, int16 save_type);
 bool many_charms(struct char_data *ch);
-struct char_data *get_pc_vis_exact(struct char_data *ch, char *name);
-void gain_exp(struct char_data *ch, int64 gain);
 
-char * get_random_hate(CHAR_DATA *ch);
 
 
 // This is purely a utility function for use inside of other mob_procs.

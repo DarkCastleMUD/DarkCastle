@@ -3,7 +3,7 @@
  * Morcallen 12/18
  *
  */
-/* $Id: ki.cpp,v 1.93 2011/01/27 03:43:58 jhhudso Exp $ */
+/* $Id: ki.cpp,v 1.94 2014/07/04 22:00:04 jhhudso Exp $ */
 
 extern "C"
 {
@@ -36,7 +36,6 @@ using namespace std;
 
 extern CWorld world;
  
-extern CHAR_DATA *character_list;
 extern int hit_gain(CHAR_DATA *, int);
 
 void remove_memory(CHAR_DATA *ch, char type);
@@ -120,7 +119,6 @@ char *ki[] = {
 	"transfer",
 	"\n"
 };
-void update_pos(CHAR_DATA *victim);
 int16 use_ki(CHAR_DATA *ch, int kn);
 bool ARE_GROUPED(CHAR_DATA *sub, CHAR_DATA *obj);
 
@@ -1058,7 +1056,7 @@ int ki_stance( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
 
 int ki_agility( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
 {
-  int learned, chance, specialization, percent;
+  int learned, chance, percent;
   struct affected_type af;
    
   if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL)
@@ -1073,7 +1071,6 @@ int ki_agility( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
     return eFAILURE;
   }
 
-  specialization = learned / 100;
   learned = learned % 100;
 
   chance = 75;

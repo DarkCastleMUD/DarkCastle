@@ -66,16 +66,12 @@ vault_search_parameter::~vault_search_parameter() {
 extern CWorld world;
 int total_vaults = 0;
 int get_line(FILE * fl, char *buf);
-char *skip_spaces(char *string);
 
 void item_remove(obj_data *obj, struct vault_data *vault);
 void item_add(int vnum, struct vault_data *vault);
 
 struct char_data *find_owner(char *name);
 void vault_log(CHAR_DATA *ch, char *owner);
-int class_restricted(struct char_data *ch, struct obj_data *obj);
-int size_restricted(struct char_data *ch, struct obj_data *obj);
-int spell_identify(byte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill);
 char *clanVName(int c);
 void vault_search_usage(CHAR_DATA *ch);
 

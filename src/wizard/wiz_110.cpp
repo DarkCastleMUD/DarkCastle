@@ -776,7 +776,6 @@ int do_range(struct char_data *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-extern long long new_meta_platinum_cost(int start, int end);
 extern int r_new_meta_platinum_cost(int start, long long plats);
 extern int r_new_meta_exp_cost(int start, long long exp);
 

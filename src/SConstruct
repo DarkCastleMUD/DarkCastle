@@ -5,8 +5,8 @@ import os.path
 env = Environment(CCFLAGS = '-ggdb3 -Wall -m32 -O3 -Wno-write-strings',
 				  LINKFLAGS = '-ggdb3 -Wall -m32 -O3 -Wno-write-strings' )
 
-if os.path.exists('/usr/bin/g++-4.8'):
-	env.Replace(CXX = 'g++-4.8')
+#if os.path.exists('/usr/bin/g++-4.8'):
+#	env.Replace(CXX = 'g++-4.8')
           
 base_src = glob.glob('[a-l]*.cpp') + glob.glob('[n-z]*.cpp') + glob.glob('mo*.cpp') + ['magic.cpp','memory.cpp','meta.cpp','MobActivity.cpp']
 wizard_src = glob.glob('wizard/*.cpp')
@@ -14,14 +14,14 @@ class_src = glob.glob('class/*.cpp')
 backend_src = glob.glob('Backend/*.cpp')
 
 env.Program('dcastle.debug', ['main.cpp'],
-CPPPATH = ['include'], CPPDEFINES=['LINUX', 'TWITTER'],
-LIBS=['dcastle', 'twitcurl', 'crypt', 'mcheck', 'z', 'pq', 'xmlrpc++'], LIBPATH=['.','/usr/local/lib']);
+CPPPATH = ['include'], CPPDEFINES=['LINUX'],
+LIBS=['dcastle', 'crypt', 'mcheck', 'z', 'pq', 'XmlRpc'], LIBPATH=['.','/usr/local/lib']);
 
 env.Program('showplayer', ['../scripts/showplayerxp.cpp'],
-CPPPATH = ['include'], CPPDEFINES=['LINUX', 'TWITTER'],
-LIBS=['dcastle', 'twitcurl', 'crypt', 'mcheck', 'z', 'pq', 'xmlrpc++'], LIBPATH=['.','/usr/local/lib']);
+CPPPATH = ['include'], CPPDEFINES=['LINUX'],
+LIBS=['dcastle', 'crypt', 'mcheck', 'z', 'pq', 'XmlRpc'], LIBPATH=['.','/usr/local/lib']);
 
 env.StaticLibrary('dcastle', [base_src,wizard_src,class_src,backend_src],
-CPPPATH = ['include','/usr/include/pgsql/'], CPPDEFINES=['LINUX', 'TWITTER'],
+CPPPATH = ['include','/usr/include/pgsql/'], CPPDEFINES=['LINUX'],
 LIBS=[], LIBPATH=['/usr/local/lib']);
 

@@ -260,7 +260,7 @@ void load_corpses(void)
   FILE *fp;
   char line[256] = { 0 };
   int t[15],zwei=0;
-  int locate=0, j, k, nr, num_objs=0;
+  int nr, num_objs=0;
   struct obj_data *temp = NULL, *obj = NULL, *next_obj = NULL;
   struct extra_descr_data *new_descr;
   char buf1[256] = {0}, buf2[256] = {0}, buf3[256] = {0};
@@ -319,7 +319,6 @@ void load_corpses(void)
         log (buf3, 0, LOG_MISC);
       }
       sscanf(line,"%d %d %d %d %d %d %d %d",t, t + 1, t+2, t + 3, t + 4,t + 5,t + 6, t + 7);
-      locate=t[0];
       GET_OBJ_VAL(temp,0) = t[1];
       GET_OBJ_VAL(temp,1) = t[2];
       GET_OBJ_VAL(temp,2) = t[3]; 
@@ -404,7 +403,7 @@ void load_corpses(void)
            }
           
         get_line_new(fp,line);
-        for (k=j=zwei=0;!zwei && !feof(fp);) {
+        for (zwei=0;!zwei && !feof(fp);) {
           switch (*line) {
             case 'E':
               CREATE(new_descr, struct extra_descr_data, 1);

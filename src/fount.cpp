@@ -8,7 +8,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: fount.cpp,v 1.5 2011/11/29 02:19:31 jhhudso Exp $ */
+/* $Id: fount.cpp,v 1.6 2014/07/04 22:00:04 jhhudso Exp $ */
 
 extern "C"
 {
@@ -30,7 +30,6 @@ extern "C"
 #include <interp.h>
 
 extern CWorld world;
-int real_object(int i);
 
 /*************************************************************************
 * Figures out if a fountain is present in the room                       *
@@ -60,7 +59,6 @@ int do_fill(CHAR_DATA *ch, char *argument, int cmd)
 {
   char buf[MAX_STRING_LENGTH];
   struct obj_data *to_obj;
-  int amount;
   void name_to_drinkcon(struct obj_data *obj, int type);
   
   one_argument(argument, buf);
@@ -104,8 +102,6 @@ int do_fill(CHAR_DATA *ch, char *argument, int cmd)
     to_obj->obj_flags.value[2]=0;
     
     /* Then how much to pour */
-    amount= to_obj->obj_flags.value[0]-to_obj->obj_flags.value[1];
-
     to_obj->obj_flags.value[1]=to_obj->obj_flags.value[0];
 
 

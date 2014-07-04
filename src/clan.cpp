@@ -1,4 +1,4 @@
-/* $Id: clan.cpp,v 1.89 2013/12/30 22:46:43 jhhudso Exp $ */
+/* $Id: clan.cpp,v 1.90 2014/07/04 22:00:04 jhhudso Exp $ */
 
 /***********************************************************************/
 /* Revision History                                                    */
@@ -3393,6 +3393,9 @@ clan_data::clan_data(void) {
 	members = NULL;
 	next = NULL;
 	acc = NULL;
+	amt = 0;
+	number = 0;
+	tax = 0;
 }
 
 void clan_data::cdeposit(const uint64_t &deposit) {
