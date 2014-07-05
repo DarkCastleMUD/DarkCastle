@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.224 2014/07/04 22:00:04 jhhudso Exp $ */
+/* $Id: db.cpp,v 1.225 2014/07/05 21:15:25 jhhudso Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -1523,7 +1523,6 @@ int read_one_room(FILE *fl, int & room_nr)
           fprintf(stderr, "Room %d is outside of any zone.\n", room_nr);
           log("Room outside of ANY zone.  ERROR", IMMORTAL, LOG_BUG);
           log("Room outside of ANY zone.  ERROR", IMMORTAL, LOG_MISC);
-//          abort();
           return FALSE;
         }
       }
