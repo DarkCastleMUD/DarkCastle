@@ -1,4 +1,4 @@
-/* $Id: clan.cpp,v 1.90 2014/07/04 22:00:04 jhhudso Exp $ */
+/* $Id: clan.cpp,v 1.91 2014/07/15 21:28:40 jhhudso Exp $ */
 
 /***********************************************************************/
 /* Revision History                                                    */
@@ -38,11 +38,14 @@ extern "C"
 #include <fileinfo.h>
 #include <stack>
 
+using namespace std;
+
 extern CHAR_DATA *character_list;
 extern descriptor_data *descriptor_list;
 extern index_data *obj_index;
 extern CWorld world;
 extern zone_data *zone_table;
+extern uint16_t port1;
 
 void send_info(char *messg);
 void addtimer(struct timer_data *timer);
@@ -214,147 +217,144 @@ void boot_clans(void)
   dc_fclose(fl);
 }
 
-void save_clans(void)
-{
-  FILE * fl;
-  clan_data * pclan = NULL;
-  struct clan_room_data * proom = NULL;
-  struct clan_member_data * pmember = NULL;
-  char buf[MAX_STRING_LENGTH];
-  char * x;
-  char * targ;
+void save_clans(void) {
+	FILE * fl;
+	clan_data * pclan = NULL;
+	struct clan_room_data * proom = NULL;
+	struct clan_member_data * pmember = NULL;
+	char buf[MAX_STRING_LENGTH];
+	char * x;
+	char * targ;
 
-  if(!(fl = dc_fopen("../lib/clan.txt", "w"))) {
-    fprintf(stderr, "Unable to open clan.txt for writing.\n");
-    abort();
-  }
-  
-  for(pclan = clan_list; pclan; pclan = pclan->next) {
-     // print normal data
-     fprintf(fl, "%s %s %s %d\n", pclan->leader, pclan->founder,
-             pclan->name, pclan->number);
-     // print rooms
-     for(proom = pclan->rooms; proom; proom = proom->next)
-        fprintf(fl, "R %d\n", proom->room_number);
-     fprintf(fl, "S\n");
+	if (!(fl = dc_fopen("../lib/clan.txt", "w"))) {
+		fprintf(stderr, "Unable to open clan.txt for writing.\n");
+		abort();
+	}
 
-     // BLAH TEMP CODE HERE
-     targ = buf;
-     for(x = pclan->email; x && *x != '\0'; x++)
-        if( *x != '\r' )
-           *targ++ = *x;
-     *targ = '\0';
-     // handle email
-     if(pclan->email)
-       fprintf(fl, "E\n%s~\n", buf);
-     //  fprintf(fl, "E\n%s~\n", pclan->email);
+	for (pclan = clan_list; pclan; pclan = pclan->next) {
+		// print normal data
+		fprintf(fl, "%s %s %s %d\n", pclan->leader, pclan->founder, pclan->name,
+				pclan->number);
+		// print rooms
+		for (proom = pclan->rooms; proom; proom = proom->next)
+			fprintf(fl, "R %d\n", proom->room_number);
+		fprintf(fl, "S\n");
 
-     // BLAH TEMP CODE THIS BLOWS
-     // What's happening is apparently fedora's fprintf doesn't strip out
-     // \r's like Redhat's does.  So we're writing \n\r to files.  This is
-     // bad because when we read it in, fread_string replaces \n with a
-     // \n\r.  So we get \n\r\r.   After a while, this is really bad.
-     // So this is some crap code to strip out \r's before we save
-     // I just did this REALLY fast so please rewrite this
-     // Does it for L X O too but C and D were the hardcore ones so i temp 
-     // fixed those since those are the ones that got long enough to crash us
-     targ = buf;
-     for(x = pclan->description; x && *x != '\0'; x++)
-        if( *x != '\r' ) 
-           *targ++ = *x;
-     *targ = '\0';
-     
-     // handle description
-     if(pclan->description)
-       fprintf(fl, "D\n%s~\n", buf);
+		// BLAH TEMP CODE HERE
+		targ = buf;
+		for (x = pclan->email; x && *x != '\0'; x++)
+			if (*x != '\r')
+				*targ++ = *x;
+		*targ = '\0';
+		// handle email
+		if (pclan->email)
+			fprintf(fl, "E\n%s~\n", buf);
+		//  fprintf(fl, "E\n%s~\n", pclan->email);
+
+		// BLAH TEMP CODE THIS BLOWS
+		// What's happening is apparently fedora's fprintf doesn't strip out
+		// \r's like Redhat's does.  So we're writing \n\r to files.  This is
+		// bad because when we read it in, fread_string replaces \n with a
+		// \n\r.  So we get \n\r\r.   After a while, this is really bad.
+		// So this is some crap code to strip out \r's before we save
+		// I just did this REALLY fast so please rewrite this
+		// Does it for L X O too but C and D were the hardcore ones so i temp
+		// fixed those since those are the ones that got long enough to crash us
+		targ = buf;
+		for (x = pclan->description; x && *x != '\0'; x++)
+			if (*x != '\r')
+				*targ++ = *x;
+		*targ = '\0';
+
+		// handle description
+		if (pclan->description)
+			fprintf(fl, "D\n%s~\n", buf);
 //       fprintf(fl, "D\n%s~\n", pclan->description);
 
+		// BLAH TEMP CODE HERE
+		targ = buf;
+		for (x = pclan->login_message; x && *x != '\0'; x++)
+			if (*x != '\r')
+				*targ++ = *x;
+		*targ = '\0';
 
-     // BLAH TEMP CODE HERE
-     targ = buf;
-     for(x = pclan->login_message; x && *x != '\0'; x++)
-        if( *x != '\r' )
-           *targ++ = *x;
-     *targ = '\0';
+		if (pclan->login_message)
+			fprintf(fl, "L\n%s~\n", buf);
+		//  fprintf(fl, "L\n%s~\n", pclan->login_message);
 
-     if(pclan->login_message)
-       fprintf(fl, "L\n%s~\n", buf);
-     //  fprintf(fl, "L\n%s~\n", pclan->login_message);
+		if (pclan->tax)
+			fprintf(fl, "T\n%d\n", pclan->tax);
 
-     if (pclan->tax)
-	fprintf(fl, "T\n%d\n", pclan->tax);
+		if (pclan->getBalance())
+			fprintf(fl, "B\n%llu\n", pclan->getBalance());
 
-     if (pclan->getBalance())
-	fprintf(fl, "B\n%llu\n", pclan->getBalance());
+		// BLAH TEMP CODE HERE
+		targ = buf;
+		for (x = pclan->death_message; x && *x != '\0'; x++)
+			if (*x != '\r')
+				*targ++ = *x;
+		*targ = '\0';
+		if (pclan->death_message)
+			fprintf(fl, "X\n%s~\n", buf);
+		// fprintf(fl, "X\n%s~\n", pclan->death_message);
 
-     // BLAH TEMP CODE HERE
-     targ = buf;
-     for(x = pclan->death_message; x && *x != '\0'; x++)
-        if( *x != '\r' )
-           *targ++ = *x;
-     *targ = '\0';
-     if(pclan->death_message)
-       fprintf(fl, "X\n%s~\n", buf);
-      // fprintf(fl, "X\n%s~\n", pclan->death_message);
-     
-     // BLAH TEMP CODE HERE
-     targ = buf;
-     for(x = pclan->logout_message; x && *x != '\0'; x++)
-        if( *x != '\r' )
-           *targ++ = *x;
-     *targ = '\0';
-     if(pclan->logout_message)
-      fprintf(fl, "O\n%s~\n", buf);
-      // fprintf(fl, "O\n%s~\n", pclan->logout_message);
+		// BLAH TEMP CODE HERE
+		targ = buf;
+		for (x = pclan->logout_message; x && *x != '\0'; x++)
+			if (*x != '\r')
+				*targ++ = *x;
+		*targ = '\0';
+		if (pclan->logout_message)
+			fprintf(fl, "O\n%s~\n", buf);
+		// fprintf(fl, "O\n%s~\n", pclan->logout_message);
 
-     // BLAH TEMP CODE HERE
-     targ = buf;
-     for(x = pclan->clanmotd; x && *x != '\0'; x++)
-        if( *x != '\r' ) 
-           *targ++ = *x;
-     *targ = '\0';
+		// BLAH TEMP CODE HERE
+		targ = buf;
+		for (x = pclan->clanmotd; x && *x != '\0'; x++)
+			if (*x != '\r')
+				*targ++ = *x;
+		*targ = '\0';
 
-     if(pclan->clanmotd)
-       fprintf(fl, "C\n%s~\n", buf);
+		if (pclan->clanmotd)
+			fprintf(fl, "C\n%s~\n", buf);
 //       fprintf(fl, "C\n%s~\n", pclan->clanmotd);
 
-     for(pmember = pclan->members; pmember; pmember = pmember->next) {
-       fprintf(fl, "M\n%s~\n", pmember->member_name);
-       fprintf(fl, "%d %d %d %d %d %d\n",
-                      pmember->member_rights, pmember->member_rank,
-                      pmember->unused1,       pmember->unused2, 
-                      pmember->unused3,       pmember->time_joined);
-       fprintf(fl, "%s~\n", pmember->unused4);
-     }
+		for (pmember = pclan->members; pmember; pmember = pmember->next) {
+			fprintf(fl, "M\n%s~\n", pmember->member_name);
+			fprintf(fl, "%d %d %d %d %d %d\n", pmember->member_rights,
+					pmember->member_rank, pmember->unused1, pmember->unused2,
+					pmember->unused3, pmember->time_joined);
+			fprintf(fl, "%s~\n", pmember->unused4);
+		}
 
-     // terminate clan
-     fprintf(fl, "~\n");
-  }  
-  fprintf(fl, "~\n");
-  dc_fclose(fl);
+		// terminate clan
+		fprintf(fl, "~\n");
+	}
+	fprintf(fl, "~\n");
+	dc_fclose(fl);
 
-extern short bport;
- if(!bport) {
-  if(!(fl = dc_fopen(WEB_CLANS_LIST, "w"))) {
-    log("Unable to open web clan file for writing.\n", 0, LOG_MISC);
-    return;
-  }
+	stringstream ssbuffer;
+	ssbuffer << HTDOCS_DIR << port1 << "/" << WEBCLANSLIST_FILE;
 
-  for(pclan = clan_list; pclan; pclan = pclan->next) {
-    fprintf(fl, "%s %s %d\n", pclan->name, pclan->leader, pclan->number);
-    fprintf(fl, 
-               "$3Contact Email$R:  %s\n"
-               "$3Clan Hall$R:      %s\n"
-               "$3Clan info$R:\n"
-               "$3----------$R\n",
-                   pclan->email ? pclan->email : "(No Email)",
-                   pclan->rooms ? "Yes" : "No");
-  // This has to be separate, or if the leader uses $'s, it comes out funky
-    fprintf(fl, "%s\n",
-               pclan->description ? pclan->description : "(No Description)\r\n");
-  }
-  dc_fclose(fl);
- } else log("Cannot save clans info file to web dir.", 0, LOG_MISC);
+	if (!(fl = dc_fopen(ssbuffer.str().c_str(), "w"))) {
+		logf(LOG_MISC, 0, "Unable to open web clan file \'%s\' for writing.\n",
+				ssbuffer.str().c_str());
+		return;
+	}
+
+	for (pclan = clan_list; pclan; pclan = pclan->next) {
+		fprintf(fl, "%s %s %d\n", pclan->name, pclan->leader, pclan->number);
+		fprintf(fl, "$3Contact Email$R:  %s\n"
+				"$3Clan Hall$R:      %s\n"
+				"$3Clan info$R:\n"
+				"$3----------$R\n", pclan->email ? pclan->email : "(No Email)",
+				pclan->rooms ? "Yes" : "No");
+		// This has to be separate, or if the leader uses $'s, it comes out funky
+		fprintf(fl, "%s\n",
+				pclan->description ?
+						pclan->description : "(No Description)\r\n");
+	}
+	dc_fclose(fl);
 
 }
 
