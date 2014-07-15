@@ -17,7 +17,6 @@ extern "C"
 #include <iostream>
 #include <sstream>
 
-
 #include "wizard.h"
 #include <utility.h>
 #include <levels.h>
@@ -29,8 +28,9 @@ extern "C"
 #include <returnvals.h>
 #include <spells.h>
 #include <interp.h>
-#include "const.h"
-#include "db.h"
+#include <const.h>
+#include <db.h>
+#include <Leaderboard.h>
 
 #ifdef WIN32
 char *crypt(const char *key, const char *salt);
@@ -586,7 +586,7 @@ int do_rename_char(struct char_data *ch, char *arg, int cmd)
   extern void rename_leaderboard(char *, char *);
 
   rename_vault_owner(oldname, newname);
-  rename_leaderboard(oldname, newname);
+  leaderboard.rename(oldname, newname);
 
   return eSUCCESS;
 }
