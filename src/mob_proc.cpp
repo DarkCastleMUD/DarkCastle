@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.204 2014/07/04 22:00:04 jhhudso Exp $ */
+/* $Id: mob_proc.cpp,v 1.205 2014/07/15 21:33:49 jhhudso Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -939,13 +939,13 @@ int clan_guard(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
 	int b = mob_index[ch->mobdata->nr].virt;
 	switch (b)
 	{
-		case 8:
-		case 88:
-		case 89:
-		case 90:
-		case 91:
-		case 22389:
-		case 22390:
+		case 8:       //golem
+		case 88:      //fire elemental
+		case 89:      //ice elemental
+		case 90:      //lightning elemental
+		case 91:      //earth elemental
+		case 22389:   //figment undead corpse
+		case 22390:   //apparation undead corpse
 		case 22391:
 		case 22392:
 		case 22393:
