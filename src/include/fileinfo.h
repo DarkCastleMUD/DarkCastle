@@ -1,7 +1,7 @@
 #ifndef FILEINFO_H_
 #define FILEINFO_H_
 /*
-| $Id: fileinfo.h,v 1.32 2012/04/10 02:50:59 jhhudso Exp $
+| $Id: fileinfo.h,v 1.33 2014/07/15 21:34:46 jhhudso Exp $
 | fileinfo.h
 | Description:  Contains information for loading files, ie "../lib", etc..
 */
@@ -46,7 +46,6 @@
 #define  HELP_KWRD_FILE     "help_key.txt"
 #define  HELP_PAGE_FILE     "help.txt"
 #define  INFO_FILE          "info.txt"
-#define  WIZLIST_FILE       "wizlist.txt"
 #define  LOCAL_WHO_FILE     "onlinewho.txt"
 
 #define  WEB_WHO_FILE        "/srv/www/www.dcastle.org/htdocs/onlinewho.txt"
@@ -57,7 +56,8 @@
 #define  NEW_IHELP_PAGE_FILE "new_ihelp_screen.txt"
 #define  LEADERBOARD_FILE    "leaderboard.txt"
 #define  QUEST_FILE         "quests.txt"
-#define  WEB_CLANS_LIST      "/srv/www/www.dcastle.org/htdocs/webclanslist.txt"
+#define  WEBCLANSLIST_FILE  "webclanslist.txt"
+#define  HTDOCS_DIR         "/srv/www/www.dcastle.org/htdocs/"
 
 #define PLAYER_DIR         "player/"
 #define BUG_LOG            "bug.log"
