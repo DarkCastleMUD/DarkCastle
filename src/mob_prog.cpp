@@ -2339,8 +2339,53 @@ char *mprog_process_if( char *ifchck, char *com_list, CHAR_DATA *mob,
        }
 	
        if (!thrw || DIFF(cmnd, activeProgTmpBuf) >= thrw->startPos) {
+
+#ifdef DEBUG_MPROG
+	 if (mob && mob->mobdata != (mob_data *)0x95959595 && mob_index[mob->mobdata->nr].virt == 4821) {
+	   fprintf(stderr, "debug: ");
+	   if (cmnd)
+	     fprintf(stderr, "cmd: %s ", cmnd);
+	   else
+	     fprintf(stderr, "cmd: (null) ");
+	   
+	   if (mob && mob->name)
+	     fprintf(stderr, "mob: %s ", mob->name);
+	   else
+	     fprintf(stderr, "mob: (null) ");
+	   
+	   if (actor && actor->name)
+	     fprintf(stderr, "actor: %s = ", actor->name);
+	   else
+	     fprintf(stderr, "actor: (null) = ");
+	 }
+#endif
 	 SET_BIT(mprog_cur_result, mprog_process_cmnd( cmnd, mob, actor, obj, vo, rndm ));
-         if(IS_SET(mprog_cur_result, eCH_DIED) || IS_SET(mprog_cur_result, eDELAYED_EXEC))
+
+#ifdef DEBUG_MPROG
+	 if (mob && mob->mobdata != (mob_data *)0x95959595 && mob_index[mob->mobdata->nr].virt == 4821) {
+	   if (IS_SET(mprog_cur_result, eFAILURE))
+	     fprintf(stderr, "eFAILURE ");
+	   if (IS_SET(mprog_cur_result, eSUCCESS))
+	     fprintf(stderr, "eSUCCESS ");
+	   if (IS_SET(mprog_cur_result, eCH_DIED))
+	     fprintf(stderr, "eCH_DIED ");
+	   if (IS_SET(mprog_cur_result, eVICT_DIED))
+	     fprintf(stderr, "eVICT_DIED ");
+	   if (IS_SET(mprog_cur_result, eINTERNAL_ERROR))
+	     fprintf(stderr, "eINTERNAL_ERROR ");
+	   if (IS_SET(mprog_cur_result, eEXTRA_VALUE))
+	     fprintf(stderr, "eEXTRA_VALUE ");
+	   if (IS_SET(mprog_cur_result, eEXTRA_VAL2))
+	     fprintf(stderr, "eEXTRA_VAL2 ");
+	   if (IS_SET(mprog_cur_result, eDELAYED_EXEC))
+	     fprintf(stderr, "eDELAYED_EXEC ");
+	   
+	   fprintf(stderr, "\n");
+	 }
+#endif
+         if(IS_SET(mprog_cur_result, eCH_DIED) || 
+	    IS_SET(mprog_cur_result, eDELAYED_EXEC) || 
+	    IS_SET(mprog_cur_result, eVICT_DIED))
            return null;
 	}
        cmnd     = com_list;
