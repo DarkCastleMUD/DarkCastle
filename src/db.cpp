@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.225 2014/07/05 21:15:25 jhhudso Exp $ */
+/* $Id: db.cpp,v 1.226 2014/07/15 21:31:47 jhhudso Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -36,6 +36,8 @@ extern "C"
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
+
+#include <sstream>
 
 #include <affect.h>
 #include <db.h>
@@ -63,6 +65,8 @@ extern "C"
 #include <quest.h>
 #include <vault.h>
 
+using namespace std;
+
 int load_new_help(FILE *fl, int reload, struct char_data *ch);
 void load_vaults();
 void load_auction_tickets();
@@ -72,6 +76,9 @@ void load_hints();
 void find_unordered_objects(void);
 void find_unordered_mobiles(void);
 char *mprog_type_to_name( int type );
+void write_wizlist(std::stringstream &filename);
+void write_wizlist(string filename);
+void write_wizlist(const char filename[]);
 
 /* load stuff */
 char* curr_type;
@@ -84,6 +91,7 @@ extern char *wear_bits[];
 extern char *extra_bits[];
 extern char *more_obj_bits[];
 extern char *apply_types[];
+extern uint16_t port1;
 
 /**************************************************************************
 *  declarations of most of the 'global' variables                         *
@@ -100,7 +108,6 @@ int top_of_world_alloc = 0;           // index of last alloc'd memory in world
 int top_of_zonet = 0;                 // index of last valid zonefile
 
 struct obj_data  *object_list = 0;    /* the global linked list of obj's */
-extern short bport;
 
 CHAR_DATA *character_list = 0; /* global l-list of chars          */
 pulse_data *bard_list = 0;      /* global l-list of bards          */
@@ -761,63 +768,71 @@ void free_wizlist_from_memory()
   }
 }
 
-void update_wizlist(CHAR_DATA *ch)
-{
-  int x /*,y = 0*/;
-  FILE *fl;
+void write_wizlist(std::stringstream &filename) {
+	write_wizlist(filename.str().c_str());
+}
 
-  if(IS_NPC(ch))
-    return;
+void write_wizlist(string filename) {
+	write_wizlist(filename.c_str());
+}
 
-  for(x = 0 ;; x++) {
-     if(wizlist[x].name[0] == '@') {
-       if(GET_LEVEL(ch) < IMMORTAL)
-         return;
-       dc_free(wizlist[x].name);
-       wizlist[x].name  = str_dup(GET_NAME(ch));
+void write_wizlist(const char filename[]) {
+	int x;
+	FILE *fl;
 
-       if (!strcmp(GET_NAME(ch), "Pirahna"))
-	 wizlist[x].level = PIRAHNA_FAKE_LVL;
-       else
-	 wizlist[x].level = GET_LEVEL(ch);
+	if (!(fl = dc_fopen(filename, "w"))) {
+		logf(IMMORTAL, LOG_BUG, "Unable to open wizlist file: %s", filename);
+		return;
+	}
 
-       wizlist[x+1].name  = str_dup("@");
-       wizlist[x+1].level = 0;
-       break;
-     }
-     else  {
-       if(isname(wizlist[x].name, GET_NAME(ch))) {
-	 if (!strcmp(GET_NAME(ch), "Pirahna"))
-	   wizlist[x].level = PIRAHNA_FAKE_LVL;
-	 else
-	   wizlist[x].level = GET_LEVEL(ch);
-         break;
-       }
-     }
-  }
+	for (x = 0;; x++) {
+		if (wizlist[x].name[0] == '@') {
+			fprintf(fl, "%s", "@ @\n");
+			break;
+		}
+		if (wizlist[x].level >= IMMORTAL)
+			fprintf(fl, "%s %d\n", wizlist[x].name, wizlist[x].level);
+	}
+	dc_fclose (fl);
+}
 
-  if(!(fl = dc_fopen("../lib/wizlist.txt", "w"))) {
-    log("db.c: error writing wizlist.txt", ANGEL, LOG_BUG);
-    perror("db.c...error writing wizlist.txt: ");
-    dc_fclose(fl);
-    return;
-  }
+void update_wizlist(CHAR_DATA *ch) {
+	int x;
 
-  for(x = 0 ;; x++) {
-     if(wizlist[x].name[0] == '@') {
-       fprintf(fl, "%s", "@ @\n");
-       break;
-     }
-     if(wizlist[x].level >= IMMORTAL)
-       fprintf(fl, "%s %d\n", wizlist[x].name, wizlist[x].level);
-  }
-  dc_fclose(fl);
+	if (IS_NPC(ch))
+		return;
 
-  if(system(0) && !bport)
-     system("cp ../lib/wizlist.txt /srv/www/www.dcastle.org/htdocs/wizlist.txt");
-  else log("Cannot save wizlist file to web dir.", 0, LOG_MISC);
+	for (x = 0;; x++) {
+		if (wizlist[x].name[0] == '@') {
+			if (GET_LEVEL(ch) < IMMORTAL)
+				return;
+			dc_free(wizlist[x].name);
+			wizlist[x].name = str_dup(GET_NAME(ch));
 
+			if (!strcmp(GET_NAME(ch), "Pirahna"))
+				wizlist[x].level = PIRAHNA_FAKE_LVL;
+			else
+				wizlist[x].level = GET_LEVEL(ch);
 
+			wizlist[x + 1].name = str_dup("@");
+			wizlist[x + 1].level = 0;
+			break;
+		} else {
+			if (isname(wizlist[x].name, GET_NAME(ch))) {
+				if (!strcmp(GET_NAME(ch), "Pirahna"))
+					wizlist[x].level = PIRAHNA_FAKE_LVL;
+				else
+					wizlist[x].level = GET_LEVEL(ch);
+				break;
+			}
+		}
+	}
+
+	write_wizlist("../lib/wizlist.txt");
+
+	stringstream ssbuffer;
+	ssbuffer << HTDOCS_DIR << port1 << "/wizlist.txt";
+	write_wizlist(ssbuffer.str().c_str());
 }
 
 int do_wizlist(CHAR_DATA *ch, char *argument, int cmd)
