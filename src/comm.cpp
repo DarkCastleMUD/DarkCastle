@@ -62,6 +62,7 @@
 #include <returnvals.h>
 #include <quest.h>
 #include <shop.h>
+#include <Leaderboard.h>
 
 #ifdef USE_SQL
 #include "Backend/Database.h"
@@ -88,6 +89,7 @@ using namespace std;
 #endif
 
 extern bool MOBtrigger;
+extern uint16_t port1, port2, port3, port4;
 unsigned mother_desc, other_desc, third_desc, fourth_desc;
 
 // This is turned on right before we call game_loop
@@ -102,11 +104,11 @@ short code_testing_mode_mob = 0;
 short code_testing_mode_world = 0;
 short bport = 0;
 bool allow_imp_password = false;
+uint16_t port1 = 0, port2 = 0, port3 = 0, port4 = 0;
 
 /* these are here for the eventual addition of ban */
 int num_invalid = 0;
 int restrict = 0;
-
 
 /* externs */
 extern int restrict;
@@ -122,7 +124,6 @@ extern struct char_data *character_list;
 extern char last_char_name[MAX_INPUT_LENGTH];
 extern char last_processed_cmd[MAX_INPUT_LENGTH];
 
-void check_leaderboard(void);
 void check_champion_and_website_who_list(void);
 void save_slot_machines(void);
 void check_silence_beacons(void);
@@ -168,10 +169,10 @@ char *any_one_arg(char *argument, char *first_arg);
 char * calc_color(int hit, int max_hit);
 void generate_prompt(CHAR_DATA *ch, char *prompt);
 int get_from_q(struct txt_q *queue, char *dest, int *aliased);
-void init_game(int port, int port2, int port3, int port4);
+void init_game(void);
 void signal_setup(void);
 void game_loop(unsigned mother_desc, unsigned other_desc, unsigned third_desc, unsigned fourth_desc);
-int init_socket(int port);
+int init_socket(uint16_t port);
 int new_descriptor(int s);
 int process_output(struct descriptor_data *t);
 int process_input(struct descriptor_data *t);
@@ -431,7 +432,7 @@ void finish_hotboot()
 }
 
 /* Init sockets, run game, and cleanup sockets */
-void init_game(int port, int port2, int port3, int port4)
+void init_game(void)
 {
 	/* Azrack -- do these need to be here?
   extern int mother_desc;
@@ -468,20 +469,19 @@ void init_game(int port, int port2, int port3, int port4)
   if((fp = fopen("died_in_bootup","w")))
     fclose(fp);
 
-  log("Attempting to load hotboot file.", 0, LOG_MISC);
-  if(load_hotboot_descs()) {
-    log("Hotboot Loading complete.", 0, LOG_MISC);
-    was_hotboot = 1;
-  }
-  else {
-    log("Hotboot failed.  Starting regular sockets.", 0, LOG_MISC);
-    log("Opening mother connections.", 0, LOG_MISC);
-    mother_desc = init_socket(port);
-    // no need for the other ports rinetd handles it now. Scratch that.
-       other_desc = init_socket(port2);
-       third_desc = init_socket(port3);
-       fourth_desc = init_socket(port4);
-  }
+	log("Attempting to load hotboot file.", 0, LOG_MISC);
+	if (load_hotboot_descs()) {
+		log("Hotboot Loading complete.", 0, LOG_MISC);
+		was_hotboot = 1;
+	} else {
+		log("Hotboot failed.  Starting regular sockets.", 0, LOG_MISC);
+		log("Opening mother connections.", 0, LOG_MISC);
+		mother_desc = init_socket(port1);
+		// no need for the other ports rinetd handles it now. Scratch that.
+		other_desc = init_socket(port2);
+		third_desc = init_socket(port3);
+		fourth_desc = init_socket(port4);
+	}
 
   start_time = time(0);
   boot_db();
@@ -571,7 +571,7 @@ void init_game(int port, int port2, int port3, int port4)
  * init_socket sets up the mother descriptor - creates the socket, sets
  * its options up, binds it, and listens.
  */
-int init_socket(int port)
+int init_socket(uint16_t port)
 {
   int s, opt;
   struct sockaddr_in sa;
@@ -1023,8 +1023,10 @@ void heartbeat()
     update_corpses_and_portals();
     check_idle_passwords();
     quest_update();
+
+    leaderboard.check(); //good place to put this
+
     if(!bport) {
-      check_leaderboard(); //good place to put this
       check_champion_and_website_who_list();
     }
     save_slot_machines();
