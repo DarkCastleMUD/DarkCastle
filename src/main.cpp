@@ -24,15 +24,15 @@ extern short code_testing_mode_mob;
 extern short code_testing_mode_world;
 extern short bport;
 extern bool allow_imp_password;
+extern uint16_t port1, port2, port3, port4;
 
 bool verbose_mode = FALSE;
 int scheck = 0; /* for syntax checking mode */
-int port, port2, port3, port4;
-int DFLT_PORT = 6667, DFLT_PORT2 = 6666, DFLT_PORT3 = 4000, DFLT_PORT4 = 6669;
+uint16_t DFLT_PORT = 6667, DFLT_PORT2 = 6666, DFLT_PORT3 = 4000, DFLT_PORT4 = 6669;
 CVoteData *DCVote;
 
 void init_random();
-void init_game(int port, int port2, int port3, int port4);
+void init_game(void);
 void boot_zones(void);
 void boot_world(void);
 
@@ -66,7 +66,7 @@ int main(int argc, char **argv) {
 
 	init_random();
 
-	port = DFLT_PORT;
+	port1 = DFLT_PORT;
 	port2 = DFLT_PORT2;
 	port3 = DFLT_PORT3;
 	port4 = DFLT_PORT4;
@@ -118,7 +118,7 @@ int main(int argc, char **argv) {
 			break;
 		case 'b': // Buildin' port.
 			bport = 1;
-			port = 7000;
+			port1 = 7000;
 			port2 = 7001;
 			port3 = 7002;
 			port4 = 7003;
@@ -134,7 +134,7 @@ int main(int argc, char **argv) {
 			}
 			break;
 		case 'p':
-			port = 1500;
+			port1 = 1500;
 			port2 = 1501;
 			port3 = 1502;
 			port4 = 1503;
@@ -159,16 +159,16 @@ int main(int argc, char **argv) {
 					"Usage: %s [-c] [-m] [-q] [-r] [-s] [-d pathname] [port #]\n",
 					argv[0]);
 			exit(1);
-		} else if ((port = atoi(argv[pos])) <= 1024) {
+		} else if ((port1 = atoi(argv[pos])) <= 1024) {
 			fprintf(stderr, "Illegal port number.\n");
 			exit(1);
 		}
 	}
 
-	if (port != DFLT_PORT) {
-		port2 = port + 1;
-		port3 = port + 2;
-		port4 = port + 3;
+	if (port1 != DFLT_PORT) {
+		port2 = port1 + 1;
+		port3 = port1 + 2;
+		port4 = port1 + 3;
 	}
 #ifdef WIN32
 	for(unsigned i = 0; i < strlen(dir); i++)
@@ -205,8 +205,8 @@ int main(int argc, char **argv) {
 		log("Done.", 0, LOG_MISC);
 		exit(0);
 	} else {
-		logf(0, LOG_MISC, "Running game on port %d, %d and %d.", port, port2, port3);
-		init_game(port, port2, port3, port4);
+		logf(0, LOG_MISC, "Running game on port %d, %d and %d.", port1, port2, port3);
+		init_game();
 	}
 
 	delete DCVote;
