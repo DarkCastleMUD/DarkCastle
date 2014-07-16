@@ -5,7 +5,7 @@
  *                                                                           *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-/* $Id: magic.h,v 1.39 2009/05/05 19:01:36 shane Exp $ */
+/* $Id: magic.h,v 1.40 2014/07/16 00:43:13 jhhudso Exp $ */
 #ifndef MAGIC_H_
 #define MAGIC_H_
 
@@ -715,6 +715,10 @@ int cast_heroism(ubyte level, CHAR_DATA * ch, char *arg, int type,
 int spell_consecrate(ubyte level, CHAR_DATA * ch,
    CHAR_DATA * victim, struct obj_data * obj, int skill);
 int cast_consecrate(ubyte level, CHAR_DATA * ch, char *arg, int type,
+   CHAR_DATA * victim, struct obj_data * tar_obj, int skill);
+int spell_desecrate(ubyte level, CHAR_DATA * ch,
+   CHAR_DATA * victim, struct obj_data * obj, int skill);
+int cast_desecrate(ubyte level, CHAR_DATA * ch, char *arg, int type,
    CHAR_DATA * victim, struct obj_data * tar_obj, int skill);
 
 #endif
