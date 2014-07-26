@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: obj.h,v 1.33 2012/12/17 20:52:29 jhhudso Exp $ */
+/* $Id: obj.h,v 1.34 2014/07/26 19:26:33 jhhudso Exp $ */
 #ifndef OBJ_H_
 #define OBJ_H_
 
@@ -220,33 +220,36 @@ struct obj_affected_type
 };
 
 struct tab_data;
+struct table_data;
+struct machine_data;
+struct wheel_data;
+
 /* ======================== Structure for object ========================= */
-struct obj_data
-{
-     int32 item_number;            /* Where in data-base               */
-     int32 in_room;                /* In what room -1 when conta/carr  */ 
-     int vroom;                   /* for corpse saving */
-    struct obj_flag_data obj_flags;/* Object information               */
-     int16 num_affects;
-    struct obj_affected_type *affected; /* Which abilities in PC to change  */
+struct obj_data {
+	int32 item_number;                  /* Where in data-base               */
+	int32 in_room;                      /* In what room -1 when conta/carr  */
+	int vroom;                          /* for corpse saving */
+	obj_flag_data obj_flags;            /* Object information               */
+	int16 num_affects;
+	obj_affected_type *affected;        /* Which abilities in PC to change  */
 
-    char *name;                    /* Title of object :get etc.        */
-    char *description ;            /* When in room                     */
-    char *short_description;       /* when worn/carry/in cont.         */
-    char *action_description;      /* What to write when used          */
-    struct extra_descr_data *ex_description; /* extra descriptions     */
-    CHAR_DATA *carried_by;         /* Carried by :NULL in room/conta   */
-    CHAR_DATA *equipped_by;        /* so I can access the player :)    */
+	char *name;                         /* Title of object :get etc.        */
+	char *description;                  /* When in room                     */
+	char *short_description;            /* when worn/carry/in cont.         */
+	char *action_description;           /* What to write when used          */
+	extra_descr_data *ex_description;   /* extra descriptions     */
+	CHAR_DATA *carried_by;              /* Carried by :NULL in room/conta   */
+	CHAR_DATA *equipped_by;             /* so I can access the player :)    */
 
-    struct obj_data *in_obj;       /* In what object NULL when none    */
-    struct obj_data *contains;     /* Contains objects                 */
+	obj_data *in_obj;                   /* In what object NULL when none    */
+	obj_data *contains;                 /* Contains objects                 */
 
-    struct obj_data *next_content; /* For 'contains' lists             */
-    struct obj_data *next;         /* For the object list              */
-    struct obj_data *next_skill; 
-    struct table_data *table;
-    struct machine_data *slot;
-    struct wheel_data *wheel;
+	obj_data *next_content;             /* For 'contains' lists             */
+	obj_data *next;                     /* For the object list              */
+	obj_data *next_skill;
+	table_data *table;
+	machine_data *slot;
+	wheel_data *wheel;
 };
 
 /* For 'equipment' */
