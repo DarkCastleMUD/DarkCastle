@@ -1314,7 +1314,7 @@ void make_prompt(struct descriptor_data *d, char *prompt)
         struct room_data *rm = &world[d->character->in_room];
         sprintf(buf,
                 IS_SET(GET_TOGGLES(d->character), PLR_ANSI) ?
-                "Z:"RED"%d "NTEXT"R:"GREEN"%d "NTEXT"I:"YELLOW"%ld"NTEXT"> " :
+                "Z:" RED "%d " NTEXT "R:" GREEN "%d " NTEXT "I:" YELLOW "%ld" NTEXT "> " :
                 "Z:%d R:%d I:%ld> ",
                 rm->zone, rm->number, d->character->pcdata->wizinvis);
         strcat(prompt, buf);
