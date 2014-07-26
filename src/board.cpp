@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: board.cpp,v 1.44 2014/07/04 22:00:04 jhhudso Exp $
+| $Id: board.cpp,v 1.45 2014/07/26 23:01:47 jhhudso Exp $
 | board.C
 | Description:  This file contains the implementation for the board
 |   code.  It's old and should be rewritten --Morc XXX
@@ -1070,7 +1070,7 @@ int board_display_msg(CHAR_DATA *ch, char *arg, std::map<std::string, BOARD_INFO
 
   if(IS_MOB(ch) || IS_SET(ch->pcdata->toggles, PLR_ANSI))
   {
-    snprintf(buf, MAX_STRING_LENGTH, "Message %2d (%s): " RED BOLD "%-14s " YELLOW"- %s"NTEXT,
+    snprintf(buf, MAX_STRING_LENGTH, "Message %2d (%s): " RED BOLD "%-14s " YELLOW "- %s" NTEXT,
          tmessage, board->second.msgs[tmessage].date.c_str(), 
          board->second.msgs[tmessage].author.c_str(), board->second.msgs[tmessage].title.c_str() );
     board_msg += buf;
@@ -1082,7 +1082,7 @@ int board_display_msg(CHAR_DATA *ch, char *arg, std::map<std::string, BOARD_INFO
     board_msg += buf;
   }
   
-  snprintf(buf,MAX_STRING_LENGTH, "\n\r----------\n\r"CYAN"%s"NTEXT, board->second.msgs[tmessage].text.c_str());
+  snprintf(buf,MAX_STRING_LENGTH, "\n\r----------\n\r" CYAN "%s" NTEXT, board->second.msgs[tmessage].text.c_str());
   board_msg += buf;
 
   page_string(ch->desc, board_msg.c_str(), 1);
@@ -1138,7 +1138,7 @@ int board_show_board(CHAR_DATA *ch, char *arg, std::map<std::string, BOARD_INFO>
     for (msg_it = board->second.msgs.rbegin(); (i > 0) && (msg_it < board->second.msgs.rend()); ++msg_it ) 
        if(IS_MOB(ch) || IS_SET(ch->pcdata->toggles, PLR_ANSI))
        {
-         snprintf(buf, MAX_STRING_LENGTH, "(%s) "YELLOW"%-14s "RED"%2d: "GREEN"%.47s"NTEXT"\n\r", 
+         snprintf(buf, MAX_STRING_LENGTH, "(%s) " YELLOW "%-14s " RED "%2d: " GREEN "%.47s" NTEXT "\n\r",
                   msg_it->date.c_str(), msg_it->author.c_str(),i--, msg_it->title.c_str());
          board_msg += buf;
 //         csendf(ch, "(%s) "YELLOW"%-14s "RED"%2d: "GREEN"%.47s"NTEXT"\n\r", msg_it->date.c_str(),
