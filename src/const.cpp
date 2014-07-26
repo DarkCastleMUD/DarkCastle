@@ -12,7 +12,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: const.cpp,v 1.331 2012/12/17 18:30:01 jhhudso Exp $ */
+/* $Id: const.cpp,v 1.332 2014/07/26 23:07:12 jhhudso Exp $ */
 
 extern "C"
 {
@@ -827,6 +827,14 @@ L(0x7FFFFFFF)
 #undef K
 #undef L
 
+
+char *mob_types[] =
+{
+		"NORMAL",
+		"GUARD",
+		"CLAN GUARD",
+		"\n"
+};
 
 char *item_types[] =
 {
