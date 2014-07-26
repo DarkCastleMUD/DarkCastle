@@ -1,4 +1,4 @@
-/* $Id: clan.cpp,v 1.91 2014/07/15 21:28:40 jhhudso Exp $ */
+/* $Id: clan.cpp,v 1.92 2014/07/26 16:19:37 jhhudso Exp $ */
 
 /***********************************************************************/
 /* Revision History                                                    */
@@ -32,6 +32,7 @@ extern "C"
 #include <room.h> // CLAN_ROOM flag
 #include <returnvals.h>
 #include <spells.h>
+
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -49,6 +50,7 @@ extern uint16_t port1;
 
 void send_info(char *messg);
 void addtimer(struct timer_data *timer);
+void delete_clan(const clan_data *currclan);
 
 clan_data * clan_list = 0;
 clan_data * end_clan_list = 0;
@@ -76,145 +78,170 @@ char * clan_rights[] = {
 };
 
 
-void boot_clans(void)
-{
-  FILE * fl;
-  char buf[1024];
-  clan_data * new_new_clan = NULL;
-  clan_room_data * new_new_room = NULL;
-  clan_member_data * new_new_member = NULL;
-  int tempint;
+void boot_clans(void) {
+	FILE * fl;
+	char buf[1024];
+	clan_data * new_new_clan = NULL;
+	clan_room_data * new_new_room = NULL;
+	clan_member_data * new_new_member = NULL;
+	int tempint;
+	bool skip_clan = false, changes_made = false;
 
-  if(!(fl = dc_fopen("../lib/clan.txt", "r"))) {
-    fprintf(stderr, "Unable to open clan file...\n");
-    fl = dc_fopen("../lib/clan.txt", "w");
-    fprintf(fl, "~\n");
-    dc_fclose(fl);
-    abort();
-  }
+	if (!(fl = dc_fopen("../lib/clan.txt", "r"))) {
+		fprintf(stderr, "Unable to open clan file...\n");
+		fl = dc_fopen("../lib/clan.txt", "w");
+		fprintf(fl, "~\n");
+		dc_fclose(fl);
+		abort();
+	}
 
-  char a;
-  while((a = fread_char(fl)) != '~') {
-   ungetc(a, fl);
-    new_new_clan = new clan_data;
-    new_new_clan->next = 0;
-    new_new_clan->tax = 0;
-    new_new_clan->email = NULL;
-    new_new_clan->description = NULL;
-    new_new_clan->login_message = NULL;
-    new_new_clan->death_message = NULL;
-    new_new_clan->logout_message = NULL;
-    new_new_clan->rooms = NULL;
-    new_new_clan->members = NULL;
-    new_new_clan->acc = 0;
-    new_new_clan->amt = 0;
-//    sscanf(buf, "%s %s %s %hd", new_new_clan->leader, new_new_clan->founder,
-//           new_new_clan->name, &new_new_clan->number);
+	char a;
+	while ((a = fread_char(fl)) != '~') {
+		ungetc(a, fl);
 
-    new_new_clan->leader = fread_word(fl, 1);
-    new_new_clan->founder = fread_word(fl, 1);
-    new_new_clan->name = fread_word(fl, 1);
-    new_new_clan->number = fread_int(fl,0, LONG_MAX);
-    // read in clan rooms
-//    fgets(buf, 198, fl);
-     char b;
-    while(TRUE) /* I see clan rooms! */
-    {
-	b = fread_char(fl);
-      if (b == 'S') break;
-      if (b != 'R') continue;
-#ifdef LEAK_CHECK
-      new_new_room = (struct clan_room_data *)calloc(1, sizeof(struct clan_room_data));
-#else
-      new_new_room = (struct clan_room_data *)dc_alloc(1, sizeof(struct clan_room_data));
-#endif
-      new_new_room->next = new_new_clan->rooms;
-      tempint = fread_int(fl, 0, 50000);
-      new_new_room->room_number = (int16) tempint;
-      new_new_clan->rooms = new_new_room;
-    }
-
-//    fgets(buf, 198, fl);
-    char a;
-    
-    while( (a = fread_char(fl)) != '~' )
-    {
-	if (a != ' ' && a != '\n')
-	getc(fl);
-      switch(a) {
-	case ' ':
-	case '\n':
-	  break;
-        case 'E': {
-          new_new_clan->email = fread_string(fl, 0);
-          break;
-        }
-        case 'D': {
-          new_new_clan->description = fread_string(fl, 0);
-          break;
-        }
-        case 'C': {
-          new_new_clan->clanmotd = fread_string(fl, 0);
-          break;
-        }
-	case 'B': { // Account balance
-		try {
-			new_new_clan->setBalance(fread_uint(fl,0,UINT64_MAX));
-		} catch (error_negative_int &e) {
-			fprintf(stderr, "negative clan balance read for clan %d.\n", new_new_clan->number);
-			fprintf(stderr, "Setting clan %d's balance to 0.\n", new_new_clan->number);
-			new_new_clan->setBalance(0);
-		} catch (...) {
-			fprintf(stderr, "unknown error reading clan balance for clan %d.\n", new_new_clan->number);
-			fprintf(stderr, "Setting clan %d's balance to 0.\n", new_new_clan->number);
-			new_new_clan->setBalance(0);
+		new_new_clan = new clan_data;
+		new_new_clan->next = 0;
+		new_new_clan->tax = 0;
+		new_new_clan->email = NULL;
+		new_new_clan->description = NULL;
+		new_new_clan->login_message = NULL;
+		new_new_clan->death_message = NULL;
+		new_new_clan->logout_message = NULL;
+		new_new_clan->rooms = NULL;
+		new_new_clan->members = NULL;
+		new_new_clan->acc = 0;
+		new_new_clan->amt = 0;
+		new_new_clan->leader = fread_word(fl, 1);
+		new_new_clan->founder = fread_word(fl, 1);
+		new_new_clan->name = fread_word(fl, 1);
+		new_new_clan->number = fread_int(fl, 0, LONG_MAX);
+		if (new_new_clan->number < 1 || new_new_clan->number >= LONG_MAX) {
+			logf(LOG_BUG, 0, "Invalid clan number %d found in ../lib/clan.txt.", new_new_clan->number);
+			skip_clan = true;
 		}
-	   break;
-	}
-	case 'T': { // Tax
-	  new_new_clan->tax = fread_int(fl,0,99);
-	  break;
-	}
-        case 'L': {
-          new_new_clan->login_message = fread_string(fl, 0);
-          break;
-        }
-        case 'X': {
-          new_new_clan->death_message = fread_string(fl, 0);
-          break;
-        }
-        case 'O': {
-          new_new_clan->logout_message = fread_string(fl, 0);
-          break;
-        }
-        case 'M': { // read a member
+
+		if (get_clan(new_new_clan->number) != NULL) {
+			logf(LOG_BUG, 0, "Duplicate clan number %d found in ../lib/clan.txt.", new_new_clan->number);
+			skip_clan = true;
+		}
+
+		char b;
+		while (TRUE) /* I see clan rooms! */
+		{
+			b = fread_char(fl);
+			if (b == 'S')
+				break;
+			if (b != 'R')
+				continue;
 #ifdef LEAK_CHECK
-          new_new_member = (struct clan_member_data *)calloc(1, sizeof(struct clan_member_data));
+			new_new_room = (struct clan_room_data *)calloc(1, sizeof(struct clan_room_data));
 #else
-          new_new_member = (struct clan_member_data *)dc_alloc(1, sizeof(struct clan_member_data));
+			new_new_room = (struct clan_room_data *) dc_alloc(1,
+					sizeof(struct clan_room_data));
 #endif
-          new_new_member->member_name = fread_string(fl, 0);
-	  new_new_member->member_rights = fread_int(fl, 0, LONG_MAX);
-          new_new_member->member_rank = fread_int(fl, 0, LONG_MAX);
-          new_new_member->unused1 = fread_int(fl, 0, LONG_MAX);
-          new_new_member->unused2 = fread_int(fl, 0, LONG_MAX);
-          new_new_member->unused3 = fread_int(fl, 0, LONG_MAX);
-          new_new_member->time_joined = fread_int(fl, 0, LONG_MAX);
-          new_new_member->unused4 = fread_string(fl, 0);
+			new_new_room->next = new_new_clan->rooms;
+			tempint = fread_int(fl, 0, 50000);
+			new_new_room->room_number = (int16) tempint;
+			new_new_clan->rooms = new_new_room;
+		}
 
-          // add it to the member linked list
-          add_clan_member(new_new_clan, new_new_member);
-          break;
-        }
-        default: log("Illegal switch hit in boot_clans.", 0, LOG_MISC);
-                 log(buf, 0, LOG_MISC);
-          break;
-      }
-    }
-    add_clan(new_new_clan);
-  }
+		char a;
+		while ((a = fread_char(fl)) != '~') {
+			if (a != ' ' && a != '\n')
+				getc(fl);
+			switch (a) {
+			case ' ':
+			case '\n':
+				break;
+			case 'E': {
+				new_new_clan->email = fread_string(fl, 0);
+				break;
+			}
+			case 'D': {
+				new_new_clan->description = fread_string(fl, 0);
+				break;
+			}
+			case 'C': {
+				new_new_clan->clanmotd = fread_string(fl, 0);
+				break;
+			}
+			case 'B': { // Account balance
+				try {
+					new_new_clan->setBalance(fread_uint(fl, 0, UINT64_MAX));
+				} catch (error_negative_int &e) {
+					fprintf(stderr, "negative clan balance read for clan %d.\n",
+							new_new_clan->number);
+					fprintf(stderr, "Setting clan %d's balance to 0.\n",
+							new_new_clan->number);
+					new_new_clan->setBalance(0);
+				} catch (...) {
+					fprintf(stderr,
+							"unknown error reading clan balance for clan %d.\n",
+							new_new_clan->number);
+					fprintf(stderr, "Setting clan %d's balance to 0.\n",
+							new_new_clan->number);
+					new_new_clan->setBalance(0);
+				}
+				break;
+			}
+			case 'T': { // Tax
+				new_new_clan->tax = fread_int(fl, 0, 99);
+				break;
+			}
+			case 'L': {
+				new_new_clan->login_message = fread_string(fl, 0);
+				break;
+			}
+			case 'X': {
+				new_new_clan->death_message = fread_string(fl, 0);
+				break;
+			}
+			case 'O': {
+				new_new_clan->logout_message = fread_string(fl, 0);
+				break;
+			}
+			case 'M': { // read a member
+#ifdef LEAK_CHECK
+			new_new_member = (struct clan_member_data *)calloc(1, sizeof(struct clan_member_data));
+#else
+				new_new_member = (struct clan_member_data *) dc_alloc(1,
+						sizeof(struct clan_member_data));
+#endif
+				new_new_member->member_name = fread_string(fl, 0);
+				new_new_member->member_rights = fread_int(fl, 0, LONG_MAX);
+				new_new_member->member_rank = fread_int(fl, 0, LONG_MAX);
+				new_new_member->unused1 = fread_int(fl, 0, LONG_MAX);
+				new_new_member->unused2 = fread_int(fl, 0, LONG_MAX);
+				new_new_member->unused3 = fread_int(fl, 0, LONG_MAX);
+				new_new_member->time_joined = fread_int(fl, 0, LONG_MAX);
+				new_new_member->unused4 = fread_string(fl, 0);
 
-  dc_fclose(fl);
+				// add it to the member linked list
+				add_clan_member(new_new_clan, new_new_member);
+				break;
+			}
+			default:
+				log("Illegal switch hit in boot_clans.", 0, LOG_MISC);
+				log(buf, 0, LOG_MISC);
+				break;
+			}
+		}
+		if (skip_clan) {
+			skip_clan = false;
+			logf(LOG_BUG, 0, "Deleting clan number %d.", new_new_clan->number);
+			delete_clan(new_new_clan);
+			changes_made = true;
+		} else {
+			add_clan(new_new_clan);
+		}
+	}
+
+	dc_fclose(fl);
+
+	if (changes_made) {
+		logf(LOG_BUG, 0, "Changes made to clans. Saving ../lib/clan.txt.");
+		save_clans();
+	}
 }
 
 void save_clans(void) {
@@ -358,42 +385,43 @@ void save_clans(void) {
 
 }
 
-void free_clans_from_memory()
-{
-  clan_data * currclan = NULL;
-  clan_data * nextclan = NULL;
-  struct clan_room_data * curr_room = NULL;
-  struct clan_room_data * next_room = NULL;
-  struct clan_member_data * curr_member = NULL;
-  struct clan_member_data * next_member = NULL;
+void delete_clan(const clan_data * currclan) {
+	struct clan_room_data * curr_room = NULL;
+	struct clan_room_data * next_room = NULL;
+	struct clan_member_data * curr_member = NULL;
+	struct clan_member_data * next_member = NULL;
 
-  for(currclan = clan_list; currclan; currclan = nextclan)
-  {
-    nextclan = currclan->next;
+	for (curr_room = currclan->rooms; curr_room; curr_room = next_room) {
+		next_room = curr_room->next;
+		dc_free(curr_room);
+	}
+	for (curr_member = currclan->members; curr_member; curr_member =
+			next_member) {
+		next_member = curr_member->next;
+		free_member(curr_member);
+	}
+	if (currclan->description)
+		dc_free(currclan->description);
+	if (currclan->email)
+		dc_free(currclan->email);
+	if (currclan->login_message)
+		dc_free(currclan->login_message);
+	if (currclan->logout_message)
+		dc_free(currclan->logout_message);
+	if (currclan->death_message)
+		dc_free(currclan->death_message);
 
-    for(curr_room = currclan->rooms; curr_room; curr_room = next_room)
-    {
-      next_room = curr_room->next;
-      dc_free(curr_room);
-    }
-    for(curr_member = currclan->members; curr_member; curr_member = next_member)
-    {
-      next_member = curr_member->next;
-      free_member(curr_member);
-    }
-    if(currclan->description)
-      dc_free(currclan->description);
-    if(currclan->email)
-      dc_free(currclan->email);
-    if(currclan->login_message)
-      dc_free(currclan->login_message);
-    if(currclan->logout_message)
-      dc_free(currclan->logout_message);
-    if(currclan->death_message)
-      dc_free(currclan->death_message);
+	delete currclan;
+}
 
-    delete currclan;
-  }
+void free_clans_from_memory(void) {
+	clan_data * currclan = NULL;
+	clan_data * nextclan = NULL;
+
+	for (currclan = clan_list; currclan; currclan = nextclan) {
+		nextclan = currclan->next;
+		delete_clan(currclan);
+	}
 }
 
 void assign_clan_rooms()
@@ -688,7 +716,7 @@ clan_data * get_clan(int nClan)
   clan_data *clan = NULL;
 
   if (nClan == 0)
-    return 0;
+    return NULL;
 
   for(clan = clan_list; clan; clan = clan->next)
      if(nClan == clan->number)
@@ -1654,7 +1682,8 @@ void do_god_clans(CHAR_DATA *ch, char *arg, int cmd)
   char text[MAX_INPUT_LENGTH];
   char last[MAX_INPUT_LENGTH];
 
-  int i, x;
+  int i;
+  int32_t x;
   int16 skill;
 
   char *god_values[] = {
@@ -1708,6 +1737,16 @@ void do_god_clans(CHAR_DATA *ch, char *arg, int cmd)
         return;
       }
       x = atoi(last);
+      if (x < 1 || x > (1 << 8*sizeof(uint16_t))-1) {
+    	  csendf(ch, "%d (%d) is an invalid clan number.\r\n", x, (1 << 8*sizeof(uint16_t))-1);
+    	  return;
+      }
+
+      if (get_clan(x) != NULL) {
+    	  csendf(ch, "%d is an invalid clan number because it already exists.\r\n", x);
+    	  return;
+      }
+
       clan = new clan_data;
       clan->leader = str_dup(GET_NAME(ch));
       clan->amt = 0;
