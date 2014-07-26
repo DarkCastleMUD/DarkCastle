@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: wizard.cpp,v 1.83 2014/07/04 22:00:04 jhhudso Exp $
+| $Id: wizard.cpp,v 1.84 2014/07/26 23:21:23 jhhudso Exp $
 | wizard.C
 | Description:  Utility functions necessary for wiz commands.
 */
@@ -518,12 +518,24 @@ void mob_stat(struct char_data *ch, struct char_data *k)
   extern char *connected_types[];
   extern race_shit race_info[];
   extern char *isr_bits[];
+  extern char *mob_types[];
   
-  sprintf(buf, "$3%s$R - $3Name$R: [%s]  $3VNum$R: %d  $3RNum$R: %d  $3In room:$R %d\n\r",
-          (!IS_NPC(k) ? "PC" : "MOB"),
-          GET_NAME(k),
-          (IS_NPC(k) ?  mob_index[k->mobdata->nr].virt : 0),
-          (IS_NPC(k) ? k->mobdata->nr : 0), k->in_room == NOWHERE ? -1 : world[k->in_room].number);
+  if (IS_MOB(k)) {
+		sprintf(buf,
+				"$3%s$R - $3Name$R: [%s]  $3VNum$R: %d  $3RNum$R: %d  $3In room:$R %d $3Mobile type:$R ",
+				(!IS_NPC(k) ? "PC" : "MOB"), GET_NAME(k),
+				(IS_NPC(k) ? mob_index[k->mobdata->nr].virt : 0),
+				(IS_NPC(k) ? k->mobdata->nr : 0),
+				k->in_room == NOWHERE ? -1 : world[k->in_room].number);
+
+		sprinttype(GET_MOB_TYPE(k), mob_types, buf2);
+		strcat(buf, buf2);
+		strcat(buf, "\n\r");
+	} else {
+		sprintf(buf, "$3%s$R - $3Name$R: [%s]  $3In room:$R %d\n\r",
+				(!IS_NPC(k) ? "PC" : "MOB"), GET_NAME(k),
+				k->in_room == NOWHERE ? -1 : world[k->in_room].number);
+	}
   send_to_char(buf, ch);
 
   strcpy(buf,"$3Short description$R: ");
@@ -818,7 +830,38 @@ void mob_stat(struct char_data *ch, struct char_data *k)
       send_to_char(buf, ch);
     }
     send_to_char("\n\r", ch);
-  } 
+  }
+
+  if (IS_MOB(k)) {
+	switch (k->mobdata->mob_flags.type) {
+	case mob_type_t::MOB_NORMAL:
+		break;
+	case mob_type_t::MOB_GUARD:
+		sprintf(buf, "$3Guard room (v1)$R: [%d]\n\r"
+				     " $3Direction (v2)$R: [%d]\n\r"
+				     "    $3Unused (v3)$R: [%d]\n\r"
+				     "    $3Unused (v4)$R: [%d]\n\r",
+				k->mobdata->mob_flags.value[0], k->mobdata->mob_flags.value[1],
+				k->mobdata->mob_flags.value[2], k->mobdata->mob_flags.value[3]);
+		send_to_char(buf, ch);
+		break;
+	case mob_type_t::MOB_CLAN_GUARD:
+		sprintf(buf, "$3Guard room (v1)$R: [%d]\n\r"
+				     " $3Direction (v2)$R: [%d]\n\r"
+				     "  $3Clan num (v3)$R: [%d]\n\r"
+				     "    $3Unused (v4)$R: [%d]\n\r",
+				k->mobdata->mob_flags.value[0], k->mobdata->mob_flags.value[1],
+				k->mobdata->mob_flags.value[2], k->mobdata->mob_flags.value[3]);
+		send_to_char(buf, ch);
+		break;
+	default:
+		sprintf(buf, "$3Values 1-4 : [$R%d$3] [$R%d$3] [$R%d$3] [$R%d$3]$R\n\r",
+				k->mobdata->mob_flags.value[0], k->mobdata->mob_flags.value[1],
+				k->mobdata->mob_flags.value[2], k->mobdata->mob_flags.value[3]);
+		send_to_char(buf, ch);
+		break;
+	}
+  }
 }    
 
 void obj_stat(struct char_data *ch, struct obj_data *j)

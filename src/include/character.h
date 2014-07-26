@@ -1,7 +1,7 @@
 #ifndef CHARACTER_H_
 #define CHARACTER_H_
 /******************************************************************************
-| $Id: character.h,v 1.84 2013/12/30 22:46:43 jhhudso Exp $
+| $Id: character.h,v 1.85 2014/07/26 23:21:23 jhhudso Exp $
 | Description: This file contains the header information for the character
 |   class implementation.
 */
@@ -176,37 +176,6 @@ struct follow_type
     CHAR_DATA *follower;
     struct follow_type *next;
 };
-/*
-#define VIEW_ACCESS 1
-#define DEPOSIT_ACCESS 2
-#define WITHDRAW_ACCESS 3
-#define FULL_ACCESS 4
-
-struct vault_access_data
-{
-  struct vault_access_data *next;
-  bool self; // own vault, or remote vault
-  char *name; // also used as an integer for clans. 
-  int segment;
-  bool view;
-  bool deposit;
-  bool withdraw;
-};
-
-
-struct player_vault
-{
-  char *segment[20];
-  char *last_search;
-  int max_contain, contains;
-  int nr_items;
-  uint amt;
-  OBJ_DATA *content;
-  struct vault_access_data *acc;
-};
-*/
-
-
 
 // DO NOT change most of these types without checking the save files
 // first, or you will probably end up corrupting all the pfiles
@@ -288,6 +257,15 @@ struct pc_data
     uint8_t profession;
 };
 
+enum mob_type_t { MOB_NORMAL = 0, MOB_GUARD, MOB_CLAN_GUARD, MOB_TYPE_FIRST = MOB_NORMAL, MOB_TYPE_LAST = MOB_CLAN_GUARD };
+const int MAX_MOB_VALUES = 4;
+
+struct mob_flag_data
+{
+    int32 value[MAX_MOB_VALUES]; /* Mob type-specific value numbers */
+    mob_type_t type;             /* Type of mobile                     */
+};
+
 struct mob_data
 {
     int32 nr;
@@ -308,8 +286,8 @@ struct mob_data
 		      // For !magic,!track changing flags.
     struct threat_struct *threat;
     struct reset_com *reset;
+	mob_flag_data mob_flags;            /* Mobile information               */
 };
-
 
 // CHAR_DATA, char_data
 // This contains all memory items for a player/mob

@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.226 2014/07/15 21:31:47 jhhudso Exp $ */
+/* $Id: db.cpp,v 1.227 2014/07/26 23:21:23 jhhudso Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -38,6 +38,7 @@ extern "C"
 #endif
 
 #include <sstream>
+#include <limits>
 
 #include <affect.h>
 #include <db.h>
@@ -206,7 +207,7 @@ void fread_new_newline (FILE *fl) {}
 char fread_char (FILE *fl);
 struct index_data *generate_mob_indices(int *top, struct index_data *index);
 struct index_data *generate_obj_indices(int *top, struct index_data *index);
-int is_empty(int zone_nr);
+int zone_is_empty(int zone_nr);
 void reset_zone(int zone);
 void fix_shopkeepers_inventory ();
 int file_to_string(const char *name, char *buf);
@@ -2737,6 +2738,15 @@ CHAR_DATA *read_mobile(int nr, FILE *fl)
              ungetc( letter, fl );
              mprog_read_programs( fl, nr, FALSE );
              break;
+          case 'Y': // type
+        	  mob->mobdata->mob_flags.type = (mob_type_t)fread_int (fl, mob_type_t::MOB_TYPE_FIRST, mob_type_t::MOB_TYPE_LAST);
+              fread_new_newline (fl);
+        	  break;
+          case 'V': // value
+        	  i = fread_int (fl, 0, MAX_MOB_VALUES-1);
+        	  mob->mobdata->mob_flags.value[i] = fread_int (fl, -1000, LONG_MAX);
+        	  fread_new_newline (fl);
+        	  break;
           case 'S':
              break;
           default: 
@@ -2896,6 +2906,13 @@ void write_mobile(char_data * mob, FILE *fl)
     if(mob_index[mob->mobdata->nr].mobprogs) {
       write_mprog_recur(fl, mob_index[mob->mobdata->nr].mobprogs,TRUE);
       fprintf(fl, "|\n");
+    }
+
+    if (mob->mobdata->mob_flags.type > 0) {
+    	fprintf(fl, "Y %d\n", mob->mobdata->mob_flags.type);
+    	for (uint32_t i=0; i < MAX_MOB_VALUES; ++i) {
+    		fprintf(fl, "V %d %d\n", i, mob->mobdata->mob_flags.value[i]);
+    	}
     }
 
     fprintf(fl, "S\n");
@@ -4244,11 +4261,11 @@ void zone_update(void)
   for(i = 0; i <= top_of_zone_table; i++) {
      if(zone_table[i].reset_mode == 0)
        continue;
-     if(zone_table[i].age < zone_table[i].lifespan && !(zone_table[i].reset_mode == 1 && !is_empty(i))) {
+     if(zone_table[i].age < zone_table[i].lifespan && !(zone_table[i].reset_mode == 1 && !zone_is_empty(i))) {
        zone_table[i].age++;
        continue;
      }
-     if(zone_table[i].reset_mode == 1 && !is_empty(i))
+     if(zone_table[i].reset_mode == 1 && !zone_is_empty(i))
        continue;
      reset_zone( i );
      // update first repop numbers
@@ -4275,7 +4292,7 @@ void reset_zone(int zone) {
 
 	char buf[MAX_STRING_LENGTH];
 
-	if (zone_table[zone].died_this_tick == 0 && is_empty(zone)) {
+	if (zone_table[zone].died_this_tick == 0 && zone_is_empty(zone)) {
 		zone_table[zone].repops_without_deaths++;
 	} else {
 		zone_table[zone].repops_without_deaths = 0;
@@ -4656,7 +4673,7 @@ void reset_zone(int zone) {
 #undef ZCMD
 
 /* for use in reset_zone; return TRUE if zone 'nr' is free of PC's  */
-int is_empty(int zone_nr) {
+int zone_is_empty(int zone_nr) {
 	struct descriptor_data *i;
 
 	for (i = descriptor_list; i; i = i->next)
@@ -5408,10 +5425,8 @@ void clear_char(CHAR_DATA *ch)
 
   ch->in_room = NOWHERE;
   ch->position = POSITION_STANDING;
-//  ch->tempVariable = NULL;
   GET_HOME(ch) = START_ROOM;
   GET_AC(ch) = 100; /* Basic Armor */
-//  ch->spelldamage = 0;
 }
 
 

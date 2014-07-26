@@ -16,7 +16,7 @@
 /* 12/08/2003   Onager   Added chop_half() to work like half_chop() but    */
 /*                       chopping off the last word.                       */
 /***************************************************************************/
-/* $Id: interp.cpp,v 1.198 2012/05/25 02:16:32 jhhudso Exp $ */
+/* $Id: interp.cpp,v 1.199 2014/07/26 23:21:23 jhhudso Exp $ */
 
 extern "C"
 {
@@ -48,8 +48,8 @@ extern "C"
 
 #define SKILL_HIDE 337
 
-extern bool check_social( CHAR_DATA *ch, char *pcomm,
-    int length, char *arg );
+bool check_social( CHAR_DATA *ch, char *pcomm, int length, char *arg );
+int clan_guard(struct char_data *ch, struct obj_data *obj, int cmd, char *arg, struct char_data *owner);
 
 extern struct index_data *mob_index;
 extern struct index_data *obj_index;
@@ -1320,14 +1320,23 @@ int special(CHAR_DATA *ch, int cmd, char *arg)
           return retval;
         }
 
-  /* special in mobile present? */
-  for (k = world[ch->in_room].people; k; k = k->next_in_room)
-    if ( IS_MOB(k) )
-      if (mob_index[k->mobdata->nr].non_combat_func) {
-        retval = ((*mob_index[k->mobdata->nr].non_combat_func)(ch, 0, cmd, arg, k));
-        if(IS_SET(retval, eCH_DIED) || IS_SET(retval, eSUCCESS))
-          return retval;
-        }
+	/* special in mobile present? */
+	for (k = world[ch->in_room].people; k; k = k->next_in_room) {
+		if (IS_MOB(k)) {
+			if (((char_data *)mob_index[k->mobdata->nr].item)->mobdata->mob_flags.type
+					== MOB_CLAN_GUARD) {
+				retval = clan_guard(ch, 0, cmd, arg, k);
+				if (IS_SET(retval, eCH_DIED) || IS_SET(retval, eSUCCESS))
+					return retval;
+			} else if (mob_index[k->mobdata->nr].non_combat_func) {
+				retval = ((*mob_index[k->mobdata->nr].non_combat_func)(ch, 0,
+						cmd, arg, k));
+				if (IS_SET(retval, eCH_DIED) || IS_SET(retval, eSUCCESS))
+					return retval;
+			}
+
+		}
+	}
 
   /* special in object present? */
   for (i = world[ch->in_room].contents; i; i = i->next_content)

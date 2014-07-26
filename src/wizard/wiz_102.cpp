@@ -15,6 +15,8 @@
 #include <ctype.h> // isspace
 #include <string>
 #include <vector>
+#include <limits>
+#include <type_traits>
 
 #include "wizard.h"
 #include "utility.h"
@@ -2624,752 +2626,922 @@ int do_mscore(struct char_data *ch, char *argument, int cmd)
     return eSUCCESS;
 }
 
-int do_medit(struct char_data *ch, char *argument, int cmd)
-{
-    char buf[MAX_INPUT_LENGTH];
-    char buf2[MAX_INPUT_LENGTH];
-    char buf3[MAX_INPUT_LENGTH];
-    char buf4[MAX_INPUT_LENGTH];
-    int  mob_num = -1;
-    int  intval = 0;
-    int  x, i;
+int do_medit(struct char_data *ch, char *argument, int cmd) {
+	char buf[MAX_INPUT_LENGTH];
+	char buf2[MAX_INPUT_LENGTH];
+	char buf3[MAX_INPUT_LENGTH];
+	char buf4[MAX_INPUT_LENGTH];
+	int mob_num = -1;
+	int intval = 0;
+	int x, i;
 
-    extern char *pc_clss_types[];
-    extern char *action_bits[];
-    extern char *affected_bits[];
-    extern char *isr_bits[];
-    extern char *position_types[];
-    extern int mob_race_mod[][5];
+	extern char *pc_clss_types[];
+	extern char *action_bits[];
+	extern char *affected_bits[];
+	extern char *isr_bits[];
+	extern char *position_types[];
+	extern int mob_race_mod[][5];
+	extern char *mob_types[];
 
-    char *fields[] = 
-    {
-      "keywords",
-      "shortdesc",
-      "longdesc",
-      "description",
-      "sex",
-      "class",
-      "race",
-      "level",
-      "alignment",
-      "loadposition",
-      "defaultposition",
-      "actflags",
-      "affectflags",
-      "numdamdice",
-      "sizedamdice",
-      "damroll",
-      "hitroll",
-      "hphitpoints",
-      "gold",
-      "experiencepoints",
-      "immune",
-      "suscept",
-      "resist",
-      "armorclass",
-      "stat",
-      "strength",
-      "dexterity",
-      "intelligence",
-      "wisdom",
-      "constitution",
-      "new",
-      "delete",
-      "\n"
-    };
-   
-    if(IS_NPC(ch))
-      return eFAILURE;
+	char *fields[] = { "keywords", "shortdesc", "longdesc", "description",
+			"sex", "class", "race", "level", "alignment", "loadposition",
+			"defaultposition", "actflags", "affectflags", "numdamdice",
+			"sizedamdice", "damroll", "hitroll", "hphitpoints", "gold",
+			"experiencepoints", "immune", "suscept", "resist", "armorclass",
+			"stat", "strength", "dexterity", "intelligence", "wisdom",
+			"constitution", "new", "delete", "type", "v1", "v2", "v3", "v4",
+			"\n" };
 
-    half_chop(argument, buf, buf2);
-    half_chop(buf2, buf3, buf4);
+	if (IS_NPC(ch))
+		return eFAILURE;
 
-    // at this point, buf  = mob_num
-    //                buf3 = field
-    //                buf4 = args
-      
-    // or
-     
-    // buf = field
-    // buf3 = args[0]
-    // buf4 = args[1-+]
-  
-    if(!*buf) {
-      send_to_char("$3Syntax$R:  medit [mob_num] [field] [arg]\r\n"
-                   "  Edit a mob_num with no field or arg to view the item.\r\n"
-                   "  Edit a field with no args for help on that field.\r\n\r\n"
-                   "The field must be one of the following:\n\r", ch);
-      display_string_list(fields, ch);
-      return eFAILURE;
-    }
+	half_chop(argument, buf, buf2);
+	half_chop(buf2, buf3, buf4);
 
-   int mobvnum = -1;
-    if(isdigit(*buf)) {
-      mob_num = atoi(buf);  // there is no mob 0, so this is okay.  Bad 0's get caught in real_mobile
-	mobvnum = mob_num;
-      if( ((mob_num = real_mobile(mob_num)) < 0))
-      {
-        send_to_char("Invalid mob number.\r\n", ch);
-        return eSUCCESS;
-      }
-    }
-    else {
-      mob_num = ch->pcdata->last_mob_edit;
-      mobvnum = mob_index[mob_num].virt;
-      // put the buffs where they should be
-      if(*buf4)
-        sprintf(buf2, "%s %s", buf3, buf4);
-      else strcpy(buf2, buf3);
+	// at this point, buf  = mob_num
+	//                buf3 = field
+	//                buf4 = args
 
-      strcpy(buf4, buf2);
-      strcpy(buf3, buf);
-    }
-    if(mob_num != ch->pcdata->last_mob_edit) {
-      sprintf(buf2, "$3Current mob set to$R: %d\n\r", 
-mob_index[mob_num].virt);
-      send_to_char(buf2, ch);
-      ch->pcdata->last_mob_edit = mob_num;
-    }
+	// or
 
-    if(!*buf3) // no field.  Stat the item.
-    {
-      mob_stat(ch, (char_data *) mob_index[mob_num].item);
-      return eSUCCESS;
-    }
+	// buf = field
+	// buf3 = args[0]
+	// buf4 = args[1-+]
 
-    if (mobvnum == -1) mobvnum = mob_index[mob_num].virt;
- // MOVED
-    for(x = 0 ;; x++)
-    {
-      if(fields[x][0] == '\n')
-      {
-        send_to_char("Invalid field.\n\r", ch);
-        return eFAILURE;
-      }
-      if(is_abbrev(buf3, fields[x]))
-        break;
-    }
+	if (!*buf) {
+		send_to_char("$3Syntax$R:  medit [mob_num] [field] [arg]\r\n"
+				"  Edit a mob_num with no field or arg to view the item.\r\n"
+				"  Edit a field with no args for help on that field.\r\n\r\n"
+				"The field must be one of the following:\n\r", ch);
+		display_string_list(fields, ch);
+		return eFAILURE;
+	}
 
-    // a this point, mob_num is the index
+	int mobvnum = -1;
+	if (isdigit(*buf)) {
+		mob_num = atoi(buf); // there is no mob 0, so this is okay.  Bad 0's get caught in real_mobile
+		mobvnum = mob_num;
+		if (((mob_num = real_mobile(mob_num)) < 0)) {
+			send_to_char("Invalid mob number.\r\n", ch);
+			return eSUCCESS;
+		}
+	} else {
+		mob_num = ch->pcdata->last_mob_edit;
+		mobvnum = mob_index[mob_num].virt;
+		// put the buffs where they should be
+		if (*buf4)
+			sprintf(buf2, "%s %s", buf3, buf4);
+		else
+			strcpy(buf2, buf3);
 
-    if (x != 30) // Checked in there.
-      if(!can_modify_mobile(ch, mobvnum)) {
-        send_to_char("You are unable to work creation outside of your range.\n\r", ch);
-        return eFAILURE;
-      }
+		strcpy(buf4, buf2);
+		strcpy(buf3, buf);
+	}
+	if (mob_num != ch->pcdata->last_mob_edit) {
+		sprintf(buf2, "$3Current mob set to$R: %d\n\r",
+				mob_index[mob_num].virt);
+		send_to_char(buf2, ch);
+		ch->pcdata->last_mob_edit = mob_num;
+	}
 
-    switch(x) {
+	if (!*buf3) // no field.  Stat the item.
+	{
+		mob_stat(ch, (char_data *) mob_index[mob_num].item);
+		return eSUCCESS;
+	}
 
-     /* edit keywords */
-      case 0 : {
-        if(!*buf4) {
-          send_to_char("$3Syntax$R: medit [mob_num] keywords <new_keywords>\n\r", ch);
-          return eFAILURE;
-        }
-        ((char_data *)mob_index[mob_num].item)->name = str_hsh(buf4);
-        sprintf(buf, "Mob keywords set to '%s'.\r\n", buf4);
-        send_to_char(buf, ch);
-      } break;
+	if (mobvnum == -1)
+		mobvnum = mob_index[mob_num].virt;
+	// MOVED
+	for (x = 0;; x++) {
+		if (fields[x][0] == '\n') {
+			send_to_char("Invalid field.\n\r", ch);
+			return eFAILURE;
+		}
+		if (is_abbrev(buf3, fields[x]))
+			break;
+	}
 
-     /* edit short desc */
-      case 1 : {
-        if(!*buf4) {
-          send_to_char("$3Syntax$R: medit [mob_num] shortdesc <desc>\n\r", ch);
-          return eFAILURE;
-        }
-        ((char_data *)mob_index[mob_num].item)->short_desc = str_hsh(buf4);
-        sprintf(buf, "Mob shortdesc set to '%s'.\r\n", buf4);
-        send_to_char(buf, ch);
-      } break;
+	// a this point, mob_num is the index
 
-     // edit long desc
-      case 2 : {
-        if(!*buf4) {
-          send_to_char("$3Syntax$R: medit [mob_num] longdesc <desc>\n\r", ch);
-          return eFAILURE;
-        }
-        strcat(buf4, "\r\n");
-        ((char_data *)mob_index[mob_num].item)->long_desc = str_hsh(buf4);
-        sprintf(buf, "Mob longdesc set to '%s'.\r\n", buf4);
-        send_to_char(buf, ch);
-      } break;
+	if (x != 30) // Checked in there.
+		if (!can_modify_mobile(ch, mobvnum)) {
+			send_to_char(
+					"You are unable to work creation outside of your range.\n\r",
+					ch);
+			return eFAILURE;
+		}
 
-     /* edit description */
-      case 3 : {
-        if(!*buf4) {
-          send_to_char("$3Syntax$R: medit [mob_num] description <anything>\n\r"
-                       "This will put you into the editor which will replace the\r\n"
-                       "current description.\r\n", ch);
-          return eFAILURE;
-        }
-        send_to_char("Enter the mob's description below."
-                     " Terminate with '/s' on a new line.\n\r\n\r", ch);
+	switch (x) {
+
+	/* edit keywords */
+	case 0: {
+		if (!*buf4) {
+			send_to_char(
+					"$3Syntax$R: medit [mob_num] keywords <new_keywords>\n\r",
+					ch);
+			return eFAILURE;
+		}
+		((char_data *) mob_index[mob_num].item)->name = str_hsh(buf4);
+		sprintf(buf, "Mob keywords set to '%s'.\r\n", buf4);
+		send_to_char(buf, ch);
+	}
+		break;
+
+		/* edit short desc */
+	case 1: {
+		if (!*buf4) {
+			send_to_char("$3Syntax$R: medit [mob_num] shortdesc <desc>\n\r",
+					ch);
+			return eFAILURE;
+		}
+		((char_data *) mob_index[mob_num].item)->short_desc = str_hsh(buf4);
+		sprintf(buf, "Mob shortdesc set to '%s'.\r\n", buf4);
+		send_to_char(buf, ch);
+	}
+		break;
+
+		// edit long desc
+	case 2: {
+		if (!*buf4) {
+			send_to_char("$3Syntax$R: medit [mob_num] longdesc <desc>\n\r", ch);
+			return eFAILURE;
+		}
+		strcat(buf4, "\r\n");
+		((char_data *) mob_index[mob_num].item)->long_desc = str_hsh(buf4);
+		sprintf(buf, "Mob longdesc set to '%s'.\r\n", buf4);
+		send_to_char(buf, ch);
+	}
+		break;
+
+		/* edit description */
+	case 3: {
+		if (!*buf4) {
+			send_to_char(
+					"$3Syntax$R: medit [mob_num] description <anything>\n\r"
+							"This will put you into the editor which will replace the\r\n"
+							"current description.\r\n", ch);
+			return eFAILURE;
+		}
+		send_to_char("Enter the mob's description below."
+				" Terminate with '/s' on a new line.\n\r\n\r", ch);
 // TODO - this causes a memory leak if you edit the desc twice (first one is hsh'd)
 //        ((char_data *)mob_index[mob_num].item)->description = NULL;
-        ch->desc->connected = CON_EDITING;
-	((char_data*)mob_index[mob_num].item)->description = str_dup("");
-        ch->desc->strnew = &(((char_data *)mob_index[mob_num].item)->description);
-        ch->desc->max_str = MAX_MESSAGE_LENGTH;
-      } break;
+		ch->desc->connected = CON_EDITING;
+		((char_data*) mob_index[mob_num].item)->description = str_dup("");
+		ch->desc->strnew =
+				&(((char_data *) mob_index[mob_num].item)->description);
+		ch->desc->max_str = MAX_MESSAGE_LENGTH;
+	}
+		break;
 
-     /* edit sex */
-      case 4 : {
-        if(!*buf4) {
-          send_to_char("$3Syntax$R: medit [mob_num] sex <male|female|neutral>\n\r", ch);
-          return eFAILURE;
-        }
-        if(is_abbrev(buf4, "male")) {
-          ((char_data *)mob_index[mob_num].item)->sex = SEX_MALE;
-          send_to_char("Mob sex set to male.\r\n", ch);
-        } else if(is_abbrev(buf4, "female")) {
-          ((char_data *)mob_index[mob_num].item)->sex = SEX_FEMALE;
-          send_to_char("Mob sex set to female.\r\n", ch);
-        } else if(is_abbrev(buf4, "neutral")) {
-          ((char_data *)mob_index[mob_num].item)->sex = SEX_NEUTRAL;
-          send_to_char("Mob sex set to neutral.\r\n", ch);
-        } else send_to_char("Invalid sex.  Chose 'male', 'female', or 'neutral'.\r\n", ch);
-      } break;
+		/* edit sex */
+	case 4: {
+		if (!*buf4) {
+			send_to_char(
+					"$3Syntax$R: medit [mob_num] sex <male|female|neutral>\n\r",
+					ch);
+			return eFAILURE;
+		}
+		if (is_abbrev(buf4, "male")) {
+			((char_data *) mob_index[mob_num].item)->sex = SEX_MALE;
+			send_to_char("Mob sex set to male.\r\n", ch);
+		} else if (is_abbrev(buf4, "female")) {
+			((char_data *) mob_index[mob_num].item)->sex = SEX_FEMALE;
+			send_to_char("Mob sex set to female.\r\n", ch);
+		} else if (is_abbrev(buf4, "neutral")) {
+			((char_data *) mob_index[mob_num].item)->sex = SEX_NEUTRAL;
+			send_to_char("Mob sex set to neutral.\r\n", ch);
+		} else
+			send_to_char(
+					"Invalid sex.  Chose 'male', 'female', or 'neutral'.\r\n",
+					ch);
+	}
+		break;
 
-     /* edit class */
-      case 5 : {
-        if(!*buf4) {
-          send_to_char("$3Syntax$R: medit [mob_num] class <class>\n\r"
-                       "$3Current$R: ", ch);
-          sprintf(buf, "%s\n", pc_clss_types[((char_data *)mob_index[mob_num].item)->c_class]);
-          send_to_char(buf, ch);
-          send_to_char("\r\n$3Valid types$R:\r\n", ch);
-          for(i = 0; *pc_clss_types[i] != '\n'; i++) {
-            sprintf(buf, "  %d) %s\n\r", i, pc_clss_types[i]);
-            send_to_char(buf, ch);
-          }
-          return eFAILURE;
-        }
-        if(!check_range_valid_and_convert(intval, buf4, 0, CLASS_MAX)) {
-          send_to_char("Value out of valid range.\r\n", ch);
-          return eFAILURE;
-        }
-        ((char_data *)mob_index[mob_num].item)->c_class = intval;
-        sprintf(buf, "Mob class set to %d.\r\n", intval);
-        send_to_char(buf, ch);
-      } break;
+		/* edit class */
+	case 5: {
+		if (!*buf4) {
+			send_to_char("$3Syntax$R: medit [mob_num] class <class>\n\r"
+					"$3Current$R: ", ch);
+			sprintf(buf, "%s\n",
+					pc_clss_types[((char_data *) mob_index[mob_num].item)->c_class]);
+			send_to_char(buf, ch);
+			send_to_char("\r\n$3Valid types$R:\r\n", ch);
+			for (i = 0; *pc_clss_types[i] != '\n'; i++) {
+				sprintf(buf, "  %d) %s\n\r", i, pc_clss_types[i]);
+				send_to_char(buf, ch);
+			}
+			return eFAILURE;
+		}
+		if (!check_range_valid_and_convert(intval, buf4, 0, CLASS_MAX)) {
+			send_to_char("Value out of valid range.\r\n", ch);
+			return eFAILURE;
+		}
+		((char_data *) mob_index[mob_num].item)->c_class = intval;
+		sprintf(buf, "Mob class set to %d.\r\n", intval);
+		send_to_char(buf, ch);
+	}
+		break;
 
-     /* edit race */
-      case 6 : {
-        if(!*buf4) {
-          send_to_char("$3Syntax$R: medit [mob_num] race <racetype>\n\r"
-                       "$3Current$R: ", ch);
-          sprintf(buf, "%s\n\r\n\r" 
-                       "Available types:\r\n",
-                        race_info[((char_data *)mob_index[mob_num].item)->race].singular_name);
-          send_to_char(buf, ch);
-          for(i = 0; i <= MAX_RACE; i++)
-            csendf(ch, "  %s\r\n", race_info[i].singular_name);
-          send_to_char("\r\n", ch);
-          return eFAILURE;
-        }
-        int race_set = 0;
-        for(i = 0; i <= MAX_RACE; i++) {
-          if(is_abbrev(buf4, race_info[i].singular_name)) {
-            csendf(ch, "Mob race set to %s.\r\n", race_info[i].singular_name);
-            ((char_data *)mob_index[mob_num].item)->race = i;
-            race_set = 1;
+		/* edit race */
+	case 6: {
+		if (!*buf4) {
+			send_to_char("$3Syntax$R: medit [mob_num] race <racetype>\n\r"
+					"$3Current$R: ", ch);
+			sprintf(buf, "%s\n\r\n\r"
+					"Available types:\r\n",
+					race_info[((char_data *) mob_index[mob_num].item)->race].singular_name);
+			send_to_char(buf, ch);
+			for (i = 0; i <= MAX_RACE; i++)
+				csendf(ch, "  %s\r\n", race_info[i].singular_name);
+			send_to_char("\r\n", ch);
+			return eFAILURE;
+		}
+		int race_set = 0;
+		for (i = 0; i <= MAX_RACE; i++) {
+			if (is_abbrev(buf4, race_info[i].singular_name)) {
+				csendf(ch, "Mob race set to %s.\r\n",
+						race_info[i].singular_name);
+				((char_data *) mob_index[mob_num].item)->race = i;
+				race_set = 1;
 
-            ((char_data *)mob_index[mob_num].item)->raw_str   = ((char_data *)mob_index[mob_num].item)->str   = BASE_STAT + mob_race_mod[GET_RACE(((char_data *)mob_index[mob_num].item))][0];
-            ((char_data *)mob_index[mob_num].item)->raw_dex   = ((char_data *)mob_index[mob_num].item)->dex   = BASE_STAT + mob_race_mod[GET_RACE(((char_data *)mob_index[mob_num].item))][1];
-            ((char_data *)mob_index[mob_num].item)->raw_con   = ((char_data *)mob_index[mob_num].item)->con   = BASE_STAT + mob_race_mod[GET_RACE(((char_data *)mob_index[mob_num].item))][2];
-            ((char_data *)mob_index[mob_num].item)->raw_intel = ((char_data *)mob_index[mob_num].item)->intel = BASE_STAT + mob_race_mod[GET_RACE(((char_data *)mob_index[mob_num].item))][3];
-            ((char_data *)mob_index[mob_num].item)->raw_wis   = ((char_data *)mob_index[mob_num].item)->wis   = BASE_STAT + mob_race_mod[GET_RACE(((char_data *)mob_index[mob_num].item))][4];
+				((char_data *) mob_index[mob_num].item)->raw_str =
+						((char_data *) mob_index[mob_num].item)->str =
+								BASE_STAT
+										+ mob_race_mod[GET_RACE(
+												((char_data * )mob_index[mob_num].item))][0];
+				((char_data *) mob_index[mob_num].item)->raw_dex =
+						((char_data *) mob_index[mob_num].item)->dex =
+								BASE_STAT
+										+ mob_race_mod[GET_RACE(
+												((char_data * )mob_index[mob_num].item))][1];
+				((char_data *) mob_index[mob_num].item)->raw_con =
+						((char_data *) mob_index[mob_num].item)->con =
+								BASE_STAT
+										+ mob_race_mod[GET_RACE(
+												((char_data * )mob_index[mob_num].item))][2];
+				((char_data *) mob_index[mob_num].item)->raw_intel =
+						((char_data *) mob_index[mob_num].item)->intel =
+								BASE_STAT
+										+ mob_race_mod[GET_RACE(
+												((char_data * )mob_index[mob_num].item))][3];
+				((char_data *) mob_index[mob_num].item)->raw_wis =
+						((char_data *) mob_index[mob_num].item)->wis =
+								BASE_STAT
+										+ mob_race_mod[GET_RACE(
+												((char_data * )mob_index[mob_num].item))][4];
 
-          }
-        }
-        if(!race_set) {
-          csendf(ch, "Could not find race '%s'.\r\n", buf4);
-          return eFAILURE;
-        }
-      } break;
+			}
+		}
+		if (!race_set) {
+			csendf(ch, "Could not find race '%s'.\r\n", buf4);
+			return eFAILURE;
+		}
+	}
+		break;
 
-     /* edit level */
-      case 7 : {
-        if(!*buf4) {
-          send_to_char("$3Syntax$R: medit [mob_num] level <levelnum>\n\r"
-                       "$3Current$R: ", ch);
-          sprintf(buf, "%d\n", ((char_data *)mob_index[mob_num].item)->level);
-          send_to_char(buf, ch);
-          return eFAILURE;
-        }
-        if(!check_range_valid_and_convert(intval, buf4, 0, 110)) {
-          send_to_char("Value out of valid range.\r\n", ch);
-          return eFAILURE;
-        }
-        ((char_data *)mob_index[mob_num].item)->level = intval;
-        sprintf(buf, "Mob level set to %d.\r\n", intval);
-        send_to_char(buf, ch);
-      } break;
+		/* edit level */
+	case 7: {
+		if (!*buf4) {
+			send_to_char("$3Syntax$R: medit [mob_num] level <levelnum>\n\r"
+					"$3Current$R: ", ch);
+			sprintf(buf, "%d\n",
+					((char_data *) mob_index[mob_num].item)->level);
+			send_to_char(buf, ch);
+			return eFAILURE;
+		}
+		if (!check_range_valid_and_convert(intval, buf4, 0, 110)) {
+			send_to_char("Value out of valid range.\r\n", ch);
+			return eFAILURE;
+		}
+		((char_data *) mob_index[mob_num].item)->level = intval;
+		sprintf(buf, "Mob level set to %d.\r\n", intval);
+		send_to_char(buf, ch);
+	}
+		break;
 
-     /* edit alignment */
-      case 8 : {
-        if(!*buf4) {
-          send_to_char("$3Syntax$R: medit [mob_num] alignment <alignnum>\n\r"
-                       "$3Current$R: ", ch);
-          sprintf(buf, "%d\n", ((char_data *)mob_index[mob_num].item)->alignment);
-          send_to_char(buf, ch);
-          return eFAILURE;
-        }
-        if(!check_range_valid_and_convert(intval, buf4, -1000, 1000)) {
-          send_to_char("Value out of valid range.\r\n", ch);
-          return eFAILURE;
-        }
-        ((char_data *)mob_index[mob_num].item)->alignment = intval;
-        sprintf(buf, "Mob alignment set to %d.\r\n", intval);
-        send_to_char(buf, ch);
-      } break;
+		/* edit alignment */
+	case 8: {
+		if (!*buf4) {
+			send_to_char("$3Syntax$R: medit [mob_num] alignment <alignnum>\n\r"
+					"$3Current$R: ", ch);
+			sprintf(buf, "%d\n",
+					((char_data *) mob_index[mob_num].item)->alignment);
+			send_to_char(buf, ch);
+			return eFAILURE;
+		}
+		if (!check_range_valid_and_convert(intval, buf4, -1000, 1000)) {
+			send_to_char("Value out of valid range.\r\n", ch);
+			return eFAILURE;
+		}
+		((char_data *) mob_index[mob_num].item)->alignment = intval;
+		sprintf(buf, "Mob alignment set to %d.\r\n", intval);
+		send_to_char(buf, ch);
+	}
+		break;
 
-     /* edit load position */
-      case 9 : {
-        if(!*buf4) {
-          send_to_char("$3Syntax$R: medit [mob_num] loadposition <position>\n\r"
-                       "$3Current$R: ", ch);
-          sprintf(buf, "%s\n", position_types[((char_data *)mob_index[mob_num].item)->position]);
-          send_to_char(buf, ch);
-          send_to_char("$3Valid positions$R:\r\n"
-                       "  1 = Standing\r\n"
-                       "  2 = Sitting\r\n"
-                       "  3 = Resting\r\n"
-                       "  4 = Sleeping\r\n", ch);
-          return eFAILURE;
-        }
-        if(!check_range_valid_and_convert(intval, buf4, 1, 4)) {
-          send_to_char("Value out of valid range.\r\n", ch);
-          return eFAILURE;
-        }
-        switch(intval) {
-          case 1: intval = POSITION_STANDING; break;
-          case 2: intval = POSITION_SITTING; break;
-          case 3: intval = POSITION_RESTING; break;
-          case 4: intval = POSITION_SLEEPING; break;
-        }
-        ((char_data *)mob_index[mob_num].item)->position = intval;
-        sprintf(buf, "Mob default position set to %s.\r\n", position_types[intval]);
-        send_to_char(buf, ch);
-      } break;
+		/* edit load position */
+	case 9: {
+		if (!*buf4) {
+			send_to_char(
+					"$3Syntax$R: medit [mob_num] loadposition <position>\n\r"
+							"$3Current$R: ", ch);
+			sprintf(buf, "%s\n",
+					position_types[((char_data *) mob_index[mob_num].item)->position]);
+			send_to_char(buf, ch);
+			send_to_char("$3Valid positions$R:\r\n"
+					"  1 = Standing\r\n"
+					"  2 = Sitting\r\n"
+					"  3 = Resting\r\n"
+					"  4 = Sleeping\r\n", ch);
+			return eFAILURE;
+		}
+		if (!check_range_valid_and_convert(intval, buf4, 1, 4)) {
+			send_to_char("Value out of valid range.\r\n", ch);
+			return eFAILURE;
+		}
+		switch (intval) {
+		case 1:
+			intval = POSITION_STANDING;
+			break;
+		case 2:
+			intval = POSITION_SITTING;
+			break;
+		case 3:
+			intval = POSITION_RESTING;
+			break;
+		case 4:
+			intval = POSITION_SLEEPING;
+			break;
+		}
+		((char_data *) mob_index[mob_num].item)->position = intval;
+		sprintf(buf, "Mob default position set to %s.\r\n",
+				position_types[intval]);
+		send_to_char(buf, ch);
+	}
+		break;
 
-     /* edit default position */
-      case 10 : {
-        if(!*buf4) {
-          send_to_char("$3Syntax$R: medit [mob_num] defaultposition <position>\n\r"
-                       "$3Current$R: ", ch);
-          sprintf(buf, "%s\n", position_types[((char_data *)mob_index[mob_num].item)->mobdata->default_pos]);
-          send_to_char(buf, ch);
-          send_to_char("$3Valid positions$R:\r\n"
-                       "  1 = Standing\r\n"
-                       "  2 = Sitting\r\n"
-                       "  3 = Resting\r\n"
-                       "  4 = Sleeping\r\n", ch);
-          return eFAILURE;
-        }
-        if(!check_range_valid_and_convert(intval, buf4, 1, 4)) {
-          send_to_char("Value out of valid range.\r\n", ch);
-          return eFAILURE;
-        }
-        switch(intval) {
-          case 1: intval = POSITION_STANDING; break;
-          case 2: intval = POSITION_SITTING; break;
-          case 3: intval = POSITION_RESTING; break;
-          case 4: intval = POSITION_SLEEPING; break;
-        }
-        ((char_data *)mob_index[mob_num].item)->mobdata->default_pos = intval;
-        sprintf(buf, "Mob default position set to %s.\r\n", position_types[intval]);
-        send_to_char(buf, ch);
-      } break;
+		/* edit default position */
+	case 10: {
+		if (!*buf4) {
+			send_to_char(
+					"$3Syntax$R: medit [mob_num] defaultposition <position>\n\r"
+							"$3Current$R: ", ch);
+			sprintf(buf, "%s\n",
+					position_types[((char_data *) mob_index[mob_num].item)->mobdata->default_pos]);
+			send_to_char(buf, ch);
+			send_to_char("$3Valid positions$R:\r\n"
+					"  1 = Standing\r\n"
+					"  2 = Sitting\r\n"
+					"  3 = Resting\r\n"
+					"  4 = Sleeping\r\n", ch);
+			return eFAILURE;
+		}
+		if (!check_range_valid_and_convert(intval, buf4, 1, 4)) {
+			send_to_char("Value out of valid range.\r\n", ch);
+			return eFAILURE;
+		}
+		switch (intval) {
+		case 1:
+			intval = POSITION_STANDING;
+			break;
+		case 2:
+			intval = POSITION_SITTING;
+			break;
+		case 3:
+			intval = POSITION_RESTING;
+			break;
+		case 4:
+			intval = POSITION_SLEEPING;
+			break;
+		}
+		((char_data *) mob_index[mob_num].item)->mobdata->default_pos = intval;
+		sprintf(buf, "Mob default position set to %s.\r\n",
+				position_types[intval]);
+		send_to_char(buf, ch);
+	}
+		break;
 
-     /* edit actflags */
-      case 11 : {
-        if(!*buf4) {
-          send_to_char("$3Syntax$R: medit [mob_num] actflags <location[s]>\n\r"
-                       "$3Current$R: ", ch);
-          sprintbit(((char_data *)mob_index[mob_num].item)->mobdata->actflags,
-                    action_bits, buf);
-          send_to_char(buf, ch);
-          send_to_char("\r\n$3Valid types$R:\r\n", ch);
-          for(i = 0; *action_bits[i] != '\n'; i++) {
-            sprintf(buf, "  %s\n\r", action_bits[i]);
-            send_to_char(buf, ch);
-          }
-          return eFAILURE;
-        }
-        parse_bitstrings_into_int(action_bits, buf4, ch, 
-                                     ((char_data *)mob_index[mob_num].item)->mobdata->actflags);
-      } break;
+		/* edit actflags */
+	case 11: {
+		if (!*buf4) {
+			send_to_char(
+					"$3Syntax$R: medit [mob_num] actflags <location[s]>\n\r"
+							"$3Current$R: ", ch);
+			sprintbit(
+					((char_data *) mob_index[mob_num].item)->mobdata->actflags,
+					action_bits, buf);
+			send_to_char(buf, ch);
+			send_to_char("\r\n$3Valid types$R:\r\n", ch);
+			for (i = 0; *action_bits[i] != '\n'; i++) {
+				sprintf(buf, "  %s\n\r", action_bits[i]);
+				send_to_char(buf, ch);
+			}
+			return eFAILURE;
+		}
+		parse_bitstrings_into_int(action_bits, buf4, ch,
+				((char_data *) mob_index[mob_num].item)->mobdata->actflags);
+	}
+		break;
 
-     /* edit affectflags */
-      case 12 : {
-        if(!*buf4) {
-          send_to_char("$3Syntax$R: medit [mob_num] affectflags <location[s]>\n\r"
-                       "$3Current$R: ", ch);
-          sprintbit(((char_data *)mob_index[mob_num].item)->affected_by[0],
-                    affected_bits, buf);
-          send_to_char(buf, ch);
-          send_to_char("\r\n$3Valid types$R:\r\n", ch);
-          for(i = 0; *affected_bits[i] != '\n'; i++) {
-            sprintf(buf, "  %s\n\r", affected_bits[i]);
-            send_to_char(buf, ch);
-          }
-          return eFAILURE;
-        }
-        parse_bitstrings_into_int(affected_bits, buf4, ch,
-					&(((char_data *)mob_index[mob_num].item)->affected_by[0]));
+		/* edit affectflags */
+	case 12: {
+		if (!*buf4) {
+			send_to_char(
+					"$3Syntax$R: medit [mob_num] affectflags <location[s]>\n\r"
+							"$3Current$R: ", ch);
+			sprintbit(((char_data *) mob_index[mob_num].item)->affected_by[0],
+					affected_bits, buf);
+			send_to_char(buf, ch);
+			send_to_char("\r\n$3Valid types$R:\r\n", ch);
+			for (i = 0; *affected_bits[i] != '\n'; i++) {
+				sprintf(buf, "  %s\n\r", affected_bits[i]);
+				send_to_char(buf, ch);
+			}
+			return eFAILURE;
+		}
+		parse_bitstrings_into_int(affected_bits, buf4, ch,
+				&(((char_data *) mob_index[mob_num].item)->affected_by[0]));
 //                             &((((char_data *)mob_index[mob_num].item)->affected_by[0])));
-      } break;
-
-     /* edit numdamdice */
-      case 13 : {
-        if(!*buf4) {
-          send_to_char("$3Syntax$R: medit [mob_num] numdamdice <amount>\n\r"
-                       "$3Current$R: ", ch);
-          sprintf(buf, "%d\n", ((char_data *)mob_index[mob_num].item)->mobdata->damnodice);
-          send_to_char(buf, ch);
-          send_to_char("$3Valid Range$R: 1 to 400\r\n", ch);
-          return eFAILURE;
-        }
-        if(!check_range_valid_and_convert(intval, buf4, 1, 400)) {
-          send_to_char("Value out of valid range.\r\n", ch);
-          return eFAILURE;
-        }
-        ((char_data *)mob_index[mob_num].item)->mobdata->damnodice = intval;
-        sprintf(buf, "Mob number dice for damage set to %d.\r\n", intval);
-        send_to_char(buf, ch);
-      } break;
-
-     /* edit sizedamdice */
-      case 14 : {
-        if(!*buf4) {
-          send_to_char("$3Syntax$R: medit [mob_num] sizedamdice <amount>\n\r"
-                       "$3Current$R: ", ch);
-          sprintf(buf, "%d\n", ((char_data *)mob_index[mob_num].item)->mobdata->damsizedice);
-          send_to_char(buf, ch);
-          send_to_char("$3Valid Range$R: 1 to 400\r\n", ch);
-          return eFAILURE;
-        }
-        if(!check_range_valid_and_convert(intval, buf4, 1, 400)) {
-          send_to_char("Value out of valid range.\r\n", ch);
-          return eFAILURE;
-        }
-        ((char_data *)mob_index[mob_num].item)->mobdata->damsizedice = intval;
-        sprintf(buf, "Mob size dice for damage set to %d.\r\n", intval);
-        send_to_char(buf, ch);
-      } break;
-
-     /* edit damroll */
-      case 15 : {
-        if(!*buf4) {
-          send_to_char("$3Syntax$R: medit [mob_num] damroll <damrollnum>\n\r"
-                       "$3Current$R: ", ch);
-          sprintf(buf, "%d\n", ((char_data *)mob_index[mob_num].item)->damroll);
-          send_to_char(buf, ch);
-          send_to_char("$3Valid Range$R: -50 to 400\r\n", ch);
-          return eFAILURE;
-        }
-        if(!check_range_valid_and_convert(intval, buf4, -50, 400)) {
-          send_to_char("Value out of valid range.\r\n", ch);
-          return eFAILURE;
-        }
-        ((char_data *)mob_index[mob_num].item)->damroll = intval;
-        sprintf(buf, "Mob damroll set to %d.\r\n", intval);
-        send_to_char(buf, ch);
-      } break;
-
-     /* edit hitroll */
-      case 16 : {
-         if(!*buf4) {
-          send_to_char("$3Syntax$R: medit [mob_num] hitroll <levelnum>\n\r"
-                       "$3Current$R: ", ch);
-          sprintf(buf, "%d\n", ((char_data *)mob_index[mob_num].item)->hitroll);
-          send_to_char(buf, ch);
-          send_to_char("$3Valid Range$R: -50 to 100\r\n", ch);
-          return eFAILURE;
-        }
-        if(!check_range_valid_and_convert(intval, buf4, -50, 300)) {
-          send_to_char("Value out of valid range.\r\n", ch);
-          return eFAILURE;
-        }
-        ((char_data *)mob_index[mob_num].item)->hitroll = intval;
-        sprintf(buf, "Mob hitroll set to %d.\r\n", intval);
-        send_to_char(buf, ch);
-     } break;
-
-     /* edit hphitpoints */
-      case 17 : {
-         if(!*buf4) {
-          send_to_char("$3Syntax$R: medit [mob_num] hphitpoints <hp>\n\r"
-                       "$3Current$R: ", ch);
-          sprintf(buf, "%d\n", ((char_data *)mob_index[mob_num].item)->raw_hit);
-          send_to_char(buf, ch);
-          send_to_char("$3Valid Range$R: 1 to 64000\r\n", ch);
-          return eFAILURE;
-        }
-        if(!check_range_valid_and_convert(intval, buf4, 1, 64000)) {
-          send_to_char("Value out of valid range.\r\n", ch);
-          return eFAILURE;
-        }
-        ((char_data *)mob_index[mob_num].item)->raw_hit = intval;
-        ((char_data *)mob_index[mob_num].item)->max_hit = intval;
-        sprintf(buf, "Mob hitpoints set to %d.\r\n", intval);
-        send_to_char(buf, ch);
-      } break;
-
-     /* edit gold */
-      case 18 : {
-         if(!*buf4) {
-          send_to_char("$3Syntax$R: medit [mob_num] gold <goldamount>\n\r"
-                       "$3Current$R: ", ch);
-          sprintf(buf, "%lld\n", ((char_data *)mob_index[mob_num].item)->gold);
-          send_to_char(buf, ch);
-          send_to_char("$3Valid Range$R: 0 to 10000000\r\n", ch);
-          return eFAILURE;
-        }
-        if(!check_range_valid_and_convert(intval, buf4, 0, 10000000)) {
-          send_to_char("Value out of valid range.\r\n", ch);
-          return eFAILURE;
-        }
-        if(intval > 250000 && GET_LEVEL(ch) <= DEITY) {
-          send_to_char("104-'s can only set a mob to 250k gold.  If you need more ask someone.\r\n", ch);
-          return eFAILURE;
-        }
-        ((char_data *)mob_index[mob_num].item)->gold = intval;
-        sprintf(buf, "Mob gold set to %d.\r\n", intval);
-        send_to_char(buf, ch);
-      } break;
-
-     /* edit experiencepoints */
-      case 19 : {
-         if(!*buf4) {
-          send_to_char("$3Syntax$R: medit [mob_num] experiencepoints <xpamount>\n\r"
-                       "$3Current$R: ", ch);
-          sprintf(buf, "%d\n", (int)((char_data *)mob_index[mob_num].item)->exp);
-          send_to_char(buf, ch);
-          send_to_char("$3Valid Range$R: 0 to 20000000\r\n", ch);
-          return eFAILURE;
-        }
-        if(!check_range_valid_and_convert(intval, buf4, 0, 20000000)) {
-          send_to_char("Value out of valid range.\r\n", ch);
-          return eFAILURE;
-        }
-        ((char_data *)mob_index[mob_num].item)->exp = intval;
-        sprintf(buf, "Mob experience set to %d.\r\n", intval);
-        send_to_char(buf, ch);
-      } break;
-
-     /* edit immune */
-      case 20 : {
-        if(!*buf4) {
-          send_to_char("$3Syntax$R: medit [mob_num] immune <location[s]>\n\r"
-                       "$3Current$R: ", ch);
-          sprintbit(((char_data *)mob_index[mob_num].item)->immune,
-                    isr_bits, buf);
-          send_to_char(buf, ch);
-          send_to_char("\r\n$3Valid types$R:\r\n", ch);
-          for(i = 0; *isr_bits[i] != '\n'; i++) {
-            sprintf(buf, "  %s\n\r", isr_bits[i]);
-            send_to_char(buf, ch);
-          }
-          return eFAILURE;
-        }
-        parse_bitstrings_into_int(isr_bits, buf4, ch, 
-                                     ((char_data *)mob_index[mob_num].item)->immune);
-      } break;
-
-     /* edit suscept */
-      case 21 : {
-        if(!*buf4) {
-          send_to_char("$3Syntax$R: medit [mob_num] suscept <location[s]>\n\r"
-                       "$3Current$R: ", ch);
-          sprintbit(((char_data *)mob_index[mob_num].item)->suscept,
-                    isr_bits, buf);
-          send_to_char(buf, ch);
-          send_to_char("\r\n$3Valid types$R:\r\n", ch);
-          for(i = 0; *isr_bits[i] != '\n'; i++) {
-            sprintf(buf, "  %s\n\r", isr_bits[i]);
-            send_to_char(buf, ch);
-          }
-          return eFAILURE;
-        }
-        parse_bitstrings_into_int(isr_bits, buf4, ch, 
-                                     ((char_data *)mob_index[mob_num].item)->suscept);
-      } break;
-
-     /* edit resist */
-      case 22 : {
-        if(!*buf4) {
-          send_to_char("$3Syntax$R: medit [mob_num] resist <location[s]>\n\r"
-                       "$3Current$R: ", ch);
-          sprintbit(((char_data *)mob_index[mob_num].item)->resist,
-                    isr_bits, buf);
-          send_to_char(buf, ch);
-          send_to_char("\r\n$3Valid types$R:\r\n", ch);
-          for(i = 0; *isr_bits[i] != '\n'; i++) {
-            sprintf(buf, "  %s\n\r", isr_bits[i]);
-            send_to_char(buf, ch);
-          }
-          return eFAILURE;
-        }
-        parse_bitstrings_into_int(isr_bits, buf4, ch, 
-                                     ((char_data *)mob_index[mob_num].item)->resist);
-      } break;
-
-      // armorclass
-      case 23: {
-         if(!*buf4) {
-          send_to_char("$3Syntax$R: medit [mob_num] armorclass <ac>\n\r"
-                       "$3Current$R: ", ch);
-          sprintf(buf, "%d\n", ((char_data *)mob_index[mob_num].item)->armor);
-          send_to_char(buf, ch);
-          send_to_char("$3Valid Range$R: 100 to $B-$R2000\r\n", ch);
-          return eFAILURE;
-        }
-        if(!check_range_valid_and_convert(intval, buf4, -2000, 100)) {
-          send_to_char("Value out of valid range.\r\n", ch);
-          return eFAILURE;
-        }
-        ((char_data *)mob_index[mob_num].item)->armor = intval;
-        sprintf(buf, "Mob armorclass(ac) set to %d.\r\n", intval);
-        send_to_char(buf, ch);
-      } break;
-
-      // stat
-      case 24: {
-        mob_stat(ch, (char_data *) mob_index[mob_num].item);
-        break;
-      }
-      // strength
-      case 25: {
-         if(!*buf4) {
-          send_to_char("$3Syntax$R: medit [mob_num] strength <str>\n\r"
-                       "$3Current$R: ", ch);
-          sprintf(buf, "%d\n", ((char_data *)mob_index[mob_num].item)->raw_str);
-          send_to_char(buf, ch);
-          send_to_char("$3Valid Range$R: 1 to 28\r\n", ch);
-          return eFAILURE;
-        }
-        if(!check_range_valid_and_convert(intval, buf4, 1, 28)) {
-          send_to_char("Value out of valid range.\r\n", ch);
-          return eFAILURE;
-        }
-        ((char_data *)mob_index[mob_num].item)->raw_str = intval;
-        sprintf(buf, "Mob raw strength set to %d.\r\n", intval);
-        send_to_char(buf, ch);
-      } break;
-      // dexterity
-      case 26: {
-         if(!*buf4) {
-          send_to_char("$3Syntax$R: medit [mob_num] dexterity <dex>\n\r"
-                       "$3Current$R: ", ch);
-          sprintf(buf, "%d\n", ((char_data *)mob_index[mob_num].item)->raw_dex);
-          send_to_char(buf, ch);
-          send_to_char("$3Valid Range$R: 1 to 28\r\n", ch);
-          return eFAILURE;
-        }
-        if(!check_range_valid_and_convert(intval, buf4, 1, 28)) {
-          send_to_char("Value out of valid range.\r\n", ch);
-          return eFAILURE;
-        }
-        ((char_data *)mob_index[mob_num].item)->raw_dex = intval;
-        sprintf(buf, "Mob raw dexterity set to %d.\r\n", intval);
-        send_to_char(buf, ch);
-      } break;
-      // intelligence
-      case 27: {
-         if(!*buf4) {
-          send_to_char("$3Syntax$R: medit [mob_num] intelligence <int>\n\r"
-                       "$3Current$R: ", ch);
-          sprintf(buf, "%d\n", ((char_data *)mob_index[mob_num].item)->raw_intel);
-          send_to_char(buf, ch);
-          send_to_char("$3Valid Range$R: 1 to 28\r\n", ch);
-          return eFAILURE;
-        }
-        if(!check_range_valid_and_convert(intval, buf4, 1, 28)) {
-          send_to_char("Value out of valid range.\r\n", ch);
-          return eFAILURE;
-        }
-        ((char_data *)mob_index[mob_num].item)->raw_intel = intval;
-        sprintf(buf, "Mob raw intelligence set to %d.\r\n", intval);
-        send_to_char(buf, ch);
-      } break;
-      // wisdom
-      case 28: {
-         if(!*buf4) {
-          send_to_char("$3Syntax$R: medit [mob_num] wisdom <wis>\n\r"
-                       "$3Current$R: ", ch);
-          sprintf(buf, "%d\n", ((char_data *)mob_index[mob_num].item)->raw_wis);
-          send_to_char(buf, ch);
-          send_to_char("$3Valid Range$R: 1 to 28\r\n", ch);
-          return eFAILURE;
-        }
-        if(!check_range_valid_and_convert(intval, buf4, 1, 28)) {
-          send_to_char("Value out of valid range.\r\n", ch);
-          return eFAILURE;
-        }
-        ((char_data *)mob_index[mob_num].item)->raw_wis = intval;
-        sprintf(buf, "Mob raw wisdom set to %d.\r\n", intval);
-        send_to_char(buf, ch);
-      } break;
-      // constitution
-      case 29: {
-         if(!*buf4) {
-          send_to_char("$3Syntax$R: medit [mob_num] constitution <con>\n\r"
-                       "$3Current$R: ", ch);
-          sprintf(buf, "%d\n", ((char_data *)mob_index[mob_num].item)->raw_con);
-          send_to_char(buf, ch);
-          send_to_char("$3Valid Range$R: 1 to 28\r\n", ch);
-          return eFAILURE;
-        }
-        if(!check_range_valid_and_convert(intval, buf4, 1, 28)) {
-          send_to_char("Value out of valid range.\r\n", ch);
-          return eFAILURE;
-        }
-        ((char_data *)mob_index[mob_num].item)->raw_con = intval;
-        sprintf(buf, "Mob raw constituion set to %d.\r\n", intval);
-        send_to_char(buf, ch);
-      } break;
-      // New
-      case 30: {  
-        if (!*buf4) {
-           send_to_char("$3Syntax$R: medit new [number]\r\n", ch);
-           return eFAILURE;
-        }
-        if(!check_range_valid_and_convert(intval, buf4, 0, 35000)) {
-          send_to_char("Please specifiy a valid number.\r\n", ch);
-          return eFAILURE;
-        }
-        if (!can_modify_mobile(ch, intval))
-        {
-          send_to_char("You cannot create mobiles in that range.\r\n",ch);
-          return eFAILURE;
-        }
-        x = create_blank_mobile(intval);
-        if(x < 0) {
-          csendf(ch, "Could not create mobile '%d'.  Max index hit or mob already exists.\r\n",intval);
-          return eFAILURE;
-        }
-        csendf(ch, "Mobile '%d' created successfully.\r\n", intval);
-      } break;
-      case 31: {
-        if(!*buf4 || strncmp(buf4, "yesiwanttodeletethismob", 23)) {
-	 send_to_char("$3Syntax$R: medit [mob_number] delete yesiwanttodeletethismob\n\r",ch);
-	 return eFAILURE;
 	}
-	CHAR_DATA *v,*n;
-	for (v = character_list; v; v = n)
-	{
-	 n = v->next;
-         if (IS_NPC(v) && v->mobdata->nr == mob_num)
-	   extract_char(v, TRUE);
+		break;
+
+		/* edit numdamdice */
+	case 13: {
+		if (!*buf4) {
+			send_to_char("$3Syntax$R: medit [mob_num] numdamdice <amount>\n\r"
+					"$3Current$R: ", ch);
+			sprintf(buf, "%d\n",
+					((char_data *) mob_index[mob_num].item)->mobdata->damnodice);
+			send_to_char(buf, ch);
+			send_to_char("$3Valid Range$R: 1 to 400\r\n", ch);
+			return eFAILURE;
+		}
+		if (!check_range_valid_and_convert(intval, buf4, 1, 400)) {
+			send_to_char("Value out of valid range.\r\n", ch);
+			return eFAILURE;
+		}
+		((char_data *) mob_index[mob_num].item)->mobdata->damnodice = intval;
+		sprintf(buf, "Mob number dice for damage set to %d.\r\n", intval);
+		send_to_char(buf, ch);
 	}
-	delete_mob_from_index(mob_num);
-	send_to_char("Mobile deleted.\r\n",ch);
-      } break;
-    }
-    set_zone_modified_mob(mob_num);
-    return eSUCCESS;
+		break;
+
+		/* edit sizedamdice */
+	case 14: {
+		if (!*buf4) {
+			send_to_char("$3Syntax$R: medit [mob_num] sizedamdice <amount>\n\r"
+					"$3Current$R: ", ch);
+			sprintf(buf, "%d\n",
+					((char_data *) mob_index[mob_num].item)->mobdata->damsizedice);
+			send_to_char(buf, ch);
+			send_to_char("$3Valid Range$R: 1 to 400\r\n", ch);
+			return eFAILURE;
+		}
+		if (!check_range_valid_and_convert(intval, buf4, 1, 400)) {
+			send_to_char("Value out of valid range.\r\n", ch);
+			return eFAILURE;
+		}
+		((char_data *) mob_index[mob_num].item)->mobdata->damsizedice = intval;
+		sprintf(buf, "Mob size dice for damage set to %d.\r\n", intval);
+		send_to_char(buf, ch);
+	}
+		break;
+
+		/* edit damroll */
+	case 15: {
+		if (!*buf4) {
+			send_to_char("$3Syntax$R: medit [mob_num] damroll <damrollnum>\n\r"
+					"$3Current$R: ", ch);
+			sprintf(buf, "%d\n",
+					((char_data *) mob_index[mob_num].item)->damroll);
+			send_to_char(buf, ch);
+			send_to_char("$3Valid Range$R: -50 to 400\r\n", ch);
+			return eFAILURE;
+		}
+		if (!check_range_valid_and_convert(intval, buf4, -50, 400)) {
+			send_to_char("Value out of valid range.\r\n", ch);
+			return eFAILURE;
+		}
+		((char_data *) mob_index[mob_num].item)->damroll = intval;
+		sprintf(buf, "Mob damroll set to %d.\r\n", intval);
+		send_to_char(buf, ch);
+	}
+		break;
+
+		/* edit hitroll */
+	case 16: {
+		if (!*buf4) {
+			send_to_char("$3Syntax$R: medit [mob_num] hitroll <levelnum>\n\r"
+					"$3Current$R: ", ch);
+			sprintf(buf, "%d\n",
+					((char_data *) mob_index[mob_num].item)->hitroll);
+			send_to_char(buf, ch);
+			send_to_char("$3Valid Range$R: -50 to 100\r\n", ch);
+			return eFAILURE;
+		}
+		if (!check_range_valid_and_convert(intval, buf4, -50, 300)) {
+			send_to_char("Value out of valid range.\r\n", ch);
+			return eFAILURE;
+		}
+		((char_data *) mob_index[mob_num].item)->hitroll = intval;
+		sprintf(buf, "Mob hitroll set to %d.\r\n", intval);
+		send_to_char(buf, ch);
+	}
+		break;
+
+		/* edit hphitpoints */
+	case 17: {
+		if (!*buf4) {
+			send_to_char("$3Syntax$R: medit [mob_num] hphitpoints <hp>\n\r"
+					"$3Current$R: ", ch);
+			sprintf(buf, "%d\n",
+					((char_data *) mob_index[mob_num].item)->raw_hit);
+			send_to_char(buf, ch);
+			send_to_char("$3Valid Range$R: 1 to 64000\r\n", ch);
+			return eFAILURE;
+		}
+		if (!check_range_valid_and_convert(intval, buf4, 1, 64000)) {
+			send_to_char("Value out of valid range.\r\n", ch);
+			return eFAILURE;
+		}
+		((char_data *) mob_index[mob_num].item)->raw_hit = intval;
+		((char_data *) mob_index[mob_num].item)->max_hit = intval;
+		sprintf(buf, "Mob hitpoints set to %d.\r\n", intval);
+		send_to_char(buf, ch);
+	}
+		break;
+
+		/* edit gold */
+	case 18: {
+		if (!*buf4) {
+			send_to_char("$3Syntax$R: medit [mob_num] gold <goldamount>\n\r"
+					"$3Current$R: ", ch);
+			sprintf(buf, "%lld\n",
+					((char_data *) mob_index[mob_num].item)->gold);
+			send_to_char(buf, ch);
+			send_to_char("$3Valid Range$R: 0 to 10000000\r\n", ch);
+			return eFAILURE;
+		}
+		if (!check_range_valid_and_convert(intval, buf4, 0, 10000000)) {
+			send_to_char("Value out of valid range.\r\n", ch);
+			return eFAILURE;
+		}
+		if (intval > 250000 && GET_LEVEL(ch) <= DEITY) {
+			send_to_char(
+					"104-'s can only set a mob to 250k gold.  If you need more ask someone.\r\n",
+					ch);
+			return eFAILURE;
+		}
+		((char_data *) mob_index[mob_num].item)->gold = intval;
+		sprintf(buf, "Mob gold set to %d.\r\n", intval);
+		send_to_char(buf, ch);
+	}
+		break;
+
+		/* edit experiencepoints */
+	case 19: {
+		if (!*buf4) {
+			send_to_char(
+					"$3Syntax$R: medit [mob_num] experiencepoints <xpamount>\n\r"
+							"$3Current$R: ", ch);
+			sprintf(buf, "%d\n",
+					(int) ((char_data *) mob_index[mob_num].item)->exp);
+			send_to_char(buf, ch);
+			send_to_char("$3Valid Range$R: 0 to 20000000\r\n", ch);
+			return eFAILURE;
+		}
+		if (!check_range_valid_and_convert(intval, buf4, 0, 20000000)) {
+			send_to_char("Value out of valid range.\r\n", ch);
+			return eFAILURE;
+		}
+		((char_data *) mob_index[mob_num].item)->exp = intval;
+		sprintf(buf, "Mob experience set to %d.\r\n", intval);
+		send_to_char(buf, ch);
+	}
+		break;
+
+		/* edit immune */
+	case 20: {
+		if (!*buf4) {
+			send_to_char("$3Syntax$R: medit [mob_num] immune <location[s]>\n\r"
+					"$3Current$R: ", ch);
+			sprintbit(((char_data *) mob_index[mob_num].item)->immune, isr_bits,
+					buf);
+			send_to_char(buf, ch);
+			send_to_char("\r\n$3Valid types$R:\r\n", ch);
+			for (i = 0; *isr_bits[i] != '\n'; i++) {
+				sprintf(buf, "  %s\n\r", isr_bits[i]);
+				send_to_char(buf, ch);
+			}
+			return eFAILURE;
+		}
+		parse_bitstrings_into_int(isr_bits, buf4, ch,
+				((char_data *) mob_index[mob_num].item)->immune);
+	}
+		break;
+
+		/* edit suscept */
+	case 21: {
+		if (!*buf4) {
+			send_to_char("$3Syntax$R: medit [mob_num] suscept <location[s]>\n\r"
+					"$3Current$R: ", ch);
+			sprintbit(((char_data *) mob_index[mob_num].item)->suscept,
+					isr_bits, buf);
+			send_to_char(buf, ch);
+			send_to_char("\r\n$3Valid types$R:\r\n", ch);
+			for (i = 0; *isr_bits[i] != '\n'; i++) {
+				sprintf(buf, "  %s\n\r", isr_bits[i]);
+				send_to_char(buf, ch);
+			}
+			return eFAILURE;
+		}
+		parse_bitstrings_into_int(isr_bits, buf4, ch,
+				((char_data *) mob_index[mob_num].item)->suscept);
+	}
+		break;
+
+		/* edit resist */
+	case 22: {
+		if (!*buf4) {
+			send_to_char("$3Syntax$R: medit [mob_num] resist <location[s]>\n\r"
+					"$3Current$R: ", ch);
+			sprintbit(((char_data *) mob_index[mob_num].item)->resist, isr_bits,
+					buf);
+			send_to_char(buf, ch);
+			send_to_char("\r\n$3Valid types$R:\r\n", ch);
+			for (i = 0; *isr_bits[i] != '\n'; i++) {
+				sprintf(buf, "  %s\n\r", isr_bits[i]);
+				send_to_char(buf, ch);
+			}
+			return eFAILURE;
+		}
+		parse_bitstrings_into_int(isr_bits, buf4, ch,
+				((char_data *) mob_index[mob_num].item)->resist);
+	}
+		break;
+
+		// armorclass
+	case 23: {
+		if (!*buf4) {
+			send_to_char("$3Syntax$R: medit [mob_num] armorclass <ac>\n\r"
+					"$3Current$R: ", ch);
+			sprintf(buf, "%d\n",
+					((char_data *) mob_index[mob_num].item)->armor);
+			send_to_char(buf, ch);
+			send_to_char("$3Valid Range$R: 100 to $B-$R2000\r\n", ch);
+			return eFAILURE;
+		}
+		if (!check_range_valid_and_convert(intval, buf4, -2000, 100)) {
+			send_to_char("Value out of valid range.\r\n", ch);
+			return eFAILURE;
+		}
+		((char_data *) mob_index[mob_num].item)->armor = intval;
+		sprintf(buf, "Mob armorclass(ac) set to %d.\r\n", intval);
+		send_to_char(buf, ch);
+	}
+		break;
+
+		// stat
+	case 24: {
+		mob_stat(ch, (char_data *) mob_index[mob_num].item);
+		break;
+	}
+		// strength
+	case 25: {
+		if (!*buf4) {
+			send_to_char("$3Syntax$R: medit [mob_num] strength <str>\n\r"
+					"$3Current$R: ", ch);
+			sprintf(buf, "%d\n",
+					((char_data *) mob_index[mob_num].item)->raw_str);
+			send_to_char(buf, ch);
+			send_to_char("$3Valid Range$R: 1 to 28\r\n", ch);
+			return eFAILURE;
+		}
+		if (!check_range_valid_and_convert(intval, buf4, 1, 28)) {
+			send_to_char("Value out of valid range.\r\n", ch);
+			return eFAILURE;
+		}
+		((char_data *) mob_index[mob_num].item)->raw_str = intval;
+		sprintf(buf, "Mob raw strength set to %d.\r\n", intval);
+		send_to_char(buf, ch);
+	}
+		break;
+		// dexterity
+	case 26: {
+		if (!*buf4) {
+			send_to_char("$3Syntax$R: medit [mob_num] dexterity <dex>\n\r"
+					"$3Current$R: ", ch);
+			sprintf(buf, "%d\n",
+					((char_data *) mob_index[mob_num].item)->raw_dex);
+			send_to_char(buf, ch);
+			send_to_char("$3Valid Range$R: 1 to 28\r\n", ch);
+			return eFAILURE;
+		}
+		if (!check_range_valid_and_convert(intval, buf4, 1, 28)) {
+			send_to_char("Value out of valid range.\r\n", ch);
+			return eFAILURE;
+		}
+		((char_data *) mob_index[mob_num].item)->raw_dex = intval;
+		sprintf(buf, "Mob raw dexterity set to %d.\r\n", intval);
+		send_to_char(buf, ch);
+	}
+		break;
+		// intelligence
+	case 27: {
+		if (!*buf4) {
+			send_to_char("$3Syntax$R: medit [mob_num] intelligence <int>\n\r"
+					"$3Current$R: ", ch);
+			sprintf(buf, "%d\n",
+					((char_data *) mob_index[mob_num].item)->raw_intel);
+			send_to_char(buf, ch);
+			send_to_char("$3Valid Range$R: 1 to 28\r\n", ch);
+			return eFAILURE;
+		}
+		if (!check_range_valid_and_convert(intval, buf4, 1, 28)) {
+			send_to_char("Value out of valid range.\r\n", ch);
+			return eFAILURE;
+		}
+		((char_data *) mob_index[mob_num].item)->raw_intel = intval;
+		sprintf(buf, "Mob raw intelligence set to %d.\r\n", intval);
+		send_to_char(buf, ch);
+	}
+		break;
+		// wisdom
+	case 28: {
+		if (!*buf4) {
+			send_to_char("$3Syntax$R: medit [mob_num] wisdom <wis>\n\r"
+					"$3Current$R: ", ch);
+			sprintf(buf, "%d\n",
+					((char_data *) mob_index[mob_num].item)->raw_wis);
+			send_to_char(buf, ch);
+			send_to_char("$3Valid Range$R: 1 to 28\r\n", ch);
+			return eFAILURE;
+		}
+		if (!check_range_valid_and_convert(intval, buf4, 1, 28)) {
+			send_to_char("Value out of valid range.\r\n", ch);
+			return eFAILURE;
+		}
+		((char_data *) mob_index[mob_num].item)->raw_wis = intval;
+		sprintf(buf, "Mob raw wisdom set to %d.\r\n", intval);
+		send_to_char(buf, ch);
+	}
+		break;
+		// constitution
+	case 29: {
+		if (!*buf4) {
+			send_to_char("$3Syntax$R: medit [mob_num] constitution <con>\n\r"
+					"$3Current$R: ", ch);
+			sprintf(buf, "%d\n",
+					((char_data *) mob_index[mob_num].item)->raw_con);
+			send_to_char(buf, ch);
+			send_to_char("$3Valid Range$R: 1 to 28\r\n", ch);
+			return eFAILURE;
+		}
+		if (!check_range_valid_and_convert(intval, buf4, 1, 28)) {
+			send_to_char("Value out of valid range.\r\n", ch);
+			return eFAILURE;
+		}
+		((char_data *) mob_index[mob_num].item)->raw_con = intval;
+		sprintf(buf, "Mob raw constituion set to %d.\r\n", intval);
+		send_to_char(buf, ch);
+	}
+		break;
+		// New
+	case 30: {
+		if (!*buf4) {
+			send_to_char("$3Syntax$R: medit new [number]\r\n", ch);
+			return eFAILURE;
+		}
+		if (!check_range_valid_and_convert(intval, buf4, 0, 35000)) {
+			send_to_char("Please specifiy a valid number.\r\n", ch);
+			return eFAILURE;
+		}
+		if (!can_modify_mobile(ch, intval)) {
+			send_to_char("You cannot create mobiles in that range.\r\n", ch);
+			return eFAILURE;
+		}
+		x = create_blank_mobile(intval);
+		if (x < 0) {
+			csendf(ch,
+					"Could not create mobile '%d'.  Max index hit or mob already exists.\r\n",
+					intval);
+			return eFAILURE;
+		}
+		csendf(ch, "Mobile '%d' created successfully.\r\n", intval);
+	}
+		break;
+	case 31: {
+		if (!*buf4 || strncmp(buf4, "yesiwanttodeletethismob", 23)) {
+			send_to_char(
+					"$3Syntax$R: medit [mob_number] delete yesiwanttodeletethismob\n\r",
+					ch);
+			return eFAILURE;
+		}
+		CHAR_DATA *v, *n;
+		for (v = character_list; v; v = n) {
+			n = v->next;
+			if (IS_NPC(v) && v->mobdata->nr == mob_num)
+				extract_char(v, TRUE);
+		}
+		delete_mob_from_index(mob_num);
+		send_to_char("Mobile deleted.\r\n", ch);
+	}
+		break;
+	case 32: {
+		if (!*buf4) {
+			send_to_char("$3Syntax$R: medit [mob_vnum] type <type id>\n\r"
+					"$3Current$R: ", ch);
+			sprintf(buf, "%s\n",
+					mob_types[((char_data *) mob_index[mob_num].item)->mobdata->mob_flags.type]);
+			send_to_char(buf, ch);
+			send_to_char("\r\n$3Valid types$R:\r\n", ch);
+			for (i = 0; *mob_types[i] != '\n'; i++) {
+				sprintf(buf, "  %d) %s\n\r", i, mob_types[i]);
+				send_to_char(buf, ch);
+			}
+			return eFAILURE;
+		}
+
+		if (!check_range_valid_and_convert(intval, buf4, MOB_TYPE_FIRST,
+				MOB_TYPE_LAST)) {
+			send_to_char("Value out of valid range.\r\n", ch);
+			return eFAILURE;
+		}
+		((char_data *) mob_index[mob_num].item)->mobdata->mob_flags.type =
+				(mob_type_t) intval;
+		sprintf(buf, "Mob type set to %d.\r\n", intval);
+		send_to_char(buf, ch);
+	}
+		break;
+		/* edit 1value */
+	case 33: {
+		if (!*buf4) {
+			send_to_char("$3Syntax$R: medit [mob_vnum] 1value <num>\n\r", ch);
+			return eFAILURE;
+		}
+		if (!check_valid_and_convert(intval, buf4)) {
+			send_to_char("Please specify a valid number.\r\n", ch);
+			return eFAILURE;
+		}
+		((char_data *) mob_index[mob_num].item)->mobdata->mob_flags.value[0] = intval;
+		sprintf(buf, "Mob value 1 set to %d.\r\n", intval);
+		send_to_char(buf, ch);
+	}
+		break;
+
+		/* edit 2value */
+	case 34: {
+		if (!*buf4) {
+			send_to_char("$3Syntax$R: medit [mob_vnum] 2value <num>\n\r", ch);
+			return eFAILURE;
+		}
+		if (!check_valid_and_convert(intval, buf4)) {
+			send_to_char("Please specify a valid number.\r\n", ch);
+			return eFAILURE;
+		}
+		((char_data *) mob_index[mob_num].item)->mobdata->mob_flags.value[1] = intval;
+		sprintf(buf, "Mob value 2 set to %d.\r\n", intval);
+		send_to_char(buf, ch);
+	}
+		break;
+
+		/* edit 3value */
+	case 35: {
+		if (!*buf4) {
+			send_to_char("$3Syntax$R: medit [mob_vnum] 3value <num>\n\r", ch);
+			return eFAILURE;
+		}
+		if (!check_valid_and_convert(intval, buf4)) {
+			send_to_char("Please specify a valid number.\r\n", ch);
+			return eFAILURE;
+		}
+		((char_data *) mob_index[mob_num].item)->mobdata->mob_flags.value[2] = intval;
+		sprintf(buf, "Mob value 3 set to %d.\r\n", intval);
+		send_to_char(buf, ch);
+	}
+		break;
+
+		/* edit 4value */
+	case 36: {
+		if (!*buf4) {
+			send_to_char("$3Syntax$R: medit [mob_vnum] 4value <num>\n\r", ch);
+			return eFAILURE;
+		}
+		if (!check_valid_and_convert(intval, buf4)) {
+			send_to_char("Please specify a valid number.\r\n", ch);
+			return eFAILURE;
+		}
+		((char_data *) mob_index[mob_num].item)->mobdata->mob_flags.value[3] = intval;
+		sprintf(buf, "Mob value 4 set to %d.\r\n", intval);
+		send_to_char(buf, ch);
+	}
+		break;
+
+	}
+	set_zone_modified_mob(mob_num);
+	return eSUCCESS;
 }
 
 int do_redit(struct char_data *ch, char *argument, int cmd)

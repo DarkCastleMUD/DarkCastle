@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.205 2014/07/15 21:33:49 jhhudso Exp $ */
+/* $Id: mob_proc.cpp,v 1.206 2014/07/26 23:21:23 jhhudso Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -901,44 +901,55 @@ GET_CLASS(ch) != clas || (align == 1 && !IS_EVIL(ch)) || (align == 3 &&
     return eFAILURE;
 }
 
-int clan_guard(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,        
-          struct char_data *owner)
-{
-    int in_room = ch->in_room;
+int clan_guard(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
+		struct char_data *owner) {
+	int in_room = ch->in_room;
+	int guard_clan = 0;
+	int guard_room = 0;
+	int guard_direction = 0;
 
-    if (cmd>6 || cmd<1)
-	return eFAILURE;
-    // 3 = south, 2 = east, 5 = up
-    // 1 = north, 4  = west, 6 = down
+	if (cmd > 6 || cmd < 1)
+		return eFAILURE;
+	// 3 = south, 2 = east, 5 = up
+	// 1 = north, 4  = west, 6 = down
 
-    if ((in_room == real_room(2300) && cmd != CMD_NORTH) ||    // up
-        (in_room == real_room(2310) && cmd != CMD_EAST) ||  // east
-        (in_room == real_room(2320) && cmd != CMD_SOUTH) || // south
-        (in_room == real_room(2330) && cmd != CMD_SOUTH) || // south
-        (in_room == real_room(2340) && cmd != CMD_SOUTH) || // south
-        (in_room == real_room(2350) && cmd != CMD_SOUTH) || // south
-        (in_room == real_room(2360) && cmd != CMD_SOUTH) || // south
-        (in_room == real_room(2370) && cmd != CMD_DOWN) ||  // down
-        (in_room == real_room(2380) && cmd != CMD_NORTH) || // north
-        (in_room == real_room(2390) && cmd != CMD_SOUTH) || // south
-        (in_room == real_room(2400) && cmd != CMD_WEST) ||  // west
-        (in_room == real_room(2410) && cmd != CMD_UP) ||    // up
-        (in_room == real_room(2420) && cmd != CMD_SOUTH) || // south
-        (in_room == real_room(2430) && cmd != CMD_SOUTH) || // south
-        (in_room == real_room(2440) && cmd != CMD_NORTH) || // north
-        (in_room == real_room(2450) && cmd != CMD_WEST) ||  // west
-		(in_room == real_room(2460) && cmd != CMD_NORTH) || // north
-		(in_room == real_room(2470) && cmd != CMD_WEST) ||  // west
-		(in_room == real_room(2480) && cmd != CMD_NORTH) || // north
-		(in_room == real_room(2500) && cmd != CMD_NORTH))   // north
-        return eFAILURE;
+	// If the mob is of type MOB_CLAN_GUARD then we look at v1-v4 to know how to guard
+	if (IS_MOB(owner) && owner->mobdata->mob_flags.type == mob_type_t::MOB_CLAN_GUARD) {
+		guard_room = owner->mobdata->mob_flags.value[0];
+		guard_direction = owner->mobdata->mob_flags.value[1];
+		guard_clan = owner->mobdata->mob_flags.value[2];
 
-    int clan_num = ch->clan;
-     if (IS_NPC(ch) && IS_AFFECTED(ch, AFF_CHARM))
-     {
-	int b = mob_index[ch->mobdata->nr].virt;
-	switch (b)
-	{
+		if (in_room != real_room(guard_room) || cmd != guard_direction) {
+			return eFAILURE;
+		}
+	} else {
+		if ((in_room == real_room(2300) && cmd != CMD_NORTH) ||    // up
+				(in_room == real_room(2310) && cmd != CMD_EAST) ||  // east
+				(in_room == real_room(2320) && cmd != CMD_SOUTH) || // south
+				(in_room == real_room(2330) && cmd != CMD_SOUTH) || // south
+				(in_room == real_room(2340) && cmd != CMD_SOUTH) || // south
+				(in_room == real_room(2350) && cmd != CMD_SOUTH) || // south
+				(in_room == real_room(2360) && cmd != CMD_SOUTH) || // south
+				(in_room == real_room(2370) && cmd != CMD_DOWN) ||  // down
+				(in_room == real_room(2380) && cmd != CMD_NORTH) || // north
+				(in_room == real_room(2390) && cmd != CMD_SOUTH) || // south
+				(in_room == real_room(2400) && cmd != CMD_WEST) ||  // west
+				(in_room == real_room(2410) && cmd != CMD_UP) ||    // up
+				(in_room == real_room(2420) && cmd != CMD_SOUTH) || // south
+				(in_room == real_room(2430) && cmd != CMD_SOUTH) || // south
+				(in_room == real_room(2440) && cmd != CMD_NORTH) || // north
+				(in_room == real_room(2450) && cmd != CMD_WEST) ||  // west
+				(in_room == real_room(2460) && cmd != CMD_NORTH) || // north
+				(in_room == real_room(2470) && cmd != CMD_WEST) ||  // west
+				(in_room == real_room(2480) && cmd != CMD_NORTH) || // north
+				(in_room == real_room(2500) && cmd != CMD_NORTH))   // north
+			return eFAILURE;
+	}
+
+	int clan_num = ch->clan;
+	if (IS_NPC(ch) && IS_AFFECTED(ch, AFF_CHARM)) {
+		int b = mob_index[ch->mobdata->nr].virt;
+		switch (b) {
 		case 8:       //golem
 		case 88:      //fire elemental
 		case 89:      //ice elemental
@@ -954,51 +965,56 @@ int clan_guard(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
 		case 22396:
 		case 22397:
 		case 22398:
-			if (ch->master) clan_num = ch->master->clan;
+			if (ch->master)
+				clan_num = ch->master->clan;
 			break;
 		default:
-		break;
+			break;
+		}
 	}
-     }
 
-    if ( (clan_num != 14 && in_room == real_room(2300))  // moor
-    ||   (clan_num !=  4 && in_room == real_room(2310))  // darkened
-    ||   (clan_num != 18 && in_room == real_room(2320))  // anarchist
-    ||   (clan_num !=  1 && in_room == real_room(2330))  // uln'hyrr
-    ||   (clan_num != 10 && in_room == real_room(2340))  // black_axe
-    ||   (clan_num !=  9 && in_room == real_room(2350))  // nazgul
-    ||   (clan_num !=  3 && in_room == real_room(2360))  // arcana
-    ||   (clan_num != 17 && in_room == real_room(2370))  // the_horde
-    ||   (clan_num != 13 && in_room == real_room(2380))  // slackers
-    ||   (clan_num != 20 && in_room == real_room(2390))  // sindicate
-    ||   (clan_num !=  8 && in_room == real_room(2400))  // merc
-    ||   (clan_num !=  6 && in_room == real_room(2410))  // timewarp
-    ||   (clan_num != 19 && in_room == real_room(2420))  // solaris
-    ||   (clan_num != 10 && in_room == real_room(2430))  // black_axe #2
-    ||   (clan_num !=  2 && in_room == real_room(2440))  // dark_tide
-    ||   (clan_num != 16 && in_room == real_room(2450))  // tel'mithrim
-    ||   (clan_num != 12 && in_room == real_room(2460))  // legion_of_ruin
-    ||   (clan_num !=  7 && in_room == real_room(2470))  // the_resistance
-    ||   (clan_num != 15 && in_room == real_room(2480))  // sng
-    ||   (clan_num != 11 && in_room == real_room(2500))  // triad
-  
-	)
-    {
-	act( "$n is turned away from the clan hall.", ch, 0, 0, TO_ROOM , 0);
-	send_to_char("The clan guard throws you out on your ass.\n\r", ch );
-	return eSUCCESS;
-    }
-    else if(affected_by_spell(ch, FUCK_PTHIEF) || affected_by_spell(ch, FUCK_GTHIEF)) { 
-	act( "$n is turned away from the clan hall.", ch, 0, 0, TO_ROOM , 0);
-	send_to_char("The clan guard says 'Hey don't be bringing trouble around here!'\n\r", ch );
-	return eSUCCESS;
-    }
-    else if(IS_AFFECTED(ch, AFF_CHAMPION)) {
-       act( "$n is turned away from the clan hall.", ch, 0, 0, TO_ROOM , 0);
-       send_to_char("The clan guard says, 'Hey, don't be a wuss, get outta here.'\n\r", ch);
-       return eSUCCESS;
-    }
-    return eFAILURE;
+	if ((clan_num != 14 && in_room == real_room(2300))  // moor
+	|| (clan_num != 4 && in_room == real_room(2310))  // darkened
+			|| (clan_num != 18 && in_room == real_room(2320))  // anarchist
+			|| (clan_num != 1 && in_room == real_room(2330))  // uln'hyrr
+			|| (clan_num != 10 && in_room == real_room(2340))  // black_axe
+			|| (clan_num != 9 && in_room == real_room(2350))  // nazgul
+			|| (clan_num != 3 && in_room == real_room(2360))  // arcana
+			|| (clan_num != 17 && in_room == real_room(2370))  // the_horde
+			|| (clan_num != 13 && in_room == real_room(2380))  // slackers
+			|| (clan_num != 20 && in_room == real_room(2390))  // sindicate
+			|| (clan_num != 8 && in_room == real_room(2400))  // merc
+			|| (clan_num != 6 && in_room == real_room(2410))  // timewarp
+			|| (clan_num != 19 && in_room == real_room(2420))  // solaris
+			|| (clan_num != 10 && in_room == real_room(2430))  // black_axe #2
+			|| (clan_num != 2 && in_room == real_room(2440))  // dark_tide
+			|| (clan_num != 16 && in_room == real_room(2450))  // tel'mithrim
+			|| (clan_num != 12 && in_room == real_room(2460))  // legion_of_ruin
+			|| (clan_num != 7 && in_room == real_room(2470))  // the_resistance
+			|| (clan_num != 15 && in_room == real_room(2480))  // sng
+			|| (clan_num != 11 && in_room == real_room(2500))  // triad
+			|| (IS_MOB(owner)
+					&& owner->mobdata->mob_flags.type == mob_type_t::MOB_CLAN_GUARD
+					&& clan_num != guard_clan
+					&& in_room == real_room(guard_room))) {
+		act("$n is turned away from the clan hall.", ch, 0, 0, TO_ROOM, 0);
+		send_to_char("The clan guard throws you out on your ass.\n\r", ch);
+		return eSUCCESS;
+	} else if (affected_by_spell(ch, FUCK_PTHIEF)
+			|| affected_by_spell(ch, FUCK_GTHIEF)) {
+		act("$n is turned away from the clan hall.", ch, 0, 0, TO_ROOM, 0);
+		send_to_char(
+				"The clan guard says 'Hey don't be bringing trouble around here!'\n\r",
+				ch);
+		return eSUCCESS;
+	} else if (IS_AFFECTED(ch, AFF_CHAMPION)) {
+		act("$n is turned away from the clan hall.", ch, 0, 0, TO_ROOM, 0);
+		send_to_char(
+				"The clan guard says, 'Hey, don't be a wuss, get outta here.'\n\r",
+				ch);
+		return eSUCCESS;
+	}
+	return eFAILURE;
 }
 
 /*--+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+--*/
