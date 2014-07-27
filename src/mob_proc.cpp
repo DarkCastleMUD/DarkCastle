@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.206 2014/07/26 23:21:23 jhhudso Exp $ */
+/* $Id: mob_proc.cpp,v 1.207 2014/07/27 00:30:46 jhhudso Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -973,34 +973,41 @@ int clan_guard(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
 		}
 	}
 
-	if ((clan_num != 14 && in_room == real_room(2300))  // moor
-	|| (clan_num != 4 && in_room == real_room(2310))  // darkened
-			|| (clan_num != 18 && in_room == real_room(2320))  // anarchist
-			|| (clan_num != 1 && in_room == real_room(2330))  // uln'hyrr
-			|| (clan_num != 10 && in_room == real_room(2340))  // black_axe
-			|| (clan_num != 9 && in_room == real_room(2350))  // nazgul
-			|| (clan_num != 3 && in_room == real_room(2360))  // arcana
-			|| (clan_num != 17 && in_room == real_room(2370))  // the_horde
-			|| (clan_num != 13 && in_room == real_room(2380))  // slackers
-			|| (clan_num != 20 && in_room == real_room(2390))  // sindicate
-			|| (clan_num != 8 && in_room == real_room(2400))  // merc
-			|| (clan_num != 6 && in_room == real_room(2410))  // timewarp
-			|| (clan_num != 19 && in_room == real_room(2420))  // solaris
-			|| (clan_num != 10 && in_room == real_room(2430))  // black_axe #2
-			|| (clan_num != 2 && in_room == real_room(2440))  // dark_tide
-			|| (clan_num != 16 && in_room == real_room(2450))  // tel'mithrim
-			|| (clan_num != 12 && in_room == real_room(2460))  // legion_of_ruin
-			|| (clan_num != 7 && in_room == real_room(2470))  // the_resistance
-			|| (clan_num != 15 && in_room == real_room(2480))  // sng
-			|| (clan_num != 11 && in_room == real_room(2500))  // triad
-			|| (IS_MOB(owner)
-					&& owner->mobdata->mob_flags.type == mob_type_t::MOB_CLAN_GUARD
-					&& clan_num != guard_clan
-					&& in_room == real_room(guard_room))) {
+	if (IS_MOB(owner)
+			&& owner->mobdata->mob_flags.type == mob_type_t::MOB_CLAN_GUARD
+			&& clan_num != guard_clan && in_room == real_room(guard_room)) {
 		act("$n is turned away from the clan hall.", ch, 0, 0, TO_ROOM, 0);
 		send_to_char("The clan guard throws you out on your ass.\n\r", ch);
 		return eSUCCESS;
-	} else if (affected_by_spell(ch, FUCK_PTHIEF)
+	} else {
+		if ((clan_num != 14 && in_room == real_room(2300))  // moor
+		|| (clan_num != 4 && in_room == real_room(2310))  // darkened
+				|| (clan_num != 18 && in_room == real_room(2320))  // anarchist
+				|| (clan_num != 1 && in_room == real_room(2330))  // uln'hyrr
+				|| (clan_num != 10 && in_room == real_room(2340))  // black_axe
+				|| (clan_num != 9 && in_room == real_room(2350))  // nazgul
+				|| (clan_num != 3 && in_room == real_room(2360))  // arcana
+				|| (clan_num != 17 && in_room == real_room(2370))  // the_horde
+				|| (clan_num != 13 && in_room == real_room(2380))  // slackers
+				|| (clan_num != 20 && in_room == real_room(2390))  // sindicate
+				|| (clan_num != 8 && in_room == real_room(2400))  // merc
+				|| (clan_num != 6 && in_room == real_room(2410))  // timewarp
+				|| (clan_num != 19 && in_room == real_room(2420))  // solaris
+				|| (clan_num != 10 && in_room == real_room(2430)) // black_axe #2
+				|| (clan_num != 2 && in_room == real_room(2440))  // dark_tide
+				|| (clan_num != 16 && in_room == real_room(2450)) // tel'mithrim
+				|| (clan_num != 12 && in_room == real_room(2460)) // legion_of_ruin
+				|| (clan_num != 7 && in_room == real_room(2470)) // the_resistance
+				|| (clan_num != 15 && in_room == real_room(2480))  // sng
+				|| (clan_num != 11 && in_room == real_room(2500))  // triad
+				) {
+			act("$n is turned away from the clan hall.", ch, 0, 0, TO_ROOM, 0);
+			send_to_char("The clan guard throws you out on your ass.\n\r", ch);
+			return eSUCCESS;
+		}
+	}
+
+	if (affected_by_spell(ch, FUCK_PTHIEF)
 			|| affected_by_spell(ch, FUCK_GTHIEF)) {
 		act("$n is turned away from the clan hall.", ch, 0, 0, TO_ROOM, 0);
 		send_to_char(
