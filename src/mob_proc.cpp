@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: mob_proc.cpp,v 1.207 2014/07/27 00:30:46 jhhudso Exp $ */
+/* $Id: mob_proc.cpp,v 1.208 2014/07/31 01:07:24 jhhudso Exp $ */
 #ifdef LEAK_CHECK
 #include <dmalloc.h>
 #endif
@@ -974,11 +974,12 @@ int clan_guard(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
 	}
 
 	if (IS_MOB(owner)
-			&& owner->mobdata->mob_flags.type == mob_type_t::MOB_CLAN_GUARD
-			&& clan_num != guard_clan && in_room == real_room(guard_room)) {
-		act("$n is turned away from the clan hall.", ch, 0, 0, TO_ROOM, 0);
-		send_to_char("The clan guard throws you out on your ass.\n\r", ch);
-		return eSUCCESS;
+			&& owner->mobdata->mob_flags.type == mob_type_t::MOB_CLAN_GUARD) {
+		if (clan_num != guard_clan && in_room == real_room(guard_room)) {
+			act("$n is turned away from the clan hall.", ch, 0, 0, TO_ROOM, 0);
+			send_to_char("The clan guard throws you out on your ass.\n\r", ch);
+			return eSUCCESS;
+		}
 	} else {
 		if ((clan_num != 14 && in_room == real_room(2300))  // moor
 		|| (clan_num != 4 && in_room == real_room(2310))  // darkened
