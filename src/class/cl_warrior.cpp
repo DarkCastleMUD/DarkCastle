@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_warrior.cpp,v 1.85 2011/11/26 03:24:38 jhhudso Exp $
+| $Id: cl_warrior.cpp,v 1.86 2014/08/21 01:59:39 jhhudso Exp $
 | cl_warrior.C
 | Description:  This file declares implementation for warrior-specific
 |   skills.
@@ -380,8 +380,6 @@ int do_hitall(struct char_data *ch, char *argument, int cmd)
       act ("You start swinging like a madman, but trip over your own feet!", ch, 0, 0, TO_CHAR, 0);
       act ("$n starts swinging like a madman, but trips over $s own feet!", ch, 0, 0, TO_ROOM, 0);
      
-      GET_POS(ch) = POSITION_SITTING;
-
       for (vict = character_list; vict; vict = temp) {
          temp = vict->next;
          if ((!ARE_GROUPED(ch, vict)) && (ch->in_room == vict->in_room) &&
@@ -390,7 +388,7 @@ int do_hitall(struct char_data *ch, char *argument, int cmd)
              add_memory(vict, GET_NAME(ch), 'h');
          }
       }
-    WAIT_STATE(ch, PULSE_VIOLENCE*2);
+    WAIT_STATE(ch, PULSE_VIOLENCE*1);
 
    } else 
    {
