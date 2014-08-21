@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.290 2014/07/16 00:43:13 jhhudso Exp $ */
+/* $Id: spells.cpp,v 1.291 2014/08/21 02:09:03 jhhudso Exp $ */
 
 extern "C"
 {
@@ -156,7 +156,7 @@ struct spell_info_type spell_info [] =
 
  { /* 30 */ 3*PULSE_TIMER, POSITION_FIGHTING, 17, TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, cast_lightning_bolt, SKILL_INCREASE_HARD },
 
- { /* 31 */ 3*PULSE_TIMER, POSITION_STANDING, 20, TAR_IGNORE, cast_locate_object, SKILL_INCREASE_HARD},
+ { /* 31 */ 0, POSITION_STANDING, 20, TAR_IGNORE, cast_locate_object, SKILL_INCREASE_HARD},
 
  { /* 32 */ 3*PULSE_TIMER, POSITION_FIGHTING, 10, TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, cast_magic_missile, SKILL_INCREASE_MEDIUM },
 
@@ -200,7 +200,7 @@ struct spell_info_type spell_info [] =
 
  { /* 52 */ 3*PULSE_TIMER, POSITION_FIGHTING, 20, TAR_IGNORE, cast_globe_of_darkness, SKILL_INCREASE_HARD },
 
- { /* 53 */ 6*PULSE_TIMER, POSITION_STANDING, 12, TAR_CHAR_ROOM|TAR_OBJ_INV|TAR_OBJ_ROOM, cast_identify, SKILL_INCREASE_EASY },
+ { /* 53 */ 0, POSITION_STANDING, 12, TAR_CHAR_ROOM|TAR_OBJ_INV|TAR_OBJ_ROOM, cast_identify, SKILL_INCREASE_EASY },
 
  { /* 54 */ 3*PULSE_TIMER, POSITION_STANDING, 75, TAR_OBJ_ROOM, cast_animate_dead, SKILL_INCREASE_MEDIUM },
 
