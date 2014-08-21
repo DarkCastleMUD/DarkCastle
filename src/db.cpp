@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.227 2014/07/26 23:21:23 jhhudso Exp $ */
+/* $Id: db.cpp,v 1.228 2014/08/21 01:34:08 jhhudso Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -4246,9 +4246,9 @@ void randomize_object(obj_data *obj)
 	case ITEM_WAND:
 		obj->obj_flags.cost = MAX(1,random_percent_change(-33, 33, obj->obj_flags.cost));
 		// total charges
-		obj->obj_flags.value[2] = random_percent_change(-10, 10, obj->obj_flags.value[2]);
+		obj->obj_flags.value[1] = random_percent_change(-10, 10, obj->obj_flags.value[2]);
 		// current charges
-		obj->obj_flags.value[3] = obj->obj_flags.value[2];
+		obj->obj_flags.value[2] = obj->obj_flags.value[1];
 		break;
 	}
 }
