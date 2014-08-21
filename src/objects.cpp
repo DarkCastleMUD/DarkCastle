@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: objects.cpp,v 1.113 2014/07/04 22:00:04 jhhudso Exp $
+| $Id: objects.cpp,v 1.114 2014/08/21 02:27:38 jhhudso Exp $
 | objects.C
 | Description:  Implementation of the things you can do with objects:
 |   wear them, wield them, grab them, drink them, eat them, etc..
@@ -395,7 +395,11 @@ int do_recite(struct char_data *ch, char *argument, int cmd)
     }
 
     if (*argument) {
-      bits = generic_find(argument, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP | FIND_CHAR_ROOM, ch, &victim, &obj);
+    	if (scroll->obj_flags.value[1] == SPELL_IDENTIFY) {
+    		bits = generic_find(argument, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_CHAR_ROOM, ch, &victim, &obj);
+    	} else {
+    		bits = generic_find(argument, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP | FIND_CHAR_ROOM, ch, &victim, &obj);
+    	}
       if (bits == 0) {
         send_to_char("No such thing around to recite the scroll on.\n\r", ch);
         return eFAILURE;
