@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: cl_thief.cpp,v 1.205 2014/07/04 22:00:04 jhhudso Exp $
+| $Id: cl_thief.cpp,v 1.206 2015/05/14 23:31:44 jhhudso Exp $
 | cl_thief.C
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
@@ -436,6 +436,9 @@ int do_backstab(CHAR_DATA *ch, char *argument, int cmd)
 
     if (IS_AFFECTED(ch, AFF_CHARM)) SET_BIT(retval, check_joincharmie(ch,1));
     if (SOMEONE_DIED(retval)) return retval;
+    if (ch->c_class == CLASS_THIEF) {
+      WAIT_STATE(ch, PULSE_VIOLENCE*2);
+    }
  }
 
 
