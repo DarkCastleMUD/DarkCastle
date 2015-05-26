@@ -16,7 +16,7 @@
 *                        forbidden names from a file instead of a hard-   *
 *                        coded list.                                      *
 ***************************************************************************/
-/* $Id: nanny.cpp,v 1.197 2014/07/04 22:00:04 jhhudso Exp $ */
+/* $Id: nanny.cpp,v 1.198 2015/05/26 08:55:40 zen Exp $ */
 extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
@@ -790,20 +790,20 @@ void check_hw(char_data *ch)
 {
   heightweight(ch, FALSE);
   if (ch->height > race_info[ch->race].max_height) {
-	  logf(ANGEL, LOG_BUG, "check_hw: %s's height %d > max %d. height set to max.", GET_NAME(ch), GET_HEIGHT(ch), race_info[ch->race].max_height);
+	  logf(IMP, LOG_BUG, "check_hw: %s's height %d > max %d. height set to max.", GET_NAME(ch), GET_HEIGHT(ch), race_info[ch->race].max_height);
 	  ch->height = race_info[ch->race].max_height;
   }
   if (ch->height < race_info[ch->race].min_height) {
-	  logf(ANGEL, LOG_BUG, "check_hw: %s's height %d < min %d. height set to min.", GET_NAME(ch), GET_HEIGHT(ch), race_info[ch->race].min_height);
+	  logf(IMP, LOG_BUG, "check_hw: %s's height %d < min %d. height set to min.", GET_NAME(ch), GET_HEIGHT(ch), race_info[ch->race].min_height);
 	  ch->height = race_info[ch->race].min_height;
   }
 
   if (ch->weight > race_info[ch->race].max_weight) {
-	  logf(ANGEL, LOG_BUG, "check_hw: %s's weight %d > max %d. weight set to max.", GET_NAME(ch), GET_WEIGHT(ch), race_info[ch->race].max_weight);
+	  logf(IMP, LOG_BUG, "check_hw: %s's weight %d > max %d. weight set to max.", GET_NAME(ch), GET_WEIGHT(ch), race_info[ch->race].max_weight);
 	  ch->weight = race_info[ch->race].max_weight;
   }
   if (ch->weight < race_info[ch->race].min_weight) {
-	  logf(ANGEL, LOG_BUG, "check_hw: %s's weight %d < min %d. weight set to min.", GET_NAME(ch), GET_WEIGHT(ch), race_info[ch->race].min_weight);
+	  logf(IMP, LOG_BUG, "check_hw: %s's weight %d < min %d. weight set to min.", GET_NAME(ch), GET_WEIGHT(ch), race_info[ch->race].min_weight);
 	  ch->weight = race_info[ch->race].min_weight;
   }
   heightweight(ch, TRUE);
