@@ -1,5 +1,5 @@
 /******************************************************************************
- * $Id: cl_ranger.cpp,v 1.94 2009/03/27 21:53:15 kkoons Exp $ | cl_ranger.C  *
+ * $Id: cl_ranger.cpp,v 1.95 2015/05/30 04:48:42 pirahna Exp $ | cl_ranger.C  *
  * Description: Ranger skills/spells                                          *
  *                                                                            *
  * Revision History                                                           *
@@ -1468,26 +1468,37 @@ int do_fire(struct char_data *ch, char *arg, int cmd)
      retval = damage(ch, victim, dam, TYPE_PIERCE, SKILL_ARCHERY, 0);
 
      if(IS_SET(retval, eVICT_DIED))  {
-        switch(number(1,2)) {
+        switch(number(1,3)) {
            case 1:
               if(dir < 0) {
-                 sprintf(buf, "The %s impales %s through the heart!", found->short_description, victname);
+                 sprintf(buf, "The %s impales %s through the heart!\r\n", found->short_description, victname);
                  send_to_room(buf, victroom);
               } else {
                  sprintf(buf, "Your shot impales %s through the heart!\r\n", victname);
                  send_to_char(buf, ch);
-                 sprintf(buf, "%s from the %s impales %s through the chest!", found->short_description, dirs[rev_dir[dir]], victname);
+                 sprintf(buf, "%s from the %s impales %s through the chest!\r\n", found->short_description, dirs[rev_dir[dir]], victname);
                  send_to_room(buf, victroom);
               }
               break;
            case 2:
               if(dir < 0) {
-                 sprintf(buf, "%s drives through the eye of %s, ending %s life.", found->short_description, victname, victhshr);
+                 sprintf(buf, "%s drives through the eye of %s, ending %s life.\r\n", found->short_description, victname, victhshr);
                  send_to_room(buf, victroom);
              }  else {
                  sprintf(buf, "Your %s drives through the eye of %s ending %s life.\r\n", found->short_description, victname, victhshr);
                  send_to_char(buf, ch);
-                 sprintf(buf, "%s from the %s lands with a solid 'thunk.'\r\n%s falls to the ground, an arrow sticking from %s left eye.", found->short_description, dirs[rev_dir[dir]], victname, victhshr);
+                 sprintf(buf, "%s from the %s lands with a solid 'thunk.'\r\n%s falls to the ground, an arrow sticking from %s left eye.\r\n", found->short_description, dirs[rev_dir[dir]], victname, victhshr);
+                 send_to_room(buf, victroom);
+              }
+              break;
+           case 3:
+              if(dir < 0) {
+                 sprintf(buf, "The %s rips through %s's throat.  Blood spouts as %s expires with a final gurgle.\r\n", found->short_description, victname, HSSH(victim));
+                 send_to_room(buf, victroom);
+              } else {
+                 sprintf(buf, "Your shot rips through the throat of %s ending their life with a gurgle.\r\n", victname);
+                 send_to_char(buf, ch);
+                 sprintf(buf, "%s from the %s ripes through the throat of %s!  Blood spouts as %s expires with a final gurgle.\r\n", found->short_description, dirs[rev_dir[dir]], victname, HSSH(victim));
                  send_to_room(buf, victroom);
               }
               break;
