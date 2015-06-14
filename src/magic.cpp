@@ -14271,3 +14271,90 @@ int cast_desecrate(ubyte level, CHAR_DATA *ch, char *arg, int type,
 
 	return eFAILURE;
 }
+
+/* ELEMENTAL_WALL */
+
+int spell_elemental_wall(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
+{
+  send_to_char("Pirahna is still working on this.\r\n", ch);
+  return eFAILURE;
+}
+
+int cast_elemental_wall( ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *tar_ch, struct obj_data *tar_obj, int skill )
+{
+  switch (type) {
+	case SPELL_TYPE_SPELL:
+		 return spell_elemental_wall(level,ch,tar_ch,0, skill);
+		 break;
+	case SPELL_TYPE_WAND:
+	case SPELL_TYPE_SCROLL:
+	case SPELL_TYPE_POTION:
+	default :
+	 log("Serious screw-up in elemental_wall!", ANGEL, LOG_BUG);
+	 break;
+  }
+  return eFAILURE;
+}
+
+
+/* ETHEREAL FOCUS */
+
+int spell_ethereal_focus(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
+{
+  struct affected_type af;
+  CHAR_DATA *ally, *next_ally;
+
+  // Set the spell on the caster to mark that they have the spell running
+  if(affected_by_spell(ch, SPELL_ETHEREAL_FOCUS))
+   affect_from_char(ch, SPELL_ETHEREAL_FOCUS);
+
+  af.type      = SPELL_ETHEREAL_FOCUS;
+  af.duration  = 1;
+  af.modifier  = 0;
+  af.location  = APPLY_NONE;
+  af.bitvector = -1;
+
+  affect_to_char(ch, &af);
+
+  send_to_char("You focus the minds of your allies to react to the slightest movement...\n\r", ch);
+  act("$n's magic attempts to focus $s allies minds into a unified supernatural focus...", ch, 0, 0, TO_ROOM, INVIS_NULL);
+  // loop through group members in room
+  for(ally = world[ch->in_room].people; ally; ally = next_ally) {
+    next_ally = ally->next_in_room;
+
+    if( !IS_NPC(ally) && GET_POS(ally) > POSITION_SLEEPING &&
+        ( ally->master == ch || ch->master == ally || (ch->master && ch->master == ally->master) ) 
+      )
+    {
+      send_to_char("Your mind's eye focuses, you still your body, and poise yourself to react to anything!\r\n", ally);
+    }
+  // TODO if not toggle set
+  //    send_to_char("You refuse to be affected by %s's magic but you probably shouldn't move or do anything right now.\r\n"
+  }
+
+  // Lastly, set the current room to flag that someone in it is using ethereal_focus
+  // We do this last because this is the trigger for the spell.  If we did this before the act() call we would trigger it
+  // on ourself immediately which would probably make the spell not very useful.
+  // NOTICE:  This is a TEMP_room_flag
+  SET_BIT(world[ch->in_room].temp_room_flags, ROOM_ETHEREAL_FOCUS);
+
+  return eSUCCESS;
+}
+
+int cast_ethereal_focus( ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *tar_ch, struct obj_data *tar_obj, int skill )
+{
+  switch (type) {
+	case SPELL_TYPE_SPELL:
+		 return spell_ethereal_focus(level,ch,tar_ch,0, skill);
+		 break;
+	case SPELL_TYPE_POTION:
+	case SPELL_TYPE_SCROLL:
+	case SPELL_TYPE_WAND:
+	default :
+	 log("Serious screw-up in ethereal_focus!", ANGEL, LOG_BUG);
+	 break;
+  }
+  return eFAILURE;
+}
+
+

@@ -20,4 +20,9 @@ enum {
   eDELAYED_EXEC     = 1<<7 // Mobprogs, MPPAUSE
 };
 
+
+#define SOCIAL_FALSE            0
+#define SOCIAL_TRUE             1
+#define SOCIAL_TRUE_WITH_NOISE  2
+
 #endif // _RETURNVALS_H_

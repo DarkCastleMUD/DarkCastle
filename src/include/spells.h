@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: spells.h,v 1.141 2012/12/17 18:24:03 jhhudso Exp $ */
+/* $Id: spells.h,v 1.142 2015/06/14 02:38:12 pirahna Exp $ */
 
 #ifndef SPELLS_H_
 #define SPELLS_H_
@@ -237,8 +237,9 @@ void check_maxes(CHAR_DATA *ch);
 #define SPELL_HEROISM		    173
 #define SPELL_CONSECRATE	    174
 #define SPELL_DESECRATE		    175
-#define MAX_SPL_LIST                175
-
+#define SPELL_ELEMENTAL_WALL        176
+#define SPELL_ETHEREAL_FOCUS        177
+#define MAX_SPL_LIST                177
 // if you add a spell, make sure you update "spells[]" in spells.C
 
 /*
@@ -617,10 +618,15 @@ void check_maxes(CHAR_DATA *ch);
 #define TAR_OBJ_EQUIP      1<<10
 #define TAR_NONE_OK        1<<11
 #define TAR_SELF_DEFAULT   1<<12
+#define TAR_ROOM_EXIT      1<<13
 
+////////////////////////////////////////////////////////////////////////
 
+#define ETHEREAL_FOCUS_TRIGGER_ACT     1
+#define ETHEREAL_FOCUS_TRIGGER_MOVE    2
+#define ETHEREAL_FOCUS_TRIGGER_SOCIAL  3
 
-
+////////////////////////////////////////////////////////////////////////
 
 
 

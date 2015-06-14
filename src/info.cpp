@@ -12,7 +12,7 @@
  * This is free software and you are benefitting.	We hope that you    *
  * share your changes too.  What goes around, comes around. 		    *
  ****************************************************************************/
-/* $Id: info.cpp,v 1.209 2015/06/14 00:19:25 pirahna Exp $ */
+/* $Id: info.cpp,v 1.210 2015/06/14 02:38:12 pirahna Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -70,6 +70,7 @@ extern char *fullness[];
 extern char *sector_types[];
 extern char *sky_look[];
 extern char *room_bits[];
+extern char *temp_room_bits[];
 extern struct race_shit race_info[];
 extern char *spells[];
 
@@ -1194,6 +1195,7 @@ int do_look(struct char_data *ch, char *argument, int cmd) {
 		case 10: {
 			char sector_buf[50];
 			char rflag_buf[MAX_STRING_LENGTH];
+			char tempflag_buf[MAX_STRING_LENGTH];
 
 			ansi_color( GREY, ch);
 			ansi_color( BOLD, ch);
@@ -1209,6 +1211,11 @@ int do_look(struct char_data *ch, char *argument, int cmd) {
 						rflag_buf);
 				csendf(ch, " Light[%d] <%s> [ %s]", DARK_AMOUNT(ch->in_room),
 						sector_buf, rflag_buf);
+                                if(world[ch->in_room].temp_room_flags) {
+				    sprintbit((long) world[ch->in_room].temp_room_flags, temp_room_bits,
+						tempflag_buf);
+				    csendf(ch, " [ %s]", tempflag_buf);
+                                }
 			}
 
 			send_to_char("\n\r", ch);

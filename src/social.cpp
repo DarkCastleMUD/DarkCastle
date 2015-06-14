@@ -35,7 +35,7 @@ long int social_array_size;           // size of actual array (since we allocate
 
 struct social_messg *find_social(char *arg);
 
-bool check_social( struct char_data *ch, char *pcomm, int length, char *arg )
+int check_social( struct char_data *ch, char *pcomm, int length, char *arg )
 {
     char buf[MAX_INPUT_LENGTH];
     struct social_messg *action = 0;
@@ -50,35 +50,33 @@ bool check_social( struct char_data *ch, char *pcomm, int length, char *arg )
 	else
 	  i++;
     if(!(action = find_social(pcomm)))
-      return FALSE;
+      return SOCIAL_FALSE;
 
     if(!IS_NPC(ch) && IS_SET(ch->pcdata->punish, PUNISH_NOEMOTE)) {
 	send_to_char( "You are anti-social!\n\r", ch );
-	return TRUE;
+	return SOCIAL_TRUE;
     }
 
     switch(GET_POS(ch)) {
     case POSITION_DEAD:
 	send_to_char( "Lie still; you are DEAD.\n\r", ch );
-	return TRUE;
+	return SOCIAL_TRUE;
 
     case POSITION_STUNNED:
 	send_to_char( "You are too stunned to do that.\n\r", ch );
-	return TRUE;
+	return SOCIAL_TRUE;
 
     case POSITION_SLEEPING:
 	send_to_char( "In your dreams, or what?\n\r", ch );
-	return TRUE;
+	return SOCIAL_TRUE;
     }
 
    if (IS_SET(world[ch->in_room].room_flags, QUIET))
-    {
+   {
     send_to_char ("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
-    return TRUE;
-    }
+    return SOCIAL_TRUE;
+   }
 
-
-   
    if (action->char_found)
 	one_argument(arg, buf);
     else
@@ -91,7 +89,7 @@ bool check_social( struct char_data *ch, char *pcomm, int length, char *arg )
 	if(action->others_no_arg)
 	  act(action->others_no_arg, ch, 0, 0, TO_ROOM,
 	    (action->hide)?INVIS_NULL:0);
-	return TRUE;
+	return SOCIAL_TRUE_WITH_NOISE;
     }
 
     if(!(vict = get_char_room_vis(ch, buf))) {
@@ -120,7 +118,7 @@ bool check_social( struct char_data *ch, char *pcomm, int length, char *arg )
 	    (action->hide)?INVIS_NULL:0);
     }
 
-    return TRUE;
+    return SOCIAL_TRUE_WITH_NOISE;
 }
 
 char *fread_social_string(FILE *fl)

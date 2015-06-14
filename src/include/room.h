@@ -1,7 +1,7 @@
 #ifndef __ROOM_H__
 #define __ROOM_H__
 /************************************************************************
-| $Id: room.h,v 1.20 2009/05/20 00:06:46 kkoons Exp $
+| $Id: room.h,v 1.21 2015/06/14 02:38:12 pirahna Exp $
 | room.h
 | Description:  This file contains all of the room header file/constant
 |   information.  It also contains information about the 'world' structs.
@@ -50,6 +50,14 @@
 #define LIGHT_ROOM   1<<30
 //#define NOHOME       1<<31
 //#define NO_KI        1<<31
+
+/* Bitvector For 'temp_room_flags' 
+   temp_room_flags are NOT in the world file and cannot be saved or added at boot time
+   These are for runtime flags, such as ETHEREAL_FOCUS
+*/
+
+#define ROOM_ETHEREAL_FOCUS   1
+#define TEMP_ROOM_FLAG_AVAILABLE 1<<1
 
 /* Internal flags */
 #define iNO_TRACK   1
@@ -135,6 +143,7 @@ struct room_data
     extra_descr_data * ex_description;   // for examine/look
     room_direction_data * dir_option[MAX_DIRS]; // Directions
     uint32 room_flags;                     // DEATH, DARK ... etc
+    uint32 temp_room_flags;             // A second bitvector for flags that do NOT get saved.  These are temporary runtime flags.
     int16 light;                        // Light factor of room
     
     int (*funct)(CHAR_DATA*, int, char*);  // special procedure

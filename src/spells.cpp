@@ -20,7 +20,7 @@
  *  12/07/2003   Onager   Changed PFE/PFG entries in spell_info[] to allow  *
  *                        casting on others                                 *
  ***************************************************************************/
-/* $Id: spells.cpp,v 1.291 2014/08/21 02:09:03 jhhudso Exp $ */
+/* $Id: spells.cpp,v 1.292 2015/06/14 02:38:12 pirahna Exp $ */
 
 extern "C"
 {
@@ -444,8 +444,9 @@ struct spell_info_type spell_info [] =
 
  { /* 174 */ (ubyte)(4.5*PULSE_TIMER), POSITION_STANDING, 100, TAR_IGNORE, cast_consecrate, SKILL_INCREASE_HARD },
 
- { /* 175 */ (ubyte)(4.5*PULSE_TIMER), POSITION_STANDING, 100, TAR_IGNORE, cast_desecrate, SKILL_INCREASE_HARD }
-
+ { /* 175 */ (ubyte)(4.5*PULSE_TIMER), POSITION_STANDING, 100, TAR_IGNORE, cast_desecrate, SKILL_INCREASE_HARD },
+ { /* 176 */ 3*PULSE_TIMER, POSITION_STANDING, 100, TAR_ROOM_EXIT, cast_elemental_wall, SKILL_INCREASE_MEDIUM },
+ { /* 177 */ 3*PULSE_TIMER, POSITION_STANDING, 100, TAR_IGNORE, cast_ethereal_focus, SKILL_INCREASE_EASY }
 };
 
 
@@ -898,6 +899,8 @@ char *spells[]=
    "heroism",
    "consecrate",
    "desecrate",
+   "elemental wall",
+   "ethereal focus",
    "\n"
 };
 
@@ -1016,6 +1019,11 @@ void affect_update( int32 duration_type )
 	        send_to_char("\n\r", i);
 	     }
 	  affect_remove(i, af, 0);
+          if(af->type == SPELL_ETHEREAL_FOCUS) {
+            // NOTICE:  this is a TEMP room flag
+            REMOVE_BIT(world[i->in_room].temp_room_flags, ROOM_ETHEREAL_FOCUS);
+            act("$n shakes his $s head suddenly in confusion losing $s magical focus.", i, NULL, NULL, TO_ROOM, NOTVICT);
+          }
 	}
       }
   }

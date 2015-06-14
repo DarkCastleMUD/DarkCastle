@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: move.cpp,v 1.98 2011/12/12 02:00:35 jhhudso Exp $
+| $Id: move.cpp,v 1.99 2015/06/14 02:38:12 pirahna Exp $
 | move.C
 | Movement commands and stuff.
 *************************************************************************
@@ -45,7 +45,7 @@ extern char *dirs[];
 extern int movement_loss[];
 
 int ambush(CHAR_DATA *ch); // class/cl_ranger.C
-
+int check_ethereal_focus(CHAR_DATA *ch, int trigger_type); // class/cl_mage.cpp
 
 int move_player(char_data * ch, int room)
 {
@@ -677,6 +677,11 @@ int do_simple_move(CHAR_DATA *ch, int cmd, int following)
     }
   }
 
+  // at this point we messaged that we are moving, but we haven't actually moved yet.  Check if ethereal focus keeps us from moving.
+  retval = check_ethereal_focus(ch, ETHEREAL_FOCUS_TRIGGER_MOVE);
+  if(IS_SET(retval, eFAILURE))
+    return retval;
+
   was_in = ch->in_room;
   record_track_data(ch, cmd);
 
@@ -882,9 +887,11 @@ int attempt_move(CHAR_DATA *ch, int cmd, int is_retreat = 0)
     if(SOMEONE_DIED(return_val) || !IS_SET(return_val, eSUCCESS))
       return return_val;
     if(!IS_AFFECTED(ch, AFF_SNEAK))
-      return ambush(ch);
-    return return_val;
-    }
+      return_val = ambush(ch);
+    if(SOMEONE_DIED(return_val) || !IS_SET(return_val, eSUCCESS))
+      return return_val;
+    return check_ethereal_focus(ch, ETHEREAL_FOCUS_TRIGGER_MOVE);
+  }
 
   if(IS_AFFECTED(ch, AFF_CHARM) && (ch->master) &&
     (ch->in_room == ch->master->in_room)) {

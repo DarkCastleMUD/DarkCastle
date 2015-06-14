@@ -16,7 +16,7 @@
 /* 12/08/2003   Onager   Added chop_half() to work like half_chop() but    */
 /*                       chopping off the last word.                       */
 /***************************************************************************/
-/* $Id: interp.cpp,v 1.199 2014/07/26 23:21:23 jhhudso Exp $ */
+/* $Id: interp.cpp,v 1.200 2015/06/14 02:38:12 pirahna Exp $ */
 
 extern "C"
 {
@@ -38,6 +38,7 @@ extern "C"
 #include <utility.h>
 #include <player.h>
 #include <fight.h>
+#include <spells.h> // ETHERAL consts
 #include <mobile.h>
 #include <connect.h> // descriptor_data
 #include <room.h>
@@ -48,8 +49,9 @@ extern "C"
 
 #define SKILL_HIDE 337
 
-bool check_social( CHAR_DATA *ch, char *pcomm, int length, char *arg );
+int check_social( CHAR_DATA *ch, char *pcomm, int length, char *arg );
 int clan_guard(struct char_data *ch, struct obj_data *obj, int cmd, char *arg, struct char_data *owner);
+int check_ethereal_focus(CHAR_DATA *ch, int trigger_type); // class/cl_mage.cpp
 
 extern struct index_data *mob_index;
 extern struct index_data *obj_index;
@@ -877,8 +879,11 @@ int command_interpreter( CHAR_DATA *ch, char *pcomm, bool procced  )
     return eSUCCESS;
   }
   // Check social table
-  if (check_social( ch, pcomm, look_at, &pcomm[look_at]))
-    return eSUCCESS;
+  if( (retval = check_social( ch, pcomm, look_at, &pcomm[look_at])) ) {
+    if( SOCIAL_TRUE_WITH_NOISE == retval )
+      return check_ethereal_focus(ch, ETHEREAL_FOCUS_TRIGGER_SOCIAL);
+    else return eSUCCESS;
+  }
 
   // Unknown command (or char too low level)
   send_to_char( "Huh?\r\n", ch );

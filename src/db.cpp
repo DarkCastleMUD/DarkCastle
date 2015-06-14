@@ -16,7 +16,7 @@
  *  11/10/2003  Onager   Modified clone_mobile() to set more appropriate   *
  *                       amounts of gold                                   *
  ***************************************************************************/
-/* $Id: db.cpp,v 1.228 2014/08/21 01:34:08 jhhudso Exp $ */
+/* $Id: db.cpp,v 1.229 2015/06/14 02:38:12 pirahna Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
 
 
@@ -1555,6 +1555,9 @@ int read_one_room(FILE *fl, int & room_nr)
     if (IS_SET(world[room_nr].room_flags,NO_ASTRAL))
       REMOVE_BIT(world[room_nr].room_flags,NO_ASTRAL);
 
+    // This bitvector is for runtime and not stored in the files, so just initialize it to 0
+    world[room_nr].temp_room_flags = 0;
+
     world[room_nr].sector_type = fread_int (fl, -1, 64000); 
 
     if (load_debug) 
@@ -2092,6 +2095,7 @@ int create_one_room(CHAR_DATA *ch, int vnum)
 
   rp->sector_type = 0;
   rp->room_flags = 0;
+  rp->temp_room_flags = 0;
   rp->ex_description = 0;
   for(x = 0; x <= 5; x++)
     rp->dir_option[x] = 0;

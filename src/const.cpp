@@ -12,7 +12,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: const.cpp,v 1.332 2014/07/26 23:07:12 jhhudso Exp $ */
+/* $Id: const.cpp,v 1.333 2015/06/14 02:38:12 pirahna Exp $ */
 
 extern "C"
 {
@@ -527,6 +527,8 @@ const char *spell_wear_off_msg[] =
   "You no longer feel especially heroic.",
   "!CONSECRATE!",
   "!DESECRATE!",
+  "!SPELL_ELEMENTAL_WALL!",
+  "You cannot hold your ethereal focus any longer.",
   "BUG DETECTED: Tell an Imm. (Spell Wear Off Message)"
 };
 
@@ -1046,6 +1048,12 @@ char *room_bits[] =
     "no_scan",
     "no_where",
     "light",
+    "\n"
+};
+
+char *temp_room_bits[] =
+{
+    "ETHEREAL_FOCUS",
     "\n"
 };
 

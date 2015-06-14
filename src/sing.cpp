@@ -42,7 +42,7 @@ using namespace std;
 extern CHAR_DATA *character_list;
 extern struct zone_data *zone_table;
 void remove_memory(CHAR_DATA *ch, char type);
-extern bool check_social( CHAR_DATA *ch, char *pcomm, int length, char *arg );
+extern int check_social( CHAR_DATA *ch, char *pcomm, int length, char *arg );
 void check_eq(CHAR_DATA *ch);
 
 //        ubyte beats;     /* Waiting time after ki */

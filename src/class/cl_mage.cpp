@@ -2,6 +2,8 @@
 | cl_mage.C
 | Description:  Commands for the mage class.
 */
+#include <string.h>
+
 #include <structs.h>
 #include <player.h>
 #include <levels.h>
@@ -272,3 +274,126 @@ int do_imbue(struct char_data *ch, char *argument, int cmd)
   }
   return eSUCCESS;
 }
+
+// Okay, if we enter this function, we came here either from do_move because I entered a room
+// or because of an act() call, meaning a made a 'noise'.
+// This is to check if ethereal focus should fire and handle the ramifications
+// Remember that ch is the person triggering the call, meaning they are actually the victim
+// eSUCCESS means the character is unaffected and can keep doing whatever.
+// eFAILURE means the character was interrupted
+int check_ethereal_focus(CHAR_DATA *ch, int trigger_type)
+{
+  CHAR_DATA *i, *next_i, *ally, *next_ally;
+  char buf[MAX_STRING_LENGTH];
+  int retval;
+
+  // Moving, and act() calls both happen a lot, so we want to get out of here as fast as possible if
+  // we can.  We do this by checking if the room has a flag or not
+  // NOTICE:  This is a TEMP_room_flag
+  if(!IS_SET(world[ch->in_room].temp_room_flags, ROOM_ETHEREAL_FOCUS))
+    return eSUCCESS;
+
+  // loop through the room to find the caster. It should only be possible for a single
+  // caster in a room to have this running (as long as no imms are being stupid)
+  for(i = world[ch->in_room].people; i; i = next_i) 
+  {
+    next_i = i->next_in_room;
+  
+    // Only the caster should have the spell
+    if( !affected_by_spell(i, SPELL_ETHEREAL_FOCUS) )
+      continue; 
+
+    // If I can't see my target, then I can't react, better keep true-sight up
+    if( !CAN_SEE(i, ch) )
+      continue;
+
+    // Okay, something is going down no matter what, so let's remove the flags first to avoid any cascading effects
+    // NOTICE:  This is a TEMP_room_flag
+    REMOVE_BIT(world[ch->in_room].temp_room_flags, ROOM_ETHEREAL_FOCUS);
+    affect_from_char(i, SPELL_ETHEREAL_FOCUS);
+
+    if(!IS_NPC(i) && !i->desc) // don't work if I'm linkdead
+      break;
+
+
+    // If for some reason the caster is busy, the spell fails. 
+    if(  GET_POS(i) <= POSITION_RESTING || 
+         GET_POS(i) == POSITION_FIGHTING || i->fighting ||
+         IS_AFFECTED(i, AFF_PARALYSIS) ||
+         ( IS_SET(world[i->in_room].room_flags, SAFE) && !IS_AFFECTED(ch, AFF_CANTQUIT) )
+      )
+    {
+      sprintf(buf, "I see you %s but I can't do anything about it!", GET_SHORT(ch));
+      do_say(i, buf, 9);
+      break;
+    }
+
+    if( i == ch ) { 
+      do_say(i, "Wait, I didn't mean to move .... crap.", 9);
+    }
+    else {
+      sprintf(buf, "I see movement!!!  It's %s!", IS_NPC(ch) ? GET_SHORT(ch) : GET_NAME(ch) );
+      do_say(i, buf, 9);
+      set_fighting(i, ch);
+      set_fighting(ch, i);
+      retval = attack(i, ch, TYPE_UNDEFINED);
+      if(IS_SET(retval, eVICT_DIED))
+        return (eFAILURE|eCH_DIED);  // dead target, so spell ends
+      if(IS_SET(retval, eCH_DIED))
+        return (eSUCCESS); // caster died, so spell ends, target gets no lag and can keep going
+      retval = eFAILURE;
+    }
+    WAIT_STATE(i, PULSE_VIOLENCE * 2);
+    WAIT_STATE(ch, PULSE_VIOLENCE * 1);
+
+    // Loop through allies and attack
+    for(ally = world[ch->in_room].people; ally; ally = next_ally) 
+    {
+      next_ally = ally->next_in_room;
+
+      // Skip anyone unable to fight
+      // Note that since they are joining the mage here, we don't check CAN_SEE.  Magical join!
+      if(ally == ch || ally == i || ally->fighting || GET_POS(ally) != POSITION_STANDING ||
+         ( !IS_NPC(ally) && !ally->desc ) // linkdead groupies won't help
+        )
+        continue;
+      // TODO - skip anyone with this toggle turned off
+
+      // Skip anyone that isn't a group member, or following me
+      if( ally == i->master || // if they are the caster's group leader
+          ally->master == i || // or the caster is their group leader
+          ( ally->master && ally->master == i->master ) // or we share the same group leader
+        ) 
+      {
+        act("$n's magically sharpened reflexes direct attacks at you as you enter the room!", i, 0, ch, TO_VICT, 0);
+        act("You attack $N with supernaturally focused reflexes!", ally, 0, ch, TO_CHAR, 0);
+        WAIT_STATE(ally, PULSE_VIOLENCE * 2);
+
+        if( trigger_type == ETHEREAL_FOCUS_TRIGGER_MOVE || trigger_type == ETHEREAL_FOCUS_TRIGGER_SOCIAL) {
+          // Get um!
+          sprintf(buf, "I see movement!!!  It's %s!", IS_NPC(ch) ? GET_SHORT(ch) : GET_NAME(ch) );
+          do_say(ally, buf, 9);
+          set_fighting(ally, ch);
+          set_fighting(ch, ally);
+          retval = attack(ally, ch, TYPE_UNDEFINED); 
+          if(IS_SET(retval, eVICT_DIED))
+            return (eFAILURE|eCH_DIED);  // ch = damage vict, return since they are dead
+	} else { // trigger_type == ETHEREAL_FOCUS_TRIGGER_ACT
+          // TODO - i don't currently do this anywhere because of the concerns below
+          // In the case of an act(), we can't return properly if someone dies, which would probably be fine, but could
+          // also cause crashes all over the mud from people no longer being where they were (or existing in memory).
+          // Because of this, we will instead just set them fighting, and still lag them
+          set_fighting(ally, ch);
+          set_fighting(ch, ally);
+	}
+      }
+    } // loop allies
+  } // loop looking for caster
+
+  if(ch->fighting)
+    return eFAILURE;
+
+  // If I made it through and no one was able to attack me for whatever reason, I'm good
+  return eSUCCESS;
+}
+
