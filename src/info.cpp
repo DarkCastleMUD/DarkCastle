@@ -12,7 +12,7 @@
  * This is free software and you are benefitting.	We hope that you    *
  * share your changes too.  What goes around, comes around. 		    *
  ****************************************************************************/
-/* $Id: info.cpp,v 1.208 2014/07/15 21:32:36 jhhudso Exp $ */
+/* $Id: info.cpp,v 1.209 2015/06/14 00:19:25 pirahna Exp $ */
 extern "C"
 {
 #include <ctype.h>
@@ -1193,7 +1193,7 @@ int do_look(struct char_data *ch, char *argument, int cmd) {
 			/* look ''		*/
 		case 10: {
 			char sector_buf[50];
-			char rflag_buf[150];
+			char rflag_buf[MAX_STRING_LENGTH];
 
 			ansi_color( GREY, ch);
 			ansi_color( BOLD, ch);
