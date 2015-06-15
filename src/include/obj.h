@@ -12,7 +12,7 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/* $Id: obj.h,v 1.34 2014/07/26 19:26:33 jhhudso Exp $ */
+/* $Id: obj.h,v 1.35 2015/06/15 03:07:23 pirahna Exp $ */
 #ifndef OBJ_H_
 #define OBJ_H_
 
@@ -155,6 +155,7 @@ void heightweight(char_data *ch, bool add);
 #define UTILITY_CATSTINK        1
 #define UTILITY_EXIT_TRAP       2
 #define UTILITY_MOVEMENT_TRAP   3
+#define UTILITY_ITEM_MAX        3
 
 /* Some different kind of liquids */
 #define LIQ_WATER       0

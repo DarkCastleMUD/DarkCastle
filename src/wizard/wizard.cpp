@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: wizard.cpp,v 1.84 2014/07/26 23:21:23 jhhudso Exp $
+| $Id: wizard.cpp,v 1.85 2015/06/15 03:07:23 pirahna Exp $
 | wizard.C
 | Description:  Utility functions necessary for wiz commands.
 */
@@ -25,6 +25,8 @@
 
 extern struct obj_data * search_char_for_item(char_data * ch, int16 item_number, bool wearonly = FALSE);
 extern int getRealSpellDamage(char_data * ch);
+extern char *sector_types[];
+extern const char *utility_item_types[];
 
 int number_or_name(char **name, int *num)
 {
@@ -1094,6 +1096,34 @@ extern char * strs_damage_types[];
                   j->obj_flags.value[2],
                   j->obj_flags.value[3]);
 	  break;
+      case ITEM_UTILITY :
+          sprintf(buf2, "$3Utility Type(v1)$R : %d (%s)\r\n", 
+                  j->obj_flags.value[0],  
+                  j->obj_flags.value[0] >= 0 && j->obj_flags.value[0] <= UTILITY_ITEM_MAX ?  
+                    utility_item_types[ j->obj_flags.value[0] ] : "INVALID TYPE" 
+                 );
+          if( j->obj_flags.value[0] == UTILITY_CATSTINK ) {
+	      sprintf(buf, "%s"
+                       "$3Sector(v2)$R : %d (%s)\r\n"
+                       "$3Unused(v3)$R : %d "
+                       "$3Unused(v4)$R : %d", 
+                  buf2,
+                  j->obj_flags.value[1],
+                  j->obj_flags.value[1] >= 0 && j->obj_flags.value[1] <= SECT_MAX_SECT ?
+                    sector_types[ j->obj_flags.value[1] ] : "INVALID SECTOR TYPE",
+                  j->obj_flags.value[2],
+                  j->obj_flags.value[3]);
+          } else {
+	      sprintf(buf, "%s"
+                       "$3Unused(v2)$R : %d "
+                       "$3Unused(v3)$R : %d "
+                       "$3Unused(v4)$R : %d", 
+                  buf2,
+                  j->obj_flags.value[1],
+                  j->obj_flags.value[2],
+                  j->obj_flags.value[3]);
+          }
+          break;
       case ITEM_KEY :
 	  sprintf(buf, "$3Keytype(v1)$R : %d"
                        "$3Unused (v2)$R : %d"

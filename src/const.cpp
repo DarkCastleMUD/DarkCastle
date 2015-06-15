@@ -12,7 +12,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: const.cpp,v 1.334 2015/06/15 00:31:46 pirahna Exp $ */
+/* $Id: const.cpp,v 1.335 2015/06/15 03:07:23 pirahna Exp $ */
 
 extern "C"
 {
@@ -345,6 +345,14 @@ char *obj_types[] = {
  "weapon_prog",
  "armour_prog",
  "can_see_prog",
+ "\n"
+};
+
+const char *utility_item_types[] {
+ "Nothing - Useless",
+ "CatStink - Track remover",
+ "ExitTrap - Do Not Use",
+ "MoveTrap - Do Not Use",
  "\n"
 };
 
