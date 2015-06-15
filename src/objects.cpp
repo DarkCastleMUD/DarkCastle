@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: objects.cpp,v 1.114 2014/08/21 02:27:38 jhhudso Exp $
+| $Id: objects.cpp,v 1.115 2015/06/15 00:31:46 pirahna Exp $
 | objects.C
 | Description:  Implementation of the things you can do with objects:
 |   wear them, wield them, grab them, drink them, eat them, etc..
@@ -499,9 +499,7 @@ void set_exit_trap(struct char_data *ch, struct obj_data *obj, char * arg)
   obj_to_room(trap_obj, ch->in_room);
 }
 
-#define CATSTINK_CITY    1
-#define CATSTINK_FOREST  2
-
+// With catstink, the value[1] is the sector type it was designed for
 void set_catstink(struct char_data *ch, struct obj_data *obj)
 {
   char buf[200];

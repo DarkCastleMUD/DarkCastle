@@ -12,7 +12,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: const.cpp,v 1.333 2015/06/14 02:38:12 pirahna Exp $ */
+/* $Id: const.cpp,v 1.334 2015/06/15 00:31:46 pirahna Exp $ */
 
 extern "C"
 {
@@ -1952,6 +1952,7 @@ struct class_skill_defines m_skills[] = { // mage skills
 {    "chill touch",         SPELL_CHILL_TOUCH,       20,     90,  0,   DEXWIS },
 {    "shield",              SPELL_SHIELD,            21,    100,  0,   CONWIS },
 {    "souldrain",           SPELL_SOULDRAIN,         22,    100,  0,   DEXWIS },
+{    "ethereal focus",      SPELL_ETHEREAL_FOCUS,    24,    100,  0,   DEXWIS },
 {    "dispel minor",        SPELL_DISPEL_MINOR,      25,     90,  0,   CONWIS },
 {    "mass invisibility",   SPELL_MASS_INVISIBILITY, 26,    100,  0,   DEXWIS },
 {    "firestorm",           SPELL_FIRESTORM,         27,    100,  0,   STRINT },
