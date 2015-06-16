@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: wizard.cpp,v 1.85 2015/06/15 03:07:23 pirahna Exp $
+| $Id: wizard.cpp,v 1.86 2015/06/16 01:46:17 pirahna Exp $
 | wizard.C
 | Description:  Utility functions necessary for wiz commands.
 */
@@ -1106,7 +1106,7 @@ extern char * strs_damage_types[];
 	      sprintf(buf, "%s"
                        "$3Sector(v2)$R : %d (%s)\r\n"
                        "$3Unused(v3)$R : %d "
-                       "$3Unused(v4)$R : %d", 
+                       "$3HowMuchLag(v4)$R : %d", 
                   buf2,
                   j->obj_flags.value[1],
                   j->obj_flags.value[1] >= 0 && j->obj_flags.value[1] <= SECT_MAX_SECT ?
@@ -1117,7 +1117,7 @@ extern char * strs_damage_types[];
 	      sprintf(buf, "%s"
                        "$3Unused(v2)$R : %d "
                        "$3Unused(v3)$R : %d "
-                       "$3Unused(v4)$R : %d", 
+                       "$3HowMuchLag(v4)$R : %d", 
                   buf2,
                   j->obj_flags.value[1],
                   j->obj_flags.value[2],
