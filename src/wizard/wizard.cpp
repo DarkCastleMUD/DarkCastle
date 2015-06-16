@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: wizard.cpp,v 1.86 2015/06/16 01:46:17 pirahna Exp $
+| $Id: wizard.cpp,v 1.87 2015/06/16 04:10:54 pirahna Exp $
 | wizard.C
 | Description:  Utility functions necessary for wiz commands.
 */
@@ -1111,6 +1111,15 @@ extern char * strs_damage_types[];
                   j->obj_flags.value[1],
                   j->obj_flags.value[1] >= 0 && j->obj_flags.value[1] <= SECT_MAX_SECT ?
                     sector_types[ j->obj_flags.value[1] ] : "INVALID SECTOR TYPE",
+                  j->obj_flags.value[2],
+                  j->obj_flags.value[3]);
+          } else if( j->obj_flags.value[0] == UTILITY_MORTAR ) {
+	      sprintf(buf, "%s"
+                       "$3NumDice(v2)$R : %d "
+                       "$3DiceSize (v3)$R : %d "
+                       "$3HowMuchLag(v4)$R : %d ", 
+                  buf2,
+                  j->obj_flags.value[1],
                   j->obj_flags.value[2],
                   j->obj_flags.value[3]);
           } else {

@@ -12,7 +12,7 @@
 *  This is free software and you are benefitting.  We hope that you       *
 *  share your changes too.  What goes around, comes around.               *
 ***************************************************************************/
-/* $Id: const.cpp,v 1.335 2015/06/15 03:07:23 pirahna Exp $ */
+/* $Id: const.cpp,v 1.336 2015/06/16 04:10:54 pirahna Exp $ */
 
 extern "C"
 {
@@ -353,6 +353,7 @@ const char *utility_item_types[] {
  "CatStink - Track remover",
  "ExitTrap - Do Not Use",
  "MoveTrap - Do Not Use",
+ "Mortar",
  "\n"
 };
 

@@ -2832,7 +2832,6 @@ int talkingsword(struct char_data*ch, struct obj_data *obj, int cmd, char*arg,
   return eFAILURE;
 }
 
-
 // Fun item to give to mortals...ticks for a while and then when it blows
 // up BOOM!!!
 int hot_potato(struct char_data*ch, struct obj_data *obj, int cmd, char*arg, 
@@ -2991,6 +2990,51 @@ int hot_potato(struct char_data*ch, struct obj_data *obj, int cmd, char*arg,
    else
    return eFAILURE;
 }
+
+
+// proc for mortar shells - see object.cpp 
+int exploding_mortar_shells(struct char_data*ch, struct obj_data *obj, int cmd, char*arg, CHAR_DATA *invoker)
+{
+   int dam = 0;
+   char buf[MAX_STRING_LENGTH];
+   char_data * victim = NULL;
+   char_data * next_v = NULL;
+
+   if(cmd)
+     return eFAILURE;
+
+   if(obj->in_room <= 0) {
+     log("Mortar round without a room?", IMMORTAL, LOG_BUG);
+     extract_obj(obj);
+     return eFAILURE;
+   }
+
+
+  send_to_room("The mortar shell explodes ripping the area to shreds!\r\n", obj->in_room);
+
+  for(int i = 0; i < 6; i++)
+    if( world[obj->in_room].dir_option[i] && world[obj->in_room].dir_option[i]->to_room )
+      send_to_room("You hear a loud boom.\r\n", world[obj->in_room].dir_option[i]->to_room);
+
+  for (victim = world[obj->in_room].people ; victim ; victim = next_v ) {
+    next_v = victim->next_in_room;
+    if(IS_NPC(victim))  // only hurts players
+      continue;
+
+    dam = dice( obj->obj_flags.value[1], obj->obj_flags.value[2] );
+    GET_HIT(victim) -= dam;
+    sprintf(buf, "Pieces of shrapnel rip through your skin inflicting %d damage!\r\n", dam);
+    send_to_char(buf, victim);
+    if(GET_HIT(victim) < 1) {
+      send_to_char("You have been KILLED!!\r\n", victim);
+      fight_kill(victim, victim, TYPE_PKILL, KILL_MORTAR);
+    }
+  }
+
+  extract_obj(obj);
+  return eSUCCESS;
+}
+
 //565
 int godload_banshee(struct char_data *ch, struct obj_data *obj, int cmd, 
       char *arg, CHAR_DATA *invoker)

@@ -20,7 +20,7 @@
  * 12/28/2003 Pirahna Changed do_fireshield() to check ch->immune instead *
  * of just race stuff                                                     *
  **************************************************************************
- * $Id: fight.cpp,v 1.570 2014/07/04 22:00:04 jhhudso Exp $               *
+ * $Id: fight.cpp,v 1.571 2015/06/16 04:10:54 pirahna Exp $               *
  **************************************************************************/
 
 extern "C"
@@ -5795,6 +5795,8 @@ void do_pkill(CHAR_DATA *ch, CHAR_DATA *victim, int type, bool vict_is_attacker)
   if (ch != NULL) {
     if (type == KILL_POTATO)
       sprintf(killer_message,"\n\r##%s just got POTATOED!!\n\r", GET_NAME(victim));
+    else if (type == KILL_MORTAR)
+      sprintf(killer_message,"\n\r##%s just got a FIRE IN THE HOLE!!\n\r", GET_NAME(victim));
     else if (type == KILL_POISON)
       sprintf(killer_message,"\n\r##%s has perished from %s's POISON!\n\r", GET_NAME(victim), GET_NAME(ch));
     else if (!str_cmp(GET_NAME(ch), GET_NAME(victim))) 

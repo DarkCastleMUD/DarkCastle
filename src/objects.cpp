@@ -1,5 +1,5 @@
 /************************************************************************
-| $Id: objects.cpp,v 1.115 2015/06/15 00:31:46 pirahna Exp $
+| $Id: objects.cpp,v 1.116 2015/06/16 04:10:54 pirahna Exp $
 | objects.C
 | Description:  Implementation of the things you can do with objects:
 |   wear them, wield them, grab them, drink them, eat them, etc..
@@ -34,6 +34,7 @@ extern "C"
 #include <clan.h> // vault stuff
 
 extern char *drinks[];
+extern char *dirs[];
 extern int drink_aff[][3];
 extern CWorld world;
 
@@ -499,6 +500,73 @@ void set_exit_trap(struct char_data *ch, struct obj_data *obj, char * arg)
   obj_to_room(trap_obj, ch->in_room);
 }
 
+#define MORTAR_ROUND_OBJECT_ID      113
+
+// Return FALSE if there was a command problem
+// Return TRUE if it went off
+bool set_utility_mortar(struct char_data *ch, struct obj_data *obj, char *arg)
+{
+  char direct[MAX_INPUT_LENGTH];
+  char buf[MAX_STRING_LENGTH];
+  struct obj_data * trap_obj = NULL;
+  int dir;
+
+  int do_say(struct char_data *ch, char *argument, int cmd);
+
+  one_argument(arg, direct);
+  if(!arg) {
+    send_to_char("Set it off in which direction?\r\n", ch);
+    return FALSE;
+  }
+
+  if(direct[0] == 'n') dir = 0;
+  else if(direct[0] == 'e') dir = 1;
+  else if(direct[0] == 's') dir = 2;
+  else if(direct[0] == 'w') dir = 3;
+  else if(direct[0] == 'u') dir = 4;
+  else if(direct[0] == 'd') dir = 5;
+  else {
+    send_to_char("Set it off in which direction?\n\r", ch);
+    return FALSE;
+  }
+
+  if( IS_SET(world[ch->in_room].room_flags, SAFE) ) {
+    send_to_char("In the rear with the gear huh?  Maybe use this somewhere in the field.\r\n", ch);
+    return FALSE;
+  }
+  if( CAN_GO(ch, dir) && IS_SET( world[ world[ch->in_room].dir_option[dir]->to_room ].room_flags, SAFE) ) {
+    send_to_char("Firing it into a safe room seems wasteful.\r\n", ch);
+    return FALSE;
+  }
+
+  // make a new item
+  trap_obj = clone_object( real_object( MORTAR_ROUND_OBJECT_ID ) );
+
+  // copy the data for that trap item over
+  for(int i = 0;i < 4; i++)
+    trap_obj->obj_flags.value[i] = obj->obj_flags.value[i];
+
+  do_say(ch, "Fire in the hole!", 9);
+  act("$n sets off $o with a flash and bang!.", ch, obj, 0, TO_ROOM, 0);
+  send_to_char("You set off the device with a loud bang.\r\n", ch);
+
+  if(!CAN_GO(ch, dir)) {
+    send_to_room("It smacks against the wall, zings aorund, and lands in the middle of the room.\r\n", ch->in_room);
+    // set it up in the room
+    obj_to_room(trap_obj, ch->in_room);
+  } else {
+    sprintf(buf, "It flies with great speed %sward.\r\n", dirs[dir]);
+    send_to_room(buf, ch->in_room);
+    sprintf(buf, "Something flies into the area with great speed landing at your feet.\r\n");
+    send_to_room(buf, world[ch->in_room].dir_option[dir]->to_room);
+    // set it up in the target room
+    obj_to_room(trap_obj, world[ch->in_room].dir_option[dir]->to_room);
+  }
+
+  return TRUE;
+}
+
+
 // With catstink, the value[1] is the sector type it was designed for
 void set_catstink(struct char_data *ch, struct obj_data *obj)
 {
@@ -551,6 +619,10 @@ void set_utility_item(struct char_data *ch, struct obj_data *obj, char *argument
       break;
     case UTILITY_MOVEMENT_TRAP:
       set_movement_trap(ch, obj);
+      break;
+    case UTILITY_MORTAR:
+      if(! set_utility_mortar(ch, obj, argument) )
+        return; // it failed
       break;
     default:
       send_to_char("Unknown utility item value.  Tell a god.\r\n", ch);
