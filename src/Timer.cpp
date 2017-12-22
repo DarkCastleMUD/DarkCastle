@@ -124,6 +124,7 @@ ostream& operator<<(ostream &out, Timer t) {
 	return out;
 }
 ostream& operator<<(ostream &out, TimeVal tv) {
-	out << static_cast<unsigned __time_t>(tv.tv_sec) << "s " << static_cast<unsigned __suseconds_t>(tv.tv_usec) << "µ";
+//	out << static_cast<unsigned __time_t>(tv.tv_sec) << "s " << static_cast<unsigned __suseconds_t>(tv.tv_usec) << "µ";
+	out << tv.tv_sec << "s " << tv.tv_usec << "µ";
 	return out;
 }
