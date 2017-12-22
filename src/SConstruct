@@ -2,11 +2,11 @@ import glob
 import sys
 import os.path
 
-env = Environment(CCFLAGS = '-ggdb3 -Wall -m32 -std=gnu++11 -O3 -Wno-write-strings',
-				  LINKFLAGS = '-ggdb3 -Wall -m32 -std=gnu++11 -O3 -Wno-write-strings' )
+env = Environment(CCFLAGS = '-ggdb3 -Wall -m32 -std=gnu++1y -O3 -Wno-write-strings',
+				  LINKFLAGS = '-ggdb3 -Wall -m32 -std=gnu++1y -O3 -Wno-write-strings' )
 
-#if os.path.exists('/usr/bin/g++-4.8'):
-#	env.Replace(CXX = 'g++-4.8')
+if os.path.exists('/usr/bin/g++-7'):
+	env.Replace(CXX = 'g++-7')
           
 base_src = glob.glob('[a-l]*.cpp') + glob.glob('[n-z]*.cpp') + glob.glob('mo*.cpp') + ['magic.cpp','memory.cpp','meta.cpp','MobActivity.cpp','Leaderboard.cpp']
 wizard_src = glob.glob('wizard/*.cpp')
@@ -15,13 +15,13 @@ backend_src = glob.glob('Backend/*.cpp')
 
 env.Program('dcastle.debug', ['main.cpp'],
 CPPPATH = ['include'], CPPDEFINES=['LINUX'],
-LIBS=['dcastle', 'crypt', 'mcheck', 'z', 'pq', 'XmlRpc'], LIBPATH=['.','/usr/local/lib']);
+LIBS=['dcastle', 'crypt', 'mcheck', 'z', 'pq', 'XmlRpc', 'twitcurl'], LIBPATH=['.','/usr/local/lib']);
 
 env.Program('showplayer', ['../scripts/showplayerxp.cpp'],
 CPPPATH = ['include'], CPPDEFINES=['LINUX'],
-LIBS=['dcastle', 'crypt', 'mcheck', 'z', 'pq', 'XmlRpc'], LIBPATH=['.','/usr/local/lib']);
+LIBS=['dcastle', 'crypt', 'mcheck', 'z', 'pq', 'XmlRpc', 'twitcurl'], LIBPATH=['.','/usr/local/lib']);
 
 env.StaticLibrary('dcastle', [base_src,wizard_src,class_src,backend_src],
-CPPPATH = ['include','/usr/include/pgsql/'], CPPDEFINES=['LINUX'],
+CPPPATH = ['include','/usr/include/pgsql/'], CPPDEFINES=['LINUX', 'TWITTER'],
 LIBS=[], LIBPATH=['/usr/local/lib']);
 
