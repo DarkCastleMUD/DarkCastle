@@ -728,7 +728,7 @@ clan_data * get_clan(int nClan)
 clan_data * get_clan(CHAR_DATA *ch)
 {
   if (ch == 0) {
-    return 0;
+    return NULL;
   }
 
   clan_data *clan;
@@ -738,7 +738,7 @@ clan_data * get_clan(CHAR_DATA *ch)
        return clan;
 
   ch->clan = 0;
-  return 0;
+  return NULL;
 }
 
 char *get_clan_name(int nClan)
