@@ -526,7 +526,7 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
   int hit_cost, mana_cost, move_cost, ki_cost = 0, hit_exp, move_exp, mana_exp, ki_exp = 0;
   int statplatprice = 0, max_stat = 0;
 
-  sbyte *pstat = '\0';
+  sbyte *pstat = 0;
   int pprice = 0;
 
   if((cmd != CMD_LIST) && (cmd != CMD_BUY))
