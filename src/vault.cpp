@@ -290,7 +290,7 @@ int do_vault(CHAR_DATA *ch, char *argument, int cmd)
     if (*arg1) {
       if (!strcasecmp(arg1, clanVName(ch->clan))) {
 	clan_data *clan = get_clan(ch);
-	if (clan == false) {
+	if (clan == nullptr) {
 	  send_to_char("You are not a member of any clan.\n\r", ch);
 	  return eFAILURE;
 	}
