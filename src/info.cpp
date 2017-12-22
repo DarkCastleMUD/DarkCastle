@@ -547,7 +547,7 @@ void show_char_to_char(struct char_data *i, struct char_data *ch, int mode)
        buffer.append( i->long_desc);
 
        send_to_char(buffer.c_str(), ch);
-       
+
        show_spells(i, ch);
        send_to_char("$R$7", ch);
      }
@@ -570,7 +570,7 @@ void show_char_to_char(struct char_data *i, struct char_data *ch, int mode)
      }
 
      buffer = GET_SHORT(i);
-       
+
      sprintf(buf, " the %s",
 	     race_info[(int)GET_RACE(i)].singular_name);
 
@@ -660,7 +660,7 @@ int do_botcheck(struct char_data *ch, char *argument, int cmd)
   }
 
   strcpy(name2, "0.");
-  strncat(name2, name, MAX_STRING_LENGTH);
+  strncat(name2, name, MAX_STRING_LENGTH-1);
   victim = get_char(name2);
 
 
@@ -1409,7 +1409,7 @@ int do_score(struct char_data *ch, char *argument, int cmd)
 
    int64 exp_needed;
    uint32 immune=0,suscept=0,resist=0;
-   char *isrString='\0';
+   string isrString;
    //int i;
 
    sprintf(race, "%s", race_info[(int)GET_RACE(ch)].singular_name);
@@ -1474,13 +1474,13 @@ int do_score(struct char_data *ch, char *argument, int cmd)
    {
       for(int i=0;i<=ISR_MAX;i++) {
         isrString=get_isr_string(immune, i);
-        if(isrString!='\0') {
+        if(!isrString.empty()) {
            scratch = frills[level];
            sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\n\r",
-                   scratch,"Immunity",isrString, scratch);
+                   scratch,"Immunity",isrString.c_str(), scratch);
            send_to_char(buf, ch);
            found = TRUE;
-           isrString='\0';
+           isrString=string();
            if(++level == 4)
               level = 0;
         }
@@ -1490,10 +1490,10 @@ int do_score(struct char_data *ch, char *argument, int cmd)
    {
       for(int i=0;i<=ISR_MAX;i++) {
         isrString=get_isr_string(suscept, i);
-        if(isrString!='\0') {
+        if(!isrString.empty()) {
            scratch = frills[level];
            sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\n\r",
-                   scratch,"Susceptibility",isrString, scratch);
+                   scratch,"Susceptibility",isrString.c_str(), scratch);
            send_to_char(buf, ch);
            found = TRUE;
            isrString='\0';
@@ -1506,13 +1506,13 @@ int do_score(struct char_data *ch, char *argument, int cmd)
    {
       for(int i=0;i<=ISR_MAX;i++) {
         isrString=get_isr_string(resist, i);
-        if(isrString!='\0') {
+        if(!isrString.empty()) {
            scratch = frills[level];
            sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\n\r",
-                   scratch,"Resistibility",isrString, scratch);
+                   scratch,"Resistibility",isrString.c_str(), scratch);
            send_to_char(buf, ch);
            found = TRUE;
-           isrString='\0';
+           isrString=string();
            if(++level == 4)
               level = 0;
         }
@@ -1535,74 +1535,75 @@ int do_score(struct char_data *ch, char *argument, int cmd)
          char * aff_name = get_skill_name(aff->type);
 //	 if (aff_name)
    //      if (*aff_name && !str_cmp(aff_name, "fly")) flying = 1;
-         switch(aff->type) {
-	   case BASE_SETS+SET_RAGER:
-	     if (aff->location == 0)
-		aff_name = "Battlerager's Fury";
-		break;
-           case BASE_SETS+SET_MOSS:
-             if(aff->location == 0)
-                aff_name = "infravision";
-             break;
-           case FUCK_CANTQUIT:
-             aff_name = "CANT_QUIT";
-             break;
-           case FUCK_PTHIEF:
-             aff_name = "DIRTY_THIEF/CANT_QUIT";
-             break;
-           case FUCK_GTHIEF:
-             aff_name = "GOLD_THIEF/CANT_QUIT";
-             break;
-           case SKILL_HARM_TOUCH:
-             aff_name = "harmtouch reuse timer";
-             break;
-           case SKILL_LAY_HANDS:
-             aff_name = "layhands reuse timer";
-             break;
-           case SKILL_QUIVERING_PALM:
-             aff_name = "quiver reuse timer";
-             break;
-           case SKILL_BLOOD_FURY:
-             aff_name = "blood fury reuse timer";
-             break;
-           case SKILL_FEROCITY_TIMER:
-             aff_name = "ferocity reuse timer";
-             break;
-	    case SKILL_DECEIT_TIMER:
-             aff_name = "deceit reuse timer";
-             break;
-           case SKILL_TACTICS_TIMER:
-             aff_name = "tactics reuse timer";
-             break;
-           case SKILL_CLANAREA_CLAIM:
-             aff_name = "clanarea claim timer";
-             break;
-           case SKILL_CLANAREA_CHALLENGE:
-             aff_name = "clanarea challenge timer";
-             break;
-           case SKILL_CRAZED_ASSAULT:
-	     if (strcmp(apply_types[(int)aff->location], "HITROLL"))
-               aff_name = "crazed assault reuse timer";
-             break;
-           case SPELL_IMMUNITY:
-             aff_name = "immunity";
-             modifyOutput = TRUE;
-             break;
-           case SKILL_NAT_SELECT:
-             aff_name = "natural selection";
-             modifyOutput = TRUE;
-             break;
-	 case SKILL_BREW_TIMER:
-	   aff_name = "brew timer";
-	   break;
-	 case SKILL_SCRIBE_TIMER:
-	   aff_name = "scribe timer";
-	   break;
-           case CONC_LOSS_FIXER:
-	     aff_name = 0; // We don't want this showing up in score
-             break;
-           default: break;
-         }
+			switch (aff->type) {
+			case BASE_SETS + SET_RAGER:
+				if (aff->location == 0)
+					aff_name = "Battlerager's Fury";
+				break;
+			case BASE_SETS + SET_MOSS:
+				if (aff->location == 0)
+					aff_name = "infravision";
+				break;
+			case FUCK_CANTQUIT:
+				aff_name = "CANT_QUIT";
+				break;
+			case FUCK_PTHIEF:
+				aff_name = "DIRTY_THIEF/CANT_QUIT";
+				break;
+			case FUCK_GTHIEF:
+				aff_name = "GOLD_THIEF/CANT_QUIT";
+				break;
+			case SKILL_HARM_TOUCH:
+				aff_name = "harmtouch reuse timer";
+				break;
+			case SKILL_LAY_HANDS:
+				aff_name = "layhands reuse timer";
+				break;
+			case SKILL_QUIVERING_PALM:
+				aff_name = "quiver reuse timer";
+				break;
+			case SKILL_BLOOD_FURY:
+				aff_name = "blood fury reuse timer";
+				break;
+			case SKILL_FEROCITY_TIMER:
+				aff_name = "ferocity reuse timer";
+				break;
+			case SKILL_DECEIT_TIMER:
+				aff_name = "deceit reuse timer";
+				break;
+			case SKILL_TACTICS_TIMER:
+				aff_name = "tactics reuse timer";
+				break;
+			case SKILL_CLANAREA_CLAIM:
+				aff_name = "clanarea claim timer";
+				break;
+			case SKILL_CLANAREA_CHALLENGE:
+				aff_name = "clanarea challenge timer";
+				break;
+			case SKILL_CRAZED_ASSAULT:
+				if (strcmp(apply_types[(int) aff->location], "HITROLL"))
+					aff_name = "crazed assault reuse timer";
+				break;
+			case SPELL_IMMUNITY:
+				aff_name = "immunity";
+				modifyOutput = TRUE;
+				break;
+			case SKILL_NAT_SELECT:
+				aff_name = "natural selection";
+				modifyOutput = TRUE;
+				break;
+			case SKILL_BREW_TIMER:
+				aff_name = "brew timer";
+				break;
+			case SKILL_SCRIBE_TIMER:
+				aff_name = "scribe timer";
+				break;
+			case CONC_LOSS_FIXER:
+				aff_name = 0; // We don't want this showing up in score
+				break;
+			default:
+				break;
+			}
          if(!aff_name) // not one we want displayed
            continue;
 
