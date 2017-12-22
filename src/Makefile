@@ -1,4 +1,4 @@
-CXX = g++-4.7
+CXX = g++-7
 SRC_DIR=.
 SRCS = $(shell find $(SRC_DIR) -maxdepth 2 -name "*.cpp")
 
