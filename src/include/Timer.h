@@ -15,7 +15,7 @@
 
 using namespace std;
 
-struct TimeVal : timeval {
+struct TimeVal {
 	TimeVal(time_t sec = 0, suseconds_t usec = 0);
 	TimeVal operator+(TimeVal t);
 	TimeVal operator-(TimeVal t);
@@ -24,7 +24,8 @@ struct TimeVal : timeval {
 	bool operator>(TimeVal t1);
 	bool operator>=(TimeVal t1);
 	void gettime(void);
-
+    uint_fast64_t tv_sec;		/* Seconds.  */
+    uint_fast64_t tv_usec;	/* Microseconds.  */
 };
 
 class Timer {
@@ -40,8 +41,8 @@ private:
 	TimeVal diff_min;
 	TimeVal diff_max;
 	TimeVal diff_avg;
-	uint64_t stopCount;
-	suseconds_t totalTime;
+	uint_fast64_t stopCount;
+	uint_fast64_t totalTime;
 	friend ostream & operator<< (ostream &, Timer t);
 };
 

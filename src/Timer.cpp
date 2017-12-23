@@ -24,8 +24,16 @@ TimeVal TimeVal::operator+(TimeVal t1) {
 
 TimeVal TimeVal::operator-(TimeVal t1) {
 	TimeVal t;
+	assert(tv_sec >= t1.tv_sec);
 	t.tv_sec = tv_sec - t1.tv_sec;
-	t.tv_usec = tv_usec - t1.tv_usec;
+
+	if (tv_usec >= t1.tv_usec) {
+		t.tv_usec = tv_usec - t1.tv_usec;
+	} else {
+		t.tv_sec--;
+		t.tv_usec = tv_usec + 1000000 - t1.tv_usec;
+	}
+
 	return t;
 }
 
