@@ -47,6 +47,9 @@ extern "C"
 #include <comm.h>
 #include <connect.h>
 #include <inventory.h>
+#ifdef USE_TIMING
+#include <Timer.h>
+#endif
 
 extern CHAR_DATA *character_list;
 extern struct index_data *mob_index;
@@ -81,6 +84,11 @@ void mobile_activity(void)
   int done;
   int tmp_race, tmp_bitv;
   int retval;
+#ifdef USE_TIMING
+  Timer mprogTimer;
+  Timer mpscavTimer;
+  stringstream timingDebugStr;
+#endif
 
   int attempt_move(CHAR_DATA *ch, int cmd, int is_retreat = 0);
   extern int mprog_cur_result;
@@ -119,7 +127,14 @@ void mobile_activity(void)
     // combat for stuff he shouldn't be able to do while fighting:)
     // And paralyze...
     if(mob_index[ch->mobdata->nr].non_combat_func) {
+#ifdef USE_TIMING
+    mprogTimer.start();
+#endif
       retval = ((*mob_index[ch->mobdata->nr].non_combat_func) (ch, 0, 0, "", ch));
+#ifdef USE_TIMING
+    mprogTimer.stop();
+#endif
+
       if(!IS_SET(retval, eFAILURE) || SOMEONE_DIED(retval))
         continue;
     }
@@ -154,8 +169,14 @@ void mobile_activity(void)
         MPROG_ACT_LIST * tmp_act, *tmp2_act;
         for ( tmp_act = ch->mobdata->mpact; tmp_act != NULL; tmp_act = tmp_act->next )
         {
+#ifdef USE_TIMING
+    mprogTimer.start();
+#endif
              mprog_wordlist_check( tmp_act->buf, ch, tmp_act->ch,
                        tmp_act->obj, tmp_act->vo, ACT_PROG, FALSE );
+#ifdef USE_TIMING
+    mprogTimer.stop();
+#endif
              retval = mprog_cur_result;
              if(IS_SET(retval, eCH_DIED))
                break; // break so we can continue with the next mob
@@ -163,16 +184,25 @@ void mobile_activity(void)
         if(IS_SET(retval, eCH_DIED) || selfpurge)
           continue; // move on to next mob, this one is dead
 
+#ifdef USE_TIMING
+    mprogTimer.start();
+#endif
         for ( tmp_act = ch->mobdata->mpact; tmp_act != NULL; tmp_act = tmp2_act )
         {
              tmp2_act = tmp_act->next;
              dc_free( tmp_act->buf );
              dc_free( tmp_act );
         }
+#ifdef USE_TIMING
+    mprogTimer.stop();
+#endif
         ch->mobdata->mpactnum = 0;
         ch->mobdata->mpact    = NULL;
     }
 
+#ifdef USE_TIMING
+    mpscavTimer.start();
+#endif
 // TODO - this really should be cleaned up and put into functions look at it and you'll
 //    see what I mean.
 
@@ -216,6 +246,10 @@ void mobile_activity(void)
       }
     }
   
+#ifdef USE_TIMING
+	mpscavTimer.stop();
+#endif
+
     /* Wander */
     if(!ISSET(ch->mobdata->actflags, ACT_SENTINEL)
       && GET_POS(ch) == POSITION_STANDING
@@ -346,7 +380,13 @@ void mobile_activity(void)
 
           if(number(0, 1)) {
             done = 1;
+#ifdef USE_TIMING            
+            mprogTimer.start();
+#endif
             retval = mprog_attack_trigger( ch, tmp_ch );
+#ifdef USE_TIMING            
+            mprogTimer.stop();
+#endif            
             if(SOMEONE_DIED(retval))
               break;
             attack(ch, tmp_ch, TYPE_UNDEFINED);
@@ -406,8 +446,13 @@ void mobile_activity(void)
           else
             sprintf(buf, "$n screams 'HEY! Don't be picking on %s!'", race_info[tmp_race].plural_name);
           act(buf,  ch, 0, 0, TO_ROOM, 0);
-
+#ifdef USE_TIMING
+          mprogTimer.start();
+#endif          
           retval = mprog_attack_trigger( ch, tmp_ch );
+#ifdef USE_TIMING          
+          mprogTimer.stop();
+#endif          
           if(SOMEONE_DIED(retval))
             break;
           attack(ch, tmp_ch->fighting, 0);
@@ -467,7 +512,13 @@ void mobile_activity(void)
 	    act("$n senses your evil intentions and attacks!", ch, 0,tmp_ch, TO_VICT,0);
 	    act("$n senses $N's evil intentions and attacks!", ch, 0,tmp_ch,TO_ROOM,NOTVICT);
  	   }
+#ifdef USE_TIMING 	   
+	   mprogTimer.start();
+#endif	   
             retval = mprog_attack_trigger( ch, tmp_ch );
+#ifdef USE_TIMING            
+       mprogTimer.stop();
+#endif       
             if(SOMEONE_DIED(retval))
               break;
             attack(ch, tmp_ch, 0);
@@ -487,7 +538,13 @@ void mobile_activity(void)
 	    act("$n is offended by your good nature and attacks!",ch,0, tmp_ch, TO_VICT,0);
 	    act("$n is offended by $N's good nature and attacks!", ch, 0,tmp_ch,  TO_ROOM,NOTVICT);
 	   }
+#ifdef USE_TIMING	   
+	   mprogTimer.start();
+#endif	   
             retval = mprog_attack_trigger( ch, tmp_ch );
+#ifdef USE_TIMING            
+       mprogTimer.stop();
+#endif       
             if(SOMEONE_DIED(retval))
               break;
             attack(ch, tmp_ch, 0);
@@ -547,6 +604,12 @@ void mobile_activity(void)
       // it just ends here.
     
   } // for() all mobs
+#ifdef USE_TIMING
+	timingDebugStr << "scavenger: " << mpscavTimer << endl;
+	timingDebugStr << "mprog: " << mprogTimer << endl;
+	cerr << timingDebugStr.str();
+#endif
+
 }
 
 // Just a function to have mobs say random stuff when they are "suprised"
