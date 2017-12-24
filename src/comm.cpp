@@ -829,7 +829,7 @@ void game_loop(unsigned mother_desc, unsigned other_desc, unsigned third_desc, u
 		heartbeat();
 #ifdef USE_TIMING		
 		hbTimer.stop();
-		timingDebugStr << "heartbeat: " << hbTimer << endl;
+		//timingDebugStr << "heartbeat: " << hbTimer << endl;
 
 		static Timer dbProcTimer;
 		dbProcTimer.start();
@@ -841,7 +841,7 @@ void game_loop(unsigned mother_desc, unsigned other_desc, unsigned third_desc, u
 
 #ifdef USE_TIMING
 		dbProcTimer.stop();
-		timingDebugStr << "db.processqueue: " << dbProcTimer << endl;
+		//timingDebugStr << "db.processqueue: " << dbProcTimer << endl;
 
 		static Timer outputTimer;
 		outputTimer.start();
@@ -858,7 +858,7 @@ void game_loop(unsigned mother_desc, unsigned other_desc, unsigned third_desc, u
 		}
 #ifdef USE_TIMING		
 		outputTimer.stop();
-		timingDebugStr << "output: " << outputTimer << endl;
+		//timingDebugStr << "output: " << outputTimer << endl;
 		
 		static Timer xmlrpcTimer;
 		xmlrpcTimer.start();
@@ -868,7 +868,7 @@ void game_loop(unsigned mother_desc, unsigned other_desc, unsigned third_desc, u
 		
 #ifdef USE_TIMING		
 		xmlrpcTimer.stop();
-		timingDebugStr << "xmlrpc: " << xmlrpcTimer << endl;
+		//timingDebugStr << "xmlrpc: " << xmlrpcTimer << endl;
 #endif
 		// we're done with this pulse.  Now calculate the time until the next pulse and sleep until then
 		// we want to pulse PASSES_PER_SEC times a second (duh).  This is currently 4.
