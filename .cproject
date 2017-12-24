@@ -19,7 +19,7 @@
 					<folderInfo id="cdt.managedbuild.toolchain.gnu.base.1739708971.830982298" name="/" resourcePath="">
 						<toolChain id="cdt.managedbuild.toolchain.gnu.base.732643339" name="cdt.managedbuild.toolchain.gnu.base" superClass="cdt.managedbuild.toolchain.gnu.base">
 							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF;org.eclipse.cdt.core.GNU_ELF" id="cdt.managedbuild.target.gnu.platform.base.677286203" name="Debug Platform" osList="linux,hpux,aix,qnx" superClass="cdt.managedbuild.target.gnu.platform.base"/>
-							<builder arguments="" autoBuildTarget="" buildPath="${workspace_loc:/dcastle/src}" cleanBuildTarget="-c" command="scons" enableAutoBuild="true" id="cdt.managedbuild.target.gnu.builder.base.388927982" incrementalBuildTarget="" keepEnvironmentInBuildfile="false" managedBuildOn="false" name="Gnu Make Builder" parallelBuildOn="true" parallelizationNumber="optimal" superClass="cdt.managedbuild.target.gnu.builder.base"/>
+							<builder arguments="" autoBuildTarget="" buildPath="${workspace_loc:/dcastle/src}" cleanBuildTarget="-c" command="scons" enableAutoBuild="false" id="cdt.managedbuild.target.gnu.builder.base.388927982" incrementalBuildTarget="" keepEnvironmentInBuildfile="false" managedBuildOn="false" name="Gnu Make Builder" parallelBuildOn="true" parallelizationNumber="optimal" superClass="cdt.managedbuild.target.gnu.builder.base"/>
 							<tool id="cdt.managedbuild.tool.gnu.archiver.base.1219976214" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.base"/>
 							<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.base.2022726878" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.base">
 								<option id="gnu.cpp.compiler.option.preprocessor.def.275695061" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
@@ -117,6 +117,7 @@
 		<project id="dcastle.null.709640054" name="dcastle"/>
 	</storageModule>
 	<storageModule moduleId="refreshScope" versionNumber="2">
+		<configuration configurationName="twitter"/>
 		<configuration configurationName="Default">
 			<resource resourceType="PROJECT" workspacePath="/dcastle"/>
 		</configuration>
