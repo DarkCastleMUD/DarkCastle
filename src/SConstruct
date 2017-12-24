@@ -2,8 +2,8 @@ import glob
 import sys
 import os.path
 
-env = Environment(CCFLAGS = '-ggdb3 -Wall -m32 -std=gnu++1y -O3 -Wno-write-strings',
-				  LINKFLAGS = '-ggdb3 -Wall -m32 -std=gnu++1y -O3 -Wno-write-strings' )
+env = Environment(CCFLAGS = '-ggdb3 -Wall -m32 -pg -std=gnu++1y -Wno-write-strings',
+				  LINKFLAGS = '-ggdb3 -Wall -m32 -pg -std=gnu++1y -Wno-write-strings' )
 
 if os.path.exists('/usr/bin/g++-7'):
 	env.Replace(CXX = 'g++-7')
