@@ -20,12 +20,6 @@
 #include <structs.h> // ubyte, etc..
 #include <comm.h>
 
-#ifdef NeXT
-#ifndef bool
-#define bool int
-#endif
-#endif
-
 /* handling the affected-structures */
 void affect_total(CHAR_DATA *ch);
 void affect_modify(CHAR_DATA *ch, int32 loc, int32 mod, long bitv, bool add, int flag = 0);
@@ -45,7 +39,6 @@ affected_type * affected_by_random(CHAR_DATA *ch);
 
 /* utility */
 struct obj_data *create_money( int amount );
-int isname(const char *str, const char *namelist);
 char *fname(char *namelist);
 int get_max_stat(char_data * ch, ubyte stat);
 //TIMERS
