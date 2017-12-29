@@ -119,9 +119,6 @@ void Timer::stop() {
 	}
 
 	diff_avg = (diff_avg + diff_cur)/2;
-	if (stopCount == 1) {
-		cerr << totalTime << endl;
-	}
 	totalTime += (diff_cur.tv_usec/1000);
 }
 
