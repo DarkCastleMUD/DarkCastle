@@ -2,8 +2,10 @@ import glob
 import sys
 import os.path
 
-env = Environment(CCFLAGS = '-ggdb3 -Wall -m32 -pg -std=gnu++1y -Wno-write-strings',
-				  LINKFLAGS = '-ggdb3 -Wall -m32 -pg -std=gnu++1y -Wno-write-strings' )
+env = Environment(CCFLAGS = '-ggdb3 -Wall -m32 -O2 -std=gnu++1z -Wno-write-strings',
+				  LINKFLAGS = '-ggdb3 -Wall -m32 -O2 -std=gnu++1z -Wno-write-strings' )
+#env = Environment(CCFLAGS = '-ggdb3 -Wall -m32 -pg -std=gnu++1z -fprofile-arcs -ftest-coverage -Wno-write-strings',
+#                  LINKFLAGS = '-ggdb3 -Wall -m32 -pg -std=gnu++1z -fprofile-arcs -ftest-coverage -Wno-write-strings' )
 
 if os.path.exists('/usr/bin/g++-7'):
 	env.Replace(CXX = 'g++-7')
@@ -14,14 +16,16 @@ class_src = glob.glob('class/*.cpp')
 backend_src = glob.glob('Backend/*.cpp')
 
 env.Program('dcastle.debug', ['main.cpp'],
-CPPPATH = ['include'], CPPDEFINES=['LINUX','TWITTER','USE_TIMING'],
+#CPPPATH = ['include'], CPPDEFINES=['LINUX','TWITTER','USE_TIMING','LEAK_CHECK'],
+CPPPATH = ['include'], CPPDEFINES=['LINUX','TWITTER'],
 LIBS=['dcastle', 'crypt', 'mcheck', 'z', 'pq', 'XmlRpc', 'twitcurl'], LIBPATH=['.','/usr/local/lib']);
 
 env.Program('showplayer', ['../scripts/showplayerxp.cpp'],
-CPPPATH = ['include'], CPPDEFINES=['LINUX','TWITTER','USE_TIMING'],
+CPPPATH = ['include'], CPPDEFINES=['LINUX'],
 LIBS=['dcastle', 'crypt', 'mcheck', 'z', 'pq', 'XmlRpc', 'twitcurl'], LIBPATH=['.','/usr/local/lib']);
 
 env.StaticLibrary('dcastle', [base_src,wizard_src,class_src,backend_src],
-CPPPATH = ['include','/usr/include/pgsql/'], CPPDEFINES=['LINUX','TWITTER','USE_TIMING'],
+#CPPPATH = ['include','/usr/include/pgsql/'], CPPDEFINES=['LINUX','TWITTER','USE_TIMING','LEAK_CHECK'],
+CPPPATH = ['include','/usr/include/pgsql/'], CPPDEFINES=['LINUX','TWITTER'],
 LIBS=[], LIBPATH=['/usr/local/lib']);
 
