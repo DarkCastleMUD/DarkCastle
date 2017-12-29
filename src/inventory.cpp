@@ -38,7 +38,7 @@ extern "C"
 #include <queue>
 
 #ifdef LEAK_CHECK
-#include <dmalloc.h>
+
 #endif
 
 /* extern variables */
@@ -52,7 +52,6 @@ extern int rev_dir[];
 /* extern functions */
 void save_corpses(void);
 char *fname(char *namelist);
-int isname(const char *arg, const char *arg2);
 struct obj_data *create_money( int amount );
 int palm  (struct char_data *ch, struct obj_data *obj_object, struct obj_data *sub_object, bool has_consent);
 void special_log(char *arg);
@@ -250,8 +249,9 @@ void get(struct char_data *ch, struct obj_data *obj_object, struct obj_data *sub
 		tax = TRUE;
 		sprintf(buffer, "%s ClanTax: %d", buffer, cgold);
         }
-	else
+	else {
 	  csendf(ch,"Your clan taxes you %d gold, leaving %d gold for you.\r\n",cgold, obj_object->obj_flags.value[0]);
+			}
 	  save_clans();
 	} else
 	GET_GOLD(ch) += obj_object->obj_flags.value[0];
@@ -1990,8 +1990,9 @@ int do_open(CHAR_DATA *ch, char *argument, int cmd)
          else {
            if (EXIT(ch, door)->keyword)
               act("$n opens the $F.", ch, 0, EXIT(ch, door)->keyword, TO_ROOM, 0);
-           else
+				else {
               act("$n opens the door.", ch, 0, 0, TO_ROOM, 0);
+				}
               send_to_char("Ok.\n\r", ch);
          }
              

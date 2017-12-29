@@ -202,17 +202,18 @@ int do_goto(struct char_data *ch, char *argument, int cmd)
       return eFAILURE;
     }
 
-    if((IS_SET(world[location].room_flags, PRIVATE)) &&
-       (GET_LEVEL(ch) <  OVERSEER)) {
- 
-      for(i = 0, pers = world[location].people; pers; pers =
-          pers->next_in_room, i++);
-         if(i > 1) { 
-           send_to_char("There's a private conversation going on in "
-                        "that room.\n\r", ch);
-           return eFAILURE;
-         }
-    }
+	if ((IS_SET(world[location].room_flags, PRIVATE))
+			&& (GET_LEVEL(ch) < OVERSEER)) {
+
+		for (i = 0, pers = world[location].people; pers;
+				pers = pers->next_in_room, i++)
+			;
+		if (i > 1) {
+			send_to_char("There's a private conversation going on in "
+					"that room.\n\r", ch);
+			return eFAILURE;
+		}
+	}
 
   if(!IS_MOB(ch))
    for(tmp_ch=world[ch->in_room].people; tmp_ch;  tmp_ch=tmp_ch->next_in_room) {

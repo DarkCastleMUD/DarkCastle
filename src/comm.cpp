@@ -75,6 +75,8 @@
 #ifdef USE_TIMING
 #include <Timer.h>
 #endif
+#include <DC.h>
+#include <algorithm>
 
 struct multiplayer {
   char *host;
@@ -120,7 +122,6 @@ extern char * sector_types[];
 extern char *time_look[];
 extern char *sky_look[];
 extern struct room_data ** world_array;
-extern struct char_data *character_list;
 extern char last_char_name[MAX_INPUT_LENGTH];
 extern char last_processed_cmd[MAX_INPUT_LENGTH];
 
@@ -417,8 +418,9 @@ void finish_hotboot()
     write_to_descriptor( d->descriptor, "Success...May your visit continue to suck...\n\r" );
 
     *d->output = '\0';
-    d->character->next = character_list;
-    character_list = d->character;
+
+    auto &character_list = DC::instance().character_list;
+    character_list.insert(d->character);
 
     do_on_login_stuff(d->character);
 
@@ -458,10 +460,10 @@ void init_game(void)
   void free_zones_from_memory();
   void free_shops_from_memory();
   void free_emoting_objects_from_memory();
-  void free_command_radix_nodes(struct cmd_hash_info * curr);
+	void free_command_radix_nodes(struct cmd_hash_info * curr);
   void free_ban_list_from_memory();
   void free_buff_pool_from_memory();
-  extern struct cmd_hash_info * cmd_radix;
+	extern cmd_hash_info * cmd_radix;
 #endif
 
   FILE * fp;
@@ -523,6 +525,7 @@ void init_game(void)
   CLOSE_SOCKET(fourth_desc);
 
 #ifdef LEAK_CHECK
+
   log("Freeing all mobs in world.", 0, LOG_MISC);
   remove_all_mobs_from_world();
   log("Freeing all objs in world.", 0, LOG_MISC);
@@ -559,6 +562,7 @@ void init_game(void)
   free_ban_list_from_memory();
   log("Freeing the bufpool.", 0, LOG_MISC);
   free_buff_pool_from_memory();
+	DC::instance().removeDead();
 #endif
 
   log("Goodbye.", 0, LOG_MISC);
@@ -719,8 +723,11 @@ void game_loop(unsigned mother_desc, unsigned other_desc, unsigned third_desc, u
 
 		// poll (without blocking) for new input, output, and exceptions
 		if (select(maxdesc + 1, &input_set, &output_set, &exc_set, &null_time) < 0) {
+			int save_errno = errno;
 			perror("game_loop : select : poll");
-			return;
+			if (save_errno != EINTR) {
+				return;
+			}
 		}
 
 		// If new connection waiting, accept it
@@ -829,7 +836,7 @@ void game_loop(unsigned mother_desc, unsigned other_desc, unsigned third_desc, u
 		heartbeat();
 #ifdef USE_TIMING		
 		hbTimer.stop();
-		//timingDebugStr << "heartbeat: " << hbTimer << endl;
+		timingDebugStr << "heartbeat: " << hbTimer << endl;
 
 		static Timer dbProcTimer;
 		dbProcTimer.start();
@@ -916,9 +923,7 @@ void game_loop(unsigned mother_desc, unsigned other_desc, unsigned third_desc, u
 		//else logf(110, LOG_BUG, "0 delay on pulse");
 		gettimeofday(&last_time, NULL);
 #ifdef USE_TIMING
-		if (timingDebugStr.str().length() > 0) {
-			cerr << timingDebugStr.str();
-		}
+		cerr << timingDebugStr.str();
 #endif		
 	}
 }
@@ -941,99 +946,147 @@ void init_heartbeat()
   pulse_short     = PULSE_SHORT;
 }
 
-void heartbeat()
-{
+void heartbeat() {
 #ifdef USE_TIMING
-  static Timer mobileTimer;
+	static Timer mobileTimer;
+	static Timer objectTimer;
 #endif
 
-  if (--pulse_mobile < 1) 
-  {
-    pulse_mobile = PULSE_MOBILE;
+	if (--pulse_mobile < 1) {
+		pulse_mobile = PULSE_MOBILE;
 #ifdef USE_TIMING
-	mobileTimer.start();
+		mobileTimer.start();
 #endif
-    mobile_activity();
+		mobile_activity();
 #ifdef USE_TIMING
-	mobileTimer.stop();
-	timingDebugStr << "mobile_activity: " << mobileTimer << endl;
+		mobileTimer.stop();
+		timingDebugStr << "mobile_activity: " << mobileTimer << endl;
+		objectTimer.start();
 #endif
-    object_activity();
-  }
-  if (--pulse_timer < 1)
-  {
-     pulse_timer = PULSE_TIMER;
-     check_timer();
-     affect_update(PULSE_TIMER);
-  }
-  if (--pulse_short < 1)
-  {
-     pulse_short = PULSE_SHORT;
-     short_activity();
-     pulse_command_lag();
-  }
-  // TODO - need to eventually modify this so it works for casters too so I can delay certain
-  if (--pulse_bard < 1) 
-  {
-    pulse_bard = PULSE_BARD;
-    update_bard_singing();
-    update_mprog_throws();  // convienant place to put it
-    update_make_camp_and_leadership();     // and this, too
-  }
+		object_activity();
+#ifdef USE_TIMING
+		objectTimer.stop();
+		timingDebugStr << "object_activity: " << objectTimer << endl;
+#endif
+	}
+	if (--pulse_timer < 1) {
+#ifdef USE_TIMING
+		static Timer affectTimer;
+#endif
+		pulse_timer = PULSE_TIMER;
+		check_timer();
+#ifdef USE_TIMING
+		affectTimer.start();
+#endif
+		affect_update(PULSE_TIMER);
+#ifdef USE_TIMING
+		affectTimer.stop();
+		timingDebugStr << "affect_update: " << affectTimer << endl;
+#endif
+	}
+	if (--pulse_short < 1) {
+#ifdef USE_TIMING
+		static Timer pulseShortTimer;
+#endif
+		pulse_short = PULSE_SHORT;
+#ifdef USE_TIMING
+		pulseShortTimer.start();
+#endif
+		short_activity();
+		pulse_command_lag();
+#ifdef USE_TIMING
+		pulseShortTimer.stop();
+		timingDebugStr << "short_activity/pulse_command_lag: " << pulseShortTimer << endl;
+#endif
+	}
+	// TODO - need to eventually modify this so it works for casters too so I can delay certain
+	if (--pulse_bard < 1) {
+#ifdef USE_TIMING
+		static Timer bardTimer;
+		static Timer mprogThrowsTimer;
+		static Timer campTimer;
+#endif
+		pulse_bard = PULSE_BARD;
+#ifdef USE_TIMING
+		bardTimer.start();
+#endif
+		update_bard_singing();
+#ifdef USE_TIMING
+		bardTimer.stop();
+		mprogThrowsTimer.start();
+#endif
+		update_mprog_throws();  // convienant place to put it
+#ifdef USE_TIMING
+		mprogThrowsTimer.stop();
+		campTimer.start();
+#endif
+		update_make_camp_and_leadership();     // and this, too
+#ifdef USE_TIMING
+		campTimer.stop();
+		timingDebugStr << "bardTimer" << bardTimer << endl;
+		timingDebugStr << "mprogThrowsTimer" << mprogThrowsTimer << endl;
+		timingDebugStr << "campTimer" << campTimer << endl;
+#endif
+	}
 
-  if (--pulse_violence < 1) 
-  {
-    pulse_violence = PULSE_VIOLENCE;
-    perform_violence();
-    update_characters();
-    affect_update(PULSE_VIOLENCE);
-    check_silence_beacons();
-  }
+	if (--pulse_violence < 1) {
+		pulse_violence = PULSE_VIOLENCE;
+#ifdef USE_TIMING
+		static Timer violenceTimer;
+		violenceTimer.start();
+#endif
+		perform_violence();
+		update_characters();
+		affect_update(PULSE_VIOLENCE);
+		check_silence_beacons();
+#ifdef USE_TIMING
+		violenceTimer.stop();
+		timingDebugStr << "violenceTimer" << violenceTimer << endl;
+#endif
+	}
 
-  if (--pulse_tensec < 1) 
-  {
-    pulse_tensec = PULSE_TENSEC;
-    checkConsecrate(PULSE_TENSEC);
-  }
+	if (--pulse_tensec < 1) {
+		pulse_tensec = PULSE_TENSEC;
+		checkConsecrate(PULSE_TENSEC);
+	}
 
-  if(--pulse_weather < 1)
-  {
-    pulse_weather = PULSE_WEATHER;
-    weather_update();
-    auction_expire();
-  }
+	if (--pulse_weather < 1) {
+		pulse_weather = PULSE_WEATHER;
+		weather_update();
+		auction_expire();
+	}
 
-  if (--pulse_regen < 1)
-  {
-    // random pulse timer for regen to make tick sleeping impossible
-    pulse_regen = number(PULSE_REGEN-8*PASSES_PER_SEC, PULSE_REGEN+5*PASSES_PER_SEC);
-    point_update();
-    pulse_takeover();
-    affect_update(PULSE_REGEN);
-    checkConsecrate(PULSE_REGEN);
-    if(!number(0,2)) send_hint();
-  }
+	if (--pulse_regen < 1) {
+		// random pulse timer for regen to make tick sleeping impossible
+		pulse_regen = number(PULSE_REGEN - 8 * PASSES_PER_SEC, PULSE_REGEN + 5 * PASSES_PER_SEC);
+		point_update();
+		pulse_takeover();
+		affect_update(PULSE_REGEN);
+		checkConsecrate(PULSE_REGEN);
+		if (!number(0, 2))
+			send_hint();
+	}
 
-  if(--pulse_time < 1) {
-    pulse_time = PULSE_TIME;
-    zone_update();
-    time_update();
-    food_update();
-    affect_update(PULSE_TIME);
-    update_corpses_and_portals();
-    check_idle_passwords();
-    quest_update();
+	if (--pulse_time < 1) {
+		pulse_time = PULSE_TIME;
+		zone_update();
+		time_update();
+		food_update();
+		affect_update(PULSE_TIME);
+		update_corpses_and_portals();
+		check_idle_passwords();
+		quest_update();
 
-    leaderboard.check(); //good place to put this
+		leaderboard.check(); //good place to put this
 
-    if(!bport) {
-      check_champion_and_website_who_list();
-    }
-    save_slot_machines();
-    pulse_hunts();
-    if(!number(0,47))
-      redo_shop_profit();
-  }
+		if (!bport) {
+			check_champion_and_website_who_list();
+		}
+		save_slot_machines();
+		pulse_hunts();
+		if (!number(0, 47))
+			redo_shop_profit();
+	}
 }
 
 
@@ -2266,7 +2319,7 @@ int close_socket(struct descriptor_data *d)
 //			GET_NAME(d->character));
 //		log(buf, 110, LOG_HMM);
 	}
-      free_char(d->character);
+			extract_char(d->character, TRUE);
     }
   }
 //   Removed this log caues it's so fricken annoying

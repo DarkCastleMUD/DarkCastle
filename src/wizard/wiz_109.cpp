@@ -72,8 +72,8 @@ int do_linkload(struct char_data *ch, char *arg, int cmd)
 
   new_new = d.character;
   new_new->desc = 0;
-  new_new->next = character_list;
-  character_list = new_new;
+	auto &character_list = DC::instance().character_list;
+	character_list.insert(new_new);
   add_to_bard_list(new_new);
 
   redo_hitpoints(new_new);

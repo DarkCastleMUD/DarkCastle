@@ -24,10 +24,6 @@ extern "C"
 //#include <sys/stat.h>
 //#include <unistd.h>
 }
-#ifdef LEAK_CHECK
-#include <dmalloc.h>
-#endif
-
 #include <obj.h>
 #include <room.h>
 #include <character.h>
@@ -868,8 +864,9 @@ bool load_char_obj( struct descriptor_data *d, char *name )
   ch = (CHAR_DATA *)dc_alloc(1, sizeof(CHAR_DATA));
 #endif
 
-  if(d->character)
-    free_char(d->character);
+	if (d->character) {
+		extract_char(d->character, TRUE);
+	}
 
   d->character    = ch;
   clear_char(ch);

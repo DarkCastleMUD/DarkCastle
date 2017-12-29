@@ -7,10 +7,6 @@ extern "C"
 {
   #include <string.h>
 }
-#ifdef LEAK_CHECK
-#include <dmalloc.h>
-#endif
-
 #include <connect.h>
 #include <utility.h>
 #include <character.h>
@@ -29,7 +25,6 @@ extern "C"
 //        from another class will pop up who name is nowhere near matching.
 
 
-extern struct char_data *character_list;
 extern struct descriptor_data *descriptor_list;
 extern struct race_shit race_info[33];
 extern char* pc_clss_abbrev[];
@@ -610,16 +605,15 @@ int do_who(struct char_data *ch, char *argument, int cmd)
 int do_whoarena(struct char_data *ch, char *argument, int cmd)
 {
    int count = 0;
-   char_data *tmp;
    clan_data * clan;
 
    send_to_char("\n\rPlayers in the Arena:\n\r--------------------------\n\r", ch);
 
    if (GET_LEVEL(ch) <= MORTAL) 
    {
-      for(tmp = character_list; tmp; tmp = tmp->next) 
-      {
-         if (CAN_SEE(ch, tmp)) 
+		auto &character_list = DC::instance().character_list;
+		for (auto& tmp : character_list) {
+         if (CAN_SEE(ch, tmp))
          {
             if (IS_SET(world[tmp->in_room].room_flags, ARENA) 
                 && !IS_SET(world[tmp->in_room].room_flags, NO_WHERE)) 
@@ -639,7 +633,8 @@ int do_whoarena(struct char_data *ch, char *argument, int cmd)
    }
       
    // If they're here that means they're a god
-   for(tmp = character_list; tmp; tmp = tmp->next) {
+	auto &character_list = DC::instance().character_list;
+	for (auto& tmp : character_list) {
       if (CAN_SEE(ch, tmp)) {
          if (IS_SET(world[tmp->in_room].room_flags, ARENA)) {
             if((tmp->clan) && (clan = get_clan(tmp)) && GET_LEVEL(tmp) < IMMORTAL)

@@ -49,7 +49,6 @@ char *valid_fields[] = {
 
 extern int keywordfind(OBJ_DATA *);
 extern void wear(CHAR_DATA *, OBJ_DATA *, int);
-extern CHAR_DATA *character_list;
 extern struct index_data *mob_index;
 extern struct index_data *obj_index;
 extern char *gl_item(OBJ_DATA *obj, int number, CHAR_DATA *ch, bool platinum);
@@ -701,52 +700,52 @@ int stop_all_quests(CHAR_DATA *ch)
    return retval;
 }
 
-void quest_update()
-{
-   char buf[MAX_STRING_LENGTH];
-   CHAR_DATA *i, *next_dude, *mob;
-   OBJ_DATA *obj;
-   struct quest_info *quest;
+void quest_update() {
+	char buf[MAX_STRING_LENGTH];
+	char_data *mob;
+	OBJ_DATA *obj;
+	struct quest_info *quest;
 
-   for(i = character_list; i; i = next_dude) {
-      next_dude = i->next;
+	auto &character_list = DC::instance().character_list;
+	for (auto& i : character_list) {
+		if (!i->desc || IS_NPC(i))
+			continue;
 
-      if(!i->desc || IS_NPC(i)) continue;
+		for (quest_list_t::iterator node = quest_list.begin(); node != quest_list.end(); node++) {
+			quest = *node;
 
-    for (quest_list_t::iterator node = quest_list.begin(); node != quest_list.end(); node++) {
-	quest = *node;
-	
-         if(quest->timer)
-            for(int j=0;j<QUEST_MAX;j++)
-               if(i->pcdata->quest_current[j] == quest->number) {
-                  if(i->pcdata->quest_current_ticksleft[j] <= 0) {
-                     stop_current_quest(i, quest);
+			if (quest->timer)
+				for (int j = 0; j < QUEST_MAX; j++)
+					if (i->pcdata->quest_current[j] == quest->number) {
+						if (i->pcdata->quest_current_ticksleft[j] <= 0) {
+							stop_current_quest(i, quest);
 
-		     logf(IMMORTAL, LOG_QUEST, "%s ran out of time on quest %d (%s).", GET_NAME(i), quest->number, quest->name);
+							logf(IMMORTAL, LOG_QUEST, "%s ran out of time on quest %d (%s).", GET_NAME(i), quest->number, quest->name);
 
-                     csendf(i, "Time has expired for %s.  This quest has ended.\n\r", quest->name);
-                  }
-                  i->pcdata->quest_current_ticksleft[j]--;
-                  break;
-               }
+							csendf(i, "Time has expired for %s.  This quest has ended.\n\r", quest->name);
+						}
+						i->pcdata->quest_current_ticksleft[j]--;
+						break;
+					}
 
-         if(check_quest_current(i, quest->number)) {
-            sprintf(buf, "q%d", quest->number);
-            obj = get_obj(buf);
-            if(!obj) {
-               if((mob = get_mob_vnum(quest->mobnum))) {
-                  obj = clone_object(quest->objnum);
-                  obj->short_description = str_hsh(quest->objshort);
-                  obj->description = str_hsh(quest->objlong);
-                  sprintf(buf, "%s q%d", quest->objkey, quest->number);
-                  obj->name = str_hsh(buf);
-                  obj_to_char(obj, mob);
-                  wear(mob, obj, keywordfind(obj));
-               }
-            }            
-         }
-      }
-   }
+			if (check_quest_current(i, quest->number)) {
+				sprintf(buf, "q%d", quest->number);
+				obj = get_obj(buf);
+				if (!obj) {
+					if ((mob = get_mob_vnum(quest->mobnum))) {
+						obj = clone_object(quest->objnum);
+						obj->short_description = str_hsh(quest->objshort);
+						obj->description = str_hsh(quest->objlong);
+						sprintf(buf, "%s q%d", quest->objkey, quest->number);
+						obj->name = str_hsh(buf);
+						obj_to_char(obj, mob);
+						wear(mob, obj, keywordfind(obj));
+					}
+				}
+			}
+		}
+	}
+	DC::instance().removeDead();
 }
 
 int quest_handler(CHAR_DATA *ch, CHAR_DATA *qmaster, int cmd, char *name)

@@ -29,9 +29,6 @@ extern "C"
   #include <stdlib.h>
 #include <math.h> // pow(double,double)
 }
-#ifdef LEAK_CHECK
-#include <dmalloc.h>
-#endif
 
 #include <room.h>
 #include <connect.h>
@@ -64,7 +61,6 @@ extern CWorld world;
 extern struct room_data ** world_array;
  
 extern struct obj_data  *object_list;
-extern CHAR_DATA *character_list;
 extern struct zone_data *zone_table;
 
 #define BEACON_OBJ_NUMBER 405
@@ -893,7 +889,7 @@ int spell_earthquake(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
   bool capsize = false, underwater = false;
   int dam = 0, retval = eSUCCESS, weap_spell = obj ? WIELD : 0, ch_zone = 0, tmp_vict_zone = 0;
   obj_data *tmp_obj = 0, *obj_next = 0;
-  char_data *tmp_victim = 0, *temp = 0;
+
 
   switch(world[ch->in_room].sector_type) {
   case SECT_AIR:
@@ -920,8 +916,11 @@ int spell_earthquake(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
     break;
   }
   
-  for (tmp_victim = character_list; tmp_victim && tmp_victim != (char_data *)0x95959595 && !IS_SET(retval, eCH_DIED); tmp_victim = temp) {
-    temp = tmp_victim->next;
+  auto &character_list = DC::instance().character_list;
+	for (auto& tmp_victim : character_list) {
+		if (IS_SET(retval, eCH_DIED)) {
+			break;
+		}
 
     try {
       ch_zone = world[ch->in_room].zone;
@@ -1203,8 +1202,7 @@ int spell_solar_gate(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
 
 int spell_group_recall(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
-  CHAR_DATA *tmp_victim, *temp;
-  int chance = 0;
+	int chance = 0;
 
   if (skill < 40) {
     chance = 5;
@@ -1218,9 +1216,8 @@ int spell_group_recall(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
     chance = 1;
   }
 
-  for(tmp_victim = character_list; tmp_victim; tmp_victim = temp) 
-  {
-    temp = tmp_victim->next;
+	auto &character_list = DC::instance().character_list;
+	for (auto& tmp_victim : character_list) {
     if(ch->in_room == tmp_victim->in_room && 
        tmp_victim != ch                   &&
        ARE_GROUPED(ch, tmp_victim)
@@ -1246,11 +1243,8 @@ int spell_group_recall(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
 
 int spell_group_fly(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
-  CHAR_DATA *tmp_victim, *temp;
-
-  for(tmp_victim = character_list; tmp_victim; tmp_victim = temp)
-  {
-    temp = tmp_victim->next;
+	auto &character_list = DC::instance().character_list;
+	for (auto& tmp_victim : character_list) {
     if ( (ch->in_room == tmp_victim->in_room) &&
          (ARE_GROUPED(ch,tmp_victim) ))
     {
@@ -1270,18 +1264,16 @@ int spell_group_fly(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
 
 int spell_heroes_feast(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
-  CHAR_DATA *tmp_victim, *temp;
-  int result = 15 + skill / 6;
+	int result = 15 + skill / 6;
 
-  if (GET_COND(ch, FULL) > -1) 
+  if (GET_COND(ch, FULL) > -1)
   {
     GET_COND(ch, FULL) = result;
     GET_COND(ch, THIRST) = result;
   }
   send_to_char("You partake in a magnificent feast!\n\r",ch);
-  for(tmp_victim = character_list; tmp_victim; tmp_victim = temp)
-  {
-    temp = tmp_victim->next;
+	auto &character_list = DC::instance().character_list;
+	for (auto& tmp_victim : character_list) {
     if ( (ch->in_room == tmp_victim->in_room) && (ch != tmp_victim) &&
 		(ARE_GROUPED(ch,tmp_victim) ))
     {
@@ -1301,10 +1293,9 @@ int spell_heroes_feast(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
 
 int spell_group_sanc(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
-  CHAR_DATA *tmp_victim, *temp;
-
-  for(tmp_victim = character_list; tmp_victim; tmp_victim = temp) {
-    temp = tmp_victim->next;
+  
+	auto &character_list = DC::instance().character_list;
+	for (auto& tmp_victim : character_list) {
     if((ch->in_room == tmp_victim->in_room) && (ARE_GROUPED(ch,tmp_victim))) {
       if(!tmp_victim) {
         log("Bad tmp_victim in character_list in group fly!", ANGEL, LOG_BUG);
@@ -1321,11 +1312,9 @@ int spell_group_sanc(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
 
 int spell_heal_spray(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
-  CHAR_DATA *tmp_victim, *temp;
-
-  for(tmp_victim = character_list; tmp_victim; tmp_victim = temp)
-  {
-	 temp = tmp_victim->next;
+  
+	auto &character_list = DC::instance().character_list;
+	for (auto& tmp_victim : character_list) {
 	 if ( (ch->in_room == tmp_victim->in_room) &&
 		(ARE_GROUPED(ch,tmp_victim) )){
 		 spell_heal(level,ch, tmp_victim, obj, skill);
@@ -1341,8 +1330,8 @@ int spell_firestorm(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
 	int dam = 0;
 	int retval = eSUCCESS;
 	int retval2 = 0;
-	CHAR_DATA *temp, *next_victim;
-
+	char_data *next_victim = 0;
+	
 	send_to_char("$B$4Fire$R falls from the heavens!\n\r", ch);
 	act("$n makes $B$4fire$R fall from the heavens!\n\r", ch, 0, 0, TO_ROOM, 0);
 
@@ -1373,8 +1362,8 @@ int spell_firestorm(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
 		}
 	}
 
-	for (char_data *tmp_victim = character_list; tmp_victim && tmp_victim != reinterpret_cast<char_data *>(0x95959595); tmp_victim = temp) {
-		temp = tmp_victim->next;
+	auto &character_list = DC::instance().character_list;
+	for (auto& tmp_victim : character_list) {
 		if ((tmp_victim->in_room == ch->in_room) ||
 			(tmp_victim == ch) ||
 			(!ARE_GROUPED(ch, tmp_victim)) ||
@@ -2972,37 +2961,39 @@ int spell_remove_curse(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
   int j;
   assert(ch && (victim || obj));
 
-  if(obj) {
-	 if(IS_SET(obj->obj_flags.extra_flags, ITEM_NODROP)) {
-		act("$p briefly glows $3blue$R.", ch, obj, 0, TO_CHAR, 0);
-		REMOVE_BIT(obj->obj_flags.extra_flags, ITEM_NODROP);
-		if (obj_index[obj->item_number].virt == 514)
-		{
-			int i = 0;
-			for (i= 0; i < obj->num_affects;i++)
-			  if (obj->affected[i].location == APPLY_MANA_REGEN)
-			  return eSUCCESS; // only do it once
-			SET_BIT(obj->obj_flags.extra_flags, ITEM_HUM);
-		struct char_data *t = obj->equipped_by;
-		int z = -1;
+	if (obj) {
+		if (IS_SET(obj->obj_flags.extra_flags, ITEM_NODROP)) {
+			act("$p briefly glows $3blue$R.", ch, obj, 0, TO_CHAR, 0);
+			REMOVE_BIT(obj->obj_flags.extra_flags, ITEM_NODROP);
+			if (obj_index[obj->item_number].virt == 514) {
+				int i = 0;
+				for (i = 0; i < obj->num_affects; i++)
+					if (obj->affected[i].location == APPLY_MANA_REGEN)
+						return eSUCCESS; // only do it once
+				SET_BIT(obj->obj_flags.extra_flags, ITEM_HUM);
+				struct char_data *t = obj->equipped_by;
+				int z = -1;
 
-		if (t->equipment[WEAR_FINGER_L] == obj)
-			z = WEAR_FINGER_L;
-		else
-			z = WEAR_FINGER_R;
-		if (t)
-		    obj_to_char(unequip_char(t, z) , t);
-			add_obj_affect(obj, APPLY_MANA_REGEN, 2);
-		if (t) 
-			wear(t, obj, 0);
-			
-			
-			act("With the restrictive curse lifted, $p begins to hum with renewed power!",ch,obj,0, TO_ROOM, 0);
-			act("With the restrictive curse lifted, $p begins to hum with renewed power!",ch,obj,0, TO_CHAR, 0);
+				if (t->equipment[WEAR_FINGER_L] == obj)
+					z = WEAR_FINGER_L;
+				else
+					z = WEAR_FINGER_R;
+				if (t)
+					obj_to_char(unequip_char(t, z), t);
+				add_obj_affect(obj, APPLY_MANA_REGEN, 2);
+				if (t)
+					wear(t, obj, 0);
+
+				act(
+						"With the restrictive curse lifted, $p begins to hum with renewed power!",
+						ch, obj, 0, TO_ROOM, 0);
+				act(
+						"With the restrictive curse lifted, $p begins to hum with renewed power!",
+						ch, obj, 0, TO_CHAR, 0);
+			}
 		}
-	 }
-	 return eSUCCESS;
-  }
+		return eSUCCESS;
+	}
 
   /* Then it is a PC | NPC */
   if(affected_by_spell(victim, SPELL_CURSE)) {
@@ -3260,36 +3251,36 @@ int cast_farsight(ubyte level, CHAR_DATA *ch, char *arg, int type,
 /* FREEFLOAT (for items) */
 
 int cast_freefloat(ubyte level, CHAR_DATA *ch, char *arg, int type,
-                    CHAR_DATA *tar_ch, struct obj_data *tar_obj, int skill)
-{
-  switch(type) {
-    case SPELL_TYPE_SPELL:
-      return spell_freefloat(level, ch, tar_ch, 0, skill);
-      break;
-    case SPELL_TYPE_POTION:
-      return spell_freefloat(level, ch, ch, 0, skill);
-      break;
-    case SPELL_TYPE_WAND:
-    case SPELL_TYPE_SCROLL:
-      if(tar_obj) {
-        return eFAILURE;
-      }
-      if(!tar_ch) {
-        tar_ch = ch;
-      }
-      return spell_freefloat(level, ch, tar_ch, 0, skill);
-      break;
-    case SPELL_TYPE_STAFF:
-      for(tar_ch = world[ch->in_room].people; tar_ch; 
-          tar_ch = tar_ch->next_in_room);
-        spell_freefloat(level, ch, tar_ch, 0, skill);
-      return eSUCCESS;
-      break;
-    default: 
-      log("Serious screw-up in cast_freefloat!", ANGEL, LOG_MISC);
-      break;
-  }
-  return eFAILURE;
+		CHAR_DATA *tar_ch, struct obj_data *tar_obj, int skill) {
+	switch (type) {
+	case SPELL_TYPE_SPELL:
+		return spell_freefloat(level, ch, tar_ch, 0, skill);
+		break;
+	case SPELL_TYPE_POTION:
+		return spell_freefloat(level, ch, ch, 0, skill);
+		break;
+	case SPELL_TYPE_WAND:
+	case SPELL_TYPE_SCROLL:
+		if (tar_obj) {
+			return eFAILURE;
+		}
+		if (!tar_ch) {
+			tar_ch = ch;
+		}
+		return spell_freefloat(level, ch, tar_ch, 0, skill);
+		break;
+	case SPELL_TYPE_STAFF:
+		for (tar_ch = world[ch->in_room].people; tar_ch;
+				tar_ch = tar_ch->next_in_room)
+			;
+		spell_freefloat(level, ch, tar_ch, 0, skill);
+		return eSUCCESS;
+		break;
+	default:
+		log("Serious screw-up in cast_freefloat!", ANGEL, LOG_MISC);
+		break;
+	}
+	return eFAILURE;
 }
 
 
@@ -4514,13 +4505,11 @@ int spell_fire_breath(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
 {
   int dam;
   int retval;
-  CHAR_DATA *tmp_victim, *temp;
 
   act("$B$4You are $IENVELOPED$I$B$4 in scorching $B$4flames$R!$R", ch, 0, 0, TO_ROOM, 0);
 
-  for(tmp_victim = character_list; tmp_victim; tmp_victim = temp)
-  {
-    temp = tmp_victim->next;
+	auto &character_list = DC::instance().character_list;
+	for (auto& tmp_victim : character_list) {
 
     if ( (ch->in_room == tmp_victim->in_room) && (ch != tmp_victim) &&
          (IS_NPC(ch) ? !IS_NPC(tmp_victim) : TRUE) ) // if i'm a mob, don't hurt other mobs
@@ -4551,15 +4540,13 @@ int spell_gas_breath(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
 {
   int dam;
   int retval;
-  CHAR_DATA *tmp_victim, *temp;
 
   act("You CHOKE on the gas fumes!",
 		ch, 0, 0, TO_ROOM, 0);
 
 
-  for(tmp_victim = character_list; tmp_victim; tmp_victim = temp)
-  {
-	 temp = tmp_victim->next;
+  auto &character_list = DC::instance().character_list;
+	for (auto& tmp_victim : character_list) {
 	 if ( (ch->in_room == tmp_victim->in_room) && (ch != tmp_victim) &&
 		(IS_NPC(tmp_victim) || IS_NPC(ch))){
 
@@ -4602,80 +4589,97 @@ int spell_lightning_breath(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct
 /* FEAR */
 
 // TODO - make this use skill
-int spell_fear(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
-{
-  if (!victim || !ch)
-    return eFAILURE;
-  
-  if (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_STUPID)) {
-    csendf(ch, "%s doesn't understand your psychological tactics.\n\r",
-	   GET_SHORT(victim));
-    return eFAILURE;
-  }
-  
-  if (GET_POS(victim) == POSITION_SLEEPING) {
-    send_to_char("How do you expect a sleeping person to be scared?\r\n", ch);
-    return eFAILURE;
-  }
-  
-  if (IS_AFFECTED(victim, AFF_FEARLESS)) {
-    act("$N seems to be quite unafraid of anything.", ch, 0, victim, TO_CHAR, 0);
-    act("You laugh at $n's feeble attempt to frighten you.", ch, 0, victim, TO_VICT, 0);
-    act("$N laughs at $n's futile attempt at scaring $M.", ch, 0, victim, TO_ROOM, NOTVICT);
-    return eFAILURE;
-  }
+int spell_fear(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim,
+		struct obj_data *obj, int skill) {
+	if (!victim || !ch)
+		return eFAILURE;
 
-  if (IS_SET(victim->combat, COMBAT_BERSERK)) {
-    act("$N looks at you with glazed over eyes, drools, and continues to fight!", ch, NULL, victim, TO_CHAR, 0);
-    act("$N smiles madly, drool running down his chin as he ignores $n's magic!", ch, NULL, victim, TO_ROOM, 0);
-    act("You grin as $n realizes you have no target for his mental attack!",
-	ch, NULL, victim, TO_VICT, 0);
-    return eFAILURE;
-  }
+	if (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_STUPID)) {
+		csendf(ch, "%s doesn't understand your psychological tactics.\n\r",
+				GET_SHORT(victim));
+		return eFAILURE;
+	}
 
-  set_cantquit( ch, victim );
-  
-  if(affected_by_spell(victim, SPELL_HEROISM) && affected_by_spell(victim, SPELL_HEROISM)->modifier >= 70) {
-   act("$N seems unaffected.", ch, 0, victim, TO_CHAR, 0);
-   act("Your gods protect you from $n's spell.", ch, 0, victim, TO_VICT, 0);
-   return eFAILURE;
-  }
+	if (GET_POS(victim) == POSITION_SLEEPING) {
+		send_to_char("How do you expect a sleeping person to be scared?\r\n",
+				ch);
+		return eFAILURE;
+	}
 
-  int retval = 0;
+	if (IS_AFFECTED(victim, AFF_FEARLESS)) {
+		act("$N seems to be quite unafraid of anything.", ch, 0, victim,
+				TO_CHAR, 0);
+		act("You laugh at $n's feeble attempt to frighten you.", ch, 0, victim,
+				TO_VICT, 0);
+		act("$N laughs at $n's futile attempt at scaring $M.", ch, 0, victim,
+				TO_ROOM, NOTVICT);
+		return eFAILURE;
+	}
 
-  if (malediction_res(ch, victim, SPELL_FEAR)) {
-    act("$N resists your attempt to scare $M!", ch, NULL, victim, TO_CHAR,0);
-    act("$N resists $n's attempt to scare $M!", ch, NULL, victim, TO_ROOM,NOTVICT);
-    act("You resist $n's attempt to scare you!",ch,NULL,victim,TO_VICT,0);
-    if (IS_NPC(victim) && (!victim->fighting) && GET_POS(ch) > POSITION_SLEEPING) {
-      retval = attack(victim, ch, TYPE_UNDEFINED);
-      retval = SWAP_CH_VICT(retval);
-      return retval;
-    }
-    
-    return eFAILURE;
-  }
+	if (IS_SET(victim->combat, COMBAT_BERSERK)) {
+		act(
+				"$N looks at you with glazed over eyes, drools, and continues to fight!",
+				ch, NULL, victim, TO_CHAR, 0);
+		act(
+				"$N smiles madly, drool running down his chin as he ignores $n's magic!",
+				ch, NULL, victim, TO_ROOM, 0);
+		act("You grin as $n realizes you have no target for his mental attack!",
+				ch, NULL, victim, TO_VICT, 0);
+		return eFAILURE;
+	}
 
-  if (saves_spell(ch, victim, 0, SAVE_TYPE_COLD) >= 0) {
-    send_to_char("For a moment you feel compelled to run away, but you fight back the urge.\n\r", victim);
-    act("$N doesnt seem to be the yellow-bellied slug you thought!", ch, NULL, victim, TO_CHAR, 0);
-  
-  if(IS_NPC(victim) && !victim->fighting)
-  {
-    mob_suprised_sayings(victim, ch);
-    retval = attack(victim, ch, 0);
-    SWAP_CH_VICT(retval);
-  }
-  else
-    retval = eFAILURE;
-    
-    return retval;
-  }
-  
-  send_to_char("You suddenly feel very frightened, and you attempt to flee!\n\r", victim);
-  do_flee(victim, "", 151);
-   
-  return eSUCCESS;
+	set_cantquit(ch, victim);
+
+	if (affected_by_spell(victim, SPELL_HEROISM)
+			&& affected_by_spell(victim, SPELL_HEROISM)->modifier >= 70) {
+		act("$N seems unaffected.", ch, 0, victim, TO_CHAR, 0);
+		act("Your gods protect you from $n's spell.", ch, 0, victim, TO_VICT,
+				0);
+		return eFAILURE;
+	}
+
+	int retval = 0;
+
+	if (malediction_res(ch, victim, SPELL_FEAR)) {
+		act("$N resists your attempt to scare $M!", ch, NULL, victim, TO_CHAR,
+				0);
+		act("$N resists $n's attempt to scare $M!", ch, NULL, victim, TO_ROOM,
+				NOTVICT);
+		act("You resist $n's attempt to scare you!", ch, NULL, victim, TO_VICT,
+				0);
+		if (IS_NPC(
+				victim) && (!victim->fighting) && GET_POS(ch) > POSITION_SLEEPING) {
+			retval = attack(victim, ch, TYPE_UNDEFINED);
+			retval = SWAP_CH_VICT(retval);
+			return retval;
+		}
+
+		return eFAILURE;
+	}
+
+	if (saves_spell(ch, victim, 0, SAVE_TYPE_COLD) >= 0) {
+		send_to_char(
+				"For a moment you feel compelled to run away, but you fight back the urge.\n\r",
+				victim);
+		act("$N doesnt seem to be the yellow-bellied slug you thought!", ch,
+				NULL, victim, TO_CHAR, 0);
+
+		if (IS_NPC(victim) && !victim->fighting) {
+			mob_suprised_sayings(victim, ch);
+			retval = attack(victim, ch, 0);
+			SWAP_CH_VICT(retval);
+		} else
+			retval = eFAILURE;
+
+		return retval;
+	}
+
+	send_to_char(
+			"You suddenly feel very frightened, and you attempt to flee!\n\r",
+			victim);
+	do_flee(victim, "", 151);
+
+	return eSUCCESS;
 }
 
 
@@ -10226,14 +10230,13 @@ int spell_bee_swarm(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
 {
    int dam;
    int retval;
-   CHAR_DATA *tmp_victim, *temp;
 
    dam = 175;
 
    act("$n calls upon the insect world!\n\r", ch, 0, 0, TO_ROOM, INVIS_NULL);
 
-   for(tmp_victim = character_list; tmp_victim && tmp_victim != (char_data *)0x95959595; tmp_victim = temp) {
-      temp = tmp_victim->next;
+	auto &character_list = DC::instance().character_list;
+	for (auto& tmp_victim : character_list) {
       try {
 	if ((ch->in_room == tmp_victim->in_room) && (ch != tmp_victim) &&
 	    (!ARE_GROUPED(ch,tmp_victim)) && can_be_attacked(ch, tmp_victim)) {
@@ -12113,7 +12116,6 @@ int spell_icestorm(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
   int dam;
   int retval = eSUCCESS;
   int retval2;
-  CHAR_DATA *tmp_victim, *temp;
   struct affected_type af;
   char buf[MAX_STRING_LENGTH];
 
@@ -12134,11 +12136,10 @@ int spell_icestorm(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
   send_damage("Your voice raises to a crescendo as you call forth nature's $B$3icy wrath$R to engulf your enemies, dealing | damage!", ch, 0, 0, buf, "Your voice raises to a crescendo as you call forth nature's $B$3icy wrath$R to engulf your enemies!", TO_CHAR);
   send_damage("$n raises $s voice mightily as $e calls forth nature's $B$3icy wrath$R to engulf $s enemies, dealing | damage!", ch, 0, 0, buf, "$n raises $s voice mightily as $e calls forth nature's $B$3icy wrath$R to engulf $s enemies!", TO_ROOM);
 
-  for (tmp_victim = character_list; tmp_victim && tmp_victim->next != reinterpret_cast<char_data *>(0x95959595); tmp_victim = temp)
-  {
-    temp = tmp_victim->next;
+	auto &character_list = DC::instance().character_list;
+	for (auto& tmp_victim : character_list) {
 
-    if ((ch->in_room == tmp_victim->in_room) 
+    if ((ch->in_room == tmp_victim->in_room)
         && (ch != tmp_victim) 
         && (!ARE_GROUPED(ch, tmp_victim)) 
         && can_be_attacked(ch, tmp_victim)) 

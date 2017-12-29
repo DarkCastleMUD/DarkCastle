@@ -12,7 +12,7 @@ extern "C"
 #include <string.h>
 }
 #ifdef LEAK_CHECK
-#include <dmalloc.h>
+
 #endif
 
 #include <ki.h>
@@ -128,224 +128,233 @@ int16 use_ki(CHAR_DATA *ch, int kn)
 }
 
 
-int do_ki(CHAR_DATA *ch, char *argument, int cmd)
-{
-  CHAR_DATA *tar_char = ch;
-  char name[MAX_STRING_LENGTH];
-  int qend, spl = -1;
-  bool target_ok;
-  int learned;
+int do_ki(CHAR_DATA *ch, char *argument, int cmd) {
+	CHAR_DATA *tar_char = ch;
+	char name[MAX_STRING_LENGTH];
+	int qend, spl = -1;
+	bool target_ok;
+	int learned;
 
-   if (GET_LEVEL(ch) < ARCHANGEL && GET_CLASS(ch) != CLASS_MONK) {
-      send_to_char("You are unable to control your ki in this way!\n\r", ch);
-      return eFAILURE;
-      }
-/*
-   if ((IS_SET(world[ch->in_room].room_flags, SAFE)) && (GET_LEVEL(ch) < IMP)) {
-      send_to_char("You feel at peace, calm, relaxed, one with yourself and "
-                   "the universe.\n\r", ch);
-      return eFAILURE;
-      }*/
+	if (GET_LEVEL(ch) < ARCHANGEL && GET_CLASS(ch) != CLASS_MONK) {
+		send_to_char("You are unable to control your ki in this way!\n\r", ch);
+		return eFAILURE;
+	}
+	/*
+	 if ((IS_SET(world[ch->in_room].room_flags, SAFE)) && (GET_LEVEL(ch) < IMP)) {
+	 send_to_char("You feel at peace, calm, relaxed, one with yourself and "
+	 "the universe.\n\r", ch);
+	 return eFAILURE;
+	 }*/
 
-  argument = skip_spaces(argument);
+	argument = skip_spaces(argument);
 
-  if(!(*argument)) {
-    send_to_char("Yes, but WHAT would you like to do?\n\r", ch);
-    return eFAILURE;
-  }
+	if (!(*argument)) {
+		send_to_char("Yes, but WHAT would you like to do?\n\r", ch);
+		return eFAILURE;
+	}
 
-  for(qend = 1; *(argument + qend) && (*(argument + qend) != ' ') ; qend++)
-    *(argument+qend) = LOWER(*(argument + qend));
+	for (qend = 1; *(argument + qend) && (*(argument + qend) != ' '); qend++)
+		*(argument + qend) = LOWER(*(argument + qend));
 
-  spl = old_search_block(argument, 0, qend, ki, 0);
-  spl--;	 /* ki goes from 0+ not 1+ like spells */
-  
-  if(spl < 0) {
-    send_to_char("You cannot harness that energy!\n\r", ch);
-    return eFAILURE;
-  }
-  
-   if (IS_SET(world[ch->in_room].room_flags, SAFE) 
-       && (GET_LEVEL(ch) < IMP) 
-       && spl != KI_SENSE 
-       && spl!=KI_SPEED 
-       && spl!=KI_PURIFY 
-       && spl!=KI_STANCE 
-       && spl!=KI_AGILITY 
-       && spl!=KI_MEDITATION) 
-   {
-      send_to_char("You feel at peace, calm, relaxed, one with yourself and "
-                   "the universe.\n\r", ch);
-      return eFAILURE;
-   }
+	spl = old_search_block(argument, 0, qend, ki, 0);
+	spl--; /* ki goes from 0+ not 1+ like spells */
 
+	if (spl < 0) {
+		send_to_char("You cannot harness that energy!\n\r", ch);
+		return eFAILURE;
+	}
 
-  learned = has_skill(ch, (spl+KI_OFFSET));
-  if(!learned)
-  {
-     send_to_char("You do not know that ki power!\r\n", ch);
-     return eFAILURE;
-  }
+	if (IS_SET(world[ch->in_room].room_flags, SAFE) && (GET_LEVEL(ch) < IMP)
+	&& spl != KI_SENSE
+	&& spl!=KI_SPEED
+	&& spl!=KI_PURIFY
+	&& spl!=KI_STANCE
+	&& spl!=KI_AGILITY
+	&& spl!=KI_MEDITATION) {
+		send_to_char("You feel at peace, calm, relaxed, one with yourself and "
+				"the universe.\n\r", ch);
+		return eFAILURE;
+	}
 
-  if(ki_info[spl].ki_pointer) {
-    if(GET_POS(ch) < ki_info[spl].minimum_position || (spl==KI_MEDITATION && (GET_POS(ch) == POSITION_FIGHTING || GET_POS(ch) <= POSITION_SLEEPING))) {
-      switch(GET_POS(ch)) {
-        case POSITION_SLEEPING:
-          send_to_char("You dream of wonderful ki powers.\n\r", ch);
-          break;
-        case POSITION_RESTING:
-          send_to_char("You cannot harness that much energy while "
-	               "resting!\n\r", ch);
-          break;
-        case POSITION_SITTING:
-          send_to_char("You can't do this sitting!\n\r", ch);
-          break;
-        case POSITION_FIGHTING:
-          send_to_char("This is a peaceful ki power.\n\r", ch);
-          break;
-        default:
-          send_to_char("It seems like you're in a pretty bad shape!\n\r", ch);
-          break;
-      }
-      return eFAILURE;
-    }
-    argument += qend; /* Point to the space after the last ' */
-    for(; *argument == ' '; argument++); /* skip spaces */
+	learned = has_skill(ch, (spl + KI_OFFSET));
+	if (!learned) {
+		send_to_char("You do not know that ki power!\r\n", ch);
+		return eFAILURE;
+	}
 
-    /* Locate targets */
-    target_ok = FALSE;
-	
-    if(!IS_SET(ki_info[spl].targets, TAR_IGNORE)) {
-      argument = one_argument(argument, name);
-      if(*name) {
-        if(IS_SET(ki_info[spl].targets, TAR_CHAR_ROOM))
-          if((tar_char = get_char_room_vis(ch, name)) != NULL)
-            target_ok = TRUE;
-        
-	if(!target_ok && IS_SET(ki_info[spl].targets, TAR_SELF_ONLY))
-          if(str_cmp(GET_NAME(ch), name) == 0) {
-            tar_char = ch;
-            target_ok = TRUE;
-          } // of !target_ok
-      } // of *name
-      
-      /* No argument was typed */
-      else if(!*name) {	
-        if(IS_SET(ki_info[spl].targets, TAR_FIGHT_VICT))
-          if(ch->fighting)
-            if((ch->fighting)->in_room == ch->in_room) {
-              tar_char = ch->fighting;
-              target_ok = TRUE;
-            } 
-            if(!target_ok && IS_SET(ki_info[spl].targets, TAR_SELF_ONLY)) {
-              tar_char = ch;
-              target_ok = TRUE;
-            }
-      } // of !*name
-      
-      else
-        target_ok = FALSE;
-    }
-    
-    if(IS_SET(ki_info[spl].targets, TAR_IGNORE))
-      target_ok = TRUE;
-	
-    if(target_ok != TRUE) {
-      if(*name)
-        send_to_char("Nobody here by that name.\n\r", ch);
-      else /* No arguments were given */
-        send_to_char("Whom should the power be used upon?\n\r", ch);
-      return eFAILURE;
-    }
-    
-    
-    else if(target_ok) {
-      if((tar_char == ch) && IS_SET(ki_info[spl].targets, TAR_SELF_NONO)) {
-        send_to_char("You cannot use this power on yourself.\n\r", ch);
-        return eFAILURE;
-      }
-      else if((tar_char != ch) &&
-              IS_SET(ki_info[spl].targets, TAR_SELF_ONLY)) {
-        send_to_char("You can only use this power upon yourself.\n\r", ch);
-        return eFAILURE;
-      }
-      else if(IS_AFFECTED(ch, AFF_CHARM) && (ch->master == tar_char)) {
-        send_to_char("You are afraid that it might harm your master.\n\r", ch);
-        return eFAILURE;
-      }
-    }
+	if (ki_info[spl].ki_pointer) {
+		if (GET_POS(ch) < ki_info[spl].minimum_position
+				|| (spl == KI_MEDITATION
+						&& (GET_POS(ch) == POSITION_FIGHTING
+								|| GET_POS(ch) <= POSITION_SLEEPING))) {
+			switch (GET_POS(ch)) {
+			case POSITION_SLEEPING:
+				send_to_char("You dream of wonderful ki powers.\n\r", ch);
+				break;
+			case POSITION_RESTING:
+				send_to_char("You cannot harness that much energy while "
+						"resting!\n\r", ch);
+				break;
+			case POSITION_SITTING:
+				send_to_char("You can't do this sitting!\n\r", ch);
+				break;
+			case POSITION_FIGHTING:
+				send_to_char("This is a peaceful ki power.\n\r", ch);
+				break;
+			default:
+				send_to_char("It seems like you're in a pretty bad shape!\n\r",
+						ch);
+				break;
+			}
+			return eFAILURE;
+		}
+		argument += qend; /* Point to the space after the last ' */
+		for (; *argument == ' '; argument++)
+			; /* skip spaces */
 
-    /* I put ths in to stop those crashes.  Morc: find your own bug ;)
-     * -Sadus
-     * This has hence been fixed. - Pir
-     */
-    if(!IS_SET(ki_info[spl].targets, TAR_IGNORE)) 
-    if(!tar_char) {
-      log("Dammit Morc, fix that null tar_char thing in ki", IMP, LOG_BUG);
-      send_to_char("If you triggered this message, you almost crashed the\n\r"
-                   "game.  Tell a god what you did immediately.\n\r", ch);
-      return eFAILURE;
-    }
+		/* Locate targets */
+		target_ok = FALSE;
 
-    /* crasher right here */
-    if (IS_SET(world[ch->in_room].room_flags, NO_KI)) {
-      send_to_char("You find yourself unable to focus your energy here.\n\r", ch);
-      return eFAILURE;
-    }
-    
-    if(!IS_SET(ki_info[spl].targets, TAR_IGNORE)) 
-      if(!can_attack(ch) || !can_be_attacked(ch, tar_char))
-        return eFAILURE;
+		if (!IS_SET(ki_info[spl].targets, TAR_IGNORE)) {
+			argument = one_argument(argument, name);
+			if (*name) {
+				if (IS_SET(ki_info[spl].targets, TAR_CHAR_ROOM))
+					if ((tar_char = get_char_room_vis(ch, name)) != NULL)
+						target_ok = TRUE;
 
-    if(GET_LEVEL(ch) < ARCHANGEL && GET_KI(ch) < use_ki(ch, spl)) {
-      send_to_char("You do not have enough ki!\n\r", ch);
-      return eFAILURE;
-    }
+				if (!target_ok && IS_SET(ki_info[spl].targets, TAR_SELF_ONLY))
+					if (str_cmp(GET_NAME(ch), name) == 0) {
+						tar_char = ch;
+						target_ok = TRUE;
+					} // of !target_ok
+			} // of *name
 
-    WAIT_STATE(ch, ki_info[spl].beats);
+			/* No argument was typed */
+			else if (!*name) {
+				if (IS_SET(ki_info[spl].targets, TAR_FIGHT_VICT))
+					if (ch->fighting)
+						if ((ch->fighting)->in_room == ch->in_room) {
+							tar_char = ch->fighting;
+							target_ok = TRUE;
+						}
+				if (!target_ok && IS_SET(ki_info[spl].targets, TAR_SELF_ONLY)) {
+					tar_char = ch;
+					target_ok = TRUE;
+				}
+			} // of !*name
 
-    if((ki_info[spl].ki_pointer == NULL) && spl > 0)
-      send_to_char("Sorry, this power has not yet been implemented.\n\r", ch);
-    else {
-      if(!skill_success(ch, tar_char, spl+KI_OFFSET) 
-         && !IS_SET(world[ch->in_room].room_flags, SAFE)) {
-        send_to_char("You lost your concentration!\n\r", ch);
-        GET_KI(ch) -= use_ki(ch, spl)/2;
-	WAIT_STATE(ch, ki_info[spl].beats/2);
+			else
+				target_ok = FALSE;
+		}
 
-        return eSUCCESS;
-      }
+		if (IS_SET(ki_info[spl].targets, TAR_IGNORE))
+			target_ok = TRUE;
 
-      if(!IS_SET(ki_info[spl].targets, TAR_IGNORE)) 
-      if(!tar_char || (ch->in_room != tar_char->in_room)) {
-        send_to_char("Whom should the power be used upon?\n\r", ch);
-        return eFAILURE;
-      }
+		if (target_ok != TRUE) {
+			if (*name)
+				send_to_char("Nobody here by that name.\n\r", ch);
+			else
+				/* No arguments were given */
+				send_to_char("Whom should the power be used upon?\n\r", ch);
+			return eFAILURE;
+		}
 
-      /* Stop abusing your betters  */
-     if(!IS_SET(ki_info[spl].targets, TAR_IGNORE)) 
-     if (!IS_NPC(tar_char) && (GET_LEVEL(ch) > ARCHANGEL) 
-          && (GET_LEVEL(tar_char) > GET_LEVEL(ch)))
-      {
-        send_to_char("That just might annoy them!\n\r", ch);
-        return eFAILURE;
-      }
+		else if (target_ok) {
+			if ((tar_char == ch) && IS_SET(ki_info[spl].targets, TAR_SELF_NONO)) {
+				send_to_char("You cannot use this power on yourself.\n\r", ch);
+				return eFAILURE;
+			} else if ((tar_char != ch)
+					&& IS_SET(ki_info[spl].targets, TAR_SELF_ONLY)) {
+				send_to_char("You can only use this power upon yourself.\n\r",
+						ch);
+				return eFAILURE;
+			} else if (IS_AFFECTED(ch, AFF_CHARM) && (ch->master == tar_char)) {
+				send_to_char(
+						"You are afraid that it might harm your master.\n\r",
+						ch);
+				return eFAILURE;
+			}
+		}
 
-      /* Imps ignore safe flags  */
-     if(!IS_SET(ki_info[spl].targets, TAR_IGNORE)) 
-     if (IS_SET(world[ch->in_room].room_flags, SAFE) && !IS_NPC(ch) 
-          && (GET_LEVEL(ch) == IMP)) {
-       send_to_char("There is no safe haven from an angry IMP!\n\r", tar_char);
-     }
+		/* I put ths in to stop those crashes.  Morc: find your own bug ;)
+		 * -Sadus
+		 * This has hence been fixed. - Pir
+		 */
+		if (!IS_SET(ki_info[spl].targets, TAR_IGNORE))
+			if (!tar_char) {
+				log("Dammit Morc, fix that null tar_char thing in ki", IMP,
+						LOG_BUG);
+				send_to_char(
+						"If you triggered this message, you almost crashed the\n\r"
+								"game.  Tell a god what you did immediately.\n\r",
+						ch);
+				return eFAILURE;
+			}
 
-      send_to_char("Ok.\n\r", ch);
-      GET_KI(ch) -= use_ki(ch, spl);
+		/* crasher right here */
+		if (IS_SET(world[ch->in_room].room_flags, NO_KI)) {
+			send_to_char(
+					"You find yourself unable to focus your energy here.\n\r",
+					ch);
+			return eFAILURE;
+		}
 
-      return ((*ki_info[spl].ki_pointer) (GET_LEVEL(ch), ch, argument, tar_char));
-    }
-    return eFAILURE;
-  }
-  return eFAILURE;
+		if (!IS_SET(ki_info[spl].targets, TAR_IGNORE))
+			if (!can_attack(ch) || !can_be_attacked(ch, tar_char))
+				return eFAILURE;
+
+		if (GET_LEVEL(ch) < ARCHANGEL && GET_KI(ch) < use_ki(ch, spl)) {
+			send_to_char("You do not have enough ki!\n\r", ch);
+			return eFAILURE;
+		}
+
+		WAIT_STATE(ch, ki_info[spl].beats);
+
+		if ((ki_info[spl].ki_pointer == NULL) && spl > 0)
+			send_to_char("Sorry, this power has not yet been implemented.\n\r",
+					ch);
+		else {
+			if (!skill_success(ch, tar_char,
+					spl + KI_OFFSET) && !IS_SET(world[ch->in_room].room_flags, SAFE)) {
+				send_to_char("You lost your concentration!\n\r", ch);
+				GET_KI(ch) -= use_ki(ch, spl) / 2;
+				WAIT_STATE(ch, ki_info[spl].beats / 2);
+
+				return eSUCCESS;
+			}
+
+			if (!IS_SET(ki_info[spl].targets, TAR_IGNORE))
+				if (!tar_char || (ch->in_room != tar_char->in_room)) {
+					send_to_char("Whom should the power be used upon?\n\r", ch);
+					return eFAILURE;
+				}
+
+			/* Stop abusing your betters  */
+			if (!IS_SET(ki_info[spl].targets, TAR_IGNORE))
+				if (!IS_NPC(tar_char) && (GET_LEVEL(ch) > ARCHANGEL)
+						&& (GET_LEVEL(tar_char) > GET_LEVEL(ch))) {
+					send_to_char("That just might annoy them!\n\r", ch);
+					return eFAILURE;
+				}
+
+			/* Imps ignore safe flags  */
+			if (!IS_SET(ki_info[spl].targets, TAR_IGNORE))
+				if (IS_SET(world[ch->in_room].room_flags, SAFE) && !IS_NPC(ch)
+						&& (GET_LEVEL(ch) == IMP)) {
+					send_to_char(
+							"There is no safe haven from an angry IMP!\n\r",
+							tar_char);
+				}
+
+			send_to_char("Ok.\n\r", ch);
+			GET_KI(ch) -= use_ki(ch, spl);
+
+			return ((*ki_info[spl].ki_pointer)(GET_LEVEL(ch), ch, argument,
+					tar_char));
+		}
+		return eFAILURE;
+	}
+	return eFAILURE;
 }
 
 void reduce_ki(CHAR_DATA *ch, int type)
@@ -404,11 +413,9 @@ int ki_blast( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
 
    if (vict->weight < 50)
       success += 50;
-   else if (vict->weight < 120)
+   else if (vict->weight >= 50 && vict->weight < 120)
       success += 20;
-   else if (vict->weight < 200)
-      ; /* No effect */
-   else if (vict->weight < 255)
+   else if (vict->weight >= 200 && vict->weight < 255)
       success -= 10;
    else
       success -= 20; /* more than 300 pounds?! */

@@ -1330,8 +1330,6 @@ int do_repop(struct char_data *ch, char *argument, int cmd)
 
 int do_clear(struct char_data *ch, char *argument, int cmd)
 {       
-        struct char_data *tmp_vict;
-        struct char_data *next_vict;
         char buf[MAX_STRING_LENGTH];
         int zone = world[ch->in_room].zone; 
  
@@ -1340,9 +1338,8 @@ int do_clear(struct char_data *ch, char *argument, int cmd)
           return eFAILURE;
         }
 
-        for(tmp_vict = character_list; tmp_vict; tmp_vict = next_vict)
-        {
-                next_vict = tmp_vict->next;
+	auto &character_list = DC::instance().character_list;
+	for (auto& tmp_vict : character_list) {
                 if(world[tmp_vict->in_room].zone == zone) {
                         if(IS_NPC(tmp_vict)) {
                                 for (int l = 0; l < MAX_WEAR; l++ )
@@ -1366,11 +1363,12 @@ int do_clear(struct char_data *ch, char *argument, int cmd)
 
 int do_linkdead(struct char_data *ch, char *arg, int cmd)
 {                               
-  struct char_data *i;  
   int x = 0;
   char buf[100];
  
-  for(i = character_list; i; i = i->next) {
+  auto &character_list = DC::instance().character_list;
+	for (auto& i : character_list) {
+
      if(IS_NPC(i) || i->desc || !CAN_SEE(ch, i))
        continue;
      x++;

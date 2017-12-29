@@ -29,6 +29,8 @@ extern "C" {
 #include <string>
 #include <vector>
 #include <string>
+#include <algorithm>
+#include "DC.h"
 
 #define ASIZE 32
 #define MAX_GOLEMS           2 // amount of golems above +1

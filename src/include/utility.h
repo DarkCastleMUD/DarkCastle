@@ -392,9 +392,14 @@ char *  get_skill_name  (int skillnum);
 void	gain_exp_regardless	(CHAR_DATA *ch, int gain);
 void	advance_level	(CHAR_DATA *ch, int is_conversion);
 int	close_socket	(struct descriptor_data *d);
-int	isname		(const char *arg, const char *arg2);
-void	page_string	(struct descriptor_data *d, const char *str,
-			    int keep_internal);
+
+bool isname(const char *arg, const char *arg2);
+bool isname2(const char *str, const char *namelist);
+bool isname(const std::string &strNeedle, const std::string &strHaystack);
+bool isname2(const std::string &strNeedle, const std::string &strHaystack);
+
+
+void page_string(struct descriptor_data *d, const char *str, int keep_internal);
 void	gain_exp	(CHAR_DATA *ch, int64 gain);
 void	redo_hitpoints  (CHAR_DATA *ch);       /* Rua's put in  */
 void	redo_mana	(CHAR_DATA *ch);       /* Rua's put in  */

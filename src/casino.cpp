@@ -1,3 +1,4 @@
+
 /*
 
  Real bloody blackjack. Who does two cards then nothing else? Wankers, that's who
@@ -9,10 +10,6 @@ extern "C"
 #include <ctype.h>
 #include <string.h>
 }
-#ifdef LEAK_CHECK
-#include <dmalloc.h>
-#endif
-
 #include <structs.h>
 #include <room.h>
 #include <character.h>
@@ -33,8 +30,11 @@ extern "C"
 #include <set.h>
 #include <returnvals.h>
 #include <timeinfo.h>
+#include <DC.h>
+#include <algorithm>
 
-extern CHAR_DATA *character_list;
+using namespace std;
+
 extern OBJ_DATA *object_list;
 extern CWorld world;
 extern struct index_data *obj_index;
@@ -183,27 +183,33 @@ if (tbl->obj->in_room)
 
 bool charExists(CHAR_DATA *ch)
 {
-  CHAR_DATA *tch = character_list;
+  auto &character_list = DC::instance().character_list;
 
-  do {
-	  if (tch == ch)
-		  return TRUE;
-  } while ((tch=tch->next));
-
-  return FALSE;
+  if (character_list.find(ch) != character_list.end()) {
+	  return true;
+  } else {
+	  return false;
+  }
 }
 
 bool verify(struct player_data *plr)
 {
   // make sure player didn't quit, die, or whatever
-  CHAR_DATA *ch;
+  //CHAR_DATA *ch;
 
-  for (ch = character_list;ch;ch=ch->next)
-    if (ch == plr->ch) break;
+  auto &character_list = DC::instance().character_list;
 
-  if (!ch || ch->in_room != plr->table->obj->in_room) 
+  auto result = find_if(character_list.begin(), character_list.end(),[&plr](char_data * const &ch){
+	  if (ch == plr->ch) {
+		  return true;
+	  } else {
+	  	  return false;
+	  }
+  });
+
+  if (result == character_list.end() || (*result)->in_room != plr->table->obj->in_room)
   {
-	if (ch)
+	if (result != character_list.end())
 	{
 	 char buf[MAX_STRING_LENGTH];
 	 sprintf(buf, "%s folds as %s leaves the room.\r\n", GET_NAME(plr->ch), HSSH(plr->ch));
@@ -211,9 +217,9 @@ bool verify(struct player_data *plr)
 	 send_to_char("Your hand is folded as you leave the room.\r\n",plr->ch);
 	}
     free_player(plr); 
-    return FALSE; 
+    return false;
   }// dead or quit
-  return TRUE;
+  return true;
 }
 
 
@@ -1266,9 +1272,7 @@ int blackjack_table(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
 			send_to_char("$BYou BUSTED!$R\r\nThe dealer takes your bet.\r\n",
 					ch);
 			nextturn(plr->table);
-			if (plr->table->plr == plr && plr->next == NULL) // make dealer show cards..
-				;
-			else
+			if (plr->table->plr != plr || plr->next == NULL) // make dealer show cards..
 				free_player(plr);
 		} else {
 			nextturn(plr->table);
@@ -1357,9 +1361,7 @@ int blackjack_table(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
 			send_to_char("$BYou BUSTED!$R\r\nThe dealer takes your bet.\r\n",
 					ch);
 			nextturn(plr->table);
-			if (plr->table->plr == plr && plr->next == NULL) // make dealer show cards..
-				;
-			else
+			if (plr->table->plr != plr || plr->next != NULL) // make dealer show cards..
 				free_player(plr);
 		} else {
 			if (plr->doubled)

@@ -28,7 +28,7 @@ extern "C"
 /*#include <memory.h>*/
 }
 #ifdef LEAK_CHECK
-#include <dmalloc.h>
+
 #endif
 
 #include <structs.h> // MAX_STRING_LENGTH
@@ -582,14 +582,6 @@ char *fillwords[]=
 };
 
 
-struct cmd_hash_info
-{
-  struct command_info *command;
-  struct cmd_hash_info *left;
-  struct cmd_hash_info *right;
-};
-
-
 struct cmd_hash_info *cmd_radix;
 
 
@@ -951,64 +943,64 @@ int do_boss(CHAR_DATA *ch, char *arg, int cmd)
 }
 
 
-int old_search_block(char *argument,int begin,int length,char **list,int mode)
-{
-  int guess, found, search;
+int old_search_block(char *argument, int begin, int length, char **list, int mode) {
+	int guess, found, search;
 
-  // If the word contains 0 letters, a match is already found
-  found = (length < 1);
-  guess = 0;
-  
-  // Search for a match
-  if(mode)
-    while ( !found && *(list[guess]) != '\n' ) {
-      found = ((unsigned) length==strlen(list[guess]));
-      for ( search = 0; search < length && found; search++ )
-        found=(*(argument+begin+search)== *(list[guess]+search));
-        guess++;
-      }
-  else {
-    while ( !found && *(list[guess]) != '\n' ) {
-      found=1;
-      for(search=0;( search < length && found );search++)
-        found=(*(argument+begin+search)== *(list[guess]+search));
-        guess++;
-      }
-    }
+	// If the word contains 0 letters, a match is already found
+	found = (length < 1);
+	guess = 0;
 
-  return ( found ? guess : -1 ); 
+	// Search for a match
+	if (mode)
+		while (!found && *(list[guess]) != '\n') {
+			found = ((unsigned) length == strlen(list[guess]));
+			for (search = 0; search < length && found; search++) {
+				found = (*(argument + begin + search) == *(list[guess] + search));
+			}
+			guess++;
+		}
+	else {
+		while (!found && *(list[guess]) != '\n') {
+			found = 1;
+			for (search = 0; (search < length && found); search++) {
+				found = (*(argument + begin + search) == *(list[guess] + search));
+			}
+			guess++;
+		}
+	}
+
+	return (found ? guess : -1);
 }
 
 
-void argument_interpreter(const char *argument,char *first_arg,char *second_arg )
-{
-  int look_at, begin;
-  
-  begin = 0;
-  
-  do {
-    /* Find first non blank */
-    for ( ;*(argument + begin ) == ' ' ; begin++);
-      /* Find length of first word */
-      for ( look_at=0; *(argument+begin+look_at)> ' ' ; look_at++)
-        /* Make all letters lower case, and copy them to first_arg */
-        *(first_arg + look_at) = LOWER(*(argument + begin + look_at));
-      *(first_arg + look_at)='\0';
-    begin += look_at;
-    }
-    while( fill_word(first_arg));
+void argument_interpreter(const char *argument, char *first_arg, char *second_arg) {
+	int look_at, begin;
 
-  do {
-    /* Find first non blank */
-    for ( ;*(argument + begin ) == ' ' ; begin++);
-      /* Find length of first word */
-      for ( look_at=0; *(argument+begin+look_at)> ' ' ; look_at++)
-        /* Make all letters lower case, and copy them to second_arg */
-        *(second_arg + look_at) = LOWER(*(argument + begin + look_at));
-      *(second_arg + look_at)='\0';
-    begin += look_at;
-    }
-    while( fill_word(second_arg));
+	begin = 0;
+
+	do {
+		/* Find first non blank */
+		for (; *(argument + begin) == ' '; begin++)
+			;
+		/* Find length of first word */
+		for (look_at = 0; *(argument + begin + look_at) > ' '; look_at++)
+			/* Make all letters lower case, and copy them to first_arg */
+			*(first_arg + look_at) = LOWER(*(argument + begin + look_at));
+		*(first_arg + look_at) = '\0';
+		begin += look_at;
+	} while (fill_word(first_arg));
+
+	do {
+		/* Find first non blank */
+		for (; *(argument + begin) == ' '; begin++)
+			;
+		/* Find length of first word */
+		for (look_at = 0; *(argument + begin + look_at) > ' '; look_at++)
+			/* Make all letters lower case, and copy them to second_arg */
+			*(second_arg + look_at) = LOWER(*(argument + begin + look_at));
+		*(second_arg + look_at) = '\0';
+		begin += look_at;
+	} while (fill_word(second_arg));
 }
 
 
@@ -1030,108 +1022,103 @@ int is_number(char *str)
 
 
 // Multiline arguments, used for mobprogs
-char *one_argument_long(char *argument, char *first_arg )
-{
-  int begin, look_at;
-  bool end = FALSE;
-  begin = 0;
-  
-  /* Find first non blank */
-  for ( ;isspace(*(argument + begin)); begin++);
-    if (*(argument+begin) == '{') {
-      end = TRUE;
-      begin++;
-      }
+char *one_argument_long(char *argument, char *first_arg) {
+	int begin, look_at;
+	bool end = FALSE;
+	begin = 0;
 
-  if (*(argument+begin) == '{') {
-   end = TRUE;
-   begin++;
-  }
-  /* Find length of first word */
-  for (look_at=0; ; look_at++)
-    if (!end && *(argument+begin+look_at) <= ' ')
-      break;
-    else if (end && (*(argument+begin+look_at) == '}' ||
-      *(argument+begin+look_at) == '\0')) {
-      begin++;
-      break;
-      }
-    else {
-      if (!end)
-        *(first_arg + look_at) = LOWER(*(argument + begin + look_at));
-      else
-        *(first_arg + look_at) = *(argument + begin + look_at);
-      }
+	/* Find first non blank */
+	for (; isspace(*(argument + begin)); begin++)
+		;
+	if (*(argument + begin) == '{') {
+		end = TRUE;
+		begin++;
+	}
 
-  /* Make all letters lower case, and copy them to first_arg */
-  *(first_arg+look_at) = '\0';
-  begin += look_at;
-  
-  return argument+begin;
+	if (*(argument + begin) == '{') {
+		end = TRUE;
+		begin++;
+	}
+	/* Find length of first word */
+	for (look_at = 0;; look_at++)
+		if (!end && *(argument + begin + look_at) <= ' ')
+			break;
+		else if (end && (*(argument + begin + look_at) == '}' || *(argument + begin + look_at) == '\0')) {
+			begin++;
+			break;
+		} else {
+			if (!end)
+				*(first_arg + look_at) = LOWER(*(argument + begin + look_at));
+			else
+				*(first_arg + look_at) = *(argument + begin + look_at);
+		}
+
+	/* Make all letters lower case, and copy them to first_arg */
+	*(first_arg + look_at) = '\0';
+	begin += look_at;
+
+	return argument + begin;
 }
 
-const char *one_argument_long(const char *argument, char *first_arg )
-{
-  int begin, look_at;
-  bool end = FALSE;
-  begin = 0;
+const char *one_argument_long(const char *argument, char *first_arg) {
+	int begin, look_at;
+	bool end = FALSE;
+	begin = 0;
 
-  /* Find first non blank */
-  for ( ;isspace(*(argument + begin)); begin++);
-    if (*(argument+begin) == '{') {
-      end = TRUE;
-      begin++;
-      }
+	/* Find first non blank */
+	for (; isspace(*(argument + begin)); begin++)
+		;
+	if (*(argument + begin) == '{') {
+		end = TRUE;
+		begin++;
+	}
 
-  if (*(argument+begin) == '{') {
-   end = TRUE;
-   begin++;
-  }
-  /* Find length of first word */
-  for (look_at=0; ; look_at++)
-    if (!end && *(argument+begin+look_at) <= ' ')
-      break;
-    else if (end && (*(argument+begin+look_at) == '}' ||
-      *(argument+begin+look_at) == '\0')) {
-      begin++;
-      break;
-      }
-    else {
-      if (!end)
-        *(first_arg + look_at) = LOWER(*(argument + begin + look_at));
-      else
-        *(first_arg + look_at) = *(argument + begin + look_at);
-      }
+	if (*(argument + begin) == '{') {
+		end = TRUE;
+		begin++;
+	}
+	/* Find length of first word */
+	for (look_at = 0;; look_at++)
+		if (!end && *(argument + begin + look_at) <= ' ')
+			break;
+		else if (end && (*(argument + begin + look_at) == '}' || *(argument + begin + look_at) == '\0')) {
+			begin++;
+			break;
+		} else {
+			if (!end)
+				*(first_arg + look_at) = LOWER(*(argument + begin + look_at));
+			else
+				*(first_arg + look_at) = *(argument + begin + look_at);
+		}
 
-  /* Make all letters lower case, and copy them to first_arg */
-  *(first_arg+look_at) = '\0';
-  begin += look_at;
+	/* Make all letters lower case, and copy them to first_arg */
+	*(first_arg + look_at) = '\0';
+	begin += look_at;
 
-  return argument+begin;
+	return argument + begin;
 }
 
 /* find the first sub-argument of a string, return pointer to first char in
    primary argument, following the sub-arg                      */
-char *one_argument(char *argument, char *first_arg )
-{
-  return one_argument_long(argument, first_arg);
-  int begin, look_at;
-  
-  begin = 0;
-  
-  do {
-    /* Find first non blank */
-    for ( ;isspace(*(argument + begin)); begin++);
-      /* Find length of first word */
-      for (look_at=0; *(argument+begin+look_at) > ' ' ; look_at++)
-        /* Make all letters lower case, and copy them to first_arg */
-        *(first_arg + look_at) = LOWER(*(argument + begin + look_at));
-      *(first_arg + look_at)='\0';
-    begin += look_at;
-    }
-    while (fill_word(first_arg));
+char *one_argument(char *argument, char *first_arg) {
+	return one_argument_long(argument, first_arg);
+	int begin, look_at;
 
-  return(argument+begin);
+	begin = 0;
+
+	do {
+		/* Find first non blank */
+		for (; isspace(*(argument + begin)); begin++)
+			;
+		/* Find length of first word */
+		for (look_at = 0; *(argument + begin + look_at) > ' '; look_at++)
+			/* Make all letters lower case, and copy them to first_arg */
+			*(first_arg + look_at) = LOWER(*(argument + begin + look_at));
+		*(first_arg + look_at) = '\0';
+		begin += look_at;
+	} while (fill_word(first_arg));
+
+	return (argument + begin);
 }
 
 const char *one_argument(const char *argument, char *first_arg )
@@ -1146,24 +1133,23 @@ int fill_wordnolow(char *argument)
 }
 
 
-char *one_argumentnolow(char *argument, char *first_arg )
-{
-  int begin, look_at;
-  begin = 0;
-  
-  do {
-    /* Find first non blank */
-    for ( ;isspace(*(argument + begin)); begin++);
-      /* Find length of first word */
-      for (look_at=0; *(argument+begin+look_at) > ' ' ; look_at++)
-        /* copy to first_arg */
-        *(first_arg + look_at) = *(argument + begin + look_at);
-      *(first_arg + look_at) = '\0';
-    begin += look_at;
-    }
-    while (fill_wordnolow(first_arg));
+char *one_argumentnolow(char *argument, char *first_arg) {
+	int begin, look_at;
+	begin = 0;
 
-  return (argument+begin);
+	do {
+		/* Find first non blank */
+		for (; isspace(*(argument + begin)); begin++)
+			;
+		/* Find length of first word */
+		for (look_at = 0; *(argument + begin + look_at) > ' '; look_at++)
+			/* copy to first_arg */
+			*(first_arg + look_at) = *(argument + begin + look_at);
+		*(first_arg + look_at) = '\0';
+		begin += look_at;
+	} while (fill_wordnolow(first_arg));
+
+	return (argument + begin);
 }
 
 

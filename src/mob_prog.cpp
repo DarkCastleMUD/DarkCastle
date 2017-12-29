@@ -45,9 +45,11 @@
 #include <handler.h>
 #include <db.h>
 #include <comm.h>
+#include <DC.h>
 #include <returnvals.h>
 #include <map>
 #include <string>
+#include <algorithm>
 
 // Extern variables
 
@@ -303,582 +305,799 @@ bool istank(CHAR_DATA *ch)
   return FALSE;
 }
 
-void translate_value(char *leftptr, char *rightptr, int16 **vali, uint32 **valui,
-		char ***valstr, int64 **vali64, sbyte **valb, CHAR_DATA *mob, CHAR_DATA *actor, 
-		OBJ_DATA *obj, void *vo, CHAR_DATA *rndm)
-{
-/*
-  $n.age
-  '$n' = left
-  'age' = right
+void translate_value(char *leftptr, char *rightptr, int16 **vali,
+		uint32 **valui, char ***valstr, int64 **vali64, sbyte **valb,
+		CHAR_DATA *mob, CHAR_DATA *actor, OBJ_DATA *obj, void *vo,
+		CHAR_DATA *rndm) {
+	/*
+	 $n.age
+	 '$n' = left
+	 'age' = right
 
-  $n,7.hasskill
-  '$n' = left
-  '7' = half
-  'hasskill' = right
-*/
+	 $n,7.hasskill
+	 '$n' = left
+	 '7' = half
+	 'hasskill' = right
+	 */
 
+	CHAR_DATA *target = NULL;
+	OBJ_DATA *otarget = NULL;
+	int rtarget = -1, ztarget = -1;
+	bool valset = FALSE; // done like that to determine if value is set, since it can be 0
+	struct tempvariable *eh = mob->tempVariable;
 
-  CHAR_DATA *target = NULL;
-  OBJ_DATA *otarget = NULL;
-  int rtarget = -1, ztarget = -1;
-  bool valset = FALSE; // done like that to determine if value is set, since it can be 0 
-  struct tempvariable *eh = mob->tempVariable;
+	// Used to store return pointer from getTemp(). Do not use more than
+	// once in this function.
+	char *targetTemp = 0;
 
-  // Used to store return pointer from getTemp(). Do not use more than
-  // once in this function.
-  char *targetTemp = 0;
-
-  
-  activeTarget = NULL;
-  char *tmp,half[MAX_INPUT_LENGTH];
-  half[0] ='\0'; 
-  if ((tmp = strchr(leftptr, ',')) != NULL)
-  {
-    *tmp = '\0';
-    tmp++;
-    one_argument(tmp, half); // strips whatever spaces
-  }
-
+	activeTarget = NULL;
+	char *tmp, half[MAX_INPUT_LENGTH];
+	half[0] = '\0';
+	if ((tmp = strchr(leftptr, ',')) != NULL) {
+		*tmp = '\0';
+		tmp++;
+		one_argument(tmp, half); // strips whatever spaces
+	}
 
 // Less nitpicky about the mobprogs with this stuff below in.
-  char larr[MAX_INPUT_LENGTH];
-  one_argument(leftptr, larr);
-  char *left = &larr[0];
+	char larr[MAX_INPUT_LENGTH];
+	one_argument(leftptr, larr);
+	char *left = &larr[0];
 
-  char rarr[MAX_INPUT_LENGTH];
-  one_argument(rightptr, rarr);
-  char *right = &rarr[0]; 
-  bool silent = FALSE;
+	char rarr[MAX_INPUT_LENGTH];
+	one_argument(rightptr, rarr);
+	char *right = &rarr[0];
+	bool silent = FALSE;
 
-  if (!str_prefix("world_",left)) {
-    left += 6;
-    CHAR_DATA *tmp;
-    for (tmp = character_list; tmp; tmp = tmp->next)
-    {
-	if (isname(left, GET_NAME(tmp)))
-	 { target = tmp; break; }
-    }
-  } else if (!str_prefix("zone_", left)) {
-    left += 5;
-    CHAR_DATA *tmp;
-    for (tmp = character_list; tmp; tmp = tmp->next)
-    {
-	if (tmp->in_room == NOWHERE || world[mob->in_room].zone != world[tmp->in_room].zone) continue;
-	if (isname(left, GET_NAME(tmp)))
-	 { target = tmp; break; }
-    }
-  } else if (!str_prefix("mroom_", left)) {
-    left += 6;
-    CHAR_DATA *tmp;
-    for (tmp = world[mob->in_room].people; tmp; tmp = tmp->next_in_room)
-    {
-	if (isname(left, GET_NAME(tmp)))
-	 { target = tmp; break; }
-    }
-  } else if (!str_prefix("room_",left)) {
-    left += 5;
-    if (is_number(left))
-	rtarget = real_room(atoi(left));
-    else
-	rtarget = mob->in_room;
-  } else if (!str_prefix("oworld_",left)) {
-    left += 7;
-    otarget = get_obj(left);
-  } else if (!str_prefix("ozone_",left)) {
-    left += 6;
-    OBJ_DATA *otmp;
-    int z = world[mob->in_room].zone;
-    for (otmp = object_list;otmp;otmp = otmp->next)
-    {
-        OBJ_DATA *cmp = otmp->in_obj?otmp->in_obj:otmp;
-	if ((cmp->in_room != -1 && world[cmp->in_room].zone == z) ||
-		(cmp->carried_by && world[cmp->carried_by->in_room].zone == z) ||
-		(cmp->equipped_by && world[cmp->equipped_by->in_room].zone == z))
-		if (isname(left, otmp->name))
-		{ otarget = otmp; break; }	
-    }
-    otarget = get_obj(left);
-  } else if (!str_prefix("oroom_",left)) {
-    left += 6;
-    otarget = get_obj_in_list(left, world[mob->in_room].contents);
-  } else if (!str_prefix("zone_",left)) {
-    ztarget = world[mob->in_room].zone;
-    left += 5;
-  } else if (*left == '$') {
- 	switch (*(left+1))
-	{
-		case 'n': target = actor;break;
-		case 'i': target = mob;break;
-		case 'r': target = rndm;silent = TRUE;break;
-		    
-		case 't': target = (CHAR_DATA*)vo;break;
-		case 'o': otarget = obj;break;
-		case 'p': otarget = (OBJ_DATA*)vo;break;
-		case 'f': if (actor) target = actor->fighting; break;
-		case 'g': if (mob) target = mob->fighting; break;
+	if (!str_prefix("world_", left)) {
+		left += 6;
+
+		auto &character_list = DC::instance().character_list;
+		find_if(character_list.begin(), character_list.end(),
+				[&target, &left](char_data * const &tmp) {
+					if (isname(left, GET_NAME(tmp))) {
+						target = tmp;
+						return true;
+					} else {
+						return false;
+					}
+				});
+	} else if (!str_prefix("zone_", left)) {
+		left += 5;
+
+		auto &character_list = DC::instance().character_list;
+		find_if(character_list.begin(), character_list.end(),
+				[&target, &left, &mob](char_data * const &tmp) {
+					if (tmp->in_room != NOWHERE && world[mob->in_room].zone == world[tmp->in_room].zone && isname(left, GET_NAME(tmp))) {
+						target = tmp;
+						return true;
+					} else {
+						return false;
+					}
+				});
+	} else if (!str_prefix("mroom_", left)) {
+		left += 6;
+		CHAR_DATA *tmp;
+		for (tmp = world[mob->in_room].people; tmp; tmp = tmp->next_in_room) {
+			if (isname(left, GET_NAME(tmp))) {
+				target = tmp;
+				break;
+			}
+		}
+	} else if (!str_prefix("room_", left)) {
+		left += 5;
+		if (is_number(left))
+			rtarget = real_room(atoi(left));
+		else
+			rtarget = mob->in_room;
+	} else if (!str_prefix("oworld_", left)) {
+		left += 7;
+		otarget = get_obj(left);
+	} else if (!str_prefix("ozone_", left)) {
+		left += 6;
+		OBJ_DATA *otmp;
+		int z = world[mob->in_room].zone;
+		for (otmp = object_list; otmp; otmp = otmp->next) {
+			OBJ_DATA *cmp = otmp->in_obj ? otmp->in_obj : otmp;
+			if ((cmp->in_room != -1 && world[cmp->in_room].zone == z)
+					|| (cmp->carried_by
+							&& world[cmp->carried_by->in_room].zone == z)
+					|| (cmp->equipped_by
+							&& world[cmp->equipped_by->in_room].zone == z))
+				if (isname(left, otmp->name)) {
+					otarget = otmp;
+					break;
+				}
+		}
+		otarget = get_obj(left);
+	} else if (!str_prefix("oroom_", left)) {
+		left += 6;
+		otarget = get_obj_in_list(left, world[mob->in_room].contents);
+	} else if (!str_prefix("zone_", left)) {
+		ztarget = world[mob->in_room].zone;
+		left += 5;
+	} else if (*left == '$') {
+		switch (*(left + 1)) {
+		case 'n':
+			target = actor;
+			break;
+		case 'i':
+			target = mob;
+			break;
+		case 'r':
+			target = rndm;
+			silent = TRUE;
+			break;
+
+		case 't':
+			target = (CHAR_DATA*) vo;
+			break;
+		case 'o':
+			otarget = obj;
+			break;
+		case 'p':
+			otarget = (OBJ_DATA*) vo;
+			break;
+		case 'f':
+			if (actor)
+				target = actor->fighting;
+			break;
+		case 'g':
+			if (mob)
+				target = mob->fighting;
+			break;
 		case 'v':
 			char buf[MAX_STRING_LENGTH];
 			buf[0] = '\0';
 			int i;
-			for (i = 2; *(left+i); i++)
-			{
-				if (*(left+i) == '[') continue;
-				if (*(left+i) == ']')
-				{
-					buf[i-3] = '\0';
+			for (i = 2; *(left + i); i++) {
+				if (*(left + i) == '[')
+					continue;
+				if (*(left + i) == ']') {
+					buf[i - 3] = '\0';
 					break;
 				}
-				buf[i-3] = *(left+i);
-			
-			}
-	          for (; eh; eh = eh->next)
-	            if (!str_cmp(buf, eh->name))
-	              break;
-	         if (eh) strcpy(buf, eh->data);
-	        
+				buf[i - 3] = *(left + i);
 
-			if (buf[0] != '\0')
-			{
-		   	  if (!is_number(buf)) target = get_char_room(buf, mob->in_room);
-  		 	  else { valset = TRUE; }
+			}
+			for (; eh; eh = eh->next)
+				if (!str_cmp(buf, eh->name))
+					break;
+			if (eh)
+				strcpy(buf, eh->data);
+
+			if (buf[0] != '\0') {
+				if (!is_number(buf))
+					target = get_char_room(buf, mob->in_room);
+				else {
+					valset = TRUE;
+				}
 			}
 			break;
 		default:
-		break;
+			break;
+		}
+	} else {
+		if (!is_number(left))
+			target = get_char_room(left, mob->in_room);
+		else {
+			valset = TRUE;
+		}
 	}
-  } else {
-   	if (!is_number(left)) target = get_char_room(left, mob->in_room);
-   	else { valset = TRUE; }
-  }
 
-  if ( !target && !otarget && ztarget == -1 && rtarget == -1 && !valset && str_cmp(right,"numpcs"))
-    {
-        if (!silent)
-        logf( IMMORTAL, LOG_WORLD,  "translate_value: Mob: %d invalid target in mobprog", mob_index[mob->mobdata->nr].virt ); 
-      return;
-    }
-  activeTarget = target;
-  // target acquired. fucking boring code.
-  // more boring code. FUCK.
-  int16 *intval = NULL;
-  uint32 *uintval = NULL;
-  char **stringval = NULL;
-  int64 *llval = NULL;
-  sbyte *sbval = NULL;
-  bool tError = FALSE;
+	if (!target && !otarget && ztarget == -1 && rtarget == -1 && !valset
+			&& str_cmp(right, "numpcs")) {
+		if (!silent)
+			logf( IMMORTAL, LOG_WORLD,
+					"translate_value: Mob: %d invalid target in mobprog",
+					mob_index[mob->mobdata->nr].virt);
+		return;
+	}
+	activeTarget = target;
+	// target acquired. fucking boring code.
+	// more boring code. FUCK.
+	int16 *intval = NULL;
+	uint32 *uintval = NULL;
+	char **stringval = NULL;
+	int64 *llval = NULL;
+	sbyte *sbval = NULL;
+	bool tError = FALSE;
 
-  /*
-     When a variable is created and assigned the value of the target-data, it is because it is
-      not meant to be modify-able through mob-progs, such as character class.
-  */
+	/*
+	 When a variable is created and assigned the value of the target-data, it is because it is
+	 not meant to be modify-able through mob-progs, such as character class.
+	 */
 
-  switch (LOWER(*right))
-  {
-    case 'a':
-		if (!str_cmp(right, "armor"))
-		{  if (!target) tError = TRUE;
-		  else {intval = &target->armor;break;}
-		} else if (!str_cmp(right, "actflags1"))
-		{  if (!target || !IS_NPC(target)) tError = TRUE;
-		  else {uintval = &target->mobdata->actflags[0];break;}
-		} else if (!str_cmp(right, "actflags2"))
-		{  if (!target || !IS_NPC(target)) tError = TRUE;
-		  else {uintval = &target->mobdata->actflags[1];break;}
-		} else if (!str_cmp(right, "affected1"))
-		{  if (!target) tError = TRUE;
-		  else {uintval = &target->affected_by[0];break;}
-		} else if (!str_cmp(right, "affected2"))
-		{  if (!target) tError = TRUE;
-		  else {uintval = &target->affected_by[1];break;}
-		} else if (!str_cmp(right, "alignment"))
-		{  if (!target) tError = TRUE;
-		  else {intval = &target->alignment;break;}
-		} else if (!str_cmp(right, "acidsave"))
-		{  if (!target) tError = TRUE;
-		  else {intval = &target->saves[SAVE_TYPE_ACID];break;}
-		} else if (!str_cmp(right, "age"))
-		{  if (!target) tError = TRUE;
-		  else {int16 ageint=age(target).year;intval = &ageint;}
+	switch (LOWER(*right)) {
+	case 'a':
+		if (!str_cmp(right, "armor")) {
+			if (!target)
+				tError = TRUE;
+			else {
+				intval = &target->armor;
+				break;
+			}
+		} else if (!str_cmp(right, "actflags1")) {
+			if (!target || !IS_NPC(target))
+				tError = TRUE;
+			else {
+				uintval = &target->mobdata->actflags[0];
+				break;
+			}
+		} else if (!str_cmp(right, "actflags2")) {
+			if (!target || !IS_NPC(target))
+				tError = TRUE;
+			else {
+				uintval = &target->mobdata->actflags[1];
+				break;
+			}
+		} else if (!str_cmp(right, "affected1")) {
+			if (!target)
+				tError = TRUE;
+			else {
+				uintval = &target->affected_by[0];
+				break;
+			}
+		} else if (!str_cmp(right, "affected2")) {
+			if (!target)
+				tError = TRUE;
+			else {
+				uintval = &target->affected_by[1];
+				break;
+			}
+		} else if (!str_cmp(right, "alignment")) {
+			if (!target)
+				tError = TRUE;
+			else {
+				intval = &target->alignment;
+				break;
+			}
+		} else if (!str_cmp(right, "acidsave")) {
+			if (!target)
+				tError = TRUE;
+			else {
+				intval = &target->saves[SAVE_TYPE_ACID];
+				break;
+			}
+		} else if (!str_cmp(right, "age")) {
+			if (!target)
+				tError = TRUE;
+			else {
+				int16 ageint = age(target).year;
+				intval = &ageint;
+			}
 		}
 		break;
-    case 'b':
-		if (!str_cmp(right, "bank"))
-		{  if (!target || !target->pcdata) tError = TRUE;
-		  else {uintval = &target->pcdata->bank;}
+	case 'b':
+		if (!str_cmp(right, "bank")) {
+			if (!target || !target->pcdata)
+				tError = TRUE;
+			else {
+				uintval = &target->pcdata->bank;
+			}
 		}
 		break;
-    case 'c':
-	        if (!str_cmp(right, "carriedby"))
-		{  if (!otarget) tError = TRUE;
-		  else if (otarget->carried_by) {stringval = &otarget->carried_by->name;}
-		  else if (otarget->equipped_by) {stringval = &otarget->equipped_by->name;}
-		  else if (otarget->in_obj && otarget->in_obj->carried_by) {stringval = &otarget->in_obj->carried_by->name;}
-		  else if (otarget->in_obj && otarget->in_obj->equipped_by) {stringval = &otarget->in_obj->equipped_by->name;}
-		  else stringval = NULL;
-		} else if (!str_cmp(right, "carryingitems"))
-		{  if (!target) tError = TRUE;
-		  else {int16 car = target->carry_items;intval = &car;}
-		} else if (!str_cmp(right, "carryingweight"))
-		{  if (!target) tError = TRUE;
-		  else {int16 car = target->carry_weight;intval = &car;}
-		} else if (!str_cmp(right, "class"))
-		{  if (!target) tError = TRUE;
-		  else {sbval = &target->c_class;}
-		} else if (!str_cmp(right, "coldsave"))
-		{  if (!target) tError = TRUE;
-		  else {intval = &target->saves[SAVE_TYPE_COLD];}
-		} else if (!str_cmp(right, "constitution"))
-		{ if (!target) tError = TRUE;
-		  else {sbval = &target->con; }
-		} else if (!str_cmp(right, "cost"))
-		{
-		  if (!otarget) tError = TRUE;
-		  else { uintval = (uint32*)&otarget->obj_flags.cost; }
+	case 'c':
+		if (!str_cmp(right, "carriedby")) {
+			if (!otarget)
+				tError = TRUE;
+			else if (otarget->carried_by) {
+				stringval = &otarget->carried_by->name;
+			} else if (otarget->equipped_by) {
+				stringval = &otarget->equipped_by->name;
+			} else if (otarget->in_obj && otarget->in_obj->carried_by) {
+				stringval = &otarget->in_obj->carried_by->name;
+			} else if (otarget->in_obj && otarget->in_obj->equipped_by) {
+				stringval = &otarget->in_obj->equipped_by->name;
+			} else
+				stringval = NULL;
+		} else if (!str_cmp(right, "carryingitems")) {
+			if (!target)
+				tError = TRUE;
+			else {
+				int16 car = target->carry_items;
+				intval = &car;
+			}
+		} else if (!str_cmp(right, "carryingweight")) {
+			if (!target)
+				tError = TRUE;
+			else {
+				int16 car = target->carry_weight;
+				intval = &car;
+			}
+		} else if (!str_cmp(right, "class")) {
+			if (!target)
+				tError = TRUE;
+			else {
+				sbval = &target->c_class;
+			}
+		} else if (!str_cmp(right, "coldsave")) {
+			if (!target)
+				tError = TRUE;
+			else {
+				intval = &target->saves[SAVE_TYPE_COLD];
+			}
+		} else if (!str_cmp(right, "constitution")) {
+			if (!target)
+				tError = TRUE;
+			else {
+				sbval = &target->con;
+			}
+		} else if (!str_cmp(right, "cost")) {
+			if (!otarget)
+				tError = TRUE;
+			else {
+				uintval = (uint32*) &otarget->obj_flags.cost;
+			}
 		}
 		break;
-    case 'd':
-		if (!str_cmp(right, "damroll"))
-		{  if (!target) tError = TRUE;
-		  else {intval = &target->damroll;}
-		} else if (!str_cmp(right,"description"))
-		{
-		   if (!target && !otarget && !rtarget) tError = TRUE;
-		   else if (otarget) { stringval = &otarget->description; }
-		   else if (rtarget >= 0) { if (world_array[rtarget]) stringval = &world[rtarget].description; else tError = TRUE; }
-		   else {stringval = &target->description; }
-		} else if (!str_cmp(right,"dexterity"))
-		{
-		   if (!target) tError = TRUE;
-		   else {sbval = &target->dex;}
-		} else if (!str_cmp(right,"drunk"))
-		{
-		   if (!target) tError = TRUE;
-		   else {sbval= &target->conditions[DRUNK];}
+	case 'd':
+		if (!str_cmp(right, "damroll")) {
+			if (!target)
+				tError = TRUE;
+			else {
+				intval = &target->damroll;
+			}
+		} else if (!str_cmp(right, "description")) {
+			if (!target && !otarget && !rtarget)
+				tError = TRUE;
+			else if (otarget) {
+				stringval = &otarget->description;
+			} else if (rtarget >= 0) {
+				if (world_array[rtarget])
+					stringval = &world[rtarget].description;
+				else
+					tError = TRUE;
+			} else {
+				stringval = &target->description;
+			}
+		} else if (!str_cmp(right, "dexterity")) {
+			if (!target)
+				tError = TRUE;
+			else {
+				sbval = &target->dex;
+			}
+		} else if (!str_cmp(right, "drunk")) {
+			if (!target)
+				tError = TRUE;
+			else {
+				sbval = &target->conditions[DRUNK];
+			}
 		}
 		break;
 	case 'e':
-		if (!str_cmp(right,"energysaves"))
-		{
-		   if (!target) tError = TRUE;
-		  else intval = &target->saves[SAVE_TYPE_ACID];
-		} else if (!str_cmp(right,"experience"))
-		{
-		   if (!target) tError = TRUE;
-		   else {llval= &target->exp;}
-		} else if (!str_cmp(right,"extra"))
-		{
-		   if (!otarget) tError = TRUE;
-		   else {uintval = &otarget->obj_flags.extra_flags;}
+		if (!str_cmp(right, "energysaves")) {
+			if (!target)
+				tError = TRUE;
+			else
+				intval = &target->saves[SAVE_TYPE_ACID];
+		} else if (!str_cmp(right, "experience")) {
+			if (!target)
+				tError = TRUE;
+			else {
+				llval = &target->exp;
+			}
+		} else if (!str_cmp(right, "extra")) {
+			if (!otarget)
+				tError = TRUE;
+			else {
+				uintval = &otarget->obj_flags.extra_flags;
+			}
 		}
 		break;
 	case 'f':
-		if (!str_cmp(right,"firesaves"))
-		{
-		   if (!target) tError = TRUE;
-		  else intval = &target->saves[SAVE_TYPE_FIRE];
-		} else if (!str_cmp(right,"flags"))
-		{
-		  if (!rtarget) tError = TRUE;
-		  else uintval = &world[rtarget].room_flags;
+		if (!str_cmp(right, "firesaves")) {
+			if (!target)
+				tError = TRUE;
+			else
+				intval = &target->saves[SAVE_TYPE_FIRE];
+		} else if (!str_cmp(right, "flags")) {
+			if (!rtarget)
+				tError = TRUE;
+			else
+				uintval = &world[rtarget].room_flags;
 		}
 		break;
 	case 'g':
-		if (!str_cmp(right,"gold"))
-		{
-		   if (!target) tError = TRUE;
-		  else llval = &target->gold;
-		} else if (!str_cmp(right,"glowfactor"))
-		{
-		   if (!target) tError = TRUE;
-		  else intval = &target->glow_factor;
+		if (!str_cmp(right, "gold")) {
+			if (!target)
+				tError = TRUE;
+			else
+				llval = &target->gold;
+		} else if (!str_cmp(right, "glowfactor")) {
+			if (!target)
+				tError = TRUE;
+			else
+				intval = &target->glow_factor;
 		}
 		break;
 	case 'h':
-		if (!str_cmp(right,"hasskill"))
-		{
-		  if (!target) tError = TRUE;
-		  else { 
-		  int skl = 0;
-		if (*half == '\0' || (skl = atoi(half)) < 0) {
-	          logf( IMMORTAL, LOG_WORLD,  "translate_value: Mob: %d invalid skillnumber in hasskill", mob_index[mob->mobdata->nr].virt ); 
-		  tError = TRUE;
-		}
-		  int16 sklint = has_skill(target,skl);
-		  intval = &sklint;
-		  }
-		}
-		else if (!str_cmp(right,"height"))
-		{
-		   if (!target) tError = TRUE;
-		  else sbval = (sbyte*)(&target->height);
-		} else if (!str_cmp(right,"hitpoints"))
-		{
-		   if (!target) tError = TRUE;
-		  else uintval = (uint32*)&target->hit;
-		} else if (!str_cmp(right,"hitroll"))
-		{
-		   if (!target) tError = TRUE;
-		  else intval = &target->hitroll;
-		} else if (!str_cmp(right,"homeroom"))
-		{
-		   if (!target) tError = TRUE;
-		  else intval = &target->hometown;
-		} else if (!str_cmp(right,"hunger"))
-		{
-		   if (!target) tError = TRUE;
-		   else {sbval= &target->conditions[FULL];}
+		if (!str_cmp(right, "hasskill")) {
+			if (!target)
+				tError = TRUE;
+			else {
+				int skl = 0;
+				if (*half == '\0' || (skl = atoi(half)) < 0) {
+					logf( IMMORTAL, LOG_WORLD,
+							"translate_value: Mob: %d invalid skillnumber in hasskill",
+							mob_index[mob->mobdata->nr].virt);
+					tError = TRUE;
+				}
+				int16 sklint = has_skill(target, skl);
+				intval = &sklint;
+			}
+		} else if (!str_cmp(right, "height")) {
+			if (!target)
+				tError = TRUE;
+			else
+				sbval = (sbyte*) (&target->height);
+		} else if (!str_cmp(right, "hitpoints")) {
+			if (!target)
+				tError = TRUE;
+			else
+				uintval = (uint32*) &target->hit;
+		} else if (!str_cmp(right, "hitroll")) {
+			if (!target)
+				tError = TRUE;
+			else
+				intval = &target->hitroll;
+		} else if (!str_cmp(right, "homeroom")) {
+			if (!target)
+				tError = TRUE;
+			else
+				intval = &target->hometown;
+		} else if (!str_cmp(right, "hunger")) {
+			if (!target)
+				tError = TRUE;
+			else {
+				sbval = &target->conditions[FULL];
+			}
 		}
 		break;
 	case 'i':
-		if (!str_cmp(right,"immune"))
-		{
-		   if (!target) tError = TRUE;
-		  else uintval = (uint32*)&target->immune;
-		} else if (!str_cmp(right,"inroom"))
-		{
-		   if (!target && !otarget) tError = TRUE;
-		   else if (target) { static uint32 tmp; tmp = (uint32)target->in_room; uintval = &tmp; }
-		   else { static uint32 tmp; tmp = (uint32)otarget->in_room; uintval = &tmp; }
-		} else if (!str_cmp(right,"intelligence"))
-		{
-		   if (!target) tError = TRUE;
-		  else sbval = (sbyte*)&target->intel;
+		if (!str_cmp(right, "immune")) {
+			if (!target)
+				tError = TRUE;
+			else
+				uintval = (uint32*) &target->immune;
+		} else if (!str_cmp(right, "inroom")) {
+			if (!target && !otarget)
+				tError = TRUE;
+			else if (target) {
+				static uint32 tmp;
+				tmp = (uint32) target->in_room;
+				uintval = &tmp;
+			} else {
+				static uint32 tmp;
+				tmp = (uint32) otarget->in_room;
+				uintval = &tmp;
+			}
+		} else if (!str_cmp(right, "intelligence")) {
+			if (!target)
+				tError = TRUE;
+			else
+				sbval = (sbyte*) &target->intel;
 		}
 		break;
 	case 'l':
-		if (!str_cmp(right,"level"))
-		{
-		   if (!target && !otarget) tError = TRUE;
-		   else if (otarget) {intval = &otarget->obj_flags.eq_level;}
-		   else { if (IS_NPC(target)) sbval= &target->level; else sbval = &target->level;}
-		} else if (!str_cmp(right,"long"))
-		{
-		   if (!target) tError = TRUE;
-		   else {stringval= &target->long_desc;}
+		if (!str_cmp(right, "level")) {
+			if (!target && !otarget)
+				tError = TRUE;
+			else if (otarget) {
+				intval = &otarget->obj_flags.eq_level;
+			} else {
+				if (IS_NPC(target))
+					sbval = &target->level;
+				else
+					sbval = &target->level;
+			}
+		} else if (!str_cmp(right, "long")) {
+			if (!target)
+				tError = TRUE;
+			else {
+				stringval = &target->long_desc;
+			}
 		}
 		break;
 	case 'k':
-		if (!str_cmp(right,"ki"))
-		{
-		   if (!target) tError = TRUE;
-		   else {uintval = (uint32*)&target->ki;}
+		if (!str_cmp(right, "ki")) {
+			if (!target)
+				tError = TRUE;
+			else {
+				uintval = (uint32*) &target->ki;
+			}
 		}
 		break;
 	case 'm':
-		if (!str_cmp(right,"magicsaves"))
-		{
-		   if (!target) tError = TRUE;
-		  else intval = &target->saves[SAVE_TYPE_MAGIC];
-		} else if (!str_cmp(right, "mana"))
-		{
-		  if (!target) tError = TRUE;
-		  else uintval = (uint32*)&target->mana;
-		} else if (!str_cmp(right, "maxhitpoints"))
-		{
-		  if (!target) tError = TRUE;
-		  else uintval = (uint32*)&target->max_hit;
-		} else if (!str_cmp(right, "maxmana"))
-		{
-		  if (!target) tError = TRUE;
-		  else uintval = (uint32*)&target->max_mana;
-		} else if (!str_cmp(right, "maxmove"))
-		{
-		  if (!target) tError = TRUE;
-		  else uintval = (uint32*)&target->max_move;
-		} else if (!str_cmp(right, "maxki"))
-		{
-		  if (!target) tError = TRUE;
-		  else uintval = (uint32*)&target->max_ki;
-		} else if (!str_cmp(right, "meleemit"))
-		{
-		  if (!target) tError = TRUE;
-		  else intval = &target->melee_mitigation;
-		} else if (!str_cmp(right, "misc"))
-		{
-		  if (!target) tError = TRUE;
-		  else uintval = &target->misc;
-		} else if (!str_cmp(right,"more"))
-		{
-		   if (!otarget) tError = TRUE;
-		   else {uintval = &otarget->obj_flags.more_flags;}
-		} else if (!str_cmp(right, "move"))
-		{
-		  if (!target) tError = TRUE;
-		  else uintval = (uint32*)&target->move;
+		if (!str_cmp(right, "magicsaves")) {
+			if (!target)
+				tError = TRUE;
+			else
+				intval = &target->saves[SAVE_TYPE_MAGIC];
+		} else if (!str_cmp(right, "mana")) {
+			if (!target)
+				tError = TRUE;
+			else
+				uintval = (uint32*) &target->mana;
+		} else if (!str_cmp(right, "maxhitpoints")) {
+			if (!target)
+				tError = TRUE;
+			else
+				uintval = (uint32*) &target->max_hit;
+		} else if (!str_cmp(right, "maxmana")) {
+			if (!target)
+				tError = TRUE;
+			else
+				uintval = (uint32*) &target->max_mana;
+		} else if (!str_cmp(right, "maxmove")) {
+			if (!target)
+				tError = TRUE;
+			else
+				uintval = (uint32*) &target->max_move;
+		} else if (!str_cmp(right, "maxki")) {
+			if (!target)
+				tError = TRUE;
+			else
+				uintval = (uint32*) &target->max_ki;
+		} else if (!str_cmp(right, "meleemit")) {
+			if (!target)
+				tError = TRUE;
+			else
+				intval = &target->melee_mitigation;
+		} else if (!str_cmp(right, "misc")) {
+			if (!target)
+				tError = TRUE;
+			else
+				uintval = &target->misc;
+		} else if (!str_cmp(right, "more")) {
+			if (!otarget)
+				tError = TRUE;
+			else {
+				uintval = &otarget->obj_flags.more_flags;
+			}
+		} else if (!str_cmp(right, "move")) {
+			if (!target)
+				tError = TRUE;
+			else
+				uintval = (uint32*) &target->move;
 		}
 		break;
 	case 'n':
-		if (!str_cmp(right, "name"))
-		{
-		  if (!target && !rtarget) tError = TRUE;
-		  else if (rtarget >= 0) { if (world_array[rtarget]) stringval = &world[rtarget].name; else tError = TRUE; }
-		  else stringval = &target->name;
+		if (!str_cmp(right, "name")) {
+			if (!target && !rtarget)
+				tError = TRUE;
+			else if (rtarget >= 0) {
+				if (world_array[rtarget])
+					stringval = &world[rtarget].name;
+				else
+					tError = TRUE;
+			} else
+				stringval = &target->name;
 		}
 		break;
 	case 'o':
 		break;
 	case 'p':
-		if (!str_cmp(right, "platinum"))
-		{
-		  if (!target) tError = TRUE;
-		  else uintval = &target->plat;
-		} else if (!str_cmp(right,"poisonsaves"))
-		{
-		   if (!target) tError = TRUE;
-		  else intval = &target->saves[SAVE_TYPE_POISON];
-                } else if (!str_cmp(right, "position"))
-                {
-                  if (!target) tError = TRUE;
-                  else intval = (int16*)&target->position;
-		} else if (!str_cmp(right, "practices"))
-		{
-		  if (!target || !target->pcdata)  tError = TRUE;
-		  else intval = (int16*)&target->pcdata->practices;
+		if (!str_cmp(right, "platinum")) {
+			if (!target)
+				tError = TRUE;
+			else
+				uintval = &target->plat;
+		} else if (!str_cmp(right, "poisonsaves")) {
+			if (!target)
+				tError = TRUE;
+			else
+				intval = &target->saves[SAVE_TYPE_POISON];
+		} else if (!str_cmp(right, "position")) {
+			if (!target)
+				tError = TRUE;
+			else
+				intval = (int16*) &target->position;
+		} else if (!str_cmp(right, "practices")) {
+			if (!target || !target->pcdata)
+				tError = TRUE;
+			else
+				intval = (int16*) &target->pcdata->practices;
 		}
 		break;
 	case 'q':
 		break;
 	case 'r':
-		if (!str_cmp(right, "race"))
-		{  if (!target) tError = TRUE;
-		  else sbval = &target->race;
-		} else if (!str_cmp(right, "rawstr"))
-		{  if (!target) tError = TRUE;
-		  else sbval = &target->raw_str;
-		} else if (!str_cmp(right, "rawcon"))
-		{  if (!target) tError = TRUE;
-		  else sbval = &target->raw_con;
-		} else if (!str_cmp(right, "rawwis"))
-		{  if (!target) tError = TRUE;
-		  else sbval = &target->raw_wis;
-		} else if (!str_cmp(right, "rawdex"))
-		{  if (!target) tError = TRUE;
-		  else sbval = &target->raw_dex;
-		} else if (!str_cmp(right, "rawint"))
-		{  if (!target) tError = TRUE;
-		  else sbval = &target->raw_intel;
-		} else if (!str_cmp(right, "rawhit"))
-		{  if (!target) tError = TRUE;
-		  else uintval = (uint32*)&target->raw_hit;
-		} else if (!str_cmp(right, "rawmana"))
-		{  if (!target) tError = TRUE;
-		  else uintval = (uint32*)&target->raw_mana;
-		} else if (!str_cmp(right, "rawmove"))
-		{  if (!target) tError = TRUE;
-		  else uintval = (uint32*)&target->raw_move;
-		} else if (!str_cmp(right, "rawki"))
-		{  if (!target) tError = TRUE;
-		  else uintval = (uint32*)&target->raw_ki;
-		} else if (!str_cmp(right, "resist"))
-		{  if (!target) tError = TRUE;
-		  else uintval = &target->resist;
+		if (!str_cmp(right, "race")) {
+			if (!target)
+				tError = TRUE;
+			else
+				sbval = &target->race;
+		} else if (!str_cmp(right, "rawstr")) {
+			if (!target)
+				tError = TRUE;
+			else
+				sbval = &target->raw_str;
+		} else if (!str_cmp(right, "rawcon")) {
+			if (!target)
+				tError = TRUE;
+			else
+				sbval = &target->raw_con;
+		} else if (!str_cmp(right, "rawwis")) {
+			if (!target)
+				tError = TRUE;
+			else
+				sbval = &target->raw_wis;
+		} else if (!str_cmp(right, "rawdex")) {
+			if (!target)
+				tError = TRUE;
+			else
+				sbval = &target->raw_dex;
+		} else if (!str_cmp(right, "rawint")) {
+			if (!target)
+				tError = TRUE;
+			else
+				sbval = &target->raw_intel;
+		} else if (!str_cmp(right, "rawhit")) {
+			if (!target)
+				tError = TRUE;
+			else
+				uintval = (uint32*) &target->raw_hit;
+		} else if (!str_cmp(right, "rawmana")) {
+			if (!target)
+				tError = TRUE;
+			else
+				uintval = (uint32*) &target->raw_mana;
+		} else if (!str_cmp(right, "rawmove")) {
+			if (!target)
+				tError = TRUE;
+			else
+				uintval = (uint32*) &target->raw_move;
+		} else if (!str_cmp(right, "rawki")) {
+			if (!target)
+				tError = TRUE;
+			else
+				uintval = (uint32*) &target->raw_ki;
+		} else if (!str_cmp(right, "resist")) {
+			if (!target)
+				tError = TRUE;
+			else
+				uintval = &target->resist;
 		}
 		break;
 	case 's':
-		if (!str_cmp(right, "sex"))
-		{  if (!target) tError = TRUE;
-		  else sbval = &target->sex;
-		} else if (!str_cmp(right, "size"))
-		{  if (!otarget) tError = TRUE;
-		   else { intval = (int16*)&otarget->obj_flags.size; }
-		} else if (!str_cmp(right, "short"))
-		{  if (!target && !otarget) tError = TRUE;
-		   else if (otarget) { stringval = &otarget->short_description; }
-		  else stringval = &target->short_desc;
-		} else if (!str_cmp(right, "songmit"))
-		{  if (!target) tError = TRUE;
-		  else intval = &target->song_mitigation;
-		} else if (!str_cmp(right, "spelleffect"))
-		{  if (!target) tError = TRUE;
-		  else uintval = (uint32*)&target->spelldamage;
-		} else if (!str_cmp(right, "spellmit"))
-		{  if (!target) tError = TRUE;
-		  else intval = &target->spell_mitigation;
-		} else if (!str_cmp(right, "strength"))
-		{  if (!target) tError = TRUE;
-		  else sbval = &target->str;
-		} else if (!str_cmp(right, "suscept"))
-		{  if (!target) tError = TRUE;
-		  else uintval = &target->suscept;
+		if (!str_cmp(right, "sex")) {
+			if (!target)
+				tError = TRUE;
+			else
+				sbval = &target->sex;
+		} else if (!str_cmp(right, "size")) {
+			if (!otarget)
+				tError = TRUE;
+			else {
+				intval = (int16*) &otarget->obj_flags.size;
+			}
+		} else if (!str_cmp(right, "short")) {
+			if (!target && !otarget)
+				tError = TRUE;
+			else if (otarget) {
+				stringval = &otarget->short_description;
+			} else
+				stringval = &target->short_desc;
+		} else if (!str_cmp(right, "songmit")) {
+			if (!target)
+				tError = TRUE;
+			else
+				intval = &target->song_mitigation;
+		} else if (!str_cmp(right, "spelleffect")) {
+			if (!target)
+				tError = TRUE;
+			else
+				uintval = (uint32*) &target->spelldamage;
+		} else if (!str_cmp(right, "spellmit")) {
+			if (!target)
+				tError = TRUE;
+			else
+				intval = &target->spell_mitigation;
+		} else if (!str_cmp(right, "strength")) {
+			if (!target)
+				tError = TRUE;
+			else
+				sbval = &target->str;
+		} else if (!str_cmp(right, "suscept")) {
+			if (!target)
+				tError = TRUE;
+			else
+				uintval = &target->suscept;
 		}
 		break;
 	case 't':
-		if (!str_cmp(right,"temp"))
-		{
-		  if (!half[0] || !target) {
-		    tError = TRUE;
-		  } else {
-		    targetTemp = getTemp(target, half);
-		  }
+		if (!str_cmp(right, "temp")) {
+			if (!half[0] || !target) {
+				tError = TRUE;
+			} else {
+				targetTemp = getTemp(target, half);
+			}
 
-		  stringval = &targetTemp;
-		}
-		else if (!str_cmp(right, "title"))
-		{
-		  if (!target) tError = TRUE;
-		  else stringval = &target->title;
-		} else if (!str_cmp(right, "type"))
-		{
-		  if (!otarget) tError = TRUE;
-		  else sbval = (sbyte*)&otarget->obj_flags.type_flag;
-		} else if (!str_cmp(right, "thirst"))
-		{
-		  if (!target) tError = TRUE;
-		  else {sbval= &target->conditions[THIRST];}
+			stringval = &targetTemp;
+		} else if (!str_cmp(right, "title")) {
+			if (!target)
+				tError = TRUE;
+			else
+				stringval = &target->title;
+		} else if (!str_cmp(right, "type")) {
+			if (!otarget)
+				tError = TRUE;
+			else
+				sbval = (sbyte*) &otarget->obj_flags.type_flag;
+		} else if (!str_cmp(right, "thirst")) {
+			if (!target)
+				tError = TRUE;
+			else {
+				sbval = &target->conditions[THIRST];
+			}
 		}
 		break;
-        case 'v':
-		if (!str_cmp(right, "value0"))
-		{
-		  if (!otarget) tError = TRUE;
-		  else uintval = (uint32*)&otarget->obj_flags.value[0];
-		} else if (!str_cmp(right, "value1"))
-		{
-		  if (!otarget) tError = TRUE;
-		  else uintval = (uint32*)&otarget->obj_flags.value[1];
-		} else if (!str_cmp(right, "value2"))
-		{
-		  if (!otarget) tError = TRUE;
-		  else uintval = (uint32*)&otarget->obj_flags.value[2];
-		} else if (!str_cmp(right, "value3"))
-		{
-		  if (!otarget) tError = TRUE;
-		  else uintval = (uint32*)&otarget->obj_flags.value[3];
+	case 'v':
+		if (!str_cmp(right, "value0")) {
+			if (!otarget)
+				tError = TRUE;
+			else
+				uintval = (uint32*) &otarget->obj_flags.value[0];
+		} else if (!str_cmp(right, "value1")) {
+			if (!otarget)
+				tError = TRUE;
+			else
+				uintval = (uint32*) &otarget->obj_flags.value[1];
+		} else if (!str_cmp(right, "value2")) {
+			if (!otarget)
+				tError = TRUE;
+			else
+				uintval = (uint32*) &otarget->obj_flags.value[2];
+		} else if (!str_cmp(right, "value3")) {
+			if (!otarget)
+				tError = TRUE;
+			else
+				uintval = (uint32*) &otarget->obj_flags.value[3];
 		}
 		break;
 	case 'w':
-		if (!str_cmp(right, "wearable"))
-		{
-		  if (!otarget) tError = TRUE;
-		  else uintval = &otarget->obj_flags.wear_flags;
-		} else if (!str_cmp(right, "weight"))
-		{
-		  if (!target && !otarget) tError = TRUE;
-		  else if (otarget) { intval = &otarget->obj_flags.weight; }
-		  else sbval = (sbyte*)&target->weight;
-		} else if (!str_cmp(right, "wisdom"))
-		{
-		  if (!target) tError = TRUE;
-		  else sbval = &target->wis;
+		if (!str_cmp(right, "wearable")) {
+			if (!otarget)
+				tError = TRUE;
+			else
+				uintval = &otarget->obj_flags.wear_flags;
+		} else if (!str_cmp(right, "weight")) {
+			if (!target && !otarget)
+				tError = TRUE;
+			else if (otarget) {
+				intval = &otarget->obj_flags.weight;
+			} else
+				sbval = (sbyte*) &target->weight;
+		} else if (!str_cmp(right, "wisdom")) {
+			if (!target)
+				tError = TRUE;
+			else
+				sbval = &target->wis;
 		}
 		break;
-	default: 
+	default:
 		break;
-					
-  }
-  if (tError)
-  {
-      logf( IMMORTAL, LOG_WORLD,  "Mob: %d tries to access non-existant field of target.", mob_index[mob->mobdata->nr].virt ); 
-      return;
-  }
-  if (intval) *vali = intval;
-  if (uintval) *valui = uintval;
-  if (stringval) *valstr = stringval;
-  if (llval) *vali64 = llval;
-  if (sbval) *valb = sbval;
 
-  return;
+	}
+	if (tError) {
+		logf( IMMORTAL, LOG_WORLD,
+				"Mob: %d tries to access non-existant field of target.",
+				mob_index[mob->mobdata->nr].virt);
+		return;
+	}
+	if (intval)
+		*vali = intval;
+	if (uintval)
+		*valui = uintval;
+	if (stringval)
+		*valstr = stringval;
+	if (llval)
+		*vali64 = llval;
+	if (sbval)
+		*valb = sbval;
+
+	return;
 }
 
 
@@ -1164,11 +1383,14 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
   sbyte *lvalb = 0; 
   //  int type = 0;
 
-  if (!traditional)
-  translate_value(buf,arg,&lvali,&lvalui, &lvalstr,&lvali64, &lvalb,mob,actor, obj, vo, rndm);
- else // switch order of traditional so it'd be $n(ispc), to conform with
-      // new ifchecks
-  translate_value(arg,buf,&lvali,&lvalui, &lvalstr,&lvali64, &lvalb, mob,actor, obj, vo, rndm);
+	if (!traditional)
+		translate_value(buf, arg, &lvali, &lvalui, &lvalstr, &lvali64, &lvalb,
+				mob, actor, obj, vo, rndm);
+	else
+		// switch order of traditional so it'd be $n(ispc), to conform with
+		// new ifchecks
+		translate_value(arg, buf, &lvali, &lvalui, &lvalstr, &lvali64, &lvalb,
+				mob, actor, obj, vo, rndm);
 
 
   if (val2[0] == '\0') {
@@ -1233,9 +1455,15 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
     int target = atoi(arg);
     int count = 0;
 
-    for (char_data *vch = character_list; vch; vch = vch->next)
-      if (IS_NPC(vch) && vch->in_room != NOWHERE && mob_index[vch->mobdata->nr].virt == target)
-	count++;
+    auto &character_list = DC::instance().character_list;
+    count = count_if(character_list.begin(), character_list.end(),
+			[&target](char_data *vch) {
+    	if (IS_NPC(vch) && vch->in_room != NOWHERE && mob_index[vch->mobdata->nr].virt == target) {
+    		return true;
+    	} else {
+    		return false;
+    	}
+    });
 
     return mprog_veval( count, opr, atoi(val) );
    }
@@ -2120,25 +2348,25 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
   break;
 
   case eCANSEE:
-      if (fvict)
+	if (fvict)
 	return CAN_SEE(mob, fvict, TRUE);
 	if (ye) return FALSE;
-      switch ( arg[1] )  /* arg should be "$*" so just get the letter */
+	switch ( arg[1] ) /* arg should be "$*" so just get the letter */
 	{
-	case 'z': return 1; // can always see holder
-	case 'i': return 1;
-	case 'n': if ( actor )
-	             return CAN_SEE(mob, actor,TRUE );
-	          else return -1;
-	case 't': if ( vict )
-                     return CAN_SEE(mob, vict,TRUE );
-	          else return -1;
-	case 'r': if ( rndm )
-	             return CAN_SEE(mob, rndm,TRUE );
-	          else return -1;
-	default:
-	  logf( IMMORTAL, LOG_WORLD, "Mob: %d bad argument to 'isnpc'", mob_index[mob->mobdata->nr].virt ); 
-	  return -1;
+		case 'z': return 1; // can always see holder
+		case 'i': return 1;
+		case 'n': if ( actor )
+		return CAN_SEE(mob, actor,TRUE );
+		else return -1;
+		case 't': if ( vict )
+		return CAN_SEE(mob, vict,TRUE );
+		else return -1;
+		case 'r': if ( rndm )
+		return CAN_SEE(mob, rndm,TRUE );
+		else return -1;
+		default:
+		logf( IMMORTAL, LOG_WORLD, "Mob: %d bad argument to 'isnpc'", mob_index[mob->mobdata->nr].virt );
+		return -1;
 	}
   break;
 
@@ -2165,22 +2393,22 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
   break;
 
   case eCLAN:
-    if(fvict)
-      return fvict->clan; 
-      switch( arg[1] )
-      {
-        case 'i': return mob->clan ; //always in the same zone as itself
-        case 'n': if ( actor )
-            return actor->clan;
-            else return -1;
-        case 'r':
-        case 't': if ( vict )
-            return vict->clan;
-            else return -1;
-	default:
-	  logf( IMMORTAL, LOG_WORLD, "Mob: %d bad argument to 'clan'", mob_index[mob->mobdata->nr].virt ); 
-	  return -1;
-      }
+	if(fvict)
+	return fvict->clan;
+	switch( arg[1] )
+	{
+		case 'i': return mob->clan; //always in the same zone as itself
+		case 'n': if ( actor )
+		return actor->clan;
+		else return -1;
+		case 'r':
+		case 't': if ( vict )
+		return vict->clan;
+		else return -1;
+		default:
+		logf( IMMORTAL, LOG_WORLD, "Mob: %d bad argument to 'clan'", mob_index[mob->mobdata->nr].virt );
+		return -1;
+	}
   break;
 
 
@@ -3171,25 +3399,22 @@ int mprog_wordlist_check( const char *arg, CHAR_DATA *mob, CHAR_DATA *actor,
 	    list = one_argument( list, word );
 	    for( ; word[0] != '\0'; list = one_argument( list, word ) )
 	    {
-	      while ( ( start = strstr( dupl, word ) ) )
-		if ( ( start == dupl || *(start-1) == ' ' )
-		    && ( *(end = start + strlen( word ) ) == ' '
-			|| *end == '\n'
-			|| *end == '\r'
-			|| *end == '\0'
-                        // allow punctuation at the end
-                        || *end == '.'
-                        || *end == '?'
-                        || *end == '!' ) )
-		  {
-                    retval = 1;
-		    mprog_driver( mprg->comlist, mob, actor, obj, vo, NULL, NULL );
-		    if (selfpurge || IS_SET(mprog_cur_result, eCH_DIED))
-		      return retval;
-		    break;
-		  }
-		else
-		  dupl = start+1;
+					while ((start = strstr(dupl, word)))
+						if ((start == dupl || *(start - 1) == ' ')
+								&& (*(end = start + strlen(word)) == ' '
+										|| *end == '\n' || *end == '\r'
+										|| *end == '\0'
+										// allow punctuation at the end
+										|| *end == '.' || *end == '?'
+										|| *end == '!')) {
+							retval = 1;
+							mprog_driver(mprg->comlist, mob, actor, obj, vo,
+									NULL, NULL);
+							if (selfpurge || IS_SET(mprog_cur_result, eCH_DIED))
+								return retval;
+							break;
+						} else
+							dupl = start + 1;
 		if (reverse) break;
   	    }
 	  }

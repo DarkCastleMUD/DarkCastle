@@ -14,10 +14,6 @@ extern "C"
   #include <stdio.h> // FILE *
   #include <ctype.h> // isspace..
 }
-#ifdef LEAK_CHECK
-#include <dmalloc.h>
-#endif
-
 #include <db.h> // real_room
 #include <player.h>
 #include <utility.h>
@@ -38,10 +34,11 @@ extern "C"
 #include <sstream>
 #include <fileinfo.h>
 #include <stack>
+#include <algorithm>
+#include <DC.h>
 
 using namespace std;
 
-extern CHAR_DATA *character_list;
 extern descriptor_data *descriptor_list;
 extern index_data *obj_index;
 extern CWorld world;
@@ -2768,26 +2765,31 @@ int do_cbalance(CHAR_DATA *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-void remove_totem(OBJ_DATA *altar, OBJ_DATA *totem)
-{
-  CHAR_DATA *t;
-  for (t = character_list;t ;t = t->next)
-   if (!IS_NPC(t) && t->altar == altar)
-   {
-     int j;
-     for(j=0; j<totem->num_affects; j++)
-        affect_modify(t, totem->affected[j].location,
-          totem->affected[j].modifier, -1, FALSE);
-     redo_hitpoints(t);
-     redo_mana(t);
-     redo_ki(t);
-   }
+void remove_totem(OBJ_DATA *altar, OBJ_DATA *totem) {
+	auto &character_list = DC::instance().character_list;
+
+	for_each(character_list.begin(), character_list.end(),
+			[&altar, totem](char_data * const &t) {
+				if (!IS_NPC(t) && t->altar == altar)
+				{
+					int j;
+					for(j=0; j<totem->num_affects; j++)
+					affect_modify(t, totem->affected[j].location,
+							totem->affected[j].modifier, -1, FALSE);
+					redo_hitpoints(t);
+					redo_mana(t);
+					redo_ki(t);
+				}
+			});
 }
 
 void add_totem(OBJ_DATA *altar, OBJ_DATA *totem)
 {
-  CHAR_DATA *t;
-  for (t = character_list;t ;t = t->next)
+	auto &character_list = DC::instance().character_list;
+
+	for_each(character_list.begin(), character_list.end(),
+			[&altar, totem](char_data * const &t) {
+
    if (!IS_NPC(t) && t->altar == altar)
    {
      int j;
@@ -2795,6 +2797,7 @@ void add_totem(OBJ_DATA *altar, OBJ_DATA *totem)
         affect_modify(t, totem->affected[j].location,
           totem->affected[j].modifier, -1, TRUE);
    }
+	});
 }
 
 void remove_totem_stats(CHAR_DATA *ch, int stat)
@@ -2855,14 +2858,19 @@ void add_totem_stats(CHAR_DATA *ch, int stat)
 struct takeover_pulse_data *pulse_list=NULL;
 extern int top_of_zonet;
 
-int count_plrs(int zone, int clan)
+int
+count_plrs (int zone, int clan)
 {
-  CHAR_DATA *tmpch;
-  int i = 0;
-  for (tmpch = character_list; tmpch; tmpch = tmpch->next)
-     if (!IS_NPC(tmpch) && world[tmpch->in_room].zone == zone && clan == tmpch->clan &&
-		GET_LEVEL(tmpch) < 100 && GET_LEVEL(tmpch) > 10)
-       i++;
+  auto &character_list = DC::instance ().character_list;
+
+  int i = count_if (character_list.begin (), character_list.end (), [&zone, &clan](char_data * const &tmpch)
+    {
+      if (!IS_NPC(tmpch) && world[tmpch->in_room].zone == zone && clan == tmpch->clan &&
+	  GET_LEVEL(tmpch) < 100 && GET_LEVEL(tmpch) > 10)
+      return true;
+      else
+      return false;
+    });
 
   return i;
 }
@@ -2983,13 +2991,16 @@ void recycle_pulse_data(struct takeover_pulse_data *pl)
 
 int online_clan_members(int clan)
 {
-  CHAR_DATA *Tmpch;
-  int i =0;
-  for (Tmpch = character_list;Tmpch;Tmpch = Tmpch->next)
-  {
+  auto &character_list = DC::instance().character_list;
+
+  int i = count_if(character_list.begin(), character_list.end(),
+			[&clan](char_data * const &Tmpch) {
 	if (!IS_NPC(Tmpch) && Tmpch->clan == clan && GET_LEVEL(Tmpch) < 100 && Tmpch->desc && GET_LEVEL(Tmpch) > 10)
-		i++;
-  }
+		return true;
+	else
+		return false;
+  });
+
   return i;
 }
 
@@ -3084,12 +3095,22 @@ void pk_check(CHAR_DATA *ch, CHAR_DATA *victim)
 
 bool can_lose(struct takeover_pulse_data *take)
 {
-  CHAR_DATA *ch;
-  for (ch = character_list;ch;ch = ch->next)
-  if (!IS_NPC(ch) && world[ch->in_room].zone == take->zone &&
-	(take->clan1 == ch->clan || take->clan2 == ch->clan))
-	return FALSE;
-  return TRUE;
+	auto &character_list = DC::instance().character_list;
+
+	auto result = find_if(character_list.begin(), character_list.end(), [&take](char_data * const &ch) {
+		if (IS_PC(ch) && world[ch->in_room].zone == take->zone
+				&& (take->clan1 == ch->clan || take->clan2 == ch->clan)) {
+			return true;
+		} else {
+			return false;
+		}
+	});
+
+	if (result != end(character_list)) {
+		return false;
+	} else {
+		return true;
+	}
 }
 
 void pulse_takeover()

@@ -28,7 +28,6 @@ int noncombat_damage(CHAR_DATA * ch, int dam, char *char_death_msg,
 void send_damage(char const *, CHAR_DATA *, OBJ_DATA *, CHAR_DATA *, char const *, char const *, int);
 int getRealSpellDamage(CHAR_DATA *ch);
  
-extern CHAR_DATA *character_list;
 /* extern CHAR_DATA *combat_list = NULL, *combat_next_dude = NULL; */
 
 #define FIRST 	    WIELD
@@ -51,6 +50,7 @@ void make_bowels(CHAR_DATA *ch);
 void make_blood(CHAR_DATA *ch);
 void make_scraps(CHAR_DATA *ch, struct obj_data *obj);
 void remove_memory(CHAR_DATA *ch, char type);
+void room_mobs_only_hate(char_data *ch);
 void add_memory(CHAR_DATA *ch, char *victim, char type);
 void stop_follower(CHAR_DATA *ch, int cmd);
 int attack(CHAR_DATA *ch, CHAR_DATA *vict, int type, int attack = FIRST);

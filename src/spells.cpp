@@ -29,9 +29,6 @@ extern "C"
 #include <assert.h>
 #include <stdlib.h>
 }
-#ifdef LEAK_CHECK
-#include <dmalloc.h>
-#endif
 
 #include <character.h>
 #include <race.h>
@@ -69,7 +66,6 @@ extern struct class_skill_defines k_skills[];
 extern struct class_skill_defines u_skills[];
 extern struct class_skill_defines c_skills[];
 extern struct class_skill_defines m_skills[];
-extern CHAR_DATA *character_list;
 extern struct song_info_type song_info[];
 extern char *spell_wear_off_msg[];
 extern struct index_data *obj_index;
@@ -904,6 +900,18 @@ char *spells[]=
    "\n"
 };
 
+bool canPerform(char_data * const &ch, const int_fast32_t &skillType,
+		string failMessage) {
+	if (IS_PC(ch) && has_skill(ch, skillType) == 0 && GET_LEVEL(ch) < ARCHANGEL) {
+		send_to_char(
+				failMessage.c_str(),
+				ch);
+		return false;
+	}
+
+	return true;
+}
+
 // Figures out how many % of max your damage does
 int dam_percent(int learned, int damage)
 {
@@ -953,83 +961,79 @@ int use_mana( CHAR_DATA *ch, int sn )
 }
 
 
-void affect_update( int32 duration_type )
-{
-    static struct affected_type *af, *next_af_dude;
-    static CHAR_DATA *i, * i_next;
-    void update_char_objects( CHAR_DATA *ch ); /* handler.c */
+void affect_update(int32 duration_type) {
+	static struct affected_type *af, *next_af_dude;
+	void update_char_objects(CHAR_DATA *ch); /* handler.c */
 
-    if (duration_type != PULSE_REGEN &&
-	duration_type != PULSE_TIMER &&
-	duration_type != PULSE_VIOLENCE &&
-	duration_type != PULSE_TIME) // Default
-      return;
+	if (duration_type != PULSE_REGEN && duration_type != PULSE_TIMER && duration_type != PULSE_VIOLENCE && duration_type != PULSE_TIME) // Default
+		return;
 
-    for (i = character_list; i; i = i_next) { 
-      i_next = i->next;
-        // This doesn't really belong here, but it beats creating an "update" just for it.
-        // That way we don't have to traverse the entire list all over again
-        if(duration_type == PULSE_TIME && !IS_NPC(i))
-          update_char_objects(i);
+	auto &character_list = DC::instance().character_list;
+	for (auto& i : character_list) {
+		// This doesn't really belong here, but it beats creating an "update" just for it.
+		// That way we don't have to traverse the entire list all over again
+		if (duration_type == PULSE_TIME && !IS_NPC(i))
+			update_char_objects(i);
 
-      for (af = i->affected; af; af = next_af_dude) {
-	next_af_dude = af->next;
-	if (af->duration_type == 0 && duration_type == PULSE_TIME) {
-	  // Business as usual
-	} else if (af->duration_type != duration_type) {
-	  continue;
+		for (af = i->affected; af; af = next_af_dude) {
+			next_af_dude = af->next;
+			if (af->duration_type == 0 && duration_type == PULSE_TIME) {
+				// Business as usual
+			} else if (af->duration_type != duration_type) {
+				continue;
+			}
+
+			if ((af->type == FUCK_PTHIEF || af->type == FUCK_CANTQUIT || af->type == FUCK_GTHIEF) && !i->desc)
+				continue;
+			if (af->duration > 1) {
+				af->duration--;
+				if (af->type == SPELL_ICESTORM)
+					af->modifier = 0 - af->duration;
+				if (!(af->caster).empty()) //means bard song
+				{
+					CHAR_DATA *get_pc_room_vis_exact(CHAR_DATA *ch, const char *name);
+					CHAR_DATA *bard = get_pc_room_vis_exact(i, (af->caster).c_str());
+					if (!bard || !ARE_GROUPED(i, bard)) {
+						send_to_char("Away from the music, the effect weakens...\n\r", i);
+						af->duration = 1;
+						(af->caster).clear();
+					}
+				}
+			} else if (af->duration == 1) {
+				// warnings for certain spells
+				switch (af->type) {
+				case SKILL_SONG_SUBMARINERS_ANTHEM:
+					send_to_char("Your musical ability to breath water weakens.\r\n", i);
+					break;
+				case SPELL_WATER_BREATHING:
+					send_to_char("You feel the magical hold of your gills about to give way.\r\n", i);
+					break;
+				default:
+					break;
+				}
+				af->duration--;
+				if (af->type == SPELL_ICESTORM)
+					af->modifier = 0 - af->duration;
+			} else if (af->duration != -1) {
+				if ((af->type > 0) && (af->type <= MAX_SPL_LIST)) // only spells for this part
+					if (*spell_wear_off_msg[af->type]) {
+						send_to_char(spell_wear_off_msg[af->type], i);
+						send_to_char("\n\r", i);
+					}
+				if (af->type == SPELL_ETHEREAL_FOCUS) {
+					// NOTICE:  this is a TEMP room flag
+					REMOVE_BIT(world[i->in_room].temp_room_flags, ROOM_ETHEREAL_FOCUS);
+					act("$n shakes his $s head suddenly in confusion losing $s magical focus.", i, NULL, NULL, TO_ROOM, NOTVICT);
+				}
+				affect_remove(i, af, 0);
+			}
+		}
+		continue;
 	}
-
-	if ((af->type == FUCK_PTHIEF || af->type == FUCK_CANTQUIT || af->type == FUCK_GTHIEF) && !i->desc)
-	  continue;
-	if (af->duration > 1)
-        {
-	  af->duration--;
-          if(af->type == SPELL_ICESTORM) af->modifier = 0 - af->duration;
-          if(!(af->caster).empty()) //means bard song
-          {
-            CHAR_DATA *get_pc_room_vis_exact(CHAR_DATA *ch, const char *name);
-            CHAR_DATA *bard = get_pc_room_vis_exact(i, (af->caster).c_str());
-            if(!bard || !ARE_GROUPED(i, bard))
-            {
-              send_to_char("Away from the music, the effect weakens...\n\r", i);
-              af->duration = 1;
-              (af->caster).clear();
-            } 
-          }
-        }
-	else if(af->duration == 1) {
-          // warnings for certain spells
-          switch(af->type) {
-            case SKILL_SONG_SUBMARINERS_ANTHEM:
-              send_to_char("Your musical ability to breath water weakens.\r\n", i);
-              break;
-            case SPELL_WATER_BREATHING:
-              send_to_char("You feel the magical hold of your gills about to give way.\r\n", i);
-              break;
-            default: break;
-          }
-          af->duration--;
-          if(af->type == SPELL_ICESTORM) af->modifier = 0 - af->duration;
-      }
-	else if (af->duration != -1){
-	  if ((af->type > 0) && (af->type <= MAX_SPL_LIST)) // only spells for this part
-	     if (*spell_wear_off_msg[af->type]) {
-	        send_to_char(spell_wear_off_msg[af->type], i);
-	        send_to_char("\n\r", i);
-	     }
-	  affect_remove(i, af, 0);
-          if(af->type == SPELL_ETHEREAL_FOCUS) {
-            // NOTICE:  this is a TEMP room flag
-            REMOVE_BIT(world[i->in_room].temp_room_flags, ROOM_ETHEREAL_FOCUS);
-            act("$n shakes his $s head suddenly in confusion losing $s magical focus.", i, NULL, NULL, TO_ROOM, NOTVICT);
-          }
-	}
-      }
-  }
+	DC::instance().removeDead();
 }
 
-// Sets any ISR's that go with a spell..  (ISR's arent saved) 
+// Sets any ISR's that go with a spell..  (ISR's arent saved)
 void isr_set(CHAR_DATA *ch)
 {
   // char buf[100];
@@ -1458,28 +1462,32 @@ int do_release(CHAR_DATA *ch, char *argument, int cmd)
 	return eFAILURE;
        }
 
-       for (aff = ch->affected; aff; aff = aff_next)
-	 {
-        aff_next = aff->next;
-	while (aff_next && aff_next->type == aff->type)
-         aff_next = aff_next->next;
+		for (aff = ch->affected; aff; aff = aff_next) {
+			aff_next = aff->next;
+			while (aff_next && aff_next->type == aff->type)
+				aff_next = aff_next->next;
 
-         if (!get_skill_name(aff->type))
-            continue;
-	 if (str_prefix(argument,get_skill_name(aff->type)))
-            continue;
-	if (aff->type > MAX_SPL_LIST) continue;
-          if (!IS_SET(spell_info[aff->type].targets, TAR_SELF_DEFAULT) && aff->type != SPELL_HOLY_AURA)
-            continue;
-         if ((aff->type > 0) && (aff->type <= MAX_SPL_LIST))
-	       if (!done && !skill_success(ch,NULL, SKILL_RELEASE))
-       {
-         send_to_char("You failed to release the spell, and are left momentarily dazed.\r\n",ch);
-	 act( "$n fails to release the magic surrounding $m and is left momentarily dazed.", ch, 0, 0, TO_ROOM , INVIS_NULL);
-         WAIT_STATE(ch,PULSE_VIOLENCE/2);
-	 ch->move -= 10;
-         return eFAILURE;
-       }
+			if (!get_skill_name(aff->type))
+				continue;
+			if (str_prefix(argument, get_skill_name(aff->type)))
+				continue;
+			if (aff->type > MAX_SPL_LIST)
+				continue;
+			if (!IS_SET(spell_info[aff->type].targets,
+					TAR_SELF_DEFAULT) && aff->type != SPELL_HOLY_AURA)
+				continue;
+			if ((aff->type > 0) && (aff->type <= MAX_SPL_LIST))
+				if (!done && !skill_success(ch, NULL, SKILL_RELEASE)) {
+					send_to_char(
+							"You failed to release the spell, and are left momentarily dazed.\r\n",
+							ch);
+					act(
+							"$n fails to release the magic surrounding $m and is left momentarily dazed.",
+							ch, 0, 0, TO_ROOM, INVIS_NULL);
+					WAIT_STATE(ch, PULSE_VIOLENCE/2);
+					ch->move -= 10;
+					return eFAILURE;
+				}
 
 	if (!done)
 	  ch->move -= 25;

@@ -19,10 +19,6 @@ extern "C"
    #include <stdio.h>
    #include <string.h>
 }
-#ifdef LEAK_CHECK
-#include <dmalloc.h>
-#endif
-
 #include <timeinfo.h>
 #include <weather.h>
 #include <character.h>

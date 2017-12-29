@@ -110,8 +110,8 @@ int do_showbits(struct char_data *ch, char *argument, int cmd)
     if (!*person)
     {
         char buf[MAX_STRING_LENGTH];
-  	for(victim = character_list; victim; victim = victim->next) 
-        {
+		auto &character_list = DC::instance().character_list;
+		for (auto& victim : character_list) {
            if(IS_NPC(victim)) continue;
 	   sprintf(buf, "0.%s", GET_NAME(victim));
            do_showbits(ch, buf, cmd);
@@ -405,7 +405,7 @@ int do_sqedit(struct char_data *ch, char *argument, int cmd)
     strcpy(arg3,arg1);
     strcat(arg3, " ");
     strcat(arg3,arg2);
-    if ((skill = find_sq(arg3))!=NULL);
+    skill = find_sq(arg3);
   }
   if (skill==NULL && (skill = find_sq(arg1))==NULL && i!=0 && i!=6 && i!=7)
   {

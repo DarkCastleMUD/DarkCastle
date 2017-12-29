@@ -13,10 +13,6 @@
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
 /* $Id: mob_proc.cpp,v 1.208 2014/07/31 01:07:24 jhhudso Exp $ */
-#ifdef LEAK_CHECK
-#include <dmalloc.h>
-#endif
-
 #include <assert.h>
 #include <character.h>
 #include <structs.h>
@@ -229,14 +225,11 @@ void damage_all_players_in_room(struct char_data *ch, int damage)
 // anywhere in the world to you.
 void summon_all_of_mob_to_room(struct char_data * ch, int iFriendId)
 {
-  struct char_data * victim = NULL;
-  extern char_data * character_list;
-
   if(!ch)
     return;
 
-  for(victim = character_list; victim; victim = victim->next)
-  {
+	auto &character_list = DC::instance().character_list;
+	for (auto& victim : character_list) {
     if(!IS_MOB(victim))
       continue;
     if(real_mobile(iFriendId) == victim->mobdata->nr)
@@ -634,66 +627,65 @@ int stofficer(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
 }
 
 
-int backstabber(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,        
-          struct char_data *owner)
-{
-    struct char_data *tch;
-    /*struct char_data *mob;
-    char buf[MAX_INPUT_LENGTH];
+int backstabber(struct char_data *ch, struct obj_data *obj, int cmd, char *arg, struct char_data *owner) {
+	struct char_data *tch;
+	/*struct char_data *mob;
+	 char buf[MAX_INPUT_LENGTH];
 
-    char *strName;*/
+	 char *strName;*/
 
-    if (cmd || !AWAKE(ch))
+	if (cmd || !AWAKE(ch))
+		return eFAILURE;
+
+	if (ch->fighting) {
+
+		if (number(0, 6) == 0)
+			do_flee(ch, "", 0);
+
+		return eSUCCESS;
+	}
+
+	for (tch = world[ch->in_room].people; tch; tch = tch->next_in_room) {
+
+		if (!IS_NPC(tch))
+			if (CAN_SEE(ch, tch)) {
+
+				if (!can_attack(ch) || !can_be_attacked(ch, tch))
+					return eFAILURE;
+
+				if (!IS_MOB(tch) && IS_SET(tch->pcdata->toggles, PLR_NOHASSLE))
+					continue;
+
+				if (IS_AFFECTED(tch, AFF_PROTECT_EVIL)) {
+					if (IS_EVIL(ch) && (GET_LEVEL(ch) <= GET_LEVEL(tch)))
+						continue;
+				}
+				if (affected_by_spell(tch, SPELL_PROTECT_FROM_GOOD)) {
+					if (IS_GOOD(ch) && (GET_LEVEL(ch) <= GET_LEVEL(tch)))
+						continue;
+				}
+
+				if (MOB_WAIT_STATE(ch))
+					continue;
+				if (IS_AFFECTED(tch, AFF_ALERT))
+					continue;
+				if (ch->equipment[WIELD]) {
+
+					if (tch->fighting) {
+
+						act("$n circles around $s target....\n\r", ch, 0, 0, TO_ROOM,
+						INVIS_NULL);
+						SET_BIT(ch->combat, COMBAT_CIRCLE);
+					}
+
+					return attack(ch, tch, SKILL_BACKSTAB);
+				} else
+					return attack(ch, tch, TYPE_UNDEFINED);
+
+				return eSUCCESS;
+			}
+	}
 	return eFAILURE;
-
-     if (ch->fighting) {
-
-       if (number(0,6)==0)
-          do_flee(ch, "", 0);
-
-         return eSUCCESS;
-            }
-
-
-    for (tch = world[ch->in_room].people; tch; tch = tch->next_in_room )
-        {
-
-        if (!IS_NPC(tch))
-           if (CAN_SEE(ch, tch)) {
-
-    if(!can_attack(ch) || !can_be_attacked(ch, tch))
-          return eFAILURE;
-	   
-          if (!IS_MOB(tch) && IS_SET(tch->pcdata->toggles, PLR_NOHASSLE))
-                  continue;
-
-    if (IS_AFFECTED(tch, AFF_PROTECT_EVIL)) {
-         if (IS_EVIL(ch) && (GET_LEVEL(ch) <= GET_LEVEL(tch)))
-             continue;
-               }
-    if (affected_by_spell(tch, SPELL_PROTECT_FROM_GOOD)) {
-         if (IS_GOOD(ch) && (GET_LEVEL(ch) <= GET_LEVEL(tch)))
-             continue;
-               }
-  
-         if (MOB_WAIT_STATE(ch)) continue;
-         if (IS_AFFECTED(tch,AFF_ALERT)) continue;
-         if (ch->equipment[WIELD])  {
-
-        if (tch->fighting) {
-
-        act ("$n circles around $s target....\n\r", ch, 0, 0, TO_ROOM, 
-	  INVIS_NULL);
-         SET_BIT(ch->combat, COMBAT_CIRCLE);
-           }
-
-               return attack (ch, tch, SKILL_BACKSTAB);
-      }  else return attack (ch, tch, TYPE_UNDEFINED);
-
-              return eSUCCESS;
-          }
-    }
-          return eFAILURE;
 }
 
 

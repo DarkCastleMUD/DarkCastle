@@ -720,9 +720,8 @@ int do_zedit(struct char_data *ch, char *argument, int cmd)
 
       // j = i-1 because the user sees arrays starting at 1
       for(j = i-1; zone_table[zone].cmd[j].command != 'S'; j++) {
-        char_data *next_vict;
-        for(char_data *tmp_vict = character_list; tmp_vict; tmp_vict = next_vict) {
-			next_vict = tmp_vict->next;
+			auto &character_list = DC::instance().character_list;
+			for (auto& tmp_vict : character_list) {
 			if (IS_MOB(tmp_vict) && tmp_vict->mobdata && tmp_vict->mobdata->reset == &zone_table[zone].cmd[j]) {
 				if (zone_table[zone].cmd[j+1].command != 'S') {
 					tmp_vict->mobdata->reset = &zone_table[zone].cmd[j+1];
@@ -3439,9 +3438,8 @@ int do_medit(struct char_data *ch, char *argument, int cmd) {
 					ch);
 			return eFAILURE;
 		}
-		CHAR_DATA *v, *n;
-		for (v = character_list; v; v = n) {
-			n = v->next;
+		auto &character_list = DC::instance().character_list;
+		for (auto& v : character_list) {
 			if (IS_NPC(v) && v->mobdata->nr == mob_num)
 				extract_char(v, TRUE);
 		}
@@ -4267,255 +4265,281 @@ int do_osave(struct char_data *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-int do_instazone(struct char_data *ch, char *arg, int cmd)
-{
-    FILE *fl;
-    extern struct char_data *character_list;
-    extern struct obj_data *object_list;
-    char buf[200],bufl[200]/*,buf2[200],buf3[200]*/;
-    int room=1,x, door/*,direction*/;
-    int pos;
-    int value;
-    int low, high;
-    int /*number,*/ count;
-    struct char_data *mob,/**tmp_mob,*next_mob,*/ *mob_list;
-    struct obj_data *obj,*tmp_obj,/**next_obj,*/ *obj_list;
+int do_instazone(struct char_data *ch, char *arg, int cmd) {
+	FILE *fl;
+	extern struct char_data *character_list;
+	extern struct obj_data *object_list;
+	char buf[200], bufl[200]/*,buf2[200],buf3[200]*/;
+	int room = 1, x, door/*,direction*/;
+	int pos;
+	int value;
+	int low, high;
+	int /*number,*/count;
+	struct char_data *mob,/**tmp_mob,*next_mob,*/*mob_list;
+	struct obj_data *obj, *tmp_obj,/**next_obj,*/*obj_list;
 
-    bool found_room = FALSE;
+	bool found_room = FALSE;
 
- send_to_char("Whoever thought of this had a good idea, but never really finished it.  Beg someone to finish it some time.\r\n", ch);
- return eFAILURE;
+	send_to_char(
+			"Whoever thought of this had a good idea, but never really finished it.  Beg someone to finish it some time.\r\n",
+			ch);
+	return eFAILURE;
 
 // Remember if you change this that it uses string_to_file which now appends a ~\n to the end
 // of the string.  This command does NOT take that into consideration currently.
 
-/*    if(!GET_RANGE(ch)) {
-    send_to_char("You don't have a zone assigned to you!\n\r", ch);
-    return eFAILURE;
-      }
+	/*    if(!GET_RANGE(ch)) {
+	 send_to_char("You don't have a zone assigned to you!\n\r", ch);
+	 return eFAILURE;
+	 }
 
-    half_chop(GET_RANGE(ch), buf, bufl);*/
-      low = atoi(buf);
-     high = atoi(bufl);
+	 half_chop(GET_RANGE(ch), buf, bufl);*/
+	low = atoi(buf);
+	high = atoi(bufl);
 
+	for (x = low; x <= high; x++) {
+		room = real_room(x);
+		if (room == (-1))
+			continue;
+		found_room = TRUE;
+		break;
+	}
 
-     for (x = low; x <= high; x++) {
-        room = real_room(x);
-         if (room == (-1))
-                continue;
-          found_room = TRUE;
-          break;
-         }
+	if (!found_room) {
+		send_to_char("Your area doesn't seem to be there.  Tell Godflesh!", ch);
+		return eFAILURE;
+	}
 
-     if (!found_room) {
-    send_to_char("Your area doesn't seem to be there.  Tell Godflesh!", ch);
-      return eFAILURE;
-      }
+	sprintf(buf, "../lib/builder/%s.zon", GET_NAME(ch));
 
-    sprintf(buf, "../lib/builder/%s.zon", GET_NAME(ch));
+	if ((fl = dc_fopen(buf, "w")) == NULL) {
+		send_to_char("Couldn't open up zone file. Tell Godflesh!", ch);
+		dc_fclose(fl);
+		return eFAILURE;
+	}
 
-    if ((fl = dc_fopen(buf, "w")) == NULL) {
-      send_to_char("Couldn't open up zone file. Tell Godflesh!", ch);
-      dc_fclose(fl);
-        return eFAILURE;
-         }
+	for (x = low; x <= high; x++) {
+		room = real_room(x);
+		if (room == (-1))
+			continue;
+		break;
+	}
 
-     for (x = low; x <= high; x++) {
-        room = real_room(x);
-         if (room == (-1))
-                continue;
-              break;
-           }
+	fprintf(fl, "#%d\n", world[room].zone);
+	sprintf(buf, "%s's Area.", ch->name);
+	string_to_file(fl, buf);
+	fprintf(fl, "~\n");
+	fprintf(fl, "%d 30 2\n", high);
 
-     fprintf(fl, "#%d\n", world[room].zone);
-       sprintf(buf, "%s's Area.", ch->name);
- string_to_file(fl, buf); fprintf(fl, "~\n");
-     fprintf(fl, "%d 30 2\n", high);
-   
+	/* Set allthe door states..  */
 
-    /* Set allthe door states..  */
+	for (x = low; x <= high; x++) {
+		room = real_room(x);
+		if (room == (-1))
+			continue;
 
-     for (x = low; x <= high; x++) {
-        room = real_room(x);
-         if (room == (-1))
-                continue;
+		for (door = 0; door <= 5; door++) {
+			if (!(world[room].dir_option[door]))
+				continue;
 
-       for (door = 0; door <= 5; door++) {
-             if(!(world[room].dir_option[door]))
-                    continue;
-         
-       if (IS_SET(world[room].dir_option[door]->exit_info, EX_ISDOOR)) {
-       if ((IS_SET(world[room].dir_option[door]->exit_info, EX_CLOSED)) &&
-               (IS_SET(world[room].dir_option[door]->exit_info, 
-EX_LOCKED)) )
-              value = 2;
-      else if (IS_SET(world[room].dir_option[door]->exit_info, EX_CLOSED))
-              value = 1;
-      else value = 0;
+			if (IS_SET(world[room].dir_option[door]->exit_info, EX_ISDOOR)) {
+				if ((IS_SET(world[room].dir_option[door]->exit_info, EX_CLOSED))
+						&& (IS_SET(world[room].dir_option[door]->exit_info,
+								EX_LOCKED)))
+					value = 2;
+				else if (IS_SET(world[room].dir_option[door]->exit_info,
+						EX_CLOSED))
+					value = 1;
+				else
+					value = 0;
 
-       fprintf(fl, "D 0 %d %d %d\n", world[room].number, 
-          world[world[room].dir_option[door]->to_room].number, value);
-        }
-      }
-    }   /*  Ok.. all door state info written...  */
+				fprintf(fl, "D 0 %d %d %d\n", world[room].number,
+						world[world[room].dir_option[door]->to_room].number,
+						value);
+			}
+		}
+	} /*  Ok.. all door state info written...  */
 
-   /*  Load loose objects.  In other words.. objects not carried by mobs. */
+	/*  Load loose objects.  In other words.. objects not carried by mobs. */
 
-     for (x = low; x <= high; x++) {
-        room = real_room(x);
-         if (room == (-1))
-                continue;
-       
-        if (world[room].contents) {
+	for (x = low; x <= high; x++) {
+		room = real_room(x);
+		if (room == (-1))
+			continue;
 
-     for (obj = world[room].contents; obj; obj = obj->next_content) {
+		if (world[room].contents) {
 
-             count = 0;
+			for (obj = world[room].contents; obj; obj = obj->next_content) {
 
-        for( obj_list = object_list; obj_list; obj_list = obj_list->next) {
-           if (obj_list->item_number == obj->item_number)
-                  count++;
-                    }
-    
-        if (!obj->in_obj) {
-     fprintf(fl, "O 0 %d %d %d", obj_index[obj->item_number].virt,
-           count, world[room].number);
-     sprintf(buf, "           %s\n", obj->short_description);
-         string_to_file(fl, buf);
+				count = 0;
 
-      if (obj->contains) {
+				for (obj_list = object_list; obj_list; obj_list =
+						obj_list->next) {
+					if (obj_list->item_number == obj->item_number)
+						count++;
+				}
 
-    for (tmp_obj = obj->contains; tmp_obj; tmp_obj = tmp_obj->next_content) {
-             count = 0;
-        for( obj_list = object_list; obj_list; obj_list = obj_list->next) {
-           if (obj_list->item_number == tmp_obj->item_number)
-                  count++;
-                    }
-    
-     fprintf(fl, "P 1 %d %d %d", obj_index[tmp_obj->item_number].virt,
-           count, obj_index[obj->item_number].virt);
-     sprintf(buf, "     %s placed inside %s\n", tmp_obj->short_description,
-                   obj->short_description);
-         string_to_file(fl, buf);
-                  } /*  for loop */
-                } /* end of the object's contents... */
-             }  /* end of if !obj->in_obj */
-      } /* first for loop for loose objects... */
-   }  /* All loose objects taken care of..  (Not on mobs,but inthe rooms) */
-  }  /*  for loop going through the fucking rooms again for loose obj's */
+				if (!obj->in_obj) {
+					fprintf(fl, "O 0 %d %d %d",
+							obj_index[obj->item_number].virt, count,
+							world[room].number);
+					sprintf(buf, "           %s\n", obj->short_description);
+					string_to_file(fl, buf);
 
-   /* Now for the major bitch...
-    * All the mobs, and all possible bullshit our builders will try to
-    * put on them.. i.e held objects with objects within them... Just
-    * your average pain in the ass shit....
-    */
+					if (obj->contains) {
 
-     for (x = low; x <= high; x++) {
-        room = real_room(x);
-         if (room == (-1))
-                continue;
+						for (tmp_obj = obj->contains; tmp_obj;
+								tmp_obj = tmp_obj->next_content) {
+							count = 0;
+							for (obj_list = object_list; obj_list; obj_list =
+									obj_list->next) {
+								if (obj_list->item_number
+										== tmp_obj->item_number)
+									count++;
+							}
 
-      if( world[room].people ) {
+							fprintf(fl, "P 1 %d %d %d",
+									obj_index[tmp_obj->item_number].virt, count,
+									obj_index[obj->item_number].virt);
+							sprintf(buf, "     %s placed inside %s\n",
+									tmp_obj->short_description,
+									obj->short_description);
+							string_to_file(fl, buf);
+						} /*  for loop */
+					} /* end of the object's contents... */
+				} /* end of if !obj->in_obj */
+			} /* first for loop for loose objects... */
+		} /* All loose objects taken care of..  (Not on mobs,but inthe rooms) */
+	} /*  for loop going through the fucking rooms again for loose obj's */
 
+	/* Now for the major bitch...
+	 * All the mobs, and all possible bullshit our builders will try to
+	 * put on them.. i.e held objects with objects within them... Just
+	 * your average pain in the ass shit....
+	 */
 
-     for (mob = world[room].people; mob; mob = mob->next_in_room) {
-        if( !IS_NPC(mob))
-             continue;
+	for (x = low; x <= high; x++) {
+		room = real_room(x);
+		if (room == (-1))
+			continue;
 
-             count = 0;
+		if (world[room].people) {
 
-        for( mob_list =character_list; mob_list; mob_list = mob_list->next) {
-           if (IS_MOB(mob_list) && mob_list->mobdata->nr == mob->mobdata->nr)
-                  count++;
-                    }
-    
-     fprintf(fl, "M 0 %d %d %d", mob_index[mob->mobdata->nr].virt,
-           count, world[room].number);
-     sprintf(buf, "           %s\n", mob->short_desc);
-         string_to_file(fl, buf);
+			for (mob = world[room].people; mob; mob = mob->next_in_room) {
+				if (!IS_NPC(mob))
+					continue;
 
-          for (pos = 0; pos < MAX_WEAR; pos++) {
-            if (mob->equipment[pos]) {
+				count = 0;
 
-            obj = mob->equipment[pos];
+				for (mob_list = character_list; mob_list;
+						mob_list = mob_list->next) {
+					if (IS_MOB(mob_list)
+							&& mob_list->mobdata->nr == mob->mobdata->nr)
+						count++;
+				}
 
-             count = 0;
-        for( obj_list = object_list; obj_list; obj_list = obj_list->next) {
-           if (obj_list->item_number == obj->item_number)
-                  count++;
-                    }
-    
-        if (!obj->in_obj) {
-     fprintf(fl, "E 1 %d %d %d", obj_index[obj->item_number].virt,
-           count, pos);
-     sprintf(buf, "      Equip %s with %s\n", mob->short_desc,
-                         obj->short_description);
-         string_to_file(fl, buf);
+				fprintf(fl, "M 0 %d %d %d", mob_index[mob->mobdata->nr].virt,
+						count, world[room].number);
+				sprintf(buf, "           %s\n", mob->short_desc);
+				string_to_file(fl, buf);
 
-      if (obj->contains) {
+				for (pos = 0; pos < MAX_WEAR; pos++) {
+					if (mob->equipment[pos]) {
 
-    for (tmp_obj = obj->contains; tmp_obj; tmp_obj = tmp_obj->next_content) {
-             count = 0;
-        for( obj_list = object_list; obj_list; obj_list = obj_list->next) {
-           if (obj_list->item_number == tmp_obj->item_number)
-                  count++;
-                    }
-    
-     fprintf(fl, "P 1 %d %d %d", obj_index[tmp_obj->item_number].virt,
-           count, obj_index[obj->item_number].virt);
-     sprintf(buf, "     %s placed inside %s\n", tmp_obj->short_description,
-                   obj->short_description);
-         string_to_file(fl, buf);
-                    } /*  for loop */
-                  }
-                } /* end of the object's contents... */
-        } /* End of if ch->equipment[pos]  */
-       } /* For loop going through a mob's eq.. */
+						obj = mob->equipment[pos];
 
-        if (mob->carrying) {
+						count = 0;
+						for (obj_list = object_list; obj_list; obj_list =
+								obj_list->next) {
+							if (obj_list->item_number == obj->item_number)
+								count++;
+						}
 
-      for(obj = mob->carrying; obj; obj = obj->next_content) {
+						if (!obj->in_obj) {
+							fprintf(fl, "E 1 %d %d %d",
+									obj_index[obj->item_number].virt, count,
+									pos);
+							sprintf(buf, "      Equip %s with %s\n",
+									mob->short_desc, obj->short_description);
+							string_to_file(fl, buf);
 
-             count = 0;
-        for( obj_list = object_list; obj_list; obj_list = obj_list->next) {
-           if (obj_list->item_number == obj->item_number)
-                  count++;
-                    }
-        
-        if (!obj->in_obj) {
-     fprintf(fl, "G 1 %d %d", obj_index[obj->item_number].virt,
-           count);
-     sprintf(buf, "      Give %s %s\n", mob->short_desc,
-                         obj->short_description);
-         string_to_file(fl, buf);
+							if (obj->contains) {
 
-      if (obj->contains) {
+								for (tmp_obj = obj->contains; tmp_obj; tmp_obj =
+										tmp_obj->next_content) {
+									count = 0;
+									for (obj_list = object_list; obj_list;
+											obj_list = obj_list->next) {
+										if (obj_list->item_number
+												== tmp_obj->item_number)
+											count++;
+									}
 
-    for (tmp_obj = obj->contains; tmp_obj; tmp_obj = tmp_obj->next_content) {
-             count = 0;
-        for( obj_list = object_list; obj_list; obj_list = obj_list->next) {
-           if (obj_list->item_number == tmp_obj->item_number)
-                  count++;
-                    }
-    
-     fprintf(fl, "P 1 %d %d %d", obj_index[tmp_obj->item_number].virt,
-           count, obj_index[obj->item_number].virt);
-     sprintf(buf, "     %s placed inside %s\n", tmp_obj->short_description,
-                   obj->short_description);
-         string_to_file(fl, buf);
-                    } /*  for loop */
-                  }
-                } /* end of the object's contents... */
-         } /* end of for loop going through a mob's inventory */
-        } /* end of if a mob has shit in their inventory */
-      } /* end of for loop for looking at the mobs in ths room. */
-    } /* end of if some body is in the fucking room.  */
- } /* end of for loop going through the zone looking for mobs...  */
+									fprintf(fl, "P 1 %d %d %d",
+											obj_index[tmp_obj->item_number].virt,
+											count,
+											obj_index[obj->item_number].virt);
+									sprintf(buf, "     %s placed inside %s\n",
+											tmp_obj->short_description,
+											obj->short_description);
+									string_to_file(fl, buf);
+								} /*  for loop */
+							}
+						} /* end of the object's contents... */
+					} /* End of if ch->equipment[pos]  */
+				} /* For loop going through a mob's eq.. */
 
-    fprintf(fl, "S\n");
-    dc_fclose(fl);
-    send_to_char("Zone File Created! Tell someone who can put it in!\n\r", ch);
-   return eSUCCESS;
+				if (mob->carrying) {
+
+					for (obj = mob->carrying; obj; obj = obj->next_content) {
+
+						count = 0;
+						for (obj_list = object_list; obj_list; obj_list =
+								obj_list->next) {
+							if (obj_list->item_number == obj->item_number)
+								count++;
+						}
+
+						if (!obj->in_obj) {
+							fprintf(fl, "G 1 %d %d",
+									obj_index[obj->item_number].virt, count);
+							sprintf(buf, "      Give %s %s\n", mob->short_desc,
+									obj->short_description);
+							string_to_file(fl, buf);
+
+							if (obj->contains) {
+
+								for (tmp_obj = obj->contains; tmp_obj; tmp_obj =
+										tmp_obj->next_content) {
+									count = 0;
+									for (obj_list = object_list; obj_list;
+											obj_list = obj_list->next) {
+										if (obj_list->item_number
+												== tmp_obj->item_number)
+											count++;
+									}
+
+									fprintf(fl, "P 1 %d %d %d",
+											obj_index[tmp_obj->item_number].virt,
+											count,
+											obj_index[obj->item_number].virt);
+									sprintf(buf, "     %s placed inside %s\n",
+											tmp_obj->short_description,
+											obj->short_description);
+									string_to_file(fl, buf);
+								} /*  for loop */
+							}
+						} /* end of the object's contents... */
+					} /* end of for loop going through a mob's inventory */
+				} /* end of if a mob has shit in their inventory */
+			} /* end of for loop for looking at the mobs in ths room. */
+		} /* end of if some body is in the fucking room.  */
+	} /* end of for loop going through the zone looking for mobs...  */
+
+	fprintf(fl, "S\n");
+	dc_fclose(fl);
+	send_to_char("Zone File Created! Tell someone who can put it in!\n\r", ch);
+	return eSUCCESS;
 }
 
 int do_rstat(struct char_data *ch, char *argument, int cmd)

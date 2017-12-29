@@ -26,7 +26,7 @@ extern "C"
 #include <stdio.h>
 }
 #ifdef LEAK_CHECK
-#include <dmalloc.h>
+
 #endif
 
 #include <character.h>
@@ -51,7 +51,6 @@ extern "C"
 #include <Timer.h>
 #endif
 
-extern CHAR_DATA *character_list;
 extern struct index_data *mob_index;
 extern struct index_data *obj_index;
 extern CWorld world;
@@ -76,8 +75,7 @@ bool is_r_denied(CHAR_DATA *ch, int room)
 }
 void mobile_activity(void)
 {
-  CHAR_DATA *ch;
-  CHAR_DATA *tmp_ch, *pch, *next_dude;
+	CHAR_DATA *tmp_ch, *pch;
   struct obj_data *obj, *best_obj;
   char buf[1000];
   int door, max;
@@ -94,11 +92,11 @@ void mobile_activity(void)
   extern int mprog_cur_result;
   
   /* Examine all mobs. */
-  for(ch = character_list; ch; ch = next_dude) 
-  {
-    if (!ch || ch == (CHAR_DATA*)0x95959595) break;
-    next_dude = ch->next;
-    
+	auto &character_list = DC::instance().character_list;
+	for (auto& ch : character_list) {
+		if (ch->in_room == NOWHERE) {
+			continue;
+		}
     if(!IS_MOB(ch))
       continue;
     
@@ -151,18 +149,25 @@ void mobile_activity(void)
     done = 0;
 
 // TODO - Try to make the 'average' mob IQ higher
+		extern bool selfpurge;
+		selfpurge = FALSE;
 
-    // Only activate mprog random triggers if someone is in the zone
-    if(zone_table[world[ch->in_room].zone].players)
-      retval = mprog_random_trigger( ch );
-    
-    if(IS_SET(retval, eCH_DIED))
-      continue;
-   extern bool selfpurge;
-	selfpurge = FALSE;
-     retval = mprog_arandom_trigger (ch);
-     if (IS_SET(retval, eCH_DIED) || selfpurge)
-       continue;
+		// Only activate mprog random triggers if someone is in the zone
+		try {
+			if (zone_table[world[ch->in_room].zone].players) {
+				retval = mprog_random_trigger(ch);
+				if (IS_SET(retval, eCH_DIED))
+					continue;
+
+				retval = mprog_arandom_trigger(ch);
+				if (IS_SET(retval, eCH_DIED) || selfpurge)
+					continue;
+			}
+		} catch (...) {
+			log("error in mobile_activity. dumping core.", IMMORTAL, LOG_BUG);
+			produce_coredump();
+		}
+
     // activate mprog act triggers
     if ( ch->mobdata->mpactnum > 0 )  // we check to make sure ch is mob in very beginning, so safe
     {
@@ -266,12 +271,10 @@ void mobile_activity(void)
          )
       ) 
     {
-      if (is_r_denied(ch, EXIT(ch,door)->to_room))
-	; // DENIED
-      else if(ch->mobdata->last_direction == door)
+      if(!is_r_denied(ch, EXIT(ch,door)->to_room) && ch->mobdata->last_direction == door)
         ch->mobdata->last_direction = -1;
-      else if(!ISSET(ch->mobdata->actflags, ACT_STAY_NO_TOWN) ||
-              !IS_SET(zone_table[world[EXIT(ch, door)->to_room].zone].zone_flags, ZONE_IS_TOWN))
+      else if(!is_r_denied(ch, EXIT(ch,door)->to_room) && (!ISSET(ch->mobdata->actflags, ACT_STAY_NO_TOWN) ||
+              !IS_SET(zone_table[world[EXIT(ch, door)->to_room].zone].zone_flags, ZONE_IS_TOWN)))
       {
         ch->mobdata->last_direction = door;
         retval = attempt_move( ch, ++door );
@@ -604,6 +607,8 @@ void mobile_activity(void)
       // it just ends here.
     
   } // for() all mobs
+	DC::instance().removeDead();
+
 #ifdef USE_TIMING
 	timingDebugStr << "scavenger: " << mpscavTimer << endl;
 	timingDebugStr << "mprog: " << mprogTimer << endl;
@@ -966,15 +971,12 @@ void clear_hunt(void *arg1, void *arg2, void *arg3)
   clear_hunt((char*)arg1, (CHAR_DATA*)arg2,NULL);
 }
 
-void clear_hunt(char *arg1, CHAR_DATA *arg2, void *arg3)
-{
-  CHAR_DATA *curr;
-  for (curr = character_list;curr;curr = curr->next)
-  {
-    if (curr == arg2)
-    {
-	dc_free(arg1);
-	arg2->hunting = NULL;
-    }
-  }
+void clear_hunt(char *arg1, CHAR_DATA *arg2, void *arg3) {
+	auto &character_list = DC::instance().character_list;
+	for (auto& curr : character_list) {
+		if (curr == arg2) {
+			dc_free(arg1);
+			arg2->hunting = NULL;
+		}
+	}
 }

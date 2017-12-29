@@ -1,3 +1,4 @@
+
 /***************************************************************************
  *  file: utility.c, Utility module.                       Part of DIKUMUD *
  *  Usage: Utility procedures                                              *
@@ -36,10 +37,6 @@ extern "C"
 #include <errno.h>
 }
 
-#ifdef LEAK_CHECK
-#include <dmalloc.h>
-#endif
-
 #include <iostream>
 #include <sstream>
 #include <map>
@@ -65,6 +62,8 @@ extern "C"
 #include "fight.h"
 #include "returnvals.h"
 #include "set.h"
+#include <DC.h>
+#include <algorithm>
 
 using namespace std;
 
@@ -960,23 +959,24 @@ int do_order(struct char_data *ch, char *argument, int cmd)
 
           org_room = ch->in_room;
 
-          if(ch->followers)
-	    for (k = ch->followers; k && k != (follow_type *)0x95959595; k = k->next) {
-		if (org_room == k->follower->in_room)
-		    if (IS_AFFECTED(k->follower, AFF_CHARM)) {
-			found = TRUE;
-			retval = command_interpreter(k->follower, message);
-                        if(IS_SET(retval, eCH_DIED)) 
-                          break;  // k is no longer valid if it was a mob(always), get out now
-		      }
-		  }
+			if (ch->followers)
+				for (k = ch->followers; k && k != (follow_type *) 0x95959595;
+						k = k->next) {
+					if (org_room == k->follower->in_room)
+						if (IS_AFFECTED(k->follower, AFF_CHARM)) {
+							found = TRUE;
+							retval = command_interpreter(k->follower, message);
+							if (IS_SET(retval, eCH_DIED))
+								break; // k is no longer valid if it was a mob(always), get out now
+						}
+				}
 
-	    if (found)
-		send_to_char("Ok.\n\r", ch);
-	    else
-		send_to_char(
-		    "Nobody here are loyal subjects of yours!\n\r", ch);
-	}
+			if (found)
+				send_to_char("Ok.\n\r", ch);
+			else
+				send_to_char("Nobody here are loyal subjects of yours!\n\r",
+						ch);
+		}
     }
     return eSUCCESS;
 }
@@ -1795,6 +1795,7 @@ void check_timer()
     }
     las = curr;
   }
+	DC::instance().removeDead();
 }
 
 int get_line(FILE * fl, char *buf)
@@ -2100,12 +2101,12 @@ int get_leadership_bonus(CHAR_DATA *ch)
 
 void update_make_camp_and_leadership(void)
 {
-  CHAR_DATA *i, *next_i;
   struct affected_type af;
   int bonus = 0;
+	auto &character_list = DC::instance().character_list;
 
-  for(i = character_list; i; i = next_i) {
-    next_i = i->next;
+  for_each(character_list.begin(), character_list.end(),
+  				[&af, &bonus](char_data *i) {
 
     if(!i->fighting) {
       if(affected_by_spell(i, SKILL_SMITE))
@@ -2169,7 +2170,7 @@ void update_make_camp_and_leadership(void)
 
     if(i->curLeadBonus != bonus)
       i->changeLeadBonus = TRUE;
-  }
+  });
 }
 
 void unique_scan(struct char_data *victim)
@@ -2248,18 +2249,21 @@ void unique_scan(struct char_data *victim)
   return;
 }
 
-string replaceString( string message, string find, string replace)
-{
- size_t j;
+string replaceString(string message, string find, string replace) {
+	size_t j;
 
- if(find.empty()) return message;
- if(replace.empty()) return message;
- if(find == replace) return message;
+	if (find.empty())
+		return message;
+	if (replace.empty())
+		return message;
+	if (find == replace)
+		return message;
 
- for ( ; (j = message.find( find )) != string::npos ; ) {
-  message.replace( j, find.length(), replace );
- }
- return message;
+	size_t find_length = find.length();
+	for (; (j = message.find(find)) != string::npos;) {
+		message.replace(j, find_length, replace);
+	}
+	return message;
 }
 
 char * numToStringTH(int number)

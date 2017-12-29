@@ -8,7 +8,7 @@ extern "C"
 #include <stdlib.h>
 }
 #ifdef LEAK_CHECK
-#include <dmalloc.h>
+
 #endif
 
 #include <connect.h> // descriptor_data
@@ -582,177 +582,174 @@ void format_text(char **ptr_string, int mode, struct descriptor_data *d, int max
    strcpy(*ptr_string, formated);
 }
 
-void new_string_add(struct descriptor_data *d, char *str)
-{
-   // char *scan;
-    int terminator = 0, action = 0;
-    CHAR_DATA *ch = d->character;
-    register int i = 2, j = 0;
-    char actions[MAX_INPUT_LENGTH];
+void new_string_add(struct descriptor_data *d, char *str) {
+	// char *scan;
+	int terminator = 0, action = 0;
+	CHAR_DATA *ch = d->character;
+	register int i = 2, j = 0;
+	char actions[MAX_INPUT_LENGTH];
 
-   int a=0;
-      while (str[a] != '\0') {
-        if (str[a++] == '~')
-        {
-          SEND_TO_Q("Cannot add tildes.\r\n",d);
-          return;
-        }
-      }
-    if (str[a-1] == '\r') str[a-1] = '\0';
-    if (str[a-2] == '\r') { str[a-1] = '\0'; str[a-2] = '\n'; }
+	int a = 0;
+	while (str[a] != '\0') {
+		if (str[a++] == '~') {
+			SEND_TO_Q("Cannot add tildes.\r\n", d);
+			return;
+		}
+	}
+	if (str[a - 1] == '\r')
+		str[a - 1] = '\0';
+	if (str[a - 2] == '\r') {
+		str[a - 1] = '\0';
+		str[a - 2] = '\n';
+	}
 
-    if ((action = (*str == '/'))) {
-      while (str[i] != '\0') {
-         actions[j] = str[i];
-         i++;
-         j++;
-      }
-      actions[j] = '\0';
-      *str = '\0';
-      switch (str[1]) {
-       case 'a':
-         terminator = 2; /* working on an abort message */
-         break;
-       case 'c':
-         if (*(d->strnew)) {
-            *(d->strnew) = NULL;
-            SEND_TO_Q("Current buffer cleared.\r\n", d);
-         } else
-           SEND_TO_Q("Current buffer empty.\r\n", d);
-         break;
-       case 'd':
-         parse_action(PARSE_DELETE, actions, d);
-         break;
-       case 'e':
-         parse_action(PARSE_EDIT, actions, d);
-         break;
-       case 'f':
-         if (*(d->strnew))
-           parse_action(PARSE_FORMAT, actions, d);
-         else
-           SEND_TO_Q("Current buffer empty.\r\n", d);
-         break;
-       case 'i':
-         if (*(d->strnew))
-           parse_action(PARSE_INSERT, actions, d);
-         else
-           SEND_TO_Q("Current buffer empty.\r\n", d);
-         break;
-       case 'h':
-         parse_action(PARSE_HELP, actions, d);
-         break;
-       case 'l':
-         if (*d->strnew)
-           parse_action(PARSE_LIST_NORM, actions, d);
-         else SEND_TO_Q("Current buffer empty.\r\n", d);
-         break;
-       case 'n':
-         if (*d->strnew)
-           parse_action(PARSE_LIST_NUM, actions, d);
-         else SEND_TO_Q("Current buffer empty.\r\n", d);
-         break;
-       case 'r':
-         parse_action(PARSE_REPLACE, actions, d);
-         break;
-       case 's':
-         terminator = 1;
-         *str = '\0';
-         break;
-       default:
-         SEND_TO_Q("Invalid option.\r\n", d);
-         break;
-      }
-    }
+	if ((action = (*str == '/'))) {
+		while (str[i] != '\0') {
+			actions[j] = str[i];
+			i++;
+			j++;
+		}
+		actions[j] = '\0';
+		*str = '\0';
+		switch (str[1]) {
+		case 'a':
+			terminator = 2; /* working on an abort message */
+			break;
+		case 'c':
+			if (*(d->strnew)) {
+				*(d->strnew) = NULL;
+				SEND_TO_Q("Current buffer cleared.\r\n", d);
+			} else
+				SEND_TO_Q("Current buffer empty.\r\n", d);
+			break;
+		case 'd':
+			parse_action(PARSE_DELETE, actions, d);
+			break;
+		case 'e':
+			parse_action(PARSE_EDIT, actions, d);
+			break;
+		case 'f':
+			if (*(d->strnew))
+				parse_action(PARSE_FORMAT, actions, d);
+			else
+				SEND_TO_Q("Current buffer empty.\r\n", d);
+			break;
+		case 'i':
+			if (*(d->strnew))
+				parse_action(PARSE_INSERT, actions, d);
+			else
+				SEND_TO_Q("Current buffer empty.\r\n", d);
+			break;
+		case 'h':
+			parse_action(PARSE_HELP, actions, d);
+			break;
+		case 'l':
+			if (*d->strnew)
+				parse_action(PARSE_LIST_NORM, actions, d);
+			else
+				SEND_TO_Q("Current buffer empty.\r\n", d);
+			break;
+		case 'n':
+			if (*d->strnew)
+				parse_action(PARSE_LIST_NUM, actions, d);
+			else
+				SEND_TO_Q("Current buffer empty.\r\n", d);
+			break;
+		case 'r':
+			parse_action(PARSE_REPLACE, actions, d);
+			break;
+		case 's':
+			terminator = 1;
+			*str = '\0';
+			break;
+		default:
+			SEND_TO_Q("Invalid option.\r\n", d);
+			break;
+		}
+	}
 
+	if (!(*d->strnew)) {
+		if ((int) strlen(str) > d->max_str) {
+			SEND_TO_Q("String too long - Truncated.\r\n", d);
+			*(str + d->max_str) = '\0';
+		}
+		CREATE(*d->strnew, char, strlen(str) + 5);
+		strcpy(*d->strnew, str);
+	} else {
+		if ((int) (strlen(str) + strlen(*d->strnew)) > d->max_str) {
+			if (!action)
+				SEND_TO_Q("String too long, limit reached on message.  Last line ignored.\r\n", d);
+		} else {
+			if (!(*d->strnew = (char *) dc_realloc(*d->strnew, strlen(*d->strnew) + strlen(str) + 5))) {
+				perror("string_add");
+				abort();
+			}
+			strcat(*d->strnew, str);
+		}
+	}
 
-
-  if (!(*d->strnew)) {
-    if ((int)strlen(str) > d->max_str) {
-      SEND_TO_Q("String too long - Truncated.\r\n", d);
-      *(str + d->max_str) = '\0';
-    }
-    CREATE(*d->strnew, char, strlen(str) + 5);
-    strcpy(*d->strnew, str);
-  } else {
-    if ((int)(strlen(str) + strlen(*d->strnew)) > d->max_str) {
-      if (!action)
-        SEND_TO_Q("String too long, limit reached on message.  Last line ignored.\r\n", d);
-    } else {
-      if (!(*d->strnew = (char *) dc_realloc(*d->strnew, strlen(*d->strnew) + strlen(str) + 5))) {
-        perror("string_add");
-        abort();
-      }
-      strcat(*d->strnew, str);
-    }
-  }
-
-  bool ishashed(char *arg);
-  if (terminator) {
-    if (terminator == 2 || *(d->strnew) == NULL) {
-      if ((d->strnew) && (*d->strnew) && (**d->strnew == '\0')
-	&& !ishashed(*d->strnew)) 
-         dc_free(*d->strnew);
-       if (d->backstr) {
-         *d->strnew = d->backstr;
-       } else {
+	bool ishashed(char *arg);
+	if (terminator) {
+		if (terminator == 2 || *(d->strnew) == NULL) {
+			if ((d->strnew) && (*d->strnew) && (**d->strnew == '\0') && !ishashed(*d->strnew))
+				dc_free(*d->strnew);
+			if (d->backstr) {
+				*d->strnew = d->backstr;
+			} else {
 //         *d->strnew = NULL;
-	  *d->strnew = strdup("");
-       }
-       d->backstr = NULL;
-       d->strnew = NULL;
-       if(d->connected == CON_WRITE_BOARD) {
-         if(d->character)
-           d->connected = CON_PLAYING;
-           new_edit_board_unlock_board(d->character, 1);
-       } else 
-       {
-         if(d->connected != CON_EXDSCR)
-           d->connected = CON_PLAYING;
+				*d->strnew = strdup("");
+			}
+			d->backstr = NULL;
+			d->strnew = NULL;
+			if (d->connected == CON_WRITE_BOARD) {
+				if (d->character) {
+					d->connected = CON_PLAYING;
+				}
+				new_edit_board_unlock_board(d->character, 1);
+			} else {
+				if (d->connected != CON_EXDSCR)
+					d->connected = CON_PLAYING;
 
-       }
-       send_to_char("Aborted.\r\n", ch);
-       if(d->connected == CON_EXDSCR)
-       {
-         extern char menu[];
-         STATE(d) = CON_SELECT_MENU;
-         SEND_TO_Q(menu, d);
-       }
-       else
-         check_for_awaymsgs(ch);
-    } else {
-      if (strlen(*d->strnew) == 0) {
-        SEND_TO_Q("You can't save blank messages, try /a for abort.\r\n", d);
-      } else {
-        if(STATE(d) == CON_EXDSCR) save_char_obj(d->character);
-        if ((d->strnew) && (*d->strnew) && (**d->strnew == '\0') &&
-	!ishashed(*d->strnew) && STATE(d))
-          dc_free(*d->strnew);
-        d->backstr = NULL;
-        d->strnew = NULL;
-        if(d->connected == CON_WRITE_BOARD) {
-          if(d->character)
-            d->connected = CON_PLAYING;
-            new_edit_board_unlock_board(d->character, 0);
-        } else {
-          send_to_char("Ok.\n\r", ch);
-  
-          if(d->connected != CON_EXDSCR)
-          {
-            d->connected = CON_PLAYING;
-	    check_for_awaymsgs(ch);
-          }
-          else
-          {
-            extern char menu[];
-            STATE(d) = CON_SELECT_MENU;
-            SEND_TO_Q( menu, d );
-          }
-        }
-      }
-    }
-  } else {
-    if (!action && !((int)(strlen(str) + strlen(*d->strnew) + 2) > d->max_str)) {
-      strcat(*d->strnew, "\r\n");
-    }
-  }
+			}
+			send_to_char("Aborted.\r\n", ch);
+			if (d->connected == CON_EXDSCR) {
+				extern char menu[];
+				STATE(d) = CON_SELECT_MENU;
+				SEND_TO_Q(menu, d);
+			} else
+				check_for_awaymsgs(ch);
+		} else {
+			if (strlen(*d->strnew) == 0) {
+				SEND_TO_Q("You can't save blank messages, try /a for abort.\r\n", d);
+			} else {
+				if (STATE(d) == CON_EXDSCR)
+					save_char_obj(d->character);
+				if ((d->strnew) && (*d->strnew) && (**d->strnew == '\0') && !ishashed(*d->strnew) && STATE(d))
+					dc_free(*d->strnew);
+				d->backstr = NULL;
+				d->strnew = NULL;
+				if (d->connected == CON_WRITE_BOARD) {
+					if (d->character) {
+						d->connected = CON_PLAYING;
+					}
+					new_edit_board_unlock_board(d->character, 0);
+				} else {
+					send_to_char("Ok.\n\r", ch);
+
+					if (d->connected != CON_EXDSCR) {
+						d->connected = CON_PLAYING;
+						check_for_awaymsgs(ch);
+					} else {
+						extern char menu[];
+						STATE(d) = CON_SELECT_MENU;
+						SEND_TO_Q(menu, d);
+					}
+				}
+			}
+		}
+	} else {
+		if (!action && !((int) (strlen(str) + strlen(*d->strnew) + 2) > d->max_str)) {
+			strcat(*d->strnew, "\r\n");
+		}
+	}
 }
