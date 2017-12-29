@@ -1,0 +1,27 @@
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Cond
+   fun:ssleay_rand_bytes
+   fun:drbg_get_entropy
+   fun:fips_get_entropy
+   fun:FIPS_drbg_instantiate
+   fun:RAND_init_fips
+   fun:OPENSSL_init_library
+   fun:call_init.part.0
+   fun:call_init
+   fun:_dl_init
+   obj:/lib/ld-2.22.so
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Cond
+   fun:ssleay_rand_bytes
+   fun:drbg_get_entropy
+   fun:FIPS_drbg_instantiate
+   fun:RAND_init_fips
+   fun:OPENSSL_init_library
+   fun:call_init.part.0
+   fun:call_init
+   fun:_dl_init
+   obj:/lib/ld-2.22.so
+}
