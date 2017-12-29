@@ -23,7 +23,7 @@
 #include <utility.h>
 #include <isr.h>
 #ifdef LEAK_CHECK
-#include <dmalloc.h>
+
 #endif
 #include <handler.h>
 // Locals
