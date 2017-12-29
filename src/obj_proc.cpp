@@ -2,9 +2,6 @@
 // Usage: This file contains special procedures pertaining to objects, except 
 // for the boards which are in board.C
 
-#ifdef LEAK_CHECK
-#include <dmalloc.h>
-#endif
 #include <db.h>
 #include <fight.h>
 #include <room.h>

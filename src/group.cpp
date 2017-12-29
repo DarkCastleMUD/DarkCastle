@@ -8,7 +8,7 @@ extern "C"
 #include <ctype.h> // isspace()
 }
 #ifdef LEAK_CHECK
-#include <dmalloc.h>
+
 #endif
 
 #include <character.h>

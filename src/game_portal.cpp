@@ -16,7 +16,7 @@
 #include <db.h>
 #include <handler.h>
 #ifdef LEAK_CHECK
-#include <dmalloc.h>
+
 #endif
 
 extern "C" 

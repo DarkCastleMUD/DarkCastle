@@ -18,10 +18,6 @@
 #include <player.h>
 #include <utility.h>
 
-#ifdef LEAK_CHECK
-#include <dmalloc.h>
-#endif
-
 typedef int    SPEC_FUN  (struct char_data * ch, struct obj_data *obj, int cmd, char *argument, 
                           struct char_data * owner);
 typedef int    ROOM_PROC (CHAR_DATA *ch, int cmd, char *arg);

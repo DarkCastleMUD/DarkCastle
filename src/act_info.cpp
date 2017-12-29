@@ -17,10 +17,6 @@ extern "C"
   #include <string.h>
   #include <ctype.h>
 }
-#ifdef LEAK_CHECK
-#include <dmalloc.h>
-#endif
-
 #include <obj.h>
 #include <mobile.h>
 #include <character.h>

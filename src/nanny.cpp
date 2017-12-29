@@ -31,10 +31,6 @@ extern "C" {
 	#include <mmsystem.h>
 #endif
 }
-#ifdef LEAK_CHECK
-#include <dmalloc.h>
-#endif
-
 #include <character.h>
 #include <comm.h>
 #include <connect.h>
@@ -83,7 +79,6 @@ extern char greetings4[MAX_STRING_LENGTH];
 extern char webpage[MAX_STRING_LENGTH];
 extern char motd[MAX_STRING_LENGTH];
 extern char imotd[MAX_STRING_LENGTH];
-extern CHAR_DATA *character_list;
 extern struct descriptor_data *descriptor_list;
 extern OBJ_DATA *object_list;
 extern struct index_data *obj_index;
@@ -833,6 +828,7 @@ void nanny(struct descriptor_data *d, char *arg)
    CHAR_DATA *get_pc(char *name);
    void remove_clan_member(int clannumber, struct char_data * ch);
   extern bool str_prefix(const char *astr, const char *bstr);
+	auto &character_list = DC::instance().character_list;
 
    ch  = d->character;
    if(arg) for ( ; isspace(*arg); arg++ );
@@ -1474,9 +1470,8 @@ is_race_eligible(ch,7)?'*':' ',is_race_eligible(ch,8)?'*':' ',is_race_eligible(c
 	     log( log_buf, 100, LOG_WARNINGS);
 	  }      
           send_to_char("\n\rWelcome to Dark Castle.  May your visit here suck.\n\r", ch );
-          ch->next            = character_list;
-          character_list      = ch;
-          
+			character_list.insert(ch);
+
           /* tjs hack - till mob bug is fixed */
           // TODO - figure out what this is for
           if (GET_LEVEL(ch) == 1) {
@@ -1719,9 +1714,8 @@ bool check_deny( struct descriptor_data *d, char *name )
 // Look for link-dead player to reconnect.
 bool check_reconnect( struct descriptor_data *d, char *name, bool fReconnect )
 {
-   CHAR_DATA * tmp_ch;
-
-   for(tmp_ch = character_list; tmp_ch; tmp_ch = tmp_ch->next) {
+	auto &character_list = DC::instance().character_list;
+	for (auto& tmp_ch : character_list) {
       if(IS_NPC(tmp_ch) || tmp_ch->desc != NULL)
          continue;
       
@@ -1823,15 +1817,8 @@ char *str_str(char *first, char *second)
    return pstr;
 }
 
-void short_activity()
-{ // handles short activity. at the moment, only archery.
-  CHAR_DATA *ch;
-  for(ch = character_list; ch; ch = ch->next) 
-  { // NOTE: no error handling if character gets removed
-    // at present, no need. Add if need arises.
-    if (ch->shotsthisround) ch->shotsthisround--;
-  }
-  
+void short_activity() { // handles short activity. at the moment, only archery.
+	DC::instance().handleShooting();
 }
 
 // these are for my special lag that only keeps you from doing certain
@@ -1852,122 +1839,97 @@ void remove_command_lag(CHAR_DATA * ch)
    ch->timer = 0;
 }
 
-void update_characters()
-{
-   CHAR_DATA *i, *next_dude;
-   int tmp, retval;
-   char log_msg[MAX_STRING_LENGTH], dammsg[MAX_STRING_LENGTH];
-   struct affected_type af;
-   
-   for(i = character_list; i; i = next_dude) 
-   {
-      next_dude = i->next;
+void update_characters() {
+	int tmp, retval;
+	char log_msg[MAX_STRING_LENGTH], dammsg[MAX_STRING_LENGTH];
+	struct affected_type af;
 
-      if(i->brace_at) //if character is bracing
-      {
-        if (!charge_moves(i, SKILL_BATTERBRACE, 0.5)
-            || !is_bracing(i, i->brace_at)) 
-        {
-          do_brace(i, "", 0);
-        }
-        else
-        {
-          csendf(i, "You strain your muscles keeping the %s closed.\r\n", fname(i->brace_at->keyword));
-          act("$n strains $s muscles keeping the $F blocked.", 
-                                       i, 0, i->brace_at->keyword, TO_ROOM, 0);
-        }
-      }
-      if (IS_AFFECTED(i, AFF_POISON) && !(affected_by_spell(i, SPELL_POISON))) 
-      {
-	logf(IMMORTAL, LOG_BUG, 
-              "Player %s affected by poison but not under poison spell. Removing poison affect.", i->name);
-	REMBIT(i->affected_by, AFF_POISON);
-      }
+	auto &character_list = DC::instance().character_list;
+	for (auto& i : character_list) {
 
-      // handle poison
-      if(IS_AFFECTED(i, AFF_POISON) 
-         && !i->fighting 
-         && affected_by_spell(i, SPELL_POISON) 
-         && affected_by_spell(i, SPELL_POISON)->location == APPLY_NONE) 
-      {
-        int tmp = number(1,2) + affected_by_spell(i, SPELL_POISON)->duration;
-        if(get_saves(i, SAVE_TYPE_POISON) > number(1,101)) {
-           tmp *= get_saves(i, SAVE_TYPE_POISON) / 100;
-           send_to_char("You feel very sick, but resist the $2poison's$R damage.\n\r", i);
-        }
-        if(tmp) {
-           sprintf(dammsg, "$B%d$R", tmp);
-           send_damage("You feel burning $2poison$R in your blood and suffer painful convulsions for | damage.", 
-                 i, 0,i, dammsg, "You feel burning $2poison$R in your blood and suffer painful convulsions.", TO_CHAR);
-           send_damage("$n looks extremely sick and shivers uncomfortably from the $2poison$R in $s veins that did | damage.",
-                 i, 0, 0, dammsg, "$n looks extremely sick and shivers uncomfortably from the $2poison$R in $s veins.", TO_ROOM);
-           retval = noncombat_damage(i, tmp,
-              "You quiver from the effects of the poison and have no enegry left...",
-              "$n stops struggling as $e is consumed by poison.",
-              0, KILL_POISON);
-           if(SOMEONE_DIED(retval))
-             continue;
-        }
-      }
+		if (i->brace_at) //if character is bracing
+		{
+			if (!charge_moves(i, SKILL_BATTERBRACE, 0.5) || !is_bracing(i, i->brace_at)) {
+				do_brace(i, "", 0);
+			} else {
+				csendf(i, "You strain your muscles keeping the %s closed.\r\n", fname(i->brace_at->keyword));
+				act("$n strains $s muscles keeping the $F blocked.", i, 0, i->brace_at->keyword, TO_ROOM, 0);
+			}
+		}
+		if (IS_AFFECTED(i, AFF_POISON) && !(affected_by_spell(i, SPELL_POISON))) {
+			logf(IMMORTAL, LOG_BUG, "Player %s affected by poison but not under poison spell. Removing poison affect.", i->name);
+			REMBIT(i->affected_by, AFF_POISON);
+		}
 
-      // handle drowning
-      if (!IS_NPC(i) 
-          && GET_LEVEL(i) < IMMORTAL 
-          && world[i->in_room].sector_type == SECT_UNDERWATER 
-          && !(affected_by_spell(i, SPELL_WATER_BREATHING) 
-               || IS_AFFECTED(i, AFF_WATER_BREATHING)
-               || affected_by_spell(i, SKILL_SONG_SUBMARINERS_ANTHEM))
-         ) 
-      {
-         tmp = GET_MAX_HIT(i) / 5;
-         sprintf(log_msg, "%s drowned in room %d.", GET_NAME(i), world[i->in_room].number);
-         retval = noncombat_damage(i, tmp,
-            "You gasp your last breath and everything goes dark...",
-            "$n stops struggling as $e runs out of oxygen.",
-            log_msg, KILL_DROWN);
-         if (SOMEONE_DIED(retval))
-            continue;
-         else {
-            sprintf(dammsg,"$B%d$R",tmp);
-            send_damage("$n thrashes and gasps, struggling vainly for air, taking | damage.", i, 0, 0, 
-                  dammsg, "$n thrashes and gasps, stuggling vainly for air.", TO_ROOM);
-            send_damage("You gasp and fight madly for air; you are drowning and take | damage!", i, 0, 0, 
-                  dammsg, "You gasp and fight madly for air; you are drowning!", TO_CHAR);
-         }
-      }
-        
-      // handle command lag
-      if(i->timer > 0)
-      {
-        if(GET_LEVEL(i) < IMMORTAL)
-          i->timer--;
-        else i->timer = 0;
-      }
+		// handle poison
+		if (IS_AFFECTED(i, AFF_POISON) && !i->fighting && affected_by_spell(i, SPELL_POISON) && affected_by_spell(i, SPELL_POISON)->location == APPLY_NONE) {
+			int tmp = number(1, 2) + affected_by_spell(i, SPELL_POISON)->duration;
+			if (get_saves(i, SAVE_TYPE_POISON) > number(1, 101)) {
+				tmp *= get_saves(i, SAVE_TYPE_POISON) / 100;
+				send_to_char("You feel very sick, but resist the $2poison's$R damage.\n\r", i);
+			}
+			if (tmp) {
+				sprintf(dammsg, "$B%d$R", tmp);
+				send_damage("You feel burning $2poison$R in your blood and suffer painful convulsions for | damage.", i, 0, i, dammsg,
+						"You feel burning $2poison$R in your blood and suffer painful convulsions.", TO_CHAR);
+				send_damage("$n looks extremely sick and shivers uncomfortably from the $2poison$R in $s veins that did | damage.", i, 0, 0, dammsg,
+						"$n looks extremely sick and shivers uncomfortably from the $2poison$R in $s veins.", TO_ROOM);
+				retval = noncombat_damage(i, tmp, "You quiver from the effects of the poison and have no enegry left...",
+						"$n stops struggling as $e is consumed by poison.", 0, KILL_POISON);
+				if (SOMEONE_DIED(retval))
+					continue;
+			}
+		}
 
-      i->shotsthisround = 0;
+		// handle drowning
+		if (!IS_NPC(i) && GET_LEVEL(i) < IMMORTAL && world[i->in_room].sector_type == SECT_UNDERWATER
+				&& !(affected_by_spell(i, SPELL_WATER_BREATHING) || IS_AFFECTED(i, AFF_WATER_BREATHING) || affected_by_spell(i, SKILL_SONG_SUBMARINERS_ANTHEM))) {
+			tmp = GET_MAX_HIT(i) / 5;
+			sprintf(log_msg, "%s drowned in room %d.", GET_NAME(i), world[i->in_room].number);
+			retval = noncombat_damage(i, tmp, "You gasp your last breath and everything goes dark...", "$n stops struggling as $e runs out of oxygen.", log_msg,
+			KILL_DROWN);
+			if (SOMEONE_DIED(retval))
+				continue;
+			else {
+				sprintf(dammsg, "$B%d$R", tmp);
+				send_damage("$n thrashes and gasps, struggling vainly for air, taking | damage.", i, 0, 0, dammsg,
+						"$n thrashes and gasps, stuggling vainly for air.", TO_ROOM);
+				send_damage("You gasp and fight madly for air; you are drowning and take | damage!", i, 0, 0, dammsg,
+						"You gasp and fight madly for air; you are drowning!", TO_CHAR);
+			}
+		}
 
-      if(IS_AFFECTED(i, AFF_CMAST_WEAKEN)) REMBIT(i->affected_by, AFF_CMAST_WEAKEN);
-      affect_from_char(i, SKILL_COMBAT_MASTERY);
+		// handle command lag
+		if (i->timer > 0) {
+			if (GET_LEVEL(i) < IMMORTAL)
+				i->timer--;
+			else
+				i->timer = 0;
+		}
 
-      //perseverance stuff
-      if(affected_by_spell(i, SKILL_PERSEVERANCE)) 
-      {
-        affect_from_char(i, SKILL_PERSEVERANCE_BONUS);
-        af.type = SKILL_PERSEVERANCE_BONUS;
-        af.duration = -1;
-        af.modifier = 0 - ( (2 + affected_by_spell(i, SKILL_PERSEVERANCE)->modifier / 10) *
-                            (1 + affected_by_spell(i, SKILL_PERSEVERANCE)->modifier / 11 -
-                                         affected_by_spell(i, SKILL_PERSEVERANCE)->duration ) );
-        af.location = APPLY_AC;
-        af.bitvector = -1;
-        affect_to_char(i, &af);
+		i->shotsthisround = 0;
 
-        GET_MOVE(i) += 5 * (1 + affected_by_spell(i, SKILL_PERSEVERANCE)->modifier/11 
-                              - affected_by_spell(i, SKILL_PERSEVERANCE)->duration);
-        GET_MOVE(i) = MIN(GET_MOVE(i), GET_MAX_MOVE(i));
-      }
+		if (IS_AFFECTED(i, AFF_CMAST_WEAKEN))
+			REMBIT(i->affected_by, AFF_CMAST_WEAKEN);
+		affect_from_char(i, SKILL_COMBAT_MASTERY);
 
-   }
+		//perseverance stuff
+		if (affected_by_spell(i, SKILL_PERSEVERANCE)) {
+			affect_from_char(i, SKILL_PERSEVERANCE_BONUS);
+			af.type = SKILL_PERSEVERANCE_BONUS;
+			af.duration = -1;
+			af.modifier = 0
+					- ((2 + affected_by_spell(i, SKILL_PERSEVERANCE)->modifier / 10)
+							* (1 + affected_by_spell(i, SKILL_PERSEVERANCE)->modifier / 11 - affected_by_spell(i, SKILL_PERSEVERANCE)->duration));
+			af.location = APPLY_AC;
+			af.bitvector = -1;
+			affect_to_char(i, &af);
+
+			GET_MOVE(i) += 5 * (1 + affected_by_spell(i, SKILL_PERSEVERANCE)->modifier / 11 - affected_by_spell(i, SKILL_PERSEVERANCE)->duration);
+			GET_MOVE(i) = MIN(GET_MOVE(i), GET_MAX_MOVE(i));
+		}
+
+	}
 }
 
 void check_silence_beacons(void)
@@ -2114,7 +2076,7 @@ void checkConsecrate(int pulseType)
     }
    }
   }
-  
+	DC::instance().removeDead();
   return;
 }
 

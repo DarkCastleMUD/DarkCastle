@@ -20,7 +20,7 @@ extern "C"
 }
 
 #ifdef LEAK_CHECK
-#include <dmalloc.h>
+
 #endif
 
 #include <map>

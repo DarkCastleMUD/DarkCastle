@@ -19,7 +19,7 @@ extern "C"
 #include <string.h>
 }
 #ifdef LEAK_CHECK
-#include <dmalloc.h>
+
 #endif
 
 #include <cstdlib>
@@ -57,7 +57,6 @@ using namespace std;
 extern CWorld world;
 
 extern struct descriptor_data *descriptor_list;
-extern struct char_data *character_list;
 extern struct obj_data *object_list;
 extern struct index_data *mob_index;
 extern struct index_data *obj_index;
@@ -841,14 +840,12 @@ int do_look(struct char_data *ch, char *argument, int cmd) {
 		send_to_char("You can't see anything but stars!\n\r", ch);
 	else if (GET_POS(ch) == POSITION_SLEEPING)
 		send_to_char("You can't see anything, you're sleeping!\n\r", ch);
-	else if (check_blind(ch))
-		;
-	else if (IS_DARK(ch->in_room) && (!IS_MOB(ch) && !ch->pcdata->holyLite)) {
+	else if (!check_blind(ch) && IS_DARK(ch->in_room) && !IS_MOB(ch) && !ch->pcdata->holyLite) {
 		send_to_char("It is pitch black...\n\r", ch);
 		list_char_to_char(world[ch->in_room].people, ch, 0);
 		send_to_char("$R", ch);
 		// TODO - if have blindfighting, list some of the room exits sometimes
-	} else {
+	} else if (!check_blind(ch)){
 		argument_split_3(argument, arg1, arg2, arg3);
 		keyword_no = search_block(arg1, keywords, FALSE); /* Partial Match */
 
@@ -2098,7 +2095,6 @@ int do_olocate(struct char_data *ch, char *name, int cmd)
 int do_mlocate(struct char_data *ch, char *name, int cmd)
 {
    char buf[300], buf2[MAX_STRING_LENGTH];
-   struct char_data * i;
    int count = 0;
    int vnum = 0;
    int searchnum = 0;
@@ -2112,7 +2108,9 @@ int do_mlocate(struct char_data *ch, char *name, int cmd)
    *buf2 = '\0';
    send_to_char(" #   Short description          Room Number\n\n\r", ch);
 
-   for(i = character_list; i; i = i->next) {
+	auto &character_list = DC::instance().character_list;
+	for (auto& i : character_list) {
+
       if((!IS_NPC(i) &&
          (cmd != 18 || !CAN_SEE(ch, i))))
          continue;
@@ -2650,14 +2648,13 @@ int do_show_exp(CHAR_DATA *ch, char *arg, int cmd)
 
 void check_champion_and_website_who_list()
 {
-   CHAR_DATA *ch = character_list, *nextch;
    OBJ_DATA *obj;
    stringstream buf, buf2;
    int addminute=0;
    string name;
 
-   for(;ch;ch = nextch) {
-      nextch = ch->next;
+	auto &character_list = DC::instance().character_list;
+	for (auto& ch : character_list) {
 
       if(!IS_NPC(ch) && ch->desc && ch->pcdata && ch->pcdata->wizinvis <= 0) {
         buf << GET_SHORT(ch) << endl;

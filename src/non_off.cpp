@@ -12,10 +12,6 @@ extern "C"
   #include <ctype.h>
   #include <string.h>
 }
-#ifdef LEAK_CHECK
-#include <dmalloc.h>
-#endif
-
 #include <connect.h>
 #include <character.h>
 #include <room.h>
@@ -438,9 +434,10 @@ int do_toggle(struct char_data * ch, char * arg, int cmd)
 	 break;
 	 
          case 8:
-	if (GET_CLASS(ch) == CLASS_BARD)
+				if (GET_CLASS(ch) == CLASS_BARD) {
 	 sprintf(buf + strlen(buf), "%s\n\r",
 	   IS_SET(ch->pcdata->toggles, PLR_BARD_SONG) ? "$B$2on$R" : "$B$4off$R");
+				}
 	 break;
 	 
          case 9:
@@ -467,9 +464,10 @@ int do_toggle(struct char_data * ch, char * arg, int cmd)
            IS_SET(ch->pcdata->toggles, PLR_NOTAX) ? "$B$2on$R" : "$B$4off$R");
          break;
          case 14:
-	if (IS_SET(ch->pcdata->toggles, PLR_GUIDE))
+				if (IS_SET(ch->pcdata->toggles, PLR_GUIDE)) {
          sprintf(buf + strlen(buf), "%s\n\r",
            IS_SET(ch->pcdata->toggles, PLR_GUIDE_TOG) ? "$B$2on$R" : "$B$4off$R");
+				}
          break;
          case 15:
          sprintf(buf + strlen(buf), "%s\n\r",

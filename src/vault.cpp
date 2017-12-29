@@ -3,10 +3,6 @@ extern "C"
   #include <ctype.h>
   #include <string.h>
 }
-#ifdef LEAK_CHECK
-#include <dmalloc.h>
-#endif
-
 #include <fstream>
 #include <sstream>
 #include <string>
@@ -1753,14 +1749,18 @@ void add_new_vault(char *name, int indexonly) {
 }
 
 struct char_data *find_owner(char *name) {
-  extern char_data * character_list;
-  struct char_data *ch;
-  for(ch = character_list; ch; ch = ch->next) {
+	auto &character_list = DC::instance().character_list;
+	auto result = find_if(character_list.begin(), character_list.end(), [&name](char_data * const &ch) {
 	  if (ch->name == NULL) {
 		  produce_coredump(); //Trying to track down bug that causes mob->name to be NULL
 	  } else if (!strcmp(name, GET_NAME(ch))) {
-		  return ch;
+			return true;
 	  }
+		return false;
+	});
+
+	if (result != end(character_list)) {
+		return *result;
   }
 
   return 0;

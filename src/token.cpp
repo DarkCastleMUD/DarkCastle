@@ -15,10 +15,6 @@ extern "C"
 #include <stdlib.h>
 #include <stdio.h>
 }
-#ifdef LEAK_CHECK
-#include <dmalloc.h>
-#endif
-
 // DarkCastle header files
 #include <db.h>
 #include <room.h>

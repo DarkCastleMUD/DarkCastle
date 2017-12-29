@@ -14,10 +14,6 @@ extern "C"
 #include <stdio.h>
 #include <string.h>
 }
-#ifdef LEAK_CHECK
-#include <dmalloc.h>
-#endif
-
 #include <structs.h>
 #include <levels.h>
 
