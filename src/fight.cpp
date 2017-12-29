@@ -34,7 +34,7 @@ extern "C"
 #endif
 }
 #ifdef LEAK_CHECK
-#include <dmalloc.h>
+
 #endif
 
 #include <fight.h>
@@ -68,7 +68,6 @@ extern "C"
 
 extern bool selfpurge;
 extern int top_of_world;
-extern CHAR_DATA *character_list;
 extern CWorld world;
 extern struct index_data *mob_index;
 extern struct index_data *obj_index;
@@ -325,9 +324,7 @@ void perform_violence(void)
         continue;
 
     } // can_attack
-    else if(is_stunned(ch) || IS_AFFECTED(ch, AFF_PARALYSIS))
-      ;
-    else
+    else if(!is_stunned(ch) && !IS_AFFECTED(ch, AFF_PARALYSIS))
       stop_fighting(ch);
 
     // This takes care of flee and stuff
@@ -2929,11 +2926,14 @@ int isHit(CHAR_DATA *ch, CHAR_DATA *victim, int attacktype, int &type, int &redu
   if (toHit < 1) toHit = 1;
   
   // Hitting stuff close to your level gives you a bonus,   
-  if (lvldiff > 25);
-  else if (lvldiff > 15) toHit += 5;
-  else if (lvldiff > 5) toHit += 7;
-  else if (lvldiff >= 0) toHit += 10;
-  else if (lvldiff >= -5) toHit += 5;
+	if (lvldiff > 15 && lvldiff <= 25)
+		toHit += 5;
+	else if (lvldiff > 5 && lvldiff <= 15)
+		toHit += 7;
+	else if (lvldiff >= 0 && lvldiff <= 5)
+		toHit += 10;
+	else if (lvldiff >= -5 && lvldiff <= 0)
+		toHit += 5;
 
   // Give a tohit bonus to low level players.
   float lowlvlmod = (50.0 - (float)GET_LEVEL(ch) - (GET_LEVEL(victim)/2.0))/10.0;
@@ -3211,7 +3211,7 @@ int check_magic_block(CHAR_DATA *ch, CHAR_DATA *victim, int attacktype)
     (IS_AFFECTED(victim, AFF_PARALYSIS)))
     return 0;
   if (IS_NPC(victim)) reduce = GET_LEVEL(victim)/2; // shrug
-  if (!(reduce = has_skill(victim,SKILL_SHIELDBLOCK)) && !GET_CLASS(victim)==CLASS_MONK)
+  if (!(reduce = has_skill(victim,SKILL_SHIELDBLOCK)) && !(GET_CLASS(victim)==CLASS_MONK))
      return 0;
    else if (!((reduce = has_skill(victim, SKILL_DEFENSE)) && GET_CLASS(victim)== CLASS_MONK))
      return 0;
@@ -3267,7 +3267,7 @@ int check_shieldblock(CHAR_DATA * ch, CHAR_DATA * victim, int attacktype)
       default:
 	modifier = -5;break;
     }
-  } else if (!(reduce = has_skill(victim,SKILL_SHIELDBLOCK)) && !GET_CLASS(victim)==CLASS_MONK)
+  } else if (!(reduce = has_skill(victim,SKILL_SHIELDBLOCK)) && !(GET_CLASS(victim)==CLASS_MONK))
      return 0;
    else if (GET_CLASS(victim) == CLASS_MONK && !((reduce = has_skill(victim, SKILL_DEFENSE))))
      return 0;
@@ -3575,11 +3575,11 @@ void update_pos(CHAR_DATA * victim)
 {
   if (GET_HIT(victim) > 0)
   {
-    if((!IS_SET(victim->combat, COMBAT_STUNNED)) &&
-      (!IS_SET(victim->combat, COMBAT_STUNNED2)) )
-      if (GET_POS(victim) <= POSITION_STUNNED)
-        GET_POS(victim) = POSITION_STANDING;
-      return;
+		if ((!IS_SET(victim->combat, COMBAT_STUNNED))
+				&& (!IS_SET(victim->combat, COMBAT_STUNNED2)))
+			if (GET_POS(victim) <= POSITION_STUNNED)
+				GET_POS(victim) = POSITION_STANDING;
+		return;
   }
   else GET_POS(victim) = POSITION_DEAD;
 }
@@ -4075,12 +4075,12 @@ void make_dust(CHAR_DATA * ch)
   for(o = ch->carrying; o; o = next_obj) {
     next_obj = o->next_content;
     
-    if(IS_SET(o->obj_flags.extra_flags, ITEM_SPECIAL) &&
-      (GET_ITEM_TYPE(o) == ITEM_CONTAINER))
-      for(tmp_o = o->contains; tmp_o; tmp_o = blah) {
-        blah = tmp_o->next_content;
-        if(!IS_SET(tmp_o->obj_flags.extra_flags, ITEM_SPECIAL))
-          move_obj(tmp_o, ch->in_room);
+    if (IS_SET(o->obj_flags.extra_flags, ITEM_SPECIAL)
+				&& (GET_ITEM_TYPE(o) == ITEM_CONTAINER))
+			for (tmp_o = o->contains; tmp_o; tmp_o = blah) {
+				blah = tmp_o->next_content;
+				if (!IS_SET(tmp_o->obj_flags.extra_flags, ITEM_SPECIAL))
+					move_obj(tmp_o, ch->in_room);
         
       } // if and for
       
@@ -4779,7 +4779,6 @@ void do_combatmastery(CHAR_DATA *ch, CHAR_DATA *vict, int weapon)
 
 void raw_kill(CHAR_DATA * ch, CHAR_DATA * victim)
 {
-  CHAR_DATA *i=0;
   char buf[MAX_STRING_LENGTH];
   char buf2[100];
   int is_thief = 0;
@@ -4894,7 +4893,9 @@ void raw_kill(CHAR_DATA * ch, CHAR_DATA * victim)
   
   save_char_obj(victim);
   
-  for (i = character_list; i; i = i->next) {
+  auto &character_list = DC::instance().character_list;
+	for (auto& i : character_list) {
+
     remove_memory(i, 'h', victim);
     if (IS_NPC(i) && (i->mobdata->fears))
         if (!strcmp(i->mobdata->fears, GET_NAME(victim)))
@@ -5753,10 +5754,11 @@ void do_pkill(CHAR_DATA *ch, CHAR_DATA *victim, int type, bool vict_is_attacker)
   }
   
   if(type == KILL_POISON && affected_by_spell(victim, SPELL_POISON)->modifier > 0) {
-    struct char_data *findchar;
-    for (findchar = character_list;findchar;findchar = findchar->next)
+		auto &character_list = DC::instance().character_list;
+		for (auto& findchar : character_list) {
       if ((int)findchar == affected_by_spell(victim, SPELL_POISON)->modifier)
         ch = findchar;
+		}
   }
 
   for(af = victim->affected; af; af = afpk) {
@@ -6042,7 +6044,6 @@ void arena_kill(CHAR_DATA *ch, CHAR_DATA *victim, int type)
   
   char killer_message[MAX_STRING_LENGTH];
 //  CHAR_DATA *i;
-  CHAR_DATA * tmp = NULL;
   clan_data * ch_clan = NULL;
   clan_data * victim_clan = NULL;
   int eliminated = 1;
@@ -6122,7 +6123,9 @@ void arena_kill(CHAR_DATA *ch, CHAR_DATA *victim, int type)
   // if it's a chaos, see if the clan was eliminated
   if(victim && arena.type == CHAOS && victim_clan)
   {
-     for(tmp = character_list; tmp; tmp = tmp->next) {
+		auto &character_list = DC::instance().character_list;
+		for (auto& tmp : character_list) {
+
       if (IS_SET(world[tmp->in_room].room_flags, ARENA))
         if(victim->clan == tmp->clan && victim != tmp && GET_LEVEL(tmp) < IMMORTAL)
           eliminated = 0;

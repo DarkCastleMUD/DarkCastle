@@ -450,9 +450,7 @@ int do_circle(CHAR_DATA *ch, char *argument, int cmd)
    CHAR_DATA * victim;
    int retval;
 
-   if(IS_MOB(ch))
-     ;
-   else if(!has_skill(ch, SKILL_CIRCLE)) {
+	if (!canPerform(ch, SKILL_CIRCLE)) {
      send_to_char("You do not know how to circle!\r\n", ch);
      return eFAILURE;
    }
@@ -598,9 +596,7 @@ int do_trip(CHAR_DATA *ch, char *argument, int cmd)
   char name[256];
   int retval;
 
-  if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL)
-    ;
-  else if(!has_skill(ch, SKILL_TRIP)) {
+	if (!canPerform(ch, SKILL_TRIP)) {
     send_to_char("You should learn how to trip first!\r\n", ch);
     return eFAILURE;
   }
@@ -706,9 +702,7 @@ int do_sneak(CHAR_DATA *ch, char *argument, int cmd)
        return eFAILURE;
   }
 
-   if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL)
-      ;
-   else if(!has_skill(ch, SKILL_SNEAK)) {
+   if(!canPerform(ch, SKILL_SNEAK)) {
       send_to_char("You just don't seem like the sneaky type.\r\n", ch);
       return eFAILURE;
    }
@@ -746,9 +740,7 @@ int do_stalk(CHAR_DATA *ch, char *argument, int cmd)
   CHAR_DATA *leader;
 
 
-  if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL)
-    ;
-  else if(!has_skill(ch, SKILL_STALK)) {
+  if(!canPerform(ch, SKILL_STALK)) {
     send_to_char("I bet you think you're a thief. ;)\n\r", ch);
     return eFAILURE;
   } 
@@ -798,9 +790,7 @@ int do_stalk(CHAR_DATA *ch, char *argument, int cmd)
 int do_hide(CHAR_DATA *ch, char *argument, int cmd)
 {
 
-  if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL)
-    ;
-  else if(!has_skill(ch, SKILL_HIDE)) {
+  if(!canPerform(ch, SKILL_HIDE)) {
     if (cmd != 12)
       send_to_char("I bet you think you're a thief. ;)\n\r", ch);
     return eFAILURE;
@@ -1888,9 +1878,7 @@ int do_vitalstrike(struct char_data *ch, char *argument, int cmd)
     return eFAILURE;
   }
     
-  if(IS_MOB(ch))
-    ;
-  else if(!has_skill(ch, SKILL_VITAL_STRIKE)) {
+  if(!canPerform(ch, SKILL_VITAL_STRIKE)) {
     send_to_char("You'd cut yourself to ribbons just trying!\r\n", ch);
     return eFAILURE;
   }
@@ -1938,9 +1926,7 @@ int do_deceit(struct char_data *ch, char *argument, int cmd)
 {
   struct affected_type af;
   
-  if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL)
-    ;
-  else if(!has_skill(ch, SKILL_DECEIT)) {
+  if(!canPerform(ch, SKILL_DECEIT)) {
     send_to_char("You do not yet understand enough of the workings of your marks.\r\n", ch);
     return eFAILURE;
   }   

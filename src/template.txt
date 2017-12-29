@@ -28,7 +28,7 @@ if (result != end(character_list)) {
 					}
 				});
 
-    if (canPerform(ch, SKILL_REDIRECT, "You aren't skilled enough to change opponents midfight!\r\n"))
+    if (!canPerform(ch, SKILL_REDIRECT, "You aren't skilled enough to change opponents midfight!\r\n"))
     	return eFAILURE;
 
 

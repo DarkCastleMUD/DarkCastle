@@ -41,10 +41,7 @@ int do_harmtouch(struct char_data *ch, char *argument, int cmd)
 
    one_argument(argument, victim_name);
 
-   if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL)
-      ;
-   else if(!has_skill(ch, SKILL_HARM_TOUCH)) {
-      send_to_char("You dunno even HOW to harm touch.\r\n", ch);
+	if (!canPerform(ch, SKILL_HARM_TOUCH, "You dunno even HOW to harm touch.\r\n")) {
       return eFAILURE;
    }
 
@@ -137,10 +134,7 @@ int do_layhands(struct char_data *ch, char *argument, int cmd)
    int duration = 24;
    one_argument(argument, victim_name);
 
-   if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL )
-     ;
-   else if(!has_skill(ch, SKILL_LAY_HANDS)) {
-     send_to_char("You aren't skilled enough to lay a two-dollar whore with three bucks.\r\n", ch);
+   if(!canPerform(ch, SKILL_LAY_HANDS, "You aren't skilled enough to lay a two-dollar whore with three bucks.\r\n")) {
      return eFAILURE;
    }
 
@@ -210,7 +204,6 @@ victim, dammsg, "A blinding flash fills the area as life force granted from $n's
 int do_behead(struct char_data *ch, char *argument, int cmd)
 {
   double modifier = 0.0;
-  int skill = 0;
   double enemy_hp = 0.0;
   int chance = 0;
   int retval = eSUCCESS;
@@ -220,11 +213,8 @@ int do_behead(struct char_data *ch, char *argument, int cmd)
   
   one_argument(argument, buf);
 
-  if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL )
-    ;
-  else if(!(skill = has_skill(ch, SKILL_BEHEAD))) 
+  if(!canPerform(ch, SKILL_BEHEAD, "The closest you'll ever get to 'beheading' is at a brit milah. Mazal tov!\r\n"))
   {
-    send_to_char("The closest you'll ever get to 'beheading' is at a brit milah. Mazal tov!\r\n", ch);
     return eFAILURE;
   }
 
@@ -268,7 +258,8 @@ int do_behead(struct char_data *ch, char *argument, int cmd)
     return retval;
   }
 
-  modifier = 50.0 + skill / 2.0 + GET_ALIGNMENT(ch) / 100.0;
+  int skill_level = has_skill(ch, SKILL_BEHEAD);
+  modifier = 50.0 + skill_level / 2.0 + GET_ALIGNMENT(ch) / 100.0;
   modifier /= 100.0; //range .15-1.0
 
   enemy_hp = (GET_HIT(vict)* 100.0) / GET_MAX_HIT(vict);

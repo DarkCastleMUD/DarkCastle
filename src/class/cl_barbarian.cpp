@@ -352,10 +352,7 @@ int do_rage(struct char_data *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL )
-    ;
-  else if(!has_skill(ch, SKILL_RAGE)) {
-    send_to_char("You should learn the skill before you try doing any raging in this machine...\r\n", ch);
+  if(!canPerform(ch, SKILL_RAGE, "You should learn the skill before you try doing any raging in this machine...\r\n")) {
     return eFAILURE;
   }
 
@@ -429,10 +426,8 @@ int do_rage(struct char_data *ch, char *argument, int cmd)
 int do_battlecry(struct char_data *ch, char *argument, int cmd)
 {
   struct follow_type *f = 0;
-  if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL)
-    ;
-  else if(!has_skill(ch, SKILL_BATTLECRY)) {
-    send_to_char("Have to learn how to battlecry before you can run with the big boys...\r\n", ch);
+
+  if (!canPerform(ch, SKILL_BATTLECRY, "Have to learn how to battlecry before you can run with the big boys...\r\n")) {
     return eFAILURE;
   }
 
@@ -497,10 +492,7 @@ int do_berserk(struct char_data *ch, char *argument, int cmd)
   int bSuccess = 0;
   int retval = 0;
   
-  if(IS_MOB(ch))
-    ;
-  else if(!has_skill(ch, SKILL_BERSERK)) {
-    send_to_char("You aren't crazy enough for that yet... try rage maybe...\r\n", ch);
+  if (!canPerform(ch, SKILL_BERSERK, "You aren't crazy enough for that yet... try rage maybe...\r\n")) {
     return eFAILURE;
   }
 
@@ -600,19 +592,17 @@ int do_berserk(struct char_data *ch, char *argument, int cmd)
 int do_headbutt(struct char_data *ch, char *argument, int cmd)
 {
   struct char_data *victim;
-  char name[256];
-  int retval = 0;
+	char name[256];
+	int retval = 0;
 
-  if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL)
-    ;
-  else if(!has_skill(ch, SKILL_HEADBUTT)) {
-    send_to_char("You'd bonk yourself silly without proper training.\r\n", ch);
-    return eFAILURE;
-  }
+	if (!canPerform(ch, SKILL_HEADBUTT,
+			"You'd bonk yourself silly without proper training.\r\n")) {
+		return eFAILURE;
+	}
 
-  one_argument(argument, name);
+	one_argument(argument, name);
 
-  victim = get_char_room_vis( ch, name );
+	victim = get_char_room_vis(ch, name);
   if ( victim == NULL )
     victim = ch->fighting;
 
@@ -737,12 +727,11 @@ int do_bloodfury(struct char_data *ch, char *argument, int cmd)
   struct affected_type af;
   float modifier;
   int duration = 42;
-  if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL)
-    ;
-  else if(!has_skill(ch, SKILL_BLOOD_FURY)) {
-    send_to_char("You've no idea how to raise such bloodlust.\r\n", ch);
-    return eFAILURE;
-  }
+
+	if (!canPerform(ch, SKILL_BLOOD_FURY,
+		  "You've no idea how to raise such bloodlust.\r\n")) {
+  		return eFAILURE;
+  	}
 
   if(affected_by_spell(ch, SKILL_BLOOD_FURY)) {
     send_to_char("Your body can not yet take the strain of another blood fury yet.\r\n", ch);
@@ -793,13 +782,10 @@ int do_crazedassault(struct char_data *ch, char *argument, int cmd)
     return eFAILURE; 
   }
 
-  if(IS_MOB(ch))
-    ;
-  else if(!has_skill(ch, SKILL_CRAZED_ASSAULT)) {
-    send_to_char("You just aren't crazy enough...try assaulting old ladies.\r\n", ch);
-    return eFAILURE;
-  }
-          
+	if (!canPerform(ch, SKILL_CRAZED_ASSAULT, "You just aren't crazy enough...try assaulting old ladies.\r\n"))
+  	return eFAILURE;
+
+
   if (!charge_moves(ch, SKILL_CRAZED_ASSAULT)) return eSUCCESS;
 
   if(!skill_success(ch,NULL,SKILL_CRAZED_ASSAULT)) {
@@ -855,10 +841,7 @@ int do_bullrush(struct char_data *ch, char *argument, int cmd)
      send_to_char("You must take a moment to gather your strength before another rush!\r\n",ch);
      return eFAILURE;
   }
-  if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL )
-    ;
-  else if(!has_skill(ch, SKILL_BULLRUSH)) {
-    send_to_char("Closest yer gonna get to a bull right now is a Red one..and you have to drink it...\r\n", ch);          
+  if(!canPerform(ch, SKILL_BULLRUSH, "Closest yer gonna get to a bull right now is a Red one..and you have to drink it...\r\n")) {
     return eFAILURE;
   }   
     
@@ -944,10 +927,7 @@ int do_ferocity(struct char_data *ch, char *argument, int cmd)
 {
   struct affected_type af;
 
-  if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL)
-    ;
-  else if(!has_skill(ch, SKILL_FEROCITY)) {
-    send_to_char("You're just not angry enough!\r\n", ch);
+  if (!canPerform(ch, SKILL_FEROCITY, "You're just not angry enough!\r\n")) {
     return eFAILURE;
   }
   if(affected_by_spell(ch, SKILL_FEROCITY_TIMER)) {
@@ -1036,10 +1016,7 @@ int do_knockback(struct char_data *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL)
-    ;
-  else if(!has_skill(ch, SKILL_KNOCKBACK)) {
-    send_to_char("You'd bounce off of your opponent before you caused any damage.\r\n", ch);
+	if (!canPerform(ch, SKILL_KNOCKBACK, "You'd bounce off of your opponent before you caused any damage.\r\n")) {
     return eFAILURE;
   }
 

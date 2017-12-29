@@ -17,10 +17,13 @@
 #include <room.h>
 #include <act.h>
 #include <db.h>
+#include <DC.h>
 #include <returnvals.h>
 #include <race.h>
 #include <iostream>
 #include <interp.h>
+#include <algorithm>
+#include "spells.h"
 
 using namespace std;
 
@@ -46,9 +49,7 @@ int do_kick(struct char_data *ch, char *argument, int cmd)
   int dam;
   int retval;
 
-  if(IS_MOB(ch) || GET_LEVEL(ch) > ARCHANGEL)
-    ;
-  else if (!has_skill(ch, SKILL_KICK)) {
+  if(!canPerform(ch, SKILL_KICK)) {
     send_to_char("You will have to study from a master before you can use this.\r\n", ch);
     return eFAILURE;
     }
@@ -152,9 +153,7 @@ int do_deathstroke(struct char_data *ch, char *argument, int cmd)
     int retval;
     int failchance = 25;
 
-    if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL)   
-      ;
-    else if(!has_skill(ch, SKILL_DEATHSTROKE)) {
+    if(!canPerform(ch, SKILL_DEATHSTROKE)) {
       send_to_char("You have no idea how to deathstroke.\r\n", ch);
       return eFAILURE;
     }
@@ -260,9 +259,7 @@ int do_retreat(struct char_data *ch, char *argument, int cmd)
    if (is_stunned(ch))
       return eFAILURE;
 
-   if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL)   
-       ;
-   else if(!has_skill(ch, SKILL_RETREAT)) {
+   if(!canPerform(ch, SKILL_RETREAT)) {
      send_to_char("You dunno how...better flee instead.\r\n", ch);
      return eFAILURE;
    }
@@ -344,96 +341,61 @@ int do_retreat(struct char_data *ch, char *argument, int cmd)
 }
 
 
-int do_hitall(struct char_data *ch, char *argument, int cmd)
-{
-    struct char_data *vict, *temp;
-    int retval=0;
+int do_hitall(struct char_data *ch, char *argument, int cmd) {
+	if (IS_PC(ch) && GET_LEVEL(ch) < ARCHANGEL && !has_skill(ch, SKILL_HITALL)) {
+		send_to_char("You better learn how to first...\r\n", ch);
+		return eFAILURE;
+	}
 
-    extern struct char_data *character_list;
+	if (GET_HIT(ch) == 1) {
+		send_to_char("You are too weak to do this right now.\r\n", ch);
+		return eFAILURE;
+	}
 
-   if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL)
-    ;
-   else if(!has_skill(ch, SKILL_HITALL)) {
-     send_to_char("You better learn how to first...\r\n", ch);
-     return eFAILURE;
-   }
+	if (!can_attack(ch))
+		return eFAILURE;
 
-   if(GET_HIT(ch) == 1) {
-      send_to_char("You are too weak to do this right now.\r\n", ch);
-      return eFAILURE;
-   }
+	if (!charge_moves(ch, SKILL_HITALL))
+		return eSUCCESS;
 
-   if(!can_attack(ch))
-     return eFAILURE; 
+	// TODO - I'm pretty sure we can remove this check....don't feel like checking right now though
+	if (IS_SET(ch->combat, COMBAT_HITALL)) {
+		send_to_char("You can't disengage!\n\r", ch);
+		return eFAILURE;
+	}
 
-   if (!charge_moves(ch, SKILL_HITALL)) return eSUCCESS;
 
-   // TODO - I'm pretty sure we can remove this check....don't feel like checking right now though
-   if(IS_SET(ch->combat, COMBAT_HITALL))
-   {
-     send_to_char("You can't disengage!\n\r",ch);
-     return eFAILURE;
-   }
+	if (!skill_success(ch, NULL, SKILL_HITALL)) {
 
-   if (!skill_success(ch,NULL,SKILL_HITALL)) {
+		act("You start swinging like a madman, but trip over your own feet!",
+				ch, 0, 0, TO_CHAR, 0);
+		act("$n starts swinging like a madman, but trips over $s own feet!", ch,
+				0, 0, TO_ROOM, 0);
 
-      act ("You start swinging like a madman, but trip over your own feet!", ch, 0, 0, TO_CHAR, 0);
-      act ("$n starts swinging like a madman, but trips over $s own feet!", ch, 0, 0, TO_ROOM, 0);
-     
-      for (vict = character_list; vict; vict = temp) {
-         temp = vict->next;
-         if ((!ARE_GROUPED(ch, vict)) && (ch->in_room == vict->in_room) &&
-           (vict != ch)  && !IS_SET(world[ch->in_room].room_flags, SAFE)) {
-             remove_memory(vict, 'h');
-             add_memory(vict, GET_NAME(ch), 'h');
-         }
-      }
-    WAIT_STATE(ch, PULSE_VIOLENCE*1);
+		room_mobs_only_hate(ch);
 
-   } else 
-   {
-      act ("You start swinging like a MADMAN!", ch, 0, 0, TO_CHAR, 0);
-      act ("$n starts swinging like a MADMAN!", ch, 0, 0, TO_ROOM, 0);
-      SET_BIT(ch->combat, COMBAT_HITALL);
-      WAIT_STATE(ch, PULSE_VIOLENCE*3);
-      CHAR_DATA *nxtplr;
-      for (vict = character_list; vict; vict = temp) 
-      {
-         temp = vict->next;
-	 nxtplr = temp; // nxtplayer is the next 100% safe target.
+		WAIT_STATE(ch, PULSE_VIOLENCE*1);
 
-	 if (nxtplr == (char_data *)0x95959595) {
+	} else {
+		act("You start swinging like a MADMAN!", ch, 0, 0, TO_CHAR, 0);
+		act("$n starts swinging like a MADMAN!", ch, 0, 0, TO_ROOM, 0);
+		SET_BIT(ch->combat, COMBAT_HITALL);
+		WAIT_STATE(ch, PULSE_VIOLENCE*3);
 
-             REMOVE_BIT(ch->combat, COMBAT_HITALL);
-	     log("Error in hitall, next vict 0x95959595 (this would be where hitall got stuck)", ANGEL, LOG_BUG);
-	     produce_coredump();
-	     return eFAILURE;
-	 }
-
-	 while (nxtplr && nxtplr != (char_data *)0x95959595 && IS_NPC(nxtplr)
-		&& ch->in_room == nxtplr->in_room
-		&& !ARE_GROUPED(ch, nxtplr) && nxtplr != ch) {
-	   nxtplr = nxtplr->next;
-	 }
-
-         if ((ch->in_room == vict->in_room) &&
-            (vict != ch) && !ARE_GROUPED(ch,vict)) 
-         {
-		bool victnpc = IS_NPC(vict);
-	    if(can_be_attacked(ch, vict))
-              retval = one_hit(ch, vict, TYPE_UNDEFINED, FIRST);
-            if(IS_SET(retval, eCH_DIED)) {
-	      REMOVE_BIT(ch->combat, COMBAT_HITALL);
-              return retval;
-	    }
-	    if (IS_SET(retval, eVICT_DIED) && temp && IS_NPC(temp) && !victnpc)
-		temp = nxtplr;
-		// some mobs vanish when their master dies making temp invalid
-         }
-       }
-       REMOVE_BIT(ch->combat, COMBAT_HITALL);
-    }
-    return eSUCCESS;
+		auto &character_list = DC::instance().character_list;
+        for_each(character_list.begin(), character_list.end(), [&ch](char_data *vict){
+			if (vict && vict != (char_data *) 0x95959595 && ch->in_room == vict->in_room && !ARE_GROUPED(ch, vict) && vict != ch && can_be_attacked(ch, vict)) {
+				int retval = one_hit(ch, vict, TYPE_UNDEFINED, FIRST);
+				if (IS_SET(retval, eCH_DIED)) {
+					REMOVE_BIT(ch->combat, COMBAT_HITALL);
+					return false;
+				}
+			}
+			return true;
+        });
+		REMOVE_BIT(ch->combat, COMBAT_HITALL);
+	}
+	return eSUCCESS;
 }
 
 int do_bash(struct char_data *ch, char *argument, int cmd)
@@ -448,10 +410,7 @@ int do_bash(struct char_data *ch, char *argument, int cmd)
     if(IS_AFFECTED(ch, AFF_CHARM))
       return eFAILURE;
 
-    if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL)   
-      ;
-    else if(!has_skill(ch, SKILL_BASH)) {
-      send_to_char("You don't know how to bash!\r\n", ch);
+    if(!canPerform(ch, SKILL_BASH, "You don't know how to bash!\r\n")) {
       return eFAILURE;
     }
 
@@ -609,9 +568,10 @@ int do_redirect(struct char_data *ch, char *argument, int cmd)
     struct char_data *victim;
     char name[256];
 
-    if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL)   
-      ;
-    else if(!has_skill(ch, SKILL_REDIRECT)) {
+    if (!canPerform(ch, SKILL_REDIRECT, "You aren't skilled enough to change opponents midfight!\r\n"))
+    	return eFAILURE;
+
+    if(IS_PC(ch) && !has_skill(ch, SKILL_REDIRECT) && GET_LEVEL(ch) < ARCHANGEL) {
       send_to_char("You aren't skilled enough to change opponents midfight!\r\n", ch);
       return eFAILURE;
     }
@@ -677,9 +637,7 @@ int do_disarm( struct char_data *ch, char *argument, int cmd )
 
     int is_fighting_mob(struct char_data *ch);
 
-    if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL)   
-     ;
-    else if(!has_skill(ch, SKILL_DISARM)) {
+    if(!canPerform(ch, SKILL_DISARM)) {
       send_to_char("You dunno how.\r\n", ch);
       return eFAILURE;
     }
@@ -795,9 +753,7 @@ int do_rescue(struct char_data *ch, char *argument, int cmd)
 
     one_argument(argument, victim_name);
 
-    if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL)   
-      ;
-    else if(!has_skill(ch, SKILL_RESCUE)) {
+    if(!canPerform(ch, SKILL_RESCUE)) {
       send_to_char("You've got alot to learn before you try to be a bodyguard.\r\n", ch);
       return eFAILURE;
     }
@@ -877,9 +833,8 @@ int do_bladeshield(struct char_data *ch, char *argument, int cmd)
 {
   struct affected_type af;
   int duration = 12;
-  if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL)   
-    ;
-  else if(!has_skill(ch, SKILL_BLADESHIELD)) {
+
+  if(!canPerform(ch, SKILL_BLADESHIELD)) {
     send_to_char("You'd cut yourself to ribbons just trying!\r\n", ch);
     return eFAILURE;
   }
@@ -1076,9 +1031,7 @@ int do_tactics(struct char_data *ch, char *argument, int cmd)
 {
   struct affected_type af;
   
-  if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL)
-    ;
-  else if(!has_skill(ch, SKILL_TACTICS)) {
+  if(!canPerform(ch, SKILL_TACTICS)) {
     send_to_char("You just don't have the mind for strategic battle.\r\n", ch);
     return eFAILURE;
   }   

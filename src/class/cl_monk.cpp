@@ -29,10 +29,7 @@ int do_eagle_claw(struct char_data *ch, char *argument, int cmd)
   int dam;
   int retval;
 
-  if (IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL)
-    ;
-  else if(!has_skill(ch, SKILL_EAGLE_CLAW)) {
-    send_to_char("Yooo are not pepared to use thees skeel, grasshoppa.\r\n", ch);
+	if (!canPerform(ch, SKILL_EAGLE_CLAW, "Yooo are not pepared to use thees skeel, grasshoppa.\r\n")) {
     return eFAILURE;
     }
 
@@ -99,10 +96,8 @@ int do_quivering_palm(struct char_data *ch, char *argument, int cmd)
   char name[256];
   int dam, retval;
   int duration = 100;
-  if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL)
-    ;
-  else if(!has_skill(ch, SKILL_QUIVERING_PALM)) {
-    send_to_char("Stick to palming yourself for now bucko.\r\n", ch);
+
+	if (!canPerform(ch, SKILL_QUIVERING_PALM, "Stick to palming yourself for now bucko.\r\n")) {
     return eFAILURE;
   }
 
@@ -188,10 +183,7 @@ int do_stun(struct char_data *ch, char *argument, int cmd)
   char name[256];
   int retval;
 
-  if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL)
-    ;
-  else if(!has_skill(ch, SKILL_STUN)) {
-    send_to_char("Your lack of knowledge is stunning...\r\n", ch);
+  if (!canPerform(ch, SKILL_STUN, "Your lack of knowledge is stunning...\r\n")) {
     return eFAILURE;
   }
   if (GET_HIT(ch) < 25)

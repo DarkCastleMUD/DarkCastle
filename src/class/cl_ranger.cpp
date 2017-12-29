@@ -138,10 +138,7 @@ int do_tame(CHAR_DATA *ch, char *arg, int cmd)
     return eFAILURE;
   }
 
-  if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL)
-     ;
-  else if(!has_skill(ch, SKILL_TAME)) {
-    send_to_char("Try learning HOW to tame first.\r\n", ch);
+	if (!canPerform(ch, SKILL_TAME, "Try learning HOW to tame first.\r\n")) {
     return eFAILURE;
   }
 
@@ -512,10 +509,9 @@ int ambush(CHAR_DATA *ch)
      if(isname(i->ambush, GET_NAME(ch)))
      {
 
-       if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL)
-        ;
-       else if(!has_skill(i, SKILL_AMBUSH))
+			if (!canPerform(i, SKILL_AMBUSH)) {
          continue;
+       }
 
        if(IS_AFFECTED(ch, AFF_ALERT)) {
           send_to_char("Your target is far too alert to accomplish an ambush!\r\n", i);
@@ -550,9 +546,7 @@ int do_ambush(CHAR_DATA *ch, char *arg, int cmd)
 {
   char buf[MAX_STRING_LENGTH];
 
-  if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL)
-     ; // do nothing!
-  else if(!has_skill(ch, SKILL_AMBUSH)) {
+  if(!canPerform(ch, SKILL_AMBUSH)) {
      send_to_char("You don't know how to ambush people!\r\n", ch);
      return eFAILURE;
   }
@@ -1153,479 +1147,580 @@ int do_arrow_damage(struct char_data *ch, struct char_data *victim,
 }
 */
 
-int do_fire(struct char_data *ch, char *arg, int cmd)
-{
-  struct char_data *victim;
-  int dam, dir = -1, artype, cost, retval, victroom;
-  struct obj_data *found;
-  unsigned cur_room, new_room = 0;
-  char direct[MAX_STRING_LENGTH], arrow[MAX_STRING_LENGTH], 
-       target[MAX_STRING_LENGTH], buf[MAX_STRING_LENGTH], 
-       buf2[MAX_STRING_LENGTH], victname[MAX_STRING_LENGTH],
-       victhshr[MAX_STRING_LENGTH]; 
-  bool enchantmentused = FALSE;
-  extern char * dirs[];
+int do_fire(struct char_data *ch, char *arg, int cmd) {
+	struct char_data *victim;
+	int dam, dir = -1, artype, cost, retval, victroom;
+	struct obj_data *found;
+	unsigned cur_room, new_room = 0;
+	char direct[MAX_STRING_LENGTH], arrow[MAX_STRING_LENGTH],
+			target[MAX_STRING_LENGTH], buf[MAX_STRING_LENGTH],
+			buf2[MAX_STRING_LENGTH], victname[MAX_STRING_LENGTH],
+			victhshr[MAX_STRING_LENGTH];
+	bool enchantmentused = FALSE;
+	extern char * dirs[];
 
-  victim = NULL;
-  *direct = '\0';
-  *arrow = '\0';
+	victim = NULL;
+	*direct = '\0';
+	*arrow = '\0';
 
-  if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL)
-    ;
-  else if(!has_skill(ch, SKILL_ARCHERY)) {
-    send_to_char("You've no idea how those pointy things with strings and feathers work.\r\n", ch);
-    return eFAILURE;
-  }
-
-  if (!ch->equipment[HOLD])
-  {
-    send_to_char("You need to be holding a bow, moron.\r\n", ch);
-    return eFAILURE;
-  }
-
-  if(!(ch->equipment[HOLD]->obj_flags.type_flag == ITEM_FIREWEAPON))
-  {
-    send_to_char("You need to be holding a bow, moron.\r\n", ch);
-    return eFAILURE;
-  }
-/*
-  if(GET_POS(ch) == POSITION_FIGHTING)
-  {
-    send_to_char("Aren't you a bit busy with hand to hand combat?\r\n", ch);
-    return eFAILURE;
-  }*/
-
-  if(ch->shotsthisround > 0)
-  {
-    send_to_char("Slow down there tiger, you can't fire them that fast!\r\n", ch);
-    return eFAILURE;
-  }
-
-
-/*  Command syntax is: fire [target] <dir> [arrowtype] 
-    if there is !dir, then check skill level
-    if there is !arrow, then choose standard arrowtype */
-
-  while(*arg == ' ')
-    arg++;
-
-  if(!*arg)
-  {
-    send_to_char("Shoot at whom?\r\n", ch);
-    return eFAILURE;
-  }
-  half_chop(arg, target, buf2);
-  half_chop(buf2, direct, arrow);
-
-  direct[MAX_STRING_LENGTH-1] = '\0';
-  arrow[MAX_STRING_LENGTH-1] = '\0';
-  target[MAX_STRING_LENGTH-1] = '\0';
-
-/* make safe rooms checks */
-  if(IS_SET(world[ch->in_room].room_flags, SAFE))
-  {
-    send_to_char("You can't shoot arrows if yer in a safe room silly.\r\n", ch);
-    return eFAILURE;
-  }
-
-  cost = 0;
-  dir = -1;
-  artype = 0;
-
-  if(*arrow) {
-     artype = parse_arrow(ch, arrow);
-     if(!artype)
-     {
-        send_to_char("You don't know of that type of arrow.\r\n", ch);
-        return eFAILURE;
-     }
-     switch(artype)
-     {
-        case 1:  cost = 30; break;
-        case 2:  cost = 20; break;
-        case 3:  cost = 10; break;
-        case 4:  cost = 40; break;
-     }
-  } 
-  if(*direct) {
-     if(direct[0] == 'n') dir = 0;
-     else if(direct[0] == 'e') dir = 1;
-     else if(direct[0] == 's') dir = 2;
-     else if(direct[0] == 'w') dir = 3;
-     else if(direct[0] == 'u') dir = 4;
-     else if(direct[0] == 'd') dir = 5;
-     else if(direct[0] == 'f' || direct[0] == 't' || direct[0] == 'g' || direct[0] == 'i') artype = parse_arrow(ch, direct);
-     else {
-        send_to_char("Shoot in which direction?\n\r", ch);
-        return eFAILURE;
-     }
-
-     if(dir >= 0 && !CAN_GO(ch, dir)) {
-        send_to_char("There is nothing to shoot in that direction.\r\n", ch);
-        return eFAILURE;
-     } else if(artype) {
-        switch(artype) {
-           case 1:  cost = 30; break;
-           case 2:  cost = 20; break;
-           case 3:  cost = 10; break;
-           case 4:  cost = 40; break;
-        }
-     }
-  }     
-
-  if((GET_MANA(ch) < cost) && (GET_LEVEL(ch) < ANGEL))
-  {
-    send_to_char("You don't have enough mana for that arrow.\r\n", ch);
-    return eFAILURE;
-  }
-
-  if (!charge_moves(ch, SKILL_ARCHERY)) return eSUCCESS;
-
-/* check if you can see your target */
-/* put ch in the targets room to check if they are visible */
-  cur_room = ch->in_room;
-
-  if(target[0]) {
-     if(!ch->fighting) {
-        if(dir >= 0) {
-           if(world[cur_room].dir_option[dir] && 
-            !(world[cur_room].dir_option[dir]->to_room == NOWHERE) && 
-            !IS_SET(world[cur_room].dir_option[dir]->exit_info, EX_CLOSED))
-           {
-              new_room = world[cur_room].dir_option[dir]->to_room;
-              if(IS_SET(world[new_room].room_flags, SAFE)) {
-                 send_to_char("Don't shoot into a safe room!  You might hit someone!\r\n", ch);
-                 return eFAILURE;
-              }
-              char_from_room(ch, false);
-              if(!char_to_room(ch, new_room)) {
-                 /* put ch into a room before we exit */
-                 char_to_room(ch, cur_room);
-                 send_to_char("Error moving you to room in do_fire\r\n", ch);
-                 return eFAILURE;
-              }
-              victim = get_char_room_vis(ch, target);
-           }
-        }
-
-        if(!victim && new_room && artype == 3 && dir >= 0) {
-           if(world[new_room].dir_option[dir] && 
-            !(world[new_room].dir_option[dir]->to_room == NOWHERE) && 
-            !IS_SET(world[new_room].dir_option[dir]->exit_info, EX_CLOSED))
-           {
-              new_room = world[new_room].dir_option[dir]->to_room;
-              char_from_room(ch, false);
-              if(IS_SET(world[new_room].room_flags, SAFE)) {
-                 send_to_char("Don't shoot into a safe room!  You might hit someone!\r\n", ch);
-                 char_to_room(ch, cur_room);
-                 return eFAILURE;
-              }
-              if(!char_to_room(ch, new_room)) {
-                 /* put ch into a room before we exit */
-                 char_to_room(ch, cur_room);
-                 send_to_char("Error moving you to room in do_fire\r\n", ch);
-                 return eFAILURE;
-              }
-              victim = get_char_room_vis(ch, target);
-           }
-        }
-
-        if(!victim && new_room && artype == 3 && affected_by_spell(ch, SPELL_FARSIGHT) && dir >= 0) {
-           if(world[new_room].dir_option[dir] && 
-            !(world[new_room].dir_option[dir]->to_room == NOWHERE) && 
-            !IS_SET(world[new_room].dir_option[dir]->exit_info, EX_CLOSED))
-           {
-              new_room = world[new_room].dir_option[dir]->to_room;
-              char_from_room(ch, false);
-              if(IS_SET(world[new_room].room_flags, SAFE)) {
-                 send_to_char("Don't shoot into a safe room!  You might hit someone!\r\n", ch);
-                 char_to_room(ch, cur_room);
-                 return eFAILURE;
-              }
-              if(!char_to_room(ch, new_room)) {
-                 /* put ch into a room before we exit */
-                 char_to_room(ch, cur_room);
-                 send_to_char("Error moving you to room in do_fire\r\n", ch);
-                 return eFAILURE;
-              }
-              victim = get_char_room_vis(ch, target);
-           }        
-        }
-        /* put char back */
-        char_from_room(ch, false);
-        char_to_room(ch, cur_room);
-     }
-     if(!victim && has_skill(ch, SKILL_ARCHERY) > 80) {
-        if((victim = get_char_room_vis(ch, target)))
-           dir = -1;
-     } else if(dir < 0) {
-        send_to_char("You aren't skilled enough to fire at a target this close.\n\r", ch);
-        return eFAILURE;
-     }
-     if(!victim) {
-        if(dir >= 0)
-           send_to_char("You cannot concentrate enough to fire into an adjacent room while fighting.\n\r", ch);
-        else send_to_char("You cannot seem to locate your target.\r\n", ch);
-        return eFAILURE;
-     }
-  } else {
-    send_to_char("Sorry, you must specify a target.\r\n", ch);
-    return eFAILURE;
-  }
-
-/* check for accidental targeting of self */
-  if(victim == ch)
-  {
-    send_to_char("You need to type more of the target's name.\r\n", ch);
-    return eFAILURE;
-  }
-
-/* Protect the newbies! */
-  if(!IS_NPC(victim) && GET_LEVEL(victim) < 6)
-  {
-    send_to_char("Don't shoot at a poor defenseless n00b! :(\r\n", ch);
-    return eFAILURE;
-  }
-/* check if target is fighting */
-/*  if(victim->fighting)
-  {
-      send_to_char("You can't seem to get a clear line of sight.\r\n", ch);
-      return eFAILURE;
-  }*/
-
-/* check for arrows here */
-
-  found = NULL;
-  int where = 0;
-  for (; where < MAX_WEAR; where++)
-  {
-    if(ch->equipment[where])
-     if((ch->equipment[where]->obj_flags.type_flag == ITEM_CONTAINER) 
-         && isname("quiver", ch->equipment[where]->name))
-        {found = find_arrow(ch->equipment[where]);
-        if(found) {
-           get(ch,found,ch->equipment[where],0,9); }
-	   break;
+	if (!canPerform(ch, SKILL_ARCHERY)) {
+		send_to_char(
+				"You've no idea how those pointy things with strings and feathers work.\r\n",
+				ch);
+		return eFAILURE;
 	}
-  }
 
-   if(!found)
-   {
-     send_to_char("You aren't wearing any quivers with arrows!\r\n", ch);
-     return eFAILURE;
-   }
+	if (!ch->equipment[HOLD]) {
+		send_to_char("You need to be holding a bow, moron.\r\n", ch);
+		return eFAILURE;
+	}
 
-  if (IS_NPC(victim) && mob_index[victim->mobdata->nr].virt >= 2300 &&
-        mob_index[victim->mobdata->nr].virt <= 2399)
-  {
-      send_to_char("Your arrow is disintegrated by the fortress' enchantments.\r\n", ch);
-      extract_obj(found);
-      return eFAILURE;
-  }
+	if (!(ch->equipment[HOLD]->obj_flags.type_flag == ITEM_FIREWEAPON)) {
+		send_to_char("You need to be holding a bow, moron.\r\n", ch);
+		return eFAILURE;
+	}
+	/*
+	 if(GET_POS(ch) == POSITION_FIGHTING)
+	 {
+	 send_to_char("Aren't you a bit busy with hand to hand combat?\r\n", ch);
+	 return eFAILURE;
+	 }*/
 
-/* go ahead and shoot */
+	if (ch->shotsthisround > 0) {
+		send_to_char(
+				"Slow down there tiger, you can't fire them that fast!\r\n",
+				ch);
+		return eFAILURE;
+	}
 
-  switch(number(1,2))
-  {
-    case 1: if(dir >= 0)
-               sprintf(buf,"$n fires an arrow %sward.", dirs[dir]);
-            else
-               sprintf(buf, "$n fires an arrow.");
-            act(buf, ch, 0, 0, TO_ROOM, 0);
-            break;
-    case 2: if(dir >= 0)
-               sprintf(buf,"$n lets off an arrow to the %s.", dirs[dir]);
-            else
-               sprintf(buf, "$n lets off an arrow.");
-            act(buf, ch, 0, 0, TO_ROOM, 0);
-            break;
-  }
+	/*  Command syntax is: fire [target] <dir> [arrowtype]
+	 if there is !dir, then check skill level
+	 if there is !arrow, then choose standard arrowtype */
 
-  GET_MANA(ch) -= cost;
+	while (*arg == ' ')
+		arg++;
 
-  if(!skill_success(ch,victim, SKILL_ARCHERY))
-  {
-     retval = eSUCCESS;
-     do_arrow_miss(ch, victim, dir, found);
-  }
-  else {
-     dam = dice(found->obj_flags.value[1], found->obj_flags.value[2]);
-     dam += dice(ch->equipment[HOLD]->obj_flags.value[1], ch->equipment[HOLD]->obj_flags.value[2]);
-     for(int i=0;i < found->num_affects;i++)
-        if(found->affected[i].location == APPLY_DAMROLL && found->affected[i].modifier != 0)
-           dam += found->affected[i].modifier;
-        else if(found->affected[i].location == APPLY_HIT_N_DAM && found->affected[i].modifier != 0)
-           dam += found->affected[i].modifier;
+	if (!*arg) {
+		send_to_char("Shoot at whom?\r\n", ch);
+		return eFAILURE;
+	}
+	half_chop(arg, target, buf2);
+	half_chop(buf2, direct, arrow);
 
-     set_cantquit(ch, victim);
-     sprintf(victname, "%s", GET_SHORT(victim));
-     victroom = victim->in_room;
-     strcpy(victhshr, HSHR(victim));
+	direct[MAX_STRING_LENGTH - 1] = '\0';
+	arrow[MAX_STRING_LENGTH - 1] = '\0';
+	target[MAX_STRING_LENGTH - 1] = '\0';
 
-     if(dir >= 0)
-        send_to_room("An arrow flies into the room with incredible speed!\n\r", victroom);
+	/* make safe rooms checks */
+	if (IS_SET(world[ch->in_room].room_flags, SAFE)) {
+		send_to_char("You can't shoot arrows if yer in a safe room silly.\r\n",
+				ch);
+		return eFAILURE;
+	}
 
-     retval = damage(ch, victim, dam, TYPE_PIERCE, SKILL_ARCHERY, 0);
+	cost = 0;
+	dir = -1;
+	artype = 0;
 
-     if(IS_SET(retval, eVICT_DIED))  {
-        switch(number(1,3)) {
-           case 1:
-              if(dir < 0) {
-                 sprintf(buf, "The %s impales %s through the heart!\r\n", found->short_description, victname);
-                 send_to_room(buf, victroom);
-              } else {
-                 sprintf(buf, "Your shot impales %s through the heart!\r\n", victname);
-                 send_to_char(buf, ch);
-                 sprintf(buf, "%s from the %s impales %s through the chest!\r\n", found->short_description, dirs[rev_dir[dir]], victname);
-                 send_to_room(buf, victroom);
-              }
-              break;
-           case 2:
-              if(dir < 0) {
-                 sprintf(buf, "%s drives through the eye of %s, ending %s life.\r\n", found->short_description, victname, victhshr);
-                 send_to_room(buf, victroom);
-             }  else {
-                 sprintf(buf, "Your %s drives through the eye of %s ending %s life.\r\n", found->short_description, victname, victhshr);
-                 send_to_char(buf, ch);
-                 sprintf(buf, "%s from the %s lands with a solid 'thunk.'\r\n%s falls to the ground, an arrow sticking from %s left eye.\r\n", found->short_description, dirs[rev_dir[dir]], victname, victhshr);
-                 send_to_room(buf, victroom);
-              }
-              break;
-           case 3:
-              if(dir < 0) {
-                 sprintf(buf, "The %s rips through %s's throat.  Blood spouts as %s expires with a final gurgle.\r\n", found->short_description, victname, HSSH(victim));
-                 send_to_room(buf, victroom);
-              } else {
-                 sprintf(buf, "Your shot rips through the throat of %s ending their life with a gurgle.\r\n", victname);
-                 send_to_char(buf, ch);
-                 sprintf(buf, "%s from the %s ripes through the throat of %s!  Blood spouts as %s expires with a final gurgle.\r\n", found->short_description, dirs[rev_dir[dir]], victname, HSSH(victim));
-                 send_to_room(buf, victroom);
-              }
-              break;
-        }
-     } else {
-        if(dir < 0) {
-           sprintf(buf, "You get shot with %s.  Ouch.", found->short_description);
-           act(buf, victim, 0, 0, TO_CHAR, 0);
-           sprintf(buf, "%s hits $n!", found->short_description);
-           act(buf, victim, 0, ch, TO_ROOM, NOTVICT);           
-           sprintf(buf, "You hit %s with %s!\r\n", GET_SHORT(victim), found->short_description);
-           send_to_char(buf, ch);
-        } else {
-           sprintf(buf, "You hit %s with %s!\r\n", GET_SHORT(victim), found->short_description);
-           send_to_char(buf, ch);
-           sprintf(buf, "You get shot with %s from the %s.  Ouch.", found->short_description, dirs[rev_dir[dir]]);
-           act(buf, victim, 0, 0, TO_CHAR, 0);
-           sprintf(buf, "%s from the %s hits $n!", found->short_description, dirs[rev_dir[dir]]);
-           act(buf, victim, 0, 0, TO_ROOM, 0);
-         }
-        GET_POS(victim) = POSITION_STANDING;
+	if (*arrow) {
+		artype = parse_arrow(ch, arrow);
+		if (!artype) {
+			send_to_char("You don't know of that type of arrow.\r\n", ch);
+			return eFAILURE;
+		}
+		switch (artype) {
+		case 1:
+			cost = 30;
+			break;
+		case 2:
+			cost = 20;
+			break;
+		case 3:
+			cost = 10;
+			break;
+		case 4:
+			cost = 40;
+			break;
+		}
+	}
+	if (*direct) {
+		if (direct[0] == 'n')
+			dir = 0;
+		else if (direct[0] == 'e')
+			dir = 1;
+		else if (direct[0] == 's')
+			dir = 2;
+		else if (direct[0] == 'w')
+			dir = 3;
+		else if (direct[0] == 'u')
+			dir = 4;
+		else if (direct[0] == 'd')
+			dir = 5;
+		else if (direct[0] == 'f' || direct[0] == 't' || direct[0] == 'g'
+				|| direct[0] == 'i')
+			artype = parse_arrow(ch, direct);
+		else {
+			send_to_char("Shoot in which direction?\n\r", ch);
+			return eFAILURE;
+		}
 
-        if(IS_NPC(victim)) 
-           retval = mob_arrow_response(ch, victim, dir);
-           if(SOMEONE_DIED(retval)) { // mob died somehow while moving
-              extract_obj(found);
-              return retval;
-           }
-     }
+		if (dir >= 0 && !CAN_GO(ch, dir)) {
+			send_to_char("There is nothing to shoot in that direction.\r\n",
+					ch);
+			return eFAILURE;
+		} else if (artype) {
+			switch (artype) {
+			case 1:
+				cost = 30;
+				break;
+			case 2:
+				cost = 20;
+				break;
+			case 3:
+				cost = 10;
+				break;
+			case 4:
+				cost = 40;
+				break;
+			}
+		}
+	}
 
-     if(!SOMEONE_DIED(retval)) {
-        cur_room = ch->in_room;
-        char_from_room(ch, false);
-        if(!char_to_room(ch, victim->in_room)) {
-           char_to_room(ch, cur_room);
-           send_to_char("Error moving you to room in do_fire.\n\r", ch);
-           return eFAILURE;
-        }
-        retval = weapon_spells(ch, victim, ITEM_MISSILE);
-        //just in case
-        if(IS_SET(retval, eCH_DIED)) {
-           OBJ_DATA *corpse, *next;
-           for(corpse = object_list; corpse; corpse = next) {
-              next = corpse->next;
-              if(IS_OBJ_STAT(corpse, ITEM_PC_CORPSE) && isname(GET_NAME(ch), GET_OBJ_NAME(corpse))) {
-                 obj_from_room(corpse);
-                 obj_to_room(corpse, cur_room);
-                 save_corpses();
-                 break;
-              }
-           }
-        } else {
-           char_from_room(ch, false);
-           char_to_room(ch, cur_room);
-        }
-     }
+	if ((GET_MANA(ch) < cost) && (GET_LEVEL(ch) < ANGEL)) {
+		send_to_char("You don't have enough mana for that arrow.\r\n", ch);
+		return eFAILURE;
+	}
 
-     char buffer[100];
-     if(!SOMEONE_DIED(retval)) {
-        switch(artype) {
-           case 1:
-              dam = 90;
-	      snprintf(buffer, 100, "%d", dam);
-              send_damage("The flames surrounding the arrow burns your wound for | damage!", ch, 0, victim, buffer,
-			  "The flames surrounding the arrow burns your wound!", TO_VICT);
-              send_damage("The flames surrounding the arrow burns $n's wound for | damage!", victim, 0, 0, buffer,
-			  "The flames surrounding the arrow burns $n's wound!", TO_ROOM);
-              retval = damage(ch, victim, dam, TYPE_FIRE, SKILL_FIRE_ARROW, 0);
-              skill_increase_check(ch, SKILL_FIRE_ARROW, has_skill(ch, SKILL_FIRE_ARROW), get_difficulty(SKILL_FIRE_ARROW));
-              enchantmentused = TRUE;
-              break;
-           case 2:
-              dam = 50;
-	      snprintf(buffer, 100, "%d", dam);
-              send_damage("The stray ice shards impale you for | damage!", ch, 0, victim, buffer,
-			  "The stray ice shards impale you!", TO_VICT);
-              send_damage("The stray ice shards impale $n for | damage!", victim, 0, 0, buffer,
-			  "The stray ice shards impale $n!", TO_ROOM);
-              if(number(1, 100) < has_skill(ch, SKILL_ICE_ARROW) / 4 ) {
-                 act("Your body slows down for a second!", ch, 0, victim, TO_VICT, 0);
-                 act("$n's body seems a bit slower!", victim, 0, 0, TO_ROOM, 0);
-                 WAIT_STATE(victim, PULSE_VIOLENCE);
-              }
-              retval = damage(ch, victim, dam, TYPE_COLD, SKILL_ICE_ARROW, 0);
-              skill_increase_check(ch, SKILL_ICE_ARROW, has_skill(ch, SKILL_ICE_ARROW), get_difficulty(SKILL_ICE_ARROW));
-              enchantmentused = TRUE;
-              break;
-           case 3:
-              dam = 30;
-	      snprintf(buffer, 100, "%d", dam);
-              send_damage("The storm cloud enveloping the arrow shocks you for | damage!", ch, 0, victim, buffer,
-			  "The storm cloud enveloping the arrow shocks you!", TO_VICT);
-              send_damage("The storm cloud enveloping the arrow shocks $n for | damage!", victim, 0, ch, buffer,
-			  "The storm cloud enveloping the arrow shocks $n!", TO_ROOM);
-              retval = damage(ch, victim, dam, TYPE_ENERGY, SKILL_TEMPEST_ARROW, 0);
-              skill_increase_check(ch, SKILL_TEMPEST_ARROW, has_skill(ch, SKILL_TEMPEST_ARROW), get_difficulty(SKILL_TEMPEST_ARROW));
-              enchantmentused = TRUE;
-              break;
-           case 4:
-              dam = 70;
-	      snprintf(buffer, 100, "%d", dam);
-              send_damage("The magical stones surrounding the arrow smack into you, hard for | damage.", ch, 0, victim, buffer,
-		  "The magical stones surrounding the arrow smack into you, hard.", TO_VICT);
-              send_damage("The magical stones surrounding the arrow smack hard into $n for | damage.", victim, 0, 0, buffer,
-		  "The magical stones surrounding the arrow smack hard into $n.", TO_ROOM);
-              if(number(1, 100) < has_skill(ch, SKILL_GRANITE_ARROW) / 4) {
-                 act("The stones knock you flat on your ass!", ch, 0, victim, TO_VICT, 0);
-                 act("The stones knock $n flat on $s ass!", victim, 0, 0, TO_ROOM, 0);
-                 GET_POS(victim) = POSITION_SITTING;
-                 WAIT_STATE(victim, PULSE_VIOLENCE);
-              }
-              retval = damage(ch, victim, dam, TYPE_HIT, SKILL_GRANITE_ARROW, 0);
-              skill_increase_check(ch, SKILL_GRANITE_ARROW, has_skill(ch, SKILL_GRANITE_ARROW), get_difficulty(SKILL_GRANITE_ARROW));
-              enchantmentused = TRUE;
-              break;
-           default: break;
-        }
-     }
-  }
+	if (!charge_moves(ch, SKILL_ARCHERY))
+		return eSUCCESS;
 
-  extract_obj(found);
+	/* check if you can see your target */
+	/* put ch in the targets room to check if they are visible */
+	cur_room = ch->in_room;
 
-  if (has_skill(ch, SKILL_ARCHERY) < 51 || enchantmentused) ch->shotsthisround += PULSE_VIOLENCE;
-  else if (has_skill(ch, SKILL_ARCHERY) < 86)               ch->shotsthisround += PULSE_VIOLENCE / 2;
-  else                                                      ch->shotsthisround += 3;
+	if (target[0]) {
+		if (!ch->fighting) {
+			if (dir >= 0) {
+				if (world[cur_room].dir_option[dir]
+						&& !(world[cur_room].dir_option[dir]->to_room == NOWHERE)
+						&& !IS_SET(world[cur_room].dir_option[dir]->exit_info,
+								EX_CLOSED)) {
+					new_room = world[cur_room].dir_option[dir]->to_room;
+					if (IS_SET(world[new_room].room_flags, SAFE)) {
+						send_to_char(
+								"Don't shoot into a safe room!  You might hit someone!\r\n",
+								ch);
+						return eFAILURE;
+					}
+					char_from_room(ch, false);
+					if (!char_to_room(ch, new_room)) {
+						/* put ch into a room before we exit */
+						char_to_room(ch, cur_room);
+						send_to_char("Error moving you to room in do_fire\r\n",
+								ch);
+						return eFAILURE;
+					}
+					victim = get_char_room_vis(ch, target);
+				}
+			}
 
-  return retval;
+			if (!victim && new_room && artype == 3 && dir >= 0) {
+				if (world[new_room].dir_option[dir]
+						&& !(world[new_room].dir_option[dir]->to_room == NOWHERE)
+						&& !IS_SET(world[new_room].dir_option[dir]->exit_info,
+								EX_CLOSED)) {
+					new_room = world[new_room].dir_option[dir]->to_room;
+					char_from_room(ch, false);
+					if (IS_SET(world[new_room].room_flags, SAFE)) {
+						send_to_char(
+								"Don't shoot into a safe room!  You might hit someone!\r\n",
+								ch);
+						char_to_room(ch, cur_room);
+						return eFAILURE;
+					}
+					if (!char_to_room(ch, new_room)) {
+						/* put ch into a room before we exit */
+						char_to_room(ch, cur_room);
+						send_to_char("Error moving you to room in do_fire\r\n",
+								ch);
+						return eFAILURE;
+					}
+					victim = get_char_room_vis(ch, target);
+				}
+			}
+
+			if (!victim && new_room && artype == 3
+					&& affected_by_spell(ch, SPELL_FARSIGHT) && dir >= 0) {
+				if (world[new_room].dir_option[dir]
+						&& !(world[new_room].dir_option[dir]->to_room == NOWHERE)
+						&& !IS_SET(world[new_room].dir_option[dir]->exit_info,
+								EX_CLOSED)) {
+					new_room = world[new_room].dir_option[dir]->to_room;
+					char_from_room(ch, false);
+					if (IS_SET(world[new_room].room_flags, SAFE)) {
+						send_to_char(
+								"Don't shoot into a safe room!  You might hit someone!\r\n",
+								ch);
+						char_to_room(ch, cur_room);
+						return eFAILURE;
+					}
+					if (!char_to_room(ch, new_room)) {
+						/* put ch into a room before we exit */
+						char_to_room(ch, cur_room);
+						send_to_char("Error moving you to room in do_fire\r\n",
+								ch);
+						return eFAILURE;
+					}
+					victim = get_char_room_vis(ch, target);
+				}
+			}
+			/* put char back */
+			char_from_room(ch, false);
+			char_to_room(ch, cur_room);
+		}
+		if (!victim && has_skill(ch, SKILL_ARCHERY) > 80) {
+			if ((victim = get_char_room_vis(ch, target)))
+				dir = -1;
+		} else if (dir < 0) {
+			send_to_char(
+					"You aren't skilled enough to fire at a target this close.\n\r",
+					ch);
+			return eFAILURE;
+		}
+		if (!victim) {
+			if (dir >= 0)
+				send_to_char(
+						"You cannot concentrate enough to fire into an adjacent room while fighting.\n\r",
+						ch);
+			else
+				send_to_char("You cannot seem to locate your target.\r\n", ch);
+			return eFAILURE;
+		}
+	} else {
+		send_to_char("Sorry, you must specify a target.\r\n", ch);
+		return eFAILURE;
+	}
+
+	/* check for accidental targeting of self */
+	if (victim == ch) {
+		send_to_char("You need to type more of the target's name.\r\n", ch);
+		return eFAILURE;
+	}
+
+	/* Protect the newbies! */
+	if (!IS_NPC(victim) && GET_LEVEL(victim) < 6) {
+		send_to_char("Don't shoot at a poor defenseless n00b! :(\r\n", ch);
+		return eFAILURE;
+	}
+	/* check if target is fighting */
+	/*  if(victim->fighting)
+	 {
+	 send_to_char("You can't seem to get a clear line of sight.\r\n", ch);
+	 return eFAILURE;
+	 }*/
+
+	/* check for arrows here */
+
+	found = NULL;
+	int where = 0;
+	for (; where < MAX_WEAR; where++) {
+		if (ch->equipment[where])
+			if ((ch->equipment[where]->obj_flags.type_flag == ITEM_CONTAINER)
+					&& isname("quiver", ch->equipment[where]->name)) {
+				found = find_arrow(ch->equipment[where]);
+				if (found) {
+					get(ch, found, ch->equipment[where], 0, 9);
+				}
+				break;
+			}
+	}
+
+	if (!found) {
+		send_to_char("You aren't wearing any quivers with arrows!\r\n", ch);
+		return eFAILURE;
+	}
+
+	if (IS_NPC(victim) && mob_index[victim->mobdata->nr].virt >= 2300
+			&& mob_index[victim->mobdata->nr].virt <= 2399) {
+		send_to_char(
+				"Your arrow is disintegrated by the fortress' enchantments.\r\n",
+				ch);
+		extract_obj(found);
+		return eFAILURE;
+	}
+
+	/* go ahead and shoot */
+
+	switch (number(1, 2)) {
+	case 1:
+		if (dir >= 0)
+			sprintf(buf, "$n fires an arrow %sward.", dirs[dir]);
+		else
+			sprintf(buf, "$n fires an arrow.");
+		act(buf, ch, 0, 0, TO_ROOM, 0);
+		break;
+	case 2:
+		if (dir >= 0)
+			sprintf(buf, "$n lets off an arrow to the %s.", dirs[dir]);
+		else
+			sprintf(buf, "$n lets off an arrow.");
+		act(buf, ch, 0, 0, TO_ROOM, 0);
+		break;
+	}
+
+	GET_MANA(ch) -= cost;
+
+	if (!skill_success(ch, victim, SKILL_ARCHERY)) {
+		retval = eSUCCESS;
+		do_arrow_miss(ch, victim, dir, found);
+	} else {
+		dam = dice(found->obj_flags.value[1], found->obj_flags.value[2]);
+		dam += dice(ch->equipment[HOLD]->obj_flags.value[1],
+				ch->equipment[HOLD]->obj_flags.value[2]);
+		for (int i = 0; i < found->num_affects; i++)
+			if (found->affected[i].location == APPLY_DAMROLL
+					&& found->affected[i].modifier != 0)
+				dam += found->affected[i].modifier;
+			else if (found->affected[i].location == APPLY_HIT_N_DAM
+					&& found->affected[i].modifier != 0)
+				dam += found->affected[i].modifier;
+
+		set_cantquit(ch, victim);
+		sprintf(victname, "%s", GET_SHORT(victim));
+		victroom = victim->in_room;
+		strcpy(victhshr, HSHR(victim));
+
+		if (dir >= 0)
+			send_to_room(
+					"An arrow flies into the room with incredible speed!\n\r",
+					victroom);
+
+		retval = damage(ch, victim, dam, TYPE_PIERCE, SKILL_ARCHERY, 0);
+
+		if (IS_SET(retval, eVICT_DIED)) {
+			switch (number(1, 3)) {
+			case 1:
+				if (dir < 0) {
+					sprintf(buf, "The %s impales %s through the heart!\r\n",
+							found->short_description, victname);
+					send_to_room(buf, victroom);
+				} else {
+					sprintf(buf, "Your shot impales %s through the heart!\r\n",
+							victname);
+					send_to_char(buf, ch);
+					sprintf(buf,
+							"%s from the %s impales %s through the chest!\r\n",
+							found->short_description, dirs[rev_dir[dir]],
+							victname);
+					send_to_room(buf, victroom);
+				}
+				break;
+			case 2:
+				if (dir < 0) {
+					sprintf(buf,
+							"%s drives through the eye of %s, ending %s life.\r\n",
+							found->short_description, victname, victhshr);
+					send_to_room(buf, victroom);
+				} else {
+					sprintf(buf,
+							"Your %s drives through the eye of %s ending %s life.\r\n",
+							found->short_description, victname, victhshr);
+					send_to_char(buf, ch);
+					sprintf(buf,
+							"%s from the %s lands with a solid 'thunk.'\r\n%s falls to the ground, an arrow sticking from %s left eye.\r\n",
+							found->short_description, dirs[rev_dir[dir]],
+							victname, victhshr);
+					send_to_room(buf, victroom);
+				}
+				break;
+			case 3:
+				if (dir < 0) {
+					sprintf(buf,
+							"The %s rips through %s's throat.  Blood spouts as %s expires with a final gurgle.\r\n",
+							found->short_description, victname, HSSH(victim));
+					send_to_room(buf, victroom);
+				} else {
+					sprintf(buf,
+							"Your shot rips through the throat of %s ending their life with a gurgle.\r\n",
+							victname);
+					send_to_char(buf, ch);
+					sprintf(buf,
+							"%s from the %s ripes through the throat of %s!  Blood spouts as %s expires with a final gurgle.\r\n",
+							found->short_description, dirs[rev_dir[dir]],
+							victname, HSSH(victim));
+					send_to_room(buf, victroom);
+				}
+				break;
+			}
+		} else {
+			if (dir < 0) {
+				sprintf(buf, "You get shot with %s.  Ouch.",
+						found->short_description);
+				act(buf, victim, 0, 0, TO_CHAR, 0);
+				sprintf(buf, "%s hits $n!", found->short_description);
+				act(buf, victim, 0, ch, TO_ROOM, NOTVICT);
+				sprintf(buf, "You hit %s with %s!\r\n", GET_SHORT(victim),
+						found->short_description);
+				send_to_char(buf, ch);
+			} else {
+				sprintf(buf, "You hit %s with %s!\r\n", GET_SHORT(victim),
+						found->short_description);
+				send_to_char(buf, ch);
+				sprintf(buf, "You get shot with %s from the %s.  Ouch.",
+						found->short_description, dirs[rev_dir[dir]]);
+				act(buf, victim, 0, 0, TO_CHAR, 0);
+				sprintf(buf, "%s from the %s hits $n!",
+						found->short_description, dirs[rev_dir[dir]]);
+				act(buf, victim, 0, 0, TO_ROOM, 0);
+			}
+			GET_POS(victim) = POSITION_STANDING;
+
+			if (IS_NPC(victim))
+				retval = mob_arrow_response(ch, victim, dir);
+			if (SOMEONE_DIED(retval)) { // mob died somehow while moving
+				extract_obj(found);
+				return retval;
+			}
+		}
+
+		if (!SOMEONE_DIED(retval)) {
+			cur_room = ch->in_room;
+			char_from_room(ch, false);
+			if (!char_to_room(ch, victim->in_room)) {
+				char_to_room(ch, cur_room);
+				send_to_char("Error moving you to room in do_fire.\n\r", ch);
+				return eFAILURE;
+			}
+			retval = weapon_spells(ch, victim, ITEM_MISSILE);
+			//just in case
+			if (IS_SET(retval, eCH_DIED)) {
+				OBJ_DATA *corpse, *next;
+				for (corpse = object_list; corpse; corpse = next) {
+					next = corpse->next;
+					if (IS_OBJ_STAT(corpse, ITEM_PC_CORPSE)
+							&& isname(GET_NAME(ch), GET_OBJ_NAME(corpse))) {
+						obj_from_room(corpse);
+						obj_to_room(corpse, cur_room);
+						save_corpses();
+						break;
+					}
+				}
+			} else {
+				char_from_room(ch, false);
+				char_to_room(ch, cur_room);
+			}
+		}
+
+		char buffer[100];
+		if (!SOMEONE_DIED(retval)) {
+			switch (artype) {
+			case 1:
+				dam = 90;
+				snprintf(buffer, 100, "%d", dam);
+				send_damage(
+						"The flames surrounding the arrow burns your wound for | damage!",
+						ch, 0, victim, buffer,
+						"The flames surrounding the arrow burns your wound!",
+						TO_VICT);
+				send_damage(
+						"The flames surrounding the arrow burns $n's wound for | damage!",
+						victim, 0, 0, buffer,
+						"The flames surrounding the arrow burns $n's wound!",
+						TO_ROOM);
+				retval = damage(ch, victim, dam, TYPE_FIRE, SKILL_FIRE_ARROW,
+						0);
+				skill_increase_check(ch, SKILL_FIRE_ARROW,
+						has_skill(ch, SKILL_FIRE_ARROW),
+						get_difficulty(SKILL_FIRE_ARROW));
+				enchantmentused = TRUE;
+				break;
+			case 2:
+				dam = 50;
+				snprintf(buffer, 100, "%d", dam);
+				send_damage("The stray ice shards impale you for | damage!", ch,
+						0, victim, buffer, "The stray ice shards impale you!",
+						TO_VICT);
+				send_damage("The stray ice shards impale $n for | damage!",
+						victim, 0, 0, buffer, "The stray ice shards impale $n!",
+						TO_ROOM);
+				if (number(1, 100) < has_skill(ch, SKILL_ICE_ARROW) / 4) {
+					act("Your body slows down for a second!", ch, 0, victim,
+							TO_VICT, 0);
+					act("$n's body seems a bit slower!", victim, 0, 0, TO_ROOM,
+							0);
+					WAIT_STATE(victim, PULSE_VIOLENCE);
+				}
+				retval = damage(ch, victim, dam, TYPE_COLD, SKILL_ICE_ARROW, 0);
+				skill_increase_check(ch, SKILL_ICE_ARROW,
+						has_skill(ch, SKILL_ICE_ARROW),
+						get_difficulty(SKILL_ICE_ARROW));
+				enchantmentused = TRUE;
+				break;
+			case 3:
+				dam = 30;
+				snprintf(buffer, 100, "%d", dam);
+				send_damage(
+						"The storm cloud enveloping the arrow shocks you for | damage!",
+						ch, 0, victim, buffer,
+						"The storm cloud enveloping the arrow shocks you!",
+						TO_VICT);
+				send_damage(
+						"The storm cloud enveloping the arrow shocks $n for | damage!",
+						victim, 0, ch, buffer,
+						"The storm cloud enveloping the arrow shocks $n!",
+						TO_ROOM);
+				retval = damage(ch, victim, dam, TYPE_ENERGY,
+						SKILL_TEMPEST_ARROW, 0);
+				skill_increase_check(ch, SKILL_TEMPEST_ARROW,
+						has_skill(ch, SKILL_TEMPEST_ARROW),
+						get_difficulty(SKILL_TEMPEST_ARROW));
+				enchantmentused = TRUE;
+				break;
+			case 4:
+				dam = 70;
+				snprintf(buffer, 100, "%d", dam);
+				send_damage(
+						"The magical stones surrounding the arrow smack into you, hard for | damage.",
+						ch, 0, victim, buffer,
+						"The magical stones surrounding the arrow smack into you, hard.",
+						TO_VICT);
+				send_damage(
+						"The magical stones surrounding the arrow smack hard into $n for | damage.",
+						victim, 0, 0, buffer,
+						"The magical stones surrounding the arrow smack hard into $n.",
+						TO_ROOM);
+				if (number(1, 100) < has_skill(ch, SKILL_GRANITE_ARROW) / 4) {
+					act("The stones knock you flat on your ass!", ch, 0, victim,
+							TO_VICT, 0);
+					act("The stones knock $n flat on $s ass!", victim, 0, 0,
+							TO_ROOM, 0);
+					GET_POS(victim) = POSITION_SITTING;
+					WAIT_STATE(victim, PULSE_VIOLENCE);
+				}
+				retval = damage(ch, victim, dam, TYPE_HIT, SKILL_GRANITE_ARROW,
+						0);
+				skill_increase_check(ch, SKILL_GRANITE_ARROW,
+						has_skill(ch, SKILL_GRANITE_ARROW),
+						get_difficulty(SKILL_GRANITE_ARROW));
+				enchantmentused = TRUE;
+				break;
+			default:
+				break;
+			}
+		}
+	}
+
+	extract_obj(found);
+
+	DC::instance().shooting_list.insert(ch);
+	if (has_skill(ch, SKILL_ARCHERY) < 51 || enchantmentused)
+		ch->shotsthisround += PULSE_VIOLENCE;
+	else if (has_skill(ch, SKILL_ARCHERY) < 86)
+		ch->shotsthisround += PULSE_VIOLENCE / 2;
+	else
+		ch->shotsthisround += 3;
+
+	return retval;
 }
 
 int do_mind_delve(struct char_data *ch, char *arg, int cmd)
