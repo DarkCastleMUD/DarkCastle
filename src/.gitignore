@@ -1,1 +1,9 @@
 dcastle.debug*
+*gcno
+*gcda
+*/*gcno
+*/*gcda
+test.cpp
+test
+*~
+gmon.out
