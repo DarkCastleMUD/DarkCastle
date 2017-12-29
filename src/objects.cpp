@@ -9,10 +9,6 @@ extern "C"
   #include <ctype.h>
   #include <string.h>
 }
-#ifdef LEAK_CHECK
-#include <dmalloc.h>
-#endif
-
 #include <obj.h>
 #include <connect.h>
 #include <utility.h>
@@ -171,38 +167,36 @@ int damage_eq_once(obj_data * obj)
   return 1;
 }
 
-void object_activity()
-{
-    struct active_object *active_obj;
-    struct active_object *next_obj;
-  
-    for(active_obj = &active_head; active_obj && active_obj != (struct active_object *)0x95959595; active_obj = next_obj) {
-        next_obj = active_obj->next;                                
-        if(active_obj->obj && active_obj->obj != (struct obj_data *)0x95959595) { 
-	  if (obj_index[active_obj->obj->item_number].non_combat_func)  
-            obj_index[active_obj->obj->item_number].non_combat_func(NULL, active_obj->obj, 0, "", NULL);
-	  else if (active_obj->obj->obj_flags.type_flag == ITEM_MEGAPHONE
-		   && active_obj->obj->ex_description && active_obj->obj->obj_flags.value[0]-- == 0)
-	    {
-  	      active_obj->obj->obj_flags.value[0] = ((obj_data *) obj_index[active_obj->obj->item_number].item)->obj_flags.value[1];
- 	      send_to_room(active_obj->obj->ex_description->description, active_obj->obj->in_room, TRUE);
-	    } else
-	    {
-		int retval = 0;
-		extern struct zone_data *zone_table;
+void object_activity() {
+	struct active_object *active_obj;
+	struct active_object *next_obj;
 
-		if (active_obj->obj->in_room != NOWHERE) {
-		    if(zone_table[world[active_obj->obj->in_room].zone].players)
-			retval = oprog_rand_trigger(active_obj->obj);
-		} else  retval = oprog_rand_trigger(active_obj->obj);
-		if (!SOMEONE_DIED(retval) && objExists(active_obj->obj))
-		  oprog_arand_trigger(active_obj->obj);
-	    }
-        } 
-        //else {
-        //}
-    }
-    return;
+	for (active_obj = &active_head; active_obj && active_obj != (struct active_object *) 0x95959595; active_obj = next_obj) {
+		next_obj = active_obj->next;
+		if (active_obj->obj && active_obj->obj != (struct obj_data *) 0x95959595) {
+			if (obj_index[active_obj->obj->item_number].non_combat_func)
+				obj_index[active_obj->obj->item_number].non_combat_func(NULL, active_obj->obj, 0, "", NULL);
+			else if (active_obj->obj->obj_flags.type_flag == ITEM_MEGAPHONE && active_obj->obj->ex_description && active_obj->obj->obj_flags.value[0]-- == 0) {
+				active_obj->obj->obj_flags.value[0] = ((obj_data *) obj_index[active_obj->obj->item_number].item)->obj_flags.value[1];
+				send_to_room(active_obj->obj->ex_description->description, active_obj->obj->in_room, TRUE);
+			} else {
+				int retval = 0;
+				extern struct zone_data *zone_table;
+
+				if (active_obj->obj->in_room != NOWHERE) {
+					if (zone_table[world[active_obj->obj->in_room].zone].players)
+						retval = oprog_rand_trigger(active_obj->obj);
+				} else
+					retval = oprog_rand_trigger(active_obj->obj);
+				if (!SOMEONE_DIED(retval) && objExists(active_obj->obj))
+					oprog_arand_trigger(active_obj->obj);
+			}
+		}
+		//else {
+		//}
+	}
+	DC::instance().removeDead();
+	return;
 }
 
 void name_from_drinkcon(struct obj_data *obj)
