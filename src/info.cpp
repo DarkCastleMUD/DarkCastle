@@ -1397,7 +1397,7 @@ int do_score(struct char_data *ch, char *argument, int cmd)
    int  level = 0;
    int to_dam, to_hit, spell_dam;
   // int flying = 0;
-   bool affect_found[AFF_MAX] = {};
+	bool affect_found[AFF_MAX + 1] = { false };
    bool modifyOutput;
 
    struct affected_type *aff;
@@ -1637,7 +1637,7 @@ int do_score(struct char_data *ch, char *argument, int cmd)
    found = FALSE;
 
    extern char *affected_bits[];
-   for(int aff_idx = 1; aff_idx < AFF_MAX+1; aff_idx++)
+	for (int aff_idx = 1; aff_idx < (AFF_MAX + 1); aff_idx++)
    {
      if((!affect_found[aff_idx])
         && IS_AFFECTED(ch, aff_idx))
