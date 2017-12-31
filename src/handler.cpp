@@ -219,7 +219,7 @@ bool isname(const char *needle, const char *haystack) {
 bool isname2(const char *needle, const char *haystack) {
 	const char* hsPtr = haystack;
 
-	cerr << "isname2: [" << needle << "][" << haystack << "] = ";
+//	cerr << "isname2: [" << needle << "][" << haystack << "] = ";
 
 	// failure if needle is empty
 	if (strlen(needle) == 0) {
