@@ -126,12 +126,16 @@ char *fname(char *namelist) {
 /// Try to find in the Haystack the Needle - ignore case
 /// Based on https://stackoverflow.com/questions/3152241/case-insensitive-stdstring-find#
 bool isname(const std::string &strNeedle, const std::string &strHaystack) {
+	if (strNeedle.empty()) {
+		return false;
+	}
 	auto it = search(strHaystack.begin(), strHaystack.end(), strNeedle.begin(), strNeedle.end(),
 			[](char ch1, char ch2) {return std::tolower(ch1) == std::tolower(ch2) && !isspace(ch1);});
-	return (it != strHaystack.end());
+	return (it != strHaystack.end() && (it == strHaystack.begin() || isspace(*(it - 1))));
 }
 
 bool isname(const char *str, const char *namelist) {
+//	cerr << "isname: [" << str << "][" << namelist << "] = " << isname(string(str), string(namelist)) << endl;
 	return isname(string(str), string(namelist));
 }
 
@@ -139,10 +143,11 @@ bool isname2(const std::string &strNeedle, const std::string &strHaystack) {
 	auto it = search(strHaystack.begin(), strHaystack.end(), strNeedle.begin(), strNeedle.end(),
 			[](char ch1, char ch2) {return std::tolower(ch1) == std::tolower(ch2);});
 	// We're at the beginning or at a word boundary
-	return (it != strHaystack.end() && (it == strHaystack.begin() || isspace(*(it-1))));
+	return (it != strHaystack.end() && (it == strHaystack.begin() || isspace(*(it - 1))));
 }
 
 bool isname2(const char *str, const char *namelist) {
+//	cerr << "isname2: [" << str << "][" << namelist << "] = " << isname(string(str), string(namelist)) << endl;
 	return isname2(string(str), string(namelist));
 }
 
@@ -157,24 +162,36 @@ bool isname2(const char *str, const char *namelist) {
 bool isname(const char *needle, const char *haystack) {
 	const char *curname, *curstr;
 
+//	cerr << "isname: [" << needle << "][" << haystack << "] = ";
+
 	if (!needle || !haystack) {
+//		cerr << "0" << endl;
 		return false;
 	}
 
-	if (strlen(needle) == 0)
+	if (strlen(needle) == 0) {
+//		cerr << "0" << endl;
 		return false;
-	if (strlen(haystack) == 0)
+	}
+
+	if (strlen(haystack) == 0) {
+//		cerr << "0" << endl;
 		return false;
+	}
 
 	curname = haystack;
 
 	for (;;) {
 		for (curstr = needle;; curstr++, curname++) {
-			if (!*curstr && !isalpha(*curname))
+			if (!*curstr && !isalpha(*curname)) {
+//				cerr << "1" << endl;
 				return true;
+			}
 
-			if (!*curname)
+			if (!*curname) {
+//				cerr << "0" << endl;
 				return false;
+			}
 
 			if (!*curstr || *curname == ' ')
 				break;
@@ -187,11 +204,14 @@ bool isname(const char *needle, const char *haystack) {
 
 		for (; isalpha(*curname); curname++)
 			;
-		if (!*curname)
+		if (!*curname) {
+//			cerr << "0" << endl;
 			return false;
+		}
 		curname++; /* first char of new_new name */
 	}
 
+//	cerr << "0" << endl;
 	return false;
 }
 
@@ -199,27 +219,36 @@ bool isname(const char *needle, const char *haystack) {
 bool isname2(const char *needle, const char *haystack) {
 	const char* hsPtr = haystack;
 
+	cerr << "isname2: [" << needle << "][" << haystack << "] = ";
+
 	// failure if needle is empty
-	if (strlen(needle) == 0)
-	return false;
+	if (strlen(needle) == 0) {
+//		cerr << "0" << endl;
+		return false;
+	}
 
 	for (;;) {
 		// success if needle matches same chars in namelist
-		if (!strncasecmp(needle, hsPtr, strlen(needle)))
-		return true;
+		if (!strncasecmp(needle, hsPtr, strlen(needle))) {
+//			cerr << "1" << endl;
+			return true;
+		}
 
 		// skip a word to form new sub-string with remaining word(s)
 		for (; isalpha(*hsPtr); hsPtr++)
 		;
 
 		// failure if we are at the end of the string
-		if (!*hsPtr)
-		return false;
+		if (!*hsPtr) {
+//			cerr << "0" << endl;
+			return false;
+		}
 
 		// first char of new sub-string
 		hsPtr++;
 	}
 
+//	cerr << "0" << endl;
 	return false;
 }
 #endif
@@ -2406,7 +2435,7 @@ CHAR_DATA *get_char_room(char *name, int room, bool careful) {
 /* search all over the world for a char, and return a pointer if found */
 CHAR_DATA *get_char(char *name) {
 	CHAR_DATA *partial_match;
-	int j, number;
+	int j = 0, number = 0;
 	char tmpname[MAX_INPUT_LENGTH];
 	char *tmp;
 
@@ -3496,7 +3525,7 @@ CHAR_DATA *get_pc_room_vis_exact(CHAR_DATA *ch, const char *name) {
 CHAR_DATA *get_mob_vis(CHAR_DATA *ch, char *name) {
 	CHAR_DATA *i;
 	CHAR_DATA *partial_match;
-	int j, number;
+	int j = 0, number = 0;
 	char tmpname[MAX_INPUT_LENGTH];
 	char *tmp;
 
@@ -3602,7 +3631,7 @@ CHAR_DATA *get_char_vis(CHAR_DATA *ch, char *name) {
 	CHAR_DATA *i;
 	CHAR_DATA *partial_match;
 
-	int j, number;
+	int j = 0, number = 0;
 	char tmpname[MAX_INPUT_LENGTH];
 	char *tmp;
 
