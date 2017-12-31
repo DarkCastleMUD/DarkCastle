@@ -4760,15 +4760,16 @@ void reset_zone(int zone)
 		zone_table[zone].repops_with_bonus++;
 
 		auto &character_list = DC::instance().character_list;
-		for_each(character_list.begin(), character_list.end(),
-		        [&zone](char_data * const &tmp_victim) {
+		for (auto &tmp_victim : character_list) {
+			if (tmp_victim->in_room == NOWHERE) {
+				continue;
+			}
 			if (IS_NPC(tmp_victim)
 					&& !ISSET(tmp_victim->mobdata->actflags, ACT_NO_GOLD_BONUS)
 					&& world[tmp_victim->in_room].zone == zone) {
 				tmp_victim->gold *= 1.10;
 			}
-		});
-
+		}
 	}
 }
 
