@@ -1983,7 +1983,7 @@ char *expand_data(char_data *ch, char *orig)
     *(ptr-l) = '~';
     for (r = 1; ; r++)
     {
-       if ((ptr+r) == '\0')
+       if ((ptr+r) == 0)
         break;
        if (!isalpha(*(ptr+r)) && (*(ptr+r) != ',') && (*(ptr-l) != '_'))
 	break;
