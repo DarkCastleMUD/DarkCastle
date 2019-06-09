@@ -660,7 +660,7 @@ int do_botcheck(struct char_data *ch, char *argument, int cmd)
   }
 
   strcpy(name2, "0.");
-  strncat(name2, name, MAX_STRING_LENGTH);
+  strncat(name2, name, MAX_STRING_LENGTH-1);
   victim = get_char(name2);
 
 
@@ -1400,7 +1400,7 @@ int do_score(struct char_data *ch, char *argument, int cmd)
    int  level = 0;
    int to_dam, to_hit, spell_dam;
   // int flying = 0;
-   bool affect_found[AFF_MAX] = {};
+   bool affect_found[AFF_MAX + 1] = { false };
    bool modifyOutput;
 
    struct affected_type *aff;
