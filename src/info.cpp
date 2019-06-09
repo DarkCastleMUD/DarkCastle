@@ -323,6 +323,23 @@ void show_obj_to_char(struct obj_data *object, struct char_data *ch, int mode)
             strcat(buffer, " [$B$4Falling Apart$R]");
          else strcat(buffer, " [$5Pile of Scraps$R]");
 */      }
+      if (IS_SET(object->obj_flags.more_flags, ITEM_24H_SAVE) && !IS_SET(object->obj_flags.extra_flags, ITEM_NOSAVE)) {
+    	  time_t now = time(NULL);
+    	  time_t expires = object->save_expiration;
+    	  if (expires == 0) {
+    		  strcat(buffer, " $R($B$0unsaved$R)");
+    	  } else if (now >= expires) {
+    		  strcat(buffer, " $R($B$0expired$R)");
+    	  } else {
+    		  char timebuffer[100];
+#if __x86_64__
+    		  snprintf(timebuffer, 100, " $R($B$0%llu secs left$R)", expires-now);
+#else
+    		  snprintf(timebuffer, 100, " $R($B$0%lu secs left$R)", expires-now);
+#endif
+    		  strcat(buffer, timebuffer);
+    	  }
+      }
 
       if(mode == 0) // 'look'
          strcat(buffer, "$B$1"); // setup color background
@@ -1537,8 +1554,9 @@ int do_score(struct char_data *ch, char *argument, int cmd)
    //      if (*aff_name && !str_cmp(aff_name, "fly")) flying = 1;
          switch(aff->type) {
 	   case BASE_SETS+SET_RAGER:
-	     if (aff->location == 0)
-		aff_name = "Battlerager's Fury";
+	     if (aff->location == 0) {
+	    	 aff_name = "Battlerager's Fury";
+	     }
 		break;
            case BASE_SETS+SET_MOSS:
              if(aff->location == 0)
