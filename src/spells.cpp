@@ -1018,12 +1018,12 @@ void affect_update( int32 duration_type )
 	        send_to_char(spell_wear_off_msg[af->type], i);
 	        send_to_char("\n\r", i);
 	     }
-	  affect_remove(i, af, 0);
           if(af->type == SPELL_ETHEREAL_FOCUS) {
             // NOTICE:  this is a TEMP room flag
             REMOVE_BIT(world[i->in_room].temp_room_flags, ROOM_ETHEREAL_FOCUS);
             act("$n shakes his $s head suddenly in confusion losing $s magical focus.", i, NULL, NULL, TO_ROOM, NOTVICT);
           }
+	  affect_remove(i, af, 0);
 	}
       }
   }
