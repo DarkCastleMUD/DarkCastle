@@ -1,1 +1,5 @@
 dcastle.debug*
+*.gcda
+*.gcno
+*~
+gmon.out
