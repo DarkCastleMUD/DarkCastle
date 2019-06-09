@@ -118,6 +118,12 @@ void mobile_activity(void)
     // It also means the mob has to check to make sure he's not already in
     // combat for stuff he shouldn't be able to do while fighting:)
     // And paralyze...
+    if (ch->in_room == -1) {
+      log("ch->in_room set to -1 but on character_list. Averting crash.", -1, LOG_BUG);
+      produce_coredump();
+      continue;
+    }
+
     if(mob_index[ch->mobdata->nr].non_combat_func) {
       retval = ((*mob_index[ch->mobdata->nr].non_combat_func) (ch, 0, 0, "", ch));
       if(!IS_SET(retval, eFAILURE) || SOMEONE_DIED(retval))
@@ -136,12 +142,6 @@ void mobile_activity(void)
     done = 0;
 
 // TODO - Try to make the 'average' mob IQ higher
-
-
-    if (ch->in_room == -1) {
-      log("ch->in_room set to -1 but on character_list. Averting crash.", -1, LOG_BUG);
-      produce_coredump();
-    }
     
     // Only activate mprog random triggers if someone is in the zone
     if(zone_table[world[ch->in_room].zone].players)
