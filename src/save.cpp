@@ -1094,6 +1094,12 @@ struct obj_data *  obj_store_to_char(CHAR_DATA *ch, FILE *fpsave, struct obj_dat
     fread(&obj->obj_flags.cost, sizeof(obj->obj_flags.cost), 1, fpsave);
     fread(&mod_type, sizeof(char), 3, fpsave);
   }
+  if(!strcmp("SAV", mod_type))
+  {
+    fread(&obj->save_expiration, sizeof(time_t), 1, fpsave);
+    fread(&mod_type, sizeof(char), 3, fpsave);
+  }
+
 
   // TODO - put extra desc support here
   // NEW READS GO HERE
@@ -1184,6 +1190,19 @@ bool put_obj_in_store (struct obj_data *obj, CHAR_DATA *ch, FILE *fpsave, int we
 
   if(IS_SET(obj->obj_flags.extra_flags, ITEM_NOSAVE))
     return TRUE;
+
+  if (IS_SET(obj->obj_flags.more_flags, ITEM_24H_SAVE)) {
+	  // First time we try to save this object we set the
+	  // expiration to 24 hours from this point
+	  if (obj->save_expiration == 0) {
+		  //obj->save_expiration = time(NULL) + (60 * 60 * 24);
+		  obj->save_expiration = time(NULL) + (60);
+	  } else if (time(NULL) > obj->save_expiration){
+		  // If the object's window for saving has expired then
+		  // we don't save it as-if it had ITEM_NOSAVE
+		  return TRUE;
+	  }
+    }
 
   if (obj->item_number < 0)
     return TRUE;
@@ -1369,6 +1388,11 @@ bool put_obj_in_store (struct obj_data *obj, CHAR_DATA *ch, FILE *fpsave, int we
   {
     fwrite("COS", sizeof(char), 3, fpsave);
     fwrite(&obj->obj_flags.cost, sizeof(obj->obj_flags.cost), 1, fpsave);
+  }
+
+  if (IS_SET(obj->obj_flags.more_flags, ITEM_24H_SAVE)) {
+	  fwrite("SAV", sizeof(char), 3, fpsave);
+	  fwrite(&obj->save_expiration, sizeof(time_t), 1, fpsave);
   }
 
   // extra descs are a little strange...it's a pointer to a list of them
