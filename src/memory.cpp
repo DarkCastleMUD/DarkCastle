@@ -1,9 +1,9 @@
-extern "C"
-{
-  #include <stdio.h>
+extern "C" {
+#include <stdio.h>
+#include <stdlib.h>
 }
 #ifdef LEAK_CHECK
-#include <dmalloc.h>
+
 #endif
 
 #include <memory.h>
