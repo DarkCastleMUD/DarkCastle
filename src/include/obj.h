@@ -143,6 +143,7 @@ void heightweight(char_data *ch, bool add);
 #define ITEM_PC_CORPSE_LOOTED   1<<8
 #define ITEM_NO_SCRAP 		1<<9
 #define ITEM_CUSTOM             1<<10
+#define ITEM_24H_SAVE			1<<11
 
 /* Bitvector for 'size' */
 #define SIZE_ANY		1
@@ -252,6 +253,7 @@ struct obj_data {
 	table_data *table;
 	machine_data *slot;
 	wheel_data *wheel;
+	time_t save_expiration;
 };
 
 /* For 'equipment' */
