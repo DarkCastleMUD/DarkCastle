@@ -1003,6 +1003,7 @@ char *more_obj_bits[] =
     "PC_CORPSE_LOOTED",
     "NO_SCRAP",
     "CUSTOM",
+	"24H_SAVE",
     "\n"
 };
 
