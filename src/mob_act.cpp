@@ -137,6 +137,12 @@ void mobile_activity(void)
 
 // TODO - Try to make the 'average' mob IQ higher
 
+
+    if (ch->in_room == -1) {
+      log("ch->in_room set to -1 but on character_list. Averting crash.", -1, LOG_BUG);
+      produce_coredump();
+    }
+    
     // Only activate mprog random triggers if someone is in the zone
     if(zone_table[world[ch->in_room].zone].players)
       retval = mprog_random_trigger( ch );
