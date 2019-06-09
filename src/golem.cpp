@@ -338,7 +338,7 @@ int do_golem_score(struct char_data *ch, char *argument, int cmd)
    int64 exp_needed;
 
    uint32 immune=0,suscept=0,resist=0;
-   char *isrString='\0';
+   string isrString;
 
    sprintf(race, "%s", race_info[(int)GET_RACE(ch)].singular_name);
    exp_needed = (int)(exp_table[(int)GET_LEVEL(ch) + 19] - (int64)GET_EXP(ch));
@@ -395,12 +395,12 @@ int do_golem_score(struct char_data *ch, char *argument, int cmd)
    {
       for(int i=0;i<=ISR_MAX;i++) {
         isrString=get_isr_string(immune, i);
-        if(isrString!='\0') {
+	if(!isrString.empty()) {
            scratch = frills[level];
            sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\n\r",
-                   scratch,"Immunity",isrString, scratch);
+                   scratch,"Immunity",isrString.c_str(), scratch);
            send_to_char(buf, master);
-           isrString='\0';
+           isrString=string();
            if(++level == 4)
               level = 0;
         }
@@ -410,12 +410,12 @@ int do_golem_score(struct char_data *ch, char *argument, int cmd)
    {
       for(int i=0;i<=ISR_MAX;i++) {
         isrString=get_isr_string(suscept, i);
-        if(isrString!='\0') {
+	if(!isrString.empty()) {
            scratch = frills[level];
            sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\n\r",
-                   scratch,"Susceptibility",isrString, scratch);
+                   scratch,"Susceptibility",isrString.c_str(), scratch);
            send_to_char(buf, master);
-           isrString='\0';
+           isrString=string();
            if(++level == 4)
               level = 0;
         }
@@ -425,12 +425,12 @@ int do_golem_score(struct char_data *ch, char *argument, int cmd)
    {
       for(int i=0;i<=ISR_MAX;i++) {
         isrString=get_isr_string(resist, i);
-        if(isrString!='\0') {
+	if(!isrString.empty()) {
            scratch = frills[level];
            sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\n\r",
-                   scratch,"Resistibility",isrString, scratch);
+                   scratch,"Resistibility",isrString.c_str(), scratch);
            send_to_char(buf, master);
-           isrString='\0';
+           isrString=string();
            if(++level == 4)
               level = 0;
         }
