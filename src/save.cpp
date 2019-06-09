@@ -1195,8 +1195,7 @@ bool put_obj_in_store (struct obj_data *obj, CHAR_DATA *ch, FILE *fpsave, int we
 	  // First time we try to save this object we set the
 	  // expiration to 24 hours from this point
 	  if (obj->save_expiration == 0) {
-		  //obj->save_expiration = time(NULL) + (60 * 60 * 24);
-		  obj->save_expiration = time(NULL) + (60);
+		  obj->save_expiration = time(NULL) + (60 * 60 * 24);
 	  } else if (time(NULL) > obj->save_expiration){
 		  // If the object's window for saving has expired then
 		  // we don't save it as-if it had ITEM_NOSAVE
