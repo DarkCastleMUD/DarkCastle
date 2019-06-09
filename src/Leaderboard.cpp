@@ -764,8 +764,6 @@ int do_leaderboard(struct char_data *ch, char *argument, int cmd) {
 			continue;
 		if (!CAN_SEE(ch, d->character))
 			continue;
-		if (GET_MAX_HIT(d->character) > 20000)
-			continue;
 
 		if (validclass && GET_CLASS(d->character) != k + 1)
 			continue;
