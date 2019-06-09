@@ -120,7 +120,7 @@ void mobile_activity(void)
     // And paralyze...
     if (ch->in_room == -1) {
       log("ch->in_room set to -1 but on character_list. Averting crash.", -1, LOG_BUG);
-      produce_coredump();
+      produce_coredump(ch);
       continue;
     }
 
@@ -132,7 +132,6 @@ void mobile_activity(void)
 
     if(ch->fighting) // that's it for monsters busy fighting
       continue;
-
 
     if(!AWAKE(ch))
       continue;

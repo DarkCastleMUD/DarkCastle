@@ -1901,10 +1901,11 @@ bool is_in_game(char_data *ch)
   return false;
 }
 
-void produce_coredump(void)
+void produce_coredump(void *ptr)
 {
-  static int counter = 0;
+  logf(IMMORTAL, LOG_BUG, "produce_coredump called with pointer %p", ptr);
 
+  static int counter = 0;
   if (++counter > COREDUMP_MAX) {
     logf(IMMORTAL, LOG_BUG, "Error detected: Unable to produce coredump. Limit of %d reached.", COREDUMP_MAX);
     return;

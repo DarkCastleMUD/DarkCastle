@@ -462,7 +462,7 @@ int do_shutdown(struct char_data *ch, char *argument, int cmd)
         }
     }
     else if (!strcmp(arg1, "core")) {
-      produce_coredump();
+      produce_coredump(ch);
       log("Corefile produced.", IMMORTAL, LOG_BUG);
     }
     else if(!strcmp(arg1, "die")) {
