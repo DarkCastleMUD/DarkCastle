@@ -755,7 +755,7 @@ int do_sing(CHAR_DATA *ch, char *arg, int cmd)
 	struct songInfo data;
 	data.song_number = spl;
 	data.song_timer = 0;
-	data.song_data = '\0';
+	data.song_data = "";
 	ch->songs.push_back(data);
       }
 
