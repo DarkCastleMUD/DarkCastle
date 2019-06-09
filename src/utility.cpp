@@ -2276,7 +2276,7 @@ char * numToStringTH(int number)
   case 9: return "ninth";
   case 10: return "tenth";
   case 11: return "eleventh";
-  default: return '\0';
+  default: return "";
  }
 }
 
@@ -2405,7 +2405,7 @@ const char *find_profession(int c_class, uint8_t profession)
 char *get_isr_string(uint32 isr, byte loc)
 {
    if(!IS_SET(isr,1<<loc)) {
-      return '\0';
+     return "";
    }
 
    switch(loc) {
