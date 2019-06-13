@@ -894,6 +894,7 @@ void nanny(struct descriptor_data *d, char *arg)
       // if they have already entered their name, drop through.  Otherwise stop and wait for input
       if(!*arg)
         break;
+        /* no break */
 
    case CON_GET_NAME:
 
