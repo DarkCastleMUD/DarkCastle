@@ -669,17 +669,14 @@ int do_botcheck(struct char_data *ch, char *argument, int cmd)
 {
   char_data *victim;
   char name[MAX_STRING_LENGTH];
-  char name2[MAX_STRING_LENGTH];
   argument = one_argument(argument, name);
   if (!*name) {
     send_to_char("botcheck <player> or all\n\r\n\r", ch);
     return eFAILURE;
   }
 
-  strcpy(name2, "0.");
-  strncat(name2, name, MAX_STRING_LENGTH-1);
-  victim = get_char(name2);
-
+  string name2 = "0." + string(name);
+  victim = get_char(name2.c_str());
 
   if (victim == NULL && name != NULL && !strcmp(name, "all")) {
     descriptor_data *d;
@@ -858,9 +855,10 @@ int do_look(struct char_data *ch, char *argument, int cmd) {
 		send_to_char("You can't see anything but stars!\n\r", ch);
 	else if (GET_POS(ch) == POSITION_SLEEPING)
 		send_to_char("You can't see anything, you're sleeping!\n\r", ch);
-	else if (check_blind(ch))
-		;
-	else if (IS_DARK(ch->in_room) && (!IS_MOB(ch) && !ch->pcdata->holyLite)) {
+	else if (check_blind(ch)) {
+		ansi_color( GREY, ch);
+		return eSUCCESS;
+	} else if (IS_DARK(ch->in_room) && (!IS_MOB(ch) && !ch->pcdata->holyLite)) {
 		send_to_char("It is pitch black...\n\r", ch);
 		list_char_to_char(world[ch->in_room].people, ch, 0);
 		send_to_char("$R", ch);
@@ -1174,7 +1172,8 @@ int do_look(struct char_data *ch, char *argument, int cmd) {
 				return eFAILURE;
 			}
 		}
-		case 9: { // look through
+	      /* no break */
+		case 9:  // look through
 			if (found != TRUE) {
 				if (*arg2) {
 					if ((tmp_object = get_obj_in_list_vis(ch, arg2,
@@ -1206,9 +1205,9 @@ int do_look(struct char_data *ch, char *argument, int cmd) {
 				send_to_char("You can't seem to look through that.\n\r", ch);
 				return eFAILURE;
 			}
-		}
-
-			/* look ''		*/
+			/* no break */
+		/* no break */
+		/* look ''		*/
 		case 10: {
 			char sector_buf[50];
 			char rflag_buf[MAX_STRING_LENGTH];
