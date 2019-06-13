@@ -40,10 +40,7 @@ int do_harmtouch(struct char_data *ch, char *argument, int cmd)
    int retval = eSUCCESS, dam;
 
    one_argument(argument, victim_name);
-
-   if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL)
-      ;
-   else if(!has_skill(ch, SKILL_HARM_TOUCH)) {
+   if(IS_PC(ch) && GET_LEVEL(ch) < ARCHANGEL && !has_skill(ch, SKILL_HARM_TOUCH)) {
       send_to_char("You dunno even HOW to harm touch.\r\n", ch);
       return eFAILURE;
    }
@@ -137,9 +134,7 @@ int do_layhands(struct char_data *ch, char *argument, int cmd)
    int duration = 24;
    one_argument(argument, victim_name);
 
-   if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL )
-     ;
-   else if(!has_skill(ch, SKILL_LAY_HANDS)) {
+   if(IS_PC(ch) && GET_LEVEL(ch) < ARCHANGEL && !has_skill(ch, SKILL_LAY_HANDS)) {
      send_to_char("You aren't skilled enough to lay a two-dollar whore with three bucks.\r\n", ch);
      return eFAILURE;
    }
@@ -219,10 +214,7 @@ int do_behead(struct char_data *ch, char *argument, int cmd)
   extern struct index_data *obj_index;
   
   one_argument(argument, buf);
-
-  if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL )
-    ;
-  else if(!(skill = has_skill(ch, SKILL_BEHEAD))) 
+  if(IS_PC(ch) && GET_LEVEL(ch) < ARCHANGEL && !(skill = has_skill(ch, SKILL_BEHEAD)))
   {
     send_to_char("The closest you'll ever get to 'beheading' is at a brit milah. Mazal tov!\r\n", ch);
     return eFAILURE;
