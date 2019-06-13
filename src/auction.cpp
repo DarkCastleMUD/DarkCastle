@@ -1379,6 +1379,7 @@ void AuctionHouse::RemoveTicket(CHAR_DATA *ch, unsigned int ticket)
     break;
     case AUC_EXPIRED: //intentional fallthrough
       expired = true;
+      /* no break */
     case AUC_FOR_SALE:
     {
       int rnum = real_object(Item_it->second.vitem);
