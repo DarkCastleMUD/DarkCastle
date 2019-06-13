@@ -84,7 +84,7 @@ void extract_obj(struct obj_data *obj);
 
 CHAR_DATA *get_char_room(char *name, int room, bool careful = FALSE);
 CHAR_DATA *get_char_num(int nr);
-CHAR_DATA *get_char(char *name);
+CHAR_DATA *get_char(const char *name);
 CHAR_DATA *get_mob(char *name);
 
 CHAR_DATA *get_pc(char *name);
