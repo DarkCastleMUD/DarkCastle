@@ -278,6 +278,8 @@ FILE * objects_log = 0;
 FILE * quest_log = 0;
 
 // writes a string to the log 
+
+
 void log( const char *str, int god_level, long type, char_data *vict)
 {
     long ct;
@@ -530,7 +532,8 @@ struct time_info_data age(CHAR_DATA *ch)
       return player_age;
     }
 
-    player_age = mud_time_passed(time(0),ch->pcdata->time.birth);
+    time_t birth = ch->pcdata->time.birth;
+    player_age = mud_time_passed(time(0), birth);
 
     player_age.year += 17;   /* All players start at 17 */
     player_age.year += GET_AGE_METAS(ch);
@@ -2403,7 +2406,7 @@ const char *find_profession(int c_class, uint8_t profession)
 }
 
 
-string get_isr_string(uint32 isr, byte loc)
+string get_isr_string(uint32 isr, int8_t loc)
 {
    if(!IS_SET(isr,1<<loc)) {
       return string();
