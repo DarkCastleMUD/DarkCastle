@@ -325,9 +325,7 @@ void perform_violence(void)
         continue;
 
     } // can_attack
-    else if(is_stunned(ch) || IS_AFFECTED(ch, AFF_PARALYSIS))
-      ;
-    else
+    else if(!is_stunned(ch) && !IS_AFFECTED(ch, AFF_PARALYSIS))
       stop_fighting(ch);
 
     // This takes care of flee and stuff
@@ -2929,11 +2927,10 @@ int isHit(CHAR_DATA *ch, CHAR_DATA *victim, int attacktype, int &type, int &redu
   if (toHit < 1) toHit = 1;
   
   // Hitting stuff close to your level gives you a bonus,   
-  if (lvldiff > 25);
-  else if (lvldiff > 15) toHit += 5;
-  else if (lvldiff > 5) toHit += 7;
-  else if (lvldiff >= 0) toHit += 10;
-  else if (lvldiff >= -5) toHit += 5;
+  if (lvldiff > 15 && lvldiff < 25) toHit += 5;
+  else if (lvldiff > 5 && lvldiff <= 15) toHit += 7;
+  else if (lvldiff >= 0 && lvldiff <= 5) toHit += 10;
+  else if (lvldiff >= -5 && lvldiff < 0) toHit += 5;
 
   // Give a tohit bonus to low level players.
   float lowlvlmod = (50.0 - (float)GET_LEVEL(ch) - (GET_LEVEL(victim)/2.0))/10.0;
@@ -3571,17 +3568,14 @@ void free_messages_from_memory()
 /*
 * Set position of a victim.
 */
-void update_pos(CHAR_DATA * victim)
-{
-  if (GET_HIT(victim) > 0)
-  {
-    if((!IS_SET(victim->combat, COMBAT_STUNNED)) &&
-      (!IS_SET(victim->combat, COMBAT_STUNNED2)) )
-      if (GET_POS(victim) <= POSITION_STUNNED)
-        GET_POS(victim) = POSITION_STANDING;
-      return;
-  }
-  else GET_POS(victim) = POSITION_DEAD;
+void update_pos(CHAR_DATA * victim) {
+	if (GET_HIT(victim) > 0) {
+		if ((!IS_SET(victim->combat, COMBAT_STUNNED)) && (!IS_SET(victim->combat, COMBAT_STUNNED2)) && GET_POS(victim) <= POSITION_STUNNED) {
+			GET_POS(victim) = POSITION_STANDING;
+		}
+	} else {
+		GET_POS(victim) = POSITION_DEAD;
+	}
 }
 
 
@@ -4056,40 +4050,39 @@ void make_corpse(CHAR_DATA * ch)
   return;
 }
 
-void make_dust(CHAR_DATA * ch)
-{
-  struct obj_data *o, *tmp_o, *blah;
-  struct obj_data *money, *next_obj;
-  int i;
-  
-  for(i = 0; i < MAX_WEAR; i++)
-    if(ch->equipment[i])
-      obj_to_char(unequip_char(ch, i), ch);
-    
-  if(GET_GOLD(ch) > 0) {
-    money = create_money(GET_GOLD(ch));
-    GET_GOLD(ch) = 0;
-    obj_to_room(money, ch->in_room);
-  }
-  
-  for(o = ch->carrying; o; o = next_obj) {
-    next_obj = o->next_content;
-    
-    if(IS_SET(o->obj_flags.extra_flags, ITEM_SPECIAL) &&
-      (GET_ITEM_TYPE(o) == ITEM_CONTAINER))
-      for(tmp_o = o->contains; tmp_o; tmp_o = blah) {
-        blah = tmp_o->next_content;
-        if(!IS_SET(tmp_o->obj_flags.extra_flags, ITEM_SPECIAL))
-          move_obj(tmp_o, ch->in_room);
-        
-      } // if and for
-      
-      if(!IS_SET(o->obj_flags.extra_flags, ITEM_SPECIAL))
-        move_obj(o, ch->in_room);
-      
-  } // for
-  
-  return;
+void make_dust(CHAR_DATA * ch) {
+	struct obj_data *o, *tmp_o, *blah;
+	struct obj_data *money, *next_obj;
+	int i;
+
+	for (i = 0; i < MAX_WEAR; i++)
+		if (ch->equipment[i])
+			obj_to_char(unequip_char(ch, i), ch);
+
+	if (GET_GOLD(ch) > 0) {
+		money = create_money(GET_GOLD(ch));
+		GET_GOLD(ch) = 0;
+		obj_to_room(money, ch->in_room);
+	}
+
+	for (o = ch->carrying; o; o = next_obj) {
+		next_obj = o->next_content;
+
+		if (IS_SET(o->obj_flags.extra_flags, ITEM_SPECIAL) && (GET_ITEM_TYPE(o) == ITEM_CONTAINER)) {
+			for (tmp_o = o->contains; tmp_o; tmp_o = blah) {
+				blah = tmp_o->next_content;
+				if (!IS_SET(tmp_o->obj_flags.extra_flags, ITEM_SPECIAL)) {
+					move_obj(tmp_o, ch->in_room);
+				} // if
+			} // for
+		} // if
+
+		if (!IS_SET(o->obj_flags.extra_flags, ITEM_SPECIAL))
+			move_obj(o, ch->in_room);
+
+	} // for
+
+	return;
 }
 
 
