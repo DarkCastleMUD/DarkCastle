@@ -34,6 +34,7 @@ extern "C" {
 #include "weather.h"
 #include "memory.h"
 #include "player.h"
+#include "obj.h"
 
 extern struct weather_data weather_info;
 extern char log_buf[MAX_STRING_LENGTH];
@@ -576,6 +577,6 @@ bool class_can_go(int ch_class, int room);
 
 const char *find_profession(int c_class, uint8_t profession);
 
-std::string get_isr_string(uint32, byte);
+std::string get_isr_string(uint32, int8_t);
 
 #endif /* UTILITY_H_ */
