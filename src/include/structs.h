@@ -9,8 +9,9 @@
 
 extern "C" {
 #include <sys/types.h>
-#include <stdio.h> // FILE
+
 }
+#include <stdio.h> // FILE
 #include <string>
 #include <vector>
 #include <map>
