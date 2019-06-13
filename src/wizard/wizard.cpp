@@ -1838,6 +1838,7 @@ void pick_up_item(struct char_data *ch, struct obj_data *obj)
 		  if (obj_index[oitem->item_number].virt < 27915 || obj_index[oitem->item_number].virt > 27918)
 			  break;
 		  else obj = oitem; // Gold! Continue on to the next cases.
+		  /* no break */
 		case 27915:
 		case 27916:
 		case 27917:
