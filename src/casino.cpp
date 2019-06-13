@@ -902,8 +902,8 @@ char *show_hand(int hand_data[21], int hide, bool ascii)
   static char buf[MAX_STRING_LENGTH];
   int i = 0;
   buf[0] = '\0';
-  sprintf(lineTwo, "%s%*s", lineTwo, strlen(tempBuf)+padnext, " ");
-  sprintf(lineTop, "%s%*s", lineTop, strlen(tempBuf)+padnext, " ");
+  snprintf(lineTwo, sizeof(lineTwo), "%s%*s", lineTwo, strlen(tempBuf)+padnext, " ");
+  snprintf(lineTop, sizeof(lineTop), "%s%*s", lineTop, strlen(tempBuf)+padnext, " ");
   if (padnext)
 	padnext = 0;
   while (hand_data[i] > 0)
@@ -956,125 +956,132 @@ int hand_number(struct player_data *plr)
   return i;
 }
 
-void blackjack_prompt(CHAR_DATA *ch, char *prompt, bool ascii)
-{
-  if (ch->in_room < 21902 || ch->in_room > 21905)
-    if (ch->in_room != 44)
- 	return;
-  struct obj_data *obj;
-  for (obj = world[ch->in_room].contents;obj;obj = obj->next_content)
-	if (obj->table) break;
-  if (!obj || !obj->table->plr) return;
- // Prompt-time
-  int plrsdone = 0;
-  char buf[MAX_STRING_LENGTH];
-  buf[0] = '\0';
-  lineTwo[0] = '\0';
-  lineTop[0] = '\0';
-  struct player_data *plr,*pnext;
-  for (plr = obj->table->plr; plr; plr = pnext)
-  {
-	pnext = plr->next;
-	if (!verify(plr)) continue;
-	if (!plr->hand_data[0]) continue;
-	if (plr->ch == ch) {
-  	  char buf2[MAX_STRING_LENGTH];
-	  buf2[0] = '\0';
-          if (plr->table->cr == plr)
-	  {
-	    strcat(buf2, "HIT STAY ");
-	    if (plr->hand_data[2] == 0)
-		strcat(buf2, "DOUBLE ");
-	  }
-	  if (canInsurance(plr))
-		strcat(buf2, "INSURANCE ");
-	  if (canSplit(plr))
-		strcat(buf2, "SPLIT ");
-	  if (buf2[0] != '\0')
-	  {
-	    strcat(prompt, "You can: ");
-	    strcat(prompt, BOLD CYAN);
-	    strcat(prompt, buf2);
-	    strcat(prompt, NTEXT);
-	    strcat(prompt, "\r\n");
-	  }
-	if (hands(plr) > 1)
-	{
-	sprintf(tempBuf, "%s, hand %d: ", GET_NAME(plr->ch), hand_number(plr));
-       sprintf(buf,"%s%s%s%s, hand %d%s: %s = %d   ",buf, BOLD,  plr==plr->table->cr?GREEN:"",GET_NAME(plr->ch), hand_number(plr), NTEXT, show_hand(plr->hand_data, 0,ascii), hand_strength(plr));
-	padnext = hand_strength(plr) > 9 ? 8:7;
-	}
-	else {
-	sprintf(tempBuf, "%s: ", GET_NAME(plr->ch));
-       sprintf(buf,"%s%s%s%s%s: %s = %d   ",buf, BOLD, plr==plr->table->cr?GREEN:"",GET_NAME(plr->ch), NTEXT, show_hand(plr->hand_data, 0,ascii), hand_strength(plr));
-	padnext = hand_strength(plr) > 9 ? 8:7;
-        }
-	}
+void blackjack_prompt(CHAR_DATA *ch, char *prompt, bool ascii) {
+	if (ch->in_room < 21902 || ch->in_room > 21905)
+		if (ch->in_room != 44)
+			return;
+	struct obj_data *obj;
+	for (obj = world[ch->in_room].contents; obj; obj = obj->next_content)
+		if (obj->table)
+			break;
+	if (!obj || !obj->table->plr)
+		return;
+	// Prompt-time
+	int plrsdone = 0;
+	char buf[MAX_STRING_LENGTH];
+	buf[0] = '\0';
+	lineTwo[0] = '\0';
+	lineTop[0] = '\0';
+	struct player_data *plr, *pnext;
+	for (plr = obj->table->plr; plr; plr = pnext) {
+		pnext = plr->next;
+		if (!verify(plr))
+			continue;
+		if (!plr->hand_data[0])
+			continue;
+		if (plr->ch == ch) {
+			char buf2[MAX_STRING_LENGTH];
+			buf2[0] = '\0';
+			if (plr->table->cr == plr) {
+				strcat(buf2, "HIT STAY ");
+				if (plr->hand_data[2] == 0)
+					strcat(buf2, "DOUBLE ");
+			}
+			if (canInsurance(plr))
+				strcat(buf2, "INSURANCE ");
+			if (canSplit(plr))
+				strcat(buf2, "SPLIT ");
+			if (buf2[0] != '\0') {
+				strcat(prompt, "You can: ");
+				strcat(prompt, BOLD CYAN);
+				strcat(prompt, buf2);
+				strcat(prompt, NTEXT);
+				strcat(prompt, "\r\n");
+			}
+			if (hands(plr) > 1) {
+				sprintf(tempBuf, "%s, hand %d: ", GET_NAME(plr->ch), hand_number(plr));
+				sprintf(buf, "%s%s%s%s, hand %d%s: %s = %d   ", buf, BOLD, plr == plr->table->cr ? GREEN : "", GET_NAME(plr->ch), hand_number(plr), NTEXT,
+						show_hand(plr->hand_data, 0, ascii), hand_strength(plr));
+				padnext = hand_strength(plr) > 9 ? 8 : 7;
+			} else {
+				sprintf(tempBuf, "%s: ", GET_NAME(plr->ch));
+				sprintf(buf, "%s%s%s%s%s: %s = %d   ", buf, BOLD, plr == plr->table->cr ? GREEN : "", GET_NAME(plr->ch), NTEXT,
+						show_hand(plr->hand_data, 0, ascii), hand_strength(plr));
+				padnext = hand_strength(plr) > 9 ? 8 : 7;
+			}
+		}
 //    }
-   else {
-   if (hands(plr) > 1) {
-  sprintf(tempBuf, "%s, hand %d: ", GET_NAME(plr->ch), hand_number(plr));
-    sprintf(buf,"%s%s%s, hand %d%s: %s ",buf, plr==plr->table->cr?BOLD GREEN:"",GET_NAME(plr->ch),hand_number(plr),
-	NTEXT, show_hand(plr->hand_data, 0,ascii));
-      padnext = 1;
-    }
-   else {
-  sprintf(tempBuf, "%s: ", GET_NAME(plr->ch));
-    
-    sprintf(buf,"%s%s%s%s: %s ",buf,plr==plr->table->cr?BOLD GREEN:"", GET_NAME(plr->ch),
-	NTEXT,show_hand(plr->hand_data, 0,ascii));
-      padnext = 1;
-  }
-   }
-    if (++plrsdone % 3 == 0)
-    {
-  if (buf[0]!= '\0'){
-  strcat(prompt,"\r\n");
-  if (ascii) {
-  strcat(prompt,lineTop);
-  strcat(prompt,"\r\n"); }
-  strcat(prompt,buf);
-  strcat(prompt,"\r\n");
-  if (ascii) {
-  strcat(prompt,lineTwo); 
-  strcat(prompt,"\r\n"); }
+		else {
+			if (hands(plr) > 1) {
+				sprintf(tempBuf, "%s, hand %d: ", GET_NAME(plr->ch), hand_number(plr));
+				sprintf(buf, "%s%s%s, hand %d%s: %s ", buf, plr == plr->table->cr ? BOLD GREEN : "", GET_NAME(plr->ch), hand_number(plr),
+				NTEXT, show_hand(plr->hand_data, 0, ascii));
+				padnext = 1;
+			} else {
+				sprintf(tempBuf, "%s: ", GET_NAME(plr->ch));
 
-  for (int z = 0; lineTop[z];z++)
-	if (lineTop[z] == ',') lineTop[z] = '\'';
-  if (ascii) {
-  strcat(prompt,lineTop);
-  strcat(prompt,"\r\n"); }
-  buf[0] = '\0';
-  lineTwo[0] = '\0';
-  lineTop[0] = '\0';
-  padnext = 0;
-  }  
-	
-    }
-  }
-  if (obj->table->hand_data[0]) {
-  sprintf(tempBuf, "Dealer: ");
-  sprintf(buf, "%s%sDealer%s: %s",buf,BOLD YELLOW, NTEXT,obj->table->state < 2?
-	show_hand(obj->table->hand_data, 1,ascii):show_hand(obj->table->hand_data, 0,ascii));
-  sprintf(buf, "%s\r\n",buf); }
-  //fixPadding(&buf[0]);
-  if (buf[0]!= '\0'){
-  strcat(prompt,"\r\n");
-  if (ascii) {
-  strcat(prompt,lineTop);
-  strcat(prompt,"\r\n"); }
-  strcat(prompt,buf);
-  if (ascii) {
-  strcat(prompt,lineTwo);
-  strcat(prompt,"\r\n"); }
-  for (int z = 0; lineTop[z];z++)
-	if (lineTop[z] == ',') lineTop[z] = '\'';
-	else if (lineTop[z] == '_') lineTop[z] = '-';
-  if (ascii) {
-  strcat(prompt,lineTop);
-  strcat(prompt,"\r\n");
-  }
-  }  
+				sprintf(buf, "%s%s%s%s: %s ", buf, plr == plr->table->cr ? BOLD GREEN : "", GET_NAME(plr->ch),
+				NTEXT, show_hand(plr->hand_data, 0, ascii));
+				padnext = 1;
+			}
+		}
+		if (++plrsdone % 3 == 0) {
+			if (buf[0] != '\0') {
+				strcat(prompt, "\r\n");
+				if (ascii) {
+					strcat(prompt, lineTop);
+					strcat(prompt, "\r\n");
+				}
+				strcat(prompt, buf);
+				strcat(prompt, "\r\n");
+				if (ascii) {
+					strcat(prompt, lineTwo);
+					strcat(prompt, "\r\n");
+				}
+
+				for (int z = 0; lineTop[z]; z++)
+					if (lineTop[z] == ',')
+						lineTop[z] = '\'';
+				if (ascii) {
+					strcat(prompt, lineTop);
+					strcat(prompt, "\r\n");
+				}
+				buf[0] = '\0';
+				lineTwo[0] = '\0';
+				lineTop[0] = '\0';
+				padnext = 0;
+			}
+
+		}
+	}
+	if (obj->table->hand_data[0]) {
+		sprintf(tempBuf, "Dealer: ");
+		sprintf(buf, "%s%sDealer%s: %s", buf, BOLD YELLOW, NTEXT,
+				obj->table->state < 2 ? show_hand(obj->table->hand_data, 1, ascii) : show_hand(obj->table->hand_data, 0, ascii));
+		sprintf(buf, "%s\r\n", buf);
+	}
+	//fixPadding(&buf[0]);
+	if (buf[0] != '\0') {
+		strcat(prompt, "\r\n");
+		if (ascii) {
+			strcat(prompt, lineTop);
+			strcat(prompt, "\r\n");
+		}
+		strcat(prompt, buf);
+		if (ascii) {
+			strcat(prompt, lineTwo);
+			strcat(prompt, "\r\n");
+		}
+		for (int z = 0; lineTop[z]; z++)
+			if (lineTop[z] == ',')
+				lineTop[z] = '\'';
+			else if (lineTop[z] == '_')
+				lineTop[z] = '-';
+		if (ascii) {
+			strcat(prompt, lineTop);
+			strcat(prompt, "\r\n");
+		}
+	}
 }
 
 int blackjack_table(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
@@ -1266,9 +1273,8 @@ int blackjack_table(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
 			send_to_char("$BYou BUSTED!$R\r\nThe dealer takes your bet.\r\n",
 					ch);
 			nextturn(plr->table);
-			if (plr->table->plr == plr && plr->next == NULL) // make dealer show cards..
-				;
-			else
+
+			if (plr->table->plr != plr || plr->next != NULL) // make dealer show cards..
 				free_player(plr);
 		} else {
 			nextturn(plr->table);
@@ -1357,9 +1363,7 @@ int blackjack_table(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
 			send_to_char("$BYou BUSTED!$R\r\nThe dealer takes your bet.\r\n",
 					ch);
 			nextturn(plr->table);
-			if (plr->table->plr == plr && plr->next == NULL) // make dealer show cards..
-				;
-			else
+			if (plr->table->plr != plr || plr->next != NULL) // make dealer show cards..
 				free_player(plr);
 		} else {
 			if (plr->doubled)
