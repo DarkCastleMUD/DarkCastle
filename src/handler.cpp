@@ -2496,7 +2496,7 @@ CHAR_DATA *get_char_room(char *name, int room, bool careful)
 
 
 /* search all over the world for a char, and return a pointer if found */
-CHAR_DATA *get_char(char *name)
+CHAR_DATA *get_char(const char *name)
 {
    CHAR_DATA *i;
    CHAR_DATA *partial_match;
