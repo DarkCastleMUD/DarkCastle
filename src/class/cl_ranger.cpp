@@ -138,9 +138,7 @@ int do_tame(CHAR_DATA *ch, char *arg, int cmd)
     return eFAILURE;
   }
 
-  if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL)
-     ;
-  else if(!has_skill(ch, SKILL_TAME)) {
+  if(IS_PC(ch) && GET_LEVEL(ch) < ARCHANGEL && !has_skill(ch, SKILL_TAME)) {
     send_to_char("Try learning HOW to tame first.\r\n", ch);
     return eFAILURE;
   }
@@ -512,9 +510,7 @@ int ambush(CHAR_DATA *ch)
      if(isname(i->ambush, GET_NAME(ch)))
      {
 
-       if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL)
-        ;
-       else if(!has_skill(i, SKILL_AMBUSH))
+    	 if(IS_PC(ch) && GET_LEVEL(ch) < ARCHANGEL && !has_skill(i, SKILL_AMBUSH))
          continue;
 
        if(IS_AFFECTED(ch, AFF_ALERT)) {
@@ -549,10 +545,7 @@ int ambush(CHAR_DATA *ch)
 int do_ambush(CHAR_DATA *ch, char *arg, int cmd)
 {
   char buf[MAX_STRING_LENGTH];
-
-  if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL)
-     ; // do nothing!
-  else if(!has_skill(ch, SKILL_AMBUSH)) {
+  if(IS_PC(ch) && GET_LEVEL(ch) < ARCHANGEL && !has_skill(ch, SKILL_AMBUSH)) {
      send_to_char("You don't know how to ambush people!\r\n", ch);
      return eFAILURE;
   }
@@ -1170,9 +1163,7 @@ int do_fire(struct char_data *ch, char *arg, int cmd)
   *direct = '\0';
   *arrow = '\0';
 
-  if(IS_MOB(ch) || GET_LEVEL(ch) >= ARCHANGEL)
-    ;
-  else if(!has_skill(ch, SKILL_ARCHERY)) {
+  if(IS_PC(ch) && GET_LEVEL(ch) < ARCHANGEL && !has_skill(ch, SKILL_ARCHERY)) {
     send_to_char("You've no idea how those pointy things with strings and feathers work.\r\n", ch);
     return eFAILURE;
   }
