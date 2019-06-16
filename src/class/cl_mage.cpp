@@ -88,8 +88,8 @@ int do_focused_repelance(struct char_data *ch, char *argument, int cmd)
   //ubyte percent;
   struct affected_type af;
   int duration = 40;
-  if(IS_PC(ch) && GET_LEVEL(ch) < ARCHANGEL && !has_skill(ch, SKILL_FOCUSED_REPELANCE)) {
-    send_to_char("You wish really really hard that magic couldn't hurt you....\r\n", ch);
+
+  if(!canPerform(ch, SKILL_FOCUSED_REPELANCE, "You wish really really hard that magic couldn't hurt you....\r\n")) {
     return eFAILURE;
   }
 

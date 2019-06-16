@@ -904,6 +904,18 @@ char *spells[]=
    "\n"
 };
 
+bool canPerform(char_data * const &ch, const int_fast32_t &skillType,
+		string failMessage) {
+	if (IS_PC(ch) && has_skill(ch, skillType) == 0 && GET_LEVEL(ch) < ARCHANGEL) {
+		send_to_char(
+				failMessage.c_str(),
+				ch);
+		return false;
+	}
+
+	return true;
+}
+
 // Figures out how many % of max your damage does
 int dam_percent(int learned, int damage)
 {

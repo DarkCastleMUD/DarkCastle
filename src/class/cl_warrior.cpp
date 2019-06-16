@@ -46,7 +46,7 @@ int do_kick(struct char_data *ch, char *argument, int cmd)
   int dam;
   int retval;
 
-  if(IS_PC(ch) && GET_LEVEL(ch) < ARCHANGEL && !has_skill(ch, SKILL_KICK)) {
+  if(!canPerform(ch, SKILL_KICK)) {
     send_to_char("You will have to study from a master before you can use this.\r\n", ch);
     return eFAILURE;
     }
@@ -150,7 +150,7 @@ int do_deathstroke(struct char_data *ch, char *argument, int cmd)
     int retval;
     int failchance = 25;
 
-    if(IS_PC(ch) && GET_LEVEL(ch) < ARCHANGEL && !has_skill(ch, SKILL_DEATHSTROKE)) {
+    if(!canPerform(ch, SKILL_DEATHSTROKE)) {
       send_to_char("You have no idea how to deathstroke.\r\n", ch);
       return eFAILURE;
     }
@@ -256,7 +256,7 @@ int do_retreat(struct char_data *ch, char *argument, int cmd)
    if (is_stunned(ch))
       return eFAILURE;
 
-   if(IS_PC(ch) && GET_LEVEL(ch) < ARCHANGEL && !has_skill(ch, SKILL_RETREAT)) {
+   if(!canPerform(ch, SKILL_RETREAT)) {
      send_to_char("You dunno how...better flee instead.\r\n", ch);
      return eFAILURE;
    }
@@ -440,8 +440,7 @@ int do_bash(struct char_data *ch, char *argument, int cmd)
     if(IS_AFFECTED(ch, AFF_CHARM))
       return eFAILURE;
 
-    if(IS_PC(ch) && GET_LEVEL(ch) < ARCHANGEL && !has_skill(ch, SKILL_BASH)) {
-      send_to_char("You don't know how to bash!\r\n", ch);
+    if(!canPerform(ch, SKILL_BASH, "You don't know how to bash!\r\n")) {
       return eFAILURE;
     }
 
@@ -598,12 +597,10 @@ int do_redirect(struct char_data *ch, char *argument, int cmd)
 {
     struct char_data *victim;
     char name[256];
-
-    if(IS_PC(ch) && GET_LEVEL(ch) < ARCHANGEL && !has_skill(ch, SKILL_REDIRECT)) {
-      send_to_char("You aren't skilled enough to change opponents midfight!\r\n", ch);
-      return eFAILURE;
-    }
-
+    
+    if (!canPerform(ch, SKILL_REDIRECT, "You aren't skilled enough to change opponents midfight!\r\n"))
+    	return eFAILURE;
+    	
     one_argument(argument, name);
 
     victim = get_char_room_vis( ch, name );
@@ -665,7 +662,7 @@ int do_disarm( struct char_data *ch, char *argument, int cmd )
 
     int is_fighting_mob(struct char_data *ch);
 
-    if(IS_PC(ch) && GET_LEVEL(ch) < ARCHANGEL && !has_skill(ch, SKILL_DISARM)) {
+    if(!canPerform(ch, SKILL_DISARM)) {
       send_to_char("You dunno how.\r\n", ch);
       return eFAILURE;
     }
@@ -781,7 +778,7 @@ int do_rescue(struct char_data *ch, char *argument, int cmd)
 
     one_argument(argument, victim_name);
 
-    if(IS_PC(ch) && GET_LEVEL(ch) < ARCHANGEL && !has_skill(ch, SKILL_RESCUE)) {
+    if(!canPerform(ch, SKILL_RESCUE)) {
       send_to_char("You've got alot to learn before you try to be a bodyguard.\r\n", ch);
       return eFAILURE;
     }
@@ -861,7 +858,8 @@ int do_bladeshield(struct char_data *ch, char *argument, int cmd)
 {
   struct affected_type af;
   int duration = 12;
-  if(IS_PC(ch) && GET_LEVEL(ch) < ARCHANGEL && !has_skill(ch, SKILL_BLADESHIELD)) {
+  
+  if(!canPerform(ch, SKILL_BLADESHIELD)) {
     send_to_char("You'd cut yourself to ribbons just trying!\r\n", ch);
     return eFAILURE;
   }
@@ -1058,7 +1056,7 @@ int do_tactics(struct char_data *ch, char *argument, int cmd)
 {
   struct affected_type af;
   
-  if(IS_PC(ch) && GET_LEVEL(ch) < ARCHANGEL && !has_skill(ch, SKILL_TACTICS)) {
+  if(!canPerform(ch, SKILL_TACTICS)) {
     send_to_char("You just don't have the mind for strategic battle.\r\n", ch);
     return eFAILURE;
   }   
