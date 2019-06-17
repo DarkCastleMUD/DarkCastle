@@ -7,3 +7,6 @@ test.cpp
 test
 *~
 gmon.out
+*.gcda
+*.gcno
+*~

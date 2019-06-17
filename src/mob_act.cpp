@@ -124,6 +124,12 @@ void mobile_activity(void)
     // It also means the mob has to check to make sure he's not already in
     // combat for stuff he shouldn't be able to do while fighting:)
     // And paralyze...
+    if (ch->in_room == -1) {
+      log("ch->in_room set to -1 but on character_list. Averting crash.", -1, LOG_BUG);
+      produce_coredump(ch);
+      continue;
+    }
+
     if(mob_index[ch->mobdata->nr].non_combat_func) {
 #ifdef USE_TIMING
     mprogTimer.start();

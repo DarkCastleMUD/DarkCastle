@@ -2926,13 +2926,13 @@ int isHit(CHAR_DATA *ch, CHAR_DATA *victim, int attacktype, int &type, int &redu
   if (toHit < 1) toHit = 1;
   
   // Hitting stuff close to your level gives you a bonus,   
-	if (lvldiff > 15 && lvldiff <= 25)
+	if (lvldiff > 15 && lvldiff < 25)
 		toHit += 5;
 	else if (lvldiff > 5 && lvldiff <= 15)
 		toHit += 7;
 	else if (lvldiff >= 0 && lvldiff <= 5)
 		toHit += 10;
-	else if (lvldiff >= -5 && lvldiff <= 0)
+	else if (lvldiff >= -5 && lvldiff < 0)
 		toHit += 5;
 
   // Give a tohit bonus to low level players.

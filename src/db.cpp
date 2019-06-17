@@ -4248,6 +4248,7 @@ struct obj_data *clone_object(int nr)
 	obj->next = object_list;
 	object_list = obj;
 	obj_index[nr].number++;
+    obj->save_expiration = 0;
 	if (obj_index[obj->item_number].non_combat_func ||
 			obj->obj_flags.type_flag == ITEM_MEGAPHONE ||
 			has_random(obj)) {

@@ -1966,7 +1966,7 @@ int spell_remove_blind(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
 int spell_cure_critic(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
   int healpoints;
-  char buf[MAX_STRING_LENGTH],dammsg[MAX_STRING_LENGTH];
+  char buf[MAX_STRING_LENGTH*2],dammsg[MAX_STRING_LENGTH];
 
   if(!victim)
   {
@@ -2022,7 +2022,7 @@ int spell_cure_critic(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
 int spell_cure_light(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
   int healpoints;
-  char buf[MAX_STRING_LENGTH],dammsg[MAX_STRING_LENGTH];
+  char buf[MAX_STRING_LENGTH*2],dammsg[MAX_STRING_LENGTH];
 
   if(!ch || !victim)
   {
@@ -2535,7 +2535,7 @@ int spell_mana(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *o
 int spell_heal(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
   int healy;
-  char buf[MAX_STRING_LENGTH],dammsg[MAX_STRING_LENGTH];
+  char buf[MAX_STRING_LENGTH*2],dammsg[MAX_STRING_LENGTH];
 
   if(!victim) {
     log("Null victim sent to heal!", ANGEL, LOG_BUG);
@@ -2594,7 +2594,7 @@ int spell_heal(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *o
 int spell_power_heal(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
   int healy;
-  char buf[MAX_STRING_LENGTH],dammsg[MAX_STRING_LENGTH];
+  char buf[MAX_STRING_LENGTH*2],dammsg[MAX_STRING_LENGTH];
 
   if(!victim) {
     log("Null victim sent to power heal!", ANGEL, LOG_BUG);
@@ -2648,7 +2648,7 @@ int spell_full_heal(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
 {
   assert(victim);
   int healamount = 0;
-  char buf[MAX_STRING_LENGTH],dammsg[MAX_STRING_LENGTH];
+  char buf[MAX_STRING_LENGTH*2],dammsg[MAX_STRING_LENGTH];
 
   if(GET_RACE(victim) == RACE_UNDEAD) {
     send_to_char("Healing spells are useless on the undead.\n\r", ch);
@@ -5464,7 +5464,7 @@ int spell_dispel_magic(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
 int spell_cure_serious(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
   int healpoints;
-  char buf[MAX_STRING_LENGTH],dammsg[MAX_STRING_LENGTH];
+  char buf[MAX_STRING_LENGTH*2],dammsg[MAX_STRING_LENGTH];
 
   if(!ch || !victim) {
     log("Null ch or victim sent to cure_serious!", ANGEL, LOG_BUG);
@@ -10397,7 +10397,7 @@ int spell_barkskin(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
 int cast_herb_lore(ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *victim, struct obj_data * tar_obj, int skill)
 {
   int healamount;
-  char buf[MAX_STRING_LENGTH],dammsg[MAX_STRING_LENGTH];
+  char buf[MAX_STRING_LENGTH*2],dammsg[MAX_STRING_LENGTH];
 
   if(GET_RACE(victim) == RACE_UNDEAD) {
     send_to_char("Healing spells are useless on the undead.\n\r", ch);

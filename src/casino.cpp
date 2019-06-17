@@ -1272,7 +1272,8 @@ int blackjack_table(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
 			send_to_char("$BYou BUSTED!$R\r\nThe dealer takes your bet.\r\n",
 					ch);
 			nextturn(plr->table);
-			if (plr->table->plr != plr || plr->next == NULL) // make dealer show cards..
+			
+			if (plr->table->plr != plr || plr->next != NULL) // make dealer show cards..
 				free_player(plr);
 		} else {
 			nextturn(plr->table);

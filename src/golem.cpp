@@ -415,7 +415,7 @@ int do_golem_score(struct char_data *ch, char *argument, int cmd)
            sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\n\r",
                    scratch,"Susceptibility",isrString.c_str(), scratch);
            send_to_char(buf, master);
-           isrString='\0';
+           isrString=string();
            if(++level == 4)
               level = 0;
         }
@@ -430,7 +430,7 @@ int do_golem_score(struct char_data *ch, char *argument, int cmd)
            sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\n\r",
                    scratch,"Resistibility",isrString.c_str(), scratch);
            send_to_char(buf, master);
-           isrString='\0';
+           isrString=string();
            if(++level == 4)
               level = 0;
         }

@@ -7,10 +7,7 @@
 |   allocate/free memory.  It declares dc_alloc() for allocating new
 |   memory and dc_free() for freeing memory.
 */
-extern "C"
-{
-  #include <stdlib.h>
-}
+#include <stdlib.h>
 
 void *dc_alloc(size_t nmemb, size_t size);
 void *dc_realloc(void * oldptr, size_t size);

@@ -6,3 +6,6 @@ dcastle.debug*
 test.cpp
 test
 *~
+/*.tt
+/*~
+/test.cpp

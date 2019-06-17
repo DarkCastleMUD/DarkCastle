@@ -529,7 +529,8 @@ struct time_info_data age(CHAR_DATA *ch)
       return player_age;
     }
 
-    player_age = mud_time_passed(time(0),ch->pcdata->time.birth);
+    time_t birth = ch->pcdata->time.birth;
+    player_age = mud_time_passed(time(0), birth);
 
     player_age.year += 17;   /* All players start at 17 */
     player_age.year += GET_AGE_METAS(ch);
@@ -1902,8 +1903,10 @@ bool is_in_game(char_data *ch)
   return false;
 }
 
-void produce_coredump(void)
+void produce_coredump(void *ptr)
 {
+  logf(IMMORTAL, LOG_BUG, "produce_coredump called with pointer %p", ptr);
+
   static int counter = 0;
 
   if (++counter > COREDUMP_MAX) {
@@ -2406,7 +2409,7 @@ const char *find_profession(int c_class, uint8_t profession)
 }
 
 
-string get_isr_string(uint32 isr, byte loc)
+string get_isr_string(uint32 isr, int8_t loc)
 {
    if(!IS_SET(isr,1<<loc)) {
       return string();

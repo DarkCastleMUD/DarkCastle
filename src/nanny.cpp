@@ -748,12 +748,12 @@ int more_than_ten_people_from_this_ip(struct descriptor_data *new_conn)
          count++;
    }
 
-   if(count > 6 )
+   if(count > 20 )
    {
-      SEND_TO_Q("Sorry, there are more than 6 connections from this IP address\r\n"
+      SEND_TO_Q("Sorry, there are more than 20 connections from this IP address\r\n"
                 "already logged into Dark Castle.  If you have a valid reason\r\n"
-                "for having this many connections from one IP please let Apocalypse\r\n"
-                "know and he will speak with you. (DC_Apoc@hotmail.com)\r\n",
+                "for having this many connections from one IP please let an imm\r\n"
+                "know and they will speak with you.\r\n",
                 new_conn);
       close_socket( new_conn );
       return 1;
@@ -890,6 +890,7 @@ void nanny(struct descriptor_data *d, char *arg)
       // if they have already entered their name, drop through.  Otherwise stop and wait for input
       if(!*arg)
         break;
+        /* no break */
 
    case CON_GET_NAME:
 

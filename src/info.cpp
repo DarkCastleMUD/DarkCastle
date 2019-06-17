@@ -322,6 +322,23 @@ void show_obj_to_char(struct obj_data *object, struct char_data *ch, int mode)
             strcat(buffer, " [$B$4Falling Apart$R]");
          else strcat(buffer, " [$5Pile of Scraps$R]");
 */      }
+      if (IS_SET(object->obj_flags.more_flags, ITEM_24H_SAVE) && !IS_SET(object->obj_flags.extra_flags, ITEM_NOSAVE)) {
+    	  time_t now = time(NULL);
+    	  time_t expires = object->save_expiration;
+    	  if (expires == 0) {
+    		  strcat(buffer, " $R($B$0unsaved$R)");
+    	  } else if (now >= expires) {
+    		  strcat(buffer, " $R($B$0expired$R)");
+    	  } else {
+    		  char timebuffer[100];
+#if __x86_64__
+    		  snprintf(timebuffer, 100, " $R($B$0%llu secs left$R)", expires-now);
+#else
+    		  snprintf(timebuffer, 100, " $R($B$0%lu secs left$R)", expires-now);
+#endif
+    		  strcat(buffer, timebuffer);
+    	  }
+      }
 
       if(mode == 0) // 'look'
          strcat(buffer, "$B$1"); // setup color background
@@ -658,10 +675,8 @@ int do_botcheck(struct char_data *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  strcpy(name2, "0.");
-  strncat(name2, name, MAX_STRING_LENGTH-1);
-  victim = get_char(name2);
-
+  string name2 = "0." + string(name);
+  victim = get_char(name2.c_str());
 
   if (victim == NULL && name != NULL && !strcmp(name, "all")) {
     descriptor_data *d;
@@ -840,12 +855,15 @@ int do_look(struct char_data *ch, char *argument, int cmd) {
 		send_to_char("You can't see anything but stars!\n\r", ch);
 	else if (GET_POS(ch) == POSITION_SLEEPING)
 		send_to_char("You can't see anything, you're sleeping!\n\r", ch);
-	else if (!check_blind(ch) && IS_DARK(ch->in_room) && !IS_MOB(ch) && !ch->pcdata->holyLite) {
+	else if (check_blind(ch)) {
+		ansi_color( GREY, ch);
+		return eSUCCESS;
+	} else if (IS_DARK(ch->in_room) && (!IS_MOB(ch) && !ch->pcdata->holyLite)) {
 		send_to_char("It is pitch black...\n\r", ch);
 		list_char_to_char(world[ch->in_room].people, ch, 0);
 		send_to_char("$R", ch);
 		// TODO - if have blindfighting, list some of the room exits sometimes
-	} else if (!check_blind(ch)){
+	} else {
 		argument_split_3(argument, arg1, arg2, arg3);
 		keyword_no = search_block(arg1, keywords, FALSE); /* Partial Match */
 
@@ -1154,7 +1172,8 @@ int do_look(struct char_data *ch, char *argument, int cmd) {
 				return eFAILURE;
 			}
 		}
-		case 9: { // look through
+	      /* no break */
+		case 9:  // look through
 			if (found != TRUE) {
 				if (*arg2) {
 					if ((tmp_object = get_obj_in_list_vis(ch, arg2,
@@ -1186,8 +1205,8 @@ int do_look(struct char_data *ch, char *argument, int cmd) {
 				send_to_char("You can't seem to look through that.\n\r", ch);
 				return eFAILURE;
 			}
-		}
-
+			/* no break */
+		/* no break */
 			/* look ''		*/
 		case 10: {
 			char sector_buf[50];
@@ -1493,7 +1512,7 @@ int do_score(struct char_data *ch, char *argument, int cmd)
                    scratch,"Susceptibility",isrString.c_str(), scratch);
            send_to_char(buf, ch);
            found = TRUE;
-           isrString='\0';
+           isrString=string();
            if(++level == 4)
               level = 0;
         }
@@ -1534,8 +1553,9 @@ int do_score(struct char_data *ch, char *argument, int cmd)
    //      if (*aff_name && !str_cmp(aff_name, "fly")) flying = 1;
 			switch (aff->type) {
 			case BASE_SETS + SET_RAGER:
-				if (aff->location == 0)
+	     if (aff->location == 0) {
 					aff_name = "Battlerager's Fury";
+	     }
 				break;
 			case BASE_SETS + SET_MOSS:
 				if (aff->location == 0)

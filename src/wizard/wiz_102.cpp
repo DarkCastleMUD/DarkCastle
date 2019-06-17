@@ -183,7 +183,7 @@ int do_check(struct char_data *ch, char *arg, int cmd) {
     send_to_char(buf, ch);
 
     /* ctime adds a \n to the string it returns! */
-    sprintf(buf, "  on: %s\r", ctime(&vict->pcdata->time.logon));
+    sprintf(buf, "$3Last connected on$R: %s\r", ctime(const_cast<const time_t *>(&vict->pcdata->time.logon)));
     send_to_char(buf, ch);
   }
 
@@ -471,6 +471,7 @@ int do_zone_single_edit(struct char_data * ch, char * argument, int zone)
 	   zone_table[zone].cmd[cmd].arg1 = 0;
 	   zone_table[zone].cmd[cmd].arg2 = 0;
 	   zone_table[zone].cmd[cmd].arg3 = 0;
+	   /* no break */
          case '%':
 	   zone_table[zone].cmd[cmd].arg2 = 100;
            zone_table[zone].cmd[cmd].command = result;
@@ -642,6 +643,7 @@ int max_res(int zone)
 int do_zedit(struct char_data *ch, char *argument, int cmd)
 {
   char buf[MAX_STRING_LENGTH];
+  char tmpbuf[MAX_STRING_LENGTH];
   char select[MAX_INPUT_LENGTH];
   char text[MAX_INPUT_LENGTH];
   int16 skill;
@@ -4097,8 +4099,6 @@ int do_rsave(struct char_data *ch, char *arg, int cmd)
 {
   FILE *f = (FILE *)NULL;
   world_file_list_item * curr;
-  char buf[180];
-  char buf2[180];
 
   extern world_file_list_item * world_file_list;
 
@@ -4124,11 +4124,11 @@ int do_rsave(struct char_data *ch, char *arg, int cmd)
     return eFAILURE;
   }
 
-  sprintf(buf, "world/%s", curr->filename);
-  sprintf(buf2, "cp %s %s.last", buf, buf);
-  system(buf2);
+  string file = string("world/") + string(curr->filename);
+  string syscmd = string("cp ") + file + string(" ") + file + string(".last");
+  system(syscmd.c_str());
 
-  if((f = dc_fopen(buf, "w")) == NULL) {
+  if((f = dc_fopen(file.c_str(), "w")) == NULL) {
     fprintf(stderr,"Couldn't open room save file %s for %s.\n\r",
             curr->filename, GET_NAME(ch));
     return eFAILURE;
@@ -4545,7 +4545,7 @@ int do_instazone(struct char_data *ch, char *arg, int cmd) {
 int do_rstat(struct char_data *ch, char *argument, int cmd)
 {
     char arg1[MAX_STRING_LENGTH];
-    char buf[MAX_STRING_LENGTH];
+    char buf[MAX_STRING_LENGTH*2];
     char buf2[MAX_STRING_LENGTH];
     struct room_data *rm=0;
     struct char_data *k=0;
@@ -4931,7 +4931,7 @@ int strncasecmp(char *s1, const char *s2, int len)
 	
 int do_punish(struct char_data *ch, char *arg, int cmd)
 {
-   char name[100], buf[100];
+   char name[100], buf[150];
    char_data *vict;
 
    int i;
@@ -4951,7 +4951,7 @@ int do_punish(struct char_data *ch, char *arg, int cmd)
       }
 
   if(!(vict = get_pc_vis(ch, name))) {
-    sprintf(buf, "%s not found.\n\r", name);
+    snprintf(buf, sizeof(buf), "%s not found.\n\r", name);
     send_to_char(buf, ch);
     return eFAILURE;
   }

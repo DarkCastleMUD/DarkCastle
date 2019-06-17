@@ -77,7 +77,7 @@ void extract_obj(struct obj_data *obj);
 
 CHAR_DATA *get_char_room(char *name, int room, bool careful = FALSE);
 CHAR_DATA *get_char_num(int nr);
-CHAR_DATA *get_char(char *name);
+CHAR_DATA *get_char(const char *name);
 CHAR_DATA *get_mob(char *name);
 
 CHAR_DATA *get_pc(char *name);
@@ -132,7 +132,7 @@ class ErrorHandler {
   class overrun {};
 };
 
-void produce_coredump(void);
+void produce_coredump(void *ptr = 0);
 
 bool objExists(OBJ_DATA *obj);
 bool charge_moves(char_data *ch, int skill, double modifier = 1);

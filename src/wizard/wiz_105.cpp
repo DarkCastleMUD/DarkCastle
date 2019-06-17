@@ -399,6 +399,7 @@ int do_sqedit(struct char_data *ch, char *argument, int cmd)
   bool done = FALSE;
   argument = one_argument(argument,arg1);
   struct skill_quest * skill=NULL;
+
   if (argument && *argument) 
   {
     argument = one_argument(argument,arg2);
@@ -407,6 +408,7 @@ int do_sqedit(struct char_data *ch, char *argument, int cmd)
     strcat(arg3,arg2);
     skill = find_sq(arg3);
   }
+
   if (skill==NULL && (skill = find_sq(arg1))==NULL && i!=0 && i!=6 && i!=7)
   {
     send_to_char("Unknown skill.\r\n",ch);

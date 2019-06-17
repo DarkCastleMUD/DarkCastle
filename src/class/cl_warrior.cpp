@@ -571,11 +571,6 @@ int do_redirect(struct char_data *ch, char *argument, int cmd)
     if (!canPerform(ch, SKILL_REDIRECT, "You aren't skilled enough to change opponents midfight!\r\n"))
     	return eFAILURE;
 
-    if(IS_PC(ch) && !has_skill(ch, SKILL_REDIRECT) && GET_LEVEL(ch) < ARCHANGEL) {
-      send_to_char("You aren't skilled enough to change opponents midfight!\r\n", ch);
-      return eFAILURE;
-    }
-
     one_argument(argument, name);
 
     victim = get_char_room_vis( ch, name );

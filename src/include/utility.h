@@ -583,6 +583,6 @@ bool class_can_go(int ch_class, int room);
 
 const char *find_profession(int c_class, uint8_t profession);
 
-string get_isr_string(uint32, byte);
+std::string get_isr_string(uint32, int8_t);
 
 #endif /* UTILITY_H_ */

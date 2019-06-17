@@ -615,7 +615,7 @@ int ki_speed( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
          return eSUCCESS;
    
   af.type      = SPELL_HASTE;
-  af.duration  = 2;
+  af.duration  = has_skill(ch, KI_OFFSET+KI_SPEED)/15;
   af.modifier  = 0; 
   af.location  = APPLY_NONE;  
   af.bitvector = AFF_HASTE;
@@ -623,7 +623,7 @@ int ki_speed( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
   affect_to_char(vict, &af);
 
   af.type = SPELL_HASTE;
-  af.duration = 2;
+  af.duration = has_skill(ch, KI_OFFSET+KI_SPEED)/15;
   af.modifier = -has_skill(ch, KI_OFFSET+KI_SPEED)/4;
   af.location = APPLY_AC;
   af.bitvector = -1;

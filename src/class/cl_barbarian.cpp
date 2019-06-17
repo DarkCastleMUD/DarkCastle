@@ -426,11 +426,11 @@ int do_rage(struct char_data *ch, char *argument, int cmd)
 int do_battlecry(struct char_data *ch, char *argument, int cmd)
 {
   struct follow_type *f = 0;
-
+  
   if (!canPerform(ch, SKILL_BATTLECRY, "Have to learn how to battlecry before you can run with the big boys...\r\n")) {
     return eFAILURE;
   }
-
+  
   if (!ch->fighting) {
      send_to_char("You must be fighting already in order to battlecry.\n\r", ch);
      return eFAILURE;

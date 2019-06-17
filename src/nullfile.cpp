@@ -11,14 +11,15 @@
 
 extern "C"
 {
-#include <stdio.h>
 #include <string.h>
 }
+#include <stdio.h>
+#ifdef LEAK_CHECK
+#include <dmalloc.h>
+#endif
+
 #include <structs.h>
 #include <levels.h>
-
-/* External functions */
-int fclose(FILE *);
 
 #ifndef LOG_BUG
 #define LOG_BUG           1
