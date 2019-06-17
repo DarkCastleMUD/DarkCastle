@@ -1,3 +1,11 @@
+dcastle.debug*
+*gcno
+*gcda
+*/*gcno
+*/*gcda
+test.cpp
+test
+*~
 /*.tt
 /*~
 /test.cpp
