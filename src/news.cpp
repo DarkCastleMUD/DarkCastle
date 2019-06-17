@@ -168,21 +168,21 @@ int do_news(struct char_data *ch, char *argument, int cmd)
 			continue;
 		if (tnews->time < thetime)
 			continue;
-		strftime(&timez[0], 10, "%d/%b/%y", gmtime(&tnews->time));
-
-		strcpy(old, buf);
-		const char *newsstring = tnews->news;
-		if (up)
+     strftime(&timez[0], 10,"%d/%b/%y", gmtime(&tnews->time));
+    
+     strcpy(old,buf);
+     const char *newsstring = tnews->news;
+       if (up)
 			sprintf(buf, "%s$B$4[ $3%-9s $4] \r\n$R%s\r\n", old, timez,
 					newsstring);
-		else
+       else 
 			sprintf(buf, "$B$4[ $3%-9s$4 ] \r\n$R%s\r\n%s", timez, newsstring,
 					old);
 		if (strlen(buf) > MAX_STRING_LENGTH - 1000)
 			break;
-	}
-	page_string(ch->desc, buf, 1);
-	return eSUCCESS;
+   } 
+   page_string(ch->desc,buf, 1);
+   return eSUCCESS;
 }
 
 int do_addnews(struct char_data *ch, char *argument, int cmd)

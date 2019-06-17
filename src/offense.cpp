@@ -304,99 +304,102 @@ int do_kill(struct char_data *ch, char *argument, int cmd)
 //
 int do_join(struct char_data *ch, char *argument, int cmd)
 {
-	struct char_data *victim, *tmp_ch, *next_char, *k;
-	struct follow_type *j;
-	extern struct char_data *combat_list;
-	int count = 0;
-	char victim_name[240];
-	bool found = FALSE;
+  struct char_data *victim, *tmp_ch, *next_char, *k;
+  struct follow_type *j;
+  extern struct char_data *combat_list;
+  int count = 0;
+  char victim_name[240];
+  bool found = FALSE;
 
-	one_argument(argument, victim_name);
+  one_argument(argument, victim_name);
 
-	if (ch->fighting) {
-		send_to_char(" Aren't you helping enough as it is?\n\r", ch);
-		return eFAILURE;
-	}
-	char tmp[MAX_STRING_LENGTH];
-	int num;
+  if(ch->fighting) {
+    send_to_char(" Aren't you helping enough as it is?\n\r", ch);
+    return eFAILURE;
+  }
+  char tmp[MAX_STRING_LENGTH];
+  int num;
 	if (IS_MOB(ch) && isdigit(*victim_name) && !(sscanf(victim_name, "%d.%s", &num, tmp) == 2)) {
-		count = atoi(victim_name);
-		victim = world[ch->in_room].people;
-		for (; victim; victim = victim->next_in_room)
-			if (IS_MOB(victim) && mob_index[victim->mobdata->nr].virt == count)
-				break;
-		if (!victim)
-			return eFAILURE;
-		count = 0;
-	}
-	else if (!(victim = get_char_room_vis(ch, victim_name)) && str_cmp("follower", victim_name)) {
-		send_to_char("Join whom?\n\r", ch);
-		return eFAILURE;
-	}
+    count = atoi(victim_name);
+    victim = world[ch->in_room].people;
+    for(; victim; victim = victim->next_in_room)
+      if(IS_MOB(victim) && mob_index[victim->mobdata->nr].virt == count)
+        break;
+    if(!victim)
+       return eFAILURE;
+    count = 0;
+  }
+  else if(!(victim = get_char_room_vis(ch, victim_name)) && str_cmp("follower", victim_name)) { 
+    send_to_char("Join whom?\n\r", ch);
+    return eFAILURE;
+  }
 
-	if (!victim) {
-		if (ch->followers)
-			for (j = ch->followers; j; j = j->next) {
-				if (ch->in_room == j->follower->in_room && j->follower->fighting)
-					if (IS_AFFECTED(j->follower, AFF_CHARM)) {
-						found = TRUE;
-						victim = j->follower;
-					}
-			}
-
-		if (!found) {
-			send_to_char("You have no loyal subjects engaged in combat!\n\r", ch);
-			return eFAILURE;
-		}
+  if(!victim) {
+     if(ch->followers)
+        for (j = ch->followers; j; j = j->next) {
+           if (ch->in_room == j->follower->in_room && j->follower->fighting)
+              if (IS_AFFECTED(j->follower, AFF_CHARM)) {
+                 found = TRUE;
+                 victim = j->follower;
+              }
 	}
 
-	if (!victim->fighting)
-	{
-		send_to_char("But they're not fighting anyone.\r\n", ch);
-		return eFAILURE;
-	}
+	if (!found) {
+	   send_to_char("You have no loyal subjects engaged in combat!\n\r", ch);
+           return eFAILURE;
+        }
+  }
 
-	if (victim == ch) {
-		send_to_char("Don't be a dork.\n\r", ch);
-		return eFAILURE;
-	}
-	if (victim->fighting == ch) {
-		send_to_char("But why join someone who is trying to kill YOU?\n\r", ch);
-		return eFAILURE;
-	}
 
-	// if (IS_AFFECTED(ch, AFF_CHARM) && !IS_NPC(ch->master) && GET_CLASS(ch->master) == CLASS_ANTI_PAL && !IS_NPC(victim->fighting)) {
-	//    act("I can't join the attack against $N master!", ch->master, 0, victim->fighting, TO_CHAR, 0);
-	//    return eFAILURE;
-	// }
+  if (!victim->fighting)
+  {
+    send_to_char("But they're not fighting anyone.\r\n", ch);
+    return eFAILURE;
+  }
 
-	tmp_ch = victim->fighting;
+  if(victim == ch) { 
+    send_to_char("Don't be a dork.\n\r", ch);
+    return eFAILURE;
+  }
+  if(victim->fighting == ch) {
+    send_to_char( "But why join someone who is trying to kill YOU?\n\r",ch);
+    return eFAILURE;
+  }
 
-	if (!tmp_ch) {
-		act("But $N is not fighting!!!", ch, 0, victim, TO_CHAR, 0);
-		return eFAILURE;
-	}
 
-	if (!can_attack(ch) || (victim->fighting &&
-			!can_be_attacked(ch, victim->fighting)))
-			{
-		return eFAILURE;
-	}
+ // if (IS_AFFECTED(ch, AFF_CHARM) && !IS_NPC(ch->master) && GET_CLASS(ch->master) == CLASS_ANTI_PAL && !IS_NPC(victim->fighting)) {
+ //    act("I can't join the attack against $N master!", ch->master, 0, victim->fighting, TO_CHAR, 0);
+ //    return eFAILURE;
+ // }
 
-	for (k = combat_list; k; k = next_char) {
-		next_char = k->next_fighting;
-		if (k->fighting == tmp_ch)
-			count++;
-	}
-	/*
-	 if(count >= 6) {
-	 send_to_char("You can't get close enough to do anything.", ch);
-	 return eFAILURE;
-	 }
-	 */
-	send_to_char("ARGGGGG!!!! *** K I L L ***!!!!.\n\r", ch);
-	act("$N joins you in the fight!", victim, 0, ch, TO_CHAR, 0);
-	act("$n has joined $N in the battle.", ch, 0, victim, TO_ROOM, NOTVICT);
+  tmp_ch = victim->fighting;
 
-	return attack(ch, tmp_ch, TYPE_UNDEFINED);
+  if(!tmp_ch) { 
+    act("But $N is not fighting!!!", ch, 0, victim, TO_CHAR, 0);
+    return eFAILURE;
+  }
+
+  if(!can_attack(ch) || (victim->fighting &&
+   !can_be_attacked(ch, victim->fighting)))
+   {
+     return eFAILURE;
+   }
+
+
+  for(k = combat_list; k; k = next_char) {
+     next_char = k->next_fighting;
+     if(k->fighting == tmp_ch)
+       count++;
+  } 
+/*
+  if(count >= 6) {
+    send_to_char("You can't get close enough to do anything.", ch);
+    return eFAILURE;
+  }
+*/
+  send_to_char("ARGGGGG!!!! *** K I L L ***!!!!.\n\r", ch);
+  act("$N joins you in the fight!", victim, 0, ch, TO_CHAR, 0);
+  act("$n has joined $N in the battle.", ch, 0, victim, TO_ROOM, NOTVICT);
+
+  return attack(ch, tmp_ch, TYPE_UNDEFINED);
 }
