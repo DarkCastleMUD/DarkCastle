@@ -596,8 +596,7 @@ int find_file(world_file_list_item *itm, int high)
   return -1;
 }
 
-int do_show(struct char_data *ch, char *argument, int cmd)
-{
+int do_show(struct char_data *ch, char *argument, int cmd) {
   char name[MAX_INPUT_LENGTH], buf[200];
   char beginrange[MAX_INPUT_LENGTH];
   char endrange[MAX_INPUT_LENGTH];
