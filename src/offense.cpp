@@ -319,7 +319,7 @@ int do_join(struct char_data *ch, char *argument, int cmd)
   }
   char tmp[MAX_STRING_LENGTH];
   int num;
-   if(IS_MOB(ch) && isdigit(*victim_name) && (!sscanf(victim_name,"%d.%s",&num,tmp)) == 2) {
+	if (IS_MOB(ch) && isdigit(*victim_name) && !(sscanf(victim_name, "%d.%s", &num, tmp) == 2)) {
     count = atoi(victim_name);
     victim = world[ch->in_room].people;
     for(; victim; victim = victim->next_in_room)

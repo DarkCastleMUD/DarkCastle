@@ -163,19 +163,23 @@ int do_news(struct char_data *ch, char *argument, int cmd)
    else
      thetime = 0;    
 
-   for (tnews = thenews;tnews;tnews = tnews->next)
-   {
-     if (!tnews->news || *tnews->news == '\0') continue;
-     if (tnews->time < thetime) continue;
+   for (tnews = thenews; tnews; tnews = tnews->next) {
+		if (!tnews->news || *tnews->news == '\0')
+			continue;
+		if (tnews->time < thetime)
+			continue;
      strftime(&timez[0], 10,"%d/%b/%y", gmtime(&tnews->time));
     
      strcpy(old,buf);
      const char *newsstring = tnews->news;
        if (up)
-	sprintf(buf, "%s$B$4[ $3%-9s $4] \r\n$R%s\r\n", old, timez, newsstring);
+			sprintf(buf, "%s$B$4[ $3%-9s $4] \r\n$R%s\r\n", old, timez,
+					newsstring);
        else 
-	sprintf(buf, "$B$4[ $3%-9s$4 ] \r\n$R%s\r\n%s", timez, newsstring, old);
-	if(strlen(buf) > MAX_STRING_LENGTH-1000) break;
+			sprintf(buf, "$B$4[ $3%-9s$4 ] \r\n$R%s\r\n%s", timez, newsstring,
+					old);
+		if (strlen(buf) > MAX_STRING_LENGTH - 1000)
+			break;
    } 
    page_string(ch->desc,buf, 1);
    return eSUCCESS;

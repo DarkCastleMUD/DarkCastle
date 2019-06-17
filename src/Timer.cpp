@@ -24,8 +24,16 @@ TimeVal TimeVal::operator+(TimeVal t1) {
 
 TimeVal TimeVal::operator-(TimeVal t1) {
 	TimeVal t;
+	assert(tv_sec >= t1.tv_sec);
 	t.tv_sec = tv_sec - t1.tv_sec;
+
+	if (tv_usec >= t1.tv_usec) {
 	t.tv_usec = tv_usec - t1.tv_usec;
+	} else {
+		t.tv_sec--;
+		t.tv_usec = tv_usec + 1000000 - t1.tv_usec;
+	}
+
 	return t;
 }
 
@@ -111,9 +119,6 @@ void Timer::stop() {
 	}
 
 	diff_avg = (diff_avg + diff_cur)/2;
-	if (stopCount == 1) {
-		cerr << totalTime << endl;
-	}
 	totalTime += (diff_cur.tv_usec/1000);
 }
 
@@ -124,6 +129,7 @@ ostream& operator<<(ostream &out, Timer t) {
 	return out;
 }
 ostream& operator<<(ostream &out, TimeVal tv) {
-	out << static_cast<unsigned __time_t>(tv.tv_sec) << "s " << static_cast<unsigned __suseconds_t>(tv.tv_usec) << "µ";
+//	out << static_cast<unsigned __time_t>(tv.tv_sec) << "s " << static_cast<unsigned __suseconds_t>(tv.tv_usec) << "µ";
+	out << tv.tv_sec << "s " << tv.tv_usec << "µ";
 	return out;
 }
