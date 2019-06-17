@@ -4,6 +4,8 @@ import os.path
 
 env = Environment(CCFLAGS = '-ggdb3 -Wall -m32 -std=gnu++1y -O3 -Wno-write-strings',
     LINKFLAGS = '-ggdb3 -Wall -m32 -std=gnu++1y -O3' )
+#env = Environment(CCFLAGS = '-ggdb3 -Wall -m32 -pg -std=gnu++1z -fprofile-arcs -ftest-coverage -Wno-write-strings',
+#                  LINKFLAGS = '-ggdb3 -Wall -m32 -pg -std=gnu++1z -fprofile-arcs -ftest-coverage -Wno-write-strings' )
 
 if os.path.exists('/usr/bin/g++-7'):
 	env.Replace(CXX = 'g++-7')
