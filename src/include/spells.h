@@ -31,7 +31,7 @@ const std::map<int,int> skill_cost = fill_skill_cost();
 void extractFamiliar(CHAR_DATA *ch);
 
 bool skill_success(CHAR_DATA *ch, CHAR_DATA *victim, int skillnum, int mod=0);
-bool canPerform(char_data * const &ch, const int_fast32_t &learned, string failMessage = string());
+bool canPerform(char_data * const &ch, const int_fast32_t &learned, std::string failMessage = std::string());
 
 /* New skill quest thingy. */
 struct skill_quest
