@@ -9,11 +9,6 @@ extern "C"
 #include <stdio.h>
 #include <stdarg.h>
 }
-
-#ifdef LEAK_CHECK
-#include <dmalloc.h>
-#endif
-
 #include <connect.h>
 #include <character.h>
 #include <utility.h>

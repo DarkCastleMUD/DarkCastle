@@ -13,10 +13,6 @@
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
 
-#ifdef LEAK_CHECK
-#include <dmalloc.h>
-#endif
-
 #include <assert.h>
 #include <character.h>
 #include <structs.h>

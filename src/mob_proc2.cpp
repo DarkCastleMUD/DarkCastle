@@ -29,10 +29,6 @@
 #include <returnvals.h>
 #include <spells.h>
 
-#ifdef LEAK_CHECK
-#include <dmalloc.h>
-#endif
-
 
 /*   external vars  */
 

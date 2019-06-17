@@ -29,9 +29,6 @@ extern "C"
   #include <stdlib.h>
 #include <math.h> // pow(double,double)
 }
-#ifdef LEAK_CHECK
-#include <dmalloc.h>
-#endif
 
 #include <room.h>
 #include <connect.h>

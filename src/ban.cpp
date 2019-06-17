@@ -1,8 +1,4 @@
 #include <string.h>
-#ifdef LEAK_CHECK
-#include <dmalloc.h>
-#endif
-
 
 #include <player.h>
 #include <levels.h>

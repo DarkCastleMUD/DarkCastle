@@ -37,10 +37,6 @@ extern "C"
 #include <inventory.h>
 #include <queue>
 
-#ifdef LEAK_CHECK
-#include <dmalloc.h>
-#endif
-
 /* extern variables */
 
 extern CWorld world;

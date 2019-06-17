@@ -4,10 +4,6 @@
 | Description:  All of the channel - type commands; do_say, gossip, etc..
 */
 
-#ifdef LEAK_CHECK
-#include <dmalloc.h>
-#endif
-
 #include <string.h> //strstr()
 #include <cctype>
 #include <string>

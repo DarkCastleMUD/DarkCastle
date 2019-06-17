@@ -29,9 +29,6 @@ extern "C"
 #include <assert.h>
 #include <stdlib.h>
 }
-#ifdef LEAK_CHECK
-#include <dmalloc.h>
-#endif
 
 #include <character.h>
 #include <race.h>

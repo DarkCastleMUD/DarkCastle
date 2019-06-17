@@ -7,10 +7,6 @@ extern "C"
 {
   #include <string.h>
 }
-#ifdef LEAK_CHECK
-#include <dmalloc.h>
-#endif
-
 #include <connect.h>
 #include <utility.h>
 #include <character.h>

@@ -9,9 +9,6 @@ extern "C" {
 #include <stdlib.h>
 #include <string.h>
 }
-#ifdef LEAK_CHECK
-#include <dmalloc.h>
-#endif
 
 #include <sing.h>
 #include <room.h>

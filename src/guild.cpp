@@ -17,9 +17,6 @@
 #include <mobile.h>
 #include <room.h>
 #include <sing.h>
-#ifdef LEAK_CHECK
-#include <dmalloc.h>
-#endif
 #include <handler.h>
 
 extern CWorld world;

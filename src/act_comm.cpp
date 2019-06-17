@@ -16,10 +16,6 @@ extern "C"
 {
   #include <string.h>
 }
-#ifdef LEAK_CHECK
-#include <dmalloc.h>
-#endif
-
 #include <assert.h>
 #include <terminal.h>
 #include <connect.h>

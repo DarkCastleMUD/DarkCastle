@@ -14,10 +14,6 @@ extern "C"
   #include <stdio.h> // FILE *
   #include <ctype.h> // isspace..
 }
-#ifdef LEAK_CHECK
-#include <dmalloc.h>
-#endif
-
 #include <db.h> // real_room
 #include <player.h>
 #include <utility.h>

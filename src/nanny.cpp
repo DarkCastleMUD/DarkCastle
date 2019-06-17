@@ -31,10 +31,6 @@ extern "C" {
 	#include <mmsystem.h>
 #endif
 }
-#ifdef LEAK_CHECK
-#include <dmalloc.h>
-#endif
-
 #include <character.h>
 #include <comm.h>
 #include <connect.h>

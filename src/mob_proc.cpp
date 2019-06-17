@@ -13,10 +13,6 @@
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
 /* $Id: mob_proc.cpp,v 1.208 2014/07/31 01:07:24 jhhudso Exp $ */
-#ifdef LEAK_CHECK
-#include <dmalloc.h>
-#endif
-
 #include <assert.h>
 #include <character.h>
 #include <structs.h>

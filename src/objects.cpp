@@ -9,10 +9,6 @@ extern "C"
   #include <ctype.h>
   #include <string.h>
 }
-#ifdef LEAK_CHECK
-#include <dmalloc.h>
-#endif
-
 #include <obj.h>
 #include <connect.h>
 #include <utility.h>

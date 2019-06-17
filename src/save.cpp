@@ -24,10 +24,6 @@ extern "C"
 //#include <sys/stat.h>
 //#include <unistd.h>
 }
-#ifdef LEAK_CHECK
-#include <dmalloc.h>
-#endif
-
 #include <obj.h>
 #include <room.h>
 #include <character.h>

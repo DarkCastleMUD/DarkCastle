@@ -33,10 +33,6 @@ extern "C"
 #include <stdlib.h>
 }
 
-#ifdef LEAK_CHECK
-#include <dmalloc.h>
-#endif
-
 #include <sstream>
 #include <limits>
 

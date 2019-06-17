@@ -24,11 +24,6 @@ extern "C"
 #include <assert.h>
 }
 
-#ifdef LEAK_CHECK
-#include <dmalloc.h>
-#endif
-
-
 #include <magic.h>
 #include <spells.h>
 #include <room.h>

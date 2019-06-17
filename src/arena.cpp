@@ -9,10 +9,6 @@
 /*****************************************************************************/
 /* $Id: arena.cpp,v 1.17 2009/04/24 21:50:43 shane Exp $ */
 
-#ifdef LEAK_CHECK
-#include <dmalloc.h>
-#endif
-
 #include <room.h>  // room_data
 #include <db.h>      // real_room()
 #include <interp.h> // do_look()

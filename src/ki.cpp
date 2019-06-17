@@ -11,9 +11,6 @@ extern "C"
 #include <stdlib.h>
 #include <string.h>
 }
-#ifdef LEAK_CHECK
-#include <dmalloc.h>
-#endif
 
 #include <ki.h>
 #include <room.h>

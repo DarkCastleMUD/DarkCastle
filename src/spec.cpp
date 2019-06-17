@@ -8,9 +8,6 @@ extern "C"
 #include <ctype.h>
 #include <string.h>
 }
-#ifdef LEAK_CHECK
-#include <dmalloc.h>
-#endif
 
 #include <structs.h>
 #include <room.h>

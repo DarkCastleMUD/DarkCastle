@@ -6,10 +6,6 @@ extern "C"
   #include <string.h>
   #include <stdlib.h> // qsort()
 }
-#ifdef LEAK_CHECK
-#include <dmalloc.h>
-#endif
-
 #include <fileinfo.h> // SOCIAL_FILE
 #include <structs.h> // MAX_INPUT_LENGTH
 #include <room.h>

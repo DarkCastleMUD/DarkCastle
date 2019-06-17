@@ -27,11 +27,6 @@ extern "C"
 #include <db.h>
 #include <interp.h>
 
-#ifdef LEAK_CHECK
-#include <dmalloc.h>
-#endif
-
-
 extern CWorld world;
 extern struct index_data *mob_index;
 

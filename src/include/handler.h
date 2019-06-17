@@ -20,12 +20,6 @@
 #include <structs.h> // ubyte, etc..
 #include <comm.h>
 
-#ifdef NeXT
-#ifndef bool
-#define bool int
-#endif
-#endif
-
 /* handling the affected-structures */
 void affect_total(CHAR_DATA *ch);
 void affect_modify(CHAR_DATA *ch, int32 loc, int32 mod, long bitv, bool add, int flag = 0);

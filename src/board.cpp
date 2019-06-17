@@ -46,10 +46,6 @@ extern "C"
   #include <string.h> // memset()
   #include <ctype.h> // isspace(), isdigit()
 }
-#ifdef LEAK_CHECK
-#include <dmalloc.h>
-#endif
-
 #include <room.h>
 #include <obj.h>
 #include <player.h> // MAX_*

@@ -22,9 +22,6 @@
 #include <affect.h>
 #include <utility.h>
 #include <isr.h>
-#ifdef LEAK_CHECK
-#include <dmalloc.h>
-#endif
 #include <handler.h>
 // Locals
 void advance_golem_level(CHAR_DATA *golem);
