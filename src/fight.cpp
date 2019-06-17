@@ -33,9 +33,6 @@ extern "C"
 #include <unistd.h>
 #endif
 }
-#ifdef LEAK_CHECK
-
-#endif
 
 #include <fight.h>
 #include <levels.h>

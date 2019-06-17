@@ -18,9 +18,6 @@ extern "C" {
 #include <stdio.h>
 #include <string.h>
 }
-#ifdef LEAK_CHECK
-
-#endif
 
 #ifdef BANDWIDTH
 #include <bandwidth.h>

@@ -27,9 +27,6 @@ extern "C"
 #include <assert.h>
 /*#include <memory.h>*/
 }
-#ifdef LEAK_CHECK
-
-#endif
 
 #include <structs.h> // MAX_STRING_LENGTH
 #include <character.h> // POSITION_*

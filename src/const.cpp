@@ -19,10 +19,6 @@ extern "C"
 #include <stdio.h>
 }
 
-#ifdef LEAK_CHECK
-
-#endif
-
 #include <map>
 #include <string>
 

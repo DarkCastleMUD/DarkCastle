@@ -25,9 +25,6 @@ extern "C"
 {
 #include <stdio.h>
 }
-#ifdef LEAK_CHECK
-
-#endif
 
 #include <character.h>
 #include <room.h>

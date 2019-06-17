@@ -23,10 +23,6 @@ extern "C" {
 #include <assert.h>
 }
 
-#ifdef LEAK_CHECK
-
-#endif
-
 #include <magic.h>
 #include <spells.h>
 #include <room.h>

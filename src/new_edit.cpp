@@ -7,9 +7,6 @@ extern "C"
 #include <time.h>
 #include <stdlib.h>
 }
-#ifdef LEAK_CHECK
-
-#endif
 
 #include <connect.h> // descriptor_data
 #include <character.h>

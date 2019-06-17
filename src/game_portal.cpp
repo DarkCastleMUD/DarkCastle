@@ -15,9 +15,6 @@
 #include <room.h>
 #include <db.h>
 #include <handler.h>
-#ifdef LEAK_CHECK
-
-#endif
 
 extern "C" 
 {

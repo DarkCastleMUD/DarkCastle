@@ -7,9 +7,6 @@ extern "C"
 {
 #include <ctype.h> // isspace()
 }
-#ifdef LEAK_CHECK
-
-#endif
 
 #include <character.h>
 #include <room.h>

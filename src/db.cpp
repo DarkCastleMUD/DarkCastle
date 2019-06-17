@@ -31,10 +31,6 @@ extern "C"
 #include <stdlib.h>
 }
 
-#ifdef LEAK_CHECK
-
-#endif
-
 #include <sstream>
 #include <limits>
 

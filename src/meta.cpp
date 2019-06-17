@@ -13,10 +13,6 @@
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
 
-#ifdef LEAK_CHECK
-
-#endif
-
 #include <assert.h>
 #include <character.h>
 #include <structs.h>

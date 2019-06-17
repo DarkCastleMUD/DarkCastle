@@ -3,9 +3,6 @@ extern "C"
 #include <ctype.h>
 #include <string.h>
 }
-#ifdef LEAK_CHECK
-
-#endif
 
 #include <structs.h>
 #include <room.h>

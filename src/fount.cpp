@@ -16,9 +16,6 @@ extern "C"
 #include <stdio.h>
 #include <ctype.h>
 }
-#ifdef LEAK_CHECK
-
-#endif
 
 #include <room.h>
 #include <obj.h>
