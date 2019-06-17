@@ -161,6 +161,12 @@ struct command_lag
    int lag;
 };
 
+struct cmd_hash_info {
+	struct command_info *command;
+	struct cmd_hash_info *left;
+	struct cmd_hash_info *right;
+};
+
 #define COM_CHARMIE_OK       1
 
 DO_FUN do_mscore;

@@ -14,6 +14,7 @@ extern "C" {
  */
 extern "C" {
 #include <sys/bsd_types.h>
+#include <sys/types.h>
 }
 /*
  * Definitions related to sockets: types, address families, options.

@@ -17,6 +17,7 @@
 #include <spells.h>
 #include <interp.h>
 #include <returnvals.h>
+#include <unistd.h>
 
 #ifdef TWITTER
 #include <curl.h>

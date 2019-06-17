@@ -597,968 +597,975 @@ int find_file(world_file_list_item *itm, int high)
 }
 
 int do_show(struct char_data *ch, char *argument, int cmd) {
-  char name[MAX_INPUT_LENGTH], buf[200];
-  char beginrange[MAX_INPUT_LENGTH];
-  char endrange[MAX_INPUT_LENGTH];
-  char type[MAX_INPUT_LENGTH];
-  world_file_list_item * curr = NULL;
-  int i;
-  int nr;
-  int count = 0;
-  int begin, end;
+	char name[MAX_INPUT_LENGTH], buf[200];
+	char beginrange[MAX_INPUT_LENGTH];
+	char endrange[MAX_INPUT_LENGTH];
+	char type[MAX_INPUT_LENGTH];
+	world_file_list_item * curr = NULL;
+	int i;
+	int nr;
+	int count = 0;
+	int begin, end;
 
-  extern world_file_list_item * world_file_list;
-  extern world_file_list_item *   mob_file_list;
-  extern world_file_list_item *   obj_file_list;
-  extern char *dirs[];
-  extern int top_of_mobt;
-  extern int top_of_objt;
-  extern int top_of_world;
- 
+	extern world_file_list_item * world_file_list;
+	extern world_file_list_item * mob_file_list;
+	extern world_file_list_item * obj_file_list;
+	extern char *dirs[];
+	extern int top_of_mobt;
+	extern int top_of_objt;
+	extern int top_of_world;
+
 //  half_chop(argument, type, name);
-  argument = one_argument(argument,type);
+	argument = one_argument(argument, type);
 
-  //argument = one_argument(argument,name);
-  
-  int has_range = has_skill(ch, COMMAND_RANGE);
+	//argument = one_argument(argument,name);
 
-  if(!*type) {
-    send_to_char("Format: show <type> <name>.\n\r"
-                 "Types:\r\n"
-                 "  keydoorcombo\r\n"
-                 "  mob\r\n"
-                 "  obj\r\n"
-                 "  room\r\n"
-                 "  zone\r\n"
-                 "  zone all\r\n",ch); 
-    if(has_range)
-      send_to_char("  rfiles\r\n"
-                   "  mfiles\r\n"
-                   "  ofiles\r\n"
-		   "  search\r\n"
-		   " msearch\r\n"
-		   " rsearch\r\n"
-		   " counts\r\n", ch);
-    return eFAILURE;
-  }
+	int has_range = has_skill(ch, COMMAND_RANGE);
 
-  if(is_abbrev(type,"mobile")) 
-  {
-    argument = one_argument(argument,name);
-    if(!*name) {
-       send_to_char("Format:  show mob <keyword>\r\n"
-                    "                  <number>\r\n"
-                    "                  <beginrange> <endrange>\r\n", ch);
-       return eFAILURE;
-    }
+	if (!*type) {
+		send_to_char("Format: show <type> <name>.\n\r"
+				"Types:\r\n"
+				"  keydoorcombo\r\n"
+				"  mob\r\n"
+				"  obj\r\n"
+				"  room\r\n"
+				"  zone\r\n"
+				"  zone all\r\n", ch);
+		if (has_range)
+			send_to_char("  rfiles\r\n"
+					"  mfiles\r\n"
+					"  ofiles\r\n"
+					"  search\r\n"
+					" msearch\r\n"
+					" rsearch\r\n"
+					" counts\r\n", ch);
+		return eFAILURE;
+	}
 
-    if(isdigit(*name)) {
+	if (is_abbrev(type, "mobile")) {
+		argument = one_argument(argument, name);
+		if (!*name) {
+			send_to_char("Format:  show mob <keyword>\r\n"
+					"                  <number>\r\n"
+					"                  <beginrange> <endrange>\r\n", ch);
+			return eFAILURE;
+		}
+
+		if (isdigit(*name)) {
 //       half_chop(name, beginrange, endrange);
-	strcpy(beginrange, name);
+			strcpy(beginrange, name);
 //        beginrange = name;
-        argument = one_argument(argument,endrange);
-        if(!*endrange)
-         strcpy(endrange, "-1");
+			argument = one_argument(argument, endrange);
+			if (!*endrange)
+				strcpy(endrange, "-1");
 
-       if(!check_range_valid_and_convert(begin, beginrange, 0, 100000) ||
-          !check_range_valid_and_convert(end, endrange, -1, 100000))
-       {
-         send_to_char("The begin and end ranges must be valid numbers.\r\n", ch);
-         return eFAILURE;
-       }
-       if(end != -1 && end < begin) {  // swap um
-         i = end;
-         end = begin;
-         begin = i;
-       }
+			if (!check_range_valid_and_convert(begin, beginrange, 0, 100000)
+					|| !check_range_valid_and_convert(end, endrange, -1,
+							100000)) {
+				send_to_char(
+						"The begin and end ranges must be valid numbers.\r\n",
+						ch);
+				return eFAILURE;
+			}
+			if (end != -1 && end < begin) {  // swap um
+				i = end;
+				end = begin;
+				begin = i;
+			}
 
-       *buf = '\0';
-       send_to_char("[#  ] [MOB #] [LV] MOB'S DESCRIPTION\n\n\r", ch);
+			*buf = '\0';
+			send_to_char("[#  ] [MOB #] [LV] MOB'S DESCRIPTION\n\n\r", ch);
 
-       if(end == -1) {
-         if((nr = real_mobile(begin)) >= 0) {
-           sprintf(buf, "[  1] [%5d] [%2d] %s\n\r", begin, ((struct char_data*)(mob_index[nr].item))->level,
-                   ((struct char_data *)(mob_index[nr].item))->short_desc);
-           send_to_char(buf, ch);
-         }
-       }
-       else {
-         for(i = begin;i <= mob_index[top_of_mobt].virt && i <= end; i++) {
-            if((nr = real_mobile(i)) < 0)
-              continue;
+			if (end == -1) {
+				if ((nr = real_mobile(begin)) >= 0) {
+					sprintf(buf, "[  1] [%5d] [%2d] %s\n\r", begin,
+							((struct char_data*) (mob_index[nr].item))->level,
+							((struct char_data *) (mob_index[nr].item))->short_desc);
+					send_to_char(buf, ch);
+				}
+			} else {
+				for (i = begin; i <= mob_index[top_of_mobt].virt && i <= end;
+						i++) {
+					if ((nr = real_mobile(i)) < 0)
+						continue;
 
-           count++;
-           sprintf(buf, "[%3d] [%5d] [%2d] %s\n\r", count, i, ((struct char_data*)(mob_index[nr].item))->level,
-              ((struct char_data *)(mob_index[nr].item))->short_desc);
-           send_to_char(buf, ch);
+					count++;
+					sprintf(buf, "[%3d] [%5d] [%2d] %s\n\r", count, i,
+							((struct char_data*) (mob_index[nr].item))->level,
+							((struct char_data *) (mob_index[nr].item))->short_desc);
+					send_to_char(buf, ch);
 
-           if(count > 200) {
-             send_to_char("Maximum number of searchable items hit.  Search ended.\r\n", ch);
-             break;
-           }
-         } 
-       } 
-    }
-    else {
-       *buf = '\0';
-       send_to_char("[#  ] [MOB #] [LV] MOB'S DESCRIPTION\n\n\r", ch);
- 
-       for(i = 0; (i <= mob_index[top_of_mobt].virt); i++) 
-       {
-          if((nr = real_mobile(i)) < 0)
-            continue;
+					if (count > 200) {
+						send_to_char(
+								"Maximum number of searchable items hit.  Search ended.\r\n",
+								ch);
+						break;
+					}
+				}
+			}
+		} else {
+			*buf = '\0';
+			send_to_char("[#  ] [MOB #] [LV] MOB'S DESCRIPTION\n\n\r", ch);
 
-          if(isname(name,
-             ((struct char_data *)(mob_index[nr].item))->name)) 
-          {
-            count++;
-            sprintf(buf, "[%3d] [%5d] [%2d] %s\n\r", count, i, ((struct char_data*)(mob_index[nr].item))->level,
-                 ((struct char_data *)(mob_index[nr].item))->short_desc);
-            send_to_char(buf, ch);
+			for (i = 0; (i <= mob_index[top_of_mobt].virt); i++) {
+				if ((nr = real_mobile(i)) < 0)
+					continue;
 
-            if(count > 200) {
-              send_to_char("Maximum number of searchable items hit.  Search ended.\r\n", ch);
-              break;
-            }
-          }
-       }
-    }
-    if(!*buf)
-      send_to_char("Couldn't find any MOBS by that NAME.\n\r", ch);
-  } /* "mobile" */
-  else if (is_abbrev(type, "counts") && has_range)
-  {
-     extern int total_rooms;
-     csendf(ch, "$3Rooms$R: %d\r\n$3Mobiles$R: %d\r\n$3Objects$R: %d\r\n",
-	     total_rooms, top_of_mobt, top_of_objt);
-     return eSUCCESS;
-  }
-  else if (is_abbrev(type,"object")) 
-  {
-    argument = one_argument(argument,name);
-     if(!*name) {
-       send_to_char("Format:  show obj <keyword>\r\n"
-                    "                  <number>\r\n"
-                    "                  <beginrange> <endrange>\r\n", ch);
-       return eFAILURE;
-    }
+				if (isname(name,
+						((struct char_data *) (mob_index[nr].item))->name)) {
+					count++;
+					sprintf(buf, "[%3d] [%5d] [%2d] %s\n\r", count, i,
+							((struct char_data*) (mob_index[nr].item))->level,
+							((struct char_data *) (mob_index[nr].item))->short_desc);
+					send_to_char(buf, ch);
 
-    if(isdigit(*name)) {
- //      half_chop(name, beginrange, endrange);
-    argument = one_argument(argument,endrange);
-	//beginrange = name;
-	strcpy(beginrange,name);
-        if(!*endrange)
-         strcpy(endrange, "-1");
+					if (count > 200) {
+						send_to_char(
+								"Maximum number of searchable items hit.  Search ended.\r\n",
+								ch);
+						break;
+					}
+				}
+			}
+		}
+		if (!*buf)
+			send_to_char("Couldn't find any MOBS by that NAME.\n\r", ch);
+	} /* "mobile" */
+	else if (is_abbrev(type, "counts") && has_range) {
+		extern int total_rooms;
+		csendf(ch, "$3Rooms$R: %d\r\n$3Mobiles$R: %d\r\n$3Objects$R: %d\r\n",
+				total_rooms, top_of_mobt, top_of_objt);
+		return eSUCCESS;
+	} else if (is_abbrev(type, "object")) {
+		argument = one_argument(argument, name);
+		if (!*name) {
+			send_to_char("Format:  show obj <keyword>\r\n"
+					"                  <number>\r\n"
+					"                  <beginrange> <endrange>\r\n", ch);
+			return eFAILURE;
+		}
 
-       if(!check_range_valid_and_convert(begin, beginrange, 0, 100000) ||
-          !check_range_valid_and_convert(end, endrange, -1, 100000))
-       {
-         send_to_char("The begin and end ranges must be valid numbers.\r\n", ch);
-         return eFAILURE;
-       }
-       if(end != -1 && end < begin) {  // swap um
-         i = end;
-         end = begin;
-         begin = i;
-       }
+		if (isdigit(*name)) {
+			//      half_chop(name, beginrange, endrange);
+			argument = one_argument(argument, endrange);
+			//beginrange = name;
+			strcpy(beginrange, name);
+			if (!*endrange)
+				strcpy(endrange, "-1");
 
-       *buf = '\0';
-       send_to_char("[#  ] [OBJ #] [LV] OBJECT'S DESCRIPTION\n\n\r", ch);
+			if (!check_range_valid_and_convert(begin, beginrange, 0, 100000)
+					|| !check_range_valid_and_convert(end, endrange, -1,
+							100000)) {
+				send_to_char(
+						"The begin and end ranges must be valid numbers.\r\n",
+						ch);
+				return eFAILURE;
+			}
+			if (end != -1 && end < begin) {  // swap um
+				i = end;
+				end = begin;
+				begin = i;
+			}
 
-       if(end == -1) {
-         if((nr = real_object(begin)) >= 0) {
-           sprintf(buf, "[  1] [%5d] [%2d] %s\n\r", begin, ((struct obj_data *)(obj_index[nr].item))->obj_flags.eq_level,
-                   ((struct obj_data *)(obj_index[nr].item))->short_description);
-           send_to_char(buf, ch);
-         }
-       }
-       else {
-         for(i = begin;i <= obj_index[top_of_objt].virt && i <= end; i++) {
-            if((nr = real_object(i)) < 0)
-              continue;
+			*buf = '\0';
+			send_to_char("[#  ] [OBJ #] [LV] OBJECT'S DESCRIPTION\n\n\r", ch);
 
-           count++;
-           sprintf(buf, "[%3d] [%5d] [%2d] %s\n\r", count, i, ((struct obj_data *)(obj_index[nr].item))->obj_flags.eq_level,
-              ((struct obj_data *)(obj_index[nr].item))->short_description);
-           send_to_char(buf, ch);
+			if (end == -1) {
+				if ((nr = real_object(begin)) >= 0) {
+					sprintf(buf, "[  1] [%5d] [%2d] %s\n\r", begin,
+							((struct obj_data *) (obj_index[nr].item))->obj_flags.eq_level,
+							((struct obj_data *) (obj_index[nr].item))->short_description);
+					send_to_char(buf, ch);
+				}
+			} else {
+				for (i = begin; i <= obj_index[top_of_objt].virt && i <= end;
+						i++) {
+					if ((nr = real_object(i)) < 0)
+						continue;
 
-           if(count > 200) {
-             send_to_char("Maximum number of searchable items hit.  Search ended.\r\n", ch);
-             break;
-           }
-         } 
-       } 
-    }
-    else {
-       *buf = '\0';
-       send_to_char("[#  ] [OBJ #] [LV] OBJECT'S DESCRIPTION\n\n\r", ch);
+					count++;
+					sprintf(buf, "[%3d] [%5d] [%2d] %s\n\r", count, i,
+							((struct obj_data *) (obj_index[nr].item))->obj_flags.eq_level,
+							((struct obj_data *) (obj_index[nr].item))->short_description);
+					send_to_char(buf, ch);
 
-       for(i = 0; ( i <= obj_index[top_of_objt].virt); i++) 
-       {
-          if((nr = real_object(i)) < 0)
-            continue;
+					if (count > 200) {
+						send_to_char(
+								"Maximum number of searchable items hit.  Search ended.\r\n",
+								ch);
+						break;
+					}
+				}
+			}
+		} else {
+			*buf = '\0';
+			send_to_char("[#  ] [OBJ #] [LV] OBJECT'S DESCRIPTION\n\n\r", ch);
 
-          if(isname(name, ((struct obj_data *)(obj_index[nr].item))->name)) 
-          {
-            count++;
-            sprintf(buf, "[%3d] [%5d] [%2d] %s\n\r", count, i, ((struct obj_data *)(obj_index[nr].item))->obj_flags.eq_level,
-                ((struct obj_data *)(obj_index[nr].item))->short_description);
-            send_to_char(buf, ch);
-          }
+			for (i = 0; (i <= obj_index[top_of_objt].virt); i++) {
+				if ((nr = real_object(i)) < 0)
+					continue;
 
-          if(count > 200) {
-             send_to_char("Maximum number of searchable items hit.  Search ended.\r\n", ch);
-             break;
-          }
-       }
-    }
-    if(!*buf)
-      send_to_char("Couldn't find any OBJECTS by that NAME.\n\r", ch);
-  } /* "object" */
-  else if (is_abbrev(type,"room")) 
-  {
-    argument = one_argument(argument,name);
-     if(!*name) {
-       send_to_char("Format:  show room <beginrange> <endrange>\r\n", ch);
-       return eFAILURE;
-    }
+				if (isname(name,
+						((struct obj_data *) (obj_index[nr].item))->name)) {
+					count++;
+					sprintf(buf, "[%3d] [%5d] [%2d] %s\n\r", count, i,
+							((struct obj_data *) (obj_index[nr].item))->obj_flags.eq_level,
+							((struct obj_data *) (obj_index[nr].item))->short_description);
+					send_to_char(buf, ch);
+				}
 
-    if(isdigit(*name)) {
- //      half_chop(name, beginrange, endrange);
-      argument = one_argument(argument,endrange);
+				if (count > 200) {
+					send_to_char(
+							"Maximum number of searchable items hit.  Search ended.\r\n",
+							ch);
+					break;
+				}
+			}
+		}
+		if (!*buf)
+			send_to_char("Couldn't find any OBJECTS by that NAME.\n\r", ch);
+	} /* "object" */
+	else if (is_abbrev(type, "room")) {
+		argument = one_argument(argument, name);
+		if (!*name) {
+			send_to_char("Format:  show room <beginrange> <endrange>\r\n", ch);
+			return eFAILURE;
+		}
+
+		if (isdigit(*name)) {
+			//      half_chop(name, beginrange, endrange);
+			argument = one_argument(argument, endrange);
 //	beginrange = name;
-	strcpy(beginrange, name);
-        if(!*endrange)
-         strcpy(endrange, "-1");
+			strcpy(beginrange, name);
+			if (!*endrange)
+				strcpy(endrange, "-1");
 
-       if(!check_range_valid_and_convert(begin, beginrange, 0, 100000) ||
-          !check_range_valid_and_convert(end, endrange, -1, 100000))
-       {
-         send_to_char("The begin and end ranges must be valid numbers.\r\n", ch);
-         return eFAILURE;
-       }
-       if(end != -1 && end < begin) {  // swap um
-         i = end;
-         end = begin;
-         begin = i;
-       }
+			if (!check_range_valid_and_convert(begin, beginrange, 0, 100000)
+					|| !check_range_valid_and_convert(end, endrange, -1,
+							100000)) {
+				send_to_char(
+						"The begin and end ranges must be valid numbers.\r\n",
+						ch);
+				return eFAILURE;
+			}
+			if (end != -1 && end < begin) {  // swap um
+				i = end;
+				end = begin;
+				begin = i;
+			}
 
-       *buf = '\0';
-       send_to_char("[#  ] [ROOM#] ROOM'S NAME\n\n\r", ch);
+			*buf = '\0';
+			send_to_char("[#  ] [ROOM#] ROOM'S NAME\n\n\r", ch);
 
-       if(end == -1) {
-         if(world_array[begin]) {
-           sprintf(buf, "[  1] [%5d] %s\n\r", begin, world[begin].name);
-           send_to_char(buf, ch);
-         }
-       }
-       else {
-         for(i = begin; i < top_of_world && i <= end; i++) {
-	   if (!world_array[i]) continue;
-           count++;
-           sprintf(buf, "[%3d] [%5d] %s\n\r", count, i, world[i].name);
-           send_to_char(buf, ch);
+			if (end == -1) {
+				if (world_array[begin]) {
+					sprintf(buf, "[  1] [%5d] %s\n\r", begin,
+							world[begin].name);
+					send_to_char(buf, ch);
+				}
+			} else {
+				for (i = begin; i < top_of_world && i <= end; i++) {
+					if (!world_array[i])
+						continue;
+					count++;
+					sprintf(buf, "[%3d] [%5d] %s\n\r", count, i, world[i].name);
+					send_to_char(buf, ch);
 
-           if(count > 200) {
-             send_to_char("Maximum number of searchable items hit.  Search ended.\r\n", ch);
-             break;
-           }
-         } 
-       } 
-    }
-    if(!*buf)
-      send_to_char("Couldn't find any ROOMS in that range.\n\r", ch);
-  } /* "object" */
-  else if (is_abbrev(type, "zone"))
-  {
-    argument = one_argument(argument,name);
-     if(!*name) {
-       send_to_char("Show which zone? (# or 'all')\r\n", ch);
-       return eFAILURE;
-    }
+					if (count > 200) {
+						send_to_char(
+								"Maximum number of searchable items hit.  Search ended.\r\n",
+								ch);
+						break;
+					}
+				}
+			}
+		}
+		if (!*buf)
+			send_to_char("Couldn't find any ROOMS in that range.\n\r", ch);
+	} /* "object" */
+	else if (is_abbrev(type, "zone")) {
+		argument = one_argument(argument, name);
+		if (!*name) {
+			send_to_char("Show which zone? (# or 'all')\r\n", ch);
+			return eFAILURE;
+		}
 
-    if(!isdigit(*name)) /* show them all */
-    {
-      send_to_char("Num Name\r\n"
-                   "--- ------------------------------------------------------\r\n", ch);
-      for(i = 0; i <= top_of_zone_table; i++)
-      {
-        sprintf(buf, "%3d %5d-%-5d %s\r\n",
-                   i, zone_table[i].bottom_rnum, zone_table[i].top_rnum,zone_table[i].name);
-        send_to_char(buf, ch);
-      }
-    }
-    else /* was a digit */
-    {
-       i = atoi(name);
-       if((!i && *name != '0') || i < 0) {
-          send_to_char("Which zone was that?\r\n", ch);
-          return eFAILURE;
-       }
-       show_zone_commands(ch, i);
+		if (!isdigit(*name)) /* show them all */
+		{
+			send_to_char(
+					"Num Name\r\n"
+							"--- ------------------------------------------------------\r\n",
+					ch);
+			for (i = 0; i <= top_of_zone_table; i++) {
+				sprintf(buf, "%3d %5d-%-5d %s\r\n", i,
+						zone_table[i].bottom_rnum, zone_table[i].top_rnum,
+						zone_table[i].name);
+				send_to_char(buf, ch);
+			}
+		} else /* was a digit */
+		{
+			i = atoi(name);
+			if ((!i && *name != '0') || i < 0) {
+				send_to_char("Which zone was that?\r\n", ch);
+				return eFAILURE;
+			}
+			show_zone_commands(ch, i);
 
-    } // else was a digit
-  } // zone
-  else if (is_abbrev(type, "rsearch") && has_range)
-  {
-     char arg1[MAX_INPUT_LENGTH];
-     int zon, bits = 0, sector = 0;
-     extern char *room_bits[], *sector_types[];
-     argument = one_argument(argument,arg1);
-     if (!is_number(arg1))
-     {
-	send_to_char("Syntax: show rsearch <zone#> <sectorname/roomflag>\r\n",ch);
-	return eSUCCESS;
-     }
-     zon = atoi(arg1);
+		} // else was a digit
+	} // zone
+	else if (is_abbrev(type, "rsearch") && has_range) {
+		char arg1[MAX_INPUT_LENGTH];
+		int zon, bits = 0, sector = 0;
+		extern char *room_bits[], *sector_types[];
+		argument = one_argument(argument, arg1);
+		if (!is_number(arg1)) {
+			send_to_char(
+					"Syntax: show rsearch <zone#> <sectorname/roomflag>\r\n",
+					ch);
+			return eSUCCESS;
+		}
+		zon = atoi(arg1);
 //     room_data  
 //   zone
 //   sector_type
 // room_flags
-       while ( (argument = one_argument(argument,arg1))!=NULL)
-       {
-	  if (arg1[0] == '\0') break;
-	  int i;
-	  bool found = FALSE;
-	  for (i = 0; room_bits[i][0] != '\n'; i++)
-	    if (!str_cmp(arg1, room_bits[i])) {
-		SET_BIT(bits, 1<<i);
-		found = TRUE;
-		break;
-	    }
-	   for (i = 0; sector_types[i][0] != '\n'; i++)
-	     if (!str_cmp(arg1,sector_types[i])) {
-		sector = i-1;
-		found = TRUE;
-		break;
-	    }
-	
-	   if (!found)
-	     send_to_char("Unknown room-flag or sector type.\r\n",ch);
-       }
-	if (!bits && !sector)
-	{
-	  send_to_char("Syntax: show rsearch <zone number> <flags/sector type\r\n",ch);
-	  return eSUCCESS;
-	}
-        if (zon > top_of_zone_table)
-        {
-	  send_to_char("Unknown zone.\r\n",ch);
- 	  return eFAILURE;
-         }
-	char buf[MAX_INPUT_LENGTH];
-       for (i = zone_table[zon].bottom_rnum; i < zone_table[zon].top_rnum;i++)
-       {
-	 if (!world_array[i]) continue;
-	 if (bits)
-  	   if (!IS_SET(world[i].room_flags,bits))
-	 	continue;
-	  if (sector)
-	    if (world[i].sector_type != sector)
-		continue;
-	 sprintf(buf,"[%3d] %s\r\n", i, world[i].name);
-	 send_to_char(buf,ch);
-       }
-  }
-  else if (is_abbrev(type, "msearch") && has_range)
-  {  // Mobile search.
-    char arg1[MAX_STRING_LENGTH];
-    uint32 affect[AFF_MAX/ASIZE+1] = {};
-    uint32 act[ACT_MAX/ASIZE+1] = {};
-    int clas = 0, levlow = -555, levhigh = -555, immune = 0, race = -1, align = 0;
-    extern char *action_bits[];
-    extern struct race_shit race_info[];
-    extern char *isr_bits[];
-    extern char *affected_bits[];
-    extern char *pc_clss_types2[];
-    //int its;
+		while ((argument = one_argument(argument, arg1)) != NULL) {
+			if (arg1[0] == '\0')
+				break;
+			int i;
+			bool found = FALSE;
+			for (i = 0; room_bits[i][0] != '\n'; i++)
+				if (!str_cmp(arg1, room_bits[i])) {
+					SET_BIT(bits, 1 << i);
+					found = TRUE;
+					break;
+				}
+			for (i = 0; sector_types[i][0] != '\n'; i++)
+				if (!str_cmp(arg1, sector_types[i])) {
+					sector = i - 1;
+					found = TRUE;
+					break;
+				}
+
+			if (!found)
+				send_to_char("Unknown room-flag or sector type.\r\n", ch);
+		}
+		if (!bits && !sector) {
+			send_to_char(
+					"Syntax: show rsearch <zone number> <flags/sector type\r\n",
+					ch);
+			return eSUCCESS;
+		}
+		if (zon > top_of_zone_table) {
+			send_to_char("Unknown zone.\r\n", ch);
+			return eFAILURE;
+		}
+		char buf[MAX_INPUT_LENGTH];
+		for (i = zone_table[zon].bottom_rnum; i < zone_table[zon].top_rnum;
+				i++) {
+			if (!world_array[i])
+				continue;
+			if (bits)
+				if (!IS_SET(world[i].room_flags, bits))
+					continue;
+			if (sector)
+				if (world[i].sector_type != sector)
+					continue;
+			sprintf(buf, "[%3d] %s\r\n", i, world[i].name);
+			send_to_char(buf, ch);
+		}
+	} else if (is_abbrev(type, "msearch") && has_range) {  // Mobile search.
+		char arg1[MAX_STRING_LENGTH];
+		uint32 affect[AFF_MAX / ASIZE + 1] = { };
+		uint32 act[ACT_MAX / ASIZE + 1] = { };
+		int clas = 0, levlow = -555, levhigh = -555, immune = 0, race = -1,
+				align = 0;
+		extern char *action_bits[];
+		extern struct race_shit race_info[];
+		extern char *isr_bits[];
+		extern char *affected_bits[];
+		extern char *pc_clss_types2[];
+		//int its;
 //    if (
-    bool fo = FALSE;
-    while ( ( argument = one_argument(argument, arg1) ) )
-    {
-       int i;
-       if (strlen(arg1) < 2) break;
-	fo = TRUE;
-       for (i = 0; *pc_clss_types2[i] != '\n' ; i++)
-        if (!str_cmp(pc_clss_types2[i],arg1))
-        {
-          clas = i;
-          goto thisLoop;
-        }
-       for (i = 0; *isr_bits[i] != '\n' ; i++)
-        if (!str_nosp_cmp(isr_bits[i],arg1))
-        {
-          SET_BIT(immune, 1<<i);
-          goto thisLoop;
-        }
-       for (i = 0; *action_bits[i] != '\n' ; i++)
-        if (!str_nosp_cmp(action_bits[i],arg1))
-        {
-          SETBIT(act, i);
-          goto thisLoop;
-        }
-       for (i = 0; *affected_bits[i] != '\n' ; i++)
-        if (!str_nosp_cmp(affected_bits[i],arg1))
-        {
-          SETBIT(affect, i);
-          goto thisLoop;
-        }
-       for (i = 0; i <= MAX_RACE; i++)
-        if (!str_nosp_cmp(race_info[i].singular_name,arg1))
-        {
-          race = i;
-          goto thisLoop;
-        }
-	if (!str_cmp(arg1,"evil"))
-	  align = 3;
-	else if (!str_cmp(arg1,"good"))
-	  align = 1;
-	else if (!str_cmp(arg1,"neutral"))
-	  align = 2;
-	if (!str_cmp(arg1,"level"))
-	{
-	  argument = one_argument(argument,arg1);
-	  if (is_number(arg1))
-	    levlow = atoi(arg1);
-	  argument = one_argument(argument,arg1);
-	  if (is_number(arg1))
-	    levhigh = atoi(arg1);
-	  if (levhigh ==-555 || levlow==-555)
-	  {
-	    send_to_char("Incorrect level requirement.\r\n",ch);
-	    return eFAILURE;
-	  }
-	}
-       thisLoop:
-	continue;
-     }
-     if (!fo)
-     {
-	int z,o=0;
-	for (z = 0; *action_bits[z] != '\n';z++)
-	{
-	   o++;
-	   send_to_char_nosp(action_bits[z],ch);
-	   if (o%7==0)
-	     send_to_char("\r\n",ch);
-	   else
-	     send_to_char(" ", ch);
-	}
-	for (z = 0; *isr_bits[z] != '\n';z++)
-	{
-	   o++;
-	   send_to_char_nosp(isr_bits[z],ch);
-	   if (o%7==0)
-	     send_to_char("\r\n",ch);
-	   else
-	     send_to_char(" ", ch);
-	}
-	for (z = 0; *affected_bits[z] != '\n';z++)
-	{
-	   o++;
-	   send_to_char_nosp(affected_bits[z],ch);
-	   if (o%7==0)
-	     send_to_char("\r\n",ch);
-	   else
-	     send_to_char(" ", ch);
-	}
-	for (z = 0; *pc_clss_types2[z] != '\n';z++)
-	{
-	   o++;
-	   send_to_char(pc_clss_types2[z],ch);
-	   if (o%7==0)
-	     send_to_char("\r\n",ch);
-	   else
-	     send_to_char(" ", ch);
-	}
-      for (i = 0; i <= MAX_RACE; i++)
-	{
-	   o++;
-	   send_to_char_nosp(race_info[i].singular_name,ch);
-	   if (o%7==0)
-	     send_to_char("\r\n",ch);
-	   else
-	     send_to_char(" ", ch);
-	}
-           send_to_char("level",ch);
-           if (o%7==0)
-             send_to_char("\r\n",ch);
-           else
-             send_to_char(" ", ch);
+		bool fo = FALSE;
+		while ((argument = one_argument(argument, arg1))) {
+			int i;
+			if (strlen(arg1) < 2)
+				break;
+			fo = TRUE;
+			for (i = 0; *pc_clss_types2[i] != '\n'; i++)
+				if (!str_cmp(pc_clss_types2[i], arg1)) {
+					clas = i;
+					goto thisLoop;
+				}
+			for (i = 0; *isr_bits[i] != '\n'; i++)
+				if (!str_nosp_cmp(isr_bits[i], arg1)) {
+					SET_BIT(immune, 1 << i);
+					goto thisLoop;
+				}
+			for (i = 0; *action_bits[i] != '\n'; i++)
+				if (!str_nosp_cmp(action_bits[i], arg1)) {
+					SETBIT(act, i);
+					goto thisLoop;
+				}
+			for (i = 0; *affected_bits[i] != '\n'; i++)
+				if (!str_nosp_cmp(affected_bits[i], arg1)) {
+					SETBIT(affect, i);
+					goto thisLoop;
+				}
+			for (i = 0; i <= MAX_RACE; i++)
+				if (!str_nosp_cmp(race_info[i].singular_name, arg1)) {
+					race = i;
+					goto thisLoop;
+				}
+			if (!str_cmp(arg1, "evil"))
+				align = 3;
+			else if (!str_cmp(arg1, "good"))
+				align = 1;
+			else if (!str_cmp(arg1, "neutral"))
+				align = 2;
+			if (!str_cmp(arg1, "level")) {
+				argument = one_argument(argument, arg1);
+				if (is_number(arg1))
+					levlow = atoi(arg1);
+				argument = one_argument(argument, arg1);
+				if (is_number(arg1))
+					levhigh = atoi(arg1);
+				if (levhigh == -555 || levlow == -555) {
+					send_to_char("Incorrect level requirement.\r\n", ch);
+					return eFAILURE;
+				}
+			}
+			thisLoop: continue;
+		}
+		if (!fo) {
+			int z, o = 0;
+			for (z = 0; *action_bits[z] != '\n'; z++) {
+				o++;
+				send_to_char_nosp(action_bits[z], ch);
+				if (o % 7 == 0)
+					send_to_char("\r\n", ch);
+				else
+					send_to_char(" ", ch);
+			}
+			for (z = 0; *isr_bits[z] != '\n'; z++) {
+				o++;
+				send_to_char_nosp(isr_bits[z], ch);
+				if (o % 7 == 0)
+					send_to_char("\r\n", ch);
+				else
+					send_to_char(" ", ch);
+			}
+			for (z = 0; *affected_bits[z] != '\n'; z++) {
+				o++;
+				send_to_char_nosp(affected_bits[z], ch);
+				if (o % 7 == 0)
+					send_to_char("\r\n", ch);
+				else
+					send_to_char(" ", ch);
+			}
+			for (z = 0; *pc_clss_types2[z] != '\n'; z++) {
+				o++;
+				send_to_char(pc_clss_types2[z], ch);
+				if (o % 7 == 0)
+					send_to_char("\r\n", ch);
+				else
+					send_to_char(" ", ch);
+			}
+			for (i = 0; i <= MAX_RACE; i++) {
+				o++;
+				send_to_char_nosp(race_info[i].singular_name, ch);
+				if (o % 7 == 0)
+					send_to_char("\r\n", ch);
+				else
+					send_to_char(" ", ch);
+			}
+			send_to_char("level", ch);
+			if (o % 7 == 0)
+				send_to_char("\r\n", ch);
+			else
+				send_to_char(" ", ch);
 
-           send_to_char("good",ch);
-           if (o%7==0)
-             send_to_char("\r\n",ch);
-           else
-             send_to_char(" ", ch);
-            send_to_char("evil",ch);
-           if (o%7==0)
-             send_to_char("\r\n",ch);
-           else
-             send_to_char(" ", ch);
-            send_to_char("neutral",ch);
-           if (o%7==0)
-             send_to_char("\r\n",ch);
-           else
-             send_to_char(" ", ch);
- 
-	return eSUCCESS;
-     }
-     int c,nr;
-	if (!*act && !clas && !levlow && !levhigh && !*affect && !immune && !race && !align)
-	{
-	   send_to_char("No valid search supplied.\r\n",ch);
-	   return eFAILURE;
-	}
-     for (c=0;c < mob_index[top_of_mobt].virt;c++)
-     {
-      if ((nr = real_mobile(c)) < 0)	
-           continue;
-      if(race > -1)
-       if (((struct char_data *)(mob_index[nr].item))->race != race)
-         continue;
-      if (align) {
-	if (align == 1 && ((struct char_data *)(mob_index[nr].item))->alignment < 350)
-	  continue;
-	else if (align == 2 && (((struct char_data*)(mob_index[nr].item))->alignment < -350 || ((struct char_data*)(mob_index[nr].item))->alignment > 350))
-	continue;
-	else if (align == 3 && ((struct char_data *)(mob_index[nr].item))->alignment > -350)
-	continue;
-      }
-      if (immune)
-	if (!IS_SET(((struct char_data *)(mob_index[nr].item))->immune, immune))
-	 continue;
-      if (clas)
-        if (((struct char_data *)(mob_index[nr].item))->c_class != clas)
-          continue;
-      if (levlow!=-555)
-	if (((struct char_data *)(mob_index[nr].item))->level < levlow)
-	  continue;
-      if (levhigh!=-555)
-	if (((struct char_data *)(mob_index[nr].item))->level > levhigh)
-	  continue;
-      if(*act)
-	for (i = 0; i < ACT_MAX; i++)
-           if (ISSET(act,i))
-      if (!ISSET(((struct char_data *)(mob_index[nr].item))->mobdata->actflags, i+1))
-         goto eheh;
-      if(*affect)
-	for (i = 0; i < AFF_MAX; i++)
-           if (ISSET(affect,i))
-      		if (!ISSET(((struct char_data *)(mob_index[nr].item))->affected_by, i+1))
-        		goto eheh;
-      count++;
-      if (count > 200)
-      {
-        send_to_char("Limit reached.\r\n",ch);
-        break;
-      }
-           sprintf(buf, "[%3d] [%5d] [%2d] %s\n\r", count, c, ((struct 
-char_data *)(mob_index[nr].item))->level,
-              ((struct char_data *)(mob_index[nr].item))->short_desc);
-      send_to_char(buf,ch);
-     eheh:
-	continue;
-     }
-  }
-  else if (is_abbrev(type, "search"))
-  {  // Object search.
-    char arg1[MAX_STRING_LENGTH];
-    int affect = 0, size = 0, extra = 0, more = 0, wear = 0,type = 0;
-    int levlow = -555, levhigh = -555,dam = 0,lweight = -555, hweight = -555;
-    int any = 0;
-    extern char *wear_bits[];
-    extern char *extra_bits[];
-    extern char *more_obj_bits[];
-    extern char *size_bitfields[];
-    extern char *spells[];
-    extern char *apply_types[];
-    extern char *item_types[];
-    extern char *strs_damage_types[];
-    bool fo = FALSE;
-    int item_type = 0;
-    int its = 0;
-    int spellnum = -1;
-    while ( ( argument = one_argument(argument, arg1) ) )
-    {
-       int i;
-       if (strlen(arg1) < 2) break;
-       fo = TRUE;
+			send_to_char("good", ch);
+			if (o % 7 == 0)
+				send_to_char("\r\n", ch);
+			else
+				send_to_char(" ", ch);
+			send_to_char("evil", ch);
+			if (o % 7 == 0)
+				send_to_char("\r\n", ch);
+			else
+				send_to_char(" ", ch);
+			send_to_char("neutral", ch);
+			if (o % 7 == 0)
+				send_to_char("\r\n", ch);
+			else
+				send_to_char(" ", ch);
 
-     
-       if(!str_nosp_cmp("wand", arg1))
-       {
-         item_type = ITEM_WAND;
-         goto endy;
-       }
-       if(!str_nosp_cmp("staff", arg1))
-       {
-         item_type = ITEM_STAFF;
-         goto endy;
-       }
-       if(!str_nosp_cmp("scroll", arg1))
-       {
-         item_type = ITEM_SCROLL;
-         goto endy;
-       }
-       if(!str_nosp_cmp("potion", arg1))
-       {
-         item_type = ITEM_POTION;
-         goto endy;
-       }
+			return eSUCCESS;
+		}
+		int c, nr;
+		if (!*act && !clas && !levlow && !levhigh && !*affect && !immune
+				&& !race && !align) {
+			send_to_char("No valid search supplied.\r\n", ch);
+			return eFAILURE;
+		}
+		for (c = 0; c < mob_index[top_of_mobt].virt; c++) {
+			if ((nr = real_mobile(c)) < 0)
+				continue;
+			if (race > -1)
+				if (((struct char_data *) (mob_index[nr].item))->race != race)
+					continue;
+			if (align) {
+				if (align == 1
+						&& ((struct char_data *) (mob_index[nr].item))->alignment
+								< 350)
+					continue;
+				else if (align == 2
+						&& (((struct char_data*) (mob_index[nr].item))->alignment
+								< -350
+								|| ((struct char_data*) (mob_index[nr].item))->alignment
+										> 350))
+					continue;
+				else if (align == 3
+						&& ((struct char_data *) (mob_index[nr].item))->alignment
+								> -350)
+					continue;
+			}
+			if (immune)
+				if (!IS_SET(((struct char_data * )(mob_index[nr].item))->immune,
+						immune))
+					continue;
+			if (clas)
+				if (((struct char_data *) (mob_index[nr].item))->c_class
+						!= clas)
+					continue;
+			if (levlow != -555)
+				if (((struct char_data *) (mob_index[nr].item))->level < levlow)
+					continue;
+			if (levhigh != -555)
+				if (((struct char_data *) (mob_index[nr].item))->level
+						> levhigh)
+					continue;
+			if (*act)
+				for (i = 0; i < ACT_MAX; i++)
+					if (ISSET(act, i))
+						if (!ISSET(
+								((struct char_data * )(mob_index[nr].item))->mobdata->actflags,
+								i + 1))
+							goto eheh;
+			if (*affect)
+				for (i = 0; i < AFF_MAX; i++)
+					if (ISSET(affect, i))
+						if (!ISSET(
+								((struct char_data * )(mob_index[nr].item))->affected_by,
+								i + 1))
+							goto eheh;
+			count++;
+			if (count > 200) {
+				send_to_char("Limit reached.\r\n", ch);
+				break;
+			}
+			sprintf(buf, "[%3d] [%5d] [%2d] %s\n\r", count, c,
+					((struct char_data *) (mob_index[nr].item))->level,
+					((struct char_data *) (mob_index[nr].item))->short_desc);
+			send_to_char(buf, ch);
+			eheh: continue;
+		}
+	} else if (is_abbrev(type, "search")) {  // Object search.
+		char arg1[MAX_STRING_LENGTH];
+		int affect = 0, size = 0, extra = 0, more = 0, wear = 0, type = 0;
+		int levlow = -555, levhigh = -555, dam = 0, lweight = -555, hweight =
+				-555;
+		int any = 0;
+		extern char *wear_bits[];
+		extern char *extra_bits[];
+		extern char *more_obj_bits[];
+		extern char *size_bitfields[];
+		extern char *spells[];
+		extern char *apply_types[];
+		extern char *item_types[];
+		extern char *strs_damage_types[];
+		bool fo = FALSE;
+		int item_type = 0;
+		int its = 0;
+		int spellnum = -1;
+		while ((argument = one_argument(argument, arg1))) {
+			int i;
+			if (strlen(arg1) < 2)
+				break;
+			fo = TRUE;
 
-       for (i = 0; *wear_bits[i] != '\n' ; i++)
-	if (!str_nosp_cmp(wear_bits[i],arg1))
-	{
-	  SET_BIT(wear, 1<<i);
-	  goto endy;
-	}
-	for (i=0; *item_types[i] != '\n';i++)
-	{
-	  if (!str_nosp_cmp(item_types[i],arg1))
-	  {
-	     type = i;
-	     goto endy;
-	  }
-	}
-       for (i = 0; *strs_damage_types[i] != '\n' ; i++)
-        if (!str_nosp_cmp(strs_damage_types[i],arg1))
-        {
-	  dam = i;
-          goto endy;
-        }
-       for (i = 0; *extra_bits[i] != '\n' ; i++)
-        if (!str_nosp_cmp(extra_bits[i],arg1))
-        {
-	if (!str_cmp(extra_bits[i], "ANY_CLASS"))
-	  any = i;
-	else
-          SET_BIT(extra, 1<<i);
-          goto endy;
-        }
-       for (i = 0; *more_obj_bits[i] != '\n' ; i++)
-        if (!str_nosp_cmp(more_obj_bits[i],arg1))
-        {
-          SET_BIT(more, 1<<i);
-          goto endy;
-        }
-       for (i = 0; *size_bitfields[i] != '\n' ; i++)
-        if (!str_nosp_cmp(size_bitfields[i],arg1))
-        {
-          SET_BIT(size, 1<<i);
-          goto endy;
-        }
+			if (!str_nosp_cmp("wand", arg1)) {
+				item_type = ITEM_WAND;
+				goto endy;
+			}
+			if (!str_nosp_cmp("staff", arg1)) {
+				item_type = ITEM_STAFF;
+				goto endy;
+			}
+			if (!str_nosp_cmp("scroll", arg1)) {
+				item_type = ITEM_SCROLL;
+				goto endy;
+			}
+			if (!str_nosp_cmp("potion", arg1)) {
+				item_type = ITEM_POTION;
+				goto endy;
+			}
 
-       if(!item_type)
-       {
-         for (i = 0; *apply_types[i] != '\n' ; i++)
-          if (!str_nosp_cmp(apply_types[i],arg1))
-          {
-              affect = i;
-              goto endy;
-          }
-       }
-       else
-       {
-         for (i = 0; *spells[i] != '\n' ; i++)
-           if (!str_nosp_cmp(spells[i],arg1))
-           {
-             spellnum = i+1;
-             goto endy;
-           }
-       }
+			for (i = 0; *wear_bits[i] != '\n'; i++)
+				if (!str_nosp_cmp(wear_bits[i], arg1)) {
+					SET_BIT(wear, 1 << i);
+					goto endy;
+				}
+			for (i = 0; *item_types[i] != '\n'; i++) {
+				if (!str_nosp_cmp(item_types[i], arg1)) {
+					type = i;
+					goto endy;
+				}
+			}
+			for (i = 0; *strs_damage_types[i] != '\n'; i++)
+				if (!str_nosp_cmp(strs_damage_types[i], arg1)) {
+					dam = i;
+					goto endy;
+				}
+			for (i = 0; *extra_bits[i] != '\n'; i++)
+				if (!str_nosp_cmp(extra_bits[i], arg1)) {
+					if (!str_cmp(extra_bits[i], "ANY_CLASS"))
+						any = i;
+					else
+						SET_BIT(extra, 1 << i);
+					goto endy;
+				}
+			for (i = 0; *more_obj_bits[i] != '\n'; i++)
+				if (!str_nosp_cmp(more_obj_bits[i], arg1)) {
+					SET_BIT(more, 1 << i);
+					goto endy;
+				}
+			for (i = 0; *size_bitfields[i] != '\n'; i++)
+				if (!str_nosp_cmp(size_bitfields[i], arg1)) {
+					SET_BIT(size, 1 << i);
+					goto endy;
+				}
 
-       if (!str_cmp(arg1,"olevel"))
-       {
-         argument = one_argument(argument,arg1);
-         if (is_number(arg1))
-           levlow = atoi(arg1);
+			if (!item_type) {
+				for (i = 0; *apply_types[i] != '\n'; i++)
+					if (!str_nosp_cmp(apply_types[i], arg1)) {
+						affect = i;
+						goto endy;
+					}
+			} else {
+				for (i = 0; *spells[i] != '\n'; i++)
+					if (!str_nosp_cmp(spells[i], arg1)) {
+						spellnum = i + 1;
+						goto endy;
+					}
+			}
 
-         argument = one_argument(argument,arg1);
-         if (is_number(arg1))
-           levhigh = atoi(arg1);
+			if (!str_cmp(arg1, "olevel")) {
+				argument = one_argument(argument, arg1);
+				if (is_number(arg1))
+					levlow = atoi(arg1);
 
-         if (levhigh == -555 || levlow == -555)
-         {
-           send_to_char("Incorrect level requirement.\r\n",ch);
-           return eFAILURE;
-         }
-       }
-       if (!str_cmp(arg1,"oweight"))
-       {
-         argument = one_argument(argument,arg1);
-         if (is_number(arg1))
-           lweight = atoi(arg1);
+				argument = one_argument(argument, arg1);
+				if (is_number(arg1))
+					levhigh = atoi(arg1);
 
-         argument = one_argument(argument,arg1);
-         if (is_number(arg1))
-           hweight = atoi(arg1);
+				if (levhigh == -555 || levlow == -555) {
+					send_to_char("Incorrect level requirement.\r\n", ch);
+					return eFAILURE;
+				}
+			}
+			if (!str_cmp(arg1, "oweight")) {
+				argument = one_argument(argument, arg1);
+				if (is_number(arg1))
+					lweight = atoi(arg1);
 
-         if (lweight == -555 || hweight == -555)
-         {
-           send_to_char("Incorrect weight requirement.\r\n",ch);
-           return eFAILURE;
-         }
-      }
-       csendf(ch, "Unknown type: %s.\r\n", arg1);
-       endy:
-	continue;
-     }
-     int c,nr,aff;
+				argument = one_argument(argument, arg1);
+				if (is_number(arg1))
+					hweight = atoi(arg1);
+
+				if (lweight == -555 || hweight == -555) {
+					send_to_char("Incorrect weight requirement.\r\n", ch);
+					return eFAILURE;
+				}
+			}
+			csendf(ch, "Unknown type: %s.\r\n", arg1);
+			endy: continue;
+		}
+		int c, nr, aff;
 //     csendf(ch,"%d %d %d %d %d", more, extra, wear, size, affect);
-     bool found = FALSE;
-    int o = 0, z;
-    if (!fo)
-    {
-	for (z = 0; *wear_bits[z] != '\n';z++)
-	{
-	   o++;
-	   send_to_char_nosp(wear_bits[z], ch);
-	   if (o%7==0)
-	     send_to_char("\r\n",ch);
-	   else
-	     send_to_char(" ", ch);
-	}
-	for (z = 0; *extra_bits[z] != '\n';z++)
-	{
-	   o++;
-	   send_to_char_nosp(extra_bits[z], ch);
-	   if (o%7==0)
-	     send_to_char("\r\n",ch);
-	   else
-	     send_to_char(" ", ch);
-	}
-        for (z = 0; *strs_damage_types[z] != '\n';z++)
-        {
-           o++;
-           send_to_char_nosp(strs_damage_types[z],ch);
-           if (o%7==0)
-             send_to_char("\r\n",ch);
-           else
-             send_to_char(" ", ch);
-        }
+		bool found = FALSE;
+		int o = 0, z;
+		if (!fo) {
+			for (z = 0; *wear_bits[z] != '\n'; z++) {
+				o++;
+				send_to_char_nosp(wear_bits[z], ch);
+				if (o % 7 == 0)
+					send_to_char("\r\n", ch);
+				else
+					send_to_char(" ", ch);
+			}
+			for (z = 0; *extra_bits[z] != '\n'; z++) {
+				o++;
+				send_to_char_nosp(extra_bits[z], ch);
+				if (o % 7 == 0)
+					send_to_char("\r\n", ch);
+				else
+					send_to_char(" ", ch);
+			}
+			for (z = 0; *strs_damage_types[z] != '\n'; z++) {
+				o++;
+				send_to_char_nosp(strs_damage_types[z], ch);
+				if (o % 7 == 0)
+					send_to_char("\r\n", ch);
+				else
+					send_to_char(" ", ch);
+			}
 
-        for (z = 0; *more_obj_bits[z] != '\n';z++)
-        {
-           o++;
-           send_to_char_nosp(more_obj_bits[z],ch);
-           if (o%7==0)
-             send_to_char("\r\n",ch);
-           else
-             send_to_char(" ", ch);
-        }
-	for (z = 0; *item_types[z] != '\n';z++)
-	{
-	   o++;
-	   send_to_char_nosp(item_types[z],ch);
-	   if (o%7==0)
-	     send_to_char("\r\n",ch);
-	   else
-	     send_to_char(" ", ch);
-	}
-	for (z = 0; *size_bitfields[z] != '\n';z++)
-	{
-	   o++;
-	   send_to_char_nosp(size_bitfields[z],ch);
-	   if (o%7==0)
-	     send_to_char("\r\n",ch);
-	   else
-	     send_to_char(" ", ch);
-	}
-	for (z = 0; *apply_types[z] != '\n';z++)
-	{
-	   o++;
-	   send_to_char_nosp(apply_types[z],ch);
-	   if (o%7==0)
-	     send_to_char("\r\n",ch);
-	   else
-	     send_to_char(" ", ch);
-	}
-           send_to_char("oweight",ch);
-           if (o%7==0)
-             send_to_char("\r\n",ch);
-           else
-             send_to_char(" ", ch);
+			for (z = 0; *more_obj_bits[z] != '\n'; z++) {
+				o++;
+				send_to_char_nosp(more_obj_bits[z], ch);
+				if (o % 7 == 0)
+					send_to_char("\r\n", ch);
+				else
+					send_to_char(" ", ch);
+			}
+			for (z = 0; *item_types[z] != '\n'; z++) {
+				o++;
+				send_to_char_nosp(item_types[z], ch);
+				if (o % 7 == 0)
+					send_to_char("\r\n", ch);
+				else
+					send_to_char(" ", ch);
+			}
+			for (z = 0; *size_bitfields[z] != '\n'; z++) {
+				o++;
+				send_to_char_nosp(size_bitfields[z], ch);
+				if (o % 7 == 0)
+					send_to_char("\r\n", ch);
+				else
+					send_to_char(" ", ch);
+			}
+			for (z = 0; *apply_types[z] != '\n'; z++) {
+				o++;
+				send_to_char_nosp(apply_types[z], ch);
+				if (o % 7 == 0)
+					send_to_char("\r\n", ch);
+				else
+					send_to_char(" ", ch);
+			}
+			send_to_char("oweight", ch);
+			if (o % 7 == 0)
+				send_to_char("\r\n", ch);
+			else
+				send_to_char(" ", ch);
 
-           send_to_char("olevel",ch);
-           if (o%7==0)
-             send_to_char("\r\n",ch);
-           else
-             send_to_char(" ", ch);
+			send_to_char("olevel", ch);
+			if (o % 7 == 0)
+				send_to_char("\r\n", ch);
+			else
+				send_to_char(" ", ch);
 
-	return eSUCCESS;
-    }
+			return eSUCCESS;
+		}
 
-     for (c=0;c < obj_index[top_of_objt].virt;c++)
-     {
-       found = FALSE;
-      if ((nr = real_object(c)) < 0)
-           continue;
-      if(wear)
-	for (i = 0; i < 20; i++)
-	  if (IS_SET(wear, 1 << i))
-      if (!IS_SET(((struct obj_data *)(obj_index[nr].item))->obj_flags.wear_flags, 1<<i))
-	goto endLoop;
-	if (type)
-	  if (((struct obj_data *)(obj_index[nr].item))->obj_flags.type_flag != type)
-	    continue;
-     if (lweight!=-555)
-      if (((struct obj_data *)(obj_index[nr].item))->obj_flags.weight < lweight)
-         continue;
-     if (hweight!=-555)
-      if (((struct obj_data *)(obj_index[nr].item))->obj_flags.weight > hweight)
-         continue;
+		for (c = 0; c < obj_index[top_of_objt].virt; c++) {
+			found = FALSE;
+			if ((nr = real_object(c)) < 0)
+				continue;
+			if (wear)
+				for (i = 0; i < 20; i++)
+					if (IS_SET(wear, 1 << i))
+						if (!IS_SET(
+								((struct obj_data * )(obj_index[nr].item))->obj_flags.wear_flags,
+								1 << i))
+							goto endLoop;
+			if (type)
+				if (((struct obj_data *) (obj_index[nr].item))->obj_flags.type_flag
+						!= type)
+					continue;
+			if (lweight != -555)
+				if (((struct obj_data *) (obj_index[nr].item))->obj_flags.weight
+						< lweight)
+					continue;
+			if (hweight != -555)
+				if (((struct obj_data *) (obj_index[nr].item))->obj_flags.weight
+						> hweight)
+					continue;
 
-     if (levhigh!=-555)
-      if (((struct obj_data *)(obj_index[nr].item))->obj_flags.eq_level > levhigh)
-         continue;
-     if (levlow!=-555)
-      if (((struct obj_data *)(obj_index[nr].item))->obj_flags.eq_level < levlow)
-         continue;
-      if (size)
-       for (i = 0; i < 10; i++)
-	if (IS_SET(size, 1<<i))
-      if (!IS_SET(((struct obj_data *)(obj_index[nr].item))->obj_flags.size, 1<<i))
-	goto endLoop;
-if (((struct obj_data *)(obj_index[nr].item))->obj_flags.type_flag == ITEM_WEAPON) {
-int get_weapon_damage_type(struct obj_data * wielded);
-its = get_weapon_damage_type(((struct obj_data *)(obj_index[nr].item)));
-	}
-     if (dam && dam != (its-1000))
-  	  continue;
-      if(extra)
-        for (i = 0; i < 30; i++)
-	  if (IS_SET(extra,1<<i))
-      if (!IS_SET(((struct obj_data *)(obj_index[nr].item))->obj_flags.extra_flags, 1<<i)
-	&& !(any && IS_SET(((struct obj_data *)(obj_index[nr].item))->obj_flags.extra_flags, 1<<any)))
-	goto endLoop;
+			if (levhigh != -555)
+				if (((struct obj_data *) (obj_index[nr].item))->obj_flags.eq_level
+						> levhigh)
+					continue;
+			if (levlow != -555)
+				if (((struct obj_data *) (obj_index[nr].item))->obj_flags.eq_level
+						< levlow)
+					continue;
+			if (size)
+				for (i = 0; i < 10; i++)
+					if (IS_SET(size, 1 << i))
+						if (!IS_SET(
+								((struct obj_data * )(obj_index[nr].item))->obj_flags.size,
+								1 << i))
+							goto endLoop;
+			if (((struct obj_data *) (obj_index[nr].item))->obj_flags.type_flag
+					== ITEM_WEAPON) {
+				int get_weapon_damage_type(struct obj_data * wielded);
+				its = get_weapon_damage_type(
+						((struct obj_data *) (obj_index[nr].item)));
+			}
+			if (dam && dam != (its - 1000))
+				continue;
+			if (extra)
+				for (i = 0; i < 30; i++)
+					if (IS_SET(extra, 1 << i))
+						if (!IS_SET(
+								((struct obj_data * )(obj_index[nr].item))->obj_flags.extra_flags,
+								1 << i)
+								&& !(any
+										&& IS_SET(
+												((struct obj_data * )(obj_index[nr].item))->obj_flags.extra_flags,
+												1 << any)))
+							goto endLoop;
 
-      if (more)
-	for (i = 0; i < 10; i++)
-	  if (IS_SET(more,1<<i))
-      if (!IS_SET(((struct obj_data *)(obj_index[nr].item))->obj_flags.more_flags, 1<<i))
-	goto endLoop;
+			if (more)
+				for (i = 0; i < 10; i++)
+					if (IS_SET(more, 1 << i))
+						if (!IS_SET(
+								((struct obj_data * )(obj_index[nr].item))->obj_flags.more_flags,
+								1 << i))
+							goto endLoop;
 //      int aff,total = 0;
-  //    bool found = FALSE;
-      if(!item_type)
-        for (aff = 0; aff < ((struct obj_data *)(obj_index[nr].item))->num_affects;aff++)
-          if (affect== ((struct obj_data *)(obj_index[nr].item))->affected[aff].location)
-	    found = TRUE;
-      if (affect && !item_type)
-        if (!found)
-          continue;
+			//    bool found = FALSE;
+			if (!item_type)
+				for (aff = 0;
+						aff
+								< ((struct obj_data *) (obj_index[nr].item))->num_affects;
+						aff++)
+					if (affect
+							== ((struct obj_data *) (obj_index[nr].item))->affected[aff].location)
+						found = TRUE;
+			if (affect && !item_type)
+				if (!found)
+					continue;
 
-      if (item_type)
-      {
-        bool spell_found = FALSE;
-        if (((struct obj_data *)(obj_index[nr].item))->obj_flags.type_flag != item_type)
-          continue;
-        if (item_type == ITEM_POTION || item_type == ITEM_SCROLL)
-          for (i = 1; i < 4; i++)
-            if ( ((struct obj_data *)(obj_index[nr].item))->obj_flags.value[i] == spellnum )
-              spell_found = TRUE;
-        if (item_type == ITEM_STAFF || item_type == ITEM_WAND) 
-          if ( ((struct obj_data *)(obj_index[nr].item))->obj_flags.value[3] == spellnum )
-            spell_found = TRUE;
+			if (item_type) {
+				bool spell_found = FALSE;
+				if (((struct obj_data *) (obj_index[nr].item))->obj_flags.type_flag
+						!= item_type)
+					continue;
+				if (item_type == ITEM_POTION || item_type == ITEM_SCROLL)
+					for (i = 1; i < 4; i++)
+						if (((struct obj_data *) (obj_index[nr].item))->obj_flags.value[i]
+								== spellnum)
+							spell_found = TRUE;
+				if (item_type == ITEM_STAFF || item_type == ITEM_WAND)
+					if (((struct obj_data *) (obj_index[nr].item))->obj_flags.value[3]
+							== spellnum)
+						spell_found = TRUE;
 
-        if(!spell_found)
-          continue;
-      }
+				if (!spell_found)
+					continue;
+			}
 
-      count++;
-      if (count > 200)
-      {
-	send_to_char("Limit reached.\r\n",ch);
-	break;
-      }
-           sprintf(buf, "[%3d] [%5d] [%2d] %s\n\r", count, c, ((struct
-obj_data *)(obj_index[nr].item))->obj_flags.eq_level,
-              ((struct obj_data *)(obj_index[nr].item))->short_description);
-           send_to_char(buf, ch);
-       endLoop:
-	continue;
-     }
-  }
-  else if (is_abbrev(type, "rfiles") && has_range)
-  {
-    curr = world_file_list;
-    i = 0;
-    send_to_char("ID ) Filename                       Begin  End\r\n"
-                 "----------------------------------------------------------\r\n", ch);
-    while(curr) {
-      sprintf(buf, "%3d) %-30s %-6ld %-6ld %1s%1s%1s %s\r\n", i++, curr->filename, 
-        curr->firstnum, curr->lastnum,
-        IS_SET(curr->flags, WORLD_FILE_IN_PROGRESS) ? "$B$1*$R" : " ",
-        IS_SET(curr->flags, WORLD_FILE_READY)       ? "$B$5*$R" : " ",
-        IS_SET(curr->flags, WORLD_FILE_APPROVED)    ? "$B$2*$R" : " ",
-        IS_SET(curr->flags, WORLD_FILE_MODIFIED) ? "MODIFIED" : "");
-      send_to_char(buf, ch);
-      curr = curr->next;
-    }
-  }
-  else if (is_abbrev(type, "mfiles") && has_range)
-  {
-    curr = mob_file_list;
-    i = 0;
-    send_to_char("ID ) Filename                       Begin  End\r\n"
-                 "----------------------------------------------------------\r\n", ch);
-    while(curr) {
-      sprintf(buf, "%3d) %-30s %-6ld %-6ld %1s%1s%1s %s\r\n", i++, curr->filename, 
-        curr->firstnum, curr->lastnum,  
-        IS_SET(curr->flags, WORLD_FILE_IN_PROGRESS) ? "$B$1*$R" : " ",
-        IS_SET(curr->flags, WORLD_FILE_READY)       ? "$B$5*$R" : " ",
-        IS_SET(curr->flags, WORLD_FILE_APPROVED)    ? "$B$2*$R" : " ",
-        IS_SET(curr->flags, WORLD_FILE_MODIFIED) ? "MODIFIED" : "");
-      send_to_char(buf, ch);
-      curr = curr->next;
-    }
-  }
-  else if (is_abbrev(type, "ofiles") && has_range)
-  {
-    curr = obj_file_list;
-    i = 0;
-    send_to_char("ID ) Filename                       Begin  End\r\n"
-                 "----------------------------------------------------------\r\n", ch);
-    while(curr) {
-      sprintf(buf, "%3d) %-30s %-6ld %-6ld %1s%1s%1s %s\r\n", i++, curr->filename, 
-        curr->firstnum, curr->lastnum,  
-        IS_SET(curr->flags, WORLD_FILE_IN_PROGRESS) ? "$B$1*$R" : " ",
-        IS_SET(curr->flags, WORLD_FILE_READY)       ? "$B$5*$R" : " ",
-        IS_SET(curr->flags, WORLD_FILE_APPROVED)    ? "$B$2*$R" : " ",
-        IS_SET(curr->flags, WORLD_FILE_MODIFIED) ? "MODIFIED" : "");
-      send_to_char(buf, ch);
-      curr = curr->next;
-    }
-  }
-  else if (is_abbrev(type, "keydoorcombo"))
-  {
-    if(!*name) {
-       send_to_char("Show which key? (# of key)\r\n", ch);
-       return eFAILURE;
-    }
+			count++;
+			if (count > 200) {
+				send_to_char("Limit reached.\r\n", ch);
+				break;
+			}
+			sprintf(buf, "[%3d] [%5d] [%2d] %s\n\r", count, c,
+					((struct obj_data *) (obj_index[nr].item))->obj_flags.eq_level,
+					((struct obj_data *) (obj_index[nr].item))->short_description);
+			send_to_char(buf, ch);
+			endLoop: continue;
+		}
+	} else if (is_abbrev(type, "rfiles") && has_range) {
+		curr = world_file_list;
+		i = 0;
+		send_to_char(
+				"ID ) Filename                       Begin  End\r\n"
+						"----------------------------------------------------------\r\n",
+				ch);
+		while (curr) {
+			sprintf(buf, "%3d) %-30s %-6ld %-6ld %1s%1s%1s %s\r\n", i++,
+					curr->filename, curr->firstnum, curr->lastnum,
+					IS_SET(curr->flags, WORLD_FILE_IN_PROGRESS) ?
+							"$B$1*$R" : " ",
+					IS_SET(curr->flags, WORLD_FILE_READY) ? "$B$5*$R" : " ",
+					IS_SET(curr->flags, WORLD_FILE_APPROVED) ? "$B$2*$R" : " ",
+					IS_SET(curr->flags, WORLD_FILE_MODIFIED) ?
+							"MODIFIED" : "");
+			send_to_char(buf, ch);
+			curr = curr->next;
+		}
+	} else if (is_abbrev(type, "mfiles") && has_range) {
+		curr = mob_file_list;
+		i = 0;
+		send_to_char(
+				"ID ) Filename                       Begin  End\r\n"
+						"----------------------------------------------------------\r\n",
+				ch);
+		while (curr) {
+			sprintf(buf, "%3d) %-30s %-6ld %-6ld %1s%1s%1s %s\r\n", i++,
+					curr->filename, curr->firstnum, curr->lastnum,
+					IS_SET(curr->flags, WORLD_FILE_IN_PROGRESS) ?
+							"$B$1*$R" : " ",
+					IS_SET(curr->flags, WORLD_FILE_READY) ? "$B$5*$R" : " ",
+					IS_SET(curr->flags, WORLD_FILE_APPROVED) ? "$B$2*$R" : " ",
+					IS_SET(curr->flags, WORLD_FILE_MODIFIED) ?
+							"MODIFIED" : "");
+			send_to_char(buf, ch);
+			curr = curr->next;
+		}
+	} else if (is_abbrev(type, "ofiles") && has_range) {
+		curr = obj_file_list;
+		i = 0;
+		send_to_char(
+				"ID ) Filename                       Begin  End\r\n"
+						"----------------------------------------------------------\r\n",
+				ch);
+		while (curr) {
+			sprintf(buf, "%3d) %-30s %-6ld %-6ld %1s%1s%1s %s\r\n", i++,
+					curr->filename, curr->firstnum, curr->lastnum,
+					IS_SET(curr->flags, WORLD_FILE_IN_PROGRESS) ?
+							"$B$1*$R" : " ",
+					IS_SET(curr->flags, WORLD_FILE_READY) ? "$B$5*$R" : " ",
+					IS_SET(curr->flags, WORLD_FILE_APPROVED) ? "$B$2*$R" : " ",
+					IS_SET(curr->flags, WORLD_FILE_MODIFIED) ?
+							"MODIFIED" : "");
+			send_to_char(buf, ch);
+			curr = curr->next;
+		}
+	} else if (is_abbrev(type, "keydoorcombo")) {
+		if (!*name) {
+			send_to_char("Show which key? (# of key)\r\n", ch);
+			return eFAILURE;
+		}
 
-    count = atoi(name);
-    if((!count && *name != '0') || count < 0) {
-       send_to_char("Which key was that?\r\n", ch);
-       return eFAILURE;
-    }
+		count = atoi(name);
+		if ((!count && *name != '0') || count < 0) {
+			send_to_char("Which key was that?\r\n", ch);
+			return eFAILURE;
+		}
 
-    csendf(ch, "$3Doors in game that use key %d$R:\r\n\r\n", count);
-    for(i = 0; i < top_of_world; i++)
-       for(nr = 0; nr < MAX_DIRS; nr++)
-         if(world_array[i] && world_array[i]->dir_option[nr])
-         {
-           if(IS_SET(world_array[i]->dir_option[nr]->exit_info, EX_ISDOOR) &&
-              world_array[i]->dir_option[nr]->key == count)
-           {
-             csendf(ch, " $3Room$R: %5d $3Dir$R: %5s $3Key$R: %d\r\n", 
-                    world_array[i]->number, dirs[nr], world_array[i]->dir_option[nr]->key);
-           }
-         }
-  }
-  else send_to_char("Illegal type.  Type just 'show' for legal types.\r\n",ch);
-  return eSUCCESS;
+		csendf(ch, "$3Doors in game that use key %d$R:\r\n\r\n", count);
+		for (i = 0; i < top_of_world; i++)
+			for (nr = 0; nr < MAX_DIRS; nr++)
+				if (world_array[i] && world_array[i]->dir_option[nr]) {
+					if (IS_SET(world_array[i]->dir_option[nr]->exit_info,
+							EX_ISDOOR)
+							&& world_array[i]->dir_option[nr]->key == count) {
+						csendf(ch,
+								" $3Room$R: %5d $3Dir$R: %5s $3Key$R: %d\r\n",
+								world_array[i]->number, dirs[nr],
+								world_array[i]->dir_option[nr]->key);
+					}
+				}
+	} else
+		send_to_char("Illegal type.  Type just 'show' for legal types.\r\n",
+				ch);
+	return eSUCCESS;
 }
 
 int do_trans(struct char_data *ch, char *argument, int cmd)

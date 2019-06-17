@@ -592,17 +592,17 @@ int do_berserk(struct char_data *ch, char *argument, int cmd)
 int do_headbutt(struct char_data *ch, char *argument, int cmd)
 {
   struct char_data *victim;
-  char name[256];
-  int retval = 0;
+	char name[256];
+	int retval = 0;
 
 	if (!canPerform(ch, SKILL_HEADBUTT,
 			"You'd bonk yourself silly without proper training.\r\n")) {
-    return eFAILURE;
-  }
+		return eFAILURE;
+	}
 
-  one_argument(argument, name);
+	one_argument(argument, name);
 
-  victim = get_char_room_vis( ch, name );
+	victim = get_char_room_vis(ch, name);
   if ( victim == NULL )
     victim = ch->fighting;
 
@@ -730,8 +730,8 @@ int do_bloodfury(struct char_data *ch, char *argument, int cmd)
 
 	if (!canPerform(ch, SKILL_BLOOD_FURY,
 		  "You've no idea how to raise such bloodlust.\r\n")) {
-    return eFAILURE;
-  }
+  		return eFAILURE;
+  	}
 
   if(affected_by_spell(ch, SKILL_BLOOD_FURY)) {
     send_to_char("Your body can not yet take the strain of another blood fury yet.\r\n", ch);
@@ -783,8 +783,9 @@ int do_crazedassault(struct char_data *ch, char *argument, int cmd)
   }
 
 	if (!canPerform(ch, SKILL_CRAZED_ASSAULT, "You just aren't crazy enough...try assaulting old ladies.\r\n"))
-    return eFAILURE;
-          
+  	return eFAILURE;
+
+
   if (!charge_moves(ch, SKILL_CRAZED_ASSAULT)) return eSUCCESS;
 
   if(!skill_success(ch,NULL,SKILL_CRAZED_ASSAULT)) {
