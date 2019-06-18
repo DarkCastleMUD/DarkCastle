@@ -14,11 +14,12 @@
  ***********************************************************************/
 
 /* The standard includes */
-extern "C"
-{
 #include <ctype.h>
 #include <string.h>
-}
+#include <stdlib.h>
+#include <returnvals.h>
+#include <errno.h>
+
 #include <obj.h>
 #include <connect.h>
 #include <utility.h>
@@ -36,8 +37,6 @@ extern "C"
 #include <assert.h>
 #include <mobile.h> // ACT_ISNPC
 #include <race.h>
-#include <returnvals.h>
-#include <errno.h>
 
 /* Set this define to wherever you want to save your corpses */
 #define CORPSE_FILE "corpse.save" 
@@ -67,7 +66,7 @@ char *fread_string_new(FILE * fl, char *error);
 
 void clean_string(char * buffer)
 {
-	register char *ptr, *str;
+	char *ptr, *str;
 
 	ptr = buffer;
 	str = ptr;
@@ -576,7 +575,7 @@ struct obj_data *read_object_new(int nr, int type)
 char *fread_string_new(FILE * fl, char *error)
 {
 	char buf[MAX_STRING_LENGTH], tmp[512], *rslt;
-	register char *point;
+	char *point;
 	int done = 0, length = 0, templength = 0;
 
 	*buf = '\0';

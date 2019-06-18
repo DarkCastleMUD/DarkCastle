@@ -583,7 +583,7 @@ int do_brew(char_data *ch, char *argument, int cmd)
     af.type = SKILL_BREW_TIMER;
     af.location = APPLY_NONE;
     af.modifier = 0;
-    af.duration = 24;
+    af.duration = 6;
     af.bitvector = -1;
     affect_to_char(ch, &af);
 
@@ -591,7 +591,7 @@ int do_brew(char_data *ch, char *argument, int cmd)
     af.type = SKILL_BREW_TIMER;
     af.location = APPLY_NONE;
     af.modifier = 0;
-    af.duration = 24;
+    af.duration = 1;
     af.bitvector = -1;
     affect_to_char(ch, &af);
 
