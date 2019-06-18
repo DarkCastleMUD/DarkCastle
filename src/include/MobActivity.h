@@ -5,6 +5,7 @@
 */
 
 #include <map>
+#include "character.h"
 using namespace std;
 
 
