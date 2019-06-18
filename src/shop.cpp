@@ -73,28 +73,32 @@ int is_ok( CHAR_DATA *keeper, CHAR_DATA *ch, int shop_nr )
     }
 
     /*
-     * Shop hours.
-     */
-	if (time_info.hours < shop_index[shop_nr].open1) {
-        do_say( keeper, "Come back later!", 0 );
-        return FALSE;
-    }
-    
-	else if (time_info.hours < shop_index[shop_nr].open2) {
-        do_say( keeper, "Come back later!", 0 );
-        return FALSE;
-	} else if (time_info.hours > shop_index[shop_nr].close1
-			|| time_info.hours > shop_index[shop_nr].close2) {
-        do_say( keeper, "Sorry, come back tomorrow.", 0 );
-        return FALSE;
-    }
-
-    /*
      * Invisible people.
      */
     if ( !CAN_SEE( keeper, ch ) )
     {
         do_say( keeper, "I don't trade with someone I can't see!", 0 );
+        return FALSE;
+    }
+
+    /*
+     * Shop hours.
+     */
+    if ( time_info.hours < shop_index[shop_nr].open1 )
+    {
+        do_say( keeper, "Come back later!", 0 );
+        return FALSE;
+    }
+    
+    else if ( time_info.hours <= shop_index[shop_nr].close1 ) {
+        return TRUE;
+    } else if ( time_info.hours < shop_index[shop_nr].open2 ) {
+        do_say( keeper, "Come back later!", 0 );
+        return FALSE;
+    } else if ( time_info.hours <= shop_index[shop_nr].close2 ) {
+    	return TRUE;
+    } else {
+        do_say( keeper, "Sorry, come back tomorrow.", 0 );
         return FALSE;
     }
 
