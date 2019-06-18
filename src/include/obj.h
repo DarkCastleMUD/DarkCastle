@@ -17,18 +17,7 @@
 #define OBJ_H_
 
 #include <structs.h> // ubyte
-
-// functions from objects.cpp
-int eq_max_damage(obj_data * obj);
-int damage_eq_once(obj_data * obj);
-int eq_current_damage(obj_data * obj);
-void eq_remove_damage(obj_data * obj);
-void add_obj_affect(obj_data * obj, int loc, int mod);
-void remove_obj_affect_by_index(obj_data * obj, int index);
-void remove_obj_affect_by_type(obj_data * obj, int loc);
-int recheck_height_wears(char_data *ch);
-bool fullSave(obj_data *obj);
-void heightweight(char_data *ch, bool add);
+#include <character.h>
 
 /* The following defs are for obj_data  */
 
@@ -298,5 +287,17 @@ struct obj_file_elem
     int16 container_depth;
     int32 other[5];        // unused
 };
+
+// functions from objects.cpp
+int eq_max_damage(obj_data * obj);
+int damage_eq_once(obj_data * obj);
+int eq_current_damage(obj_data * obj);
+void eq_remove_damage(obj_data * obj);
+void add_obj_affect(obj_data * obj, int loc, int mod);
+void remove_obj_affect_by_index(obj_data * obj, int index);
+void remove_obj_affect_by_type(obj_data * obj, int loc);
+int recheck_height_wears(char_data *ch);
+bool fullSave(obj_data *obj);
+void heightweight(char_data *ch, bool add);
 
 #endif
