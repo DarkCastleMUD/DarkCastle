@@ -5934,6 +5934,10 @@ void copySaveData(obj_data *target, obj_data *source)
 	  }
   }
 
+  if (IS_SET(source->obj_flags.more_flags, ITEM_24H_SAVE)) {
+	  target->save_expiration = source->save_expiration;
+  }
+
   return;
 }
 
