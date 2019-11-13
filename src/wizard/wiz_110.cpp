@@ -581,6 +581,7 @@ int do_rename_char(struct char_data *ch, char *arg, int cmd)
     add_clan_member(tc, victim);  
     if((pmember = get_member(GET_NAME(victim), ch->clan)))
       pmember->member_rights = rights;
+    add_totem_stats(victim);
   }
   extern void rename_vault_owner(char *arg1, char *arg2);
   extern void rename_leaderboard(char *, char *);
