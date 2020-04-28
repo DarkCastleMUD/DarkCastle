@@ -20,7 +20,7 @@ if os.path.exists('/usr/bin/g++-10'):
        env.Replace(CCFLAGS = '-ggdb3 -Wall -m32 -std=gnu++17 -O3 -Wno-write-strings')
        env.Replace(LINKFLAGS = '-ggdb3 -Wall -m32 -std=gnu++17 -O3')
 
-base_src = glob.glob('[a-l]*.cpp') + glob.glob('[n-z]*.cpp') + glob.glob('mo*.cpp') + ['magic.cpp','memory.cpp','meta.cpp','MobActivity.cpp','Leaderboard.cpp']
+base_src = glob.glob('[a-l]*.cpp') + glob.glob('[n-z]*.cpp') + glob.glob('mo*.cpp') + ['magic.cpp','memory.cpp','meta.cpp','MobActivity.cpp','Leaderboard.cpp','DC.cpp']
 wizard_src = glob.glob('wizard/*.cpp')
 class_src = glob.glob('class/*.cpp')
 backend_src = glob.glob('Backend/*.cpp')
