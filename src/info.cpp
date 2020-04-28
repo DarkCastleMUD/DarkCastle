@@ -665,7 +665,6 @@ int do_botcheck(struct char_data *ch, char *argument, int cmd)
 {
   char_data *victim;
   char name[MAX_STRING_LENGTH];
-  char name2[MAX_STRING_LENGTH];
   argument = one_argument(argument, name);
   if (!*name) {
     send_to_char("botcheck <player> or all\n\r\n\r", ch);
