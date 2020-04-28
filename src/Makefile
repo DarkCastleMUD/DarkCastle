@@ -8,7 +8,7 @@ OBJS = $(SRCS:.cpp=.o)
 DEBUG_FLAGS = -ggdb3
 PROF_FLAGS = $(DEBUG_FLAGS) -pg
 
-LDFLAGS = -L/usr/local/lib -ltwitcurl -lcrypt -lmcheck -lz -lpq -lxmlrpc++
+LDFLAGS = -L/usr/local/lib -ltwitcurl -lcrypt -lmcheck -lz -lpq -lXmlRpc
 CYGWIN_LDFLAGS = -L/emul/linux/x86/lib -L/usr/local/lib32 -lcrypt -lz -lpq /usr/local/lib/libXmlRpc.a
 IN_CXXFLAGS = -Wall -Wno-write-strings -DTWITTER -DLINUX -m32 -Iinclude -I/usr/include/pgsql/
 
