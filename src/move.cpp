@@ -1111,7 +1111,7 @@ int move_char(CHAR_DATA *ch, int dest, bool stop_all_fighting) {
 	}
 
 	// Couldn't move char to new room
-	if (char_to_room(ch, dest) == 0) {
+	if (char_to_room(ch, dest, stop_all_fighting) == 0) {
 		// Now we have real problems
 		if (char_to_room(ch, origination) == 0) {
 			fprintf(stderr, "Error in move_char(), character stuck in NOWHERE: %s.\n", GET_NAME(ch));
