@@ -1799,7 +1799,8 @@ static char *dethSayText [ ] =
   "If it's an \"eye for an eye and a tooth for a tooth\", why is there no Eye Fairy?",
   "Necrophilia - putting the fun back in funeral.",
   "Monopolies are like children on an airplane, you complain about them until you have one.",
-  "Grannies are pernonin' noobs."
+  "Grannies are pernonin' noobs.",
+  "Why is he called Iron-man instead of Fe-male?"
  };
 
 // ENDOFCHAIN
