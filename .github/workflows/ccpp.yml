@@ -14,9 +14,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: configure
-      run: sudo apt-cache search g++
-    - name: configure2
-      run: sudo apt-cache search gcc
+      run: sudo apt-get install g++-7
     - name: make
       run: make -C src -j3 debug
 #    - name: make check
