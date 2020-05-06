@@ -67,7 +67,7 @@ function parse_log($line) {
 {
   require_once('DB.php');
 
-  $db =& DB::connect('pgsql://dcastle:W2dFF83@localhost/dcastle', null);
+  $db =& DB::connect('pgsql://dcastle:xyz@localhost/dcastle', null);
   if (PEAR::isError($db)) {
     die($db->getMessage());
   }
