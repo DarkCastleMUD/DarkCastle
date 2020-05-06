@@ -15,10 +15,8 @@ jobs:
     - uses: actions/checkout@v2
 #    - name: configure
 #      run: ./configure
-    - name: cpuinfo
-      run: cat /proc/cpuinfo
     - name: make
-      run: make -C src debug
+      run: make -C src -j3 debug
 #    - name: make check
 #      run: make check
 #    - name: make distcheck
