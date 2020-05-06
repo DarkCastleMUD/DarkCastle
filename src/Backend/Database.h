@@ -13,7 +13,7 @@
 
 using namespace std;
 
-const char CONN_OPTS[]="host=127.0.0.1 dbname=dcastle user=dcastle password=wm42LyP1";
+const char CONN_OPTS[]="host=127.0.0.1 dbname=dcastle user=dcastle";
 
 typedef vector<pair<string, string> > PrepareVector;
 

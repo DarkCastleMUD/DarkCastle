@@ -129,7 +129,7 @@ class socket_log {
       $this->verbose = FALSE;   
     }
 
-    $this->db = pg_connect('dbname=dcastle user=dcastle password=wm42LyP1 host=localhost');
+    $this->db = pg_connect('dbname=dcastle user=dcastle password=xyz host=localhost');
     if ($this->db === FALSE) {
       die('Could not connect: ' . pg_last_error());
     }
