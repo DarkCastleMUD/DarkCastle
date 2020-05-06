@@ -16,7 +16,7 @@ jobs:
     - name: update list of available software
       run: sudo apt-get update
     - name: install software
-      run: sudo apt-get install gcc-multilib g++-multilib
+      run: sudo apt-get install gcc-multilib g++-multilib scons
     - name: make
       run: cd src && scons
 #    - name: make check
