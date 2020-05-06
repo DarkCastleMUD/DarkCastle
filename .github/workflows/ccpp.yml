@@ -14,9 +14,9 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: configure
-      run: apt install g++-32bit
+      run: sudo apt install g++-32bit
     - name: configure2
-      run: apt-cache search gcc
+      run: sudo apt-cache search gcc
     - name: make
       run: make -C src -j3 debug
 #    - name: make check
