@@ -84,6 +84,7 @@ CHAR_DATA *get_pc(char *name);
 
 int char_from_room(CHAR_DATA *ch, bool stop_all_fighting);
 int char_from_room(CHAR_DATA *ch);
+int  char_to_room(CHAR_DATA *ch, int room, bool stop_all_action);
 int  char_to_room(CHAR_DATA *ch, int room);
 
 /* find if character can see */

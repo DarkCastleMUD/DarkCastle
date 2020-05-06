@@ -516,7 +516,6 @@ DO_FUN do_smite;
 DO_FUN do_sneak;
 DO_FUN do_snoop;
 DO_FUN do_sockets;
-DO_FUN do_spam;
 DO_FUN do_spells;
 DO_FUN do_split;
 DO_FUN do_sqedit;

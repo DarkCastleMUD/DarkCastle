@@ -2415,6 +2415,10 @@ bool fullSave(obj_data *obj)
 	  return 1;
   }
 
+  if (IS_SET(obj->obj_flags.more_flags, ITEM_24H_SAVE)) {
+	  return 1;
+  }
+
   if (strcmp(GET_OBJ_SHORT(obj), GET_OBJ_SHORT(tmp_obj)))
     return 1;
 

@@ -294,13 +294,13 @@ int do_donate(struct char_data *ch, char *argument, int cmd)
 
   location = real_room(room);
   origin = ch->in_room;
-  move_char(ch, location);
+  move_char(ch, location, false);
 
   act("$n has made a donation...", ch, obj, 0, TO_ROOM, 0);
   act("$p falls through a glowing white portal in the top of the ceiling.",
          ch, obj, 0, TO_ROOM, INVIS_NULL);
       
-  move_char(ch, origin);
+  move_char(ch, origin, false);
   move_obj(obj, location);
      
   do_save(ch, "", 0);
