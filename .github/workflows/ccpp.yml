@@ -14,7 +14,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: install software
-      run: sudo apt update && sudo apt install gcc-8-multilib g++-8-multilib gcc-multilib g++-multilib
+      run: sudo apt update && sudo apt install gcc-8-multilib g++-8-multilib gcc-multilib g++-multilib scons
     - name: make
       run: make -C src -j3 debug
 
