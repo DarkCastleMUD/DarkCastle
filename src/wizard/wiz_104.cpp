@@ -1668,12 +1668,6 @@ int do_teleport(struct char_data *ch, char *argument, int cmd)
       return eFAILURE;
     } /* if */
 
-    if (world[target].number == 25 && !isname (GET_NAME(victim), "Apocalypse"))
-      {
-      send_to_char ("Sorry, you need permission first!\n\r", ch);
-      return eFAILURE;
-      }
-
    if (IS_SET(world[target].room_flags, PRIVATE)) {
       for (loop = 0, pers = world[target].people; pers;
            pers = pers->next_in_room, loop++);
