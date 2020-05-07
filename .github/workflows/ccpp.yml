@@ -13,8 +13,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: install software
-      run: sudo apt update && sudo apt install gcc-8-multilib g++-8-multilib gcc-multilib g++-multilib scons
+    - name: install ubuntu software
+      run: sudo apt update && sudo apt install gcc-8-multilib g++-8-multilib gcc-multilib g++-multilib scons libcurl4-openssl-dev unzip
+    - name: install twitcurl
+      run: wget https://github.com/swatkat/twitcurl/archive/master.zip && unzip master.zip && cd twitcurl-master/libtwitcurl && sudo make install
     - name: make
       run: make -C src -j3 debug
 
