@@ -846,7 +846,7 @@ int do_wizlist(CHAR_DATA *ch, char *argument, int cmd)
        "(:) == Deities == (:)",
        "(:) == Overseers == (:)",
        "(:) == Divinities == (:)",
-       " -- Empty --",
+	   "(:) == Honorary Immortals == (:)",
        "(:) == Coordinators == (:)",
        "(:) == Senior Coordinators == (:)",
        "(:) == Implementors == (:)"
