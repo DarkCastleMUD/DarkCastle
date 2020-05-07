@@ -765,9 +765,6 @@ int more_than_ten_people_from_this_ip(struct descriptor_data *new_conn)
 
 const char *host_list[]=
 {
-  "62.65.106.", // Urizen
-  "72.139.200.", // Apocalypse
-  "172.192.3.", // Scyld
   "127.0.0.1", // localhost (duh)
 };
 
