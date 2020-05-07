@@ -921,7 +921,7 @@ void nanny(struct descriptor_data *d, char *arg)
          if(file_exists(str_tmp.str().c_str()))
          {
             SEND_TO_Q("That character is archived.\n\rPlease mail "
-               "Apocalypse with unarchive requests (DC_Apoc@hotmail.com).\n\r", d);
+               "imps@dcastle.org to request it be restored.\n\r", d);
             close_socket(d);
             return;
          }
@@ -938,12 +938,7 @@ void nanny(struct descriptor_data *d, char *arg)
 
       if(check_reconnect(d, tmp_name, FALSE))
          fOld = TRUE;
-      else if((wizlock) && !allowed_host(d->host))/* &&
-         strcmp(GET_NAME(ch),"Apocalypse") &&
-         strcmp(GET_NAME(ch),"Urizen") &&
-         strcmp(GET_NAME(ch),"Scyld") &&
-         strcmp(GET_NAME(ch),"Julian") &&
-         strcmp(GET_NAME(ch),"Wendy"))*/
+      else if((wizlock) && !allowed_host(d->host))
       {
          SEND_TO_Q( "The game is wizlocked.\n\r", d );
          close_socket( d );
@@ -1069,7 +1064,7 @@ void nanny(struct descriptor_data *d, char *arg)
                GET_NAME(d->character), d->host);
             log(buf, OVERSEER, LOG_SOCKET);
             SEND_TO_Q("Sorry, new chars are not allowed from your site.\n\r"
-                      "Questions may be directed to Apocalypse at DC_Apoc@hotmail.com\n\r",
+                      "Questions may be directed to imps@dcastle.org\n\r",
                d);
             STATE(d) = CON_CLOSE;
             return;

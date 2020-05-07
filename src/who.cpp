@@ -426,12 +426,11 @@ int do_who(struct char_data *ch, char *argument, int cmd)
       if (IS_NPC(i)) {
 	continue;
       }
-      if (!CAN_SEE(ch, i) && strcmp(GET_NAME(ch), "Apocalypse")
-	  && strcmp(GET_NAME(ch), "Urizen")) {
+      if (!CAN_SEE(ch, i)) {
 	continue;
       }
       // Level checks.  These happen no matter what
-      if (GET_LEVEL(i) < lowlevel || (!strcmp(GET_NAME(i), "Pirahna") && lowlevel > PIRAHNA_FAKE_LVL )) {
+      if (GET_LEVEL(i) < lowlevel) {
 	continue;
       }
 

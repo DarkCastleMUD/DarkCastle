@@ -214,7 +214,7 @@ int do_slay(struct char_data *ch, char *argument, int cmd)
   if (ch == victim)
       send_to_char("Your mother would be so sad.. :(\n\r", ch);
     else {
-      if (!strcmp(GET_NAME(victim), "Apocalypse")) {
+      if (GET_LEVEL(victim) >= IMP) {
         send_to_char("You no make ME into chop suey!\r\n", ch);
         sprintf(buf,"%s just tried to kill you.\r\n", GET_NAME(ch));
         send_to_char(buf, victim);
@@ -276,7 +276,7 @@ int do_kill(struct char_data *ch, char *argument, int cmd)
     if (ch == victim)
       send_to_char("Your mother would be so sad.. :(\n\r", ch);
     else {
-      if (!strcmp(GET_NAME(victim), "Apocalypse")) {
+      if (GET_LEVEL(victim) >= IMP) {
         send_to_char("You no make ME into chop suey!\r\n", ch);
         sprintf(buf,"%s just tried to kill you.\r\n", GET_NAME(ch));
         send_to_char(buf, victim);
