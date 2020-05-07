@@ -805,21 +805,14 @@ void update_wizlist(CHAR_DATA *ch)
 				return;
 			dc_free(wizlist[x].name);
 			wizlist[x].name = str_dup(GET_NAME(ch));
-
-			if (!strcmp(GET_NAME(ch), "Pirahna"))
-				wizlist[x].level = PIRAHNA_FAKE_LVL;
-			else
-				wizlist[x].level = GET_LEVEL(ch);
+			wizlist[x].level = GET_LEVEL(ch);
 
 			wizlist[x + 1].name = str_dup("@");
 			wizlist[x + 1].level = 0;
 			break;
 		} else {
 			if (isname(wizlist[x].name, GET_NAME(ch))) {
-				if (!strcmp(GET_NAME(ch), "Pirahna"))
-					wizlist[x].level = PIRAHNA_FAKE_LVL;
-				else
-					wizlist[x].level = GET_LEVEL(ch);
+				wizlist[x].level = GET_LEVEL(ch);
 				break;
 			}
 		}
