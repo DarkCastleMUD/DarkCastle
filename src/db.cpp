@@ -834,10 +834,33 @@ void update_wizlist(CHAR_DATA *ch)
 
 int do_wizlist(CHAR_DATA *ch, char *argument, int cmd)
 {
-	char buf[MAX_STRING_LENGTH], lines[500], space[80];
-	int x, current_level, z = 1;
-	int gods_each_level[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-	int line_length, sp;
+  char buf[MAX_STRING_LENGTH], lines[500], space[80];
+  int x, current_level, z = 1;
+  int gods_each_level[] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+  int line_length, sp;
+  
+  char *names[] =
+  {
+       "(:) == Immortals == (:)",
+       "(:) == Architects == (:)",
+       "(:) == Deities == (:)",
+       "(:) == Overseers == (:)",
+       "(:) == Divinities == (:)",
+	   "(:) == Honorary Immortals == (:)",
+       "(:) == Coordinators == (:)",
+       "(:) == Senior Coordinators == (:)",
+       "(:) == Implementors == (:)"
+  };
+
+  for(sp = 0; sp < 80; sp++)
+     space[sp] = ' ';
+
+  // count the number of gods at each level, store in array gods_each_level
+  for(x = 0 ;; x++) {
+     if(wizlist[x].name[0] == '@')
+       break;
+     gods_each_level[wizlist[x].level - IMMORTAL]++;
+  }
 
 	char *names[] =
 			{
