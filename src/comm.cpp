@@ -1859,8 +1859,8 @@ int new_descriptor(int s)
   if (isbanned(newd->host) == BAN_ALL) {
     write_to_descriptor(desc, 
               "Your site has been banned from Dark Castle. If you have any\n\r"
-              "Questions, please email Apocalypse at:\n\r"
-              "dc_apoc@hotmail.com\n\r");
+              "Questions, please email us at:\n\r"
+              "imps@dcastle.org\n\r");
                                                   
     CLOSE_SOCKET(desc);
     sprintf(buf, "Connection attempt denied from [%s]", newd->host);
@@ -1913,7 +1913,7 @@ int process_output(struct descriptor_data *t)
   if (t->bufptr < 0)
     strcat(i, "**OVERFLOW**");
 
-  if (t->character && t->character->name && !str_cmp(t->character->name, "Apocalypse"))
+  if (t->character && t->character->name)
     write_to_descriptor(t->descriptor, FLASH);
   /*
    * now, send the output.  If this is an 'interruption', use the prepended
