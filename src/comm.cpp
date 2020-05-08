@@ -1860,8 +1860,6 @@ int process_output(struct descriptor_data *t)
   if (t->bufptr < 0)
     strcat(i, "**OVERFLOW**");
 
-  if (t->character && t->character->name && !str_cmp(t->character->name, "Apocalypse"))
-    write_to_descriptor(t->descriptor, FLASH);
   /*
    * now, send the output.  If this is an 'interruption', use the prepended
    * CRLF, otherwise send the straight output sans CRLF.
