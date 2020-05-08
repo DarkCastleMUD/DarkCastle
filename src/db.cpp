@@ -839,96 +839,73 @@ int do_wizlist(CHAR_DATA *ch, char *argument, int cmd)
        "(:) == Deities == (:)",
        "(:) == Overseers == (:)",
        "(:) == Divinities == (:)",
-	   "(:) == Honorary Immortals == (:)",
+       "(:) == Honorary Immortals == (:)",
        "(:) == Coordinators == (:)",
        "(:) == Senior Coordinators == (:)",
        "(:) == Implementors == (:)"
   };
 
-  for(sp = 0; sp < 80; sp++)
-     space[sp] = ' ';
+  for (sp = 0; sp < 80; sp++)
+    space[sp] = ' ';
 
   // count the number of gods at each level, store in array gods_each_level
-  for(x = 0 ;; x++) {
-     if(wizlist[x].name[0] == '@')
-       break;
-     gods_each_level[wizlist[x].level - IMMORTAL]++;
+  for (x = 0;; x++) {
+    if (wizlist[x].name[0] == '@')
+      break;
+    gods_each_level[wizlist[x].level - IMMORTAL]++;
   }
 
-	char *names[] =
-			{
-					"(:) == Immortals == (:)",
-					"(:) == Architects == (:)",
-					"(:) == Deities == (:)",
-					"(:) == Overseers == (:)",
-					"(:) == Divinities == (:)",
-					" -- Empty --",
-					"(:) == Coordinators == (:)",
-					"(:) == Senior Coordinators == (:)",
-					"(:) == Implementors == (:)"
-			};
+  buf[0] = '\0';
+  for (current_level = IMP; current_level >= IMMORTAL; current_level--) {
+    if (gods_each_level[current_level - IMMORTAL] == 0)
+      continue;
 
-	for (sp = 0; sp < 80; sp++)
-		space[sp] = ' ';
-
-	// count the number of gods at each level, store in array gods_each_level
-	for (x = 0;; x++) {
-		if (wizlist[x].name[0] == '@')
-			break;
-		gods_each_level[wizlist[x].level - IMMORTAL]++;
+    line_length = strlen(names[current_level - IMMORTAL]);
+    sp = 79 - line_length;
+    sp /= 2;
+    space[sp + 1] = '\0';
+    sprintf(buf + strlen(buf), "\n\r%s%s\n\r", space,
+	    names[current_level - IMMORTAL]);
+    space[sp + 1] = ' ';
+    
+    lines[0] = '\0';
+    for (x = 0;; x++) {
+      if (wizlist[x].name[0] == '@') {
+	z = 1;
+	if (*lines) {
+	  line_length = strlen(lines) - 2;
+	  lines[strlen(lines) - 2] = '\n';
+	  lines[strlen(lines) - 1] = '\r';
+	  sp = 79 - line_length;
+	  sp /= 2;
+	  space[sp + 1] = '\0';
+	  sprintf(buf + strlen(buf), "%s%s", space, lines);
+	  space[sp + 1] = ' ';
+	  lines[0] = '\0';
 	}
-
-	buf[0] = '\0';
-	for (current_level = IMP; current_level >= IMMORTAL; current_level--) {
-		if (gods_each_level[current_level - IMMORTAL] == 0)
-			continue;
-
-		line_length = strlen(names[current_level - IMMORTAL]);
-		sp = 79 - line_length;
-		sp /= 2;
-		space[sp + 1] = '\0';
-		sprintf(buf + strlen(buf), "\n\r%s%s\n\r", space,
-				names[current_level - IMMORTAL]);
-		space[sp + 1] = ' ';
-
-		lines[0] = '\0';
-		for (x = 0;; x++) {
-			if (wizlist[x].name[0] == '@') {
-				z = 1;
-				if (*lines) {
-					line_length = strlen(lines) - 2;
-					lines[strlen(lines) - 2] = '\n';
-					lines[strlen(lines) - 1] = '\r';
-					sp = 79 - line_length;
-					sp /= 2;
-					space[sp + 1] = '\0';
-					sprintf(buf + strlen(buf), "%s%s", space, lines);
-					space[sp + 1] = ' ';
-					lines[0] = '\0';
-				}
-				break;
-			}
-
-			if (wizlist[x].level != current_level)
-				continue;
-
-			if (z++ % 5)
-				sprintf(lines + strlen(lines), "%s, ", wizlist[x].name);
-			else {
-				sprintf(lines + strlen(lines), "%s\n\r", wizlist[x].name);
-				line_length = strlen(lines) - 2;
-				sp = 79 - line_length;
-				sp /= 2;
-				space[sp + 1] = '\0';
-				sprintf(buf + strlen(buf), "%s%s", space, lines);
-				space[sp + 1] = ' ';
-				lines[0] = '\0';
-			}
-		}
-	}
-
-	page_string(ch->desc, buf, 1);
-	return 1;
+	break;
+      }
+      
+      if (wizlist[x].level != current_level)
+	continue;
+      
+      if (z++ % 5)
+	sprintf(lines + strlen(lines), "%s, ", wizlist[x].name);
+      else {
+	sprintf(lines + strlen(lines), "%s\n\r", wizlist[x].name);
+	line_length = strlen(lines) - 2;
+	sp = 79 - line_length;
+	sp /= 2;
+	space[sp + 1] = '\0';
+	sprintf(buf + strlen(buf), "%s%s", space, lines);
+	space[sp + 1] = ' ';
+	lines[0] = '\0';
+      }
+    }
+  }
+  
+  page_string(ch->desc, buf, 1);
+  return 1;
 }
 
 /* reset the time in the game from file */
