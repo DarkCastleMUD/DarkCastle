@@ -20,7 +20,7 @@ jobs:
         echo -----
         sudo apt search curl
         echo -----
-        sudo apt install gcc-8-multilib g++-8-multilib gcc-multilib g++-multilib scons libcurl4:i386 libcurl4-openssl-dev:i386 unzip
+        sudo apt install gcc-8-multilib g++-8-multilib gcc-multilib g++-multilib scons libcurl4:i386 libcurl4-openssl-dev:i386 unzip postgresql-dev:i386
     - name: install twitcurl
       run: |
         wget https://github.com/swatkat/twitcurl/archive/master.zip
