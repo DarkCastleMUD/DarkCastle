@@ -131,8 +131,11 @@ bool isname(const std::string &strNeedle, const std::string &strHaystack) {
 }
 
 bool isname(const char *str, const char *namelist) {
-//	cerr << "isname: [" << str << "][" << namelist << "] = " << isname(string(str), string(namelist)) << endl;
-	return isname(string(str), string(namelist));
+	if (str == NULL || namelist == NULL) {
+		return false;
+	} else {
+		return isname(string(str), string(namelist));
+	}
 }
 
 bool isname2(const std::string &strNeedle, const std::string &strHaystack) {
