@@ -16,7 +16,8 @@ jobs:
     - name: install ubuntu software
       run: |
         sudo apt update
-        sudo apt install gcc-8-multilib g++-8-multilib gcc-multilib g++-multilib scons libcurl4-openssl-dev.i386 unzip libxmlrpc-c++8-dev
+        sudo apt-cache search libcurl4
+        sudo apt install gcc-8-multilib g++-8-multilib gcc-multilib g++-multilib scons libcurl4-openssl-dev unzip libxmlrpc-c++8-dev
     - name: install twitcurl
       run: |
         wget https://github.com/swatkat/twitcurl/archive/master.zip
