@@ -28,7 +28,9 @@ jobs:
         unzip xmlrpc++0.7.zip	     
         patch -p0 < thirdparty/xmlrpc++0.7-gccfixes.diff
         cd xmlrpc++0.7
-        sudo make install
+        make
+        sudo cp libXmlRpc.a /usr/local/lib/
+        sudo cp -a src/*h /usr/local/include/
     - name: make
       run: make -C src -j3 debug
 
