@@ -20,6 +20,8 @@ jobs:
         wget https://github.com/swatkat/twitcurl/archive/master.zip
         unzip master.zip
         cd twitcurl-master/libtwitcurl
+	export CC='g++ -m32'
+	make -e
         sudo make install
         sudo sed 's:include/curl/curl.h:curl/curl.h:g' -i /usr/local/include/twitcurl.h
     - name: install xmlrpc++
