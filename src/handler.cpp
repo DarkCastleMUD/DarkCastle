@@ -3887,6 +3887,7 @@ struct obj_data *get_obj_vis(CHAR_DATA *ch, char *name, bool loc) {
 
 	/* ok.. no luck yet. scan the entire obj list   */
 	for (i = object_list, j = 1; i && (j <= number); i = i->next) {
+		if (i->item_number == -1) continue;
 		if (loc && IS_SET(i->obj_flags.more_flags, ITEM_NOLOCATE) &&
 		GET_LEVEL(ch) < 101)
 			continue;
