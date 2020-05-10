@@ -1989,7 +1989,7 @@ int char_to_room(CHAR_DATA *ch, int room) {
 
 /* place a character in a room */
 /* Returns zero on failure, and one on success */
-int char_to_room(CHAR_DATA *ch, int room, bool stop_all_action)
+int char_to_room(CHAR_DATA *ch, int room, bool stop_all_fighting)
 {
 	CHAR_DATA *temp;
 	if (room == NOWHERE)
@@ -2054,7 +2054,7 @@ int char_to_room(CHAR_DATA *ch, int room, bool stop_all_action)
 		}
 	}
 
-	if ((GET_CLASS(ch) == CLASS_BARD) && IS_SET(world[ch->in_room].room_flags, NO_KI) && !(ch->songs.empty())) {
+	if (stop_all_fighting && (GET_CLASS(ch) == CLASS_BARD) && IS_SET(world[ch->in_room].room_flags, NO_KI) && !(ch->songs.empty())) {
 		do_sing(ch, "stop", 9);
 	}
 
