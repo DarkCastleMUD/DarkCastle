@@ -118,172 +118,125 @@ char *fname(char *namelist) {
 	return (holder);
 }
 
-#ifndef OLD_ISNAME
-/// Try to find in the Haystack the Needle - ignore case
-/// Based on https://stackoverflow.com/questions/3152241/case-insensitive-stdstring-find#
-bool isname(const std::string &strNeedle, const std::string &strHaystack) {
-	if (strNeedle.empty()) {
-		return false;
-	}
-	auto it = search(strHaystack.begin(), strHaystack.end(), strNeedle.begin(), strNeedle.end(),
-			[](char ch1, char ch2) {return std::tolower(ch1) == std::tolower(ch2) && !isspace(ch1);});
-	return (it != strHaystack.end() && (it == strHaystack.begin() || isspace(*(it - 1))));
+// TODO - figure out how this is different from isname() and comment why
+// we need it.  Neither of them are case-sensitive....
+int isname2(const char *str, const char *namel)
+{
+   const char* s = namel;
+
+   if (strlen(str) == 0)
+      return 0;
+
+   for (;;)
+   {
+      if (!strncasecmp(str, s, strlen(str)))
+         return 1;
+
+  	   for (; isalpha(*s); s++);
+  	   if (!*s)
+         return(0);
+      s++;          /* first char of new_new name */
+   }
+
+   return 0;
 }
 
-bool isname(const char *str, const char *namelist) {
-	if (str == NULL || namelist == NULL) {
-		return false;
-	} else {
-		return isname(string(str), string(namelist));
-	}
-}
-
-bool isname2(const std::string &strNeedle, const std::string &strHaystack) {
-	auto it = search(strHaystack.begin(), strHaystack.end(), strNeedle.begin(), strNeedle.end(),
-			[](char ch1, char ch2) {return std::tolower(ch1) == std::tolower(ch2);});
-	// We're at the beginning or at a word boundary
-	return (it != strHaystack.end() && (it == strHaystack.begin() || isspace(*(it - 1))));
-}
-
-bool isname2(const char *str, const char *namelist) {
-//	cerr << "isname2: [" << str << "][" << namelist << "] = " << isname(string(str), string(namelist)) << endl;
-	return isname2(string(str), string(namelist));
-}
-
-#else
 /************************************************************************
- | isname
- | Preconditions:  str != 0, namelist != 0
- | Postconditions: None
- | Side Effects: None
- | Returns: true if the needle word is found among all the words in haystack
- */
-bool isname(const char *needle, const char *haystack) {
+| isname
+| Preconditions:  str != 0, namelist != 0
+| Postconditions: None
+| Side Effects: None
+| Returns: One if it's in the namelist, zero otherwise
+*/
+int isname(const char *str, const char *namelist)
+{
+#if 0
+	string haystack(namelist);
+	if (haystack.find(str) != string::npos) {
+		return 1;
+	}
+
+	return 0;
+
+
+#endif
 	const char *curname, *curstr;
 
-//	cerr << "isname: [" << needle << "][" << haystack << "] = ";
 
-	if (!needle || !haystack) {
-//		cerr << "0" << endl;
-		return false;
-	}
+   if(!str || !namelist) {
+     return(0);
+   }
 
-	if (strlen(needle) == 0) {
-//		cerr << "0" << endl;
-		return false;
-	}
+   if (strlen(str) == 0)
+      return 0;
+   if(strlen(namelist) == 0)
+     return 0;
 
-	if (strlen(haystack) == 0) {
-//		cerr << "0" << endl;
-		return false;
-	}
+   curname = namelist;    
+   
+   for (;;)
+      {
+	   for (curstr = str;; curstr++, curname++)
+	      {
+	      if (!*curstr && !isalpha(*curname))
+		      return(1);
 
-	curname = haystack;
+	      if (!*curname)
+		      return(0);
 
-	for (;;) {
-		for (curstr = needle;; curstr++, curname++) {
-			if (!*curstr && !isalpha(*curname)) {
-//				cerr << "1" << endl;
-				return true;
-			}
+	      if (!*curstr || *curname == ' ')
+		      break;
 
-			if (!*curname) {
-//				cerr << "0" << endl;
-				return false;
-			}
+	      if (LOWER(*curstr) != LOWER(*curname))
+		      break;
+	      }
 
-			if (!*curstr || *curname == ' ')
-				break;
+	   /* skip to next name */
 
-			if (LOWER(*curstr) != LOWER(*curname))
-				break;
-		}
+	   for (; isalpha(*curname); curname++);
+	   if (!*curname)
+		   return(0);
+	   curname++;          /* first char of new_new name */
+      }
 
-		/* skip to next name */
-
-		for (; isalpha(*curname); curname++)
-			;
-		if (!*curname) {
-//			cerr << "0" << endl;
-			return false;
-		}
-		curname++; /* first char of new_new name */
-	}
-
-//	cerr << "0" << endl;
-	return false;
+   return 0;
 }
 
-// This case-insensitively matches the entire string or increasingly smaller substrings
-bool isname2(const char *needle, const char *haystack) {
-	const char* hsPtr = haystack;
+int isname_exact(char *str, char *namelist)
+{
+   char *curname, *curstr;
 
-//	cerr << "isname2: [" << needle << "][" << haystack << "] = ";
+   if (strlen(str) == 0)
+      return 0;
 
-	// failure if needle is empty
-	if (strlen(needle) == 0) {
-//		cerr << "0" << endl;
-		return false;
-	}
 
-	for (;;) {
-		// success if needle matches same chars in namelist
-		if (!strncasecmp(needle, hsPtr, strlen(needle))) {
-//			cerr << "1" << endl;
-			return true;
-		}
+   curname = namelist;    
+   
+   for (;;)
+      {
+	   for (curstr = str;; curstr++, curname++)
+	      {
+	      if (!*curstr && !isalpha(*curname))
+		      return(1);
 
-		// skip a word to form new sub-string with remaining word(s)
-		for (; isalpha(*hsPtr); hsPtr++)
-		;
+	      if (!*curname)
+		      return(0);
 
-		// failure if we are at the end of the string
-		if (!*hsPtr) {
-//			cerr << "0" << endl;
-			return false;
-		}
+	      if (!*curstr || *curname == ' ')
+		      break;
 
-		// first char of new sub-string
-		hsPtr++;
-	}
+	      if (LOWER(*curstr) != LOWER(*curname))
+		      break;
+	      }
 
-//	cerr << "0" << endl;
-	return false;
-}
-#endif
+	   /* skip to next name */
 
-int isname_exact(char *str, char *namelist) {
-	char *curname, *curstr;
-
-	if (strlen(str) == 0)
-		return 0;
-
-	curname = namelist;
-
-	for (;;) {
-		for (curstr = str;; curstr++, curname++) {
-			if (!*curstr && !isalpha(*curname))
-				return (1);
-
-			if (!*curname)
-				return (0);
-
-			if (!*curstr || *curname == ' ')
-				break;
-
-			if (LOWER(*curstr) != LOWER(*curname))
-				break;
-		}
-
-		/* skip to next name */
-
-		for (; isalpha(*curname); curname++)
-			;
-		if (!*curname)
-			return (0);
-		curname++; /* first char of new_new name */
-	}
-	return 0;
+	   for (; isalpha(*curname); curname++);
+	   if (!*curname)
+		   return(0);
+	   curname++;          /* first char of new_new name */
+      }
+   return 0;
 }
 
 int get_max_stat(char_data * ch, ubyte stat) {
