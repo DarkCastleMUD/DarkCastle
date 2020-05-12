@@ -71,6 +71,7 @@ void add_command_lag(CHAR_DATA *ch, int cmdnum, int lag);
 #define CMD_READ	67
 #define CMD_REMOVE	69
 #define CMD_ERASE	70
+#define CMD_ESTIMATE	71
 #define CMD_REMORT	80
 #define CMD_SLIP	87
 #define CMD_GIVE	88
