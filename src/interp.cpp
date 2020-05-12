@@ -353,6 +353,7 @@ struct command_info cmd_info[] =
     { "value",		do_not_here,	POSITION_STANDING, 0, CMD_VALUE, 0, 0 },
     { "watch",		do_not_here,	POSITION_STANDING, 0, CMD_WATCH, 0, 0},
     { "list",		do_not_here,	POSITION_STANDING, 0, CMD_LIST, 0, 0 },
+    { "estimate",	do_not_here,	POSITION_STANDING, 0, CMD_ESTIMATE, 0, 0 },
     { "repair",		do_not_here,	POSITION_STANDING, 0, CMD_REPAIR, 0, 0 },
     { "practice",	do_practice,	POSITION_SLEEPING, 1, CMD_PRACTICE, 0, 0 },
     { "practise",	do_practice,	POSITION_SLEEPING, 1, CMD_PRACTICE, 0, 0 },
