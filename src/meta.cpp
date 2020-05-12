@@ -121,7 +121,7 @@ int r_new_meta_exp_cost(int start, long long exp)
 	return start - 5;
 }
 
-int new_meta_exp_cost_one(int start)
+long long new_meta_exp_cost_one(int start)
 {
 	if (start < 0)
 		return 0;
@@ -501,7 +501,7 @@ void meta_list_stats(char_data * ch)
 
 }
 
-int meta_get_moves_exp_cost(char_data * ch)
+long long meta_get_moves_exp_cost(char_data * ch)
 {
 	int meta = GET_MOVE_METAS(ch);
 	if (GET_MAX_MOVE(ch) - GET_RAW_MOVE(ch) < 0)
@@ -509,15 +509,15 @@ int meta_get_moves_exp_cost(char_data * ch)
 	return new_meta_exp_cost_one(MAX(0, meta));
 }
 
-int meta_get_moves_plat_cost(char_data * ch, int amount)
+long long meta_get_moves_plat_cost(char_data * ch, int amount)
 {
 	int meta = GET_MOVE_METAS(ch);
 	if (GET_MAX_MOVE(ch) - GET_RAW_MOVE(ch) < 0)
 		meta += GET_MAX_MOVE(ch) - GET_RAW_MOVE(ch);
-	return (int)new_meta_platinum_cost(MAX(0, meta), MAX(0,meta) + amount);
+	return new_meta_platinum_cost(MAX(0, meta), MAX(0,meta) + amount);
 }
 
-int meta_get_hps_exp_cost(char_data * ch)
+long long meta_get_hps_exp_cost(char_data * ch)
 {
 	int meta = GET_HP_METAS(ch);
 	int bonus = 0;
@@ -533,7 +533,7 @@ int meta_get_hps_exp_cost(char_data * ch)
 	return new_meta_exp_cost_one(MAX(0, meta));
 }
 
-int meta_get_hps_plat_cost(char_data * ch, int amount)
+long long meta_get_hps_plat_cost(char_data * ch, int amount)
 {
 	int meta = GET_HP_METAS(ch);
 	int bonus = 0;
@@ -546,10 +546,10 @@ int meta_get_hps_plat_cost(char_data * ch, int amount)
 	if (GET_RAW_HIT(ch) + bonus - GET_MAX_HIT(ch) > 0)
 		meta -= GET_RAW_HIT(ch) + bonus - GET_MAX_HIT(ch);
 
-	return (int)new_meta_platinum_cost(MAX(0, meta), MAX(0,meta) + amount);
+	return new_meta_platinum_cost(MAX(0, meta), MAX(0,meta) + amount);
 }
 
-int meta_get_mana_exp_cost(char_data * ch)
+long long meta_get_mana_exp_cost(char_data * ch)
 {
 	int meta = GET_MANA_METAS(ch);
 	int stat, bonus = 0;
@@ -572,7 +572,7 @@ int meta_get_mana_exp_cost(char_data * ch)
 	return new_meta_exp_cost_one(MAX(0, meta));
 }
 
-int meta_get_mana_plat_cost(char_data * ch, int amount)
+long long meta_get_mana_plat_cost(char_data * ch, int amount)
 {
 	int meta = GET_MANA_METAS(ch);
 	int stat, bonus = 0;
@@ -592,7 +592,7 @@ int meta_get_mana_plat_cost(char_data * ch, int amount)
 	if (GET_RAW_MANA(ch) + bonus - GET_MAX_MANA(ch) > 0)
 		meta -= GET_RAW_MANA(ch) + bonus - GET_MAX_MANA(ch);
 
-	return (int)new_meta_platinum_cost(MAX(0, meta), MAX(0,meta) + amount);
+	return new_meta_platinum_cost(MAX(0, meta), MAX(0,meta) + amount);
 }
 
 int meta_get_ki_exp_cost(char_data * ch)
@@ -647,7 +647,7 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
 	int stat;
 	int choice;
 	int increase;
-	int hit_cost, mana_cost, move_cost, ki_cost = 0, hit_exp, move_exp, mana_exp, ki_exp = 0;
+	long long hit_cost, mana_cost, move_cost, ki_cost = 0, hit_exp, move_exp, mana_exp, ki_exp = 0;
 	int statplatprice = 0, max_stat = 0;
 
 	sbyte *pstat = 0;
@@ -712,8 +712,8 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
 
 		}
 
-		int platcost;
-		int expcost;
+		long long platcost;
+		long long expcost;
 		switch (choice)
 		{
 			case 1:
@@ -729,7 +729,7 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
 
 		}
 		expcost = platcost * 51523;
-		csendf(ch,"$B$2The Meta-physician tells you, 'That would cost you %d platinum and %d experience.'$R \n\r", platcost, expcost);
+		csendf(ch,"$B$2The Meta-physician tells you, 'That would cost you %lld platinum and %lld experience.'$R \n\r", platcost, expcost);
 		return eSUCCESS;
 
 	}
@@ -741,45 +741,45 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
 
 		send_to_char("$BStatistic Meta:$R\r\n", ch);
 		if (hit_exp && hit_cost)
-			csendf(ch, "$B$36)$R Add 5 points to your hit points:   %d experience points and %d"
+			csendf(ch, "$B$36)$R Add 5 points to your hit points:   %lld experience points and %lld"
 					" Platinum coins.\n\r", hit_exp, hit_cost);
 		else
 			csendf(ch, "$B$36)$R Add to your hit points:   You cannot do this.\r\n");
 
 		if (hit_exp && hit_cost)
-			csendf(ch, "$B$37)$R Add 1 point to your hit points:   %d experience points and %d"
-					" Platinum coins.\n\r", (int)(hit_exp / 5 * 1.1), (int)(hit_cost / 5 * 1.1));
+			csendf(ch, "$B$37)$R Add 1 point to your hit points:   %lld experience points and %lld"
+					" Platinum coins.\n\r", (long long)(hit_exp / 5 * 1.1), (long long)(hit_cost / 5 * 1.1));
 		else
 			csendf(ch, "$B$37)$R Add to your hit points:   You cannot do this.\r\n");
 
 		if (mana_exp && mana_cost)
-			csendf(ch, "$B$38)$R Add 5 points to your mana points:  %d experience points and %d"
+			csendf(ch, "$B$38)$R Add 5 points to your mana points:  %lld experience points and %lld"
 					" Platinum coins.\n\r", mana_exp, mana_cost);
 		else
 			csendf(ch, "$B$38)$R Add to your mana points:  You cannot do this.\r\n");
 
 		if (mana_exp && mana_cost)
-			csendf(ch, "$B$39)$R Add 1 point to your mana points:   %d experience points and %d"
-					" Platinum coins.\n\r", (int)(mana_exp / 5 * 1.1), (int)(mana_cost / 5 * 1.1));
+			csendf(ch, "$B$39)$R Add 1 point to your mana points:   %lld experience points and %lld"
+					" Platinum coins.\n\r", (long long)(mana_exp / 5 * 1.1), (long long)(mana_cost / 5 * 1.1));
 		else
 			csendf(ch, "$B$39)$R Add to your mana points:   You cannot do this.\r\n");
 
 		if (move_exp && move_cost)
-			csendf(ch, "$B$310)$R Add 5 points to your movement points: %d experience points and %d"
+			csendf(ch, "$B$310)$R Add 5 points to your movement points: %lld experience points and %lld"
 					" Platinum coins.\n\r", move_exp, move_cost);
 		else
 			csendf(ch, "$B$310)$R Add to your movement points:  You cannot do this.\r\n");
 
 		if (move_exp && move_cost)
-			csendf(ch, "$B$311)$R Add 1 points to your movement points:   %d experience points and %d"
-					" Platinum coins.\n\r", (int)(move_exp / 5 * 1.1), (int)(move_cost / 5 * 1.1));
+			csendf(ch, "$B$311)$R Add 1 points to your movement points:   %lld experience points and %lld"
+					" Platinum coins.\n\r", (long long)(move_exp / 5 * 1.1), (long long)(move_cost / 5 * 1.1));
 		else
 			csendf(ch, "$B$311)$R Add to your movement points:   You cannot do this.\r\n");
 
 		send_to_char("$BUse 'estimate' command to get costs for higher intervals.\r\n",ch);
 
 		if (!IS_MOB(ch) && ki_cost && ki_exp) {   // mobs can't meta ki
-			csendf(ch, "$B$312)$R Add a point of ki:        %d experience points and %d Platinum.\n\r", ki_exp, ki_cost);
+			csendf(ch, "$B$312)$R Add a point of ki:        %lld experience points and %lld Platinum.\n\r", ki_exp, ki_cost);
 		}
 		else if (!IS_MOB(ch))
 			csendf(ch, "$B$312)$R Add a point of ki:        You cannot do this.\r\n");
