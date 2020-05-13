@@ -88,13 +88,13 @@ int do_incognito(struct char_data *ch, char *argument, int cmd)
 
 int do_load(struct char_data *ch, char *arg, int cmd)
 {
-  char type[MAX_INPUT_LENGTH];
-  char name[MAX_INPUT_LENGTH];
-  char arg2[MAX_INPUT_LENGTH];
-  char arg3[MAX_INPUT_LENGTH];
-  char qty[MAX_INPUT_LENGTH];
-  char random[MAX_INPUT_LENGTH];
-  char buf[MAX_STRING_LENGTH];
+  char type[MAX_INPUT_LENGTH] = { 0 };
+  char name[MAX_INPUT_LENGTH] = { 0 };
+  char arg2[MAX_INPUT_LENGTH] = { 0 };
+  char arg3[MAX_INPUT_LENGTH] = { 0 };
+  char qty[MAX_INPUT_LENGTH] = { 0 };
+  char random[MAX_INPUT_LENGTH] = { 0 };
+  char buf[MAX_STRING_LENGTH] = { 0 };
 
   char *c;
   int x, number =0, num = 0,cnt = 1;

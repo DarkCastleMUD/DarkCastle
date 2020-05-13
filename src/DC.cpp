@@ -8,6 +8,7 @@
 
 #include "DC.h"
 #include "room.h" // NOWHERE
+#include "db.h"
 
 DC& DC::instance()
 {
@@ -21,7 +22,7 @@ void DC::removeDead(void) {
 		ch = death_list.front();
 		character_list.erase(ch);
 		shooting_list.erase(ch);
-		dc_free(ch);
+		free_char(ch);
 		death_list.pop();
 	}
 }

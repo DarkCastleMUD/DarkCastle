@@ -3109,10 +3109,6 @@ void extract_char(CHAR_DATA *ch, bool pull) {
 	/*CHAR_DATA *i;*/
 	bool isGolem = FALSE;
 	extern CHAR_DATA *combat_list;
-	void die_follower(CHAR_DATA *ch);
-	void remove_from_bard_list(char_data * ch);
-	void stop_guarding_me(char_data * victim);
-	void stop_guarding(char_data * guard);
 	struct obj_data *i;
 	CHAR_DATA *omast = NULL;
 	int ret = eSUCCESS;
@@ -3289,10 +3285,9 @@ void extract_char(CHAR_DATA *ch, bool pull) {
 
 	if (pull || isGolem) {
 		remove_from_bard_list(ch);
+		auto &death_list = DC::instance().death_list;
+		death_list.push(ch);
 	}
-
-	auto &death_list = DC::instance().death_list;
-	death_list.push(ch);
 }
 
 /* ***********************************************************************

@@ -138,6 +138,10 @@ void produce_coredump(void *ptr = 0);
 bool objExists(OBJ_DATA *obj);
 bool charge_moves(char_data *ch, int skill, double modifier = 1);
 
+void die_follower(CHAR_DATA *ch);
+void remove_from_bard_list(char_data * ch);
+void stop_guarding_me(char_data * victim);
+void stop_guarding(char_data * guard);
 
 #endif
 
