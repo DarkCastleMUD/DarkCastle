@@ -1391,7 +1391,7 @@ int spell_dispel_evil(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
 {
   if(obj && obj->in_room && obj->obj_flags.value[0] == SPELL_DESECRATE) { // desecrate object
    CHAR_DATA *pal=NULL;
-   if( (pal = get_char((char *)(obj->obj_flags.value[3]))) ) {
+   if( (pal = ((CHAR_DATA *)(obj->obj_flags.value[3]) )  )  && charExists(pal)) {
     pal->cRooms--;
     if(pal->in_room == obj->in_room) {
      send_to_char("The runes upon the ground shatter with a burst of magic!\r\nYour unholy desecration has been destroyed!\r\n", pal);
@@ -1432,7 +1432,7 @@ int spell_dispel_good(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
 {
   if(obj && obj->in_room && obj->obj_flags.value[0] == SPELL_CONSECRATE) { // consecrate object
    CHAR_DATA *pal=NULL;
-   if( (pal = get_char((char *)(obj->obj_flags.value[3]))) ) {
+   if( (pal = (CHAR_DATA *)(obj->obj_flags.value[3])) && charExists(pal) ) {
     pal->cRooms--;
     if(pal->in_room == obj->in_room) {
      send_to_char("The runes upon the ground glow brightly, then fade to nothing.\r\nYour holy consecration has been destroyed!\r\n", pal);
@@ -14056,8 +14056,7 @@ int spell_consecrate(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim,
 
 	if ((cItem = get_obj_in_list("consecrateitem",world[ch->in_room].contents))) {
 		if (ch
-				== get_char(
-						(char *) (cItem->obj_flags.value[3])) && spl == SPELL_CONSECRATE) {
+				== ((CHAR_DATA*) (cItem->obj_flags.value[3])) && spl == SPELL_CONSECRATE) {
 			send_to_char("You have already consecrated the ground here!\r\n",
 					ch);
 			return eSUCCESS;
@@ -14104,9 +14103,9 @@ int spell_consecrate(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim,
 		return eFAILURE;
 	}
 	cItem->obj_flags.value[0] = spl;
-	cItem->obj_flags.value[1] = 1 + skill / 50;
+	cItem->obj_flags.value[1] = 2 + skill / 50;
 	cItem->obj_flags.value[2] = skill;
-	cItem->obj_flags.value[3] = (int) (ch->name);
+	cItem->obj_flags.value[3] = (int) (ch);
 
 	obj_to_room(cItem, ch->in_room);
 
@@ -14195,7 +14194,7 @@ int spell_desecrate(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim,
 
 	OBJ_DATA *cItem = NULL;
 	if ((cItem = get_obj_in_list("consecrateitem", world[ch->in_room].contents))) {
-		if (ch == get_char((char *) (cItem->obj_flags.value[3]))) {
+		if (ch == ((CHAR_DATA *) (cItem->obj_flags.value[3]))) {
 			send_to_char("You have already desecrated the ground here!\r\n",
 					ch);
 			return eSUCCESS;
@@ -14240,9 +14239,9 @@ int spell_desecrate(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim,
 			"A circle of ominously humming blood runes are etched upon the ground here.");
 	cItem->description = str_hsh(buf);
 	cItem->obj_flags.value[0] = spl;
-	cItem->obj_flags.value[1] = 1 + skill / 50;
+	cItem->obj_flags.value[1] = 2 + skill / 50;
 	cItem->obj_flags.value[2] = skill;
-	cItem->obj_flags.value[3] = (int) (ch->name);
+	cItem->obj_flags.value[3] = (int) (ch);
 
 	obj_to_room(cItem, ch->in_room);
 
