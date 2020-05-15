@@ -3862,72 +3862,72 @@ int mprog_catch_trigger(char_data * mob, int catch_num, char *var, int opt, char
  return mprog_cur_result;
 }
 
-void update_mprog_throws()
-{
-   struct mprog_throw_type * curr;
-   struct mprog_throw_type * action;
-   struct mprog_throw_type * last = NULL;
-   char_data * vict;
-   obj_data *vobj;
-   for(curr = g_mprog_throw_list; curr; )
-   {
-      // update
-      if(curr->delay > 0) {
-        curr->delay--;
-        last = curr;
-        curr = curr->next;
-        continue;
-      }
-	vobj = NULL;
-        vict = NULL;
-        if (curr->data_num == -999) debugpoint();
-	if (curr->tMob && charExists(curr->tMob))
-	{
-	 vict = curr->tMob;
-	}else if (curr->mob) {
-    	 	 // find target
-     		 if(*curr->target_mob_name) { // find me by name
-       		    vict = get_mob(curr->target_mob_name);
-      		 }
-    		 else {                 // find me by num
-     		    vict = get_mob_vnum(curr->target_mob_num);
-      		 }
-	} else {
-  	  if (*curr->target_mob_name)
-	    vobj = get_obj(curr->target_mob_name);
-	  else vobj = get_obj_vnum(curr->target_mob_num);
-       }
-      // remove from list
-      if(last) {
-        last->next = curr->next;
-        action = curr;
-        curr = last->next;
-        // last doesn't move
-      }
-      else {
-        g_mprog_throw_list = curr->next;
-        action = curr;
-        curr = g_mprog_throw_list;
-      }
+void update_mprog_throws() {
+	struct mprog_throw_type *curr;
+	struct mprog_throw_type *action;
+	struct mprog_throw_type *last = NULL;
+	char_data *vict;
+	obj_data *vobj;
+	for (curr = g_mprog_throw_list; curr;) {
+		// update
+		if (curr->delay > 0) {
+			curr->delay--;
+			last = curr;
+			curr = curr->next;
+			continue;
+		}
+		vobj = NULL;
+		vict = NULL;
 
-//	if (vict && vict->mobdata && mob_index[vict->mobdata->nr].virt == 1928)
-//		debugpoint();
-     
-      // This is done this way in case the 'catch' does a 'throw' inside of it
+		if (curr->data_num == -999)
+			debugpoint();
 
-      // if !vict, oh well....remove it anyway.  Someone killed him.
-      if (action->data_num == -999 && vict) { // 'tis a pause
-	mprog_driver(action->orig, vict, action->actor, action->obj,action->vo, action, action->rndm);
-	dc_free(action->orig);
-	action->orig = 0;
- 	}
-      else if(vict)  // activate
-        mprog_catch_trigger(vict, action->data_num, action->var,action->opt,action->actor, action->obj, action->vo, action->rndm);
-      else if (vobj)
-	oprog_catch_trigger(vobj, action->data_num, action->var,action->opt, action->actor, action->obj, action->vo, action->rndm);
-      dc_free(action);
-   }
-};
+		if (curr->tMob && charExists(curr->tMob) && curr->tMob->in_room >= 0) {
+			vict = curr->tMob;
+		} else if (curr->mob) {
+			// find target
+			if (*curr->target_mob_name) { // find me by name
+				vict = get_mob(curr->target_mob_name);
+			} else {                 // find me by num
+				vict = get_mob_vnum(curr->target_mob_num);
+			}
+		} else {
+			if (*curr->target_mob_name)
+				vobj = get_obj(curr->target_mob_name);
+			else
+				vobj = get_obj_vnum(curr->target_mob_num);
+		}
+
+		// remove from list
+		if (last) {
+			last->next = curr->next;
+			action = curr;
+			curr = last->next;
+			// last doesn't move
+		} else {
+			g_mprog_throw_list = curr->next;
+			action = curr;
+			curr = g_mprog_throw_list;
+		}
+
+		// This is done this way in case the 'catch' does a 'throw' inside of it
+
+		// if !vict, oh well....remove it anyway.  Someone killed him.
+		if (action->data_num == -999 && vict) { // 'tis a pause
+			mprog_driver(action->orig, vict, action->actor, action->obj, action->vo, action, action->rndm);
+			dc_free(action->orig);
+			action->orig = 0;
+		} else if (vict)  {// activate
+			if (vict->in_room >= 0) {
+				mprog_catch_trigger(vict, action->data_num, action->var, action->opt, action->actor, action->obj, action->vo, action->rndm);
+			}
+		} else if (vobj) {
+			oprog_catch_trigger(vobj, action->data_num, action->var, action->opt, action->actor, action->obj, action->vo, action->rndm);
+		}
+
+		dc_free(action);
+	}
+}
 
 CHAR_DATA *initiate_oproc(CHAR_DATA *ch, OBJ_DATA *obj)
 { // Sneakiness.
