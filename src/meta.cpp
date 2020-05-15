@@ -642,7 +642,7 @@ int meta_get_ki_plat_cost(char_data * ch)
 int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
 		struct char_data *owner)
 {
-	char argument[256];
+	char argument[MAX_INPUT_LENGTH];
 
 	int stat;
 	int choice;
@@ -684,7 +684,7 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
 
 	if (cmd == CMD_ESTIMATE) {
 		// Estimate costs
-		char arg2[256];
+		char arg2[MAX_INPUT_LENGTH];
 		arg = one_argument(arg, argument);
 		one_argument(arg, arg2);
 
