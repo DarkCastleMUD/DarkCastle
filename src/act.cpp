@@ -92,16 +92,18 @@ int act
   else if(destination == TO_ROOM || destination == TO_GROUP) 
   {
     char_data * tmp_char, *next_tmp_char;
-    for (tmp_char = world[ch->in_room].people; tmp_char; tmp_char = next_tmp_char) {
-      next_tmp_char = tmp_char->next_in_room;
-      // If they're not really playing, and no force flag, don't send
-      if (tmp_char == ch)
-        continue;
-      if(destination == TO_GROUP && !ARE_GROUPED(tmp_char, ch))
-        continue;
-      if (tmp_char->position > POSITION_SLEEPING || IS_SET(flags, ASLEEP))
-        retval |= send_message(tokens, ch, obj, vict_obj, flags, tmp_char);
-      }
+    if (ch->in_room >= 0) {
+		for (tmp_char = world[ch->in_room].people; tmp_char; tmp_char = next_tmp_char) {
+		  next_tmp_char = tmp_char->next_in_room;
+		  // If they're not really playing, and no force flag, don't send
+		  if (tmp_char == ch)
+			continue;
+		  if(destination == TO_GROUP && !ARE_GROUPED(tmp_char, ch))
+			continue;
+		  if (tmp_char->position > POSITION_SLEEPING || IS_SET(flags, ASLEEP))
+			retval |= send_message(tokens, ch, obj, vict_obj, flags, tmp_char);
+		  }
+		}
     }
   // TO_ZONE, TO_WORLD
   else {
@@ -114,6 +116,8 @@ int act
       // Dropped link or they're not really playing and no force flag, don't send.
       if (!i->character || i->character == ch)
         continue;
+      if (i->character->in_room < 0 || ch->in_room < 0)
+    	  continue;
       if ((destination == TO_ZONE) && world[i->character->in_room].zone != world[ch->in_room].zone)
         continue;
       retval |= send_message(tokens, ch, obj, vict_obj, flags, i->character);
