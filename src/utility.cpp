@@ -1380,7 +1380,7 @@ mob_index[fol->follower->mobdata->nr].virt == 8)
   }
   affect_from_char(ch, SPELL_IRON_ROOTS);
   affect_from_char(ch, SPELL_DIVINE_INTER);  //sloppy sloppy
-  affect_from_char(ch, SPELL_NO_CAST_TIMER); //*sigh*
+  affect_from_char(ch, SPELL_NO_CAST_TIMER); // *sigh*
   affect_from_char(ch, SKILL_CM_TIMER);
   affect_from_char(ch, SPELL_IMMUNITY);
   affect_from_char(ch, SKILL_BATTLESENSE);
@@ -1393,7 +1393,7 @@ mob_index[fol->follower->mobdata->nr].virt == 8)
    for(obj = object_list; obj; obj = tmp_obj) {
     tmp_obj = obj->next;
     if(obj_index[obj->item_number].virt == CONSECRATE_OBJ_NUMBER)
-      if(ch == get_char((char *)(obj->obj_flags.value[3])))
+      if(ch == (CHAR_DATA *)(obj->obj_flags.value[3]) )
        extract_obj(obj);
    }
   }

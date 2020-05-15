@@ -1955,7 +1955,7 @@ void checkConsecrate(int pulseType)
      spl = obj->obj_flags.value[0];
      obj->obj_flags.value[1]--;
      if(obj->obj_flags.value[1] <= 0) {
-      if( (ch = get_char((char *)(obj->obj_flags.value[3]))) ){
+      if( (ch = (CHAR_DATA*)(obj->obj_flags.value[3])) && charExists(ch) ){
        ch->cRooms--;
        if(ch->desc) {
         if(spl == SPELL_CONSECRATE) {
@@ -1979,6 +1979,10 @@ void checkConsecrate(int pulseType)
          send_to_char("Runes upon the ground glow brightly, then fade to nothing.\r\nThe holy consecration here has ended.\n\r", tmp_ch);
        } else {
         if(affected_by_spell(tmp_ch, SPELL_DETECT_EVIL) && affected_by_spell(tmp_ch, SPELL_DETECT_EVIL)->modifier >= 80)
+ 	if (ch && tmp_ch != ch)
+	{
+	       	send_damage("Runes upon the ground glow softly as your holy consecration heals $N of | damage.", ch, 0, tmp_ch, buf, "Runes upon the ground glow softly as your holy consecration heals $N.", TO_CHAR);
+	}
          send_to_char("The runes upon the ground shatter with a burst of magic!\r\nThe unholy desecration has ended.\n\r", tmp_ch);
        }
       }
@@ -1992,7 +1996,10 @@ void checkConsecrate(int pulseType)
     tmp_obj = obj->next;
     if(obj_index[obj->item_number].virt == CONSECRATE_OBJ_NUMBER) {
      spl = obj->obj_flags.value[0];
-     ch = get_char((char *)(obj->obj_flags.value[3]));
+     if (charExists((CHAR_DATA*)obj->obj_flags.value[3]))
+     {
+	     ch = (CHAR_DATA*)obj->obj_flags.value[3];
+     }
      for(tmp_ch = world[obj->in_room].people; tmp_ch; tmp_ch = next_ch) {
       next_ch = tmp_ch->next_in_room;
       align = GET_ALIGNMENT(tmp_ch);
@@ -2004,11 +2011,20 @@ void checkConsecrate(int pulseType)
         GET_HIT(tmp_ch) += amount;
         if(tmp_ch == ch)
          send_damage("The runes upon the ground glow softly as your holy consecration heals you of | damage.", tmp_ch, 0, 0, buf, "The runes upon the ground glow softly as your holy consecration heals you. ", TO_CHAR);
-        else if(affected_by_spell(tmp_ch, SPELL_DETECT_GOOD) && affected_by_spell(tmp_ch, SPELL_DETECT_GOOD)->modifier >= 80)
-         send_damage("Runes upon the ground glow softly as $n's holy consecration heals you of | damage.", tmp_ch, 0, 0, buf, "Runes upon the ground glow softly as $n's holy consecration heals you.", TO_CHAR);
-        else
-         send_damage("Runes upon the ground glow softly as a holy consecration heals you of | damage.", tmp_ch, 0, 0, buf, "Runes upon the ground glow softly as a holy consecration heals you.", TO_CHAR);
+        else if(affected_by_spell(tmp_ch, SPELL_DETECT_GOOD) && affected_by_spell(tmp_ch, SPELL_DETECT_GOOD)->modifier >= 80) 
+	  send_damage("Runes upon the ground glow softly as $n's holy consecration heals you of | damage.", tmp_ch, 0, 0, buf, "Runes upon the ground glow softly as $n's holy consecration heals you.", TO_CHAR);
+	else
+	  send_damage("Runes upon the ground glow softly as a holy consecration heals you of | damage.", tmp_ch, 0, 0, buf, "Runes upon the ground glow softly as a holy consecration heals you.", TO_CHAR);
+
+ 	if (ch && tmp_ch != ch)
+	{
+	  send_damage("Runes upon the ground glow softly as your holy consecration heals $N of | damage.", ch, 0, tmp_ch, buf, "Runes upon the ground glow softly as your holy consecration heals $N.", TO_CHAR);
+	}
        } else {
+	if (ch && !ARE_GROUPED(ch, tmp_ch))
+	{
+	 	set_cantquit(ch, tmp_ch);
+	}
         if(GET_HIT(tmp_ch) - amount < 0) {
          act("The strength of $N's desecration proves to powerful for $n to overcome and $e drops dead!", tmp_ch, 0, ch, TO_ROOM, NOTVICT);
          act("The strength of your desecration proves to powerful for $n to overcome and $e drops dead!", tmp_ch, 0, ch, TO_VICT, 0);
@@ -2028,6 +2044,12 @@ void checkConsecrate(int pulseType)
          send_damage("Runes upon the ground hum ominously as $n's unholy desecration injures you, dealing | damage.", tmp_ch, 0, 0, buf, "Runes upon the ground hum ominously as $n's unholy desecration injures you.", TO_CHAR);
         else
          send_damage("Runes upon the ground hum ominously as an unholy desecration injures you, dealing | damage.", tmp_ch, 0, 0, buf, "Runes upon the ground hum ominously as an unholy desecration injures you.", TO_CHAR);
+
+ 	if (ch && tmp_ch != ch)
+	{
+          send_damage("Runes upon the ground hum ominously as an unholy desecration injures $N dealing | damage.", ch, 0, tmp_ch, buf, "Runes upon the ground hum ominously as an unholy desecration injures $N.", TO_CHAR);
+	}
+
        }
       }
       else if(align < 0) {
@@ -2042,7 +2064,19 @@ void checkConsecrate(int pulseType)
          send_damage("Runes upon the ground hum ominously as $n's unholy desecration heals you of | damage.", tmp_ch, 0, 0, buf, "Runes upon the ground hum ominously as $n's unholy desecration heals you.", TO_CHAR);
         else
          send_damage("Runes upon the ground hum ominously as an unholy desecration heals you of | damage.", tmp_ch, 0, 0, buf, "Runes upon the ground hum ominously as an unholy desecration heals you.", TO_CHAR);
+
+ 	if (ch && tmp_ch != ch)
+	{
+          send_damage("Runes upon the ground hum ominously as an unholy desecration heals $N of | damage.", ch, 0, tmp_ch, buf, "Runes upon the ground hum ominously as an unholy desecration heals $N.", TO_CHAR);
+	}
+
+
        } else {
+
+	if (ch && !ARE_GROUPED(ch, tmp_ch))
+	{
+	 	set_cantquit(ch, tmp_ch);
+	}
         if(GET_HIT(tmp_ch) - amount < 0) {
          act("The strength of $N's consecration proves to powerful for $n to overcome and $e drops dead!", tmp_ch, 0, ch, TO_ROOM, NOTVICT);
          act("The strength of your consecration proves to powerful for $n to overcome and $e drops dead!", tmp_ch, 0, ch, TO_VICT, 0);
@@ -2062,7 +2096,13 @@ void checkConsecrate(int pulseType)
          send_damage("Runes upon the ground glow softly as $n's holy consecration injures you, dealing | damage.", tmp_ch, 0, 0, buf, "Runes upon the ground glow softly as $n's holy consecration injures you.", TO_CHAR);
         else
          send_damage("Runes upon the ground glow softly as a holy consecration injures you, dealing | damage.", tmp_ch, 0, 0, buf, "Runes upon the ground glow softly as a holy consecration injures you.", TO_CHAR);
-       }
+ 	if (ch && tmp_ch != ch)
+	{
+          send_damage("Runes upon the ground hum softly as an holy consecration injures $N, dealing | damage.", ch, 0, tmp_ch, buf, "Runes upon the ground hum softly as a holy consecration injures $N.", TO_CHAR);
+	}
+
+
+      }
       }
      }
      break;
