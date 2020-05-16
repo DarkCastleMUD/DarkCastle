@@ -865,7 +865,7 @@ bool load_char_obj( struct descriptor_data *d, char *name )
 #endif
 
 	if (d->character) {
-		extract_char(d->character, TRUE);
+		free_char(d->character);
 	}
 
   d->character    = ch;

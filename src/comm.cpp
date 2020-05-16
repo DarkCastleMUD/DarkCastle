@@ -2317,7 +2317,7 @@ int close_socket(struct descriptor_data *d)
 //			GET_NAME(d->character));
 //		log(buf, 110, LOG_HMM);
 	}
-			extract_char(d->character, TRUE);
+			free_char(d->character);
     }
   }
 //   Removed this log caues it's so fricken annoying
