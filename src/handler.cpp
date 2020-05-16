@@ -3209,7 +3209,7 @@ void extract_char(CHAR_DATA *ch, bool pull) {
 			for (i = ch->carrying; i; i = inext) {
 				inext = i->next_content;
 				obj_from_char(i);
-				obj_to_room(i, was_in);
+				//obj_to_room(i, was_in);
 			}
 		}
 	}
