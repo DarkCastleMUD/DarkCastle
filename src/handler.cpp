@@ -3201,7 +3201,8 @@ void extract_char(CHAR_DATA *ch, bool pull) {
 	if (pull) {
 		for (l = 0; l < MAX_WEAR; l++) {
 			if (ch->equipment[l]) {
-				obj_to_room(unequip_char(ch, l), was_in);
+				//obj_to_room(unequip_char(ch, l), was_in);
+				unequip_char(ch, l);
 			}
 		}
 		if (ch->carrying) {
