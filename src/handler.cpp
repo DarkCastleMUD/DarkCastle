@@ -3201,8 +3201,11 @@ void extract_char(CHAR_DATA *ch, bool pull) {
 	if (pull) {
 		for (l = 0; l < MAX_WEAR; l++) {
 			if (ch->equipment[l]) {
-				//obj_to_room(unequip_char(ch, l), was_in);
-				unequip_char(ch, l);
+				if (IS_NPC(ch)) {
+					obj_to_room(unequip_char(ch, l), was_in);
+				} else {
+					unequip_char(ch, l);
+				}
 			}
 		}
 		if (ch->carrying) {
@@ -3210,7 +3213,9 @@ void extract_char(CHAR_DATA *ch, bool pull) {
 			for (i = ch->carrying; i; i = inext) {
 				inext = i->next_content;
 				obj_from_char(i);
-				//obj_to_room(i, was_in);
+				if (IS_NPC(ch)) {
+					obj_to_room(i, was_in);
+				}
 			}
 		}
 	}
