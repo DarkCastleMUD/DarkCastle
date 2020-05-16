@@ -604,7 +604,7 @@ int returner(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
    if(get_obj_in_list_num(real_object(2200), ch->carrying))
       return eFAILURE;
 
-   if(move_char(ch, real_room(3001)) == 0)
+   if(move_char(ch, real_room(START_ROOM)) == 0)
       return eFAILURE;
 
    do_look(ch, "\0", 15);
@@ -1167,7 +1167,7 @@ int carriage(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
    if(ch->in_room != obj->in_room)
       return eFAILURE;
    
-   if(move_char(ch, real_room(3001)) == 0)
+   if(move_char(ch, real_room(START_ROOM)) == 0)
       return eFAILURE;
 
    do_look(ch, "\0", 15);
@@ -2754,7 +2754,7 @@ int talkingsword(struct char_data*ch, struct obj_data *obj, int cmd, char*arg,
         tmp.push_back(buf);
       }
 
-      if(vict->in_room == 3001) //tavern
+      if(vict->in_room == START_ROOM) //tavern
       {
         buf = "Are you going to just sit in the Tavern all day? Great... I'm owned by Avalios.";
         tmp.push_back(buf);

@@ -1010,8 +1010,8 @@ int do_outcast(CHAR_DATA *ch, char *arg, int cmd)
     victim = d.character;
     victim->desc = 0;
 
-    victim->hometown = 3001;
-    victim->in_room = 3001;
+    victim->hometown = START_ROOM;
+    victim->in_room = START_ROOM;
     connected = FALSE;    
   }
 

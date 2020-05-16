@@ -139,7 +139,7 @@ int do_boot(struct char_data *ch, char *arg, int cmd)
 "                     ~\"####ggy_____                  ___g###F'\n\r"
 "                             \"~~~~~##################~~~\"\n\r", victim);
     }
-    move_char(victim, real_room(3001));
+    move_char(victim, real_room(START_ROOM));
     do_quit(victim, "", 666);
   }
 
