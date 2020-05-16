@@ -2317,6 +2317,14 @@ int close_socket(struct descriptor_data *d)
 //			GET_NAME(d->character));
 //		log(buf, 110, LOG_HMM);
 	}
+                        for(int iWear = 0; iWear < MAX_WEAR; iWear++)
+                             if(d->character->equipment[iWear])
+                                       obj_to_char( unequip_char( d->character, iWear,1 ), d->character );
+
+                        while(d->character->carrying)
+                            extract_obj(d->character->carrying);
+
+
 			extract_char(d->character, TRUE);
     }
   }
