@@ -2728,3 +2728,11 @@ int do_sector(CHAR_DATA *ch, char *arg, int cmd)
     csendf(ch, "You are currently in a %s area.\n\r", sector_types[world[ch->in_room].sector_type]);
   return eSUCCESS;
 }
+
+int do_version(CHAR_DATA *ch, char *arg, int cmd)
+{
+	if (ch) {
+		csendf(ch, "Version: %s Build time: %s\n", DC::getVersion().c_str(), DC::getBuildTime().c_str());
+	}
+	return eSUCCESS;
+}

@@ -557,6 +557,7 @@ DO_FUN do_use;
 DO_FUN do_varstat;
 DO_FUN do_vault;
 DO_FUN do_vend;
+DO_FUN do_version;
 DO_FUN do_visible;
 DO_FUN do_vitalstrike;
 DO_FUN do_vt100;
@@ -586,5 +587,6 @@ DO_FUN do_zoneexits;
 DO_FUN do_zsave;
 DO_FUN do_editor;
 DO_FUN do_pursue;
+
 
 #endif
