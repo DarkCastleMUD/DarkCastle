@@ -1,4 +1,7 @@
-dcastle.debug*
+dcastle.debug.[0-9]*
+dcastle.[0-9]*
+nohup.out
+dcastle
 *gcno
 *gcda
 */*gcno
