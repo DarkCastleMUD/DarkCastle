@@ -1,8 +1,11 @@
+VERSION := "$(shell git describe --tags --always --abbrev=8)"
+BUILD_TIME := "$(shell date +'%Y-%m-%d %H:%M:%S')"
+
 CXX = g++-7
 SRC_DIR=.
-SRCS = $(shell find $(SRC_DIR) -maxdepth 2 -name "*.cpp")
+SRCS = $(shell find $(SRC_DIR) -maxdepth 2 -name showplayerxp.cpp -prune -o -name '*.cpp' -print)
 
-OBJS = $(SRCS:.cpp=.o)
+OBJS = $(SRCS:cpp=o)
 
 #FAST_FLAGS  = -02
 DEBUG_FLAGS = -ggdb3
@@ -16,9 +19,6 @@ BASENAME = dcastle# Base product name -- NO SPACES
 
 .SUFFIXES: .C
 
-.C.o:
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c -o $@ $<
-
 default:
 	@echo "Type make followed by one of:"
 	@echo ""
@@ -28,6 +28,12 @@ default:
 	@echo "fast	Make with optimization flags"
 	@echo "profile  Make with debug & profile libraries/flags"
 	@echo ""
+
+DC.o: DC.cpp
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -DVERSION=\"$(VERSION)\" -DBUILD_TIME=\"$(BUILD_TIME)\" -c -o $@ $<
+
+.C.o:
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c -o $@ $<
 
 install:
 	mv /srv/dcastle/bin/$(BASENAME) /srv/dcastle/bin/$(BASENAME).old
@@ -75,3 +81,4 @@ cygwin_darkcastle: $(OBJS)
 
 clean:
 	/bin/rm -f `find . -name '*.[oa]' -print`
+
