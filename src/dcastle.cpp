@@ -15,6 +15,7 @@
 // DC headers
 #include <fileinfo.h>
 #include <utility.h>
+#include <DC.h>
 
 using namespace std;
 
@@ -43,6 +44,8 @@ void boot_world(void);
 int main(int argc, char **argv) {
 	struct stat stat_buffer;
 	char char_buffer[512] = { '\0' };
+
+	logf(0, LOG_MISC, "Executable: %s Version: %s Build date: %s\n", argv[0], DC::getVersion().c_str(), DC::getBuildTime().c_str());
 
 #ifndef __CYGWIN__
 	// Make a copy of our executable so that in the event of a crash we have a
