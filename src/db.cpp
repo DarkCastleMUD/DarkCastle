@@ -4758,6 +4758,7 @@ void reset_zone(int zone)
 					&& !ISSET(tmp_victim->mobdata->actflags, ACT_NO_GOLD_BONUS)
 					&& world[tmp_victim->in_room].zone == zone) {
 				tmp_victim->gold *= 1.10;
+				tmp_victim->exp *= 1.10;
 			}
 		}
 	}
