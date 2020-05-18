@@ -28,7 +28,9 @@ public:
 	void handleShooting(void);
 
 	static DC& instance();
-
+	static string getVersion();
+	static string getBuildTime();
+	
     character_list_t character_list;
 	queue<char_data *> death_list;
 	unordered_set<char_data *> shooting_list;

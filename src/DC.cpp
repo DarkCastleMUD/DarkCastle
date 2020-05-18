@@ -48,3 +48,12 @@ void DC::handleShooting(void) {
 	}
 }
 
+string DC::getVersion(void)
+{
+  return string(VERSION);
+}
+
+string DC::getBuildTime(void)
+{
+  return string(BUILD_TIME);
+}
