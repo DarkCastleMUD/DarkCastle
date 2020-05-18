@@ -31,12 +31,12 @@ default:
 
 install:
 	mv /srv/dcastle/bin/$(BASENAME) /srv/dcastle/bin/$(BASENAME).old
-	cp $(BASENAME).debug /srv/dcastle/bin/$(BASENAME)
+	cp $(BASENAME) /srv/dcastle/bin/$(BASENAME)
 	cp showplayer /srv/dcastle/bin/
 	cp ../scripts/lastcore.sh /srv/dcastle/bin/
 
 	mv /srv/dcastle2/bin/$(BASENAME) /srv/dcastle2/bin/$(BASENAME).old
-	cp $(BASENAME).debug /srv/dcastle2/bin/$(BASENAME)
+	cp $(BASENAME) /srv/dcastle2/bin/$(BASENAME)
 	cp showplayer /srv/dcastle2/bin/
 	cp ../scripts/lastcore.sh /srv/dcastle2/bin/
 
@@ -46,7 +46,7 @@ profile:
 	@$(MAKE) darkcastle PROGNAME=$(BASENAME).prof CXXFLAGS="$(IN_CXXFLAGS) $(PROF_FLAGS)"
 
 debug:
-	@$(MAKE) darkcastle PROGNAME=$(BASENAME).debug CXXFLAGS="$(IN_CXXFLAGS) $(DEBUG_FLAGS)"
+	@$(MAKE) darkcastle PROGNAME=$(BASENAME) CXXFLAGS="$(IN_CXXFLAGS) $(DEBUG_FLAGS)"
 
 cygwin:
 	@$(MAKE) cygwin_darkcastle PROGNAME=$(BASENAME)_debug.exe CXXFLAGS="$(IN_CXXFLAGS) $(DEBUG_FLAGS) -fpack-struct=4"
