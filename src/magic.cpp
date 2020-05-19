@@ -922,7 +922,7 @@ int spell_earthquake(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
       break;
     }
 
-    if (GET_POS(tmp_victim) == POSITION_DEAD) {
+    if (GET_POS(tmp_victim) == POSITION_DEAD || tmp_victim->in_room == NOWHERE) {
       continue;
     }
 
@@ -1222,6 +1222,11 @@ int spell_group_recall(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
 
 	auto &character_list = DC::instance().character_list;
 	for (auto& tmp_victim : character_list) {
+	  if (GET_POS(tmp_victim) == POSITION_DEAD || tmp_victim->in_room == NOWHERE) {
+		continue;
+	  }
+
+
     if(ch->in_room == tmp_victim->in_room && 
        tmp_victim != ch                   &&
        ARE_GROUPED(ch, tmp_victim)
@@ -1249,6 +1254,11 @@ int spell_group_fly(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
 {
 	auto &character_list = DC::instance().character_list;
 	for (auto& tmp_victim : character_list) {
+
+	  if (GET_POS(tmp_victim) == POSITION_DEAD || tmp_victim->in_room == NOWHERE) {
+		continue;
+	  }
+
     if ( (ch->in_room == tmp_victim->in_room) &&
          (ARE_GROUPED(ch,tmp_victim) ))
     {
@@ -1278,6 +1288,10 @@ int spell_heroes_feast(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
   send_to_char("You partake in a magnificent feast!\n\r",ch);
 	auto &character_list = DC::instance().character_list;
 	for (auto& tmp_victim : character_list) {
+	  if (GET_POS(tmp_victim) == POSITION_DEAD || tmp_victim->in_room == NOWHERE) {
+		continue;
+	  }
+
     if ( (ch->in_room == tmp_victim->in_room) && (ch != tmp_victim) &&
 		(ARE_GROUPED(ch,tmp_victim) ))
     {
@@ -1300,6 +1314,10 @@ int spell_group_sanc(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
   
 	auto &character_list = DC::instance().character_list;
 	for (auto& tmp_victim : character_list) {
+    if (GET_POS(tmp_victim) == POSITION_DEAD || tmp_victim->in_room == NOWHERE) {
+      continue;
+    }
+
     if((ch->in_room == tmp_victim->in_room) && (ARE_GROUPED(ch,tmp_victim))) {
       if(!tmp_victim) {
         log("Bad tmp_victim in character_list in group fly!", ANGEL, LOG_BUG);
@@ -1319,10 +1337,14 @@ int spell_heal_spray(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
   
 	auto &character_list = DC::instance().character_list;
 	for (auto& tmp_victim : character_list) {
-	 if ( (ch->in_room == tmp_victim->in_room) &&
-		(ARE_GROUPED(ch,tmp_victim) )){
-		 spell_heal(level,ch, tmp_victim, obj, skill);
-	 }
+	  if (GET_POS(tmp_victim) == POSITION_DEAD || tmp_victim->in_room == NOWHERE) {
+		continue;
+	  }
+
+	  if ( (ch->in_room == tmp_victim->in_room) &&
+		   (ARE_GROUPED(ch,tmp_victim) )){
+		spell_heal(level,ch, tmp_victim, obj, skill);
+	  }
   }
   return eSUCCESS;
 }
@@ -1368,6 +1390,10 @@ int spell_firestorm(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
 
 	auto &character_list = DC::instance().character_list;
 	for (auto& tmp_victim : character_list) {
+	  if (GET_POS(tmp_victim) == POSITION_DEAD || tmp_victim->in_room == NOWHERE) {
+		continue;
+	  }
+	  
 		if ((tmp_victim->in_room == ch->in_room) ||
 			(tmp_victim == ch) ||
 			(!ARE_GROUPED(ch, tmp_victim)) ||
@@ -4517,6 +4543,10 @@ int spell_fire_breath(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
 
 	auto &character_list = DC::instance().character_list;
 	for (auto& tmp_victim : character_list) {
+	  if (GET_POS(tmp_victim) == POSITION_DEAD || tmp_victim->in_room == NOWHERE) {
+		continue;
+	  }
+
 
     if ( (ch->in_room == tmp_victim->in_room) && (ch != tmp_victim) &&
          (IS_NPC(ch) ? !IS_NPC(tmp_victim) : TRUE) ) // if i'm a mob, don't hurt other mobs
@@ -4554,6 +4584,10 @@ int spell_gas_breath(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
 
   auto &character_list = DC::instance().character_list;
 	for (auto& tmp_victim : character_list) {
+	  if (GET_POS(tmp_victim) == POSITION_DEAD || tmp_victim->in_room == NOWHERE) {
+		continue;
+	  }
+
 	 if ( (ch->in_room == tmp_victim->in_room) && (ch != tmp_victim) &&
 		(IS_NPC(tmp_victim) || IS_NPC(ch))){
 
@@ -10245,24 +10279,31 @@ int spell_bee_swarm(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
 	auto &character_list = DC::instance().character_list;
 	for (auto& tmp_victim : character_list) {
       try {
-	if ((ch->in_room == tmp_victim->in_room) && (ch != tmp_victim) &&
-	    (!ARE_GROUPED(ch,tmp_victim)) && can_be_attacked(ch, tmp_victim)) {
-	  set_cantquit(ch, tmp_victim);
-	  retval = damage(ch, tmp_victim, dam, TYPE_MAGIC, SPELL_BEE_SWARM, 0);
-	  if(IS_SET(retval, eCH_DIED))
-	    return retval;
-	} else if(world[ch->in_room].zone == world[tmp_victim->in_room].zone) {
-	  send_to_char("You hear the buzzing of hundreds of bees.\n\r",
-		       tmp_victim);
-	}
+		if (GET_POS(tmp_victim) == POSITION_DEAD || tmp_victim->in_room == NOWHERE) {
+		  continue;
+		}
+
+		if ((ch->in_room == tmp_victim->in_room) && (ch != tmp_victim) &&
+			(!ARE_GROUPED(ch,tmp_victim)) && can_be_attacked(ch, tmp_victim)) {
+		  
+		  set_cantquit(ch, tmp_victim);
+		  
+		  retval = damage(ch, tmp_victim, dam, TYPE_MAGIC, SPELL_BEE_SWARM, 0);		  
+		  if(IS_SET(retval, eCH_DIED))
+			return retval;
+		  
+		} else if(world[ch->in_room].zone == world[tmp_victim->in_room].zone) {
+		  send_to_char("You hear the buzzing of hundreds of bees.\n\r",
+					   tmp_victim);
+		}
       } catch(CWorld::underrun &) {
-	log("Underrun exception occurred in spell_bee_swarm.", IMMORTAL, LOG_BUG);
-	produce_coredump();
-	return eFAILURE;
+		log("Underrun exception occurred in spell_bee_swarm.", IMMORTAL, LOG_BUG);
+		produce_coredump();
+		return eFAILURE;
       } catch(CWorld::overrun &) {
-	log("Overrun exception occurred in spell_bee_swarm.", IMMORTAL, LOG_BUG);
-	produce_coredump();
-	return eFAILURE;
+		log("Overrun exception occurred in spell_bee_swarm.", IMMORTAL, LOG_BUG);
+		produce_coredump();
+		return eFAILURE;
       }
    }
   return eSUCCESS;
@@ -12145,6 +12186,10 @@ int spell_icestorm(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
 
 	auto &character_list = DC::instance().character_list;
 	for (auto& tmp_victim : character_list) {
+	  if (GET_POS(tmp_victim) == POSITION_DEAD || tmp_victim->in_room == NOWHERE) {
+		continue;
+	  }
+
 
     if ((ch->in_room == tmp_victim->in_room)
         && (ch != tmp_victim) 
