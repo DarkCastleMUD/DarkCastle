@@ -639,7 +639,7 @@ int godload_sales(struct char_data *ch, struct obj_data *obj, int cmd, char *arg
 			return eSUCCESS;
 		}
 		if (!obj) {
-			sprintf(buf, "%s Try that on the cooky meta-physician..", GET_NAME(ch));
+			sprintf(buf, "%s Try that on the kooky meta-physician..", GET_NAME(ch));
 			do_tell(owner, buf, 0);
 			return eSUCCESS;
 		}

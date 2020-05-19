@@ -1401,7 +1401,7 @@ int quest_vendor(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
 
       OBJ_DATA *obj = get_obj_in_list_vis(ch, arg2, ch->carrying);
       if (!obj) {
-	  sprintf(buf, "%s Try that on the cooky meta-physician..", GET_NAME(ch));
+	  sprintf(buf, "%s Try that on the kooky meta-physician..", GET_NAME(ch));
 	  do_tell(owner, buf, 0);
 	  return eSUCCESS;
       }
