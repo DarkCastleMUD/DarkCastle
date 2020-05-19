@@ -917,10 +917,14 @@ int spell_earthquake(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
   }
   
   auto &character_list = DC::instance().character_list;
-	for (auto& tmp_victim : character_list) {
-		if (IS_SET(retval, eCH_DIED)) {
-			break;
-		}
+  for (auto& tmp_victim : character_list) {
+    if (IS_SET(retval, eCH_DIED)) {
+      break;
+    }
+
+    if (GET_POS(tmp_victim) == POSITION_DEAD) {
+      continue;
+    }
 
     try {
       ch_zone = world[ch->in_room].zone;
