@@ -793,6 +793,10 @@ bool CAN_SEE( struct char_data *sub, struct char_data *obj, bool noprog )
    if ( IS_AFFECTED(obj, AFF_GLITTER_DUST) && GET_LEVEL(obj) < IMMORTAL )
       return TRUE;
 
+   if (obj->in_room == NOWHERE) {
+	 return FALSE;
+   }
+   
    if (world[obj->in_room].sector_type == SECT_FOREST &&
        IS_AFFECTED(obj, AFF_FOREST_MELD) &&
        IS_AFFECTED(obj, AFF_HIDE))
