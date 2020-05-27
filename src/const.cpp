@@ -1000,7 +1000,7 @@ char *more_obj_bits[] =
     "NO_SCRAP",
     "CUSTOM",
 	"24H_SAVE",
-	"NO_DISARM"
+	"NO_DISARM",
     "\n"
 };
 
