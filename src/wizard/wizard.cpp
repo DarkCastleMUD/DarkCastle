@@ -1339,20 +1339,23 @@ int do_clear(struct char_data *ch, char *argument, int cmd)
         }
 
 	auto &character_list = DC::instance().character_list;
-	for (auto& tmp_vict : character_list) {
-                if(world[tmp_vict->in_room].zone == zone) {
-                        if(IS_NPC(tmp_vict)) {
+	for (auto& tmp_victim : character_list) {
+		if (GET_POS(tmp_victim) == POSITION_DEAD || tmp_victim->in_room == NOWHERE) {
+			continue;
+		}
+                if(world[tmp_victim->in_room].zone == zone) {
+                        if(IS_NPC(tmp_victim)) {
                                 for (int l = 0; l < MAX_WEAR; l++ )
                                 {
-                                   if ( tmp_vict->equipment[l] )
-                                      extract_obj(unequip_char(tmp_vict,l));
+                                   if ( tmp_victim->equipment[l] )
+                                      extract_obj(unequip_char(tmp_victim,l));
                                 }
-                                while(tmp_vict->carrying)
-                                   extract_obj(tmp_vict->carrying);
-                                extract_char(tmp_vict, TRUE);
+                                while(tmp_victim->carrying)
+                                   extract_obj(tmp_victim->carrying);
+                                extract_char(tmp_victim, TRUE);
                         }
                         else 
-                                send_to_char("You hear unmatched screams of terror as all mobs are summarily executed!\n\r", tmp_vict);
+                                send_to_char("You hear unmatched screams of terror as all mobs are summarily executed!\n\r", tmp_victim);
                 }
         }
         send_to_char("You have just caused the destruction of countless creatures in ths area!\n\r",ch);
