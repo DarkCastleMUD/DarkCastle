@@ -133,6 +133,7 @@
 #define ITEM_NO_SCRAP 		1<<9
 #define ITEM_CUSTOM             1<<10
 #define ITEM_24H_SAVE			1<<11
+#define ITEM_NO_DISARM			1<<12
 
 /* Bitvector for 'size' */
 #define SIZE_ANY		1

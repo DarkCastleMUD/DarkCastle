@@ -709,7 +709,7 @@ int do_disarm( struct char_data *ch, char *argument, int cmd )
     if ( skill_success(ch,victim,SKILL_DISARM,modifier))
     {
 
-        if (((IS_SET(wielded->obj_flags.extra_flags,ITEM_NODROP)) || 
+        if (((IS_SET(wielded->obj_flags.extra_flags,ITEM_NODROP) || IS_SET(wielded->obj_flags.more_flags,ITEM_NO_DISARM)) ||
             (GET_LEVEL(victim) >= IMMORTAL)) && (!IS_NPC(victim) || mob_index[victim->mobdata->nr].virt > 2400 ||
 		mob_index[victim->mobdata->nr].virt < 2300))
           send_to_char("You can't seem to work it loose.\n\r", ch);
