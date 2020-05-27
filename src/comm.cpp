@@ -76,6 +76,7 @@
 #include <Timer.h>
 #endif
 #include <DC.h>
+#include <CommandStack.h>
 #include <algorithm>
 
 struct multiplayer {
@@ -697,6 +698,9 @@ void game_loop(unsigned mother_desc, unsigned other_desc, unsigned third_desc, u
 		timingDebugStr.str("");
 		gameloopTimer.start();
 #endif
+		// Set CommandStack to track a command stack with max queue depth of 20
+		CommandStack cstack(0, 20);
+
 		extern bool selfpurge;
 		selfpurge = FALSE;
 		// Set up the input, output, and exception sets for select().

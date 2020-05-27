@@ -43,6 +43,7 @@ extern "C"
 #include <act.h>
 #include <returnvals.h>
 #include <terminal.h>
+#include <CommandStack.h>
 
 #define SKILL_HIDE 337
 
@@ -695,6 +696,20 @@ int do_imotd(CHAR_DATA *ch, char *arg, int cmd)
 
 int command_interpreter( CHAR_DATA *ch, char *pcomm, bool procced  )
 {
+  CommandStack cstack;
+
+  if (cstack.isOverflow() == true) {
+	// Prevent errors from showing up multiple times per loop
+	if (cstack.getOverflowCount() < 2) {
+		if (ch && pcomm && GET_NAME(ch)) {
+		  logf(IMMORTAL, LOG_BUG, "Command stack exceeded. depth: %d, max_depth: %d, name: %s, cmd: %s", cstack.getDepth(), cstack.getMax(), GET_NAME(ch), pcomm);
+		} else {
+		  logf(IMMORTAL, LOG_BUG, "CommandStack::depth %d exceeds CommandStack::max_depth %d", cstack.getDepth(), cstack.getMax());
+		}
+	}
+    return eFAILURE;
+  }
+
   int look_at;
   int retval;
   struct command_info *found = 0;
