@@ -133,8 +133,6 @@ class ErrorHandler {
   class overrun {};
 };
 
-void produce_coredump(void *ptr = 0);
-
 bool objExists(OBJ_DATA *obj);
 bool charge_moves(char_data *ch, int skill, double modifier = 1);
 

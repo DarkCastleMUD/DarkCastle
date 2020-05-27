@@ -580,4 +580,6 @@ const char *find_profession(int c_class, uint8_t profession);
 
 std::string get_isr_string(uint32, int8_t);
 
+void produce_coredump(void *ptr = 0);
+
 #endif /* UTILITY_H_ */
