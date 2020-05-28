@@ -344,10 +344,10 @@ int do_join(struct char_data *ch, char *argument, int cmd)
               }
 	}
 
-	if (!found) {
-	   send_to_char("You have no loyal subjects engaged in combat!\n\r", ch);
-           return eFAILURE;
-        }
+     if (!found) {
+        send_to_char("You have no loyal subjects engaged in combat!\n\r", ch);
+        return eFAILURE;
+     }
   }
 
 
