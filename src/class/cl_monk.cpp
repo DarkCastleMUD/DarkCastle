@@ -28,10 +28,12 @@ int do_eagle_claw(struct char_data *ch, char *argument, int cmd)
   char name[MAX_INPUT_LENGTH];
   int dam;
   int retval;
+  time_t time_raw_format;
+  struct tm * ptr_time;
 
-	if (!canPerform(ch, SKILL_EAGLE_CLAW, "Yooo are not pepared to use thees skeel, grasshoppa.\r\n")) {
+  if (!canPerform(ch, SKILL_EAGLE_CLAW, "Yooo are not pepared to use thees skeel, grasshoppa.\r\n")) {
     return eFAILURE;
-    }
+  }
 
   int hands = 0;
   if(ch->equipment[WIELD])          hands++;
@@ -44,7 +46,7 @@ int do_eagle_claw(struct char_data *ch, char *argument, int cmd)
   if(hands > 1) {
     send_to_char ("You need a free hand to eagleclaw someone.\r\n", ch);
     return eFAILURE;
-    }
+  }
 
   one_argument(argument, name);
 
@@ -55,12 +57,12 @@ int do_eagle_claw(struct char_data *ch, char *argument, int cmd)
       send_to_char("You raise your hand in a claw and make strange bird noises.\r\n", ch);
       return eFAILURE;
       }
-    }
+  }
 
   if (victim == ch) {
     send_to_char("You lower your claw-shaped hand and scratch yourself gently.\r\n", ch);
     return eFAILURE;
-    }
+  }
 
   if (IS_SET(victim->combat, COMBAT_BLADESHIELD1) || IS_SET(victim->combat, COMBAT_BLADESHIELD2)) {
         send_to_char("Clawing a bladeshielded opponent would be suicide!\n\r", ch);
@@ -78,9 +80,20 @@ int do_eagle_claw(struct char_data *ch, char *argument, int cmd)
     retval = damage(ch, victim, 0, TYPE_UNDEFINED, SKILL_EAGLE_CLAW, 0);
   else 
   {
-    dam = (GET_STR(ch) * 3) + (GET_DEX(ch) * 2) + dice(2, GET_LEVEL(ch)) + 100;
-    if (number(1, 100) == 1 && GET_LEVEL(victim) < IMMORTAL) 
-      dam = GET_HIT(victim)*5 + 20;//1% bingo chance same as drown
+    // 1% bingo chance 
+    if (number(1, 100) >= 1 && GET_LEVEL(victim) < IMMORTAL) {
+      time ( &time_raw_format );
+      ptr_time = localtime ( &time_raw_format );
+      if( 11 == ptr_time->tm_mon ) {
+        do_say(victim, "Laaaaaaast Christmas, I gave you my....", 9);
+      }
+      act("$N blinks and stares glassy-eyed into the distance blissfully no longer aware of $n RIPPING OUT $S $B$4heart$R!", ch, 0, victim, TO_ROOM, NOTVICT);
+      act("You feel empty inside and full of heart-ache as if something important to you is missing.  Memories flash of your longing fo....", ch, 0, victim, TO_VICT, 0);
+      act("You slide your fingers between $N's ribs and give $S's left ventricle a ticket with your pinky before RIPPING OUT $S heart.", ch, 0, victim, TO_CHAR, 0);
+      dam = 9999999;
+    } else {
+      dam = (GET_STR(ch) * 3) + (GET_DEX(ch) * 2) + dice(2, GET_LEVEL(ch)) + 100;
+    }
     retval = damage(ch, victim, dam, TYPE_UNDEFINED, SKILL_EAGLE_CLAW, 0);
   }
 

@@ -1731,6 +1731,7 @@ bool is_bingo(int dam, int weapon_type, int attacktype)
 
   switch (attacktype) {
   case SKILL_SKEWER:
+  case SKILL_EAGLE_CLAW:
   case SKILL_BACKSTAB:
   case SKILL_SONG_WHISTLE_SHARP:
   case SPELL_CREEPING_DEATH:
