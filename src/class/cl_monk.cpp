@@ -81,7 +81,7 @@ int do_eagle_claw(struct char_data *ch, char *argument, int cmd)
   else 
   {
     // 1% bingo chance 
-    if (number(1, 100) >= 1 && GET_LEVEL(victim) < IMMORTAL) {
+    if (number(1, 100) == 1 && GET_LEVEL(victim) < IMMORTAL) {
       time ( &time_raw_format );
       ptr_time = localtime ( &time_raw_format );
       if( 11 == ptr_time->tm_mon ) {
