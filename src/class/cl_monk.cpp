@@ -89,7 +89,7 @@ int do_eagle_claw(struct char_data *ch, char *argument, int cmd)
       }
       act("$N blinks and stares glassy-eyed into the distance blissfully no longer aware of $n RIPPING OUT $S $B$4heart$R!", ch, 0, victim, TO_ROOM, NOTVICT);
       act("You feel empty inside and full of heart-ache as if something important to you is missing.  Memories flash of your longing fo....", ch, 0, victim, TO_VICT, 0);
-      act("You slide your fingers between $N's ribs and give $S's left ventricle a ticket with your pinky before RIPPING OUT $S heart.", ch, 0, victim, TO_CHAR, 0);
+      act("You slide your fingers between $N's ribs and give $S's left ventricle a tickle with your pinky before RIPPING OUT $S heart.", ch, 0, victim, TO_CHAR, 0);
       dam = 9999999;
     } else {
       dam = (GET_STR(ch) * 3) + (GET_DEX(ch) * 2) + dice(2, GET_LEVEL(ch)) + 100;
