@@ -643,7 +643,6 @@ int max_res(int zone)
 int do_zedit(struct char_data *ch, char *argument, int cmd)
 {
   char buf[MAX_STRING_LENGTH];
-  char tmpbuf[MAX_STRING_LENGTH];
   char select[MAX_INPUT_LENGTH];
   char text[MAX_INPUT_LENGTH];
   int16 skill;
