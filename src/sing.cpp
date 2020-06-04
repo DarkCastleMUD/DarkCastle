@@ -638,10 +638,15 @@ void update_bard_singing() {
 
 	auto &character_list = DC::instance().character_list;
 	find_if(character_list.begin(), character_list.end(), [&j](char_data * const &i) {
-		if (!IS_NPC(i) && GET_CLASS(i) != CLASS_BARD && GET_LEVEL(i) < 100)
-		return false;
+		if (IS_PC(i) && GET_CLASS(i) != CLASS_BARD && GET_LEVEL(i) < IMMORTAL)
+		  return false;
+		
 		if (i->songs.empty())
-		return false;
+		  return false;
+
+		if (GET_POS(i) == POSITION_DEAD || i->in_room == NOWHERE) {
+		  return false;
+		}
 
 		for (j = i->songs.begin(); j != i->songs.end(); ++j) {
 			if ((*j).song_timer == -1) {
