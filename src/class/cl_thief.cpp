@@ -416,7 +416,7 @@ int do_backstab(CHAR_DATA *ch, char *argument, int cmd)
   }
 
   // If we're intended to have a dual backstab AND we still can
-  if (perform_dual_backstab == true && charge_moves(ch, SKILL_BACKSTAB)) {
+  if (perform_dual_backstab == true && charge_moves(ch, SKILL_BACKSTAB) && GET_POS(victim) != POSITION_DEAD && victim->in_room != NOWHERE) {
     if (was_in == ch->in_room) {
       if (AWAKE(victim) && !skill_success(ch,victim, SKILL_BACKSTAB)) {
 	retval = damage(ch, victim, 0, TYPE_UNDEFINED, SKILL_BACKSTAB, SECOND);
