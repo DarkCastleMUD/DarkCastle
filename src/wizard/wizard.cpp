@@ -1340,6 +1340,11 @@ int do_clear(struct char_data *ch, char *argument, int cmd)
 
 	auto &character_list = DC::instance().character_list;
 	for (auto& tmp_victim : character_list) {
+		// This should never happen but it has before so we must investigate without crashing the whole MUD
+		if (tmp_victim == 0) {
+			produce_coredump(tmp_victim);
+			continue;
+		}
 		if (GET_POS(tmp_victim) == POSITION_DEAD || tmp_victim->in_room == NOWHERE) {
 			continue;
 		}
