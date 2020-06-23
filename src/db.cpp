@@ -4376,10 +4376,7 @@ void reset_zone(int zone)
 	int last_no;
 	CHAR_DATA *mob = NULL;
 	struct obj_data *obj, *obj_to;
-	int hrs;
 	last_cmd = last_mob = last_obj = last_percent = -1;
-	int i;
-	float z;
 
 	char buf[MAX_STRING_LENGTH];
 
@@ -4524,23 +4521,7 @@ void reset_zone(int zone)
 				break;
 
 				case '%': /* percent chance of next command happening */
-				z = ZCMD.arg1 / ZCMD.arg2;
-				if (z > 0.2)
-				i = ZCMD.arg1;
-				else
-				i = (int) ((float) ZCMD.arg1 * 2);
-
-				hrs = (time(NULL) - ZCMD.last) / 3600;
-				if (hrs > 24)
-				i *= 4;
-				else if (hrs > 8)
-				i *= 3;
-				else if (hrs > 2)
-				i *= 2;
-				else if (hrs > 1)
-				i = (int) (i * 1.5);
-
-				if (number(0, ZCMD.arg2) <= i) {
+				if (number(1, ZCMD.arg2) <= ZCMD.arg1) {
 					ZCMD.last = time(NULL);
 					last_percent = 1;
 					last_cmd = 1;
