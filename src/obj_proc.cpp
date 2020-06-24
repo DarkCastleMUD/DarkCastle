@@ -675,6 +675,13 @@ struct assembler_data gem_data[] = {
      { 5260, 5261, 5262, -1, -1, -1, -1, -1, -1, -1, 5263 }
    },
 
+   // Item 7, a curiously notched medallion
+   { "With a blinding flash, the gem makes the medallion whole.\n\r",
+     "As $n fiddles with the medallion pieces, you are dazed by a bright flash!\n\r",
+	 "You attempt to assemble the family medallion but something is missing.\n\r",
+     { 30084, 30085, 30086, 30087, 30088, -1, -1, -1, -1, -1, 30083 }
+   },
+
    // Junk Item.  THIS MUST BE LAST IN THE ARRAY
    { "Capulet",
      "is a fatt",

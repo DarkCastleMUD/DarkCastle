@@ -639,6 +639,13 @@ void assign_objects(void)
   assign_one_obj_non(5261, gem_assembler);
   assign_one_obj_non(5262, gem_assembler);
 
+  //a curiously notched medallion
+  assign_one_obj_non(30084, gem_assembler);
+  assign_one_obj_non(30085, gem_assembler);
+  assign_one_obj_non(30086, gem_assembler);
+  assign_one_obj_non(30087, gem_assembler);
+  assign_one_obj_non(30088, gem_assembler);
+
   assign_one_obj_non(22399,  board);  // quests2do Board
 
   assign_one_obj_com(2715,   shield_combat_procs);
