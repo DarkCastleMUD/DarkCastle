@@ -373,7 +373,7 @@ struct command_info cmd_info[] =
     { "finish",		do_not_here,	POSITION_RESTING, 0, CMD_FINISH, 0, 0 },
     { "veternarian",	do_not_here,	POSITION_RESTING, 0, CMD_VETERNARIAN, 0, 0 },
     { "feed",		do_not_here,	POSITION_RESTING, 0, CMD_FEED, 0, 0 },
-    { "assemble",	do_not_here,	POSITION_RESTING, 0, CMD_ASSEMBLE, 0, 0 },
+    { "assemble",	do_assemble,	POSITION_RESTING, 0, CMD_ASSEMBLE, 0, 0 },
     { "pay",		do_not_here,	POSITION_STANDING, 0, CMD_PAY, 0, 0 },
     { "restring",	do_not_here,	POSITION_STANDING, 0, CMD_RESTRING, 0, 0 },
     { "push",		do_not_here,	POSITION_STANDING, 0, CMD_PUSH, 0, 0 },
