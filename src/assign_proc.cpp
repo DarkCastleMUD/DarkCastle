@@ -411,7 +411,6 @@ void assign_objects(void)
   SPEC_FUN returner;
   SPEC_FUN pushwand;
   SPEC_FUN barbweap;
-  SPEC_FUN gem_assembler;
   SPEC_FUN pfe_word;
   SPEC_FUN devilsword;
   SPEC_FUN eliara_non_combat;
@@ -599,52 +598,9 @@ void assign_objects(void)
   assign_one_obj_non(6352, spellcraft_glyphs);
   assign_one_obj_non(6353, spellcraft_glyphs);  
     
-// assembled items
-// forage arrow (2 kinds, 3185 and 3187 used for both kinds)
-  assign_one_obj_non(3185,  gem_assembler);  
-  assign_one_obj_non(3186,  gem_assembler);  
-  assign_one_obj_non(3187,  gem_assembler);  
-  assign_one_obj_non(28301, gem_assembler);  
-
   //assign_one_obj_com(4818, glove_combat_procs);
   //assign_one_obj_com(4819, glove_combat_procs);
 
-  // Crystalline tir
-  assign_one_obj_non(12607, gem_assembler);  
-  assign_one_obj_non(2602,  gem_assembler);  
-  assign_one_obj_non(2714,  gem_assembler);  
-
-  // Etala
-  assign_one_obj_non(181,  gem_assembler);  
-  assign_one_obj_non(182,  gem_assembler);  
-  assign_one_obj_non(183,  gem_assembler);  
-
-  // DK Gaiot key
-  assign_one_obj_non(9502,  gem_assembler);  
-  assign_one_obj_non(9503,  gem_assembler);  
-  assign_one_obj_non(9504,  gem_assembler);  
-  assign_one_obj_non(9505,  gem_assembler);  
-  assign_one_obj_non(9506,  gem_assembler);  
-
-  // ventriloqute dummy
-  assign_one_obj_non(17349,  gem_assembler);  
-  assign_one_obj_non(17350,  gem_assembler);  
-  assign_one_obj_non(17351,  gem_assembler);  
-  assign_one_obj_non(17352,  gem_assembler);  
-  assign_one_obj_non(17353,  gem_assembler);  
-  assign_one_obj_non(17354,  gem_assembler);  
-
-  //the Shield of the Beholder
-  assign_one_obj_non(5260, gem_assembler);
-  assign_one_obj_non(5261, gem_assembler);
-  assign_one_obj_non(5262, gem_assembler);
-
-  //a curiously notched medallion
-  assign_one_obj_non(30084, gem_assembler);
-  assign_one_obj_non(30085, gem_assembler);
-  assign_one_obj_non(30086, gem_assembler);
-  assign_one_obj_non(30087, gem_assembler);
-  assign_one_obj_non(30088, gem_assembler);
 
   assign_one_obj_non(22399,  board);  // quests2do Board
 
