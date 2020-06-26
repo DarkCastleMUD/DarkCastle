@@ -197,6 +197,7 @@ DO_FUN do_ambush;
 DO_FUN do_anonymous;
 DO_FUN do_ansi;
 DO_FUN do_appraise;
+DO_FUN do_assemble;
 DO_FUN do_release;
 DO_FUN do_jab;
 DO_FUN do_areas;
