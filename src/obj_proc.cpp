@@ -612,28 +612,31 @@ int returner(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
    return eSUCCESS;
 }
 
-#define MAX_GEM_ASSEMBLER_ITEM   11
+#define MAX_GEM_ASSEMBLER_ITEM   10
 
-struct assembler_data {
+struct assemble_item {
    char * finish_to_char;
    char * finish_to_room;
-   char * missing_text;
-   int  pieces[MAX_GEM_ASSEMBLER_ITEM];
+   char * missing_to_char;
+   int components[MAX_GEM_ASSEMBLER_ITEM];
+   int item;
 };
 
-struct assembler_data gem_data[] = {
+struct assemble_item assemble_items[] = {
    // Item 0, the crystalline tir stuff
    { "A brilliant flash of light erupts from your hands as the gems mold themselves together and form a cohesive and flawless gem.\r\n",
      "A brilliant flash of light erupts from $n's hands as the gems $e holds form a new cohesive and flawless gem.",
      "One of the gems seems to be missing.\r\n",
-     { 2714, 2602, 12607, -1, -1, -1, -1, -1, -1, -1, 1506 }
+     { 2714, 2602, 12607, -1, -1, -1, -1, -1, -1, -1 },
+	 1506
    },
 
    // Item 1, Etala the Shadowblade
    { "Connecting the hilt and gem to the blade, you form a whole sword.\r\n",
      "$n fiddles around with some stuff in $s inventory.",
      "You seem to be missing a piece.\r\n",
-     { 181, 182, 183, -1, -1, -1, -1, -1, -1, -1, 184 }
+     { 181, 182, 183, -1, -1, -1, -1, -1, -1, -1 },
+	 184
    },
 
    // Item 2, Broadhead arrow from forage items
@@ -642,7 +645,8 @@ struct assembler_data gem_data[] = {
      "Finally, you shape the scorpion stinger into a deadly arrowhead and secure it to the front.\r\n",
      "$n sits down with some junk and tries $s hand at fletching.",
      "You don't have all the items required to fletch an arrow.\r\n",
-     { 3185, 3186, 3187, -1, -1, -1, -1, -1, -1, -1, 3188 }
+     { 3185, 3186, 3187, -1, -1, -1, -1, -1, -1, -1 },
+	 3188
    },
 
    // Item 3, Wolf tooh arrow from forage items
@@ -651,42 +655,48 @@ struct assembler_data gem_data[] = {
      "Finally, you hone the wolf's tooth stinger into a sharp arrowhead and secure it to the front.\r\n",
      "$n sits down with some junk and tries $s hand at fletching.",
      "You don't have all the items required to fletch an arrow.\r\n",
-     { 3185, 28301, 3187, -1, -1, -1, -1, -1, -1, -1, 3190 }
+     { 3185, 28301, 3187, -1, -1, -1, -1, -1, -1, -1 },
+	 3190
    },
 
    // Item 4, Gaiot key in DK
    { "The stone pieces join together to form a small statue of a dragon.\r\n",
      "$n assembles some stones together to form a black statue.\r\n",
      "The pieces click together but fall apart as if something is missing.\r\n",
-     { 9502, 9503, 9504, 9505, 9506, -1, -1, -1, -1, -1, 9501 }
+     { 9502, 9503, 9504, 9505, 9506, -1, -1, -1, -1, -1 },
+	 9501
    },
 
    // Item 5, ventriloquate dummy - rahz
    { "You are able to put the parts together, and create a ventriloquist's dummy.\r\n",
      "$n manages to the parts together, creating a ventriloquist's dummy.\r\n",
      "The pieces don't seem to fit together quite right.\r\n",
-     { 17349, 17350, 17351, 17352, 17353, 17354, -1, -1, -1, -1, 17348 }
+     { 17349, 17350, 17351, 17352, 17353, 17354, -1, -1, -1, -1 },
+	 17348
    },
 
    // Item 6, the Shield of the Beholder
    { "You place the two gems into the holes on the shield and it seems to hum with power.\n\r",
      "$n places two precious gemstones into a beholder's carapace to create a shield.\n\r",
      "You seem to be missing a piece.\n\r",
-     { 5260, 5261, 5262, -1, -1, -1, -1, -1, -1, -1, 5263 }
+     { 5260, 5261, 5262, -1, -1, -1, -1, -1, -1, -1 },
+	 5263
    },
 
    // Item 7, a curiously notched medallion
    { "With a blinding flash, the gem makes the medallion whole.\n\r",
      "As $n fiddles with the medallion pieces, you are dazed by a bright flash!\n\r",
 	 "You attempt to assemble the family medallion but something is missing.\n\r",
-     { 30084, 30085, 30086, 30087, 30088, -1, -1, -1, -1, -1, 30083 }
+     { 30084, 30085, 30086, 30087, 30088, -1, -1, -1, -1, -1 },
+	 30083
    },
 
    // Junk Item.  THIS MUST BE LAST IN THE ARRAY
-   { "Capulet",
-     "is a fatt",
-     "butt.",
-     { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 }
+   { "",
+     "",
+     "",
+     { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 },
+	 -1
    }
 
 };
@@ -729,134 +739,191 @@ int hellmouth_thing(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
   return eFAILURE; // So normal say function will execute after this
 }
 
-
-int gem_assembler(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg, 
-                   CHAR_DATA *invoker)
+int search_assemble_items(int vnum)
 {
-   obj_data * ptr_array[MAX_GEM_ASSEMBLER_ITEM - 1];
-   obj_data * reward = NULL;
-   int position, i, done;
-   bool haveall = FALSE;
-   char buf[200];
-   extern struct index_data *obj_index;
+	// This should never happen
+	if (vnum < 1) {
+		logf(ANGEL, LOG_BUG, "search_assemble_items passed vnumx=%d\n\r", vnum);
+		produce_coredump();
+		return -1;
+	}
 
-   if(cmd != CMD_ASSEMBLE)
-      return eFAILURE;
+	for (int item_index=0; assemble_items[item_index].item != -1; item_index++) {
+		// We search until MAX_GEM_ASSEMBLER_ITEM -1 because we don't want to include the last item
+		// which is the finished item vnum
+		for (int component_index=0; component_index < MAX_GEM_ASSEMBLER_ITEM; component_index++) {
+			if (assemble_items[item_index].components[component_index] == vnum) {
+				return item_index;
+			}
+		}
+	}
 
-   done = 0;
+	return -1;
+}
 
-   // Find our position in the array
-   for(position = 0; gem_data[position].pieces[0] != -1 && !done; position++)
-   {
-      for(i = 0; i < MAX_GEM_ASSEMBLER_ITEM; i++)
-      {
-         if(gem_data[position].pieces[i] == obj_index[obj->item_number].virt)
-         { 
-            for(int j=0;j<MAX_GEM_ASSEMBLER_ITEM;j++) {
-               if(gem_data[position].pieces[j] == -1) haveall = TRUE;
-               if(!(get_obj_in_list_num(real_object(gem_data[position].pieces[j]), ch->carrying)))
-                  break;
-            }
-            if(haveall) done = 1; 
-         }
-         if(done) break;
-         if(-1 == gem_data[position].pieces[i])
-            break;
-      }
-      if(done)
-        break;
-   }
+struct obj_data * search_char_for_item(char_data * ch, int16 item_number, bool wearonly = FALSE);
 
-   if(gem_data[position].pieces[0] == -1)
-   {
-      // Could not locate obj in data array
-      sprintf(buf, "Item %d has gem_assembler proc with invalid data.", obj_index[obj->item_number].virt);
-      log(buf, ANGEL, LOG_BUG); // 102
-      send_to_char("You can't seem to assemble that.", ch);
-      return eSUCCESS;
-   }
+bool assemble_item_index(char_data *ch, int item_index)
+{
+	// This should never happen
+	if (item_index < 0) {
+		logf(ANGEL, LOG_BUG, "assemble_item_index passed item_index=%d\n\r", item_index);
+		produce_coredump();
+		return false;
+	}
 
-   done = 1;
-   // Make sure all our items exist in the world
-   for(i = 0; i < MAX_GEM_ASSEMBLER_ITEM; i++) 
-   {
-      if( -1 == gem_data[position].pieces[i] ) // last piece in list, skip to end
-      {
-        // if last piece doesn't exist, get out
-        if( -1 == real_object(gem_data[position].pieces[MAX_GEM_ASSEMBLER_ITEM - 1]) )
-          done = 0;
-        break;
-      } 
+	// Look through all the components of item_index and see if the player has them
+	for (int component_index=0; component_index < MAX_GEM_ASSEMBLER_ITEM; component_index++) {
 
-      // if object doesn't exist, get out
-      if( -1 == real_object(gem_data[position].pieces[i] ) )
-        { done = 0; break; }
-   }
+		int component_virt = assemble_items[item_index].components[component_index];
+		if (component_virt < 1) {
+			continue;
+		}
 
-   if(!done)
-   {
-      sprintf(buf, "Gem_assembler's objects not loading properly. Contact a god. (%d)\r\n", position);
-      send_to_char(buf, ch);
-      return eSUCCESS;
-   }
+		int component_real = real_object(component_virt);
+		if (component_real < 0) {
+			logf (ANGEL, LOG_BUG, "assemble_items[%d], component_index %d refers to invalid rnum %d for vnum %d.",
+					item_index, component_index, component_real, component_virt);
 
-   // make sure our ptr_array is clean
-   for(i = 0; i < (MAX_GEM_ASSEMBLER_ITEM - 1); i++)
-      ptr_array[i] = NULL;
+			send_to_char("There was an internal malfunction assembling your item. Contact an Immortal.\n\r", ch);
+			produce_coredump();
+			return true;
+		}
 
-   // go through and find all our pointers
-   for(i = 0; i < (MAX_GEM_ASSEMBLER_ITEM - 1); i++)
-   {
-      if(-1 == gem_data[position].pieces[i]) // last item in list
-      {
-         i--; // Set i to the last valid position
-         break;
-      }
-      if(!(ptr_array[i] = get_obj_in_list_num(real_object(gem_data[position].pieces[i]), ch->carrying)))
-      {
-         // we didn't have a piece
-         send_to_char(gem_data[position].missing_text, ch);
-         return eSUCCESS;
-      }
-   }
-   if (real_object(gem_data[position].pieces[MAX_GEM_ASSEMBLER_ITEM-1]) < 0)
-   {
-      send_to_char("Assembled item not found.\r\n",ch);
-      return eSUCCESS;
-   }
-  struct obj_data * search_char_for_item(char_data * ch, int16 item_number, bool wearonly = FALSE);
+	    if (get_obj_in_list_num(component_real, ch->carrying) == 0) {
+	    	return false;
+	    }
+	}
 
-  if(IS_SET(((OBJ_DATA*)obj_index[real_object(gem_data[position].pieces[MAX_GEM_ASSEMBLER_ITEM-1])].item)->obj_flags.more_flags, ITEM_UNIQUE)) {
-      if(search_char_for_item(ch, real_object(gem_data[position].pieces[MAX_GEM_ASSEMBLER_ITEM-1]))) {
-         send_to_char("You already have one of those!\r\n", ch);
-         return eSUCCESS;
-      }
+	// If we get to this point then all components for item_index were found
+	int item_vnum = assemble_items[item_index].item;
+	int item_real = real_object(item_vnum);
+	obj_data *item = (obj_data *)obj_index[item_real].item;
+
+	// Check if the item to be assembled is marked UNIQUE but the player already has one
+	if (IS_SET(item->obj_flags.more_flags, ITEM_UNIQUE)) {
+		if (search_char_for_item(ch, item_real)) {
+			send_to_char("You already have one of those!\r\n", ch);
+			return true;
+		}
+	}
+
+	// Send item specific assemble messages to the player and room
+	send_to_char(assemble_items[item_index].finish_to_char, ch);
+	act(assemble_items[item_index].finish_to_room, ch, 0, 0, TO_ROOM, 0);
+
+	// Remove all the components from the player
+	for (int component_index=0; component_index < MAX_GEM_ASSEMBLER_ITEM; component_index++) {
+		int component_virt = assemble_items[item_index].components[component_index];
+		if (component_virt < 1) {
+			continue;
+		}
+
+		int component_real = real_object(component_virt);
+		if (component_real < 0) {
+			logf (ANGEL, LOG_BUG, "assemble_items index %d, component_index %d refers to invalid rnum %d for vnum %d.",
+					item_index, component_index, component_real, component_virt);
+
+			send_to_char("There was an internal malfunction assembling your item. Contact an Immortal.\n\r", ch);
+			return true;
+		}
+
+		obj_data *component_obj = get_obj_in_list_num(component_real, ch->carrying);
+		obj_from_char(component_obj);
+		extract_obj(component_obj);
+	}
+
+	// make the new item
+	obj_data *reward_item = clone_object(item_real);
+	if (reward_item == 0) {
+		logf (ANGEL, LOG_BUG, "Unable to clone vnum %d, rnum %d.", item_vnum, item_real);
+		send_to_char("There was an internal malfunction cloning the new item. Contact an Immortal.\n\r", ch);
+		return true;
+	}
+
+	obj_to_char(reward_item, ch);
+
+	return true;
+}
+
+int do_assemble(struct char_data *ch, char *argument, int cmd)
+{
+	bool different_item_components = false;
+	int vnum, item_index = -1, last_item_index = -1;
+    char arg1[MAX_INPUT_LENGTH+1];
+    obj_data *obj;
+
+    one_argument(argument, arg1);
+
+    // if no arguments are given then look through entire inventory for items to assemble.
+    if (arg1[0] == 0) {
+    	// for each inventory item
+    	for (obj = ch->carrying; obj; obj = obj->next_content) {
+    		// if we can see it
+			if (CAN_SEE_OBJ(ch, obj, false)) {
+				vnum = obj_index[obj->item_number].virt;
+			    item_index = search_assemble_items(vnum);
+
+				// check if it's a component of an item to be assembled
+			    if (item_index != -1) {
+			    	// check if the current component is from a different item than the previous
+			    	// component that we found
+			    	if (last_item_index == -1) {
+			    		last_item_index = item_index;
+			    	} else if (last_item_index != item_index) {
+			    		different_item_components = true;
+			    	}
+
+			    	if (different_item_components) {
+			    		break;
+			    	}
+			    }
+			}
+    	}
+
+    	// If components from multiple items were found then make the player specify
+    	// the item that needs to be assembled
+    	if (different_item_components) {
+    		csendf(ch, "Assemble which object?\n\r");
+    		return eFAILURE;
+    	} else if (last_item_index == -1) {
+    		csendf(ch, "You don't have anything that can be assembled.\n\r");
+    		return eFAILURE;
+    	} else {
+    		// Attempt to assemble all the components
+    		if (assemble_item_index(ch, last_item_index) == false) {
+    			csendf(ch, "%s", assemble_items[last_item_index].missing_to_char);
+    			return eFAILURE;
+    		}
+    	}
+
+		return eSUCCESS;
     }
 
-   // if we get here, ptr_array[0 through i] contain all our objs
+    // if arguments are given, find object and see if it can be assembled.
+    obj = get_obj_in_list_vis(ch, arg1, ch->carrying);
+    if(obj == NULL)
+    {
+        act("You can't find it!", ch, 0, 0, TO_CHAR, 0);
+        return eFAILURE;
+    }
 
-   // send out the messages
-   send_to_char(gem_data[position].finish_to_char, ch);
-   act(gem_data[position].finish_to_room, ch, 0, 0, TO_ROOM, 0);
+    vnum = obj_index[obj->item_number].virt;
+    item_index = search_assemble_items(vnum);
 
-   // Remove the old items from the player's inventory
-   for(; -1 != i; i--)
-   {
-      obj_from_char(ptr_array[i]);
-      extract_obj(ptr_array[i]);
-   }
+    // Object specified is not part of an item that can be assembled
+	if (item_index == -1) {
+		csendf(ch, "That item can't be assembled into anything.\n\r");
+		return eFAILURE;
+	}
 
-   // make the new item
-   reward = clone_object(real_object(gem_data[position].pieces[MAX_GEM_ASSEMBLER_ITEM - 1]));
+	// Attempt to assemble all the components
+	if (assemble_item_index(ch, item_index) == false) {
+		csendf(ch, "%s", assemble_items[item_index].missing_to_char);
+		return eFAILURE;
+	}
 
-   if(!reward)
-   {
-      send_to_char("Your assemble was unable to clone the new obj.  Please alert a god.\r\n", ch);
-      return eSUCCESS;
-   }
-   
-   obj_to_char(reward, ch);
-   return eSUCCESS;
+    return eSUCCESS;
 }
 
 int stupid_button(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
