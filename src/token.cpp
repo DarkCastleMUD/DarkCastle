@@ -166,6 +166,9 @@ char * TokenList::Interpret(CHAR_DATA *from, OBJ_DATA *obj,
   // A few checks before we bother
   //--
   // If they're not playing and force flag isn't set, don't send
+  if (send_to == nullptr) {
+	  return(0);
+  }
   if(send_to->desc && send_to->desc->connected != CON_PLAYING && !(flags & FORCE))
     return(0);
   if(IS_SET(world[send_to->in_room].room_flags, QUIET) && !(flags & FORCE))
@@ -247,7 +250,7 @@ char * TokenList::Interpret(CHAR_DATA *from, OBJ_DATA *obj,
                     strcat(interp, GET_SHORT(from));
 		  }
 		  break; 
-	case 'N': if(!CAN_SEE(send_to, (CHAR_DATA *)vict_obj,TRUE))
+	case 'N': if (!CAN_SEE(send_to, (CHAR_DATA *)vict_obj,TRUE))
 		  {
 		    if(flags & INVIS_NULL) return(0);
 		    else if(flags & INVIS_VISIBLE)
