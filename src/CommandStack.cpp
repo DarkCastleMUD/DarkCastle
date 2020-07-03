@@ -11,7 +11,7 @@
 #include "utility.h" // logf
 
 uint32_t CommandStack::depth = 0;
-uint32_t CommandStack::max_depth = 20;
+uint32_t CommandStack::max_depth = 5;
 uint32_t CommandStack::overflow_count = 0;
 
 CommandStack::CommandStack() {
