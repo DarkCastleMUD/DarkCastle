@@ -23,6 +23,7 @@ if os.path.exists('/usr/bin/g++-10'):
 
 debug=ARGUMENTS.get('debug', 0)
 profile=ARGUMENTS.get('profile', 0)
+twitter=ARGUMENTS.get('twitter', 0)
 
 if int(debug):
    env.Append(CCFLAGS = ' -O0')
@@ -50,21 +51,25 @@ class_src = glob.glob('class/*.cpp')
 backend_src = glob.glob('Backend/*.cpp')
 libdcastle_src = glob.glob('[abc]*.cpp') + glob.glob('[e-l]*.cpp') + glob.glob('[n-r]*.cpp') + glob.glob('[t-z]*.cpp') + glob.glob('mo*.cpp') + ['magic.cpp','memory.cpp','meta.cpp','MobActivity.cpp','Leaderboard.cpp','Timer.cpp', 'db.cpp', 'save.cpp', 'shop.cpp', 'sing.cpp', 'social.cpp', 'spec.cpp',  'spells.cpp', 'stat.cpp', 'CommandStack.cpp'] + wizard_src + class_src + backend_src
 
-env.Append(CPPDEFINES=['LINUX', 'TWITTER'])
+if not int(twitter):
+    env.Append(CPPDEFINES=['LINUX'])
+else:
+    env.Append(CPPDEFINES=['LINUX', 'TWITTER'])
+    
 env.Append(CPPPATH = ['include'])
 env.Append(LIBPATH = ['/usr/local/lib', '.'])
-DC = env.Object('DC.cpp', CPPDEFINES=['LINUX', 'TWITTER', {'VERSION' :('\\"%s\\"' % version)}, {'BUILD_TIME' :('\\"%s\\"' % build_time)}])
+DC = env.Object('DC.cpp', CPPDEFINES=['LINUX', {'VERSION' :('\\"%s\\"' % version)}, {'BUILD_TIME' :('\\"%s\\"' % build_time)}])
            
 libdcastle=env.Clone()
 libdcastle.MergeFlags({'CPPPATH' : '/usr/include/pgsql/'})
 libdcastle.StaticLibrary('dcastle', [libdcastle_src + DC]);
 
 dcastle=env.Clone()
-dcastle.MergeFlags({'LIBS' : ['dcastle', 'crypt', 'mcheck', 'z', 'pq', 'XmlRpc', 'twitcurl']})
+dcastle.MergeFlags({'LIBS' : ['dcastle', 'crypt', 'mcheck', 'z', 'pq', 'XmlRpc']})
 dcastle.Program('dcastle', ['dcastle.cpp'])
 
 showplayerexp=env.Clone()
-showplayerexp.MergeFlags({'LIBS' : ['dcastle', 'crypt', 'mcheck', 'z', 'pq', 'XmlRpc', 'twitcurl']})
+showplayerexp.MergeFlags({'LIBS' : ['dcastle', 'crypt', 'mcheck', 'z', 'pq', 'XmlRpc']})
 showplayerexp.Program('showplayer', ['showplayerxp.cpp'])
 
 
