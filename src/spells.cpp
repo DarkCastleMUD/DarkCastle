@@ -1161,24 +1161,35 @@ void stop_follower(CHAR_DATA *ch, int cmd)
            ch, 0, ch->master, TO_CHAR, 0);
     }
     else {
-      act("You stop following $N.", ch, 0, ch->master, TO_CHAR, 0);
-      act("$n stops following $N.", ch, 0, ch->master, TO_ROOM, NOTVICT);
-      act("$n stops following you.", ch, 0, ch->master, TO_VICT, 0);
+    	// multiple checks if ch->master is still valid are necessary because a mob program may mak it no longer valid
+    	if (ch->master != nullptr) {
+		  act("You stop following $N.", ch, 0, ch->master, TO_CHAR, 0);
+
+		  if (ch->master != nullptr) {
+			  act("$n stops following $N.", ch, 0, ch->master, TO_ROOM, NOTVICT);
+		  }
+
+ 		  if (ch->master != nullptr) {
+ 			  act("$n stops following you.", ch, 0, ch->master, TO_VICT, 0);
+ 		  }
+    	}
     }
   }
 
-  if(ch->master->followers->follower == ch) { /* Head of follower-list? */
+  if(ch != nullptr && ch->master != nullptr && ch->master->followers != nullptr && ch->master->followers->follower == ch) { /* Head of follower-list? */
     k = ch->master->followers;
     ch->master->followers = k->next;
     dc_free(k);
   }
   else { /* locate follower who is not head of list */
-    for(k = ch->master->followers; k->next->follower != ch; k=k->next)
-       ;
+	  if (ch->master != nullptr) {
+		for(k = ch->master->followers; k->next->follower != ch; k=k->next)
+		   ;
 
-    j = k->next;
-    k->next = j->next;
-    dc_free(j);
+		j = k->next;
+		k->next = j->next;
+		dc_free(j);
+	  }
   }
 
   ch->master = 0;
