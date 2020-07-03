@@ -24,6 +24,14 @@ typedef int socket_t;
 #define PASSES_PER_SEC          10
 #define HOST_LENGTH             30
 
+enum pulse_type { TIMER, MOBILE, OBJECT, VIOLENCE, BARD, TENSEC, WEATHER, TIME, REGEN, SHORT };
+
+struct pulse_info {
+	pulse_type pulse;
+	uint64_t duration;
+	char name[];
+};
+
 #define PULSE_TIMER	(1 * PASSES_PER_SEC)
 #define PULSE_MOBILE    (4 * PASSES_PER_SEC)
 #define PULSE_OBJECT    (4 * PASSES_PER_SEC)
