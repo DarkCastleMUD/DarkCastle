@@ -167,7 +167,7 @@ int damage_eq_once(obj_data * obj)
   return 1;
 }
 
-void object_activity() {
+void object_activity(uint64_t pulse_type) {
     struct active_object *active_obj;
     struct active_object *next_obj;
   
