@@ -195,7 +195,7 @@ void affect_update(int32 duration_type);	/* In spells.c */
 void point_update(void);	/* In limits.c */
 void food_update(void);		/* In limits.c */
 void mobile_activity(void);
-void object_activity(void);
+void object_activity(uint64_t pulse_type);
 void update_corpses_and_portals(void);
 void new_string_add(struct descriptor_data *d, char *str);
 void string_hash_add(struct descriptor_data *d, char *str);
@@ -699,7 +699,7 @@ void game_loop(unsigned mother_desc, unsigned other_desc, unsigned third_desc, u
 		gameloopTimer.start();
 #endif
 		// Set CommandStack to track a command stack with max queue depth of 20
-		CommandStack cstack(0, 20);
+		CommandStack cstack(0, 5);
 
 		extern bool selfpurge;
 		selfpurge = FALSE;
@@ -967,7 +967,7 @@ void heartbeat() {
 		timingDebugStr << "mobile_activity: " << mobileTimer << endl;
 		objectTimer.start();
 #endif
-		object_activity();
+		object_activity(PULSE_MOBILE);
 #ifdef USE_TIMING
 		objectTimer.stop();
 		timingDebugStr << "object_activity: " << objectTimer << endl;
