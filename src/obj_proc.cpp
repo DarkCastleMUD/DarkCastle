@@ -1919,7 +1919,7 @@ int pull_proc(struct char_data*ch, struct obj_data *obj, int cmd, char*arg, CHAR
 int szrildor_pass(struct char_data *ch, struct obj_data *obj, int cmd, char *arg, CHAR_DATA *invoker)
 {
         struct obj_data *p;
-        // 30097
+        // 30097 
         if (cmd) return eFAILURE;
 
         if (obj->obj_flags.timer == 1800)
