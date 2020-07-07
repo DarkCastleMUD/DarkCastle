@@ -46,6 +46,8 @@ extern void end_oproc(CHAR_DATA *ch);
 extern void reset_zone(int zone);
  extern struct obj_data * search_char_for_item(char_data * ch, int16 item_number, bool wearonly = FALSE);
 
+extern struct mprog_throw_type *g_mprog_throw_list;
+
 
 
 // TODO - go over emoting object stuff and make sure it's as effecient as we can get it
@@ -1978,8 +1980,23 @@ int szrildor_pass_checks(struct char_data *ch, struct obj_data *obj, int cmd, ch
                 if (!search_char_for_item(i, real_object(30097)) || (++count) > 4)
                 {
                         act("Jeff arrives and forcibly extracts $n.\r\n", i, 0,0, TO_ROOM, 0);
-                        act("Jeff arrives and forcibly extracts you.\r\n", i, 0,0, TO_CHAR, 0);
+//                        act("Jeff arrives and forcibly extracts you.\r\n", i, 0,0, TO_CHAR, 0);
                         move_char(i, real_room(30000));
+			struct mprog_throw_type * throwitem = NULL;
+			throwitem = (struct mprog_throw_type *)dc_alloc(1, sizeof(struct mprog_throw_type));
+			throwitem->target_mob_num = 30033;
+			strcpy(throwitem->target_mob_name,"");
+			throwitem->data_num = 99;
+			throwitem->delay = 0;
+			throwitem->mob = TRUE; // This is, suprisingly, a mob
+			throwitem->actor = i;
+			throwitem->obj = NULL;
+			throwitem->vo = NULL;
+			throwitem->rndm = NULL;
+			throwitem->opt = 0;
+			throwitem->var = NULL;
+			throwitem->next = g_mprog_throw_list;
+			g_mprog_throw_list = throwitem;
                 }
 
         }

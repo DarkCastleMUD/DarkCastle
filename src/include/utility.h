@@ -527,7 +527,7 @@ size_t nocolor_strlen(const char *s);
 
 #define MAX_THROW_NAME     60
 #define MPROG_CATCH_MIN    1
-#define MPROG_CATCH_MAX    50
+#define MPROG_CATCH_MAX    100
 
 struct mprog_throw_type {
    int target_mob_num;         // num of mob to recieve
