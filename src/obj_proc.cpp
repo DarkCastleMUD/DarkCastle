@@ -43,6 +43,13 @@ extern struct descriptor_data *descriptor_list;
 extern CHAR_DATA *initiate_oproc(CHAR_DATA *ch, OBJ_DATA *obj);
 extern void end_oproc(CHAR_DATA *ch);
 
+extern void reset_zone(int zone);
+ extern struct obj_data * search_char_for_item(char_data * ch, int16 item_number, bool wearonly = FALSE);
+
+extern struct mprog_throw_type *g_mprog_throw_list;
+
+
+
 // TODO - go over emoting object stuff and make sure it's as effecient as we can get it
  
 struct obj_emote_data {
@@ -761,7 +768,6 @@ int search_assemble_items(int vnum)
 	return -1;
 }
 
-struct obj_data * search_char_for_item(char_data * ch, int16 item_number, bool wearonly = FALSE);
 
 bool assemble_item_index(char_data *ch, int item_index)
 {
@@ -1909,6 +1915,98 @@ int pull_proc(struct char_data*ch, struct obj_data *obj, int cmd, char*arg, CHAR
 
    return eSUCCESS;
 }
+
+int szrildor_pass(struct char_data *ch, struct obj_data *obj, int cmd, char *arg, CHAR_DATA *invoker)
+{
+        struct obj_data *p;
+        // 30097 
+        if (cmd) return eFAILURE;
+
+        if (obj->obj_flags.timer == 1800)
+        {       // Just created - check if this is the first pass in existence and if so, repop zone 161
+                bool first = TRUE;
+                for (p = object_list; p;p = p->next)
+                {
+                        if (obj_index[p->item_number].virt == 30097 && p != obj && p->obj_flags.timer != 1800)  // if any exist that are not at 1800 timer
+                        {
+                                first = FALSE;
+                                break;
+                        }
+                }
+                if (first && real_room(30000) != -1)
+                {
+                        reset_zone(world[real_room(30000)].zone);
+                }
+
+        }
+
+        obj->obj_flags.timer--;
+        struct obj_data *n;
+        if (obj->obj_flags.timer<=0)
+        {
+                // once one expires, ALL expire.
+                for (p = object_list; p;p = n)
+                {
+                        n = p->next;
+                        if (obj_index[p->item_number].virt == 30097 )
+                        {
+                                if (p->carried_by)
+                                {
+                                        send_to_char("The Szrildor daypass crumbles into dust.\r\n", p->carried_by);
+                                }
+                                extract_obj(p); // extract handles all variations of obj_from_char etc
+
+                        }
+                }
+
+        }
+        return eSUCCESS;
+}
+
+int szrildor_pass_checks(struct char_data *ch, struct obj_data *obj, int cmd, char *arg, CHAR_DATA *invoker)
+{
+        // 30096
+        if (cmd) return eFAILURE;
+
+        int count = 0;
+        auto &character_list = DC::instance().character_list;
+        for (auto& i : character_list) {
+                if (IS_NPC(i)) continue;
+                if (!i->in_room) continue;
+                if (world[i->in_room].zone != 161) continue;
+                if (GET_LEVEL(i) >= 100) continue;
+                if (i->in_room == real_room(30000)) continue;
+
+                if (!search_char_for_item(i, real_object(30097)) || (++count) > 4)
+                {
+                        act("Jeff arrives and forcibly extracts $n.\r\n", i, 0,0, TO_ROOM, 0);
+//                        act("Jeff arrives and forcibly extracts you.\r\n", i, 0,0, TO_CHAR, 0);
+                        move_char(i, real_room(30000));
+			struct mprog_throw_type * throwitem = NULL;
+			throwitem = (struct mprog_throw_type *)dc_alloc(1, sizeof(struct mprog_throw_type));
+			throwitem->target_mob_num = 30033;
+			strcpy(throwitem->target_mob_name,"");
+			throwitem->data_num = 99;
+			throwitem->delay = 0;
+			throwitem->mob = TRUE; // This is, suprisingly, a mob
+			throwitem->actor = i;
+			throwitem->obj = NULL;
+			throwitem->vo = NULL;
+			throwitem->rndm = NULL;
+			throwitem->opt = 0;
+			throwitem->var = NULL;
+			throwitem->next = g_mprog_throw_list;
+			g_mprog_throw_list = throwitem;
+                }
+
+        }
+        return eSUCCESS;
+}
+
+
+
+
+
 int moving_portals(struct char_data*ch, struct obj_data *obj, int cmd, 
 char*arg, CHAR_DATA *invoker)
 {
