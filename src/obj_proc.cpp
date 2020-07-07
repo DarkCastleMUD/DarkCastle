@@ -1937,10 +1937,6 @@ int szrildor_pass(struct char_data *ch, struct obj_data *obj, int cmd, char *arg
                 }
 
         }
-        if (obj->obj_flags.timer == 1790 && obj->carried_by)
-        {
-                send_to_char("40 seconds have passed!\r\n", obj->carried_by);
-        }
 
         obj->obj_flags.timer--;
         struct obj_data *n;
