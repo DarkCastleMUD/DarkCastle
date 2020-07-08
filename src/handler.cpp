@@ -2136,6 +2136,24 @@ int equip_char(CHAR_DATA *ch, struct obj_data *obj, int pos, int flag) {
 		}
 	}
 
+	if (obj_index[obj->item_number].virt == 30010)
+	{
+			act("$p binds to your skin and won't let go. It hurts!", ch, obj, 0, TO_CHAR, 0);
+			act("$p binds to $n's skin!", ch, obj, 0, TO_ROOM, 0);
+			obj->obj_flags.timer = 0;
+
+	}
+	if (obj_index[obj->item_number].virt == 30036)
+	{
+			act("As you grasp the staff, raw magical energy surges through you.  You can barely control it!", ch, obj, 0, TO_CHAR, 0);
+			obj->obj_flags.timer = 0;
+	}
+	if (obj_index[obj->item_number].virt == 30033)
+	{
+			act("The Chaos Blade begins to pulse with a dull red light, your life force is being drained!", ch, obj, 0, TO_CHAR, 0);
+			obj->obj_flags.timer = 0;
+	}
+
 	ch->equipment[pos] = obj;
 	obj->equipped_by = ch;
 	if (!IS_NPC(ch))
@@ -2186,7 +2204,19 @@ struct obj_data *unequip_char(CHAR_DATA *ch, int pos, int flag) {
 	assert(pos>=0 && pos<MAX_WEAR);
 	assert(ch->equipment[pos]);
 
+
 	obj = ch->equipment[pos];
+
+	if (obj_index[obj->item_number].virt == 30036)
+	{
+			act("Your magical energies stabilize.", ch, obj, 0, TO_CHAR, 0);
+	}
+	if (obj_index[obj->item_number].virt == 30033)
+	{
+			act("You feel relieved as the presence draining your life force relents.", ch, obj, 0, TO_CHAR, 0);
+
+	}
+
 	if (GET_ITEM_TYPE(obj) == ITEM_ARMOR)
 		GET_AC(ch) += apply_ac(ch, pos);
 
@@ -3059,7 +3089,7 @@ void extract_obj(struct obj_data *obj) {
 }
 
 void update_object(struct obj_data *obj, int use) {
-	if (obj->obj_flags.timer > 0)
+	if (obj->obj_flags.timer > 0 && (obj_index[obj->item_number].virt != 30010 && obj_index[obj->item_number].virt != 30036 &&obj_index[obj->item_number].virt != 30033 ))
 		obj->obj_flags.timer -= use;
 	if (obj->contains)
 		update_object(obj->contains, use);

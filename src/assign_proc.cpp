@@ -487,8 +487,16 @@ void assign_objects(void)
     SPEC_FUN    szrildor_pass;
     SPEC_FUN    szrildor_pass_checks;
 
+    SPEC_FUN    chaosblade;
+    SPEC_FUN    eternitystaff;
+    SPEC_FUN    rubybrooch;
+
     assign_one_obj_non(30097,   szrildor_pass);
     assign_one_obj_non(30096,   szrildor_pass_checks);
+
+    assign_one_obj_non(30010,   rubybrooch);
+    assign_one_obj_non(30036,   eternitystaff);
+    assign_one_obj_non(30033,   chaosblade);
 
 
 

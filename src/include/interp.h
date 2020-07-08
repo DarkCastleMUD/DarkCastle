@@ -116,6 +116,7 @@ void add_command_lag(CHAR_DATA *ch, int cmdnum, int lag);
 #define CMD_VOTE	203
 #define CMD_VEND	204
 #define CMD_FILTER	205
+#define CMD_EXAMINE	206
 #define CMD_PRIZE	999
 #define CMD_GAZE	1820
 
