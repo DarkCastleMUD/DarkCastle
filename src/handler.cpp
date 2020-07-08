@@ -3089,7 +3089,7 @@ void extract_obj(struct obj_data *obj) {
 }
 
 void update_object(struct obj_data *obj, int use) {
-	if (obj->obj_flags.timer > 0 && (obj_index[obj->item_number].virt != 30010 && obj_index[obj->item_number].virt != 30036 &&obj_index[obj->item_number].virt != 30033 ))
+	if (obj->obj_flags.timer > 0 && (obj_index[obj->item_number].virt != 30010 && obj_index[obj->item_number].virt != 30036 &&obj_index[obj->item_number].virt != 30033 && obj_index[obj->item_number].virt != 30097 ))
 		obj->obj_flags.timer -= use;
 	if (obj->contains)
 		update_object(obj->contains, use);

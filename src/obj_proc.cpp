@@ -1927,7 +1927,7 @@ int szrildor_pass(struct char_data *ch, struct obj_data *obj, int cmd, char *arg
 		if (!str_cmp(target, "daypass") || !str_cmp(target, "pass"))
 		{
 			char buf[2000];
-			sprintf(buf, "There appears to be approximately %d minutes left of time before the pass expires.\r\n", (obj->obj_flags.timer*4)/60);
+			sprintf(buf, "There appears to be approximately %d minutes left of time before the pass expires.\r\n", ((1800-obj->obj_flags.timer)*4)/60);
 			send_to_char(buf, ch);
 			return eSUCCESS;
 		}
@@ -1935,12 +1935,12 @@ int szrildor_pass(struct char_data *ch, struct obj_data *obj, int cmd, char *arg
 
         if (cmd) return eFAILURE;
 
-        if (obj->obj_flags.timer == 1800)
+        if (obj->obj_flags.timer == 0)
         {       // Just created - check if this is the first pass in existence and if so, repop zone 161
                 bool first = TRUE;
                 for (p = object_list; p;p = p->next)
                 {
-                        if (obj_index[p->item_number].virt == 30097 && p != obj && p->obj_flags.timer != 1800)  // if any exist that are not at 1800 timer
+                        if (obj_index[p->item_number].virt == 30097 && p != obj && p->obj_flags.timer != 0)  // if any exist that are not at 1800 timer
                         {
                                 first = FALSE;
                                 break;
@@ -1953,9 +1953,9 @@ int szrildor_pass(struct char_data *ch, struct obj_data *obj, int cmd, char *arg
 
         }
 
-        obj->obj_flags.timer--;
+        obj->obj_flags.timer++;
         struct obj_data *n;
-        if (obj->obj_flags.timer<=0)
+        if (obj->obj_flags.timer>=1800)
         {
                 // once one expires, ALL expire.
                 for (p = object_list; p;p = n)
