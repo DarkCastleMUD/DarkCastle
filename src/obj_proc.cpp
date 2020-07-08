@@ -1927,7 +1927,7 @@ int szrildor_pass(struct char_data *ch, struct obj_data *obj, int cmd, char *arg
 		if (!str_cmp(target, "daypass") || !str_cmp(target, "pass"))
 		{
 			char buf[2000];
-			sprintf(buf, "There appears to be approximately %d minutes left of time before the pass expires.\r\n", (obj->obj_flags.timer*4)/60);
+			sprintf(buf, "There appears to be approximately %d minutes left of time before the pass expires.\r\n", ((1800-obj->obj_flags.timer)*4)/60);
 			send_to_char(buf, ch);
 			return eSUCCESS;
 		}
