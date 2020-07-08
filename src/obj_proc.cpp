@@ -1920,6 +1920,19 @@ int szrildor_pass(struct char_data *ch, struct obj_data *obj, int cmd, char *arg
 {
         struct obj_data *p;
         // 30097 
+	if (cmd && cmd == CMD_EXAMINE)
+	{
+		char target[MAX_INPUT_LENGTH];
+		one_argument(arg, target);
+		if (!str_cmp(target, "daypass") || !str_cmp(target, "pass"))
+		{
+			char buf[2000];
+			sprintf(buf, "There appears to be approximately %d minutes left of time before the pass expires.\r\n", (obj->obj_flags.timer*4)/60);
+			send_to_char(buf, ch);
+			return eSUCCESS;
+		}
+	}
+
         if (cmd) return eFAILURE;
 
         if (obj->obj_flags.timer == 1800)
@@ -2814,6 +2827,92 @@ void do_talking_init()
 }
 
 
+
+int chaosblade(struct char_data*ch, struct obj_data *obj, int cmd, char*arg, 
+                   CHAR_DATA *invoker)
+{
+	if (cmd) return eFAILURE;
+	if (!obj->equipped_by) return eFAILURE;
+
+	if ((++obj->obj_flags.timer) > 4)
+	{
+		int dam = number(75,150);
+		obj->obj_flags.timer = 0;
+		if (dam >= GET_HIT(obj->equipped_by) )
+		{
+			dam = GET_HIT(obj->equipped_by) - 1;
+		}
+		if (dam > 0)
+		{
+			char buf[MAX_STRING_LENGTH];
+			sprintf(buf,"%d", dam);
+			send_damage("The Chaos Blade hungers!  You are drained for | damage.",  obj->equipped_by, 0, 0, buf, "The Chaos Blade hungers!  You feel your life force being drained!", TO_CHAR);
+			send_damage("The katana in $n's hand pulses with a dull red glow as it drains their life force for | damage!",  obj->equipped_by, 0, 0, buf, "The katana in $n's hand pulses with a dull red glow as it drains their life force!", TO_ROOM);
+			GET_HIT(obj->equipped_by) -= dam;
+		}
+	}
+	return eSUCCESS;
+}
+
+int rubybrooch(struct char_data*ch, struct obj_data *obj, int cmd, char*arg, 
+                   CHAR_DATA *invoker)
+{
+	if (cmd) return eFAILURE;
+	if (!obj->equipped_by) return eFAILURE;
+
+	if (obj->obj_flags.timer == 39)
+	{
+		csendf(obj->equipped_by, "You feel the ruby brooch's grip upon your neck loosen slightly.\r\n");
+	}
+	++obj->obj_flags.timer;
+
+	if ((obj->obj_flags.timer % 4) == 0 )
+	{
+		if ((obj->obj_flags.timer) == 44)
+		{
+			obj->obj_flags.timer = 40; // 40+ = can be removed
+		}
+		int dam = number(75,150);
+		if (dam >= GET_HIT(obj->equipped_by) )
+		{
+			dam = GET_HIT(obj->equipped_by) - 1;
+		}
+		if (dam > 0)
+		{
+			char buf[MAX_STRING_LENGTH];
+			sprintf(buf, "%d", dam);
+			send_damage("The ruby brooch squeezes your neck painfully for | damage!",  obj->equipped_by, 0, 0, buf, "The ruby brooch squeezes your neck painfully!", TO_CHAR);
+			send_damage("A ruby brooch constricts $n's neck for | damage and they cough violently.",  obj->equipped_by, 0, 0, buf, "A ruby brooch constricts $n's neck and they cough violently.", TO_ROOM);
+			GET_HIT(obj->equipped_by) -= dam;
+		}
+	}
+	return eSUCCESS;
+}
+
+int eternitystaff(struct char_data*ch, struct obj_data *obj, int cmd, char*arg, 
+                   CHAR_DATA *invoker)
+{
+	if (cmd) return eFAILURE;
+	if (!obj->equipped_by) return eFAILURE;
+
+	if ((++obj->obj_flags.timer) > 4)
+	{
+		int dam = number(75,100);
+		obj->obj_flags.timer = 0;
+		if (dam >= GET_MANA(obj->equipped_by) )
+		{
+			dam = GET_MANA(obj->equipped_by) - 1;
+		}
+		if (dam > 0)
+		{
+			csendf(obj->equipped_by, "Your body hemorrhages magical energy as you struggle to control The Eternity Staff.\r\n");
+			GET_MANA(obj->equipped_by) -= dam;
+
+			act("$n is wracked by magical energies!", obj->equipped_by, 0, 0, TO_ROOM, 0);
+		}
+	}
+	return eSUCCESS;
+}
 
 
 

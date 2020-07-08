@@ -2291,6 +2291,12 @@ int do_remove(struct char_data *ch, char *argument, int cmd)
               send_to_char(arg1, ch);
               continue;
 	    }
+ 	    if(obj_index[obj_object->item_number].virt == 30010 && obj_object->obj_flags.timer < 40)
+ 	    {
+		csendf(ch, "The ruby brooch is bound to your flesh. You cannot remove it!\r\n");
+		continue;
+   	    }
+
             if(obj_index[obj_object->item_number].virt == SPIRIT_SHIELD_OBJ_NUMBER)
             {
               send_to_room("The spirit shield shimmers brightly then fades away.\n\r", ch->in_room);
@@ -2300,7 +2306,7 @@ int do_remove(struct char_data *ch, char *argument, int cmd)
                obj_to_char(unequip_char(ch, j) , ch);
              act("You stop using $p.",ch,obj_object,0,TO_CHAR, 0);
              act("$n stops using $p.",ch,obj_object,0,TO_ROOM, INVIS_NULL);
-            
+
           }
         } else {
           send_to_char("You can't carry that many items.\n\r", ch);
@@ -2324,6 +2330,12 @@ int do_remove(struct char_data *ch, char *argument, int cmd)
             send_to_char(arg1, ch);
             return eFAILURE;
 	  }
+ 	  if(obj_index[obj_object->item_number].virt == 30010 && obj_object->obj_flags.timer < 40)
+ 	  {
+	    csendf(ch, "The ruby brooch is bound to your flesh. You cannot remove it!\r\n");
+	    return eFAILURE;
+   	  }
+
           if(will_screwup_worn_sizes(ch, obj_object, 0))
           {
             // will_screwup_worn_sizes() takes care of the messages

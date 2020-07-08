@@ -293,7 +293,7 @@ struct command_info cmd_info[] =
     { "jab",		do_jab,		POSITION_FIGHTING, 0, CMD_DEFAULT, 0, 0 },
     { "enter",		do_enter,	POSITION_STANDING, 0, CMD_ENTER, COM_CHARMIE_OK, 20 },
     { "climb",		do_climb,	POSITION_STANDING, 0, CMD_CLIMB, COM_CHARMIE_OK, 20 },
-    { "examine",	do_examine,	POSITION_RESTING, 0, CMD_DEFAULT, 0, 1 },
+    { "examine",	do_examine,	POSITION_RESTING, 0, CMD_EXAMINE, 0, 1 },
     { "follow",		do_follow,	POSITION_RESTING, 0, CMD_DEFAULT, 0, 0 },
     { "stalk",		do_stalk,	POSITION_STANDING, 6, CMD_DEFAULT, 0, 10 },
     { "group",		do_group,	POSITION_SLEEPING, 0, CMD_DEFAULT, 0, 0 },
