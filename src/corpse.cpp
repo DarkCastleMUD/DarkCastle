@@ -37,6 +37,7 @@
 #include <assert.h>
 #include <mobile.h> // ACT_ISNPC
 #include <race.h>
+#include <cstddef>
 
 /* Set this define to wherever you want to save your corpses */
 #define CORPSE_FILE "corpse.save" 
@@ -261,7 +262,6 @@ void load_corpses(void)
 	int number = -1;
 	struct obj_data *money;
 	int debug = 0;
-	int alloc_num_affects = 0;
 
 	if (!(fp = dc_fopen(CORPSE_FILE, "r"))) {
 		sprintf(buf1, "SYSERR: READING CORPSE FILE %s in load_corpses", CORPSE_FILE);
@@ -378,7 +378,8 @@ void load_corpses(void)
 				temp->obj_flags.wear_flags = t[1];
 				temp->obj_flags.weight = (t[2] > 0 ? t[2] : 0);
 				temp->obj_flags.cost = t[3];
-				alloc_num_affects = t[4];
+				size_t alloc_num_affects = max(0, t[4]);
+
 
 				temp->affected = (obj_affected_type *)calloc(alloc_num_affects, sizeof(obj_affected_type));
 
