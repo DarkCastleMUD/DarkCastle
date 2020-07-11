@@ -2140,6 +2140,13 @@ int do_mlocate(struct char_data *ch, char *name, int cmd)
       else if(!(isname(name, i->name)))
          continue;
 
+      if (i->in_room < 0) {
+    	  logf(ANGEL, LOG_BUG, "do_mlocate: %s is in_room %d, averting crash. IS_NPC(i)==%s, IS_PC(i)==%s, IS_MOB(i)==%s",
+    			  GET_NAME(i), i->in_room, IS_NPC(i) ? "true" : "false", IS_PC(i) ? "true" : "false", IS_MOB(i) ? "true" : "false");
+    	  produce_coredump(i);
+    	  continue;
+      }
+
       count++;
       *buf = '\0';
       sprintf(buf, "[%2d] %-26s %d\n\r",
