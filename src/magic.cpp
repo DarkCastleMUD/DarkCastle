@@ -2795,9 +2795,12 @@ int spell_locate_object(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim
 
   for (i = object_list, n = 0; i && (j>0) && (number>0); i = i->next)
   {
-	  if (i->item_number == -1) {
-		  continue;
-	  }
+// TODO
+// Removed for now because it's keep locate spell from seeing portals or corpses
+//	  if (i->item_number == -1) {
+//		  continue;
+//	  }
+//
     if (IS_OBJ_STAT(i, ITEM_NOSEE))
        continue;
 
