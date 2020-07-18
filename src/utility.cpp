@@ -2447,3 +2447,13 @@ string get_isr_string(uint32 isr, int8_t loc)
 	default: return "ErCode: Somebodydunfuckedup";
    }
 }
+
+bool isDead(char_data *ch)
+{
+	return (ch && ch->position == POSITION_DEAD);
+}
+
+bool isNowhere(char_data *ch)
+{
+	return (ch && ch->in_room == NOWHERE);
+}

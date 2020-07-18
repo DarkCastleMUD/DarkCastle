@@ -582,4 +582,7 @@ std::string get_isr_string(uint32, int8_t);
 
 void produce_coredump(void *ptr = 0);
 
+bool isDead(char_data *ch);
+bool isNowhere(char_data *ch);
+
 #endif /* UTILITY_H_ */
