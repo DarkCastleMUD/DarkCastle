@@ -2922,7 +2922,32 @@ int talkingsword(struct char_data*ch, struct obj_data *obj, int cmd, char*arg,
   char_data * vict = NULL;
   int unequip = -1;
   static bool init_done = false;
+  if (cmd)
+  {
+	if (cmd == CMD_GAG && (!str_cmp(arg, " sword") || !str_cmp(arg, " ghaerad")) && obj->equipped_by)
+	{
+			      char buf2[MAX_STRING_LENGTH] = "$B$7Ghaerad, Sword of Legends says, '";
 
+		if (IS_SET(obj->obj_flags.more_flags, ITEM_TOGGLE))
+		{
+			REMOVE_BIT(obj->obj_flags.more_flags, ITEM_TOGGLE);
+ 		        strcat(buf2, "And I'm back! couldnt live without me eh?'$R\n\r");
+		        send_to_room(buf2, obj->equipped_by->in_room);
+		} else {
+			SET_BIT(obj->obj_flags.more_flags, ITEM_TOGGLE);
+ 		        strcat(buf2, "Fine, I will keep quite for a while, but you will miss me!'$R\n\r");
+		        send_to_room(buf2, obj->equipped_by->in_room);
+		}
+		return eSUCCESS;
+	} else {
+		return eFAILURE;
+	}
+  }
+
+  if (IS_SET(obj->obj_flags.more_flags, ITEM_TOGGLE))
+  {
+	return eFAILURE;
+  }
   if(!init_done)
   {
     init_done = true;

@@ -348,6 +348,7 @@ struct command_info cmd_info[] =
     // Special procedure commands
 
     { "vend",		do_vend,	POSITION_STANDING, 2, CMD_VEND, 0, 0 }, 
+    { "gag",		do_not_here,	POSITION_STANDING, 0, CMD_GAG, 0, 0 },
     { "design",		do_not_here,	POSITION_STANDING, 0, CMD_DESIGN, 0, 0 },
     { "stock",		do_not_here,	POSITION_STANDING, 0, CMD_STOCK, 0, 0 },
     { "buy",		do_not_here,	POSITION_STANDING, 0, CMD_BUY, 0, 0 },
