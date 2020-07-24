@@ -87,7 +87,7 @@
 #define ITEM_DARK               1<<2
 #define ITEM_LOCK               1<<3
 #define ITEM_ANY_CLASS          1<<4     // Any class can use
-#define ITEM_INVISIBLE          1<<5 
+#define ITEM_INVISIBLE          1<<5
 #define ITEM_MAGIC              1<<6
 #define ITEM_NODROP             1<<7
 #define ITEM_BLESS              1<<8
@@ -109,7 +109,7 @@
 #define ITEM_ENCHANTED          1<<24
 #define ITEM_SPECIAL            1<<25
 #define ITEM_NOSAVE             1<<26
-#define ITEM_NOSEE		1<<27 
+#define ITEM_NOSEE		1<<27
 #define ITEM_NOREPAIR           1<<28
 #define ITEM_NEWBIE             1<<29 // Newbie flagged.
 #define ITEM_PC_CORPSE		1<<30
@@ -132,8 +132,9 @@
 #define ITEM_PC_CORPSE_LOOTED   1<<8
 #define ITEM_NO_SCRAP 		1<<9
 #define ITEM_CUSTOM             1<<10
-#define ITEM_24H_SAVE			1<<11
-#define ITEM_NO_DISARM			1<<12
+#define ITEM_24H_SAVE		1<<11
+#define ITEM_NO_DISARM		1<<12
+#define ITEM_TOGGLE		1<<13 // Toggles for certain items.
 
 /* Bitvector for 'size' */
 #define SIZE_ANY		1
