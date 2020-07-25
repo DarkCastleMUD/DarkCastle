@@ -1178,6 +1178,51 @@ void remove_eliara(CHAR_DATA *ch)
 
 }
 
+int dancevest(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg, 
+                   CHAR_DATA *invoker)
+{
+	if (!cmd || cmd != CMD_SAY || !ch || !ch->in_room || str_cmp(arg, " just dance"))
+	{
+		return eFAILURE;
+	}
+	if (obj->obj_flags.timer > 0)
+	{
+		send_to_char("The vest remains silent.\r\n",ch);
+		return eSUCCESS;
+	}
+	char *command_list [] =
+	{
+		"dance", // 0
+		"shuffle",
+		"wiggle",
+		"bellydance",
+		"bounce",
+		"polka", //5
+		"waltz",
+		"boogie",
+		"headbang",
+		"showtune" // 9
+	};
+	CHAR_DATA *v;
+	send_to_char("As you intone the sacred words, phantom music swells around you and everyon within earshot joins in!\r\n",ch);
+	for (v = world[ch->in_room].people; v; v = v->next_in_room)
+	{
+		if (GET_POS(v) != POSITION_STANDING)
+		{
+			continue;
+		}
+		send_to_char("As phantom music swells around you, you are helpless to resist.  You must obey.\r\n", v);
+		char tmp_command[32];
+		strcpy(tmp_command, command_list[number(0,9)]);
+		command_interpreter(v, tmp_command);
+
+
+	}
+	obj->obj_flags.timer = 48;
+	return eSUCCESS;
+
+}
+
 // When fighting an evil opponent, sancts PC
 int eliara_combat(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg, 
                    CHAR_DATA *invoker)
@@ -2836,8 +2881,12 @@ int chaosblade(struct char_data*ch, struct obj_data *obj, int cmd, char*arg,
 
 	if ((++obj->obj_flags.timer) > 4)
 	{
-		int dam = number(75,150);
+		int dam = number(100,200);
 		obj->obj_flags.timer = 0;
+		if (GET_HIT(obj->equipped_by) * 25 / 1000 > dam)
+		{
+			dam = GET_HIT(obj->equipped_by) * 25 / 1000;
+		}
 		if (dam >= GET_HIT(obj->equipped_by) )
 		{
 			dam = GET_HIT(obj->equipped_by) - 1;
@@ -2899,6 +2948,11 @@ int eternitystaff(struct char_data*ch, struct obj_data *obj, int cmd, char*arg,
 	{
 		int dam = number(75,100);
 		obj->obj_flags.timer = 0;
+		if (GET_MANA(obj->equipped_by) * 25 / 1000 > dam)
+		{
+			dam = GET_MANA(obj->equipped_by) * 25 / 1000;
+		}
+
 		if (dam >= GET_MANA(obj->equipped_by) )
 		{
 			dam = GET_MANA(obj->equipped_by) - 1;

@@ -146,7 +146,6 @@ void assign_non_combat_procs() {
     SPEC_FUN    startrek_miles;
     SPEC_FUN    cardinal;
     SPEC_FUN    eddie_shopkeeper;
-
     assign_one_mob_non(3071, cardinal);
 
     assign_one_mob_non(501, arena_only);
@@ -490,6 +489,10 @@ void assign_objects(void)
     SPEC_FUN    chaosblade;
     SPEC_FUN    eternitystaff;
     SPEC_FUN    rubybrooch;
+
+    SPEC_FUN    dancevest;
+
+    assign_one_obj_non(30062, dancevest);
 
     assign_one_obj_non(30097,   szrildor_pass);
     assign_one_obj_non(30096,   szrildor_pass_checks);
