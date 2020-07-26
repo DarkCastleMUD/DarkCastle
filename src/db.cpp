@@ -6005,9 +6005,18 @@ void copySaveData(obj_data *target, obj_data *source)
 	if (strcmp(GET_OBJ_SHORT(source), GET_OBJ_SHORT(target))) {
 		GET_OBJ_SHORT(target) = str_hsh(GET_OBJ_SHORT(source));
 	}
+	if (strcmp(source->description, target->description))
+	{
+		target->description = str_hsh(source->description);
+	}
 
 	if (strcmp(source->name, target->name)) {
 		target->name = str_hsh(source->name);
+	}
+
+	if (source->obj_flags.type_flag != target->obj_flags.type_flag)
+	{
+		target->obj_flags.type_flag = source->obj_flags.type_flag;
 	}
 
 	if (source->obj_flags.extra_flags != target->obj_flags.extra_flags) {
