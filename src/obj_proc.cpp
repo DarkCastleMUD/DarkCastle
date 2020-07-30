@@ -1204,7 +1204,7 @@ int dancevest(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
 		"showtune" // 9
 	};
 	CHAR_DATA *v;
-	send_to_char("As you intone the sacred words, phantom music swells around you and everyon within earshot joins in!\r\n",ch);
+	send_to_char("As you intone the sacred words, phantom music swells around you and everyone within earshot joins in!\r\n",ch);
 	for (v = world[ch->in_room].people; v; v = v->next_in_room)
 	{
 		if (GET_POS(v) != POSITION_STANDING)
