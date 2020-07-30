@@ -59,6 +59,7 @@ extern struct index_data *obj_index;
 CHAR_DATA *rndm2;
 extern struct obj_data  *object_list;
 extern struct room_data ** world_array;
+int activeProgs = 0; // loop protection
 
 CHAR_DATA *activeActor = NULL;
 CHAR_DATA *activeRndm = NULL;
@@ -3249,6 +3250,14 @@ void mprog_driver ( char *com_list, CHAR_DATA *mob, CHAR_DATA *actor,
  mprog_cur_result = eSUCCESS;
  mprog_line_num = 0;
 
+ activeProgs++;
+ if (activeProgs > 20)
+ {
+        logf( IMMORTAL, LOG_WORLD, "Mob: %d : Too many active mobprograms : LOOP", mob_index[mob->mobdata->nr].virt );
+	activeProgs--;
+	return;
+ }
+
  //int cIfs[256]; // for MPPAUSE
  //int ifpos;
  ifpos = 0;
@@ -3268,6 +3277,7 @@ void mprog_driver ( char *com_list, CHAR_DATA *mob, CHAR_DATA *actor,
    activeActor = activeRndm = NULL;
    activeObj = NULL;
    activeVo = NULL;
+   activeProgs--;
    return;
  }
 
@@ -3311,6 +3321,7 @@ void mprog_driver ( char *com_list, CHAR_DATA *mob, CHAR_DATA *actor,
 	   activeActor = activeRndm = NULL;
 	   activeObj = NULL;
 	   activeVo = NULL;
+	   activeProgs--;
          return;
 	}
      }
@@ -3324,7 +3335,8 @@ void mprog_driver ( char *com_list, CHAR_DATA *mob, CHAR_DATA *actor,
 		   activeActor = activeRndm = NULL;
 		   activeObj = NULL;
 		   activeVo = NULL;
-	         return;
+		   activeProgs--;
+        	  return;
 		}
 	}	
      }
@@ -3334,6 +3346,7 @@ void mprog_driver ( char *com_list, CHAR_DATA *mob, CHAR_DATA *actor,
    activeActor = activeRndm = NULL;
    activeObj = NULL;
    activeVo = NULL;
+   activeProgs--;
  return;
 
 }
