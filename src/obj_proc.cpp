@@ -1185,6 +1185,7 @@ int dancevest(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
 	{
 		return eFAILURE;
 	}
+	do_say(ch, " just dance", CMD_SAY);
 	if (obj->obj_flags.timer > 0)
 	{
 		send_to_char("The vest remains silent.\r\n",ch);
@@ -1222,6 +1223,72 @@ int dancevest(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
 	return eSUCCESS;
 
 }
+
+int durendal(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg, 
+                   CHAR_DATA *invoker)
+{
+
+	if (!cmd)
+	{ // pulse
+	  if (obj->obj_flags.timer > 0)
+	  {
+		obj->obj_flags.timer--;
+	  }
+	  if (obj->obj_flags.timer < 322 && IS_SET(obj->obj_flags.more_flags, ITEM_TOGGLE))
+	  {
+		REMOVE_BIT(obj->obj_flags.more_flags, ITEM_TOGGLE);
+		if (obj->obj_flags.timer > 0 && obj->equipped_by && obj->equipped_by->in_room)
+		{
+		  send_to_char("The white fire surrounding Durendal gutters and flickers out.\r\n", obj->equipped_by);
+		  act("The flames surrounding $n's weapon gutters and fade.", obj->equipped_by, 0, 0, TO_ROOM, 0);
+		}
+
+
+	  }
+	  return eSUCCESS;
+	}
+
+
+	if (cmd != CMD_SAY || !ch || !ch->in_room || str_cmp(arg, " Gods forgive me") || obj->equipped_by != ch)
+	{
+		return eFAILURE;
+	}
+	if (obj->obj_flags.timer > 0)
+	{
+		send_to_char("Your plea goes unanswered. Durendal slumbers.\r\n",ch);
+		return eSUCCESS;
+	}
+	if (GET_ALIGNMENT(ch) < 350)
+	{
+		send_to_char("Your soul is impure. Durendel ignores your contrition.\r\n", ch);
+		return eSUCCESS;
+	}
+	if (IS_SET(world[ch->in_room].room_flags, SAFE))
+	{
+		send_to_char("Something about this room prohibits your prayer from being heard.\r\n",ch);
+		return eSUCCESS;
+	}
+	send_to_char("Upon hearing your plea, Durendal suddenly bursts into flame with a blinding flash of searing white heat!\r\n",ch);
+	act("$n mutters a quiet prayer and with a blinding flash, their weapon bursts into flame!", ch, 0, 0, TO_ROOM, 0);
+	CHAR_DATA *v, *vn;
+	for (v = world[ch->in_room].people; v; v = vn)
+	{
+		vn = v->next_in_room;
+		if (GET_ALIGNMENT(v) > -350 || ARE_GROUPED(ch, v))
+		{
+			continue;
+		}
+		send_to_char("You feel the evil in your soul being burned away!\r\n", v);
+		damage(ch, v, 250, TYPE_COLD, TYPE_UNDEFINED, 0);
+		act("The evil in $N's soul is burned away!", ch, 0, v, TO_CHAR, 0);
+
+	}
+	SET_BIT(obj->obj_flags.more_flags, ITEM_TOGGLE);
+	obj->obj_flags.timer = 360;
+	return eSUCCESS;
+
+}
+
 
 // When fighting an evil opponent, sancts PC
 int eliara_combat(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg, 
@@ -2881,11 +2948,11 @@ int chaosblade(struct char_data*ch, struct obj_data *obj, int cmd, char*arg,
 
 	if ((++obj->obj_flags.timer) > 4)
 	{
-		int dam = number(100,200);
+		int dam = number(175,250);
 		obj->obj_flags.timer = 0;
-		if (GET_HIT(obj->equipped_by) * 25 / 1000 > dam)
+		if (GET_HIT(obj->equipped_by) * 30 / 1000 > dam)
 		{
-			dam = GET_HIT(obj->equipped_by) * 25 / 1000;
+			dam = GET_HIT(obj->equipped_by) * 30 / 1000;
 		}
 		if (dam >= GET_HIT(obj->equipped_by) )
 		{
@@ -2946,11 +3013,11 @@ int eternitystaff(struct char_data*ch, struct obj_data *obj, int cmd, char*arg,
 
 	if ((++obj->obj_flags.timer) > 4)
 	{
-		int dam = number(75,100);
+		int dam = number(175,200);
 		obj->obj_flags.timer = 0;
-		if (GET_MANA(obj->equipped_by) * 25 / 1000 > dam)
+		if (GET_MANA(obj->equipped_by) * 30 / 1000 > dam)
 		{
-			dam = GET_MANA(obj->equipped_by) * 25 / 1000;
+			dam = GET_MANA(obj->equipped_by) * 30 / 1000;
 		}
 
 		if (dam >= GET_MANA(obj->equipped_by) )

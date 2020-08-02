@@ -890,7 +890,7 @@ int do_mptransfer( CHAR_DATA *ch, char *argument, int cmd )
 	    {
 		char buf[MAX_STRING_LENGTH];
 		sprintf( buf, "%s %s", d->character->name, arg2 );
-		do_trans( ch, buf, 9 );
+		do_mptransfer( ch, buf, cmd );
 	    }
 	}
 	return eSUCCESS;
