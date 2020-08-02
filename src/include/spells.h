@@ -531,6 +531,8 @@ void check_maxes(CHAR_DATA *ch);
 #define SKILL_RECALL                 800
 #define INTERNAL_SLEEPING            801
 
+#define SKILL_FLAMESLASH	     850 // just used internally for flameslash, do not want in skill lists etc
+
 /*
  * Only for dragon breaths, not char abilities.
  */

@@ -491,8 +491,10 @@ void assign_objects(void)
     SPEC_FUN    rubybrooch;
 
     SPEC_FUN    dancevest;
+    SPEC_FUN    durendal;
 
     assign_one_obj_non(30062, dancevest);
+    assign_one_obj_non(30019, durendal);
 
     assign_one_obj_non(30097,   szrildor_pass);
     assign_one_obj_non(30096,   szrildor_pass_checks);

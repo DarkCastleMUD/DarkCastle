@@ -1316,7 +1316,7 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
       for( ; ; )
 	{
 	  if (*point == '.') { *valpt = '\0'; valpt = val2; point++;}
-	  else if ( ( *point != ' ' ) && ( *point == '\0' ) )
+	  else if (  *point == '\0' || *point == '\r' || *point == '\n')
 	    break;
 	  else
 	    *valpt++ = *point++; 

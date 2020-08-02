@@ -2136,19 +2136,19 @@ int equip_char(CHAR_DATA *ch, struct obj_data *obj, int pos, int flag) {
 		}
 	}
 
-	if (obj_index[obj->item_number].virt == 30010)
+	if (obj_index[obj->item_number].virt == 30010 && !ISSET(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT))
 	{
 			act("$p binds to your skin and won't let go. It hurts!", ch, obj, 0, TO_CHAR, 0);
 			act("$p binds to $n's skin!", ch, obj, 0, TO_ROOM, 0);
 			obj->obj_flags.timer = 0;
 
 	}
-	if (obj_index[obj->item_number].virt == 30036)
+	if (obj_index[obj->item_number].virt == 30036 && !ISSET(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT))
 	{
 			act("As you grasp the staff, raw magical energy surges through you.  You can barely control it!", ch, obj, 0, TO_CHAR, 0);
 			obj->obj_flags.timer = 0;
 	}
-	if (obj_index[obj->item_number].virt == 30033)
+	if (obj_index[obj->item_number].virt == 30033 && !ISSET(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT))
 	{
 			act("The Chaos Blade begins to pulse with a dull red light, your life force is being drained!", ch, obj, 0, TO_CHAR, 0);
 			obj->obj_flags.timer = 0;
@@ -2207,14 +2207,15 @@ struct obj_data *unequip_char(CHAR_DATA *ch, int pos, int flag) {
 
 	obj = ch->equipment[pos];
 
-	if (obj_index[obj->item_number].virt == 30036)
+	if (obj_index[obj->item_number].virt == 30036  && !ISSET(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT))
 	{
-			act("Your magical energies stabilize.", ch, obj, 0, TO_CHAR, 0);
+			act("With great effort, you are able to separate the Staff of Eternity from your own magical aura, but it comes at a great cost...", ch, obj, 0, TO_CHAR, 0);
+			GET_MANA(ch) = GET_MANA(ch)/2;
 	}
-	if (obj_index[obj->item_number].virt == 30033)
+	if (obj_index[obj->item_number].virt == 30033  && !ISSET(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT))
 	{
-			act("You feel relieved as the presence draining your life force relents.", ch, obj, 0, TO_CHAR, 0);
-
+			act("The effort required to separate the Chaos Blade from your own life force is immense! The Blade exacts a toll...", ch, obj, 0, TO_CHAR, 0);
+			GET_HIT(ch) = GET_HIT(ch) /2;
 	}
 
 	if (GET_ITEM_TYPE(obj) == ITEM_ARMOR)
@@ -3089,7 +3090,7 @@ void extract_obj(struct obj_data *obj) {
 }
 
 void update_object(struct obj_data *obj, int use) {
-	if (obj->obj_flags.timer > 0 && (obj_index[obj->item_number].virt != 30010 && obj_index[obj->item_number].virt != 30036 &&obj_index[obj->item_number].virt != 30033 && obj_index[obj->item_number].virt != 30097 ))
+	if (obj->obj_flags.timer > 0 && (obj_index[obj->item_number].virt != 30010 && obj_index[obj->item_number].virt != 30036 &&obj_index[obj->item_number].virt != 30033 && obj_index[obj->item_number].virt != 30097 && obj_index[obj->item_number].virt != 30019 ))
 		obj->obj_flags.timer -= use;
 	if (obj->contains)
 		update_object(obj->contains, use);

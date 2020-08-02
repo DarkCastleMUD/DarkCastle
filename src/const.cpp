@@ -1001,6 +1001,7 @@ char *more_obj_bits[] =
     "CUSTOM",
 	"24H_SAVE",
 	"NO_DISARM",
+    "PROCTOGGLE",
     "\n"
 };
 

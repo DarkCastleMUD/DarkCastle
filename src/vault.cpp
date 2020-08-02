@@ -1450,6 +1450,11 @@ int can_put_in_vault(struct obj_data *obj, int self, struct vault_data *vault, s
     csendf(ch, "You can't seem to stuff %s in the vault.  Its too big!\r\n", GET_OBJ_SHORT(obj));
     return 0;
   }
+  if (obj->obj_flags.timer > 0)
+  {
+    csendf(ch, "%s cannot be placed in the vault right now.\r\n", GET_OBJ_SHORT(obj));
+    return 0;
+  }
 
   return 1;
 }

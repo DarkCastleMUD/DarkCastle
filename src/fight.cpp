@@ -1305,7 +1305,6 @@ int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
   int retval = 0;
   int weapon_skill_hit_bonus = 0;
   int weapon_skill_dam_bonus = 0;  
-
  
   extern ubyte backstab_mult[];
   
@@ -1342,6 +1341,11 @@ int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
   if(wielded && wielded->obj_flags.type_flag == ITEM_WEAPON) 
      w_type = get_weapon_damage_type(wielded);
 
+  if (wielded && obj_index[wielded->item_number].virt == 30019 && IS_SET(wielded->obj_flags.more_flags, ITEM_TOGGLE))
+  { // Durendal - changes damage type and other stuff
+	w_type = TYPE_FIRE; // no skill bonus
+  }
+
   check_weapon_skill_bonus(ch, w_type, wielded, weapon_skill_hit_bonus, weapon_skill_dam_bonus);
 
   weapon_type = w_type;
@@ -1373,7 +1377,13 @@ int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
   dam += weapon_skill_dam_bonus;
   dam += calculate_paladin_damage_bonus(ch, vict);
   
-  
+
+  if (wielded && obj_index[wielded->item_number].virt == 30019 && IS_SET(wielded->obj_flags.more_flags, ITEM_TOGGLE))
+  {
+	dam = dam * 85 / 100;
+	dam = dam + (getRealSpellDamage(ch) / 2);
+	w_type = SKILL_FLAMESLASH;
+  }
   // BACKSTAB GOES IN HERE!
   if( (type == SKILL_BACKSTAB || type == SKILL_CIRCLE ) && dam < 10000) {  // Bingo not affected.
     if(IS_SET(ch->combat, COMBAT_CIRCLE)) {
@@ -1771,7 +1781,8 @@ int getRealSpellDamage( CHAR_DATA * ch)
 
 // returns standard returnvals.h return codes
 int damage(CHAR_DATA * ch, CHAR_DATA * victim,
-           int dam, int weapon_type, int attacktype, int weapon, bool is_death_prog)
+           int dam, int weapon_type, int attacktype, int weapon, bool is_death_prog
+	   )
 {
   int can_miss = 1;
   long weapon_bit;
@@ -2143,7 +2154,7 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
       dam /= 2;
   int reduce = 0,type = 0;
   if (can_miss == 1) {
-  if (attacktype >= TYPE_HIT && attacktype < TYPE_SUFFERING)
+  if ((attacktype >= TYPE_HIT && attacktype < TYPE_SUFFERING) || attacktype == SKILL_FLAMESLASH)
   {
     int retval2 = 0;
 
@@ -2169,7 +2180,6 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
 			break;
 		default:
 			return eFAILURE; // Shouldn't happen
-			
 	}
     }
 
@@ -2287,7 +2297,7 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
   weapon_bit = get_weapon_bit(weapon_type);
   
   if ((attacktype >= TYPE_HIT && attacktype < TYPE_SUFFERING) ||
-    (attacktype == SKILL_BACKSTAB)) 
+    (attacktype == SKILL_BACKSTAB))
   {
     if (IS_SET(victim->immune, ISR_PHYSICAL))
       weapon_bit += ISR_PHYSICAL;
@@ -2295,9 +2305,9 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
       weapon_bit += ISR_PHYSICAL;
     else if (IS_SET(victim->suscept, ISR_PHYSICAL))
       weapon_bit += ISR_PHYSICAL;
-    
+
     wielded = ch->equipment[weapon];
-    
+
     if(wielded) 
     {
 //      if ((IS_SET(victim->immune, ISR_MAGIC)) &&
@@ -2323,7 +2333,7 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
   
   if (IS_SET(victim->immune, weapon_bit)) {
     dam = 0;
-    if (attacktype >= TYPE_HIT && attacktype < TYPE_SUFFERING) {
+    if ((attacktype >= TYPE_HIT && attacktype < TYPE_SUFFERING) || attacktype == SKILL_FLAMESLASH) {
       SET_BIT(modifier, COMBAT_MOD_IGNORE);
       SET_BIT(retval,eEXTRA_VALUE);
     }
@@ -2331,7 +2341,7 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
   else if (IS_SET(victim->suscept, weapon_bit)) 
   {
     //    magic stuff is handled elsewhere
-    if (attacktype >= TYPE_HIT && attacktype < TYPE_SUFFERING) {
+    if ((attacktype >= TYPE_HIT && attacktype < TYPE_SUFFERING) || attacktype == SKILL_FLAMESLASH) {
       dam = (int)(dam * 1.3);
       SET_BIT(modifier, COMBAT_MOD_SUSCEPT);
     }
@@ -2339,7 +2349,7 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
   else if (IS_SET(victim->resist, weapon_bit)) 
   {
     //    magic stuff is handled elsewhere
-    if (attacktype >= TYPE_HIT && attacktype < TYPE_SUFFERING)  {
+    if ((attacktype >= TYPE_HIT && attacktype < TYPE_SUFFERING) || attacktype == SKILL_FLAMESLASH)  {
         dam = (int)(dam * 0.7);
         SET_BIT(modifier, COMBAT_MOD_RESIST);
     } 
@@ -2401,7 +2411,8 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
 
   // Check for parry, mob disarm, and trip. Print a suitable damage message. 
   if ((attacktype >= TYPE_HIT && attacktype < TYPE_SUFFERING) || (IS_NPC(ch) && 
-	mob_index[ch->mobdata->nr].virt > 87 && mob_index[ch->mobdata->nr].virt < 92))
+	mob_index[ch->mobdata->nr].virt > 87 && mob_index[ch->mobdata->nr].virt < 92)
+	|| attacktype == SKILL_FLAMESLASH)
   {
     if (ch->equipment[weapon] == NULL) {
       dam_message(dam, ch, victim, TYPE_HIT, modifier);
@@ -5453,12 +5464,16 @@ void dam_message(int dam, CHAR_DATA * ch, CHAR_DATA * victim,
      vp = "nicks";
   }
    
-   w_type -= TYPE_HIT;
-   if (((unsigned) w_type) >= sizeof(attack_table))
-   {
-     log("Dam_message: bad w_type", ANGEL, LOG_BUG);
-     w_type = 0;
-   }
+   if (w_type != SKILL_FLAMESLASH) {
+ 	  w_type -= TYPE_HIT;
+  	 if (((unsigned) w_type) >= sizeof(attack_table))
+  	 {
+    	 log("Dam_message: bad w_type", ANGEL, LOG_BUG);
+    	 w_type = 0;
+  	 }
+  } else {
+	attack = "$B$4flaming slash$R";
+  }
 
   // Custom damage messages.
    if (IS_NPC(ch))
@@ -5489,7 +5504,7 @@ void dam_message(int dam, CHAR_DATA * ch, CHAR_DATA * victim,
    }
    else *modstring = '\0';
 
-   if( dam > 0 ) 
+   if( dam > 0 )
    {
      if(IS_SET(modifier, COMBAT_MOD_SUSCEPT)) {
        strcpy(endstring, " doing extra damage");
