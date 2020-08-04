@@ -1431,7 +1431,7 @@ int can_put_in_vault(struct obj_data *obj, int self, struct vault_data *vault, s
     return 0;
   }
 
-  if (IS_SET(obj->obj_flags.extra_flags, ITEM_NOSAVE))   { //nosave
+  if (IS_SET(obj->obj_flags.extra_flags, ITEM_NOSAVE) || IS_SET(obj->obj_flags.more_flags, ITEM_24H_SAVE))   { //nosave
     csendf(ch, "%s doesn't seem to be a permanent part of the world.\r\n", GET_OBJ_SHORT(obj));
     return 0;
   }
