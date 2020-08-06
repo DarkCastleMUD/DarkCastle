@@ -6675,11 +6675,12 @@ int do_flee(struct char_data *ch, char *argument, int cmd)
     return eFAILURE;
 
   if(cmd == CMD_ESCAPE) {
-    if(!(escape=has_skill(ch, SKILL_ESCAPE))) {
+    if( IS_PC(ch) && !(escape=has_skill(ch, SKILL_ESCAPE)))  {
       send_to_char("Huh?\n\r", ch);
       return eFAILURE;
     }
-    
+    if (IS_NPC(ch)) escape = 50 + GET_LEVEL(ch) / 3;
+ 
     if(!ch->fighting) {
       send_to_char("But there is nobody from whom to escape!\n\r", ch);
       return eFAILURE;
