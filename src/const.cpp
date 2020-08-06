@@ -2793,5 +2793,8 @@ char *reserved[] = {
     "ki transfer reuse timer",
     "brew reuse timer",
     "scribe reuse timer",
-    "profession"
+    "profession",
+    "lilith ring reuse timer",
+    "dawn reuse timer",
+    "durendal resue timer"
 };

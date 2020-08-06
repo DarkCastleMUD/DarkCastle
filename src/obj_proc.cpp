@@ -343,11 +343,207 @@ int pushwand(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
 	 obj_from_char(curr);
 	 extract_obj(curr);
 	 return eSUCCESS;
-       }       
+       }
      }
      return eFAILURE;
    } else return eFAILURE;
 }
+
+
+int dawnsword(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg, CHAR_DATA *invoker)
+{
+	if (cmd != CMD_SAY)
+		return eFAILURE;
+	if (str_cmp(arg, " liberate me ab inferis"))
+		return eFAILURE;
+	if (GET_ALIGNMENT(ch) < 350)
+	{
+		send_to_char("Dawn refuses your impure prayer.\r\n",ch);
+		return eSUCCESS;
+	}
+	if (isTimer(ch, OBJ_DAWNSWORD))
+	{
+		send_to_char("Dawn needs more time to recharge and is not ready to hear your prayer yet.",ch);
+		return eSUCCESS;
+	}
+	if (!ch->in_room || IS_SET(world[ch->in_room].room_flags, SAFE) || IS_SET(world[ch->in_room].room_flags, NO_MAGIC))
+	{
+		send_to_char("Something about this room blocks your command.\r\n", ch);
+		return eSUCCESS;
+	}
+	addTimer(ch, OBJ_DAWNSWORD, 24);
+
+	send_to_char("You whisper a prayer to Dawn and it responds in a brilliant flash of light!\r\n",ch);
+	CHAR_DATA *v;
+	struct affected_type af;
+	for (v = world[ch->in_room].people; v; v = v->next_in_room)
+	{
+		if (v==ch) continue;
+		if (GET_ALIGNMENT(v) >= 350)
+		{
+			act("$n whispers a quiet prayer and a glorious flash of holy light explodes from their weapon!",ch, 0, v, TO_VICT, 0);
+			continue;
+		}
+		if (IS_AFFECTED(v, AFF_BLIND)) continue; // no doubleblind
+		act("whispers a quiet prayer and a searing blast of white light suddenly blinds you!",ch, 0, v, TO_VICT, 0);
+		af.type      = SPELL_BLINDNESS;
+	        af.location  = APPLY_HITROLL;
+      		af.modifier  = has_skill(v,SKILL_BLINDFIGHTING)?skill_success(v,0,SKILL_BLINDFIGHTING)?-10:-20:-20;
+	        af.duration  = 2;
+      		af.bitvector = AFF_BLIND;
+   	 	affect_to_char(v, &af);
+    		af.location = APPLY_AC;
+ 		af.modifier  = has_skill(v,SKILL_BLINDFIGHTING)?skill_success(v,0,SKILL_BLINDFIGHTING)?20:40:40;
+	        affect_to_char(v, &af);
+	}
+
+	return eSUCCESS;
+
+}
+int songstaff(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg, CHAR_DATA *invoker)
+{
+	if (cmd) return eFAILURE;
+	if (obj->equipped_by == NULL || !obj->equipped_by->in_room) return eFAILURE;
+	ch = obj->equipped_by;
+	char buf[MAX_STRING_LENGTH];
+	if ((IS_SET(world[ch->in_room].room_flags, SAFE) || IS_SET(world[ch->in_room].room_flags, NO_MAGIC) || IS_SET(world[ch->in_room].room_flags, QUIET) )) return eFAILURE;
+
+	obj->obj_flags.timer--;
+	if (obj->obj_flags.timer > 0) return eFAILURE;
+	obj->obj_flags.timer = 5;
+
+	int heal;
+        for (char_data * tmp_char = world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room) {
+                if (!ARE_GROUPED(ch, tmp_char))
+                        continue;
+
+                heal = 50 / 2 + ((GET_MAX_MOVE(tmp_char) * 2) / 100) + (number(0, 20) - 10);
+                if (heal < 5)
+                        heal = 5;
+
+                if (IS_PC(tmp_char) && IS_SET(tmp_char->pcdata->toggles, PLR_DAMAGE)) {
+                        if (tmp_char == ch) {
+                                csendf(tmp_char, "You feel your Travelling March recover %d moves for you.\r\n", heal);
+                        } else {
+                                sprintf(buf, "You feel %s's Travelling March recovering %d moves for you.\r\n", GET_NAME(ch), heal);
+                                send_to_char(buf, tmp_char);
+                        }
+                } else
+                        send_to_char("Your feet feel lighter.\r\n", tmp_char);
+                GET_MOVE(tmp_char) += heal;
+                if (GET_MOVE(tmp_char) > GET_MAX_MOVE(tmp_char))
+                        GET_MOVE(tmp_char) = GET_MAX_MOVE(tmp_char);
+        }
+
+
+	return eSUCCESS;
+}
+
+void check_eq(CHAR_DATA *ch);
+
+int lilithring(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg, CHAR_DATA *invoker)
+{
+	if (cmd != CMD_SAY)
+		return eFAILURE;
+	char arg1[MAX_INPUT_LENGTH];
+	char arg2[MAX_INPUT_LENGTH];
+	arg = one_argument(arg, arg1);
+	arg = one_argument(arg, arg2);
+	if (str_cmp(arg1, "ateni"))
+		return eFAILURE;
+	CHAR_DATA *victim;
+	if (!(victim = get_char_room_vis(ch, arg2))) {
+		send_to_char("Noone here by that name.\r\n", ch);
+		return eSUCCESS;
+	}
+	if (!IS_NPC(victim))
+	{
+		send_to_char("The Gods prohibit such evil.\r\n", ch);
+		return eSUCCESS;
+	}
+	if (isTimer(ch, OBJ_LILITHRING))
+	{
+		send_to_char("The ring remains dark and your command goes unheeded.\r\n",ch);
+		return eSUCCESS;
+	}
+
+       if (circle_follow(victim, ch)) {
+                send_to_char("Sorry, following in circles can not be allowed.\n\r", ch);
+		return eSUCCESS;
+        }
+
+        if (!ISSET(victim->mobdata->actflags, ACT_BARDCHARM) || GET_LEVEL(victim)>50) {
+		act("$N's soul is too powerful for you to command.", ch, 0, victim, TO_CHAR, 0);
+		return eSUCCESS;
+        }
+	if (GET_ALIGNMENT(ch) > -350)
+	{
+		send_to_char("Your soul is too pure for such an unclean act.\r\n",ch);
+		return eSUCCESS;
+	}
+
+	if (!ch->in_room || IS_SET(world[ch->in_room].room_flags, SAFE))
+	{
+		send_to_char("Something about this room blocks your command.\r\n", ch);
+		return eSUCCESS;
+	}
+	act("You speak the command and $N must comply. Lilith's Ring of Command glows with mirthful malevolence.", ch, 0, victim, TO_CHAR, 0);
+	act("$n whispers softly to $N. $N's eyes go blank and they now follow $n.", ch, 0, victim, TO_ROOM, 0);
+
+      addTimer(ch, OBJ_LILITHRING, 24);
+      if (victim->master)
+                stop_follower(victim, 0);
+
+        remove_memory(victim, 'h');
+
+        add_follower(victim, ch, 0);
+	struct affected_type af;
+
+        af.type = OBJ_LILITHRING;
+        af.duration = 3;
+        af.modifier = 0;
+        af.location = 0;
+        af.bitvector = AFF_CHARM;
+        affect_to_char(victim, &af);
+
+        /* remove any !charmie eq the charmie is wearing */
+        check_eq(victim);
+
+	return eSUCCESS;
+}
+
+
+int orrowand(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg, CHAR_DATA *invoker)
+{
+	if (cmd != CMD_SAY || str_cmp(arg, " recharge"))
+		return eFAILURE;
+
+	struct obj_data *curr;
+	struct obj_data *firstP = NULL, *secondP = NULL, *vial = NULL, *diamond = NULL;
+
+	for (curr = ch->carrying; curr; curr=curr->next_content)
+	{
+		if (obj_index[curr->item_number].virt == 17399) diamond = curr;
+		else if (obj_index[curr->item_number].virt == 27903 && firstP != NULL) secondP = curr;
+		else if (obj_index[curr->item_number].virt == 27903 )  firstP = curr;
+		else if (obj_index[curr->item_number].virt == 27904) vial = curr;
+	}
+
+	if (!firstP || !secondP || !vial || !diamond)
+	{
+		send_to_char("Recharge unsuccessful:  Missing required components.\r\n",ch);
+		return eSUCCESS;
+	}
+	obj_from_char(firstP); extract_obj(firstP);
+	obj_from_char(secondP); extract_obj(secondP);
+	obj_from_char(vial); extract_obj(vial);
+	obj_from_char(diamond); extract_obj(diamond);
+	obj->obj_flags.value[2] = 5;
+	send_to_char("The wand emits a soft \"beep\" and the display flashes \"Wand Recharged\"\r\n",ch);
+	return eSUCCESS;
+}
+
+
 
 int holyavenger(CHAR_DATA *ch, struct obj_data *obj,  int cmd, char *arg, 
                    CHAR_DATA *invoker)
@@ -958,7 +1154,7 @@ int gazeofgaiot(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
 		   CHAR_DATA *invoker)
 {
    CHAR_DATA *victim;
-   char vict[256];
+   char vict[MAX_INPUT_LENGTH]; // buffer overflow fix
 
    one_argument(arg, vict);
    if (cmd != CMD_GAZE) return eFAILURE;

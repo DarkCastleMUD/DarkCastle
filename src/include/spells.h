@@ -241,6 +241,8 @@ void check_maxes(CHAR_DATA *ch);
 #define SPELL_ELEMENTAL_WALL        176
 #define SPELL_ETHEREAL_FOCUS        177
 #define MAX_SPL_LIST                177
+
+
 // if you add a spell, make sure you update "spells[]" in spells.C
 
 /*
@@ -605,7 +607,11 @@ void check_maxes(CHAR_DATA *ch);
 #define SKILL_BREW_TIMER             4017
 #define SKILL_SCRIBE_TIMER           4018
 #define SKILL_PROFESSION             4019
-#define RESERVED_MAX                 4019
+#define OBJ_LILITHRING		     4020
+#define OBJ_DAWNSWORD		     4021
+#define OBJ_DURENDAL		     4022
+#define RESERVED_MAX                 4022
+
 ///////////////////////////////////////////////////////////////////////
 
 #define TAR_IGNORE         1
@@ -717,6 +723,7 @@ struct attack_hit_type
 #define END_STALK	1
 #define CHANGE_LEADER	2
 #define BROKE_CHARM	3
+#define BROKE_CHARM_LILITH	4
 
   #define DETECT_GOOD_VNUM 6302
   #define DETECT_EVIL_VNUM 6301

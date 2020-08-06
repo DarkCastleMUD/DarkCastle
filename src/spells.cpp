@@ -1137,9 +1137,9 @@ void stop_follower(CHAR_DATA *ch, int cmd)
   }
 */
 //  if(IS_AFFECTED(ch, AFF_CHARM)) {
-  if(cmd == BROKE_CHARM) {
+  if(cmd == BROKE_CHARM || cmd == BROKE_CHARM_LILITH) {
 
-   if (GET_CLASS(ch->master) != CLASS_RANGER) {
+   if (GET_CLASS(ch->master) != CLASS_RANGER || cmd == BROKE_CHARM_LILITH) {
     act("You realize that $N is a jerk!", ch, 0, ch->master, TO_CHAR, 0);
     act("$n is free from the bondage of the spell.", ch, 0, 0, TO_ROOM, 0);
     act("$n hates your guts!", ch, 0, ch->master, TO_VICT, 0);
