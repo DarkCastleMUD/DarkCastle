@@ -544,6 +544,8 @@ int do_mpmload( CHAR_DATA *ch, char *argument, int cmd )
     victim = clone_mobile( realnum );
     victim->hometown = world[ch->in_room].number;
     char_to_room( victim, ch->in_room );
+    mprog_load_trigger(victim); // victim not used after, no selfpurge checks, leave the selfpurge of the mobprog that is causing this load intact as whatever it is
+
     return eSUCCESS;
 }
 

@@ -91,31 +91,37 @@ int number_or_name(char **name, int *num)
 #endif
 
 void do_mload(struct char_data *ch, int rnum, int cnt)
-{      
+{
   struct char_data *mob = NULL;
   char buf[MAX_STRING_LENGTH];
-  int i; 
- 
+  int i;
   if (cnt == 0) cnt = 1;
   for (i=1; i<=cnt; i++) {
     mob = clone_mobile(rnum);
     char_to_room(mob, ch->in_room);
+    extern bool selfpurge;
+    selfpurge = FALSE;
+    mprog_load_trigger(mob);
+    if (selfpurge) {
+      mob = NULL;
+    }
   }
-  
-  act("$n draws up a swirling column of dust and breathes life into it.",
+
+  if (mob) {
+    act("$n draws up a swirling column of dust and breathes life into it.",
       ch, 0, 0, TO_ROOM, 0);
-  act("$n has created $N!", ch, 0, mob, TO_ROOM, 0);
-  sprintf(buf,"You create %i %s!\n\r",cnt, mob->short_desc);
-  send_to_char(buf, ch);
-  if (cnt > 1) {
-    snprintf(buf, MAX_STRING_LENGTH, "%s loads %i copies of mob %d (%s) at room %d (%s).",
+    act("$n has created $N!", ch, 0, mob, TO_ROOM, 0);
+    sprintf(buf,"You create %i %s!\n\r",cnt, mob->short_desc);
+    send_to_char(buf, ch);
+    if (cnt > 1) {
+      snprintf(buf, MAX_STRING_LENGTH, "%s loads %i copies of mob %d (%s) at room %d (%s).",
 	     GET_NAME(ch),
 	     cnt,
 	     mob_index[rnum].virt,
 	     mob->short_desc,
 	     world[ch->in_room].number,
 	     world[ch->in_room].name);
-  } else {
+    } else {
     snprintf(buf, MAX_STRING_LENGTH, "%s loads %i copy of mob %d (%s) at room %d (%s).",
 	     GET_NAME(ch),
 	     cnt,
@@ -123,10 +129,19 @@ void do_mload(struct char_data *ch, int rnum, int cnt)
 	     mob->short_desc,
 	     world[ch->in_room].number,
 	     world[ch->in_room].name);
-    
-  }
+    }
+    log(buf, GET_LEVEL(ch), LOG_GOD);
+ } else {
+    snprintf(buf, MAX_STRING_LENGTH, "%s loads %i copies of mob %d at room %d (%s).",
+	     GET_NAME(ch),
+	     cnt,
+	     mob_index[rnum].virt,
+	     world[ch->in_room].number,
+	     world[ch->in_room].name);
   log(buf, GET_LEVEL(ch), LOG_GOD);
-}    
+  send_to_char("You load the mob(s) but they immediatly destroy themselves.\r\n",ch);
+ }
+}
 
 
 void do_oload(struct char_data *ch, int rnum, int cnt, bool random)
