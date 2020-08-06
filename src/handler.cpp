@@ -78,6 +78,11 @@ void add_memory(CHAR_DATA *ch, char *victim, char type);
 bool isTimer(CHAR_DATA *ch, int spell) {
 	return affected_by_spell(ch, BASE_TIMERS + spell);
 }
+int timerLeft(CHAR_DATA *ch, int spell) {
+	struct affected_type *af = affected_by_spell(ch, BASE_TIMERS + spell);
+	if (af == NULL) return 0;
+	else return af->duration;
+}
 void addTimer(CHAR_DATA *ch, int spell, int ticks) {
 
 	struct affected_type af;
@@ -1798,6 +1803,22 @@ void affect_remove(CHAR_DATA *ch, struct affected_type *af, int flags) {
 			send_to_char("You feel ready to brew something again.\n\r", ch);
 		}
 		break;
+	case OBJ_LILITHRING:
+		if (IS_NPC(ch))
+		{
+			remove_memory(ch, 'h');
+			if (ch->master) {
+				if (ch->master->in_room == ch->in_room)
+				{
+					act("$N blinks, shakes their head and snaps out of their dark trance. $N looks pissed!", ch->master, 0, ch, TO_ROOM, 0);
+					act("$N blinks, shakes their head and snaps out of their dark trance. $N looks pissed!", ch->master, 0, ch, TO_CHAR, 0);
+
+				}
+				if (!(flags & SUPPRESS_CONSEQUENCES) )
+					add_memory(ch, GET_NAME(ch->master), 'h');
+				stop_follower(ch, BROKE_CHARM_LILITH);
+			}
+		}
 	default:
 		break;
 	}
@@ -2154,6 +2175,12 @@ int equip_char(CHAR_DATA *ch, struct obj_data *obj, int pos, int flag) {
 			obj->obj_flags.timer = 0;
 	}
 
+	if (obj_index[obj->item_number].virt == 30008 && !ISSET(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT))
+	{
+			act("Upon grasping Lyvenia the Song Staff, you feel more lively!", ch, obj, 0, TO_CHAR, 0);
+			obj->obj_flags.timer = 5;
+	}
+
 	ch->equipment[pos] = obj;
 	obj->equipped_by = ch;
 	if (!IS_NPC(ch))
@@ -2216,6 +2243,11 @@ struct obj_data *unequip_char(CHAR_DATA *ch, int pos, int flag) {
 	{
 			act("The effort required to separate the Chaos Blade from your own life force is immense! The Blade exacts a toll...", ch, obj, 0, TO_CHAR, 0);
 			GET_HIT(ch) = GET_HIT(ch) /2;
+	}
+	if (obj_index[obj->item_number].virt == 30008  && !ISSET(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT))
+	{
+			act("The spring in your step has subsided.", ch, obj, 0, TO_CHAR, 0);
+			obj->obj_flags.timer = 0;
 	}
 
 	if (GET_ITEM_TYPE(obj) == ITEM_ARMOR)
