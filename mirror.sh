@@ -1,14 +1,16 @@
 #!/bin/bash
-TIME=`date +%b-%d-%y`
-FILENAME=backup-$TIME.tar.gz
+TIME=`date +%Y%m%d`
+FILENAME=dcastle_world_$TIME.tar.xz
+FILENAME2=dcastle2_world_$TIME.tar.xz
 SOURCE=/srv/dcastle2/lib
 DESTINATION=/srv/dcastle/lib
 
-tar cfz "$FILENAME" --exclude=playershop* --exclude=*02300* --exclude=*02399* $DESTINATION/mobs $DESTINATION/zonefiles $DESTINATION/world $DESTINATION/objects $DESTINATION/*index 
-shopt -s extglob
+cd $DESTINATION
+tar cfJ "$FILENAME" --exclude=playershop* --exclude=*clan* --exclude=*03100* --exclude=*03000* --exclude=*05000* --exclude=*17800* --exclude=*03200* --exclude=*11300* --exclude=*18900* --exclude=*00600* --exclude=*22701* --exclude=*00401* --exclude=*00400* --exclude=*22700* mobs zonefiles world objects ./*index
 
-cp $SOURCE/mobs/!(*clan*|*03100*|*03000*|*05000*|*17800*|*3200*|*11300*|*18900*|*0600*|*22701*|*00401*).mob $DESTINATION/mobs/
-cp $SOURCE/objects/!(*clan*|*03100*|*03000*|*05000*|*17800*|*3200*|*11300*|*18900*|*0600*|*22701*|*00401*).obj $DESTINATION/objects/
-cp $SOURCE/zonefiles/!(*clan*|*03100*|*03000*|*05000*|*17800*|*3200*|*11300*|*18900*|*0600*|*22701*|*00401*).zon $DESTINATION/zonefiles/
-cp $SOURCE/world/!(*clan*|*03100*|*03001*|*05000*|*17800*|*3200*|*11300*|*18900*|*0600*|*22700*|*00400*).txt $DESTINATION/world/
-cp $SOURCE/*index $DESTINATION
+cd $SOURCE
+tar cfJ "$FILENAME2" --exclude=playershop* --exclude=*clan* --exclude=*03100* --exclude=*03000* --exclude=*05000* --exclude=*17800* --exclude=*03200* --exclude=*11300* --exclude=*18900* --exclude=*00600* --exclude=*22701* --exclude=*00401* --exclude=*00400* --exclude=*22700* mobs zonefiles world objects ./*index
+
+cd $DESTINATION
+cp "$SOURCE/$FILENAME2" .
+sudo -u dcastle tar xJf "$FILENAME2"
