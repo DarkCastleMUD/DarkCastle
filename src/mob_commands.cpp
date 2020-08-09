@@ -1930,13 +1930,13 @@ int process_math(char_data *ch, char *string)
       }
       curr = 0;
     }
-    if (*string == '\0') break; 
+    if (*string == '\0' || *string == '\r' || *string == '\n') break; 
     switch (*string)
     {
-	case '+': 
-	case '-': 
-        case '/': 
-	case '*': 
+	case '+':
+	case '-':
+        case '/':
+	case '*':
 	  curr = 0;
 	  lastsign = *string;
 	  break;
