@@ -5057,7 +5057,7 @@ int spell_dispel_minor(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
    else if (skill < 81) savebonus = -15;
    else savebonus = -20;
     
-   if (spell && savebonus != -20)
+   if (spell && savebonus != -20 && IS_PC(ch))
    {
       send_to_char("You do not know this spell well enough to target it.\r\n",ch);
       return eFAILURE;

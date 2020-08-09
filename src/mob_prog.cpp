@@ -3283,7 +3283,7 @@ void mprog_driver ( char *com_list, CHAR_DATA *mob, CHAR_DATA *actor,
 
  // count valid random victs in room
  for ( vch = world[mob->in_room].people; vch; vch = vch->next_in_room )
-   if ( CAN_SEE( mob, vch, TRUE ) )
+   if ( CAN_SEE( mob, vch, TRUE ) && !IS_NPC(vch) )
        count++;
 
  if(count)
@@ -3293,7 +3293,7 @@ void mprog_driver ( char *com_list, CHAR_DATA *mob, CHAR_DATA *actor,
  {
    for ( vch = world[mob->in_room].people; vch && count; )
    {
-     if ( CAN_SEE( mob, vch, TRUE ) )
+     if ( CAN_SEE( mob, vch, TRUE ) && !IS_NPC(vch) )
        count--;
      if (count) vch = vch->next_in_room;
   }

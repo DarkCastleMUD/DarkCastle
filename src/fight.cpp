@@ -1819,7 +1819,7 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
 	attacktype == SPELL_POISON)) 
      return debug_retval(ch, victim, retval);
   int l=0;
-  if (dam!=0 && attacktype && attacktype < TYPE_HIT && attacktype != TYPE_UNDEFINED)
+  if (dam!=0 && attacktype && attacktype < TYPE_HIT && attacktype != TYPE_UNDEFINED && attacktype != SKILL_FLAMESLASH)
   { // Skill damages based on learned %
     l = has_skill(ch, attacktype);
     if (IS_NPC(ch)) l = 50;

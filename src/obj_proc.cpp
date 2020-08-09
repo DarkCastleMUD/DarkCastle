@@ -2256,7 +2256,32 @@ int szrildor_pass(struct char_data *ch, struct obj_data *obj, int cmd, char *arg
                 }
                 if (first && real_room(30000) != -1)
                 {
-                        reset_zone(world[real_room(30000)].zone);
+			int zone = world[real_room(30000)].zone;
+       		 	auto &character_list = DC::instance().character_list;
+		        for (auto& tmp_victim : character_list) {
+        	        // This should never happen but it has before so we must investigate without crashing the whole MUD
+               		 if (tmp_victim == 0) {
+               	        	 produce_coredump(tmp_victim);
+                       		 continue;
+               		 }
+            		if (GET_POS(tmp_victim) == POSITION_DEAD || tmp_victim->in_room == NOWHERE) {
+                        	continue;
+	                }
+        	        if(world[tmp_victim->in_room].zone == zone) {
+                	        if(IS_NPC(tmp_victim)) {
+                        	        for (int l = 0; l < MAX_WEAR; l++ )
+                                	{
+                               		    if ( tmp_victim->equipment[l] )
+                                   		   extract_obj(unequip_char(tmp_victim,l));
+                               		 }
+                              		 while(tmp_victim->carrying)
+                                	   extract_obj(tmp_victim->carrying);
+                              		 extract_char(tmp_victim, TRUE);
+	                        }
+        	        }
+		        }
+	               reset_zone(world[real_room(30000)].zone);
+
                 }
 
         }
@@ -2271,14 +2296,37 @@ int szrildor_pass(struct char_data *ch, struct obj_data *obj, int cmd, char *arg
                         n = p->next;
                         if (obj_index[p->item_number].virt == 30097 )
                         {
-                                if (p->carried_by)
+				CHAR_DATA *v = p->carried_by;
+                                if (v)
                                 {
-                                        send_to_char("The Szrildor daypass crumbles into dust.\r\n", p->carried_by);
+                                        send_to_char("The Szrildor daypass crumbles into dust.\r\n", v);
                                 }
                                 extract_obj(p); // extract handles all variations of obj_from_char etc
 
+                	        act("As your pass expires and crumbles to dust, you begin to feel a bit fuzzy for a moment, then vanish into thin air", v, 0,0, TO_CHAR, 0);
+       		                 act("begins to look blurry for a moment, then winks out of existence with a \"pop\"!", v, 0,0, TO_ROOM, 0);
+       		                 move_char(v, real_room(30000));
+				struct mprog_throw_type * throwitem = NULL;
+				throwitem = (struct mprog_throw_type *)dc_alloc(1, sizeof(struct mprog_throw_type));
+				throwitem->target_mob_num = 30033;
+				strcpy(throwitem->target_mob_name,"");
+				throwitem->data_num = 99;
+				throwitem->delay = 0;
+				throwitem->mob = TRUE; // This is, suprisingly, a mob
+				throwitem->actor = v;
+				throwitem->obj = NULL;
+				throwitem->vo = NULL;
+				throwitem->rndm = NULL;
+				throwitem->opt = 0;
+				throwitem->var = NULL;
+				throwitem->next = g_mprog_throw_list;
+				g_mprog_throw_list = throwitem;
+
+
+
                         }
                 }
+
 
         }
         return eSUCCESS;
@@ -2300,24 +2348,9 @@ int szrildor_pass_checks(struct char_data *ch, struct obj_data *obj, int cmd, ch
 
                 if (!search_char_for_item(i, real_object(30097)) || (++count) > 4)
                 {
-                        act("Jeff arrives and forcibly extracts $n.\r\n", i, 0,0, TO_ROOM, 0);
-//                        act("Jeff arrives and forcibly extracts you.\r\n", i, 0,0, TO_CHAR, 0);
+                        act("Jeff arrives and frowns. $$B$$7Jeff says, ‘Hey! You don’t have a pass. Get the heck outta here!’$$R", i, 0,0, TO_CHAR, 0);
+                        act("Jeff arrives and frowns at $n. $$B$$7Jeff says, ‘Hey! You don’t have a pass. Get the heck outta here!’$$R", i, 0,0, TO_ROOM, 0);
                         move_char(i, real_room(30000));
-			struct mprog_throw_type * throwitem = NULL;
-			throwitem = (struct mprog_throw_type *)dc_alloc(1, sizeof(struct mprog_throw_type));
-			throwitem->target_mob_num = 30033;
-			strcpy(throwitem->target_mob_name,"");
-			throwitem->data_num = 99;
-			throwitem->delay = 0;
-			throwitem->mob = TRUE; // This is, suprisingly, a mob
-			throwitem->actor = i;
-			throwitem->obj = NULL;
-			throwitem->vo = NULL;
-			throwitem->rndm = NULL;
-			throwitem->opt = 0;
-			throwitem->var = NULL;
-			throwitem->next = g_mprog_throw_list;
-			g_mprog_throw_list = throwitem;
                 }
 
         }

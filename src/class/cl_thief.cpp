@@ -42,7 +42,7 @@ int palm(CHAR_DATA *ch, struct obj_data *obj_object,
           struct obj_data *sub_object, bool has_consent)
 {
   char buffer[MAX_STRING_LENGTH];
-    
+   
   if(!has_skill(ch, SKILL_PALM) && !IS_NPC(ch)) {
     send_to_char("You aren't THAT slick there, pal.\r\n", ch);
     return eFAILURE;
@@ -182,6 +182,8 @@ int do_eyegouge(CHAR_DATA *ch, char *argument, int cmd)
   CHAR_DATA *victim;
   char name[256];
   int level = has_skill(ch, SKILL_EYEGOUGE);
+
+  if (IS_NPC(ch)) level = 50 + GET_LEVEL(ch) / 2;
 
   argument = one_argument(argument,name);
 
@@ -340,15 +342,14 @@ int do_backstab(CHAR_DATA *ch, char *argument, int cmd)
 
   // Will this be a single or dual backstab this round?
   bool perform_dual_backstab = false;
-  if( ((GET_CLASS(ch) == CLASS_THIEF) || (GET_LEVEL(ch) >= ARCHANGEL)) 
-      && (ch->equipment[SECOND_WIELD])                                    
+  if ((((!IS_NPC(ch) && GET_CLASS(ch) == CLASS_THIEF && has_skill(ch, SKILL_DUAL_BACKSTAB)) || GET_LEVEL(ch) >= ARCHANGEL) || (IS_NPC(ch) && GET_LEVEL(ch) > 70))
+      && (ch->equipment[SECOND_WIELD])
       && ((ch->equipment[SECOND_WIELD]->obj_flags.value[3] == 11) ||
-          (ch->equipment[SECOND_WIELD]->obj_flags.value[3] == 9))        
-      && has_skill(ch, SKILL_DUAL_BACKSTAB) 
+          (ch->equipment[SECOND_WIELD]->obj_flags.value[3] == 9))
       && (cmd != 14)
-    )
+	)
     {
-      if(skill_success(ch,victim,SKILL_DUAL_BACKSTAB)) {
+      if(skill_success(ch,victim,SKILL_DUAL_BACKSTAB) || IS_NPC(ch)) {
 	perform_dual_backstab = true;
       }
     }
@@ -1346,8 +1347,6 @@ int do_pocket(CHAR_DATA *ch, char *argument, int cmd)
      return eFAILURE;
   }
 
-  if(IS_MOB(ch))
-     return eFAILURE;
 
   if((GET_LEVEL(ch) < (GET_LEVEL(victim) - 19))) {
     send_to_char("That person is far too experienced to steal from.\r\n", ch);
@@ -1390,7 +1389,7 @@ int do_pocket(CHAR_DATA *ch, char *argument, int cmd)
     return eFAILURE;
   }
 */
-  if(!has_skill(ch,SKILL_POCKET))
+  if(!has_skill(ch,SKILL_POCKET) && IS_PC(ch))
   {
    send_to_char("Well, you would, if you knew how.\r\n",ch);
     return eFAILURE;
