@@ -385,7 +385,7 @@ int dawnsword(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg, CHAR_DATA
 			continue;
 		}
 		if (IS_AFFECTED(v, AFF_BLIND)) continue; // no doubleblind
-		act("whispers a quiet prayer and a searing blast of white light suddenly blinds you!",ch, 0, v, TO_VICT, 0);
+		act("$n whispers a quiet prayer and a searing blast of white light suddenly blinds you!",ch, 0, v, TO_VICT, 0);
 		af.type      = SPELL_BLINDNESS;
 	        af.location  = APPLY_HITROLL;
       		af.modifier  = has_skill(v,SKILL_BLINDFIGHTING)?skill_success(v,0,SKILL_BLINDFIGHTING)?-10:-20:-20;
@@ -472,7 +472,7 @@ int lilithring(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg, CHAR_DAT
 		return eSUCCESS;
         }
 
-        if (!ISSET(victim->mobdata->actflags, ACT_BARDCHARM) || GET_LEVEL(victim)>50) {
+        if ((!ISSET(victim->mobdata->actflags, ACT_BARDCHARM) && !ISSET(victim->mobdata->actflags, ACT_CHARM)) || GET_LEVEL(victim)>50) {
 		act("$N's soul is too powerful for you to command.", ch, 0, victim, TO_CHAR, 0);
 		return eSUCCESS;
         }
@@ -2348,8 +2348,8 @@ int szrildor_pass_checks(struct char_data *ch, struct obj_data *obj, int cmd, ch
 
                 if (!search_char_for_item(i, real_object(30097)) || (++count) > 4)
                 {
-                        act("Jeff arrives and frowns. $$B$$7Jeff says, ‘Hey! You don’t have a pass. Get the heck outta here!’$$R", i, 0,0, TO_CHAR, 0);
-                        act("Jeff arrives and frowns at $n. $$B$$7Jeff says, ‘Hey! You don’t have a pass. Get the heck outta here!’$$R", i, 0,0, TO_ROOM, 0);
+                        act("Jeff arrives and frowns.\r\n$B$7Jeff says, 'Hey! You don't have a pass. Get the heck outta here!'$R", i, 0,0, TO_CHAR, 0);
+                        act("Jeff arrives and frowns at $n.\r\n$B$7Jeff says, 'Hey! You don't have a pass. Get the heck outta here!'$R", i, 0,0, TO_ROOM, 0);
                         move_char(i, real_room(30000));
                 }
 
