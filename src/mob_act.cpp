@@ -311,6 +311,15 @@ void mobile_activity(void)
           else if(!IS_NPC(tmp_ch))  
           {
             act("$n screams, 'I am going to KILL YOU!'", ch, 0, 0, TO_ROOM, 0);
+#ifdef USE_TIMING
+            mprogTimer.start();
+#endif
+            retval = mprog_attack_trigger( ch, tmp_ch );
+#ifdef USE_TIMING
+            mprogTimer.stop();
+#endif
+            if(SOMEONE_DIED(retval))
+              break;
             attack(ch, tmp_ch, 0);
             done = 1;
             break;

@@ -1810,6 +1810,7 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
   weapon_bit = get_weapon_bit(weapon_type);
   typeofdamage = damage_type(weapon_type);
   struct follow_type *fol;
+  if (attacktype == SKILL_FLAMESLASH) weapon_bit = TYPE_FIRE;
 
   if(GET_POS(victim) == POSITION_DEAD)           return (eSUCCESS|eVICT_DIED);
   if (ch->in_room != victim->in_room && !(attacktype == SPELL_SOLAR_GATE ||
