@@ -247,7 +247,7 @@ int do_track(CHAR_DATA *ch, char *argument, int cmd)
   char weight[40];
   char victim[MAX_INPUT_LENGTH];
   CHAR_DATA *quarry;
-  CHAR_DATA *tmp_ch;  // For checking room stuff
+  CHAR_DATA *tmp_ch = NULL;  // For checking room stuff
   room_track_data * pScent = 0;
   void swap_hate_memory(char_data * ch);
   extern char *dirs[];
@@ -386,7 +386,12 @@ int do_track(CHAR_DATA *ch, char *argument, int cmd)
               if (!IS_SET(world[ch->in_room].room_flags, SAFE))  {
                  act("$n screams 'YOU CAN RUN, BUT YOU CAN'T HIDE!'",
                      ch, 0, 0, TO_ROOM, 0);
-                 return do_hit(ch, ch->hunting, 0);
+		retval = eSUCCESS;
+		if (tmp_ch) {
+	     	       	retval = mprog_attack_trigger( ch, tmp_ch );
+		}
+		if (SOMEONE_DIED(retval) || (ch && ch->fighting)) return retval;
+		else              return do_hit(ch, ch->hunting, 0);
                  }
               else 
                  act("$n says 'You can't stay here forever.'",

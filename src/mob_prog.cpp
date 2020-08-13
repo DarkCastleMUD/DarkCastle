@@ -120,7 +120,7 @@ char *mprog_next_command( char *clist )
 
   for ( ; *pointer != '\0'; pointer++)
   {
-	if (!open && *pointer == '\n') break;
+	if (!open && (*pointer == '\n' || *pointer == '\r')) break;
 	if (*pointer == '{') open = TRUE;
 	if (open && *pointer == '}') open = FALSE;
   }
