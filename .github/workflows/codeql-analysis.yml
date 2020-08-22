@@ -47,7 +47,7 @@ jobs:
     #    uses a compiled language
 
     - run: |
-        apt-get install g++-multilib
+        sudo apt-get install g++-multilib
         cd src
         make debug
     #   make release
