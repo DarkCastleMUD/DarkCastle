@@ -48,8 +48,9 @@ jobs:
 
     - run: |
         sudo apt-get install g++-multilib
+        sudo apt-get install scons
         cd src
-        make debug
+        scons debug=1
     #   make release
 
     - name: Perform CodeQL Analysis
