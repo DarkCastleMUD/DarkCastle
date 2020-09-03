@@ -394,15 +394,18 @@ const struct set_data set_list[] = { { "Ascetic's Focus", 19, { 2700, 6904, 8301
 		"Captain's Regalia", 7, { 17341, 17342, 17343, 17344, 17345, 17346, 17347, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 },
 		"You feel an increased vigor surge throughout your body.\n", "Your vigor is reduced to its normal state.\n" }, { "Celebrant's Defenses", 7, { 17319,
 		17320, 17321, 17322, 17323, 17324, 17325, 17326, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 },
-		"Your inner focus feels as though it is more powerful.\r\n", "Your inner focus has reverted to its original form.\r\n" }, { "Battlerager's Fury", 18, {
-		352, 353, 354, 355, 356, 357, 358, 359, 359, 360, 361, 362, 362, 9702, 9808, 9808, 27114, 27114, -1 },
+		"Your inner focus feels as though it is more powerful.\r\n", "Your inner focus has reverted to its original form.\r\n" }, 
+		{ "Battlerager's Fury", 18, {352, 353, 354, 355, 356, 357, 358, 359, 359, 360, 361, 362, 362, 9702, 9808, 9808, 27114, 27114, -1 },
 		"You feel your stance harden and blood boil as you strap on your battlerager's gear.\r\n",
-		"Your blood returns to its normal temperature as you remove your battlerager's gear.\r\n" }, { "Veteran's Field Plate Armour", 9, { 21719, 21720, 21721,
+		"Your blood returns to its normal temperature as you remove your battlerager's gear.\r\n" }, 
+{ "Veteran's Field Plate Armour", 9, { 21719, 21720, 21721,
 		21722, 21723, 21724, 21725, 21726, 21727, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 },
 		"There is an audible *click* as the field plate locks into its optimal assembly.\r\n",
-		"There is a soft *click* as you remove the field plate from its optimal positioning.\r\n" }, { "Mother of All Dragons' Trophies", 7, { 22320, 22321,
+		"There is a soft *click* as you remove the field plate from its optimal positioning.\r\n" }, 
+		{ "Mother of All Dragons' Trophies", 7, { 22320, 22321,
 		22322, 22323, 22324, 22325, 22326, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 },
-		"You feel the might of the ancient dragonkind surge through your body.\r\n", "The might of the ancient dragonkind has left you.\r\n" }, { "Feral Fangs",
+		"You feel the might of the ancient dragonkind surge through your body.\r\n", "The might of the ancient dragonkind has left you.\r\n" }, 
+		{ "Feral Fangs",
 		2, { 4818, 4819, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 },
 		"As the fangs' cries harmonize they unleash something feral inside you.\r\n", "As you remove the fangs your muscles relax and focus is restored.\r\n" },
 		{ "White Crystal Armours", 10, { 22003, 22006, 22010, 22014, 22015, 22020, 22021, 22022, 22023, 22024, -1, -1, -1, -1, -1, -1, -1, -1, -1 },
@@ -411,17 +414,28 @@ const struct set_data set_list[] = { { "Ascetic's Focus", 19, { 2700, 6904, 8301
 				"Your crystal armours $B$0darken$R and begin to hum with magic.\r\n", "The $B$0darkness$R disperses as the crystal armours are removed.\r\n" },
 		{ "Aqua Pendants", 2, { 5611, 5643, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 },
 				"The pendants click softly and you feel a surge of energy as gills spring from your neck!\r\n",
-				"Your gills retract and fade as the two pendants separate quietly.\r\n" }, { "Arcane Apparatus", 19, { 367, 368, 369, 370, 371, 372, 373, 374,
+				"Your gills retract and fade as the two pendants separate quietly.\r\n" }, 
+		{ "Arcane Apparatus", 19, { 367, 368, 369, 370, 371, 372, 373, 374,
 				375, 376, 377, 378, 379, 379, 380, 381, 382, 383, 383 },
 				"The power of ancient magicks surges through your body as you slowly fade out of existence.\r\n",
-				"You feel a slight tingle of fading magicks as you shimmer into existence.\r\n" }, { "Titanic Gear", 11, { 19402, 19404, 19406, 19407, 19408,
+				"You feel a slight tingle of fading magicks as you shimmer into existence.\r\n" }, 
+		{ "Titanic Gear", 11, { 19402, 19404, 19406, 19407, 19408,
 				19409, 19410, 19411, 19413, 19417, 19419, -1, -1, -1, -1, -1, -1, -1, -1 }, "You feel a mighty surge as your body rapidly expands.\n\r",
-				"You feel your size reduce to normal proportions.\n\r" }, { "Moss Equipment", 11, { 18001, 18002, 18003, 18004, 18006, 18008, 18009, 18010,
+				"You feel your size reduce to normal proportions.\n\r" }, 
+		{ "Moss Equipment", 11, { 18001, 18002, 18003, 18004, 18006, 18008, 18009, 18010,
 				18011, 18016, 18017, -1, -1, -1, -1, -1, -1, -1, -1 }, "A strange energy surges through you and you feel your senses sharpen.\n\r",
-				"Your senses return to normal as you remove your mossy garb.\n\r" }, { "Blacksteel Battlegear", 19, { 283, 283, 284, 284, 285, 286, 287, 288,
+				"Your senses return to normal as you remove your mossy garb.\n\r" }, 
+		{ "Blacksteel Battlegear", 19, { 283, 283, 284, 284, 285, 286, 287, 288,
 				289, 290, 292, 293, 294, 294, 295, 296, 296, 297, 291 },
 				"The might of the warrior's spirit, past, present, and future, hums through your body.\n\r",
-				"The harmony of the warrior's spirit has left you.\n\r" }, { "\n", 0, { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+				"The harmony of the warrior's spirit has left you.\n\r" }, 
+		{ "Mother of All Dragons' Trophies", 7, { 22323, 22330, 22331, 22332, 22334, 22335, 22336, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 },
+				"You feel the might of the ancient dragonkind surge through your body.\r\n", "The might of the ancient dragonkind has left you.\r\n" }, 
+		{ "Berkthgar's Rage", 1, {27977, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 },
+		NULL,
+		NULL }, 
+
+		{ "\n", 0, { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 				-1 }, "\n", "\n" } };
 
 void add_set_stats(char_data *ch, obj_data *obj, int flag, int pos) {
@@ -465,7 +479,7 @@ void add_set_stats(char_data *ch, obj_data *obj, int flag, int pos) {
 				// By gawd, they just completed the set.
 				if (affected_by_spell(ch, BASE_SETS + z))
 					return;
-				if (!flag)
+				if (!flag && set_list[z].Set_Wear_Message != NULL)
 					send_to_char(set_list[z].Set_Wear_Message, ch);
 				switch (z) {
 				case SET_SAIYAN: // (aka Ascetic's Focus)
@@ -516,6 +530,13 @@ void add_set_stats(char_data *ch, obj_data *obj, int flag, int pos) {
 					af.bitvector = -1;
 					affect_to_char(ch, &af);
 					break;
+				case SET_RAGER2:
+					af.location = 0;
+					af.location = SKILL_BLOOD_FURY * 1000;
+					af.modifier = 5;
+					af.bitvector = -1;
+					affect_to_char(ch, &af);
+					break;
 				case SET_FIELDPLATE:
 					af.location = APPLY_HIT;
 					af.modifier = 100;
@@ -528,6 +549,20 @@ void add_set_stats(char_data *ch, obj_data *obj, int flag, int pos) {
 					affect_to_char(ch, &af);
 					break;
 				case SET_MOAD:
+					af.location = APPLY_HIT_N_DAM;
+					af.modifier = 4;
+					affect_to_char(ch, &af);
+					af.location = APPLY_SAVING_FIRE;
+					af.modifier = 15;
+					affect_to_char(ch, &af);
+					af.location = APPLY_MELEE_DAMAGE;
+					af.modifier = 5;
+					affect_to_char(ch, &af);
+					af.location = APPLY_SONG_DAMAGE;
+					af.modifier = 5;
+					affect_to_char(ch, &af);
+					break;
+				case SET_MOAD2:
 					af.location = APPLY_HIT_N_DAM;
 					af.modifier = 4;
 					affect_to_char(ch, &af);
@@ -680,7 +715,7 @@ void remove_set_stats(char_data *ch, obj_data *obj, int flag) {
 				}
 				//Remove it
 				affect_from_char(ch, BASE_SETS + z);
-				if (!flag)
+				if (!flag && set_list[z].Set_Remove_Message != NULL)
 					send_to_char(set_list[z].Set_Remove_Message, ch);
 				break;
 			}
@@ -2098,13 +2133,15 @@ int apply_ac(CHAR_DATA *ch, int eq_pos) {
 	return value;
 }
 
+
+
 // return 0 on failure
 // 1 on success
 int equip_char(CHAR_DATA *ch, struct obj_data *obj, int pos, int flag) {
 	int j;
 
 	if (!ch || !obj) {
-		log("Null ch or obj in equp_char()!", ANGEL, LOG_BUG);
+		log("Null ch or obj in equip_char()!", ANGEL, LOG_BUG);
 		return 0;
 	}
 	if (pos < 0 || pos >= MAX_WEAR) {

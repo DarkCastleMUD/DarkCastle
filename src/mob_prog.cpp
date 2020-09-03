@@ -3467,6 +3467,11 @@ void mprog_percent_check( CHAR_DATA *mob, CHAR_DATA *actor, OBJ_DATA *obj,
  mprg = mob_index[mob->mobdata->nr].mobprogs;
  if (!mprg) { done = TRUE; mprg = mob_index[mob->mobdata->nr].mobspec; }
 
+ if (mob_index[mob->mobdata->nr].virt == 30013)
+ {
+	debugpoint();
+ }
+
  mprog_command_num = 0;
  for ( ; mprg != NULL; mprg = next )
  {
@@ -3911,8 +3916,8 @@ void update_mprog_throws() {
 		vobj = NULL;
 		vict = NULL;
 
-		if (curr->data_num == -999)
-			debugpoint();
+//		if (curr->data_num == -999)
+//			debugpoint();
 
 		if (curr->tMob && charExists(curr->tMob) && curr->tMob->in_room >= 0) {
 			vict = curr->tMob;

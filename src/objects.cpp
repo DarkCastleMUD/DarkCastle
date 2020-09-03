@@ -1481,17 +1481,17 @@ int will_screwup_worn_sizes(char_data * ch, obj_data * obj, int add)
 
   // temporarily affect the person's height
   if(add) {
-	  logf(ANGEL, LOG_BUG, "will_screwup_worn_sizes: %s height %d by %d = %d", GET_NAME(ch), GET_HEIGHT(ch), mod, GET_HEIGHT(ch)+mod);
+//	  logf(ANGEL, LOG_BUG, "will_screwup_worn_sizes: %s height %d by %d = %d", GET_NAME(ch), GET_HEIGHT(ch), mod, GET_HEIGHT(ch)+mod);
 	  GET_HEIGHT(ch) += mod;
   } else {
-	  logf(ANGEL, LOG_BUG, "will_screwup_worn_sizes: %s height %d by -%d = %d", GET_NAME(ch), GET_HEIGHT(ch), mod, GET_HEIGHT(ch)-mod);
+//	  logf(ANGEL, LOG_BUG, "will_screwup_worn_sizes: %s height %d by -%d = %d", GET_NAME(ch), GET_HEIGHT(ch), mod, GET_HEIGHT(ch)-mod);
 	  GET_HEIGHT(ch) -= mod;
   }
 
   if(add == 1 && size_restricted(ch, obj))
   {
     // Only have to check the item itself if we're wearing it, not removing
-	  logf(ANGEL, LOG_BUG, "will_screwup_worn_sizes: %s height %d by -%d = %d", GET_NAME(ch), GET_HEIGHT(ch), mod, GET_HEIGHT(ch)-mod);
+//	  logf(ANGEL, LOG_BUG, "will_screwup_worn_sizes: %s height %d by -%d = %d", GET_NAME(ch), GET_HEIGHT(ch), mod, GET_HEIGHT(ch)-mod);
 	  GET_HEIGHT(ch) -= mod;
     send_to_char("After modifying your height that item would not fit!\r\n", ch);
     return TRUE;
@@ -1511,10 +1511,10 @@ int will_screwup_worn_sizes(char_data * ch, obj_data * obj, int add)
 
   // fix height back to normal
   if(add) {
-	  logf(ANGEL, LOG_BUG, "will_screwup_worn_sizes: %s height %d by -%d = %d", GET_NAME(ch), GET_HEIGHT(ch), mod, GET_HEIGHT(ch)-mod);
+//	  logf(ANGEL, LOG_BUG, "will_screwup_worn_sizes: %s height %d by -%d = %d", GET_NAME(ch), GET_HEIGHT(ch), mod, GET_HEIGHT(ch)-mod);
 	  GET_HEIGHT(ch) -= mod;
   } else {
-	  logf(ANGEL, LOG_BUG, "will_screwup_worn_sizes: %s height %d by %d = %d", GET_NAME(ch), GET_HEIGHT(ch), mod, GET_HEIGHT(ch)+mod);
+//	  logf(ANGEL, LOG_BUG, "will_screwup_worn_sizes: %s height %d by %d = %d", GET_NAME(ch), GET_HEIGHT(ch), mod, GET_HEIGHT(ch)+mod);
 	  GET_HEIGHT(ch) += mod;
   }
 
