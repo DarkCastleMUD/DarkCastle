@@ -1465,6 +1465,12 @@ is_race_eligible(ch,7)?'*':' ',is_race_eligible(ch,8)?'*':' ',is_race_eligible(c
           send_to_char("\n\rWelcome to Dark Castle.  May your visit here suck.\n\r", ch );
 			character_list.insert(ch);
 
+	  if (IS_AFFECTED(ch, AFF_ITEM_REMOVE))
+ 	  {
+		REMBIT(ch->affected_by, AFF_ITEM_REMOVE);
+		send_to_char("\r\n$I$B$4***WARNING*** Items you were previously wearing have been moved to your inventory, please check before moving out of a safe room.$R\r\n", ch);
+  	  }
+
           /* tjs hack - till mob bug is fixed */
           // TODO - figure out what this is for
           if (GET_LEVEL(ch) == 1) {

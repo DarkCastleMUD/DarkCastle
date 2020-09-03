@@ -82,7 +82,8 @@
 #define AFF_ACID_SHIELD         70
 #define AFF_PRIMAL_FURY		71
 #define AFF_ELEMENTAL           72
-#define AFF_MAX                 72
+#define AFF_ITEM_REMOVE         73
+#define AFF_MAX                 73
 //#define AFF_CHECKTHISASIZE     96 //do not change unless ASIZE changes
 //#define AFF_CHECKTHISASIZE	128
 

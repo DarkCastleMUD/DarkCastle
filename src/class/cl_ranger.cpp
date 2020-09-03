@@ -371,9 +371,9 @@ int do_track(CHAR_DATA *ch, char *argument, int cmd)
 	      // by, say, a thief.  I'll let he who wrote it fix that.
 	      // Morc 28 July 96
 
-              if (!(get_char_room_vis(ch, ch->hunting))) {
-	         if ((tmp_ch = get_char(ch->hunting)) == 0)
+	       if ((tmp_ch = get_char(ch->hunting)) == 0)
 		    return eFAILURE;
+              if (!(get_char_room_vis(ch, ch->hunting))) {
                  if (tmp_ch->in_room == ch->in_room) {
 		    // The mob can't see him
                     act("$n says 'Damn, must have lost $M!'", ch, 0, tmp_ch,
@@ -390,7 +390,7 @@ int do_track(CHAR_DATA *ch, char *argument, int cmd)
 		if (tmp_ch) {
 	     	       	retval = mprog_attack_trigger( ch, tmp_ch );
 		}
-		if (SOMEONE_DIED(retval) || (ch && ch->fighting)) return retval;
+		if (SOMEONE_DIED(retval) || (ch && ch->fighting) || !ch->hunting) return retval;
 		else              return do_hit(ch, ch->hunting, 0);
                  }
               else 

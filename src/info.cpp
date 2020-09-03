@@ -1549,9 +1549,14 @@ int do_score(struct char_data *ch, char *argument, int cmd)
    //      if (*aff_name && !str_cmp(aff_name, "fly")) flying = 1;
 			switch (aff->type) {
 			case BASE_SETS + SET_RAGER:
-	     if (aff->location == 0) {
+				     if (aff->location == 0) {
 					aff_name = "Battlerager's Fury";
-	     }
+	     			}
+				break;
+			case BASE_SETS + SET_RAGER2:
+				     if (aff->location == 0) {
+					aff_name = "Battlerager's Fury";
+	     			}
 				break;
 			case BASE_SETS + SET_MOSS:
 				if (aff->location == 0)

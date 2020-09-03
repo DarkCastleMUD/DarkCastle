@@ -1137,7 +1137,11 @@ struct obj_data *  obj_store_to_char(CHAR_DATA *ch, FILE *fpsave, struct obj_dat
   // screw it, just put it in their inventory
   else {
     obj_to_char(obj, ch);
-    return obj;
+    if (wear_pos > -1 && wear_pos < MAX_WEAR)
+    {
+	SETBIT(ch->affected_by, AFF_ITEM_REMOVED);
+    }
+   return obj;
   }
 
 
