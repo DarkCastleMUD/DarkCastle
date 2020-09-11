@@ -3281,11 +3281,11 @@ int talkingsword(struct char_data*ch, struct obj_data *obj, int cmd, char*arg,
 		if (IS_SET(obj->obj_flags.more_flags, ITEM_TOGGLE))
 		{
 			REMOVE_BIT(obj->obj_flags.more_flags, ITEM_TOGGLE);
- 		        strcat(buf2, "And I'm back! couldnt live without me eh?'$R\n\r");
+ 		        strcat(buf2, "And I'm back! Couldn\'t live without me eh?'$R\n\r");
 		        send_to_room(buf2, obj->equipped_by->in_room);
 		} else {
 			SET_BIT(obj->obj_flags.more_flags, ITEM_TOGGLE);
- 		        strcat(buf2, "Fine, I will keep quite for a while, but you will miss me!'$R\n\r");
+ 		        strcat(buf2, "Fine, I will keep quiet for a while, but you will miss me!'$R\n\r");
 		        send_to_room(buf2, obj->equipped_by->in_room);
 		}
 		return eSUCCESS;
