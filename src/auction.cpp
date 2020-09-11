@@ -460,6 +460,10 @@ Is item type ok to sell?
 */
 bool AuctionHouse::IsOkToSell(OBJ_DATA *obj)
 {
+  if (IS_SET(obj->obj_flags.more_flags, ITEM_24H_SAVE)) {
+	return false;
+  }
+	
   switch(obj->obj_flags.type_flag)
   {
     case ITEM_LIGHT:
