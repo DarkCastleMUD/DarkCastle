@@ -3776,8 +3776,9 @@ struct obj_data *read_object(int nr, FILE *fl, bool zz)
 
 	obj->description = fread_string(fl, 1);
 	obj->action_description = fread_string(fl, 1);
-	if (obj->action_description && (obj->action_description[0] < 'A' || obj->action_description[0] > 'z')) {
-		logf( IMMORTAL, LOG_BUG, "read_object: vnum %d action description [ ] removed.", obj_index[nr].virt, obj->action_description);
+	if ((obj->action_description && (obj->action_description[0] < ' ' || obj->action_description[0] > '~'))
+			&& obj->action_description[0] != '\0') {
+		logf( IMMORTAL, LOG_BUG, "read_object: vnum %d action description [%s] removed.", obj_index[nr].virt, obj->action_description);
 		obj->action_description[0] = '\0';
 	}
 	obj->table = 0;
