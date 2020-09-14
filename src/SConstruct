@@ -65,11 +65,11 @@ libdcastle.MergeFlags({'CPPPATH' : '/usr/include/pgsql/'})
 libdcastle.StaticLibrary('dcastle', [libdcastle_src + DC]);
 
 dcastle=env.Clone()
-dcastle.MergeFlags({'LIBS' : ['dcastle', 'crypt', 'mcheck', 'z', 'pq', 'XmlRpc']})
+dcastle.MergeFlags({'LIBS' : ['dcastle', 'crypt', 'mcheck', 'z', 'pq', 'XmlRpc', 'fmt']})
 dcastle.Program('dcastle', ['dcastle.cpp'])
 
 showplayerexp=env.Clone()
-showplayerexp.MergeFlags({'LIBS' : ['dcastle', 'crypt', 'mcheck', 'z', 'pq', 'XmlRpc']})
+showplayerexp.MergeFlags({'LIBS' : ['dcastle', 'crypt', 'mcheck', 'z', 'pq', 'XmlRpc', 'fmt']})
 showplayerexp.Program('showplayer', ['showplayerxp.cpp'])
 
 
