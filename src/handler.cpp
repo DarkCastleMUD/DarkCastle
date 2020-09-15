@@ -385,58 +385,139 @@ bool still_affected_by_poison(CHAR_DATA * ch) {
 	return 0;
 }
 
-const struct set_data set_list[] = { { "Ascetic's Focus", 19, { 2700, 6904, 8301, 8301, 9567, 9567, 12108, 14805, 15621, 21718, 22302, 22314, 22600, 22601,
-		22602, 24815, 24815, 24816, 26237 }, "You attach your penis mightier.\r\n", "You remove your penis mightier.\r\n" }, { "Warlock's Vestments", 7, {
-		17334, 17335, 17336, 17337, 17338, 17339, 17340, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 },
-		"You feel an increase in energy coursing through your body.\r\n", "Your magical energy returns to its normal state.\r\n" }, { "Hunter's Arsenal", 7, {
-		17327, 17328, 17329, 17330, 17331, 17332, 17333, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 },
-		"You sense your accuracy and endurance have undergone a magical improvement.\r\n", "Your accuracy and endurance return to their normal levels.\r\n" }, {
-		"Captain's Regalia", 7, { 17341, 17342, 17343, 17344, 17345, 17346, 17347, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 },
-		"You feel an increased vigor surge throughout your body.\n", "Your vigor is reduced to its normal state.\n" }, { "Celebrant's Defenses", 7, { 17319,
-		17320, 17321, 17322, 17323, 17324, 17325, 17326, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 },
-		"Your inner focus feels as though it is more powerful.\r\n", "Your inner focus has reverted to its original form.\r\n" }, 
-		{ "Battlerager's Fury", 18, {352, 353, 354, 355, 356, 357, 358, 359, 359, 360, 361, 362, 362, 9702, 9808, 9808, 27114, 27114, -1 },
-		"You feel your stance harden and blood boil as you strap on your battlerager's gear.\r\n",
-		"Your blood returns to its normal temperature as you remove your battlerager's gear.\r\n" }, 
-{ "Veteran's Field Plate Armour", 9, { 21719, 21720, 21721,
-		21722, 21723, 21724, 21725, 21726, 21727, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 },
-		"There is an audible *click* as the field plate locks into its optimal assembly.\r\n",
-		"There is a soft *click* as you remove the field plate from its optimal positioning.\r\n" }, 
-		{ "Mother of All Dragons' Trophies", 7, { 22320, 22321,
-		22322, 22323, 22324, 22325, 22326, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 },
-		"You feel the might of the ancient dragonkind surge through your body.\r\n", "The might of the ancient dragonkind has left you.\r\n" }, 
-		{ "Feral Fangs",
-		2, { 4818, 4819, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 },
-		"As the fangs' cries harmonize they unleash something feral inside you.\r\n", "As you remove the fangs your muscles relax and focus is restored.\r\n" },
-		{ "White Crystal Armours", 10, { 22003, 22006, 22010, 22014, 22015, 22020, 22021, 22022, 22023, 22024, -1, -1, -1, -1, -1, -1, -1, -1, -1 },
-				"Your crystal armours begin to $B$7glow$R with an ethereal light.\r\n", "The $B$7glow$R fades from your crystal armours.\r\n" }, {
-				"Black Crystal Armours", 7, { 22011, 22017, 22025, 22026, 22027, 22028, 22029, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 },
-				"Your crystal armours $B$0darken$R and begin to hum with magic.\r\n", "The $B$0darkness$R disperses as the crystal armours are removed.\r\n" },
-		{ "Aqua Pendants", 2, { 5611, 5643, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 },
-				"The pendants click softly and you feel a surge of energy as gills spring from your neck!\r\n",
-				"Your gills retract and fade as the two pendants separate quietly.\r\n" }, 
-		{ "Arcane Apparatus", 19, { 367, 368, 369, 370, 371, 372, 373, 374,
-				375, 376, 377, 378, 379, 379, 380, 381, 382, 383, 383 },
-				"The power of ancient magicks surges through your body as you slowly fade out of existence.\r\n",
-				"You feel a slight tingle of fading magicks as you shimmer into existence.\r\n" }, 
-		{ "Titanic Gear", 11, { 19402, 19404, 19406, 19407, 19408,
-				19409, 19410, 19411, 19413, 19417, 19419, -1, -1, -1, -1, -1, -1, -1, -1 }, "You feel a mighty surge as your body rapidly expands.\n\r",
-				"You feel your size reduce to normal proportions.\n\r" }, 
-		{ "Moss Equipment", 11, { 18001, 18002, 18003, 18004, 18006, 18008, 18009, 18010,
-				18011, 18016, 18017, -1, -1, -1, -1, -1, -1, -1, -1 }, "A strange energy surges through you and you feel your senses sharpen.\n\r",
-				"Your senses return to normal as you remove your mossy garb.\n\r" }, 
-		{ "Blacksteel Battlegear", 19, { 283, 283, 284, 284, 285, 286, 287, 288,
-				289, 290, 292, 293, 294, 294, 295, 296, 296, 297, 291 },
-				"The might of the warrior's spirit, past, present, and future, hums through your body.\n\r",
-				"The harmony of the warrior's spirit has left you.\n\r" }, 
-		{ "Mother of All Dragons' Trophies", 7, { 22323, 22330, 22331, 22332, 22334, 22335, 22336, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 },
-				"You feel the might of the ancient dragonkind surge through your body.\r\n", "The might of the ancient dragonkind has left you.\r\n" }, 
-		{ "Berkthgar's Rage", 1, {27977, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 },
-		NULL,
-		NULL }, 
-
-		{ "\n", 0, { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-				-1 }, "\n", "\n" } };
+const struct set_data set_list[] = {
+    {
+        "Ascetic's Focus",
+        19,
+        { 2700, 6904, 8301, 8301, 9567, 9567, 12108, 14805, 15621, 21718, 22302, 22314, 22600, 22601, 22602, 24815, 24815, 24816, 26237 },
+        "You attach your penis mightier.\r\n",
+        "You remove your penis mightier.\r\n"
+    },
+    {
+        "Warlock's Vestments",
+        7,
+        { 17334, 17335, 17336, 17337, 17338, 17339, 17340, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 },
+        "You feel an increase in energy coursing through your body.\r\n",
+        "Your magical energy returns to its normal state.\r\n"
+    },
+    {
+        "Hunter's Arsenal",
+        7,
+        { 17327, 17328, 17329, 17330, 17331, 17332, 17333, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 },
+        "You sense your accuracy and endurance have undergone a magical improvement.\r\n",
+        "Your accuracy and endurance return to their normal levels.\r\n"
+    },
+    {
+        "Captain's Regalia",
+        7,
+        { 17341, 17342, 17343, 17344, 17345, 17346, 17347, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 },
+        "You feel an increased vigor surge throughout your body.\n",
+        "Your vigor is reduced to its normal state.\n" },
+    {
+        "Celebrant's Defenses",
+        7,
+        { 17319, 17320, 17321, 17322, 17323, 17324, 17325, 17326, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 },
+        "Your inner focus feels as though it is more powerful.\r\n", "Your inner focus has reverted to its original form.\r\n"
+    },
+    {
+        "Battlerager's Fury",
+        18,
+        {352, 353, 354, 355, 356, 357, 358, 359, 359, 360, 361, 362, 362, 9702, 9808, 9808, 27114, 27114, -1 },
+        "You feel your stance harden and blood boil as you strap on your battlerager's gear.\r\n",
+        "Your blood returns to its normal temperature as you remove your battlerager's gear.\r\n"
+    },
+    {
+        "Veteran's Field Plate Armour",
+        9,
+        { 21719, 21720, 21721, 21722, 21723, 21724, 21725, 21726, 21727, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 },
+        "There is an audible *click* as the field plate locks into its optimal assembly.\r\n",
+        "There is a soft *click* as you remove the field plate from its optimal positioning.\r\n"
+    },
+    {
+        "Mother of All Dragons' Trophies",
+        7,
+        { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 },
+        "You feel the might of the ancient dragonkind surge through your body.\r\n",
+        "The might of the ancient dragonkind has left you.\r\n"
+    },
+    {
+        "Feral Fangs",
+        2,
+        { 4818, 4819, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 },
+        "As the fangs' cries harmonize they unleash something feral inside you.\r\n",
+        "As you remove the fangs your muscles relax and focus is restored.\r\n"
+    },
+    {
+        "White Crystal Armours",
+        10,
+        { 22003, 22006, 22010, 22014, 22015, 22020, 22021, 22022, 22023, 22024, -1, -1, -1, -1, -1, -1, -1, -1, -1 },
+        "Your crystal armours begin to $B$7glow$R with an ethereal light.\r\n",
+        "The $B$7glow$R fades from your crystal armours.\r\n"
+    },
+    {
+        "Black Crystal Armours",
+        7,
+        { 22011, 22017, 22025, 22026, 22027, 22028, 22029, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 },
+        "Your crystal armours $B$0darken$R and begin to hum with magic.\r\n",
+        "The $B$0darkness$R disperses as the crystal armours are removed.\r\n"
+    },
+    {
+        "Aqua Pendants",
+        2,
+        { 5611, 5643, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 },
+        "The pendants click softly and you feel a surge of energy as gills spring from your neck!\r\n",
+        "Your gills retract and fade as the two pendants separate quietly.\r\n"
+    },
+    {
+        "Arcane Apparatus",
+        19,
+        { 367, 368, 369, 370, 371, 372, 373, 374, 375, 376, 377, 378, 379, 379, 380, 381, 382, 383, 383 },
+        "The power of ancient magicks surges through your body as you slowly fade out of existence.\r\n",
+        "You feel a slight tingle of fading magicks as you shimmer into existence.\r\n"
+    },
+    {
+        "Titanic Gear",
+        11,
+        { 19402, 19404, 19406, 19407, 19408, 19409, 19410, 19411, 19413, 19417, 19419, -1, -1, -1, -1, -1, -1, -1, -1 },
+        "You feel a mighty surge as your body rapidly expands.\n\r",
+        "You feel your size reduce to normal proportions.\n\r"
+    },
+    {
+        "Moss Equipment",
+        11,
+        { 18001, 18002, 18003, 18004, 18006, 18008, 18009, 18010, 18011, 18016, 18017, -1, -1, -1, -1, -1, -1, -1, -1 },
+        "A strange energy surges through you and you feel your senses sharpen.\n\r",
+        "Your senses return to normal as you remove your mossy garb.\n\r"
+    },
+    {
+        "Blacksteel Battlegear",
+        19,
+        { 283, 283, 284, 284, 285, 286, 287, 288, 289, 290, 292, 293, 294, 294, 295, 296, 296, 297, 291 },
+        "The might of the warrior's spirit, past, present, and future, hums through your body.\n\r",
+        "The harmony of the warrior's spirit has left you.\n\r"
+    },
+    {
+        "Mother of All Dragons' Trophies",
+        7,
+        { 22323, 22330, 22331, 22332, 22334, 22335, 22336, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 },
+        "You feel the might of the ancient dragonkind surge through your body.\r\n",
+        "The might of the ancient dragonkind has left you.\r\n"
+    },
+    {
+        "Berkthgar's Rage",
+        1,
+        {27977, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 },
+        NULL,
+        NULL
+    },
+    {
+        "\n",
+        0,
+        { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 },
+        "\n",
+        "\n"
+    }
+};
 
 void add_set_stats(char_data *ch, obj_data *obj, int flag, int pos) {
 	// obj has just been worn
