@@ -1531,113 +1531,112 @@ int do_score(struct char_data *ch, char *argument, int cmd)
       }
    }
 
-   if((aff = ch->affected))
-   {
+  if ((aff = ch->affected)) {
 
-      for( ; aff; aff = aff->next) {
+    for (; aff; aff = aff->next) {
 
-         if(aff->bitvector)
-           affect_found[aff->bitvector] = true;
-         if(aff->type == SKILL_SNEAK)
-            continue;
-         scratch = frills[level];
-         modifyOutput = FALSE;
+      if (aff->bitvector)
+        affect_found[aff->bitvector] = true;
+      if (aff->type == SKILL_SNEAK)
+        continue;
+      scratch = frills[level];
+      modifyOutput = FALSE;
 
-         // figure out the name of the affect (if any)
-         char * aff_name = get_skill_name(aff->type);
+      // figure out the name of the affect (if any)
+      char *aff_name = get_skill_name(aff->type);
 //	 if (aff_name)
-   //      if (*aff_name && !str_cmp(aff_name, "fly")) flying = 1;
-			switch (aff->type) {
-			case BASE_SETS + SET_RAGER:
-				     if (aff->location == 0) {
-					aff_name = "Battlerager's Fury";
-	     			}
-				break;
-			case BASE_SETS + SET_RAGER2:
-				     if (aff->location == 0) {
-					aff_name = "Battlerager's Fury";
-	     			}
-				break;
-			case BASE_SETS + SET_MOSS:
-				if (aff->location == 0)
-					aff_name = "infravision";
-				break;
-			case FUCK_CANTQUIT:
-				aff_name = "CANT_QUIT";
-				break;
-			case FUCK_PTHIEF:
-				aff_name = "DIRTY_THIEF/CANT_QUIT";
-				break;
-			case FUCK_GTHIEF:
-				aff_name = "GOLD_THIEF/CANT_QUIT";
-				break;
-			case SKILL_HARM_TOUCH:
-				aff_name = "harmtouch reuse timer";
-				break;
-			case SKILL_LAY_HANDS:
-				aff_name = "layhands reuse timer";
-				break;
-			case SKILL_QUIVERING_PALM:
-				aff_name = "quiver reuse timer";
-				break;
-			case SKILL_BLOOD_FURY:
-				aff_name = "blood fury reuse timer";
-				break;
-			case SKILL_FEROCITY_TIMER:
-				aff_name = "ferocity reuse timer";
-				break;
-			case SKILL_DECEIT_TIMER:
-				aff_name = "deceit reuse timer";
-				break;
-			case SKILL_TACTICS_TIMER:
-				aff_name = "tactics reuse timer";
-				break;
-			case SKILL_CLANAREA_CLAIM:
-				aff_name = "clanarea claim timer";
-				break;
-			case SKILL_CLANAREA_CHALLENGE:
-				aff_name = "clanarea challenge timer";
-				break;
-			case SKILL_CRAZED_ASSAULT:
-				if (strcmp(apply_types[(int) aff->location], "HITROLL"))
-					aff_name = "crazed assault reuse timer";
-				break;
-			case SPELL_IMMUNITY:
-				aff_name = "immunity";
-				modifyOutput = TRUE;
-				break;
-			case SKILL_NAT_SELECT:
-				aff_name = "natural selection";
-				modifyOutput = TRUE;
-				break;
-			case SKILL_BREW_TIMER:
-				aff_name = "brew timer";
-				break;
-			case SKILL_SCRIBE_TIMER:
-				aff_name = "scribe timer";
-				break;
-			case CONC_LOSS_FIXER:
-				aff_name = 0; // We don't want this showing up in score
-				break;
-			default:
-				break;
-			}
-         if(!aff_name) // not one we want displayed
-           continue;
-
-         sprintf(buf, "|%c| Affected by %-25s %s Modifier %-13s   |%c|\n\r",
-               scratch, aff_name,
-               ((IS_AFFECTED(ch, AFF_DETECT_MAGIC) && aff->duration < 3) ?
-                          "$2(fading)$7" : "        "),
-                modifyOutput ? affected_by_spell(ch, SKILL_NAT_SELECT) ? race_info[aff->modifier].singular_name :
-		affected_by_spell(ch, SPELL_IMMUNITY) ? spells[aff->modifier] : apply_types[(int)aff->location] :
-		apply_types[(int)aff->location], scratch);
-         send_to_char(buf, ch);
-         found = TRUE;
-         if(++level == 4)
-            level = 0;
+      //      if (*aff_name && !str_cmp(aff_name, "fly")) flying = 1;
+      switch (aff->type) {
+      case BASE_SETS + SET_RAGER:
+        if (aff->location == 0) {
+          aff_name = "Battlerager's Fury";
+        }
+        break;
+      case BASE_SETS + SET_RAGER2:
+        if (aff->location == 0) {
+          aff_name = "Battlerager's Fury";
+        }
+        break;
+      case BASE_SETS + SET_MOSS:
+        if (aff->location == 0)
+          aff_name = "infravision";
+        break;
+      case FUCK_CANTQUIT:
+        aff_name = "CANT_QUIT";
+        break;
+      case FUCK_PTHIEF:
+        aff_name = "DIRTY_THIEF/CANT_QUIT";
+        break;
+      case FUCK_GTHIEF:
+        aff_name = "GOLD_THIEF/CANT_QUIT";
+        break;
+      case SKILL_HARM_TOUCH:
+        aff_name = "harmtouch reuse timer";
+        break;
+      case SKILL_LAY_HANDS:
+        aff_name = "layhands reuse timer";
+        break;
+      case SKILL_QUIVERING_PALM:
+        aff_name = "quiver reuse timer";
+        break;
+      case SKILL_BLOOD_FURY:
+        aff_name = "blood fury reuse timer";
+        break;
+      case SKILL_FEROCITY_TIMER:
+        aff_name = "ferocity reuse timer";
+        break;
+      case SKILL_DECEIT_TIMER:
+        aff_name = "deceit reuse timer";
+        break;
+      case SKILL_TACTICS_TIMER:
+        aff_name = "tactics reuse timer";
+        break;
+      case SKILL_CLANAREA_CLAIM:
+        aff_name = "clanarea claim timer";
+        break;
+      case SKILL_CLANAREA_CHALLENGE:
+        aff_name = "clanarea challenge timer";
+        break;
+      case SKILL_CRAZED_ASSAULT:
+        if (strcmp(apply_types[(int) aff->location], "HITROLL"))
+          aff_name = "crazed assault reuse timer";
+        break;
+      case SPELL_IMMUNITY:
+        aff_name = "immunity";
+        modifyOutput = TRUE;
+        break;
+      case SKILL_NAT_SELECT:
+        aff_name = "natural selection";
+        modifyOutput = TRUE;
+        break;
+      case SKILL_BREW_TIMER:
+        aff_name = "brew timer";
+        break;
+      case SKILL_SCRIBE_TIMER:
+        aff_name = "scribe timer";
+        break;
+      case CONC_LOSS_FIXER:
+        aff_name = 0; // We don't want this showing up in score
+        break;
+      default:
+        break;
       }
-   }
+      if (!aff_name) // not one we want displayed
+        continue;
+
+      sprintf(buf, "|%c| Affected by %-25s %s Modifier %-13s   |%c|\n\r", scratch, aff_name,
+          ((IS_AFFECTED(ch, AFF_DETECT_MAGIC) && aff->duration < 3) ? "$2(fading)$7" : "        "),
+          modifyOutput ?
+              affected_by_spell(ch, SKILL_NAT_SELECT) ? race_info[aff->modifier].singular_name :
+              affected_by_spell(ch, SPELL_IMMUNITY) ? spells[aff->modifier] : apply_types[(int) aff->location]
+              :
+              apply_types[(int) aff->location], scratch);
+      send_to_char(buf, ch);
+      found = TRUE;
+      if (++level == 4)
+        level = 0;
+    }
+  }
  /*  if (flying == 0 && IS_AFFECTED(ch, AFF_FLYING)) {
      scratch = frills[level];
      sprintf(buf, "|%c| Affected by fly                                Modifier NONE            |%c|\n\r",
