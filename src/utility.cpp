@@ -1571,30 +1571,29 @@ int do_beep(struct char_data *ch, char *argument, int cmd)
 
 
 // if a skill has a valid name, return it, else NULL
-char * get_skill_name(int skillnum)
-{
-    extern char *skills[];
-    extern char *spells[];
-    extern char *songs[];
-    extern char *ki[];
-    extern char *innate_skills[];
-    extern char *reserved[];
+char* get_skill_name(int skillnum) {
+  extern char *skills[];
+  extern char *spells[];
+  extern char *songs[];
+  extern char *ki[];
+  extern char *innate_skills[];
+  extern char *reserved[];
 
-    if(skillnum >= SKILL_SONG_BASE && skillnum <= SKILL_SONG_MAX)
-       return songs[skillnum-SKILL_SONG_BASE];
-    else if(skillnum >= SKILL_BASE && skillnum <= SKILL_MAX)
-       return skills[skillnum-SKILL_BASE];
-    else if(skillnum >= KI_OFFSET && skillnum <= (KI_OFFSET+MAX_KI_LIST))
-       return ki[skillnum-KI_OFFSET];
-    else if(skillnum >= 0 && skillnum <= MAX_SPL_LIST)
-       return spells[skillnum-1];
-    else if(skillnum >= SKILL_INNATE_BASE && skillnum <= SKILL_INNATE_MAX)
-       return innate_skills[skillnum-SKILL_INNATE_BASE];
-    else if (skillnum >= BASE_SETS && skillnum <= SET_MAX)
-	return set_list[skillnum-BASE_SETS].SetName;
-    else if (skillnum >= RESERVED_BASE && skillnum <= RESERVED_MAX)
-	return reserved[skillnum-RESERVED_BASE];
-   return NULL;      
+  if (skillnum >= SKILL_SONG_BASE && skillnum <= SKILL_SONG_MAX)
+    return songs[skillnum - SKILL_SONG_BASE];
+  else if (skillnum >= SKILL_BASE && skillnum <= SKILL_MAX)
+    return skills[skillnum - SKILL_BASE];
+  else if (skillnum >= KI_OFFSET && skillnum <= (KI_OFFSET + MAX_KI_LIST))
+    return ki[skillnum - KI_OFFSET];
+  else if (skillnum >= 0 && skillnum <= MAX_SPL_LIST)
+    return spells[skillnum - 1];
+  else if (skillnum >= SKILL_INNATE_BASE && skillnum <= SKILL_INNATE_MAX)
+    return innate_skills[skillnum - SKILL_INNATE_BASE];
+  else if (skillnum >= BASE_SETS && skillnum <= SET_MAX)
+    return set_list[skillnum - BASE_SETS].SetName;
+  else if (skillnum >= RESERVED_BASE && skillnum <= RESERVED_MAX)
+    return reserved[skillnum - RESERVED_BASE];
+  return NULL;
 }
 
 void double_dollars(char * destination, char * source)
