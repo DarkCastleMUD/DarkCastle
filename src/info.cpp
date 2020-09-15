@@ -1624,13 +1624,18 @@ int do_score(struct char_data *ch, char *argument, int cmd)
       if (!aff_name) // not one we want displayed
         continue;
 
-      sprintf(buf, "|%c| Affected by %-25s %s Modifier %-13s   |%c|\n\r", scratch, aff_name,
-          ((IS_AFFECTED(ch, AFF_DETECT_MAGIC) && aff->duration < 3) ? "$2(fading)$7" : "        "),
-          modifyOutput ?
-              affected_by_spell(ch, SKILL_NAT_SELECT) ? race_info[aff->modifier].singular_name :
-              affected_by_spell(ch, SPELL_IMMUNITY) ? spells[aff->modifier] : apply_types[(int) aff->location]
-              :
-              apply_types[(int) aff->location], scratch);
+      sprintf(buf, "|%c| Affected by %-25s %s Modifier %-13s   |%c|\n\r",
+      scratch,
+      aff_name,
+      ((IS_AFFECTED(ch, AFF_DETECT_MAGIC) && aff->duration < 3) ? "$2(fading)$7" : "        "),
+      modifyOutput ?
+      affected_by_spell(ch, SKILL_NAT_SELECT) ?
+      race_info[aff->modifier].singular_name :
+      affected_by_spell(ch, SPELL_IMMUNITY) ?
+      spells[aff->modifier] :
+      apply_types[(int) aff->location] :
+      apply_types[(int) aff->location], scratch);
+      
       send_to_char(buf, ch);
       found = TRUE;
       if (++level == 4)
