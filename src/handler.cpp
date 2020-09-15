@@ -427,14 +427,14 @@ const struct set_data set_list[] = {
         "Your blood returns to its normal temperature as you remove your battlerager's gear.\r\n"
     },
     {
-        "Veteran's Field Plate Armour",
+        "Veteran's Field Plate Set",
         9,
         { 21719, 21720, 21721, 21722, 21723, 21724, 21725, 21726, 21727, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 },
         "There is an audible *click* as the field plate locks into its optimal assembly.\r\n",
         "There is a soft *click* as you remove the field plate from its optimal positioning.\r\n"
     },
     {
-        "Mother of All Dragons' Trophies",
+        "Mother of All Dragons",
         7,
         { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 },
         "You feel the might of the ancient dragonkind surge through your body.\r\n",
@@ -497,7 +497,7 @@ const struct set_data set_list[] = {
         "The harmony of the warrior's spirit has left you.\n\r"
     },
     {
-        "Mother of All Dragons' Trophies",
+        "Mother of All Dragons",
         7,
         { 22323, 22330, 22331, 22332, 22334, 22335, 22336, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 },
         "You feel the might of the ancient dragonkind surge through your body.\r\n",
