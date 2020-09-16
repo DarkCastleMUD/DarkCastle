@@ -1978,6 +1978,7 @@ struct class_skill_defines m_skills[] = { // mage skills
 {    "teleport",            SPELL_TELEPORT,          38,    100,  0,   DEXWIS },
 {    "stoneskin",           SPELL_STONE_SKIN,        39,     70,  0,   CONWIS },
 {    "meteor swarm",        SPELL_METEOR_SWARM,      40,    100,  0,   STRCON },
+{    "life leech",          SPELL_LIFE_LEECH,        41,    100,  0,   CONWIS },
 {    "word of recall",      SPELL_WORD_OF_RECALL,    42,     90,  0,   DEXWIS },
 {    "create golem",        SPELL_CREATE_GOLEM,      43,    100,  0,   STRCON },
 {    "release golem",       SPELL_RELEASE_GOLEM,     43,    100,  0,   STRCON },
