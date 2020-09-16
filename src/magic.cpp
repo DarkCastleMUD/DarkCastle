@@ -990,47 +990,44 @@ int spell_earthquake(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
 
 /* LIFE LEECH */
 
-int spell_life_leech(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
-{
-  int dam,retval = eSUCCESS;
-  int weap_spell = obj?WIELD:0;
+int spell_life_leech(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill) {
+  int dam, retval = eSUCCESS;
+  int weap_spell = obj ? WIELD : 0;
   CHAR_DATA *tmp_victim, *temp;
 
-  if(IS_SET(world[ch->in_room].room_flags, SAFE)) 
+  if (IS_SET(world[ch->in_room].room_flags, SAFE))
     return eFAILURE;
-/*  double o = 0.0, m = 0.0, avglevel = 0.0;
-  for (tmp_victim = world[ch->in_room].people;tmp_victim;tmp_victim = tmp_victim->next_in_room)
-    if (!ARE_GROUPED(ch, tmp_victim) && ch != tmp_victim)
-     { o++; m++; avglevel *= o-1; avglevel += GET_LEVEL(tmp_victim); avglevel /= o;}
-    else m++;
-  m--; // don't count player
-  avglevel -= (double)GET_LEVEL(ch);
-  double powmod = 0.2;
-  powmod -= (avglevel*0.001);
-  powmod -= (has_skill(ch, SPELL_LIFE_LEECH) * 0.001);
-  int max = (int)(o * 50 * ( m / pow(m, powmod*m)));
-  max += number(-10,10);
-*/
-  for(tmp_victim = world[ch->in_room].people;tmp_victim && tmp_victim != (char_data *)0x95959595;tmp_victim = temp)
-  {
-	 temp = tmp_victim->next_in_room;
-	 if ( (ch->in_room == tmp_victim->in_room) && (ch != tmp_victim) &&
-		(!ARE_GROUPED(ch,tmp_victim)) && can_be_attacked(ch, tmp_victim))
-	{
+  /*  double o = 0.0, m = 0.0, avglevel = 0.0;
+   for (tmp_victim = world[ch->in_room].people;tmp_victim;tmp_victim = tmp_victim->next_in_room)
+   if (!ARE_GROUPED(ch, tmp_victim) && ch != tmp_victim)
+   { o++; m++; avglevel *= o-1; avglevel += GET_LEVEL(tmp_victim); avglevel /= o;}
+   else m++;
+   m--; // don't count player
+   avglevel -= (double)GET_LEVEL(ch);
+   double powmod = 0.2;
+   powmod -= (avglevel*0.001);
+   powmod -= (has_skill(ch, SPELL_LIFE_LEECH) * 0.001);
+   int max = (int)(o * 50 * ( m / pow(m, powmod*m)));
+   max += number(-10,10);
+   */
+  for (tmp_victim = world[ch->in_room].people; tmp_victim && tmp_victim != (char_data*) 0x95959595; tmp_victim = temp) {
+    temp = tmp_victim->next_in_room;
+    if ((ch->in_room == tmp_victim->in_room) && (ch != tmp_victim) && (!ARE_GROUPED(ch, tmp_victim)) && can_be_attacked(ch, tmp_victim)) {
 //		dam = max / o;
-                dam = 150;
-		int adam = dam_percent(skill, dam);
-                if (IS_SET(tmp_victim->immune, ISR_POISON))
-		  adam = 0;
+      dam = 150;
+      int adam = dam_percent(skill, dam);
+      if (IS_SET(tmp_victim->immune, ISR_POISON))
+        adam = 0;
 
-		 if (GET_HIT(tmp_victim) < adam)
-		  GET_HIT(ch) += (int)(GET_HIT(tmp_victim) * 0.3);
-		 else GET_HIT(ch) += (int)(adam * 0.3);
+      if (GET_HIT(tmp_victim) < adam)
+        GET_HIT(ch) += (int) (GET_HIT(tmp_victim) * 0.3);
+      else
+        GET_HIT(ch) += (int) (adam * 0.3);
 
-		 if (GET_HIT(ch) > GET_MAX_HIT(ch))
-		  GET_HIT(ch) = GET_MAX_HIT(ch);
-		 retval &= damage (ch, tmp_victim, dam,TYPE_POISON, SPELL_LIFE_LEECH, weap_spell);
-	}
+      if (GET_HIT(ch) > GET_MAX_HIT(ch))
+        GET_HIT(ch) = GET_MAX_HIT(ch);
+      retval &= damage(ch, tmp_victim, dam, TYPE_POISON, SPELL_LIFE_LEECH, weap_spell);
+    }
   }
   return retval;
 }
