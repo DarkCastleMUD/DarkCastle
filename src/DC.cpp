@@ -10,6 +10,12 @@
 #include "room.h" // NOWHERE
 #include "db.h"
 
+string DC::version = VERSION;
+
+DC::DC() {
+
+}
+
 DC& DC::instance()
 {
 	static DC DC_instance { /* ... */};
@@ -50,7 +56,7 @@ void DC::handleShooting(void) {
 
 string DC::getVersion(void)
 {
-  return string(VERSION);
+  return version;
 }
 
 string DC::getBuildTime(void)
