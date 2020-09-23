@@ -511,6 +511,20 @@ const struct set_data set_list[] = {
         NULL
     },
     {
+        "The Naturalists Trappings",
+        17,
+        { 331, 332, 333, 334, 335, 336, 337, 338, 339, 340, 341, 342, 343, 343, 344, 345, 346, 347, 347 },
+        "You feel the spirit of the wolf upon you.\r\n",
+        "The spirit of the wolf leaves you.\r\n"
+    },
+    {
+        "Troubadour's Finery",
+        19,
+        { 323, 323, 314, 314, 315, 316, 317, 318, 319, 320, 321, 322, 328, 328, 324, 325, 325, 326, 327 },
+        "You feel the need to sing, you are a STAR!\r\n",
+        "Your desire to sing like a star has faded.\r\n"
+    },
+    {
         "\n",
         0,
         { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 },
@@ -519,250 +533,274 @@ const struct set_data set_list[] = {
     }
 };
 
-void add_set_stats(char_data *ch, obj_data *obj, int flag, int pos) {
-	// obj has just been worn
-	int obj_vnum = obj_index[obj->item_number].virt;
-	int i;
-	int z = 0, y;
-	// Quadruply nested for. Annoying, but it's gotta be done.
-	// I'm sure "quadruply" is a word.
-	for (; *(set_list[z].SetName) != '\n'; z++)
-		for (y = 0; y < 19 && set_list[z].vnum[y] != -1; y++)
-			if (set_list[z].vnum[y] == obj_vnum) {  // Aye, 'tis part of a set.
-				if ((obj_vnum == 4818 || obj_vnum == 4819) && pos == WEAR_HANDS)
-					continue;
-				for (y = 0; y < 19 && set_list[z].vnum[y] != -1; y++) {
-					if (set_list[z].vnum[y] == 17326 && GET_CLASS(ch) != CLASS_BARD)
-						continue;
-					if (set_list[z].vnum[y] == 17325 && GET_CLASS(ch) != CLASS_MONK)
-						continue;
-					bool found = FALSE, doublea = FALSE;
-					for (i = 0; i < MAX_WEAR; i++) {
-						if (ch->equipment[i] && obj_index[ch->equipment[i]->item_number].virt == set_list[z].vnum[y]) {
-							if (y > 0 && !doublea && set_list[z].vnum[y] == set_list[z].vnum[y - 1]) {
-								doublea = TRUE;
-								continue;
-							}
-							found = TRUE;
-							break;
-						}
-					}
-					if (!found) {
-						return;
-					}  // Nope.
-				}
-				struct affected_type af;
-				af.duration = -1;
-				af.bitvector = -1;
-				af.type = BASE_SETS + z;
-				af.location = APPLY_NONE;
-				af.modifier = 0;
-				// By gawd, they just completed the set.
-				if (affected_by_spell(ch, BASE_SETS + z))
-					return;
-				if (!flag && set_list[z].Set_Wear_Message != NULL)
-					send_to_char(set_list[z].Set_Wear_Message, ch);
-				switch (z) {
-				case SET_SAIYAN: // (aka Ascetic's Focus)
-					af.bitvector = AFF_HASTE;
-					affect_to_char(ch, &af);
-					break;
-				case SET_VESTMENTS:
-					af.location = APPLY_MANA;
-					af.modifier = 75;
-					affect_to_char(ch, &af);
-					break;
-				case SET_HUNTERS:
-					af.location = APPLY_HITROLL;
-					af.modifier = 5;
-					affect_to_char(ch, &af);
-					af.location = APPLY_MOVE;
-					af.modifier = 40;
-					affect_to_char(ch, &af);
-					break;
-				case SET_FERAL:
-					af.location = APPLY_HITROLL;
-					af.modifier = 2;
-					affect_to_char(ch, &af);
-					af.location = APPLY_HIT;
-					af.modifier = 10;
-					affect_to_char(ch, &af);
-					af.location = APPLY_DAMROLL;
-					af.modifier = 1;
-					affect_to_char(ch, &af);
-					break;
-				case SET_CAPTAINS:
-					af.location = APPLY_HIT;
-					af.modifier = 75;
-					affect_to_char(ch, &af);
-					break;
-				case SET_CELEBRANTS:
-					af.location = APPLY_KI;
-					af.modifier = 8;
-					affect_to_char(ch, &af);
-					break;
-				case SET_RAGER:
-					af.location = 0;
-					af.modifier = 0;
-					af.bitvector = AFF_STABILITY;
-					affect_to_char(ch, &af);
-					af.location = SKILL_BLOOD_FURY * 1000;
-					af.modifier = 5;
-					af.bitvector = -1;
-					affect_to_char(ch, &af);
-					break;
-				case SET_RAGER2:
-					af.location = 0;
-					af.location = SKILL_BLOOD_FURY * 1000;
-					af.modifier = 5;
-					af.bitvector = -1;
-					affect_to_char(ch, &af);
-					break;
-				case SET_FIELDPLATE:
-					af.location = APPLY_HIT;
-					af.modifier = 100;
-					affect_to_char(ch, &af);
-					af.location = APPLY_HIT_N_DAM;
-					af.modifier = 6;
-					affect_to_char(ch, &af);
-					af.location = APPLY_AC;
-					af.modifier = -40;
-					affect_to_char(ch, &af);
-					break;
-				case SET_MOAD:
-					af.location = APPLY_HIT_N_DAM;
-					af.modifier = 4;
-					affect_to_char(ch, &af);
-					af.location = APPLY_SAVING_FIRE;
-					af.modifier = 15;
-					affect_to_char(ch, &af);
-					af.location = APPLY_MELEE_DAMAGE;
-					af.modifier = 5;
-					affect_to_char(ch, &af);
-					af.location = APPLY_SONG_DAMAGE;
-					af.modifier = 5;
-					affect_to_char(ch, &af);
-					break;
-				case SET_MOAD2:
-					af.location = APPLY_HIT_N_DAM;
-					af.modifier = 4;
-					affect_to_char(ch, &af);
-					af.location = APPLY_SAVING_FIRE;
-					af.modifier = 15;
-					affect_to_char(ch, &af);
-					af.location = APPLY_MELEE_DAMAGE;
-					af.modifier = 5;
-					affect_to_char(ch, &af);
-					af.location = APPLY_SONG_DAMAGE;
-					af.modifier = 5;
-					affect_to_char(ch, &af);
-					break;
-				case SET_WHITECRYSTAL:
-					af.location = APPLY_HITROLL;
-					af.modifier = 10;
-					affect_to_char(ch, &af);
-					af.location = APPLY_HIT;
-					af.modifier = 50;
-					affect_to_char(ch, &af);
-					af.location = APPLY_MANA;
-					af.modifier = 50;
-					affect_to_char(ch, &af);
-					af.location = APPLY_SAVING_MAGIC;
-					af.modifier = 8;
-					affect_to_char(ch, &af);
-					break;
-				case SET_BLACKCRYSTAL:
-					af.location = APPLY_HIT_N_DAM;
-					af.modifier = 4;
-					affect_to_char(ch, &af);
-					af.location = APPLY_MANA;
-					af.modifier = 80;
-					affect_to_char(ch, &af);
-					af.location = APPLY_SAVING_ACID;
-					af.modifier = 8;
-					affect_to_char(ch, &af);
-					af.location = APPLY_SAVING_ENERGY;
-					af.modifier = 8;
-					affect_to_char(ch, &af);
-					break;
-				case SET_AQUA:
-					af.bitvector = AFF_WATER_BREATHING;
-					affect_to_char(ch, &af);
-					af.bitvector = -1;
-					af.location = APPLY_HIT_N_DAM;
-					af.modifier = 2;
-					affect_to_char(ch, &af);
-					break;
-				case SET_APPARATUS:
-					af.bitvector = AFF_INVISIBLE;
-					affect_to_char(ch, &af);
-					af.bitvector = -1;
-					af.location = APPLY_HP_REGEN;
-					af.modifier = 10;
-					affect_to_char(ch, &af);
-					break;
-				case SET_TITANIC:
-					af.location = APPLY_STR;
-					af.modifier = 3;
-					affect_to_char(ch, &af);
-					af.location = APPLY_INT;
-					affect_to_char(ch, &af);
-					af.location = APPLY_HIT;
-					af.modifier = 25;
-					affect_to_char(ch, &af);
-					af.location = APPLY_MANA;
-					affect_to_char(ch, &af);
-					af.location = APPLY_MOVE;
-					affect_to_char(ch, &af);
-					af.location = APPLY_CHAR_HEIGHT;
-					af.modifier = 30;
-					affect_to_char(ch, &af);
-					af.location = APPLY_CHAR_WEIGHT;
-					af.modifier = 60;
-					affect_to_char(ch, &af);
-					break;
-				case SET_MOSS:
-					af.bitvector = AFF_INFRARED;
-					affect_to_char(ch, &af);
-					af.bitvector = -1;
-					af.location = APPLY_HIT;
-					af.modifier = 25;
-					affect_to_char(ch, &af);
-					af.location = APPLY_KI;
-					af.modifier = 5;
-					affect_to_char(ch, &af);
-					af.location = APPLY_MOVE;
-					af.modifier = 50;
-					affect_to_char(ch, &af);
-					af.location = APPLY_HIT_N_DAM;
-					af.modifier = 5;
-					affect_to_char(ch, &af);
-					af.location = APPLY_WIS;
-					af.modifier = 3;
-					affect_to_char(ch, &af);
-					break;
-				case SET_BLACKSTEEL:
-					af.bitvector = AFF_FLYING;
-					af.location = 0;
-					af.modifier = 0;
-					affect_to_char(ch, &af);
+void add_set_stats(char_data *ch, obj_data *obj, int flag, int pos)
+{
+  // obj has just been worn
+  int obj_vnum = obj_index[obj->item_number].virt;
+  int i;
+  int z = 0, y;
+  // Quadruple nested for. Annoying, but it's gotta be done.
 
-					af.bitvector = -1;
-					af.location = APPLY_ARMOR;
-					af.modifier = -100;
-					affect_to_char(ch, &af);
+  for (; *(set_list[z].SetName) != '\n'; z++)
+    for (y = 0; y < 19 && set_list[z].vnum[y] != -1; y++)
+      if (set_list[z].vnum[y] == obj_vnum)
+      {  // Aye, 'tis part of a set.
+        if ((obj_vnum == 4818 || obj_vnum == 4819) && pos == WEAR_HANDS)
+          continue;
+        for (y = 0; y < 19 && set_list[z].vnum[y] != -1; y++)
+        {
+          if (set_list[z].vnum[y] == 17326 && GET_CLASS(ch) != CLASS_BARD)
+            continue;
+          if (set_list[z].vnum[y] == 17325 && GET_CLASS(ch) != CLASS_MONK)
+            continue;
+          bool found = FALSE, doublea = FALSE;
+          for (i = 0; i < MAX_WEAR; i++)
+          {
+            if (ch->equipment[i] && obj_index[ch->equipment[i]->item_number].virt == set_list[z].vnum[y])
+            {
+              if (y > 0 && !doublea && set_list[z].vnum[y] == set_list[z].vnum[y - 1])
+              {
+                doublea = TRUE;
+                continue;
+              }
+              found = TRUE;
+              break;
+            }
+          }
+          if (!found)
+          {
+            return;
+          }  // Nope.
+        }
+        struct affected_type af;
+        af.duration = -1;
+        af.bitvector = -1;
+        af.type = BASE_SETS + z;
+        af.location = APPLY_NONE;
+        af.modifier = 0;
+        // By gawd, they just completed the set.
+        if (affected_by_spell(ch, BASE_SETS + z))
+          return;
+        if (!flag && set_list[z].Set_Wear_Message != NULL)
+          send_to_char(set_list[z].Set_Wear_Message, ch);
+        switch (z) {
+        case SET_SAIYAN: // (aka Ascetic's Focus)
+          af.bitvector = AFF_HASTE;
+          affect_to_char(ch, &af);
+          break;
+        case SET_VESTMENTS:
+          af.location = APPLY_MANA;
+          af.modifier = 75;
+          affect_to_char(ch, &af);
+          break;
+        case SET_HUNTERS:
+          af.location = APPLY_HITROLL;
+          af.modifier = 5;
+          affect_to_char(ch, &af);
+          af.location = APPLY_MOVE;
+          af.modifier = 40;
+          affect_to_char(ch, &af);
+          break;
+        case SET_FERAL:
+          af.location = APPLY_HITROLL;
+          af.modifier = 2;
+          affect_to_char(ch, &af);
+          af.location = APPLY_HIT;
+          af.modifier = 10;
+          affect_to_char(ch, &af);
+          af.location = APPLY_DAMROLL;
+          af.modifier = 1;
+          affect_to_char(ch, &af);
+          break;
+        case SET_CAPTAINS:
+          af.location = APPLY_HIT;
+          af.modifier = 75;
+          affect_to_char(ch, &af);
+          break;
+        case SET_CELEBRANTS:
+          af.location = APPLY_KI;
+          af.modifier = 8;
+          affect_to_char(ch, &af);
+          break;
+        case SET_RAGER:
+          af.location = 0;
+          af.modifier = 0;
+          af.bitvector = AFF_STABILITY;
+          affect_to_char(ch, &af);
+          af.location = SKILL_BLOOD_FURY * 1000;
+          af.modifier = 5;
+          af.bitvector = -1;
+          affect_to_char(ch, &af);
+          break;
+        case SET_RAGER2:
+          af.location = 0;
+          af.location = SKILL_BLOOD_FURY * 1000;
+          af.modifier = 5;
+          af.bitvector = -1;
+          affect_to_char(ch, &af);
+          break;
+        case SET_FIELDPLATE:
+          af.location = APPLY_HIT;
+          af.modifier = 100;
+          affect_to_char(ch, &af);
+          af.location = APPLY_HIT_N_DAM;
+          af.modifier = 6;
+          affect_to_char(ch, &af);
+          af.location = APPLY_AC;
+          af.modifier = -40;
+          affect_to_char(ch, &af);
+          break;
+        case SET_MOAD:
+          af.location = APPLY_HIT_N_DAM;
+          af.modifier = 4;
+          affect_to_char(ch, &af);
+          af.location = APPLY_SAVING_FIRE;
+          af.modifier = 15;
+          affect_to_char(ch, &af);
+          af.location = APPLY_MELEE_DAMAGE;
+          af.modifier = 5;
+          affect_to_char(ch, &af);
+          af.location = APPLY_SONG_DAMAGE;
+          af.modifier = 5;
+          affect_to_char(ch, &af);
+          break;
+        case SET_MOAD2:
+          af.location = APPLY_HIT_N_DAM;
+          af.modifier = 4;
+          affect_to_char(ch, &af);
+          af.location = APPLY_SAVING_FIRE;
+          af.modifier = 15;
+          affect_to_char(ch, &af);
+          af.location = APPLY_MELEE_DAMAGE;
+          af.modifier = 5;
+          affect_to_char(ch, &af);
+          af.location = APPLY_SONG_DAMAGE;
+          af.modifier = 5;
+          affect_to_char(ch, &af);
+          break;
+        case SET_WHITECRYSTAL:
+          af.location = APPLY_HITROLL;
+          af.modifier = 10;
+          affect_to_char(ch, &af);
+          af.location = APPLY_HIT;
+          af.modifier = 50;
+          affect_to_char(ch, &af);
+          af.location = APPLY_MANA;
+          af.modifier = 50;
+          affect_to_char(ch, &af);
+          af.location = APPLY_SAVING_MAGIC;
+          af.modifier = 8;
+          affect_to_char(ch, &af);
+          break;
+        case SET_BLACKCRYSTAL:
+          af.location = APPLY_HIT_N_DAM;
+          af.modifier = 4;
+          affect_to_char(ch, &af);
+          af.location = APPLY_MANA;
+          af.modifier = 80;
+          affect_to_char(ch, &af);
+          af.location = APPLY_SAVING_ACID;
+          af.modifier = 8;
+          affect_to_char(ch, &af);
+          af.location = APPLY_SAVING_ENERGY;
+          af.modifier = 8;
+          affect_to_char(ch, &af);
+          break;
+        case SET_AQUA:
+          af.bitvector = AFF_WATER_BREATHING;
+          affect_to_char(ch, &af);
+          af.bitvector = -1;
+          af.location = APPLY_HIT_N_DAM;
+          af.modifier = 2;
+          affect_to_char(ch, &af);
+          break;
+        case SET_APPARATUS:
+          af.bitvector = AFF_INVISIBLE;
+          affect_to_char(ch, &af);
+          af.bitvector = -1;
+          af.location = APPLY_HP_REGEN;
+          af.modifier = 10;
+          affect_to_char(ch, &af);
+          break;
+        case SET_TITANIC:
+          af.location = APPLY_STR;
+          af.modifier = 3;
+          affect_to_char(ch, &af);
+          af.location = APPLY_INT;
+          affect_to_char(ch, &af);
+          af.location = APPLY_HIT;
+          af.modifier = 25;
+          affect_to_char(ch, &af);
+          af.location = APPLY_MANA;
+          affect_to_char(ch, &af);
+          af.location = APPLY_MOVE;
+          affect_to_char(ch, &af);
+          af.location = APPLY_CHAR_HEIGHT;
+          af.modifier = 30;
+          affect_to_char(ch, &af);
+          af.location = APPLY_CHAR_WEIGHT;
+          af.modifier = 60;
+          affect_to_char(ch, &af);
+          break;
+        case SET_MOSS:
+          af.bitvector = AFF_INFRARED;
+          affect_to_char(ch, &af);
+          af.bitvector = -1;
+          af.location = APPLY_HIT;
+          af.modifier = 25;
+          affect_to_char(ch, &af);
+          af.location = APPLY_KI;
+          af.modifier = 5;
+          affect_to_char(ch, &af);
+          af.location = APPLY_MOVE;
+          af.modifier = 50;
+          affect_to_char(ch, &af);
+          af.location = APPLY_HIT_N_DAM;
+          af.modifier = 5;
+          affect_to_char(ch, &af);
+          af.location = APPLY_WIS;
+          af.modifier = 3;
+          affect_to_char(ch, &af);
+          break;
+        case SET_BLACKSTEEL:
+          af.bitvector = AFF_FLYING;
+          af.location = 0;
+          af.modifier = 0;
+          affect_to_char(ch, &af);
 
-					af.bitvector = -1;
-					af.location = APPLY_SAVES;
-					af.modifier = 25;
-					affect_to_char(ch, &af);
-					break;
-				default:
-					send_to_char("Tough luck, you completed an unimplemented set. Report what you just wore, eh?\r\n", ch);
-					break;
-				}
-				break;
-			}
+          af.bitvector = -1;
+          af.location = APPLY_ARMOR;
+          af.modifier = -100;
+          affect_to_char(ch, &af);
+
+          af.bitvector = -1;
+          af.location = APPLY_SAVES;
+          af.modifier = 25;
+          affect_to_char(ch, &af);
+          break;
+
+        case SET_TRAPPINGS:
+          af.bitvector = AFF_HASTE;
+          affect_to_char(ch, &af);
+
+          af.bitvector = -1;
+          af.location = APPLY_MANA_REGEN;
+          af.modifier = 15;
+          affect_to_char(ch, &af);
+          break;
+
+        case SET_FINERY:
+          af.location = APPLY_KI_REGEN;
+          af.modifier = 5;
+          affect_to_char(ch, &af);
+          break;
+
+        default:
+          send_to_char("Tough luck, you completed an unimplemented set. Report what you just wore, eh?\r\n", ch);
+          break;
+        }
+        break;
+      }
 }
 
 void remove_set_stats(char_data *ch, obj_data *obj, int flag) {
@@ -2443,7 +2481,8 @@ int get_number(char **name) {
 		// \0 between the number and the name as they appear in the string.
 		strcpy(number, *name);
 		// now number contains the number as a string
-		strncpy(buffer, ppos, MAX_INPUT_LENGTH);
+		strncpy(buffer, ppos, MAX_INPUT_LENGTH-1);
+		buffer[MAX_INPUT_LENGTH-1] = 0;
 		strcpy(*name, buffer);
 		// now the pointer that was passed into the function
 		// points to the name only.
