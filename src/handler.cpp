@@ -1957,6 +1957,11 @@ void affect_remove(CHAR_DATA *ch, struct affected_type *af, int flags) {
 			send_to_char("You feel ready to brew something again.\n\r", ch);
 		}
 		break;
+	case SKILL_SCRIBE_TIMER:
+		if (!(flags & SUPPRESS_MESSAGES)) {
+			send_to_char("You feel ready to scribe something again.\n\r", ch);
+		}
+		break;
 	case OBJ_LILITHRING:
 		if (IS_NPC(ch))
 		{
