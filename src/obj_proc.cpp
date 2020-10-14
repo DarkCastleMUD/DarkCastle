@@ -2304,7 +2304,7 @@ int szrildor_pass(struct char_data *ch, struct obj_data *obj, int cmd, char *arg
                                 extract_obj(p); // extract handles all variations of obj_from_char etc
 
                 	        act("As your pass expires and crumbles to dust, you begin to feel a bit fuzzy for a moment, then vanish into thin air", v, 0,0, TO_CHAR, 0);
-       		                 act("begins to look blurry for a moment, then winks out of existence with a \"pop\"!", v, 0,0, TO_ROOM, 0);
+       		                 act("$n begins to look blurry for a moment, then winks out of existence with a \"pop\"!", v, 0,0, TO_ROOM, 0);
        		                 move_char(v, real_room(30000));
 				struct mprog_throw_type * throwitem = NULL;
 				throwitem = (struct mprog_throw_type *)dc_alloc(1, sizeof(struct mprog_throw_type));
