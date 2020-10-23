@@ -4344,6 +4344,14 @@ void randomize_object(obj_data *obj)
 		// current charges
 		obj->obj_flags.value[2] = obj->obj_flags.value[1];
 		break;
+	case ITEM_INSTRUMENT:
+		obj->obj_flags.cost = MAX(1, random_percent_change(-33, 33, obj->obj_flags.cost));
+		// non-combat
+		obj->obj_flags.value[1] = random_percent_change(-33, 33, obj->obj_flags.value[1]);
+		// combat
+		obj->obj_flags.value[2] = random_percent_change(-33, 33, obj->obj_flags.value[2]);
+		randomize_object_affects(obj);
+		break;
 	}
 }
 
