@@ -2274,328 +2274,372 @@ void update_mobprog_bits(int mob_num)
 
 int do_procedit(struct char_data *ch, char *argument, int cmd)
 {
-    char buf[MAX_INPUT_LENGTH];
-    char buf2[MAX_INPUT_LENGTH];
-    char buf3[MAX_STRING_LENGTH];
-    char buf4[MAX_INPUT_LENGTH];
-    int  mob_num = -1;
-    int  intval = 0;
-    int  x, i;
-    MPROG_DATA * prog;
-    MPROG_DATA * currprog;
+  char buf[MAX_INPUT_LENGTH];
+  char buf2[MAX_INPUT_LENGTH];
+  char buf3[MAX_STRING_LENGTH];
+  char buf4[MAX_INPUT_LENGTH];
+  int mob_num = -1;
+  int intval = 0;
+  int x, i;
+  MPROG_DATA *prog;
+  MPROG_DATA *currprog;
 
-    void mpstat( CHAR_DATA *ch, CHAR_DATA *victim);
+  void mpstat(CHAR_DATA *ch, CHAR_DATA *victim);
 
-    char *fields[] =
+  char *fields[] = { "add", "remove", "type", "arglist", "command", "list", "\n" };
+
+  if (IS_NPC(ch))
+    return eFAILURE;
+
+  half_chop(argument, buf, buf2);
+  half_chop(buf2, buf3, buf4);
+
+  // at this point, buf  = mob_num
+  //                buf3 = field
+  //                buf4 = args
+
+  // or
+
+  // buf = field
+  // buf3 = args[0]
+  // buf4 = args[1-+]
+  if (!*buf)
+  {
+    send_to_char("$3Syntax$R:  procedit [mob_num] [field] [arg]\r\n"
+        "  Edit a field with no args for help on that field.\r\n\r\n"
+        "  The field must be one of the following:\n\r", ch);
+    display_string_list(fields, ch);
+    sprintf(buf2, "\n\r$3Current mob set to$R: %d\n\r", mob_index[ch->pcdata->last_mob_edit].virt);
+    send_to_char(buf2, ch);
+    return eFAILURE;
+  }
+  int mobvnum = -1;
+  if (isdigit(*buf))
+  {
+    mob_num = atoi(buf);
+    mobvnum = mob_num;
+    if (((mob_num = real_mobile(mob_num)) < 0) || (mob_num == 0 && *buf != '0'))
     {
-      "add",
-      "remove",
-      "type",
-      "arglist",
-      "command",
-      "list",
-      "\n"
-    };
-
-    if(IS_NPC(ch))
-      return eFAILURE;
-
-    half_chop(argument, buf, buf2);
-    half_chop(buf2, buf3, buf4);
-
-    // at this point, buf  = mob_num
-    //                buf3 = field
-    //                buf4 = args
-
-    // or
-  
-    // buf = field
-    // buf3 = args[0]
-    // buf4 = args[1-+]
-    if(!*buf) {
-      send_to_char("$3Syntax$R:  procedit [mob_num] [field] [arg]\r\n"
-                   "  Edit a field with no args for help on that field.\r\n\r\n"
-                   "  The field must be one of the following:\n\r", ch);
-      display_string_list(fields, ch);
-      sprintf(buf2, "\n\r$3Current mob set to$R: %d\n\r", mob_index[ch->pcdata->last_mob_edit].virt);
-      send_to_char(buf2, ch);
-      return eFAILURE;
-    }
-    int mobvnum = -1;
-    if(isdigit(*buf)) {
-      mob_num = atoi(buf);
-      mobvnum = mob_num;
-      if( ((mob_num = real_mobile(mob_num)) < 0) ||
-          (mob_num == 0 && *buf != '0')
-        )
-      {
-        send_to_char("Invalid mob number.\r\n", ch);
-        return eSUCCESS;
-      }
-    }
-    else {
-      mob_num = ch->pcdata->last_mob_edit;
-      // put the buffs where they should be
-      sprintf(buf2, "%s %s", buf3, buf4);
-      strcpy(buf4, buf2);
-      strcpy(buf3, buf);
-    }
-
-    // a this point, mob_num is the index
-    if (mobvnum == -1) mobvnum = mob_index[mob_num].virt;
-
-    if(!can_modify_mobile(ch, mobvnum)) {
-      send_to_char("You are unable to work creation outside of your range.\n\r", ch);
-      return eFAILURE;
-    }
-
-    if(mob_num != ch->pcdata->last_mob_edit) {
-      sprintf(buf2, "$3Current mob set to$R: %d\n\r", mob_index[mob_num].virt);
-      send_to_char(buf2, ch);
-      ch->pcdata->last_mob_edit = mob_num;
-    }
-
-    // no field
-    if(!*buf3) {
-      mpstat(ch, (char_data *) mob_index[mob_num].item);
+      send_to_char("Invalid mob number.\r\n", ch);
       return eSUCCESS;
     }
+  } else
+  {
+    mob_num = ch->pcdata->last_mob_edit;
+    // put the buffs where they should be
+    sprintf(buf2, "%s %s", buf3, buf4);
+    strcpy(buf4, buf2);
+    strcpy(buf3, buf);
+  }
 
-    for(x = 0 ;; x++)
-    {
-      if(fields[x][0] == '\n')
-      {
-        send_to_char("Invalid field.\n\r", ch);
-        return eFAILURE;
-      }
-      if(is_abbrev(buf3, fields[x]))
-        break;
-    }
+  // a this point, mob_num is the index
+  if (mobvnum == -1)
+    mobvnum = mob_index[mob_num].virt;
 
-    switch(x) {
+  if (!can_modify_mobile(ch, mobvnum))
+  {
+    send_to_char("You are unable to work creation outside of your range.\n\r", ch);
+    return eFAILURE;
+  }
 
-     /* add */
-      case 0 : {
-        if(!*buf4) {
-          send_to_char("$3Syntax$R: procedit [mob_num] add new\n\r"
-                       "This creates a new mob prog and tacks it on the end.\r\n", ch);
-          return eFAILURE;
-        }
-#ifdef LEAK_CHECK
-        prog = (MPROG_DATA *) calloc(1, sizeof(MPROG_DATA));
-#else
-        prog = (MPROG_DATA *) dc_alloc(1, sizeof(MPROG_DATA));
-#endif
-        prog->type = GREET_PROG;
-        prog->arglist = strdup("80");
-        prog->comlist = strdup("say This is my new mob prog!\n\r");
-        prog->next = NULL;
+  if (mob_num != ch->pcdata->last_mob_edit)
+  {
+    sprintf(buf2, "$3Current mob set to$R: %d\n\r", mob_index[mob_num].virt);
+    send_to_char(buf2, ch);
+    ch->pcdata->last_mob_edit = mob_num;
+  }
 
-	int prog_num = 1;
-        if((currprog = mob_index[mob_num].mobprogs)) {
-          while(currprog->next) {
-	    prog_num++;
-            currprog = currprog->next;
-	  }
-          currprog->next = prog;
-	  prog_num++;
-        }
-        else 
-          mob_index[mob_num].mobprogs = prog;
-
-        update_mobprog_bits(mob_num);
-
-	 csendf(ch, "New mobprog created as #%d.\r\n", prog_num);
-      } break;
-
-     /* remove */
-      case 1 : {
-        if(!*buf4) {
-          send_to_char("$3Syntax$R: procedit [mob_num] remove <prog>\n\r", ch);
-          return eFAILURE;
-        }
-        if(!check_range_valid_and_convert(intval, buf4, 1, 999)) {
-          send_to_char("Invalid prog number.\r\n", ch);
-          return eFAILURE;
-        }
-        // find program number "intval"
-        prog = NULL;
-        for(i = 1, currprog = mob_index[mob_num].mobprogs; 
-            currprog && i != intval; 
-            i++, prog = currprog, currprog = currprog->next)
-          ;
-
-        if(!currprog) { // intval was too high
-          send_to_char("Invalid prog number.\r\n", ch);
-          return eFAILURE;
-        }
-
-        if(prog) 
-          prog->next = currprog->next;
-        else mob_index[mob_num].mobprogs = currprog->next;
-
-        currprog->type = 0;
-        dc_free(currprog->arglist);
-        dc_free(currprog->comlist);
-        dc_free(currprog);
-
-        update_mobprog_bits(mob_num);
-
-        send_to_char("Program deleted.\r\n", ch);
-      } break;
-
-     /* type */
-      case 2 : {
-        half_chop(buf4, buf2, buf3);
-        if(!*buf2 || !*buf3) {
-          send_to_char("$3Syntax$R: procedit [mob_num] type <prog> <newtype>\n\r"
-                       "$3Valid types$R:\r\n"
-                       "  1 -       act_prog\r\n"
-                       "  2 -    speech_prog\r\n"
-                       "  3 -      rand_prog\r\n"
-                       "  4 -     fight_prog\r\n"
-                       "  5 -     death_prog\r\n"
-                       "  6 -  hitprcnt_prog\r\n"
-                       "  7 -     entry_prog\r\n"
-                       "  8 -     greet_prog\r\n"
-                       "  9 - all_greet_prog\r\n"
-                       " 10 -      give_prog\r\n"
-                       " 11 -     bribe_prog\r\n"
-                       " 12 -     catch_prog\r\n"
-                       " 13 -    attack_prog\r\n"
-		       " 14 -     arand_prog\r\n"
-		       " 15 -      load_prog\r\n"
-		       " 16 -      can_see_prog\r\n"
-		       " 17 -      damage_prog\r\n"
-		  
-							, ch);
-		       
-          return eFAILURE;
-        }
-        if(!check_range_valid_and_convert(intval, buf2, 1, 999)) {
-          send_to_char("Invalid prog number.\r\n", ch);
-          return eFAILURE;
-        }
-        // find program number "intval"
-        for(i = 1, currprog = mob_index[mob_num].mobprogs; 
-            currprog && i != intval; 
-            i++, currprog = currprog->next)
-          ;
-
-        if(!currprog) { // intval was too high
-          send_to_char("Invalid prog number.\r\n", ch);
-          return eFAILURE;
-        }
-
-        if(!check_range_valid_and_convert(intval, buf3, 1, 17)) {
-          send_to_char("Invalid prog number.\r\n", ch);
-          return eFAILURE;
-        }
-
-        switch(intval) {
-          case 1:   currprog->type = ACT_PROG;       break;
-          case 2:   currprog->type = SPEECH_PROG;    break;
-          case 3:   currprog->type = RAND_PROG;      break;
-          case 4:   currprog->type = FIGHT_PROG;     break;
-          case 5:   currprog->type = DEATH_PROG;     break;
-          case 6:   currprog->type = HITPRCNT_PROG;  break;
-          case 7:   currprog->type = ENTRY_PROG;     break;
-          case 8:   currprog->type = GREET_PROG;     break;
-          case 9:   currprog->type = ALL_GREET_PROG; break;
-          case 10:  currprog->type = GIVE_PROG;      break;
-          case 11:  currprog->type = BRIBE_PROG;     break;
-          case 12:  currprog->type = CATCH_PROG;     break;
-          case 13:  currprog->type = ATTACK_PROG;    break;
-	  case 14:  currprog->type = ARAND_PROG; break;
-	  case 15:  currprog->type = LOAD_PROG; break;
-	  case 16:  currprog->type = CAN_SEE_PROG; break;
-	  case 17:  currprog->type = DAMAGE_PROG; break;
-        }
-
-
-        update_mobprog_bits(mob_num);
-
-        send_to_char("Mob program type changed.\r\n", ch);
-      } break;
-
-     /* arglist */
-      case 3 : {
-        half_chop(buf4, buf2, buf3);
-        if(!*buf2 || !*buf3) {
-          send_to_char("$3Syntax$R: procedit [mob_num] arglist <prog> <new arglist>\n\r", ch);
-          return eFAILURE;
-        }
-        if(!check_range_valid_and_convert(intval, buf2, 1, 999)) {
-          send_to_char("Invalid prog number.\r\n", ch);
-          return eFAILURE;
-        }
-        // find program number "intval"
-        for(i = 1, currprog = mob_index[mob_num].mobprogs; 
-            currprog && i != intval; 
-            i++, currprog = currprog->next)
-          ;
-
-        if(!currprog) { // intval was too high
-          send_to_char("Invalid prog number.\r\n", ch);
-          return eFAILURE;
-        }
-
-        dc_free(currprog->arglist);
-        currprog->arglist = strdup(buf3);
-
-        send_to_char("Mob program arglist changed.\r\n", ch);
-      } break;
-
-     /* command */
-      case 4 : {
-        if(!*buf4) {
-          send_to_char("$3Syntax$R: procedit [mob_num] command <prog>\n\r"
-                       "This will put you into the editor which will replace the current\r\n"
-                       "command for program number <prog>.\r\n", ch);
-          return eFAILURE;
-        }
-        if(!check_range_valid_and_convert(intval, buf4, 1, 999)) {
-          send_to_char("Invalid prog number.\r\n", ch);
-          return eFAILURE;
-        }
-        // find program number "intval"
-        for(i = 1, currprog = mob_index[mob_num].mobprogs; 
-            currprog && i != intval; 
-            i++, currprog = currprog->next)
-          ;
-
-        if(!currprog) { // intval was too high
-          send_to_char("Invalid prog number.\r\n", ch);
-          return eFAILURE;
-        }
-
-        ch->desc->backstr = NULL;
-        ch->desc->strnew = &(currprog->comlist);
-        ch->desc->max_str = MAX_MESSAGE_LENGTH;
-
-       if (IS_SET(ch->pcdata->toggles, PLR_EDITOR_WEB)) {
-          ch->desc->web_connected = CON_EDIT_MPROG;
-        } else {
-          ch->desc->connected = CON_EDIT_MPROG;
-	  
-	  send_to_char("        Write your help entry and stay within the line.  (/s saves /h for help)\r\n"
-                     "   |--------------------------------------------------------------------------------|\r\n", ch);
-	  
-        if (currprog->comlist) {
-          ch->desc->backstr = str_dup(currprog->comlist);
-          double_dollars(buf3, ch->desc->backstr);
-          send_to_char(buf3, ch);
-        }
-	}
-      } break;
-
-     // list
-      case 5:
-        mpstat(ch, (char_data *) mob_index[mob_num].item);
-        return eFAILURE;
-    }
-    set_zone_modified_mob(mob_num);
+  // no field
+  if (!*buf3)
+  {
+    mpstat(ch, (char_data*) mob_index[mob_num].item);
     return eSUCCESS;
+  }
+
+  for (x = 0;; x++)
+  {
+    if (fields[x][0] == '\n')
+    {
+      send_to_char("Invalid field.\n\r", ch);
+      return eFAILURE;
+    }
+    if (is_abbrev(buf3, fields[x]))
+      break;
+  }
+
+  switch (x) {
+
+  /* add */
+  case 0: {
+    if (!*buf4)
+    {
+      send_to_char("$3Syntax$R: procedit [mob_num] add new\n\r"
+          "This creates a new mob prog and tacks it on the end.\r\n", ch);
+      return eFAILURE;
+    }
+#ifdef LEAK_CHECK
+    prog = (MPROG_DATA *) calloc(1, sizeof(MPROG_DATA));
+#else
+    prog = (MPROG_DATA*) dc_alloc(1, sizeof(MPROG_DATA));
+#endif
+    prog->type = GREET_PROG;
+    prog->arglist = strdup("80");
+    prog->comlist = strdup("say This is my new mob prog!\n\r");
+    prog->next = NULL;
+
+    int prog_num = 1;
+    if ((currprog = mob_index[mob_num].mobprogs))
+    {
+      while (currprog->next)
+      {
+        prog_num++;
+        currprog = currprog->next;
+      }
+      currprog->next = prog;
+      prog_num++;
+    } else
+      mob_index[mob_num].mobprogs = prog;
+
+      update_mobprog_bits(mob_num);
+
+      csendf(ch, "New mobprog created as #%d.\r\n", prog_num);
+    }
+    break;
+
+    /* remove */
+  case 1: {
+    if (!*buf4)
+    {
+      send_to_char("$3Syntax$R: procedit [mob_num] remove <prog>\n\r", ch);
+      return eFAILURE;
+    }
+    if (!check_range_valid_and_convert(intval, buf4, 1, 999))
+    {
+      send_to_char("Invalid prog number.\r\n", ch);
+      return eFAILURE;
+    }
+    // find program number "intval"
+    prog = NULL;
+    for (i = 1, currprog = mob_index[mob_num].mobprogs; currprog && i != intval; i++, prog = currprog, currprog = currprog->next)
+      ;
+
+    if (!currprog)
+    { // intval was too high
+      send_to_char("Invalid prog number.\r\n", ch);
+      return eFAILURE;
+    }
+
+    if (prog)
+      prog->next = currprog->next;
+    else
+      mob_index[mob_num].mobprogs = currprog->next;
+
+    currprog->type = 0;
+    dc_free(currprog->arglist);
+    dc_free(currprog->comlist);
+    dc_free(currprog);
+
+    update_mobprog_bits(mob_num);
+
+    send_to_char("Program deleted.\r\n", ch);
+  }
+    break;
+
+    /* type */
+  case 2: {
+    half_chop(buf4, buf2, buf3);
+    if (!*buf2 || !*buf3)
+    {
+      send_to_char("$3Syntax$R: procedit [mob_num] type <prog> <newtype>\n\r"
+          "$3Valid types$R:\r\n"
+          "  1 -       act_prog\r\n"
+          "  2 -    speech_prog\r\n"
+          "  3 -      rand_prog\r\n"
+          "  4 -     fight_prog\r\n"
+          "  5 -     death_prog\r\n"
+          "  6 -  hitprcnt_prog\r\n"
+          "  7 -     entry_prog\r\n"
+          "  8 -     greet_prog\r\n"
+          "  9 - all_greet_prog\r\n"
+          " 10 -      give_prog\r\n"
+          " 11 -     bribe_prog\r\n"
+          " 12 -     catch_prog\r\n"
+          " 13 -    attack_prog\r\n"
+          " 14 -     arand_prog\r\n"
+          " 15 -      load_prog\r\n"
+          " 16 -      can_see_prog\r\n"
+          " 17 -      damage_prog\r\n"
+
+      , ch);
+
+      return eFAILURE;
+    }
+    if (!check_range_valid_and_convert(intval, buf2, 1, 999))
+    {
+      send_to_char("Invalid prog number.\r\n", ch);
+      return eFAILURE;
+    }
+    // find program number "intval"
+    for (i = 1, currprog = mob_index[mob_num].mobprogs; currprog && i != intval; i++, currprog = currprog->next)
+      ;
+
+    if (!currprog)
+    { // intval was too high
+      send_to_char("Invalid prog number.\r\n", ch);
+      return eFAILURE;
+    }
+
+    if (!check_range_valid_and_convert(intval, buf3, 1, 17))
+    {
+      send_to_char("Invalid prog number.\r\n", ch);
+      return eFAILURE;
+    }
+
+    switch (intval) {
+    case 1:
+      currprog->type = ACT_PROG;
+      break;
+    case 2:
+      currprog->type = SPEECH_PROG;
+      break;
+    case 3:
+      currprog->type = RAND_PROG;
+      break;
+    case 4:
+      currprog->type = FIGHT_PROG;
+      break;
+    case 5:
+      currprog->type = DEATH_PROG;
+      break;
+    case 6:
+      currprog->type = HITPRCNT_PROG;
+      break;
+    case 7:
+      currprog->type = ENTRY_PROG;
+      break;
+    case 8:
+      currprog->type = GREET_PROG;
+      break;
+    case 9:
+      currprog->type = ALL_GREET_PROG;
+      break;
+    case 10:
+      currprog->type = GIVE_PROG;
+      break;
+    case 11:
+      currprog->type = BRIBE_PROG;
+      break;
+    case 12:
+      currprog->type = CATCH_PROG;
+      break;
+    case 13:
+      currprog->type = ATTACK_PROG;
+      break;
+    case 14:
+      currprog->type = ARAND_PROG;
+      break;
+    case 15:
+      currprog->type = LOAD_PROG;
+      break;
+    case 16:
+      currprog->type = CAN_SEE_PROG;
+      break;
+    case 17:
+      currprog->type = DAMAGE_PROG;
+      break;
+    }
+
+    update_mobprog_bits(mob_num);
+
+    send_to_char("Mob program type changed.\r\n", ch);
+  }
+    break;
+
+    /* arglist */
+  case 3: {
+    half_chop(buf4, buf2, buf3);
+    if (!*buf2 || !*buf3)
+    {
+      send_to_char("$3Syntax$R: procedit [mob_num] arglist <prog> <new arglist>\n\r", ch);
+      return eFAILURE;
+    }
+    if (!check_range_valid_and_convert(intval, buf2, 1, 999))
+    {
+      send_to_char("Invalid prog number.\r\n", ch);
+      return eFAILURE;
+    }
+    // find program number "intval"
+    for (i = 1, currprog = mob_index[mob_num].mobprogs; currprog && i != intval; i++, currprog = currprog->next)
+      ;
+
+    if (!currprog)
+    { // intval was too high
+      send_to_char("Invalid prog number.\r\n", ch);
+      return eFAILURE;
+    }
+
+    dc_free(currprog->arglist);
+    currprog->arglist = strdup(buf3);
+
+    send_to_char("Mob program arglist changed.\r\n", ch);
+  }
+    break;
+
+    /* command */
+  case 4: {
+    if (!*buf4)
+    {
+      send_to_char("$3Syntax$R: procedit [mob_num] command <prog>\n\r"
+          "This will put you into the editor which will replace the current\r\n"
+          "command for program number <prog>.\r\n", ch);
+      return eFAILURE;
+    }
+    if (!check_range_valid_and_convert(intval, buf4, 1, 999))
+    {
+      send_to_char("Invalid prog number.\r\n", ch);
+      return eFAILURE;
+    }
+    // find program number "intval"
+    for (i = 1, currprog = mob_index[mob_num].mobprogs; currprog && i != intval; i++, currprog = currprog->next)
+      ;
+
+    if (!currprog)
+    { // intval was too high
+      send_to_char("Invalid prog number.\r\n", ch);
+      return eFAILURE;
+    }
+
+    ch->desc->backstr = NULL;
+    ch->desc->strnew = &(currprog->comlist);
+    ch->desc->max_str = MAX_MESSAGE_LENGTH;
+
+    if (IS_SET(ch->pcdata->toggles, PLR_EDITOR_WEB))
+    {
+      ch->desc->web_connected = CON_EDIT_MPROG;
+    } else
+    {
+      ch->desc->connected = CON_EDIT_MPROG;
+
+      send_to_char("        Write your help entry and stay within the line.  (/s saves /h for help)\r\n"
+          "   |--------------------------------------------------------------------------------|\r\n", ch);
+
+      if (currprog->comlist)
+      {
+        ch->desc->backstr = str_dup(currprog->comlist);
+        double_dollars(buf3, ch->desc->backstr);
+        send_to_char(buf3, ch);
+      }
+    }
+  }
+    break;
+
+    // list
+  case 5:
+    mpstat(ch, (char_data*) mob_index[mob_num].item);
+    return eFAILURE;
+  }
+  set_zone_modified_mob(mob_num);
+  return eSUCCESS;
 }
 
 int do_mscore(struct char_data *ch, char *argument, int cmd)
