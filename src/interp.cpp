@@ -445,7 +445,7 @@ struct command_info cmd_info[] =
     { "shutdown",	do_shutdown,	POSITION_DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1 },
     { "opedit",		do_opedit,	POSITION_DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1 },
     { "opstat",		do_opstat,	POSITION_DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1 },
-    { "procedit",	do_mpedit,	POSITION_DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1 },
+    { "procedit",	do_procedit,	POSITION_DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1 },
     { "procstat",	do_mpstat,	POSITION_DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1 },
     { "range",		do_range,	POSITION_DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1 },
    // { "pshopedit",	do_pshopedit,	POSITION_DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1 },

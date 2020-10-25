@@ -2272,7 +2272,7 @@ void update_mobprog_bits(int mob_num)
     }
 }
 
-int do_mpedit(struct char_data *ch, char *argument, int cmd)
+int do_procedit(struct char_data *ch, char *argument, int cmd)
 {
     char buf[MAX_INPUT_LENGTH];
     char buf2[MAX_INPUT_LENGTH];
