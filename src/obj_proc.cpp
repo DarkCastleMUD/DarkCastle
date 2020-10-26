@@ -2226,135 +2226,145 @@ int pull_proc(struct char_data*ch, struct obj_data *obj, int cmd, char*arg, CHAR
 
 int szrildor_pass(struct char_data *ch, struct obj_data *obj, int cmd, char *arg, CHAR_DATA *invoker)
 {
-        struct obj_data *p;
-        // 30097 
-	if (cmd && cmd == CMD_EXAMINE)
-	{
-		char target[MAX_INPUT_LENGTH];
-		one_argument(arg, target);
-		if (!str_cmp(target, "daypass") || !str_cmp(target, "pass"))
-		{
-			char buf[2000];
-			sprintf(buf, "There appears to be approximately %d minutes left of time before the pass expires.\r\n", ((1800-obj->obj_flags.timer)*4)/60);
-			send_to_char(buf, ch);
-			return eSUCCESS;
-		}
-	}
+  struct obj_data *p;
+  // 30097
+  if (cmd && cmd == CMD_EXAMINE)
+  {
+    char target[MAX_INPUT_LENGTH];
+    one_argument(arg, target);
+    if (!str_cmp(target, "daypass") || !str_cmp(target, "pass"))
+    {
+      char buf[2000];
+      sprintf(buf, "There appears to be approximately %d minutes left of time before the pass expires.\r\n", ((1800 - obj->obj_flags.timer) * 4) / 60);
+      send_to_char(buf, ch);
+      return eSUCCESS;
+    }
+  }
 
-        if (cmd) return eFAILURE;
+  if (cmd)
+    return eFAILURE;
 
-        if (obj->obj_flags.timer == 0)
-        {       // Just created - check if this is the first pass in existence and if so, repop zone 161
-                bool first = TRUE;
-                for (p = object_list; p;p = p->next)
-                {
-                        if (obj_index[p->item_number].virt == 30097 && p != obj && p->obj_flags.timer != 0)  // if any exist that are not at 1800 timer
-                        {
-                                first = FALSE;
-                                break;
-                        }
-                }
-                if (first && real_room(30000) != -1)
-                {
-			int zone = world[real_room(30000)].zone;
-       		 	auto &character_list = DC::instance().character_list;
-		        for (auto& tmp_victim : character_list) {
-        	        // This should never happen but it has before so we must investigate without crashing the whole MUD
-               		 if (tmp_victim == 0) {
-               	        	 produce_coredump(tmp_victim);
-                       		 continue;
-               		 }
-            		if (GET_POS(tmp_victim) == POSITION_DEAD || tmp_victim->in_room == NOWHERE) {
-                        	continue;
-	                }
-        	        if(world[tmp_victim->in_room].zone == zone) {
-                	        if(IS_NPC(tmp_victim)) {
-                        	        for (int l = 0; l < MAX_WEAR; l++ )
-                                	{
-                               		    if ( tmp_victim->equipment[l] )
-                                   		   extract_obj(unequip_char(tmp_victim,l));
-                               		 }
-                              		 while(tmp_victim->carrying)
-                                	   extract_obj(tmp_victim->carrying);
-                              		 extract_char(tmp_victim, TRUE);
-	                        }
-        	        }
-		        }
-	               reset_zone(world[real_room(30000)].zone);
-
-                }
-
-        }
-
-        obj->obj_flags.timer++;
-        struct obj_data *n;
-        if (obj->obj_flags.timer>=1800)
+  if (obj->obj_flags.timer == 0)
+  {       // Just created - check if this is the first pass in existence and if so, repop zone 161
+    bool first = TRUE;
+    for (p = object_list; p; p = p->next)
+    {
+      if (obj_index[p->item_number].virt == 30097 && p != obj && p->obj_flags.timer != 0)  // if any exist that are not at 1800 timer
+      {
+        first = FALSE;
+        break;
+      }
+    }
+    if (first && real_room(30000) != -1)
+    {
+      int zone = world[real_room(30000)].zone;
+      auto &character_list = DC::instance().character_list;
+      for (auto &tmp_victim : character_list)
+      {
+        // This should never happen but it has before so we must investigate without crashing the whole MUD
+        if (tmp_victim == 0)
         {
-                // once one expires, ALL expire.
-                for (p = object_list; p;p = n)
-                {
-                        n = p->next;
-                        if (obj_index[p->item_number].virt == 30097 )
-                        {
-				CHAR_DATA *v = p->carried_by;
-                                if (v)
-                                {
-                                        send_to_char("The Szrildor daypass crumbles into dust.\r\n", v);
-                                }
-                                extract_obj(p); // extract handles all variations of obj_from_char etc
-
-                	        act("As your pass expires and crumbles to dust, you begin to feel a bit fuzzy for a moment, then vanish into thin air", v, 0,0, TO_CHAR, 0);
-       		                 act("$n begins to look blurry for a moment, then winks out of existence with a \"pop\"!", v, 0,0, TO_ROOM, 0);
-       		                 move_char(v, real_room(30000));
-				struct mprog_throw_type * throwitem = NULL;
-				throwitem = (struct mprog_throw_type *)dc_alloc(1, sizeof(struct mprog_throw_type));
-				throwitem->target_mob_num = 30033;
-				strcpy(throwitem->target_mob_name,"");
-				throwitem->data_num = 99;
-				throwitem->delay = 0;
-				throwitem->mob = TRUE; // This is, suprisingly, a mob
-				throwitem->actor = v;
-				throwitem->obj = NULL;
-				throwitem->vo = NULL;
-				throwitem->rndm = NULL;
-				throwitem->opt = 0;
-				throwitem->var = NULL;
-				throwitem->next = g_mprog_throw_list;
-				g_mprog_throw_list = throwitem;
-
-
-
-                        }
-                }
-
-
+          produce_coredump(tmp_victim);
+          continue;
         }
-        return eSUCCESS;
+        if (GET_POS(tmp_victim) == POSITION_DEAD || tmp_victim->in_room == NOWHERE)
+        {
+          continue;
+        }
+        if (world[tmp_victim->in_room].zone == zone)
+        {
+          if (IS_NPC(tmp_victim))
+          {
+            for (int l = 0; l < MAX_WEAR; l++)
+            {
+              if (tmp_victim->equipment[l])
+                extract_obj(unequip_char(tmp_victim, l));
+            }
+            while (tmp_victim->carrying)
+              extract_obj(tmp_victim->carrying);
+            extract_char(tmp_victim, TRUE);
+          }
+        }
+      }
+      reset_zone(world[real_room(30000)].zone);
+
+    }
+
+  }
+
+  obj->obj_flags.timer++;
+  struct obj_data *n;
+  if (obj->obj_flags.timer >= 1800)
+  {
+    // once one expires, ALL expire.
+    for (p = object_list; p; p = n)
+    {
+      n = p->next;
+      if (obj_index[p->item_number].virt == 30097)
+      {
+        CHAR_DATA *v = p->carried_by;
+        if (v)
+        {
+          send_to_char("The Szrildor daypass crumbles into dust.\r\n", v);
+        }
+        extract_obj(p); // extract handles all variations of obj_from_char etc
+
+        act("As your pass expires and crumbles to dust, you begin to feel a bit fuzzy for a moment, then vanish into thin air", v, 0, 0, TO_CHAR, 0);
+        act("$n begins to look blurry for a moment, then winks out of existence with a \"pop\"!", v, 0, 0, TO_ROOM, 0);
+        move_char(v, real_room(30000));
+        struct mprog_throw_type *throwitem = NULL;
+        throwitem = (struct mprog_throw_type*) dc_alloc(1, sizeof(struct mprog_throw_type));
+        throwitem->target_mob_num = 30033;
+        strcpy(throwitem->target_mob_name, "");
+        throwitem->data_num = 99;
+        throwitem->delay = 0;
+        throwitem->mob = TRUE; // This is, suprisingly, a mob
+        throwitem->actor = v;
+        throwitem->obj = NULL;
+        throwitem->vo = NULL;
+        throwitem->rndm = NULL;
+        throwitem->opt = 0;
+        throwitem->var = NULL;
+        throwitem->next = g_mprog_throw_list;
+        g_mprog_throw_list = throwitem;
+
+      }
+    }
+
+  }
+  return eSUCCESS;
 }
 
 int szrildor_pass_checks(struct char_data *ch, struct obj_data *obj, int cmd, char *arg, CHAR_DATA *invoker)
 {
-        // 30096
-        if (cmd) return eFAILURE;
+  // 30096
+  if (cmd)
+    return eFAILURE;
 
-        int count = 0;
-        auto &character_list = DC::instance().character_list;
-        for (auto& i : character_list) {
-                if (IS_NPC(i)) continue;
-                if (!i->in_room) continue;
-                if (world[i->in_room].zone != 161) continue;
-                if (GET_LEVEL(i) >= 100) continue;
-                if (i->in_room == real_room(30000)) continue;
+  int count = 0;
+  auto &character_list = DC::instance().character_list;
+  for (auto &i : character_list)
+  {
+    if (IS_NPC(i))
+      continue;
+    if (!i->in_room)
+      continue;
+    if (world[i->in_room].zone != 161)
+      continue;
+    if (GET_LEVEL(i) >= 100)
+      continue;
+    if (i->in_room == real_room(30000))
+      continue;
 
-                if (!search_char_for_item(i, real_object(30097)) || (++count) > 4)
-                {
-                        act("Jeff arrives and frowns.\r\n$B$7Jeff says, 'Hey! You don't have a pass. Get the heck outta here!'$R", i, 0,0, TO_CHAR, 0);
-                        act("Jeff arrives and frowns at $n.\r\n$B$7Jeff says, 'Hey! You don't have a pass. Get the heck outta here!'$R", i, 0,0, TO_ROOM, 0);
-                        move_char(i, real_room(30000));
-                }
+    if (!search_char_for_item(i, real_object(30097)) || (++count) > 4)
+    {
+      act("Jeff arrives and frowns.\r\n$B$7Jeff says, 'Hey! You don't have a pass. Get the heck outta here!'$R", i, 0, 0, TO_CHAR, 0);
+      act("Jeff arrives and frowns at $n.\r\n$B$7Jeff says, 'Hey! You don't have a pass. Get the heck outta here!'$R", i, 0, 0, TO_ROOM, 0);
+      move_char(i, real_room(30000));
+    }
 
-        }
-        return eSUCCESS;
+  }
+  return eSUCCESS;
 }
 
 
