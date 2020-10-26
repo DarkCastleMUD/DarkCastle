@@ -2306,31 +2306,34 @@ int szrildor_pass(struct char_data *ch, struct obj_data *obj, int cmd, char *arg
         if (v)
         {
           send_to_char("The Szrildor daypass crumbles into dust.\r\n", v);
+          extract_obj(p); // extract handles all variations of obj_from_char etc
+
+          if (IS_PC(v) && v->in_room && world[v->in_room].zone == 161 && GET_LEVEL(v) <= MORTAL && v->in_room != real_room(30000)
+              && v->in_room != real_room(30096))
+          {
+            act("As your pass expires and crumbles to dust, you begin to feel a bit fuzzy for a moment, then vanish into thin air", v, 0, 0, TO_CHAR, 0);
+            act("$n begins to look blurry for a moment, then winks out of existence with a \"pop\"!", v, 0, 0, TO_ROOM, 0);
+            move_char(v, real_room(30000));
+
+            struct mprog_throw_type *throwitem = NULL;
+            throwitem = (struct mprog_throw_type*) dc_alloc(1, sizeof(struct mprog_throw_type));
+            throwitem->target_mob_num = 30033;
+            strcpy(throwitem->target_mob_name, "");
+            throwitem->data_num = 99;
+            throwitem->delay = 0;
+            throwitem->mob = TRUE; // This is, surprisingly, a mob
+            throwitem->actor = v;
+            throwitem->obj = NULL;
+            throwitem->vo = NULL;
+            throwitem->rndm = NULL;
+            throwitem->opt = 0;
+            throwitem->var = NULL;
+            throwitem->next = g_mprog_throw_list;
+            g_mprog_throw_list = throwitem;
+          }
         }
-        extract_obj(p); // extract handles all variations of obj_from_char etc
-
-        act("As your pass expires and crumbles to dust, you begin to feel a bit fuzzy for a moment, then vanish into thin air", v, 0, 0, TO_CHAR, 0);
-        act("$n begins to look blurry for a moment, then winks out of existence with a \"pop\"!", v, 0, 0, TO_ROOM, 0);
-        move_char(v, real_room(30000));
-        struct mprog_throw_type *throwitem = NULL;
-        throwitem = (struct mprog_throw_type*) dc_alloc(1, sizeof(struct mprog_throw_type));
-        throwitem->target_mob_num = 30033;
-        strcpy(throwitem->target_mob_name, "");
-        throwitem->data_num = 99;
-        throwitem->delay = 0;
-        throwitem->mob = TRUE; // This is, suprisingly, a mob
-        throwitem->actor = v;
-        throwitem->obj = NULL;
-        throwitem->vo = NULL;
-        throwitem->rndm = NULL;
-        throwitem->opt = 0;
-        throwitem->var = NULL;
-        throwitem->next = g_mprog_throw_list;
-        g_mprog_throw_list = throwitem;
-
       }
     }
-
   }
   return eSUCCESS;
 }
@@ -2354,6 +2357,8 @@ int szrildor_pass_checks(struct char_data *ch, struct obj_data *obj, int cmd, ch
     if (GET_LEVEL(i) >= 100)
       continue;
     if (i->in_room == real_room(30000))
+      continue;
+    if (i->in_room == real_room(30096))
       continue;
 
     if (!search_char_for_item(i, real_object(30097)) || (++count) > 4)
