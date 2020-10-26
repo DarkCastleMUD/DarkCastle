@@ -584,5 +584,7 @@ void produce_coredump(void *ptr = 0);
 
 bool isDead(char_data *ch);
 bool isNowhere(char_data *ch);
+bool file_exists(string filename);
+bool char_file_exists(string name);
 
 #endif /* UTILITY_H_ */
