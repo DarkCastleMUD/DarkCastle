@@ -23,9 +23,8 @@ jobs:
         sudo apt install gcc-8-multilib g++-8-multilib gcc-multilib
         sudo apt install g++-multilib scons libcurl4:i386 
         sudo apt install libpq-dev:i386 libpq5:i386 libcurl4-openssl-dev:i386
-        sudo apt install unzip zlib1g-dev:i386 || sudo apt search zlib
-        sudo apt search format
-        sudo apt search fmt
+        sudo apt install unzip zlib1g-dev:i386
+        sudo apt libfmt-dev libfmt-dev:i386
     - name: install twitcurl
       run: |
         wget https://github.com/swatkat/twitcurl/archive/master.zip
