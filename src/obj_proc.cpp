@@ -2331,6 +2331,8 @@ int szrildor_pass(struct char_data *ch, struct obj_data *obj, int cmd, char *arg
             throwitem->next = g_mprog_throw_list;
             g_mprog_throw_list = throwitem;
           }
+        } else {
+          logf(IMMORTAL, LOG_BUG, "szrildor_pass found nullptr in carried by");
         }
       }
     }
