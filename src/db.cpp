@@ -225,7 +225,6 @@ void boot_social_messages(void);
 void boot_clans(void);
 void assign_clan_rooms(void);
 struct help_index_element *build_help_index(FILE *fl, int *num);
-struct active_object active_head = {NULL, NULL};
 // The room_data implementation
 // -Sadus 9/1/96
 
@@ -3293,7 +3292,7 @@ CHAR_DATA *clone_mobile(int nr)
 	clear_char(mob);
 	old = ((CHAR_DATA *)(mob_index[nr].item)); /* cast void pointer */
 
-	memcpy(mob, old, sizeof(CHAR_DATA));
+	*mob = *old;
 
 #ifdef LEAK_CHECK
 	mob->mobdata = (mob_data *)calloc(1, sizeof(mob_data));
@@ -4186,24 +4185,18 @@ bool has_random(OBJ_DATA *obj)
 /* clone an object from obj_index */
 struct obj_data *clone_object(int nr)
 {
-	struct active_object *active_obj, *active_obj2;
 	struct obj_data *obj, *old;
 	struct extra_descr_data *new_new_descr, *descr;
 
 	if (nr < 0)
 		return 0;
 
-#ifdef LEAK_CHECK
-	obj = (struct obj_data *)calloc(1, sizeof(struct obj_data));
-#else
-	obj = (struct obj_data *)dc_alloc(1, sizeof(struct obj_data));
-#endif
-
+	obj = new obj_data;
 	clear_object(obj);
 	old = ((struct obj_data *)obj_index[nr].item); /* cast the void pointer */
 
 	if (old != 0) {
-		memcpy(obj, old, sizeof(struct obj_data));
+	  *obj = *old;
 	} else {
 		fprintf(stderr, "clone_object(%d): Obj not found in obj_index.\n", nr);
 		dc_free(obj);
@@ -4238,20 +4231,12 @@ struct obj_data *clone_object(int nr)
 	obj->next = object_list;
 	object_list = obj;
 	obj_index[nr].number++;
-    obj->save_expiration = 0;
+  obj->save_expiration = 0;
+
 	if (obj_index[obj->item_number].non_combat_func ||
 			obj->obj_flags.type_flag == ITEM_MEGAPHONE ||
 			has_random(obj)) {
-		active_obj2 = &active_head;
-#ifdef LEAK_CHECK
-		active_obj = (struct active_object *)calloc(1, sizeof(struct active_object));
-#else
-		active_obj = (struct active_object *)dc_alloc(1, sizeof(struct active_object));
-#endif
-		active_obj->obj = obj;
-		active_obj->next = active_obj2->next;
-		active_obj2->next = active_obj;
-		assert(!active_obj2->obj); // make sure our anchor point is still intact
+	  DC::instance().active_obj_list.insert(obj);
 	}
 	return obj;
 }
@@ -5518,10 +5503,32 @@ void clear_char(CHAR_DATA *ch)
 
 void clear_object(struct obj_data *obj)
 {
-	memset((char *)obj, (char)'\0', (int)sizeof(struct obj_data));
-
+	//memset((char *)obj, (char)'\0', (int)sizeof(struct obj_data));
 	obj->item_number = -1;
 	obj->in_room = NOWHERE;
+  obj->vroom = 0;
+  obj->obj_flags = obj_flag_data();
+  obj->num_affects = 0;
+  obj->affected = nullptr;
+
+  obj->name = nullptr;
+  obj->description = nullptr;
+  obj->short_description = nullptr;
+  obj->action_description = nullptr;
+  obj->ex_description = nullptr;
+  obj->carried_by = nullptr;
+  obj->equipped_by = nullptr;
+
+  obj->in_obj = nullptr;
+  obj->contains = nullptr;
+
+  obj->next_content = nullptr;
+  obj->next = nullptr;
+  obj->next_skill = nullptr;;
+  obj->table = nullptr;
+  obj->slot = nullptr;
+  obj->wheel = nullptr;
+  obj->save_expiration = 0;
 }
 
 // Roll up the random modifiers to saving throw for new character
