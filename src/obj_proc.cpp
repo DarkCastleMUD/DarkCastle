@@ -50,7 +50,7 @@ extern struct mprog_throw_type *g_mprog_throw_list;
 
 
 
-// TODO - go over emoting object stuff and make sure it's as effecient as we can get it
+// TODO - go over emoting object stuff and make sure it's as efficient as we can get it
  
 struct obj_emote_data {
     char *emote_text;
@@ -2280,8 +2280,11 @@ int szrildor_pass(struct char_data *ch, struct obj_data *obj, int cmd, char *arg
               if (tmp_victim->equipment[l])
                 extract_obj(unequip_char(tmp_victim, l));
             }
-            while (tmp_victim->carrying)
+
+            while (tmp_victim->carrying) {
               extract_obj(tmp_victim->carrying);
+            }
+
             extract_char(tmp_victim, TRUE);
           }
         }
@@ -2302,7 +2305,14 @@ int szrildor_pass(struct char_data *ch, struct obj_data *obj, int cmd, char *arg
       n = p->next;
       if (obj_index[p->item_number].virt == 30097)
       {
-        CHAR_DATA *v = p->carried_by;
+        CHAR_DATA *v = nullptr;
+
+        if (p->carried_by) {
+          v = p->carried_by;
+        } else if (p->in_obj) {
+          v = p->in_obj->carried_by;
+        }
+
         if (v)
         {
           send_to_char("The Szrildor daypass crumbles into dust.\r\n", v);
@@ -2331,8 +2341,6 @@ int szrildor_pass(struct char_data *ch, struct obj_data *obj, int cmd, char *arg
             throwitem->next = g_mprog_throw_list;
             g_mprog_throw_list = throwitem;
           }
-        } else {
-          logf(IMMORTAL, LOG_BUG, "szrildor_pass found nullptr in carried by");
         }
       }
     }
