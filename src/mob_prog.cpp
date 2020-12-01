@@ -325,7 +325,10 @@ void translate_value(char *leftptr, char *rightptr, int16 **vali,
 	OBJ_DATA *otarget = NULL;
 	int rtarget = -1, ztarget = -1;
 	bool valset = FALSE; // done like that to determine if value is set, since it can be 0
-	struct tempvariable *eh = mob->tempVariable;
+	struct tempvariable* mobTempVar = nullptr;
+	if (mob) {
+	 mobTempVar = mob->tempVariable;
+	}
 
 	// Used to store return pointer from getTemp(). Do not use more than
 	// once in this function.
@@ -418,7 +421,14 @@ void translate_value(char *leftptr, char *rightptr, int16 **vali,
 		ztarget = world[mob->in_room].zone;
 		left += 5;
 	} else if (*left == '$') {
-		switch (*(left + 1)) {
+	  uint8_t number_of_dollar_signs=1;
+	  while (*(left + number_of_dollar_signs) == '$') {
+	    number_of_dollar_signs++;
+	  }
+
+		switch (*(left + number_of_dollar_signs)) {
+		case '$':
+		  break;
 		case 'n':
 			target = actor;
 			break;
@@ -461,11 +471,11 @@ void translate_value(char *leftptr, char *rightptr, int16 **vali,
 				buf[i - 3] = *(left + i);
 
 			}
-			for (; eh; eh = eh->next)
-				if (!str_cmp(buf, eh->name))
+			for (; mobTempVar; mobTempVar = mobTempVar->next)
+				if (!str_cmp(buf, mobTempVar->name))
 					break;
-			if (eh)
-				strcpy(buf, eh->data);
+			if (mobTempVar)
+				strcpy(buf, mobTempVar->data);
 
 			if (buf[0] != '\0') {
 				if (!is_number(buf))
@@ -486,14 +496,22 @@ void translate_value(char *leftptr, char *rightptr, int16 **vali,
 		}
 	}
 
-	if (!target && !otarget && ztarget == -1 && rtarget == -1 && !valset
-			&& str_cmp(right, "numpcs")) {
-		if (!silent)
-			logf( IMMORTAL, LOG_WORLD,
-					"translate_value: Mob: %d invalid target in mobprog",
-					mob_index[mob->mobdata->nr].virt);
-		return;
-	}
+  if (!target && !otarget && ztarget == -1 && rtarget == -1 && !valset && str_cmp(right, "numpcs") && str_cmp(right, "hitpoints") && str_cmp(right, "move") && str_cmp(right, "mana"))
+  {
+    if (!silent)
+    {
+      if (mob == nullptr) {
+        logf( IMMORTAL, LOG_WORLD, "translate_value: %s.%s mob == nullptr", left, right);
+      } else if (mob->mobdata == nullptr) {
+        logf( IMMORTAL, LOG_WORLD, "translate_value: %s.%s mob->mobdata == nullptr", left, right);
+      } else if (mob->mobdata->nr < 0) {
+        logf( IMMORTAL, LOG_WORLD, "translate_value: %s.%s mob->mobdata->nr = %d < 0 ", left, right, mob->mobdata->nr);
+      } else {
+        logf( IMMORTAL, LOG_WORLD, "translate_value: Mob: %d invalid target in mobprog", mob_index[mob->mobdata->nr].virt);
+      }
+    }
+    return;
+  }
 	activeTarget = target;
 	// target acquired. fucking boring code.
 	// more boring code. FUCK.
@@ -733,7 +751,7 @@ void translate_value(char *leftptr, char *rightptr, int16 **vali,
 			else
 				sbval = (sbyte*) (&target->height);
 		} else if (!str_cmp(right, "hitpoints")) {
-			if (!target)
+		  if (!target)
 				tError = TRUE;
 			else
 				uintval = (uint32*) &target->hit;
@@ -1081,12 +1099,25 @@ void translate_value(char *leftptr, char *rightptr, int16 **vali,
 		break;
 
 	}
-	if (tError) {
-		logf( IMMORTAL, LOG_WORLD,
-				"Mob: %d tries to access non-existant field of target.",
-				mob_index[mob->mobdata->nr].virt);
-		return;
-	}
+  if (tError)
+  {
+    logf( IMMORTAL, LOG_WORLD, "translate_value: %s.%s target=%p actor=%p mob=%p", left, right, target, actor, mob);
+
+    if (mob)
+    {
+      if (mob->mobdata == nullptr)
+      {
+        logf( IMMORTAL, LOG_WORLD, "translate_value: %s.%s mob->mobdata == nullptr", left, right);
+      } else if (mob->mobdata->nr < 0)
+      {
+        logf( IMMORTAL, LOG_WORLD, "translate_value: %s.%s mob->mobdata->nr = %d < 0 ", left, right, mob->mobdata->nr);
+      } else
+      {
+        logf( IMMORTAL, LOG_WORLD, "translate_value: Mob: %d tried to access non-existent field of target", mob_index[mob->mobdata->nr].virt);
+      }
+    }
+    return;
+  }
 	if (intval)
 		*vali = intval;
 	if (uintval)
