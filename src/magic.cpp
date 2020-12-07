@@ -10461,7 +10461,7 @@ int cast_herb_lore(ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *v
      healamount = number(healamount-(healamount/10), healamount+(healamount/10));
      if(OUTSIDE(ch))    GET_HIT(victim) += healamount;   
      else { /* if not outside */
-       healamount = dam_percent(skill,80);
+       healamount = dam_percent(skill,175);
        healamount = number(healamount-(healamount/10), healamount+(healamount/10));
        GET_HIT(victim) += healamount;
        send_to_char("Your spell is less effective because you are indoors!\n\r", ch);
