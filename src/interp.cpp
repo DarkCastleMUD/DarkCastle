@@ -857,7 +857,7 @@ int command_interpreter( CHAR_DATA *ch, char *pcomm, bool procced  )
 	send_to_char("You are still recovering from your last attempt.\r\n",ch);
         return eSUCCESS;
       }
-      // We're going to execute, check for useable special proc.
+      // We're going to execute, check for usable special proc.
       retval = special( ch, found->command_number, &pcomm[look_at] );
       if(IS_SET(retval, eSUCCESS) || IS_SET(retval, eCH_DIED))
         return retval;
