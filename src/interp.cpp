@@ -786,6 +786,13 @@ int command_interpreter( CHAR_DATA *ch, char *pcomm, bool procced  )
   // Old method used a linear search. *yuck* (Sadus)
   if((found = find_cmd_in_radix(pcomm)))
     if(GET_LEVEL(ch) >= found->minimum_level && found->command_pointer != NULL) {
+      if (found->minimum_level == GIFTED_COMMAND) {
+        if (IS_NPC(ch) || !has_skill(ch, found->command_number)) {
+            send_to_char("Huh?\r\n", ch);
+            return eFAILURE;
+        }
+      }
+
       // Paralysis stops everything but ...
       if (IS_AFFECTED(ch, AFF_PARALYSIS) && 
           found->command_number != CMD_GTELL &&  // gtell
