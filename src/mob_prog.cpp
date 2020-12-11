@@ -3313,25 +3313,28 @@ void mprog_driver ( char *com_list, CHAR_DATA *mob, CHAR_DATA *actor,
  }
 
  // count valid random victs in room
- for ( vch = world[mob->in_room].people; vch; vch = vch->next_in_room )
-   if ( CAN_SEE( mob, vch, TRUE ) && !IS_NPC(vch) )
-       count++;
-
- if(count)
-   count = number( 1, count );  // if we have valid victs, choose one
-
- if(!rndm && count) 
- {
-   for ( vch = world[mob->in_room].people; vch && count; )
-   {
+ if (mob->in_room > 0) {
+   for ( vch = world[mob->in_room].people; vch; vch = vch->next_in_room )
      if ( CAN_SEE( mob, vch, TRUE ) && !IS_NPC(vch) )
-       count--;
-     if (count) vch = vch->next_in_room;
-  }
-   rndm = vch;
+         count++;
+
+   if(count)
+     count = number( 1, count );  // if we have valid victs, choose one
+
+   if(!rndm && count)
+   {
+     for ( vch = world[mob->in_room].people; vch && count; )
+     {
+       if ( CAN_SEE( mob, vch, TRUE ) && !IS_NPC(vch) )
+         count--;
+       if (count) vch = vch->next_in_room;
+    }
+     rndm = vch;
+   }
+
+   activeRndm = rndm;
  }
 
- activeRndm = rndm;
  strcpy( tmpcmndlst, com_list );
 
  command_list = tmpcmndlst;
