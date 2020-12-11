@@ -445,7 +445,7 @@ struct command_info cmd_info[] =
     { "shutdown",	do_shutdown,	POSITION_DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1 },
     { "opedit",		do_opedit,	POSITION_DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1 },
     { "opstat",		do_opstat,	POSITION_DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1 },
-    { "procedit",	do_mpedit,	POSITION_DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1 },
+    { "procedit",	do_procedit,	POSITION_DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1 },
     { "procstat",	do_mpstat,	POSITION_DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1 },
     { "range",		do_range,	POSITION_DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1 },
    // { "pshopedit",	do_pshopedit,	POSITION_DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1 },
@@ -786,6 +786,13 @@ int command_interpreter( CHAR_DATA *ch, char *pcomm, bool procced  )
   // Old method used a linear search. *yuck* (Sadus)
   if((found = find_cmd_in_radix(pcomm)))
     if(GET_LEVEL(ch) >= found->minimum_level && found->command_pointer != NULL) {
+      if (found->minimum_level == GIFTED_COMMAND) {
+        if (IS_NPC(ch) || !has_skill(ch, found->command_number)) {
+            send_to_char("Huh?\r\n", ch);
+            return eFAILURE;
+        }
+      }
+
       // Paralysis stops everything but ...
       if (IS_AFFECTED(ch, AFF_PARALYSIS) && 
           found->command_number != CMD_GTELL &&  // gtell
@@ -857,7 +864,7 @@ int command_interpreter( CHAR_DATA *ch, char *pcomm, bool procced  )
 	send_to_char("You are still recovering from your last attempt.\r\n",ch);
         return eSUCCESS;
       }
-      // We're going to execute, check for useable special proc.
+      // We're going to execute, check for usable special proc.
       retval = special( ch, found->command_number, &pcomm[look_at] );
       if(IS_SET(retval, eSUCCESS) || IS_SET(retval, eCH_DIED))
         return retval;

@@ -68,7 +68,7 @@ void parse_action(int command, char *string, struct descriptor_data *d) {
        j++;
       }
       format_text(d->strnew, flags, d, d->max_str);
-      sprintf(buf, "Text formarted with%s indent.\r\n", (indent ? "" : "out")); 
+      sprintf(buf, "Text formatted with%s indent.\r\n", (indent ? "" : "out"));
       SEND_TO_Q(buf, d);
       break;    
     case PARSE_REPLACE: 

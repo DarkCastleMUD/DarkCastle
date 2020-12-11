@@ -362,7 +362,7 @@ DO_FUN do_memoryleak;
 DO_FUN do_mortal_set;
 //DO_FUN do_motdload;
 DO_FUN do_msave;
-DO_FUN do_mpedit;
+DO_FUN do_procedit;
 DO_FUN do_mpbestow;
 DO_FUN do_mpstat;
 DO_FUN do_opedit;

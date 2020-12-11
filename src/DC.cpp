@@ -31,6 +31,13 @@ void DC::removeDead(void) {
 		free_char(ch);
 		death_list.pop();
 	}
+
+	while (!obj_free_list.empty()) {
+	  obj_data *obj = *(obj_free_list.cbegin());
+	  active_obj_list.erase(obj);
+	  obj_free_list.erase(obj);
+    delete obj;
+	}
 }
 
 void DC::handleShooting(void) {

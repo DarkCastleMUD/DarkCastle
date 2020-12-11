@@ -69,8 +69,10 @@ int do_log(struct char_data *ch, char *argument, int cmd)
     char buf[MAX_INPUT_LENGTH];
     char buf2[MAX_INPUT_LENGTH];
 
-    if (IS_NPC(ch))
+    if (IS_MOB(ch) || !has_skill(ch, COMMAND_LOG)) {
+        send_to_char("Huh?\r\n", ch);
         return eFAILURE;
+    }
 
 
     one_argument(argument, buf);
