@@ -1,0 +1,11 @@
+* This file contains the list of the files which make up the zonefiles
+* Comments are on lines that begin with a "*"
+* The files themselves, are located in the lib/zonefiles directory
+* The file name should be surrounded with <tilda>s on a line of it's own.
+* ie: <tilda><enter>filename<tilda>
+* DO NOT USE TILDAS IN THE COMMENTS*
+* Zones _must_ be in correct order.
+~
+00049-boardsmegaphones.zon~
+00200-299.zon~
+$~

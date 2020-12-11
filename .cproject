@@ -39,7 +39,7 @@
                             							
                             <targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF;org.eclipse.cdt.core.GNU_ELF" id="cdt.managedbuild.target.gnu.platform.base.677286203" name="Debug Platform" osList="linux,hpux,aix,qnx" superClass="cdt.managedbuild.target.gnu.platform.base"/>
                             							
-                            <builder arguments="" autoBuildTarget="" buildPath="${workspace_loc:/dcastle/src}" cleanBuildTarget="-c" command="scons" enableAutoBuild="true" id="cdt.managedbuild.target.gnu.builder.base.388927982" incrementalBuildTarget="" keepEnvironmentInBuildfile="false" managedBuildOn="false" name="Gnu Make Builder" parallelBuildOn="true" parallelizationNumber="optimal" superClass="cdt.managedbuild.target.gnu.builder.base">
+                            <builder arguments="" autoBuildTarget="" buildPath="${workspace_loc:/dcastle/src}" cleanBuildTarget="-c" command="scons" enableAutoBuild="false" id="cdt.managedbuild.target.gnu.builder.base.388927982" incrementalBuildTarget="" keepEnvironmentInBuildfile="false" managedBuildOn="false" name="Gnu Make Builder" parallelBuildOn="true" parallelizationNumber="optimal" superClass="cdt.managedbuild.target.gnu.builder.base">
                                 								
                                 <outputEntries>
                                     									

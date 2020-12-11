@@ -35,7 +35,6 @@ extern int drink_aff[][3];
 extern CWorld world;
 
 extern struct spell_info_type spell_info[MAX_SPL_LIST];
-extern struct active_object active_head;
 extern struct index_data *obj_index;
 extern struct index_data *mob_index; 
 int hands_are_free(CHAR_DATA *ch, int number);
@@ -167,34 +166,36 @@ int damage_eq_once(obj_data * obj)
   return 1;
 }
 
-void object_activity(uint64_t pulse_type) {
-  struct active_object *active_obj;
-  struct active_object *next_obj;
 
-  for (active_obj = &active_head; active_obj && active_obj != (struct active_object*) 0x95959595; active_obj = next_obj) {
-    next_obj = active_obj->next;
-    if (active_obj->obj && active_obj->obj != (struct obj_data*) 0x95959595) {
-      if (obj_index[active_obj->obj->item_number].non_combat_func)
-        obj_index[active_obj->obj->item_number].non_combat_func(NULL, active_obj->obj, 0, "", NULL);
-      else if (active_obj->obj->obj_flags.type_flag == ITEM_MEGAPHONE && active_obj->obj->ex_description && active_obj->obj->obj_flags.value[0]-- == 0) {
-        active_obj->obj->obj_flags.value[0] = ((obj_data*) obj_index[active_obj->obj->item_number].item)->obj_flags.value[1];
-        send_to_room(active_obj->obj->ex_description->description, active_obj->obj->in_room, TRUE);
-      } else {
-        int retval = 0;
-        extern struct zone_data *zone_table;
+void object_activity(uint64_t pulse_type)
+{
+  for (auto &obj : DC::instance().active_obj_list)
+  {
+    int32 item_number = obj->item_number;
 
-        if (active_obj->obj->in_room != NOWHERE) {
-          if (zone_table[world[active_obj->obj->in_room].zone].players)
-            retval = oprog_rand_trigger(active_obj->obj);
-        } else
-          retval = oprog_rand_trigger(active_obj->obj);
-        if (!SOMEONE_DIED(retval) && objExists(active_obj->obj))
-          oprog_arand_trigger(active_obj->obj);
-      }
+    if (obj_index[item_number].non_combat_func)
+    {
+      obj_index[item_number].non_combat_func(NULL, obj, 0, "", NULL);
+    } else if (obj->obj_flags.type_flag == ITEM_MEGAPHONE && obj->ex_description && obj->obj_flags.value[0]-- == 0)
+    {
+      obj->obj_flags.value[0] = ((obj_data*) obj_index[item_number].item)->obj_flags.value[1];
+      send_to_room(obj->ex_description->description, obj->in_room, TRUE);
+    } else
+    {
+      int retval = 0;
+      extern struct zone_data *zone_table;
+
+      if (obj->in_room != NOWHERE)
+      {
+        if (zone_table[world[obj->in_room].zone].players)
+          retval = oprog_rand_trigger(obj);
+      } else
+        retval = oprog_rand_trigger(obj);
+      if (!SOMEONE_DIED(retval) && objExists(obj))
+        oprog_arand_trigger(obj);
     }
-    //else {
-    //}
   }
+
   DC::instance().removeDead();
   return;
 }

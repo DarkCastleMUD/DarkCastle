@@ -155,17 +155,22 @@ void mobile_activity(void)
 		try {
 			if (zone_table[world[ch->in_room].zone].players) {
 				retval = mprog_random_trigger(ch);
-				if (IS_SET(retval, eCH_DIED) || isDead(ch) || isNowhere(ch))
+				if (IS_SET(retval, eCH_DIED) || isDead(ch) || isNowhere(ch)) {
 					continue;
+				}
+      }
 
-				retval = mprog_arandom_trigger(ch);
-				if (IS_SET(retval, eCH_DIED) || selfpurge || isDead(ch) || isNowhere(ch))
-					continue;
-			}
+			retval = mprog_arandom_trigger(ch);
+      if (IS_SET(retval, eCH_DIED) || selfpurge || isDead(ch) || isNowhere(ch)) {
+        continue;
+      }
 		} catch (...) {
 			log("error in mobile_activity. dumping core.", IMMORTAL, LOG_BUG);
 			produce_coredump(ch);
 		}
+
+
+
 
     // activate mprog act triggers
     if ( ch->mobdata->mpactnum > 0 )  // we check to make sure ch is mob in very beginning, so safe

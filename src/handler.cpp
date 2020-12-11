@@ -55,7 +55,6 @@ extern struct obj_data *object_list;
 extern struct index_data *mob_index;
 extern struct index_data *obj_index;
 extern struct descriptor_data *descriptor_list;
-extern struct active_object active_head;
 extern struct zone_data *zone_table;
 
 bool has_random(OBJ_DATA *obj);
@@ -1957,6 +1956,11 @@ void affect_remove(CHAR_DATA *ch, struct affected_type *af, int flags) {
 			send_to_char("You feel ready to brew something again.\n\r", ch);
 		}
 		break;
+	case SKILL_SCRIBE_TIMER:
+		if (!(flags & SUPPRESS_MESSAGES)) {
+			send_to_char("You feel ready to scribe something again.\n\r", ch);
+		}
+		break;
 	case OBJ_LILITHRING:
 		if (IS_NPC(ch))
 		{
@@ -3193,29 +3197,7 @@ void object_list_new_new_owner(struct obj_data *list, CHAR_DATA *ch) {
 // Extract an object from the world
 void extract_obj(struct obj_data *obj) {
 	struct obj_data *temp1;
-	//struct obj_data *temp2;
-	struct active_object *active_obj = NULL, *last_active = NULL;
-
 	huntclear_item(obj);
-
-	if (obj_index[obj->item_number].non_combat_func || obj->obj_flags.type_flag == ITEM_MEGAPHONE || has_random(obj)) {
-		active_obj = &active_head;
-		while (active_obj) {
-			if ((active_obj->obj == obj) && (last_active)) {
-				last_active->next = active_obj->next;
-				dc_free(active_obj);
-				break;
-			} else if (active_obj->obj == obj) {
-				active_head.obj = active_obj->next->obj;
-				active_head.next = active_obj->next->next;
-//		last_active->next = active_obj->next;
-				dc_free(active_obj);
-				break;
-			}
-			last_active = active_obj;
-			active_obj = active_obj->next;
-		}
-	}
 
 	// if we're going away, unhook myself from my owner
 	if (GET_ITEM_TYPE(obj) == ITEM_BEACON && obj->equipped_by) {
@@ -3273,9 +3255,11 @@ void extract_obj(struct obj_data *obj) {
 			temp1->next = obj->next;
 	}
 
-	if (obj->item_number >= 0)
+	if (obj->item_number >= 0) {
 		(obj_index[obj->item_number].number)--;
-	free_obj(obj);
+	}
+
+	DC::instance().obj_free_list.insert(obj);
 }
 
 void update_object(struct obj_data *obj, int use) {

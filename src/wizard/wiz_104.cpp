@@ -24,7 +24,6 @@ extern struct room_data ** world_array;
 void save_corpses(void);
 extern char *obj_types[];
 extern std::vector<std::string> continent_names;
-extern struct active_object active_head;
 
 
 int do_thunder(struct char_data *ch, char *argument, int cmd)
@@ -2113,25 +2112,11 @@ int do_oclone(struct char_data *ch, char *argument, int cmd)
   obj = clone_object(r1);
   extern bool has_random(OBJ_DATA *obj);
   if (!obj) {csendf(ch, "Failure. Unable to clone item.\r\n"); return eFAILURE; }
-  struct active_object *active_obj = NULL,*last_active = NULL;
+
   if(obj_index[obj->item_number].non_combat_func ||
         obj->obj_flags.type_flag == ITEM_MEGAPHONE ||
         has_random(obj)) {
-       active_obj = &active_head;
-       while(active_obj) {
-           if((active_obj->obj == obj) && (last_active)) {
-                last_active->next = active_obj->next;
-                dc_free(active_obj);
-                break;
-            } else if(active_obj->obj == obj) {
-                active_head.obj = active_obj->next->obj;
-                active_head.next = active_obj->next->next;
-                dc_free(active_obj);
-                break;
-            }
-            last_active = active_obj;
-            active_obj = active_obj->next;
-        }
+    DC::instance().obj_free_list.insert(obj);
   }
 
   csendf(ch, "Ok.\n\rYou copied item %d (%s) and replaced item %d (%s).\n\r",

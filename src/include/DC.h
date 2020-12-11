@@ -12,14 +12,16 @@
 #include <queue>
 #include <unordered_set>
 #include "character.h"
+#include "obj.h"
 
 
 using namespace std;
 
-typedef set<char_data *> character_list_t;
+typedef set<char_data*> character_list_t;
+typedef set<obj_data*> obj_list_t;
 
 class DC {
-  // favour reference semantics over pointer semantics
+  // Favor reference semantics over pointer semantics
 public:
   DC();
   void removeDead(void);
@@ -31,6 +33,8 @@ public:
 
   character_list_t character_list;
   queue<char_data*> death_list;
+  obj_list_t active_obj_list;
+  obj_list_t obj_free_list;
   unordered_set<char_data*> shooting_list;
 
 private:
