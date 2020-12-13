@@ -67,7 +67,7 @@ int do_pview(struct char_data *ch, char *argument, int cmd)
 
   argument = one_argument(argument, name);
 
-  if((!*name) || (!(victim = get_char_vis(ch, name)))) {
+  if((!*name) || (!(victim = get_pc_vis(ch, name)))) {
     send_to_char("View the prompt of whom?\n\r", ch);
     return eFAILURE;
   }

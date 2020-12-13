@@ -224,14 +224,10 @@ int do_pardon(struct char_data *ch, char *argument, int cmd)
         send_to_char("Pardon whom?\n\r", ch);
         return eFAILURE;
     }
-    if(!(victim = get_char(person)))
+
+    if(!(victim = get_pc_vis(ch, person)))
     {
       send_to_char("They aren't here.\n\r", ch);
-      return eFAILURE;
-    }
-    if(IS_NPC(victim))
-    {
-      send_to_char("Can't pardon NPCs.\n\r",ch);
       return eFAILURE;
     }
 

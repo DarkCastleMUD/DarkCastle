@@ -136,18 +136,13 @@ int do_guide(struct char_data *ch, char *argument, int cmd)
     one_argument(argument,name);
 
     if(*name) {
-        if(!(victim = get_char_vis(ch, name))) {
+        if(!(victim = get_pc_vis(ch, name))) {
             send_to_char("That player is not here.\n\r", ch);
             return eFAILURE;
         }
     } else {
         send_to_char("Who exactly would you like to be a guide?\n\r", ch);
         return eFAILURE;
-    }
-
-    if (IS_NPC(victim)) {
-      send_to_char("Hmm, mobs wouldn't make very good guides now would they?\r\n", ch);
-      return eFAILURE;
     }
 
     if (!IS_SET(victim->pcdata->toggles, PLR_GUIDE)) {
