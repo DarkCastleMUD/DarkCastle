@@ -77,10 +77,9 @@ int do_log(struct char_data *ch, char *argument, int cmd)
 
     one_argument(argument, buf);
 
-    if (!*buf)
+    if (!*buf) {
         send_to_char("Log who?\n\r", ch);
-
-    else if (!generic_find(argument, FIND_CHAR_WORLD, ch, &vict, &dummy))
+    } else if (!(vict = get_pc_vis(ch, buf)))
         send_to_char("Couldn't find any such creature.\n\r", ch);
     else if (IS_NPC(vict))
         send_to_char("Can't do that to a beast.\n\r", ch);
