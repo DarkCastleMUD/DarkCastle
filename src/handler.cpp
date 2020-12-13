@@ -2130,9 +2130,9 @@ int char_from_room(CHAR_DATA *ch, bool stop_all_fighting) {
 			REMOVE_BIT(world[ch->in_room].room_flags, NO_TRACK);
 		}
 	if (IS_NPC(ch))
-		if (ISSET(ch->mobdata->actflags, ACT_NOKI) && !kimore && IS_SET(world[ch->in_room].iFlags, NOKI)) {
-			REMOVE_BIT(world[ch->in_room].iFlags, NOKI);
-			REMOVE_BIT(world[ch->in_room].room_flags, NOKI);
+		if (ISSET(ch->mobdata->actflags, ACT_NOKI) && !kimore && IS_SET(world[ch->in_room].iFlags, NO_KI)) {
+			REMOVE_BIT(world[ch->in_room].iFlags, NO_KI);
+			REMOVE_BIT(world[ch->in_room].room_flags, NO_KI);
 		}
 	if (IS_NPC(ch) && ISSET(ch->mobdata->actflags, ACT_NOMAGIC) && !Other && IS_SET(world[ch->in_room].iFlags, NO_MAGIC)) {
 		REMOVE_BIT(world[ch->in_room].iFlags, NO_MAGIC);
