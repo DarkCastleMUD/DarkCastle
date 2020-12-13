@@ -44,6 +44,7 @@ extern "C"
 #include <returnvals.h>
 #include <terminal.h>
 #include <CommandStack.h>
+#include "const.h"
 
 #define SKILL_HIDE 337
 
@@ -787,8 +788,22 @@ int command_interpreter( CHAR_DATA *ch, char *pcomm, bool procced  )
   if((found = find_cmd_in_radix(pcomm)))
     if(GET_LEVEL(ch) >= found->minimum_level && found->command_pointer != NULL) {
       if (found->minimum_level == GIFTED_COMMAND) {
-        if (IS_NPC(ch) || !has_skill(ch, found->command_number)) {
+
+        //search bestowable_god_commands for the command skill number to lookup with has_skill
+        int command_skill=0;
+        for (int i = 0; *bestowable_god_commands[i].name != '\n'; i++) {
+          if (bestowable_god_commands[i].name == found->command_name) {
+            command_skill=bestowable_god_commands[i].num;
+            break;
+          }
+        }
+
+        if (command_skill == 0 || IS_NPC(ch) || !has_skill(ch, command_skill)) {
             send_to_char("Huh?\r\n", ch);
+
+            if (command_skill == 0) {
+              logf(LOG_BUG, IMMORTAL, "Unable to find command [%s] within bestowable_god_commands", found->command_name);
+            }
             return eFAILURE;
         }
       }
