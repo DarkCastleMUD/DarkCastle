@@ -522,7 +522,7 @@ int oprog_load_trigger( OBJ_DATA *item);
 int oprog_can_see_trigger( CHAR_DATA *ch, OBJ_DATA *item );
 bool is_in_game(char_data *ch);
 int get_stat(CHAR_DATA *ch, int stat);
-char *pluralize(int qty, char *ending = "s");
+char *pluralize(int qty, char ending[] = "s");
 size_t nocolor_strlen(const char *s);
 
 #define MAX_THROW_NAME     60
