@@ -5,7 +5,7 @@ import datetime
 import subprocess
 from subprocess import *
 
-env = Environment(CCFLAGS = '-ggdb3 -Wall -m32 -std=gnu++1y -Wno-write-strings',
+env = Environment(CCFLAGS = '-ggdb3 -Wall -m32 -std=gnu++1y -Wno-write-strings -fdiagnostics-color=always',
     LINKFLAGS = '-ggdb3 -Wall -m32 -std=gnu++1y' )
 
 if os.path.exists('/usr/bin/g++-7'):
@@ -13,12 +13,12 @@ if os.path.exists('/usr/bin/g++-7'):
 
 if os.path.exists('/usr/bin/g++-9'):
 	env.Replace(CXX = 'g++-9')
-	env.Replace(CCFLAGS = '-ggdb3 -Wall -m32 -std=gnu++17 -Wno-write-strings')
-	env.Replace(LINKFLAGS = '-ggdb3 -Wall -m32 -std=gnu++17')
+	env.Replace(CCFLAGS = '-ggdb3 -Wall -m32 -std=gnu++17 -Wno-write-strings -fdiagnostics-color=always')
+	env.Replace(LINKFLAGS = '-ggdb3 -Wall -m32 -std=gnu++17 -fdiagnostics-color=always')
 
 if os.path.exists('/usr/bin/g++-10'):
        env.Replace(CXX = 'g++-10')
-       env.Replace(CCFLAGS = '-ggdb3 -Wall -m32 -std=gnu++20 -Wno-write-strings')
+       env.Replace(CCFLAGS = '-ggdb3 -Wall -m32 -std=gnu++20 -Wno-write-strings -fdiagnostics-color=always')
        env.Replace(LINKFLAGS = '-ggdb3 -Wall -m32 -std=gnu++20')
 
 debug=ARGUMENTS.get('debug', 0)
