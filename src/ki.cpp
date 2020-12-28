@@ -12,21 +12,21 @@ extern "C"
 #include <string.h>
 }
 
-#include <ki.h>
-#include <room.h>
-#include <character.h>
-#include <spells.h> // tar_char..
-#include <levels.h>
-#include <utility.h>
-#include <player.h>
-#include <interp.h>
-#include <mobile.h>
-#include <fight.h>
-#include <handler.h>
-#include <connect.h>
-#include <act.h>
-#include <db.h>
-#include <returnvals.h>
+#include "ki.h"
+#include "room.h"
+#include "character.h"
+#include "spells.h" // tar_char..
+#include "levels.h"
+#include "utility.h"
+#include "player.h"
+#include "interp.h"
+#include "mobile.h"
+#include "fight.h"
+#include "handler.h"
+#include "connect.h"
+#include "act.h"
+#include "db.h"
+#include "returnvals.h"
 #include <vector>
 
 using namespace std;

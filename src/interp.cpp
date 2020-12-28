@@ -25,25 +25,25 @@ extern "C"
 #include <ctype.h>
 #include <stdio.h>
 #include <assert.h>
-/*#include <memory.h>*/
+/*#include "memory.h"*/
 }
 
-#include <structs.h> // MAX_STRING_LENGTH
-#include <character.h> // POSITION_*
-#include <interp.h>
-#include <levels.h>
-#include <utility.h>
-#include <player.h>
-#include <fight.h>
-#include <spells.h> // ETHERAL consts
-#include <mobile.h>
-#include <connect.h> // descriptor_data
-#include <room.h>
-#include <db.h>
-#include <act.h>
-#include <returnvals.h>
-#include <terminal.h>
-#include <CommandStack.h>
+#include "structs.h" // MAX_STRING_LENGTH
+#include "character.h" // POSITION_*
+#include "interp.h"
+#include "levels.h"
+#include "utility.h"
+#include "player.h"
+#include "fight.h"
+#include "spells.h" // ETHERAL consts
+#include "mobile.h"
+#include "connect.h" // descriptor_data
+#include "room.h"
+#include "db.h"
+#include "act.h"
+#include "returnvals.h"
+#include "terminal.h"
+#include "CommandStack.h"
 #include "const.h"
 
 #define SKILL_HIDE 337

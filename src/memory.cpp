@@ -6,7 +6,7 @@ extern "C" {
 
 #endif
 
-#include <memory.h>
+#include "memory.h"
 
 /************************************************************************
 | void * dc_alloc(size_t nmemb, size_t size)

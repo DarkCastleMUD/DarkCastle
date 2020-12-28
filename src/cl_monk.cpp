@@ -3,21 +3,21 @@
 | cl_monk.C
 | Description:  Monk skills.
 */
-#include <structs.h>
-#include <player.h>
-#include <levels.h>
-#include <fight.h>
-#include <utility.h>
-#include <character.h>
-#include <spells.h>
-#include <handler.h>
-#include <connect.h>
-#include <mobile.h>
-#include <act.h>
-#include <returnvals.h>
-#include <db.h>
-#include <room.h>
-#include <interp.h>
+#include "structs.h"
+#include "player.h"
+#include "levels.h"
+#include "fight.h"
+#include "utility.h"
+#include "character.h"
+#include "spells.h"
+#include "handler.h"
+#include "connect.h"
+#include "mobile.h"
+#include "act.h"
+#include "returnvals.h"
+#include "db.h"
+#include "room.h"
+#include "interp.h"
 
 /************************************************************************
 | OFFENSIVE commands.

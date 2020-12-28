@@ -13,21 +13,21 @@
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
 /* $Id: mob_proc2.cpp,v 1.89 2012/05/25 02:15:46 jhhudso Exp $ */
-#include <room.h>
-#include <obj.h>
-#include <connect.h>
-#include <timeinfo.h>
-#include <utility.h>
-#include <character.h>
-#include <handler.h>
-#include <db.h>
-#include <player.h>
-#include <levels.h>
-#include <interp.h>
-#include <act.h>
+#include "room.h"
+#include "obj.h"
+#include "connect.h"
+#include "timeinfo.h"
+#include "utility.h"
+#include "character.h"
+#include "handler.h"
+#include "db.h"
+#include "player.h"
+#include "levels.h"
+#include "interp.h"
+#include "act.h"
 #include <string.h>
-#include <returnvals.h>
-#include <spells.h>
+#include "returnvals.h"
+#include "spells.h"
 
 extern struct obj_data * search_char_for_item(char_data * ch, int16 item_number, bool wearonly = FALSE);
 

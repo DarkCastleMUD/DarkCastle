@@ -46,24 +46,24 @@ extern "C"
   #include <string.h> // memset()
   #include <ctype.h> // isspace(), isdigit()
 }
-#include <room.h>
-#include <obj.h>
-#include <player.h> // MAX_*
-#include <connect.h> // CON_WRITE_BOARD
-#include <terminal.h> // BOLD
-#include <fileinfo.h> // for the board files
-#include <levels.h> // levels..
-#include <clan.h>
-#include <character.h> 
-#include <utility.h> // FALSE
-#include <memory.h>
-#include <act.h>
-#include <db.h>
-#include <returnvals.h>
+#include "room.h"
+#include "obj.h"
+#include "player.h" // MAX_*
+#include "connect.h" // CON_WRITE_BOARD
+#include "terminal.h" // BOLD
+#include "fileinfo.h" // for the board files
+#include "levels.h" // levels..
+#include "clan.h"
+#include "character.h" 
+#include "utility.h" // FALSE
+#include "memory.h"
+#include "act.h"
+#include "db.h"
+#include "returnvals.h"
 #include <string>
 #include <map>
 #include <vector>
-#include <interp.h>
+#include "interp.h"
 #include <sstream>
 
 #define MAX_MESSAGE_LENGTH 	2048

@@ -10,24 +10,24 @@ extern "C" {
 #include <string.h>
 }
 
-#include <sing.h>
-#include <room.h>
-#include <character.h>
-#include <spells.h> // tar_char..
-#include <levels.h>
-#include <race.h>
-#include <utility.h>
-#include <player.h>
-#include <interp.h>
-#include <mobile.h>
-#include <fight.h>
-#include <handler.h>
-#include <connect.h>
-#include <act.h>
-#include <db.h>
-#include <magic.h> // dispel_magic
-#include <innate.h> // SKILL_INNATE_EVASION
-#include <returnvals.h>
+#include "sing.h"
+#include "room.h"
+#include "character.h"
+#include "spells.h" // tar_char..
+#include "levels.h"
+#include "race.h"
+#include "utility.h"
+#include "player.h"
+#include "interp.h"
+#include "mobile.h"
+#include "fight.h"
+#include "handler.h"
+#include "connect.h"
+#include "act.h"
+#include "db.h"
+#include "magic.h" // dispel_magic
+#include "innate.h" // SKILL_INNATE_EVASION
+#include "returnvals.h"
 #include <vector>
 extern CWorld world;
 extern index_data *mob_index;

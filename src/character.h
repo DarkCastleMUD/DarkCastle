@@ -8,16 +8,16 @@
 
 #define  COMPILE_WITH_CHANGES 1
 
-#include <affect.h>  /* MAX_AFFECTS, etc.. */
-#include <alias.h>   /* struct char_player_alias, MAX_ALIASES, etc.. */
-#include <structs.h> /* ubyte, ubyte, int16, etc.. */
-#include <timeinfo.h> // time data, etc..
-#include <event.h> // eventBrief
-#include <isr.h>   // SAVE_TYPE_MAX
-#include <utility.h>
-#include <mobile.h>
-#include <sing.h>
-#include <quest.h>
+#include "affect.h"  /* MAX_AFFECTS, etc.. */
+#include "alias.h"   /* struct char_player_alias, MAX_ALIASES, etc.. */
+#include "structs.h" /* ubyte, ubyte, int16, etc.. */
+#include "timeinfo.h" // time data, etc..
+#include "event.h" // eventBrief
+#include "isr.h"   // SAVE_TYPE_MAX
+#include "utility.h"
+#include "mobile.h"
+#include "sing.h"
+#include "quest.h"
 
 extern "C" {
 #include <sys/time.h>

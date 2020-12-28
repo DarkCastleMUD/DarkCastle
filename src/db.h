@@ -21,9 +21,9 @@ extern "C" {
   #include <time.h>
 }
 
-#include <character.h>
-#include <weather.h>
-#include <handler.h>
+#include "character.h"
+#include "weather.h"
+#include "handler.h"
 #include <string>
 #include <vector>
 #include <fstream>

@@ -17,21 +17,22 @@ extern "C"
   #include <string.h>
 }
 #include <assert.h>
-#include <terminal.h>
-#include <connect.h>
-#include <levels.h>
-#include <room.h>
-#include <mobile.h>
-#include <player.h>
-#include <character.h>
-#include <obj.h>
-#include <handler.h>
-#include <interp.h>
-#include <utility.h>
-#include <act.h>
-#include <db.h>
-#include <returnvals.h>
-#include <fileinfo.h>
+#include "terminal.h"
+#include "connect.h"
+#include "levels.h"
+#include "room.h"
+#include "mobile.h"
+#include "player.h"
+#include "character.h"
+#include "obj.h"
+#include "handler.h"
+#include "interp.h"
+#include "utility.h"
+#include "act.h"
+#include "db.h"
+
+#include "returnvals.h"
+#include "fileinfo.h"
 
 extern CWorld world;
 extern struct descriptor_data *descriptor_list;

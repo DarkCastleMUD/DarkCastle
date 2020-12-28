@@ -4,18 +4,18 @@
 **********************/
 #include "wizard.h"
 
-#include <utility.h>
-#include <mobile.h>
-#include <player.h>
-#include <db.h>
-#include <connect.h>
-#include <interp.h>
-#include <room.h>
-#include <handler.h>
-#include <returnvals.h>
-#include <spells.h>
-#include <clan.h>
-#include <race.h>
+#include "utility.h"
+#include "mobile.h"
+#include "player.h"
+#include "db.h"
+#include "connect.h"
+#include "interp.h"
+#include "room.h"
+#include "handler.h"
+#include "returnvals.h"
+#include "spells.h"
+#include "clan.h"
+#include "race.h"
 
 extern char* pc_clss_types[];
 extern struct room_data ** world_array;

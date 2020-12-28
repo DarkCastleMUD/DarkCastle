@@ -3,20 +3,20 @@
 | 11/20/95 -- Azrack
 **********************/
 #include "wizard.h"
-#include <spells.h>
-#include <fileinfo.h>
-#include <connect.h>
-#include <utility.h>
-#include <player.h>
-#include <levels.h>
-#include <mobile.h>
-#include <handler.h>
-#include <interp.h>
-#include <db.h>
-#include <returnvals.h>
-#include <comm.h>
-#include <vault.h>
-#include <utility.h>
+#include "spells.h"
+#include "fileinfo.h"
+#include "connect.h"
+#include "utility.h"
+#include "player.h"
+#include "levels.h"
+#include "mobile.h"
+#include "handler.h"
+#include "interp.h"
+#include "db.h"
+#include "returnvals.h"
+#include "comm.h"
+#include "vault.h"
+#include "utility.h"
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -25,7 +25,7 @@
 #include <signal.h>
 
 #ifdef BANDWIDTH
-  #include <bandwidth.h>
+  #include "bandwidth.h"
 #endif
 
 void AuctionHandleDelete(string name);

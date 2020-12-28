@@ -8,28 +8,28 @@
  *                        noncombat_damage() for damage                  *
  *************************************************************************
  */
-#include <character.h>
-#include <affect.h>
-#include <room.h>
-#include <levels.h>
-#include <utility.h>
-#include <player.h>
-#include <fight.h>
-#include <mobile.h>
-#include <interp.h>
-#include <spells.h>
-#include <handler.h>
-#include <db.h>
-#include <obj.h>
-#include <connect.h>
-#include <act.h>
-#include <race.h> // RACE_FISH
-#include <clan.h> // clan_room_data
+#include "character.h"
+#include "affect.h"
+#include "room.h"
+#include "levels.h"
+#include "utility.h"
+#include "player.h"
+#include "fight.h"
+#include "mobile.h"
+#include "interp.h"
+#include "spells.h"
+#include "handler.h"
+#include "db.h"
+#include "obj.h"
+#include "connect.h"
+#include "act.h"
+#include "race.h" // RACE_FISH
+#include "clan.h" // clan_room_data
 #include <string.h>
-#include <returnvals.h>
-#include <game_portal.h>
-#include <innate.h>
-#include <weather.h>
+#include "returnvals.h"
+#include "game_portal.h"
+#include "innate.h"
+#include "weather.h"
 
 extern struct obj_data *object_list;
 extern struct index_data *obj_index;

@@ -3,15 +3,15 @@
 | 11/20/95 -- Azrack
 **********************/
 #include "wizard.h"
-#include <interp.h>
-#include <utility.h>
-#include <levels.h>
-#include <player.h>
-#include <mobile.h>
-#include <connect.h>
-#include <handler.h>
-#include <returnvals.h>
-#include <spells.h>
+#include "interp.h"
+#include "utility.h"
+#include "levels.h"
+#include "player.h"
+#include "mobile.h"
+#include "connect.h"
+#include "handler.h"
+#include "returnvals.h"
+#include "spells.h"
 
 int do_archive(struct char_data *ch, char *argument, int cmd)
 {

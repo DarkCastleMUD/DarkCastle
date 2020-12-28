@@ -15,22 +15,22 @@ extern "C"
   #include <ctype.h>
 }
 
-#include <character.h>
-#include <act.h>
+#include "character.h"
+#include "act.h"
 
-#include <levels.h>
-#include <utility.h>
-#include <mobile.h>
-#include <interp.h>
-#include <room.h>
-#include <handler.h>
-#include <obj.h>
-#include <interp.h>
-#include <terminal.h>
-#include <player.h>
-#include <connect.h>
-#include <time.h>
-#include <db.h>
+#include "levels.h"
+#include "utility.h"
+#include "mobile.h"
+#include "interp.h"
+#include "room.h"
+#include "handler.h"
+#include "obj.h"
+#include "interp.h"
+#include "terminal.h"
+#include "player.h"
+#include "connect.h"
+#include "time.h"
+#include "db.h"
 
 /* External variables */
 extern CWorld world;

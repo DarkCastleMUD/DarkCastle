@@ -8,17 +8,17 @@ extern "C"
 #include <stdlib.h>
 }
 
-#include <connect.h> // descriptor_data
-#include <character.h>
-#include <utility.h>
-#include <mobile.h>
-#include <interp.h>
-#include <levels.h>
-#include <player.h>
-#include <obj.h>
-#include <handler.h>
-#include <db.h>
-#include <newedit.h>
+#include "connect.h" // descriptor_data
+#include "character.h"
+#include "utility.h"
+#include "mobile.h"
+#include "interp.h"
+#include "levels.h"
+#include "player.h"
+#include "obj.h"
+#include "handler.h"
+#include "db.h"
+#include "newedit.h"
 
 // send_to_char("Write your note.  (/s saves /h for help)
 void new_edit_board_unlock_board(CHAR_DATA *ch, int abort);

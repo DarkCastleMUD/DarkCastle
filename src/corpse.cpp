@@ -17,26 +17,26 @@
 #include <ctype.h>
 #include <string.h>
 #include <stdlib.h>
-#include <returnvals.h>
+#include "returnvals.h"
 #include <errno.h>
 
-#include <obj.h>
-#include <connect.h>
-#include <utility.h>
-#include <room.h>
-#include <spells.h>
-#include <player.h>
-#include <handler.h>
-#include <affect.h>
-#include <levels.h>
-#include <interp.h>
-#include <character.h>
-#include <act.h>
-#include <structs.h>
-#include <db.h>
+#include "obj.h"
+#include "connect.h"
+#include "utility.h"
+#include "room.h"
+#include "spells.h"
+#include "player.h"
+#include "handler.h"
+#include "affect.h"
+#include "levels.h"
+#include "interp.h"
+#include "character.h"
+#include "act.h"
+#include "structs.h"
+#include "db.h"
 #include <assert.h>
-#include <mobile.h> // ACT_ISNPC
-#include <race.h>
+#include "mobile.h" // ACT_ISNPC
+#include "race.h"
 #include <cstddef>
 
 /* Set this define to wherever you want to save your corpses */

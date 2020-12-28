@@ -34,31 +34,31 @@ extern "C"
 #include <sstream>
 #include <limits>
 
-#include <affect.h>
-#include <db.h>
-#include <memory.h>
-#include <structs.h> // MAX_STRING_LENGTH
-#include <weather.h> // structs
-#include <timeinfo.h> // structs
-#include <player.h> // log info
-#include <fileinfo.h> // file names
-#include <utility.h> // assign..
-#include <levels.h>
-#include <character.h>
-#include <mobile.h> 
-#include <room.h>
-#include <race.h>
-#include <obj.h> // extra_descr_data
-#include <handler.h> // get_obj_num
-#include <connect.h> // descriptor_data
-#include <game_portal.h> // load_game_portals()
-#include <interp.h>
-#include <returnvals.h>
-#include <spells.h> // command_range
-#include <shop.h>
-#include <help.h>
-#include <quest.h>
-#include <vault.h>
+#include "affect.h"
+#include "db.h"
+#include "memory.h"
+#include "structs.h" // MAX_STRING_LENGTH
+#include "weather.h" // structs
+#include "timeinfo.h" // structs
+#include "player.h" // log info
+#include "fileinfo.h" // file names
+#include "utility.h" // assign..
+#include "levels.h"
+#include "character.h"
+#include "mobile.h" 
+#include "room.h"
+#include "race.h"
+#include "obj.h" // extra_descr_data
+#include "handler.h" // get_obj_num
+#include "connect.h" // descriptor_data
+#include "game_portal.h" // load_game_portals()
+#include "interp.h"
+#include "returnvals.h"
+#include "spells.h" // command_range
+#include "shop.h"
+#include "help.h"
+#include "quest.h"
+#include "vault.h"
 
 
 using namespace std;

@@ -14,28 +14,28 @@ extern "C"
   #include <stdio.h> // FILE *
   #include <ctype.h> // isspace..
 }
-#include <db.h> // real_room
-#include <player.h>
-#include <utility.h>
-#include <character.h>
-#include <connect.h> // descriptor_data
-#include <mobile.h> // utility.h stuff
-#include <clan.h>   // duh
-#include <interp.h> // do_outcast, etc..
-#include <levels.h> // levels
-#include <handler.h> // get_char_room_vis
-#include <terminal.h> // get_char_room_vis
-#include <room.h> // CLAN_ROOM flag
-#include <returnvals.h>
-#include <spells.h>
+#include "db.h" // real_room
+#include "player.h"
+#include "utility.h"
+#include "character.h"
+#include "connect.h" // descriptor_data
+#include "mobile.h" // utility.h stuff
+#include "clan.h"   // duh
+#include "interp.h" // do_outcast, etc..
+#include "levels.h" // levels
+#include "handler.h" // get_char_room_vis
+#include "terminal.h" // get_char_room_vis
+#include "room.h" // CLAN_ROOM flag
+#include "returnvals.h"
+#include "spells.h"
 
 #include <fstream>
 #include <iostream>
 #include <sstream>
-#include <fileinfo.h>
+#include "fileinfo.h"
 #include <stack>
 #include <algorithm>
-#include <DC.h>
+#include "DC.h"
 
 using namespace std;
 

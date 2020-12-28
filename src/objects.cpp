@@ -9,25 +9,25 @@ extern "C"
   #include <ctype.h>
   #include <string.h>
 }
-#include <obj.h>
-#include <connect.h>
-#include <utility.h>
-#include <room.h>
-#include <spells.h>
-#include <player.h>
-#include <handler.h>
-#include <affect.h>
-#include <levels.h>
-#include <interp.h>
-#include <character.h>
-#include <act.h>
-#include <structs.h>
-#include <db.h>
+#include "obj.h"
+#include "connect.h"
+#include "utility.h"
+#include "room.h"
+#include "spells.h"
+#include "player.h"
+#include "handler.h"
+#include "affect.h"
+#include "levels.h"
+#include "interp.h"
+#include "character.h"
+#include "act.h"
+#include "structs.h"
+#include "db.h"
 #include <assert.h>
-#include <mobile.h> // ACT_ISNPC
-#include <race.h>
-#include <returnvals.h>
-#include <clan.h> // vault stuff
+#include "mobile.h" // ACT_ISNPC
+#include "race.h"
+#include "returnvals.h"
+#include "clan.h" // vault stuff
 
 extern char *drinks[];
 extern char *dirs[];

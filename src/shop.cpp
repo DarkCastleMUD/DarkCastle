@@ -20,22 +20,22 @@ extern "C"
 #include <string.h>
 }
 
-#include <affect.h>
-#include <character.h>
-#include <utility.h>
-#include <interp.h>
-#include <obj.h>
-#include <levels.h>
-#include <player.h>
-#include <handler.h>
-#include <mobile.h>
-#include <room.h>
-#include <fileinfo.h>
-#include <db.h>
-#include <act.h>
-#include <returnvals.h>
-#include <shop.h>
-#include <spells.h>
+#include "affect.h"
+#include "character.h"
+#include "utility.h"
+#include "interp.h"
+#include "obj.h"
+#include "levels.h"
+#include "player.h"
+#include "handler.h"
+#include "mobile.h"
+#include "room.h"
+#include "fileinfo.h"
+#include "db.h"
+#include "act.h"
+#include "returnvals.h"
+#include "shop.h"
+#include "spells.h"
 #include "inventory.h"
 
 extern struct index_data *mob_index;

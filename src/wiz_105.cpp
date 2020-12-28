@@ -3,18 +3,18 @@
 | 11/20/95 -- Azrack
 **********************/
 #include "wizard.h"
-#include <spells.h> // FUCK_CANTQUIT
-#include <mobile.h>
-#include <handler.h>
-#include <room.h>
-#include <player.h>
-#include <fight.h>
-#include <utility.h>
-#include <levels.h>
-#include <interp.h>
-#include <returnvals.h>
-#include <innate.h>
-#include <fileinfo.h>
+#include "spells.h" // FUCK_CANTQUIT
+#include "mobile.h"
+#include "handler.h"
+#include "room.h"
+#include "player.h"
+#include "fight.h"
+#include "utility.h"
+#include "levels.h"
+#include "interp.h"
+#include "returnvals.h"
+#include "innate.h"
+#include "fileinfo.h"
 
 int do_clearaff(struct char_data *ch, char *argument, int cmd)
 {

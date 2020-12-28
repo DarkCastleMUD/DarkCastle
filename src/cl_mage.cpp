@@ -4,21 +4,21 @@
 */
 #include <string.h>
 
-#include <structs.h>
-#include <player.h>
-#include <levels.h>
-#include <character.h>
-#include <spells.h>
-#include <utility.h>
-#include <fight.h>
-#include <mobile.h>
-#include <connect.h>
-#include <handler.h>
-#include <act.h>
-#include <interp.h>
-#include <returnvals.h>
-#include <room.h>
-#include <db.h>
+#include "structs.h"
+#include "player.h"
+#include "levels.h"
+#include "character.h"
+#include "spells.h"
+#include "utility.h"
+#include "fight.h"
+#include "mobile.h"
+#include "connect.h"
+#include "handler.h"
+#include "act.h"
+#include "interp.h"
+#include "returnvals.h"
+#include "room.h"
+#include "db.h"
 
 extern CWorld world;
 extern struct spell_info_type spell_info[MAX_SPL_LIST];

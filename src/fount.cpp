@@ -17,14 +17,14 @@ extern "C"
 #include <ctype.h>
 }
 
-#include <room.h>
-#include <obj.h>
-#include <character.h>
-#include <utility.h>
-#include <act.h>
-#include <db.h>
-#include <handler.h>
-#include <interp.h>
+#include "room.h"
+#include "obj.h"
+#include "character.h"
+#include "utility.h"
+#include "act.h"
+#include "db.h"
+#include "handler.h"
+#include "interp.h"
 
 extern CWorld world;
 

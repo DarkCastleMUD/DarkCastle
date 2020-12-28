@@ -30,30 +30,30 @@ extern "C"
 #include <math.h> // pow(double,double)
 }
 
-#include <room.h>
-#include <connect.h>
-#include <obj.h>
-#include <race.h>
-#include <character.h>
-#include <spells.h>
-#include <magic.h>
-#include <player.h>
-#include <fight.h>
-#include <utility.h>
-#include <structs.h>
-#include <handler.h>
-#include <mobile.h>
-#include <interp.h>
-#include <levels.h>
-#include <weather.h>
-#include <isr.h>
-#include <db.h>
-#include <act.h>
-#include <clan.h>
-#include <arena.h>
-#include <innate.h>
-#include <returnvals.h>
-#include <arena.h>
+#include "room.h"
+#include "connect.h"
+#include "obj.h"
+#include "race.h"
+#include "character.h"
+#include "spells.h"
+#include "magic.h"
+#include "player.h"
+#include "fight.h"
+#include "utility.h"
+#include "structs.h"
+#include "handler.h"
+#include "mobile.h"
+#include "interp.h"
+#include "levels.h"
+#include "weather.h"
+#include "isr.h"
+#include "db.h"
+#include "act.h"
+#include "clan.h"
+#include "arena.h"
+#include "innate.h"
+#include "returnvals.h"
+#include "arena.h"
 
 /* Extern Structures */
 

@@ -19,10 +19,10 @@ extern "C"
    #include <stdio.h>
    #include <string.h>
 }
-#include <timeinfo.h>
-#include <weather.h>
-#include <character.h>
-#include <utility.h>
+#include "timeinfo.h"
+#include "weather.h"
+#include "character.h"
+#include "utility.h"
 
 // TODO - Either rip out the pressure stuff, or make it easier to understand.
 // TODO - Add wind, and it's effects (on movement/combat etc)

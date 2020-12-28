@@ -6,8 +6,8 @@
 | Description: This file defines the player vectors..punishment, specials,
 |   etc...
 */
-#include <punish.h> // punishment vectors
-#include <structs.h> // ubyte
+#include "punish.h" // punishment vectors
+#include "structs.h" // ubyte
 
 /************************************************************************
 | CHAR_DATA.misc vector

@@ -14,29 +14,29 @@
  ***************************************************************************/
 
 #include <assert.h>
-#include <character.h>
-#include <structs.h>
-#include <utility.h>
-#include <mobile.h>
-#include <spells.h>
-#include <room.h>
-#include <handler.h>
-#include <magic.h>
-#include <levels.h>
-#include <fight.h>
-#include <obj.h>
-#include <player.h>
-#include <connect.h>
-#include <interp.h>
-#include <isr.h>
-#include <race.h>
-#include <db.h>
-#include <sing.h>
-#include <act.h>
-#include <ki.h>
+#include "character.h"
+#include "structs.h"
+#include "utility.h"
+#include "mobile.h"
+#include "spells.h"
+#include "room.h"
+#include "handler.h"
+#include "magic.h"
+#include "levels.h"
+#include "fight.h"
+#include "obj.h"
+#include "player.h"
+#include "connect.h"
+#include "interp.h"
+#include "isr.h"
+#include "race.h"
+#include "db.h"
+#include "sing.h"
+#include "act.h"
+#include "ki.h"
 #include <string.h>
-#include <returnvals.h>
-#include <obj.h>
+#include "returnvals.h"
+#include "obj.h"
 
 /*
 

@@ -23,28 +23,28 @@ extern "C" {
 #include <assert.h>
 }
 
-#include <magic.h>
-#include <spells.h>
-#include <room.h>
-#include <obj.h>
-#include <character.h>
-#include <player.h> // APPLY
-#include <utility.h> // LOWER
-#include <clan.h>
-#include <levels.h>
-#include <db.h>
-#include <mobile.h>
-#include <connect.h> // descriptor_data
-#include <handler.h> // FIND_CHAR_ROOM
-#include <interp.h> // do_return
-#include <machine.h> // index
-#include <act.h>
-#include <isr.h>
-#include <race.h>
-#include <fight.h>
-#include <returnvals.h>
-#include <innate.h>
-#include <set.h>
+#include "magic.h"
+#include "spells.h"
+#include "room.h"
+#include "obj.h"
+#include "character.h"
+#include "player.h" // APPLY
+#include "utility.h" // LOWER
+#include "clan.h"
+#include "levels.h"
+#include "db.h"
+#include "mobile.h"
+#include "connect.h" // descriptor_data
+#include "handler.h" // FIND_CHAR_ROOM
+#include "interp.h" // do_return
+#include "machine.h" // index
+#include "act.h"
+#include "isr.h"
+#include "race.h"
+#include "fight.h"
+#include "returnvals.h"
+#include "innate.h"
+#include "set.h"
 #include <sys/time.h>
 #include "DC.h"
 #include <algorithm>

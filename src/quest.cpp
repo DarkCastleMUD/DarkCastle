@@ -3,23 +3,23 @@ one liner quest shit
 *****************************************************/
 
 #include <math.h>
-#include <structs.h>
-#include <character.h>
-#include <comm.h>
-#include <fileinfo.h>
-#include <returnvals.h>
-#include <obj.h>
-#include <act.h>
-#include <levels.h>
-#include <interp.h>
-#include <handler.h>
-#include <db.h>
-#include <connect.h>
-#include <quest.h>
-#include <spells.h>
+#include "structs.h"
+#include "character.h"
+#include "comm.h"
+#include "fileinfo.h"
+#include "returnvals.h"
+#include "obj.h"
+#include "act.h"
+#include "levels.h"
+#include "interp.h"
+#include "handler.h"
+#include "db.h"
+#include "connect.h"
+#include "quest.h"
+#include "spells.h"
 #include <vector>
 #include <string.h>
-#include <room.h>
+#include "room.h"
 
 using namespace std;
 

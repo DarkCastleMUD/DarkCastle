@@ -17,9 +17,9 @@
 #ifndef SPELLS_H_
 #define SPELLS_H_
 
-#include <structs.h> // ubyte, int16
-#include <handler.h>
-#include <obj.h>
+#include "structs.h" // ubyte, int16
+#include "handler.h"
+#include "obj.h"
 #include <map>
 
 #define MAX_BUF_LENGTH               240

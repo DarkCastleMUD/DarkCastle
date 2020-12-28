@@ -13,25 +13,25 @@ extern "C"  {
 }
 //#include <iostream.h>
 #include <stdio.h>
-#include <character.h>
-#include <affect.h>
-#include <mobile.h>
-#include <utility.h>
-#include <spells.h>
-#include <isr.h>
-#include <handler.h>
-#include <room.h>
-#include <terminal.h>
-#include <player.h>
-#include <levels.h>
-#include <connect.h>
-#include <fight.h>
-#include <interp.h>
-#include <db.h>
-#include <act.h>
-#include <fileinfo.h> // SAVE_DIR
-#include <returnvals.h>
-#include <inventory.h>
+#include "character.h"
+#include "affect.h"
+#include "mobile.h"
+#include "utility.h"
+#include "spells.h"
+#include "isr.h"
+#include "handler.h"
+#include "room.h"
+#include "terminal.h"
+#include "player.h"
+#include "levels.h"
+#include "connect.h"
+#include "fight.h"
+#include "interp.h"
+#include "db.h"
+#include "act.h"
+#include "fileinfo.h" // SAVE_DIR
+#include "returnvals.h"
+#include "inventory.h"
 
 extern CWorld world;
 extern struct zone_data *zone_table;

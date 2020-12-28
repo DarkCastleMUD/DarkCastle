@@ -1,16 +1,16 @@
 #include <string.h>
 
-#include <player.h>
-#include <levels.h>
-#include <structs.h>
-#include <character.h>
-#include <utility.h>
-#include <comm.h>
-#include <interp.h>
-#include <handler.h>
-#include <db.h>
-#include <returnvals.h>
-#include <spells.h>
+#include "player.h"
+#include "levels.h"
+#include "structs.h"
+#include "character.h"
+#include "utility.h"
+#include "comm.h"
+#include "interp.h"
+#include "handler.h"
+#include "db.h"
+#include "returnvals.h"
+#include "spells.h"
 
 struct ban_list_element *ban_list = NULL;
 

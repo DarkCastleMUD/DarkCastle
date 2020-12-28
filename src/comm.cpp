@@ -10,7 +10,7 @@
 ************************************************************************ */
 
 #include <errno.h>
-#include <terminal.h>
+#include "terminal.h"
 #include <string.h>
 
 #ifndef WIN32
@@ -47,22 +47,22 @@
 #include <signal.h>
 #include <ctype.h>
 
-#include <fileinfo.h>
-#include <act.h>
-#include <player.h>
-#include <levels.h>
-#include <room.h>
-#include <structs.h>
-#include <utility.h>
-#include <connect.h>
-#include <interp.h>
-#include <handler.h>
-#include <db.h>
-#include <comm.h>
-#include <returnvals.h>
-#include <quest.h>
-#include <shop.h>
-#include <Leaderboard.h>
+#include "fileinfo.h"
+#include "act.h"
+#include "player.h"
+#include "levels.h"
+#include "room.h"
+#include "structs.h"
+#include "utility.h"
+#include "connect.h"
+#include "interp.h"
+#include "handler.h"
+#include "db.h"
+#include "comm.h"
+#include "returnvals.h"
+#include "quest.h"
+#include "shop.h"
+#include "Leaderboard.h"
 
 #ifdef USE_SQL
 #include "Backend/Database.h"
@@ -71,12 +71,12 @@
 #include <sstream>
 #include <iostream>
 #include <list>
-#include <dc_xmlrpc.h>
+#include "dc_xmlrpc.h"
 #ifdef USE_TIMING
-#include <Timer.h>
+#include "Timer.h"
 #endif
-#include <DC.h>
-#include <CommandStack.h>
+#include "DC.h"
+#include "CommandStack.h"
 #include <algorithm>
 
 struct multiplayer {

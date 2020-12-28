@@ -12,11 +12,11 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-#include <db.h>
-#include <room.h>
-#include <levels.h>
-#include <player.h>
-#include <utility.h>
+#include "db.h"
+#include "room.h"
+#include "levels.h"
+#include "player.h"
+#include "utility.h"
 
 typedef int    SPEC_FUN  (struct char_data * ch, struct obj_data *obj, int cmd, char *argument, 
                           struct char_data * owner);

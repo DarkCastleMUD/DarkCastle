@@ -23,17 +23,17 @@ extern "C" {
 #include <stdlib.h>
 }
 
-#include <connect.h> // descriptor_data
-#include <utility.h>
-#include <character.h>
-#include <mobile.h>
-#include <interp.h>
-#include <levels.h>
-#include <player.h>
-#include <obj.h>
-#include <spells.h>
-#include <handler.h>
-#include <db.h>
+#include "connect.h" // descriptor_data
+#include "utility.h"
+#include "character.h"
+#include "mobile.h"
+#include "interp.h"
+#include "levels.h"
+#include "player.h"
+#include "obj.h"
+#include "spells.h"
+#include "handler.h"
+#include "db.h"
 #include <string>
 #include <iostream>
 using namespace std;

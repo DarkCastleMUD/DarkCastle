@@ -3,16 +3,16 @@
 | 11/20/95 -- Azrack
 **********************/
 #include "wizard.h"
-#include <interp.h>
-#include <utility.h>
-#include <levels.h>
-#include <mobile.h>
-#include <player.h>
-#include <handler.h>
-#include <returnvals.h>
-#include <spells.h>
+#include "interp.h"
+#include "utility.h"
+#include "levels.h"
+#include "mobile.h"
+#include "player.h"
+#include "handler.h"
+#include "returnvals.h"
+#include "spells.h"
 #include <string>
-#include <game_portal.h>
+#include "game_portal.h"
 
 using namespace std;
 

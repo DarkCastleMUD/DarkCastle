@@ -5,8 +5,8 @@
 | connect.h
 | Description: State of connectedness information.
 */
-#include <structs.h>  // MAX_INPUT_LENGTH
-#include <comm.h>
+#include "structs.h"  // MAX_INPUT_LENGTH
+#include "comm.h"
  
 #define STATE(d)  ((d)->connected) 
 #define CON_PLAYING                        0 

@@ -24,20 +24,20 @@ extern "C"
 //#include <sys/stat.h>
 //#include <unistd.h>
 }
-#include <obj.h>
-#include <room.h>
-#include <character.h>
-#include <mobile.h>
-#include <utility.h>
-#include <spells.h>
-#include <fileinfo.h> // SAVE_DIR
-#include <player.h>
-#include <levels.h>
-#include <db.h>
-#include <connect.h>
-#include <handler.h>
-#include <race.h>
-#include <vault.h>
+#include "obj.h"
+#include "room.h"
+#include "character.h"
+#include "mobile.h"
+#include "utility.h"
+#include "spells.h"
+#include "fileinfo.h" // SAVE_DIR
+#include "player.h"
+#include "levels.h"
+#include "db.h"
+#include "connect.h"
+#include "handler.h"
+#include "race.h"
+#include "vault.h"
 #include "const.h"
 
 #ifdef USE_SQL

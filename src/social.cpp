@@ -6,21 +6,21 @@ extern "C"
   #include <string.h>
   #include <stdlib.h> // qsort()
 }
-#include <fileinfo.h> // SOCIAL_FILE
-#include <structs.h> // MAX_INPUT_LENGTH
-#include <room.h>
-#include <character.h>
-#include <utility.h>
-#include <mobile.h>
-#include <connect.h>
-#include <levels.h>
-#include <player.h>
-#include <social.h>
-#include <handler.h>
-#include <act.h>
-#include <db.h>
-#include <interp.h> // len_cmp
-#include <returnvals.h>
+#include "fileinfo.h" // SOCIAL_FILE
+#include "structs.h" // MAX_INPUT_LENGTH
+#include "room.h"
+#include "character.h"
+#include "utility.h"
+#include "mobile.h"
+#include "connect.h"
+#include "levels.h"
+#include "player.h"
+#include "social.h"
+#include "handler.h"
+#include "act.h"
+#include "db.h"
+#include "interp.h" // len_cmp
+#include "returnvals.h"
 
 extern CWorld world;
  

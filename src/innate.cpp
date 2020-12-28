@@ -1,27 +1,27 @@
 // This file takes care of all innate race abilities
 
-#include <innate.h>
-#include <race.h>
-#include <db.h>
-#include <fight.h>
-#include <room.h>
-#include <obj.h>
-#include <connect.h>
-#include <utility.h>
-#include <character.h>
-#include <handler.h>
-#include <db.h>
-#include <player.h>
-#include <levels.h>
-#include <interp.h>
-#include <magic.h>
-#include <act.h>
-#include <mobile.h>
-#include <spells.h>
+#include "innate.h"
+#include "race.h"
+#include "db.h"
+#include "fight.h"
+#include "room.h"
+#include "obj.h"
+#include "connect.h"
+#include "utility.h"
+#include "character.h"
+#include "handler.h"
+#include "db.h"
+#include "player.h"
+#include "levels.h"
+#include "interp.h"
+#include "magic.h"
+#include "act.h"
+#include "mobile.h"
+#include "spells.h"
 #include <string.h> // strstr()
-#include <returnvals.h>
-#include <interp.h>
-#include <arena.h>
+#include "returnvals.h"
+#include "interp.h"
+#include "arena.h"
 
 ////////////////////////////////////////////////////////////////////////////
 // external vars

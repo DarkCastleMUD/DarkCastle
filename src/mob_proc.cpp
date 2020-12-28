@@ -14,28 +14,28 @@
  ***************************************************************************/
 /* $Id: mob_proc.cpp,v 1.208 2014/07/31 01:07:24 jhhudso Exp $ */
 #include <assert.h>
-#include <character.h>
-#include <structs.h>
-#include <utility.h>
-#include <mobile.h>
-#include <spells.h>
-#include <room.h>
-#include <handler.h>
-#include <magic.h>
-#include <levels.h>
-#include <fight.h>
-#include <obj.h>
-#include <player.h>
-#include <connect.h>
-#include <interp.h>
-#include <isr.h>
-#include <race.h>
-#include <db.h> // real_room
-#include <sing.h> // bard skills
-#include <act.h>
-#include <ki.h> // monk skills
+#include "character.h"
+#include "structs.h"
+#include "utility.h"
+#include "mobile.h"
+#include "spells.h"
+#include "room.h"
+#include "handler.h"
+#include "magic.h"
+#include "levels.h"
+#include "fight.h"
+#include "obj.h"
+#include "player.h"
+#include "connect.h"
+#include "interp.h"
+#include "isr.h"
+#include "race.h"
+#include "db.h" // real_room
+#include "sing.h" // bard skills
+#include "act.h"
+#include "ki.h" // monk skills
 #include <string.h>
-#include <returnvals.h>
+#include "returnvals.h"
 
 /*   external vars  */
 

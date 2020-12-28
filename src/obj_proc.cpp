@@ -2,29 +2,29 @@
 // Usage: This file contains special procedures pertaining to objects, except 
 // for the boards which are in board.C
 
-#include <db.h>
-#include <fight.h>
-#include <room.h>
-#include <obj.h>
-#include <connect.h>
-#include <timeinfo.h>
-#include <utility.h>
-#include <character.h>
-#include <handler.h>
-#include <db.h>
-#include <player.h>
-#include <levels.h>
-#include <sing.h>
-#include <interp.h>
-#include <magic.h>
-#include <act.h>
-#include <mobile.h>
-#include <spells.h>
+#include "db.h"
+#include "fight.h"
+#include "room.h"
+#include "obj.h"
+#include "connect.h"
+#include "timeinfo.h"
+#include "utility.h"
+#include "character.h"
+#include "handler.h"
+#include "db.h"
+#include "player.h"
+#include "levels.h"
+#include "sing.h"
+#include "interp.h"
+#include "magic.h"
+#include "act.h"
+#include "mobile.h"
+#include "spells.h"
 #include <string.h> // strstr()
-#include <returnvals.h>
-#include <set.h>
-#include <arena.h>
-#include <race.h>
+#include "returnvals.h"
+#include "set.h"
+#include "arena.h"
+#include "race.h"
 
 #include <vector>
 #include <string>

@@ -3,15 +3,15 @@
 | 11/20/95 -- Azrack
 **********************/
 #include "wizard.h"
-#include <handler.h>
-#include <spells.h>
-#include <utility.h>
-#include <connect.h>
-#include <levels.h>
-#include <mobile.h>
-#include <interp.h>
-#include <player.h>
-#include <returnvals.h>
+#include "handler.h"
+#include "spells.h"
+#include "utility.h"
+#include "connect.h"
+#include "levels.h"
+#include "mobile.h"
+#include "interp.h"
+#include "player.h"
+#include "returnvals.h"
 
 int do_plats (struct char_data *ch, char *argument, int cmd)
 {

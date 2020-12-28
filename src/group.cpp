@@ -8,23 +8,23 @@ extern "C"
 #include <ctype.h> // isspace()
 }
 
-#include <character.h>
-#include <room.h>
-#include <affect.h>
-#include <utility.h>
-#include <mobile.h>
-#include <interp.h>
-#include <handler.h>
-#include <clan.h>
-#include <levels.h>
-#include <act.h>
-#include <db.h>
-#include <player.h>
-#include <sing.h> // stop_grouped_bards
+#include "character.h"
+#include "room.h"
+#include "affect.h"
+#include "utility.h"
+#include "mobile.h"
+#include "interp.h"
+#include "handler.h"
+#include "clan.h"
+#include "levels.h"
+#include "act.h"
+#include "db.h"
+#include "player.h"
+#include "sing.h" // stop_grouped_bards
 #include <string.h>
-#include <returnvals.h>
-#include <spells.h>
-#include <terminal.h>
+#include "returnvals.h"
+#include "spells.h"
+#include "terminal.h"
 
 extern CWorld world;
 char * calc_color(int hit, int max_hit);

@@ -31,28 +31,28 @@ extern "C" {
 	#include <mmsystem.h>
 #endif
 }
-#include <character.h>
-#include <comm.h>
-#include <connect.h>
-#include <race.h>
-#include <player.h>
-#include <structs.h> // TRUE
-#include <utility.h>
-#include <levels.h>
-#include <ki.h>
-#include <clan.h>
-#include <fileinfo.h> // SAVE_DIR
-#include <db.h> // init_char..
-#include <mobile.h>
-#include <interp.h>
-#include <room.h>
-#include <act.h>
-#include <clan.h>
-#include <spells.h>
-#include <fight.h>
-#include <handler.h>
+#include "character.h"
+#include "comm.h"
+#include "connect.h"
+#include "race.h"
+#include "player.h"
+#include "structs.h" // TRUE
+#include "utility.h"
+#include "levels.h"
+#include "ki.h"
+#include "clan.h"
+#include "fileinfo.h" // SAVE_DIR
+#include "db.h" // init_char..
+#include "mobile.h"
+#include "interp.h"
+#include "room.h"
+#include "act.h"
+#include "clan.h"
+#include "spells.h"
+#include "fight.h"
+#include "handler.h"
 #include <string.h>
-#include <vault.h>
+#include "vault.h"
 #include <queue>
 
 #define STATE(d)    ((d)->connected)

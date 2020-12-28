@@ -30,27 +30,27 @@ extern "C"
 #include <stdlib.h>
 }
 
-#include <character.h>
-#include <race.h>
-#include <levels.h>
-#include <spells.h>
-#include <magic.h>
-#include <player.h>
-#include <isr.h>
-#include <utility.h>
-#include <fight.h>
-#include <mobile.h>
-#include <room.h>
-#include <db.h>
-#include <handler.h>
-#include <connect.h>
-#include <interp.h>
-#include <act.h>
-#include <returnvals.h> 
-#include <ki.h>
-#include <sing.h>
-#include <arena.h>
-#include <clan.h>
+#include "character.h"
+#include "race.h"
+#include "levels.h"
+#include "spells.h"
+#include "magic.h"
+#include "player.h"
+#include "isr.h"
+#include "utility.h"
+#include "fight.h"
+#include "mobile.h"
+#include "room.h"
+#include "db.h"
+#include "handler.h"
+#include "connect.h"
+#include "interp.h"
+#include "act.h"
+#include "returnvals.h" 
+#include "ki.h"
+#include "sing.h"
+#include "arena.h"
+#include "clan.h"
 
 // Global data 
 

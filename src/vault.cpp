@@ -11,22 +11,22 @@ extern "C"
 #include <unistd.h>
 #include <list>
 
-#include <structs.h>
-#include <db.h>
+#include "structs.h"
+#include "db.h"
 #include "utility.h"
-#include <vault.h>
-#include <room.h>
-#include <player.h>
-#include <fileinfo.h>
-#include <obj.h>
-#include <act.h>
-#include <handler.h>
-#include <levels.h>
-#include <connect.h>
-#include <returnvals.h>
-#include <interp.h>
-#include <spells.h>
-#include <clan.h> // clan right
+#include "vault.h"
+#include "room.h"
+#include "player.h"
+#include "fileinfo.h"
+#include "obj.h"
+#include "act.h"
+#include "handler.h"
+#include "levels.h"
+#include "connect.h"
+#include "returnvals.h"
+#include "interp.h"
+#include "spells.h"
+#include "clan.h" // clan right
 
 using namespace std;
 

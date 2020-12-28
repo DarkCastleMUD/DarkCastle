@@ -10,16 +10,16 @@ extern "C" {
 }
 #include <sstream>
 
-#include <Leaderboard.h>
-#include <utility.h>
-#include <structs.h>
-#include <fileinfo.h>
-#include <connect.h>
-#include <levels.h>
+#include "Leaderboard.h"
+#include "utility.h"
+#include "structs.h"
+#include "fileinfo.h"
+#include "connect.h"
+#include "levels.h"
 #include <limits.h>
-#include <db.h>
-#include <interp.h>
-#include <returnvals.h>
+#include "db.h"
+#include "interp.h"
+#include "returnvals.h"
 
 extern struct descriptor_data *descriptor_list;
 

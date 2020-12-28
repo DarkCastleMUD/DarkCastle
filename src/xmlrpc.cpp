@@ -1,12 +1,12 @@
 #include <iostream>
 #include <unistd.h>
-#include <dc_xmlrpc.h>
+#include "dc_xmlrpc.h"
 #include <string.h>
 
-#include <character.h>
-#include <handler.h>
-#include <connect.h>
-#include <levels.h>
+#include "character.h"
+#include "handler.h"
+#include "connect.h"
+#include "levels.h"
 
 #ifdef __CYGWIN__
 #include <crypt.h>

@@ -66,7 +66,7 @@ extern "C"
 #include "fight.h"
 #include "returnvals.h"
 #include "set.h"
-#include <DC.h>
+#include "DC.h"
 #include <algorithm>
 
 using namespace std;

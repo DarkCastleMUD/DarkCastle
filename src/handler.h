@@ -17,8 +17,8 @@
 #ifndef HANDLER_H_
 #define HANDLER_H_
 
-#include <structs.h> // ubyte, etc..
-#include <comm.h>
+#include "structs.h" // ubyte, etc..
+#include "comm.h"
 
 /* handling the affected-structures */
 void affect_total(CHAR_DATA *ch);

@@ -16,25 +16,25 @@ extern "C"
   #include <ctype.h>
 }
 
-#include <connect.h>
-#include <character.h>
-#include <obj.h>
-#include <mobile.h>
-#include <room.h>
-#include <structs.h>
-#include <utility.h>
-#include <player.h>
-#include <levels.h>
-#include <interp.h>
-#include <handler.h>
-#include <db.h>
-#include <act.h>
+#include "connect.h"
+#include "character.h"
+#include "obj.h"
+#include "mobile.h"
+#include "room.h"
+#include "structs.h"
+#include "utility.h"
+#include "player.h"
+#include "levels.h"
+#include "interp.h"
+#include "handler.h"
+#include "db.h"
+#include "act.h"
 #include <string.h>
-#include <returnvals.h>
-#include <spells.h>
-#include <clan.h>
-#include <arena.h>
-#include <inventory.h>
+#include "returnvals.h"
+#include "spells.h"
+#include "clan.h"
+#include "arena.h"
+#include "inventory.h"
 #include <queue>
 
 /* extern variables */

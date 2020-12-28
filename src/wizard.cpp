@@ -4,23 +4,23 @@
 | Description:  Utility functions necessary for wiz commands.
 */
 #include "wizard.h"
-#include <character.h>
-#include <utility.h>
-#include <levels.h>
-#include <db.h>
-#include <room.h>
-#include <player.h>
-#include <obj.h>
-#include <mobile.h>
-#include <handler.h>
-#include <connect.h>
-#include <spells.h>
-#include <interp.h>
-#include <returnvals.h>
+#include "character.h"
+#include "utility.h"
+#include "levels.h"
+#include "db.h"
+#include "room.h"
+#include "player.h"
+#include "obj.h"
+#include "mobile.h"
+#include "handler.h"
+#include "connect.h"
+#include "spells.h"
+#include "interp.h"
+#include "returnvals.h"
 #include <unistd.h>
 
 #ifdef TWITTER
-#include <curl.h>
+#include "curl.h"
 #include <twitcurl.h>
 #endif
 

@@ -34,33 +34,33 @@ extern "C"
 #endif
 }
 
-#include <fight.h>
-#include <levels.h>
-#include <race.h>
-#include <player.h> // log
-#include <character.h>
-#include <utility.h> // log
-#include <connect.h>
-#include <spells.h> // weapon_spells
-#include <isr.h>
-#include <mobile.h>
-#include <room.h>
-#include <handler.h>
-#include <interp.h> // do_flee()
-#include <fileinfo.h> // SAVE_DIR
-#include <db.h> // fread_string()
-#include <connect.h> // descriptor_data
-#include <magic.h> // weapon spells
-#include <terminal.h> // YELLOW, etc..
-#include <act.h>
-#include <clan.h>
-#include <returnvals.h>
+#include "fight.h"
+#include "levels.h"
+#include "race.h"
+#include "player.h" // log
+#include "character.h"
+#include "utility.h" // log
+#include "connect.h"
+#include "spells.h" // weapon_spells
+#include "isr.h"
+#include "mobile.h"
+#include "room.h"
+#include "handler.h"
+#include "interp.h" // do_flee()
+#include "fileinfo.h" // SAVE_DIR
+#include "db.h" // fread_string()
+#include "connect.h" // descriptor_data
+#include "magic.h" // weapon spells
+#include "terminal.h" // YELLOW, etc..
+#include "act.h"
+#include "clan.h"
+#include "returnvals.h"
 #include <assert.h>
-#include <sing.h> // stop_grouped_bards
-#include <innate.h>
-#include <token.h>
-#include <vault.h>
-#include <arena.h>
+#include "sing.h" // stop_grouped_bards
+#include "innate.h"
+#include "token.h"
+#include "vault.h"
+#include "arena.h"
 #include <sstream>
 
 extern bool selfpurge;

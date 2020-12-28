@@ -3,21 +3,21 @@
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
-#include <character.h>
-#include <structs.h>
-#include <spells.h>
-#include <utility.h>
-#include <levels.h>
-#include <player.h>
-#include <db.h> // exp_table
-#include <interp.h>
+#include "character.h"
+#include "structs.h"
+#include "spells.h"
+#include "utility.h"
+#include "levels.h"
+#include "player.h"
+#include "db.h" // exp_table
+#include "interp.h"
 #include <string.h>
-#include <returnvals.h>
-#include <ki.h>
-#include <mobile.h>
-#include <room.h>
-#include <sing.h>
-#include <handler.h>
+#include "returnvals.h"
+#include "ki.h"
+#include "mobile.h"
+#include "room.h"
+#include "sing.h"
+#include "handler.h"
 
 extern CWorld world;
 extern struct class_skill_defines g_skills[];

@@ -17,22 +17,22 @@ extern "C"
   #include <string.h>
   #include <ctype.h>
 }
-#include <obj.h>
-#include <mobile.h>
-#include <character.h>
-#include <utility.h>
-#include <player.h>
-#include <levels.h>
-#include <clan.h>
-#include <room.h>
-#include <weather.h>
-#include <handler.h>
-#include <terminal.h>
-#include <interp.h>
-#include <connect.h>
-#include <db.h> // help_index_element
-#include <spells.h>
-#include <returnvals.h>
+#include "obj.h"
+#include "mobile.h"
+#include "character.h"
+#include "utility.h"
+#include "player.h"
+#include "levels.h"
+#include "clan.h"
+#include "room.h"
+#include "weather.h"
+#include "handler.h"
+#include "terminal.h"
+#include "interp.h"
+#include "connect.h"
+#include "db.h" // help_index_element
+#include "spells.h"
+#include "returnvals.h"
 
 /* Used for "who" */
 int max_who = 0;

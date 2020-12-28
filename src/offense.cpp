@@ -11,21 +11,21 @@ extern "C"
 #include <ctype.h>
 }
 
-#include <structs.h>
-#include <character.h>
-#include <utility.h>
-#include <handler.h>
-#include <spells.h>
-#include <fight.h>
-#include <connect.h>
-#include <mobile.h>
-#include <levels.h>
-#include <act.h>
+#include "structs.h"
+#include "character.h"
+#include "utility.h"
+#include "handler.h"
+#include "spells.h"
+#include "fight.h"
+#include "connect.h"
+#include "mobile.h"
+#include "levels.h"
+#include "act.h"
 #include <string.h>
-#include <returnvals.h>
-#include <room.h>
-#include <db.h>
-#include <interp.h>
+#include "returnvals.h"
+#include "room.h"
+#include "db.h"
+#include "interp.h"
 
 extern CWorld world;
 extern struct index_data *mob_index;

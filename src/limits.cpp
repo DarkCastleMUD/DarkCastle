@@ -20,30 +20,30 @@ extern "C" {
 }
 
 #ifdef BANDWIDTH
-#include <bandwidth.h>
+#include "bandwidth.h"
 #endif
-#include <room.h>
-#include <character.h>
-#include <utility.h>
-#include <mobile.h>
-#include <isr.h>
-#include <spells.h> // TYPE
-#include <levels.h>
-#include <player.h>
-#include <obj.h>
-#include <connect.h>
-#include <db.h> // exp_table
-#include <fight.h> // damage
-#include <ki.h>
-#include <game_portal.h>
-#include <act.h>
-#include <handler.h>
-#include <race.h>
-#include <returnvals.h>
-#include <interp.h>
-#include <clan.h> //totem
-#include <vault.h>
-#include <inventory.h>
+#include "room.h"
+#include "character.h"
+#include "utility.h"
+#include "mobile.h"
+#include "isr.h"
+#include "spells.h" // TYPE
+#include "levels.h"
+#include "player.h"
+#include "obj.h"
+#include "connect.h"
+#include "db.h" // exp_table
+#include "fight.h" // damage
+#include "ki.h"
+#include "game_portal.h"
+#include "act.h"
+#include "handler.h"
+#include "race.h"
+#include "returnvals.h"
+#include "interp.h"
+#include "clan.h" //totem
+#include "vault.h"
+#include "inventory.h"
 
 extern struct obj_data *object_list;
 extern CWorld world;

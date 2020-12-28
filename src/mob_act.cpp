@@ -26,26 +26,26 @@ extern "C"
 #include <stdio.h>
 }
 
-#include <character.h>
-#include <room.h>
-#include <mobile.h>
-#include <utility.h>
-#include <fight.h>
-#include <db.h> // index_data
-#include <player.h>
-#include <levels.h>
-#include <act.h>
-#include <handler.h>
-#include <interp.h>
-#include <returnvals.h>
+#include "character.h"
+#include "room.h"
+#include "mobile.h"
+#include "utility.h"
+#include "fight.h"
+#include "db.h" // index_data
+#include "player.h"
+#include "levels.h"
+#include "act.h"
+#include "handler.h"
+#include "interp.h"
+#include "returnvals.h"
 #include <string.h>
-#include <spells.h>
-#include <race.h> // Race defines used in align-aggro messages.
-#include <comm.h>
-#include <connect.h>
-#include <inventory.h>
+#include "spells.h"
+#include "race.h" // Race defines used in align-aggro messages.
+#include "comm.h"
+#include "connect.h"
+#include "inventory.h"
 #ifdef USE_TIMING
-#include <Timer.h>
+#include "Timer.h"
 #endif
 
 extern struct index_data *mob_index;

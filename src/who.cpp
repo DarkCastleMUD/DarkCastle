@@ -7,19 +7,19 @@ extern "C"
 {
   #include <string.h>
 }
-#include <connect.h>
-#include <utility.h>
-#include <character.h>
-#include <mobile.h>
-#include <terminal.h>
-#include <player.h>
-#include <levels.h>
-#include <clan.h>
-#include <room.h>
-#include <interp.h>
-#include <handler.h>
-#include <db.h>
-#include <returnvals.h>
+#include "connect.h"
+#include "utility.h"
+#include "character.h"
+#include "mobile.h"
+#include "terminal.h"
+#include "player.h"
+#include "levels.h"
+#include "clan.h"
+#include "room.h"
+#include "interp.h"
+#include "handler.h"
+#include "db.h"
+#include "returnvals.h"
 
 // TODO - Figure out the weird bug for why when I do "who <class>" a random player
 //        from another class will pop up who name is nowhere near matching.

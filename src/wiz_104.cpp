@@ -4,19 +4,19 @@
 **********************/
 #include "wizard.h"
 
-#include <utility.h>
-#include <connect.h>
-#include <mobile.h>
-#include <player.h>
-#include <levels.h>
-#include <obj.h>
-#include <handler.h>
-#include <db.h>
-#include <room.h>
-#include <interp.h>
-#include <returnvals.h>
-#include <spells.h>
-#include <race.h>
+#include "utility.h"
+#include "connect.h"
+#include "mobile.h"
+#include "player.h"
+#include "levels.h"
+#include "obj.h"
+#include "handler.h"
+#include "db.h"
+#include "room.h"
+#include "interp.h"
+#include "returnvals.h"
+#include "spells.h"
+#include "race.h"
 #include <vector>
 #include <string>
 

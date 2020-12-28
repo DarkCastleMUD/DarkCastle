@@ -13,9 +13,9 @@
 #include <iostream>
 
 // DC headers
-#include <fileinfo.h>
-#include <utility.h>
-#include <DC.h>
+#include "fileinfo.h"
+#include "utility.h"
+#include "DC.h"
 
 using namespace std;
 

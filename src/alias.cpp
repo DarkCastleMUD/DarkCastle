@@ -7,12 +7,12 @@ extern "C"
 {
   #include <string.h>
 }
-#include <character.h>
-#include <utility.h>
-#include <levels.h>
-#include <player.h>
-#include <returnvals.h>
-#include <interp.h>
+#include "character.h"
+#include "utility.h"
+#include "levels.h"
+#include "player.h"
+#include "returnvals.h"
+#include "interp.h"
 
 int do_alias(struct char_data *ch, char *arg, int cmd)
 {

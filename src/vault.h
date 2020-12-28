@@ -1,4 +1,4 @@
-#include <utility.h>
+#include "utility.h"
 
 #define VAULT_UPGRADE_COST 100 // plats
 #define VAULT_BASE_SIZE 10  // weight

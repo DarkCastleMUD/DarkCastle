@@ -9,20 +9,20 @@
 /*****************************************************************************/
 /* $Id: arena.cpp,v 1.17 2009/04/24 21:50:43 shane Exp $ */
 
-#include <room.h>  // room_data
-#include <db.h>      // real_room()
-#include <interp.h> // do_look()
-#include <character.h>
-#include <utility.h> // send_to_char, etc.. 
-#include <spells.h> 
-#include <handler.h>
-#include <act.h>
-#include <punish.h>
-#include <player.h>
-#include <arena.h>
+#include "room.h"  // room_data
+#include "db.h"      // real_room()
+#include "interp.h" // do_look()
+#include "character.h"
+#include "utility.h" // send_to_char, etc.. 
+#include "spells.h" 
+#include "handler.h"
+#include "act.h"
+#include "punish.h"
+#include "player.h"
+#include "arena.h"
 #include <string.h>
-#include <returnvals.h>
-#include <levels.h>
+#include "returnvals.h"
+#include "levels.h"
 
 void send_info(char *messg);
 

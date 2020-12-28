@@ -20,28 +20,28 @@ extern "C"
 }
 
 #include <cstdlib>
-#include <structs.h>
-#include <room.h>
-#include <character.h>
-#include <obj.h>
-#include <utility.h>
-#include <terminal.h>
-#include <player.h>
-#include <levels.h>
-#include <mobile.h>
-#include <clan.h>
-#include <handler.h>
-#include <db.h> // exp_table
-#include <interp.h>
-#include <connect.h>
-#include <spells.h>
-#include <race.h>
-#include <act.h>
-#include <set.h>
-#include <returnvals.h>
-#include <fileinfo.h>
-#include <utility.h>
-#include <isr.h>
+#include "structs.h"
+#include "room.h"
+#include "character.h"
+#include "obj.h"
+#include "utility.h"
+#include "terminal.h"
+#include "player.h"
+#include "levels.h"
+#include "mobile.h"
+#include "clan.h"
+#include "handler.h"
+#include "db.h" // exp_table
+#include "interp.h"
+#include "connect.h"
+#include "spells.h"
+#include "race.h"
+#include "act.h"
+#include "set.h"
+#include "returnvals.h"
+#include "fileinfo.h"
+#include "utility.h"
+#include "isr.h"
 #include "Leaderboard.h"
 
 #include <map>

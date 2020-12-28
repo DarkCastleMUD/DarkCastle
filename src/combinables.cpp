@@ -2,24 +2,24 @@
 // in it's container type.  For example, poison making.
 
 
-#include <db.h>
-#include <fight.h>
-#include <room.h>
-#include <obj.h>
-#include <connect.h>
-#include <utility.h>
-#include <character.h>
-#include <handler.h>
-#include <db.h>
-#include <player.h>
-#include <levels.h>
-#include <interp.h>
-#include <magic.h>
-#include <act.h>
-#include <mobile.h>
-#include <spells.h>
+#include "db.h"
+#include "fight.h"
+#include "room.h"
+#include "obj.h"
+#include "connect.h"
+#include "utility.h"
+#include "character.h"
+#include "handler.h"
+#include "db.h"
+#include "player.h"
+#include "levels.h"
+#include "interp.h"
+#include "magic.h"
+#include "act.h"
+#include "mobile.h"
+#include "spells.h"
 #include <string.h> // strstr()
-#include <returnvals.h>
+#include "returnvals.h"
 #include "combinables.h"
 
 #include <vector>

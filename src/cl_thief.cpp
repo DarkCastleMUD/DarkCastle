@@ -4,25 +4,25 @@
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
 */
-#include <character.h>
-#include <structs.h>
-#include <utility.h>
-#include <spells.h>
-#include <levels.h>
-#include <player.h>
-#include <obj.h>
-#include <room.h>
-#include <handler.h>
-#include <mobile.h>
-#include <fight.h>
-#include <connect.h>
-#include <interp.h>
-#include <act.h>
-#include <db.h>
+#include "character.h"
+#include "structs.h"
+#include "utility.h"
+#include "spells.h"
+#include "levels.h"
+#include "player.h"
+#include "obj.h"
+#include "room.h"
+#include "handler.h"
+#include "mobile.h"
+#include "fight.h"
+#include "connect.h"
+#include "interp.h"
+#include "act.h"
+#include "db.h"
 #include <string.h>
-#include <returnvals.h>
-#include <clan.h>
-#include <arena.h>
+#include "returnvals.h"
+#include "clan.h"
+#include "arena.h"
 
 extern int rev_dir[];
 extern CWorld world;

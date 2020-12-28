@@ -6,10 +6,10 @@
 | Description:  This file contains all of the room header file/constant
 |   information.  It also contains information about the 'world' structs.
 */
-#include <structs.h> // ubyte
-#include <obj.h> // ubyte
-#include <MobActivity.h> // struct path_data
-#include <player.h> // CLASS_MAX
+#include "structs.h" // ubyte
+#include "obj.h" // ubyte
+#include "MobActivity.h" // struct path_data
+#include "player.h" // CLASS_MAX
 
 // The following defs are for room_data
 

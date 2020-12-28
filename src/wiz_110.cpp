@@ -18,19 +18,19 @@ extern "C"
 #include <sstream>
 
 #include "wizard.h"
-#include <utility.h>
-#include <levels.h>
-#include <player.h>
-#include <mobile.h>
-#include <interp.h>
-#include <fileinfo.h>
-#include <clan.h>
-#include <returnvals.h>
-#include <spells.h>
-#include <interp.h>
-#include <const.h>
-#include <db.h>
-#include <Leaderboard.h>
+#include "utility.h"
+#include "levels.h"
+#include "player.h"
+#include "mobile.h"
+#include "interp.h"
+#include "fileinfo.h"
+#include "clan.h"
+#include "returnvals.h"
+#include "spells.h"
+#include "interp.h"
+#include "const.h"
+#include "db.h"
+#include "Leaderboard.h"
 
 #ifdef WIN32
 char *crypt(const char *key, const char *salt);

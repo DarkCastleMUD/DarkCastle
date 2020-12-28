@@ -9,12 +9,12 @@ extern "C"
 #include <stdio.h>
 #include <stdarg.h>
 }
-#include <connect.h>
-#include <character.h>
-#include <utility.h>
-#include <terminal.h>
-#include <player.h> // PLR_ANSI
-#include <utility.h>
+#include "connect.h"
+#include "character.h"
+#include "utility.h"
+#include "terminal.h"
+#include "player.h" // PLR_ANSI
+#include "utility.h"
 
 void send_to_char(const char *messg, CHAR_DATA *ch);
 

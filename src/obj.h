@@ -16,8 +16,8 @@
 #ifndef OBJ_H_
 #define OBJ_H_
 
-#include <structs.h> // ubyte
-#include <character.h>
+#include "structs.h" // ubyte
+#include "character.h"
 
 /* The following defs are for obj_data  */
 
