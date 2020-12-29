@@ -1,0 +1,25 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "process",
+			"label": "Run scons",
+			"command": "scons",
+			"args": [
+				"-j",
+				"128"
+			],
+			"options": {
+				"cwd": "${workspaceFolder}/src/"
+			},
+			"problemMatcher": [
+				"$gcc"
+			],
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"detail": "compiler: /usr/bin/g++-10"
+		}
+	]
+}

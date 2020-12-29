@@ -7,7 +7,11 @@
             			
             <storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="cdt.managedbuild.toolchain.gnu.base.1739708971" moduleId="org.eclipse.cdt.core.settings" name="Default">
                 				
-                <externalSettings/>
+                <externalSettings>
+                    					
+                    <externalSetting/>
+                    				
+                </externalSettings>
                 				
                 <extensions>
                     					
@@ -165,7 +169,7 @@
                             							
                             <targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF;org.eclipse.cdt.core.GNU_ELF" id="cdt.managedbuild.target.gnu.platform.base.1875744908" name="Debug Platform" osList="linux,hpux,aix,qnx" superClass="cdt.managedbuild.target.gnu.platform.base"/>
                             							
-                            <builder arguments="" autoBuildTarget="" buildPath="${workspace_loc:/dcastle/src}" cleanBuildTarget="-c" command="scons" enableAutoBuild="true" id="cdt.managedbuild.target.gnu.builder.base.1812820472" incrementalBuildTarget="" keepEnvironmentInBuildfile="false" managedBuildOn="false" name="Gnu Make Builder" parallelBuildOn="true" parallelizationNumber="optimal" superClass="cdt.managedbuild.target.gnu.builder.base"/>
+                            <builder arguments="" autoBuildTarget="" buildPath="${workspace_loc:/src}" cleanBuildTarget="-c" command="scons" enableAutoBuild="true" id="cdt.managedbuild.target.gnu.builder.base.1812820472" incrementalBuildTarget="" keepEnvironmentInBuildfile="false" managedBuildOn="false" name="Gnu Make Builder" parallelBuildOn="true" parallelizationNumber="optimal" superClass="cdt.managedbuild.target.gnu.builder.base"/>
                             							
                             <tool id="cdt.managedbuild.tool.gnu.archiver.base.960747582" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.base"/>
                             							
