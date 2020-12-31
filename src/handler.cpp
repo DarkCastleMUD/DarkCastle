@@ -145,6 +145,11 @@ int isname2(const char *str, const char *namel)
    return 0;
 }
 
+int isname(string str, const char *namelist)
+{
+  return isname(str.c_str(), namelist);
+}
+
 /************************************************************************
 | isname
 | Preconditions:  str != 0, namelist != 0
