@@ -1222,7 +1222,7 @@ int do_mpsettemp(CHAR_DATA *ch, char *argument, int cmd)
     if (IS_NPC(ch)) {
       int num = mob_index[ch->mobdata->nr].virt;
       sprintf(arg, "Mob %d lacking argument for mpsettemp.", num);
-      log(arg, 104, LOG_BUG);
+      logf(104, LOG_BUG, arg);
     }
     return eFAILURE;
   }
