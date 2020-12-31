@@ -81,7 +81,6 @@ extern CWorld world;
 extern index_data *mob_index;
 extern zone_data *zone_table;
 extern std::map<int, std::map<uint8_t, std::string> > professions;
-extern short bport;
 
 // extern funcs
 clan_data * get_clan(char_data *);
@@ -281,17 +280,21 @@ FILE * clan_log   = 0;
 FILE * objects_log = 0;
 FILE * quest_log = 0;
 
+void log(const char *str, int god_level, long type)
+{
+  log(str, god_level, type, nullptr);
+}
+
 // writes a string to the log 
 void log(const char *str, int god_level, long type, char_data *vict)
 {
-  long ct;
-  char *tmstr;
   FILE **f = 0;
   int stream = 1;
   stringstream logpath;
-  extern short bport;
+  DC &dc = DC::instance();
+  DC::config &cf = dc.cf;
 
-  if (bport)
+  if (DC::instance().cf.bport)
   {
     logpath << "../blog/";
   } else
@@ -412,13 +415,19 @@ void log(const char *str, int god_level, long type, char_data *vict)
     break;
   }
 
-  ct = time(0);
-  tmstr = asctime(localtime(&ct));
+  time_t t = time(0);
+  const tm *lt = localtime(&t);
+  char *tmstr = asctime(lt);
   *(tmstr + strlen(tmstr) - 1) = '\0';
 
   if (!stream)
   {
-    fprintf(stderr, "%s :: %s\n", tmstr, str);
+    if (cf.stderr_timestamp == true) {
+
+      fprintf(stderr, "%s :: %s\n", tmstr, str);
+    } else {
+      fprintf(stderr, "%s\n", str);
+    }
   } else
   {
     fprintf(*f, "%s :: %s\n", tmstr, str);
@@ -1660,9 +1669,8 @@ bool check_valid_and_convert(int & value, char * buf)
 }
 
 // modified for new SETBIT et al. commands
-void parse_bitstrings_into_int(char * bits[], char * strings, char_data *ch, uint value[])
+void parse_bitstrings_into_int(char * bits[], const char * strings, char_data *ch, uint value[])
 {
-  char buf[MAX_INPUT_LENGTH];
   bool found = FALSE;
 
   if(!ch)
@@ -1673,12 +1681,13 @@ void parse_bitstrings_into_int(char * bits[], char * strings, char_data *ch, uin
     if(!*strings)
       break;
 
-    half_chop(strings, buf, strings);
+    string arg1, remainder_args;
+    tie (arg1, remainder_args) = half_chop(strings);
                        
     for(int x = 0 ;*bits[x] != '\n'; x++) 
     {
       if (!strcmp("unused",bits[x])) continue;
-      if(is_abbrev(buf, bits[x])) 
+      if(is_abbrev(arg1, bits[x])) 
       {
         if(ISSET(value, x+1)) {
           REMBIT(value, x+1);
@@ -1698,9 +1707,8 @@ void parse_bitstrings_into_int(char * bits[], char * strings, char_data *ch, uin
 }
 
 // calls below uint32 version
-void parse_bitstrings_into_int(char * bits[], char * strings, char_data * ch, uint16 & value)
+void parse_bitstrings_into_int(char * bits[], const char * strings, char_data * ch, uint16 & value)
 {
-  char buf[MAX_INPUT_LENGTH];
   int  found = FALSE;
 
   if(!ch)
@@ -1711,12 +1719,13 @@ void parse_bitstrings_into_int(char * bits[], char * strings, char_data * ch, ui
     if(!*strings)
       break;
 
-    half_chop(strings, buf, strings);
+    string arg1, remainder_args;
+    tie (arg1, remainder_args) = half_chop(strings);
                        
     for(int x = 0 ;*bits[x] != '\n'; x++) 
     {
       if (!strcmp("unused",bits[x])) continue;
-      if(is_abbrev(buf, bits[x])) 
+      if(is_abbrev(arg1, bits[x])) 
       {
         if(IS_SET(value, (1<<x))) {
           REMOVE_BIT(value, (1<<x));
@@ -1740,9 +1749,8 @@ void parse_bitstrings_into_int(char * bits[], char * strings, char_data * ch, ui
 // Finds the bits[] strings listed in "strings" and toggles the bit in "value"
 // Informs 'ch' of what has happened
 //
-void parse_bitstrings_into_int(char * bits[], char * strings, char_data * ch, uint32 & value)
+void parse_bitstrings_into_int(char * bits[], const char * strings, char_data * ch, uint32 & value)
 {
-  char buf[MAX_INPUT_LENGTH];
   int  found = FALSE;
 
   if(!ch)
@@ -1753,12 +1761,13 @@ void parse_bitstrings_into_int(char * bits[], char * strings, char_data * ch, ui
     if(!*strings)
       break;
 
-    half_chop(strings, buf, strings);
+    string arg1, remainder_args;
+    tie (arg1, remainder_args) = half_chop(strings);
                        
     for(int x = 0 ;*bits[x] != '\n'; x++) 
     {
       if (!strcmp("unused",bits[x])) continue;
-      if(is_abbrev(buf, bits[x])) 
+      if(is_abbrev(arg1, bits[x])) 
       {
         if(IS_SET(value, (1<<x))) {
           REMOVE_BIT(value, (1<<x));
@@ -1967,7 +1976,6 @@ void remove_character(char *name, BACKUP_TYPE backup)
   char dst_dir[256] = {0};
   char syscmd[512];
   struct stat statbuf;
-  extern short bport;
 
   if (name == NULL) {
     return;
@@ -1993,7 +2001,7 @@ void remove_character(char *name, BACKUP_TYPE backup)
     break;
   }
 
-  if (bport) {
+  if (DC::instance().cf.bport) {
     snprintf(src_filename, 256, "%s/%c/%s", BSAVE_DIR, name[0], name);
   } else {
     snprintf(src_filename, 256, "%s/%c/%s", SAVE_DIR, name[0], name);
@@ -2008,7 +2016,7 @@ void remove_character(char *name, BACKUP_TYPE backup)
     }
   }
 
-  if (bport) {
+  if (DC::instance().cf.bport) {
     snprintf(src_filename, 256, "%s/%c/%s.backup", BSAVE_DIR, name[0], name);
   } else {
     snprintf(src_filename, 256, "%s/%c/%s.backup", SAVE_DIR, name[0], name);
@@ -2497,7 +2505,7 @@ bool char_file_exists(string name)
 
   string filename;
 
-  if (bport) {
+  if (DC::instance().cf.bport) {
     filename = fmt::format("{}/{}", BSAVE_DIR, name);
   } else {
     filename = fmt::format("{}/{}", SAVE_DIR, name);
