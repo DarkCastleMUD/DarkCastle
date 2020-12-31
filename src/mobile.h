@@ -103,4 +103,7 @@ void translate_value(char *leftptr, char *rightptr, int16 **vali, uint32 **valui
                 char ***valstr, int64 **vali64, sbyte **valb, CHAR_DATA *mob, CHAR_DATA *actor,
                 OBJ_DATA *obj, void *vo, CHAR_DATA *rndm);
 
+void save_golem_data(CHAR_DATA *ch);
+void save_charmie_data(CHAR_DATA *ch);
+
 #endif
