@@ -41,7 +41,7 @@ extern CVoteData *DCVote;
 void log_sacrifice(CHAR_DATA *ch, OBJ_DATA *obj, bool decay = FALSE)
 { //decay variable means it's from a decaying corpse, not a player
   FILE *fl;
-  long ct;
+  time_t timep;
   char *tmstr;
 
   if(GET_OBJ_RNUM(obj) == NOWHERE) return;
@@ -51,8 +51,8 @@ void log_sacrifice(CHAR_DATA *ch, OBJ_DATA *obj, bool decay = FALSE)
     return;
   }
 
-  ct = time(0);
-  tmstr = asctime(localtime(&ct));
+  timep = time(0);
+  tmstr = asctime(localtime(&timep));
   *(tmstr + strlen(tmstr) - 1) = '\0';
   if (!decay)
     fprintf(fl, "%s :: %s just sacrificed %s[%d]\n", tmstr, GET_NAME(ch), GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj));
