@@ -1793,7 +1793,7 @@ void affect_remove(CHAR_DATA *ch, struct affected_type *af, int flags) {
 			fight_kill(NULL, ch, TYPE_RAW_KILL, 0);
 			char_died = TRUE;
 #else
-			act("$n begins to choke on the water, a look of panic filling $s eyes as it fill $s lungs.\n\r", ch, 0, 0, TO_ROOM, 0);
+			act("$n begins to choke on the water, a look of panic filling $s eyes as it fills $s lungs.\n\r", ch, 0, 0, TO_ROOM, 0);
 			send_to_char("The water rushes into your lungs and the light fades with your oxygen.\n\r", ch);
 #endif
 		}
