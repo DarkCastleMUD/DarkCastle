@@ -26,27 +26,34 @@ extern struct descriptor_data *descriptor_list;
 using namespace std;
 
 Leaderboard::Leaderboard() {
-	memset(hpactivename, 0, 5 * sizeof(char));
-	memset(mnactivename, 0, 5 * sizeof(char));
-	memset(kiactivename, 0, 5 * sizeof(char));
-	memset(pkactivename, 0, 5 * sizeof(char));
-	memset(pdactivename, 0, 5 * sizeof(char));
-	memset(rdactivename, 0, 5 * sizeof(char));
-	memset(mvactivename, 0, 5 * sizeof(char));
-	memset(&hpactive, 0, 5 * sizeof(int));
-	memset(&mnactive, 0, 5 * sizeof(int));
-	memset(&kiactive, 0, 5 * sizeof(int));
-	memset(&pkactive, 0, 5 * sizeof(int));
-	memset(&pdactive, 0, 5 * sizeof(int));
-	memset(&rdactive, 0, 5 * sizeof(int));
-	memset(&mvactive, 0, 5 * sizeof(int));
-	memset(hpactiveclassname, 0, (CLASS_MAX - 2) * 5 * sizeof(char));
-	memset(mnactiveclassname, 0, (CLASS_MAX - 2) * 5 * sizeof(char));
-	memset(kiactiveclassname, 0, (CLASS_MAX - 2) * 5 * sizeof(char));
-	memset(pkactiveclassname, 0, (CLASS_MAX - 2) * 5 * sizeof(char));
-	memset(pdactiveclassname, 0, (CLASS_MAX - 2) * 5 * sizeof(char));
-	memset(rdactiveclassname, 0, (CLASS_MAX - 2) * 5 * sizeof(char));
-	memset(mvactiveclassname, 0, (CLASS_MAX - 2) * 5 * sizeof(char));
+	memset(hpactivename, 5, sizeof(char));
+	memset(mnactivename, 5, sizeof(char));
+	memset(kiactivename, 5, sizeof(char));
+	memset(pkactivename, 5, sizeof(char));
+	memset(pdactivename, 5, sizeof(char));
+	memset(rdactivename, 5, sizeof(char));
+	memset(mvactivename, 5, sizeof(char));
+	memset(&hpactive, 5, sizeof(int));
+	memset(&mnactive, 5, sizeof(int));
+	memset(&kiactive, 5, sizeof(int));
+	memset(&pkactive, 5, sizeof(int));
+	memset(&pdactive, 5, sizeof(int));
+	memset(&rdactive, 5, sizeof(int));
+	memset(&mvactive, 5, sizeof(int));
+	memset(hpactiveclassname, (CLASS_MAX - 2) * 5, sizeof(char));
+	memset(mnactiveclassname, (CLASS_MAX - 2) * 5, sizeof(char));
+	memset(kiactiveclassname, (CLASS_MAX - 2) * 5, sizeof(char));
+	memset(pkactiveclassname, (CLASS_MAX - 2) * 5, sizeof(char));
+	memset(pdactiveclassname, (CLASS_MAX - 2) * 5, sizeof(char));
+	memset(rdactiveclassname, (CLASS_MAX - 2) * 5, sizeof(char));
+	memset(mvactiveclassname, (CLASS_MAX - 2) * 5, sizeof(char));
+	memset(hpactiveclass, (CLASS_MAX - 2) * 5, sizeof(char));
+	memset(mnactiveclass, (CLASS_MAX - 2) * 5, sizeof(char));
+	memset(kiactiveclass, (CLASS_MAX - 2) * 5, sizeof(char));
+	memset(pkactiveclass, (CLASS_MAX - 2) * 5, sizeof(char));
+	memset(pdactiveclass, (CLASS_MAX - 2) * 5, sizeof(char));
+	memset(rdactiveclass, (CLASS_MAX - 2) * 5, sizeof(char));
+	memset(mvactiveclass, (CLASS_MAX - 2) * 5, sizeof(char));
 }
 
 Leaderboard::~Leaderboard() {
@@ -503,6 +510,9 @@ void Leaderboard::read_file(void) {
 			for (i = 0; i < 5; i++) {
 				hpactivename[i] = fread_string(fl, 0);
 				hpactive[i] = fread_int(fl, 0, LONG_MAX);
+				if (char_file_exists(hpactivename[i]) == false) {
+					hpactivename[i] = str_dup("UNKNOWN");
+				}
 			}
 			for (i = 0; i < 5; i++) {
 				mnactivename[i] = fread_string(fl, 0);
