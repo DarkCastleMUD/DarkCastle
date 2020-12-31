@@ -971,7 +971,7 @@ int search_block(const char *orig_arg, char **list, bool exact)
     for (i = 0; **(list + i) != '\n'; i++)
     {
       string haystack = *(list + i);
-      if (!haystack.compare(0, needle.size(), haystack))
+      if (!haystack.compare(0, string::npos, needle))
       {
         return (i);
       }
