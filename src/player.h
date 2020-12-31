@@ -17,36 +17,36 @@
 |  but it's as good a place as any and this is all fubar'd anyway.
 |  -pir 7/30
 */
-#define LOG_BUG            1
-#define LOG_PRAYER         1<<1
-#define LOG_GOD            1<<2
-#define LOG_MORTAL         1<<3
-#define LOG_SOCKET         1<<4
-#define LOG_MISC           1<<5
-#define LOG_PLAYER         1<<6
-#define CHANNEL_GOSSIP     1<<7
-#define CHANNEL_AUCTION    1<<8
-#define CHANNEL_INFO       1<<9
-#define CHANNEL_TRIVIA     1<<10
-#define CHANNEL_DREAM      1<<11
-#define CHANNEL_CLAN       1<<12
-#define CHANNEL_NEWBIE     1<<13
-#define CHANNEL_SHOUT      1<<14
-#define LOG_WORLD          1<<15
-#define LOG_ARENA          1<<16
-#define LOG_CLAN           1<<17
-#define LOG_WARNINGS       1<<18
-#define LOG_HELP	   1<<19
+#define LOG_BUG            1U
+#define LOG_PRAYER         1U<<1
+#define LOG_GOD            1U<<2
+#define LOG_MORTAL         1U<<3
+#define LOG_SOCKET         1U<<4
+#define LOG_MISC           1U<<5
+#define LOG_PLAYER         1U<<6
+#define CHANNEL_GOSSIP     1U<<7
+#define CHANNEL_AUCTION    1U<<8
+#define CHANNEL_INFO       1U<<9
+#define CHANNEL_TRIVIA     1U<<10
+#define CHANNEL_DREAM      1U<<11
+#define CHANNEL_CLAN       1U<<12
+#define CHANNEL_NEWBIE     1U<<13
+#define CHANNEL_SHOUT      1U<<14
+#define LOG_WORLD          1U<<15
+#define LOG_ARENA          1U<<16
+#define LOG_CLAN           1U<<17
+#define LOG_WARNINGS       1U<<18
+#define LOG_HELP           1U<<19
 
-#define LOG_DATABASE	   1<<20
-#define LOG_OBJECTS        1<<21
-#define CHANNEL_TELL       1<<22
-#define CHANNEL_HINTS      1<<23
-#define LOG_VAULT          1<<24
-#define LOG_QUEST          1<<25
+#define LOG_DATABASE	   1U<<20
+#define LOG_OBJECTS        1U<<21
+#define CHANNEL_TELL       1U<<22
+#define CHANNEL_HINTS      1U<<23
+#define LOG_VAULT          1U<<24
+#define LOG_QUEST          1U<<25
 // ...
-#define MISC_IS_OBJ        1<<30
-#define MISC_IS_MOB        1<<31
+#define MISC_IS_OBJ        1U<<30
+#define MISC_IS_MOB        1U<<31
 
 /************************************************************************
 | Thirst, FULL, etc..
@@ -59,43 +59,43 @@
 | Player vectors
 | CHAR_DATA->pcdata->toggles
 */
-#define PLR_BRIEF        1
-#define PLR_COMPACT      1<<1
-#define PLR_DONTSET      1<<2
-#define PLR_DONOTUSE     1<<3
-#define PLR_NOHASSLE     1<<4
-#define PLR_SUMMONABLE   1<<5
-#define PLR_WIMPY        1<<6
-#define PLR_ANSI         1<<7
-#define PLR_VT100        1<<8
-#define PLR_ONEWAY       1<<9
-#define PLR_DISGUISED    1<<10
-#define PLR_UNUSED       1<<11
-#define PLR_PAGER        1<<12
-#define PLR_BEEP         1<<13
-#define PLR_BARD_SONG    1<<14
-#define PLR_ANONYMOUS    1<<15
-#define PLR_AUTOEAT      1<<16
-#define PLR_LFG          1<<17
-#define PLR_CHARMIEJOIN  1<<18
-#define PLR_NOTAX	 1<<19
-#define PLR_GUIDE	 1<<20
-#define PLR_GUIDE_TOG	 1<<21
-#define PLR_NEWS         1<<22
-#define PLR_50PLUS	 1<<23
-#define PLR_ASCII         1<<24
-#define PLR_DAMAGE       1<<25
-#define PLR_CLS_TREE_A   1<<26
-#define PLR_CLS_TREE_B   1<<27
-#define PLR_CLS_TREE_C   1<<28 //might happen one day
-#define PLR_EDITOR_WEB   1<<29
-#define PLR_REMORTED     1<<30
+#define PLR_BRIEF        1U
+#define PLR_COMPACT      1U<<1
+#define PLR_DONTSET      1U<<2
+#define PLR_DONOTUSE     1U<<3
+#define PLR_NOHASSLE     1U<<4
+#define PLR_SUMMONABLE   1U<<5
+#define PLR_WIMPY        1U<<6
+#define PLR_ANSI         1U<<7
+#define PLR_VT100        1U<<8
+#define PLR_ONEWAY       1U<<9
+#define PLR_DISGUISED    1U<<10
+#define PLR_UNUSED       1U<<11
+#define PLR_PAGER        1U<<12
+#define PLR_BEEP         1U<<13
+#define PLR_BARD_SONG    1U<<14
+#define PLR_ANONYMOUS    1U<<15
+#define PLR_AUTOEAT      1U<<16
+#define PLR_LFG          1U<<17
+#define PLR_CHARMIEJOIN  1U<<18
+#define PLR_NOTAX	     1U<<19
+#define PLR_GUIDE	     1U<<20
+#define PLR_GUIDE_TOG	 1U<<21
+#define PLR_NEWS         1U<<22
+#define PLR_50PLUS	     1U<<23
+#define PLR_ASCII        1U<<24
+#define PLR_DAMAGE       1U<<25
+#define PLR_CLS_TREE_A   1U<<26
+#define PLR_CLS_TREE_B   1U<<27
+#define PLR_CLS_TREE_C   1U<<28 //might happen one day
+#define PLR_EDITOR_WEB   1U<<29
+#define PLR_REMORTED     1U<<30
 
 /************************************************************************
 | Class types for PCs
 */
 #define CLASS_MAGIC_USER   1
-#define CLASS_MAGE 	   1 // Laziness > consistency
+#define CLASS_MAGE 	       1 // Laziness > consistency
 #define CLASS_CLERIC       2
 #define CLASS_THIEF        3
 #define CLASS_WARRIOR      4
