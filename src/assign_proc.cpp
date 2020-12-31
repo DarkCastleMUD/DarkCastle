@@ -54,28 +54,24 @@ void assign_mobiles(void)
 
 void assign_one_mob_non(int mob_num, int (*func)(CHAR_DATA*, struct obj_data *, int, char*, CHAR_DATA*))
 {
-	extern short code_testing_mode;
-
 	int mob = real_mobile(mob_num);
 
 	if(mob < 0)
 	{
-		if(!code_testing_mode)
-			logf(IMMORTAL, LOG_WORLD, "Assigning non_combat proc to non-existant mob '%d'.", mob_num);
+	  if (DC::instance().cf.test_world == false) {
+	    logf(IMMORTAL, LOG_WORLD, "Assigning non_combat proc to non-existant mob '%d'.", mob_num);
+	  }
 	}
 	else mob_index[mob].non_combat_func = func;
 }
 
 void assign_one_mob_com(int mob_num, int (*func)(CHAR_DATA*, struct obj_data *, int, char*, CHAR_DATA*))
 {
-	extern short code_testing_mode;
-
 	int mob = real_mobile(mob_num);
 
 	if(mob < 0)
 	{
-		if(!code_testing_mode)
-			logf(IMMORTAL, LOG_WORLD, "Assigning combat proc to non-existant mob '%d'.", mob_num);
+		logf(IMMORTAL, LOG_WORLD, "Assigning combat proc to non-existant mob '%d'.", mob_num);
 	}
 	else mob_index[mob].combat_func = func;
 }
