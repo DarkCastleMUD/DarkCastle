@@ -491,7 +491,7 @@ int ki_blast( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
 int ki_punch( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
 {	
    if (!vict) {
-      log("Serious problem in ki punch!", ANGEL, LOG_BUG);
+      logf(ANGEL, LOG_BUG, "Serious problem in ki punch!", ANGEL, LOG_BUG);
       return eINTERNAL_ERROR;
       }
 
