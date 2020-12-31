@@ -81,13 +81,11 @@ char* curr_type;
 char* curr_name;
 int curr_virtno;
 
-extern bool verbose_mode;
 extern char *item_types[];
 extern char *wear_bits[];
 extern char *extra_bits[];
 extern char *more_obj_bits[];
 extern char *apply_types[];
-extern uint16_t port1;
 
 /**************************************************************************
  *  declarations of most of the 'global' variables                         *
@@ -631,8 +629,8 @@ void boot_db(void)
 	log("Looking for unordered objects...", 0, LOG_MISC);
 	find_unordered_objects();
 
-	extern short bport;
-	if (!bport) {
+	if (DC::instance().cf.bport == false)
+	{
 		log("Loading Corpses.", 0, LOG_MISC);
 		load_corpses();
 	}
@@ -661,13 +659,14 @@ void boot_db(void)
 	assign_objects();
 	assign_rooms();
 
-	if (verbose_mode) {
+	DC::config &cf = DC::instance().cf;
+	if (cf.verbose_mode) {
 		fprintf( stderr, "\n[ Room  Room]\t{Level}\t  Author\tZone\n");
 	}
 
 	for (i = 0; i <= top_of_zone_table; i++)
 			{
-		if (verbose_mode) {
+		if (cf.verbose_mode) {
 			fprintf(stderr, "[%5d %5d]\t%s.\n",
 					(i ? (zone_table[i - 1].top + 1) : 0),
 					zone_table[i].top,
@@ -676,7 +675,8 @@ void boot_db(void)
 
 		reset_zone(i);
 	}
-	if (verbose_mode) {
+
+	if (cf.verbose_mode) {
 		fprintf( stderr, "\n");
 	}
 
@@ -818,6 +818,12 @@ void update_wizlist(CHAR_DATA *ch)
 	}
 
 	write_wizlist("../lib/wizlist.txt");
+
+	in_port_t port1 = 0;
+  if (DC::instance().cf.ports.size() > 0)
+  {
+    port1 = DC::instance().cf.ports[0];
+  }
 
 	stringstream ssbuffer;
 	ssbuffer << HTDOCS_DIR << port1 << "/wizlist.txt";
@@ -999,18 +1005,19 @@ struct index_data *generate_mob_indices(int *top, struct index_data *index)
 	char endfile[180];
 	struct world_file_list_item * pItem = NULL;
 //  extern short code_testing_mode;
-	extern short code_testing_mode_mob;
 
 	log("Opening mobile file index.", 0, LOG_MISC);
-	if (!code_testing_mode_mob) {
-		if (!(flMobIndex = dc_fopen(MOB_INDEX_FILE, "r"))) {
-			log("Could not open index file.", 0, LOG_MISC);
-			abort();
-		}
-	}
-	else if (!(flMobIndex = dc_fopen(MOB_INDEX_FILE_TINY, "r"))) {
-		log("Could not open index file.", 0, LOG_MISC);
-		abort();
+	if (DC::instance().cf.test_mobs) {
+	  if (!(flMobIndex = dc_fopen(MOB_INDEX_FILE_TINY, "r"))) {
+	    log("Could not open index file.", 0, LOG_MISC);
+	    abort();
+	  }
+	} else
+	{
+    if (!(flMobIndex = dc_fopen(MOB_INDEX_FILE, "r"))) {
+      log("Could not open index file.", 0, LOG_MISC);
+      abort();
+    }
 	}
 
 	log("Opening object files.", 0, LOG_MISC);
@@ -1023,7 +1030,9 @@ struct index_data *generate_mob_indices(int *top, struct index_data *index)
 		strcpy(endfile, "mobs/");
 		strcat(endfile, temp);
 
-		if (verbose_mode) {
+		DC::config &cf = DC::instance().cf;
+
+		if (cf.verbose_mode) {
 			log(temp, 0, LOG_MISC);
 		}
 
@@ -1318,7 +1327,8 @@ struct index_data *generate_obj_indices(int *top,
 		strcpy(endfile, "objects/");
 		strcat(endfile, temp);
 
-		if (verbose_mode) {
+		DC::config &cf = DC::instance().cf;
+		if (cf.verbose_mode) {
 			log(temp, 0, LOG_MISC);
 		}
 
@@ -1936,26 +1946,29 @@ void boot_world(void)
 	char * temp;
 	char endfile[200]; // hopefully noone is stupid and makes a 180 char filename
 	struct world_file_list_item * pItem = NULL;
-	extern short code_testing_mode;
-	extern short code_testing_mode_world;
 
 	object_list = 0;
 
-	if ((!code_testing_mode || code_testing_mode_world))
+	DC::config &cf = DC::instance().cf;
+
+	if (cf.test_world)
 	{
-		if (!(flWorldIndex = dc_fopen(WORLD_INDEX_FILE, "r")))
-		{
-			perror("dc_fopen");
-			log("boot_world: could not open world index file.", 0, LOG_BUG);
-			abort();
-		}
-	}
-	else if (!(flWorldIndex = dc_fopen(WORLD_INDEX_FILE_TINY, "r")))
+    if (!(flWorldIndex = dc_fopen(WORLD_INDEX_FILE_TINY, "r")))
+	  {
+	    perror("dc_fopen");
+	    log("boot_world: could not open world index file tiny.", 0, LOG_BUG);
+	    abort();
+	  }
+	} else
 	{
-		perror("dc_fopen");
-		log("boot_world: could not open world index file tiny.", 0, LOG_BUG);
-		abort();
+    if (!(flWorldIndex = dc_fopen(WORLD_INDEX_FILE, "r")))
+    {
+      perror("dc_fopen");
+      log("boot_world: could not open world index file.", 0, LOG_BUG);
+      abort();
+    }
 	}
+
 	log("Booting individual world files", 0, LOG_MISC);
 
 	// note, we don't worry about free'ing temp, cause it's held in the "world_file_list"
@@ -1966,7 +1979,8 @@ void boot_world(void)
 		strcpy(endfile, "world/");
 		strcat(endfile, temp);
 
-		if (verbose_mode) {
+		DC::config &cf = DC::instance().cf;
+		if (cf.verbose_mode) {
 			log(temp, 0, LOG_MISC);
 		}
 
@@ -2533,14 +2547,15 @@ void boot_zones(void)
 	FILE *fl;
 	FILE *flZoneIndex;
 	int zon = 0;
-	extern short code_testing_mode;
 	char * temp;
 	char endfile[200]; // hopefully noone is stupid and makes a 180 char filename
 
 //  for (zon = 0;zon < MAX_ZONE;zon++)
 	//  zone_table[zon] = NULL; // Null list, top_of_z can't be used now
 
-	if (!code_testing_mode)
+	DC::config &cf = DC::instance().cf;
+
+	if (cf.test_world == false && cf.test_mobs == false && cf.test_objs == false)
 	{
 		if (!(flZoneIndex = dc_fopen(ZONE_INDEX_FILE, "r")))
 		{
@@ -2563,7 +2578,7 @@ void boot_zones(void)
 		strcpy(endfile, "zonefiles/");
 		strcat(endfile, temp);
 
-		if (verbose_mode) {
+		if (cf.verbose_mode) {
 			log(temp, 0, LOG_MISC);
 		}
 
@@ -4092,7 +4107,7 @@ string quotequotes(const char *str)
 
 string quotequotes(string &s1)
 {
-	size_t pos = s1.find('\"');
+	size_t pos = s1.find("\"");
 	while (pos != string::npos) {
 		s1.insert(pos, 1, '\"');
 		pos = s1.find('\"', pos + 2);
@@ -4103,7 +4118,7 @@ string quotequotes(string &s1)
 
 string lf_to_crlf(string &s1)
 {
-	size_t pos = s1.find('\n');
+	size_t pos = s1.find('\n'); // @suppress("Ambiguous problem")
 	while (pos != string::npos) {
 		s1.insert(pos, 1, '\r');
 		pos = s1.find('\n', pos + 2);
@@ -4365,7 +4380,6 @@ void zone_update(void)
 void reset_zone(int zone)
 {
 	extern int top_of_world;
-	extern short code_testing_mode;
 	int cmd_no, last_cmd, last_mob, last_obj, last_percent;
 	int last_no;
 	CHAR_DATA *mob = NULL;
@@ -4455,7 +4469,9 @@ void reset_zone(int zone)
 							last_obj = 0;
 						}
 					} else {
-						if (!code_testing_mode) {
+					  DC::config &cf = DC::instance().cf;
+
+						if (cf.test_world == false && cf.test_mobs == false && cf.test_objs == false) {
 							sprintf(buf,
 							"Obj %d loaded to NOWHERE. Zone %d Cmd %d",
 							obj_index[ZCMD.arg1].virt, zone, cmd_no);
@@ -4515,14 +4531,22 @@ void reset_zone(int zone)
 				break;
 
 				case '%': /* percent chance of next command happening */
-				if (number(1, ZCMD.arg2) <= ZCMD.arg1) {
-					ZCMD.last = time(NULL);
-					last_percent = 1;
-					last_cmd = 1;
-				} else {
-					last_cmd = 0;
-					last_percent = 0;
-				}
+				  // We can't send a number less than one to number() otherwise a debug coredump occurs
+				  if (ZCMD.arg2 < 1) {
+				    logf(IMMORTAL, LOG_BUG, "Zone %d, line %d: % arg1: %d arg2: %d - Error: arg2 < 1", zone, cmd_no, ZCMD.arg1, ZCMD.arg2);
+            last_cmd = 0;
+            last_percent = 0;
+				  } else
+				  {
+            if (number(1, ZCMD.arg2) <= ZCMD.arg1) {
+              ZCMD.last = time(NULL);
+              last_percent = 1;
+              last_cmd = 1;
+            } else {
+              last_cmd = 0;
+              last_percent = 0;
+            }
+				  }
 				break;
 
 				case 'E': /* object to equipment list */
