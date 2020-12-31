@@ -57,7 +57,6 @@ void Leaderboard::check(void) {
 	// check online players to the file and make sure the file is up to date
 	struct descriptor_data *d;
 	int i, j, k;
-	extern uint16_t port1;
 	extern char* curr_type;
 	extern char* curr_name;
 	extern int curr_virtno;
@@ -450,7 +449,14 @@ void Leaderboard::check(void) {
 	}
 
 	write_file(LEADERBOARD_FILE);
-	stringstream ssbuffer;
+
+  in_port_t port1 = 0;
+  if (DC::instance().cf.ports.size() > 0)
+  {
+    port1 = DC::instance().cf.ports[0];
+  }
+
+  stringstream ssbuffer;
 	ssbuffer << HTDOCS_DIR << port1 << "/" << LEADERBOARD_FILE;
 	write_file(ssbuffer);
 
@@ -1098,9 +1104,9 @@ void Leaderboard::rename(char *oldname, char *newname) {
 	int value[lines], i;
 	char *name[lines];
 
-	extern short bport;
-	if (bport)
+	if (DC::instance().cf.bport) {
 		return;
+	}
 
 	if (!(fl = dc_fopen(LEADERBOARD_FILE, "r"))) {
 		logf(0, LOG_BUG, "Cannot open leaderboard file: %s", LEADERBOARD_FILE);
