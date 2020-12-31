@@ -1797,7 +1797,7 @@ void vault_log(CHAR_DATA *ch, char *owner)
 
 void vlog(const char *message, const char *name) {
   struct tm *tm = NULL;
-  long ct;
+  time_t ct;
   FILE *ofile, *nfile;
   char buf[MAX_INPUT_LENGTH], line[MAX_INPUT_LENGTH];
   char fname[256], nfname[256];
