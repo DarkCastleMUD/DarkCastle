@@ -4036,7 +4036,7 @@ void end_oproc(CHAR_DATA *ch)
 
 	if (core_counter++ < 10) {
 	    produce_coredump();
-	    log("Corefile produced.", IMMORTAL, LOG_BUG);
+	    logf(IMMORTAL, LOG_BUG, "Corefile produced.");
 	}
     } else {
 	extract_char(ch, TRUE);
