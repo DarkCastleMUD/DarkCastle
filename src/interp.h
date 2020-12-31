@@ -329,6 +329,7 @@ DO_FUN do_hitall;
 DO_FUN do_holylite;
 DO_FUN do_home;
 DO_FUN do_idea;
+DO_FUN do_identify;
 DO_FUN do_ignore;
 DO_FUN do_imotd;
 DO_FUN do_imbue;
