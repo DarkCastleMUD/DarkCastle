@@ -40,8 +40,6 @@ void load_auction_tickets()
 #include <queue>
 #include "fileinfo.h"
 #include <errno.h>
-#include <iostream>
-#include <fstream>
 
 using namespace std;
 
@@ -553,8 +551,7 @@ Is item of type slot?
 bool AuctionHouse::IsSlot(string slot, int vnum)
 {
   int keyword;
-  char buf[MAX_STRING_LENGTH];
-  strncpy(buf, slot.c_str(), MAX_STRING_LENGTH);
+  string buf = slot;
 
   static char *keywords[] = 
   {
@@ -578,7 +575,7 @@ bool AuctionHouse::IsSlot(string slot, int vnum)
         "\n"
   };
 
-  keyword = search_block(buf, keywords, FALSE);
+  keyword = search_block(buf.c_str(), keywords, FALSE);
   if (keyword == -1) 
     return false;
   
@@ -704,8 +701,10 @@ SEARCY BY LEVEL
 bool AuctionHouse::IsLevel(unsigned int to, unsigned int from, int vnum)
 {
   int nr;
-  if(to > from)
-    swap(to, from);
+  if(to > from) {
+    std::swap(to, from); // @suppress("Invalid arguments")
+  }
+
   unsigned int eq_level;
   if(from == 0) from = 999;
 
@@ -904,9 +903,8 @@ void AuctionHouse::Save()
   FILE * the_file;
   map<unsigned int, AuctionTicket>::iterator Item_it;
   map<int, int>::iterator room_it;
-  extern short bport;
 
-  if(bport)
+  if (DC::instance().cf.bport)
   {
     log("Unable to save auction files because this is the testport!", ANGEL, LOG_MISC);
     return;
@@ -1255,8 +1253,7 @@ void AuctionHouse::BuyItem(CHAR_DATA *ch, unsigned int ticket)
   do_save(ch, "", 9);
 
 
- extern short bport;
- if(!bport) {
+ if(DC::instance().cf.bport == false) {
   errno = 0;
   if (!(fl = dc_fopen(WEB_AUCTION_FILE,"r"))) {
     logf(IMMORTAL, LOG_BUG, "%s: %s", WEB_AUCTION_FILE, strerror(errno));
