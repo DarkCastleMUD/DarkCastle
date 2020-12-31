@@ -56,5 +56,6 @@ void     scramble_text(char * txt);
 void     warn_if_duplicate_ip(char_data * ch);
 void     record_msg(char *messg, char_data *ch);
 int      write_hotboot_file(char **argv);
-
+void  send_info(string messg);
+void  send_info(const char *messg);
 #endif
