@@ -722,7 +722,7 @@ void new_edit_board_unlock_board(CHAR_DATA *ch, int abort)
 void board_write_msg(CHAR_DATA *ch, char *arg, std::map<string,BOARD_INFO>::iterator board) 
 {
   char buf[MAX_STRING_LENGTH];
-  long ct; // clock time
+  time_t timep; // clock time
   char *tmstr;
   
 
@@ -771,8 +771,8 @@ void board_write_msg(CHAR_DATA *ch, char *arg, std::map<string,BOARD_INFO>::iter
 
   reserve->new_post.author = GET_NAME(ch);
 
-  ct = time(0);
-  tmstr = asctime(localtime(&ct));
+  timep = time(0);
+  tmstr = asctime(localtime(&timep));
   *(tmstr + strlen(tmstr) - 1) = '\0';
   sprintf(buf, "%.10s", tmstr);
 
