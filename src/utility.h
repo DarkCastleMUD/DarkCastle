@@ -34,6 +34,7 @@ extern "C" {
 #include "weather.h"
 #include "memory.h"
 #include "player.h"
+#include "obj.h"
 
 using namespace std;
 
@@ -362,7 +363,8 @@ int     str_n_nosp_cmp  (char *arg1, char *arg2, int size);
 char *  str_nospace     (char *stri);
 char *	str_dup		(const char *str);
 char *	str_dup0	(const char *str);
-void    log		(const char *str, int god_level, long type, char_data *vict = 0);
+void    log   (const char *str, int god_level, long type);
+void    log		(const char *str, int god_level, long type, char_data *vict);
 void    logf            (int level, long type, const char *arg, ...);
 int     send_to_gods    (const char * str, int god_level, long type);
 void	sprintbit	(uint value[], char *names[], char *result);
@@ -377,7 +379,7 @@ struct time_info_data
 bool	circle_follow   (CHAR_DATA *ch, CHAR_DATA *victim);
 bool ARE_GROUPED( struct char_data *sub, struct char_data *obj); 
 bool ARE_CLANNED( struct char_data *sub, struct char_data *obj); 
-int	is_number	(char *str);
+int	is_number	(const char *str);
 void	gain_condition	(CHAR_DATA *ch, int condition, int value);
 void	set_fighting	(CHAR_DATA *ch, CHAR_DATA *vict);
 void	stop_fighting	(CHAR_DATA *ch, int clearlag = 1);
@@ -392,6 +394,7 @@ char *  get_skill_name  (int skillnum);
 void	gain_exp_regardless	(CHAR_DATA *ch, int gain);
 void	advance_level	(CHAR_DATA *ch, int is_conversion);
 int	close_socket	(struct descriptor_data *d);
+int isname    (string arg, const char *arg2);
 int	isname		(const char *arg, const char *arg2);
 void	page_string	(struct descriptor_data *d, const char *str,
 			    int keep_internal);
@@ -402,7 +405,6 @@ void    redo_ki		(CHAR_DATA *ch);	/* And Urizen*/
 void assign_rooms(void);
 void assign_objects(void);
 void assign_mobiles(void);
-int search_block( char *arg, char **list, bool exact );
 void free_obj(struct obj_data *obj);
 
 int char_to_room(CHAR_DATA *ch, int room);
@@ -448,6 +450,7 @@ void disarm( CHAR_DATA *ch, CHAR_DATA *victim );
 int shop_keeper( CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg, CHAR_DATA * invoker );
 void send_to_all(char *messg);
 void ansi_color(char *txt, CHAR_DATA *ch);
+void send_to_char(string messg, struct char_data *ch);
 void send_to_char(const char *messg, CHAR_DATA *ch);
 void send_to_char_nosp(char *messg, CHAR_DATA *ch);
 void send_to_room(const char *messg, int room, bool awakeonly = FALSE, CHAR_DATA *nta = NULL);
@@ -467,9 +470,9 @@ void send_to_char_regardless(char *messg, struct char_data *ch);
 int csendf(struct char_data *ch, char *arg, ...);
 bool check_range_valid_and_convert(int & value, char * buf, int begin, int end);
 bool check_valid_and_convert(int & value, char * buf);
-void parse_bitstrings_into_int(char * bits[], char * strings, char_data * ch, uint32 value[]);
-void parse_bitstrings_into_int(char * bits[], char * strings, char_data * ch, uint32 & value);
-void parse_bitstrings_into_int(char * bits[], char * strings, char_data * ch, uint16 & value);
+void parse_bitstrings_into_int(char * bits[], const char * strings, char_data * ch, uint32 value[]);
+void parse_bitstrings_into_int(char * bits[], const char * strings, char_data * ch, uint32 & value);
+void parse_bitstrings_into_int(char * bits[], const char * strings, char_data * ch, uint16 & value);
 void display_string_list(char * list[], char_data *ch);
 int contains_no_trade_item(obj_data * obj);
 int contents_cause_unique_problem(obj_data * obj, char_data * vict);
