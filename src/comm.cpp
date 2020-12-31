@@ -92,8 +92,6 @@ using namespace std;
 #endif
 
 extern bool MOBtrigger;
-extern uint16_t port1, port2, port3, port4;
-unsigned mother_desc, other_desc, third_desc, fourth_desc;
 
 // This is turned on right before we call game_loop
 int do_not_save_corpses = 1;
@@ -101,14 +99,7 @@ int try_to_hotboot_on_crash = 0;
 int was_hotboot = 0;
 int died_from_sigsegv = 0;
 
-char **orig_argv;
-short code_testing_mode = 0;
-short code_testing_mode_mob = 0;
-short code_testing_mode_world = 0;
-short bport = 0;
-bool allow_imp_password = false;
-uint16_t port1 = 0, port2 = 0, port3 = 0, port4 = 0;
-
+char* const* orig_argv;
 /* these are here for the eventual addition of ban */
 int num_invalid = 0;
 int restrict = 0;
@@ -171,10 +162,7 @@ char *any_one_arg(char *argument, char *first_arg);
 char * calc_color(int hit, int max_hit);
 void generate_prompt(CHAR_DATA *ch, char *prompt);
 int get_from_q(struct txt_q *queue, char *dest, int *aliased);
-void init_game(void);
 void signal_setup(void);
-void game_loop(unsigned mother_desc, unsigned other_desc, unsigned third_desc, unsigned fourth_desc);
-int init_socket(uint16_t port);
 int new_descriptor(int s);
 int process_output(struct descriptor_data *t);
 int process_input(struct descriptor_data *t);
@@ -240,7 +228,14 @@ int write_hotboot_file(char **new_argv)
     log("Hotboot failed, unable to open hotboot file.", 0, LOG_MISC);
     return 0; 
   }
-  fprintf(fp, "%d\n%d\n%d\n%d\n", mother_desc, other_desc, third_desc, fourth_desc);
+
+  DC &dc = DC::instance();
+  //for_each(dc.server_descriptor_list.begin(), dc.server_descriptor_list.end(), [fp](server_descriptor_list_i i)
+  for_each(dc.server_descriptor_list.begin(), dc.server_descriptor_list.end(), [&fp](const int &fd)
+  {
+    fprintf(fp, "%d\n", fd);
+  });
+
   for (d=descriptor_list;d;d=sd)
   {
     sd = d->next;  
@@ -292,7 +287,7 @@ int write_hotboot_file(char **new_argv)
 
   chdir("../bin/");
 
-  char **argv;
+  char* const* argv;
   if (new_argv) {
     argv = new_argv;
   } else {
@@ -341,7 +336,15 @@ int load_hotboot_descs()
   log("Hotboot, reloading characters.", 0, LOG_MISC);
   unlink("hotboot"); // remove the file, it's in memory for reading anyways
 
-  fscanf(fp, "%d\n%d\n%d\n%d\n", &mother_desc, &other_desc, &third_desc, &fourth_desc);
+  DC &dc = DC::instance();
+  for_each(dc.cf.ports.begin(), dc.cf.ports.end(), [&dc, fp](in_port_t &port)
+  {
+    int fd;
+    fscanf(fp, "%d\n", &fd);
+    dc.server_descriptor_list.insert(fd);
+  });
+
+
 
   while(!feof(fp)) {
     desc =0;
@@ -435,15 +438,8 @@ void finish_hotboot()
 }
 
 /* Init sockets, run game, and cleanup sockets */
-void init_game(void)
+void DC::init_game(void)
 {
-	/* Azrack -- do these need to be here?
-  extern int mother_desc;
-  extern int other_desc;
-  extern int third_desc;
-  extern int was_hotboot;
-  extern int try_to_hotboot_on_crash;
-  */
 
 #ifdef LEAK_CHECK
   void remove_all_mobs_from_world();
@@ -467,39 +463,55 @@ void init_game(void)
 	extern cmd_hash_info * cmd_radix;
 #endif
 
-  FILE * fp;
+  FILE *fp;
   // create boot'ing lockfile
-  if((fp = fopen("died_in_bootup","w")))
+  if ((fp = fopen("died_in_bootup", "w")))
+  {
     fclose(fp);
+  }
 
-	log("Attempting to load hotboot file.", 0, LOG_MISC);
-	if (load_hotboot_descs()) {
-		log("Hotboot Loading complete.", 0, LOG_MISC);
-		was_hotboot = 1;
-	} else {
-		log("Hotboot failed.  Starting regular sockets.", 0, LOG_MISC);
-		log("Opening mother connections.", 0, LOG_MISC);
-		mother_desc = init_socket(port1);
-		// no need for the other ports rinetd handles it now. Scratch that.
-		other_desc = init_socket(port2);
-		third_desc = init_socket(port3);
-		fourth_desc = init_socket(port4);
-	}
+  log("Attempting to load hotboot file.", 0, LOG_MISC);
+
+  if (load_hotboot_descs())
+  {
+    log("Hotboot Loading complete.", 0, LOG_MISC);
+    was_hotboot = 1;
+  } else
+  {
+    log("Hotboot failed.  Starting regular sockets.", 0, LOG_MISC);
+    log("Opening mother connections.", 0, LOG_MISC);
+
+    for_each(cf.ports.begin(), cf.ports.end(), [this](in_port_t &port)
+    {
+      logf(0, LOG_MISC, "Opening port %d.", port);
+      int listen_fd = init_socket(port);
+      if (listen_fd >= 0)
+      {
+        server_descriptor_list.insert(listen_fd);
+      } else
+      {
+        logf(0, LOG_MISC, "Error opening port %d.", port);
+      }
+    });
+  }
 
   start_time = time(0);
   boot_db();
 
-  if(was_hotboot) {
+  if (was_hotboot)
+  {
     log("Connecting hotboot characters to their descriptiors", 0, LOG_MISC);
     finish_hotboot();
   }
 
-  if (bport) {
-      logf(0, LOG_MISC, "Initializing xmlrpc server on port: %d", 8889);
-      xmlrpc_s = xmlrpc_init(8889);
-  } else {
-      logf(0, LOG_MISC, "Initializing xmlrpc server on port: %d", 8888);
-      xmlrpc_s = xmlrpc_init(8888);
+  if (DC::instance().cf.bport == true)
+  {
+    logf(0, LOG_MISC, "Initializing xmlrpc server on port: %d", 8889);
+    xmlrpc_s = xmlrpc_init(8889);
+  } else
+  {
+    logf(0, LOG_MISC, "Initializing xmlrpc server on port: %d", 8888);
+    xmlrpc_s = xmlrpc_init(8888);
   }
 
   log("Signal trapping.", 0, LOG_MISC);
@@ -512,19 +524,24 @@ void init_game(void)
 
   unlink("died_in_bootup");
 
-  if (!bport)
-      do_not_save_corpses = 0;
-  game_loop(mother_desc, other_desc, third_desc, fourth_desc);
+  if (DC::instance().cf.bport == false)
+  {
+    do_not_save_corpses = 0;
+  }
+  game_loop();
   do_not_save_corpses = 1;
 
   log("Closing all sockets.", 0, LOG_MISC);
   while (descriptor_list)
+  {
     close_socket(descriptor_list);
-  CLOSE_SOCKET(mother_desc);
-  CLOSE_SOCKET(other_desc);
-  CLOSE_SOCKET(third_desc);
-  CLOSE_SOCKET(fourth_desc);
-
+  }
+  
+   for_each(server_descriptor_list.begin(), server_descriptor_list.end(), [](const int &fd)
+   {
+   logf(0, LOG_MISC, "Closing fd %d.", fd);
+   CLOSE_SOCKET(fd);
+   });
 #ifdef LEAK_CHECK
 
   log("Freeing all mobs in world.", 0, LOG_MISC);
@@ -576,47 +593,32 @@ void init_game(void)
  * init_socket sets up the mother descriptor - creates the socket, sets
  * its options up, binds it, and listens.
  */
-int init_socket(uint16_t port)
+int DC::init_socket(in_port_t port)
 {
-  int s, opt;
+  int fd, opt;
   struct sockaddr_in sa;
 
-#ifdef WIN32
-    WORD wVersionRequested;
-    WSADATA wsaData;
-
-    wVersionRequested = MAKEWORD(1, 1);
-
-    if (WSAStartup(wVersionRequested, &wsaData) != 0) {
-      perror("SYSERR: WinSock not available!");
-      exit(1);
-    }
-
-   if ((s = socket(PF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET) {
-      exit(1);
-   }
-#else
-
-  if ((s = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
+  if ((fd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
     perror("Error creating socket");
     exit(1);
   }
-#endif
+
   opt = LARGE_BUFSIZE + GARBAGE_SPACE;
-  if (setsockopt(s, SOL_SOCKET, SO_SNDBUF, (char *) &opt, sizeof(opt)) < 0) {
+  if (setsockopt(fd, SOL_SOCKET, SO_SNDBUF, (char *) &opt, sizeof(opt)) < 0) {
     perror("setsockopt SNDBUF");
     exit(1);
   }
 
   opt = 1;
-  if (setsockopt(s, SOL_SOCKET, SO_REUSEADDR, (char *) &opt, sizeof(opt)) < 0) {
+  if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, (char *) &opt, sizeof(opt)) < 0) {
     perror("setsockopt REUSEADDR");
     exit(1);
   }
+
   struct linger ld;
   ld.l_onoff = 0;
   ld.l_linger = 0;
-  if (setsockopt(s, SOL_SOCKET, SO_LINGER, (char *) &ld, sizeof(ld)) < 0) {
+  if (setsockopt(fd, SOL_SOCKET, SO_LINGER, (char *) &ld, sizeof(ld)) < 0) {
      perror("setsockopt LINGER");
      exit(1);
   }
@@ -625,29 +627,22 @@ int init_socket(uint16_t port)
   sa.sin_port = htons(port);
   sa.sin_addr.s_addr = htonl(INADDR_ANY);
 
-  if (bind(s, (struct sockaddr *) &sa, sizeof(sa)) < 0) {
+  if (bind(fd, (struct sockaddr *) &sa, sizeof(sa)) < 0) {
     perror("bind");
-    CLOSE_SOCKET(s);
+    CLOSE_SOCKET(fd);
     exit(1);
   }
-#ifndef WIN32
-  if(fcntl(s, F_SETFL, O_NONBLOCK) < 0) {
+
+  if(fcntl(fd, F_SETFL, O_NONBLOCK) < 0) {
     perror("init_socket : fcntl : nonblock");
     exit(1);
   }
-#else
-  	unsigned long int nb = 1;
-	if(ioctlsocket(s, FIONBIO, &nb) < 0)
-	{
-		perror("init_socket : ioctl : nonblock");
-		exit(1);
-	}
-#endif
-  if(listen(s, 5) < 0) {
+
+  if(listen(fd, 5) < 0) {
     perror("init_socket : listen");
     exit(1);
   }
-  return s;
+  return fd;
 }
 
 
@@ -666,7 +661,7 @@ unsigned long long pulseavg = 0;
  * new connections, polling existing connections for input, dequeueing
  * output and sending it out to players, and calling "heartbeat" function
  */
-void game_loop(unsigned mother_desc, unsigned other_desc, unsigned third_desc, unsigned fourth_desc)
+void DC::game_loop(void)
 {
 
 	fd_set input_set, output_set, exc_set, null_set;
@@ -682,7 +677,7 @@ void game_loop(unsigned mother_desc, unsigned other_desc, unsigned third_desc, u
 	char comm[MAX_STRING_LENGTH];
 	char buf[128];
 	struct descriptor_data *d;
-	unsigned maxdesc;
+	int maxdesc;
 	int aliased;
 
 	null_time.tv_sec = 0;
@@ -707,15 +702,15 @@ void game_loop(unsigned mother_desc, unsigned other_desc, unsigned third_desc, u
 		FD_ZERO(&input_set);
 		FD_ZERO(&output_set);
 		FD_ZERO(&exc_set);
-		FD_SET(mother_desc, &input_set);
-		FD_SET(other_desc, &input_set);
-		FD_SET(third_desc, &input_set);
-		FD_SET(fourth_desc, &input_set);
 
-		maxdesc = ((mother_desc > other_desc) ? mother_desc : other_desc);
-		maxdesc = ((maxdesc > third_desc) ? maxdesc : third_desc);
-		maxdesc = ((maxdesc > fourth_desc) ? maxdesc : fourth_desc);
-		//maxdesc = mother_desc;
+		maxdesc = 0;
+    for_each(server_descriptor_list.begin(), server_descriptor_list.end(), [&input_set, &maxdesc](const int &fd)
+    {
+      FD_SET(fd, &input_set);
+      if (fd > maxdesc) {
+        maxdesc = fd;
+      }
+    });
 
 		for (d = descriptor_list; d; d = d->next) {
 			if(d->descriptor > maxdesc)
@@ -734,15 +729,14 @@ void game_loop(unsigned mother_desc, unsigned other_desc, unsigned third_desc, u
 			}
 		}
 
-		// If new connection waiting, accept it
-		if (FD_ISSET(mother_desc, &input_set))
-			new_descriptor(mother_desc);
-		if (FD_ISSET(other_desc, &input_set))
-			new_descriptor(other_desc);
-		if (FD_ISSET(third_desc, &input_set))
-			new_descriptor(third_desc);
-		if (FD_ISSET(fourth_desc, &input_set))
-			new_descriptor(fourth_desc);
+    // If new connection waiting, accept it
+    for_each(server_descriptor_list.begin(), server_descriptor_list.end(), [&input_set](const int &fd)
+    {
+      if (FD_ISSET(fd, &input_set))
+      {
+        new_descriptor(fd);
+      }
+    });
 
 		// close the weird descriptors in the exception set
 		for (d = descriptor_list; d; d = next_d) {
@@ -1083,7 +1077,7 @@ void heartbeat() {
 
 		leaderboard.check(); //good place to put this
 
-		if (!bport) {
+		if (DC::instance().cf.bport == false) {
 			check_champion_and_website_who_list();
 		}
 		save_slot_machines();
@@ -2652,6 +2646,11 @@ void check_for_awaymsgs(struct char_data *ch)
   send_to_char("Type awaymsgs to view them.\n\r", ch);
 }
 
+void send_to_char(string messg, struct char_data *ch)
+{
+  send_to_char(messg.c_str(), ch);
+}
+
 void send_to_char(const char *messg, struct char_data *ch)
 {
   extern bool selfpurge;
@@ -2703,7 +2702,13 @@ void ansi_color( char *txt, CHAR_DATA *ch )
     }
 }
 
-void send_info(char *messg)
+void send_info(string messg)
+{
+  send_info(messg.c_str());
+}
+
+
+void send_info(const char *messg)
 {
     struct descriptor_data *i;
 
