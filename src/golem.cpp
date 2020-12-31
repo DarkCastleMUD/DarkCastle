@@ -186,6 +186,39 @@ void save_golem_data(CHAR_DATA *ch)
   dc_fclose(fpfile);
 }
 
+void save_charmie_data(CHAR_DATA *ch)
+{
+  char file[200];
+  FILE *fpfile = nullptr;
+
+  if (IS_NPC(ch) || ch->followers == nullptr)
+  {
+    return;
+  }
+
+  for (follow_type *followers = ch->followers; followers != nullptr; followers = followers->next)
+  {
+    char_data *follower = followers->follower;
+
+    if (follower == nullptr || IS_PC(follower) || follower->master == nullptr || !IS_AFFECTED(follower, AFF_CHARM))
+    {
+      continue;
+    }
+
+    //logf(IMMORTAL, LOG_MISC, "Saving charmie %s for %s", follower->name, ch->name);
+    sprintf(file, "%s/%c/%s.%d", FOLLOWER_DIR, ch->name[0], ch->name, 0);
+    if (!(fpfile = dc_fopen(file, "w")))
+    {
+      logf(ANGEL, LOG_BUG, "Error while opening file in save_charmie_data[golem.cpp].");
+      return;
+    }
+    obj_to_store(follower->carrying, follower, fpfile, -1);
+    store_worn_eq(follower, fpfile);
+    dc_fclose(fpfile);
+  }
+}
+
+
 void advance_golem_level(CHAR_DATA *golem)
 {
   int golemtype = !IS_AFFECTED(golem, AFF_GOLEM); // 0 or 1
