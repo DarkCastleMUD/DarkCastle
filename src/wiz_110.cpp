@@ -44,7 +44,6 @@ extern "C" {
 
 void AuctionHandleRenames(CHAR_DATA *ch, string old_name, string new_name);
 
-extern short bport;
 extern world_file_list_item * obj_file_list;
 extern char *extra_bits[];
 extern char *wear_bits[];
@@ -454,7 +453,8 @@ int do_rename_char(struct char_data *ch, char *arg, int cmd)
   }
 
 //extern short bport;
-  if (!bport) {
+  if (DC::instance().cf.bport == false)
+  {
     sprintf(strsave, "%s/%c/%s", SAVE_DIR, newname[0], newname);  
   } else {
     sprintf(strsave, "%s/%c/%s", BSAVE_DIR, newname[0], newname);  
@@ -524,12 +524,12 @@ int do_rename_char(struct char_data *ch, char *arg, int cmd)
   do_fsave(ch, GET_NAME(victim), 9);
 
   // Copy the pfile
-  if (!bport) {
-    sprintf(name, "cp %s/%c/%s %s/%c/%s", SAVE_DIR, victim->name[0],
-	    GET_NAME(victim), SAVE_DIR, newname[0], newname);
-  } else {
-    sprintf(name, "cp %s/%c/%s %s/%c/%s", BSAVE_DIR, victim->name[0],
-	    GET_NAME(victim), BSAVE_DIR, newname[0], newname);
+  if (DC::instance().cf.bport == false)
+  {
+    sprintf(name, "cp %s/%c/%s %s/%c/%s", SAVE_DIR, victim->name[0], GET_NAME(victim), SAVE_DIR, newname[0], newname);
+  } else
+  {
+    sprintf(name, "cp %s/%c/%s %s/%c/%s", BSAVE_DIR, victim->name[0], GET_NAME(victim), BSAVE_DIR, newname[0], newname);
   }
 
   system(name);
@@ -661,7 +661,7 @@ int do_install(struct char_data *ch, char *arg, int cmd)
     return eFAILURE;
   }
   
-  sprintf(buf, "./new_zone %d %d %c true %s", range, numrooms, *type,bport == 1 ? "b":"n");
+  sprintf(buf, "./new_zone %d %d %c true %s", range, numrooms, *type, DC::instance().cf.bport == true ? "b":"n");
   ret = system(buf);
   // ret = bits, but I didn't use bits because I'm lazy and it only returns 2 values I gives a flyging fuck about!
   // if you change the script, you gotta change this too. - Rahz
