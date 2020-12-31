@@ -9,6 +9,8 @@
 /*****************************************************************************/
 /* $Id: arena.cpp,v 1.17 2009/04/24 21:50:43 shane Exp $ */
 
+#include <string.h>
+
 #include "room.h"  // room_data
 #include "db.h"      // real_room()
 #include "interp.h" // do_look()
@@ -20,7 +22,6 @@
 #include "punish.h"
 #include "player.h"
 #include "arena.h"
-#include <string.h>
 #include "returnvals.h"
 #include "levels.h"
 
@@ -41,7 +42,7 @@ int do_arena(CHAR_DATA *ch, char *argument, int cmd)
   argument = one_argument(argument, arg2);
   argument = one_argument(argument, arg3);
   argument = one_argument(argument, arg4);
-  argument = one_argument(argument, arg5);
+  one_argument(argument, arg5);
 
   if(!*arg1 || !*arg2) {
     sprintf(buf, "Currently open for levels: %d %d\n\r", arena.low, arena.high);
