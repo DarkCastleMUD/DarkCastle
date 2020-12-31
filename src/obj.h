@@ -54,8 +54,8 @@
 #define ITEM_LOCKPICK   29
 #define ITEM_CLIMBABLE  30
 #define ITEM_MEGAPHONE  31
-#define ITEM_ALTAR	32
-#define ITEM_TOTEM	33
+#define ITEM_ALTAR	    32
+#define ITEM_TOTEM	    33
 #define ITEM_TYPE_MAX   33
 
 /* Bitvector For 'wear_flags' */
@@ -82,65 +82,65 @@
 
 /* Bitvector for 'extra_flags' */
 
-#define ITEM_GLOW               1
-#define ITEM_HUM                1<<1
-#define ITEM_DARK               1<<2
-#define ITEM_LOCK               1<<3
-#define ITEM_ANY_CLASS          1<<4     // Any class can use
-#define ITEM_INVISIBLE          1<<5
-#define ITEM_MAGIC              1<<6
-#define ITEM_NODROP             1<<7
-#define ITEM_BLESS              1<<8
-#define ITEM_ANTI_GOOD          1<<9
-#define ITEM_ANTI_EVIL          1<<10
-#define ITEM_ANTI_NEUTRAL       1<<11
-#define ITEM_WARRIOR            1<<12
-#define ITEM_MAGE               1<<13
-#define ITEM_THIEF              1<<14
-#define ITEM_CLERIC             1<<15
-#define ITEM_PAL                1<<16
-#define ITEM_ANTI               1<<17
-#define ITEM_BARB               1<<18
-#define ITEM_MONK               1<<19
-#define ITEM_RANGER             1<<20
-#define ITEM_DRUID              1<<21
-#define ITEM_BARD               1<<22
-#define ITEM_TWO_HANDED         1<<23
-#define ITEM_ENCHANTED          1<<24
-#define ITEM_SPECIAL            1<<25
-#define ITEM_NOSAVE             1<<26
-#define ITEM_NOSEE		1<<27
-#define ITEM_NOREPAIR           1<<28
-#define ITEM_NEWBIE             1<<29 // Newbie flagged.
-#define ITEM_PC_CORPSE		1<<30
-#define ITEM_QUEST              1<<31
+#define ITEM_GLOW               1U
+#define ITEM_HUM                1U<<1
+#define ITEM_DARK               1U<<2
+#define ITEM_LOCK               1U<<3
+#define ITEM_ANY_CLASS          1U<<4     // Any class can use
+#define ITEM_INVISIBLE          1U<<5
+#define ITEM_MAGIC              1U<<6
+#define ITEM_NODROP             1U<<7
+#define ITEM_BLESS              1U<<8
+#define ITEM_ANTI_GOOD          1U<<9
+#define ITEM_ANTI_EVIL          1U<<10
+#define ITEM_ANTI_NEUTRAL       1U<<11
+#define ITEM_WARRIOR            1U<<12
+#define ITEM_MAGE               1U<<13
+#define ITEM_THIEF              1U<<14
+#define ITEM_CLERIC             1U<<15
+#define ITEM_PAL                1U<<16
+#define ITEM_ANTI               1U<<17
+#define ITEM_BARB               1U<<18
+#define ITEM_MONK               1U<<19
+#define ITEM_RANGER             1U<<20
+#define ITEM_DRUID              1U<<21
+#define ITEM_BARD               1U<<22
+#define ITEM_TWO_HANDED         1U<<23
+#define ITEM_ENCHANTED          1U<<24
+#define ITEM_SPECIAL            1U<<25
+#define ITEM_NOSAVE             1U<<26
+#define ITEM_NOSEE		        1U<<27
+#define ITEM_NOREPAIR           1U<<28
+#define ITEM_NEWBIE             1U<<29 // Newbie flagged.
+#define ITEM_PC_CORPSE		    1U<<30
+#define ITEM_QUEST              1U<<31
 
 #define ALL_CLASSES ITEM_WARRIOR|ITEM_MAGE|ITEM_THIEF|ITEM_CLERIC|ITEM_PAL|ITEM_ANTI|ITEM_BARB|ITEM_MONK|ITEM_RANGER|ITEM_DRUID|ITEM_BARD
 
 /* Bitvector for 'more_flags' */
 
-#define ITEM_NO_RESTRING        1
-#define ITEM_UNUSED		1<<1
-#define ITEM_UNIQUE             1<<2
-#define ITEM_NO_TRADE           1<<3
-#define ITEM_NONOTICE           1<<4  // Item doesn't show up on 'look' but
-                                      // can still be accessed with 'get' etc FUTURE
-#define ITEM_NOLOCATE           1<<5 
-#define ITEM_UNIQUE_SAVE	1<<6 // for corpse saving, didn't want to affect other unique flag so made a new one
+#define ITEM_NO_RESTRING        1U
+#define ITEM_UNUSED		        1U<<1
+#define ITEM_UNIQUE             1U<<2
+#define ITEM_NO_TRADE           1U<<3
+#define ITEM_NONOTICE           1U<<4  // Item doesn't show up on 'look' but
+                                       // can still be accessed with 'get' etc FUTURE
+#define ITEM_NOLOCATE           1U<<5 
+#define ITEM_UNIQUE_SAVE	    1U<<6 // for corpse saving, didn't want to affect other unique flag so made a new one
 
-#define ITEM_NPC_CORPSE		1<<7
-#define ITEM_PC_CORPSE_LOOTED   1<<8
-#define ITEM_NO_SCRAP 		1<<9
-#define ITEM_CUSTOM             1<<10
-#define ITEM_24H_SAVE		1<<11
-#define ITEM_NO_DISARM		1<<12
-#define ITEM_TOGGLE		1<<13 // Toggles for certain items.
+#define ITEM_NPC_CORPSE		    1U<<7
+#define ITEM_PC_CORPSE_LOOTED   1U<<8
+#define ITEM_NO_SCRAP 		    1U<<9
+#define ITEM_CUSTOM             1U<<10
+#define ITEM_24H_SAVE		    1U<<11
+#define ITEM_NO_DISARM		    1U<<12
+#define ITEM_TOGGLE		        1U<<13 // Toggles for certain items.
 
 /* Bitvector for 'size' */
-#define SIZE_ANY		1
-#define SIZE_SMALL		1<<1
-#define SIZE_MEDIUM		1<<2
-#define SIZE_LARGE		1<<3
+#define SIZE_ANY		1U
+#define SIZE_SMALL		1U<<1
+#define SIZE_MEDIUM		1U<<2
+#define SIZE_LARGE		1U<<3
 
 /* Different types of 'utility' items */
 
@@ -268,7 +268,7 @@ struct obj_data {
 #define WIELD           16
 #define SECOND_WIELD    17
 #define HOLD            18
-#define HOLD2		19
+#define HOLD2		    19
 #define WEAR_FACE       20
 #define WEAR_EAR_L      21
 #define WEAR_EAR_R      22
