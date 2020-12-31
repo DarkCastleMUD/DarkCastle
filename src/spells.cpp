@@ -1739,7 +1739,7 @@ bool check_conc_loss(CHAR_DATA *ch, int spl)
   return true;
 }
 
-// Assumes that *argument does start with first letter of chopped string 
+// Assumes that *argument does start with first letter of chopped string
 int do_cast(CHAR_DATA *ch, char *argument, int cmd)
 {
   struct obj_data *tar_obj;
@@ -1748,135 +1748,167 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
   int qend, spl, i, learned;
   bool target_ok;
 
-//  if (IS_NPC(ch))
-//    return eFAILURE;
-// Need to allow mob_progs to use cast without allowing charmies to
+  //  if (IS_NPC(ch))
+  //    return eFAILURE;
+  // Need to allow mob_progs to use cast without allowing charmies to
 
-  if (IS_NPC(ch) && ch->desc && ch->desc->original && ch->desc->original != ch->desc->character && GET_LEVEL(ch->desc->original) < IMMORTAL) {
+  if (IS_NPC(ch) && ch->desc && ch->desc->original && ch->desc->original != ch->desc->character && GET_LEVEL(ch->desc->original) < IMMORTAL)
+  {
     send_to_char("You cannot cast in this form.\n\r", ch);
     return eFAILURE;
   }
 
-  if(affected_by_spell(ch, SPELL_NO_CAST_TIMER)) {
+  if (affected_by_spell(ch, SPELL_NO_CAST_TIMER))
+  {
     send_to_char("You seem unable to concentrate enough to cast any spells.\n\r", ch);
     return eFAILURE;
   }
-  
+
   OBJ_DATA *tmp_obj;
-  for(tmp_obj = world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
-    if(obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER) {
+  for (tmp_obj = world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
+    if (obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER)
+    {
       send_to_char("The magical silence prevents you from casting!\n\r", ch);
       return eFAILURE;
     }
-  
-  if(IS_AFFECTED(ch, AFF_CHARM))
+
+  if (IS_AFFECTED(ch, AFF_CHARM))
   {
     send_to_char("You cannot cast while charmed!\n\r", ch);
     return eFAILURE;
   }
 
-  if (GET_LEVEL(ch) < ARCHANGEL && (!IS_NPC(ch) || IS_AFFECTED(ch, AFF_CHARM))) {
-    if (GET_CLASS(ch) == CLASS_WARRIOR) {
-        send_to_char("Think you had better stick to fighting...\n\r", ch);
-        return eFAILURE;
-    } else if (GET_CLASS(ch) == CLASS_THIEF) {
-       send_to_char("Think you should stick to robbing and killing...\n\r", ch);
-        return eFAILURE;
-    } else if (GET_CLASS(ch) == CLASS_BARBARIAN) {
-        send_to_char("Think you should stick to berserking...\n\r", ch);
-        return eFAILURE;
-    } else if (GET_CLASS(ch) == CLASS_MONK) {
-        send_to_char("Think you should stick with meditating...\n\r", ch);
-        return eFAILURE;
-    } else if ((GET_CLASS(ch) == CLASS_ANTI_PAL) && (!IS_EVIL(ch))) {
-        send_to_char("You're not evil enough!\n\r", ch);
-        return eFAILURE;
-    } else if ((GET_CLASS(ch) == CLASS_PALADIN) && (!IS_GOOD(ch))) {
-        send_to_char("You're not pure enough!\n\r", ch);
-        return eFAILURE;
-    } else if (GET_CLASS(ch) == CLASS_BARD) {
-        send_to_char("Stick to singing bucko.", ch);
-        return eFAILURE;
+  if (GET_LEVEL(ch) < ARCHANGEL && (!IS_NPC(ch) || IS_AFFECTED(ch, AFF_CHARM)))
+  {
+    if (GET_CLASS(ch) == CLASS_WARRIOR)
+    {
+      send_to_char("Think you had better stick to fighting...\n\r", ch);
+      return eFAILURE;
     }
-    if (IS_SET(world[ch->in_room].room_flags, NO_MAGIC)) {
-        send_to_char("You find yourself unable to weave magic here.\n\r", ch);
-        return eFAILURE;
+    else if (GET_CLASS(ch) == CLASS_THIEF)
+    {
+      send_to_char("Think you should stick to robbing and killing...\n\r", ch);
+      return eFAILURE;
+    }
+    else if (GET_CLASS(ch) == CLASS_BARBARIAN)
+    {
+      send_to_char("Think you should stick to berserking...\n\r", ch);
+      return eFAILURE;
+    }
+    else if (GET_CLASS(ch) == CLASS_MONK)
+    {
+      send_to_char("Think you should stick with meditating...\n\r", ch);
+      return eFAILURE;
+    }
+    else if ((GET_CLASS(ch) == CLASS_ANTI_PAL) && (!IS_EVIL(ch)))
+    {
+      send_to_char("You're not evil enough!\n\r", ch);
+      return eFAILURE;
+    }
+    else if ((GET_CLASS(ch) == CLASS_PALADIN) && (!IS_GOOD(ch)))
+    {
+      send_to_char("You're not pure enough!\n\r", ch);
+      return eFAILURE;
+    }
+    else if (GET_CLASS(ch) == CLASS_BARD)
+    {
+      send_to_char("Stick to singing bucko.", ch);
+      return eFAILURE;
+    }
+    if (IS_SET(world[ch->in_room].room_flags, NO_MAGIC))
+    {
+      send_to_char("You find yourself unable to weave magic here.\n\r", ch);
+      return eFAILURE;
     }
   }
 
   argument = skip_spaces(argument);
-  
+
   /* If there is no chars in argument */
-  if (!(*argument)) {
+  if (!(*argument))
+  {
     send_to_char("Cast which what where?\n\r", ch);
     return eFAILURE;
   }
 
-  if (*argument != '\'') {
-    send_to_char("Magic must always be enclosed by the holy magic symbols : '\n\r",ch);
+  if (*argument != '\'')
+  {
+    send_to_char("Magic must always be enclosed by the holy magic symbols : '\n\r", ch);
     return eFAILURE;
   }
 
   /* Locate the last quote && lowercase the magic words (if any) */
-  
-  for (qend=1; *(argument+qend) && (*(argument+qend) != '\'') ; qend++)
-    *(argument+qend) = LOWER(*(argument+qend));
-  
-  if (*(argument+qend) != '\'') {
+
+  for (qend = 1; *(argument + qend) && (*(argument + qend) != '\''); qend++)
+    *(argument + qend) = LOWER(*(argument + qend));
+
+  if (*(argument + qend) != '\'')
+  {
     send_to_char("Magic must always be enclosed by the holy magic symbols : '\n\r", ch);
     return eFAILURE;
   }
-  
-  spl = old_search_block(argument, 1, qend-1, spells, 0);
-  if (spl <= 0) {
-    send_to_char("Your lips do not move, no magic appears.\n\r",ch);
+
+  spl = old_search_block(argument, 1, qend - 1, spells, 0);
+  if (spl <= 0)
+  {
+    send_to_char("Your lips do not move, no magic appears.\n\r", ch);
     return eFAILURE;
   }
-  if (spl == SPELL_DIVINE_INTER && affected_by_spell(ch, SPELL_DIV_INT_TIMER)) {
+  if (spl == SPELL_DIVINE_INTER && affected_by_spell(ch, SPELL_DIV_INT_TIMER))
+  {
     send_to_char("The gods are unwilling to intervene on your behalf again so soon.\n\r", ch);
     return eFAILURE;
   }
 
   if (spell_info[spl].spell_pointer)
   {
-    if (GET_POS(ch) < spell_info[spl].minimum_position) {
-      switch(GET_POS(ch)) {
-        case POSITION_SLEEPING :
-          send_to_char("You dream about great magical powers.\n\r", ch);
-          break;
-        case POSITION_RESTING :
-          send_to_char("You can't concentrate enough while resting.\n\r",ch);
-          break;
-        case POSITION_SITTING :
-          send_to_char("You can't do this sitting!\n\r", ch);
-          break;
-        case POSITION_FIGHTING :
-          send_to_char("Impossible! You can't concentrate enough!\n\r", ch);
-          break;
-        default:
-          send_to_char("It seems like you're in a pretty bad shape!\n\r",ch);
-          break;
+    if (GET_POS(ch) < spell_info[spl].minimum_position)
+    {
+      switch (GET_POS(ch))
+      {
+      case POSITION_SLEEPING:
+        send_to_char("You dream about great magical powers.\n\r", ch);
+        break;
+      case POSITION_RESTING:
+        send_to_char("You can't concentrate enough while resting.\n\r", ch);
+        break;
+      case POSITION_SITTING:
+        send_to_char("You can't do this sitting!\n\r", ch);
+        break;
+      case POSITION_FIGHTING:
+        send_to_char("Impossible! You can't concentrate enough!\n\r", ch);
+        break;
+      default:
+        send_to_char("It seems like you're in a pretty bad shape!\n\r", ch);
+        break;
       } /* Switch */
-    } else 
+    }
+    else
     {
       if (!IS_MOB(ch))
       {
-        if(!(learned = has_skill(ch, spl))) {
-	if (GET_LEVEL(ch) < 101) {
-          send_to_char("You do not know how to cast that spell!\n\r", ch);
-          return eFAILURE;
-        } else {
-	  learned = 80;
-	}
+        if (!(learned = has_skill(ch, spl)))
+        {
+          if (GET_LEVEL(ch) < 101)
+          {
+            send_to_char("You do not know how to cast that spell!\n\r", ch);
+            return eFAILURE;
+          }
+          else
+          {
+            learned = 80;
+          }
         }
       }
-      else learned = 80;
+      else
+        learned = 80;
 
-      argument+=qend+1; /* Point to the last ' */
-      for(;*argument == ' '; argument++);
-      
+      argument += qend + 1; /* Point to the last ' */
+      for (; *argument == ' '; argument++)
+        ;
+
       /* **************** Locate targets **************** */
-      
+
       target_ok = FALSE;
       tar_char = 0;
       tar_obj = 0;
@@ -1887,99 +1919,108 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
       if (spl == SPELL_LIGHTNING_BOLT && has_skill(ch, SKILL_SPELLCRAFT) && cmd != CMD_FILTER)
       { // Oh the special cases of spellcraft.
 
-	 name[0] = '\0';
-         one_argument(argument, name);
-	 if (argument && strlen(argument) > strlen(name))
-	 {
-	   *argument = LOWER(*(argument + strlen(name) +1));
+        name[0] = '\0';
+        one_argument(argument, name);
+        if (argument && strlen(argument) > strlen(name))
+        {
+          *argument = LOWER(*(argument + strlen(name) + 1));
 
- 	   if(*argument == 'n') dir = 0;
-	   else if(*argument == 'e') dir = 1;
- 	   else if (*argument == 's') dir = 2;
-	   else if(*argument == 'w') dir = 3;
-	   else if(*argument == 'u') dir = 4;
-	   else if(*argument == 'd') dir = 5;
-	   if (dir == -1)
-	   {
-		send_to_char("Fire a lightning bolt where?\r\n",ch);
-		return eFAILURE;
-	   }
-	   if (!world[ch->in_room].dir_option[dir])
-	   {
-		send_to_char("The wall blocks your attempt.\r\n",ch);
-		return eFAILURE;
-	   }
-	   if (!CAN_GO(ch, dir))
-	   {
-		send_to_char("You cannot do that.\r\n",ch);
-		return eFAILURE;
-	   }
-           if(ch->fighting) {
-             send_to_char("You cannot concentrate enough to fire a bolt of lightning into another room!\n\r", ch);
-             return eFAILURE;
-           }
-	   int new_room = world[ch->in_room].dir_option[dir]->to_room;
-	   if(IS_SET(world[new_room].room_flags, SAFE) || IS_SET(world[new_room].room_flags, NO_MAGIC))
-	   {
-   	     send_to_char("That room is protected from this harmful magic.\r\n", ch);
-	     return eFAILURE;
-	   }
+          if (*argument == 'n')
+            dir = 0;
+          else if (*argument == 'e')
+            dir = 1;
+          else if (*argument == 's')
+            dir = 2;
+          else if (*argument == 'w')
+            dir = 3;
+          else if (*argument == 'u')
+            dir = 4;
+          else if (*argument == 'd')
+            dir = 5;
+          if (dir == -1)
+          {
+            send_to_char("Fire a lightning bolt where?\r\n", ch);
+            return eFAILURE;
+          }
+          if (!world[ch->in_room].dir_option[dir])
+          {
+            send_to_char("The wall blocks your attempt.\r\n", ch);
+            return eFAILURE;
+          }
+          if (!CAN_GO(ch, dir))
+          {
+            send_to_char("You cannot do that.\r\n", ch);
+            return eFAILURE;
+          }
+          if (ch->fighting)
+          {
+            send_to_char("You cannot concentrate enough to fire a bolt of lightning into another room!\n\r", ch);
+            return eFAILURE;
+          }
+          int new_room = world[ch->in_room].dir_option[dir]->to_room;
+          if (IS_SET(world[new_room].room_flags, SAFE) || IS_SET(world[new_room].room_flags, NO_MAGIC))
+          {
+            send_to_char("That room is protected from this harmful magic.\r\n", ch);
+            return eFAILURE;
+          }
 
-	   // can't use spellcraft(ch, SPELL_LIGHTNING_BOLT) here because it
-	   // will cause spellcraft to increase possibly
-	   if ((has_skill(ch, SPELL_LIGHTNING_BOLT) < 71) ||
-	       (has_skill(ch, SKILL_SPELLCRAFT) < 21)) {
-	     send_to_char("You don't know how.\r\n",ch);
-	     return eFAILURE;
-           }
+          // can't use spellcraft(ch, SPELL_LIGHTNING_BOLT) here because it
+          // will cause spellcraft to increase possibly
+          if ((has_skill(ch, SPELL_LIGHTNING_BOLT) < 71) ||
+              (has_skill(ch, SKILL_SPELLCRAFT) < 21))
+          {
+            send_to_char("You don't know how.\r\n", ch);
+            return eFAILURE;
+          }
 
-	   oldroom = ch->in_room;
-	   char_from_room(ch);
-	   if (!char_to_room(ch, new_room)) {
-	     char_to_room(ch, oldroom);
-	    send_to_char("Error code: 57A. Report this to an immortal, along with what you typed and where.\r\n",ch);
-	    return eFAILURE;
-	   }
-	   if (!(tar_char = get_char_room_vis(ch, name)))
-	   {
-		char_from_room(ch); 
-		char_to_room(ch, oldroom);
-	        send_to_char("You don't see anyone like that there.\r\n",ch);
-		return eFAILURE;
-	   }
+          oldroom = ch->in_room;
+          char_from_room(ch);
+          if (!char_to_room(ch, new_room))
+          {
+            char_to_room(ch, oldroom);
+            send_to_char("Error code: 57A. Report this to an immortal, along with what you typed and where.\r\n", ch);
+            return eFAILURE;
+          }
+          if (!(tar_char = get_char_room_vis(ch, name)))
+          {
+            char_from_room(ch);
+            char_to_room(ch, oldroom);
+            send_to_char("You don't see anyone like that there.\r\n", ch);
+            return eFAILURE;
+          }
 
-	   if (IS_NPC(tar_char) && mob_index[tar_char->mobdata->nr].virt >= 2300 &&
-		mob_index[tar_char->mobdata->nr].virt <= 2399)
-	   {
-   	        char_from_room(ch); 
-		char_to_room(ch, oldroom);
-		tar_char = ch;
-		send_to_char("Your spell bounces off the fortress' enchantments, and the lightning bolt comes flying back towards you!\r\n",ch);
-	 	ok_self = TRUE;
-	   }
-	   target_ok = TRUE;
+          if (IS_NPC(tar_char) && mob_index[tar_char->mobdata->nr].virt >= 2300 &&
+              mob_index[tar_char->mobdata->nr].virt <= 2399)
+          {
+            char_from_room(ch);
+            char_to_room(ch, oldroom);
+            tar_char = ch;
+            send_to_char("Your spell bounces off the fortress' enchantments, and the lightning bolt comes flying back towards you!\r\n", ch);
+            ok_self = TRUE;
+          }
+          target_ok = TRUE;
 
-	   // Reduce timer on paralyze even the victim is hit by a lightning bolt
-	   affected_type *af;
-	   if ((af = affected_by_spell(tar_char, SPELL_PARALYZE)) != NULL) 
-           {
-	     af->duration--;
-	     if (af->duration <= 0) 
-             {
-	       affect_remove(tar_char, af, 0);
-	     }
-	   }
-	 }
-	 spellcraft(ch, SPELL_LIGHTNING_BOLT);
+          // Reduce timer on paralyze even the victim is hit by a lightning bolt
+          affected_type *af;
+          if ((af = affected_by_spell(tar_char, SPELL_PARALYZE)) != NULL)
+          {
+            af->duration--;
+            if (af->duration <= 0)
+            {
+              affect_remove(tar_char, af, 0);
+            }
+          }
+        }
+        spellcraft(ch, SPELL_LIGHTNING_BOLT);
       } //end lightning bolt
 
-      if(spl == SPELL_IMMUNITY) 
+      if (spl == SPELL_IMMUNITY)
       {
         argument = skip_spaces(argument);
 
-        for(int i = 0;i<MAX_SPL_LIST;i++) 
+        for (int i = 0; i < MAX_SPL_LIST; i++)
         {
-          if(!strcmp(spells[i], argument)) 
+          if (!strcmp(spells[i], argument))
           {
             ok_self = TRUE;
             tar_char = ch;
@@ -1988,7 +2029,7 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
             break;
           }
         }
-        if(!target_ok) 
+        if (!target_ok)
         {
           send_to_char("There is no such known spell in the realms to protect yourself against.\n\r", ch);
           return eFAILURE;
@@ -1997,56 +2038,76 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
       int fil = 0;
       float rel = 1;
       int fillvl = has_skill(ch, SKILL_ELEMENTAL_FILTER);
-      if(cmd == CMD_FILTER && fillvl) 
+      if (cmd == CMD_FILTER && fillvl)
       {
-        if(spl == SPELL_BURNING_HANDS || spl == SPELL_FIREBALL || spl == SPELL_FIRESTORM || spl == SPELL_HELLSTREAM || 
-           spl == SPELL_MAGIC_MISSILE || spl == SPELL_METEOR_SWARM || spl == SPELL_LIGHTNING_BOLT || spl == SPELL_CHILL_TOUCH)
+        if (spl == SPELL_BURNING_HANDS || spl == SPELL_FIREBALL || spl == SPELL_FIRESTORM || spl == SPELL_HELLSTREAM ||
+            spl == SPELL_MAGIC_MISSILE || spl == SPELL_METEOR_SWARM || spl == SPELL_LIGHTNING_BOLT || spl == SPELL_CHILL_TOUCH)
         {
           name[0] = '\0';
           filter[0] = '\0';
           argument = one_argument(argument, filter);
- 
-          if (*filter) 
+
+          if (*filter)
           {
- 
-            if(*filter == 'f') fil = FILTER_FIRE;
-            else if(*filter == 'm') fil = FILTER_MAGIC;
-            else if(*filter == 'c') fil = FILTER_COLD;
-            else if(*filter == 'e') fil = FILTER_ENERGY;
- 
-            if(!fil) 
+
+            if (*filter == 'f')
+              fil = FILTER_FIRE;
+            else if (*filter == 'm')
+              fil = FILTER_MAGIC;
+            else if (*filter == 'c')
+              fil = FILTER_COLD;
+            else if (*filter == 'e')
+              fil = FILTER_ENERGY;
+
+            if (!fil)
             {
               send_to_char("You do not know how to filter your spell through that.\r\n", ch);
               return eFAILURE;
             }
- 
-            if(spl == SPELL_BURNING_HANDS || spl == SPELL_FIREBALL || spl == SPELL_FIRESTORM || spl == SPELL_HELLSTREAM) 
+
+            if (spl == SPELL_BURNING_HANDS || spl == SPELL_FIREBALL || spl == SPELL_FIRESTORM || spl == SPELL_HELLSTREAM)
             {
-              if(fil == FILTER_MAGIC && fillvl > 50) rel = 1.5;
-              else if(fil == FILTER_ENERGY && fillvl > 70) rel = 2;
-              else if(fil == FILTER_COLD && fillvl > 90) rel = 2.5;
-              else fil = 0;
+              if (fil == FILTER_MAGIC && fillvl > 50)
+                rel = 1.5;
+              else if (fil == FILTER_ENERGY && fillvl > 70)
+                rel = 2;
+              else if (fil == FILTER_COLD && fillvl > 90)
+                rel = 2.5;
+              else
+                fil = 0;
             }
-            else if(spl == SPELL_MAGIC_MISSILE || spl == SPELL_METEOR_SWARM) 
+            else if (spl == SPELL_MAGIC_MISSILE || spl == SPELL_METEOR_SWARM)
             {
-              if(fil == FILTER_FIRE && fillvl > 50) rel = 1.5;
-              else if(fil == FILTER_COLD && fillvl > 70) rel = 2;
-              else if(fil == FILTER_ENERGY && fillvl > 90) rel = 2.5;
-              else fil = 0;
+              if (fil == FILTER_FIRE && fillvl > 50)
+                rel = 1.5;
+              else if (fil == FILTER_COLD && fillvl > 70)
+                rel = 2;
+              else if (fil == FILTER_ENERGY && fillvl > 90)
+                rel = 2.5;
+              else
+                fil = 0;
             }
-            else if(spl == SPELL_LIGHTNING_BOLT) 
+            else if (spl == SPELL_LIGHTNING_BOLT)
             {
-              if(fil == FILTER_COLD && fillvl > 50) rel = 1.5;
-              else if(fil == FILTER_FIRE && fillvl > 70) rel = 2;
-              else if(fil == FILTER_MAGIC && fillvl > 90) rel = 2.5;
-              else fil = 0;
+              if (fil == FILTER_COLD && fillvl > 50)
+                rel = 1.5;
+              else if (fil == FILTER_FIRE && fillvl > 70)
+                rel = 2;
+              else if (fil == FILTER_MAGIC && fillvl > 90)
+                rel = 2.5;
+              else
+                fil = 0;
             }
-            else if(spl == SPELL_CHILL_TOUCH) 
+            else if (spl == SPELL_CHILL_TOUCH)
             {
-              if(fil == FILTER_ENERGY && fillvl > 50) rel = 1.5;
-              else if(fil == FILTER_MAGIC && fillvl > 70) rel = 2;
-              else if(fil == FILTER_FIRE && fillvl > 90) rel = 2.5;
-              else fil = 0;
+              if (fil == FILTER_ENERGY && fillvl > 50)
+                rel = 1.5;
+              else if (fil == FILTER_MAGIC && fillvl > 70)
+                rel = 2;
+              else if (fil == FILTER_FIRE && fillvl > 90)
+                rel = 2.5;
+              else
+                fil = 0;
             }
           }
           else
@@ -2054,131 +2115,118 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
             send_to_char("You need to specify a filter type.\r\n", ch);
             return eFAILURE;
           }
-            
+
         } //end if filterable spell
-      } //end filter
-      if (!target_ok && !IS_SET(spell_info[spl].targets, TAR_IGNORE)) 
+      }   //end filter
+      if (!target_ok && !IS_SET(spell_info[spl].targets, TAR_IGNORE))
       {
         argument = one_argument(argument, name);
 
-        if (*name) 
+        if (*name)
         {
-          if (IS_SET(spell_info[spl].targets, TAR_CHAR_ROOM)) 
+          if (IS_SET(spell_info[spl].targets, TAR_CHAR_ROOM))
           {
-            if ( ( tar_char = get_char_room_vis(ch, name) ) != NULL )
+            if ((tar_char = get_char_room_vis(ch, name)) != NULL)
               target_ok = TRUE;
-            if(!str_cmp(name, "group") && has_skill(ch, SKILL_COMMUNE)) 
+            if (!str_cmp(name, "group") && has_skill(ch, SKILL_COMMUNE))
             {
-              if((has_skill(ch, SKILL_COMMUNE) >= 90 
-                    && (spl == SPELL_PROTECT_FROM_EVIL 
-                        || spl == SPELL_RESIST_MAGIC
-                        || spl == SPELL_PROTECT_FROM_GOOD)) 
-                 ||(has_skill(ch, SKILL_COMMUNE) >= 70 
-                    && (spl == SPELL_CURE_CRITIC 
-                        || spl == SPELL_SANCTUARY 
-                        || spl == SPELL_REMOVE_POISON 
-                        || spl == SPELL_REMOVE_BLIND
-                        || spl == SPELL_IRIDESCENT_AURA)) 
-                 ||(has_skill(ch, SKILL_COMMUNE) >= 40 
-                    && (spl == SPELL_ARMOR 
-                        || spl == SPELL_REFRESH 
-                        || spl == SPELL_REMOVE_PARALYSIS
-                        || spl == SPELL_CURE_SERIOUS 
-                        || spl == SPELL_BLESS 
-                        || spl == SPELL_FLY))
-                 ||(spl == SPELL_DETECT_INVISIBLE 
-                    || spl == SPELL_DETECT_MAGIC 
-                    || spl == SPELL_DETECT_POISON 
-                    || spl == SPELL_SENSE_LIFE
-                    || spl == SPELL_CURE_LIGHT))
+              if ((has_skill(ch, SKILL_COMMUNE) >= 90 && (spl == SPELL_PROTECT_FROM_EVIL || spl == SPELL_RESIST_MAGIC || spl == SPELL_PROTECT_FROM_GOOD)) || (has_skill(ch, SKILL_COMMUNE) >= 70 && (spl == SPELL_CURE_CRITIC || spl == SPELL_SANCTUARY || spl == SPELL_REMOVE_POISON || spl == SPELL_REMOVE_BLIND || spl == SPELL_IRIDESCENT_AURA)) || (has_skill(ch, SKILL_COMMUNE) >= 40 && (spl == SPELL_ARMOR || spl == SPELL_REFRESH || spl == SPELL_REMOVE_PARALYSIS || spl == SPELL_CURE_SERIOUS || spl == SPELL_BLESS || spl == SPELL_FLY)) || (spl == SPELL_DETECT_INVISIBLE || spl == SPELL_DETECT_MAGIC || spl == SPELL_DETECT_POISON || spl == SPELL_SENSE_LIFE || spl == SPELL_CURE_LIGHT))
               {
                 skill_increase_check(ch, SKILL_COMMUNE, has_skill(ch, SKILL_COMMUNE), SKILL_INCREASE_HARD);
                 target_ok = TRUE;
                 group_spell = TRUE;
                 tar_char = ch;
-              } else 
+              }
+              else
               {
                 send_to_char("You cannot cast this spell on your entire group at once.\n\r", ch);
                 return eFAILURE;
-              }          
+              }
             }
           }
 
           if (!target_ok && IS_SET(spell_info[spl].targets, TAR_CHAR_WORLD))
-	  {
-		bool orig = ISSET(ch->affected_by, AFF_TRUE_SIGHT);
-		if (spl == SPELL_EAGLE_EYE)
-		  SETBIT(ch->affected_by, AFF_TRUE_SIGHT);
-            if ( ( tar_char = get_char_vis(ch, name) ) != NULL )
+          {
+            bool orig = ISSET(ch->affected_by, AFF_TRUE_SIGHT);
+            if (spl == SPELL_EAGLE_EYE)
+              SETBIT(ch->affected_by, AFF_TRUE_SIGHT);
+            if ((tar_char = get_char_vis(ch, name)) != NULL)
               target_ok = TRUE;
-		if (!orig)
-		  REMBIT(ch->affected_by, AFF_TRUE_SIGHT);
+            if (!orig)
+              REMBIT(ch->affected_by, AFF_TRUE_SIGHT);
           }
           if (!target_ok && IS_SET(spell_info[spl].targets, TAR_OBJ_INV))
-            if ( ( tar_obj = get_obj_in_list_vis(ch, name, ch->carrying)) != NULL )
+            if ((tar_obj = get_obj_in_list_vis(ch, name, ch->carrying)) != NULL)
               target_ok = TRUE;
 
           if (!target_ok && IS_SET(spell_info[spl].targets, TAR_OBJ_ROOM))
           {
-            tar_obj = get_obj_in_list_vis( ch, name, world[ch->in_room].contents );
-            if ( tar_obj != NULL )
+            tar_obj = get_obj_in_list_vis(ch, name, world[ch->in_room].contents);
+            if (tar_obj != NULL)
               target_ok = TRUE;
           }
 
           if (!target_ok && IS_SET(spell_info[spl].targets, TAR_OBJ_WORLD))
-            if ( ( tar_obj = get_obj_vis(ch, name, TRUE) ) != NULL)
-/* && !(IS_SET(tar_obj->obj_flags.more_flags, ITEM_NOLOCATE)))*/
+            if ((tar_obj = get_obj_vis(ch, name, TRUE)) != NULL)
+              /* && !(IS_SET(tar_obj->obj_flags.more_flags, ITEM_NOLOCATE)))*/
               target_ok = TRUE;
 
-          if (!target_ok && IS_SET(spell_info[spl].targets, TAR_OBJ_EQUIP)) 
+          if (!target_ok && IS_SET(spell_info[spl].targets, TAR_OBJ_EQUIP))
           {
-            for(i=0; i<MAX_WEAR && !target_ok; i++)
-              if (ch->equipment[i] && str_cmp(name, ch->equipment[i]->name) == 0) {
+            for (i = 0; i < MAX_WEAR && !target_ok; i++)
+              if (ch->equipment[i] && str_cmp(name, ch->equipment[i]->name) == 0)
+              {
                 tar_obj = ch->equipment[i];
                 target_ok = TRUE;
               }
           }
 
           if (!target_ok && IS_SET(spell_info[spl].targets, TAR_SELF_ONLY))
-            if (str_cmp(GET_NAME(ch), name) == 0) {
+            if (str_cmp(GET_NAME(ch), name) == 0)
+            {
               tar_char = ch;
               target_ok = TRUE;
             }
+        }
+        else
+        { // !*name No argument was typed
 
-        } else { // !*name No argument was typed 
-    
           if (IS_SET(spell_info[spl].targets, TAR_FIGHT_SELF))
-            if ((ch->fighting) 
-                 && ((ch->fighting)->in_room == ch->in_room)) {
+            if ((ch->fighting) && ((ch->fighting)->in_room == ch->in_room))
+            {
               tar_char = ch;
               target_ok = TRUE;
             }
 
           if (!target_ok && IS_SET(spell_info[spl].targets, TAR_FIGHT_VICT))
-            if (ch->fighting && (ch->in_room == ch->fighting->in_room)) 
-                   // added the in_room checks -pir2/23/01
+            if (ch->fighting && (ch->in_room == ch->fighting->in_room))
+            // added the in_room checks -pir2/23/01
             {
               tar_char = ch->fighting;
               target_ok = TRUE;
             }
 
-          if (!target_ok && ( IS_SET(spell_info[spl].targets, TAR_SELF_ONLY) ||
-                              IS_SET(spell_info[spl].targets, TAR_SELF_DEFAULT))) {
+          if (!target_ok && (IS_SET(spell_info[spl].targets, TAR_SELF_ONLY) ||
+                             IS_SET(spell_info[spl].targets, TAR_SELF_DEFAULT)))
+          {
             tar_char = ch;
             target_ok = TRUE;
           }
 
-          if (!target_ok && IS_SET(spell_info[spl].targets, TAR_NONE_OK)) {
+          if (!target_ok && IS_SET(spell_info[spl].targets, TAR_NONE_OK))
+          {
             target_ok = TRUE;
           }
         }
-
-      } else { // tar_ignore is true
+      }
+      else
+      {                   // tar_ignore is true
         target_ok = TRUE; /* No target, is a good target */
       }
 
-      if (!target_ok) {
-        if (*name) 
+      if (!target_ok)
+      {
+        if (*name)
         {
           if (IS_SET(spell_info[spl].targets, TAR_CHAR_ROOM))
             send_to_char("Nobody here by that name.\n\r", ch);
@@ -2194,331 +2242,382 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
             send_to_char("You are not wearing anything like that.\n\r", ch);
           else if (IS_SET(spell_info[spl].targets, TAR_OBJ_WORLD))
             send_to_char("Nothing at all by that name.\n\r", ch);
-        } else { /* Nothing was given as argument */
+        }
+        else
+        { /* Nothing was given as argument */
           if (spell_info[spl].targets < TAR_OBJ_INV)
             send_to_char("Whom should the spell be cast upon?\n\r", ch);
           else
             send_to_char("What should the spell be cast upon?\n\r", ch);
         }
         return eFAILURE;
-      } else { /* TARGET IS OK */
-        if ((tar_char == ch) && !ok_self && IS_SET(spell_info[spl].targets, TAR_SELF_NONO)) {
-	  if (oldroom) {
-		char_from_room(ch); 
-		char_to_room(ch, oldroom);
-	  }
+      }
+      else
+      { /* TARGET IS OK */
+        if ((tar_char == ch) && !ok_self && IS_SET(spell_info[spl].targets, TAR_SELF_NONO))
+        {
+          if (oldroom)
+          {
+            char_from_room(ch);
+            char_to_room(ch, oldroom);
+          }
           send_to_char("You can not cast this spell upon yourself.\n\r", ch);
           return eFAILURE;
         }
-        else if ((tar_char != ch) && IS_SET(spell_info[spl].targets, TAR_SELF_ONLY)) {
+        else if ((tar_char != ch) && IS_SET(spell_info[spl].targets, TAR_SELF_ONLY))
+        {
           send_to_char("You can only cast this spell upon yourself.\n\r", ch);
           return eFAILURE;
-        } else if (IS_AFFECTED(ch, AFF_CHARM) && (ch->master == tar_char)) {
+        }
+        else if (IS_AFFECTED(ch, AFF_CHARM) && (ch->master == tar_char))
+        {
           send_to_char("You are afraid that it could harm your master.\n\r", ch);
           return eFAILURE;
         }
       }
 
-      if (GET_LEVEL(ch) < ARCHANGEL && !IS_MOB(ch)) {
-        if (GET_MANA(ch) < use_mana(ch, spl) * rel) {
-	  if (oldroom) {
-		char_from_room(ch); 
-		char_to_room(ch, oldroom);
-	  }
-          send_to_char("You can't summon enough energy to cast the spell.\n\r",ch);
+      if (GET_LEVEL(ch) < ARCHANGEL && !IS_MOB(ch))
+      {
+        if (GET_MANA(ch) < use_mana(ch, spl) * rel)
+        {
+          if (oldroom)
+          {
+            char_from_room(ch);
+            char_to_room(ch, oldroom);
+          }
+          send_to_char("You can't summon enough energy to cast the spell.\n\r", ch);
           return eFAILURE;
         }
       }
-     if (tar_char && IS_SET(spell_info[spl].targets, TAR_FIGHT_VICT))
-     {
-	  if (!can_attack(ch) || !can_be_attacked(ch, tar_char))
-	  {
-	  if (oldroom) {
-		char_from_room(ch); 
-		char_to_room(ch, oldroom);
-	  }
-	    return eFAILURE;
-	  }
-     }
-
-     int retval = 0;
-     if (spl != SPELL_VENTRILOQUATE) { /* :-) */
-       retval = say_spell(ch, spl, oldroom);
-
-       // Someone died, most likely the mob due to an act_trigger program
-       if (SOMEONE_DIED(retval)) {
-	 return eSUCCESS;
-       }
-     }
-
-      if (cmd == CMD_FILTER && fillvl) {
-	skill_increase_check(ch, SKILL_ELEMENTAL_FILTER, fillvl, SKILL_INCREASE_HARD);
+      if (tar_char && IS_SET(spell_info[spl].targets, TAR_FIGHT_VICT))
+      {
+        if (!can_attack(ch) || !can_be_attacked(ch, tar_char))
+        {
+          if (oldroom)
+          {
+            char_from_room(ch);
+            char_to_room(ch, oldroom);
+          }
+          return eFAILURE;
+        }
       }
 
-      if (!spellcraft(ch, spl) || (spl != SPELL_MAGIC_MISSILE && spl != SPELL_FIREBALL) )
-	WAIT_STATE(ch, spell_info[spl].beats);
-      else 
-	WAIT_STATE(ch, (int)(spell_info[spl].beats/1.5));
-      
-      if ((spell_info[spl].spell_pointer == 0) && spl>0)
-        send_to_char("Sorry, this magic has not yet been implemented :(\n\r", ch);
-      else 
+      int retval = 0;
+      if (spl != SPELL_VENTRILOQUATE)
+      { /* :-) */
+        retval = say_spell(ch, spl, oldroom);
+
+        // Someone died, most likely the mob due to an act_trigger program
+        if (SOMEONE_DIED(retval))
+        {
+          return eSUCCESS;
+        }
+      }
+
+      if (cmd == CMD_FILTER && fillvl)
       {
-	int chance = 50;
+        skill_increase_check(ch, SKILL_ELEMENTAL_FILTER, fillvl, SKILL_INCREASE_HARD);
+      }
 
-	if (IS_MOB(ch))
-	  {
-	    learned = GET_LEVEL(ch);
-	  }
+      if (!spellcraft(ch, spl) || (spl != SPELL_MAGIC_MISSILE && spl != SPELL_FIREBALL))
+        WAIT_STATE(ch, spell_info[spl].beats);
+      else
+        WAIT_STATE(ch, (int)(spell_info[spl].beats / 1.5));
 
-	chance += learned / 1.5;
+      if ((spell_info[spl].spell_pointer == 0) && spl > 0)
+        send_to_char("Sorry, this magic has not yet been implemented :(\n\r", ch);
+      else
+      {
+        int chance = 50;
 
-	if (GET_CLASS(ch) == CLASS_MAGIC_USER || GET_CLASS(ch) == CLASS_ANTI_PAL)
-	  chance += int_app[GET_INT(ch)].conc_bonus;
-	else 
+        if (IS_MOB(ch))
+        {
+          learned = GET_LEVEL(ch);
+        }
+
+        chance += learned / 1.5;
+
+        if (GET_CLASS(ch) == CLASS_MAGIC_USER || GET_CLASS(ch) == CLASS_ANTI_PAL)
+          chance += int_app[GET_INT(ch)].conc_bonus;
+        else
           chance += wis_app[GET_WIS(ch)].conc_bonus;
-	extern int get_max(CHAR_DATA *ch, int skill);
+        extern int get_max(CHAR_DATA * ch, int skill);
 
         if (GET_RACE(ch) == RACE_HUMAN)
-  	  chance = MIN(95, chance);
-	else
-	  chance = MIN(97, chance);
+          chance = MIN(95, chance);
+        else
+          chance = MIN(97, chance);
 
-	if (GET_LEVEL(ch) == 1) chance++;
+        if (GET_LEVEL(ch) == 1)
+          chance++;
 
-        if (check_conc_loss(ch, spl)) chance = 99;
+        if (check_conc_loss(ch, spl))
+          chance = 99;
 
-        if(IS_AFFECTED(ch, AFF_CRIPPLE) && affected_by_spell(ch, SKILL_CRIPPLE))
-           chance -= 1 + affected_by_spell(ch, SKILL_CRIPPLE)->modifier/10;
+        if (IS_AFFECTED(ch, AFF_CRIPPLE) && affected_by_spell(ch, SKILL_CRIPPLE))
+          chance -= 1 + affected_by_spell(ch, SKILL_CRIPPLE)->modifier / 10;
 
-        if(GET_LEVEL(ch) < IMMORTAL && number(1,100) > chance && !IS_AFFECTED(ch,AFF_FOCUS) && !IS_SET(world[ch->in_room].room_flags, SAFE) )
+        if (GET_LEVEL(ch) < IMMORTAL && number(1, 100) > chance && !IS_AFFECTED(ch, AFF_FOCUS) && !IS_SET(world[ch->in_room].room_flags, SAFE))
         {
           set_conc_loss(ch, spl);
-          csendf(ch, "You lost your concentration and are unable to cast %s!\n\r", spells[spl-1]);
-          if(rel > 1) {
-           send_to_char("The failed elemental filter drains you of additional mana.\r\n", ch);
+          csendf(ch, "You lost your concentration and are unable to cast %s!\n\r", spells[spl - 1]);
+          if (rel > 1)
+          {
+            send_to_char("The failed elemental filter drains you of additional mana.\r\n", ch);
           }
           GET_MANA(ch) -= (use_mana(ch, spl) >> 1) * rel;
           act("$n loses $s concentration and is unable to complete $s spell.", ch, 0, 0, TO_ROOM, 0);
-	  skill_increase_check(ch, spl, learned, spell_info[spl].difficulty);
-	  if (oldroom) {
-		char_from_room(ch); 
-		char_to_room(ch, oldroom);
-	  }
+          skill_increase_check(ch, spl, learned, spell_info[spl].difficulty);
+          if (oldroom)
+          {
+            char_from_room(ch);
+            char_to_room(ch, oldroom);
+          }
           return eSUCCESS;
         }
 
-        if (IS_AFFECTED(ch, AFF_INVISIBLE) && !IS_AFFECTED(ch, AFF_ILLUSION)
-		&& affected_by_spell(ch, SPELL_INVISIBLE)) {
-           act("$n slowly fades into existence.", ch, 0, 0, TO_ROOM, 0);
-           affect_from_char(ch, SPELL_INVISIBLE);
-           REMBIT(ch->affected_by, AFF_INVISIBLE);
+        if (IS_AFFECTED(ch, AFF_INVISIBLE) && !IS_AFFECTED(ch, AFF_ILLUSION) && affected_by_spell(ch, SPELL_INVISIBLE))
+        {
+          act("$n slowly fades into existence.", ch, 0, 0, TO_ROOM, 0);
+          affect_from_char(ch, SPELL_INVISIBLE);
+          REMBIT(ch->affected_by, AFF_INVISIBLE);
         }
 
         send_to_char("Ok.\n\r", ch);
 
-        if(group_spell) {
+        if (group_spell)
+        {
           CHAR_DATA *leader;
-          if(ch->master) leader = ch->master;
-          else leader = ch;
+          if (ch->master)
+            leader = ch->master;
+          else
+            leader = ch;
 
           struct follow_type *k;
           int counter = 0;
 
-          for(k = leader->followers; k; k = k->next)
-            if(k->follower->in_room == ch->in_room) 
+          for (k = leader->followers; k; k = k->next)
+            if (k->follower->in_room == ch->in_room)
               counter++;
-          if(leader->in_room == ch->in_room) counter++;
+          if (leader->in_room == ch->in_room)
+            counter++;
 
           counter = MIN(5, counter);
-          if(learned >= 80 && counter > 3) counter--;
-          if(learned >= 90 && counter > 3) counter--;
+          if (learned >= 80 && counter > 3)
+            counter--;
+          if (learned >= 90 && counter > 3)
+            counter--;
           counter *= use_mana(ch, spl);
-          if(GET_MANA(ch) < counter) {
+          if (GET_MANA(ch) < counter)
+          {
             send_to_char("You do not have enough mana to cast this group spell.\n\r", ch);
             return eFAILURE;
           }
           GET_MANA(ch) -= counter;
-        } else GET_MANA(ch) -= (use_mana(ch, spl) * rel);
-        if (tar_char && !AWAKE(tar_char) && ch->in_room == tar_char->in_room && number(1,5) < 3)
-            send_to_char("Your sleep is restless.\r\n",tar_char);
-	 skill_increase_check(ch, spl, learned,500+ spell_info[spl].difficulty);
+        }
+        else
+          GET_MANA(ch) -= (use_mana(ch, spl) * rel);
+        if (tar_char && !AWAKE(tar_char) && ch->in_room == tar_char->in_room && number(1, 5) < 3)
+          send_to_char("Your sleep is restless.\r\n", tar_char);
+        skill_increase_check(ch, spl, learned, 500 + spell_info[spl].difficulty);
 
-	 if (tar_char && tar_char != ch && IS_PC(ch) && IS_PC(tar_char) && tar_char->desc && ch->desc) {
-	   if (!strcmp(tar_char->desc->host, ch->desc->host)) {
-	     sprintf( log_buf, "Multi: %s casted '%s' on %s", GET_NAME(ch),
-		      get_skill_name(spl), GET_NAME(tar_char));
-	     log( log_buf, 110, LOG_PLAYER, ch );
-	   }
+        if (tar_char && tar_char != ch && IS_PC(ch) && IS_PC(tar_char) && tar_char->desc && ch->desc)
+        {
+          if (!strcmp(tar_char->desc->host, ch->desc->host))
+          {
+            sprintf(log_buf, "Multi: %s casted '%s' on %s", GET_NAME(ch),
+                    get_skill_name(spl), GET_NAME(tar_char));
+            log(log_buf, 110, LOG_PLAYER, ch);
+          }
 
-	   // Wizard's eye (88) is ok to cast
-	   // Prize Arena
-	   if (IS_SET(world[ch->in_room].room_flags, ARENA) && arena.type == PRIZE && spl != 88) {
-	       if (tar_char && tar_char != ch && !IS_SET(spell_info[spl].targets, TAR_FIGHT_VICT)) {
-		   send_to_char("You can't cast that spell on someone in a prize arena.\n\r", ch);
-		   logf(IMMORTAL, LOG_ARENA, "%s was prevented from casting '%s' on %s.",
-			GET_NAME(ch), get_skill_name(spl), GET_NAME(tar_char));
-		   return eFAILURE;
-	       }
+          // Wizard's eye (88) is ok to cast
+          // Prize Arena
+          if (IS_SET(world[ch->in_room].room_flags, ARENA) && arena.type == PRIZE && spl != 88)
+          {
+            if (tar_char && tar_char != ch && !IS_SET(spell_info[spl].targets, TAR_FIGHT_VICT))
+            {
+              send_to_char("You can't cast that spell on someone in a prize arena.\n\r", ch);
+              logf(IMMORTAL, LOG_ARENA, "%s was prevented from casting '%s' on %s.",
+                   GET_NAME(ch), get_skill_name(spl), GET_NAME(tar_char));
+              return eFAILURE;
+            }
 
-	       if (ch->fighting && ch->fighting != tar_char) {
-		   send_to_char("You can't cast that because you're in a fight with someone else.\n\r", ch);
-		   logf(IMMORTAL, LOG_ARENA, "%s, whom was fighting %s, was prevented from casting '%s' on %s.", GET_NAME(ch),
-			GET_NAME(ch->fighting), get_skill_name(spl), GET_NAME(tar_char));
-		   return eFAILURE;
-	       } else if (tar_char->fighting && tar_char->fighting != ch) {
-		   send_to_char("You can't cast that because they are fighting someone else.\n\r", ch);
-		   logf(IMMORTAL, LOG_ARENA, "%s was prevented from casting '%s' on %s who was fighting %s.", GET_NAME(ch),
-			get_skill_name(spl), GET_NAME(tar_char), GET_NAME(tar_char->fighting));
-		   return eFAILURE;
-	       }
-	   }
-  	 
+            if (ch->fighting && ch->fighting != tar_char)
+            {
+              send_to_char("You can't cast that because you're in a fight with someone else.\n\r", ch);
+              logf(IMMORTAL, LOG_ARENA, "%s, whom was fighting %s, was prevented from casting '%s' on %s.", GET_NAME(ch),
+                   GET_NAME(ch->fighting), get_skill_name(spl), GET_NAME(tar_char));
+              return eFAILURE;
+            }
+            else if (tar_char->fighting && tar_char->fighting != ch)
+            {
+              send_to_char("You can't cast that because they are fighting someone else.\n\r", ch);
+              logf(IMMORTAL, LOG_ARENA, "%s was prevented from casting '%s' on %s who was fighting %s.", GET_NAME(ch),
+                   get_skill_name(spl), GET_NAME(tar_char), GET_NAME(tar_char->fighting));
+              return eFAILURE;
+            }
+          }
 
-	 // Wizard's eye (88) is ok to cast
-	 // Clan Chaos
-	   if (IS_SET(world[ch->in_room].room_flags, ARENA) && arena.type == CHAOS && spl != 88) {
-	       if (tar_char && tar_char != ch && !IS_SET(spell_info[spl].targets, TAR_FIGHT_VICT) && !ARE_CLANNED(ch, tar_char)) {
-	       send_to_char("You can't cast that spell on someone from another clan in a prize arena.\n\r", ch);
-	       logf(IMMORTAL, LOG_ARENA, "%s [%s] was prevented from casting '%s' on %s [%s].",
-		    GET_NAME(ch), get_clan_name(ch), get_skill_name(spl), GET_NAME(tar_char), get_clan_name(tar_char));
-	       return eFAILURE;
-	     }
+          // Wizard's eye (88) is ok to cast
+          // Clan Chaos
+          if (IS_SET(world[ch->in_room].room_flags, ARENA) && arena.type == CHAOS && spl != 88)
+          {
+            if (tar_char && tar_char != ch && !IS_SET(spell_info[spl].targets, TAR_FIGHT_VICT) && !ARE_CLANNED(ch, tar_char))
+            {
+              send_to_char("You can't cast that spell on someone from another clan in a prize arena.\n\r", ch);
+              logf(IMMORTAL, LOG_ARENA, "%s [%s] was prevented from casting '%s' on %s [%s].",
+                   GET_NAME(ch), get_clan_name(ch), get_skill_name(spl), GET_NAME(tar_char), get_clan_name(tar_char));
+              return eFAILURE;
+            }
 
-	       if (ch->fighting && ch->fighting != tar_char && !ARE_CLANNED(ch->fighting, tar_char) && IS_SET(spell_info[spl].targets, TAR_FIGHT_VICT)) {
-	       send_to_char("You can't cast that because you're in a fight with someone else.\n\r", ch);
-	       logf(IMMORTAL, LOG_ARENA, "%s [%s], whom was fighting %s [%s], was prevented from casting '%s' on %s [%s].", 
-		    GET_NAME(ch), get_clan_name(ch),
-		    GET_NAME(ch->fighting), get_clan_name(ch->fighting),
-		    get_skill_name(spl),
-		    GET_NAME(tar_char), get_clan_name(tar_char));
-	       return eFAILURE;
-	       } else if (tar_char->fighting && tar_char->fighting != ch && !ARE_CLANNED(tar_char->fighting, ch) && IS_SET(spell_info[spl].targets, TAR_FIGHT_VICT)) {
-	       send_to_char("You can't cast that because they are fighting someone else.\n\r", ch);
-	       logf(IMMORTAL, LOG_ARENA, "%s [%s] was prevented from casting '%s' on %s [%s] who was fighting %s [%s].",
-		    GET_NAME(ch), get_clan_name(ch),
-		    get_skill_name(spl),
-		    GET_NAME(tar_char), get_clan_name(tar_char),
-		    GET_NAME(tar_char->fighting), get_clan_name(tar_char->fighting));
-	       return eFAILURE;
-	     }
-	   }
-  	 }
-    
-         if (tar_char && IS_AFFECTED(tar_char, AFF_REFLECT) && number(0,99) < tar_char->spell_reflect) {
-           if(ch == tar_char) { // some idiot was shooting at himself
-//out		  act("The spell harmlessly reflects off you and disperses.", tar_char, 0, 0, TO_CHAR, 0);
-//for		  act("The spell harmlessly reflects off $n and disperses.", tar_char, 0, 0, TO_ROOM, 0);
-//heals		  return eSUCCESS;
-	   } else {
-		  act("$n's spell bounces back at $m.", ch, 0, tar_char, TO_VICT, 0);
-		  act("Oh SHIT! Your spell bounces off of $N and heads right back at you.", ch, 0, tar_char, TO_CHAR, 0);
-		  act("$n's spell reflects off of $N's magical aura", ch, 0, tar_char, TO_ROOM, NOTVICT);
-		  tar_char = ch;
-
-		  // Ping-pong
-		   if (IS_AFFECTED(tar_char, AFF_REFLECT) && number(0,99) < tar_char->spell_reflect) {
-				 act("The spell harmlessly reflects off you and disperses.", tar_char, 0, 0, TO_CHAR, 0);
-				 act("The spell harmlessly reflects off $n and disperses.", tar_char, 0, 0, TO_ROOM, 0);
-				 if (oldroom) {
-						char_from_room(ch);
-						char_to_room(ch, oldroom);
-				 }
-				 return eSUCCESS;
-	           }
-	    }
+            if (ch->fighting && ch->fighting != tar_char && !ARE_CLANNED(ch->fighting, tar_char) && IS_SET(spell_info[spl].targets, TAR_FIGHT_VICT))
+            {
+              send_to_char("You can't cast that because you're in a fight with someone else.\n\r", ch);
+              logf(IMMORTAL, LOG_ARENA, "%s [%s], whom was fighting %s [%s], was prevented from casting '%s' on %s [%s].",
+                   GET_NAME(ch), get_clan_name(ch),
+                   GET_NAME(ch->fighting), get_clan_name(ch->fighting),
+                   get_skill_name(spl),
+                   GET_NAME(tar_char), get_clan_name(tar_char));
+              return eFAILURE;
+            }
+            else if (tar_char->fighting && tar_char->fighting != ch && !ARE_CLANNED(tar_char->fighting, ch) && IS_SET(spell_info[spl].targets, TAR_FIGHT_VICT))
+            {
+              send_to_char("You can't cast that because they are fighting someone else.\n\r", ch);
+              logf(IMMORTAL, LOG_ARENA, "%s [%s] was prevented from casting '%s' on %s [%s] who was fighting %s [%s].",
+                   GET_NAME(ch), get_clan_name(ch),
+                   get_skill_name(spl),
+                   GET_NAME(tar_char), get_clan_name(tar_char),
+                   GET_NAME(tar_char->fighting), get_clan_name(tar_char->fighting));
+              return eFAILURE;
+            }
+          }
         }
 
-   ubyte level = GET_LEVEL(ch);    
+        if (tar_char && IS_AFFECTED(tar_char, AFF_REFLECT) && number(0, 99) < tar_char->spell_reflect)
+        {
+          if (ch == tar_char)
+          { // some idiot was shooting at himself
+            //out		  act("The spell harmlessly reflects off you and disperses.", tar_char, 0, 0, TO_CHAR, 0);
+            //for		  act("The spell harmlessly reflects off $n and disperses.", tar_char, 0, 0, TO_ROOM, 0);
+            //heals		  return eSUCCESS;
+          }
+          else
+          {
+            act("$n's spell bounces back at $m.", ch, 0, tar_char, TO_VICT, 0);
+            act("Oh SHIT! Your spell bounces off of $N and heads right back at you.", ch, 0, tar_char, TO_CHAR, 0);
+            act("$n's spell reflects off of $N's magical aura", ch, 0, tar_char, TO_ROOM, NOTVICT);
+            tar_char = ch;
 
-        if(group_spell) {
-           send_to_char("You utter a swift prayer to the gods to amplify your powers.\n\r", ch);
-           act("$n utters a swift prayer to the gods to amplify $s powers.", ch, 0, 0, TO_ROOM, 0);
-           strcpy(argument,"communegroupspell");
+            // Ping-pong
+            if (IS_AFFECTED(tar_char, AFF_REFLECT) && number(0, 99) < tar_char->spell_reflect)
+            {
+              act("The spell harmlessly reflects off you and disperses.", tar_char, 0, 0, TO_CHAR, 0);
+              act("The spell harmlessly reflects off $n and disperses.", tar_char, 0, 0, TO_ROOM, 0);
+              if (oldroom)
+              {
+                char_from_room(ch);
+                char_to_room(ch, oldroom);
+              }
+              return eSUCCESS;
+            }
+          }
         }
-        else if(tar_char && affected_by_spell(tar_char, SPELL_IMMUNITY) && affected_by_spell(tar_char, SPELL_IMMUNITY)->modifier == spl-1) {
+
+        ubyte level = GET_LEVEL(ch);
+
+        if (group_spell)
+        {
+          send_to_char("You utter a swift prayer to the gods to amplify your powers.\n\r", ch);
+          act("$n utters a swift prayer to the gods to amplify $s powers.", ch, 0, 0, TO_ROOM, 0);
+          strcpy(argument, "communegroupspell");
+        }
+        else if (tar_char && affected_by_spell(tar_char, SPELL_IMMUNITY) && affected_by_spell(tar_char, SPELL_IMMUNITY)->modifier == spl - 1)
+        {
           act("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_char, TO_VICT, 0);
           act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_char, TO_CHAR, 0);
           act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_char, TO_ROOM, NOTVICT);
           return eSUCCESS;
         }
-        else if(fil) 
+        else if (fil)
         {
-          switch(fil) 
+          switch (fil)
           {
-            case FILTER_FIRE:
-             csendf(ch, "Upon casting, your %s filters through a $B$4blast of flame$R!\r\n", spells[spl-1] );
-             act("Upon casting, $n filters $s magic through a $B$4blast of flame$R!", ch, 0, 0, TO_ROOM, 0 );
-             level = 200 + TYPE_FIRE - TYPE_HIT;
+          case FILTER_FIRE:
+            csendf(ch, "Upon casting, your %s filters through a $B$4blast of flame$R!\r\n", spells[spl - 1]);
+            act("Upon casting, $n filters $s magic through a $B$4blast of flame$R!", ch, 0, 0, TO_ROOM, 0);
+            level = 200 + TYPE_FIRE - TYPE_HIT;
             break;
-            case FILTER_ACID:
-             csendf(ch, "Upon casting, your %s filters through $B$2sizzling acid$R!\r\n", spells[spl-1] );
-             act("Upon casting, $n filters $s magic through $B$2sizzling acid$R!", ch, 0, 0, TO_ROOM, 0 );
-             level = 200 + TYPE_ACID - TYPE_HIT;
+          case FILTER_ACID:
+            csendf(ch, "Upon casting, your %s filters through $B$2sizzling acid$R!\r\n", spells[spl - 1]);
+            act("Upon casting, $n filters $s magic through $B$2sizzling acid$R!", ch, 0, 0, TO_ROOM, 0);
+            level = 200 + TYPE_ACID - TYPE_HIT;
             break;
-            case FILTER_COLD:
-             csendf(ch, "Upon casting, your %s filters through $B$3shards of ice$R!\r\n", spells[spl-1] );
-             act("Upon casting, $n filters $s magic through $B$3shards of ice$R!", ch, 0, 0, TO_ROOM, 0 );
-             level = 200 + TYPE_COLD - TYPE_HIT;
+          case FILTER_COLD:
+            csendf(ch, "Upon casting, your %s filters through $B$3shards of ice$R!\r\n", spells[spl - 1]);
+            act("Upon casting, $n filters $s magic through $B$3shards of ice$R!", ch, 0, 0, TO_ROOM, 0);
+            level = 200 + TYPE_COLD - TYPE_HIT;
             break;
-            case FILTER_ENERGY:
-             csendf(ch, "Upon casting, your %s filters through $B$5crackling energy$R!\r\n", spells[spl-1] );
-             act("Upon casting, $n filters $s magic through $B$4crackling energy$R!", ch, 0, 0, TO_ROOM, 0 );
-             level = 200 + TYPE_ENERGY - TYPE_HIT;
+          case FILTER_ENERGY:
+            csendf(ch, "Upon casting, your %s filters through $B$5crackling energy$R!\r\n", spells[spl - 1]);
+            act("Upon casting, $n filters $s magic through $B$4crackling energy$R!", ch, 0, 0, TO_ROOM, 0);
+            level = 200 + TYPE_ENERGY - TYPE_HIT;
             break;
-            case FILTER_MAGIC:
-             csendf(ch, "Upon casting, your %s filters through a $B$7burst of magic$R!\r\n", spells[spl-1] );
-             act("Upon casting, $n filters $s magic through a $B$4burst of magic$R!", ch, 0, 0, TO_ROOM, 0 );
-             level = 200 + TYPE_MAGIC - TYPE_HIT;
+          case FILTER_MAGIC:
+            csendf(ch, "Upon casting, your %s filters through a $B$7burst of magic$R!\r\n", spells[spl - 1]);
+            act("Upon casting, $n filters $s magic through a $B$4burst of magic$R!", ch, 0, 0, TO_ROOM, 0);
+            level = 200 + TYPE_MAGIC - TYPE_HIT;
             break;
-            case FILTER_POISON:
-             csendf(ch, "Upon casting, your %s filters through $2poisonous fumes$R!\r\n", spells[spl-1] );
-             act("Upon casting, $n filters $s magic through $2poisonous fumes$R!", ch, 0, 0, TO_ROOM, 0 );
-             level = 200 + TYPE_POISON - TYPE_HIT;
+          case FILTER_POISON:
+            csendf(ch, "Upon casting, your %s filters through $2poisonous fumes$R!\r\n", spells[spl - 1]);
+            act("Upon casting, $n filters $s magic through $2poisonous fumes$R!", ch, 0, 0, TO_ROOM, 0);
+            level = 200 + TYPE_POISON - TYPE_HIT;
             break;
-            default:
-             send_to_char("WTF?!?!?!?!, tell an immortal about this.\r\n", ch);
+          default:
+            send_to_char("WTF?!?!?!?!, tell an immortal about this.\r\n", ch);
             break;
           }
         }
 
-	int retval = ((*spell_info[spl].spell_pointer) (level, ch, argument, SPELL_TYPE_SPELL, tar_char, tar_obj, learned));
+        int retval = ((*spell_info[spl].spell_pointer)(level, ch, argument, SPELL_TYPE_SPELL, tar_char, tar_obj, learned));
 
-	if (oldroom && !IS_SET(retval, eCH_DIED)) {
-	  char_from_room(ch);
-	  char_to_room(ch, oldroom);
-	  WAIT_STATE(ch, (int)(spell_info[spl].beats));
+        if (oldroom && !IS_SET(retval, eCH_DIED))
+        {
+          char_from_room(ch);
+          char_to_room(ch, oldroom);
+          WAIT_STATE(ch, (int)(spell_info[spl].beats));
 
-	  if (spl == SPELL_LIGHTNING_BOLT) {
-	    char buffer[MAX_STRING_LENGTH];
-	    strcpy(buffer, "$n unleashes a bolt of $B$5lightning$R to the ");
-	    switch (dir) {
-	    case 0:
-	      strcat(buffer, "north.");
-	      break;
-	    case 1:
-	      strcat(buffer, "east.");
-	      break;
-	    case 2:
-	      strcat(buffer, "south.");
-	      break;
-	    case 3:
-	      strcat(buffer, "west.");
-	      break;
-	    case 4:
-	      strcat(buffer, "area above you.");
-	      break;
-	    case 5:
-	      strcat(buffer, "area below you.");
-	      break;
-	    }
-	    act(buffer, ch, 0, 0, TO_ROOM, 0);
-	  }
-	}
+          if (spl == SPELL_LIGHTNING_BOLT)
+          {
+            char buffer[MAX_STRING_LENGTH];
+            strcpy(buffer, "$n unleashes a bolt of $B$5lightning$R to the ");
+            switch (dir)
+            {
+            case 0:
+              strcat(buffer, "north.");
+              break;
+            case 1:
+              strcat(buffer, "east.");
+              break;
+            case 2:
+              strcat(buffer, "south.");
+              break;
+            case 3:
+              strcat(buffer, "west.");
+              break;
+            case 4:
+              strcat(buffer, "area above you.");
+              break;
+            case 5:
+              strcat(buffer, "area below you.");
+              break;
+            }
+            act(buffer, ch, 0, 0, TO_ROOM, 0);
+          }
+        }
 
         return retval;
-    }
-    }   /* if GET_POS < min_pos */
+      }
+    } /* if GET_POS < min_pos */
     return eFAILURE;
   }
   return eFAILURE;
