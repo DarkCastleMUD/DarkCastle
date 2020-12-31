@@ -2055,7 +2055,6 @@ void reel_spin(void *arg1, void *arg2, void *arg3)
          send_to_room("The jackpot lights flash and loud noises come from all around you!\n\r", machine->obj->in_room);
          csendf(machine->ch, "$BJACKPOT!!!!!!  You win the jackpot of %d %s!!$R\n\r", (int)machine->jackpot, machine->gold?"coins":"plats");
 	 sprintf(buf, "##%s just won the JACKPOT for %d %s!\r\n", GET_NAME(machine->ch), (int)machine->jackpot, machine->gold?"coins":"plats");
- 	 extern void send_info(char *messg);
 	 send_info(buf);
 
          logf( IMMORTAL, LOG_MORTAL, "Jackpot win! %s won the jackpot of %d %s!",
