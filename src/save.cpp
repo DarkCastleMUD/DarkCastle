@@ -52,7 +52,6 @@ using namespace std;
 
 extern struct index_data *obj_index;
 extern CWorld world;
-extern short bport;
 
 struct obj_data * obj_store_to_char( CHAR_DATA *ch, FILE *fpsave, struct obj_data * last_cont );
 bool put_obj_in_store( struct obj_data *obj, CHAR_DATA *ch, FILE *fpsave, int wear_pos);
@@ -781,10 +780,13 @@ void save_char_obj (CHAR_DATA *ch)
     return;
 
   // TODO - figure out a way for mob's to save...maybe <mastername>.pet ?
-  if (bport)
-  sprintf (name, "%s/%c/%s", BSAVE_DIR, ch->name[0], ch->name);
-  else
-  sprintf (name, "%s/%c/%s", SAVE_DIR, ch->name[0], ch->name);
+  if (DC::instance().cf.bport)
+  {
+    sprintf (name, "%s/%c/%s", BSAVE_DIR, ch->name[0], ch->name);
+  } else
+  {
+    sprintf (name, "%s/%c/%s", SAVE_DIR, ch->name[0], ch->name);
+  }
 
   sprintf (strsave, "%s.back", name);
 
@@ -872,10 +874,13 @@ bool load_char_obj( struct descriptor_data *d, char *name )
   clear_char(ch);
   ch->desc        = d;
 
-  if (bport)
-  sprintf(strsave, "%s/%c/%s", BSAVE_DIR, UPPER(name[0]), name);
-  else
-  sprintf(strsave, "%s/%c/%s", SAVE_DIR, UPPER(name[0]), name);
+  if (DC::instance().cf.bport)
+  {
+    sprintf(strsave, "%s/%c/%s", BSAVE_DIR, UPPER(name[0]), name);
+  } else
+  {
+    sprintf(strsave, "%s/%c/%s", SAVE_DIR, UPPER(name[0]), name);
+  }
 
 //  struct stat mystats;
 //  stat(strsave, &mystats);
