@@ -14,6 +14,15 @@ extern "C"
   #include <stdio.h> // FILE *
   #include <ctype.h> // isspace..
 }
+#include <fstream>
+#include <iostream>
+#include <sstream>
+#include "fileinfo.h"
+#include <stack>
+#include <algorithm>
+#include <netinet/in.h>
+#include <fmt/format.h>
+
 #include "db.h" // real_room
 #include "player.h"
 #include "utility.h"
@@ -29,12 +38,6 @@ extern "C"
 #include "returnvals.h"
 #include "spells.h"
 
-#include <fstream>
-#include <iostream>
-#include <sstream>
-#include "fileinfo.h"
-#include <stack>
-#include <algorithm>
 #include "DC.h"
 
 using namespace std;
@@ -43,9 +46,7 @@ extern descriptor_data *descriptor_list;
 extern index_data *obj_index;
 extern CWorld world;
 extern zone_data *zone_table;
-extern uint16_t port1;
 
-void send_info(char *messg);
 void addtimer(struct timer_data *timer);
 void delete_clan(const clan_data *currclan);
 
@@ -357,14 +358,19 @@ void save_clans(void) {
 	fprintf(fl, "~\n");
 	dc_fclose(fl);
 
-	stringstream ssbuffer;
-	ssbuffer << HTDOCS_DIR << port1 << "/" << WEBCLANSLIST_FILE;
+  in_port_t port1 = 0;
+  if (DC::instance().cf.ports.size() > 0)
+  {
+    port1 = DC::instance().cf.ports[0];
+  }
 
-	if (!(fl = dc_fopen(ssbuffer.str().c_str(), "w"))) {
-		logf(LOG_MISC, 0, "Unable to open web clan file \'%s\' for writing.\n",
-				ssbuffer.str().c_str());
-		return;
-	}
+  stringstream ssbuffer;
+  ssbuffer << HTDOCS_DIR << port1 << "/" << WEBCLANSLIST_FILE;
+  if (!(fl = dc_fopen(ssbuffer.str().c_str(), "w")))
+  {
+    logf(LOG_MISC, 0, "Unable to open web clan file \'%s\' for writing.\n", ssbuffer.str().c_str());
+    return;
+  }
 
 	for (pclan = clan_list; pclan; pclan = pclan->next) {
 		fprintf(fl, "%s %s %d\n", pclan->name, pclan->leader, pclan->number);
@@ -1538,18 +1544,18 @@ int do_ctell(CHAR_DATA *ch, char *arg, int cmd)
 void do_clan_list(CHAR_DATA *ch)
 {
   clan_data * clan = 0;
-  char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH];
+  string buf, buf2;
 
   send_to_char("Clan                 Leader\n\r", ch);
   
   for(clan = clan_list; clan; clan = clan->next) {
-     sprintf(buf, "%-20s$R %-16s %d", clan->name, clan->leader, 
+     buf = fmt::format("{:<20}$R {:<16} {}", clan->name, clan->leader,
            clan->number);
      if (GET_LEVEL(ch) > 103)
      {
-    	 sprintf(buf2, "%s  Balance: %llu Tax: %d\r\n", buf, clan->getBalance(), clan->tax);
+    	 buf2 = fmt::format("{}  Balance: {} Tax: {}\r\n", buf, clan->getBalance(), clan->tax);
      } else {
-    	 sprintf(buf2, "%s\r\n", buf);
+    	 buf2 = fmt::format("{}\r\n", buf);
      }
      send_to_char(buf2, ch);
   }
