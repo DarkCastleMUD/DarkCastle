@@ -28,6 +28,11 @@ extern "C"
 /*#include "memory.h"*/
 }
 
+#include <string>
+#include <tuple>
+
+using namespace std;
+
 #include "structs.h" // MAX_STRING_LENGTH
 #include "character.h" // POSITION_*
 #include "interp.h"
@@ -919,7 +924,7 @@ int command_interpreter( CHAR_DATA *ch, char *pcomm, bool procced  )
 }
 
 
-int search_block(char *arg, char **list, bool exact)
+int old_search_block(char *arg, char **list, bool exact)
 {
   int i,l;
   
@@ -940,6 +945,40 @@ int search_block(char *arg, char **list, bool exact)
       }
 
   return(-1);
+}
+
+int search_block(const char *orig_arg, char **list, bool exact)
+{
+  int i;
+
+  string needle = string(orig_arg);
+
+  // Make into lower case and get length of string
+  transform(needle.begin(), needle.end(), needle.begin(), ::tolower);
+
+  if (exact)
+  {
+    for (i = 0; **(list + i) != '\n'; i++)
+    {
+      string haystack = *(list + i);
+      if (needle == haystack)
+      {
+        return (i);
+      }
+    }
+  } else
+  {
+    for (i = 0; **(list + i) != '\n'; i++)
+    {
+      string haystack = *(list + i);
+      if (!haystack.compare(0, needle.size(), haystack))
+      {
+        return (i);
+      }
+    }
+  }
+
+  return (-1);
 }
 
 
@@ -1042,7 +1081,7 @@ void argument_interpreter(const char *argument, char *first_arg, char *second_ar
 
 // If the string is ALL numbers, return TRUE
 // If there is a non-numeric in string, return FALSE
-int is_number(char *str)
+int is_number(const char *str)
 {
   int look_at;
   
@@ -1207,6 +1246,19 @@ void automail(char * name)
   system(buf);
 }
 
+bool is_abbrev(const string& aabrev, const string& word)
+{
+  if (aabrev.empty())
+  {
+    return false;
+  }
+
+  return equal(aabrev.begin(), aabrev.end(), word.begin(),
+  [](char a, char w)
+  {
+    return tolower(a) == tolower(w);
+  });
+}
 
 /* determine if a given string is an abbreviation of another */
 int is_abbrev(char *arg1, char *arg2) /* arg1 is short, arg2 is long */ 
@@ -1221,6 +1273,24 @@ int is_abbrev(char *arg1, char *arg2) /* arg1 is short, arg2 is long */
   return(1);
 }
 
+tuple<string,string> half_chop(string arguments)
+{
+  // remove leading spaces
+  auto first_non_space = arguments.find_first_not_of(' ');
+  arguments.erase(0, first_non_space);
+
+  auto space_after_arg1 = arguments.find_first_of(' ');
+  auto arg1 = arguments.substr(0, space_after_arg1);
+
+  // remove arg1 from arguments
+  arguments.erase(0, space_after_arg1);
+
+  // remove leading spaces from arguments before returning it
+  first_non_space = arguments.find_first_not_of(' ');
+  arguments.erase(0, first_non_space);
+
+  return tuple<string,string>(arg1, arguments);
+}
 
 /* return first 'word' plus trailing substring of input string */
 void half_chop(char *string, char *arg1, char *arg2)
