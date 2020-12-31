@@ -54,7 +54,6 @@ void room_mobs_only_hate(char_data *ch);
 void add_memory(CHAR_DATA *ch, char *victim, char type);
 void stop_follower(CHAR_DATA *ch, int cmd);
 int attack(CHAR_DATA *ch, CHAR_DATA *vict, int type, int attack = FIRST);
-void send_info(char *messg);
 void perform_violence(void);
 void dam_message(int dam, CHAR_DATA *ch, CHAR_DATA *vict, int w_type, long modifier);
 void group_gain(CHAR_DATA *ch, CHAR_DATA *vict);
