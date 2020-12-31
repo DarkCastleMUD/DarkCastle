@@ -17,6 +17,8 @@
 #include <vector>
 #include <limits>
 #include <type_traits>
+#include <tuple>
+#include <fmt/format.h>
 
 #include "wizard.h"
 #include "utility.h"
@@ -38,8 +40,7 @@
 #include "structs.h"
 #include "guild.h"
 
-using std::vector;
-using std::string;
+using namespace std;
 
 extern vector<string> continent_names;
 extern CVoteData *DCVote;
@@ -875,11 +876,14 @@ int do_zedit(struct char_data *ch, char *argument, int cmd)
         send_to_char("$3Usage$R: zedit mode <modetype>\r\n"
                      "You much choose the rule the zone follows when it\r\n"
                      "attempts to repop itself.  Available modes are:\r\n", ch);
-        *buf = '\0';
+        string buffer;
         for(j = 0; *zone_modes[j] != '\n'; j++)
-          sprintf(buf, "%s  $C%d$R: %s\r\n", buf, j+1, zone_modes[j]);
+        {
+          buffer += fmt::format("{}  $C{}$R: {}\r\n", buf, j+1, zone_modes[j]);
 
-        send_to_char(buf, ch);          
+        }
+
+        send_to_char(buffer.c_str(), ch);          
         return eFAILURE;
       }
       
@@ -2397,12 +2401,13 @@ int do_procedit(struct char_data *ch, char *argument, int cmd)
       }
       currprog->next = prog;
       prog_num++;
-    } else
+    } else {
       mob_index[mob_num].mobprogs = prog;
+    }
 
-      update_mobprog_bits(mob_num);
+    update_mobprog_bits(mob_num);
 
-      csendf(ch, "New mobprog created as #%d.\r\n", prog_num);
+    csendf(ch, "New mobprog created as #%d.\r\n", prog_num);
     }
     break;
 
@@ -3589,7 +3594,7 @@ int do_medit(struct char_data *ch, char *argument, int cmd) {
 
 int do_redit(struct char_data *ch, char *argument, int cmd)
 {
-    char buf[200], buf2[200], buf3[200];
+    string buf, remainder_args;
     extern char *dirs[];
     extern char *room_bits[];
     extern char *sector_types[];
@@ -3629,8 +3634,9 @@ int do_redit(struct char_data *ch, char *argument, int cmd)
     if(IS_NPC(ch))
       return eFAILURE;
 
-    half_chop(argument, buf, buf2);
-    if(!*buf) {
+    string arg1;
+    tie (arg1, remainder_args) = half_chop(string(argument));
+    if(arg1.empty()) {
       send_to_char("The field must be one of the following:\n\r", ch);
       for(x = 0 ;; x++) {
         if(fields[x][0] == '\0')
@@ -3656,7 +3662,7 @@ int do_redit(struct char_data *ch, char *argument, int cmd)
           csendf(ch, "%s\n\r", fields[x]);
         }
       }
-      if(is_abbrev(buf, fields[x]))
+      if(is_abbrev(arg1, fields[x]))
         break;
     }
 
@@ -3664,31 +3670,25 @@ int do_redit(struct char_data *ch, char *argument, int cmd)
 
      /* redit name */
       case 0 : {
-        if(!*buf2) {
+        if(remainder_args.empty()) {
           send_to_char("$3Syntax$R: redit name <Room Name>\n\r", ch);
           return eFAILURE;
         }
         dc_free(world[ch->in_room].name);
-        world[ch->in_room].name = str_dup(buf2);
+        world[ch->in_room].name = str_dup(remainder_args.c_str());
         send_to_char("Ok.\n\r", ch);
       } break;
 
      /* redit description */
       case 1 : {
-        if(*buf2) {
-          sprintf(buf, "%s\n\r", buf2);
+        if(!remainder_args.empty()) {
+          string description = remainder_args + "\n\r";
           dc_free(world[ch->in_room].description);
-          world[ch->in_room].description = str_dup(buf);
+          world[ch->in_room].description = str_dup(description.c_str());
           send_to_char("Ok.\n\r", ch);
           return eFAILURE;
         }
-//        send_to_char("Enter your room's description below."
-  //                   " Terminate with '~' on a new line.\n\r\n\r", ch);
-	        send_to_char("        Write your room's description.  (/s saves /h for help)\r\n",ch);
-
-//        FREE(world[ch->in_room].description);
-  //      world[ch->in_room].description = 0;
-	
+	      send_to_char("        Write your room's description.  (/s saves /h for help)\r\n",ch);
         ch->desc->connected = CON_EDITING;
         ch->desc->strnew = &(world[ch->in_room].description);
         ch->desc->max_str = MAX_MESSAGE_LENGTH;
@@ -3696,7 +3696,7 @@ int do_redit(struct char_data *ch, char *argument, int cmd)
 
      // redit exit
       case 2 : {
-        if(!*buf2) {
+        if(remainder_args.empty()) {
           send_to_char("$3Syntax$R: redit exit <direction> <destination> "
                        "[flags keynumber keywords]\n\r", ch);
           send_to_char("NOTE: [flags keynumber keywords] are "
@@ -3718,27 +3718,38 @@ int do_redit(struct char_data *ch, char *argument, int cmd)
           return eFAILURE;
         }
 
-        half_chop(buf2, buf, buf3);
+        string arg2;
+        tie (arg2, remainder_args) = half_chop(remainder_args);
         for(x = 0; x <=6; x++) {
           if(x == 6) {
             send_to_char("No such direction.\n\r", ch);
             return eFAILURE;
           }
-          if(is_abbrev(buf, dirs[x]))
+          if(is_abbrev(arg2, dirs[x]))
             break;
         }
-        if(!*buf3) return eFAILURE;
+        if(remainder_args.empty())
+        {
+          return eFAILURE;
+        }
 
-        half_chop(buf3, buf, buf2);
-        d = atoi(buf); c = real_room(d); 
+        string arg3;
+        tie (arg3, remainder_args) = half_chop(remainder_args);
+        d = stoi(arg3);
+        c = real_room(d); 
 
-        if(*buf2) {
-          half_chop(buf2, buf, buf3);
-          a = atoi(buf);
-          if(!*buf3) return eFAILURE;
+        if(!remainder_args.empty()) {
+          string arg4;
+          tie (arg4, remainder_args) = half_chop(remainder_args);
+          a = stoi(arg4);
+          if(remainder_args.empty())
+          {
+            return eFAILURE;
+          }
 
-          half_chop(buf3, buf, buf2);
-          b = atoi(buf);
+          string arg5;
+          tie (arg5, remainder_args) = half_chop(remainder_args);
+          b = stoi(arg5);
           if(b == 0)
           {
             send_to_char("No key 0's allowed.  Changing to -1.\r\n", ch);
@@ -3773,10 +3784,10 @@ int do_redit(struct char_data *ch, char *argument, int cmd)
         world[ch->in_room].dir_option[x]->exit_info = a;
         world[ch->in_room].dir_option[x]->key = b;
         world[ch->in_room].dir_option[x]->to_room = c;
-        if(*buf2) {
+        if(!remainder_args.empty()) {
           if(world[ch->in_room].dir_option[x]->keyword)
             dc_free(world[ch->in_room].dir_option[x]->keyword);
-          world[ch->in_room].dir_option[x]->keyword = str_dup(buf2);
+          world[ch->in_room].dir_option[x]->keyword = str_dup(remainder_args.c_str());
         }
 
         send_to_char("Ok.\n\r", ch);
@@ -3788,11 +3799,13 @@ int do_redit(struct char_data *ch, char *argument, int cmd)
             send_to_char("COULD NOT CREATE EXIT...One already exists.\n\r", ch);
           }
           else {
-            sprintf(buf, "%d redit exit %s %d %d %d %s", d,
+            buf = fmt::format("{} redit exit {} {} {} {} {}", d,
                   return_directions[x], world[ch->in_room].number,
-                  a, b, (*buf2 ? buf2 : ""));
+                  a, b, (remainder_args != "" ? remainder_args.c_str() : ""));
             SET_BIT(ch->pcdata->toggles, PLR_ONEWAY);
-            do_at(ch, buf, 9);
+            char *tmp = strdup(buf.c_str());
+            do_at(ch, tmp, 9);
+            free(tmp);
             REMOVE_BIT(ch->pcdata->toggles, PLR_ONEWAY);
           }
         }
@@ -3800,7 +3813,7 @@ int do_redit(struct char_data *ch, char *argument, int cmd)
 
      /* redit extra */
       case 3 : {
-        if(!*buf2) {
+        if(remainder_args.empty()) {
           send_to_char("$3Syntax$R: redit extra <keywords>\n\r"
                        "Use it once to create the desc with a new keyword(s).\r\n"
                        "Use it a second time with one of those keys to edit the description for it.\r\n"
@@ -3808,7 +3821,8 @@ int do_redit(struct char_data *ch, char *argument, int cmd)
           return eFAILURE;
         }
 
-        half_chop(buf2, buf, buf3);
+        string arg2;
+        tie (arg2, remainder_args) = half_chop(remainder_args);
 
         for(extra = world[ch->in_room].ex_description ;; extra = extra->next) 
         {
@@ -3836,7 +3850,7 @@ int do_redit(struct char_data *ch, char *argument, int cmd)
         }
 
         FREE(extra->keyword);
-        extra->keyword = str_dup(buf2);
+        extra->keyword = str_dup(arg2.c_str());
         send_to_char("        Write your extra description.  (/s saves /h for help)\r\n",ch);
 
 //        send_to_char("Enter your extra description below. Terminate with 
@@ -3851,18 +3865,19 @@ int do_redit(struct char_data *ch, char *argument, int cmd)
 
      /* redit exdesc */
       case 4 : {
-        if(!*buf2) {
+        if(remainder_args.empty()) {
           send_to_char("$3Syntax$R: redit exdesc <direction>\n\r", ch);
           return eFAILURE;
         }
 
-        one_argument(buf2, buf);
+        string arg3;
+        tie (arg3, remainder_args) = half_chop(remainder_args);
         for(x = 0; x <=6; x++) {
           if(x == 6) {
             send_to_char("No such direction.\n\r", ch);
             return eFAILURE;
           }
-          if(is_abbrev(buf, dirs[x]))
+          if(is_abbrev(arg3, dirs[x]))
             break;
         }
 
@@ -3885,7 +3900,7 @@ int do_redit(struct char_data *ch, char *argument, int cmd)
       // rflag
       case 5 : {
         a = FALSE;
-        if(!*buf2) {
+        if(remainder_args.empty()) {
           send_to_char("$3Syntax$R: redit rflag <flags>\n\r", ch);
           send_to_char("$3Available room flags$R:\n\r", ch);
           for(x = 0 ;; x++) {
@@ -3902,12 +3917,12 @@ int do_redit(struct char_data *ch, char *argument, int cmd)
           send_to_char("\r\n\r\n", ch);
           return eFAILURE;
         }
-        parse_bitstrings_into_int(room_bits, buf2, ch, (world[ch->in_room].room_flags));
+        parse_bitstrings_into_int(room_bits, remainder_args.c_str(), ch, (world[ch->in_room].room_flags));
       } break;
 
       // sector
       case 6: {
-        if(!*buf2) {
+        if(remainder_args.empty()) {
           send_to_char("$3Syntax$R: redit sector <sector>\r\n", ch);
           send_to_char("$3Available sector types$R:\n\r", ch);
           for(x = 0 ;; x++) {
@@ -3927,7 +3942,7 @@ int do_redit(struct char_data *ch, char *argument, int cmd)
             send_to_char("No such sector type.\n\r", ch);
             return eFAILURE;
           }
-          else if(is_abbrev(buf2, sector_types[x])) {
+          else if(is_abbrev(remainder_args, sector_types[x])) {
             world[ch->in_room].sector_type = x;
             csendf(ch, "Sector type set to %s.\n\r", sector_types[x]);
             break;
@@ -3935,13 +3950,13 @@ int do_redit(struct char_data *ch, char *argument, int cmd)
         }
       } break;
        case 7: // denymob
-	if (!*buf2 || !is_number(buf2))
+	if (remainder_args.empty() || !is_number(remainder_args.c_str()))
 	{
 	  send_to_char("Syntax: redit denymob <vnum>\r\nDoing this on an already denied mob will allow it once more.\r\n",ch);
 	  return eFAILURE;
 	}
 	bool done = FALSE;
-	int mob = atoi(buf2);
+	int mob = stoi(remainder_args);
 	struct deny_data *nd,*pd = NULL;
 	for (nd = world[ch->in_room].denied;nd;nd = nd->next)
 	{
@@ -3962,7 +3977,7 @@ int do_redit(struct char_data *ch, char *argument, int cmd)
 		nd = (struct deny_data *)dc_alloc(1, sizeof(struct deny_data));
 	#endif
 	nd->next = world[ch->in_room].denied;
-	nd->vnum = atoi(buf2);
+	nd->vnum = stoi(remainder_args);
 	world[ch->in_room].denied = nd;
 	csendf(ch, "Mobile %d DENIED entrance.\r\n",mob);
 	break;
@@ -4641,8 +4656,8 @@ int do_rstat(struct char_data *ch, char *argument, int cmd)
 
             send_to_char("Room flags: ", ch);
             sprintbit((long) rm->room_flags,room_bits,buf);
-	    sprintf(buf,"%s [ %u ]\r\n", buf, rm->room_flags);
-            send_to_char(buf,ch);
+            string buffer = fmt::format("{} [ {} ]\r\n", buf, rm->room_flags);
+            send_to_char(buffer.c_str(),ch);
 
             send_to_char("Description:\n\r", ch);
             send_to_char(rm->description, ch);
@@ -4685,7 +4700,6 @@ int do_rstat(struct char_data *ch, char *argument, int cmd)
             strcat(buf, "\n\r");
             send_to_char(buf, ch);
 
-            string buffer;
             buffer = "--------- Contents ---------\n\r";
             for (j = rm->contents; j; j = j->next_content)
 	      {
