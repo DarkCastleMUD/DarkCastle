@@ -29,7 +29,6 @@
 #endif
 
 void AuctionHandleDelete(string name);
-extern short bport;
 
 int do_linkload(struct char_data *ch, char *arg, int cmd)
 {
@@ -526,7 +525,7 @@ int do_testport(char_data *ch, char *argument, int cmd)
 	    // Find next available fd
 
 	    FILE *testportlog;
-	    if (bport) {
+	    if (DC::instance().cf.bport) {
 	    	testportlog = fopen("../blog/testport.log", "w");
 	    } else {
 	    	testportlog = fopen("../log/testport.log", "w");
