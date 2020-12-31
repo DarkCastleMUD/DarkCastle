@@ -160,6 +160,7 @@ struct command_info cmd_info[] =
     { "commands", 	do_new_help,	POSITION_DEAD, 0, CMD_DEFAULT, 0, 1 },
     { "experience",	do_show_exp,	POSITION_DEAD, 0, CMD_DEFAULT, 0, 1 },
     { "version",	do_version,	POSITION_DEAD, 0, CMD_DEFAULT, 0, 0 },
+    { "identify", do_identify, POSITION_DEAD, 0, CMD_DEFAULT, COM_CHARMIE_OK, 0 },
 
     // Communication commands
     { "ask",		do_ask,		POSITION_RESTING, 0, CMD_DEFAULT, COM_CHARMIE_OK, 0 },
