@@ -24,8 +24,6 @@
 #include "returnvals.h"
 #include "levels.h"
 
-void send_info(char *messg);
-
 extern CWorld world;
 struct _arena arena;
 
