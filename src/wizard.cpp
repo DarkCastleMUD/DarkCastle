@@ -18,9 +18,10 @@
 #include "interp.h"
 #include "returnvals.h"
 #include <unistd.h>
+#include "comm.h"
 
 #ifdef TWITTER
-#include "curl.h"
+#include <curl.h>
 #include <twitcurl.h>
 #endif
 
@@ -1560,8 +1561,6 @@ struct hunt_items
 struct hunt_data *hunt_list = NULL;
 struct hunt_items *hunt_items_list = NULL;
 
-extern void send_info(char *messg);
-
 void check_end_of_hunt(struct hunt_data *h, bool forced = FALSE)
 {
   struct hunt_items *i,*p=NULL,*in;
@@ -1725,7 +1724,7 @@ void begin_hunt(int item, int duration, int amount, char *huntname)
   struct hunt_data *n;
   char *tmp;
   struct tm *pTime = NULL;
-  long ct;  
+  time_t ct;
 
 #ifdef LEAK_CHECK
   n = (struct hunt_data *)calloc(1, sizeof(struct hunt_data));
