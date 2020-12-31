@@ -15,6 +15,8 @@ extern "C"
 {
   #include <ctype.h>
 }
+#include <queue>
+#include <fmt/format.h>
 
 #include "connect.h"
 #include "character.h"
@@ -35,7 +37,6 @@ extern "C"
 #include "clan.h"
 #include "arena.h"
 #include "inventory.h"
-#include <queue>
 
 /* extern variables */
 
@@ -54,12 +55,11 @@ void special_log(char *arg);
 struct obj_data * bring_type_to_front(char_data * ch, int item_type);
 struct obj_data * search_char_for_item(char_data * ch, int16 item_number, bool wearonly = FALSE);
 bool search_container_for_item(obj_data * obj, int item_number);
-void send_info(char *);
 
 /* procedures related to get */
 void get(struct char_data *ch, struct obj_data *obj_object, struct obj_data *sub_object, bool has_consent, int cmd)
 {
-    char buffer[MAX_STRING_LENGTH];
+    string buffer;
    
     if(!sub_object || sub_object->carried_by != ch) 
     {
@@ -87,66 +87,64 @@ void get(struct char_data *ch, struct obj_data *obj_object, struct obj_data *sub
        return;
     }
 
-    if (sub_object) {
-			sprintf(buffer,"%s_consent",GET_NAME(ch));
-		      if (has_consent && obj_object->obj_flags.type_flag != ITEM_MONEY) {
-                                if ((cmd==CMD_LOOT && isname("lootable",sub_object->name)) && !isname(buffer,sub_object->name))
-                                {
-				  SET_BIT(sub_object->obj_flags.more_flags, ITEM_PC_CORPSE_LOOTED);;
-                                  struct affected_type pthiefaf;
-				  WAIT_STATE(ch, PULSE_VIOLENCE*2);
+  if (sub_object)
+  {
+    buffer = fmt::format("{}_consent", GET_NAME(ch));
+    if (has_consent && obj_object->obj_flags.type_flag != ITEM_MONEY)
+    {
+      if ((cmd == CMD_LOOT && isname("lootable", sub_object->name)) && !isname(buffer, sub_object->name))
+      {
+        SET_BIT(sub_object->obj_flags.more_flags, ITEM_PC_CORPSE_LOOTED);;
+        struct affected_type pthiefaf;
+        WAIT_STATE(ch, PULSE_VIOLENCE*2);
 
-				  char log_buf[MAX_STRING_LENGTH];
-			          sprintf(log_buf,"%s looted %s[%d] from %s",
-			                 GET_NAME(ch), obj_object->short_description,
-                			 obj_index[obj_object->item_number].virt, sub_object->name);
-         			  log(log_buf, ANGEL, LOG_MORTAL);
+        char log_buf[MAX_STRING_LENGTH];
+        sprintf(log_buf, "%s looted %s[%d] from %s", GET_NAME(ch), obj_object->short_description, obj_index[obj_object->item_number].virt, sub_object->name);
+        log(log_buf, ANGEL, LOG_MORTAL);
 
-				  send_to_char("You suddenly feel very guilty...shame on you stealing from the dead!\r\n",ch);
+        send_to_char("You suddenly feel very guilty...shame on you stealing from the dead!\r\n", ch);
 
-                                  pthiefaf.type = FUCK_PTHIEF;
-                                  pthiefaf.duration = 10;
-                                  pthiefaf.modifier = 0;
-                                  pthiefaf.location = APPLY_NONE;
-                                  pthiefaf.bitvector = -1;
+        pthiefaf.type = FUCK_PTHIEF;
+        pthiefaf.duration = 10;
+        pthiefaf.modifier = 0;
+        pthiefaf.location = APPLY_NONE;
+        pthiefaf.bitvector = -1;
 
-                                  if(affected_by_spell(ch, FUCK_PTHIEF))
-                                  {
-                                        affect_from_char(ch, FUCK_PTHIEF);
-                                        affect_to_char(ch, &pthiefaf);
-                                  }
-                                  else
-                                        affect_to_char(ch, &pthiefaf);
+        if (affected_by_spell(ch, FUCK_PTHIEF))
+        {
+          affect_from_char(ch, FUCK_PTHIEF);
+          affect_to_char(ch, &pthiefaf);
+        } else
+          affect_to_char(ch, &pthiefaf);
 
-                                }
-		      } else if (has_consent && obj_object->obj_flags.type_flag == ITEM_MONEY && !isname(buffer,sub_object->name)) {
-                                if (cmd==CMD_LOOT && isname("lootable",sub_object->name))
-                                {
-                                  struct affected_type pthiefaf;
+      }
+    } else if (has_consent && obj_object->obj_flags.type_flag == ITEM_MONEY && !isname(buffer, sub_object->name))
+    {
+      if (cmd == CMD_LOOT && isname("lootable", sub_object->name))
+      {
+        struct affected_type pthiefaf;
 
-                                  pthiefaf.type = FUCK_GTHIEF;
-                                  pthiefaf.duration = 10;
-                                  pthiefaf.modifier = 0;
-                                  pthiefaf.location = APPLY_NONE;
-                                  pthiefaf.bitvector = -1;
-				  WAIT_STATE(ch, PULSE_VIOLENCE);
-				  send_to_char("You suddenly feel very guilty...shame on you stealing from the dead!\r\n",ch);
+        pthiefaf.type = FUCK_GTHIEF;
+        pthiefaf.duration = 10;
+        pthiefaf.modifier = 0;
+        pthiefaf.location = APPLY_NONE;
+        pthiefaf.bitvector = -1;
+        WAIT_STATE(ch, PULSE_VIOLENCE);
+        send_to_char("You suddenly feel very guilty...shame on you stealing from the dead!\r\n", ch);
 
-				  char log_buf[MAX_STRING_LENGTH];
-			          sprintf(log_buf,"%s looted %d coins from %s",
-			                 GET_NAME(ch), obj_object->obj_flags.value[0], sub_object->name);
-         			  log(log_buf, ANGEL, LOG_MORTAL);
+        char log_buf[MAX_STRING_LENGTH];
+        sprintf(log_buf, "%s looted %d coins from %s", GET_NAME(ch), obj_object->obj_flags.value[0], sub_object->name);
+        log(log_buf, ANGEL, LOG_MORTAL);
 
-                                  if(affected_by_spell(ch, FUCK_GTHIEF))
-                                  {
-                                        affect_from_char(ch, FUCK_GTHIEF);
-                                        affect_to_char(ch, &pthiefaf);
-                                  }
-                                  else
-                                        affect_to_char(ch, &pthiefaf);
+        if (affected_by_spell(ch, FUCK_GTHIEF))
+        {
+          affect_from_char(ch, FUCK_GTHIEF);
+          affect_to_char(ch, &pthiefaf);
+        } else
+          affect_to_char(ch, &pthiefaf);
 
-                                }
-		      }
+      }
+    }
 
         if (sub_object->in_room && obj_object->obj_flags.type_flag != ITEM_MONEY && sub_object->carried_by != ch)
 	{ // Logging gold gets from corpses would just be too much.
@@ -191,7 +189,7 @@ void get(struct char_data *ch, struct obj_data *obj_object, struct obj_data *sub
 
         if(obj_index[obj_object->item_number].virt == CHAMPION_ITEM) {
            SETBIT(ch->affected_by, AFF_CHAMPION);
-           sprintf(buffer, "\n\r##%s has just picked up the Champion flag!\n\r", GET_NAME(ch));
+           buffer = fmt::format("\n\r##{} has just picked up the Champion flag!\n\r", GET_NAME(ch));
            send_info(buffer);
         }
     }
@@ -204,7 +202,7 @@ void get(struct char_data *ch, struct obj_data *obj_object, struct obj_data *sub
 	(obj_object->obj_flags.value[0]>=1)) {
 	obj_from_char(obj_object);
 
-	sprintf(buffer,"There was %d coins.",
+	buffer = fmt::format("There was {} coins.",
 		obj_object->obj_flags.value[0]);
         if(IS_MOB(ch) || !IS_SET(ch->pcdata->toggles, PLR_BRIEF))
 	{
@@ -223,7 +221,7 @@ void get(struct char_data *ch, struct obj_data *obj_object, struct obj_data *sub
 	if(!IS_MOB(ch) && IS_SET(ch->pcdata->toggles, PLR_BRIEF))
 	{
 		tax = TRUE;
-		sprintf(buffer, "%s Bounty: %d", buffer, cgold);
+		buffer = fmt::format("{} Bounty: {}", buffer, cgold);
 		zone_table[world[ch->in_room].zone].gold += cgold;
 	}
 	else csendf(ch, "Clan %s collects %d bounty, leaving %d for you.\r\n",get_clan(zone_table[world[ch->in_room].zone].clanowner)->name,cgold,
@@ -243,7 +241,7 @@ void get(struct char_data *ch, struct obj_data *obj_object, struct obj_data *sub
 	if(!IS_MOB(ch) && IS_SET(ch->pcdata->toggles, PLR_BRIEF))
         {
 		tax = TRUE;
-		sprintf(buffer, "%s ClanTax: %d", buffer, cgold);
+		buffer = fmt::format("{} ClanTax: {}", buffer, cgold);
         }
 	else {
 	  csendf(ch,"Your clan taxes you %d gold, leaving %d gold for you.\r\n",cgold, obj_object->obj_flags.value[0]);
@@ -258,9 +256,13 @@ void get(struct char_data *ch, struct obj_data *obj_object, struct obj_data *sub
     SETBIT(ch->mobdata->actflags, ACT_NO_GOLD_BONUS);
   }
 
-	if (tax)
-	 sprintf(buffer, "%s. %d gold remaining.\r\n",buffer, obj_object->obj_flags.value[0]);
-	else sprintf(buffer, "%s\r\n",buffer);
+    if (tax)
+    {
+      buffer = fmt::format("{}. {} gold remaining.\r\n", buffer, obj_object->obj_flags.value[0]);
+    } else
+    {
+      buffer = fmt::format("{}\r\n", buffer);
+    }
 
         if(!IS_MOB(ch) && IS_SET(ch->pcdata->toggles, PLR_BRIEF))
   	  send_to_char(buffer,ch);
