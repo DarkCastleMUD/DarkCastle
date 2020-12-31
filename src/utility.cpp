@@ -1515,8 +1515,14 @@ int do_save(struct char_data *ch, char *argument, int cmd)
 #ifdef USE_SQL
     save_char_obj_db(ch);
 #endif
-	void save_golem_data(CHAR_DATA *ch);
-    if (ch->pcdata->golem) save_golem_data(ch); // Golem data, eh!
+
+    if (ch->pcdata->golem) {
+      save_golem_data(ch); // Golem data, eh!
+    }
+    if (IS_PC(ch) && ch->followers) {
+      save_charmie_data(ch);
+    }
+
     return eSUCCESS;
 }
 
