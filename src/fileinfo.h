@@ -22,6 +22,7 @@
 #define  FORBIDDEN_NAME_FILE "../lib/forbidden_names.txt"
 #define  SKILL_QUEST_FILE    "../lib/skill_quests.txt"
 #define  FAMILIAR_DIR        "../familiar"
+#define  FOLLOWER_DIR        "../follower"
 #define  VAULT_DIR           "../vaults"
 
 // TODO - Remove tinyworld.shp and divide the stops up into some meaningful
