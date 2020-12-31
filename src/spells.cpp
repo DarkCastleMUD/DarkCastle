@@ -2619,6 +2619,10 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
       }
     } /* if GET_POS < min_pos */
     return eFAILURE;
+  } 
+  else
+  {
+    send_to_char("Your lips do not move, no magic appears.\n\r", ch);
   }
   return eFAILURE;
 }
