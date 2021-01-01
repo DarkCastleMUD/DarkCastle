@@ -467,7 +467,7 @@ int is_busy(CHAR_DATA *ch);
 int is_ignoring(struct char_data *ch, struct char_data *i);
 void colorCharSend(char* s, struct char_data* ch);
 void send_to_char_regardless(char *messg, struct char_data *ch);
-int csendf(struct char_data *ch, char *arg, ...);
+int csendf(struct char_data *ch, const char *arg, ...);
 bool check_range_valid_and_convert(int & value, char * buf, int begin, int end);
 bool check_valid_and_convert(int & value, char * buf);
 void parse_bitstrings_into_int(char * bits[], const char * strings, char_data * ch, uint32 value[]);
@@ -589,5 +589,7 @@ bool isDead(char_data *ch);
 bool isNowhere(char_data *ch);
 bool file_exists(string filename);
 bool char_file_exists(string name);
+void show_obj_class_size_mini(obj_data * obj, char_data * ch);
+const char *item_condition(struct obj_data *obj);
 
 #endif /* UTILITY_H_ */
