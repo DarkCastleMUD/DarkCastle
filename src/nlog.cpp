@@ -115,7 +115,7 @@ void logf(int level, long type, const char *arg, ...)
   log(s, level, type);
 }
 
-int csendf(struct char_data *ch, char *arg, ...)
+int csendf(struct char_data *ch, const char *arg, ...)
 { 
   va_list args;
   char s[MAX_STRING_LENGTH];
