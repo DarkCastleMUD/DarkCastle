@@ -74,7 +74,6 @@ void vault_search_usage(CHAR_DATA *ch);
 extern struct index_data *obj_index;
 extern struct obj_data * search_char_for_item(char_data * ch, int16 item_number, bool wearOnly = FALSE);
 extern struct obj_data  *object_list;
-extern char *item_condition(struct obj_data *obj);
 
 struct vault_data *has_vault(const char *name) 
 {
