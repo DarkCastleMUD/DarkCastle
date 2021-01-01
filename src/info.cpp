@@ -13,13 +13,14 @@
  * share your changes too.  What goes around, comes around. 		    *
  ****************************************************************************/
 /* $Id: info.cpp,v 1.210 2015/06/14 02:38:12 pirahna Exp $ */
-extern "C"
-{
-#include <ctype.h>
-#include <string.h>
-}
-
+#include <cctype>
+#include <cstring>
+#include <cassert>
 #include <cstdlib>
+#include <map>
+#include <sstream>
+#include <fstream>
+
 #include "structs.h"
 #include "room.h"
 #include "character.h"
@@ -43,10 +44,8 @@ extern "C"
 #include "utility.h"
 #include "isr.h"
 #include "Leaderboard.h"
+#include "handler.h"
 
-#include <map>
-#include <sstream>
-#include <fstream>
 using namespace std;
 
 /* extern variables */
@@ -190,7 +189,7 @@ char *find_ex_description(char *word, struct extra_descr_data *list)
    return(0);
 }
 
-char *item_condition(struct obj_data *object)
+const char *item_condition(struct obj_data *object)
 {
          int percent = 100 - (int)(100 * ((float)eq_current_damage(object) / (float)eq_max_damage(object)));
 
@@ -825,6 +824,190 @@ void try_to_peek_into_container(struct char_data *vict, struct char_data *ch,
 
    if(!found)
       send_to_char("You don't see anything inside it.\r\n", ch);
+}
+
+int do_identify(char_data *ch, char *argument, int cmd)
+{
+   char buf[MAX_STRING_LENGTH], buf2[256];
+   int i;
+   bool found;
+   int value;
+
+   /* Spell Names */
+   extern char *spells[];
+
+   /* For Objects */
+   extern char *item_types[];
+   extern char *extra_bits[];
+   extern char *more_obj_bits[];
+   extern char *apply_types[];
+   extern char *size_bits[];
+
+   string arg1, remainder_args;
+   tie (arg1, remainder_args) = half_chop(argument);
+
+   if (arg1.empty())
+   {
+      csendf(ch, "What object do you want to identify?\n\r");
+      return eFAILURE;
+   }
+
+   obj_data *obj = get_obj_in_list_vis(ch, arg1.c_str(), ch->carrying);
+
+   if (obj == nullptr && ch->in_room > 0)
+   {
+      obj = get_obj_in_list_vis(ch, arg1.c_str(), world[ch->in_room].contents);
+   }
+
+   if (obj == nullptr)
+   {
+      csendf(ch, "You could not find %s in your inventory or this room.\n\r", arg1.c_str());
+      return eFAILURE;
+   }
+
+   if (IS_SET(obj->obj_flags.extra_flags, ITEM_DARK) && GET_LEVEL(ch) < IMMORTAL)
+   {
+      send_to_char("A magical aura around the item attempts to conceal its secrets.\r\n", ch);
+      return eFAILURE;
+   }
+
+   send_to_char("You feel informed:\n\r", ch);
+
+   sprintf(buf, "Object '%s', Item type: ", obj->name);
+   sprinttype(GET_ITEM_TYPE(obj), item_types, buf2);
+   strcat(buf, buf2);
+   strcat(buf, "\n\r");
+   send_to_char(buf, ch);
+
+   send_to_char("Item is: ", ch);
+   sprintbit(obj->obj_flags.extra_flags, extra_bits, buf);
+   sprintbit(obj->obj_flags.more_flags, more_obj_bits, buf2);
+   strcat(buf, " ");
+   strcat(buf, buf2);
+   strcat(buf, "\n\r");
+   send_to_char(buf, ch);
+
+   send_to_char("Worn by: ", ch);
+   sprintbit(obj->obj_flags.size, size_bits, buf);
+   strcat(buf, "\r\n");
+   send_to_char(buf, ch);
+
+   sprintf(buf, "Weight: %d, Value: %d, Level: %d\n\r", obj->obj_flags.weight, obj->obj_flags.cost, obj->obj_flags.eq_level);
+   send_to_char(buf, ch);
+
+   switch (GET_ITEM_TYPE(obj))
+   {
+
+   case ITEM_SCROLL:
+   case ITEM_POTION:
+      sprintf(buf, "Level %d spells of:\n\r", obj->obj_flags.value[0]);
+      send_to_char(buf, ch);
+      if (obj->obj_flags.value[1] >= 1)
+      {
+         sprinttype(obj->obj_flags.value[1] - 1, spells, buf);
+         strcat(buf, "\n\r");
+         send_to_char(buf, ch);
+      }
+      if (obj->obj_flags.value[2] >= 1)
+      {
+         sprinttype(obj->obj_flags.value[2] - 1, spells, buf);
+         strcat(buf, "\n\r");
+         send_to_char(buf, ch);
+      }
+      if (obj->obj_flags.value[3] >= 1)
+      {
+         sprinttype(obj->obj_flags.value[3] - 1, spells, buf);
+         strcat(buf, "\n\r");
+         send_to_char(buf, ch);
+      }
+      break;
+
+   case ITEM_WAND:
+   case ITEM_STAFF:
+      sprintf(buf, "Has %d charges, with %d charges left.\n\r",
+               obj->obj_flags.value[1],
+               obj->obj_flags.value[2]);
+      send_to_char(buf, ch);
+
+      sprintf(buf, "Level %d spell of:\n\r", obj->obj_flags.value[0]);
+      send_to_char(buf, ch);
+
+      if (obj->obj_flags.value[3] >= 1)
+      {
+         sprinttype(obj->obj_flags.value[3] - 1, spells, buf);
+         strcat(buf, "\n\r");
+         send_to_char(buf, ch);
+      }
+      break;
+
+   case ITEM_WEAPON:
+      sprintf(buf, "Damage Dice are '%dD%d'\n\r",
+               obj->obj_flags.value[1],
+               obj->obj_flags.value[2]);
+      send_to_char(buf, ch);
+      break;
+
+   case ITEM_INSTRUMENT:
+      sprintf(buf, "Affects non-combat singing by '%d'\r\nAffects combat singing by '%d'\r\n",
+               obj->obj_flags.value[0],
+               obj->obj_flags.value[1]);
+      send_to_char(buf, ch);
+      break;
+
+   case ITEM_MISSILE:
+      sprintf(buf, "Damage Dice are '%dD%d'\n\rIt is +%d to arrow hit and +%d to arrow damage\r\n",
+               obj->obj_flags.value[0],
+               obj->obj_flags.value[1],
+               obj->obj_flags.value[2],
+               obj->obj_flags.value[3]);
+      send_to_char(buf, ch);
+      break;
+
+   case ITEM_FIREWEAPON:
+      sprintf(buf, "Bow is +%d to arrow hit and +%d to arrow damage.\r\n",
+               obj->obj_flags.value[0],
+               obj->obj_flags.value[1]);
+      send_to_char(buf, ch);
+      break;
+
+   case ITEM_ARMOR:
+
+      if (IS_SET(obj->obj_flags.extra_flags, ITEM_ENCHANTED))
+         value = obj->obj_flags.value[0];
+      else
+         value = (obj->obj_flags.value[0]) - (obj->obj_flags.value[1]);
+
+      sprintf(buf, "AC-apply is %d     Resistance to damage is %d\n\r",
+               value, obj->obj_flags.value[2]);
+      send_to_char(buf, ch);
+      break;
+   }
+
+   found = FALSE;
+
+   for (i = 0; i < obj->num_affects; i++)
+   {
+      if ((obj->affected[i].location != APPLY_NONE) &&
+            (obj->affected[i].modifier != 0))
+      {
+         if (!found)
+         {
+            send_to_char("Can affect you as:\n\r", ch);
+            found = TRUE;
+         }
+
+         if (obj->affected[i].location < 1000)
+            sprinttype(obj->affected[i].location, apply_types, buf2);
+         else if (get_skill_name(obj->affected[i].location / 1000))
+            strcpy(buf2, get_skill_name(obj->affected[i].location / 1000));
+         else
+            strcpy(buf2, "Invalid");
+         sprintf(buf, "    Affects : %s By %d\n\r", buf2, obj->affected[i].modifier);
+         send_to_char(buf, ch);
+      }
+   }
+
+   return eSUCCESS;
 }
 
 int do_look(struct char_data *ch, char *argument, int cmd) {
@@ -1717,7 +1900,8 @@ int do_score(struct char_data *ch, char *argument, int cmd)
 
 int do_time(struct char_data *ch, char *argument, int cmd)
 {
-   char buf[100], *suf;
+   char buf[100];
+   char const *suf;
    int weekday, day;
    time_t timep;
    long h,m;
