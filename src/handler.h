@@ -101,7 +101,7 @@ CHAR_DATA *get_random_mob_vnum(int vnum);
 CHAR_DATA *get_mob_room_vis(CHAR_DATA *ch, char *name);
 CHAR_DATA *get_mob_vnum(int vnum);
 OBJ_DATA *get_obj_vnum(int vnum);
-struct obj_data *get_obj_in_list_vis(CHAR_DATA *ch, char *name, 
+struct obj_data *get_obj_in_list_vis(CHAR_DATA *ch, const char *name, 
 		struct obj_data *list, bool bf = FALSE);
 struct obj_data *get_obj_in_list_vis(CHAR_DATA *ch, int item_num, 
 		struct obj_data *list, bool bf = FALSE);
