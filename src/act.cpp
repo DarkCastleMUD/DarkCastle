@@ -151,6 +151,11 @@ int send_message(TokenList * tokens, CHAR_DATA *ch, OBJ_DATA * obj, void * vict_
   int retval = 0;
   char * buf = tokens->Interpret(ch, obj, vict_obj, to, flags);
   
+  // Uppercase first letter of sentence.
+  if (buf != nullptr && buf[0] != 0)
+  {
+    buf[0] = toupper(buf[0]);
+  }
   send_message(buf, to);
   
   if (MOBtrigger && buf)
