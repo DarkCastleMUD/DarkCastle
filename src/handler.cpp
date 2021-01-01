@@ -4004,7 +4004,7 @@ struct obj_data *get_obj_in_list_vis(CHAR_DATA *ch, int item_num, struct obj_dat
 	return NULL;
 }
 
-struct obj_data *get_obj_in_list_vis(CHAR_DATA *ch, char *name, struct obj_data *list, bool blindfighting) {
+struct obj_data *get_obj_in_list_vis(CHAR_DATA *ch, const char *name, struct obj_data *list, bool blindfighting) {
 	struct obj_data *i;
 	int j, number;
 	char tmpname[MAX_INPUT_LENGTH];
