@@ -913,19 +913,23 @@ int do_move(CHAR_DATA *ch, char *argument, int cmd) {
 	return attempt_move(ch, cmd);
 }
 
-int do_leave(struct char_data *ch, char *arguement, int cmd) {
+int do_leave(struct char_data *ch, char *arguement, int cmd)
+{
 	struct obj_data *k;
 	char buf[200];
 	int retval;
 
-	for (k = object_list; k; k = k->next) {
-		if ((k->obj_flags.type_flag == ITEM_PORTAL) && (k->obj_flags.value[1] == 1 || (k->obj_flags.value[1] == 2)) && (k->in_room > -1)
-				&& !IS_SET(k->obj_flags.value[3], PORTAL_NO_LEAVE)) {
-			if ((k->obj_flags.value[0] == world[ch->in_room].number) || (k->obj_flags.value[2] == world[ch->in_room].zone)) {
+	for (k = object_list; k; k = k->next)
+	{
+		if ((k->obj_flags.type_flag == ITEM_PORTAL) && (k->obj_flags.value[1] == 1 || (k->obj_flags.value[1] == 2)) && (k->in_room > -1) && !IS_SET(k->obj_flags.value[3], PORTAL_NO_LEAVE))
+		{
+			if ((k->obj_flags.value[0] == world[ch->in_room].number) || (k->obj_flags.value[2] == world[ch->in_room].zone))
+			{
 				send_to_char("You exit the area.\r\n", ch);
 				act("$n has left the area.", ch, 0, 0, TO_ROOM, INVIS_NULL | STAYHIDE);
 				retval = move_char(ch, real_room(world[k->in_room].number));
-				if (!IS_SET(retval, eSUCCESS)) {
+				if (!IS_SET(retval, eSUCCESS))
+				{
 					send_to_char("You attempt to leave, but the door slams in your face!\r\n", ch);
 					act("$n attempts to leave, but can't!", ch, 0, 0, TO_ROOM, INVIS_NULL | STAYHIDE);
 					return eFAILURE;
