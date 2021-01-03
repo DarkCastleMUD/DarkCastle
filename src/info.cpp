@@ -858,15 +858,13 @@ int do_identify(char_data *ch, char *argument, int cmd)
       return eFAILURE;
    }
 
-   send_to_char("You feel informed:\n\r", ch);
-
-   sprintf(buf, "Object '%s', Item type: ", obj->name);
+   sprintf(buf, "$3Object '$R%s$3', Item type:$R ", obj->name);
    sprinttype(GET_ITEM_TYPE(obj), item_types, buf2);
    strcat(buf, buf2);
    strcat(buf, "\n\r");
    send_to_char(buf, ch);
 
-   send_to_char("Item is: ", ch);
+   send_to_char("$3Item is:$R ", ch);
    sprintbit(obj->obj_flags.extra_flags, extra_bits, buf);
    sprintbit(obj->obj_flags.more_flags, more_obj_bits, buf2);
    strcat(buf, " ");
@@ -874,12 +872,18 @@ int do_identify(char_data *ch, char *argument, int cmd)
    strcat(buf, "\n\r");
    send_to_char(buf, ch);
 
-   send_to_char("Worn by: ", ch);
+    send_to_char("$3Worn on:$R ", ch);
+    sprintbit(obj->obj_flags.wear_flags, wear_bits, buf);
+    strcat(buf,"\n\r");
+    send_to_char(buf, ch);
+
+
+   send_to_char("$3Worn by:$R ", ch);
    sprintbit(obj->obj_flags.size, size_bits, buf);
    strcat(buf, "\r\n");
    send_to_char(buf, ch);
 
-   sprintf(buf, "Weight: %d, Value: %d, Level: %d\n\r", obj->obj_flags.weight, obj->obj_flags.cost, obj->obj_flags.eq_level);
+   sprintf(buf, "$3Weight: $R%d$3, Value: $R%d$3, Level: $R%d\n\r", obj->obj_flags.weight, obj->obj_flags.cost, obj->obj_flags.eq_level);
    send_to_char(buf, ch);
 
    switch (GET_ITEM_TYPE(obj))
@@ -887,7 +891,7 @@ int do_identify(char_data *ch, char *argument, int cmd)
 
    case ITEM_SCROLL:
    case ITEM_POTION:
-      sprintf(buf, "Level %d spells of:\n\r", obj->obj_flags.value[0]);
+      sprintf(buf, "$3Level $R%d $3spells of:$R\n\r", obj->obj_flags.value[0]);
       send_to_char(buf, ch);
       if (obj->obj_flags.value[1] >= 1)
       {
@@ -911,12 +915,12 @@ int do_identify(char_data *ch, char *argument, int cmd)
 
    case ITEM_WAND:
    case ITEM_STAFF:
-      sprintf(buf, "Has %d charges, with %d charges left.\n\r",
+      sprintf(buf, "$3Has $R%d$3 charges, with $R%d$3 charges left.$R\n\r",
                obj->obj_flags.value[1],
                obj->obj_flags.value[2]);
       send_to_char(buf, ch);
 
-      sprintf(buf, "Level %d spell of:\n\r", obj->obj_flags.value[0]);
+      sprintf(buf, "$3Level $R%d$3 spell of:$R\n\r", obj->obj_flags.value[0]);
       send_to_char(buf, ch);
 
       if (obj->obj_flags.value[3] >= 1)
@@ -928,21 +932,21 @@ int do_identify(char_data *ch, char *argument, int cmd)
       break;
 
    case ITEM_WEAPON:
-      sprintf(buf, "Damage Dice are '%dD%d'\n\r",
+      sprintf(buf, "$3Damage Dice are '$R%dD%d$3'$R\n\r",
                obj->obj_flags.value[1],
                obj->obj_flags.value[2]);
       send_to_char(buf, ch);
       break;
 
    case ITEM_INSTRUMENT:
-      sprintf(buf, "Affects non-combat singing by '%d'\r\nAffects combat singing by '%d'\r\n",
+      sprintf(buf, "$3Affects non-combat singing by '$R%d$3'$R\r\n$3Affects combat singing by '$R%d$3'$R\r\n",
                obj->obj_flags.value[0],
                obj->obj_flags.value[1]);
       send_to_char(buf, ch);
       break;
 
    case ITEM_MISSILE:
-      sprintf(buf, "Damage Dice are '%dD%d'\n\rIt is +%d to arrow hit and +%d to arrow damage\r\n",
+      sprintf(buf, "$3Damage Dice are '$R%dD%d$3'$R\n\rIt is +%d to arrow hit and +%d to arrow damage\r\n",
                obj->obj_flags.value[0],
                obj->obj_flags.value[1],
                obj->obj_flags.value[2],
@@ -951,7 +955,7 @@ int do_identify(char_data *ch, char *argument, int cmd)
       break;
 
    case ITEM_FIREWEAPON:
-      sprintf(buf, "Bow is +%d to arrow hit and +%d to arrow damage.\r\n",
+      sprintf(buf, "$3Bow is +$R%d$3 to arrow hit and +$R%d$3 to arrow damage.$R\r\n",
                obj->obj_flags.value[0],
                obj->obj_flags.value[1]);
       send_to_char(buf, ch);
@@ -964,7 +968,7 @@ int do_identify(char_data *ch, char *argument, int cmd)
       else
          value = (obj->obj_flags.value[0]) - (obj->obj_flags.value[1]);
 
-      sprintf(buf, "AC-apply is %d     Resistance to damage is %d\n\r",
+      sprintf(buf, "$3AC-apply is $R%d$3     Resistance to damage is $R%d\n\r",
                value, obj->obj_flags.value[2]);
       send_to_char(buf, ch);
       break;
@@ -979,7 +983,7 @@ int do_identify(char_data *ch, char *argument, int cmd)
       {
          if (!found)
          {
-            send_to_char("Can affect you as:\n\r", ch);
+            send_to_char("$3Can affect you as:$R\n\r", ch);
             found = TRUE;
          }
 
@@ -989,7 +993,7 @@ int do_identify(char_data *ch, char *argument, int cmd)
             strcpy(buf2, get_skill_name(obj->affected[i].location / 1000));
          else
             strcpy(buf2, "Invalid");
-         sprintf(buf, "    Affects : %s By %d\n\r", buf2, obj->affected[i].modifier);
+         sprintf(buf, "    $3Affects : $R%s$3 By $R%d\n\r", buf2, obj->affected[i].modifier);
          send_to_char(buf, ch);
       }
    }
