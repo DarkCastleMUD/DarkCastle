@@ -36,7 +36,7 @@ extern CWorld world;
 
 extern struct spell_info_type spell_info[MAX_SPL_LIST];
 extern struct index_data *obj_index;
-extern struct index_data *mob_index; 
+extern struct index_data *mob_index;
 int hands_are_free(CHAR_DATA *ch, int number);
 struct obj_data *get_object_in_equip_vis(struct char_data *ch,
     char *arg, struct obj_data *equipment[], int *j, bool blindfighting);
@@ -1542,13 +1542,13 @@ void wear(struct char_data *ch, struct obj_data *obj_object, int keyword)
   obj = obj_object;
   if(class_restricted(ch, obj_object))
   {
-    send_to_char("You are forbidden.\n\r", ch);
+    act("You are forbidden from wearing $p due to a class restriction.", ch, obj_object, 0, TO_CHAR, 0);
     return;
   }
 
   if(size_restricted(ch, obj_object))
   {
-    send_to_char("The size does not fit.\r\n", ch);
+    act("$p is the wrong size for you and does not fit.", ch, obj_object, 0, TO_CHAR, 0);
     return;
   }
 
@@ -1560,17 +1560,17 @@ void wear(struct char_data *ch, struct obj_data *obj_object, int keyword)
 
   if (!IS_NPC(ch)) {
     if(GET_LEVEL(ch) < obj_object->obj_flags.eq_level) {
-      sprintf(buffer, "You must be level %d to use this object.\n\r",
+      sprintf(buffer, "You must be level %d to use $p.",
         obj_object->obj_flags.eq_level);
-      send_to_char(buffer, ch);
+      act(buffer, ch, obj_object, 0, TO_CHAR, 0);
       return;
     }
   } else {
   if (mob_index[ch->mobdata->nr].virt != 8)
       if(GET_LEVEL(ch) < obj_object->obj_flags.eq_level) {
-        sprintf(buffer, "You must be level %d to use this object.\n\r",
+        sprintf(buffer, "You must be level %d to use $p.",
           obj_object->obj_flags.eq_level);
-        send_to_char(buffer, ch);
+        act(buffer, ch, obj_object, 0, TO_CHAR, 0);
         return;
       }
   }
@@ -1582,7 +1582,7 @@ void wear(struct char_data *ch, struct obj_data *obj_object, int keyword)
 
   if(IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL) &&
      !isname(GET_NAME(ch), obj->name) && GET_LEVEL(ch) < IMP) {
-    send_to_char("This item will only work on its rightful owner.\n\r", ch);
+       act("$p can only be worn by its rightful owner.", ch, obj_object, 0, TO_CHAR, 0);
     return;
   }
 
@@ -2055,7 +2055,7 @@ int do_wear(struct char_data *ch, char *argument, int cmd)
     struct obj_data *obj_object, *tmp_object, *next_obj;
     int keyword;
     bool blindlag = FALSE;
-    static char *keywords[] = {
+    static char const *keywords[] = {
         "finger",
         "neck",
         "body",
@@ -2073,7 +2073,7 @@ int do_wear(struct char_data *ch, char *argument, int cmd)
         "hold",
         "ear",
         "light",
-	"primary",
+	      "primary",
         "\n"
     };
 
@@ -2410,7 +2410,7 @@ bool fullSave(obj_data *obj)
   if(!tmp_obj)
   {
     char buf[MAX_STRING_LENGTH];
-    sprintf(buf, "crash bug! vault.cpp, tmp_obj was null! %s is obj", obj->name);
+    sprintf(buf, "crash bug! objects.cpp, tmp_obj was null! %s is obj", obj->name);
     log(buf, IMMORTAL, LOG_BUG);
     return 0;
   }
