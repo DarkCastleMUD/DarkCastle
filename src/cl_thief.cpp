@@ -23,6 +23,8 @@
 #include "returnvals.h"
 #include "clan.h"
 #include "arena.h"
+#include "const.h"
+#include "inventory.h"
 
 extern int rev_dir[];
 extern CWorld world;
@@ -33,7 +35,6 @@ extern int top_of_world;
 extern struct zone_data *zone_table;
 
 int find_door(CHAR_DATA *ch, char *type, char *dir);
-struct obj_data * search_char_for_item(char_data * ch, int16 item_number, bool wearonly = FALSE);
 int get_weapon_damage_type(struct obj_data * wielded);
 int check_autojoiners(CHAR_DATA *ch, int skill = 0);
 int check_joincharmie(CHAR_DATA *ch, int skill = 0);
@@ -50,7 +51,7 @@ int palm(CHAR_DATA *ch, struct obj_data *obj_object,
 
   if(!sub_object || sub_object->carried_by != ch) {
      if(IS_SET(obj_object->obj_flags.more_flags, ITEM_UNIQUE))
-        if(search_char_for_item(ch, obj_object->item_number)) {
+        if(search_char_for_item(ch, obj_object->item_number, false)) {
            send_to_char("The item's uniqueness prevents it!\r\n", ch);
            return eFAILURE;
         }
@@ -1067,7 +1068,7 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
           }
         if (obj_index[obj->item_number].virt != 76) {
           obj_from_char(obj);
-          has_item = search_char_for_item(ch, obj->item_number);
+          has_item = search_char_for_item(ch, obj->item_number, false);
           obj_to_char(obj, ch);
         }
           if(IS_SET(obj->obj_flags.more_flags, ITEM_NO_TRADE) ||
@@ -1263,7 +1264,7 @@ int do_steal(CHAR_DATA *ch, char *argument, int cmd)
           }  
         } // !is_npc
         obj_from_char(obj);
-        has_item = search_char_for_item(ch, obj->item_number);
+        has_item = search_char_for_item(ch, obj->item_number, false);
         obj_to_char(obj, ch);
 
         if(IS_SET(obj->obj_flags.more_flags, ITEM_NO_TRADE) ||
@@ -1816,7 +1817,7 @@ int do_slip(struct char_data *ch, char *argument, int cmd)
       }
     
    if(IS_SET(obj->obj_flags.more_flags, ITEM_UNIQUE)) {
-     if(search_char_for_item(vict, obj->item_number)) {
+     if(search_char_for_item(vict, obj->item_number, false)) {
         send_to_char("The item's uniqueness prevents it!\r\n", ch);
         return eFAILURE;
      }

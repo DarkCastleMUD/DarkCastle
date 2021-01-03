@@ -18,21 +18,8 @@
 #include "room.h"
 #include "sing.h"
 #include "handler.h"
+#include "const.h"
 
-extern CWorld world;
-extern struct class_skill_defines g_skills[];
-extern struct class_skill_defines w_skills[];
-extern struct class_skill_defines t_skills[];
-extern struct class_skill_defines d_skills[];
-extern struct class_skill_defines b_skills[];
-extern struct class_skill_defines a_skills[];
-extern struct class_skill_defines p_skills[];
-extern struct class_skill_defines r_skills[];
-extern struct class_skill_defines k_skills[];
-extern struct class_skill_defines u_skills[];
-extern struct class_skill_defines c_skills[];
-extern struct class_skill_defines m_skills[];
-extern char *pc_clss_types3[];
 extern vector<profession> professions;
 
 int get_max(CHAR_DATA *ch, int skill);
@@ -518,7 +505,7 @@ int skills_guild ( struct char_data *ch, char *arg, struct char_data *owner )
       send_to_char ( " Ability:                  Expertise:          Lvl:  Cost:      Ability Group:\r\n", ch );
       send_to_char ( "--------------------------------------------------------------------------------\r\n", ch );
       output_praclist ( ch, g_skills );
-      extern char *pc_clss_types[];
+
       sprintf ( buf, "\r\n$B%c%s skills:$R\r\n", UPPER ( *pc_clss_types[GET_CLASS ( ch ) ] ), ( 1 + pc_clss_types[GET_CLASS ( ch ) ] ) );
       send_to_char ( buf, ch );
 
@@ -764,13 +751,11 @@ int guild(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
         char buf[MAX_STRING_LENGTH];
         if (GET_LEVEL(ch) == 60)
 	{
-	     extern char* pc_clss_types3[];
 	     sprintf(buf, "You have truly reached the highest level of %s mastery.", pc_clss_types3[GET_CLASS(ch)]);
 	     do_say(owner, buf, 9);
  	     do_say(owner,"As such, the guild will imbue into you some of our most powerful magic and grant you freedom from hunger and thirst!",9);
 //	     send_to_char(buf, ch);
 	} else {
-	 extern char *pc_clss_types3[];
 	 sprintf(buf, "Well done master %s, the guild has collected a tithe to reward your continued support of our profession.",pc_clss_types3[GET_CLASS(ch)]);
 
 	 do_say(owner, buf, 9);
@@ -1131,7 +1116,7 @@ void skill_increase_check(char_data * ch, int skill, int learned, int difficulty
    }
    if (oi > chance) return;
    // figure out the name of the affect (if any)
-   char * skillname = get_skill_name(skill);
+   const char * skillname = get_skill_name(skill);
 
    if(!skillname) {
       csendf(ch, "Increase in unknown skill %d.  Tell a god. (bug)\r\n", skill);

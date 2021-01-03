@@ -59,7 +59,7 @@ extern "C"
 #include "help.h"
 #include "quest.h"
 #include "vault.h"
-
+#include "const.h"
 
 using namespace std;
 
@@ -80,12 +80,6 @@ void write_wizlist(const char filename[]);
 char* curr_type;
 char* curr_name;
 int curr_virtno;
-
-extern char *item_types[];
-extern char *wear_bits[];
-extern char *extra_bits[];
-extern char *more_obj_bits[];
-extern char *apply_types[];
 
 /**************************************************************************
  *  declarations of most of the 'global' variables                         *
@@ -2618,9 +2612,6 @@ CHAR_DATA *read_mobile(int nr, FILE *fl)
 	CHAR_DATA *mob;
 	char letter;
 
-	extern struct race_shit race_info[];
-	extern int mob_race_mod[][5];
-
 	i = nr;
 
 #ifdef LEAK_CHECK
@@ -2873,7 +2864,6 @@ void write_mprog_recur(ofstream &fl, MPROG_DATA *mprg, bool mob)
 void write_mobile(char_data * mob, FILE *fl)
 {
 	int i = 0;
-	extern int mob_race_mod[][5];
 
 	fprintf(fl, "#%d\n", mob_index[mob->mobdata->nr].virt);
 	string_to_file(fl, mob->name);
@@ -4127,7 +4117,7 @@ string lf_to_crlf(string &s1)
 	return s1;
 }
 
-void write_bitvector_csv(unsigned long vector, char * const *array, ofstream &fout)
+void write_bitvector_csv(unsigned long vector, const char * const *array, ofstream &fout)
 {
 	int nr = 0;
 	while (*array[nr] != '\n') {

@@ -50,6 +50,8 @@
 #include <map>
 #include <string>
 #include <algorithm>
+#include "inventory.h"
+#include "const.h"
 
 // Extern variables
 
@@ -2104,7 +2106,6 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
   {
     struct obj_data *obj=0;
     CHAR_DATA *take;
-    struct obj_data * search_char_for_item(char_data * ch, int16 item_number, bool wearingonly = FALSE);
     char bufeh[MAX_STRING_LENGTH];
     char *valu = one_argument(val, bufeh);
 
@@ -2168,36 +2169,35 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
   {
     struct obj_data *obj=0;
     CHAR_DATA *take;
-    struct obj_data * search_char_for_item(char_data * ch, int16 item_number, bool wearingonly = FALSE);
     char bufeh[MAX_STRING_LENGTH];
     char *valu = one_argument(val, bufeh);
     if (fvict) {
-      obj = search_char_for_item(fvict, real_object(atoi(valu)));
+      obj = search_char_for_item(fvict, real_object(atoi(valu)), false);
 	take = fvict;
    } else {
 	if (ye) return FALSE;
     switch (arg[1] )
     {
 	case 'z': if (!mob->beacon) return -1;
-		obj = search_char_for_item(((CHAR_DATA*)mob->beacon), real_object(atoi(valu)));
+		obj = search_char_for_item(((CHAR_DATA*)mob->beacon), real_object(atoi(valu)), false);
 	      take = ((CHAR_DATA*)mob->beacon);
        case 'i': // mob
-          obj = search_char_for_item(mob, real_object(atoi(valu)));
+          obj = search_char_for_item(mob, real_object(atoi(valu)), false);
 	  take = mob;
 	   break;
        case 'n': // actor
 	 if (!actor) return -1;
-         obj = search_char_for_item(actor, real_object(atoi(valu)));
+         obj = search_char_for_item(actor, real_object(atoi(valu)), false);
 	 take = actor;
 	     break;
 	case 't': // vict
 	  if (!vict) return -1;
-          obj = search_char_for_item(vict, real_object(atoi(valu)));
+          obj = search_char_for_item(vict, real_object(atoi(valu)), false);
 	  take = vict;
 	  break;
        case 'r': // rndm
 	 if (!rndm) return -1;
-	  obj = search_char_for_item(rndm, real_object(atoi(valu)));
+	  obj = search_char_for_item(rndm, real_object(atoi(valu)), false);
 	  take = rndm;
 	  break;
 	default:

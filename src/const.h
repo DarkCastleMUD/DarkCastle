@@ -1,77 +1,100 @@
 #include "levels.h"
+#include "mobile.h"
+#include "db.h"
+#include "character.h"
 
-const bestowable_god_commands_type bestowable_god_commands[] =
-{
-{ "impchan",	COMMAND_IMP_CHAN, false },
-{ "snoop",	COMMAND_SNOOP, false },
-{ "restore",	COMMAND_RESTORE, false },
-{ "purloin",	COMMAND_PURLOIN, false },
-{ "possess",	COMMAND_POSSESS, false},
-{ "arena",	COMMAND_ARENA, false },
-{ "set",	COMMAND_SET, false },
-{ "load",	COMMAND_LOAD, false },
-{ "shutdown",   COMMAND_SHUTDOWN, false },
-{ "procedit",	COMMAND_MP_EDIT, false },
-{ "range",      COMMAND_RANGE, false },
-{ "procstat",	COMMAND_MPSTAT, false },
-{ "sedit",      COMMAND_SEDIT, false },
-{ "punish",     COMMAND_PUNISH, false },
-{ "sqedit",     COMMAND_SQEDIT, false },
-{ "hedit",      COMMAND_HEDIT, false },
-{ "opstat",	COMMAND_OPSTAT, false },
-{ "opedit",	COMMAND_OPEDIT, false },
-{ "force",	COMMAND_FORCE, false },
-{ "string",	COMMAND_STRING, false },
-{ "stat",	COMMAND_STAT, false },
-{ "sqsave",	COMMAND_SQSAVE, false },
-{ "find",	COMMAND_FIND, false },
-{ "log",	COMMAND_LOG, false },
-{ "addnews",	COMMAND_ADDNEWS, false },
-{ "prize",	COMMAND_PRIZE, false },
-{ "sockets",	COMMAND_SOCKETS, false },
-{ "qedit",	COMMAND_QEDIT, false },
-{ "rename",	COMMAND_RENAME, false },
-{ "findpath",   COMMAND_FINDPATH, true },
-{ "findpath2",  COMMAND_FINDPATH2, true },
-{ "addroom",    COMMAND_ADDROOM, true },
-{ "newpath",    COMMAND_NEWPATH, true },
-{ "listpathsbyzone", COMMAND_LISTPATHSBYZONE, true },
-{ "listallpaths",    COMMAND_LISTALLPATHS, true },
-{ "testhand",   COMMAND_TESTHAND, true },
-{ "dopathpath", COMMAND_DOPATHPATH, true },
-{ "testport", COMMAND_TESTPORT, false },
-{ "testuser", COMMAND_TESTUSER, false },
-{ "remort", COMMAND_REMORT, true },
-{ "testhit", COMMAND_TESTHIT, true },
-{ "\n",		-1 }
-};
+extern bestowable_god_commands_type bestowable_god_commands[];
+extern int wear_corr[];
+extern const char *dirs[];
+extern struct race_shit race_info[];
+extern const char *extra_bits[];
+extern const char *size_bits[];
+extern const char *spells[];
+extern const char *apply_types[];
+extern const char *item_types[];
+extern const char *wear_bits[];
+extern const char *more_obj_bits[];
+extern const char *connected_states[];
+extern const char *race_types[];
+extern const char *zone_modes[];
+extern const char *isr_bits[];
+extern const char *sector_types[];
+extern const char *room_bits[];
+extern const char *sector_types[];
+extern struct class_skill_defines g_skills[];
+extern struct class_skill_defines w_skills[];
+extern struct class_skill_defines t_skills[];
+extern struct class_skill_defines d_skills[];
+extern struct class_skill_defines b_skills[];
+extern struct class_skill_defines a_skills[];
+extern struct class_skill_defines p_skills[];
+extern struct class_skill_defines r_skills[];
+extern struct class_skill_defines k_skills[];
+extern struct class_skill_defines u_skills[];
+extern struct class_skill_defines c_skills[];
+extern struct class_skill_defines m_skills[];
+extern const char *pc_clss_types[];
+extern const char *pc_clss_types2[];
+extern const char *pc_clss_types3[];
+extern const char *pc_clss_abbrev[];
 
-// WEAR, ITEM_WEAR correspondances
-const int wear_corr[] =
-{
-  ITEM_LIGHT_SOURCE, //0
-  ITEM_WEAR_FINGER,
-  ITEM_WEAR_FINGER,
-  ITEM_WEAR_NECK,
-  ITEM_WEAR_NECK,
-  ITEM_WEAR_BODY, // 5
-  ITEM_WEAR_HEAD,
-  ITEM_WEAR_LEGS,
-  ITEM_WEAR_FEET,
-  ITEM_WEAR_HANDS, 
-  ITEM_WEAR_ARMS, // 10
-  ITEM_WEAR_SHIELD,
-  ITEM_WEAR_ABOUT,
-  ITEM_WEAR_WAISTE,
-  ITEM_WEAR_WRIST,
-  ITEM_WEAR_WRIST, //15
-  ITEM_WIELD,
-  ITEM_WIELD,
-  ITEM_HOLD,
-  ITEM_HOLD,
-  ITEM_WEAR_FACE,//20
-  ITEM_WEAR_EAR, 
-  ITEM_WEAR_EAR,
-  0
-};
+/* External variables */
+extern CWorld world;
+extern int max_who;
+extern int top_of_zone_table;
+extern struct zone_data *zone_table;
+extern int top_of_world;
+extern struct descriptor_data *descriptor_list;
+extern char globalBuf[MAX_STRING_LENGTH];
+extern bool wizlock;
+extern struct descriptor_data *descriptor_list;
+extern CHAR_DATA *character_list;
+extern CHAR_DATA *combat_list;
+extern struct index_data *mob_index;
+extern struct index_data *obj_index;
+extern char *ban_list[30];
+extern char *nonew_new_list[30];
+extern const char *zone_bits[];
+extern const char *zone_modes[];
+extern const char *equipment_types[];
+extern int top_of_zonet;
+extern const char *utility_item_types[];
+extern world_file_list_item *world_file_list;
+extern world_file_list_item *mob_file_list;
+extern world_file_list_item *obj_file_list;
+extern int top_of_mobt;
+extern int top_of_objt;
+extern int top_of_world;
+extern int total_rooms;
+extern const char *action_bits[];
+extern const char *affected_bits[];
+extern const char *size_bitfields[];
+extern char *strs_damage_types[];
+extern char *obj_types[];
+extern std::vector<std::string> continent_names;
+extern struct room_data **world_array;
+extern int top_of_objt;
+extern world_file_list_item *obj_file_list;
+extern const char *drinks[];
+extern const char *portal_bits[];
+extern const char *player_bits[];
+extern const char *combat_bits[];
+extern const char *position_types[];
+extern const char *connected_types[];
+extern const char *mob_types[];
+extern const char *exit_bits[];
+extern int mob_race_mod[][5];
 
+extern struct index_data *mob_index;
+extern struct index_data *obj_index;
+extern struct zone_data *zone_table;
+extern struct descriptor_data *descriptor_list;
+extern const char *race_abbrev[];
+
+extern int max_who;
+extern int movement_loss[];
+extern const char *skills[];
+extern const char *songs[];
+extern const char *ki[];
+extern const char *innate_skills[];
+extern const char *reserved[];

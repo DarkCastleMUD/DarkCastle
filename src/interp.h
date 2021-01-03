@@ -17,12 +17,13 @@
 #ifndef INTERP_H_
 #define INTERP_H_
 
+#include "character.h"
 
 
 char *remove_trailing_spaces(char *arg);
 int command_interpreter(CHAR_DATA *ch, char *argument, bool procced = 0 );
-int search_block(const char *arg, char **list, bool exact);
-int old_search_block(char *argument,int begin,int length,char **list,int mode);
+int search_block(const char *arg, const char **l, bool exact);
+int old_search_block(char *argument,int begin,int length, const char **list, int mode);
 char lower( char c );
 void argument_interpreter(const char *argument, char *first_arg, char *second_arg);
 char *one_argument(char *argument,char *first_arg);

@@ -44,12 +44,7 @@ extern "C" {
 #include "clan.h" //totem
 #include "vault.h"
 #include "inventory.h"
-
-extern struct obj_data *object_list;
-extern CWorld world;
-extern struct index_data *obj_index;
-extern struct index_data *mob_index;
-extern char *pc_clss_types[];
+#include "const.h"
 
 /* External procedures */
 void save_corpses(void);

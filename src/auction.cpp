@@ -40,6 +40,10 @@ void load_auction_tickets()
 #include <queue>
 #include "fileinfo.h"
 #include <errno.h>
+#include "const.h"
+#include "inventory.h"
+#include "const.h"
+#include "inventory.h"
 
 using namespace std;
 
@@ -48,7 +52,6 @@ using namespace std;
 #define AUC_MAX_PRICE 2000000000
 
 struct AuctionTicket;
-struct obj_data * search_char_for_item(char_data * ch, int16 item_number, bool wearingonly = FALSE);
 obj_data * ticket_object_load(map<unsigned int, AuctionTicket>::iterator Item_it, int ticket);
 
 extern struct index_data *obj_index;
@@ -553,7 +556,7 @@ bool AuctionHouse::IsSlot(string slot, int vnum)
   int keyword;
   string buf = slot;
 
-  static char *keywords[] = 
+  static const char *keywords[] = 
   {
         "finger",//0
         "neck",//1
@@ -1188,7 +1191,7 @@ void AuctionHouse::BuyItem(CHAR_DATA *ch, unsigned int ticket)
     return;
   }
 
-  if (IS_SET(obj->obj_flags.more_flags, ITEM_UNIQUE) && search_char_for_item(ch, obj->item_number)) 
+  if (IS_SET(obj->obj_flags.more_flags, ITEM_UNIQUE) && search_char_for_item(ch, obj->item_number, false)) 
   { 
     send_to_char("Why would you want another one of those?\r\n", ch);
     return;
@@ -1199,7 +1202,7 @@ void AuctionHouse::BuyItem(CHAR_DATA *ch, unsigned int ticket)
     OBJ_DATA *no_trade_obj;
     int nr = real_object(27909);
 
-    no_trade_obj = search_char_for_item(ch, nr);
+    no_trade_obj = search_char_for_item(ch, nr, false);
 
     if(!no_trade_obj) 
     { //27909 == wingding right now (notrade transfer token)
@@ -1395,7 +1398,7 @@ void AuctionHouse::RemoveTicket(CHAR_DATA *ch, unsigned int ticket)
       }
 
       if (IS_SET(( (struct obj_data *)(obj_index[rnum].item))->obj_flags.more_flags, ITEM_UNIQUE) 
-          && search_char_for_item(ch, rnum))
+          && search_char_for_item(ch, rnum, false))
       { 
         send_to_char("Why would you want another one of those?\r\n", ch);
         return;

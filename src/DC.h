@@ -13,11 +13,13 @@
 #include <queue>
 #include <unordered_set>
 #include <netinet/in.h>
+#include <string>
 
 #include "character.h"
 #include "obj.h"
 #include "character.h"
 #include "fileinfo.h"
+#include "connect.h"
 
 using namespace std;
 
@@ -80,6 +82,12 @@ private:
   int init_socket(in_port_t port);
 };
 
-
+extern descriptor_data *descriptor_list;
+extern vector<string> continent_names;
+extern CVoteData *DCVote;
+extern struct room_data ** world_array;
+extern struct obj_data  *object_list;
+extern struct zone_data *zone_table;
+extern struct spell_info_type spell_info [ ];
 
 #endif /* SRC_INCLUDE_DC_H_ */

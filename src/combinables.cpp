@@ -21,6 +21,7 @@
 #include <string.h> // strstr()
 #include "returnvals.h"
 #include "combinables.h"
+#include "const.h"
 
 #include <vector>
 #include <algorithm>
@@ -35,7 +36,6 @@ using namespace std;
 using namespace Combinables;
 
 extern struct index_data *obj_index; 
-extern char *spells[];
 
 ////////////////////////////////////////////////////////////////////////////
 // local function declarations

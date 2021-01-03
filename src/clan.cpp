@@ -55,7 +55,7 @@ clan_data * end_clan_list = 0;
 
 #define MAX_CLAN_DESC_LENGTH 1022
 
-char * clan_rights[] = {
+const char * clan_rights[] = {
    "accept",
    "outcast",
    "read",
@@ -1689,7 +1689,7 @@ void do_god_clans(CHAR_DATA *ch, char *arg, int cmd)
   int32_t x;
   int16 skill;
 
-  char *god_values[] = {
+  const char *god_values[] = {
           "create", "rename", "leader", "delete", "addroom",
           "list", "save", "showrooms", "killroom", "email", 
           "description", "login", "logout", "death", "members", 
@@ -2197,7 +2197,7 @@ void do_leader_clans(CHAR_DATA *ch, char *arg, int cmd)
 //  int x;
   int16 skill;
 
-  char *mortal_values[] = {
+  const char *mortal_values[] = {
           "list", 
           "email", 
           "description", 
@@ -2208,7 +2208,7 @@ void do_leader_clans(CHAR_DATA *ch, char *arg, int cmd)
           "rights",
           "motd",
           "help",
-	  "log",
+	        "log",
           "\n"
   };
 

@@ -1,9 +1,7 @@
-/********************************
-| Level 104 wizard commands
-| 11/20/95 -- Azrack
-**********************/
-#include "wizard.h"
+#include <vector>
+#include <string>
 
+#include "wizard.h"
 #include "utility.h"
 #include "connect.h"
 #include "mobile.h"
@@ -17,14 +15,9 @@
 #include "returnvals.h"
 #include "spells.h"
 #include "race.h"
-#include <vector>
-#include <string>
+#include "const.h"
 
-extern struct room_data ** world_array;
 void save_corpses(void);
-extern char *obj_types[];
-extern std::vector<std::string> continent_names;
-
 
 int do_thunder(struct char_data *ch, char *argument, int cmd)
 {
@@ -97,8 +90,6 @@ int do_load(struct char_data *ch, char *arg, int cmd)
 
   char *c;
   int x, number =0, num = 0,cnt = 1;
-
-  extern int top_of_objt;
 
   char *types[] = {
     "mobile",
@@ -350,10 +341,6 @@ char* dirNumToChar(int dir)
 int show_zone_commands(struct char_data *ch, int i, int start = 0)
 {
   char buf[MAX_STRING_LENGTH];
-  extern char * zone_bits[];
-  extern char * zone_modes[];
-  extern char *equipment_types[];
-  extern int top_of_zonet;
   int k = 0;
   int num_to_show;
 
@@ -606,13 +593,6 @@ int do_show(struct char_data *ch, char *argument, int cmd) {
 	int count = 0;
 	int begin, end;
 
-	extern world_file_list_item * world_file_list;
-	extern world_file_list_item * mob_file_list;
-	extern world_file_list_item * obj_file_list;
-	extern char *dirs[];
-	extern int top_of_mobt;
-	extern int top_of_objt;
-	extern int top_of_world;
 
 //  half_chop(argument, type, name);
 	argument = one_argument(argument, type);
@@ -731,7 +711,6 @@ int do_show(struct char_data *ch, char *argument, int cmd) {
 			send_to_char("Couldn't find any MOBS by that NAME.\n\r", ch);
 	} /* "mobile" */
 	else if (is_abbrev(type, "counts") && has_range) {
-		extern int total_rooms;
 		csendf(ch, "$3Rooms$R: %d\r\n$3Mobiles$R: %d\r\n$3Objects$R: %d\r\n",
 				total_rooms, top_of_mobt, top_of_objt);
 		return eSUCCESS;
@@ -915,7 +894,6 @@ int do_show(struct char_data *ch, char *argument, int cmd) {
 	else if (is_abbrev(type, "rsearch") && has_range) {
 		char arg1[MAX_INPUT_LENGTH];
 		int zon, bits = 0, sector = 0;
-		extern char *room_bits[], *sector_types[];
 		argument = one_argument(argument, arg1);
 		if (!is_number(arg1)) {
 			send_to_char(
@@ -979,11 +957,6 @@ int do_show(struct char_data *ch, char *argument, int cmd) {
 		uint32 act[ACT_MAX / ASIZE + 1] = { };
 		int clas = 0, levlow = -555, levhigh = -555, immune = 0, race = -1,
 				align = 0;
-		extern char *action_bits[];
-		extern struct race_shit race_info[];
-		extern char *isr_bits[];
-		extern char *affected_bits[];
-		extern char *pc_clss_types2[];
 		//int its;
 //    if (
 		bool fo = FALSE;
@@ -1177,14 +1150,6 @@ int do_show(struct char_data *ch, char *argument, int cmd) {
 		int levlow = -555, levhigh = -555, dam = 0, lweight = -555, hweight =
 				-555;
 		int any = 0;
-		extern char *wear_bits[];
-		extern char *extra_bits[];
-		extern char *more_obj_bits[];
-		extern char *size_bitfields[];
-		extern char *spells[];
-		extern char *apply_types[];
-		extern char *item_types[];
-		extern char *strs_damage_types[];
 		bool fo = FALSE;
 		int item_type = 0;
 		int its = 0;
@@ -1624,7 +1589,6 @@ int do_teleport(struct char_data *ch, char *argument, int cmd)
    char person[MAX_INPUT_LENGTH], room[MAX_INPUT_LENGTH];
    int target;
    int loop;
-   //extern int top_of_world;
 
    if (IS_NPC(ch)) return eFAILURE;
 
@@ -2110,7 +2074,6 @@ int do_oclone(struct char_data *ch, char *argument, int cmd)
     }
   }
   obj = clone_object(r1);
-  extern bool has_random(OBJ_DATA *obj);
   if (!obj) {csendf(ch, "Failure. Unable to clone item.\r\n"); return eFAILURE; }
 
   if(obj_index[obj->item_number].non_combat_func ||

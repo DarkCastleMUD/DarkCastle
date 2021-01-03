@@ -27,6 +27,8 @@ extern "C"
 #include "interp.h"
 #include "spells.h"
 #include "clan.h" // clan right
+#include "inventory.h"
+
 
 using namespace std;
 
@@ -72,7 +74,6 @@ char *clanVName(int c);
 void vault_search_usage(CHAR_DATA *ch);
 
 extern struct index_data *obj_index;
-extern struct obj_data * search_char_for_item(char_data * ch, int16 item_number, bool wearOnly = FALSE);
 extern struct obj_data  *object_list;
 
 struct vault_data *has_vault(const char *name) 
@@ -1136,7 +1137,7 @@ void vault_get(CHAR_DATA *ch, char *object, char *owner) {
       return;
     }
 
-    if (IS_SET(obj->obj_flags.more_flags, ITEM_UNIQUE) && search_char_for_item(ch, obj->item_number)) { 
+    if (IS_SET(obj->obj_flags.more_flags, ITEM_UNIQUE) && search_char_for_item(ch, obj->item_number, false)) { 
       send_to_char("Why would you want another one of those?\r\n", ch);
       return;
     } 

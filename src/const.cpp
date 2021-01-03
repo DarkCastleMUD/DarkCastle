@@ -548,7 +548,7 @@ int rev_dir[] =
     4
 };
 
-char *connected_states[] =
+const char *connected_states[] =
 {
     "CON_PLAYING",
     "CON_GET_NAME",
@@ -599,7 +599,7 @@ int movement_loss[]=
     6   /* Arctic */
 };
 
-char *dirs[] =
+const char *dirs[] =
 {
     "north",
     "east",
@@ -610,7 +610,7 @@ char *dirs[] =
     "\n"
 };
 
-char *dirswards[] =
+const char *dirswards[] =
 {
     "northward",
     "eastward",
@@ -621,7 +621,7 @@ char *dirswards[] =
     "\n"
 };
 
-char *weekdays[7] =
+const char *weekdays[7] =
 {
     "Aetherday",
     "the Day of Firesong",
@@ -632,7 +632,7 @@ char *weekdays[7] =
     "Praiseday"
 };
 
-char *month_name[17] =
+const char *month_name[17] =
 {
     "Month of the Whistling Wind",           /* 0 */
     "Month of the Frozen Sky",
@@ -653,7 +653,7 @@ char *month_name[17] =
     "Month of Thin Shadows"
 };
 
-char *where[] =
+const char *where[] =
 {
     "<used as light> ",
     "<right finger>  ",
@@ -681,7 +681,7 @@ char *where[] =
     "<on penis>      "
 };
 
-char *strs_damage_types[] = 
+const char *strs_damage_types[] = 
 {
     "hit",
     "bludgeon",
@@ -709,7 +709,7 @@ char *strs_damage_types[] =
     "\n"
 };
 
-char *drinks[] =
+const char *drinks[] =
 {
     "water",
     "beer",
@@ -733,7 +733,7 @@ char *drinks[] =
     "\n"
 };
 
-char *drinknames[] =
+const char *drinknames[] =
 {
     "water",
     "beer",
@@ -778,7 +778,7 @@ int drink_aff[][3] =
     { 0,1,10 }
 };
 
-char *color_liquid[]=
+const char *color_liquid[]=
 {
     "clear",
     "brown",
@@ -800,7 +800,7 @@ char *color_liquid[]=
     "clear"
 };
 
-char *fullness[] =
+const char *fullness[] =
 {
     "less than half ",
     "about half ",
@@ -835,7 +835,7 @@ L(0x7FFFFFFF)
 #undef L
 
 
-char *mob_types[] =
+const char *mob_types[] =
 {
 		"NORMAL",
 		"GUARD",
@@ -843,7 +843,7 @@ char *mob_types[] =
 		"\n"
 };
 
-char *item_types[] =
+const char *item_types[] =
 {
     "UNDEFINED",
     "LIGHT",
@@ -882,7 +882,7 @@ char *item_types[] =
     "\n"
 };
 
-char *wear_bits[] =
+const char *wear_bits[] =
 {
     "TAKE",
     "FINGER",
@@ -906,7 +906,7 @@ char *wear_bits[] =
     "\n"
 };
 
-char *zone_modes[] =
+const char *zone_modes[] =
 {
     "Don't_Update",
     "RepopIfEmpty",
@@ -934,7 +934,7 @@ vector<string> get_cont_names()
 vector<string> continent_names = get_cont_names();
 
 
-char *zone_bits[] =
+const char *zone_bits[] =
 {
     "NO_TELEPORT",
     "IS_TOWN(keep out STAY_NO_TOWN mobs)",
@@ -947,7 +947,7 @@ char *zone_bits[] =
 };
 
 // new obj flags
-char *extra_bits[] =
+const char *extra_bits[] =
 {
     "GLOWING",
     "HUMMING",
@@ -986,7 +986,7 @@ char *extra_bits[] =
 
 // more_flags obj flags
 
-char *more_obj_bits[] =
+const char *more_obj_bits[] =
 {
     "NO_RESTRING",
     "UNUSED",
@@ -1005,7 +1005,7 @@ char *more_obj_bits[] =
     "\n"
 };
 
-char *size_bitfields[] =
+const char *size_bitfields[] =
 {
     "ANY",
     "SMALL",
@@ -1014,7 +1014,7 @@ char *size_bitfields[] =
     "\n"
 };
 
-char *size_bits[] =
+const char *size_bits[] =
 {
     "Any race",
     "Small races",
@@ -1023,7 +1023,7 @@ char *size_bits[] =
     "\n"
 };
 
-char *room_bits[] =
+const char *room_bits[] =
 {
     "dark",
     "nohome",
@@ -1059,13 +1059,13 @@ char *room_bits[] =
     "\n"
 };
 
-char *temp_room_bits[] =
+const char *temp_room_bits[] =
 {
     "ETHEREAL_FOCUS",
     "\n"
 };
 
-char *exit_bits[] =
+const char *exit_bits[] =
 {
     "IS-DOOR",
     "CLOSED",
@@ -1077,7 +1077,7 @@ char *exit_bits[] =
     "\n"
 };
 
-char *sector_types[] =
+const char *sector_types[] =
 {
     "inside",
     "city",
@@ -1098,7 +1098,7 @@ char *sector_types[] =
     "\n"
 };
 
-char *time_look[] =
+const char *time_look[] =
 {
     "night time",
     "sun rise",
@@ -1107,7 +1107,7 @@ char *time_look[] =
     "/n"
 };
 
-char *sky_look[] =
+const char *sky_look[] =
 {
     "cloudless",
     "cloudy",
@@ -1117,7 +1117,7 @@ char *sky_look[] =
     "/n"
 };
 
-char *equipment_types[] =
+const char *equipment_types[] =
 {
     "Special",
     "Worn Right finger",
@@ -1148,7 +1148,7 @@ char *equipment_types[] =
 
 
 /* Should be in exact correlation as the AFF types -Kahn */
-char *affected_bits[] =
+const char *affected_bits[] =
 { // When you modify this, modify skill_aff in mob_commands
     "BLIND",
     "INVISIBLE",
@@ -1228,7 +1228,7 @@ char *affected_bits[] =
 
 /* Should be in exact correlation as the APPLY types -Kahn */
 
-char *apply_types[] =
+const char *apply_types[] =
 {
     "NONE", // 0
     "STR",
@@ -1343,7 +1343,7 @@ char *apply_types[] =
     "\n"
 };
 
-char *pc_clss_types[] =
+const char *pc_clss_types[] =
 {
     "UNDEFINED",
     "Mage",
@@ -1361,7 +1361,8 @@ char *pc_clss_types[] =
     "Necromancer",
     "\n"
 };
-char *pc_clss_types2[] =
+
+const char *pc_clss_types2[] =
 {
     "UNDEFINED",
     "Mage",
@@ -1379,7 +1380,8 @@ char *pc_clss_types2[] =
     "Necromancer",
     "\n"
 };
-char *pc_clss_types3[] =
+
+const char *pc_clss_types3[] =
 {
     "UNDEFINED",
     "mage",
@@ -1400,7 +1402,7 @@ char *pc_clss_types3[] =
 
 
 
-char* pc_clss_abbrev[] =
+const char* pc_clss_abbrev[] =
 {
     "Und",
     "Mag",
@@ -1420,7 +1422,7 @@ char* pc_clss_abbrev[] =
 };
 
 
-char *class_tree_name[11][3] = {
+const char *class_tree_name[11][3] = {
   {"Warmage", "Spellbinder", "MAGE3"},
   {"Zealot", "Ritualist", "CLERIC3"},
   {"Pilferer", "Assassin", "THIEF3"},
@@ -1997,7 +1999,7 @@ struct class_skill_defines m_skills[] = { // mage skills
 
 
 
-char *languages[] =
+const char *languages[] =
 {
   "common"
   "human",
@@ -2018,7 +2020,7 @@ char *languages[] =
   "\n"
 };
 
-char *race_types[] =
+const char *race_types[] =
 {
     "Undefined",
     "Human",
@@ -2033,7 +2035,7 @@ char *race_types[] =
     "\n"
 };
 
-char *race_abbrev[] =
+const char *race_abbrev[] =
 {
     "Und",
     "Hum",
@@ -2165,7 +2167,7 @@ int mob_race_mod[][5] =
 {  16,  24,  20,  15,  15 }, // feline
 };
 
-char 
+const char 
 *action_bits[] = {
     "SPEC",
     "SENTINEL",
@@ -2208,7 +2210,7 @@ char
 };
 
 
-char *player_bits[] =
+const char *player_bits[] =
 {
     "BRIEF",
     "COMPACT",
@@ -2243,7 +2245,7 @@ char *player_bits[] =
     "\n"
 };
 
-char *punish_bits[] =
+const char *punish_bits[] =
 {
     "Silenced",
     "NoEmote",
@@ -2257,7 +2259,7 @@ char *punish_bits[] =
     "\n"
 };
 
-char *combat_bits[] =
+const char *combat_bits[] =
 {
     "Shocked",
     "Bash1",
@@ -2285,7 +2287,7 @@ char *combat_bits[] =
     "\n"
 };
 
-char *isr_bits[] =
+const char *isr_bits[] =
 {
     "PIERCE",
     "SLASH",
@@ -2316,7 +2318,7 @@ char *isr_bits[] =
 
 // Mortally wounded and Incapacitated are no longer used.
 // Dead is used in fight.C but should never been seen by a player
-char *position_types[] =
+const char *position_types[] =
 {
     "Dead",
     "Mortally wounded",
@@ -2330,7 +2332,7 @@ char *position_types[] =
     "\n"
 };
 
-char *connected_types[] =
+const char *connected_types[] =
 {
     "Playing",
     "Get name",
@@ -2774,7 +2776,7 @@ struct mob_matrix_data mob_matrix[] =
 /*110 */{11000000,30000, 80,100, -800, 6500000}
 };
 
-char *reserved[] = {
+const char *reserved[] = {
     "holy aura timer",
     "natural select timer",
     "divine intervention timer",
@@ -2798,4 +2800,79 @@ char *reserved[] = {
     "lilith ring reuse timer",
     "dawn reuse timer",
     "durendal resue timer"
+};
+
+bestowable_god_commands_type bestowable_god_commands[] =
+{
+{ "impchan",	COMMAND_IMP_CHAN, false },
+{ "snoop",	COMMAND_SNOOP, false },
+{ "restore",	COMMAND_RESTORE, false },
+{ "purloin",	COMMAND_PURLOIN, false },
+{ "possess",	COMMAND_POSSESS, false},
+{ "arena",	COMMAND_ARENA, false },
+{ "set",	COMMAND_SET, false },
+{ "load",	COMMAND_LOAD, false },
+{ "shutdown",   COMMAND_SHUTDOWN, false },
+{ "procedit",	COMMAND_MP_EDIT, false },
+{ "range",      COMMAND_RANGE, false },
+{ "procstat",	COMMAND_MPSTAT, false },
+{ "sedit",      COMMAND_SEDIT, false },
+{ "punish",     COMMAND_PUNISH, false },
+{ "sqedit",     COMMAND_SQEDIT, false },
+{ "hedit",      COMMAND_HEDIT, false },
+{ "opstat",	COMMAND_OPSTAT, false },
+{ "opedit",	COMMAND_OPEDIT, false },
+{ "force",	COMMAND_FORCE, false },
+{ "string",	COMMAND_STRING, false },
+{ "stat",	COMMAND_STAT, false },
+{ "sqsave",	COMMAND_SQSAVE, false },
+{ "find",	COMMAND_FIND, false },
+{ "log",	COMMAND_LOG, false },
+{ "addnews",	COMMAND_ADDNEWS, false },
+{ "prize",	COMMAND_PRIZE, false },
+{ "sockets",	COMMAND_SOCKETS, false },
+{ "qedit",	COMMAND_QEDIT, false },
+{ "rename",	COMMAND_RENAME, false },
+{ "findpath",   COMMAND_FINDPATH, true },
+{ "findpath2",  COMMAND_FINDPATH2, true },
+{ "addroom",    COMMAND_ADDROOM, true },
+{ "newpath",    COMMAND_NEWPATH, true },
+{ "listpathsbyzone", COMMAND_LISTPATHSBYZONE, true },
+{ "listallpaths",    COMMAND_LISTALLPATHS, true },
+{ "testhand",   COMMAND_TESTHAND, true },
+{ "dopathpath", COMMAND_DOPATHPATH, true },
+{ "testport", COMMAND_TESTPORT, false },
+{ "testuser", COMMAND_TESTUSER, false },
+{ "remort", COMMAND_REMORT, true },
+{ "testhit", COMMAND_TESTHIT, true },
+{ "\n",		-1 }
+};
+
+// WEAR, ITEM_WEAR correspondances
+int wear_corr[] =
+{
+  ITEM_LIGHT_SOURCE, //0
+  ITEM_WEAR_FINGER,
+  ITEM_WEAR_FINGER,
+  ITEM_WEAR_NECK,
+  ITEM_WEAR_NECK,
+  ITEM_WEAR_BODY, // 5
+  ITEM_WEAR_HEAD,
+  ITEM_WEAR_LEGS,
+  ITEM_WEAR_FEET,
+  ITEM_WEAR_HANDS, 
+  ITEM_WEAR_ARMS, // 10
+  ITEM_WEAR_SHIELD,
+  ITEM_WEAR_ABOUT,
+  ITEM_WEAR_WAISTE,
+  ITEM_WEAR_WRIST,
+  ITEM_WEAR_WRIST, //15
+  ITEM_WIELD,
+  ITEM_WIELD,
+  ITEM_HOLD,
+  ITEM_HOLD,
+  ITEM_WEAR_FACE,//20
+  ITEM_WEAR_EAR, 
+  ITEM_WEAR_EAR,
+  0
 };

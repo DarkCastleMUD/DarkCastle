@@ -576,7 +576,7 @@ struct command_info cmd_info[] =
 };
 
 
-char *fillwords[]=
+const char *fillwords[]=
 {
   "in",
   "from",
@@ -925,7 +925,7 @@ int command_interpreter( CHAR_DATA *ch, char *pcomm, bool procced  )
 }
 
 
-int old_search_block(char *arg, char **list, bool exact)
+int old_search_block(char *arg, const char **list, bool exact)
 {
   int i,l;
   
@@ -948,7 +948,7 @@ int old_search_block(char *arg, char **list, bool exact)
   return(-1);
 }
 
-int search_block(const char *orig_arg, char **list, bool exact)
+int search_block(const char *orig_arg, const char **list, bool exact)
 {
   int i;
 
@@ -988,7 +988,7 @@ int search_block(const char *orig_arg, char **list, bool exact)
 }
 
 
-int search_blocknolow(char *arg, char **list, bool exact) {
+int search_blocknolow(char *arg, const char **list, bool exact) {
 	int i;
 	unsigned int l = strlen(arg);
 
@@ -1024,7 +1024,7 @@ int do_boss(CHAR_DATA *ch, char *arg, int cmd)
 }
 
 
-int old_search_block(char *argument, int begin, int length, char **list, int mode) {
+int old_search_block(char *argument, int begin, int length, const char **list, int mode) {
 	int guess, found, search;
 
 	// If the word contains 0 letters, a match is already found

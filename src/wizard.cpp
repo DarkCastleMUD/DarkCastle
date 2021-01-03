@@ -19,16 +19,15 @@
 #include "returnvals.h"
 #include <unistd.h>
 #include "comm.h"
+#include "const.h"
+#include "inventory.h"
 
 #ifdef TWITTER
 #include <curl.h>
 #include <twitcurl.h>
 #endif
 
-extern struct obj_data * search_char_for_item(char_data * ch, int16 item_number, bool wearonly = FALSE);
-extern int getRealSpellDamage(char_data * ch);
-extern char *sector_types[];
-extern const char *utility_item_types[];
+int getRealSpellDamage(char_data * ch);
 
 int number_or_name(char **name, int *num)
 {
@@ -211,21 +210,6 @@ void boro_mob_stat(struct char_data *ch, struct char_data *k)
 	struct follow_type *fol;
 	struct obj_data  *j=0;
 	struct affected_type *aff;
-
-	extern char *skills[];
-	extern char *spells[];
-	// for chars
-	extern char *affected_bits[];
-	extern char *apply_types[];
-	extern char *pc_clss_types[];
-	// extern char *punish_bits[];
-	extern char *action_bits[];
-	//extern char *player_bits[];
-	extern char *combat_bits[];
-	extern char *position_types[];
-	extern char *connected_types[];
-	extern race_shit race_info[];
-	extern char *isr_bits[];
 
 	sprinttype(k->c_class, pc_clss_types, buf2);
 	sprintf(buf,
@@ -524,20 +508,6 @@ void mob_stat(struct char_data *ch, struct char_data *k)
  // extern char *ki[];
  // extern char *songs[];
   struct affected_type *aff;  
-
-  // for chars
-  extern char *affected_bits[];
-  extern char *apply_types[];
-  extern char *pc_clss_types[];
-  // extern char *punish_bits[];
-  extern char *action_bits[];
-  extern char *player_bits[];
-  extern char *combat_bits[];
-  extern char *position_types[];
-  extern char *connected_types[];
-  extern race_shit race_info[];
-  extern char *isr_bits[];
-  extern char *mob_types[];
   
   if (IS_MOB(k)) {
 		sprintf(buf,
@@ -825,7 +795,7 @@ void mob_stat(struct char_data *ch, struct char_data *k)
     send_to_char("\n\r$3Affecting Spells$R:\n\r--------------\n\r", ch);
     for(aff = k->affected; aff; aff = aff->next) {
 
-      char * aff_name = get_skill_name(aff->type);
+      const char * aff_name = get_skill_name(aff->type);
       
       if(!aff_name)
       {
@@ -894,19 +864,7 @@ void obj_stat(struct char_data *ch, struct obj_data *j)
   bool found;
   int i, virt;
 
-  /* for objects */
-  extern char *item_types[];
-  extern char *wear_bits[];
-  extern char *extra_bits[];
-  extern char *drinks[];
-  extern char *more_obj_bits[];
-  extern char *size_bits[];
-  extern char *spells[];
-  extern char *portal_bits[];
   int its;
-  /* For chars */
-  extern char *equipment_types[];
-  extern char *apply_types[];
 
 /*
     if(IS_SET(j->obj_flags.extra_flags, ITEM_DARK) && GET_LEVEL(ch) < POWER)
@@ -1845,7 +1803,7 @@ void pick_up_item(struct char_data *ch, struct obj_data *obj)
 			obj->short_description,oitem->short_description);
 		    send_info(buf);
                     if(IS_SET(oitem->obj_flags.more_flags, ITEM_UNIQUE)) {
-                      if(search_char_for_item(ch, oitem->item_number)) {
+                      if(search_char_for_item(ch, oitem->item_number, false)) {
                         send_to_char("The item's uniqueness causes it to poof into thin air!\r\n", ch);
                         extract_obj(oitem);
 			break; // Used to crash it.

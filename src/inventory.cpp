@@ -53,7 +53,6 @@ struct obj_data *create_money( int amount );
 int palm  (struct char_data *ch, struct obj_data *obj_object, struct obj_data *sub_object, bool has_consent);
 void special_log(char *arg);
 struct obj_data * bring_type_to_front(char_data * ch, int item_type);
-struct obj_data * search_char_for_item(char_data * ch, int16 item_number, bool wearonly = FALSE);
 bool search_container_for_item(obj_data * obj, int item_number);
 
 /* procedures related to get */
@@ -70,7 +69,7 @@ void get(struct char_data *ch, struct obj_data *obj_object, struct obj_data *sub
       // we only have to check for uniqueness if the container is not on the character
       // or if there is no container
       if(IS_SET(obj_object->obj_flags.more_flags, ITEM_UNIQUE)) {
-        if(search_char_for_item(ch, obj_object->item_number)) {
+        if(search_char_for_item(ch, obj_object->item_number, false)) {
            send_to_char("The item's uniqueness prevents it!\r\n", ch);
            return;
         }
@@ -973,7 +972,7 @@ int contents_cause_unique_problem(obj_data * obj, char_data * vict)
        continue;                       // this item, don't do it again. 
 
     if( IS_SET(inside->obj_flags.more_flags, ITEM_UNIQUE) &&
-        search_char_for_item(vict, inside->item_number))
+        search_char_for_item(vict, inside->item_number, false))
        return TRUE;
     lastnum = inside->item_number;
   }
@@ -1653,7 +1652,7 @@ int do_give(struct char_data *ch, char *argument, int cmd)
       } 
     }
     if(IS_SET(obj->obj_flags.more_flags, ITEM_UNIQUE)) {
-      if(search_char_for_item(vict, obj->item_number)) {
+      if(search_char_for_item(vict, obj->item_number, false)) {
          send_to_char("The item's uniqueness prevents it.\r\n", ch);
          csendf(vict, "%s tried to give you an item but was unable.\r\n", GET_NAME(ch));
          return eFAILURE;
@@ -1834,7 +1833,7 @@ bool search_container_for_item(obj_data * obj, int item_number)
 int find_door(CHAR_DATA *ch, char *type, char *dir)
 {
     int door;
-    char *dirs[] =
+    const char *dirs[] =
     {
         "north",
         "east",

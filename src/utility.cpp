@@ -44,6 +44,7 @@ extern "C"
 #include <sstream>
 #include <map>
 #include <fmt/format.h>
+#include <algorithm>
 
 #include "innate.h"
 #include "structs.h"
@@ -67,7 +68,7 @@ extern "C"
 #include "returnvals.h"
 #include "set.h"
 #include "DC.h"
-#include <algorithm>
+#include "const.h"
 
 using namespace std;
 
@@ -75,11 +76,6 @@ using namespace std;
   #define GZIP "gzip"
 #endif
 
-// extern vars
-extern index_data *obj_index;
-extern CWorld world;
-extern index_data *mob_index;
-extern zone_data *zone_table;
 extern std::map<int, std::map<uint8_t, std::string> > professions;
 
 // extern funcs
@@ -206,7 +202,7 @@ int dice( int num, int size )
 }
 
 // compare strings but ignore case (unlike strcmp)
-int str_cmp( char *arg1, char *arg2 )
+int str_cmp( const char *arg1, const char *arg2 )
 {
     int check, i;
 
@@ -229,7 +225,7 @@ int str_cmp( char *arg1, char *arg2 )
     return 0;
 }
 
-char *str_nospace(char *stri)
+char *str_nospace(const char *stri)
 {
   if (!stri) return "";
 
@@ -246,7 +242,7 @@ char *str_nospace(char *stri)
 }
 
 // compare strings but ignore case and change all spaces to underscores
-int str_nosp_cmp( char *arg1, char *arg2 )
+int str_nosp_cmp( const char *arg1, const char *arg2 )
 {
   char *tmp_arg1 = str_nospace(arg1);
   char *tmp_arg2 = str_nospace(arg2);
@@ -257,7 +253,7 @@ int str_nosp_cmp( char *arg1, char *arg2 )
   return retval;
 }
 
-int str_n_nosp_cmp( char *arg1, char *arg2, int size)
+int str_n_nosp_cmp( const char *arg1, const char *arg2, int size)
 {
   char *tmp_arg1 = str_nospace(arg1);
   char *tmp_arg2 = str_nospace(arg2);
@@ -439,7 +435,7 @@ void log(const char *str, int god_level, long type, char_data *vict)
 }
 
 // function for new SETBIT et al. commands
-void sprintbit( uint value[], char *names[], char *result )
+void sprintbit( uint value[], const char *names[], char *result )
 {
    int i;
    *result = '\0';
@@ -459,7 +455,7 @@ void sprintbit( uint value[], char *names[], char *result )
       strcat( result, "NoBits " );
 }
 
-void sprintbit( unsigned long vektor, char *names[], char *result )
+void sprintbit( unsigned long vektor, const char *names[], char *result )
 {
     long nr;
 
@@ -492,7 +488,7 @@ void sprintbit( unsigned long vektor, char *names[], char *result )
 }
 
 
-void sprinttype( int type, char *names[], char *result )
+void sprinttype( int type, const char *names[], char *result )
 {
     int nr;
 
@@ -504,7 +500,7 @@ void sprinttype( int type, char *names[], char *result )
 	strcpy( result, "Undefined" );
 }
 
-int consttype( char * search_str, char *names[] )
+int consttype( char * search_str, const char *names[] )
 {
     int nr;
 
@@ -515,7 +511,7 @@ int consttype( char * search_str, char *names[] )
     return -1;
 }
 
-char * constindex( int index, char *names[] )
+const char * constindex( int index, const char *names[] )
 {
     int nr;
 
@@ -1587,7 +1583,11 @@ int do_memoryleak(struct char_data *ch, char *argument, int cmd)
       send_to_char("The 'leak' command is not available to you.\r\n", ch);
       return eFAILURE;
    }
-   malloc(10);
+   void *ptr = malloc(10);
+   if (ptr == nullptr)
+   {
+     perror("malloc");
+   }
 
    send_to_char("A memory leak was just caused.\r\n", ch);
    return eSUCCESS;
@@ -1596,7 +1596,11 @@ int do_memoryleak(struct char_data *ch, char *argument, int cmd)
 // Used for debugging with dmalloc
 void cause_leak()
 {
-   malloc(10);
+   void *ptr = malloc(10);
+   if (ptr == nullptr)
+   {
+     perror("malloc");
+   }
 }
 
 int do_beep(struct char_data *ch, char *argument, int cmd)
@@ -1607,13 +1611,7 @@ int do_beep(struct char_data *ch, char *argument, int cmd)
 
 
 // if a skill has a valid name, return it, else NULL
-char* get_skill_name(int skillnum) {
-  extern char *skills[];
-  extern char *spells[];
-  extern char *songs[];
-  extern char *ki[];
-  extern char *innate_skills[];
-  extern char *reserved[];
+const char* get_skill_name(int skillnum) {
 
   if (skillnum >= SKILL_SONG_BASE && skillnum <= SKILL_SONG_MAX)
     return songs[skillnum - SKILL_SONG_BASE];
@@ -1675,7 +1673,7 @@ bool check_valid_and_convert(int & value, char * buf)
 }
 
 // modified for new SETBIT et al. commands
-void parse_bitstrings_into_int(char * bits[], const char * strings, char_data *ch, uint value[])
+void parse_bitstrings_into_int(const char * bits[], const char * strings, char_data *ch, uint value[])
 {
   bool found = FALSE;
 
@@ -1713,7 +1711,7 @@ void parse_bitstrings_into_int(char * bits[], const char * strings, char_data *c
 }
 
 // calls below uint32 version
-void parse_bitstrings_into_int(char * bits[], const char * strings, char_data * ch, uint16 & value)
+void parse_bitstrings_into_int(const char * bits[], const char * strings, char_data * ch, uint16 & value)
 {
   int  found = FALSE;
 
@@ -1755,7 +1753,7 @@ void parse_bitstrings_into_int(char * bits[], const char * strings, char_data * 
 // Finds the bits[] strings listed in "strings" and toggles the bit in "value"
 // Informs 'ch' of what has happened
 //
-void parse_bitstrings_into_int(char * bits[], const char * strings, char_data * ch, uint32 & value)
+void parse_bitstrings_into_int(const char * bits[], const char * strings, char_data * ch, uint32 & value)
 {
   int  found = FALSE;
 
@@ -1794,7 +1792,7 @@ void parse_bitstrings_into_int(char * bits[], const char * strings, char_data * 
 
 // Display a \n terminated list to the character
 //
-void display_string_list(char * list[], char_data *ch)
+void display_string_list(const char * list[], char_data *ch)
 {
   char buf[MAX_STRING_LENGTH];
   *buf = '\0';

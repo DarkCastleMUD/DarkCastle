@@ -2,16 +2,15 @@
 | Level 110 wizard commands
 | 11/20/95 -- Azrack
 **********************/
-extern "C"
-{
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
-#include <stdio.h>
+#include <cstdlib>
+#include <cstring>
+#include <cctype>
+#include <cstdio>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <assert.h>
-}
+#include <cassert>
+#include <unistd.h>
+
 
 #include <fstream>
 #include <iostream>
@@ -31,23 +30,11 @@ extern "C"
 #include "const.h"
 #include "db.h"
 #include "Leaderboard.h"
-
-#ifdef WIN32
-char *crypt(const char *key, const char *salt);
-#else
-#include <unistd.h>
-extern "C" {
-  char *crypt(const char *key, const char *salt);
-}
-#endif
+#include "guild.h"
+#include "const.h"
 
 
 void AuctionHandleRenames(CHAR_DATA *ch, string old_name, string new_name);
-
-extern world_file_list_item * obj_file_list;
-extern char *extra_bits[];
-extern char *wear_bits[];
-extern char *more_obj_bits[];
 
 int get_max_stat_bonus(CHAR_DATA *ch, int attrs)
 {
@@ -92,9 +79,6 @@ int do_maxes(struct char_data *ch, char *argument, int cmd)
   // get_skill_list uses a char argument, and so to keep upkeep
    // at a min I'm just modifying this here.
   int i;
-  extern char* pc_clss_types2[];
-  extern class_skill_defines *get_skill_list(char_data *ch);
-  extern char* race_types[];
   for (i=0; pc_clss_types2[i][0] != '\n';i++)
     if (!str_cmp(pc_clss_types2[i], arg))
        break;
@@ -851,7 +835,7 @@ int do_acfinder(CHAR_DATA *ch, char *argument, int cmdnum)
       send_to_char("Syntax: acfinder <wear slot>\r\n",ch);
       return eFAILURE;
   }
-  extern char *wear_bits[];
+
   int i = 1;
   for (; wear_bits[i][0] != '\n'; i++)
      if (!str_cmp(wear_bits[i],arg))
@@ -922,7 +906,7 @@ int do_testhit(char_data *ch, char *argument, int cmd)
 
 }
 
-void write_array_csv(char * const *array, ofstream &fout) {
+void write_array_csv(const char * const *array, ofstream &fout) {
 	int index = 0;
 	const char *ptr = array[index];
 	while (*ptr != '\n') {

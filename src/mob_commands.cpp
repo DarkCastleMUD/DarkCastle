@@ -33,8 +33,10 @@ extern "C"
 }
 
 #include <sys/types.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cstdarg>
+
 #include "fileinfo.h" 
 #include "act.h"
 #include "player.h"
@@ -53,7 +55,8 @@ extern "C"
 #include "innate.h"
 #include "arena.h"
 #include "race.h"
-#include <stdarg.h>
+#include "const.h"
+
 
 // external vars
 
@@ -1132,7 +1135,7 @@ int do_mpteachskill( CHAR_DATA *ch, char *argument, int cmd )
         return eFAILURE|eINTERNAL_ERROR;
     }
 
-    char * skillname = get_skill_name(skillnum);
+    const char * skillname = get_skill_name(skillnum);
 
     if(has_skill(victim, skillnum)) {
        csendf(victim, "You already know the basics of %s!\r\n", skillname ? skillname : "Unknown");
@@ -1667,7 +1670,7 @@ int do_mpbestow(CHAR_DATA *ch, char *argument, int cmd) {
 	int a = 0;
 	if (ch->beacon)
 		owner = (CHAR_DATA*) ch->beacon;
-	extern char *affected_bits[];
+
 	if (!victim)
 		victim = world[ch->in_room].people;
 	int z = 0;

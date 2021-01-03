@@ -29,7 +29,7 @@ void check_for_awaymsgs(char_data *);
 /*  handle some editor commands */
 void parse_action(int command, char *string, struct descriptor_data *d) {
    int indent = 0, rep_all = 0, flags = 0, total_len, replaced;
-   register int j = 0;
+   int j = 0;
    int i, line_low, line_high;
    char *s, *t, temp, buf[32768], buf2[32768];
    
@@ -583,7 +583,7 @@ void new_string_add(struct descriptor_data *d, char *str) {
 	// char *scan;
 	int terminator = 0, action = 0;
 	CHAR_DATA *ch = d->character;
-	register int i = 2, j = 0;
+	int i = 2, j = 0;
 	char actions[MAX_INPUT_LENGTH];
 
 	int a = 0;

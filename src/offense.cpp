@@ -6,10 +6,8 @@
 |   in class/
 */
 
-extern "C" 
-{
-#include <ctype.h>
-}
+#include <cctype>
+#include <cstring>
 
 #include "structs.h"
 #include "character.h"
@@ -21,14 +19,11 @@ extern "C"
 #include "mobile.h"
 #include "levels.h"
 #include "act.h"
-#include <string.h>
 #include "returnvals.h"
 #include "room.h"
 #include "db.h"
 #include "interp.h"
-
-extern CWorld world;
-extern struct index_data *mob_index;
+#include "const.h"
 
 int do_suicide(struct char_data *ch, char *argument, int cmd)
 {
@@ -82,7 +77,6 @@ int do_hit(struct char_data *ch, char *argument, int cmd)
 {
   char arg[MAX_STRING_LENGTH];
   struct char_data *victim, *k, *next_char;
-  extern struct char_data *combat_list;
   int count = 0;
   
   one_argument(argument, arg);

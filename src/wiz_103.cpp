@@ -16,9 +16,7 @@
 #include "spells.h"
 #include "clan.h"
 #include "race.h"
-
-extern char* pc_clss_types[];
-extern struct room_data ** world_array;
+#include "const.h"
 
 int do_boot(struct char_data *ch, char *arg, int cmd)
 {
@@ -301,10 +299,6 @@ int do_peace( struct char_data *ch, char *argument, int cmd )
 
 int do_matrixinfo(struct char_data *ch, char *argument, int cmd)
 {
-  extern struct race_shit race_info[];
-  extern char *isr_bits[];
-  extern char *race_abbrev[];
-
   char buf[MAX_STRING_LENGTH];
   int i = 0;
   buf[0] = '\0';

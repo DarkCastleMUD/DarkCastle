@@ -21,10 +21,8 @@
 /**************************************************************************/
 /* $Id: mob_act.cpp,v 1.52 2014/07/04 22:00:04 jhhudso Exp $ */
 
-extern "C"
-{
-#include <stdio.h>
-}
+#include <cstdio>
+#include <string.h>
 
 #include "character.h"
 #include "room.h"
@@ -38,22 +36,17 @@ extern "C"
 #include "handler.h"
 #include "interp.h"
 #include "returnvals.h"
-#include <string.h>
 #include "spells.h"
 #include "race.h" // Race defines used in align-aggro messages.
 #include "comm.h"
 #include "connect.h"
 #include "inventory.h"
+#include "const.h"
+
+
 #ifdef USE_TIMING
 #include "Timer.h"
 #endif
-
-extern struct index_data *mob_index;
-extern struct index_data *obj_index;
-extern CWorld world;
-extern struct zone_data *zone_table;
-
-extern struct race_shit race_info[33];
 
 int keywordfind(struct obj_data *obj_object);
 int hands_are_free(CHAR_DATA *ch, int number);

@@ -45,6 +45,7 @@
 #include "isr.h"
 #include "Leaderboard.h"
 #include "handler.h"
+#include "const.h"
 
 using namespace std;
 
@@ -62,12 +63,8 @@ extern char story[MAX_STRING_LENGTH];
 extern char *where[];
 extern char *color_liquid[];
 extern char *fullness[];
-extern char *sector_types[];
 extern char *sky_look[];
-extern char *room_bits[];
-extern char *temp_room_bits[];
-extern struct race_shit race_info[];
-extern char *spells[];
+extern const char *temp_room_bits[];
 
 /* Used for "who" */
 extern int max_who;
@@ -833,16 +830,6 @@ int do_identify(char_data *ch, char *argument, int cmd)
    bool found;
    int value;
 
-   /* Spell Names */
-   extern char *spells[];
-
-   /* For Objects */
-   extern char *item_types[];
-   extern char *extra_bits[];
-   extern char *more_obj_bits[];
-   extern char *apply_types[];
-   extern char *size_bits[];
-
    string arg1, remainder_args;
    tie (arg1, remainder_args) = half_chop(argument);
 
@@ -1023,7 +1010,7 @@ int do_look(struct char_data *ch, char *argument, int cmd) {
 	struct obj_data *tmp_object, *found_object;
 	struct char_data *tmp_char;
 	char *tmp_desc;
-	static char *keywords[] = { "north", "east", "south", "west", "up", "down",
+	static const char *keywords[] = { "north", "east", "south", "west", "up", "down",
 			"in", "at", "out", "through", "", /* Look at '' case */
 			"\n" };
 
@@ -1599,8 +1586,6 @@ int do_score(struct char_data *ch, char *argument, int cmd)
    bool modifyOutput;
 
    struct affected_type *aff;
-   extern char *apply_types[];
-   extern char *pc_clss_types[];
 
    int64 exp_needed;
    uint32 immune=0,suscept=0,resist=0;
@@ -1726,7 +1711,7 @@ int do_score(struct char_data *ch, char *argument, int cmd)
       modifyOutput = FALSE;
 
       // figure out the name of the affect (if any)
-      char *aff_name = get_skill_name(aff->type);
+      const char *aff_name = get_skill_name(aff->type);
 //	 if (aff_name)
       //      if (*aff_name && !str_cmp(aff_name, "fly")) flying = 1;
       switch (aff->type) {
@@ -1844,7 +1829,6 @@ int do_score(struct char_data *ch, char *argument, int cmd)
 
    found = FALSE;
 
-   extern char *affected_bits[];
 	for (int aff_idx = 1; aff_idx < (AFF_MAX + 1); aff_idx++)
    {
      if((!affect_found[aff_idx])

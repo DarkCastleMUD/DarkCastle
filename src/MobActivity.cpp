@@ -25,6 +25,7 @@ extern "C"
 #include "returnvals.h"
 #include "fileinfo.h"
 #include "MobActivity.h"
+#include "const.h"
 
 // Externs
 extern CWorld world;
@@ -103,8 +104,6 @@ void Path::resetPath()
   for( map<int, int>::iterator iter = begin(); iter != end(); iter++ )
     (*iter).second = 1000;
 }
-
-extern const char *dirs[];
 
 bool Path::findRoom(int from, int to, int steps, int leastSteps, char *buf)
 {

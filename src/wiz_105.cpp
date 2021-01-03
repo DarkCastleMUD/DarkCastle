@@ -15,6 +15,7 @@
 #include "returnvals.h"
 #include "innate.h"
 #include "fileinfo.h"
+#include "const.h"
 
 int do_clearaff(struct char_data *ch, char *argument, int cmd)
 {
@@ -312,7 +313,6 @@ char *print_classes(int bitv)
   static char buf[512];
   int i = 0;
   buf[0] = '\0';
-  extern char*pc_clss_types2[];
  
   for (; *pc_clss_types2[i] != '\n'; i++)
   {
@@ -350,7 +350,6 @@ int do_sqedit(struct char_data *ch, char *argument, int cmd)
   argument = one_argument(argument,command);
     int clas = 1;
        
-  extern char*pc_clss_types2[];
   const char *fields [] = {
     "new",
     "delete",

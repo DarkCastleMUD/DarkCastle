@@ -39,11 +39,9 @@
 #include "set.h"
 #include "structs.h"
 #include "guild.h"
+#include "const.h"
 
 using namespace std;
-
-extern vector<string> continent_names;
-extern CVoteData *DCVote;
 
 // Urizen's rebuild rnum references to enable additions to mob/obj arrays w/out screwing everything up.
 // A hack of renum_zone_tables *yawns*
@@ -104,10 +102,6 @@ int do_check(struct char_data *ch, char *arg, int cmd) {
   char buf[120];
   char tmp_buf[160];
   char *c;
-
-  extern struct race_shit race_info[];
-  extern char *pc_clss_types[]; 
-  // extern char *punish_bits[];
 
   while(isspace(*arg))
     arg++;
@@ -651,10 +645,8 @@ int do_zedit(struct char_data *ch, char *argument, int cmd)
   int zone, last_cmd;
   int robj, rmob;
   int show_zone_commands(struct char_data * ch, int i, int start = 0);
-  extern char *zone_modes[];
-  extern int top_of_zonet;
 
-  char * zedit_values[] = {
+  const char * zedit_values[] = {
     "remove", "add", "edit", "list", "name", 
     "lifetime", "mode", "flags", "help", "search", 
     "swap", "copy", "continent",
@@ -1157,7 +1149,7 @@ int do_sedit(struct char_data *ch, char *argument, int cmd)
   int16 learned;
   int i;
 
-  char * sedit_values[] = {
+  const char * sedit_values[] = {
     "add", 
     "remove", 
     "set", 
@@ -1314,7 +1306,7 @@ int do_sedit(struct char_data *ch, char *argument, int cmd)
       send_to_char(buf, ch);
       for(skill = vict->skills; skill; skill = skill->next)
       {
-        char * skillname = get_skill_name(skill->skillnum);
+        const char * skillname = get_skill_name(skill->skillnum);
 
         if(skillname) {
           sprintf(buf, "  %-15s%d\r\n", skillname, skill->learned);
@@ -1355,7 +1347,7 @@ int oedit_exdesc(char_data * ch, int item_num, char * buf)
     extra_descr_data * curr = NULL;
     extra_descr_data * curr2 = NULL;
 
-    char * fields[] =
+    const char * fields[] =
     {
       "new",
       "delete",
@@ -1519,9 +1511,7 @@ int oedit_affects(char_data * ch, int item_num, char * buf)
     int  num;
     int  modifier;
 
-    extern char *apply_types[];
-
-    char * fields[] =
+    const char * fields[] =
     {
       "new",
       "delete",
@@ -1732,14 +1722,7 @@ int do_oedit(struct char_data *ch, char *argument, int cmd)
     int  intval = 0;
     int  x, i;
 
-    extern char *item_types[];
-    extern char *wear_bits[];
-    extern char *size_bitfields[];
-    extern char *extra_bits[];
-    extern char *more_obj_bits[];
-    extern struct obj_data  *object_list;
-
-    char *fields[] = 
+    const char *fields[] = 
     {
       "keywords",
       "longdesc",
@@ -2290,7 +2273,7 @@ int do_procedit(struct char_data *ch, char *argument, int cmd)
 
   void mpstat(CHAR_DATA *ch, CHAR_DATA *victim);
 
-  char *fields[] = { "add", "remove", "type", "arglist", "command", "list", "\n" };
+  const char *fields[] = { "add", "remove", "type", "arglist", "command", "list", "\n" };
 
   if (IS_NPC(ch))
     return eFAILURE;
@@ -2684,15 +2667,7 @@ int do_medit(struct char_data *ch, char *argument, int cmd) {
 	int intval = 0;
 	int x, i;
 
-	extern char *pc_clss_types[];
-	extern char *action_bits[];
-	extern char *affected_bits[];
-	extern char *isr_bits[];
-	extern char *position_types[];
-	extern int mob_race_mod[][5];
-	extern char *mob_types[];
-
-	char *fields[] = { "keywords", "shortdesc", "longdesc", "description",
+	const char *fields[] = { "keywords", "shortdesc", "longdesc", "description",
 			"sex", "class", "race", "level", "alignment", "loadposition",
 			"defaultposition", "actflags", "affectflags", "numdamdice",
 			"sizedamdice", "damroll", "hitroll", "hphitpoints", "gold",
@@ -3595,14 +3570,11 @@ int do_medit(struct char_data *ch, char *argument, int cmd) {
 int do_redit(struct char_data *ch, char *argument, int cmd)
 {
     string buf, remainder_args;
-    extern char *dirs[];
-    extern char *room_bits[];
-    extern char *sector_types[];
     int x, a, b, c, d = 0;
     struct extra_descr_data *extra;
     struct extra_descr_data *ext;
 
-    char *return_directions[] =
+    const char *return_directions[] =
     {
       "south",
       "west",
@@ -3991,7 +3963,6 @@ int do_rdelete(struct char_data *ch, char *arg, int cmd)
   int x;
   char buf[50], buf2[50];
   struct extra_descr_data *i, *extra;
-  extern char *dirs[];
 
   half_chop(arg, buf, buf2);
 
@@ -4116,8 +4087,6 @@ int do_zsave(struct char_data *ch, char *arg, int cmd)
   char buf[180];
   char buf2[180];
 
-  extern struct zone_data *zone_table;
-
   if(!can_modify_room(ch, ch->in_room)) {
     send_to_char("You may only zsave inside of the room range you are assigned to.\n\r", ch);
     return eFAILURE;
@@ -4158,10 +4127,10 @@ int do_rsave(struct char_data *ch, char *arg, int cmd)
   FILE *f = (FILE *)NULL;
   world_file_list_item * curr;
 
-  extern world_file_list_item * world_file_list;
+
 
   if(!can_modify_room(ch, ch->in_room)) {
-    send_to_char("You may only rsave inside of the room range you are assigned to.\n\r", ch);
+   send_to_char("You may only rsave inside of the room range you are assigned to.\n\r", ch);
     return eFAILURE;
   }
 
@@ -4210,8 +4179,6 @@ int do_msave(struct char_data *ch, char *arg, int cmd)
   world_file_list_item * curr;
   char buf[180];
   char buf2[180];
-
-  extern world_file_list_item * mob_file_list;
 
   if (ch->pcdata->last_mob_edit <= 0)
   {
@@ -4272,8 +4239,6 @@ int do_osave(struct char_data *ch, char *arg, int cmd)
   char buf[180];
   char buf2[180];
 
-  extern world_file_list_item * obj_file_list;
-
   if (ch->pcdata->last_obj_edit <= 0)
   {
     send_to_char("You have not recently edited an item.\r\n",ch);
@@ -4325,8 +4290,6 @@ int do_osave(struct char_data *ch, char *arg, int cmd)
 
 int do_instazone(struct char_data *ch, char *arg, int cmd) {
 	FILE *fl;
-	extern struct char_data *character_list;
-	extern struct obj_data *object_list;
 	char buf[200], bufl[200]/*,buf2[200],buf3[200]*/;
 	int room = 1, x, door/*,direction*/;
 	int pos;
@@ -4611,12 +4574,6 @@ int do_rstat(struct char_data *ch, char *argument, int cmd)
     struct extra_descr_data *desc;
     int i, x, loc;
 
-    /* for rooms */
-    extern char *dirs[];
-    extern char *room_bits[];
-    extern char *exit_bits[];
-    extern char *sector_types[];
-
     if (IS_NPC(ch))
         return eFAILURE;
 
@@ -4839,15 +4796,13 @@ int do_return(struct char_data *ch, char *argument, int cmd)
 
 int do_sockets(struct char_data *ch, char *argument, int cmd)
 {
-   char * pStr     = 0;
+   const char * pStr     = 0;
    int num_can_see = 0;
 
    char name[200];
    char buf[MAX_STRING_LENGTH];
 
    descriptor_data * d = 0, *ad = 0;
-
-   extern char *connected_states[];
 
    if (IS_NPC(ch)) {
       send_to_char( "Monsters don't care who's logged in.\n\r", ch );

@@ -102,20 +102,20 @@ struct ki_info_type ki_info [ ] = {
 
 };
 
-char *ki[] = {
-	"blast",
-	"punch",
-	"sense",
-	"storm",
-        "speed",
-        "purify",
-        "disrupt",
-        "stance",
-        "agility",
-        "meditation",
-	"transfer",
-	"\n"
-};
+const char *ki[] = {
+    "blast",
+    "punch",
+    "sense",
+    "storm",
+    "speed",
+    "purify",
+    "disrupt",
+    "stance",
+    "agility",
+    "meditation",
+    "transfer",
+    "\n"};
+
 int16 use_ki(CHAR_DATA *ch, int kn);
 bool ARE_GROUPED(CHAR_DATA *sub, CHAR_DATA *obj);
 

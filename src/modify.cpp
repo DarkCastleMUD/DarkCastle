@@ -49,12 +49,12 @@ void show_string(struct descriptor_data *d, char *input);
 void check_for_awaymsgs(char_data *ch);
 void page_string_dep(struct descriptor_data *d, const char *str, int keep_internal);
 
-char *string_fields[] = { "name", "short", "long", "description", "title", "delete-description", "\n" };
+const char *string_fields[] = { "name", "short", "long", "description", "title", "delete-description", "\n" };
 
 // maximum length for text field x+1 
 int length[] = { 40, 60, 256, 240, 60 };
 
-char *skill_fields[] = { "learned", "recognize", "\n" };
+const char *skill_fields[] = { "learned", "recognize", "\n" };
 
 // TODO - I'd like to put together some sort of "post office" for sending "mail"
 //  to players that are offline.  (they get notified when they login, and have to

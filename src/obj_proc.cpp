@@ -25,6 +25,8 @@
 #include "set.h"
 #include "arena.h"
 #include "race.h"
+#include "const.h"
+#include "inventory.h"
 
 #include <vector>
 #include <string>
@@ -44,7 +46,6 @@ extern CHAR_DATA *initiate_oproc(CHAR_DATA *ch, OBJ_DATA *obj);
 extern void end_oproc(CHAR_DATA *ch);
 
 extern void reset_zone(int zone);
- extern struct obj_data * search_char_for_item(char_data * ch, int16 item_number, bool wearonly = FALSE);
 
 extern struct mprog_throw_type *g_mprog_throw_list;
 
@@ -1004,7 +1005,7 @@ bool assemble_item_index(char_data *ch, int item_index)
 
 	// Check if the item to be assembled is marked UNIQUE but the player already has one
 	if (IS_SET(item->obj_flags.more_flags, ITEM_UNIQUE)) {
-		if (search_char_for_item(ch, item_real)) {
+		if (search_char_for_item(ch, item_real, false)) {
 			send_to_char("You already have one of those!\r\n", ch);
 			return true;
 		}
@@ -2371,7 +2372,7 @@ int szrildor_pass_checks(struct char_data *ch, struct obj_data *obj, int cmd, ch
     if (i->in_room == real_room(30096))
       continue;
 
-    if (!search_char_for_item(i, real_object(30097)) || (++count) > 4)
+    if (!search_char_for_item(i, real_object(30097), false) || (++count) > 4)
     {
       act("Jeff arrives and frowns.\r\n$B$7Jeff says, 'Hey! You don't have a pass. Get the heck outta here!'$R", i, 0, 0, TO_CHAR, 0);
       act("Jeff arrives and frowns at $n.\r\n$B$7Jeff says, 'Hey! You don't have a pass. Get the heck outta here!'$R", i, 0, 0, TO_ROOM, 0);
@@ -2974,8 +2975,6 @@ int gotta_dance_boots(struct char_data*ch, struct obj_data *obj, int cmd, char*a
 int random_dir_boots(struct char_data*ch, struct obj_data *obj, int cmd, char*arg, 
                    CHAR_DATA *invoker)
 {
-   extern char *dirs[];
-
    if(cmd)
       return eFAILURE;
 

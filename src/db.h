@@ -165,6 +165,7 @@ string lf_to_crlf(string &s1);
 void copySaveData(obj_data *new_obj, obj_data *obj);
 bool verify_item(struct obj_data **obj);
 bool fullItemMatch(obj_data *obj, obj_data *obj2);
+bool has_random(OBJ_DATA *obj);
 
 extern int top_of_objt;
 extern time_t start_time; /* mud start time */

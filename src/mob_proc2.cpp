@@ -13,6 +13,10 @@
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
 /* $Id: mob_proc2.cpp,v 1.89 2012/05/25 02:15:46 jhhudso Exp $ */
+#include <string.h>
+
+using namespace std;
+
 #include "room.h"
 #include "obj.h"
 #include "connect.h"
@@ -25,11 +29,10 @@
 #include "levels.h"
 #include "interp.h"
 #include "act.h"
-#include <string.h>
 #include "returnvals.h"
 #include "spells.h"
-
-extern struct obj_data * search_char_for_item(char_data * ch, int16 item_number, bool wearonly = FALSE);
+#include "const.h"
+#include "inventory.h"
 
 extern struct obj_data *object_list;
 extern struct index_data *obj_index;
@@ -463,7 +466,6 @@ char *gl_item(OBJ_DATA *obj, int number, CHAR_DATA *ch, bool platinum = TRUE) {
 	else
 		sprintf(buf, "$B$7%-2d$R) $3$B%s$R ", number + 1, obj->short_description);
 
-	extern char* apply_types[];
 	if (obj->obj_flags.type_flag == ITEM_WEAPON) { // weapon
 		sprintf(buf, "%s%dd%d, %s, ", buf, obj->obj_flags.value[1], obj->obj_flags.value[2],
 		IS_SET(obj->obj_flags.extra_flags, ITEM_TWO_HANDED) ? "Two-handed" : "One-handed");
@@ -503,8 +505,6 @@ char *gl_item(OBJ_DATA *obj, int number, CHAR_DATA *ch, bool platinum = TRUE) {
 			}
 		}
 	} else {
-		extern char *extra_bits[];
-
 		uint32 a = obj->obj_flags.extra_flags;
 		a &= ALL_CLASSES;
 		sprintbit(a, extra_bits, buf2);
@@ -571,7 +571,6 @@ int godload_sales(struct char_data *ch, struct obj_data *obj, int cmd, char *arg
 			do_tell(owner, buf, 0);
 			return eSUCCESS;
 		}
-		extern char* pc_clss_types3[];
 		sprintf(buf, "%s Here's what I can do for you, %s.", GET_NAME(ch), pc_clss_types3[GET_CLASS(ch)]);
 		do_tell(owner, buf, 0);
 		for (int z = 0; z < 13 && platsmith_list[o].sales[z] != 0; z++) {
@@ -610,7 +609,7 @@ int godload_sales(struct char_data *ch, struct obj_data *obj, int cmd, char *arg
 		struct obj_data *obj;
 		obj = clone_object(real_object(platsmith_list[o].sales[k]));
 
-		if (class_restricted(ch, obj) || size_restricted(ch, obj) || search_char_for_item(ch, obj->item_number)) {
+		if (class_restricted(ch, obj) || size_restricted(ch, obj) || search_char_for_item(ch, obj->item_number, false)) {
 			sprintf(buf, "%s That item is not available to you.", GET_NAME(ch));
 			do_tell(owner, buf, 0);
 			extract_obj(obj);

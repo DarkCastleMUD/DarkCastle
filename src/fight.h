@@ -28,8 +28,6 @@ int noncombat_damage(CHAR_DATA * ch, int dam, char *char_death_msg,
 void send_damage(char const *, CHAR_DATA *, OBJ_DATA *, CHAR_DATA *, char const *, char const *, int);
 int getRealSpellDamage(CHAR_DATA *ch);
  
-/* extern CHAR_DATA *combat_list = NULL, *combat_next_dude = NULL; */
-
 #define FIRST 	    WIELD
 #define SECOND 	    SECOND_WIELD
 

@@ -32,7 +32,7 @@ struct game_portal game_portals[MAX_GAME_PORTALS];
 |   hard coded!
 */
 
-char * portal_bits[] = {
+const char * portal_bits[] = {
   "NO_LEAVE",
   "NO_ENTER",
   "\n"

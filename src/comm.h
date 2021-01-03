@@ -4,8 +4,9 @@
 #ifndef __COMM_H__
 #define __COMM_H__
 
-#include "character.h"
+#include <string>
 
+using namespace std;
 typedef int socket_t;
 
 #define SEND_TO_Q(messg, desc)  write_to_output((messg), desc)
@@ -49,6 +50,7 @@ struct pulse_info {
 #define BAN_ALL         3
 
 
+#include "character.h"
 
 //void     write_to_output(const char *txt, struct descriptor_data *d);
 void     write_to_output(const char *txt, struct descriptor_data *d);

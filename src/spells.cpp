@@ -571,7 +571,7 @@ struct skill_stuff skill_info[] =
 
 
 
-char *skills[]=
+const char *skills[]=
 {
   "trip",    // 0
   "dodge",
@@ -718,7 +718,7 @@ char *skills[]=
   "\n"
 };
 
-char *spells[]=
+const char *spells[]=
 {
    "armor",               /* 1 */
    "teleport",
@@ -1460,7 +1460,7 @@ int do_release(CHAR_DATA *ch, char *argument, int cmd)
              aff->type == SPELL_HOLY_AURA) && aff->type != SPELL_IMMUNITY)
        { // Spells that default to self seems a good measure of
 	 // allow to release spells..
-         char * aff_name = get_skill_name(aff->type);
+         const char * aff_name = get_skill_name(aff->type);
 	 send_to_char(aff_name,ch);
          send_to_char("\r\n",ch);
        }

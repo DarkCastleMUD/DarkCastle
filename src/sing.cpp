@@ -9,6 +9,7 @@ extern "C" {
 #include <stdlib.h>
 #include <string.h>
 }
+#include <vector>
 
 #include "sing.h"
 #include "room.h"
@@ -28,7 +29,9 @@ extern "C" {
 #include "magic.h" // dispel_magic
 #include "innate.h" // SKILL_INNATE_EVASION
 #include "returnvals.h"
-#include <vector>
+#include "const.h"
+#include "inventory.h"
+
 extern CWorld world;
 extern index_data *mob_index;
 char_data *origsing = NULL;
@@ -191,7 +194,7 @@ NULL, NULL, SKILL_INCREASE_MEDIUM }, { /* 30 */
 TAR_IGNORE, 2, song_summon_song, execute_song_summon_song, NULL,
 NULL, SKILL_INCREASE_MEDIUM }, };
 
-char *songs[] = {  "listsongs", "whistle sharp", "stop", /* If you move stop, update do_sing */
+const char *songs[] = {  "listsongs", "whistle sharp", "stop", /* If you move stop, update do_sing */
 "travelling march", "bountiful sonnet", "insane chant", "glitter dust", "synchronous chord", "healing melody", "sticky lullaby", "revealing staccato",
 		"flight of the bumblebee", "jig of alacrity", "note of knowledge", "terrible clef", "soothing rememberance", "forgetful rhythm", "searching song",
 		"vigilant siren", "astral chanty", "disarming limerick", "shattering resonance", "irresistable ditty", "fanatical fanfare", "dischordant dirge",
@@ -1537,10 +1540,9 @@ void do_astral_chanty_movement(CHAR_DATA *victim, CHAR_DATA *target) {
 	}
 
 	CHAR_DATA *tmpch;
-	extern struct obj_data * search_char_for_item(char_data * ch, int16 item_number, bool wearonly = FALSE);
-
+	
 	for (tmpch = world[target->in_room].people; tmpch; tmpch = tmpch->next_in_room)
-		if (search_char_for_item(tmpch, real_object(76)) || search_char_for_item(tmpch, real_object(51))) {
+		if (search_char_for_item(tmpch, real_object(76), false) || search_char_for_item(tmpch, real_object(51), false)) {
 			send_to_char("Your astral travels fail to find your destination.\n\r", victim);
 			return;
 		}
@@ -1584,10 +1586,9 @@ int execute_song_astral_chanty(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA 
 	} else {
 
 		CHAR_DATA *tmpch;
-		extern struct obj_data * search_char_for_item(char_data * ch, int16 item_number, bool wearonly = FALSE);
 
 		for (tmpch = world[victim->in_room].people; tmpch; tmpch = tmpch->next_in_room)
-			if (search_char_for_item(tmpch, real_object(51))) {
+			if (search_char_for_item(tmpch, real_object(51), false)) {
 				send_to_char("$B$1Phire whispers, 'You had to know I wouldn't make it THAT easy now didn't you? You're just going to have to walk!$R\r\n", ch);
 				status = eFAILURE;
 				break;
@@ -2604,8 +2605,6 @@ int execute_song_synchronous_chord(ubyte level, CHAR_DATA *ch, char *arg, CHAR_D
 		if ((*i).song_number == SKILL_SONG_SYNC_CHORD - SKILL_SONG_BASE)
 			break;
 	}
-
-	extern char *isr_bits[];
 
 	target = get_char_room_vis(ch, (*i).song_data);
 

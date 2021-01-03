@@ -37,6 +37,7 @@ extern "C"
 #include "shop.h"
 #include "spells.h"
 #include "inventory.h"
+#include "const.h"
 
 extern struct index_data *mob_index;
 
@@ -51,7 +52,6 @@ struct shop_data shop_index[MAX_SHOP];
 int max_shop;
 
 // extern function
-struct obj_data * search_char_for_item(char_data * ch, int16 item_number, bool wearonly = FALSE);
 int fwrite_string(char *buf, FILE *fl);
 
 /*
@@ -231,7 +231,7 @@ void shopping_buy( char *arg, CHAR_DATA *ch,
     }
 
     if(IS_SET(obj->obj_flags.more_flags, ITEM_UNIQUE)) {
-      if(search_char_for_item(ch, obj->item_number)) {
+      if(search_char_for_item(ch, obj->item_number, false)) {
          send_to_char("The item's uniqueness prevents it!\r\n", ch);
          return;
       }
@@ -393,9 +393,6 @@ void shopping_value( char *arg, CHAR_DATA *ch,
     struct obj_data *obj;
     int cost;
     bool keeperhas = FALSE;
-    extern char *extra_bits[];
-    extern char *size_bits[];
-    extern char *spells[];
 
     if ( !is_ok( keeper, ch, shop_nr ) )
         return;
@@ -1250,7 +1247,7 @@ void player_shopping_design(char * arg, char_data * ch, char_data * keeper)
   if(IS_NPC(ch))   
     return;
 
-  char * pdesign_values [] = {
+  const char * pdesign_values [] = {
     "sellmessage",
     "roomname",
     "roomdesc",
@@ -1630,7 +1627,7 @@ int eddie_shopkeeper(struct char_data *ch, struct obj_data *obj, int cmd, char *
       return eSUCCESS;
     }
 
-    int count = search_char_for_item_count(ch, real_object(eddie[choice-1].cost_vnum));
+    int count = search_char_for_item_count(ch, real_object(eddie[choice-1].cost_vnum), false);
 
     if (count < eddie[choice-1].cost_qty) {
       send_to_char("You don't have enough to trade.\n\r", ch);
@@ -1638,7 +1635,7 @@ int eddie_shopkeeper(struct char_data *ch, struct obj_data *obj, int cmd, char *
     }
 
     for (int i=0; i < eddie[choice-1].cost_qty; i++) {
-      obj_data *obj = search_char_for_item(ch, real_object(eddie[choice-1].cost_vnum));
+      obj_data *obj = search_char_for_item(ch, real_object(eddie[choice-1].cost_vnum), false);
       if (obj != 0) {
 	if (obj->in_obj) {
 	  obj_from_obj(obj);

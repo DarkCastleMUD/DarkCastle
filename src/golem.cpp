@@ -3,6 +3,10 @@
    Separated all this from the rest(by putting it in save.cpp,
    magic.cpp, etc) to have all the golem code in one place.
 */
+#include <string.h>
+
+using namespace std;
+
 #include "character.h"
 #include "structs.h"
 #include "spells.h"
@@ -11,7 +15,6 @@
 #include "player.h"
 #include "db.h"
 #include "interp.h"
-#include <string.h>
 #include "returnvals.h"
 #include "ki.h"
 #include "fileinfo.h"
@@ -22,16 +25,11 @@
 #include "affect.h"
 #include "utility.h"
 #include "isr.h"
-#ifdef LEAK_CHECK
-
-#endif
 #include "handler.h"
+#include "const.h"
+
 // Locals
 void advance_golem_level(CHAR_DATA *golem);
-
-// db.cpp
-extern struct index_data *obj_index;
-extern struct index_data *mob_index;
 
 // save.cpp
 int store_worn_eq(char_data * ch, FILE * fpsave);
@@ -42,9 +40,6 @@ extern int hit_gain(CHAR_DATA *ch);
 extern int mana_gain(CHAR_DATA*ch);
 extern int ki_gain(CHAR_DATA *ch);
 extern int move_gain(CHAR_DATA *ch, int extra);
-
-// const.cpp
-extern struct race_shit race_info[];
 
 
 struct golem_data
@@ -365,8 +360,6 @@ int do_golem_score(struct char_data *ch, char *argument, int cmd)
    }
    ch = ch->pcdata->golem;
    struct affected_type *aff;
-   extern char *apply_types[];
-   extern char *pc_clss_types[];
 
    int64 exp_needed;
 
@@ -495,7 +488,7 @@ int do_golem_score(struct char_data *ch, char *argument, int cmd)
             continue;
          scratch = frills[level];
          // figure out the name of the affect (if any)
-         char * aff_name = get_skill_name(aff->type);
+         const char * aff_name = get_skill_name(aff->type);
          switch(aff->type) {
            case FUCK_CANTQUIT:
              aff_name = "CANT_QUIT";

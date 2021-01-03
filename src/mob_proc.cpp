@@ -14,6 +14,8 @@
  ***************************************************************************/
 /* $Id: mob_proc.cpp,v 1.208 2014/07/31 01:07:24 jhhudso Exp $ */
 #include <assert.h>
+#include <string.h>
+
 #include "character.h"
 #include "structs.h"
 #include "utility.h"
@@ -34,8 +36,9 @@
 #include "sing.h" // bard skills
 #include "act.h"
 #include "ki.h" // monk skills
-#include <string.h>
 #include "returnvals.h"
+#include "const.h"
+
 
 /*   external vars  */
 
@@ -3341,7 +3344,7 @@ int druid_familiar_owl_non(struct char_data *ch, struct obj_data *obj, int cmd, 
 	return eSUCCESS;
      }
      int dir;
-     extern char *dirs[];
+
      for (dir = 0; *dirs[dir] != '\n'; dir++)
        if (!str_cmp(dirs[dir], arg2))
          break;

@@ -14,6 +14,8 @@
  ***************************************************************************/
 
 #include <assert.h>
+#include <string.h>
+
 #include "character.h"
 #include "structs.h"
 #include "utility.h"
@@ -34,9 +36,9 @@
 #include "sing.h"
 #include "act.h"
 #include "ki.h"
-#include <string.h>
 #include "returnvals.h"
 #include "obj.h"
+#include "const.h"
 
 /*
 
@@ -1516,8 +1518,6 @@ char *race_message(char_data *ch, int race)
 	sprintf(buf, "%d platinum coins.", changecost(GET_RACE(ch), race));
 	return &buf[0];
 }
-
-extern struct race_shit race_info[];
 
 int cardinal(struct char_data *ch, struct obj_data *obj, int cmd, char *argument, struct char_data *owner)
 {

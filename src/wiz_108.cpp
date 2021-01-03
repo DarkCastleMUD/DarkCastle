@@ -13,12 +13,9 @@
 #include "spells.h"
 #include <string>
 #include "game_portal.h"
+#include "const.h"
 
 using namespace std;
-
-extern struct obj_data *object_list;
-extern struct room_data ** world_array;
-extern char *dirs[];
 
 int get_number(char **name);
 
@@ -281,7 +278,7 @@ int do_set(struct char_data *ch, char *argument, int cmd)
 
     /* from spell_parser.c */
 
-    char *values[] = {
+    const char *values[] = {
         "age","sex","class","level","height","weight","str","stradd",
         "int","wis","dex","con","gold","exp","mana","hit","move",
         "sessions","alignment","thirst","drunk","full","race",

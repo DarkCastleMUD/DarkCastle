@@ -54,20 +54,16 @@ extern "C"
 #include "innate.h"
 #include "returnvals.h"
 #include "arena.h"
+#include "const.h"
+#include "inventory.h"
 
 /* Extern Structures */
 
-extern CWorld world;
-extern struct room_data ** world_array;
- 
-extern struct obj_data  *object_list;
-extern struct zone_data *zone_table;
 
 #define BEACON_OBJ_NUMBER 405
 
-extern struct spell_info_type spell_info [ ];
-extern bool str_prefix(const char *astr, const char *bstr);
-extern void wear(struct char_data *ch, struct obj_data *obj_object, int keyword);
+bool str_prefix(const char *astr, const char *bstr);
+void wear(struct char_data *ch, struct obj_data *obj_object, int keyword);
 
 /* Extern Procedures */
 
@@ -81,7 +77,6 @@ bool ARE_GROUPED( CHAR_DATA *sub, CHAR_DATA *obj);
 void add_memory(CHAR_DATA *ch, char *victim, char type);
 extern struct index_data *mob_index;
 extern struct index_data *obj_index;
-extern char* spells[];
 
 
 bool player_resist_reallocation(CHAR_DATA *victim, int skill)
@@ -1075,7 +1070,7 @@ int spell_solar_gate(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
   CHAR_DATA *tmp_victim, *temp;
   int orig_room;
 
-  char *dirs[] = {
+  char *desc_dirs[] = {
     "from the South.",
     "from the West.",
     "from the North.",
@@ -1144,7 +1139,7 @@ int spell_solar_gate(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
           {
 	   char buf[MAX_STRING_LENGTH];
             dam = 300; //dice(level, 10) + skill/2;
-	    sprintf(buf,"You are ENVELOPED in a PAINFUL BRIGHT LIGHT pouring in %s.",dirs[i]);
+	    sprintf(buf,"You are ENVELOPED in a PAINFUL BRIGHT LIGHT pouring in %s.",desc_dirs[i]);
 	    act(buf, tmp_victim, 0, ch, TO_CHAR, 0);
 
             retval = damage(ch, tmp_victim, dam, TYPE_FIRE, SPELL_SOLAR_GATE, 0);
@@ -4195,7 +4190,6 @@ int spell_sense_life(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
 
 void show_obj_class_size_mini(obj_data * obj, char_data * ch)
 {
-   extern char *extra_bits[];
    for(int i = 12; i < 23; i++)
       if(IS_SET(obj->obj_flags.extra_flags, 1<<i))
          csendf(ch, " %s", extra_bits[i]);
@@ -4213,18 +4207,6 @@ int spell_identify(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
   int value;
 
   struct time_info_data age(CHAR_DATA *ch);
-
-  extern char *race_types[];
-
-  /* Spell Names */
-  extern char *spells[];
-
-  /* For Objects */
-  extern char *item_types[];
-  extern char *extra_bits[];
-  extern char *more_obj_bits[];
-  extern char *apply_types[];
-  extern char *size_bits[];
 
   assert(obj || victim);
 
@@ -6182,10 +6164,9 @@ int spell_portal(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data 
          break;
 
   CHAR_DATA *tmpch;
- extern struct obj_data * search_char_for_item(char_data * ch, int16 item_number, bool wearonly = FALSE);
 
   for (tmpch = world[victim->in_room].people; tmpch; tmpch = tmpch->next_in_room)
-     if (search_char_for_item(tmpch, real_object(76)) || search_char_for_item(tmpch, real_object(51)))
+     if (search_char_for_item(tmpch, real_object(76), false) || search_char_for_item(tmpch, real_object(51), false))
 	portal = (obj_data*)1; // Makes the below produce an error. And yeah, I'm lazy. Go away.
 
   if(portal || IS_ARENA(victim->in_room) || IS_ARENA(ch->in_room)) {
@@ -11642,8 +11623,6 @@ int spell_lighted_path( ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DA
 {
   struct room_track_data * ptrack;
   char buf[180];
-  extern struct race_shit race_info[];
-  extern char * dirs[];
 
   ptrack = world[ch->in_room].tracks;
 

@@ -21,6 +21,7 @@
 #include "db.h"
 #include "clan.h"
 #include "utility.h"
+#include "const.h"
 
 extern struct index_data *obj_index;
 extern int rev_dir[];
@@ -829,7 +830,6 @@ int do_bullrush(struct char_data *ch, char *argument, int cmd)
   int dir = 0;
   int retval;
   char_data *victim;
-  extern char *dirs[];
 
   if(GET_HIT(ch) == 1) {
     send_to_char("You are feeling too weak right now for rushing to and fro.\r\n", ch);
@@ -1009,7 +1009,6 @@ int do_knockback(struct char_data *ch, char *argument, int cmd)
   char buf[MAX_STRING_LENGTH], where[MAX_STRING_LENGTH], who[MAX_STRING_LENGTH];
   int dir = 0;
   int retval, dam, dampercent, learned;
-  extern char * dirs[];
 
   if(GET_HIT(ch) == 1) {
     send_to_char("You are feeling too weak right now to smash into anybody.\n\r", ch);

@@ -21,16 +21,12 @@ extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
-#ifndef WIN32
 //#include <arpa/telnet.h>
 #include <unistd.h>
-
-#else
-	#include <winsock2.h>
-	#include <process.h>
-	#include <mmsystem.h>
-#endif
 }
+#include <string.h>
+#include <queue>
+
 #include "character.h"
 #include "comm.h"
 #include "connect.h"
@@ -51,9 +47,8 @@ extern "C" {
 #include "spells.h"
 #include "fight.h"
 #include "handler.h"
-#include <string.h>
 #include "vault.h"
-#include <queue>
+#include "const.h"
 
 #define STATE(d)    ((d)->connected)
 
@@ -620,7 +615,6 @@ void do_on_login_stuff(char_data * ch)
 	  int search_skills2(int arg, class_skill_defines * list_skills);
 	  struct class_skill_defines * get_skill_list(char_data * ch);
  	  struct class_skill_defines *a = get_skill_list(ch);
- 	  extern struct class_skill_defines g_skills[];
 
 	while (curr) {
 		if (curr->skillnum < 600 && search_skills2(curr->skillnum,a)==-1 && search_skills2(curr->skillnum, g_skills) == -1 && curr->skillnum != 385) {
@@ -774,7 +768,6 @@ bool allowed_host(char *host)
       return TRUE;
   return FALSE;
 }
-extern struct race_shit race_info[];
 
 void check_hw(char_data *ch)
 {

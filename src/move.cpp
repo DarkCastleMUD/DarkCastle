@@ -30,15 +30,7 @@
 #include "game_portal.h"
 #include "innate.h"
 #include "weather.h"
-
-extern struct obj_data *object_list;
-extern struct index_data *obj_index;
-extern struct index_data *mob_index;
-extern struct zone_data *zone_table;
-extern CWorld world;
-
-extern char *dirs[];
-extern int movement_loss[];
+#include "const.h"
 
 int ambush(CHAR_DATA *ch); // class/cl_ranger.C
 int check_ethereal_focus(CHAR_DATA *ch, int trigger_type); // class/cl_mage.cpp

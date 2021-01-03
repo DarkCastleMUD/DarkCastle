@@ -20,6 +20,7 @@ one liner quest shit
 #include <vector>
 #include <string.h>
 #include "room.h"
+#include "inventory.h"
 
 using namespace std;
 
@@ -52,7 +53,6 @@ extern void wear(CHAR_DATA *, OBJ_DATA *, int);
 extern struct index_data *mob_index;
 extern struct index_data *obj_index;
 extern char *gl_item(OBJ_DATA *obj, int number, CHAR_DATA *ch, bool platinum);
-extern struct obj_data * search_char_for_item(char_data * ch, int16 item_number, bool wearonly = FALSE);
 
 int load_quests(void)
 {
@@ -145,13 +145,11 @@ struct quest_info * get_quest_struct(int num)
 
 struct quest_info * get_quest_struct(char *name)
 {
-   if (!*name)
+   if (name == nullptr || !*name)
        return 0;
-   
-   struct quest_info *quest;
 
     for (quest_list_t::iterator node = quest_list.begin(); node != quest_list.end(); node++) {
-		quest = *node;
+		struct quest_info *quest = *node;
 
 		if(!str_nosp_cmp(name, quest->name))
 			return quest;
@@ -1376,7 +1374,7 @@ int quest_vendor(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
 	  return eSUCCESS;
       } else */
       if (IS_SET(obj->obj_flags.more_flags, ITEM_UNIQUE) &&
-		 search_char_for_item(ch, obj->item_number)) {
+		 search_char_for_item(ch, obj->item_number, false)) {
 	  sprintf(buf, "%s You already have one of those.", GET_NAME(ch));
 	  do_tell(owner, buf, 0);
 	  extract_obj(obj);

@@ -15,13 +15,15 @@
  ***************************************************************************/
 /* $Id: handler.cpp,v 1.208 2013/03/27 03:32:58 jhhudso Exp $ */
 
-extern "C" {
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
-#include <ctype.h>
-#include <assert.h>
-}
+#include <cstdlib>
+#include <cstring>
+#include <cstdio>
+#include <cctype>
+#include <cassert>
+
+#include <sys/time.h>
+#include <algorithm>
+
 
 #include "magic.h"
 #include "spells.h"
@@ -45,9 +47,8 @@ extern "C" {
 #include "returnvals.h"
 #include "innate.h"
 #include "set.h"
-#include <sys/time.h>
 #include "DC.h"
-#include <algorithm>
+#include "const.h"
 
 extern CWorld world;
 
@@ -57,7 +58,6 @@ extern struct index_data *obj_index;
 extern struct descriptor_data *descriptor_list;
 extern struct zone_data *zone_table;
 
-bool has_random(OBJ_DATA *obj);
 void huntclear_item(struct obj_data *obj);
 
 #ifdef WIN32
@@ -2084,7 +2084,6 @@ int char_from_room(CHAR_DATA *ch) {
 /* Returns 0 on failure, non-zero otherwise */
 int char_from_room(CHAR_DATA *ch, bool stop_all_fighting) {
 	CHAR_DATA *i, *fighter, *next_char;
-	extern CHAR_DATA *combat_list;
 	bool Other = FALSE, More = FALSE, kimore = FALSE;
 
 	if (ch->in_room == NOWHERE) {
@@ -2850,7 +2849,6 @@ int move_obj(obj_data *obj, char_data * ch) {
 	int obj_in_room = NOWHERE;
 	obj_data * contained_by = 0;
 	char_data * carried_by = 0;
-	struct obj_data * search_char_for_item(char_data * ch, int16 item_number, bool wearonly = FALSE);
 
 //  char buffer[300];
 
@@ -3317,7 +3315,7 @@ void extract_char(CHAR_DATA *ch, bool pull) {
 	int l, was_in;
 	/*CHAR_DATA *i;*/
 	bool isGolem = FALSE;
-	extern CHAR_DATA *combat_list;
+
 	struct obj_data *i;
 	CHAR_DATA *omast = NULL;
 	int ret = eSUCCESS;
@@ -4130,7 +4128,7 @@ struct obj_data *create_money(int amount) {
 /* one_argument routine).                                                 */
 
 int generic_find(char *arg, int bitvector, CHAR_DATA *ch, CHAR_DATA **tar_ch, struct obj_data **tar_obj) {
-	static char *ignore[] = { "the", "in", "\n" };
+	static const char *ignore[] = { "the", "in", "\n" };
 
 	int i;
 	char name[256] = { '\0' };
@@ -4393,10 +4391,6 @@ bool charge_moves(char_data *ch, int skill, double modifier) {
 }
 
 int find_skill_num(char * name) {
-	extern char * skills[];
-	extern char * spells[];
-	extern char * songs[];
-	extern char * ki[];
 	int i;
 	unsigned int name_length = strlen(name);
 

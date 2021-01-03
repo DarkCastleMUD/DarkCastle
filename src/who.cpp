@@ -3,10 +3,8 @@
 | who.C
 | Commands for who, maybe? :P
 */
-extern "C"
-{
-  #include <string.h>
-}
+#include <cstring>
+
 #include "connect.h"
 #include "utility.h"
 #include "character.h"
@@ -20,19 +18,10 @@ extern "C"
 #include "handler.h"
 #include "db.h"
 #include "returnvals.h"
+#include "const.h"
 
 // TODO - Figure out the weird bug for why when I do "who <class>" a random player
 //        from another class will pop up who name is nowhere near matching.
-
-
-extern struct descriptor_data *descriptor_list;
-extern struct race_shit race_info[33];
-extern char* pc_clss_abbrev[];
-extern char* race_abbrev[];
-extern char *pc_clss_types[];
-extern CWorld world;
- 
-extern int max_who;
 
 clan_data * get_clan(struct char_data *);
 
@@ -321,7 +310,7 @@ int do_who(struct char_data *ch, char *argument, int cmd)
       "psionicist",
       "\n"
     };
-    char *race_types[] = {
+    char *lowercase_race_types[] = {
       "human",
       "elf",
       "dwarf",
@@ -383,7 +372,7 @@ int do_who(struct char_data *ch, char *argument, int cmd)
 	  if (race == 9) {
 	    race = 0;
 	    break;
-	  } else if (is_abbrev(oneword, race_types[race])) {
+	  } else if (is_abbrev(oneword, lowercase_race_types[race])) {
 	    race++;
 	    break;
 	  }

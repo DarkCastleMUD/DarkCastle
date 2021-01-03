@@ -4,6 +4,9 @@
 | Description:  This file declares implementation for warrior-specific
 |   skills.
 */
+
+#include <algorithm>
+
 #include "structs.h"
 #include "character.h"
 #include "player.h"
@@ -22,16 +25,14 @@
 #include "race.h"
 #include <iostream>
 #include "interp.h"
-#include <algorithm>
 #include "spells.h"
+#include "const.h"
 
 using namespace std;
 
 extern CWorld world;
 extern struct index_data *obj_index;
  
-extern char *dirs[];
-
 bool ARE_GROUPED( CHAR_DATA *sub, CHAR_DATA *obj);
 int attempt_move(CHAR_DATA *ch, int cmd, int is_retreat = 0);
 
@@ -253,7 +254,6 @@ int do_retreat(struct char_data *ch, char *argument, int cmd)
    int retval = 0;
    CHAR_DATA *chTemp, *loop_ch;
 
-   extern struct char_data *combat_list;
    int is_stunned(CHAR_DATA *ch);
 
    if (is_stunned(ch))

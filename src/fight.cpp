@@ -23,16 +23,11 @@
  * $Id: fight.cpp,v 1.571 2015/06/16 04:10:54 pirahna Exp $               *
  **************************************************************************/
 
-extern "C"
-{
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h> /* malloc */
-
-#ifndef WIN32
-#include <unistd.h>
-#endif
-}
+#include <cstdio>
+#include <cstring>
+#include <cstdlib>
+#include <assert.h>
+#include <sstream>
 
 #include "fight.h"
 #include "levels.h"
@@ -55,13 +50,12 @@ extern "C"
 #include "act.h"
 #include "clan.h"
 #include "returnvals.h"
-#include <assert.h>
 #include "sing.h" // stop_grouped_bards
 #include "innate.h"
 #include "token.h"
 #include "vault.h"
 #include "arena.h"
-#include <sstream>
+#include "const.h"
 
 extern bool selfpurge;
 extern int top_of_world;
@@ -834,7 +828,6 @@ bool do_frostshield(CHAR_DATA *ch, CHAR_DATA *vict)
 
 int do_lightning_shield(CHAR_DATA *ch, CHAR_DATA *vict, int dam) 
 {
-  extern struct race_shit race_info[];
   struct affected_type * cur_af;
   int learned = 0;
   
@@ -941,7 +934,6 @@ int do_fireshield(CHAR_DATA *ch, CHAR_DATA *vict, int dam)
 {
   // ch is the person who just hit the victim
   // so ch takes the damage from this spell 
-  extern struct race_shit race_info[];
   struct affected_type * cur_af;
   int learned = 0;
 
@@ -1021,7 +1013,6 @@ int do_acidshield(CHAR_DATA *ch, CHAR_DATA *vict, int dam)
 {
   // ch is the person who just hit the victim
   // so ch takes the damage from this spell 
-  extern struct race_shit race_info[];
   struct affected_type * cur_af;
   int learned = 0;  
 
@@ -1101,7 +1092,6 @@ int do_boneshield(CHAR_DATA *ch, CHAR_DATA *vict, int dam)
 {
   // ch is the person who just hit the victim
   // so ch takes the damage from this spell 
-  extern struct race_shit race_info[];
   struct affected_type * cur_af;
   int learned = 0;
 
@@ -5347,7 +5337,6 @@ void dam_message(int dam, CHAR_DATA * ch, CHAR_DATA * victim,
     "hit", "pound", "pierce", "slash", "whip", "claw",
       "bite", "sting", "crush"
   };
-  extern struct race_shit race_info[];
 
   char buf1[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH], buf3[MAX_STRING_LENGTH];
   char *vs, *vp, *vx;
@@ -6734,7 +6723,7 @@ int do_flee(struct char_data *ch, char *argument, int cmd)
           GET_POS(ch) = POSITION_STANDING;
 
           char tempcommand[32] = { 0 };
-          extern char *dirs[];
+
           strncpy(tempcommand, dirs[attempt], 31);
           // we do this so that any spec procs overriding movement can take effect
 	  SET_BIT(ch->combat, COMBAT_FLEEING);

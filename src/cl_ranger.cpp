@@ -32,11 +32,11 @@ extern "C"  {
 #include "fileinfo.h" // SAVE_DIR
 #include "returnvals.h"
 #include "inventory.h"
+#include "const.h"
 
 extern CWorld world;
 extern struct zone_data *zone_table;
 extern struct obj_data *object_list; 
-extern struct race_shit race_info[];
 extern int rev_dir[];
 void save_corpses(void);
 
@@ -250,7 +250,6 @@ int do_track(CHAR_DATA *ch, char *argument, int cmd)
   CHAR_DATA *tmp_ch = NULL;  // For checking room stuff
   room_track_data * pScent = 0;
   void swap_hate_memory(char_data * ch);
-  extern char *dirs[];
 
   one_argument(argument, victim);
 
@@ -915,8 +914,6 @@ void do_arrow_miss(struct char_data *ch, struct char_data *victim, int
 {
   char buf[200];
 
-  extern char * dirs[];
-
   switch(number(1,6))
   {
      case 1: send_to_char("You miss your shot.\r\n", ch);
@@ -1070,7 +1067,6 @@ int do_arrow_damage(struct char_data *ch, struct char_data *victim,
   char buf[200];
   int retval;
 
-  extern char * dirs[];
   void inform_victim(CHAR_DATA *, CHAR_DATA *, int);
 
   buf[199] = '\0'; // just cause I'm paranoid
@@ -1162,7 +1158,6 @@ int do_fire(struct char_data *ch, char *arg, int cmd) {
 			buf2[MAX_STRING_LENGTH], victname[MAX_STRING_LENGTH],
 			victhshr[MAX_STRING_LENGTH];
 	bool enchantmentused = FALSE;
-	extern char * dirs[];
 
 	victim = NULL;
 	*direct = '\0';
@@ -1796,7 +1791,6 @@ int do_natural_selection(CHAR_DATA *ch, char *arg, int cmd)
 {
    int i;
    char buf[MAX_STRING_LENGTH];
-   extern struct race_shit race_info[];
    struct affected_type af, *cur;
 
    one_argument(arg, buf);

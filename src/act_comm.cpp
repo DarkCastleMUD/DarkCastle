@@ -30,12 +30,10 @@ extern "C"
 #include "utility.h"
 #include "act.h"
 #include "db.h"
-
 #include "returnvals.h"
 #include "fileinfo.h"
+#include "const.h"
 
-extern CWorld world;
-extern struct descriptor_data *descriptor_list;
 extern bool MOBtrigger;
 
 /* extern functions */
