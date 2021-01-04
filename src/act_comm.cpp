@@ -378,7 +378,7 @@ int do_ignore(struct char_data *ch, char *arg, int cmd)
 
 int is_ignoring(struct char_data *ch, struct char_data *i)
 {
-  if(IS_MOB(ch) || GET_LEVEL(i) > MORTAL || !ch->pcdata->ignoring)
+  if(IS_MOB(ch) || (GET_LEVEL(i) >= IMMORTAL && IS_PC(i)) || !ch->pcdata->ignoring)
     return(0);
   
    if(isname(GET_NAME(i), ch->pcdata->ignoring))
