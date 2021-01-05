@@ -1875,6 +1875,11 @@ char *reel3[] = {
 
 void save_slot_machines()
 {
+   if(DC::instance().cf.bport == true)
+   {
+      return;
+   }
+
   FILE *f = (FILE *)NULL;
   world_file_list_item * curr;
   char buf[180];
@@ -2051,6 +2056,7 @@ void reel_spin(void *arg1, void *arg2, void *arg3)
             ((OBJ_DATA *)obj_index[machine->obj->item_number].item)->description = str_dup(buf);
          }
       }
+
       if(payout == 200 && machine->bet == 5) {
          send_to_room("The jackpot lights flash and loud noises come from all around you!\n\r", machine->obj->in_room);
          csendf(machine->ch, "$BJACKPOT!!!!!!  You win the jackpot of %d %s!!$R\n\r", (int)machine->jackpot, machine->gold?"coins":"plats");
@@ -2074,7 +2080,6 @@ void reel_spin(void *arg1, void *arg2, void *arg3)
             //   dc_free(((OBJ_DATA*)obj_index[machine->obj->item_number].item)->description);
             ((OBJ_DATA *)obj_index[machine->obj->item_number].item)->description = str_dup(buf);
          }
-         save_slot_machines();
       } else if(payout) {
          send_to_room("Lights flash and noises emanate from the slot machine!\n\r", machine->obj->in_room);
          machine->lastwin = machine->cost * payout * machine->bet;
@@ -2091,6 +2096,8 @@ void reel_spin(void *arg1, void *arg2, void *arg3)
    } else { //something bad happened
       machine->busy = FALSE;
    }
+   
+   save_slot_machines();
 }
 
 int slot_machine(CHAR_DATA *ch, OBJ_DATA *obj, int cmd, char *arg, CHAR_DATA *invoker)
