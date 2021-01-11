@@ -2001,135 +2001,150 @@ int do_jab(struct char_data *ch, char *argument, int cmd)
 {
   int retval = eFAILURE, learned;
 
-  if(affected_by_spell(ch, SKILL_JAB) && GET_LEVEL(ch) < IMMORTAL) 
+  if (affected_by_spell(ch, SKILL_JAB) && GET_LEVEL(ch) < IMMORTAL)
   {
     send_to_char("Your arm is still sore from your last attempt.\r\n", ch);
     return eFAILURE;
   }
 
-  if (!(learned = has_skill(ch, SKILL_JAB))) {
-    send_to_char("You don't know how to jab.\r\n",ch);
+  if (!(learned = has_skill(ch, SKILL_JAB)))
+  {
+    send_to_char("You don't know how to jab.\r\n", ch);
     return eFAILURE;
   }
 
   if (!ch->equipment[WIELD])
-    {
-      send_to_char("Your must be wielding a weapon to make it a success.\r\n",ch);
-      return eFAILURE;
-    }
+  {
+    send_to_char("Your must be wielding a weapon to make it a success.\r\n", ch);
+    return eFAILURE;
+  }
 
   char arg[MAX_INPUT_LENGTH];
-  one_argument(argument,arg);
+  one_argument(argument, arg);
   struct char_data *victim;
 
-  if(!*arg && ch->fighting) 
-      victim = ch->fighting;
+  if (!*arg && ch->fighting)
+    victim = ch->fighting;
   else
     victim = get_char_room_vis(ch, arg);
 
-  if(!victim)
+  if (!victim)
   {
-    send_to_char( "Jab whom?\n\r", ch );
+    send_to_char("Jab whom?\n\r", ch);
     return eFAILURE;
   }
-  
-  if(ch->in_room != victim->in_room) 
+
+  if (ch->in_room != victim->in_room)
   {
     send_to_char("That person seems to have left.\n\r", ch);
     return eFAILURE;
   }
-  
+
   if (victim == ch)
   {
-    send_to_char("Why are you trying to hit yourself on the head???.\r\n",ch);
+    send_to_char("Why are you trying to hit yourself on the head???.\r\n", ch);
     return eFAILURE;
   }
 
-  if(IS_MOB(victim) 
-     && (ISSET(victim->mobdata->actflags, ACT_HUGE) && learned < 81)) 
+  if (IS_MOB(victim) && (ISSET(victim->mobdata->actflags, ACT_HUGE) && learned < 81))
   {
     send_to_char("You cannot jab someone that HUGE!\r\n", ch);
     return eFAILURE;
   }
 
-  if(IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_SWARM) && learned < 81) 
+  if (IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_SWARM) && learned < 81)
   {
     send_to_char("You cannot target just one to jab!\r\n", ch);
     return eFAILURE;
   }
 
-  if(IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_TINY) && learned < 81)  
+  if (IS_MOB(victim) && ISSET(victim->mobdata->actflags, ACT_TINY) && learned < 81)
   {
     send_to_char("You cannot target someone that tiny to jab!\r\n", ch);
     return eFAILURE;
   }
 
-  if((GET_LEVEL(ch) < G_POWER) || IS_NPC(ch)) 
+  if ((GET_LEVEL(ch) < G_POWER) || IS_NPC(ch))
   {
-      if(!can_attack(ch) || !can_be_attacked(ch, victim))
+    if (!can_attack(ch) || !can_be_attacked(ch, victim))
       return eFAILURE;
   }
 
-  if (!charge_moves(ch, SKILL_JAB)) return eSUCCESS;
+  if (!charge_moves(ch, SKILL_JAB))
+    return eSUCCESS;
 
   set_cantquit(ch, victim);
   WAIT_STATE(ch, PULSE_VIOLENCE);
 
   struct affected_type af;
-  af.type      = SKILL_JAB;
-  af.duration  = 2;
-  af.duration_type  = PULSE_VIOLENCE;
-  af.location  = APPLY_NONE;
+  af.type = SKILL_JAB;
+  af.duration = 2;
+  af.duration_type = PULSE_VIOLENCE;
+  af.location = APPLY_NONE;
   af.bitvector = AFF_BLACKJACK;
-    
-  if(!skill_success(ch, victim, SKILL_JAB)) 
+
+  if (!skill_success(ch, victim, SKILL_JAB))
   {
     retval = damage(ch, victim, 0, TYPE_BLUDGEON, SKILL_JAB, 0);
     return eSUCCESS;
   }
 
-  if(number(0, 1))
-  {
-     // victim's next target will be random
-    af.modifier = 1;     
-    affect_to_char(victim, &af, PULSE_VIOLENCE);
-  }
-  else 
-  {
-    af.modifier = 2;
-    GET_POS(victim) = POSITION_SITTING;
-    SET_BIT(victim->combat, COMBAT_BASH1);
-    affect_to_char(victim, &af, PULSE_VIOLENCE);
-    // victim's next attack will fail
-  }
-
-  af.location = APPLY_AC;
-  af.modifier = learned*1.5;
-  affect_to_char(victim, &af, PULSE_VIOLENCE);
-
-  af.type = SKILL_JAB;
-  af.duration  = 1;
-  af.modifier  = 0;
-  af.location  = APPLY_NONE;
-  af.bitvector = -1;
-  affect_to_char(ch, &af);
-
   retval = damage(ch, victim, 100, TYPE_BLUDGEON, SKILL_JAB, 0);
 
+  // if there wasn't a failure and...
+  if (!(retval & eFAILURE))
+  {
+    // the victim didn't die then affect victim with jab effect
+    if (!(retval & eVICT_DIED))
+    {
+      if (number(0, 1))
+      {
+        // victim's next target will be random
+        af.modifier = 1;
+        affect_to_char(victim, &af, PULSE_VIOLENCE);
+      }
+      else
+      {
+        af.modifier = 2;
+        GET_POS(victim) = POSITION_SITTING;
+        SET_BIT(victim->combat, COMBAT_BASH1);
+        affect_to_char(victim, &af, PULSE_VIOLENCE);
+        // victim's next attack will fail
+      }
+
+      af.location = APPLY_AC;
+      af.modifier = learned * 1.5;
+      affect_to_char(victim, &af, PULSE_VIOLENCE);
+    }
+
+    // the character didn't die so affect it with jab wait effect
+    if (!(retval & eCH_DIED))
+    {
+      af.type = SKILL_JAB;
+      af.duration = 1;
+      af.modifier = 0;
+      af.location = APPLY_NONE;
+      af.bitvector = -1;
+      affect_to_char(ch, &af);
+    }
+  }
+
+  // if the victim died and the character did not die
   if ((retval & eVICT_DIED) && !(retval & eCH_DIED))
   {
-    if(!IS_NPC(ch) && IS_SET(ch->pcdata->toggles, PLR_WIMPY))
-       WAIT_STATE(ch, PULSE_VIOLENCE);
+    if (!IS_NPC(ch) && IS_SET(ch->pcdata->toggles, PLR_WIMPY))
+      WAIT_STATE(ch, PULSE_VIOLENCE);
     return retval;
   }
 
-  if (retval & eCH_DIED) return retval;
-
-  if (retval & eVICT_DIED)
-     return retval;
-
-  return eSUCCESS;
-
+  if ((retval & eCH_DIED) || (retval & eVICT_DIED))
+  {
+    return retval;
+  }
+  else
+  {
+    return eSUCCESS;
+  }
 }
 
 int do_appraise(CHAR_DATA *ch, char *argument, int cmd)
