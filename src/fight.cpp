@@ -2324,6 +2324,7 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
   
   if (IS_SET(victim->immune, weapon_bit)) {
     dam = 0;
+    SET_BIT(retval,eIMMUNE_VICTIM);
     if ((attacktype >= TYPE_HIT && attacktype < TYPE_SUFFERING) || attacktype == SKILL_FLAMESLASH) {
       SET_BIT(modifier, COMBAT_MOD_IGNORE);
       SET_BIT(retval,eEXTRA_VALUE);
