@@ -2091,8 +2091,8 @@ int do_jab(struct char_data *ch, char *argument, int cmd)
 
   retval = damage(ch, victim, 100, TYPE_BLUDGEON, SKILL_JAB, 0);
 
-  // if there wasn't a failure and...
-  if (!(retval & eFAILURE))
+  // if there wasn't a failure and not immune to attack
+  if (!(retval & eFAILURE) && !(retval & eIMMUNE_VICTIM))
   {
     // the victim didn't die then affect victim with jab effect
     if (!(retval & eVICT_DIED))
