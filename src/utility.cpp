@@ -1676,17 +1676,18 @@ bool check_valid_and_convert(int & value, char * buf)
 void parse_bitstrings_into_int(const char * bits[], const char * strings, char_data *ch, uint value[])
 {
   bool found = FALSE;
+  string remainder_args(strings);
 
   if(!ch)
     return;
 
   for(;;) 
   {
-    if(!*strings)
+    if(remainder_args.empty())
       break;
 
-    string arg1, remainder_args;
-    tie (arg1, remainder_args) = half_chop(strings);
+    string arg1;
+    tie (arg1, remainder_args) = half_chop(remainder_args);
                        
     for(int x = 0 ;*bits[x] != '\n'; x++) 
     {
@@ -1714,17 +1715,18 @@ void parse_bitstrings_into_int(const char * bits[], const char * strings, char_d
 void parse_bitstrings_into_int(const char * bits[], const char * strings, char_data * ch, uint16 & value)
 {
   int  found = FALSE;
+  string remainder_args(strings);
 
   if(!ch)
     return;
 
   for(;;) 
   {
-    if(!*strings)
+    if(remainder_args.empty())
       break;
 
-    string arg1, remainder_args;
-    tie (arg1, remainder_args) = half_chop(strings);
+    string arg1;
+    tie (arg1, remainder_args) = half_chop(remainder_args);
                        
     for(int x = 0 ;*bits[x] != '\n'; x++) 
     {
@@ -1756,18 +1758,19 @@ void parse_bitstrings_into_int(const char * bits[], const char * strings, char_d
 void parse_bitstrings_into_int(const char * bits[], const char * strings, char_data * ch, uint32 & value)
 {
   int  found = FALSE;
+  string remainder_args(strings);
 
   if(!ch)
     return;
 
   for(;;) 
   {
-    if(!*strings)
+    if(remainder_args.empty())
       break;
 
-    string arg1, remainder_args;
-    tie (arg1, remainder_args) = half_chop(strings);
-                       
+    string arg1;
+    tie (arg1, remainder_args) = half_chop(remainder_args);
+
     for(int x = 0 ;*bits[x] != '\n'; x++) 
     {
       if (!strcmp("unused",bits[x])) continue;
