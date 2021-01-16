@@ -1,5 +1,6 @@
 #include <vector>
 #include <string>
+#include <utility>
 
 #include "wizard.h"
 #include "utility.h"
@@ -18,6 +19,29 @@
 #include "const.h"
 
 void save_corpses(void);
+
+int count_rooms(int start, int end)
+{
+	if (start < 0 || end < 0 || start > 1000000 || end > 1000000)
+	{
+		return 0;
+	}
+
+	if (start > end)
+	{
+		swap<int>(start, end);
+	}
+
+	int count = 0;
+	for (int i = start; i < top_of_world && i <= end; i++)
+	{
+		if (!world_array[i])
+			continue;
+		count++;
+	}
+
+	return count;
+}
 
 int do_thunder(struct char_data *ch, char *argument, int cmd)
 {
@@ -871,12 +895,19 @@ int do_show(struct char_data *ch, char *argument, int cmd) {
 		if (!isdigit(*name)) /* show them all */
 		{
 			send_to_char(
-					"Num Name\r\n"
-							"--- ------------------------------------------------------\r\n",
+					"Num  Range Start-End (Usage Start-End) Rooms  Name\r\n"
+							"---  ------------------------- -----  ----------------------\r\n",
 					ch);
 			for (i = 0; i <= top_of_zone_table; i++) {
-				sprintf(buf, "%3d %5d-%-5d %s\r\n", i,
+				int range_start=(i ? (zone_table[i - 1].top + 1) : 0);
+				int range_end=zone_table[i].top;
+				int num = count_rooms(range_start, range_end);
+
+				sprintf(buf, "%3d  %5d-%-5d $0$B(%5d-%-5d) %5d$R  %s$R\r\n", i,
+				       (i ? (zone_table[i - 1].top + 1) : 0), 
+                        zone_table[i].top,
 						zone_table[i].bottom_rnum, zone_table[i].top_rnum,
+						num,
 						zone_table[i].name);
 				send_to_char(buf, ch);
 			}
