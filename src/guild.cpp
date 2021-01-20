@@ -1125,7 +1125,8 @@ void skill_increase_check(char_data * ch, int skill, int learned, int difficulty
 
    // increase the skill by one
    learn_skill(ch, skill, 1, maximum);
-   csendf(ch, "You feel more competent in your %s ability.\r\n", skillname);
+   learned = has_skill(ch, skill);
+   csendf(ch, "$R$B$5You feel more competent in your %s ability. It increased to %d out of %d.$R\r\n", skillname, learned, maximum);
 }
 
 
