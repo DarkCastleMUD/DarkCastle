@@ -26,34 +26,34 @@ extern struct descriptor_data *descriptor_list;
 using namespace std;
 
 Leaderboard::Leaderboard() {
-	memset(hpactivename, 5, sizeof(char));
-	memset(mnactivename, 5, sizeof(char));
-	memset(kiactivename, 5, sizeof(char));
-	memset(pkactivename, 5, sizeof(char));
-	memset(pdactivename, 5, sizeof(char));
-	memset(rdactivename, 5, sizeof(char));
-	memset(mvactivename, 5, sizeof(char));
-	memset(&hpactive, 5, sizeof(int));
-	memset(&mnactive, 5, sizeof(int));
-	memset(&kiactive, 5, sizeof(int));
-	memset(&pkactive, 5, sizeof(int));
-	memset(&pdactive, 5, sizeof(int));
-	memset(&rdactive, 5, sizeof(int));
-	memset(&mvactive, 5, sizeof(int));
-	memset(hpactiveclassname, (CLASS_MAX - 2) * 5, sizeof(char));
-	memset(mnactiveclassname, (CLASS_MAX - 2) * 5, sizeof(char));
-	memset(kiactiveclassname, (CLASS_MAX - 2) * 5, sizeof(char));
-	memset(pkactiveclassname, (CLASS_MAX - 2) * 5, sizeof(char));
-	memset(pdactiveclassname, (CLASS_MAX - 2) * 5, sizeof(char));
-	memset(rdactiveclassname, (CLASS_MAX - 2) * 5, sizeof(char));
-	memset(mvactiveclassname, (CLASS_MAX - 2) * 5, sizeof(char));
-	memset(hpactiveclass, (CLASS_MAX - 2) * 5, sizeof(char));
-	memset(mnactiveclass, (CLASS_MAX - 2) * 5, sizeof(char));
-	memset(kiactiveclass, (CLASS_MAX - 2) * 5, sizeof(char));
-	memset(pkactiveclass, (CLASS_MAX - 2) * 5, sizeof(char));
-	memset(pdactiveclass, (CLASS_MAX - 2) * 5, sizeof(char));
-	memset(rdactiveclass, (CLASS_MAX - 2) * 5, sizeof(char));
-	memset(mvactiveclass, (CLASS_MAX - 2) * 5, sizeof(char));
+	memset(hpactivename, 0, 5*sizeof(char *));
+	memset(mnactivename, 0, 5*sizeof(char *));
+	memset(kiactivename, 0, 5*sizeof(char *));
+	memset(pkactivename, 0, 5*sizeof(char *));
+	memset(pdactivename, 0, 5*sizeof(char *));
+	memset(rdactivename, 0, 5*sizeof(char *));
+	memset(mvactivename, 0, 5*sizeof(char *));
+	memset(&hpactive, 0, 5*sizeof(int));
+	memset(&mnactive, 0, 5*sizeof(int));
+	memset(&kiactive, 0, 5*sizeof(int));
+	memset(&pkactive, 0, 5*sizeof(int));
+	memset(&pdactive, 0, 5*sizeof(int));
+	memset(&rdactive, 0, 5*sizeof(int));
+	memset(&mvactive, 0, 5*sizeof(int));
+	memset(hpactiveclassname, 0, (CLASS_MAX - 2)*5*sizeof(char *));
+	memset(mnactiveclassname, 0, (CLASS_MAX - 2)*5*sizeof(char *));
+	memset(kiactiveclassname, 0, (CLASS_MAX - 2)*5*sizeof(char *));
+	memset(pkactiveclassname, 0, (CLASS_MAX - 2)*5*sizeof(char *));
+	memset(pdactiveclassname, 0, (CLASS_MAX - 2)*5*sizeof(char *));
+	memset(rdactiveclassname, 0, (CLASS_MAX - 2)*5*sizeof(char *));
+	memset(mvactiveclassname, 0, (CLASS_MAX - 2)*5*sizeof(char *));
+	memset(hpactiveclass, 0, (CLASS_MAX - 2)*5*sizeof(int));
+	memset(mnactiveclass, 0, (CLASS_MAX - 2)*5*sizeof(int));
+	memset(kiactiveclass, 0, (CLASS_MAX - 2)*5*sizeof(int));
+	memset(pkactiveclass, 0, (CLASS_MAX - 2)*5*sizeof(int));
+	memset(pdactiveclass, 0, (CLASS_MAX - 2)*5*sizeof(int));
+	memset(rdactiveclass, 0, (CLASS_MAX - 2)*5*sizeof(int));
+	memset(mvactiveclass, 0, (CLASS_MAX - 2)*5*sizeof(int));
 }
 
 Leaderboard::~Leaderboard() {
@@ -468,34 +468,76 @@ void Leaderboard::check(void) {
 	write_file(ssbuffer);
 
 	for (i = 0; i < 5; i++)
+	{
 		dc_free(hpactivename[i]);
+		hpactivename[i] = nullptr;
+	}
 	for (i = 0; i < 5; i++)
+	{
 		dc_free(mnactivename[i]);
+		mnactivename[i] = nullptr;
+	}
 	for (i = 0; i < 5; i++)
+	{
 		dc_free(kiactivename[i]);
+		kiactivename[i] = nullptr;
+	}
 	for (i = 0; i < 5; i++)
+	{
 		dc_free(pkactivename[i]);
+		pkactivename[i] = nullptr;
+	}
 	for (i = 0; i < 5; i++)
+	{
 		dc_free(pdactivename[i]);
+		pdactivename[i] = nullptr;
+	}
 	for (i = 0; i < 5; i++)
+	{
 		dc_free(rdactivename[i]);
+		rdactivename[i] = nullptr;
+	}
 	for (i = 0; i < 5; i++)
+	{
 		dc_free(mvactivename[i]);
+		mvactivename[i] = nullptr;
+	}
 	for (j = 0; j < CLASS_MAX - 2; j++) {
 		for (i = 0; i < 5; i++)
+		{
 			dc_free(hpactiveclassname[j][i]);
+			hpactiveclassname[j][i] = nullptr;
+		}
 		for (i = 0; i < 5; i++)
+		{
 			dc_free(mnactiveclassname[j][i]);
+			mnactiveclassname[j][i] = nullptr;
+		}
 		for (i = 0; i < 5; i++)
+		{
 			dc_free(kiactiveclassname[j][i]);
+			kiactiveclassname[j][i] = nullptr;
+		}
 		for (i = 0; i < 5; i++)
+		{
 			dc_free(pkactiveclassname[j][i]);
+			pkactiveclassname[j][i] = nullptr;
+		}
 		for (i = 0; i < 5; i++)
+		{
 			dc_free(pdactiveclassname[j][i]);
+			pdactiveclassname[j][i] = nullptr;
+		}
 		for (i = 0; i < 5; i++)
+		{
 			dc_free(rdactiveclassname[j][i]);
+			rdactiveclassname[j][i] = nullptr;
+		}
 		for (i = 0; i < 5; i++)
+		{
 			dc_free(mvactiveclassname[j][i]);
+			mvactiveclassname[j][i] = nullptr;
+		}
 	}
 }
 
@@ -517,55 +559,95 @@ void Leaderboard::read_file(void) {
 			for (i = 0; i < 5; i++) {
 				mnactivename[i] = fread_string(fl, 0);
 				mnactive[i] = fread_int(fl, 0, LONG_MAX);
+				if (char_file_exists(mnactivename[i]) == false) {
+					mnactivename[i] = str_dup("UNKNOWN");
+				}
 			}
 			for (i = 0; i < 5; i++) {
 				kiactivename[i] = fread_string(fl, 0);
 				kiactive[i] = fread_int(fl, 0, LONG_MAX);
+				if (char_file_exists(kiactivename[i]) == false) {
+					kiactivename[i] = str_dup("UNKNOWN");
+				}
 			}
 			for (i = 0; i < 5; i++) {
 				pkactivename[i] = fread_string(fl, 0);
 				pkactive[i] = fread_int(fl, 0, LONG_MAX);
+				if (char_file_exists(pkactivename[i]) == false) {
+					pkactivename[i] = str_dup("UNKNOWN");
+				}
 			}
 			for (i = 0; i < 5; i++) {
 				pdactivename[i] = fread_string(fl, 0);
 				pdactive[i] = fread_int(fl, 0, LONG_MAX);
+				if (char_file_exists(pdactivename[i]) == false) {
+					pdactivename[i] = str_dup("UNKNOWN");
+				}
 			}
 			for (i = 0; i < 5; i++) {
 				rdactivename[i] = fread_string(fl, 0);
 				rdactive[i] = fread_int(fl, 0, LONG_MAX);
+				if (char_file_exists(rdactivename[i]) == false) {
+					rdactivename[i] = str_dup("UNKNOWN");
+				}
+
 			}
 			for (i = 0; i < 5; i++) {
 				mvactivename[i] = fread_string(fl, 0);
 				mvactive[i] = fread_int(fl, 0, LONG_MAX);
+				if (char_file_exists(mvactivename[i]) == false) {
+					mvactivename[i] = str_dup("UNKNOWN");
+				}
 			}
 			for (j = 0; j < CLASS_MAX - 2; j++) {
 				for (i = 0; i < 5; i++) {
 					hpactiveclassname[j][i] = fread_string(fl, 0);
 					hpactiveclass[j][i] = fread_int(fl, 0, LONG_MAX);
+					if (char_file_exists(hpactiveclassname[j][i]) == false) {
+						hpactiveclassname[j][i] = str_dup("UNKNOWN");
+					}
 				}
 				for (i = 0; i < 5; i++) {
 					mnactiveclassname[j][i] = fread_string(fl, 0);
 					mnactiveclass[j][i] = fread_int(fl, 0, LONG_MAX);
+					if (char_file_exists(mnactiveclassname[j][i]) == false) {
+						mnactiveclassname[j][i] = str_dup("UNKNOWN");
+					}
 				}
 				for (i = 0; i < 5; i++) {
 					kiactiveclassname[j][i] = fread_string(fl, 0);
 					kiactiveclass[j][i] = fread_int(fl, 0, LONG_MAX);
+					if (char_file_exists(kiactiveclassname[j][i]) == false) {
+						kiactiveclassname[j][i] = str_dup("UNKNOWN");
+					}
 				}
 				for (i = 0; i < 5; i++) {
 					pkactiveclassname[j][i] = fread_string(fl, 0);
 					pkactiveclass[j][i] = fread_int(fl, 0, LONG_MAX);
+					if (char_file_exists(pkactiveclassname[j][i]) == false) {
+						pkactiveclassname[j][i] = str_dup("UNKNOWN");
+					}
 				}
 				for (i = 0; i < 5; i++) {
 					pdactiveclassname[j][i] = fread_string(fl, 0);
 					pdactiveclass[j][i] = fread_int(fl, 0, LONG_MAX);
+					if (char_file_exists(pdactiveclassname[j][i]) == false) {
+						pdactiveclassname[j][i] = str_dup("UNKNOWN");
+					}
 				}
 				for (i = 0; i < 5; i++) {
 					rdactiveclassname[j][i] = fread_string(fl, 0);
 					rdactiveclass[j][i] = fread_int(fl, 0, LONG_MAX);
+					if (char_file_exists(rdactiveclassname[j][i]) == false) {
+						rdactiveclassname[j][i] = str_dup("UNKNOWN");
+					}
 				}
 				for (i = 0; i < 5; i++) {
 					mvactiveclassname[j][i] = fread_string(fl, 0);
 					mvactiveclass[j][i] = fread_int(fl, 0, LONG_MAX);
+					if (char_file_exists(mvactiveclassname[j][i]) == false) {
+						mvactiveclassname[j][i] = str_dup("UNKNOWN");
+					}
 				}
 			}
 		} catch (error_eof &) {
@@ -587,6 +669,11 @@ void Leaderboard::write_file(std::string &filename) {
 }
 
 void Leaderboard::write_file(const char filename[]) {
+	if (DC::instance().cf.leaderboard_check == "suspend")
+	{
+		return;
+	}
+
 	FILE *fl;
 	int i, j;
 
@@ -664,6 +751,42 @@ int do_leaderboard(struct char_data *ch, char *argument, int cmd) {
 	char *clss_types[] = { "mage", "cleric", "thief", "warrior", "antipaladin",
 			"paladin", "barbarian", "monk", "ranger", "bard", "druid", "\n" };
 
+	if (IS_PC(ch) && GET_LEVEL(ch) >= IMP)
+	{
+		string arg1, remainder;
+		tie(arg1, remainder) = half_chop(argument);
+		if (arg1 == "suspend")
+		{
+			if (DC::instance().cf.leaderboard_check == "suspend")
+			{
+				csendf(ch, "Leaderboard writes already suspended.\n\r");
+			}
+			else
+			{
+				DC::instance().cf.leaderboard_check = "suspend";
+				csendf(ch, "Leaderboard writes suspended.\n\r");
+				logf(IMP, LOG_GOD, "Leaderboard writes suspended by %s.", GET_NAME(ch));
+			}
+
+			return eSUCCESS;
+		}
+		else if (arg1 == "resume")
+		{
+			if (DC::instance().cf.leaderboard_check == "")
+			{
+				csendf(ch, "Leaderboard writes already resumed.\n\r");
+			}
+			else
+			{
+				DC::instance().cf.leaderboard_check = "";
+				csendf(ch, "Leaderboard writes resumed.\n\r");
+				logf(IMP, LOG_GOD, "Leaderboard writes resumed by %s.", GET_NAME(ch));
+			}
+
+			return eSUCCESS;
+		}
+	}
+
 	leaderboard.check();
 
 	for (i = 0; i < 5; i++)
@@ -724,19 +847,40 @@ int do_leaderboard(struct char_data *ch, char *argument, int cmd) {
 	if (validclass) {
 		for (j = 0; j < k + 1; j++) {
 			for (i = 0; i < 5; i++)
+			{
 				dc_free(hpactivename[i]);
+				hpactivename[i] = nullptr;
+			}
 			for (i = 0; i < 5; i++)
+			{
 				dc_free(mnactivename[i]);
+				mnactivename[i] = nullptr;
+			}
 			for (i = 0; i < 5; i++)
+			{
 				dc_free(kiactivename[i]);
+				kiactivename[i] = nullptr;
+			}
 			for (i = 0; i < 5; i++)
+			{
 				dc_free(pkactivename[i]);
+				pkactivename[i] = nullptr;
+			}
 			for (i = 0; i < 5; i++)
+			{
 				dc_free(pdactivename[i]);
+				pdactivename[i] = nullptr;
+			}
 			for (i = 0; i < 5; i++)
+			{
 				dc_free(rdactivename[i]);
+				rdactivename[i] = nullptr;
+			}
 			for (i = 0; i < 5; i++)
+			{
 				dc_free(mvactivename[i]);
+				mvactivename[i] = nullptr;
+			}
 			for (i = 0; i < 5; i++) {
 				hpactivename[i] = fread_string(fl, 0);
 				hpactive[i] = fread_int(fl, 0, LONG_MAX);
@@ -1075,33 +1219,75 @@ int do_leaderboard(struct char_data *ch, char *argument, int cmd) {
 			"(*)**************************************************************************(*)\r\n");
 	page_string(ch->desc, buf, 1);
 	for (i = 0; i < 5; i++)
+	{
 		dc_free(hponlinename[i]);
+		hponlinename[i] = nullptr;
+	}
 	for (i = 0; i < 5; i++)
+	{
 		dc_free(mnonlinename[i]);
+		mnonlinename[i] = nullptr;
+	}
 	for (i = 0; i < 5; i++)
+	{
 		dc_free(kionlinename[i]);
+		kionlinename[i] = nullptr;
+	}
 	for (i = 0; i < 5; i++)
+	{
 		dc_free(pkonlinename[i]);
+		pkonlinename[i] = nullptr;
+	}
 	for (i = 0; i < 5; i++)
+	{
 		dc_free(pdonlinename[i]);
+		pdonlinename[i] = nullptr;
+	}
 	for (i = 0; i < 5; i++)
+	{
 		dc_free(rdonlinename[i]);
+		rdonlinename[i] = nullptr;
+	}
 	for (i = 0; i < 5; i++)
+	{
 		dc_free(mvonlinename[i]);
+		mvonlinename[i] = nullptr;
+	}
 	for (i = 0; i < 5; i++)
+	{
 		dc_free(hpactivename[i]);
+		hpactivename[i] = nullptr;
+	}
 	for (i = 0; i < 5; i++)
+	{
 		dc_free(mnactivename[i]);
+		mnactivename[i] = nullptr;
+	}
 	for (i = 0; i < 5; i++)
+	{
 		dc_free(kiactivename[i]);
+		kiactivename[i] = nullptr;
+	}
 	for (i = 0; i < 5; i++)
+	{
 		dc_free(pkactivename[i]);
+		pkactivename[i] = nullptr;
+	}
 	for (i = 0; i < 5; i++)
+	{
 		dc_free(pdactivename[i]);
+		pdactivename[i] = nullptr;
+	}
 	for (i = 0; i < 5; i++)
+	{
 		dc_free(rdactivename[i]);
+		rdactivename[i] = nullptr;
+	}
 	for (i = 0; i < 5; i++)
+	{
 		dc_free(mvactivename[i]);
+		mvactivename[i] = nullptr;
+	}
 
 	return eSUCCESS;
 }
@@ -1135,17 +1321,30 @@ void Leaderboard::rename(char *oldname, char *newname) {
 		}
 	}
 
-	if (!(fl = dc_fopen(LEADERBOARD_FILE, "w"))) {
-		logf(0, LOG_BUG, "Cannot open leaderboard file: %s", LEADERBOARD_FILE);
-		abort();
+	if (DC::instance().cf.leaderboard_check == "suspend")
+	{
+		logf(IMMORTAL, LOG_GOD, "Leaderboard rename of %s to %s failed because writes are suspended.", oldname, newname);
+	}
+	else
+	{
+		if (!(fl = dc_fopen(LEADERBOARD_FILE, "w"))) {
+			logf(0, LOG_BUG, "Cannot open leaderboard file: %s", LEADERBOARD_FILE);
+			abort();
+		}
+
+		for (i = 0; i < lines; i++)
+		{
+			fprintf(fl, "%s~ %d\n", name[i], value[i]);
+		}
+
+		dc_fclose(fl);
 	}
 
 	for (i = 0; i < lines; i++)
-		fprintf(fl, "%s~ %d\n", name[i], value[i]);
-	dc_fclose(fl);
-
-	for (i = 0; i < lines; i++)
+	{
 		dc_free(name[i]);
+		name[i] = nullptr;
+	}
 }
 
 Leaderboard leaderboard;
