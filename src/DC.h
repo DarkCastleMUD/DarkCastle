@@ -51,7 +51,7 @@ public:
   obj_list_t active_obj_list;
   obj_list_t obj_free_list;
   unordered_set<char_data*> shooting_list;
-
+  
   struct config {
     port_list_t ports;
     bool allow_imp_password = false;
@@ -63,6 +63,7 @@ public:
     bool check_syntax = false;
     bool stderr_timestamp = true;
     string dir = DFLT_DIR;
+    string leaderboard_check;
   } cf;
 
   void init_game(void);
