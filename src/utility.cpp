@@ -2513,9 +2513,9 @@ bool char_file_exists(string name)
   string filename;
 
   if (DC::instance().cf.bport) {
-    filename = fmt::format("{}/{}", BSAVE_DIR, name);
+    filename = fmt::format("{}/{}/{}", BSAVE_DIR, name[0], name);
   } else {
-    filename = fmt::format("{}/{}", SAVE_DIR, name);
+    filename = fmt::format("{}/{}/{}", SAVE_DIR, name[0], name);
   }
 
   return file_exists(filename);
