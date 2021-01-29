@@ -373,114 +373,135 @@ void output_praclist(struct char_data *ch, class_skill_defines *skilllist)
 {
   int known, last_profession = 0;
   char buf[MAX_STRING_LENGTH];
-     for(int i=0; *skilllist[i].skillname != '\n';i++) 
-    {
-      known = has_skill(ch, skilllist[i].skillnum);
-      if(!known && GET_LEVEL(ch) < skilllist[i].levelavailable)
-          continue;
-     
-      if (IS_PC(ch) && skilllist[i].group > 0 && skilllist[i].group != ch->pcdata->profession) {
-	continue;
-      } else {
-	if (last_profession != skilllist[i].group) {
-	  last_profession = skilllist[i].group;
-	  csendf(ch, "\n\r$B%s Profession Skills:$R\n\r", find_profession(ch->c_class, skilllist[i].group));
-          send_to_char ( " Ability:                  Expertise:          Lvl:  Cost:      Ability Group:\r\n", ch );
-	  send_to_char ( "--------------------------------------------------------------------------------\r\n", ch );
-	}
-      }
+  for (int i = 0; *skilllist[i].skillname != '\n'; i++)
+  {
+    known = has_skill(ch, skilllist[i].skillnum);
+    if (!known && GET_LEVEL(ch) < skilllist[i].levelavailable)
+      continue;
 
-      sprintf(buf, " %c%-24s%s%15s $B$0($R%c%s%3d$B$0)$R   $B%2d$R   ", UPPER(*skilllist[i].skillname), (skilllist[i].skillname+1),
-                   per_col(known), how_good(known),charthing(ch, known,skilllist[i].skillnum, skilllist[i].maximum), per_col(known), known,
-		skilllist[i].levelavailable);
-      send_to_char(buf, ch);
-      if(skilllist[i].skillnum >= 1 && skilllist[i].skillnum <= MAX_SPL_LIST) 
+    if (IS_PC(ch) && skilllist[i].group > 0 && skilllist[i].group != ch->pcdata->profession)
+    {
+      continue;
+    }
+    else
+    {
+      if (last_profession != skilllist[i].group)
       {
-	if (skilllist[i].skillnum == SPELL_PORTAL && GET_CLASS(ch) == CLASS_CLERIC)
-	  sprintf(buf,"Mana: $B%3d$R ", 150);
-	else
-          sprintf(buf,"Mana: $B%3d$R ",use_mana(ch,skilllist[i].skillnum));
-        send_to_char(buf, ch);
+        last_profession = skilllist[i].group;
+        csendf(ch, "\n\r$B%s Profession Skills:$R\n\r", find_profession(ch->c_class, skilllist[i].group));
+        send_to_char ( " Ability:                Current/Practice/Autolearn  Cost:     Group:\r\n", ch);
+        send_to_char("--------------------------------------------------------------------------------\r\n", ch);
       }
-      else if (skilllist[i].skillnum >= SKILL_SONG_BASE && skilllist[i].skillnum <= SKILL_SONG_MAX)
-      {
-	extern struct song_info_type song_info[];
-	csendf(ch, "Ki:   $B%3d$R ",song_info[skilllist[i].skillnum-SKILL_SONG_BASE].min_useski);
-      }
-      else if (skilllist[i].skillnum >= KI_OFFSET && skilllist[i].skillnum <= KI_OFFSET+MAX_KI_LIST)
-      {
-	extern struct ki_info_type ki_info[];
-	csendf(ch, "Ki:   $B%3d$R ",ki_info[skilllist[i].skillnum-KI_OFFSET].min_useski);
-      }
-      else if (skilllist[i].skillnum == 318) // scan
-      {
-	csendf(ch, "Move: $B%3d$R ",2);
-      }
-      else if (skilllist[i].skillnum == 320) // switch
-      {
-	csendf(ch, "Move: $B%3d$R ",4);
-      }
-      else if (skilllist[i].skillnum == 319) // consider
-      {
-	csendf(ch, "Move: $B%3d$R ",5);
-      }
-      else if (skilllist[i].skillnum == 368) // release
-      {
-	csendf(ch, "Move: $B%3d$R ",25);
-      }
-      else if(skilllist[i].skillnum == 380) // fire arrows
-      {
-        csendf(ch, "Mana: $B%3d$R ", 30);
-      }
-      else if(skilllist[i].skillnum == 381) //ice arrows
-      {
-        csendf(ch, "Mana: $B%3d$R ", 20);
-      }
-      else if(skilllist[i].skillnum == 382) //tempest arrows
-      {
-        csendf(ch, "Mana: $B%3d$R ", 10);
-      }
-      else if(skilllist[i].skillnum == 383) //granite arrows
-      {
-        csendf(ch, "Mana: $B%3d$R ", 40);
-      }
-      else if(skill_cost.find(skilllist[i].skillnum) != skill_cost.end())
-      {
-        csendf(ch, "Move: $B%3d$R ", skill_cost.find(skilllist[i].skillnum)->second);
-      }
-      else send_to_char("          ", ch);
-      if (skilllist[i].attrs)
-      {
-        if(skilllist != g_skills) {
-	  sprintf(buf, " %s",attrname(GET_CLASS(ch), skilllist[i].attrs));
-	  send_to_char(buf, ch);
-        } else send_to_char(" General", ch);
-      }
-      if(skilllist[i].skillnum == SKILL_SONG_DISARMING_LIMERICK) { 
-        send_to_char("$B        #$R\n\r", ch);
-      }
-      else if(skilllist[i].skillnum == SKILL_SONG_FANATICAL_FANFARE) { 
-        send_to_char("$B  #$R\n\r", ch);
-      }
-      else if(skilllist[i].skillnum == SKILL_SONG_SEARCHING_SONG) { 
-        send_to_char("$B    #$R\n\r", ch);
-      }
-      else if(skilllist[i].skillnum == SKILL_SONG_VIGILANT_SIREN) { 
-        send_to_char("$B  #$R\n\r", ch);
-      }
-      else if(skilllist[i].skillnum == SKILL_SONG_MKING_CHARGE) { 
-        send_to_char("$B      #$R\n\r", ch);
-      }
-      else if(skilllist[i].skillnum == SKILL_SONG_HYPNOTIC_HARMONY) { 
-        send_to_char("$B        #$R\n\r", ch);
-      }
-      else if(skilllist[i].skillnum == SKILL_SONG_SHATTERING_RESO) { 
-        send_to_char("$B        #$R\n\r", ch);
-      }
-      else send_to_char("\n\r", ch);
     }
 
+    int self_learn_max = (float)skilllist[i].maximum * 0.5;
+    if (GET_LEVEL(ch) * 2 < self_learn_max)
+    {
+      self_learn_max = GET_LEVEL(ch) * 2;
+    }
+
+    sprintf(buf, " %c%-24s%s%15s $B$0$R%s%3d/%3d/%3d$B$0$R  ", UPPER(*skilllist[i].skillname), (skilllist[i].skillname + 1),
+            per_col(known), how_good(known), per_col(known), known, self_learn_max, skilllist[i].maximum);
+    send_to_char(buf, ch);
+    if (skilllist[i].skillnum >= 1 && skilllist[i].skillnum <= MAX_SPL_LIST)
+    {
+      if (skilllist[i].skillnum == SPELL_PORTAL && GET_CLASS(ch) == CLASS_CLERIC)
+        sprintf(buf, "Mana: $B%3d$R ", 150);
+      else
+        sprintf(buf, "Mana: $B%3d$R ", use_mana(ch, skilllist[i].skillnum));
+      send_to_char(buf, ch);
+    }
+    else if (skilllist[i].skillnum >= SKILL_SONG_BASE && skilllist[i].skillnum <= SKILL_SONG_MAX)
+    {
+      extern struct song_info_type song_info[];
+      csendf(ch, "Ki:   $B%3d$R ", song_info[skilllist[i].skillnum - SKILL_SONG_BASE].min_useski);
+    }
+    else if (skilllist[i].skillnum >= KI_OFFSET && skilllist[i].skillnum <= KI_OFFSET + MAX_KI_LIST)
+    {
+      extern struct ki_info_type ki_info[];
+      csendf(ch, "Ki:   $B%3d$R ", ki_info[skilllist[i].skillnum - KI_OFFSET].min_useski);
+    }
+    else if (skilllist[i].skillnum == 318) // scan
+    {
+      csendf(ch, "Move: $B%3d$R ", 2);
+    }
+    else if (skilllist[i].skillnum == 320) // switch
+    {
+      csendf(ch, "Move: $B%3d$R ", 4);
+    }
+    else if (skilllist[i].skillnum == 319) // consider
+    {
+      csendf(ch, "Move: $B%3d$R ", 5);
+    }
+    else if (skilllist[i].skillnum == 368) // release
+    {
+      csendf(ch, "Move: $B%3d$R ", 25);
+    }
+    else if (skilllist[i].skillnum == 380) // fire arrows
+    {
+      csendf(ch, "Mana: $B%3d$R ", 30);
+    }
+    else if (skilllist[i].skillnum == 381) //ice arrows
+    {
+      csendf(ch, "Mana: $B%3d$R ", 20);
+    }
+    else if (skilllist[i].skillnum == 382) //tempest arrows
+    {
+      csendf(ch, "Mana: $B%3d$R ", 10);
+    }
+    else if (skilllist[i].skillnum == 383) //granite arrows
+    {
+      csendf(ch, "Mana: $B%3d$R ", 40);
+    }
+    else if (skill_cost.find(skilllist[i].skillnum) != skill_cost.end())
+    {
+      csendf(ch, "Move: $B%3d$R ", skill_cost.find(skilllist[i].skillnum)->second);
+    }
+    else
+      send_to_char("          ", ch);
+    if (skilllist[i].attrs)
+    {
+      if (skilllist != g_skills)
+      {
+        sprintf(buf, " %s", attrname(GET_CLASS(ch), skilllist[i].attrs));
+        send_to_char(buf, ch);
+      }
+      else
+        send_to_char(" General", ch);
+    }
+    if (skilllist[i].skillnum == SKILL_SONG_DISARMING_LIMERICK)
+    {
+      send_to_char("$B        #$R\n\r", ch);
+    }
+    else if (skilllist[i].skillnum == SKILL_SONG_FANATICAL_FANFARE)
+    {
+      send_to_char("$B  #$R\n\r", ch);
+    }
+    else if (skilllist[i].skillnum == SKILL_SONG_SEARCHING_SONG)
+    {
+      send_to_char("$B    #$R\n\r", ch);
+    }
+    else if (skilllist[i].skillnum == SKILL_SONG_VIGILANT_SIREN)
+    {
+      send_to_char("$B  #$R\n\r", ch);
+    }
+    else if (skilllist[i].skillnum == SKILL_SONG_MKING_CHARGE)
+    {
+      send_to_char("$B      #$R\n\r", ch);
+    }
+    else if (skilllist[i].skillnum == SKILL_SONG_HYPNOTIC_HARMONY)
+    {
+      send_to_char("$B        #$R\n\r", ch);
+    }
+    else if (skilllist[i].skillnum == SKILL_SONG_SHATTERING_RESO)
+    {
+      send_to_char("$B        #$R\n\r", ch);
+    }
+    else
+      send_to_char("\n\r", ch);
+  }
 }
+
 int skills_guild ( struct char_data *ch, char *arg, struct char_data *owner )
 {
   char buf[160];
@@ -502,7 +523,7 @@ int skills_guild ( struct char_data *ch, char *arg, struct char_data *owner )
       send_to_char ( "You can practice any of these skills:\n\r\r\n", ch );
 
       send_to_char ( "$BUniversal skills:$R\r\n", ch );
-      send_to_char ( " Ability:                  Expertise:          Lvl:  Cost:      Ability Group:\r\n", ch );
+      send_to_char ( " Ability:                Current/Practice/Autolearn  Cost:     Group:\r\n", ch);
       send_to_char ( "--------------------------------------------------------------------------------\r\n", ch );
       output_praclist ( ch, g_skills );
 
@@ -510,9 +531,9 @@ int skills_guild ( struct char_data *ch, char *arg, struct char_data *owner )
       send_to_char ( buf, ch );
 
       if ( GET_CLASS ( ch ) != CLASS_MONK )
-        send_to_char ( " Ability:                  Expertise:          Lvl:  Cost:      Ability Group:\r\n", ch );
+        send_to_char ( " Ability:                Current/Practice/Autolearn  Cost:     Group:\r\n", ch);
       else
-        send_to_char ( " Ability:                  Expertise:          Lvl:  Cost:      Style:\r\n", ch );
+        send_to_char ( " Ability:                Current/Practice/Autolearn  Cost:     Style:\r\n", ch);
 
       send_to_char ( "--------------------------------------------------------------------------------\r\n", ch );
 
@@ -709,26 +730,48 @@ int guild(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
 
     if (GET_LEVEL(ch) == 50)
     { // To get past 50 you need to know your q skill.
-       int skl = -1;
-       switch (GET_CLASS(ch))
-       {
-	 case CLASS_MAGE: skl = SKILL_SPELLCRAFT; break;
-	 case CLASS_BARBARIAN: skl = SKILL_BULLRUSH; break;
-	 case CLASS_PALADIN: skl = SPELL_HOLY_AURA; break;
-	 case CLASS_MONK: skl = KI_OFFSET+KI_MEDITATION; break;
-	 case CLASS_WARRIOR: skl = SKILL_COMBAT_MASTERY; break;
-	 case CLASS_THIEF: skl = SKILL_CRIPPLE; break;
-	 case CLASS_RANGER: skl = SKILL_NAT_SELECT; break;
-         case CLASS_CLERIC: skl = SPELL_DIVINE_INTER; break;
- 	 case CLASS_ANTI_PAL: skl = SPELL_VAMPIRIC_AURA; break;
-         case CLASS_DRUID: skl = SPELL_CONJURE_ELEMENTAL; break;   
-	 case CLASS_BARD: skl = SKILL_SONG_HYPNOTIC_HARMONY; break;
-       }
-       if (!has_skill(ch, skl))
-       {
-	 send_to_char("You need to learn your Quest Skill before you can progress further.\r\n",ch);
-         return eSUCCESS;
-       }
+      int skl = -1;
+      switch (GET_CLASS(ch))
+      {
+      case CLASS_MAGE:
+        skl = SKILL_SPELLCRAFT;
+        break;
+      case CLASS_BARBARIAN:
+        skl = SKILL_BULLRUSH;
+        break;
+      case CLASS_PALADIN:
+        skl = SPELL_HOLY_AURA;
+        break;
+      case CLASS_MONK:
+        skl = KI_OFFSET + KI_MEDITATION;
+        break;
+      case CLASS_WARRIOR:
+        skl = SKILL_COMBAT_MASTERY;
+        break;
+      case CLASS_THIEF:
+        skl = SKILL_CRIPPLE;
+        break;
+      case CLASS_RANGER:
+        skl = SKILL_NAT_SELECT;
+        break;
+      case CLASS_CLERIC:
+        skl = SPELL_DIVINE_INTER;
+        break;
+      case CLASS_ANTI_PAL:
+        skl = SPELL_VAMPIRIC_AURA;
+        break;
+      case CLASS_DRUID:
+        skl = SPELL_CONJURE_ELEMENTAL;
+        break;
+      case CLASS_BARD:
+        skl = SKILL_SONG_HYPNOTIC_HARMONY;
+        break;
+      }
+      if (!has_skill(ch, skl))
+      {
+        send_to_char("You need to learn your Quest Skill before you can progress further.\r\n", ch);
+        return eSUCCESS;
+      }
     }
     exp_needed = exp_table[(int)GET_LEVEL(ch) + 1];
 
@@ -1145,37 +1188,41 @@ void verify_max_stats(CHAR_DATA *ch)
 
 int get_max(CHAR_DATA *ch, int skill)
 {
-   int maximum;
-   class_skill_defines * skilllist = get_skill_list(ch);
-   if(!skilllist)
-	skilllist = g_skills;
-//     return -1;  // class has no skills by default
-   maximum = 0;
-   int i;
-   for(i = 0; *skilllist[i].skillname != '\n'; i++)
-     if(skilllist[i].skillnum == skill)
-     {
-       maximum = skilllist[i].maximum;
-       break;
-     }
-   if (!maximum && skilllist != g_skills) { skilllist = g_skills; 
-   for(i = 0; *skilllist[i].skillname != '\n'; i++)
-     if(skilllist[i].skillnum == skill)
-     {
-       maximum = skilllist[i].maximum;
-       break;
-     }
-   }
+  class_skill_defines *skilllist = get_skill_list(ch);
+  if (!skilllist)
+    skilllist = g_skills;
+ 
+  int maximum = 0;
+  int i = 0;
+  for (; *skilllist[i].skillname != '\n'; i++)
+  {
+    if (skilllist[i].skillnum == skill)
+    {
+      maximum = skilllist[i].maximum;
+      break;
+    }
+  }
 
-   float percent = maximum*0.75;
+  if (!maximum && skilllist != g_skills)
+  {
+    skilllist = g_skills;
+    for (i = 0; *skilllist[i].skillname != '\n'; i++)
+      if (skilllist[i].skillnum == skill)
+      {
+        maximum = skilllist[i].maximum;
+        break;
+      }
+  }
 
-   if (maximum && skilllist[i].attrs)
-        percent += maximum/100.0 * get_stat_bonus(ch,skilllist[i].attrs);
+  float percent = maximum * 0.75;
 
-   percent = MIN(maximum, percent);
-   percent = MAX(maximum*0.75, percent);
+  if (maximum && skilllist[i].attrs)
+    percent += maximum / 100.0 * get_stat_bonus(ch, skilllist[i].attrs);
 
-   return (int)percent;
+  percent = MIN(maximum, percent);
+  percent = MAX(maximum * 0.75, percent);
+
+  return (int)percent;
 }
 
 void check_maxes(CHAR_DATA *ch)
