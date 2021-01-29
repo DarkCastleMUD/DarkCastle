@@ -401,7 +401,7 @@ void output_praclist(struct char_data *ch, class_skill_defines *skilllist)
     }
 
     sprintf(buf, " %c%-24s%s%15s $B$0$R%s%3d/%3d/%3d$B$0$R  ", UPPER(*skilllist[i].skillname), (skilllist[i].skillname + 1),
-            per_col(known), how_good(known), per_col(known), known, self_learn_max, skilllist[i].maximum);
+            per_col(known), how_good(known), per_col(known), known, self_learn_max, get_max(ch, skilllist[i].skillnum));
     send_to_char(buf, ch);
     if (skilllist[i].skillnum >= 1 && skilllist[i].skillnum <= MAX_SPL_LIST)
     {
@@ -543,10 +543,6 @@ int skills_guild ( struct char_data *ch, char *arg, struct char_data *owner )
 
       if ( GET_CLASS ( ch ) == CLASS_BARD )
         send_to_char ( "$B#$R denotes a song which requires an instrument.\n\r", ch );
-
-      send_to_char ( "$B*$R indicates this skill is at its maximum for your race and class.\r\n"
-                     "$B+$R indicates you can still use practice sessions to improve this skill.\r\n"
-                     "$B=$R indicates you must use this skill to continue improving.\r\n", ch );
 
       return eSUCCESS;
 
