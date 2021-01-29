@@ -669,7 +669,7 @@ void Leaderboard::write_file(std::string &filename) {
 }
 
 void Leaderboard::write_file(const char filename[]) {
-	if (DC::instance().cf.leaderboard_check == "suspend")
+	if (DC::instance().cf.leaderboard_check == "suspend" || DC::instance().cf.bport == true)
 	{
 		return;
 	}
