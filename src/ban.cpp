@@ -133,7 +133,7 @@ int do_ban(CHAR_DATA *ch, char *argument, int cmd)
       send_to_char("No sites are banned.\r\n", ch);
       return eSUCCESS;
     }
-    strcpy(format, "%-25.25s  %-8.8s  %-10s  %-16.16s\r\n");
+    strcpy(format, "%-15.15s  %-8.8s  %-19s  %-16.16s\r\n");
     sprintf(buf, format,
             "Banned Site Name",
             "Ban Type",
@@ -141,9 +141,9 @@ int do_ban(CHAR_DATA *ch, char *argument, int cmd)
             "Banned By");
     send_to_char(buf, ch);
     sprintf(buf, format,
+            "-----------------------",
             "---------------------------------",
-            "---------------------------------",
-            "---------------------------------",
+            "-------------------",
             "---------------------------------");
     send_to_char(buf, ch);
 
