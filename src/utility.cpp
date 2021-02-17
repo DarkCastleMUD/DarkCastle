@@ -1487,41 +1487,40 @@ mob_index[fol->follower->mobdata->nr].virt == 8)
 //        of writing we're doing.
 int do_save(struct char_data *ch, char *argument, int cmd)
 {
-    char buf[100];
-    // With the cmd numbers
-    // 666 = save quietly
-    // 10 = save
-    // 9 = save with a round of lag
-    // -pir 3/15/1999
+  // With the cmd numbers
+  // 666 = save quietly
+  // 10 = save
+  // 9 = save with a round of lag
+  // -pir 3/15/1999
 
-    if(GET_LEVEL(ch) < 2 && cmd != 666) {
-      send_to_char("You must be at least level 2 to save.\n\r", ch);
-      return eFAILURE;
-    }
+  if (IS_NPC(ch) || GET_LEVEL(ch) > IMP)
+    return eFAILURE;
 
-    if (IS_NPC(ch) || GET_LEVEL(ch) > IMP)
-	return eFAILURE;
+  if (cmd != 666)
+  {
+    csendf(ch, "Saving %s.\n\r", GET_NAME(ch));
+  }
 
-    if(cmd != 666) {
-      sprintf(buf, "Saving %s.\n\r", GET_NAME(ch));
-      send_to_char(buf, ch);
-    }
-
+  if (IS_PC(ch))
+  {
     save_char_obj(ch);
 #ifdef USE_SQL
     save_char_obj_db(ch);
 #endif
 
-    if (ch->pcdata->golem) {
-      save_golem_data(ch); // Golem data, eh!
-    }
-    if (IS_PC(ch) && ch->followers) {
+    if (ch->followers)
+    {
       save_charmie_data(ch);
     }
 
-    return eSUCCESS;
-}
+    if (ch->pcdata->golem)
+    {
+      save_golem_data(ch); // Golem data, eh!
+    }
+  }
 
+  return eSUCCESS;
+}
 
 int do_home(struct char_data *ch, char *argument, int cmd)
 {

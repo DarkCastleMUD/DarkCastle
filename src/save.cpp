@@ -776,8 +776,10 @@ void save_char_obj (CHAR_DATA *ch)
   memset(&uchar, 0, sizeof(uchar));
   memset(&tmpage, 0, sizeof(tmpage));
 
-  if(IS_NPC(ch) || GET_LEVEL(ch) < 2)
+  if(IS_NPC(ch))
+  {
     return;
+  }
 
   // TODO - figure out a way for mob's to save...maybe <mastername>.pet ?
   if (DC::instance().cf.bport)
