@@ -1,3 +1,4 @@
+#include <arpa/inet.h>
 #include <string.h>
 
 #include "player.h"
@@ -113,60 +114,76 @@ void write_ban_list(void)
   return;
 }
 
-
 int do_ban(CHAR_DATA *ch, char *argument, int cmd)
 {
   char flag[MAX_INPUT_LENGTH], site[MAX_INPUT_LENGTH],
-	format[MAX_INPUT_LENGTH], *nextchar, *timestr;
+      format[MAX_INPUT_LENGTH], *nextchar, *timestr;
   int i;
-  char buf[MAX_STRING_LENGTH];  
+  char buf[MAX_STRING_LENGTH];
   struct ban_list_element *ban_node;
 
   *buf = '\0';
 
-  if (!*argument) {
-    if (!ban_list) {
+  if (!*argument)
+  {
+    if (!ban_list)
+    {
       send_to_char("No sites are banned.\r\n", ch);
       return eSUCCESS;
     }
     strcpy(format, "%-25.25s  %-8.8s  %-10.10s  %-16.16s\r\n");
     sprintf(buf, format,
-	    "Banned Site Name",
-	    "Ban Type",
-	    "Banned On",
-	    "Banned By");
+            "Banned Site Name",
+            "Ban Type",
+            "Banned On",
+            "Banned By");
     send_to_char(buf, ch);
     sprintf(buf, format,
-	    "---------------------------------",
-	    "---------------------------------",
-	    "---------------------------------",
-	    "---------------------------------");
+            "---------------------------------",
+            "---------------------------------",
+            "---------------------------------",
+            "---------------------------------");
     send_to_char(buf, ch);
 
-    for (ban_node = ban_list; ban_node; ban_node = ban_node->next) {
-      if (ban_node->date) {
-	timestr = asctime(localtime(&(ban_node->date)));
-	*(timestr + 10) = 0;
-	strcpy(site, timestr);
-      } else
-	strcpy(site, "Unknown");
+    for (ban_node = ban_list; ban_node; ban_node = ban_node->next)
+    {
+      if (ban_node->date)
+      {
+        timestr = asctime(localtime(&(ban_node->date)));
+        *(timestr + 10) = 0;
+        strcpy(site, timestr);
+      }
+      else
+        strcpy(site, "Unknown");
       sprintf(buf, format, ban_node->site, ban_types[ban_node->type], site,
-	      ban_node->name);
+              ban_node->name);
       send_to_char(buf, ch);
     }
     return eSUCCESS;
   }
   half_chop(argument, flag, site);
-  if (!*site || !*flag) {
+  if (!*site || !*flag)
+  {
     send_to_char("Usage: ban {all | select | new} site_name\r\n", ch);
     return eSUCCESS;
   }
-  if (!(!str_cmp(flag, "select") || !str_cmp(flag, "all") || !str_cmp(flag, "new"))) {
+
+  struct sockaddr_in sa;
+  if (inet_pton(AF_INET, site, &(sa.sin_addr)) == 0)
+  {
+    csendf(ch, "Invalid IP address.\n\r");
+    return eFAILURE;
+  }
+
+  if (!(!str_cmp(flag, "select") || !str_cmp(flag, "all") || !str_cmp(flag, "new")))
+  {
     send_to_char("Flag must be ALL, SELECT, or NEW.\r\n", ch);
     return eSUCCESS;
   }
-  for (ban_node = ban_list; ban_node; ban_node = ban_node->next) {
-    if (!str_cmp(ban_node->site, site)) {
+  for (ban_node = ban_list; ban_node; ban_node = ban_node->next)
+  {
+    if (!str_cmp(ban_node->site, site))
+    {
       send_to_char("That site has already been banned -- unban it to change the ban type.\r\n", ch);
       return eSUCCESS;
     }
@@ -189,8 +206,8 @@ int do_ban(CHAR_DATA *ch, char *argument, int cmd)
   ban_list = ban_node;
 
   sprintf(buf, "%s has banned %s for %s players.", GET_NAME(ch), site,
-	  ban_types[ban_node->type]);
-  log(buf, LOG_GOD, POWER); 
+          ban_types[ban_node->type]);
+  log(buf, LOG_GOD, POWER);
   send_to_char("Site banned.\r\n", ch);
   write_ban_list();
   return eSUCCESS;
