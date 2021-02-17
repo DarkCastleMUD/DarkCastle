@@ -1,5 +1,7 @@
 #include <arpa/inet.h>
 #include <string.h>
+#include <fmt/format.h>
+#include <fmt/chrono.h>
 
 #include "player.h"
 #include "levels.h"
@@ -116,11 +118,11 @@ void write_ban_list(void)
 
 int do_ban(CHAR_DATA *ch, char *argument, int cmd)
 {
-  char flag[MAX_INPUT_LENGTH], site[MAX_INPUT_LENGTH],
-      format[MAX_INPUT_LENGTH], *nextchar, *timestr;
+  char flag[MAX_INPUT_LENGTH], format[MAX_INPUT_LENGTH], site[MAX_INPUT_LENGTH], *nextchar;
   int i;
   char buf[MAX_STRING_LENGTH];
   struct ban_list_element *ban_node;
+  string buffer;
 
   *buf = '\0';
 
@@ -131,7 +133,7 @@ int do_ban(CHAR_DATA *ch, char *argument, int cmd)
       send_to_char("No sites are banned.\r\n", ch);
       return eSUCCESS;
     }
-    strcpy(format, "%-25.25s  %-8.8s  %-10.10s  %-16.16s\r\n");
+    strcpy(format, "%-25.25s  %-8.8s  %-10s  %-16.16s\r\n");
     sprintf(buf, format,
             "Banned Site Name",
             "Ban Type",
@@ -149,15 +151,14 @@ int do_ban(CHAR_DATA *ch, char *argument, int cmd)
     {
       if (ban_node->date)
       {
-        timestr = asctime(localtime(&(ban_node->date)));
-        *(timestr + 10) = 0;
-        strcpy(site, timestr);
+        buffer = fmt::format("{:%Y-%m-%d %H:%M:%S}", *std::localtime(&(ban_node->date)));
       }
       else
-        strcpy(site, "Unknown");
-      sprintf(buf, format, ban_node->site, ban_types[ban_node->type], site,
-              ban_node->name);
-      send_to_char(buf, ch);
+      {
+        buffer = "Unknown";
+      }
+
+      csendf(ch, format, ban_node->site, ban_types[ban_node->type], buffer.c_str(), ban_node->name);
     }
     return eSUCCESS;
   }
