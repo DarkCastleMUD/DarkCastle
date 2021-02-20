@@ -776,7 +776,7 @@ void save_char_obj (CHAR_DATA *ch)
   memset(&uchar, 0, sizeof(uchar));
   memset(&tmpage, 0, sizeof(tmpage));
 
-  if(IS_NPC(ch))
+  if(IS_NPC(ch) || GET_LEVEL(ch) < 1)
   {
     return;
   }
@@ -807,10 +807,18 @@ void save_char_obj (CHAR_DATA *ch)
   // if they're in a safe room, save them there.
   // if they're a god, send 'em home
   // otherwise save them in tavern
-  if(IS_SET(world[ch->in_room].room_flags, SAFE))
-    uchar.load_room = world[ch->in_room].number;
+
+  if (ch->in_room < 1)
+  {
+    uchar.load_room = START_ROOM;
+  }
   else
-    uchar.load_room = real_room(GET_HOME(ch));
+  {
+    if(IS_SET(world[ch->in_room].room_flags, SAFE))
+      uchar.load_room = world[ch->in_room].number;
+    else
+      uchar.load_room = real_room(GET_HOME(ch));
+  }
 
   if((fwrite(&uchar, sizeof(uchar), 1, fpsave))               &&
      (char_to_store_variable_data(ch, fpsave))                &&
