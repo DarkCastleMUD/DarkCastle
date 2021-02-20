@@ -1388,7 +1388,6 @@ int do_quit(struct char_data *ch, char *argument, int cmd)
       }
     }
     act( "$n has left the game.", ch, 0, 0, TO_ROOM , INVIS_NULL);
-    csendf(ch, "Deleting %s.\n\r", GET_NAME(ch));
   }
 
   // Finish off any performances
