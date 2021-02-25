@@ -726,7 +726,7 @@ void roll_and_display_stats(CHAR_DATA * ch)
          SEND_TO_Q(buf, ch->desc);
          SEND_TO_Q("Choose a group <1-5>, or press return to reroll(Help <attribute> for more information) --> ", ch->desc);
 
-	WAIT_STATE(ch, PULSE_VIOLENCE);
+	WAIT_STATE(ch, PULSE_TIMER);
 }
 
 int more_than_ten_people_from_this_ip(struct descriptor_data *new_conn)
@@ -1418,87 +1418,84 @@ is_race_eligible(ch,7)?'*':' ',is_race_eligible(ch,8)?'*':' ',is_race_eligible(c
        break;
 
     case CON_SELECT_MENU:
-       switch( *arg )
+       switch (*arg)
        {
        case '0':
-          close_socket( d );
+          close_socket(d);
           d = NULL;
           break;
-          
+
        case '1':
-          // I believe this is here to stop a dupe bug 
+          // I believe this is here to stop a dupe bug
           // by logging in twice, and leaving one at the password: prompt
-          if(GET_LEVEL(ch) > 0) {
+          if (GET_LEVEL(ch) > 0)
+          {
              strcpy(tmp_name, GET_NAME(ch));
              free_char(d->character);
              d->character = 0;
              load_char_obj(d, tmp_name);
              ch = d->character;
-	     if (!ch)
-	     {
-		write_to_descriptor(d->descriptor, "It seems your character has been deleted during logon, or you just experienced some obscure bug.");
-		close_socket(d);
-		d = NULL;
-		break;
-	     }
+             if (!ch)
+             {
+                write_to_descriptor(d->descriptor, "It seems your character has been deleted during logon, or you just experienced some obscure bug.");
+                close_socket(d);
+                d = NULL;
+                break;
+             }
           }
           unique_scan(ch);
-	  if  (GET_GOLD(ch) > 1000000000)
+          if (GET_GOLD(ch) > 1000000000)
           {
              sprintf(log_buf, "%s has more than a billion gold. Bugged?", GET_NAME(ch));
-             log( log_buf, 100, LOG_WARNINGS );
+             log(log_buf, 100, LOG_WARNINGS);
           }
           if (GET_BANK(ch) > 1000000000)
-	  {
-	     sprintf(log_buf,"%s has more than a billion gold in the bank. Rich fucker or bugged.",GET_NAME(ch));
-	     log( log_buf, 100, LOG_WARNINGS);
-	  }      
-          send_to_char("\n\rWelcome to Dark Castle.  May your visit here suck.\n\r", ch );
-			character_list.insert(ch);
-
-	  if (IS_AFFECTED(ch, AFF_ITEM_REMOVE))
- 	  {
-		REMBIT(ch->affected_by, AFF_ITEM_REMOVE);
-		send_to_char("\r\n$I$B$4***WARNING*** Items you were previously wearing have been moved to your inventory, please check before moving out of a safe room.$R\r\n", ch);
-  	  }
-
-          /* tjs hack - till mob bug is fixed */
-          // TODO - figure out what this is for
-          if (GET_LEVEL(ch) == 1) {
-             advance_level(ch, 0);
-             advance_level(ch, 0);
-          }
-          
-          do_on_login_stuff(ch);
-          
-          if(GET_LEVEL(ch) < OVERSEER)
-             clan_login(ch);
-          
-          act( "$n has entered the game.", ch, 0, 0, TO_ROOM , INVIS_NULL);
-          if(!GET_SHORT_ONLY(ch)) GET_SHORT_ONLY(ch) = str_dup(GET_NAME(ch)); 
-          update_wizlist(ch);
-	  check_maxes(ch); // Check skill maxes.
-          
-          STATE(d) = CON_PLAYING;
-          if ( GET_LEVEL(ch) == 0 ) {
-             do_start( ch );
-	     do_new_help(ch, "new", 0);
-          }
-	  do_look( ch, "", 8 );
           {
-            if(GET_LEVEL(ch) >= 40 && DCVote->IsActive() && !DCVote->HasVoted(ch))
-            {
-               send_to_char("\n\rThere is an active vote in which you have not yet voted.\n\r"
-                            "Enter \"vote\" to see details\n\r\n\r", ch);
-            }
+             sprintf(log_buf, "%s has more than a billion gold in the bank. Rich fucker or bugged.", GET_NAME(ch));
+             log(log_buf, 100, LOG_WARNINGS);
           }
-  	  extern void zap_eq_check(char_data *ch);
-	  zap_eq_check(ch);
+          send_to_char("\n\rWelcome to Dark Castle.  May your visit here suck.\n\r", ch);
+          character_list.insert(ch);
+
+          if (IS_AFFECTED(ch, AFF_ITEM_REMOVE))
+          {
+             REMBIT(ch->affected_by, AFF_ITEM_REMOVE);
+             send_to_char("\r\n$I$B$4***WARNING*** Items you were previously wearing have been moved to your inventory, please check before moving out of a safe room.$R\r\n", ch);
+          }
+
+          do_on_login_stuff(ch);
+
+          if (GET_LEVEL(ch) < OVERSEER)
+             clan_login(ch);
+
+          act("$n has entered the game.", ch, 0, 0, TO_ROOM, INVIS_NULL);
+          if (!GET_SHORT_ONLY(ch))
+             GET_SHORT_ONLY(ch) = str_dup(GET_NAME(ch));
+          update_wizlist(ch);
+          check_maxes(ch); // Check skill maxes.
+
+          STATE(d) = CON_PLAYING;
+          if (GET_LEVEL(ch) == 0)
+          {
+             do_start(ch);
+             do_new_help(ch, "new", 0);
+          }
+          do_look(ch, "", 8);
+          {
+             if (GET_LEVEL(ch) >= 40 && DCVote->IsActive() && !DCVote->HasVoted(ch))
+             {
+                send_to_char("\n\rThere is an active vote in which you have not yet voted.\n\r"
+                             "Enter \"vote\" to see details\n\r\n\r",
+                             ch);
+             }
+          }
+          extern void zap_eq_check(char_data * ch);
+          zap_eq_check(ch);
           break;
-          
+
        case '2':
           SEND_TO_Q("Enter a text you'd like others to see when they look at you.\n\r"
-                    "Terminate with \\s \n\r", d);
+                    "Terminate with '/s' on a new line.\n\r", d);
           if(ch->description) {
              SEND_TO_Q("Old description:\n\r", d);
              SEND_TO_Q(ch->description, d);
