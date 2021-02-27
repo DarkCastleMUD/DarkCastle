@@ -29,7 +29,7 @@ typedef int	KI_FUN		( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict);
 
 struct ki_info_type
 {
-	ubyte beats;	/* Waiting time after ki */
+	uint32_t beats;	/* Waiting time after ki */
 	ubyte minimum_position; /* min position for use */
 	ubyte min_useski;	/* minimum ki used */
 	int16 targets;		/* Legal targets */

@@ -650,7 +650,7 @@ typedef	int	SPELL_FUN	( ubyte level, CHAR_DATA *ch,
 // using an offset from min_level_magic depending on class *(min_level_magic+2bytes)
 struct spell_info_type
 {
-    ubyte	beats;			/* Waiting time after spell	*/
+    uint32_t	beats;			/* Waiting time after spell	*/
     ubyte	minimum_position;	/* Position for caster		*/
     ubyte	min_usesmana;		/* Mana used			*/
     int16	targets;		/* Legal targets		*/
