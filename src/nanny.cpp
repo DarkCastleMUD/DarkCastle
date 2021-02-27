@@ -726,7 +726,7 @@ void roll_and_display_stats(CHAR_DATA * ch)
          SEND_TO_Q(buf, ch->desc);
          SEND_TO_Q("Choose a group <1-5>, or press return to reroll(Help <attribute> for more information) --> ", ch->desc);
 
-	WAIT_STATE(ch, PULSE_TIMER);
+	WAIT_STATE(ch, PULSE_TIMER/4);
 }
 
 int more_than_ten_people_from_this_ip(struct descriptor_data *new_conn)
