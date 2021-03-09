@@ -58,18 +58,63 @@ int do_report(struct char_data *ch, char *argument, int cmd)
     return eSUCCESS;
   }
 
+  if (IS_PC(ch) && argument != nullptr)
+  {
+    string arg1, remainder_args;
+    tie(arg1, remainder_args) = half_chop(string(argument));
+    if (arg1 == "help")
+    {
+      csendf(ch, "report       - Reports hps, mana, moves and ki. (default)\n\r");
+      csendf(ch, "report xp    - Reports current xp, xp till next level and levels to be gained.\n\r");
+      csendf(ch, "report help  - Shows different ways report can be used.\n\r");
+      return eFAILURE;
+    }
+
+    if (arg1 == "xp")
+    {
+      // calculate how many levels a player could gain with their current XP
+      uint8_t levels_to_gain = 0;
+      int64_t players_exp = GET_EXP(ch);
+      while (levels_to_gain < IMMORTAL)
+      {
+        if (players_exp >= (int64_t)exp_table[(int)GET_LEVEL(ch) + levels_to_gain + 1])
+        {
+          players_exp -= (int64_t)exp_table[(int)GET_LEVEL(ch) + levels_to_gain + 1];
+          levels_to_gain++;
+        }
+        else
+        {
+          break;
+        }
+      }
+
+      snprintf(report, 200, "XP: %lld, XP till level: %lld, Levels to gain: %d",
+               GET_EXP(ch),
+               (int64)(exp_table[(int)GET_LEVEL(ch) + 1] - (int64)GET_EXP(ch)),
+               levels_to_gain);
+
+      sprintf(buf, "$n reports '%s'", report);
+      act(buf, ch, 0, 0, TO_ROOM, 0);
+
+      csendf(ch, "You report: %s\n\r", report);
+      return eSUCCESS;
+    }
+  }
+
   if(IS_NPC(ch) || IS_ANONYMOUS(ch))
-    sprintf(report, "%d%% hps, %d%% mana, %d%% movement, and %d%% ki.",
+    snprintf(report, 200, "%d%% hps, %d%% mana, %d%% movement, and %d%% ki.",
       MAX(1, GET_HIT(ch)*100)  / MAX(1, GET_MAX_HIT(ch)),
       MAX(1, GET_MANA(ch)*100) / MAX(1, GET_MAX_MANA(ch)),
       MAX(1, GET_MOVE(ch)*100) / MAX(1, GET_MAX_MOVE(ch)),
       MAX(1, GET_KI(ch)*100)   / MAX(1, GET_MAX_KI(ch)));
   else
-    sprintf(report, "%d/%d hps, %d/%d mana, %d/%d movement, and %d/%d ki.",
+  {
+    snprintf(report, 200, "%d/%d hps, %d/%d mana, %d/%d movement, and %d/%d ki.",
       GET_HIT(ch) , GET_MAX_HIT(ch),
       GET_MANA(ch), GET_MAX_MANA(ch),
       GET_MOVE(ch), GET_MAX_MOVE(ch),
       GET_KI(ch), GET_MAX_KI(ch));
+  }
 
   sprintf(buf, "$n reports '%s'", report);
   act(buf, ch, 0, 0, TO_ROOM, 0);
