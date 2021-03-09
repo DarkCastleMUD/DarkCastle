@@ -88,7 +88,7 @@ int do_report(struct char_data *ch, char *argument, int cmd)
         }
       }
 
-      snprintf(report, 200, "XP: %lld, XP till level: %lld, Levels to gain: %d",
+      snprintf(report, 200, "XP: %lld, XP till level: %lld, Levels to gain: %u",
                GET_EXP(ch),
                (int64)(exp_table[(int)GET_LEVEL(ch) + 1] - (int64)GET_EXP(ch)),
                levels_to_gain);
