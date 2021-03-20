@@ -11,6 +11,7 @@ extern "C"
 #include <stdlib.h>
 #include <string.h>
 }
+#include <fmt/format.h>
 
 #include "ki.h"
 #include "room.h"
@@ -1195,19 +1196,22 @@ int ki_transfer( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim)
   else if(type[0] == 'm') 
   {
     GET_KI(ch) -= amount;
-    temp = (learned+5/5) * amount;
+
+    int mana_per_ki = learned/5;
+
+    temp = mana_per_ki * amount;
     GET_MANA(victim) += temp;
     if(GET_MANA(victim) > GET_MAX_MANA(victim)) 
       GET_MANA(victim) = GET_MAX_MANA(victim);
 
-    sprintf(amt, "%d", amount);
-    send_damage("You focus intently, bonding briefly with $N's spirit, transferring | ki of your essence to $M.", 
-                 ch, 0, victim, amt, 
-                 "You focus intently, bonding briefly with $N's spirit, transferring a portion of your essence to $M.", TO_CHAR);
-   sprintf(amt, "%d", temp);
-   send_damage("$n focuses intently, bonding briefly with your spirit, replenishing | magic with a portion of $s essence.", 
-                ch, 0, victim, amt, 
-               "$n focuses intently, bonding briefly with your spirit, replenishing your magic with a portion of $s essence.", TO_VICT);
+    string buffer;
+    buffer = fmt::format("You focus intently, bonding briefly with $N's spirit, transferring {} ki of your essence into {} mana for $M.", amount, temp);
+    act(buffer.c_str(), ch, 0, victim, TO_CHAR, 0);
+
+    buffer = fmt::format("$n focuses intently, bonding briefly with your spirit, replenishing {} mana with a portion of $s essence.", temp);
+    act(buffer.c_str(), ch, 0, victim, TO_VICT, 0);
+
+
     act("$n focuses intently upon $N as though briefly bonding with $S spirit.", ch, 0, victim, TO_ROOM, NOTVICT);
   }
   else 
