@@ -1195,9 +1195,7 @@ int ki_transfer( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim)
   else if(type[0] == 'm') 
   {
     GET_KI(ch) -= amount;
-    
-    temp = number(amount-amount/10, amount+amount/10) * 2;
-    temp = (temp * learned) / 100;
+    temp = (learned+5/5) * amount;
     GET_MANA(victim) += temp;
     if(GET_MANA(victim) > GET_MAX_MANA(victim)) 
       GET_MANA(victim) = GET_MAX_MANA(victim);
