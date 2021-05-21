@@ -325,9 +325,10 @@ int do_zap(struct char_data *ch, char *argument, int cmd)
 
     AuctionHandleDelete(GET_NAME(victim));
     snprintf(buf, 500, "%s has deleted %s.\n\r", ch->name, victim->name);
-    remove_character(victim->name, ZAPPED);
 
     do_quit(victim, "", 666);
+    remove_character(victim->name, ZAPPED);
+    
     send_to_room(buf, room);
     send_to_all("You hear an ominous clap of thunder in the distance.\n\r");
     log(buf, ANGEL, LOG_GOD);
