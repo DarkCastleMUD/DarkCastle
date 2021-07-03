@@ -549,7 +549,7 @@ int show_zone_commands(struct char_data *ch, int i, int start = 0)
         }
       break;
     case '%':
-      sprintf(buf, "%s Consider myself true on %d times out of %d.", buf,
+      sprintf(buf, "%s Consider myself true on %d times out of %d.\r\n", buf,
         zone_table[i].cmd[j].arg1,
         zone_table[i].cmd[j].arg2);
 
