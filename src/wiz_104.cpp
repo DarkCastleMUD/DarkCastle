@@ -1,4 +1,6 @@
 #include <vector>
+#include <fmt/format.h>
+#include <fmt/chrono.h>
 #include <string>
 #include <utility>
 
@@ -431,6 +433,25 @@ int show_zone_commands(struct char_data *ch, int i, int start = 0)
   // show zone cmds
   for(int j = start; (j < start+num_to_show) && (zone_table[i].cmd[j].command != 'S'); j++)
   {
+    time_t last = zone_table[i].cmd[j].last;
+	string lastStr = "never";
+	if (last) {
+		lastStr = fmt::format("{:%Y-%m-%d %H:%M:%S}", fmt::localtime(last));
+	}
+	
+	time_t lastSuccess = zone_table[i].cmd[j].lastSuccess;
+	string lastSuccessStr = "never";
+	if (lastSuccess) {
+		lastSuccessStr = fmt::format("{:%Y-%m-%d %H:%M:%S}", fmt::localtime(lastSuccess));
+	}
+
+	uint64_t attempts = zone_table[i].cmd[j].attempts;
+	uint64_t successes = zone_table[i].cmd[j].successes;
+	double successRate = 0.0;
+	if (attempts > 0) {
+		successRate = (double)successes / (double)attempts;
+	}
+
     // show command # and if_flag
     // note that we show the command as cmd+1.  This is so we don't have a
     // command 0 from the user's perspective.
@@ -528,9 +549,10 @@ int show_zone_commands(struct char_data *ch, int i, int start = 0)
         }
       break;
     case '%':
-      sprintf(buf, "%s Consider myself true on %d times out of %d.\r\n", buf,
+      sprintf(buf, "%s Consider myself true on %d times out of %d.", buf,
         zone_table[i].cmd[j].arg1,
         zone_table[i].cmd[j].arg2);
+
       break;
     case 'J':
       sprintf(buf, "%s Temp Command. [%d] [%d] [%d]\r\n", buf,
@@ -591,6 +613,7 @@ int show_zone_commands(struct char_data *ch, int i, int start = 0)
       sprintf(buf, "%s       %s\r\n", buf, zone_table[i].cmd[j].comment);
 
     send_to_char(buf, ch);
+	csendf(ch, "[%3d] Last attempt: $B%s$R Last success: $B%s$R Average: $B%.2f$R\r\n", j+1, lastStr.c_str(), lastSuccessStr.c_str(), successRate * 100.0);
   } // for
 
   send_to_char("\r\nUse zedit to see the rest of the commands if they were truncated.\r\n", ch);

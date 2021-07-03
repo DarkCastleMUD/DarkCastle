@@ -4405,6 +4405,8 @@ void reset_zone(int zone)
 		if (ZCMD.active == 0)
 		continue;
 
+		ZCMD.last = time(nullptr);
+		ZCMD.attempts++;
 		if (ZCMD.if_flag == 0 || // always
 		(last_cmd == 1 && ZCMD.if_flag == 1) ||// if last command true
 		(last_cmd == 0 && ZCMD.if_flag == 2) ||// if last command false
@@ -4416,6 +4418,8 @@ void reset_zone(int zone)
 		(last_percent == 1 && ZCMD.if_flag == 8) ||// if-last-percent-true
 		(last_percent == 0 && ZCMD.if_flag == 9)// if-last-percent-false
 		) {
+			ZCMD.lastSuccess = ZCMD.last;
+			ZCMD.successes++;
 			switch (ZCMD.command) {
 
 				case 'M': /* read a mobile */

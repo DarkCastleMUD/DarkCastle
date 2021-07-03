@@ -187,6 +187,9 @@ struct reset_com
     int active; // is it active? alot aren't on the builders' port
     time_t last; // when was it last reset
     CHAR_DATA *lastPop;
+    time_t lastSuccess;
+    uint64_t attempts;
+    uint64_t successes;
     /* 
     *  Commands:              *
     *  'M': Read a mobile     *
