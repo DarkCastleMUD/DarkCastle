@@ -5806,7 +5806,7 @@ void do_pkill(CHAR_DATA *ch, CHAR_DATA *victim, int type, bool vict_is_attacker)
     else if (type == KILL_POISON)
       sprintf(killer_message,"\n\r##%s has perished from %s's POISON!\n\r", GET_NAME(victim), GET_NAME(ch));
     else if (!str_cmp(GET_NAME(ch), GET_NAME(victim))) 
-      ;
+      sprintf(killer_message,"");
 //    sprintf(killer_message,"\n\r##%s just commited SUICIDE!\n\r", GET_NAME(victim));
     else if(GET_LEVEL(victim) < PKILL_COUNT_LIMIT || ch == victim)
       //sprintf(killer_message,"\n\r##%s just DIED!\n\r", GET_NAME(victim));
