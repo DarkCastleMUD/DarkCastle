@@ -6031,12 +6031,14 @@ void string_to_file(ofstream &f, char *string)
 void copySaveData(obj_data *target, obj_data *source)
 {
 	int i;
-	if ((i = eq_current_damage(source)) > 0) {
+	if ((i = eq_current_damage(source)) > 0)
+	{
 		for (; i > 0; i--)
 			damage_eq_once(target);
 	}
 
-	if (strcmp(GET_OBJ_SHORT(source), GET_OBJ_SHORT(target))) {
+	if (strcmp(GET_OBJ_SHORT(source), GET_OBJ_SHORT(target)))
+	{
 		GET_OBJ_SHORT(target) = str_hsh(GET_OBJ_SHORT(source));
 	}
 	if (strcmp(source->description, target->description))
@@ -6044,7 +6046,8 @@ void copySaveData(obj_data *target, obj_data *source)
 		target->description = str_hsh(source->description);
 	}
 
-	if (strcmp(source->name, target->name)) {
+	if (strcmp(source->name, target->name))
+	{
 		target->name = str_hsh(source->name);
 	}
 
@@ -6053,60 +6056,72 @@ void copySaveData(obj_data *target, obj_data *source)
 		target->obj_flags.type_flag = source->obj_flags.type_flag;
 	}
 
-	if (source->obj_flags.extra_flags != target->obj_flags.extra_flags) {
+	if (source->obj_flags.extra_flags != target->obj_flags.extra_flags)
+	{
 		target->obj_flags.extra_flags = source->obj_flags.extra_flags;
 	}
 
-	if (source->obj_flags.more_flags != target->obj_flags.more_flags) {
+	if (source->obj_flags.more_flags != target->obj_flags.more_flags)
+	{
 		target->obj_flags.more_flags = source->obj_flags.more_flags;
 	}
 
-	if (IS_SET(source->obj_flags.more_flags, ITEM_CUSTOM)
-			&& source->obj_flags.value[0] != target->obj_flags.value[0]) {
+	bool custom = IS_SET(source->obj_flags.more_flags, ITEM_CUSTOM);
+	if (custom)
+	{
 		target->obj_flags.value[0] = source->obj_flags.value[0];
 	}
-
-	if ((IS_SET(source->obj_flags.more_flags, ITEM_CUSTOM) || source->obj_flags.type_flag == ITEM_DRINKCON)
-			&& source->obj_flags.value[1] != target->obj_flags.value[1]) {
+	
+	ubyte type_flag = source->obj_flags.type_flag;
+	if ((custom || type_flag == ITEM_DRINKCON) && (source->obj_flags.value[1] != target->obj_flags.value[1]))
+	{
 		target->obj_flags.value[1] = source->obj_flags.value[1];
 	}
 
-	if ((IS_SET(source->obj_flags.more_flags, ITEM_CUSTOM) || source->obj_flags.type_flag == ITEM_STAFF || source->obj_flags.type_flag == ITEM_WAND)
-			&& source->obj_flags.value[2] != target->obj_flags.value[2]) {
+	if ((custom || type_flag == ITEM_STAFF || type_flag == ITEM_WAND) && (source->obj_flags.value[2] != target->obj_flags.value[2]))
+	{
 		target->obj_flags.value[2] = source->obj_flags.value[2];
 	}
 
-	if (IS_SET(source->obj_flags.more_flags, ITEM_CUSTOM)
-			&& source->obj_flags.value[3] != target->obj_flags.value[3]) {
+	if (custom && (source->obj_flags.value[3] != target->obj_flags.value[3]))
+	{
 		target->obj_flags.value[3] = source->obj_flags.value[3];
 	}
+	
+	if (type_flag == ITEM_ARMOR || type_flag == ITEM_WEAPON || type_flag == ITEM_INSTRUMENT || type_flag == ITEM_WAND)
+	{
+		if (custom)
+		{
+			target->obj_flags.weight = source->obj_flags.weight;
+			target->obj_flags.cost = source->obj_flags.cost;
+			target->obj_flags.value[1] = source->obj_flags.value[1];
+			target->obj_flags.value[2] = source->obj_flags.value[2];
 
-	if ((source->obj_flags.type_flag == ITEM_ARMOR || source->obj_flags.type_flag == ITEM_WEAPON) && IS_SET(source->obj_flags.more_flags, ITEM_CUSTOM)) {
-		target->obj_flags.weight = source->obj_flags.weight;
-		target->obj_flags.cost = source->obj_flags.cost;
-		target->obj_flags.value[1] = source->obj_flags.value[1];
-		target->obj_flags.value[2] = source->obj_flags.value[2];
-
-		// If new object does not have enough room for affects to be copied then realloc it
-		if (source->num_affects != target->num_affects) {
-			target->affected = (obj_affected_type *)realloc(target->affected,
-					(sizeof(obj_affected_type) * source->num_affects));
-			if (target->affected == NULL) {
-				perror("realloc");
-				exit(EXIT_FAILURE);
+			// If new object does not have enough room for affects to be copied then realloc it
+			if (source->num_affects != target->num_affects)
+			{
+				target->affected = (obj_affected_type *)realloc(target->affected,
+																(sizeof(obj_affected_type) * source->num_affects));
+				if (target->affected == NULL)
+				{
+					perror("realloc");
+					exit(EXIT_FAILURE);
+				}
+				target->num_affects = source->num_affects;
 			}
-			target->num_affects = source->num_affects;
-		}
 
-		for (int i = 0; i < source->num_affects; ++i) {
-			target->affected[i].location = source->affected[i].location;
-			target->affected[i].modifier = source->affected[i].modifier;
+			for (int i = 0; i < source->num_affects; ++i)
+			{
+				target->affected[i].location = source->affected[i].location;
+				target->affected[i].modifier = source->affected[i].modifier;
+			}
 		}
 	}
 
-  if (IS_SET(source->obj_flags.more_flags, ITEM_24H_SAVE)) {
-	  target->save_expiration = source->save_expiration;
-  }
+	if (IS_SET(source->obj_flags.more_flags, ITEM_24H_SAVE))
+	{
+		target->save_expiration = source->save_expiration;
+	}
 
 	return;
 }
