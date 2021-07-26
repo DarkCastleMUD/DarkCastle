@@ -159,7 +159,7 @@ void do_oload(struct char_data *ch, int rnum, int cnt, bool random)
     }
 
     if ( (obj->obj_flags.type_flag == ITEM_MONEY) &&
-         (GET_LEVEL(ch) < OVERSEER)) {
+         (GET_LEVEL(ch) < IMP)) {
        extract_obj(obj);
        send_to_char("Denied.\n\r", ch);
        return;
