@@ -1263,7 +1263,7 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
 
   if ( *point == '\0' ) 
     {
-      logf( IMMORTAL, LOG_WORLD,  "Mob: %d null ifchck", mob_index[mob->mobdata->nr].virt ); 
+      logf( IMMORTAL, LOG_WORLD,  "Mob: v%d r%d: null ifchck: '%s'", mob_index[mob->mobdata->nr].virt, mob->mobdata->nr, ifchck ); 
       return -1;
     }   
   /* skip leading spaces */
@@ -1280,7 +1280,7 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
     }
     else if (*point == ' ')
     {
-	logf( IMMORTAL, LOG_WORLD,  "Mob: %d ifchck syntax error", mob_index[mob->mobdata->nr].virt ); 
+	logf( IMMORTAL, LOG_WORLD,  "Mob: v%d r%d: ifchck syntax error: '%s'", mob_index[mob->mobdata->nr].virt, mob->mobdata->nr, ifchck ); 
 	return -1;
     }
     else if ( *point == '.' )
@@ -1289,7 +1289,7 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
     }
     else if ( *point == '\0' ) 
       {
-	logf( IMMORTAL, LOG_WORLD,  "Mob: %d ifchck syntax error", mob_index[mob->mobdata->nr].virt ); 
+	logf( IMMORTAL, LOG_WORLD,  "Mob: v%d r%d: ifchck syntax error: '%s'", mob_index[mob->mobdata->nr].virt, mob->mobdata->nr, ifchck ); 
 	return -1;
       }   
     else
@@ -1307,7 +1307,7 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
     else if (!traditional && !isalpha(*point)) { point--; break; }
     else if ( *point == '\0' )
       {
-	logf( IMMORTAL, LOG_WORLD,  "Mob: %d ifchck syntax error", mob_index[mob->mobdata->nr].virt ); 
+		logf( IMMORTAL, LOG_WORLD,  "Mob: v%d r%d: ifchck syntax error: '%s'", mob_index[mob->mobdata->nr].virt, mob->mobdata->nr, ifchck ); 
 	return -1;
       }   
     else
@@ -1334,8 +1334,7 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
       while ( ( *point != ' ' ) && ( !isalnum( *point ) ) ) 
 	if ( *point == '\0' ) 
 	  {
-	    logf( IMMORTAL, LOG_WORLD,  "Mob: %d ifchck operator without value",
-		 mob_index[mob->mobdata->nr].virt ); 
+	  	logf( IMMORTAL, LOG_WORLD,  "Mob: v%d r%d: ifchck operator without value: '%s'", mob_index[mob->mobdata->nr].virt, mob->mobdata->nr, ifchck ); 
 	    return -1;
 	  }   
 	else
@@ -1560,7 +1559,7 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
         case 'g': if (mob && mob->fighting)
 		    return ( !IS_NPC(mob->fighting));
 		  else return 0;
-	default:
+	default:	
 	  logf( IMMORTAL, LOG_WORLD,  "Mob: %d bad argument to 'ispc'", mob_index[mob->mobdata->nr].virt ); 
 	  return -1;
 	}
@@ -1673,7 +1672,7 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
 	             return IS_NPC( rndm )/100;
 	          else return -1;
 	default:
-	  logf( IMMORTAL, LOG_WORLD, "Mob: %d bad argument to 'isnpc'", mob_index[mob->mobdata->nr].virt ); 
+	  logf( IMMORTAL, LOG_WORLD, "Mob: v%d r%d: bad argument to isnpc(): '%s'", mob_index[mob->mobdata->nr].virt, mob->mobdata->nr, ifchck ); 
 	  return -1;
 	}
     break;
@@ -1699,7 +1698,7 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
 	             return IS_GOOD( rndm );
 	          else return -1;
 	default:
-	  logf( IMMORTAL, LOG_WORLD,  "Mob: %d bad argument to 'isgood'", mob_index[mob->mobdata->nr].virt ); 
+	  logf( IMMORTAL, LOG_WORLD, "Mob: v%d r%d: bad argument to isgood(): '%s'", mob_index[mob->mobdata->nr].virt, mob->mobdata->nr, ifchck ); 
 	  return -1;
 	}
     break;
@@ -1735,7 +1734,7 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
 	      else
 		  return -1;
 	  default:
-	      logf( IMMORTAL, LOG_WORLD,  "Mob: %d bad argument to 'isgood'", mob_index[mob->mobdata->nr].virt ); 
+	      logf( IMMORTAL, LOG_WORLD, "Mob: v%d r%d: bad argument to isgood(): '%s'", mob_index[mob->mobdata->nr].virt, mob->mobdata->nr, ifchck ); 
 	      return -1;
       }
     break;
@@ -1771,7 +1770,7 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
 	      else
 		  return -1;
 	  default:
-	      logf( IMMORTAL, LOG_WORLD,  "Mob: %d bad argument to 'isgood'", mob_index[mob->mobdata->nr].virt ); 
+		  logf( IMMORTAL, LOG_WORLD, "Mob: v%d r%d: bad argument to isgood(): '%s'", mob_index[mob->mobdata->nr].virt, mob->mobdata->nr, ifchck ); 
 	      return -1;
       }
     break;
@@ -1800,7 +1799,7 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
 	             return is_wearing(rndm, o);
 	          else return -1;
 	default:
-	  logf( IMMORTAL, LOG_WORLD,  "Mob: %d bad argument to 'isworn'", mob_index[mob->mobdata->nr].virt ); 
+	  logf( IMMORTAL, LOG_WORLD, "Mob: v%d r%d: bad argument to isword(): '%s'", mob_index[mob->mobdata->nr].virt, mob->mobdata->nr, ifchck ); 
 	  return -1;
 	}
      }
@@ -1827,7 +1826,7 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
 	             return ( rndm->fighting ) ? 1 : 0;
 	          else return -1;
 	default:
-	  logf( IMMORTAL, LOG_WORLD,  "Mob: %d bad argument to 'isfight'", mob_index[mob->mobdata->nr].virt ); 
+      logf( IMMORTAL, LOG_WORLD, "Mob: v%d r%d: bad argument to isfight(): '%s'", mob_index[mob->mobdata->nr].virt, mob->mobdata->nr, ifchck ); 
 	  return -1;
 	}
     break;
@@ -1853,7 +1852,7 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
 	             return istank( rndm ) ? 1 : 0;
 	          else return -1;
 	default:
-	  logf( IMMORTAL, LOG_WORLD,  "Mob: %d bad argument to 'istank'", mob_index[mob->mobdata->nr].virt ); 
+	  logf( IMMORTAL, LOG_WORLD, "Mob: v%d r%d: bad argument to istank(): '%s'", mob_index[mob->mobdata->nr].virt, mob->mobdata->nr, ifchck ); 
 	  return -1;
 	}
     break;
@@ -1879,7 +1878,7 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
 	             return ( GET_LEVEL( rndm ) > IMMORTAL );
                   else return -1;
 	default:
-	  logf( IMMORTAL, LOG_WORLD,  "Mob: %d bad argument to 'isimmort'", mob_index[mob->mobdata->nr].virt ); 
+	  logf( IMMORTAL, LOG_WORLD, "Mob: v%d r%d: bad argument to isimmort(): '%s'", mob_index[mob->mobdata->nr].virt, mob->mobdata->nr, ifchck ); 
 	  return -1;
 	}
     break;
@@ -1907,7 +1906,8 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
 	          else return -1;
 	default:
 	  logf( IMMORTAL, LOG_WORLD,  "Mob: %d bad argument to 'ischarmed'",
-	       mob_index[mob->mobdata->nr].virt ); 
+	       mob_index[mob->mobdata->nr].virt );
+		    
 	  return -1;
 	}
     break;
