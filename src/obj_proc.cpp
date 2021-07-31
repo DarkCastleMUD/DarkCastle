@@ -3279,8 +3279,9 @@ int eternitystaff(struct char_data*ch, struct obj_data *obj, int cmd, char*arg,
 		}
 		if (dam > 0)
 		{
-			csendf(obj->equipped_by, "Your body hemorrhages magical energy as you struggle to control The Eternity Staff.\r\n");
-			GET_MANA(obj->equipped_by) -= dam;
+      GET_MANA(obj->equipped_by) -= dam;
+			csendf(obj->equipped_by, "Your body hemorrhages %d mana as you struggle to control The Eternity Staff.\r\n", dam);
+			
 
 			act("$n is wracked by magical energies!", obj->equipped_by, 0, 0, TO_ROOM, 0);
 		}
