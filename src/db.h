@@ -38,6 +38,8 @@ struct index_data;
 struct error_eof {};
 struct error_negative_int {};
 struct error_range_int {};
+struct error_range_under {};
+struct error_range_over {};
 
 #define WORLD_MAX_ROOM        50000  // should never get this high...
                                      // it's just to keep builders/imps from 
