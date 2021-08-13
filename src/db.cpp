@@ -3842,7 +3842,13 @@ struct obj_data *read_object(int nr, FILE *fl, bool zz)
 		case 'A':
 			// these are only two members of obj_affected_type, so nothing else needs initializing
 			loc = fread_int(fl, -1000, LONG_MAX);
-			mod = fread_int(fl, -1000, 1000);
+			try {
+				mod = fread_int(fl, -1000, 1000);
+			} catch (error_range_over) {
+				mod = 1000;
+			} catch (error_range_under) {
+				mod = -1000;
+			}
 			add_obj_affect(obj, loc, mod);
 			break;
 
@@ -5216,7 +5222,11 @@ int64_t fread_int(FILE *fl, int64_t beg_range, int64_t end_range)
 					printf("fread_int: Bad value for range %lld - %lld: %lld\n",
 							beg_range, end_range, i);
 					perror("fread_int: Value range error");
-					throw error_range_int();
+					if (i < beg_range) {
+						throw error_range_under();
+					} else if (i > end_range) {
+						throw error_range_over();
+					}
 				}
 			}
 			break;
