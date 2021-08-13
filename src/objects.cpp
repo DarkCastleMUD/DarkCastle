@@ -158,6 +158,10 @@ int damage_eq_once(obj_data * obj)
     if(obj->affected[i].location == APPLY_DAMAGED)
     {
        obj->affected[i].modifier++;
+       if (obj->affected[i].modifier > 1000)
+       {
+         obj->affected[i].modifier = 1000;
+       }
        return (obj->affected[i].modifier);
     }
 
