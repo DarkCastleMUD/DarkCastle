@@ -10,6 +10,8 @@
 
 using namespace std;
 
+map<string, Timer> PerfTimers;
+
 TimeVal::TimeVal(time_t sec, suseconds_t usec) {
 	tv_sec = sec;
 	tv_usec = usec;
