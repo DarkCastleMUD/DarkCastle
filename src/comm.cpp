@@ -13,31 +13,15 @@
 #include "terminal.h"
 #include <string.h>
 
-#ifndef WIN32
-	#include <unistd.h>
-	#include <sys/wait.h>
-	#include <sys/socket.h>
-	#include <sys/resource.h>
-	#include <sys/time.h>
-	#include <netinet/in.h>
-	#include <netdb.h>
-	#include <arpa/telnet.h>
-	#include <arpa/inet.h>
-#else
-	#include <direct.h>
-	#include <winsock2.h>
-	#include <process.h>
-	#include <mmsystem.h>
-
-	// swipe some defined out of arpa telnet
-	#define	IAC				255		/* interpret as command: */
-	#define	WONT			252		/* I won't use option */
-	#define	WILL			251		/* I will use option */
-	#define TELOPT_NAOCRD	10	/* negotiate about CR disposition */
-	#define TELOPT_ECHO		1	/* echo */
-	#define TELOPT_NAOFFD	13	/* negotiate about formfeed disposition */
-
-#endif
+#include <unistd.h>
+#include <sys/wait.h>
+#include <sys/socket.h>
+#include <sys/resource.h>
+#include <sys/time.h>
+#include <netinet/in.h>
+#include <netdb.h>
+#include <arpa/telnet.h>
+#include <arpa/inet.h>
 #include <fcntl.h>
 
 #include <sys/types.h>
@@ -63,7 +47,7 @@
 #include "quest.h"
 #include "shop.h"
 #include "Leaderboard.h"
-
+#include "Timer.h"
 #ifdef USE_SQL
 #include "Backend/Database.h"
 #endif
@@ -72,9 +56,7 @@
 #include <iostream>
 #include <list>
 #include "dc_xmlrpc.h"
-#ifdef USE_TIMING
 #include "Timer.h"
-#endif
 #include "DC.h"
 #include "CommandStack.h"
 #include <algorithm>
@@ -650,10 +632,8 @@ int DC::init_socket(in_port_t port)
 // used in game_loop.  It has to be global so that "close_socket" can increment
 // it if we are closing the socket that is next to be processed.
 struct descriptor_data * next_d;
-#ifdef USE_TIMING
 stringstream timingDebugStr;
 unsigned long long pulseavg = 0;
-#endif
 
 /*
  * game_loop contains the main loop which drives the entire MUD.  It
@@ -666,11 +646,7 @@ void DC::game_loop(void)
 
 	fd_set input_set, output_set, exc_set, null_set;
 	struct timeval last_time, delay_time, now_time;
-	long secDelta, usecDelta;
-
-#ifdef USE_TIMING
-	static Timer gameloopTimer, commandTimer;
-#endif
+	long secDelta, usecDelta;	
 
 	// comm must be much longer than MAX_INPUT_LENGTH since we allow aliases in-game
 	// otherwise an alias'd command could easily overrun the buffer
@@ -689,10 +665,7 @@ void DC::game_loop(void)
 
 	/* The Main Loop.  The Big Cheese.  The Top Dog.  The Head Honcho.  The.. */
 	while (!_shutdown) {
-#ifdef USE_TIMING
-		timingDebugStr.str("");
-		gameloopTimer.start();
-#endif
+		PerfTimers["gameloop"].start();
 		// Set CommandStack to track a command stack with max queue depth of 20
 		CommandStack cstack(0, 5);
 
@@ -795,9 +768,7 @@ void DC::game_loop(void)
 						if (perform_alias(d, comm))
 							get_from_q(&d->input, comm, &aliased);
 					}
-#ifdef USE_TIMING				
-					commandTimer.start();
-#endif
+					PerfTimers["command"].start();
 					// Azrack's a chode.  Don't forget to check
 					// ->snooping before you check snooping->char:P
 					if(*comm == '%' && d->snooping && d->snooping->character) {
@@ -805,12 +776,8 @@ void DC::game_loop(void)
 					} else {
 						command_interpreter(d->character, comm);	/* send it to interpreter */
 					}
-#ifdef USE_TIMING					
-					commandTimer.stop();
+          PerfTimers["command"].stop();
 
-					timingDebugStr <<  last_char_name << ":" << comm << " took "
-								<< commandTimer << endl;
-#endif
 				} // else if input
 			} // if input
 			// the below two if-statements are used to allow the mud to detect and respond
@@ -827,30 +794,16 @@ void DC::game_loop(void)
 		} // for
 
 		// do what needs to be done.  violence, repoping, regen, etc.
-#ifdef USE_TIMING		
-		static Timer hbTimer;
-		hbTimer.start();
-#endif		
+		PerfTimers["heartbeat"].start();
 		heartbeat();
-#ifdef USE_TIMING		
-		hbTimer.stop();
-		timingDebugStr << "heartbeat: " << hbTimer << endl;
-
-		static Timer dbProcTimer;
-		dbProcTimer.start();
-#endif
+		PerfTimers["heartbeat"].stop();
 	
 #ifdef USE_SQL
+		PerfTimers["db"].start();
 		db.processqueue();
+    PerfTimers["db"].stop();
 #endif
-
-#ifdef USE_TIMING
-		dbProcTimer.stop();
-		//timingDebugStr << "db.processqueue: " << dbProcTimer << endl;
-
-		static Timer outputTimer;
-		outputTimer.start();
-#endif
+    PerfTimers["output"].start();
 		
 		/* send queued output out to the operating system (ultimately to user) */
 		for (d = descriptor_list; d; d = next_d) {
@@ -861,34 +814,23 @@ void DC::game_loop(void)
 			// else
 			// d->prompt_mode = 1;
 		}
-#ifdef USE_TIMING		
-		outputTimer.stop();
-		//timingDebugStr << "output: " << outputTimer << endl;
-		
-		static Timer xmlrpcTimer;
-		xmlrpcTimer.start();
-#endif
-			
-		xmlrpc_s->work(0);
-		
-#ifdef USE_TIMING		
-		xmlrpcTimer.stop();
-		//timingDebugStr << "xmlrpc: " << xmlrpcTimer << endl;
-#endif
+		PerfTimers["output"].stop();
 		// we're done with this pulse.  Now calculate the time until the next pulse and sleep until then
 		// we want to pulse PASSES_PER_SEC times a second (duh).  This is currently 4.
 
 		gettimeofday( &now_time, NULL );
 		usecDelta   = ((int) last_time.tv_usec) - ((int) now_time.tv_usec);
 		secDelta    = ((int) last_time.tv_sec ) - ((int) now_time.tv_sec );
-#ifdef USE_TIMING
+
+    /*
 		if (now_time.tv_sec-last_time.tv_sec > 0 || now_time.tv_usec-last_time.tv_usec > 20000) {
 			timingDebugStr <<  "Time since last pulse is "
 					<< (((int) now_time.tv_sec) - ((int) last_time.tv_sec)) << "sec "
 					<< (((int) now_time.tv_usec) - ((int) last_time.tv_usec)) << "usec.\r\n";
 			//logf(110, LOG_BUG, timingDebugStr.str().c_str());
 		}
-#endif
+    */
+
 		usecDelta   += (1000000 / PASSES_PER_SEC);
 		while ( usecDelta < 0 )
 		{
@@ -907,22 +849,16 @@ void DC::game_loop(void)
 			delay_time.tv_usec = usecDelta;
 			delay_time.tv_sec  = secDelta;
 			//logf(110, LOG_BUG, "Pausing for  %dsec %dusec.", secDelta, usecDelta);
-#ifndef WIN32
 			if ( select( 0, NULL, NULL, NULL, &delay_time ) < 0 && errno != EINTR)
 			{
 				perror( "game_loop: select: delay" );
 				exit( 1 );
 			}
-#else
-			Sleep(delay_time.tv_sec * 1000 + delay_time.tv_usec / 1000);
-#endif
 		}
 		// temp removing this since it's spamming the crap out of us
 		//else logf(110, LOG_BUG, "0 delay on pulse");
 		gettimeofday(&last_time, NULL);
-#ifdef USE_TIMING
-		cerr << timingDebugStr.str();
-#endif		
+    PerfTimers["gameloop"].stop();
 	}
 }
 
@@ -945,102 +881,59 @@ void init_heartbeat()
 }
 
 void heartbeat() {
-#ifdef USE_TIMING
-	static Timer mobileTimer;
-	static Timer objectTimer;
-#endif
-
 	if (--pulse_mobile < 1) {
 		pulse_mobile = PULSE_MOBILE;
-#ifdef USE_TIMING
-		mobileTimer.start();
-#endif
+
+		PerfTimers["mobile"].start();
 		mobile_activity();
-#ifdef USE_TIMING
-		mobileTimer.stop();
-		timingDebugStr << "mobile_activity: " << mobileTimer << endl;
-		objectTimer.start();
-#endif
+    PerfTimers["mobile"].stop();
+
+    PerfTimers["object"].start();
 		object_activity(PULSE_MOBILE);
-#ifdef USE_TIMING
-		objectTimer.stop();
-		timingDebugStr << "object_activity: " << objectTimer << endl;
-#endif
+    PerfTimers["object"].stop();
 	}
 	if (--pulse_timer < 1) {
-#ifdef USE_TIMING
-		static Timer affectTimer;
-#endif
 		pulse_timer = PULSE_TIMER;
 		check_timer();
-#ifdef USE_TIMING
-		affectTimer.start();
-#endif
+
+    PerfTimers["affect"].start();
 		affect_update(PULSE_TIMER);
-#ifdef USE_TIMING
-		affectTimer.stop();
-		timingDebugStr << "affect_update: " << affectTimer << endl;
-#endif
+    PerfTimers["affect"].stop();
 	}
 	if (--pulse_short < 1) {
-#ifdef USE_TIMING
-		static Timer pulseShortTimer;
-#endif
 		pulse_short = PULSE_SHORT;
-#ifdef USE_TIMING
-		pulseShortTimer.start();
-#endif
+    PerfTimers["short"].start();
 		short_activity();
+    PerfTimers["short"].stop();
 		pulse_command_lag();
-#ifdef USE_TIMING
-		pulseShortTimer.stop();
-		timingDebugStr << "short_activity/pulse_command_lag: " << pulseShortTimer << endl;
-#endif
+
 	}
 	// TODO - need to eventually modify this so it works for casters too so I can delay certain
 	if (--pulse_bard < 1) {
-#ifdef USE_TIMING
-		static Timer bardTimer;
-		static Timer mprogThrowsTimer;
-		static Timer campTimer;
-#endif
 		pulse_bard = PULSE_BARD;
-#ifdef USE_TIMING
-		bardTimer.start();
-#endif
+
+    PerfTimers["bard"].start();
 		update_bard_singing();
-#ifdef USE_TIMING
-		bardTimer.stop();
-		mprogThrowsTimer.start();
-#endif
+    PerfTimers["bard"].stop();
+
+    PerfTimers["mprogthrows"].start();
 		update_mprog_throws();  // convienant place to put it
-#ifdef USE_TIMING
-		mprogThrowsTimer.stop();
-		campTimer.start();
-#endif
+    PerfTimers["mprogthrows"].stop();
+
+    PerfTimers["camp"].start();
 		update_make_camp_and_leadership();     // and this, too
-#ifdef USE_TIMING
-		campTimer.stop();
-		timingDebugStr << "bardTimer" << bardTimer << endl;
-		timingDebugStr << "mprogThrowsTimer" << mprogThrowsTimer << endl;
-		timingDebugStr << "campTimer" << campTimer << endl;
-#endif
+    PerfTimers["camp"].stop();
 	}
 
 	if (--pulse_violence < 1) {
 		pulse_violence = PULSE_VIOLENCE;
-#ifdef USE_TIMING
-		static Timer violenceTimer;
-		violenceTimer.start();
-#endif
+
+    PerfTimers["violence+"].start();
 		perform_violence();
 		update_characters();
 		affect_update(PULSE_VIOLENCE);
 		check_silence_beacons();
-#ifdef USE_TIMING
-		violenceTimer.stop();
-		timingDebugStr << "violenceTimer" << violenceTimer << endl;
-#endif
+    PerfTimers["violence+"].stop();
 	}
 
 	if (--pulse_tensec < 1) {

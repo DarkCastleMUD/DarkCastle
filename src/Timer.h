@@ -9,6 +9,7 @@
 #define TIMER_H_
 
 #include <string>
+#include <map>
 #include <sys/time.h>
 #include <stdint.h>
 #include <iostream>
@@ -45,6 +46,8 @@ private:
 	uint_fast64_t totalTime;
 	friend ostream & operator<< (ostream &, Timer t);
 };
+
+extern map<string, Timer> PerfTimers;
 
 ostream& operator<<(ostream &out, Timer t);
 ostream& operator<<(ostream &out, TimeVal tv);
