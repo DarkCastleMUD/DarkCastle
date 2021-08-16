@@ -197,6 +197,9 @@ int send_to_gods(const char *str, int god_level, long type)
       case LOG_QUEST:
 	  sprintf(typestr, "quest");
 	  break;
+    case LOG_DEBUG:
+    sprintf(typestr, "debug");
+    break;
       default:
 	  sprintf(typestr, "unknown");
 	  break;

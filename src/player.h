@@ -44,6 +44,7 @@
 #define CHANNEL_HINTS      1U<<23
 #define LOG_VAULT          1U<<24
 #define LOG_QUEST          1U<<25
+#define LOG_DEBUG          1U<<26
 // ...
 #define MISC_IS_OBJ        1U<<30
 #define MISC_IS_MOB        1U<<31
