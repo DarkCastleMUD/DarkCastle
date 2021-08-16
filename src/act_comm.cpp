@@ -223,119 +223,125 @@ int send_to_gods(const char *str, int god_level, long type)
   return(1);
 }
 
-
-
 int do_channel(struct char_data *ch, char *arg, int cmd)
 {
   int x;
-  int y = 0; 
+  int y = 0;
   char buf[200];
   char buf2[200];
- 
+
   char *on_off[] = {
-    "$B$4off$R",
-    "$B$2on$R"
-  };
+      "$B$4off$R",
+      "$B$2on$R"};
 
   char *types[] = {
-    "bug",       // 0
-    "prayer",
-    "god",
-    "mortal",
-    "socket",    
-    "misc",      // 5
-    "player",
-    "gossip",    // 7
-    "auction",
-    "info",
-    "trivia",    // 10
-    "dream",
-    "clan",
-    "newbie",
-    "shout",
-    "world",    // 15
-    "arena",
-    "logclan",
-    "warnings",
-    "help",
-    "database",   // 20
-    "objects",
-    "tell",
-    "hints",
-    "vault",
-    "quest",      // 25
- "\\@"
-  };
+      "bug", // 0
+      "prayer",
+      "god",
+      "mortal",
+      "socket",
+      "misc", // 5
+      "player",
+      "gossip", // 7
+      "auction",
+      "info",
+      "trivia", // 10
+      "dream",
+      "clan",
+      "newbie",
+      "shout",
+      "world", // 15
+      "arena",
+      "logclan",
+      "warnings",
+      "help",
+      "database", // 20
+      "objects",
+      "tell",
+      "hints",
+      "vault",
+      "quest", // 25
+      "debug",
+      "\\@"};
 
-  if(IS_NPC(ch))
+  if (IS_NPC(ch))
     return eSUCCESS;
 
-  if(*arg)
+  if (*arg)
     one_argument(arg, buf);
 
-  else { 
-//    send_to_char("\n\r", ch);
+  else
+  {
+    //    send_to_char("\n\r", ch);
 
-    if(GET_LEVEL(ch) < IMMORTAL) {
-      for(x = 7; x <= 14; x++) {
-         if(IS_SET(ch->misc, (1<<x)))
-           y = 1;
-         else
-           y = 0;
-         sprintf(buf2, "%-9s%s\n\r", types[x], on_off[y]); 
-         send_to_char(buf2, ch);
+    if (GET_LEVEL(ch) < IMMORTAL)
+    {
+      for (x = 7; x <= 14; x++)
+      {
+        if (IS_SET(ch->misc, (1 << x)))
+          y = 1;
+        else
+          y = 0;
+        sprintf(buf2, "%-9s%s\n\r", types[x], on_off[y]);
+        send_to_char(buf2, ch);
       }
     }
-    else {
-	int o = GET_LEVEL(ch) == 110 ? 21:19;
-      for(x = 0; x <= o; x++) {
-         if(IS_SET(ch->misc, (1<<x)))
-           y = 1;
-         else
-           y = 0;
-         sprintf(buf2, "%-9s%s\n\r", types[x], on_off[y]); 
-         send_to_char(buf2, ch);
+    else
+    {
+      int o = GET_LEVEL(ch) == 110 ? 21 : 19;
+      for (x = 0; x <= o; x++)
+      {
+        if (IS_SET(ch->misc, (1 << x)))
+          y = 1;
+        else
+          y = 0;
+        sprintf(buf2, "%-9s%s\n\r", types[x], on_off[y]);
+        send_to_char(buf2, ch);
       }
     }
 
-    if(IS_SET(ch->misc, 1<<22))
-       y = 1;
+    if (IS_SET(ch->misc, 1 << 22))
+      y = 1;
     else
-       y = 0;
-    sprintf(buf2, "%-9s%s\n\r", types[22], on_off[y]); 
+      y = 0;
+    sprintf(buf2, "%-9s%s\n\r", types[22], on_off[y]);
     send_to_char(buf2, ch);
 
-    if(IS_SET(ch->misc, 1<<23))
-       y = 1;
+    if (IS_SET(ch->misc, 1 << 23))
+      y = 1;
     else
-       y = 0;
-    sprintf(buf2, "%-9s%s\n\r", types[23], on_off[y]); 
+      y = 0;
+    sprintf(buf2, "%-9s%s\n\r", types[23], on_off[y]);
     send_to_char(buf2, ch);
-    
-    int o = GET_LEVEL(ch) == 110 ? 25:0;
-    for(x = 24; x <= o; x++) {
-	if(IS_SET(ch->misc, (1<<x)))
-	    y = 1;
-	else
-	    y = 0;
-	sprintf(buf2, "%-9s%s\n\r", types[x], on_off[y]); 
-	send_to_char(buf2, ch);
+
+    int o = GET_LEVEL(ch) == 110 ? 26 : 0;
+    for (x = 24; x <= o; x++)
+    {
+      if (IS_SET(ch->misc, (1 << x)))
+        y = 1;
+      else
+        y = 0;
+      sprintf(buf2, "%-9s%s\n\r", types[x], on_off[y]);
+      send_to_char(buf2, ch);
     }
 
     return eSUCCESS;
   }
 
-  for(x = 0; x <= 26; x++) {
-     if(x == 26) {
-       send_to_char("That type was not found.\n\r", ch);
-       return eSUCCESS;
-     }
-     if(is_abbrev(buf, types[x]))
-       break;
+  for (x = 0; x <= 27; x++)
+  {
+    if (x == 27)
+    {
+      send_to_char("That type was not found.\n\r", ch);
+      return eSUCCESS;
+    }
+    if (is_abbrev(buf, types[x]))
+      break;
   }
 
-  if(GET_LEVEL(ch) < IMMORTAL &&
-      ( x < 7 || (x > 14 && x < 22)) ) {
+  if (GET_LEVEL(ch) < IMMORTAL &&
+      (x < 7 || (x > 14 && x < 22)))
+  {
     send_to_char("That type was not found.\n\r", ch);
     return eSUCCESS;
   }
@@ -344,15 +350,17 @@ int do_channel(struct char_data *ch, char *arg, int cmd)
     send_to_char("That type was not found.\n\r", ch);
     return eSUCCESS;
   }
-  if(IS_SET(ch->misc, (1<<x))) {
+  if (IS_SET(ch->misc, (1 << x)))
+  {
     sprintf(buf, "%s channel turned $B$4OFF$R.\n\r", types[x]);
     send_to_char(buf, ch);
-    REMOVE_BIT(ch->misc, (1<<x));
+    REMOVE_BIT(ch->misc, (1 << x));
   }
-  else {
+  else
+  {
     sprintf(buf, "%s channel turned $B$2ON$R.\n\r", types[x]);
     send_to_char(buf, ch);
-    SET_BIT(ch->misc, (1<<x));
+    SET_BIT(ch->misc, (1 << x));
   }
   return eSUCCESS;
 }
