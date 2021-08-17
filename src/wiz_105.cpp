@@ -16,6 +16,7 @@
 #include "innate.h"
 #include "fileinfo.h"
 #include "const.h"
+#include "Timer.h"
 
 int do_clearaff(struct char_data *ch, char *argument, int cmd)
 {
@@ -206,6 +207,83 @@ int do_showbits(struct char_data *ch, char *argument, int cmd)
     send_to_char("--------------------\n\r\n\r", ch);
 
     return eSUCCESS;
+}
+
+int do_debug(struct char_data *ch, char *args, int cmd)
+{
+  string arg1, arg2, arg3;
+  string remainder;
+
+  tie(arg1, remainder) = half_chop(args);
+  if (arg1 == "perf")
+  {
+    tie(arg2, remainder) = half_chop(remainder);
+    if (arg2 == "list")
+    {
+      for (auto &pt : PerfTimers)
+      {
+        csendf(ch, "%s\n\r", pt.first.c_str());
+      }
+    }
+    else if (arg2 == "show")
+    {
+      tie(arg3, remainder) = half_chop(remainder);
+      if (arg3 == "all")
+      {
+        for (auto &pt : PerfTimers)
+        {
+          string key = pt.first;
+          Timer t = pt.second;
+          csendf(ch, "%15s: "
+                     "cur:%llus %lluμs"
+                     "\tmin:%llus %lluμs"
+                     "\tmax:%llus %lluμs"
+                     "\tavg:%llus %lluμs\n\r",
+                 key.c_str(),
+                 t.getDiff().tv_sec, t.getDiff().tv_usec,
+                 t.getDiffMin().tv_sec, t.getDiffMin().tv_usec,
+                 t.getDiffMax().tv_sec, t.getDiffMax().tv_usec,
+                 t.getDiffAvg().tv_sec, t.getDiffAvg().tv_usec);
+        }
+      }
+      else if (arg3 != "")
+      {
+        map<string, Timer>::iterator i = PerfTimers.find(arg3);
+        if (i != PerfTimers.end())
+        {
+          string key = i->first;
+          Timer t = i->second;
+          csendf(ch, "%15s: "
+                     "cur:%llus %lluμs"
+                     "\tmin:%llus %lluμs"
+                     "\tmax:%llus %lluμs"
+                     "\tavg:%llus %lluμs\n\r",
+                 key.c_str(),
+                 t.getDiff().tv_sec, t.getDiff().tv_usec,
+                 t.getDiffMin().tv_sec, t.getDiffMin().tv_usec,
+                 t.getDiffMax().tv_sec, t.getDiffMax().tv_usec,
+                 t.getDiffAvg().tv_sec, t.getDiffAvg().tv_usec);
+        }
+        else
+        {
+          csendf(ch, "performance timer key not found\n\r");
+        }
+      }
+      else
+      {
+        csendf(ch, "Please specify a performance timer key. Run debug perf list\n\r");
+      }
+    }
+  }
+  else
+  {
+    csendf(ch, "debug <perf> <list>\n\r");
+    csendf(ch, "      <perf> <show> <key>\n\r");
+    csendf(ch, "      <perf> <set> <key> <value>\n\r");
+  }
+
+  csendf(ch, "\n\r");
+  return eSUCCESS;
 }
 
 int do_pardon(struct char_data *ch, char *argument, int cmd)

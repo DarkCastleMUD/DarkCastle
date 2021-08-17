@@ -264,6 +264,7 @@ DO_FUN do_credits;
 DO_FUN do_cripple;
 DO_FUN do_ctell; 
 DO_FUN do_deathstroke;
+DO_FUN do_debug;
 DO_FUN do_deceit;
 DO_FUN do_defenders_stance;
 DO_FUN do_disarm;
