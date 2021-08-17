@@ -124,6 +124,27 @@ void Timer::stop() {
 	totalTime += (diff_cur.tv_usec/1000);
 }
 
+TimeVal Timer::getDiff()
+{
+	return diff_cur;
+}
+
+TimeVal Timer::getDiffMin()
+{
+	return diff_min;
+}
+
+TimeVal Timer::getDiffMax()
+{
+	return diff_max;
+}
+
+TimeVal Timer::getDiffAvg()
+{
+	return diff_avg;
+}
+
+
 ostream& operator<<(ostream &out, Timer t) {
 	out << "last=" << t.diff_cur << " min=" << t.diff_min
 		<< " max=" << t.diff_max << " avg=" << t.diff_avg

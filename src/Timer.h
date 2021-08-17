@@ -36,6 +36,10 @@ public:
 	void start();
 	void stop();
 	void setCount(uint16_t c) { stopCount = c; }
+	TimeVal getDiff();
+	TimeVal getDiffMin();
+	TimeVal getDiffMax();
+	TimeVal getDiffAvg();
 private:
 	TimeVal starttv;
 	TimeVal diff_cur;
