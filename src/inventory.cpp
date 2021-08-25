@@ -2143,7 +2143,7 @@ int do_close(CHAR_DATA *ch, char *argument, int cmd)
 
 int has_key(CHAR_DATA *ch, int key)
 {
-    struct obj_data *o;
+    struct obj_data *o, *tmp_o, *blah;
     
     if(!key) 
      return 0; //if key vnum is 0, there is no key
@@ -2156,6 +2156,14 @@ int has_key(CHAR_DATA *ch, int key)
     for (o = ch->carrying; o; o = o->next_content)
         if (obj_index[o->item_number].virt == key)
             return(1);
+	if(IS_SET(o->obj_flags.extra_flags, ITEM_SPECIAL) &&
+        (GET_ITEM_TYPE(o) == ITEM_KEYRING)){
+	    for(tmp_o = o->contains; tmp_o; tmp_o = blah) {
+                blah = tmp_o->next_content;
+		if (obj_index[tmp_o->item_number].virt == key)
+                    return(1);
+	    }
+	}
             
     return(0);
 }
