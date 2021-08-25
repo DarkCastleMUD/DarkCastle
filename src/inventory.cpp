@@ -1308,6 +1308,45 @@ int do_put(struct char_data *ch, char *argument, int cmd)
                  send_to_char("The objects uniqueness prevents it!\n\r",ch);
                  return eFAILURE;
               }
+	      if ((GET_ITEM_TYPE(obj_object) != ITEM_KEY) &&
+		IS_SET(sub_object->obj_flags.more_flags, ITEM_KEYRING))
+	      {
+		send_to_char("Only keys can be put on a keyring.");
+		return eFAILURE;
+	      }
+	      if (IS_SET(sub_object->obj_flags.more_flags, ITEM_KEYRING) &&
+		(bits == FIND_OBJ_INV))
+	      {
+		for(comp_object = sub_object->contains;
+		  comp_object;
+		  comp_object = next_obj) 
+		{
+		  next_obj = sub_object->next_content;
+		  if (obj_index[obj_object->item_number].virt ==
+		      obj_index[comp_object->item_number].virt)
+		  {
+		    act("$n discards a duplicate $p.", ch, obj, 0, TO_ROOM , 0);
+  		    act("You discard a duplicate $p .", ch, obj, 0, TO_CHAR , 0);
+  		    GET_GOLD(ch) += 1;
+  		    log_sacrifice(ch, obj);
+   	     	    extract_obj(obj);
+		    return eSUCCESS;
+		  }
+		}//end loop to check for duplicates
+		obj_from_char(obj_object);
+		IS_CARRYING_W(ch) += GET_OBJ_WEIGHT(obj_object);
+		obj_to_obj(obj_object, sub_object);
+		act("$n attaches $p to the $P.", ch, obj_object, sub_object, TO_ROOM, INVIS_NULL);
+             	act("You attach $p to the $P.",ch,obj_object,sub_object,TO_CHAR,0);
+		logf(IMP, LOG_OBJECTS, "%s attaches %s[%d] to %s[%d]",
+		  ch->name,
+		  obj_object->short_description,
+		  obj_index[obj_object->item_number].virt,
+		  sub_object->short_description,
+		  obj_index[sub_object->item_number].virt);
+                return eSUCCESS;
+	      }//end keyring code
+		    
 	      if (((sub_object->obj_flags.weight) + 
                (obj_object->obj_flags.weight)) <=
                (sub_object->obj_flags.value[0]) &&
@@ -2152,11 +2191,24 @@ int has_key(CHAR_DATA *ch, int key)
         if (obj_index[ch->equipment[HOLD]->item_number].virt == key)
             return(1);
     }
-     
+    
+	
     for (o = ch->carrying; o; o = o->next_content)
-        if (obj_index[o->item_number].virt == key)
+    {
+      if (obj_index[o->item_number].virt == key)
             return(1);
-            
+      if (IS_SET(o->obj_flags.more_flags, ITEM_KEYRING))
+      {
+	for(comp_object = sub_object->contains;
+	  comp_object;
+	  comp_object = next_obj) 
+	{
+	  next_obj = sub_object->next_content;
+	  if (obj_index[comp_object->item_number].virt == key)
+		  return(1);
+	}
+      }
+    }       
     return(0);
 }
 
