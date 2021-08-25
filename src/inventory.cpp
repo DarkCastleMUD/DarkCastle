@@ -2153,7 +2153,7 @@ int has_key(CHAR_DATA *ch, int key)
             return(1);
     }
      
-    for (o = ch->carrying; o; o = o->next_content)
+    for (o = ch->carrying; o; o = o->next_content) {
         if (obj_index[o->item_number].virt == key)
             return(1);
 	if(IS_SET(o->obj_flags.extra_flags, ITEM_SPECIAL) &&
@@ -2165,7 +2165,7 @@ int has_key(CHAR_DATA *ch, int key)
                     return(1);
 	    }
 	}
-            
+    }    
     return(0);
 }
 
