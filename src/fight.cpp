@@ -1514,7 +1514,7 @@ void eq_destroyed(char_data * ch, obj_data * obj, int pos)
 {
   if (IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL)) return;
   if (IS_SET(obj->obj_flags.more_flags, ITEM_NO_SCRAP)) return;
-  
+  if (IS_SET(obj->obj_flags.extra_flags, ITEM_QUEST))  return;
   if(pos != -1) //if its not an inventory item, do this
   {
     unequip_char(ch, pos);
