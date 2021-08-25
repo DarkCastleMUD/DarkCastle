@@ -2156,9 +2156,9 @@ int has_key(CHAR_DATA *ch, int key)
     for (o = ch->carrying; o; o = o->next_content) {
         if (obj_index[o->item_number].virt == key)
             return(1);
-	if(IS_SET(o->obj_flags.more_flags, ITEM_SPECIAL) &&
+	if(IS_SET(o->obj_flags.extra_flags, ITEM_SPECIAL) &&
         (GET_ITEM_TYPE(o) == ITEM_CONTAINER) && 
-	(o->obj_flags.extra_flags, ITEM_KEYRING)){
+	(o->obj_flags.more_flags, ITEM_KEYRING)){
 	    for(tmp_o = o->contains; tmp_o; tmp_o = blah) {
                 blah = tmp_o->next_content;
 		if (obj_index[tmp_o->item_number].virt == key)
