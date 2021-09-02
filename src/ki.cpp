@@ -489,48 +489,51 @@ int ki_blast( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
    return eSUCCESS;
 }
 
-int ki_punch( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
-{	
-   if (!vict) {
-      logf(ANGEL, LOG_BUG, "Serious problem in ki punch!", ANGEL, LOG_BUG);
-      return eINTERNAL_ERROR;
-      }
+int ki_punch(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
+{
+  if (!vict)
+  {
+    logf(ANGEL, LOG_BUG, "Serious problem in ki punch!", ANGEL, LOG_BUG);
+    return eINTERNAL_ERROR;
+  }
 
-   set_cantquit(ch, vict);
-   int dam = GET_HIT(vict) / 4, manadam = GET_MANA(vict) / 4;
-   int retval;
+  set_cantquit(ch, vict);
+  int dam = GET_HIT(vict) / 4, manadam = GET_MANA(vict) / 4;
+  int retval;
 
+  dam = MAX(350, dam);
+  dam = MIN(1000, dam);
+  manadam = MAX(150, manadam);
+  manadam = MIN(750, manadam);
+  if (GET_HIT(vict) < 500000)
+  {
+    if (number(1, 101) <
+        GET_LEVEL(ch) / 5 + has_skill(ch, KI_OFFSET + KI_PUNCH) / 2 - GET_LEVEL(vict) / 5)
 
-   dam = MAX(350, dam);
-   dam = MIN(1000,dam);
-   manadam = MAX(150, manadam);
-   manadam = MIN(750, manadam);
-   if (GET_HIT(vict) < 500000) {
-	      if (number(1, 101) <
-           GET_LEVEL(ch)/5 + has_skill(ch, KI_OFFSET+KI_PUNCH)/2 - GET_LEVEL(vict)/5)
+    {
+      GET_MANA(vict) -= manadam;
+      retval = damage(ch, vict, dam, TYPE_UNDEFINED, KI_OFFSET + KI_PUNCH, 0);
+      return retval;
+    }
+    else
+    {
+      retval = damage(ch, vict, 0, TYPE_UNDEFINED, KI_OFFSET + KI_PUNCH, 0);
 
-      {
- 	 GET_MANA(vict) -= manadam;
-	 retval = damage(ch,vict,dam, TYPE_UNDEFINED, KI_OFFSET+KI_PUNCH,0);
-	 return retval;
-      }
-      else {
-	 retval = damage(ch,vict,0, TYPE_UNDEFINED, KI_OFFSET+KI_PUNCH,0);
- 
-         GET_HIT(ch) -= 1/8 * (GET_MAX_HIT(ch));
-	 WAIT_STATE(ch, PULSE_VIOLENCE);
-         if (!vict->fighting)
-            return attack(vict, ch, TYPE_UNDEFINED);
-         }	
-      } // end of < 5000
-      
-   else {
-      send_to_char("Your opponent has too many hit points!\n\r", ch);
+      GET_HIT(ch) -= 1 / 8 * (GET_MAX_HIT(ch));
+      WAIT_STATE(ch, PULSE_VIOLENCE);
       if (!vict->fighting)
-         return attack(vict, ch, TYPE_UNDEFINED);
-      }
-      
-   return eSUCCESS; // shouldn't get here
+        return attack(vict, ch, TYPE_UNDEFINED);
+    }
+  } // end of < 5000
+
+  else
+  {
+    send_to_char("Your opponent has too many hit points!\n\r", ch);
+    if (!vict->fighting)
+      return attack(vict, ch, TYPE_UNDEFINED);
+  }
+
+  return eSUCCESS; // shouldn't get here
 }
 
 int ki_sense( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
