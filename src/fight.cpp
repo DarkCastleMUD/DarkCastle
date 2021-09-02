@@ -502,11 +502,11 @@ int attack(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
     return eINTERNAL_ERROR;
   }
 
+  // victim could be dead if a skill like do_ki causes folowers to autojoin and kill
+  // before attack gets called
   if (GET_POS(vict) == POSITION_DEAD) {
-    log("Dead victim sent to attack. Wtf ;)", -1, LOG_BUG);
-    produce_coredump();
-    
-    return eINTERNAL_ERROR;
+    stop_fighting(ch);
+    return eFAILURE;
   }
 
   if (!can_attack(ch))                          return eFAILURE;
