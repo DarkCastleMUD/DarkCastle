@@ -77,7 +77,7 @@ char *activeProgTmpBuf;
 
 bool  MOBtrigger;
 struct mprog_throw_type *g_mprog_throw_list = 0;   // holds all pending mprog throws
-bool selfpurge = FALSE;
+bool selfpurge = false;
 
 int cIfs[256]; // for MPPAUSE
 int ifpos;
@@ -3277,7 +3277,7 @@ void mprog_driver ( char *com_list, CHAR_DATA *mob, CHAR_DATA *actor,
  int        count = 0;
  if (IS_AFFECTED( mob, AFF_CHARM ))
    return;
- selfpurge = FALSE;
+ selfpurge = false;
  mprog_cur_result = eSUCCESS;
  mprog_line_num = 0;
 
@@ -4030,21 +4030,24 @@ CHAR_DATA *initiate_oproc(CHAR_DATA *ch, OBJ_DATA *obj)
 
 void end_oproc(CHAR_DATA *ch)
 {
-    static int core_counter = 0;
-    if (selfpurge) {
-	logf( IMMORTAL, LOG_BUG, "Crash averted in end_oproc()" );
+	static int core_counter = 0;
+	if (selfpurge)
+	{
+		logf(IMMORTAL, LOG_BUG, "Crash averted in end_oproc()");
 
-	if (core_counter++ < 10) {
-	    produce_coredump();
-	    logf(IMMORTAL, LOG_BUG, "Corefile produced.");
+		if (core_counter++ < 10)
+		{
+			produce_coredump();
+			logf(IMMORTAL, LOG_BUG, "Corefile produced.");
+		}
 	}
-    } else {
-	extract_char(ch, TRUE);
-	mob_index[real_mobile(12)].progtypes = 0;
-	mob_index[real_mobile(12)].mobprogs = 0;
-    }
+	else
+	{
+		extract_char(ch, TRUE);
+		mob_index[real_mobile(12)].progtypes = 0;
+		mob_index[real_mobile(12)].mobprogs = 0;
+	}
 }
-
 
 int oprog_can_see_trigger( CHAR_DATA *ch, OBJ_DATA *item )
 {
@@ -4234,23 +4237,25 @@ item->next_content)
   return mprog_cur_result;
 }
 
-int oprog_rand_trigger( OBJ_DATA *item )
+int oprog_rand_trigger(OBJ_DATA *item)
 {
 
-  CHAR_DATA *vmob;
-//  OBJ_DATA *item;
-  CHAR_DATA *ch;
-  mprog_cur_result = eSUCCESS;
-  if (item->carried_by) ch=item->carried_by;
-  else ch = NULL;
-    if (obj_index[item->item_number].progtypes & RAND_PROG)
-     {
-        vmob = initiate_oproc(ch, item);
-        mprog_percent_check(vmob, ch, item, NULL, RAND_PROG);
-        end_oproc(vmob);
-        return mprog_cur_result;
-     }
- return mprog_cur_result;
+	CHAR_DATA *vmob;
+	//  OBJ_DATA *item;
+	CHAR_DATA *ch;
+	mprog_cur_result = eSUCCESS;
+	if (item->carried_by)
+		ch = item->carried_by;
+	else
+		ch = NULL;
+	if (obj_index[item->item_number].progtypes & RAND_PROG)
+	{
+		vmob = initiate_oproc(ch, item);
+		mprog_percent_check(vmob, ch, item, NULL, RAND_PROG);
+		end_oproc(vmob);
+		return mprog_cur_result;
+	}
+	return mprog_cur_result;
 }
 
 int oprog_arand_trigger( OBJ_DATA *item )

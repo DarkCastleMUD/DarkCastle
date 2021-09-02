@@ -4440,7 +4440,7 @@ void reset_zone(int zone)
 					last_cmd = 1;
 					last_mob = 1;
 					extern bool selfpurge;
-					selfpurge = FALSE;
+					selfpurge = false;
 					mprog_load_trigger(mob);
 					if (selfpurge) {
 						mob = NULL;

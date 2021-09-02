@@ -670,7 +670,7 @@ void DC::game_loop(void)
 		CommandStack cstack(0, 5);
 
 		extern bool selfpurge;
-		selfpurge = FALSE;
+		selfpurge = false;
 		// Set up the input, output, and exception sets for select().
 		FD_ZERO(&input_set);
 		FD_ZERO(&output_set);

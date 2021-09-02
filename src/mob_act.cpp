@@ -129,7 +129,7 @@ void mobile_activity(void)
 
 // TODO - Try to make the 'average' mob IQ higher
 		extern bool selfpurge;
-		selfpurge = FALSE;
+		selfpurge = false;
 
 		// Only activate mprog random triggers if someone is in the zone
 		try {

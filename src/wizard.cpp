@@ -100,7 +100,7 @@ void do_mload(struct char_data *ch, int rnum, int cnt)
     mob = clone_mobile(rnum);
     char_to_room(mob, ch->in_room);
     extern bool selfpurge;
-    selfpurge = FALSE;
+    selfpurge = false;
     mprog_load_trigger(mob);
     if (selfpurge) {
       mob = NULL;

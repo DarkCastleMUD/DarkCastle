@@ -4823,16 +4823,18 @@ void raw_kill(CHAR_DATA * ch, CHAR_DATA * victim)
     )
     make_dust(victim);
   else make_corpse(victim);
-  
-  if(IS_NPC(victim)) { 
-    if (ch == victim) {
-	logf(IMMORTAL, LOG_BUG, "selfpurge on %s to %s", GET_NAME(ch), GET_NAME(victim));
-	selfpurge = 1;
+
+  if (IS_NPC(victim))
+  {
+    if (ch == victim)
+    {
+      logf(IMMORTAL, LOG_BUG, "selfpurge on %s to %s", GET_NAME(ch), GET_NAME(victim));
+      selfpurge = true;
     }
     extract_char(victim, TRUE);
     return;
   }
-  
+
   if (victim->followers || victim->master)
   {
      stop_grouped_bards(victim,!IS_SINGING(victim));

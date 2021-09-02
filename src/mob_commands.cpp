@@ -671,7 +671,11 @@ int do_mppurge( CHAR_DATA *ch, char *argument, int cmd )
 
 //    issame = (ch == victim);
     if (ch == victim)
-	{ extern bool selfpurge; selfpurge = TRUE; }
+    {
+      extern bool selfpurge;
+      logf(IMMORTAL, LOG_BUG, "selfpurge on %s to %s", GET_NAME(ch), GET_NAME(victim));
+      selfpurge = true;
+    }
     extract_char( victim, TRUE );
 
 //    if(issame)
