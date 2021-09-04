@@ -1,6 +1,11 @@
 {
     "files.associations": {
         "tuple": "cpp",
-        "sstream": "cpp"
-    }
+        "sstream": "cpp",
+        "cmath": "cpp",
+        "*.tcc": "cpp",
+        "qstring": "cpp",
+        "list": "cpp"
+    },
+    "C_Cpp.errorSquiggles": "Disabled"
 }
