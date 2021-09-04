@@ -879,6 +879,7 @@ const char *item_types[] =
     "MEGAPHONE",
     "ALTAR",
     "TOTEM",
+    "KEYRING",
     "\n"
 };
 
