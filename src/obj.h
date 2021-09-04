@@ -56,7 +56,8 @@
 #define ITEM_MEGAPHONE  31
 #define ITEM_ALTAR	    32
 #define ITEM_TOTEM	    33
-#define ITEM_TYPE_MAX   33
+#define ITEM_KEYRING    34
+#define ITEM_TYPE_MAX   34
 
 /* Bitvector For 'wear_flags' */
 
