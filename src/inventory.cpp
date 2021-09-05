@@ -1,15 +1,8 @@
 /************************************************************************
-| $Id: inventory.cpp,v 1.121 2014/07/04 22:00:04 jhhudso Exp $
-| inventory.C
 | Description:  This file contains implementation of inventory-management
 |   commands: get, give, put, etc..
 |
-| Revision history
-| 10/17/2003   Onager   Changed do_consent() to fix buffer overflow crash bug
-|                       and to only add consented character's name to the
-|                       corpse name once (it was getting added on every consent)
-| 11/10/2003   Onager   Added check to prevent consenting NPCs, and limited
-|                       consented string lenth to 1/2 max string length
+| Authors: DikuMUD, Pirahna, Staylor, Urizen, Rahz, Zaphod, Shane, Jhhudso, Heaven1 and others
 */
 extern "C"
 {
@@ -82,7 +75,7 @@ void get(struct char_data *ch, struct obj_data *obj_object, struct obj_data *sub
 
     if( ( IS_NPC(ch) || affected_by_spell(ch, OBJ_CHAMPFLAG_TIMER) )
         && obj_index[obj_object->item_number].virt == CHAMPION_ITEM) {
-       send_to_char("No champion flag for you, two years!\n\r", ch);
+       send_to_char("No champion flag for you, two years!\r\n", ch);
        return;
     }
 
@@ -188,7 +181,7 @@ void get(struct char_data *ch, struct obj_data *obj_object, struct obj_data *sub
 
         if(obj_index[obj_object->item_number].virt == CHAMPION_ITEM) {
            SETBIT(ch->affected_by, AFF_CHAMPION);
-           buffer = fmt::format("\n\r##{} has just picked up the Champion flag!\n\r", GET_NAME(ch));
+           buffer = fmt::format("\r\n##{} has just picked up the Champion flag!\r\n", GET_NAME(ch));
            send_info(buffer);
         }
     }
@@ -338,18 +331,18 @@ int do_get(struct char_data *ch, char *argument, int cmd)
 
     if((cmd == 10) && (GET_CLASS(ch) != CLASS_THIEF) &&
       (GET_LEVEL(ch) < IMMORTAL)) {
-      send_to_char("I bet you think you're a thief.\n\r", ch);
+      send_to_char("I bet you think you're a thief.\r\n", ch);
       return eFAILURE; 
     }
 
     if(cmd == 10 && type != 2 && type != 6 && type != 0) {
       send_to_char("You can only palm objects that are in the same room, "
-                   "one at a time.\n\r", ch);
+                   "one at a time.\r\n", ch);
       return eFAILURE; 
     }
 
     if (cmd == CMD_LOOT && type != 0 && type != 6) {
-      send_to_char("You can only loot 1 item from a non-consented corpse.\n\r", ch);
+      send_to_char("You can only loot 1 item from a non-consented corpse.\r\n", ch);
       return eFAILURE;
     }
 
@@ -358,19 +351,19 @@ int do_get(struct char_data *ch, char *argument, int cmd)
 	case 0:{ 
 	  switch(cmd) {
 	  case 10:
-	    send_to_char("Palm what?\n\r", ch); 
+	    send_to_char("Palm what?\r\n", ch); 
 	    break;
 	  case CMD_LOOT:
-	    send_to_char("Loot what?\n\r", ch); 
+	    send_to_char("Loot what?\r\n", ch); 
 	    break;
 	  default:
-	    send_to_char("Get what?\n\r", ch); 
+	    send_to_char("Get what?\r\n", ch); 
 	  }
 	} break;
 	/* get all */
 	case 1:{ 
             if(ch->in_room == real_room(3099)) {
-              send_to_char("Not in the donation room.\n\r", ch);
+              send_to_char("Not in the donation room.\r\n", ch);
               return eFAILURE;
             }
 	    sub_object = 0;
@@ -410,7 +403,7 @@ int do_get(struct char_data *ch, char *argument, int cmd)
 
 		if (IS_SET(obj_object->obj_flags.extra_flags, ITEM_SPECIAL) &&
 		    !isname(GET_NAME(ch), obj_object->name) && GET_LEVEL(ch) < IMP) {
-		    csendf(ch, "The %s appears to be SPECIAL. Only its rightful owner can take it.\n\r", obj_object->short_description);
+		    csendf(ch, "The %s appears to be SPECIAL. Only its rightful owner can take it.\r\n", obj_object->short_description);
 		    continue;
 		}
 
@@ -423,13 +416,13 @@ int do_get(struct char_data *ch, char *argument, int cmd)
                      has_consent = TRUE;
 		   if(!has_consent && !isname(GET_NAME(ch), obj_object->name)) {
                      if (GET_LEVEL(ch) < OVERSEER) {
-		       send_to_char("You don't have consent to take the corpse.\n\r", ch);
+		       send_to_char("You don't have consent to take the corpse.\r\n", ch);
 		       continue;
                      }
                    }
                    if(has_consent && contains_no_trade_item(obj_object)) {
                      if (GET_LEVEL(ch) < OVERSEER) {
-                       send_to_char("This item contains no_trade items that cannot be picked up.\n\r", ch);
+                       send_to_char("This item contains no_trade items that cannot be picked up.\r\n", ch);
 		       has_consent = FALSE; // bugfix, could loot without consent
                        continue;
                      }
@@ -447,14 +440,14 @@ int do_get(struct char_data *ch, char *argument, int cmd)
                         !( GET_ITEM_TYPE(obj_object) == ITEM_MONEY && obj_object->item_number == -1 && GET_LEVEL(ch) < IMMORTAL)
                        ) 
 		    {
-			sprintf(buffer, "%s : You can't carry that many items.\n\r", fname(obj_object->name));
+			sprintf(buffer, "%s : You can't carry that many items.\r\n", fname(obj_object->name));
 			send_to_char(buffer, ch);
 			fail = TRUE;
 		    } 
                     else if ((IS_CARRYING_W(ch) + obj_object->obj_flags.weight) > CAN_CARRY_W(ch) && GET_LEVEL(ch) < IMMORTAL
 			&& GET_ITEM_TYPE(obj_object) != ITEM_MONEY)
                     {
-			sprintf(buffer, "%s : You can't carry that much weight.\n\r", fname(obj_object->name));
+			sprintf(buffer, "%s : You can't carry that much weight.\r\n", fname(obj_object->name));
 			send_to_char(buffer, ch);
 			fail = TRUE;
 		    }
@@ -464,7 +457,7 @@ int do_get(struct char_data *ch, char *argument, int cmd)
 			found = TRUE;
 		    } else 
 		    {
-			send_to_char("You can't take that.\n\r", ch);
+			send_to_char("You can't take that.\r\n", ch);
 			fail = TRUE;
 		    }
 		} else if (CAN_SEE_OBJ(ch, obj_object) && GET_LEVEL(ch) >= IMMORTAL && CAN_WEAR(obj_object,ITEM_TAKE)) {
@@ -473,10 +466,10 @@ int do_get(struct char_data *ch, char *argument, int cmd)
                 }
 	    } // of for loop
 	    if (found) {
-//		send_to_char("OK.\n\r", ch);
+//		send_to_char("OK.\r\n", ch);
                  do_save(ch,"", 666);
 	    } else {
-		if (!fail) send_to_char("You see nothing here.\n\r", ch);
+		if (!fail) send_to_char("You see nothing here.\r\n", ch);
 	    }
 	} break;
 	/* get ??? */
@@ -496,7 +489,7 @@ int do_get(struct char_data *ch, char *argument, int cmd)
                      has_consent = TRUE;
 		   if(!has_consent && !isname(GET_NAME(ch), obj_object->name)) {
 		     send_to_char("You don't have consent to take the "
-		               "corpse.\n\r", ch);
+		               "corpse.\r\n", ch);
 		     return eFAILURE;
                    }
                    has_consent = FALSE;  // reset it
@@ -504,18 +497,18 @@ int do_get(struct char_data *ch, char *argument, int cmd)
 
 		if (IS_SET(obj_object->obj_flags.extra_flags, ITEM_SPECIAL) &&
 		    !isname(GET_NAME(ch), obj_object->name) && GET_LEVEL(ch) < IMP) {
-		    csendf(ch, "The %s appears to be SPECIAL. Only its rightful owner can take it.\n\r", obj_object->short_description);
+		    csendf(ch, "The %s appears to be SPECIAL. Only its rightful owner can take it.\r\n", obj_object->short_description);
 		} else if( (IS_CARRYING_N(ch) + 1 > CAN_CARRY_N(ch)) &&
                    !( GET_ITEM_TYPE(obj_object) == ITEM_MONEY && obj_object->item_number == -1 && GET_LEVEL(ch) < IMMORTAL)
                   )
                 {
-		    sprintf(buffer, "%s : You can't carry that many items.\n\r", fname(obj_object->name));
+		    sprintf(buffer, "%s : You can't carry that many items.\r\n", fname(obj_object->name));
 		    send_to_char(buffer, ch);
 		    fail = TRUE;
 		} else if((IS_CARRYING_W(ch) + obj_object->obj_flags.weight) > CAN_CARRY_W(ch) &&
                         GET_LEVEL(ch) < IMMORTAL && GET_ITEM_TYPE(obj_object) != ITEM_MONEY)
                 {
-		    sprintf(buffer,"%s : You can't carry that much weight.\n\r", fname(obj_object->name));
+		    sprintf(buffer,"%s : You can't carry that much weight.\r\n", fname(obj_object->name));
 		    send_to_char(buffer, ch);
 		    fail = TRUE;
 		}
@@ -533,7 +526,7 @@ int do_get(struct char_data *ch, char *argument, int cmd)
 		     csendf(ch, "%s is too powerful for you to possess.\r\n", obj_object->short_description);
 		     fail = TRUE;	
                   } else {
-                     csendf(ch, "The aura of the donation room allows you to pick up %s.\n\r", obj_object->short_description);
+                     csendf(ch, "The aura of the donation room allows you to pick up %s.\r\n", obj_object->short_description);
                      get(ch, obj_object, sub_object, 0, cmd);
                      do_save(ch,"", 666);
                      found = TRUE;
@@ -548,18 +541,18 @@ int do_get(struct char_data *ch, char *argument, int cmd)
 		  do_save(ch,"", 666);
 		  found = TRUE;
 		} else {
-		    send_to_char("You can't take that.\n\r", ch);
+		    send_to_char("You can't take that.\r\n", ch);
 		    fail = TRUE;
 		}
 	    } else {
-		sprintf(buffer,"You do not see a %s here.\n\r", arg1);
+		sprintf(buffer,"You do not see a %s here.\r\n", arg1);
 		send_to_char(buffer, ch);
 		fail = TRUE;
 	    }
 	} break;
 	/* get all all */
 	case 3:{ 
-	    send_to_char("You must be joking?!\n\r", ch);
+	    send_to_char("You must be joking?!\r\n", ch);
 	} break;
 	/* get all ??? */
 	case 4:{
@@ -581,14 +574,14 @@ int do_get(struct char_data *ch, char *argument, int cmd)
 		   if((isname("thiefcorpse", sub_object->name) && !isname(GET_NAME(ch), sub_object->name) ) || isname(buffer, sub_object->name) || GET_LEVEL(ch) > 105)
                      has_consent = TRUE;
 		   if(!has_consent && !isname(GET_NAME(ch), sub_object->name)) {
-		     send_to_char("You don't have consent to touch the corpse.\n\r", ch);
+		     send_to_char("You don't have consent to touch the corpse.\r\n", ch);
 		     return eFAILURE;
                    }
                 }
 		if (GET_ITEM_TYPE(sub_object) == ITEM_CONTAINER
 		|| GET_ITEM_TYPE(sub_object) == ITEM_ALTAR) {
 		  if (IS_SET(sub_object->obj_flags.value[1], CONT_CLOSED)){
-		    sprintf(buffer, "The %s is closed.\n\r",fname(sub_object->name));
+		    sprintf(buffer, "The %s is closed.\r\n",fname(sub_object->name));
 		    send_to_char(buffer, ch);
 		    return eFAILURE;
 		  }
@@ -598,7 +591,7 @@ int do_get(struct char_data *ch, char *argument, int cmd)
 		    next_obj = obj_object->next_content;
 		if (GET_ITEM_TYPE(obj_object) == ITEM_CONTAINER && contains_no_trade_item(obj_object))
 		{
-                  csendf(ch, "%s : It seems magically attached to the corpse.\n\r", 
+                  csendf(ch, "%s : It seems magically attached to the corpse.\r\n", 
 fname(obj_object->name));
 		  continue;
 		} /*
@@ -626,7 +619,7 @@ fname(obj_object->name));
 
 		if (IS_SET(obj_object->obj_flags.extra_flags, ITEM_SPECIAL) &&
 		    !isname(GET_NAME(ch), obj_object->name) && GET_LEVEL(ch) < IMP) {
-		    csendf(ch, "The %s appears to be SPECIAL. Only its rightful owner can take it.\n\r", obj_object->short_description);
+		    csendf(ch, "The %s appears to be SPECIAL. Only its rightful owner can take it.\r\n", obj_object->short_description);
 		    continue;
 		}
 
@@ -637,7 +630,7 @@ fname(obj_object->name));
                            !( GET_ITEM_TYPE(obj_object) == ITEM_MONEY && obj_object->item_number == -1 && GET_LEVEL(ch) < IMMORTAL)
                          )
                       {
-		        sprintf(buffer,"%s : You can't carry that many items.\n\r", fname(obj_object->name));
+		        sprintf(buffer,"%s : You can't carry that many items.\r\n", fname(obj_object->name));
 		        send_to_char(buffer, ch);
 		        fail = TRUE;
 		      } else 
@@ -657,7 +650,7 @@ fname(obj_object->name));
 			extract_obj(obj_object);
 			continue;
 				}
-                              csendf(ch, "%s : It seems magically attached to the corpse.\n\r", fname(obj_object->name));
+                              csendf(ch, "%s : It seems magically attached to the corpse.\r\n", fname(obj_object->name));
                               continue;
                             }
                           }
@@ -679,12 +672,12 @@ fname(obj_object->name));
 			    get(ch,obj_object, sub_object, 0, cmd);
 			    found = TRUE;
 		          } else {
-			    send_to_char("You can't take that.\n\r", ch);
+			    send_to_char("You can't take that.\r\n", ch);
 			    fail = TRUE;
 		          }
 		        } else {
 		          sprintf(buffer,
-		            "%s : You can't carry that much weight.\n\r", 
+		            "%s : You can't carry that much weight.\r\n", 
 			    fname(obj_object->name));
 		          send_to_char(buffer, ch);
 		          fail = TRUE;
@@ -693,26 +686,26 @@ fname(obj_object->name));
 		    }
 		  }
 		  if (!found && !fail) {
-		    sprintf(buffer,"You do not see anything in the %s.\n\r", 
+		    sprintf(buffer,"You do not see anything in the %s.\r\n", 
 			fname(sub_object->name));
 		    send_to_char(buffer, ch);
 		    fail = TRUE;
 		  }
 		} else {
-		  sprintf(buffer,"The %s is not a container.\n\r",
+		  sprintf(buffer,"The %s is not a container.\r\n",
 		      fname(sub_object->name));
 		  send_to_char(buffer, ch);
 		  fail = TRUE;
 		}
 	      } else { 
-		sprintf(buffer,"You do not see or have the %s.\n\r", arg2);
+		sprintf(buffer,"You do not see or have the %s.\r\n", arg2);
 		send_to_char(buffer, ch);
 		fail = TRUE;
 	      }
 	    } break;
 	case 5:{ 
 	  send_to_char(
-	    "You can't take a thing from more than one container.\n\r", ch);
+	    "You can't take a thing from more than one container.\r\n", ch);
 	} break;
         case 6:{ // get ??? ???
 	  found = FALSE;
@@ -721,7 +714,7 @@ fname(obj_object->name));
 			   world[ch->in_room].contents);
 	  if (!sub_object){
 	    if (cmd==CMD_LOOT) {
-	      send_to_char("You can only loot 1 item from a non-consented corpse.\n\r", ch);
+	      send_to_char("You can only loot 1 item from a non-consented corpse.\r\n", ch);
 	      return eFAILURE;
 	    }
 
@@ -754,7 +747,7 @@ fname(obj_object->name));
 	       if(!has_consent && !isname(GET_NAME(ch), sub_object->name)) 
                {
 		 send_to_char("You don't have consent to touch the "
-		               "corpse.\n\r", ch);
+		               "corpse.\r\n", ch);
 	         return eFAILURE;
                }
             }
@@ -762,7 +755,7 @@ fname(obj_object->name));
 		GET_ITEM_TYPE(sub_object) == ITEM_ALTAR) 
             {
 	      if (IS_SET(sub_object->obj_flags.value[1], CONT_CLOSED)){
-	        sprintf(buffer,"The %s is closed.\n\r", fname(sub_object->name));
+	        sprintf(buffer,"The %s is closed.\r\n", fname(sub_object->name));
 	        send_to_char(buffer, ch);
 	        return eFAILURE;
 	      }
@@ -791,7 +784,7 @@ fname(obj_object->name));
                     !( GET_ITEM_TYPE(obj_object) == ITEM_MONEY && obj_object->item_number == -1 && GET_LEVEL(ch) < IMMORTAL)
                    )
                 { 
-                  sprintf(buffer,"%s : You can't carry that many items.\n\r",fname(obj_object->name));
+                  sprintf(buffer,"%s : You can't carry that many items.\r\n",fname(obj_object->name));
                   send_to_char(buffer, ch);
 	          fail = TRUE;
 	        } else if (inventorycontainer || 
@@ -845,7 +838,7 @@ fname(obj_object->name));
 					
 				  }
 			  } else {
-			      csendf(ch, "%s : It seems magically attached to the corpse.\n\r", fname(obj_object->name));
+			      csendf(ch, "%s : It seems magically attached to the corpse.\r\n", fname(obj_object->name));
 			      fail = TRUE;
 			  }
                       }
@@ -859,28 +852,28 @@ fname(obj_object->name));
 		      found = TRUE;
                       if(blindlag) WAIT_STATE(ch, PULSE_VIOLENCE);
 		    } else {
-		      send_to_char("You can't take that.\n\r", ch);
+		      send_to_char("You can't take that.\r\n", ch);
 		      fail = TRUE;
 		    }
 	        } else {
-		    sprintf(buffer,"%s : You can't carry that much weight.\n\r", fname(obj_object->name));
+		    sprintf(buffer,"%s : You can't carry that much weight.\r\n", fname(obj_object->name));
 		    send_to_char(buffer, ch);
 		    fail = TRUE;
 	        }
 	      } else {
-	        sprintf(buffer,"The %s does not contain the %s.\n\r", 
+	        sprintf(buffer,"The %s does not contain the %s.\r\n", 
 		fname(sub_object->name), arg1);
 	        send_to_char(buffer, ch);
 	        fail = TRUE;
 	      }
 	    } else {
 	      sprintf(buffer,
-	      "The %s is not a container.\n\r", fname(sub_object->name));
+	      "The %s is not a container.\r\n", fname(sub_object->name));
 	      send_to_char(buffer, ch);
 	      fail = TRUE;
 	    }
 	  } else {
-	    sprintf(buffer,"You do not see or have the %s.\n\r", arg2);
+	    sprintf(buffer,"You do not see or have the %s.\r\n", arg2);
 	    send_to_char(buffer, ch);
 	    fail = TRUE;
 	  }
@@ -905,12 +898,12 @@ int do_consent(struct char_data *ch, char *arg, int cmd)
   one_argument(arg, buf);
   
   if(!*buf) {
-    send_to_char("Give WHO consent to touch your rotting carcass?\n\r", ch);
+    send_to_char("Give WHO consent to touch your rotting carcass?\r\n", ch);
     return eFAILURE;
   }
  
   if(!(vict = get_char_vis(ch, buf))) {
-    csendf(ch, "Consent whom?  You can't see any %s.\n\r", buf);
+    csendf(ch, "Consent whom?  You can't see any %s.\r\n", buf);
     return eFAILURE;
   }
 
@@ -926,7 +919,7 @@ int do_consent(struct char_data *ch, char *arg, int cmd)
 
   // prevent consenting of NPCs
   if (IS_NPC(vict)) {
-    send_to_char("Now what business would THAT thing have with your mortal remains?\n\r", ch);
+    send_to_char("Now what business would THAT thing have with your mortal remains?\r\n", ch);
     return eFAILURE;
   }
 
@@ -947,7 +940,7 @@ int do_consent(struct char_data *ch, char *arg, int cmd)
      // check for buffer overflow before adding the new name to the list
      if ((strlen(obj->name) + strlen(buf) + strlen(" _consent")) > (MAX_STRING_LENGTH / 2)) {
        send_to_char("Don't you think there are enough perverts molesting "
-                    "your\n\rmaggot-ridden corpse already?\n\r", ch);
+                    "your\r\nmaggot-ridden corpse already?\r\n", ch);
        return eFAILURE;
      }
      sprintf(buf2, "%s %s_consent", obj->name, buf);
@@ -955,7 +948,7 @@ int do_consent(struct char_data *ch, char *arg, int cmd)
   }
   
   sprintf(buf2, "All corpses in the game which belong to you can now be "
-          "molested by\n\ranyone named %s.\n\r", buf);
+          "molested by\r\nanyone named %s.\r\n", buf);
   send_to_char(buf2, ch);
   return eSUCCESS;
 }
@@ -1015,29 +1008,29 @@ int do_drop(struct char_data *ch, char *argument, int cmd)
   if(is_number(arg)) {
     if(!IS_MOB(ch) && affected_by_spell(ch, FUCK_GTHIEF)) 
     {
-      send_to_char("Your criminal acts prohibit it.\n\r", ch);
+      send_to_char("Your criminal acts prohibit it.\r\n", ch);
       return eFAILURE;
     }
 
 /*    if(strlen(arg) > 7) {
-      send_to_char("Number field too big.\n\r", ch);
+      send_to_char("Number field too big.\r\n", ch);
       return eFAILURE;
     }*/
     amount = atoi(arg);
     argument=one_argument(argument,arg);
     if(str_cmp("coins",arg) && str_cmp("coin",arg) && str_cmp("gold", arg)) {
-      send_to_char("Sorry, you can't do that (yet)...\n\r", ch);
+      send_to_char("Sorry, you can't do that (yet)...\r\n", ch);
       return eFAILURE;
     }
     if(amount < 0) {
-      send_to_char("Sorry, you can't do that!\n\r",ch);
+      send_to_char("Sorry, you can't do that!\r\n",ch);
       return eFAILURE;
     }
     if(GET_GOLD(ch) < (uint32)amount) {
-      send_to_char("You haven't got that many coins!\n\r",ch);
+      send_to_char("You haven't got that many coins!\r\n",ch);
       return eFAILURE;
     }
-    send_to_char("OK.\n\r",ch);
+    send_to_char("OK.\r\n",ch);
     if(amount==0)
       return eSUCCESS;
 	
@@ -1066,7 +1059,7 @@ int do_drop(struct char_data *ch, char *argument, int cmd)
            continue;
 
          if(!IS_MOB(ch) && affected_by_spell(ch, FUCK_PTHIEF)) {
-            send_to_char("Your criminal acts prohibit it.\n\r", ch);
+            send_to_char("Your criminal acts prohibit it.\r\n", ch);
             return eFAILURE;
          }
          if(IS_SET(tmp_object->obj_flags.more_flags, ITEM_NO_TRADE)) 
@@ -1076,18 +1069,18 @@ int do_drop(struct char_data *ch, char *argument, int cmd)
          if(!IS_SET(tmp_object->obj_flags.extra_flags, ITEM_NODROP) ||
                GET_LEVEL(ch) >= IMMORTAL) {
             if(IS_SET(tmp_object->obj_flags.extra_flags, ITEM_NODROP))
-               send_to_char("(This item is cursed, BTW.)\n\r", ch);
+               send_to_char("(This item is cursed, BTW.)\r\n", ch);
             if(CAN_SEE_OBJ(ch, tmp_object)) {
-               sprintf(buffer, "You drop the %s.\n\r", fname(tmp_object->name));
+               sprintf(buffer, "You drop the %s.\r\n", fname(tmp_object->name));
                send_to_char(buffer, ch);
             }
             else if(CAN_SEE_OBJ(ch, tmp_object, TRUE)) {
-               sprintf(buffer, "You drop the %s.\n\r", fname(tmp_object->name));
+               sprintf(buffer, "You drop the %s.\r\n", fname(tmp_object->name));
                send_to_char(buffer, ch);
                blindlag = TRUE;
             }
             else
-               send_to_char("You drop something.\n\r", ch);
+               send_to_char("You drop something.\r\n", ch);
 
             if (tmp_object->obj_flags.type_flag != ITEM_MONEY)
             {
@@ -1107,7 +1100,7 @@ int do_drop(struct char_data *ch, char *argument, int cmd)
          }
          else {
             if(CAN_SEE_OBJ(ch, tmp_object, TRUE)) {
-               sprintf(buffer, "You can't drop the %s, it must be CURSED!\n\r", fname(tmp_object->name));
+               sprintf(buffer, "You can't drop the %s, it must be CURSED!\r\n", fname(tmp_object->name));
                send_to_char(buffer, ch);
                test = TRUE;
             }
@@ -1115,7 +1108,7 @@ int do_drop(struct char_data *ch, char *argument, int cmd)
       } /* for */
 
       if(!test)
-        send_to_char("You do not seem to have anything.\n\r", ch);
+        send_to_char("You do not seem to have anything.\r\n", ch);
 
     } /* if strcmp "all" */
 
@@ -1124,7 +1117,7 @@ int do_drop(struct char_data *ch, char *argument, int cmd)
       if(tmp_object) {
 
       if(!IS_MOB(ch) && affected_by_spell(ch, FUCK_PTHIEF)) {
-        send_to_char("Your criminal acts prohibit it.\n\r", ch);
+        send_to_char("Your criminal acts prohibit it.\r\n", ch);
         return eFAILURE;
       }
       if(IS_SET(tmp_object->obj_flags.more_flags, ITEM_NO_TRADE) && GET_LEVEL(ch) < IMMORTAL) {
@@ -1137,14 +1130,14 @@ int do_drop(struct char_data *ch, char *argument, int cmd)
       }
 
         if(IS_SET(tmp_object->obj_flags.extra_flags, ITEM_SPECIAL)) {
-	  send_to_char("Don't be a dork.\n\r", ch);
+	  send_to_char("Don't be a dork.\r\n", ch);
 	  return eFAILURE;
 	}
         else if(!IS_SET(tmp_object->obj_flags.extra_flags, ITEM_NODROP) ||
             GET_LEVEL(ch) >= IMMORTAL) {
           if(IS_SET(tmp_object->obj_flags.extra_flags, ITEM_NODROP))
-            send_to_char("(This item is cursed, BTW.)\n\r", ch);
-          sprintf(buffer, "You drop the %s.\n\r", fname(tmp_object->name));
+            send_to_char("(This item is cursed, BTW.)\r\n", ch);
+          sprintf(buffer, "You drop the %s.\r\n", fname(tmp_object->name));
           send_to_char(buffer, ch);
           act("$n drops $p.", ch, tmp_object, 0, TO_ROOM, INVIS_NULL);
           if (tmp_object->obj_flags.type_flag != ITEM_MONEY)
@@ -1163,16 +1156,16 @@ int do_drop(struct char_data *ch, char *argument, int cmd)
           return eSUCCESS;
         }
         else
-	  send_to_char("You can't drop it, it must be CURSED!\n\r", ch);
+	  send_to_char("You can't drop it, it must be CURSED!\r\n", ch);
       }
       else
-        send_to_char("You do not have that item.\n\r", ch);
+        send_to_char("You do not have that item.\r\n", ch);
 
     }
     do_save(ch, "", 666);
   }
   else
-    send_to_char("Drop what?\n\r", ch);
+    send_to_char("Drop what?\r\n", ch);
   return eFAILURE;
 }
 
@@ -1204,7 +1197,7 @@ void do_putalldot(struct char_data *ch, char *name, char *target, int cmd)
   }
 
   if(!found)
-    send_to_char("You don't have one.\n\r", ch);
+    send_to_char("You don't have one.\r\n", ch);
 }
 
 int weight_in(struct obj_data *obj)
@@ -1227,140 +1220,194 @@ int do_put(struct char_data *ch, char *argument, int cmd)
   int bits;
   char allbuf[MAX_STRING_LENGTH];
 
-  if(IS_SET(world[ch->in_room].room_flags, QUIET)) {
-    send_to_char ("SHHHHHH!! Can't you see people are trying to read?\r\n",ch);
+  if (IS_SET(world[ch->in_room].room_flags, QUIET))
+  {
+    send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
     return eFAILURE;
   }
 
   argument_interpreter(argument, arg1, arg2);
 
-  if(*arg1) {
-    if(*arg2) {
-      if(!(get_obj_in_list_vis(ch, arg2, ch->carrying))
-	&& !(get_obj_in_list_vis(ch, arg2, world[ch->in_room].contents))) {
-        sprintf(buffer, "You don't have a %s.\n\r", arg2);
+  if (*arg1)
+  {
+    if (*arg2)
+    {
+      if (!(get_obj_in_list_vis(ch, arg2, ch->carrying)) && !(get_obj_in_list_vis(ch, arg2, world[ch->in_room].contents)))
+      {
+        sprintf(buffer, "You don't have a %s.\r\n", arg2);
         send_to_char(buffer, ch);
         return 1;
       }
       allbuf[0] = '\0';
-      if(!str_cmp(arg1, "all")) {
+      if (!str_cmp(arg1, "all"))
+      {
         do_putalldot(ch, 0, arg2, cmd);
         return eSUCCESS;
       }
-      else if(sscanf(arg1, "all.%s", allbuf) != 0) {
+      else if (sscanf(arg1, "all.%s", allbuf) != 0)
+      {
         do_putalldot(ch, allbuf, arg2, cmd);
         return eSUCCESS;
       }
       obj_object = get_obj_in_list_vis(ch, arg1, ch->carrying);
 
-      if(obj_object) {
-        if(IS_SET(obj_object->obj_flags.extra_flags, ITEM_NODROP)) {
-          if(GET_LEVEL(ch) < IMMORTAL) {
-            send_to_char("You are unable to! That item must be CURSED!\n\r", ch);
+      if (obj_object)
+      {
+        if (IS_SET(obj_object->obj_flags.extra_flags, ITEM_NODROP))
+        {
+          if (GET_LEVEL(ch) < IMMORTAL)
+          {
+            send_to_char("You are unable to! That item must be CURSED!\r\n", ch);
             return eFAILURE;
           }
           else
-            send_to_char("(This item is cursed, BTW.)\n\r", ch);
-        } 
-        if(obj_index[obj_object->item_number].virt == CHAMPION_ITEM) {
-          send_to_char("You must display this flag for all to see!\n\r", ch);
+            send_to_char("(This item is cursed, BTW.)\r\n", ch);
+        }
+        if (obj_index[obj_object->item_number].virt == CHAMPION_ITEM)
+        {
+          send_to_char("You must display this flag for all to see!\r\n", ch);
           return eFAILURE;
         }
-	if (IS_SET(obj_object->obj_flags.extra_flags, ITEM_NEWBIE)) {
-	  send_to_char("The protective enchantment this item holds cannot be held within this container.\r\n",ch);
-	  return eFAILURE;
-	}
-	if(GET_ITEM_TYPE(obj_object) == ITEM_CONTAINER) {
-	  send_to_char("You would ruin it!\n\r", ch);
-	  return eFAILURE;
-	}
+        if (IS_SET(obj_object->obj_flags.extra_flags, ITEM_NEWBIE))
+        {
+          send_to_char("The protective enchantment this item holds cannot be held within this container.\r\n", ch);
+          return eFAILURE;
+        }
+        if (GET_ITEM_TYPE(obj_object) == ITEM_CONTAINER)
+        {
+          send_to_char("You would ruin it!\r\n", ch);
+          return eFAILURE;
+        }
 
         bits = generic_find(arg2, FIND_OBJ_INV | FIND_OBJ_ROOM,
                             ch, &tmp_char, &sub_object);
-        if(sub_object) {
-          if(GET_ITEM_TYPE(sub_object) == ITEM_CONTAINER || GET_ITEM_TYPE(sub_object) == ITEM_ALTAR) {
-	    if (GET_ITEM_TYPE(sub_object) == ITEM_ALTAR && GET_ITEM_TYPE(obj_object) != ITEM_TOTEM) {
-               send_to_char("You cannot put that in an altar.\r\n",ch);
-               return eFAILURE;
+        if (sub_object)
+        {
+          if (GET_ITEM_TYPE(sub_object) == ITEM_CONTAINER || GET_ITEM_TYPE(sub_object) == ITEM_ALTAR || GET_ITEM_TYPE(sub_object) == ITEM_KEYRING)
+          {
+            // Keyrings can only hold keys
+            if (GET_ITEM_TYPE(sub_object) == ITEM_KEYRING && GET_ITEM_TYPE(obj_object) != ITEM_KEY)
+            {
+              csendf(ch, "You can't put a %s on a keyring.\r\n", GET_OBJ_SHORT(obj_object));
+              return eFAILURE;
             }
-	    if(!IS_SET(sub_object->obj_flags.value[1], CONT_CLOSED)) {
-	      if(obj_object == sub_object) {
-		send_to_char("You attempt to fold it into itself, but fail.\n\r", ch);
-		return eFAILURE;
-	      }
-              if(IS_SET(obj_object->obj_flags.extra_flags, ITEM_SPECIAL) &&
-               !IS_SET(sub_object->obj_flags.extra_flags, ITEM_SPECIAL))
+
+            // Altars can only hold totems
+            if (GET_ITEM_TYPE(sub_object) == ITEM_ALTAR && GET_ITEM_TYPE(obj_object) != ITEM_TOTEM)
+            {
+              send_to_char("You cannot put that in an altar.\r\n", ch);
+              return eFAILURE;
+            }
+
+            if (!IS_SET(sub_object->obj_flags.value[1], CONT_CLOSED))
+            {
+              // Can't put an item in itself
+              if (obj_object == sub_object)
+              {
+                send_to_char("You attempt to fold it into itself, but fail.\r\n", ch);
+                return eFAILURE;
+              }
+
+              // Can't put godload in non-godload
+              if (IS_SPECIAL(obj_object) && NOT_SPECIAL(sub_object))
               {
                 send_to_char("Are you crazy?!  Someone could steal it!\r\n", ch);
                 return eFAILURE;
               }
-              if(IS_SET(obj_object->obj_flags.more_flags, ITEM_NO_TRADE) &&
-                sub_object->carried_by != ch)
+
+              // Can't put NO_TRADE item in someone else's container/altar/totem
+              if (IS_SET(obj_object->obj_flags.more_flags, ITEM_NO_TRADE) &&
+                  sub_object->carried_by != ch)
               {
-                 send_to_char("Now, now, no doing that *wink*.\n\r", ch);
-                 return eFAILURE;
+                send_to_char("You can't trade that item.\r\n", ch);
+                return eFAILURE;
               }
-              if(IS_SET(obj_object->obj_flags.more_flags, ITEM_UNIQUE)
-                 && (sub_object->carried_by != ch)
-                 && search_container_for_item(sub_object, obj_object->item_number)
-                )
+
+              if (IS_SET(obj_object->obj_flags.more_flags, ITEM_UNIQUE) && (sub_object->carried_by != ch) && search_container_for_item(sub_object, obj_object->item_number))
               {
-                 send_to_char("The objects uniqueness prevents it!\n\r",ch);
-                 return eFAILURE;
+                send_to_char("The objects uniqueness prevents it!\r\n", ch);
+                return eFAILURE;
               }
-	      if (((sub_object->obj_flags.weight) + 
-               (obj_object->obj_flags.weight)) <=
-               (sub_object->obj_flags.value[0]) &&
-               (obj_index[sub_object->item_number].virt != 536 || 
-               weight_in(sub_object) + obj_object->obj_flags.weight <= 200))
+
+              if (((sub_object->obj_flags.weight) +
+                   (obj_object->obj_flags.weight)) <=
+                      (sub_object->obj_flags.value[0]) &&
+                  (obj_index[sub_object->item_number].virt != 536 ||
+                   weight_in(sub_object) + obj_object->obj_flags.weight <= 200))
               {
-		if(bits == FIND_OBJ_INV) {
-		  obj_from_char(obj_object);
-		  /* make up for above line */
-		  if (obj_index[sub_object->item_number].virt != 536)
-  		     IS_CARRYING_W(ch) += GET_OBJ_WEIGHT(obj_object);
-		  obj_to_obj(obj_object, sub_object);
-		}
+                if (bits == FIND_OBJ_INV)
+                {
+                  obj_from_char(obj_object);
+                  /* make up for above line */
+                  if (obj_index[sub_object->item_number].virt != 536)
+                    IS_CARRYING_W(ch) += GET_OBJ_WEIGHT(obj_object);
+                  obj_to_obj(obj_object, sub_object);
+                }
                 else
-		  move_obj(obj_object, sub_object);
-		
-		act("$n puts $p in $P.", ch, obj_object, sub_object, TO_ROOM, INVIS_NULL);
-                act("You put $p in $P.",ch,obj_object,sub_object,TO_CHAR,0);
-		logf(IMP, LOG_OBJECTS, "%s puts %s[%d] in %s[%d]",
-		     ch->name,
-		     obj_object->short_description,
-		     obj_index[obj_object->item_number].virt,
-		     sub_object->short_description,
-		     obj_index[sub_object->item_number].virt);
+                {
+                  move_obj(obj_object, sub_object);
+                }
+
+                if (GET_ITEM_TYPE(sub_object) == ITEM_KEYRING)
+                {
+                  act("$n attaches $p to the $P.", ch, obj_object, sub_object, TO_ROOM, INVIS_NULL);
+                  act("You attach $p to the $P.", ch, obj_object, sub_object, TO_CHAR, 0);
+                  logf(IMP, LOG_OBJECTS, "%s attaches %s[%d] to %s[%d]",
+                      ch->name,
+                      obj_object->short_description,
+                      obj_index[obj_object->item_number].virt,
+                      sub_object->short_description,
+                      obj_index[sub_object->item_number].virt);
+                }
+                else
+                {
+                  act("$n puts $p in $P.", ch, obj_object, sub_object, TO_ROOM, INVIS_NULL);
+                  act("You put $p in $P.", ch, obj_object, sub_object, TO_CHAR, 0);
+                  logf(IMP, LOG_OBJECTS, "%s puts %s[%d] in %s[%d]",
+                      ch->name,
+                      obj_object->short_description,
+                      obj_index[obj_object->item_number].virt,
+                      sub_object->short_description,
+                      obj_index[sub_object->item_number].virt);
+                }
 
                 return eSUCCESS;
-	      }
-              else {
-		send_to_char("It won't fit.\n\r", ch);
-	      }
-	    }
+              }
+              else
+              {
+                send_to_char("It won't fit.\r\n", ch);
+              }
+            }
             else
-	      send_to_char("It seems to be closed.\n\r", ch);
-          } else {
-	     sprintf(buffer, "The %s is not a container.\n\r", fname(sub_object->name));
-	     send_to_char(buffer, ch);
-	  }
-        } else {
-           sprintf(buffer, "You dont have the %s.\n\r", arg2);
-           send_to_char(buffer, ch);
+              send_to_char("It seems to be closed.\r\n", ch);
+          }
+          else
+          {
+            sprintf(buffer, "The %s is not a container.\r\n", fname(sub_object->name));
+            send_to_char(buffer, ch);
+          }
         }
-      } else {
-        sprintf(buffer, "You dont have the %s.\n\r", arg1);
+        else
+        {
+          sprintf(buffer, "You dont have the %s.\r\n", arg2);
+          send_to_char(buffer, ch);
+        }
+      }
+      else
+      {
+        sprintf(buffer, "You dont have the %s.\r\n", arg1);
         send_to_char(buffer, ch);
       }
     } /* if arg2 */
-    else {
-       sprintf(buffer, "Put %s in what?\n\r", arg1);
-       send_to_char(buffer, ch);
+    else
+    {
+      sprintf(buffer, "Put %s in what?\r\n", arg1);
+      send_to_char(buffer, ch);
     }
   } /* if arg1 */
-  else {
-     send_to_char("Put what in what?\n\r",ch);
+  else
+  {
+    send_to_char("Put what in what?\r\n", ch);
   }
   return eFAILURE;
 }
@@ -1389,7 +1436,7 @@ void do_givealldot(CHAR_DATA *ch, char *name, char *target, int cmd)
   }
 
   if(!found)
-    send_to_char("You don't have one.\n\r", ch);
+    send_to_char("You don't have one.\r\n", ch);
 }
 
 int do_give(struct char_data *ch, char *argument, int cmd)
@@ -1418,38 +1465,38 @@ int do_give(struct char_data *ch, char *argument, int cmd)
   if(is_number(obj_name)) { 
     if(!IS_MOB(ch) && affected_by_spell(ch, FUCK_GTHIEF)) 
     {
-      send_to_char("Your criminal acts prohibit it.\n\r", ch);
+      send_to_char("Your criminal acts prohibit it.\r\n", ch);
       return eFAILURE;
     }
 /*
     if(strlen(obj_name) > 7) {
-      send_to_char("Number field too large.\n\r", ch);
+      send_to_char("Number field too large.\r\n", ch);
       return eFAILURE;
     }*/
     amount = atoll(obj_name);
     argument = one_argument(argument, arg);
     if(str_cmp("gold", arg) && str_cmp("coins",arg) && str_cmp("coin",arg)) { 
-      send_to_char("Sorry, you can't do that (yet)...\n\r",ch);
+      send_to_char("Sorry, you can't do that (yet)...\r\n",ch);
       return eFAILURE;
     }
     if(amount < 0) { 
-      send_to_char("Sorry, you can't do that!\n\r",ch);
+      send_to_char("Sorry, you can't do that!\r\n",ch);
       return eFAILURE;
     }
     if(GET_GOLD(ch) < amount && GET_LEVEL(ch) < DEITY) 
     {
-      send_to_char("You haven't got that many coins!\n\r",ch);
+      send_to_char("You haven't got that many coins!\r\n",ch);
       return eFAILURE;
     }
     argument = one_argument(argument, vict_name);
     if(!*vict_name) { 
-      send_to_char("To whom?\n\r",ch);
+      send_to_char("To whom?\r\n",ch);
       return eFAILURE;
     }
 
       if (!(vict = get_char_room_vis(ch, vict_name))) 
       {
-        send_to_char("To whom?\n\r",ch);
+        send_to_char("To whom?\r\n",ch);
         return eFAILURE;
       }
     
@@ -1464,7 +1511,7 @@ int do_give(struct char_data *ch, char *argument, int cmd)
          return eFAILURE;
       }
 */
-      csendf(ch, "You give %lld coin%s to %s.\n\r", amount,
+      csendf(ch, "You give %lld coin%s to %s.\r\n", amount,
              amount == 1 ? "" : "s", GET_SHORT(vict));
 
         sprintf(buf, "%s gives %lld coin%s to %s", GET_NAME(ch), amount,
@@ -1516,7 +1563,7 @@ int do_give(struct char_data *ch, char *argument, int cmd)
 
     if (!*obj_name || !*vict_name)
     {
-	send_to_char("Give what to whom?\n\r", ch);
+	send_to_char("Give what to whom?\r\n", ch);
 	return eFAILURE;
     }
 
@@ -1538,7 +1585,7 @@ int do_give(struct char_data *ch, char *argument, int cmd)
 
       if(!found)
       {
-	send_to_char("Nobody here are loyal subjects of yours!\n\r", ch);
+	send_to_char("Nobody here are loyal subjects of yours!\r\n", ch);
         return eFAILURE;
       }
     }
@@ -1546,7 +1593,7 @@ int do_give(struct char_data *ch, char *argument, int cmd)
     {
       if (!(vict = get_char_room_vis(ch, vict_name)))
       {
-	send_to_char("No one by that name around here.\n\r", ch);
+	send_to_char("No one by that name around here.\r\n", ch);
 	return eFAILURE;
       }
     }
@@ -1568,17 +1615,17 @@ int do_give(struct char_data *ch, char *argument, int cmd)
 
     if (!(obj = get_obj_in_list_vis(ch, obj_name, ch->carrying)))
     {
-	send_to_char("You do not seem to have anything like that.\n\r",
+	send_to_char("You do not seem to have anything like that.\r\n",
 	   ch);
 	return eFAILURE;
     }
     if(IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL) && GET_LEVEL(ch) < OVERSEER) {
-      send_to_char("That sure would be a fucking stupid thing to do.\n\r", ch);
+      send_to_char("That sure would be a fucking stupid thing to do.\r\n", ch);
       return eFAILURE;
     }
 
     if(!IS_MOB(ch) && affected_by_spell(ch, FUCK_PTHIEF)) {
-      send_to_char("Your criminal acts prohibit it.\n\r", ch);
+      send_to_char("Your criminal acts prohibit it.\r\n", ch);
       return eFAILURE;
     }
 
@@ -1586,11 +1633,11 @@ int do_give(struct char_data *ch, char *argument, int cmd)
     {
       if(GET_LEVEL(ch) < DEITY)
       {
-	send_to_char("You can't let go of it! Yeech!!\n\r", ch);
+	send_to_char("You can't let go of it! Yeech!!\r\n", ch);
 	return eFAILURE;
       }
       else
-        send_to_char("This item is NODROP btw.\n\r", ch);
+        send_to_char("This item is NODROP btw.\r\n", ch);
     }
 
     // You can give no_trade items to mobs for quest purposes.  It's taken care of later
@@ -1625,7 +1672,7 @@ int do_give(struct char_data *ch, char *argument, int cmd)
     }
 
     if(!IS_MOB(ch) && affected_by_spell(ch, FUCK_PTHIEF) && !vict->desc) {
-      send_to_char("Now WHY would a thief give something to a linkdead char..?\n\r", ch);
+      send_to_char("Now WHY would a thief give something to a linkdead char..?\r\n", ch);
       return eFAILURE;
     }
 
@@ -1681,11 +1728,11 @@ int do_give(struct char_data *ch, char *argument, int cmd)
 
     if((vict->in_room >= 0 && vict->in_room <= top_of_world) && GET_LEVEL(vict) < IMMORTAL && 
       IS_SET(world[vict->in_room].room_flags, ARENA) && arena.type == POTATO && obj_index[obj->item_number].virt == 393) {
-      send_to_char("Here, have some for some potato lag!!\n\r", vict);
+      send_to_char("Here, have some for some potato lag!!\r\n", vict);
       WAIT_STATE(vict, PULSE_VIOLENCE *2);
     }
 
-//    send_to_char("Ok.\n\r", ch);
+//    send_to_char("Ok.\r\n", ch);
     do_save(ch,"",10);
     do_save(vict,"",10);
     // if I gave a no_trade item to a mob, the mob needs to destroy it
@@ -1816,17 +1863,22 @@ int search_char_for_item_count(char_data * ch, int16 item_number, bool wearonly)
   return count;
 }
 
-bool search_container_for_item(obj_data * obj, int item_number)
+bool search_container_for_item(obj_data *obj, int item_number)
 {
   obj_data *i;
-  if(GET_ITEM_TYPE(obj) != ITEM_CONTAINER)
-    return false;
-  
-  for(i = obj->contains; i; i = i->next_content)
+  if (NOT_CONTAINER(obj) && NOT_ALTAR(obj) && NOT_KEYRING(obj))
   {
-    if(i->item_number == item_number)
-      return true;
+    return false;
   }
+
+  for (i = obj->contains; i; i = i->next_content)
+  {
+    if (i->item_number == item_number)
+    {
+      return true;
+    }
+  }
+
   return false;
 }
 
@@ -1848,7 +1900,7 @@ int find_door(CHAR_DATA *ch, char *type, char *dir)
     {
         if ((door = search_block(dir, dirs, FALSE)) == -1) /* Partial Match */
         {
-            send_to_char("That's not a direction.\n\r", ch);
+            send_to_char("That's not a direction.\r\n", ch);
             return(-1);
         }
      
@@ -1931,19 +1983,19 @@ int do_open(CHAR_DATA *ch, char *argument, int cmd)
    argument_interpreter(argument, type, dir);
             
    if (!*type) {
-      send_to_char("Open what?\n\r", ch);
+      send_to_char("Open what?\r\n", ch);
       return eFAILURE;
    } else if ((door = find_door(ch, type, dir)) >= 0)
    { 
      found = true;
       if (!IS_SET(EXIT(ch, door)->exit_info, EX_ISDOOR))
-         send_to_char("That's impossible, I'm afraid.\n\r", ch);
+         send_to_char("That's impossible, I'm afraid.\r\n", ch);
       else if (!IS_SET(EXIT(ch, door)->exit_info, EX_CLOSED))
-         send_to_char("It's already open!\n\r", ch);
+         send_to_char("It's already open!\r\n", ch);
       else if (IS_SET(EXIT(ch, door)->exit_info, EX_LOCKED))
-         send_to_char("It seems to be locked.\n\r", ch);  
+         send_to_char("It seems to be locked.\r\n", ch);  
       else if (IS_SET(EXIT(ch, door)->exit_info, EX_BROKEN)) 
-         send_to_char("It's already been broken open!\n\r", ch);  
+         send_to_char("It's already been broken open!\r\n", ch);  
       else if (EXIT(ch, door)->bracee != NULL)
       {
          if(is_bracing(EXIT(ch, door)->bracee, EXIT(ch, door)))
@@ -1957,7 +2009,7 @@ int do_open(CHAR_DATA *ch, char *argument, int cmd)
            }
            else
            {
-             csendf(ch, "The %s seems to be barred from the other side.\n\r", fname(EXIT(ch, door)->keyword));   
+             csendf(ch, "The %s seems to be barred from the other side.\r\n", fname(EXIT(ch, door)->keyword));   
              csendf(EXIT(ch, door)->bracee, "The %s quivers slightly but holds as someone attempts to force their way through.\r\n", 
                               fname(EXIT(ch, door)->keyword));
            }
@@ -1969,7 +2021,7 @@ int do_open(CHAR_DATA *ch, char *argument, int cmd)
          }
       }
       else if (IS_SET(EXIT(ch, door)->exit_info, EX_IMM_ONLY) && GET_LEVEL(ch) < IMMORTAL)
-         send_to_char("It seems to slither and resist your attempt to touch it.\n\r", ch);
+         send_to_char("It seems to slither and resist your attempt to touch it.\r\n", ch);
       else
       {   
          REMOVE_BIT(EXIT(ch, door)->exit_info, EX_CLOSED);
@@ -1977,11 +2029,11 @@ int do_open(CHAR_DATA *ch, char *argument, int cmd)
          if(IS_SET(EXIT(ch, door)->exit_info, EX_HIDDEN)) {
             if (EXIT(ch, door)->keyword) {
                act("$n reveals a hidden $F!", ch, 0, EXIT(ch, door)->keyword, TO_ROOM, 0);
-               csendf(ch, "You reveal a hidden %s!\n\r", fname((char *)EXIT(ch, door)->keyword));
+               csendf(ch, "You reveal a hidden %s!\r\n", fname((char *)EXIT(ch, door)->keyword));
             }
             else {
                act("$n reveals a hidden door!",ch, 0, EXIT(ch, door)->keyword, TO_ROOM, 0);
-               send_to_char("You reveal a hidden door!\n\r", ch);
+               send_to_char("You reveal a hidden door!\r\n", ch);
             }
          }  
          else {
@@ -1990,7 +2042,7 @@ int do_open(CHAR_DATA *ch, char *argument, int cmd)
 				else {
               act("$n opens the door.", ch, 0, 0, TO_ROOM, 0);
 				}
-              send_to_char("Ok.\n\r", ch);
+              send_to_char("Ok.\r\n", ch);
          }
              
          /* now for opening the OTHER side of the door! */
@@ -2001,12 +2053,12 @@ int do_open(CHAR_DATA *ch, char *argument, int cmd)
                   REMOVE_BIT(back->exit_info, EX_CLOSED);
                   if ((back->keyword) && !IS_SET(world[EXIT(ch, door)->to_room].room_flags, QUIET))
                   {
-                     sprintf(buf, "The %s is opened from the other side.\n\r",
+                     sprintf(buf, "The %s is opened from the other side.\r\n",
                                 fname(back->keyword));
                      send_to_room(buf, EXIT(ch, door)->to_room, TRUE);
                   }
                   else
-                     send_to_room("The door is opened from the other side.\n\r",
+                     send_to_room("The door is opened from the other side.\r\n",
                                 EXIT(ch, door)->to_room, TRUE);
                }
 
@@ -2041,23 +2093,23 @@ int do_open(CHAR_DATA *ch, char *argument, int cmd)
      found = true;
       // this is an object
       if (obj->obj_flags.type_flag != ITEM_CONTAINER)
-         send_to_char("That's not a container.\n\r", ch);
+         send_to_char("That's not a container.\r\n", ch);
       else if (!IS_SET(obj->obj_flags.value[1], CONT_CLOSED))
-         send_to_char("But it's already open!\n\r", ch);
+         send_to_char("But it's already open!\r\n", ch);
       else if (!IS_SET(obj->obj_flags.value[1], CONT_CLOSEABLE))
-         send_to_char("You can't do that.\n\r", ch);
+         send_to_char("You can't do that.\r\n", ch);
       else if (IS_SET(obj->obj_flags.value[1], CONT_LOCKED))
-         send_to_char("It seems to be locked.\n\r", ch);   
+         send_to_char("It seems to be locked.\r\n", ch);   
       else
       {   
          REMOVE_BIT(obj->obj_flags.value[1], CONT_CLOSED);
-         send_to_char("Ok.\n\r", ch);
+         send_to_char("Ok.\r\n", ch);
          act("$n opens $p.", ch, obj, 0, TO_ROOM, 0);
       }
    }
 
    if (found == false) {
-     csendf(ch, "I see no %s here.\n\r", type);
+     csendf(ch, "I see no %s here.\r\n", type);
    }
 
    // in case ch died or anything
@@ -2078,17 +2130,17 @@ int do_close(CHAR_DATA *ch, char *argument, int cmd)
    argument_interpreter(argument, type, dir);
     
    if (!*type) {
-      send_to_char("Close what?\n\r", ch);
+      send_to_char("Close what?\r\n", ch);
       return eFAILURE;
    } else if ((door = find_door(ch, type, dir)) >= 0)
    {    
      found = true;
       if (!IS_SET(EXIT(ch, door)->exit_info, EX_ISDOOR))
-         send_to_char("That's absurd.\n\r", ch);
+         send_to_char("That's absurd.\r\n", ch);
       else if (IS_SET(EXIT(ch, door)->exit_info, EX_CLOSED))
-         send_to_char("It's already closed!\n\r", ch);
+         send_to_char("It's already closed!\r\n", ch);
       else if (IS_SET(EXIT(ch, door)->exit_info, EX_BROKEN))
-         send_to_char("It appears to be broken!\n\r", ch);
+         send_to_char("It appears to be broken!\r\n", ch);
       else
       {   
          SET_BIT(EXIT(ch, door)->exit_info, EX_CLOSED);
@@ -2096,7 +2148,7 @@ int do_close(CHAR_DATA *ch, char *argument, int cmd)
             act("$n closes the $F.", ch, 0, EXIT(ch, door)->keyword, TO_ROOM, 0);
          else
             act("$n closes the door.", ch, 0, 0, TO_ROOM, 0);
-         send_to_char("Ok.\n\r", ch);
+         send_to_char("Ok.\r\n", ch);
          /* now for closing the other side, too */
          if ((other_room = EXIT(ch, door)->to_room) != NOWHERE)
             if ( ( back = world[other_room].dir_option[rev_dir[door]] ) != 0 )
@@ -2106,12 +2158,12 @@ int do_close(CHAR_DATA *ch, char *argument, int cmd)
                   if ((back->keyword) &&
                        !IS_SET(world[EXIT(ch, door)->to_room].room_flags, QUIET))
                   {
-                     sprintf(buf, "The %s closes quietly.\n\r",
+                     sprintf(buf, "The %s closes quietly.\r\n",
                                    fname(back->keyword));
                      send_to_room(buf, EXIT(ch, door)->to_room, TRUE);
                   }
                   else
-                     send_to_room("The door closes quietly.\n\r",
+                     send_to_room("The door closes quietly.\r\n",
                                        EXIT(ch, door)->to_room, TRUE);
                }
       }
@@ -2120,21 +2172,21 @@ int do_close(CHAR_DATA *ch, char *argument, int cmd)
    {     
      found = true;
       if (obj->obj_flags.type_flag != ITEM_CONTAINER)
-         send_to_char("That's not a container.\n\r", ch);
+         send_to_char("That's not a container.\r\n", ch);
       else if (IS_SET(obj->obj_flags.value[1], CONT_CLOSED))
-         send_to_char("But it's already closed!\n\r", ch); 
+         send_to_char("But it's already closed!\r\n", ch); 
       else if (!IS_SET(obj->obj_flags.value[1], CONT_CLOSEABLE))
-         send_to_char("That's impossible.\n\r", ch);
+         send_to_char("That's impossible.\r\n", ch);
       else
       {   
          SET_BIT(obj->obj_flags.value[1], CONT_CLOSED);
-         send_to_char("Ok.\n\r", ch);
+         send_to_char("Ok.\r\n", ch);
          act("$n closes $p.", ch, obj, 0, TO_ROOM, 0);
       }
    }
 
    if (found == false) {
-     csendf(ch, "I see no %s here.\n\r", type);
+     csendf(ch, "I see no %s here.\r\n", type);
    }
 
    return eSUCCESS;
@@ -2171,7 +2223,7 @@ int do_lock(CHAR_DATA *ch, char *argument, int cmd)
     argument_interpreter(argument, type, dir);
     
     if (!*type) {
-        send_to_char("Lock what?\n\r", ch);
+        send_to_char("Lock what?\r\n", ch);
 	return eFAILURE;
     } else if (generic_find(argument, FIND_OBJ_INV | FIND_OBJ_ROOM,
         ch, &victim, &obj))
@@ -2179,19 +2231,19 @@ int do_lock(CHAR_DATA *ch, char *argument, int cmd)
         /* ths is an object */
         
         if (obj->obj_flags.type_flag != ITEM_CONTAINER)
-            send_to_char("That's not a container.\n\r", ch);
+            send_to_char("That's not a container.\r\n", ch);
         else if (!IS_SET(obj->obj_flags.value[1], CONT_CLOSED))
-            send_to_char("Maybe you should close it first...\n\r", ch);
+            send_to_char("Maybe you should close it first...\r\n", ch);
         else if (obj->obj_flags.value[2] < 0)
-            send_to_char("That thing can't be locked.\n\r", ch);
+            send_to_char("That thing can't be locked.\r\n", ch);
         else if (!has_key(ch, obj->obj_flags.value[2]))
-            send_to_char("You don't seem to have the proper key.\n\r", ch);
+            send_to_char("You don't seem to have the proper key.\r\n", ch);
         else if (IS_SET(obj->obj_flags.value[1], CONT_LOCKED))
-            send_to_char("It is locked already.\n\r", ch);
+            send_to_char("It is locked already.\r\n", ch);
         else
         {   
             SET_BIT(obj->obj_flags.value[1], CONT_LOCKED);
-            send_to_char("*Cluck*\n\r", ch);
+            send_to_char("*Cluck*\r\n", ch);
             act("$n locks $p - 'cluck', it says.", ch, obj, 0, TO_ROOM, 0);
         }
     }
@@ -2200,17 +2252,17 @@ int do_lock(CHAR_DATA *ch, char *argument, int cmd)
         /* a door, perhaps */
         
         if (!IS_SET(EXIT(ch, door)->exit_info, EX_ISDOOR))
-            send_to_char("That's absurd.\n\r", ch);
+            send_to_char("That's absurd.\r\n", ch);
         else if (!IS_SET(EXIT(ch, door)->exit_info, EX_CLOSED))
-            send_to_char("You have to close it first, I'm afraid.\n\r", ch);
+            send_to_char("You have to close it first, I'm afraid.\r\n", ch);
         else if (IS_SET(EXIT(ch, door)->exit_info, EX_BROKEN))
-            send_to_char("You cannot lock it, it is broken.\n\r", ch);
+            send_to_char("You cannot lock it, it is broken.\r\n", ch);
         else if (EXIT(ch, door)->key < 0)
-            send_to_char("There does not seem to be any keyholes.\n\r", ch);
+            send_to_char("There does not seem to be any keyholes.\r\n", ch);
         else if (!has_key(ch, EXIT(ch, door)->key))
-            send_to_char("You don't have the proper key.\n\r", ch);
+            send_to_char("You don't have the proper key.\r\n", ch);
         else if (IS_SET(EXIT(ch, door)->exit_info, EX_LOCKED))
-            send_to_char("It's already locked!\n\r", ch);
+            send_to_char("It's already locked!\r\n", ch);
         else
         {   
             SET_BIT(EXIT(ch, door)->exit_info, EX_LOCKED);
@@ -2219,7 +2271,7 @@ int do_lock(CHAR_DATA *ch, char *argument, int cmd)
                     TO_ROOM, 0);
             else
                 act("$n locks the door.", ch, 0, 0, TO_ROOM, 0);
-            send_to_char("*Click*\n\r", ch);
+            send_to_char("*Click*\r\n", ch);
             /* now for locking the other side, too */
             if ((other_room = EXIT(ch, door)->to_room) != NOWHERE)
             if ( ( back = world[other_room].dir_option[rev_dir[door]] ) != 0 )
@@ -2228,7 +2280,7 @@ int do_lock(CHAR_DATA *ch, char *argument, int cmd)
         }
     }
     else
-      send_to_char("You don't see anything like that.\n\r", ch);
+      send_to_char("You don't see anything like that.\r\n", ch);
    return eSUCCESS;
 }
  
@@ -2244,7 +2296,7 @@ int do_unlock(CHAR_DATA *ch, char *argument, int cmd)
     argument_interpreter(argument, type, dir);
     
     if (!*type) {
-        send_to_char("Unlock what?\n\r", ch);
+        send_to_char("Unlock what?\r\n", ch);
 	return eFAILURE;
     } else if (generic_find(argument, FIND_OBJ_INV | FIND_OBJ_ROOM,
         ch, &victim, &obj))
@@ -2252,19 +2304,19 @@ int do_unlock(CHAR_DATA *ch, char *argument, int cmd)
         /* ths is an object */
         
         if (obj->obj_flags.type_flag != ITEM_CONTAINER)
-            send_to_char("That's not a container.\n\r", ch);
+            send_to_char("That's not a container.\r\n", ch);
         else if (!IS_SET(obj->obj_flags.value[1], CONT_CLOSED))
-            send_to_char("Silly - it ain't even closed!\n\r", ch);
+            send_to_char("Silly - it ain't even closed!\r\n", ch);
         else if (obj->obj_flags.value[2] < 0)
-            send_to_char("Odd - you can't seem to find a keyhole.\n\r", ch);
+            send_to_char("Odd - you can't seem to find a keyhole.\r\n", ch);
         else if (!has_key(ch, obj->obj_flags.value[2]))
-            send_to_char("You don't seem to have the proper key.\n\r", ch);
+            send_to_char("You don't seem to have the proper key.\r\n", ch);
         else if (!IS_SET(obj->obj_flags.value[1], CONT_LOCKED))
-            send_to_char("Oh.. it wasn't locked, after all.\n\r", ch);
+            send_to_char("Oh.. it wasn't locked, after all.\r\n", ch);
         else
         {   
             REMOVE_BIT(obj->obj_flags.value[1], CONT_LOCKED);
-            send_to_char("*Click*\n\r", ch);
+            send_to_char("*Click*\r\n", ch);
             act("$n unlocks $p.", ch, obj, 0, TO_ROOM, 0);
         }
     }
@@ -2273,17 +2325,17 @@ int do_unlock(CHAR_DATA *ch, char *argument, int cmd)
         /* it is a door */
         
         if (!IS_SET(EXIT(ch, door)->exit_info, EX_ISDOOR))
-            send_to_char("That's absurd.\n\r", ch);
+            send_to_char("That's absurd.\r\n", ch);
         else if (!IS_SET(EXIT(ch, door)->exit_info, EX_CLOSED))
-            send_to_char("Heck ... it ain't even closed!\n\r", ch);
+            send_to_char("Heck ... it ain't even closed!\r\n", ch);
         else if (EXIT(ch, door)->key < 0)
-            send_to_char("You can't seem to spot any keyholes.\n\r", ch);
+            send_to_char("You can't seem to spot any keyholes.\r\n", ch);
         else if (!has_key(ch, EXIT(ch, door)->key))
-            send_to_char("You do not have the proper key for that.\n\r", ch);
+            send_to_char("You do not have the proper key for that.\r\n", ch);
         else if (IS_SET(EXIT(ch, door)->exit_info, EX_BROKEN))
-            send_to_char("You cannot unlock it, it is broken!\n\r", ch);
+            send_to_char("You cannot unlock it, it is broken!\r\n", ch);
         else if (!IS_SET(EXIT(ch, door)->exit_info, EX_LOCKED))
-            send_to_char("It's already unlocked, it seems.\n\r", ch);
+            send_to_char("It's already unlocked, it seems.\r\n", ch);
         else
         {   
             REMOVE_BIT(EXIT(ch, door)->exit_info, EX_LOCKED);
@@ -2292,7 +2344,7 @@ int do_unlock(CHAR_DATA *ch, char *argument, int cmd)
                     TO_ROOM, 0);
             else
                 act("$n unlocks the door.", ch, 0, 0, TO_ROOM, 0);
-            send_to_char("*click*\n\r", ch);
+            send_to_char("*click*\r\n", ch);
             /* now for unlocking the other side, too */
             if ((other_room = EXIT(ch, door)->to_room) != NOWHERE)
             if ( ( back = world[other_room].dir_option[rev_dir[door]] ) != 0 )
@@ -2301,7 +2353,7 @@ int do_unlock(CHAR_DATA *ch, char *argument, int cmd)
         }
     }
     else
-      send_to_char("You don't see anything like that.\n\r", ch);
+      send_to_char("You don't see anything like that.\r\n", ch);
     return eSUCCESS;
 }
 
