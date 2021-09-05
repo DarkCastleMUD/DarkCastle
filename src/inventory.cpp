@@ -1325,7 +1325,7 @@ int do_put(struct char_data *ch, char *argument, int cmd)
 
               if (IS_SET(obj_object->obj_flags.more_flags, ITEM_UNIQUE) && (sub_object->carried_by != ch) && search_container_for_item(sub_object, obj_object->item_number))
               {
-                send_to_char("The objects uniqueness prevents it!\r\n", ch);
+                send_to_char("The object's uniqueness prevents it!\r\n", ch);
                 return eFAILURE;
               }
 
@@ -1865,13 +1865,17 @@ int search_char_for_item_count(char_data * ch, int16 item_number, bool wearonly)
 
 bool search_container_for_item(obj_data *obj, int item_number)
 {
-  obj_data *i;
-  if (NOT_CONTAINER(obj) && NOT_ALTAR(obj) && NOT_KEYRING(obj))
+  if (obj == nullptr)
   {
     return false;
   }
 
-  for (i = obj->contains; i; i = i->next_content)
+  if (NOT_CONTAINERS(obj))
+  {
+    return false;
+  }
+
+  for (obj_data *i = obj->contains; i; i = i->next_content)
   {
     if (i->item_number == item_number)
     {
@@ -2192,24 +2196,36 @@ int do_close(CHAR_DATA *ch, char *argument, int cmd)
    return eSUCCESS;
 }
 
-
-int has_key(CHAR_DATA *ch, int key)
+bool has_key(CHAR_DATA *ch, int key)
 {
-    struct obj_data *o;
-    
-    if(!key) 
-     return 0; //if key vnum is 0, there is no key
+ //if key vnum is 0, there is no key
+  if (key == 0)
+  {
+    return false;
+  }
 
-    if (ch->equipment[HOLD]) {
-        if (obj_index[ch->equipment[HOLD]->item_number].virt == key)
-            return(1);
+  if (ch->equipment[HOLD])
+  {
+    if (obj_index[ch->equipment[HOLD]->item_number].virt == key)
+    {
+      return true;
     }
-     
-    for (o = ch->carrying; o; o = o->next_content)
-        if (obj_index[o->item_number].virt == key)
-            return(1);
-            
-    return(0);
+  }
+
+  for (obj_data *o = ch->carrying; o; o = o->next_content)
+  {
+    if (obj_index[o->item_number].virt == key)
+    {
+      return true;
+    }
+
+    if (IS_KEYRING(o))
+    {
+      return search_container_for_item(o, key);
+    }
+  }
+
+  return false;
 }
 
 int do_lock(CHAR_DATA *ch, char *argument, int cmd)
