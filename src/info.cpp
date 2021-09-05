@@ -1125,8 +1125,7 @@ int do_look(struct char_data *ch, char *argument, int cmd) {
 									color_liquid[tmp_object->obj_flags.value[2]]);
 							send_to_char(buffer, ch);
 						}
-					} else if (GET_ITEM_TYPE(tmp_object) == ITEM_CONTAINER ||
-					GET_ITEM_TYPE(tmp_object) == ITEM_ALTAR) {
+					} else if (ARE_CONTAINERS(tmp_object)) {
 						if (!IS_SET(tmp_object->obj_flags.value[1],
 								CONT_CLOSED)) {
 							send_to_char(fname(tmp_object->name), ch);
@@ -1135,10 +1134,10 @@ int do_look(struct char_data *ch, char *argument, int cmd) {
 								send_to_char(" (carried) ", ch);
 								break;
 							case FIND_OBJ_ROOM:
-								send_to_char(" (here) ", ch);
+								send_to_char(" (in room) ", ch);
 								break;
 							case FIND_OBJ_EQUIP:
-								send_to_char(" (used) ", ch);
+								send_to_char(" (equipped) ", ch);
 								break;
 							}
 
@@ -1168,7 +1167,14 @@ int do_look(struct char_data *ch, char *argument, int cmd) {
 										tmp_object->obj_flags.value[0]);
 							}
 
-							csendf(ch, "(%sfull) : \n\r", fullness[temp]);
+                     if (NOT_KEYRING(tmp_object))
+                     {
+                        csendf(ch, "(%sfull) : \r\n", fullness[temp]);
+                     } else
+                     {
+                        csendf(ch, ": \r\n");
+                     }
+							
 							list_obj_to_char(tmp_object->contains, ch, 2, TRUE);
 						} else
 							send_to_char("It is closed.\n\r", ch);
@@ -1512,8 +1518,7 @@ int do_examine(struct char_data *ch, char *argument, int cmd)
 		FIND_OBJ_EQUIP, ch, &tmp_char, &tmp_object);
 
    if (tmp_object) {
-      if ((GET_ITEM_TYPE(tmp_object) == ITEM_DRINKCON) ||
-         (GET_ITEM_TYPE(tmp_object) == ITEM_CONTAINER)) {
+      if (GET_ITEM_TYPE(tmp_object) == ITEM_DRINKCON || ARE_CONTAINERS(tmp_object)) {
          send_to_char("When you look inside, you see:\n\r", ch);
          sprintf(buf, "in %s", argument);
          do_look(ch, buf, 15);
