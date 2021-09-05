@@ -313,7 +313,20 @@ inline const short IS_ANONYMOUS(CHAR_DATA *ch)
     CAN_SEE_OBJ((ch),(obj)))
 
 #define IS_OBJ_STAT(obj,stat) (IS_SET((obj)->obj_flags.extra_flags,stat))
+#define IS_SPECIAL(obj) (IS_OBJ_STAT(obj, ITEM_SPECIAL))
+#define NOT_SPECIAL(obj) (!IS_SPECIAL(obj))
 
+#define IS_CONTAINER(obj) (GET_ITEM_TYPE(obj) == ITEM_CONTAINER)
+#define NOT_CONTAINER(obj) (!IS_CONTAINER(obj))
+
+#define IS_ALTAR(obj) (GET_ITEM_TYPE(obj) == ITEM_ALTAR)
+#define NOT_ALTAR(obj) (!IS_ALTAR(obj))
+
+#define IS_KEYRING(obj) (GET_ITEM_TYPE(obj) == ITEM_KEYRING)
+#define NOT_KEYRING(obj) (!IS_KEYRING(obj))
+
+#define ARE_CONTAINERS(obj) (IS_CONTAINER(obj) || IS_ALTAR(obj) || IS_KEYRING(obj))
+#define NOT_CONTAINERS(obj) (NOT_CONTAINER(obj) && NOT_ALTAR(obj) && NOT_KEYRING(obj))
 
 /* char name/short_desc(for mobs) or someone?  */
 
