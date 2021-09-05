@@ -1288,7 +1288,7 @@ int do_put(struct char_data *ch, char *argument, int cmd)
             // Keyrings can only hold keys
             if (GET_ITEM_TYPE(sub_object) == ITEM_KEYRING && GET_ITEM_TYPE(obj_object) != ITEM_KEY)
             {
-              csendf(ch, "You can't put a %s on a keyring.\r\n", GET_OBJ_SHORT(obj_object));
+              csendf(ch, "You can't put %s on a keyring.\r\n", GET_OBJ_SHORT(obj_object));
               return eFAILURE;
             }
 
