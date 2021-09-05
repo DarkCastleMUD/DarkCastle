@@ -85,43 +85,37 @@ void remove_obj_affect_by_type(obj_data * obj, int loc)
 
 // given an object, return the maximum points of damage the item
 // can take before being scrapped
-int eq_max_damage(obj_data * obj)
+int eq_max_damage(obj_data *obj)
 {
-   int amount = 0;
+  int amount = 0;
 
-   switch(GET_ITEM_TYPE(obj)) {
-      case ITEM_ARMOR:
-         amount = 3;
-         amount += ((obj->obj_flags.value[0]) / 2);  // + 1 hit per 2ac
-         break;
-      case ITEM_WEAPON:
-         amount = 5;
-         break;
-      case ITEM_FIREWEAPON:
-         amount = 2;
-         break;
-      case ITEM_CONTAINER:
-         amount = 2;
-         break;
-      case ITEM_INSTRUMENT:
-         amount = 3;
-         break;
-      case ITEM_WAND:
-      case ITEM_STAFF:
-	amount = 3;
-	break;
-      case ITEM_LIGHT:
-	amount = 3;
-	break;
-      case ITEM_KEY:
-         amount = 2;
-         break;
-      default:
-         amount = 1;
-         break;
-   }
+  switch (GET_ITEM_TYPE(obj))
+  {
+  case ITEM_WEAPON:
+    amount = 5;
+    break;
+  case ITEM_ARMOR:
+    amount = 3;
+    amount += ((obj->obj_flags.value[0]) / 2); // + 1 hit per 2ac
+    break;
+  case ITEM_WAND:
+  case ITEM_STAFF:
+  case ITEM_INSTRUMENT:
+  case ITEM_LIGHT:
+    amount = 3;
+    break;
+  case ITEM_FIREWEAPON:
+  case ITEM_CONTAINER:
+  case ITEM_KEYRING:
+  case ITEM_KEY:
+    amount = 2;
+    break;
+  default:
+    amount = 1;
+    break;
+  }
 
-   return amount;
+  return amount;
 }
 
 int eq_current_damage(obj_data * obj)
