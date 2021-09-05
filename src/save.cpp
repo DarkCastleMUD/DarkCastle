@@ -1198,9 +1198,6 @@ bool put_obj_in_store (struct obj_data *obj, CHAR_DATA *ch, FILE *fpsave, int we
 
   memset(&object, 0, sizeof(object));
 
-  if (GET_ITEM_TYPE(obj) == ITEM_KEY)
-    return TRUE;
-
   if (GET_ITEM_TYPE(obj) == ITEM_NOTE)
     return TRUE;
 
