@@ -1,0 +1,76 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    //valgrind --vgdb=yes --vgdb-error=0 ./dcastle -d ~/dcastle/lib/
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "(gdb) Launch",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/dcastle",
+            "args": ["-d", "${workspaceFolder}/../../dcastle/lib", "-P"], 
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "logging": { "engineLogging": true, "trace": true, "traceResponse": true },
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
+            "name": "(gdb) Launch tests only",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/dcastle",
+            "args": ["-d", "${workspaceFolder}/../../dcastle/lib", "-t", "-s"], 
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "logging": { "engineLogging": true, "trace": true, "traceResponse": true },
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
+            "name": "(gdb) valgrind remote-target",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/dcastle",
+            "targetArchitecture": "x64",
+            "customLaunchSetupCommands" : [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                  "description": "Attach to valgrind",
+                  "text": "target remote | /usr/bin/vgdb",
+                  "ignoreFailures": false  
+                }
+            ],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb"
+        },
+
+
+
+    ]
+}
