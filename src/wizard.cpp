@@ -851,11 +851,11 @@ void mob_stat(struct char_data *ch, struct char_data *k)
 		break;
 	}
   }
-}    
+}
 
 void obj_stat(struct char_data *ch, struct obj_data *j)
 {
-  struct obj_data  *j2=0;
+  struct obj_data *j2 = 0;
   char buf[MAX_STRING_LENGTH];
   char buf2[MAX_STRING_LENGTH];
   char buf3[MAX_STRING_LENGTH];
@@ -866,7 +866,7 @@ void obj_stat(struct char_data *ch, struct obj_data *j)
 
   int its;
 
-/*
+  /*
     if(IS_SET(j->obj_flags.extra_flags, ITEM_DARK) && GET_LEVEL(ch) < POWER)
     {
       send_to_char("A magical aura around the item attempts to conceal its secrets.\r\n", ch);
@@ -874,349 +874,365 @@ void obj_stat(struct char_data *ch, struct obj_data *j)
     }
 */
 
-    virt = (j->item_number >= 0) ? obj_index[j->item_number].virt : 0;
-    sprintf(buf,"$3Object name$R:[%s]  $3R-number$R:[%d]  $3V-number$R:[%d]  $3Item type$R: ",
-            j->name, j->item_number, virt);
-    sprinttype(GET_ITEM_TYPE(j),item_types,buf2);
+  virt = (j->item_number >= 0) ? obj_index[j->item_number].virt : 0;
+  sprintf(buf, "$3Object name$R:[%s]  $3R-number$R:[%d]  $3V-number$R:[%d]  $3Item type$R: ",
+          j->name, j->item_number, virt);
+  sprinttype(GET_ITEM_TYPE(j), item_types, buf2);
 
-    strcat(buf,buf2); strcat(buf,"\n\r");
-    send_to_char(buf, ch);
+  strcat(buf, buf2);
+  strcat(buf, "\n\r");
+  send_to_char(buf, ch);
 
-    sprintf(buf,"$3Short description$R: %s\n\r$3Long description$R:\n\r%s\n\r",
-	    ((j->short_description) ? j->short_description : "None"),
-	    ((j->description) ? j->description : "None") );
-    send_to_char(buf, ch);
-    if(j->ex_description)
+  sprintf(buf, "$3Short description$R: %s\n\r$3Long description$R:\n\r%s\n\r",
+          ((j->short_description) ? j->short_description : "None"),
+          ((j->description) ? j->description : "None"));
+  send_to_char(buf, ch);
+  if (j->ex_description)
+  {
+    strcpy(buf, "$3Extra description keyword(s)$R:\n\r----------\n\r");
+    for (desc = j->ex_description; desc; desc = desc->next)
     {
-      strcpy(buf, "$3Extra description keyword(s)$R:\n\r----------\n\r");
-      for (desc = j->ex_description; desc; desc = desc->next) 
-      {
-        strcat(buf, desc->keyword);
-        strcat(buf, "\n\r");
-      }
-        strcat(buf, "----------\n\r");
-        send_to_char(buf, ch);
-    } 
-    else 
-    {
-      strcpy(buf,"$3Extra description keyword(s)$R: None\n\r");
-      send_to_char(buf, ch);
+      strcat(buf, desc->keyword);
+      strcat(buf, "\n\r");
     }
-    send_to_char("$3Can be worn on$R:", ch);
-    sprintbit(j->obj_flags.wear_flags,wear_bits,buf);
-    strcat(buf,"\n\r");
+    strcat(buf, "----------\n\r");
     send_to_char(buf, ch);
-
-    send_to_char("$3Can be worn by$R:", ch);
-    sprintbit(j->obj_flags.size,size_bits,buf);
-    strcat(buf,"\n\r");
+  }
+  else
+  {
+    strcpy(buf, "$3Extra description keyword(s)$R: None\n\r");
     send_to_char(buf, ch);
+  }
+  send_to_char("$3Can be worn on$R:", ch);
+  sprintbit(j->obj_flags.wear_flags, wear_bits, buf);
+  strcat(buf, "\n\r");
+  send_to_char(buf, ch);
 
-    send_to_char("$3Extra flags$R: ", ch);
-    sprintbit(j->obj_flags.extra_flags,extra_bits,buf);
-    strcat(buf,"\n\r");
-    send_to_char(buf,ch);
+  send_to_char("$3Can be worn by$R:", ch);
+  sprintbit(j->obj_flags.size, size_bits, buf);
+  strcat(buf, "\n\r");
+  send_to_char(buf, ch);
 
-    send_to_char("$3More flags$R: ", ch);
-    sprintbit(j->obj_flags.more_flags,more_obj_bits,buf);
-    strcat(buf,"\n\r");
-    send_to_char(buf,ch);
+  send_to_char("$3Extra flags$R: ", ch);
+  sprintbit(j->obj_flags.extra_flags, extra_bits, buf);
+  strcat(buf, "\n\r");
+  send_to_char(buf, ch);
 
+  send_to_char("$3More flags$R: ", ch);
+  sprintbit(j->obj_flags.more_flags, more_obj_bits, buf);
+  strcat(buf, "\n\r");
+  send_to_char(buf, ch);
+
+  sprintf(buf,
+          "$3Weight$R: %d  $3Value$R: %d  $3Timer$R: %d  $3Eq Level$R: %d\n\r",
+          j->obj_flags.weight,
+          j->obj_flags.cost,
+          j->obj_flags.timer,
+          j->obj_flags.eq_level);
+  send_to_char(buf, ch);
+
+  strcpy(buf, "$3In room$R: ");
+  if (j->in_room == NOWHERE)
+    strcat(buf, "Nowhere");
+  else
+  {
+    sprintf(buf2, "%d", world[j->in_room].number);
+    strcat(buf, buf2);
+  }
+  strcat(buf, "  $3In object$R: ");
+  strcat(buf, (!j->in_obj ? "None" : fname(j->in_obj->name)));
+  strcat(buf, "  $3Carried by$R: ");
+  strcat(buf, (!j->carried_by) ? "Nobody" : GET_NAME(j->carried_by));
+  strcat(buf, "\n\r");
+  send_to_char(buf, ch);
+
+  switch (j->obj_flags.type_flag)
+  {
+  case ITEM_LIGHT:
+    sprintf(buf, "$3Colour (v1)$R: %d\n\r"
+                 "$3Type   (v2)$R: %d\n\r"
+                 "$3Hours  (v3)$R: %d\n\r"
+                 "$3Unused (v4)$R: %d",
+            j->obj_flags.value[0],
+            j->obj_flags.value[1],
+            j->obj_flags.value[2],
+            j->obj_flags.value[3]);
+    break;
+  case ITEM_SCROLL:
+    sprinttype(j->obj_flags.value[1] - 1, spells, buf2);
+    sprinttype(j->obj_flags.value[2] - 1, spells, buf3);
+    sprinttype(j->obj_flags.value[3] - 1, spells, buf4);
+    sprintf(buf, "$3Level(v1)$R  : %d\n\r"
+                 " $3Spells(v2)$R: %d (%s)\r\n"
+                 " $3Spells(v3)$R: %d (%s)\r\n"
+                 " $3Spells(v4)$R: %d (%s)",
+            j->obj_flags.value[0],
+            j->obj_flags.value[1], buf2,
+            j->obj_flags.value[2], buf3,
+            j->obj_flags.value[3], buf4);
+    break;
+  case ITEM_WAND:
+  case ITEM_STAFF:
+    sprinttype(j->obj_flags.value[3] - 1, spells, buf2);
+    sprintf(buf, "$3Level(v1)$R: %d  $3Spell(v4)$R: %d - %s\r\n"
+                 "$3Total Charges(v2)$R: %d   $3Current Charges(v3)$R: %d",
+            j->obj_flags.value[0],
+            j->obj_flags.value[3],
+            buf2,
+            j->obj_flags.value[1],
+            j->obj_flags.value[2]);
+    break;
+  case ITEM_WEAPON:
+    int get_weapon_damage_type(struct obj_data * wielded);
+    its = get_weapon_damage_type(j) - 1000;
+    extern char *strs_damage_types[];
+    sprintf(buf, "$3Unused(v1)$R: %d (make 0)\n\r$3Todam(v2)d(v3)$R: %dD%d\n\r$3Type(v4)$R: %d (%s)",
+            j->obj_flags.value[0],
+            j->obj_flags.value[1],
+            j->obj_flags.value[2],
+            j->obj_flags.value[3],
+            strs_damage_types[its]);
+    break;
+  case ITEM_MEGAPHONE:
+    sprintf(buf, "Interval(v1): %d\r\nInterval, again(v2): %d", j->obj_flags.value[0], j->obj_flags.value[1]);
+    break;
+  case ITEM_FIREWEAPON:
+    sprintf(buf, "$3Tohit(v1)$R: %d\n\r$3Todam(v2)d<v3)$R: %dD%d\n\r$3Type(v4)$R: %d",
+            j->obj_flags.value[0],
+            j->obj_flags.value[1],
+            j->obj_flags.value[2],
+            j->obj_flags.value[3]);
+    break;
+  case ITEM_MISSILE:
+    sprintf(buf, "$3Damage(v1dv2)$R: %d$3/$R%d\n\r$3Tohit(v3)$R: %d\n\r$3Todam(v4)$R: %d",
+            j->obj_flags.value[0],
+            j->obj_flags.value[1],
+            j->obj_flags.value[3],
+            j->obj_flags.value[2]);
+    break;
+  case ITEM_ARMOR:
+    sprintf(buf, "$3AC-apply(v1)$R: [%d]\n\r"
+                 "$3Unused  (v2)$R: [%d] (make 0)\n\r"
+                 "$3Unused  (v3)$R: [%d] (make 0)\n\r"
+                 "$3Unused  (v4)$R: [%d] (make 0)",
+            j->obj_flags.value[0], j->obj_flags.value[1], j->obj_flags.value[2], j->obj_flags.value[3]);
+    break;
+  case ITEM_POTION:
+    sprinttype(j->obj_flags.value[1] - 1, spells, buf2);
+    sprinttype(j->obj_flags.value[2] - 1, spells, buf3);
+    sprinttype(j->obj_flags.value[3] - 1, spells, buf4);
+    sprintf(buf, "$3Level (v1)$R: %d\n\r"
+                 " $3Spell(v2)$R: %d (%s)\n\r"
+                 " $3Spell(v3)$R: %d (%s)\n\r"
+                 " $3Spell(v4)$R: %d (%s)",
+            j->obj_flags.value[0],
+            j->obj_flags.value[1], buf2,
+            j->obj_flags.value[2], buf3,
+            j->obj_flags.value[3], buf4);
+    break;
+  case ITEM_TRAP:
+    sprintf(buf, "$3Spell(v1)$R    : %d\n\r"
+                 "$3Hitpoints(v2)$R: %d",
+            j->obj_flags.value[0],
+            j->obj_flags.value[1]);
+    break;
+  case ITEM_CONTAINER:
     sprintf(buf,
-             "$3Weight$R: %d  $3Value$R: %d  $3Timer$R: %d  $3Eq Level$R: %d\n\r",
-             j->obj_flags.weight,
-             j->obj_flags.cost,
-             j->obj_flags.timer,
-             j->obj_flags.eq_level);
-             send_to_char(buf, ch);
-
-    strcpy(buf,"$3In room$R: ");
-    if (j->in_room == NOWHERE)
-      strcat(buf,"Nowhere");
-    else 
+            "$3Max-contains(v1)$R : %d\n\r"
+            "$3Locktype(v2)$R     : %d\n\r"
+            "$3Key #$R            : %d\n\r"
+            "$3Corpse(v4)$R       : %s",
+            j->obj_flags.value[0],
+            j->obj_flags.value[1],
+            j->obj_flags.value[2],
+            j->obj_flags.value[3] ? "Yes" : "No");
+    break;
+  case ITEM_DRINKCON:
+    sprinttype(j->obj_flags.value[2], drinks, buf2);
+    //  strcpy(buf2,drinks[j->obj_flags.value[2]]);
+    sprintf(buf,
+            "$3Max-contains(v1)$R: %d\n\r"
+            "$3Contains    (v2)$R: %d\n\r"
+            "$3Liquid      (v3)$R: %s (%d)\n\r"
+            "$3Poisoned    (v4)$R: %d",
+            j->obj_flags.value[0],
+            j->obj_flags.value[1],
+            buf2,
+            j->obj_flags.value[2],
+            j->obj_flags.value[3]);
+    break;
+  case ITEM_NOTE:
+    sprintf(buf, "$3Tounge(v1)$R : %d"
+                 "$3Unused(v2)$R : %d"
+                 "$3Unused(v3)$R : %d"
+                 "$3Unused(v4)$R : %d",
+            j->obj_flags.value[0],
+            j->obj_flags.value[1],
+            j->obj_flags.value[2],
+            j->obj_flags.value[3]);
+    break;
+  case ITEM_UTILITY:
+    sprintf(buf2, "$3Utility Type(v1)$R : %d (%s)\r\n",
+            j->obj_flags.value[0],
+            j->obj_flags.value[0] >= 0 && j->obj_flags.value[0] <= UTILITY_ITEM_MAX ? utility_item_types[j->obj_flags.value[0]] : "INVALID TYPE");
+    if (j->obj_flags.value[0] == UTILITY_CATSTINK)
     {
-      sprintf(buf2,"%d",world[j->in_room].number);
-      strcat(buf,buf2);
+      sprintf(buf, "%s"
+                   "$3Sector(v2)$R : %d (%s)\r\n"
+                   "$3Unused(v3)$R : %d "
+                   "$3HowMuchLag(v4)$R : %d",
+              buf2,
+              j->obj_flags.value[1],
+              j->obj_flags.value[1] >= 0 && j->obj_flags.value[1] <= SECT_MAX_SECT ? sector_types[j->obj_flags.value[1]] : "INVALID SECTOR TYPE",
+              j->obj_flags.value[2],
+              j->obj_flags.value[3]);
     }
-    strcat(buf,"  $3In object$R: ");
-    strcat(buf, (!j->in_obj ? "None" : fname(j->in_obj->name)));
-    strcat(buf,"  $3Carried by$R: ");
-    strcat(buf, (!j->carried_by) ? "Nobody" : GET_NAME(j->carried_by));
-    strcat(buf,"\n\r");
-    send_to_char(buf, ch);
-
-    switch (j->obj_flags.type_flag) 
+    else if (j->obj_flags.value[0] == UTILITY_MORTAR)
     {
-      case ITEM_LIGHT : 
-        sprintf(buf,"$3Colour (v1)$R: %d\n\r"
-                    "$3Type   (v2)$R: %d\n\r"
-                    "$3Hours  (v3)$R: %d\n\r"
-                    "$3Unused (v4)$R: %d",
-	          j->obj_flags.value[0],
-	          j->obj_flags.value[1],
-	          j->obj_flags.value[2],
-                  j->obj_flags.value[3]);
-         break;
-      case ITEM_SCROLL : 
-        sprinttype(j->obj_flags.value[1]-1,spells,buf2); 
-        sprinttype(j->obj_flags.value[2]-1,spells,buf3); 
-        sprinttype(j->obj_flags.value[3]-1,spells,buf4); 
-        sprintf(buf, "$3Level(v1)$R  : %d\n\r"
-                     " $3Spells(v2)$R: %d (%s)\r\n"
-                     " $3Spells(v3)$R: %d (%s)\r\n"
-                     " $3Spells(v4)$R: %d (%s)",
-	          j->obj_flags.value[0],
-		  j->obj_flags.value[1], buf2,
-		  j->obj_flags.value[2], buf3,
-		  j->obj_flags.value[3], buf4 );
-	  break;
-      case ITEM_WAND : 
-      case ITEM_STAFF :
-          sprinttype(j->obj_flags.value[3]-1,spells,buf2); 
-	  sprintf(buf, "$3Level(v1)$R: %d  $3Spell(v4)$R: %d - %s\r\n"
-                       "$3Total Charges(v2)$R: %d   $3Current Charges(v3)$R: %d",
-	          j->obj_flags.value[0],
-	          j->obj_flags.value[3],
-                  buf2,
-	          j->obj_flags.value[1],
-	          j->obj_flags.value[2]);
-	  break;
-      case ITEM_WEAPON :
-int get_weapon_damage_type(struct obj_data * wielded);
-its = get_weapon_damage_type(j) -1000;
-extern char * strs_damage_types[];
-	  sprintf(buf, "$3Unused(v1)$R: %d (make 0)\n\r$3Todam(v2)d(v3)$R: %dD%d\n\r$3Type(v4)$R: %d (%s)",
-	          j->obj_flags.value[0],
-	          j->obj_flags.value[1],
-	          j->obj_flags.value[2],
-	          j->obj_flags.value[3],
-		  strs_damage_types[its]
-		  );
-	  break;
-      case ITEM_MEGAPHONE:
-	 sprintf(buf,"Interval(v1): %d\r\nInterval, again(v2): %d", j->obj_flags.value[0],j->obj_flags.value[1]);
- 	 break;
-      case ITEM_FIREWEAPON : 
-	  sprintf(buf, "$3Tohit(v1)$R: %d\n\r$3Todam(v2)d<v3)$R: %dD%d\n\r$3Type(v4)$R: %d",
-	          j->obj_flags.value[0],
-	          j->obj_flags.value[1],
-	          j->obj_flags.value[2],
-	          j->obj_flags.value[3]);
-	  break;
-      case ITEM_MISSILE : 
-	  sprintf(buf, "$3Damage(v1dv2)$R: %d$3/$R%d\n\r$3Tohit(v3)$R: %d\n\r$3Todam(v4)$R: %d",
-	          j->obj_flags.value[0],
-	          j->obj_flags.value[1],
-	          j->obj_flags.value[3],
-	          j->obj_flags.value[2]);
-	  break;
-      case ITEM_ARMOR :
-	  sprintf(buf, "$3AC-apply(v1)$R: [%d]\n\r"
-                       "$3Unused  (v2)$R: [%d] (make 0)\n\r"
-                       "$3Unused  (v3)$R: [%d] (make 0)\n\r"
-                       "$3Unused  (v4)$R: [%d] (make 0)",
-	          j->obj_flags.value[0], j->obj_flags.value[1], j->obj_flags.value[2], j->obj_flags.value[3]);
-	  break;
-      case ITEM_POTION : 
-          sprinttype(j->obj_flags.value[1]-1,spells,buf2); 
-          sprinttype(j->obj_flags.value[2]-1,spells,buf3); 
-          sprinttype(j->obj_flags.value[3]-1,spells,buf4); 
-	  sprintf(buf, "$3Level (v1)$R: %d\n\r"
-                       " $3Spell(v2)$R: %d (%s)\n\r"
-                       " $3Spell(v3)$R: %d (%s)\n\r"
-                       " $3Spell(v4)$R: %d (%s)",
-	          j->obj_flags.value[0],
-	          j->obj_flags.value[1], buf2,
-	          j->obj_flags.value[2], buf3,
-	          j->obj_flags.value[3], buf4); 
-	  break;
-      case ITEM_TRAP :
-	  sprintf(buf, "$3Spell(v1)$R    : %d\n\r"
-                       "$3Hitpoints(v2)$R: %d",
-	          j->obj_flags.value[0],
-	          j->obj_flags.value[1]);
-	  break;
-      case ITEM_CONTAINER :
-	  sprintf(buf,
-	          "$3Max-contains(v1)$R : %d\n\r"
-                  "$3Locktype(v2)$R     : %d\n\r"
-                  "$3Key #$R            : %d\n\r"
-                  "$3Corpse(v4)$R       : %s",
-	          j->obj_flags.value[0],
-	          j->obj_flags.value[1],
-	          j->obj_flags.value[2],
-	          j->obj_flags.value[3]?"Yes":"No");
-	  break;
-      case ITEM_DRINKCON :
-	  sprinttype(j->obj_flags.value[2],drinks,buf2);
-        //  strcpy(buf2,drinks[j->obj_flags.value[2]]);
-	  sprintf(buf,
-	  "$3Max-contains(v1)$R: %d\n\r"
-          "$3Contains    (v2)$R: %d\n\r"
-          "$3Liquid      (v3)$R: %s (%d)\n\r"
-          "$3Poisoned    (v4)$R: %d",
-	          j->obj_flags.value[0],
-	          j->obj_flags.value[1],
-                  buf2,
-	          j->obj_flags.value[2],
-		  j->obj_flags.value[3]);
-	  break;
-      case ITEM_NOTE :
-	  sprintf(buf, "$3Tounge(v1)$R : %d"
-                       "$3Unused(v2)$R : %d"
-                       "$3Unused(v3)$R : %d"
-                       "$3Unused(v4)$R : %d", 
-                  j->obj_flags.value[0],
-                  j->obj_flags.value[1],
-                  j->obj_flags.value[2],
-                  j->obj_flags.value[3]);
-	  break;
-      case ITEM_UTILITY :
-          sprintf(buf2, "$3Utility Type(v1)$R : %d (%s)\r\n", 
-                  j->obj_flags.value[0],  
-                  j->obj_flags.value[0] >= 0 && j->obj_flags.value[0] <= UTILITY_ITEM_MAX ?  
-                    utility_item_types[ j->obj_flags.value[0] ] : "INVALID TYPE" 
-                 );
-          if( j->obj_flags.value[0] == UTILITY_CATSTINK ) {
-	      sprintf(buf, "%s"
-                       "$3Sector(v2)$R : %d (%s)\r\n"
-                       "$3Unused(v3)$R : %d "
-                       "$3HowMuchLag(v4)$R : %d", 
-                  buf2,
-                  j->obj_flags.value[1],
-                  j->obj_flags.value[1] >= 0 && j->obj_flags.value[1] <= SECT_MAX_SECT ?
-                    sector_types[ j->obj_flags.value[1] ] : "INVALID SECTOR TYPE",
-                  j->obj_flags.value[2],
-                  j->obj_flags.value[3]);
-          } else if( j->obj_flags.value[0] == UTILITY_MORTAR ) {
-	      sprintf(buf, "%s"
-                       "$3NumDice(v2)$R : %d "
-                       "$3DiceSize (v3)$R : %d "
-                       "$3HowMuchLag(v4)$R : %d ", 
-                  buf2,
-                  j->obj_flags.value[1],
-                  j->obj_flags.value[2],
-                  j->obj_flags.value[3]);
-          } else {
-	      sprintf(buf, "%s"
-                       "$3Unused(v2)$R : %d "
-                       "$3Unused(v3)$R : %d "
-                       "$3HowMuchLag(v4)$R : %d", 
-                  buf2,
-                  j->obj_flags.value[1],
-                  j->obj_flags.value[2],
-                  j->obj_flags.value[3]);
-          }
-          break;
-      case ITEM_KEY :
-	  sprintf(buf, "$3Keytype(v1)$R : %d"
-                       "$3Unused (v2)$R : %d"
-                       "$3Unused (v3)$R : %d"
-                       "$3Unused (v4)$R : %d",
-                  j->obj_flags.value[0],
-                  j->obj_flags.value[1],
-                  j->obj_flags.value[2],
-                  j->obj_flags.value[3]);
-	  break;
-      case ITEM_FOOD :
-	  sprintf(buf, "$3Makes full(v1)$R : %d\n\r"
-                       "$3Poisoned  (v4)$R : %d",
-	          j->obj_flags.value[0],
-	          j->obj_flags.value[3]);
-	  break;
-      case ITEM_INSTRUMENT :
-          sprintf(buf, "$3Song Effect$R:  $3Non-Combat(v1)$R[%d] $3Combat(v2)$R[%d]",
-                  j->obj_flags.value[0],
-                  j->obj_flags.value[1]);
-          break;
-      case ITEM_PORTAL :
-          sprintf(buf, "$3ToRoom (v1)$R : %d\r\n"
-                       "$3Type   (v2)$R : ",  j->obj_flags.value[0]);
-          switch(j->obj_flags.value[1]) {
-             case 0: strcat(buf, "0-Player-Portal");         break;
-             case 1: strcat(buf, "1-Permanent-Game-Portal"); break;
-             case 2: strcat(buf, "2-Temp-Game-portal");      break;
-             case 3: strcat(buf, "3-Look-only-portal");       break;
-             case 4: strcat(buf, "4-Perm-No-Look-portal");       break;
-             default: strcat(buf, "Unknown!!!");         break;
-          }
-          sprintf(buf2, "(can be 0-4)\r\n"
-                      "$3Zone   (v3)$R : %d (can 'leave' anywhere from this zone (set to -1 otherwise))\r\n"
-                      "$3Flags  (v4)$R : ", j->obj_flags.value[2] );
-          strcat(buf, buf2);
-          sprintbit(j->obj_flags.value[3],portal_bits,buf2);
-          strcat(buf, buf2);
-          strcat(buf, "\n(0 = nobits, 1 = no_leave, 2 = no_enter)");
-          break;
-      default :
-	  sprintf(buf,"Values 0-3 : [%d] [%d] [%d] [%d]",
-	          j->obj_flags.value[0],
-	          j->obj_flags.value[1],
-	          j->obj_flags.value[2],
-	          j->obj_flags.value[3]);
-	  break;
+      sprintf(buf, "%s"
+                   "$3NumDice(v2)$R : %d "
+                   "$3DiceSize (v3)$R : %d "
+                   "$3HowMuchLag(v4)$R : %d ",
+              buf2,
+              j->obj_flags.value[1],
+              j->obj_flags.value[2],
+              j->obj_flags.value[3]);
     }
-    send_to_char(buf, ch);
-
-    strcpy(buf,"\n\r$3Equipment Status$R: ");
-    if (!j->carried_by)
-      strcat(buf,"NONE");
-    else 
-    {
-        found = FALSE;
-        for (i=0;i < MAX_WEAR;i++) 
-        {
-          if (j->carried_by->equipment[i] == j) 
-          {
-            sprinttype(i,equipment_types,buf2);
-            strcat(buf,buf2);
-            found = TRUE;
-          }
-        }
-        if (!found)
-          strcat(buf,"Inventory");
-    }
-    send_to_char(buf, ch);
-
-    strcpy(buf, "\n\r$3Non-Combat Special procedure$R : ");
-    if (j->item_number >= 0)
-      strcat(buf,(obj_index[j->item_number].non_combat_func ? "exists\n\r" : 
-             "No\n\r"));
     else
-      strcat(buf, "No\n\r");
-    send_to_char(buf, ch);
-    strcpy(buf, "$3Combat Special procedure$R : ");
-    if(j->item_number >= 0)
-       strcat(buf, (obj_index[j->item_number].combat_func ? "exists\n\r" :
-              "No\n\r"));
-    else
-      strcat(buf, "No\n\r");
-    send_to_char(buf, ch);
-    strcpy(buf, "$3Contains$R :\n\r");
+    {
+      sprintf(buf, "%s"
+                   "$3Unused(v2)$R : %d "
+                   "$3Unused(v3)$R : %d "
+                   "$3HowMuchLag(v4)$R : %d",
+              buf2,
+              j->obj_flags.value[1],
+              j->obj_flags.value[2],
+              j->obj_flags.value[3]);
+    }
+    break;
+  case ITEM_KEY:
+    sprintf(buf, "$3Keytype(v1)$R : %d"
+                 "$3Unused (v2)$R : %d"
+                 "$3Unused (v3)$R : %d"
+                 "$3Unused (v4)$R : %d",
+            j->obj_flags.value[0],
+            j->obj_flags.value[1],
+            j->obj_flags.value[2],
+            j->obj_flags.value[3]);
+    break;
+  case ITEM_FOOD:
+    sprintf(buf, "$3Makes full(v1)$R : %d\n\r"
+                 "$3Poisoned  (v4)$R : %d",
+            j->obj_flags.value[0],
+            j->obj_flags.value[3]);
+    break;
+  case ITEM_INSTRUMENT:
+    sprintf(buf, "$3Song Effect$R:  $3Non-Combat(v1)$R[%d] $3Combat(v2)$R[%d]",
+            j->obj_flags.value[0],
+            j->obj_flags.value[1]);
+    break;
+  case ITEM_PORTAL:
+    sprintf(buf, "$3ToRoom (v1)$R : %d\r\n"
+                 "$3Type   (v2)$R : ",
+            j->obj_flags.value[0]);
+    switch (j->obj_flags.value[1])
+    {
+    case 0:
+      strcat(buf, "0-Player-Portal");
+      break;
+    case 1:
+      strcat(buf, "1-Permanent-Game-Portal");
+      break;
+    case 2:
+      strcat(buf, "2-Temp-Game-portal");
+      break;
+    case 3:
+      strcat(buf, "3-Look-only-portal");
+      break;
+    case 4:
+      strcat(buf, "4-Perm-No-Look-portal");
+      break;
+    default:
+      strcat(buf, "Unknown!!!");
+      break;
+    }
+    sprintf(buf2, "(can be 0-4)\r\n"
+                  "$3Zone   (v3)$R : %d (can 'leave' anywhere from this zone (set to -1 otherwise))\r\n"
+                  "$3Flags  (v4)$R : ",
+            j->obj_flags.value[2]);
+    strcat(buf, buf2);
+    sprintbit(j->obj_flags.value[3], portal_bits, buf2);
+    strcat(buf, buf2);
+    strcat(buf, "\n(0 = nobits, 1 = no_leave, 2 = no_enter)");
+    break;
+  default:
+    sprintf(buf, "Values 0-3 : [%d] [%d] [%d] [%d]",
+            j->obj_flags.value[0],
+            j->obj_flags.value[1],
+            j->obj_flags.value[2],
+            j->obj_flags.value[3]);
+    break;
+  }
+  send_to_char(buf, ch);
+
+  strcpy(buf, "\n\r$3Equipment Status$R: ");
+  if (!j->carried_by)
+    strcat(buf, "NONE");
+  else
+  {
     found = FALSE;
-    for(j2=j->contains;j2;j2 = j2->next_content) 
+    for (i = 0; i < MAX_WEAR; i++)
     {
-      strcat(buf,fname(j2->name));
-      strcat(buf,"\n\r");
-      found = TRUE;
+      if (j->carried_by->equipment[i] == j)
+      {
+        sprinttype(i, equipment_types, buf2);
+        strcat(buf, buf2);
+        found = TRUE;
+      }
     }
     if (!found)
-      strcpy(buf,"$3Contains$R : Nothing\n\r");
-    send_to_char(buf, ch);
+      strcat(buf, "Inventory");
+  }
+  send_to_char(buf, ch);
 
-    send_to_char("$3Can affect char$R :\n\r", ch);
-    for (i=0;i<j->num_affects;i++) 
-    {
-//      sprinttype(j->affected[i].location,apply_types,buf2);
-                if (j->affected[i].location < 1000)
-                 sprinttype(j->affected[i].location,apply_types,buf2);
-                else if (get_skill_name(j->affected[i].location/1000))
-                  strcpy(buf2, get_skill_name(j->affected[i].location/1000));
-		else strcpy(buf2, "Invalid");
-	
-      sprintf(buf,"    $3Affects$R : %s By %d\n\r", buf2,j->affected[i].modifier);
-      send_to_char(buf, ch);
-    }           
+  strcpy(buf, "\n\r$3Non-Combat Special procedure$R : ");
+  if (j->item_number >= 0)
+    strcat(buf, (obj_index[j->item_number].non_combat_func ? "exists\n\r" : "No\n\r"));
+  else
+    strcat(buf, "No\n\r");
+  send_to_char(buf, ch);
+  strcpy(buf, "$3Combat Special procedure$R : ");
+  if (j->item_number >= 0)
+    strcat(buf, (obj_index[j->item_number].combat_func ? "exists\n\r" : "No\n\r"));
+  else
+    strcat(buf, "No\n\r");
+  send_to_char(buf, ch);
+  strcpy(buf, "$3Contains$R :\n\r");
+  found = FALSE;
+  for (j2 = j->contains; j2; j2 = j2->next_content)
+  {
+    strcat(buf, fname(j2->name));
+    strcat(buf, "\n\r");
+    found = TRUE;
+  }
+  if (!found)
+    strcpy(buf, "$3Contains$R : Nothing\n\r");
+  send_to_char(buf, ch);
+
+  send_to_char("$3Can affect char$R :\n\r", ch);
+  for (i = 0; i < j->num_affects; i++)
+  {
+    //      sprinttype(j->affected[i].location,apply_types,buf2);
+    if (j->affected[i].location < 1000)
+      sprinttype(j->affected[i].location, apply_types, buf2);
+    else if (get_skill_name(j->affected[i].location / 1000))
+      strcpy(buf2, get_skill_name(j->affected[i].location / 1000));
+    else
+      strcpy(buf2, "Invalid");
+
+    sprintf(buf, "    $3Affects$R : %s By %d\n\r", buf2, j->affected[i].modifier);
+    send_to_char(buf, ch);
+  }
   return;
 }
 
