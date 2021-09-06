@@ -578,8 +578,7 @@ int do_get(struct char_data *ch, char *argument, int cmd)
 		     return eFAILURE;
                    }
                 }
-		if (GET_ITEM_TYPE(sub_object) == ITEM_CONTAINER
-		|| GET_ITEM_TYPE(sub_object) == ITEM_ALTAR) {
+		if (ARE_CONTAINERS(sub_object)) {
 		  if (IS_SET(sub_object->obj_flags.value[1], CONT_CLOSED)){
 		    sprintf(buffer, "The %s is closed.\r\n",fname(sub_object->name));
 		    send_to_char(buffer, ch);
@@ -1283,7 +1282,7 @@ int do_put(struct char_data *ch, char *argument, int cmd)
                             ch, &tmp_char, &sub_object);
         if (sub_object)
         {
-          if (GET_ITEM_TYPE(sub_object) == ITEM_CONTAINER || GET_ITEM_TYPE(sub_object) == ITEM_ALTAR || GET_ITEM_TYPE(sub_object) == ITEM_KEYRING)
+          if (ARE_CONTAINERS(sub_object))
           {
             // Keyrings can only hold keys
             if (GET_ITEM_TYPE(sub_object) == ITEM_KEYRING && GET_ITEM_TYPE(obj_object) != ITEM_KEY)
@@ -2204,24 +2203,25 @@ bool has_key(CHAR_DATA *ch, int key)
     return false;
   }
 
-  if (ch->equipment[HOLD])
+  obj_data *obj = ch->equipment[HOLD];
+  if (obj && IS_KEY(obj))
   {
-    if (obj_index[ch->equipment[HOLD]->item_number].virt == key)
+    if (obj_index[obj->item_number].virt == key)
     {
       return true;
     }
   }
 
-  for (obj_data *o = ch->carrying; o; o = o->next_content)
+  for (obj = ch->carrying; obj && IS_KEY(obj); obj = obj->next_content)
   {
-    if (obj_index[o->item_number].virt == key)
+    if (obj_index[obj->item_number].virt == key)
     {
       return true;
     }
 
-    if (IS_KEYRING(o))
+    if (IS_KEYRING(obj))
     {
-      return search_container_for_item(o, key);
+      return search_container_for_item(obj, key);
     }
   }
 
