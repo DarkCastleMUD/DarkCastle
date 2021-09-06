@@ -1876,7 +1876,7 @@ bool search_container_for_item(obj_data *obj, int item_number)
 
   for (obj_data *i = obj->contains; i; i = i->next_content)
   {
-    if (i->item_number == item_number)
+    if (IS_KEY(i) && i->item_number == item_number)
     {
       return true;
     }
@@ -2212,9 +2212,9 @@ bool has_key(CHAR_DATA *ch, int key)
     }
   }
 
-  for (obj = ch->carrying; obj && IS_KEY(obj); obj = obj->next_content)
+  for (obj = ch->carrying; obj; obj = obj->next_content)
   {
-    if (obj_index[obj->item_number].virt == key)
+    if (IS_KEY(obj) && obj_index[obj->item_number].virt == key)
     {
       return true;
     }
