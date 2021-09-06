@@ -849,15 +849,13 @@ int do_hide(CHAR_DATA *ch, char *argument, int cmd)
 
 int max_level(CHAR_DATA *ch)
 {
-  int i = 0,lvl = 0;
+  int i = 0, lvl = 0;
   for (; i < MAX_WEAR; i++)
-    if (ch->equipment[i] && (GET_ITEM_TYPE(ch->equipment[i]) == ITEM_ARMOR ||
-GET_ITEM_TYPE(ch->equipment[i]) == ITEM_WEAPON || GET_ITEM_TYPE(ch->equipment[i]) == 
-ITEM_INSTRUMENT ||GET_ITEM_TYPE(ch->equipment[i]) == ITEM_FIREWEAPON ||
-GET_ITEM_TYPE(ch->equipment[i]) == ITEM_LIGHT || GET_ITEM_TYPE(ch->equipment[i]) == ITEM_CONTAINER) && 
-!IS_SET(ch->equipment[i]->obj_flags.extra_flags, ITEM_SPECIAL))
-        lvl = MAX(lvl, ch->equipment[i]->obj_flags.eq_level);
-  if (lvl < 20) lvl = 20;
+    if (ch->equipment[i] && (GET_ITEM_TYPE(ch->equipment[i]) == ITEM_ARMOR || GET_ITEM_TYPE(ch->equipment[i]) == ITEM_WEAPON || GET_ITEM_TYPE(ch->equipment[i]) == ITEM_INSTRUMENT || GET_ITEM_TYPE(ch->equipment[i]) == ITEM_FIREWEAPON || GET_ITEM_TYPE(ch->equipment[i]) == ITEM_LIGHT || GET_ITEM_TYPE(ch->equipment[i]) == ITEM_CONTAINER) &&
+        !IS_SET(ch->equipment[i]->obj_flags.extra_flags, ITEM_SPECIAL))
+      lvl = MAX(lvl, ch->equipment[i]->obj_flags.eq_level);
+  if (lvl < 20)
+    lvl = 20;
   return lvl;
 }
 
@@ -1530,13 +1528,14 @@ int do_pick(CHAR_DATA *ch, char *argument, int cmd)
        send_to_char("The lock resists even your best attempts to pick it.\n\r", ch);
      else {
        if (!charge_moves(ch, SKILL_PICK_LOCK)) return eSUCCESS;
-    
-       if (!skill_success(ch,NULL,SKILL_PICK_LOCK)) {
-	 send_to_char("You failed to pick the lock.\n\r", ch);
-	 WAIT_STATE(ch, PULSE_VIOLENCE);
-	 return eFAILURE;
+
+       if (!skill_success(ch, NULL, SKILL_PICK_LOCK))
+       {
+         send_to_char("You failed to pick the lock.\n\r", ch);
+         WAIT_STATE(ch, PULSE_VIOLENCE);
+         return eFAILURE;
        }
-       
+
        REMOVE_BIT(obj->obj_flags.value[1], CONT_LOCKED);
        send_to_char("*Click*\n\r", ch);
        act("$n fiddles with $p.", ch, obj, 0, TO_ROOM, 0);
