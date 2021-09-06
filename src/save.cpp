@@ -1137,7 +1137,7 @@ struct obj_data *  obj_store_to_char(CHAR_DATA *ch, FILE *fpsave, struct obj_dat
   {
     // put the eq in a container
     // this code does not currently support containers in containers
-    if(GET_ITEM_TYPE(last_cont) == ITEM_CONTAINER)
+    if(ARE_CONTAINERS(last_cont))
     {
       obj_to_obj(obj, last_cont);
       // we don't add weight to the character for containers that are worn
