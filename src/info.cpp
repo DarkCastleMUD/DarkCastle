@@ -292,6 +292,7 @@ void show_obj_to_char(struct obj_data *object, struct char_data *ch, int mode)
           object->obj_flags.type_flag == ITEM_WEAPON ||
           object->obj_flags.type_flag == ITEM_FIREWEAPON ||
           object->obj_flags.type_flag == ITEM_CONTAINER ||
+          IS_KEYRING(object) ||
           object->obj_flags.type_flag == ITEM_INSTRUMENT ||
 	   object->obj_flags.type_flag == ITEM_WAND ||
 	  object->obj_flags.type_flag == ITEM_STAFF ||
@@ -797,7 +798,7 @@ void try_to_peek_into_container(struct char_data *vict, struct char_data *ch,
       return;
    }
 
-   if(GET_ITEM_TYPE(cont) != ITEM_CONTAINER)
+   if(NOT_CONTAINERS(cont))
    {
       send_to_char("It's not a container....\r\n", ch);
       return;
