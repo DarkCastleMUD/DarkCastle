@@ -268,333 +268,399 @@ void get(struct char_data *ch, struct obj_data *obj_object, struct obj_data *sub
 // return eSUCCESS if item was picked up
 // return eFAILURE if not
 // TODO - currently this is designed with icky if-logic.  While it allows you to put
-// code at the end that would affect any attempted 'get' it looks really nasty and 
+// code at the end that would affect any attempted 'get' it looks really nasty and
 // is never utilized.  Restructure it so it is clear.  Pay proper attention to 'saving'
 // however so as not to introduce a potential dupe-bug.
 int do_get(struct char_data *ch, char *argument, int cmd)
 {
-    char arg1[MAX_STRING_LENGTH];
-    char arg2[MAX_STRING_LENGTH];
-    char buffer[MAX_STRING_LENGTH];
-    struct obj_data *sub_object;
-    struct obj_data *obj_object;
-    struct obj_data *next_obj;
-    bool found = FALSE;
-    bool fail  = FALSE;
-    bool has_consent = FALSE;
-    int type   = 3;
-    bool alldot = FALSE;
-    bool inventorycontainer = FALSE, blindlag = FALSE;
-    char allbuf[MAX_STRING_LENGTH];
+  char arg1[MAX_STRING_LENGTH];
+  char arg2[MAX_STRING_LENGTH];
+  char buffer[MAX_STRING_LENGTH];
+  struct obj_data *sub_object;
+  struct obj_data *obj_object;
+  struct obj_data *next_obj;
+  bool found = FALSE;
+  bool fail = FALSE;
+  bool has_consent = FALSE;
+  int type = 3;
+  bool alldot = FALSE;
+  bool inventorycontainer = FALSE, blindlag = FALSE;
+  char allbuf[MAX_STRING_LENGTH];
 
-    argument_interpreter(argument, arg1, arg2);
+  argument_interpreter(argument, arg1, arg2);
 
-    /* get type */
-    if (!*arg1) {
-	type = 0;
+  /* get type */
+  if (!*arg1)
+  {
+    type = 0;
+  }
+  if (*arg1 && !*arg2)
+  {
+    alldot = FALSE;
+    allbuf[0] = '\0';
+    if ((str_cmp(arg1, "all") != 0) &&
+        (sscanf(arg1, "all.%s", allbuf) != 0))
+    {
+      strcpy(arg1, "all");
+      alldot = TRUE;
     }
-    if (*arg1 && !*arg2) {
-      alldot = FALSE;
-      allbuf[0] = '\0';
-      if ((str_cmp(arg1, "all") != 0) &&
-	  (sscanf(arg1, "all.%s", allbuf) != 0)){
-	strcpy(arg1, "all");
-	alldot = TRUE;
+    if (!str_cmp(arg1, "all"))
+    {
+      type = 1;
+    }
+    else
+    {
+      type = 2;
+    }
+  }
+  if (*arg1 && *arg2)
+  {
+    alldot = FALSE;
+    allbuf[0] = '\0';
+    if ((str_cmp(arg1, "all") != 0) &&
+        (sscanf(arg1, "all.%s", allbuf) != 0))
+    {
+      strcpy(arg1, "all");
+      alldot = TRUE;
+    }
+    if (!str_cmp(arg1, "all"))
+    {
+      if (!str_cmp(arg2, "all"))
+      {
+        type = 3;
       }
-      if (!str_cmp(arg1,"all")) {
-	type = 1;
-      } else {
-	type = 2;
+      else
+      {
+        type = 4;
       }
     }
-    if (*arg1 && *arg2) {
-      alldot = FALSE;
-      allbuf[0] = '\0';
-      if ((str_cmp(arg1, "all") != 0) &&
-	      (sscanf(arg1, "all.%s", allbuf) != 0)){
-	    strcpy(arg1, "all");
-	    alldot = TRUE;
-	  }
-      if (!str_cmp(arg1,"all")) {
-	if (!str_cmp(arg2,"all")) {
-	  type = 3;
-	} else {
-	  type = 4;
-	}
-      } else {
-	if (!str_cmp(arg2,"all")) {
-	  type = 5;
-	} else {
-	  type = 6;
-	}
+    else
+    {
+      if (!str_cmp(arg2, "all"))
+      {
+        type = 5;
+      }
+      else
+      {
+        type = 6;
       }
     }
+  }
 
-    if((cmd == 10) && (GET_CLASS(ch) != CLASS_THIEF) &&
-      (GET_LEVEL(ch) < IMMORTAL)) {
-      send_to_char("I bet you think you're a thief.\r\n", ch);
-      return eFAILURE; 
+  if ((cmd == 10) && (GET_CLASS(ch) != CLASS_THIEF) &&
+      (GET_LEVEL(ch) < IMMORTAL))
+  {
+    send_to_char("I bet you think you're a thief.\r\n", ch);
+    return eFAILURE;
+  }
+
+  if (cmd == 10 && type != 2 && type != 6 && type != 0)
+  {
+    send_to_char("You can only palm objects that are in the same room, "
+                 "one at a time.\r\n",
+                 ch);
+    return eFAILURE;
+  }
+
+  if (cmd == CMD_LOOT && type != 0 && type != 6)
+  {
+    send_to_char("You can only loot 1 item from a non-consented corpse.\r\n", ch);
+    return eFAILURE;
+  }
+
+  switch (type)
+  {
+  /* get */
+  case 0:
+  {
+    switch (cmd)
+    {
+    case 10:
+      send_to_char("Palm what?\r\n", ch);
+      break;
+    case CMD_LOOT:
+      send_to_char("Loot what?\r\n", ch);
+      break;
+    default:
+      send_to_char("Get what?\r\n", ch);
     }
-
-    if(cmd == 10 && type != 2 && type != 6 && type != 0) {
-      send_to_char("You can only palm objects that are in the same room, "
-                   "one at a time.\r\n", ch);
-      return eFAILURE; 
-    }
-
-    if (cmd == CMD_LOOT && type != 0 && type != 6) {
-      send_to_char("You can only loot 1 item from a non-consented corpse.\r\n", ch);
+  }
+  break;
+  /* get all */
+  case 1:
+  {
+    if (ch->in_room == real_room(3099))
+    {
+      send_to_char("Not in the donation room.\r\n", ch);
       return eFAILURE;
     }
+    sub_object = 0;
+    found = FALSE;
+    fail = FALSE;
+    for (obj_object = world[ch->in_room].contents;
+         obj_object;
+         obj_object = next_obj)
+    {
+      next_obj = obj_object->next_content;
 
-    switch (type) {
-	/* get */
-	case 0:{ 
-	  switch(cmd) {
-	  case 10:
-	    send_to_char("Palm what?\r\n", ch); 
-	    break;
-	  case CMD_LOOT:
-	    send_to_char("Loot what?\r\n", ch); 
-	    break;
-	  default:
-	    send_to_char("Get what?\r\n", ch); 
-	  }
-	} break;
-	/* get all */
-	case 1:{ 
-            if(ch->in_room == real_room(3099)) {
-              send_to_char("Not in the donation room.\r\n", ch);
-              return eFAILURE;
-            }
-	    sub_object = 0;
-	    found = FALSE;
-	    fail    = FALSE;
-	    for(obj_object = world[ch->in_room].contents;
-		obj_object;
-		obj_object = next_obj) {
-		next_obj = obj_object->next_content;
+      /* IF all.obj, only get those named "obj" */
+      if (alldot && !isname(allbuf, obj_object->name))
+        continue;
 
-		/* IF all.obj, only get those named "obj" */
-		if(alldot && !isname(allbuf, obj_object->name))
-		  continue;
+      // Can't pick up NO_NOTICE items with 'get all'  only 'all.X' or 'X'
+      if (!alldot && IS_SET(obj_object->obj_flags.more_flags, ITEM_NONOTICE) && GET_LEVEL(ch) < IMMORTAL)
+        continue;
 
-                // Can't pick up NO_NOTICE items with 'get all'  only 'all.X' or 'X'
-                if(!alldot && IS_SET(obj_object->obj_flags.more_flags, ITEM_NONOTICE) && GET_LEVEL(ch) < IMMORTAL)
-                  continue;
+      // Ignore NO_TRADE items on a 'get all'
+      if (IS_SET(obj_object->obj_flags.more_flags, ITEM_NO_TRADE) && GET_LEVEL(ch) < IMMORTAL)
+      {
+        csendf(ch, "The %s appears to be NO_TRADE so you don't pick it up.\r\n", obj_object->short_description);
+        continue;
+      }
+      if (GET_ITEM_TYPE(obj_object) == ITEM_MONEY &&
+          obj_object->obj_flags.value[0] > 10000 &&
+          GET_LEVEL(ch) < 5)
+      {
+        send_to_char("You cannot pick up that much money!\r\n", ch);
+        continue;
+      }
 
-                // Ignore NO_TRADE items on a 'get all'
-                if(IS_SET(obj_object->obj_flags.more_flags, ITEM_NO_TRADE) && GET_LEVEL(ch) < IMMORTAL) {
-                  csendf(ch, "The %s appears to be NO_TRADE so you don't pick it up.\r\n", obj_object->short_description);
-                  continue;
-                }
-		if (GET_ITEM_TYPE(obj_object) == ITEM_MONEY &&
-			obj_object->obj_flags.value[0] > 10000 &&
-			GET_LEVEL(ch) < 5)
-		{
-		  send_to_char("You cannot pick up that much money!\r\n",ch);
-		  continue;
-		}
+      if (obj_object->obj_flags.eq_level > 9 && GET_LEVEL(ch) < 5)
+      {
+        csendf(ch, "%s is too powerful for you to possess.\r\n", obj_object->short_description);
+        continue;
+      }
 
-		if (obj_object->obj_flags.eq_level > 9 && GET_LEVEL(ch) < 5)
-		{
-		  csendf(ch, "%s is too powerful for you to possess.\r\n", obj_object->short_description);
-		  continue;	
-		}
+      if (IS_SET(obj_object->obj_flags.extra_flags, ITEM_SPECIAL) &&
+          !isname(GET_NAME(ch), obj_object->name) && GET_LEVEL(ch) < IMP)
+      {
+        csendf(ch, "The %s appears to be SPECIAL. Only its rightful owner can take it.\r\n", obj_object->short_description);
+        continue;
+      }
 
-		if (IS_SET(obj_object->obj_flags.extra_flags, ITEM_SPECIAL) &&
-		    !isname(GET_NAME(ch), obj_object->name) && GET_LEVEL(ch) < IMP) {
-		    csendf(ch, "The %s appears to be SPECIAL. Only its rightful owner can take it.\r\n", obj_object->short_description);
-		    continue;
-		}
+      // PC corpse
+      if ((obj_object->obj_flags.value[3] == 1 && isname("pc", obj_object->name)) || isname("thiefcorpse", obj_object->name))
+      {
+        sprintf(buffer, "%s_consent", GET_NAME(ch));
+        if ((isname("thiefcorpse", obj_object->name) &&
+             !isname(GET_NAME(ch), obj_object->name)) ||
+            isname(GET_NAME(ch), obj_object->name) || GET_LEVEL(ch) >= OVERSEER)
+          has_consent = TRUE;
+        if (!has_consent && !isname(GET_NAME(ch), obj_object->name))
+        {
+          if (GET_LEVEL(ch) < OVERSEER)
+          {
+            send_to_char("You don't have consent to take the corpse.\r\n", ch);
+            continue;
+          }
+        }
+        if (has_consent && contains_no_trade_item(obj_object))
+        {
+          if (GET_LEVEL(ch) < OVERSEER)
+          {
+            send_to_char("This item contains no_trade items that cannot be picked up.\r\n", ch);
+            has_consent = FALSE; // bugfix, could loot without consent
+            continue;
+          }
+        }
+        if (GET_LEVEL(ch) < OVERSEER)
+          has_consent = FALSE; // reset it for the next item:P
+        else
+          has_consent = TRUE; // reset it for the next item:P
+      }
 
-                // PC corpse
-		if ((obj_object->obj_flags.value[3] == 1 && isname("pc", obj_object->name)) || isname("thiefcorpse", obj_object->name))
-                {
-                   sprintf(buffer, "%s_consent", GET_NAME(ch));
-		   if( (isname("thiefcorpse", obj_object->name) &&
-			!isname(GET_NAME(ch), obj_object->name)) || isname(GET_NAME(ch), obj_object->name) || GET_LEVEL(ch) >= OVERSEER)
-                     has_consent = TRUE;
-		   if(!has_consent && !isname(GET_NAME(ch), obj_object->name)) {
-                     if (GET_LEVEL(ch) < OVERSEER) {
-		       send_to_char("You don't have consent to take the corpse.\r\n", ch);
-		       continue;
-                     }
-                   }
-                   if(has_consent && contains_no_trade_item(obj_object)) {
-                     if (GET_LEVEL(ch) < OVERSEER) {
-                       send_to_char("This item contains no_trade items that cannot be picked up.\r\n", ch);
-		       has_consent = FALSE; // bugfix, could loot without consent
-                       continue;
-                     }
-                   }
-                   if (GET_LEVEL(ch) < OVERSEER)
-                     has_consent = FALSE;  // reset it for the next item:P
-                   else
-                     has_consent = TRUE;  // reset it for the next item:P
-		}
-		
-		if (CAN_SEE_OBJ(ch, obj_object) && GET_LEVEL(ch) < IMMORTAL) 
-		{
-                    // Don't bother checking this if item is gold coins.
-		    if ((IS_CARRYING_N(ch) + 1) > CAN_CARRY_N(ch) &&
-                        !( GET_ITEM_TYPE(obj_object) == ITEM_MONEY && obj_object->item_number == -1 && GET_LEVEL(ch) < IMMORTAL)
-                       ) 
-		    {
-			sprintf(buffer, "%s : You can't carry that many items.\r\n", fname(obj_object->name));
-			send_to_char(buffer, ch);
-			fail = TRUE;
-		    } 
-                    else if ((IS_CARRYING_W(ch) + obj_object->obj_flags.weight) > CAN_CARRY_W(ch) && GET_LEVEL(ch) < IMMORTAL
-			&& GET_ITEM_TYPE(obj_object) != ITEM_MONEY)
-                    {
-			sprintf(buffer, "%s : You can't carry that much weight.\r\n", fname(obj_object->name));
-			send_to_char(buffer, ch);
-			fail = TRUE;
-		    }
-		    else if (CAN_WEAR(obj_object,ITEM_TAKE)) 
-		    {
-			get(ch, obj_object, sub_object, 0, cmd);
-			found = TRUE;
-		    } else 
-		    {
-			send_to_char("You can't take that.\r\n", ch);
-			fail = TRUE;
-		    }
-		} else if (CAN_SEE_OBJ(ch, obj_object) && GET_LEVEL(ch) >= IMMORTAL && CAN_WEAR(obj_object,ITEM_TAKE)) {
-		    get(ch, obj_object, sub_object, 0, cmd);
-                    found = TRUE;
-                }
-	    } // of for loop
-	    if (found) {
-//		send_to_char("OK.\r\n", ch);
-                 do_save(ch,"", 666);
-	    } else {
-		if (!fail) send_to_char("You see nothing here.\r\n", ch);
-	    }
-	} break;
-	/* get ??? */
-	case 2:{
-	    sub_object = 0;
-	    found = FALSE;
-	    fail    = FALSE;
-	    obj_object = get_obj_in_list_vis(ch, arg1, 
-		world[ch->in_room].contents);
-	    if (obj_object) {
-	        if(obj_object->obj_flags.type_flag == ITEM_CONTAINER && 
-                   obj_object->obj_flags.value[3] == 1 &&
-		   isname("pc", obj_object->name)) 
-                {
-                   sprintf(buffer, "%s_consent", GET_NAME(ch));
-		   if(isname(GET_NAME(ch), obj_object->name))
-                     has_consent = TRUE;
-		   if(!has_consent && !isname(GET_NAME(ch), obj_object->name)) {
-		     send_to_char("You don't have consent to take the "
-		               "corpse.\r\n", ch);
-		     return eFAILURE;
-                   }
-                   has_consent = FALSE;  // reset it
-                }
+      if (CAN_SEE_OBJ(ch, obj_object) && GET_LEVEL(ch) < IMMORTAL)
+      {
+        // Don't bother checking this if item is gold coins.
+        if ((IS_CARRYING_N(ch) + 1) > CAN_CARRY_N(ch) &&
+            !(GET_ITEM_TYPE(obj_object) == ITEM_MONEY && obj_object->item_number == -1 && GET_LEVEL(ch) < IMMORTAL))
+        {
+          sprintf(buffer, "%s : You can't carry that many items.\r\n", fname(obj_object->name));
+          send_to_char(buffer, ch);
+          fail = TRUE;
+        }
+        else if ((IS_CARRYING_W(ch) + obj_object->obj_flags.weight) > CAN_CARRY_W(ch) && GET_LEVEL(ch) < IMMORTAL && GET_ITEM_TYPE(obj_object) != ITEM_MONEY)
+        {
+          sprintf(buffer, "%s : You can't carry that much weight.\r\n", fname(obj_object->name));
+          send_to_char(buffer, ch);
+          fail = TRUE;
+        }
+        else if (CAN_WEAR(obj_object, ITEM_TAKE))
+        {
+          get(ch, obj_object, sub_object, 0, cmd);
+          found = TRUE;
+        }
+        else
+        {
+          send_to_char("You can't take that.\r\n", ch);
+          fail = TRUE;
+        }
+      }
+      else if (CAN_SEE_OBJ(ch, obj_object) && GET_LEVEL(ch) >= IMMORTAL && CAN_WEAR(obj_object, ITEM_TAKE))
+      {
+        get(ch, obj_object, sub_object, 0, cmd);
+        found = TRUE;
+      }
+    } // of for loop
+    if (found)
+    {
+      //		send_to_char("OK.\r\n", ch);
+      do_save(ch, "", 666);
+    }
+    else
+    {
+      if (!fail)
+        send_to_char("You see nothing here.\r\n", ch);
+    }
+  }
+  break;
+  /* get ??? */
+  case 2:
+  {
+    sub_object = 0;
+    found = FALSE;
+    fail = FALSE;
+    obj_object = get_obj_in_list_vis(ch, arg1,
+                                     world[ch->in_room].contents);
+    if (obj_object)
+    {
+      if (obj_object->obj_flags.type_flag == ITEM_CONTAINER &&
+          obj_object->obj_flags.value[3] == 1 &&
+          isname("pc", obj_object->name))
+      {
+        sprintf(buffer, "%s_consent", GET_NAME(ch));
+        if (isname(GET_NAME(ch), obj_object->name))
+          has_consent = TRUE;
+        if (!has_consent && !isname(GET_NAME(ch), obj_object->name))
+        {
+          send_to_char("You don't have consent to take the "
+                       "corpse.\r\n",
+                       ch);
+          return eFAILURE;
+        }
+        has_consent = FALSE; // reset it
+      }
 
-		if (IS_SET(obj_object->obj_flags.extra_flags, ITEM_SPECIAL) &&
-		    !isname(GET_NAME(ch), obj_object->name) && GET_LEVEL(ch) < IMP) {
-		    csendf(ch, "The %s appears to be SPECIAL. Only its rightful owner can take it.\r\n", obj_object->short_description);
-		} else if( (IS_CARRYING_N(ch) + 1 > CAN_CARRY_N(ch)) &&
-                   !( GET_ITEM_TYPE(obj_object) == ITEM_MONEY && obj_object->item_number == -1 && GET_LEVEL(ch) < IMMORTAL)
-                  )
-                {
-		    sprintf(buffer, "%s : You can't carry that many items.\r\n", fname(obj_object->name));
-		    send_to_char(buffer, ch);
-		    fail = TRUE;
-		} else if((IS_CARRYING_W(ch) + obj_object->obj_flags.weight) > CAN_CARRY_W(ch) &&
-                        GET_LEVEL(ch) < IMMORTAL && GET_ITEM_TYPE(obj_object) != ITEM_MONEY)
-                {
-		    sprintf(buffer,"%s : You can't carry that much weight.\r\n", fname(obj_object->name));
-		    send_to_char(buffer, ch);
-		    fail = TRUE;
-		}
-                else if (GET_ITEM_TYPE(obj_object) == ITEM_MONEY &&
-                        obj_object->obj_flags.value[0] > 10000 &&
-			GET_LEVEL(ch) < 5)
-                {
-                  send_to_char("You cannot pick up that much money!\r\n",ch);
-		fail = TRUE;
-                }
+      if (IS_SET(obj_object->obj_flags.extra_flags, ITEM_SPECIAL) &&
+          !isname(GET_NAME(ch), obj_object->name) && GET_LEVEL(ch) < IMP)
+      {
+        csendf(ch, "The %s appears to be SPECIAL. Only its rightful owner can take it.\r\n", obj_object->short_description);
+      }
+      else if ((IS_CARRYING_N(ch) + 1 > CAN_CARRY_N(ch)) &&
+               !(GET_ITEM_TYPE(obj_object) == ITEM_MONEY && obj_object->item_number == -1 && GET_LEVEL(ch) < IMMORTAL))
+      {
+        sprintf(buffer, "%s : You can't carry that many items.\r\n", fname(obj_object->name));
+        send_to_char(buffer, ch);
+        fail = TRUE;
+      }
+      else if ((IS_CARRYING_W(ch) + obj_object->obj_flags.weight) > CAN_CARRY_W(ch) &&
+               GET_LEVEL(ch) < IMMORTAL && GET_ITEM_TYPE(obj_object) != ITEM_MONEY)
+      {
+        sprintf(buffer, "%s : You can't carry that much weight.\r\n", fname(obj_object->name));
+        send_to_char(buffer, ch);
+        fail = TRUE;
+      }
+      else if (GET_ITEM_TYPE(obj_object) == ITEM_MONEY &&
+               obj_object->obj_flags.value[0] > 10000 &&
+               GET_LEVEL(ch) < 5)
+      {
+        send_to_char("You cannot pick up that much money!\r\n", ch);
+        fail = TRUE;
+      }
 
-		else if (obj_object->obj_flags.eq_level > 19 && GET_LEVEL(ch) < 5)
-		{
-                  if(ch->in_room != real_room(3099)) {
-		     csendf(ch, "%s is too powerful for you to possess.\r\n", obj_object->short_description);
-		     fail = TRUE;	
-                  } else {
-                     csendf(ch, "The aura of the donation room allows you to pick up %s.\r\n", obj_object->short_description);
-                     get(ch, obj_object, sub_object, 0, cmd);
-                     do_save(ch,"", 666);
-                     found = TRUE;
-                  }
-		} else if (CAN_WEAR(obj_object,ITEM_TAKE)) 
-                {
-		  if (cmd == 10)
-		    palm(ch, obj_object, sub_object, 0);
-		  else
-		    get(ch, obj_object, sub_object, 0, cmd);
+      else if (obj_object->obj_flags.eq_level > 19 && GET_LEVEL(ch) < 5)
+      {
+        if (ch->in_room != real_room(3099))
+        {
+          csendf(ch, "%s is too powerful for you to possess.\r\n", obj_object->short_description);
+          fail = TRUE;
+        }
+        else
+        {
+          csendf(ch, "The aura of the donation room allows you to pick up %s.\r\n", obj_object->short_description);
+          get(ch, obj_object, sub_object, 0, cmd);
+          do_save(ch, "", 666);
+          found = TRUE;
+        }
+      }
+      else if (CAN_WEAR(obj_object, ITEM_TAKE))
+      {
+        if (cmd == 10)
+          palm(ch, obj_object, sub_object, 0);
+        else
+          get(ch, obj_object, sub_object, 0, cmd);
 
-		  do_save(ch,"", 666);
-		  found = TRUE;
-		} else {
-		    send_to_char("You can't take that.\r\n", ch);
-		    fail = TRUE;
-		}
-	    } else {
-		sprintf(buffer,"You do not see a %s here.\r\n", arg1);
-		send_to_char(buffer, ch);
-		fail = TRUE;
-	    }
-	} break;
-	/* get all all */
-	case 3:{ 
-	    send_to_char("You must be joking?!\r\n", ch);
-	} break;
-	/* get all ??? */
-	case 4:{
-	    found = FALSE;
-	    fail    = FALSE; 
-	    sub_object = get_obj_in_list_vis(ch, arg2, 
-		world[ch->in_room].contents);
-	    if (!sub_object) {
-		sub_object = get_obj_in_list_vis(ch, arg2, ch->carrying);
-                inventorycontainer = TRUE;
-            }
+        do_save(ch, "", 666);
+        found = TRUE;
+      }
+      else
+      {
+        send_to_char("You can't take that.\r\n", ch);
+        fail = TRUE;
+      }
+    }
+    else
+    {
+      sprintf(buffer, "You do not see a %s here.\r\n", arg1);
+      send_to_char(buffer, ch);
+      fail = TRUE;
+    }
+  }
+  break;
+  /* get all all */
+  case 3:
+  {
+    send_to_char("You must be joking?!\r\n", ch);
+  }
+  break;
+  /* get all ??? */
+  case 4:
+  {
+    found = FALSE;
+    fail = FALSE;
+    sub_object = get_obj_in_list_vis(ch, arg2,
+                                     world[ch->in_room].contents);
+    if (!sub_object)
+    {
+      sub_object = get_obj_in_list_vis(ch, arg2, ch->carrying);
+      inventorycontainer = TRUE;
+    }
 
-	    if (sub_object) {
-	        if(sub_object->obj_flags.type_flag == ITEM_CONTAINER && 
-                   ((sub_object->obj_flags.value[3] == 1 &&
-		   isname("pc", sub_object->name))||isname("thiefcorpse",sub_object->name))) 
-                {
-                   sprintf(buffer, "%s_consent", GET_NAME(ch));
-		   if((isname("thiefcorpse", sub_object->name) && !isname(GET_NAME(ch), sub_object->name) ) || isname(buffer, sub_object->name) || GET_LEVEL(ch) > 105)
-                     has_consent = TRUE;
-		   if(!has_consent && !isname(GET_NAME(ch), sub_object->name)) {
-		     send_to_char("You don't have consent to touch the corpse.\r\n", ch);
-		     return eFAILURE;
-                   }
-                }
-		if (ARE_CONTAINERS(sub_object)) {
-		  if (IS_SET(sub_object->obj_flags.value[1], CONT_CLOSED)){
-		    sprintf(buffer, "The %s is closed.\r\n",fname(sub_object->name));
-		    send_to_char(buffer, ch);
-		    return eFAILURE;
-		  }
-		  for(obj_object = sub_object->contains;
-		      obj_object;
-		      obj_object = next_obj) {
-		    next_obj = obj_object->next_content;
-		if (GET_ITEM_TYPE(obj_object) == ITEM_CONTAINER && contains_no_trade_item(obj_object))
-		{
-                  csendf(ch, "%s : It seems magically attached to the corpse.\r\n", 
-fname(obj_object->name));
-		  continue;
-		} /*
+    if (sub_object)
+    {
+      if (sub_object->obj_flags.type_flag == ITEM_CONTAINER &&
+          ((sub_object->obj_flags.value[3] == 1 &&
+            isname("pc", sub_object->name)) ||
+           isname("thiefcorpse", sub_object->name)))
+      {
+        sprintf(buffer, "%s_consent", GET_NAME(ch));
+        if ((isname("thiefcorpse", sub_object->name) && !isname(GET_NAME(ch), sub_object->name)) || isname(buffer, sub_object->name) || GET_LEVEL(ch) > 105)
+          has_consent = TRUE;
+        if (!has_consent && !isname(GET_NAME(ch), sub_object->name))
+        {
+          send_to_char("You don't have consent to touch the corpse.\r\n", ch);
+          return eFAILURE;
+        }
+      }
+      if (ARE_CONTAINERS(sub_object))
+      {
+        if (IS_SET(sub_object->obj_flags.value[1], CONT_CLOSED))
+        {
+          sprintf(buffer, "The %s is closed.\r\n", fname(sub_object->name));
+          send_to_char(buffer, ch);
+          return eFAILURE;
+        }
+        for (obj_object = sub_object->contains;
+             obj_object;
+             obj_object = next_obj)
+        {
+          next_obj = obj_object->next_content;
+          if (GET_ITEM_TYPE(obj_object) == ITEM_CONTAINER && contains_no_trade_item(obj_object))
+          {
+            csendf(ch, "%s : It seems magically attached to the corpse.\r\n",
+                   fname(obj_object->name));
+            continue;
+          } /*
 		   struct obj_data *temp,*next_contentthing;
 		   for (temp = obj_object->contains;temp;temp = next_contentthing)
 		   {
@@ -605,286 +671,310 @@ fname(obj_object->name));
 			extract_obj(temp);
 			}
 		   }*/
-//		}
-		    /* IF all.obj, only get those named "obj" */
-		    if (alldot && !isname(allbuf,obj_object->name)){
-		      continue;
-		    }
+            //		}
+          /* IF all.obj, only get those named "obj" */
+          if (alldot && !isname(allbuf, obj_object->name))
+          {
+            continue;
+          }
 
-                    // Ignore NO_TRADE items on a 'get all'
-                    if(IS_SET(obj_object->obj_flags.more_flags, ITEM_NO_TRADE) && GET_LEVEL(ch) < 100) {
-                      csendf(ch, "The %s appears to be NO_TRADE so you don't pick it up.\r\n", obj_object->short_description);
-                      continue;
-                    }
+          // Ignore NO_TRADE items on a 'get all'
+          if (IS_SET(obj_object->obj_flags.more_flags, ITEM_NO_TRADE) && GET_LEVEL(ch) < 100)
+          {
+            csendf(ch, "The %s appears to be NO_TRADE so you don't pick it up.\r\n", obj_object->short_description);
+            continue;
+          }
 
-		if (IS_SET(obj_object->obj_flags.extra_flags, ITEM_SPECIAL) &&
-		    !isname(GET_NAME(ch), obj_object->name) && GET_LEVEL(ch) < IMP) {
-		    csendf(ch, "The %s appears to be SPECIAL. Only its rightful owner can take it.\r\n", obj_object->short_description);
-		    continue;
-		}
+          if (IS_SET(obj_object->obj_flags.extra_flags, ITEM_SPECIAL) &&
+              !isname(GET_NAME(ch), obj_object->name) && GET_LEVEL(ch) < IMP)
+          {
+            csendf(ch, "The %s appears to be SPECIAL. Only its rightful owner can take it.\r\n", obj_object->short_description);
+            continue;
+          }
 
-
-		    if (CAN_SEE_OBJ(ch,obj_object)) 
-                    {
-		      if ((IS_CARRYING_N(ch) + 1 > CAN_CARRY_N(ch)) &&
-                           !( GET_ITEM_TYPE(obj_object) == ITEM_MONEY && obj_object->item_number == -1 && GET_LEVEL(ch) < IMMORTAL)
-                         )
-                      {
-		        sprintf(buffer,"%s : You can't carry that many items.\r\n", fname(obj_object->name));
-		        send_to_char(buffer, ch);
-		        fail = TRUE;
-		      } else 
-                      {
-		        if (inventorycontainer || 
-                            (IS_CARRYING_W(ch) + obj_object->obj_flags.weight) < CAN_CARRY_W(ch) ||
-                            GET_LEVEL(ch) > IMMORTAL || GET_ITEM_TYPE(obj_object) == ITEM_MONEY) 
-                        {
-                          if(has_consent && IS_SET(obj_object->obj_flags.more_flags, ITEM_NO_TRADE)) {
-                            // if I have consent and i'm touching the corpse, then I shouldn't be able
-                            // to pick up no_trade items because it is someone else's corpse.  If I am
-                            // the other of the corpse, has_consent will be false.
-                            if (GET_LEVEL(ch) < IMMORTAL) {
-			       if (isname(obj_object->name, "thiefcorpse"))
-				{
-                        csendf(ch, "Whoa!  The %s poofed into thin air!\r\n", obj_object->short_description);
-			extract_obj(obj_object);
-			continue;
-				}
-                              csendf(ch, "%s : It seems magically attached to the corpse.\r\n", fname(obj_object->name));
-                              continue;
-                            }
-                          }
-               if (GET_ITEM_TYPE(obj_object) == ITEM_MONEY &&
-                        obj_object->obj_flags.value[0] > 10000 &&
-                        GET_LEVEL(ch) < 5)
-                {
-                  send_to_char("You cannot pick up that much money!\r\n",ch);
-                  continue;
-                }
-
-			if (sub_object->carried_by != ch &&obj_object->obj_flags.eq_level > 9 && GET_LEVEL(ch) < 5)
- 			{
-			  csendf(ch, "%s is too powerful for you to possess.\r\n", obj_object->short_description);
-			  continue;	
-			}
-
-		          if (CAN_WEAR(obj_object,ITEM_TAKE)) {
-			    get(ch,obj_object, sub_object, 0, cmd);
-			    found = TRUE;
-		          } else {
-			    send_to_char("You can't take that.\r\n", ch);
-			    fail = TRUE;
-		          }
-		        } else {
-		          sprintf(buffer,
-		            "%s : You can't carry that much weight.\r\n", 
-			    fname(obj_object->name));
-		          send_to_char(buffer, ch);
-		          fail = TRUE;
-		        }
-		      }
-		    }
-		  }
-		  if (!found && !fail) {
-		    sprintf(buffer,"You do not see anything in the %s.\r\n", 
-			fname(sub_object->name));
-		    send_to_char(buffer, ch);
-		    fail = TRUE;
-		  }
-		} else {
-		  sprintf(buffer,"The %s is not a container.\r\n",
-		      fname(sub_object->name));
-		  send_to_char(buffer, ch);
-		  fail = TRUE;
-		}
-	      } else { 
-		sprintf(buffer,"You do not see or have the %s.\r\n", arg2);
-		send_to_char(buffer, ch);
-		fail = TRUE;
-	      }
-	    } break;
-	case 5:{ 
-	  send_to_char(
-	    "You can't take a thing from more than one container.\r\n", ch);
-	} break;
-        case 6:{ // get ??? ???
-	  found = FALSE;
-	  fail  = FALSE;
-	  sub_object = get_obj_in_list_vis(ch, arg2, 
-			   world[ch->in_room].contents);
-	  if (!sub_object){
-	    if (cmd==CMD_LOOT) {
-	      send_to_char("You can only loot 1 item from a non-consented corpse.\r\n", ch);
-	      return eFAILURE;
-	    }
-
-	    sub_object = get_obj_in_list_vis(ch, arg2, ch->carrying, TRUE);
-            inventorycontainer = TRUE;
-	  }
-	  if(sub_object) {
-	    if(sub_object->obj_flags.type_flag == ITEM_CONTAINER && 
-               ((sub_object->obj_flags.value[3] == 1 &&
-	       isname("pc", sub_object->name)) || isname("thiefcorpse",sub_object->name))) 
+          if (CAN_SEE_OBJ(ch, obj_object))
+          {
+            if ((IS_CARRYING_N(ch) + 1 > CAN_CARRY_N(ch)) &&
+                !(GET_ITEM_TYPE(obj_object) == ITEM_MONEY && obj_object->item_number == -1 && GET_LEVEL(ch) < IMMORTAL))
             {
-               sprintf(buffer, "%s_consent", GET_NAME(ch));
-
-	       if((cmd != CMD_LOOT 
-                  && (isname("thiefcorpse", sub_object->name) 
-                      && !isname(GET_NAME(ch), sub_object->name)
-                     ) )
-                  || isname(buffer, sub_object->name)
-                 )
-                 has_consent = TRUE;
-               if (!isname(GET_NAME(ch), sub_object->name) 
-                   && (cmd==CMD_LOOT 
-                       && isname("lootable", sub_object->name)
-                      ) 
-                   && !IS_SET(sub_object->obj_flags.more_flags, ITEM_PC_CORPSE_LOOTED) 
-                   &&  !IS_SET(world[ch->in_room].room_flags, SAFE) 
-                   && GET_LEVEL(ch) >= 50
-                  )
-		 has_consent = TRUE;
-	       if(!has_consent && !isname(GET_NAME(ch), sub_object->name)) 
-               {
-		 send_to_char("You don't have consent to touch the "
-		               "corpse.\r\n", ch);
-	         return eFAILURE;
-               }
+              sprintf(buffer, "%s : You can't carry that many items.\r\n", fname(obj_object->name));
+              send_to_char(buffer, ch);
+              fail = TRUE;
             }
-	    if (GET_ITEM_TYPE(sub_object) == ITEM_CONTAINER ||
-		GET_ITEM_TYPE(sub_object) == ITEM_ALTAR) 
+            else
             {
-	      if (IS_SET(sub_object->obj_flags.value[1], CONT_CLOSED)){
-	        sprintf(buffer,"The %s is closed.\r\n", fname(sub_object->name));
-	        send_to_char(buffer, ch);
-	        return eFAILURE;
-	      }
-	      obj_object = get_obj_in_list_vis(ch, arg1, sub_object->contains);
-              if(!obj_object && IS_AFFECTED(ch, AFF_BLIND) && has_skill(ch, SKILL_BLINDFIGHTING)) {
-	         obj_object = get_obj_in_list_vis(ch, arg1, sub_object->contains, TRUE);
-                 blindlag = TRUE;
-              }
-	      if (obj_object) 
+              if (inventorycontainer ||
+                  (IS_CARRYING_W(ch) + obj_object->obj_flags.weight) < CAN_CARRY_W(ch) ||
+                  GET_LEVEL(ch) > IMMORTAL || GET_ITEM_TYPE(obj_object) == ITEM_MONEY)
               {
-                if (GET_ITEM_TYPE(obj_object) == ITEM_MONEY &&
-                        obj_object->obj_flags.value[0] > 10000 &&
-                        GET_LEVEL(ch) < 5)
+                if (has_consent && IS_SET(obj_object->obj_flags.more_flags, ITEM_NO_TRADE))
                 {
-                  send_to_char("You cannot pick up that much money!\r\n",ch);
-                  fail = TRUE;
-                }
-
-		else if (sub_object->carried_by != ch && obj_object->obj_flags.eq_level > 9 && GET_LEVEL(ch) < 5)
-		{
-		  csendf(ch, "%s is too powerful for you to possess.\r\n", obj_object->short_description);
-		 fail = TRUE;	
-		}
-
-	        else if ((IS_CARRYING_N(ch) + 1 > CAN_CARRY_N(ch)) &&
-                    !( GET_ITEM_TYPE(obj_object) == ITEM_MONEY && obj_object->item_number == -1 && GET_LEVEL(ch) < IMMORTAL)
-                   )
-                { 
-                  sprintf(buffer,"%s : You can't carry that many items.\r\n",fname(obj_object->name));
-                  send_to_char(buffer, ch);
-	          fail = TRUE;
-	        } else if (inventorycontainer || 
-                     (IS_CARRYING_W(ch) + obj_object->obj_flags.weight) < CAN_CARRY_W(ch)
-			|| GET_ITEM_TYPE(obj_object) == ITEM_MONEY) 
-                {
-                    if(has_consent && ( IS_SET(obj_object->obj_flags.more_flags, ITEM_NO_TRADE) || 
-                                        contains_no_trade_item(obj_object) ) ) 
-                    {
                   // if I have consent and i'm touching the corpse, then I shouldn't be able
                   // to pick up no_trade items because it is someone else's corpse.  If I am
                   // the other of the corpse, has_consent will be false.
-                      if (GET_LEVEL(ch) < IMMORTAL) {
-			  if (isname("thiefcorpse",sub_object->name) || (cmd==CMD_LOOT && isname("lootable",sub_object->name)))
-			  {
-			      csendf(ch, "Whoa!  The %s poofed into thin air!\r\n", obj_object->short_description);
-
-			      char log_buf[MAX_STRING_LENGTH];
-			      sprintf(log_buf,"%s poofed %s[%d] from %s[%d]",
-				      GET_NAME(ch),
-				      obj_object->short_description,
-				      obj_index[obj_object->item_number].virt, 
-				      sub_object->name,
-				      obj_index[sub_object->item_number].virt);
-			      log(log_buf, ANGEL, LOG_MORTAL);
- 
-			      extract_obj(obj_object);
-			      fail = TRUE;
-			      sprintf(buffer,"%s_consent",GET_NAME(ch));
-
-			      if ((cmd==CMD_LOOT && isname("lootable",sub_object->name)) && !isname(buffer, sub_object->name))
-			      {
-				  SET_BIT(sub_object->obj_flags.more_flags, ITEM_PC_CORPSE_LOOTED);
-				  struct affected_type pthiefaf;
-
-				  pthiefaf.type = FUCK_PTHIEF;
-				  pthiefaf.duration = 10;
-				  pthiefaf.modifier = 0;
-				  pthiefaf.location = APPLY_NONE;
-				  pthiefaf.bitvector = -1;
-
-				  WAIT_STATE(ch, PULSE_VIOLENCE*2);
-				  send_to_char("You suddenly feel very guilty...shame on you stealing from the dead!\r\n",ch);
-		                  if(affected_by_spell(ch, FUCK_PTHIEF))
-             			  {
-			                affect_from_char(ch, FUCK_PTHIEF);
-                			affect_to_char(ch, &pthiefaf);
-		                  }
-              			  else
-		                	affect_to_char(ch, &pthiefaf);
-					
-				  }
-			  } else {
-			      csendf(ch, "%s : It seems magically attached to the corpse.\r\n", fname(obj_object->name));
-			      fail = TRUE;
-			  }
-                      }
-                    }
-		    else if (CAN_WEAR(obj_object,ITEM_TAKE)) 
+                  if (GET_LEVEL(ch) < IMMORTAL)
+                  {
+                    if (isname(obj_object->name, "thiefcorpse"))
                     {
-                      if(cmd == 10)
-			palm(ch, obj_object, sub_object,has_consent);
-		      else
-			get(ch, obj_object, sub_object, has_consent, cmd);
-		      found = TRUE;
-                      if(blindlag) WAIT_STATE(ch, PULSE_VIOLENCE);
-		    } else {
-		      send_to_char("You can't take that.\r\n", ch);
-		      fail = TRUE;
-		    }
-	        } else {
-		    sprintf(buffer,"%s : You can't carry that much weight.\r\n", fname(obj_object->name));
-		    send_to_char(buffer, ch);
-		    fail = TRUE;
-	        }
-	      } else {
-	        sprintf(buffer,"The %s does not contain the %s.\r\n", 
-		fname(sub_object->name), arg1);
-	        send_to_char(buffer, ch);
-	        fail = TRUE;
-	      }
-	    } else {
-	      sprintf(buffer,
-	      "The %s is not a container.\r\n", fname(sub_object->name));
-	      send_to_char(buffer, ch);
-	      fail = TRUE;
-	    }
-	  } else {
-	    sprintf(buffer,"You do not see or have the %s.\r\n", arg2);
-	    send_to_char(buffer, ch);
-	    fail = TRUE;
-	  }
-	} break;
-      }
-      if(fail)
-        return eFAILURE;
-      do_save(ch, "", 666);
-      return eSUCCESS;
-}
+                      csendf(ch, "Whoa!  The %s poofed into thin air!\r\n", obj_object->short_description);
+                      extract_obj(obj_object);
+                      continue;
+                    }
+                    csendf(ch, "%s : It seems magically attached to the corpse.\r\n", fname(obj_object->name));
+                    continue;
+                  }
+                }
+                if (GET_ITEM_TYPE(obj_object) == ITEM_MONEY &&
+                    obj_object->obj_flags.value[0] > 10000 &&
+                    GET_LEVEL(ch) < 5)
+                {
+                  send_to_char("You cannot pick up that much money!\r\n", ch);
+                  continue;
+                }
 
+                if (sub_object->carried_by != ch && obj_object->obj_flags.eq_level > 9 && GET_LEVEL(ch) < 5)
+                {
+                  csendf(ch, "%s is too powerful for you to possess.\r\n", obj_object->short_description);
+                  continue;
+                }
+
+                if (CAN_WEAR(obj_object, ITEM_TAKE))
+                {
+                  get(ch, obj_object, sub_object, 0, cmd);
+                  found = TRUE;
+                }
+                else
+                {
+                  send_to_char("You can't take that.\r\n", ch);
+                  fail = TRUE;
+                }
+              }
+              else
+              {
+                sprintf(buffer,
+                        "%s : You can't carry that much weight.\r\n",
+                        fname(obj_object->name));
+                send_to_char(buffer, ch);
+                fail = TRUE;
+              }
+            }
+          }
+        }
+        if (!found && !fail)
+        {
+          sprintf(buffer, "You do not see anything in the %s.\r\n",
+                  fname(sub_object->name));
+          send_to_char(buffer, ch);
+          fail = TRUE;
+        }
+      }
+      else
+      {
+        sprintf(buffer, "The %s is not a container.\r\n",
+                fname(sub_object->name));
+        send_to_char(buffer, ch);
+        fail = TRUE;
+      }
+    }
+    else
+    {
+      sprintf(buffer, "You do not see or have the %s.\r\n", arg2);
+      send_to_char(buffer, ch);
+      fail = TRUE;
+    }
+  }
+  break;
+  case 5:
+  {
+    send_to_char(
+        "You can't take a thing from more than one container.\r\n", ch);
+  }
+  break;
+  case 6:
+  { // get ??? ???
+    found = FALSE;
+    fail = FALSE;
+    sub_object = get_obj_in_list_vis(ch, arg2,
+                                     world[ch->in_room].contents);
+    if (!sub_object)
+    {
+      if (cmd == CMD_LOOT)
+      {
+        send_to_char("You can only loot 1 item from a non-consented corpse.\r\n", ch);
+        return eFAILURE;
+      }
+
+      sub_object = get_obj_in_list_vis(ch, arg2, ch->carrying, TRUE);
+      inventorycontainer = TRUE;
+    }
+    if (sub_object)
+    {
+      if (sub_object->obj_flags.type_flag == ITEM_CONTAINER &&
+          ((sub_object->obj_flags.value[3] == 1 &&
+            isname("pc", sub_object->name)) ||
+           isname("thiefcorpse", sub_object->name)))
+      {
+        sprintf(buffer, "%s_consent", GET_NAME(ch));
+
+        if ((cmd != CMD_LOOT && (isname("thiefcorpse", sub_object->name) && !isname(GET_NAME(ch), sub_object->name))) || isname(buffer, sub_object->name))
+          has_consent = TRUE;
+        if (!isname(GET_NAME(ch), sub_object->name) && (cmd == CMD_LOOT && isname("lootable", sub_object->name)) && !IS_SET(sub_object->obj_flags.more_flags, ITEM_PC_CORPSE_LOOTED) && !IS_SET(world[ch->in_room].room_flags, SAFE) && GET_LEVEL(ch) >= 50)
+          has_consent = TRUE;
+        if (!has_consent && !isname(GET_NAME(ch), sub_object->name))
+        {
+          send_to_char("You don't have consent to touch the "
+                       "corpse.\r\n",
+                       ch);
+          return eFAILURE;
+        }
+      }
+      if (ARE_CONTAINERS(sub_object))
+      {
+        if (IS_SET(sub_object->obj_flags.value[1], CONT_CLOSED))
+        {
+          sprintf(buffer, "The %s is closed.\r\n", fname(sub_object->name));
+          send_to_char(buffer, ch);
+          return eFAILURE;
+        }
+        obj_object = get_obj_in_list_vis(ch, arg1, sub_object->contains);
+        if (!obj_object && IS_AFFECTED(ch, AFF_BLIND) && has_skill(ch, SKILL_BLINDFIGHTING))
+        {
+          obj_object = get_obj_in_list_vis(ch, arg1, sub_object->contains, TRUE);
+          blindlag = TRUE;
+        }
+        if (obj_object)
+        {
+          if (GET_ITEM_TYPE(obj_object) == ITEM_MONEY &&
+              obj_object->obj_flags.value[0] > 10000 &&
+              GET_LEVEL(ch) < 5)
+          {
+            send_to_char("You cannot pick up that much money!\r\n", ch);
+            fail = TRUE;
+          }
+
+          else if (sub_object->carried_by != ch && obj_object->obj_flags.eq_level > 9 && GET_LEVEL(ch) < 5)
+          {
+            csendf(ch, "%s is too powerful for you to possess.\r\n", obj_object->short_description);
+            fail = TRUE;
+          }
+
+          else if ((IS_CARRYING_N(ch) + 1 > CAN_CARRY_N(ch)) &&
+                   !(GET_ITEM_TYPE(obj_object) == ITEM_MONEY && obj_object->item_number == -1 && GET_LEVEL(ch) < IMMORTAL))
+          {
+            sprintf(buffer, "%s : You can't carry that many items.\r\n", fname(obj_object->name));
+            send_to_char(buffer, ch);
+            fail = TRUE;
+          }
+          else if (inventorycontainer ||
+                   (IS_CARRYING_W(ch) + obj_object->obj_flags.weight) < CAN_CARRY_W(ch) || GET_ITEM_TYPE(obj_object) == ITEM_MONEY)
+          {
+            if (has_consent && (IS_SET(obj_object->obj_flags.more_flags, ITEM_NO_TRADE) ||
+                                contains_no_trade_item(obj_object)))
+            {
+              // if I have consent and i'm touching the corpse, then I shouldn't be able
+              // to pick up no_trade items because it is someone else's corpse.  If I am
+              // the other of the corpse, has_consent will be false.
+              if (GET_LEVEL(ch) < IMMORTAL)
+              {
+                if (isname("thiefcorpse", sub_object->name) || (cmd == CMD_LOOT && isname("lootable", sub_object->name)))
+                {
+                  csendf(ch, "Whoa!  The %s poofed into thin air!\r\n", obj_object->short_description);
+
+                  char log_buf[MAX_STRING_LENGTH];
+                  sprintf(log_buf, "%s poofed %s[%d] from %s[%d]",
+                          GET_NAME(ch),
+                          obj_object->short_description,
+                          obj_index[obj_object->item_number].virt,
+                          sub_object->name,
+                          obj_index[sub_object->item_number].virt);
+                  log(log_buf, ANGEL, LOG_MORTAL);
+
+                  extract_obj(obj_object);
+                  fail = TRUE;
+                  sprintf(buffer, "%s_consent", GET_NAME(ch));
+
+                  if ((cmd == CMD_LOOT && isname("lootable", sub_object->name)) && !isname(buffer, sub_object->name))
+                  {
+                    SET_BIT(sub_object->obj_flags.more_flags, ITEM_PC_CORPSE_LOOTED);
+                    struct affected_type pthiefaf;
+
+                    pthiefaf.type = FUCK_PTHIEF;
+                    pthiefaf.duration = 10;
+                    pthiefaf.modifier = 0;
+                    pthiefaf.location = APPLY_NONE;
+                    pthiefaf.bitvector = -1;
+
+                    WAIT_STATE(ch, PULSE_VIOLENCE * 2);
+                    send_to_char("You suddenly feel very guilty...shame on you stealing from the dead!\r\n", ch);
+                    if (affected_by_spell(ch, FUCK_PTHIEF))
+                    {
+                      affect_from_char(ch, FUCK_PTHIEF);
+                      affect_to_char(ch, &pthiefaf);
+                    }
+                    else
+                      affect_to_char(ch, &pthiefaf);
+                  }
+                }
+                else
+                {
+                  csendf(ch, "%s : It seems magically attached to the corpse.\r\n", fname(obj_object->name));
+                  fail = TRUE;
+                }
+              }
+            }
+            else if (CAN_WEAR(obj_object, ITEM_TAKE))
+            {
+              if (cmd == 10)
+                palm(ch, obj_object, sub_object, has_consent);
+              else
+                get(ch, obj_object, sub_object, has_consent, cmd);
+              found = TRUE;
+              if (blindlag)
+                WAIT_STATE(ch, PULSE_VIOLENCE);
+            }
+            else
+            {
+              send_to_char("You can't take that.\r\n", ch);
+              fail = TRUE;
+            }
+          }
+          else
+          {
+            sprintf(buffer, "%s : You can't carry that much weight.\r\n", fname(obj_object->name));
+            send_to_char(buffer, ch);
+            fail = TRUE;
+          }
+        }
+        else
+        {
+          sprintf(buffer, "The %s does not contain the %s.\r\n",
+                  fname(sub_object->name), arg1);
+          send_to_char(buffer, ch);
+          fail = TRUE;
+        }
+      }
+      else
+      {
+        sprintf(buffer,
+                "The %s is not a container.\r\n", fname(sub_object->name));
+        send_to_char(buffer, ch);
+        fail = TRUE;
+      }
+    }
+    else
+    {
+      sprintf(buffer, "You do not see or have the %s.\r\n", arg2);
+      send_to_char(buffer, ch);
+      fail = TRUE;
+    }
+  }
+  break;
+  }
+  if (fail)
+    return eFAILURE;
+  do_save(ch, "", 666);
+  return eSUCCESS;
+}
 
 int do_consent(struct char_data *ch, char *arg, int cmd)
 {
