@@ -47,6 +47,7 @@ int palm  (struct char_data *ch, struct obj_data *obj_object, struct obj_data *s
 void special_log(char *arg);
 struct obj_data * bring_type_to_front(char_data * ch, int item_type);
 bool search_container_for_item(obj_data * obj, int item_number);
+bool search_container_for_vnum(obj_data * obj, int vnum);
 
 /* procedures related to get */
 void get(struct char_data *ch, struct obj_data *obj_object, struct obj_data *sub_object, bool has_consent, int cmd)
@@ -1885,6 +1886,29 @@ bool search_container_for_item(obj_data *obj, int item_number)
   return false;
 }
 
+bool search_container_for_vnum(obj_data *obj, int vnum)
+{
+  if (obj == nullptr)
+  {
+    return false;
+  }
+
+  if (NOT_CONTAINERS(obj))
+  {
+    return false;
+  }
+
+  for (obj_data *i = obj->contains; i; i = i->next_content)
+  {
+    if (IS_KEY(i) && obj_index[i->item_number].virt == vnum)
+    {
+      return true;
+    }
+  }
+
+  return false;
+}
+
 int find_door(CHAR_DATA *ch, char *type, char *dir)
 {
     int door;
@@ -2221,7 +2245,7 @@ bool has_key(CHAR_DATA *ch, int key)
 
     if (IS_KEYRING(obj))
     {
-      return search_container_for_item(obj, key);
+      return search_container_for_vnum(obj, key);
     }
   }
 
