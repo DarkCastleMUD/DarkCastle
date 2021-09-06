@@ -325,6 +325,9 @@ inline const short IS_ANONYMOUS(CHAR_DATA *ch)
 #define IS_KEYRING(obj) (GET_ITEM_TYPE(obj) == ITEM_KEYRING)
 #define NOT_KEYRING(obj) (!IS_KEYRING(obj))
 
+#define IS_KEY(obj) (GET_ITEM_TYPE(obj) == ITEM_KEY)
+#define NOT_KEY(obj) (!IS_KEY(obj))
+
 #define ARE_CONTAINERS(obj) (IS_CONTAINER(obj) || IS_ALTAR(obj) || IS_KEYRING(obj))
 #define NOT_CONTAINERS(obj) (NOT_CONTAINER(obj) && NOT_ALTAR(obj) && NOT_KEYRING(obj))
 
