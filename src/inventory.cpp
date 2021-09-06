@@ -1272,9 +1272,9 @@ int do_put(struct char_data *ch, char *argument, int cmd)
           send_to_char("The protective enchantment this item holds cannot be held within this container.\r\n", ch);
           return eFAILURE;
         }
-        if (GET_ITEM_TYPE(obj_object) == ITEM_CONTAINER)
+        if (ARE_CONTAINERS(obj_object))
         {
-          send_to_char("You would ruin it!\r\n", ch);
+          send_to_char("You can't put that in there.\r\n", ch);
           return eFAILURE;
         }
 
