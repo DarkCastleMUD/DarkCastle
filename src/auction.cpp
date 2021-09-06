@@ -482,6 +482,7 @@ bool AuctionHouse::IsOkToSell(OBJ_DATA *obj)
     case ITEM_INSTRUMENT:
     case ITEM_LOCKPICK:
     case ITEM_BOAT:
+    case ITEM_KEYRING:
     return true;
     break;
     default:
@@ -1650,7 +1651,7 @@ void AuctionHouse::AddItem(CHAR_DATA *ch, OBJ_DATA *obj, unsigned int price, str
     return;
   }
 
-  if (obj->obj_flags.type_flag == ITEM_CONTAINER && obj->contains)  { // non-empty containers
+  if (ARE_CONTAINERS(obj) && obj->contains)  { // non-empty containers
     csendf(ch, "%s needs to be emptied first.\r\n", GET_OBJ_SHORT(obj));
     return;
   }
