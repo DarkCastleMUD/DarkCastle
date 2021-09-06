@@ -1423,19 +1423,21 @@ int do_fire(struct char_data *ch, char *arg, int cmd) {
 
 	found = NULL;
 	int where = 0;
-	for (; where < MAX_WEAR; where++) {
-		if (ch->equipment[where])
-			if (IS_CONTAINER(ch->equipment[where]))
-					&& isname("quiver", ch->equipment[where]->name)) {
-				found = find_arrow(ch->equipment[where]);
-				if (found) {
-					get(ch, found, ch->equipment[where], 0, 9);
-				}
-				break;
-			}
-	}
+  for (; where < MAX_WEAR; where++)
+  {
+    if (ch->equipment[where])
+      if (IS_CONTAINER(ch->equipment[where]) && isname("quiver", ch->equipment[where]->name))
+          {
+            found = find_arrow(ch->equipment[where]);
+            if (found)
+            {
+              get(ch, found, ch->equipment[where], 0, 9);
+            }
+            break;
+          }
+  }
 
-	if (!found) {
+  if (!found) {
 		send_to_char("You aren't wearing any quivers with arrows!\r\n", ch);
 		return eFAILURE;
 	}
