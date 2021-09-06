@@ -1425,7 +1425,7 @@ int do_fire(struct char_data *ch, char *arg, int cmd) {
 	int where = 0;
 	for (; where < MAX_WEAR; where++) {
 		if (ch->equipment[where])
-			if ((ch->equipment[where]->obj_flags.type_flag == ITEM_CONTAINER)
+			if (IS_CONTAINER(ch->equipment[where]))
 					&& isname("quiver", ch->equipment[where]->name)) {
 				found = find_arrow(ch->equipment[where]);
 				if (found) {
