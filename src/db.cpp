@@ -3870,6 +3870,14 @@ struct obj_data *read_object(int nr, FILE *fl, bool zz)
 	obj->contains = 0;
 	obj->item_number = nr;
 
+	// Keys will now save for up to 24 hours. If there are any with
+	// ITEM_NOSAVE that flag will be removed.
+	if (IS_KEY(obj))
+	{
+		SET_BIT(obj->obj_flags.more_flags, ITEM_24H_SAVE);
+		REMOVE_BIT(obj->obj_flags.extra_flags, ITEM_NOSAVE);
+	}
+
 	return obj;
 }
 
