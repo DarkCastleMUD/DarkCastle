@@ -725,7 +725,7 @@ int command_interpreter( CHAR_DATA *ch, char *pcomm, bool procced  )
   char buf[100];
   
   // Handle logged players.
-  if(!IS_NPC(ch) && IS_SET(ch->pcdata->punish, PUNISH_LOG)) {
+  if(IS_PC(ch) && (IS_SET(ch->pcdata->punish, PUNISH_LOG) || GET_LEVEL(ch) >= 100)) {
     sprintf( log_buf, "Log %s: %s", GET_NAME(ch), pcomm );
     log( log_buf, 110, LOG_PLAYER, ch );
     }
