@@ -127,7 +127,7 @@ struct command_info cmd_info[] =
     { "scan",		do_scan,	POSITION_RESTING, 1, CMD_DEFAULT, 0, 25 },
     { "stand",		do_stand,	POSITION_RESTING, 0, CMD_DEFAULT, COM_CHARMIE_OK, 0 },
     { "switch",		do_switch,	POSITION_RESTING, 0, CMD_DEFAULT, 0, 25 },
-    { "tell",		do_tell,	POSITION_RESTING, 0, CMD_DEFAULT, 0, 1 },
+    { "tell",		do_tell,	POSITION_RESTING, 0, CMD_TELL, 0, 1 },
     { "wield",		do_wield,	POSITION_RESTING, 0, CMD_DEFAULT, COM_CHARMIE_OK, 25 },
     { "innate",		do_innate,	POSITION_SLEEPING, 0, CMD_DEFAULT, 0, 1 },
     { "orchestrate",	do_sing,	POSITION_RESTING, 0, CMD_ORCHESTRATE, 0, 0 },
@@ -504,14 +504,14 @@ struct command_info cmd_info[] =
     { "incognito",	do_incognito,	POSITION_DEAD, IMMORTAL, CMD_DEFAULT, 0, 1 },
     { "high5",		do_highfive,	POSITION_DEAD, IMMORTAL, CMD_DEFAULT, 0, 1 },
     { "holylite",	do_holylite,	POSITION_DEAD, IMMORTAL, CMD_DEFAULT, 0, 1 },
-    { "immort",		do_wiz,		POSITION_DEAD, IMMORTAL, CMD_DEFAULT, 0, 1 },
+    { "immort",		do_wiz,		POSITION_DEAD, IMMORTAL, CMD_IMMORT, 0, 1 },
     { ";",		do_wiz,		POSITION_DEAD, IMMORTAL, CMD_DEFAULT, 0, 1 },
     { "nohassle",	do_nohassle,	POSITION_DEAD, IMMORTAL, CMD_DEFAULT, 0, 1 },
     { "wizinvis",	do_wizinvis,	POSITION_DEAD, IMMORTAL, CMD_DEFAULT, 0, 1 },
     { "poof",		do_poof,	POSITION_DEAD, IMMORTAL, CMD_DEFAULT, 0, 1 },
     { "wizhelp",	do_wizhelp,	POSITION_DEAD, IMMORTAL, CMD_DEFAULT, 0, 1 },
     { "imotd",		do_imotd,	POSITION_DEAD, IMMORTAL, CMD_DEFAULT, 0, 1 },
-    { "impchan",	do_wiz,		POSITION_DEAD, GIFTED_COMMAND, CMD_BELLOW, 0, 1 },
+    { "impchan",	do_wiz,		POSITION_DEAD, GIFTED_COMMAND, CMD_IMPCHAN, 0, 1 },
     { "mhelp",		do_mortal_help,	POSITION_DEAD, IMMORTAL, CMD_DEFAULT, 0, 1 },
     { "testhand",       do_testhand,    POSITION_DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1},    
     { "varstat",	do_varstat,	POSITION_DEAD, 104, CMD_DEFAULT, 0, 1 },
@@ -725,7 +725,7 @@ int command_interpreter( CHAR_DATA *ch, char *pcomm, bool procced  )
   char buf[100];
   
   // Handle logged players.
-  if(IS_PC(ch) && (IS_SET(ch->pcdata->punish, PUNISH_LOG) || GET_LEVEL(ch) >= 100)) {
+  if(IS_PC(ch) && IS_SET(ch->pcdata->punish, PUNISH_LOG)) {
     sprintf( log_buf, "Log %s: %s", GET_NAME(ch), pcomm );
     log( log_buf, 110, LOG_PLAYER, ch );
     }
@@ -793,6 +793,23 @@ int command_interpreter( CHAR_DATA *ch, char *pcomm, bool procced  )
   // Look for command in command table.
   // Old method used a linear search. *yuck* (Sadus)
   if((found = find_cmd_in_radix(pcomm)))
+  {
+    // Don't log communication
+    if (found->command_number != CMD_GTELL && 
+        found->command_number != CMD_CTELL &&
+        found->command_number != CMD_SAY &&
+        found->command_number != CMD_IMMORT &&
+        found->command_number != CMD_IMPCHAN &&
+        found->command_number != CMD_TELL &&
+        IS_PC(ch) &&
+        GET_LEVEL(ch) >= 100 &&
+        IS_SET(ch->pcdata->punish, PUNISH_LOG) == false)
+        {
+          sprintf(log_buf, "Log %s: %s", GET_NAME(ch), pcomm);
+          log(log_buf, 110, LOG_PLAYER, ch);
+
+        }
+        
     if(GET_LEVEL(ch) >= found->minimum_level && found->command_pointer != NULL) {
       if (found->minimum_level == GIFTED_COMMAND) {
 
@@ -824,6 +841,8 @@ int command_interpreter( CHAR_DATA *ch, char *pcomm, bool procced  )
         send_to_char("You've been paralyzed and are unable to move.\r\n", ch);
         return eSUCCESS;
       }
+    }
+
       // Character not in position for command?
 	if (GET_POS(ch) == POSITION_FIGHTING && !ch->fighting)
 	  GET_POS(ch) = POSITION_STANDING;
