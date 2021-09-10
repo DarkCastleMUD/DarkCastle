@@ -537,75 +537,85 @@ int do_nohassle (struct char_data *ch, char *argument, int cmd)
 // cmd == 8 - /
 int do_wiz(struct char_data *ch, char *argument, int cmd)
 {
-    char buf1[MAX_STRING_LENGTH];
-    struct descriptor_data *i;
+  char buf1[MAX_STRING_LENGTH];
+  struct descriptor_data *i;
 
-    if(IS_NPC(ch))
-      return eFAILURE;
+  if (IS_NPC(ch))
+    return eFAILURE;
 
-    if(cmd != 9 && !has_skill(ch, COMMAND_IMP_CHAN)) {
-        send_to_char("Huh?\r\n", ch);
-        return eFAILURE;
+  if (cmd != CMD_IMMORT && !has_skill(ch, COMMAND_IMP_CHAN))
+  {
+    send_to_char("Huh?\r\n", ch);
+    return eFAILURE;
+  }
+
+  for (; *argument == ' '; argument++)
+    ;
+
+  if (!(*argument))
+  {
+    queue<string> tmp;
+    if (cmd == CMD_IMMORT)
+    {
+      tmp = imm_history;
+      send_to_char("Here are the last 10 imm messages:\r\n", ch);
+    }
+    else if (cmd == CMD_IMPCHAN)
+    {
+      tmp = imp_history;
+      send_to_char("Here are the last 10 imp messages:\r\n", ch);
+    }
+    else
+    {
+      send_to_char("What? How did you get here?? Contact a coder.\r\n", ch);
+      return eSUCCESS;
     }
 
-    for (; *argument == ' '; argument++);
-
-    if (!(*argument))
+    while (!tmp.empty())
     {
-      queue<string> tmp;
-      if(cmd == 9)
-      {
-        tmp = imm_history;
-        send_to_char("Here are the last 10 imm messages:\r\n", ch);
-      }
-      else if(cmd == 8)
-      {
-        tmp = imp_history;
-        send_to_char("Here are the last 10 imp messages:\r\n", ch);
-      }
-      else
-      {
-        send_to_char("What? How did you get here?? Contact a coder.\r\n", ch);
-        return eSUCCESS;
-      }
-
-      while(!tmp.empty())
-      {
-        send_to_char((tmp.front()).c_str(), ch);
-        tmp.pop();
-      }
+      send_to_char((tmp.front()).c_str(), ch);
+      tmp.pop();
     }
-    else 
+  }
+  else
+  {
+    if (cmd == CMD_IMMORT)
     {
-        if(cmd == 9)
+      sprintf(buf1, "$B$4%s$7: $7$B%s$R\n\r", GET_SHORT(ch), argument);
+      imm_history.push(buf1);
+      if (imm_history.size() > 10)
+        imm_history.pop();
+    }
+    else
+    {
+      sprintf(buf1, "$B$7%s> %s$R\n\r", GET_SHORT(ch), argument);
+      imp_history.push(buf1);
+      if (imp_history.size() > 10)
+        imp_history.pop();
+    }
+
+    send_to_char(buf1, ch);
+    ansi_color(NTEXT, ch);
+
+    for (i = descriptor_list; i; i = i->next)
+    {
+      if (i->character && i->character != ch && GET_LEVEL(i->character) >= IMMORTAL && !IS_NPC(i->character))
+      {
+        if (cmd == 8 && !has_skill(i->character, COMMAND_IMP_CHAN))
+          continue;
+
+        if (STATE(i) == CON_PLAYING)
         {
-          sprintf(buf1, "$B$4%s$7: $7$B%s$R\n\r", GET_SHORT(ch), argument);
-          imm_history.push(buf1);
-          if(imm_history.size() > 10) imm_history.pop();
+          send_to_char(buf1, i->character);
         }
         else
         {
-          sprintf(buf1, "$B$7%s> %s$R\n\r", GET_SHORT(ch), argument);
-          imp_history.push(buf1);
-          if(imp_history.size() > 10) imp_history.pop();
+          record_msg(buf1, i->character);
         }
-
-	send_to_char(buf1, ch);
-        ansi_color( NTEXT, ch);
-
-        for (i = descriptor_list; i; i = i->next) {
-	  if (i->character && i->character != ch && GET_LEVEL(i->character) >= IMMORTAL && !IS_NPC(i->character)) {
-	  if (cmd == 8 && !has_skill(i->character, COMMAND_IMP_CHAN)) continue;
-
-	    if (STATE(i) == CON_PLAYING) {
-	      send_to_char(buf1, i->character);
-	    } else {
-	      record_msg(buf1, i->character);
-	    }
-	  }
-	}
+      }
     }
-    return eSUCCESS;
+  }
+  return eSUCCESS;
 }
 
 int do_findfix(char_data *ch, char *argument, int cmd)
