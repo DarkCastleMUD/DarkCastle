@@ -2423,12 +2423,13 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
 
         if (tar_char && tar_char != ch && IS_PC(ch) && IS_PC(tar_char) && tar_char->desc && ch->desc)
         {
+          /*
           if (!strcmp(tar_char->desc->host, ch->desc->host))
           {
             sprintf(log_buf, "Multi: %s casted '%s' on %s", GET_NAME(ch),
                     get_skill_name(spl), GET_NAME(tar_char));
             log(log_buf, 110, LOG_PLAYER, ch);
-          }
+          }*/
 
           // Wizard's eye (88) is ok to cast
           // Prize Arena
