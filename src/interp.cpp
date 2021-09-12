@@ -176,13 +176,13 @@ struct command_info cmd_info[] =
     { ".",		do_grouptell,	POSITION_DEAD, 0, CMD_GTELL, 0, 1 },
     { "ignore",		do_ignore,	POSITION_DEAD, 0, CMD_DEFAULT, 0, 1 },
     { "insult",		do_insult,	POSITION_RESTING, 0, CMD_DEFAULT, COM_CHARMIE_OK, 0 },
-    { "reply",		do_reply,	POSITION_RESTING, 0, CMD_DEFAULT, 0, 1 },
+    { "reply",		do_reply,	POSITION_RESTING, 0, CMD_REPLY, 0, 1 },
     { "report",		do_report,	POSITION_RESTING, 0, CMD_DEFAULT, COM_CHARMIE_OK, 0 },
     { "say",		do_say,		POSITION_RESTING, 0, CMD_SAY, COM_CHARMIE_OK, 0 },
     { "psay",		do_psay,	POSITION_RESTING, 0, CMD_SAY, COM_CHARMIE_OK, 0 },
     { "'",		do_say,		POSITION_RESTING, 0, CMD_SAY, COM_CHARMIE_OK, 0 },
     { "shout",		do_shout,	POSITION_RESTING, 0, CMD_DEFAULT, 0, 1 },
-    { "whisper",	do_whisper,	POSITION_RESTING, 0, CMD_DEFAULT, 0, 0 },
+    { "whisper",	do_whisper,	POSITION_RESTING, 0, CMD_WHISPER, 0, 0 },
 
     // Object manipulation
     { "slip",		do_slip,	POSITION_STANDING, 0,  CMD_SLIP, 0, 1 },
@@ -801,6 +801,8 @@ int command_interpreter( CHAR_DATA *ch, char *pcomm, bool procced  )
         found->command_number != CMD_IMMORT &&
         found->command_number != CMD_IMPCHAN &&
         found->command_number != CMD_TELL &&
+        found->command_number != CMD_WHISPER &&
+        found->command_number != CMD_REPLY &&
         IS_PC(ch) &&
         GET_LEVEL(ch) >= 100 &&
         IS_SET(ch->pcdata->punish, PUNISH_LOG) == false)

@@ -57,6 +57,8 @@ void add_command_lag(CHAR_DATA *ch, int cmdnum, int lag);
 #define CMD_BACKSTAB	13
 #define CMD_SBS		14
 #define CMD_ORCHESTRATE 15
+#define CMD_REPLY   16
+#define CMD_WHISPER 17
 #define CMD_GLANCE	20
 #define CMD_FLEE	28
 #define CMD_ESCAPE	29
