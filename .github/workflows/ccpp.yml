@@ -22,24 +22,8 @@ jobs:
         sudo apt install libpq-dev:i386 libpq5:i386 libcurl4-openssl-dev:i386
         sudo apt install unzip zlib1g-dev:i386
         sudo apt install libfmt-dev:i386
-    - name: install twitcurl
-      run: |
-        wget https://github.com/swatkat/twitcurl/archive/master.zip
-        unzip master.zip
-        cd twitcurl-master/libtwitcurl
-        export CC='g++ -m32'
-        make -e
-        sudo CC='g++ -m32' make -e install
-        sudo sed 's:include/curl/curl.h:curl/curl.h:g' -i /usr/local/include/twitcurl.h
-    - name: install xmlrpc++
-      run: |
-        wget https://svwh.dl.sourceforge.net/project/xmlrpcpp/xmlrpc%2B%2B/Version%200.7/xmlrpc%2B%2B0.7.zip
-        unzip xmlrpc++0.7.zip	     
-        patch -p0 < thirdparty/xmlrpc++0.7-gccfixes.diff
-        cd xmlrpc++0.7
-        make
-        sudo cp libXmlRpc.a /usr/local/lib/
-        sudo cp -a src/*h /usr/local/include/
     - name: make
-      run: make -C src -j3 debug
+      run: |
+        cd src
+        scons -j4
 
