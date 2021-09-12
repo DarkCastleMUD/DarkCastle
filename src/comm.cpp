@@ -928,38 +928,50 @@ void heartbeat() {
 	if (--pulse_violence < 1) {
 		pulse_violence = PULSE_VIOLENCE;
 
-    PerfTimers["violence+"].start();
+    PerfTimers["violence"].start();
 		perform_violence();
 		update_characters();
 		affect_update(PULSE_VIOLENCE);
 		check_silence_beacons();
-    PerfTimers["violence+"].stop();
+    PerfTimers["violence"].stop();
 	}
 
 	if (--pulse_tensec < 1) {
 		pulse_tensec = PULSE_TENSEC;
+    PerfTimers["consecrate"].start();
 		checkConsecrate(PULSE_TENSEC);
+    PerfTimers["consecrate"].stop();
 	}
 
 	if (--pulse_weather < 1) {
 		pulse_weather = PULSE_WEATHER;
+    PerfTimers["weather"].start();
 		weather_update();
+    PerfTimers["weather"].stop();
+
+    PerfTimers["auctionexp"].start();
 		auction_expire();
+    PerfTimers["auctionexp"].stop();
 	}
 
 	if (--pulse_regen < 1) {
+    PerfTimers["pulse_regen"].start();
 		// random pulse timer for regen to make tick sleeping impossible
-		pulse_regen = number(PULSE_REGEN - 8 * PASSES_PER_SEC, PULSE_REGEN + 5 * PASSES_PER_SEC);
+		pulse_regen = number(PULSE_REGEN - 8 * PASSES_PER_SEC, PULSE_REGEN + 5 * PASSES_PER_SEC);    
 		point_update();
 		pulse_takeover();
 		affect_update(PULSE_REGEN);
 		checkConsecrate(PULSE_REGEN);
 		if (!number(0, 2))
+    {
 			send_hint();
+    }
+    PerfTimers["pulse_regen"].stop();
 	}
 
 	if (--pulse_time < 1) {
 		pulse_time = PULSE_TIME;
+    PerfTimers["pulse_time"].start();
 		zone_update();
 		time_update();
 		food_update();
@@ -976,7 +988,10 @@ void heartbeat() {
 		save_slot_machines();
 		pulse_hunts();
 		if (!number(0, 47))
+    {
 			redo_shop_profit();
+    }
+    PerfTimers["pulse_time"].stop();
 	}
 }
 
