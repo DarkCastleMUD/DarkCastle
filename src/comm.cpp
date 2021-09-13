@@ -972,25 +972,61 @@ void heartbeat() {
 	if (--pulse_time < 1) {
 		pulse_time = PULSE_TIME;
     PerfTimers["pulse_time"].start();
-		zone_update();
-		time_update();
-		food_update();
-		affect_update(PULSE_TIME);
-		update_corpses_and_portals();
-		check_idle_passwords();
-		quest_update();
 
+    PerfTimers["zone_update"].start();
+		zone_update();
+    PerfTimers["zone_update"].stop();
+
+    PerfTimers["time_update"].start();
+		time_update();
+    PerfTimers["time_update"].stop();
+
+    PerfTimers["food_update"].start();
+		food_update();
+    PerfTimers["food_update"].stop();
+
+    PerfTimers["affect_update"].start();
+		affect_update(PULSE_TIME);
+    PerfTimers["affect_update"].stop();
+
+    PerfTimers["update_corpses"].start();
+		update_corpses_and_portals();
+    PerfTimers["update_corpses"].stop();
+
+    PerfTimers["check_idle"].start();
+		check_idle_passwords();
+    PerfTimers["check_idle"].stop();
+
+    PerfTimers["quest_update"].start();
+		quest_update();
+    PerfTimers["quest_update"].stop();
+
+    PerfTimers["leaderboard"].start();
 		leaderboard.check(); //good place to put this
+    PerfTimers["leaderboard"].stop();
 
 		if (DC::instance().cf.bport == false) {
+      PerfTimers["check_champ"].start();
 			check_champion_and_website_who_list();
+      PerfTimers["check_champ"].stop();
 		}
+
+    PerfTimers["save_slot"].start();
 		save_slot_machines();
+    PerfTimers["save_slot"].stop();
+
+    PerfTimers["pulse_hunts"].start();
 		pulse_hunts();
+    PerfTimers["pulse_hunts"].stop();
+
+    PerfTimers["redo_shop"].start();
 		if (!number(0, 47))
     {
 			redo_shop_profit();
     }
+    PerfTimers["redo_shop"].stop();
+
+
     PerfTimers["pulse_time"].stop();
 	}
 }
