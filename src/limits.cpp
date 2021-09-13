@@ -816,6 +816,7 @@ void update_corpses_and_portals(void)
 	struct obj_data *j, *next_thing;
 	struct obj_data *jj, *next_thing2;
 	int proc = 0;							 // Processed items. Debugging.
+	bool corpses_need_saving = false;
 	void extract_obj(struct obj_data * obj); /* handler.c */
 	/* objects */
 	for (j = object_list; j; j = next_thing, proc++)
@@ -937,11 +938,15 @@ void update_corpses_and_portals(void)
 				// Is THIS what caused the crasher then?
 				// Wtf: damnit.
 				extract_obj(j);
-				save_corpses();
+				corpses_need_saving = true;
 			}
 		}
 	}
 	DC::instance().removeDead();
+	if (corpses_need_saving == true)
+	{
+		save_corpses();
+	}
 	//sprintf(buf, "DEBUG: Processed Objects: %d", proc);
 	//log(buf, 108, LOG_BUG);
 	/* Now process the portals */
