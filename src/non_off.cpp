@@ -46,22 +46,18 @@ void log_sacrifice(CHAR_DATA *ch, OBJ_DATA *obj, bool decay = FALSE)
 
   if(GET_OBJ_RNUM(obj) == NOWHERE) return;
 
-  if(!(fl = dc_fopen(OBJECTS_LOG, "a"))) {
-    log("Could not open the objects log file.", IMMORTAL, LOG_BUG);
-    return;
-  }
-
   timep = time(0);
   tmstr = asctime(localtime(&timep));
   *(tmstr + strlen(tmstr) - 1) = '\0';
   if (!decay)
-    fprintf(fl, "%s :: %s just sacrificed %s[%d]\n", tmstr, GET_NAME(ch), GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj));
-  else
-    fprintf(fl, "%s :: %s just poofed from decaying corpse %s[%d]\n", tmstr, GET_OBJ_SHORT((OBJ_DATA*)ch), GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj));
+  {
+    logf(IMP, LOG_OBJECTS, "%s just sacrificed %s[%d] in room %d\n", GET_NAME(ch), GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj), GET_ROOM_VNUM(ch->in_room));
+  } else {
+    logf(IMP, LOG_OBJECTS, "%s just poofed from decaying corpse %s[%d] in room %d\n", GET_OBJ_SHORT((OBJ_DATA*)ch), GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj), GET_ROOM_VNUM(obj->in_room));
+  }
 
   for(OBJ_DATA *loop_obj = obj->contains; loop_obj; loop_obj = loop_obj->next_content) {
-    fprintf(fl, "%s :: The %s contained %s[%d]\n",
-	    tmstr,
+    logf(IMP, LOG_OBJECTS, "The %s contained %s[%d]\n",
 	    GET_OBJ_SHORT(obj),
 	    GET_OBJ_SHORT(loop_obj),
 	    GET_OBJ_VNUM(loop_obj));
