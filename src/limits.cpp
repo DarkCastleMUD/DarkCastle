@@ -810,15 +810,17 @@ void point_update(void) {
 	} /* for */
 }
 
-void update_corpses_and_portals(void) {
+void update_corpses_and_portals(void)
+{
 	//char buf[256];
 	struct obj_data *j, *next_thing;
 	struct obj_data *jj, *next_thing2;
-	int proc = 0; // Processed items. Debugging.
-	void extract_obj(struct obj_data *obj); /* handler.c */
+	int proc = 0;							 // Processed items. Debugging.
+	void extract_obj(struct obj_data * obj); /* handler.c */
 	/* objects */
-	for (j = object_list; j; j = next_thing, proc++) {
-		if (j == (struct obj_data *) 0x95959595)
+	for (j = object_list; j; j = next_thing, proc++)
+	{
+		if (j == (struct obj_data *)0x95959595)
 			break;
 		next_thing = j->next; /* Next in object list */
 		/* Type 1 is a permanent game portal, and type 3 is a look_only
@@ -826,11 +828,14 @@ void update_corpses_and_portals(void) {
 		 |  Type 4 is a no look permanent game portal
 		 */
 
-		if ((GET_ITEM_TYPE(j) == ITEM_PORTAL) && (j->obj_flags.value[1] == 0 || j->obj_flags.value[1] == 2)) {
+		if ((GET_ITEM_TYPE(j) == ITEM_PORTAL) && (j->obj_flags.value[1] == 0 || j->obj_flags.value[1] == 2))
+		{
 			if (j->obj_flags.timer > 0)
 				(j->obj_flags.timer)--;
-			if (!(j->obj_flags.timer)) {
-				if ((j->in_room != NOWHERE) && (world[j->in_room].people)) {
+			if (!(j->obj_flags.timer))
+			{
+				if ((j->in_room != NOWHERE) && (world[j->in_room].people))
+				{
 					act("$p shimmers brightly and then fades away.", world[j->in_room].people, j, 0, TO_ROOM, INVIS_NULL);
 					act("$p shimmers brightly and then fades away.", world[j->in_room].people, j, 0, TO_CHAR, INVIS_NULL);
 				}
@@ -840,68 +845,89 @@ void update_corpses_and_portals(void) {
 		}
 
 		/* If this is a corpse */
-		else if ((GET_ITEM_TYPE(j) == ITEM_CONTAINER) && (j->obj_flags.value[3])) {
+		else if ((GET_ITEM_TYPE(j) == ITEM_CONTAINER) && (j->obj_flags.value[3]))
+		{
 			// TODO ^^^ - makes value[3] for containers a bitvector instead of a boolean
 
 			/* timer count down */
-			if (j->obj_flags.timer > 0) {
+			if (j->obj_flags.timer > 0)
+			{
 				j->obj_flags.timer--;
 				save_corpses();
 			}
 
-			if (!j->obj_flags.timer) {
+			if (!j->obj_flags.timer)
+			{
 				if (j->carried_by)
 					act("$p decays in your hands.", j->carried_by, j, 0, TO_CHAR, 0);
-				else if ((j->in_room != NOWHERE) && (world[j->in_room].people)) {
+				else if ((j->in_room != NOWHERE) && (world[j->in_room].people))
+				{
 					act("A quivering horde of maggots consumes $p.", world[j->in_room].people, j, 0, TO_ROOM, INVIS_NULL);
 					act("A quivering horde of maggots consumes $p.", world[j->in_room].people, j, 0, TO_CHAR, 0);
 				}
 
-				for (jj = j->contains; jj; jj = next_thing2) {
+				for (jj = j->contains; jj; jj = next_thing2)
+				{
 					next_thing2 = jj->next_content; /* Next in inventory */
 
-					if (GET_ITEM_TYPE(jj) == ITEM_CONTAINER) {
+					if (GET_ITEM_TYPE(jj) == ITEM_CONTAINER)
+					{
 						OBJ_DATA *oo, *oon;
-						for (oo = jj->contains; oo; oo = oon) {
+						for (oo = jj->contains; oo; oo = oon)
+						{
 							oon = oo->next_content;
 
-							if (IS_SET(oo->obj_flags.more_flags, ITEM_NO_TRADE)) {
-								log_sacrifice((CHAR_DATA*) j, oo, TRUE);
+							if (IS_SET(oo->obj_flags.more_flags, ITEM_NO_TRADE))
+							{
+								log_sacrifice((CHAR_DATA *)j, oo, TRUE);
 								extract_obj(oo);
 							}
 						}
 					}
-					if (j->in_obj) {
-						if (IS_SET(jj->obj_flags.more_flags, ITEM_NO_TRADE)) {
+					if (j->in_obj)
+					{
+						if (IS_SET(jj->obj_flags.more_flags, ITEM_NO_TRADE))
+						{
 							if (next_thing == jj)
 								next_thing = jj->next;
 							while (next_thing && next_thing->in_obj == jj)
 								next_thing = next_thing->next;
-							log_sacrifice((CHAR_DATA*) j, jj, TRUE);
+							log_sacrifice((CHAR_DATA *)j, jj, TRUE);
 							extract_obj(jj);
-						} else
+						}
+						else
 							move_obj(jj, j->in_obj);
-					} else if (j->carried_by) {
-						if (IS_SET(jj->obj_flags.more_flags, ITEM_NO_TRADE)) {
+					}
+					else if (j->carried_by)
+					{
+						if (IS_SET(jj->obj_flags.more_flags, ITEM_NO_TRADE))
+						{
 							if (next_thing == jj)
 								next_thing = jj->next;
 							while (next_thing->in_obj == jj)
 								next_thing = next_thing->next;
-							log_sacrifice((CHAR_DATA*) j, jj, TRUE);
+							log_sacrifice((CHAR_DATA *)j, jj, TRUE);
 							extract_obj(jj);
-						} else
+						}
+						else
 							move_obj(jj, j->carried_by);
-					} else if (j->in_room != NOWHERE) {
-						if (IS_SET(jj->obj_flags.more_flags, ITEM_NO_TRADE)) {
+					}
+					else if (j->in_room != NOWHERE)
+					{
+						if (IS_SET(jj->obj_flags.more_flags, ITEM_NO_TRADE))
+						{
 							if (next_thing == jj)
 								next_thing = jj->next;
 							while (next_thing && next_thing->in_obj == jj)
 								next_thing = next_thing->next;
-							log_sacrifice((CHAR_DATA*) j, jj, TRUE);
+							log_sacrifice((CHAR_DATA *)j, jj, TRUE);
 							extract_obj(jj);
-						} else
+						}
+						else
 							move_obj(jj, j->in_room);
-					} else {
+					}
+					else
+					{
 						log("BIIIG problem in limits.c!", OVERSEER, LOG_BUG);
 						return;
 					}
