@@ -4828,7 +4828,7 @@ void raw_kill(CHAR_DATA * ch, CHAR_DATA * victim)
   {
     if (ch == victim)
     {
-      logf(IMMORTAL, LOG_BUG, "selfpurge on %s to %s", GET_NAME(ch), GET_NAME(victim));
+      logf(0, LOG_BUG, "selfpurge on %s to %s", GET_NAME(ch), GET_NAME(victim));
       selfpurge = true;
     }
     extract_char(victim, TRUE);
