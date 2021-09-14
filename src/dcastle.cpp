@@ -50,6 +50,7 @@ int main(int argc, char *const argv[])
   {
     dc.cf.ports.push_back(DFLT_PORT);
     dc.cf.ports.push_back(DFLT_PORT2);
+    dc.cf.allow_multi = true;
     dc.cf.ports.push_back(DFLT_PORT3);
     dc.cf.ports.push_back(DFLT_PORT4);
   }
@@ -134,6 +135,10 @@ DC::config parse_arguments(int argc, char *const argv[])
     case 'p':
       port = atoi(optarg);
       cf.ports.push_back(port);
+      if (port == 6666)
+      {
+        cf.allow_multi = true;
+      }
       break;
     case 'P':
       cf.allow_imp_password = true;

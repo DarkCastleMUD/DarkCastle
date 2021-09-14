@@ -62,6 +62,7 @@ public:
     bool bport = false;
     bool check_syntax = false;
     bool stderr_timestamp = true;
+    bool allow_multi = false;
     string dir = DFLT_DIR;
     string leaderboard_check;
   } cf;
