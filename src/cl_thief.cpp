@@ -1454,12 +1454,9 @@ int do_pocket(CHAR_DATA *ch, char *argument, int cmd)
             affect_to_char(ch, &pthiefaf);
         }
       }
-      if ((GET_LEVEL(ch)<ANGEL) && (!IS_NPC(victim))) 
-      {
-        sprintf(log_buf,"%s stole %d gold from %s", GET_NAME(ch), gold, GET_NAME(victim));
-        log(log_buf, ANGEL, LOG_MORTAL);
-      }
-    } else 
+      logf(0, LOG_OBJECTS, "%s stole %d gold from %s in room %d", GET_NAME(ch), gold, GET_NAME(victim), GET_ROOM_VNUM(victim->in_room));
+    }
+    else 
     {
       send_to_char("You couldn't get any gold...\n\r", ch);
     }
