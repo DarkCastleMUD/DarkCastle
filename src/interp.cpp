@@ -702,20 +702,24 @@ int do_imotd(CHAR_DATA *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-
-int command_interpreter( CHAR_DATA *ch, char *pcomm, bool procced  )
+int command_interpreter(CHAR_DATA *ch, char *pcomm, bool procced)
 {
   CommandStack cstack;
 
-  if (cstack.isOverflow() == true) {
-	// Prevent errors from showing up multiple times per loop
-	if (cstack.getOverflowCount() < 2) {
-		if (ch && pcomm && GET_NAME(ch)) {
-		  logf(IMMORTAL, LOG_BUG, "Command stack exceeded. depth: %d, max_depth: %d, name: %s, cmd: %s", cstack.getDepth(), cstack.getMax(), GET_NAME(ch), pcomm);
-		} else {
-		  logf(IMMORTAL, LOG_BUG, "CommandStack::depth %d exceeds CommandStack::max_depth %d", cstack.getDepth(), cstack.getMax());
-		}
-	}
+  if (cstack.isOverflow() == true)
+  {
+    // Prevent errors from showing up multiple times per loop
+    if (cstack.getOverflowCount() < 2)
+    {
+      if (ch && pcomm && GET_NAME(ch))
+      {
+        logf(IMMORTAL, LOG_BUG, "Command stack exceeded. depth: %d, max_depth: %d, name: %s, cmd: %s", cstack.getDepth(), cstack.getMax(), GET_NAME(ch), pcomm);
+      }
+      else
+      {
+        logf(IMMORTAL, LOG_BUG, "CommandStack::depth %d exceeds CommandStack::max_depth %d", cstack.getDepth(), cstack.getMax());
+      }
+    }
     return eFAILURE;
   }
 
@@ -723,165 +727,159 @@ int command_interpreter( CHAR_DATA *ch, char *pcomm, bool procced  )
   int retval;
   struct command_info *found = 0;
   char buf[100];
-  
+
   // Handle logged players.
-  if(IS_PC(ch) && IS_SET(ch->pcdata->punish, PUNISH_LOG)) {
-    sprintf( log_buf, "Log %s: %s", GET_NAME(ch), pcomm );
-    log( log_buf, 110, LOG_PLAYER, ch );
-    }
-    
+  if (IS_PC(ch) && IS_SET(ch->pcdata->punish, PUNISH_LOG))
+  {
+    sprintf(log_buf, "Log %s: %s", GET_NAME(ch), pcomm);
+    log(log_buf, 110, LOG_PLAYER, ch);
+  }
+
   // Implement freeze command.
-  if(!IS_NPC(ch) && IS_SET(ch->pcdata->punish, PUNISH_FREEZE) && str_cmp(pcomm, "quit")) {
-    send_to_char( "You've been frozen by an immortal.\r\n", ch );
+  if (!IS_NPC(ch) && IS_SET(ch->pcdata->punish, PUNISH_FREEZE) && str_cmp(pcomm, "quit"))
+  {
+    send_to_char("You've been frozen by an immortal.\r\n", ch);
     return eSUCCESS;
-    }
+  }
   if (IS_AFFECTED(ch, AFF_PRIMAL_FURY))
   {
-     send_to_char("SOMEMESSAGE\r\n",ch);
-     return eSUCCESS;
+    send_to_char("SOMEMESSAGE\r\n", ch);
+    return eSUCCESS;
   }
 
   // Berserk checks
-  if (IS_SET(ch->combat, COMBAT_BERSERK)) {
-    if (ch->fighting) {
+  if (IS_SET(ch->combat, COMBAT_BERSERK))
+  {
+    if (ch->fighting)
+    {
       send_to_char("You've gone BERSERK! Beat them down, Beat them!! Rrrrrraaaaaagghh!!\r\n", ch);
       return eSUCCESS;
-      }
+    }
     REMOVE_BIT(ch->combat, COMBAT_BERSERK);
     act("$n settles down.", ch, 0, 0, TO_ROOM, 0);
     act("You settle down.", ch, 0, 0, TO_CHAR, 0);
     GET_AC(ch) -= 30;
-    }
-
+  }
 
   // Strip initial spaces OR tab characters and parse command word.
   // Translate to lower case.  We need to translate tabs for the MOBProgs to work
-  if (ch && ch->desc && ch->desc->connected == CON_EDITING) {
+  if (ch && ch->desc && ch->desc->connected == CON_EDITING)
+  {
     ;
-    }
-  else {
-    while ( *pcomm == ' ' || *pcomm == '\t')
+  }
+  else
+  {
+    while (*pcomm == ' ' || *pcomm == '\t')
       pcomm++;
-    }
+  }
 
   // MOBprogram commands weeded out
-  if (*pcomm == 'm' && *(pcomm+1) == 'p')
-    if (ch->desc ) {
+  if (*pcomm == 'm' && *(pcomm + 1) == 'p')
+    if (ch->desc)
+    {
       send_to_char("Huh?\r\n", ch);
       return eSUCCESS;
-      }
+    }
 
-  for ( look_at = 0; pcomm[look_at] > ' '; look_at++ )
-    pcomm[look_at]  = LOWER(pcomm[look_at]);
+  for (look_at = 0; pcomm[look_at] > ' '; look_at++)
+    pcomm[look_at] = LOWER(pcomm[look_at]);
 
-  if ( look_at == 0 )
+  if (look_at == 0)
     return eFAILURE;
 
   // if we got this far, we're going to play with the command, so put
   // it into the debugging globals
-  strncpy(last_processed_cmd, pcomm, (MAX_INPUT_LENGTH-1));
-  strncpy(last_char_name, GET_NAME(ch), (MAX_INPUT_LENGTH-1));
+  strncpy(last_processed_cmd, pcomm, (MAX_INPUT_LENGTH - 1));
+  strncpy(last_char_name, GET_NAME(ch), (MAX_INPUT_LENGTH - 1));
   last_char_room = ch->in_room;
 
-
-  if (pcomm && *pcomm) {
+  if (pcomm && *pcomm)
+  {
     retval = oprog_command_trigger(pcomm, ch, &pcomm[look_at]);
     if (SOMEONE_DIED(retval) || IS_SET(retval, eEXTRA_VALUE))
-        return retval;
+      return retval;
   }
-  
+
   // Look for command in command table.
   // Old method used a linear search. *yuck* (Sadus)
-  if((found = find_cmd_in_radix(pcomm)))
-  {
-    // Don't log communication
-    if (found->command_number != CMD_GTELL && 
-        found->command_number != CMD_CTELL &&
-        found->command_number != CMD_SAY &&
-        found->command_number != CMD_IMMORT &&
-        found->command_number != CMD_IMPCHAN &&
-        found->command_number != CMD_TELL &&
-        found->command_number != CMD_WHISPER &&
-        found->command_number != CMD_REPLY &&
-        IS_PC(ch) &&
-        GET_LEVEL(ch) >= 100 &&
-        IS_SET(ch->pcdata->punish, PUNISH_LOG) == false)
-        {
-          sprintf(log_buf, "Log %s: %s", GET_NAME(ch), pcomm);
-          log(log_buf, 110, LOG_PLAYER, ch);
-
-        }
-        
-    if(GET_LEVEL(ch) >= found->minimum_level && found->command_pointer != NULL) {
-      if (found->minimum_level == GIFTED_COMMAND) {
+  if ((found = find_cmd_in_radix(pcomm)))
+    if (GET_LEVEL(ch) >= found->minimum_level && found->command_pointer != NULL)
+    {
+      if (found->minimum_level == GIFTED_COMMAND)
+      {
 
         //search bestowable_god_commands for the command skill number to lookup with has_skill
-        int command_skill=0;
-        for (int i = 0; *bestowable_god_commands[i].name != '\n'; i++) {
-          if (bestowable_god_commands[i].name == found->command_name) {
-            command_skill=bestowable_god_commands[i].num;
+        int command_skill = 0;
+        for (int i = 0; *bestowable_god_commands[i].name != '\n'; i++)
+        {
+          if (bestowable_god_commands[i].name == found->command_name)
+          {
+            command_skill = bestowable_god_commands[i].num;
             break;
           }
         }
 
-        if (command_skill == 0 || IS_NPC(ch) || !has_skill(ch, command_skill)) {
-            send_to_char("Huh?\r\n", ch);
+        if (command_skill == 0 || IS_NPC(ch) || !has_skill(ch, command_skill))
+        {
+          send_to_char("Huh?\r\n", ch);
 
-            if (command_skill == 0) {
-              logf(LOG_BUG, IMMORTAL, "Unable to find command [%s] within bestowable_god_commands", found->command_name);
-            }
-            return eFAILURE;
+          if (command_skill == 0)
+          {
+            logf(LOG_BUG, IMMORTAL, "Unable to find command [%s] within bestowable_god_commands", found->command_name);
+          }
+          return eFAILURE;
         }
       }
 
       // Paralysis stops everything but ...
-      if (IS_AFFECTED(ch, AFF_PARALYSIS) && 
-          found->command_number != CMD_GTELL &&  // gtell
-          found->command_number != CMD_CTELL     // ctell
-         ) 
+      if (IS_AFFECTED(ch, AFF_PARALYSIS) &&
+          found->command_number != CMD_GTELL && // gtell
+          found->command_number != CMD_CTELL    // ctell
+      )
       {
         send_to_char("You've been paralyzed and are unable to move.\r\n", ch);
         return eSUCCESS;
       }
-    }
-
       // Character not in position for command?
-	if (GET_POS(ch) == POSITION_FIGHTING && !ch->fighting)
-	  GET_POS(ch) = POSITION_STANDING;
-	// fix for thin air thing
-      if ( GET_POS(ch) < found->minimum_position ) {
-        switch( GET_POS(ch) ) {
-          case POSITION_DEAD:
-            send_to_char( "Lie still; you are DEAD.\r\n", ch );
-            break;
-          case POSITION_STUNNED:
-            send_to_char( "You are too stunned to do that.\n\r", ch );
-            break;
-          case POSITION_SLEEPING:
-            send_to_char( "In your dreams, or what?\r\n", ch );
-            break;
-          case POSITION_RESTING:
-            send_to_char( "Nah... You feel too relaxed...\r\n", ch);
-            break;
-          case POSITION_SITTING:
-            send_to_char( "Maybe you should stand up first?\r\n", ch);
-            break;
-          case POSITION_FIGHTING:
-            send_to_char( "No way!  You are still fighting!\r\n", ch);
-            break;
-          }
-        return eSUCCESS;
+      if (GET_POS(ch) == POSITION_FIGHTING && !ch->fighting)
+        GET_POS(ch) = POSITION_STANDING;
+      // fix for thin air thing
+      if (GET_POS(ch) < found->minimum_position)
+      {
+        switch (GET_POS(ch))
+        {
+        case POSITION_DEAD:
+          send_to_char("Lie still; you are DEAD.\r\n", ch);
+          break;
+        case POSITION_STUNNED:
+          send_to_char("You are too stunned to do that.\n\r", ch);
+          break;
+        case POSITION_SLEEPING:
+          send_to_char("In your dreams, or what?\r\n", ch);
+          break;
+        case POSITION_RESTING:
+          send_to_char("Nah... You feel too relaxed...\r\n", ch);
+          break;
+        case POSITION_SITTING:
+          send_to_char("Maybe you should stand up first?\r\n", ch);
+          break;
+        case POSITION_FIGHTING:
+          send_to_char("No way!  You are still fighting!\r\n", ch);
+          break;
         }
+        return eSUCCESS;
+      }
       // charmies can only use charmie "ok" commands
       if (!procced) // Charmed mobs can still use their procs.
-        if((IS_AFFECTED(ch, AFF_FAMILIAR) || IS_AFFECTED(ch, AFF_CHARM)) && !IS_SET(found->flags, COM_CHARMIE_OK))
+        if ((IS_AFFECTED(ch, AFF_FAMILIAR) || IS_AFFECTED(ch, AFF_CHARM)) && !IS_SET(found->flags, COM_CHARMIE_OK))
           return do_say(ch, "I'm sorry master, I cannot do that.", 9);
       if (IS_NPC(ch) && ch->desc && ch->desc->original &&
-        ch->desc->original->level <= MAX_MORTAL && !IS_SET(found->flags, COM_CHARMIE_OK)) {
-        send_to_char("The spirit cannot perform that action.\r\n",ch);
+          ch->desc->original->level <= MAX_MORTAL && !IS_SET(found->flags, COM_CHARMIE_OK))
+      {
+        send_to_char("The spirit cannot perform that action.\r\n", ch);
         return eFAILURE;
-        }
-/*
+      }
+      /*
       if (IS_AFFECTED(ch, AFF_HIDE)) {
         if (found->toggle_hide == 0) {
           REMBIT(ch->affected_by, AFF_HIDE);
@@ -895,7 +893,7 @@ int command_interpreter( CHAR_DATA *ch, char *pcomm, bool procced  )
           }
         }
 */
-/*
+      /*
       // Last resort for debugging...if you know it's a mortal.
       // -Sadus 
       char DEBUGbuf[MAX_STRING_LENGTH];
@@ -904,48 +902,51 @@ int command_interpreter( CHAR_DATA *ch, char *pcomm, bool procced  )
 */
       if (!can_use_command(ch, found->command_number))
       {
-	send_to_char("You are still recovering from your last attempt.\r\n",ch);
+        send_to_char("You are still recovering from your last attempt.\r\n", ch);
         return eSUCCESS;
       }
       // We're going to execute, check for usable special proc.
-      retval = special( ch, found->command_number, &pcomm[look_at] );
-      if(IS_SET(retval, eSUCCESS) || IS_SET(retval, eCH_DIED))
+      retval = special(ch, found->command_number, &pcomm[look_at]);
+      if (IS_SET(retval, eSUCCESS) || IS_SET(retval, eCH_DIED))
         return retval;
 
       // Normal dispatch
-      retval = (*(found->command_pointer)) (ch, &pcomm[look_at], found->command_number);
+      retval = (*(found->command_pointer))(ch, &pcomm[look_at], found->command_number);
       // Next bit for the DUI client, they needed it.
       extern bool selfpurge;
-      if (!SOMEONE_DIED(retval) && !selfpurge) {
-        sprintf(buf, "%s%s",BOLD,NTEXT);
-        send_to_char(buf,ch);
-        }
+      if (!SOMEONE_DIED(retval) && !selfpurge)
+      {
+        sprintf(buf, "%s%s", BOLD, NTEXT);
+        send_to_char(buf, ch);
+      }
       // This call is here to prevent gcc from tail-chaining the
       // previous call, which screws up the debugger call stack.
       // -- Furey
-      number( 0, 0 );
+      number(0, 0);
 
       return retval;
     }
-    // end if((found = find_cmd_in_radix(pcomm)))
+  // end if((found = find_cmd_in_radix(pcomm)))
 
   // If we're at this point, Paralyze stops everything so get out.
-  if (IS_AFFECTED(ch, AFF_PARALYSIS) ) {
+  if (IS_AFFECTED(ch, AFF_PARALYSIS))
+  {
     send_to_char("You've been paralyzed and are unable to move.\r\n", ch);
     return eSUCCESS;
   }
   // Check social table
-  if( (retval = check_social( ch, pcomm, look_at, &pcomm[look_at])) ) {
-    if( SOCIAL_TRUE_WITH_NOISE == retval )
+  if ((retval = check_social(ch, pcomm, look_at, &pcomm[look_at])))
+  {
+    if (SOCIAL_TRUE_WITH_NOISE == retval)
       return check_ethereal_focus(ch, ETHEREAL_FOCUS_TRIGGER_SOCIAL);
-    else return eSUCCESS;
+    else
+      return eSUCCESS;
   }
 
   // Unknown command (or char too low level)
-  send_to_char( "Huh?\r\n", ch );
+  send_to_char("Huh?\r\n", ch);
   return eSUCCESS;
 }
-
 
 int old_search_block(char *arg, const char **list, bool exact)
 {
