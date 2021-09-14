@@ -803,6 +803,7 @@ int command_interpreter(CHAR_DATA *ch, char *pcomm, bool procced)
   // Look for command in command table.
   // Old method used a linear search. *yuck* (Sadus)
   if ((found = find_cmd_in_radix(pcomm)))
+  {
     if (GET_LEVEL(ch) >= found->minimum_level && found->command_pointer != NULL)
     {
       if (found->minimum_level == GIFTED_COMMAND)
@@ -869,6 +870,7 @@ int command_interpreter(CHAR_DATA *ch, char *pcomm, bool procced)
         }
         return eSUCCESS;
       }
+
       // charmies can only use charmie "ok" commands
       if (!procced) // Charmed mobs can still use their procs.
         if ((IS_AFFECTED(ch, AFF_FAMILIAR) || IS_AFFECTED(ch, AFF_CHARM)) && !IS_SET(found->flags, COM_CHARMIE_OK))
@@ -892,19 +894,37 @@ int command_interpreter(CHAR_DATA *ch, char *pcomm, bool procced)
           act(buf, ch, 0, 0, TO_CHAR, 0);
           }
         }
-*/
+      */
       /*
       // Last resort for debugging...if you know it's a mortal.
       // -Sadus 
       char DEBUGbuf[MAX_STRING_LENGTH];
       sprintf(DEBUGbuf, "%s: %s", GET_NAME(ch), pcomm); 
       log (DEBUGbuf, 0, LOG_MISC);
-*/
+      */
       if (!can_use_command(ch, found->command_number))
       {
         send_to_char("You are still recovering from your last attempt.\r\n", ch);
         return eSUCCESS;
       }
+
+      // Don't log communication
+      if (found->command_number != CMD_GTELL &&
+          found->command_number != CMD_CTELL &&
+          found->command_number != CMD_SAY &&
+          found->command_number != CMD_IMMORT &&
+          found->command_number != CMD_IMPCHAN &&
+          found->command_number != CMD_TELL &&
+          found->command_number != CMD_WHISPER &&
+          found->command_number != CMD_REPLY &&
+          IS_PC(ch) &&
+          GET_LEVEL(ch) >= 100 &&
+          IS_SET(ch->pcdata->punish, PUNISH_LOG) == false)
+      {
+        sprintf(log_buf, "Log %s: %s", GET_NAME(ch), pcomm);
+        log(log_buf, 110, LOG_PLAYER, ch);
+      }
+    
       // We're going to execute, check for usable special proc.
       retval = special(ch, found->command_number, &pcomm[look_at]);
       if (IS_SET(retval, eSUCCESS) || IS_SET(retval, eCH_DIED))
@@ -926,7 +946,7 @@ int command_interpreter(CHAR_DATA *ch, char *pcomm, bool procced)
 
       return retval;
     }
-  // end if((found = find_cmd_in_radix(pcomm)))
+  } // end if((found = find_cmd_in_radix(pcomm)))
 
   // If we're at this point, Paralyze stops everything so get out.
   if (IS_AFFECTED(ch, AFF_PARALYSIS))
