@@ -182,8 +182,15 @@ int do_check(struct char_data *ch, char *arg, int cmd) {
     send_to_char(buf, ch);
   }
 
-  display_punishes(ch, vict);
+  if (vict->pcdata && vict->pcdata->multi == true)
+  {
+    csendf(ch, "They's multiplayed since logging in.\r\n");
+  } else {
+    csendf(ch, "They've not multiplayed since logging in.\r\n");
+  }
 
+  display_punishes(ch, vict);
+  
   if(connected) 
     if(vict->desc) {
       if(GET_LEVEL(ch) >= OVERSEER && GET_LEVEL(ch) >= GET_LEVEL(vict))
