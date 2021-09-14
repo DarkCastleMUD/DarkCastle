@@ -908,22 +908,25 @@ int command_interpreter(CHAR_DATA *ch, char *pcomm, bool procced)
         return eSUCCESS;
       }
 
-      DC &dc = DC::instance();
-      // Don't log communication
-      if (found->command_number != CMD_GTELL &&
-          found->command_number != CMD_CTELL &&
-          found->command_number != CMD_SAY &&
-          found->command_number != CMD_IMMORT &&
-          found->command_number != CMD_IMPCHAN &&
-          found->command_number != CMD_TELL &&
-          found->command_number != CMD_WHISPER &&
-          found->command_number != CMD_REPLY &&
-          IS_PC(ch) &&
-          (GET_LEVEL(ch) >= 100 || (ch->pcdata->multi == true && dc.cf.allow_multi == false)) &&
-          IS_SET(ch->pcdata->punish, PUNISH_LOG) == false)
+
+      if (IS_PC(ch))
       {
-        sprintf(log_buf, "Log %s: %s", GET_NAME(ch), pcomm);
-        log(log_buf, 110, LOG_PLAYER, ch);
+        DC &dc = DC::instance();
+        // Don't log communication
+        if (found->command_number != CMD_GTELL &&
+            found->command_number != CMD_CTELL &&
+            found->command_number != CMD_SAY &&
+            found->command_number != CMD_IMMORT &&
+            found->command_number != CMD_IMPCHAN &&
+            found->command_number != CMD_TELL &&
+            found->command_number != CMD_WHISPER &&
+            found->command_number != CMD_REPLY &&
+            (GET_LEVEL(ch) >= 100 || (ch->pcdata->multi == true && dc.cf.allow_multi == false)) &&
+            IS_SET(ch->pcdata->punish, PUNISH_LOG) == false)
+        {
+          sprintf(log_buf, "Log %s: %s", GET_NAME(ch), pcomm);
+          log(log_buf, 110, LOG_PLAYER, ch);
+        }
       }
     
       // We're going to execute, check for usable special proc.
