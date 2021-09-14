@@ -184,7 +184,7 @@ int do_check(struct char_data *ch, char *arg, int cmd) {
 
   if (vict->pcdata && vict->pcdata->multi == true)
   {
-    csendf(ch, "They's multiplayed since logging in.\r\n");
+    csendf(ch, "They've multiplayed since logging in.\r\n");
   } else {
     csendf(ch, "They've not multiplayed since logging in.\r\n");
   }
