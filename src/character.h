@@ -257,6 +257,7 @@ struct pc_data
     char *last_prompt;
     std::multimap<int, std::pair<timeval, timeval> > *lastseen;
     uint8_t profession;
+    bool multi;
 };
 
 enum mob_type_t { MOB_NORMAL = 0, MOB_GUARD, MOB_CLAN_GUARD, MOB_TYPE_FIRST = MOB_NORMAL, MOB_TYPE_LAST = MOB_CLAN_GUARD };
