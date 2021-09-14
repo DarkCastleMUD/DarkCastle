@@ -918,7 +918,7 @@ int command_interpreter(CHAR_DATA *ch, char *pcomm, bool procced)
           found->command_number != CMD_WHISPER &&
           found->command_number != CMD_REPLY &&
           IS_PC(ch) &&
-          GET_LEVEL(ch) >= 100 &&
+          (GET_LEVEL(ch) >= 100 || ch->pcdata->multi == true) &&
           IS_SET(ch->pcdata->punish, PUNISH_LOG) == false)
       {
         sprintf(log_buf, "Log %s: %s", GET_NAME(ch), pcomm);
