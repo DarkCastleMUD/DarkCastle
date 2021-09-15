@@ -2370,7 +2370,7 @@ int szrildor_pass_checks(struct char_data *ch, struct obj_data *obj, int cmd, ch
       continue;
     if (!i->in_room)
       continue;
-    if (world[i->in_room].zone != 161)
+    if (real_room(30000) > 0 && world[i->in_room].zone != world[real_room(30000)].zone)
       continue;
     if (GET_LEVEL(i) >= 100)
       continue;
