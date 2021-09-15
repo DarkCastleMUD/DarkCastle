@@ -3399,7 +3399,7 @@ int mprog_wordlist_check( const char *arg, CHAR_DATA *mob, CHAR_DATA *actor,
 			  OBJ_DATA *obj, void *vo, int type, bool reverse )
 // reverse ALSO IMPLIES IT ALSO ONLY CHECKS THE FIRST WORD
 {
-
+	
   char        temp1[ MAX_STRING_LENGTH ];
   char        temp2[ MAX_STRING_LENGTH ];
   char        word[ MAX_INPUT_LENGTH ];
@@ -3546,7 +3546,7 @@ int mprog_act_trigger( const char *buf, CHAR_DATA *mob, CHAR_DATA *ch,
     return mprog_cur_result;
 
   if ( IS_NPC( mob )
-      && ( mob_index[mob->mobdata->nr].progtypes & ACT_PROG ) )
+      && ( mob_index[mob->mobdata->nr].progtypes & ACT_PROG ) && isPaused(mob) == false)
              mprog_wordlist_check( buf, mob, ch,
                        obj, vo, ACT_PROG );
 
@@ -3590,8 +3590,8 @@ int mprog_bribe_trigger( CHAR_DATA *mob, CHAR_DATA *ch, int amount )
   OBJ_DATA   *obj = 0;
   bool done = FALSE;
 
-  if ( IS_NPC( mob ) && ( mob_index[mob->mobdata->nr].progtypes & BRIBE_PROG ) ) {
-    mob->gold -= amount;
+  if ( IS_NPC( mob ) && ( mob_index[mob->mobdata->nr].progtypes & BRIBE_PROG ) && isPaused(mob) == false) {
+	mob->gold -= amount;
     
     mprg = mob_index[mob->mobdata->nr].mobprogs;
     if (!mprg) {
@@ -3628,9 +3628,9 @@ int mprog_damage_trigger( CHAR_DATA *mob, CHAR_DATA *ch, int amount )
   MPROG_DATA *next = 0;
   OBJ_DATA   *obj = 0;
   bool done = FALSE;
-  if ( IS_NPC( mob ) && ( mob_index[mob->mobdata->nr].progtypes & DAMAGE_PROG ) )
+  if ( IS_NPC( mob ) && ( mob_index[mob->mobdata->nr].progtypes & DAMAGE_PROG ) && isPaused(mob) == false)
     {
-      mprg = mob_index[mob->mobdata->nr].mobprogs;
+	  mprg = mob_index[mob->mobdata->nr].mobprogs;
 
       if (!mprg) {
 	done = TRUE;
@@ -3661,9 +3661,9 @@ int mprog_death_trigger( CHAR_DATA *mob, CHAR_DATA *killer )
 {
 
  if ( IS_NPC( mob )
-     && ( mob_index[mob->mobdata->nr].progtypes & DEATH_PROG ) )
+     && ( mob_index[mob->mobdata->nr].progtypes & DEATH_PROG ) && isPaused(mob) == false)
    {
-     mprog_percent_check( mob, killer, NULL, NULL, DEATH_PROG );
+	 mprog_percent_check( mob, killer, NULL, NULL, DEATH_PROG );
    }
  if (!SOMEONE_DIED(mprog_cur_result))
   death_cry( mob );
@@ -3675,7 +3675,7 @@ int mprog_entry_trigger( CHAR_DATA *mob )
 {
 
  if ( IS_NPC( mob )
-     && ( mob_index[mob->mobdata->nr].progtypes & ENTRY_PROG ) )
+     && ( mob_index[mob->mobdata->nr].progtypes & ENTRY_PROG ) && isPaused(mob) == false)
    mprog_percent_check( mob, NULL, NULL, NULL, ENTRY_PROG );
 
  return mprog_cur_result;
@@ -3687,7 +3687,7 @@ int mprog_fight_trigger( CHAR_DATA *mob, CHAR_DATA *ch )
 
  if ( IS_NPC( mob )
  && MOB_WAIT_STATE(mob) <= 0
-     && ( mob_index[mob->mobdata->nr].progtypes & FIGHT_PROG ) )
+     && ( mob_index[mob->mobdata->nr].progtypes & FIGHT_PROG ) && isPaused(mob) == false)
    mprog_percent_check( mob, ch, NULL, NULL, FIGHT_PROG );
 
  return mprog_cur_result;
@@ -3698,7 +3698,7 @@ int mprog_attack_trigger( CHAR_DATA *mob, CHAR_DATA *ch )
 {
 
  if ( IS_NPC( mob )
-     && ( mob_index[mob->mobdata->nr].progtypes & ATTACK_PROG ) )
+     && ( mob_index[mob->mobdata->nr].progtypes & ATTACK_PROG ) && isPaused(mob) == false)
    mprog_percent_check( mob, ch, NULL, NULL, ATTACK_PROG );
 
  return mprog_cur_result;
@@ -3713,7 +3713,7 @@ int mprog_give_trigger( CHAR_DATA *mob, CHAR_DATA *ch, OBJ_DATA *obj )
  MPROG_DATA *next;
  bool done = FALSE, okay = FALSE;
  if ( IS_NPC( mob )
-     && ( mob_index[mob->mobdata->nr].progtypes & GIVE_PROG ) )
+     && ( mob_index[mob->mobdata->nr].progtypes & GIVE_PROG ) && isPaused(mob) == false)
 {
   mprg = mob_index[mob->mobdata->nr].mobprogs;
   if (!mprg) { done = TRUE; mprg = mob_index[mob->mobdata->nr].mobspec; }
@@ -3764,10 +3764,10 @@ int mprog_greet_trigger( CHAR_DATA *ch )
    {
      if ( ch != vmob
        && CAN_SEE( vmob, ch )
-       && ( mob_index[vmob->mobdata->nr].progtypes & GREET_PROG) )
+       && ( mob_index[vmob->mobdata->nr].progtypes & GREET_PROG) && isPaused(vmob) == false)
        mprog_percent_check( vmob, ch, NULL, NULL, GREET_PROG );
      else
-        if( ( mob_index[vmob->mobdata->nr].progtypes & ALL_GREET_PROG ) )
+        if( ( mob_index[vmob->mobdata->nr].progtypes & ALL_GREET_PROG ) && isPaused(vmob) == false)
          mprog_percent_check(vmob,ch,NULL,NULL,ALL_GREET_PROG);
      
      if(SOMEONE_DIED(mprog_cur_result)||selfpurge)
@@ -3785,7 +3785,7 @@ int mprog_hitprcnt_trigger( CHAR_DATA *mob, CHAR_DATA *ch)
 
   if ( IS_NPC( mob )
        && MOB_WAIT_STATE(mob) <= 0
-       && (mob_index[mob->mobdata->nr].progtypes & HITPRCNT_PROG ) )
+       && (mob_index[mob->mobdata->nr].progtypes & HITPRCNT_PROG ) && isPaused(mob) == false)
     {
       mprg = mob_index[mob->mobdata->nr].mobprogs;
       if (!mprg) { done = TRUE; mprg = mob_index[mob->mobdata->nr].mobspec; }
@@ -3817,7 +3817,7 @@ int mprog_random_trigger( CHAR_DATA *mob )
 {
   mprog_cur_result = eSUCCESS;
 
-  if ( mob_index[mob->mobdata->nr].progtypes & RAND_PROG)
+  if ( (mob_index[mob->mobdata->nr].progtypes & RAND_PROG) && isPaused(mob) == false)
     mprog_percent_check(mob,NULL,NULL,NULL,RAND_PROG);
 
   return mprog_cur_result;
@@ -3827,7 +3827,7 @@ int mprog_random_trigger( CHAR_DATA *mob )
 int mprog_load_trigger(CHAR_DATA *mob)
 {
   mprog_cur_result = eSUCCESS;
-  if (mob_index[mob->mobdata->nr].progtypes & LOAD_PROG)
+  if ((mob_index[mob->mobdata->nr].progtypes & LOAD_PROG) && isPaused(mob) == false)
      mprog_percent_check(mob, NULL, NULL, NULL, LOAD_PROG);
   return mprog_cur_result;
 }
@@ -3835,7 +3835,7 @@ int mprog_load_trigger(CHAR_DATA *mob)
 int mprog_arandom_trigger( CHAR_DATA *mob)
 {
   mprog_cur_result = eSUCCESS;
-  if (mob_index[mob->mobdata->nr].progtypes & ARAND_PROG)
+  if ((mob_index[mob->mobdata->nr].progtypes & ARAND_PROG) && isPaused(mob) == false)
      mprog_percent_check(mob,NULL,NULL,NULL,ARAND_PROG);
    return mprog_cur_result;
 }
@@ -3843,7 +3843,7 @@ int mprog_arandom_trigger( CHAR_DATA *mob)
 int mprog_can_see_trigger( CHAR_DATA *ch, CHAR_DATA *mob )
 {
   mprog_cur_result = eSUCCESS;
-  if (mob_index[mob->mobdata->nr].progtypes & CAN_SEE_PROG)
+  if ((mob_index[mob->mobdata->nr].progtypes & CAN_SEE_PROG) && isPaused(mob) == false)
      mprog_percent_check(mob,ch,NULL,NULL,CAN_SEE_PROG);
 
  return mprog_cur_result;
@@ -3858,7 +3858,7 @@ int mprog_speech_trigger( char *txt, CHAR_DATA *mob )
   mprog_cur_result = eSUCCESS;
 
   for ( vmob = world[mob->in_room].people; vmob != NULL; vmob = vmob->next_in_room )
-    if ( IS_NPC( vmob ) && ( mob_index[vmob->mobdata->nr].progtypes & SPEECH_PROG ) )
+    if ( IS_NPC( vmob ) && ( mob_index[vmob->mobdata->nr].progtypes & SPEECH_PROG ) && isPaused(vmob) == false)
     {
       if(mprog_wordlist_check( txt, vmob, mob, NULL, NULL, SPEECH_PROG ))
         break;
@@ -3877,7 +3877,7 @@ int mprog_catch_trigger(char_data * mob, int catch_num, char *var, int opt, char
  mprog_cur_result = eFAILURE;
 
  if ( IS_NPC( mob )
-     && ( mob_index[mob->mobdata->nr].progtypes & CATCH_PROG ) )
+     && ( mob_index[mob->mobdata->nr].progtypes & CATCH_PROG ) && isPaused(mob) == false)
  {
  mprg = mob_index[mob->mobdata->nr].mobprogs;
  if (!mprg || (opt & 1)) { done = TRUE; mprg = mob_index[mob->mobdata->nr].mobspec; }
@@ -3985,6 +3985,14 @@ void update_mprog_throws() {
 
 		// if !vict, oh well....remove it anyway.  Someone killed him.
 		if (action->data_num == -999 && vict) { // 'tis a pause
+			mprog_driver(action->orig, vict, action->actor, action->obj, action->vo, action, action->rndm);
+			dc_free(action->orig);
+			action->orig = 0;
+		} else if (action->data_num == -1000 && vict) {
+			if (action->tMob && action->tMob->mobdata)
+			{
+				action->tMob->mobdata->paused = false;
+			}
 			mprog_driver(action->orig, vict, action->actor, action->obj, action->vo, action, action->rndm);
 			dc_free(action->orig);
 			action->orig = 0;
@@ -4415,3 +4423,13 @@ int oprog_command_trigger( char *txt, CHAR_DATA *ch, char *arg )
   return mprog_cur_result;
 }
 
+bool isPaused(char_data *mob)
+{
+	if (mob && mob->mobdata && mob->mobdata->paused == true)
+	{
+		return true;
+	}
+
+	return false;
+}
+ 

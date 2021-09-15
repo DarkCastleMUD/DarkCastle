@@ -32,6 +32,8 @@ extern "C"
   #include <string.h>
 }
 
+using namespace std;
+
 #include <sys/types.h>
 #include <cstdio>
 #include <cstdlib>
@@ -1736,20 +1738,38 @@ int do_mppause( CHAR_DATA *ch, char *argument, int cmd )
   int delay;
 
   char first[MAX_INPUT_LENGTH];
+  char second[MAX_INPUT_LENGTH];
 
   argument = one_argument(argument, first);
+  if (string(first) == "all")
+  {
+    argument = one_argument(argument, second);
 
-  if(!check_range_valid_and_convert(delay, first, 0, 65536)) {
-    prog_error(ch, "Mppause - Invalid delay.");
-    return eFAILURE;
+    if(!check_range_valid_and_convert(delay, second, 0, 65536)) {
+      prog_error(ch, "mpppause all - Invalid delay.");
+      return eFAILURE;
+    }
+    throwitem = (struct mprog_throw_type *)dc_alloc(1, sizeof(struct mprog_throw_type));
+
+    if (ch && ch->mobdata)
+    {      
+      ch->mobdata->paused = true;
+      throwitem->data_num = -1000;
+    }
+  }
+  else
+  {
+    if(!check_range_valid_and_convert(delay, first, 0, 65536)) {
+      prog_error(ch, "mppause - Invalid delay.");
+      return eFAILURE;
+    }
+    throwitem = (struct mprog_throw_type *)dc_alloc(1, sizeof(struct mprog_throw_type));
+    throwitem->data_num = -999;
   }
 
-  // create struct
-  throwitem = (struct mprog_throw_type *)dc_alloc(1, sizeof(struct mprog_throw_type));
   throwitem->target_mob_num = mob_index[ch->mobdata->nr].virt;
   throwitem->target_mob_name[0] = '\0';
   throwitem->tMob = ch;
-  throwitem->data_num = -999;
   throwitem->delay = delay;
   throwitem->mob = TRUE; // This is, suprisingly, a mob
 

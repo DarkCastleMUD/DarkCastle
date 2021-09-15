@@ -290,6 +290,7 @@ struct mob_data
     struct threat_struct *threat;
     struct reset_com *reset;
 	mob_flag_data mob_flags;            /* Mobile information               */
+    bool paused;
 };
 
 // CHAR_DATA, char_data
@@ -514,5 +515,6 @@ struct profession {
 void clear_hunt(void *arg1, void *arg2, void *arg3);
 void clear_hunt(char *arg1, CHAR_DATA *arg2, void *arg3);
 void prepare_character_for_sixty(CHAR_DATA *ch);
+bool isPaused(char_data *mob);
 
 #endif
