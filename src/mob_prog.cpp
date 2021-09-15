@@ -3985,11 +3985,16 @@ void update_mprog_throws() {
 
 		// if !vict, oh well....remove it anyway.  Someone killed him.
 		if (action->data_num == -999 && vict) { // 'tis a pause
-			mprog_driver(action->orig, vict, action->actor, action->obj, action->vo, action, action->rndm);
+			// Only resume a MPPAUSE <duration> if we're not in the middle of a MPPAUSE all <duration>
+			if (isPaused(action->tMob) == false)
+			{
+				mprog_driver(action->orig, vict, action->actor, action->obj, action->vo, action, action->rndm);
+			}
+			
 			dc_free(action->orig);
 			action->orig = 0;
 		} else if (action->data_num == -1000 && vict) {
-			if (action->tMob && action->tMob->mobdata)
+			if (isPaused(action->tMob))
 			{
 				action->tMob->mobdata->paused = false;
 			}
