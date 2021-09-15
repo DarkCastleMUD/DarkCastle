@@ -4430,7 +4430,17 @@ int oprog_command_trigger( char *txt, CHAR_DATA *ch, char *arg )
 
 bool isPaused(char_data *mob)
 {
-	if (mob && mob->mobdata && mob->mobdata->paused == true)
+	if (mob == nullptr || mob == (char_data *)0x95959595)
+	{
+		return false;
+	}
+
+	if (mob->mobdata == nullptr || mob->mobdata == (mob_data *)0x95959595)
+	{
+		return false;
+	}
+
+	if (mob->mobdata->paused == true)
 	{
 		return true;
 	}
