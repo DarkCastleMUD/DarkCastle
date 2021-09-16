@@ -2331,6 +2331,7 @@ int szrildor_pass(struct char_data *ch, struct obj_data *obj, int cmd, char *arg
               act("As your pass expires and crumbles to dust, you begin to feel a bit fuzzy for a moment, then vanish into thin air", v, 0, 0, TO_CHAR, 0);
               act("$n begins to look blurry for a moment, then winks out of existence with a \"pop\"!", v, 0, 0, TO_ROOM, 0);
               move_char(v, real_room(30000));
+              do_look(v, "", CMD_LOOK);
 
               struct mprog_throw_type *throwitem = NULL;
               throwitem = (struct mprog_throw_type *)dc_alloc(1, sizeof(struct mprog_throw_type));
@@ -2383,9 +2384,20 @@ int szrildor_pass_checks(struct char_data *ch, struct obj_data *obj, int cmd, ch
     {
       act("Jeff arrives and frowns.\r\n$B$7Jeff says, 'Hey! You don't have a pass. Get the heck outta here!'$R", i, 0, 0, TO_CHAR, 0);
       act("Jeff arrives and frowns at $n.\r\n$B$7Jeff says, 'Hey! You don't have a pass. Get the heck outta here!'$R", i, 0, 0, TO_ROOM, 0);
-      move_char(i, real_room(30000));
-    }
 
+      if (GET_LEVEL(i) >= IMMORTAL)
+      {
+        act("As your pass expires and crumbles to dust, you begin to feel a bit fuzzy for a moment but due to immortal magics your head becomes clear.", i, 0, 0, TO_CHAR, 0);
+        act("$n begins to look blurry for a moment but due to immortal magics they become sharp again.", i, 0, 0, TO_ROOM, 0);
+      }
+      else
+      {
+        act("As your pass expires and crumbles to dust, you begin to feel a bit fuzzy for a moment, then vanish into thin air", i, 0, 0, TO_CHAR, 0);
+        act("$n begins to look blurry for a moment, then winks out of existence with a \"pop\"!", i, 0, 0, TO_ROOM, 0);
+        move_char(i, real_room(30000));
+        do_look(i, "", CMD_LOOK);
+      }
+    }
   }
   return eSUCCESS;
 }
