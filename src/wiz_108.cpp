@@ -548,12 +548,12 @@ int do_set(struct char_data *ch, char *argument, int cmd)
             break;
             case 13: /* exp */
             {
-		int64 val;
-//                value = atoi(buf);
-		val = atoll(buf);
-                log(buf2, IMP, LOG_GOD);
-                /* set original exp of victim */
-                vict->exp = val;
+              int64 val;
+              val = atoll(buf);
+              int64 before_exp = vict->exp;
+              vict->exp = val;
+              logf(GET_LEVEL(ch), LOG_GOD, "%s sets %s's exp from %lld to %lld.",
+                   GET_NAME(ch), GET_NAME(vict), before_exp, vict->exp);
             }
             break;
             case 14: /* mana */
@@ -678,10 +678,13 @@ int do_set(struct char_data *ch, char *argument, int cmd)
             break;
             case 24:  /* platinum */
             {
-               if(GET_LEVEL(ch) == IMP) { 
+              if (GET_LEVEL(ch) == IMP)
+              {
+                uint32 before_plat = GET_PLATINUM(vict);
                 GET_PLATINUM(vict) = atoi(buf);
-                log(buf2, GET_LEVEL(ch), LOG_GOD);
-              } 
+                logf(IMP, LOG_GOD, "%s sets %s's platinum from %u to %u.",
+                     GET_NAME(ch), GET_NAME(vict), before_plat, GET_PLATINUM(vict));
+              }
             }
             break;
             case 25: /* ki */
