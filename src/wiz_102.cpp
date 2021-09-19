@@ -3569,393 +3569,457 @@ int do_medit(struct char_data *ch, char *argument, int cmd) {
 
 int do_redit(struct char_data *ch, char *argument, int cmd)
 {
-    string buf, remainder_args;
-    int x, a, b, c, d = 0;
-    struct extra_descr_data *extra;
-    struct extra_descr_data *ext;
+  string buf, remainder_args;
+  int x, a, b, c, d = 0;
+  struct extra_descr_data *extra;
+  struct extra_descr_data *ext;
 
-    const char *return_directions[] =
+  const char *return_directions[] =
+      {
+          "south",
+          "west",
+          "north",
+          "east",
+          "down",
+          "up",
+          ""};
+
+  int reverse_number[] =
+      {
+          2, 3, 0, 1, 5, 4};
+  char *fields[] =
+      {
+          "name",
+          "description",
+          "exit",
+          "extra",
+          "exdesc",
+          "rflag",
+          "sector",
+          "denymob",
+          ""};
+
+  if (IS_NPC(ch))
+    return eFAILURE;
+
+  string arg1;
+  tie(arg1, remainder_args) = half_chop(string(argument));
+  if (arg1.empty())
+  {
+    send_to_char("The field must be one of the following:\n\r", ch);
+    for (x = 0;; x++)
     {
-      "south",
-      "west",
-      "north",
-      "east",
-      "down",
-      "up",
-      ""
-    }; 
-
-    int reverse_number[] =
-    {
-      2, 3, 0, 1, 5, 4
-    };
-    char *fields[] = 
-    {
-      "name",
-      "description",
-      "exit",
-      "extra",
-      "exdesc",
-      "rflag",
-      "sector",
-      "denymob",
-      ""
-    };
-   
-
-    if(IS_NPC(ch))
-      return eFAILURE;
-
-    string arg1;
-    tie (arg1, remainder_args) = half_chop(string(argument));
-    if(arg1.empty()) {
-      send_to_char("The field must be one of the following:\n\r", ch);
-      for(x = 0 ;; x++) {
-        if(fields[x][0] == '\0')
-          return eFAILURE;
-        csendf(ch, "  %s\n\r", fields[x]);
-      }
+      if (fields[x][0] == '\0')
+        return eFAILURE;
+      csendf(ch, "  %s\n\r", fields[x]);
     }
+  }
 
-  if(!can_modify_room(ch, ch->in_room)) {
+  if (!can_modify_room(ch, ch->in_room))
+  {
     send_to_char("You are unable to work creation outside of your range.\n\r", ch);
     return eFAILURE;
   }
 
-    for(x = 0 ;; x++)
+  for (x = 0;; x++)
+  {
+    if (fields[x][0] == '\0')
     {
-      if(fields[x][0] == '\0')
+      send_to_char("The field must be one of the following:\n\r", ch);
+      for (x = 0;; x++)
       {
-        send_to_char("The field must be one of the following:\n\r", ch);
-        for(x = 0 ;; x++)
-        {
-          if(fields[x][0] == '\0')
-             return eFAILURE;
-          csendf(ch, "%s\n\r", fields[x]);
-        }
+        if (fields[x][0] == '\0')
+          return eFAILURE;
+        csendf(ch, "%s\n\r", fields[x]);
       }
-      if(is_abbrev(arg1, fields[x]))
+    }
+    if (is_abbrev(arg1, fields[x]))
+      break;
+  }
+
+  switch (x)
+  {
+
+    /* redit name */
+  case 0:
+  {
+    if (remainder_args.empty())
+    {
+      send_to_char("$3Syntax$R: redit name <Room Name>\n\r", ch);
+      return eFAILURE;
+    }
+    dc_free(world[ch->in_room].name);
+    world[ch->in_room].name = str_dup(remainder_args.c_str());
+    send_to_char("Ok.\n\r", ch);
+  }
+  break;
+
+    /* redit description */
+  case 1:
+  {
+    if (!remainder_args.empty())
+    {
+      string description = remainder_args + "\n\r";
+      dc_free(world[ch->in_room].description);
+      world[ch->in_room].description = str_dup(description.c_str());
+      send_to_char("Ok.\n\r", ch);
+      return eFAILURE;
+    }
+    send_to_char("        Write your room's description.  (/s saves /h for help)\r\n", ch);
+    ch->desc->connected = CON_EDITING;
+    ch->desc->strnew = &(world[ch->in_room].description);
+    ch->desc->max_str = MAX_MESSAGE_LENGTH;
+  }
+  break;
+
+    // redit exit
+  case 2:
+  {
+    if (remainder_args.empty())
+    {
+      send_to_char("$3Syntax$R: redit exit <direction> <destination> "
+                   "[flags keynumber keywords]\n\r",
+                   ch);
+      send_to_char("NOTE: [flags keynumber keywords] are "
+                   "optional for door creation.\n\r",
+                   ch);
+      send_to_char("$3Examples$R:\n\r", ch);
+      send_to_char("redit exit north 1200   Puts an exit going north "
+                   "to room 1200 (no door.)\n\r",
+                   ch);
+      send_to_char("redit exit north 1200 1 -1 door wooden    Same "
+                   "exit except it has a door with no key.\n\r",
+                   ch);
+      send_to_char("redit exit north 1200 9 345 grate rusty    Same "
+                   "exit except it has a hidden grate with key 345.\n\r\n\r",
+                   ch);
+      send_to_char("Flags at your disposal:\n\r"
+                   "IS_DOOR    1\n\r"
+                   "CLOSED     2\n\r"
+                   "LOCKED     4\n\r"
+                   "HIDDEN     8\n\r"
+                   "IMM_ONLY  16\n\r"
+                   "PICKPROOF 32\n\r",
+                   ch);
+      return eFAILURE;
+    }
+
+    string arg2;
+    tie(arg2, remainder_args) = half_chop(remainder_args);
+    for (x = 0; x <= 6; x++)
+    {
+      if (x == 6)
+      {
+        send_to_char("No such direction.\n\r", ch);
+        return eFAILURE;
+      }
+      if (is_abbrev(arg2, dirs[x]))
+        break;
+    }
+    if (remainder_args.empty())
+    {
+      return eFAILURE;
+    }
+
+    string arg3;
+    tie(arg3, remainder_args) = half_chop(remainder_args);
+    d = stoi(arg3);
+    c = real_room(d);
+
+    if (!remainder_args.empty())
+    {
+      string arg4;
+      tie(arg4, remainder_args) = half_chop(remainder_args);
+      a = stoi(arg4);
+      if (remainder_args.empty())
+      {
+        return eFAILURE;
+      }
+
+      string arg5;
+      tie(arg5, remainder_args) = half_chop(remainder_args);
+      b = stoi(arg5);
+      if (b == 0)
+      {
+        send_to_char("No key 0's allowed.  Changing to -1.\r\n", ch);
+        b = -1;
+      }
+    }
+    else
+    {
+      a = 0;
+      b = -1;
+    }
+
+    if (c == (-1) && can_modify_room(ch, d))
+    {
+      if (create_one_room(ch, d))
+      {
+        c = real_room(d);
+        csendf(ch, "Creating room %d.\n\r", d);
+      }
+    }
+
+    if (c == (-1))
+    {
+      csendf(ch, "Error creating exit to room %d.\r\n", d);
+      return eFAILURE;
+    }
+
+    if (world[ch->in_room].dir_option[x])
+      send_to_char("Modifying exit.\n\r", ch);
+    else
+    {
+      send_to_char("Creating new exit.\n\r", ch);
+      CREATE(world[ch->in_room].dir_option[x], struct room_direction_data, 1);
+      world[ch->in_room].dir_option[x]->general_description = 0;
+      world[ch->in_room].dir_option[x]->keyword = 0;
+    }
+
+    world[ch->in_room].dir_option[x]->exit_info = a;
+    world[ch->in_room].dir_option[x]->key = b;
+    world[ch->in_room].dir_option[x]->to_room = c;
+    if (!remainder_args.empty())
+    {
+      if (world[ch->in_room].dir_option[x]->keyword)
+        dc_free(world[ch->in_room].dir_option[x]->keyword);
+      world[ch->in_room].dir_option[x]->keyword = str_dup(remainder_args.c_str());
+    }
+
+    send_to_char("Ok.\n\r", ch);
+
+    if (!IS_MOB(ch) && !IS_SET(ch->pcdata->toggles, PLR_ONEWAY))
+    {
+      send_to_char("Attempting to create a return exit from "
+                   "that room...\n\r",
+                   ch);
+      if (world[c].dir_option[reverse_number[x]])
+      {
+        send_to_char("COULD NOT CREATE EXIT...One already exists.\n\r", ch);
+      }
+      else
+      {
+        buf = fmt::format("{} redit exit {} {} {} {} {}", d,
+                          return_directions[x], world[ch->in_room].number,
+                          a, b, (remainder_args != "" ? remainder_args.c_str() : ""));
+        SET_BIT(ch->pcdata->toggles, PLR_ONEWAY);
+        char *tmp = strdup(buf.c_str());
+        do_at(ch, tmp, 9);
+        free(tmp);
+        REMOVE_BIT(ch->pcdata->toggles, PLR_ONEWAY);
+      }
+    }
+  }
+  break;
+
+    /* redit extra */
+  case 3:
+  {
+    if (remainder_args.empty())
+    {
+      send_to_char("$3Syntax$R: redit extra <keywords>\n\r"
+                   "Use it once to create the desc with a new keyword(s).\r\n"
+                   "Use it a second time with one of those keys to edit the description for it.\r\n",
+                   ch);
+      return eFAILURE;
+    }
+
+    string arg2;
+    tie(arg2, remainder_args) = half_chop(remainder_args);
+
+    for (extra = world[ch->in_room].ex_description;; extra = extra->next)
+    {
+      if (!extra)
+      { // make a new one
+        send_to_char("Creating new extra description.\n\r", ch);
+        CREATE(extra, struct extra_descr_data, 1);
+        if (!(world[ch->in_room].ex_description))
+          world[ch->in_room].ex_description = extra;
+        else
+          for (ext = world[ch->in_room].ex_description;; ext = ext->next)
+          {
+            if (ext->next == NULL)
+            {
+              ext->next = extra;
+              break;
+            }
+          }
+        extra->next = NULL;
+        break;
+      }
+      /* modifying old extra description */
+      else if (isname(buf, extra->keyword))
+      {
+        send_to_char("Modifying extra description.\n\r", ch);
+        break;
+      }
+    }
+
+    FREE(extra->keyword);
+    extra->keyword = str_dup(arg2.c_str());
+    send_to_char("        Write your extra description.  (/s saves /h for help)\r\n", ch);
+
+    //        send_to_char("Enter your extra description below. Terminate with
+    //"
+    //                   "'~' on a new line.\n\r\n\r", ch);
+    //        FREE(extra->description);
+    //      extra->description = 0;
+    ch->desc->strnew = &extra->description;
+    ch->desc->max_str = MAX_MESSAGE_LENGTH;
+    ch->desc->connected = CON_EDITING;
+  }
+  break;
+
+    /* redit exdesc */
+  case 4:
+  {
+    if (remainder_args.empty())
+    {
+      send_to_char("$3Syntax$R: redit exdesc <direction>\n\r", ch);
+      return eFAILURE;
+    }
+
+    string arg3;
+    tie(arg3, remainder_args) = half_chop(remainder_args);
+    for (x = 0; x <= 6; x++)
+    {
+      if (x == 6)
+      {
+        send_to_char("No such direction.\n\r", ch);
+        return eFAILURE;
+      }
+      if (is_abbrev(arg3, dirs[x]))
         break;
     }
 
-    switch(x) {
+    if (!(world[ch->in_room].dir_option[x]))
+    {
+      send_to_char("That exit does not exist...create it first.\n\r", ch);
+      return eFAILURE;
+    }
 
-     /* redit name */
-      case 0 : {
-        if(remainder_args.empty()) {
-          send_to_char("$3Syntax$R: redit name <Room Name>\n\r", ch);
-          return eFAILURE;
-        }
-        dc_free(world[ch->in_room].name);
-        world[ch->in_room].name = str_dup(remainder_args.c_str());
-        send_to_char("Ok.\n\r", ch);
-      } break;
-
-     /* redit description */
-      case 1 : {
-        if(!remainder_args.empty()) {
-          string description = remainder_args + "\n\r";
-          dc_free(world[ch->in_room].description);
-          world[ch->in_room].description = str_dup(description.c_str());
-          send_to_char("Ok.\n\r", ch);
-          return eFAILURE;
-        }
-	      send_to_char("        Write your room's description.  (/s saves /h for help)\r\n",ch);
-        ch->desc->connected = CON_EDITING;
-        ch->desc->strnew = &(world[ch->in_room].description);
-        ch->desc->max_str = MAX_MESSAGE_LENGTH;
-      } break;
-
-     // redit exit
-      case 2 : {
-        if(remainder_args.empty()) {
-          send_to_char("$3Syntax$R: redit exit <direction> <destination> "
-                       "[flags keynumber keywords]\n\r", ch);
-          send_to_char("NOTE: [flags keynumber keywords] are "
-                       "optional for door creation.\n\r", ch);
-          send_to_char("$3Examples$R:\n\r", ch);
-          send_to_char("redit exit north 1200   Puts an exit going north "
-                       "to room 1200 (no door.)\n\r", ch);
-          send_to_char("redit exit north 1200 1 -1 door wooden    Same "
-                       "exit except it has a door with no key.\n\r", ch);
-          send_to_char("redit exit north 1200 9 345 grate rusty    Same "
-                       "exit except it has a hidden grate with key 345.\n\r\n\r", ch);
-          send_to_char("Flags at your disposal:\n\r"
-                       "IS_DOOR    1\n\r"
-                       "CLOSED     2\n\r"
-                       "LOCKED     4\n\r"
-                       "HIDDEN     8\n\r"
-                       "IMM_ONLY  16\n\r"
-                       "PICKPROOF 32\n\r", ch);
-          return eFAILURE;
-        }
-
-        string arg2;
-        tie (arg2, remainder_args) = half_chop(remainder_args);
-        for(x = 0; x <=6; x++) {
-          if(x == 6) {
-            send_to_char("No such direction.\n\r", ch);
-            return eFAILURE;
-          }
-          if(is_abbrev(arg2, dirs[x]))
-            break;
-        }
-        if(remainder_args.empty())
-        {
-          return eFAILURE;
-        }
-
-        string arg3;
-        tie (arg3, remainder_args) = half_chop(remainder_args);
-        d = stoi(arg3);
-        c = real_room(d); 
-
-        if(!remainder_args.empty()) {
-          string arg4;
-          tie (arg4, remainder_args) = half_chop(remainder_args);
-          a = stoi(arg4);
-          if(remainder_args.empty())
-          {
-            return eFAILURE;
-          }
-
-          string arg5;
-          tie (arg5, remainder_args) = half_chop(remainder_args);
-          b = stoi(arg5);
-          if(b == 0)
-          {
-            send_to_char("No key 0's allowed.  Changing to -1.\r\n", ch);
-            b = -1;
-          }
-        } else {
-           a = 0;
-           b = -1;
-         }
-
-        if(c == (-1) && can_modify_room(ch, d)) {
-          if(create_one_room(ch, d)) {
-            c = real_room(d);
-            csendf(ch, "Creating room %d.\n\r", d); 
-          }
-        } 
-        
-        if (c == (-1)) {
-          csendf(ch, "Error creating exit to room %d.\r\n", d);
-          return eFAILURE;
-        }
-
-        if(world[ch->in_room].dir_option[x])
-          send_to_char("Modifying exit.\n\r", ch);
-        else {
-          send_to_char("Creating new exit.\n\r", ch);
-          CREATE(world[ch->in_room].dir_option[x], struct room_direction_data, 1);
-          world[ch->in_room].dir_option[x]->general_description = 0;
-          world[ch->in_room].dir_option[x]->keyword = 0;
-        }
-
-        world[ch->in_room].dir_option[x]->exit_info = a;
-        world[ch->in_room].dir_option[x]->key = b;
-        world[ch->in_room].dir_option[x]->to_room = c;
-        if(!remainder_args.empty()) {
-          if(world[ch->in_room].dir_option[x]->keyword)
-            dc_free(world[ch->in_room].dir_option[x]->keyword);
-          world[ch->in_room].dir_option[x]->keyword = str_dup(remainder_args.c_str());
-        }
-
-        send_to_char("Ok.\n\r", ch);
-
-        if(!IS_MOB(ch) && !IS_SET(ch->pcdata->toggles, PLR_ONEWAY)) {
-          send_to_char("Attempting to create a return exit from "
-                       "that room...\n\r", ch);
-          if(world[c].dir_option[reverse_number[x]]) {
-            send_to_char("COULD NOT CREATE EXIT...One already exists.\n\r", ch);
-          }
-          else {
-            buf = fmt::format("{} redit exit {} {} {} {} {}", d,
-                  return_directions[x], world[ch->in_room].number,
-                  a, b, (remainder_args != "" ? remainder_args.c_str() : ""));
-            SET_BIT(ch->pcdata->toggles, PLR_ONEWAY);
-            char *tmp = strdup(buf.c_str());
-            do_at(ch, tmp, 9);
-            free(tmp);
-            REMOVE_BIT(ch->pcdata->toggles, PLR_ONEWAY);
-          }
-        }
-      } break;
-
-     /* redit extra */
-      case 3 : {
-        if(remainder_args.empty()) {
-          send_to_char("$3Syntax$R: redit extra <keywords>\n\r"
-                       "Use it once to create the desc with a new keyword(s).\r\n"
-                       "Use it a second time with one of those keys to edit the description for it.\r\n"
-                       , ch);
-          return eFAILURE;
-        }
-
-        string arg2;
-        tie (arg2, remainder_args) = half_chop(remainder_args);
-
-        for(extra = world[ch->in_room].ex_description ;; extra = extra->next) 
-        {
-          if(!extra) 
-          { // make a new one
-            send_to_char("Creating new extra description.\n\r", ch);
-            CREATE(extra, struct extra_descr_data, 1);
-            if(!(world[ch->in_room].ex_description))
-              world[ch->in_room].ex_description = extra;
-            else
-              for(ext = world[ch->in_room].ex_description ;; ext = ext->next) {
-                if(ext->next == NULL) {
-                  ext->next = extra;
-                  break;
-                }
-              }
-            extra->next = NULL;
-            break;
-          }
-          /* modifying old extra description */
-          else if(isname(buf, extra->keyword)) {
-            send_to_char("Modifying extra description.\n\r", ch);
-            break;
-          }
-        }
-
-        FREE(extra->keyword);
-        extra->keyword = str_dup(arg2.c_str());
-        send_to_char("        Write your extra description.  (/s saves /h for help)\r\n",ch);
-
-//        send_to_char("Enter your extra description below. Terminate with 
-//"
-  //                   "'~' on a new line.\n\r\n\r", ch);
-//        FREE(extra->description);
-  //      extra->description = 0;
-        ch->desc->strnew = &extra->description;
-        ch->desc->max_str = MAX_MESSAGE_LENGTH;
-        ch->desc->connected = CON_EDITING;
-      } break;
-
-     /* redit exdesc */
-      case 4 : {
-        if(remainder_args.empty()) {
-          send_to_char("$3Syntax$R: redit exdesc <direction>\n\r", ch);
-          return eFAILURE;
-        }
-
-        string arg3;
-        tie (arg3, remainder_args) = half_chop(remainder_args);
-        for(x = 0; x <=6; x++) {
-          if(x == 6) {
-            send_to_char("No such direction.\n\r", ch);
-            return eFAILURE;
-          }
-          if(is_abbrev(arg3, dirs[x]))
-            break;
-        }
-
-        if(!(world[ch->in_room].dir_option[x])) {
-          send_to_char("That exit does not exist...create it first.\n\r", ch);
-          return eFAILURE;
-        }
-
-        send_to_char("Enter the exit's description below. Terminate with "
-                     "'~' on a new line.\n\r\n\r", ch);
-/*        if(world[ch->in_room].dir_option[x]->general_description) {
+    send_to_char("Enter the exit's description below. Terminate with "
+                 "'~' on a new line.\n\r\n\r",
+                 ch);
+    /*        if(world[ch->in_room].dir_option[x]->general_description) {
           dc_free(world[ch->in_room].dir_option[x]->general_description);
           world[ch->in_room].dir_option[x]->general_description = 0;
         }
-   */     ch->desc->strnew = &world[ch->in_room].dir_option[x]->general_description;
-        ch->desc->max_str = MAX_MESSAGE_LENGTH;
-        ch->desc->connected = CON_EDITING;
-      } break;
+   */
+    ch->desc->strnew = &world[ch->in_room].dir_option[x]->general_description;
+    ch->desc->max_str = MAX_MESSAGE_LENGTH;
+    ch->desc->connected = CON_EDITING;
+  }
+  break;
 
-      // rflag
-      case 5 : {
-        a = FALSE;
-        if(remainder_args.empty()) {
-          send_to_char("$3Syntax$R: redit rflag <flags>\n\r", ch);
-          send_to_char("$3Available room flags$R:\n\r", ch);
-          for(x = 0 ;; x++) {
-            if(!strcmp(room_bits[x], "\n"))
-              break;
-	    if (!strcmp(room_bits[x], "unused"))
-		continue;
-            if((x+1)%4 == 0) {
-              csendf(ch, "%-18s\n\r", room_bits[x]);
-            } else {
-              csendf(ch, "%-18s", room_bits[x]);
-            }
-          }
-          send_to_char("\r\n\r\n", ch);
-          return eFAILURE;
+  // rflag
+  case 5:
+  {
+    a = FALSE;
+    if (remainder_args.empty())
+    {
+      send_to_char("$3Syntax$R: redit rflag <flags>\n\r", ch);
+      send_to_char("$3Available room flags$R:\n\r", ch);
+      for (x = 0;; x++)
+      {
+        if (!strcmp(room_bits[x], "\n"))
+          break;
+        if (!strcmp(room_bits[x], "unused"))
+          continue;
+        if ((x + 1) % 4 == 0)
+        {
+          csendf(ch, "%-18s\n\r", room_bits[x]);
         }
-        parse_bitstrings_into_int(room_bits, remainder_args.c_str(), ch, (world[ch->in_room].room_flags));
-      } break;
-
-      // sector
-      case 6: {
-        if(remainder_args.empty()) {
-          send_to_char("$3Syntax$R: redit sector <sector>\r\n", ch);
-          send_to_char("$3Available sector types$R:\n\r", ch);
-          for(x = 0 ;; x++) {
-            if(!strcmp(sector_types[x], "\n"))
-              break;
-            if((x+1)%4 == 0) {
-              csendf(ch, "%-18s\n\r", sector_types[x]);
-            } else {
-              csendf(ch, "%-18s", sector_types[x]); 
-            }
-          }
-          send_to_char("\r\n\r\n", ch);
-          return eFAILURE;
+        else
+        {
+          csendf(ch, "%-18s", room_bits[x]);
         }
-        for(x = 0 ;; x++) {
-          if(!strcmp(sector_types[x], "\n")) {
-            send_to_char("No such sector type.\n\r", ch);
-            return eFAILURE;
-          }
-          else if(is_abbrev(remainder_args, sector_types[x])) {
-            world[ch->in_room].sector_type = x;
-            csendf(ch, "Sector type set to %s.\n\r", sector_types[x]);
-            break;
-          }
-        }
-      } break;
-       case 7: // denymob
-	if (remainder_args.empty() || !is_number(remainder_args.c_str()))
-	{
-	  send_to_char("Syntax: redit denymob <vnum>\r\nDoing this on an already denied mob will allow it once more.\r\n",ch);
-	  return eFAILURE;
-	}
-	bool done = FALSE;
-	int mob = stoi(remainder_args);
-	struct deny_data *nd,*pd = NULL;
-	for (nd = world[ch->in_room].denied;nd;nd = nd->next)
-	{
-	  if (nd->vnum == mob){
-		if (pd) pd->next = nd->next;
-		else world[ch->in_room].denied = nd->next;
-		dc_free(nd);
-		csendf(ch, "Mobile %d ALLOWED entrance.\r\n", mob);
-		done = TRUE;
-		break;
-	  }
-	  pd = nd;
-	}
-	if (done) break;
-	#ifdef LEAK_CHECK
-		nd = (struct deny_data *)calloc(1, sizeof(struct deny_data));
-	#else
-		nd = (struct deny_data *)dc_alloc(1, sizeof(struct deny_data));
-	#endif
-	nd->next = world[ch->in_room].denied;
-	nd->vnum = stoi(remainder_args);
-	world[ch->in_room].denied = nd;
-	csendf(ch, "Mobile %d DENIED entrance.\r\n",mob);
-	break;
+      }
+      send_to_char("\r\n\r\n", ch);
+      return eFAILURE;
     }
-    set_zone_modified_world(ch->in_room);
-    return eSUCCESS;
+    parse_bitstrings_into_int(room_bits, remainder_args.c_str(), ch, (world[ch->in_room].room_flags));
+  }
+  break;
+
+  // sector
+  case 6:
+  {
+    if (remainder_args.empty())
+    {
+      send_to_char("$3Syntax$R: redit sector <sector>\r\n", ch);
+      send_to_char("$3Available sector types$R:\n\r", ch);
+      for (x = 0;; x++)
+      {
+        if (!strcmp(sector_types[x], "\n"))
+          break;
+        if ((x + 1) % 4 == 0)
+        {
+          csendf(ch, "%-18s\n\r", sector_types[x]);
+        }
+        else
+        {
+          csendf(ch, "%-18s", sector_types[x]);
+        }
+      }
+      send_to_char("\r\n\r\n", ch);
+      return eFAILURE;
+    }
+    for (x = 0;; x++)
+    {
+      if (!strcmp(sector_types[x], "\n"))
+      {
+        send_to_char("No such sector type.\n\r", ch);
+        return eFAILURE;
+      }
+      else if (is_abbrev(remainder_args, sector_types[x]))
+      {
+        world[ch->in_room].sector_type = x;
+        csendf(ch, "Sector type set to %s.\n\r", sector_types[x]);
+        break;
+      }
+    }
+  }
+  break;
+  case 7: // denymob
+    if (remainder_args.empty() || !is_number(remainder_args.c_str()))
+    {
+      send_to_char("Syntax: redit denymob <vnum>\r\nDoing this on an already denied mob will allow it once more.\r\n", ch);
+      return eFAILURE;
+    }
+    bool done = FALSE;
+    int mob = stoi(remainder_args);
+    struct deny_data *nd, *pd = NULL;
+    for (nd = world[ch->in_room].denied; nd; nd = nd->next)
+    {
+      if (nd->vnum == mob)
+      {
+        if (pd)
+          pd->next = nd->next;
+        else
+          world[ch->in_room].denied = nd->next;
+        dc_free(nd);
+        csendf(ch, "Mobile %d ALLOWED entrance.\r\n", mob);
+        done = TRUE;
+        break;
+      }
+      pd = nd;
+    }
+    if (done)
+      break;
+#ifdef LEAK_CHECK
+    nd = (struct deny_data *)calloc(1, sizeof(struct deny_data));
+#else
+    nd = (struct deny_data *)dc_alloc(1, sizeof(struct deny_data));
+#endif
+    nd->next = world[ch->in_room].denied;
+    nd->vnum = stoi(remainder_args);
+    world[ch->in_room].denied = nd;
+    csendf(ch, "Mobile %d DENIED entrance.\r\n", mob);
+    break;
+  }
+  set_zone_modified_world(ch->in_room);
+  return eSUCCESS;
 }
 
 int do_rdelete(struct char_data *ch, char *arg, int cmd)
