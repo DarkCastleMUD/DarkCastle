@@ -1070,6 +1070,12 @@ void echo_on(struct descriptor_data *d)
   SEND_TO_Q(on_string, d);
 }
 
+void telnet_ga(descriptor_data *d)
+{
+  char go_ahead[] = {(char)IAC, (char)GA, (char)0};
+  SEND_TO_Q(go_ahead, d);
+}
+
 int do_lastprompt(CHAR_DATA *ch, char *arg, int cmd) 
 {
   if (GET_LAST_PROMPT(ch))
@@ -1313,6 +1319,8 @@ void make_prompt(struct descriptor_data *d, char *prompt)
                 rm->zone, rm->number, d->character->pcdata->wizinvis);
         strcat(prompt, buf);
     }
+    char go_ahead[] = {(char)IAC, (char)GA, (char)0};
+    strcat(prompt, go_ahead);
 }
 
 CHAR_DATA* get_charmie(CHAR_DATA *ch)
@@ -1871,9 +1879,6 @@ int process_output(struct descriptor_data *t)
     SEND_TO_Q(t->output, t->snoop_by);
     SEND_TO_Q("%%", t->snoop_by);
   }
-
-  char telnet_ga[3] = {(char)255, (char)249, (char)0};
-  write_to_descriptor(t->descriptor, telnet_ga);
   
   /*
    * if we were using a large buffer, put the large buffer on the buffer pool
