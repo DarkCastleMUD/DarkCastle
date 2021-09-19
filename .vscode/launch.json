@@ -10,7 +10,7 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/src/dcastle",
-            "args": ["-d", "${workspaceFolder}/../../dcastle/lib", "-P"], 
+            "args": ["-d", "${workspaceFolder}/../../dcastle.6969/lib", "-P", "-p 6969"], 
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],
