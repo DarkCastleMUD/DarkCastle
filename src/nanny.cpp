@@ -688,45 +688,57 @@ void do_on_login_stuff(char_data * ch)
   }
 }
 
-void roll_and_display_stats(CHAR_DATA * ch)
+void roll_and_display_stats(CHAR_DATA *ch)
 {
-  int x, a, b;
-  char buf[MAX_STRING_LENGTH];
+   int x, a, b;
+   char buf[MAX_STRING_LENGTH];
 
-         for(x = 0; x <= 4; x++) {
-            a=dice(3, 6); b=dice(6, 3); ch->desc->stats->str[x] = MAX(12+number(0,1), MAX(a, b));
-            a=dice(3, 6); b=dice(6, 3); ch->desc->stats->dex[x] = MAX(12+number(0,1), MAX(a, b));
-            a=dice(3, 6); b=dice(6, 3); ch->desc->stats->con[x] = MAX(12+number(0,1), MAX(a, b));
-            a=dice(3, 6); b=dice(6, 3); ch->desc->stats->tel[x] = MAX(12+number(0,1), MAX(a, b));
-            a=dice(3, 6); b=dice(6, 3); ch->desc->stats->wis[x] = MAX(12+number(0,1), MAX(a, b));
-         }
+   for (x = 0; x <= 4; x++)
+   {
+      a = dice(3, 6);
+      b = dice(6, 3);
+      ch->desc->stats->str[x] = MAX(12 + number(0, 1), MAX(a, b));
+      a = dice(3, 6);
+      b = dice(6, 3);
+      ch->desc->stats->dex[x] = MAX(12 + number(0, 1), MAX(a, b));
+      a = dice(3, 6);
+      b = dice(6, 3);
+      ch->desc->stats->con[x] = MAX(12 + number(0, 1), MAX(a, b));
+      a = dice(3, 6);
+      b = dice(6, 3);
+      ch->desc->stats->tel[x] = MAX(12 + number(0, 1), MAX(a, b));
+      a = dice(3, 6);
+      b = dice(6, 3);
+      ch->desc->stats->wis[x] = MAX(12 + number(0, 1), MAX(a, b));
+   }
 
-         SEND_TO_Q("\n\r  Choose from any of the following groups of abilities...     \n\r", ch->desc);
-         
-         SEND_TO_Q( "Group: 1     2     3     4     5\n\r",ch->desc); 
-         sprintf(buf,"Str:   %-2d    %-2d    %-2d    %-2d    %-2d\n\r",
-            ch->desc->stats->str[0], ch->desc->stats->str[1], ch->desc->stats->str[2],
-            ch->desc->stats->str[3], ch->desc->stats->str[4]);
-         SEND_TO_Q(buf, ch->desc);
-         sprintf(buf,"Dex:   %-2d    %-2d    %-2d    %-2d    %-2d\n\r",
-            ch->desc->stats->dex[0], ch->desc->stats->dex[1], ch->desc->stats->dex[2],
-            ch->desc->stats->dex[3], ch->desc->stats->dex[4]);
-         SEND_TO_Q(buf, ch->desc);
-         sprintf(buf,"Con:   %-2d    %-2d    %-2d    %-2d    %-2d\n\r",
-            ch->desc->stats->con[0], ch->desc->stats->con[1], ch->desc->stats->con[2],
-            ch->desc->stats->con[3], ch->desc->stats->con[4]);
-         SEND_TO_Q(buf, ch->desc);
-         sprintf(buf,"Int:   %-2d    %-2d    %-2d    %-2d    %-2d\n\r",
-            ch->desc->stats->tel[0], ch->desc->stats->tel[1], ch->desc->stats->tel[2],
-            ch->desc->stats->tel[3], ch->desc->stats->tel[4]);
-         SEND_TO_Q(buf, ch->desc);
-         sprintf(buf,"Wis:   %-2d    %-2d    %-2d    %-2d    %-2d\n\r",
-            ch->desc->stats->wis[0], ch->desc->stats->wis[1], ch->desc->stats->wis[2],
-            ch->desc->stats->wis[3], ch->desc->stats->wis[4]);
-         SEND_TO_Q(buf, ch->desc);
-         SEND_TO_Q("Choose a group <1-5>, or press return to reroll(Help <attribute> for more information) --> ", ch->desc);
+   SEND_TO_Q("\n\r  Choose from any of the following groups of abilities...     \n\r", ch->desc);
 
-	WAIT_STATE(ch, PULSE_TIMER/4);
+   SEND_TO_Q("Group: 1     2     3     4     5\n\r", ch->desc);
+   sprintf(buf, "Str:   %-2d    %-2d    %-2d    %-2d    %-2d\n\r",
+           ch->desc->stats->str[0], ch->desc->stats->str[1], ch->desc->stats->str[2],
+           ch->desc->stats->str[3], ch->desc->stats->str[4]);
+   SEND_TO_Q(buf, ch->desc);
+   sprintf(buf, "Dex:   %-2d    %-2d    %-2d    %-2d    %-2d\n\r",
+           ch->desc->stats->dex[0], ch->desc->stats->dex[1], ch->desc->stats->dex[2],
+           ch->desc->stats->dex[3], ch->desc->stats->dex[4]);
+   SEND_TO_Q(buf, ch->desc);
+   sprintf(buf, "Con:   %-2d    %-2d    %-2d    %-2d    %-2d\n\r",
+           ch->desc->stats->con[0], ch->desc->stats->con[1], ch->desc->stats->con[2],
+           ch->desc->stats->con[3], ch->desc->stats->con[4]);
+   SEND_TO_Q(buf, ch->desc);
+   sprintf(buf, "Int:   %-2d    %-2d    %-2d    %-2d    %-2d\n\r",
+           ch->desc->stats->tel[0], ch->desc->stats->tel[1], ch->desc->stats->tel[2],
+           ch->desc->stats->tel[3], ch->desc->stats->tel[4]);
+   SEND_TO_Q(buf, ch->desc);
+   sprintf(buf, "Wis:   %-2d    %-2d    %-2d    %-2d    %-2d\n\r",
+           ch->desc->stats->wis[0], ch->desc->stats->wis[1], ch->desc->stats->wis[2],
+           ch->desc->stats->wis[3], ch->desc->stats->wis[4]);
+   SEND_TO_Q(buf, ch->desc);
+   SEND_TO_Q("Choose a group <1-5>, or press return to reroll(Help <attribute> for more information) --> ", ch->desc);
+   telnet_ga(ch->desc);
+
+   WAIT_STATE(ch, PULSE_TIMER / 10);
 }
 
 int more_than_ten_people_from_this_ip(struct descriptor_data *new_conn)
@@ -873,6 +885,7 @@ void nanny(struct descriptor_data *d, char *arg)
 	 SEND_TO_Q("The game is currently WIZLOCKED. Only immortals can connect at this time.\r\n",d);
 	}
       SEND_TO_Q("What name for the roster? ", d);
+      telnet_ga(d);      
       STATE(d) = CON_GET_NAME;
 
       // if they have already entered their name, drop through.  Otherwise stop and wait for input
@@ -895,6 +908,7 @@ void nanny(struct descriptor_data *d, char *arg)
       
       if ( _parse_name(arg, tmp_name)) { 
          SEND_TO_Q( "Illegal name, try another.\n\rName: ", d );
+         telnet_ga(d);
          return;
       }
       
@@ -944,6 +958,7 @@ void nanny(struct descriptor_data *d, char *arg)
       if ( fOld ) {
          /* Old player */
          SEND_TO_Q( "Password: ", d );
+         telnet_ga(d);
          STATE(d) = CON_GET_OLD_PASSWORD;
          return;
       }
@@ -956,6 +971,7 @@ void nanny(struct descriptor_data *d, char *arg)
          /* New player */
          sprintf( buf, "Did I get that right, %s (Y/N)? ", tmp_name );
          SEND_TO_Q( buf, d );
+         telnet_ga(d);
          STATE(d) = CON_CONFIRM_NEW_NAME;
          return;
       }
@@ -1035,6 +1051,7 @@ void nanny(struct descriptor_data *d, char *arg)
                        "\n\rLast connected from:\n\r%s\n\r", 
                          ch->pcdata->last_site); 
       SEND_TO_Q(log_buf, d);
+      telnet_ga(d);
       
       if(d->character->pcdata->bad_pw_tries)
       {
@@ -1062,6 +1079,7 @@ void nanny(struct descriptor_data *d, char *arg)
          }
          sprintf( buf, "New character.\n\rGive me a password for %s: ", GET_NAME(ch) );
          SEND_TO_Q( buf, d );
+         telnet_ga(d);
          STATE(d) = CON_GET_NEW_PASSWORD;
          // at this point, pcdata hasn't yet been created.  So we're going to go ahead and
          // allocate it since a new character is obviously a PC
@@ -1074,6 +1092,7 @@ void nanny(struct descriptor_data *d, char *arg)
          
       case 'n': case 'N':
          SEND_TO_Q( "Ok, what IS it, then? ", d );
+         telnet_ga(d);
          // TODO - double check this to make sure we're free'ing properly
          dc_free( GET_NAME(ch) );
          GET_NAME(ch) = NULL;
@@ -1084,6 +1103,7 @@ void nanny(struct descriptor_data *d, char *arg)
          
       default:
          SEND_TO_Q( "Please type Yes or No? ", d );
+         telnet_ga(d);
          break;
       }
       break;
@@ -1093,12 +1113,14 @@ void nanny(struct descriptor_data *d, char *arg)
       
       if(arg == 0 || strlen(arg) < 6) {
          SEND_TO_Q("Password must be at least six characters long.\n\rPassword: ", d );
+         telnet_ga(d);
          return;
       }
       
       strncpy( ch->pcdata->pwd, (char *)crypt((char *)arg, (char *)ch->name), PASSWORD_LEN );
       ch->pcdata->pwd[PASSWORD_LEN] = '\0';
       SEND_TO_Q( "Please retype password: ", d );
+      telnet_ga(d);
       STATE(d) = CON_CONFIRM_NEW_PASSWORD;
       break;
       
@@ -1107,11 +1129,13 @@ void nanny(struct descriptor_data *d, char *arg)
       
       if(strncmp( (char *)crypt((char *)arg, (char *)ch->pcdata->pwd ), ch->pcdata->pwd, PASSWORD_LEN )) {
          SEND_TO_Q("Passwords don't match.\n\rRetype password: ", d );
+         telnet_ga(d);
          STATE(d) = CON_GET_NEW_PASSWORD;
          return;
       }
       
       SEND_TO_Q( "What is your sex (M/F)? ", d );
+      telnet_ga(d);
       STATE(d) = CON_GET_NEW_SEX;
       break;
 
@@ -1126,6 +1150,7 @@ void nanny(struct descriptor_data *d, char *arg)
          break;
       default:
          SEND_TO_Q( "That's not a sex.\n\rWhat IS your sex? ", d );
+         telnet_ga(d);
          return;
       }
 
@@ -1164,6 +1189,7 @@ is_race_eligible(ch,1)?'*':' ',is_race_eligible(ch,2)?'*':' ',is_race_eligible(c
 is_race_eligible(ch,7)?'*':' ',is_race_eligible(ch,8)?'*':' ',is_race_eligible(ch,9)?'*':' ');
 
             SEND_TO_Q(buf, d);
+            telnet_ga(d);
             STATE(d) = CON_GET_RACE;
             break;
          }
@@ -1175,6 +1201,7 @@ is_race_eligible(ch,7)?'*':' ',is_race_eligible(ch,8)?'*':' ',is_race_eligible(c
          {
          default:
             SEND_TO_Q( "That's not a race.\n\rWhat IS your race? ", d );
+            telnet_ga(d);
             return;
             
          case '1':
@@ -1330,6 +1357,7 @@ is_race_eligible(ch,7)?'*':' ',is_race_eligible(ch,8)?'*':' ',is_race_eligible(c
             (is_clss_eligible(ch, CLASS_DRUID) ? '*' : ' ') 
             );
          SEND_TO_Q(buf, d);
+         telnet_ga(d);
          STATE(d) = CON_GET_NEW_CLASS;
          break;
          
@@ -1338,6 +1366,7 @@ is_race_eligible(ch,7)?'*':' ',is_race_eligible(ch,8)?'*':' ',is_race_eligible(c
        {
        default:
           SEND_TO_Q( "That's not a class.\n\rWhat IS your class? ", d );
+          telnet_ga(d);
           return;
 
        case 1:
@@ -1408,12 +1437,14 @@ is_race_eligible(ch,7)?'*':' ',is_race_eligible(ch,8)?'*':' ',is_race_eligible(c
        SEND_TO_Q( "\n\r", d );
        SEND_TO_Q( motd, d );
        SEND_TO_Q("\n\rIf you have read this motd, press Return.", d);
+       telnet_ga(d);
 
        STATE(d) = CON_READ_MOTD;
        break;
        
     case CON_READ_MOTD:
        SEND_TO_Q( menu, d );
+       telnet_ga(d);
        STATE(d) = CON_SELECT_MENU;
        break;
 
@@ -1454,7 +1485,7 @@ is_race_eligible(ch,7)?'*':' ',is_race_eligible(ch,8)?'*':' ',is_race_eligible(c
              sprintf(log_buf, "%s has more than a billion gold in the bank. Rich fucker or bugged.", GET_NAME(ch));
              log(log_buf, 100, LOG_WARNINGS);
           }
-          send_to_char("\n\rWelcome to Dark Castle.  May your visit here suck.\n\r", ch);
+          send_to_char("\n\rWelcome to Dark Castle.\r\n", ch);
           character_list.insert(ch);
 
           if (IS_AFFECTED(ch, AFF_ITEM_REMOVE))
@@ -1516,23 +1547,27 @@ is_race_eligible(ch,7)?'*':' ',is_race_eligible(ch,8)?'*':' ',is_race_eligible(c
       
        case '3':
           SEND_TO_Q( "Enter current password: ", d );
+          telnet_ga(d);
           STATE(d) = CON_CONFIRM_PASSWORD_CHANGE;
           break;
       
        case '4':
           // Archive the charater 
           SEND_TO_Q("This will archive your character until you ask to be unarchived.\n\rYou will need to speak to a god greater than level 107.\n\rType ARCHIVE ME if this is what you want:  ", d);
+          telnet_ga(d);
           STATE(d) = CON_ARCHIVE_CHAR;
           break;
       
        case '5':
           // delete this character 
           SEND_TO_Q("This will _permanently_ erase you.\n\rType ERASE ME if this is really what you want: ", d);
+          telnet_ga(d);
           STATE(d) = CON_DELETE_CHAR;
           break;
       
        default:
           SEND_TO_Q( menu, d );
+          telnet_ga(d);
           break;
        }
        break;
@@ -1553,7 +1588,7 @@ is_race_eligible(ch,7)?'*':' ',is_race_eligible(ch,8)?'*':' ',is_race_eligible(c
        
     case CON_DELETE_CHAR:
        if(!strcmp(arg, "ERASE ME")) {
-          sprintf(buf, "%s just deleted themself.  Their visit here must have sucked.", d->character->name);
+          sprintf(buf, "%s just deleted themself.", d->character->name);
           log(buf, IMMORTAL, LOG_MORTAL);
 
           AuctionHandleDelete(d->character->name);
@@ -1573,6 +1608,7 @@ is_race_eligible(ch,7)?'*':' ',is_race_eligible(ch,8)?'*':' ',is_race_eligible(c
        else {
           STATE(d) = CON_SELECT_MENU;
           SEND_TO_Q( menu, d );
+          telnet_ga(d);
        }
        break;
        
@@ -1580,6 +1616,7 @@ is_race_eligible(ch,7)?'*':' ',is_race_eligible(ch,8)?'*':' ',is_race_eligible(c
        SEND_TO_Q( "\n\r", d );
        if(!strncmp( (char *)crypt((char *)arg, (char *)ch->pcdata->pwd), ch->pcdata->pwd, PASSWORD_LEN)) {
           SEND_TO_Q( "Enter a new password: ", d );
+         telnet_ga(d);
           STATE(d) = CON_RESET_PASSWORD;
           break;
        } else {
@@ -1594,11 +1631,13 @@ is_race_eligible(ch,7)?'*':' ',is_race_eligible(ch,8)?'*':' ',is_race_eligible(c
        
        if(strlen(arg) < 6) {
           SEND_TO_Q("Password must be at least six characters long.\n\rPassword: ", d );
+          telnet_ga(d);
           return;
        }
        strncpy( ch->pcdata->pwd, (char *)crypt((char *)arg, (char *)ch->name ), PASSWORD_LEN );
        ch->pcdata->pwd[PASSWORD_LEN] = '\0';
        SEND_TO_Q( "Please retype password: ", d );
+       telnet_ga(d);
        STATE(d) = CON_CONFIRM_RESET_PASSWORD;
        break;
        
@@ -1607,6 +1646,7 @@ is_race_eligible(ch,7)?'*':' ',is_race_eligible(ch,8)?'*':' ',is_race_eligible(c
        
        if (strncmp( (char *)crypt((char *)arg, (char *)ch->pcdata->pwd ), ch->pcdata->pwd, PASSWORD_LEN )) {
           SEND_TO_Q( "Passwords don't match.\n\rRetype password: ", d );
+          telnet_ga(d);
           STATE(d) = CON_RESET_PASSWORD;
           return;
        }
