@@ -3883,12 +3883,12 @@ int do_redit(struct char_data *ch, char *argument, int cmd)
     for (extra = world[ch->in_room].ex_description;; extra = extra->next)
     {
       if (!extra)
-      { 
+      {
         // No matching extra description found so make a new one
         csendf(ch, "Creating new extra description for keyword '%s'.\r\n", arg2.c_str());
         CREATE(extra, struct extra_descr_data, 1);
         extra->next = nullptr;
-        
+
         if (!(world[ch->in_room].ex_description))
         {
           // The room has no pre-existing extra descriptions so this will be its first
@@ -3907,7 +3907,7 @@ int do_redit(struct char_data *ch, char *argument, int cmd)
             }
           }
         }
-        
+
         break;
       }
       else if (arg2 == string(extra->keyword))
@@ -3923,7 +3923,7 @@ int do_redit(struct char_data *ch, char *argument, int cmd)
     send_to_char("Write your extra description. (/s saves /h for help)\r\n", ch);
     ch->desc->strnew = &extra->description;
     ch->desc->max_str = MAX_MESSAGE_LENGTH;
-    ch->desc->connected = CON_EDITING;    
+    ch->desc->connected = CON_EDITING;
     if (ch->desc->strnew != nullptr && *ch->desc->strnew != nullptr && **ch->desc->strnew != '\0')
     {
       // There's already an existing extra description so let's show it
@@ -4092,55 +4092,69 @@ int do_rdelete(struct char_data *ch, char *arg, int cmd)
 
   half_chop(arg, buf, buf2);
 
-  if(!*buf) {
+  if (!*buf)
+  {
     send_to_char("$3Syntax$R:\n\rrdelete exit   <direction>\n\rrdelete "
-                 "exdesc <direction>\n\rrdelete extra  <keyword>\n\r", ch);
-    return eFAILURE; 
+                 "exdesc <direction>\n\rrdelete extra  <keyword>\n\r",
+                 ch);
+    return eFAILURE;
   }
 
-  if(!can_modify_room(ch, ch->in_room)) {
+  if (!can_modify_room(ch, ch->in_room))
+  {
     send_to_char("You cannot destroy things here, it is not your domain.\n\r", ch);
     return eFAILURE;
   }
 
-  if(is_abbrev(buf, "exit")) {
-    for(x = 0; x <= 6; x++) {
-      if(x == 6) {
+  if (is_abbrev(buf, "exit"))
+  {
+    for (x = 0; x <= 6; x++)
+    {
+      if (x == 6)
+      {
         send_to_char("No such direction.\n\r", ch);
         return eFAILURE;
       }
-      if(is_abbrev(buf2, dirs[x]))
+      if (is_abbrev(buf2, dirs[x]))
         break;
     }
 
-    if(!(world[ch->in_room].dir_option[x])) {
+    if (!(world[ch->in_room].dir_option[x]))
+    {
       send_to_char("There is nothing there to remove.\n\r", ch);
       return eFAILURE;
     }
     dc_free(world[ch->in_room].dir_option[x]);
-    world[ch->in_room].dir_option[x] = 0; 
+    world[ch->in_room].dir_option[x] = 0;
     csendf(ch, "You stretch forth your hands and remove "
-            "the %s exit.\n\r", dirs[x]);
+               "the %s exit.\n\r",
+           dirs[x]);
   }
 
-  else if(is_abbrev(buf, "extra")) {
-    for(i = world[ch->in_room].ex_description ;; i = i->next) {
-      if(i == NULL) {
+  else if (is_abbrev(buf, "extra"))
+  {
+    for (i = world[ch->in_room].ex_description;; i = i->next)
+    {
+      if (i == NULL)
+      {
         send_to_char("There is nothing there to remove.\n\r", ch);
         return eFAILURE;
       }
-      if(isname(buf2, i->keyword))
+      if (isname(buf2, i->keyword))
         break;
     }
 
-    if(world[ch->in_room].ex_description == i) {
+    if (world[ch->in_room].ex_description == i)
+    {
       world[ch->in_room].ex_description = i->next;
       dc_free(i);
       send_to_char("You remove the extra description.\n\r", ch);
     }
-    else {
-      for(extra = world[ch->in_room].ex_description ;; extra = extra->next)
-        if(extra->next == i) {
+    else
+    {
+      for (extra = world[ch->in_room].ex_description;; extra = extra->next)
+        if (extra->next == i)
+        {
           extra->next = i->next;
           dc_free(i);
           send_to_char("You remove the extra description.\n\r", ch);
@@ -4148,42 +4162,50 @@ int do_rdelete(struct char_data *ch, char *arg, int cmd)
         }
     }
   }
- 
-  else if(is_abbrev(buf, "exdesc")) {
-        if(!*buf2) {
-          send_to_char("Syntax:\n\rrdelete exdesc <direction>\n\r", ch);
-          return eFAILURE;
-        }
-        one_argument(buf2, buf);
-        for(x = 0; x <=6; x++) {
-          if(x == 6) {
-            send_to_char("No such direction.\n\r", ch);
-            return eFAILURE;
-          }
-          if(is_abbrev(buf, dirs[x]))
-            break;
-        }
 
-        if(!(world[ch->in_room].dir_option[x])) {
-          send_to_char("That exit does not exist...create it first.\n\r", ch);
-          return eFAILURE;
-        }
+  else if (is_abbrev(buf, "exdesc"))
+  {
+    if (!*buf2)
+    {
+      send_to_char("Syntax:\n\rrdelete exdesc <direction>\n\r", ch);
+      return eFAILURE;
+    }
+    one_argument(buf2, buf);
+    for (x = 0; x <= 6; x++)
+    {
+      if (x == 6)
+      {
+        send_to_char("No such direction.\n\r", ch);
+        return eFAILURE;
+      }
+      if (is_abbrev(buf, dirs[x]))
+        break;
+    }
 
-        if(!(world[ch->in_room].dir_option[x]->general_description)) {
-          send_to_char("There's no description there to delete.\n\r", ch);
-          return eFAILURE;
-        }
+    if (!(world[ch->in_room].dir_option[x]))
+    {
+      send_to_char("That exit does not exist...create it first.\n\r", ch);
+      return eFAILURE;
+    }
 
-        else {
-          dc_free(world[ch->in_room].dir_option[x]->general_description);
-          world[ch->in_room].dir_option[x]->general_description = 0;
-          send_to_char("Ok.\n\r", ch);
-        }
+    if (!(world[ch->in_room].dir_option[x]->general_description))
+    {
+      send_to_char("There's no description there to delete.\n\r", ch);
+      return eFAILURE;
+    }
+
+    else
+    {
+      dc_free(world[ch->in_room].dir_option[x]->general_description);
+      world[ch->in_room].dir_option[x]->general_description = 0;
+      send_to_char("Ok.\n\r", ch);
+    }
   }
 
   else
     send_to_char("Syntax:\n\rrdelete exit   <direction>\n\rrdelete "
-                 "exdesc <direction>\n\rrdelete extra  <keyword>\n\r", ch);
+                 "exdesc <direction>\n\rrdelete extra  <keyword>\n\r",
+                 ch);
 
   set_zone_modified_world(ch->in_room);
   return eSUCCESS;
