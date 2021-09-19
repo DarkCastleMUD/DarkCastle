@@ -14,3 +14,5 @@
 
 /* format modes for format_text */
 #define FORMAT_INDENT         (1 << 0)
+
+void parse_action(int command, char *string, struct descriptor_data *d);
