@@ -3821,14 +3821,23 @@ int do_redit(struct char_data *ch, char *argument, int cmd)
       csendf(ch, "$3Syntax$R: <> is required. [] is optional.\r\n"
                  "redit extra                   - show this syntax and current keywords.\r\n"
                  "redit extra <keywords ...>    - add or edit keywords.\r\n"
-                 "redit extra delete <keyword>  - delete extra descriptions linked to keyword.\r\n\r\n"
-                 "Extra description keywords:\r\n");
+                 "redit extra delete <keyword>  - delete extra descriptions linked to keyword.\r\n\r\n");
+      bool found = false;
       for (extra = world[ch->in_room].ex_description; extra != nullptr; extra = extra->next)
       {
         if (extra->keyword != nullptr)
         {
+          if (found == false)
+          {
+            found = true;
+            csendf(ch, "Extra description keywords:\r\n");
+          }
           csendf(ch, "%s\r\n", extra->keyword);
         }
+      }
+      if (found == false)
+      {
+        csendf(ch, "No extra description keywords found.\r\n");
       }
 
       return eSUCCESS;
@@ -3837,47 +3846,88 @@ int do_redit(struct char_data *ch, char *argument, int cmd)
     string arg2;
     tie(arg2, remainder_args) = half_chop(remainder_args);
 
+    if (arg2 == "delete")
+    {
+      string arg3;
+      tie(arg3, remainder_args) = half_chop(remainder_args);
+
+      bool deleted = false;
+      extra_descr_data *prev = nullptr;
+      for (extra = world[ch->in_room].ex_description; extra != nullptr; prev = extra, extra = extra->next)
+      {
+        if (arg3 == string(extra->keyword))
+        {
+          if (prev == nullptr)
+          {
+            world[ch->in_room].ex_description = extra->next;
+          }
+          else
+          {
+            prev->next = extra->next;
+          }
+          csendf(ch, "Extra description with keyword '%s' deleted.\r\n", extra->keyword);
+          FREE(extra);
+          deleted = true;
+          // break out of for loop
+          break;
+        }
+      }
+      if (deleted == false)
+      {
+        csendf(ch, "Extra description with keyword '%s' not found.\r\n", arg3.c_str());
+      }
+      // break out of switch case
+      break;
+    }
+
     for (extra = world[ch->in_room].ex_description;; extra = extra->next)
     {
       if (!extra)
-      { // make a new one
-        send_to_char("Creating new extra description.\n\r", ch);
+      { 
+        // No matching extra description found so make a new one
+        csendf(ch, "Creating new extra description for keyword '%s'.\r\n", arg2.c_str());
         CREATE(extra, struct extra_descr_data, 1);
+        extra->next = nullptr;
+        
         if (!(world[ch->in_room].ex_description))
+        {
+          // The room has no pre-existing extra descriptions so this will be its first
           world[ch->in_room].ex_description = extra;
+        }
         else
+        {
+          // The room has pre-existing extra descriptions so we will find the end of
+          // this linked list and append our new extra description to it
           for (ext = world[ch->in_room].ex_description;; ext = ext->next)
           {
-            if (ext->next == NULL)
+            if (ext->next == nullptr)
             {
               ext->next = extra;
               break;
             }
           }
-        extra->next = NULL;
+        }
+        
         break;
       }
-      /* modifying old extra description */
-      else if (isname(arg2, extra->keyword))
+      else if (arg2 == string(extra->keyword))
       {
-        send_to_char("Modifying extra description.\n\r", ch);
+        // A pre-existing extra description was found
+        csendf(ch, "Modifying extra description for keyword '%s'.\r\n", arg2.c_str());
         break;
       }
     }
 
     FREE(extra->keyword);
     extra->keyword = str_dup(arg2.c_str());
-    send_to_char("        Write your extra description.  (/s saves /h for help)\r\n", ch);
+    send_to_char("Write your extra description. (/s saves /h for help)\r\n", ch);
     ch->desc->strnew = &extra->description;
     ch->desc->max_str = MAX_MESSAGE_LENGTH;
-    ch->desc->connected = CON_EDITING;
-    if (ch->desc->strnew != nullptr)
+    ch->desc->connected = CON_EDITING;    
+    if (ch->desc->strnew != nullptr && *ch->desc->strnew != nullptr && **ch->desc->strnew != '\0')
     {
+      // There's already an existing extra description so let's show it
       parse_action(PARSE_LIST_NUM, "", ch->desc);
-    }
-    else
-    {
-      SEND_TO_Q("Current buffer empty.\r\n", ch->desc);
     }
   }
   break;
