@@ -826,10 +826,10 @@ void try_to_peek_into_container(struct char_data *vict, struct char_data *ch,
 
 int do_identify(char_data *ch, char *argument, int cmd)
 {
-   char buf[MAX_STRING_LENGTH], buf2[256];
-   int i;
-   bool found;
-   int value;
+   char buf[MAX_STRING_LENGTH] = { 0 }, buf2[256] = { 0 };
+   int i = 0, value = 0, bits = 0;
+   bool found = false;
+
 
    string arg1, remainder_args;
    tie (arg1, remainder_args) = half_chop(argument);
@@ -934,9 +934,14 @@ int do_identify(char_data *ch, char *argument, int cmd)
 
    case ITEM_WEAPON:
       sprintf(buf, "$3Damage Dice are '$R%dD%d$3'$R\n\r",
-               obj->obj_flags.value[1],
-               obj->obj_flags.value[2]);
+              obj->obj_flags.value[1],
+              obj->obj_flags.value[2]);
       send_to_char(buf, ch);
+
+      int get_weapon_damage_type(obj_data *wielded);
+      bits = get_weapon_damage_type(obj) - 1000;
+      extern char *strs_damage_types[];
+      csendf(ch, "$3Damange type$R: %s\r\n", strs_damage_types[bits]);
       break;
 
    case ITEM_INSTRUMENT:
