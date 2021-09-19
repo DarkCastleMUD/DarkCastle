@@ -61,5 +61,6 @@ int      write_hotboot_file(char **argv);
 void  send_info(string messg);
 void  send_info(const char *messg);
 bool is_multi(char_data *ch);
+void new_string_add(struct descriptor_data *d, char *str);
 
 #endif
