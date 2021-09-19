@@ -40,6 +40,7 @@
 #include "structs.h"
 #include "guild.h"
 #include "const.h"
+#include "newedit.h"
 
 using namespace std;
 
@@ -3817,11 +3818,20 @@ int do_redit(struct char_data *ch, char *argument, int cmd)
   {
     if (remainder_args.empty())
     {
-      send_to_char("$3Syntax$R: redit extra <keywords>\n\r"
-                   "Use it once to create the desc with a new keyword(s).\r\n"
-                   "Use it a second time with one of those keys to edit the description for it.\r\n",
-                   ch);
-      return eFAILURE;
+      csendf(ch, "$3Syntax$R: <> is required. [] is optional.\r\n"
+                 "redit extra                   - show this syntax and current keywords.\r\n"
+                 "redit extra <keywords ...>    - add or edit keywords.\r\n"
+                 "redit extra delete <keyword>  - delete extra descriptions linked to keyword.\r\n\r\n"
+                 "Extra description keywords:\r\n");
+      for (extra = world[ch->in_room].ex_description; extra != nullptr; extra = extra->next)
+      {
+        if (extra->keyword != nullptr)
+        {
+          csendf(ch, "%s\r\n", extra->keyword);
+        }
+      }
+
+      return eSUCCESS;
     }
 
     string arg2;
@@ -3848,7 +3858,7 @@ int do_redit(struct char_data *ch, char *argument, int cmd)
         break;
       }
       /* modifying old extra description */
-      else if (isname(buf, extra->keyword))
+      else if (isname(arg2, extra->keyword))
       {
         send_to_char("Modifying extra description.\n\r", ch);
         break;
@@ -3858,15 +3868,17 @@ int do_redit(struct char_data *ch, char *argument, int cmd)
     FREE(extra->keyword);
     extra->keyword = str_dup(arg2.c_str());
     send_to_char("        Write your extra description.  (/s saves /h for help)\r\n", ch);
-
-    //        send_to_char("Enter your extra description below. Terminate with
-    //"
-    //                   "'~' on a new line.\n\r\n\r", ch);
-    //        FREE(extra->description);
-    //      extra->description = 0;
     ch->desc->strnew = &extra->description;
     ch->desc->max_str = MAX_MESSAGE_LENGTH;
     ch->desc->connected = CON_EDITING;
+    if (ch->desc->strnew != nullptr)
+    {
+      parse_action(PARSE_LIST_NUM, "", ch->desc);
+    }
+    else
+    {
+      SEND_TO_Q("Current buffer empty.\r\n", ch->desc);
+    }
   }
   break;
 
