@@ -1872,6 +1872,10 @@ int process_output(struct descriptor_data *t)
     SEND_TO_Q(t->output, t->snoop_by);
     SEND_TO_Q("%%", t->snoop_by);
   }
+
+  char telnet_ga[3] = {(char)255, (char)249, (char)0};
+  write_to_descriptor(t->descriptor, telnet_ga);
+  
   /*
    * if we were using a large buffer, put the large buffer on the buffer pool
    * and switch back to the small one
