@@ -941,7 +941,7 @@ int do_identify(char_data *ch, char *argument, int cmd)
       int get_weapon_damage_type(obj_data *wielded);
       bits = get_weapon_damage_type(obj) - 1000;
       extern char *strs_damage_types[];
-      csendf(ch, "$3Damange type$R: %s\r\n", strs_damage_types[bits]);
+      csendf(ch, "$3Damage type$R: %s\r\n", strs_damage_types[bits]);
       break;
 
    case ITEM_INSTRUMENT:
