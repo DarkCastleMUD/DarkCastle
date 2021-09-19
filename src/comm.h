@@ -62,5 +62,6 @@ void  send_info(string messg);
 void  send_info(const char *messg);
 bool is_multi(char_data *ch);
 void new_string_add(struct descriptor_data *d, char *str);
+void telnet_ga(descriptor_data *d);
 
 #endif
