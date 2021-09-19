@@ -167,7 +167,6 @@ void food_update(void);		/* In limits.c */
 void mobile_activity(void);
 void object_activity(uint64_t pulse_type);
 void update_corpses_and_portals(void);
-void new_string_add(struct descriptor_data *d, char *str);
 void string_hash_add(struct descriptor_data *d, char *str);
 void perform_violence(void);
 void show_string(struct descriptor_data *d, char *input);
