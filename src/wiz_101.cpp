@@ -543,7 +543,7 @@ int do_wiz(struct char_data *ch, char *argument, int cmd)
   if (IS_NPC(ch))
     return eFAILURE;
 
-  if (cmd != CMD_IMMORT && !has_skill(ch, COMMAND_IMP_CHAN))
+  if (cmd == CMD_IMPCHAN && !has_skill(ch, COMMAND_IMP_CHAN))
   {
     send_to_char("Huh?\r\n", ch);
     return eFAILURE;
@@ -601,7 +601,7 @@ int do_wiz(struct char_data *ch, char *argument, int cmd)
     {
       if (i->character && i->character != ch && GET_LEVEL(i->character) >= IMMORTAL && !IS_NPC(i->character))
       {
-        if (cmd == 8 && !has_skill(i->character, COMMAND_IMP_CHAN))
+        if (cmd == CMD_IMPCHAN && !has_skill(i->character, COMMAND_IMP_CHAN))
           continue;
 
         if (STATE(i) == CON_PLAYING)
