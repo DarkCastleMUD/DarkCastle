@@ -3678,35 +3678,85 @@ int do_redit(struct char_data *ch, char *argument, int cmd)
   {
     if (remainder_args.empty())
     {
-      send_to_char("$3Syntax$R: redit exit <direction> <destination> "
-                   "[flags keynumber keywords]\n\r",
-                   ch);
-      send_to_char("NOTE: [flags keynumber keywords] are "
-                   "optional for door creation.\n\r",
-                   ch);
-      send_to_char("$3Examples$R:\n\r", ch);
-      send_to_char("redit exit north 1200   Puts an exit going north "
-                   "to room 1200 (no door.)\n\r",
-                   ch);
-      send_to_char("redit exit north 1200 1 -1 door wooden    Same "
-                   "exit except it has a door with no key.\n\r",
-                   ch);
-      send_to_char("redit exit north 1200 9 345 grate rusty    Same "
-                   "exit except it has a hidden grate with key 345.\n\r\n\r",
-                   ch);
-      send_to_char("Flags at your disposal:\n\r"
-                   "IS_DOOR    1\n\r"
-                   "CLOSED     2\n\r"
-                   "LOCKED     4\n\r"
-                   "HIDDEN     8\n\r"
-                   "IMM_ONLY  16\n\r"
-                   "PICKPROOF 32\n\r",
-                   ch);
+      csendf(ch, "$3Syntax$R: <> is required. [] is optional.\r\n"
+                 "redit exit <direction> <room vnum> [flagnumber] [keynumber] [keywords]\r\n"
+                 "redit exit delete <direction>\r\n"
+                 "\r\n"
+                 "Directions: north, n, south, s, east, e, west, w, up, u, down or d.\r\n"
+                 "Exit flags: (Add the numbers together for multiple flags)\r\n"
+                 "IS_DOOR    1\r\n"
+                 "CLOSED     2\r\n"
+                 "LOCKED     4\r\n"
+                 "HIDDEN     8\r\n"
+                 "IMM_ONLY  16\r\n"
+                 "PICKPROOF 32\r\n"
+                 "\r\n"
+                 "$3Examples$R:\r\n"
+                 "redit exit n 1200                    - North exit to room 1200.\r\n"
+                 "redit exit n 1200 1 -1 door wooden   - North door exit with keywords 'door' or 'wooden' to room 1200.\r\n"
+                 "redit exit n 1200 9 345 grate rusty  - North hidden door exit with keywords 'grate' or 'rusty' to room 1200 that requires key vnum 345.\r\n");
       return eFAILURE;
     }
 
     string arg2;
     tie(arg2, remainder_args) = half_chop(remainder_args);
+    if (arg2 == "delete")
+    {
+      string direction;
+      tie(direction, remainder_args) = half_chop(remainder_args);
+      for (x = 0; x <= 6; x++)
+      {
+        if (is_abbrev(direction, dirs[x]))
+        {
+          if (world[ch->in_room].dir_option[x] == nullptr)
+          {
+            csendf(ch, "There is no %s exit.\r\n", dirs[x]);
+            return eFAILURE;
+          }
+
+          int16 destination_room = world[ch->in_room].dir_option[x]->to_room;
+          csendf(ch, "Deleting %s exit from room %d to %d.\r\n", dirs[x], ch->in_room, destination_room);
+          free(world[ch->in_room].dir_option[x]);
+          world[ch->in_room].dir_option[x] = nullptr;
+
+          if (IS_PC(ch) && !IS_SET(ch->pcdata->toggles, PLR_ONEWAY))
+          {
+            // if the destination room has a reverse exit
+            if (world[destination_room].dir_option[reverse_number[x]])
+            {
+              // and that reverse exit points to us then we can delete it too
+              if (world[destination_room].dir_option[reverse_number[x]]->to_room == ch->in_room)
+              {
+                csendf(ch, "Deleting %s exit from room %d to %d.\r\n", dirs[reverse_number[x]], destination_room, ch->in_room);
+                free(world[destination_room].dir_option[reverse_number[x]]);
+                world[destination_room].dir_option[reverse_number[x]] = nullptr;
+                return eSUCCESS;
+              }
+              else
+              {
+                csendf(ch, "Reverse %s exit in room %d does not point to room %d.\r\n",
+                dirs[reverse_number[x]],
+                destination_room,
+                ch->in_room);
+                return eSUCCESS;
+              }
+            }
+            else
+            {
+              csendf(ch, "Reverse %s exit in room %d does not exist.\r\n",
+                dirs[reverse_number[x]],
+                destination_room);
+              return eSUCCESS;
+            }
+          } // end of check if PLR_ONEWAY is toggled
+          return eSUCCESS;
+        } // end of is_abbred for dirs
+      } // end of for loop through directions
+
+      csendf(ch, "Missing direction you want to delete.\r\n");
+      return eFAILURE;
+    } // end of delete
+
     for (x = 0; x <= 6; x++)
     {
       if (x == 6)
@@ -3719,6 +3769,7 @@ int do_redit(struct char_data *ch, char *argument, int cmd)
     }
     if (remainder_args.empty())
     {
+      csendf(ch, "Missing vnum of room you want to have %s exit connect to.\r\n", dirs[x]);
       return eFAILURE;
     }
 
