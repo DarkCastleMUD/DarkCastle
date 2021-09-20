@@ -2847,6 +2847,7 @@ bestowable_god_commands_type bestowable_god_commands[] =
 { "testuser", COMMAND_TESTUSER, false },
 { "remort", COMMAND_REMORT, true },
 { "testhit", COMMAND_TESTHIT, true },
+{ "/", COMMAND_IMP_CHAN, false},
 { "\n",		-1 }
 };
 
