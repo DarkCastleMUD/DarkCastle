@@ -1651,83 +1651,90 @@ int skill_aff[] =
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 };
 
-int do_mpbestow(CHAR_DATA *ch, char *argument, int cmd) {
-	char arg[MAX_INPUT_LENGTH], arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH],
-			arg3[MAX_INPUT_LENGTH];
-	CHAR_DATA *victim, *owner = NULL;
-	if (!IS_NPC(ch))
-		return eFAILURE;
-	argument = one_argument(argument, arg);
-	argument = one_argument(argument, arg1);
-	argument = one_argument(argument, arg2);
-	argument = one_argument(argument, arg3);
+int do_mpbestow(CHAR_DATA *ch, char *argument, int cmd)
+{
+  char arg[MAX_INPUT_LENGTH], arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH],
+      arg3[MAX_INPUT_LENGTH];
+  CHAR_DATA *victim, *owner = NULL;
+  if (!IS_NPC(ch))
+    return eFAILURE;
+  argument = one_argument(argument, arg);
+  argument = one_argument(argument, arg1);
+  argument = one_argument(argument, arg2);
+  argument = one_argument(argument, arg3);
 
-	if (arg[0] == '\0' || arg1[0] == '\0' || arg2[0] == '\0')
-		return eFAILURE;
-	if ((victim = get_char_room(arg, ch->in_room, TRUE)) == NULL
-			&& str_cmp(arg, "all") && str_cmp(arg, "allpc")) {
-		prog_error(ch, "Mpbestow - No such person.");
-		return eFAILURE | eINTERNAL_ERROR;
-	}
-	int i, o = 0;
-	if (!check_range_valid_and_convert(i, arg2, 0, 100))
-		return eFAILURE | eINTERNAL_ERROR;
-	check_range_valid_and_convert(o, arg3, 0, 10000);
-	int a = 0;
-	if (ch->beacon)
-		owner = (CHAR_DATA*) ch->beacon;
+  if (arg[0] == '\0' || arg1[0] == '\0' || arg2[0] == '\0')
+    return eFAILURE;
+  if ((victim = get_char_room(arg, ch->in_room, TRUE)) == NULL && str_cmp(arg, "all") && str_cmp(arg, "allpc"))
+  {
+    prog_error(ch, "Mpbestow - No such person.");
+    return eFAILURE | eINTERNAL_ERROR;
+  }
+  int i, o = 0;
+  if (!check_range_valid_and_convert(i, arg2, 0, 100))
+    return eFAILURE | eINTERNAL_ERROR;
+  check_range_valid_and_convert(o, arg3, 0, 10000);
+  int a = 0;
+  if (ch->beacon)
+    owner = (CHAR_DATA *)ch->beacon;
 
-	if (!victim)
-		victim = world[ch->in_room].people;
-	int z = 0;
-	for (; victim;) {
-		for (; affected_bits[a][0] != '\n'; a++) {
-			if (!str_cmp(affected_bits[a], arg1)) {
-				//debugpoint();
-				struct affected_type af;
-				af.type = z = skill_aff[a];
-				if (affected_by_spell(victim, z + BASE_TIMERS)) {
-//		send_to_char("A s.\r\n",victim);
-					return eFAILURE;
-				}
-				af.duration = i;
-				af.bitvector = a + 1;
-				af.location = 0;
-				af.modifier = 987; // Notifies that it's timered.
-				affect_join(victim, &af, TRUE, FALSE);
-				if (z && o) // Timer on it
-						{
-					af.type = BASE_TIMERS + z;
-					af.duration = o;
-					af.bitvector = -1;
-					af.location = 0;
-					af.modifier = 0;
-					affect_join(victim, &af, TRUE, FALSE);
-				}
-
-			}
-		}
-		if (!str_cmp(arg, "all"))
-			victim = victim->next_in_room;
-		else if (!str_cmp(arg, "allpc")) {
-			while ((victim = victim->next_in_room)) {
-				if (!IS_NPC(victim))
-					break;
-			}
-		} else
-			break;
-	}
-	if (z && o && owner) // Timer on it
-			{
-		struct affected_type af;
-		af.type = BASE_TIMERS + z;
-		af.duration = o;
-		af.bitvector = -1;
-		af.location = 0;
-		af.modifier = 0;
-		affect_join(owner, &af, TRUE, FALSE);
-	}
-	return eSUCCESS;
+  if (!victim)
+    victim = world[ch->in_room].people;
+  int z = 0;
+  for (; victim;)
+  {
+    for (; affected_bits[a][0] != '\n'; a++)
+    {
+      if (!str_cmp(affected_bits[a], arg1))
+      {
+        //debugpoint();
+        struct affected_type af;
+        af.type = z = skill_aff[a];
+        if (affected_by_spell(victim, z + BASE_TIMERS))
+        {
+          //		send_to_char("A s.\r\n",victim);
+          return eFAILURE;
+        }
+        af.duration = i;
+        af.bitvector = a + 1;
+        af.location = 0;
+        af.modifier = 987; // Notifies that it's timered.
+        affect_join(victim, &af, TRUE, FALSE);
+        if (z && o) // Timer on it
+        {
+          af.type = BASE_TIMERS + z;
+          af.duration = o;
+          af.bitvector = -1;
+          af.location = 0;
+          af.modifier = 0;
+          affect_join(victim, &af, TRUE, FALSE);
+        }
+      }
+    }
+    if (!str_cmp(arg, "all"))
+      victim = victim->next_in_room;
+    else if (!str_cmp(arg, "allpc"))
+    {
+      while ((victim = victim->next_in_room))
+      {
+        if (!IS_NPC(victim))
+          break;
+      }
+    }
+    else
+      break;
+  }
+  if (z && o && owner) // Timer on it
+  {
+    struct affected_type af;
+    af.type = BASE_TIMERS + z;
+    af.duration = o;
+    af.bitvector = -1;
+    af.location = 0;
+    af.modifier = 0;
+    affect_join(owner, &af, TRUE, FALSE);
+  }
+  return eSUCCESS;
 }
 
 // simulate a pause in proc execution
