@@ -10,7 +10,7 @@ struct set_data
   char *Set_Remove_Message;
 };
 
-#define BASE_SETS        1200
+#define BASE_SETS        1400
 #define SET_SAIYAN          0
 #define SET_VESTMENTS       1
 #define SET_HUNTERS         2
@@ -31,6 +31,6 @@ struct set_data
 #define SET_RAGER2         17
 #define SET_TRAPPINGS      18
 #define SET_FINERY         19
-#define SET_MAX          1219
+#define SET_MAX          1419
 
 extern const struct set_data set_list[];
