@@ -4262,56 +4262,61 @@ struct obj_data *clone_object(int nr)
 
 void randomize_object_affects(obj_data *obj)
 {
-	if (obj == NULL) {
+	if (obj == NULL)
+	{
 		return;
 	}
 
 	// Don't alter godload
-	if (IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL)) {
+	if (IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL))
+	{
 		return;
 	}
 
-	for (int i = 0; i < obj->num_affects; i++) {
-		switch (obj->affected[i].location) {
+	for (int i = 0; i < obj->num_affects; i++)
+	{
+		switch (obj->affected[i].location)
+		{
 		case APPLY_STR:
-			case APPLY_DEX:
-			case APPLY_INT:
-			case APPLY_WIS:
-			case APPLY_CON:
-			if (number(1, 100) <= 33) {
+		case APPLY_DEX:
+		case APPLY_INT:
+		case APPLY_WIS:
+		case APPLY_CON:
+			if (number(1, 100) <= 33)
+			{
 				obj->affected[i].modifier += number(-1, 1);
 			}
 			break;
 		case APPLY_LIGHTNING_SHIELD:
-			case WEP_LIGHTNING_BOLT:
-			case WEP_FIREBALL:
-			case WEP_FLAMESTRIKE:
-			case WEP_DISPEL_EVIL:
-			case WEP_MAGIC_MISSILE:
-			case WEP_METEOR_SWARM:
-			case APPLY_HIT:
-			case APPLY_MOVE:
-			case APPLY_MANA:
-			case APPLY_KI:
-			case APPLY_HIT_N_DAM:
-			case APPLY_HITROLL:
-			case APPLY_DAMROLL:
-			case APPLY_SPELLDAMAGE:
-			case APPLY_MELEE_DAMAGE: // melee mitigation
+		case WEP_LIGHTNING_BOLT:
+		case WEP_FIREBALL:
+		case WEP_FLAMESTRIKE:
+		case WEP_DISPEL_EVIL:
+		case WEP_MAGIC_MISSILE:
+		case WEP_METEOR_SWARM:
+		case APPLY_HIT:
+		case APPLY_MOVE:
+		case APPLY_MANA:
+		case APPLY_KI:
+		case APPLY_HIT_N_DAM:
+		case APPLY_HITROLL:
+		case APPLY_DAMROLL:
+		case APPLY_SPELLDAMAGE:
+		case APPLY_MELEE_DAMAGE: // melee mitigation
 		case APPLY_SPELL_DAMAGE: // spell mitigation
-		case APPLY_SONG_DAMAGE:  // song mitigation
+		case APPLY_SONG_DAMAGE:	 // song mitigation
 		case APPLY_HP_REGEN:
-			case APPLY_MANA_REGEN:
-			case APPLY_MOVE_REGEN:
-			case APPLY_KI_REGEN:
-			case APPLY_SAVING_FIRE:
-			case APPLY_SAVING_COLD:
-			case APPLY_SAVING_ENERGY:
-			case APPLY_SAVING_ACID:
-			case APPLY_SAVING_MAGIC:
-			case APPLY_SAVING_POISON:
-			case APPLY_SAVES:
-			case APPLY_AC:
+		case APPLY_MANA_REGEN:
+		case APPLY_MOVE_REGEN:
+		case APPLY_KI_REGEN:
+		case APPLY_SAVING_FIRE:
+		case APPLY_SAVING_COLD:
+		case APPLY_SAVING_ENERGY:
+		case APPLY_SAVING_ACID:
+		case APPLY_SAVING_MAGIC:
+		case APPLY_SAVING_POISON:
+		case APPLY_SAVES:
+		case APPLY_AC:
 			obj->affected[i].modifier = random_percent_change(-33, 33, obj->affected[i].modifier);
 			break;
 		}
