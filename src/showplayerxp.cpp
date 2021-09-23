@@ -1,12 +1,15 @@
 #include <iostream>
 #include <string.h>
 #include <unistd.h>
+#include <map>
+#include <cmath>
 #include "spells.h"
 #include "connect.h"
 #include "utility.h"
 #include "db.h"
 #include "obj.h"
 #include "const.h"
+#include "utility.h"
 
 using namespace std;
 void load_char_obj_error(FILE *fpsave, char strsave[MAX_INPUT_LENGTH]);
@@ -357,8 +360,25 @@ bool test_rolls(uint8_t total)
   }
 }
 
+void test_random_stats(void)
+{  
+  init_random();
+
+  map<int,int> results;
+  for(int i=0; i < 10000; ++i)
+  {
+    int result = random_percent_change(33, 6);
+    results[result]++;
+  }
+  //printf("%d\n", result);
+  for (auto &cur : results)
+  {
+    cout << cur.first << "=" << cur.second << endl;
+  }
+}
+
 int main(int argc, char **argv)
-{
+{  
   string orig_cwd;
   if (argc < 2)
     return 1;
