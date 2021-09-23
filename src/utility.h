@@ -372,7 +372,6 @@ int     move_char       (CHAR_DATA *ch, int dest);
 int     move_char       (CHAR_DATA *ch, int dest, bool stop_all_fighting);
 int	number		(int from, int to);
 int 	dice		(int number, int size);
-int random_percent_change(int from, int to, int value);
 int	str_cmp		(const char *arg1, const char *arg2);
 int	str_nosp_cmp	(const char *arg1, const char *arg2);
 int     str_n_nosp_cmp  (const char *arg1, const char *arg2, int size);
@@ -607,5 +606,7 @@ bool file_exists(string filename);
 bool char_file_exists(string name);
 void show_obj_class_size_mini(obj_data * obj, char_data * ch);
 const char *item_condition(struct obj_data *obj);
+int random_percent_change(uint percentage, int value);
+int random_percent_change(int from, int to, int value);
 
 #endif /* UTILITY_H_ */

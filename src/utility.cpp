@@ -1905,6 +1905,12 @@ int number( int from, int to )
     return number;
 }
 
+int random_percent_change(uint percentage, int value)
+{
+  int diff = round(value * (percentage / 100.0));
+  return number(-diff, diff) + value;
+}
+
 int random_percent_change(int from, int to, int value) {
 	return ((number(from, to) / 100.0) * value)+0.50+value;
 }
