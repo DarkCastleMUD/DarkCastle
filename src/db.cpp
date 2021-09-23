@@ -4282,18 +4282,51 @@ void randomize_object_affects(obj_data *obj)
 		case APPLY_INT:
 		case APPLY_WIS:
 		case APPLY_CON:
-			if (number(1, 100) <= 33)
+			if (number(0, 1) == 1)
 			{
 				obj->affected[i].modifier += number(-1, 1);
+				obj->affected[i].modifier = MAX(0, obj->affected[i].modifier);
 			}
 			break;
-		case APPLY_LIGHTNING_SHIELD:
-		case WEP_LIGHTNING_BOLT:
-		case WEP_FIREBALL:
-		case WEP_FLAMESTRIKE:
-		case WEP_DISPEL_EVIL:
+		// Spells found on weapons from weapon_spells()
 		case WEP_MAGIC_MISSILE:
+		case WEP_BLIND:
+		case WEP_EARTHQUAKE:
+		case WEP_CURSE:
+		case WEP_COLOUR_SPRAY:
+		case WEP_DISPEL_EVIL:
+		case WEP_ENERGY_DRAIN:
+		case WEP_FIREBALL:
+		case WEP_LIGHTNING_BOLT:
+		case WEP_HARM:
+		case WEP_POISON:
+		case WEP_SLEEP:
+		case WEP_FEAR:
+		case WEP_DISPEL_MAGIC:
+		case WEP_WEAKEN:
+		case WEP_CAUSE_LIGHT:
+		case WEP_CAUSE_CRITICAL:
+		case WEP_PARALYZE:
+		case WEP_ACID_BLAST:
+		case WEP_BEE_STING:
+		case WEP_CURE_LIGHT:
+		case WEP_FLAMESTRIKE:
+		case WEP_HEAL_SPRAY:
+		case WEP_DROWN:
+		case WEP_HOWL:
+		case WEP_SOULDRAIN:
+		case WEP_SPARKS:
+		case WEP_DISPEL_GOOD:
+		case WEP_TELEPORT:
+		case WEP_CHILL_TOUCH:
+		case WEP_POWER_HARM:
+		case WEP_VAMPIRIC_TOUCH:
+		case WEP_LIFE_LEECH:
 		case WEP_METEOR_SWARM:
+		case WEP_ENTANGLE:
+		case WEP_CREATE_FOOD:
+		case WEP_WILD_MAGIC:
+		case APPLY_LIGHTNING_SHIELD:		
 		case APPLY_HIT:
 		case APPLY_MOVE:
 		case APPLY_MANA:
@@ -4317,7 +4350,8 @@ void randomize_object_affects(obj_data *obj)
 		case APPLY_SAVING_POISON:
 		case APPLY_SAVES:
 		case APPLY_AC:
-			obj->affected[i].modifier = random_percent_change(-33, 33, obj->affected[i].modifier);
+		case APPLY_REFLECT:
+			obj->affected[i].modifier = random_percent_change(33, obj->affected[i].modifier);
 			break;
 		}
 	}
