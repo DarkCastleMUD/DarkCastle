@@ -887,6 +887,22 @@ int do_identify(char_data *ch, char *argument, int cmd)
    sprintf(buf, "$3Weight: $R%d$3, Value: $R%d$3, Level: $R%d\n\r", obj->obj_flags.weight, obj->obj_flags.cost, obj->obj_flags.eq_level);
    send_to_char(buf, ch);
 
+   const obj_data * vobj = nullptr;
+   if (obj->item_number >= 0)
+   {
+      const int vnum = obj_index[obj->item_number].virt;
+      if (vnum >= 0)
+      {
+         const int rn_of_vnum = real_object(vnum);
+         if (rn_of_vnum >= 0)
+         {
+            vobj = (obj_data *)obj_index[rn_of_vnum].item;
+         }
+      }
+      
+   }
+
+
    switch (GET_ITEM_TYPE(obj))
    {
 
@@ -933,10 +949,46 @@ int do_identify(char_data *ch, char *argument, int cmd)
       break;
 
    case ITEM_WEAPON:
-      sprintf(buf, "$3Damage Dice are '$R%dD%d$3'$R\n\r",
-              obj->obj_flags.value[1],
-              obj->obj_flags.value[2]);
-      send_to_char(buf, ch);
+      sprintf(buf, "$3Damage Dice are '$R%dD%d$3'$R",
+            obj->obj_flags.value[1],
+            obj->obj_flags.value[2]);
+
+      if (vobj != nullptr)
+      {
+         // original value
+         sprintf(buf2, " (%d", vobj->obj_flags.value[1]);
+         strcat(buf, buf2);
+         
+         if (obj->obj_flags.value[1]-vobj->obj_flags.value[1] > 0)
+         {
+            // if postive show "+ difference"
+            sprintf(buf2, "$2+%d$R", obj->obj_flags.value[1]-vobj->obj_flags.value[1]);
+            strcat(buf, buf2);
+         } else if (obj->obj_flags.value[1]-vobj->obj_flags.value[1] < 0)
+         {
+            // if negative show "- difference"
+            sprintf(buf2, "$4%d$R", obj->obj_flags.value[1]-vobj->obj_flags.value[1]);
+            strcat(buf, buf2);
+         }
+
+         sprintf(buf2, "D%d", vobj->obj_flags.value[2]);
+         strcat(buf, buf2);
+
+         if (obj->obj_flags.value[2]-vobj->obj_flags.value[2] > 0)
+         {
+            // if postive show "+ difference"
+            sprintf(buf2, "$2+%d$R", obj->obj_flags.value[2]-vobj->obj_flags.value[2]);
+            strcat(buf, buf2);
+         } else if (obj->obj_flags.value[2]-vobj->obj_flags.value[2] < 0)
+         {
+            // if negative show "- difference"
+            sprintf(buf2, "$4%d$R", obj->obj_flags.value[2]-vobj->obj_flags.value[2]);
+            strcat(buf, buf2);
+         }
+         
+         strcat(buf, ")");         
+      }
+      csendf(ch, "%s\r\n", buf);
 
       int get_weapon_damage_type(obj_data *wielded);
       bits = get_weapon_damage_type(obj) - 1000;
@@ -999,8 +1051,32 @@ int do_identify(char_data *ch, char *argument, int cmd)
             strcpy(buf2, get_skill_name(obj->affected[i].location / 1000));
          else
             strcpy(buf2, "Invalid");
-         sprintf(buf, "    $3Affects : $R%s$3 By $R%d\n\r", buf2, obj->affected[i].modifier);
-         send_to_char(buf, ch);
+         sprintf(buf, "    $3Affects : $R%s$3 By $R%d", buf2, obj->affected[i].modifier);
+
+         if (vobj != nullptr &&
+            i < vobj->num_affects &&
+            vobj->affected != nullptr &&
+            vobj->affected[i].location == obj->affected[i].location)
+         {
+            // original value
+            sprintf(buf2, " (%d", vobj->affected[i].modifier);
+            strcat(buf, buf2);
+            
+            if (obj->affected[i].modifier-vobj->affected[i].modifier > 0)
+            {
+               // if postive show "+ difference"
+               sprintf(buf2, "$2+%d$R", obj->affected[i].modifier-vobj->affected[i].modifier);
+               strcat(buf, buf2);
+            } else if (obj->affected[i].modifier-vobj->affected[i].modifier < 0)
+            {
+               // if negative show "- difference"
+               sprintf(buf2, "$4%d$R", obj->affected[i].modifier-vobj->affected[i].modifier);
+               strcat(buf, buf2);
+            }
+            strcat(buf, ")");
+         }
+
+         csendf(ch, "%s\r\n", buf);
       }
    }
 
