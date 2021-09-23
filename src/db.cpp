@@ -4367,32 +4367,30 @@ void randomize_object(obj_data *obj)
 
 	switch (obj->obj_flags.type_flag) {
 	case ITEM_WEAPON:
-		//obj->obj_flags.weight = MAX(1,random_percent_change(-33, 33, obj->obj_flags.weight));
-		obj->obj_flags.cost = MAX(1, random_percent_change(-33, 33, obj->obj_flags.cost));
-		obj->obj_flags.value[1] = random_percent_change(-20, 20, obj->obj_flags.value[1]);
-		obj->obj_flags.value[2] = random_percent_change(-20, 20, obj->obj_flags.value[2]);
+		obj->obj_flags.cost = MAX(1, random_percent_change(33, obj->obj_flags.cost));
+		obj->obj_flags.value[1] = random_percent_change(20, obj->obj_flags.value[1]);
+		obj->obj_flags.value[2] = random_percent_change(20, obj->obj_flags.value[2]);
 		randomize_object_affects(obj);
 		break;
 	case ITEM_ARMOR:
-		//obj->obj_flags.weight = MAX(1,random_percent_change(-33, 33, obj->obj_flags.weight));
-		obj->obj_flags.cost = MAX(1, random_percent_change(-33, 33, obj->obj_flags.cost));
+		obj->obj_flags.cost = MAX(1, random_percent_change(33, obj->obj_flags.cost));
 		// AC-apply
-		obj->obj_flags.value[1] = random_percent_change(-25, 25, obj->obj_flags.value[1]);
+		obj->obj_flags.value[1] = random_percent_change(25, obj->obj_flags.value[1]);
 		randomize_object_affects(obj);
 		break;
 	case ITEM_WAND:
-		obj->obj_flags.cost = MAX(1, random_percent_change(-33, 33, obj->obj_flags.cost));
+		obj->obj_flags.cost = MAX(1, random_percent_change(33, obj->obj_flags.cost));
 		// total charges
-		obj->obj_flags.value[1] = random_percent_change(-10, 10, obj->obj_flags.value[2]);
+		obj->obj_flags.value[1] = random_percent_change(10, obj->obj_flags.value[2]);
 		// current charges
 		obj->obj_flags.value[2] = obj->obj_flags.value[1];
 		break;
 	case ITEM_INSTRUMENT:
-		obj->obj_flags.cost = MAX(1, random_percent_change(-33, 33, obj->obj_flags.cost));
+		obj->obj_flags.cost = MAX(1, random_percent_change(33, obj->obj_flags.cost));
 		// non-combat
-		obj->obj_flags.value[1] = random_percent_change(-33, 33, obj->obj_flags.value[1]);
+		obj->obj_flags.value[1] = random_percent_change(33, obj->obj_flags.value[1]);
 		// combat
-		obj->obj_flags.value[2] = random_percent_change(-33, 33, obj->obj_flags.value[2]);
+		obj->obj_flags.value[2] = random_percent_change(33, obj->obj_flags.value[2]);
 		randomize_object_affects(obj);
 		break;
 	}
