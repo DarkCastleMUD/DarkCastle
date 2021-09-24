@@ -1908,7 +1908,7 @@ int number( int from, int to )
 // Random
 int random_percent_change(uint percentage, int value)
 {
-  int diff = round(value * (percentage / 100.0));
+  int diff = abs(round(value * (percentage / 100.0)));
   return number(-diff, diff) + value;
 }
 
