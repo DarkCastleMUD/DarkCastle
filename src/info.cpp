@@ -1037,7 +1037,11 @@ int do_identify(char_data *ch, char *argument, int cmd)
    for (i = 0; i < obj->num_affects; i++)
    {
       if ((obj->affected[i].location != APPLY_NONE) &&
-            (obj->affected[i].modifier != 0))
+            (obj->affected[i].modifier != 0 || 
+            (vobj != nullptr &&
+            i < vobj->num_affects &&
+            vobj->affected != nullptr &&
+            vobj->affected[i].location == obj->affected[i].location)))
       {
          if (!found)
          {
