@@ -4,9 +4,9 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "scons -C src -j 128",
+            "label": "scons debug=1 -C src -j 128",
             "type": "shell",
-            "command": "scons -C src -j 128",
+            "command": "scons debug=1 -C src -j 128",
             "problemMatcher": {
                 "base": "$gcc",
                 "fileLocation": [
