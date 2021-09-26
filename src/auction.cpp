@@ -538,12 +538,7 @@ void AuctionHouse::Identify(CHAR_DATA *ch, unsigned int ticket)
     return;
   }
 
-  TaxCollected += 6000;
-  GET_GOLD(ch) -= 6000;
-  send_to_char("You pay the broker 6000 gold to identify the item.\n\r", ch);
-  do_save(ch, "", 9);
-
-  spell_identify(60, ch, NULL, obj, 100);
+  identify(ch, obj);
 
   return;
  
@@ -1482,7 +1477,7 @@ void AuctionHouse::ListItems(CHAR_DATA *ch, ListOptions options, string name, un
   int i;
   string output_buf;
   string state_output;
-  char buf[MAX_STRING_LENGTH];
+  char buf[MAX_STRING_LENGTH] = {0};
  
   if(options == LIST_MINE)
     send_to_char("Ticket-Buyer--------Price------Status--T--Item---------------------------\n\r", ch);
@@ -1679,14 +1674,16 @@ void AuctionHouse::AddItem(CHAR_DATA *ch, OBJ_DATA *obj, unsigned int price, str
     send_to_char("Why would you want to privately sell something to yourself?\n\r", ch);
     return;
   }
-
-  if(!strcmp(buf, "Advertise"))
-    advertise = true;
-
-  if(advertise == true && (GET_GOLD(ch) < (200000)))
+ 
+  // Players no longer need to specify Advertise to advertise an auction
+  if (!strcmp(buf, "Advertise"))
   {
-    csendf(ch, "You need 200000 gold to advertise an item.\n\r");
-    return;
+    buf[0] = 0;
+  }
+
+  if (price >= 1000000)
+  {
+    advertise = true;
   }
 
   if (IS_SET(obj->obj_flags.more_flags, ITEM_UNIQUE) && IsExist(GET_NAME(ch), obj_index[obj->item_number].virt))
@@ -1726,8 +1723,10 @@ void AuctionHouse::AddItem(CHAR_DATA *ch, OBJ_DATA *obj, unsigned int price, str
   NewTicket.seller = GET_NAME(ch);
   NewTicket.item_name = obj->short_description;
 
-  if(advertise == false)
+  if (buf[0] != 0)
+  {
     NewTicket.buyer = buf;
+  }
 
   if (fullSave(obj)) {
 	  NewTicket.obj = obj;
@@ -1754,9 +1753,6 @@ void AuctionHouse::AddItem(CHAR_DATA *ch, OBJ_DATA *obj, unsigned int price, str
     CHAR_DATA *Broker = find_mob_in_room(ch, 5258);
     if(Broker)
     {
-      TaxCollected += 200000;
-      GET_GOLD(ch) -= 200000;
-      send_to_char("You pay the 200000 gold to advertise your item.\n\r", ch);
       snprintf(auc_buf, MAX_STRING_LENGTH, "$7$B%s has just posted $R%s $7$Bfor sale.",
                          GET_SHORT(ch), obj->short_description);
       do_auction(Broker, auc_buf, 9); 
