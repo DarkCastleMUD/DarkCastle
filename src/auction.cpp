@@ -1538,7 +1538,7 @@ void AuctionHouse::ListItems(CHAR_DATA *ch, ListOptions options, string name, un
       }
       i++;
       stringstream ss;
-      ss.imbue(locale(""));
+      ss.imbue(locale("en_US"));
       ss << Item_it->second.price;
       sprintf(buf, "\n\r%05d) $7$B%-12s$R $5%-10s$R %s %s %s%-30s\n\r", 
                Item_it->first,
