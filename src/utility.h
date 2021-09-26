@@ -608,5 +608,6 @@ void show_obj_class_size_mini(obj_data * obj, char_data * ch);
 const char *item_condition(struct obj_data *obj);
 int random_percent_change(uint percentage, int value);
 int random_percent_change(int from, int to, int value);
+bool identify(char_data *ch, obj_data *obj);
 
 #endif /* UTILITY_H_ */
