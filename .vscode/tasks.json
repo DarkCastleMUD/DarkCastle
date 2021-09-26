@@ -4,6 +4,29 @@
     "version": "2.0.0",
     "tasks": [
         {
+            "label": "scons -C src -j 128",
+            "type": "shell",
+            "command": "scons -C src -j 128",
+            "problemMatcher": {
+                "base": "$gcc",
+                "fileLocation": [
+                    "relative",
+                    "${workspaceRoot}/src/"
+                ],
+                "pattern": {
+                    "regexp": "^(.*):(\\d+):(\\d+):\\s+(.*)$",
+                    "file": 1,
+                    "line": 2,
+                    "column": 3,
+                    "message": 4
+                }
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
             "label": "scons debug=1 -C src -j 128",
             "type": "shell",
             "command": "scons debug=1 -C src -j 128",
