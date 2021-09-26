@@ -810,7 +810,7 @@ int command_interpreter(CHAR_DATA *ch, char *pcomm, bool procced)
         int command_skill = 0;
         for (int i = 0; *bestowable_god_commands[i].name != '\n'; i++)
         {
-          if (bestowable_god_commands[i].name == found->command_name)
+          if (string(bestowable_god_commands[i].name) == string(found->command_name))
           {
             command_skill = bestowable_god_commands[i].num;
             break;
