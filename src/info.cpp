@@ -838,7 +838,7 @@ bool identify(char_data *ch, obj_data *obj)
    if (IS_SET(obj->obj_flags.extra_flags, ITEM_DARK) && GET_LEVEL(ch) < IMMORTAL)
    {
       send_to_char("A magical aura around the item attempts to conceal its secrets.\r\n", ch);
-      return eFAILURE;
+      return false;
    }
 
    sprintf(buf, "$3Object '$R%s$3', Item type:$R ", obj->name);
@@ -1065,6 +1065,8 @@ bool identify(char_data *ch, obj_data *obj)
          csendf(ch, "%s\r\n", buf);
       }
    }
+
+   return true;
 }
 
 int do_identify(char_data *ch, char *argument, int cmd)
