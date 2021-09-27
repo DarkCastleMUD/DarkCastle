@@ -14,3 +14,4 @@ gmon.out
 *.gcda
 *.gcno
 *~
+.qmake.stash
