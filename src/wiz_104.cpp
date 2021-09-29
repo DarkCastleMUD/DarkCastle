@@ -2130,11 +2130,13 @@ int do_oclone(struct char_data *ch, char *argument, int cmd)
   obj = clone_object(r1);
   if (!obj) {csendf(ch, "Failure. Unable to clone item.\r\n"); return eFAILURE; }
 
+/*
   if(obj_index[obj->item_number].non_combat_func ||
         obj->obj_flags.type_flag == ITEM_MEGAPHONE ||
         has_random(obj)) {
     DC::instance().obj_free_list.insert(obj);
   }
+*/
 
   csendf(ch, "Ok.\n\rYou copied item %d (%s) and replaced item %d (%s).\n\r",
 	 v1, ((OBJ_DATA*)obj_index[real_object(v1)].item)->short_description,
