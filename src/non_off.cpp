@@ -1437,6 +1437,7 @@ CVoteData::CVoteData()
   int is_active = 0;
   int i = 0;
   SVoteData tmp_vote_data;
+  active = false;
  
   the_file = dc_fopen("../lib/vote_data", "r");
   if (!the_file) 
