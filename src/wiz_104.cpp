@@ -2150,7 +2150,7 @@ int do_oclone(struct char_data *ch, char *argument, int cmd)
   obj_index[r2].mobprogs = NULL;
   obj_index[r2].combat_func = 0;
   obj_index[r2].mobspec = 0;
-  extract_obj(otmp);
+  //extract_obj(otmp);
 
   ch->pcdata->last_obj_edit = r2;
   set_zone_modified_obj(r2);
