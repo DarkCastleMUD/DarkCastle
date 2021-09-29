@@ -1582,7 +1582,6 @@ static char *dethSayText [ ] =
   "In a perfect world spammers would be locked up with men that have enlarged their penis, taken Viagra, and are looking for new relationships.",
   "I'm going to name my kids Control, Alt, and Delete so I can just hit them all at once to solve any acting up.",
   "Does anyone here have a computer?",
-  "Girls always act all old and mature until you fuck them in the ass and they're like 'STOP IM ONLY THIRTEEN, IM ONLY THIRTEEN!'",
   "Sorry Mario but the Princess is on another MUD.",
   "I'm annoyed that they can get 11KBps from mars but can't get me a stable 5KBps over 17 miles.",
   "If my calculations are correct SLINKY + ESCALATOR = EVERLASTING FUN!",
