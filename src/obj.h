@@ -136,6 +136,7 @@
 #define ITEM_24H_SAVE		    1U<<11
 #define ITEM_NO_DISARM		    1U<<12
 #define ITEM_TOGGLE		        1U<<13 // Toggles for certain items.
+#define ITEM_NO_CUSTOM          IU<<14
 
 /* Bitvector for 'size' */
 #define SIZE_ANY		1U

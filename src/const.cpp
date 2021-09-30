@@ -1003,6 +1003,7 @@ const char *more_obj_bits[] =
 	"24H_SAVE",
 	"NO_DISARM",
     "PROCTOGGLE",
+    "NO_CUSTOM",
     "\n"
 };
 
