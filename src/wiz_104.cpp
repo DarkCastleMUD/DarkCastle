@@ -253,6 +253,26 @@ int do_load(struct char_data *ch, char *arg, int cmd)
           return eFAILURE;
         } 
 
+		if (random[0] == 'r')
+		{
+			obj_data *obj = (obj_data *)(obj_index[number].item));
+			if (IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL))
+			{
+				csendf(ch, "You cannot random load vnum %d because extra flag ITEM_SPECIAL is set.\r\n", num);
+				return eFAILURE;
+			}
+			else if (IS_SET(obj->obj_flags.extra_flags, ITEM_QUEST))
+			{
+				csendf(ch, "You cannnot random load vnum %d because extra flag ITEM_QUEST is set.\r\n", num);
+				return eFAILURE;
+			}
+			else if (IS_SET(obj->obj_flags.more_flags, ITEM_NO_CUSTOM))
+			{
+				csendf(ch, "You cannot random load vnum %d because more flag ITEM_NO_CUSTOM is set.\r\n", num);
+				return eFAILURE;
+			}
+		}
+
         do_oload(ch, number, cnt, (random[0] == 'r'? true : false));
         return eSUCCESS;
       }
