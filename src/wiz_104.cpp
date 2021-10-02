@@ -255,7 +255,7 @@ int do_load(struct char_data *ch, char *arg, int cmd)
 
 		if (random[0] == 'r')
 		{
-			obj_data *obj = (obj_data *)(obj_index[number].item));
+			obj_data *obj = (obj_data *)(obj_index[number].item);
 			if (IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL))
 			{
 				csendf(ch, "You cannot random load vnum %d because extra flag ITEM_SPECIAL is set.\r\n", num);
