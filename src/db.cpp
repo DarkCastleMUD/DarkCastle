@@ -4382,8 +4382,8 @@ void randomize_object(obj_data *obj)
 		break;
 	case ITEM_ARMOR:
 		obj->obj_flags.cost = MAX(1, random_percent_change(33, obj->obj_flags.cost));
-		// v2 AC-apply
-		obj->obj_flags.value[1] = random_percent_change(25, obj->obj_flags.value[1]);
+		// v1 AC-apply
+		obj->obj_flags.value[0] = random_percent_change(25, obj->obj_flags.value[0]);
 		randomize_object_affects(obj);
 		break;
 	case ITEM_WAND:
