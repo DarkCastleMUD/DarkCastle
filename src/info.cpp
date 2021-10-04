@@ -824,6 +824,32 @@ void try_to_peek_into_container(struct char_data *vict, struct char_data *ch,
       send_to_char("You don't see anything inside it.\r\n", ch);
 }
 
+void showStatDiff(char_data *ch, int base, int random)
+{
+   char buf[MAX_STRING_LENGTH] = { 0 }, buf2[256] = { 0 };
+
+   // original value
+   sprintf(buf2, "%d", base);
+   strcat(buf, buf2);
+   
+   if (random-base > 0)
+   {
+      // if postive show "+ difference"
+      sprintf(buf2, "$2+%d$R", random-base);
+      strcat(buf, buf2);
+   }
+   else if (random-base < 0)
+   {
+      // if negative show "- difference"
+      sprintf(buf2, "$4%d$R", random-base);
+      strcat(buf, buf2);
+   }         
+   strcat(buf, "$R");
+
+   csendf(ch, "%s", buf);
+   return;
+}
+
 bool identify(char_data *ch, obj_data *obj)
 {
    if (ch == nullptr || obj == nullptr)
@@ -890,8 +916,16 @@ bool identify(char_data *ch, obj_data *obj)
 
    case ITEM_SCROLL:
    case ITEM_POTION:
-      sprintf(buf, "$3Level $R%d $3spells of:$R\n\r", obj->obj_flags.value[0]);
-      send_to_char(buf, ch);
+      csendf(ch, "$3Level $R%d ", obj->obj_flags.value[0]);
+
+      if (vobj != nullptr)
+      {
+         csendf(ch, "(");
+         showStatDiff(ch, vobj->obj_flags.value[0], obj->obj_flags.value[0]);
+         csendf(ch, ") ");
+      }
+      csendf(ch, "$3spells of:$R\r\n");
+
       if (obj->obj_flags.value[1] >= 1)
       {
          sprinttype(obj->obj_flags.value[1] - 1, spells, buf);
@@ -1008,9 +1042,17 @@ bool identify(char_data *ch, obj_data *obj)
       else
          value = (obj->obj_flags.value[0]) - (obj->obj_flags.value[1]);
 
-      sprintf(buf, "$3AC-apply is $R%d$3     Resistance to damage is $R%d\n\r",
-               value, obj->obj_flags.value[2]);
+      sprintf(buf, "$3AC-apply is $R%d (", value);
       send_to_char(buf, ch);
+      if (vobj != nullptr)
+      {         
+         showStatDiff(ch, vobj->obj_flags.value[0], obj->obj_flags.value[0]);
+      }
+      if (IS_SET(obj->obj_flags.extra_flags, ITEM_ENCHANTED) == false)
+      {
+         csendf(ch, "-%d", obj->obj_flags.value[1]);
+      }
+      csendf(ch, ")$3     Resistance to damage is $R%d\n\r", obj->obj_flags.value[2]);      
       break;
    }
 
