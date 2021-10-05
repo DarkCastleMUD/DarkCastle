@@ -4369,31 +4369,40 @@ int oprog_armour_trigger( CHAR_DATA *ch, OBJ_DATA *item )
 
 int oprog_command_trigger(char *txt, CHAR_DATA *ch, char *arg)
 {
+	if (ch == nullptr)
+	{
+		return eFAILURE;
+	}
 
-	CHAR_DATA *vmob;
-	OBJ_DATA *item;
-
+	CHAR_DATA *vmob = nullptr;
+	OBJ_DATA *item = nullptr;
 	mprog_cur_result = eFAILURE;
-
-	char buf[MAX_STRING_LENGTH];
-	for (item = world[ch->in_room].contents; item; item = item->next_content)
-		if (obj_index[item->item_number].progtypes & COMMAND_PROG)
+	char buf[MAX_STRING_LENGTH] = { 0 };
+	if (ch->in_room >= 0)
+	{
+		for (item = world[ch->in_room].contents; item; item = item->next_content)
 		{
-			if (arg && *arg)
+			if (obj_index[item->item_number].progtypes & COMMAND_PROG)
 			{
-				sprintf(buf, "%s lasttyped %s", GET_NAME(ch), arg);
-				do_mpsettemp(ch, &buf[0], 999);
-			}
+				if (arg && *arg)
+				{
+					sprintf(buf, "%s lasttyped %s", GET_NAME(ch), arg);
+					do_mpsettemp(ch, &buf[0], 999);
+				}
 
-			vmob = initiate_oproc(ch, item);
-			if (mprog_wordlist_check(txt, vmob, ch, NULL, NULL, COMMAND_PROG, TRUE))
-			{
+				vmob = initiate_oproc(ch, item);
+				if (mprog_wordlist_check(txt, vmob, ch, NULL, NULL, COMMAND_PROG, TRUE))
+				{
+					end_oproc(vmob);
+					return mprog_cur_result;
+				}
 				end_oproc(vmob);
-				return mprog_cur_result;
 			}
-			end_oproc(vmob);
 		}
+	}
+	
 	for (item = ch->carrying; item; item = item->next_content)
+	{
 		if (obj_index[item->item_number].progtypes & COMMAND_PROG)
 		{
 			if (arg && *arg)
@@ -4409,9 +4418,12 @@ int oprog_command_trigger(char *txt, CHAR_DATA *ch, char *arg)
 			}
 			end_oproc(vmob);
 		}
+	}
 
 	for (int i = 0; i < MAX_WEAR; i++)
+	{
 		if (ch->equipment[i])
+		{
 			if (obj_index[ch->equipment[i]->item_number].progtypes & COMMAND_PROG)
 			{
 				if (arg && *arg)
@@ -4428,6 +4440,8 @@ int oprog_command_trigger(char *txt, CHAR_DATA *ch, char *arg)
 				}
 				end_oproc(vmob);
 			}
+		}
+	}
 	return mprog_cur_result;
 }
 
