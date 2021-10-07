@@ -390,7 +390,7 @@ int spell_drown(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *
    if (skill > 80) {
      if (number(1, 100) == 1 && GET_LEVEL(victim) < IMMORTAL) {
         dam = GET_HIT(victim)*5 + 20;
-        sprintf(buf, "You are torn apart by the force of %s's watery blast and are killed instantly!", GET_NAME(ch));
+        sprintf(buf, "You are torn apart by the force of %s's watery blast and are killed instantly!\r\n", GET_NAME(ch));
         send_to_char(buf, victim);
         act("$N is torn apart by the force of $n's watery blast and killed instantly!", ch, 0, victim, TO_ROOM, NOTVICT);
         act("$N is torn apart by the force of your watery blast and killed instantly!", ch, 0, victim, TO_CHAR, 0);
