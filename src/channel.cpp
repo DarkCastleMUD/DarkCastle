@@ -976,50 +976,56 @@ int do_grouptell(struct char_data *ch, char *argument, int cmd)
   OBJ_DATA *tmp_obj;
   bool silence = FALSE;
 
-  if (!*argument) {
+  if (!*argument)
+  {
     send_to_char("Tell your group what?\n\r", ch);
     return eSUCCESS;
   }
 
-  for(tmp_obj = world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
-    if(obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER) {
+  for (tmp_obj = world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
+    if (obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER)
+    {
       send_to_char("The magical silence prevents you from speaking!\n\r", ch);
       return eFAILURE;
     }
 
+  for (; isspace(*argument); argument++)
+    ;
 
-  for ( ; isspace(*argument); argument++)
-      ;
+  if (!IS_MOB(ch) && IS_SET(ch->pcdata->punish, PUNISH_NOTELL))
+  {
+    send_to_char("Your message didn't get through!!\n\r", ch);
+    return eSUCCESS;
+  }
 
-  if (!IS_MOB(ch) && IS_SET(ch->pcdata->punish, PUNISH_NOTELL)) {
-     send_to_char("Your message didn't get through!!\n\r", ch);
-     return eSUCCESS;
-     }
-
-  if (!IS_AFFECTED(ch, AFF_GROUP)) {
-     send_to_char("You don't have a group to talk to!\n\r", ch);
-     return eSUCCESS;
-     }
+  if (!IS_AFFECTED(ch, AFF_GROUP))
+  {
+    send_to_char("You don't have a group to talk to!\n\r", ch);
+    return eSUCCESS;
+  }
 
   sprintf(buf, "$B$1You tell the group, $7'%s'$R", argument);
-  act(buf, ch, 0, 0, TO_CHAR, STAYHIDE|ASLEEP);
+  act(buf, ch, 0, 0, TO_CHAR, STAYHIDE | ASLEEP);
 
-  if (!(k = ch->master)) 
-     k = ch;
+  if (!(k = ch->master))
+    k = ch;
 
   sprintf(buf, "$B$1$n tells the group, $7'%s'$R", argument);
 
   if (ch->master)
-      act(buf, ch, 0, ch->master, TO_VICT, STAYHIDE|ASLEEP);
+    act(buf, ch, 0, ch->master, TO_VICT, STAYHIDE | ASLEEP);
 
-  for(f = k->followers; f; f = f->next)
-    if(IS_AFFECTED(f->follower, AFF_GROUP) && ( f->follower != ch) ) {
-          for(tmp_obj = world[f->follower->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
-            if(obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER) {
-              silence = TRUE;
-              break;
-            }
-          if(!silence) act(buf, ch, 0, f->follower, TO_VICT, STAYHIDE|ASLEEP);
+  for (f = k->followers; f; f = f->next)
+    if (IS_AFFECTED(f->follower, AFF_GROUP) && (f->follower != ch))
+    {
+      for (tmp_obj = world[f->follower->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
+        if (obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER)
+        {
+          silence = TRUE;
+          break;
+        }
+      if (!silence)
+        act(buf, ch, 0, f->follower, TO_VICT, STAYHIDE | ASLEEP);
     }
   return eSUCCESS;
 }
