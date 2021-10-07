@@ -2665,105 +2665,108 @@ void send_damage(char const *buf, CHAR_DATA *ch, OBJ_DATA *obj, CHAR_DATA *victi
  delete tokens2;
 }
 
-
-
 void do_dam_msgs(CHAR_DATA *ch, CHAR_DATA *victim, int dam, int attacktype, int weapon, int filter)
 {
   extern struct message_list fight_messages[MAX_MESSAGES];
-  struct message_type *messages,*messages2;
-  int i,j, nr;
+  struct message_type *messages, *messages2;
+  int i, j, nr;
   string find, replace;
 
-  if (is_bingo(dam, weapon, attacktype)) return;
+  if (is_bingo(dam, weapon, attacktype))
+    return;
 
-  if(filter > TYPE_HIT && (attacktype == SPELL_BURNING_HANDS || attacktype == SPELL_FIREBALL || attacktype == SPELL_FIRESTORM || attacktype == SPELL_HELLSTREAM 
-	|| attacktype == SPELL_MAGIC_MISSILE || attacktype == SPELL_METEOR_SWARM || attacktype == SPELL_LIGHTNING_BOLT || attacktype == SPELL_CHILL_TOUCH) )
+  if (filter > TYPE_HIT && (attacktype == SPELL_BURNING_HANDS || attacktype == SPELL_FIREBALL || attacktype == SPELL_FIRESTORM || attacktype == SPELL_HELLSTREAM || attacktype == SPELL_MAGIC_MISSILE || attacktype == SPELL_METEOR_SWARM || attacktype == SPELL_LIGHTNING_BOLT || attacktype == SPELL_CHILL_TOUCH))
   {
-   if(attacktype == SPELL_CHILL_TOUCH) find = "$B$3";
-   else if(attacktype == SPELL_LIGHTNING_BOLT) find = "$B$5";
-   else if(attacktype == SPELL_MAGIC_MISSILE || attacktype == SPELL_METEOR_SWARM) find = "$B$7";
-   else find = "$B$4";
+    if (attacktype == SPELL_CHILL_TOUCH)
+      find = "$B$3";
+    else if (attacktype == SPELL_LIGHTNING_BOLT)
+      find = "$B$5";
+    else if (attacktype == SPELL_MAGIC_MISSILE || attacktype == SPELL_METEOR_SWARM)
+      find = "$B$7";
+    else
+      find = "$B$4";
 
-   switch (filter) {
-		case TYPE_FIRE:
-			replace = "$B$4";
-			break;
-		case TYPE_COLD:
-			replace = "$B$3";
-			break;
-		case TYPE_ENERGY:
-			replace = "$B$5";
-			break;
-		case TYPE_ACID:
-			replace = "$B$2";
-			break;
-		case TYPE_POISON:
-			replace = "$2";
-			break;
-		case TYPE_MAGIC:
-			replace = "$B$7";
-			break;
-		default:
-			replace = find;
-			break;
-		}
+    switch (filter)
+    {
+    case TYPE_FIRE:
+      replace = "$B$4";
+      break;
+    case TYPE_COLD:
+      replace = "$B$3";
+      break;
+    case TYPE_ENERGY:
+      replace = "$B$5";
+      break;
+    case TYPE_ACID:
+      replace = "$B$2";
+      break;
+    case TYPE_POISON:
+      replace = "$2";
+      break;
+    case TYPE_MAGIC:
+      replace = "$B$7";
+      break;
+    default:
+      replace = find;
+      break;
+    }
   }
 
   for (i = 0; i < MAX_MESSAGES; i++)
   {
     if (fight_messages[i].a_type != attacktype)
       continue;
-    
+
     nr = dice(1, fight_messages[i].number_of_attacks);
     j = 1;
     for (messages = fight_messages[i].msg, messages2 = fight_messages[i].msg2; j < nr && messages; j++)
     {
       messages = messages->next;
-      if (messages2) messages2 = messages2->next;
+      if (messages2)
+        messages2 = messages2->next;
     }
     char dmgmsg[MAX_INPUT_LENGTH];
     dmgmsg[0] = '\0';
-	if (dam > 0)
-    sprintf(dmgmsg, "$B%d$R", dam);
-    if (!messages) return;
+    if (dam > 0)
+      sprintf(dmgmsg, "$B%d$R", dam);
+    if (!messages)
+      return;
     if (!IS_NPC(victim) && GET_LEVEL(victim) >= IMMORTAL)
     {
       act(replaceString(messages->god_msg.attacker_msg, find, replace),
-        ch, ch->equipment[weapon], victim, TO_CHAR, 0);
+          ch, ch->equipment[weapon], victim, TO_CHAR, 0);
       act(replaceString(messages->god_msg.victim_msg, find, replace),
-        ch, ch->equipment[weapon], victim, TO_VICT, 0);
+          ch, ch->equipment[weapon], victim, TO_VICT, 0);
       act(replaceString(messages->god_msg.room_msg, find, replace),
-        ch, ch->equipment[weapon], victim, TO_ROOM, NOTVICT);
+          ch, ch->equipment[weapon], victim, TO_ROOM, NOTVICT);
+    }
+    else if (dam == 0)
+    {
+      act(replaceString(messages->miss_msg.attacker_msg, find, replace),
+          ch, ch->equipment[weapon], victim, TO_CHAR, 0);
+      act(replaceString(messages->miss_msg.victim_msg, find, replace),
+          ch, ch->equipment[weapon], victim, TO_VICT, 0);
+      act(replaceString(messages->miss_msg.room_msg, find, replace),
+          ch, ch->equipment[weapon], victim, TO_ROOM, NOTVICT);
+    }
+    else if (GET_POS(victim) == POSITION_DEAD)
+    {
+      send_damage(replaceString(messages2->die_msg.victim_msg, find, replace).c_str(), ch, ch->equipment[weapon],
+                  victim, dmgmsg, replaceString(messages->die_msg.victim_msg, find, replace).c_str(), TO_VICT);
+      send_damage(replaceString(messages2->die_msg.attacker_msg, find, replace).c_str(), ch, ch->equipment[weapon],
+                  victim, dmgmsg, replaceString(messages->die_msg.attacker_msg, find, replace).c_str(), TO_CHAR);
+      send_damage(replaceString(messages2->die_msg.room_msg, find, replace).c_str(), ch, ch->equipment[weapon],
+                  victim, dmgmsg, replaceString(messages->die_msg.room_msg, find, replace).c_str(), TO_ROOM);
     }
     else
-      if (dam == 0)
-      {
-        act(replaceString(messages->miss_msg.attacker_msg, find, replace),
-          ch, ch->equipment[weapon], victim, TO_CHAR, 0);
-        act(replaceString(messages->miss_msg.victim_msg, find, replace),
-          ch, ch->equipment[weapon], victim, TO_VICT, 0);
-        act(replaceString(messages->miss_msg.room_msg, find, replace),
-          ch, ch->equipment[weapon], victim, TO_ROOM, NOTVICT);
-      }
-      else
-        if (GET_POS(victim) == POSITION_DEAD)
-        {
-	send_damage(replaceString(messages2->die_msg.victim_msg, find, replace).c_str(), ch, ch->equipment[weapon],
-		victim, dmgmsg, replaceString(messages->die_msg.victim_msg, find, replace).c_str(), TO_VICT);
-	send_damage(replaceString(messages2->die_msg.attacker_msg, find, replace).c_str(), ch, ch->equipment[weapon],
-		victim, dmgmsg, replaceString(messages->die_msg.attacker_msg, find, replace).c_str(), TO_CHAR);
-	send_damage(replaceString(messages2->die_msg.room_msg, find, replace).c_str(), ch, ch->equipment[weapon],
-		victim, dmgmsg, replaceString(messages->die_msg.room_msg, find, replace).c_str(), TO_ROOM);
-        }
-        else
-        {
-	send_damage(replaceString(messages2->hit_msg.victim_msg, find, replace).c_str(), ch, ch->equipment[weapon],
-		victim, dmgmsg, replaceString(messages->hit_msg.victim_msg, find, replace).c_str(), TO_VICT);
-	send_damage(replaceString(messages2->hit_msg.attacker_msg, find, replace).c_str(), ch, ch->equipment[weapon],
-		victim, dmgmsg, replaceString(messages->hit_msg.attacker_msg, find, replace).c_str(), TO_CHAR);
-	send_damage(replaceString(messages2->hit_msg.room_msg, find, replace).c_str(), ch, ch->equipment[weapon],
-		victim, dmgmsg, replaceString(messages->hit_msg.room_msg, find, replace).c_str(), TO_ROOM);
-        }
+    {
+      send_damage(replaceString(messages2->hit_msg.victim_msg, find, replace).c_str(), ch, ch->equipment[weapon],
+                  victim, dmgmsg, replaceString(messages->hit_msg.victim_msg, find, replace).c_str(), TO_VICT);
+      send_damage(replaceString(messages2->hit_msg.attacker_msg, find, replace).c_str(), ch, ch->equipment[weapon],
+                  victim, dmgmsg, replaceString(messages->hit_msg.attacker_msg, find, replace).c_str(), TO_CHAR);
+      send_damage(replaceString(messages2->hit_msg.room_msg, find, replace).c_str(), ch, ch->equipment[weapon],
+                  victim, dmgmsg, replaceString(messages->hit_msg.room_msg, find, replace).c_str(), TO_ROOM);
+    }
   }
 }
 
