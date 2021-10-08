@@ -69,6 +69,26 @@
             "externalConsole": false,
             "MIMode": "gdb"
         },
+        {
+            "name": "(gdb) showplayerxp",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/showplayer",
+            "args": ["${workspaceFolder}/../../dcastle/save/J/Julian"], 
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/../../dcastle/lib",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "logging": { "engineLogging": true, "trace": true, "traceResponse": true },
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        },
 
 
 
