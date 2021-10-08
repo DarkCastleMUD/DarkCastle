@@ -3,6 +3,8 @@
 #include <unistd.h>
 #include <map>
 #include <cmath>
+#include <filesystem>
+
 #include "spells.h"
 #include "connect.h"
 #include "utility.h"
@@ -10,6 +12,7 @@
 #include "obj.h"
 #include "const.h"
 #include "utility.h"
+#include "vault.h"
 
 using namespace std;
 void load_char_obj_error(FILE *fpsave, char strsave[MAX_INPUT_LENGTH]);
@@ -18,8 +21,10 @@ int store_to_char_variable_data(CHAR_DATA *ch, FILE *fpsave);
 struct obj_data *my_obj_store_to_char(CHAR_DATA *ch, FILE *fpsave, struct obj_data *last_cont);
 int read_pc_or_mob_data(CHAR_DATA *ch, FILE *fpsave);
 void init_random();
+void load_vaults();
 
 extern struct index_data *obj_index;
+extern struct vault_data *vault_table;
 
 CVoteData *DCVote;
 bool verbose_mode = FALSE;
@@ -202,6 +207,11 @@ struct obj_data *my_obj_store_to_char(CHAR_DATA *ch, FILE *fpsave, struct obj_da
     fread(&obj->obj_flags.cost, sizeof(obj->obj_flags.cost), 1, fpsave);
     fread(&mod_type, sizeof(char), 3, fpsave);
   }
+  if (!strcmp("SAV", mod_type))
+  {
+    fread(&obj->save_expiration, sizeof(time_t), 1, fpsave);
+    fread(&mod_type, sizeof(char), 3, fpsave);
+  }
 
   // TODO - put extra desc support here
   // NEW READS GO HERE
@@ -251,7 +261,7 @@ struct obj_data *my_obj_store_to_char(CHAR_DATA *ch, FILE *fpsave, struct obj_da
   return last_cont;
 }
 
-bool my_load_char_obj(struct descriptor_data *d, char *name)
+bool my_load_char_obj(struct descriptor_data *d, const char *name)
 {
   FILE *fpsave = NULL;
   char strsave[MAX_INPUT_LENGTH];
@@ -311,7 +321,7 @@ bool my_load_char_obj(struct descriptor_data *d, char *name)
     last_cont = my_obj_store_to_char(ch, fpsave, last_cont);
     if (last_cont)
     {
-      printf("%d: %s\n", obj_index[last_cont->item_number].virt, last_cont->short_description);
+      //printf("%d: %s\n", obj_index[last_cont->item_number].virt, last_cont->short_description);
     }
   }
 
@@ -361,11 +371,11 @@ bool test_rolls(uint8_t total)
 }
 
 void test_random_stats(void)
-{  
+{
   init_random();
 
-  map<int,int> results;
-  for(int i=0; i < 10000; ++i)
+  map<int, int> results;
+  for (int i = 0; i < 10000; ++i)
   {
     int result = random_percent_change(33, 6);
     results[result]++;
@@ -377,15 +387,55 @@ void test_random_stats(void)
   }
 }
 
+void showObjectVault(const char* owner, obj_data* obj)
+{
+  cout << obj_index[obj->item_number].virt << ":";
+  char buf[255];
+
+  sprintbit(obj->obj_flags.wear_flags, wear_bits, buf);
+  cout << buf << ":";
+
+  sprintbit(obj->obj_flags.size, size_bits, buf);                     
+  cout << buf << ":";
+
+  sprintbit(obj->obj_flags.extra_flags, extra_bits, buf);
+  cout << buf << ":";
+
+  sprintbit(obj->obj_flags.more_flags, more_obj_bits, buf);
+  cout << buf << ":";
+
+  cout << obj->short_description << " in " << owner << "'s vault." << endl;
+}
+
+void showObject(char_data* ch, obj_data* obj)
+{
+  cout << obj_index[obj->item_number].virt << ":";
+  char buf[255];
+
+  sprintbit(obj->obj_flags.wear_flags, wear_bits, buf);
+  cout << buf << ":";
+
+  sprintbit(obj->obj_flags.size, size_bits, buf);                     
+  cout << buf << ":";
+
+  sprintbit(obj->obj_flags.extra_flags, extra_bits, buf);
+  cout << buf << ":";
+
+  sprintbit(obj->obj_flags.more_flags, more_obj_bits, buf);
+  cout << buf << ":";
+
+  cout << obj->short_description << " in " << GET_NAME(ch) << endl;
+}
+
 int main(int argc, char **argv)
-{  
-  string orig_cwd;
+{
+  string orig_cwd, dclib;
   if (argc < 2)
     return 1;
 
   if (getenv("DCLIB"))
   {
-    string dclib(getenv("DCLIB"));
+    dclib = string(getenv("DCLIB"));
     if (!dclib.empty())
     {
       orig_cwd = getcwd(NULL, 0);
@@ -401,26 +451,93 @@ int main(int argc, char **argv)
   /* Create 1 blank obj to be used when playerfile loads */
   create_blank_item(1);
 
-  chdir(orig_cwd.c_str());
-  my_load_char_obj(d, argv[1]);
-  cout << "Gold: " << d->character->gold << " Plat: " << d->character->plat << " XP: " << d->character->exp << " HP: " << d->character->raw_hit << " hpmeta: " << d->character->hpmetas << " Con: " << int(d->character->con) << "," << int(d->character->raw_con) << "," << int(d->character->con_bonus) << endl;
-  cout << "Mana: " << d->character->mana << " MetaMana: " << d->character->manametas << endl;
+  load_vaults();
 
-  int equip_count = 0;
-  char_data *ch = d->character;
-  for (int iWear = 0; iWear < MAX_WEAR; iWear++)
+  chdir(orig_cwd.c_str());
+
+  int vnum = 0;
+  if (argc >= 3)
   {
-    if (ch->equipment[iWear])
+    vnum = atoi(argv[2]);
+  }
+
+  if (argv[1] == string("all"))
+  {
+    string savepath = dclib + "../save/";
+    for (const auto &entry : filesystem::directory_iterator(savepath))
     {
-      obj_data *obj = ch->equipment[iWear];
-      if (GET_NAME(obj))
+      if (entry.is_directory() && entry.path() != "../save/qdata" && entry.path() != "../save/deleted")
       {
-        cerr << GET_NAME(obj) << endl;
+        for (const auto &pfile : filesystem::directory_iterator(entry.path().c_str()))
+        {
+          memset(d, 0, sizeof(descriptor_data));
+          
+          //cout << pfile.path().c_str() << endl;
+
+          try
+          {
+            obj_data *obj;
+            my_load_char_obj(d, pfile.path().c_str());
+
+            char_data *ch = d->character;
+            for (int iWear = 0; iWear < MAX_WEAR; iWear++)
+            {
+              if (ch->equipment[iWear])
+              {
+                obj = ch->equipment[iWear];
+                if (obj)
+                {
+                  if (vnum > 0 && obj_index[obj->item_number].virt == vnum)
+                  {
+                    showObject(ch, obj);
+                  }
+                }
+
+              }
+            }
+
+            for (obj_data *obj = ch->carrying; obj; obj = obj->next_content)
+            {
+              if (vnum == 0 || (vnum > 0 && obj_index[obj->item_number].virt == vnum))
+              {
+                showObject(ch, obj);
+              }
+
+              if (GET_OBJ_TYPE(obj) == ITEM_CONTAINER && obj->contains)
+              {
+                for (obj_data *container = obj->contains; container; container = container->next_content)
+                {
+                  if (vnum > 0 && obj_index[container->item_number].virt == vnum)
+                  {
+                    showObject(ch, container);
+                  }
+                }
+              }
+            }
+          }
+          catch (...)
+          {
+          }
+        }
       }
-      equip_count++;
+    }
+
+    struct vault_data *vault;
+
+    for (vault = vault_table;vault;vault = vault->next)
+    {
+      for (vault_items_data* items = vault->items;items;items = items->next)
+      {
+        obj_data* obj = items->obj ? items->obj : get_obj(items->item_vnum);
+        if (vnum > 0 && obj_index[obj->item_number].virt == vnum)
+        {
+          showObjectVault(vault->owner, obj);
+        }
+      }
     }
   }
 
-  cout << "Equipped count: " << equip_count << endl;
   return 0;
 }
+//      cout << "Gold: " << d->character->gold << " Plat: " << d->character->plat << " XP: " << d->character->exp << " HP: " << d->character->raw_hit << " hpmeta: " << d->character->hpmetas << " Con: " << int(d->character->con) << "," << int(d->character->raw_con) << "," << int(d->character->con_bonus) << endl;
+//      cout << "Mana: " << d->character->mana << " MetaMana: " << d->character->manametas << endl;
