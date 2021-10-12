@@ -485,106 +485,57 @@ int do_shutdow(struct char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-
 int do_testport(char_data *ch, char *argument, int cmd)
 {
-    int errnosave = 0;
-    static pid_t child = 0;
-    char arg1[MAX_INPUT_LENGTH];
+  int errnosave = 0;
+  static pid_t child = 0;
+  char arg1[MAX_INPUT_LENGTH];
 
-    if (ch == NULL) {
-	return eFAILURE;
+  if (ch == NULL)
+  {
+    return eFAILURE;
+  }
+
+  if (IS_MOB(ch) || !has_skill(ch, COMMAND_TESTPORT))
+  {
+    send_to_char("Huh?\r\n", ch);
+    return eFAILURE;
+  }
+
+  argument = one_argument(argument, arg1);
+
+  if (*arg1 == 0)
+  {
+    send_to_char("testport <start | stop>\n\r\n\r", ch);
+    return eFAILURE;
+  }
+
+  if (!str_cmp(arg1, "start"))
+  {
+    child = fork();
+    if (child == 0)
+    {
+      system("sudo -n /usr/bin/systemctl start --no-block dcastle_test");
+      exit(0);
     }
 
-    if (IS_MOB(ch) || !has_skill(ch, COMMAND_TESTPORT)) {
-        send_to_char("Huh?\r\n", ch);
-        return eFAILURE;
-    }  
-
-    argument = one_argument(argument, arg1);
-
-    if (*arg1 == 0) {
-	if (child) {
-	    send_to_char("status: running\n\r", ch);
-	} else {
-	    send_to_char("status: not running\n\r", ch);
-	}
-	send_to_char("testport <start | stop>\n\r\n\r", ch);
-	return eFAILURE;
+    logf(105, LOG_MISC, "Starting testport.");
+    send_to_char("Testport successfully started.\n\r", ch);
+  }
+  else if (!str_cmp(arg1, "stop"))
+  {
+    child = fork();
+    if (child == 0)
+    {
+      system("sudo -n /usr/bin/systemctl stop --no-block dcastle_test");
+      exit(0);
     }
 
-    if (!str_cmp(arg1, "start")) {
-	if (child) {
-	    send_to_char("Another testport is already running.\n\r", ch);
-	    return eFAILURE;
-	}
-	child = fork();
-	// inside of child of process
-	if (child == 0) {
-	    chdir("../bin/");
+    logf(105, LOG_MISC, "Shutdown testport under pid %d", child);
+    send_to_char("Testport successfully shutdown.\n\r", ch);
+  }
 
-	    // Find next available fd
-
-	    FILE *testportlog;
-	    if (DC::instance().cf.bport) {
-	    	testportlog = fopen("../blog/testport.log", "w");
-	    } else {
-	    	testportlog = fopen("../log/testport.log", "w");
-	    }
-
-	    if (testportlog != NULL) {
-		int fd = fileno(testportlog);
-
-		close(0);
-		// Redirect stdout and stderr to go to testportlog's fd instead
-		dup2(fd, 1);
-		dup2(fd, 2);
-
-		// Close all fds so this child doesnt have access to parent's fds
-		for (int i=3; i <= fd; i++) {
-		    errno = 0;
-		    close(i);
-		    if (errno) {
-			perror("do_testport");
-		    }
-		}
-
-		char *myargv[] = {"./dcastle", "-P", "-b", "7000", NULL};
-		errno = 0;
-		execv("./dcastle", myargv);
-	    }
-	    exit(0);
-	}
-	
-	logf(105, LOG_MISC, "Starting testport under pid %d", child);
-	send_to_char("Testport successfully started.\n\r", ch);
-    } else if (!str_cmp(arg1, "stop")) {
-	if (!child) {
-	    send_to_char("The testport is not running currently.\n\r", ch);
-	    return eFAILURE;
-	} else {
-	    errno = 0;
-	    kill(child, 9);
-	    errnosave = errno;
-	    if (errnosave) {
-		csendf(ch, "Error: %s\n\r", strerror(errnosave));
-
-		// Process must have already died because it cant be found now
-		if (errnosave == ESRCH) {
-		    child = 0;
-		}
-		return eFAILURE;
-	    }
-	    logf(105, LOG_MISC, "Shutdown testport under pid %d", child);
-	    send_to_char("Testport successfully shutdown.\n\r", ch);
-	    child = 0;
-	    return eSUCCESS;
-	}
-    } else {
-	send_to_char("Invalid option.\n\r", ch);
-    }
-
-    return eSUCCESS;
+  return eSUCCESS;
 }
 
 int do_testuser(char_data *ch, char *argument, int cmd)
@@ -624,7 +575,7 @@ int do_testuser(char_data *ch, char *argument, int cmd)
     }
 
     snprintf(savefile, 255, "../save/%c/%s", UPPER(username[0]), username);
-    snprintf(bsavefile, 255, "../bsave/%c/%s", UPPER(username[0]), username);
+    snprintf(bsavefile, 255, "/srv/dcastle_test/bsave/%c/%s", UPPER(username[0]), username);
 
     if (!file_exists(savefile)) {
       send_to_char("Player file not found.\n\r", ch);
