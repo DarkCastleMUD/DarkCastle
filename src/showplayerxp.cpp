@@ -536,6 +536,44 @@ int main(int argc, char **argv)
       }
     }
   }
+  else
+  {
+    try
+    {
+      obj_data *obj;
+      my_load_char_obj(d, argv[1]);
+
+      char_data *ch = d->character;
+      for (int iWear = 0; iWear < MAX_WEAR; iWear++)
+      {
+        if (ch->equipment[iWear])
+        {
+          obj = ch->equipment[iWear];
+          if (obj)
+          {
+            showObject(ch, obj);
+          }
+        }
+      }
+
+      for (obj_data *obj = ch->carrying; obj; obj = obj->next_content)
+      {
+        showObject(ch, obj);
+
+        if (GET_OBJ_TYPE(obj) == ITEM_CONTAINER && obj->contains)
+        {
+          for (obj_data *container = obj->contains; container; container = container->next_content)
+          {
+            showObject(ch, container);
+          }
+        }
+      }
+    }
+    catch (...)
+    {
+    }
+
+  }
 
   return 0;
 }
