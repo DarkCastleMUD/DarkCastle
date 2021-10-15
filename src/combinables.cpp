@@ -867,7 +867,7 @@ int do_scribe(char_data *ch, char *argument, int cmd)
 
   argument = one_argument(argument, arg1);
 
-  if (IS_PC(ch) && GET_LEVEL(ch) >= 108) {
+  if (IS_PC(ch) && GET_LEVEL(ch) >= 106) {
     if (!str_cmp(arg1, "load")) {
       s.load();
       logf(108, LOG_WORLD, "Loaded %d scribe recipes.", s.size());
