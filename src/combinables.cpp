@@ -417,7 +417,7 @@ int do_brew(char_data *ch, char *argument, int cmd)
   if (!*argument) {
       send_to_char("Brew what?\n\r"
 		   "$3Syntax:$R brew <herb> <liquid> <container>\n\r", ch);
-      if (GET_LEVEL(ch) >= 108) {
+      if (GET_LEVEL(ch) >= 106) {
 	send_to_char("        brew load\n\r"
 		     "        brew save\n\r"
 		     "        brew list\n\r"
