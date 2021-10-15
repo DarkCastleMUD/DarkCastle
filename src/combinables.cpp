@@ -429,7 +429,7 @@ int do_brew(char_data *ch, char *argument, int cmd)
 
   argument = one_argument(argument, arg1);
 
-  if (IS_PC(ch) && GET_LEVEL(ch) >= 108) {
+  if (IS_PC(ch) && GET_LEVEL(ch) >= 106) {
     if (!str_cmp(arg1, "load")) {
       b.load();
       logf(108, LOG_WORLD, "Loaded %d brew recipes.", b.size());
@@ -855,7 +855,7 @@ int do_scribe(char_data *ch, char *argument, int cmd)
   if (!*argument) {
       send_to_char("Scribe what?\n\r"
 		   "$3Syntax:$R scribe <ink> <dust> <pen> <paper>\n\r", ch);
-      if (GET_LEVEL(ch) >= 108) {
+      if (GET_LEVEL(ch) >= 106) {
 	send_to_char("        scribe load\n\r"
 		     "        scribe save\n\r"
 		     "        scribe list\n\r"
