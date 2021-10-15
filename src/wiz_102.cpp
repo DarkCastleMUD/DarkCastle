@@ -2207,6 +2207,7 @@ int do_oedit(struct char_data *ch, char *argument, int cmd)
       // stat
       case 20: {
         obj_stat(ch, (obj_data *) obj_index[item_num].item);
+        return eSUCCESS;
         break;
       }
 	case 21:
@@ -3331,6 +3332,7 @@ int do_medit(struct char_data *ch, char *argument, int cmd) {
 		// stat
 	case 24: {
 		mob_stat(ch, (char_data *) mob_index[mob_num].item);
+    return eSUCCESS;
 		break;
 	}
 		// strength
