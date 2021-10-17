@@ -387,6 +387,34 @@ void test_random_stats(void)
   }
 }
 
+void showObjectAffects(obj_data* obj)
+{
+    for (int i=0; i < obj->num_affects; ++i)
+  {
+    if (i>0)
+    {
+      cout << ", ";
+    }
+
+    char buf2[255];
+    if (obj->affected[i].location < 1000)
+    {
+      sprinttype(obj->affected[i].location, apply_types, buf2);
+    }
+    else if (get_skill_name(obj->affected[i].location / 1000))
+    {
+      strncpy(buf2, get_skill_name(obj->affected[i].location / 1000), sizeof(buf2));
+    }
+    else
+    {
+      strncpy(buf2, "Invalid", sizeof(buf2));
+    }
+    buf2[254] = 0;
+
+    cout << buf2 << " by " << obj->affected[i].modifier;
+  }
+}
+
 void showObjectVault(const char* owner, obj_data* obj)
 {
   cout << obj_index[obj->item_number].virt << ":";
@@ -404,7 +432,9 @@ void showObjectVault(const char* owner, obj_data* obj)
   sprintbit(obj->obj_flags.more_flags, more_obj_bits, buf);
   cout << buf << ":";
 
-  cout << obj->short_description << " in " << owner << "'s vault." << endl;
+  showObjectAffects(obj);
+
+  cout << " " << obj->short_description << " in " << owner << "'s vault." << endl;
 }
 
 void showObject(char_data* ch, obj_data* obj)
@@ -424,7 +454,9 @@ void showObject(char_data* ch, obj_data* obj)
   sprintbit(obj->obj_flags.more_flags, more_obj_bits, buf);
   cout << buf << ":";
 
-  cout << obj->short_description << " in " << GET_NAME(ch) << endl;
+  showObjectAffects(obj);
+
+  cout << " " << obj->short_description << " in " << GET_NAME(ch) << endl;
 }
 
 int main(int argc, char **argv)
