@@ -634,6 +634,15 @@ int do_config(char_data *ch, char *argument, int cmd)
   // config key
   if (equal_position == string::npos && value.empty() == true)
   {
+    csendf(ch, "Usage:\r\n");
+    csendf(ch, "config                       - Show all currently set configuration options.\r\n");
+    csendf(ch, "config color.good=color name - Set color to use for \"good\" values in game.\r\n");
+    csendf(ch, "config color.bad=color name  - Set color to use for \"bad\" values in game.\r\n");
+    csendf(ch, "                               Use ? as color name to see valid colors.\r\n");
+    csendf(ch, "config color.good=           - Unset color.good. Will use default \"good\" color.\r\n");
+    csendf(ch, "config color.bad=            - Unset color.bad. Will use default \"bad\" color.\r\n\r\n");
+    csendf(ch, "Current config:\r\n");
+
     bool found=false;
     for (auto &option : *ch->pcdata->options)
     {      
@@ -679,7 +688,15 @@ int do_config(char_data *ch, char *argument, int cmd)
     {
       if (colors.find(value) == colors.end())
       {
-        csendf(ch, "Invalid color specified. Valid colors:\r\n");
+        if (value == "?")
+        {
+          csendf(ch, "Valid colors:\r\n");
+        }
+        else
+        {
+          csendf(ch, "Invalid color specified. Valid colors:\r\n");
+        }
+        
         for (auto &color : colors)
         {
           if (color.first == "black")
