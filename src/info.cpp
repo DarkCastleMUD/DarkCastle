@@ -824,9 +824,56 @@ void try_to_peek_into_container(struct char_data *vict, struct char_data *ch,
       send_to_char("You don't see anything inside it.\r\n", ch);
 }
 
-void showStatDiff(char_data *ch, int base, int random)
+void showStatDiff(char_data *ch, int base, int random, bool swapcolors=false)
 {
    char buf[MAX_STRING_LENGTH] = { 0 }, buf2[256] = { 0 };
+   string color_good="$2";
+   string color_bad="$4";
+
+   if (ch && ch->pcdata)
+   {
+      if (ch->pcdata->options)
+      {
+         map<string,string> colors;
+         //colors["black"]="$0";
+         colors["blue"]="$1";
+         colors["green"]="$2";
+         colors["cyan"]="$3";
+         colors["red"]="$4";
+         colors["yellow"]="$5";
+         colors["magenta"]="$6";
+         colors["white"]="$7";
+         colors["gray"]="$B$0";
+         colors["bright blue"]="$B$1";
+         colors["bright green"]="$B$2";
+         colors["bright cyan"]="$B$3";
+         colors["bright red"]="$B$4";
+         colors["bright yellow"]="$B$5";
+         colors["bright magenta"]="$B$6";
+         colors["bright white"]="$B$7";
+         map<string,string>::iterator value;
+
+         if (ch->pcdata->options->find("color.good")->second.empty() == false)
+         {
+            if (colors.find(ch->pcdata->options->find("color.good")->second)->second.empty() == false)
+            {
+               color_good = colors.find(ch->pcdata->options->find("color.good")->second)->second;
+            }
+         }
+
+         if (ch->pcdata->options->find("color.bad")->second.empty() == false)
+         {
+            if (colors.find(ch->pcdata->options->find("color.bad")->second)->second.empty() == false)
+            {
+               color_bad = colors.find(ch->pcdata->options->find("color.bad")->second)->second;
+            }
+         }
+      }
+   }
+   else
+   {
+      return;
+   }
 
    // original value
    sprintf(buf2, "%d", base);
@@ -835,13 +882,27 @@ void showStatDiff(char_data *ch, int base, int random)
    if (random-base > 0)
    {
       // if postive show "+ difference"
-      sprintf(buf2, "$2+%d$R", random-base);
+      if (swapcolors)
+      {
+         sprintf(buf2, "%s+%d$R", color_bad.c_str(), random-base);
+      }
+      else
+      {
+         sprintf(buf2, "%s+%d$R", color_good.c_str(), random-base);
+      }
       strcat(buf, buf2);
    }
    else if (random-base < 0)
    {
       // if negative show "- difference"
-      sprintf(buf2, "$4%d$R", random-base);
+      if (swapcolors)
+      {
+         sprintf(buf2, "%s%d$R", color_good.c_str(), random-base);
+      }
+      else
+      {
+         sprintf(buf2, "%s%d$R", color_bad.c_str(), random-base);
+      }
       strcat(buf, buf2);
    }         
    strcat(buf, "$R");
@@ -965,46 +1026,19 @@ bool identify(char_data *ch, obj_data *obj)
       break;
 
    case ITEM_WEAPON:
-      sprintf(buf, "$3Damage Dice are '$R%dD%d$3'$R",
+      csendf(ch, "$3Damage Dice are '$R%dD%d$3'$R",
             obj->obj_flags.value[1],
             obj->obj_flags.value[2]);
 
       if (vobj != nullptr)
       {
-         // original value
-         sprintf(buf2, " (%d", vobj->obj_flags.value[1]);
-         strcat(buf, buf2);
-         
-         if (obj->obj_flags.value[1]-vobj->obj_flags.value[1] > 0)
-         {
-            // if postive show "+ difference"
-            sprintf(buf2, "$2+%d$R", obj->obj_flags.value[1]-vobj->obj_flags.value[1]);
-            strcat(buf, buf2);
-         } else if (obj->obj_flags.value[1]-vobj->obj_flags.value[1] < 0)
-         {
-            // if negative show "- difference"
-            sprintf(buf2, "$4%d$R", obj->obj_flags.value[1]-vobj->obj_flags.value[1]);
-            strcat(buf, buf2);
-         }
-
-         sprintf(buf2, "D%d", vobj->obj_flags.value[2]);
-         strcat(buf, buf2);
-
-         if (obj->obj_flags.value[2]-vobj->obj_flags.value[2] > 0)
-         {
-            // if postive show "+ difference"
-            sprintf(buf2, "$2+%d$R", obj->obj_flags.value[2]-vobj->obj_flags.value[2]);
-            strcat(buf, buf2);
-         } else if (obj->obj_flags.value[2]-vobj->obj_flags.value[2] < 0)
-         {
-            // if negative show "- difference"
-            sprintf(buf2, "$4%d$R", obj->obj_flags.value[2]-vobj->obj_flags.value[2]);
-            strcat(buf, buf2);
-         }
-         
-         strcat(buf, ")");         
+         csendf(ch, " (");
+         showStatDiff(ch, vobj->obj_flags.value[1], obj->obj_flags.value[1]);
+         csendf(ch, "D");
+         showStatDiff(ch, vobj->obj_flags.value[2], obj->obj_flags.value[2]);
+         csendf(ch, ")");
       }
-      csendf(ch, "%s\r\n", buf);
+      csendf(ch, "\r\n");
 
       int get_weapon_damage_type(obj_data *wielded);
       bits = get_weapon_damage_type(obj) - 1000;
@@ -1045,7 +1079,7 @@ bool identify(char_data *ch, obj_data *obj)
       sprintf(buf, "$3AC-apply is $R%d (", value);
       send_to_char(buf, ch);
       if (vobj != nullptr)
-      {         
+      {
          showStatDiff(ch, vobj->obj_flags.value[0], obj->obj_flags.value[0]);
       }
       if (IS_SET(obj->obj_flags.extra_flags, ITEM_ENCHANTED) == false)
@@ -1079,32 +1113,28 @@ bool identify(char_data *ch, obj_data *obj)
             strcpy(buf2, get_skill_name(obj->affected[i].location / 1000));
          else
             strcpy(buf2, "Invalid");
-         sprintf(buf, "    $3Affects : $R%s$3 By $R%d", buf2, obj->affected[i].modifier);
+         csendf(ch, "    $3Affects : $R%s$3 By $R%d", buf2, obj->affected[i].modifier);
 
          if (vobj != nullptr &&
             i < vobj->num_affects &&
             vobj->affected != nullptr &&
             vobj->affected[i].location == obj->affected[i].location)
          {
-            // original value
-            sprintf(buf2, " (%d", vobj->affected[i].modifier);
-            strcat(buf, buf2);
-            
-            if (obj->affected[i].modifier-vobj->affected[i].modifier > 0)
+            csendf(ch, " (");
+            // Swap color for ARMOR so lower values use "good" color
+            if (vobj->affected[i].location == 17)
             {
-               // if postive show "+ difference"
-               sprintf(buf2, "$2+%d$R", obj->affected[i].modifier-vobj->affected[i].modifier);
-               strcat(buf, buf2);
-            } else if (obj->affected[i].modifier-vobj->affected[i].modifier < 0)
-            {
-               // if negative show "- difference"
-               sprintf(buf2, "$4%d$R", obj->affected[i].modifier-vobj->affected[i].modifier);
-               strcat(buf, buf2);
+               showStatDiff(ch, vobj->affected[i].modifier, obj->affected[i].modifier, true);
             }
-            strcat(buf, ")");
+            else
+            {
+               showStatDiff(ch, vobj->affected[i].modifier, obj->affected[i].modifier);
+            }
+            
+            csendf(ch, ")");
          }
 
-         csendf(ch, "%s\r\n", buf);
+         csendf(ch, "\r\n", buf);
       }
    }
 
