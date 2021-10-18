@@ -2388,6 +2388,7 @@ int spell_haste(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *
   }
 
   if ( affected_by_spell(victim, SPELL_HASTE) || IS_AFFECTED(victim, AFF_HASTE))
+     send_to_char("You are already moving too quickly!\n\r", ch);	  
 	 return eFAILURE;
 
   af.type      = SPELL_HASTE;
@@ -2936,8 +2937,10 @@ int spell_protection_from_evil(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, st
   // Used to identify PFE from godload_defender(), obj vnum 556
   if (skill == 150) { duration = 4; modifier = 60; } 
 
-  if (!affected_by_spell(victim, SPELL_PROTECT_FROM_EVIL) ) 
-  {
+   if(affected_by_spell(victim, SPELL_PROTECT_FROM_EVIL)) {
+     send_to_char("You are already protected from evil!\n\r", ch);
+     return eFAILURE;
+   }
 	 af.type      = SPELL_PROTECT_FROM_EVIL;
 	 af.duration  = duration;
 	 af.modifier  = modifier;
@@ -2946,7 +2949,7 @@ int spell_protection_from_evil(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, st
 	 affect_to_char(victim, &af);
 	 send_to_char("You have a righteous, protected feeling!\n\r", victim);
          act("A dark, $6pulsing$R aura surrounds $n.", victim, 0, 0, TO_ROOM, INVIS_NULL);
-  }
+  
   return eSUCCESS;
 }
 
@@ -2967,8 +2970,10 @@ int spell_protection_from_good(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, st
       affected_by_spell(victim, SPELL_PROTECT_FROM_EVIL))
     return eFAILURE;
 
-  if (!affected_by_spell(victim, SPELL_PROTECT_FROM_GOOD)) 
-  {
+   if(affected_by_spell(victim, SPELL_PROTECT_FROM_GOOD)) {
+     send_to_char("You are already protected from good!\n\r", ch);
+     return eFAILURE;
+   }
 	 af.type      = SPELL_PROTECT_FROM_GOOD;
 	 af.duration  = duration;
 	 af.modifier  = modifier;
@@ -2977,7 +2982,7 @@ int spell_protection_from_good(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, st
 	 affect_to_char(victim, &af);
 	 send_to_char("You feel yourself wrapped in a protective mantle of evil.\n\r", victim);
          act("A light, $B$6pulsing$R aura surrounds $n.", victim, 0, 0, TO_ROOM, INVIS_NULL);
-  }
+  
   return eSUCCESS;
 }
 
@@ -3465,8 +3470,10 @@ int cast_sanctuary( ubyte level, CHAR_DATA *ch, char *arg, int type,
 int spell_camouflague(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill) 
 {
   struct affected_type af;
-
-  if(!affected_by_spell(victim, SPELL_CAMOUFLAGE)) {
+   if(affected_by_spell(victim, SPELL_CAMOUFLAGE)) {
+     send_to_char("You are already well hidden enough!\n\r", ch);
+     return eFAILURE;
+   }
      act("$n fades into the plant life.", victim, 0, 0, TO_ROOM, INVIS_NULL);
      act("You fade into the plant life.", victim, 0, 0, TO_CHAR, 0);
      
@@ -3476,7 +3483,7 @@ int spell_camouflague(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
      af.location      = APPLY_NONE;
      af.bitvector     = AFF_CAMOUFLAGUE;
      affect_to_char(victim, &af);
-  }
+  
   return eSUCCESS;
 }
 
@@ -3487,8 +3494,10 @@ int spell_camouflague(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
 int spell_farsight(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *tar_obj, int skill) 
 {
   struct affected_type af;
-
-  if(!affected_by_spell(victim, SPELL_FARSIGHT)) {
+   if(affected_by_spell(victim, SPELL_FARSIGHT)) {
+     send_to_char("You are can already see far enough!\n\r", ch);
+     return eFAILURE;
+   }
      act("Your eyesight improves.", victim, 0, 0, TO_CHAR, 0);
 
      af.type         = SPELL_FARSIGHT;
@@ -3497,7 +3506,7 @@ int spell_farsight(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
      af.location     = APPLY_NONE;
      af.bitvector    = AFF_FARSIGHT;
      affect_to_char(victim, &af);
-  }
+  
   return eSUCCESS;
 }
 
@@ -3508,8 +3517,10 @@ int spell_farsight(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
 int spell_freefloat(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *tar_obj, int skill) 
 {
    struct affected_type af;
-
-   if(!affected_by_spell(victim, SPELL_FREEFLOAT)) {
+   if(affected_by_spell(victim, SPELL_FREEFLOAT)) {
+     send_to_char("You are already stable enough!\n\r", ch);
+     return eFAILURE;
+   }
      act("You gain added stability.", victim, 0, 0, TO_CHAR, 0);
 
      af.type         = SPELL_FREEFLOAT;
@@ -3518,7 +3529,7 @@ int spell_freefloat(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
      af.location     = APPLY_NONE;
      af.bitvector    = AFF_FREEFLOAT;
      affect_to_char(victim, &af);
-   }
+   
    return eSUCCESS;
 }
 
@@ -3530,7 +3541,10 @@ int spell_insomnia(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
 {
    struct affected_type af;
 
-   if(!affected_by_spell(victim, SPELL_INSOMNIA)) {
+   if(affected_by_spell(victim, SPELL_INSOMNIA)) {
+     send_to_char("You are already feeling wife awake!\n\r", ch);
+     return eFAILURE;
+   }
      act("You suddenly feel wide awake.", victim, 0, 0, TO_CHAR, 0);
 
      af.type          = SPELL_INSOMNIA;
@@ -3539,7 +3553,7 @@ int spell_insomnia(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
      af.location      = APPLY_NONE;
      af.bitvector     = AFF_INSOMNIA;
      affect_to_char(victim, &af);
-   }
+   
    return eSUCCESS;
 }
 
@@ -3550,8 +3564,10 @@ int spell_insomnia(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
 int spell_shadowslip(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *tar_obj, int skill) 
 {
    struct affected_type af;
-
-   if(!affected_by_spell(victim, SPELL_SHADOWSLIP)) {
+   if(affected_by_spell(victim, SPELL_SHADOWSLIP)) {
+     send_to_char("You are already hiding amongst the shadows!\n\r", ch);
+     return eFAILURE;
+   }
      act("Portals will no longer find you as your presence becomes obscured by shadows.", victim, 0, 0, TO_CHAR, 0);
 
      af.type           = SPELL_SHADOWSLIP;
@@ -3560,7 +3576,7 @@ int spell_shadowslip(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
      af.location       = APPLY_NONE;
      af.bitvector      = AFF_SHADOWSLIP;
      affect_to_char(victim, &af);
-   }
+   
    return eSUCCESS;
 }
 
@@ -5637,21 +5653,25 @@ int spell_flamestrike(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
 
 
 /* IRIDESCENT AURA */
-
 int spell_iridescent_aura(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
    struct affected_type af;
 
-   if (!affected_by_spell(victim, SPELL_IRIDESCENT_AURA)) {
-      act("The air around $n shimmers and an $B$3i$7r$3i$7d$3e$7s$3c$7e$3n$7t$R aura appears around $m.", victim, 0, 0, TO_ROOM, INVIS_NULL);
-      act("The air around you shimmers and an $B$3i$7r$3i$7d$3e$7s$3c$7e$3n$7t$R aura appears around you.",victim,0,0, TO_CHAR,0);
+   if(affected_by_spell(victim, SPELL_IRIDESCENT_AURA)) {
+     send_to_char("You are already protected by an iridescent aura!\n\r", ch);
+     return eFAILURE;
+   }
+   act("The air around $n shimmers and an $B$3i$7r$3i$7d$3e$7s$3c$7e$3n$7t$R aura appears around $m.", victim, 0, 0, TO_ROOM, INVIS_NULL);
+   act("The air around you shimmers and an $B$3i$7r$3i$7d$3e$7s$3c$7e$3n$7t$R aura appears around you.",victim,0,0, TO_CHAR,0);
+   
       af.type = SPELL_IRIDESCENT_AURA;
       af.duration = 1 + skill / 10;
       af.modifier = skill/15;
       af.bitvector = -1;
       af.location = APPLY_SAVES;
       affect_to_char(victim, &af);
-   }
+
+
    return eSUCCESS;
 }
 
@@ -5667,7 +5687,10 @@ int spell_resist_cold(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
 	return eFAILURE;
    }
 
-   if (!affected_by_spell(victim, SPELL_RESIST_COLD)) {
+   if(affected_by_spell(victim, SPELL_RESIST_COLD)) {
+     send_to_char("You are already resistant to cold!\n\r", ch);
+     return eFAILURE;
+   }
       act("$n's skin turns $3blue$R momentarily.", victim, 0, 0, TO_ROOM, INVIS_NULL);
       act("Your skin turns $3blue$R momentarily.", victim, 0, 0, TO_CHAR, 0);
 
@@ -5677,7 +5700,7 @@ int spell_resist_cold(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
       af.location = APPLY_SAVING_COLD;
       af.bitvector = -1;
       affect_to_char(victim, &af);
-   }
+   
    return eSUCCESS;
 }
 
@@ -5694,7 +5717,10 @@ int spell_resist_fire(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
 	return eFAILURE;
    }
 
-   if (!affected_by_spell(victim, SPELL_RESIST_FIRE)) {
+   if(affected_by_spell(victim, SPELL_RESIST_FIRE)) {
+     send_to_char("You are already resistant to fire!\n\r", ch);
+     return eFAILURE;
+   }
       act("$n's skin turns $4red$R momentarily.", victim, 0, 0, TO_ROOM, INVIS_NULL);
       act("Your skin turns $4red$R momentarily.", victim, 0, 0, TO_CHAR, 0);
       af.type = SPELL_RESIST_FIRE;
@@ -5703,7 +5729,7 @@ int spell_resist_fire(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
       af.location = APPLY_SAVING_FIRE;
       af.bitvector = -1;
       affect_to_char(victim, &af);
-   }
+ 
    return eSUCCESS;
 }
 
@@ -5720,8 +5746,10 @@ int spell_resist_magic(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
 	return eFAILURE;
    }
 
-
-   if (!affected_by_spell(victim, SPELL_RESIST_MAGIC)) {
+   if(affected_by_spell(victim, SPELL_RESIST_MAGIC)) {
+     send_to_char("You are already resistant to magic!\n\r", ch);
+     return eFAILURE;
+   }
       act("$n's skin turns $B$7white$R momentarily.", victim, 0, 0, TO_ROOM, INVIS_NULL);
       act("Your skin turns $B$7white$R momentarily.", victim, 0, 0, TO_CHAR, 0);
       af.type = SPELL_RESIST_MAGIC;
@@ -5730,7 +5758,7 @@ int spell_resist_magic(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
       af.location = APPLY_SAVING_MAGIC;
       af.bitvector = -1;
       affect_to_char(victim, &af);
-   }
+   
    return eSUCCESS;
 }
 
@@ -5746,7 +5774,10 @@ int spell_staunchblood(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
 	send_to_char("You can only cast this on yourself.\r\n",ch);
 	return eFAILURE;
    }
-    if(!affected_by_spell(victim, SPELL_STAUNCHBLOOD)) {
+   if(affected_by_spell(victim, SPELL_STAUNCHBLOOD)) {
+     send_to_char("You are already resistant to poison!\n\r", ch);
+     return eFAILURE;
+   }
        act("You feel supremely healthy and resistant to $2poison$R!", victim, 0, 0, TO_CHAR, 0);
        act("$n looks supremely healthy and begins looking for snakes and spiders to fight.", victim, 0, 0, TO_ROOM, INVIS_NULL);
        af.type = SPELL_STAUNCHBLOOD;
@@ -5755,7 +5786,7 @@ int spell_staunchblood(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
        af.location = APPLY_SAVING_POISON;
        af.bitvector = -1;
        affect_to_char(victim, &af);
-    }
+    
   return eSUCCESS;
 }
 
@@ -5771,7 +5802,10 @@ int spell_resist_energy(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct ob
 	send_to_char("You can only cast this on yourself.\r\n",ch);
 	return eFAILURE;
    }
-   if(!affected_by_spell(victim, SPELL_RESIST_ENERGY)) {
+   if(affected_by_spell(victim, SPELL_RESIST_ENERGY)) {
+     send_to_char("You are already resistant to energy!\n\r", ch);
+     return eFAILURE;
+   }
       act("$n's skin turns $5yellow$R momentarily.", victim, 0, 0, TO_ROOM, INVIS_NULL);
       act("Your skin turns $5yellow$R momentarily.", victim, 0, 0, TO_CHAR, 0);
       af.type = SPELL_RESIST_ENERGY;
@@ -5780,7 +5814,7 @@ int spell_resist_energy(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct ob
       af.location = APPLY_SAVING_ENERGY;
       af.bitvector = -1;
       affect_to_char(victim, &af);
-   }
+   
    return eSUCCESS;
 }
 
@@ -5797,7 +5831,10 @@ int spell_stone_skin(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
         return eFAILURE;
     }
 
-    if (!affected_by_spell(ch, SPELL_STONE_SKIN)) {
+   if(affected_by_spell(victim, SPELL_STONE_SKIN)) {
+     send_to_char("Your skin is already rock hard!\n\r", ch);
+     return eFAILURE;
+   }
 	act("$n's skin turns grey and stone-like.", ch, 0, 0, TO_ROOM, INVIS_NULL);
 	act("Your skin turns to a stone-like substance.", ch, 0, 0, TO_CHAR, 0);
 
@@ -5809,7 +5846,7 @@ int spell_stone_skin(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
 	affect_to_char(ch, &af);
 
         SET_BIT(ch->resist, ISR_PIERCE);
-  }
+  
   return eSUCCESS;
 }
 
@@ -6808,6 +6845,16 @@ int cast_harm( ubyte level, CHAR_DATA *ch, char *arg, int type,
   case SPELL_TYPE_POTION:
     return spell_harm(level, ch, ch, 0, skill);
     break;
+  case SPELL_TYPE_SCROLL:
+  	    if(victim)
+  		return spell_harm(level, ch, victim, 0, skill);
+  	    else if(!tar_obj)
+  		 return spell_harm(level, ch, ch, 0, skill);
+  	    break;
+    case SPELL_TYPE_WAND:
+  	    if(victim)
+  		return spell_harm(level, ch, victim, 0, skill);
+  	    break;
   case SPELL_TYPE_STAFF:
     for (victim = world[ch->in_room].people ; victim ; victim = next_v )
     {
@@ -6846,6 +6893,12 @@ int cast_power_harm( ubyte level, CHAR_DATA *ch, char *arg, int type,
   case SPELL_TYPE_POTION:
     return spell_power_harm(level, ch, ch, 0, skill);
     break;
+  case SPELL_TYPE_SCROLL:
+    if(victim)
+      return spell_power_harm(level, ch, victim, 0, skill);
+    else if(!tar_obj)
+	  return spell_power_harm(level, ch, ch, 0, skill);
+  	break;
   case SPELL_TYPE_WAND:
     if(victim)
       return spell_power_harm(level, ch, victim, 0, skill);
@@ -7912,16 +7965,16 @@ int cast_haste( ubyte level, CHAR_DATA *ch, char *arg, int type,
 {
   switch (type) {
   case SPELL_TYPE_SPELL:
-	 if ( affected_by_spell(tar_ch, SPELL_HASTE) ){
-		send_to_char("Nothing seems to happen.\n\r", tar_ch);
-		return eFAILURE;
-	 }
 	 return spell_haste(level,ch,tar_ch,0, skill);
 	 break;
   case SPELL_TYPE_POTION:
 	 return spell_haste(level,ch,ch,0, skill);
 	 break;
   case SPELL_TYPE_WAND:
+	 if (tar_obj) return eFAILURE;
+	 if (!tar_ch) tar_ch = ch;
+	 return spell_haste(level, ch, tar_ch, 0, skill);
+	 break;		  
   case SPELL_TYPE_SCROLL:
 	 if (tar_obj) return eFAILURE;
 	 if (!tar_ch) tar_ch = ch;
@@ -8190,6 +8243,12 @@ int cast_heal( ubyte level, CHAR_DATA *ch, char *arg, int type,
 	 case SPELL_TYPE_POTION:
 	 return spell_heal(level, ch, ch, 0, skill);
 	 break;
+  	case SPELL_TYPE_SCROLL:
+           if(tar_obj)
+          return eFAILURE;
+       if(!tar_ch) tar_ch = ch;
+  		 return spell_heal(level, ch, tar_ch, 0, skill);
+  	  break;
 	 case SPELL_TYPE_STAFF:
 	 for (tar_ch = world[ch->in_room].people ;
 			tar_ch ; tar_ch = tar_ch->next_in_room)
@@ -8214,6 +8273,11 @@ int cast_power_heal( ubyte level, CHAR_DATA *ch, char *arg, int type,
 	 case SPELL_TYPE_POTION:
 	 return spell_power_heal(level, ch, ch, 0, skill);
 	 break;
+	 case SPELL_TYPE_SCROLL:
+	 for (tar_ch = world[ch->in_room].people ;
+			tar_ch ; tar_ch = tar_ch->next_in_room)
+		 spell_power_heal(level, ch, tar_ch, 0, skill);
+	 break;		  
 	 case SPELL_TYPE_WAND:
 	   if (!tar_ch) return eFAILURE;
 		return spell_power_heal(level,ch,tar_ch,0,skill);
@@ -8529,6 +8593,13 @@ int cast_remove_curse( ubyte level, CHAR_DATA *ch, char *arg, int type,
 	 if(!tar_ch) tar_ch = ch;
 		 return spell_remove_curse(level, ch, tar_ch, 0, skill);
 		 break;
+  	case SPELL_TYPE_WAND:
+	 if(tar_obj) {
+		return spell_remove_curse(level, ch, 0, tar_obj, skill);
+		 }
+	 if(!tar_ch) tar_ch = ch;
+		 return spell_remove_curse(level, ch, tar_ch, 0, skill);
+		 break;
 	 case SPELL_TYPE_STAFF:
 	 for (tar_ch = world[ch->in_room].people ;
 			tar_ch ; tar_ch = tar_ch->next_in_room)
@@ -8577,6 +8648,13 @@ int cast_remove_poison( ubyte level, CHAR_DATA *ch, char *arg, int type,
   case SPELL_TYPE_POTION:
     return spell_remove_poison(level, ch, ch, 0, skill);
     break;
+
+  case SPELL_TYPE_SCROLL:
+           if(tar_obj)
+          return eFAILURE;
+       if(!tar_ch) tar_ch = ch;
+		 return spell_remove_poison(level, ch, tar_ch, 0, skill);
+	    break;	  
 
   case SPELL_TYPE_STAFF:
     for (tar_ch = world[ch->in_room].people ;
@@ -9198,6 +9276,9 @@ int cast_know_alignment(ubyte level, CHAR_DATA *ch, char *arg, int type,
 	 if (!tar_ch) tar_ch = ch;
 	 return spell_know_alignment(level, ch, tar_ch, 0, skill);
 	 break;
+  case SPELL_TYPE_POTION:
+    return spell_know_alignment(level, ch, ch, 0, skill);
+    break;
   case SPELL_TYPE_WAND:
 	 if (tar_obj) return eFAILURE;
 	 if (!tar_ch) tar_ch = ch;
@@ -10127,6 +10208,13 @@ int cast_infravision( ubyte level, CHAR_DATA *ch, char *arg,
 	 return spell_infravision(level, ch, tar_ch, 0, skill);
 	 break;
   case SPELL_TYPE_WAND:
+	 if (tar_obj) return eFAILURE;
+	 if (!tar_ch) tar_ch = ch;
+	 return spell_infravision(level, ch, tar_ch, 0, skill);
+	 break;
+  case SPELL_TYPE_POTION:
+    return spell_infravision(level, ch, ch, 0, skill);
+    break;
   case SPELL_TYPE_SCROLL:
 	 if (tar_obj) return eFAILURE;
 	 if (!tar_ch) tar_ch = ch;
@@ -10245,6 +10333,22 @@ int cast_bee_swarm(ubyte level, CHAR_DATA *ch, char *arg, int type,
          break;
       case SPELL_TYPE_POTION:
 	 return spell_bee_swarm(level, ch, ch, 0, skill);
+  case SPELL_TYPE_SCROLL:
+  	    if(victim)
+  		return spell_bee_swarm(level, ch, victim, 0, skill);
+  	    else if(!tar_obj)
+  		 return spell_bee_swarm(level, ch, ch, 0, skill);
+  	    break;
+    case SPELL_TYPE_WAND:
+  	    if(victim)
+  		return spell_bee_swarm(level, ch, victim, 0, skill);
+  	    break;
+  case SPELL_TYPE_STAFF:
+  	    if(victim)
+  		return spell_bee_swarm(level, ch, victim, 0, skill);
+  	    else if(!tar_obj)
+  		 return spell_bee_swarm(level, ch, ch, 0, skill);
+  	    break;		   
       default :
 	 log("Serious screw-up in bee swarm!", ANGEL, LOG_BUG);
 	 break;
@@ -10644,6 +10748,23 @@ int cast_entangle(ubyte level, CHAR_DATA *ch, char *arg, int type,
          break;
       case SPELL_TYPE_POTION:
 	 return spell_entangle(level, ch, ch, 0, skill);
+    break;
+  case SPELL_TYPE_SCROLL:
+  	    if(victim)
+  		return spell_entangle(level, ch, victim, 0, skill);
+  	    else if(!tar_obj)
+  		 return spell_entangle(level, ch, ch, 0, skill);
+  	    break;
+    case SPELL_TYPE_WAND:
+  	    if(victim)
+  		return spell_entangle(level, ch, victim, 0, skill);
+  	    break;
+    case SPELL_TYPE_STAFF:
+  	    if(victim)
+  		return spell_entangle(level, ch, victim, 0, skill);
+  	    else if(!tar_obj)
+  		 return spell_entangle(level, ch, ch, 0, skill);
+  	    break;  
       default :
 	 log("Serious screw-up in entangle!", ANGEL, LOG_BUG);
 	 break;
@@ -10698,6 +10819,23 @@ int cast_eyes_of_the_owl(ubyte level, CHAR_DATA *ch, char *arg, int type,
          break;
       case SPELL_TYPE_POTION:
 	 return spell_eyes_of_the_owl(level, ch, ch, 0, skill);
+    break;
+  case SPELL_TYPE_SCROLL:
+  	    if(victim)
+  		return spell_eyes_of_the_owl(level, ch, victim, 0, skill);
+  	    else if(!tar_obj)
+  		 return spell_eyes_of_the_owl(level, ch, ch, 0, skill);
+  	    break;
+    case SPELL_TYPE_WAND:
+  	    if(victim)
+  		return spell_eyes_of_the_owl(level, ch, victim, 0, skill);
+  	    break;
+  case SPELL_TYPE_STAFF:
+  	    if(victim)
+  		return spell_eyes_of_the_owl(level, ch, victim, 0, skill);
+  	    else if(!tar_obj)
+  		 return spell_eyes_of_the_owl(level, ch, ch, 0, skill);
+  	    break;	
       default :
 	 log("Serious screw-up in eyes of the owl!", ANGEL, LOG_BUG);
 	 break;
@@ -11665,16 +11803,16 @@ int cast_lighted_path( ubyte level, CHAR_DATA *ch, char *arg, int type,
 		 return spell_lighted_path(level,ch, "", SPELL_TYPE_SPELL, tar_ch,0, skill);
 		 break;
 	case SPELL_TYPE_POTION:
-		 log("Serious screw-up in lighted_path(potion)!", ANGEL, LOG_BUG);
-		 return eFAILURE;
+		 return spell_lighted_path(level,ch, "", SPELL_TYPE_SPELL, tar_ch,0, skill);
 		 break;
 	case SPELL_TYPE_SCROLL:
-		 log("Serious screw-up in lighted_path(scroll)!", ANGEL, LOG_BUG);
-		 return eFAILURE;
+		 return spell_lighted_path(level,ch, "", SPELL_TYPE_SPELL, tar_ch,0, skill);
 		 break;
 	case SPELL_TYPE_WAND:
-		 log("Serious screw-up in lighted_path(wand)!", ANGEL, LOG_BUG);
-		 return eFAILURE;
+		 return spell_lighted_path(level,ch, "", SPELL_TYPE_SPELL, tar_ch,0, skill);
+		 break;
+	case SPELL_TYPE_STAFF:
+		 return spell_lighted_path(level,ch, "", SPELL_TYPE_SPELL, tar_ch,0, skill);
 		 break;
 		default :
 	 log("Serious screw-up in lighted_path! (unknown)", ANGEL, LOG_BUG);
@@ -11694,7 +11832,10 @@ int spell_resist_acid(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
 	return eFAILURE;
     }
 
-    if(!affected_by_spell(victim, SPELL_RESIST_ACID)) {
+     if(affected_by_spell(victim, SPELL_RESIST_ACID)) {
+     send_to_char("You are already resistant to acid!\n\r", ch);
+     return eFAILURE;
+   }
        act("$n's skin turns $2green$R momentarily.", victim, 0, 0, TO_ROOM, INVIS_NULL);
        act("Your skin turns $2green$R momentarily.", victim, 0, 0, TO_CHAR, 0);
 
@@ -11704,7 +11845,7 @@ int spell_resist_acid(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
        af.location = APPLY_SAVING_ACID;
        af.bitvector = -1;
        affect_to_char(victim, &af);
-    }
+    
   return eSUCCESS;
 }
 
@@ -11718,6 +11859,8 @@ int cast_resist_acid(ubyte level, CHAR_DATA *ch, char *arg, int type,
       return spell_resist_acid(level, ch, tar_ch, 0, skill);
       break;
     case SPELL_TYPE_WAND:
+	  return spell_resist_acid(level, ch, tar_ch, 0, skill);
+      break;
     case SPELL_TYPE_SCROLL:
       if (tar_obj) return eFAILURE;
       if (!tar_ch) tar_ch = ch;
@@ -12471,6 +12614,9 @@ int cast_debility( ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *t
     case SPELL_TYPE_SPELL:
        return spell_debility(level, ch, tar_ch, 0, skill);
        break;
+	case SPELL_TYPE_POTION:
+	   return spell_debility(level, ch, tar_ch, 0, skill);
+       break;
     case SPELL_TYPE_WAND:
     case SPELL_TYPE_SCROLL:
        if(tar_obj)
@@ -12576,6 +12722,9 @@ int cast_attrition( ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *
     case SPELL_TYPE_SPELL:
        return spell_attrition(level, ch, tar_ch, 0, skill);
        break;
+	case SPELL_TYPE_POTION:
+	   return spell_debility(level, ch, tar_ch, 0, skill);
+       break;		 
     case SPELL_TYPE_WAND:
     case SPELL_TYPE_SCROLL:
        if(tar_obj)
@@ -12616,8 +12765,10 @@ int spell_vampiric_aura(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct ob
      return eFAILURE;
   }
 */
-  if (!affected_by_spell(victim, SPELL_VAMPIRIC_AURA))
-  {
+   if(affected_by_spell(victim, SPELL_VAMPIRIC_AURA)) {
+     send_to_char("You are already covered in a film of shadows!\n\r", ch);
+     return eFAILURE;
+   }
     act("A film of $B$0shadow$R encompasses $n then fades from view.", victim, 0, 0, TO_ROOM, INVIS_NULL);
     act("A film of $B$0shadow$R encompasses you then fades from view.", victim, 0, 0, TO_CHAR, 0);
 
@@ -12627,7 +12778,7 @@ int spell_vampiric_aura(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct ob
     af.location  = APPLY_NONE;
     af.bitvector = -1;
     affect_to_char(victim, &af);
-  }
+  
   return eSUCCESS;
 }
 
@@ -13657,10 +13808,17 @@ int cast_solidity( ubyte level, CHAR_DATA *ch, char *arg,
 	 break;
   case SPELL_TYPE_WAND:
   case SPELL_TYPE_SCROLL:
-      if (tar_obj) return eFAILURE;
-      if (!tar_ch) tar_ch = ch;
+       if(tar_obj)
+          return eFAILURE;
+       if(!tar_ch) tar_ch = ch;
+          return spell_solidity(level, ch, tar_ch, 0, skill);
+       break;
     return spell_solidity(level, ch, tar_ch, 0, skill);
     break;
+    case SPELL_TYPE_STAFF:
+       for (tar_ch = world[ch->in_room].people ; tar_ch ; tar_ch = tar_ch->next_in_room)
+          spell_solidity(level,ch,tar_ch,0, skill);
+       break;	
   default:
 	 log("Serious screw-up in solidity!", ANGEL, LOG_BUG);
 	 break;
@@ -13709,10 +13867,17 @@ int cast_stability( ubyte level, CHAR_DATA *ch, char *arg,
 	 break;
   case SPELL_TYPE_WAND:
   case SPELL_TYPE_SCROLL:
-      if (tar_obj) return eFAILURE;
-      if (!tar_ch) tar_ch = ch;
+       if(tar_obj)
+          return eFAILURE;
+       if(!tar_ch) tar_ch = ch;
+          return spell_stability(level, ch, tar_ch, 0, skill);
+       break;
     return spell_stability(level, ch, tar_ch, 0, skill);
     break;
+    case SPELL_TYPE_STAFF:
+       for (tar_ch = world[ch->in_room].people ; tar_ch ; tar_ch = tar_ch->next_in_room)
+          spell_stability(level,ch,tar_ch,0, skill);
+       break;	
   default:
 	 log("Serious screw-up in stability!", ANGEL, LOG_BUG);
 	 break;
@@ -13758,10 +13923,17 @@ int cast_frostshield( ubyte level, CHAR_DATA *ch, char *arg,
 	 break;
   case SPELL_TYPE_WAND:
   case SPELL_TYPE_SCROLL:
-      if (tar_obj) return eFAILURE;
-      if (!tar_ch) tar_ch = ch;
+       if(tar_obj)
+          return eFAILURE;
+       if(!tar_ch) tar_ch = ch;
+          return spell_frostshield(level, ch, tar_ch, 0, skill);
+       break;
     return spell_frostshield(level, ch, tar_ch, 0, skill);
     break;
+    case SPELL_TYPE_STAFF:
+       for (tar_ch = world[ch->in_room].people ; tar_ch ; tar_ch = tar_ch->next_in_room)
+          spell_frostshield(level,ch,tar_ch,0, skill);
+       break;		  
   default:
 	 log("Serious screw-up in frostshield!", ANGEL, LOG_BUG);
 	 break;
