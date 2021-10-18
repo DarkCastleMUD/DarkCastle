@@ -58,7 +58,7 @@ using namespace std;
 #include "arena.h"
 #include "race.h"
 #include "const.h"
-
+#include "guild.h"
 
 // external vars
 
@@ -1108,10 +1108,6 @@ int do_mpteachskill( CHAR_DATA *ch, char *argument, int cmd )
     char arg[ MAX_INPUT_LENGTH ];
     char skill[ MAX_INPUT_LENGTH ];
 
-    int learn_skill(char_data * ch, int skill, int amount, int maximum);
-    class_skill_defines * get_skill_list(char_data * ch);
-    int search_skills(char * arg, class_skill_defines * list_skills);
-    int search_skills2(int arg, class_skill_defines * list_skills);
     if ( !IS_NPC( ch ) )
     {
 	send_to_char( "Huh?\n\r", ch );
@@ -1170,16 +1166,8 @@ int do_mpteachskill( CHAR_DATA *ch, char *argument, int cmd )
 
     send_to_char(skill, victim);
 
-    learn_skill(victim, skillnum, 1, 1);/*
-    // TEMP until borodin is happy
-        char_data * boro = get_char("Borodin");
-        if(boro) {
-          sprintf(skill, "$B$2%s tells you, 'I just taught %s the basics of %s.'$R\n\r", GET_SHORT(ch), GET_NAME(victim), skillname);
-          send_to_char(skill, boro);
-        }
-    }*/
+    learn_skill(victim, skillnum, 1, 1);
    
-    extern void prepare_character_for_sixty(CHAR_DATA *ch);
     prepare_character_for_sixty(ch);
 
     sprintf(skill,"$N has learned the basics of %s.",skillname);
