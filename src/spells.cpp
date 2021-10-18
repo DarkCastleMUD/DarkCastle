@@ -1563,7 +1563,6 @@ bool skill_success(CHAR_DATA *ch, CHAR_DATA *victim, int skillnum, int mod )
 {
 //  extern int stat_mod[];
 //  int modifier = 0;
-  extern class_skill_defines *get_skill_list(char_data *ch);
   extern int get_stat(CHAR_DATA *ch, int stat);
   //struct class_skill_defines *t;
   int stat=0;
