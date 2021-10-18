@@ -46,6 +46,11 @@ install:
 	cp showplayer /srv/dcastle2/bin/
 	cp ../scripts/lastcore.sh /srv/dcastle2/bin/
 
+	mv /srv/dcastle_test/bin/$(BASENAME) /srv/dcastle_test/bin/$(BASENAME).old
+	cp $(BASENAME) /srv/dcastle_test/bin/$(BASENAME)
+	cp showplayer /srv/dcastle_test/bin/
+	cp ../scripts/lastcore.sh /srv/dcastle_test/bin/
+
 all:	debug
 
 profile:
