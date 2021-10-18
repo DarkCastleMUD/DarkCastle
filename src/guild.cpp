@@ -247,8 +247,6 @@ class_skill_defines * get_skill_list(char_data * ch)
   }
   return skilllist;
 }
-void debug_here()
-{}
 
 char *attrstring(int attr)
 {
@@ -1079,28 +1077,12 @@ void skill_increase_check(char_data *ch, int skill, int learned, int difficulty)
     return;
   }
 
-  if (ch->in_room && IS_SET(world[ch->in_room].room_flags, NOLEARN))
+  if (ch->in_room < 1)
   {
     return;
   }
 
-  if (!difficulty)
-  {
-    logf(IMMORTAL, LOG_BUG, "%s had an invalid skill level of %d in skill %d.", GET_NAME(ch), difficulty, skill);
-    return; // Skill w/out difficulty.
-  }
-
-  if (!(learned = has_skill(ch, skill)))
-  {
-    return; // get out if i don't have the skill
-  }
-
-  if (skill == SKILL_DODGE && affected_by_spell(ch, SKILL_DEFENDERS_STANCE))
-  {
-    return;
-  }
-
-  if (learned >= (GET_LEVEL(ch) * 2))
+  if (IS_SET(world[ch->in_room].room_flags, NOLEARN))
   {
     return;
   }
@@ -1110,15 +1092,40 @@ void skill_increase_check(char_data *ch, int skill, int learned, int difficulty)
     return;
   }
 
-  class_skill_defines *skilllist = get_skill_list(ch);
-  if (!skilllist)
+  if (difficulty < 1)
   {
-    return; // class has no skills by default
+    logf(IMMORTAL, LOG_BUG, "%s had an invalid skill level of %d in skill %d.", GET_NAME(ch), difficulty, skill);
+    return; // Skill w/out difficulty.
+  }
+
+  if (skill == SKILL_DODGE && affected_by_spell(ch, SKILL_DEFENDERS_STANCE))
+  {
+    return;
   }
 
   if (skill == SKILL_COMBAT_MASTERY && number(0, 8) > 0)
   {
     return;
+  }
+
+  learned = has_skill(ch, skill);
+
+  // If we don't know the skill yet then we can't learn it any more
+  if (learned < 1)
+  {
+    return; // get out if i don't have the skill
+  }
+
+  // If we've already learned it 2*level or more then we can't learn it anymore until we gain more levels
+  if (learned >= (GET_LEVEL(ch) * 2))
+  {
+    return;
+  }
+
+  class_skill_defines *skilllist = get_skill_list(ch);
+  if (!skilllist)
+  {
+    return; // class has no skills by default
   }
 
   maximum = 0;
@@ -1132,7 +1139,7 @@ void skill_increase_check(char_data *ch, int skill, int learned, int difficulty)
     }
   }
 
-  if (!maximum)
+  if (maximum < 1)
   {
     skilllist = g_skills;
     for (i = 0; *skilllist[i].skillname != '\n'; i++)
@@ -1145,7 +1152,7 @@ void skill_increase_check(char_data *ch, int skill, int learned, int difficulty)
     }
   }
 
-  if (!maximum)
+  if (maximum < 1)
   {
     return;
   }
