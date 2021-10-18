@@ -33,6 +33,8 @@ extern "C"
 #include "fileinfo.h"
 #include <string>
 #include <vector>
+#include <map>
+#include <set>
 
 extern CWorld world;
 extern struct index_data *obj_index;
@@ -581,6 +583,138 @@ int do_toggle(struct char_data * ch, char * arg, int cmd)
   }
   return eSUCCESS;
 }
+
+int do_config(char_data *ch, char *argument, int cmd)
+{
+  if (ch == nullptr || ch->pcdata == nullptr || IS_MOB(ch))
+  {
+    return eFAILURE;
+  }
+
+  if (ch->pcdata->options == nullptr)
+  {
+    ch->pcdata->options = new map<string,string>();
+  }
+
+  if (ch->pcdata->options->empty())
+  {
+    (*ch->pcdata->options)["color.good"] = string("green");
+    (*ch->pcdata->options)["color.bad"] = string("red");
+  }
+
+  map<string,string> colors;
+  //colors["black"]="$0";
+  colors["blue"]="$1";
+  colors["green"]="$2";
+  colors["cyan"]="$3";
+  colors["red"]="$4";
+  colors["yellow"]="$5";
+  colors["magenta"]="$6";
+  colors["white"]="$7";
+  colors["gray"]="$B$0";
+  colors["bright blue"]="$B$1";
+  colors["bright green"]="$B$2";
+  colors["bright cyan"]="$B$3";
+  colors["bright red"]="$B$4";
+  colors["bright yellow"]="$B$5";
+  colors["bright magenta"]="$B$6";
+  colors["bright white"]="$B$7";
+
+  string key, value, orig_arguments = string(argument);
+  tie (key, value) = half_chop(argument, '=');
+  size_t equal_position = orig_arguments.find('=');
+
+  if (key.empty() == false && key != "color.good" && key != "color.bad")
+  {
+    csendf(ch, "Invalid configuration key specified.\r\n");
+    return eFAILURE;
+  }
+
+  // config
+  // config key
+  if (equal_position == string::npos && value.empty() == true)
+  {
+    bool found=false;
+    for (auto &option : *ch->pcdata->options)
+    {      
+      if ((key.empty() == false && key == option.first) || key.empty() == true)
+      {
+        found=true;
+        csendf(ch, "%s=%s\r\n", option.first.c_str(), option.second.c_str());
+      }     
+    }
+
+    if (found == false)
+    {
+      if (key.empty() == false)
+      {
+        csendf(ch, "%s not found.\r\n", key.c_str());
+      }
+      else
+      {
+        csendf(ch, "No config options set.\r\n");
+      }
+      return eFAILURE;
+    }
+
+    return eSUCCESS;
+  }
+
+  // config key=
+  if (equal_position == (orig_arguments.length() - 1) && key.empty() == false && value.empty() == true)
+  {
+    if (ch->pcdata->options->find(key) != ch->pcdata->options->end())
+    {
+      csendf(ch, "%s unset.\r\n", key.c_str());
+      (*ch->pcdata->options)[key]=string();
+      return eSUCCESS;
+    }
+    return eFAILURE;
+  }
+
+  // config key=value
+  if (key.empty() == false && value.empty() == false)
+  {
+    if (key == "color.good" || key == "color.bad")
+    {
+      if (colors.find(value) == colors.end())
+      {
+        csendf(ch, "Invalid color specified. Valid colors:\r\n");
+        for (auto &color : colors)
+        {
+          if (color.first == "black")
+          {
+            csendf(ch, "%s\r\n", color.first.c_str());
+          }
+          else
+          {
+            csendf(ch, "%-15s - %sExample$R\r\n", color.first.c_str(), color.second.c_str());
+          }
+          
+        }
+
+        return eFAILURE;
+      }
+
+      (*ch->pcdata->options)[key] = value;
+      csendf(ch, "Setting %s=%s\r\n", key.c_str(), value.c_str());
+      return eSUCCESS;
+    }
+    else
+    {
+      csendf(ch, "Invalid config option.\r\n");
+      return eFAILURE;
+    }   
+  }
+
+  // debug. This point should not be reached.
+  csendf(ch, "Invalid scenario.\r\n");
+  csendf(ch, "=:%u orig length:%u [%s]\r\n", equal_position, orig_arguments.length(), orig_arguments.c_str());
+  csendf(ch, "key:[%s] value:[%s]\r\n", key.c_str(), value.c_str());
+
+  return eFAILURE;
+}
+
 
 int do_brief(struct char_data *ch, char *argument, int cmd)
 {
