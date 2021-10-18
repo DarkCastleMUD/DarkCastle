@@ -136,7 +136,7 @@ struct command_info cmd_info[] =
         {"alias", do_alias, POSITION_DEAD, 0, CMD_DEFAULT, 0, 1},
         {"toggle", do_toggle, POSITION_DEAD, 0, CMD_DEFAULT, 0, 1},
         {"consider", do_consider, POSITION_RESTING, 0, CMD_DEFAULT, 0, 1},
-        {"configure", do_toggle, POSITION_DEAD, 0, CMD_DEFAULT, 0, 1},
+        {"configure", do_config, POSITION_DEAD, 0, CMD_DEFAULT, 0, 1},
         {"credits", do_credits, POSITION_DEAD, 0, CMD_DEFAULT, 0, 1},
         {"equipment", do_equipment, POSITION_DEAD, 0, CMD_DEFAULT, 0, 1},
         {"ohelp", do_help, POSITION_DEAD, 0, CMD_DEFAULT, 0, 1},
@@ -1322,6 +1322,26 @@ int is_abbrev(char *arg1, char *arg2) /* arg1 is short, arg2 is long */
 
   return(1);
 }
+
+tuple<string,string> half_chop(string arguments, const char token)
+{
+  // remove leading spaces
+  auto first_non_space = arguments.find_first_not_of(' ');
+  arguments.erase(0, first_non_space);
+
+  auto space_after_arg1 = arguments.find_first_of(token);
+  auto arg1 = arguments.substr(0, space_after_arg1);
+
+  // remove arg1 from arguments
+  arguments.erase(0, space_after_arg1);
+
+  // remove leading spaces from arguments before returning it
+  first_non_space = arguments.find_first_not_of(token);
+  arguments.erase(0, first_non_space);
+
+  return tuple<string,string>(arg1, arguments);
+}
+
 
 tuple<string,string> half_chop(string arguments)
 {
