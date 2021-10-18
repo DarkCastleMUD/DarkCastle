@@ -49,6 +49,7 @@ extern "C" {
 #include "handler.h"
 #include "vault.h"
 #include "const.h"
+#include "guild.h"
 
 #define STATE(d)    ((d)->connected)
 
@@ -79,9 +80,6 @@ extern OBJ_DATA *object_list;
 extern struct index_data *obj_index;
 extern CWorld world;
 extern CVoteData *DCVote;
-            
-extern int learn_skill(char_data * ch, int skill, int amount, int maximum);
-
 
 #ifndef WIN32
 extern "C" {
@@ -612,8 +610,6 @@ void do_on_login_stuff(char_data * ch)
 
           struct char_skill_data *  curr = ch->skills; 
 	  struct char_skill_data *  prev = NULL;
-	  int search_skills2(int arg, class_skill_defines * list_skills);
-	  struct class_skill_defines * get_skill_list(char_data * ch);
  	  struct class_skill_defines *a = get_skill_list(ch);
 
 	while (curr) {
