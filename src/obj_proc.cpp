@@ -2,6 +2,12 @@
 // Usage: This file contains special procedures pertaining to objects, except 
 // for the boards which are in board.C
 
+#include <vector>
+#include <string>
+#include <sstream>
+
+#include <string.h> // strstr()
+
 #include "db.h"
 #include "fight.h"
 #include "room.h"
@@ -20,17 +26,13 @@
 #include "act.h"
 #include "mobile.h"
 #include "spells.h"
-#include <string.h> // strstr()
 #include "returnvals.h"
 #include "set.h"
 #include "arena.h"
 #include "race.h"
 #include "const.h"
 #include "inventory.h"
-
-#include <vector>
-#include <string>
-#include <sstream>
+#include "guild.h"
 
 #define EMOTING_FILE "emoting-objects.txt"
 
@@ -4139,7 +4141,6 @@ int spellcraft_glyphs(struct char_data*ch, struct obj_data *obj, int cmd, char*a
 {
    char target[MAX_STRING_LENGTH],arg[MAX_STRING_LENGTH];
    struct obj_data * sunglyph, *  bookglyph, * heartglyph;
-   extern int learn_skill(char_data *, int, int, int);
 
    if(cmd != CMD_PUT) return eFAILURE; //put
    
