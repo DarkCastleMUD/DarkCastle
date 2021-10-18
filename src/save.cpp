@@ -15,15 +15,11 @@
  ***************************************************************************/
 /* $Id: save.cpp,v 1.76 2015/06/15 01:06:10 pirahna Exp $ */
 
-extern "C"
-{
 #include <stdlib.h>
 #include <stdio.h>
 #include <ctype.h>
 #include <string.h>
-//#include <sys/stat.h>
-//#include <unistd.h>
-}
+
 #include "obj.h"
 #include "room.h"
 #include "character.h"
@@ -39,6 +35,7 @@ extern "C"
 #include "race.h"
 #include "vault.h"
 #include "const.h"
+#include "guild.h"
 
 #ifdef USE_SQL
 #include <iostream>
@@ -153,7 +150,7 @@ char *fread_alias_string(FILE *fpsave)
     return(buf);
 }
 
-void fwrite_var_string(char * string, FILE * fpsave)
+void fwrite_var_string(const char * string, FILE * fpsave)
 {
    uint16 tmp_size;
 
@@ -326,6 +323,20 @@ void save_pc_data(struct pc_data * i, FILE * fpsave, struct time_data tmpage)
 	fwrite("WIZ", sizeof(char), 3, fpsave);
 	fwrite(&(i->wizinvis), sizeof(i->wizinvis), 1, fpsave);
   }
+  if (i->options && i->options->empty() == false)
+  {
+    for (auto &opt : *i->options)
+    {
+      if (opt.first == "color.good" ||
+          opt.first == "color.bad")
+      {
+        fwrite("OPT", sizeof(char),3, fpsave);
+        fwrite_var_string(opt.first.c_str(),fpsave);
+        fwrite_var_string(opt.second.c_str(),fpsave);
+      }
+    }
+  }
+
   // Any future additions to this save file will need to be placed LAST here with a 3 letter code
   // and appropriate strcmp statement in the read_mob_data object
 
@@ -467,6 +478,23 @@ void read_pc_data(struct char_data *ch, FILE* fpsave)
 	  fread(&i->wizinvis, sizeof(i->wizinvis), 1, fpsave);
 	  fread(&typeflag, sizeof(char), 3, fpsave);
   }
+  while (!strcmp("OPT", typeflag))
+  {
+    if (i->options == nullptr)
+    {
+      i->options = new map<string,string>();
+    }
+
+    string key = fread_var_string(fpsave);
+    string value = fread_var_string(fpsave);
+    if (key.empty() == false && (key == "color.good" || key == "color.bad"))
+    {
+      (*i->options)[key] = value;
+    }    
+
+    fread(&typeflag, sizeof(char), 3, fpsave);
+  }
+
   i->skillchange = 0;
   // Add new items in this format
 //  if(!strcmp(typeflag, "XXX"))
@@ -528,11 +556,9 @@ int store_worn_eq(char_data * ch, FILE * fpsave)
   }
   return 1;
 }
-extern int learn_skill(char_data * ch, int skill, int amount, int maximum);
 
 int char_to_store_variable_data(CHAR_DATA * ch, FILE * fpsave)
 {
-
   fwrite_var_string(ch->name, fpsave);
   fwrite_var_string(ch->short_desc, fpsave);
   fwrite_var_string(ch->long_desc, fpsave);
