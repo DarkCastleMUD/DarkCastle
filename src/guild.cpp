@@ -1070,104 +1070,164 @@ int get_stat_bonus(CHAR_DATA *ch, int stat)
 // object affects someone that doesn't have the skill is getting a
 // valid amount passed in.
 
-void skill_increase_check(char_data * ch, int skill, int learned, int difficulty)
+void skill_increase_check(char_data *ch, int skill, int learned, int difficulty)
 {
-   int chance, maximum;
+  int chance, maximum;
 
-   if(IS_MOB(ch))
-      return;
+  if (IS_MOB(ch))
+  {
+    return;
+  }
 
-   if (ch->in_room && IS_SET(world[ch->in_room].room_flags, NOLEARN))
-	return;
+  if (ch->in_room && IS_SET(world[ch->in_room].room_flags, NOLEARN))
+  {
+    return;
+  }
 
-   if (!difficulty) 
-   {
-     logf(IMMORTAL, LOG_BUG, "%s had an invalid skill level of %d in skill %d.", GET_NAME(ch), difficulty, skill);
-     return; // Skill w/out difficulty.
-   }
-   if( ! ( learned = has_skill(ch, skill) ) )
-      return; // get out if i don't have the skill
+  if (!difficulty)
+  {
+    logf(IMMORTAL, LOG_BUG, "%s had an invalid skill level of %d in skill %d.", GET_NAME(ch), difficulty, skill);
+    return; // Skill w/out difficulty.
+  }
 
-   if(skill == SKILL_DODGE && affected_by_spell(ch, SKILL_DEFENDERS_STANCE))
-     return;
+  if (!(learned = has_skill(ch, skill)))
+  {
+    return; // get out if i don't have the skill
+  }
 
-   if(learned >= ( GET_LEVEL(ch) * 2 ))
-      return;
+  if (skill == SKILL_DODGE && affected_by_spell(ch, SKILL_DEFENDERS_STANCE))
+  {
+    return;
+  }
 
-   if (IS_SET(world[ch->in_room].room_flags, SAFE)) return;
-   class_skill_defines * skilllist = get_skill_list(ch);
-   if(!skilllist)
-     return;  // class has no skills by default
+  if (learned >= (GET_LEVEL(ch) * 2))
+  {
+    return;
+  }
 
-   if(skill == SKILL_COMBAT_MASTERY && number(0,8)) return;
+  if (IS_SET(world[ch->in_room].room_flags, SAFE))
+  {
+    return;
+  }
 
-   maximum = 0;
-   int i;
-   for(i = 0; *skilllist[i].skillname != '\n'; i++)
-     if(skilllist[i].skillnum == skill)
-     {
-       maximum = skilllist[i].maximum;
-       break;
-     }
-   if (!maximum) {
+  class_skill_defines *skilllist = get_skill_list(ch);
+  if (!skilllist)
+  {
+    return; // class has no skills by default
+  }
+
+  if (skill == SKILL_COMBAT_MASTERY && number(0, 8) > 0)
+  {
+    return;
+  }
+
+  maximum = 0;
+  int i;
+  for (i = 0; *skilllist[i].skillname != '\n'; i++)
+  {
+    if (skilllist[i].skillnum == skill)
+    {
+      maximum = skilllist[i].maximum;
+      break;
+    }
+  }
+
+  if (!maximum)
+  {
     skilllist = g_skills;
-   for(i = 0; *skilllist[i].skillname != '\n'; i++)
-     if(skilllist[i].skillnum == skill)
-     {
-       maximum = skilllist[i].maximum;
-       break;
-     }
-   }
-   if (!maximum) return;
-   float percent = maximum*0.75;
-
-   if (skilllist[i].attrs)
-	percent += maximum/100.0 * get_stat_bonus(ch,skilllist[i].attrs);
-	
-   percent = MIN(maximum, percent);
-   percent = MAX(maximum*0.75, percent);
-
-   if(learned >= (int)percent)
-     return;
-
-   chance = number(1, 101);
-   if(learned < 15)
-      chance += 5;
-
-   int oi = 101;
-   if (difficulty > 500) { oi = 100; difficulty -= 500; }
-   switch(difficulty) {
-     case SKILL_INCREASE_EASY:
-	 if (oi==101) oi = 94;
-	 oi -= int_app[GET_INT(ch)].easy_bonus;
+    for (i = 0; *skilllist[i].skillname != '\n'; i++)
+    {
+      if (skilllist[i].skillnum == skill)
+      {
+        maximum = skilllist[i].maximum;
         break;
-     case SKILL_INCREASE_MEDIUM:
-	if (oi==101)oi = 96;
-	oi -= int_app[GET_INT(ch)].medium_bonus;
-        break;
-     case SKILL_INCREASE_HARD:
-	if (oi==101)oi = 98;
-	oi -= int_app[GET_INT(ch)].hard_bonus;
-        break;
-     default:
-       log("Illegal difficulty value sent to skill_increase_check", IMMORTAL, LOG_BUG);
-       break;
-   }
-   if (oi > chance) return;
-   // figure out the name of the affect (if any)
-   const char * skillname = get_skill_name(skill);
+      }
+    }
+  }
 
-   if(!skillname) {
-      csendf(ch, "Increase in unknown skill %d.  Tell a god. (bug)\r\n", skill);
-      return;
-   }
+  if (!maximum)
+  {
+    return;
+  }
 
-   // increase the skill by one
-   learn_skill(ch, skill, 1, maximum);
-   learned = has_skill(ch, skill);
-   csendf(ch, "$R$B$5You feel more competent in your %s ability. It increased to %d out of %d.$R\r\n", skillname, learned, maximum);
+  float percent = maximum * 0.75;
+
+  if (skilllist[i].attrs)
+  {
+    percent += maximum / 100.0 * get_stat_bonus(ch, skilllist[i].attrs);
+  }
+
+  percent = MIN(maximum, percent);
+  percent = MAX(maximum * 0.75, percent);
+
+  if (learned >= (int)percent)
+  {
+    return;
+  }
+
+  chance = number(1, 101);
+  if (learned < 15)
+  {
+    chance += 5;
+  }
+
+  int oi = 101;
+  if (difficulty > 500)
+  {
+    oi = 100;
+    difficulty -= 500;
+  }
+
+  switch (difficulty)
+  {
+  case SKILL_INCREASE_EASY:
+    if (oi == 101)
+    {
+      oi = 94;
+    }
+
+    oi -= int_app[GET_INT(ch)].easy_bonus;
+    break;
+  case SKILL_INCREASE_MEDIUM:
+    if (oi == 101)
+    {
+      oi = 96;
+    }
+
+    oi -= int_app[GET_INT(ch)].medium_bonus;
+    break;
+  case SKILL_INCREASE_HARD:
+    if (oi == 101)
+    {
+      oi = 98;
+    }
+
+    oi -= int_app[GET_INT(ch)].hard_bonus;
+    break;
+  default:
+    log("Illegal difficulty value sent to skill_increase_check", IMMORTAL, LOG_BUG);
+    break;
+  }
+
+  if (oi > chance)
+  {
+    return;
+  }
+  // figure out the name of the affect (if any)
+  const char *skillname = get_skill_name(skill);
+
+  if (!skillname)
+  {
+    csendf(ch, "Attempt to increase an unknown skill %d.  Tell a god. (bug)\r\n", skill);
+    logf(IMMORTAL, LOG_BUG, "skill_increase_check(%s, skill=%d, learned=%d, difficulty=%d): Attempt to increase an unknown skill.", GET_NAME(ch), skill, learned, difficulty);
+    return;
+  }
+
+  // increase the skill by one
+  learn_skill(ch, skill, 1, maximum);
+  learned = has_skill(ch, skill);
+  csendf(ch, "$R$B$5You feel more competent in your %s ability. It increased to %d out of %d.$R\r\n", skillname, learned, maximum);
 }
-
 
 void verify_max_stats(CHAR_DATA *ch)
 {
