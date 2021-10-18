@@ -5405,6 +5405,12 @@ void free_char(CHAR_DATA *ch)
 			if (ch->pcdata->lastseen)
 				delete ch->pcdata->lastseen;
 
+			if (ch->pcdata->options)
+			{
+				delete ch->pcdata->options;
+			}
+
+
 			dc_free(ch->pcdata);
 		}
 	}
