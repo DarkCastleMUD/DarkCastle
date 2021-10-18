@@ -2253,9 +2253,13 @@ int apply_ac(CHAR_DATA *ch, int eq_pos) {
 		return 0;
 
 	if (IS_SET(ch->equipment[eq_pos]->obj_flags.extra_flags, ITEM_ENCHANTED))
-		value = (ch->equipment[eq_pos]->obj_flags.value[0]);
-	else
+	{
 		value = (ch->equipment[eq_pos]->obj_flags.value[0]) - (ch->equipment[eq_pos]->obj_flags.value[1]);
+	}
+	else
+	{
+		value = (ch->equipment[eq_pos]->obj_flags.value[0]);
+	}
 
 	return value;
 }

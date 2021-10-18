@@ -1072,9 +1072,13 @@ bool identify(char_data *ch, obj_data *obj)
    case ITEM_ARMOR:
 
       if (IS_SET(obj->obj_flags.extra_flags, ITEM_ENCHANTED))
-         value = obj->obj_flags.value[0];
-      else
+      {
          value = (obj->obj_flags.value[0]) - (obj->obj_flags.value[1]);
+      }
+      else
+      {
+         value = obj->obj_flags.value[0];
+      }
 
       sprintf(buf, "$3AC-apply is $R%d (", value);
       send_to_char(buf, ch);
@@ -1082,7 +1086,7 @@ bool identify(char_data *ch, obj_data *obj)
       {
          showStatDiff(ch, vobj->obj_flags.value[0], obj->obj_flags.value[0]);
       }
-      if (IS_SET(obj->obj_flags.extra_flags, ITEM_ENCHANTED) == false)
+      if (IS_SET(obj->obj_flags.extra_flags, ITEM_ENCHANTED))
       {
          csendf(ch, "-%d", obj->obj_flags.value[1]);
       }

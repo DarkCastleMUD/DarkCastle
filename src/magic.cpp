@@ -2455,7 +2455,7 @@ int spell_enchant_armor(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct ob
 
     SET_BIT(obj->obj_flags.extra_flags, ITEM_ENCHANTED);
       
-	 obj->obj_flags.value[2] += 1 +(level >=MAX_MORTAL);
+	 obj->obj_flags.value[1] += 1 +(level >=MAX_MORTAL);
 
     if (IS_GOOD(ch)) {
 		SET_BIT(obj->obj_flags.extra_flags, ITEM_ANTI_EVIL);
@@ -4338,9 +4338,13 @@ int spell_identify(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
 	 case ITEM_ARMOR :
 
 		if (IS_SET(obj->obj_flags.extra_flags, ITEM_ENCHANTED))
-			value = obj->obj_flags.value[0];
-		 else
+    {
 			value = (obj->obj_flags.value[0]) - (obj->obj_flags.value[1]);
+    }
+    else
+    {
+      value = obj->obj_flags.value[0];
+    }
 
 		sprintf(buf, "AC-apply is %d     Resistance to damage is %d\n\r",
 		  value, obj->obj_flags.value[2]);
