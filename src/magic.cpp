@@ -5742,13 +5742,13 @@ int spell_resist_magic(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
 
   if (GET_CLASS(ch) == CLASS_MAGIC_USER && ch != victim)
   {
-    act("$N is already resistant to magic.", ch, 0, victim, TO_CHAR, 0);
+    send_to_char("You can only cast this on yourself.\r\n",ch);
     return eFAILURE;
   }
 
   if (affected_by_spell(victim, SPELL_RESIST_MAGIC))
   {
-    send_to_char("You are already resistant to magic!\n\r", ch);
+    act("$N is already resistant to magic.", ch, 0, victim, TO_CHAR, 0);
     return eFAILURE;
   }
   act("$n's skin turns $B$7white$R momentarily.", victim, 0, 0, TO_ROOM, INVIS_NULL);
@@ -5831,9 +5831,9 @@ int spell_stone_skin(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
     return eFAILURE;
   }
 
-  if (affected_by_spell(victim, SPELL_STONE_SKIN))
+  if (affected_by_spell(ch, SPELL_STONE_SKIN))
   {
-    act("$N is already rock hard.", ch, 0, victim, TO_CHAR, 0);
+    act("$N is already rock hard.", ch, 0, ch, TO_CHAR, 0);
     return eFAILURE;
   }
   act("$n's skin turns grey and stone-like.", ch, 0, 0, TO_ROOM, INVIS_NULL);
