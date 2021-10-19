@@ -360,7 +360,7 @@ int do_recite(struct char_data *ch, char *argument, int cmd)
     equipped = FALSE;
     obj = 0;
     victim = 0;
-  int pos = -1;
+    int pos = -1;
     argument = one_argument(argument,buf);
 
   if (!(scroll = get_obj_in_list_vis(ch,buf,ch->carrying))) {
@@ -431,12 +431,25 @@ int do_recite(struct char_data *ch, char *argument, int cmd)
       {
         if (scroll->obj_flags.value[i] >= 1)
         {
-          lvl = (int) (1.5 * scroll->obj_flags.value[0]); 
-          retval = ((*spell_info[scroll->obj_flags.value[i]].spell_pointer)
-            ((ubyte) scroll->obj_flags.value[0], ch, "", SPELL_TYPE_SCROLL, victim, obj, lvl));
-          if(SOMEONE_DIED(retval))
-            break;
-          if(victim && ch->in_room != victim->in_room) break;
+          lvl = (int) (1.5 * scroll->obj_flags.value[0]);
+		  if (spell_info[scroll->obj_flags.value[i]].spell_pointer == nullptr)
+		  {
+			logf(100, LOG_BUG, "do_recite ran for scroll %d with spell %d but spell_info[%d].spell_pointer == nullptr", obj_index[scroll->item_number].virt, i, i);
+			continue;
+		  }
+		  else
+		  {
+			retval = ((*spell_info[scroll->obj_flags.value[i]].spell_pointer)
+					  ((ubyte) scroll->obj_flags.value[0], ch, "", SPELL_TYPE_SCROLL, victim, obj, lvl));
+			if(SOMEONE_DIED(retval))
+			{
+			  break;
+			}
+			if(victim && ch->in_room != victim->in_room)
+			{
+			  break;
+			}
+		  }
         }
       }
     }
