@@ -49,7 +49,7 @@ build_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 wizard_src = glob.glob('wizard/*.cpp')
 class_src = glob.glob('class/*.cpp')
 backend_src = glob.glob('Backend/*.cpp')
-libdcastle_src = glob.glob('[abc]*.cpp') + glob.glob('[e-l]*.cpp') + glob.glob('[n-r]*.cpp') + glob.glob('[t-z]*.cpp') + glob.glob('mo*.cpp') + ['magic.cpp','memory.cpp','meta.cpp','MobActivity.cpp','Leaderboard.cpp','Timer.cpp', 'db.cpp', 'save.cpp', 'shop.cpp', 'sing.cpp', 'social.cpp', 'spec.cpp',  'spells.cpp', 'stat.cpp', 'CommandStack.cpp'] + wizard_src + class_src + backend_src
+libdcastle_src = glob.glob('[abc]*.cpp') + glob.glob('[e-l]*.cpp') + glob.glob('[n-r]*.cpp') + glob.glob('[t-w,yz]*.cpp') + glob.glob('mo*.cpp') + ['magic.cpp','memory.cpp','meta.cpp','MobActivity.cpp','Leaderboard.cpp','Timer.cpp', 'db.cpp', 'save.cpp', 'shop.cpp', 'sing.cpp', 'social.cpp', 'spec.cpp',  'spells.cpp', 'stat.cpp', 'CommandStack.cpp'] + wizard_src + class_src + backend_src
 
 if not int(twitter):
     env.Append(CPPDEFINES=['LINUX'])
@@ -65,11 +65,11 @@ libdcastle.MergeFlags({'CPPPATH' : '/usr/include/pgsql/'})
 libdcastle.StaticLibrary('dcastle', [libdcastle_src + DC]);
 
 dcastle=env.Clone()
-dcastle.MergeFlags({'LIBS' : ['dcastle', 'crypt', 'mcheck', 'z', 'pq', 'XmlRpc', 'fmt']})
+dcastle.MergeFlags({'LIBS' : ['dcastle', 'crypt', 'mcheck', 'z', 'pq', 'fmt']})
 dcastle.Program('dcastle', ['dcastle.cpp'])
 
 showplayerexp=env.Clone()
-showplayerexp.MergeFlags({'LIBS' : ['dcastle', 'crypt', 'mcheck', 'z', 'pq', 'XmlRpc', 'fmt']})
+showplayerexp.MergeFlags({'LIBS' : ['dcastle', 'crypt', 'mcheck', 'z', 'pq', 'fmt']})
 showplayerexp.Program('showplayer', ['showplayerxp.cpp'])
 
 
