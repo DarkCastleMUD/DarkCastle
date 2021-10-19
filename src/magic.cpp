@@ -2388,9 +2388,10 @@ int spell_haste(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *
   }
 
   if (affected_by_spell(victim, SPELL_HASTE) || IS_AFFECTED(victim, AFF_HASTE))
+  {
     act("$N is already moving fast enough.",ch,0,victim,TO_CHAR, 0);
   return eFAILURE;
-
+  }	
   af.type = SPELL_HASTE;
   af.duration = skill / 10;
   af.modifier = 0;
