@@ -5833,7 +5833,7 @@ int spell_stone_skin(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
 
   if (affected_by_spell(ch, SPELL_STONE_SKIN))
   {
-    act("$N is already rock hard.", ch, 0, ch, TO_CHAR, 0);
+    act("Your skin already rock hard.", ch, 0, 0, TO_CHAR, 0);
     return eFAILURE;
   }
   act("$n's skin turns grey and stone-like.", ch, 0, 0, TO_ROOM, INVIS_NULL);
