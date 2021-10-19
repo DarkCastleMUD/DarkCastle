@@ -55,7 +55,9 @@
 #include <sstream>
 #include <iostream>
 #include <list>
+#ifdef XMLRPC
 #include "dc_xmlrpc.h"
+#endif
 #include "Timer.h"
 #include "DC.h"
 #include "CommandStack.h"
@@ -128,7 +130,9 @@ int pulse_regen;
 int pulse_time;
 int pulse_short; // short timer, for archery
 
+#ifdef XMLRPC
 XmlRpcServer *xmlrpc_s;
+#endif
 
 #ifdef USE_SQL
 Database db;
