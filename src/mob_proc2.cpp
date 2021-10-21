@@ -196,7 +196,7 @@ int super_repair_guy(struct char_data *ch, struct obj_data *obj, int cmd, char *
 	value0 = eq_max_damage(obj);
 	value2 = obj->obj_flags.value[2];
 
-	if ((obj->obj_flags.type_flag == ITEM_ARMOR || obj->obj_flags.type_flag == ITEM_CONTAINER || obj->obj_flags.type_flag == ITEM_LIGHT)
+	if ((obj->obj_flags.type_flag == ITEM_ARMOR || ARE_CONTAINERS(obj) || obj->obj_flags.type_flag == ITEM_LIGHT)
 			&& !IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL)) {
 		percent = ((100 * eqdam) / value0); /* now we know what percent to repair ..  */
 		price = ((cost * percent) / 100); /* now we know what to charge */
@@ -290,7 +290,7 @@ int repair_shop(struct char_data *ch, struct obj_data *obj, int cmd, char *arg, 
 		price = ((cost * percent) / 100); /* now we know what to charge them fuckers! */
 		price *= 4; /* he likes to charge more..  */
 		/*  for armor... cuz he's a crook..  */
-	} else if ((obj->obj_flags.type_flag == ITEM_WEAPON || obj->obj_flags.type_flag == ITEM_FIREWEAPON || obj->obj_flags.type_flag == ITEM_CONTAINER
+	} else if ((obj->obj_flags.type_flag == ITEM_WEAPON || obj->obj_flags.type_flag == ITEM_FIREWEAPON || ARE_CONTAINERS(obj)
 			|| obj->obj_flags.type_flag == ITEM_STAFF || obj->obj_flags.type_flag == ITEM_WAND) && !IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL))
 
 	{
@@ -729,7 +729,7 @@ int gl_repair_shop(struct char_data *ch, struct obj_data *obj, int cmd, char *ar
 		price = ((cost * percent) / 100); /* now we know what to charge them fuckers! */
 		price *= 4; /* he likes to charge more..  */
 		/*  for armor... cuz he's a crook..  */
-	} else if (obj->obj_flags.type_flag == ITEM_WEAPON || obj->obj_flags.type_flag == ITEM_FIREWEAPON || obj->obj_flags.type_flag == ITEM_CONTAINER
+	} else if (obj->obj_flags.type_flag == ITEM_WEAPON || obj->obj_flags.type_flag == ITEM_FIREWEAPON || ARE_CONTAINERS(obj)
 			|| obj->obj_flags.type_flag == ITEM_STAFF || obj->obj_flags.type_flag == ITEM_WAND || obj->obj_flags.type_flag == ITEM_INSTRUMENT) {
 
 		percent = ((100 * eqdam) / (value0 + value2));
