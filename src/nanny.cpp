@@ -1769,14 +1769,16 @@ bool check_reconnect( struct descriptor_data *d, char *name, bool fReconnect )
             GET_NAME(tmp_ch), d->host );
          act( "$n has reconnected and is ready to kick ass.", tmp_ch, 0,
             0, TO_ROOM, INVIS_NULL);
-         if(GET_LEVEL(tmp_ch) < ANGEL) {
-            WAIT_STATE(tmp_ch, PULSE_VIOLENCE * 4);
-            send_to_char("Heya sport, how about some RECONNECT LAG?\n\r", tmp_ch); 
-            log( log_buf, OVERSEER, LOG_SOCKET );
-         } 
+
+         if (GET_LEVEL(tmp_ch) < IMMORTAL)
+         {
+            log(log_buf, COORDINATOR, LOG_SOCKET);
+         }
          else
-            log( log_buf, GET_LEVEL(tmp_ch), LOG_SOCKET );
-         
+         {
+            log(log_buf, GET_LEVEL(tmp_ch), LOG_SOCKET);
+         }
+
          STATE(d)            = CON_PLAYING;
       }
       return TRUE;
