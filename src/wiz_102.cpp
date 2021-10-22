@@ -3777,14 +3777,25 @@ int do_redit(struct char_data *ch, char *argument, int cmd)
 
     string arg3;
     tie(arg3, remainder_args) = half_chop(remainder_args);
-    d = stoi(arg3);
+    try {
+      d = stoi(arg3);
+    } catch(...)
+    {
+      d=0;
+    }
     c = real_room(d);
 
     if (!remainder_args.empty())
     {
       string arg4;
       tie(arg4, remainder_args) = half_chop(remainder_args);
-      a = stoi(arg4);
+      try {
+        a = stoi(arg4);
+      } catch(...)
+      {
+        a=0;
+      }
+      
       if (remainder_args.empty())
       {
         return eFAILURE;
@@ -3792,7 +3803,13 @@ int do_redit(struct char_data *ch, char *argument, int cmd)
 
       string arg5;
       tie(arg5, remainder_args) = half_chop(remainder_args);
-      b = stoi(arg5);
+      try {
+        b = stoi(arg5);
+      } catch (...)
+      {
+        b=0;
+      }
+      
       if (b == 0)
       {
         send_to_char("No key 0's allowed.  Changing to -1.\r\n", ch);
@@ -4103,7 +4120,13 @@ int do_redit(struct char_data *ch, char *argument, int cmd)
       return eFAILURE;
     }
     bool done = FALSE;
-    int mob = stoi(remainder_args);
+    int mob=0;
+    try {
+      mob = stoi(remainder_args);
+    } catch(...)
+    {
+      mob=0;
+    }
     struct deny_data *nd, *pd = NULL;
     for (nd = world[ch->in_room].denied; nd; nd = nd->next)
     {
@@ -4128,7 +4151,13 @@ int do_redit(struct char_data *ch, char *argument, int cmd)
     nd = (struct deny_data *)dc_alloc(1, sizeof(struct deny_data));
 #endif
     nd->next = world[ch->in_room].denied;
-    nd->vnum = stoi(remainder_args);
+    try {
+      nd->vnum = stoi(remainder_args);
+    } catch(...)
+    {
+      nd->vnum = 0;
+    }
+    
     world[ch->in_room].denied = nd;
     csendf(ch, "Mobile %d DENIED entrance.\r\n", mob);
     break;
