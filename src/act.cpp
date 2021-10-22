@@ -87,7 +87,7 @@ int act(
   {
     retval |= send_message(tokens, ch, obj, vict_obj, flags, ch);
   }
-  else if (destination == TO_ROOM || destination == TO_GROUP)
+  else if (destination == TO_ROOM || destination == TO_GROUP || destination == TO_ROOM_NOT_GROUP)
   {
     char_data *tmp_char, *next_tmp_char;
     if (ch->in_room >= 0)
@@ -100,6 +100,10 @@ int act(
           continue;
         if (destination == TO_GROUP && !ARE_GROUPED(tmp_char, ch))
           continue;
+        if (destination == TO_ROOM_NOT_GROUP && ARE_GROUPED(tmp_char, ch))
+        {
+          continue;
+        }
         if (tmp_char->position > POSITION_SLEEPING || IS_SET(flags, ASLEEP))
         {
           if (!IS_SET(flags, BARDSONG) || tmp_char->pcdata == nullptr || !IS_SET(tmp_char->pcdata->toggles, PLR_BARD_SONG))
