@@ -48,87 +48,89 @@ int act(const string &str, CHAR_DATA *ch, OBJ_DATA *obj, void *vict_obj, int16 d
   return act(str.c_str(), ch, obj, vict_obj, destination, flags);
 }
 
-int act
-(
-  const char *str,          // Buffer
-  CHAR_DATA *ch,      // Character from
-  OBJ_DATA *obj,      // Object
-  void *vict_obj,     // Victim object
-  int16 destination,  // Destination flags
-  int16 flags         // Optional flags
+int act(
+    const char *str,   // Buffer
+    CHAR_DATA *ch,     // Character from
+    OBJ_DATA *obj,     // Object
+    void *vict_obj,    // Victim object
+    int16 destination, // Destination flags
+    int16 flags        // Optional flags
 )
 {
   struct descriptor_data *i;
   int retval = 0;
 
   TokenList *tokens;
-  
+
   tokens = new TokenList(str);
-  
+
   // This shouldn't happen
-  if (ch == 0) {
+  if (ch == 0)
+  {
     log("Error in act(), character equal to 0", OVERSEER, LOG_BUG);
     delete tokens;
     return eFAILURE;
-    }
+  }
 
   if (
-      (IS_AFFECTED(ch, AFF_HIDE) || ISSET(ch->affected_by, AFF_FOREST_MELD)) 
-       && (destination != TO_CHAR) 
-       && (destination != TO_GROUP)
-       && !(flags & GODS) 
-       && !(flags & STAYHIDE)) 
+      (IS_AFFECTED(ch, AFF_HIDE) || ISSET(ch->affected_by, AFF_FOREST_MELD)) && (destination != TO_CHAR) && (destination != TO_GROUP) && !(flags & GODS) && !(flags & STAYHIDE))
   {
     REMBIT(ch->affected_by, AFF_HIDE);
     affect_from_char(ch, SPELL_FOREST_MELD);
   }
-    
-  if (destination == TO_VICT) {
+
+  if (destination == TO_VICT)
+  {
     retval |= send_message(tokens, ch, obj, vict_obj, flags, (CHAR_DATA *)vict_obj);
   }
-  else if(destination == TO_CHAR) {
-    retval |= send_message(tokens, ch, obj, vict_obj, flags, ch);
-    }
-  else if(destination == TO_ROOM || destination == TO_GROUP) 
+  else if (destination == TO_CHAR)
   {
-    char_data * tmp_char, *next_tmp_char;
-    if (ch->in_room >= 0) {
-		for (tmp_char = world[ch->in_room].people; tmp_char; tmp_char = next_tmp_char) {
-		  next_tmp_char = tmp_char->next_in_room;
-		  // If they're not really playing, and no force flag, don't send
-		  if (tmp_char == ch)
-			continue;
-		  if(destination == TO_GROUP && !ARE_GROUPED(tmp_char, ch))
-			continue;
-		  if (tmp_char->position > POSITION_SLEEPING || IS_SET(flags, ASLEEP))
-			retval |= send_message(tokens, ch, obj, vict_obj, flags, tmp_char);
-		  }
-		}
+    retval |= send_message(tokens, ch, obj, vict_obj, flags, ch);
+  }
+  else if (destination == TO_ROOM || destination == TO_GROUP)
+  {
+    char_data *tmp_char, *next_tmp_char;
+    if (ch->in_room >= 0)
+    {
+      for (tmp_char = world[ch->in_room].people; tmp_char; tmp_char = next_tmp_char)
+      {
+        next_tmp_char = tmp_char->next_in_room;
+        // If they're not really playing, and no force flag, don't send
+        if (tmp_char == ch)
+          continue;
+        if (destination == TO_GROUP && !ARE_GROUPED(tmp_char, ch))
+          continue;
+        if (tmp_char->position > POSITION_SLEEPING || IS_SET(flags, ASLEEP))
+          retval |= send_message(tokens, ch, obj, vict_obj, flags, tmp_char);
+      }
     }
+  }
   // TO_ZONE, TO_WORLD
-  else {
-    if (destination != TO_ZONE && destination != TO_WORLD) {
+  else
+  {
+    if (destination != TO_ZONE && destination != TO_WORLD)
+    {
       log("Error in act(), invalid value sent as 'destination'", OVERSEER, LOG_BUG);
       delete tokens;
       return eFAILURE;
-      }
-    for (i = descriptor_list; i; i = i->next) {
+    }
+    for (i = descriptor_list; i; i = i->next)
+    {
       // Dropped link or they're not really playing and no force flag, don't send.
       if (!i->character || i->character == ch)
         continue;
       if (i->character->in_room < 0 || ch->in_room < 0)
-    	  continue;
+        continue;
       if ((destination == TO_ZONE) && world[i->character->in_room].zone != world[ch->in_room].zone)
         continue;
       retval |= send_message(tokens, ch, obj, vict_obj, flags, i->character);
-      }
     }
-      
-   delete tokens;
+  }
 
-   return retval;
+  delete tokens;
+
+  return retval;
 }
-
 
 /************************************************************************
 | void send_message()
