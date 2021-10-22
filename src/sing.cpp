@@ -766,17 +766,17 @@ void update_bard_singing() {
 	if ((*j).song_timer > 1) {
 		(*j).song_timer--;
 
-		string buffer1 = "Singing [" + string(songs[(*j).song_number]) + "]: ";
-		string buffer2 = "$N is singing [" + string(songs[(*j).song_number]) + "]: ";
+		string buffer_for_singer = "Singing [" + string(songs[(*j).song_number]) + "]: ";
+		string buffer_for_group = "$N is singing [" + string(songs[(*j).song_number]) + "]: ";
+		string buffer_for_room = "$N is singing " + string(songs[(*j).song_number]) + ".";
 		for (int k = 0; k < (*j).song_timer; k++)
 		{
-			buffer1 +="* ";
-			buffer2 +="* ";
+			buffer_for_singer +="* ";
+			buffer_for_group +="* ";
 		}
-		buffer1 += "\r\n";
-		buffer2 += "\r\n";
-		act(buffer1, i, 0, i, TO_CHAR, BARDSONG);
-		act(buffer2, i, 0, i, TO_ROOM, BARDSONG);
+		act(buffer_for_singer, i, 0, i, TO_CHAR, BARDSONG);
+		act(buffer_for_group, i, 0, i, TO_GROUP, BARDSONG);
+		act(buffer_for_room, i, 0, i, TO_ROOM_NOT_GROUP, BARDSONG);
 	} else if ((*j).song_timer == 1) {
 		(*j).song_timer = 0;
 
