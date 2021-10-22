@@ -389,9 +389,10 @@ int do_toggle(struct char_data *ch, char *arg, int cmd)
   {
     for (x = 0; toggle_txt[x][0] != '\0'; x++)
     {
-      if (x != 8 || GET_CLASS(ch) == CLASS_BARD)
-        if (x != 14 || (IS_SET(ch->pcdata->toggles, PLR_GUIDE)))
-          sprintf(buf + strlen(buf), "%-10s ", toggle_txt[x]);
+      if (x != 14 || (IS_SET(ch->pcdata->toggles, PLR_GUIDE)))
+      {
+        sprintf(buf + strlen(buf), "%-11s ", toggle_txt[x]);
+      }
 
       switch (x)
       {
@@ -436,11 +437,8 @@ int do_toggle(struct char_data *ch, char *arg, int cmd)
         break;
 
       case 8:
-        if (GET_CLASS(ch) == CLASS_BARD)
-        {
           sprintf(buf + strlen(buf), "%s\n\r",
-                  IS_SET(ch->pcdata->toggles, PLR_BARD_SONG) ? "$B$2on$R" : "$B$4off$R");
-        }
+                  IS_SET(ch->pcdata->toggles, PLR_BARD_SONG) ? "$B$2on$R (brief)" : "$B$4off$R (verbose)");
         break;
 
       case 9:
@@ -542,10 +540,7 @@ int do_toggle(struct char_data *ch, char *arg, int cmd)
     break;
 
   case 8:
-    if (GET_CLASS(ch) == CLASS_BARD)
-      do_bard_song_toggle(ch, "", 9);
-    else
-      send_to_char("You're not a bard!\r\n", ch);
+    do_bard_song_toggle(ch, "", 9);
     break;
 
   case 9:
