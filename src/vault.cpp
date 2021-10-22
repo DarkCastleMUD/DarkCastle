@@ -1437,7 +1437,7 @@ int can_put_in_vault(struct obj_data *obj, int self, struct vault_data *vault, s
     return 0;
   }
 
-  if (obj->obj_flags.type_flag == ITEM_CONTAINER && obj->contains)  { // non-empty containers
+  if (ARE_CONTAINERS(obj) && obj->contains)  { // non-empty containers
     csendf(ch, "%s needs to be emptied first.\r\n", GET_OBJ_SHORT(obj));
     return 0;
   }
