@@ -5729,7 +5729,7 @@ void init_char(CHAR_DATA *ch)
 		ch->pcdata->quest_complete[j] = 0;
 
 	SET_BIT(ch->pcdata->toggles, PLR_ANSI);
-	SET_BIT(ch->pcdata->toggles, PLR_BARD_SONG);
+	SET_BIT(ch->pcdata->toggles, PLR_DAMAGE);
 	int i;
 	for (i = 0; i < AFF_MAX / ASIZE + 1; i++)
 		ch->affected_by[i] = 0;
