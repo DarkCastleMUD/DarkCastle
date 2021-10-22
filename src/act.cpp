@@ -101,7 +101,12 @@ int act(
         if (destination == TO_GROUP && !ARE_GROUPED(tmp_char, ch))
           continue;
         if (tmp_char->position > POSITION_SLEEPING || IS_SET(flags, ASLEEP))
-          retval |= send_message(tokens, ch, obj, vict_obj, flags, tmp_char);
+        {
+          if (!IS_SET(flags, BARDSONG) || tmp_char->pcdata == nullptr || !IS_SET(tmp_char->pcdata->toggles, PLR_BARD_SONG))
+          {
+            retval |= send_message(tokens, ch, obj, vict_obj, flags, tmp_char);
+          }
+        }
       }
     }
   }

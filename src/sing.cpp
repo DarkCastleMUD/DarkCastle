@@ -766,14 +766,17 @@ void update_bard_singing() {
 	if ((*j).song_timer > 1) {
 		(*j).song_timer--;
 
-		if (IS_MOB(i) || !IS_SET(i->pcdata->toggles, PLR_BARD_SONG)) {
-			send_to_char("Singing [", i);
-			send_to_char(songs[(*j).song_number], i);
-			send_to_char("]: ", i);
-			for (int k = 0; k < (*j).song_timer; k++)
-			send_to_char("* ", i);
-			send_to_char("\r\n", i);
+		string buffer1 = "Singing [" + string(songs[(*j).song_number]) + "]: ";
+		string buffer2 = "$N is singing [" + string(songs[(*j).song_number]) + "]: ";
+		for (int k = 0; k < (*j).song_timer; k++)
+		{
+			buffer1 +="* ";
+			buffer2 +="* ";
 		}
+		buffer1 += "\r\n";
+		buffer2 += "\r\n";
+		act(buffer1, i, 0, i, TO_CHAR, BARDSONG);
+		act(buffer2, i, 0, i, TO_ROOM, BARDSONG);
 	} else if ((*j).song_timer == 1) {
 		(*j).song_timer = 0;
 
