@@ -45,5 +45,6 @@ int act(const std::string &str, CHAR_DATA *ch, OBJ_DATA *obj, void *vict_obj,
 #define INVIS_VISIBLE 1<<4 // Invisible messages are shown w/names visible
 #define FORCE         1<<5 // Sends regardless of nanny state
 #define STAYHIDE      1<<6 // Stayhide flag keeps thieves in hiding.
+#define BARDSONG      1<<7 // Bard song so only show it to people in room with BARD_SONG toggle set to verbose
 
 #endif /* ACT_H_ */
