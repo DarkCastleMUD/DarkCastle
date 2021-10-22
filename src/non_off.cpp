@@ -372,212 +372,221 @@ char * toggle_txt[] = {
   ""
 };
 
-int do_toggle(struct char_data * ch, char * arg, int cmd)
+int do_toggle(struct char_data *ch, char *arg, int cmd)
 {
   int x;
   char buf[MAX_STRING_LENGTH];
-  
+
   one_argument(arg, buf);
-  
-  if(IS_MOB(ch)) {
+
+  if (IS_MOB(ch))
+  {
     send_to_char("You can't toggle anything, you're a mob!\r\n", ch);
     return eFAILURE;
   }
 
-  if(!*buf) {
-    for(x = 0; toggle_txt[x][0] != '\0'; x++) {
-	if (x != 8 || GET_CLASS(ch) == CLASS_BARD)
-	  if (x != 14 ||  (IS_SET(ch->pcdata->toggles, PLR_GUIDE)))
-       sprintf(buf + strlen(buf), "%-10s ", toggle_txt[x]);
+  if (!*buf)
+  {
+    for (x = 0; toggle_txt[x][0] != '\0'; x++)
+    {
+      if (x != 8 || GET_CLASS(ch) == CLASS_BARD)
+        if (x != 14 || (IS_SET(ch->pcdata->toggles, PLR_GUIDE)))
+          sprintf(buf + strlen(buf), "%-10s ", toggle_txt[x]);
 
-       switch(x) {
-         case 0:
-	 sprintf(buf + strlen(buf), "%s\n\r",
-	   IS_SET(ch->pcdata->toggles, PLR_BRIEF) ? "$B$2on$R" : "$B$4off$R");
-	 break;
-	 
-         case 1:
-	 sprintf(buf + strlen(buf), "%s\n\r",
-	   IS_SET(ch->pcdata->toggles, PLR_COMPACT) ? "$B$2on$R" : "$B$4off$R");
-	 break;
-	 
-         case 2:
-	 sprintf(buf + strlen(buf), "%s\n\r",
-	   IS_SET(ch->pcdata->toggles, PLR_BEEP) ? "$B$2on$R" : "$B$4off$R");
-	 break;
-	 
-         case 3:
-	 sprintf(buf + strlen(buf), "%s\n\r",
-           IS_SET(ch->pcdata->toggles, PLR_ANONYMOUS) ? "$B$2on$R" : "$B$4off$R");
-	 break;
-	 
-         case 4:
-	 sprintf(buf + strlen(buf), "%s\n\r",
-	   IS_SET(ch->pcdata->toggles, PLR_ANSI) ? "$B$2on$R" : "$B$4off$R");
-	 break;
-	 
-         case 5:
-	 sprintf(buf + strlen(buf), "%s\n\r",
-	   IS_SET(ch->pcdata->toggles, PLR_VT100) ? "$B$2on$R" : "$B$4off$R");
-	 break;
-	 
-         case 6:
-	 sprintf(buf + strlen(buf), "%s\n\r",
-	   IS_SET(ch->pcdata->toggles, PLR_WIMPY) ? "$B$2on$R" : "$B$4off$R");
-	 break;
-	 
-         case 7:
-	 sprintf(buf + strlen(buf), "%s\n\r",
-	   IS_SET(ch->pcdata->toggles, PLR_PAGER) ? "$B$4off$R" : "$B$2on$R");
-	 break;
-	 
-         case 8:
-				if (GET_CLASS(ch) == CLASS_BARD) {
-	 sprintf(buf + strlen(buf), "%s\n\r",
-	   IS_SET(ch->pcdata->toggles, PLR_BARD_SONG) ? "$B$2on$R" : "$B$4off$R");
-				}
-	 break;
-	 
-         case 9:
-	 sprintf(buf + strlen(buf), "%s\n\r",
-	   IS_SET(ch->pcdata->toggles, PLR_AUTOEAT) ? "$B$2on$R" : "$B$4off$R");
-	 break;
-	 
-         case 10:
-	 sprintf(buf + strlen(buf), "%s\n\r",
-	   IS_SET(ch->pcdata->toggles, PLR_SUMMONABLE) ? "$B$2on$R" : "$B$4off$R");
-	 break;
-	 
-         case 11:
-	 sprintf(buf + strlen(buf), "%s\n\r",
-	   IS_SET(ch->pcdata->toggles, PLR_LFG) ? "$B$2on$R" : "$B$4off$R");
-	 break;
-	 
-         case 12:
-	 sprintf(buf + strlen(buf), "%s\n\r",
-	   IS_SET(ch->pcdata->toggles, PLR_CHARMIEJOIN) ? "$B$2on$R" : "$B$4off$R");
-	 break;
-         case 13:
-         sprintf(buf + strlen(buf), "%s\n\r",
-           IS_SET(ch->pcdata->toggles, PLR_NOTAX) ? "$B$2on$R" : "$B$4off$R");
-         break;
-         case 14:
-				if (IS_SET(ch->pcdata->toggles, PLR_GUIDE)) {
-         sprintf(buf + strlen(buf), "%s\n\r",
-           IS_SET(ch->pcdata->toggles, PLR_GUIDE_TOG) ? "$B$2on$R" : "$B$4off$R");
-				}
-         break;
-         case 15:
-         sprintf(buf + strlen(buf), "%s\n\r",
-           IS_SET(ch->pcdata->toggles, PLR_NEWS) ? "$B$2on$R" : "$B$4off$R");
-	break;
-         case 16:
-         sprintf(buf + strlen(buf), "%s\n\r",
-           IS_SET(ch->pcdata->toggles, PLR_ASCII) ? "$B$4off$R" : "$B$2on$R");
-         break;
-         case 17:
-         sprintf(buf + strlen(buf), "%s\n\r",
-           IS_SET(ch->pcdata->toggles, PLR_DAMAGE) ? "$B$2on$R" : "$B$4off$R");
-         break;
+      switch (x)
+      {
+      case 0:
+        sprintf(buf + strlen(buf), "%s\n\r",
+                IS_SET(ch->pcdata->toggles, PLR_BRIEF) ? "$B$2on$R" : "$B$4off$R");
+        break;
 
+      case 1:
+        sprintf(buf + strlen(buf), "%s\n\r",
+                IS_SET(ch->pcdata->toggles, PLR_COMPACT) ? "$B$2on$R" : "$B$4off$R");
+        break;
 
-	 
-         default:
-	 break;
-       }
+      case 2:
+        sprintf(buf + strlen(buf), "%s\n\r",
+                IS_SET(ch->pcdata->toggles, PLR_BEEP) ? "$B$2on$R" : "$B$4off$R");
+        break;
+
+      case 3:
+        sprintf(buf + strlen(buf), "%s\n\r",
+                IS_SET(ch->pcdata->toggles, PLR_ANONYMOUS) ? "$B$2on$R" : "$B$4off$R");
+        break;
+
+      case 4:
+        sprintf(buf + strlen(buf), "%s\n\r",
+                IS_SET(ch->pcdata->toggles, PLR_ANSI) ? "$B$2on$R" : "$B$4off$R");
+        break;
+
+      case 5:
+        sprintf(buf + strlen(buf), "%s\n\r",
+                IS_SET(ch->pcdata->toggles, PLR_VT100) ? "$B$2on$R" : "$B$4off$R");
+        break;
+
+      case 6:
+        sprintf(buf + strlen(buf), "%s\n\r",
+                IS_SET(ch->pcdata->toggles, PLR_WIMPY) ? "$B$2on$R" : "$B$4off$R");
+        break;
+
+      case 7:
+        sprintf(buf + strlen(buf), "%s\n\r",
+                IS_SET(ch->pcdata->toggles, PLR_PAGER) ? "$B$4off$R" : "$B$2on$R");
+        break;
+
+      case 8:
+        if (GET_CLASS(ch) == CLASS_BARD)
+        {
+          sprintf(buf + strlen(buf), "%s\n\r",
+                  IS_SET(ch->pcdata->toggles, PLR_BARD_SONG) ? "$B$2on$R" : "$B$4off$R");
+        }
+        break;
+
+      case 9:
+        sprintf(buf + strlen(buf), "%s\n\r",
+                IS_SET(ch->pcdata->toggles, PLR_AUTOEAT) ? "$B$2on$R" : "$B$4off$R");
+        break;
+
+      case 10:
+        sprintf(buf + strlen(buf), "%s\n\r",
+                IS_SET(ch->pcdata->toggles, PLR_SUMMONABLE) ? "$B$2on$R" : "$B$4off$R");
+        break;
+
+      case 11:
+        sprintf(buf + strlen(buf), "%s\n\r",
+                IS_SET(ch->pcdata->toggles, PLR_LFG) ? "$B$2on$R" : "$B$4off$R");
+        break;
+
+      case 12:
+        sprintf(buf + strlen(buf), "%s\n\r",
+                IS_SET(ch->pcdata->toggles, PLR_CHARMIEJOIN) ? "$B$2on$R" : "$B$4off$R");
+        break;
+      case 13:
+        sprintf(buf + strlen(buf), "%s\n\r",
+                IS_SET(ch->pcdata->toggles, PLR_NOTAX) ? "$B$2on$R" : "$B$4off$R");
+        break;
+      case 14:
+        if (IS_SET(ch->pcdata->toggles, PLR_GUIDE))
+        {
+          sprintf(buf + strlen(buf), "%s\n\r",
+                  IS_SET(ch->pcdata->toggles, PLR_GUIDE_TOG) ? "$B$2on$R" : "$B$4off$R");
+        }
+        break;
+      case 15:
+        sprintf(buf + strlen(buf), "%s\n\r",
+                IS_SET(ch->pcdata->toggles, PLR_NEWS) ? "$B$2on$R" : "$B$4off$R");
+        break;
+      case 16:
+        sprintf(buf + strlen(buf), "%s\n\r",
+                IS_SET(ch->pcdata->toggles, PLR_ASCII) ? "$B$4off$R" : "$B$2on$R");
+        break;
+      case 17:
+        sprintf(buf + strlen(buf), "%s\n\r",
+                IS_SET(ch->pcdata->toggles, PLR_DAMAGE) ? "$B$2on$R" : "$B$4off$R");
+        break;
+
+      default:
+        break;
+      }
     }
-    
+
     send_to_char(buf, ch);
     return eSUCCESS;
   }
-  
-  for(x = 0; toggle_txt[x][0] != '\0'; x++)
-     if(is_abbrev(buf, toggle_txt[x]))
-       break;
-  
-  if(toggle_txt[x][0] == '\0') {
+
+  for (x = 0; toggle_txt[x][0] != '\0'; x++)
+    if (is_abbrev(buf, toggle_txt[x]))
+      break;
+
+  if (toggle_txt[x][0] == '\0')
+  {
     send_to_char("Bad option.  Type toggle with no arguments for a list of "
-                 "good ones.\n\r", ch);
+                 "good ones.\n\r",
+                 ch);
     return eFAILURE;
   }
 
-  switch(x) {
-    case 0:
+  switch (x)
+  {
+  case 0:
     do_brief(ch, "", 9);
     break;
-    
-    case 1:
+
+  case 1:
     do_compact(ch, "", 9);
     break;
-    
-    case 2:
+
+  case 2:
     do_beep_set(ch, "", 9);
     break;
-    
-    case 3:
+
+  case 3:
     do_anonymous(ch, "", 9);
     break;
-    
-    case 4:
+
+  case 4:
     do_ansi(ch, "", 9);
     break;
-    
-    case 5:
+
+  case 5:
     do_vt100(ch, "", 9);
     break;
-    
-    case 6:
+
+  case 6:
     do_wimpy(ch, "", 9);
     break;
-    
-    case 7:
+
+  case 7:
     do_pager(ch, "", 9);
     break;
-    
-    case 8:
-   if (GET_CLASS(ch) == CLASS_BARD)
-    do_bard_song_toggle(ch, "", 9);
-   else send_to_char("You're not a bard!\r\n",ch);
+
+  case 8:
+    if (GET_CLASS(ch) == CLASS_BARD)
+      do_bard_song_toggle(ch, "", 9);
+    else
+      send_to_char("You're not a bard!\r\n", ch);
     break;
-    
-    case 9:
+
+  case 9:
     do_autoeat(ch, "", 9);
     break;
-    
-    case 10:
+
+  case 10:
     do_summon_toggle(ch, "", 9);
     break;
-    
-    case 11:
+
+  case 11:
     do_lfg_toggle(ch, "", 9);
     break;
-    
-    case 12:
+
+  case 12:
     do_charmiejoin_toggle(ch, "", 9);
     break;
 
-    case 13:
+  case 13:
     do_notax_toggle(ch, "", 9);
     break;
-    
-    case 14:
-	if (IS_SET(ch->pcdata->toggles, PLR_GUIDE))
-    do_guide_toggle(ch, "", 9);
-   else send_to_char("You're not a guide!\r\n",ch);
+
+  case 14:
+    if (IS_SET(ch->pcdata->toggles, PLR_GUIDE))
+      do_guide_toggle(ch, "", 9);
+    else
+      send_to_char("You're not a guide!\r\n", ch);
     break;
 
-    case 15:
+  case 15:
     do_news_toggle(ch, "", 9);
     break;
 
-    case 16:
+  case 16:
     do_ascii_toggle(ch, "", 9);
     break;
-    case 17:
+  case 17:
     do_damage_toggle(ch, "", 9);
     break;
 
-    default:
+  default:
     send_to_char("A bad thing just happened.  Tell the gods.\n\r", ch);
     break;
   }
