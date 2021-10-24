@@ -442,8 +442,8 @@ struct char_data
     int spec;
 
     struct room_direction_data *brace_at, *brace_exit; //exits affected by brace
+    void tell_history(string message);
 };
-
 
 // This structure is written to the disk.  DO NOT MODIFY THIS STRUCTURE
 // There is a method in save.C for adding additional items to the pfile

@@ -703,7 +703,9 @@ int do_tell(struct char_data *ch, char *argument, int cmd)
     queue<string> tmp = *(ch->pcdata->tell_history);
     while (!tmp.empty())
     {
-      send_to_char((tmp.front()).c_str(), ch);
+      string buf = tmp.front();
+      buf += "\r\n";
+      send_to_char(buf, ch);
       tmp.pop();
     }
 
@@ -724,10 +726,15 @@ int do_tell(struct char_data *ch, char *argument, int cmd)
     vict = get_pc_vis(ch, name);
     if ((vict != NULL) && GET_LEVEL(vict) >= IMMORTAL)
     {
-      send_to_char("That person is busy right now.\n\r", ch);
-      send_to_char("Your message has been saved.\n\r", ch);
-      sprintf(buf, "$2$B%s told you, '%s'$R\n\r", PERS(ch, vict), message);
+      send_to_char("That person is busy right now.\r\n", ch);
+      send_to_char("Your message has been saved.\r\n", ch);
+      sprintf(buf, "$2$B%s told you, '%s'$R\r\n", PERS(ch, vict), message);
       record_msg(buf, vict);
+      sprintf(buf, "$2$B%s told you, '%s'$R", PERS(ch, vict), message);
+      vict->tell_history(buf);
+
+      sprintf(buf, "$2$BYou told %s, '%s'$R", GET_SHORT(vict), message);
+      ch->tell_history(buf);
     }
     else
     {
@@ -773,8 +780,7 @@ int do_tell(struct char_data *ch, char *argument, int cmd)
         sprintf(buf, "%s tells you, '%s'", PERS(ch, vict), message);
       else
       {
-        sprintf(buf, "%s tells you, '%s'%c",
-                PERS(ch, vict), message, IS_SET(vict->pcdata->toggles, PLR_BEEP) ? '\a' : '\0');
+        sprintf(buf, "%s tells you, '%s'%c", PERS(ch, vict), message, IS_SET(vict->pcdata->toggles, PLR_BEEP) ? '\a' : '\0');
         if (!IS_NPC(ch) && !IS_NPC(vict) && vict->pcdata->last_tell)
           dc_free(vict->pcdata->last_tell);
         if (!IS_NPC(ch) && !IS_NPC(vict))
@@ -786,25 +792,11 @@ int do_tell(struct char_data *ch, char *argument, int cmd)
       send_to_char_regardless(buf, vict);
       ansi_color(NTEXT, vict);
 
-      if (IS_PC(vict))
-      {
-        sprintf(buf, "%s tells you, '%s'%c\r\n",
-                PERS(ch, vict), message, IS_SET(vict->pcdata->toggles, PLR_BEEP) ? '\a' : '\0');
-        if (vict->pcdata->tell_history == 0)
-        {
-          vict->pcdata->tell_history = new std::queue<string>();
-        }
-
-        vict->pcdata->tell_history->push(buf);
-        if (vict->pcdata->tell_history->size() > 10)
-        {
-          vict->pcdata->tell_history->pop();
-        }
-      }
+      sprintf(buf, "$2$B%s tells you, '%s'$R", PERS(ch, vict), message);
+      vict->tell_history(buf);
 
       sprintf(buf, "$2$BYou tell %s, '%s'$R", PERS(vict, ch), message);
       send_to_char(buf, ch);
-      //        act(buf, ch, 0, 0, TO_CHAR, STAYHIDE);
     }
     else if (!is_busy(vict) && GET_POS(vict) > POSITION_SLEEPING)
     {
@@ -812,8 +804,7 @@ int do_tell(struct char_data *ch, char *argument, int cmd)
         sprintf(buf, "$2$B%s tells you, '%s'$R", PERS(ch, vict), message);
       else
       {
-        sprintf(buf, "$2$B%s tells you, '%s'$R%c", PERS(ch, vict), message,
-                IS_SET(vict->pcdata->toggles, PLR_BEEP) ? '\a' : '\0');
+        sprintf(buf, "$2$B%s tells you, '%s'$R%c", PERS(ch, vict), message, IS_SET(vict->pcdata->toggles, PLR_BEEP) ? '\a' : '\0');
         if (vict->pcdata->last_tell && !IS_NPC(ch) && !IS_NPC(vict))
           dc_free(vict->pcdata->last_tell);
         if (!IS_NPC(ch) && !IS_NPC(vict))
@@ -821,23 +812,12 @@ int do_tell(struct char_data *ch, char *argument, int cmd)
       }
       act(buf, vict, 0, 0, TO_CHAR, STAYHIDE);
 
-      if (IS_PC(vict))
-      {
-        sprintf(buf, "$2$B%s tells you, '%s'$R\r\n", PERS(ch, vict), message);
-        if (vict->pcdata->tell_history == 0)
-        {
-          vict->pcdata->tell_history = new std::queue<string>();
-        }
-
-        vict->pcdata->tell_history->push(buf);
-        if (vict->pcdata->tell_history->size() > 10)
-        {
-          vict->pcdata->tell_history->pop();
-        }
-      }
+      sprintf(buf, "$2$B%s tells you, '%s'$R%c", PERS(ch, vict), message);
+      vict->tell_history(buf);
 
       sprintf(buf, "$2$BYou tell %s, '%s'$R", PERS(vict, ch), message);
-      act(buf, ch, 0, 0, TO_CHAR, STAYHIDE);
+      act_return ar = act(buf, ch, 0, 0, TO_CHAR, STAYHIDE);
+      ch->tell_history(ar.str);
 
       // Log what I told a logged player under their name
       if (!IS_MOB(vict) && IS_SET(vict->pcdata->punish, PUNISH_LOG))
@@ -855,8 +835,7 @@ int do_tell(struct char_data *ch, char *argument, int cmd)
         sprintf(buf, "%s tells you, '%s'", PERS(ch, vict), message);
       else
       {
-        sprintf(buf, "%s tells you, '%s'%c",
-                PERS(ch, vict), message, IS_SET(vict->pcdata->toggles, PLR_BEEP) ? '\a' : '\0');
+        sprintf(buf, "%s tells you, '%s'%c", PERS(ch, vict), message, IS_SET(vict->pcdata->toggles, PLR_BEEP) ? '\a' : '\0');
 
         if (vict->pcdata->last_tell && !IS_NPC(ch) && !IS_NPC(vict))
           dc_free(vict->pcdata->last_tell);
@@ -868,8 +847,12 @@ int do_tell(struct char_data *ch, char *argument, int cmd)
       send_to_char_regardless(buf, vict);
       ansi_color(NTEXT, vict);
 
+      sprintf(buf, "$2$B%s tells you, '%s'$R", PERS(ch, vict), message);
+      vict->tell_history(buf);
+
       sprintf(buf, "$2$BYou tell %s, '%s'$R", PERS(vict, ch), message);
-      act(buf, ch, 0, 0, TO_CHAR, STAYHIDE);
+      act_return ar = act(buf, ch, 0, 0, TO_CHAR, STAYHIDE);
+      ch->tell_history(ar.str);
 
       send_to_char("They were sleeping btw...\r\n", ch);
       // Log what I told a logged player under their name
@@ -960,9 +943,13 @@ int do_whisper(struct char_data *ch, char *argument, int cmd)
   else
   {
     sprintf(buf, "$1$B$n whispers to you, '%s'$R", message);
-    act(buf, ch, 0, vict, TO_VICT, STAYHIDE);
+    act_return ar = act(buf, ch, 0, vict, TO_VICT, STAYHIDE);
+    vict->tell_history(ar.str);
+
     sprintf(buf, "$1$BYou whisper to $N, '%s'$R", message);
-    act(buf, ch, 0, vict, TO_CHAR, STAYHIDE);
+    ar = act(buf, ch, 0, vict, TO_CHAR, STAYHIDE);
+    ch->tell_history(ar.str);
+
     act("$n whispers something to $N.", ch, 0, vict, TO_ROOM,
         NOTVICT | STAYHIDE);
   }
@@ -1002,9 +989,13 @@ int do_ask(struct char_data *ch, char *argument, int cmd)
   else
   {
     sprintf(buf, "$B$n asks you, '%s'$R", message);
-    act(buf, ch, 0, vict, TO_VICT, 0);
+    act_return ar = act(buf, ch, 0, vict, TO_VICT, 0);
+    vict->tell_history(ar.str);
+
     sprintf(buf, "$BYou ask $N, '%s'$R", message);
-    act(buf, ch, 0, vict, TO_CHAR, 0);
+    ar = act(buf, ch, 0, vict, TO_CHAR, 0);
+    ch->tell_history(ar.str);
+
     act("$n asks $N a question.", ch, 0, vict, TO_ROOM, NOTVICT);
   }
   return eSUCCESS;
@@ -1208,3 +1199,21 @@ int do_newbie(struct char_data *ch, char *argument, int cmd)
     return eSUCCESS;
 }
 
+void char_data::tell_history(string message)
+{
+  if (this->pcdata == nullptr)
+  {
+    return;
+  }
+
+  if (this->pcdata->tell_history == nullptr)
+  {
+    this->pcdata->tell_history = new std::queue<string>();
+  }
+
+  this->pcdata->tell_history->push(message);
+  if (this->pcdata->tell_history->size() > 10)
+  {
+    this->pcdata->tell_history->pop();
+  }
+}
