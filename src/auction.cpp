@@ -1646,7 +1646,7 @@ void AuctionHouse::AddItem(CHAR_DATA *ch, OBJ_DATA *obj, unsigned int price, str
   
   if(IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL)) 
   {
-    send_to_char("That sure would be a fucking stupid thing to do.\n\r", ch);
+    send_to_char("You can't sell godload.\r\n", ch);
     return;
   }
 
@@ -1714,7 +1714,20 @@ void AuctionHouse::AddItem(CHAR_DATA *ch, OBJ_DATA *obj, unsigned int price, str
   {
     send_to_char("The Consignment Broker curtly informs you that it needs to have full charges.\n\r", ch);
     return;
-  } 
+  }
+
+  // Private sales cost money now
+  if (buf[0] != 0)
+  {
+    if (GET_GOLD(ch) < 500000)
+    {
+      send_to_char("You do not have the 500,000 gold required to sell an item privately.\r\n", ch);
+      return;
+    }
+
+    GET_GOLD(ch) -= 500000;
+    send_to_char("The Consignment Broker takes 500,000 gold from you as a cost for selling something privately.\r\n", ch);
+  }
 
   ItemsPosted += 1;
   ItemsActive += 1;
@@ -1742,32 +1755,40 @@ void AuctionHouse::AddItem(CHAR_DATA *ch, OBJ_DATA *obj, unsigned int price, str
   Save();
   
   if(buyer.empty())
-    csendf(ch, "You are now selling %s for %d coins.\n\r", 
+    csendf(ch, "You are now selling %s for %u coins.\n\r", 
               obj->short_description, price);
   else
   {
-    csendf(ch, "You are now selling %s to %s for %d coins.\n\r", 
+    csendf(ch, "You are now selling %s to %s for %u coins.\n\r", 
               obj->short_description, buyer.c_str(), price);
   }
  
-  if(advertise == true)
+  if(advertise == true && NewTicket.buyer.empty())
   {
     char_data * find_mob_in_room(struct char_data *ch, int iFriendId);
     char auc_buf[MAX_STRING_LENGTH];
     CHAR_DATA *Broker = find_mob_in_room(ch, 5258);
     if(Broker)
     {
-      snprintf(auc_buf, MAX_STRING_LENGTH, "$7$B%s has just posted $R%s $7$Bfor sale.",
-                         GET_SHORT(ch), obj->short_description);
+      snprintf(auc_buf, MAX_STRING_LENGTH, "$7$B%s has just posted $R%s $7$Bfor sale for %u gold coins.",
+                         GET_SHORT(ch), obj->short_description, price);
       do_auction(Broker, auc_buf, 9); 
     }
     else
+    {
       send_to_char("The Consignment Broker couldn't auction. Contact an imm.\n\r", ch);
+    }
   }
  
   char log_buf[MAX_STRING_LENGTH];
-  sprintf(log_buf, "VEND: %s just listed %s for sale for %u coins.\n\r", 
-               GET_NAME(ch), obj->short_description, price);
+  if (NewTicket.buyer.empty())
+  {
+    sprintf(log_buf, "VEND: %s just listed %s for sale for %u coins.\n\r", GET_NAME(ch), obj->short_description, price);
+  }
+  else
+  {
+    sprintf(log_buf, "VEND: %s just listed %s for sale for %u coins for %s.\n\r", GET_NAME(ch), obj->short_description, price, NewTicket.buyer.c_str());
+  }
   log(log_buf, IMP, LOG_OBJECTS);
 
   // If this is a custom item we need it to continue existing otherwise we remove the clone
@@ -2094,19 +2115,19 @@ int do_vend(CHAR_DATA *ch, char *argument, int cmd)
     argument = one_argument(argument, buf);
     if(!*buf)
     {
-      send_to_char("Sell what?\n\rSyntax: vend sell <item> <price> [person | advertise]\n\r", ch);
+      send_to_char("Sell what?\n\rSyntax: vend sell <item> <price> [person]\n\r", ch);
       return eSUCCESS;
     }  
     obj = get_obj_in_list_vis(ch, buf, ch->carrying);
     if(!obj)
     {
-      send_to_char("You don't seem to have that item.\n\rSyntax: vend sell <item> <price> [person | advertise]\n\r", ch);
+      send_to_char("You don't seem to have that item.\n\rSyntax: vend sell <item> <price> [person]\n\r", ch);
       return eSUCCESS;
     }
     argument = one_argument(argument, buf);
     if(!*buf)
     {
-       send_to_char("How much do you want to sell it for?\n\rSyntax: vend sell <item> <price> [person | advertise]\n\r", ch);
+       send_to_char("How much do you want to sell it for?\n\rSyntax: vend sell <item> <price> [person]\n\r", ch);
        return eSUCCESS;
     }
     price = atoi(buf);
