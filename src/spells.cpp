@@ -1350,9 +1350,11 @@ int say_spell( CHAR_DATA *ch, int si, int room )
 	temp_char = temp_char->next_in_room)
 	if(temp_char != ch) {
 	  if (GET_CLASS(ch) == GET_CLASS(temp_char)) {
-	      retval = act(buf, ch, 0, temp_char, TO_VICT, 0);
+	      act_return ar = act(buf, ch, 0, temp_char, TO_VICT, 0);
+        retval = ar.retval;
 	  } else {
-	      retval = act(buf2, ch, 0, temp_char, TO_VICT, 0);
+	      act_return ar = act(buf2, ch, 0, temp_char, TO_VICT, 0);
+        retval = ar.retval;
 	  }
 
 	  // Need better solution, but this will keep DC from crashing when a act_prog trigger kills a mob in the room

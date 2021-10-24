@@ -388,8 +388,8 @@ int do_rage(struct char_data *ch, char *argument, int cmd)
 	 ch, 0, victim, TO_CHAR, 0);
     act ("$n starts advancing towards $N, but trips over $s own feet!",
          ch, 0, victim, TO_ROOM, NOTVICT);
-    retval = act ("$n starts advancing toward you, but trips over $s own feet!",
-		  ch, 0, victim, TO_VICT, 0);
+    act_return ar = act ("$n starts advancing toward you, but trips over $s own feet!", ch, 0, victim, TO_VICT, 0);
+    retval = ar.retval;
     if (IS_SET(retval, eVICT_DIED)) {
       return retval;
     }
@@ -403,8 +403,8 @@ int do_rage(struct char_data *ch, char *argument, int cmd)
         ch, 0, victim, TO_CHAR, 0);
     act ("$n advances confidently towards $N, and flies into a rage!",
             ch, 0, victim, TO_ROOM, NOTVICT);
-    retval = act ("$n advances confidently towards you, and flies into a rage!",
-		  ch, 0, victim, TO_VICT, 0);
+    act_return ar = act ("$n advances confidently towards you, and flies into a rage!", ch, 0, victim, TO_VICT, 0);
+    retval = ar.retval;
     if (IS_SET(retval, eVICT_DIED)) {
       return retval;
     }
@@ -535,7 +535,8 @@ int do_berserk(struct char_data *ch, char *argument, int cmd)
   if (!skill_success(ch,victim,SKILL_BERSERK)) {
     act ("You start freaking out on $N, but trip over your own feet!", ch, 0, victim, TO_CHAR, 0);
     act ("$n starts freaking out on $N, but trips over $s own feet!", ch, 0, victim, TO_ROOM, NOTVICT);
-    retval = act ("$n starts freaking out on you, but trips over $s own feet!", ch, 0, victim, TO_VICT, 0);
+    act_return ar = act ("$n starts freaking out on you, but trips over $s own feet!", ch, 0, victim, TO_VICT, 0);
+    retval = ar.retval;
     if (IS_SET(retval, eVICT_DIED)) {
       return retval;
     }
@@ -554,7 +555,8 @@ int do_berserk(struct char_data *ch, char *argument, int cmd)
   else {
     act ("You start FOAMING at the mouth, and you go BERSERK on $N!", ch, 0, victim, TO_CHAR, 0);
     act ("$n starts FOAMING at the mouth, as $e goes BERSERK on $N!", ch, 0, victim, TO_ROOM, NOTVICT);
-    retval = act ("$n starts FOAMING at the mouth, and goes BERSERK on you!", ch, 0, victim, TO_VICT, 0);
+    act_return ar = act ("$n starts FOAMING at the mouth, and goes BERSERK on you!", ch, 0, victim, TO_VICT, 0);
+    retval = ar.retval;
     if (IS_SET(retval, eVICT_DIED)) {
       return retval;
     }
@@ -688,9 +690,10 @@ int do_headbutt(struct char_data *ch, char *argument, int cmd)
              number(1, 100) < affected_by_spell(victim, SKILL_BATTLESENSE)->modifier) {
       act("$N's heightened battlesense sees your headbutt coming from a mile away.", ch, 0, victim, TO_CHAR, 0);
       act("$N's heightened battlesense sees $n's headbutt coming from a mile away.", ch, 0, victim, TO_ROOM, NOTVICT);
-      retval = act("Your heightened battlesense sees $n's headbutt coming from a mile away.", ch, 0, victim, TO_VICT, 0);
+      act_return ar = act("Your heightened battlesense sees $n's headbutt coming from a mile away.", ch, 0, victim, TO_VICT, 0);
+      retval = ar.retval;
       if (IS_SET(retval, eVICT_DIED)) {
-	return retval;
+	      return retval;
       }
   
       WAIT_STATE(ch, PULSE_VIOLENCE*3);
@@ -1114,7 +1117,8 @@ int do_knockback(struct char_data *ch, char *argument, int cmd)
   if(!victim_paralyzed && !skill_success(ch, victim, SKILL_KNOCKBACK, 0-(learned/4 * 3))) {
     act("You lunge forward in an attempt to smash $N but fall, missing $M completely.", ch, 0, victim, TO_CHAR, 0);
     act("$n lunges forward in an attempt to smash into $N but falls flat on $s face.", ch, 0, victim, TO_ROOM, NOTVICT);
-    retval = act("$n lunges forward in an attempt to smash into you but falls flat on $s face, missing completely.", ch, 0, victim, TO_VICT, 0);
+    act_return ar = act("$n lunges forward in an attempt to smash into you but falls flat on $s face, missing completely.", ch, 0, victim, TO_VICT, 0);
+    retval = ar.retval;
     if (IS_SET(retval, eVICT_DIED)) {
       return retval;
     }
@@ -1127,7 +1131,8 @@ int do_knockback(struct char_data *ch, char *argument, int cmd)
              number(1, 100) < affected_by_spell(victim, SKILL_BATTLESENSE)->modifier) {
     act("$N's heightened battlesense sees your smash coming from a mile away and $E easily sidesteps it.", ch, 0, victim, TO_CHAR, 0);
     act("$N's heightened battlesense sees $n's smash coming from a mile away and $N easily sidesteps it.", ch, 0, victim, TO_ROOM, NOTVICT);  
-    retval = act("Your heightened battlesense sees $n's smash coming from a mile away and you easily sidestep it.", ch, 0, victim, TO_VICT, 0);
+    act_return ar = act("Your heightened battlesense sees $n's smash coming from a mile away and you easily sidestep it.", ch, 0, victim, TO_VICT, 0);
+    retval = ar.retval;
     if (IS_SET(retval, eVICT_DIED)) {
       return retval;
     }

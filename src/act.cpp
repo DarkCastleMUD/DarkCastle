@@ -39,16 +39,22 @@ extern CWorld world;
 extern struct descriptor_data *descriptor_list;
 extern bool MOBtrigger;
 
-int send_message(TokenList * tokens, CHAR_DATA *ch, OBJ_DATA * obj, void * vch, int flags, CHAR_DATA *to);
+struct send_message_return
+{
+  string str;
+  int retval;
+};
+
+send_message_return send_message(TokenList * tokens, CHAR_DATA *ch, OBJ_DATA * obj, void * vch, int flags, CHAR_DATA *to);
 void send_message(const char *str, CHAR_DATA *to);
 
 
-int act(const string &str, CHAR_DATA *ch, OBJ_DATA *obj, void *vict_obj, int16 destination, int16 flags)
+act_return act(const string &str, CHAR_DATA *ch, OBJ_DATA *obj, void *vict_obj, int16 destination, int16 flags)
 {
   return act(str.c_str(), ch, obj, vict_obj, destination, flags);
 }
 
-int act(
+act_return act(
     const char *str,   // Buffer
     CHAR_DATA *ch,     // Character from
     OBJ_DATA *obj,     // Object
@@ -59,7 +65,7 @@ int act(
 {
   struct descriptor_data *i;
   int retval = 0;
-
+  send_message_return smr;
   TokenList *tokens;
 
   tokens = new TokenList(str);
@@ -69,7 +75,7 @@ int act(
   {
     log("Error in act(), character equal to 0", OVERSEER, LOG_BUG);
     delete tokens;
-    return eFAILURE;
+    return {string(), eFAILURE};
   }
 
   if (
@@ -81,11 +87,13 @@ int act(
 
   if (destination == TO_VICT)
   {
-    retval |= send_message(tokens, ch, obj, vict_obj, flags, (CHAR_DATA *)vict_obj);
+    smr = send_message(tokens, ch, obj, vict_obj, flags, (CHAR_DATA *)vict_obj);
+    retval |= smr.retval;
   }
   else if (destination == TO_CHAR)
   {
-    retval |= send_message(tokens, ch, obj, vict_obj, flags, ch);
+    smr = send_message(tokens, ch, obj, vict_obj, flags, ch);
+    retval |= smr.retval;
   }
   else if (destination == TO_ROOM || destination == TO_GROUP || destination == TO_ROOM_NOT_GROUP)
   {
@@ -108,7 +116,8 @@ int act(
         {
           if (!IS_SET(flags, BARDSONG) || tmp_char->pcdata == nullptr || !IS_SET(tmp_char->pcdata->toggles, PLR_BARD_SONG))
           {
-            retval |= send_message(tokens, ch, obj, vict_obj, flags, tmp_char);
+            smr = send_message(tokens, ch, obj, vict_obj, flags, tmp_char);
+            retval |= smr.retval;
           }
         }
       }
@@ -121,7 +130,7 @@ int act(
     {
       log("Error in act(), invalid value sent as 'destination'", OVERSEER, LOG_BUG);
       delete tokens;
-      return eFAILURE;
+      return {string(), eFAILURE};
     }
     for (i = descriptor_list; i; i = i->next)
     {
@@ -132,13 +141,14 @@ int act(
         continue;
       if ((destination == TO_ZONE) && world[i->character->in_room].zone != world[ch->in_room].zone)
         continue;
-      retval |= send_message(tokens, ch, obj, vict_obj, flags, i->character);
+      smr = send_message(tokens, ch, obj, vict_obj, flags, i->character);
+      retval |= smr.retval;
     }
   }
 
   delete tokens;
 
-  return retval;
+  return {smr.str, retval};
 }
 
 /************************************************************************
@@ -157,7 +167,7 @@ void send_message(const char *str, CHAR_DATA *to)
 }
 
 
-int send_message(TokenList * tokens, CHAR_DATA *ch, OBJ_DATA * obj, void * vict_obj, int flags, CHAR_DATA *to)
+send_message_return send_message(TokenList * tokens, CHAR_DATA *ch, OBJ_DATA * obj, void * vict_obj, int flags, CHAR_DATA *to)
 {
   int retval = 0;
   char * buf = tokens->Interpret(ch, obj, vict_obj, to, flags);
@@ -175,7 +185,18 @@ int send_message(TokenList * tokens, CHAR_DATA *ch, OBJ_DATA * obj, void * vict_
     retval |= oprog_act_trigger( buf, ch);
     
   MOBtrigger = TRUE;
-  return retval;
+  if (buf == nullptr)
+  {
+    return {string(), retval};
+  }
+
+  size_t buf_len = strlen(buf);
+  if (buf_len >= 2)
+  {
+    // Remove \r\n at end before returning string
+    buf[buf_len-2] = '\0';    
+  }
+  return {string(buf), retval};
 }
 
 

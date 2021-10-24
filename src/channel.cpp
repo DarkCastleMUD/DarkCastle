@@ -8,6 +8,8 @@
 #include <cctype>
 #include <string>
 #include <sstream>
+#include <list>
+#include <queue>
 
 #include "structs.h"
 #include "player.h"
@@ -687,26 +689,28 @@ int do_tell(struct char_data *ch, char *argument, int cmd)
     message[199] = '\0';
     
     if(!*name || !*message)  {
-      if (ch->pcdata->tell_history == 0 || ch->pcdata->tell_history->empty()) {
-	send_to_char("You've not recieved any tell messages.\r\n", ch);
-	return eSUCCESS;
+      if (ch->pcdata->tell_history == nullptr || ch->pcdata->tell_history->empty())
+      {
+        send_to_char("You have not sent or recieved any tell messages.\r\n", ch);
+        return eSUCCESS;
       }
 
-      send_to_char("Here are the last 10 tell messages you've received:\r\n", ch);
+      send_to_char("Here are the last 10 tell messages:\r\n", ch);
       queue<string> tmp = *(ch->pcdata->tell_history);
-      while(!tmp.empty())
-	{
-	  send_to_char((tmp.front()).c_str(), ch);
-	  tmp.pop();
-	}
+      while (!tmp.empty())
+      {
+        send_to_char((tmp.front()).c_str(), ch);
+        tmp.pop();
+      }
 
       return eSUCCESS;
     }
 
     if(cmd == 9999) {
-      if(!(vict = get_active_pc(name))) {
-	send_to_char ("They seem to have left!\n\r", ch);
-	return eSUCCESS;
+      if (!(vict = get_active_pc(name)))
+      {
+        send_to_char("They seem to have left!\n\r", ch);
+        return eSUCCESS;
       }
       cmd = 9;
     }
@@ -767,18 +771,21 @@ int do_tell(struct char_data *ch, char *argument, int cmd)
         send_to_char_regardless(buf, vict);
         ansi_color(NTEXT, vict);
 
-	if (IS_PC(vict)) {
-          sprintf(buf,"%s tells you, '%s'%c\r\n",
-                PERS(ch, vict), message, IS_SET(vict->pcdata->toggles, PLR_BEEP) ? '\a' : '\0');
-	  if (vict->pcdata->tell_history == 0) {
-	    vict->pcdata->tell_history = new std::queue<string>();
-	  }
+        if (IS_PC(vict))
+        {
+          sprintf(buf, "%s tells you, '%s'%c\r\n",
+                  PERS(ch, vict), message, IS_SET(vict->pcdata->toggles, PLR_BEEP) ? '\a' : '\0');
+          if (vict->pcdata->tell_history == 0)
+          {
+            vict->pcdata->tell_history = new std::queue<string>();
+          }
 
-	  vict->pcdata->tell_history->push(buf);
-          if(vict->pcdata->tell_history->size() > 10) {
-	    vict->pcdata->tell_history->pop();
-	  }
-	}
+          vict->pcdata->tell_history->push(buf);
+          if (vict->pcdata->tell_history->size() > 10)
+          {
+            vict->pcdata->tell_history->pop();
+          }
+        }
 
         sprintf(buf,"$2$BYou tell %s, '%s'$R", PERS(vict, ch), message);
         send_to_char(buf, ch);
@@ -976,9 +983,25 @@ int do_grouptell(struct char_data *ch, char *argument, int cmd)
   OBJ_DATA *tmp_obj;
   bool silence = FALSE;
 
+  if (ch == nullptr || ch->pcdata == nullptr)
+  {
+    return eFAILURE;
+  }
+
   if (!*argument)
   {
-    send_to_char("Tell your group what?\n\r", ch);
+    if (ch->pcdata->gtell_history == nullptr || ch->pcdata->gtell_history->empty()) {
+      send_to_char("No one has said anything.\r\n", ch);
+      return eFAILURE;
+    }
+
+    queue<string> copy = *(ch->pcdata->gtell_history);
+    send_to_char("Here are the last 10 group tells:\r\n", ch);
+    while(!copy.empty()) {
+      csendf(ch, "%s\r\n", copy.front().c_str());
+      copy.pop();
+    }
+
     return eSUCCESS;
   }
 
@@ -1004,8 +1027,18 @@ int do_grouptell(struct char_data *ch, char *argument, int cmd)
     return eSUCCESS;
   }
 
+  if (ch->pcdata->gtell_history == nullptr)
+  {
+    ch->pcdata->gtell_history = new queue<string>;
+  }
+
   sprintf(buf, "$B$1You tell the group, $7'%s'$R", argument);
-  act(buf, ch, 0, 0, TO_CHAR, STAYHIDE | ASLEEP);
+  act_return ar = act(buf, ch, 0, 0, TO_CHAR, STAYHIDE | ASLEEP);
+  ch->pcdata->gtell_history->push(ar.str);
+  if (ch->pcdata->gtell_history->size() > 10)
+  {
+    ch->pcdata->gtell_history->pop();
+  }
 
   if (!(k = ch->master))
     k = ch;
@@ -1013,20 +1046,53 @@ int do_grouptell(struct char_data *ch, char *argument, int cmd)
   sprintf(buf, "$B$1$n tells the group, $7'%s'$R", argument);
 
   if (ch->master)
-    act(buf, ch, 0, ch->master, TO_VICT, STAYHIDE | ASLEEP);
+  {
+    act_return ar = act(buf, ch, 0, ch->master, TO_VICT, STAYHIDE | ASLEEP);
+
+    if (ch->master && ch->master->pcdata)
+    {
+      if (ch->master->pcdata->gtell_history == nullptr)
+      {
+          ch->master->pcdata->gtell_history = new queue<string>;
+      }
+      ch->master->pcdata->gtell_history->push(ar.str);
+      if (ch->master->pcdata->gtell_history->size() > 10)
+      {
+        ch->master->pcdata->gtell_history->pop();
+      }
+    }
+  }
 
   for (f = k->followers; f; f = f->next)
+  {
     if (IS_AFFECTED(f->follower, AFF_GROUP) && (f->follower != ch))
     {
       for (tmp_obj = world[f->follower->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
+      {
         if (obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER)
         {
           silence = TRUE;
           break;
         }
+      }
       if (!silence)
-        act(buf, ch, 0, f->follower, TO_VICT, STAYHIDE | ASLEEP);
+      {
+        act_return ar = act(buf, ch, 0, f->follower, TO_VICT, STAYHIDE | ASLEEP);
+        if (f->follower && f->follower->pcdata)
+        {
+          if (f->follower->pcdata->gtell_history == nullptr)
+          {
+             f->follower->pcdata->gtell_history = new queue<string>;
+          }
+          f->follower->pcdata->gtell_history->push(ar.str);
+          if (f->follower->pcdata->gtell_history->size() > 10)
+          {
+            f->follower->pcdata->gtell_history->pop();
+          }
+        }
+      }
     }
+  }
   return eSUCCESS;
 }
 

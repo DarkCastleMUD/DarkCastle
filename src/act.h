@@ -14,10 +14,17 @@
 //--
 // Function interface
 //--
-int act(const char *str, CHAR_DATA *ch, OBJ_DATA *obj, void *vict_obj,
+
+struct act_return
+{
+    string str;
+    int retval;
+};
+
+act_return act(const char *str, CHAR_DATA *ch, OBJ_DATA *obj, void *vict_obj,
           int16 destination, int16 flags);
 
-int act(const std::string &str, CHAR_DATA *ch, OBJ_DATA *obj, void *vict_obj,
+act_return act(const std::string &str, CHAR_DATA *ch, OBJ_DATA *obj, void *vict_obj,
 	 int16 destination, int16 flags);
 
 //--
