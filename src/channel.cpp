@@ -663,234 +663,261 @@ int do_dream(struct char_data *ch, char *argument, int cmd)
 
 int do_tell(struct char_data *ch, char *argument, int cmd)
 {
-    struct char_data *vict;
-    char name[200], message[200], buf[200];
-    OBJ_DATA *tmp_obj;
+  struct char_data *vict;
+  char name[200], message[200], buf[200];
+  OBJ_DATA *tmp_obj;
 
-    if (!IS_MOB(ch) && IS_SET(ch->pcdata->punish, PUNISH_NOTELL)) {
-	send_to_char("Your message didn't get through!!\n\r", ch);
-	return eSUCCESS;
+  if (!IS_MOB(ch) && IS_SET(ch->pcdata->punish, PUNISH_NOTELL))
+  {
+    send_to_char("Your message didn't get through!!\n\r", ch);
+    return eSUCCESS;
+  }
+
+  for (tmp_obj = world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
+    if (obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER)
+    {
+      send_to_char("The magical silence prevents you from speaking!\n\r", ch);
+      return eFAILURE;
     }
 
-    for(tmp_obj = world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
-      if(obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER) {
-        send_to_char("The magical silence prevents you from speaking!\n\r", ch);
-        return eFAILURE;
-      }
+  if (!IS_MOB(ch) && !IS_SET(ch->misc, CHANNEL_TELL))
+  {
+    send_to_char("You have tell channeled off!!\n\r", ch);
+    return eSUCCESS;
+  }
 
-    if (!IS_MOB(ch) && !IS_SET(ch->misc, CHANNEL_TELL)) {
-	send_to_char("You have tell channeled off!!\n\r", ch);
-	return eSUCCESS;
+  half_chop(argument, name, message);
+  // these don't do anything that i can see -pir
+  name[199] = '\0';
+  message[199] = '\0';
+
+  if (!*name || !*message)
+  {
+    if (ch->pcdata->tell_history == nullptr || ch->pcdata->tell_history->empty())
+    {
+      send_to_char("You have not sent or recieved any tell messages.\r\n", ch);
+      return eSUCCESS;
     }
 
-    half_chop(argument, name, message);
-    // these don't do anything that i can see -pir
-    name[199]     = '\0';
-    message[199] = '\0';
-    
-    if(!*name || !*message)  {
-      if (ch->pcdata->tell_history == nullptr || ch->pcdata->tell_history->empty())
+    send_to_char("Here are the last 10 tell messages:\r\n", ch);
+    queue<string> tmp = *(ch->pcdata->tell_history);
+    while (!tmp.empty())
+    {
+      send_to_char((tmp.front()).c_str(), ch);
+      tmp.pop();
+    }
+
+    return eSUCCESS;
+  }
+
+  if (cmd == 9999)
+  {
+    if (!(vict = get_active_pc(name)))
+    {
+      send_to_char("They seem to have left!\n\r", ch);
+      return eSUCCESS;
+    }
+    cmd = 9;
+  }
+  else if (!(vict = get_active_pc_vis(ch, name)))
+  {
+    vict = get_pc_vis(ch, name);
+    if ((vict != NULL) && GET_LEVEL(vict) >= IMMORTAL)
+    {
+      send_to_char("That person is busy right now.\n\r", ch);
+      send_to_char("Your message has been saved.\n\r", ch);
+      sprintf(buf, "$2$B%s told you, '%s'$R\n\r", PERS(ch, vict), message);
+      record_msg(buf, vict);
+    }
+    else
+    {
+      send_to_char("No-one by that name here.\n\r", ch);
+    }
+
+    return eSUCCESS;
+  }
+
+  // vict guarantted to be a PC
+  // Re: Last comment. Switched immortals crash this.
+
+  if (!IS_NPC(vict) && !IS_SET(vict->misc, CHANNEL_TELL) && ch->level <= MAX_MORTAL)
+  {
+    send_to_char("The person is ignoring all tells right now.\r\n", ch);
+    return eSUCCESS;
+  }
+  else if (!IS_NPC(vict) && !IS_SET(vict->misc, CHANNEL_TELL))
+  {
+    // Immortal sent a tell to a player with NOTELL.  Allow the tell butnotify the imm.
+    send_to_char("That player has tell channeled off btw...\r\n", ch);
+  }
+  if (ch == vict)
+    send_to_char("You try to tell yourself something.\n\r", ch);
+  else if ((GET_POS(vict) == POSITION_SLEEPING || IS_SET(world[vict->in_room].room_flags, QUIET)) && GET_LEVEL(ch) < IMMORTAL)
+    act("Sorry, $E cannot hear you.", ch, 0, vict, TO_CHAR, STAYHIDE);
+  else
+  {
+    for (tmp_obj = world[vict->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
+      if (obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER)
       {
-        send_to_char("You have not sent or recieved any tell messages.\r\n", ch);
+        act("$E cannot hear you right now.", ch, 0, vict, TO_CHAR, STAYHIDE);
         return eSUCCESS;
       }
-
-      send_to_char("Here are the last 10 tell messages:\r\n", ch);
-      queue<string> tmp = *(ch->pcdata->tell_history);
-      while (!tmp.empty())
+    if (is_ignoring(vict, ch))
+    {
+      csendf(ch, "%s is ignoring you right now.\n\r", GET_SHORT(vict));
+      return eSUCCESS;
+    }
+    if (is_busy(vict) && GET_LEVEL(ch) >= OVERSEER)
+    {
+      if (IS_MOB(vict))
+        sprintf(buf, "%s tells you, '%s'", PERS(ch, vict), message);
+      else
       {
-        send_to_char((tmp.front()).c_str(), ch);
-        tmp.pop();
-      }
-
-      return eSUCCESS;
-    }
-
-    if(cmd == 9999) {
-      if (!(vict = get_active_pc(name)))
-      {
-        send_to_char("They seem to have left!\n\r", ch);
-        return eSUCCESS;
-      }
-      cmd = 9;
-    }
-    else if(!(vict = get_active_pc_vis(ch, name))) { 
-      vict = get_pc_vis(ch, name);
-      if ((vict != NULL) && GET_LEVEL(vict) >= IMMORTAL) {
-	send_to_char("That person is busy right now.\n\r", ch);
-	send_to_char("Your message has been saved.\n\r", ch);
-	sprintf(buf,"$2$B%s told you, '%s'$R\n\r", PERS(ch, vict), message);
-	record_msg(buf, vict);
-      } else {
-	send_to_char("No-one by that name here.\n\r", ch);
-      }
-
-      return eSUCCESS;
-    }
-   
-        // vict guarantted to be a PC
-        // Re: Last comment. Switched immortals crash this.
-	
-    if( !IS_NPC(vict) && !IS_SET(vict->misc, CHANNEL_TELL) 
-	&& ch->level <= MAX_MORTAL) {
-      send_to_char("The person is ignoring all tells right now.\r\n", ch);
-      return eSUCCESS;
-    }
-   else if( !IS_NPC(vict) && !IS_SET(vict->misc, CHANNEL_TELL)) {
-     // Immortal sent a tell to a player with NOTELL.  Allow the tell butnotify the imm.
-     send_to_char("That player has tell channeled off btw...\r\n", ch);
-   }    
-    if(ch == vict)
-      send_to_char("You try to tell yourself something.\n\r", ch);
-    else if((GET_POS(vict) == POSITION_SLEEPING || IS_SET(world[vict->in_room].room_flags, QUIET)) && GET_LEVEL(ch) < IMMORTAL) 
-      act("Sorry, $E cannot hear you.", ch, 0, vict, TO_CHAR, STAYHIDE);
-    else {
-      for(tmp_obj = world[vict->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
-        if(obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER) {
-          act("$E cannot hear you right now.", ch, 0, vict, TO_CHAR, STAYHIDE);
-          return eSUCCESS;
-        }
-      if(is_ignoring(vict, ch)) { 
-	csendf(ch, "%s is ignoring you right now.\n\r", GET_SHORT(vict));
-	return eSUCCESS;
-      } 
-      if(is_busy(vict) && GET_LEVEL(ch) >= OVERSEER) {
-        if(IS_MOB(vict))
-          sprintf(buf,"%s tells you, '%s'", PERS(ch, vict), message);
-        else { 
-          sprintf(buf,"%s tells you, '%s'%c",
+        sprintf(buf, "%s tells you, '%s'%c",
                 PERS(ch, vict), message, IS_SET(vict->pcdata->toggles, PLR_BEEP) ? '\a' : '\0');
-          if(!IS_NPC(ch) && !IS_NPC(vict) &&vict->pcdata->last_tell)
-             dc_free(vict->pcdata->last_tell);
-	if (!IS_NPC(ch) && !IS_NPC(vict))
+        if (!IS_NPC(ch) && !IS_NPC(vict) && vict->pcdata->last_tell)
+          dc_free(vict->pcdata->last_tell);
+        if (!IS_NPC(ch) && !IS_NPC(vict))
           vict->pcdata->last_tell = str_dup(GET_NAME(ch));
-        }
+      }
 
-        ansi_color(GREEN, vict);
-        ansi_color(BOLD, vict);
-        send_to_char_regardless(buf, vict);
-        ansi_color(NTEXT, vict);
+      ansi_color(GREEN, vict);
+      ansi_color(BOLD, vict);
+      send_to_char_regardless(buf, vict);
+      ansi_color(NTEXT, vict);
 
-        if (IS_PC(vict))
+      if (IS_PC(vict))
+      {
+        sprintf(buf, "%s tells you, '%s'%c\r\n",
+                PERS(ch, vict), message, IS_SET(vict->pcdata->toggles, PLR_BEEP) ? '\a' : '\0');
+        if (vict->pcdata->tell_history == 0)
         {
-          sprintf(buf, "%s tells you, '%s'%c\r\n",
-                  PERS(ch, vict), message, IS_SET(vict->pcdata->toggles, PLR_BEEP) ? '\a' : '\0');
-          if (vict->pcdata->tell_history == 0)
-          {
-            vict->pcdata->tell_history = new std::queue<string>();
-          }
-
-          vict->pcdata->tell_history->push(buf);
-          if (vict->pcdata->tell_history->size() > 10)
-          {
-            vict->pcdata->tell_history->pop();
-          }
+          vict->pcdata->tell_history = new std::queue<string>();
         }
 
-        sprintf(buf,"$2$BYou tell %s, '%s'$R", PERS(vict, ch), message);
-        send_to_char(buf, ch);
-//        act(buf, ch, 0, 0, TO_CHAR, STAYHIDE);
-      }
-      else if(!is_busy(vict) && GET_POS(vict) > POSITION_SLEEPING)
-       {
-        if(IS_MOB(vict)) 
-          sprintf(buf,"$2$B%s tells you, '%s'$R", PERS(ch, vict), message);
-        else {
-          sprintf(buf,"$2$B%s tells you, '%s'$R%c", PERS(ch, vict), message,
-	        IS_SET(vict->pcdata->toggles, PLR_BEEP) ? '\a' : '\0');
-          if(vict->pcdata->last_tell && !IS_NPC(ch) && !IS_NPC(vict))
-            dc_free(vict->pcdata->last_tell);
-          if (!IS_NPC(ch) && !IS_NPC(vict))
-	  vict->pcdata->last_tell = str_dup(GET_NAME(ch));
-        }
-        act(buf, vict, 0, 0, TO_CHAR, STAYHIDE);
-
-	if (IS_PC(vict)) {
-	  sprintf(buf, "$2$B%s tells you, '%s'$R\r\n", PERS(ch, vict), message);
-	  if (vict->pcdata->tell_history == 0) {
-	    vict->pcdata->tell_history = new std::queue<string>();
-	  }
-
-	  vict->pcdata->tell_history->push(buf);
-          if(vict->pcdata->tell_history->size() > 10) {
-	    vict->pcdata->tell_history->pop();
-	  }
-	}
-
-        sprintf(buf,"$2$BYou tell %s, '%s'$R", PERS(vict, ch), message);
-        act(buf, ch, 0, 0, TO_CHAR, STAYHIDE);
-
-        // Log what I told a logged player under their name
-        if(!IS_MOB(vict) && IS_SET(vict->pcdata->punish, PUNISH_LOG)) {
-          sprintf( log_buf, "Log %s: %s told them: %s", GET_NAME(vict),
-                         GET_NAME(ch),  message);
-          log( log_buf, IMP, LOG_PLAYER, vict );
+        vict->pcdata->tell_history->push(buf);
+        if (vict->pcdata->tell_history->size() > 10)
+        {
+          vict->pcdata->tell_history->pop();
         }
       }
-      else if(!is_busy(vict) && GET_POS(vict) == POSITION_SLEEPING &&
-               GET_LEVEL(ch) >= SERAPH)
+
+      sprintf(buf, "$2$BYou tell %s, '%s'$R", PERS(vict, ch), message);
+      send_to_char(buf, ch);
+      //        act(buf, ch, 0, 0, TO_CHAR, STAYHIDE);
+    }
+    else if (!is_busy(vict) && GET_POS(vict) > POSITION_SLEEPING)
+    {
+      if (IS_MOB(vict))
+        sprintf(buf, "$2$B%s tells you, '%s'$R", PERS(ch, vict), message);
+      else
       {
-        send_to_char("A heavenly power intrudes on your subconcious dreaming...\r\n", vict);
-        if(IS_MOB(vict))
-          sprintf(buf,"%s tells you, '%s'", PERS(ch, vict), message);
-        else {
-          sprintf(buf,"%s tells you, '%s'%c",
+        sprintf(buf, "$2$B%s tells you, '%s'$R%c", PERS(ch, vict), message,
+                IS_SET(vict->pcdata->toggles, PLR_BEEP) ? '\a' : '\0');
+        if (vict->pcdata->last_tell && !IS_NPC(ch) && !IS_NPC(vict))
+          dc_free(vict->pcdata->last_tell);
+        if (!IS_NPC(ch) && !IS_NPC(vict))
+          vict->pcdata->last_tell = str_dup(GET_NAME(ch));
+      }
+      act(buf, vict, 0, 0, TO_CHAR, STAYHIDE);
+
+      if (IS_PC(vict))
+      {
+        sprintf(buf, "$2$B%s tells you, '%s'$R\r\n", PERS(ch, vict), message);
+        if (vict->pcdata->tell_history == 0)
+        {
+          vict->pcdata->tell_history = new std::queue<string>();
+        }
+
+        vict->pcdata->tell_history->push(buf);
+        if (vict->pcdata->tell_history->size() > 10)
+        {
+          vict->pcdata->tell_history->pop();
+        }
+      }
+
+      sprintf(buf, "$2$BYou tell %s, '%s'$R", PERS(vict, ch), message);
+      act(buf, ch, 0, 0, TO_CHAR, STAYHIDE);
+
+      // Log what I told a logged player under their name
+      if (!IS_MOB(vict) && IS_SET(vict->pcdata->punish, PUNISH_LOG))
+      {
+        sprintf(log_buf, "Log %s: %s told them: %s", GET_NAME(vict),
+                GET_NAME(ch), message);
+        log(log_buf, IMP, LOG_PLAYER, vict);
+      }
+    }
+    else if (!is_busy(vict) && GET_POS(vict) == POSITION_SLEEPING &&
+             GET_LEVEL(ch) >= SERAPH)
+    {
+      send_to_char("A heavenly power intrudes on your subconcious dreaming...\r\n", vict);
+      if (IS_MOB(vict))
+        sprintf(buf, "%s tells you, '%s'", PERS(ch, vict), message);
+      else
+      {
+        sprintf(buf, "%s tells you, '%s'%c",
                 PERS(ch, vict), message, IS_SET(vict->pcdata->toggles, PLR_BEEP) ? '\a' : '\0');
 
-          if(vict->pcdata->last_tell && !IS_NPC(ch) && !IS_NPC(vict))
-            dc_free(vict->pcdata->last_tell);
-          if (!IS_NPC(ch) && !IS_NPC(vict))
+        if (vict->pcdata->last_tell && !IS_NPC(ch) && !IS_NPC(vict))
+          dc_free(vict->pcdata->last_tell);
+        if (!IS_NPC(ch) && !IS_NPC(vict))
           vict->pcdata->last_tell = str_dup(GET_NAME(ch));
-        }
-        ansi_color(GREEN, vict);
-        ansi_color(BOLD, vict);
-        send_to_char_regardless(buf, vict);
-        ansi_color(NTEXT, vict);
-
-        sprintf(buf,"$2$BYou tell %s, '%s'$R", PERS(vict, ch), message);
-        act(buf, ch, 0, 0, TO_CHAR, STAYHIDE);
-        
-        send_to_char("They were sleeping btw...\r\n", ch);
-        // Log what I told a logged player under their name
-        if(!IS_MOB(vict) && IS_SET(vict->pcdata->punish, PUNISH_LOG)) {
-          sprintf( log_buf, "Log %s: %s told them: %s", GET_NAME(vict),
-                         GET_NAME(ch),  message);
-          log( log_buf, IMP, LOG_PLAYER, vict );
-        }
-
       }
-      else {
-        sprintf(buf,"$2$B%s can't hear anything right now.$R", GET_SHORT(vict));
-        act(buf, ch, 0, 0, TO_CHAR, STAYHIDE);
+      ansi_color(GREEN, vict);
+      ansi_color(BOLD, vict);
+      send_to_char_regardless(buf, vict);
+      ansi_color(NTEXT, vict);
+
+      sprintf(buf, "$2$BYou tell %s, '%s'$R", PERS(vict, ch), message);
+      act(buf, ch, 0, 0, TO_CHAR, STAYHIDE);
+
+      send_to_char("They were sleeping btw...\r\n", ch);
+      // Log what I told a logged player under their name
+      if (!IS_MOB(vict) && IS_SET(vict->pcdata->punish, PUNISH_LOG))
+      {
+        sprintf(log_buf, "Log %s: %s told them: %s", GET_NAME(vict),
+                GET_NAME(ch), message);
+        log(log_buf, IMP, LOG_PLAYER, vict);
       }
-   }
- return eSUCCESS;
+    }
+    else
+    {
+      sprintf(buf, "$2$B%s can't hear anything right now.$R", GET_SHORT(vict));
+      act(buf, ch, 0, 0, TO_CHAR, STAYHIDE);
+    }
+  }
+  return eSUCCESS;
 }
 
 int do_reply(struct char_data *ch, char *argument, int cmd)
 {
   char buf[200];
-  char_data * vict = NULL;
+  char_data *vict = NULL;
 
-  if(IS_MOB(ch) || !ch->pcdata->last_tell) { 
+  if (IS_MOB(ch) || !ch->pcdata->last_tell)
+  {
     send_to_char("You have noone to reply to.\n\r", ch);
     return eSUCCESS;
   }
 
   OBJ_DATA *tmp_obj;
-  for(tmp_obj = world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
-    if(obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER) {
+  for (tmp_obj = world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
+    if (obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER)
+    {
       send_to_char("The magical silence prevents you from speaking!\n\r", ch);
       return eFAILURE;
     }
 
-  for(; *argument == ' '; argument++);
+  for (; *argument == ' '; argument++)
+    ;
 
-  if(!(*argument)) {
-    send_to_char ("Reply what?\n\r", ch);
-    if((vict = get_char(ch->pcdata->last_tell)) && CAN_SEE(ch, vict))
-       sprintf(buf, "Last tell was from %s.\n\r", ch->pcdata->last_tell);
-    else sprintf(buf, "Last tell was from someone you cannot currently see.\n\r");
+  if (!(*argument))
+  {
+    send_to_char("Reply what?\n\r", ch);
+    if ((vict = get_char(ch->pcdata->last_tell)) && CAN_SEE(ch, vict))
+      sprintf(buf, "Last tell was from %s.\n\r", ch->pcdata->last_tell);
+    else
+      sprintf(buf, "Last tell was from someone you cannot currently see.\n\r");
     send_to_char(buf, ch);
     return eSUCCESS;
   }
@@ -902,77 +929,85 @@ int do_reply(struct char_data *ch, char *argument, int cmd)
 
 int do_whisper(struct char_data *ch, char *argument, int cmd)
 {
-    struct char_data *vict;
-    char name[MAX_INPUT_LENGTH+1], message[MAX_STRING_LENGTH],
-	buf[MAX_STRING_LENGTH];
+  struct char_data *vict;
+  char name[MAX_INPUT_LENGTH + 1], message[MAX_STRING_LENGTH],
+      buf[MAX_STRING_LENGTH];
 
-    OBJ_DATA *tmp_obj;
-    for(tmp_obj = world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
-      if(obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER) {
-        send_to_char("The magical silence prevents you from speaking!\n\r", ch);
-        return eFAILURE;
-      }
+  OBJ_DATA *tmp_obj;
+  for (tmp_obj = world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
+    if (obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER)
+    {
+      send_to_char("The magical silence prevents you from speaking!\n\r", ch);
+      return eFAILURE;
+    }
 
-    half_chop(argument,name,message);
+  half_chop(argument, name, message);
 
-    if(!*name || !*message)
-	send_to_char("Who do you want to whisper to.. and what??\n\r", ch);
-    else if (!(vict = get_char_room_vis(ch, name)))
-	send_to_char("No-one by that name here..\n\r", ch);
-    else if (vict == ch) {
-	act("$n whispers quietly to $mself.", ch, 0, 0, TO_ROOM, STAYHIDE);
-	send_to_char(
-	    "You can't seem to get your mouth close enough to your ear...\n\r", ch);
-    }
-    else if(is_ignoring(vict, ch)) {
-      send_to_char("They are ignoring you :(\n\r", ch);
-    }
-    else {
-      sprintf(buf,"$1$B$n whispers to you, '%s'$R",message);
-      act(buf, ch, 0, vict, TO_VICT, STAYHIDE);
-      sprintf(buf,"$1$BYou whisper to $N, '%s'$R",message);
-      act(buf, ch, 0, vict, TO_CHAR, STAYHIDE);
-      act("$n whispers something to $N.", ch, 0, vict, TO_ROOM,
-          NOTVICT|STAYHIDE);
-    }
-    return eSUCCESS;
+  if (!*name || !*message)
+    send_to_char("Who do you want to whisper to.. and what??\n\r", ch);
+  else if (!(vict = get_char_room_vis(ch, name)))
+    send_to_char("No-one by that name here..\n\r", ch);
+  else if (vict == ch)
+  {
+    act("$n whispers quietly to $mself.", ch, 0, 0, TO_ROOM, STAYHIDE);
+    send_to_char(
+        "You can't seem to get your mouth close enough to your ear...\n\r", ch);
+  }
+  else if (is_ignoring(vict, ch))
+  {
+    send_to_char("They are ignoring you :(\n\r", ch);
+  }
+  else
+  {
+    sprintf(buf, "$1$B$n whispers to you, '%s'$R", message);
+    act(buf, ch, 0, vict, TO_VICT, STAYHIDE);
+    sprintf(buf, "$1$BYou whisper to $N, '%s'$R", message);
+    act(buf, ch, 0, vict, TO_CHAR, STAYHIDE);
+    act("$n whispers something to $N.", ch, 0, vict, TO_ROOM,
+        NOTVICT | STAYHIDE);
+  }
+  return eSUCCESS;
 }
 
 int do_ask(struct char_data *ch, char *argument, int cmd)
 {
-    struct char_data *vict;
-    char name[MAX_INPUT_LENGTH+1], message[MAX_INPUT_LENGTH+1], buf[MAX_STRING_LENGTH];
+  struct char_data *vict;
+  char name[MAX_INPUT_LENGTH + 1], message[MAX_INPUT_LENGTH + 1], buf[MAX_STRING_LENGTH];
 
-    OBJ_DATA *tmp_obj;
-    for(tmp_obj = world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
-      if(obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER) {
-        send_to_char("The magical silence prevents you from speaking!\n\r", ch);
-        return eFAILURE;
-      }
-
-    half_chop(argument, name, message);
-    name[MAX_INPUT_LENGTH]    = '\0';
-    message[MAX_INPUT_LENGTH] = '\0';
-   
-    if(!*name || !*message)
-	send_to_char("Who do you want to ask something, and what??\n\r", ch);
-    else if (!(vict = get_char_room_vis(ch, name)))
-	send_to_char("No-one by that name here.\n\r", ch);
-    else if (vict == ch) {
-	act("$n quietly asks $mself a question.",ch,0,0,TO_ROOM, 0);
-	send_to_char("You think about it for a while...\n\r", ch);
-        }
-    else if(is_ignoring(vict, ch)) {
-      send_to_char("They are ignoring you :(\n\r", ch);
+  OBJ_DATA *tmp_obj;
+  for (tmp_obj = world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
+    if (obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER)
+    {
+      send_to_char("The magical silence prevents you from speaking!\n\r", ch);
+      return eFAILURE;
     }
-    else {
-       sprintf(buf,"$B$n asks you, '%s'$R",message);
-       act(buf, ch, 0, vict, TO_VICT, 0);
-       sprintf(buf,"$BYou ask $N, '%s'$R",message);
-       act(buf, ch, 0, vict, TO_CHAR, 0);
-       act("$n asks $N a question.", ch, 0, vict, TO_ROOM, NOTVICT);
-       }
-    return eSUCCESS;
+
+  half_chop(argument, name, message);
+  name[MAX_INPUT_LENGTH] = '\0';
+  message[MAX_INPUT_LENGTH] = '\0';
+
+  if (!*name || !*message)
+    send_to_char("Who do you want to ask something, and what??\n\r", ch);
+  else if (!(vict = get_char_room_vis(ch, name)))
+    send_to_char("No-one by that name here.\n\r", ch);
+  else if (vict == ch)
+  {
+    act("$n quietly asks $mself a question.", ch, 0, 0, TO_ROOM, 0);
+    send_to_char("You think about it for a while...\n\r", ch);
+  }
+  else if (is_ignoring(vict, ch))
+  {
+    send_to_char("They are ignoring you :(\n\r", ch);
+  }
+  else
+  {
+    sprintf(buf, "$B$n asks you, '%s'$R", message);
+    act(buf, ch, 0, vict, TO_VICT, 0);
+    sprintf(buf, "$BYou ask $N, '%s'$R", message);
+    act(buf, ch, 0, vict, TO_CHAR, 0);
+    act("$n asks $N a question.", ch, 0, vict, TO_ROOM, NOTVICT);
+  }
+  return eSUCCESS;
 }
 
 int do_grouptell(struct char_data *ch, char *argument, int cmd)
