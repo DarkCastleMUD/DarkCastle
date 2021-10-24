@@ -10,15 +10,15 @@
 #include <string>
 #include "character.h"
 #include "obj.h"
-
+#include "token.h"
 //--
 // Function interface
 //--
 
 struct act_return
 {
-    string str;
-    int retval;
+  string str;
+  int retval;
 };
 
 act_return act(const char *str, CHAR_DATA *ch, OBJ_DATA *obj, void *vict_obj,
@@ -26,6 +26,16 @@ act_return act(const char *str, CHAR_DATA *ch, OBJ_DATA *obj, void *vict_obj,
 
 act_return act(const std::string &str, CHAR_DATA *ch, OBJ_DATA *obj, void *vict_obj,
 	 int16 destination, int16 flags);
+
+struct send_tokens_return
+{
+  string str;
+  int retval;
+};
+
+send_tokens_return send_tokens(TokenList * tokens, CHAR_DATA *ch, OBJ_DATA * obj, void * vch, int flags, CHAR_DATA *to);
+
+void send_message(const char *str, CHAR_DATA *to);
 
 //--
 // Constants

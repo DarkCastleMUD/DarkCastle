@@ -600,10 +600,10 @@ int do_trivia(struct char_data *ch, char *argument, int cmd)
 
 int do_dream(struct char_data *ch, char *argument, int cmd)
 {
-    char buf1[MAX_STRING_LENGTH];
-    char buf2[MAX_STRING_LENGTH];
-    struct descriptor_data *i;
-    int ctr;
+    char buf1[MAX_STRING_LENGTH] = {0};
+    char buf2[MAX_STRING_LENGTH] = {0};
+    struct descriptor_data *i = nullptr;
+    int ctr = 0;
 
     if((GET_POS(ch) != POSITION_SLEEPING) && (GET_LEVEL(ch) < MIN_GOD))
     {
@@ -663,9 +663,9 @@ int do_dream(struct char_data *ch, char *argument, int cmd)
 
 int do_tell(struct char_data *ch, char *argument, int cmd)
 {
-  struct char_data *vict;
-  char name[200], message[200], buf[200];
-  OBJ_DATA *tmp_obj;
+  struct char_data *vict = nullptr;
+  char name[200] = {0}, message[200] = {0}, buf[200] = {0};
+  OBJ_DATA *tmp_obj =  nullptr;
 
   if (!IS_MOB(ch) && IS_SET(ch->pcdata->punish, PUNISH_NOTELL))
   {
@@ -777,7 +777,9 @@ int do_tell(struct char_data *ch, char *argument, int cmd)
     if (is_busy(vict) && GET_LEVEL(ch) >= OVERSEER)
     {
       if (IS_MOB(vict))
+      {
         sprintf(buf, "%s tells you, '%s'", PERS(ch, vict), message);
+      }
       else
       {
         sprintf(buf, "%s tells you, '%s'%c", PERS(ch, vict), message, IS_SET(vict->pcdata->toggles, PLR_BEEP) ? '\a' : '\0');
@@ -801,7 +803,9 @@ int do_tell(struct char_data *ch, char *argument, int cmd)
     else if (!is_busy(vict) && GET_POS(vict) > POSITION_SLEEPING)
     {
       if (IS_MOB(vict))
+      {
         sprintf(buf, "$2$B%s tells you, '%s'$R", PERS(ch, vict), message);
+      }
       else
       {
         sprintf(buf, "$2$B%s tells you, '%s'$R%c", PERS(ch, vict), message, IS_SET(vict->pcdata->toggles, PLR_BEEP) ? '\a' : '\0');
@@ -812,7 +816,7 @@ int do_tell(struct char_data *ch, char *argument, int cmd)
       }
       act(buf, vict, 0, 0, TO_CHAR, STAYHIDE);
 
-      sprintf(buf, "$2$B%s tells you, '%s'$R%c", PERS(ch, vict), message);
+      sprintf(buf, "$2$B%s tells you, '%s'$R", PERS(ch, vict), message);
       vict->tell_history(buf);
 
       sprintf(buf, "$2$BYou tell %s, '%s'$R", PERS(vict, ch), message);

@@ -146,8 +146,7 @@ void TokenList::Next()
 |   Zero is returned (0) if the string should not be sent -- either
 |   the send_to is asleep or the INVIS_NULL flag was used (for example).
 */
-char * TokenList::Interpret(CHAR_DATA *from, OBJ_DATA *obj,
-      void *vict_obj, CHAR_DATA *send_to, int flags)
+char * TokenList::Interpret(CHAR_DATA *from, OBJ_DATA *obj, void *vict_obj, CHAR_DATA *send_to, int flags)
 {
 
   // Reset the string

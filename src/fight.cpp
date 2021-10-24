@@ -2612,8 +2612,7 @@ int is_pkill(CHAR_DATA *ch, CHAR_DATA *vict)
 
 void send_damage(char const *buf, CHAR_DATA *ch, OBJ_DATA *obj, CHAR_DATA *victim, char const *dmg, char const *buf2, int to)
 {
- void send_message(TokenList * tokens, CHAR_DATA *ch, OBJ_DATA * obj, void * vch, int flags, CHAR_DATA *to);
-  CHAR_DATA *tmpch;
+ CHAR_DATA *tmpch;
  char string1[MAX_INPUT_LENGTH], string2[MAX_INPUT_LENGTH]; 
 
  int i, z = 0, y = 0;
@@ -2646,20 +2645,20 @@ void send_damage(char const *buf, CHAR_DATA *ch, OBJ_DATA *obj, CHAR_DATA *victi
    {
      if (tmpch == ch || tmpch == victim) continue;
      if (!IS_NPC(tmpch) && IS_SET(tmpch->pcdata->toggles, PLR_DAMAGE))
-	send_message(tokens, ch, obj, victim, 0, tmpch);
+	send_tokens(tokens, ch, obj, victim, 0, tmpch);
      else
-	send_message(tokens2, ch, obj, victim, 0, tmpch);
+	send_tokens(tokens2, ch, obj, victim, 0, tmpch);
    }
  } else if (to == TO_CHAR) {
      if (!IS_NPC(ch) && IS_SET(ch->pcdata->toggles, PLR_DAMAGE))
-	send_message(tokens, ch, obj, victim, 0, ch);
+	send_tokens(tokens, ch, obj, victim, 0, ch);
      else
-	send_message(tokens2, ch, obj, victim, 0, ch);
+	send_tokens(tokens2, ch, obj, victim, 0, ch);
  } else if (to == TO_VICT) {
      if (!IS_NPC(victim) && IS_SET(victim->pcdata->toggles, PLR_DAMAGE))
-	send_message(tokens, ch, obj, victim, 0, victim);
+	send_tokens(tokens, ch, obj, victim, 0, victim);
      else
-	send_message(tokens2, ch, obj, victim, 0, victim);
+	send_tokens(tokens2, ch, obj, victim, 0, victim);
  }
  delete tokens;
  delete tokens2;

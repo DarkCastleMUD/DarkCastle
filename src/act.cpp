@@ -39,16 +39,6 @@ extern CWorld world;
 extern struct descriptor_data *descriptor_list;
 extern bool MOBtrigger;
 
-struct send_message_return
-{
-  string str;
-  int retval;
-};
-
-send_message_return send_message(TokenList * tokens, CHAR_DATA *ch, OBJ_DATA * obj, void * vch, int flags, CHAR_DATA *to);
-void send_message(const char *str, CHAR_DATA *to);
-
-
 act_return act(const string &str, CHAR_DATA *ch, OBJ_DATA *obj, void *vict_obj, int16 destination, int16 flags)
 {
   return act(str.c_str(), ch, obj, vict_obj, destination, flags);
@@ -65,8 +55,15 @@ act_return act(
 {
   struct descriptor_data *i;
   int retval = 0;
-  send_message_return smr;
   TokenList *tokens;
+
+  send_tokens_return st_return;
+  st_return.str = string();
+  st_return.retval = 0;
+  
+  act_return ar;
+  ar.str = string();
+  ar.retval = 0;
 
   tokens = new TokenList(str);
 
@@ -75,7 +72,8 @@ act_return act(
   {
     log("Error in act(), character equal to 0", OVERSEER, LOG_BUG);
     delete tokens;
-    return {string(), eFAILURE};
+    ar.retval = eFAILURE;
+    return ar;
   }
 
   if (
@@ -87,13 +85,17 @@ act_return act(
 
   if (destination == TO_VICT)
   {
-    smr = send_message(tokens, ch, obj, vict_obj, flags, (CHAR_DATA *)vict_obj);
-    retval |= smr.retval;
+    st_return = send_tokens(tokens, ch, obj, vict_obj, flags, (CHAR_DATA *)vict_obj);
+    retval |= st_return.retval;
+    ar.str = st_return.str;
+    ar.retval = retval;
   }
   else if (destination == TO_CHAR)
   {
-    smr = send_message(tokens, ch, obj, vict_obj, flags, ch);
-    retval |= smr.retval;
+    st_return = send_tokens(tokens, ch, obj, vict_obj, flags, ch);
+    retval |= st_return.retval;
+    ar.str = st_return.str;
+    ar.retval = retval;
   }
   else if (destination == TO_ROOM || destination == TO_GROUP || destination == TO_ROOM_NOT_GROUP)
   {
@@ -116,8 +118,10 @@ act_return act(
         {
           if (!IS_SET(flags, BARDSONG) || tmp_char->pcdata == nullptr || !IS_SET(tmp_char->pcdata->toggles, PLR_BARD_SONG))
           {
-            smr = send_message(tokens, ch, obj, vict_obj, flags, tmp_char);
-            retval |= smr.retval;
+            st_return = send_tokens(tokens, ch, obj, vict_obj, flags, tmp_char);
+            retval |= st_return.retval;
+            ar.str = st_return.str;
+            ar.retval = retval;
           }
         }
       }
@@ -130,7 +134,8 @@ act_return act(
     {
       log("Error in act(), invalid value sent as 'destination'", OVERSEER, LOG_BUG);
       delete tokens;
-      return {string(), eFAILURE};
+      ar.retval = eFAILURE;
+      return ar;
     }
     for (i = descriptor_list; i; i = i->next)
     {
@@ -141,14 +146,15 @@ act_return act(
         continue;
       if ((destination == TO_ZONE) && world[i->character->in_room].zone != world[ch->in_room].zone)
         continue;
-      smr = send_message(tokens, ch, obj, vict_obj, flags, i->character);
-      retval |= smr.retval;
+      st_return = send_tokens(tokens, ch, obj, vict_obj, flags, i->character);
+      retval |= st_return.retval;
+      ar.str = st_return.str;
+      ar.retval = retval;
     }
   }
 
   delete tokens;
-
-  return {smr.str, retval};
+  return ar;
 }
 
 /************************************************************************
@@ -167,7 +173,7 @@ void send_message(const char *str, CHAR_DATA *to)
 }
 
 
-send_message_return send_message(TokenList * tokens, CHAR_DATA *ch, OBJ_DATA * obj, void * vict_obj, int flags, CHAR_DATA *to)
+send_tokens_return send_tokens(TokenList * tokens, CHAR_DATA *ch, OBJ_DATA * obj, void * vict_obj, int flags, CHAR_DATA *to)
 {
   int retval = 0;
   char * buf = tokens->Interpret(ch, obj, vict_obj, to, flags);
@@ -187,7 +193,10 @@ send_message_return send_message(TokenList * tokens, CHAR_DATA *ch, OBJ_DATA * o
   MOBtrigger = TRUE;
   if (buf == nullptr)
   {
-    return {string(), retval};
+    send_tokens_return str;
+    str.str = string();
+    str.retval = retval;
+    return str;
   }
 
   size_t buf_len = strlen(buf);
@@ -196,7 +205,10 @@ send_message_return send_message(TokenList * tokens, CHAR_DATA *ch, OBJ_DATA * o
     // Remove \r\n at end before returning string
     buf[buf_len-2] = '\0';    
   }
-  return {string(buf), retval};
+  send_tokens_return str;
+  str.str = string(buf);
+  str.retval = retval;
+  return str;
 }
 
 
