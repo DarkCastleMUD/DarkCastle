@@ -375,7 +375,7 @@ char * TokenList::Interpret(CHAR_DATA *from, OBJ_DATA *obj,
     #endif
   } /* for loop */    
 
-  strcat(interp, "\n\r");
+  strcat(interp, "\r\n");
 
   #ifdef DEBUG_TOKEN
     cerr << "Finished building interp; it is:" << endl;
