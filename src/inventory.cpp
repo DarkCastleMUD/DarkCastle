@@ -1419,9 +1419,10 @@ int do_put(struct char_data *ch, char *argument, int cmd)
                 return eFAILURE;
               }
 
+              bool duplicate_key = search_container_for_item(sub_object, obj_object->item_number);
               if (GET_ITEM_TYPE(sub_object) == ITEM_KEYRING)
               {
-                if (search_container_for_item(sub_object, obj_object->item_number) == true)
+                if (duplicate_key == true)
                 {
                   if (ch && ch->pcdata && IS_SET(ch->pcdata->toggles, PLR_NODUPEKEYS))
                   {
