@@ -259,17 +259,16 @@ struct zone_data
 /* element in monster and object index-tables   */
 struct index_data
 {
-    int virt;    /* virt number of ths mob/obj           */
-    int number;     /* number of existing units of ths mob/obj */
-    int (*non_combat_func)(CHAR_DATA*, struct obj_data *, int, char*, CHAR_DATA*); // non Combat special proc
-    int (*combat_func)(CHAR_DATA*, struct obj_data *, int, char*, CHAR_DATA*); // combat special proc
-    void *item;     /* the mobile/object itself                 */
+  int virt;                                                                         /* virt number of ths mob/obj           */
+  int number;                                                                       /* number of existing units of ths mob/obj */
+  int (*non_combat_func)(CHAR_DATA *, struct obj_data *, int, char *, CHAR_DATA *); // non Combat special proc
+  int (*combat_func)(CHAR_DATA *, struct obj_data *, int, char *, CHAR_DATA *);     // combat special proc
+  void *item;                                                                       /* the mobile/object itself                 */
 
-    MPROG_DATA *        mobprogs;
-    MPROG_DATA *	mobspec;
-    int			progtypes;
+  MPROG_DATA *mobprogs;
+  MPROG_DATA *mobspec;
+  int progtypes;
 };
-
 
 struct help_index_element
 {
