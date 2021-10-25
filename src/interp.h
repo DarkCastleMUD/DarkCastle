@@ -441,6 +441,7 @@ DO_FUN do_open;
 DO_FUN do_order;
 DO_FUN do_orchestrate;
 DO_FUN do_osave;
+DO_FUN do_nodupekeys_toggle;
 DO_FUN do_outcast;
 DO_FUN do_pager;
 DO_FUN do_pardon;
