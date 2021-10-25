@@ -3326,13 +3326,13 @@ int talkingsword(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
       {
         REMOVE_BIT(obj->obj_flags.more_flags, ITEM_TOGGLE);
         strcat(buf2, "And I'm back! Couldn\'t live without me eh?'$R\n\r");
-        send_to_room(buf2, obj->equipped_by->in_room);
+        send_to_room(buf2, obj->equipped_by->in_room, true);
       }
       else
       {
         SET_BIT(obj->obj_flags.more_flags, ITEM_TOGGLE);
         strcat(buf2, "Fine, I will keep quiet for a while, but you will miss me!'$R\n\r");
-        send_to_room(buf2, obj->equipped_by->in_room);
+        send_to_room(buf2, obj->equipped_by->in_room, true);
       }
       return eSUCCESS;
     }
@@ -3357,6 +3357,11 @@ int talkingsword(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
 
   if (!vict)
     return eFAILURE;
+
+  if (vict->pcdata && vict->desc == nullptr)
+  {
+    return eFAILURE;
+  }
 
   if (obj->obj_flags.value[0] > 0)
   {
@@ -3483,7 +3488,7 @@ int talkingsword(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
       char buf2[MAX_STRING_LENGTH] = "$B$7Ghaerad, Sword of Legends says, '";
       strcat(buf2, tmp[rnd].c_str());
       strcat(buf2, "'$R\n\r");
-      send_to_room(buf2, vict->in_room);
+      send_to_room(buf2, vict->in_room, true);
 
       if (rnd == unequip)
       {
@@ -3618,7 +3623,7 @@ int hot_potato(struct char_data*ch, struct obj_data *obj, int cmd, char*arg,
    {
       obj->obj_flags.value[3]--;
       if(obj->obj_flags.value[3] % 3 == 0)
-         send_to_room("You smell a delicious baked potato and hear a faint *beep*.\n\r", vict->in_room );
+         send_to_room("You smell a delicious baked potato and hear a faint *beep*.\n\r", vict->in_room, true);
    }
    else {
       if (dropped == 1) {
