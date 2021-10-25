@@ -3310,41 +3310,43 @@ int eternitystaff(struct char_data*ch, struct obj_data *obj, int cmd, char*arg,
 	return eSUCCESS;
 }
 
-
-
-int talkingsword(struct char_data*ch, struct obj_data *obj, int cmd, char*arg, 
-                   CHAR_DATA *invoker)
+int talkingsword(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
+                 CHAR_DATA *invoker)
 {
-  char_data * vict = NULL;
+  char_data *vict = NULL;
   int unequip = -1;
   static bool init_done = false;
   if (cmd)
   {
-	if (cmd == CMD_GAG && (!str_cmp(arg, " sword") || !str_cmp(arg, " ghaerad")) && obj->equipped_by)
-	{
-			      char buf2[MAX_STRING_LENGTH] = "$B$7Ghaerad, Sword of Legends says, '";
+    if (cmd == CMD_GAG && (!str_cmp(arg, " sword") || !str_cmp(arg, " ghaerad")) && obj->equipped_by)
+    {
+      char buf2[MAX_STRING_LENGTH] = "$B$7Ghaerad, Sword of Legends says, '";
 
-		if (IS_SET(obj->obj_flags.more_flags, ITEM_TOGGLE))
-		{
-			REMOVE_BIT(obj->obj_flags.more_flags, ITEM_TOGGLE);
- 		        strcat(buf2, "And I'm back! Couldn\'t live without me eh?'$R\n\r");
-		        send_to_room(buf2, obj->equipped_by->in_room);
-		} else {
-			SET_BIT(obj->obj_flags.more_flags, ITEM_TOGGLE);
- 		        strcat(buf2, "Fine, I will keep quiet for a while, but you will miss me!'$R\n\r");
-		        send_to_room(buf2, obj->equipped_by->in_room);
-		}
-		return eSUCCESS;
-	} else {
-		return eFAILURE;
-	}
+      if (IS_SET(obj->obj_flags.more_flags, ITEM_TOGGLE))
+      {
+        REMOVE_BIT(obj->obj_flags.more_flags, ITEM_TOGGLE);
+        strcat(buf2, "And I'm back! Couldn\'t live without me eh?'$R\n\r");
+        send_to_room(buf2, obj->equipped_by->in_room);
+      }
+      else
+      {
+        SET_BIT(obj->obj_flags.more_flags, ITEM_TOGGLE);
+        strcat(buf2, "Fine, I will keep quiet for a while, but you will miss me!'$R\n\r");
+        send_to_room(buf2, obj->equipped_by->in_room);
+      }
+      return eSUCCESS;
+    }
+    else
+    {
+      return eFAILURE;
+    }
   }
 
   if (IS_SET(obj->obj_flags.more_flags, ITEM_TOGGLE))
   {
-	return eFAILURE;
+    return eFAILURE;
   }
-  if(!init_done)
+  if (!init_done)
   {
     init_done = true;
     do_talking_init();
@@ -3352,7 +3354,7 @@ int talkingsword(struct char_data*ch, struct obj_data *obj, int cmd, char*arg,
 
   if (obj->equipped_by)
     vict = obj->equipped_by;
-  
+
   if (!vict)
     return eFAILURE;
 
@@ -3361,78 +3363,76 @@ int talkingsword(struct char_data*ch, struct obj_data *obj, int cmd, char*arg,
     obj->obj_flags.value[0]--;
   }
 
-
   if (obj->obj_flags.value[0] == 0)
   {
     vector<string> tmp;
     string buf;
 
-   if(GET_POS(vict) == POSITION_FIGHTING)  
+    if (GET_POS(vict) == POSITION_FIGHTING)
     {
       tmp = sword_combat;
-      if(IS_NPC(vict->fighting) && GET_LEVEL(vict->fighting) > 99)
+      if (IS_NPC(vict->fighting) && GET_LEVEL(vict->fighting) > 99)
       {
         buf = "Are you sure you can win this one? I mean.... I'll be ok, but I'm pretty sure you're screwed.";
         tmp.push_back(buf);
       }
-      if(IS_NPC(vict->fighting) 
-         && (GET_LEVEL(vict) - GET_LEVEL(vict->fighting)) > 40)
+      if (IS_NPC(vict->fighting) && (GET_LEVEL(vict) - GET_LEVEL(vict->fighting)) > 40)
       {
         buf = "Oh come on... this is fuckin' embarrassing...";
         tmp.push_back(buf);
-        unequip = tmp.size()-1;
+        unequip = tmp.size() - 1;
       }
-      switch(GET_RACE(vict->fighting))
+      switch (GET_RACE(vict->fighting))
       {
-        case RACE_HOBBIT:
-          buf = "Oh, that is just gross! Like, seriously, shave your feet some time.";
-          tmp.push_back(buf);
+      case RACE_HOBBIT:
+        buf = "Oh, that is just gross! Like, seriously, shave your feet some time.";
+        tmp.push_back(buf);
         break;
-        case RACE_PIXIE:
-          buf = "Why are you using me to fight a pixie? Get a fly swatter or something.";
-          tmp.push_back(buf);
+      case RACE_PIXIE:
+        buf = "Why are you using me to fight a pixie? Get a fly swatter or something.";
+        tmp.push_back(buf);
         break;
-        case RACE_ELVEN:
-          buf = "I hate elves. Fuckin' skinnier than I am. Go eat a burger.";
-          tmp.push_back(buf);
+      case RACE_ELVEN:
+        buf = "I hate elves. Fuckin' skinnier than I am. Go eat a burger.";
+        tmp.push_back(buf);
         break;
-        case RACE_DWARVEN:
-          buf = "Cut him off at the knees! Oh, wait... looks like someone already did.";
-          tmp.push_back(buf);
+      case RACE_DWARVEN:
+        buf = "Cut him off at the knees! Oh, wait... looks like someone already did.";
+        tmp.push_back(buf);
         break;
-        case RACE_TROLL:
-          buf = "I hate trolls. This smell isn't going to go away for weeks. ARGH!";
-          tmp.push_back(buf);
-        break;
-      } 
-      switch(GET_CLASS(vict->fighting))
-      {
-        case CLASS_MONK:
-          buf = "LOVE MONK AND STUN!";
-          tmp.push_back(buf);
-        break;
-        case CLASS_WARRIOR:
-          buf = "This is horrible... who taught you to fight? That idiot Gireth?";
-          tmp.push_back(buf);
-        break;
-        case CLASS_THIEF:
-          buf = "Look who brought a knife to a sword fight? *snicker*";
-          tmp.push_back(buf);
-        break;
-        case CLASS_PALADIN:
-          buf = "I hate fighting people in platemail. I get such a headache.";
-          tmp.push_back(buf);
-        break;
-        case CLASS_MAGE:
-          buf = "Hey magey, you'd better lose or I'm going to have the gods nerf you again.";
-          tmp.push_back(buf);
+      case RACE_TROLL:
+        buf = "I hate trolls. This smell isn't going to go away for weeks. ARGH!";
+        tmp.push_back(buf);
         break;
       }
-    }  
+      switch (GET_CLASS(vict->fighting))
+      {
+      case CLASS_MONK:
+        buf = "LOVE MONK AND STUN!";
+        tmp.push_back(buf);
+        break;
+      case CLASS_WARRIOR:
+        buf = "This is horrible... who taught you to fight? That idiot Gireth?";
+        tmp.push_back(buf);
+        break;
+      case CLASS_THIEF:
+        buf = "Look who brought a knife to a sword fight? *snicker*";
+        tmp.push_back(buf);
+        break;
+      case CLASS_PALADIN:
+        buf = "I hate fighting people in platemail. I get such a headache.";
+        tmp.push_back(buf);
+        break;
+      case CLASS_MAGE:
+        buf = "Hey magey, you'd better lose or I'm going to have the gods nerf you again.";
+        tmp.push_back(buf);
+        break;
+      }
+    }
     else
     {
       tmp = sword_non_combat;
-      if(GET_POS(vict) == POSITION_SLEEPING)
+      if (GET_POS(vict) == POSITION_SLEEPING)
       {
         buf = "Hey... someone steal me already... this guy sucks...";
         tmp.push_back(buf);
@@ -3446,56 +3446,56 @@ int talkingsword(struct char_data*ch, struct obj_data *obj, int cmd, char*arg,
         tmp.push_back(buf);
       }
 
-      if(vict->in_room == START_ROOM) //tavern
+      if (vict->in_room == START_ROOM) //tavern
       {
         buf = "Are you going to just sit in the Tavern all day? Great... I'm owned by Avalios.";
         tmp.push_back(buf);
       }
-      if(IS_SET(world[vict->in_room].room_flags, SAFE))
+      if (IS_SET(world[vict->in_room].room_flags, SAFE))
       {
         buf = "Oh... I suppose we're just going to sit here and gossip for the next few hours, huh?";
         tmp.push_back(buf);
         buf = "While we're here, why don't we just talk about how badass we are on gossip....";
         tmp.push_back(buf);
       }
-      switch(world[vict->in_room].sector_type)
+      switch (world[vict->in_room].sector_type)
       {
-        case SECT_UNDERWATER:
-          buf = "Aww man, I hate being under water. I'll rust!";
-          tmp.push_back(buf);
-          buf = "What the fuck, do I LOOK like a harpoon??";
-          tmp.push_back(buf);
+      case SECT_UNDERWATER:
+        buf = "Aww man, I hate being under water. I'll rust!";
+        tmp.push_back(buf);
+        buf = "What the fuck, do I LOOK like a harpoon??";
+        tmp.push_back(buf);
         break;
-        case SECT_FOREST:
-          buf = "If you try to use me like an axe on one of these trees, I am going to shove myself up your ass.";
-          tmp.push_back(buf);
+      case SECT_FOREST:
+        buf = "If you try to use me like an axe on one of these trees, I am going to shove myself up your ass.";
+        tmp.push_back(buf);
         break;
-        case SECT_MOUNTAIN:
-          buf = "I like mountains. The iron I was made of comes from a mountain. Know what else is made from iron? Trains.";
-          tmp.push_back(buf);
+      case SECT_MOUNTAIN:
+        buf = "I like mountains. The iron I was made of comes from a mountain. Know what else is made from iron? Trains.";
+        tmp.push_back(buf);
         break;
       }
     }
 
-    if(!tmp.empty()) 
+    if (!tmp.empty())
     {
-      int rnd = number(0, tmp.size()-1);
+      int rnd = number(0, tmp.size() - 1);
       char buf2[MAX_STRING_LENGTH] = "$B$7Ghaerad, Sword of Legends says, '";
       strcat(buf2, tmp[rnd].c_str());
       strcat(buf2, "'$R\n\r");
       send_to_room(buf2, vict->in_room);
-    
-      if(rnd == unequip)
+
+      if (rnd == unequip)
       {
-       
-        if(vict->equipment[WIELD] && obj_index[vict->equipment[WIELD]->item_number].virt == 27997)
+
+        if (vict->equipment[WIELD] && obj_index[vict->equipment[WIELD]->item_number].virt == 27997)
         {
 
           act("Your $p unequips itself.",
-            vict, vict->equipment[WIELD], 0, TO_CHAR, 0);
+              vict, vict->equipment[WIELD], 0, TO_CHAR, 0);
           act("$n stops using $p.", vict, vict->equipment[WIELD], 0, TO_ROOM, INVIS_NULL);
           obj_to_char(unequip_char(vict, WIELD), vict);
-          if(vict->equipment[SECOND_WIELD])
+          if (vict->equipment[SECOND_WIELD])
           {
             act("You move your $p to be your primary weapon.", vict, vict->equipment[SECOND_WIELD], 0, TO_CHAR, INVIS_NULL);
             act("$n moves $s $p to be $s primary weapon.", vict, vict->equipment[SECOND_WIELD], 0, TO_ROOM, INVIS_NULL);
@@ -3504,15 +3504,14 @@ int talkingsword(struct char_data*ch, struct obj_data *obj, int cmd, char*arg,
             equip_char(vict, weapon, WIELD);
           }
         }
-        else if(vict->equipment[SECOND_WIELD] && obj_index[vict->equipment[SECOND_WIELD]->item_number].virt == 27997)
+        else if (vict->equipment[SECOND_WIELD] && obj_index[vict->equipment[SECOND_WIELD]->item_number].virt == 27997)
         {
 
           act("Your $p unequips itself.",
-            vict, vict->equipment[SECOND_WIELD], 0, TO_CHAR, 0);
+              vict, vict->equipment[SECOND_WIELD], 0, TO_CHAR, 0);
           act("$n stops using $p.", vict, vict->equipment[SECOND_WIELD], 0, TO_ROOM, INVIS_NULL);
           obj_to_char(unequip_char(vict, SECOND_WIELD), vict);
         }
-
       }
     }
     obj->obj_flags.value[0] = number(8, 10);
