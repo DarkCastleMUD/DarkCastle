@@ -369,6 +369,7 @@ char * toggle_txt[] = {
   "news-up",
   "ascii",
   "damage",
+  "nodupekeys",
   ""
 };
 
@@ -483,7 +484,10 @@ int do_toggle(struct char_data *ch, char *arg, int cmd)
         sprintf(buf + strlen(buf), "%s\n\r",
                 IS_SET(ch->pcdata->toggles, PLR_DAMAGE) ? "$B$2on$R" : "$B$4off$R");
         break;
-
+      case 18:
+        sprintf(buf + strlen(buf), "%s\n\r",
+                IS_SET(ch->pcdata->toggles, PLR_NODUPEKEYS) ? "$B$2on$R" : "$B$4off$R");
+        break;
       default:
         break;
       }
@@ -580,7 +584,9 @@ int do_toggle(struct char_data *ch, char *arg, int cmd)
   case 17:
     do_damage_toggle(ch, "", 9);
     break;
-
+  case 18:
+    do_nodupekeys_toggle(ch, "", 9);
+    break;
   default:
     send_to_char("A bad thing just happened.  Tell the gods.\n\r", ch);
     break;
@@ -1047,6 +1053,20 @@ int do_bard_song_toggle(struct char_data *ch, char *argument, int cmd)
 
   send_to_char("Bard singing now in brief mode.\n\r", ch);
   SET_BIT(ch->pcdata->toggles, PLR_BARD_SONG);
+  return eSUCCESS;
+}
+
+int do_nodupekeys_toggle(char_data *ch, char *argument, int cmd)
+{
+  if (IS_SET(ch->pcdata->toggles, PLR_NODUPEKEYS))
+  {
+    send_to_char("You will attach duplicate keys to keyrings.\r\n", ch);
+    REMOVE_BIT(ch->pcdata->toggles, PLR_NODUPEKEYS);
+    return eFAILURE;
+  }
+
+  send_to_char("You will not attach duplicate keys to keyrings.\r\n", ch);
+  SET_BIT(ch->pcdata->toggles, PLR_NODUPEKEYS);
   return eSUCCESS;
 }
 
