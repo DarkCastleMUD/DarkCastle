@@ -1456,8 +1456,8 @@ int do_put(struct char_data *ch, char *argument, int cmd)
 
                 if (GET_ITEM_TYPE(sub_object) == ITEM_KEYRING)
                 {
-                  act("$n attaches $p to the $P.", ch, obj_object, sub_object, TO_ROOM, INVIS_NULL);
-                  act("You attach $p to the $P.", ch, obj_object, sub_object, TO_CHAR, 0);
+                  act("$n attaches $p to $P.", ch, obj_object, sub_object, TO_ROOM, INVIS_NULL);
+                  act("You attach $p to $P.", ch, obj_object, sub_object, TO_CHAR, 0);
                   logf(IMP, LOG_OBJECTS, "%s attaches %s[%d] to %s[%d]",
                       ch->name,
                       obj_object->short_description,
