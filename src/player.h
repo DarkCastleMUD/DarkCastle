@@ -91,6 +91,7 @@
 #define PLR_CLS_TREE_C   1U<<28 //might happen one day
 #define PLR_EDITOR_WEB   1U<<29
 #define PLR_REMORTED     1U<<30
+#define PLR_NODUPEKEYS   1U<<31
 
 /************************************************************************
 | Class types for PCs
