@@ -42,7 +42,6 @@ extern CVoteData *DCVote;
    
 void log_sacrifice(CHAR_DATA *ch, OBJ_DATA *obj, bool decay = FALSE)
 { //decay variable means it's from a decaying corpse, not a player
-  FILE *fl;
   time_t timep;
   char *tmstr;
 
@@ -64,8 +63,6 @@ void log_sacrifice(CHAR_DATA *ch, OBJ_DATA *obj, bool decay = FALSE)
 	    GET_OBJ_SHORT(loop_obj),
 	    GET_OBJ_VNUM(loop_obj));
   }
-
-  dc_fclose(fl);
 }
 
 int do_tap(struct char_data *ch, char *argument, int cmd)
