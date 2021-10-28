@@ -542,7 +542,7 @@ struct skill_stuff skill_info[] =
 /* 92 */         {  "ignoreclan", 0 },
 /* 93 */         { "ignoreclan2", 0 },
 /* 94 */             { "commune", SKILL_INCREASE_HARD },
-/* 95 */              { "scribe", SKILL_INCREASE_HARD },
+/* 95 */              { "scribe", SKILL_INCREASE_EASY },
 /* 96 */           { "make camp", SKILL_INCREASE_HARD },
 /* 97 */         { "battlesense", SKILL_INCREASE_HARD },
 /* 98 */        { "perseverance", SKILL_INCREASE_HARD },
@@ -565,7 +565,7 @@ struct skill_stuff skill_info[] =
 /* 115 */   { "elemental filter", SKILL_INCREASE_HARD},
 /* 116 */        { "orchestrate", SKILL_INCREASE_HARD},
 /* 117 */            {"tumbling", SKILL_INCREASE_HARD},
-/* 118 */                {"brew", SKILL_INCREASE_HARD},
+/* 118 */                {"brew", SKILL_INCREASE_EASY},
 /*    */                  { "\n", 0 },
 };
 
