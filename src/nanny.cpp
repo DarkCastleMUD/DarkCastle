@@ -2015,7 +2015,15 @@ void checkConsecrate(int pulseType)
                {
                   next_ch = tmp_ch->next_in_room;
                   if (tmp_ch == ch)
+                  {
                      continue;
+                  }
+
+                  if (GET_LEVEL(tmp_ch) >= IMMORTAL)
+                  {
+                     continue;
+                  }
+                  
                   if (spl == SPELL_CONSECRATE)
                   {
                      if (affected_by_spell(tmp_ch, SPELL_DETECT_GOOD) && affected_by_spell(tmp_ch, SPELL_DETECT_GOOD)->modifier >= 80)
@@ -2051,6 +2059,11 @@ void checkConsecrate(int pulseType)
             for (tmp_ch = world[obj->in_room].people; tmp_ch; tmp_ch = next_ch)
             {
                next_ch = tmp_ch->next_in_room;
+               if (GET_LEVEL(tmp_ch) >= IMMORTAL)
+               {
+                  continue;
+               }
+
                align = GET_ALIGNMENT(tmp_ch);
                if (align > 0)
                {
