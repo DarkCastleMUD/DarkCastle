@@ -1808,13 +1808,13 @@ int do_give(struct char_data *ch, char *argument, int cmd)
     if(IS_SET(obj->obj_flags.more_flags, ITEM_UNIQUE)) {
       if(search_char_for_item(vict, obj->item_number, false)) {
          send_to_char("The item's uniqueness prevents it.\r\n", ch);
-         csendf(vict, "%s tried to give you an item but was unable.\r\n", GET_NAME(ch));
+         csendf(vict, "%s tried to give you an item but was unable.\r\n", GET_SHORT(ch));         
          return eFAILURE;
       }
     }
     if(contents_cause_unique_problem(obj, vict)) {
       send_to_char("The uniqueness of something inside it prevents it.\r\n", ch);
-      csendf(vict, "%s tried to give you an item but was unable.\r\n", GET_NAME(ch));
+      csendf(vict, "%s tried to give you an item but was unable.\r\n", GET_SHORT(ch));
       return eFAILURE;
     }
 
