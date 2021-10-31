@@ -267,8 +267,7 @@ int do_donate(struct char_data *ch, char *argument, int cmd)
   } 
 
   if(IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL)) {
-    do_gossip(ch, "I just tried to donate my gl, I'm fucking stupid.", 9);
-    send_to_char("DAMN but you sure are stupid.\n\r", ch);
+    send_to_char("You can't donate godload equipment.\r\n", ch);
     return eFAILURE;
   }
   
