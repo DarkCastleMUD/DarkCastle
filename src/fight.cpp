@@ -4013,7 +4013,7 @@ void make_corpse(CHAR_DATA * ch)
           break;
         }
       }
-      if(recipeitem > 0)
+      if(recipeitem > (obj_data *)0)
       {
         obj_to_obj(recipeitem, corpse);
       }
