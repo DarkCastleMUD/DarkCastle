@@ -2364,7 +2364,7 @@ int do_olocate(struct char_data *ch, char *name, int cmd)
 {
    char buf[300], buf2[MAX_STRING_LENGTH];
    struct obj_data *k;
-   int in_room = -1, count = 0;
+   int in_room = 0, count = 0;
    int vnum = 0;
    int searchnum = 0;
 
@@ -2417,14 +2417,14 @@ int do_olocate(struct char_data *ch, char *name, int cmd)
             continue;
          in_room = world[k->equipped_by->in_room].number;
       }
-      else if(k->in_room > (-1))
+      else if(k->in_room > -1)
          in_room = world[k->in_room].number;
       else
-         in_room = -1;
+         in_room = 0;
 
       count++;
 
-      if(in_room != -1)
+      if(in_room != NOWHERE)
          sprintf(buf, "[%2d] %-26s %d", count, k->short_description, in_room);
       else
          sprintf(buf, "[%2d] %-26s %s", count, k->short_description,
