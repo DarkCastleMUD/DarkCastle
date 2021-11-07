@@ -1178,18 +1178,18 @@ int do_identify(char_data *ch, char *argument, int cmd)
 }
 
 int do_look(struct char_data *ch, char *argument, int cmd) {
-	char buffer[MAX_STRING_LENGTH];
-	char arg1[MAX_STRING_LENGTH];
-	char arg2[MAX_STRING_LENGTH];
-	char arg3[MAX_STRING_LENGTH];
-	char tmpbuf[MAX_STRING_LENGTH];
-	int keyword_no;
-	int j, bits, temp;
-	int door, original_loc;
-	bool found;
-	struct obj_data *tmp_object, *found_object;
-	struct char_data *tmp_char;
-	char *tmp_desc;
+	char buffer[MAX_STRING_LENGTH] = {0};
+	char arg1[MAX_STRING_LENGTH] = {0};
+	char arg2[MAX_STRING_LENGTH] = {0};
+	char arg3[MAX_STRING_LENGTH] = {0};
+	char tmpbuf[MAX_STRING_LENGTH] = {0};
+	int keyword_no = 0;
+	int j=0, bits=0, temp=0;
+	int door=0, original_loc=0;
+	bool found=0;
+	struct obj_data *tmp_object = nullptr, *found_object = nullptr;
+	struct char_data *tmp_char = nullptr;
+	char *tmp_desc = nullptr;
 	static const char *keywords[] = { "north", "east", "south", "west", "up", "down",
 			"in", "at", "out", "through", "", /* Look at '' case */
 			"\n" };
