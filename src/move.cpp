@@ -954,7 +954,7 @@ int do_enter(CHAR_DATA *ch, char *argument, int cmd) {
 	CHAR_DATA *sesame;
 	OBJ_DATA *portal = NULL;
 
-	if ((ch->in_room != -1) || (ch->in_room)) {
+	if ((ch->in_room != NOWHERE) || (ch->in_room)) {
 		one_argument(argument, buf);
 	}
 
