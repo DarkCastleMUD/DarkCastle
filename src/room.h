@@ -13,7 +13,7 @@
 
 // The following defs are for room_data
 
-#define NOWHERE    -1
+const unsigned int NOWHERE = 0;
 
 /* Bitvector For 'room_flags' */
 
