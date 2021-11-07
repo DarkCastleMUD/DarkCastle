@@ -451,7 +451,7 @@ int do_shutdown(struct char_data *ch, char *argument, int cmd)
     else if(!strcmp(arg1, "crash")) {
         // let's crash the mud!
         char_data * crashus = NULL;
-        if (crashus->in_room == -1) {
+        if (crashus->in_room == NOWHERE) {
         	return eFAILURE; // this should never be reached
         }
     }
@@ -465,7 +465,7 @@ int do_shutdown(struct char_data *ch, char *argument, int cmd)
 
         // let's crash the mud!
         char_data * crashus = NULL;
-        if (crashus->in_room == -1) {
+        if (crashus->in_room == NOWHERE) {
         	return eFAILURE; // this should never be reached
         }
     }
