@@ -405,7 +405,7 @@ void translate_value(char *leftptr, char *rightptr, int16 **vali,
 		int z = world[mob->in_room].zone;
 		for (otmp = object_list; otmp; otmp = otmp->next) {
 			OBJ_DATA *cmp = otmp->in_obj ? otmp->in_obj : otmp;
-			if ((cmp->in_room != -1 && world[cmp->in_room].zone == z)
+			if ((cmp->in_room != NOWHERE && world[cmp->in_room].zone == z)
 					|| (cmp->carried_by
 							&& world[cmp->carried_by->in_room].zone == z)
 					|| (cmp->equipped_by
