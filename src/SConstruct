@@ -21,6 +21,11 @@ if os.path.exists('/usr/bin/g++-10'):
        env.Replace(CCFLAGS = '-ggdb3 -m32 -std=gnu++20 -Wno-write-strings -fdiagnostics-color=always')
        env.Replace(LINKFLAGS = '-ggdb3 -m32 -std=gnu++20')
 
+if os.path.exists('/usr/bin/g++-11'):
+       env.Replace(CXX = 'g++-11')
+       env.Replace(CCFLAGS = '-ggdb3 -m32 -std=gnu++23 -Wno-write-strings -fdiagnostics-color=always')
+       env.Replace(LINKFLAGS = '-ggdb3 -m32 -std=gnu++23')
+
 debug=ARGUMENTS.get('debug', 0)
 profile=ARGUMENTS.get('profile', 0)
 twitter=ARGUMENTS.get('twitter', 0)
