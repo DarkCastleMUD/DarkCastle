@@ -1453,9 +1453,9 @@ void write_one_room(FILE * f, int a)
 int read_one_room(FILE *fl, int & room_nr)
 {
 	int zone = 0, tmp = 0;
-	char *temp;
-	char ch;
-	int dir;
+	char *temp = nullptr;
+	char ch = 0;
+	int dir = 0;
 	struct extra_descr_data *new_new_descr;
 
 	ch = fread_char(fl);
