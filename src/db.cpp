@@ -1863,7 +1863,7 @@ void free_mobs_from_memory()
 			{
 		if ((curr = (struct char_data *)mob_index[i].item))
 		{
-			free_char(curr);
+			free_char(curr, "free_mobs_from_memory");
 			mob_index[i].item = NULL;
 		}
 	}
@@ -5334,7 +5334,7 @@ char fread_char(FILE *fl)
 }
 
 /* release memory allocated for a char struct */
-void free_char(CHAR_DATA *ch)
+void free_char(CHAR_DATA *ch, string source)
 {
 	int iWear;
 //  struct affected_type *af;
@@ -5342,6 +5342,32 @@ void free_char(CHAR_DATA *ch)
 	struct char_player_alias * next;
 	MPROG_ACT_LIST * currmprog;
 	auto &character_list = DC::instance().character_list;
+
+	typedef unordered_map<char_data *, string> free_list_t;
+	static free_list_t free_list = free_list_t();	
+	if (free_list.contains(ch))
+	{
+		string old_source = free_list.at(ch);
+		logf(IMMORTAL, LOG_BUG, "free_char: previously freed char_data %p found in free_list from %s", ch, old_source.c_str());
+
+		if (character_list.contains(ch))
+		{
+			logf(IMMORTAL, LOG_BUG, "free_char: previously freed char_data %p found in character_list", ch);
+		}
+
+		auto &shooting_list = DC::instance().shooting_list;
+		if (shooting_list.contains(ch))
+		{
+			logf(IMMORTAL, LOG_BUG, "free_char: previously freed char_data %p found in shooting_list", ch);
+		}
+
+		produce_coredump(ch);
+		return;
+	}
+	else
+	{
+		free_list[ch] = source;
+	}
 
 	character_list.erase(ch);
 

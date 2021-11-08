@@ -131,7 +131,7 @@ void init_char(CHAR_DATA *ch);
 void clear_char(CHAR_DATA *ch);
 void clear_object(struct obj_data *obj);
 void reset_char(CHAR_DATA *ch);
-void free_char(CHAR_DATA *ch);
+void free_char(CHAR_DATA *ch, string source = "unknown");
 int  real_room(int virt);
 char *fread_string(FILE *fl, int hasher);
 char *fread_string(ifstream &in, int hasher);

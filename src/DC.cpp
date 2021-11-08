@@ -28,7 +28,7 @@ void DC::removeDead(void) {
 		ch = death_list.front();
 		character_list.erase(ch);
 		shooting_list.erase(ch);
-		free_char(ch);
+		free_char(ch, "DC::removeDead");
 		death_list.pop();
 	}
 

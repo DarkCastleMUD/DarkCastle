@@ -279,7 +279,7 @@ bool my_load_char_obj(struct descriptor_data *d, const char *name)
 #endif
 
   if (d->character)
-    free_char(d->character);
+    free_char(d->character, "my_load_char_obj");
 
   d->character = ch;
   clear_char(ch);

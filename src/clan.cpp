@@ -1067,7 +1067,7 @@ int do_outcast(CHAR_DATA *ch, char *arg, int cmd)
   log(buf, IMP, LOG_CLAN);
 
   do_save(victim,"",666);
-  if(!connected) free_char(victim);
+  if(!connected) free_char(victim, "do_outcast");
 
   return eSUCCESS;
 }
