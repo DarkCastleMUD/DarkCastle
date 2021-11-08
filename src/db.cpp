@@ -2044,7 +2044,14 @@ void setup_dir(FILE *fl, int room, int dir)
 	world[room].dir_option[dir]->bracee = NULL;
 
 	world[room].dir_option[dir]->key = fread_int(fl, -62000, 62000);
-	world[room].dir_option[dir]->to_room = fread_int(fl, -62000, 62000);
+	try
+	{
+		world[room].dir_option[dir]->to_room = fread_int(fl, 0, 62000);
+	} catch (...)
+	{
+		world[room].dir_option[dir]->to_room = NOWHERE;
+	}
+	
 }
 
 // return true for success
@@ -5160,8 +5167,8 @@ uint64_t fread_uint(FILE *fl, uint64_t beg_range, uint64_t end_range)
 	pBufLast = buf;
 
 	if (ch == '-' && beg_range >= 0) {
-		printf("Reading %s: %s, %d\n", curr_type, curr_name, curr_virtno);
-		perror("fread_int: Bad value - < 0 on positive only num");
+		cerr << "Reading " << curr_type << ": " << curr_name << ", " << curr_virtno << endl;
+		cerr << "fread_int: Bad value - < 0 on positive only num" << endl;
 		while (isdigit(getc(fl))) {
 		}
 		throw error_negative_int();
@@ -5253,8 +5260,8 @@ int64_t fread_int(FILE *fl, int64_t beg_range, int64_t end_range)
 	pBufLast = buf;
 
 	if (ch == '-' && beg_range >= 0) {
-		printf("Reading %s: %s, %d\n", curr_type, curr_name, curr_virtno);
-		perror("fread_int: Bad value - < 0 on positive only num");
+		cerr << "Reading " << curr_type << ": " << curr_name << ", " << curr_virtno << endl;
+		cerr << "fread_int: Bad value - < 0 on positive only num" << endl;
 		while (isdigit(getc(fl))) {
 		}
 		throw error_negative_int();
