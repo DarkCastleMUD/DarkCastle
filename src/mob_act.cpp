@@ -227,33 +227,37 @@ void mobile_activity(void)
     PerfTimers["scavenge"].stop();
 
     /* Wander */
-    if(!ISSET(ch->mobdata->actflags, ACT_SENTINEL)
-      && GET_POS(ch) == POSITION_STANDING
-      && (door = number(0,30)) <= 5
-      && CAN_GO(ch, door)
-      && !IS_SET(world[EXIT(ch,door)->to_room].room_flags, NO_MOB)
-      && !IS_SET(world[EXIT(ch,door)->to_room].room_flags, CLAN_ROOM)
-      && ( IS_AFFECTED(ch, AFF_FLYING) ||
-           !IS_SET(world[EXIT(ch,door)->to_room].room_flags, 
-                   (FALL_UP | FALL_SOUTH | FALL_NORTH | FALL_EAST | FALL_WEST | FALL_DOWN))
-         )
-      && ( !ISSET(ch->mobdata->actflags, ACT_STAY_ZONE) ||
-           world[EXIT(ch, door)->to_room].zone == world[ch->in_room].zone
-         )
-      ) 
+    if (!ISSET(ch->mobdata->actflags, ACT_SENTINEL) && GET_POS(ch) == POSITION_STANDING)
     {
-      if(!is_r_denied(ch, EXIT(ch,door)->to_room) && ch->mobdata->last_direction == door)
-        ch->mobdata->last_direction = -1;
-      else if(!is_r_denied(ch, EXIT(ch,door)->to_room) && (!ISSET(ch->mobdata->actflags, ACT_STAY_NO_TOWN) ||
-              !IS_SET(zone_table[world[EXIT(ch, door)->to_room].zone].zone_flags, ZONE_IS_TOWN)))
+      door = number(0, 30);
+      if (door <= 5 && CAN_GO(ch, door))
       {
-        ch->mobdata->last_direction = door;
-        retval = attempt_move( ch, ++door );
-        if(IS_SET(retval, eCH_DIED))
+        int room_nr_past_door = EXIT(ch, door)->to_room;
+        if (room_nr_past_door < 0)
+        {
+          logf(IMMORTAL, LOG_BUG, "Error: Room %d has exit %d to room %d", ch->in_room, door, room_nr_past_door);
           continue;
+        }
+        room_data room_past_door = world[room_nr_past_door];
+        if (!IS_SET(room_past_door.room_flags, NO_MOB)
+        && !IS_SET(room_past_door.room_flags, CLAN_ROOM)
+        && (IS_AFFECTED(ch, AFF_FLYING) || !IS_SET(room_past_door.room_flags, (FALL_UP | FALL_SOUTH | FALL_NORTH | FALL_EAST | FALL_WEST | FALL_DOWN)))
+        && (!ISSET(ch->mobdata->actflags, ACT_STAY_ZONE) || room_past_door.zone == world[ch->in_room].zone))
+        {
+          if (!is_r_denied(ch, EXIT(ch, door)->to_room) && ch->mobdata->last_direction == door)
+            ch->mobdata->last_direction = -1;
+          else if (!is_r_denied(ch, EXIT(ch, door)->to_room) && (!ISSET(ch->mobdata->actflags, ACT_STAY_NO_TOWN) ||
+                                                                 !IS_SET(zone_table[world[EXIT(ch, door)->to_room].zone].zone_flags, ZONE_IS_TOWN)))
+          {
+            ch->mobdata->last_direction = door;
+            retval = attempt_move(ch, ++door);
+            if (IS_SET(retval, eCH_DIED))
+              continue;
+          }
+        }
       }
     }
-  
+
     // check hatred 
     if((ch->mobdata->hatred != NULL))    //  && (!ch->fighting)) (we check fighting earlier)
     {
