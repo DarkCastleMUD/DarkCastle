@@ -501,7 +501,7 @@ const char *spell_wear_off_msg[] =
   "You don't feel quite so hateful anymore.",
   "The foul mantle surrounding you dissipates to nothing.",
   "Your oaken fortitude fades, returning your constitution to normal.",
-  "The $B$2icy$R shield of frost around you fades away.",
+  "The $B$1icy$R shield of frost around you fades away.",
   "Your ability to stand firm ends as the magical stability fades.",
   "You are no longer flagged as a thief.",
   "You are no longer CANTQUIT flagged.",
