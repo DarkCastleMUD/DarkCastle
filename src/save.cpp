@@ -1393,28 +1393,28 @@ bool put_obj_in_store (struct obj_data *obj, CHAR_DATA *ch, FILE *fpsave, int we
 	  }
   }
 
-  if(strcmp(obj->name, standard_obj->name))
+  if(obj->name && strcmp(obj->name, standard_obj->name))
   {
     fwrite("NAM", sizeof(char), 3, fpsave);
     length = strlen(obj->name);
     fwrite(&length, sizeof(length), 1, fpsave);
     fwrite(obj->name, sizeof(char), length, fpsave);
   }
-  if(strcmp(obj->description, standard_obj->description))
+  if(obj->description && strcmp(obj->description, standard_obj->description))
   {
     fwrite("DES", sizeof(char), 3, fpsave);
     length = strlen(obj->description);
     fwrite(&length, sizeof(length), 1, fpsave);
     fwrite(obj->description, sizeof(char), length, fpsave);
   }
-  if(strcmp(obj->short_description, standard_obj->short_description))
+  if(obj->short_description && strcmp(obj->short_description, standard_obj->short_description))
   {
     fwrite("SDE", sizeof(char), 3, fpsave);
     length = strlen(obj->short_description);
     fwrite(&length, sizeof(length), 1, fpsave);
     fwrite(obj->short_description, sizeof(char), length, fpsave);
   }
-  if(strcmp(obj->action_description, standard_obj->action_description))
+  if(obj->action_description && strcmp(obj->action_description, standard_obj->action_description))
   {
     fwrite("ADE", sizeof(char), 3, fpsave);
     length = strlen(obj->action_description);
