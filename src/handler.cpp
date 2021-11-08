@@ -3497,7 +3497,15 @@ void extract_char(CHAR_DATA *ch, bool pull) {
 	if (pull || isGolem) {
 		remove_from_bard_list(ch);
 		auto &death_list = DC::instance().death_list;
-		death_list.push(ch);
+		if (death_list.contains(ch))
+		{
+			logf(IMMORTAL, LOG_BUG, "extract_char: death_list already contained char_data %p.", ch);
+			produce_coredump(ch);
+		}
+		else
+		{
+			death_list[ch] = 1;
+		}
 	}
 }
 

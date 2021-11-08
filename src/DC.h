@@ -47,7 +47,9 @@ public:
   server_descriptor_list_t server_descriptor_list;
   client_descriptor_list_t client_descriptor_list;
   character_list_t character_list;
-  queue<char_data*> death_list;
+
+  typedef unordered_map<char_data*, unsigned int> death_list_t;
+  unordered_map<char_data*, unsigned int> death_list;
   obj_list_t active_obj_list;
   obj_list_t obj_free_list;
   unordered_set<char_data*> shooting_list;

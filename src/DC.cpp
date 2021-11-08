@@ -23,13 +23,13 @@ DC& DC::instance()
 }
 
 void DC::removeDead(void) {
-	char_data *ch = 0;
-	while (!death_list.empty()) {
-		ch = death_list.front();
-		character_list.erase(ch);
-		shooting_list.erase(ch);
-		free_char(ch, "DC::removeDead");
-		death_list.pop();
+
+	for (auto& node : death_list)
+	{
+		character_list.erase(node.first);
+		shooting_list.erase(node.first);
+		free_char(node.first, "DC::removeDead");
+		death_list.erase(node.first);
 	}
 
 	while (!obj_free_list.empty()) {
