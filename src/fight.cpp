@@ -3834,7 +3834,7 @@ void make_scraps(CHAR_DATA *ch, struct obj_data *obj)
 #endif
   clear_object(corpse);
   
-  corpse->item_number = NOWHERE;
+  corpse->item_number = -1;
   corpse->in_room = NOWHERE;
   corpse->name = str_hsh("scraps");
   
@@ -3882,7 +3882,7 @@ void make_corpse(CHAR_DATA * ch)
 #endif
   clear_object(corpse);
   
-  corpse->item_number = NOWHERE;
+  corpse->item_number = -1;
   corpse->in_room = NOWHERE;
   
   // If pc is in the name, the consent system works
@@ -4162,7 +4162,7 @@ void make_husk(CHAR_DATA *ch) {
   corpse = (struct obj_data*)dc_alloc(1, sizeof(struct obj_data));
 #endif
   clear_object(corpse);
-  corpse->item_number = NOWHERE;
+  corpse->item_number = -1;
   corpse->in_room = NOWHERE;
   corpse->name = str_hsh("husk");
   sprintf(buf, "The withered husk of %s, its soul drained, flutters here.",
@@ -4201,7 +4201,7 @@ void make_head(CHAR_DATA * ch)
 #endif
   clear_object(corpse);
   
-  corpse->item_number = NOWHERE;
+  corpse->item_number = -1;
   corpse->in_room = NOWHERE;
   corpse->name = str_hsh("head");
   
@@ -4248,7 +4248,7 @@ void make_arm(CHAR_DATA * ch)
 #endif
   clear_object(corpse);
   
-  corpse->item_number = NOWHERE;
+  corpse->item_number = -1;
   corpse->in_room = NOWHERE;
   corpse->name = str_hsh("arm");
   
@@ -4295,7 +4295,7 @@ void make_leg(CHAR_DATA * ch)
 #endif
   clear_object(corpse);
   
-  corpse->item_number = NOWHERE;
+  corpse->item_number = -1;
   corpse->in_room = NOWHERE;
   corpse->name = str_hsh("leg");
   
@@ -4342,7 +4342,7 @@ void make_bowels(CHAR_DATA * ch)
 #endif
   clear_object(corpse);
   
-  corpse->item_number = NOWHERE;
+  corpse->item_number = -1;
   corpse->in_room = NOWHERE;
   corpse->name = str_hsh("bowels");
   
@@ -4389,7 +4389,7 @@ void make_blood(CHAR_DATA * ch)
 #endif
   clear_object(corpse);
   
-  corpse->item_number = NOWHERE;
+  corpse->item_number = -1;
   corpse->in_room = NOWHERE;
   corpse->name = str_hsh("blood");
   
@@ -4441,7 +4441,7 @@ void make_heart(CHAR_DATA * ch, CHAR_DATA * vict)
   
   clear_object(corpse);
   
-  corpse->item_number = NOWHERE;
+  corpse->item_number = -1;
   corpse->in_room = NOWHERE;
   corpse->name = str_hsh("heart");
   

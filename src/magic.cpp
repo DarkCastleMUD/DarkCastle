@@ -6073,8 +6073,8 @@ void make_portal(CHAR_DATA * ch, CHAR_DATA * vict)
   clear_object(ch_portal);
   clear_object(vict_portal);
 
-  ch_portal->item_number   = NOWHERE;
-  vict_portal->item_number = NOWHERE;
+  ch_portal->item_number   = -1;
+  vict_portal->item_number = -1;
   ch_portal->in_room       = NOWHERE;
   vict_portal->in_room     = NOWHERE;
 
