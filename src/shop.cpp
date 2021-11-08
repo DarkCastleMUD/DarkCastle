@@ -799,7 +799,14 @@ void boot_the_shops()
 
         fscanf( fp, "%d \n", &temp );
 
-        shop_index[max_shop].in_room    = real_room( temp );
+        int room_nr = real_room( temp );
+        if (room_nr < 0 || room_nr > top_of_world)
+        {
+          logf(100, LOG_BUG, "shopkeeper %d loaded with in_room set to %d. Setting to 0.", max_shop, room_nr);
+          room_nr = 0;
+        }
+
+        shop_index[max_shop].in_room = room_nr;
 
         fscanf( fp, "%d \n", &shop_index[max_shop].open1   );
         fscanf( fp, "%d \n", &shop_index[max_shop].close1  );
