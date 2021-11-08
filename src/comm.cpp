@@ -2715,7 +2715,7 @@ void send_to_room(const char *messg, int room, bool awakeonly, CHAR_DATA *nta)
     CHAR_DATA *i = NULL;
 
     //If a megaphone goes off when in someone's inventory this happens
-    if (room == -1)
+    if (room == NOWHERE)
       return;
 
     if(!world_array[room] || !world[room].people) {
