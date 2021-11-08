@@ -3140,6 +3140,16 @@ bool find_spell_shield(CHAR_DATA *ch, CHAR_DATA *victim)
     return TRUE;
   }
 
+  if (IS_AFFECTED(victim, AFF_FROSTSHIELD))
+  {
+    if (ch == victim)
+      send_to_char("You are already protected by a $1frost shield$R.\r\n", ch);
+    else
+      act("$N is already protected by a $1frost shield$R.", ch, 0, victim, TO_CHAR, INVIS_NULL);
+
+    return TRUE;
+  }
+
   if (IS_AFFECTED(victim, AFF_ACID_SHIELD))
   {
     if (ch == victim)
@@ -3148,8 +3158,8 @@ bool find_spell_shield(CHAR_DATA *ch, CHAR_DATA *victim)
       act("$N is already protected by a shield of acid.", ch, 0, victim, TO_CHAR, INVIS_NULL);
 
     return TRUE;
-  }
-
+  }	
+	
   return FALSE;
 }
 
@@ -13897,12 +13907,9 @@ int spell_frostshield(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, OBJ_DATA *o
 {
   struct affected_type af;
   
-  if(IS_AFFECTED(victim, AFF_FROSTSHIELD))
-  {
-    act("You are already protected by a $1frost shield$R.", victim, 0, 0, TO_CHAR, 0);
-    act("$n is already protected by a $1frost shield$R.", ch, 0, 0, TO_CHAR, 0);
+
+  if (find_spell_shield(ch, victim) && IS_PC(victim))
     return eFAILURE;
-  }
 
   if(!affected_by_spell(victim, SPELL_FROSTSHIELD))
   {
