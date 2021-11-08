@@ -29,8 +29,8 @@ void DC::removeDead(void) {
 		character_list.erase(node.first);
 		shooting_list.erase(node.first);
 		free_char(node.first, "DC::removeDead");
-		death_list.erase(node.first);
 	}
+	death_list.clear();
 
 	while (!obj_free_list.empty()) {
 	  obj_data *obj = *(obj_free_list.cbegin());
