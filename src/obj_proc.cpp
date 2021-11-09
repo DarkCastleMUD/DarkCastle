@@ -686,8 +686,10 @@ int bank(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
 
   /* balance */
   if(cmd == CMD_BALANCE) {
-    sprintf(buf, "You have %d coins in the bank.\n\r", GET_BANK(ch));
-    send_to_char(buf, ch);
+    stringstream ss;
+    ss.imbue(locale("en_US"));
+    ss << GET_BANK(ch);
+    csendf(ch, "You have %s $B$5gold$R coins in the bank.\r\n", ss.str().c_str());
     return eSUCCESS;
   }
 
@@ -750,8 +752,10 @@ int casino_atm(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
 
   /* balance */
   if(cmd == CMD_BALANCE) {
-    sprintf(buf, "You have %d coins in the bank.\n\r", GET_BANK(ch));
-    send_to_char(buf, ch);
+    stringstream ss;
+    ss.imbue(locale("en_US"));
+    ss << GET_BANK(ch);
+    csendf(ch, "You have %s $B$5gold$R coins in the bank.\r\n", ss.str().c_str());
     return eSUCCESS;
   }
 
