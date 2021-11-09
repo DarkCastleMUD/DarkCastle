@@ -928,33 +928,35 @@ bool identify(char_data *ch, obj_data *obj)
       return false;
    }
 
-   sprintf(buf, "$3Object '$R%s$3', Item type:$R ", obj->name);
+   if (obj->short_description)
+   {
+      csendf(ch, "$3Short description: $R%s\r\n", obj->short_description);
+   }
+   else
+   {
+      csendf(ch, "$3Short description: $R\r\n");
+   }
+
+   csendf(ch, "$3Keywords: '$R%s$3'$R\r\n", obj->name);
+   
    sprinttype(GET_ITEM_TYPE(obj), item_types, buf2);
-   strcat(buf, buf2);
-   strcat(buf, "\n\r");
-   send_to_char(buf, ch);
-
-   send_to_char("$3Item is:$R ", ch);
+   csendf(ch, "$3Item type: $R%s\r\n", buf2);
+      
    sprintbit(obj->obj_flags.extra_flags, extra_bits, buf);
+   csendf(ch, "$3Extra flags: $R%s\r\n", buf);
+
    sprintbit(obj->obj_flags.more_flags, more_obj_bits, buf2);
-   strcat(buf, " ");
-   strcat(buf, buf2);
-   strcat(buf, "\n\r");
-   send_to_char(buf, ch);
+   csendf(ch, "$3More flags: $R%s\r\n", buf2);
 
-    send_to_char("$3Worn on:$R ", ch);
-    sprintbit(obj->obj_flags.wear_flags, wear_bits, buf);
-    strcat(buf,"\n\r");
-    send_to_char(buf, ch);
+   sprintbit(obj->obj_flags.wear_flags, wear_bits, buf);
+   csendf(ch, "$3Worn on: $R%s\r\n", buf);
 
-
-   send_to_char("$3Worn by:$R ", ch);
    sprintbit(obj->obj_flags.size, size_bits, buf);
-   strcat(buf, "\r\n");
-   send_to_char(buf, ch);
+   csendf(ch, "$3Worn by: $R%s\r\n", buf);
 
-   sprintf(buf, "$3Weight: $R%d$3, Value: $R%d$3, Level: $R%d\n\r", obj->obj_flags.weight, obj->obj_flags.cost, obj->obj_flags.eq_level);
-   send_to_char(buf, ch);
+   csendf(ch, "$3Level: $R%d\n\r", obj->obj_flags.eq_level);
+   csendf(ch, "$3Weight: $R%d\r\n", obj->obj_flags.weight);
+   csendf(ch, "$3Value: $R%d\r\n", obj->obj_flags.cost);   
 
    const obj_data * vobj = nullptr;
    if (obj->item_number >= 0)
@@ -968,7 +970,6 @@ bool identify(char_data *ch, obj_data *obj)
             vobj = (obj_data *)obj_index[rn_of_vnum].item;
          }
       }
-      
    }
 
 
@@ -1156,25 +1157,22 @@ int do_identify(char_data *ch, char *argument, int cmd)
       return eFAILURE;
    }
 
-   obj_data *obj = get_obj_in_list_vis(ch, arg1.c_str(), ch->carrying);
-
-   if (obj == nullptr && ch->in_room > 0)
+   char_data *tmp_char;
+   obj_data *obj;
+   int bits = generic_find(arg1.c_str(), FIND_OBJ_INV | FIND_OBJ_EQUIP | FIND_OBJ_ROOM, ch, &tmp_char, &obj, true);
+   if (bits && obj)
    {
-      obj = get_obj_in_list_vis(ch, arg1.c_str(), world[ch->in_room].contents);
+      if (identify(ch, obj))
+      {
+         return eSUCCESS;
+      }
+   }
+   else
+   {
+      csendf(ch, "You could not find %s in your inventory, among your equipment or in this room.\n\r", arg1.c_str());
    }
 
-   if (obj == nullptr)
-   {
-      csendf(ch, "You could not find %s in your inventory or this room.\n\r", arg1.c_str());
-      return eFAILURE;
-   }
-
-   if (identify(ch, obj) == false)
-   {
-      return eFAILURE;
-   }
-
-   return eSUCCESS;
+   return eFAILURE;
 }
 
 int do_look(struct char_data *ch, char *argument, int cmd) {
@@ -1275,7 +1273,7 @@ int do_look(struct char_data *ch, char *argument, int cmd) {
 			if (*arg2) {
 				/* Item carried */
 
-				bits = generic_find(arg2, FIND_OBJ_INV | FIND_OBJ_ROOM |
+				bits = generic_find(arg2, FIND_OBJ_INV | FIND_OBJ_EQUIP | FIND_OBJ_ROOM |
 				FIND_OBJ_EQUIP, ch, &tmp_char, &tmp_object);
 
 				if (bits) { /* Found something */
@@ -1690,8 +1688,7 @@ int do_examine(struct char_data *ch, char *argument, int cmd)
       return eFAILURE;
    }
 
-   generic_find(name, FIND_OBJ_INV | FIND_OBJ_ROOM |
-		FIND_OBJ_EQUIP, ch, &tmp_char, &tmp_object);
+   generic_find(name, FIND_OBJ_INV | FIND_OBJ_EQUIP | FIND_OBJ_ROOM, ch, &tmp_char, &tmp_object, true);
 
    if (tmp_object) {
       if (GET_ITEM_TYPE(tmp_object) == ITEM_DRINKCON || ARE_CONTAINERS(tmp_object)) {
