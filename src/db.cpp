@@ -1863,7 +1863,7 @@ void free_mobs_from_memory()
 			{
 		if ((curr = (struct char_data *)mob_index[i].item))
 		{
-			free_char(curr, "free_mobs_from_memory");
+			free_char(curr, Trace("free_mobs_from_memory"));
 			mob_index[i].item = NULL;
 		}
 	}
@@ -2626,6 +2626,8 @@ CHAR_DATA *read_mobile(int nr, FILE *fl)
 #else
 	mob = (CHAR_DATA *)dc_alloc(1, sizeof(CHAR_DATA));
 #endif
+	auto &free_list = DC::instance().free_list;
+	free_list.erase(mob);
 
 	clear_char(mob);
 	GET_RACE(mob) = 0;
@@ -3300,6 +3302,8 @@ CHAR_DATA *clone_mobile(int nr)
 #else
 	mob = (CHAR_DATA *)dc_alloc(1, sizeof(CHAR_DATA));
 #endif
+	auto &free_list = DC::instance().free_list;
+	free_list.erase(mob);
 
 	clear_char(mob);
 	old = ((CHAR_DATA *)(mob_index[nr].item)); /* cast void pointer */
@@ -5334,7 +5338,7 @@ char fread_char(FILE *fl)
 }
 
 /* release memory allocated for a char struct */
-void free_char(CHAR_DATA *ch, string source)
+void free_char(CHAR_DATA *ch, Trace trace)
 {
 	int iWear;
 //  struct affected_type *af;
@@ -5342,13 +5346,14 @@ void free_char(CHAR_DATA *ch, string source)
 	struct char_player_alias * next;
 	MPROG_ACT_LIST * currmprog;
 	auto &character_list = DC::instance().character_list;
+	auto &free_list = DC::instance().free_list;
 
-	typedef unordered_map<char_data *, string> free_list_t;
-	static free_list_t free_list = free_list_t();	
 	if (free_list.contains(ch))
 	{
-		string old_source = free_list.at(ch);
-		logf(IMMORTAL, LOG_BUG, "free_char: previously freed char_data %p found in free_list from %s", ch, old_source.c_str());
+		Trace trace = free_list.at(ch);
+		stringstream ss;
+		ss << trace;
+		logf(IMMORTAL, LOG_BUG, "free_char: previously freed char_data %p found in free_list from %s", ch, ss.str().c_str());
 
 		if (character_list.contains(ch))
 		{
@@ -5366,7 +5371,7 @@ void free_char(CHAR_DATA *ch, string source)
 	}
 	else
 	{
-		free_list[ch] = source;
+		free_list[ch] = trace;
 	}
 
 	character_list.erase(ch);

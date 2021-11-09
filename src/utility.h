@@ -36,6 +36,8 @@ extern "C" {
 #include "player.h"
 #include "obj.h"
 
+#include "Trace.h"
+
 using namespace std;
 
 extern struct weather_data weather_info;
@@ -609,5 +611,6 @@ const char *item_condition(struct obj_data *obj);
 int random_percent_change(uint percentage, int value);
 int random_percent_change(int from, int to, int value);
 bool identify(char_data *ch, obj_data *obj);
+extern void end_oproc(CHAR_DATA *ch, Trace trace = Trace("unknown"));
 
 #endif /* UTILITY_H_ */

@@ -21,6 +21,8 @@
 #include "fileinfo.h"
 #include "connect.h"
 
+#include "Trace.h"
+
 using namespace std;
 
 typedef set<char_data *> character_list_t;
@@ -32,7 +34,8 @@ typedef set<char_data *>::iterator character_list_i;
 typedef set<int>::iterator client_descriptor_list_i;
 typedef set<int>::iterator server_descriptor_list_i;
 typedef vector<in_port_t>::iterator port_list_i;
-
+typedef unordered_map<char_data*, Trace> death_list_t;
+typedef unordered_map<char_data *, Trace> free_list_t;
 class DC {
   // Favor reference semantics over pointer semantics
 public:
@@ -48,12 +51,12 @@ public:
   client_descriptor_list_t client_descriptor_list;
   character_list_t character_list;
 
-  typedef unordered_map<char_data*, unsigned int> death_list_t;
-  unordered_map<char_data*, unsigned int> death_list;
+  death_list_t death_list;
   obj_list_t active_obj_list;
   obj_list_t obj_free_list;
   unordered_set<char_data*> shooting_list;
   
+	free_list_t free_list;
   struct config {
     port_list_t ports;
     bool allow_imp_password = false;

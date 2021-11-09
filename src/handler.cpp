@@ -23,7 +23,8 @@
 
 #include <sys/time.h>
 #include <algorithm>
-
+#include <iostream>
+#include <sstream>
 
 #include "magic.h"
 #include "spells.h"
@@ -3313,7 +3314,7 @@ void update_char_objects(CHAR_DATA *ch) {
 }
 
 /* Extract a ch completely from the world, and leave his stuff behind */
-void extract_char(CHAR_DATA *ch, bool pull) {
+void extract_char(CHAR_DATA *ch, bool pull, Trace t) {
 	CHAR_DATA *k, *next_char;
 	struct descriptor_data *t_desc;
 	int l, was_in;
@@ -3499,12 +3500,14 @@ void extract_char(CHAR_DATA *ch, bool pull) {
 		auto &death_list = DC::instance().death_list;
 		if (death_list.contains(ch))
 		{
-			logf(IMMORTAL, LOG_BUG, "extract_char: death_list already contained char_data %p.", ch);
+			stringstream ss;
+			ss << "extract_char: " << t << endl;
+			logf(IMMORTAL, LOG_BUG, "extract_char: death_list already contained char_data %p from %s.", ch, ss.str().c_str());
 			produce_coredump(ch);
 		}
 		else
 		{
-			death_list[ch] = 1;
+			death_list[ch] = t;
 		}
 	}
 }

@@ -649,7 +649,7 @@ void load_vaults(void) {
   dc_fclose(index);
 
   sprintf(buf, "boot_vaults: found [%d] player vaults to read.", total_vaults);
-  log(buf, IMMORTAL, LOG_BUG);
+  //log(buf, IMMORTAL, LOG_BUG);
   if (total_vaults)
   CREATE(vault_table, struct vault_data, total_vaults);
 
@@ -836,7 +836,7 @@ void add_vault_access(CHAR_DATA *ch, char *name, struct vault_data *vault) {
   if (has_vault_access(name, vault)) {
     send_to_char("That person already has access to your vault.\r\n", ch);
     if (d.character) 
-      free_char(d.character, "add_vault_access 1");
+      free_char(d.character, Trace("add_vault_access 1"));
     return;   
   }
  
@@ -848,7 +848,7 @@ void add_vault_access(CHAR_DATA *ch, char *name, struct vault_data *vault) {
 
   save_char_obj(ch);
   if (d.character) 
-    free_char(d.character, "add_vault_access 2");
+    free_char(d.character, Trace("add_vault_access 2"));
 }
 
 void remove_vault_access(CHAR_DATA *ch, char *name, struct vault_data *vault) {

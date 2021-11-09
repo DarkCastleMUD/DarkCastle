@@ -28,7 +28,9 @@ void DC::removeDead(void) {
 	{
 		character_list.erase(node.first);
 		shooting_list.erase(node.first);
-		free_char(node.first, "DC::removeDead");
+		Trace& t = node.second;
+		t.addTrack("DC::removeDeath");
+		free_char(node.first, t);
 	}
 	death_list.clear();
 

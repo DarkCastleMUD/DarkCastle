@@ -202,7 +202,7 @@ int do_check(struct char_data *ch, char *arg, int cmd) {
       send_to_char("(Linkdead)\n\r", ch); 
   else { 
     send_to_char("(Not on game)\n\r", ch);
-    free_char(vict, "do_check");
+    free_char(vict, Trace("do_check"));
   }
   return eSUCCESS;
 }
@@ -365,7 +365,7 @@ int do_stat(struct char_data *ch, char *arg, int cmd)
     char_to_room(vict, ch->in_room);
     mob_stat(ch, vict);
     char_from_room(vict);
-    free_char(vict, "do_stat");
+    free_char(vict, Trace("do_stat"));
     return eSUCCESS;;
   }
 

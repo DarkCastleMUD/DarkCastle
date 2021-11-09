@@ -81,19 +81,6 @@ extern struct index_data *obj_index;
 extern CWorld world;
 extern CVoteData *DCVote;
 
-#ifndef WIN32
-extern "C" {
-  char *crypt(const char *key, const char *salt);
-}
-#else
- 
-char *crypt(const char *key, const char *salt)
-{
-	return((char *)key);
-}
-#endif
-
-
 int isbanned(char *hostname);
 int _parse_email( char * arg );
 int _parse_name(char *arg, char *name);
@@ -1458,7 +1445,7 @@ is_race_eligible(ch,7)?'*':' ',is_race_eligible(ch,8)?'*':' ',is_race_eligible(c
           if (GET_LEVEL(ch) > 0)
           {
              strcpy(tmp_name, GET_NAME(ch));
-             free_char(d->character, "nanny CON_SELECT_MENU 1");
+             free_char(d->character, Trace("nanny CON_SELECT_MENU 1"));
              d->character = 0;
              load_char_obj(d, tmp_name);
              ch = d->character;
@@ -1655,7 +1642,7 @@ is_race_eligible(ch,7)?'*':' ',is_race_eligible(ch,8)?'*':' ',is_race_eligible(c
           // this prevents a dupe bug
           strcpy(blah1, GET_NAME(ch));
           strcpy(blah2, ch->pcdata->pwd);
-          free_char(d->character, "nanny CON_CONFIRM_RESET_PASSWORD");
+          free_char(d->character, Trace("nanny CON_CONFIRM_RESET_PASSWORD"));
           d->character = 0;
           load_char_obj(d, blah1);
           ch = d->character;
@@ -1760,7 +1747,7 @@ bool check_reconnect( struct descriptor_data *d, char *name, bool fReconnect )
 //      else {
 
        if(fReconnect == TRUE) {
-         free_char( d->character, "check_reconnect");
+         free_char( d->character, Trace("check_reconnect"));
          d->character            = tmp_ch;
          tmp_ch->desc            = d;
          tmp_ch->timer  = 0;
@@ -1815,7 +1802,7 @@ bool check_playing(struct descriptor_data *d, char *name)
          continue;
       
       if(STATE(dold) == CON_GET_OLD_PASSWORD) {
-         free_char(dold->character, "check_playing");
+         free_char(dold->character, Trace("check_playing"));
          dold->character = 0;
          close_socket(dold);
          continue;

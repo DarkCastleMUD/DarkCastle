@@ -277,9 +277,11 @@ bool my_load_char_obj(struct descriptor_data *d, const char *name)
 #else
   ch = (CHAR_DATA *)dc_alloc(1, sizeof(CHAR_DATA));
 #endif
+  auto &free_list = DC::instance().free_list;
+	free_list.erase(ch);
 
   if (d->character)
-    free_char(d->character, "my_load_char_obj");
+    free_char(d->character, Trace("my_load_char_obj"));
 
   d->character = ch;
   clear_char(ch);

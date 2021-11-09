@@ -2276,7 +2276,7 @@ int close_socket(struct descriptor_data *d)
 //			GET_NAME(d->character));
 //		log(buf, 110, LOG_HMM);
 	}
-			free_char(d->character, "close_socket");
+			free_char(d->character,Trace("close_socket"));
     }
   }
 //   Removed this log caues it's so fricken annoying

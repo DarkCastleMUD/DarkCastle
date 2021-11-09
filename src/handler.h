@@ -19,6 +19,7 @@
 
 #include "structs.h" // ubyte, etc..
 #include "comm.h"
+#include "Trace.h"
 
 /* handling the affected-structures */
 void affect_total(CHAR_DATA *ch);
@@ -107,7 +108,7 @@ struct obj_data *get_obj_in_list_vis(CHAR_DATA *ch, int item_num,
 		struct obj_data *list, bool bf = FALSE);
 struct obj_data *get_obj_vis(CHAR_DATA *ch, char *name, bool loc = FALSE);
 
-void extract_char(CHAR_DATA *ch, bool pull);
+void extract_char(CHAR_DATA *ch, bool pull, Trace t = Trace("unknown"));
 /* wiz_102.cpp */
 int find_skill_num(char *name);
 

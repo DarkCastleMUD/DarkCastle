@@ -31,6 +31,10 @@
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <map>
+#include <string>
+#include <algorithm>
+
 #include "fileinfo.h"
 #include "act.h"
 #include "player.h"
@@ -45,13 +49,14 @@
 #include "handler.h"
 #include "db.h"
 #include "comm.h"
-#include "DC.h"
 #include "returnvals.h"
-#include <map>
-#include <string>
-#include <algorithm>
-#include "inventory.h"
 #include "const.h"
+#include "inventory.h"
+
+#include "DC.h"
+#include "Trace.h"
+
+using namespace std;
 
 // Extern variables
 
@@ -4041,7 +4046,7 @@ CHAR_DATA *initiate_oproc(CHAR_DATA *ch, OBJ_DATA *obj)
   return temp;
 }
 
-void end_oproc(CHAR_DATA *ch)
+void end_oproc(CHAR_DATA *ch, Trace trace)
 {
 	static int core_counter = 0;
 	if (selfpurge)
@@ -4056,198 +4061,197 @@ void end_oproc(CHAR_DATA *ch)
 	}
 	else
 	{
-		extract_char(ch, TRUE);
+		trace.addTrack("end_oproc");
+		extract_char(ch, TRUE, trace);
 		mob_index[real_mobile(12)].progtypes = 0;
 		mob_index[real_mobile(12)].mobprogs = 0;
 	}
 }
 
-int oprog_can_see_trigger( CHAR_DATA *ch, OBJ_DATA *item )
+int oprog_can_see_trigger(CHAR_DATA *ch, OBJ_DATA *item)
 {
 
-  CHAR_DATA *vmob;
-  mprog_cur_result = eSUCCESS;
+	CHAR_DATA *vmob;
+	mprog_cur_result = eSUCCESS;
 
-  if (obj_index[item->item_number].progtypes & CAN_SEE_PROG)
-     {
-        vmob = initiate_oproc(ch, item);
-        mprog_percent_check(vmob, ch, item, NULL, CAN_SEE_PROG);
-        end_oproc(vmob);
-        return mprog_cur_result;
-     }
- return mprog_cur_result;
+	if (obj_index[item->item_number].progtypes & CAN_SEE_PROG)
+	{
+		vmob = initiate_oproc(ch, item);
+		mprog_percent_check(vmob, ch, item, NULL, CAN_SEE_PROG);
+		end_oproc(vmob, Trace("oprog_can_see_trigger"));
+		return mprog_cur_result;
+	}
+	return mprog_cur_result;
 }
 
-
-int oprog_speech_trigger( char *txt, CHAR_DATA *ch )
+int oprog_speech_trigger(char *txt, CHAR_DATA *ch)
 {
-  CHAR_DATA *vmob = NULL;
-  OBJ_DATA *item;
+	CHAR_DATA *vmob = NULL;
+	OBJ_DATA *item;
 
-  mprog_cur_result = eSUCCESS;
+	mprog_cur_result = eSUCCESS;
 
+	for (item = world[ch->in_room].contents; item; item = item->next_content)
+		if (obj_index[item->item_number].progtypes & SPEECH_PROG)
+		{
+			vmob = initiate_oproc(ch, item);
+			if (mprog_wordlist_check(txt, vmob, ch, NULL, NULL, SPEECH_PROG))
+			{
+				end_oproc(vmob, Trace("oprog_speech_trigger1"));
+				return mprog_cur_result;
+			}
+			end_oproc(vmob, Trace("oprog_speech_trigger2"));
+		}
+	for (item = ch->carrying; item; item = item->next_content)
+		if (obj_index[item->item_number].progtypes & SPEECH_PROG)
+		{
+			vmob = initiate_oproc(ch, item);
+			if (mprog_wordlist_check(txt, vmob, ch, NULL, NULL, SPEECH_PROG))
+			{
+				end_oproc(vmob, Trace("oprog_speech_trigger3"));
+				return mprog_cur_result;
+			}
+			end_oproc(vmob, Trace("oprog_speech_trigger4"));
+		}
 
-  for (item = world[ch->in_room].contents; item; item = item->next_content)
-     if (obj_index[item->item_number].progtypes & SPEECH_PROG)
-     {
-	vmob = initiate_oproc(ch, item);
-	if (mprog_wordlist_check(txt, vmob, ch, NULL, NULL, SPEECH_PROG))
-        {
- 	  end_oproc(vmob);
-	  return mprog_cur_result;
-        }
-	end_oproc(vmob);
-     }
-  for (item = ch->carrying; item; item = item->next_content)
-     if (obj_index[item->item_number].progtypes & SPEECH_PROG)
-     {
-	vmob = initiate_oproc(ch, item);
-	if (mprog_wordlist_check(txt, vmob, ch, NULL, NULL, SPEECH_PROG))
-        {
- 	  end_oproc(vmob);
-	  return mprog_cur_result;
-        }
-	end_oproc(vmob);
-     }
-
-  for (int i = 0; i < MAX_WEAR; i++)
-  if (ch->equipment[i])
-     if (obj_index[ch->equipment[i]->item_number].progtypes & SPEECH_PROG)
-     {
-	vmob = initiate_oproc(ch, ch->equipment[i]);
-	if (mprog_wordlist_check(txt, vmob, ch,  NULL, NULL, SPEECH_PROG))
-        {
- 	  end_oproc(vmob);
-	  return mprog_cur_result;
-        }
-	end_oproc(vmob);
-     }
-  return mprog_cur_result;
+	for (int i = 0; i < MAX_WEAR; i++)
+		if (ch->equipment[i])
+			if (obj_index[ch->equipment[i]->item_number].progtypes & SPEECH_PROG)
+			{
+				vmob = initiate_oproc(ch, ch->equipment[i]);
+				if (mprog_wordlist_check(txt, vmob, ch, NULL, NULL, SPEECH_PROG))
+				{
+					end_oproc(vmob, Trace("oprog_speech_trigger5"));
+				}
+				end_oproc(vmob, Trace("oprog_speech_trigger6"));
+			}
+	return mprog_cur_result;
 }
-
 
 int oprog_catch_trigger(obj_data *obj, int catch_num, char *var, int opt, char_data *actor, obj_data *obj2, void *vo, char_data *rndm)
 {
- MPROG_DATA *mprg;
- int curr_catch;
- mprog_cur_result = eFAILURE;
- CHAR_DATA *vmob;
+	MPROG_DATA *mprg;
+	int curr_catch;
+	mprog_cur_result = eFAILURE;
+	CHAR_DATA *vmob;
 
- if ( obj_index[obj->item_number].progtypes & CATCH_PROG ) 
- {
-    mprg = obj_index[obj->item_number].mobprogs;
-    mprog_command_num = 0;
-    for ( ; mprg != NULL; mprg = mprg->next )
-     {
-       mprog_command_num++;
+	if (obj_index[obj->item_number].progtypes & CATCH_PROG)
+	{
+		mprg = obj_index[obj->item_number].mobprogs;
+		mprog_command_num = 0;
+		for (; mprg != NULL; mprg = mprg->next)
+		{
+			mprog_command_num++;
 
-       if ( mprg->type & CATCH_PROG )
-       {
-         if(!check_range_valid_and_convert(curr_catch, mprg->arglist, MPROG_CATCH_MIN, MPROG_CATCH_MAX)) {
-           logf( IMMORTAL, LOG_WORLD, "Invalid catch argument: vnum %d",
-             obj_index[obj->item_number].virt);
-           return eFAILURE;
-         }
-         if(curr_catch == catch_num) {
-	   vmob = initiate_oproc(NULL, obj);
-           if (var) {
-	     struct tempvariable *eh;
-	     
+			if (mprg->type & CATCH_PROG)
+			{
+				if (!check_range_valid_and_convert(curr_catch, mprg->arglist, MPROG_CATCH_MIN, MPROG_CATCH_MAX))
+				{
+					logf(IMMORTAL, LOG_WORLD, "Invalid catch argument: vnum %d",
+						 obj_index[obj->item_number].virt);
+					return eFAILURE;
+				}
+				if (curr_catch == catch_num)
+				{
+					vmob = initiate_oproc(NULL, obj);
+					if (var)
+					{
+						struct tempvariable *eh;
+
 #ifdef LEAK_CHECK
-     		eh = (struct tempvariable *)
-                        calloc(1, sizeof(struct tempvariable));
+						eh = (struct tempvariable *)
+							calloc(1, sizeof(struct tempvariable));
 #else
-	       eh = (struct tempvariable *)
-                        dc_alloc(1, sizeof(struct tempvariable));
+						eh = (struct tempvariable *)
+							dc_alloc(1, sizeof(struct tempvariable));
 #endif
 
-	     eh->data = var;
-	     eh->name = str_dup("throw");
-	     eh->next = vmob->tempVariable;
-	     vmob->tempVariable = eh;
-           }
+						eh->data = var;
+						eh->name = str_dup("throw");
+						eh->next = vmob->tempVariable;
+						vmob->tempVariable = eh;
+					}
 
-           mprog_driver( mprg->comlist, vmob, actor, obj2, vo, NULL, rndm );
-		if (selfpurge) return mprog_cur_result;
-	   end_oproc(vmob);
-	   break;
-         }
-       }
-
-     }
+					mprog_driver(mprg->comlist, vmob, actor, obj2, vo, NULL, rndm);
+					if (selfpurge)
+						return mprog_cur_result;
+					end_oproc(vmob, Trace("oprog_catch_trigger"));
+					break;
+				}
+			}
+		}
+	}
+	return mprog_cur_result;
 }
- return mprog_cur_result;
-}
 
-
-int oprog_act_trigger( const char *txt, CHAR_DATA *ch )
+int oprog_act_trigger(const char *txt, CHAR_DATA *ch)
 {
 
-  CHAR_DATA *vmob;
-  OBJ_DATA *item;
+	CHAR_DATA *vmob;
+	OBJ_DATA *item;
 
-  mprog_cur_result = eSUCCESS;
+	mprog_cur_result = eSUCCESS;
 
-  if (ch->in_room < 0) return mprog_cur_result;
+	if (ch->in_room < 0)
+		return mprog_cur_result;
 
-  for (item = world[ch->in_room].contents; item; item = 
-item->next_content)
-     if (obj_index[item->item_number].progtypes & ACT_PROG)
-     {
-	vmob = initiate_oproc(ch, item);
-	if (mprog_wordlist_check(txt, vmob, ch, NULL, NULL, ACT_PROG))
-        {
- 	  end_oproc(vmob);
-	  return mprog_cur_result;
-        }
-	end_oproc(vmob);
-     }
-  for (item = ch->carrying; item; item = item->next_content)
-     if (obj_index[item->item_number].progtypes & ACT_PROG)
-     {
-	vmob = initiate_oproc(ch, item);
-	if (mprog_wordlist_check(txt, vmob, ch, NULL, NULL, ACT_PROG))
-        {
- 	  end_oproc(vmob);
-	  return mprog_cur_result;
-        }
-	end_oproc(vmob);
-     }
+	for (item = world[ch->in_room].contents; item; item =
+													   item->next_content)
+		if (obj_index[item->item_number].progtypes & ACT_PROG)
+		{
+			vmob = initiate_oproc(ch, item);
+			if (mprog_wordlist_check(txt, vmob, ch, NULL, NULL, ACT_PROG))
+			{
+				end_oproc(vmob, Trace("oprog_act_trigger1"));
+				return mprog_cur_result;
+			}
+			end_oproc(vmob, Trace("oprog_act_trigger2"));
+		}
+	for (item = ch->carrying; item; item = item->next_content)
+		if (obj_index[item->item_number].progtypes & ACT_PROG)
+		{
+			vmob = initiate_oproc(ch, item);
+			if (mprog_wordlist_check(txt, vmob, ch, NULL, NULL, ACT_PROG))
+			{
+				end_oproc(vmob, Trace("oprog_act_trigger3"));
+				return mprog_cur_result;
+			}
+			end_oproc(vmob, Trace("oprog_act_trigger4"));
+		}
 
-  for (int i = 0; i < MAX_WEAR; i++)
-  if (ch->equipment[i])
-     if (obj_index[ch->equipment[i]->item_number].progtypes & ACT_PROG)
-     {
-	vmob = initiate_oproc(ch, ch->equipment[i]);
-	if (mprog_wordlist_check(txt, vmob,ch,  NULL, NULL, ACT_PROG))
-        {
- 	  end_oproc(vmob);
-	  return mprog_cur_result;
-        }
-	end_oproc(vmob);
-     }
-  return mprog_cur_result;
+	for (int i = 0; i < MAX_WEAR; i++)
+		if (ch->equipment[i])
+			if (obj_index[ch->equipment[i]->item_number].progtypes & ACT_PROG)
+			{
+				vmob = initiate_oproc(ch, ch->equipment[i]);
+				if (mprog_wordlist_check(txt, vmob, ch, NULL, NULL, ACT_PROG))
+				{
+					end_oproc(vmob, Trace("oprog_act_trigger5"));
+					return mprog_cur_result;
+				}
+				end_oproc(vmob, Trace("oprog_act_trigger6"));
+			}
+	return mprog_cur_result;
 }
 
-int oprog_greet_trigger( CHAR_DATA *ch )
+int oprog_greet_trigger(CHAR_DATA *ch)
 {
 
-  CHAR_DATA *vmob;
-  OBJ_DATA *item;
+	CHAR_DATA *vmob;
+	OBJ_DATA *item;
 
-  mprog_cur_result = eSUCCESS;
+	mprog_cur_result = eSUCCESS;
 
-
-  for (item = world[ch->in_room].contents; item; item = 
-item->next_content)
-     if (obj_index[item->item_number].progtypes & ALL_GREET_PROG)
-     {
-	vmob = initiate_oproc(ch, item);
-	mprog_percent_check(vmob, ch, item, NULL, ALL_GREET_PROG);
-	end_oproc(vmob);
-        return mprog_cur_result;
-     }
-  return mprog_cur_result;
+	for (item = world[ch->in_room].contents; item; item =
+													   item->next_content)
+		if (obj_index[item->item_number].progtypes & ALL_GREET_PROG)
+		{
+			vmob = initiate_oproc(ch, item);
+			mprog_percent_check(vmob, ch, item, NULL, ALL_GREET_PROG);
+			end_oproc(vmob, Trace("oprog_greet_trigger"));
+			return mprog_cur_result;
+		}
+	return mprog_cur_result;
 }
 
 int oprog_rand_trigger(OBJ_DATA *item)
@@ -4271,100 +4275,98 @@ int oprog_rand_trigger(OBJ_DATA *item)
 	return mprog_cur_result;
 }
 
-int oprog_arand_trigger( OBJ_DATA *item )
+int oprog_arand_trigger(OBJ_DATA *item)
 {
-  CHAR_DATA *vmob;
-  CHAR_DATA *ch;
-  mprog_cur_result = eSUCCESS;
+	CHAR_DATA *vmob;
+	CHAR_DATA *ch;
+	mprog_cur_result = eSUCCESS;
 
-  if (item->carried_by) ch=item->carried_by;
-  else ch = NULL;
-    if (obj_index[item->item_number].progtypes & ARAND_PROG)
-     {
-        vmob = initiate_oproc(ch, item);
-        mprog_percent_check(vmob, ch, item, NULL, ARAND_PROG);
-        end_oproc(vmob);
-        return mprog_cur_result;
-     }
- return mprog_cur_result;
+	if (item->carried_by)
+		ch = item->carried_by;
+	else
+		ch = NULL;
+	if (obj_index[item->item_number].progtypes & ARAND_PROG)
+	{
+		vmob = initiate_oproc(ch, item);
+		mprog_percent_check(vmob, ch, item, NULL, ARAND_PROG);
+		end_oproc(vmob);
+		return mprog_cur_result;
+	}
+	return mprog_cur_result;
 }
 
-
-
-int oprog_load_trigger( CHAR_DATA *ch )
+int oprog_load_trigger(CHAR_DATA *ch)
 {
 
-  CHAR_DATA *vmob;
-  OBJ_DATA *item;
+	CHAR_DATA *vmob;
+	OBJ_DATA *item;
 
-  mprog_cur_result = eSUCCESS;
+	mprog_cur_result = eSUCCESS;
 
+	for (item = world[ch->in_room].contents; item; item =
+													   item->next_content)
+		if (obj_index[item->item_number].progtypes & LOAD_PROG)
+		{
+			vmob = initiate_oproc(ch, item);
+			mprog_percent_check(vmob, ch, item, NULL, LOAD_PROG);
+			end_oproc(vmob);
+			return mprog_cur_result;
+		}
+	for (item = ch->carrying; item; item = item->next_content)
+		if (obj_index[item->item_number].progtypes & LOAD_PROG)
+		{
+			vmob = initiate_oproc(ch, item);
+			mprog_percent_check(vmob, ch, item, NULL, LOAD_PROG);
+			end_oproc(vmob);
+			return mprog_cur_result;
+		}
 
-  for (item = world[ch->in_room].contents; item; item = 
-item->next_content)
-     if (obj_index[item->item_number].progtypes & LOAD_PROG)
-     {
-	vmob = initiate_oproc(ch, item);
-	mprog_percent_check(vmob, ch, item, NULL, LOAD_PROG);
-	end_oproc(vmob);
-        return mprog_cur_result;
-     }
-  for (item = ch->carrying; item; item = item->next_content)
-     if (obj_index[item->item_number].progtypes & LOAD_PROG)
-     {
-	vmob = initiate_oproc(ch, item);
-	mprog_percent_check(vmob, ch, item, NULL, LOAD_PROG);
-	end_oproc(vmob);
-        return mprog_cur_result;
-     }
-
-  for (int i = 0; i < MAX_WEAR; i++)
-  if (ch->equipment[i])
-     if (obj_index[ch->equipment[i]->item_number].progtypes & LOAD_PROG)
-     {
-	vmob = initiate_oproc(ch, item);
-	mprog_percent_check(vmob, ch, item, NULL, LOAD_PROG);
-	end_oproc(vmob);
-        return mprog_cur_result;
-     }
-  return mprog_cur_result;
+	for (int i = 0; i < MAX_WEAR; i++)
+		if (ch->equipment[i])
+			if (obj_index[ch->equipment[i]->item_number].progtypes & LOAD_PROG)
+			{
+				vmob = initiate_oproc(ch, item);
+				mprog_percent_check(vmob, ch, item, NULL, LOAD_PROG);
+				end_oproc(vmob);
+				return mprog_cur_result;
+			}
+	return mprog_cur_result;
 }
 
-
-int oprog_weapon_trigger( CHAR_DATA *ch, OBJ_DATA *item )
+int oprog_weapon_trigger(CHAR_DATA *ch, OBJ_DATA *item)
 {
 
-  CHAR_DATA *vmob;
+	CHAR_DATA *vmob;
 
-  mprog_cur_result = eSUCCESS;
+	mprog_cur_result = eSUCCESS;
 
-     if (obj_index[item->item_number].progtypes & WEAPON_PROG)
-     {
-	vmob = initiate_oproc(ch, item);
-	mprog_percent_check(vmob, ch, item, NULL, WEAPON_PROG);
-	end_oproc(vmob);
-        return mprog_cur_result;
-     }
+	if (obj_index[item->item_number].progtypes & WEAPON_PROG)
+	{
+		vmob = initiate_oproc(ch, item);
+		mprog_percent_check(vmob, ch, item, NULL, WEAPON_PROG);
+		end_oproc(vmob);
+		return mprog_cur_result;
+	}
 
-   return mprog_cur_result;
+	return mprog_cur_result;
 }
 
-int oprog_armour_trigger( CHAR_DATA *ch, OBJ_DATA *item )
+int oprog_armour_trigger(CHAR_DATA *ch, OBJ_DATA *item)
 {
 
-  CHAR_DATA *vmob;
+	CHAR_DATA *vmob;
 
-  mprog_cur_result = eSUCCESS;
+	mprog_cur_result = eSUCCESS;
 
-     if (obj_index[item->item_number].progtypes & ARMOUR_PROG)
-     {
-	vmob = initiate_oproc(ch, item);
-	mprog_percent_check(vmob, ch, item, NULL, ARMOUR_PROG);
-	end_oproc(vmob);
-        return mprog_cur_result;
-     }
+	if (obj_index[item->item_number].progtypes & ARMOUR_PROG)
+	{
+		vmob = initiate_oproc(ch, item);
+		mprog_percent_check(vmob, ch, item, NULL, ARMOUR_PROG);
+		end_oproc(vmob);
+		return mprog_cur_result;
+	}
 
-   return mprog_cur_result;
+	return mprog_cur_result;
 }
 
 int oprog_command_trigger(char *txt, CHAR_DATA *ch, char *arg)
@@ -4377,7 +4379,7 @@ int oprog_command_trigger(char *txt, CHAR_DATA *ch, char *arg)
 	CHAR_DATA *vmob = nullptr;
 	OBJ_DATA *item = nullptr;
 	mprog_cur_result = eFAILURE;
-	char buf[MAX_STRING_LENGTH] = { 0 };
+	char buf[MAX_STRING_LENGTH] = {0};
 	if (ch->in_room >= 0)
 	{
 		for (item = world[ch->in_room].contents; item; item = item->next_content)
@@ -4400,7 +4402,7 @@ int oprog_command_trigger(char *txt, CHAR_DATA *ch, char *arg)
 			}
 		}
 	}
-	
+
 	for (item = ch->carrying; item; item = item->next_content)
 	{
 		if (obj_index[item->item_number].progtypes & COMMAND_PROG)
