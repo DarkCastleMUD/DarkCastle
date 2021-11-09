@@ -4142,7 +4142,7 @@ struct obj_data *create_money(int amount) {
 /* The routine returns a pointer to the next word in *arg (just like the  */
 /* one_argument routine).                                                 */
 
-int generic_find(char *arg, int bitvector, CHAR_DATA *ch, CHAR_DATA **tar_ch, struct obj_data **tar_obj) {
+int generic_find(const char *arg, int bitvector, CHAR_DATA *ch, CHAR_DATA **tar_ch, struct obj_data **tar_obj, bool verbose) {
 	static const char *ignore[] = { "the", "in", "\n" };
 
 	int i;
@@ -4173,42 +4173,145 @@ int generic_find(char *arg, int bitvector, CHAR_DATA *ch, CHAR_DATA **tar_ch, st
 	*tar_obj = 0;
 
 	if (IS_SET(bitvector, FIND_CHAR_ROOM)) { /* Find person in room */
-		if ((*tar_ch = get_char_room_vis(ch, name)) != NULL) {
+		*tar_ch = get_char_room_vis(ch, name);
+		if (*tar_ch)
+		{
+			if (verbose)
+			{
+				if ((*tar_ch)->short_desc)
+				{
+					csendf(ch, "You find %s in this room.\r\n\r\n", (*tar_ch)->short_desc);
+				}
+				else if ((*tar_ch)->name)
+				{
+					csendf(ch, "You find %s in this room.\r\n\r\n", (*tar_ch)->name);
+				}
+				else
+				{
+					csendf(ch, "You find them in this room.\r\n\r\n");
+				}
+			}
 			return (FIND_CHAR_ROOM);
 		}
 	}
 
 	if (IS_SET(bitvector, FIND_CHAR_WORLD)) {
-		if ((*tar_ch = get_char_vis(ch, name)) != NULL) {
+		*tar_ch = get_char_vis(ch, name);
+		if (*tar_ch)
+		{
+			if (verbose)
+			{
+				if ((*tar_ch)->short_desc)
+				{
+					csendf(ch, "You find %s somewhere in the world.\r\n\r\n", (*tar_ch)->short_desc);
+				}
+				else if ((*tar_ch)->name)
+				{
+					csendf(ch, "You find %s somewhere in the world.\r\n\r\n", (*tar_ch)->name);
+				}
+				else
+				{
+					csendf(ch, "You find them somewhere in the world.\r\n\r\n");
+				}
+			}
 			return (FIND_CHAR_WORLD);
+		}
+	}
+
+	if (IS_SET(bitvector, FIND_OBJ_INV)) {
+		*tar_obj = get_obj_in_list_vis(ch, name, ch->carrying);
+		if (*tar_obj)
+		{
+			if (verbose)
+			{
+				if ((*tar_obj)->short_description)
+				{
+					csendf(ch, "You find %s in your inventory.\r\n\r\n", (*tar_obj)->short_description);
+				}
+				else if ((*tar_obj)->name)
+				{
+					csendf(ch, "You find %s in your inventory.\r\n\r\n", (*tar_obj)->name);
+				}
+				else
+				{
+					csendf(ch, "You find it in your inventory.\r\n\r\n");
+				}
+			}
+			return (FIND_OBJ_INV);
 		}
 	}
 
 	if (IS_SET(bitvector, FIND_OBJ_EQUIP)) {
 		for (found = FALSE, i = 0; i < MAX_WEAR && !found; i++)
+		{
 			if (ch->equipment[i] && isname(name, ch->equipment[i]->name) && CAN_SEE_OBJ(ch, ch->equipment[i])) {
 				*tar_obj = ch->equipment[i];
-				found = TRUE;
+				found = true;
 			}
+		}
 		if (found)
+		{
+			if (verbose)
+			{
+				if ((*tar_obj)->short_description)
+				{
+					csendf(ch, "You find %s among your equipment.\r\n\r\n", (*tar_obj)->short_description);
+				}
+				else if ((*tar_obj)->name)
+				{
+					csendf(ch, "You find %s among your equipment.\r\n\r\n", (*tar_obj)->name);
+				}
+				else
+				{
+					csendf(ch, "You find it among your equipment.\r\n\r\n");
+				}
+			}
 			return (FIND_OBJ_EQUIP);
+		}
+		
 	}
 
-	if (IS_SET(bitvector, FIND_OBJ_INV)) {
-		if ((*tar_obj = get_obj_in_list_vis(ch, name, ch->carrying)) != NULL) {
-			return (FIND_OBJ_INV);
-		}
-	}
 
 	if (IS_SET(bitvector, FIND_OBJ_ROOM)) {
 		*tar_obj = get_obj_in_list_vis(ch, name, world[ch->in_room].contents);
-		if (*tar_obj != NULL) {
+		if (*tar_obj) {
+			if (verbose)
+			{
+				if ((*tar_obj)->short_description)
+				{
+					csendf(ch, "You find %s in this room.\r\n\r\n", (*tar_obj)->short_description);
+				}
+				else if ((*tar_obj)->name)
+				{
+					csendf(ch, "You find %s in this room.\r\n\r\n", (*tar_obj)->name);
+				}
+				else
+				{
+					csendf(ch, "You find it in this room.\r\n\r\n");
+				}
+			}
 			return (FIND_OBJ_ROOM);
 		}
 	}
 
 	if (IS_SET(bitvector, FIND_OBJ_WORLD)) {
-		if ((*tar_obj = get_obj_vis(ch, name)) != NULL) {
+		*tar_obj = get_obj_vis(ch, name);
+		if (*tar_obj) {
+			if (verbose)
+			{
+				if ((*tar_obj)->short_description)
+				{
+					csendf(ch, "You find %s somewhere in the world.\r\n\r\n", (*tar_obj)->short_description);
+				}
+				else if ((*tar_obj)->name)
+				{
+					csendf(ch, "You find %s somewhere in the world\r\n\r\n", (*tar_obj)->name);
+				}
+				else
+				{
+					csendf(ch, "You find it somewhere in the world\r\n\r\n");
+				}
+			}
 			return (FIND_OBJ_WORLD);
 		}
 	}
