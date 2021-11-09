@@ -114,8 +114,7 @@ int find_skill_num(char *name);
 
 /* Generic Find */
 
-int generic_find(char *arg, int bitvector, CHAR_DATA *ch,
-		   CHAR_DATA **tar_ch, struct obj_data **tar_obj);
+int generic_find(const char *arg, int bitvector, CHAR_DATA *ch, CHAR_DATA **tar_ch, struct obj_data **tar_obj, bool verbose = false);
 
 int get_number(char **name);
 
