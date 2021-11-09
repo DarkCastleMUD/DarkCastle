@@ -1227,6 +1227,12 @@ void vault_get(CHAR_DATA *ch, char *object, char *owner) {
 }
 
 void item_add(int vnum, struct vault_data *vault) {
+  if (vnum == -1)
+  {
+    produce_coredump();
+    return;
+  }
+
   struct vault_items_data *item;
 
   for (item = vault->items; item; item = item->next) {
@@ -1455,18 +1461,21 @@ int can_put_in_vault(struct obj_data *obj, int self, struct vault_data *vault, s
   return 1;
 }
 
-void vault_put(CHAR_DATA *ch, char *object, char *owner) {
+void vault_put(CHAR_DATA *ch, char *object, char *owner)
+{
   struct obj_data *obj, *tmp_obj;
   struct vault_data *vault;
   char buf[MAX_INPUT_LENGTH];
   int self = 0;
 
   owner[0] = UPPER(owner[0]);
-  if (!strcmp(owner, GET_NAME(ch))) {
-	  self = 1;
+  if (!strcmp(owner, GET_NAME(ch)))
+  {
+    self = 1;
   }
 
-  if (!(vault = has_vault(owner))) {
+  if (!(vault = has_vault(owner)))
+  {
     if (self)
       csendf(ch, "You don't have a vault.\r\n");
     else
@@ -1474,107 +1483,135 @@ void vault_put(CHAR_DATA *ch, char *object, char *owner) {
     return;
   }
 
-  if (!has_vault_access(GET_NAME(ch), vault)) {
+  if (!has_vault_access(GET_NAME(ch), vault))
+  {
     csendf(ch, "You don't have permission to put things in %s's vault.\r\n", owner);
     return;
   }
 
-  if (!strcmp(object, "all")) {
-    for (obj = ch->carrying; obj ; obj = tmp_obj) {
+  if (!strcmp(object, "all"))
+  {
+    for (obj = ch->carrying; obj; obj = tmp_obj)
+    {
       tmp_obj = obj->next_content;
-      if (!can_put_in_vault(obj, self, vault, ch)) 
-        continue;
-      
-      if ((GET_OBJ_WEIGHT(obj) + vault->weight) > vault->size) {
-        csendf(ch, "%s won't fit in the vault!\r\n", GET_OBJ_SHORT(obj));
-        continue;
-      }
-
-    if (GET_LEVEL(ch) < IMMORTAL)
-	snprintf(buf, MAX_INPUT_LENGTH, "%s added %s to %s's vault.", GET_NAME(ch), GET_OBJ_SHORT(obj), owner);
-    else
-	snprintf(buf, MAX_INPUT_LENGTH, "%s added %s[%d] to %s's vault.", GET_NAME(ch), GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj), owner);
-
-      vlog(buf, owner);
-      csendf(ch, "%s has been placed in the vault.\r\n", GET_OBJ_SHORT(obj));
-
-    std::string sbuf;
-    std::stringstream ssin;
-    ssin << GET_OBJ_VNUM(obj);
-
-    sbuf = GET_NAME(ch);
-    sbuf += " added ";
-    sbuf += GET_OBJ_SHORT(obj);
-    sbuf += "[";
-    sbuf += ssin.str();
-    sbuf += "] to ";
-    sbuf += owner;
-    sbuf += "'s vault.";
-
-      act(sbuf.c_str(), ch, 0, 0, TO_ROOM, GODS);
-
-      if (!fullSave(obj))
-         { item_add(GET_OBJ_VNUM(obj), vault); extract_obj(obj); }
-      else { obj_from_char(obj); item_add(obj, vault); }
-    }
-  } else if (sscanf(object, "all.%s", object)) {
-    for (obj = ch->carrying; obj ; obj = tmp_obj) {
-      tmp_obj = obj->next_content;
-      if (!isname(object, GET_OBJ_NAME(obj))) 
-        continue;
-      if (!can_put_in_vault(obj, self, vault, ch)) 
+      if (!can_put_in_vault(obj, self, vault, ch))
         continue;
 
-      if ((GET_OBJ_WEIGHT(obj) + vault->weight) > vault->size) {
+      if ((GET_OBJ_WEIGHT(obj) + vault->weight) > vault->size)
+      {
         csendf(ch, "%s won't fit in the vault!\r\n", GET_OBJ_SHORT(obj));
         continue;
       }
 
       if (GET_LEVEL(ch) < IMMORTAL)
-	  snprintf(buf, MAX_INPUT_LENGTH, "%s added %s to %s's vault.", GET_NAME(ch), GET_OBJ_SHORT(obj), owner);
+        snprintf(buf, MAX_INPUT_LENGTH, "%s added %s to %s's vault.", GET_NAME(ch), GET_OBJ_SHORT(obj), owner);
       else
-	  snprintf(buf, MAX_INPUT_LENGTH, "%s added %s[%d] to %s's vault.", GET_NAME(ch), GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj), owner);
+        snprintf(buf, MAX_INPUT_LENGTH, "%s added %s[%d] to %s's vault.", GET_NAME(ch), GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj), owner);
 
       vlog(buf, owner);
       csendf(ch, "%s has been placed in the vault.\r\n", GET_OBJ_SHORT(obj));
-      if (!fullSave(obj)) {
-        item_add(GET_OBJ_VNUM(obj), vault); extract_obj(obj); }
-      else { obj_from_char(obj); item_add(obj, vault); }
+
+      std::string sbuf;
+      std::stringstream ssin;
+      ssin << GET_OBJ_VNUM(obj);
+
+      sbuf = GET_NAME(ch);
+      sbuf += " added ";
+      sbuf += GET_OBJ_SHORT(obj);
+      sbuf += "[";
+      sbuf += ssin.str();
+      sbuf += "] to ";
+      sbuf += owner;
+      sbuf += "'s vault.";
+
+      act(sbuf.c_str(), ch, 0, 0, TO_ROOM, GODS);
+
+      if (!fullSave(obj) && GET_OBJ_VNUM(obj) > 0)
+      {
+        item_add(GET_OBJ_VNUM(obj), vault);
+        extract_obj(obj);
+      }
+      else
+      {
+        obj_from_char(obj);
+        item_add(obj, vault);
+      }
     }
-  } else {
-    if (!(obj = get_obj_in_list_vis(ch, object, ch->carrying))) {
+  }
+  else if (sscanf(object, "all.%s", object))
+  {
+    for (obj = ch->carrying; obj; obj = tmp_obj)
+    {
+      tmp_obj = obj->next_content;
+      if (!isname(object, GET_OBJ_NAME(obj)))
+        continue;
+      if (!can_put_in_vault(obj, self, vault, ch))
+        continue;
+
+      if ((GET_OBJ_WEIGHT(obj) + vault->weight) > vault->size)
+      {
+        csendf(ch, "%s won't fit in the vault!\r\n", GET_OBJ_SHORT(obj));
+        continue;
+      }
+
+      if (GET_LEVEL(ch) < IMMORTAL)
+        snprintf(buf, MAX_INPUT_LENGTH, "%s added %s to %s's vault.", GET_NAME(ch), GET_OBJ_SHORT(obj), owner);
+      else
+        snprintf(buf, MAX_INPUT_LENGTH, "%s added %s[%d] to %s's vault.", GET_NAME(ch), GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj), owner);
+
+      vlog(buf, owner);
+      csendf(ch, "%s has been placed in the vault.\r\n", GET_OBJ_SHORT(obj));
+      if (!fullSave(obj) && GET_OBJ_VNUM(obj) > 0)
+      {
+        item_add(GET_OBJ_VNUM(obj), vault);
+        extract_obj(obj);
+      }
+      else
+      {
+        obj_from_char(obj);
+        item_add(obj, vault);
+      }
+    }
+  }
+  else
+  {
+    if (!(obj = get_obj_in_list_vis(ch, object, ch->carrying)))
+    {
       send_to_char("You don't have anything like that.\n\r", ch);
       return;
     }
-  
-    if (!can_put_in_vault(obj, self, vault, ch)) 
+
+    if (!can_put_in_vault(obj, self, vault, ch))
       return;
 
-    if ((GET_OBJ_WEIGHT(obj) + vault->weight) > vault->size) {
+    if ((GET_OBJ_WEIGHT(obj) + vault->weight) > vault->size)
+    {
       csendf(ch, "%s won't fit in the vault!\r\n", GET_OBJ_SHORT(obj));
       return;
     }
 
     if (GET_LEVEL(ch) < IMMORTAL)
-	snprintf(buf, MAX_INPUT_LENGTH, "%s added %s to %s's vault.", GET_NAME(ch), GET_OBJ_SHORT(obj), owner);
+      snprintf(buf, MAX_INPUT_LENGTH, "%s added %s to %s's vault.", GET_NAME(ch), GET_OBJ_SHORT(obj), owner);
     else
-	snprintf(buf, MAX_INPUT_LENGTH, "%s added %s[%d] to %s's vault.", GET_NAME(ch), GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj), owner);
+      snprintf(buf, MAX_INPUT_LENGTH, "%s added %s[%d] to %s's vault.", GET_NAME(ch), GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj), owner);
 
     vlog(buf, owner);
     csendf(ch, "%s has been placed in the vault.\r\n", GET_OBJ_SHORT(obj));
-  
-    if (!fullSave(obj)) {
-    	item_add(GET_OBJ_VNUM(obj), vault);
-    	extract_obj(obj);
-    } else {
-    	obj_from_char(obj);
-    	item_add(obj, vault);
+
+    if (!fullSave(obj) && GET_OBJ_VNUM(obj) > 0)
+    {
+      item_add(GET_OBJ_VNUM(obj), vault);
+      extract_obj(obj);
+    }
+    else
+    {
+      obj_from_char(obj);
+      item_add(obj, vault);
     }
   }
   save_vault(owner);
   save_char_obj(ch);
 }
-
 
 void vault_list(CHAR_DATA *ch, char *owner) {
   struct vault_items_data *items;
