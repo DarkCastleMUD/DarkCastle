@@ -2222,7 +2222,7 @@ int do_open(CHAR_DATA *ch, char *argument, int cmd)
          }
       }
    }
-   else if (generic_find(argument, FIND_OBJ_INV | FIND_OBJ_ROOM, ch, &victim, &obj))
+   else if (generic_find(argument, FIND_OBJ_INV | FIND_OBJ_EQUIP | FIND_OBJ_ROOM, ch, &victim, &obj, true))
    {
      found = true;
       // this is an object
@@ -2302,7 +2302,7 @@ int do_close(CHAR_DATA *ch, char *argument, int cmd)
                }
       }
    }
-   else if (generic_find(argument, FIND_OBJ_INV | FIND_OBJ_ROOM, ch, &victim, &obj))
+   else if (generic_find(argument, FIND_OBJ_INV | FIND_OBJ_EQUIP | FIND_OBJ_ROOM, ch, &victim, &obj, true))
    {     
      found = true;
       if (obj->obj_flags.type_flag != ITEM_CONTAINER)
@@ -2372,8 +2372,7 @@ int do_lock(CHAR_DATA *ch, char *argument, int cmd)
     if (!*type) {
         send_to_char("Lock what?\r\n", ch);
 	return eFAILURE;
-    } else if (generic_find(argument, FIND_OBJ_INV | FIND_OBJ_ROOM,
-        ch, &victim, &obj))
+    } else if (generic_find(argument, FIND_OBJ_INV | FIND_OBJ_EQUIP | FIND_OBJ_ROOM, ch, &victim, &obj, true))
     {    
         /* ths is an object */
         
@@ -2445,8 +2444,8 @@ int do_unlock(CHAR_DATA *ch, char *argument, int cmd)
     if (!*type) {
         send_to_char("Unlock what?\r\n", ch);
 	return eFAILURE;
-    } else if (generic_find(argument, FIND_OBJ_INV | FIND_OBJ_ROOM,
-        ch, &victim, &obj))
+    } else if (generic_find(argument, FIND_OBJ_INV | FIND_OBJ_EQUIP | FIND_OBJ_ROOM,
+        ch, &victim, &obj, true))
     {
         /* ths is an object */
         
