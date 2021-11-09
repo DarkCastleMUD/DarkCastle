@@ -1510,7 +1510,7 @@ int do_pick(CHAR_DATA *ch, char *argument, int cmd)
 
    if (!*type) {
       send_to_char("Pick what?\n\r", ch);
-   } else if (generic_find(argument, (FIND_OBJ_INV | FIND_OBJ_ROOM), ch, &victim, &obj)) {
+   } else if (generic_find(argument, (FIND_OBJ_INV | FIND_OBJ_EQUIP | FIND_OBJ_ROOM), ch, &victim, &obj, true)) {
      // this is an object
 
      if (obj->obj_flags.type_flag != ITEM_CONTAINER)
@@ -2167,7 +2167,7 @@ int do_appraise(CHAR_DATA *ch, char *argument, int cmd)
 
    bits = generic_find(name, FIND_OBJ_INV | FIND_OBJ_ROOM |
                   FIND_OBJ_EQUIP | FIND_CHAR_ROOM,
-                  ch, &victim, &obj);
+                  ch, &victim, &obj, true);
 
    if(!bits) {
      send_to_char("Appraise whom?\n\r", ch);
