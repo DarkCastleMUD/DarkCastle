@@ -1547,18 +1547,24 @@ void do_clan_list(CHAR_DATA *ch)
   clan_data * clan = 0;
   string buf, buf2;
 
-  send_to_char("$B$7Clan                 Leader           ##   Tax Balance$R\n\r", ch);
+  if (GET_LEVEL(ch) > 103)
+  {
+    send_to_char("$B$7## Clan                 Leader           Tax   $B$5Gold$7 Balance$R\n\r", ch);
+  }
+  else
+  {
+    send_to_char("$B$7## Clan                 Leader           $R\n\r", ch);
+  }
+  
 
   for(clan = clan_list; clan; clan = clan->next) {
-     buf = fmt::format("{:<20}$R {:<16} {:2}", clan->name, clan->leader,
-           clan->number);
      if (GET_LEVEL(ch) > 103)
      {
-    	 buf2 = fmt::format(std::locale("en_US.UTF-8"), "{}   {:3} {:16L}\r\n", buf, clan->tax, clan->getBalance());
+    	 buf = fmt::format(std::locale("en_US.UTF-8"), "{:2} {:<20}$R {:<16} {:3} {:16L}\r\n", clan->number, clan->name, clan->leader, clan->tax, clan->getBalance());
      } else {
-    	 buf2 = fmt::format("{}\r\n", buf);
+    	 buf = fmt::format(std::locale("en_US.UTF-8"), "{:2} {:<20}$R {:<16}\r\n", clan->number, clan->name, clan->leader);
      }
-     send_to_char(buf2, ch);
+     send_to_char(buf, ch);
   }
 }
 
