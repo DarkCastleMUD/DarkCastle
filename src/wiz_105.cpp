@@ -20,27 +20,44 @@
 
 int do_clearaff(struct char_data *ch, char *argument, int cmd)
 {
+  bool found = false;
+  char buf[MAX_INPUT_LENGTH];
+  struct char_data *victim;
+  struct affected_type *af, *afpk;
+  struct obj_data *dummy;
 
-   char buf[MAX_INPUT_LENGTH];
-   struct char_data *victim;
-   struct affected_type *af, *afpk;
-    struct obj_data *dummy;
- 
+  one_argument(argument, buf);
 
-   one_argument(argument, buf);
-
-    if (!*buf)
-     victim = ch;
-    else if (!generic_find(argument, FIND_CHAR_WORLD, ch, &victim, &dummy))
-        send_to_char("Couldn't find any such creature.\n\r", ch);
-    if (victim) {
-      for(af = victim->affected; af; af = afpk) {
-        afpk = af->next;
-        affect_remove(victim, af, SUPPRESS_ALL);
+  if (!*buf)
+    victim = ch;
+  else if (!generic_find(argument, FIND_CHAR_ROOM | FIND_CHAR_WORLD, ch, &victim, &dummy, true))
+    csendf(ch, "Couldn't find '%s' anywhere.\n\r", argument);
+  if (victim)
+  {
+    for (af = victim->affected; af; af = afpk)
+    {
+      found = true;
+      afpk = af->next;
+      const char *aff_name = get_skill_name(af->type);
+      if (aff_name)
+      {
+        csendf(ch, "Removing %s affect.\r\n", aff_name);
+      }
+      else
+      {
+        csendf(ch, "Removing unknown affect.\r\n");
       }
 
-//    send_to_char("Done.\r\n",ch);
-  //  send_to_char("Your affects have been cleared.\r\n",victim);
+      affect_remove(victim, af, 0);
+    }
+
+    if (found == false)
+    {
+      csendf(ch, "No affects found.\r\n");
+    }
+
+    //    send_to_char("Done.\r\n",ch);
+    //  send_to_char("Your affects have been cleared.\r\n",victim);
     return eSUCCESS;
   }
   return eFAILURE;
