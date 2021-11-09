@@ -389,11 +389,7 @@ int do_recite(struct char_data *ch, char *argument, int cmd)
     }
 
     if (*argument) {
-    	if (scroll->obj_flags.value[1] == SPELL_IDENTIFY) {
-    		bits = generic_find(argument, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_CHAR_ROOM, ch, &victim, &obj);
-    	} else {
-    		bits = generic_find(argument, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP | FIND_CHAR_ROOM, ch, &victim, &obj);
-    	}
+    	bits = generic_find(argument, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP | FIND_CHAR_ROOM, ch, &victim, &obj, true);
       if (bits == 0) {
         send_to_char("No such thing around to recite the scroll on.\n\r", ch);
         return eFAILURE;
@@ -728,7 +724,7 @@ int do_use(struct char_data *ch, char *argument, int cmd)
     }
   } else if (stick->obj_flags.type_flag == ITEM_WAND) {
 
-    bits = generic_find(targ, FIND_CHAR_ROOM | FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP, ch, &tmp_char, &tmp_object);
+    bits = generic_find(targ, FIND_CHAR_ROOM | FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP, ch, &tmp_char, &tmp_object, true);
     if (bits) {
       if (bits == FIND_CHAR_ROOM) {
         act("$n points $p at you.", ch, stick, tmp_char, TO_VICT, INVIS_NULL);
