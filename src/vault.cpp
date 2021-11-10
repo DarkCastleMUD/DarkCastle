@@ -1408,7 +1408,7 @@ void vault_withdraw(CHAR_DATA *ch, unsigned int amount, char *owner) {
 int can_put_in_vault(struct obj_data *obj, int self, struct vault_data *vault, struct char_data *ch) {
 //  struct obj_data *tmp_obj;
  
-  if (GET_OBJ_VNUM(obj) == NOWHERE) {
+  if (GET_OBJ_VNUM(obj) == -1) {
     csendf(ch, "%s is hardly worth saving.\r\n", GET_OBJ_SHORT(obj));
     return 0;
   }
