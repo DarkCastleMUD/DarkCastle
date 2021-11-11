@@ -724,7 +724,7 @@ void roll_and_display_stats(CHAR_DATA *ch)
    WAIT_STATE(ch, PULSE_TIMER / 10);
 }
 
-int more_than_ten_people_from_this_ip(struct descriptor_data *new_conn)
+int count_IP_connections(struct descriptor_data *new_conn)
 {
    int count = 0;
    for(struct descriptor_data *d = descriptor_list; d; d = d->next)
@@ -861,7 +861,7 @@ void nanny(struct descriptor_data *d, char *arg)
         SEND_TO_Q(greetings3, d);  // greeting 3 is the dc++ one we don't use now
 */
 
-      if(more_than_ten_people_from_this_ip(d))
+      if(count_IP_connections(d))
         break;
        if (wizlock)
 	{
