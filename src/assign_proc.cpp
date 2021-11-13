@@ -98,9 +98,9 @@ void assign_non_combat_procs() {
     SPEC_FUN    guild;
     SPEC_FUN    guild_guard;
     SPEC_FUN    francis_guard;
-    SPEC_FUN	deth;
-    SPEC_FUN	fido;
-    SPEC_FUN	janitor;
+    SPEC_FUN    chain_gossips;
+    SPEC_FUN	  fido;
+    SPEC_FUN	  janitor;
     SPEC_FUN    backstabber;
     SPEC_FUN    mud_school_adept;
     SPEC_FUN    adept;    
@@ -148,7 +148,7 @@ void assign_non_combat_procs() {
     assign_one_mob_non(502, arena_only);
     assign_one_mob_non(503, arena_only);
     assign_one_mob_non(8, mage_golem);
-    assign_one_mob_non(1,  deth);
+    assign_one_mob_non(1,  chain_gossips);
     assign_one_mob_non(5,  mage_familiar_imp_non);
     assign_one_mob_non(4, mage_familiar_gremlin_non);
     assign_one_mob_non(6,  druid_familiar_chipmunk_non);

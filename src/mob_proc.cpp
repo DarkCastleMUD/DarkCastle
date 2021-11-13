@@ -1021,7 +1021,7 @@ int clan_guard(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
 }
 
 /*--+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+--*/
-static char *dethSayText [ ] =
+vector<string> ChainSayText =
 {
   "Can i lick your stamps?",
   "Want to buy a some cheap godload equipment?",
@@ -1794,31 +1794,36 @@ static char *dethSayText [ ] =
 
 // ENDOFCHAIN
 
-#define DETH_SAY_TEXT_SIZE    ( sizeof ( dethSayText )    / sizeof ( char * ) )
-
-int deth (struct char_data *ch, struct obj_data *obj, int cmd, char *arg,        
-          struct char_data *owner)
+int chain_gossips(char_data *ch, struct obj_data *obj, int cmd, char *arg, char_data *owner)
 {
-    int x;
+  int x;
 
-    if(IS_AFFECTED(ch, AFF_PARALYSIS))
-      return eFAILURE;
-
-    if(cmd)
-      return eFAILURE;
-
-    if (number(1,4) != 1)
-    {
-      return eFAILURE;
-    }
-
-    x = number ( 0, DETH_SAY_TEXT_SIZE * 120 );
-
-    if ((unsigned) x < DETH_SAY_TEXT_SIZE) {
-	do_gossip ( ch, dethSayText [ x ], 0 );
-	return eSUCCESS;
-    }
+  if (IS_AFFECTED(ch, AFF_PARALYSIS))
     return eFAILURE;
+
+  if (cmd)
+    return eFAILURE;
+
+  if (number(1, 120) != 1)
+  {
+    return eFAILURE;
+  }
+
+  x = number(0, ChainSayText.size());
+
+  string message;
+  try
+  {
+    message = ChainSayText.at(x);
+  }
+  catch(...)
+  {
+    return eFAILURE;
+  }
+  
+  do_gossip(ch, message.data(), 0);
+
+  return eFAILURE;
 }
 /*--+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+--*/
 
