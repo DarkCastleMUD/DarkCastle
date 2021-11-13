@@ -760,7 +760,7 @@ int command_interpreter(CHAR_DATA *ch, char *pcomm, bool procced)
 
   // Strip initial spaces OR tab characters and parse command word.
   // Translate to lower case.  We need to translate tabs for the MOBProgs to work
-  if (ch && ch->desc && ch->desc->connected == CON_EDITING)
+  if (ch && ch->desc && ch->desc->connected == conn::EDITING)
   {
     ;
   }

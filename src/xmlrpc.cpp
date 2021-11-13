@@ -87,7 +87,7 @@ public:
 
     if (IS_PC(ch) && GET_LEVEL(ch) >= IMMORTAL && ch->desc->strnew) {
       switch(ch->desc->web_connected) {
-      case CON_EDIT_MPROG:
+      case conn::EDIT_MPROG:
 	if (!contents.empty()) {
 	  if (!(*ch->desc->strnew)) {
 	    if ((int)contents.size() > ch->desc->max_str) {
@@ -104,7 +104,7 @@ public:
 	    }
 	    strcpy(*ch->desc->strnew, contents.c_str());
 	  }
-	  ch->desc->web_connected = CON_PLAYING;
+	  ch->desc->web_connected = conn::PLAYING;
 	  result = *(ch->desc->strnew);
 	  ch->desc->strnew = 0;
 	  send_to_char("Entry submitted.\n\r", ch);
@@ -123,7 +123,7 @@ public:
 	break;
       }
     } else {
-      ch->desc->web_connected = CON_PLAYING;
+      ch->desc->web_connected = conn::PLAYING;
     }
   }
 };
@@ -156,7 +156,7 @@ public:
 
     if (IS_PC(ch) && GET_LEVEL(ch) >= IMMORTAL) {
       switch(ch->desc->web_connected) {
-      case CON_EDIT_MPROG:
+      case conn::EDIT_MPROG:
 	result = "Obj or Mob program";
 	break;
       default:

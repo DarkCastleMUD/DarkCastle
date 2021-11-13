@@ -4845,7 +4845,7 @@ int zone_is_empty(int zone_nr)
 	struct descriptor_data *i;
 
 	for (i = descriptor_list; i; i = i->next)
-		if (STATE(i) == CON_PLAYING && i->character
+		if (STATE(i) == conn::PLAYING && i->character
 				&& world[i->character->in_room].zone == zone_nr)
 			return (0);
 

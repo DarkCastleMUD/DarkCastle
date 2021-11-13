@@ -222,7 +222,7 @@ int write_hotboot_file(char **new_argv)
   for (d = descriptor_list; d; d = sd)
   {
     sd = d->next;
-    if (STATE(d) != CON_PLAYING || !d->character || GET_LEVEL(d->character) < 2)
+    if (STATE(d) != conn::PLAYING || !d->character || GET_LEVEL(d->character) < 2)
     {
       // Kick out anyone not currently playing in the game.
       write_to_descriptor(d->descriptor, "We are rebooting, come back in a minute.");
@@ -230,7 +230,7 @@ int write_hotboot_file(char **new_argv)
     }
     else
     {
-      STATE(d) = CON_PLAYING; // if editors.
+      STATE(d) = conn::PLAYING; // if editors.
       if (d->original)
       {
         fprintf(fp, "%d\n%s\n%s\n", d->descriptor, GET_NAME(d->original), d->host);
@@ -426,7 +426,7 @@ void finish_hotboot()
 
     do_on_login_stuff(d->character);
 
-    STATE(d) = CON_PLAYING;
+    STATE(d) = conn::PLAYING;
   }
 
   for (d = descriptor_list; d; d = d->next)
@@ -778,13 +778,24 @@ void DC::game_loop(void)
     {
       next_d = d->next;
       d->wait = MAX(d->wait, 1);
-      if (d->connected == CON_CLOSE)
+      if (d->connected == conn::CLOSE)
       {
         close_socket(d); // So they don't have to type a command.
         continue;
       }
-      //debugpoint();
-      if ((--(d->wait) <= 0) && get_from_q(&d->input, comm, &aliased))
+      --(d->wait);
+      if (STATE(d) == conn::QUESTION_ANSI ||
+          STATE(d) == conn::QUESTION_SEX ||
+          STATE(d) == conn::QUESTION_STAT_METHOD ||
+          STATE(d) == conn::NEW_STAT_METHOD ||
+          STATE(d) == conn::OLD_STAT_METHOD ||
+          STATE(d) == conn::QUESTION_RACE ||
+          STATE(d) == conn::QUESTION_CLASS ||
+          STATE(d) == conn::QUESTION_STATS)
+      {
+        nanny(d,"");
+      }
+      else if ((d->wait <= 0) && get_from_q(&d->input, comm, &aliased))
       {
         /* reset the idle timer & pull char back from void if necessary */
         d->wait = 1;
@@ -794,13 +805,13 @@ void DC::game_loop(void)
           show_string(d, comm);
         //	else if (d->str)		/* writing boards, mail, etc.     */
         //	  string_add(d, comm);
-        else if (d->strnew && STATE(d) == CON_EXDSCR)
+        else if (d->strnew && STATE(d) == conn::EXDSCR)
           new_string_add(d, comm);
         else if (d->hashstr)
           string_hash_add(d, comm);
         else if (d->strnew && (IS_MOB(d->character) || !IS_SET(d->character->pcdata->toggles, PLR_EDITOR_WEB)))
           new_string_add(d, comm);
-        else if (d->connected != CON_PLAYING) /* in menus, etc. */
+        else if (d->connected != conn::PLAYING) /* in menus, etc. */
           nanny(d, comm);
         else
         {              /* else: we're playing normally */
@@ -831,11 +842,11 @@ void DC::game_loop(void)
       // this line processes a "get" or "post" if available.  Otherwise it prints the
       // entrance screen.  If a player has already entered their name, it processes
       // that too.
-      else if (d->connected == CON_DISPLAY_ENTRANCE)
+      else if (d->connected == conn::DISPLAY_ENTRANCE)
         nanny(d, "");
       // this line allows the mud to skip this descriptor until next pulse
-      else if (d->connected == CON_PRE_DISPLAY_ENTRANCE)
-        d->connected = CON_DISPLAY_ENTRANCE;
+      else if (d->connected == conn::PRE_DISPLAY_ENTRANCE)
+        d->connected = conn::DISPLAY_ENTRANCE;
       else
         d->idle_time++;
     } // for
@@ -1365,7 +1376,7 @@ void make_prompt(struct descriptor_data *d, char *prompt)
   {
     strcat(prompt, "] ");
   }
-  else if (STATE(d) != CON_PLAYING)
+  else if (STATE(d) != conn::PLAYING)
   {
     return;
   }
@@ -1776,7 +1787,7 @@ void write_to_output(const char *txt, struct descriptor_data *t)
   if (t->bufptr < 0)
     return;
 
-  if (t->connected != CON_EDITING && t->connected != CON_WRITE_BOARD && t->connected != CON_EDIT_MPROG)
+  if (t->connected != conn::EDITING && t->connected != conn::WRITE_BOARD && t->connected != conn::EDIT_MPROG)
   {
     temp = handle_ansi((char *)txt, t->character);
     txt = temp;
@@ -1785,7 +1796,7 @@ void write_to_output(const char *txt, struct descriptor_data *t)
   strncpy(buf, txt, MAX_STRING_LENGTH);
   size = strlen(buf);
 
-  if (t->character && IS_AFFECTED(t->character, AFF_INSANE) && t->connected == CON_PLAYING)
+  if (t->character && IS_AFFECTED(t->character, AFF_INSANE) && t->connected == conn::PLAYING)
   {
     //    temp = str_dup(txt);
     //    scramble_text(temp);
@@ -1935,7 +1946,7 @@ int new_descriptor(int s)
   /* prepend to list */
   descriptor_list = newd;
 
-  newd->connected = CON_PRE_DISPLAY_ENTRANCE;
+  newd->connected = conn::PRE_DISPLAY_ENTRANCE;
   return 0;
 }
 
@@ -1951,7 +1962,7 @@ int process_output(struct descriptor_data *t)
   strcpy(i + 2, t->output);
 
   extern void blackjack_prompt(CHAR_DATA * ch, char *prompt, bool ascii);
-  if (t->character && t->connected == CON_PLAYING)
+  if (t->character && t->connected == conn::PLAYING)
     blackjack_prompt(t->character, i, t->character->pcdata && !IS_SET(t->character->pcdata->toggles, PLR_ASCII));
   make_prompt(t, i);
 
@@ -2109,7 +2120,7 @@ int process_input(struct descriptor_data *t)
 
     /* search for a newline in the data we just read */
     for (ptr = read_point; *ptr && !nl_pos; ptr++)
-      if (ISNEWL(*ptr) || (t->connected != CON_WRITE_BOARD && t->connected != CON_EDITING && t->connected != CON_EDIT_MPROG && *ptr == '|'))
+      if (ISNEWL(*ptr) || (t->connected != conn::WRITE_BOARD && t->connected != conn::EDITING && t->connected != conn::EDIT_MPROG && *ptr == '|'))
         nl_pos = ptr;
 
     read_point += bytes_read;
@@ -2182,8 +2193,8 @@ int process_input(struct descriptor_data *t)
           tmp_ptr = (ptr + 1);
           if (isdigit(*tmp_ptr) || *tmp_ptr == 'I' || *tmp_ptr == 'L' ||
               *tmp_ptr == '*' || *tmp_ptr == 'R' ||
-              *tmp_ptr == 'B' || t->connected == CON_EDIT_MPROG ||
-              t->connected == CON_EDITING)
+              *tmp_ptr == 'B' || t->connected == conn::EDIT_MPROG ||
+              t->connected == conn::EDITING)
           { // write it like normal
             *write_point++ = *ptr;
             space_left--;
@@ -2265,13 +2276,13 @@ END OLD HERE */
 
     /* find the end of this line */
     //while (ISNEWL(*nl_pos))
-    while (ISNEWL(*nl_pos) || (t->connected != CON_WRITE_BOARD && t->connected != CON_EDITING && t->connected != CON_EDIT_MPROG && *nl_pos == '|'))
+    while (ISNEWL(*nl_pos) || (t->connected != conn::WRITE_BOARD && t->connected != conn::EDITING && t->connected != conn::EDIT_MPROG && *nl_pos == '|'))
       nl_pos++;
 
     /* see if there's another newline in the input buffer */
     read_point = ptr = nl_pos;
     for (nl_pos = NULL; *ptr && !nl_pos; ptr++)
-      if (ISNEWL(*ptr) || (t->connected != CON_WRITE_BOARD && t->connected != CON_EDITING && t->connected != CON_EDIT_MPROG && *ptr == '|'))
+      if (ISNEWL(*ptr) || (t->connected != conn::WRITE_BOARD && t->connected != conn::EDITING && t->connected != conn::EDIT_MPROG && *ptr == '|'))
         nl_pos = ptr;
     //if (ISNEWL(*ptr))
   }
@@ -2376,8 +2387,8 @@ int close_socket(struct descriptor_data *d)
   if (d->character)
   {
     // target_idnum = GET_IDNUM(d->character);
-    if (d->connected == CON_PLAYING || d->connected == CON_WRITE_BOARD ||
-        d->connected == CON_EDITING || d->connected == CON_EDIT_MPROG)
+    if (d->connected == conn::PLAYING || d->connected == conn::WRITE_BOARD ||
+        d->connected == conn::EDITING || d->connected == conn::EDIT_MPROG)
     {
       save_char_obj(d->character);
       // clan area stuff
@@ -2401,7 +2412,7 @@ int close_socket(struct descriptor_data *d)
       sprintf(buf, "Losing player: %s.",
               GET_NAME(d->character) ? GET_NAME(d->character) : "<null>");
       log(buf, ANGEL, LOG_SOCKET);
-      if (d->connected == CON_WRITE_BOARD || d->connected == CON_EDITING || d->connected == CON_EDIT_MPROG)
+      if (d->connected == conn::WRITE_BOARD || d->connected == conn::EDITING || d->connected == conn::EDIT_MPROG)
       {
         //		sprintf(buf, "Suspicious: %s.",
         //			GET_NAME(d->character));
@@ -2457,7 +2468,7 @@ void check_idle_passwords(void)
   for (d = descriptor_list; d; d = next_d)
   {
     next_d = d->next;
-    if (STATE(d) != CON_GET_OLD_PASSWORD && STATE(d) != CON_GET_NAME)
+    if (STATE(d) != conn::GET_OLD_PASSWORD && STATE(d) != conn::GET_NAME)
       continue;
     if (!d->idle_tics)
     {
@@ -2468,7 +2479,7 @@ void check_idle_passwords(void)
     {
       echo_on(d);
       SEND_TO_Q("\r\nTimed out... goodbye.\r\n", d);
-      STATE(d) = CON_CLOSE;
+      STATE(d) = conn::CLOSE;
     }
   }
 }
@@ -2875,10 +2886,10 @@ int is_busy(CHAR_DATA *ch)
 {
 
   if (ch->desc &&
-      ((ch->desc->connected == CON_WRITE_BOARD) ||
-       (ch->desc->connected == CON_SEND_MAIL) ||
-       (ch->desc->connected == CON_EDITING) ||
-       (ch->desc->connected == CON_EDIT_MPROG)))
+      ((ch->desc->connected == conn::WRITE_BOARD) ||
+       (ch->desc->connected == conn::SEND_MAIL) ||
+       (ch->desc->connected == conn::EDITING) ||
+       (ch->desc->connected == conn::EDIT_MPROG)))
     return 1;
 
   return (0);

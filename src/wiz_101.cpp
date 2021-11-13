@@ -604,7 +604,7 @@ int do_wiz(struct char_data *ch, char *argument, int cmd)
         if (cmd == CMD_IMPCHAN && !has_skill(i->character, COMMAND_IMP_CHAN))
           continue;
 
-        if (STATE(i) == CON_PLAYING)
+        if (STATE(i) == conn::PLAYING)
         {
           send_to_char(buf1, i->character);
         }

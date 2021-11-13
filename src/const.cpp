@@ -548,37 +548,6 @@ int rev_dir[] =
     4
 };
 
-const char *connected_states[] =
-{
-    "CON_PLAYING",
-    "CON_GET_NAME",
-    "CON_GET_OLD_PASSWORD",
-    "CON_CONFIRM_NEW_NAME",
-    "CON_GET_NEW_PASSWORD",
-    "CON_CONFIRM_NEW_PASSWORD",
-    "CON_GET_NEW_SEX",
-    "CON_GET_NEW_CLASS",
-    "CON_READ_MOTD",
-    "CON_SELECT_MENU",
-    "CON_RESET_PASSWORD",
-    "CON_CONFIRM_RESET_PASSWORD",
-    "CON_EXDSCR",
-    "CON_GET_RACE",
-    "CON_WRITE_BOARD",
-    "CON_EDITING",
-    "CON_SEND_MAIL",
-    "CON_DELETE_CHAR",
-    "CON_CHOOSE_STATS",
-    "CON_PFILE_WIPE",
-    "CON_ARCHIVE_CHAR",
-    "CON_CLOSE",
-    "CON_CONFIRM_PASSWORD_CHANGE",
-    "CON_EDIT_MPROG",
-    "CON_DISPLAY_ENTRANCE",
-    "CON_PRE_DISPLAY_ENTRANCE",
-    "\n"
-};
-
 int movement_loss[]=
 {
     1,  /* Inside     */
@@ -2336,33 +2305,100 @@ const char *position_types[] =
 };
 
 const char *connected_types[] =
-{
-    "Playing",
-    "Get name",
-    "Get old password",
-    "Confirm name",
-    "Get new password",
-    "Confirm new password",      // 5
-    "Get sex",
-    "Get new class",
-    "Read messages of today",
-    "Select Menu",
-    "Reset password",            // 10
-    "Confirm reset password",
-    "Get extra description",
-    "Get race",
-    "Write board",
-    "Editing",
-    "Sending Mail",
-    "Delete character screen",
-    "Choose stats",
-    "Pfile wipe",
-    "Archive char screen",
-    "Closing",
-    "Confirm password change",
-    "Editing mprog",
-    "\n"
-};
+    {
+        "Playing",
+        "Get name",
+        "Get old password",
+        "Confirm name",
+        "Get new password",
+        "Confirm new password", // 5
+        "Get sex",
+        "Old get class",
+        "Read messages of today",
+        "Select Menu",
+        "Reset password", // 10
+        "Confirm reset password",
+        "Get extra description",
+        "Old get race",
+        "Write board",
+        "Editing", // 15
+        "Sending Mail",
+        "Delete character screen",
+        "Choose stats",
+        "Pfile wipe",
+        "Archive char screen", // 20
+        "Closing",
+        "Confirm password change",
+        "Editing mprog",
+        "Display Entrance",
+        "Pre-display Entrance", // 25
+        "Select Recovery Menu",
+        "Get new recovery question",
+        "Get new recovery answer",
+        "Get new recovery email",
+        "Question ANSI", // 30
+        "Get ANSI",
+        "Question sex",
+        "Question stat method",
+        "Get stat method",
+        "Old stat method", // 35
+        "New stat method",
+        "New player",
+        "Question race",
+        "Get race",
+        "Question class", // 40
+        "Get Class",
+        "Question stats",
+        "Get stats",
+        "\n"};
+
+const char *connected_states[] =
+    {
+        "PLAYING", // 0
+        "GET_NAME",
+        "GET_OLD_PASSWORD",
+        "CONFIRM_NEW_NAME",
+        "GET_NEW_PASSWORD",
+        "CONFIRM_NEW_PASSWORD", // 5
+        "GET_NEW_SEX",
+        "OLD_GET_CLASS",
+        "READ_MOTD",
+        "SELECT_MENU",
+        "RESET_PASSWORD", // 10
+        "CONFIRM_RESET_PASSWORD",
+        "EXDSCR",
+        "OLD_GET_RACE",
+        "WRITE_BOARD",
+        "EDITING", // 15
+        "SEND_MAIL",
+        "DELETE_CHAR",
+        "OLD_CHOOSE_STATS",
+        "PFILE_WIPE",
+        "ARCHIVE_CHAR", // 20
+        "CLOSE",
+        "CONFIRM_PASSWORD_CHANGE",
+        "EDIT_MPROG",
+        "DISPLAY_ENTRANCE",
+        "PRE_DISPLAY_ENTRANCE", // 25
+        "SELECT_RECOVERY_MENU",
+        "GET_NEW_RECOVERY_QUESTION",
+        "GET_NEW_RECOVERY_ANSWER",
+        "GET_NEW_RECOVERY_EMAIL",
+        "QUESTION_ANSI", // 30
+        "GET_ANSI",
+        "QUESTION_SEX",
+        "QUESTION_STAT_METHOD",
+        "GET_STAT_METHOD",
+        "OLD_STAT_METHOD", // 35
+        "NEW_STAT_METHOD",
+        "NEW_PLAYER",
+        "QUESTION_RACE",
+        "GET_RACE",
+        "QUESTION_CLASS", // 40
+        "GET_CLASS",
+        "QUESTION_STATS",
+        "GET_STATS",
+        "\n"};
 
 // Constitution Attribute Modifiers
 const struct con_app_type con_app[] = {

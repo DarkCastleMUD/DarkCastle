@@ -698,20 +698,20 @@ void new_string_add(struct descriptor_data *d, char *str) {
 			}
 			d->backstr = NULL;
 			d->strnew = NULL;
-			if (d->connected == CON_WRITE_BOARD) {
+			if (d->connected == conn::WRITE_BOARD) {
 				if (d->character) {
-					d->connected = CON_PLAYING;
+					d->connected = conn::PLAYING;
 				}
 				new_edit_board_unlock_board(d->character, 1);
 			} else {
-				if (d->connected != CON_EXDSCR)
-					d->connected = CON_PLAYING;
+				if (d->connected != conn::EXDSCR)
+					d->connected = conn::PLAYING;
 
 			}
 			send_to_char("Aborted.\r\n", ch);
-			if (d->connected == CON_EXDSCR) {
+			if (d->connected == conn::EXDSCR) {
 				extern char menu[];
-				STATE(d) = CON_SELECT_MENU;
+				STATE(d) = conn::SELECT_MENU;
 				SEND_TO_Q(menu, d);
 			} else
 				check_for_awaymsgs(ch);
@@ -719,26 +719,26 @@ void new_string_add(struct descriptor_data *d, char *str) {
 			if (strlen(*d->strnew) == 0) {
 				SEND_TO_Q("You can't save blank messages, try /a for abort.\r\n", d);
 			} else {
-				if (STATE(d) == CON_EXDSCR)
+				if (STATE(d) == conn::EXDSCR)
 					save_char_obj(d->character);
 				if ((d->strnew) && (*d->strnew) && (**d->strnew == '\0') && !ishashed(*d->strnew) && STATE(d))
 					dc_free(*d->strnew);
 				d->backstr = NULL;
 				d->strnew = NULL;
-				if (d->connected == CON_WRITE_BOARD) {
+				if (d->connected == conn::WRITE_BOARD) {
 					if (d->character) {
-						d->connected = CON_PLAYING;
+						d->connected = conn::PLAYING;
 					}
 					new_edit_board_unlock_board(d->character, 0);
 				} else {
 					send_to_char("Ok.\n\r", ch);
 
-					if (d->connected != CON_EXDSCR) {
-						d->connected = CON_PLAYING;
+					if (d->connected != conn::EXDSCR) {
+						d->connected = conn::PLAYING;
 						check_for_awaymsgs(ch);
 					} else {
 						extern char menu[];
-						STATE(d) = CON_SELECT_MENU;
+						STATE(d) = conn::SELECT_MENU;
 						SEND_TO_Q(menu, d);
 					}
 				}

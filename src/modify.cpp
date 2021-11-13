@@ -110,7 +110,7 @@ void string_hash_add(struct descriptor_data *d, char *str) {
 		dc_free(*d->hashstr);
 		*d->hashstr = scan;
 		d->hashstr = 0;
-		d->connected = CON_PLAYING;
+		d->connected = conn::PLAYING;
 		send_to_char("Ok.\n\r", ch);
 		check_for_awaymsgs(ch);
 	} else
@@ -376,7 +376,7 @@ int do_string(CHAR_DATA *ch, char *arg, int cmd) {
 			(*ch->desc->hashstr) = (char *) dc_alloc(length[field - 1], sizeof(char));
 #endif
 		ch->desc->max_str = length[field - 1];
-		ch->desc->connected = CON_EDITING;
+		ch->desc->connected = conn::EDITING;
 	}
 	return 1;
 }

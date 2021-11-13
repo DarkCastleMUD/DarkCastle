@@ -8,37 +8,55 @@
 #include "structs.h"  // MAX_INPUT_LENGTH
 #include "comm.h"
  
-#define STATE(d)  ((d)->connected) 
-#define CON_PLAYING                        0 
-#define CON_GET_NAME                       1 
-#define CON_GET_OLD_PASSWORD               2
-#define CON_CONFIRM_NEW_NAME               3 
-#define CON_GET_NEW_PASSWORD               4
-#define CON_CONFIRM_NEW_PASSWORD           5 
-#define CON_GET_NEW_SEX                    6 
-#define CON_GET_NEW_CLASS                  7 
-#define CON_READ_MOTD                      8 
-#define CON_SELECT_MENU                    9 
-#define CON_RESET_PASSWORD                 10 
-#define CON_CONFIRM_RESET_PASSWORD         11 
-#define CON_EXDSCR                         12 
-#define CON_GET_RACE                       13 
-#define CON_WRITE_BOARD                    14 
-#define CON_EDITING                        15 
-#define CON_SEND_MAIL                      16 
-#define CON_DELETE_CHAR                    17
-#define CON_CHOOSE_STATS                   18 
-#define CON_PFILE_WIPE                     19 
-#define CON_ARCHIVE_CHAR                   20 
-#define CON_CLOSE                          21 
-#define CON_CONFIRM_PASSWORD_CHANGE        22
-#define CON_EDIT_MPROG                     23 
-#define CON_DISPLAY_ENTRANCE               24 
-#define CON_PRE_DISPLAY_ENTRANCE           25
-#define CON_SELECT_RECOVERY_MENU           26
-#define CON_GET_NEW_RECOVERY_QUESTION      27
-#define CON_GET_NEW_RECOVERY_ANSWER        28
-#define CON_GET_NEW_RECOVERY_EMAIL         29
+#define STATE(d)  ((d)->connected)
+
+enum conn
+{
+  PLAYING,
+  GET_NAME,
+  GET_OLD_PASSWORD,
+  CONFIRM_NEW_NAME,
+  GET_NEW_PASSWORD,
+  CONFIRM_NEW_PASSWORD,
+  GET_NEW_SEX,
+  OLD_GET_CLASS,
+  READ_MOTD,
+  SELECT_MENU,
+  RESET_PASSWORD,
+  CONFIRM_RESET_PASSWORD,
+  EXDSCR,
+  OLD_GET_RACE,
+  WRITE_BOARD,
+  EDITING,
+  SEND_MAIL,
+  DELETE_CHAR,
+  OLD_CHOOSE_STATS,
+  PFILE_WIPE,
+  ARCHIVE_CHAR,
+  CLOSE,
+  CONFIRM_PASSWORD_CHANGE,
+  EDIT_MPROG,
+  DISPLAY_ENTRANCE,
+  PRE_DISPLAY_ENTRANCE,
+  SELECT_RECOVERY_MENU,
+  GET_NEW_RECOVERY_QUESTION,
+  GET_NEW_RECOVERY_ANSWER,
+  GET_NEW_RECOVERY_EMAIL,
+  QUESTION_ANSI,
+  GET_ANSI,
+  QUESTION_SEX,
+  QUESTION_STAT_METHOD,
+  GET_STAT_METHOD,
+  OLD_STAT_METHOD,
+  NEW_STAT_METHOD,
+  NEW_PLAYER,
+  QUESTION_RACE,
+  GET_RACE,
+  QUESTION_CLASS,
+  GET_CLASS,
+  QUESTION_STATS,
+  GET_STATS
+};
 
 // if you change, make sure you update char *connected_states[] in const.C
 // also update connected_types[]
@@ -55,7 +73,7 @@ struct descriptor_data {
   int desc_num;
   char *name; /* Copy of the player name	*/
   char host[80]; /* hostname			*/
-  int connected; /* mode of 'connectedness'	*/
+  conn connected; /* mode of 'connectedness'	*/
   int web_connected;
   int wait; /* wait for how many loops	*/
   char *showstr_head; /* for paging through texts	*/
@@ -91,6 +109,7 @@ struct descriptor_data {
   char **strnew; /* for the modify-str system	*/
   char *backstr;
   int idle_time; // How long the descriptor has been idle, overall.
+  bool color;
 };
 
 #endif

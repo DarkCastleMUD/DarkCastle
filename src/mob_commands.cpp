@@ -899,7 +899,7 @@ int do_mptransfer( CHAR_DATA *ch, char *argument, int cmd )
     {
 	for ( d = descriptor_list; d != NULL; d = d->next )
 	{
-	    if ( d->connected == CON_PLAYING
+	    if ( d->connected == conn::PLAYING
 	    &&   d->character != ch
 	    &&   d->character->in_room == ch->in_room
 	    &&   CAN_SEE( ch, d->character ) )

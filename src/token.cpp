@@ -168,7 +168,7 @@ char * TokenList::Interpret(CHAR_DATA *from, OBJ_DATA *obj, void *vict_obj, CHAR
   if (send_to == nullptr) {
 	  return(0);
   }
-  if(send_to->desc && send_to->desc->connected != CON_PLAYING && !(flags & FORCE))
+  if(send_to->desc && send_to->desc->connected != conn::PLAYING && !(flags & FORCE))
     return(0);
   if(IS_SET(world[send_to->in_room].room_flags, QUIET) && !(flags & FORCE))
     return(0);

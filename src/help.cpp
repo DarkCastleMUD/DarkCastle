@@ -758,7 +758,7 @@ int do_hedit(struct char_data *ch, char *argument, int cmd)
             send_to_char(ch->desc->backstr, ch);
           }
 
-          ch->desc->connected = CON_EDITING;
+          ch->desc->connected = conn::EDITING;
           ch->desc->strnew = &(new_help_table[help_id].entry);
           ch->desc->max_str = MAX_HELP_LENGTH;
         } else {  // no idea wtf they are doing

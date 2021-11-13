@@ -2080,9 +2080,9 @@ int do_opedit(char_data *ch, char *argument, int cmd)
         ch->desc->max_str = MAX_MESSAGE_LENGTH;
 
 	if (IS_SET(ch->pcdata->toggles, PLR_EDITOR_WEB)) {
-	  ch->desc->web_connected = CON_EDIT_MPROG;
+	  ch->desc->web_connected = conn::EDIT_MPROG;
 	} else {
-	  ch->desc->connected = CON_EDIT_MPROG;
+	  ch->desc->connected = conn::EDIT_MPROG;
 
 	  send_to_char("        Write your help entry and stay within the line.(/s saves /h for help)\r\n"
 		       "|--------------------------------------------------------------------------------|\r\n", ch);

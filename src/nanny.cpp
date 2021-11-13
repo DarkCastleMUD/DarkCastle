@@ -930,7 +930,7 @@ void nanny(struct descriptor_data *d, char *arg)
    char *password;
    bool fOld;
    struct char_data *ch;
-   int x, y;
+   int y;
    char badclssmsg[] = "You must choose a class that matches your stats. These are marked by a '*'.\n\rSelect a class-> ";
 
    CHAR_DATA *get_pc(char *name);
@@ -940,9 +940,18 @@ void nanny(struct descriptor_data *d, char *arg)
 
    ch = d->character;
    if (arg)
+   {
+      // Removing leading spaces
       for (; isspace(*arg); arg++)
          ;
-   if (!str_prefix("help", arg) && (STATE(d) == CON_GET_NEW_CLASS || STATE(d) == CON_GET_RACE || STATE(d) == CON_CHOOSE_STATS))
+   }
+   if (!str_prefix("help", arg) && 
+      (STATE(d) == conn::OLD_GET_CLASS ||
+       STATE(d) == conn::OLD_GET_RACE ||
+       STATE(d) == conn::OLD_CHOOSE_STATS ||
+       STATE(d) == conn::GET_CLASS ||
+       STATE(d) == conn::GET_RACE ||
+       STATE(d) == conn::GET_STATS))
    {
       do_new_help(d->character, arg + 5, 88);
       return;
@@ -956,13 +965,13 @@ void nanny(struct descriptor_data *d, char *arg)
       close_socket(d);
       return;
 
-   case CON_PRE_DISPLAY_ENTRANCE:
-      // _shouldn't_ get here, but if we do, let it fall through to CON_DISPLAY_ENTRANCE
+   case conn::PRE_DISPLAY_ENTRANCE:
+      // _shouldn't_ get here, but if we do, let it fall through to conn::DISPLAY_ENTRANCE
       // This is here to allow the mud to 'skip' this descriptor until the next pulse on
       // a new connection.  That allows the "GET" and "POST" from a webbrowser to get there.
       // no break;
 
-   case CON_DISPLAY_ENTRANCE:
+   case conn::DISPLAY_ENTRANCE:
 
       // Check for people trying to connect to a webserver
       if (!strncmp(arg, "GET", 3) || !strncmp(arg, "POST", 4))
@@ -974,20 +983,25 @@ void nanny(struct descriptor_data *d, char *arg)
       }
 
       // if it's not a webbrowser, display the entrance greeting
-
-      x = number(1, 100);
-      if (x > 75)
+      switch(number(1, 4))
+      {
+         default:
+         case 1:
          SEND_TO_Q(greetings1, d);
-      else if (x > 50)
+         break;
+
+         case 2:
          SEND_TO_Q(greetings2, d);
-      else if (x > 25)
+         break;
+
+         case 3:
          SEND_TO_Q(greetings3, d);
-      else
+         break;
+
+         case 4:
          SEND_TO_Q(greetings4, d);
-      /*
-      else if(x < 75)
-        SEND_TO_Q(greetings3, d);  // greeting 3 is the dc++ one we don't use now
-*/
+         break;
+      }
 
       if (count_IP_connections(d))
          break;
@@ -997,14 +1011,14 @@ void nanny(struct descriptor_data *d, char *arg)
       }
       SEND_TO_Q("What name for the roster? ", d);
       telnet_ga(d);
-      STATE(d) = CON_GET_NAME;
+      STATE(d) = conn::GET_NAME;
 
       // if they have already entered their name, drop through.  Otherwise stop and wait for input
       if (!*arg)
          break;
       /* no break */
 
-   case CON_GET_NAME:
+   case conn::GET_NAME:
 
       if (!*arg)
       {
@@ -1053,8 +1067,8 @@ void nanny(struct descriptor_data *d, char *arg)
       // doing it to fix it.  (No time to verify this now, so i'll do it later)
       GET_NAME(ch) = str_dup(tmp_name);
 
-      if (allowed_host(d->host))
-         SEND_TO_Q("You are logging in from an ALLOWED host.\r\n", d);
+      // if (allowed_host(d->host))
+      // SEND_TO_Q("You are logging in from an ALLOWED host.\r\n", d);
 
       if (check_reconnect(d, tmp_name, FALSE))
          fOld = TRUE;
@@ -1065,36 +1079,31 @@ void nanny(struct descriptor_data *d, char *arg)
          return;
       }
 
-      //      if (bport && GET_LEVEL(ch) < 100 && strcmp(GET_NAME(ch), "Ubertestchar"))
-      //	{
-      //		send_to_char("Mortals not allowed on this port.\r\n",ch);
-      //		close_socket(d);
-      //	}
       if (fOld)
       {
          /* Old player */
          SEND_TO_Q("Password: ", d);
          telnet_ga(d);
-         STATE(d) = CON_GET_OLD_PASSWORD;
+         STATE(d) = conn::GET_OLD_PASSWORD;
          return;
       }
       else
       {
-         if (DC::instance().cf.bport && strcmp(tmp_name, "Ubertestchar"))
+         if (DC::instance().cf.bport)
          {
             SEND_TO_Q("New chars not allowed on this port.\r\nEnter a new name: ", d);
             return;
          }
          /* New player */
-         sprintf(buf, "Did I get that right, %s (Y/N)? ", tmp_name);
+         sprintf(buf, "Did I get that right, %s (y/n)? ", tmp_name);
          SEND_TO_Q(buf, d);
          telnet_ga(d);
-         STATE(d) = CON_CONFIRM_NEW_NAME;
+         STATE(d) = conn::CONFIRM_NEW_NAME;
          return;
       }
       break;
 
-   case CON_GET_OLD_PASSWORD:
+   case conn::GET_OLD_PASSWORD:
       SEND_TO_Q("\n\r", d);
 
       // Default is to authenticate against character password
@@ -1184,10 +1193,10 @@ void nanny(struct descriptor_data *d, char *arg)
          SEND_TO_Q(buf, d);
       }
       check_for_sold_items(d->character);
-      STATE(d) = CON_READ_MOTD;
+      STATE(d) = conn::READ_MOTD;
       break;
 
-   case CON_CONFIRM_NEW_NAME:
+   case conn::CONFIRM_NEW_NAME:
       switch (*arg)
       {
       case 'y':
@@ -1201,13 +1210,13 @@ void nanny(struct descriptor_data *d, char *arg)
             SEND_TO_Q("Sorry, new chars are not allowed from your site.\n\r"
                       "Questions may be directed to imps@dcastle.org\n\r",
                       d);
-            STATE(d) = CON_CLOSE;
+            STATE(d) = conn::CLOSE;
             return;
          }
          sprintf(buf, "New character.\n\rGive me a password for %s: ", GET_NAME(ch));
          SEND_TO_Q(buf, d);
          telnet_ga(d);
-         STATE(d) = CON_GET_NEW_PASSWORD;
+         STATE(d) = conn::GET_NEW_PASSWORD;
          // at this point, pcdata hasn't yet been created.  So we're going to go ahead and
          // allocate it since a new character is obviously a PC
 #ifdef LEAK_CHECK
@@ -1226,17 +1235,17 @@ void nanny(struct descriptor_data *d, char *arg)
          GET_NAME(ch) = NULL;
          dc_free(d->character);
          d->character = NULL;
-         STATE(d) = CON_GET_NAME;
+         STATE(d) = conn::GET_NAME;
          break;
 
       default:
-         SEND_TO_Q("Please type Yes or No? ", d);
+         SEND_TO_Q("Please type y or n: ", d);
          telnet_ga(d);
          break;
       }
       break;
 
-   case CON_GET_NEW_PASSWORD:
+   case conn::GET_NEW_PASSWORD:
       SEND_TO_Q("\n\r", d);
 
       if (arg == 0 || strlen(arg) < 6)
@@ -1250,26 +1259,52 @@ void nanny(struct descriptor_data *d, char *arg)
       ch->pcdata->pwd[PASSWORD_LEN] = '\0';
       SEND_TO_Q("Please retype password: ", d);
       telnet_ga(d);
-      STATE(d) = CON_CONFIRM_NEW_PASSWORD;
+      STATE(d) = conn::CONFIRM_NEW_PASSWORD;
       break;
 
-   case CON_CONFIRM_NEW_PASSWORD:
+   case conn::CONFIRM_NEW_PASSWORD:
       SEND_TO_Q("\n\r", d);
 
       if (strncmp((char *)crypt((char *)arg, (char *)ch->pcdata->pwd), ch->pcdata->pwd, PASSWORD_LEN))
       {
          SEND_TO_Q("Passwords don't match.\n\rRetype password: ", d);
          telnet_ga(d);
-         STATE(d) = CON_GET_NEW_PASSWORD;
+         STATE(d) = conn::GET_NEW_PASSWORD;
          return;
       }
 
-      SEND_TO_Q("What is your sex (M/F)? ", d);
+   case conn::QUESTION_ANSI:
+      SEND_TO_Q("Do you want ANSI color (y/n)? ", d);
       telnet_ga(d);
-      STATE(d) = CON_GET_NEW_SEX;
+      STATE(d) = conn::GET_ANSI;
       break;
 
-   case CON_GET_NEW_SEX:
+   case conn::GET_ANSI:
+      switch (*arg)
+      {         
+      case 'y':
+      case 'Y':
+         d->color = true;
+         break;
+      case 'n':
+      case 'N':
+         d->color = false;
+         break;
+      default:
+         STATE(d) = conn::QUESTION_ANSI;
+         return;
+      }
+
+      STATE(d) = conn::QUESTION_SEX;
+      break;
+
+   case conn::QUESTION_SEX:
+      SEND_TO_Q("What is your sex (m/f)? ", d);
+      telnet_ga(d);
+      STATE(d) = conn::GET_NEW_SEX;
+      break;
+
+   case conn::GET_NEW_SEX:
       switch (*arg)
       {
       case 'm':
@@ -1281,22 +1316,98 @@ void nanny(struct descriptor_data *d, char *arg)
          ch->sex = SEX_FEMALE;
          break;
       default:
-         SEND_TO_Q("That's not a sex.\n\rWhat IS your sex? ", d);
-         telnet_ga(d);
+         SEND_TO_Q("That's not a sex.\r\n", d);
+         STATE(d) = conn::QUESTION_SEX;
          return;
       }
 
-#ifdef LEAK_CHECK
-      ch->desc->stats = (struct stat_shit *)calloc(1, sizeof(struct stat_shit));
-#else
-      ch->desc->stats = (struct stat_shit *)dc_alloc(1, sizeof(struct stat_shit));
-#endif
+      SEND_TO_Q("\r\n", d);
+      SEND_TO_Q("$R$7Note: If you see a word that is entirely CAPITALIZED and $Bbold$R then there\r\n", d);
+      SEND_TO_Q("exists a helpfile for that word which you can lookup with the command\r\n", d);
+      SEND_TO_Q("help keyword.\r\n", d);
+      SEND_TO_Q("\r\n", d);
+      SEND_TO_Q("Dark Castle supports two ways of picking your race, class and initial\r\n", d);
+      SEND_TO_Q("$BATTRIBUTES$R such as $BSTRENGTH$R, $BDEXTERITY$R, $BCONSTITUION$R, $BINTELLIGENCE$R\r\n", d);
+      SEND_TO_Q("or $BWISDOM$R.\r\n\r\n", d);
+      SEND_TO_Q("The newest method is you first pick a race, a class then you get 13 points\r\n", d);
+      SEND_TO_Q("in each attribute and 18 points you can divide among those five\r\n", d);
+      SEND_TO_Q("attributes.\r\n\r\n", d);
+      SEND_TO_Q("The old method is you roll virtual dice. The virtual dice consist of either\r\n", d);
+      SEND_TO_Q("three 6-sided dice or six 3-sided dice. The game picks the larger group of\r\n", d);
+      SEND_TO_Q("those two separate sets of dice rolls and throws out any sets with a sum less\r\n", d);
+      SEND_TO_Q("than 12. You can roll virtual dice as many times as you like. After you finish\r\n", d);
+      SEND_TO_Q("rolling dice then the game shows you what races you can pick based on the dice\r\n", d);
+      SEND_TO_Q("rolls. After picking from the races your dice rolls allow then you have to\r\n", d);
+      SEND_TO_Q("pick a class that fits your choosen stats.\r\n", d);
+      STATE(d) = conn::QUESTION_STAT_METHOD;
+      return;
 
-      STATE(d) = CON_CHOOSE_STATS;
+   case conn::QUESTION_STAT_METHOD:
+      SEND_TO_Q("\r\n", d);
+      SEND_TO_Q("1. Pick race, class then assign points to attributes. (new method)\r\n", d);
+      SEND_TO_Q("2. Roll virtual dice for attributes then pick race and class. (old method)\r\n", d);      
+      SEND_TO_Q("What is your choice (1,2)? ", d);
+      telnet_ga(d);
+      STATE(d) = conn::GET_STAT_METHOD;
+      break;
+
+   case conn::GET_STAT_METHOD:
+      if (arg[0] == '1')
+      {
+         STATE(d) = conn::NEW_STAT_METHOD;
+      }
+      else if (arg[0] == '2')
+      {
+         STATE(d) = conn::OLD_STAT_METHOD;
+      }
+      else
+      {
+         STATE(d) = conn::QUESTION_STAT_METHOD;
+      }
+      break;
+
+   case conn::NEW_STAT_METHOD:
+      STATE(d) = conn::QUESTION_RACE;
+      break;
+
+   case conn::QUESTION_RACE:
+      STATE(d) = conn::GET_RACE;
+      break;
+   
+   case conn::GET_RACE:
+      STATE(d) = conn::QUESTION_RACE;
+      STATE(d) = conn::QUESTION_CLASS;
+      break;
+
+   case conn::QUESTION_CLASS:
+      STATE(d) = conn::GET_CLASS;
+      break;
+   
+   case conn::GET_CLASS:
+      STATE(d) = conn::QUESTION_CLASS;
+      STATE(d) = conn::QUESTION_STATS;
+      break;
+
+   case conn::QUESTION_STATS:
+      break;
+
+   case conn::GET_STATS:
+      STATE(d) = conn::QUESTION_STATS;
+      STATE(d) = conn::NEW_PLAYER;
+      break;
+   
+   case conn::OLD_STAT_METHOD:
+      if (ch->desc->stats != nullptr)
+      {
+         free(ch->desc->stats);
+      }
+      ch->desc->stats = (struct stat_shit *)dc_alloc(1, sizeof(struct stat_shit));
+
+      STATE(d) = conn::OLD_CHOOSE_STATS;
       *arg = '\0';
       // break;  no break on purpose...might as well do this now.  no point in waiting
 
-   case CON_CHOOSE_STATS:
+   case conn::OLD_CHOOSE_STATS:
 
       if (*arg != '\0')
          *(arg + 1) = '\0';
@@ -1311,7 +1422,7 @@ void nanny(struct descriptor_data *d, char *arg)
          GET_RAW_DEX(ch) = ch->desc->stats->dex[y - 1];
          GET_RAW_CON(ch) = ch->desc->stats->con[y - 1];
          dc_free(ch->desc->stats);
-         ch->desc->stats = NULL;
+         ch->desc->stats = nullptr;
          SEND_TO_Q("\n\rChoose a race(races you can select are marked with a *).\n\r", d);
          sprintf(buf, "  %c1: Human\n\r  %c2: Elf\n\r  %c3: Dwarf\n\r"
                       "  %c4: Hobbit\n\r  %c5: Pixie\n\r  %c6: Ogre\n\r"
@@ -1322,13 +1433,13 @@ void nanny(struct descriptor_data *d, char *arg)
 
          SEND_TO_Q(buf, d);
          telnet_ga(d);
-         STATE(d) = CON_GET_RACE;
+         STATE(d) = conn::OLD_GET_RACE;
          break;
       }
       roll_and_display_stats(ch);
       break;
 
-   case CON_GET_RACE:
+   case conn::OLD_GET_RACE:
       switch (*arg)
       {
       default:
@@ -1490,10 +1601,10 @@ void nanny(struct descriptor_data *d, char *arg)
               (is_clss_eligible(ch, CLASS_DRUID) ? '*' : ' '));
       SEND_TO_Q(buf, d);
       telnet_ga(d);
-      STATE(d) = CON_GET_NEW_CLASS;
+      STATE(d) = conn::OLD_GET_CLASS;
       break;
 
-   case CON_GET_NEW_CLASS:
+   case conn::OLD_GET_CLASS:
       switch (atoi(arg))
       {
       default:
@@ -1592,6 +1703,10 @@ void nanny(struct descriptor_data *d, char *arg)
          GET_CLASS(ch) = CLASS_DRUID;
          break;
       }
+      STATE(d) = conn::NEW_PLAYER;
+      break;
+
+   case conn::NEW_PLAYER:
 
       init_char(ch);
 
@@ -1602,16 +1717,16 @@ void nanny(struct descriptor_data *d, char *arg)
       SEND_TO_Q("\n\rIf you have read this motd, press Return.", d);
       telnet_ga(d);
 
-      STATE(d) = CON_READ_MOTD;
+      STATE(d) = conn::READ_MOTD;
       break;
 
-   case CON_READ_MOTD:
+   case conn::READ_MOTD:
       SEND_TO_Q(menu, d);
       telnet_ga(d);
-      STATE(d) = CON_SELECT_MENU;
+      STATE(d) = conn::SELECT_MENU;
       break;
 
-   case CON_SELECT_MENU:
+   case conn::SELECT_MENU:
       switch (*arg)
       {
       case '0':
@@ -1625,7 +1740,7 @@ void nanny(struct descriptor_data *d, char *arg)
          if (GET_LEVEL(ch) > 0)
          {
             strcpy(tmp_name, GET_NAME(ch));
-            free_char(d->character, Trace("nanny CON_SELECT_MENU 1"));
+            free_char(d->character, Trace("nanny conn::SELECT_MENU 1"));
             d->character = 0;
             load_char_obj(d, tmp_name);
             ch = d->character;
@@ -1668,7 +1783,7 @@ void nanny(struct descriptor_data *d, char *arg)
          update_wizlist(ch);
          check_maxes(ch); // Check skill maxes.
 
-         STATE(d) = CON_PLAYING;
+         STATE(d) = conn::PLAYING;
          if (GET_LEVEL(ch) == 0)
          {
             do_start(ch);
@@ -1707,27 +1822,27 @@ void nanny(struct descriptor_data *d, char *arg)
 
          d->strnew = &ch->description;
          d->max_str = 539;
-         STATE(d) = CON_EXDSCR;
+         STATE(d) = conn::EXDSCR;
          break;
 
       case '3':
          SEND_TO_Q("Enter current password: ", d);
          telnet_ga(d);
-         STATE(d) = CON_CONFIRM_PASSWORD_CHANGE;
+         STATE(d) = conn::CONFIRM_PASSWORD_CHANGE;
          break;
 
       case '4':
          // Archive the charater
          SEND_TO_Q("This will archive your character until you ask to be unarchived.\n\rYou will need to speak to a god greater than level 107.\n\rType ARCHIVE ME if this is what you want:  ", d);
          telnet_ga(d);
-         STATE(d) = CON_ARCHIVE_CHAR;
+         STATE(d) = conn::ARCHIVE_CHAR;
          break;
 
       case '5':
          // delete this character
          SEND_TO_Q("This will _permanently_ erase you.\n\rType ERASE ME if this is really what you want: ", d);
          telnet_ga(d);
-         STATE(d) = CON_DELETE_CHAR;
+         STATE(d) = conn::DELETE_CHAR;
          break;
 
       default:
@@ -1737,7 +1852,7 @@ void nanny(struct descriptor_data *d, char *arg)
       }
       break;
 
-   case CON_ARCHIVE_CHAR:
+   case conn::ARCHIVE_CHAR:
       if (!strcmp(arg, "ARCHIVE ME"))
       {
          str_tmp << GET_NAME(d->character);
@@ -1748,12 +1863,12 @@ void nanny(struct descriptor_data *d, char *arg)
       }
       else
       {
-         STATE(d) = CON_SELECT_MENU;
+         STATE(d) = conn::SELECT_MENU;
          SEND_TO_Q(menu, d);
       }
       break;
 
-   case CON_DELETE_CHAR:
+   case conn::DELETE_CHAR:
       if (!strcmp(arg, "ERASE ME"))
       {
          sprintf(buf, "%s just deleted themself.", d->character->name);
@@ -1776,30 +1891,30 @@ void nanny(struct descriptor_data *d, char *arg)
       }
       else
       {
-         STATE(d) = CON_SELECT_MENU;
+         STATE(d) = conn::SELECT_MENU;
          SEND_TO_Q(menu, d);
          telnet_ga(d);
       }
       break;
 
-   case CON_CONFIRM_PASSWORD_CHANGE:
+   case conn::CONFIRM_PASSWORD_CHANGE:
       SEND_TO_Q("\n\r", d);
       if (!strncmp((char *)crypt((char *)arg, (char *)ch->pcdata->pwd), ch->pcdata->pwd, PASSWORD_LEN))
       {
          SEND_TO_Q("Enter a new password: ", d);
          telnet_ga(d);
-         STATE(d) = CON_RESET_PASSWORD;
+         STATE(d) = conn::RESET_PASSWORD;
          break;
       }
       else
       {
          SEND_TO_Q("Incorrect.", d);
-         STATE(d) = CON_SELECT_MENU;
+         STATE(d) = conn::SELECT_MENU;
          SEND_TO_Q(menu, d);
       }
       break;
 
-   case CON_RESET_PASSWORD:
+   case conn::RESET_PASSWORD:
       SEND_TO_Q("\n\r", d);
 
       if (strlen(arg) < 6)
@@ -1812,30 +1927,30 @@ void nanny(struct descriptor_data *d, char *arg)
       ch->pcdata->pwd[PASSWORD_LEN] = '\0';
       SEND_TO_Q("Please retype password: ", d);
       telnet_ga(d);
-      STATE(d) = CON_CONFIRM_RESET_PASSWORD;
+      STATE(d) = conn::CONFIRM_RESET_PASSWORD;
       break;
 
-   case CON_CONFIRM_RESET_PASSWORD:
+   case conn::CONFIRM_RESET_PASSWORD:
       SEND_TO_Q("\n\r", d);
 
       if (strncmp((char *)crypt((char *)arg, (char *)ch->pcdata->pwd), ch->pcdata->pwd, PASSWORD_LEN))
       {
          SEND_TO_Q("Passwords don't match.\n\rRetype password: ", d);
          telnet_ga(d);
-         STATE(d) = CON_RESET_PASSWORD;
+         STATE(d) = conn::RESET_PASSWORD;
          return;
       }
 
       SEND_TO_Q("\n\rDone.\n\r", d);
       SEND_TO_Q(menu, d);
-      STATE(d) = CON_SELECT_MENU;
+      STATE(d) = conn::SELECT_MENU;
       if (GET_LEVEL(ch) > 1)
       {
          char blah1[50], blah2[50];
          // this prevents a dupe bug
          strcpy(blah1, GET_NAME(ch));
          strcpy(blah2, ch->pcdata->pwd);
-         free_char(d->character, Trace("nanny CON_CONFIRM_RESET_PASSWORD"));
+         free_char(d->character, Trace("nanny conn::CONFIRM_RESET_PASSWORD"));
          d->character = 0;
          load_char_obj(d, blah1);
          ch = d->character;
@@ -1846,7 +1961,7 @@ void nanny(struct descriptor_data *d, char *arg)
       }
 
       break;
-   case CON_CLOSE:
+   case conn::CLOSE:
       close_socket(d);
       break;
    }
@@ -1958,7 +2073,7 @@ bool check_reconnect(struct descriptor_data *d, char *name, bool fReconnect)
             log(log_buf, GET_LEVEL(tmp_ch), LOG_SOCKET);
          }
 
-         STATE(d) = CON_PLAYING;
+         STATE(d) = conn::PLAYING;
       }
       return TRUE;
    }
@@ -1991,10 +2106,10 @@ bool check_playing(struct descriptor_data *d, char *name)
       if (str_cmp(name, GET_NAME(compare)))
          continue;
 
-      if (STATE(dold) == CON_GET_NAME)
+      if (STATE(dold) == conn::GET_NAME)
          continue;
 
-      if (STATE(dold) == CON_GET_OLD_PASSWORD)
+      if (STATE(dold) == conn::GET_OLD_PASSWORD)
       {
          free_char(dold->character, Trace("check_playing"));
          dold->character = 0;

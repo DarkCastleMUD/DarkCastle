@@ -400,8 +400,8 @@ int do_who(struct char_data *ch, char *argument, int cmd)
 	break;
       }
         
-      if ((d->connected) && (d->connected) != CON_WRITE_BOARD && (d->connected) != CON_EDITING
-	  && (d->connected) != CON_EDIT_MPROG) {
+      if ((d->connected) && (d->connected) != conn::WRITE_BOARD && (d->connected) != conn::EDITING
+	  && (d->connected) != conn::EDIT_MPROG) {
 	continue;
       }
         
@@ -526,8 +526,8 @@ int do_who(struct char_data *ch, char *argument, int cmd)
 	numPC++;
       }
       
-      if ((d->connected) == CON_WRITE_BOARD || (d->connected) == CON_EDITING ||
-	  (d->connected) == CON_EDIT_MPROG) {
+      if ((d->connected) == conn::WRITE_BOARD || (d->connected) == conn::EDITING ||
+	  (d->connected) == conn::EDIT_MPROG) {
 	strcpy(tailBuf, "$1$B(writing) ");
       } else {
 	*tailBuf = '\0'; // clear it
@@ -653,7 +653,7 @@ int do_where(struct char_data *ch, char *argument, int cmd)
   if (GET_LEVEL(ch) >= IMMORTAL && *buf && !strcmp(buf, "all")) { //  immortal noly, shows all
     send_to_char("All Players:\n\r--------\n\r", ch);
     for (d = descriptor_list; d; d = d->next) {
-      if (d->character && (d->connected == CON_PLAYING) && (CAN_SEE(ch, d->character)) && (d->character->in_room != NOWHERE)) {
+      if (d->character && (d->connected == conn::PLAYING) && (CAN_SEE(ch, d->character)) && (d->character->in_room != NOWHERE)) {
         if (d->original) {  // If switched
           csendf(ch, "%-20s - %s$R [%d] In body of %s\n\r", d->original->name, world[d->character->in_room].name,
                  world[d->character->in_room].number, fname(d->character->name));
@@ -666,7 +666,7 @@ int do_where(struct char_data *ch, char *argument, int cmd)
   } else if (GET_LEVEL(ch) >= IMMORTAL && *buf) { // immortal only, shows ONE person
     send_to_char("Search of Players:\n\r--------\n\r", ch);
     for (d = descriptor_list; d; d = d->next) {
-      if (d->character && (d->connected == CON_PLAYING) && (CAN_SEE(ch, d->character)) && (d->character->in_room != NOWHERE)) {
+      if (d->character && (d->connected == conn::PLAYING) && (CAN_SEE(ch, d->character)) && (d->character->in_room != NOWHERE)) {
         if (d->original) {  // If switched
           if (is_abbrev(buf, d->original->name)) {
             csendf(ch, "%-20s - %s$R [%d] In body of %s\n\r", d->original->name, world[d->character->in_room].name,
@@ -686,7 +686,7 @@ int do_where(struct char_data *ch, char *argument, int cmd)
     if (IS_SET(world[ch->in_room].room_flags, NO_WHERE))
        return eFAILURE;
     for (d = descriptor_list; d; d = d->next) {
-      if (d->character && (d->connected == CON_PLAYING) && (d->character->in_room != NOWHERE) &&
+      if (d->character && (d->connected == conn::PLAYING) && (d->character->in_room != NOWHERE) &&
           !IS_SET(world[d->character->in_room].room_flags, NO_WHERE) &&
  	  CAN_SEE(ch, d->character) && !IS_MOB(d->character) /*Don't show snooped mobs*/)  {
           if (world[d->character->in_room].zone == zonenumber)

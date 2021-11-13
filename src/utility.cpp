@@ -1937,11 +1937,11 @@ bool is_in_game(char_data *ch)
   }
 
   switch(STATE(ch->desc)) {
-  case CON_PLAYING:
-  case CON_EDIT_MPROG:
-  case CON_WRITE_BOARD:
-  case CON_EDITING:
-  case CON_SEND_MAIL:
+  case conn::PLAYING:
+  case conn::EDIT_MPROG:
+  case conn::WRITE_BOARD:
+  case conn::EDITING:
+  case conn::SEND_MAIL:
     return true;
     break;
   }
