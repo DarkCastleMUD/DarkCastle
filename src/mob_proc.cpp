@@ -1807,6 +1807,11 @@ int deth (struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     if(cmd)
       return eFAILURE;
 
+    if (number(1,4) != 1)
+    {
+      return eFAILURE;
+    }
+
     x = number ( 0, DETH_SAY_TEXT_SIZE * 120 );
 
     if ((unsigned) x < DETH_SAY_TEXT_SIZE) {
