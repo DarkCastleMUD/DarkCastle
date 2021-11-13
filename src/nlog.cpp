@@ -165,7 +165,7 @@ char * handle_ansi(char * s, char_data * ch)
     if(*sp != '$') {
       *tp++ = *sp++;
     } else {
-       if(IS_MOB(ch) || IS_SET(ch->pcdata->toggles, PLR_ANSI)) {
+       if(IS_MOB(ch) || IS_SET(ch->pcdata->toggles, PLR_ANSI) || (ch->desc && ch->desc->color)) {
           switch(*++sp) {
 //             case 'B':  i = BLACK; break;
 //             case 'R':  i = RED; break;
