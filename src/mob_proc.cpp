@@ -1804,7 +1804,7 @@ int chain_gossips(char_data *ch, struct obj_data *obj, int cmd, char *arg, char_
   if (cmd)
     return eFAILURE;
 
-  if (number(1, 120) != 1)
+  if (number(1, 240) != 1)
   {
     return eFAILURE;
   }
