@@ -35,15 +35,15 @@ extern CWorld world;
 // local function declarations
 
 
-DO_FUN innate_powerwield;
-DO_FUN innate_regeneration;
-DO_FUN innate_illusion;
-DO_FUN innate_repair;
-DO_FUN innate_focus;
-DO_FUN innate_evasion;
-DO_FUN innate_shadowslip;
-DO_FUN innate_bloodlust;
-DO_FUN innate_fly;
+int innate_powerwield (CHAR_DATA *ch, char *argument, int cmd);
+int innate_regeneration (CHAR_DATA *ch, char *argument, int cmd);
+int innate_illusion (CHAR_DATA *ch, char *argument, int cmd);
+int innate_repair (CHAR_DATA *ch, char *argument, int cmd);
+int innate_focus (CHAR_DATA *ch, char *argument, int cmd);
+int innate_evasion (CHAR_DATA *ch, char *argument, int cmd);
+int innate_shadowslip (CHAR_DATA *ch, char *argument, int cmd);
+int innate_bloodlust (CHAR_DATA *ch, char *argument, int cmd);
+int innate_fly (CHAR_DATA *ch, char *argument, int cmd);
 
 ////////////////////////////////////////////////////////////////////////////
 // local definitions
