@@ -769,7 +769,7 @@ void add_set_stats(char_data *ch, obj_data *obj, int flag, int pos)
           break;
         case SET_BLACKSTEEL:
           af.bitvector = AFF_FLYING;
-          af.location = 0;
+          af.location = APPLY_FLY;
           af.modifier = 0;
           affect_to_char(ch, &af);
 
