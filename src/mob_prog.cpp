@@ -3831,111 +3831,150 @@ int mprog_random_trigger( CHAR_DATA *mob )
 
 int mprog_load_trigger(CHAR_DATA *mob)
 {
-  mprog_cur_result = eSUCCESS;
-  if ((mob_index[mob->mobdata->nr].progtypes & LOAD_PROG) && isPaused(mob) == false)
-     mprog_percent_check(mob, NULL, NULL, NULL, LOAD_PROG);
-  return mprog_cur_result;
+	if (!mob || isDead(mob) || isNowhere(mob))
+	{
+		return eFAILURE;
+	}
+
+	mprog_cur_result = eSUCCESS;
+	if ((mob_index[mob->mobdata->nr].progtypes & LOAD_PROG) && isPaused(mob) == false)
+		mprog_percent_check(mob, NULL, NULL, NULL, LOAD_PROG);
+	return mprog_cur_result;
 }
 
-int mprog_arandom_trigger( CHAR_DATA *mob)
+int mprog_arandom_trigger(CHAR_DATA *mob)
 {
-  mprog_cur_result = eSUCCESS;
-  if ((mob_index[mob->mobdata->nr].progtypes & ARAND_PROG) && isPaused(mob) == false)
-     mprog_percent_check(mob,NULL,NULL,NULL,ARAND_PROG);
-   return mprog_cur_result;
-}
- 
-int mprog_can_see_trigger( CHAR_DATA *ch, CHAR_DATA *mob )
-{
-  mprog_cur_result = eSUCCESS;
-  if ((mob_index[mob->mobdata->nr].progtypes & CAN_SEE_PROG) && isPaused(mob) == false)
-     mprog_percent_check(mob,ch,NULL,NULL,CAN_SEE_PROG);
-
- return mprog_cur_result;
+	if (!mob || isDead(mob) || isNowhere(mob))
+	{
+		return eFAILURE;
+	}
+	mprog_cur_result = eSUCCESS;
+	if ((mob_index[mob->mobdata->nr].progtypes & ARAND_PROG) && isPaused(mob) == false)
+		mprog_percent_check(mob, NULL, NULL, NULL, ARAND_PROG);
+	return mprog_cur_result;
 }
 
-
-int mprog_speech_trigger( char *txt, CHAR_DATA *mob )
+int mprog_can_see_trigger(CHAR_DATA *ch, CHAR_DATA *mob)
 {
+	if (!ch || isDead(ch) || isNowhere(ch))
+	{
+		return eFAILURE;
+	}
 
-  CHAR_DATA *vmob;
+	if (!mob || isDead(mob) || isNowhere(mob))
+	{
+		return eFAILURE;
+	}
 
-  mprog_cur_result = eSUCCESS;
+	mprog_cur_result = eSUCCESS;
+	if ((mob_index[mob->mobdata->nr].progtypes & CAN_SEE_PROG) && isPaused(mob) == false)
+		mprog_percent_check(mob, ch, NULL, NULL, CAN_SEE_PROG);
 
-  for ( vmob = world[mob->in_room].people; vmob != NULL; vmob = vmob->next_in_room )
-    if ( IS_NPC( vmob ) && ( mob_index[vmob->mobdata->nr].progtypes & SPEECH_PROG ) && isPaused(vmob) == false)
-    {
-      if(mprog_wordlist_check( txt, vmob, mob, NULL, NULL, SPEECH_PROG ))
-        break;
-    }
-  
-  return mprog_cur_result;
-
+	return mprog_cur_result;
 }
 
-int mprog_catch_trigger(char_data * mob, int catch_num, char *var, int opt, char_data *actor, obj_data *obj, void *vo, char_data *rndm)
+int mprog_speech_trigger(char *txt, CHAR_DATA *mob)
 {
- MPROG_DATA *mprg;
- MPROG_DATA *next;
- int curr_catch;
- bool done = FALSE;
- mprog_cur_result = eFAILURE;
+	if (!mob || isDead(mob) || isNowhere(mob))
+	{
+		return eFAILURE;
+	}
 
- if ( IS_NPC( mob )
-     && ( mob_index[mob->mobdata->nr].progtypes & CATCH_PROG ) && isPaused(mob) == false)
- {
- mprg = mob_index[mob->mobdata->nr].mobprogs;
- if (!mprg || (opt & 1)) { done = TRUE; mprg = mob_index[mob->mobdata->nr].mobspec; }
+	CHAR_DATA *vmob;
 
- mprog_command_num = 0;
- for ( ; mprg != NULL; mprg = next )
-     {
-       mprog_command_num++;
-	next = mprg->next;
-       if ( mprg->type & CATCH_PROG )
-       {
-         if(!check_range_valid_and_convert(curr_catch, mprg->arglist, MPROG_CATCH_MIN, MPROG_CATCH_MAX)) {
-           logf( IMMORTAL, LOG_WORLD, "Invalid catch argument: vnum %d", 
-             mob_index[mob->mobdata->nr].virt);
-           return eFAILURE;
-         }
-         if(curr_catch == catch_num) {
-	  if (var) {
-		struct tempvariable *eh;
-		for (eh = mob->tempVariable; eh; eh = eh->next)
+	mprog_cur_result = eSUCCESS;
+
+	for (vmob = world[mob->in_room].people; vmob != NULL; vmob = vmob->next_in_room)
+		if (IS_NPC(vmob) && (mob_index[vmob->mobdata->nr].progtypes & SPEECH_PROG) && isPaused(vmob) == false)
 		{
-		  if (!str_cmp(eh->name, "throw")) break;
+			if (mprog_wordlist_check(txt, vmob, mob, NULL, NULL, SPEECH_PROG))
+				break;
 		}
-		if (eh) {
-		  dc_free(eh->data);
-		  eh->data = var;
-		} else {
+
+	return mprog_cur_result;
+}
+
+int mprog_catch_trigger(char_data *mob, int catch_num, char *var, int opt, char_data *actor, obj_data *obj, void *vo, char_data *rndm)
+{
+	if (!mob || isDead(mob) || isNowhere(mob))
+	{
+		return eFAILURE;
+	}
+
+	MPROG_DATA *mprg;
+	MPROG_DATA *next;
+	int curr_catch;
+	bool done = FALSE;
+	mprog_cur_result = eFAILURE;
+
+	if (IS_NPC(mob) && (mob_index[mob->mobdata->nr].progtypes & CATCH_PROG) && isPaused(mob) == false)
+	{
+		mprg = mob_index[mob->mobdata->nr].mobprogs;
+		if (!mprg || (opt & 1))
+		{
+			done = TRUE;
+			mprg = mob_index[mob->mobdata->nr].mobspec;
+		}
+
+		mprog_command_num = 0;
+		for (; mprg != NULL; mprg = next)
+		{
+			mprog_command_num++;
+			next = mprg->next;
+			if (mprg->type & CATCH_PROG)
+			{
+				if (!check_range_valid_and_convert(curr_catch, mprg->arglist, MPROG_CATCH_MIN, MPROG_CATCH_MAX))
+				{
+					logf(IMMORTAL, LOG_WORLD, "Invalid catch argument: vnum %d",
+						 mob_index[mob->mobdata->nr].virt);
+					return eFAILURE;
+				}
+				if (curr_catch == catch_num)
+				{
+					if (var)
+					{
+						struct tempvariable *eh;
+						for (eh = mob->tempVariable; eh; eh = eh->next)
+						{
+							if (!str_cmp(eh->name, "throw"))
+								break;
+						}
+						if (eh)
+						{
+							dc_free(eh->data);
+							eh->data = var;
+						}
+						else
+						{
 #ifdef LEAK_CHECK
-        	eh = (struct tempvariable *)
-                        calloc(1, sizeof(struct tempvariable));
+							eh = (struct tempvariable *)
+								calloc(1, sizeof(struct tempvariable));
 #else
-	       eh = (struct tempvariable *)
-                        dc_alloc(1, sizeof(struct tempvariable));
+							eh = (struct tempvariable *)
+								dc_alloc(1, sizeof(struct tempvariable));
 #endif
 
-	     eh->data = var;
-	     eh->name = str_dup("throw");
-	   	  eh->next = mob->tempVariable;
-    		 mob->tempVariable = eh;
+							eh->data = var;
+							eh->name = str_dup("throw");
+							eh->next = mob->tempVariable;
+							mob->tempVariable = eh;
+						}
+					}
+					mprog_driver(mprg->comlist, mob, actor, obj, vo, NULL, rndm);
+					if (selfpurge)
+						return mprog_cur_result;
 
+					break;
+				}
+			}
+			if (!next && !done)
+			{
+				done = TRUE;
+				next = mob_index[mob->mobdata->nr].mobspec;
+			}
 		}
-	  }
-           mprog_driver( mprg->comlist, mob,actor, obj, vo, NULL, rndm );
-		if (selfpurge) return mprog_cur_result;
-
-           break;
-         }
-       }
-	if (!next && !done){done = TRUE; next = mob_index[mob->mobdata->nr].mobspec;}
-
-     }
-}
- return mprog_cur_result;
+	}
+	return mprog_cur_result;
 }
 
 void update_mprog_throws() {
@@ -4070,6 +4109,10 @@ void end_oproc(CHAR_DATA *ch, Trace trace)
 
 int oprog_can_see_trigger(CHAR_DATA *ch, OBJ_DATA *item)
 {
+	if (!ch || isDead(ch) || isNowhere(ch))
+	{
+		return eFAILURE;
+	}
 
 	CHAR_DATA *vmob;
 	mprog_cur_result = eSUCCESS;
@@ -4086,6 +4129,11 @@ int oprog_can_see_trigger(CHAR_DATA *ch, OBJ_DATA *item)
 
 int oprog_speech_trigger(char *txt, CHAR_DATA *ch)
 {
+	if (!ch || isDead(ch) || isNowhere(ch))
+	{
+		return eFAILURE;
+	}
+
 	CHAR_DATA *vmob = NULL;
 	OBJ_DATA *item;
 
@@ -4186,6 +4234,10 @@ int oprog_catch_trigger(obj_data *obj, int catch_num, char *var, int opt, char_d
 
 int oprog_act_trigger(const char *txt, CHAR_DATA *ch)
 {
+	if (!ch || isDead(ch) || isNowhere(ch))
+	{
+		return eFAILURE;
+	}
 
 	CHAR_DATA *vmob;
 	OBJ_DATA *item;
@@ -4236,6 +4288,10 @@ int oprog_act_trigger(const char *txt, CHAR_DATA *ch)
 
 int oprog_greet_trigger(CHAR_DATA *ch)
 {
+	if (!ch || isDead(ch) || isNowhere(ch))
+	{
+		return eFAILURE;
+	}
 
 	CHAR_DATA *vmob;
 	OBJ_DATA *item;
@@ -4256,7 +4312,6 @@ int oprog_greet_trigger(CHAR_DATA *ch)
 
 int oprog_rand_trigger(OBJ_DATA *item)
 {
-
 	CHAR_DATA *vmob;
 	//  OBJ_DATA *item;
 	CHAR_DATA *ch;
@@ -4335,6 +4390,10 @@ int oprog_load_trigger(CHAR_DATA *ch)
 
 int oprog_weapon_trigger(CHAR_DATA *ch, OBJ_DATA *item)
 {
+	if (!ch || isDead(ch) || isNowhere(ch))
+	{
+		return eFAILURE;
+	}
 
 	CHAR_DATA *vmob;
 
@@ -4353,6 +4412,10 @@ int oprog_weapon_trigger(CHAR_DATA *ch, OBJ_DATA *item)
 
 int oprog_armour_trigger(CHAR_DATA *ch, OBJ_DATA *item)
 {
+	if (!ch || isDead(ch) || isNowhere(ch))
+	{
+		return eFAILURE;
+	}
 
 	CHAR_DATA *vmob;
 
@@ -4371,7 +4434,7 @@ int oprog_armour_trigger(CHAR_DATA *ch, OBJ_DATA *item)
 
 int oprog_command_trigger(char *txt, CHAR_DATA *ch, char *arg)
 {
-	if (ch == nullptr)
+	if (!ch || isDead(ch) || isNowhere(ch))
 	{
 		return eFAILURE;
 	}
