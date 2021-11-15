@@ -612,5 +612,6 @@ int random_percent_change(uint percentage, int value);
 int random_percent_change(int from, int to, int value);
 bool identify(char_data *ch, obj_data *obj);
 extern void end_oproc(CHAR_DATA *ch, Trace trace = Trace("unknown"));
+void undo_race_saves(char_data * ch);
 
 #endif /* UTILITY_H_ */
