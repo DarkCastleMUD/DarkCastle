@@ -308,11 +308,16 @@ void perform_violence(void)
 
       // MOB Progs
       retval = mprog_hitprcnt_trigger( ch, ch->fighting );
-      if(SOMEONE_DIED(retval))
+      if(SOMEONE_DIED(retval) || !ch || !(ch->fighting) || isDead(ch) || isNowhere(ch) || isDead(ch->fighting) || isNowhere(ch->fighting))
+      {
         continue;
+      }
+        
       retval = mprog_fight_trigger( ch, ch->fighting );
-      if(SOMEONE_DIED(retval))
+      if(SOMEONE_DIED(retval) || !ch || !(ch->fighting) || isDead(ch) || isNowhere(ch) || isDead(ch->fighting) || isNowhere(ch->fighting))
+      {
         continue;
+      }
 
     } // can_attack
     else if(!is_stunned(ch) && !IS_AFFECTED(ch, AFF_PARALYSIS))
