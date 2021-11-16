@@ -108,6 +108,7 @@
 #define CLASS_RANGER       9
 #define CLASS_BARD        10
 #define CLASS_DRUID       11
+#define CLASS_MAX_PROD    11
 #define CLASS_PSIONIC     12
 #define CLASS_NECROMANCER 13
 #define CLASS_MAX         13
