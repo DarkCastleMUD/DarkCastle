@@ -1,14 +1,12 @@
 /* $Id: nlog.cpp,v 1.12 2014/07/04 22:00:04 jhhudso Exp $ */
 
-extern "C"
-{
 #include <stdio.h>
 #include <time.h>
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdarg.h>
-}
+
 #include "connect.h"
 #include "character.h"
 #include "utility.h"
