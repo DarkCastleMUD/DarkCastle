@@ -6,6 +6,12 @@
 | Description:  This file contains the header information for mobile
 |   control.
 */
+
+#include <string>
+
+using namespace std;
+
+
 void rebuild_rnum_references(int startAt, int type);
 void    mprog_driver            ( char* com_list, CHAR_DATA* mob,
                                        CHAR_DATA* actor, OBJ_DATA* obj,
@@ -71,7 +77,8 @@ char *getTemp(CHAR_DATA *ch, char *name);
 
 struct race_shit
 {
-  char *singular_name;  /* dwarf, elf, etc.     */
+  char *singular_name;   /* Dwarf, Elf, etc.     */
+  string lowercase_name; /* dwarf, elf, etc.     */
   char *plural_name;     /* dwarves, elves, etc. */
    
   long body_parts;  /* bitvector for body parts       */
