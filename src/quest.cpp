@@ -959,7 +959,7 @@ int do_quest(CHAR_DATA *ch, char *arg, int cmd)
 		}
 
        if (completed < 100) {
-    	   csendf(ch, "You need will need to complete at least 100 quests.\n\r");
+    	   csendf(ch, "You will need to complete at least 100 quests before you can reset.\n\r");
     	   return eFAILURE;
        }
 
