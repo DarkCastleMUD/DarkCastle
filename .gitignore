@@ -5,3 +5,5 @@ src/dcastle.debug
 src/showplayer
 src/libdcastle.a
 src/.sconsign.dblite
+src/*~
+*~
