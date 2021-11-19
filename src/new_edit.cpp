@@ -710,7 +710,6 @@ void new_string_add(struct descriptor_data *d, char *str) {
 			}
 			send_to_char("Aborted.\r\n", ch);
 			if (d->connected == conn::EXDSCR) {
-				extern char menu[];
 				STATE(d) = conn::SELECT_MENU;
 				SEND_TO_Q(menu, d);
 			} else
@@ -737,7 +736,6 @@ void new_string_add(struct descriptor_data *d, char *str) {
 						d->connected = conn::PLAYING;
 						check_for_awaymsgs(ch);
 					} else {
-						extern char menu[];
 						STATE(d) = conn::SELECT_MENU;
 						SEND_TO_Q(menu, d);
 					}
