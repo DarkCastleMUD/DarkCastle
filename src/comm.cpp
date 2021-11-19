@@ -794,7 +794,7 @@ void DC::game_loop(void)
           STATE(d) == conn::QUESTION_STATS ||
           STATE(d) == conn::NEW_PLAYER)
       {
-        nanny(d,"");
+        nanny(d);
       }
       else if ((d->wait <= 0) && get_from_q(&d->input, comm, &aliased))
       {
