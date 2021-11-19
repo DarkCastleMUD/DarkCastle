@@ -27,6 +27,7 @@ extern "C"
 }
 #include <string.h>
 #include <queue>
+#include <fmt/format.h>
 
 #include "character.h"
 #include "comm.h"
@@ -60,6 +61,7 @@ using namespace std;
 void AuctionHandleDelete(string name);
 bool is_bracing(CHAR_DATA *bracee, struct room_direction_data *exit);
 void check_for_sold_items(CHAR_DATA *ch);
+void show_question_race(descriptor_data *d);
 
 const char menu[] = "\n\rWelcome to Dark Castle Mud\n\r\n\r"
               "0) Exit Dark Castle.\n\r"
@@ -94,9 +96,16 @@ bool check_reconnect(struct descriptor_data *d, char *name, bool fReconnect);
 bool check_playing(struct descriptor_data *d, char *name);
 bool on_forbidden_name_list(char *name);
 void check_hw(char_data *ch);
-
 char *str_str(char *first, char *second);
-
+bool apply_race_attributes(char_data *ch, int race = 0);
+bool check_race_attributes(char_data *ch, int race = 0);
+bool handle_get_race(descriptor_data *d, string arg);
+void show_question_race(descriptor_data *d);
+void show_question_class(descriptor_data *d);
+bool handle_get_class(descriptor_data* d, string arg);
+int is_clss_race_compat(CHAR_DATA *ch, int clss);
+void show_question_stats(descriptor_data *d);
+bool handle_get_stats(descriptor_data* d, string arg);
 int is_race_eligible(CHAR_DATA *ch, int race)
 {
    if (race == 2 && (GET_RAW_DEX(ch) < 10 || GET_RAW_INT(ch) < 10))
@@ -116,6 +125,61 @@ int is_race_eligible(CHAR_DATA *ch, int race)
    if (race == 9 && (GET_RAW_CON(ch) < 12))
       return FALSE;
    return TRUE;
+}
+
+int is_clss_race_compat(const char_data* ch, int clss, int race)
+{
+   bool compat = false;
+
+   switch (clss)
+   {
+   case CLASS_MAGIC_USER:
+      compat = true;
+      break;
+   case CLASS_CLERIC:
+      compat = true;
+      break;
+   case CLASS_THIEF:
+      if (race != RACE_GIANT)
+      {
+         compat = true;
+      }
+      break;
+   case CLASS_WARRIOR:
+      compat = true;
+      break;
+   case CLASS_ANTI_PAL:
+      if (race == RACE_HUMAN || race == RACE_ORC || race == RACE_DWARVEN)
+      {
+         compat = true;
+      }
+      break;
+   case CLASS_PALADIN:
+      if (race == RACE_HUMAN || race == RACE_ELVEN || race == RACE_DWARVEN)
+      {
+         compat = true;
+      }
+      break;
+   case CLASS_BARBARIAN:
+      if (race != RACE_PIXIE)
+      {
+         compat = true;
+      }
+      break;
+   case CLASS_MONK:
+      compat = true;
+      break;
+   case CLASS_RANGER:
+      compat = true;
+      break;
+   case CLASS_BARD:
+      compat = true;
+      break;
+   case CLASS_DRUID:
+      compat = true;
+      break;
+   }
+   return (compat);
 }
 
 int is_clss_eligible(CHAR_DATA *ch, int clss)
@@ -1005,6 +1069,7 @@ void nanny(struct descriptor_data *d, string arg)
 
       if (count_IP_connections(d))
          break;
+
       if (wizlock)
       {
          SEND_TO_Q("The game is currently WIZLOCKED. Only immortals can connect at this time.\r\n", d);
@@ -1401,30 +1466,58 @@ void nanny(struct descriptor_data *d, string arg)
       break;
 
    case conn::QUESTION_RACE:
+      show_question_race(d);
+
       STATE(d) = conn::GET_RACE;
       break;
    
    case conn::GET_RACE:
-      STATE(d) = conn::QUESTION_RACE;
-      STATE(d) = conn::QUESTION_CLASS;
+      if (handle_get_race(d, arg) == true)
+      {
+         STATE(d) = conn::QUESTION_CLASS;
+      }
+      else
+      {
+         STATE(d) = conn::QUESTION_RACE;
+      }      
       break;
 
    case conn::QUESTION_CLASS:
+      show_question_class(d);
+      
       STATE(d) = conn::GET_CLASS;
       break;
    
    case conn::GET_CLASS:
-      STATE(d) = conn::QUESTION_CLASS;
-      STATE(d) = conn::QUESTION_STATS;
+    if (handle_get_class(d, arg) == false)
+      {
+         if (STATE(d) != conn::QUESTION_RACE)
+         {
+            STATE(d) = conn::QUESTION_CLASS;
+         }
+      }
+      else
+      {
+         STATE(d) = conn::QUESTION_STATS;
+      }
       break;
 
    case conn::QUESTION_STATS:
+      show_question_stats(d);
+
+      STATE(d) = conn::GET_STATS;
       break;
 
    case conn::GET_STATS:
+   if (handle_get_stats(d, arg) == false)
+   {
       STATE(d) = conn::QUESTION_STATS;
+   }
+   else
+   {
       STATE(d) = conn::NEW_PLAYER;
-      break;
+   }
+   break;
    
    case conn::OLD_STAT_METHOD:
       if (ch->desc->stats != nullptr)
@@ -1444,7 +1537,7 @@ void nanny(struct descriptor_data *d, string arg)
          arg[1] = '\0';
       }
 
-      // first time, this hasthe m/f from sex and goes right through
+      // first time, this has the m/f from sex and goes right through
 
       try {
          selection = stoul(arg);
@@ -2581,4 +2674,610 @@ bool on_forbidden_name_list(char *name)
       dc_fclose(nameList);
    }
    return found;
+}
+
+void show_question_race(descriptor_data *d)
+{
+   if (d == nullptr || d->character == nullptr)
+   {
+      return;
+   }
+
+   char_data* ch = d->character;
+   string buffer, races_buffer;
+   ch->saves[SAVE_TYPE_FIRE] += RACE_HUMAN_FIRE_MOD;
+   ch->saves[SAVE_TYPE_COLD] += RACE_HUMAN_COLD_MOD;
+   ch->saves[SAVE_TYPE_ENERGY] += RACE_HUMAN_ENERGY_MOD;
+   ch->saves[SAVE_TYPE_ACID] += RACE_HUMAN_ACID_MOD;
+   ch->saves[SAVE_TYPE_MAGIC] += RACE_HUMAN_MAGIC_MOD;
+   ch->saves[SAVE_TYPE_POISON] += RACE_HUMAN_POISON_MOD;
+   buffer += "\r\nRacial Bonuses and Pentalties:\r\n";
+   buffer += "$B$7   Race   STR DEX CON INT WIS$R\r\n";
+   for(int race=1; race <= 9; race++)
+      {
+         GET_RAW_STR(ch) = 0;
+         GET_RAW_DEX(ch) = 0;
+         GET_RAW_CON(ch) = 0;
+         GET_RAW_INT(ch) = 0;
+         GET_RAW_WIS(ch) = 0;
+         GET_ALIGNMENT(ch) = 0;
+         apply_race_attributes(ch, race);
+         do_inate_race_abilities(ch);
+         if (race_info[race].singular_name != nullptr)
+         {
+            buffer += fmt::format("{}. {:6} {:3} {:3} {:3} {:3} {:3}\r\n",
+            race, race_info[race].singular_name,
+            GET_RAW_STR(ch), GET_RAW_DEX(ch), GET_RAW_CON(ch),  GET_RAW_INT(ch), GET_RAW_WIS(ch));
+            races_buffer += race_info[race].lowercase_name;
+            if (race < MAX_PC_RACE)
+            {
+               races_buffer += ",";
+            }
+         }
+         undo_race_saves(ch);
+      }
+      buffer += "Type 1-" + to_string(MAX_PC_RACE) + "," + races_buffer + " or help <keyword>: ";
+      SEND_TO_Q(buffer.c_str(), d);
+      telnet_ga(d);
+}
+
+bool handle_get_race(descriptor_data* d, string arg)
+{
+   if (d == nullptr || d->character == nullptr || arg == "")
+   {
+      return false;
+   }
+
+   for(unsigned race=1; race <= 9; race++)
+   {
+      if (race_info[race].lowercase_name == arg)
+      {
+         GET_RACE(d->character) = race;
+         return true;
+      }
+   }
+
+   unsigned long race = 0;
+   try 
+   {
+      race = stoul(arg);
+   } catch (...)
+   {
+      return false;
+   }
+
+   if (race < 1 || race > MAX_PC_RACE)
+   {
+      return false;
+   }
+
+   GET_RACE(d->character) = race;
+
+   return true;
+}
+
+void show_question_class(descriptor_data *d)
+{
+   if (d == nullptr || d->character == nullptr)
+   {
+      return;
+   }
+
+   char_data* ch = d->character;
+   string buffer, classes_buffer;
+   buffer += "\r\n   Class  Minimum STR DEX CON INT WIS$R\r\n";
+   int clss;
+   for(clss=1; clss <= CLASS_MAX_PROD; clss++)
+   {
+      //apply_race_attributes(ch, race);
+      //do_inate_race_abilities(ch);
+      if (pc_clss_types[clss] != nullptr)
+      {
+         if (!is_clss_race_compat(ch, clss, GET_RACE(ch)))
+         {
+            buffer += fmt::format("{:2}. {:11} (Unavailble for your race)\r\n", clss, pc_clss_types[clss]);
+         }
+         else
+         {
+            buffer += fmt::format("{:2}. {:11}\r\n", clss, pc_clss_types[clss]);
+            classes_buffer += string(pc_clss_types3[clss]);
+            if (clss < CLASS_MAX_PROD)
+            {
+               classes_buffer += ",";
+            }
+         }
+      }
+   }
+
+   buffer += "Type 'back' to go back and pick a different race.\r\n";
+   buffer += "Type '1-" + to_string(CLASS_MAX_PROD) + "," + classes_buffer + "' or 'help keyword': ";
+   SEND_TO_Q(buffer.c_str(), d);
+   telnet_ga(d);
+}
+
+bool handle_get_class(descriptor_data* d, string arg)
+{
+   if (d == nullptr || d->character == nullptr || arg == "")
+   {
+      return false;
+   }
+
+   if (arg == "back")
+   {
+      STATE(d) = conn::QUESTION_RACE;
+      return false;
+   }
+
+   const char_data* ch = d->character;
+
+   for(unsigned clss=1; clss <= CLASS_MAX_PROD; clss++)
+   {
+      if (string(pc_clss_types[clss]) == string(arg) || string(pc_clss_types3[clss]) == string(arg))
+      {
+         if (!is_clss_race_compat(ch, clss, GET_RACE(ch)))
+         {
+            return false;
+         }
+         else
+         {
+            GET_CLASS(d->character) = clss;
+            return true;
+         }
+      }
+   }
+
+   unsigned long clss = 0;
+   try 
+   {
+      clss = stoul(arg);
+   } catch (...)
+   {
+      return false;
+   }
+
+   if (clss < 1 || clss > CLASS_MAX_PROD || !is_clss_race_compat(ch, clss, GET_RACE(ch)))
+   {
+      return false;
+   }
+
+   GET_CLASS(d->character) = clss;
+
+   return true;
+}
+
+void show_question_stats(descriptor_data *d)
+{
+   if (d == nullptr || d->character == nullptr)
+   {
+      return;
+   }
+
+   if (d->stats == nullptr)
+   {
+      d->stats = new stat_shit;
+
+      char_data* ch = d->character;
+      // Current
+      d->stats->str[0] = 12;
+      d->stats->dex[0] = 12;
+      d->stats->con[0] = 12;
+      d->stats->tel[0] = 12;
+      d->stats->wis[0] = 12;
+   
+      // Minimums
+      d->stats->str[1] = 12;
+      d->stats->dex[1] = 12;
+      d->stats->con[1] = 12;
+      d->stats->tel[1] = 12;
+      d->stats->wis[1] = 12;
+   
+      d->stats->points = 23;
+
+      int str_needed=0, dex_needed=0, con_needed=0, int_needed=0, wis_needed=0;
+
+      switch (GET_RACE(ch))
+      {         
+         case 1:
+         break;
+
+         case RACE_ELVEN:
+            dex_needed = (10 - d->stats->dex[0] + RACE_ELVEN_DEX_MOD);
+            if (dex_needed > 0)
+            {
+               d->stats->points -= dex_needed;
+               d->stats->dex[0] += dex_needed;
+            }
+            int_needed = (10 - d->stats->tel[0] + RACE_ELVEN_INT_MOD);
+            if (int_needed > 0)
+            {
+               d->stats->points -= int_needed;
+               d->stats->tel[0] += int_needed;
+            }
+            break;
+
+         case RACE_DWARVEN:
+            con_needed = (10 - d->stats->con[0] + RACE_DWARVEN_CON_MOD);
+            if (con_needed > 0)
+            {
+               d->stats->points -= con_needed;
+               d->stats->con[0] += con_needed;
+            }
+            wis_needed = (10 - d->stats->wis[0] + RACE_DWARVEN_WIS_MOD);
+            if (wis_needed > 0)
+            {
+               d->stats->points -= wis_needed;
+               d->stats->wis[0] += wis_needed;
+            }
+            break;
+
+         case 4:
+            if (GET_RAW_DEX(ch) < 10)
+            {
+             
+            }
+            ch->race = RACE_HOBBIT;
+            GET_RAW_STR(ch) += RACE_HOBBIT_STR_MOD;
+            GET_RAW_INT(ch) += RACE_HOBBIT_INT_MOD;
+            GET_RAW_WIS(ch) += RACE_HOBBIT_WIS_MOD;
+            GET_RAW_DEX(ch) += RACE_HOBBIT_DEX_MOD;
+            GET_RAW_CON(ch) += RACE_HOBBIT_CON_MOD;
+            break;
+
+         case 5:
+            if (GET_RAW_INT(ch) < 12)
+            {
+             
+            }
+            ch->race = RACE_PIXIE;
+            GET_RAW_STR(ch) += RACE_PIXIE_STR_MOD;
+            GET_RAW_INT(ch) += RACE_PIXIE_INT_MOD;
+            GET_RAW_WIS(ch) += RACE_PIXIE_WIS_MOD;
+            GET_RAW_DEX(ch) += RACE_PIXIE_DEX_MOD;
+            GET_RAW_CON(ch) += RACE_PIXIE_CON_MOD;
+            
+            break;
+
+         case 6:
+            if (GET_RAW_STR(ch) < 12)
+            {         
+            }
+            
+            ch->race = RACE_GIANT;
+            GET_RAW_STR(ch) += RACE_GIANT_STR_MOD;
+            GET_RAW_INT(ch) += RACE_GIANT_INT_MOD;
+            GET_RAW_WIS(ch) += RACE_GIANT_WIS_MOD;
+            GET_RAW_DEX(ch) += RACE_GIANT_DEX_MOD;
+            GET_RAW_CON(ch) += RACE_GIANT_CON_MOD;
+            
+            break;
+
+         case 7:
+            if (GET_RAW_WIS(ch) < 12)
+            {
+            
+            }
+            ch->race = RACE_GNOME;
+            GET_RAW_STR(ch) += RACE_GNOME_STR_MOD;
+            GET_RAW_INT(ch) += RACE_GNOME_INT_MOD;
+            GET_RAW_WIS(ch) += RACE_GNOME_WIS_MOD;
+            GET_RAW_DEX(ch) += RACE_GNOME_DEX_MOD;
+            GET_RAW_CON(ch) += RACE_GNOME_CON_MOD;
+            
+            break;
+
+         case 8:
+            if (GET_RAW_CON(ch) < 10 || GET_RAW_STR(ch) < 10)
+            {
+            
+            }
+            ch->race = RACE_ORC;
+            ch->alignment = -1000;
+            GET_RAW_STR(ch) += RACE_ORC_STR_MOD;
+            GET_RAW_INT(ch) += RACE_ORC_INT_MOD;
+            GET_RAW_WIS(ch) += RACE_ORC_WIS_MOD;
+            GET_RAW_DEX(ch) += RACE_ORC_DEX_MOD;
+            GET_RAW_CON(ch) += RACE_ORC_CON_MOD;
+            
+            break;
+         case 9:
+            if (GET_RAW_CON(ch) < 12)
+            {
+            
+            }
+            ch->race = RACE_TROLL;
+            ch->alignment = 0;
+            GET_RAW_STR(ch) += RACE_TROLL_STR_MOD;
+            GET_RAW_INT(ch) += RACE_TROLL_INT_MOD;
+            GET_RAW_WIS(ch) += RACE_TROLL_WIS_MOD;
+            GET_RAW_DEX(ch) += RACE_TROLL_DEX_MOD;
+            GET_RAW_CON(ch) += RACE_TROLL_CON_MOD;
+            
+            break;
+      }
+   }
+
+   char_data* ch = d->character;
+   string buffer = fmt::format("Race: {}\r\n", race_info[GET_RACE(ch)].singular_name);
+   buffer += fmt::format("Class: {}\r\n", pc_clss_types[GET_CLASS(ch)]);
+   buffer += fmt::format("Points left to assign: {}\r\n", d->stats->points);
+   buffer += fmt::format("## Attribute    Current  Offsets  Total\r\n");
+   buffer += fmt::format("1. Strength     {:2}      {:2}        {:2}\r\n",
+   d->stats->str[0], GET_RAW_STR(ch), d->stats->str[0] + GET_RAW_STR(ch));
+   buffer += fmt::format("2. Dexterity    {:2}      {:2}        {:2}\r\n",
+   d->stats->dex[0], GET_RAW_DEX(ch), d->stats->dex[0] + GET_RAW_DEX(ch));
+   buffer += fmt::format("3. Constitution {:2}      {:2}        {:2}\r\n",
+   d->stats->con[0], GET_RAW_CON(ch), d->stats->con[0] + GET_RAW_CON(ch));
+   buffer += fmt::format("4. Intelligence {:2}      {:2}        {:2}\r\n",
+   d->stats->tel[0], GET_RAW_INT(ch), d->stats->tel[0] + GET_RAW_INT(ch));
+   buffer += fmt::format("5. Wisdom       {:2}      {:2}        {:2}\r\n",
+   d->stats->wis[0], GET_RAW_WIS(ch), d->stats->wis[0] + GET_RAW_WIS(ch));
+
+   SEND_TO_Q(buffer.c_str(), d);
+}
+
+bool handle_get_stats(descriptor_data* d, string arg)
+{
+   return false;
+}
+
+
+
+bool apply_race_attributes(char_data *ch, int race)
+{
+   if (ch == nullptr)
+   {
+      return false;
+   }
+
+   if (race == 0)
+   {
+      race = ch->race;
+   }
+
+   switch (race)
+   {
+      case 1:
+      ch->race = RACE_HUMAN;
+      GET_RAW_STR(ch) += RACE_HUMAN_STR_MOD;
+      GET_RAW_INT(ch) += RACE_HUMAN_INT_MOD;
+      GET_RAW_WIS(ch) += RACE_HUMAN_WIS_MOD;
+      GET_RAW_DEX(ch) += RACE_HUMAN_DEX_MOD;
+      GET_RAW_CON(ch) += RACE_HUMAN_CON_MOD;
+      return true;
+      break;
+
+   case 2:
+      ch->race = RACE_ELVEN;
+      ch->alignment = 1000;
+      GET_RAW_STR(ch) += RACE_ELVEN_STR_MOD;
+      GET_RAW_INT(ch) += RACE_ELVEN_INT_MOD;
+      GET_RAW_WIS(ch) += RACE_ELVEN_WIS_MOD;
+      GET_RAW_DEX(ch) += RACE_ELVEN_DEX_MOD;
+      GET_RAW_CON(ch) += RACE_ELVEN_CON_MOD;
+      return true;
+      break;
+
+   case 3:
+      ch->race = RACE_DWARVEN;
+      GET_RAW_STR(ch) += RACE_DWARVEN_STR_MOD;
+      GET_RAW_INT(ch) += RACE_DWARVEN_INT_MOD;
+      GET_RAW_WIS(ch) += RACE_DWARVEN_WIS_MOD;
+      GET_RAW_DEX(ch) += RACE_DWARVEN_DEX_MOD;
+      GET_RAW_CON(ch) += RACE_DWARVEN_CON_MOD;
+      return true;
+      break;
+
+   case 4:
+      ch->race = RACE_HOBBIT;
+      GET_RAW_STR(ch) += RACE_HOBBIT_STR_MOD;
+      GET_RAW_INT(ch) += RACE_HOBBIT_INT_MOD;
+      GET_RAW_WIS(ch) += RACE_HOBBIT_WIS_MOD;
+      GET_RAW_DEX(ch) += RACE_HOBBIT_DEX_MOD;
+      GET_RAW_CON(ch) += RACE_HOBBIT_CON_MOD;
+      return true;
+      break;
+
+   case 5:
+      ch->race = RACE_PIXIE;
+      GET_RAW_STR(ch) += RACE_PIXIE_STR_MOD;
+      GET_RAW_INT(ch) += RACE_PIXIE_INT_MOD;
+      GET_RAW_WIS(ch) += RACE_PIXIE_WIS_MOD;
+      GET_RAW_DEX(ch) += RACE_PIXIE_DEX_MOD;
+      GET_RAW_CON(ch) += RACE_PIXIE_CON_MOD;
+      return true;
+      break;
+
+   case 6:
+      ch->race = RACE_GIANT;
+      GET_RAW_STR(ch) += RACE_GIANT_STR_MOD;
+      GET_RAW_INT(ch) += RACE_GIANT_INT_MOD;
+      GET_RAW_WIS(ch) += RACE_GIANT_WIS_MOD;
+      GET_RAW_DEX(ch) += RACE_GIANT_DEX_MOD;
+      GET_RAW_CON(ch) += RACE_GIANT_CON_MOD;
+      return true;
+      break;
+
+   case 7:
+      ch->race = RACE_GNOME;
+      GET_RAW_STR(ch) += RACE_GNOME_STR_MOD;
+      GET_RAW_INT(ch) += RACE_GNOME_INT_MOD;
+      GET_RAW_WIS(ch) += RACE_GNOME_WIS_MOD;
+      GET_RAW_DEX(ch) += RACE_GNOME_DEX_MOD;
+      GET_RAW_CON(ch) += RACE_GNOME_CON_MOD;
+      return true;
+      break;
+
+   case 8:
+      ch->race = RACE_ORC;
+      ch->alignment = -1000;
+      GET_RAW_STR(ch) += RACE_ORC_STR_MOD;
+      GET_RAW_INT(ch) += RACE_ORC_INT_MOD;
+      GET_RAW_WIS(ch) += RACE_ORC_WIS_MOD;
+      GET_RAW_DEX(ch) += RACE_ORC_DEX_MOD;
+      GET_RAW_CON(ch) += RACE_ORC_CON_MOD;
+      return true;
+      break;
+   case 9:
+      ch->race = RACE_TROLL;
+      ch->alignment = 0;
+      GET_RAW_STR(ch) += RACE_TROLL_STR_MOD;
+      GET_RAW_INT(ch) += RACE_TROLL_INT_MOD;
+      GET_RAW_WIS(ch) += RACE_TROLL_WIS_MOD;
+      GET_RAW_DEX(ch) += RACE_TROLL_DEX_MOD;
+      GET_RAW_CON(ch) += RACE_TROLL_CON_MOD;
+      return true;
+      break;
+
+   default:
+      return false;
+      break;
+   }
+
+   return false;
+}
+
+bool check_race_attributes(char_data *ch, int race)
+{
+   if (ch == nullptr)
+   {
+      return false;
+   }
+
+   if (race == 0)
+   {
+      race = ch->race;
+   }
+
+   switch (race)
+   {
+      case 1:
+      ch->race = RACE_HUMAN;
+      GET_RAW_STR(ch) += RACE_HUMAN_STR_MOD;
+      GET_RAW_INT(ch) += RACE_HUMAN_INT_MOD;
+      GET_RAW_WIS(ch) += RACE_HUMAN_WIS_MOD;
+      GET_RAW_DEX(ch) += RACE_HUMAN_DEX_MOD;
+      GET_RAW_CON(ch) += RACE_HUMAN_CON_MOD;
+      return true;
+      break;
+
+   case 2:
+      if (GET_RAW_DEX(ch) < 10 || GET_RAW_INT(ch) < 10)
+      {
+         return false;
+      }
+      ch->race = RACE_ELVEN;
+      ch->alignment = 1000;
+      GET_RAW_STR(ch) += RACE_ELVEN_STR_MOD;
+      GET_RAW_INT(ch) += RACE_ELVEN_INT_MOD;
+      GET_RAW_WIS(ch) += RACE_ELVEN_WIS_MOD;
+      GET_RAW_DEX(ch) += RACE_ELVEN_DEX_MOD;
+      GET_RAW_CON(ch) += RACE_ELVEN_CON_MOD;
+      return true;
+      break;
+
+   case 3:
+      if (GET_RAW_CON(ch) < 10 || GET_RAW_WIS(ch) < 10)
+      {         
+         return false;
+      }
+      ch->race = RACE_DWARVEN;
+      GET_RAW_STR(ch) += RACE_DWARVEN_STR_MOD;
+      GET_RAW_INT(ch) += RACE_DWARVEN_INT_MOD;
+      GET_RAW_WIS(ch) += RACE_DWARVEN_WIS_MOD;
+      GET_RAW_DEX(ch) += RACE_DWARVEN_DEX_MOD;
+      GET_RAW_CON(ch) += RACE_DWARVEN_CON_MOD;
+      return true;
+      break;
+
+   case 4:
+      if (GET_RAW_DEX(ch) < 10)
+      {
+         return false;
+      }
+      ch->race = RACE_HOBBIT;
+      GET_RAW_STR(ch) += RACE_HOBBIT_STR_MOD;
+      GET_RAW_INT(ch) += RACE_HOBBIT_INT_MOD;
+      GET_RAW_WIS(ch) += RACE_HOBBIT_WIS_MOD;
+      GET_RAW_DEX(ch) += RACE_HOBBIT_DEX_MOD;
+      GET_RAW_CON(ch) += RACE_HOBBIT_CON_MOD;
+      return true;
+      break;
+
+   case 5:
+      if (GET_RAW_INT(ch) < 12)
+      {
+         return false;
+      }
+      ch->race = RACE_PIXIE;
+      GET_RAW_STR(ch) += RACE_PIXIE_STR_MOD;
+      GET_RAW_INT(ch) += RACE_PIXIE_INT_MOD;
+      GET_RAW_WIS(ch) += RACE_PIXIE_WIS_MOD;
+      GET_RAW_DEX(ch) += RACE_PIXIE_DEX_MOD;
+      GET_RAW_CON(ch) += RACE_PIXIE_CON_MOD;
+      return true;
+      break;
+
+   case 6:
+      if (GET_RAW_STR(ch) < 12)
+      {         
+         return false;
+      }
+      ch->race = RACE_GIANT;
+      GET_RAW_STR(ch) += RACE_GIANT_STR_MOD;
+      GET_RAW_INT(ch) += RACE_GIANT_INT_MOD;
+      GET_RAW_WIS(ch) += RACE_GIANT_WIS_MOD;
+      GET_RAW_DEX(ch) += RACE_GIANT_DEX_MOD;
+      GET_RAW_CON(ch) += RACE_GIANT_CON_MOD;
+      return true;
+      break;
+
+   case 7:
+      if (GET_RAW_WIS(ch) < 12)
+      {
+         return false;
+      }
+      ch->race = RACE_GNOME;
+      GET_RAW_STR(ch) += RACE_GNOME_STR_MOD;
+      GET_RAW_INT(ch) += RACE_GNOME_INT_MOD;
+      GET_RAW_WIS(ch) += RACE_GNOME_WIS_MOD;
+      GET_RAW_DEX(ch) += RACE_GNOME_DEX_MOD;
+      GET_RAW_CON(ch) += RACE_GNOME_CON_MOD;
+      return true;
+      break;
+
+   case 8:
+      if (GET_RAW_CON(ch) < 10 || GET_RAW_STR(ch) < 10)
+      {
+         return false;
+      }
+      ch->race = RACE_ORC;
+      ch->alignment = -1000;
+      GET_RAW_STR(ch) += RACE_ORC_STR_MOD;
+      GET_RAW_INT(ch) += RACE_ORC_INT_MOD;
+      GET_RAW_WIS(ch) += RACE_ORC_WIS_MOD;
+      GET_RAW_DEX(ch) += RACE_ORC_DEX_MOD;
+      GET_RAW_CON(ch) += RACE_ORC_CON_MOD;
+      return true;
+      break;
+   case 9:
+      if (GET_RAW_CON(ch) < 12)
+      {
+         return false;
+      }
+      ch->race = RACE_TROLL;
+      ch->alignment = 0;
+      GET_RAW_STR(ch) += RACE_TROLL_STR_MOD;
+      GET_RAW_INT(ch) += RACE_TROLL_INT_MOD;
+      GET_RAW_WIS(ch) += RACE_TROLL_WIS_MOD;
+      GET_RAW_DEX(ch) += RACE_TROLL_DEX_MOD;
+      GET_RAW_CON(ch) += RACE_TROLL_CON_MOD;
+      return true;
+      break;
+
+   default:
+      return false;
+      break;
+   }
+
+   return false;
 }
