@@ -1697,7 +1697,8 @@ void vault_list(CHAR_DATA *ch, char *owner) {
     }
 
     if (strlen(linebuf) + strlen(sectionbuf) < MAX_STRING_LENGTH*4 - 200) {
-	strncat(sectionbuf, linebuf, MAX_STRING_LENGTH*4);
+	    strncat(sectionbuf, linebuf, sizeof(sectionbuf)-1);
+      sectionbuf[sizeof(sectionbuf)-1] = 0;
     } else {
 	strcat(sectionbuf, "Overflow!!!\r\n");
 	break;
@@ -2262,7 +2263,8 @@ vault_search(CHAR_DATA *ch, char *args)
 
         if (strlen(linebuf) + strlen(sectionbuf)
             < MAX_STRING_LENGTH * 4 - 200) {
-          strncat(sectionbuf, linebuf, MAX_STRING_LENGTH * 4);
+          strncat(sectionbuf, linebuf, sizeof(sectionbuf)-1);
+          sectionbuf[sizeof(sectionbuf)-1] = 0;
         } else {
           strcat(sectionbuf, "Overflow!!!\r\n");
           break;
