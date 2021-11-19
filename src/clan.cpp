@@ -1923,7 +1923,8 @@ void do_god_clans(CHAR_DATA *ch, char *arg, int cmd)
          } else {
         	 strcpy(buf, "Room Data without number.  PROBLEM.\r\n");
          }
-    	 strncat(buf2, buf, sizeof(buf2));
+    	 strncat(buf2, buf, sizeof(buf2)-1);
+       buf2[sizeof(buf2)-1] = 0;
       }
 
       send_to_char(buf2, ch);
