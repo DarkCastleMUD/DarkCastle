@@ -6,7 +6,27 @@
         {
             "label": "scons -C src -j 128",
             "type": "shell",
-            "command": "scons -C src -j 128",
+            "command": "scons -C src -c; scons -C src -j 128",
+            "problemMatcher": {
+                "base": "$gcc",
+                "fileLocation": [
+                    "relative",
+                    "${workspaceRoot}/src/"
+                ],
+                "pattern": {
+                    "regexp": "^(.*):(\\d+):(\\d+):\\s+(.*)$",
+                    "file": 1,
+                    "line": 2,
+                    "column": 3,
+                    "message": 4
+                }
+            },
+            "group": "build"
+        },
+        {
+            "label": "scons debug=1 -C src -j 128",
+            "type": "shell",
+            "command": "scons -C src -c; scons debug=1 -C src -j 128",
             "problemMatcher": {
                 "base": "$gcc",
                 "fileLocation": [
@@ -27,32 +47,9 @@
             }
         },
         {
-            "label": "scons debug=1 -C src -j 128",
-            "type": "shell",
-            "command": "scons debug=1 -C src -j 128",
-            "problemMatcher": {
-                "base": "$gcc",
-                "fileLocation": [
-                    "relative",
-                    "${workspaceRoot}/src/"
-                ],
-                "pattern": {
-                    "regexp": "^(.*):(\\d+):(\\d+):\\s+(.*)$",
-                    "file": 1,
-                    "line": 2,
-                    "column": 3,
-                    "message": 4
-                }
-            },
-            "group": {
-                "kind": "build",
-                "isDefault": false
-            }
-        },
-        {
             "type": "cppbuild",
             "label": "C/C++: g++-10 build active file",
-            "command": "/usr/bin/g++-10",
+            "command": "/usr/bin/g++-11",
             "args": [
                 "-g",
                 "${file}",
@@ -66,7 +63,7 @@
                 "$gcc"
             ],
             "group": "build",
-            "detail": "compiler: /usr/bin/g++-10"
+            "detail": "compiler: /usr/bin/g++-11"
         }
     ]
 }
