@@ -66,6 +66,7 @@ enum conn
 struct stat_shit
 {   
   int str[5], tel[5], wis[5], dex[5], con[5];
+  unsigned int points;
 };
 
 struct descriptor_data {
