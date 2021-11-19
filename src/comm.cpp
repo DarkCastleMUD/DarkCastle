@@ -791,7 +791,8 @@ void DC::game_loop(void)
           STATE(d) == conn::OLD_STAT_METHOD ||
           STATE(d) == conn::QUESTION_RACE ||
           STATE(d) == conn::QUESTION_CLASS ||
-          STATE(d) == conn::QUESTION_STATS)
+          STATE(d) == conn::QUESTION_STATS ||
+          STATE(d) == conn::NEW_PLAYER)
       {
         nanny(d,"");
       }
