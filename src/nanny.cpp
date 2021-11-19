@@ -51,6 +51,9 @@ extern "C"
 #include "vault.h"
 #include "const.h"
 #include "guild.h"
+#include <string>
+
+using namespace std;
 
 #define STATE(d) ((d)->connected)
 
@@ -58,7 +61,7 @@ void AuctionHandleDelete(string name);
 bool is_bracing(CHAR_DATA *bracee, struct room_direction_data *exit);
 void check_for_sold_items(CHAR_DATA *ch);
 
-char menu[] = "\n\rWelcome to Dark Castle Mud\n\r\n\r"
+const char menu[] = "\n\rWelcome to Dark Castle Mud\n\r\n\r"
               "0) Exit Dark Castle.\n\r"
               "1) Enter the game.\n\r"
               "2) Enter your character's description.\n\r"
@@ -84,7 +87,6 @@ extern CVoteData *DCVote;
 
 int isbanned(char *hostname);
 int _parse_email(char *arg);
-int _parse_name(char *arg, char *name);
 bool check_deny(struct descriptor_data *d, char *name);
 void update_wizlist(CHAR_DATA *ch);
 void isr_set(CHAR_DATA *ch);
@@ -922,7 +924,7 @@ void set_hw(char_data *ch)
 }
 
 // Deal with sockets that haven't logged in yet.
-void nanny(struct descriptor_data *d, char *arg)
+void nanny(struct descriptor_data *d, string arg)
 {
    char buf[MAX_STRING_LENGTH];
    stringstream str_tmp;
@@ -932,6 +934,7 @@ void nanny(struct descriptor_data *d, char *arg)
    struct char_data *ch;
    int y;
    char badclssmsg[] = "You must choose a class that matches your stats. These are marked by a '*'.\n\rSelect a class-> ";
+   unsigned selection = 0;
 
    CHAR_DATA *get_pc(char *name);
    void remove_clan_member(int clannumber, struct char_data *ch);
@@ -939,13 +942,9 @@ void nanny(struct descriptor_data *d, char *arg)
    auto &character_list = DC::instance().character_list;
 
    ch = d->character;
-   if (arg)
-   {
-      // Removing leading spaces
-      for (; isspace(*arg); arg++)
-         ;
-   }
-   if (!str_prefix("help", arg) && 
+   arg.erase(0, arg.find_first_not_of(' '));
+   
+   if (!str_prefix("help", arg.c_str()) && 
       (STATE(d) == conn::OLD_GET_CLASS ||
        STATE(d) == conn::OLD_GET_RACE ||
        STATE(d) == conn::OLD_CHOOSE_STATS ||
@@ -953,7 +952,8 @@ void nanny(struct descriptor_data *d, char *arg)
        STATE(d) == conn::GET_RACE ||
        STATE(d) == conn::GET_STATS))
    {
-      do_new_help(d->character, arg + 5, 88);
+      arg.erase(0, 4);
+      do_new_help(d->character, arg.data(), 88);
       return;
    }
 
@@ -974,7 +974,7 @@ void nanny(struct descriptor_data *d, char *arg)
    case conn::DISPLAY_ENTRANCE:
 
       // Check for people trying to connect to a webserver
-      if (!strncmp(arg, "GET", 3) || !strncmp(arg, "POST", 4))
+      if (arg == "GET" || arg == "POST")
       {
          // send webpage
          SEND_TO_Q(webpage, d);
@@ -1014,13 +1014,15 @@ void nanny(struct descriptor_data *d, char *arg)
       STATE(d) = conn::GET_NAME;
 
       // if they have already entered their name, drop through.  Otherwise stop and wait for input
-      if (!*arg)
+      if (arg.empty())
+      {
          break;
+      }
       /* no break */
 
    case conn::GET_NAME:
 
-      if (!*arg)
+      if (arg.empty())
       {
          SEND_TO_Q("Empty name.  Disconnecting...", d);
          close_socket(d);
@@ -1032,7 +1034,7 @@ void nanny(struct descriptor_data *d, char *arg)
       for (y = 1; arg[y] != '\0'; y++)
          arg[y] = LOWER(arg[y]);
 
-      if (_parse_name(arg, tmp_name))
+      if (_parse_name(arg.c_str(), tmp_name))
       {
          SEND_TO_Q("Illegal name, try another.\n\rName: ", d);
          telnet_ga(d);
@@ -1126,7 +1128,7 @@ void nanny(struct descriptor_data *d, char *arg)
          }
       }
 
-      if (strncmp((char *)crypt((char *)arg, password), password, (PASSWORD_LEN)))
+      if (string(crypt(arg.c_str(), password)) != password)
       {
          SEND_TO_Q("Wrong password.\n\r", d);
          sprintf(log_buf, "%s wrong password: %s", GET_NAME(ch), d->host);
@@ -1197,7 +1199,14 @@ void nanny(struct descriptor_data *d, char *arg)
       break;
 
    case conn::CONFIRM_NEW_NAME:
-      switch (*arg)
+      if (arg.empty())
+      {
+         SEND_TO_Q("Please type y or n: ", d);
+         telnet_ga(d);
+         break;
+      }
+
+      switch (arg[0])
       {
       case 'y':
       case 'Y':
@@ -1246,16 +1255,16 @@ void nanny(struct descriptor_data *d, char *arg)
       break;
 
    case conn::GET_NEW_PASSWORD:
-      SEND_TO_Q("\n\r", d);
+      SEND_TO_Q("\r\n", d);
 
-      if (arg == 0 || strlen(arg) < 6)
+      if (arg.length() < 6)
       {
          SEND_TO_Q("Password must be at least six characters long.\n\rPassword: ", d);
          telnet_ga(d);
          return;
       }
 
-      strncpy(ch->pcdata->pwd, (char *)crypt((char *)arg, (char *)ch->name), PASSWORD_LEN);
+      strncpy(ch->pcdata->pwd, crypt(arg.c_str(), ch->name), PASSWORD_LEN);
       ch->pcdata->pwd[PASSWORD_LEN] = '\0';
       SEND_TO_Q("Please retype password: ", d);
       telnet_ga(d);
@@ -1265,7 +1274,7 @@ void nanny(struct descriptor_data *d, char *arg)
    case conn::CONFIRM_NEW_PASSWORD:
       SEND_TO_Q("\n\r", d);
 
-      if (strncmp((char *)crypt((char *)arg, (char *)ch->pcdata->pwd), ch->pcdata->pwd, PASSWORD_LEN))
+      if (string(crypt(arg.c_str(), ch->pcdata->pwd)) != ch->pcdata->pwd)
       {
          SEND_TO_Q("Passwords don't match.\n\rRetype password: ", d);
          telnet_ga(d);
@@ -1280,7 +1289,13 @@ void nanny(struct descriptor_data *d, char *arg)
       break;
 
    case conn::GET_ANSI:
-      switch (*arg)
+      if (arg.empty())
+      {
+         STATE(d) = conn::QUESTION_ANSI;
+         return;
+      }
+
+      switch (arg[0])
       {         
       case 'y':
       case 'Y':
@@ -1305,7 +1320,14 @@ void nanny(struct descriptor_data *d, char *arg)
       break;
 
    case conn::GET_NEW_SEX:
-      switch (*arg)
+      if (arg.empty())
+      {
+         SEND_TO_Q("That's not a sex.\r\n", d);
+         STATE(d) = conn::QUESTION_SEX;
+         break;
+      }
+
+      switch (arg[0])
       {
       case 'm':
       case 'M':
@@ -1352,11 +1374,19 @@ void nanny(struct descriptor_data *d, char *arg)
       break;
 
    case conn::GET_STAT_METHOD:
-      if (arg[0] == '1')
+      try
+      {
+         selection = stoul(arg);
+      } catch(...)
+      {
+         selection = 0;
+      }
+
+      if (selection == 1)
       {
          STATE(d) = conn::NEW_STAT_METHOD;
       }
-      else if (arg[0] == '2')
+      else if (selection == 2)
       {
          STATE(d) = conn::OLD_STAT_METHOD;
       }
@@ -1404,23 +1434,32 @@ void nanny(struct descriptor_data *d, char *arg)
       ch->desc->stats = (struct stat_shit *)dc_alloc(1, sizeof(struct stat_shit));
 
       STATE(d) = conn::OLD_CHOOSE_STATS;
-      *arg = '\0';
+      arg.clear();
       // break;  no break on purpose...might as well do this now.  no point in waiting
 
    case conn::OLD_CHOOSE_STATS:
 
-      if (*arg != '\0')
-         *(arg + 1) = '\0';
+      if (arg.length() > 1)
+      {
+         arg[1] = '\0';
+      }
 
       // first time, this hasthe m/f from sex and goes right through
 
-      if ((y = atoi(arg)) && (y <= 5) && y >= 1)
+      try {
+         selection = stoul(arg);
+      } catch(...)
       {
-         GET_RAW_STR(ch) = ch->desc->stats->str[y - 1];
-         GET_RAW_INT(ch) = ch->desc->stats->tel[y - 1];
-         GET_RAW_WIS(ch) = ch->desc->stats->wis[y - 1];
-         GET_RAW_DEX(ch) = ch->desc->stats->dex[y - 1];
-         GET_RAW_CON(ch) = ch->desc->stats->con[y - 1];
+         selection = 0;
+      }
+
+      if (selection >= 1 && selection <= 5)
+      {
+         GET_RAW_STR(ch) = ch->desc->stats->str[selection - 1];
+         GET_RAW_INT(ch) = ch->desc->stats->tel[selection - 1];
+         GET_RAW_WIS(ch) = ch->desc->stats->wis[selection - 1];
+         GET_RAW_DEX(ch) = ch->desc->stats->dex[selection - 1];
+         GET_RAW_CON(ch) = ch->desc->stats->con[selection - 1];
          dc_free(ch->desc->stats);
          ch->desc->stats = nullptr;
          SEND_TO_Q("\n\rChoose a race(races you can select are marked with a *).\n\r", d);
@@ -1440,14 +1479,21 @@ void nanny(struct descriptor_data *d, char *arg)
       break;
 
    case conn::OLD_GET_RACE:
-      switch (*arg)
+      try {
+         selection = stoul(arg);
+      } catch(...)
+      {
+         selection = 0;
+      }
+      
+      switch (selection)
       {
       default:
          SEND_TO_Q("That's not a race.\n\rWhat IS your race? ", d);
          telnet_ga(d);
          return;
 
-      case '1':
+      case 1:
          ch->race = RACE_HUMAN;
          GET_RAW_STR(ch) += RACE_HUMAN_STR_MOD;
          GET_RAW_INT(ch) += RACE_HUMAN_INT_MOD;
@@ -1456,7 +1502,7 @@ void nanny(struct descriptor_data *d, char *arg)
          GET_RAW_CON(ch) += RACE_HUMAN_CON_MOD;
          break;
 
-      case '2':
+      case 2:
          if (GET_RAW_DEX(ch) < 10 || GET_RAW_INT(ch) < 10)
          {
             send_to_char("Your stats do not qualify for that race.\r\n", ch);
@@ -1471,7 +1517,7 @@ void nanny(struct descriptor_data *d, char *arg)
          GET_RAW_CON(ch) += RACE_ELVEN_CON_MOD;
          break;
 
-      case '3':
+      case 3:
          if (GET_RAW_CON(ch) < 10 || GET_RAW_WIS(ch) < 10)
          {
             send_to_char("Your stats do not qualify for that race.\r\n", ch);
@@ -1485,7 +1531,7 @@ void nanny(struct descriptor_data *d, char *arg)
          GET_RAW_CON(ch) += RACE_DWARVEN_CON_MOD;
          break;
 
-      case '4':
+      case 4:
          if (GET_RAW_DEX(ch) < 10)
          {
             send_to_char("Your stats do not qualify for that race.\r\n", ch);
@@ -1499,7 +1545,7 @@ void nanny(struct descriptor_data *d, char *arg)
          GET_RAW_CON(ch) += RACE_HOBBIT_CON_MOD;
          break;
 
-      case '5':
+      case 5:
          if (GET_RAW_INT(ch) < 12)
          {
             send_to_char("Your stats do not qualify for that race.\r\n", ch);
@@ -1513,7 +1559,7 @@ void nanny(struct descriptor_data *d, char *arg)
          GET_RAW_CON(ch) += RACE_PIXIE_CON_MOD;
          break;
 
-      case '6':
+      case 6:
          if (GET_RAW_STR(ch) < 12)
          {
             send_to_char("Your stats do not qualify for that race.\r\n", ch);
@@ -1527,7 +1573,7 @@ void nanny(struct descriptor_data *d, char *arg)
          GET_RAW_CON(ch) += RACE_GIANT_CON_MOD;
          break;
 
-      case '7':
+      case 7:
          if (GET_RAW_WIS(ch) < 12)
          {
             send_to_char("Your stats do not qualify for that race.\r\n", ch);
@@ -1541,7 +1587,7 @@ void nanny(struct descriptor_data *d, char *arg)
          GET_RAW_CON(ch) += RACE_GNOME_CON_MOD;
          break;
 
-      case '8':
+      case 8:
          if (GET_RAW_CON(ch) < 10 || GET_RAW_STR(ch) < 10)
          {
             send_to_char("Your stats do not qualify for that race.\r\n", ch);
@@ -1556,7 +1602,7 @@ void nanny(struct descriptor_data *d, char *arg)
          GET_RAW_DEX(ch) += RACE_ORC_DEX_MOD;
          GET_RAW_CON(ch) += RACE_ORC_CON_MOD;
          break;
-      case '9':
+      case 9:
          if (GET_RAW_CON(ch) < 12)
          {
             send_to_char("Your stats do not qualify for that race.\r\n", ch);
@@ -1605,7 +1651,15 @@ void nanny(struct descriptor_data *d, char *arg)
       break;
 
    case conn::OLD_GET_CLASS:
-      switch (atoi(arg))
+      try
+      {
+         selection = stoul(arg);
+      } catch(...)
+      {
+         selection = 0;
+      }
+      
+      switch (selection)
       {
       default:
          SEND_TO_Q("That's not a class.\n\rWhat IS your class? ", d);
@@ -1727,7 +1781,14 @@ void nanny(struct descriptor_data *d, char *arg)
       break;
 
    case conn::SELECT_MENU:
-      switch (*arg)
+      if (arg.empty())
+      {
+         SEND_TO_Q(menu, d);
+         telnet_ga(d);
+         break;
+      }
+
+      switch (arg[0])
       {
       case '0':
          close_socket(d);
@@ -1853,7 +1914,7 @@ void nanny(struct descriptor_data *d, char *arg)
       break;
 
    case conn::ARCHIVE_CHAR:
-      if (!strcmp(arg, "ARCHIVE ME"))
+      if (arg == "ARCHIVE ME")
       {
          str_tmp << GET_NAME(d->character);
          SEND_TO_Q("\n\rCharacter Archived.\n\r", d);
@@ -1869,7 +1930,7 @@ void nanny(struct descriptor_data *d, char *arg)
       break;
 
    case conn::DELETE_CHAR:
-      if (!strcmp(arg, "ERASE ME"))
+      if (arg == "ERASE ME")
       {
          sprintf(buf, "%s just deleted themself.", d->character->name);
          log(buf, IMMORTAL, LOG_MORTAL);
@@ -1899,7 +1960,7 @@ void nanny(struct descriptor_data *d, char *arg)
 
    case conn::CONFIRM_PASSWORD_CHANGE:
       SEND_TO_Q("\n\r", d);
-      if (!strncmp((char *)crypt((char *)arg, (char *)ch->pcdata->pwd), ch->pcdata->pwd, PASSWORD_LEN))
+      if (string(crypt(arg.c_str(), ch->pcdata->pwd)) == ch->pcdata->pwd)
       {
          SEND_TO_Q("Enter a new password: ", d);
          telnet_ga(d);
@@ -1917,13 +1978,13 @@ void nanny(struct descriptor_data *d, char *arg)
    case conn::RESET_PASSWORD:
       SEND_TO_Q("\n\r", d);
 
-      if (strlen(arg) < 6)
+      if (arg.length() < 6)
       {
          SEND_TO_Q("Password must be at least six characters long.\n\rPassword: ", d);
          telnet_ga(d);
          return;
       }
-      strncpy(ch->pcdata->pwd, (char *)crypt((char *)arg, (char *)ch->name), PASSWORD_LEN);
+      strncpy(ch->pcdata->pwd, crypt(arg.c_str(), ch->name), PASSWORD_LEN);
       ch->pcdata->pwd[PASSWORD_LEN] = '\0';
       SEND_TO_Q("Please retype password: ", d);
       telnet_ga(d);
@@ -1933,7 +1994,7 @@ void nanny(struct descriptor_data *d, char *arg)
    case conn::CONFIRM_RESET_PASSWORD:
       SEND_TO_Q("\n\r", d);
 
-      if (strncmp((char *)crypt((char *)arg, (char *)ch->pcdata->pwd), ch->pcdata->pwd, PASSWORD_LEN))
+      if (string(crypt(arg.c_str(), ch->pcdata->pwd)) != ch->pcdata->pwd)
       {
          SEND_TO_Q("Passwords don't match.\n\rRetype password: ", d);
          telnet_ga(d);
@@ -1983,7 +2044,7 @@ int _parse_email(char *arg)
 }
 
 // Parse a name for acceptability.
-int _parse_name(char *arg, char *name)
+int _parse_name(const char *arg, char *name)
 {
    int i;
 
