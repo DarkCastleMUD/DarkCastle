@@ -235,7 +235,7 @@ void boro_mob_stat(struct char_data *ch, struct char_data *k)
 	/* end of third line */
 	
 	(k->fighting ? GET_NAME(k->fighting) : "Nobody"),
-	(race_info[(int)(GET_RACE(k))].singular_name),
+	(races[(int)(GET_RACE(k))].singular_name),
 	GET_HIT(k), hit_limit(k), hit_gain(k),
 	/* end of fourth line */
 
@@ -559,7 +559,7 @@ void mob_stat(struct char_data *ch, struct char_data *k)
   send_to_char(buf, ch);
   sprintf(buf, "$3Spelldamage$R:[%d] ", getRealSpellDamage(k));
   send_to_char(buf,ch);
-  sprintf(buf,"$3Race$R: %s\r\n", race_info[(int)(GET_RACE(k))].singular_name);
+  sprintf(buf,"$3Race$R: %s\r\n", races[(int)(GET_RACE(k))].singular_name);
   send_to_char(buf, ch);
 
   if(!IS_MOB(k)) {     

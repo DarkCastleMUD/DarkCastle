@@ -2727,13 +2727,13 @@ CHAR_DATA *read_mobile(int nr, FILE *fl)
 	// the race defaults.
 //    if(mob->immune == 0 && mob->suscept == 0 && mob->resist == 0)
 	//  {
-	SET_BIT(mob->immune, race_info[(int)GET_RACE(mob)].immune);
-	SET_BIT(mob->suscept, race_info[(int)GET_RACE(mob)].suscept);
-	SET_BIT(mob->resist, race_info[(int)GET_RACE(mob)].resist);
-// TOODO:FIXTHIS         SETBIT(mob->affected_by, race_info[(int)GET_RACE(mob)].affects);
-	//      mob->immune  = race_info[(int)GET_RACE(mob)].immune;
-	//    mob->suscept = race_info[(int)GET_RACE(mob)].suscept;
-	//  mob->resist  = race_info[(int)GET_RACE(mob)].resist;
+	SET_BIT(mob->immune, races[(int)GET_RACE(mob)].immune);
+	SET_BIT(mob->suscept, races[(int)GET_RACE(mob)].suscept);
+	SET_BIT(mob->resist, races[(int)GET_RACE(mob)].resist);
+// TOODO:FIXTHIS         SETBIT(mob->affected_by, races[(int)GET_RACE(mob)].affects);
+	//      mob->immune  = races[(int)GET_RACE(mob)].immune;
+	//    mob->suscept = races[(int)GET_RACE(mob)].suscept;
+	//  mob->resist  = races[(int)GET_RACE(mob)].resist;
 //    }
 
 	mob->c_class = 0;

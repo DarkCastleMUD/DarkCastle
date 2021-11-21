@@ -955,35 +955,35 @@ bool allowed_host(char *host)
 void check_hw(char_data *ch)
 {
    heightweight(ch, FALSE);
-   if (ch->height > race_info[ch->race].max_height)
+   if (ch->height > races[ch->race].max_height)
    {
-      logf(IMP, LOG_BUG, "check_hw: %s's height %d > max %d. height set to max.", GET_NAME(ch), GET_HEIGHT(ch), race_info[ch->race].max_height);
-      ch->height = race_info[ch->race].max_height;
+      logf(IMP, LOG_BUG, "check_hw: %s's height %d > max %d. height set to max.", GET_NAME(ch), GET_HEIGHT(ch), races[ch->race].max_height);
+      ch->height = races[ch->race].max_height;
    }
-   if (ch->height < race_info[ch->race].min_height)
+   if (ch->height < races[ch->race].min_height)
    {
-      logf(IMP, LOG_BUG, "check_hw: %s's height %d < min %d. height set to min.", GET_NAME(ch), GET_HEIGHT(ch), race_info[ch->race].min_height);
-      ch->height = race_info[ch->race].min_height;
+      logf(IMP, LOG_BUG, "check_hw: %s's height %d < min %d. height set to min.", GET_NAME(ch), GET_HEIGHT(ch), races[ch->race].min_height);
+      ch->height = races[ch->race].min_height;
    }
 
-   if (ch->weight > race_info[ch->race].max_weight)
+   if (ch->weight > races[ch->race].max_weight)
    {
-      logf(IMP, LOG_BUG, "check_hw: %s's weight %d > max %d. weight set to max.", GET_NAME(ch), GET_WEIGHT(ch), race_info[ch->race].max_weight);
-      ch->weight = race_info[ch->race].max_weight;
+      logf(IMP, LOG_BUG, "check_hw: %s's weight %d > max %d. weight set to max.", GET_NAME(ch), GET_WEIGHT(ch), races[ch->race].max_weight);
+      ch->weight = races[ch->race].max_weight;
    }
-   if (ch->weight < race_info[ch->race].min_weight)
+   if (ch->weight < races[ch->race].min_weight)
    {
-      logf(IMP, LOG_BUG, "check_hw: %s's weight %d < min %d. weight set to min.", GET_NAME(ch), GET_WEIGHT(ch), race_info[ch->race].min_weight);
-      ch->weight = race_info[ch->race].min_weight;
+      logf(IMP, LOG_BUG, "check_hw: %s's weight %d < min %d. weight set to min.", GET_NAME(ch), GET_WEIGHT(ch), races[ch->race].min_weight);
+      ch->weight = races[ch->race].min_weight;
    }
    heightweight(ch, TRUE);
 }
 
 void set_hw(char_data *ch)
 {
-   ch->height = number(race_info[ch->race].min_height, race_info[ch->race].max_height);
+   ch->height = number(races[ch->race].min_height, races[ch->race].max_height);
    logf(ANGEL, LOG_MORTAL, "%s's height set to %d", GET_NAME(ch), GET_HEIGHT(ch));
-   ch->weight = number(race_info[ch->race].min_weight, race_info[ch->race].max_weight);
+   ch->weight = number(races[ch->race].min_weight, races[ch->race].max_weight);
    logf(ANGEL, LOG_MORTAL, "%s's weight set to %d", GET_NAME(ch), GET_WEIGHT(ch));
 }
 
@@ -2703,12 +2703,12 @@ void show_question_race(descriptor_data *d)
          GET_ALIGNMENT(ch) = 0;
          apply_race_attributes(ch, race);
          do_inate_race_abilities(ch);
-         if (race_info[race].singular_name != nullptr)
+         if (races[race].singular_name != nullptr)
          {
             buffer += fmt::format("{}. {:6} {:3} {:3} {:3} {:3} {:3}\r\n",
-            race, race_info[race].singular_name,
+            race, races[race].singular_name,
             GET_RAW_STR(ch), GET_RAW_DEX(ch), GET_RAW_CON(ch),  GET_RAW_INT(ch), GET_RAW_WIS(ch));
-            races_buffer += race_info[race].lowercase_name;
+            races_buffer += races[race].lowercase_name;
             if (race < MAX_PC_RACE)
             {
                races_buffer += ",";
@@ -2730,7 +2730,7 @@ bool handle_get_race(descriptor_data* d, string arg)
 
    for(unsigned race=1; race <= 9; race++)
    {
-      if (race_info[race].lowercase_name == arg)
+      if (races[race].lowercase_name == arg)
       {
          GET_RACE(d->character) = race;
          return true;
@@ -2997,19 +2997,19 @@ void show_question_stats(descriptor_data *d)
    }
 
    char_data* ch = d->character;
-   string buffer = fmt::format("Race: {}\r\n", race_info[GET_RACE(ch)].singular_name);
+   string buffer = fmt::format("Race: {}\r\n", races[GET_RACE(ch)].singular_name);
    buffer += fmt::format("Class: {}\r\n", pc_clss_types[GET_CLASS(ch)]);
    buffer += fmt::format("Points left to assign: {}\r\n", d->stats->points);
-   buffer += fmt::format("## Attribute    Current  Offsets  Total\r\n");
-   buffer += fmt::format("1. Strength     {:2}      {:2}        {:2}\r\n",
+   buffer += fmt::format("## Attribute    Current  Racial Offsets  Total\r\n");
+   buffer += fmt::format("1. Strength     {:2}      {:2}               {:2}\r\n",
    d->stats->str[0], GET_RAW_STR(ch), d->stats->str[0] + GET_RAW_STR(ch));
-   buffer += fmt::format("2. Dexterity    {:2}      {:2}        {:2}\r\n",
+   buffer += fmt::format("2. Dexterity    {:2}      {:2}               {:2}\r\n",
    d->stats->dex[0], GET_RAW_DEX(ch), d->stats->dex[0] + GET_RAW_DEX(ch));
-   buffer += fmt::format("3. Constitution {:2}      {:2}        {:2}\r\n",
+   buffer += fmt::format("3. Constitution {:2}      {:2}               {:2}\r\n",
    d->stats->con[0], GET_RAW_CON(ch), d->stats->con[0] + GET_RAW_CON(ch));
-   buffer += fmt::format("4. Intelligence {:2}      {:2}        {:2}\r\n",
+   buffer += fmt::format("4. Intelligence {:2}      {:2}               {:2}\r\n",
    d->stats->tel[0], GET_RAW_INT(ch), d->stats->tel[0] + GET_RAW_INT(ch));
-   buffer += fmt::format("5. Wisdom       {:2}      {:2}        {:2}\r\n",
+   buffer += fmt::format("5. Wisdom       {:2}      {:2}               {:2}\r\n",
    d->stats->wis[0], GET_RAW_WIS(ch), d->stats->wis[0] + GET_RAW_WIS(ch));
 
    SEND_TO_Q(buffer.c_str(), d);

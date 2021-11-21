@@ -844,7 +844,7 @@ int do_lightning_shield(CHAR_DATA *ch, CHAR_DATA *vict, int dam)
   if(GET_POS(vict) == POSITION_DEAD)            return eFAILURE;
   if(GET_LEVEL(ch) >= IMMORTAL)                 return eFAILURE;
   if(!IS_AFFECTED(vict, AFF_LIGHTNINGSHIELD))   return eFAILURE;
-  if (IS_SET(race_info[(int)GET_RACE(ch)].immune, ISR_ENERGY)
+  if (IS_SET(races[(int)GET_RACE(ch)].immune, ISR_ENERGY)
       || IS_SET(ch->immune, ISR_ENERGY)
      ) {
     dam = 0;
@@ -952,7 +952,7 @@ int do_fireshield(CHAR_DATA *ch, CHAR_DATA *vict, int dam)
   if(!IS_NPC(ch) && GET_LEVEL(ch) >= IMMORTAL)  return eFAILURE;
   if(!IS_AFFECTED(vict, AFF_FIRESHIELD))        return eFAILURE;
 
-  if (IS_SET(race_info[(int)GET_RACE(ch)].immune, ISR_FIRE) ||
+  if (IS_SET(races[(int)GET_RACE(ch)].immune, ISR_FIRE) ||
       IS_SET(ch->immune, ISR_FIRE)) {
     dam = 0;
   } else {
@@ -1030,7 +1030,7 @@ int do_acidshield(CHAR_DATA *ch, CHAR_DATA *vict, int dam)
   if(!IS_NPC(ch) && GET_LEVEL(ch) >= IMMORTAL)  return eFAILURE;
   if(!IS_AFFECTED(vict, AFF_ACID_SHIELD)) return eFAILURE;
 
-  if (IS_SET(race_info[(int)GET_RACE(ch)].immune, ISR_ACID)
+  if (IS_SET(races[(int)GET_RACE(ch)].immune, ISR_ACID)
       || IS_SET(ch->immune, ISR_ACID)
      )
     dam = 0;
@@ -1110,7 +1110,7 @@ int do_boneshield(CHAR_DATA *ch, CHAR_DATA *vict, int dam)
   if(!IS_NPC(ch) && GET_LEVEL(ch) >= IMMORTAL)  return eFAILURE;
   if(!affected_by_spell(vict, SPELL_BONESHIELD)) return eFAILURE;
 
-  if (IS_SET(race_info[(int)GET_RACE(ch)].immune, ISR_PHYSICAL) ||
+  if (IS_SET(races[(int)GET_RACE(ch)].immune, ISR_PHYSICAL) ||
       IS_SET(ch->immune, ISR_PHYSICAL))
     dam = 0;
   else {
@@ -5342,7 +5342,7 @@ CHAR_DATA *loop_followers(struct follow_type **f)
 void dam_message(int dam, CHAR_DATA * ch, CHAR_DATA * victim,
                  int w_type, long modifier)
 {
-  static char *attack_table[] =
+  static const char *attack_table[] =
   {
     "hit", "pound", "pierce", "slash", "whip", "claw",
       "bite", "sting", "crush"
@@ -5350,7 +5350,7 @@ void dam_message(int dam, CHAR_DATA * ch, CHAR_DATA * victim,
 
   char buf1[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH], buf3[MAX_STRING_LENGTH];
   char *vs, *vp, *vx;
-  char *attack=0;
+  const char *attack=0;
   char punct;
   char modstring[200];
   char endstring[200];
@@ -5557,7 +5557,7 @@ void dam_message(int dam, CHAR_DATA * ch, CHAR_DATA * victim,
      if (GET_CLASS(victim) == CLASS_MONK) {
        if (w_type == 0)
        {
-         if (!attack) attack = race_info[GET_RACE(ch)].unarmed;
+         if (!attack) attack = races[GET_RACE(ch)].unarmed;
          sprintf(buf1, "$n's %s %s $N%s| as it deflects off $S %s%c", attack, vp, vx,  shield,punct);
          sprintf(buf2, "You %s $N%s%s as $E raises $S %s to deflect your %s%c", vs, vx, !IS_NPC(ch) && IS_SET(ch->pcdata->toggles, 
 PLR_DAMAGE)?dammsg:"", shield, attack, punct);
@@ -5588,7 +5588,7 @@ PLR_DAMAGE)?dammsg:"", attack, shield, punct);
      } else {
        if (w_type == 0)
        {
-         if (!attack) attack = race_info[GET_RACE(ch)].unarmed;
+         if (!attack) attack = races[GET_RACE(ch)].unarmed;
          sprintf(buf1, "$n's %s %s $N%s| as it strikes $S %s%c", attack, vp, vx, shield, punct);
          sprintf(buf2, "You %s $N%s%s as $E raises $S %s to deflect your %s%c", vs, vx, !IS_NPC(ch) && IS_SET(ch->pcdata->toggles, 
 PLR_DAMAGE)?dammsg:"", shield, attack, punct);
@@ -5609,7 +5609,7 @@ PLR_DAMAGE)?dammsg:"", attack, shield, punct);
    else {
      if (w_type == 0)
      {
-       if (!attack) attack = race_info[GET_RACE(ch)].unarmed;
+       if (!attack) attack = races[GET_RACE(ch)].unarmed;
        int a;
        if (IS_NPC(ch) && (a = mob_index[ch->mobdata->nr].virt) < 92 && a > 87)
         attack = elem_type[a-88];

@@ -132,13 +132,13 @@ int do_whogroup(struct char_data *ch, char *argument, int cmd)
          {
              sprintf(tempbuffer,
                  "   $B%-18s %-10s %-14s   Level %2d      $1($7Leader$1)$R \n\r",
-                 GET_NAME(k), race_info[(int)GET_RACE(k)].singular_name,
+                 GET_NAME(k), races[(int)GET_RACE(k)].singular_name,
 	         pc_clss_types[(int)GET_CLASS(k)], GET_LEVEL(k));
          }
          else {
              sprintf(tempbuffer,
                  "   $B%-18s %-10s Anonymous                      $1($7Leader$1)$R \n\r", 
-                 GET_NAME(k), race_info[(int)GET_RACE(k)].singular_name);
+                 GET_NAME(k), races[(int)GET_RACE(k)].singular_name);
          }
          add_to_who(tempbuffer);
 
@@ -152,12 +152,12 @@ int do_whogroup(struct char_data *ch, char *argument, int cmd)
                   // First if they're not anonymous
                   if (!IS_ANONYMOUS(f->follower) || (f->follower->clan == ch->clan && ch->clan))
                      sprintf(tempbuffer, "   %-18s %-10s %-14s   Level %2d\n\r",
-                          GET_NAME(f->follower), race_info[(int)GET_RACE(f->follower)].singular_name,
+                          GET_NAME(f->follower), races[(int)GET_RACE(f->follower)].singular_name,
                           pc_clss_types[(int)GET_CLASS(f->follower)], GET_LEVEL(f->follower));
                   else 
                      sprintf(tempbuffer,
                           "   %-18s %-10s Anonymous            \n\r",
-                          GET_NAME(f->follower), race_info[(int)GET_RACE(f->follower)].singular_name);
+                          GET_NAME(f->follower), races[(int)GET_RACE(f->follower)].singular_name);
                   add_to_who(tempbuffer);
                }
          } // for f = k->followers
@@ -224,7 +224,7 @@ int do_whosolo(struct char_data *ch, char *argument, int cmd)
                sprintf(tempbuffer,
                  "   %-15s %-9s %-13s %2d     %-4d%-7d%d\n\r",
                  i->name,
-                 race_info[(int)GET_RACE(i)].singular_name,
+                 races[(int)GET_RACE(i)].singular_name,
                  pc_clss_types[(int)GET_CLASS(i)], GET_LEVEL(i),
                  IS_MOB(i) ? 0 : i->pcdata->totalpkills, 
                  IS_MOB(i) ? 0 : i->pcdata->pdeathslogin, 
@@ -235,7 +235,7 @@ int do_whosolo(struct char_data *ch, char *argument, int cmd)
                sprintf(tempbuffer,
                 "   %-15s %-9s Anonymous            %-4d%-7d%d\n\r",
 	        i->name, 
-                race_info[(int)GET_RACE(i)].singular_name,
+                races[(int)GET_RACE(i)].singular_name,
                  IS_MOB(i) ? 0 : i->pcdata->totalpkills, 
                  IS_MOB(i) ? 0 : i->pcdata->pdeathslogin, 
                  IS_MOB(i) ? 0 : (i->pcdata->totalpkills ? 

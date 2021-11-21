@@ -11758,7 +11758,7 @@ int spell_lighted_path( ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DA
 
   while(ptrack) {
     sprintf(buf, "A %s called %s headed %s...\r\n",
-            race_info[ptrack->race].singular_name,
+            races[ptrack->race].singular_name,
             ptrack->trackee,
             dirs[ptrack->direction]);
     send_to_char(buf, ch);

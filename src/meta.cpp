@@ -1529,7 +1529,7 @@ int cardinal(struct char_data *ch, struct obj_data *obj, int cmd, char *argument
 		send_to_char("$BRace Change:$R\r\n(Remember a race change will reduce your base attributes by 2 points each.)\r\n", ch);
 
 		for (int i = 1; i <= MAX_PC_RACE; i++)
-			csendf(ch, "$B$3%d)$R  %-32s - %s\r\n", i, race_info[i].singular_name, race_message(ch, i));
+			csendf(ch, "$B$3%d)$R  %-32s - %s\r\n", i, races[i].singular_name, race_message(ch, i));
 
 		send_to_char("$BOther Services:$R\r\n", ch);
 
@@ -1538,22 +1538,22 @@ int cardinal(struct char_data *ch, struct obj_data *obj, int cmd, char *argument
 
 		send_to_char("$BHeight/Weight Change:$R\r\n", ch);
 		heightweight(ch, FALSE);
-		if (ch->height < race_info[ch->race].max_height)
+		if (ch->height < races[ch->race].max_height)
 			csendf(ch, "$B$3%d)$R %-32s - 250 platinum coins.\r\n", MAX_PC_RACE + 3, "Increase your height by 1");
 		else
 			csendf(ch, "$B$3%d)$R %-32s.\r\n", MAX_PC_RACE + 3, "You cannot increase your height further");
 
-		if (ch->height > race_info[ch->race].min_height)
+		if (ch->height > races[ch->race].min_height)
 			csendf(ch, "$B$3%d)$R %-32s - 250 platinum coins.\r\n", MAX_PC_RACE + 4, "Decrease your height by 1");
 		else
 			csendf(ch, "$B$3%d)$R %-32s.\r\n", MAX_PC_RACE + 4, "You cannot decrease your height further");
 
-		if (ch->weight < race_info[ch->race].max_weight)
+		if (ch->weight < races[ch->race].max_weight)
 			csendf(ch, "$B$3%d)$R %-32s - 250 platinum coins.\r\n", MAX_PC_RACE + 5, "Increase your weight by 1");
 		else
 			csendf(ch, "$B$3%d)$R %-32s.\r\n", MAX_PC_RACE + 5, "You cannot increase your weight further");
 
-		if (ch->weight > race_info[ch->race].min_weight)
+		if (ch->weight > races[ch->race].min_weight)
 			csendf(ch, "$B$3%d)$R %-32s - 250 platinum coins.\r\n", MAX_PC_RACE + 6, "Decrease your weight by 1");
 		else
 			csendf(ch, "$B$3%d)$R %-32s.\r\n", MAX_PC_RACE + 6, "You cannot decrease your weight further");
@@ -1696,25 +1696,25 @@ int cardinal(struct char_data *ch, struct obj_data *obj, int cmd, char *argument
 			choice -= MAX_PC_RACE;
 
 			heightweight(ch, FALSE);
-			if (choice == 3 && ch->height >= race_info[ch->race].max_height)
+			if (choice == 3 && ch->height >= races[ch->race].max_height)
 					{
 				send_to_char("You cannot increase your height any more.\r\n", ch);
 				heightweight(ch, TRUE);
 				return eSUCCESS;
 			}
-			else if (choice == 4 && ch->height <= race_info[ch->race].min_height)
+			else if (choice == 4 && ch->height <= races[ch->race].min_height)
 					{
 				send_to_char("You cannot decrease your height any more.\r\n", ch);
 				heightweight(ch, TRUE);
 				return eSUCCESS;
 			}
-			else if (choice == 5 && ch->weight >= race_info[ch->race].max_weight)
+			else if (choice == 5 && ch->weight >= races[ch->race].max_weight)
 					{
 				send_to_char("You cannot increase your weight any more.\r\n", ch);
 				heightweight(ch, TRUE);
 				return eSUCCESS;
 			}
-			else if (choice == 6 && ch->weight <= race_info[ch->race].min_weight)
+			else if (choice == 6 && ch->weight <= races[ch->race].min_weight)
 					{
 				send_to_char("You cannot decrease your weight any more.\r\n", ch);
 				heightweight(ch, TRUE);

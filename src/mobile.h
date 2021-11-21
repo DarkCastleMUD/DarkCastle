@@ -75,12 +75,12 @@ char *getTemp(CHAR_DATA *ch, char *name);
 #define ACT_MAX             37
 //#define CHECKTHISACT      64 //Do not chance unless ASIZE changes
 
-struct race_shit
+struct race_data
 {
   char *singular_name;   /* Dwarf, Elf, etc.     */
   string lowercase_name; /* dwarf, elf, etc.     */
   char *plural_name;     /* dwarves, elves, etc. */
-   
+  bool playable;    /* Can a player play as this race? */
   long body_parts;  /* bitvector for body parts       */
   long immune;      /* bitvector for immunities       */
   long resist;      /* bitvector for resistances      */
@@ -89,10 +89,32 @@ struct race_shit
   long friendly;    /* bitvector for friendliness     */
   int  min_weight;      /* min weight */
   int  max_weight;
+  
   int  min_height;      
   int  max_height;
+
+  unsigned min_str;
+  unsigned max_str;
+  int mod_str;
+
+  unsigned min_dex;
+  unsigned max_dex;
+  int mod_dex;
+
+  unsigned min_con;
+  unsigned max_con;
+  int mod_con;
+
+  unsigned min_int;
+  unsigned max_int;
+  int mod_int;
+
+  unsigned min_wis;
+  unsigned max_wis;
+  int mod_wis;
+  
   int affects;      /* automatically added affects   */
-  char *unarmed;    // unarmed attack message
+  const char *unarmed;    // unarmed attack message
 };
 
 struct mob_matrix_data

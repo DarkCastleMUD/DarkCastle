@@ -465,7 +465,7 @@ void show_char_to_char(struct char_data *i, struct char_data *ch, int mode)
 	     buffer.append(buf);
 	   } else {
 	     sprintf(buf, " the %s [%s]",
-                     race_info[(int)GET_RACE(i)].singular_name, clan->name);
+                     races[(int)GET_RACE(i)].singular_name, clan->name);
 	     buffer.append(buf);
 	   }
 	 } else {
@@ -474,7 +474,7 @@ void show_char_to_char(struct char_data *i, struct char_data *ch, int mode)
 	     buffer.append(GET_TITLE(i));
 	   } else {
 	     buffer.append(" the ");
-	     sprintf(buf2, "%s", race_info[(int)GET_RACE(i)].singular_name);
+	     sprintf(buf2, "%s", races[(int)GET_RACE(i)].singular_name);
 	     buffer.append(buf2);
 	   }
 	 }
@@ -582,7 +582,7 @@ void show_char_to_char(struct char_data *i, struct char_data *ch, int mode)
      buffer = GET_SHORT(i);
 
      sprintf(buf, " the %s",
-	     race_info[(int)GET_RACE(i)].singular_name);
+	     races[(int)GET_RACE(i)].singular_name);
 
      buffer.append(buf);
 
@@ -1774,7 +1774,7 @@ int do_score(struct char_data *ch, char *argument, int cmd)
    string isrString;
    //int i;
 
-   sprintf(race, "%s", race_info[(int)GET_RACE(ch)].singular_name);
+   sprintf(race, "%s", races[(int)GET_RACE(ch)].singular_name);
    exp_needed = (exp_table[(int)GET_LEVEL(ch) + 1] - GET_EXP(ch));
 
    to_hit = GET_REAL_HITROLL(ch);
@@ -1980,7 +1980,7 @@ int do_score(struct char_data *ch, char *argument, int cmd)
       ((IS_AFFECTED(ch, AFF_DETECT_MAGIC) && aff->duration < 3) ? "$2(fading)$7" : "        "),
       modifyOutput ?
       affected_by_spell(ch, SKILL_NAT_SELECT) ?
-      race_info[aff->modifier].singular_name :
+      races[aff->modifier].singular_name :
       affected_by_spell(ch, SPELL_IMMUNITY) ?
       spells[aff->modifier] :
       apply_types[(int) aff->location] :

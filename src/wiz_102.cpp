@@ -151,7 +151,7 @@ int do_check(struct char_data *ch, char *arg, int cmd) {
   sprintf(buf, "$3Short Desc$R: %s\n\r", GET_SHORT(vict));
   send_to_char(buf, ch); 
   sprintf(buf, "$3Race$R: %-9s $3Class$R: %-9s $3Level$R: %-8d $3In Room$R: %d\n\r",
-          race_info[(int)(GET_RACE(vict))].singular_name,
+          races[(int)(GET_RACE(vict))].singular_name,
           pc_clss_types[(int)(GET_CLASS(vict))], GET_LEVEL(vict),
           (connected ? world[vict->in_room].number : -1));
   send_to_char(buf, ch);  
@@ -2877,18 +2877,18 @@ int do_medit(struct char_data *ch, char *argument, int cmd) {
 					"$3Current$R: ", ch);
 			sprintf(buf, "%s\n\r\n\r"
 					"Available types:\r\n",
-					race_info[((char_data *) mob_index[mob_num].item)->race].singular_name);
+					races[((char_data *) mob_index[mob_num].item)->race].singular_name);
 			send_to_char(buf, ch);
 			for (i = 0; i <= MAX_RACE; i++)
-				csendf(ch, "  %s\r\n", race_info[i].singular_name);
+				csendf(ch, "  %s\r\n", races[i].singular_name);
 			send_to_char("\r\n", ch);
 			return eFAILURE;
 		}
 		int race_set = 0;
 		for (i = 0; i <= MAX_RACE; i++) {
-			if (is_abbrev(buf4, race_info[i].singular_name)) {
+			if (is_abbrev(buf4, races[i].singular_name)) {
 				csendf(ch, "Mob race set to %s.\r\n",
-						race_info[i].singular_name);
+						races[i].singular_name);
 				((char_data *) mob_index[mob_num].item)->race = i;
 				race_set = 1;
 

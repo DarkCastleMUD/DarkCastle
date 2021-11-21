@@ -1060,7 +1060,7 @@ int do_show(struct char_data *ch, char *argument, int cmd) {
 					goto thisLoop;
 				}
 			for (i = 0; i <= MAX_RACE; i++)
-				if (!str_nosp_cmp(race_info[i].singular_name, arg1)) {
+				if (!str_nosp_cmp(races[i].singular_name, arg1)) {
 					race = i;
 					goto thisLoop;
 				}
@@ -1120,7 +1120,7 @@ int do_show(struct char_data *ch, char *argument, int cmd) {
 			}
 			for (i = 0; i <= MAX_RACE; i++) {
 				o++;
-				send_to_char_nosp(race_info[i].singular_name, ch);
+				send_to_char_nosp(races[i].singular_name, ch);
 				if (o % 7 == 0)
 					send_to_char("\r\n", ch);
 				else

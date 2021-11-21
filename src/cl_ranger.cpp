@@ -462,7 +462,7 @@ int do_track(CHAR_DATA *ch, char *argument, int cmd)
         strcpy(sex,""); 
 
      if (pScent->race >=1 && pScent->race <= 30) 
-        sprintf(race, " %s", race_info[pScent->race].singular_name);
+        sprintf(race, " %s", races[pScent->race].singular_name);
      else
         strcpy(race," non-descript race");
 
@@ -1811,7 +1811,7 @@ int do_natural_selection(CHAR_DATA *ch, char *arg, int cmd)
    cur = affected_by_spell(ch, SKILL_NAT_SELECT);
 
    for(i=1;i<33;i++) {
-      if(is_abbrev(buf,race_info[i].singular_name)) {
+      if(is_abbrev(buf,races[i].singular_name)) {
          if(cur && cur->modifier == i) {
             send_to_char("You are already studying this race.\n\r", ch);
             return eFAILURE;
@@ -1841,7 +1841,7 @@ int do_natural_selection(CHAR_DATA *ch, char *arg, int cmd)
    af.bitvector = -1;
    affect_to_char(ch, &af);
 
-   csendf(ch, "You study the habits of the %s race and select them as your enemy of choice.\n\r", race_info[i].singular_name);
+   csendf(ch, "You study the habits of the %s race and select them as your enemy of choice.\n\r", races[i].singular_name);
 
    return eSUCCESS;
 }

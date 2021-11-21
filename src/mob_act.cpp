@@ -414,19 +414,19 @@ void mobile_activity(void)
 	   (!ch->mobdata->hatred || !isname(GET_NAME(tmp_ch), ch->mobdata->hatred)) &&
            tmp_ch->fighting &&
 	   CAN_SEE(ch, tmp_ch) &&
-           (IS_SET(race_info[(int)GET_RACE(ch)].friendly, tmp_bitv) ||
+           (IS_SET(races[(int)GET_RACE(ch)].friendly, tmp_bitv) ||
 	     (int)GET_RACE(ch) == (int)GET_RACE(tmp_ch)) &&
 
            !(IS_NPC(tmp_ch->fighting) && !IS_AFFECTED(tmp_ch->fighting, AFF_CHARM))
-		&& !IS_SET(race_info[(int)GET_RACE(ch)].friendly, GET_BITV(tmp_ch->fighting)) &&
+		&& !IS_SET(races[(int)GET_RACE(ch)].friendly, GET_BITV(tmp_ch->fighting)) &&
 	!affected_by_spell(tmp_ch, FUCK_PTHIEF) && !affected_by_spell(tmp_ch, FUCK_GTHIEF)
 )
         {
           tmp_race = GET_RACE(tmp_ch);
           if(GET_RACE(ch) == tmp_race)
-            sprintf(buf, "$n screams 'Take heart, fellow %s!'", race_info[tmp_race].singular_name);
+            sprintf(buf, "$n screams 'Take heart, fellow %s!'", races[tmp_race].singular_name);
           else
-            sprintf(buf, "$n screams 'HEY! Don't be picking on %s!'", race_info[tmp_race].plural_name);
+            sprintf(buf, "$n screams 'HEY! Don't be picking on %s!'", races[tmp_race].plural_name);
           act(buf,  ch, 0, 0, TO_ROOM, 0);
 
           PerfTimers["attack_trigger3"].start();
@@ -545,7 +545,7 @@ void mobile_activity(void)
           }
       
           if(ISSET(ch->mobdata->actflags, ACT_RACIST) &&
-            IS_SET(race_info[(int)GET_RACE(ch)].hate_fear, tmp_bitv))
+            IS_SET(races[(int)GET_RACE(ch)].hate_fear, tmp_bitv))
           {
             tmp_race = GET_RACE(tmp_ch);
             bool wimpy = ISSET(ch->mobdata->actflags, ACT_WIMPY);
@@ -556,7 +556,7 @@ void mobile_activity(void)
             //if mob is wimpy, and lower level.. flee
             if(!wimpy || (wimpy && GET_LEVEL(ch) >= GET_LEVEL(tmp_ch)))
             {
-              sprintf(buf, "$n screams 'Oooo, I HATE %s!'", race_info[tmp_race].plural_name);
+              sprintf(buf, "$n screams 'Oooo, I HATE %s!'", races[tmp_race].plural_name);
               act(buf, ch, 0, 0, TO_ROOM, 0);
               retval = mprog_attack_trigger( ch, tmp_ch );
               if(SOMEONE_DIED(retval))
@@ -565,7 +565,7 @@ void mobile_activity(void)
             } 
             else 
             {
-              sprintf(buf, "$n screams 'Eeeeek, I HATE %s!'", race_info[tmp_race].plural_name);
+              sprintf(buf, "$n screams 'Eeeeek, I HATE %s!'", races[tmp_race].plural_name);
               act(buf,  ch, 0, 0, TO_ROOM, 0);
               do_flee(ch, "", 9);
             }

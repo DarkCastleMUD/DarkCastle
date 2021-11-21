@@ -366,7 +366,7 @@ int do_golem_score(struct char_data *ch, char *argument, int cmd)
    uint32 immune=0,suscept=0,resist=0;
    string isrString;
 
-   sprintf(race, "%s", race_info[(int)GET_RACE(ch)].singular_name);
+   sprintf(race, "%s", races[(int)GET_RACE(ch)].singular_name);
    exp_needed = (int)(exp_table[(int)GET_LEVEL(ch) + 19] - (int64)GET_EXP(ch));
 
    to_hit = GET_REAL_HITROLL(ch);

@@ -306,17 +306,17 @@ int do_matrixinfo(struct char_data *ch, char *argument, int cmd)
   {
     char immbuf[MAX_STRING_LENGTH], resbuf[MAX_STRING_LENGTH], susbuf[MAX_STRING_LENGTH];
     immbuf[0] = resbuf[0] = susbuf[0] = '\0';
-    sprintbit(race_info[i].immune, isr_bits, immbuf);
-    sprintbit(race_info[i].resist, isr_bits, resbuf);
-    sprintbit(race_info[i].suscept, isr_bits, susbuf);
+    sprintbit(races[i].immune, isr_bits, immbuf);
+    sprintbit(races[i].resist, isr_bits, resbuf);
+    sprintbit(races[i].suscept, isr_bits, susbuf);
 
     char hatbuf[MAX_STRING_LENGTH], fribuf[MAX_STRING_LENGTH];
     hatbuf[0] = fribuf[0] = '\0';
-    sprintbit(race_info[i].hate_fear<<1, race_abbrev, hatbuf);
-    sprintbit(race_info[i].friendly<<1, race_abbrev, fribuf);
+    sprintbit(races[i].hate_fear<<1, race_abbrev, hatbuf);
+    sprintbit(races[i].friendly<<1, race_abbrev, fribuf);
 
     sprintf(buf, "%s %s - Imm: %s Res: %s Sus: %s\r\n    Hates: %s Friend: %s\r\n",
-		buf, race_info[i].plural_name, immbuf, resbuf, susbuf, hatbuf, fribuf);
+		buf, races[i].plural_name, immbuf, resbuf, susbuf, hatbuf, fribuf);
   }
   send_to_char(buf,ch);
   return eSUCCESS;

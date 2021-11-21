@@ -659,11 +659,11 @@ int do_set(struct char_data *ch, char *argument, int cmd)
                     send_to_char("No such race.\n\r", ch);
                     return eFAILURE;
                   }
-                  if(isname(race_info[x].singular_name, buf)) {
+                  if(isname(races[x].singular_name, buf)) {
                     GET_RACE(vict) = x;
-                    vict->immune = race_info[(int)GET_RACE(vict)].immune;
-                    vict->suscept = race_info[(int)GET_RACE(vict)].suscept;
-                    vict->resist = race_info[(int)GET_RACE(vict)].resist;
+                    vict->immune = races[(int)GET_RACE(vict)].immune;
+                    vict->suscept = races[(int)GET_RACE(vict)].suscept;
+                    vict->resist = races[(int)GET_RACE(vict)].resist;
                     break;
                   }
                 }
