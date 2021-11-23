@@ -106,6 +106,7 @@ bool handle_get_class(descriptor_data* d, string arg);
 int is_clss_race_compat(CHAR_DATA *ch, int clss);
 void show_question_stats(descriptor_data *d);
 bool handle_get_stats(descriptor_data* d, string arg);
+
 int is_race_eligible(CHAR_DATA *ch, int race)
 {
    if (race == 2 && (GET_RAW_DEX(ch) < 10 || GET_RAW_INT(ch) < 10))
@@ -1524,7 +1525,7 @@ void nanny(struct descriptor_data *d, string arg)
       {
          free(ch->desc->stats);
       }
-      ch->desc->stats = (struct stat_shit *)dc_alloc(1, sizeof(struct stat_shit));
+      ch->desc->stats = (struct stat_data *)dc_alloc(1, sizeof(struct stat_data));
 
       STATE(d) = conn::OLD_CHOOSE_STATS;
       arg.clear();
@@ -2701,13 +2702,13 @@ void show_question_race(descriptor_data *d)
          GET_RAW_INT(ch) = 0;
          GET_RAW_WIS(ch) = 0;
          GET_ALIGNMENT(ch) = 0;
-         apply_race_attributes(ch, race);
+         //apply_race_attributes(ch, race);
          do_inate_race_abilities(ch);
          if (races[race].singular_name != nullptr)
          {
             buffer += fmt::format("{}. {:6} {:3} {:3} {:3} {:3} {:3}\r\n",
             race, races[race].singular_name,
-            GET_RAW_STR(ch), GET_RAW_DEX(ch), GET_RAW_CON(ch),  GET_RAW_INT(ch), GET_RAW_WIS(ch));
+            races[race].mod_str, races[race].mod_dex, races[race].mod_con,  races[race].mod_int, races[race].mod_wis);
             races_buffer += races[race].lowercase_name;
             if (race < MAX_PC_RACE)
             {
@@ -2854,7 +2855,7 @@ void show_question_stats(descriptor_data *d)
 
    if (d->stats == nullptr)
    {
-      d->stats = new stat_shit;
+      d->stats = new stat_data;
 
       char_data* ch = d->character;
       // Current
@@ -2896,13 +2897,13 @@ void show_question_stats(descriptor_data *d)
             break;
 
          case RACE_DWARVEN:
-            con_needed = (10 - d->stats->con[0] + RACE_DWARVEN_CON_MOD);
+            con_needed = (10 - d->stats->con[0] + races[RACE_DWARVEN].mod_con);
             if (con_needed > 0)
             {
                d->stats->points -= con_needed;
                d->stats->con[0] += con_needed;
             }
-            wis_needed = (10 - d->stats->wis[0] + RACE_DWARVEN_WIS_MOD);
+            wis_needed = (10 - d->stats->wis[0] + races[RACE_DWARVEN].mod_wis);
             if (wis_needed > 0)
             {
                d->stats->points -= wis_needed;
@@ -2916,39 +2917,20 @@ void show_question_stats(descriptor_data *d)
              
             }
             ch->race = RACE_HOBBIT;
-            GET_RAW_STR(ch) += RACE_HOBBIT_STR_MOD;
-            GET_RAW_INT(ch) += RACE_HOBBIT_INT_MOD;
-            GET_RAW_WIS(ch) += RACE_HOBBIT_WIS_MOD;
-            GET_RAW_DEX(ch) += RACE_HOBBIT_DEX_MOD;
-            GET_RAW_CON(ch) += RACE_HOBBIT_CON_MOD;
             break;
 
          case 5:
             if (GET_RAW_INT(ch) < 12)
             {
-             
             }
-            ch->race = RACE_PIXIE;
-            GET_RAW_STR(ch) += RACE_PIXIE_STR_MOD;
-            GET_RAW_INT(ch) += RACE_PIXIE_INT_MOD;
-            GET_RAW_WIS(ch) += RACE_PIXIE_WIS_MOD;
-            GET_RAW_DEX(ch) += RACE_PIXIE_DEX_MOD;
-            GET_RAW_CON(ch) += RACE_PIXIE_CON_MOD;
-            
+            ch->race = RACE_PIXIE;            
             break;
 
          case 6:
             if (GET_RAW_STR(ch) < 12)
             {         
             }
-            
-            ch->race = RACE_GIANT;
-            GET_RAW_STR(ch) += RACE_GIANT_STR_MOD;
-            GET_RAW_INT(ch) += RACE_GIANT_INT_MOD;
-            GET_RAW_WIS(ch) += RACE_GIANT_WIS_MOD;
-            GET_RAW_DEX(ch) += RACE_GIANT_DEX_MOD;
-            GET_RAW_CON(ch) += RACE_GIANT_CON_MOD;
-            
+            ch->race = RACE_GIANT;           
             break;
 
          case 7:
@@ -2956,13 +2938,7 @@ void show_question_stats(descriptor_data *d)
             {
             
             }
-            ch->race = RACE_GNOME;
-            GET_RAW_STR(ch) += RACE_GNOME_STR_MOD;
-            GET_RAW_INT(ch) += RACE_GNOME_INT_MOD;
-            GET_RAW_WIS(ch) += RACE_GNOME_WIS_MOD;
-            GET_RAW_DEX(ch) += RACE_GNOME_DEX_MOD;
-            GET_RAW_CON(ch) += RACE_GNOME_CON_MOD;
-            
+            ch->race = RACE_GNOME;            
             break;
 
          case 8:
@@ -2971,13 +2947,7 @@ void show_question_stats(descriptor_data *d)
             
             }
             ch->race = RACE_ORC;
-            ch->alignment = -1000;
-            GET_RAW_STR(ch) += RACE_ORC_STR_MOD;
-            GET_RAW_INT(ch) += RACE_ORC_INT_MOD;
-            GET_RAW_WIS(ch) += RACE_ORC_WIS_MOD;
-            GET_RAW_DEX(ch) += RACE_ORC_DEX_MOD;
-            GET_RAW_CON(ch) += RACE_ORC_CON_MOD;
-            
+            ch->alignment = -1000;            
             break;
          case 9:
             if (GET_RAW_CON(ch) < 12)
@@ -2985,32 +2955,27 @@ void show_question_stats(descriptor_data *d)
             
             }
             ch->race = RACE_TROLL;
-            ch->alignment = 0;
-            GET_RAW_STR(ch) += RACE_TROLL_STR_MOD;
-            GET_RAW_INT(ch) += RACE_TROLL_INT_MOD;
-            GET_RAW_WIS(ch) += RACE_TROLL_WIS_MOD;
-            GET_RAW_DEX(ch) += RACE_TROLL_DEX_MOD;
-            GET_RAW_CON(ch) += RACE_TROLL_CON_MOD;
-            
+            ch->alignment = 0;            
             break;
       }
    }
 
    char_data* ch = d->character;
+   unsigned race = GET_RACE(ch);
    string buffer = fmt::format("Race: {}\r\n", races[GET_RACE(ch)].singular_name);
    buffer += fmt::format("Class: {}\r\n", pc_clss_types[GET_CLASS(ch)]);
    buffer += fmt::format("Points left to assign: {}\r\n", d->stats->points);
    buffer += fmt::format("## Attribute    Current  Racial Offsets  Total\r\n");
    buffer += fmt::format("1. Strength     {:2}      {:2}               {:2}\r\n",
-   d->stats->str[0], GET_RAW_STR(ch), d->stats->str[0] + GET_RAW_STR(ch));
+   d->stats->str[0], races[race].mod_str, d->stats->str[0] + races[race].mod_str);
    buffer += fmt::format("2. Dexterity    {:2}      {:2}               {:2}\r\n",
-   d->stats->dex[0], GET_RAW_DEX(ch), d->stats->dex[0] + GET_RAW_DEX(ch));
+   d->stats->dex[0], races[race].mod_dex, d->stats->dex[0] + races[race].mod_dex);
    buffer += fmt::format("3. Constitution {:2}      {:2}               {:2}\r\n",
-   d->stats->con[0], GET_RAW_CON(ch), d->stats->con[0] + GET_RAW_CON(ch));
+   d->stats->con[0], races[race].mod_con, d->stats->con[0] + races[race].mod_con);
    buffer += fmt::format("4. Intelligence {:2}      {:2}               {:2}\r\n",
-   d->stats->tel[0], GET_RAW_INT(ch), d->stats->tel[0] + GET_RAW_INT(ch));
+   d->stats->tel[0], races[race].mod_int, d->stats->tel[0] + races[race].mod_int);
    buffer += fmt::format("5. Wisdom       {:2}      {:2}               {:2}\r\n",
-   d->stats->wis[0], GET_RAW_WIS(ch), d->stats->wis[0] + GET_RAW_WIS(ch));
+   d->stats->wis[0], races[race].mod_wis, d->stats->wis[0] + races[race].mod_wis);
 
    SEND_TO_Q(buffer.c_str(), d);
 }
