@@ -1093,7 +1093,7 @@ int do_stand(CHAR_DATA *ch, char *argument, int cmd)
             act("You stand up.",  ch,0,0,TO_CHAR, 0);
             act("$n clambers on $s feet.",ch, 0, 0, TO_ROOM, INVIS_NULL);
             if(ch->fighting)
-              GET_POS(ch) = POSITION_FIGHTING;
+              ch->setPOSFighting();
             else GET_POS(ch) = POSITION_STANDING;
         } break;
         case POSITION_RESTING   : {

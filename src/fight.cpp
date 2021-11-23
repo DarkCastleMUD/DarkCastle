@@ -800,7 +800,7 @@ void update_stuns(CHAR_DATA *ch)
         act("$n regains consciousness...", ch, 0, 0, TO_ROOM, 0);
         act("You regain consciousness...", ch, 0, 0, TO_CHAR, 0);
 	if (ch->fighting)
-	  GET_POS(ch) = POSITION_FIGHTING;
+	  ch->setPOSFighting();
 	else
           GET_POS(ch) = POSITION_STANDING;
 	if (IS_SET(ch->combat, COMBAT_BERSERK))
@@ -1772,6 +1772,39 @@ int getRealSpellDamage( CHAR_DATA * ch)
    return spell_dam;
 }
 
+void set_hp(char_data *ch, char_data *victim, int dam)
+{
+  int old_hp = GET_HIT(victim);
+  if (victim)
+  {
+    GET_HIT(victim) = dam;
+
+    if (ch)
+    {
+      ch->damages++;
+      ch->damage_done += old_hp-dam;
+      ch->damage_per_second = ch->damage_done / ch->damages;
+    }
+  }
+}
+
+void remove_hp(char_data *ch, char_data *victim, int dam)
+{
+  if (victim)
+  {
+    GET_HIT(victim) -= dam;
+
+    if (ch)
+    {
+      ch->damages++;
+      ch->damage_done += dam;
+      ch->damage_per_second = ch->damage_done / ch->damages;
+    }
+  }
+}
+
+
+
 // returns standard returnvals.h return codes
 int damage(CHAR_DATA *ch, CHAR_DATA *victim,
            int dam, int weapon_type, int attacktype, int weapon, bool is_death_prog)
@@ -2070,7 +2103,7 @@ int damage(CHAR_DATA *ch, CHAR_DATA *victim,
         {
           act("$n scrambles to $s feet!", victim, 0, 0, TO_ROOM, 0);
           act("You scramble to your feet!", victim, 0, 0, TO_CHAR, 0);
-          GET_POS(victim) = POSITION_FIGHTING;
+          victim->setPOSFighting();
         }
       }
     }
@@ -2080,7 +2113,7 @@ int damage(CHAR_DATA *ch, CHAR_DATA *victim,
     affect_from_char(victim, INTERNAL_SLEEPING);
     act("$n is shocked to a wakened state and scrambles to $s feet!", victim, 0, 0, TO_ROOM, 0);
     send_to_char("You are awakened from combat adrenaline springing you to your feet!", ch);
-    GET_POS(victim) = POSITION_FIGHTING;
+    victim->setPOSFighting();
   }
 
   if (GET_POS(ch) == POSITION_FIGHTING &&
@@ -2456,7 +2489,7 @@ int damage(CHAR_DATA *ch, CHAR_DATA *victim,
       dam_message(dam, ch, victim, attacktype, modifier);
     }
 
-    GET_HIT(victim) -= dam;
+    remove_hp(ch, victim, dam);
     update_pos(victim);
   }
   else
@@ -2470,7 +2503,7 @@ int damage(CHAR_DATA *ch, CHAR_DATA *victim,
       affect_remove(victim, af, 0);
     }
 
-    GET_HIT(victim) -= dam;
+    remove_hp(ch, victim, dam);
     update_pos(victim);
     do_dam_msgs(ch, victim, dam, attacktype, weapon, weapon_type);
   }
@@ -2615,7 +2648,7 @@ int noncombat_damage(CHAR_DATA * ch, int dam, char *char_death_msg,
   if(affected_by_spell(ch, SPELL_DIVINE_INTER) && dam > affected_by_spell(ch, SPELL_DIVINE_INTER)->modifier)
     dam = affected_by_spell(ch, SPELL_DIVINE_INTER)->modifier;
 
-  GET_HIT(ch) -= dam;
+  remove_hp(nullptr, ch, dam);
   update_pos(ch);
   if(GET_POS(ch) == POSITION_DEAD) {
      if (char_death_msg) {
@@ -3740,7 +3773,7 @@ timer_data));
       (!IS_SET(ch->combat, COMBAT_STUNNED2)) &&
       (!IS_SET(ch->combat, COMBAT_BASH1)) &&
       (!IS_SET(ch->combat, COMBAT_BASH2)) )
-    GET_POS(ch) = POSITION_FIGHTING;
+    ch->setPOSFighting();
     
   return;
 }
@@ -3872,6 +3905,16 @@ void stop_fighting(CHAR_DATA * ch, int clearlag)
   if (IS_SET(ch->combat, COMBAT_CRUSH_BLOW2))
       REMOVE_BIT(ch->combat, COMBAT_CRUSH_BLOW2);
   
+  ch->last_damage = time(nullptr);
+
+  uint64_t fight_length = ch->last_damage - ch->first_damage;
+  if (fight_length < 1)
+  {
+    fight_length = 1;
+  }
+
+  ch->damage_per_second = ch->damage_done/fight_length;
+  csendf(ch, "You caused %llu damage over %llu seconds with DPS of %llu.\r\n", ch->damage_done, fight_length, ch->damage_per_second);
   return;
 }
 
@@ -4612,7 +4655,7 @@ int do_skewer(CHAR_DATA *ch, CHAR_DATA *vict, int dam, int wt, int wt2, int weap
     inform_victim(ch, vict, damadd); 
 
     if(GET_POS(vict) != POSITION_DEAD && number(0, 4999) == 1) { /* tiny chance of instakill */
-      GET_HIT(vict) = -1;
+      set_hp(ch, vict, -1);
       send_to_char("You impale your weapon through your opponent's chest!\r\n", ch);
       act("$n's weapon blows through your chest sending your entrails flying for yards behind you.  Everything goes black...", ch, 0, vict, TO_VICT, 0);
       act("$n's weapon rips through $N's chest sending gore and entrails flying for yards!\r\n", ch, 0, vict, NOTVICT, 0);
@@ -4662,7 +4705,7 @@ int do_behead_skill(CHAR_DATA *ch, CHAR_DATA *vict)
           act("You feel your life end as $n's sword SLICES YOUR HEAD OFF!", ch, 0, vict, TO_VICT, 0);
           act("You SLICE $N's head CLEAN OFF $S body!", ch, 0, vict, TO_CHAR, 0);
           act("$n cleanly slices $N's head off $S body!", ch, 0, vict, TO_ROOM, NOTVICT);
-          GET_HIT(vict) = -20;
+          set_hp(ch, vict, -20);
           make_head(vict);
           group_gain(ch, vict); 
           fight_kill(ch, vict, TYPE_CHOOSE, 0);
@@ -6823,7 +6866,7 @@ int do_flee(struct char_data *ch, char *argument, int cmd)
               act("$n tries to flee, but is too exhausted!", ch, 0, 0, TO_ROOM, INVIS_NULL);
 	    
             if (last_fighting)
-               GET_POS(ch) = POSITION_FIGHTING;
+               ch->setPOSFighting();
 	    
             return retval;
           }

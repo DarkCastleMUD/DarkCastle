@@ -2526,3 +2526,16 @@ bool char_file_exists(string name)
 
   return file_exists(filename);
 }
+
+void char_data::setPOSFighting(void)
+{
+  if (position != POSITION_FIGHTING)
+  {
+    position = POSITION_FIGHTING;
+
+    first_damage = time(nullptr);
+    damages = 0;
+    damage_done = 0;
+    last_damage = 0;
+  }
+}

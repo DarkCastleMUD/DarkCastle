@@ -443,6 +443,12 @@ struct char_data
 
     struct room_direction_data *brace_at, *brace_exit; //exits affected by brace
     void tell_history(string message);
+    time_t first_damage;
+    uint64_t damage_done;
+    uint64_t damages;
+    time_t last_damage;
+    uint64_t damage_per_second;
+    void setPOSFighting();
 };
 
 // This structure is written to the disk.  DO NOT MODIFY THIS STRUCTURE
