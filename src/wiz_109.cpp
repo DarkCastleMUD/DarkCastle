@@ -384,25 +384,29 @@ int do_shutdown(struct char_data *ch, char *argument, int cmd)
     argument = one_argument(argument, arg1);
 
     // If there was more than 1 argument, create an argument array
-    if (*argument != 0) {
+    if (*argument != 0)
+    {
       char argN[MAX_INPUT_LENGTH];
       queue<char *> arg_list;
 
-      while (*argument != 0) {
-	argument = one_argumentnolow(argument, argN);
-	arg_list.push(strdup(argN));
+      while (*argument != 0)
+      {
+        argument = one_argumentnolow(argument, argN);
+        arg_list.push(strdup(argN));
       }
 
-      if (arg_list.size() > 0) {
-	new_argv = new char*[arg_list.size()+1];
+      if (arg_list.size() > 0)
+      {
+        new_argv = new char *[arg_list.size() + 1];
 
-	int index = 0;
-	while (! arg_list.empty()) {
-	  new_argv[index++] = arg_list.front();
-	  arg_list.pop();
-	}
+        int index = 0;
+        while (!arg_list.empty())
+        {
+          new_argv[index++] = arg_list.front();
+          arg_list.pop();
+        }
 
-	new_argv[index] = 0;
+        new_argv[index] = 0;
       }
     }
 
