@@ -335,7 +335,7 @@ bool my_load_char_obj(struct descriptor_data *d, const char *name)
 bool test_rolls(uint8_t total)
 {
   int x, a, b;
-  stat_shit stats;
+  stat_data stats;
 
   init_random();
 
