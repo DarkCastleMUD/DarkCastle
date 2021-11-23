@@ -1772,12 +1772,9 @@ int getRealSpellDamage( CHAR_DATA * ch)
    return spell_dam;
 }
 
-
-
 // returns standard returnvals.h return codes
-int damage(CHAR_DATA * ch, CHAR_DATA * victim,
-           int dam, int weapon_type, int attacktype, int weapon, bool is_death_prog
-	   )
+int damage(CHAR_DATA *ch, CHAR_DATA *victim,
+           int dam, int weapon_type, int attacktype, int weapon, bool is_death_prog)
 {
   int can_miss = 1;
   long weapon_bit;
@@ -1795,9 +1792,12 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
   char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH], buf3[MAX_STRING_LENGTH];
 
   bool bingo;
-  if (is_bingo(dam, weapon_type, attacktype)) {
+  if (is_bingo(dam, weapon_type, attacktype))
+  {
     bingo = true;
-  } else {
+  }
+  else
+  {
     bingo = false;
   }
 
@@ -1805,30 +1805,38 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
   weapon_bit = get_weapon_bit(weapon_type);
   typeofdamage = damage_type(weapon_type);
   struct follow_type *fol;
-  if (attacktype == SKILL_FLAMESLASH) weapon_bit = TYPE_FIRE;
+  if (attacktype == SKILL_FLAMESLASH)
+    weapon_bit = TYPE_FIRE;
 
-  if(GET_POS(victim) == POSITION_DEAD)           return (eSUCCESS|eVICT_DIED);
+  if (GET_POS(victim) == POSITION_DEAD)
+    return (eSUCCESS | eVICT_DIED);
   if (ch->in_room != victim->in_room && !(attacktype == SPELL_SOLAR_GATE ||
-   attacktype == SKILL_ARCHERY ||attacktype == SPELL_LIGHTNING_BOLT || 
-   attacktype == SKILL_FIRE_ARROW || attacktype == SKILL_TEMPEST_ARROW || 
-   attacktype == SKILL_GRANITE_ARROW || attacktype == SKILL_ICE_ARROW ||
-	attacktype == SPELL_POISON)) 
-     return debug_retval(ch, victim, retval);
-  int l=0;
-  if (dam!=0 && attacktype && attacktype < TYPE_HIT && attacktype != TYPE_UNDEFINED && attacktype != SKILL_FLAMESLASH)
+                                          attacktype == SKILL_ARCHERY || attacktype == SPELL_LIGHTNING_BOLT ||
+                                          attacktype == SKILL_FIRE_ARROW || attacktype == SKILL_TEMPEST_ARROW ||
+                                          attacktype == SKILL_GRANITE_ARROW || attacktype == SKILL_ICE_ARROW ||
+                                          attacktype == SPELL_POISON))
+    return debug_retval(ch, victim, retval);
+  int l = 0;
+  if (dam != 0 && attacktype && attacktype < TYPE_HIT && attacktype != TYPE_UNDEFINED && attacktype != SKILL_FLAMESLASH)
   { // Skill damages based on learned %
     l = has_skill(ch, attacktype);
-    if (IS_NPC(ch)) l = 50;
+    if (IS_NPC(ch))
+      l = 50;
     if (IS_NPC(ch) && ch->master)
-       l *= (ch->master->level / 50);
- //   if (l || !IS_NPC(ch))
-    if(weapon && attacktype <= MAX_SPL_LIST) {l = 70;dam/=2;} //weapon spell
+      l *= (ch->master->level / 50);
+    //   if (l || !IS_NPC(ch))
+    if (weapon && attacktype <= MAX_SPL_LIST)
+    {
+      l = 70;
+      dam /= 2;
+    } //weapon spell
     dam = dam_percent(l, dam);
-    dam = number(dam-(dam/10), dam+(dam/10)); // +- 10%
-    if (IS_NPC(ch)) dam =  (int)(dam * 0.6);
+    dam = number(dam - (dam / 10), dam + (dam / 10)); // +- 10%
+    if (IS_NPC(ch))
+      dam = (int)(dam * 0.6);
   }
 
-  if(!weapon)
+  if (!weapon)
     weapon = WIELD;
 
   // here goes le elemental stuff
@@ -1839,89 +1847,92 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
     dam += elemental_damage_bonus(attacktype, ch);
   //
 
-    if(IS_SET(victim->combat, COMBAT_REPELANCE) && !bingo &&
-	attacktype <= MAX_SPL_LIST)
+  if (IS_SET(victim->combat, COMBAT_REPELANCE) && !bingo &&
+      attacktype <= MAX_SPL_LIST)
+  {
+    if (GET_LEVEL(ch) > 70)
+      send_to_char("The power of the spell bursts through your mental barriers as if they weren't there!\r\n", victim);
+    else if (!(number(0, 9)))
+      send_to_char("Your mental shields cannot hold back the force of the spell!\r\n", victim);
+    else
     {
-       if(GET_LEVEL(ch) > 70)
-         send_to_char("The power of the spell bursts through your mental barriers as if they weren't there!\r\n", victim);
-       else if(!(number(0, 9)))
-         send_to_char("Your mental shields cannot hold back the force of the spell!\r\n", victim);
-       else {
-        if(reflected) {
-         act("You dissolve the reflected spell into nothingness by your will.", ch, 0, victim, TO_VICT, 0);
-         act("$n's reacts quickly and dissolves the reflected spell into formless mana.", ch, 0, victim, TO_ROOM, NOTVICT);
-        }
-        else {
-         act("$n's spell is dissolved into nothingness by your will.", ch, 0, victim, TO_VICT, 0);
-         act("$N's supreme will dissolves your spell into formless mana.", ch, 0, victim, TO_CHAR, 0);
-         act("$n's spell streaks at $N and suddenly ceases to be.", ch, 0, victim, TO_ROOM, NOTVICT);
-        }
-        REMOVE_BIT(victim->combat, COMBAT_REPELANCE);
-        return debug_retval(ch, victim, retval);
-       }
-       REMOVE_BIT(victim->combat, COMBAT_REPELANCE);
-  //  }
+      if (reflected)
+      {
+        act("You dissolve the reflected spell into nothingness by your will.", ch, 0, victim, TO_VICT, 0);
+        act("$n's reacts quickly and dissolves the reflected spell into formless mana.", ch, 0, victim, TO_ROOM, NOTVICT);
+      }
+      else
+      {
+        act("$n's spell is dissolved into nothingness by your will.", ch, 0, victim, TO_VICT, 0);
+        act("$N's supreme will dissolves your spell into formless mana.", ch, 0, victim, TO_CHAR, 0);
+        act("$n's spell streaks at $N and suddenly ceases to be.", ch, 0, victim, TO_ROOM, NOTVICT);
+      }
+      REMOVE_BIT(victim->combat, COMBAT_REPELANCE);
+      return debug_retval(ch, victim, retval);
+    }
+    REMOVE_BIT(victim->combat, COMBAT_REPELANCE);
+    //  }
   }
   bool imm = FALSE;
   if (IS_SET(victim->immune, weapon_bit))
-   imm = TRUE;
+    imm = TRUE;
 
   if (attacktype < MAX_SPL_LIST && ch && dam > 1)
   {
-     if (attacktype != SPELL_MAGIC_MISSILE &&
-	 attacktype != SPELL_BEE_STING &&
-	 attacktype != SPELL_BLUE_BIRD && // Handled separately in magic.cpp
-	 attacktype != SPELL_LIGHTNING_SHIELD && 
-	 attacktype != SPELL_FIRESHIELD && 
-	 attacktype != SPELL_ACID_SHIELD
+    if (attacktype != SPELL_MAGIC_MISSILE &&
+        attacktype != SPELL_BEE_STING &&
+        attacktype != SPELL_BLUE_BIRD && // Handled separately in magic.cpp
+        attacktype != SPELL_LIGHTNING_SHIELD &&
+        attacktype != SPELL_FIRESHIELD &&
+        attacktype != SPELL_ACID_SHIELD
 
-
-	)
-     dam += getRealSpellDamage(ch);
+    )
+      dam += getRealSpellDamage(ch);
   }
 
   learned = has_skill(victim, SKILL_MAGIC_RESIST);
   int save = 0;
-   if (!imm)
-    switch(weapon_type) {
-       case TYPE_FIRE:
-            save = get_saves(victim, SAVE_TYPE_FIRE);
-            sprintf(buf, "$B$4fire$R and sustain");
-            if(learned)
-              skill_increase_check(victim, SKILL_MAGIC_RESIST, learned, SKILL_INCREASE_MEDIUM);
-            break;
-      case TYPE_COLD:
-            save = get_saves(victim, SAVE_TYPE_COLD);
-            sprintf(buf, "$B$3cold$R and sustain");
-            if(learned)
-              skill_increase_check(victim, SKILL_MAGIC_RESIST, learned, SKILL_INCREASE_MEDIUM);
-            break;
-      case TYPE_ENERGY:
-            save = get_saves(victim, SAVE_TYPE_ENERGY);
-            sprintf(buf, "$B$5energy$R and sustain");
-            if(learned)
-              skill_increase_check(victim, SKILL_MAGIC_RESIST, learned, SKILL_INCREASE_MEDIUM);
-            break;
+  if (!imm)
+    switch (weapon_type)
+    {
+    case TYPE_FIRE:
+      save = get_saves(victim, SAVE_TYPE_FIRE);
+      sprintf(buf, "$B$4fire$R and sustain");
+      if (learned)
+        skill_increase_check(victim, SKILL_MAGIC_RESIST, learned, SKILL_INCREASE_MEDIUM);
+      break;
+    case TYPE_COLD:
+      save = get_saves(victim, SAVE_TYPE_COLD);
+      sprintf(buf, "$B$3cold$R and sustain");
+      if (learned)
+        skill_increase_check(victim, SKILL_MAGIC_RESIST, learned, SKILL_INCREASE_MEDIUM);
+      break;
+    case TYPE_ENERGY:
+      save = get_saves(victim, SAVE_TYPE_ENERGY);
+      sprintf(buf, "$B$5energy$R and sustain");
+      if (learned)
+        skill_increase_check(victim, SKILL_MAGIC_RESIST, learned, SKILL_INCREASE_MEDIUM);
+      break;
     case TYPE_ACID:
-            save = get_saves(victim, SAVE_TYPE_ACID);
-            sprintf(buf, "$B$2acid$R and sustain");
-            if(learned)
-              skill_increase_check(victim, SKILL_MAGIC_RESIST, learned, SKILL_INCREASE_MEDIUM);
-            break;
-      case TYPE_MAGIC:
-            save = get_saves(victim,SAVE_TYPE_MAGIC);
-            sprintf(buf, "$B$7magic$R and sustain");
-            break;
-      case TYPE_POISON:
-            save = get_saves(victim,SAVE_TYPE_POISON);
-            sprintf(buf, "$2poison$R and sustain");
-            if(learned)
-              skill_increase_check(victim, SKILL_MAGIC_RESIST, learned, SKILL_INCREASE_HARD);
-            break;
-      default:
-        break;
+      save = get_saves(victim, SAVE_TYPE_ACID);
+      sprintf(buf, "$B$2acid$R and sustain");
+      if (learned)
+        skill_increase_check(victim, SKILL_MAGIC_RESIST, learned, SKILL_INCREASE_MEDIUM);
+      break;
+    case TYPE_MAGIC:
+      save = get_saves(victim, SAVE_TYPE_MAGIC);
+      sprintf(buf, "$B$7magic$R and sustain");
+      break;
+    case TYPE_POISON:
+      save = get_saves(victim, SAVE_TYPE_POISON);
+      sprintf(buf, "$2poison$R and sustain");
+      if (learned)
+        skill_increase_check(victim, SKILL_MAGIC_RESIST, learned, SKILL_INCREASE_HARD);
+      break;
+    default:
+      break;
     }
- /* int v = 0;
+  /* int v = 0;
   if (GET_CLASS(ch) == CLASS_MAGIC_USER) {
   //spellcraft
     v = has_skill(ch, SKILL_SPELLCRAFT);
@@ -1931,76 +1942,83 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
      }
    }*/
 
-   if (save < 0 && !imm)
-   { double mult = 0 - save; // Turns positive.
-     mult = 1.0 + (double)mult/100;
-     dam = (int)(dam * mult);
-     if(reflected) {
-         strcpy(buf3, buf);
-         sprintf(buf2, "s additional damage.");
-         strcat(buf, buf2);
-         sprintf(buf2, "%s is susceptible to the reflected ", GET_SHORT(ch));
-         strcat(buf2, buf);
-         act(buf2, ch, 0, victim, TO_ROOM, NOTVICT);
-         sprintf(buf2, " additional damage.");
-         strcat(buf3, buf2);
-         sprintf(buf2, "You are susceptible to the reflected ");
-         strcat(buf2, buf3);
-         act(buf2, ch, 0, victim, TO_CHAR, 0);
-     }
-     else {
-        strcpy(buf3, buf);
-        sprintf(buf2, "s additional damage.");
-        strcat(buf, buf2);
-        sprintf(buf2, " additional damage.");
-        strcat(buf3, buf2);
-        sprintf(buf2, "%s is susceptible to %s's ", GET_SHORT(victim), GET_SHORT(ch));
-        strcat(buf2, buf);
-        act(buf2, victim, 0, ch, TO_ROOM, NOTVICT);
-        sprintf(buf2, "%s is susceptible to your ", GET_SHORT(victim));
-        strcat(buf2, buf);
-        act(buf2, victim, 0, ch, TO_VICT, 0);
-        sprintf(buf2, "You are susceptible to %s's ", GET_SHORT(ch));
-        strcat(buf2, buf3);
-        act(buf2, victim, 0, ch, TO_CHAR, 0);
-     }
-   }
-   else if (number(1,101) < save && !imm) {
-      if (save > 50) save = 50;
-      dam -= (int)(dam * (double)save/100); // Save chance.
-      if(reflected) {
-         strcpy(buf3, buf);
-         sprintf(buf2, "s reduced damage.");
-         strcat(buf, buf2);
-         sprintf(buf2, "%s resists the reflected ", GET_SHORT(ch));
-         strcat(buf2, buf);
-         act(buf2, ch, 0, victim, TO_ROOM, NOTVICT);
-         sprintf(buf2, " reduced damage.");
-         strcat(buf3, buf2);
-         sprintf(buf2, "You resist the reflected ");
-         strcat(buf2, buf3);
-         act(buf2, ch, 0, victim, TO_CHAR, 0);
-      }
-      else {
-        strcpy(buf3, buf);
-        sprintf(buf2, "s reduced damage.");
-        strcat(buf, buf2);
-        sprintf(buf2, " reduced damage.");
-        strcat(buf3, buf2);
-        sprintf(buf2, "%s resists %s's ", GET_SHORT(victim), GET_SHORT(ch));
-        strcat(buf2, buf);
-        act(buf2, victim, 0, ch, TO_ROOM, NOTVICT);
-        sprintf(buf2, "%s resists your ", GET_SHORT(victim));
-        strcat(buf2, buf);
-        act(buf2, victim, 0, ch, TO_VICT, 0);
-        sprintf(buf2, "You resist %s's ", GET_SHORT(ch));
-        strcat(buf2, buf3);
-        act(buf2, victim, 0, ch, TO_CHAR, 0);
-      }
-//        act("$n resists $N's assault and sustains reduced damage.", victim, 0, ch, TO_ROOM, NOTVICT);
-//        act("$n resists your assault and sustains reduced damage.", victim,0,ch, TO_VICT,0);
-//        act("You resist $N's assault and sustain reduced damage.", victim, 0, ch, TO_CHAR, 0);
-   }
+  if (save < 0 && !imm)
+  {
+    double mult = 0 - save; // Turns positive.
+    mult = 1.0 + (double)mult / 100;
+    dam = (int)(dam * mult);
+    if (reflected)
+    {
+      strcpy(buf3, buf);
+      sprintf(buf2, "s additional damage.");
+      strcat(buf, buf2);
+      sprintf(buf2, "%s is susceptible to the reflected ", GET_SHORT(ch));
+      strcat(buf2, buf);
+      act(buf2, ch, 0, victim, TO_ROOM, NOTVICT);
+      sprintf(buf2, " additional damage.");
+      strcat(buf3, buf2);
+      sprintf(buf2, "You are susceptible to the reflected ");
+      strcat(buf2, buf3);
+      act(buf2, ch, 0, victim, TO_CHAR, 0);
+    }
+    else
+    {
+      strcpy(buf3, buf);
+      sprintf(buf2, "s additional damage.");
+      strcat(buf, buf2);
+      sprintf(buf2, " additional damage.");
+      strcat(buf3, buf2);
+      sprintf(buf2, "%s is susceptible to %s's ", GET_SHORT(victim), GET_SHORT(ch));
+      strcat(buf2, buf);
+      act(buf2, victim, 0, ch, TO_ROOM, NOTVICT);
+      sprintf(buf2, "%s is susceptible to your ", GET_SHORT(victim));
+      strcat(buf2, buf);
+      act(buf2, victim, 0, ch, TO_VICT, 0);
+      sprintf(buf2, "You are susceptible to %s's ", GET_SHORT(ch));
+      strcat(buf2, buf3);
+      act(buf2, victim, 0, ch, TO_CHAR, 0);
+    }
+  }
+  else if (number(1, 101) < save && !imm)
+  {
+    if (save > 50)
+      save = 50;
+    dam -= (int)(dam * (double)save / 100); // Save chance.
+    if (reflected)
+    {
+      strcpy(buf3, buf);
+      sprintf(buf2, "s reduced damage.");
+      strcat(buf, buf2);
+      sprintf(buf2, "%s resists the reflected ", GET_SHORT(ch));
+      strcat(buf2, buf);
+      act(buf2, ch, 0, victim, TO_ROOM, NOTVICT);
+      sprintf(buf2, " reduced damage.");
+      strcat(buf3, buf2);
+      sprintf(buf2, "You resist the reflected ");
+      strcat(buf2, buf3);
+      act(buf2, ch, 0, victim, TO_CHAR, 0);
+    }
+    else
+    {
+      strcpy(buf3, buf);
+      sprintf(buf2, "s reduced damage.");
+      strcat(buf, buf2);
+      sprintf(buf2, " reduced damage.");
+      strcat(buf3, buf2);
+      sprintf(buf2, "%s resists %s's ", GET_SHORT(victim), GET_SHORT(ch));
+      strcat(buf2, buf);
+      act(buf2, victim, 0, ch, TO_ROOM, NOTVICT);
+      sprintf(buf2, "%s resists your ", GET_SHORT(victim));
+      strcat(buf2, buf);
+      act(buf2, victim, 0, ch, TO_VICT, 0);
+      sprintf(buf2, "You resist %s's ", GET_SHORT(ch));
+      strcat(buf2, buf3);
+      act(buf2, victim, 0, ch, TO_CHAR, 0);
+    }
+    //        act("$n resists $N's assault and sustains reduced damage.", victim, 0, ch, TO_ROOM, NOTVICT);
+    //        act("$n resists your assault and sustains reduced damage.", victim,0,ch, TO_VICT,0);
+    //        act("You resist $N's assault and sustain reduced damage.", victim, 0, ch, TO_CHAR, 0);
+  }
   /*
   if (v) { // spellcraft damage bonus
 	int o = 0;
@@ -2018,35 +2036,37 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
   }
 */
 
-   if (affected_by_spell(ch, SKILL_SONG_MKING_CHARGE)) {
+  if (affected_by_spell(ch, SKILL_SONG_MKING_CHARGE))
+  {
     dam = (int)(dam * 1.2); // scary!
     SET_BIT(modifier, COMBAT_MOD_FRENZY);
-   }
+  }
 
-  // Can't hurt god, but he likes to see the messages. 
+  // Can't hurt god, but he likes to see the messages.
   if (GET_LEVEL(victim) >= IMMORTAL && !IS_NPC(victim))
     dam = 0;
-  
-  if(victim != ch) {
-    if(!can_attack(ch) || !can_be_attacked(ch, victim))
+
+  if (victim != ch)
+  {
+    if (!can_attack(ch) || !can_be_attacked(ch, victim))
       return eFAILURE;
     set_cantquit(ch, victim);
   }
-  
+
   /* An eye for an eye, a tooth for a tooth, a life for a life. */
   if (GET_POS(victim) > POSITION_STUNNED && ch != victim)
   {
-    if(!victim->fighting && ch->in_room == victim->in_room)
+    if (!victim->fighting && ch->in_room == victim->in_room)
       set_fighting(victim, ch);
 
-    if((!IS_SET(victim->combat, COMBAT_STUNNED)) &&
-      (!IS_SET(victim->combat, COMBAT_STUNNED2)) &&
-      (!IS_SET(victim->combat, COMBAT_BASH1)) &&
-      (!IS_SET(victim->combat, COMBAT_BASH2)) )
+    if ((!IS_SET(victim->combat, COMBAT_STUNNED)) &&
+        (!IS_SET(victim->combat, COMBAT_STUNNED2)) &&
+        (!IS_SET(victim->combat, COMBAT_BASH1)) &&
+        (!IS_SET(victim->combat, COMBAT_BASH2)))
     {
       if (GET_POS(victim) > POSITION_STUNNED)
       {
-        if (GET_POS(victim) < POSITION_FIGHTING) 
+        if (GET_POS(victim) < POSITION_FIGHTING)
         {
           act("$n scrambles to $s feet!", victim, 0, 0, TO_ROOM, 0);
           act("You scramble to your feet!", victim, 0, 0, TO_CHAR, 0);
@@ -2055,7 +2075,7 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
       }
     }
   }
-  else if(GET_POS(victim) == POSITION_SLEEPING) 
+  else if (GET_POS(victim) == POSITION_SLEEPING)
   {
     affect_from_char(victim, INTERNAL_SLEEPING);
     act("$n is shocked to a wakened state and scrambles to $s feet!", victim, 0, 0, TO_ROOM, 0);
@@ -2064,19 +2084,20 @@ int damage(CHAR_DATA * ch, CHAR_DATA * victim,
   }
 
   if (GET_POS(ch) == POSITION_FIGHTING &&
-	!ch->fighting)
+      !ch->fighting)
   { // fix for fighting thin air thing related to poison
-	GET_POS(ch) = POSITION_STANDING;
+    GET_POS(ch) = POSITION_STANDING;
   }
-  if (GET_POS(ch) > POSITION_STUNNED && ch != victim) {
+  if (GET_POS(ch) > POSITION_STUNNED && ch != victim)
+  {
     if (!ch->fighting && ch->in_room == victim->in_room)
       set_fighting(ch, victim);
   }
 
-  if (IS_AFFECTED(ch, AFF_INVISIBLE)
-	&& (!IS_AFFECTED(ch, AFF_ILLUSION) || !(affected_by_spell(ch, 
-BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE) 
-&& affected_by_spell(ch, SPELL_INVISIBLE)->modifier == 987) )) {
+  if (IS_AFFECTED(ch, AFF_INVISIBLE) && (!IS_AFFECTED(ch, AFF_ILLUSION) || !(affected_by_spell(ch,
+                                                                                               BASE_TIMERS + SPELL_INVISIBLE) &&
+                                                                             affected_by_spell(ch, SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)->modifier == 987)))
+  {
     act("$n slowly fades into existence.", ch, 0, 0, TO_ROOM, 0);
     //if (affected_by_spell(ch, SPELL_INVISIBLE))
     // no point it looping through the list twice...
@@ -2085,56 +2106,64 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
   }
 
   // Frost Shield won't effect a backstab
-  if(attacktype != SKILL_BACKSTAB &&  GET_HIT(victim) > 0 &&
-     (typeofdamage == DAMAGE_TYPE_PHYSICAL || attacktype == TYPE_PHYSICAL_MAGIC))
-    if(do_frostshield(ch, victim)) {
-      return debug_retval(ch, victim, retval)|eEXTRA_VALUE;;
+  if (attacktype != SKILL_BACKSTAB && GET_HIT(victim) > 0 &&
+      (typeofdamage == DAMAGE_TYPE_PHYSICAL || attacktype == TYPE_PHYSICAL_MAGIC))
+    if (do_frostshield(ch, victim))
+    {
+      return debug_retval(ch, victim, retval) | eEXTRA_VALUE;
+      ;
     }
 
-  if(typeofdamage == DAMAGE_TYPE_PHYSICAL) {
+  if (typeofdamage == DAMAGE_TYPE_PHYSICAL)
+  {
     if (IS_SET(ch->combat, COMBAT_BERSERK))
       dam = (int)(dam * 1.75);
     if (IS_AFFECTED(ch, AFF_PRIMAL_FURY))
-	dam = dam * 5;
+      dam = dam * 5;
     if (IS_SET(ch->combat, COMBAT_RAGE1) || (IS_SET(ch->combat, COMBAT_RAGE2) && attacktype != SKILL_BACKSTAB))
       dam = (int)(dam * 1.4);
     if (IS_SET(ch->combat, COMBAT_HITALL))
       dam = (int)(dam * 2);
-    if (IS_SET(ch->combat, COMBAT_ORC_BLOODLUST1)) {
-      dam = (int)(dam * 1.7); 
-//      REMOVE_BIT(ch->combat, COMBAT_ORC_BLOODLUST1);
-//      SET_BIT(ch->combat, COMBAT_ORC_BLOODLUST2);
-    }
-    if (IS_SET(ch->combat, COMBAT_ORC_BLOODLUST2)) {
-      dam = (int)(dam * 1.7);
-//      REMOVE_BIT(ch->combat, COMBAT_ORC_BLOODLUST2);
-    }
-    percent = (int) (( ((float)GET_HIT(ch)) / ((float)GET_MAX_HIT(ch)) ) * 100);
-    if( percent < 40 && (learned = has_skill(ch, SKILL_FRENZY))) 
+    if (IS_SET(ch->combat, COMBAT_ORC_BLOODLUST1))
     {
-      if(skill_success(ch, victim, SKILL_FRENZY)) {
+      dam = (int)(dam * 1.7);
+      //      REMOVE_BIT(ch->combat, COMBAT_ORC_BLOODLUST1);
+      //      SET_BIT(ch->combat, COMBAT_ORC_BLOODLUST2);
+    }
+    if (IS_SET(ch->combat, COMBAT_ORC_BLOODLUST2))
+    {
+      dam = (int)(dam * 1.7);
+      //      REMOVE_BIT(ch->combat, COMBAT_ORC_BLOODLUST2);
+    }
+    percent = (int)((((float)GET_HIT(ch)) / ((float)GET_MAX_HIT(ch))) * 100);
+    if (percent < 40 && (learned = has_skill(ch, SKILL_FRENZY)))
+    {
+      if (skill_success(ch, victim, SKILL_FRENZY))
+      {
         dam = (int)(dam * 1.2);
         SET_BIT(modifier, COMBAT_MOD_FRENZY);
       }
     }
-    if(IS_SET(ch->combat, COMBAT_VITAL_STRIKE))
+    if (IS_SET(ch->combat, COMBAT_VITAL_STRIKE))
       dam = (int)(dam * 2.5);
 
     // we do this AFTER all the multipliers but BEFORE all the reducers
     // to make it cause the smallest impact
     if (dam) // misses turned to tickles
-      dam = (dam * (100 - victim->melee_mitigation))/100;
+      dam = (dam * (100 - victim->melee_mitigation)) / 100;
 
     if (affected_by_spell(victim, SPELL_HOLY_AURA) && affected_by_spell(victim, SPELL_HOLY_AURA)->modifier == 50)
       dam /= 2; // half damage against physical attacks
-  } else {
-    if (affected_by_spell(victim, SPELL_HOLY_AURA) && affected_by_spell(victim, SPELL_HOLY_AURA)->modifier == 25)
-	dam /= 2;
   }
-  if(typeofdamage == DAMAGE_TYPE_MAGIC && dam)
-    dam = (dam * (100 - victim->spell_mitigation))/100;
-  else if(typeofdamage == DAMAGE_TYPE_SONG && dam)
-    dam = (dam * (100 - victim->song_mitigation))/100;
+  else
+  {
+    if (affected_by_spell(victim, SPELL_HOLY_AURA) && affected_by_spell(victim, SPELL_HOLY_AURA)->modifier == 25)
+      dam /= 2;
+  }
+  if (typeofdamage == DAMAGE_TYPE_MAGIC && dam)
+    dam = (dam * (100 - victim->spell_mitigation)) / 100;
+  else if (typeofdamage == DAMAGE_TYPE_SONG && dam)
+    dam = (dam * (100 - victim->song_mitigation)) / 100;
 
   if (IS_AFFECTED(victim, AFF_EAS))
     dam /= 4;
@@ -2142,44 +2171,46 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
   // sanct damage now 35% for all caster aligns
   if (IS_AFFECTED(victim, AFF_SANCTUARY) && dam > 0)
   {
-    int mod = affected_by_spell(victim, SPELL_SANCTUARY)? affected_by_spell(victim, SPELL_SANCTUARY)->modifier:35;
-    dam -= (int) (float)((float)dam*((float)mod/100.0));
-
+    int mod = affected_by_spell(victim, SPELL_SANCTUARY) ? affected_by_spell(victim, SPELL_SANCTUARY)->modifier : 35;
+    dam -= (int)(float)((float)dam * ((float)mod / 100.0));
   }
-  if(IS_SET(victim->combat, COMBAT_MONK_STANCE) && dam > 0)  // half damage
-      dam /= 2;
-  int reduce = 0,type = 0;
-  if (can_miss == 1) {
-  if ((attacktype >= TYPE_HIT && attacktype < TYPE_SUFFERING) || attacktype == SKILL_FLAMESLASH)
+  if (IS_SET(victim->combat, COMBAT_MONK_STANCE) && dam > 0) // half damage
+    dam /= 2;
+  int reduce = 0, type = 0;
+  if (can_miss == 1)
   {
-    int retval2 = 0;
-
-    retval2 = isHit(ch, victim, attacktype, type, reduce);
-    if (SOMEONE_DIED(retval2)) // Riposte
-      return damage_retval(ch, victim, retval2);
-
-    if (IS_SET(retval2, eSUCCESS))
+    if ((attacktype >= TYPE_HIT && attacktype < TYPE_SUFFERING) || attacktype == SKILL_FLAMESLASH)
     {
-	switch(type)
-	{
-		case 0: return eFAILURE; // Dodge or parry
+      int retval2 = 0;
 
-                case 4:
-		case 1:
-		case 2:	SET_BIT(modifier, COMBAT_MOD_REDUCED);
-			dam -= (int) ((float)dam  *((float)reduce/100));
-			break;
-			// Shield block or Mdefense or tumbling partial avoid
+      retval2 = isHit(ch, victim, attacktype, type, reduce);
+      if (SOMEONE_DIED(retval2)) // Riposte
+        return damage_retval(ch, victim, retval2);
 
-		case 3:
-			dam = 0; // Miss!
-			break;
-		default:
-			return eFAILURE; // Shouldn't happen
-	}
-    }
+      if (IS_SET(retval2, eSUCCESS))
+      {
+        switch (type)
+        {
+        case 0:
+          return eFAILURE; // Dodge or parry
 
-    /* Old Hitcode!
+        case 4:
+        case 1:
+        case 2:
+          SET_BIT(modifier, COMBAT_MOD_REDUCED);
+          dam -= (int)((float)dam * ((float)reduce / 100));
+          break;
+          // Shield block or Mdefense or tumbling partial avoid
+
+        case 3:
+          dam = 0; // Miss!
+          break;
+        default:
+          return eFAILURE; // Shouldn't happen
+        }
+      }
+
+      /* Old Hitcode!
     if(check_parry(ch, victim, attacktype)) {
       if(typeofdamage == DAMAGE_TYPE_PHYSICAL)
       {
@@ -2196,17 +2227,17 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
      }
    */
 
-  if((learned = has_skill(ch, SKILL_CRIT_HIT)) && dam)
-    if(number(1, 101) <= learned/10 + GET_DEX(ch) - GET_DEX(victim)) {
-      dam += (int)(dam * (float)(2 + learned/5)/100);
-      act("Your strike at $N lands with lethal accuracy and inflicts additional damage!", ch, 0, victim, TO_CHAR, 0);
-      act("$n's strike lands with lethal accuracy and inflicts additional damage!", ch, 0, victim, TO_VICT, 0);
-      act("$n's strike at $N lands with lethal accuracy and inflicts additional damage!", ch, 0, victim, TO_ROOM, NOTVICT);
-      skill_increase_check(ch, SKILL_CRIT_HIT, learned, SKILL_INCREASE_HARD);
+      if ((learned = has_skill(ch, SKILL_CRIT_HIT)) && dam)
+        if (number(1, 101) <= learned / 10 + GET_DEX(ch) - GET_DEX(victim))
+        {
+          dam += (int)(dam * (float)(2 + learned / 5) / 100);
+          act("Your strike at $N lands with lethal accuracy and inflicts additional damage!", ch, 0, victim, TO_CHAR, 0);
+          act("$n's strike lands with lethal accuracy and inflicts additional damage!", ch, 0, victim, TO_VICT, 0);
+          act("$n's strike at $N lands with lethal accuracy and inflicts additional damage!", ch, 0, victim, TO_ROOM, NOTVICT);
+          skill_increase_check(ch, SKILL_CRIT_HIT, learned, SKILL_INCREASE_HARD);
+        }
     }
-
-  }
-/* Never heard of it.
+    /* Never heard of it.
   if (attacktype == TYPE_PHYSICAL_MAGIC)
   {
     // Physical Magic can be dodged or blocked with a shield, but not parried
@@ -2215,45 +2246,45 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
     if (check_dodge(ch, victim,attacktype))
       return eFAILURE;
   }*/
-  if (attacktype <= MAX_SPL_LIST  && attacktype != TYPE_UNDEFINED)
-  {
-   int reduce = 0;
-    if ((reduce = check_magic_block(ch, victim, attacktype))) {
-     if (GET_CLASS(victim) != CLASS_MONK && !IS_NPC(victim))
-     {
-       if (number(1,100) <= MAX(1, dam/150))
-       {
-        int eqdam = damage_eq_once(victim->equipment[WEAR_SHIELD]);
-        if(victim->equipment[WEAR_SHIELD]) {
-          if (obj_index[victim->equipment[WEAR_SHIELD]->item_number].progtypes & ARMOUR_PROG)
-            oprog_armour_trigger(victim, victim->equipment[WEAR_SHIELD]);
-          if(eqdam >= eq_max_damage(victim->equipment[WEAR_SHIELD]))
-            eq_destroyed(victim, victim->equipment[WEAR_SHIELD], WEAR_SHIELD);
-          else {
-            act("$p is damaged by the force of the spell!", victim, victim->equipment[WEAR_SHIELD], 0, TO_CHAR, 0);
-            act("$p worn by $n is damaged by the force of the spell!", victim, victim->equipment[WEAR_SHIELD], 0, TO_ROOM, 0);
-           }
-         }
-       }
-     }
-	dam -= (int)((float) dam * ((float)reduce/100));
-    }
-  } // spellblock
+    if (attacktype <= MAX_SPL_LIST && attacktype != TYPE_UNDEFINED)
+    {
+      int reduce = 0;
+      if ((reduce = check_magic_block(ch, victim, attacktype)))
+      {
+        if (GET_CLASS(victim) != CLASS_MONK && !IS_NPC(victim))
+        {
+          if (number(1, 100) <= MAX(1, dam / 150))
+          {
+            int eqdam = damage_eq_once(victim->equipment[WEAR_SHIELD]);
+            if (victim->equipment[WEAR_SHIELD])
+            {
+              if (obj_index[victim->equipment[WEAR_SHIELD]->item_number].progtypes & ARMOUR_PROG)
+                oprog_armour_trigger(victim, victim->equipment[WEAR_SHIELD]);
+              if (eqdam >= eq_max_damage(victim->equipment[WEAR_SHIELD]))
+                eq_destroyed(victim, victim->equipment[WEAR_SHIELD], WEAR_SHIELD);
+              else
+              {
+                act("$p is damaged by the force of the spell!", victim, victim->equipment[WEAR_SHIELD], 0, TO_CHAR, 0);
+                act("$p worn by $n is damaged by the force of the spell!", victim, victim->equipment[WEAR_SHIELD], 0, TO_ROOM, 0);
+              }
+            }
+          }
+        }
+        dam -= (int)((float)dam * ((float)reduce / 100));
+      }
+    } // spellblock
 
   } // can_miss
 
   int pre_stoneshield_dam = 0;
   stringstream string1;
-  struct affected_type * pspell = NULL;
-  if(GET_LEVEL(victim) < IMMORTAL && dam > 0 && typeofdamage == DAMAGE_TYPE_PHYSICAL &&
-     (
-      (pspell = affected_by_spell(victim, SPELL_STONE_SHIELD)) ||
-      (pspell = affected_by_spell(victim, SPELL_GREATER_STONE_SHIELD))
-     )
-    )
+  struct affected_type *pspell = NULL;
+  if (GET_LEVEL(victim) < IMMORTAL && dam > 0 && typeofdamage == DAMAGE_TYPE_PHYSICAL &&
+      ((pspell = affected_by_spell(victim, SPELL_STONE_SHIELD)) ||
+       (pspell = affected_by_spell(victim, SPELL_GREATER_STONE_SHIELD))))
   {
-    pre_stoneshield_dam = dam;    
-   if (dam > pspell->modifier)
+    pre_stoneshield_dam = dam;
+    if (dam > pspell->modifier)
     {
       dam -= pspell->modifier;
       pspell->duration -= pspell->modifier;
@@ -2276,24 +2307,25 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
       string1 << "$N's stones completely absorbed $n's attack of " << dam << " damage changing its direction slightly.";
       act(string1.str().c_str(), ch, 0, victim, TO_ROOM, NOTVICT);
       dam = 1;
-    } 
-    
-    if(0 >= pspell->duration) {
+    }
+
+    if (0 >= pspell->duration)
+    {
       ethereal = 1;
       affect_from_char(victim, SPELL_STONE_SHIELD);
       affect_from_char(victim, SPELL_GREATER_STONE_SHIELD);
     }
   }
-  
+
   if (dam < 0)
     dam = 0;
-  
-  // Immune / Susceptibilities / Resistances 
+
+  // Immune / Susceptibilities / Resistances
   // Some code is in saves_spell  (for obvious reasons)
   weapon_bit = get_weapon_bit(weapon_type);
-  
+
   if ((attacktype >= TYPE_HIT && attacktype < TYPE_SUFFERING) ||
-    (attacktype == SKILL_BACKSTAB))
+      (attacktype == SKILL_BACKSTAB))
   {
     if (IS_SET(victim->immune, ISR_PHYSICAL))
       weapon_bit += ISR_PHYSICAL;
@@ -2304,61 +2336,67 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
 
     wielded = ch->equipment[weapon];
 
-    if(wielded) 
+    if (wielded)
     {
-//      if ((IS_SET(victim->immune, ISR_MAGIC)) &&
-  //      (IS_SET(wielded->obj_flags.extra_flags, ITEM_MAGIC)) )
-    //    weapon_bit += ISR_MAGIC;
+      //      if ((IS_SET(victim->immune, ISR_MAGIC)) &&
+      //      (IS_SET(wielded->obj_flags.extra_flags, ITEM_MAGIC)) )
+      //    weapon_bit += ISR_MAGIC;
       if ((IS_SET(victim->immune, ISR_NON_MAGIC)) &&
-        (!IS_SET(wielded->obj_flags.extra_flags, ITEM_MAGIC)) )
+          (!IS_SET(wielded->obj_flags.extra_flags, ITEM_MAGIC)))
         weapon_bit += ISR_NON_MAGIC;
-//      if ((IS_SET(victim->suscept, ISR_MAGIC)) &&
-//        (IS_SET(wielded->obj_flags.extra_flags, ITEM_MAGIC)) )
-//        weapon_bit += ISR_MAGIC;
+      //      if ((IS_SET(victim->suscept, ISR_MAGIC)) &&
+      //        (IS_SET(wielded->obj_flags.extra_flags, ITEM_MAGIC)) )
+      //        weapon_bit += ISR_MAGIC;
       if ((IS_SET(victim->suscept, ISR_NON_MAGIC)) &&
-        (!IS_SET(wielded->obj_flags.extra_flags, ITEM_MAGIC)) )
+          (!IS_SET(wielded->obj_flags.extra_flags, ITEM_MAGIC)))
         weapon_bit += ISR_NON_MAGIC;
-//      if ((IS_SET(victim->resist, ISR_MAGIC)) &&
- //       (IS_SET(wielded->obj_flags.extra_flags, ITEM_MAGIC)) )
- //       weapon_bit += ISR_MAGIC;
+      //      if ((IS_SET(victim->resist, ISR_MAGIC)) &&
+      //       (IS_SET(wielded->obj_flags.extra_flags, ITEM_MAGIC)) )
+      //       weapon_bit += ISR_MAGIC;
       if ((IS_SET(victim->resist, ISR_NON_MAGIC)) &&
-        (!IS_SET(wielded->obj_flags.extra_flags, ITEM_MAGIC)) )
+          (!IS_SET(wielded->obj_flags.extra_flags, ITEM_MAGIC)))
         weapon_bit += ISR_NON_MAGIC;
     }
   }
-  
-  if (IS_SET(victim->immune, weapon_bit)) {
+
+  if (IS_SET(victim->immune, weapon_bit))
+  {
     dam = 0;
-    SET_BIT(retval,eIMMUNE_VICTIM);
-    if ((attacktype >= TYPE_HIT && attacktype < TYPE_SUFFERING) || attacktype == SKILL_FLAMESLASH) {
+    SET_BIT(retval, eIMMUNE_VICTIM);
+    if ((attacktype >= TYPE_HIT && attacktype < TYPE_SUFFERING) || attacktype == SKILL_FLAMESLASH)
+    {
       SET_BIT(modifier, COMBAT_MOD_IGNORE);
-      SET_BIT(retval,eEXTRA_VALUE);
+      SET_BIT(retval, eEXTRA_VALUE);
     }
   }
-  else if (IS_SET(victim->suscept, weapon_bit)) 
+  else if (IS_SET(victim->suscept, weapon_bit))
   {
     //    magic stuff is handled elsewhere
-    if ((attacktype >= TYPE_HIT && attacktype < TYPE_SUFFERING) || attacktype == SKILL_FLAMESLASH) {
+    if ((attacktype >= TYPE_HIT && attacktype < TYPE_SUFFERING) || attacktype == SKILL_FLAMESLASH)
+    {
       dam = (int)(dam * 1.3);
       SET_BIT(modifier, COMBAT_MOD_SUSCEPT);
     }
-  } 
-  else if (IS_SET(victim->resist, weapon_bit)) 
+  }
+  else if (IS_SET(victim->resist, weapon_bit))
   {
     //    magic stuff is handled elsewhere
-    if ((attacktype >= TYPE_HIT && attacktype < TYPE_SUFFERING) || attacktype == SKILL_FLAMESLASH)  {
-        dam = (int)(dam * 0.7);
-        SET_BIT(modifier, COMBAT_MOD_RESIST);
-    } 
+    if ((attacktype >= TYPE_HIT && attacktype < TYPE_SUFFERING) || attacktype == SKILL_FLAMESLASH)
+    {
+      dam = (int)(dam * 0.7);
+      SET_BIT(modifier, COMBAT_MOD_RESIST);
+    }
   }
   if (dam < 0)
     dam = 0;
 
-  percent = (int) (( ((float)GET_HIT(victim)) / 
-		     ((float)GET_MAX_HIT(victim)) ) * 100);
-  if( percent < 40 && (learned = has_skill(victim, SKILL_FRENZY))) 
-  {    
-    switch(attacktype) {
+  percent = (int)((((float)GET_HIT(victim)) /
+                   ((float)GET_MAX_HIT(victim))) *
+                  100);
+  if (percent < 40 && (learned = has_skill(victim, SKILL_FRENZY)))
+  {
+    switch (attacktype)
+    {
     case SPELL_BURNING_HANDS:
     case SPELL_DROWN:
     case SPELL_CAUSE_SERIOUS:
@@ -2385,43 +2423,47 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
     case SPELL_SUN_RAY:
     case SPELL_BEE_STING:
     case SPELL_DIVINE_FURY:
-      if (number(1,100) <= (learned/2)) {
-	act("In your frenzied state you shake off some of the affects of "
-	    "$n's magical attack!", ch, 0, victim, TO_VICT, 0);
-	act("In $k frenzied state, $N shakes off some of the damage of "
-	    "your spell!", ch, 0, victim, TO_CHAR, 0);
-	act("In $k frenzied state, $N shakes off some of the damage of "
-	    "$n's spell!", ch, 0, victim, TO_ROOM, NOTVICT);
+      if (number(1, 100) <= (learned / 2))
+      {
+        act("In your frenzied state you shake off some of the affects of "
+            "$n's magical attack!",
+            ch, 0, victim, TO_VICT, 0);
+        act("In $k frenzied state, $N shakes off some of the damage of "
+            "your spell!",
+            ch, 0, victim, TO_CHAR, 0);
+        act("In $k frenzied state, $N shakes off some of the damage of "
+            "$n's spell!",
+            ch, 0, victim, TO_ROOM, NOTVICT);
 
-	dam = (int)(dam * (double)(number(45,55) / 100.0));
+        dam = (int)(dam * (double)(number(45, 55) / 100.0));
       }
       break;
     }
   }
 
-  if(dam > 0 
-     && affected_by_spell(victim, SPELL_DIVINE_INTER) 
-     && dam > affected_by_spell(victim, SPELL_DIVINE_INTER)->modifier)
+  if (dam > 0 && affected_by_spell(victim, SPELL_DIVINE_INTER) && dam > affected_by_spell(victim, SPELL_DIVINE_INTER)->modifier)
     dam = affected_by_spell(victim, SPELL_DIVINE_INTER)->modifier;
 
-
-
-  // Check for parry, mob disarm, and trip. Print a suitable damage message. 
-  if ((attacktype >= TYPE_HIT && attacktype < TYPE_SUFFERING) || (IS_NPC(ch) && 
-	mob_index[ch->mobdata->nr].virt > 87 && mob_index[ch->mobdata->nr].virt < 92)
-	|| attacktype == SKILL_FLAMESLASH)
+  // Check for parry, mob disarm, and trip. Print a suitable damage message.
+  if ((attacktype >= TYPE_HIT && attacktype < TYPE_SUFFERING) || (IS_NPC(ch) && mob_index[ch->mobdata->nr].virt > 87 && mob_index[ch->mobdata->nr].virt < 92) || attacktype == SKILL_FLAMESLASH)
   {
-    if (ch->equipment[weapon] == NULL) {
+    if (ch->equipment[weapon] == NULL)
+    {
       dam_message(dam, ch, victim, TYPE_HIT, modifier);
-    } else {
+    }
+    else
+    {
       dam_message(dam, ch, victim, attacktype, modifier);
     }
-    
+
     GET_HIT(victim) -= dam;
     update_pos(victim);
-  } else {
+  }
+  else
+  {
     affected_type *af;
-    if (dam >= 350 && (af = affected_by_spell(victim, SPELL_PARALYZE)) && IS_PC(victim)) {
+    if (dam >= 350 && (af = affected_by_spell(victim, SPELL_PARALYZE)) && IS_PC(victim))
+    {
       act("The overpowering magic from $n's spell disrupts the paralysis surrounding you!", ch, 0, victim, TO_VICT, 0);
       act("The powerful magic from your spell has disrupted the paralysis surrounding $N!", ch, 0, victim, TO_CHAR, 0);
       act("The powerful magic of $n's spell has disrupted the paralysis surrounding $N!", ch, 0, victim, TO_ROOM, NOTVICT);
@@ -2433,74 +2475,69 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
     do_dam_msgs(ch, victim, dam, attacktype, weapon, weapon_type);
   }
 
-  mprog_damage_trigger( victim, ch, dam );
+  mprog_damage_trigger(victim, ch, dam);
 
-  if(ethereal) {
+  if (ethereal)
+  {
     send_to_char("The ethereal stones protecting you shatter and fade into nothing.\r\n", victim);
     act("The ethereal stones surrounding $n shatter into nothingness.\r\n", victim, 0, 0, TO_ROOM, 0);
   }
-  
+
   /*  Now for eq damage...   */
-  if(dam > 25 && typeofdamage == DAMAGE_TYPE_PHYSICAL)
-      eq_damage(ch, victim, dam, weapon_type, attacktype);
+  if (dam > 25 && typeofdamage == DAMAGE_TYPE_PHYSICAL)
+    eq_damage(ch, victim, dam, weapon_type, attacktype);
 
   inform_victim(ch, victim, dam);
 
-
-
-
-  if (GET_POS(victim) != POSITION_DEAD &&ch->in_room != victim->in_room && 
-   !(attacktype == SPELL_SOLAR_GATE|| attacktype == SKILL_ARCHERY || 
-   attacktype == SPELL_LIGHTNING_BOLT || attacktype == SKILL_FIRE_ARROW ||
-   attacktype == SKILL_ICE_ARROW || attacktype == SKILL_TEMPEST_ARROW ||
-   attacktype == SKILL_GRANITE_ARROW || attacktype == SPELL_POISON)) // Wimpy
-      return debug_retval(ch, victim, retval);   
-
+  if (GET_POS(victim) != POSITION_DEAD && ch->in_room != victim->in_room &&
+      !(attacktype == SPELL_SOLAR_GATE || attacktype == SKILL_ARCHERY ||
+        attacktype == SPELL_LIGHTNING_BOLT || attacktype == SKILL_FIRE_ARROW ||
+        attacktype == SKILL_ICE_ARROW || attacktype == SKILL_TEMPEST_ARROW ||
+        attacktype == SKILL_GRANITE_ARROW || attacktype == SPELL_POISON)) // Wimpy
+    return debug_retval(ch, victim, retval);
 
   if (typeofdamage == DAMAGE_TYPE_PHYSICAL && type == 1 && reduce > 0 && dam > 0 && ch != victim)
   { // Shieldblock riposte..
-     int retval2 = check_riposte(ch, victim, attacktype);
-     if (SOMEONE_DIED(retval2)) return damage_retval(ch, victim, retval2);
+    int retval2 = check_riposte(ch, victim, attacktype);
+    if (SOMEONE_DIED(retval2))
+      return damage_retval(ch, victim, retval2);
   }
 
   if (typeofdamage == DAMAGE_TYPE_PHYSICAL && type == 2 && reduce > 0 && dam > 0 && ch != victim)
   { // Martial Defense Counter Strike..
-     int retval2 = checkCounterStrike(ch, victim);
-     if (SOMEONE_DIED(retval2)) return damage_retval(ch, victim, retval2);
+    int retval2 = checkCounterStrike(ch, victim);
+    if (SOMEONE_DIED(retval2))
+      return damage_retval(ch, victim, retval2);
   }
 
-  if(typeofdamage == DAMAGE_TYPE_PHYSICAL 
-     && dam > 0 
-     && ch != victim 
-     && attacktype != SKILL_ARCHERY
-     && !is_death_prog)
+  if (typeofdamage == DAMAGE_TYPE_PHYSICAL && dam > 0 && ch != victim && attacktype != SKILL_ARCHERY && !is_death_prog)
   {
     int retval2;
     retval2 = do_fireshield(ch, victim, MAX(pre_stoneshield_dam, dam));
-    if(SOMEONE_DIED(retval2))
+    if (SOMEONE_DIED(retval2))
       return damage_retval(ch, victim, retval2);
     retval2 = do_acidshield(ch, victim, MAX(pre_stoneshield_dam, dam));
-    if(SOMEONE_DIED(retval2))
+    if (SOMEONE_DIED(retval2))
       return damage_retval(ch, victim, retval2);
     retval2 = do_lightning_shield(ch, victim, MAX(pre_stoneshield_dam, dam));
-    if(SOMEONE_DIED(retval2))
+    if (SOMEONE_DIED(retval2))
       return damage_retval(ch, victim, retval2);
     retval2 = do_vampiric_aura(ch, victim);
-    if(SOMEONE_DIED(retval2))
+    if (SOMEONE_DIED(retval2))
       return damage_retval(ch, victim, retval2);
     retval2 = do_boneshield(ch, victim, dam);
-    if(SOMEONE_DIED(retval2))
+    if (SOMEONE_DIED(retval2))
       return damage_retval(ch, victim, retval2);
   }
 
   // Sleep spells.
   if (!IS_SET(victim->combat, COMBAT_STUNNED) &&
-    !IS_SET(victim->combat, COMBAT_STUNNED2) )
-    if (!AWAKE(victim)) 
+      !IS_SET(victim->combat, COMBAT_STUNNED2))
+    if (!AWAKE(victim))
     {
       if (victim->fighting)
         stop_fighting(victim);
-      
+
       if (IS_SET(victim->combat, COMBAT_BERSERK))
         REMOVE_BIT(victim->combat, COMBAT_BERSERK);
       if (IS_SET(victim->combat, COMBAT_RAGE1))
@@ -2508,43 +2545,56 @@ BASE_TIMERS+SPELL_INVISIBLE) && affected_by_spell(ch, SPELL_INVISIBLE)
       if (IS_SET(victim->combat, COMBAT_RAGE2))
         REMOVE_BIT(victim->combat, COMBAT_RAGE2);
     }
-      
-  // Payoff for killing things. 
-  if(GET_POS(victim) == POSITION_DEAD) {
+
+  // Payoff for killing things.
+  if (GET_POS(victim) == POSITION_DEAD)
+  {
     if (attacktype == SKILL_EAGLE_CLAW)
       make_heart(ch, victim);
     group_gain(ch, victim);
     if (attacktype == SPELL_POISON)
       fight_kill(ch, victim, TYPE_CHOOSE, KILL_POISON);
-    else {
+    else
+    {
       if (bingo)
-	fight_kill(ch, victim, TYPE_CHOOSE, KILL_BINGO);
+        fight_kill(ch, victim, TYPE_CHOOSE, KILL_BINGO);
       else
-	fight_kill(ch, victim, TYPE_CHOOSE, 0);
+        fight_kill(ch, victim, TYPE_CHOOSE, 0);
     }
-    return damage_retval(ch, victim, (eSUCCESS|eVICT_DIED));
-    } else {
-  
-  if (ch->in_room == victim->in_room && attacktype != SKILL_BACKSTAB && attacktype != SKILL_CIRCLE) {
-    SET_BIT(retval, check_autojoiners(ch,1));
-    if (!SOMEONE_DIED(retval))
-    if (IS_AFFECTED(ch, AFF_CHARM)) SET_BIT(retval, check_joincharmie(ch));
-    if (SOMEONE_DIED(retval)) return debug_retval(ch, victim, retval);
-     if(!IS_NPC(ch) && IS_SET(ch->pcdata->toggles, PLR_CHARMIEJOIN) && attacktype != SKILL_AMBUSH) {
-       if(ch->followers) {
-               struct follow_type *folnext;
-          for(fol = ch->followers; fol; fol = folnext) {
-	    folnext = fol->next;
-	    if (IS_AFFECTED(fol->follower, AFF_CHARM) && ch->in_room == fol->follower->in_room) SET_BIT(retval,check_charmiejoin(fol->follower));
-             if (IS_SET(retval, eVICT_DIED)) break;
-          }
-       }
-    }
-    if (SOMEONE_DIED(retval)) return debug_retval(ch, victim, retval);
+    return damage_retval(ch, victim, (eSUCCESS | eVICT_DIED));
   }
- }
+  else
+  {
+
+    if (ch->in_room == victim->in_room && attacktype != SKILL_BACKSTAB && attacktype != SKILL_CIRCLE)
+    {
+      SET_BIT(retval, check_autojoiners(ch, 1));
+      if (!SOMEONE_DIED(retval))
+        if (IS_AFFECTED(ch, AFF_CHARM))
+          SET_BIT(retval, check_joincharmie(ch));
+      if (SOMEONE_DIED(retval))
+        return debug_retval(ch, victim, retval);
+      if (!IS_NPC(ch) && IS_SET(ch->pcdata->toggles, PLR_CHARMIEJOIN) && attacktype != SKILL_AMBUSH)
+      {
+        if (ch->followers)
+        {
+          struct follow_type *folnext;
+          for (fol = ch->followers; fol; fol = folnext)
+          {
+            folnext = fol->next;
+            if (IS_AFFECTED(fol->follower, AFF_CHARM) && ch->in_room == fol->follower->in_room)
+              SET_BIT(retval, check_charmiejoin(fol->follower));
+            if (IS_SET(retval, eVICT_DIED))
+              break;
+          }
+        }
+      }
+      if (SOMEONE_DIED(retval))
+        return debug_retval(ch, victim, retval);
+    }
+  }
   return debug_retval(ch, victim, retval);
-} 
+}
 
 // this function deals damage in noncombat situations (falls, drowning, etc.)
 // returns standard returnvals.h return codes
