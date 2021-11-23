@@ -1772,34 +1772,28 @@ int getRealSpellDamage( CHAR_DATA * ch)
    return spell_dam;
 }
 
-void set_hp(char_data *ch, char_data *victim, int dam)
+void char_data::setHP(int dam, char_data* causer)
 {
-  int old_hp = GET_HIT(victim);
-  if (victim)
-  {
-    GET_HIT(victim) = dam;
+  int old_hp = this->hit;
+  this->hit = dam;
 
-    if (ch)
-    {
-      ch->damages++;
-      ch->damage_done += old_hp-dam;
-      ch->damage_per_second = ch->damage_done / ch->damages;
-    }
+  if (causer)
+  {
+    causer->damages++;
+    causer->damage_done += old_hp - dam;
+    causer->damage_per_second = causer->damage_done / causer->damages;
   }
 }
 
-void remove_hp(char_data *ch, char_data *victim, int dam)
+void char_data::removeHP(int dam, char_data* causer)
 {
-  if (victim)
-  {
-    GET_HIT(victim) -= dam;
+  this->hit -= dam;
 
-    if (ch)
-    {
-      ch->damages++;
-      ch->damage_done += dam;
-      ch->damage_per_second = ch->damage_done / ch->damages;
-    }
+  if (causer)
+  {
+    causer->damages++;
+    causer->damage_done += dam;
+    causer->damage_per_second = causer->damage_done / causer->damages;
   }
 }
 
@@ -2489,7 +2483,7 @@ int damage(CHAR_DATA *ch, CHAR_DATA *victim,
       dam_message(dam, ch, victim, attacktype, modifier);
     }
 
-    remove_hp(ch, victim, dam);
+    victim->removeHP(dam, ch);
     update_pos(victim);
   }
   else
@@ -2503,7 +2497,7 @@ int damage(CHAR_DATA *ch, CHAR_DATA *victim,
       affect_remove(victim, af, 0);
     }
 
-    remove_hp(ch, victim, dam);
+    victim->removeHP(dam, ch);
     update_pos(victim);
     do_dam_msgs(ch, victim, dam, attacktype, weapon, weapon_type);
   }
@@ -2648,7 +2642,7 @@ int noncombat_damage(CHAR_DATA * ch, int dam, char *char_death_msg,
   if(affected_by_spell(ch, SPELL_DIVINE_INTER) && dam > affected_by_spell(ch, SPELL_DIVINE_INTER)->modifier)
     dam = affected_by_spell(ch, SPELL_DIVINE_INTER)->modifier;
 
-  remove_hp(nullptr, ch, dam);
+  ch->removeHP(dam);
   update_pos(ch);
   if(GET_POS(ch) == POSITION_DEAD) {
      if (char_death_msg) {
@@ -4655,7 +4649,7 @@ int do_skewer(CHAR_DATA *ch, CHAR_DATA *vict, int dam, int wt, int wt2, int weap
     inform_victim(ch, vict, damadd); 
 
     if(GET_POS(vict) != POSITION_DEAD && number(0, 4999) == 1) { /* tiny chance of instakill */
-      set_hp(ch, vict, -1);
+      vict->setHP(-1, ch);
       send_to_char("You impale your weapon through your opponent's chest!\r\n", ch);
       act("$n's weapon blows through your chest sending your entrails flying for yards behind you.  Everything goes black...", ch, 0, vict, TO_VICT, 0);
       act("$n's weapon rips through $N's chest sending gore and entrails flying for yards!\r\n", ch, 0, vict, NOTVICT, 0);
@@ -4705,7 +4699,7 @@ int do_behead_skill(CHAR_DATA *ch, CHAR_DATA *vict)
           act("You feel your life end as $n's sword SLICES YOUR HEAD OFF!", ch, 0, vict, TO_VICT, 0);
           act("You SLICE $N's head CLEAN OFF $S body!", ch, 0, vict, TO_CHAR, 0);
           act("$n cleanly slices $N's head off $S body!", ch, 0, vict, TO_ROOM, NOTVICT);
-          set_hp(ch, vict, -20);
+          vict->setHP(-20, ch);
           make_head(vict);
           group_gain(ch, vict); 
           fight_kill(ch, vict, TYPE_CHOOSE, 0);

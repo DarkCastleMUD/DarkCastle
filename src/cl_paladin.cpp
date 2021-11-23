@@ -316,7 +316,8 @@ int do_behead(struct char_data *ch, char *argument, int cmd)
     act("You feel your life end as $n's sword SLICES YOUR HEAD OFF!", ch, 0, vict, TO_VICT, 0);
     act("You SLICE $N's head CLEAN OFF $S body!", ch, 0, vict, TO_CHAR, 0);
     act("$n cleanly slices $N's head off $S body!", ch, 0, vict, TO_ROOM, NOTVICT);
-    GET_HIT(vict) = -20;
+
+    vict->setHP(-20);
     make_head(vict);
     group_gain(ch, vict); 
     fight_kill(ch, vict, TYPE_CHOOSE, 0);
