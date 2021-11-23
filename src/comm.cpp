@@ -222,7 +222,7 @@ int write_hotboot_file(char **new_argv)
   for (d = descriptor_list; d; d = sd)
   {
     sd = d->next;
-    if (STATE(d) != conn::PLAYING || !d->character || GET_LEVEL(d->character) < 2)
+    if (STATE(d) != conn::PLAYING || !d->character || GET_LEVEL(d->character) < 1)
     {
       // Kick out anyone not currently playing in the game.
       write_to_descriptor(d->descriptor, "We are rebooting, come back in a minute.");
@@ -909,10 +909,20 @@ void DC::game_loop(void)
       delay_time.tv_usec = usecDelta;
       delay_time.tv_sec = secDelta;
       //logf(110, LOG_BUG, "Pausing for  %dsec %dusec.", secDelta, usecDelta);
-      if (select(0, NULL, NULL, NULL, &delay_time) < 0 && errno != EINTR)
+      int fd_nr = -1;
+      errno = 0;
+      fd_nr = select(0, NULL, NULL, NULL, &delay_time);
+      if (fd_nr == -1)
       {
-        perror("game_loop: select: delay");
-        exit(1);
+        if (errno == EINTR)
+        {
+          cerr << "select() interupted." << endl;
+        }
+        else
+        {
+          perror("game_loop: select: delay");
+          exit(1);
+        }
       }
     }
     // temp removing this since it's spamming the crap out of us
@@ -2606,6 +2616,15 @@ void hupsig(int sig)
 				 * substituted */
 }
 
+void sigusr1(int sig)
+{
+  do_not_save_corpses = 1;
+  log("Writing sockets to file for hotboot recovery.", 0, LOG_MISC);
+  if(!write_hotboot_file(nullptr)) {
+    log("Hotboot failed.  Closing all sockets.", 0, LOG_MISC);    
+  }
+}
+
 #ifndef WIN32
 void sigchld(int sig)
 {
@@ -2644,12 +2663,31 @@ void signal_handler(int signal, siginfo_t *si, void *)
   {
     abort();
   }
+  if (signal == SIGHUP)
+  {
+    char **new_argv = nullptr;
+    string buf = "Hot reboot by SIGHUP.\n\r";
+    extern int do_not_save_corpses;
+    do_not_save_corpses = 1;
+    send_to_all(buf.data());
+    log(buf.c_str(), ANGEL, LOG_GOD);
+    log("Writing sockets to file for hotboot recovery.", 0, LOG_MISC);
+    //do_force(nullptr, "all save", 123);
+    if (!write_hotboot_file(new_argv))
+    {
+      log("Hotboot failed.  Closing all sockets.", 0, LOG_MISC);
+    }
+  }
 }
 
 void signal_setup(void)
 {
-#ifndef WIN32
-  // struct timeval interval;
+  sigset_t set;
+  sigfillset(&set);
+  sigprocmask(SIG_UNBLOCK, &set, nullptr);
+
+  // Hot reboots the game
+  my_signal(SIGUSR1, sigusr1);
 
   /*
    * user signal 2: unrestrict game.  Used for emergencies if you lock
@@ -2676,10 +2714,9 @@ void signal_setup(void)
   my_signal(SIGALRM, SIG_IGN);
   signal(SIGCHLD, sigchld); // hopefully kill zombies
 
-  //  my_signal(SIGSEGV, crashsig);  // catch null->blah
+  //my_signal(SIGSEGV, crashsig);  // catch null->blah
   my_signal(SIGFPE, crashfpe); // catch x / 0
   my_signal(SIGILL, crashill); // catch illegal instruction
-#endif
 }
 
 /* ****************************************************************
