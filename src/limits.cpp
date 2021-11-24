@@ -574,7 +574,7 @@ void advance_level(CHAR_DATA *ch, int is_conversion) {
 		for (int i = 0; i <= SAVE_TYPE_MAX; i++)
 			ch->saves[i]++;
 
-	GET_HIT(ch) = GET_MAX_HIT(ch);
+	ch->fillHP();
 	GET_MANA(ch) = GET_MAX_MANA(ch);
 	GET_MOVE(ch) = GET_MAX_MOVE(ch);
 	GET_KI(ch) = GET_MAX_KI(ch);

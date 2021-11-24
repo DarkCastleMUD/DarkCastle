@@ -500,11 +500,13 @@ int spell_vampiric_touch (ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct 
   if (!SOMEONE_DIED(retval) && GET_HIT(victim) >= i) return retval;
       
   if (!SOMEONE_DIED(retval))
-    GET_HIT(ch) += MIN(adam, i-GET_HIT(victim));
+  {
+    ch->addHP(MIN(adam, i-GET_HIT(victim)));
+  }
   else
-    GET_HIT(ch) += MIN(adam, i);
-  if (GET_HIT(ch) > GET_MAX_HIT(ch))
-    GET_HIT(ch) = GET_MAX_HIT(ch);
+  {
+    ch->addHP(MIN(adam, i));
+  }
 
    return retval;
 }
@@ -1020,7 +1022,7 @@ int spell_life_leech(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
         GET_HIT(ch) += (int) (adam * 0.3);
 
       if (GET_HIT(ch) > GET_MAX_HIT(ch))
-        GET_HIT(ch) = GET_MAX_HIT(ch);
+        ch->fillHP();
       retval &= damage(ch, tmp_victim, dam, TYPE_POISON, SPELL_LIFE_LEECH, weap_spell);
     }
   }
@@ -3203,9 +3205,10 @@ int spell_mend_golem(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
 
       GET_HIT(fol->follower) += heal;
 
-      if (GET_HIT(fol->follower) > GET_MAX_HIT(fol->follower)) {
+      if (GET_HIT(fol->follower) > GET_MAX_HIT(fol->follower))
+      {
         heal += GET_MAX_HIT(fol->follower) - GET_HIT(fol->follower);
-        GET_HIT(fol->follower) = GET_MAX_HIT(fol->follower);
+        fol->follower->fillHP();
       }
       sprintf(dammsg, "$B%d$R", heal);
 
@@ -10667,8 +10670,7 @@ int cast_herb_lore(ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *v
 	case 2256:
 		aff = 0; spl =0;
 		send_to_char("Adding the herbs improve the healing effect of the spell.\r\n",ch);
-		GET_HIT(victim) += 40;
-		if (GET_HIT(victim) > GET_MAX_HIT(victim)) GET_HIT(victim) = GET_MAX_HIT(victim);
+    victim->addHP(40);
 		break;
 	default:
 		send_to_char("That's not a herb!\r\n",ch);
@@ -11289,9 +11291,14 @@ int spell_create_golem(int level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
   // kill charmie(s) and give stats to golem
 
   if(GET_MAX_HIT(victim)*2 < 32000)
+  {
      mob->max_hit = GET_MAX_HIT(victim)*2;
-  else mob->max_hit = 32000;
-  GET_HIT(mob) = GET_MAX_HIT(mob); /* 50% of max */
+  }
+  else
+  {
+    mob->max_hit = 32000;
+  }
+  mob->fillHP(); /* 50% of max */
   GET_AC(mob) = GET_AC(victim) - 30;
   mob->mobdata->damnodice = victim->mobdata->damnodice+5;
   mob->mobdata->damsizedice = victim->mobdata->damsizedice;

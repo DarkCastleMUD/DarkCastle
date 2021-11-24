@@ -221,178 +221,227 @@ void perform_violence(void)
   int is_mob = 0;
   int retval;
   static struct affected_type *af, *next_af_dude;
-  struct follow_type *fol,*folnext;
+  struct follow_type *fol, *folnext;
   extern char *spell_wear_off_msg[];
-  
-  if(!combat_list)                  return;
 
-  
-  for(ch = combat_list; ch; ch = combat_next_dude) {
+  if (!combat_list)
+    return;
+
+  for (ch = combat_list; ch; ch = combat_next_dude)
+  {
     // if combat_next_dude gets killed, it get's updated in "stop_fighting"
     // pretty kludgy way to do it, but it work
     combat_next_dude = ch->next_fighting;
-    
-    if(!ch->fighting) { 
+
+    if (!ch->fighting)
+    {
       log("Error in perform_violence()!  Null ch->fighting!", IMMORTAL, LOG_BUG);
       return;
     }
-    
-// DEBUG CODE
-   int last_virt = -1;
-   int last_class = GET_CLASS(ch);
-   if(IS_MOB(ch))
-      last_virt  = mob_index[ch->mobdata->nr].virt;
-// DEBUG CODE
-   if (!ch->fighting) continue;
-      
-   if (ch->in_room != ch->fighting->in_room)
-   { // Fix for the whacky fighting someone who's not here thing.
-     stop_fighting(ch);
-     continue;
-   }
-   int retval = check_autojoiners(ch);
-   if (SOMEONE_DIED(retval)) continue;
-   if (IS_AFFECTED(ch, AFF_CHARM)) retval = check_joincharmie(ch);
-   if (SOMEONE_DIED(retval)) continue;
-   if(!IS_NPC(ch) && IS_SET(ch->pcdata->toggles, PLR_CHARMIEJOIN)) {
-      if(ch->followers) {
-         for(fol = ch->followers; fol; fol = folnext) {
-	    folnext = fol->next;
-            if (IS_AFFECTED(fol->follower, AFF_CHARM) && ch->in_room == fol->follower->in_room) retval = check_charmiejoin(fol->follower);
-            if (IS_SET(retval, eVICT_DIED)) break;
-         }
-      }
-   }
-   if (SOMEONE_DIED(retval)) continue;
 
-   if (!ch->fighting || ch->fighting->in_room != ch->in_room) {
-     continue;
-   }
+    // DEBUG CODE
+    int last_virt = -1;
+    int last_class = GET_CLASS(ch);
+    if (IS_MOB(ch))
+      last_virt = mob_index[ch->mobdata->nr].virt;
+    // DEBUG CODE
+    if (!ch->fighting)
+      continue;
 
-    if(can_attack(ch)) {
-      is_mob = IS_MOB(ch);
-      if(is_mob) {
-        if((mob_index[ch->mobdata->nr].combat_func)&&MOB_WAIT_STATE(ch) <=0) {
-          retval = ((*mob_index[ch->mobdata->nr].combat_func)(ch, NULL, 0, "", ch));
-          if(SOMEONE_DIED(retval))
-            continue;
-	  // Check if we're still fighting someone
-	  if (ch->fighting == 0)
-	    continue;
-        }
-        else if(!IS_AFFECTED(ch, AFF_CHARM)) 
+    if (ch->in_room != ch->fighting->in_room)
+    { // Fix for the whacky fighting someone who's not here thing.
+      stop_fighting(ch);
+      continue;
+    }
+    int retval = check_autojoiners(ch);
+    if (SOMEONE_DIED(retval))
+      continue;
+    if (IS_AFFECTED(ch, AFF_CHARM))
+      retval = check_joincharmie(ch);
+    if (SOMEONE_DIED(retval))
+      continue;
+    if (!IS_NPC(ch) && IS_SET(ch->pcdata->toggles, PLR_CHARMIEJOIN))
+    {
+      if (ch->followers)
+      {
+        for (fol = ch->followers; fol; fol = folnext)
         {
-          if(MOB_WAIT_STATE(ch) > 0) {
-           // sprintf(debug, "DEBUG: Mob: %s (Lag: %d)", GET_SHORT(ch), MOB_WAIT_STATE(ch));
-           // MOB_WAIT_STATE(ch) -= PULSE_VIOLENCE; // MIKE
-           // log(debug, OVERSEER, LOG_BUG);
-	  } else {
+          folnext = fol->next;
+          if (IS_AFFECTED(fol->follower, AFF_CHARM) && ch->in_room == fol->follower->in_room)
+            retval = check_charmiejoin(fol->follower);
+          if (IS_SET(retval, eVICT_DIED))
+            break;
+        }
+      }
+    }
+    if (SOMEONE_DIED(retval))
+      continue;
+
+    if (!ch->fighting || ch->fighting->in_room != ch->in_room)
+    {
+      continue;
+    }
+
+    if (can_attack(ch))
+    {
+      is_mob = IS_MOB(ch);
+      if (is_mob)
+      {
+        if ((mob_index[ch->mobdata->nr].combat_func) && MOB_WAIT_STATE(ch) <= 0)
+        {
+          retval = ((*mob_index[ch->mobdata->nr].combat_func)(ch, NULL, 0, "", ch));
+          if (SOMEONE_DIED(retval))
+            continue;
+          // Check if we're still fighting someone
+          if (ch->fighting == 0)
+            continue;
+        }
+        else if (!IS_AFFECTED(ch, AFF_CHARM))
+        {
+          if (MOB_WAIT_STATE(ch) > 0)
+          {
+            // sprintf(debug, "DEBUG: Mob: %s (Lag: %d)", GET_SHORT(ch), MOB_WAIT_STATE(ch));
+            // MOB_WAIT_STATE(ch) -= PULSE_VIOLENCE; // MIKE
+            // log(debug, OVERSEER, LOG_BUG);
+          }
+          else
+          {
             ;
-           }
+          }
         }
       } // if is_mob
 
       // DEBUG CODE
-      if(last_class != GET_CLASS(ch)) {
-         // if this happened, most likely the mob died somehow during the proc and didn't return eCH_DIED and is
-         // now invalid memory.  report what class we were and return
-         logf(IMP, LOG_BUG, "Crash bug!!!!  fight.cpp last_class changed (%d) Mob=%d", last_class, last_virt);
-         break;
+      if (last_class != GET_CLASS(ch))
+      {
+        // if this happened, most likely the mob died somehow during the proc and didn't return eCH_DIED and is
+        // now invalid memory.  report what class we were and return
+        logf(IMP, LOG_BUG, "Crash bug!!!!  fight.cpp last_class changed (%d) Mob=%d", last_class, last_virt);
+        break;
       }
       // DEBUG CODE
 
       retval = attack(ch, ch->fighting, TYPE_UNDEFINED);
 
-      if(SOMEONE_DIED(retval)) // no point in going anymore
+      if (SOMEONE_DIED(retval)) // no point in going anymore
         continue;
 
       // MOB Progs
-      retval = mprog_hitprcnt_trigger( ch, ch->fighting );
-      if(SOMEONE_DIED(retval) || !ch || !(ch->fighting) || isDead(ch) || isNowhere(ch) || isDead(ch->fighting) || isNowhere(ch->fighting))
+      retval = mprog_hitprcnt_trigger(ch, ch->fighting);
+      if (SOMEONE_DIED(retval) || !ch || !(ch->fighting) || isDead(ch) || isNowhere(ch) || isDead(ch->fighting) || isNowhere(ch->fighting))
       {
         continue;
       }
-        
-      retval = mprog_fight_trigger( ch, ch->fighting );
-      if(SOMEONE_DIED(retval) || !ch || !(ch->fighting) || isDead(ch) || isNowhere(ch) || isDead(ch->fighting) || isNowhere(ch->fighting))
+
+      retval = mprog_fight_trigger(ch, ch->fighting);
+      if (SOMEONE_DIED(retval) || !ch || !(ch->fighting) || isDead(ch) || isNowhere(ch) || isDead(ch->fighting) || isNowhere(ch->fighting))
       {
         continue;
       }
 
     } // can_attack
-    else if(!is_stunned(ch) && !IS_AFFECTED(ch, AFF_PARALYSIS))
+    else if (!is_stunned(ch) && !IS_AFFECTED(ch, AFF_PARALYSIS))
       stop_fighting(ch);
 
     // This takes care of flee and stuff
-    if(ch && ch->fighting)
-      if(ch->fighting != (CHAR_DATA*)0x95959595 && ch->in_room != (ch->fighting)->in_room)
+    if (ch && ch->fighting)
+      if (ch->fighting != (CHAR_DATA *)0x95959595 && ch->in_room != (ch->fighting)->in_room)
         stop_fighting(ch);
   } // for
   //
 
-// new round thing, so that how long things lasts doesn't depend
-// on who attacked who first
-  for(ch = combat_list; ch; ch = combat_next_dude) {
+  // new round thing, so that how long things lasts doesn't depend
+  // on who attacked who first
+  for (ch = combat_list; ch; ch = combat_next_dude)
+  {
     combat_next_dude = ch->next_fighting;
 
-    if(!ch->fighting) {
+    if (!ch->fighting)
+    {
       log("Error in perform_violence(), part2!  Null ch->fighting!", IMMORTAL, LOG_BUG);
       return;
     }
     bool over = FALSE;
-    for (af = ch->affected; af;af = next_af_dude)
+    for (af = ch->affected; af; af = next_af_dude)
     {
-      if (af == (affected_type*)0x95959595) {over =TRUE; break;}
+      if (af == (affected_type *)0x95959595)
+      {
+        over = TRUE;
+        break;
+      }
       next_af_dude = af->next;
       if (af->type == SPELL_POISON && af->location == APPLY_NONE)
       {
-        int dam = af->duration * 10 + number(30,50);
-        if(get_saves(ch, SAVE_TYPE_POISON) > number(1,100)) {
-           dam = dam * get_saves(ch, SAVE_TYPE_POISON) / 100;
-           send_to_char("You feel very sick, but resist the $2poison's$R damage.\n\r", ch);
+        int dam = af->duration * 10 + number(30, 50);
+        if (get_saves(ch, SAVE_TYPE_POISON) > number(1, 100))
+        {
+          dam = dam * get_saves(ch, SAVE_TYPE_POISON) / 100;
+          send_to_char("You feel very sick, but resist the $2poison's$R damage.\n\r", ch);
         }
-        if(dam) {
-           char dammsg[MAX_STRING_LENGTH];
-           sprintf(dammsg, "$B%d$R", dam);
-           send_damage("You feel burning $2poison$R in your blood and suffer painful convulsions for | damage.", ch, 
-                 0, 0, dammsg, "You feel burning $2poison$R in your blood and suffer painful convulsions.", TO_CHAR);
-           send_damage("$n looks extremely sick and shivers uncomfortably from the $2poison$R in $s veins that did | damage.", ch,
-                 0, 0, dammsg, "$n looks extremely sick and shivers uncomfortably from the $2poison$R in $s veins.", TO_ROOM);
-           retval = noncombat_damage(ch, dam,
-                 "You quiver from the effects of the poison and have no enegry left...",
-                 "$n stops struggling as $e is consumed by poison.",
-                 0, KILL_POISON);
-           if (SOMEONE_DIED(retval))
-              { over = TRUE; break; }
+        if (dam)
+        {
+          char dammsg[MAX_STRING_LENGTH];
+          sprintf(dammsg, "$B%d$R", dam);
+          send_damage("You feel burning $2poison$R in your blood and suffer painful convulsions for | damage.", ch,
+                      0, 0, dammsg, "You feel burning $2poison$R in your blood and suffer painful convulsions.", TO_CHAR);
+          send_damage("$n looks extremely sick and shivers uncomfortably from the $2poison$R in $s veins that did | damage.", ch,
+                      0, 0, dammsg, "$n looks extremely sick and shivers uncomfortably from the $2poison$R in $s veins.", TO_ROOM);
+          retval = noncombat_damage(ch, dam,
+                                    "You quiver from the effects of the poison and have no enegry left...",
+                                    "$n stops struggling as $e is consumed by poison.",
+                                    0, KILL_POISON);
+          if (SOMEONE_DIED(retval))
+          {
+            over = TRUE;
+            break;
+          }
         }
       }
       else if (af->type == SPELL_ATTRITION)
       {
-         send_to_char("Your body aches at the effort of combat.\r\n", ch);
-         if(affected_by_spell(ch, SPELL_DIVINE_INTER))
-            GET_HIT(ch) -= affected_by_spell(ch, SPELL_DIVINE_INTER)->modifier;
-         else GET_HIT(ch) -= 25;
-         GET_HIT(ch) = MAX(1, GET_HIT(ch));  // doesn't kill only hurts
+        send_to_char("Your body aches at the effort of combat.\r\n", ch);
+        if (affected_by_spell(ch, SPELL_DIVINE_INTER))
+        {
+          ch->removeHP(affected_by_spell(ch, SPELL_DIVINE_INTER)->modifier);
+        }
+        else
+        {
+          ch->removeHP(25);
+        }
+         ch->setHP(MAX(1, GET_HIT(ch)));  // doesn't kill only hurts
       }
- // primal checks bitvecotr instead of type because the timer has type SKILL_PRIMAL_FURY..
+      // primal checks bitvecotr instead of type because the timer has type SKILL_PRIMAL_FURY..
       else if ((af->type != SPELL_PARALYZE && af->bitvector != AFF_PRIMAL_FURY) || !someone_fighting(ch))
-         continue;
+      {
+        continue;
+      }
 
       if (af->duration >= 1)
+      {
         af->duration--;
-      if(af->duration <= 0) {
-        if (af->type < MAX_SPL_LIST && *spell_wear_off_msg[af->type]) {
+      }
+
+      if (af->duration <= 0)
+      {
+        if (af->type < MAX_SPL_LIST && *spell_wear_off_msg[af->type])
+        {
           send_to_char(spell_wear_off_msg[af->type], ch);
           send_to_char("\n\r", ch);
-	}
-          while (next_af_dude&&af->type == next_af_dude->type) next_af_dude = next_af_dude->next;
-          affect_remove(ch, af, 0);
+        }
+
+        while (next_af_dude && af->type == next_af_dude->type)
+        {
+          next_af_dude = next_af_dude->next;
+        }
+
+        affect_remove(ch, af, 0);
       }
     }
-    if (over) continue;
+    if (over)
+      continue;
     update_flags(ch);
     if (is_stunned(ch) || IS_AFFECTED(ch, AFF_PARALYSIS))
-	update_stuns(ch);
+      update_stuns(ch);
   }
 }
 
@@ -1774,8 +1823,8 @@ int getRealSpellDamage( CHAR_DATA * ch)
 
 void char_data::setHP(int dam, char_data* causer)
 {
-  int old_hp = this->hit;
-  this->hit = dam;
+  int old_hp = hit;
+  hit = dam;
 
   if (causer)
   {
@@ -1787,7 +1836,7 @@ void char_data::setHP(int dam, char_data* causer)
 
 void char_data::removeHP(int dam, char_data* causer)
 {
-  this->hit -= dam;
+  hit -= dam;
 
   if (causer)
   {
@@ -1797,7 +1846,19 @@ void char_data::removeHP(int dam, char_data* causer)
   }
 }
 
+void char_data::fillHP(void)
+{
+  setHP(max_hit);
+}
 
+void char_data::addHP(int newhp, char_data* causer)
+{
+  hit += newhp;
+  if (hit > max_hit)
+  {
+    hit = max_hit;
+  }
+}
 
 // returns standard returnvals.h return codes
 int damage(CHAR_DATA *ch, CHAR_DATA *victim,
@@ -4748,7 +4809,7 @@ int do_execute_skill(CHAR_DATA *ch, CHAR_DATA *vict, int w_type)
         } else {
           act("$n quickly thrusts aside your defenses and strikes a fatal blow!", ch, 0, vict, TO_VICT, 0);
           act("You feel a flash of pain and your vision dims from $4red$R to $B$0black$R...", ch, 0, vict, TO_VICT, 0);
-          GET_HIT(vict) = -20;
+          vict->setHP(-20, ch);
           act("You quickly thrust aside $N's defenses and strike a fatal blow!", ch, 0, vict, TO_CHAR, 0);
           act("$n quickly thrusts aside $N's defenses and strikes a lethal blow!", ch, 0, vict, TO_ROOM, NOTVICT);
           if(w_type == TYPE_SLASH || w_type == TYPE_PIERCE) {
@@ -4972,7 +5033,7 @@ void raw_kill(CHAR_DATA * ch, CHAR_DATA * victim)
   death_room = victim->in_room;
   extract_char(victim, FALSE);
   
-  GET_HIT(victim)  = 1;
+  victim->setHP(1);
   if(GET_MOVE(victim) <= 0)
     GET_MOVE(victim) = 1;
   if(GET_MANA(victim) <= 0)
@@ -5880,7 +5941,7 @@ void do_pkill(CHAR_DATA *ch, CHAR_DATA *victim, int type, bool vict_is_attacker)
       affect_remove(victim, af, SUPPRESS_ALL);
   }
   
-  GET_HIT(victim)  = 1;
+  victim->setHP(1);
   GET_KI(victim)   = 1;
   GET_MANA(victim) = 1;
   if(IS_AFFECTED(victim, AFF_CANTQUIT))
@@ -6241,7 +6302,7 @@ void arena_kill(CHAR_DATA *ch, CHAR_DATA *victim, int type)
   
   send_to_char("You have been completely healed.\n\r", victim);
   GET_POS(victim) = POSITION_RESTING;
-  GET_HIT(victim) = GET_MAX_HIT(victim);
+  victim->fillHP();
   GET_MANA(victim) = GET_MAX_MANA(victim);
   GET_MOVE(victim) = GET_MAX_MOVE(victim);
   GET_KI(victim) = GET_MAX_KI(victim);

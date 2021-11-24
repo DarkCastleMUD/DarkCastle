@@ -2411,7 +2411,7 @@ struct obj_data *unequip_char(CHAR_DATA *ch, int pos, int flag) {
 	if (obj_index[obj->item_number].virt == 30033  && !ISSET(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT))
 	{
 			act("The effort required to separate the Chaos Blade from your own life force is immense! The Blade exacts a toll...", ch, obj, 0, TO_CHAR, 0);
-			GET_HIT(ch) = GET_HIT(ch) /2;
+			ch->setHP(GET_HIT(ch)/2);
 	}
 	if (obj_index[obj->item_number].virt == 30008  && !ISSET(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT))
 	{

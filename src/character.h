@@ -449,8 +449,10 @@ struct char_data
     time_t last_damage;
     uint64_t damage_per_second;
     void setPOSFighting();
-    void setHP(int dam, char_data* causer = nullptr);
+    void setHP(int hp, char_data* causer = nullptr);
+    void addHP(int hp, char_data* causer = nullptr);
     void removeHP(int dam, char_data* causer = nullptr);
+    void fillHP(void);
 };
 
 // This structure is written to the disk.  DO NOT MODIFY THIS STRUCTURE

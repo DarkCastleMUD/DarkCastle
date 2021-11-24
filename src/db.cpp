@@ -5602,7 +5602,7 @@ void reset_char(CHAR_DATA *ch)
 		ch->songs.clear();
 
 	if (GET_HIT(ch) < 1)
-		GET_HIT(ch) = 1;
+		ch->setHP(1);
 	if (GET_MOVE(ch) < 1)
 		GET_MOVE(ch) = 1;
 	if (GET_MANA(ch) < 1)

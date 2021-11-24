@@ -181,7 +181,7 @@ int do_joinarena(CHAR_DATA *ch, char *arg, int cmd)
 
   GET_MOVE(ch) = GET_MAX_MOVE(ch);
   GET_MANA(ch) = GET_MAX_MANA(ch);
-  GET_HIT(ch)  = GET_MAX_HIT(ch);
+  ch->fillHP();
   GET_KI(ch)   = GET_MAX_KI(ch);
  
   act("$n disappears in a glorious flash of heroism.", ch, 0, 0, TO_ROOM, 0);

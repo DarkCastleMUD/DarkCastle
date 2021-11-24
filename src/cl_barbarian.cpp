@@ -760,9 +760,8 @@ int do_bloodfury(struct char_data *ch, char *argument, int cmd)
 
     modifier = .2 + (.00375 * has_skill(ch,SKILL_BLOOD_FURY));  // mod = .2 - .5
 
-    GET_HIT(ch) += (int)((float)GET_MAX_HIT(ch) * modifier);
-    if(GET_HIT(ch) > GET_MAX_HIT(ch))
-      GET_HIT(ch) = GET_MAX_HIT(ch);
+    ch->addHP((float)GET_MAX_HIT(ch) * modifier);
+      
     duration = 36 - (GET_LEVEL(ch) / 6);
   }
 
