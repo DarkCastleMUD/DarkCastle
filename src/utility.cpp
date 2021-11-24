@@ -807,7 +807,7 @@ bool CAN_SEE( struct char_data *sub, struct char_data *obj, bool noprog )
    }
 
 
-   if ( !IS_MOB(sub) && sub->pcdata->holyLite )
+   if (sub && IS_PC(sub) && sub->pcdata && sub->pcdata->holyLite )
       return TRUE;
 
    if (!noprog && IS_NPC(obj))
@@ -820,13 +820,20 @@ bool CAN_SEE( struct char_data *sub, struct char_data *obj, bool noprog )
       return TRUE;
 
    if (obj->in_room == NOWHERE) {
-	 return FALSE;
+	  return FALSE;
    }
-   
-   if (world[obj->in_room].sector_type == SECT_FOREST &&
-       IS_AFFECTED(obj, AFF_FOREST_MELD) &&
-       IS_AFFECTED(obj, AFF_HIDE))
-      return FALSE;
+
+   try
+   {
+     if (world[obj->in_room].sector_type == SECT_FOREST && IS_AFFECTED(obj, AFF_FOREST_MELD) && IS_AFFECTED(obj, AFF_HIDE))
+     {
+       return false;
+     }
+   }
+   catch (...)
+   {
+     return false;
+   }
 
    if ( IS_AFFECTED(sub, AFF_BLIND) )
       return FALSE;
