@@ -25,8 +25,6 @@ CVoteData *DCVote;
 
 void init_random();
 void init_game(void);
-void boot_zones(void);
-void boot_world(void);
 void backup_executable(char * const argv[]);
 DC::config parse_arguments(int argc, char * const argv[]);
 

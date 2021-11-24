@@ -196,8 +196,6 @@ int zone_is_empty(int zone_nr);
 void reset_zone(int zone);
 void fix_shopkeepers_inventory();
 int file_to_string(const char *name, char *buf);
-void renum_world(void);
-void renum_zone_table(void);
 void reset_time(void);
 void clear_char(CHAR_DATA *ch);
 

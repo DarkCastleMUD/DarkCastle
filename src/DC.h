@@ -96,5 +96,9 @@ extern struct room_data ** world_array;
 extern struct obj_data  *object_list;
 extern struct zone_data *zone_table;
 extern struct spell_info_type spell_info [ ];
+void boot_zones(void);
+void boot_world(void);
+void renum_world(void);
+void renum_zone_table(void);
 
 #endif /* SRC_INCLUDE_DC_H_ */
