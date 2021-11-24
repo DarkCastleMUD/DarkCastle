@@ -137,6 +137,10 @@ DC::config parse_arguments(int argc, char *const argv[])
       {
         cf.allow_multi = true;
       }
+      if (port == 7000)
+      {
+        cf.allow_newstatsys = true;
+      }
       break;
     case 'P':
       cf.allow_imp_password = true;

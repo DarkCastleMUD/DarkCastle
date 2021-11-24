@@ -1409,7 +1409,7 @@ void nanny(struct descriptor_data *d, string arg)
          return;
       }
 
-      if (!allowed_host(d->host))
+      if (!allowed_host(d->host) || !DC::instance().cf.allow_newstatsys)
       {
          STATE(d) = conn::OLD_STAT_METHOD;
          break;

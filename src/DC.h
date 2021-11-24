@@ -68,6 +68,7 @@ public:
     bool check_syntax = false;
     bool stderr_timestamp = true;
     bool allow_multi = false;
+    bool allow_newstatsys = false;
     string dir = DFLT_DIR;
     string leaderboard_check;
   } cf;
