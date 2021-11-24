@@ -13,20 +13,26 @@ extern "C" {
 }
 
 #include <sstream>
-
+#include <string>
 #include "player.h"
+
+using namespace std;
+
 
 class Leaderboard {
 public:
 	Leaderboard();
 	virtual ~Leaderboard();
 	void check(void);
+	void check_offline(void);
 	void read_file(void);
 	void write_file(std::string &filename);
 	void write_file(std::stringstream &filename);
 	void write_file(const char filename[]);
 	int pdscore(CHAR_DATA * ch);
 	void rename(char *oldname, char *newname);
+	void setHP(unsigned int placement, string name, int value);	
+	int scan(char_data* ch);
 private:
 	char *hpactivename[5];
 	char *mnactivename[5];

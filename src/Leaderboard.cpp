@@ -541,6 +541,542 @@ void Leaderboard::check(void) {
 	}
 }
 
+void Leaderboard::check_offline(void)
+{
+	char_data *ch;
+	int i, j, k;
+	extern char *curr_type;
+	extern char *curr_name;
+	extern int curr_virtno;
+
+	curr_type = "leaderboard";
+	curr_name = "NA";
+	curr_virtno = 0;
+
+	for (auto &ch : DC::instance().character_list)
+	{
+		if (GET_LEVEL(ch) >= IMMORTAL || IS_NPC(ch))
+			continue;
+
+		if (ch->pcdata == nullptr)
+			continue;
+
+		k = MIN(CLASS_DRUID - 1, GET_CLASS(ch) - 1);
+
+		for (i = 0; i < 5; i++)
+		{
+			if (hpactivename[i] && !strcmp(hpactivename[i], GET_NAME(ch)))
+			{
+				for (j = i; j < 4; j++)
+				{
+					hpactive[j] = hpactive[j + 1];
+					dc_free(hpactivename[j]);
+					hpactivename[j] = str_dup0(hpactivename[j + 1]);
+				}
+				hpactive[4] = 0;
+				dc_free(hpactivename[4]);
+				hpactivename[4] = str_dup(" ");
+			}
+			if (mnactivename[i] && !strcmp(mnactivename[i], GET_NAME(ch)))
+			{
+				for (j = i; j < 4; j++)
+				{
+					mnactive[j] = mnactive[j + 1];
+					dc_free(mnactivename[j]);
+					mnactivename[j] = str_dup0(mnactivename[j + 1]);
+				}
+				mnactive[4] = 0;
+				dc_free(mnactivename[4]);
+				mnactivename[4] = str_dup(" ");
+			}
+			if (kiactivename[i] && !strcmp(kiactivename[i], GET_NAME(ch)))
+			{
+				for (j = i; j < 4; j++)
+				{
+					kiactive[j] = kiactive[j + 1];
+					dc_free(kiactivename[j]);
+					kiactivename[j] = str_dup0(kiactivename[j + 1]);
+				}
+				kiactive[4] = 0;
+				dc_free(kiactivename[4]);
+				kiactivename[4] = str_dup(" ");
+			}
+			if (pkactivename[i] && !strcmp(pkactivename[i], GET_NAME(ch)))
+			{
+				for (j = i; j < 4; j++)
+				{
+					pkactive[j] = pkactive[j + 1];
+					dc_free(pkactivename[j]);
+					pkactivename[j] = str_dup0(pkactivename[j + 1]);
+				}
+				pkactive[4] = 0;
+				dc_free(pkactivename[4]);
+				pkactivename[4] = str_dup(" ");
+			}
+			if (pdactivename[i] && !strcmp(pdactivename[i], GET_NAME(ch)))
+			{
+				for (j = i; j < 4; j++)
+				{
+					pdactive[j] = pdactive[j + 1];
+					dc_free(pdactivename[j]);
+					pdactivename[j] = str_dup0(pdactivename[j + 1]);
+				}
+				pdactive[4] = 0;
+				dc_free(pdactivename[4]);
+				pdactivename[4] = str_dup(" ");
+			}
+			if (rdactivename[i] && !strcmp(rdactivename[i], GET_NAME(ch)))
+			{
+				for (j = i; j < 4; j++)
+				{
+					rdactive[j] = rdactive[j + 1];
+					dc_free(rdactivename[j]);
+					rdactivename[j] = str_dup0(rdactivename[j + 1]);
+				}
+				rdactive[4] = 0;
+				dc_free(rdactivename[4]);
+				rdactivename[4] = str_dup(" ");
+			}
+			if (mvactivename[i] && !strcmp(mvactivename[i], GET_NAME(ch)))
+			{
+				for (j = i; j < 4; j++)
+				{
+					mvactive[j] = mvactive[j + 1];
+					dc_free(mvactivename[j]);
+					mvactivename[j] = str_dup0(mvactivename[j + 1]);
+				}
+				mvactive[4] = 0;
+				dc_free(mvactivename[4]);
+				mvactivename[4] = str_dup(" ");
+			}
+		}
+
+		for (i = 0; i < 5; i++)
+		{
+			if (hpactiveclassname[k][i] && !strcmp(hpactiveclassname[k][i],
+												   GET_NAME(ch)))
+			{
+				for (j = i; j < 4; j++)
+				{
+					hpactiveclass[k][j] = hpactiveclass[k][j + 1];
+					dc_free(hpactiveclassname[k][j]);
+					hpactiveclassname[k][j] = str_dup0(
+						hpactiveclassname[k][j + 1]);
+				}
+				hpactiveclass[k][4] = 0;
+				dc_free(hpactiveclassname[k][4]);
+				hpactiveclassname[k][4] = str_dup(" ");
+			}
+			if (mnactiveclassname[k][i] && !strcmp(mnactiveclassname[k][i],
+												   GET_NAME(ch)))
+			{
+				for (j = i; j < 4; j++)
+				{
+					mnactiveclass[k][j] = mnactiveclass[k][j + 1];
+					dc_free(mnactiveclassname[k][j]);
+					mnactiveclassname[k][j] = str_dup0(
+						mnactiveclassname[k][j + 1]);
+				}
+				mnactiveclass[k][4] = 0;
+				dc_free(mnactiveclassname[k][4]);
+				mnactiveclassname[k][4] = str_dup(" ");
+			}
+			if (kiactiveclassname[k][i] && !strcmp(kiactiveclassname[k][i],
+												   GET_NAME(ch)))
+			{
+				for (j = i; j < 4; j++)
+				{
+					kiactiveclass[k][j] = kiactiveclass[k][j + 1];
+					dc_free(kiactiveclassname[k][j]);
+					kiactiveclassname[k][j] = str_dup0(
+						kiactiveclassname[k][j + 1]);
+				}
+				kiactiveclass[k][4] = 0;
+				dc_free(kiactiveclassname[k][4]);
+				kiactiveclassname[k][4] = str_dup(" ");
+			}
+			if (pkactiveclassname[k][i] && !strcmp(pkactiveclassname[k][i],
+												   GET_NAME(ch)))
+			{
+				for (j = i; j < 4; j++)
+				{
+					pkactiveclass[k][j] = pkactiveclass[k][j + 1];
+					dc_free(pkactiveclassname[k][j]);
+					pkactiveclassname[k][j] = str_dup0(
+						pkactiveclassname[k][j + 1]);
+				}
+				pkactiveclass[k][4] = 0;
+				dc_free(pkactiveclassname[k][4]);
+				pkactiveclassname[k][4] = str_dup(" ");
+			}
+			if (pdactiveclassname[k][i] && !strcmp(pdactiveclassname[k][i],
+												   GET_NAME(ch)))
+			{
+				for (j = i; j < 4; j++)
+				{
+					pdactiveclass[k][j] = pdactiveclass[k][j + 1];
+					dc_free(pdactiveclassname[k][j]);
+					pdactiveclassname[k][j] = str_dup0(
+						pdactiveclassname[k][j + 1]);
+				}
+				pdactiveclass[k][4] = 0;
+				dc_free(pdactiveclassname[k][4]);
+				pdactiveclassname[k][4] = str_dup(" ");
+			}
+			if (rdactiveclassname[k][i] && !strcmp(rdactiveclassname[k][i],
+												   GET_NAME(ch)))
+			{
+				for (j = i; j < 4; j++)
+				{
+					rdactiveclass[k][j] = rdactiveclass[k][j + 1];
+					dc_free(rdactiveclassname[k][j]);
+					rdactiveclassname[k][j] = str_dup0(
+						rdactiveclassname[k][j + 1]);
+				}
+				rdactiveclass[k][4] = 0;
+				dc_free(rdactiveclassname[k][4]);
+				rdactiveclassname[k][4] = str_dup(" ");
+			}
+			if (mvactiveclassname[k][i] && !strcmp(mvactiveclassname[k][i],
+												   GET_NAME(ch)))
+			{
+				for (j = i; j < 4; j++)
+				{
+					mvactiveclass[k][j] = mvactiveclass[k][j + 1];
+					dc_free(mvactiveclassname[k][j]);
+					mvactiveclassname[k][j] = str_dup0(
+						mvactiveclassname[k][j + 1]);
+				}
+				mvactiveclass[k][4] = 0;
+				dc_free(mvactiveclassname[k][4]);
+				mvactiveclassname[k][4] = str_dup(" ");
+			}
+		}
+
+		for (i = 0; i < 5; i++)
+		{
+			if (GET_MAX_HIT(ch) > hpactive[i])
+			{
+				for (j = 4; j > i; j--)
+				{
+					hpactive[j] = hpactive[j - 1];
+					dc_free(hpactivename[j]);
+					hpactivename[j] = str_dup0(hpactivename[j - 1]);
+				}
+				hpactive[i] = GET_MAX_HIT(ch);
+				dc_free(hpactivename[i]);
+				hpactivename[i] = str_dup(GET_NAME(ch));
+				break;
+			}
+		}
+		for (i = 0; i < 5; i++)
+		{
+			if (GET_MAX_MANA(ch) > mnactive[i])
+			{
+				for (j = 4; j > i; j--)
+				{
+					mnactive[j] = mnactive[j - 1];
+					dc_free(mnactivename[j]);
+					mnactivename[j] = str_dup0(mnactivename[j - 1]);
+				}
+				mnactive[i] = GET_MAX_MANA(ch);
+				dc_free(mnactivename[i]);
+				mnactivename[i] = str_dup(GET_NAME(ch));
+				break;
+			}
+		}
+		for (i = 0; i < 5; i++)
+		{
+			if (GET_MAX_KI(ch) > kiactive[i])
+			{
+				for (j = 4; j > i; j--)
+				{
+					kiactive[j] = kiactive[j - 1];
+					dc_free(kiactivename[j]);
+					kiactivename[j] = str_dup0(kiactivename[j - 1]);
+				}
+				kiactive[i] = GET_MAX_KI(ch);
+				dc_free(kiactivename[i]);
+				kiactivename[i] = str_dup(GET_NAME(ch));
+				break;
+			}
+		}
+		for (i = 0; i < 5; i++)
+		{
+			if ((int)GET_PKILLS(ch) > pkactive[i])
+			{
+				for (j = 4; j > i; j--)
+				{
+					pkactive[j] = pkactive[j - 1];
+					dc_free(pkactivename[j]);
+					pkactivename[j] = str_dup0(pkactivename[j - 1]);
+				}
+				pkactive[i] = (int)GET_PKILLS(ch);
+				dc_free(pkactivename[i]);
+				pkactivename[i] = str_dup(GET_NAME(ch));
+				break;
+			}
+		}
+		for (i = 0; i < 5; i++)
+		{
+			if (pdscore(ch) > pdactive[i])
+			{
+				for (j = 4; j > i; j--)
+				{
+					pdactive[j] = pdactive[j - 1];
+					dc_free(pdactivename[j]);
+					pdactivename[j] = str_dup0(pdactivename[j - 1]);
+				}
+				pdactive[i] = pdscore(ch);
+				dc_free(pdactivename[i]);
+				pdactivename[i] = str_dup(GET_NAME(ch));
+				break;
+			}
+		}
+		for (i = 0; i < 5; i++)
+		{
+			if (GET_LEVEL(ch) < MAX_MORTAL)
+				break;
+			if ((int)GET_RDEATHS(ch) > rdactive[i])
+			{
+				for (j = 4; j > i; j--)
+				{
+					rdactive[j] = rdactive[j - 1];
+					dc_free(rdactivename[j]);
+					rdactivename[j] = str_dup0(rdactivename[j - 1]);
+				}
+				rdactive[i] = (int)GET_RDEATHS(ch);
+				dc_free(rdactivename[i]);
+				rdactivename[i] = str_dup(GET_NAME(ch));
+				break;
+			}
+		}
+		for (i = 0; i < 5; i++)
+		{
+			if (GET_MAX_MOVE(ch) > mvactive[i])
+			{
+				for (j = 4; j > i; j--)
+				{
+					mvactive[j] = mvactive[j - 1];
+					dc_free(mvactivename[j]);
+					mvactivename[j] = str_dup0(mvactivename[j - 1]);
+				}
+				mvactive[i] = GET_MAX_MOVE(ch);
+				dc_free(mvactivename[i]);
+				mvactivename[i] = str_dup(GET_NAME(ch));
+				break;
+			}
+		}
+		for (i = 0; i < 5; i++)
+		{
+			if (GET_MAX_HIT(ch) > hpactiveclass[k][i])
+			{
+				for (j = 4; j > i; j--)
+				{
+					hpactiveclass[k][j] = hpactiveclass[k][j - 1];
+					dc_free(hpactiveclassname[k][j]);
+					hpactiveclassname[k][j] = str_dup0(
+						hpactiveclassname[k][j - 1]);
+				}
+				hpactiveclass[k][i] = GET_MAX_HIT(ch);
+				dc_free(hpactiveclassname[k][i]);
+				hpactiveclassname[k][i] = str_dup(GET_NAME(ch));
+				break;
+			}
+		}
+		for (i = 0; i < 5; i++)
+		{
+			if (GET_MAX_MANA(ch) > mnactiveclass[k][i])
+			{
+				for (j = 4; j > i; j--)
+				{
+					mnactiveclass[k][j] = mnactiveclass[k][j - 1];
+					dc_free(mnactiveclassname[k][j]);
+					mnactiveclassname[k][j] = str_dup0(
+						mnactiveclassname[k][j - 1]);
+				}
+				mnactiveclass[k][i] = GET_MAX_MANA(ch);
+				dc_free(mnactiveclassname[k][i]);
+				mnactiveclassname[k][i] = str_dup(GET_NAME(ch));
+				break;
+			}
+		}
+		for (i = 0; i < 5; i++)
+		{
+			if (GET_MAX_KI(ch) > kiactiveclass[k][i])
+			{
+				for (j = 4; j > i; j--)
+				{
+					kiactiveclass[k][j] = kiactiveclass[k][j - 1];
+					dc_free(kiactiveclassname[k][j]);
+					kiactiveclassname[k][j] = str_dup0(
+						kiactiveclassname[k][j - 1]);
+				}
+				kiactiveclass[k][i] = GET_MAX_KI(ch);
+				dc_free(kiactiveclassname[k][i]);
+				kiactiveclassname[k][i] = str_dup(GET_NAME(ch));
+				break;
+			}
+		}
+		for (i = 0; i < 5; i++)
+		{
+			if ((int)GET_PKILLS(ch) > pkactiveclass[k][i])
+			{
+				for (j = 4; j > i; j--)
+				{
+					pkactiveclass[k][j] = pkactiveclass[k][j - 1];
+					dc_free(pkactiveclassname[k][j]);
+					pkactiveclassname[k][j] = str_dup0(
+						pkactiveclassname[k][j - 1]);
+				}
+				pkactiveclass[k][i] = (int)GET_PKILLS(ch);
+				dc_free(pkactiveclassname[k][i]);
+				pkactiveclassname[k][i] = str_dup(GET_NAME(ch));
+				break;
+			}
+		}
+		for (i = 0; i < 5; i++)
+		{
+			if (pdscore(ch) > pdactiveclass[k][i])
+			{
+				for (j = 4; j > i; j--)
+				{
+					pdactiveclass[k][j] = pdactiveclass[k][j - 1];
+					dc_free(pdactiveclassname[k][j]);
+					pdactiveclassname[k][j] = str_dup0(
+						pdactiveclassname[k][j - 1]);
+				}
+				pdactiveclass[k][i] = pdscore(ch);
+				dc_free(pdactiveclassname[k][i]);
+				pdactiveclassname[k][i] = str_dup(GET_NAME(ch));
+				break;
+			}
+		}
+		for (i = 0; i < 5; i++)
+		{
+			if (GET_LEVEL(ch) < MAX_MORTAL)
+				break;
+			if ((int)GET_RDEATHS(ch) > rdactiveclass[k][i])
+			{
+				for (j = 4; j > i; j--)
+				{
+					rdactiveclass[k][j] = rdactiveclass[k][j - 1];
+					dc_free(rdactiveclassname[k][j]);
+					rdactiveclassname[k][j] = str_dup0(
+						rdactiveclassname[k][j - 1]);
+				}
+				rdactiveclass[k][i] = (int)GET_RDEATHS(ch);
+				dc_free(rdactiveclassname[k][i]);
+				rdactiveclassname[k][i] = str_dup(GET_NAME(ch));
+				break;
+			}
+		}
+		for (i = 0; i < 5; i++)
+		{
+			if (GET_MAX_MOVE(ch) > mvactiveclass[k][i])
+			{
+				for (j = 4; j > i; j--)
+				{
+					mvactiveclass[k][j] = mvactiveclass[k][j - 1];
+					dc_free(mvactiveclassname[k][j]);
+					mvactiveclassname[k][j] = str_dup0(
+						mvactiveclassname[k][j - 1]);
+				}
+				mvactiveclass[k][i] = GET_MAX_MOVE(ch);
+				dc_free(mvactiveclassname[k][i]);
+				mvactiveclassname[k][i] = str_dup(GET_NAME(ch));
+				break;
+			}
+		}
+	}
+
+	write_file(LEADERBOARD_FILE);
+
+	in_port_t port1 = 0;
+	if (DC::instance().cf.ports.size() > 0)
+	{
+		port1 = DC::instance().cf.ports[0];
+	}
+
+	stringstream ssbuffer;
+	ssbuffer << HTDOCS_DIR << port1 << "/" << LEADERBOARD_FILE;
+	write_file(ssbuffer);
+
+	for (i = 0; i < 5; i++)
+	{
+		dc_free(hpactivename[i]);
+		hpactivename[i] = nullptr;
+	}
+	for (i = 0; i < 5; i++)
+	{
+		dc_free(mnactivename[i]);
+		mnactivename[i] = nullptr;
+	}
+	for (i = 0; i < 5; i++)
+	{
+		dc_free(kiactivename[i]);
+		kiactivename[i] = nullptr;
+	}
+	for (i = 0; i < 5; i++)
+	{
+		dc_free(pkactivename[i]);
+		pkactivename[i] = nullptr;
+	}
+	for (i = 0; i < 5; i++)
+	{
+		dc_free(pdactivename[i]);
+		pdactivename[i] = nullptr;
+	}
+	for (i = 0; i < 5; i++)
+	{
+		dc_free(rdactivename[i]);
+		rdactivename[i] = nullptr;
+	}
+	for (i = 0; i < 5; i++)
+	{
+		dc_free(mvactivename[i]);
+		mvactivename[i] = nullptr;
+	}
+	for (j = 0; j < CLASS_MAX - 2; j++)
+	{
+		for (i = 0; i < 5; i++)
+		{
+			dc_free(hpactiveclassname[j][i]);
+			hpactiveclassname[j][i] = nullptr;
+		}
+		for (i = 0; i < 5; i++)
+		{
+			dc_free(mnactiveclassname[j][i]);
+			mnactiveclassname[j][i] = nullptr;
+		}
+		for (i = 0; i < 5; i++)
+		{
+			dc_free(kiactiveclassname[j][i]);
+			kiactiveclassname[j][i] = nullptr;
+		}
+		for (i = 0; i < 5; i++)
+		{
+			dc_free(pkactiveclassname[j][i]);
+			pkactiveclassname[j][i] = nullptr;
+		}
+		for (i = 0; i < 5; i++)
+		{
+			dc_free(pdactiveclassname[j][i]);
+			pdactiveclassname[j][i] = nullptr;
+		}
+		for (i = 0; i < 5; i++)
+		{
+			dc_free(rdactiveclassname[j][i]);
+			rdactiveclassname[j][i] = nullptr;
+		}
+		for (i = 0; i < 5; i++)
+		{
+			dc_free(mvactiveclassname[j][i]);
+			mvactiveclassname[j][i] = nullptr;
+		}
+	}
+}
+
 void Leaderboard::read_file(void) {
 	FILE *fl;
 	int i, j;
@@ -554,6 +1090,7 @@ void Leaderboard::read_file(void) {
 				hpactive[i] = fread_int(fl, 0, LONG_MAX);
 				if (char_file_exists(hpactivename[i]) == false) {
 					hpactivename[i] = str_dup("UNKNOWN");
+					hpactive[i] = 0;
 				}
 			}
 			for (i = 0; i < 5; i++) {
@@ -784,6 +1321,10 @@ int do_leaderboard(struct char_data *ch, char *argument, int cmd) {
 			}
 
 			return eSUCCESS;
+		}
+		else if (arg1 == "scan")
+		{
+			return leaderboard.scan(ch);
 		}
 	}
 
@@ -1345,6 +1886,19 @@ void Leaderboard::rename(char *oldname, char *newname) {
 		dc_free(name[i]);
 		name[i] = nullptr;
 	}
+}
+
+void Leaderboard::setHP(unsigned int placement, string name, int value)
+{
+	hpactive[placement] = value;
+	hpactivename[placement] = name.data();
+}
+
+int Leaderboard::scan(char_data* ch)
+{
+	check_offline();
+
+	return eSUCCESS;
 }
 
 Leaderboard leaderboard;
