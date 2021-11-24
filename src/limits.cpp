@@ -797,13 +797,13 @@ void point_update(void) {
 
 		// only heal linkalive's and mobs
 		if (GET_POS(i) > POSITION_DEAD && (IS_NPC(i) || i->desc)) {
-			GET_HIT(i) = MIN(GET_HIT(i) + hit_gain(i), hit_limit(i));
+			i->setHP(MIN(i->getHP() + hit_gain(i), hit_limit(i)));
 
 			GET_MANA(i) = MIN(GET_MANA(i) + mana_gain(i), mana_limit(i));
 
 			GET_MOVE(i) = MIN(GET_MOVE(i) + move_gain(i,0), move_limit(i));
 			GET_KI(i) = MIN(GET_KI(i) + ki_gain(i), ki_limit(i));
-		} else if (!IS_MOB(i) && GET_LEVEL(i) < 2 && !i->desc) {
+		} else if (!IS_MOB(i) && GET_LEVEL(i) < 1 && !i->desc) {
 			act("$n fades away into obscurity; $s life leaving history with nothing of note.", i, 0, 0, TO_ROOM, 0);
 			do_quit(i, "", 666);
 		}

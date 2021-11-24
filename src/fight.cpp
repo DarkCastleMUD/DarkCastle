@@ -408,7 +408,7 @@ void perform_violence(void)
         {
           ch->removeHP(25);
         }
-         ch->setHP(MAX(1, GET_HIT(ch)));  // doesn't kill only hurts
+         ch->setHP(MAX(1, ch->getHP()));  // doesn't kill only hurts
       }
       // primal checks bitvecotr instead of type because the timer has type SKILL_PRIMAL_FURY..
       else if ((af->type != SPELL_PARALYZE && af->bitvector != AFF_PRIMAL_FURY) || !someone_fighting(ch))
@@ -735,7 +735,7 @@ int attack(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
     int lrn = has_skill(ch, SKILL_OFFHAND_DOUBLE);
     if(gets_dual_wield_attack(ch) && lrn) {
      skill_increase_check(ch, SKILL_OFFHAND_DOUBLE, lrn, SKILL_INCREASE_HARD);
-     int p = lrn/2 + GET_HIT(ch) * 10 / GET_MAX_HIT(ch) - (10 - has_skill(ch, SKILL_SECOND_ATTACK)/10);
+     int p = lrn/2 + ch->getHP() * 10 / GET_MAX_HIT(ch) - (10 - has_skill(ch, SKILL_SECOND_ATTACK)/10);
      if(number(1,100) <= p) {
       result = one_hit(ch, vict, type, SECOND);
       if(SOMEONE_DIED(result))       return result;
@@ -844,7 +844,7 @@ void update_stuns(CHAR_DATA *ch)
   }
   else if(IS_SET(ch->combat, COMBAT_STUNNED2)) {
     REMOVE_BIT(ch->combat, COMBAT_STUNNED2);
-    if (GET_HIT(ch) > 0)
+    if (ch->getHP() > 0)
       if (GET_POS(ch) != POSITION_FIGHTING) {
         act("$n regains consciousness...", ch, 0, 0, TO_ROOM, 0);
         act("You regain consciousness...", ch, 0, 0, TO_CHAR, 0);
@@ -938,7 +938,7 @@ int do_lightning_shield(CHAR_DATA *ch, CHAR_DATA *vict, int dam)
     }
   }
   */   
-  GET_HIT(ch) -= dam;
+  ch->removeHP(dam);
   do_dam_msgs(vict, ch, dam, SPELL_LIGHTNING_SHIELD, WIELD);
   update_pos(ch);
     
@@ -1045,7 +1045,7 @@ int do_fireshield(CHAR_DATA *ch, CHAR_DATA *vict, int dam)
     }
   }
 */
-  GET_HIT(ch) -= dam;
+  ch->removeHP(dam);
   do_dam_msgs(vict, ch, dam, SPELL_FIRESHIELD, WIELD);                         
   update_pos(ch);
     
@@ -1124,7 +1124,7 @@ int do_acidshield(CHAR_DATA *ch, CHAR_DATA *vict, int dam)
     }
   }
   */ 
-  GET_HIT(ch) -= dam;
+  ch->removeHP(dam);
   do_dam_msgs(vict, ch, dam, SPELL_ACID_SHIELD, WIELD);
   update_pos(ch);
     
@@ -1181,7 +1181,7 @@ int do_boneshield(CHAR_DATA *ch, CHAR_DATA *vict, int dam)
 
   }
     
-  GET_HIT(ch) -= dam;
+  ch->removeHP(dam);
   do_dam_msgs(vict, ch, dam, SPELL_BONESHIELD, WIELD);
   update_pos(ch);
     
@@ -1449,7 +1449,7 @@ int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
   }
 
   if(wielded && IS_SET(wielded->obj_flags.extra_flags, ITEM_TWO_HANDED) && has_skill(ch, SKILL_EXECUTE))
-    if(GET_HIT(vict) < 3500 && GET_HIT(vict) * 100 / GET_MAX_HIT(vict) < 15) {
+    if(vict->getHP() < 3500 && vict->getHP() * 100 / GET_MAX_HIT(vict) < 15) {
       retval = do_execute_skill(ch, vict, w_type);
       if(SOMEONE_DIED(retval)) return debug_retval(ch, vict, retval);
     }
@@ -1821,6 +1821,11 @@ int getRealSpellDamage( CHAR_DATA * ch)
    return spell_dam;
 }
 
+int32 char_data::getHP(void)
+{
+  return hit;
+}
+
 void char_data::setHP(int dam, char_data* causer)
 {
   int old_hp = hit;
@@ -1849,6 +1854,11 @@ void char_data::removeHP(int dam, char_data* causer)
 void char_data::fillHP(void)
 {
   setHP(max_hit);
+}
+
+void char_data::fillHPLimit(void)
+{
+  setHP(hit_limit(this));
 }
 
 void char_data::addHP(int newhp, char_data* causer)
@@ -2194,7 +2204,7 @@ int damage(CHAR_DATA *ch, CHAR_DATA *victim,
   }
 
   // Frost Shield won't effect a backstab
-  if (attacktype != SKILL_BACKSTAB && GET_HIT(victim) > 0 &&
+  if (attacktype != SKILL_BACKSTAB && victim->getHP() > 0 &&
       (typeofdamage == DAMAGE_TYPE_PHYSICAL || attacktype == TYPE_PHYSICAL_MAGIC))
     if (do_frostshield(ch, victim))
     {
@@ -2223,7 +2233,7 @@ int damage(CHAR_DATA *ch, CHAR_DATA *victim,
       dam = (int)(dam * 1.7);
       //      REMOVE_BIT(ch->combat, COMBAT_ORC_BLOODLUST2);
     }
-    percent = (int)((((float)GET_HIT(ch)) / ((float)GET_MAX_HIT(ch))) * 100);
+    percent = (int)((((float)ch->getHP()) / ((float)GET_MAX_HIT(ch))) * 100);
     if (percent < 40 && (learned = has_skill(ch, SKILL_FRENZY)))
     {
       if (skill_success(ch, victim, SKILL_FRENZY))
@@ -2478,7 +2488,7 @@ int damage(CHAR_DATA *ch, CHAR_DATA *victim,
   if (dam < 0)
     dam = 0;
 
-  percent = (int)((((float)GET_HIT(victim)) /
+  percent = (int)((((float)victim->getHP()) /
                    ((float)GET_MAX_HIT(victim))) *
                   100);
   if (percent < 40 && (learned = has_skill(victim, SKILL_FRENZY)))
@@ -3204,7 +3214,7 @@ int checkCounterStrike(CHAR_DATA * ch, CHAR_DATA * victim)
      (IS_SET(ch->combat, COMBAT_BLADESHIELD2)))
     return eFAILURE;
 
-  int p = lvl/2 - (100 - has_skill(victim, SKILL_DEFENSE)) - GET_DEX(ch) + GET_HIT(victim) * 10 / GET_MAX_HIT(victim);
+  int p = lvl/2 - (100 - has_skill(victim, SKILL_DEFENSE)) - GET_DEX(ch) + victim->getHP() * 10 / GET_MAX_HIT(victim);
 
   skill_increase_check(victim, SKILL_COUNTER_STRIKE, lvl, SKILL_INCREASE_HARD);
       
@@ -3719,7 +3729,7 @@ void free_messages_from_memory()
 */
 void update_pos(CHAR_DATA * victim)
 {
-  if (GET_HIT(victim) > 0)
+  if (victim->getHP() > 0)
   {
 		if ((!IS_SET(victim->combat, COMBAT_STUNNED))
 				&& (!IS_SET(victim->combat, COMBAT_STUNNED2)))
@@ -4705,7 +4715,7 @@ int do_skewer(CHAR_DATA *ch, CHAR_DATA *vict, int dam, int wt, int wt2, int weap
   //    damadd /= GET_LEVEL(vict) - GET_LEVEL(ch);
     int retval = damage(ch, vict, damadd, wt, SKILL_SKEWER, weapon);
     if (SOMEONE_DIED(retval)) return debug_retval(ch, vict, retval);
-    //GET_HIT(vict) -= damadd;
+    //vict->removeHP(damadd);
     update_pos(vict);
     inform_victim(ch, vict, damadd); 
 
@@ -4731,10 +4741,10 @@ int do_behead_skill(CHAR_DATA *ch, CHAR_DATA *vict)
 {
   int chance, percent;
 
-  percent = (100 * GET_HIT(vict)) / GET_MAX_HIT(vict);
+  percent = (100 * vict->getHP()) / GET_MAX_HIT(vict);
   chance = number(0, 101);
   if(chance > (1.3 * percent)) {
-    percent = (100 * GET_HIT(vict)) / GET_MAX_HIT(vict);
+    percent = (100 * vict->getHP()) / GET_MAX_HIT(vict);
     chance = number(0, 101);
     if(chance > (2 * percent)) {
       chance = number(0, 101);
@@ -4782,10 +4792,10 @@ int do_execute_skill(CHAR_DATA *ch, CHAR_DATA *vict, int w_type)
 {
   int chance, percent;
 
-  percent = (100 * GET_HIT(vict)) / GET_MAX_HIT(vict);
+  percent = (100 * vict->getHP()) / GET_MAX_HIT(vict);
   chance = number(0, 101);
   if(chance > (1.3 * percent)) {
-    percent = (100 * GET_HIT(vict)) / GET_MAX_HIT(vict);
+    percent = (100 * vict->getHP()) / GET_MAX_HIT(vict);
     chance = number(0, 101);
     if(chance > (2 * percent)) {
       chance = number(0, 101);
@@ -6749,7 +6759,7 @@ void inform_victim(CHAR_DATA *ch, CHAR_DATA *victim, int dam)
     if (dam > max_hit / 5)
       send_to_char("That really did HURT!\n\r", victim);
     // Wimp out?
-    if ( GET_HIT(victim) < (max_hit / 5) ) {
+    if ( victim->getHP() < (max_hit / 5) ) {
       if (IS_SET(victim->combat, COMBAT_BERSERK) ||
 	       IS_SET(victim->combat, COMBAT_RAGE1) ||
          IS_SET(victim->combat, COMBAT_RAGE2)) {

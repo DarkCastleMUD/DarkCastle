@@ -628,10 +628,10 @@ int do_whoarena(struct char_data *ch, char *argument, int cmd)
             if((tmp->clan) && (clan = get_clan(tmp)) && GET_LEVEL(tmp) < IMMORTAL)
                csendf(ch, "%-20s  Level: %-3d  Hit: %-5d  Room: %-5d - [%s$R]\n\r",
 	           GET_NAME(tmp),
-                   GET_LEVEL(tmp), GET_HIT(tmp), tmp->in_room, clan->name);
+                   GET_LEVEL(tmp), tmp->getHP(), tmp->in_room, clan->name);
             else csendf(ch, "%-20s  Level: %-3d  Hit: %-5d  Room: %-5d\n\r",
 	           GET_NAME(tmp),
-                   GET_LEVEL(tmp), GET_HIT(tmp), tmp->in_room);
+                   GET_LEVEL(tmp), tmp->getHP(), tmp->in_room);
             count++;
             }
          }

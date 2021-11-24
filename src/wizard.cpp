@@ -236,7 +236,7 @@ void boro_mob_stat(struct char_data *ch, struct char_data *k)
 	
 	(k->fighting ? GET_NAME(k->fighting) : "Nobody"),
 	(races[(int)(GET_RACE(k))].singular_name),
-	GET_HIT(k), hit_limit(k), hit_gain(k),
+	k->getHP(), hit_limit(k), hit_gain(k),
 	/* end of fourth line */
 
 	(k->master ? GET_NAME(k->master) : "Nobody"),
@@ -612,7 +612,7 @@ void mob_stat(struct char_data *ch, struct char_data *k)
      
   sprintf(buf, "$3Mana$R:[%5d/%5d+%-4d]  $3Hit$R:[%5d/%5d+%-3d]  $3Move$R:[%5d/%5d+%-3d]  $3Ki$R:[%3d/%3d]\n\r",
           GET_MANA(k),mana_limit(k),mana_gain(k),
-          GET_HIT(k),hit_limit(k),hit_gain(k),
+          k->getHP(),hit_limit(k),hit_gain(k),
           GET_MOVE(k),move_limit(k),move_gain(k,0),
           GET_KI(k), ki_limit(k));
   send_to_char(buf,ch);
@@ -1288,7 +1288,7 @@ void do_start(struct char_data *ch)
     GET_PDEATHS(ch) = 0;
     GET_PKILLS(ch) = 0;
 
-    GET_HIT(ch)  = hit_limit(ch);
+    ch->fillHPLimit();
     GET_MANA(ch) = mana_limit(ch);
     GET_MOVE(ch) = move_limit(ch);
 
@@ -1432,7 +1432,7 @@ int do_restore(struct char_data *ch, char *argument, int cmd)
           }
      
             GET_MANA(victim) = GET_MAX_MANA(victim);
-            GET_HIT(victim) = GET_MAX_HIT(victim);
+            victim->fillHP();
             GET_MOVE(victim) = GET_MAX_MOVE(victim);
             GET_KI(victim) = GET_MAX_KI(victim);
 
@@ -1474,7 +1474,7 @@ int do_restore(struct char_data *ch, char *argument, int cmd)
                victim = i->character;
      
             GET_MANA(victim) = GET_MAX_MANA(victim);
-            GET_HIT(victim) = GET_MAX_HIT(victim);
+            victim->fillHP();
             GET_MOVE(victim) = GET_MAX_MOVE(victim);
             GET_KI(victim) = GET_MAX_KI(victim);
 

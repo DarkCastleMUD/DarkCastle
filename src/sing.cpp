@@ -1045,11 +1045,7 @@ int execute_song_healing_melody(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA
 			csendf(tmp_char, "You feel a little better.\r\n");
 		}
 
-		GET_HIT(tmp_char) += heal;
-
-		if (GET_HIT(tmp_char) > GET_MAX_HIT(tmp_char)) {
-			GET_HIT(tmp_char) = GET_MAX_HIT(tmp_char);
-		}
+		tmp_char->addHP(heal);
 	}
 
 	if (!skill_success(ch, NULL, SKILL_SONG_HEALING_MELODY)) {

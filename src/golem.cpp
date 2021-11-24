@@ -218,7 +218,7 @@ void advance_golem_level(CHAR_DATA *golem)
 {
   int golemtype = !IS_AFFECTED(golem, AFF_GOLEM); // 0 or 1
   golem->max_hit = golem->raw_hit = (golem->raw_hit + (golem_list[golemtype].max_hp/20));
-  GET_HIT(golem) += golem_list[golemtype].max_hp/20;
+  golem->addHP(golem_list[golemtype].max_hp/20);
   golem->hitroll += golem_list[golemtype].hit / 20;
   golem->damroll += golem_list[golemtype].dam / 20;
   golem->armor += golem_list[golemtype].ac / 20;
@@ -388,7 +388,7 @@ int do_golem_score(struct char_data *ch, char *argument, int cmd)
       "|o| $4Intelligence$7:    %4d  (%2d) |~| $1Height$7: %3d        $1Ki$7:     %4d$1/$7(%5d) |/|\n\r"
       "|\\| $4Wisdom$7:          %4d  (%2d) |/| $1Weight$7: %3d                             |~|\n\r"
       "|~| $3Rgn$7: $4H$7:%3d $4M$7:%3d $4V$7:%3d $4K$7:%2d |o| $1Age$7:    %3d yrs    $1Align$7: %+5d         |\\|\n\r",
-      GET_STR(ch), GET_RAW_STR(ch), race, GET_HIT(ch), GET_MAX_HIT(ch),
+      GET_STR(ch), GET_RAW_STR(ch), race, ch->getHP(), GET_MAX_HIT(ch),
       GET_DEX(ch), GET_RAW_DEX(ch), pc_clss_types[(int)GET_CLASS(ch)], GET_MANA(ch), GET_MAX_MANA(ch),
       GET_CON(ch), GET_RAW_CON(ch), GET_LEVEL(ch), GET_MOVE(ch), GET_MAX_MOVE(ch),
       GET_INT(ch), GET_RAW_INT(ch), GET_HEIGHT(ch), GET_KI(ch),  GET_MAX_KI(ch),

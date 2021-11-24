@@ -574,7 +574,7 @@ void show_char_to_char(struct char_data *i, struct char_data *ch, int mode)
      /* Show a character to another */
 
      if (GET_MAX_HIT(i) > 0) {
-       percent = (100*GET_HIT(i))/GET_MAX_HIT(i);
+       percent = (100*i->getHP())/GET_MAX_HIT(i);
      } else {
        percent = -1; /* How could MAX_HIT be < 1?? */
      }
@@ -1797,7 +1797,7 @@ int do_score(struct char_data *ch, char *argument, int cmd)
       "|o| $4Intelligence$7:    %4d  (%2d) |~| $1Height$7: %3d        $1Ki$7:     %4d$1/$7(%5d) |/|\n\r"
       "|\\| $4Wisdom$7:          %4d  (%2d) |/| $1Weight$7: %3d        $1Rdeaths$7:   %-5d     |~|\n\r"
       "|~| $3Rgn$7: $4H$7:%3d $4M$7:%3d $4V$7:%3d $4K$7:%2d |o| $1Age$7:    %3d yrs    $1Align$7: %+5d         |\\|\n\r",
-      GET_STR(ch), GET_RAW_STR(ch), race, GET_HIT(ch), GET_MAX_HIT(ch),
+      GET_STR(ch), GET_RAW_STR(ch), race, ch->getHP(), GET_MAX_HIT(ch),
       GET_DEX(ch), GET_RAW_DEX(ch), pc_clss_types[(int)GET_CLASS(ch)], GET_MANA(ch), GET_MAX_MANA(ch),
       GET_CON(ch), GET_RAW_CON(ch), GET_LEVEL(ch), GET_MOVE(ch), GET_MAX_MOVE(ch),
       GET_INT(ch), GET_RAW_INT(ch), GET_HEIGHT(ch), GET_KI(ch),  GET_MAX_KI(ch),
@@ -2680,8 +2680,8 @@ int do_consider(struct char_data *ch, char *argument, int cmd)
       }
       else {
 
-         if(GET_HIT(ch) >= GET_HIT(victim) || GET_LEVEL(ch) > MORTAL) {
-            x = GET_HIT(victim)/GET_HIT(ch)*100;
+         if(ch->getHP() >= victim->getHP() || GET_LEVEL(ch) > MORTAL) {
+            x = victim->getHP()/ch->getHP()*100;
             x /= 10;
             if(x < 0)  x = 0;
             if(x > 10) x = 10;
@@ -2699,7 +2699,7 @@ int do_consider(struct char_data *ch, char *argument, int cmd)
             csendf(ch, "Compared to your hps, %s %s.\n\r", GET_SHORT(victim), hplow_messages[x]);
          }
          else {
-            x = GET_HIT(ch)/GET_HIT(victim)*100;
+            x = ch->getHP()/victim->getHP()*100;
             x /= 10;
             if(x < 0)  x = 0;
             if(x > 10) x = 10;

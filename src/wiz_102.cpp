@@ -168,7 +168,7 @@ int do_check(struct char_data *ch, char *arg, int cmd) {
           GET_CON(vict));
   send_to_char(buf, ch);
   sprintf(buf, "$3Hit Points$R: %d/%d $3Mana$R: %d/%d $3Move$R: %d/%d $3Ki$R: %d/%d\n\r",
-          GET_HIT(vict), GET_MAX_HIT(vict), GET_MANA(vict),
+          vict->getHP(), GET_MAX_HIT(vict), GET_MANA(vict),
           GET_MAX_MANA(vict), GET_MOVE(vict), GET_MAX_MOVE(vict),
           GET_KI(vict), GET_MAX_KI(vict));
   send_to_char(buf, ch);

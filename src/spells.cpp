@@ -1698,13 +1698,13 @@ skillnum <= SKILL_SONG_MAX) || (skillnum >= KI_OFFSET && skillnum <= (KI_OFFSET+
 
   if (i > number(1,100) || GET_LEVEL(ch) >= IMMORTAL)
   {
-    if(skillnum != SKILL_ENHANCED_REGEN || ( skillnum == SKILL_ENHANCED_REGEN && GET_HIT(ch) + 50 < GET_MAX_HIT(ch) && ( GET_POS(ch) == POSITION_RESTING || GET_POS(ch) == POSITION_SLEEPING ) ) )
+    if(skillnum != SKILL_ENHANCED_REGEN || ( skillnum == SKILL_ENHANCED_REGEN && ch->getHP() + 50 < GET_MAX_HIT(ch) && ( GET_POS(ch) == POSITION_RESTING || GET_POS(ch) == POSITION_SLEEPING ) ) )
       skill_increase_check(ch,skillnum,learned,a+500);
     return TRUE; // Success
   }
   else {
   /* Check for skill improvement anyway */
-    if(skillnum != SKILL_ENHANCED_REGEN || ( skillnum == SKILL_ENHANCED_REGEN && GET_HIT(ch) + 50 < GET_MAX_HIT(ch) && ( GET_POS(ch) == POSITION_RESTING || GET_POS(ch) == POSITION_SLEEPING ) ) )
+    if(skillnum != SKILL_ENHANCED_REGEN || ( skillnum == SKILL_ENHANCED_REGEN && ch->getHP() + 50 < GET_MAX_HIT(ch) && ( GET_POS(ch) == POSITION_RESTING || GET_POS(ch) == POSITION_SLEEPING ) ) )
       skill_increase_check(ch, skillnum, learned,a);
     return FALSE; // Failure  
   }

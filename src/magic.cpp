@@ -164,22 +164,22 @@ bool can_heal(CHAR_DATA *ch, CHAR_DATA *victim, int spellnum)
     return FALSE;
   }
 
-  if (GET_HIT(victim) > GET_MAX_HIT(victim)-10)
+  if (victim->getHP() > GET_MAX_HIT(victim)-10)
   {
     if (spellnum != SPELL_CURE_LIGHT)
        can_cast = FALSE;
-  } else if (GET_HIT(victim) > GET_MAX_HIT(victim) - 25)
+  } else if (victim->getHP() > GET_MAX_HIT(victim) - 25)
   {
      if (spellnum != SPELL_CURE_LIGHT && spellnum != SPELL_CURE_SERIOUS)
         can_cast = FALSE;
-  } else if (GET_HIT(victim) > GET_MAX_HIT(victim) -50)
+  } else if (victim->getHP() > GET_MAX_HIT(victim) -50)
   {
      if (spellnum != SPELL_CURE_LIGHT && spellnum != SPELL_CURE_SERIOUS &&
            spellnum != SPELL_CURE_CRITIC)
          can_cast = FALSE;
   }
 
-//  if (GET_HIT(victim) > GET_MAX_HIT(victim)-5)
+//  if (victim->getHP() > GET_MAX_HIT(victim)-5)
 //    can_cast = FALSE;
 
   if (!can_cast)
@@ -389,7 +389,7 @@ int spell_drown(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *
 	/* Drown BINGO Effect */
    if (skill > 80) {
      if (number(1, 100) == 1 && GET_LEVEL(victim) < IMMORTAL) {
-        dam = GET_HIT(victim)*5 + 20;
+        dam = victim->getHP()*5 + 20;
         sprintf(buf, "You are torn apart by the force of %s's watery blast and are killed instantly!\r\n", GET_NAME(ch));
         send_to_char(buf, victim);
         act("$N is torn apart by the force of $n's watery blast and killed instantly!", ch, 0, victim, TO_ROOM, NOTVICT);
@@ -416,7 +416,7 @@ int spell_energy_drain(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
       mult /=2;
 
    gain_exp(victim, 0-mult);
-   GET_HIT(victim) -= GET_HIT(victim) /20;
+   victim->removeHP(victim->getHP() /20);
    send_to_char("Your knees buckle as life force is drained from your body!\n\rYou have lost some experience!\n\r", victim);
    act("You drain some of $N's experience!", ch, 0, victim, TO_CHAR, 0);
    return eSUCCESS;
@@ -495,13 +495,13 @@ int spell_vampiric_touch (ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct 
     adam /= 2;
   }
 
-  int i = GET_HIT(victim);
+  int i = victim->getHP();
   int retval =  damage (ch, victim, dam,TYPE_COLD, SPELL_VAMPIRIC_TOUCH, weap_spell);
-  if (!SOMEONE_DIED(retval) && GET_HIT(victim) >= i) return retval;
+  if (!SOMEONE_DIED(retval) && victim->getHP() >= i) return retval;
       
   if (!SOMEONE_DIED(retval))
   {
-    ch->addHP(MIN(adam, i-GET_HIT(victim)));
+    ch->addHP(MIN(adam, i-victim->getHP()));
   }
   else
   {
@@ -1017,12 +1017,14 @@ int spell_life_leech(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
         adam = 0;
 
       if (GET_HIT(tmp_victim) < adam)
-        GET_HIT(ch) += (int) (GET_HIT(tmp_victim) * 0.3);
+      {
+        ch->addHP(GET_HIT(tmp_victim) * 0.3);
+      }
       else
-        GET_HIT(ch) += (int) (adam * 0.3);
+      {
+        ch->addHP(adam * 0.3);
+      }
 
-      if (GET_HIT(ch) > GET_MAX_HIT(ch))
-        ch->fillHP();
       retval &= damage(ch, tmp_victim, dam, TYPE_POISON, SPELL_LIFE_LEECH, weap_spell);
     }
   }
@@ -2012,12 +2014,14 @@ int spell_cure_critic(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
   healpoints = dam_percent(skill, 100 + getRealSpellDamage(ch));
   healpoints = number(healpoints-(healpoints/10), healpoints+(healpoints/10));
 
-  if ( (healpoints + GET_HIT(victim)) > hit_limit(victim) ) {
-    healpoints = hit_limit(victim) - GET_HIT(victim);
-	 GET_HIT(victim) = hit_limit(victim);
+  if ( (healpoints + victim->getHP()) > hit_limit(victim) ) {
+    healpoints = hit_limit(victim) - victim->getHP();
+    victim->fillHPLimit();
   }
   else
-	 GET_HIT(victim) += healpoints;
+  {
+	 victim->addHP(healpoints);
+  }
 
   update_pos(victim);
 
@@ -2067,12 +2071,12 @@ int spell_cure_light(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
   if (!can_heal(ch,victim, SPELL_CURE_LIGHT)) return eFAILURE;
   healpoints = dam_percent(skill, 25 + getRealSpellDamage(ch));
   healpoints = number(healpoints-(healpoints/10), healpoints+(healpoints/10));
-  if ( (healpoints+GET_HIT(victim)) > hit_limit(victim) ) {
-     healpoints = hit_limit(victim) - GET_HIT(victim);
-	 GET_HIT(victim) = hit_limit(victim);
+  if ( (healpoints+victim->getHP()) > hit_limit(victim) ) {
+     healpoints = hit_limit(victim) - victim->getHP();
+	 victim->fillHPLimit();
   }
   else
-	 GET_HIT(victim) += healpoints;
+	 victim->addHP(healpoints);
 
   update_pos( victim );
 
@@ -2586,11 +2590,11 @@ int spell_heal(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *o
   if (!can_heal(ch,victim,SPELL_HEAL)) return eFAILURE;
   healy = dam_percent(skill,250 + getRealSpellDamage(ch));
   healy = number(healy-(healy/10), healy+(healy/10));
-  GET_HIT(victim) += healy;
+  victim->addHP(healy);
 
-  if (GET_HIT(victim) >= hit_limit(victim)) {
-     healy += hit_limit(victim) - GET_HIT(victim);
-	 GET_HIT(victim) = hit_limit(victim);
+  if (victim->getHP() >= hit_limit(victim)) {
+     healy += hit_limit(victim) - victim->getHP();
+	 victim->fillHPLimit();
   }
 
   update_pos( victim );
@@ -2638,11 +2642,11 @@ int spell_power_heal(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
   if (!can_heal(ch,victim, SPELL_POWER_HEAL)) return eFAILURE;
   healy = dam_percent(skill, 300 + getRealSpellDamage(ch));
   healy = number(healy-(healy/10), healy+(healy/10));
-  GET_HIT(victim) += healy;
+  victim->addHP(healy);
 
-  if (GET_HIT(victim) >= hit_limit(victim)) {
-     healy += hit_limit(victim)-GET_HIT(victim);
-	 GET_HIT(victim) = hit_limit(victim);
+  if (victim->getHP() >= hit_limit(victim)) {
+     healy += hit_limit(victim)-victim->getHP();
+	 victim->fillHPLimit();
   }
 
   update_pos( victim );
@@ -2693,11 +2697,11 @@ int spell_full_heal(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
     healamount += (skill / 2 + 5);
 
   healamount = number(healamount-(healamount/10), healamount+(healamount/10));
-  GET_HIT(victim) += healamount;
+  victim->addHP(healamount);
 
-  if (GET_HIT(victim) >= hit_limit(victim)) {
-         healamount += hit_limit(victim) - GET_HIT(victim);         
-	 GET_HIT(victim) = hit_limit(victim);
+  if (victim->getHP() >= hit_limit(victim)) {
+         healamount += hit_limit(victim) - victim->getHP();         
+	 victim->fillHPLimit();
   }
 
   update_pos( victim );
@@ -3203,7 +3207,7 @@ int spell_mend_golem(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
       heal = (int)(GET_MAX_HIT(fol->follower) * (0.12 + level / 1000.0));
       heal = number(heal-(heal/10), heal+(heal/10));
 
-      GET_HIT(fol->follower) += heal;
+      fol->follower->addHP(heal);
 
       if (GET_HIT(fol->follower) > GET_MAX_HIT(fol->follower))
       {
@@ -4457,7 +4461,7 @@ int spell_frost_breath(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
 
 	 set_cantquit( ch, victim );
 
-	 hpch = GET_HIT(ch);
+	 hpch = ch->getHP();
 	 if(hpch<10) hpch=10;
 
 	 dam = number((hpch/8)+1,(hpch/4));
@@ -4509,7 +4513,7 @@ int spell_acid_breath(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
 
 	 set_cantquit( ch, victim );
 
-	 hpch = GET_HIT(ch);
+	 hpch = ch->getHP();
 	 if(hpch<10) hpch=10;
 
 	 dam = number((hpch/8)+1,(hpch/4));
@@ -4629,7 +4633,7 @@ int spell_lightning_breath(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct
 
 	 set_cantquit( ch, victim );
 
-	 hpch = GET_HIT(ch);
+	 hpch = ch->getHP();
 	 if(hpch<10) hpch=10;
 
 	 dam = number((hpch/8)+1,(hpch/4));
@@ -5541,12 +5545,14 @@ int spell_cure_serious(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
       healpoints = dam_percent(skill,50 + getRealSpellDamage(ch));
   healpoints = number(healpoints-(healpoints/10), healpoints+(healpoints/10));
 
-  if ((healpoints + GET_HIT(victim)) > hit_limit(victim)) {
-    healpoints = hit_limit(victim) - GET_HIT(victim);
-    GET_HIT(victim) = hit_limit(victim);
+  if ((healpoints + victim->getHP()) > hit_limit(victim)) {
+    healpoints = hit_limit(victim) - victim->getHP();
+    victim->fillHPLimit();
   }
   else
-    GET_HIT(victim) += healpoints;
+  {
+    victim->addHP(healpoints);
+  }
 
   update_pos(victim);
 
@@ -10547,16 +10553,20 @@ int cast_herb_lore(ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *v
   if (can_heal(ch,victim, SPELL_HERB_LORE)) {
      healamount = dam_percent(skill,250);
      healamount = number(healamount-(healamount/10), healamount+(healamount/10));
-     if(OUTSIDE(ch))    GET_HIT(victim) += healamount;   
-     else { /* if not outside */
+     if(OUTSIDE(ch))
+     {
+       victim->addHP(healamount);
+     }
+     else
+     { /* if not outside */
        healamount = dam_percent(skill,150);
        healamount = number(healamount-(healamount/10), healamount+(healamount/10));
-       GET_HIT(victim) += healamount;
+       victim->addHP(healamount);
        send_to_char("Your spell is less effective because you are indoors!\n\r", ch);
      }
-     if (GET_HIT(victim) >= hit_limit(victim)) {
-        healamount += hit_limit(victim)-GET_HIT(victim);
-        GET_HIT(victim) = hit_limit(victim);
+     if (victim->getHP() >= hit_limit(victim)) {
+        healamount += hit_limit(victim)-victim->getHP();
+        victim->fillHPLimit();
      }
 
      update_pos( victim );
@@ -13711,10 +13721,10 @@ int spell_channel(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, OBJ_DATA *obj, 
   if(!can_heal(ch, victim, SPELL_CHANNEL))
     return eSUCCESS; //to still use the mana of the loser botting channel
 
-  if(heal <= 0) heal = GET_MAX_HIT(victim) - GET_HIT(victim);
+  if(heal <= 0) heal = GET_MAX_HIT(victim) - victim->getHP();
   if(GET_MANA(ch) < 2*heal - 100) heal = GET_MANA(ch)/2 + 50;
   GET_MANA(ch) -= heal*2-100;
-  GET_HIT(victim) += heal;
+  victim->addHP(heal);
 
   sprintf(buf, "$B%d$R", heal);
   send_damage("You channel the power of the gods to heal $N of | damage.", ch, 0, victim, buf, "You channel the power of the gods to heal $N of $S injuries.", TO_CHAR);

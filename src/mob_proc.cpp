@@ -213,12 +213,12 @@ void damage_all_players_in_room(struct char_data *ch, int damage)
         continue;
 
       if(affected_by_spell(vict, SPELL_DIVINE_INTER) && damage > affected_by_spell(vict, SPELL_DIVINE_INTER)->modifier)
-         GET_HIT(vict) -= affected_by_spell(vict, SPELL_DIVINE_INTER)->modifier;
+         vict->removeHP(affected_by_spell(vict, SPELL_DIVINE_INTER)->modifier);
       else
-         GET_HIT(vict) -= damage; // Note -damage will HEAL the player
+         vict->removeHP(damage); // Note -damage will HEAL the player
       update_pos(vict);
       inform_victim(ch, vict, damage);
-      if(GET_HIT(vict) < 1)
+      if(vict->getHP() < 1)
         fight_kill(ch, vict, TYPE_CHOOSE, 0);
     }
 }
@@ -2844,7 +2844,7 @@ int koban_combat(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
     }
 
     // full-heal Iasenko if he's hurt
-    if(iasenko && ((GET_HIT(iasenko)+5) < GET_MAX_HIT(iasenko)) && number(0, 1))
+    if(iasenko && ((iasenko->getHP()+5) < GET_MAX_HIT(iasenko)) && number(0, 1))
     {
       act("$n calls on the souls of his fallen ancestors!", ch, 0, 0, TO_ROOM, INVIS_NULL);
       cast_full_heal(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, iasenko, 0, GET_LEVEL(ch));
@@ -2878,7 +2878,7 @@ int koban_non_combat(struct char_data *ch, struct obj_data *obj, int cmd, char *
     }
 
     // full heal Iasenko if he's hurt
-    if(iasenko && ((GET_HIT(iasenko)+5) < GET_MAX_HIT(iasenko)))
+    if(iasenko && ((iasenko->getHP()+5) < GET_MAX_HIT(iasenko)))
     {
       act("$n calls on the souls of his fallen ancestors!", ch, 0, 0, TO_ROOM, INVIS_NULL);
       cast_full_heal(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, iasenko, 0, GET_LEVEL(ch));
@@ -2894,7 +2894,7 @@ int koban_non_combat(struct char_data *ch, struct obj_data *obj, int cmd, char *
     }
 
     // full-heal myself if i'm hurt
-    if((GET_HIT(ch) + 5) < GET_MAX_HIT(ch))
+    if((ch->getHP() + 5) < GET_MAX_HIT(ch))
     {
       act("$n calls on the souls of his fallen ancestors!", ch, 0, 0, TO_ROOM, INVIS_NULL);
       cast_full_heal(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch, 0, GET_LEVEL(ch));

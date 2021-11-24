@@ -942,13 +942,11 @@ int do_drink(struct char_data *ch, char *argument, int cmd)
           act("You are full.",ch,0,0,TO_CHAR, 0);
         
         if(temp->obj_flags.value[2] == LIQ_HOLYWATER && 
-             GET_HIT(ch) < GET_MAX_HIT(ch) &&
+             ch->getHP() < GET_MAX_HIT(ch) &&
              number(0, 1)) 
         {
            send_to_char("You feel refreshed!\r\n", ch);
-           GET_HIT(ch) += 10;
-           if(GET_HIT(ch) > GET_MAX_HIT(ch))
-             GET_HIT(ch) = GET_MAX_HIT(ch);
+           ch->addHP(10);
         }
 
         if(temp->obj_flags.value[3] && (GET_LEVEL(ch)<IMMORTAL))

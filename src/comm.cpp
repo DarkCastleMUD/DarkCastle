@@ -1292,10 +1292,10 @@ string calc_name(CHAR_DATA *ch, bool colour = FALSE)
   int percent;
   string name;
 
-  if (GET_HIT(ch) == 0 || GET_MAX_HIT(ch) == 0)
+  if (ch->getHP() == 0 || GET_MAX_HIT(ch) == 0)
     percent = 0;
   else
-    percent = GET_HIT(ch) * 100 / GET_MAX_HIT(ch);
+    percent = ch->getHP() * 100 / GET_MAX_HIT(ch);
 
   if (colour == TRUE)
   {
@@ -1335,10 +1335,10 @@ char *calc_condition(CHAR_DATA *ch, bool colour = FALSE)
   else
     memcpy(cond_txt, cond_txtz, sizeof(cond_txtz));
 
-  if (GET_HIT(ch) == 0 || GET_MAX_HIT(ch) == 0)
+  if (ch->getHP() == 0 || GET_MAX_HIT(ch) == 0)
     percent = 0;
   else
-    percent = GET_HIT(ch) * 100 / GET_MAX_HIT(ch);
+    percent = ch->getHP() * 100 / GET_MAX_HIT(ch);
 
   if (percent >= 100)
     return cond_txt[0];
@@ -1520,7 +1520,7 @@ void generate_prompt(CHAR_DATA *ch, char *prompt)
       sprintf(pro, "%d", GET_PLATINUM(ch));
       break;
     case 'h':
-      sprintf(pro, "%d", GET_HIT(ch));
+      sprintf(pro, "%d", ch->getHP());
       break;
     case 'H':
       sprintf(pro, "%d", GET_MAX_HIT(ch));
@@ -1548,8 +1548,8 @@ void generate_prompt(CHAR_DATA *ch, char *prompt)
               GET_KI(ch), NTEXT);
       break;
     case 'i':
-      sprintf(pro, "%s%d%s", calc_color(GET_HIT(ch), GET_MAX_HIT(ch)),
-              GET_HIT(ch), NTEXT);
+      sprintf(pro, "%s%d%s", calc_color(ch->getHP(), GET_MAX_HIT(ch)),
+              ch->getHP(), NTEXT);
       break;
     case 'n':
       sprintf(pro, "%s%d%s", calc_color(GET_MANA(ch), GET_MAX_MANA(ch)),
@@ -1562,20 +1562,20 @@ void generate_prompt(CHAR_DATA *ch, char *prompt)
     case 'y':
       charmie = get_charmie(ch);
       if (charmie != NULL)
-        sprintf(pro, "%d", (GET_HIT(charmie) * 100) / GET_MAX_HIT(charmie));
+        sprintf(pro, "%d", (charmie->getHP() * 100) / GET_MAX_HIT(charmie));
       else
         sprintf(pro, " ");
       break;
     case 'Y':
       charmie = get_charmie(ch);
       if (charmie != NULL)
-        sprintf(pro, "%s%d%s", calc_color(GET_HIT(charmie), GET_MAX_HIT(charmie)),
-                (GET_HIT(charmie) * 100) / GET_MAX_HIT(charmie), NTEXT);
+        sprintf(pro, "%s%d%s", calc_color(charmie->getHP(), GET_MAX_HIT(charmie)),
+                (charmie->getHP() * 100) / GET_MAX_HIT(charmie), NTEXT);
       else
         sprintf(pro, " ");
       break;
     case 'I':
-      sprintf(pro, "%d", ((GET_HIT(ch) * 100) / GET_MAX_HIT(ch)));
+      sprintf(pro, "%d", ((ch->getHP() * 100) / GET_MAX_HIT(ch)));
       break;
     case 'N':
       sprintf(pro, "%d", ((GET_MANA(ch) * 100) / GET_MAX_MANA(ch)));

@@ -254,58 +254,64 @@ int barbweap(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
   }
  return eFAILURE;
 }
-int souldrainer(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg, 
-                   CHAR_DATA *invoker) 
+int souldrainer(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
+                CHAR_DATA *invoker)
 {
-    // struct obj_data *wielded;
-    int percent, chance;
-    CHAR_DATA *vict;
+  // struct obj_data *wielded;
+  int percent, chance;
+  CHAR_DATA *vict;
 
-    if(!(vict = ch->fighting)) {
-	return eFAILURE;
+  if (!(vict = ch->fighting))
+  {
+    return eFAILURE;
+  }
+  if (vict->getHP() < 3500)
+  {
+    percent = (100 * vict->getHP()) / GET_MAX_HIT(vict);
+    chance = number(0, 101);
+    if (chance > (1.3 * percent))
+    {
+      chance = number(0, 101);
+      if (chance > (2 * percent))
+      {
+        chance = number(0, 101);
+        if (chance > (2 * percent))
+        {
+          chance = number(0, 101);
+          if (chance > (2 * percent))
+          {
+            act("You feel your soul being drained as $n's magics swirl around you",
+                ch, 0, vict, TO_VICT, 0);
+            act("$N gasps in agony as $n's dark magics grasp at $S soul.",
+                ch, 0, vict, TO_ROOM, NOTVICT);
+            act("Evil energy surges into you as you wrench at $N's soul.",
+                ch, 0, vict, TO_CHAR, 0);
+            act("The Darkness has triumphed! You drain away $N's esseence.",
+                ch, 0, vict, TO_CHAR, 0);
+            act("Everything goes black as your soul is pulled into the abyss.",
+                ch, 0, vict, TO_VICT, 0);
+            act("$N screams as his soul is destroyed by $n's dark magics",
+                ch, 0, vict, TO_ROOM, NOTVICT);
+            vict->setHP(-20, ch);
+            group_gain(ch, vict);
+            fight_kill(ch, vict, TYPE_CHOOSE, 0);
+            return eSUCCESS;
+          }
+          else
+          { // Missed the fucker
+            act("You braveley resist as $n pulls at the very essence of your soul.",
+                ch, 0, vict, TO_VICT, 0);
+            act("$N stands his ground as dark magic coils around $n",
+                ch, 0, vict, TO_ROOM, NOTVICT);
+            act("$N shudders but resists your grasp upon $S soul.",
+                ch, 0, vict, TO_CHAR, 0);
+          }
+        }
+      }
     }
-    if(GET_HIT(vict) < 3500) {
-        percent = (100 * GET_HIT(vict)) / GET_MAX_HIT(vict);
-	chance = number(0, 101);
-	if(chance > (1.3 * percent)) {
-	    chance = number(0, 101);
-	    if(chance > (2 * percent)) {
-		chance = number(0, 101);
-		if(chance > (2 * percent)) {
-		    chance = number(0, 101);
-		    if(chance > (2 * percent)) {
-			act("You feel your soul being drained as $n's magics swirl around you",
-			    ch, 0, vict, TO_VICT, 0);
-                        act("$N gasps in agony as $n's dark magics grasp at $S soul.", 
-			    ch, 0, vict, TO_ROOM, NOTVICT);
-                        act("Evil energy surges into you as you wrench at $N's soul.",
-			    ch, 0, vict, TO_CHAR, 0);
-                        act("The Darkness has triumphed! You drain away $N's esseence.", 
-			    ch, 0, vict, TO_CHAR, 0);
-                        act("Everything goes black as your soul is pulled into the abyss.", 
-			    ch, 0, vict, TO_VICT, 0);
-                        act("$N screams as his soul is destroyed by $n's dark magics",
-			    ch, 0, vict, TO_ROOM, NOTVICT);
-                        GET_HIT(vict) = -20; 
-			group_gain(ch, vict);
-			fight_kill(ch, vict, TYPE_CHOOSE, 0);
-			return eSUCCESS;
-
-                   } else { // Missed the fucker
-		       act("You braveley resist as $n pulls at the very essence of your soul.", 
-			   ch, 0, vict, TO_VICT, 0);
-                       act("$N stands his ground as dark magic coils around $n",
-			   ch, 0, vict, TO_ROOM, NOTVICT);
-                       act("$N shudders but resists your grasp upon $S soul.",
-			   ch, 0, vict, TO_CHAR, 0);
-                   }
-               }
-	   }
-       }
-   }
-   return eFAILURE;
+  }
+  return eFAILURE;
 }
-
 
 int pushwand(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
 		CHAR_DATA *invoker)
@@ -545,65 +551,72 @@ int orrowand(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg, CHAR_DATA 
 	return eSUCCESS;
 }
 
-
-
-int holyavenger(CHAR_DATA *ch, struct obj_data *obj,  int cmd, char *arg, 
-                   CHAR_DATA *invoker)
+int holyavenger(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
+                CHAR_DATA *invoker)
 {
   // struct obj_data *wielded;
-   int percent, chance;
-   CHAR_DATA *vict; 
+  int percent, chance;
+  CHAR_DATA *vict;
 
-   if(!(vict = ch->fighting)) {
-     return eFAILURE;
-   }
-   if(GET_HIT(vict) < 3500) {
-       percent = (100 * GET_HIT(vict)) / GET_MAX_HIT(vict);
-       chance = number(1, 100);
-       if(chance > (1.3 * percent)) {
-           percent = (100 * GET_HIT(vict)) / GET_MAX_HIT(vict);
-           chance = number(1, 100);
-           if(chance > (2 * percent)) {
-               chance = number(1, 100);
-               if(chance > (2 * percent)) {
-                   chance = number(1, 100);
-                   if(chance > (2 * percent) && !IS_SET(vict->immune, ISR_SLASH)) {
-		     if ((
-                         (vict->equipment[WEAR_NECK_1] && obj_index[vict->equipment[WEAR_NECK_1]->item_number].virt == 518) ||
-			 (vict->equipment[WEAR_NECK_2] && obj_index[vict->equipment[WEAR_NECK_2]->item_number].virt == 518)) 
-			 && !number(0,1))
-		       { // tarrasque's leash..
-			 act("You attempt to behead $N, but your sword bounces of $S neckwear.",ch, 0, vict, TO_CHAR, 0);
-			 act("$n attempts to behead $N, but fails.", ch, 0, vict, TO_ROOM, NOTVICT);
-			 act("$n attempts to behead you, but cannot cut through your neckwear.",ch,0,vict,TO_VICT,0);
-			 return eSUCCESS;
-		       }
-		     if(IS_AFFECTED(vict, AFF_NO_BEHEAD)) {
-		       act("$N deftly dodges your beheading attempt!", ch, 0, vict, TO_CHAR, 0);
-		       act("$N deftly dodges $n's attempt to behead $M!", ch, 0, vict, TO_ROOM, NOTVICT);
-		       act("You deftly avoid $n's attempt to lop your head off!", ch, 0, vict, TO_VICT, 0);
-		       return eSUCCESS;
-		     }
-		     act("You feel your life end as $n's sword SLICES YOUR HEAD OFF!", ch, 0, vict, TO_VICT, 0);
-		     act("You SLICE $N's head CLEAN OFF $S body!", ch, 0, vict, TO_CHAR, 0);
-		     act("$n cleanly slices $N's head off $S body!", ch, 0, vict, TO_ROOM, NOTVICT);
-		     GET_HIT(vict) = -20;
-		     make_head(vict);
-		     group_gain(ch, vict); 
-		     fight_kill(ch, vict, TYPE_CHOOSE, 0);
-		     return eSUCCESS|eVICT_DIED; /* Zero means kill it! */
-		     // it died..
-                   } else { /* You MISS the fucker! */
-		     act("You hear the SWOOSH sound of wind as $n's sword attempts to slice off your head!", ch, 0, vict, TO_VICT, 0);
-		     act("You miss your attempt to behead $N.", ch, 0, vict, TO_CHAR, 0);
-		     act("$N jumps back as $n makes an attempt to BEHEAD $M!", ch, 0, vict, TO_ROOM, NOTVICT);
-                   }
-               }
-           }
-       }
-   }
-   return eFAILURE;  
-} 
+  if (!(vict = ch->fighting))
+  {
+    return eFAILURE;
+  }
+  if (vict->getHP() < 3500)
+  {
+    percent = (100 * vict->getHP()) / GET_MAX_HIT(vict);
+    chance = number(1, 100);
+    if (chance > (1.3 * percent))
+    {
+      percent = (100 * vict->getHP()) / GET_MAX_HIT(vict);
+      chance = number(1, 100);
+      if (chance > (2 * percent))
+      {
+        chance = number(1, 100);
+        if (chance > (2 * percent))
+        {
+          chance = number(1, 100);
+          if (chance > (2 * percent) && !IS_SET(vict->immune, ISR_SLASH))
+          {
+            if ((
+                    (vict->equipment[WEAR_NECK_1] && obj_index[vict->equipment[WEAR_NECK_1]->item_number].virt == 518) ||
+                    (vict->equipment[WEAR_NECK_2] && obj_index[vict->equipment[WEAR_NECK_2]->item_number].virt == 518)) &&
+                !number(0, 1))
+            { // tarrasque's leash..
+              act("You attempt to behead $N, but your sword bounces of $S neckwear.", ch, 0, vict, TO_CHAR, 0);
+              act("$n attempts to behead $N, but fails.", ch, 0, vict, TO_ROOM, NOTVICT);
+              act("$n attempts to behead you, but cannot cut through your neckwear.", ch, 0, vict, TO_VICT, 0);
+              return eSUCCESS;
+            }
+            if (IS_AFFECTED(vict, AFF_NO_BEHEAD))
+            {
+              act("$N deftly dodges your beheading attempt!", ch, 0, vict, TO_CHAR, 0);
+              act("$N deftly dodges $n's attempt to behead $M!", ch, 0, vict, TO_ROOM, NOTVICT);
+              act("You deftly avoid $n's attempt to lop your head off!", ch, 0, vict, TO_VICT, 0);
+              return eSUCCESS;
+            }
+            act("You feel your life end as $n's sword SLICES YOUR HEAD OFF!", ch, 0, vict, TO_VICT, 0);
+            act("You SLICE $N's head CLEAN OFF $S body!", ch, 0, vict, TO_CHAR, 0);
+            act("$n cleanly slices $N's head off $S body!", ch, 0, vict, TO_ROOM, NOTVICT);
+            vict->setHP(-20, ch);
+            make_head(vict);
+            group_gain(ch, vict);
+            fight_kill(ch, vict, TYPE_CHOOSE, 0);
+            return eSUCCESS | eVICT_DIED; /* Zero means kill it! */
+                                          // it died..
+          }
+          else
+          { /* You MISS the fucker! */
+            act("You hear the SWOOSH sound of wind as $n's sword attempts to slice off your head!", ch, 0, vict, TO_VICT, 0);
+            act("You miss your attempt to behead $N.", ch, 0, vict, TO_CHAR, 0);
+            act("$N jumps back as $n makes an attempt to BEHEAD $M!", ch, 0, vict, TO_ROOM, NOTVICT);
+          }
+        }
+      }
+    }
+  }
+  return eFAILURE;
+}
 
 int hooktippedsteelhalberd(CHAR_DATA *ch, struct obj_data *obj, int cmd,
                             char* arg, CHAR_DATA *invoker)
@@ -650,12 +663,12 @@ int drainingstaff(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
     dam += GET_DAMROLL(ch);
     dam = (dam * 2) / 10; // Mages usually have 2-3 attacks
     if(IS_NPC(ch)) { // NPC'S have no mana, so we'll drain hp instead
-        if(dam >= GET_HIT(vict)) {
-            dam = GET_HIT(vict) - 1;
+        if(dam >= vict->getHP()) {
+            dam = vict->getHP() - 1;
         }
       if(affected_by_spell(vict, SPELL_DIVINE_FURY) && dam > affected_by_spell(vict, SPELL_DIVINE_FURY)->modifier)
          dam = affected_by_spell(vict, SPELL_DIVINE_FURY)->modifier;
-        GET_HIT(vict) -= dam;
+        vict->removeHP(dam);
         GET_MANA(ch) += dam;
     } else { // We have a character... drain mana 
         if(dam >= GET_MANA(vict)) {
@@ -936,7 +949,7 @@ int hellmouth_thing(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
   GET_KI(invoker) -= 50;
   if (GET_KI(invoker) < 0)
     GET_KI(invoker) = 0;
-  GET_HIT(invoker) /= 2;
+  invoker->setHP(invoker->getHP()/2);
   GET_MANA(invoker) /= 2;
   GET_MOVE(invoker) /= 2;  
   //  do_look(invoker, "", 9);
@@ -2823,7 +2836,7 @@ int dk_rend(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
 
    GET_HIT(ch->fighting) /= 2;
    if(GET_HIT(ch->fighting) < 1)
-     GET_HIT(ch->fighting) = 1;
+     ch->fighting->setHP(1);
 
    return eSUCCESS;
 }
@@ -3241,7 +3254,7 @@ int chaosblade(struct char_data*ch, struct obj_data *obj, int cmd, char*arg,
 			sprintf(buf,"%d", dam);
 			send_damage("The Chaos Blade hungers!  You are drained for | damage.",  obj->equipped_by, 0, 0, buf, "The Chaos Blade hungers!  You feel your life force being drained!", TO_CHAR);
 			send_damage("The katana in $n's hand pulses with a dull red glow as it drains their life force for | damage!",  obj->equipped_by, 0, 0, buf, "The katana in $n's hand pulses with a dull red glow as it drains their life force!", TO_ROOM);
-			GET_HIT(obj->equipped_by) -= dam;
+			obj->equipped_by->removeHP(dam);
 		}
 	}
 	return eSUCCESS;
@@ -3276,7 +3289,7 @@ int rubybrooch(struct char_data*ch, struct obj_data *obj, int cmd, char*arg,
 			sprintf(buf, "%d", dam);
 			send_damage("The ruby brooch squeezes your neck painfully for | damage!",  obj->equipped_by, 0, 0, buf, "The ruby brooch squeezes your neck painfully!", TO_CHAR);
 			send_damage("A ruby brooch constricts $n's neck for | damage and they cough violently.",  obj->equipped_by, 0, 0, buf, "A ruby brooch constricts $n's neck and they cough violently.", TO_ROOM);
-			GET_HIT(obj->equipped_by) -= dam;
+			obj->equipped_by->removeHP(dam);
 		}
 	}
 	return eSUCCESS;
@@ -3658,7 +3671,7 @@ int hot_potato(struct char_data*ch, struct obj_data *obj, int cmd, char*arg,
         return eSUCCESS;
        }
 
-       GET_HIT(vict) = -1;
+       vict->setHP(-1);
        update_pos(vict);
        send_to_char("$B"
            "BBBB     OOO     OOO    M   M !!   !!\n\r"
@@ -3718,10 +3731,10 @@ int exploding_mortar_shells(struct char_data*ch, struct obj_data *obj, int cmd, 
       continue;
 
     dam = dice( obj->obj_flags.value[1], obj->obj_flags.value[2] );
-    GET_HIT(victim) -= dam;
+    victim->removeHP(dam);
     sprintf(buf, "Pieces of shrapnel rip through your skin inflicting %d damage!\r\n", dam);
     send_to_char(buf, victim);
-    if(GET_HIT(victim) < 1) {
+    if(victim->getHP() < 1) {
       send_to_char("You have been KILLED!!\r\n", victim);
       fight_kill(victim, victim, TYPE_PKILL, KILL_MORTAR);
     }
@@ -4258,7 +4271,7 @@ int godload_grathelok(CHAR_DATA *ch, struct obj_data *obj,  int cmd, char *arg,
    if(!(vict = ch->fighting))
        return eFAILURE;
 
-   if(GET_HIT(vict) > 100)
+   if(vict->getHP() > 100)
      return eFAILURE;
 
    switch(number(0, 1)) {
@@ -4275,7 +4288,7 @@ int godload_grathelok(CHAR_DATA *ch, struct obj_data *obj,  int cmd, char *arg,
        make_arm(vict);
        break;
    }
-   GET_HIT(vict) = -20;
+   vict->setHP(-20, ch);
    group_gain(ch, vict); 
    fight_kill(ch, vict, TYPE_CHOOSE, 0);
    return eSUCCESS|eVICT_DIED; 
@@ -4288,7 +4301,7 @@ int goldenbatleth(CHAR_DATA *ch, struct obj_data *obj,  int cmd, char *arg,
    if(!(vict = ch->fighting))
        return eFAILURE;
 
-   if(GET_HIT(vict) > 40)
+   if(vict->getHP() > 40)
      return eFAILURE;
 
    switch(number(0, 1)) {
@@ -4305,7 +4318,7 @@ int goldenbatleth(CHAR_DATA *ch, struct obj_data *obj,  int cmd, char *arg,
        make_arm(vict);
        break;
    }
-   GET_HIT(vict) = -20;
+   vict->setHP(-20, ch);
    group_gain(ch, vict); 
    fight_kill(ch, vict, TYPE_CHOOSE, 0);
    return eSUCCESS|eVICT_DIED; 
@@ -4333,11 +4346,13 @@ int godload_jaelgreth(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
       && dam > affected_by_spell(victim, SPELL_DIVINE_INTER)->modifier)
       dam = affected_by_spell(victim, SPELL_DIVINE_INTER)->modifier;
 
-   GET_HIT(victim) -= dam;
-   GET_HIT(ch) += dam;
+   victim->removeHP(dam, ch);
+   ch->addHP(dam, victim);
 
-   if (GET_HIT(ch) > GET_MAX_HIT(ch)) 
-     GET_HIT(ch) = GET_MAX_HIT(ch);
+   if (ch->getHP() > GET_MAX_HIT(ch))
+   {
+     ch->fillHP();
+   }
 
    dam = MIN(100, GET_MANA(victim));
    if(dam < 0) 
@@ -4399,7 +4414,7 @@ int godload_foecrusher(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
 
    if(affected_by_spell(victim, SPELL_DIVINE_INTER) && dam > affected_by_spell(victim, SPELL_DIVINE_INTER)->modifier)
       dam = affected_by_spell(victim, SPELL_DIVINE_INTER)->modifier;
-   GET_HIT(victim) -= dam;
+   victim->removeHP(dam);
 
    update_pos(victim);
 

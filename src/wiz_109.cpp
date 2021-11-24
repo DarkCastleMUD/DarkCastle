@@ -230,7 +230,7 @@ int do_advance(struct char_data *ch, char *argument, int cmd)
                 victim->max_hit  = 5;  /* These are BASE numbers  */
                 victim->raw_hit  = 5;
 
-                GET_HIT(victim) = hit_limit(victim);
+                victim->fillHPLimit();
                 GET_MANA(victim) = mana_limit(victim);
                 GET_MOVE(victim) = move_limit(victim);
 

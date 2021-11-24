@@ -1500,7 +1500,7 @@ void store_to_char(struct char_file_u *st, CHAR_DATA *ch)
     ch->resist  = st->resist;
     ch->suscept = st->suscept;
 
-    GET_HIT(ch)      = st->hit;
+    ch->setHP(st->hit);
     GET_RAW_HIT(ch)  = st->raw_hit;
     GET_MANA(ch)     = st->mana;
     GET_RAW_MANA(ch) = st->raw_mana;
@@ -1588,7 +1588,7 @@ void char_to_store(CHAR_DATA *ch, struct char_file_u *st, struct time_data & tmp
 
   st->mana      = GET_MANA(ch);
   st->raw_mana  = GET_RAW_MANA(ch);
-  st->hit       = GET_HIT(ch);
+  st->hit       = ch->getHP();
   st->raw_hit   = GET_RAW_HIT(ch);
   st->move      = GET_MOVE(ch);
   st->raw_move  = GET_RAW_MOVE(ch);

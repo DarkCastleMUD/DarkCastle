@@ -2543,7 +2543,7 @@ void checkConsecrate(int pulseType)
                      if (GET_HIT(tmp_ch) + amount > GET_MAX_HIT(tmp_ch))
                         amount = GET_MAX_HIT(tmp_ch) - GET_HIT(tmp_ch);
                      sprintf(buf, "%d", amount);
-                     GET_HIT(tmp_ch) += amount;
+                     tmp_ch->addHP(amount);
                      if (tmp_ch == ch)
                         send_damage("The runes upon the ground glow softly as your holy consecration heals you of | damage.", tmp_ch, 0, 0, buf, "The runes upon the ground glow softly as your holy consecration heals you. ", TO_CHAR);
                      else if (affected_by_spell(tmp_ch, SPELL_DETECT_GOOD) && affected_by_spell(tmp_ch, SPELL_DETECT_GOOD)->modifier >= 80)
@@ -2576,7 +2576,7 @@ void checkConsecrate(int pulseType)
                         continue;
                      }
                      sprintf(buf, "%d", amount);
-                     GET_HIT(tmp_ch) -= amount;
+                     tmp_ch->removeHP(amount);
                      if (tmp_ch == ch)
                         send_damage("The runes upon the ground hum ominously as your unholy desecration injures you, dealing | damage.", tmp_ch, 0, 0, buf, "The runes upon the ground hum ominously as your unholy desecration injures you. ", TO_CHAR);
                      else if (affected_by_spell(tmp_ch, SPELL_DETECT_GOOD) && affected_by_spell(tmp_ch, SPELL_DETECT_GOOD)->modifier >= 80)
@@ -2598,7 +2598,7 @@ void checkConsecrate(int pulseType)
                      if (GET_HIT(tmp_ch) + amount > GET_MAX_HIT(tmp_ch))
                         amount = GET_MAX_HIT(tmp_ch) - GET_HIT(tmp_ch);
                      sprintf(buf, "%d", amount);
-                     GET_HIT(tmp_ch) += amount;
+                     tmp_ch->addHP(amount);
                      if (tmp_ch == ch)
                         send_damage("The runes upon the ground hum ominously as your unholy desecration heals you of | damage.", tmp_ch, 0, 0, buf, "The runes upon the ground hum ominously as your unholy desecration heals you. ", TO_CHAR);
                      else if (affected_by_spell(tmp_ch, SPELL_DETECT_EVIL) && affected_by_spell(tmp_ch, SPELL_DETECT_EVIL)->modifier >= 80)
@@ -2632,7 +2632,7 @@ void checkConsecrate(int pulseType)
                         continue;
                      }
                      sprintf(buf, "%d", amount);
-                     GET_HIT(tmp_ch) -= amount;
+                     tmp_ch->removeHP(amount);
                      if (tmp_ch == ch)
                         send_damage("The runes upon the ground glow softly as your holy consecration injures you, dealing | damage.", tmp_ch, 0, 0, buf, "The runes upon the ground glow softly as your holy consecration injures you. ", TO_CHAR);
                      else if (affected_by_spell(tmp_ch, SPELL_DETECT_GOOD) && affected_by_spell(tmp_ch, SPELL_DETECT_GOOD)->modifier >= 80)

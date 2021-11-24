@@ -1073,7 +1073,7 @@ int do_arrow_damage(struct char_data *ch, struct char_data *victim,
 
   set_cantquit(ch, victim);
  
-  if(0 > (GET_HIT(victim) - dam))
+  if(0 > (victim->getHP() - dam))
   { // they aren't going to survive..life sucks
    switch(number(1,2)) 
    {
@@ -1127,17 +1127,17 @@ int do_arrow_damage(struct char_data *ch, struct char_data *victim,
          return retval;
   } 
 
-  GET_HIT(victim) -= dam;
+  victim->removeHP(dam);
   update_pos(victim);
   inform_victim(ch, victim, dam);                   
 
-  if(GET_HIT(victim) > 0)
+  if(victim->getHP() > 0)
      GET_POS(victim) = POSITION_STANDING;
 
 // This is a cut & paste from fight.C cause I can't think of a better way to do it
 
   // Payoff for killing things.
-  if(GET_HIT(victim) < 0)
+  if(victim->getHP() < 0)
   {
     group_gain(ch, victim);
     fight_kill(ch, victim, TYPE_CHOOSE, 0);

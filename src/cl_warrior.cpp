@@ -225,7 +225,7 @@ int do_deathstroke(struct char_data *ch, char *argument, int cmd)
 	dam /= 4;
         if (IS_AFFECTED(ch, AFF_SANCTUARY))
           dam /= 2;
-        GET_HIT(ch) -= dam;
+        ch->removeHP(dam);
         update_pos(ch);
         if (GET_POS(ch) == POSITION_DEAD) {
           fight_kill(ch, ch, TYPE_CHOOSE, 0);
@@ -347,7 +347,7 @@ int do_hitall(struct char_data *ch, char *argument, int cmd) {
 		return eFAILURE;
 	}
 
-	if (GET_HIT(ch) == 1) {
+	if (ch->getHP() == 1) {
 		send_to_char("You are too weak to do this right now.\r\n", ch);
 		return eFAILURE;
 	}

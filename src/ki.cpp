@@ -463,13 +463,13 @@ int ki_blast( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
    else /* There is no exit there */
    {
       char buf[MAX_STRING_LENGTH], name[100];
-      int prev = GET_HIT(vict);
+      int prev = vict->getHP();
       
       strcpy(name, GET_SHORT(vict));
       int retval = damage(ch,vict,100, TYPE_KI,KI_OFFSET+KI_BLAST,0);
       GET_POS(vict) = POSITION_SITTING;
       if(!SOMEONE_DIED(retval)) {
-        sprintf(buf, "$B%d$R", prev - GET_HIT(vict));
+        sprintf(buf, "$B%d$R", prev - vict->getHP());
         send_damage("$N is blasted across the room by $n for | damage!", ch, 0, vict, buf,
 		    "$N is blasted across the room by $n!", TO_ROOM);
         send_damage("$N is thrown to the ground by your blast and suffers | damage!", ch, 0, vict, buf,
@@ -498,14 +498,14 @@ int ki_punch(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
   }
 
   set_cantquit(ch, vict);
-  int dam = GET_HIT(vict) / 4, manadam = GET_MANA(vict) / 4;
+  int dam = vict->getHP() / 4, manadam = GET_MANA(vict) / 4;
   int retval;
 
   dam = MAX(350, dam);
   dam = MIN(1000, dam);
   manadam = MAX(150, manadam);
   manadam = MIN(750, manadam);
-  if (GET_HIT(vict) < 500000)
+  if (vict->getHP() < 500000)
   {
     if (number(1, 101) <
         GET_LEVEL(ch) / 5 + has_skill(ch, KI_OFFSET + KI_PUNCH) / 2 - GET_LEVEL(vict) / 5)
@@ -519,7 +519,7 @@ int ki_punch(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
     {
       retval = damage(ch, vict, 0, TYPE_UNDEFINED, KI_OFFSET + KI_PUNCH, 0);
 
-      GET_HIT(ch) -= 1 / 8 * (GET_MAX_HIT(ch));
+      ch->removeHP((1 / 8) * (GET_MAX_HIT(ch)));
       WAIT_STATE(ch, PULSE_VIOLENCE);
       if (!vict->fighting)
         return attack(vict, ch, TYPE_UNDEFINED);
@@ -594,8 +594,8 @@ int ki_storm( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
   if(number(1,4) == 4 && !ch->fighting) {
     char dammsg[MAX_STRING_LENGTH];
     sprintf(dammsg, "$B%d$R", dam);
-    if (dam + GET_HIT(ch) > GET_MAX_HIT(ch)) dam = GET_MAX_HIT(ch) - GET_HIT(ch);
-    GET_HIT(ch) += dam;
+    if (dam + ch->getHP() > GET_MAX_HIT(ch)) dam = GET_MAX_HIT(ch) - ch->getHP();
+    ch->addHP(dam);
     send_damage("The flash of energy surges within you for | life!", ch, 0, 0, dammsg, "The flash of energy surges within you!", TO_CHAR);
   }
   WAIT_STATE(ch, PULSE_VIOLENCE);
@@ -1130,7 +1130,7 @@ int ki_meditation( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
 
    gain = hit_gain(ch, POSITION_SLEEPING);
 
-   GET_HIT(ch)  = MIN(GET_HIT(ch) + gain,  hit_limit(ch));
+   ch->setHP(MIN(ch->getHP() + gain,  hit_limit(ch)));
 
    return eSUCCESS;
 }

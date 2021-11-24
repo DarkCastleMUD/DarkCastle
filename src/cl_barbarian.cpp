@@ -347,7 +347,7 @@ int do_rage(struct char_data *ch, char *argument, int cmd)
   char_data *victim;
   char name[256];
 
-  if(GET_HIT(ch) == 1) {
+  if(ch->getHP() == 1) {
     send_to_char("You are feeling too weak right now to work yourself up into "
                  "a rage.", ch);
     return eFAILURE;
@@ -497,7 +497,7 @@ int do_berserk(struct char_data *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if(GET_HIT(ch) == 1) {
+  if(ch->getHP() == 1) {
     send_to_char("You are feeling too weak right now to work yourself up into "
                  "a frenzy.", ch);
     return eFAILURE;
@@ -833,7 +833,7 @@ int do_bullrush(struct char_data *ch, char *argument, int cmd)
   int retval;
   char_data *victim;
 
-  if(GET_HIT(ch) == 1) {
+  if(ch->getHP() == 1) {
     send_to_char("You are feeling too weak right now for rushing to and fro.\r\n", ch);
     return eFAILURE;
   }
@@ -1012,7 +1012,7 @@ int do_knockback(struct char_data *ch, char *argument, int cmd)
   int dir = 0;
   int retval, dam, dampercent, learned;
 
-  if(GET_HIT(ch) == 1) {
+  if(ch->getHP() == 1) {
     send_to_char("You are feeling too weak right now to smash into anybody.\n\r", ch);
     return eFAILURE;
   }
@@ -1111,7 +1111,7 @@ int do_knockback(struct char_data *ch, char *argument, int cmd)
   dam = (int)(dam * (1.0 + dampercent / 100.0));
 
   char buf2[MAX_STRING_LENGTH], dammsg[20];
-  int prevhps = GET_HIT(victim);
+  int prevhps = victim->getHP();
 
   if(!victim_paralyzed && !skill_success(ch, victim, SKILL_KNOCKBACK, 0-(learned/4 * 3))) {
     act("You lunge forward in an attempt to smash $N but fall, missing $M completely.", ch, 0, victim, TO_CHAR, 0);
@@ -1159,7 +1159,7 @@ int do_knockback(struct char_data *ch, char *argument, int cmd)
        return retval; // this too, just in case it gets called from  a
 		      // proc later on, it returns correct stuff
     } else {
-       sprintf(dammsg, "$B%d$R", prevhps - GET_HIT(victim));
+       sprintf(dammsg, "$B%d$R", prevhps - victim->getHP());
        sprintf(buf2, "Your smash for | damage sends %s reeling %s.", GET_SHORT(victim), dirs[dir]);
        sprintf(buf, "Your smash sends %s reeling %s.", GET_SHORT(victim), dirs[dir]);
        send_damage(buf2, ch, 0, victim, dammsg, buf, TO_CHAR);
@@ -1202,7 +1202,7 @@ int do_knockback(struct char_data *ch, char *argument, int cmd)
        act(buf, ch, 0, 0, TO_ROOM, 0);
        return retval;
     } else {
-       sprintf(dammsg, "$B%d$R", prevhps - GET_HIT(victim));
+       sprintf(dammsg, "$B%d$R", prevhps - victim->getHP());
        send_damage("$N backpeddles across the room due to $n's smash for | damage.", ch, 0, victim, dammsg,
                    "$N backpessles across the room due to $n's smash.", TO_ROOM);
        send_damage("$N barely keeps $S footing, stumbling backwards after your smash and taking | damage.", ch, 0, victim, dammsg,

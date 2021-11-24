@@ -298,7 +298,7 @@ int do_backstab(CHAR_DATA *ch, char *argument, int cmd)
   int min_hp = (int) (GET_MAX_HIT(ch) / 5);
   min_hp = MIN( min_hp, 25 );
 
-  if( GET_HIT(ch) < min_hp ) {
+  if( ch->getHP() < min_hp ) {
     send_to_char("You are feeling too weak right now to attempt such a bold maneuver.\r\n", ch);
     return eFAILURE;
   }
@@ -460,7 +460,7 @@ int do_circle(CHAR_DATA *ch, char *argument, int cmd)
    int min_hp = (int) (GET_MAX_HIT(ch) / 5);
    min_hp = MIN( min_hp, 25 );
 
-   if( GET_HIT(ch) < min_hp ) {
+   if( ch->getHP() < min_hp ) {
       send_to_char("You are feeling too weak right now to attempt such a bold maneuver.", ch);
       return eFAILURE;
    }

@@ -1347,10 +1347,11 @@ void add_dmg(CHAR_DATA *ch, int dmg)
 
 int do_mpdamage( CHAR_DATA *ch, char *argument, int cmd )
 {
-    char arg[ MAX_INPUT_LENGTH ];
-    char temp[ MAX_INPUT_LENGTH ];
-    char damroll[ MAX_INPUT_LENGTH ];
-    char attacktype[ MAX_INPUT_LENGTH ];
+  char arg[ MAX_INPUT_LENGTH ];
+  char temp[ MAX_INPUT_LENGTH ];
+  char damroll[ MAX_INPUT_LENGTH ];
+  char attacktype[ MAX_INPUT_LENGTH ];
+  int32 hitpoints = 0;
 
     free_dmg_list();
     if ( !IS_NPC( ch ) )
@@ -1431,53 +1432,65 @@ int do_mpdamage( CHAR_DATA *ch, char *argument, int cmd )
     // half of the casts are probably pointless, but whatever
 
       if(victim) {
-	int *data = NULL;
-	if (!temp[0] || !str_cmp(temp,"hitpoints"))
-	  data = &GET_HIT(victim);
-	else if (!str_cmp(temp, "mana"))
-	  data = &GET_MANA(victim);
-	else if (!str_cmp(temp, "ki"))
-	  data = &GET_KI(victim);
-	else if (!str_cmp(temp, "move"))
-	  data = &GET_MOVE(victim);
-	else {
-           prog_error(ch, "Mpdamage - Must damage either ki,mana,hitpoints or move");
-           return eFAILURE|eINTERNAL_ERROR;
-	}
-	if (perc)
-         dam = (int)((double)(*data) / 100.0 * (double)dice(numdice, sizedice));
-	else
-	 dam = dice(numdice, sizedice);
-       if (plusPerc)
-         dam += (int)((double)(*data) / 100.0 * (double)plus);
-       else
-         dam += plus;
-       add_dmg(victim,dam);
-       if (!temp[0] || !str_cmp(temp,"hitpoints")) {
-	 retval = damage(ch, victim, dam, damtype, TYPE_UNDEFINED, 0, true);
-	 if (SOMEONE_DIED(retval)) return retval;
-       } else {
-	 *data -= dam;
-	 if (*data < 0) *data = 0;
-       }
-/*
-       else if (!str_cmp(temp, "mana"))
-       {
-	   GET_MANA(victim) -= dam;
-	   if (GET_MANA(victim) < 0) GET_MANA(victim) = 0;
-       } else if (!str_cmp(temp, "ki"))
-       {
-	   GET_KI(victim) -= dam;
-	   if (GET_KI(victim) < 0) GET_KI(victim) = 0;
-       } else if (!str_cmp(temp, "move"))
-       {
-   	   GET_MOVE(victim) -= dam;
-	   if (GET_MOVE(victim) < 0) GET_MOVE(victim) = 0;
-       } else {
-           prog_error(ch, "Mpdamage - Must damage either ki,mana,hitpoints or move");
-           return eFAILURE|eINTERNAL_ERROR;
-       }*/
-	continue;
+        int *data = NULL;
+        if (!temp[0] || !str_cmp(temp,"hitpoints"))
+        {
+          hitpoints = ch->getHP();
+          data = &hitpoints;
+        }
+        else if (!str_cmp(temp, "mana"))
+        {
+          data = &GET_MANA(victim);
+        }
+        else if (!str_cmp(temp, "ki"))
+        {
+          data = &GET_KI(victim);
+        }
+        else if (!str_cmp(temp, "move"))
+        {
+          data = &GET_MOVE(victim);
+        }
+        else
+        {
+          prog_error(ch, "Mpdamage - Must damage either ki,mana,hitpoints or move");
+          return eFAILURE|eINTERNAL_ERROR;
+        }
+
+        if (perc)
+        {
+          dam = (int)((double)(*data) / 100.0 * (double)dice(numdice, sizedice));
+        }
+        else
+        {
+          dam = dice(numdice, sizedice);
+        }
+
+        if (plusPerc)
+        {
+          dam += (int)((double)(*data) / 100.0 * (double)plus);
+        }
+        else
+        {
+          dam += plus;
+        }
+
+        add_dmg(victim,dam);
+        if (!temp[0] || !str_cmp(temp,"hitpoints"))
+        {
+          retval = damage(ch, victim, dam, damtype, TYPE_UNDEFINED, 0, true);
+          if (SOMEONE_DIED(retval)) return retval;
+        }
+        else
+        {
+      	 *data -= dam;
+
+	        if (*data < 0)
+          {
+            *data = 0;
+          }
+        } 
+
+	      continue;
       }
       
       char_data * next_vict;
@@ -1485,13 +1498,19 @@ int do_mpdamage( CHAR_DATA *ch, char *argument, int cmd )
       {
         next_vict = victim->next_in_room;
         if((!IS_NPC(victim) && GET_LEVEL(victim) > MORTAL) || victim==ch)
+        {
            continue;
-	if (!strcmp(arg, "allpc") && IS_NPC(victim)) {
-	    continue;
-	}
+        }
+
+        if (!strcmp(arg, "allpc") && IS_NPC(victim)) {
+            continue;
+        }
         int *data = NULL;
         if (!temp[0] || !str_cmp(temp,"hitpoints"))
-          data = &GET_HIT(victim);
+        {
+          hitpoints = ch->getHP();
+          data = &hitpoints;
+        }
         else if (!str_cmp(temp, "mana"))
           data = &GET_MANA(victim);
         else if (!str_cmp(temp, "ki"))
@@ -1511,48 +1530,22 @@ int do_mpdamage( CHAR_DATA *ch, char *argument, int cmd )
        else
          dam += plus;
        add_dmg(victim,dam);
-       if (!temp[0] || !str_cmp(temp,"hitpoints")) {
+       if (!temp[0] || !str_cmp(temp,"hitpoints"))
+       {
          retval = damage(ch, victim, dam, damtype, TYPE_UNDEFINED, 0, true);
-         if (IS_SET(retval, eCH_DIED)) return retval;
+         if (IS_SET(retval, eCH_DIED))
+         {
+           return retval;
+         }
        } else {
          *data -= dam;
          if (*data < 0) *data = 0;
        }
-/*
-        if (perc)
-         dam = (int)((double)GET_HIT(victim) / 100.0 * (double)dice(numdice, sizedice));
-        else
-         dam = dice(numdice, sizedice);
-       if (plusPerc)
-         dam += (int)((double)GET_HIT(victim) / 100.0 * (double)plus);
-       else
-         dam += plus;
-	 add_dmg(victim,dam);
-        if (!temp[0] || !str_cmp(temp,"hitpoints"))
-	{
-            retval = damage(ch, victim, dam, damtype, TYPE_UNDEFINED, 0);
-  	    if (IS_SET(retval, eCH_DIED)) return retval;
 
-	}
-        else if (!str_cmp(temp, "mana"))
-        {
-           GET_MANA(victim) -= dam;
-           if (GET_MANA(victim) < 0) GET_MANA(victim) = 0;
-        } else if (!str_cmp(temp, "ki"))
-        {
-           GET_KI(victim) -= dam;
-           if (GET_KI(victim) < 0) GET_KI(victim) = 0;
-        } else if (!str_cmp(temp, "move"))
-        {
-           GET_MOVE(victim) -= dam;
-           if (GET_MOVE(victim) < 0) GET_MOVE(victim) = 0;
-        } else {
-           prog_error(ch, "Mpdamage - Must damage either ki,mana,hitpoints or move");
-           return eFAILURE|eINTERNAL_ERROR;
-        }*/
         if (SOMEONE_DIED(retval))
-//        if(IS_SET(retval, eCH_DIED))
+        {
            return retval;
+        }
       }
     }
     return eSUCCESS;

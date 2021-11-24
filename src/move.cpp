@@ -116,7 +116,7 @@ void record_track_data(CHAR_DATA *ch, int cmd) {
 	newScent->weight = (int) ch->weight;
 	newScent->race = (int) ch->race;
 	newScent->sex = (int) ch->sex;
-	newScent->condition = ((GET_HIT(ch) * 100) / (GET_MAX_HIT(ch) == 0 ? 100 : GET_MAX_HIT(ch)));
+	newScent->condition = ((ch->getHP() * 100) / (GET_MAX_HIT(ch) == 0 ? 100 : GET_MAX_HIT(ch)));
 	newScent->next = NULL; // just in case
 	newScent->previous = NULL; // just in case
 

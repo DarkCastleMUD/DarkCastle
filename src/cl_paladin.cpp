@@ -76,7 +76,7 @@ int do_harmtouch(struct char_data *ch, char *argument, int cmd)
       return eFAILURE;
    }
 
-   if(GET_HIT(ch) < GET_MAX_HIT(ch) / 4)
+   if(ch->getHP() < GET_MAX_HIT(ch) / 4)
    {
       send_to_char("You don't posess the energy to do it!\r\n", ch);
       return eFAILURE;
@@ -99,10 +99,10 @@ int do_harmtouch(struct char_data *ch, char *argument, int cmd)
         if(has_skill(ch,SKILL_HARM_TOUCH) > 30 && number(1, 3) == 1) {
            char dammsg[MAX_STRING_LENGTH];
            int amount = GET_LEVEL(ch) * 10;
-           if(amount + GET_HIT(ch) > GET_MAX_HIT(ch)) amount = GET_MAX_HIT(ch) - GET_HIT(ch);
+           if(amount + ch->getHP() > GET_MAX_HIT(ch)) amount = GET_MAX_HIT(ch) - ch->getHP();
            sprintf(dammsg, "$B%d$R", amount);
            send_damage("Your god basks in your worship of pain and infuses you with | life.", ch, 0, victim, dammsg, "You god basks in your worship of pain and infuses you with life.", TO_CHAR);
-           GET_HIT(ch) += amount;
+           ch->addHP(amount);
         }
      }
    }
@@ -164,7 +164,7 @@ int do_layhands(struct char_data *ch, char *argument, int cmd)
       return eFAILURE;
    }
 
-   if(GET_HIT(ch) < GET_MAX_HIT(ch) / 4)
+   if(ch->getHP() < GET_MAX_HIT(ch) / 4)
    {
       send_to_char("You don't posess the energy to do it!\r\n", ch);
       return eFAILURE;
@@ -179,9 +179,9 @@ int do_layhands(struct char_data *ch, char *argument, int cmd)
    else {
      char dammsg[MAX_STRING_LENGTH];
      int amount = 500 + (has_skill(ch, SKILL_LAY_HANDS)*10);
-     if(amount + GET_HIT(victim) > GET_MAX_HIT(victim))
-       amount = GET_MAX_HIT(victim) - GET_HIT(victim);
-     GET_HIT(victim) += amount;
+     if(amount + victim->getHP() > GET_MAX_HIT(victim))
+       amount = GET_MAX_HIT(victim) - victim->getHP();
+     victim->addHP(amount);
      sprintf(dammsg, "$B%d$R", amount);
      send_damage("Praying fervently, you lay hands as life force granted by your god streams from your body healing $N for | health.",
 ch, 0, victim, dammsg, "Praying fervently, you lay hands as life force granted by your god streams from your body into $N.", TO_CHAR);
@@ -262,7 +262,7 @@ int do_behead(struct char_data *ch, char *argument, int cmd)
   modifier = 50.0 + skill_level / 2.0 + GET_ALIGNMENT(ch) / 100.0;
   modifier /= 100.0; //range .15-1.0
 
-  enemy_hp = (GET_HIT(vict)* 100.0) / GET_MAX_HIT(vict);
+  enemy_hp = (vict->getHP()* 100.0) / GET_MAX_HIT(vict);
   enemy_hp /= 100.0; //range 0-1;
 
   if(enemy_hp <= 0)

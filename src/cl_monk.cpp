@@ -173,7 +173,7 @@ int do_quivering_palm(struct char_data *ch, char *argument, int cmd)
     duration = 6;
   }
   else {
-    dam = GET_HIT(victim) /2;
+    dam = victim->getHP() /2;
     if (dam < 500) dam = 500;
     if (dam > 2000) dam = 2000;
     retval = damage(ch, victim, dam, TYPE_UNDEFINED, SKILL_QUIVERING_PALM, 0);
@@ -199,7 +199,7 @@ int do_stun(struct char_data *ch, char *argument, int cmd)
   if (!canPerform(ch, SKILL_STUN, "Your lack of knowledge is stunning...\r\n")) {
     return eFAILURE;
   }
-  if (GET_HIT(ch) < 25)
+  if (ch->getHP() < 25)
   {
     send_to_char("You can't muster the energy for such an attack.\r\n",ch);
     return eFAILURE;
