@@ -246,7 +246,10 @@ char * TokenList::Interpret(CHAR_DATA *from, OBJ_DATA *obj, void *vict_obj, CHAR
 		  }
 		  else
 		  {
-                    strcat(interp, GET_SHORT(from));
+        if (GET_SHORT(from))
+        {
+          strcat(interp, GET_SHORT(from));
+        }
 		  }
 		  break; 
 	case 'N': if (!CAN_SEE(send_to, (CHAR_DATA *)vict_obj,TRUE))
