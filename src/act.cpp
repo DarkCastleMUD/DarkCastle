@@ -92,10 +92,13 @@ act_return act(
   }
   else if (destination == TO_CHAR)
   {
-    st_return = send_tokens(tokens, ch, obj, vict_obj, flags, ch);
-    retval |= st_return.retval;
-    ar.str = st_return.str;
-    ar.retval = retval;
+    if (!IS_SET(flags, BARDSONG) || ch->pcdata == nullptr || !IS_SET(ch->pcdata->toggles, PLR_BARD_SONG))
+    {
+      st_return = send_tokens(tokens, ch, obj, vict_obj, flags, ch);
+      retval |= st_return.retval;
+      ar.str = st_return.str;
+      ar.retval = retval;
+    }
   }
   else if (destination == TO_ROOM || destination == TO_GROUP || destination == TO_ROOM_NOT_GROUP)
   {
