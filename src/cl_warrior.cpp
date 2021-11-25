@@ -1507,7 +1507,7 @@ int do_onslaught(struct char_data *ch, char *argument, int cmd)
     af.type = SKILL_ONSLAUGHT_TIMER;
     af.location = 0;
     af.modifier = 0;
-    af.duration = 7 + learned/15;
+    af.duration = 7;
     af.bitvector = -1;
     affect_to_char(ch, &af);
 
