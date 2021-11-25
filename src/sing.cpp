@@ -2014,6 +2014,7 @@ int song_summon_song(ubyte level, CHAR_DATA *ch, char *Aag, CHAR_DATA *victim, i
 	for (i = ch->songs.begin(); i != ch->songs.end(); ++i)
 		if ((*i).song_number == SKILL_SONG_SUMMONING_SONG - SKILL_SONG_BASE)
 			break;
+	csendf(ch, "%d %d\r\n", song_info[(*i).song_number].beats, song_info[(*i).song_number].beats - (skill / 10));
 
 	(*i).song_timer = song_info[(*i).song_number].beats - (skill / 10);
 
