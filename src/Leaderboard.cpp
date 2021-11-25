@@ -1324,11 +1324,13 @@ int do_leaderboard(struct char_data *ch, char *argument, int cmd) {
 		}
 		else if (arg1 == "scan")
 		{
-			return leaderboard.scan(ch);
+			leaderboard.scan(ch);
 		}
 	}
-
-	leaderboard.check();
+	else
+	{
+		leaderboard.check();
+	}	
 
 	for (i = 0; i < 5; i++)
 		hponlinename[i] = str_dup(" ");
