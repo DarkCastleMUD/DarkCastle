@@ -13,6 +13,10 @@
 #include "const.h"
 #include "utility.h"
 #include "vault.h"
+#include "Leaderboard.h"
+#include "interp.h"
+#include "DC.h"
+#include <queue>
 
 using namespace std;
 void load_char_obj_error(FILE *fpsave, char strsave[MAX_INPUT_LENGTH]);
@@ -25,6 +29,8 @@ void load_vaults();
 
 extern struct index_data *obj_index;
 extern struct vault_data *vault_table;
+extern Leaderboard leaderboard;
+
 
 CVoteData *DCVote;
 bool verbose_mode = FALSE;
@@ -329,6 +335,8 @@ bool my_load_char_obj(struct descriptor_data *d, const char *name)
 
   if (fpsave != NULL)
     dc_fclose(fpsave);
+
+  DC::instance().character_list.insert(ch);
   return TRUE;
 }
 
@@ -476,8 +484,28 @@ int main(int argc, char **argv)
       chdir(dclib.c_str());
     }
   }
-  //log("Generating object indices/loading all objects", 0, LOG_MISC);
-  generate_obj_indices(&top_of_objt, obj_index);
+  
+  log("Loading the zones", 0, LOG_MISC);
+	boot_zones();
+
+	log("Loading the world.", 0, LOG_MISC);
+	world_array = (room_data **)realloc(world_array, 2000 * sizeof(room_data *));
+	extern int top_of_world_alloc;
+  top_of_world_alloc = 2000;
+	// clear it (realloc = malloc, not calloc)
+	for (int counter = 0; counter < top_of_world_alloc; counter++)
+		world_array[counter] = 0;
+
+	boot_world();
+
+	log("Renumbering the world.", 0, LOG_MISC);
+	renum_world();
+
+	log("Generating object indices/loading all objects", 0, LOG_MISC);
+	generate_obj_indices(&top_of_objt, obj_index);
+
+	log("renumbering zone table", 0, LOG_MISC);
+	renum_zone_table();
 
   struct descriptor_data *d = new descriptor_data;
   memset(d, 0, sizeof(descriptor_data));
@@ -495,55 +523,81 @@ int main(int argc, char **argv)
     vnum = atoi(argv[2]);
   }
 
-  if (argv[1] == string("all"))
+    d = new descriptor_data;
+    memset(d, 0, sizeof(descriptor_data));
+    char_data* ch = new char_data;
+    memset(ch, 0, sizeof(char_data));
+    ch->pcdata = new pc_data;
+    memset(ch->pcdata, 0, sizeof(pc_data));
+
+    ch->desc = d;
+    ch->level = 110;
+    d->descriptor = 1;
+    d->character = ch;
+    d->output = d->small_outbuf;
+    do_stand(ch, "", CMD_DEFAULT);
+    char_to_room(ch, 3001);
+    do_toggle(ch, "pager", CMD_DEFAULT);
+    do_toggle(ch, "ansi", CMD_DEFAULT);
+    do_toggle(ch, "", CMD_DEFAULT);
+    //do_goto(ch, "23", CMD_DEFAULT);
+    do_look(ch, "", CMD_LOOK);
+    process_output(d);
+
+  if (argv[1] == string("all") || argv[1] == string("leaderboard"))
   {
+    obj_data *obj = nullptr;
     string savepath = dclib + "../save/";
     for (const auto &entry : filesystem::directory_iterator(savepath))
     {
       if (entry.is_directory() && entry.path() != "../save/qdata" && entry.path() != "../save/deleted")
       {
         for (const auto &pfile : filesystem::directory_iterator(entry.path().c_str()))
-        {
-          memset(d, 0, sizeof(descriptor_data));
+        {          
           
           //cout << pfile.path().c_str() << endl;
 
           try
           {
-            obj_data *obj;
-            my_load_char_obj(d, pfile.path().c_str());
-
-            char_data *ch = d->character;
-            for (int iWear = 0; iWear < MAX_WEAR; iWear++)
+            string path = pfile.path().string();
+            path.erase(0, path.find_last_of('/')+1);            
+            do_linkload(ch, path.data(), CMD_DEFAULT);
+            process_output(d);
+            
+            if (argv[1] == string("all"))
             {
-              if (ch->equipment[iWear])
+              char_data *ch = d->character;
+              for (int iWear = 0; iWear < MAX_WEAR; iWear++)
               {
-                obj = ch->equipment[iWear];
-                if (obj)
+                if (ch->equipment[iWear])
                 {
-                  if (vnum > 0 && obj_index[obj->item_number].virt == vnum)
+                  obj = ch->equipment[iWear];
+                  if (obj)
                   {
-                    showObject(ch, obj);
+                    if (vnum > 0 && obj_index[obj->item_number].virt == vnum)
+                    {
+                      showObject(ch, obj);
+                    }
                   }
+
+                }
+              }
+
+              for (obj_data *obj = ch->carrying; obj; obj = obj->next_content)
+              {
+                if (vnum == 0 || (vnum > 0 && obj_index[obj->item_number].virt == vnum))
+                {
+                  showObject(ch, obj);
                 }
 
-              }
-            }
-
-            for (obj_data *obj = ch->carrying; obj; obj = obj->next_content)
-            {
-              if (vnum == 0 || (vnum > 0 && obj_index[obj->item_number].virt == vnum))
-              {
-                showObject(ch, obj);
-              }
-
-              if (GET_OBJ_TYPE(obj) == ITEM_CONTAINER && obj->contains)
-              {
-                for (obj_data *container = obj->contains; container; container = container->next_content)
+                if (GET_OBJ_TYPE(obj) == ITEM_CONTAINER && obj->contains)
                 {
-                  if (vnum > 0 && obj_index[container->item_number].virt == vnum)
+                  for (obj_data *container = obj->contains; container; container = container->next_content)
                   {
-                    showObject(ch, container);
+                    if (vnum > 0 && obj_index[container->item_number].virt == vnum)
+                    {
+                      showObject(ch, container);
+                    }
                   }
                 }
               }
@@ -555,6 +609,48 @@ int main(int argc, char **argv)
         }
       }
     }
+    
+    do_leaderboard(ch, "scan", CMD_DEFAULT);
+    process_output(d);
+    do_leaderboard(ch, "", CMD_DEFAULT);
+    process_output(d);
+/*
+    multimap<int32, string> hp_leaders;
+    for (auto& ch : DC::instance().character_list)
+    {
+      if (IS_PC(ch))
+      {
+        hp_leaders.insert(pair<int32,string>(ch->max_hit, ch->name));
+      }
+    }
+
+    queue<pair<int32,string>> top_hp_leaders;
+    for (auto& l : hp_leaders)
+    {
+      //cout << l.first << " " << l.second << endl;
+      top_hp_leaders.push(l);
+      if (top_hp_leaders.size() > 5)
+      {
+        top_hp_leaders.pop();
+      }
+    }
+
+    unsigned int placement = 0;
+    while (top_hp_leaders.size() > 0)
+    {
+      cout << top_hp_leaders.front().first << " " << top_hp_leaders.front().second << endl;
+      leaderboard.setHP(placement++, top_hp_leaders.front().second, top_hp_leaders.front().first);
+      top_hp_leaders.pop();
+    }
+*/
+
+
+    //leaderboard.check_offline();
+    //cout << DC::instance().character_list.size() << endl;
+    //do_leaderboard(ch, "", CMD_DEFAULT);
+    //process_output(d);
+    exit(0);
+
 
     struct vault_data *vault;
 
