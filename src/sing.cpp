@@ -153,7 +153,7 @@ TAR_IGNORE, 2, song_vigilant_siren, execute_song_vigilant_siren, pulse_vigilant_
 SKILL_INCREASE_HARD },
 
 { /* 20 */
-30, POSITION_RESTING, 10, SKILL_SONG_ASTRAL_CHANTY,
+17, POSITION_RESTING, 10, SKILL_SONG_ASTRAL_CHANTY,
 TAR_CHAR_WORLD, 3, song_astral_chanty, execute_song_astral_chanty, pulse_song_astral_chanty, NULL, SKILL_INCREASE_HARD },
 
 { /* 21 */
@@ -190,7 +190,7 @@ TAR_IGNORE, 3, song_mking_charge, execute_song_mking_charge, pulse_mking_charge,
 20, POSITION_RESTING, 8, SKILL_SONG_SUBMARINERS_ANTHEM,
 TAR_IGNORE, 1, song_submariners_anthem, execute_song_submariners_anthem,
 NULL, NULL, SKILL_INCREASE_MEDIUM }, { /* 30 */
-20, POSITION_STANDING, 20, SKILL_SONG_SUMMONING_SONG,
+12, POSITION_STANDING, 20, SKILL_SONG_SUMMONING_SONG,
 TAR_IGNORE, 2, song_summon_song, execute_song_summon_song, NULL,
 NULL, SKILL_INCREASE_MEDIUM }, };
 
@@ -1500,7 +1500,7 @@ int song_astral_chanty(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim,
 		if ((*i).song_number == SKILL_SONG_ASTRAL_CHANTY - SKILL_SONG_BASE)
 			break;
 
-	(*i).song_timer = song_info[(*i).song_number].beats - (3 + skill / 8);
+	(*i).song_timer = song_info[(*i).song_number].beats - (skill / 10);
 
 	// Store it for later, since we can't store the vict pointer
 	(*i).song_data = str_dup(arg);
@@ -2015,7 +2015,7 @@ int song_summon_song(ubyte level, CHAR_DATA *ch, char *Aag, CHAR_DATA *victim, i
 		if ((*i).song_number == SKILL_SONG_SUMMONING_SONG - SKILL_SONG_BASE)
 			break;
 
-	(*i).song_timer = song_info[(*i).song_number].beats - (1 + skill / 10);
+	(*i).song_timer = song_info[(*i).song_number].beats - (skill / 10);
 
 	return eSUCCESS;
 }
