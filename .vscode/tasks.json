@@ -26,7 +26,7 @@
         {
             "label": "scons debug=1 -C src -j 128",
             "type": "shell",
-            "command": "scons -C src -c; scons debug=1 -C src -j 128",
+            "command": "scons debug=1 -C src -j 128;killall -HUP dcastle",
             "problemMatcher": {
                 "base": "$gcc",
                 "fileLocation": [
