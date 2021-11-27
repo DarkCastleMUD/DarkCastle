@@ -4517,6 +4517,11 @@ bool isPaused(char_data *mob)
 		return false;
 	}
 
+	if (!charExists(mob))
+	{
+		return false;
+	}
+
 	if (mob->mobdata == nullptr || mob->mobdata == (mob_data *)0x95959595)
 	{
 		return false;
