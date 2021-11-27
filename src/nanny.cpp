@@ -1409,7 +1409,7 @@ void nanny(struct descriptor_data *d, string arg)
          return;
       }
 
-      if (!allowed_host(d->host) || !DC::instance().cf.allow_newstatsys)
+      if (!allowed_host(d->host) && DC::instance().cf.allow_newstatsys == false)
       {
          STATE(d) = conn::OLD_STAT_METHOD;
          break;
@@ -1529,9 +1529,9 @@ void nanny(struct descriptor_data *d, string arg)
    case conn::OLD_STAT_METHOD:
       if (ch->desc->stats != nullptr)
       {
-         free(ch->desc->stats);
+         delete ch->desc->stats;
       }
-      ch->desc->stats = (struct stat_data *)dc_alloc(1, sizeof(struct stat_data));
+      ch->desc->stats = new stat_data;
 
       STATE(d) = conn::OLD_CHOOSE_STATS;
       arg.clear();
@@ -2692,29 +2692,34 @@ void show_question_race(descriptor_data *d)
 
    char_data* ch = d->character;
    string buffer, races_buffer;
+   /*
    ch->saves[SAVE_TYPE_FIRE] += RACE_HUMAN_FIRE_MOD;
    ch->saves[SAVE_TYPE_COLD] += RACE_HUMAN_COLD_MOD;
    ch->saves[SAVE_TYPE_ENERGY] += RACE_HUMAN_ENERGY_MOD;
    ch->saves[SAVE_TYPE_ACID] += RACE_HUMAN_ACID_MOD;
    ch->saves[SAVE_TYPE_MAGIC] += RACE_HUMAN_MAGIC_MOD;
    ch->saves[SAVE_TYPE_POISON] += RACE_HUMAN_POISON_MOD;
+   */
+
    buffer += "\r\nRacial Bonuses and Pentalties:\r\n";
    buffer += "$B$7   Race   STR DEX CON INT WIS$R\r\n";
    for(int race=1; race <= 9; race++)
       {
+         /*
          GET_RAW_STR(ch) = 0;
          GET_RAW_DEX(ch) = 0;
          GET_RAW_CON(ch) = 0;
          GET_RAW_INT(ch) = 0;
          GET_RAW_WIS(ch) = 0;
          GET_ALIGNMENT(ch) = 0;
+         */
          //apply_race_attributes(ch, race);
-         do_inate_race_abilities(ch);
+         //do_inate_race_abilities(ch);
          if (races[race].singular_name != nullptr)
          {
-            buffer += fmt::format("{}. {:6} {:3} {:3} {:3} {:3} {:3}\r\n",
-            race, races[race].singular_name,
-            races[race].mod_str, races[race].mod_dex, races[race].mod_con,  races[race].mod_int, races[race].mod_wis);
+            buffer += fmt::format("{}. {:6} {:3} {:3} {:3} {:3} {:3}\r\n", race, races[race].singular_name,
+                                  races[race].mod_str, races[race].mod_dex, races[race].mod_con, races[race].mod_int,
+                                  races[race].mod_wis);
             races_buffer += races[race].lowercase_name;
             if (race < MAX_PC_RACE)
             {
@@ -2759,6 +2764,7 @@ bool handle_get_race(descriptor_data* d, string arg)
    }
 
    GET_RACE(d->character) = race;
+   apply_race_attributes(d->character);
 
    return true;
 }
@@ -2864,105 +2870,39 @@ void show_question_stats(descriptor_data *d)
       d->stats = new stat_data;
 
       char_data* ch = d->character;
+      int32 race = ch->race;
       // Current
       d->stats->str[0] = 12;
       d->stats->dex[0] = 12;
       d->stats->con[0] = 12;
       d->stats->tel[0] = 12;
-      d->stats->wis[0] = 12;
-   
-      // Minimums
-      d->stats->str[1] = 12;
-      d->stats->dex[1] = 12;
-      d->stats->con[1] = 12;
-      d->stats->tel[1] = 12;
-      d->stats->wis[1] = 12;
-   
+      d->stats->wis[0] = 12;      
       d->stats->points = 23;
 
-      int str_needed=0, dex_needed=0, con_needed=0, int_needed=0, wis_needed=0;
-
-      switch (GET_RACE(ch))
-      {         
-         case 1:
-         break;
-
-         case RACE_ELVEN:
-            dex_needed = (10 - d->stats->dex[0] + RACE_ELVEN_DEX_MOD);
-            if (dex_needed > 0)
-            {
-               d->stats->points -= dex_needed;
-               d->stats->dex[0] += dex_needed;
-            }
-            int_needed = (10 - d->stats->tel[0] + RACE_ELVEN_INT_MOD);
-            if (int_needed > 0)
-            {
-               d->stats->points -= int_needed;
-               d->stats->tel[0] += int_needed;
-            }
-            break;
-
-         case RACE_DWARVEN:
-            con_needed = (10 - d->stats->con[0] + races[RACE_DWARVEN].mod_con);
-            if (con_needed > 0)
-            {
-               d->stats->points -= con_needed;
-               d->stats->con[0] += con_needed;
-            }
-            wis_needed = (10 - d->stats->wis[0] + races[RACE_DWARVEN].mod_wis);
-            if (wis_needed > 0)
-            {
-               d->stats->points -= wis_needed;
-               d->stats->wis[0] += wis_needed;
-            }
-            break;
-
-         case 4:
-            if (GET_RAW_DEX(ch) < 10)
-            {
-             
-            }
-            ch->race = RACE_HOBBIT;
-            break;
-
-         case 5:
-            if (GET_RAW_INT(ch) < 12)
-            {
-            }
-            ch->race = RACE_PIXIE;            
-            break;
-
-         case 6:
-            if (GET_RAW_STR(ch) < 12)
-            {         
-            }
-            ch->race = RACE_GIANT;           
-            break;
-
-         case 7:
-            if (GET_RAW_WIS(ch) < 12)
-            {
-            
-            }
-            ch->race = RACE_GNOME;            
-            break;
-
-         case 8:
-            if (GET_RAW_CON(ch) < 10 || GET_RAW_STR(ch) < 10)
-            {
-            
-            }
-            ch->race = RACE_ORC;
-            ch->alignment = -1000;            
-            break;
-         case 9:
-            if (GET_RAW_CON(ch) < 12)
-            {
-            
-            }
-            ch->race = RACE_TROLL;
-            ch->alignment = 0;            
-            break;
+      if (races[race].min_str > d->stats->str[0])
+      {
+         d->stats->points -= races[race].min_str -  d->stats->str[0];
+         d->stats->str[0] = races[race].min_str;
+      }
+      if (races[race].min_dex > d->stats->dex[0])
+      {
+         d->stats->points -= races[race].min_dex -  d->stats->dex[0];
+         d->stats->dex[0] = races[race].min_dex;
+      }
+      if (races[race].min_con > d->stats->con[0])
+      {
+         d->stats->points -= races[race].min_con -  d->stats->con[0];
+         d->stats->con[0] = races[race].min_con;
+      }
+      if (races[race].min_int > d->stats->tel[0])
+      {
+         d->stats->points -= races[race].min_int -  d->stats->tel[0];
+         d->stats->tel[0] = races[race].min_int;
+      }
+      if (races[race].min_wis > d->stats->wis[0])
+      {
+         d->stats->points -= races[race].min_wis -  d->stats->wis[0];
+         d->stats->wis[0] = races[race].min_wis;
       }
    }
 
@@ -3251,4 +3191,14 @@ bool check_race_attributes(char_data *ch, int race)
    }
 
    return false;
+}
+
+stat_data::stat_data(void)
+: min_str(0), min_dex(0), min_con(0), min_int(0), min_wis(0), points(0), selection(0)
+{
+   memset(str, 0, sizeof(str));
+   memset(dex, 0, sizeof(dex));
+   memset(con, 0, sizeof(con));
+   memset(tel, 0, sizeof(tel));
+   memset(wis, 0, sizeof(wis));
 }

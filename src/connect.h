@@ -63,10 +63,14 @@ enum conn
 
 #define MAX_RAW_INPUT_LENGTH  512
 
-struct stat_data
-{   
+class stat_data
+{
+public:
+  stat_data();
   int str[5], tel[5], wis[5], dex[5], con[5];
+  int min_str, min_int, min_wis, min_dex, min_con;
   unsigned int points;
+  unsigned int selection;
 };
 
 struct descriptor_data {
@@ -105,7 +109,7 @@ struct descriptor_data {
   char small_outbuf[SMALL_BUFSIZE];
   ubyte idle_tics;
   time_t login_time;
-  struct stat_data *stats;            // for rolling up a char
+  stat_data *stats;            // for rolling up a char
 
   char **strnew; /* for the modify-str system	*/
   char *backstr;
