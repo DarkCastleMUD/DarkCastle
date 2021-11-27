@@ -1,12 +1,10 @@
-extern "C"
-{
 #include <signal.h>
 #include <stdio.h>
 #include <ctype.h>
-#include <string.h>
+#include <cstring>
 #include <time.h>
 #include <stdlib.h>
-}
+
 
 #include "connect.h" // descriptor_data
 #include "character.h"
@@ -20,6 +18,11 @@ extern "C"
 #include "db.h"
 #include "newedit.h"
 
+#include <string>
+#include <fmt/format.h>
+
+using namespace std;
+
 // send_to_char("Write your note.  (/s saves /h for help)
 void new_edit_board_unlock_board(CHAR_DATA *ch, int abort);
 void format_text(char **ptr_string, int mode, struct descriptor_data *d, int maxlen);
@@ -27,11 +30,12 @@ int replace_str(char **string, char *pattern, char *replacement, int rep_all, in
 void check_for_awaymsgs(char_data *);
 
 /*  handle some editor commands */
-void parse_action(int command, char *string, struct descriptor_data *d) {
+void parse_action(int command, char *str, struct descriptor_data *d) {
    int indent = 0, rep_all = 0, flags = 0, total_len, replaced;
    int j = 0;
    int i, line_low, line_high;
    char *s, *t, temp, buf[32768], buf2[32768];
+   string sbuffer;
    
    switch (command) { 
     case PARSE_HELP: 
@@ -54,8 +58,8 @@ void parse_action(int command, char *string, struct descriptor_data *d) {
       SEND_TO_Q(buf, d);
       break;
     case PARSE_FORMAT: 
-      while (isalpha(string[j]) && j < 2) {
-       switch (string[j]) {
+      while (isalpha(str[j]) && j < 2) {
+       switch (str[j]) {
         case 'i':
           if (!indent) {
              indent = 1;
@@ -72,8 +76,8 @@ void parse_action(int command, char *string, struct descriptor_data *d) {
       SEND_TO_Q(buf, d);
       break;    
     case PARSE_REPLACE: 
-      while (isalpha(string[j]) && j < 2) {
-       switch (string[j]) {
+      while (isalpha(str[j]) && j < 2) {
+       switch (str[j]) {
         case 'a':
           if (!indent) {
              rep_all = 1;
@@ -84,7 +88,7 @@ void parse_action(int command, char *string, struct descriptor_data *d) {
        }     
        j++;
       }
-      s = strtok(string, "'");
+      s = strtok(str, "'");
       if (s == NULL) {
        SEND_TO_Q("Invalid format.\r\n", d);
        return;
@@ -122,7 +126,7 @@ void parse_action(int command, char *string, struct descriptor_data *d) {
       }
       break;
     case PARSE_DELETE:
-      switch (sscanf(string, " %d - %d ", &line_low, &line_high)) {
+      switch (sscanf(str, " %d - %d ", &line_low, &line_high)) {
        case 0:
        SEND_TO_Q("You must specify a line number or range to delete.\r\n", d);
        return;
@@ -181,8 +185,8 @@ void parse_action(int command, char *string, struct descriptor_data *d) {
       /* note: my buf,buf1,buf2 vars are defined at 32k sizes so they
        * are prolly ok fer what i want to do here. */
       *buf = '\0';
-      if (*string != '\0')
-      switch (sscanf(string, " %d - %d ", &line_low, &line_high)) {
+      if (*str != '\0')
+      switch (sscanf(str, " %d - %d ", &line_low, &line_high)) {
        case 0:
          line_low = 1;
          line_high = 999999;
@@ -246,8 +250,8 @@ void parse_action(int command, char *string, struct descriptor_data *d) {
       /* note: my buf,buf1,buf2 vars are defined at 32k sizes so they
        * are prolly ok fer what i want to do here. */
       *buf = '\0';
-      if (*string != '\0')
-      switch (sscanf(string, " %d - %d ", &line_low, &line_high)) {
+      if (*str != '\0')
+      switch (sscanf(str, " %d - %d ", &line_low, &line_high)) {
        case 0:
          line_low = 1;
          line_high = 999999;
@@ -291,7 +295,9 @@ void parse_action(int command, char *string, struct descriptor_data *d) {
          s++;
          temp = *s;
          *s = '\0';
-         sprintf(buf, "%s%4d: ", buf, (i-1));
+         sbuffer = fmt::format("{}{:4}: ", buf, (i-1));
+         strncpy(buf, sbuffer.c_str(), sizeof(buf)-1);
+         buf[sizeof(buf)-1] = 0;
          strncat(buf, t, 32768-strlen(buf)-1);
          *s = temp;
          t = s;
@@ -312,7 +318,7 @@ void parse_action(int command, char *string, struct descriptor_data *d) {
       break;
 
     case PARSE_INSERT:
-      half_chop(string, buf, buf2);
+      half_chop(str, buf, buf2);
       if (*buf == '\0') {
        SEND_TO_Q("You must specify a line number before which to insert text.\r\n", d);
        return;
@@ -358,7 +364,7 @@ void parse_action(int command, char *string, struct descriptor_data *d) {
       break;
 
     case PARSE_EDIT:
-      half_chop(string, buf, buf2);
+      half_chop(str, buf, buf2);
       if (*buf == '\0') {
        SEND_TO_Q("You must specify a line number at which to change text.\r\n", d);
        return;
