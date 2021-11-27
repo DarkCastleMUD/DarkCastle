@@ -5,6 +5,7 @@
     //valgrind --vgdb=yes --vgdb-error=0 ./dcastle -d ~/dcastle/lib/
     "version": "0.2.0",
     "configurations": [
+
         {
             "name": "(gdb) Launch",
             "type": "cppdbg",
@@ -22,8 +23,7 @@
                     "description": "Enable pretty-printing for gdb",
                     "text": "-enable-pretty-printing",
                     "ignoreFailures": true
-                }
-            ]
+                }            ]
         },
         {
             "name": "(gdb) Launch tests only",
@@ -77,6 +77,26 @@
             "args": ["${workspaceFolder}/../../dcastle/save/J/Julian"], 
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}/../../dcastle/lib",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "logging": { "engineLogging": true, "trace": true, "traceResponse": true },
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
+            "name": "(gdb) showplayerxp leaderboard",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/showplayer",
+            "args": ["leaderboard"], 
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/../../dcastle.6969/lib",
             "environment": [],
             "externalConsole": false,
             "MIMode": "gdb",
