@@ -884,6 +884,16 @@ void roll_and_display_stats(CHAR_DATA *ch)
       ch->desc->stats->wis[x] = MAX(12 + number(0, 1), MAX(a, b));
    }
 
+   /*
+   For testing purposes
+   ch->desc->stats->str[0] = 13;
+   ch->desc->stats->dex[0] = 14;
+   ch->desc->stats->con[0] = 13;
+   ch->desc->stats->tel[0] = 12;
+   ch->desc->stats->wis[0] = 14;
+   */
+
+
    SEND_TO_Q("\n\r  Choose from any of the following groups of abilities...     \n\r", ch->desc);
 
    SEND_TO_Q("Group: 1     2     3     4     5\n\r", ch->desc);
@@ -2692,29 +2702,10 @@ void show_question_race(descriptor_data *d)
 
    char_data* ch = d->character;
    string buffer, races_buffer;
-   /*
-   ch->saves[SAVE_TYPE_FIRE] += RACE_HUMAN_FIRE_MOD;
-   ch->saves[SAVE_TYPE_COLD] += RACE_HUMAN_COLD_MOD;
-   ch->saves[SAVE_TYPE_ENERGY] += RACE_HUMAN_ENERGY_MOD;
-   ch->saves[SAVE_TYPE_ACID] += RACE_HUMAN_ACID_MOD;
-   ch->saves[SAVE_TYPE_MAGIC] += RACE_HUMAN_MAGIC_MOD;
-   ch->saves[SAVE_TYPE_POISON] += RACE_HUMAN_POISON_MOD;
-   */
-
    buffer += "\r\nRacial Bonuses and Pentalties:\r\n";
    buffer += "$B$7   Race   STR DEX CON INT WIS$R\r\n";
    for(int race=1; race <= 9; race++)
       {
-         /*
-         GET_RAW_STR(ch) = 0;
-         GET_RAW_DEX(ch) = 0;
-         GET_RAW_CON(ch) = 0;
-         GET_RAW_INT(ch) = 0;
-         GET_RAW_WIS(ch) = 0;
-         GET_ALIGNMENT(ch) = 0;
-         */
-         //apply_race_attributes(ch, race);
-         //do_inate_race_abilities(ch);
          if (races[race].singular_name != nullptr)
          {
             buffer += fmt::format("{}. {:6} {:3} {:3} {:3} {:3} {:3}\r\n", race, races[race].singular_name,
@@ -2778,12 +2769,10 @@ void show_question_class(descriptor_data *d)
 
    char_data* ch = d->character;
    string buffer, classes_buffer;
-   buffer += "\r\n   Class  Minimum STR DEX CON INT WIS$R\r\n";
+   buffer += "\r\n   Class$R\r\n";
    int clss;
    for(clss=1; clss <= CLASS_MAX_PROD; clss++)
    {
-      //apply_race_attributes(ch, race);
-      //do_inate_race_abilities(ch);
       if (pc_clss_types[clss] != nullptr)
       {
          if (!is_clss_race_compat(ch, clss, GET_RACE(ch)))
@@ -2858,6 +2847,30 @@ bool handle_get_class(descriptor_data* d, string arg)
    return true;
 }
 
+uint8_t stat_data::getMin(uint8_t cur, int8_t race_mod, uint8_t min)
+{
+   if (min > cur + race_mod)
+   {
+      uint8_t points_needed = min - (cur + race_mod);
+      if (points > points_needed)
+      {
+         points -= points_needed;
+         cur += points_needed;
+      }
+   }
+
+   return cur;
+}
+
+void stat_data::setMin(void)
+{
+   str[0] = getMin(str[0], races[race].mod_str, MAX(races[race].min_str, classes[clss].min_str));
+   dex[0] = getMin(dex[0], races[race].mod_dex, MAX(races[race].min_dex, classes[clss].min_dex));
+   con[0] = getMin(con[0], races[race].mod_con, MAX(races[race].min_con, classes[clss].min_con));
+   tel[0] = getMin(tel[0], races[race].mod_int, MAX(races[race].min_int, classes[clss].min_int));
+   wis[0] = getMin(wis[0], races[race].mod_wis, MAX(races[race].min_wis, classes[clss].min_wis));
+}
+
 void show_question_stats(descriptor_data *d)
 {
    if (d == nullptr || d->character == nullptr)
@@ -2870,67 +2883,245 @@ void show_question_stats(descriptor_data *d)
       d->stats = new stat_data;
 
       char_data* ch = d->character;
-      int32 race = ch->race;
+      int32 race = d->stats->race = GET_RACE(ch);
+      sbyte clss = d->stats->clss = GET_CLASS(ch);
+
       // Current
       d->stats->str[0] = 12;
       d->stats->dex[0] = 12;
       d->stats->con[0] = 12;
       d->stats->tel[0] = 12;
-      d->stats->wis[0] = 12;      
+      d->stats->wis[0] = 12;
+
       d->stats->points = 23;
 
-      if (races[race].min_str > d->stats->str[0])
-      {
-         d->stats->points -= races[race].min_str -  d->stats->str[0];
-         d->stats->str[0] = races[race].min_str;
-      }
-      if (races[race].min_dex > d->stats->dex[0])
-      {
-         d->stats->points -= races[race].min_dex -  d->stats->dex[0];
-         d->stats->dex[0] = races[race].min_dex;
-      }
-      if (races[race].min_con > d->stats->con[0])
-      {
-         d->stats->points -= races[race].min_con -  d->stats->con[0];
-         d->stats->con[0] = races[race].min_con;
-      }
-      if (races[race].min_int > d->stats->tel[0])
-      {
-         d->stats->points -= races[race].min_int -  d->stats->tel[0];
-         d->stats->tel[0] = races[race].min_int;
-      }
-      if (races[race].min_wis > d->stats->wis[0])
-      {
-         d->stats->points -= races[race].min_wis -  d->stats->wis[0];
-         d->stats->wis[0] = races[race].min_wis;
-      }
+      d->stats->setMin();
    }
 
    char_data* ch = d->character;
    unsigned race = GET_RACE(ch);
-   string buffer = fmt::format("Race: {}\r\n", races[GET_RACE(ch)].singular_name);
-   buffer += fmt::format("Class: {}\r\n", pc_clss_types[GET_CLASS(ch)]);
+   unsigned clss = GET_CLASS(ch);
+   string buffer = fmt::format("\r\nRace: {}\r\n", races[race].singular_name);
+   buffer += fmt::format("Class: {}\r\n", classes[clss].name);
    buffer += fmt::format("Points left to assign: {}\r\n", d->stats->points);
    buffer += fmt::format("## Attribute    Current  Racial Offsets  Total\r\n");
-   buffer += fmt::format("1. Strength     {:2}      {:2}               {:2}\r\n",
-   d->stats->str[0], races[race].mod_str, d->stats->str[0] + races[race].mod_str);
-   buffer += fmt::format("2. Dexterity    {:2}      {:2}               {:2}\r\n",
-   d->stats->dex[0], races[race].mod_dex, d->stats->dex[0] + races[race].mod_dex);
-   buffer += fmt::format("3. Constitution {:2}      {:2}               {:2}\r\n",
-   d->stats->con[0], races[race].mod_con, d->stats->con[0] + races[race].mod_con);
-   buffer += fmt::format("4. Intelligence {:2}      {:2}               {:2}\r\n",
-   d->stats->tel[0], races[race].mod_int, d->stats->tel[0] + races[race].mod_int);
-   buffer += fmt::format("5. Wisdom       {:2}      {:2}               {:2}\r\n",
-   d->stats->wis[0], races[race].mod_wis, d->stats->wis[0] + races[race].mod_wis);
+   if (d->stats->selection == 1)
+   {
+      buffer += fmt::format("1. $B*Strength*$R     {:2}      {:2}               {:2}\r\n",
+      d->stats->str[0], races[race].mod_str, d->stats->str[0] + races[race].mod_str);
+   }
+   else
+   {
+      buffer += fmt::format("1. Strength       {:2}      {:2}               {:2}\r\n",
+      d->stats->str[0], races[race].mod_str, d->stats->str[0] + races[race].mod_str);
+   }
 
+   if (d->stats->selection == 2)
+   {
+      buffer += fmt::format("2. $B*Dexterity*$R    {:2}      {:2}               {:2}\r\n",
+      d->stats->dex[0], races[race].mod_dex, d->stats->dex[0] + races[race].mod_dex);
+   } else
+   {
+      buffer += fmt::format("2. Dexterity      {:2}      {:2}               {:2}\r\n",
+      d->stats->dex[0], races[race].mod_dex, d->stats->dex[0] + races[race].mod_dex);
+
+   }
+
+   if (d->stats->selection == 3)
+   {
+      buffer += fmt::format("3. $B*Constitution*$R {:2}      {:2}               {:2}\r\n",
+      d->stats->con[0], races[race].mod_con, d->stats->con[0] + races[race].mod_con);
+   }
+   else
+   {
+      buffer += fmt::format("3. Constitution   {:2}      {:2}               {:2}\r\n",
+      d->stats->con[0], races[race].mod_con, d->stats->con[0] + races[race].mod_con);
+   }
+
+   if (d->stats->selection == 4)
+   {
+      buffer += fmt::format("4. $B*Intelligence*$R {:2}      {:2}               {:2}\r\n",
+      d->stats->tel[0], races[race].mod_int, d->stats->tel[0] + races[race].mod_int);
+   }
+   else
+   {
+      buffer += fmt::format("4. Intelligence   {:2}      {:2}               {:2}\r\n",
+      d->stats->tel[0], races[race].mod_int, d->stats->tel[0] + races[race].mod_int);
+
+   }
+
+   if (d->stats->selection == 5)
+   {
+      buffer += fmt::format("5. $B*Wisdom*$R       {:2}      {:2}               {:2}\r\n",
+      d->stats->wis[0], races[race].mod_wis, d->stats->wis[0] + races[race].mod_wis);
+   }
+   else
+   {
+      buffer += fmt::format("5. Wisdom         {:2}      {:2}               {:2}\r\n",
+      d->stats->wis[0], races[race].mod_wis, d->stats->wis[0] + races[race].mod_wis);
+   }
+
+   if (d->stats->selection == 0)
+   {
+      buffer += "Type 1-5,help keyword> ";
+   }
+   else if (d->stats->points > 0)
+   {
+      buffer += "Type +,-,1-5,help keyword,confirm> ";
+   }
+   else
+   {
+      buffer += "Type -,1-5,help keyword,confirm> ";
+   }
    SEND_TO_Q(buffer.c_str(), d);
+   telnet_ga(d);
 }
 
 bool handle_get_stats(descriptor_data* d, string arg)
 {
+   if (arg != "+" && arg != "-" && arg != "confirm")
+   {
+      try 
+      {
+         d->stats->selection = stoul(arg);
+      } catch (...)
+      {
+         d->stats->selection = 0;
+         SEND_TO_Q("Invalid number specified.\r\n", d);
+      }
+      return false;
+   }
+
+   if (d->stats->selection > 0 && d->stats->selection < 6)
+   {
+      if (arg == "+")
+      {
+         if (d->stats->points > 0)
+         {
+            switch(d->stats->selection)
+            {
+               case 1: // STR
+               if (d->stats->str[0] < races[d->character->race].max_str)
+               {
+                  d->stats->str[0]++;
+                  d->stats->points--;
+               }
+               break;
+
+               case 2: // DEX
+               if (d->stats->dex[0] < races[d->character->race].max_dex)
+               {
+                  d->stats->dex[0]++;
+                  d->stats->points--;
+               }
+               break;
+               case 3: // CON
+               if (d->stats->con[0] < races[d->character->race].max_con)
+               {
+                  d->stats->con[0]++;
+                  d->stats->points--;
+               }
+               break;
+               case 4: // INT
+               if (d->stats->tel[0] < races[d->character->race].max_int)
+               {
+                  d->stats->tel[0]++;
+                  d->stats->points--;
+               }
+               break;
+               case 5: // WIS
+               if (d->stats->wis[0] < races[d->character->race].max_wis)
+               {
+                  d->stats->wis[0]++;
+                  d->stats->points--;
+               }
+               break;
+            }
+            
+         }
+      }
+      else if (arg == "-")
+      {
+            switch(d->stats->selection)
+            {
+               case 1: // STR
+               if (d->stats->str[0] > 12)
+               {
+                  d->stats->str[0]--;
+                  d->stats->points++;
+               }
+               break;
+
+               case 2: // DEX
+               if (d->stats->dex[0] > 12)
+               {
+                  d->stats->dex[0]--;
+                  d->stats->points++;
+               }
+               break;
+               case 3: // CON
+               if (d->stats->con[0] > 12)
+               {
+                  d->stats->con[0]--;
+                  d->stats->points++;
+               }
+               break;
+               case 4: // INT
+               if (d->stats->tel[0] > 12)
+               {
+                  d->stats->tel[0]--;
+                  d->stats->points++;
+               }
+               break;
+               case 5: // WIS
+               if (d->stats->wis[0] > 12)
+               {
+                  d->stats->wis[0]--;
+                  d->stats->points++;
+               }
+               break;
+            }
+            d->stats->setMin();
+      }
+      else if (arg.find("help") == 0)
+      {
+         arg.erase(0,5);
+         do_help(d->character, arg.data(), CMD_DEFAULT);
+         return false;
+      }
+      else if (arg == "confirm")
+      {
+         if (d->stats->points > 0)
+         {
+            SEND_TO_Q("You must assign all your points first.\r\n", d);
+            //return false;
+         }
+
+         char_data* ch = d->character;
+         unsigned race = GET_RACE(ch);
+         GET_RAW_STR(ch) = d->stats->str[0];
+         GET_RAW_DEX(ch) = d->stats->dex[0];
+         GET_RAW_CON(ch) = d->stats->con[0];
+         GET_RAW_INT(ch) = d->stats->tel[0];
+         GET_RAW_WIS(ch) = d->stats->wis[0];
+         apply_race_attributes(ch);
+
+         if (GET_CLASS(ch) == CLASS_ANTI_PAL)
+         {
+            GET_ALIGNMENT(ch) = -1000;
+         }
+         else if (GET_CLASS(ch) == CLASS_PALADIN)
+         {
+            GET_ALIGNMENT(ch) = 1000;
+         }
+
+         return true;
+      }
+
+   }
+
    return false;
 }
-
 
 
 bool apply_race_attributes(char_data *ch, int race)
@@ -3194,7 +3385,7 @@ bool check_race_attributes(char_data *ch, int race)
 }
 
 stat_data::stat_data(void)
-: min_str(0), min_dex(0), min_con(0), min_int(0), min_wis(0), points(0), selection(0)
+: min_str(0), min_dex(0), min_con(0), min_int(0), min_wis(0), points(0), selection(0), race(0), clss(0)
 {
    memset(str, 0, sizeof(str));
    memset(dex, 0, sizeof(dex));
