@@ -1419,11 +1419,13 @@ void nanny(struct descriptor_data *d, string arg)
          return;
       }
 
+/*
       if (!allowed_host(d->host) && DC::instance().cf.allow_newstatsys == false)
       {
          STATE(d) = conn::OLD_STAT_METHOD;
          break;
       }
+*/
 
       SEND_TO_Q("\r\n", d);
       SEND_TO_Q("$R$7Note: If you see a word that is entirely CAPITALIZED and $Bbold$R then there\r\n", d);
