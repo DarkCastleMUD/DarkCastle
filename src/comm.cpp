@@ -53,9 +53,6 @@
 #include <sstream>
 #include <iostream>
 #include <list>
-#ifdef XMLRPC
-#include "dc_xmlrpc.h"
-#endif
 #include "Timer.h"
 #include "DC.h"
 #include "CommandStack.h"
@@ -128,10 +125,6 @@ int pulse_weather;
 int pulse_regen;
 int pulse_time;
 int pulse_short; // short timer, for archery
-
-#ifdef XMLRPC
-XmlRpcServer *xmlrpc_s;
-#endif
 
 #ifdef USE_SQL
 Database db;
@@ -270,11 +263,6 @@ int write_hotboot_file(char **new_argv)
   }
   fclose(fp);
   log("Hotboot descriptor file successfully written.", 0, LOG_MISC);
-
-#ifdef XMLRPC
-  log("Shutting down xmlrpc server.", 0, LOG_MISC);
-  xmlrpc_s->shutdown();
-#endif
 
   chdir("../bin/");
 
@@ -504,19 +492,6 @@ void DC::init_game(void)
     log("Connecting hotboot characters to their descriptiors", 0, LOG_MISC);
     finish_hotboot();
   }
-
-#ifdef XMLRPC
-  if (DC::instance().cf.bport == true)
-  {
-    logf(0, LOG_MISC, "Initializing xmlrpc server on port: %d", 8889);
-    xmlrpc_s = xmlrpc_init(8889);
-  }
-  else
-  {
-    logf(0, LOG_MISC, "Initializing xmlrpc server on port: %d", 8888);
-    xmlrpc_s = xmlrpc_init(8888);
-  }
-#endif
 
   log("Signal trapping.", 0, LOG_MISC);
   signal_setup();
