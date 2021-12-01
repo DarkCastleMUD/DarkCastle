@@ -67,10 +67,14 @@ class stat_data
 {
 public:
   stat_data();
+  void setMin(void);
+  uint8_t getMin(uint8_t cur, int8_t mod, uint8_t min);
   int str[5], tel[5], wis[5], dex[5], con[5];
   int min_str, min_int, min_wis, min_dex, min_con;
   unsigned int points;
   unsigned int selection;
+  uint8_t race;
+  uint8_t clss;
 };
 
 struct descriptor_data {
