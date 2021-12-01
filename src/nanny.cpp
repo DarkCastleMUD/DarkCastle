@@ -3115,6 +3115,8 @@ bool handle_get_stats(descriptor_data* d, string arg)
             GET_ALIGNMENT(ch) = 1000;
          }
 
+         set_hw(ch);
+
          return true;
       }
 
