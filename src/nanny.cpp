@@ -3001,7 +3001,7 @@ bool handle_get_stats(descriptor_data* d, string arg)
             switch(d->stats->selection)
             {
                case 1: // STR
-               if (d->stats->str[0] < races[d->character->race].max_str)
+               if (d->stats->str[0] < 18)
                {
                   d->stats->str[0]++;
                   d->stats->points--;
@@ -3009,28 +3009,28 @@ bool handle_get_stats(descriptor_data* d, string arg)
                break;
 
                case 2: // DEX
-               if (d->stats->dex[0] < races[d->character->race].max_dex)
+               if (d->stats->dex[0] < 18)
                {
                   d->stats->dex[0]++;
                   d->stats->points--;
                }
                break;
                case 3: // CON
-               if (d->stats->con[0] < races[d->character->race].max_con)
+               if (d->stats->con[0] < 18)
                {
                   d->stats->con[0]++;
                   d->stats->points--;
                }
                break;
                case 4: // INT
-               if (d->stats->tel[0] < races[d->character->race].max_int)
+               if (d->stats->tel[0] < 18)
                {
                   d->stats->tel[0]++;
                   d->stats->points--;
                }
                break;
                case 5: // WIS
-               if (d->stats->wis[0] < races[d->character->race].max_wis)
+               if (d->stats->wis[0] < 18)
                {
                   d->stats->wis[0]++;
                   d->stats->points--;
