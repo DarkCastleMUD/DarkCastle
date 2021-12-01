@@ -1433,8 +1433,8 @@ void nanny(struct descriptor_data *d, string arg)
       SEND_TO_Q("Dark Castle supports two ways of picking your race, class and initial\r\n", d);
       SEND_TO_Q("$BATTRIBUTES$R such as $BSTRENGTH$R, $BDEXTERITY$R, $BCONSTITUION$R, $BINTELLIGENCE$R\r\n", d);
       SEND_TO_Q("or $BWISDOM$R.\r\n\r\n", d);
-      SEND_TO_Q("The newest method is you first pick a race, a class then you get 13 points\r\n", d);
-      SEND_TO_Q("in each attribute and 18 points you can divide among those five\r\n", d);
+      SEND_TO_Q("The newest method is you first pick a race, a class then you get 12 points\r\n", d);
+      SEND_TO_Q("in each attribute and 23 points you can divide among those five\r\n", d);
       SEND_TO_Q("attributes.\r\n\r\n", d);
       SEND_TO_Q("The old method is you roll virtual dice. The virtual dice consist of either\r\n", d);
       SEND_TO_Q("three 6-sided dice or six 3-sided dice. The game picks the larger group of\r\n", d);
