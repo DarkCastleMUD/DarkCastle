@@ -3094,7 +3094,7 @@ bool handle_get_stats(descriptor_data* d, string arg)
          if (d->stats->points > 0)
          {
             SEND_TO_Q("You must assign all your points first.\r\n", d);
-            //return false;
+            return false;
          }
 
          char_data* ch = d->character;
