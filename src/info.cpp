@@ -3090,8 +3090,24 @@ void check_champion_and_website_who_list()
 
 int do_sector(CHAR_DATA *ch, char *arg, int cmd)
 {
-  if(ch->desc && ch->in_room)
-    csendf(ch, "You are currently in a %s area.\n\r", sector_types[world[ch->in_room].sector_type]);
+   string art = "a";
+
+   if(ch->desc && ch->in_room)
+   {
+      int sector = world[ch->in_room].sector_type;
+      switch(sector)
+      {
+         case SECT_INSIDE:
+         case SECT_UNDERWATER:
+         case SECT_AIR:
+         case SECT_ARCTIC:
+         art = "an";
+         break;
+      }
+
+      csendf(ch, "You are currently in %s %s area.\n\r", art.c_str(), sector_types[sector]);
+   }
+   
   return eSUCCESS;
 }
 
