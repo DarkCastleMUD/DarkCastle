@@ -455,6 +455,7 @@ struct char_data
     void removeHP(int dam, char_data* causer = nullptr);
     void fillHP(void);
     void fillHPLimit(void);
+    void send(string);
 };
 
 // This structure is written to the disk.  DO NOT MODIFY THIS STRUCTURE
