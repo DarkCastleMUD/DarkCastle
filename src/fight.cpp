@@ -7145,5 +7145,5 @@ int debug_retval(CHAR_DATA *ch, CHAR_DATA *victim, int retval)
 
 void char_data::send(string buffer)
 {
-  send_to_char(buffer.c_str(), this);
+  send_to_char(buffer, this);
 }
