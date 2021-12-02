@@ -2906,7 +2906,7 @@ void show_question_stats(descriptor_data *d)
    string buffer = fmt::format("\r\nRace: {}\r\n", races[race].singular_name);
    buffer += fmt::format("Class: {}\r\n", classes[clss].name);
    buffer += fmt::format("Points left to assign: {}\r\n", d->stats->points);
-   buffer += fmt::format("## Attribute    Current  Racial Offsets  Total\r\n");
+   buffer += fmt::format("## Attribute      Current  Racial Offsets  Total\r\n");
    if (d->stats->selection == 1)
    {
       buffer += fmt::format("1. $B*Strength*$R     {:2}      {:2}               {:2}\r\n",
@@ -2965,15 +2965,15 @@ void show_question_stats(descriptor_data *d)
 
    if (d->stats->selection == 0)
    {
-      buffer += "Type 1-5,help keyword> ";
+      buffer += "Type '1-5' or 'help keyword': ";
    }
    else if (d->stats->points > 0)
    {
-      buffer += "Type +,-,1-5,help keyword,confirm> ";
+      buffer += "Type '+', '-', '1-5', 'confirm' or 'help keyword': ";
    }
    else
    {
-      buffer += "Type -,1-5,help keyword,confirm> ";
+      buffer += "Type '-', '1-5', 'confirm' or 'help keyword': ";
    }
    SEND_TO_Q(buffer.c_str(), d);
    telnet_ga(d);
