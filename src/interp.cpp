@@ -474,6 +474,7 @@ struct command_info cmd_info[] =
         {"teleport", do_teleport, POSITION_DEAD, DEITY, CMD_DEFAULT, 0, 1},
         {"purge", do_purge, POSITION_DEAD, 103, CMD_DEFAULT, 0, 1},
         {"show", do_show, POSITION_DEAD, ANGEL, CMD_DEFAULT, 0, 1},
+        {"search", do_search, POSITION_DEAD, ANGEL, CMD_DEFAULT, 0, 1},
         {"fighting", do_fighting, POSITION_DEAD, 104, CMD_DEFAULT, 0, 1},
         {"peace", do_peace, POSITION_DEAD, ANGEL, CMD_DEFAULT, 0, 1},
         {"check", do_check, POSITION_DEAD, 105, CMD_DEFAULT, 0, 1},
@@ -1357,7 +1358,10 @@ tuple<string,string> half_chop(string arguments)
 
   // remove leading spaces from arguments before returning it
   first_non_space = arguments.find_first_not_of(' ');
-  arguments.erase(0, first_non_space);
+  if (first_non_space != string::npos)
+  {
+    arguments.erase(0, first_non_space);
+  }
 
   return tuple<string,string>(arg1, arguments);
 }

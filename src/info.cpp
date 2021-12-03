@@ -20,6 +20,7 @@
 #include <map>
 #include <sstream>
 #include <fstream>
+#include <fmt/format.h>
 
 #include "structs.h"
 #include "room.h"
@@ -3118,3 +3119,285 @@ int do_version(CHAR_DATA *ch, char *arg, int cmd)
 	}
 	return eSUCCESS;
 }
+
+enum search_types
+{
+   O_NAME,
+   O_LEVEL,
+   O_TYPE
+};
+struct search
+{
+   search_types type;
+   string name;
+   uint8_t min_level;
+   uint8_t max_level;
+   uint8_t o_type;
+   bool operator==(const obj_data* obj);
+};
+
+bool search::operator==(const obj_data* obj)
+{
+   if (obj == nullptr)
+   {
+      return false;
+   }
+
+   switch(this->type)
+   {
+      case O_NAME:
+      if (this->name == string(obj->name) || isname(this->name, obj->name))
+      {
+         return true;
+      }
+      break;
+
+      case O_LEVEL:
+      if (this->max_level == -1 && obj->obj_flags.eq_level >= this->min_level)
+      {
+         return true;
+      }
+      else if (obj->obj_flags.eq_level >= this->min_level && obj->obj_flags.eq_level <= this->max_level)
+      {
+         return true;
+      }
+      break;
+
+      case O_TYPE:
+      if (obj->obj_flags.type_flag == this->o_type)
+      {
+         return true;
+      }
+      else
+      {
+         return false;
+      }
+   }
+   return false;
+}
+
+
+int do_search(char_data* ch, char *argument_buffer, int cmd)
+{
+   if (ch == nullptr || GET_LEVEL(ch) < IMMORTAL)
+   {
+      return false;
+   }
+
+   vector<string> parsables;
+   string arg1, arg2, args(argument_buffer);
+
+   do {
+      // Separate arguments by spaces first, half_chop will remove leading spaces
+      tie (arg1, arg2) = half_chop(args);
+      if (arg1.empty())
+      {
+         break;
+      }
+
+      // Look to see if doublequotes were used because then we have to include spaces
+      // found within the doublequotes
+      auto quotes1 = arg1.find('"');
+      auto quotes2 = arg2.find('"');
+      if (quotes1 != string::npos && quotes2 != string::npos)
+      {
+         arg1 = arg1 + " " + arg2.substr(0, quotes2+1);
+         arg2.erase(0,quotes2+1);
+      }
+      args = arg2;
+      parsables.push_back(arg1);
+   } while (args.length() > 0);
+
+   if (parsables.empty())
+   {
+      ch->send("Usage: search <objects> <search terms>\r\n");
+      return eFAILURE;
+   }
+
+   if (string("objects").find(parsables[0]) == string::npos)
+   {
+      ch->send(fmt::format("{} not a valid search target.\r\n", parsables[0]));
+      return eFAILURE;
+   }
+
+   // Create search object based on parameters
+   struct search so;
+   vector<struct search> sl;
+   for(auto i=1; i < parsables.size(); ++i)
+   {
+      //ch->send(fmt::format("{} [{}]\r\n", i, parsables[i]));
+      string arg1, arg2;
+      if (parsables[i].find('=') != string::npos)
+      {
+         tie(arg1, arg2) = half_chop(parsables[i],'=');
+      }
+      else
+      {
+         arg1 = parsables[i];
+      }
+
+      if (arg1 == "level")
+      {
+         if (arg2.empty())
+         {
+            ch->send("What level?\r\n");
+            return eFAILURE;
+         }
+         else
+         {
+            try
+            {
+               // #-#
+               // #-
+               if (arg2.find('-') != string::npos)
+               {
+                  tie(arg1, arg2) = half_chop(arg2, '-');
+                  if (!arg1.empty())
+                  {
+                     so.min_level = stoul(arg1.c_str());
+                     if (!arg2.empty())
+                     {
+                        so.max_level = stoul(arg2.c_str());
+                     }
+                     else
+                     {
+                        so.max_level = -1;
+                     }
+                     
+                     so.type = O_LEVEL;
+                     sl.push_back(so);
+                  }
+               }
+               else // #
+               {
+                  if (!arg2.empty())
+                  {
+                     so.min_level = stoul(arg2.c_str());
+                     so.max_level = stoul(arg2.c_str());
+                     so.type = O_LEVEL;
+                     sl.push_back(so);
+                  }
+               }
+            } // catch exceptions from invalid stoul conversions
+            catch (...)
+            {
+            }
+         }
+      }
+      else if (arg1 == "name")
+      {
+         if (arg2.empty())
+         {
+            ch->send("What name are you searching for? You can use name=value multiple times.\r\n");
+            return eFAILURE;
+         }
+         else
+         {
+            size_t quote;
+            while ((quote = arg2.find('"')) != string::npos)
+            {
+               arg2.erase(quote, 1);
+            }
+
+            // Ex. name=woodbey
+            so.name = arg2;
+            so.type = O_NAME;
+            sl.push_back(so);
+         }        
+      }
+      else if (arg1 == "type")
+      {
+         bool found = false;
+         if (!arg2.empty())
+         {
+            // UPPERCASE arg2 to match item_types list
+            for(auto i=0; i < arg2.size(); ++i)
+            {
+               arg2[i] = toupper(arg2[i]);
+            }
+
+            for(auto i=0; i < item_types.size(); ++i)
+            {               
+               if (string(item_types[i]).find(arg2) == 0)
+               {
+                  found = true;
+                  so.o_type = i;
+                  so.type = O_TYPE;
+                  sl.push_back(so);
+                  break;
+               }
+            }
+         }
+
+         if (!found)
+         {
+            ch->send("What type are you searching for?\r\n");
+            ch->send("Here are some valid types:\r\n");
+            for (auto& i : item_types)
+            {
+               ch->send(string(i) + "\r\n");
+            }
+            return eFAILURE;
+         }
+      }
+   }
+
+   ch->send(fmt::format("Searching {} objects...", top_of_objt));
+
+   bool header_shown = false;
+   size_t objects_found = 0;
+   vector<struct obj_data*> obj_results;
+
+   for (int vnum = 0; vnum < obj_index[top_of_objt].virt; ++vnum)
+   {
+      int rnum = 0;
+      // real_object returns -1 for missing VNUMs
+      if ((rnum = real_object(vnum)) < 0)
+      {            
+         continue;
+      }
+      obj_data* obj = static_cast<obj_data*>(obj_index[rnum].item);
+      if (obj == nullptr)
+      {
+         continue;
+      }
+
+      bool matches = false;
+      for(auto i=0; i < sl.size(); ++i)
+      {
+         if (sl[i] == obj)
+         {
+            matches = true;
+         }
+         else
+         {
+            matches = false;
+            break;
+         }
+      }
+
+      if (matches)
+      {
+         obj_results.push_back(obj);
+      }
+   }
+
+   if (obj_results.empty())
+   {
+      ch->send("No results found.\r\n");
+      return eFAILURE;
+   }
+
+   ch->send(fmt::format("{} matches found.\r\n\r\n", obj_results.size()));      
+
+   ch->send("[ VNUM] [ LV] Short Description\r\n");
+   for (auto obj : obj_results)
+   {
+      ch->send(fmt::format("[{:5}] [{:3}] {}\r\n", GET_OBJ_VNUM(obj), obj->obj_flags.eq_level, GET_OBJ_SHORT(obj)));
+   }   
+
+   return eSUCCESS;
+}
+
+
+// search o level=1 wear=about name="cape woodbey" type=armor

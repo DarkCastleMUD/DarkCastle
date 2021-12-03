@@ -492,6 +492,7 @@ int do_sector(CHAR_DATA *ch, char *argument, int cmd);
 int do_sedit(CHAR_DATA *ch, char *argument, int cmd);
 int do_send(CHAR_DATA *ch, char *argument, int cmd);
 int do_set(CHAR_DATA *ch, char *argument, int cmd);
+int do_search(char_data* ch, char *argument, int cmd);
 int do_shout(CHAR_DATA *ch, char *argument, int cmd);
 int do_showhunt(CHAR_DATA *ch, char *argument, int cmd);
 int do_skills(CHAR_DATA *ch, char *argument, int cmd);
