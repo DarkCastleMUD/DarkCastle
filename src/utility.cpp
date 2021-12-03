@@ -487,17 +487,28 @@ void sprintbit( unsigned long vektor, const char *names[], char *result )
 	strcat( result, "NoBits " );
 }
 
-
-void sprinttype( int type, const char *names[], char *result )
+void sprinttype(int type, const char *names[], char *result)
 {
-    int nr;
+  int nr;
 
-    for ( nr = 0; *names[nr] != '\n'; nr++ )
-	;
-    if ( type > -1 && type < nr )
-	strcpy( result, names[type] );
-    else
-	strcpy( result, "Undefined" );
+  for (nr = 0; *names[nr] != '\n'; nr++)
+    ;
+  if (type > -1 && type < nr)
+    strcpy(result, names[type]);
+  else
+    strcpy(result, "Undefined");
+}
+
+void sprinttype(int type, item_types_t names, char *result)
+{
+  int nr;
+
+  for (nr = 0; *names[nr] != '\n'; nr++)
+    ;
+  if (type > -1 && type < nr)
+    strcpy(result, names[type]);
+  else
+    strcpy(result, "Undefined");
 }
 
 int consttype( char * search_str, const char *names[] )

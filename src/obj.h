@@ -304,4 +304,6 @@ int recheck_height_wears(char_data *ch);
 bool fullSave(obj_data *obj);
 void heightweight(char_data *ch, bool add);
 
+typedef vector<const char *> item_types_t;
+
 #endif

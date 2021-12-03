@@ -387,6 +387,7 @@ int     send_to_gods    (const char * str, int god_level, long type);
 void	sprintbit	(uint value[], const char *names[], char *result);
 void    sprintbit	(unsigned long vektor, const char *names[], char *result);
 void    sprinttype	(int type, const char *names[], char *result);
+void    sprinttype	(int type, vector<const char *>, char *result);
 int     consttype       (char * search_str, const char *names[]);
 const char *  constindex      (int index, const char *names[]);
 struct time_info_data

@@ -812,7 +812,7 @@ const char *mob_types[] =
 		"\n"
 };
 
-const char *item_types[] =
+item_types_t item_types = 
 {
     "UNDEFINED",
     "LIGHT",
