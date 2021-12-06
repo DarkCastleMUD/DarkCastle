@@ -1613,12 +1613,13 @@ void vault_put(CHAR_DATA *ch, char *object, char *owner)
   save_char_obj(ch);
 }
 
-void vault_list(CHAR_DATA *ch, char *owner) {
+void vault_list(CHAR_DATA *ch, char *owner)
+{
   struct vault_items_data *items;
   struct vault_data *vault;
   struct obj_data *obj;
   int objects = 0, self = 0;
-  char sectionbuf[MAX_STRING_LENGTH*4];
+  char sectionbuf[MAX_STRING_LENGTH * 4];
   char linebuf[MAX_INPUT_LENGTH];
   char buf[MAX_INPUT_LENGTH];
   int diff_len = 0;
@@ -1626,114 +1627,133 @@ void vault_list(CHAR_DATA *ch, char *owner) {
   int linebuf_len = 0;
 
   owner[0] = UPPER(owner[0]);
-  if (!strcmp(owner, GET_NAME(ch))) self = 1;
+  if (!strcmp(owner, GET_NAME(ch)))
+    self = 1;
 
-  if (!(vault = has_vault(owner))) {
+  if (!(vault = has_vault(owner)))
+  {
     if (self)
       csendf(ch, "You don't have a vault.\r\n", ch);
     else
       csendf(ch, "%s doesn't have a vault.\r\n", owner);
     return;
   }
-  
-  if (!has_vault_access(GET_NAME(ch), vault)) {
+
+  if (!has_vault_access(GET_NAME(ch), vault))
+  {
     csendf(ch, "You don't have access to %s's vault.\r\n", owner);
     return;
-  } 
-
+  }
 
   if (self)
-      snprintf(sectionbuf, sizeof(sectionbuf), "Your vault is at %d of %d maximum pounds and contains:\r\n", vault->weight, vault->size);
+    snprintf(sectionbuf, sizeof(sectionbuf), "Your vault is at %d of %d maximum pounds and contains:\r\n", vault->weight, vault->size);
   else
-      snprintf(sectionbuf, sizeof(sectionbuf), "%s's vault is at %d of %d maximum pounds and contains:\r\n", owner, vault->weight, vault->size);
-   
-  
-  for (items = vault->items;items;items = items->next) {
+    snprintf(sectionbuf, sizeof(sectionbuf), "%s's vault is at %d of %d maximum pounds and contains:\r\n", owner, vault->weight, vault->size);
+
+  for (items = vault->items; items; items = items->next)
+  {
     linebuf[0] = '\0';
 
     obj = items->obj ? items->obj : get_obj(items->item_vnum);
     if (obj == NULL)
-	continue;
+      continue;
 
-    if (items->count > 1) {
-	snprintf(linebuf, sizeof(linebuf), "[$5%d$R] ", items->count);
+    if (items->count > 1)
+    {
+      snprintf(linebuf, sizeof(linebuf), "[$5%d$R] ", items->count);
 
-	sectionbuf_len = strlen(sectionbuf);
-	linebuf_len = strlen(linebuf);
-	diff_len = sizeof(sectionbuf) - (sectionbuf_len + linebuf_len + 1 + 2);
+      sectionbuf_len = strlen(sectionbuf);
+      linebuf_len = strlen(linebuf);
+      diff_len = sizeof(sectionbuf) - (sectionbuf_len + linebuf_len + 1 + 2);
 
-	if (diff_len > 0) {
-	    strncat(sectionbuf, linebuf, diff_len);
-	}
+      if (diff_len > 0)
+      {
+        strncat(sectionbuf, linebuf, diff_len);
+      }
     }
 
     snprintf(linebuf, sizeof(linebuf), "%s ", GET_OBJ_SHORT(obj));
 
     if (obj->obj_flags.type_flag == ITEM_ARMOR ||
-	obj->obj_flags.type_flag == ITEM_WEAPON ||
-	obj->obj_flags.type_flag == ITEM_FIREWEAPON ||
-	obj->obj_flags.type_flag == ITEM_CONTAINER ||
-	obj->obj_flags.type_flag == ITEM_INSTRUMENT ||
-	obj->obj_flags.type_flag == ITEM_STAFF ||
-	obj->obj_flags.type_flag == ITEM_WAND ||
-	obj->obj_flags.type_flag == ITEM_LIGHT)
-    { 
-	strncpy(buf, linebuf, sizeof(buf));
-	snprintf(linebuf, MAX_INPUT_LENGTH, "%s %s $3Lvl: %d$R", buf,
-		 item_condition(obj), obj->obj_flags.eq_level);
+        obj->obj_flags.type_flag == ITEM_WEAPON ||
+        obj->obj_flags.type_flag == ITEM_FIREWEAPON ||
+        obj->obj_flags.type_flag == ITEM_CONTAINER ||
+        obj->obj_flags.type_flag == ITEM_INSTRUMENT ||
+        obj->obj_flags.type_flag == ITEM_STAFF ||
+        obj->obj_flags.type_flag == ITEM_WAND ||
+        obj->obj_flags.type_flag == ITEM_LIGHT)
+    {
+      strncpy(buf, linebuf, sizeof(buf));
+      snprintf(linebuf, MAX_INPUT_LENGTH, "%s %s $3Lvl: %d$R", buf,
+               item_condition(obj), obj->obj_flags.eq_level);
     }
 
-    if (GET_LEVEL(ch) > IMMORTAL) {
-	strncpy(buf, linebuf, sizeof(buf));
-	snprintf(linebuf, sizeof(linebuf), "%s [%d]", buf, items->item_vnum);
+    if (GET_LEVEL(ch) > IMMORTAL)
+    {
+      strncpy(buf, linebuf, sizeof(buf));
+      snprintf(linebuf, sizeof(linebuf), "%s [%d]", buf, items->item_vnum);
     }
-      
+
     objects = 1;
     linebuf_len = strlen(linebuf);
     diff_len = sizeof(linebuf) - (linebuf_len + 2 + 1);
 
-    if (diff_len > 0) {
-	strncat(linebuf,"\r\n", diff_len);
+    if (diff_len > 0)
+    {
+      strncat(linebuf, "\r\n", diff_len);
     }
 
-    if (strlen(linebuf) + strlen(sectionbuf) < MAX_STRING_LENGTH*4 - 200) {
-	    strncat(sectionbuf, linebuf, sizeof(sectionbuf)-1);
-      sectionbuf[sizeof(sectionbuf)-1] = 0;
-    } else {
-	strcat(sectionbuf, "Overflow!!!\r\n");
-	break;
+    if (strlen(linebuf) + strlen(sectionbuf) < MAX_STRING_LENGTH * 4 - 200)
+    {
+      strncat(sectionbuf, linebuf, sizeof(sectionbuf) - 1);
+      sectionbuf[sizeof(sectionbuf) - 1] = 0;
+    }
+    else
+    {
+      strcat(sectionbuf, "Overflow!!!\r\n");
+      break;
     }
   }
 
-  if (!objects) {
-      if (self) {
-	  csendf(ch, "Your vault is currently empty and can hold %d pounds.\r\n", vault->size);
-      } else {
-	  csendf(ch, "%s's vault is currently empty.\r\n", owner);
-      }
-  } else {
-      page_string(ch->desc, sectionbuf, 1);
+  if (!objects)
+  {
+    if (self)
+    {
+      csendf(ch, "Your vault is currently empty and can hold %d pounds.\r\n", vault->size);
+    }
+    else
+    {
+      csendf(ch, "%s's vault is currently empty.\r\n", owner);
+    }
+  }
+  else
+  {
+    page_string(ch->desc, sectionbuf, 1);
   }
 }
 
-void add_new_vault(char *name, int indexonly) {
+void add_new_vault(char *name, int indexonly)
+{
   FILE *vfl, *tvfl, *pvfl;
   struct vault_data *vault;
   char fname[256], line[MAX_INPUT_LENGTH], buf[MAX_INPUT_LENGTH];
 
-  if (!(vfl = dc_fopen(VAULT_INDEX_FILE, "r" ))) {
+  if (!(vfl = dc_fopen(VAULT_INDEX_FILE, "r")))
+  {
     log("add_new_vault: error opening index file.", IMMORTAL, LOG_BUG);
     return;
   }
 
-  if (!(tvfl = fopen( VAULT_INDEX_FILE_TMP, "w"))) {
+  if (!(tvfl = fopen(VAULT_INDEX_FILE_TMP, "w")))
+  {
     log("add_new_vault: error opening temp index file.", IMMORTAL, LOG_BUG);
     return;
   }
 
   // read and print each line until we get to $
   fscanf(vfl, "%s\n", line);
-  while (*line != '$') {
+  while (*line != '$')
+  {
     fprintf(tvfl, "%s\n", line);
     fscanf(vfl, "%s\n", line);
   }
@@ -1744,22 +1764,23 @@ void add_new_vault(char *name, int indexonly) {
   dc_fclose(vfl);
   rename(VAULT_INDEX_FILE_TMP, VAULT_INDEX_FILE);
 
-  if (indexonly) return;
-
+  if (indexonly)
+    return;
 
   // now create a new vault for the player
 
   CHAR_DATA *ch = find_owner(name);
 
-   sprintf(fname, "../vaults/%c/%s.vault", UPPER(*name), name);
-  if (!(pvfl = dc_fopen(fname, "w"))) {
+  sprintf(fname, "../vaults/%c/%s.vault", UPPER(*name), name);
+  if (!(pvfl = dc_fopen(fname, "w")))
+  {
     sprintf(buf, "add_new_vault: error opening new vault file [%s].", fname);
     log(buf, IMMORTAL, LOG_BUG);
     return;
   }
 
-  if(ch)
-    fprintf(pvfl, "S %d\n", VAULT_BASE_SIZE * GET_LEVEL(ch) );
+  if (ch)
+    fprintf(pvfl, "S %d\n", VAULT_BASE_SIZE * GET_LEVEL(ch));
   else
     fprintf(pvfl, "S %d\n", VAULT_BASE_SIZE);
   fprintf(pvfl, "$\n");
@@ -1773,14 +1794,14 @@ void add_new_vault(char *name, int indexonly) {
   RECREATE(vault_table, struct vault_data, total_vaults);
   CREATE(vault, struct vault_data, 1);
 
-  vault->owner 	= str_dup(name);
-  if(ch)
-    vault->size	= VAULT_BASE_SIZE * GET_LEVEL(ch);
+  vault->owner = str_dup(name);
+  if (ch)
+    vault->size = VAULT_BASE_SIZE * GET_LEVEL(ch);
   else
     vault->size = VAULT_BASE_SIZE;
-  vault->weight	= 0;
-  vault->access	= NULL;
-  vault->items 	= NULL;
+  vault->weight = 0;
+  vault->access = NULL;
+  vault->items = NULL;
   vault->next = vault_table;
   vault_table = vault;
 
