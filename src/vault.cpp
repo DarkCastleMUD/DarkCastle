@@ -10,6 +10,7 @@ extern "C"
 #include <sys/stat.h>
 #include <unistd.h>
 #include <list>
+#include <fmt/format.h>
 
 #include "structs.h"
 #include "db.h"
@@ -1645,34 +1646,49 @@ void vault_list(CHAR_DATA *ch, char *owner)
     return;
   }
 
-  if (self)
-    snprintf(sectionbuf, sizeof(sectionbuf), "Your vault is at %d of %d maximum pounds and contains:\r\n", vault->weight, vault->size);
-  else
-    snprintf(sectionbuf, sizeof(sectionbuf), "%s's vault is at %d of %d maximum pounds and contains:\r\n", owner, vault->weight, vault->size);
-
+  unsigned int weight = 0;
+  map<string, pair<obj_data*,uint32_t>> vault_contents;
   for (items = vault->items; items; items = items->next)
   {
-    linebuf[0] = '\0';
-
-    obj = items->obj ? items->obj : get_obj(items->item_vnum);
-    if (obj == NULL)
-      continue;
-
-    if (items->count > 1)
+    obj = items->obj;
+    if (obj == nullptr)
     {
-      snprintf(linebuf, sizeof(linebuf), "[$5%d$R] ", items->count);
-
-      sectionbuf_len = strlen(sectionbuf);
-      linebuf_len = strlen(linebuf);
-      diff_len = sizeof(sectionbuf) - (sectionbuf_len + linebuf_len + 1 + 2);
-
-      if (diff_len > 0)
-      {
-        strncat(sectionbuf, linebuf, diff_len);
-      }
+      obj = get_obj(items->item_vnum);
     }
 
-    snprintf(linebuf, sizeof(linebuf), "%s ", GET_OBJ_SHORT(obj));
+    auto& o = vault_contents[GET_OBJ_SHORT(obj)];
+    o.first = obj;
+    o.second += items->count;
+    weight += (obj->obj_flags.weight*items->count);
+  }
+
+  if (weight != vault->weight)
+  {
+    ch->send(fmt::format("Some objects in your vault have changed weight.\r\nYour vault's weight has been recalculated from {} to {}.\r\n", vault->weight, weight));
+    vault->weight = weight;
+  }
+
+  if (self)
+  {
+    ch->send(fmt::format("Your vault is at {} of {} maximum pounds and contains:\r\n", vault->weight, vault->size));
+  }
+  else
+  {
+    ch->send(fmt::format("{}'s vault is at {} of {} maximum pounds and contains:\r\n", owner, vault->weight, vault->size));
+  }
+
+  for (auto& v : vault_contents)
+  {
+    auto& o = v.second;
+    auto& obj = o.first;
+    auto& count = o.second;
+
+    if (count > 1)
+    {
+      ch->send(fmt::format("[$5{}$R] ", count));
+    }
+
+    ch->send(fmt::format("{}$R", GET_OBJ_SHORT(obj))); 
 
     if (obj->obj_flags.type_flag == ITEM_ARMOR ||
         obj->obj_flags.type_flag == ITEM_WEAPON ||
@@ -1683,36 +1699,15 @@ void vault_list(CHAR_DATA *ch, char *owner)
         obj->obj_flags.type_flag == ITEM_WAND ||
         obj->obj_flags.type_flag == ITEM_LIGHT)
     {
-      strncpy(buf, linebuf, sizeof(buf));
-      snprintf(linebuf, MAX_INPUT_LENGTH, "%s %s $3Lvl: %d$R", buf,
-               item_condition(obj), obj->obj_flags.eq_level);
+      ch->send(fmt::format("{} $3Lvl: {}$R", item_condition(obj), obj->obj_flags.eq_level));
     }
 
-    if (GET_LEVEL(ch) > IMMORTAL)
+    if (GET_LEVEL(ch) > IMMORTAL && obj->item_number > 0)
     {
-      strncpy(buf, linebuf, sizeof(buf));
-      snprintf(linebuf, sizeof(linebuf), "%s [%d]", buf, items->item_vnum);
+      ch->send(fmt::format(" [{}]", obj_index[obj->item_number].virt));
     }
-
-    objects = 1;
-    linebuf_len = strlen(linebuf);
-    diff_len = sizeof(linebuf) - (linebuf_len + 2 + 1);
-
-    if (diff_len > 0)
-    {
-      strncat(linebuf, "\r\n", diff_len);
-    }
-
-    if (strlen(linebuf) + strlen(sectionbuf) < MAX_STRING_LENGTH * 4 - 200)
-    {
-      strncat(sectionbuf, linebuf, sizeof(sectionbuf) - 1);
-      sectionbuf[sizeof(sectionbuf) - 1] = 0;
-    }
-    else
-    {
-      strcat(sectionbuf, "Overflow!!!\r\n");
-      break;
-    }
+    ch->send("\r\n");
+    objects = true;
   }
 
   if (!objects)
@@ -1725,10 +1720,6 @@ void vault_list(CHAR_DATA *ch, char *owner)
     {
       csendf(ch, "%s's vault is currently empty.\r\n", owner);
     }
-  }
-  else
-  {
-    page_string(ch->desc, sectionbuf, 1);
   }
 }
 
