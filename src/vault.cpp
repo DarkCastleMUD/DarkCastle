@@ -1054,8 +1054,8 @@ struct obj_data *exists_in_vault(struct vault_data *vault, obj_data *obj)
   return 0;
 }
 
-
-void vault_get(CHAR_DATA *ch, char *object, char *owner) {
+void vault_get(CHAR_DATA *ch, char *object, char *owner)
+{
   std::string sbuf;
   char obj_list[50][100];
   struct obj_data *obj, *tmp_obj;
@@ -1064,9 +1064,11 @@ void vault_get(CHAR_DATA *ch, char *object, char *owner) {
   int self = 0, num = 1, i;
 
   owner[0] = UPPER(owner[0]);
-  if (!strcmp(owner, GET_NAME(ch))) self = 1;
+  if (!strcmp(owner, GET_NAME(ch)))
+    self = 1;
 
-  if (!(vault = has_vault(owner))) {
+  if (!(vault = has_vault(owner)))
+  {
     if (self)
       csendf(ch, "You don't have a vault.\r\n");
     else
@@ -1074,7 +1076,8 @@ void vault_get(CHAR_DATA *ch, char *object, char *owner) {
     return;
   }
 
-  if (!has_vault_access(GET_NAME(ch), vault)) {
+  if (!has_vault_access(GET_NAME(ch), vault))
+  {
     csendf(ch, "You don't have permission to take %s's stuff.\r\n", owner);
     return;
   }
@@ -1082,83 +1085,98 @@ void vault_get(CHAR_DATA *ch, char *object, char *owner) {
   if (sscanf(object, "%d.%s", &num, object) != 2)
     num = 1;
 
-  if (!strcmp(object, "all")) {
+  if (!strcmp(object, "all"))
+  {
     bool ioverload = FALSE;
-    for (items = vault->items, i=0; items; items=items->next) {
-      obj = items->obj?items->obj:get_obj(items->item_vnum);
+    for (items = vault->items, i = 0; items; items = items->next)
+    {
+      obj = items->obj ? items->obj : get_obj(items->item_vnum);
       if (obj == 0)
-	  continue;
+        continue;
 
-      for(int j = 0; j < items->count ; j++, i++) {
-	  strncpy(obj_list[i],fname(obj->name), sizeof(obj_list[i]));
-        if(i>49) {
+      for (int j = 0; j < items->count; j++, i++)
+      {
+        strncpy(obj_list[i], fname(obj->name), sizeof(obj_list[i]));
+        if (i > 49)
+        {
           send_to_char("You can only take out 50 items at a time.\n\r", ch);
-          ioverload=TRUE;
+          ioverload = TRUE;
           break;
         }
-        if(IS_CARRYING_N(ch) + i > CAN_CARRY_N(ch)) {
-          ioverload=TRUE;
+        if (IS_CARRYING_N(ch) + i > CAN_CARRY_N(ch))
+        {
+          ioverload = TRUE;
           break;
         }
       }
-      if(ioverload) break;
+      if (ioverload)
+        break;
     }
-    int amount=i;
-    for (i=0;i<amount;i++)
+    int amount = i;
+    for (i = 0; i < amount; i++)
       vault_get(ch, obj_list[i], owner);
     return;
   }
 
-  if (sscanf(object, "all.%s", object)) {
-    num = 0;  // count the number of items that match that keyword so we know how many to get
-    for (items = vault->items; items ; items = items->next) {
-      obj = items->obj?items->obj:get_obj(items->item_vnum);
-  //    obj = get_obj(items->item_vnum);
+  if (sscanf(object, "all.%s", object))
+  {
+    num = 0; // count the number of items that match that keyword so we know how many to get
+    for (items = vault->items; items; items = items->next)
+    {
+      obj = items->obj ? items->obj : get_obj(items->item_vnum);
+      //    obj = get_obj(items->item_vnum);
       if (obj == 0)
-	  continue;
+        continue;
 
       if (isname(object, GET_OBJ_NAME(obj)))
         num += items->count;
     }
 
-    if (!num) {
+    if (!num)
+    {
       send_to_char("There is nothing like that in the vault.\n\r", ch);
       return;
     }
 
-     //start at end of the list and get each item all the way back to the first one.
-    for (i = num; i > 0; i--) {
+    //start at end of the list and get each item all the way back to the first one.
+    for (i = num; i > 0; i--)
+    {
       vault_get(ch, object, owner);
     }
     return;
-  } else {
+  }
+  else
+  {
 
-   if (!(obj = get_obj_in_vault(vault, object, num))) {
+    if (!(obj = get_obj_in_vault(vault, object, num)))
+    {
       send_to_char("There is nothing like that in the vault.\n\r", ch);
       return;
     }
 
-    if (IS_SET(obj->obj_flags.more_flags, ITEM_UNIQUE) && search_char_for_item(ch, obj->item_number, false)) { 
+    if (IS_SET(obj->obj_flags.more_flags, ITEM_UNIQUE) && search_char_for_item(ch, obj->item_number, false))
+    {
       send_to_char("Why would you want another one of those?\r\n", ch);
       return;
-    } 
-  
-    if (!self && (IS_SET(obj->obj_flags.more_flags, ITEM_NO_TRADE) ||
-		IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL)) && GET_LEVEL(ch) < IMMORTAL) {
+    }
+
+    if (!self && (IS_SET(obj->obj_flags.more_flags, ITEM_NO_TRADE) || IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL)) && GET_LEVEL(ch) < IMMORTAL)
+    {
       send_to_char("That item seems to be bound to the vault.\r\n", ch);
       return;
-    } 
-  
-    if ((IS_CARRYING_W(ch) + GET_OBJ_WEIGHT(obj)) > CAN_CARRY_W(ch)) 
+    }
+
+    if ((IS_CARRYING_W(ch) + GET_OBJ_WEIGHT(obj)) > CAN_CARRY_W(ch))
     {
       send_to_char("You cannot hold any more.\r\n", ch);
-      if(GET_LEVEL(ch) < IMMORTAL)
+      if (GET_LEVEL(ch) < IMMORTAL)
         return;
       else
         send_to_char("But since you're an immortal, you get it anyway.\n\r", ch);
     }
 
-    if(IS_CARRYING_N(ch) + 1 > CAN_CARRY_N(ch)) {
+    if (IS_CARRYING_N(ch) + 1 > CAN_CARRY_N(ch))
+    {
       send_to_char("You cannot carry any more items.\n\r", ch);
       return;
     }
@@ -1168,12 +1186,12 @@ void vault_get(CHAR_DATA *ch, char *object, char *owner) {
 
     if (GET_LEVEL(ch) < IMMORTAL)
     {
-        sbuf = GET_NAME(ch);
-        sbuf += " removed ";
-        sbuf += GET_OBJ_SHORT(obj);
-        sbuf += " from ";
-        sbuf += owner;
-        sbuf += "'s vault.";
+      sbuf = GET_NAME(ch);
+      sbuf += " removed ";
+      sbuf += GET_OBJ_SHORT(obj);
+      sbuf += " from ";
+      sbuf += owner;
+      sbuf += "'s vault.";
     }
     else
     {
@@ -1189,7 +1207,7 @@ void vault_get(CHAR_DATA *ch, char *object, char *owner) {
 
     vlog(sbuf.c_str(), owner);
     csendf(ch, "%s has been removed from the vault.\r\n", GET_OBJ_SHORT(obj));
-  
+
     sbuf = GET_NAME(ch);
     sbuf += " removed ";
     sbuf += GET_OBJ_SHORT(obj);
@@ -1199,20 +1217,20 @@ void vault_get(CHAR_DATA *ch, char *object, char *owner) {
     sbuf += owner;
     sbuf += "'s vault.";
 
-
     act(sbuf.c_str(), ch, 0, 0, TO_ROOM, GODS);
 
     item_remove(obj, vault);
-   
+
     if (!fullSave(obj))
       tmp_obj = clone_object(real_object(GET_OBJ_VNUM(obj)));
-    else 
+    else
     {
       tmp_obj = clone_object(real_object(GET_OBJ_VNUM(obj)));
-      copySaveData(tmp_obj,obj);
+      copySaveData(tmp_obj, obj);
 
-      if (verify_item(&tmp_obj)) {
-    	  copySaveData(tmp_obj,obj);
+      if (verify_item(&tmp_obj))
+      {
+        copySaveData(tmp_obj, obj);
       }
 
       // Jared: Removed for the time being because the item is still
