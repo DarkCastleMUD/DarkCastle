@@ -1344,7 +1344,7 @@ int quest_vendor(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
 	  }
       }
       if (!FOUND) {
-	  for (int qvnum=3124; qvnum <= 3126; qvnum++) {
+	  for (int qvnum=3124; qvnum <= 3127; qvnum++) {
 	      rnum = real_object(qvnum);
 	      if (rnum && n++ == want_num) {
 		  FOUND = true;
