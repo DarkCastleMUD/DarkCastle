@@ -1665,7 +1665,11 @@ void vault_list(CHAR_DATA *ch, char *owner)
   }
 
   unsigned int weight = 0;
-  map<string, pair<obj_data*,uint32_t>> vault_contents;
+  // This stores the quantity of each item found in a vault
+  map<string, pair<obj_data*,uint32_t>> vault_content_qty;
+
+  // This stores the order in which vault items are found
+  vector<string> vault_contents;
   for (items = vault->items; items; items = items->next)
   {
     obj = items->obj;
@@ -1674,10 +1678,18 @@ void vault_list(CHAR_DATA *ch, char *owner)
       obj = get_obj(items->item_vnum);
     }
 
-    auto& o = vault_contents[GET_OBJ_SHORT(obj)];
-    o.first = obj;
-    o.second += items->count;
-    weight += (obj->obj_flags.weight*items->count);
+    if (GET_OBJ_SHORT(obj) != nullptr)
+    {
+      auto& o = vault_content_qty[GET_OBJ_SHORT(obj)];
+      o.first = obj;
+      if (o.second == 0)
+      {
+        vault_contents.push_back(GET_OBJ_SHORT(obj));
+      }
+      o.second += items->count;
+      weight += (obj->obj_flags.weight*items->count);
+
+    }
   }
 
   if (weight != vault->weight)
@@ -1695,9 +1707,9 @@ void vault_list(CHAR_DATA *ch, char *owner)
     ch->send(fmt::format("{}'s vault is at {} of {} maximum pounds and contains:\r\n", owner, vault->weight, vault->size));
   }
 
-  for (auto& v : vault_contents)
+  for (auto& o_short_description : vault_contents)
   {
-    auto& o = v.second;
+    auto& o = vault_content_qty[o_short_description];
     auto& obj = o.first;
     auto& count = o.second;
 
