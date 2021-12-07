@@ -3123,16 +3123,50 @@ int do_version(CHAR_DATA *ch, char *arg, int cmd)
 enum search_types
 {
    O_NAME,
-   O_LEVEL,
-   O_TYPE
+   O_DESCRIPTION,
+   O_SHORT_DESCRIPTION,   
+   O_ACTION_DESCRIPTION,
+   O_TYPE_FLAG,
+   O_WEAR_FLAGS,
+   O_SIZE,
+   O_EXTRA_FLAGS,
+   O_WEIGHT,
+   O_COST,
+   O_MORE_FLAGS,
+   O_EQ_LEVEL,   
+   O_V1,
+   O_V2,
+   O_V3,
+   O_V4,
+   O_AFFECTED,
+   O_EDD_KEYWORD,
+   O_EDD_DESCRIPTION,
+   O_CARRIED_BY,
+   O_EQUIPPED_BY
 };
 struct search
 {
    search_types type;
-   string name;
-   uint8_t min_level;
-   uint8_t max_level;
-   uint8_t o_type;
+
+   uint8_t o_min_level;
+   uint8_t o_max_level;
+
+	int32 o_item_number;                   /* Where in data-base               */
+	int32 o_in_room;                       /* In what room -1 when conta/carr  */
+	int o_vroom;                           /* for corpse saving */
+	struct obj_flag_data obj_flags;             /* Object information               */
+	int16 o_num_affects;
+	obj_affected_type o_affected;          /* Which abilities in PC to change  */
+
+	string o_name;                         /* Title of object :get etc.        */
+	string o_description;                  /* When in room                     */
+	string o_short_description;            /* when worn/carry/in cont.         */
+	string o_action_description;           /* What to write when used          */
+
+   string o_edd_keyword;                  /* Keyword in look/examine          */
+   string o_edd_description;              /* What to see                      */
+	string o_carried_by;                   
+	string o_equipped_by;                  
    bool operator==(const obj_data* obj);
 };
 
@@ -3146,25 +3180,23 @@ bool search::operator==(const obj_data* obj)
    switch(this->type)
    {
       case O_NAME:
-      if (this->name == string(obj->name) || isname(this->name, obj->name))
+      if (this->o_name == string(obj->name) || isname(this->o_name, obj->name))
       {
          return true;
       }
       break;
 
-      case O_LEVEL:
-      if (this->max_level == -1 && obj->obj_flags.eq_level >= this->min_level)
-      {
-         return true;
-      }
-      else if (obj->obj_flags.eq_level >= this->min_level && obj->obj_flags.eq_level <= this->max_level)
-      {
-         return true;
-      }
+      case O_DESCRIPTION:
       break;
 
-      case O_TYPE:
-      if (obj->obj_flags.type_flag == this->o_type)
+      case O_SHORT_DESCRIPTION:
+      break;
+
+      case O_ACTION_DESCRIPTION:
+      break;
+
+      case O_TYPE_FLAG:
+      if (obj->obj_flags.type_flag == this->obj_flags.type_flag)
       {
          return true;
       }
@@ -3172,6 +3204,56 @@ bool search::operator==(const obj_data* obj)
       {
          return false;
       }
+      break;
+
+      case O_WEAR_FLAGS:
+      break;
+
+      case O_SIZE:
+      break;
+
+      case O_EDD_KEYWORD:
+      break;
+
+      case O_EDD_DESCRIPTION:
+      break;
+
+      case O_WEIGHT:
+      break;
+
+      case O_COST:
+      break;
+
+      case O_MORE_FLAGS:
+      break;
+
+      case O_EQ_LEVEL:
+      if (this->o_max_level == -1 && obj->obj_flags.eq_level >= this->o_min_level)
+      {
+         return true;
+      }
+      else if (obj->obj_flags.eq_level >= this->o_min_level && obj->obj_flags.eq_level <= this->o_max_level)
+      {
+         return true;
+      }
+      break;
+
+   
+      case O_V1:
+      break;
+
+      case O_V2:
+      break;
+
+      case O_V3:
+      break;
+
+      case O_V4:
+      break;
+
+      case O_AFFECTED:
+      break;
+
    }
    return false;
 }
@@ -3254,17 +3336,17 @@ int do_search(char_data* ch, char *argument_buffer, int cmd)
                   tie(arg1, arg2) = half_chop(arg2, '-');
                   if (!arg1.empty())
                   {
-                     so.min_level = stoul(arg1.c_str());
+                     so.o_min_level = stoul(arg1.c_str());
                      if (!arg2.empty())
                      {
-                        so.max_level = stoul(arg2.c_str());
+                        so.o_max_level = stoul(arg2.c_str());
                      }
                      else
                      {
-                        so.max_level = -1;
+                        so.o_max_level = -1;
                      }
                      
-                     so.type = O_LEVEL;
+                     so.type = O_EQ_LEVEL;
                      sl.push_back(so);
                   }
                }
@@ -3272,9 +3354,9 @@ int do_search(char_data* ch, char *argument_buffer, int cmd)
                {
                   if (!arg2.empty())
                   {
-                     so.min_level = stoul(arg2.c_str());
-                     so.max_level = stoul(arg2.c_str());
-                     so.type = O_LEVEL;
+                     so.o_min_level = stoul(arg2.c_str());
+                     so.o_max_level = stoul(arg2.c_str());
+                     so.type = O_EQ_LEVEL;
                      sl.push_back(so);
                   }
                }
@@ -3300,7 +3382,7 @@ int do_search(char_data* ch, char *argument_buffer, int cmd)
             }
 
             // Ex. name=woodbey
-            so.name = arg2;
+            so.o_name = arg2;
             so.type = O_NAME;
             sl.push_back(so);
          }        
@@ -3321,8 +3403,8 @@ int do_search(char_data* ch, char *argument_buffer, int cmd)
                if (string(item_types[i]).find(arg2) == 0)
                {
                   found = true;
-                  so.o_type = i;
-                  so.type = O_TYPE;
+                  so.obj_flags.type_flag = i;
+                  so.type = O_TYPE_FLAG;
                   sl.push_back(so);
                   break;
                }
