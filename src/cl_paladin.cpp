@@ -70,12 +70,6 @@ int do_harmtouch(struct char_data *ch, char *argument, int cmd)
       return eFAILURE;
    }
 
-   // Can't do it in !magic rooms....
-   if(IS_SET(world[ch->in_room].room_flags, NO_MAGIC)) {
-      send_to_char("The area seems to prohibit you from such magical actions!\r\n", ch);
-      return eFAILURE;
-   }
-
    if(ch->getHP() < GET_MAX_HIT(ch) / 4)
    {
       send_to_char("You don't posess the energy to do it!\r\n", ch);
@@ -155,12 +149,6 @@ int do_layhands(struct char_data *ch, char *argument, int cmd)
 
    if (affected_by_spell(ch, SKILL_LAY_HANDS)) {
       send_to_char("You have not spent enough time in devotion to your god to warrant such a favor yet.\r\n", ch);
-      return eFAILURE;
-   }
-
-   // Can't do it in !magic rooms....
-   if(IS_SET(world[ch->in_room].room_flags, NO_MAGIC)) {
-      send_to_char("The area seems to prohibit you from giving such magical assistance!\r\n", ch);
       return eFAILURE;
    }
 
