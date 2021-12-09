@@ -1408,7 +1408,8 @@ int quest_vendor(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
 	  obj_index[obj->item_number].virt > 27999 ||
 	  obj_index[obj->item_number].virt != 3124 ||
 	  obj_index[obj->item_number].virt != 3125 ||
-	  obj_index[obj->item_number].virt != 3126) {
+	  obj_index[obj->item_number].virt != 3126 ||
+	  obj_index[obj->item_number].virt != 3127) {
 	  sprintf(buf, "%s I don't deal in worthless junk.", GET_NAME(ch));
 	  do_tell(owner, buf, 0);
 	  return eSUCCESS;
