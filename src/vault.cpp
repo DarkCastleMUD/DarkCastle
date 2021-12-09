@@ -1632,6 +1632,44 @@ void vault_put(CHAR_DATA *ch, char *object, char *owner)
   save_char_obj(ch);
 }
 
+struct sorted_vault
+{
+  // This stores the quantity of each item found in a vault
+  map<string, pair<obj_data*,uint32_t>> vault_content_qty;
+
+  // This stores the order in which vault items are found
+  vector<string> vault_contents;
+  unsigned int weight = 0;
+};
+
+void sort_vault(const vault_data& vault, sorted_vault& sv)
+{
+  struct obj_data *obj;
+
+  for (vault_items_data* items = vault.items; items; items = items->next)
+  {
+    obj = items->obj;
+    if (obj == nullptr)
+    {
+      obj = get_obj(items->item_vnum);
+    }
+
+    if (GET_OBJ_SHORT(obj) != nullptr)
+    {
+      auto& o = sv.vault_content_qty[GET_OBJ_SHORT(obj)];
+      o.first = obj;
+      if (o.second == 0)
+      {
+        //sv.vault_contents.push_back(GET_OBJ_SHORT(obj));
+        sv.vault_contents.insert(sv.vault_contents.begin(), GET_OBJ_SHORT(obj));
+      }
+      o.second += items->count;
+      sv.weight += (obj->obj_flags.weight*items->count);
+    }
+  }
+}
+
+
 void vault_list(CHAR_DATA *ch, char *owner)
 {
   struct vault_items_data *items;
@@ -1664,38 +1702,29 @@ void vault_list(CHAR_DATA *ch, char *owner)
     return;
   }
 
-  unsigned int weight = 0;
-  // This stores the quantity of each item found in a vault
-  map<string, pair<obj_data*,uint32_t>> vault_content_qty;
+  sorted_vault sv;
+  sort_vault(*vault, sv);
 
-  // This stores the order in which vault items are found
-  vector<string> vault_contents;
-  for (items = vault->items; items; items = items->next)
+  if (sv.weight != vault->weight)
   {
-    obj = items->obj;
-    if (obj == nullptr)
+    if (self)
     {
-      obj = get_obj(items->item_vnum);
+      ch->send(fmt::format("Some objects in your vault have changed weight.\r\nYour vault's weight has been recalculated from {} to {}.\r\n", vault->weight, sv.weight));
     }
-
-    if (GET_OBJ_SHORT(obj) != nullptr)
-    {
-      auto& o = vault_content_qty[GET_OBJ_SHORT(obj)];
-      o.first = obj;
-      if (o.second == 0)
-      {
-        vault_contents.push_back(GET_OBJ_SHORT(obj));
-      }
-      o.second += items->count;
-      weight += (obj->obj_flags.weight*items->count);
-
-    }
+    vault->weight = sv.weight;
   }
 
-  if (weight != vault->weight)
+  if (sv.vault_contents.empty())
   {
-    ch->send(fmt::format("Some objects in your vault have changed weight.\r\nYour vault's weight has been recalculated from {} to {}.\r\n", vault->weight, weight));
-    vault->weight = weight;
+    if (self)
+    {
+      csendf(ch, "Your vault is currently empty and can hold %d pounds.\r\n", vault->size);
+    }
+    else
+    {
+      csendf(ch, "%s's vault is currently empty.\r\n", owner);
+    }
+    return;
   }
 
   if (self)
@@ -1707,9 +1736,9 @@ void vault_list(CHAR_DATA *ch, char *owner)
     ch->send(fmt::format("{}'s vault is at {} of {} maximum pounds and contains:\r\n", owner, vault->weight, vault->size));
   }
 
-  for (auto& o_short_description : vault_contents)
+  for (auto& o_short_description : sv.vault_contents)
   {
-    auto& o = vault_content_qty[o_short_description];
+    auto& o = sv.vault_content_qty[o_short_description];
     auto& obj = o.first;
     auto& count = o.second;
 
@@ -1737,19 +1766,6 @@ void vault_list(CHAR_DATA *ch, char *owner)
       ch->send(fmt::format(" [{}]", obj_index[obj->item_number].virt));
     }
     ch->send("\r\n");
-    objects = true;
-  }
-
-  if (!objects)
-  {
-    if (self)
-    {
-      csendf(ch, "Your vault is currently empty and can hold %d pounds.\r\n", vault->size);
-    }
-    else
-    {
-      csendf(ch, "%s's vault is currently empty.\r\n", owner);
-    }
   }
 }
 
