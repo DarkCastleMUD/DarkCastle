@@ -1344,7 +1344,7 @@ int quest_vendor(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
 	  }
       }
       if (!FOUND) {
-	  for (int qvnum=3124; qvnum <= 3126; qvnum++) {
+	  for (int qvnum=3124; qvnum <= 3127; qvnum++) {
 	      rnum = real_object(qvnum);
 	      if (rnum && n++ == want_num) {
 		  FOUND = true;
@@ -1408,7 +1408,8 @@ int quest_vendor(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
 	  obj_index[obj->item_number].virt > 27999 ||
 	  obj_index[obj->item_number].virt != 3124 ||
 	  obj_index[obj->item_number].virt != 3125 ||
-	  obj_index[obj->item_number].virt != 3126) {
+	  obj_index[obj->item_number].virt != 3126 ||
+	  obj_index[obj->item_number].virt != 3127) {
 	  sprintf(buf, "%s I don't deal in worthless junk.", GET_NAME(ch));
 	  do_tell(owner, buf, 0);
 	  return eSUCCESS;
