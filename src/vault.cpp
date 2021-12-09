@@ -69,7 +69,7 @@ int get_line(FILE * fl, char *buf);
 void item_remove(obj_data *obj, struct vault_data *vault);
 void item_add(int vnum, struct vault_data *vault);
 
-struct char_data *find_owner(char *name);
+char_data *find_owner(const char *name);
 void vault_log(CHAR_DATA *ch, char *owner);
 char *clanVName(int c);
 void vault_search_usage(CHAR_DATA *ch);
@@ -84,7 +84,7 @@ struct vault_data *has_vault(const char *name)
   for (vault = vault_table;vault;vault = vault->next)
     if (vault && vault->owner && !strcasecmp(vault->owner, name))
       return vault;
-  char_data *ch = find_owner((char*)name);
+  char_data *ch = find_owner(name);
   if (ch && GET_LEVEL(ch) >= 10) {
      add_new_vault(GET_NAME(ch), 0);
      for (vault = vault_table;vault;vault = vault->next)
@@ -1845,12 +1845,15 @@ void add_new_vault(char *name, int indexonly)
   save_vault(name);
 }
 
-struct char_data *find_owner(char *name) {
-	auto &character_list = DC::instance().character_list;
-	auto result = find_if(character_list.begin(), character_list.end(), [&name](char_data * const &ch) {
-	  if (ch->name == NULL) {
+char_data *find_owner(const char *name) {
+	const auto& character_list = DC::instance().character_list;
+	const auto& result = find_if(character_list.begin(), character_list.end(), [&name](const auto& ch) {
+	  if (ch->name == NULL)
+    {
 		  produce_coredump(); //Trying to track down bug that causes mob->name to be NULL
-	  } else if (!strcmp(name, GET_NAME(ch))) {
+	  }
+    else if (!strcmp(name, GET_NAME(ch)) && IS_PC(ch))
+    {
 			return true;
 	  }
 		return false;
@@ -1860,7 +1863,7 @@ struct char_data *find_owner(char *name) {
 		return *result;
   }
 
-  return 0;
+  return nullptr;
 }
 
 void vault_log(CHAR_DATA *ch, char *owner)
