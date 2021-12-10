@@ -1635,11 +1635,12 @@ void vault_put(CHAR_DATA *ch, char *object, char *owner)
 struct sorted_vault
 {
   // This stores the quantity of each item found in a vault
-  map<string, pair<obj_data*,uint32_t>> vault_content_qty;
+  map<string, pair<obj_data*,uint32_t>> vault_content_qty{};
 
   // This stores the order in which vault items are found
-  vector<string> vault_contents;
-  unsigned int weight = 0;
+  vector<string> vault_contents{};
+
+  unsigned int weight{};
 };
 
 void sort_vault(const vault_data& vault, sorted_vault& sv)
@@ -1736,6 +1737,8 @@ void vault_list(CHAR_DATA *ch, char *owner)
     ch->send(fmt::format("{}'s vault is at {} of {} maximum pounds and contains:\r\n", owner, vault->weight, vault->size));
   }
 
+  // We are showing the last item in vault first because items were inserted at the
+  // front of the sv.vault_contents container
   for (auto& o_short_description : sv.vault_contents)
   {
     auto& o = sv.vault_content_qty[o_short_description];
@@ -2109,27 +2112,19 @@ vault_search_usage(CHAR_DATA *ch)
   send_to_char("vault search keyword staff level 40-60.\r\n\r\n", ch);
 }
 
-int vault_search(CHAR_DATA *ch, char *args)
+int vault_search(CHAR_DATA *ch, const char *args)
 {
-  struct vault_items_data *items;
-  struct obj_data *obj;
-  char sectionbuf[MAX_STRING_LENGTH * 4];
-  char
-      linebuf[MAX_INPUT_LENGTH];
-  char buf[MAX_INPUT_LENGTH];
   int objects = 0;
-  int diff_len = 0;
-  int sectionbuf_len = 0;
-  int linebuf_len = 0;
   bool owner_shown = false;
   int vaults_searched = 0;
   int objects_found = 0;
-  char argument[MAX_INPUT_LENGTH];
+  string arg1 {};
+  string arguments{args};
   list<vault_search_parameter>::iterator p;
   bool nomatch;
 
-  args = one_argument(args, argument);
-  if (argument[0] == '\0')
+  tie (arg1, arguments) = half_chop(arguments);
+  if (arg1.empty())
   {
     vault_search_usage(ch);
     return eFAILURE;
@@ -2141,10 +2136,10 @@ int vault_search(CHAR_DATA *ch, char *args)
   //parse our arguments and setup a list of the things we want to search for
   do
   {
-    if (!strcmp(argument, "keyword"))
+    if (arg1 == "keyword")
     {
-      args = one_argument(args, argument);
-      if (argument[0] == '\0')
+      tie (arg1, arguments) = half_chop(arguments);
+      if (arg1.empty())
       {
         send_to_char("Missing keyword parameter.\r\n\r\n", ch);
         vault_search_usage(ch);
@@ -2153,16 +2148,16 @@ int vault_search(CHAR_DATA *ch, char *args)
       else
       {
         parameter.type = KEYWORD;
-        parameter.str_argument = str_dup(argument);
+        parameter.str_argument = str_dup(arg1.c_str());
         search.push_back(parameter);
         // We need
         parameter.type = UNDEFINED;
       }
     }
-    else if (!strcmp(argument, "level"))
+    else if (arg1 == "level")
     {
-      args = one_argument(args, argument);
-      if (argument[0] == '\0')
+      tie (arg1, arguments) = half_chop(arguments);
+      if (arg1.empty())
       {
         send_to_char("Missing level parameter.\r\n\r\n", ch);
         vault_search_usage(ch);
@@ -2172,12 +2167,12 @@ int vault_search(CHAR_DATA *ch, char *args)
       {
         //start parsing level and level ranges
         size_t pos;
-        string level_string(argument);
+        string level_string(arg1);
 
         //if a '-' is not found then assume a single number is specified
         if ((pos = level_string.find('-')) == string::npos)
         {
-          parameter.int_argument = atoi(argument);
+          parameter.int_argument = atoi(arg1.c_str());
           // Check if a non numeric value is passed
           if (parameter.int_argument == 0 && level_string != "0")
           {
@@ -2227,8 +2222,8 @@ int vault_search(CHAR_DATA *ch, char *args)
       vault_search_usage(ch);
       return eFAILURE;
     }
-    args = one_argument(args, argument);
-  } while (argument[0] != '\0');
+    tie(arg1, arguments) = half_chop(arguments);
+  } while (!arg1.empty());
 
   //now that we know what we're looking for, let's search through all the vaults to find it
   for (vault_data *vault = vault_table; vault; vault = vault->next)
@@ -2237,21 +2232,15 @@ int vault_search(CHAR_DATA *ch, char *args)
     {
       vaults_searched++;
       objects = 0;
-      diff_len = 0;
-      sectionbuf_len = 0;
-      linebuf_len = 0;
-      sectionbuf[0] = '\0';
-      linebuf[0] = '\0';
-      buf[0] = '\0';
       owner_shown = false;
 
-      for (items = vault->items; items; items = items->next)
-      {
-        linebuf[0] = '\0';
-        obj = items->obj ? items->obj : get_obj(items->item_vnum);
+      sorted_vault sv;
+      sort_vault(*vault, sv);
 
-        if (obj == NULL)
-          continue;
+      for (auto &o_short_description : sv.vault_contents)
+      {
+        auto &o = sv.vault_content_qty[o_short_description];
+        auto &obj = o.first;
 
         nomatch = false;
         //look through each search parameter to see if any of them don't match the current object
@@ -2306,62 +2295,33 @@ int vault_search(CHAR_DATA *ch, char *args)
           csendf(ch, "\n\r%s:\n\r", vault->owner);
         }
 
-        if (items->count > 1)
+        auto &count = o.second;
+        objects_found += count;
+        if (count > 1)
         {
-          snprintf(linebuf, sizeof(linebuf), "[$5%d$R] ", items->count);
-
-          sectionbuf_len = strlen(sectionbuf);
-          linebuf_len = strlen(linebuf);
-          diff_len = sizeof(sectionbuf) - (sectionbuf_len + linebuf_len + 1 + 2);
-
-          if (diff_len > 0)
-          {
-            strncat(sectionbuf, linebuf, diff_len);
-          }
+          ch->send(fmt::format("[$5{}$R] ", count));
         }
 
-        objects_found += items->count;
+        ch->send(fmt::format("{}$R", GET_OBJ_SHORT(obj)));
 
-        snprintf(linebuf, sizeof(linebuf), "%s ", GET_OBJ_SHORT(obj));
-
-        if (obj->obj_flags.type_flag == ITEM_ARMOR || obj->obj_flags.type_flag == ITEM_WEAPON || obj->obj_flags.type_flag == ITEM_FIREWEAPON || obj->obj_flags.type_flag == ITEM_CONTAINER || obj->obj_flags.type_flag == ITEM_INSTRUMENT || obj->obj_flags.type_flag == ITEM_STAFF || obj->obj_flags.type_flag == ITEM_WAND || obj->obj_flags.type_flag == ITEM_LIGHT)
+        if (obj->obj_flags.type_flag == ITEM_ARMOR ||
+            obj->obj_flags.type_flag == ITEM_WEAPON ||
+            obj->obj_flags.type_flag == ITEM_FIREWEAPON ||
+            obj->obj_flags.type_flag == ITEM_CONTAINER ||
+            obj->obj_flags.type_flag == ITEM_INSTRUMENT ||
+            obj->obj_flags.type_flag == ITEM_STAFF ||
+            obj->obj_flags.type_flag == ITEM_WAND ||
+            obj->obj_flags.type_flag == ITEM_LIGHT)
         {
-          strncpy(buf, linebuf, sizeof(buf));
-          snprintf(linebuf, MAX_INPUT_LENGTH, "%s %s $3Lvl: %d$R", buf,
-                   item_condition(obj), obj->obj_flags.eq_level);
+          ch->send(fmt::format("{} $3Lvl: {}$R", item_condition(obj), obj->obj_flags.eq_level));
         }
 
-        if (GET_LEVEL(ch) > IMMORTAL)
+        if (GET_LEVEL(ch) > IMMORTAL && obj->item_number > 0)
         {
-          strncpy(buf, linebuf, sizeof(buf));
-          snprintf(linebuf, sizeof(linebuf), "%s [%d]", buf, items->item_vnum);
+          ch->send(fmt::format(" [{}]", obj_index[obj->item_number].virt));
         }
-
-        objects = 1;
-        linebuf_len = strlen(linebuf);
-        diff_len = sizeof(linebuf) - (linebuf_len + 2 + 1);
-
-        if (diff_len > 0)
-        {
-          strncat(linebuf, "\r\n", diff_len);
-        }
-
-        if (strlen(linebuf) + strlen(sectionbuf) < MAX_STRING_LENGTH * 4 - 200)
-        {
-          strncat(sectionbuf, linebuf, sizeof(sectionbuf) - 1);
-          sectionbuf[sizeof(sectionbuf) - 1] = 0;
-        }
-        else
-        {
-          strcat(sectionbuf, "Overflow!!!\r\n");
-          break;
-        }
+        ch->send("\r\n");    
       } // for loop of objects
-
-      if (objects)
-      {
-        page_string(ch->desc, sectionbuf, 1);
-      }
     } // if we have access to vault
   }   // for loop of vaults
 
