@@ -1315,7 +1315,7 @@ int quest_vendor(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
 	      dc_free(buffer);
 	  }
       }
-      for (int qvnum=3124; qvnum <= 3126; qvnum++) {
+      for (int qvnum=3124; qvnum <= 3127; qvnum++) {
 	  rnum = real_object(qvnum);
 	  if (rnum) {
 	      char *buffer = gl_item((OBJ_DATA*)obj_index[rnum].item, n++, ch, FALSE);
