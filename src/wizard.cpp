@@ -1936,107 +1936,106 @@ int do_huntstart(struct char_data *ch, char *argument, int cmd)
 #ifdef TWITTER
   twitCurl twitterObj;
   string authUrl, replyMsg;
-  string myOAuthAccessTokenKey( "" );
-  string myOAuthAccessTokenSecret( "" );
-  string userName ( "" );
-  string passWord ( "" );
-  string message ( "" );
+  string myOAuthAccessTokenKey("");
+  string myOAuthAccessTokenSecret("");
+  string userName("");
+  string passWord("");
+  string message("");
 
   userName = "DarkCastleMUD";
   passWord = "$dc2009";
 
-  twitterObj.setTwitterUsername( userName );
-  twitterObj.setTwitterPassword( passWord );
+  twitterObj.setTwitterUsername(userName);
+  twitterObj.setTwitterPassword(passWord);
 
-  twitterObj.getOAuth().setConsumerKey( string( "phRZBl2IDCFryRITUNtkw" ) );
-  twitterObj.getOAuth().setConsumerSecret( string( "AK5Uxb6jlgROX79d78mPCyuq85E08DbAmJm94RMyY" ) );
+  twitterObj.getOAuth().setConsumerKey(string("phRZBl2IDCFryRITUNtkw"));
+  twitterObj.getOAuth().setConsumerSecret(string("AK5Uxb6jlgROX79d78mPCyuq85E08DbAmJm94RMyY"));
 
-  twitterObj.getOAuth().setOAuthTokenKey( string( "36770859-RMEAZ5jw5hMoVqadRWUS4cMB2VrvK513bck1I61Bz" ) );
-  twitterObj.getOAuth().setOAuthTokenSecret( string( "2TTedhTy6NP1ntHqexsLl4OVWVn5BpZHvZDRp4Fh10" ) );
+  twitterObj.getOAuth().setOAuthTokenKey(string("36770859-RMEAZ5jw5hMoVqadRWUS4cMB2VrvK513bck1I61Bz"));
+  twitterObj.getOAuth().setOAuthTokenSecret(string("2TTedhTy6NP1ntHqexsLl4OVWVn5BpZHvZDRp4Fh10"));
 
-  if( twitterObj.accountVerifyCredGet() )
+  if (twitterObj.accountVerifyCredGet())
   {
-//    twitterObj.getLastWebResponse( replyMsg );
-    sprintf(buf, "twitterClient:: twitCurl::accountVerifyCredGet web response:\n%s\n", replyMsg.c_str() );
+    //    twitterObj.getLastWebResponse( replyMsg );
+    sprintf(buf, "twitterClient:: twitCurl::accountVerifyCredGet web response:\n%s\n", replyMsg.c_str());
     log(buf, 100, LOG_GOD);
   }
   else
   {
-    twitterObj.getLastCurlError( replyMsg );
-    sprintf( buf, "twitterClient:: twitCurl::accountVerifyCredGet error:\n%s\n", replyMsg.c_str() );
+    twitterObj.getLastCurlError(replyMsg);
+    sprintf(buf, "twitterClient:: twitCurl::accountVerifyCredGet error:\n%s\n", replyMsg.c_str());
     log(buf, 100, LOG_GOD);
   }
 #endif
 
-  argument = one_argument(argument,arg);
-  argument = one_argument(argument,arg2);
-  argument = one_argument(argument,arg3);
+  argument = one_argument(argument, arg);
+  argument = one_argument(argument, arg2);
+  argument = one_argument(argument, arg3);
 
   if (arg3[0] == '\0')
   {
-     send_to_char("Syntax: huntstart <vnum> <# of items (1-60)> <time limit> [hunt name]\r\n",ch);
-     return eSUCCESS;
+    send_to_char("Syntax: huntstart <vnum> <# of items (1-60)> <time limit> [hunt name]\r\n", ch);
+    return eSUCCESS;
   }
   int vnum = atoi(arg), num = atoi(arg2), time = atoi(arg3);
   if (vnum <= 0 || real_object(vnum) < 0)
   {
-    send_to_char("Non-existent item.\r\n",ch);
+    send_to_char("Non-existent item.\r\n", ch);
     return eSUCCESS;
   }
   if (num <= 0 || num > 60)
   {
-    send_to_char("Invalid number of items. Maximum of 60 allowed.\r\n",ch);
+    send_to_char("Invalid number of items. Maximum of 60 allowed.\r\n", ch);
     return eSUCCESS;
   }
   if (time <= 0)
   {
-    send_to_char("Invalid duration.\r\n",ch);
+    send_to_char("Invalid duration.\r\n", ch);
     return eSUCCESS;
   }
   struct hunt_data *h;
-  for (h = hunt_list;h;h = h->next)
-  if (h->itemnum == vnum)
-  {
-    send_to_char("A hunt for that item is already ongoing!\r\n",ch);
-    return eSUCCESS;
-  }
+  for (h = hunt_list; h; h = h->next)
+    if (h->itemnum == vnum)
+    {
+      send_to_char("A hunt for that item is already ongoing!\r\n", ch);
+      return eSUCCESS;
+    }
   char huntname[200];
-  if (argument && *argument) 
+  if (argument && *argument)
   {
-	strcpy(huntname,argument);
-	begin_hunt(vnum, time, num, argument);
+    strcpy(huntname, argument);
+    begin_hunt(vnum, time, num, argument);
   }
   else
   {
-	strcpy(huntname, "A hunt");
-	begin_hunt(vnum,time,num,0);
+    strcpy(huntname, "A hunt");
+    begin_hunt(vnum, time, num, 0);
   }
 
-  sprintf(buf,"\r\n## %s has been started! There are a total of %d items and %d minutes to find them all!\r\n## Type 'huntitems' to get the locations!\r\n",huntname,num,time);
+  sprintf(buf, "\r\n## %s has been started! There are a total of %d items and %d minutes to find them all!\r\n## Type 'huntitems' to get the locations!\r\n", huntname, num, time);
   send_info(buf);
 
 #ifdef TWITTER
   string holding[3] = {
-	"Get your ass to MAHS... err, DC.  There's a hunt!",
-	"You may be wondering why I've gathered you here today.  There's a hunt!",
-	"Aussie Aussie Aussie! Oi Oi Hunt!!"
-	};
+      "Get your ass to MAHS... err, DC.  There's a hunt!",
+      "You may be wondering why I've gathered you here today.  There's a hunt!",
+      "Aussie Aussie Aussie! Oi Oi Hunt!!"};
 
   int pos = rand() % 3;
 
-  message=holding[pos];
+  message = holding[pos];
 
-  if( twitterObj.statusUpdate( message ) )
+  if (twitterObj.statusUpdate(message))
   {
-//    twitterObj.getLastWebResponse( replyMsg );
-    sprintf( buf, "\ntwitterClient:: twitCurl::statusUpdate web response:\n%s\n", replyMsg.c_str() );
-    log( buf, 100, LOG_GOD );
+    //    twitterObj.getLastWebResponse( replyMsg );
+    sprintf(buf, "\ntwitterClient:: twitCurl::statusUpdate web response:\n%s\n", replyMsg.c_str());
+    log(buf, 100, LOG_GOD);
   }
   else
   {
-    twitterObj.getLastCurlError( replyMsg );
-    sprintf( buf, "\ntwitterClient:: twitCurl::statusUpdate error:\n%s\n", replyMsg.c_str() );
-    log( buf, 100, LOG_GOD );
+    twitterObj.getLastCurlError(replyMsg);
+    sprintf(buf, "\ntwitterClient:: twitCurl::statusUpdate error:\n%s\n", replyMsg.c_str());
+    log(buf, 100, LOG_GOD);
   }
 #endif
 
