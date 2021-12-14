@@ -1709,72 +1709,77 @@ void begin_hunt(int item, int duration, int amount, char *huntname)
   hunt_list = n;
   n->itemnum = item;
   n->time = duration;
-  if (huntname) n->huntname = str_dup(huntname);
-  
+  if (huntname)
+    n->huntname = str_dup(huntname);
+
   ct = time(0);
   pTime = localtime(&ct);
   tmp = last_hunt_time(NULL);
 
-  if(NULL != pTime)
+  if (NULL != pTime)
   {
-#ifdef __CYGWIN__  
-     snprintf(tmp, strlen(tmp)+1, "%d/%d/%d (%d:%02d)\n\r",
-           pTime->tm_mon+1,
-	   pTime->tm_mday,
-	   pTime->tm_year+1900,
-	   pTime->tm_hour,
-	   pTime->tm_min);
+#ifdef __CYGWIN__
+    snprintf(tmp, strlen(tmp) + 1, "%d/%d/%d (%d:%02d)\n\r",
+             pTime->tm_mon + 1,
+             pTime->tm_mday,
+             pTime->tm_year + 1900,
+             pTime->tm_hour,
+             pTime->tm_min);
 #else
-	 snprintf(tmp, strlen(tmp)+1, "%d/%d/%d (%d:%02d) %s\n\r",
-           pTime->tm_mon+1,
-	   pTime->tm_mday,
-	   pTime->tm_year+1900,
-	   pTime->tm_hour,
-	   pTime->tm_min,
-	   pTime->tm_zone);
+    snprintf(tmp, strlen(tmp) + 1, "%d/%d/%d (%d:%02d) %s\n\r",
+             pTime->tm_mon + 1,
+             pTime->tm_mday,
+             pTime->tm_year + 1900,
+             pTime->tm_hour,
+             pTime->tm_min,
+             pTime->tm_zone);
 #endif
   }
 
-  
-  
-  if (item == 76) init_random_hunt_items(n);
+  if (item == 76)
+    init_random_hunt_items(n);
   int rnum = real_object(item);
   extern int top_of_mobt;
-  if (rnum < 0) return;
+  if (rnum < 0)
+    return;
 
-  for (int i = 0; i < amount;i++)
+  for (int i = 0; i < amount; i++)
   {
     int mob = -1;
     CHAR_DATA *vict;
     while (1)
     {
-	mob = number(1,top_of_mobt);
-	int vnum = mob_index[mob].virt; // debug
-	if (!(mob_index[mob].virt > 300 &&
-        (mob_index[mob].virt < 2300 || mob_index[mob].virt > 2499) &&
-	(mob_index[mob].virt < 29200 || mob_index[mob].virt > 29299) && 
-	(mob_index[mob].virt < 5600 || mob_index[mob].virt > 5699) && 
-	(mob_index[mob].virt < 16200 || mob_index[mob].virt > 16399) && 
-	(mob_index[mob].virt < 1900 || mob_index[mob].virt > 1999) && 
-	(mob_index[mob].virt < 10500 || mob_index[mob].virt > 10622) && 
-	(mob_index[mob].virt < 8500 || mob_index[mob].virt > 8699 ))) continue;
+      mob = number(1, top_of_mobt);
+      int vnum = mob_index[mob].virt; // debug
+      if (!(mob_index[mob].virt > 300 &&
+            (mob_index[mob].virt < 2300 || mob_index[mob].virt > 2499) &&
+            (mob_index[mob].virt < 29200 || mob_index[mob].virt > 29299) &&
+            (mob_index[mob].virt < 5600 || mob_index[mob].virt > 5699) &&
+            (mob_index[mob].virt < 16200 || mob_index[mob].virt > 16399) &&
+            (mob_index[mob].virt < 1900 || mob_index[mob].virt > 1999) &&
+            (mob_index[mob].virt < 10500 || mob_index[mob].virt > 10622) &&
+            (mob_index[mob].virt < 8500 || mob_index[mob].virt > 8699)))
+        continue;
 
+      if (mob_index[mob].number <= 0)
+        continue;
+      if (!(vict = get_random_mob_vnum(vnum)))
+        continue;
+      if (IS_SET(zone_table[world[vict->in_room].zone].zone_flags, ZONE_NOHUNT))
+        continue;
 
-        if (mob_index[mob].number <= 0) continue;
-	if (!(vict = get_random_mob_vnum(vnum))) continue;
-        if (IS_SET(zone_table[world[vict->in_room].zone].zone_flags, ZONE_NOHUNT)) continue;
+      if (strlen(vict->short_desc) > 34)
+        continue; // They suck
 
-	if (strlen(vict->short_desc) > 34) continue; // They suck
-
-	break;
+      break;
     }
     struct obj_data *obj = clone_object(rnum);
     obj_to_char(obj, vict);
     struct hunt_items *ni;
 #ifdef LEAK_CHECK
-  ni = (struct hunt_items *)calloc(1, sizeof(struct hunt_items));
+    ni = (struct hunt_items *)calloc(1, sizeof(struct hunt_items));
 #else
-  ni = (struct hunt_items *)dc_alloc(1, sizeof(struct hunt_items));
+    ni = (struct hunt_items *)dc_alloc(1, sizeof(struct hunt_items));
 #endif
     ni->hunt = n;
     ni->obj = obj;
@@ -1786,92 +1791,102 @@ void begin_hunt(int item, int duration, int amount, char *huntname)
 
 void pick_up_item(struct char_data *ch, struct obj_data *obj)
 {
-  struct hunt_items *i,*p = NULL,*in;
+  struct hunt_items *i, *p = NULL, *in;
   char buf[MAX_STRING_LENGTH];
   int gold = 0;
   for (i = hunt_items_list; i; i = in)
   {
-     in = i->next;
-     if (i->obj == obj)
-     {
-	if (p) p->next = in;
-	else hunt_items_list = in;
-	int vnum = obj_index[obj->item_number].virt;
-	sprintf(buf, "\r\n## %s has been recovered from %s by %s!\r\n",
-		obj->short_description,i->mobname,ch->name);
-	send_info(buf);
-	struct hunt_data *h = i->hunt;
-	struct obj_data *oitem = NULL;
-	int r1 = 0;
-	switch (vnum)
-	{
-		case 76:
-		  obj_from_char(obj);
-		  obj_to_room(obj, 6345);
-		  r1 = real_object(get_rand_obj(h));
-		  if (r1 > 0)
-		  {
-		    oitem = clone_object(r1);
-		    sprintf(buf, "As if by magic, %s transforms into %s!\r\n",
-			obj->short_description, oitem->short_description);
-		    send_to_char(buf,ch);
-		    sprintf(buf, "## %s turned into %s!\r\n",
-			obj->short_description,oitem->short_description);
-		    send_info(buf);
-                    if(IS_SET(oitem->obj_flags.more_flags, ITEM_UNIQUE)) {
-                      if(search_char_for_item(ch, oitem->item_number, false)) {
-                        send_to_char("The item's uniqueness causes it to poof into thin air!\r\n", ch);
-                        extract_obj(oitem);
-			break; // Used to crash it.
-                      } else obj_to_char(oitem, ch);
-                    }
-		    else obj_to_char(oitem, ch);
-		  } else {
-		    send_to_char("Brick turned into a non-existent item. Tell an imm.\r\n",ch);
-		    break;
-		  }
-		  if (obj_index[oitem->item_number].virt < 27915 || obj_index[oitem->item_number].virt > 27918)
-			  break;
-		  else obj = oitem; // Gold! Continue on to the next cases.
-		  /* no break */
-		case 27915:
-		case 27916:
-		case 27917:
-		case 27918:
-		  gold = obj->obj_flags.value[0];
-		  sprintf(buf, "As if by magic, %s transform into %d gold!\r\n",
-			obj->short_description, gold);
-		  send_to_char(buf,ch);
+    in = i->next;
+    if (i->obj == obj)
+    {
+      if (p)
+        p->next = in;
+      else
+        hunt_items_list = in;
+      int vnum = obj_index[obj->item_number].virt;
+      sprintf(buf, "\r\n## %s has been recovered from %s by %s!\r\n",
+              obj->short_description, i->mobname, ch->name);
+      send_info(buf);
+      struct hunt_data *h = i->hunt;
+      struct obj_data *oitem = NULL;
+      int r1 = 0;
+      switch (vnum)
+      {
+      case 76:
+        obj_from_char(obj);
+        obj_to_room(obj, 6345);
+        r1 = real_object(get_rand_obj(h));
+        if (r1 > 0)
+        {
+          oitem = clone_object(r1);
+          sprintf(buf, "As if by magic, %s transforms into %s!\r\n",
+                  obj->short_description, oitem->short_description);
+          send_to_char(buf, ch);
+          sprintf(buf, "## %s turned into %s!\r\n",
+                  obj->short_description, oitem->short_description);
+          send_info(buf);
+          if (IS_SET(oitem->obj_flags.more_flags, ITEM_UNIQUE))
+          {
+            if (search_char_for_item(ch, oitem->item_number, false))
+            {
+              send_to_char("The item's uniqueness causes it to poof into thin air!\r\n", ch);
+              extract_obj(oitem);
+              break; // Used to crash it.
+            }
+            else
+              obj_to_char(oitem, ch);
+          }
+          else
+            obj_to_char(oitem, ch);
+        }
+        else
+        {
+          send_to_char("Brick turned into a non-existent item. Tell an imm.\r\n", ch);
+          break;
+        }
+        if (obj_index[oitem->item_number].virt < 27915 || obj_index[oitem->item_number].virt > 27918)
+          break;
+        else
+          obj = oitem; // Gold! Continue on to the next cases.
+        /* no break */
+      case 27915:
+      case 27916:
+      case 27917:
+      case 27918:
+        gold = obj->obj_flags.value[0];
+        sprintf(buf, "As if by magic, %s transform into %d gold!\r\n",
+                obj->short_description, gold);
+        send_to_char(buf, ch);
 
-		  GET_GOLD(ch) += gold;
-		  obj_from_char(obj);
-		  obj_to_room(obj, 6345);
-		  break;
-
-	}
-	dc_free(i->mobname);
-	dc_free(i);
-	check_end_of_hunt(h);
-	continue;
-     }
-     p = i;
+        GET_GOLD(ch) += gold;
+        obj_from_char(obj);
+        obj_to_room(obj, 6345);
+        break;
+      }
+      dc_free(i->mobname);
+      dc_free(i);
+      check_end_of_hunt(h);
+      continue;
+    }
+    p = i;
   }
 }
 
 void pulse_hunts()
 {
-  struct hunt_data *h,*hn;
+  struct hunt_data *h, *hn;
 
-  for (h = hunt_list;h;h = hn)
+  for (h = hunt_list; h; h = hn)
   {
-     hn = h->next;
-     h->time--;
-     check_end_of_hunt(h);
+    hn = h->next;
+    h->time--;
+    check_end_of_hunt(h);
   }
 
-  if (&world[6345] == NULL) {
-	  logf(IMMORTAL, LOG_BUG, "pulse_hunts: room 6345 does not exist.");
-	  return;
+  if (&world[6345] == NULL)
+  {
+    logf(IMMORTAL, LOG_BUG, "pulse_hunts: room 6345 does not exist.");
+    return;
   }
 
   struct obj_data *obj, *onext;
