@@ -1598,38 +1598,42 @@ void check_end_of_hunt(struct hunt_data *h, bool forced = FALSE)
 int do_huntclear(struct char_data *ch, char *arg, int cmd)
 {
   char arg1[MAX_INPUT_LENGTH];
-  arg = one_argument(arg,arg1);
-  
+  arg = one_argument(arg, arg1);
+
   if (str_cmp(arg1, "doit"))
   {
-    send_to_char("Syntax: huntclear doit\r\nClears all currently running treasure hunts.\r\n",ch);
+    send_to_char("Syntax: huntclear doit\r\nClears all currently running treasure hunts.\r\n", ch);
     return eSUCCESS;
-  } else {
-    struct hunt_data *h,*hn;
-    for (h = hunt_list;h; h = hn)
+  }
+  else
+  {
+    struct hunt_data *h, *hn;
+    for (h = hunt_list; h; h = hn)
     {
-       hn = h->next;
-       h->time = -1;
-       check_end_of_hunt(h,TRUE);
+      hn = h->next;
+      h->time = -1;
+      check_end_of_hunt(h, TRUE);
     }
-    send_to_char("Done!\r\n",ch);
+    send_to_char("Done!\r\n", ch);
     return eSUCCESS;
   }
 }
 
 void huntclear_item(struct obj_data *obj)
 {
-  struct hunt_items *hi,*hin,*hip = NULL;
-  for (hi = hunt_items_list;hi;hi = hin)
+  struct hunt_items *hi, *hin, *hip = NULL;
+  for (hi = hunt_items_list; hi; hi = hin)
   {
     hin = hi->next;
     if (hi->obj == obj)
     {
-	if (hip) hip->next = hin;
-	else hunt_items_list = hin;
-	dc_free(hi->mobname);
-	dc_free(hi);
-	continue; // Hopefully there's not two in the list, but just in case.
+      if (hip)
+        hip->next = hin;
+      else
+        hunt_items_list = hin;
+      dc_free(hi->mobname);
+      dc_free(hi);
+      continue; // Hopefully there's not two in the list, but just in case.
     }
     hip = hi;
   }
@@ -1637,15 +1641,16 @@ void huntclear_item(struct obj_data *obj)
 
 int get_rand_obj(struct hunt_data *h)
 {
-  int i,v;
+  int i, v;
 
-  for (i = 49;i > 0;i--)
+  for (i = 49; i > 0; i--)
     if (h->itemsAvail[i] > 0)
       break;
 
-  if (i < 0) return -1;
+  if (i < 0)
+    return -1;
 
-  v = number(0,i);
+  v = number(0, i);
   int c = h->itemsAvail[v];
   h->itemsAvail[v] = h->itemsAvail[i];
   h->itemsAvail[i] = -1;
@@ -1656,41 +1661,47 @@ int get_rand_obj(struct hunt_data *h)
 void init_random_hunt_items(struct hunt_data *h)
 {
   FILE *f;
-  if ((f= dc_fopen("huntitems.txt","r"))==NULL)
+  if ((f = dc_fopen("huntitems.txt", "r")) == NULL)
   {
-    for (int i = 0; i < 50;i++)
-	h->itemsAvail[i] = -1;
-    return; 
+    for (int i = 0; i < 50; i++)
+      h->itemsAvail[i] = -1;
+    return;
   }
   int a, i;
   bool over = FALSE;
-  for (a = 0; a < 50;a++)
+  for (a = 0; a < 50; a++)
   {
-    if (!over) {
+    if (!over)
+    {
       i = fread_int(f, 0, INT_MAX);
-      if (i == 0) over = TRUE;
-      else { h->itemsAvail[a] = i; continue; }
+      if (i == 0)
+        over = TRUE;
+      else
+      {
+        h->itemsAvail[a] = i;
+        continue;
+      }
     }
     h->itemsAvail[a] = -1;
   }
   dc_fclose(f);
 }
 
-char * last_hunt_time(char * last_hunt)
+char *last_hunt_time(char *last_hunt)
 {
-   static char *time_of_last_hunt = NULL;
-   char buf[MAX_STRING_LENGTH];
+  static char *time_of_last_hunt = NULL;
+  char buf[MAX_STRING_LENGTH];
 
-   if(!time_of_last_hunt)
-   {
-      sprintf(buf, "There have been no hunts since the last reboot.       \n\r");
-      time_of_last_hunt = str_dup(buf);
-   }
-   
-   if(last_hunt)
-      time_of_last_hunt = last_hunt;
+  if (!time_of_last_hunt)
+  {
+    sprintf(buf, "There have been no hunts since the last reboot.       \n\r");
+    time_of_last_hunt = str_dup(buf);
+  }
 
-   return time_of_last_hunt;
+  if (last_hunt)
+    time_of_last_hunt = last_hunt;
+
+  return time_of_last_hunt;
 }
 
 void begin_hunt(int item, int duration, int amount, char *huntname)
@@ -1903,46 +1914,49 @@ int do_showhunt(CHAR_DATA *ch, char *arg, int cmd)
   struct hunt_data *h;
   struct hunt_items *hi;
 
-  if (!hunt_list) 
+  if (!hunt_list)
   {
-     send_to_char("There are no active hunts at the moment.\r\n",ch);
-     	 
-     sprintf(buf, "Last hunt was run: %s \n\r", last_hunt_time(NULL));
-     
-     send_to_char(buf, ch);
-  }
-  else send_to_char("The following hunts are currently active:\r\n",ch);
+    send_to_char("There are no active hunts at the moment.\r\n", ch);
 
-  for (h = hunt_list;h;h = h->next)
-  {
-	if (h->huntname)
-	 sprintf(buf,"\r\n%s for '%s'(%d minutes remaining):\r\n",h->huntname,
-			((OBJ_DATA*)obj_index[real_object(h->itemnum)].item)->short_description,h->time);
-	else
-	 sprintf(buf,"\r\nThe hunt for '%s'(%d minutes remaining):\r\n",
-			((OBJ_DATA*)obj_index[real_object(h->itemnum)].item)->short_description,h->time);
-	send_to_char(buf,ch);
-	int itemsleft = 0;
-	buf[0] = '\0';
-	for (hi = hunt_items_list;hi;hi = hi->next)
-	{
-		if (hi->hunt != h) continue;
-		itemsleft++;
-		sprintf(buf,"%s| %-35s  ",
-			buf,hi->mobname);
-		if ((itemsleft % 2) == 0)
-		{
-		  sprintf(buf,"%s|\r\n",buf);
-		  send_to_char(buf,ch);
-		  buf[0] = '\0';
-		}
-	}
-	if (buf[0] != '\0') {
-	  sprintf(buf,"%s|\r\n",buf);
-	  send_to_char(buf,ch);
-	}
+    sprintf(buf, "Last hunt was run: %s \n\r", last_hunt_time(NULL));
+
+    send_to_char(buf, ch);
   }
- return eSUCCESS;
+  else
+    send_to_char("The following hunts are currently active:\r\n", ch);
+
+  for (h = hunt_list; h; h = h->next)
+  {
+    if (h->huntname)
+      sprintf(buf, "\r\n%s for '%s'(%d minutes remaining):\r\n", h->huntname,
+              ((OBJ_DATA *)obj_index[real_object(h->itemnum)].item)->short_description, h->time);
+    else
+      sprintf(buf, "\r\nThe hunt for '%s'(%d minutes remaining):\r\n",
+              ((OBJ_DATA *)obj_index[real_object(h->itemnum)].item)->short_description, h->time);
+    send_to_char(buf, ch);
+    int itemsleft = 0;
+    buf[0] = '\0';
+    for (hi = hunt_items_list; hi; hi = hi->next)
+    {
+      if (hi->hunt != h)
+        continue;
+      itemsleft++;
+      sprintf(buf, "%s| %-35s  ",
+              buf, hi->mobname);
+      if ((itemsleft % 2) == 0)
+      {
+        sprintf(buf, "%s|\r\n", buf);
+        send_to_char(buf, ch);
+        buf[0] = '\0';
+      }
+    }
+    if (buf[0] != '\0')
+    {
+      sprintf(buf, "%s|\r\n", buf);
+      send_to_char(buf, ch);
+    }
+  }
+  return eSUCCESS;
 }
 
 int do_huntstart(struct char_data *ch, char *argument, int cmd)
