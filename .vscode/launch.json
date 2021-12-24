@@ -5,6 +5,26 @@
     //valgrind --vgdb=yes --vgdb-error=0 ./dcastle -d ~/dcastle/lib/
     "version": "0.2.0",
     "configurations": [
+        {
+            "name": "(gdb) Launch using ../lib",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/dcastle",
+            "args": [ "-P", "-p 6969"],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/lib/",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+    
 
         {
             "name": "(gdb) Launch",
