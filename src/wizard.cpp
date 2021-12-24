@@ -1894,17 +1894,22 @@ void pulse_hunts()
     check_end_of_hunt(h);
   }
 
-  if (&world[6345] == NULL)
+  try {
+    if (&world[6345] == NULL)
+    {
+      logf(IMMORTAL, LOG_BUG, "pulse_hunts: room 6345 does not exist.");
+      return;
+    }
+
+    struct obj_data *obj, *onext;
+    for (obj = world[6345].contents; obj; obj = onext)
+    {
+      onext = obj->next_content;
+      extract_obj(obj);
+    }
+  } catch(...)
   {
     logf(IMMORTAL, LOG_BUG, "pulse_hunts: room 6345 does not exist.");
-    return;
-  }
-
-  struct obj_data *obj, *onext;
-  for (obj = world[6345].contents; obj; obj = onext)
-  {
-    onext = obj->next_content;
-    extract_obj(obj);
   }
 }
 
