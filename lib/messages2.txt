@@ -1,0 +1,995 @@
+M
+ 5
+You $B$4burned$R $N to death with a spray of | $B$4fire$R damage.~
+You have been $B$4burned$R to death by $n's spray of | $B$4fire$R damage.~
+$n has $B$4burned$R $N to death with a spray of | $B$4fire$R damage from $s hands.~
+You miss $N with your $B$4burning hands$R.~
+$n sends forth a spray of flame from $s $B$4burning hands$R, but misses.~
+$n tries to $B$4burn$R $N, but $E escapes.~
+You $B$4burned$R $N causing | damage.~
+You cry out in pain as $n $B$4burns$R you for | damage.~
+$N cries out as $n $B$4burns$R $M for | damage.~
+Your attempt to $B$4burn$R $N nears BLASPHEMY!~
+The pitiful creature before you tries to $B$4burn$R you.~
+Unaware of the risks, $n tries to $B$4burn$R $N.~
+M
+ 134
+Your $B$1blue bird$R's last peck of | damage was one too many for poor $N.~
+You are pecked for | damage and killed by $n's $B$1blue bird$R!~
+$N fails to fend off $n's | $B$1blue bird$R damage and is pecked to death!~
+Your $B$1blue bird tries to peck at $n but is batted aside.~
+You manage to bat away $n's $B$1blue bird$R before it can peck you.~
+$n's $B$1blue bird$R is nimbly batted out of the air by $N~
+Your $B$1blue bird$R gives $N a nasty peck delivering | damage.~
+$n summons a $B$1blue bird$R out of the air which gives you a nasty peck delivering | damage!~
+$n summons a $B$1blue bird$R out of the air which gives $N a nasty peck delivering | damage!~
+Your $B$1blue bird$R runs away in fear.~
+$n's $B$1blue bird$R takes one look at you and runs.~
+$n summons a $B$1blue bird$R which takes one look at $N and flies away in terror.~
+M
+ 157
+Your $B$5lightning$R blasts | volts into $N who explodes in a shower of gore!~
+The $B$5lightning$R sent by $n sends | volts through you, ending your life!~
+The dead body of $N sizzles with | volts of $B$5lightning$R sent by $n.~
+Your $B$5lightning$R scores the ground in front of $N, missing $M completely.~
+The ground before you is scored as $n misses you with $B$5lightning$R.~
+$N jumps backwards in time to avoid $B$5lightning$R sent by $n.~
+You hit $N for | volts with your $B$5lightning$R, bullseye!~
+$n calls forth a $B$5lightning$R strike of | volts to blast you!~
+$N screams in pain as | volts of $B$5lightning$R from $n penetrates $M.~
+$N stops your $B$5lightning$R with a single gesture, BEWARE!~
+You stop $n's $B$5lightning$R with a sure hand, no time for children's games.~
+$n's $B$5lightning$R disappears as $N makes a simple gesture.~
+M
+ 157
+You call forth | volts of $B$5lightning$R from the heavens, shattering $N to pieces!~
+$n raises $s arms skyward and calls down | volts of $B$5lightning$R that ends your life!~
+$n calls forth | volts of $B$5lightning$R from the sky, shattering $N to pieces!~
+Your called $B$5lightning$R dissipates before reaching $N.~
+$n calls $B$5lightning$R from the heavens that dissipates before reaching you.~
+$n calls $B$5lightning$R from the sky, but it dissipates before reaching $N.~
+Your called $B$5lightning$R crackles in the air as | volts strike $N.~
+Your skin sizzles from | volts of $B$5lightning$R sent by $n.~
+The air around $N crackles as | volts of $B$5lightning$R sent by $n strikes $M.~
+$N casually grabs your bolt of $B$5lightning$R from the air and makes a snack of it.~ 
+You casually grab $n's $B$5lightning$R from the air and munch on it -- MMmMmmM crispy.~
+$N casually reaches up and grabs $n's $B$5lightning$R from the air and begins to snack on it.~
+M
+ 48
+The | damage from your $B$5ray of sunlight$R fries $N into a crispy hulk.~
+Your skin cracks and your organs boil into goo as | damage from $n's $B$5ray of sunlight$R cooks you!~
+A $B$5ray of sunlight$R converges from the heavens dealing | damage to $N, frying $M into a crisp!~
+Your $B$5sun ray$R burns the ground in front of $N.~
+The ground before you is scored black by a $B$5ray of sunlight$R.~
+$N jumps to the side to avoid $B$5a ray of sunlight$R that scorches the ground.~
+Your $B$5sun ray$R gives $N a horrible sunburn inflicting | damage.~
+A strong $B$5ray of sunlight$R sent by $n reddens your skin badly as it burns for | damage.~
+$N winces in pain as a $B$5ray of sunlight$R from $n burns $S skin for | damage.~
+$N causes a quick eclipse, and snickers at you.~
+You cover the sun with the moon, blocking $n's attempt to ray you with sunlight.~
+$N snaps $S fingers causing an eclipse that blocks $n's ray of sunlight.~
+M
+ 8
+Your $B$3chill touch$R freezes $N for | damage, and $S body falls to the ground frozen solid.~
+You are $B$3chilled$R for | damage by $n freezing your heart and ending your life.~
+$n $B$3chill touches$R $N causing | damage, who slumps to the ground as a dead lump of ice.~
+The atmosphere turns $B$3chilly$R as you miss $N.~
+You dodge $n and $s $B$3chill touch$R.~
+$n tries unsuccesfully to $B$3chill$R $N.~
+You $B$3chill touch$R $N inflicting | damage, and watch with glee as $S shivers in pain.~
+You feel your life flowing away as $n $B$3chills$R you, dealing | damage.~
+$N suddenly seems less lively as $n $B$3chills$R $M for | damage.~
+Are you trying to $B$3chill$R $N ? - what a joke.~
+$n tries to $B$3chill$R you, what a laugh.~
+$N starts to laugh as $n turns $B$3chilly$R.~
+M
+ 309
+You drive your forehead into $N's face, dealing | damage and crushing $S skull like an egg.~
+$n drives $s forehead into your face, dealing | damage and crushing your skull like an egg.~
+$n drives $s forehead into $N's face, dealing | damage and crushing $S skull like an egg.~
+You try to headbutt $N, but fail miserably.~
+$n tries to headbutt you, but fails miserably.~
+$n tries to headbutt $N, but fails miserably.~
+$N is SHOCKED as you slam your forehead into $S face dealing | damage!~
+You are SHOCKED as $n slams $s forehead into your face dealing | damage!~
+$N looks SHOCKED as $n slams $s forehead into $S face dealing | damage!~
+~
+~
+~
+M
+326
+You thrust your weapon forward, penetrating deep into $N, causing | damage and killing $M instantly!~
+$n thrusts $s weapon forward, pentrating deep into you, causing | damage and ending your life.~
+$n thrusts $s weapon forward, penetrating deep into $N, causing | damage and killing $M instantly!~
+$N narrowly avoids being impaled upon your weapon!~
+You step quickly aside as $n attempts to impale you with $s weapon!~
+$n jabs $s weapon forward in an attempt to impale $N, but misses.~
+$N screams in pain as you impale $M with your weapon inflicting | damage!~
+$n knocks aside your defenses and impales you with $s weapon inflicting | damage!~
+$n lunges forward and impales $N with $s weapon inflicting | damage!~
+You can't skewer a GOD!~
+You can't skewer a GOD!~
+You can't skewer a GOD!~
+M
+ 370
+You push your thumb through $N's eye socket, causing | damage and squishing $S brain!~
+$n pushes $s thumb through your eye socket, causing | damage and squishing your brain!~
+$n pushes $s thumb through $N's eye socket, causing | damage and squishing $S brain!~
+You miss $N's eye with your gouge.~
+$n walks up to you and tries to push $s thumb into your eye, but misses.~
+$n walks up to $N and tries to push $s thumb into $N's eye, but misses.~
+You press your thumb into $N's eye, causing | damage.~
+$n walks up to you and pushes $s thumb into your eye, causing | damage!~
+$n walks up to $N and pushes $s thumb into $N's eye, causing | damage!~
+~
+~
+~
+M
+ 342
+You bash $N's chest for | damage and it collapses!~
+$n bashes you with enough force to deal | damage and collapse your chest!~
+$n bashes $N with enough force to deal | damage and collapse $S chest.~
+As $N avoids your bash, you topple over and fall to the ground.~
+You dodge a bash from $n, who loses $s balance and falls.~
+$N dodges a bash from $n, who loses $s balance and falls.~
+Your bash at $N delivers | damage and sends $M sprawling.~
+$n's bash causes | damage and sends you sprawling.~
+$n's bash deals | damage and sends $N sprawling.~
+~
+~
+~
+M
+ 37
+$N's head explodes as $S body absorbs the | volts of your $B$6shock$R.~
+$n $B$6shocks$R you with | volts of energy, bursting your heart and ending your life.~
+$n grins as $N's dead body still twitches from the | volt $B$6shock$R.~
+$N rather $B$6shockingly$R evades your assault.~
+You nimbly dodge a $B$6shocking$R attack from $n.~
+$N $B$6shockingly$R evades the assault of $n.~
+Your touch $B$6shocks$R $N as you send | volts through $S hapless body.~
+You feel | volts course through your body as $n magically $B$6shocks$R you.~
+$N screams in pain as $n $B$6shocks$R $M with | volts.~
+You shockingly realize you can't $B$6shock$R $N.~
+These puny creatures are $B$6shocking$R at times.~
+The atmosphere gets loaded as $n tries to $B$6shock$R $N.~
+M
+ 10
+YOU $B$1KI$R$B$2LL$R$B$4ED$R $N with | magical damage!!! - don't you feel ashamed?~
+Your head is filled with all the colors of the rainbow before it bursts from | damage.~
+$n blasts $N for | damage, creating a $B$1co$R$B$2lo$B$4rf$R$B$6ul$R corpse.~
+Your spray of $B$1c$R$B$2o$R$B$3l$R$B$2o$R$B$1r$R misses $N - what a dull world.~
+$n unsuccesfully tries to add $B$1c$R$B$2o$R$B$3l$R$B$2o$R$B$1r$R to your life.~
+$n splashes $B$1c$R$B$2o$R$B$3l$R$B$2o$R$B$1r$R everywhere except $N.~
+Your own private $B$4r$R$4a$R$B$2i$R$2n$R$2b$R$B$1o$R$1w$R hits $N in the face inflicting | damage!~
+$n's sudden burst of $B$4c$2o$3l$7o$1u$6r$R delivers | damage and sends you reeling - $BWOWIE!$R~
+$N tries in vain to escape as $n throws $B$4c$2o$3l$7o$1u$6r$R at $N, inflicting | damage.~
+Your spray of $B$4c$2o$3l$7o$1u$6r$R turns into butterflies as $N frowns.~
+Your frown is enough to turn $n's $B$1c$R$B$2o$R$B$3l$R$B$2o$R$B$1r$R spray into little butterflies.~
+The air is filled with butterflies as $N frowns at $n's $B$1c$R$B$2o$R$B$3l$R$B$2o$R$B$1r$R spray.~
+M
+ 25
+$N crumples as you kill $M by $2draining$R $S | lifeforce.~
+As $n $2drains$R your last | life, you look forward to the peace of the graveyard.~
+$n $2drains$R | life from $N, who crumples as a lifeless cocoon.~
+You need more $2draining$R lessons.~
+Luckily for you $n slept during $2draining$R-lessons.~
+$n fails to $2drain$R $N - what a waste of energy.~
+You $2drain$R $N of | lifeforce.~
+You feel less energic as $n $2drains$R | life from you.~
+$n cackles with glee as $e $2drains$R | life from $N.~
+You waste energy trying to $2drain$R $N.~
+How amusing - $n tries to $2drain$R you.~
+$N's eyes twinkle with laughter as $n tries to $2drain$R $M.~
+M
+ 26
+Your $B$4fireball$R hits $N inflicting | damage and causing an immediate death.~
+As you absorb | damage and burst into $B$4flames$R, $n grins evilly.~
+The | damage from $n's $B$4fireball$R turns $N into a charred corpse.~
+Your $B$4fireball$R blooms few feet before $N who claps $S hands in wonder.~
+$n aims a $B$4fireball$R at you but it blooms few feet before you, you clap your hands at the show.~
+A $B$4fireball$R from $n misses $N - what great fireworks around here !!~
+You throw a $B$4fireball$R at $N and have the satisfaction of seeing $M burn for | damage.~
+A $B$4fireball$R sent by $n envelops you in flames inflicting | damage!~
+$n smirks as $s $B$4fireball$R explodes into the face of $N causing | damage.~
+How shameful to throw $B$4fireballs$R at a GOD !!!~
+You choose to ignore a shameful attempt to $B$4fireball$R you.~
+$n's $B$4fireball$R is tactfully ignored by $N.~
+M
+ 50
+Your $B$2acid shield$R burns deep into $N's flesh, causing | damage and melting $S organs into slime.~
+As your skin begins to liquify from | acid damage, the last thing your melting eyes see is $n's evil grin.~
+$n's $B$2acid shield$R causes | damage and melts $N into a pile of bubbling goo.~
+Your $B$2acid shield$R blooms few feet before $N who claps $S hands in wonder.~
+$n's $B$2shield of acid$R fails to scorch your skin.~
+$N manages to avoid being scorched by $n's $B$2acid shield$R.~
+Your $B$2acid shield$R envelops $N chemically burning $S skin for | damage.~
+$n's shield of $2$Bacid$R burns deeply into your skin inflicting | damage.~
+The $B$2acid$R of $n's magic shield burns $N's skin badly causing | damage.~
+Your pathetic $2$Bacid shield$R parts to avoid hitting $N.~
+$n's $B$2acid shield$R parts before you to avoid your touch.~
+$n's $B$2acid shield$R parts before $N to avoid $S touch.~
+M
+ 30
+Your $B$5lightning bolt$R shatters $N with | volts, killing $M instantly.~
+| volts course through you from the $B$5lightning bolt$R $n sends and everything fades to black.~
+$N receives a blast of | volts from $n's $B$5lightning bolt$R and is no more.~
+Your aim is going from bad to worse and the $B$5lightning bolt$R misses $N.~
+$n has got a bad aim and the $B$5lightning bolt$R misses you.~
+$n fails in hitting $N with a $B$5lightning bolt$R.~
+The $B$5lightning bolt$R hits $N with | volts of damage.~
+YOU'RE HIT. | volts from $n's $B$5lightning bolt$R reach their goal.~
+$N wavers under the impact of | volts from $n's $B$5lightning bolt$R.~
+Your $B$5lightning bolt$R is extinguished as mighty $N moves $S ears.~
+You move your ears to extinguish $n's $B$5lightning bolt$R.~
+$N moves $S ears and $n's $B$5lightning bolt$R is extinguished.~
+M
+ 32
+The $B$7magic missile$R deals | damage and tears away the remaining life of $N.~
+You only have time to notice $n uttering strange sounds before receiving | damage and a quick death.~
+$n's $B$7magic missile$R causes | damage to $N, who collapses in a lifeless heap.~
+The $B$7magic missile$R penetrates the air miles above $N.~
+You don't even have to duck as $n sends a $B$7magic missile$R way over your head.~
+$n tries in vain to correct the course of the $B$7magic missile$R meant to hit $N.~
+You watch with selfpride as the $B$7magic missile$R hits $N and delivers | damage.~
+You stagger as a $B$7magic missile$R from $n hits you causing | damage.~
+$n throws a $B$7magic missile$R at $N who staggers under the blow of | damage.~
+Your $B$7magic missile$R makes $N roar with laughter.~
+You can't help laughing as $n sends a $B$7magic missile$R at you.~
+$N starts to roar with laughter as $n sends a $B$7magic missile$R at $M.~
+M
+ 32
+The $B$7magic missile$R pummels $N's body for | damage and into a $4$Bbloody pulp$R.~
+Your last visions of life include $n chanting, a $Bmagic missile$R, and | damage.~
+$n's $B$7magic missile$R blasts $N into the ground, crushing the life from $M.~
+Your $B$7magic missile$R barely misses $N and leaves a small crater in the ground.~
+Your quick thinking and dexterous skills allow you to avoid $n's $B$7magic missile$R.~
+$N shows tremendous skill and ability by dodging the $B$7magic missile$R sent by $n.~
+$N jolts from the | damage of your $B$7magic missile$R.~
+$n's $B$7magic missile$R nails you directly in the chest dealing | damage.  Ouch.~
+$n launches a $B$7magic missile$R at $N nailing $M in the chest for | damage.~
+$N winks at you and makes your $B$7magic missile$R poof from existence.~
+You blink and $n's $B$7magic missile$R is no more.~
+$N deexistancizes $n's $B$7magic missile$R with a mere blink.~
+M
+ 346
+Praying fervently to your god, you direct the hate deep inside you at $N, inflicting | damage.~
+Your body surges with unholy wrath as $n's hate pours into you causing | damage!~
+The surrounding light dims as unholy energies pour from $n's body into $N, inflicting | damage.~
+$N avoids your deadly touch.~
+You avoid $n's deadly touch.~
+$N avoids $n's deadly touch.~
+Praying fervently to your god, you direct the hate deep inside you at $N, inflicting | damage.~
+Your body surges with unholy wrath as $n's hate pours into you causing | damage!~
+The surrounding light dims as unholy energies pour from $n's body into $N, inflicting | damage.~
+$N screams in pain at your touch...then giggles...just kidding!~
+$n tried to harmtouch you....how quaint!~
+$n ties to harmtouch $N who finds this very amusing.~
+M
+ 341
+You hear $N's neck snap as you lash out with | damage from a perfect roundhouse kick.~
+You feel your neckbones separate as $n kicks you fiercely in the head doing | damage.~
+A fierce roundhouse kick from $n deals | damage and neatly snaps the neck of $N in two!~
+$N ducks, noticing you aim a high kick at $S face.~
+You duck just in time as $n spins a roundhouse kick right overhead.~
+$n aims a flashy roundhouse kick at $N, who easily ducks the manuever.~
+$N reels back as you whirl and plant a roundhouse kick in $S face for | damage.~
+$n smashes a roundhouse kick in your face delivering | damage, and you angrily spit $4blood$R.~
+An expert roundhouse kick from $n deals | damage sending $N reeling and spitting $4blood$R.~
+You get an immediate charlie horse attempting to kick $N.~
+As $n tries to kick you, $m leg cramps badly causing $s to stumble.~
+$n readies to kick at $N, but seems to cramp up badly.~
+M
+ 341
+You grab $N's head, and deal | damage by smashing $S face into $4blood$R sauce on your kneecap!~
+$n grabs you by the hair and deals | damage, caving your face in on $s knee.~
+$n brutally drives a knee into $N's face dealing | damage and smashing it like a melon.~
+You attempt to knee-kick $N, but lose your balance on the way.~
+$n tries to smash you with $s knee, but pathetically loses $s balance.~
+$n gets in close to knee $N, but loses $s balance in the process.~
+You drive a hard knee into $N's side, who gasps in breathless agony as $e takes | damage.~
+$n smashes a knee into your side, dealing | damage and knocking all the air from your lungs.~
+$n plants a knee sharply in $N's side, who receives | damage and responds in pained gasps.~
+You get an immediate charlie horse attempting to kick $N.~
+As $n tries to kick you, $m leg cramps badly with a painful charlie horse.~
+$n readies to kick at $N, but seems to cramp up badly.~
+M
+ 341
+You break $N's knee with a sharp kick of | damage, and finish $M with a throat stomp.~
+$n snaps your knee out of place with | damage, and then crushes your throat with two kicks.~
+$n savagely takes out $N's leg for | damage, and crushes $S throat with two powerful kicks.~
+$N blocks your kick with surprising skill, or was it luck?~
+You see $n's kick a mile away, and beat it aside skillfully.~
+$n raises a kick at $N, who blocks it mid-target with $S arm.~
+You snap a | damage side-kick into $N's knee, who groans and hobbles back in pain.~
+A savage | damage side-kick from $n hits your knee, nearly dislocating it!~
+A blinding | damage side-kick from $n nails $N squarely in the knee.~
+You get an immediate charlie horse attempting to kick $N.~
+As $n tries to kick you, $m leg cramps with a painful charlie horse.~
+$n readies to kick at $N, but seems to cramp up badly.~
+M
+ 341
+Your kick at $N's kidneys caused | damage and made $M die.~
+$n kills you by kicking your kidneys in with | damage.~
+$N dies from $n's last | damage kick to $S kidneys.~
+Your beautiful full-circle-kick misses $N by a mile.~
+$n makes a nice balletstep which plants a foot a mile above your head.~
+$n makes a nice balletstep which plants a foot a mile above $N's head.~
+Your boots need polishing again from a | damage kick - $4blood$R all over.~
+$n wipes $s boots in your face dealing | damage.~
+$n wipes $s boots in the face of $N dealing | damage.~
+$N makes you kick at a huge stone appearing from nowhere - OUCH.~
+You make $n kick a huge stone appearing from nowhere - *giggle*~
+$n starts kicking a huge stone which suddenly appears.~
+M
+ 341
+Your kick at $N's face delivers | damage and splits $S head open - yummy.~
+$n aims a kick at your face which deals | damage and splits your head in two.~
+$n neatly kicks $N's head into pieces with | damage - YUMMY.~
+You miss your kick at $N's groin, much to $S relief.~
+$n misses a kick at your groin, you breathe lighter now.~
+$n misses a kick at $N's groin.~
+Your kick hits $N in the solar plexus dealing | damage.~
+You're hit in solar plexus and receive | damage, wow, this is breathtaking!!~
+$n kicks $N in solar plexus, dealing | damage and rendering $M breathless.~
+You attempt to kick $N but lose your balance and fall face down in some grease that has suddenly appeared.~
+When $n tries to kick you, you quickly toss some grease on the floor causing $m to slip and fall.~
+$n falls face down in some grease thrown by $N.~
+M
+ 200
+~
+You can only lie still as the last heartbeat ebbs from your chest...~
+$N suffers from bloodloss, and the lack of a beating heart.~
+~
+suffer miss victim..~
+suffer miss room..~
+~
+You lie on the ground suffering from many bleeding wounds.~
+$N lies immobile on the ground, suffering from many bleeding wounds.~
+~
+Suffer god victim..~
+Suffer god room..~
+M
+ 56
+$N killed.~
+You are $B$4burned$R to ash, as $n breathes on you.~
+$n makes $N to ash.~
+$N missed.~
+$n breathes $B$4fire$R at you, but you avoids it.~
+$N avoids $n $B$4firebreath$R.~
+$N hit.~
+$n $B$4burns$R you.~
+$N is partly made ash, as $n breaths $B$4fire$R.~
+$N immortal.~
+$n warms you.~
+$n warms $N.~
+M
+ 57
+$N killed.~
+You die from the $2gas$R $n breathes on you.~
+$n kills $N with a $2gas$R breath.~
+$N missed.~
+$n breathes $2gas$R at you, but it has no effect.~
+$N avoids $n's $2gas$R.~
+$N hit.~
+$n $2gasses$R you.~
+$N is $2gassed$R by $n.~
+$N immortal.~
+$n want's to $2gas$R you, but can't.~
+$n tries to $2gas$R $N, but can't.~
+M
+ 58
+$N killed.~
+You are frozen to $B$3ice$R, as $n breathes on you.~
+$n makes $N to $B$3ice$R.~
+$N missed.~
+$n breathes $3frost$R at you, but you avoid it.~
+$N avoids $n $3frostbreath$R.~
+$N hit.~
+$n $B$3freezes$R you.~
+$N is partly made $B$3ice$R, as $n breaths $3frost$R.~
+$N immortal.~
+$n supplies you with airconditioning.~
+$n supplies $N with airconditioning.~
+M
+ 59
+$N killed.~
+You are corroded to nothing, as $n breathes on you.~
+$n corrodes $N to nothing.~
+$N missed.~
+$n breathes $B$2acid$R at you, but you avoid it.~
+$N avoids $n $B$2acidbreath$R.~
+$N hit.~
+$n corrodes you.~
+$N is corroded as $n breathes $B$2acid$R.~
+$N immortal.~
+$n helps you clean your hands with a little $B$2acid$R.~
+$n helps $N cleaning.~
+M
+ 60
+$N killed.~
+You are killed by $n $B$5lightning breath$R.~
+$n killes $N with a $B$5lightning breath$R.~
+$N missed.~
+$n breathes $B$5lightning$R at you, but you avoid it.~
+$N avoids $n $B$5lightning breath$R.~
+$N hit.~
+$n hits you with a $B$5lightning breath$R.~
+$N is hit by $n's $B$5lightning breath$R.~
+$N immortal.~
+$n tries to breathe $B$5lightning$R upon you.~
+$n tries to breathe $B$5lightning$R upon $N.~
+M
+ 339
+$N gasps in surprise and becomes suddenly silent as you place $p in $S back, delivering | damage.~
+Everything fades to black as $n suddenly stabs you in the back, inflicting | damage.~
+$n thrusts $p into $N's back, felling $M instantly with | damage.~
+$N deftly avoids your backstab, exposing your dark intentions!~
+$n clumsily tries to backstab you, but you easily avoid $s attempt.~
+$n tries to backstab $N, but is exposed!~
+$N makes a strange gargling sound as you thrust $p in $S back, causing | damage.~
+Suddenly $n stabs you in the back, dealing | damage.~
+$N makes a strange gargling sound as $n thrusts $p into $S back, causing | damage!~
+$N sends you a look that makes you forget all about backstabbing.~
+$n tries to backstab you, but changes $s mind.~
+$n tries to backstab $N, but changes $s mind.~
+M
+ 339
+You approach $N from the shadows, deftly dealing | damage and cutting $S throat clean open.~
+The whisper of $n's blade at your throat deals | damage and spills your life upon the ground.~
+$n clamps a hand over $N's mouth as $e delivers | damage and slices $S throat clean open.~
+$N deftly avoids your backstab, exposing your dark intentions!~
+$n clumsily tries to backstab you, but you easily avoid $s attempt.~
+$n tries to backstab $N, but is exposed!~
+$N makes a strange gargling sound as you thrust $p in $S back, dealing | damage.~
+Suddenly $n stabs you in the back causing | damage.~
+$N makes a strange gargling sound and receives | damage as $n thrusts $p into $S's back!~
+$N sends you a look that makes you forget all about backstabbing.~
+$n tries to backstab you, but changes $s mind.~
+$n tries to backstab $N, but changes $s mind.~
+M
+ 339
+You swiftly knife $N in the back, dealing | damage and withdrawing in a stream of $B$4blood$R.~
+A searing pain spreads between your shoulder blades, as $n deals | damage, ending your life.~
+$N palpitates in death from | damage and collapses to reveal $n with $p.~
+$N deftly avoids your backstab, exposing your dark intentions!~
+$n clumsily tries to backstab you, but you easily avoid $s attempt.~
+$n tries to backstab $N, but is exposed!~
+$N makes a strange gargling sound as you thrust $p in $S back for | damage.~
+Suddenly $n stabs you in the back and inflicts | damage!~
+$N makes a strange gargling sound as $n thrusts $p into $S's back for | damage!~
+$N sends you a look that makes you forget all about backstabbing.~
+$n tries to backstab you, but changes $s mind.~
+$n tries to backstab $N, but changes $s mind.~
+M
+ 22
+$N is dissolved from the | damage your $B$7goodness$R inflicts.~
+$n dissolves you with | damage, you regret having been so evil, and die...~
+$n completely dissolves $N with | damage from $s $B$7goodness$R.~
+$N is unaffected by your $B$7goodness$R!~
+$n thinks that $e is really $B$7good$R, and tries to dispel you.~
+$N laughs at $n as $e tries to $B$7dispel$R $M with $B$7goodness$R!~
+$N shivers, and suffers | damage from $S $4evilness$R!~
+$n makes your soul hurt and suffer | damage!~
+$n makes $N's $4evil spirit$R shiver and suffer | damage!~
+Did you really expect $M to suffer?~
+$n unfruitfully tries to dispel you.~
+$n is stupid.~
+M
+ 33
+$N has a few cramps, suffers | damage, and dies from deadly $2poison$R.~
+As the $2poison$R burns intensely in your veins causing | damage, you shudder once and die.~
+$N falls to the ground convulsing from | $2poison$R damage and is soon dead.~
+$N is unaffected by the $2poison$R!~
+The $2poison$R has no affect on your sturdy constitution!~
+$N is unaffected by $n's weak poison.~
+$N looks extremely sick and shivers uncomfortably from | $2poison$R damage.~
+You feel burning $2poison$R in your blood and suffer | damage from painful convulsions.~
+$N suffers from a burning $2poison$R in $S veins and convulses violently from | damage.~
+$N ignores the $2poison$R completely.~
+You ignore the $2poison$R completely.~
+$N ignores $n's $2poison$R completely.~
+M
+ 70
+You completely dissolve $N with | damage from your $B$2acid$R.~
+$n completely dissolves you with | damage from $S $B$2acid$R.~
+$N dissolves into a puddle from | $B$2acid$R damage thrown by $n.~
+$N effortlessly dodges your $B$2acid$R.~
+$n throws $B$2acid$R at you but misses you by a mile.~
+$B$2Acid$R thrown by $n misses $N - how pathetic!~
+You throw $B$2acid$R at $N, inflicting | damage and watch $M scream in pain.~
+You scream in pain as | damage from the $B$2acid$R thrown by $n eats away at your flesh.~
+$n grins evily as $s $B$2acid$R makes $N scream in pain from | damage.~
+How disrespectful to throw $B$2acid$R at a GOD!~
+You choose to ignore $n's $B$2acid$R.~
+$n's $B$2acid$R completely misses $N - HOW STUPID!~
+M
+ 70
+Your $B$2acid$R boils deep into $N's body, causing | damage and leaving nothing but a puddle of bubbling gore!~
+$n's $B$2acid$R boils right through your body causing | damage, ending your life in equisite pain.~
+$n sends a stream of $B$2acid$R that boils through $N, dealing | damage and liquefying $M completely!~
+Your $B$2acid$R seems to splash harmlessly off of $N, leaving $M unscathed.~
+$n's $B$2acid$R splashes harmlessly off you, leaving you unscathed.~
+$n's $B$2acid$R splashes harmlessly off $N, leaving $M unscathed.~
+Your $B$2acid$R boils deeply into $N, causing $M to writhe in agony from | damage.~
+You writhe in agony as $n's $B$2acid$R inflicts | damage,  boiling deep into your flesh!~
+$n cackles maniacally as $s $B$2acid$R inflicts | damage, boiling deep into $N's flesh!~
+No god could be harmed by your puny mortal acid!~
+You ignore $n's pathetic attempt to cast $B$2acid$R in your direction.~
+$n's $B$2acid$R is harmlessly deflected by $N, who chuckles with amusement.~
+M
+ 75
+$N is dissolved by the | damage your $4evil$R inflicts.~
+As $n dissolves you with | damage, you regret having been so $B$7good$R, and die...~
+$n completely dissolves $N with | damage from $s $4evilness$R.~
+$N is unaffected by your $4evil$R!~
+$n thinks that $e is really $4evil$R, and tries to dispel you.~
+$N laughs at $n as $e tries to dispel $M with $4evil$R!~
+$N shivers, and suffers | damage from $S $B$7goodness$R!~
+$n makes your soul hurt and suffer | damage!~
+$n makes $N's $B$7good$R spirit shiver and suffer | damage!~
+Did you really expect $M to suffer?~
+$n unfruitfully tries to dispel you.~
+$n is stupid.~
+M
+ 76
+You burn $N into a crispy corpse with | damage from your $B$4HELLFIRE$R!~
+$n burns you into a crispy corpse with | damage from $S $B$4HELLFIRE$R!~
+$N is burnt into a crispy corpse by the | $B$4HELLFIRE$R damage conjured by $n!~
+$N effortlessly dodges your $B$4HELLFIRE$R!~
+$n conjures $B$4HELLFIRE$R at you but misses you by a mile.~
+$n conjures $B$4HELLFIRE$R at $N but misses! - What a waste!~
+You conjure $B$4HELLFIRE$R and direct | damage at $N!~
+You SCREAM in pain as $n directs | damage from $B$4HELLFIRE$R at you!~
+$n cackles as $e directs $B$4HELLFIRE$R at $N, inflicting | damage and watching $M SCREAM in pain!~
+How disrespectful to direct $B$4HELLFIRE$R at a GOD!~
+You choose to ignore $n's $B$4HELLFIRE$R.~
+$n's $B$4HELLSTREAM$R completely misses $N - HOW STUPID!~
+M
+ 76
+You completely $B$4INCINERATE$R $N with | damage from a $B$4stream of hellfire$R!~
+$n completely $B$4INCINERATES$R you with | damage from a focused $B$4stream of hellfire$R!~
+$N is completely $B$4INCINERATED$R by | damage from $n's focused $B$4stream of hellfire$R!~
+$N moves nimbly aside, narrowly avoiding your $B$4stream of HELLFIRE$R!~
+$n's focus wavers and $e misses you with a $B$4stream of HELLFIRE$R.~
+$n loses focus and fails to hit $N with $s $B$4stream of HELLFIRE$R.~
+Your blistering $B$4stream of HELLFIRE$R, causes | damage and badly chars $N's flesh!~
+Flesh falls away in charred chunks as | damage from $n's $B$4stream of HELLFIRE$R burns into you!~
+$n grins wickedly as $e chars $N's flesh with | damage from a focused $B$4stream of HELLFIRE$R!~
+You foolishly attempt to direct your puny $B$4HELLFIRE$R at $N.~
+You ignore $n's ridiculous attempt to burn you with $B$4HELLFIRE$R.~
+$n foolishly attempts to burn $N with $s $B$4HELLFIRE$R.~
+M
+ 82
+$N crumples as you touch $M and $4drain$R the remaining | of $S lifeforce.~
+As $n $4drains$R the last | of your lifeforce, you look foreward to the peace of the graveyard.~
+$n $4drains$R the last | of $N's lifeforce, and $E crumples as a lifeless cocoon.~
+You miss $N as you try to touch $M.~
+$n reaches out and tries to touch you.~
+$n reaches out, but fails to touch $N.~
+You $4drain$R $N of | lifeforce by touching $M.~
+You feel | of your lifeforce draining as $n touches you.~
+$n touches $N and $4drains$R | of $S lifeforce - $E looks weaker.~
+You waste energy trying to $4drain$R $N.~
+How amusing - $n tries to $4drain$R you.~
+$N's eyes twinkle with laughter as $n tries to $Rdrain$R $M.~
+M
+ 83
+$N crumples as you kill $M by $B$4leeching$R | of $S lifeforce.~
+As $n $B$4leeches$R the last | of your lifeforce, you look foreward to the peace of the graveyard.~
+$n $B$4leeches$R the last | of $N's energy, and $E crumples as a lifeless cocoon.~
+You need more $B$4leeching$R lessons.~
+Luckily for you $n slept during $B$4leeching$R lessons.~
+$n fails to $B$4leech$R $N - what a waste of energy.~
+You $B$4leech$R $N of | lifeforce.~
+You don't feel so tough anymore after $n $B$4leeches$R | of your lifeforce.~
+$n $B$4leeches$R $N | of $S lifeforce - $E looks weaker.~
+You waste energy trying to $4drain$R $N.~
+How amusing - $n tries to $4drain$R you.~
+$N's eyes twinkle with laughter as $n tries to $4drain$R $M.~
+M
+ 86
+Your $B$4fireshield$R hits $N with full force, causing | damage and an immediate death.~
+$n's $B$4fireshield$R inflicts | damage, causing you to burst into flames and die.~
+The heat from $n's $B$4fireshield$R deals | damage and turns $N into a charred corpse.~
+Your $B$4fireshield$R blooms few feet before $N who claps $S hands in wonder.~
+$n's $B$4fireshield$R blooms a few feet before you, you clap your hands at the show.~
+$n's $B$4fireshield$R misses $N.~
+Flames from your $B$4fireshield$R deal | damage and envelop $N in a great ball of flame!~
+You are enveloped in | damage from the flames of $n's $B$4fireshield$R! - OUCH!~
+Flames from $n's $B$4fireshield$R envelop $N in a great ball of flame causing | damage!~
+How shameful to throw $B$4fire$R at a GOD!~
+You choose to ignore a shameful attempt to $B$4burn$R you.~
+$n's $B$4fire$R is tactfully ignored by $N.~
+M
+ 87
+$N is crushed to death under | damage from your $B$6m$R$B$5e$R$B$6t$R$B$5e$R$B$6o$R$B$5r$R $B$6s$R$B$5w$R$B$6a$R$B$5r$R$B$6m$R!~
+You are crushed to death by | damage from $n's $B$6m$R$B$5e$R$B$6t$R$B$5e$R$B$6o$R$B$5r$R $B$6s$R$B$5w$R$B$6a$R$B$5r$R$B$6m$R.~
+$N is crushed to death by | damage from $n's $B$6m$R$B$5e$R$B$6t$R$B$5e$R$B$6o$R$B$5r$R $B$6s$R$B$5w$R$B$6a$R$B$5r$R$B$6m$R!~
+Your $B$6meteors$R go out of control and miss $N.~
+$n's $B$6meteors$R miss you..  -- Lucky you eh?~
+$n's $B$6meteors$R go out of control and miss $N.~
+Your $B$6m$R$B$5e$R$B$6t$R$B$5e$R$B$6o$R$B$5r$R $B$6s$R$B$5w$R$B$6a$R$B$5r$R$B$6m$R hits $N causing | damage!~
+You are whacked by a $B$6m$R$B$5e$R$B$6t$R$B$5e$R$B$6o$R$B$5r$R $B$6s$R$B$5w$R$B$6a$R$B$5r$R$B$6m$R sent by $n and absorb | damage.~
+A $B$6m$R$B$5e$R$B$6t$R$B$5e$R$B$6o$R$B$5r$R $B$6s$R$B$5w$R$B$6a$R$B$5r$R$B$6m$R sent by $n WHACKS $N causing | damage!~
+You idiot, you can't harm $M!~
+$n tried to $B$6meteor$R you!~
+$N laugs at $n's feeble attempt to $B$6meteor$R $m.~
+M
+ 306
+Your deathstroke punctures deep into $N's kidneys, causing | damage and an immediate death.~
+$n kills you with a deadly | damage blow to your kidneys.~
+$N dies from $n's last | damage blow to $S kidneys.~
+You miss your deathstroke at $N and fall to the ground punching yourself in the kidneys!   AARRRGGGGHHHHH!~
+$n misses you with $s deathstroke and falls to the ground.~
+$n misses $N with $s deathstroke and falls to the ground.~
+$N screams in pain from your | damage deathstroke to $S kidneys!~
+You scream in pain from $n's | damage deathstroke to your kidneys!   AARRRGGGGHHHH!~
+$n deathstrokes $N in $S kidneys for | damage!   $N cries out in pain!~
+$N makes you punch at a huge stone appearing from nowhere - OUCH.~
+You make $n punch a huge stone appearing from nowhere - *giggle*~
+$n starts punching a huge stone which suddenly appears.~
+M
+ 310
+You punch through $N's chest, dealing | damage and rip $S $B$4heart$R out!~
+$n punches through your chest, dealing | damage and ripping out your $B$4heart$R!~
+$n punches through $N's chest, dealing | damage and ripping out $S $B$4heart$R!~
+You miss your attempt to eagle claw $N.~
+$n misses you with $s eagle claw.~
+$n misses $N with $s eagle claw.~
+$N cries out in pain as you eagle claw $M in the chest causing | damage!~
+You cry out in pain as $n eagle claws into your chest for | damage!~
+$n eagle claws $N in $S chest causing | damage!  $N cries out in pain!~
+$N makes you punch at a huge stone appearing from nowhere - OUCH.~
+You make $n punch a huge stone appearing from nowhere - *giggle*~
+$n starts punching a huge stone which suddenly appears.~
+M
+ 311
+You instantly kill $N with | damage from your vibrations!~
+$n instantly kills you with | damage from $s vibrations!~
+$n instantly kills $N with | damage from $s vibrations!~
+You miss $N with your vibrations.~
+$n misses you with $s vibrations.~
+$n misses $N with $s vibrations.~
+$N screams in agony as your vibrations make $M suffer | damage!~
+You scream in agony as $n's vibrations make you suffer | damage!~
+$N screams in agony as $n's vibrations make $M suffer | damage!~
+$N makes you vibrate at the ground.~
+Good vibrations are best left to Markie Mark, silly.~
+$n's vibrations seem to be failing today.~
+M
+ 100
+An extremely large $B$5bee$R appears, inflicts | damage, and stings $N to death!~
+As a large $B$5bee$R causes | damage and stings you to death, $n laughs in the background.~
+The sting of $n's $B$5bee$R deals | damage and kills $N in short order.~
+Your $B$5bee$R is evidently too busy to attack $N.~
+$n pleads for help from the insects..which fails to appear.~
+$n's $B$5bee$R forsakes $m, leaving $N unharmed.~
+Your $B$5bee$R causes | damage and raises a large welt on $N!~
+A large $B$5bee$R summoned by $n deals | damage and raises quite a welt on you!~
+An extremely large $B$5bee$R summoned by $n deals | damage as it stings $N repeatedly!~
+Your $B$5bee$R decides attacking $N is hardly worth it.~
+$n's $B$5bee$R takes one look at you and decides to go back to collecting honey.~
+$N glares at $n's large $B$5bee$R, which turns tail and flees.~
+M
+ 101
+An extremely large swarm of $B$5bees$R appear, and sting $N to death with | damage!~
+As a large swarm of $B$5bees$R cause | damage and sting you to death, $n laughs in the background.~
+The stings of $n's swarm of $B$5bees$R deal | damage and kill $N in short order.~
+Your swarm of $B$5bees$R are evidently too busy to attack $N.~
+$n pleads for help from the insects..which fails to appear.~
+$n's swarm of $B$5bees$R forsake $m, leaving $N unharmed.~
+Your swarm of $B$5bees$R cause | damage and raise large welts on $N!~
+A large swarm of $B$5bees$R summoned by $n deal | damage and raise a number of huge welts on you!~
+An extremely large swarm of $B$5bees$R summoned by $n sting $N all over for | damage!~
+Your swarm of $B$5bees$R decide attacking $N is hardly worth it.~
+$n's swarm of $B$5bees$R look at you and decide to go back to collecting honey.~
+$N glares at $n's swarm of $B$5bees$R, which turn tail and flee.~
+M
+ 102
+$N screams in agony as your $B$6insects$R deal | damage as they feed on $S entrails!~
+$n's insects burrow deep into your skin, dealing | damage and killing you.~
+$n's grotesque $B$6insects$R deal | damage and crawl into $N's now dead body and feed on it!~
+Evidently the $B$6insects$R respect $N very much.~
+$n fails in $s attempt to summon the $B$6insect$R world!~
+$N breaths a sigh of relief upon seeing that $n's $B$6insects$R aren't coming.~
+Your $B$6insects$R swarm over $N inflicting | damage!~
+$n's $B$6insects$R swarm like a cloud over your face inflicting | damage!~
+$n summons a myriad of $B$6insects$R to dine on $N, dealing | damage.~
+You cannot send the $B$6insects$R at a GOD!!~
+$n unfruitfully summons the $B$6insect$R world to attack you.~
+$N stares with disdain at $n's attempt to call the $B$6insects$R.~
+M
+ 65
+$N screams in agony as your $B$4flamestrike$R deals | damage and burns $M alive!~
+$n casts a | damage $B$4flamestrike$R in your direction, and burns you alive!~
+$n's | damage $B$4flamestrike$R consumes $N's body!~
+Evidently the $B$4flames$R aren't harming $N very much.~
+$n fails in $s attempt to summon a $B$4flamestrike$R!~
+$N breathes a sigh of relief upon seeing that $n's $B$4flamestrike$R failed to appear.~
+Your | damage $B$4flamestrike$R catches $N full force!~
+$n's | damage $B$4flamestrike$R catches you full force!~
+$n summons a $B$4flamestrike$R to consume $N with | damage.~
+You cannot send the flames at a GOD!!~
+$n unfruitfully summons a $B$4flamestrike$R to attack you.~
+$N stares with disdain at $n's attempt to call a $B$4flamestrike$R.~
+M
+ 111
+Your surge of $B$1water$R drowns $N under its crushing weight of | damage!~
+$n summons a surge of $B$1water$R, drowning you beneath its crushing weight of | damage!~
+A surge of $B$1water$R accompanies $n's blow, crushing $N under its weight of | damage!~
+Evidently the waves aren't harming $N very much.~
+$n fails in $s attempt to summon the power of the waves!~
+$N breaths a sigh of relief upon seeing that $n's waves aren't coming.~
+$N chokes as briny $B$1water$R fills $S lungs, causing | damage!~
+$n gestures at you...you choke as briny $B$1water$R fills your lungs and causes | damage!~
+$n summons a surge of $B$1water$R to drown $N and cause | damage.~
+You cannot send the waves at a GOD!!~
+$n unfruitfully summons a surge of $B$1water$R to attack you.~
+$N stares with disdain at $n's attempt to call a powerful wave.~
+M
+ 112
+Your howl drives the remaining | life from $N.~
+$n howls so plaintively, that you receive | damage and die.~
+$n howls so plaintively, that $N receives | damage and dies.~
+Evidently the howls aren't harming $N very much.~
+$n howls half-heartedly, quite pathetic actually.~
+$N breaths a sigh of relief upon seeing that $n's howl isn't working.~
+Your howls and wails cause $N a painful | damage.~
+You reel as $n's howls shatter the sound barrier and deals | damage.~
+$N reels, clutching $S head from | damage, as howls fill the air.~
+You cannot howl at a GOD!!~
+$n howls impotently at you.~
+$n howls impotently at $N.~
+M
+ 113
+$N crumples as you drain away | life and $S very soul.~
+$n drains | life and your soul away, leaving your body a lifeless husk.~
+$n drains | life and the soul of $N, leaving behind a lifeless husk.~
+You need more souldraining lessons.~
+Luckily for you $n slept during soul-draining lessons.~
+$n fails to drain $N - what a waste of the life force.~
+Your heart sings as you feel $N's soul feeding your own with | life.~
+You feel | life and your very soul being drained by $n's power.~
+$N's face pales as $E feels $n draining | life and $S soul away.~
+You waste energy trying to souldrain $N.~
+How amusing - $n tries to souldrain you.~
+$N's eyes twinkle with laughter as $n tries to souldrain $M.~
+M
+ 114
+$N screams in agony as your shower of | sparks burn $M alive!~
+$n casts a shower of | sparks in your direction, and burns you alive!~
+$n's | sparks consume $N in a shower of deadly light!~
+Evidently the sparks aren't harming $N very much.~
+$n fails in $s attempt to summon a shower of sparks!~
+$N smiles upon seeing that $n's shower of sparks isn't coming.~
+$N howls as your | sparks shower around $M.~
+Scintillating sparks shower around you, dealing | damage and burning your flesh.~
+Sparks fly from $n to $N in a shower of | deadly sparks.~
+You cannot shower sparks at a GOD!!~
+$n unfruitfully summons a shower of sparks to attack you.~
+$N stares with disdain at $n's attempt to call a shower of sparks.~
+M
+ 62
+| tiny cuts cross the flesh of $N, who dies in agony!~
+You die from the | tiny cuts which suddenly cross your flesh!~
+$n inflicts | cuts on the flesh of $N, who collapses in pain!~
+Your minor wounding spell is shrugged off by $N.~
+Your skin is too tough for $n's magic to hurt.~
+The minor wounding spell of $n has no effect on $N, whatsoever.~
+| tiny bleeding cuts and painful bruises appear on $N's exposed skin!~
+$n grins sadistically as $e causes your skin to erupt with | tiny wounds!~
+The flesh of $N erupts with | small, painful-looking wounds.~
+This wounding magic cannot mar immortal skin!~
+The wounding spell of $n cannot mar your immortal flesh.~
+$n makes a feeble attempt to wound $N.  Dork.~
+M
+ 64
+$N's flesh is gouged with | horrid wounds, and $E dies in a $4bloody$R heap.~
+$4Blood$R rushes from your body by $n's | wounding magic damage.  You black out!~
+$n causes | serious trauma damage and reduces $N to a $4bloody$R pulp.~
+Your serious wounding spell is shrugged off by $N.~
+Your skin is too tough for $n's magic to hurt.~
+The serious wounding spell of $n has no effect on $N, whatsoever.~
+| nasty lacerations and magic rending destroy the flesh of $N!~
+$n seriously rends your flesh with sadistic magic, dealing | damage.~
+$N staggers in pain as $n causes | serious wounds to appear on $M!~
+This wounding magic cannot mar immortal skin!~
+The wounding spell of $n cannot mar your immortal flesh.~
+$n makes a feeble attempt to wound $N.  Dork.~
+M
+ 63
+$N collapses to the floor in spasms from | damage, nearly unrecognizable in death.~
+Your vision blurs with $4blood$R as $n's wounding magic deals | damage and causes death!~
+Critically-wounded by $n's magic, $N absorbs | damage and dies in throes of spastic agony.~ 
+Your critical wounding spell is shrugged off by $N.~
+Your skin is too tough for $n's magic to hurt.~
+The critical wounding spell of $n has no effect on $N, whatsoever.~
+Your | damage rips into $N's body like the jaws of a ravenous beast.~
+| gaping wounds open up on your body, spattering $n with $4blood$R!~
+| critical wounds open up on $N's body, covering $n happily in gore.~
+This wounding magic cannot mar immortal skin!~
+The wounding spell of $n cannot mar your immortal flesh.~
+$n makes a feeble attempt to wound $N.  Dork.~
+M
+ 27
+Your vicious magic rabidly rips | damage into the body of $N!~
+Your entrails leave your body from | damage and a gaping hole in your midsection!~
+The harmful magic of $n deals | damage and disembowels $N like a rotted pumpkin!~
+Your critical wounding spell is shrugged off by $N.~
+Your skin is too tough for $n's magic to hurt.~
+The critical wounding spell of $n has no effect on $N, whatsoever.~
+$N is sent staggering by | damage from the harmful stroke of an intangible blade!~
+The harmful magic of $n deals | damage and sends you reeling as if struck by a god!~
+$n's harm spell cuts into $N for | damage like the stroke of a broadsword!~
+This wounding magic cannot mar immortal skin!~
+The wounding spell of $n cannot mar your immortal flesh.~
+$n makes a feeble attempt to wound $N.  Dork.~
+M
+ 80
+The body of $N explodes with a deafening blast from | damage!  Carnage splatters down.~
+$n blasts you into a cloud of gore with | damage of channeled divine power!~
+$n points at $N, who absorbs | damage and explodes in a $B$4crimson$R blast of divine fury!~
+Your wounding spell is shrugged off by $N.~
+Your skin is too tough for $n's magic to hurt.~
+The wounding spell of $n has no effect on $N, whatsoever.~
+Divine wrath $4bloodily$R contorts the mortal shell of $N inflicting | damage!~
+Calling upon unseen powers, $n wracks you with | damage of divine retribution!~
+$n crushes the shell of $N with | damage of deific power!~
+This wounding magic cannot mar immortal skin!~
+The wounding spell of $n cannot mar your immortal flesh.~
+$n makes a feeble attempt to wound $N.  Dork.~
+M
+ 158
+Your fury is too much for $N to bear and $E suffers | damage, exploding in a shower of gore!~
+You are unable to handle the force of $n's fury, suffer | damage, and your body is ripped apart!~
+$N bursts into fleshy chunks as | damage from $n's fury rends all trace of life from $S body!~
+$N finds your fury amusing at best and certainly not furious.~
+You giggle at $n's fury that is obviously not so furious.~
+$N finds $n's fury more amusing than furious.~
+$N writhes in agony as $E bears the full | damage of your divine fury!~
+You writh in agony as you bear the full | damage of $n's divine fury!~
+$N writhes in agony as $E bears the full | damage of $n's divine fury!~
+It would be hard to direct the gods' fury at a god!~
+$n tried to use your own fury against you.  What a twit.~
+$N finds $n's attempt to delive divine fury amusing.~
+M
+ 91
+You open a direct $B$5SOLAR$R gateway to the sun that burns $N for | damage - crispy!~
+$n opens a direct $B$5SOLAR$R gateway to the sun that burns you for | damage - crispy!~
+$n opens a direct $B$0SOLAR$R gateway to the sun burning $N for | damage - crispy!~
+$N seems unconcerned by your solar gateway.~
+You feel little concern as $n opens a solar gateway.~
+$N appears unconcerned by $n's opening of a solar gateway.~
+$N's skin blackens as flames pour through your $B$5SOLAR$R gateway, inflicting | damage!~
+Your skin blackens as flames pour through $n's $B$5SOLAR$R gateway, inflicting | damage!~
+$N's skin blackens as flames pour through $n's $B$5SOLAR$R gateway, inflicting | damage!~
+$N snickers and puts on some tanning lotion.~
+$n tried to use the sun to scare you, how quaint!~
+$n tries to hurt $N with the sun.  $N simply puts on some lotion.$R~
+M
+ 79
+Your storm of $B$4FIRE$R rages around $N, causing | damage and killing $M instantly!~
+$n's storm of $B$4FIRE$R rages around you, causing | damage and a painful end to your life!~
+$n calls forth a storm of $B$4FIRE$R that causes | damage and cooks $N alive!~
+$N seems unharmed by your raging $B$4firestorm$R.~
+You are unharmed as $n's $B$4firestorm$R rages around you.~
+$N seems quite comfortable within $n's raging $B$4firestorm$R.~
+An all-consuming storm of $B$4FIRE$R falls from the heavens and burns $N for | damage!~
+$n's all-consuming storm of $B$4FIRE$R falls from the heavens and burns you for | damage!~
+$n brings forth an all-consuming storm of $B$4FIRE$R to burn $N for | damage.~
+$N breaks out the marshmallows at the sight of your $B$4firestorm$R.~
+You break out the marshmallows at the sight of $n's $B$4firestorm$R.~
+$N breaks out the marshmallows at the sight of $n's $B$4firestorm$R.~
+M
+ 23
+You open a great hole in the earth to swallow $N, dealing | damage and ending $S life.~
+$n opens a great hole in the earth to swallow you whole, dealing | damage and ending your life.~
+$n opens a great hole in the earth to swallow $N whole, dealing | damage and ending $S life.~
+$N appears unconcerned with your earthquake.~
+$n foolishly attempts to cause an earthquake that has no chance to harm you.~
+$N seems unaffected by $n's earthquake!~
+$N takes | damage as your earthquake causes the ground to tremble and shiver.~
+You fall painfully for | damage as $n's earthquake causes the ground to tremble and shiver.~
+$n causes $N to fall painfully for | damage as $E calls forth a large earthquake.~
+$N looks around in mild interest as the earth shakes around $E.~
+You note with mild interest that $n has caused an earthquake.~
+$N looks around with mild interest as $n causes an earthquake.~
+M
+ 133
+Your $B$5lightning shield$R hits $N with | damage, causing an immediate death.~
+$n's $B$5lightning shield$R causes | damage as you burst into pieces and die in agony.~
+The | damage from $n's $B$5lightning shield$R turns $N into a crackling corpse.~
+Your $B$5lightning shield$R crackles few feet before $N who claps $S hands in wonder.~
+As $n's $B$5lightning shield$R crackles a few feet before you, you clap your hands at the show.~
+$n's $B$5lightning shield$R crackles and misses $N.~
+Sparks from your $B$5lightning shield$R surround $N in | damage of crackling energy!~
+You absorb | damage of crackling energy from $n's $B$5lightning shield$R!~
+Sparks from $n's $B$5lightning shield$R surround $N in | damage of crackling energy!~
+How shameful to throw $B$5lightning$R at a GOD!~
+You choose to ignore a shameful attempt to $B$5electrocute$R you.~
+$n's $5lightning$R is tactfully ignored by $N.~
+M
+ 377
+You jab your weapon into $N's head, maybe a little too hard, dealing | damage!~
+$n jabs his weapon into your head causing | damage, all goes black!~
+$n jabs his weapon into $N's head causing | damage, killing $M!~
+You try to jab $N, but fail.~
+$n tried to jab you with $s weapon, but failed miserably.~
+$n tried to jab $N in the head, but $E dodged like a pro.~
+You hear a satisfying THUMP as your weapon connects with $N's head, doing | damage!~
+$n lands a blow for | damage against your head and you see double!~
+$n's jab hits $N upside $S head for | points of damage! Ouch!~
+You make an awesome swish sound as your jab misses $N's head.~
+$n misses your head with jis jab.~
+$n looks silly as $e completely misses $N with $s jab.~
+M
+ 251
+The blood gushes as you put your fist into $N's chest, taking | life from $M!~
+$n shoves $s hand into your chest, and | points of your lifeblood ebbs away.~
+$n punches $s fist RIGHT INTO $N, taking the remaining | life from $M!~
+$N dodges out of your way, barely saving $S life!~
+$n makes a killer move, which you luckily dodge.~
+$N narrowly avoids $n's deadly thrust!~
+You focus your ki and punch $N square in the chest, dealing | damage.~
+$n focuses and punches you square in the chest, dealing | damage.~
+$n focuses and punches $N square in the chest, dealing | damage.~
+You get a funny feeling deep down inside when you think about doing that.~
+$n gets a funny feeling when trying to ki punch you.~
+$n gets a funny feeling deep down inside when $e thinks about $N.~
+M
+ 322
+You ambush $N for | damage, scaring $M to death!~
+$n ambushes you for | damage, scaring you to death!~
+$n ambushes $N for | damage, scaring $M to death!~
+You try to scare $N but fail.~
+$n tried to jump your ass, but you laugh at him.~
+$n tried to jump $N, but $E saw it coming a mile away.~
+You ambush $N with a brilliant surprise attack, causing | points of damage!~
+$n ambushes you as you enter the room, causing | points of damage!~
+$n ambushes $N with a brilliant surprise attack for | damage!~
+You jump out at $N and he stares you down.~
+$n tries to ambush you, you stare him down easily.~
+$n tries to ambush $N, but can't go through with it.~
+M
+ 526
+$N's head explodes as your whistle goes off the scale, doing | damage!"~
+$n's whistle goes off the scale, dealing | damage, and your head explodes!"~
+$n's whistle goes off the scale, dealing | damage, and $N's head explodes!~
+$N covers $S ears and says, "Na na!"~
+$n tried to hurt you with song, but you laugh it off.~
+$N covers $S ears and says, "Na na!" to $n's song~
+You send a sharp piercing whistle at $N dealing | damage.~
+$n whistles a sharp tune that ravages your ear drums and pierces you to the bone for | damage!~
+$n whistles a super-high note at $N which deals | damage and blood drips from $S ears!~
+You look at $N and your lips meld together.~
+You try to whistle at $N but $s lips meld together.~
+$n tries to whistle at $N but $s lips meld together.~
+M
+ 539
+The terrible clef for | damage has left $N broken, bloody, and dead!"~
+$n's terrible clef has beaten you to a pulp with | damage!~
+$n's terrible clef bangs against for | damage$N until they are no more!~
+$N laughs at your song.~
+$n tried to sing a hurtful song to you!~
+$N laughs at $n's song.~
+Your singing hurts $N with | damage!~
+The music!  It hurts!  It hurts! | damage worth!~
+$n's singing causes pain in $N's ears, dealing | damage!~
+Apparently, $N doesn't want to hear your song.~
+$n tries to sing for you, but you don't want to hear it.~
+$n tries to sing for $N, but $e doesn't want to hear it.~
+M
+ 253
+Your wholeness of spirit purges $N right out of existence, dealing | damage!~
+$n's eyes flash and $e purges you out of existence, dealing | damage!~
+$n's eyes flash as $e purges $N right out of existence, dealing | damage!~
+$N seems immune to your storm!~
+You are immune to $n's ki storm.~
+$N seems immune to $n's ki storm.~
+Your wholeness of spirit purges the souls of those around you, dealing | damage!~
+$n's eyes flash as $e pools the energy within $m, causing | damage!~
+$n's eyes flash as $e pools the energy within $m, causing | damage!~
+Your purging doesn't purge $N at all.~
+$n tries to purge you with ki storm, heh, what a loser.~
+$n tries to purge $N's soul, not gonna happen.~
+$~

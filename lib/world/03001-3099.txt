@@ -1,0 +1,2015 @@
+#3001
+The Albatross Tavern~
+   This sea bird is the most popular pub in Sorpigal.  A dim, relaxed
+atmosphere pervades this deceptively large room.  There are public
+announcements and a bulletin $Bboard$R in the chambers to the west, and low
+level characters wait pathetically in the $BChamber of Charity$R, which sits
+just below the $Bmorgue$R, to the east.  Some stairs lead upwards, where the
+sounds of busy students from the $BDC Academy$R can be heard.
+~
+28 67110124 0
+D0
+You see a small corner near the rear of the tavern.  Looks discreet.
+~
+~
+0 -1 3054
+D1
+You see a room set up for donations.
+~
+~
+0 -1 3099
+D2
+~
+~
+0 -1 3014
+D3
+You see a giant bulletin board in the center of the Chamber of Current Events.
+~
+~
+0 -1 3098
+D4
+Hey, it's the MUD SCHOOL!
+~
+~
+0 -1 200
+E
+plaque~
+This entire world and all its files are under constant revision.
+Llevity, Kate, and all the revamping gods all do a great job, tell
+them thanks...8-)
+Eas tries, but he just doesn't have what it takes...
+NOTE THAT EAS WROTE THE ABOVE CRAP, yet it was still *I*,
+the great and powerful Sadus, who mostly built the wonderful city of Sorpigal,
+although I left in a bunch of rooms Kate had rewritten and then failed to
+credit her in this plaque, so she had to change it next time she went through
+the world file.
+~
+S
+#3002
+OLD GUILD "Cleric's Inner Sanctum"~
+   You stand in a vast chamber, divine energies ebbing and flowing in the
+crackling air all around room.  An enormous white altar stands against the west
+wall, stretching from the tiled floor to the plaster ceiling.  From its center,
+a huge face gazes at you dispassionately, as though judging your worthiness and
+finding you slightly lacking.
+~
+28 33563784 0
+D1
+You see your favorite place, the bar of divination.
+~
+~
+0 -1 3003
+E
+altar~
+Carved of white marble, its surface gleams as though recently polished.
+~
+E
+face~
+You can't determine its gender, age or race, only that it is godlier
+than anything you've ever seen before.
+~
+S
+#3003
+OLD GUILD "Cleric's Cafe"~
+   Clerics from across the land sit at small tables, discussing the intricacies
+of animal sacrifice, rites of propriation, the best tailor for ritual robes,
+and other highly important and arcane clerical knowledge.  A bored waiter
+somehow manages to be at every table as soon as he's needed.  A small sign
+hangs on the wall, next to several dartboards showing the pictures of various
+gods currently in disfavor.  Another wall holds a set of shelves which bear a
+number of tiny statues, many with aromatic incense smouldering in dishes in
+front of them.
+~
+28 33562764 0
+D2
+You see the entrance.
+~
+~
+0 -1 3004
+D3
+You see the inner sanctum.
+~
+~
+0 -1 3002
+E
+sign~
+The sign reads:
+Free instructions provided by the waiter:
+   Buy  - Buy something (drinkable) from the waiter.
+   List - The waiter will show you all the different drinks and
+          specialties, and tell the price of each.
+~
+S
+#3004
+The Healer's Plaza~
+   You find yourself between Indica way to the east and Arcanus lane to the
+south, where a rather recently laid cobblestone courtyard opens up before you.
+This busy space serves as the center of all medical activities in the city.
+Four unconnected sections of a three-foot-tall granite wall form the corners to
+an uncompleted ellipse and designate the area in which merchants and healers
+are allowed to offer their goods and services to the public.  In the center, a
+magnificant old weeping willow, its base surrounded by a tall wrought iron
+fence, provides shade to the weary and concealment to the various volunteer
+healers that are innundated with requests from a never-ending flow of ill and
+injured unfortunates.  To the north stands a two-story wood building that holds
+the Sorpigal Cleric's guild.
+~
+28 67110996 1
+D0
+~
+~
+0 -1 1950
+D1
+~
+~
+0 -1 3064
+D2
+~
+~
+0 -1 3062
+S
+#3005
+Sorpigal Gold Depository~
+   The chamber walls have been panelled in a deep-grained, polished wood.  The
+effect is unique and opulent.  You feel safe leaving your money here.
+~
+28 67110116 1
+D1
+~
+~
+0 -1 3063
+S
+#3006
+Entrance to the Quester's Haven Inn~
+   You are standing in the entrance hall of a busy inn.  Various flyers,
+advertising equipment for sale, lost charmies, death threats, clan challenges,
+and offers to group have been tacked up on the walls, most of them too tattered
+and faded to read.  A small staircase twists its way up to the Dark Castle
+Souvenir Shoppe, while you can hear the clatter of mugs and shouts of toasts
+being offered from the large room to your east.
+~
+28 8 0
+D1
+Surprise! You see the bar.
+~
+~
+0 -1 3007
+D3
+~
+~
+0 -1 3043
+D4
+You see the Souvenir Shop.
+~
+~
+0 -1 3008
+S
+#3007
+Quester's Haven Inn~
+   You are standing in a large, smoky room filled with drinkers.  Against the
+northern wall, the mirror behind a large wooden bar gleams, reflecting the
+lights of the candles which glimmer on the surfaces of the tables and booths.
+A barely visible obsidian door stands to the south. A fire in the fireplace
+against the western wall leaps with flames of purple, green and gold.  Several
+barmaids argue about their tips in one corner in fierce whispers, while the
+bartender polishes the small brass sign fastened to the front of the bar.
+~
+28 204 0
+D1
+~
+~
+0 -1 3055
+D3
+You see the exit to the entrance hall.
+~
+~
+0 -1 3006
+E
+writing carving carvings symbols symbol~
+Although it is very hard to understand, you think it looks a lot like beer,
+poems about beer, and small beer-mugs.
+~
+E
+sign~
+The sign reads:
+   Buy  - Buy something (drinkable) from the bartender.
+   List - The bartender will show you all the different drinks and
+          specialities, and tell the price of each.
+~
+S
+#3008
+Ye Olde Darke Castle Souvenir Shoppe~
+   You are standing in a small, rather crowded souvenir shop, selling all
+manners of Dark Castle paraphernalia.  A wire rack against one wall holds maps
+to various sites on the mud, while a display case is filled with snow globes
+depicting scenes of lamias and enfans cavorting in blizzards.
+~
+28 1096 0
+D5
+You see the entrance hall.
+~
+~
+0 -1 3006
+S
+#3009
+Sadus' House of Fish and Pastries~
+   You are standing inside a small bakery, filled with the aromatic smells of
+baking bread and sweet rolls.  Pastries and cakes are arranged behind a large
+glass walled counter.  A rack along the east wall holds an assortment of smoked
+fish and frozen pizzas.  A small sign sits on the counter, next to the large
+brass-keyed cash register, which gleams beneath its dusting of flour.
+~
+28 1256 0
+D2
+You see Sativa Street, filled with busy pedestrians.
+~
+~
+0 -1 3013
+E
+sign~
+Free instructions provided by the store:
+   Buy  - Will buy you some bread or pastry.
+   List - The baker will kindly tell you the price and sort of the bread in
+          his bakery.
+~
+E
+danish pastry~
+You see that this is truly delicious pastry.  Must be made by a Dane from
+Denmark (which surely is not the capital of Sweden!).  Former ruler of
+Scandinavia, England, Northern Germany, Northern France, Russia, Greenland,
+Iceland, Estonia etc. etc.
+   The sight of those large, wholesome chokoladeboller makes your mouth water
+and your soul sing.
+~
+S
+#3010
+The General Store~
+   Several aged adventurers sit around a small iron stove, swapping unlikely
+stories and playing checkers.  All sorts of tempting items are stacked on the
+shelves, mostly out of your reach.  An orange-haired cat stalks along one of
+the topmost shelves, in search of mice or very small dragons.  The shopkeeper
+looks at you and points at the small $Bnote$R hanging on the wall above the
+counter.
+~
+28 1256 0
+D0
+~
+~
+0 -1 3013
+E
+note~
+The note reads:
+  List  - Show which various items are in the store.
+  Buy   - Buy an item.
+  Value - The shopkeeper will (free of charge) tell how much she will
+          pay for your item.
+  Sell  - Sell an item.
+~
+S
+#3011
+Eas-o-matic's Weapon-o-rama~
+   Blades of every conceivable shape and size glitter in racks covering the
+panelled walls, and a tray of brass knuckles lying on the counter catches your
+eye with their sultry gleam.  A couple of assassins lean over one case,
+morbidly eying several knives and discussing the applicability of poisons in
+whispers.  A small sign is propped against the cash box.
+~
+28 200 0
+D2
+~
+~
+0 -1 3016
+E
+sign~
+The sign reads:
+  List  - Show which various items are in the store.
+  Buy   - Buy an item.
+  Value - The shopkeeper will (free of charge) tell how much he will
+          pay for your item, and at the same time provide some basic
+          information about it.
+  Sell  - Sell an item.
+~
+S
+#3012
+Sativa Street~
+   The dusty cobblestones of Sorpigal's Sativa Street pass beneath your feet as
+you walk along.  The traffic here is moving overwhelmingly from the gate-tower
+eastward, where you can hear the shouts and cries of the traders at Stonewitch.
+Shops line both sides of Sativa Street.
+~
+28 67108864 1
+D0
+~
+~
+0 -1 3059
+D1
+You see Sativa Street, filled with travellers.
+~
+~
+0 -1 3013
+D2
+~
+~
+0 -1 3031
+D3
+You see the city gate.
+~
+~
+0 -1 3040
+S
+#3013
+Sativa Street~
+   You are travelling along Sorpigal's busiest street.  The western half of
+Sativa Street has developed into a farmer's market.  You're likely to find
+everything you need for survival here, but you should look elsewhere in the
+city if you're looking for a more exotic purchase.
+~
+28 67108864 1
+D0
+~
+~
+0 -1 3009
+D1
+~
+~
+0 -1 3014
+D2
+~
+~
+0 -1 3010
+D3
+~
+~
+0 -1 3012
+S
+#3014
+Stonewitch~
+   You stand in the center of Sorpigal, the busy Stonewitch square.
+Travellers from across the continent come and go around you, while peddlers try
+to interest you in their multitude of goods.  The popular Albatross Tavern sits
+just to the north, and Indica Way travels south.  Sativa Street stretches to
+the east and west.  There is a statue here of a tall, dark, shadowy figure.
+Its vacant gaze betrays no life.
+~
+28 67108864 1
+D0
+~
+~
+0 -1 3001
+D1
+~
+~
+0 -1 3015
+D2
+~
+~
+0 -1 3063
+D3
+~
+~
+0 -1 3013
+D4
+You're looking straight up into the sky.
+~
+~
+0 -1 1017
+S
+#3015
+Sativa Street~
+   The eastern side of town contains mostly craftsmen and specialty work.  A
+leatherworks shop sits on the southern curb, while the armory is to the north.
+A weapons shop sits across from the warrior's guild just to the east.
+~
+28 67108864 1
+D0
+~
+~
+0 -1 3020
+D1
+~
+~
+0 -1 3058
+D2
+~
+~
+0 -1 3035
+D3
+You see the Market Square.
+~
+~
+0 -1 3014
+S
+#3016
+Sativa Street~
+   The dusty cobblestones of Sativa Street pass beneath your feet as you walk
+along.  From the north comes the alluring gleam of the weapon shop's wares
+while a sullen guard stands in front of the Guild of Warriors to the south.
+The city gate towers in the east, and the road leads west, in the direction of
+Stonewitch.
+~
+28 67108864 1
+D0
+~
+~
+0 -1 3011
+D1
+You see the city gate.
+~
+~
+0 -1 3041
+D2
+~
+~
+0 -1 1942
+D3
+~
+~
+0 -1 3058
+S
+#3017
+OLD GUILD "Entrance to the Mage's Guild"~
+   Odd looking walking staffs and canes are propped up against the eastern wall
+in an ornate wooden rack.  Here and there, small balls of witchlight dart
+lazily through the air, apparently abandoned by their users.  Embroidered
+cloaks, their folds edged with violet and crimson glows of mystic energy, have
+been hung on the coat rack.  The room is badly lit and feels cramped.
+~
+28 33554574 0
+D0
+~
+~
+0 -1 3018
+D2
+~
+~
+0 -1 3061
+S
+#3018
+OLD GUILD "An Infinitely Unsettling Bar"~
+   Images of horrific monsters do battle over a gaming table in the corner,
+occasionally spattering those around it with illusionary blood.  The furniture
+varies wildly, but most of it seems to have grown directly out of the floor.
+Bottles float through the air as the bartender levitates them to the proper
+tables, occasionally colliding.  The lights flicker and dim in an odd rhythm,
+and a band in the corner plays discordant music which most of the patrons seem
+to totally ignore.
+~
+28 33563790 0
+D1
+You see the laboratory.
+~
+~
+0 -1 3019
+D2
+~
+~
+0 -1 3017
+S
+#3019
+OLD GUILD "Mage's Laboratory"~
+   This is the Magical Experiments Laboratory.  Dark smoke-stained stones arch
+over numerous huge oaken tables, most of these cluttered with strange- looking
+pipes and flasks.  The floor is covered with half-erased pentagrams and even
+weirder symbols, and a blackboard in a dark corner has only been partially
+cleaned, some painful-looking letters faintly visible.
+~
+28 33563790 0
+D3
+You see the bar.
+~
+~
+0 -1 3018
+S
+#3020
+The House of Arms~
+   Racks hold well polished armor and other accoutrements, most of it stamped
+with the Waz Seal of Approval (tm).  A discount rack against one wall holds a
+jumbled heap of chainmail paraphernalia.  Another set of shelves holds metal
+polish and mystic waxes guaranteed to keep your armor looking like new.  A
+small note has been tacked to the wall over the bored proprietor's head.
+~
+28 200 0
+D2
+~
+~
+0 -1 3015
+E
+note~
+  You can use these commands for trading:
+  value <item>     To get the price of an item in your possession and some basic information.
+  sell <item>      To sell something.
+  buy <item>       To buy something (provided that the shop has it in store).
+  list             Gives you a listing of the shop's inventory.
+        WE DON'T GIVE CREDIT; WE DON'T EXPECT TO RECEIVE CREDIT!
+                             NO HAGGLING
+~
+S
+#3021
+OLD GUILD "Entrance Hall to the Guild of Swordsmen"~
+   Warriors come and go around you, their armor gleaming in the dim light of
+the lantern hanging from the ceiling of this entranceway.  A large grindstone
+is set up in one corner for the convenience of those whose weapons have been
+dulled by battle.  To the east come raucous shouts from the bar, while Sativa
+Street lies to your north.
+~
+28 100663436 0
+D0
+You see Sativa Street, filled with hurrying pedestrians.
+~
+~
+0 -1 3016
+D1
+You see the Voluptuous Lamia, a warriors-only bar.
+~
+~
+0 -1 3022
+S
+#3022
+OLD GUILD "The Voluptuous Lamia"~
+   The wooden walls echo to the rowdy shouts and songs of the bar's many
+patrons.  Oil lanterns flicker along the walls, illuminating the thick oaken
+tables and benches which are the only furnishings.  In the fireplace, an
+enormous leg of beef drips as it roasts over an open fire, sending out the
+hearty aroma of cooking meat.  The floor is sticky with spilled ale.  You can
+glimpse a practice yard through the south archway, and the entrance to the
+guildhall lies to the west.
+~
+28 33563788 0
+D2
+You see the practice yard.
+~
+~
+0 -1 3023
+D3
+You see the entrance hall to the guild.
+~
+~
+0 -1 3021
+S
+#3023
+OLD GUILD "The Tournament and Practice Yard"~
+   Large canvas dummies, stuffed with straw, hang along one wall in this dusty
+yard, while archery targets have been set up against another, bristling with
+arrows.  The earth floor is dusty, and only a few blades of yellow grass have
+dared to sprout here and there along the edges of the clay walls.  You can hear
+the noise of the bar to your north.
+~
+28 33563784 0
+D0
+You see the bar.
+~
+~
+0 -1 3022
+S
+#3025
+Midwitch~
+   The travellers here are of a slightly more disreputable appearance than
+those in Sativa Street and Stonewitch, and you're pretty sure you've glimpsed
+at least one pickpocket in this motley crowd.  Scruffy dogs search through the
+gutters for food, snarling at each other over a scrap of discarded fish.  An
+alleyway leads east towards the wharf, and Arcanus Lane goes west.  A breeze
+carries a waft of fresh air to you from the south.
+~
+28 67108868 1
+D0
+~
+~
+0 -1 3064
+D1
+~
+~
+0 -1 3026
+D2
+~
+~
+0 -1 3030
+D3
+~
+~
+0 -1 3062
+S
+#3026
+The Dark Alley~
+   A lean alley cat stalks its way through the shadows, looking for rats, while
+a couple of street urchins sit against a curb, playing mumblety-peg.
+Northward, you see a small shack at the edge of a small shanty town.  The
+Antipaladins guild lies just south of here.
+~
+28 0 1
+D1
+The alley continues east.
+~
+~
+0 -1 3045
+D2
+~
+~
+0 -1 1920
+D3
+~
+~
+0 -1 3025
+S
+#3028
+A tunnel below the north wall of Sorpigal~
+   You find yourself in a cleverly disguised and dingy tunnel that appears to
+lead under the north wall of the city of Sorpigal.  This must be the secret
+passage that Sorpigal's "less desireable" elements utilize to travel unnoticed
+past the prying eyes of the law.
+~
+28 100663437 0
+D0
+The wall seems worn to the north here.
+~
+wall hidden~
+15 1 -1
+D2
+There appears to be some kind of door in the tunnel to the south.
+~
+secret case tunnel~
+15 1 3029
+S
+#3029
+OLD GUILD "Skiv's shack"~
+   The drunken man before you leans and staggers against the pitch wall of a
+nearly shack.  Nevertheless, the dagger in his hand flashes in flips, twirls,
+and circles.  Skiv stalks a large rat, then pins it to the ground through the
+back.  You wonder if he could teach you to do that.  The room has various
+chairs and tables scattered throughout.  A bookcase with various manuals and
+diagrams of safes and locks leans crookedly against the wall.  Perhaps it
+conceals something beyond?
+~
+28 100672652 0
+D0
+The bookcase seems to be a bit askew.
+~
+secret case tunnel~
+15 1 3028
+D2
+~
+~
+0 -1 3070
+S
+#3030
+Indica Way~
+   To your north, the Midwitch Square opens up, filled with thieves, ruffians,
+pimps, prostitutes, pickpockets and other members of Sorpigal's citizenry.  To
+the south, you see a mossy bridge, leading across the Anfract River, which cuts
+through the center of Sorpigal, toward the promenade and Sorpigal's Public
+Gardens.  There appears to be some kind of fire to the east.
+~
+28 67108864 2
+D0
+~
+~
+0 -1 3025
+D2
+~
+~
+0 -1 3071
+S
+#3031
+The Pet Shop~
+   You step inside a small store, crowded with cages full of animals of every
+imaginable size and shape.  A white ferret hisses at you and blinks its red
+eyes, while a kennel of spotted puppies bark ferociously at you, wagging their
+tiny tails.  An enormous green parrot squawks and eyes you, wondering if you
+have any crackers in your pockets.  In the back, a wall of aquariums bubbles
+gently next to a rack draped with leashes and collars.  A small sign hangs on
+the wall next to the front door.
+~
+28 8328 0
+D0
+~
+~
+0 -1 3012
+E
+notice~
+Sorpigal Pet Store temporarily closed for health violations
+under section 33d of the Sorpigal Pets and Familars Act.
+Re-Opening Soon.
+.
+- The Management.
+~
+E
+sign~
+The sign reads:
+  Use 'List' to see the available pets.
+  Use 'Buy <pet>' to buy yourself an animal companion.
+  Instructions for having a furry friend:
+  You can use 'order <pet> <instructions>' to order your pets around.
+  If you abuse your pet, it will no longer regard you as its master, and
+  we will be obliged to report you to the Dark Castle SPCA.
+  If you have several pets you may use 'order followers <instructions>'
+  You can name the pet you buy as : "buy <pet> <name>"
+~
+S
+#3032
+Pet Shop Store~
+   This is the small dark room in which the Pet Shop Boy keeps his pets.
+It is vital that this room's virtual number is exactly one larger than the
+Pet Shop number. If you are a player and in here report it IMMEDIATELY.
+~
+28 33581185 0
+E
+no_tele~
+~
+S
+#3033
+Magiks R Us~
+   You stand inside a large shop, its aisles lined with cases of potions, racks
+of wands and shelf after shelf of exotic items imported from regions across
+Dark Castle.  Adventurers come and go all around you, while a loud speaker
+advertises a blue light special on yellow potions in Aisle 12.  A large cash
+register sits near the entrance, a small sign sitting next to the larger one
+that reads "We take SorpigalCard."
+~
+28 1260 0
+D0
+~
+~
+0 -1 3062
+D1
+~
+obelisk~
+11 -1 -1
+E
+sign~
+The sign reads:
+  List  - Show which various items are in the store.
+  Buy   - Buy an item.
+  Value - The shopkeeper will (free of charge) tell how much he will
+          pay for your item, and at the same time provide some basic
+          information about it.
+  Sell  - Sell an item.
+~
+S
+#3034
+The Jeweller's Shop~
+   Cases of scintillating gems and beautifully fashioned jewelry line the walls
+of this small, tastefully furnished shop.  A couple hangs over one case,
+admiring a variety of mud wedding and engagement rings.  The warm yellow light
+emanating from the small silver oil lamps on the walls is reflected in the
+polished surface of the massive mahogany desk that stands in the center of the
+room.  A small sign, lettered in golden cursive, sits on the desk.
+~
+28 204 0
+D3
+~
+~
+0 -1 3063
+E
+sign~
+The golden letters say :-
+    Use 'list' to see what is in store,
+        'buy <item>' to buy an item,
+        'sell <item>' to sell an item and
+        'value <item>' to make the jeweller evaluate an item.
+~
+E
+desk~
+Your face is reflected in its surface.
+~
+E
+oil lamps~
+They are made from polished silver and look as if they are securely fastened
+to the smooth stone walls.
+~
+S
+#3035
+Ye Leatherworks Shoppe~
+   An acrid smell fills this large room.  Along the walls are numerous shelves
+containing all sorts of animal hide and in the crackling fireplace hangs a big
+iron pot with boiling water, several hides bobbing here and there in its
+depths.  In the middle of the room is a large oak table.  A wooden sign hangs
+above the fireplace.
+~
+28 136 0
+D0
+~
+~
+0 -1 3015
+E
+sign~
+The wooden sign says :-
+    Use 'list' to see what is in store,
+        'buy <item>' to buy an item,
+        'sell <item>' to sell an item and
+        'value <item>' to make the leather worker evaluate an item.
+~
+E
+pot~
+Several large pieces of leather hide are boiling in the iron pot.
+~
+E
+table~
+It is made from solid oak but appears to be very used.  Its surface is
+covered in marks and scratches.  A large burning candle stands directly on
+the table surface, tallow flowing down its sides.
+~
+E
+fireplace~
+It is a rather large fireplace made from heavy granite rocks.
+~
+S
+#3036
+A grungy little alleyway~
+   The cobblestones here are stained with blood and refuse, and strange
+alleycats stalk rats through the shadows.  High stone walls tower all around,
+closing off sight.
+~
+28 8 1
+D1
+~
+~
+0 -1 3037
+D3
+~
+~
+0 -1 3054
+S
+#3037
+A grungy little alleyway~
+   The cobblestones here are stained with blood and refuse, and strange
+alleycats stalk rats through the shadows.  High stone walls tower all around,
+closing off sight.
+~
+28 8 1
+D1
+~
+~
+0 -1 3038
+D3
+~
+~
+0 -1 3036
+S
+#3038
+A grungy little alleyway~
+   The alley twists like a writhing snake here, bending abruptly south and
+west.  The cobblestones are slick with slime and waste, and a cold wind
+whistles sharply.  One wall of the alley appears to have a strange shimmer.
+There is a fairly shabby looking shack to the north, cleverly tucked away
+from prying eyes.
+~
+28 8 1
+D0
+~
+~
+0 -1 3070
+D2
+~
+~
+0 -1 3039
+D3
+~
+~
+0 -1 3037
+S
+#3039
+A grungy little alley~
+   A vile little alley leads between the greystone walls of the architecture of
+Sorpigal.  Moisture beads and clings to almost every surface and slime covers
+the rounded surfaces of the cobblestones.
+~
+28 8 1
+D0
+~
+~
+0 -1 3038
+D1
+~
+~
+0 -1 3088
+D2
+~
+~
+0 -1 3057
+D3
+~
+~
+0 -1 3099
+S
+#3040
+Inside the West Gate Tower~
+   You are standing under the watchtower at the west gate of Sorpigal.  There
+is a footbridge across the heavy wooden gate.  Sativa Street leads east, and
+Tanj Avenue extends south from here.  To the north is the entrance to the
+Paladin's guild.
+~
+28 67108864 1
+D0
+~
+~
+0 -1 1968
+D1
+You see Sativa Street.
+~
+~
+0 -1 3012
+D2
+You see the road running along the inner side of the city wall.  You notice
+that it is called Tanj Avenue.
+~
+~
+0 -1 3042
+D3
+The city gate is to the west.
+~
+gate~
+1 3133 3052
+D4
+~
+~
+0 -1 3146
+E
+wall~
+It is built from large grey rocks that have been fastened to each other with
+some kind of mortar.  It is far too high to climb.
+~
+E
+tower towers~
+Both of the towers are built from large grey rocks that have been fastened to
+each other with some kind of mortar, just like the city wall.
+~
+E
+gate~
+It is a set of very big double doors made from hard wood.  They have been
+reinforced with large iron bands to make them even more sturdy.  One of the
+doors is equipped with a very big lock.
+~
+E
+bridge footbridge~
+It is too high up to reach but it looks as if one easily could walk across it
+from one tower to the other.
+~
+S
+#3041
+Inside the East Gate Tower~
+   You are by a large tower that has been built into the eastern city wall and
+connected with a footbridge across the heavy wooden gate.  Sativa Street leads
+west from here.  North of here is the entrance to the Barbarian's guild.
+South of here is the wharf, but it looks dirty and not too safe.
+~
+28 67108864 1
+D0
+~
+~
+0 -1 1926
+D1
+You see the city gate.
+~
+gate~
+1 3133 3053
+D2
+~
+~
+0 -1 3068
+D3
+You see Sativa Street.
+~
+~
+0 -1 3016
+D4
+~
+~
+0 -1 3147
+E
+wall~
+It is built from large grey rocks that have been fastened to each other with
+some kind of mortar.  It is far too high to climb.
+~
+E
+tower towers~
+Both of the towers are built from large grey rocks that have been fastened to
+each other with some kind of mortar, just like the city wall.
+~
+E
+gate~
+It is a set of very big double doors made from hard wood.  They have been
+reinforced with large iron bands to make them even more sturdy.  One of the
+doors is equipped with a very big lock.
+~
+E
+bridge footbridge~
+It is too high up to reach but it looks as if one easily could walk across it
+from one tower to the other.
+~
+S
+#3042
+Tanj Avenue~
+   You walk along a small and unprepossessing side street.  The high stone wall
+of the city is to your west.  To the north, you can catch a glimpse of the
+well-guarded City Gates, while the road continues to your south.  A large
+statue has been set into an alcove in the city wall.  Finger's Repair Shop is
+just east of here.
+~
+28 67108864 1
+D0
+~
+~
+0 -1 3040
+D1
+~
+~
+0 -1 3072
+D2
+The road continues further south.
+~
+~
+0 -1 3043
+D3
+~
+~
+0 -1 3069
+E
+statue~
+It depicts a brawny god, his face masked, towering over a multitude
+of small shivering mortals, icicles hanging off their limbs.  The
+inscription reads 'Dedicated to the memory of Uther and the multitudes
+of multi-players he caught and froze.'
+~
+E
+wall~
+It is built from large grey rocks that have been fastened to each other with
+some kind of mortar.  It is far too high to climb.
+~
+S
+#3043
+Tanj Avenue~
+   This avenue runs north-south along Sorpigal's western wall.  The west gate
+is a bit off to the north, and the Quester's Haven Inn sits innocuously off to
+the east.  You can journey farther south into Skunk Corner.
+~
+28 67108864 1
+D0
+The road continues further north.
+~
+~
+0 -1 3042
+D1
+~
+~
+0 -1 3006
+D2
+The road continues further south.
+~
+~
+0 -1 3047
+E
+wall~
+It is built from large grey rocks that have been fastened to each other with
+some kind of mortar.  It is far too high to climb.
+~
+E
+letters graffiti~
+Among other things, it says: 'Who watches the watchmen?'  'Has anyone
+seen Kildoc?'  'Galdus was here'  'Wanted: one Longsword of Legend, will
+pay top price'
+~
+S
+#3045
+Alley at Levee~
+   Full of gloom and menacing shadows, the alley leads west and east, towards
+the wharf.  A small shanty town subsists quietly to the north, while south of
+you lies the levee.  Beggars convene on one corner, comparing methods and
+glancing at you appraisingly.
+$B$1A small plaque has been embedded into the cobblestones here.$R
+~
+28 160 1
+D0
+~
+~
+0 -1 3066
+D1
+Looks like the south end of the wharf.
+~
+~
+0 -1 3046
+D2
+You see the levee.
+~
+~
+0 -1 3049
+D3
+The alley leads west.
+~
+~
+0 -1 3026
+E
+plaque~
+Embedded in the stone, as if by some tremendous magical burst, the
+plaque reads simply:
+ "In memory of the magics long lost and days gone by. - A"
+Strangely, no magic appears to function nearby.
+~
+S
+#3046
+South end of the Wharf~
+   This is the southern end of Sorpigal's wharf.  The cry of the occasional
+seabird breaks the silence, and a cold wind makes its way over the waters of
+the bay.  An alley leads into town to the west, and the wharf extends further
+north.  Just south of here is an abandoned, three-story warehouse.
+~
+28 0 1
+D0
+~
+~
+0 -1 3065
+D2
+You see the warehouse.
+~
+~
+0 -1 3050
+D3
+You see the alley.
+~
+~
+0 -1 3045
+S
+#3047
+Skunk Corner~
+   Occupying the southwestern end of northern Sorpigal, Skunk Corner sits just
+north of the river.  Arcanus Lane lies to the east, and Tanj Avenue leads north
+to the western city gate.  You can follow Wall Road to the south.  To the west
+the sounds of raucous laughter and partying can be heard from the legendary
+$BPlatinum Strip$R.
+~
+28 67108864 1
+D0
+You see the road.
+~
+~
+0 -1 3043
+D1
+~
+~
+0 -1 3061
+D2
+~
+~
+0 -1 2171
+D3
+~
+~
+0 -1 23000
+E
+wall~
+It is built from large grey rocks that have been fastened to each other with
+some kind of mortar.  It is far too high to climb.
+~
+S
+#3048
+Seasick Wench Inn~
+   You are inside the Seasick Wench Inn, where only the foolish and very brave
+venture.  The unsavory clientele sit at their round oak tables, glancing at you
+over their shoulders.  A few pigeons coo from the rafters of the mouldering
+roof, and a rat runs across a roof beam in search of food scraps.  The smell of
+unwashed people and ancient beer hits you in the face in a dizzying wave of
+stench.
+~
+28 9452 0
+D3
+~
+~
+0 -1 3068
+S
+#3049
+Levee~
+   You stand on the levee and hear the gentle lapping of the water at the
+edges.  To your south, the river gently flows west, laden with small boats
+carrying tradestuffs to some unknown destination.  Several watercraft have been
+tied up to the pier.  As you look down into the dark water, an enormous pike
+surfaces, its long white teeth glimmering as it searches for the little
+freshwater crabs that scavenge along the water's edge.
+~
+28 67108992 1
+D0
+You see the Alley.
+~
+~
+0 -1 3045
+D2
+You see the river flowing west.
+~
+~
+0 -1 3203
+S
+#3050
+Abandoned Warehouse~
+   You are inside the only room in the old warehouse.  Only a sparse amount of
+light shines in through the boarded up windows above you.  The place is very
+dusty and appears to have been unused for many years.  A heavy wooden ladder
+heads upwards towards another, better constructed level of the warehouse.  A
+suprisingly well-tended stairway leads down into the basement.  A small sign
+has been affixed to a chain and placed across the stairway.
+~
+28 67108940 0
+D0
+The southern end of the Wharf lies to the north, running all the way to the East Gate.
+~
+~
+0 -1 3046
+D5
+~
+~
+0 -1 2390
+E
+sign~
+"Condemned. Enter at your own risk."
+~
+S
+#3051
+On the Bridge~
+   You are standing on the wooden bridge that crosses the river.  Carved of
+some unknown fine-grained wood, it is patterned with serpents and flowering
+vines.  It sits against the western city wall, and you can see the water of the
+river flowing west through an opening in the wall ten feet below the bridge.
+~
+28 67108864 1
+D0
+~
+~
+0 -1 3061
+D2
+You see the Concourse.
+~
+~
+0 -1 3100
+E
+wall~
+It is built from large grey rocks that have been fastened to each other with
+some kind of mortar.  It is far too high to climb.
+~
+E
+opening~
+You cannot really see it from here as it is somewhere beneath your feet.
+~
+E
+bridge~
+   You search for some marker identifying its maker, but see none.  Its
+craftsmanship is marvelous, though, down to the fine scales patterning
+the bodies of the serpents and the tiny butterflies fluttering among the
+vines.
+~
+S
+#3052
+Outside the West Gate of Sorpigal~
+   You are by two small towers that have been built into the city wall and
+connected with a footbridge across the heavy wooden gate.  To the west you can
+see the edge of a big forest.  A small dusty trail leads north along the wall.
+~
+28 4 1
+D0
+The trail continues around the City of Sorpigal.
+~
+~
+0 -1 376
+D1
+The city gate is to the east.
+~
+gate~
+1 3133 3040
+D3
+The forest edge is to the west.
+~
+~
+0 -1 6000
+E
+wall~
+It is built from large grey rocks that have been fastened to each other with
+some kind of mortar.  It is far too high to climb.
+~
+E
+tower towers~
+Both of the towers are built from large grey rocks that have been fastened to
+each other with some kind of mortar, just like the city wall.
+~
+E
+gate~
+It is a set of very big double doors made from hard wood.  They have been
+reinforced with large iron bands to make them even more sturdy.  One of the
+doors is equipped with a very big lock.
+~
+E
+bridge footbridge~
+It is too high up to reach but it looks as if one easily could walk across it
+from one tower to the other.
+~
+S
+#3053
+Outside the East Gate of Sorpigal~
+   You are by a large tower that has been built into the eastern city wall and
+connected with a footbridge across the heavy wooden gate.  To the east the
+plains stretch out in the distance.  To the north a small dusty trail follow
+the city wall.
+~
+28 4 1
+D0
+The trail continues around the City of Sorpigal.
+~
+~
+0 -1 384
+D1
+You see the plains.~
+~
+0 -1 18962
+D3
+You see the city gate.
+~
+gate~
+1 3133 3041
+E
+wall~
+It is built from large grey rocks that have been fastened to each other with
+some kind of mortar.  It is far too high to climb.
+~
+E
+tower towers~
+Both of the towers are built from large grey rocks that have been fastened to
+each other with some kind of mortar, just like the city wall.
+~
+E
+gate~
+It is a set of very big double doors made from hard wood.  They have been
+reinforced with large iron bands to make them even more sturdy.  One of the
+doors is equipped with a very big lock.
+~
+E
+bridge footbridge~
+It is too high up to reach but it looks as if one easily could walk across it
+from one tower to the other.
+~
+S
+#3054
+A cozy corner~
+   This is the rear end of the Albatross Tavern.  The lighting is somewhat dim
+here, and the conversation is quieter.  Who knows what plots may have hatched
+here?  As they say, "God is in the shadows".  There is a small sign affixed to
+the wall here.  A small archway leads east into shadows.
+~
+28 67110124 0
+D1
+~
+~
+0 -1 3036
+D2
+~
+~
+0 -1 3001
+D3
+~
+~
+0 -1 3073
+E
+chess~
+The chess game seems to glimmer with some kind of magical power, and you
+notice that the chess pieces look remarkably realistic, some even dripping
+with fresh blood.
+~
+E
+sign~
+Please check to make sure that your equipment is in excellent
+condition before you sell it back to the Platinumsmith.  If you
+sell godload that requires repair, you WILL NOT receive the full
+amount of platinum for it.
+~
+S
+#3055
+A Dimly Lit Room~
+   Off the main Inn lies this small room that seems to see heavy traffic from
+travellers far and wide.  Dirty wooden floors, dressed in shadow from the far
+fire in the fireplace, creak as people move over them.  A small table and a few
+chairs are against the northern wall of this room, but are not often used.
+Several large candles are lit providing just enough light to see who is in the
+room, but not enough to get a good look at anyone.
+~
+28 33563836 0
+D3
+~
+~
+0 -1 3007
+S
+#3056
+Uncle Juan's Eatery~
+   Brightly decorated in blues and reds, this well-lit and pleasant
+establishment is filled with spicy smells that make your nose start to run the
+minute you step inside the door.  A grill sizzles behind the counter, and the
+shelves are stacked high with boxes of taco shells.  Having given up his
+aspirations to the office of mayor after facing numerous obstacles and red
+tape, Uncle Juan has apparently returned to his peaceful life of burritos and
+chimichangas.
+~
+28 1260 0
+D1
+~
+~
+0 -1 3067
+S
+#3057
+A grungy little alley~
+   Barely lit by what light manages to make its way in from the main street, a
+narrow little alley leads north and south between larger buildings.
+~
+28 8 1
+D0
+~
+~
+0 -1 3039
+D2
+~
+~
+0 -1 3058
+S
+#3058
+Sativa Street~
+   The cobblestones that cover the streets of Sorpigal, polished by the wear of
+countless centuries of travelling feet, lead east and west here.  A few scrawny
+trees grow in large blue marble planters here and there.  A narrow alleyway
+lies to the north.  While a smell of wood drifts from the fletcher's shop to
+the south.
+~
+28 67108864 1
+D0
+~
+~
+0 -1 3057
+D1
+~
+~
+0 -1 3016
+D2
+A shop selling bows and arrows.
+~
+~
+0 -1 3060
+D3
+~
+~
+0 -1 3015
+S
+#3059
+The Meta Shop~
+   The walls of this spacious shop are lined with blank white shelves, which
+you presume must hold the intangible wares in which the Meta-Physician deals.
+Sleeping and resting adventurers slump along one wall, comparing old scars and
+betting on the size and the shape of the next.
+~
+28 1276 0
+D0
+~
+~
+0 -1 -1
+D2
+~
+~
+0 -1 3012
+S
+#3060
+Arnold's House of Authentic Austrian Arrows~
+   This is a small store that sells arrows and bows.  Large wood cases filled
+with hooks and pegs line the east and west walls.  Bows hang from the pegs and
+light iron canisters full of arrows hang from the hooks.  A small display holds
+leather quivers in the center of the shop.  A chair sits square in front of a
+complicated device.  A small area in the back of the store is closed off with a
+curtain.  The smell of wood permeates the air here.
+~
+28 200 0
+D0
+The busy street of Sativa bustles with activity.
+~
+~
+0 -1 3058
+D2
+~
+~
+0 -1 -1
+E
+device~
+The device has a handle on one side and consists of two wood partitions
+seperated a foot apart with little semicircle grooves.  A semicircle pipe
+is turned by a handle on one side pushing the pipe along the grooves.  Sharp
+knives just above the grooves can be set different distances.  Obviously the
+device is used to cut wood into arrows quickly.
+~
+S
+#3061
+Arcanus Way~
+   This quaint path continues east through Sorpigal, eventually reaching the
+wharf.  The Mage's guild is just to the north, and there is a bridge to the
+south which crosses into the southern district.
+~
+28 67108864 1
+D0
+~
+~
+0 -1 1978
+D1
+~
+~
+0 -1 3062
+D2
+~
+~
+0 -1 3051
+D3
+~
+~
+0 -1 3047
+S
+#3062
+Arcanus Way~
+   Sturdy branches rise from the trees on either side of the road and extend
+towards each other tentatively, criss-crossing and caressing like young lovers.
+Arcanus Lane ends abruptly to the east at Midwitch, and the Magic Shoppe lies
+to the south.  The Healer's Plaza can be found to the north.
+~
+28 67108864 1
+D0
+~
+~
+0 -1 3004
+D1
+~
+~
+0 -1 3025
+D2
+~
+~
+0 -1 3033
+D3
+~
+~
+0 -1 3061
+S
+#3063
+Indica Way~
+   This is the main north-south artery through Sorpigal.  The Jeweller and the
+Bank are to the east and west, respectively, and most traffic seems to be
+moving from the southern parts of Sorpigal towards Stonewitch, to the north.
+~
+28 67108864 1
+D0
+~
+~
+0 -1 3014
+D1
+~
+~
+0 -1 3034
+D2
+~
+~
+0 -1 3064
+D3
+~
+~
+0 -1 3005
+S
+#3064
+Indica Way~
+   Slightly removed from the hustle and bustle of the market sector, Indica Way
+continues south over Midwitch and into the southern district of Sorpigal.  It
+also goes north, where you can follow it straight to the Albatross, a popular
+pub in town.  The Healer's Plaza is just to the west.  A large temple is under
+construction to the east.
+~
+28 67108864 1
+D0
+~
+~
+0 -1 3063
+D1
+A small garment shop is tucked away.
+~
+~
+0 -1 3091
+D2
+~
+~
+0 -1 3025
+D3
+~
+~
+0 -1 3004
+S
+#3065
+The Wharf~
+   This part of the wharf looks much like a converted slum.  Merchants have set
+up shop at random intervals, tactfully avoiding the occasional body sprawled in
+the street.  There appears to be a small shanty town just to the west.
+~
+28 0 0
+D0
+~
+~
+0 -1 3067
+D2
+~
+~
+0 -1 3046
+D3
+~
+~
+0 -1 3066
+S
+#3066
+A tiny shanty town~
+   A rough homeless-village has sprouted up along the rear building walls here.
+Spartan, wood and tar shacks have been piled on top of each other by the whims
+of the city's unfortunate inhabitants.  A small shack rests undisturbed just to
+the west, and there is a small alley to the south.  The wharf is east of here.
+~
+28 12 0
+D1
+~
+~
+0 -1 3065
+D2
+~
+~
+0 -1 3045
+S
+#3067
+The Wharf~
+   The enticing aroma of Mexican food wafts in from the west, where Juan
+operates the finest eating establishment in all of Sorpigal.  It appears to be
+the only bright spot of the wharf, which extends further north and south.
+~
+28 0 0
+D0
+~
+~
+0 -1 3068
+D2
+~
+~
+0 -1 3065
+D3
+~
+~
+0 -1 3056
+S
+#3068
+The Wharf~
+   The stench of gutted fish and unwashed bodies permeates Sorpigal's wharf.
+Built along the bay shores, the wharf is prime ground for trading and rumor-
+mongering.  There is a small inn by the water, just to the east, and the wharf
+extends to the south.
+~
+28 0 0
+D0
+~
+~
+0 -1 3041
+D1
+~
+~
+0 -1 3048
+D2
+~
+~
+0 -1 3067
+S
+#3069
+Paul's Used Vault Emporium~
+   This shop is very modern compared to the rest of the shops on Sativa Street.
+The front exterior walls are actually large panels of glass, so that everyone
+can see the vault models on the showroom floor inside.  Decorating the walls
+are a few sales award plaques and a rather large moose head hangs above the
+plaques, its antlers nearly scraping the ceiling.
+~
+28 1252 0
+D1
+~
+~
+0 -1 3042
+E
+plaque~
+~
+S
+#3070
+The grungy alleyway ends~
+   The dirty and dingy alleyway ends abruptly here.  Assorted trash is piled
+high at its corners.  The cobblestones appear to be kept clear of this debris
+however, and you can see a run-down shack just to the north.
+~
+28 0 0
+D0
+~
+~
+0 -1 1910
+D2
+~
+~
+0 -1 3038
+S
+#3071
+The South Bridge~
+   This mossy bridge arches up and over the churning river below which leads
+east and west directly between north and south Sorpigal.  To the south the
+bridge leads out onto the promenade which overlooks the river and then into the
+windy roads of South Sorpigal.  To the north a small lane leads up into North
+Sorpigal.
+~
+28 67108996 2
+D0
+~
+~
+0 -1 3030
+D2
+~
+~
+0 -1 3102
+S
+#3072
+Fingers' Equipment Repair Shop~
+   Tools and gear are piled in every nook and cranny of this disaster area of a
+"shoppe".  Fingers seems unphased by the mess around him.  He instead nimbly
+picks his way through his assortment of tools and items to find just the right
+pieces of material, metal, gems, or armour to fix even the most devastated
+piece of equipment.  A small sign rests on the counter, and appears to be the
+only clean space in the entire shop.
+~
+28 128 0
+D3
+~
+~
+0 -1 3042
+E
+sign~
+
+"If you have something to fix, Fingers can do the trick!"
+"LOWEST repair costs ANYWHERE!"
+"(Small service fees and other surcharges may apply.)"
+~
+S
+#3073
+Gustav's store and smithy~
+   Steam rises from the hot forge that dominates this small shoppe.  Hard at
+work are numerous assistants as Gustav supervises their labours.  In front of
+the forge is a long counter covered in books, manuals, and price lists.  It is
+from these manuals that Gustav trains his new apprentices and guides
+adventurers to the best locations to purchase rare platinum goods.  It is said
+that Gustav has received a mandate from the Gods themselves to deliver clues as
+to where the mythical "godload" can be acquired.  Gustav is also a master
+armourer and as such, is the only person in the realms with the capabilities to
+repair the powerful "godload".  A small sign sits atop the countertop providing
+information.
+~
+28 100672740 0
+D1
+~
+~
+0 -1 3054
+E
+sign~
+
+A small placard on the countertop reads:
+Gustav, the godload questmaster and repair specialist, is
+open for consultation.  If you're lucky, he might provide
+you with information when you enter his shoppe.
+Thank you.
+The Management.
+~
+S
+#3084
+The kitchen~
+The room is small.  Along one wall, there is a sink and countertop.  There is
+an old stove on the other side of the room.  On the stove, there is a pot with
+liquid in it that is steaming.  There is smoke coming from the oven, causing an
+acrid smell in the air.  There is blood on the floor and walls.  Something died
+here and not necessarily for dinner.    
+~
+28 0 0
+D2
+~
+~
+0 -1 3085
+S
+#3085
+The dining room~
+It looks like no one has dined in this room in a long time.  The walls are all
+wood paneling.  The floor is hardwood.    
+~
+28 0 0
+D0
+~
+~
+0 -1 3084
+D3
+~
+~
+0 -1 3087
+S
+#3086
+A bedroom~
+The overhead light has burnt out.  The only light comes through the doorway to
+the living room.  There's not enough light to see the color of the walls.  The
+shadows are long in this room and possibly are obscuring things best unseen.  
+~
+28 0 0
+D0
+~
+~
+0 -1 3089
+S
+#3087
+The living room~
+The room is spacious.  Despite its name, there's not much living here.  The
+walls were painted gray or maybe just white and became dingy over time.    
+~
+28 0 0
+D1
+~
+~
+0 -1 3085
+D3
+~
+~
+0 -1 3089
+S
+#3088
+The front porch~
+The darkened wood has weathered with age and neglect.  To the east is the front
+door of this old house.  There are two windows, but thick wooden shutters
+obscure them.  The porch smells of old wood and dampness.  There are cobwebs
+stretched between the rafters.    
+~
+28 67108868 1
+D1
+~
+door~
+39 3056 3089
+D3
+~
+~
+0 -1 3039
+S
+#3089
+The foyer~
+The light in the room is dim and comes from a single overhead bulb.  The walls
+are made of wood paneling and partly covered in yellowing wallpaper.  The
+wooden floor has a dark red stain on it.  There's a layer of dust on
+everything.  It looks like no one has cleaned this room in a while.    
+~
+28 0 0
+D0
+~
+~
+0 -1 3090
+D1
+~
+~
+0 -1 3087
+D2
+~
+~
+0 -1 3086
+D3
+~
+door~
+0 -1 3088
+S
+#3090
+The study~
+The light in this room is brighter than in the other rooms.  The ceiling is
+angled upwards with wooden rafters showing.  The walls, like the other rooms,
+are partly covered with wallpaper.    
+~
+28 0 0
+D2
+~
+~
+0 -1 3089
+S
+#3091
+The Non-Denominational Church of Dark Castle~
+   As you enter the cathedral, the first thing that is obvious is the building
+is very much a work in progress.  Assorted priests, friars, and acolytes run
+about in a frenzy in an effort to prepare the church for its grand opening.
+Great arches and intricate buttresses are covered with intricate scaffolding as
+construction crews work feverishly.  The one feature that does appear to
+immediately draw your attention is a polished marble dais and altar.  Through
+all the bustle it exudes an aura of calm and serenity.
+~
+28 1073742956 0
+D3
+The street of Indica.
+~
+~
+0 -1 3064
+E
+spool spools thread~
+Hundreds of colors of threads are wound about spools.  The spools themselves are
+hung on upwardly slanted hooks that jut out from a rack.  Its easy to
+~
+S
+#3094
+The Void~
+   You step out into ......  You don't think that you are not floating in
+nothing.
+~
+28 538191884 1
+D4
+~
+~
+0 -1 3001
+E
+sign~
+The sign reads:
+  Use 'List' to see the available pets.
+  Use 'Buy pet' to buy yourself an animal companion.
+  You can use 'order pet instructions' to order your pets around.
+  If you abuse your pet, it will no longer regard you as its master, and
+  we will be obliged to report you to the Dark Castle SPCA.
+  If you have several pets you may use 'order followers instructions'
+  You can name the pet you buy as : "buy <pet> <name>"
+~
+E
+notice~
+Sorpigal Pet Store temporarily closed for health violations
+under section 33d of the Sorpigal Pets and Familars Act.
+Re-Opening Soon.
+.
+- The Management.
+~
+S
+#3096
+The Morgue~
+   The room is filled with a thick, decaying scent and a layer of slime covers
+the walls and ceiling.  The northern wall is covered by a row of metal
+cabinets, each one chill and ominous.  A few of the shelves have been opened in
+a hurry, spilling the contents onto the floor in piles.
+~
+28 100672756 0
+D1
+~
+cabinet~
+1 -1 -1
+D5
+~
+~
+0 -1 3099
+E
+cabinet cabinets~
+On closer examination of the cabinets in this dank hallway you notice a
+strange and mystical light flickering through the cracks in one of the
+cabinets doors.  Upon getting closer to the cabinet, strange scratchings
+of an age long past can barely be seen. They appear to read:
+'Mummy Materials of the Old Gods - DANGER!'
+Air quickly races past you as it gets violently sucked into the cabinet
+through its various cracks. What could this cabinet contain? What indeed?
+~
+S
+#3097
+Builders' Room~
+   A small room set aside for builders of DC++ to exchange information with the
+implementors and with each other.
+~
+28 33563820 0
+D1
+You see the Reading Room.
+~
+~
+0 -1 3098
+S
+#3098
+Chamber of Current Events~
+   You are standing in the Chamber of Current Events.  People from around the
+world come here to write on the magical stone.  This is a spiritual room, so I
+would be cautious when starting trouble.
+~
+28 33686764 0
+D1
+You see the Albatross Tavern.
+~
+~
+0 -1 3001
+S
+#3099
+Chamber of Charity~
+   A room where heroes send their spare equipment for the less fortunate.  All
+of the heat in this room seems to be escaping through the ceiling.  Looking up
+to see what's causing this, a drop of cold blood drips through the ceiling and
+into your eye.  You notice fresh drops of blood on most of the equipment
+scattered across the floor.  You wonder how there can be such a bloodbath
+upstairs without making any sound.
+~
+28 67110124 0
+D1
+A breath of wind comes in through the archway.
+~
+~
+0 -1 3039
+D3
+You see the Albatross Tavern.
+~
+~
+0 -1 3001
+D4
+~
+~
+0 -1 3096
+S
+$~

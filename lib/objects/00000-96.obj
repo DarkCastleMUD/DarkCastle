@@ -1,0 +1,839 @@
+#1
+item test~
+a reflecty test item~
+an empty item~
+~
+9 16 16385 1
+0 0 0 0 1
+1 0 1
+A
+103 100
+S
+#2
+iou wendy~
+an IOU from Wendy, good for any piece of eq that currently loads in the game.~
+A piece of paper has some writing on it~
+~
+8 0 16385 1
+0 0 0 0 0
+1 1 0
+S
+#3
+test item apocalypse~
+Apocalypse's Test Item~
+Apocalypse's test item - do not overwrite or edit.~
+~
+14 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#4
+batwing bat wing component~
+a small batwing~
+The wing of some poor unfortunate bat lies here.~
+The wing is small and leathery.  It appears to have been forceably
+removed from a less than willing bat.
+~
+12 8192 16385 1
+0 0 0 0 3
+2 80000 33
+S
+#5
+shirt sweat sweatshirt~
+an Official "DC Building Team" Sweatshirt~
+A sweatshirt with the words 'DC Immortal Team' stenciled on it lies here.~
+~
+9 16 9 1
+1 0 0 0 101
+0 0 32
+A
+35 100
+S
+#6
+ball light~
+a bright ball of light~
+There is a bright ball of light on the ground here.~
+It's bright.  And round.
+~
+1 67108881 81921 1
+0 0 -1 0 0
+1 0 0
+S
+#7
+mushroom~
+a 'magic' mushroom~
+A really delicious looking 'magic' mushroom lies here.~
+It looks tasty!
+~
+19 67108880 16385 1
+12 0 0 0 0
+1 0 0
+S
+#8
+mackerel holy~
+a holy mackerel~
+A delicious holy mackerel is here looking significant.~
+Fixed.~
+19 67108880 16385 1
+12 0 0 0 0
+1 0 0
+S
+#9
+locator phish~
+the $2$BPhish$R locator~
+A small device beeps quietly, locating aquatic life forms.~
+~
+12 134217744 1 1
+0 0 0 0 0
+0 0 33
+E
+locator phish~
+It is a small device shaped like a cartoon fish.  It has a small
+red button on the side that says "Find the Phish".
+~
+S
+#10
+cake wedding~
+a wedding cake~
+An enormous wedding cake, covered with swirls of white frosting, towers here.~
+~
+15 0 0 0
+300 1 0 0 0
+0 0 0
+S
+#11
+slice cake wedding~
+a slice of wedding cake~
+A slice of wedding cake sits on a small paper plate.~
+~
+19 0 1 0
+3 0 0 0 0
+1 0 0
+S
+#12
+empty immortal item~
+an empty immortal item~
+an empty immortal item~
+Fixed.~
+32 0 0 0
+1000 0 0 0 0
+0 0 0
+S
+#13
+board quest~
+the Quest Board~
+A large board is here, daring quests pinned to it by daggers.~
+~
+23 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#14
+rules area installation~
+the Official new Immortal's Rules (tm) (to be redone)~
+The rules for new immortals to learn lies here.~
+This needs to be redone.
+~
+16 134217744 1 1
+0 0 0 0 0
+0 0 33
+S
+#15
+handbook builders range~
+the Range Builder's Official Handbook (tm) (to be redone)~
+An official range builder's handbook lies here.~
+This needs to be redone.
+~
+16 134217744 1 0
+0 0 0 0 0
+0 0 33
+S
+#16
+handbook builders zone~
+the Zone Builder's Official Handbook (tm) (to be redone)~
+An official zone builder's handbook lies here.~
+This needs to be redone.
+~
+16 134217744 1 0
+0 0 0 0 0
+0 0 33
+S
+#17
+handbook builders object~
+the Object Builder's Official Handbook (tm) (to be redone)~
+An official object builder's handbook lies here.~
+This needs to be redone.
+~
+16 134217744 1 0
+0 0 0 0 0
+0 0 33
+S
+#18
+handbook builders mob~
+the Mob Builder's Official Handbook (tm) (to be redone)~
+A mob builder's official handbook lies here.~
+This needs to be redone.
+~
+16 134217744 1 0
+0 0 0 0 0
+0 0 33
+S
+#19
+handbook builders mprog~
+the Mob-Program Coder's Handbook (tm) (to be redone)~
+A mob-program coder's handbook lies here.~
+~
+16 134217744 1 1
+0 0 0 0 0
+0 0 33
+S
+#20
+handbook charmie builders~
+the Charmie Builder's Handbook (tm) (to be redone)~
+An charmie builder's handbook lies here.~
+~
+12 134217744 1 1
+0 0 0 0 0
+0 0 33
+S
+#21
+arena guide rules guideline~
+the Official Arena Rules and Guidelines (tm) (to be redone)~
+The official arena rules and guidelines lies here.~
+Fixed.~
+12 134217744 1 1
+0 0 0 0 0
+0 0 33
+S
+#22
+plate steel etching secret clue~
+a piece of steel plate with secret etching~
+An important note has been left here, you better pick it up.~
+This list is an attempt to codify the world implementors' policies on
+charmable mobiles.  Some mobs might already exist in the world that
+violate these guidelines; they should be reported if you discover any,
+and do not form a precedent for compounding a prior error or old policy.
+.
+Mobs with the following affects should not be charmable:  fireshield,
+lightningshield, is_huge, reflect, eas, special procedures, is_undead,
+racist, friendly.
+.
+The following mob races should not be used: demon, dragon, ghost, golem,
+wraith, undead, yrnali, tree.
+.
+Keep mob hitpoints and barehand damage reasonable.  A 7000 hp charmie
+that beats the living shit through sanctuary isn't what a charmie is
+supposed to be.  At best, charmies have about the same hit points as an
+unmeta'd gameloaded barbarian character of comparable level.  High level
+charmies with astronomically low armor class shouldn't be used, either.
+.
+Probably the best way to figure out what's 'too much' is to ask around about
+charmies for the level you are creating the charmie at, do some stats on
+those mobiles, and use them as a guideline.  You might go a little higher
+or come down a little lower, dependent on your judgment.  Again, if
+you're going a little far afield, consult with a world implementor or
+more experienced builder for guidance.
+Written by Imberline.
+~
+9 2 1 1
+0 0 0 0 1
+1 1 0
+E
+plate etching secret~
+The etching reads:
+Congratulations for finding or purchasing Apocalypse's secret clue!
+Now visit Wesley Crusher for a special treat!
+- Apoc
+~
+S
+#23
+workbench~
+a wooden workbench~
+a wooden workbench stands here.~
+Crystals of pristine white cover the ground here in a cold blanket,
+touched with shadows of chilly blue.
+~
+10 0 1 0
+50 131 0 0 0
+0 0 0
+E
+workbench~
+~
+S
+#24
+bookcase book case~
+a bookcase~
+A tall bookcase holds some tattered leaflets.~
+~
+15 0 0 0
+500 1 0 0 0
+0 0 0
+E
+bookcase~
+Made of an unknown silvery wood, this bookcase looks as though it
+was made by someone a little unsure of their handiwork.  It leans
+a little lopsidedly, and creaks with every passing footstep.
+~
+S
+#25
+mob summoner~
+a mob summoner obj (proc item)~
+An invisible object for summoning mobs is here.~
+~
+13 134217728 0 0
+0 0 0 0 0
+0 0 16
+S
+#26
+aventail glowing tail prize~
+a $B$7glowing$R aventail~
+A glowing aventail has been left here.~
+Fixed.~
+9 17 5 1
+25 0 0 0 1
+1 0 2060
+A
+33 100
+A
+27 100
+S
+#27
+machine soda~
+a large soda machine~
+A sleek soda machine, frost curling off its chrome edges, stands here.~
+~
+15 0 0 0
+1000 0 -1 0 0
+0 0 0
+E
+soda machine~
+This large rectangular machine shines with an almost blinding light,
+all glitter and chrome and obviously brand spanking new.  Large buttons
+covered with arcane symbols allow one to choose their own particular
+brand of immortal brew.
+~
+\command_prog blehblah~
+say This is my new obj prog!
+mpretval true
+~
+|
+S
+#28
+cola cosmic can~
+a can of cosmic cola~
+A small can, bearing a starry logo, sits on the floor here.~
+~
+17 0 1 0
+3 3 15 0 0
+0 0 0
+E
+can cosmic cola~
+A glittering logo proclaims this soda the best in all the universe.
+Tiny bubbles fizz from it, sending out colored vapors into the air.
+~
+S
+#29
+soda lemon lime can~
+a can of lemonlime soda~
+A small can, colored green and yellow, sits on the floor here.~
+~
+17 0 1 0
+3 3 6 0 0
+0 0 0
+E
+soda lemon lime can~
+Proclaiming itself the ultimate refresher, this can's sides are
+covered with tiny dancing, smiling lemons and limes in a display
+of almost sickening cuteness.
+~
+S
+#30
+spritzer wine can~
+a can of wine spritzer~
+A small can, bubbling with a raspberry-smelling liquid, sits here.~
+~
+17 0 1 0
+3 3 2 0 0
+0 0 0
+E
+spritzer wine can~
+This spritzer, manufactured in the southern vineyards of Sorpigal, is
+made of sweet raspberry wine, mixed with the sparkling waters of the
+dwarvish mineral springs.
+~
+S
+#31
+beer ale can~
+a can of beer~
+A small can bears a logo of fighting unicorns and elves on its sides.~
+~
+17 0 1 0
+3 3 3 0 0
+0 0 0
+E
+beer ale can~
+This beer's brand is somewhat dubious, and the name is written in elvish,
+the ornate script preventing anyone from quite making out the name.  Along
+the silver sides, drunken unicorns appear to be reeling in dizzy
+inebriation.
+~
+S
+#32
+soda vampire blood can~
+a dubious looking can~
+A small can bears the logo 'Preferred by vampires everywhere.'~
+~
+17 0 1 0
+3 3 13 0 0
+0 0 0
+E
+soda vampire blood can~
+Bearing a black and red label, this can looks somewhat unsavory, and
+the liquid inside it even more so.
+~
+S
+#33
+apocalypse staff~
+the Staff of Apocalypse~
+This isn't the REAL staff of the Apocalypse!~
+Fixed.~
+5 16 8193 1
+0 0 0 0 61
+0 0 2056
+A
+85 100
+S
+#34
+starbucks coffee cup~
+A cup of $2Starbucks$R coffee~
+A steaming cup of expensive coffee looks inviting.~
+Fixed.~
+17 16 16385 1
+50 50 12 0 0
+1 420 0
+S
+#35
+racquetball ball~
+$I$1The Ball(tm)$R~
+A $I$1blue$R $B$1racquetball covered in dog drool lies here.~
+Fixed.~
+9 0 131073 1
+5 0 0 0 61
+0 0 0
+S
+#39
+arrow prize chicken~
+a $B$4flaming$R chicken~
+A deadly $B$4flaming$1 chicken is here burning hotly.$R~
+The arrow is scaly and slimey.
+~
+7 17 1 1
+20 50 20 20 1
+2 100 1
+A
+43 80
+S
+#40
+megaphone azrack~
+the divine megaphone (proc item)~
+A megaphone sits here broadcasting important information.~
+~
+12 134217728 0 0
+10 100 0 0 0
+0 0 16
+S
+#41
+machine restring box small~
+the godload restring machine (proc item)~
+A small box lies here humming softly.~
+~
+12 0 1 0
+0 0 0 0 0
+9999 0 0
+S
+#42
+test testitem scribe paper~
+a test item for scribe~
+A test item for scribe~
+Fixed.~
+13 67108868 1 0
+0 0 0 0 0
+0 0 0
+E
+paper scroll scrollitem test testitem~
+This is an item for scribe, very boring description
+~
+S
+#43
+silver piece component~
+a piece of silver~
+A piece of silver, stamped with the face of a hobgoblin king, lies on the ground.~
+Fixed.~
+12 8192 16385 1
+0 0 0 0 0
+1 100 1
+S
+#44
+mouse dead component~
+a dead mouse~
+A dead mouse is laying on the ground.~
+Fixed.~
+12 2097152 16385 1
+0 0 0 0 1
+1 20 1
+S
+#45
+champion flag~
+$B$4the Champion flag$R~
+The $B$4Champion flag$1 lies here, waiting to be picked up.$R~
+Fixed.~
+8 67108887 1 0
+0 0 0 0 50
+1 1 525
+S
+#46
+fries boardwalk special builder~
+boardwalk fries~
+A small paper carton overflowing with cheese-covered curly fries sits here.~
+Guidelines need to be rewritten.
+~
+10 16 16385 1
+75 86 0 0 0
+1 100 0
+S
+#49
+shirt stupid dark castle~
+an "I worked on DC for 5 years and all I got was this lousy shirt" t-shirt~
+an "I worked on DC for 5 years and all I got was this lousy shirt" t-shirt~
+Fixed.~
+9 19 9 1
+99 0 0 0 101
+1 0 40
+A
+27 100
+S
+#50
+board builder~
+The Builder's bulletin board~
+The Builder's bulletin board is mounted here for the Builders to use.~
+Fixed.~
+23 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#51
+quest item~
+a Quest item~
+A quest item lies here.~
+Fixed.~
+8 67108884 1 1
+0 0 0 0 1
+2 10 548
+S
+#52
+fountain tengu tank clan~
+a Phish tank~
+A large tank of Phishies sits in one window.~
+~
+25 0 0 0
+50 50 0 0 0
+0 0 0
+E
+tank~
+Filled with scintillating fish, neon tetras, glass catfish, red mollies,
+the tank shimmers with life as the tiny inhabitants dart among the green
+weeds over the purple gravel.  Someone seems to have gone a little crazy
+in the pet store: the bottom is full of tiny divers, mermaids, castles,
+wrecked pirate ships and a statue of John F. Kennedy.
+~
+S
+#53
+couch ikea swedish~
+a not at all $B$2neon-green$R IKEA couch~
+$RAn IKEA couch with a suprising lack of $B$2neon-green$R colour looks like a good place to eat meatballs.$R~
+Fixed.~
+12 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#54
+track eight player ABBA~
+an 8-track tape player~
+$RAn 8-track tape player sits here belting out some classic ABBA tunes.$R~
+Fixed.~
+15 0 0 0
+200 0 0 0 0
+0 0 0
+S
+#55
+meatball dispenser swedish~
+a Genuine Swedish Meatball Dispenser(tm)~
+$RA Genuine Swedish Meatball Dispenser(tm) sits here spitting out meatball sandwiches.$R~
+Fixed.~
+12 0 0 0
+0 0 0 0 0
+0 0 0
+\speech_prog p sir sweden~
+if ispc($n)
+  MPECHO The Meatball Dispenser(tm) makes some funny noises and spits out a sandwich.
+  MPOLOAD 217
+  give sandwich $n
+  break
+endif
+~
+|
+S
+#56
+kronor kronors swedish swede~
+a stash of Swedish Kronors~
+A super-secret Swedish stash of Krazy Kronors has been left here!~
+Fixed.~
+20 0 1 0
+0 0 0 0 0
+10 100 0
+S
+#57
+notice gold red blue yellow green purple white platinum prize~
+$B$5DO NOT CHANGE ITEMS OUTSIDE YOUR ZONE WITHOUT PERMISSION$R~
+An empty obj sits here dejectedly.~
+Fixed.~
+0 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#58
+award penis golden~
+the $B$5Golden Phallus$R Award~
+A very large $B$5Golden Phallus$1 sits here awaiting a pussy to claim it.$R~
+Fixed.~
+5 33554576 8193 1
+0 1 1 9 100
+1 1 2573
+E
+phallus penis golden award~
+You know you must be someone special when you have the biggest penis.
+This award will clearly only fit the biggest pussy.
+~
+A
+11 6
+S
+#60
+window picturesque bay~
+a picturesque bay window~
+A picturesque bay window overlooks the surrounding terrain.~
+Fixed.~
+24 0 1 0
+3001 3 -1 0 1
+1 0 1
+E
+token~
+On the reverse side of the token you see a carefully-scribed message,
+written in wee letters barely visible to the naked eye.
+ __________________________________________________________________
+:                                                                  :
+: This token signifies the bearer has proven him or herself worthy :
+: of notice by Tak, the God of Trivia.  These tokens can only be   :
+: earned by proving dominance in the field of useless knowledge,   :
+: thus the bearer has earned the right to be called a TriviaMonkey.:
+:                                                                  :
+: FIVE Tak tokens may be redeemed toward the ultimate test of      :
+: knowledge and skill: a crusade.                                  :
+:                                                                  :
+: For details regarding crusades, contact Valkyrie or one of her   :
+: designated assistants.                                           :
+:__________________________________________________________________:
+~
+S
+#70
+board bulletin vend~
+a bulletin board~
+A bulletin board filled with dozens of tiny want ads is here.~
+~
+23 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#71
+iou easter~
+an IOU from the Easter egg hunt~
+A piece of paper has some writing on it~
+~
+8 0 16385 1
+0 0 0 0 0
+1 1 0
+S
+#72
+button red big~
+A big $4$BRED$R button~
+A big $4$BRED$1 button sits here beneath a sign that reads "Do NOT push"$R~
+Fixed.~
+0 0 0 0
+0 0 0 0 0
+500 0 0
+S
+#76
+brick golden prize mystical~
+a mystical $B$5golden$R brick~
+A mystical golden brick lies here awaiting a lucky hunter!~
+~
+8 67108881 16385 0
+0 0 0 0 1
+0 10000 545
+E
+brick golden~
+Empty desc.
+Etched into the brick is the following message:
+Redeem me with an Immortal for 5 MILLION gold coins!
+~
+S
+#77
+token prize illusion~
+an $B$3illusionary$R token~
+An $B$3illusionary$1 token can be redeemed for special items.$R~
+~
+8 17 16385 0
+0 0 0 0 1
+1 10000 33
+E
+token illusion~
+This token can be redeemed for a piece of illusionary equipment
+at Olaf, the Illusionists' shoppe!  Remember that illusionary
+equipment disappears when you log out or the game reboots!
+~
+S
+#81
+labcoat~
+A Glowing Labcoat~
+A Glowing Labcoat covered in stains radiates in the shadows.~
+Fixed.~
+9 17 1025 1
+100 0 0 0 100
+1 0 12
+A
+33 100
+A
+27 100
+A
+72 100
+A
+103 100
+A
+26 100
+A
+31 100
+A
+89 100
+S
+#82
+magical chalk~
+radiating magical white chalk~
+A perfect unbroken stick of chalk glows with a subtle light here.~
+Fixed.~
+5 0 0 0
+0 100 100 5 1
+1 1 2048
+A
+26 100
+A
+40 100
+A
+42 100
+A
+49 100
+A
+85 100
+A
+53 100
+A
+39 100
+A
+103 100
+S
+#88
+statue clan chaos champion arcana pluto~
+the statue of the Clan Chaos Champions~
+A large statue of Pluto towers over Sorpigal.~
+~
+8 0 0 0
+0 0 0 0 0
+0 0 0
+E
+statue fountain~
+$B$7Arcana$R - Current Clan Chaos Champions.
+~
+S
+#90
+plaque bronzed clan chaos CC~
+a $5bronzed$R plaque~
+A$R$5 bronzed$B$1 plaque decrying the Clan Chaos winners is posted here.$R~
+~
+12 1 0 0
+0 0 0 0 0
+0 0 0
+E
+plaque bronzed poster~
+$B$7@$R-----------------------------$B$7@$R
+|  $B$6Clan Chaos Champions List$R  |
+|      April - June 2006      |
+|                             |
+|  $B$51st Place:$R SINdicate       |
+|  $B$72nd Place:$R Nazgul          |
+|  $53rd Place:$R DC_Guard        |
+$B$7@$R-----------------------------$B$7@$R
+~
+S
+#92
+bar burgerbar~
+The Big Bang Burgerbar~
+The Big Bang Burgerbar floats just beyond the event horizon.~
+~
+15 0 0 0
+300 1 -1 0 0
+0 0 0
+S
+#93
+burger bang~
+a Big Bang Burger~
+a delicious burger sits emitting steam.~
+~
+19 0 1 0
+100 0 0 0 0
+0 0 0
+S
+#94
+coke big bang~
+a Big Bang Coke~
+There's more ice than Coke here.~
+~
+17 0 1 0
+10 10 15 0 0
+0 0 0
+S
+#95
+fries bang big~
+Big Bang Fries~
+These fries need some extra salt.~
+~
+19 0 1 0
+50 0 0 0 0
+0 0 0
+S
+#98
+board punishment mortal~
+The Mortal Punishment Board~
+This board sits here to give accord to those living in infamy.~
+Fixed.~
+23 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#99
+pick lockpick~
+small lockpick~
+a small lockpick~
+Fixed.~
+29 16384 16385 1
+0 0 0 0 1
+0 10000 0
+S
+$~

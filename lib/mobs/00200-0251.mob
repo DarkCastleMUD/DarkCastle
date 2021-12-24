@@ -1,0 +1,587 @@
+#200
+acolyte apocalypse cleric~
+the acolyte of the Apocalypse~
+An acolyte of the Apocalypse is here, grinning at you and looking helpful.
+~
+He is big and bad.  Don't mess with him.
+~
+134513474 0 -1
+35913768 32 0 -1
+1000 1 100
+-10 -20 25000d1+0 10d4+10
+0 0
+8 8 1 0 0 0
+C 11
+T 13 28 28 13 13 0
+>greet_prog 50~
+say Greetings $n, I hope you are learning a lot at the academy!
+say This should help you with your exams....
+c 'rapid mend' $n
+~
+|
+S
+#201
+blob mudschool~
+$B$4do not edit mob 200$R~
+The blob is here, waiting to eat you up.
+~
+It is big, it is bad.  You don't want to fight it when it isn't chained up.
+Perhaps now would be a good time to flee from it!!!  If you don't flee, you
+would really suffer the consequences.
+~
+32774 0 -1
+2097160 0 0 -1
+0 20 10
+20 -10 51d1+0 1d1+0
+0 500
+8 8 0 3 528 64
+S
+#202
+monster mudschool~
+the monster~
+There is a monster leashed here.
+~
+It looks mean, but you feel comfortable that you can kill it, especially since
+it is leashed up, and you are not.
+~
+2 0 -1
+35651616 0 0 -1
+0 29 1
+20 10 7d1+0 1d3+0
+100 100
+8 8 0 528 1048576 8
+S
+#203
+monster wimpy mudschool~
+the wimpy monster~
+There is a wimpy monster leashed here.
+~
+It looks wimpy.  You feel comfortable that you can kill it, especially since
+it is leashed up, and you are not.
+~
+130 0 -1
+35651616 0 0 -1
+0 29 1
+20 10 4d1+0 1d3+0
+100 100
+8 8 0 528 1048576 8
+S
+#204
+monster aggressive mudschool~
+the aggressive monster~
+There is an aggressive monster leashed here.
+~
+It looks mean, but you feel comfortable that you can kill it, especially since
+it is leashed up, and you are not.
+~
+32 0 -1
+35651616 0 0 -1
+0 29 1
+20 10 7d1+0 1d3+0
+100 100
+8 8 0 528 1048576 8
+S
+#205
+monster wimpy aggressive mudschool~
+the wimpy and aggressive monster~
+There is a wimpy and aggressive monster leashed here.
+~
+It looks mean, but you feel comfortable that you can kill it, especially since
+it is leashed up, and you are not.
+~
+162 0 -1
+35651616 0 0 -1
+0 29 1
+20 10 4d1+0 1d3+0
+100 100
+8 8 0 528 1048576 8
+S
+#206
+big creature mudschool~
+the big creature~
+There is a big creature hulking over your form.
+~
+It looks mean, and you just might have a small problem killing it, but it
+looks like a great prize!!!
+~
+2 0 -1
+35651616 0 0 -1
+0 29 2
+19 9 9d1+0 1d4+1
+150 100
+8 8 0 528 1048576 8
+S
+#207
+adept cleric mudschool~
+the adept of Eas~
+An adept of Overlord Eas is here, contemplating your progress.
+~
+He is big and bad.  Don't mess with him.
+~
+262982 0 -1
+2359336 0 0 -1
+1000 1 101
+-10 -20 12495d1+0 10d4+50
+150 100
+8 8 1 0 0 0
+C 2
+S
+#208
+adept cleric mudschool~
+the adept of Waz~
+An adept of Overlord Waz meditates on the wowness of Waz.
+~
+He is big and bad.  Don't mess with him.
+~
+295750 0 -1
+2359336 0 0 -1
+1000 1 101
+-10 -20 12495d1+0 10d4+50
+150 100
+8 8 1 0 0 0
+C 2
+S
+#209
+rabbit~
+the rabbit~
+A rabbit is bouncing around here.
+~
+The rabbit smiles at you, completely harmless!
+~
+192 0 -1
+2097184 0 0 -1
+100 21 1
+20 10 3d1+0 1d3+0
+10 100
+8 8 0 0 128 0
+S
+#210
+lizard~
+the lizard~
+A lizard slithers up to you!
+~
+It smiles at you, and tries to eat your leg.
+~
+64 0 -1
+2097152 0 0 -1
+-100 11 2
+19 9 3d1+0 1d4+1
+10 200
+8 8 0 0 520 0
+S
+#211
+boar~
+the boar~
+A boar tries to run you over!
+~
+It grunts at you.
+~
+64 0 -1
+2097184 0 0 -1
+0 21 3
+18 8 11d1+0 1d6+1
+0 400
+8 8 0 0 128 0
+S
+#212
+fox~
+the fox~
+A fox is here staring at you.
+~
+Its fur might be worth money! (*NOT*)
+~
+192 0 -1
+2097184 0 0 -1
+100 21 1
+20 10 5d1+0 1d3+0
+0 100
+8 8 0 0 128 0
+S
+#213
+snail~
+the snail~
+A snail is trying to get out of your way.
+~
+You don't see much but slime about it.
+~
+64 0 -1
+35651584 0 0 -1
+0 19 0
+21 10 1d1+0 1d1+0
+0 100
+8 8 0 3 0 0
+S
+#214
+beast~
+the beast~
+A beast tries to feed off of you.
+~
+It looks mean.  You'd better run.
+~
+1048673 0 -1
+2097184 0 0 -1
+0 21 5
+16 6 68d1+0 1d6+3
+0 800
+8 8 0 0 128 0
+S
+#215
+bear~
+the bear~
+A bear is here growling at you.
+~
+The bear must be bigger than you!  It wants to rip your head off.
+~
+64 0 -1
+2097184 0 0 -1
+0 21 4
+17 7 56d1+0 1d6+2
+0 600
+8 8 0 0 128 0
+S
+#216
+wolf~
+the wolf~
+A wolf is here snarling at you.
+~
+The wolf doesn't want to be bothered.
+~
+64 0 -1
+2097184 0 0 -1
+0 21 4
+17 7 55d1+0 1d6+2
+0 700
+8 8 0 0 128 0
+S
+#217
+adept cleric mudschool~
+the adept of Morcallen~
+An adept of Overlord Morcallen is here, grinning at you and selling you things.
+~
+He is big and bad.  Don't mess with him. (grin)
+~
+262978 0 -1
+2359336 0 0 -1
+1000 1 101
+-1 -20 5495d1+0 10d5+10
+0 700
+8 8 1 0 0 0
+C 2
+S
+#218
+adept cleric mudschool~
+the adept of Sadus~
+An adept of Overlord Sadus is here, training the abilities of young students.
+~
+He is big and bad.  Don't mess with him.
+~
+262982 0 -1
+2359336 0 0 -1
+1000 1 101
+-10 -20 12524d1+0 10d4+50
+0 700
+8 8 1 0 0 0
+C 2
+S
+#219
+priest cleric mudschool~
+the priest of Waz~
+The priest of Waz is here, ready to train you in spells and skills.
+~
+He is big and bad.  Don't mess with him.
+~
+262982 0 -1
+2359336 0 0 -1
+1000 1 101
+-10 -20 12486d1+0 10d4+50
+0 700
+8 8 1 0 0 0
+C 2
+S
+#220
+adept llevity sorpigal~
+the adept of Llevity~
+The adept of Llevity is here, trying to teach you the ways of the jest.
+~
+He looks kinda funny!
+~
+262982 0 -1
+2425384 0 0 -1
+1000 1 101
+-10 -20 12445d1+0 10d4+50
+0 700
+8 8 1 0 0 0
+C 2
+S
+#221
+adept kate sorpigal~
+the adept of Kate~
+The adept of Kate is here, searching for more typos.
+~
+She carries a small clipboard, and scatters bits of paper and post-it
+notes in her wake.
+~
+262982 0 -1
+2359848 0 0 -1
+1000 1 101
+-10 -20 12473d1+0 10d4+50
+0 700
+8 8 2 0 0 0
+C 2
+S
+#222
+hank security guard academy~
+Hank, the Security Guard~
+Hank, the security guard is here protecting the academy's hapless students.
+~
+The guard is well muscled and exudes an aura of confidence.
+~
+952131 0 -1
+1663042216 4096 0 -1
+0 26 80
+-60 -80 6000d1+0 8d10+70
+0 0
+8 8 1 256 64 128
+C 4
+T 18 18 18 18 18 0
+S
+#223
+empty mob~
+$B$4do not edit mob 222$R~
+an empty mob description~
+~
+0 0 -1
+0 0 0 -1
+0 0 0
+20 10 0d1+0 1d1+0
+0 0
+8 8 0 0 0 0
+S
+#224
+empty mob~
+Orro, the Quest Guide~
+Orro, the Quest Guide is here, pleased to show you quest items.
+~
+~
+0 0 -1
+0 0 0 -1
+0 0 0
+20 10 0d1+0 1d1+0
+0 0
+8 8 0 0 0 0
+S
+#250
+gnome birthday~
+the birthday gnome~
+The birthday gnome is here wishing Pirahna a Happy Birthday.
+~
+~
+264006 0 -1
+2097152 0 0 -1
+1000 1 1
+0 -10 1454d1+0 5d9+99
+0 1000000
+8 8 1 0 0 0
+S
+#251
+poodle yappy little~
+a yappy little poodle~
+A yappy little poodle does its best to annoy you.
+~
+A small, annoying dog looks like it wants to hump your leg.
+~
+68 0 -1
+2097184 0 0 -1
+0 21 5
+5 -10 24d1+0 2d4+0
+10 500
+8 8 1 0 128 0
+S
+#252
+proc mob air magic procassistant~
+PROC MOB AIR MAGIC~
+The lord of air proc magic is here.
+~
+~
+0 0 -1
+0 0 0 -1
+0 0 0
+20 10 0d1+0 1d1+0
+0 0
+8 8 0 0 0 0
+>fight_prog 0~
+# SUMMON STORM
+if ispc($r)
+   if isimmort($r)
+       or isobjvnuminroom(110)
+       break
+       else
+       MPECHO $$B$I points toward the sky and utters a strange incantation.$$R
+       MPECHO $$BStreams of dark cloud begin to coalesce forming a menacing storm.$$R
+       MPOLOAD 110
+       endif
+   endif
+~
+>catch_prog 4~
+MPAT $v[throw] MPECHOAT $v[throw] $$BYou find yourself enveloped in a globe of wind and fog!$$R
+MPAT $v[throw] MPECHOAROUND $v[throw] $$BA globe of wind and fog suddenly envelops $v[throw]!$$R
+MPAT $v[throw] MPECHOAT $v[throw] $$B$v[casterboss] swiftly raises and lowers $l arm, sending you flying and then plummeting to the earth!$$R
+MPAT $v[throw] MPECHOAROUND $v[throw] $$B$v[casterboss] swiftly raises and lowers $l arm, sending $v[throw] flying and then plummeting to the earth!$$R
+if wears($[vthrow]) keep 536
+    MPAT $v[throw] MPDAMAGE $v[throw] 2d1% undefined hitpoints
+    MPAT $v[throw] MPDAMAGE $v[throw] 11d10 undefined hitpoints
+    else
+    MPAT $v[throw] MPDAMAGE $v[throw] 2d1% undefined hitpoints
+    MPAT $v[throw] MPDAMAGE $v[throw] 20d5 undefined hitpoints
+    MPAT $v[throw] MPTELEPORT $v[throw] area
+    endif
+~
+>fight_prog 0~
+# SKYHURL
+if ispc($r)
+    MPECHO $$B$I utters an arcane word...$$R
+    MPTHROW 252 2 0 $I
+    MPTHROW 252 4 1 $r
+endif
+~
+>catch_prog 3~
+MPAT $v[throw] MPECHOAT $v[throw] $$BWith unnatural speed, $v[casterboss] rushes forward and stabs you with the cloud spear!$$R
+MPAT $v[throw] MPECHOAT $v[throw] $$BThe spear pierces your armor and then dissipates in a flash of boiling steam.$$R
+MPAT $v[throw] MPECHOAROUND $v[throw] $$BLightning quick, $v[casterboss] rushes forward and stabs $v[throw] with the cloud spear!$$R
+MPAT $v[throw] MPDAMAGE $v[throw] 2d1% undefined hitpoints
+MPAT $v[throw] MPDAMAGE $v[throw] 10d11 undefined hitpoints
+~
+>catch_prog 2~
+MPSETTEMP $i casterboss $v[throw]
+~
+>fight_prog 0~
+# CLOUD SPEAR
+MPECHO $$BWith a quick word and an obscure gesture, a shaft of roiling vapor extends from $I's hand.$$R
+MPTHROW 252 2 0 $I
+if numpcs() < 4
+    MPTHROW 252 3 1 $n
+    else
+    if ispc($r)
+       MPTHROW 252 3 1 $r
+   endif
+endif
+~
+>catch_prog 1~
+if rand(10)
+    MPAT $v[throw] MPECHO $$BYou scream in pain as multiple sets of teeth rend flesh from bone!$$R
+    MPAT $v[throw] MPDAMAGE allpc 2d1% undefined hitpoints
+    MPAT $v[throw] MPDAMAGE allpc 22d5 undefined hitpoints
+    else
+    MPAT $v[throw] MPECHOAT $v[throw] $$BSet upon by vicious piranha, you scream in pain as multiple sets of teeth rend flesh from bone!$$R
+    MPAT $v[throw] MPECHOAROUND $v[throw] $$BSet upon by vicious piranha, $v[throw] screams in pain!$$R
+    MPAT $v[throw] MPDAMAGE $v[throw] 2d1% undefined hitpoints
+    MPAT $v[throw] MPDAMAGE $v[throw] 30d5 undefined hitpoints
+endif
+~
+>fight_prog 0~
+# VORTEX OF TEETH
+MPECHO $$BWith a mischievous grin, $I pulls a piranha's tooth from a pocket and then quickly begins a strange chant.$$R
+MPECHO $$BA school of ethereal piranha materializes, forming a vortex of teeth as they swim swiftly around the room.$$R
+MPECHO $$BUnfortunately, the ravenous teeth of these magical fish solidify upon contact.$$R
+if numpcs() <= 3
+    MPTHROW 252 1 0 $n
+    else
+    if ispc($r)
+        MPTHROW 252 1 0 $r
+endif
+endif
+~
+>can_see_prog 100~
+if isimmort($n)
+    MPRETVAL true
+    else
+    MPRETVAL false
+endif
+~
+|
+S
+#253
+proc mob underground magic procassistant~
+PROC MOB UNDERGROUND MAGIC~
+The lord of underground proc magic is here.
+~
+~
+0 0 -1
+0 0 0 -1
+0 0 0
+20 10 0d1+0 1d1+0
+0 0
+8 8 0 0 0 0
+>catch_prog 5~
+MPAT $v[throw] MPECHO $$BChunks of rock hurled by the superheated air explode into torrents of lava.$$R
+MPAT $v[throw] MPDAMAGE allpc 2d1% undefined hitpoints
+MPAT $v[throw] MPDAMAGE allpc 70d5 undefined hitpoints
+~
+>catch_prog 4~
+MPAT $v[throw] MPECHO $$BFist-sized chunks of rock hurled by the superheated air rain down upon you.$$R
+MPAT $v[throw] MPDAMAGE allpc 1d1% undefined hitpoints
+MPAT $v[throw] MPDAMAGE allpc 10d10 undefined hitpoints
+~
+>catch_prog 3~
+MPAT $v[throw] MPECHO $$BA pyroclastic wind rises out of the fissure blanketing the area in billowing clouds of volcanic ash.$$R
+MPAT $v[throw] MPDAMAGE allpc 2d1% undefined hitpoints
+MPAT $v[throw] MPDAMAGE allpc 20d5 undefined hitpoints
+~
+>fight_prog 0~
+#VOLCANIC STORM
+if isobjvnuminroom(111)
+   if tempvar($i[volcanicstorm]) == stage3
+      MPTHROW 253 5 0 $i
+      MPSETTEMP $i volcanicstorm stage1
+      endif
+   if tempvar($i[volcanicstorm]) == stage2
+      MPTHROW 253 4 0 $i
+      MPSETTEMP $i volcanicstorm stage3
+      endif
+   if tempvar($i[volcanicstorm]) == stage1
+      MPTHROW 253 3 0 $i
+      MPSETTEMP $i volcanicstorm stage2
+      endif
+   else
+   MPECHO $$B$I mutters an incantation and then stomps the ground with one foot.$$R
+   MPOLOAD 111
+   MPOTHROW 111 1 1
+   MPSETTEMP $i volcanicstorm stage1
+   endif
+~
+>catch_prog 2~
+MPAT $v[throw] MPECHOAT $v[throw] $$BA razor sharp stalagmite suddenly bursts forth from the ground to penetrate your defenses!$$R
+MPAT $v[throw] MPECHOAROUND $v[throw] $$BA razor sharp stalagmite suddenly bursts forth from the ground to impale $v[throw]!$$R
+MPAT $v[throw] MPDAMAGE $v[throw] 2d1% undefined hitpoints
+MPAT $v[throw] MPDAMAGE $v[throw] 75d2 undefined hitpoints
+~
+>fight_prog 0~
+#SUDDEN STALAGMITE
+MPECHO $$B$With a sharp gesture, $I hisses an incantation.$$R
+if ispc($r)
+   MPTHROW 253 2 0 $r
+   else
+   MPTHROW 253 2 0 $n
+endif
+~
+>catch_prog 1~
+MPAT $v[throw] MPECHO $$BThe cavern begins to shudder sending down a shower of debris.$$R
+MPAT $v[throw] MPECHO $$BWith dull clangs, unavoidable chunks of rock ricochet off of your armor with bruising force.$$R
+MPAT $v[throw] MPDAMAGE allpc 2d1% undefined hitpoints
+MPAT $v[throw] MPDAMAGE allpc 10d10 undefined hitpoints
+~
+>fight_prog 0~
+# CAVE IN
+MPECHO $$B$I mutters an incantation and then stomps the ground with one foot.$$R
+MPTHROW 253 1 1 $i
+~
+>can_see_prog 100~
+if isimmort($n)
+    MPRETVAL true
+    else
+    MPRETVAL false
+endif
+~
+|
+S
+$~

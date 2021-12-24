@@ -1,0 +1,18 @@
+V2
+#0
+ $B$4Special Proc and Platsmith Range - IMM ONLY$R~
+299 30 2 101 1
+M  0   200   1  5451 Acolyte of the Apocalypse to help Noobs.
+* PLATSMITH RANGE
+M  0 10018   1  3073 Gustav the Platinum Repair and Quest Guy
+E  4  2326  -1    16 Gustav's Razor Sharp Meatball
+M  0 10019   1   201 Cirrus the Cloud Giant Platsmith
+M  0 10021   1 17885 Gronk the Chaos Realms Platsmith 1
+M  0 10020   1   202 Hu'uti Platsmith
+M  0 10023   1  1864 Wandering Birdman Platinum Seller
+M  0 10022   1   203 Manx the Krys'kath Platinum Seller
+M  0 10026   1   204 the Crystal Platsmith
+O  0   220  -1 13020 Load Hu'uti Platsmith's Hut
+* End of Platsmith Range
+S
+$~

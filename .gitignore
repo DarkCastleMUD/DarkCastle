@@ -7,3 +7,5 @@ src/libdcastle.a
 src/.sconsign.dblite
 src/*~
 *~
+log/*log
+lib/corpse.save

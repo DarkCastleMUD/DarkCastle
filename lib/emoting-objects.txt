@@ -1,0 +1,312 @@
+299 0 
+This would be one of a couple of emotes that this object can so~
+This would be another, completely different emote~
+These emotes are for Azrack's room (room #299)~
+S
+17 0 
+This is another set of emotes~
+These emotes would be for Aasgard~
+This is room #17~
+S
+5 10
+A gentle breeze sweeps in from the sea.~
+A flock of gulls quarrels over some fish guts spilled on the pier.~
+In the distance, a dolphin arcs above the waves.~
+A breeze sharp with the smell of salt wafts through the air.~
+A school of rays are barely visible below the surface of the water.~
+A distant sail appears on the horizon.~
+Waves lap softly against the pier.~
+Clouds scud by overhead, chasing each other through the sky.~
+A osprey skims the water, searching its depths with keen eyes.~
+Waves lap against the pier, their sound hypnotic and peaceful.~
+A gull lands on the railing, looking around for scraps.~
+A school of pelicans flies along the shoreline.~
+Sanderlings chase each other along the sand.~
+A breeze, smelling of honeysuckle, stirs your hair.~
+The wind picks up, bringing with it a momentary chill.~
+A small boat sails by, its crew waving a cheerful hello.~
+A osprey calls out shrilly before diving in search of a bluefish.~
+S
+3014 10
+Someone cries out, "Llama stampede, llama stampede!"~
+You feel someone's hand in your pocket.~
+A citizen of Ofcol walks past, muttering ominously.~
+A band of partying gnomes staggers past, smelling of cheap whiskey.~
+Some vacationing newts walk through, cameras at the ready.~
+Some Troll gang members swagger past, eying you.~
+An Ogre gang member offers you a cheap Rolex.~
+The brawny chief enforcer clutches his weapon, watching you.~
+You hear the sound of laughter from underneath your feet.~
+The shadow of a floating tower creeps over the city.~
+A salt breeze comes from the south.~
+A badly toupeed salesman tries to interest you in a souvenir.~
+A vendor calls out, "MUD school caps!  Get yer MUD school caps, right here!"~
+Drunken song comes from the tavern to the north.~
+A newbie plaintively asks you, "Who cast this Cantquit spell on me?"~
+The clock tower of Sorpigal chimes from somewhere to the south.~
+A waft of refuse laden air comes from the direction of the docks.~
+A yappy little poodle pees on your leg and runs away, barking shrilly.~
+You hear an ominous clap of thunder in the distance.~
+A pickpocket eyes you and licks his lips.~
+S
+3109 10
+A gentle breeze ruffles through the garden, bringing with it the scent of roses.~
+From somewhere to the east, the clock tower of Sorpigal chimes.~
+Sounds of revelry drift from elsewhere in the garden.~
+Music ripples through the air as a bard tunes his lute.~
+Children run through the garden, laughter in their wake.~
+The trees rustle overhead in the winds, boughs creaking.~
+A flock of birds swoops through the sky before settling to the grass.~
+A vendor calls out, advertising her wares.  "Fresh squid on a stick!"~
+A vendor shouts shrilly, "Get your souvenirs!  Sadus figures, Kate dolls!"~
+A ripple runs through reality as Azrack tinkers with the code.~
+A salt breeze comes from the south, bearing on it the cries of sea gulls.~
+You hear an ominous clap of thunder in the distance.~
+A cloud of butterflies, purple and golden winged, floats through the air.~
+Someone whispers in your ear, "Damn black elves, committing all the crimes!"~
+A sudden chill breeze makes you shiver.~
+You feel someone watching you.~
+Giggles fill the air as someone invokes the name of Llevity.~
+You hear the far off throaty roar of the Tarrasque.~
+The fountain gurgles softly.~
+The fountain sends a spray of water up into the air.~
+A vendor calls out, "Fresh dinosaur eggs, get your fresh pickled dinosaur eggs!~
+A scream sounds from somewhere outside the peaceful gardens.~
+Someone murmurs plaintively, "I wonder where my plats are.~
+A voice whispers from the shadows, "Hey, how about that new godload?"~
+The wind picks up, bringing with it a momentary chill.~
+S
+473 8
+A shimmering tree springs from the center of the floor.~
+The lamp's flame, a trapped fire elemental, leaps and dances.~
+Rhythmic chanting arises from somewhere far below.~
+A beaker bubbles softly, emitting green steam.~
+The room shimmers, as though reality had shifted.~
+Mystic energies flicker across the mirror's surface.~
+A distorted face peers from the portal, growling.~
+A golden light comes from deep within the mirror.~
+The surface of the mirror darkens.~
+A gremlin scampers across the corner of the room.~
+Silver mist swirls around the edges of the portal.~
+The noise of static crackles from within the mirror.~
+The smell of incense is heavy in the chamber.~
+Smoke eddies from a frothing concoction on the table.~
+A water elemental gurgles from a basin in the corner of the room.~
+An air elemental dances around the room before vanishing with a pop!~
+You feel someone watching over your shoulder.~
+The throaty growl of an earth elemental comes from somewhere.~
+A snatch of song comes from the mirror, echoing eerily.~
+Sparkles of light coalesce into a form within the mirror.~
+The floor creaks underfoot, startlingly loud.~
+Someone knocks loudly on the door.~
+S
+26314 2
+A shrill whistle comes from one of the gadgets.~
+A clock pendulum goes 'tick tick tick'.~
+A large CRASH followed by a 'Dammit!' comes from another part of the village.~
+A gnome child has arrived.
+A gnome child sees you, screams, and runs for his mother.~
+Non-stopping clicking comes from several gadgets.~
+A machine coughs in protest and a cloud of smoke rises into the air.~
+A bell goes off ringing as loud as it can.~
+a gnome scientist walks in grabs a few things and leaves.~
+A guage begins to spin wildly as steam shoots out of a pipe.~
+A crank turns itself several times.~
+A large bucket swings in on a rope, pours water into a kettle, and swings back.~
+S
+13331 2
+Agonized screams drown away to nothing but frenzied insect chatter.~
+Glistening tendrils tighten themselves about the wall at your approach.~
+Thick, transparent tubes pulse rapidly with a jelly-like fluid.~
+A young elf, her body wrapped in a layer of webbing, cries out in pain.~
+A group of squat insects lumber by, unidentifiable shapes draped across their backs.~
+A constant clacking sound echoes endlessly throughout the tunnels.~
+A bright stream of sickly fluid sprays out from one of the pores in the walls.~
+A bulky insect reaches up to reconnect a severed tube before lumbering on.~   
+The tunnel walls constrict quickly, the numerous tubes tightening visibly.~ 
+A slender insect wanders by and kneels quickly, its antennae wavering against the cilia on the walls.~ 
+S
+13333 2
+Agonized screams drown away to nothing but frenzied insect chatter.~
+Glistening tendrils tighten themselves about the wall at your approach.~
+Thick, transparent tubes pulse rapidly with a jelly-like fluid.~
+A young elf, her body wrapped in a layer of webbing, cries out in pain.~
+A group of squat insects lumber by, unidentifiable shapes draped across their backs.~
+A constant clacking sound echoes endlessly throughout the tunnels.~
+A bright stream of sickly fluid sprays out from one of the pores in the walls.~
+A bulky insect reaches up to reconnect a severed tube before lumbering on.~   
+The tunnel walls constrict quickly, the numerous tubes tightening visibly.~ 
+A slender insect wanders by and kneels quickly, its antennae wavering against the cilia on the walls.~
+S
+13336 2
+Agonized screams drown away to nothing but frenzied insect chatter.~
+Glistening tendrils tighten themselves about the wall at your approach.~
+Thick, transparent tubes pulse rapidly with a jelly-like fluid.~
+A young elf, her body wrapped in a layer of webbing, cries out in pain.~
+A group of squat insects lumber by, unidentifiable shapes draped across their backs.~
+A constant clacking sound echoes endlessly throughout the tunnels.~
+A bright stream of sickly fluid sprays out from one of the pores in the walls.~
+A bulky insect reaches up to reconnect a severed tube before lumbering on.~   
+The tunnel walls constrict quickly, the numerous tubes tightening visibly.~ 
+A slender insect wanders by and kneels quickly, its antennae wavering against the cilia on the walls.~
+S
+13338 2
+Agonized screams drown away to nothing but frenzied insect chatter.~
+Glistening tendrils tighten themselves about the wall at your approach.~
+Thick, transparent tubes pulse rapidly with a jelly-like fluid.~
+A young elf, her body wrapped in a layer of webbing, cries out in pain.~
+A group of squat insects lumber by, unidentifiable shapes draped across their backs.~
+A constant clacking sound echoes endlessly throughout the tunnels.~
+A bright stream of sickly fluid sprays out from one of the pores in the walls.~
+A bulky insect reaches up to reconnect a severed tube before lumbering on.~   
+The tunnel walls constrict quickly, the numerous tubes tightening visibly.~ 
+A slender insect wanders by and kneels quickly, its antennae wavering against the cilia on the walls.~
+S
+13341 2
+Agonized screams drown away to nothing but frenzied insect chatter.~
+Glistening tendrils tighten themselves about the wall at your approach.~
+Thick, transparent tubes pulse rapidly with a jelly-like fluid.~
+A young elf, her body wrapped in a layer of webbing, cries out in pain.~
+A group of squat insects lumber by, unidentifiable shapes draped across their backs.~
+A constant clacking sound echoes endlessly throughout the tunnels.~
+A bright stream of sickly fluid sprays out from one of the pores in the walls.~
+A bulky insect reaches up to reconnect a severed tube before lumbering on.~   
+The tunnel walls constrict quickly, the numerous tubes tightening visibly.~ 
+A slender insect wanders by and kneels quickly, its antennae wavering against the cilia on the walls.~
+S
+13347 2
+Agonized screams drown away to nothing but frenzied insect chatter.~
+Glistening tendrils tighten themselves about the wall at your approach.~
+Thick, transparent tubes pulse rapidly with a jelly-like fluid.~
+A young elf, her body wrapped in a layer of webbing, cries out in pain.~
+A group of squat insects lumber by, unidentifiable shapes draped across their backs.~
+A constant clacking sound echoes endlessly throughout the tunnels.~
+A bright stream of sickly fluid sprays out from one of the pores in the walls.~
+A bulky insect reaches up to reconnect a severed tube before lumbering on.~   
+The tunnel walls constrict quickly, the numerous tubes tightening visibly.~ 
+A slender insect wanders by and kneels quickly, its antennae wavering against the cilia on the walls.~
+S
+13354 2
+Agonized screams drown away to nothing but frenzied insect chatter.~
+Glistening tendrils tighten themselves about the wall at your approach.~
+Thick, transparent tubes pulse rapidly with a jelly-like fluid.~
+A young elf, her body wrapped in a layer of webbing, cries out in pain.~
+A group of squat insects lumber by, unidentifiable shapes draped across their backs.~
+A constant clacking sound echoes endlessly throughout the tunnels.~
+A bright stream of sickly fluid sprays out from one of the pores in the walls.~
+A bulky insect reaches up to reconnect a severed tube before lumbering on.~   
+The tunnel walls constrict quickly, the numerous tubes tightening visibly.~ 
+A slender insect wanders by and kneels quickly, its antennae wavering against the cilia on the walls.~
+S
+14534 10
+A voice pleads out, 'Save us, Master Bee-Keeper!'~
+Screams of terror echo out from somewhere in the distance.~
+The sound of an enormous bee bussing passes nearby.~
+The sun becomes temporarily blotted out as an enormous bee flies overhead.~
+A dull, droning hum vibrates the air.~
+Somewhere in the distance a scream is suddenly cut short.~
+S
+14557 2
+A voice pleads out, 'Save us, Master Bee-Keeper!'~
+Screams of terror echo out from somewhere in the distance.~
+The sound of an enormous bee bussing passes nearby.~
+The sun becomes temporarily blotted out as an enormous bee flies overhead.~
+A dull, droning hum vibrates the air.~
+Somewhere in the distance a scream is suddenly cut short.~
+S
+14566 2
+A voice pleads out, 'Save us, Master Bee-Keeper!'~
+Screams of terror echo out from somewhere in the distance.~
+The sound of an enormous bee bussing passes nearby.~
+The sun becomes temporarily blotted out as an enormous bee flies overhead.~
+A dull, droning hum vibrates the air.~
+Somewhere in the distance a scream is suddenly cut short.~
+S
+14570 2
+A voice pleads out, 'Save us, Master Bee-Keeper!'~
+Screams of terror echo out from somewhere in the distance.~
+The sound of an enormous bee bussing passes nearby.~
+The sun becomes temporarily blotted out as an enormous bee flies overhead.~
+A dull, droning hum vibrates the air.~
+Somewhere in the distance a scream is suddenly cut short.~
+S
+14572 2
+A voice pleads out, 'Save us, Master Bee-Keeper!'~
+Screams of terror echo out from somewhere in the distance.~
+The sound of an enormous bee bussing passes nearby.~
+The sun becomes temporarily blotted out as an enormous bee flies overhead.~
+A dull, droning hum vibrates the air.~
+Somewhere in the distance a scream is suddenly cut short.~
+S
+14574 2
+A voice pleads out, 'Save us, Master Bee-Keeper!'~
+Screams of terror echo out from somewhere in the distance.~
+The sound of an enormous bee bussing passes nearby.~
+The sun becomes temporarily blotted out as an enormous bee flies overhead.~
+A dull, droning hum vibrates the air.~
+Somewhere in the distance a scream is suddenly cut short.~
+S
+14585 2
+A voice pleads out, 'Save us, Master Bee-Keeper!'~
+Screams of terror echo out from somewhere in the distance.~
+The sound of an enormous bee bussing passes nearby.~
+The sun becomes temporarily blotted out as an enormous bee flies overhead.~
+A dull, droning hum vibrates the air.~
+Somewhere in the distance a scream is suddenly cut short.~
+S
+14593 2
+A voice pleads out, 'Save us, Master Bee-Keeper!'~
+Screams of terror echo out from somewhere in the distance.~
+The sound of an enormous bee bussing passes nearby.~
+The sun becomes temporarily blotted out as an enormous bee flies overhead.~
+A dull, droning hum vibrates the air.~
+Somewhere in the distance a scream is suddenly cut short.~
+S
+3054 2
+The sparks from the godly forge cascade down like dragon spittle.~
+A bloodied pawn is hurled from the chess game, and dies at your feet.~
+the Platinumsmith scratches himself abundantly, and returns to work.~
+the Platinumsmith hammers his thumb by mistake, and yelps in pain.~
+A newbie tugs at your pantleg and begs you for some platinum coins.~
+A coupon for a "Spellsword" wafts by in the breeze.~
+the Platinumsmith mutters, 'Day in, and day out.  Same old shit.'~
+the Platinumsmith says, 'Watch the store, bub.  I gotta take a powder.'~
+the Platinumsmith says, 'I'm thinking about starting up a union.'~
+A sign above the forge reads, 'Don't equate.  Donate.'~
+the Platinumsmith says, 'Damn, sometimes I really miss Jitter.'~
+the Platinumsmith says, 'Just weapons, pal.  I don't forge kinky stuff.'~
+A soul-like stream of smoke rises up from the white-hot coals.~
+A chess knight is disqualified for not putting a diaper on his steed.~
+S
+2358 5
+Frodo moans in pain from the lashings he has received.~
+Frodo mutters a simple tune in a muffled, low voice.~
+Frodo rolls about on the ground in pain and torment.~
+The Dratul snarls at the cowering figure.~
+The Dratul whips the cowering form maliciously.~
+The Dratul growls, 'Stop your squeaking, you dung hill rat.'~
+S
+4203 2
+Fred says, 'Please, take a moment to read all these informational
+brochures and pamphlets.  Use READ BROCHURE or READ pamphlet to do so.'~
+Fred says, 'Oh, before you take the tour, please READ that SIGN.  Thanks
+much!'~
+S
+4233 2
+Fred says, 'You know...a great many time travellers used to be able walk
+through time, quite literally.'~
+Fred says, 'Unfortunately the secrets of opening time and using it to
+travel places have been lost for some time.'~
+S
+16 5
+The Meta-physician cuts an extremely loud and noxious fart.~
+Someone in the room tears one off, and man does it reek.~
+You feel slightly nauseous and let a ripe squeaky fart fill the room.~
+A mouse in the corner flatulates with the force of a storm giant.~
+Suddenly, everyone in Sorpigal farts in one great rank unison!~
+Oh my God!  That cute chick in the corner just broke wind!~
+Your acute senses warn that you should not stand by the bean-eating
+dwarf.~
+It's suddenly much warmer in here.  Everyone's farting, that's why...~
+S
+$

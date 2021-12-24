@@ -1,0 +1,755 @@
+#200
+The DC++ Reception Area~
+   A busy reception area greets you as you enter Dark Castle.  Players,
+Immortals, and Mobiles all bustle about in a literal frenzy as they head to
+their assigned places within the realms.  A slinking Enfan stalks his way
+downwards to the Albatross Tavern, which leads out into the world.  Most
+players to be forming a line heading north where a large sign declares, "Sign
+up for DC Academy here!"
+~
+1 1644176620 0
+D0
+~
+~
+0 -1 257
+D5
+~
+~
+0 -1 3001
+E
+sign large~
+   Welcome to the University of Basic MUDding.  Here you will learn the
+valuable information that will help you make the most of your time here.
+All instructions in the University are in the form of signs, so please
+read every sign you see.
+   For those of you who do not wish to continue, just go down (type 'down')
+to go back to the Inn.  If you already know how to MUD, you might still
+want to continue through the school in order to gain starting equipment.
+After completing the University course, you should be level 2 and able to
+save.
+~
+S
+#201
+The Platinum Forge in the Clouds~
+   Resting atop on a thick, stone floor and floating amidst the clouds is a
+mighty forge.  The steam and smoke from the forge burn acridly in your nostrils
+and add to the thick cloudiness already present in the smithy.  Assistants
+bustle rapidly but proficiently about the platinumworks forging, smelting, and
+shaping the raw chunks of rare and precious metals into the rudimentary shapes
+of adventuring gear.  Behind the forge itself, adding detail and performing the
+finishing touches on many magically imbued items, is Cirrus the platsmith.  It
+is said that his talents, while notoriously pricey, have been sought by even
+the gods themselves.
+~
+1 1711286284 0
+D1
+~
+door platinum~
+1 -1 28105
+E
+sign~
+Welcome to your first sign!  Most of the rooms will have them.  Be sure to
+check each one, as they will all have information useful to your game
+play.  This one is telling you to go east to recieve your first pieces of
+equipment.
+~
+E
+plaque~
+This zone (Mud School) is created by Hatchet for any MERC Mud.
+copyright 1992.  It was heavily modified by Kahlan in 1995.
+~
+S
+#202
+An extremely large and hot smithy~
+   The walls of this clay hut are cracked and flaking due to the constant heat
+from the forge that sits in the center.  A small hole in the ceiling allows
+smoke to escape and a small amount of air circulation to flow through the hut.
+Even so, the air is stifling and hot as the forge heats precious metals for
+forging.  The implements of a master craftsman are placed neatly on shelves and
+tables, and several buckets of cooling oils and water have been set carefully
+to the left side of the forge.
+~
+1 570433548 0
+E
+sign~
+      Hopefully by the time you read this, you will no longer be naked!
+You should have something on your body, legs and feet.  Next, go east
+back where you came from, and if you are primarily a skills user, go north.
+If you are primarily a spell caster, go south.  If you're not sure what
+you are, ask an immortal (we are found by typing who 51) and we will
+tell you.  If no immortal is visible, pray for guidance.
+~
+S
+#203
+An opulent store and smithy~
+   It is difficult to tell whether this store is either a forge or a shoppe.
+The shelves are covered in neatly stacked and exotic wares from accross the
+realms.  At the far end of the richly appointed store lies a strange, smokeless
+forge.  While appearing to burn as hotly as any other forge, its unique
+technological design prevents the bustling shoppe from filling with any smoke.
+Creatures both strange and familiar, as well as a healthy number of Krys'Kath,
+peruse the wares contained within.  Manx is never one to turn away a customer.
+~
+1 570433548 0
+D3
+~
+~
+0 -1 17271
+E
+sign~
+     After looking to see what is in your bag, get the items out.
+Then try wielding your weapons or wielding one weapon and using a
+shield, to see whether you want to inflict more damage or have more
+interest in defending against damage from others.
+~
+S
+#204
+The Crystal Forge~
+   A forge of pure, indestructible crystal sits atop a dark crystal dais in the
+center of the room.  Smoke rises upwards from it as many workers scramble about
+to maintain the tremendous amount of goods they are required to output.  The
+primary provider of weapons and goods for the better part of the northern
+reaches, this armoury serves in capacities both functional and magical.  Great
+works of platinum can be seen stored in locked crystal cabinets to the back of
+the room.
+~
+1 570433548 0
+D2
+~
+~
+0 -1 22056
+S
+#205
+$B$4Proc room for Gustav.$R~
+   Players should NOT be in this room.
+~
+1 1644177580 0
+S
+#206
+$B$5Occoran Proc Mobs$R~
+   Empty description.
+~
+1 0 0
+S
+#207
+$B$5Far Reach Proc Mobs$R~
+$BIf you are in this room, alert an immortal immediately.$R
+~
+1 33562624 0
+S
+#208
+$B$5Diamond Isle Proc Mobs$R~
+   Empty description.
+~
+1 0 0
+S
+#209
+Room 209~
+   Empty description.
+~
+1 0 0
+S
+#210
+Room 210~
+   Empty description.
+~
+1 0 0
+S
+#211
+Room 211~
+   Empty description.
+~
+1 0 0
+S
+#212
+Room 212~
+   Empty description.
+~
+1 0 0
+S
+#213
+Room 213~
+   Empty description.
+~
+1 0 0
+S
+#214
+Room 214~
+   Empty description.
+~
+1 0 0
+S
+#215
+Room 215~
+   Empty description.
+~
+1 0 0
+S
+#216
+Room 216~
+   Empty description.
+~
+1 0 0
+S
+#217
+Room 217~
+   Empty description.
+~
+1 0 0
+S
+#218
+Room 218~
+   Empty description.
+~
+1 0 0
+S
+#219
+Room 219~
+   Empty description.
+~
+1 0 0
+S
+#220
+Room 220~
+   Empty description.
+~
+1 0 0
+S
+#221
+Room 221~
+   Empty description.
+~
+1 0 0
+S
+#222
+Room 222~
+   Empty description.
+~
+1 0 0
+S
+#223
+Room 223~
+   Empty description.
+~
+1 0 0
+S
+#224
+Room 224~
+   Empty description.
+~
+1 0 0
+S
+#225
+Room 225~
+   Empty description.
+~
+1 0 0
+S
+#226
+Room 226~
+   Empty description.
+~
+1 0 0
+S
+#227
+Room 227~
+   Empty description.
+~
+1 0 0
+S
+#228
+Room 228~
+   Empty description.
+~
+1 0 0
+S
+#229
+Room 229~
+   Empty description.
+~
+1 0 0
+S
+#230
+Room 230~
+   Empty description.
+~
+1 0 0
+S
+#231
+Room 231~
+   Empty description.
+~
+1 0 0
+S
+#232
+Room 232~
+   Empty description.
+~
+1 0 0
+S
+#233
+Room 233~
+   Empty description.
+~
+1 0 0
+S
+#234
+Room 234~
+   Empty description.
+~
+1 0 0
+S
+#235
+Room 235~
+   Empty description.
+~
+1 0 0
+S
+#236
+Room 236~
+   Empty description.
+~
+1 0 0
+S
+#237
+Room 237~
+   Empty description.
+~
+1 0 0
+S
+#238
+Room 238~
+   Empty description.
+~
+1 0 0
+S
+#239
+Room 239~
+   Empty description.
+~
+1 0 0
+S
+#240
+Room 240~
+   Empty description.
+~
+1 0 0
+S
+#241
+Room 241~
+   Empty description.
+~
+1 0 0
+S
+#242
+Room 242~
+   Empty description.
+~
+1 0 0
+S
+#243
+Room 243~
+   Empty description.
+~
+1 0 0
+S
+#244
+Room 244~
+   Empty description.
+~
+1 0 0
+S
+#245
+Room 245~
+   Empty description.
+~
+1 0 0
+S
+#246
+Room 246~
+   Empty description.
+~
+1 0 0
+S
+#247
+Room 247~
+   Empty description.
+~
+1 0 0
+S
+#248
+Room 248~
+   Empty description.
+~
+1 0 0
+S
+#249
+Room 249~
+   Empty description.
+~
+1 0 0
+S
+#250
+Room 250~
+   Empty description.
+~
+1 0 0
+S
+#251
+Room 251~
+   Empty description.
+~
+1 0 0
+S
+#252
+Room 252~
+   Empty description.
+~
+1 0 0
+S
+#253
+Room 253~
+   Empty description.
+~
+1 0 0
+S
+#254
+Room 254~
+   Empty description.
+~
+1 0 0
+S
+#255
+Room 255~
+   Empty description.  Players should not be in this room.
+~
+1 0 0
+S
+#256
+$B$4Do not edit room 257$R~
+   Players should not be in this room.
+~
+1 0 1
+D1
+~
+~
+0 -1 257
+D2
+~
+~
+0 -1 -1
+D3
+~
+~
+0 -1 -1
+S
+#257
+The Dark Castle Academy ~
+   You stand at the gates of the newly constructed Dark Castle Academy.  It is
+an immense brick building four stories high.  Fellow students mill about, going
+about their studies.  A flagpole stands erect in the center of this small
+courtyard, and a flag adorned with a mean looking fish waves gently.  The bell
+rings, and it is time to attend class.
+~
+1 1174939788 1
+D0
+~
+~
+0 -1 5401
+D2
+~
+~
+0 -1 200
+S
+#258
+$B$4Do not edit room 257$R~
+   Players should not be in this room.
+~
+1 0 1
+D0
+~
+~
+0 -1 -1
+D1
+~
+~
+0 -1 259
+D3
+~
+~
+0 -1 257
+S
+#259
+$4$BDo not edit room 259$R~
+   Players should not be in this room.
+~
+1 0 1
+D1
+~
+~
+0 -1 -1
+D2
+~
+~
+0 -1 -1
+D3
+You see the room you came from and the room you should go to.
+~
+~
+0 0 257
+E
+sign~
+   Welcome to Hatchet's Guild Room.  Here you will learn your skills and
+spells.  In order to practice them, you need available practices.  To find
+out what spells and skills you can practice and the available practices, type
+'practice'.  Then, to practice the specific skill, type practice <skill>,
+where skill is the skill or spell you wish to practice.  Practicing increases
+the amount you know of that spell or skill, up to a certain maximum.  When
+you have practiced all you wish to practice, go west and north to continue.
+~
+S
+#260
+Room 260~
+   Empty description.
+~
+1 0 0
+S
+#261
+Room 261~
+   Empty description.
+~
+1 0 0
+S
+#262
+Room 262~
+   Empty description.
+~
+1 0 0
+S
+#263
+Room 263~
+   Empty description.
+~
+1 0 0
+S
+#264
+Room 264~
+   Empty description.
+~
+1 0 0
+S
+#265
+Room 265~
+   Empty description.
+~
+1 0 0
+S
+#266
+Room 266~
+   Empty description.
+~
+1 0 0
+S
+#267
+Room 267~
+   Empty description.
+~
+1 0 0
+S
+#268
+Room 268~
+   Empty description.
+~
+1 0 0
+S
+#269
+Room 269~
+   Empty description.
+~
+1 0 0
+S
+#270
+Room 270~
+   Empty description.
+~
+1 0 0
+S
+#271
+Room 271~
+   Empty description.
+~
+1 0 0
+S
+#272
+Room 272~
+   Empty description.
+~
+1 0 0
+S
+#273
+Room 273~
+   Empty description.
+~
+1 0 0
+S
+#274
+Room 274~
+   Empty description.
+~
+1 0 0
+S
+#275
+Room 275~
+   Empty description.
+~
+1 0 0
+S
+#276
+Room 276~
+   Empty description.
+~
+1 0 0
+S
+#277
+Room 277~
+   Empty description.
+~
+1 0 0
+S
+#278
+Room 278~
+   Empty description.
+~
+1 0 0
+S
+#279
+Room 279~
+   Empty description.
+~
+1 0 0
+S
+#280
+Room 280~
+   Empty description.
+~
+1 0 0
+S
+#281
+Room 281~
+   Empty description.
+~
+1 0 0
+S
+#282
+Room 282~
+   Empty description.
+~
+1 0 0
+S
+#283
+Room 283~
+   Empty description.
+~
+1 0 0
+S
+#284
+Room 284~
+   Empty description.
+~
+1 0 0
+S
+#285
+Room 285~
+   Empty description.
+~
+1 0 0
+S
+#286
+Room 286~
+   Empty description.
+~
+1 0 0
+S
+#287
+Room 287~
+   Empty description.
+~
+1 0 0
+S
+#288
+Room 288~
+   Empty description.
+~
+1 0 0
+S
+#289
+Room 289~
+   Empty description.
+~
+1 0 0
+S
+#290
+Room 290~
+   Empty description.
+~
+1 0 0
+S
+#291
+Room 291~
+   Empty description.
+~
+1 0 0
+S
+#292
+Room 292~
+   Empty description.
+~
+1 0 0
+S
+#293
+Room 293~
+   Empty description.
+~
+1 0 0
+S
+#294
+Room 294~
+   Empty description.
+~
+1 0 0
+S
+#295
+Room 295~
+   Empty description.
+~
+1 0 0
+S
+#296
+Room 296~
+   Empty description.
+~
+1 0 0
+S
+#297
+Room 297~
+   Empty description.
+~
+1 0 0
+S
+#298
+Room 298~
+   Empty description.
+~
+1 0 0
+S
+#299
+$B$4End of Platsmith and Special Proc Range$R~
+   Players should not be in this room.
+~
+1 33564672 1
+D0
+~
+~
+0 -1 -1
+S
+$~

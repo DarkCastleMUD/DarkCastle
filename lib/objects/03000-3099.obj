@@ -1,0 +1,977 @@
+#3000
+barrel beer~
+a barrel of beer~
+A beer barrel has been left here.~
+~
+17 16 16385 1
+50 50 1 0 0
+10 1000 0
+S
+#3001
+bottle beer~
+a bottle of beer~
+A beer bottle has been left here.~
+~
+17 16 16385 1
+8 8 1 0 0
+1 125 0
+S
+#3002
+bottle ale~
+a bottle of ale~
+A dark bottle of ale has been left here.~
+~
+17 16 16385 1
+8 8 3 0 0
+1 110 0
+S
+#3003
+bottle firebreather fire breather~
+a bottle of firebreather~
+A firebreather has been left here.~
+~
+17 16 16385 1
+8 8 7 0 0
+1 200 0
+S
+#3004
+bottle local specialty~
+a bottle of the local specialty~
+A dark bottle has been left here.~
+~
+17 16 16385 1
+8 8 8 0 0
+1 105 0
+S
+#3005
+effervescent potion~
+an effervescent potion~
+An effervescent potion bubbles softly.~
+Fixed.~
+10 17 16385 1
+30 51 0 0 5
+2 55000 0
+S
+#3006
+empty obj~
+------------~
+An empty obj sits here dejectedly.~
+Fixed.~
+0 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#3007
+gatorade bottle~
+a bottle of "Gator"-ade~
+A bottle of "Gator"-ade is here.~
+Fixed.~
+17 16 16385 1
+5 5 16 0 0
+1 300 0
+E
+bottle gatorade~
+Preferred by Gators everywhere!
+~
+S
+#3008
+cherry pie~
+a slice of cherry pie~
+A tasty looking slice of cherry pie sits here.~
+Fixed.~
+19 16 1 1
+6 0 0 0 0
+1 75 0
+S
+#3009
+tombstone pizza~
+a zesty tombstone pizza~
+A zesty tombstone pizza has been left here.~
+~
+19 16 16385 1
+9 0 0 0 0
+2 100 0
+S
+#3010
+fish salty~
+a chewy salted fish~
+A yummy fish has been left here.~
+~
+19 16 1 1
+12 0 0 0 0
+1 150 0
+S
+#3011
+donut tasty spanky~
+a delicious DONUT~
+A NICE and TASTY looking donut has been placed here.~
+~
+19 16 16385 1
+3 0 0 0 0
+1 50 0
+S
+#3012
+taco mexican~
+a tasty Mexican taco~
+A tasty looking Mexican taco has been dropped on the ground.~
+.~
+19 16 16385 1
+5 0 0 0 0
+1 80 0
+S
+#3013
+burrito hot~
+a tasty Mexican burrito~
+A spicy looking burrito has been set here.~
+~
+19 16 16385 1
+10 0 0 0 0
+1 120 0
+S
+#3014
+nachos nacho~
+some nachos with cheese~
+Some nachos have been left here they have cheese on them.~
+~
+19 16 16385 1
+3 0 0 0 0
+1 30 0
+S
+#3015
+wagon~
+a colorful gypsy wagon~
+A colorful gypsy wagon is here, covered with gaudy tarps.~
+~
+24 0 0 0
+3150 1 -1 0 0
+0 0 0
+S
+#3016
+tent~
+a hide covered tent~
+A tent covered in brightly dyed animal hides is here, flapping in the wind.~
+~
+24 0 0 0
+3145 1 -1 0 0
+0 0 0
+E
+tent~
+Covered with brightly dyed hides that are in the easily recognizable gypsy
+style, this tent is flapping in the wind while a jingling music comes from
+within.
+~
+S
+#3017
+aquarium tank phish~
+a phish filled aquarium~
+An aquarium filled with nasty-looking fish has been left here.~
+~
+24 0 0 0
+3144 1 -1 0 0
+0 0 0
+S
+#3018
+spyglass~
+a pirate's spyglass~
+A pirate's spyglass has been set up on a tripod here.~
+~
+24 0 0 0
+3025 3 -1 0 0
+0 0 0
+S
+#3019
+empty obj~
+------------~
+An empty obj sits here dejectedly.~
+Fixed.~
+0 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#3020
+small dagger~
+a small dagger~
+A dagger with a long thin blade is here.~
+pierce~
+5 16 8193 1
+0 1 3 11 0
+1 500 0
+S
+#3021
+whip leather short~
+a short whip~
+A small whip lies here.~
+fart~
+5 16 8193 1
+0 1 3 1 0
+4 1000 0
+S
+#3022
+sword long~
+a long sword~
+A long sword has been left here.~
+slash~
+5 16 8193 1
+0 1 1 3 0
+14 2500 0
+A
+359000 0
+S
+#3023
+club wooden~
+a wooden club~
+A simple looking wooden club is here.~
+pound~
+5 16 8193 1
+0 1 3 7 0
+6 250 0
+S
+#3024
+warhammer hammer~
+a warhammer~
+A medium sized warhammer is here.~
+.~
+5 16 8193 1
+0 2 2 5 0
+16 2000 0
+S
+#3025
+short sword~
+a short sword~
+A short sword lies here.~
+Fixed.~
+5 16 8193 1
+0 1 3 3 0
+5 1000 0
+S
+#3026
+mace small~
+a small mace~
+A small mace sits here.~
+Fixed.~
+5 16 8193 1
+0 3 1 5 0
+8 1500 0
+S
+#3027
+quarterstaff quarter staff~
+a quarterstaff~
+A quarterstaff rests here.~
+Fixed.~
+5 8388624 8193 1
+0 3 2 7 0
+10 1250 0
+S
+#3028
+empty obj~
+------------~
+An empty obj sits here dejectedly.~
+Fixed.~
+0 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#3030
+torch~
+a torch~
+A large torch has been placed upside down on the ground.~
+~
+1 16 65537 1
+0 0 24 0 0
+1 1250 0
+S
+#3031
+lantern~
+a lantern~
+A brass lantern sits here extinguished.~
+~
+1 16 65537 1
+1 0 48 0 0
+2 3300 0
+E
+lantern~
+This hardy brass lantern is perfect for lighting
+the way of intrepid adventurers.
+~
+S
+#3032
+bag~
+a bag~
+A small bag lies on the ground.~
+~
+15 16 16385 1
+25 0 0 0 0
+1 500 0
+S
+#3033
+box~
+a box~
+A small box sits here.~
+~
+15 16 16385 1
+50 0 0 0 0
+4 2000 0
+S
+#3034
+paper note~
+a paper note~
+A paper note has been left here.~
+~
+16 16 16385 1
+0 0 0 0 0
+1 25 0
+S
+#3035
+quill goose-feather~
+a goose-feather quill~
+A goose-feather quill is lying here.~
+~
+21 16 16385 1
+0 0 0 0 0
+1 80 0
+S
+#3036
+keyring iron~
+An iron keyring~
+An iron keyring lays here.~
+Fixed.~
+34 16 16385 0
+20 0 0 0 0
+1 10000 16384
+S
+#3037
+empty obj~
+------------~
+An empty obj sits here dejectedly.~
+Fixed.~
+0 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#3038
+keyring crystal~
+A $B$7crystal$R keyring~
+A $B$7crystal$R keyring lays here.~
+Fixed.~
+34 16 16385 0
+50 0 0 0 0
+1 50000 16384
+S
+#3039
+keyring golden~
+A $B$5golden$R keyring~
+A $B$5golden$R keyring lays here.~
+Fixed.~
+34 16 16385 0
+100 0 0 0 0
+1 100000 16384
+S
+#3040
+identify scroll~
+a scroll of identify~
+A scroll has carelessly been left here.~
+~
+2 16 16385 1
+20 53 -1 -1 0
+1 8000 0
+E
+scroll identify~
+The scroll has a magic formula drawn upon it:
+     ???
+    ?   ?
+       ?
+      ?
+      ?
+      *
+~
+S
+#3041
+potion yellow~
+a $B$5yellow$R potion of see invisible~
+A $R$B$5yellow$1$B potion has carelessly been left here.$R~
+~
+10 16 16385 1
+25 19 -1 -1 1
+1 42500 0
+E
+potion yellow~
+The potion has a small label 'Detect The Invisible'.
+~
+S
+#3042
+recall scroll~
+a scroll of recall~
+A scroll has carelessly been left here.~
+~
+2 16 16385 1
+12 42 -1 -1 0
+1 400000 0
+E
+scroll~
+The scroll has written a formulae of 'Word of Recall' upon it.
+~
+S
+#3045
+empty obj~
+------------~
+An empty obj sits here dejectedly.~
+Fixed.~
+0 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#3046
+enforcer axe~
+the Enforcer~
+An axe that looks too huge for any mortal to use is lying here.~
+~
+5 1040 8193 8
+0 5 5 3 50
+20 200000 0
+A
+41 5
+A
+26 4
+S
+#3047
+jewel sorpigal fire~
+the priceless Jewel of Sorpigal~
+A soft red glow emanates from a jewel forged from the bowels of the earth.~
+~
+1 67108880 65537 1
+0 0 -1 0 0
+1 1000000 0
+S
+#3048
+shield jewel fire sorpigal~
+the jewel in the center of the $4$BFireshield$R~
+The dancing shield of fire circles around the Jewel of Sorpigal.~
+~
+15 0 0 0
+20 15 1215 0 0
+0 0 0
+S
+#3050
+raft~
+a raft~
+A raft has been left here.~
+~
+22 16 1 1
+0 0 0 0 0
+10 300 0
+E
+raft~
+The raft looks very primitive.
+~
+S
+#3051
+canoe~
+a canoe~
+A canoe has been left here.~
+~
+22 16 1 1
+0 0 0 0 0
+5 2300 0
+E
+canoe~
+The canoe is fairly light.
+~
+S
+#3053
+empty obj~
+------------~
+An empty obj sits here dejectedly.~
+Fixed.~
+0 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#3055
+jack-o'-lantern pumpkin orange~
+A jack-o'lantern~
+An orange pumpkin carved to show a skull with a wicked grin sits here.~
+Fixed.~
+0 0 0 0
+0 0 0 0 0
+0 0 0
+\speech_prog p trick or treat~
+if ispc($n)
+  if ismobvnuminroom(3002)
+    if rand(50)      
+      MPFORCE martha MPAT 3089 get illusion
+      MPFORCE martha say Happy Halloween. You get a treat!
+      MPFORCE martha give illusion $n
+    else
+      MPFORCE martha say Happy Halloween. You get a trick!
+      say DEBUG: loading aggro mob...
+    endif
+  endif
+endif
+~
+|
+S
+#3056
+treat~
+A treat~
+A treat lays here.~
+Fixed.~
+0 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#3059
+cloak leather soft~
+a soft leather cloak~
+A soft leather cloak is lying on the ground.~
+~
+9 16 1025 1
+2 0 0 0 2
+2 250 0
+A
+13 3
+A
+14 3
+S
+#3060
+leather jerkin soft~
+a soft leather jerkin~
+A soft leather jerkin is lying on the ground.~
+~
+9 16 9 1
+5 0 0 0 2
+3 500 0
+A
+14 5
+S
+#3061
+leather cap soft~
+a soft leather cap~
+A soft leather cap is lying on the ground.~
+~
+9 16 17 1
+2 0 0 0 2
+2 400 0
+A
+13 3
+A
+14 3
+S
+#3062
+pants leather soft~
+a pair of soft leather pants~
+A pair of soft leather pants is lying in the ground.~
+~
+9 16 33 1
+3 0 0 0 2
+2 500 0
+A
+13 3
+A
+14 3
+S
+#3063
+leather boots soft~
+a pair of soft leather boots~
+A pair of soft leather boots.~
+~
+9 16 65 1
+2 0 0 0 2
+2 400 0
+A
+92 1
+S
+#3064
+gloves leather soft~
+a pair of soft leather gloves~
+A pair of soft leather gloves is lying on the ground.~
+~
+9 16 129 1
+2 0 0 0 2
+2 400 0
+A
+14 3
+A
+18 1
+S
+#3065
+leather sleeves soft~
+a pair of soft leather sleeves~
+A pair of soft leather sleeves is lying on the ground.~
+~
+9 16 257 1
+3 0 0 0 2
+2 500 0
+A
+13 3
+A
+17 -3
+S
+#3066
+jerkin studded leather~
+a studded leather jerkin~
+A studded leather jerkin is lying on the ground.~
+~
+9 6279168 9 1
+9 0 0 0 5
+6 2000 0
+A
+14 8
+A
+17 -5
+S
+#3067
+cap hard leather~
+a studded leather cap~
+A hard leather cap is lying on the ground.~
+~
+9 6279168 17 1
+4 0 0 0 5
+3 1000 0
+A
+13 5
+A
+17 -5
+S
+#3068
+studded leather skirt~
+a studded leather skirt~
+A studded leather skirt is lying on the ground.~
+~
+9 16 33 1
+5 0 0 0 5
+5 1500 0
+A
+12 5
+A
+14 5
+S
+#3069
+boots hard~
+a pair of hard leather boots~
+A pair of hard leather boots lies here.~
+~
+9 16 65 1
+4 0 0 0 5
+3 1000 0
+A
+92 2
+S
+#3070
+gloves hard leather~
+a pair of hard leather gloves~
+A pair of hard leather gloves is lying on the ground.~
+~
+9 16 129 1
+4 0 0 0 5
+2 1000 0
+A
+14 6
+A
+18 1
+S
+#3071
+sleeves studded leather~
+a pair of studded leather sleeves~
+A pair of studded leather sleeves is lying on the ground.~
+~
+9 16 257 1
+5 0 0 0 5
+4 1500 0
+A
+13 5
+A
+17 -5
+S
+#3072
+jerkin scale mail~
+a scale mail jerkin~
+A scale mail jerkin is lying on the ground.~
+~
+9 1544192 9 1
+15 0 0 0 11
+5 8500 0
+S
+#3073
+coif scale mail~
+a scale mail coif~
+A scale mail coif is lying on the ground.~
+~
+9 1544192 17 1
+8 0 0 0 11
+5 5500 0
+S
+#3074
+skirt scale mail~
+a long scale mail skirt~
+A long scale mail skirt is lying on the ground.~
+~
+9 1544192 33 1
+10 0 0 0 11
+5 6000 0
+S
+#3075
+boots reinforced~
+a pair of reinforced boots~
+A pair of reinforced boots lies here.~
+~
+9 1544192 65 1
+7 0 0 0 11
+5 6000 0
+S
+#3076
+gloves reinforced~
+a pair of reinforced gloves~
+A pair of reinforced gloves is lying on the ground.~
+~
+9 1544192 129 1
+7 0 0 0 11
+5 6000 0
+S
+#3077
+sleeves scale mail~
+a pair of scale mail sleeves~
+A pair of scale mail sleeves is lying on the ground.~
+~
+9 1544192 257 1
+10 0 0 0 11
+5 6500 0
+S
+#3078
+chain mail jerkin~
+a chain mail jerkin~
+A chain mail jerkin is lying on the ground.~
+~
+9 7852032 9 1
+12 0 0 0 8
+4 4500 0
+A
+14 10
+A
+17 -10
+S
+#3079
+coif chain mail~
+a chain mail coif~
+A chain mail coif is lying on the ground.~
+~
+9 7852032 17 1
+6 0 0 0 8
+4 2500 0
+A
+13 5
+A
+17 -5
+S
+#3080
+skirt chain mail~
+a long chain mail skirt~
+A long chain mail skirt is lying on the ground.~
+~
+9 7852032 33 1
+8 0 0 0 8
+4 3000 0
+A
+13 8
+A
+14 8
+S
+#3081
+boots ironbound~
+a pair of ironbound boots~
+A pair of ironbound boots lies here.~
+~
+9 7852032 65 1
+6 0 0 0 8
+4 2500 0
+A
+92 3
+S
+#3082
+gloves ironbound~
+a pair of ironbound gloves~
+A pair of ironbound gloves is lying on the ground.~
+~
+9 7852032 129 1
+6 0 0 0 8
+4 2500 0
+A
+14 10
+A
+18 1
+S
+#3083
+sleeves chain mail~
+a pair of chain mail sleeves~
+A pair of chain mail sleeves is lying on the ground.~
+~
+9 7852032 257 1
+8 0 0 0 8
+4 3000 0
+A
+13 8
+A
+17 -8
+S
+#3084
+bronze breast plate~
+a $5bronze$R breast plate~
+A $5bronze$B$1 breast plate lies on the ground.$R~
+~
+9 1511424 9 1
+10 0 0 0 10
+7 25000 0
+A
+26 1
+S
+#3085
+helmet bronze~
+a $5bronze$R helmet~
+A $5bronze$B$1 helmet lies on the ground.$R~
+~
+9 6262784 17 1
+4 0 0 0 10
+7 10000 0
+A
+3 1
+A
+18 1
+S
+#3086
+leggings bronze~
+a pair of $5bronze$R leggings~
+A pair of $5bronze$B$1 leggings lie on the ground.$R~
+pair of bronze leggings~
+9 6262784 33 1
+4 0 0 0 10
+7 11000 0
+A
+1 1
+A
+5 1
+S
+#3087
+boots bronze~
+a pair of $5bronze$R boots~
+A pair of $5bronze$B$1 boots lie on the ground.$R~
+~
+9 2068480 65 1
+2 0 0 0 10
+7 10000 0
+A
+2 1
+A
+14 15
+S
+#3088
+gauntlets bronze~
+a pair of $5bronze$R gauntlets~
+A pair of $5bronze$B$1 gauntlets lie on the ground.$R~
+~
+9 2068480 129 1
+3 0 0 0 10
+7 11000 0
+A
+4 1
+A
+19 1
+S
+#3089
+bracers bronze~
+a pair of $5bronze$R bracers~
+A pair of $5bronze$B$1 bracers lie on the ground.$R~
+~
+9 2068480 257 1
+3 0 0 0 10
+7 10000 0
+A
+1 1
+A
+13 12
+S
+#3090
+looking glass lookingglass~
+a magical looking glass~
+A magical looking glass lies discarded on the ground.~
+~
+12 64 1 1
+0 0 0 0 0
+2 190000 0
+E
+glass looking lookingglass~
+   The looking glass is a long golden color with an opaque material
+used for the lenses.  A small button lies near the viewing end.
+~
+S
+#3091
+empty obj~
+NOTE: bronze items load only in enchanted woods~
+An empty obj sits here dejectedly.~
+Fixed.~
+0 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#3092
+shield jewel fire sorpigal~
+the $B$4Fireshield$R without the jewel~
+The dancing shield of fire circles around nothing.~
+Fixed.~
+15 0 0 0
+20 15 0 0 0
+0 0 0
+S
+#3093
+sample herbs herb~
+a small sample of an herb~
+A small sample of an unknown herb is here.~
+Fixed.~
+19 67108880 16385 1
+0 0 0 0 0
+0 0 0
+S
+#3094
+flask holy water~
+a flask of holy water~
+A flask of holy water is here.~
+Fixed.~
+17 18 1 1
+10 10 17 0 10
+3 46500 0
+S
+#3096
+shield small wooden~
+a small wooden shield~
+A small wooden shield is lying on the ground.~
+~
+9 16 513 1
+4 0 0 0 2
+2 1200 0
+S
+#3097
+shield small metal~
+a small metal shield~
+A small metal shield is lying on the ground.~
+~
+9 5754880 513 1
+7 0 0 0 5
+4 2400 0
+S
+#3098
+shield large metal~
+a large metal shield~
+A large metal shield is lying on the ground.~
+~
+9 5754880 513 12
+10 0 0 0 8
+5 4800 0
+S
+#3099
+board bulletin~
+a bulletin board~
+A large bulletin board is mounted on the wall for the mortals to use.~
+~
+23 0 0 0
+0 0 0 0 0
+0 0 0
+S
+$~

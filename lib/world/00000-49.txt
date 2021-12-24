@@ -1,0 +1,107 @@
+#0
+$B$0The Void$R~
+  You step out into ......
+  You don't think that you are not floating in nothing.
+~
+0 605300812 0
+D3
+~
+~
+0 -1 70
+S
+#1
+$R$0The Abyss$R~
+$R$0You don't think you are not floating in nothing.$R
+~
+0 570485980 0
+D3
+~
+~
+0 -1 70
+D5
+~
+seeya door~
+25 -1 3096
+S
+#2
+$B$0Limbo$R~
+   You are floating in a formless void, detached from all sensation of physical
+matter, surrounded by swirling glowing light, which fades into the relative
+darkness around you without any trace of edges or shadow.
+   There is a "No Tipping" notice pinned to the darkness.
+~
+0 571081866 1
+S
+#3
+A totally empty room~
+  The walls are completely bare...no nothing at all in the room.
+  You feel very lonely in this totally empty room.  Obviously you should
+have thought twice before lipping off to the wrong person.
+~
+0 8204 0
+D0
+~
+~
+0 -1 30
+D4
+You do not see that here.
+~
+~
+0 0 3048
+S
+#17
+$BAsgard, Home of the Gods$R~
+   The dead have highways.
+   They run, unerring lines of ghost trains, of dream carriages, across the
+wasteland behind our lives. Their thrum and throb can be heard through the
+broken places of the world, through cracks made by cruelty, violence, and
+depravity.
+   It is at these places where the barrier between their world and ours becomes
+breached, worn thin by the passage of innumerable feet.
+~
+0 33596556 0
+D0
+The TOP SECRET entrance to the Quest Headquarters rooms lies north.
+~
+~
+0 -1 18
+D1
+The Sheriff's Office, where punishments are posted lies to the east.
+~
+~
+0 -1 13
+D2
+A filthy and slovenly room filled with porn lies to the south.
+~
+~
+0 -1 15
+D3
+Several Architects and Builders relax in the lounge to the west.
+~
+door~
+1 -1 14
+D4
+A spiral staircase leads upward to the Immortal Observatory and home of the Mortal Board.
+~
+~
+0 -1 16
+D5
+An entrance to the Mortal realms heads down below.
+~
+hatch trapdoor door~
+17 -1 3001
+S
+#88
+$B$4Platsmith and Special Proc Range$R~
+This range is reserved for special proc rooms, platsmiths, and
+other special immortal purposes.
+~
+1 33562640 0
+S
+#96
+Room 96~
+Empty description.
+~
+1 0 0
+S
+$~

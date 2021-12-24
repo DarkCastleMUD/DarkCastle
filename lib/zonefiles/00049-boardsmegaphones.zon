@@ -1,0 +1,104 @@
+V2
+#0
+ $B$5Asgard, Home of the Immortals$R~
+49 48 2 101 1
+* **IMMORTAL ROOMS ZONEFILE**
+M  0     1   1  3005 Chain's New Zonefile Spot (to fix a problem)
+O  0    52   2   351 Phish Bowl Fountain in Tavern Backrooms
+* -----------------------------------
+* BULLETIN/MORTAL BOARDS
+O  0  3099  -1    16 Immortal Observatory Mortal Board
+O  0  3099  -1  3098 Chamber of Current Events Mortal Board
+O  0  3099  -1   350 Backroom of Albatross Tavern
+* -----------------------------------
+* IMPLEMENTOR BOARDS
+O  0  9997  -1    15 Implementor's Room Imp Board
+* -----------------------------------
+* WIZBOARDS
+O  0  9999  -1    17 Main Immortal Board in Asgard
+O  0  9999  -1     1 Apoc's Room Wizboard
+* -----------------------------------
+* BUILDER BOARDS
+O  0    50  -1    14 Architect's Lounge Builder's Board
+* -----------------------------------
+* QUEST BOARDS (2 varieties)
+O  0 22399  -1    19 Quest Board for Immortal Information
+O  0    13  -1    18 Quest Board for Posts for Immortals
+* -----------------------------------
+* PUNISHMENT BOARDS
+O  0    71  -1    13 Sheriff's Office Punishment Board
+* -----------------------------------
+O  0    24   1    14 Architect's Lounge Bookcase
+P  1     5   5    24 Immortal Sweatshirt
+P  1    14   1    24 Immortal Rules
+P  1    21   1    24 Immortal Building Guides
+P  1    15   1    24 
+P  1    16   1    24 
+P  1    17   1    24 
+P  1    18   1    24 
+P  1    19   1    24 
+P  1    20   1    24 
+O  0    27   1    14 soda machine
+P  1    28   2    27 
+P  1    28   2    27 
+P  1    29   2    27 
+P  1    29   2    27 
+P  1    30   2    27 
+P  1    30   2    27 
+P  1    31   2    27 
+P  1    31   2    27 
+P  1    32   2    27 
+* -----------------------------------
+O  0    40   1 14593 Megaphones
+O  1    40   2 14585 
+O  1    40   3 14574 
+O  1    40   3 14572 
+O  1    40   5 14570 
+O  1    40   6 14566 
+O  1    40   7 14557 
+O  1    40   8 14534 
+O  1    40   9 13354 
+O  1    40  10 13347 
+O  1    40  11 13341 
+O  1    40  12 13338 
+O  1    40  13 13336 
+O  1    40  14 13333 
+O  1    40  15 13331 
+O  1    40  16   473 
+O  1    40  18     5 
+O  1    40  19  4203 
+O  1    40  20  4233 
+O  0    92   1    37 
+P  1    93   5    92 
+P  1    93   5    92 
+P  1    93   5    92 
+P  1    93   5    92 
+P  1    93   5    92 
+P  1    94   5    92 
+P  1    94   5    92 
+P  1    94   5    92 
+P  1    94   5    92 
+P  1    94   5    92 
+P  1    95   5    92 
+P  1    95   5    92 
+P  1    95   5    92 
+P  1    95   5    92 
+P  1    95   5    92 
+O  0    53  -1    10 
+O  0  3099  -1    10 
+M  0   100   1    13 Load Spam Guard Mob
+%  4 100 100 
+E  8    33  -1    16 Give Spam Guard a Staff of Apocalypse
+M  0    23   1    23 
+* End of Immortal Range
+M  0  1653   1    48 - jane, sergio's test mob
+M  0   253   1   207 - Proc Mob for Underground Magic
+M  0   252   1   207 - Proc Mob for Air Magic
+G  4  3039  -1     0 
+G  4  3038  -1     0 
+G  4  3036  -1     0 
+O  0    61   1  3059 
+O  0    62   1  3059 
+O  0    50   2    12 
+S
+$~

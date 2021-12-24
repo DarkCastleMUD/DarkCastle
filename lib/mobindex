@@ -1,0 +1,12 @@
+* This file contains the list of the files which make up the world
+* Comments are on lines that begin with a "*"
+* The files themselves, are located in the lib/world directory
+* The file name should be surrounded with <tilda>s on a line of it's own.
+* ie: <tilda><enter>filename<tilda>
+* DO NOT USE TILDAS IN THE COMMENTS*
+
+~
+00000-0193.mob~
+00200-0251.mob~
+03000-3177.mob~
+$~

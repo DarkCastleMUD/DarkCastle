@@ -1,0 +1,328 @@
+V2
+#29
+ $7$Bthe City of Sorpigal$R~
+3099 18 2 102 2
+O  0    45   1  3014 Champion Flag
+O  0    88   1  3014 Clan Chaos Statue
+O  0    89   1  3006 Clan Chaos Plaque
+* SORPIGAL TOWN PROPER FILE *DO NOT MESS WITH* - Apoc
+* Most objects in this range should have "always" as their load max.
+M  0  1929   1  3004 
+O  0    13  -1  3007 Quest Board
+O  0  9995  -1  3005 Bank Teller
+M  0  9999   3  3096 The Undertaker
+M  3  3075   1  3014 The Unhappy Chief Enforcer
+M  5  3017   1  3014 The Chief Enforcer
+%  4  33 100 Blacksteel (leg) load %
+E  8   287   3     7 Blacksteel (leg) item
+%  4  33 100 Enforcer Axe load %
+E  8  3046   3    16 wield the Enforcer Axe
+O  3  3092   1  3014 the empty "fireshield" in Stonewitch
+M  0  3011   1  3008 Souvenir Shop Proprietor
+G  4  6252  -1     0 Arachnos Journal
+G  4   231  -1     0 Map of Gnome Village
+G  4   230  -1     0 Map of Chess Match
+G  4   232  -1     0 Map of St. Colins
+G  4   233  -1     0 Map of Rivendell
+G  4   234  -1     0 Map of Gangland
+G  4   229  -1     0 Map of Newtonia
+G  4   193  -1     0 Load Etala Clues Document
+M  0  3000   1  3033 Magic Shoppe Shopkeeper
+G  4     4  -1     0 give batwings
+G  4  3040  -1     0 give identify scroll
+G  4  3041  -1     0 give detect invisible potion
+G  4  3090  -1     0 give ToHS looking glass
+G  4 10002  -1     0 give cure poison potion
+G  4  3042  -1     0 give recall scroll
+G  4   697  -1     0 give empty vial
+O  1   137   1  3056 load tequila bottle in Juan's
+M  0  3007   1  3056 Uncle Juan
+G  4  3007  -1     0 Bottle of Gator-ade
+G  4  3012  -1     0 give taco
+G  4  3013  -1     0 give burrito
+G  4  3014  -1     0 give nachos
+E  4  6262  -1    18 Juan's campaign sign
+M  0  3003   1  3011 the Weaponsmith
+G  4  3020  -1     0 dagger
+G  4  3021  -1     0 short whip
+G  4  3022  -1     0 long sword
+G  4  3023  -1     0 wooden club
+G  4  3024  -1     0 war hammer
+G  4  3025  -1     0 short sword
+G  4  3026  -1     0 small mace
+G  4  3027  -1     0 quarterstaff
+E  4  3022  -1    16 wields a long sword
+E  4  3098  -1    11 wears a shield
+M  0  3004   1  3020 the Armourer
+G  4  3072  -1     0 scale mail jerkin
+G  4  3073  -1     0 scale mail coif
+G  4  3074  -1     0 scale mail skirt
+G  4  3077  -1     0 scale mail sleeves
+G  4  3075  -1     0 reinforced boots
+G  4  3076  -1     0 reinforced gloves
+G  4  3078  -1     0 chain mail jerkin
+G  4  3079  -1     0 chain mail coif
+G  4  3080  -1     0 chain mail skirt
+G  4  3083  -1     0 chain mail sleeves
+G  4  3081  -1     0 ironbound boots
+G  4  3082  -1     0 ironbound gloves
+G  4  3097  -1     0 small shield
+G  4  3098  -1     0 large shield
+E  4  3022  -1    16 wields a long sword
+E  4  3098  -1    11 wears a shield
+M  0 10010   5  3004 Sadus's Elite Rogue
+E  4  3020  -1    16 wields dagger
+E  4  3020  -1    17 wields dagger
+M  0 10010   5  3046 Sadus's Elite Rogue
+E  4  3020  -1    16 wields dagger
+E  4  3020  -1    17 wields dagger
+M  0 10010   5  3006 Sadus's Elite Rogue
+E  4  3020  -1    16 wields dagger
+E  4  3020  -1    17 wields dagger
+M  0 10010   5  3014 Sadus's Elite Rogue
+E  4  3020  -1    16 wields dagger
+E  4  3020  -1    17 wields dagger
+M  0 10010   5  3043 Sadus's Elite Rogue
+E  4  3020  -1    16 wields dagger
+E  4  3020  -1    17 wields dagger
+M  0  3002   1  3010 the Grocer
+G  4  3030  -1     0 torch
+G  4    99  -1     0 lockpick
+G  4  3031  -1     0 lantern
+G  4  3032  -1     0 bag
+G  4  3033  -1     0 box
+G  4  3138  -1     0 water skin
+G  4  3034  -1     0 paper note
+G  4  3035  -1     0 quill
+G  4  3039  -1     0 
+G  4  3038  -1     0 
+G  4  3036  -1     0 
+G  4   698  -1     0 mortar and pestle
+E  4  3023  -1    16 wields a wooden club
+E  4  3096  -1    11 wears wooden shield
+M  0  3001   1  3009 the Baker
+G  4  3008  -1     0 cherry pie slice
+G  4  3009  -1     0 pizza slice
+G  4  3010  -1     0 chewy fish
+G  4  3011  -1     0 danish pastry
+E  4  3023  -1    16 wields a club
+E  4  3096  -1    11 wears a wooden shield
+M  0  3008   1  3031 the Pet Shop Boy
+E  4  3021  -1    16 wields a whip
+M  0  3009   1  3034 the Jeweller
+G  4 17393  -1     0 flawed diamond (imp familiar proc component)
+G  4 17394  -1     0 opal
+G  4 17395  -1     0 sapphire
+G  4 17396  -1     0 topaz
+G  4 17397  -1     0 emerald
+G  4 17398  -1     0 ruby
+M  0  3010   1  3035 the Leather Worker
+G  4  3059  -1     0 soft leather cloak
+G  4  3060  -1     0 soft leather jerkin
+G  4  3061  -1     0 soft leather cap
+G  4  3062  -1     0 soft leather pants
+G  4  3065  -1     0 soft leather sleeves
+G  4  3063  -1     0 soft leather boots
+G  4  3064  -1     0 soft leather gloves
+G  4  3066  -1     0 studded leather jerkin
+G  4  3067  -1     0 studded leather cap
+G  4  3068  -1     0 studded leather skirt
+G  4  3071  -1     0 studded leather sleeves
+G  4  3069  -1     0 hard leather boots
+G  4  3070  -1     0 hard leather gloves
+G  4  3096  -1     0 wooden shield
+E  4  3024  -1    16 wields a warhammer
+E  4  3097  -1    11 wears a small shield
+M  0 10009   3  3059 the Meta-Physician
+E  4 30627   1    16 Meta's Eliara
+E  4   185   1    17 Meta's Cestus
+M  0  3006   1  3049 the Captain at Levee (boat salesman)
+G  4  3050  -1     0 raft
+G  4  3051  -1     0 canoe
+M  0  3040   1  3007 the Bartender in Quester's Inn
+G  4  3000  -1     0 barrel of beer
+G  4  3001  -1     0 bottle of beer
+E  4  3023  -1    16 wields a club
+M  0  3043   1  3003 the Cleric Guild waiter
+G  4  3002 100     0 bottle of ale
+G  4  3004 100     0 bottle of local specialty
+E  4  3026  -1    16 wields a mace
+E  4  3027  -1    17 wields a quarterstaff
+M  0  3045   1  3022 the Warrior Guild waiter
+G  4  3002  -1     0 bottle of ale
+G  4  3003  -1     0 bottle of firebreather
+G  4  3004  -1     0 bottle of local specialty
+E  4  3022  -1    16 wields a longsword
+M  0  3046   1  3048 Quark the bartender
+G  4  3003  -1     0 bottle of firebreather
+G  4  3004  -1     0 bottle of local specialty
+G  4  3005  -1     5 incandescent potion
+G  4  3094  -1     5 holy water
+E  4  3025  -1    16 wields a short sword
+M  0  3060  15  3004 Night Watchman 1
+E  4   250  -1    16 sword
+M  0  3060  15  3004 Night Watchman 2
+E  4   252  -1    16 wields mace
+M  0  3060  15  3014 Night Watchman 3
+E  4   252  -1    16 wields mace
+E  4   265  -1    18 banner
+E  4   264  -1     1 signet ring
+E  4   255  -1     3 cloak
+E  4   253  -1     5 vest
+E  4   256  -1     6 helmet
+E  4   257  -1     7 leggings
+E  4   258  -1     8 boots
+E  4   259  -1     9 gloves
+E  4   260  -1    10 sleeves
+E  4   254  -1    11 shield
+E  4   261  -1    12 cape
+E  4   262  -1    13 belt
+E  4   263  -1    14 bracer
+M  0  3060  15  3017 Night Watchman 4
+M  0  3060  15  3017 Night Watchman 5
+E  4   250  -1    16 sword
+M  0  3060  15  3021 Night Watchman 6
+M  0  3060  15  3021 Night Watchman 7
+E  4   265  -1     0 banner
+E  4   264  -1     1 signet ring
+E  4   255  -1     4 cloak
+E  4   253  -1     5 vest
+E  4   256  -1     6 helmet
+E  4   257  -1     7 leggings
+E  4   258  -1     8 boots
+E  4   259  -1     9 gloves
+E  4   260  -1    10 sleeves
+E  4   254  -1    11 shield
+E  4   261  -1    12 cape
+E  4   262  -1    13 belt
+E  4   263  -1    15 bracer
+E  4   250  -1    16 sword
+M  0  3060  15  3005 Night Watchman 8
+M  0  3060  15  3005 Night Watchman 9
+E  4   250  -1    16 sword
+M  0  3060  15  3046 Night Watchman 10
+M  0  3060  15  3047 Night Watchman 11
+M  0  3060  15  3047 Night Watchman 12
+M  0  3060  15  3111 Night Watchman 13
+M  0  3060  15  3111 Night Watchman 14
+M  0  3060  15  3111 Night Watchman 15
+M  0  3067   8  3041 Shock Trooper 1 at East Gate
+E  4   250  -1    16 sword
+M  0  3067   8  3041 Shock Trooper 2 at East Gate
+M  0  3067   8  3041 Shock Trooper 3 at East Gate
+M  0  3067   8  3040 Shock Trooper 1 at West Gate
+M  0  3067   8  3041 Shock Trooper 4 at East Gate
+E  4   264  -1     1 signet ring
+E  4   255  -1     4 cloak
+E  4   253  -1     5 vest
+E  4   256  -1     6 helmet
+E  4   257  -1     7 leggings
+E  4   258  -1     8 boots
+E  4   259  -1     9 gloves
+E  4   260  -1    10 sleeves
+E  4   254  -1    11 shield
+E  4   261  -1    12 cape
+E  4   262  -1    13 belt
+E  4   263  -1    15 bracer
+E  4   250  -1    16 sword
+M  0  3073   8  3049 Azrack's Warrior
+E  4 10001  -1    16 - Give Warrior Avenger (non-player kind)
+M  0  3073   8  3052 Azrack's Warrior
+E  4 10001  -1    16 - Give Warrior Avenger (non-player kind)
+M  0  3073   8  3053 -                                Azrack's Warrior
+E  4 10001  -1    16 - Give Warrior Avenger (non-player kind)
+M  0  3073   8  3049 -                                Azrack's Warrior
+E  4 10001  -1    16 - Give Warrior Avenger (non-player kind)
+M  0  3073   8  3052 -                                Azrack's Warrior
+E  4 10001  -1    16 - Give Warrior Avenger (non-player kind)
+M  0  3073   8  3053 -                                Azrack's Warrior
+E  4 10001  -1    16 - Give Warrior Avenger (non-player kind)
+M  0  3073   8  1017 -                                Azrack's Warrior
+E  4 10001  -1    16 - Give Warrior Avenger (non-player kind)
+M  0  3073   8  1017 -                                Azrack's Warrior
+E  4 10001  -1    16 - Give Warrior Avenger (non-player kind)
+M  0  3067   8  3040 Shock Trooper 2 at West Gate
+E  4   250  30    16 sword
+M  0  3067   8  3040 Shock Trooper 3 at West Gate
+E  4   250  30    16 - sword
+M  0  3067   8  3040 Shock Trooper 4 at West Gate
+E  4   265  10     0 banner
+E  4   264  10     1 signet ring
+E  4   255  10     3 cloak
+E  4   253  -1     5 vest
+E  4   256  -1     6 helmet
+E  4   257  -1     7 leggings
+E  4   258  -1     8 boots
+E  4   259  -1     9 gloves
+E  4   260  -1    10 sleeves
+E  4   254  -1    11 shield
+E  4   261  -1    12 cape
+E  4   262  -1    13 belt
+E  4   263  -1    15 bracer
+E  4   250  -1    16 sword
+M  0  3063   3  3026 A Mercenary (at Dark Alley)
+M  0  3063   3  3026 
+M  0  3063   3  3026 
+E  4  3021  -1    16 wields a whip
+M  0  3064   3  3007 A Happy Drunk (at Inn)
+M  0  3064   3  3007 
+M  0  3064   3  3007 
+M  0  3065   1  3048 the Old Man in Quark's
+M  0  9998   3  3048 the Giant Loud Mouth
+M  0  9998   3  3048 
+M  0  9998   3  3048 
+M  0  3062   6  3025 pink poodle 1
+M  0  3062   6  3025 
+M  0  3062   6  3016 pink poodle 2
+M  0  3062   6  3016 
+M  0  3062   6  3012 pink poodle 3
+M  0  3062   6  3012 
+M  0  3066   2  3143 large pitbull
+M  0  3066   2  3026 large pitbull
+M  0  3072   4  3025 mean llama 1
+M  0  3072   4  3016 mean llama 2
+M  0  3072   4  3012 mean llama 3
+M  0  3072   4  3026 mean llama 4
+M  0  3061   3  3006 sanitation engineer
+M  0  3061   3  3006 
+M  0  3061   3  3006 
+M  0  7012   1  3025 Madam Esther at Midwitch
+M  0  3090   1  3032 Kitten
+M  0  3091   1  3032 Puppy
+M  0  3092   1  3032 Beagle
+M  0  3093   1  3032 Rottweiler
+M  0  3069   1  3005 Funny Jester
+M  0  3068   3  3030 Blob
+M  0  3068   3  3048 Blob
+M  0  3068   3  3008 Blob
+M  0  3018   3  3059 Salesman
+M  0  3018   3  3025 Salesman
+M  0  3018   3  3007 Salesman
+M  0 32044   1  3014 The Tarrasque
+M  0  6440   1  3029 Caijin the Thief (Skill Quest Mob)
+M  0  3070   1  3060 Arnold the Terminator
+G  1  6368  -1     0 -Loads a simple quiver on Arnold.
+G  1  6367  -1     0 -Loads a light leather quiver on Arnold.
+G  1  6366  -1     0 -Loads a simple bow on Arnold.
+G  1  6365  -1     0 -Loads a longbow on Arnold.
+G  1  6364  -1     0 -Loads an arrow on Arnold.
+G  1  6363  -1     0 -Loads a sturdy arrow on Arnold.
+M  0  3071   3  3091 Cardinal Thelonius
+G  1  3094  -1     0 holy water for druid conjure elemental
+D  0  3029   0     2 thieves guild secret door 1
+D  0  3028   2     2 thieves guild secret door 2
+D  0  3028   0     2 thieves guild secret door 3
+M  0 17392   1  3060 -Loads Charles, the fletcher's assistant, for the Archery SQ.
+M  0 32047   1  3072 Fingers the Repair Guy
+O  0  3017   1  3096 Phish Aquarium
+O  0  2320  -1  3001 beer fountain in tavern
+M  0 10004   1  3054 GL Weapons Plat guy
+M  3 10030   1  3069 paul, vault vendor
+M  0 10027   1  3055 The quest master
+M  0    73   3  3055 The Quest Vender
+O  3    98   1  3001 mort punishment board
+* --- END OF MAIN TOWN FILE ---
+J  0     0   0     0 
+M  0  3089   1  3088 
+S
+$~

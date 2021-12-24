@@ -1,0 +1,12 @@
+* This file contains the list of the files which make up the objects
+* Comments are on lines that begin with a "*"
+* The files themselves, are located in the lib/objects directory
+* The file name should be surrounded with <tilda>s on a line of it's own.
+* ie: <tilda><enter>filename<tilda>
+* DO NOT USE TILDAS IN THE COMMENTS*
+~
+00000-96.obj~
+00101-0199.obj~
+00200-0299.obj~
+03000-3099.obj~
+$~

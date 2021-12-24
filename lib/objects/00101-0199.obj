@@ -1,0 +1,777 @@
+#101
+darkness globe~
+a room darkener obj (proc item)~
+An invisible object for the globe of darkness spell is here.~
+~
+12 134217728 0 0
+0 0 0 0 0
+0 0 0
+S
+#102
+component~
+-= Create Golem Components Below =-~
+An empty obj sits here dejectedly.~
+Fixed.~
+0 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#103
+component~
+-= Create Golem Bonus Powers Items: 7003, 7004 =-~
+An empty obj sits here dejectedly.~
+Fixed.~
+0 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#104
+pouch granite stone component~
+a small pouch of crushed granite~
+A small pouch of crushed granite and other strange sands has been discarded here.~
+Fixed.~
+12 8192 16385 1
+0 0 0 0 48
+5 60000 33
+S
+#105
+spirit rock stone component~
+a rock minion's spirit~
+A captured spirit writhes inside of a small rock here.~
+Fixed.~
+12 8194 16385 1
+0 0 0 0 48
+3 10000 33
+S
+#106
+torso rock dweller stone component~
+a hollow rock dweller's torso~
+The hollowed out torso of a rock dweller has had its limbs removed.~
+Fixed.~
+12 8192 16385 1
+0 0 0 0 48
+20 1000 33
+S
+#107
+rod small iron component~
+a small, sturdy rod of steel~
+A small and sturdy rod of steel has been discarded on the ground here.~
+Fixed.~
+12 8192 16385 1
+0 0 0 0 48
+10 81750 33
+S
+#108
+filings iron component~
+a small pile of iron filings~
+A small pile of iron filings sits on the ground here.~
+Fixed.~
+12 8192 16385 1
+0 0 0 0 48
+2 1000 33
+S
+#109
+heart guardian steel iron component~
+an iron guardian's steel heart~
+A shining, steel heart has been ripped from the chest of a magical creation.~
+Fixed.~
+12 8193 16385 1
+0 0 0 0 48
+8 35000 33
+S
+#110
+sphere storm prison spellprocobj~
+the storm~
+A sphere of crackling energy shines brilliantly here.~
+Fixed.~
+24 134217728 0 0
+0 2 -1 2 0
+0 0 48
+\rand_prog 100~
+if rand(85)
+    MPECHO $$BBolts of lightning arc through the air striking everything and everyone!$$R
+    MPDAMAGE allpc 1d1% energy hitpoints
+    else
+    if ispc($r)
+        MPECHOAT $r $$BA bolt of lightning arcs through the air to surge through your body. OUCH!$$R
+        MPECHOAROUND $r $$BA bolt of lightning arcs through the air to surge through $rs body.$$R
+        MPDAMAGE $r 2d1% energy hitpoints
+        endif
+    endif
+~
+|
+S
+#111
+fissure magma spellprocobj~
+the magma fissure~
+The earth has split here, revealing a magma fissure.~
+Fixed.~
+24 134217728 0 0
+0 2 -1 2 0
+0 0 48
+\can_see_prog 100~
+if isimmort($n)
+   MPRETVAL true
+   else
+   MPRETVAL false
+   endif
+~
+\rand_prog 100~
+MPECHO $$BGouts of lava and ash blast from the magma fissure.$$R
+MPDAMAGE allpc 1d1% undefined hitpoints
+MPDAMAGE allpc 4d25 fire hitpoints
+~
+\catch_prog 1~
+MPECHO $$BThe earth trembles and shudders as a rift opens along the floor venting $$4magma$$7.$$R
+~
+|
+S
+#112
+ground consecrate desecrate spellprocobj~
+The rune-filled circle~
+The consecrated ground is riddled with glowing runes.~
+Fixed.~
+24 134217728 0 0
+0 2 -1 2 0
+0 0 48
+\catch_prog 2~
+MPECHO A rune-filled circle appears above the ground, $$B$$4glowing$$R brightly.
+~
+\rand_prog 100~
+MPECHO The glowing circle pulses gently.
+~
+\catch_prog 1~
+MPECHO A rune-filled circle appears above the ground, $$B$$3glowing$$R brightly.
+~
+|
+S
+#113
+mortar shell~
+a mortar shell~
+A fired mortar shell lies on the ground sizzling.~
+Fixed.~
+12 3 0 2
+0 0 0 0 0
+1 1 0
+E
+mortar shell~
+The mortar shell is small and colored darkly.  The outside appears
+singed as if it had recently been exposed to intense heat.  You
+wonder why it's making a quiet sizzling noise.
+~
+S
+#133
+arcana portal nexus~
+a wave of arcane energy~
+A crackling wave of psychic and geomantic power engulfs the terrain.~
+~
+24 0 0 0
+2360 1 -1 0 0
+0 0 0
+E
+wave~
+The wave appears to be an ambulatory mass of energy, undulating from
+one location to the next.  As it moves, it obscures all it touches,
+but leaves the site unscathed by its touch.
+~
+S
+#137
+portal tequila bottle~
+a tequila bottle~
+A bottle of tequila lies tipped over on its side.~
+~
+24 0 0 0
+3001 1 -1 1 0
+0 0 0
+E
+tequila bottle~
+   The label of this bottle is faded by the sun and age, its once gaudy
+colors now a muted splash of pastels.  Beside it lies a withered slice
+of lime.
+~
+S
+#150
+sword spellsword gl specialgoditem~
+SpellBinder the SpellSword~
+A glowing blade of purest steel lays here in the dust.~
+~
+5 0 0 0
+0 4 10 3 0
+0 0 0
+A
+49 5
+A
+26 6
+A
+43 25
+A
+44 35
+S
+#151
+wavy kris gl specialgoditem~
+A wavy bladed kris~
+A wavy bladed steel kris lays in the dust here.~
+~
+5 0 0 0
+0 9 4 11 0
+0 0 0
+A
+37 15
+A
+26 7
+A
+42 15
+S
+#152
+hammer worn gl specialgoditem~
+A worn and rusted hammer~
+A rusted hammer of ancient origin gathers dust on the ground.~
+~
+5 0 0 0
+0 4 20 6 0
+0 0 0
+A
+26 7
+A
+34 100
+S
+#153
+sourne mask shadow gl~
+Sourne's Mask of Shadows~
+A pair of small eyes shimmer in the dust.~
+~
+9 0 0 0
+3 0 0 0 0
+0 0 0
+A
+14 100
+A
+32 100
+A
+17 15
+A
+26 5
+S
+#154
+krylar claws gl~
+Krylar's Rapacious Claws~
+Strong leather gloves on the ground catch your eye.~
+~
+9 0 0 0
+3 0 0 0 0
+0 0 0
+A
+13 100
+A
+1 3
+A
+17 10
+A
+26 5
+S
+#155
+boots cloud gl~
+Cloudwalking Boots~
+A pair of light sturdy boots rests on the ground here.~
+~
+9 0 0 0
+3 0 0 0 0
+0 0 0
+A
+13 100
+A
+26 5
+A
+35 100
+A
+12 100
+S
+#156
+leggings gazelle gl~
+The leggings of the Gazelle~
+Powerful mechanical legwear lays on the ground here.~
+~
+9 0 0 0
+3 0 0 0 0
+0 0 0
+A
+2 3
+A
+17 20
+A
+26 5
+S
+#157
+balis crimson bracer gl~
+Balis's Crimson Bracers~
+Powerful mechanical armwear lays on the ground here.~
+~
+9 0 0 0
+3 0 0 0 0
+0 0 0
+A
+17 60
+A
+26 4
+A
+5 2
+S
+#158
+runed breastplate plate gl~
+A Runed Breastplate~
+A lightweight suit of shiny chainmail lays on the ground here.~
+~
+9 0 0 0
+30 0 0 0 0
+0 0 0
+A
+13 25
+A
+25 20
+A
+26 5
+A
+12 25
+S
+#159
+sati sash gl~
+Sati's Indestructible Sash~
+An enormous belt lays on the ground here.~
+~
+15 0 0 0
+500 0 0 0 0
+0 0 0
+A
+26 6
+S
+#160
+ring fate gl specialgoditem~
+The Ring of Fate~
+You see a small ring which appears to be your destiny on the ground here.~
+~
+9 3 0 0
+50 0 0 0 0
+1 100 0
+A
+33 100
+A
+18 25
+A
+19 4
+S
+#161
+ring madman gl specialgoditem~
+A Madman's Ring~
+The ring on the ground makes your mind tilt and turn crazily.~
+~
+9 0 0 0
+3 0 0 0 0
+0 0 0
+A
+13 100
+A
+26 5
+A
+12 100
+S
+#162
+silver amulet magic gl specialgoditem~
+A Silver Amulet of Magic~
+Laying on the ground is a silver magickal amulet.~
+~
+9 0 0 0
+3 0 0 0 0
+0 0 0
+A
+13 75
+A
+26 4
+A
+12 125
+S
+#163
+skull iron gl specialgoditem~
+The Iron Skull~
+An iron skull lays on the ground here.~
+~
+9 0 0 0
+3 0 0 0 0
+0 0 0
+A
+17 10
+A
+26 6
+S
+#164
+plates cursed wrist gl specialgoditem~
+Tasslehoff's Cursed Wrist Plates~
+Two bands of shiny metal lay on the ground here awaiting you.~
+~
+9 0 0 0
+5 0 0 0 0
+0 0 0
+A
+17 10
+A
+26 7
+S
+#166
+morcallen barrier shield gl specialgoditem~
+Morcallen's Magickal Barrier~
+A magickal shield of shadowy light lays on the ground here.~
+~
+9 0 0 0
+3 0 0 0 0
+0 0 0
+A
+25 20
+A
+17 25
+A
+26 5
+A
+27 100
+S
+#169
+gumpa magic stick gl specialgoditem~
+Gumpa's Magic Stick~
+A runed stick of some value lays on the ground here.~
+~
+9 0 0 0
+3 0 0 0 0
+0 0 0
+A
+13 50
+A
+33 100
+A
+26 5
+S
+#172
+shadow dragon gl specialgoditem~
+The Dragon's Shadow~
+A shadow of a dragon is cast across the ground here at your feet.~
+~
+9 0 0 0
+3 0 0 0 0
+0 0 0
+A
+30 100
+A
+26 4
+A
+35 100
+S
+#173
+fleece shepherd gl specialgoditem~
+The Shepherd's Fleece~
+A pile of white fleece lays on the ground here.~
+~
+9 0 0 0
+3 0 0 0 0
+0 0 0
+A
+17 20
+A
+26 6
+S
+#174
+rogue loop gl specialgoditem~
+The Rogue's Loop~
+A sneaky little loop of gold lays on the ground here.~
+~
+9 0 0 0
+5 0 0 0 0
+0 0 0
+A
+17 10
+A
+25 10
+A
+26 5
+S
+#175
+lantern gl specialgoditem~
+The Stardaughter's Lantern~
+A tall ceramic lantern battered from the ages glows with a pure light.~
+~
+1 0 0 0
+0 0 -1 0 0
+0 0 0
+A
+13 50
+A
+26 5
+A
+34 100
+A
+12 50
+S
+#176
+ivory short sword gl~
+Ivory-Handled Short Sword~
+A short steel blade with a runed ivory handle lays here collecting dust.~
+~
+5 0 0 0
+0 5 5 11 0
+0 0 0
+A
+37 20
+A
+26 5
+A
+27 100
+S
+#177
+warstaff staff war gl~
+The War Staff~
+A long staff of ancient wood bound with dull copper lays here.~
+~
+9 0 0 0
+40 0 0 0 0
+0 0 0
+A
+13 125
+A
+26 6
+A
+12 125
+S
+#178
+crown maharani gl~
+The Maharani's Crown~
+A delicate crown of twisting gold lays here with delicate finesse.~
+~
+9 0 0 0
+3 0 0 0 0
+0 0 0
+A
+13 125
+A
+3 3
+A
+4 3
+A
+12 125
+S
+#179
+sword mystery gl~
+The Sword of Mystery~
+A dancing sword which flickers in and out of existence lays here, kind of.~
+~
+5 0 0 0
+0 6 6 3 0
+0 0 0
+A
+29 100
+A
+30 100
+A
+40 100
+A
+26 5
+S
+#180
+sati sash gl~
+Sati's Indestructible Sash~
+A silken sash, pleated in intricate folds, lies here.~
+~
+15 0 0 0
+500 0 0 0 0
+0 0 0
+A
+26 6
+S
+#181
+hilt gold trimmed etala~
+the $B$5gold-trimmed$R hilt~
+The shattered hilt of some mystical blade lies here.~
+~
+4 80 16385 1
+40 1 1 86 54
+3 100000 45
+S
+#182
+gem ruby catseye eye etala~
+the Cat's Eye $B$4Ruby$R~
+A beautifully crafted $B$4ruby$1 lies here glimmering.$R~
+~
+8 273 16385 1
+0 0 0 0 53
+5 200000 45
+A
+26 5
+S
+#183
+blade etala shattered~
+the $B$7shattered$R blade~
+A broken $B$7platinum$1 blade hums with enigmatic power.$R~
+~
+3 8376386 16385 1
+45 3 3 76 52
+10 50000 45
+A
+26 3
+A
+1 -2
+S
+#184
+blade shadow etala shadowblade~
+Etala the $B$0Shadowblade$R~
+The chosen weapon of the Nameless Ones rests against a far wall.~
+~
+5 5705795 8193 1
+0 6 8 3 59
+12 0 16421
+E
+etala blade shadowblade~
+Empty desc.
+This magnificant weapon was re-crafted from the three pieces of the
+the original legendary blade that was shattered in the great battle
+between Ghaura'sun and the Daine.
+~
+A
+26 6
+A
+43 5
+A
+44 10
+S
+#185
+hammer fang devil devilfang cestus~
+the Devilfang Cestus~
+A hammer, its hilt carved with hideous demonic faces, blazes in eager anticipation.~
+~
+5 67 8193 1
+0 8 8 6 61
+0 0 2093
+E
+cestus devilfang~
+A powerful malus that fits neatly over the fist seems to be able to
+magically adjust to the size of its bearer.  It is enhanced with
+numerous carvings of terrible demons, devils, and monsters.  It is
+unclear however, if the carvings are blessing or bane.
+Two words seem to be intertwined in the etchings and glow brightly
+under moonlight.  They read $Bpulsus$R and $Binfrendeo$R.
+~
+A
+41 53
+A
+43 19
+A
+19 7
+S
+#186
+blade shattered iron unforged~
+a shattered blade~
+A broken blade looks in no way magical.~
+~
+5 16 1 1
+0 3 4 8 20
+10 50000 2085
+A
+26 2
+S
+#189
+medal honour honor sorpigal reward~
+$B$5the Sorpigal Medal of Honour$R~
+A $B$5golden medal$1 sits here, engraved with the thanks of Sorpigal.$R~
+~
+33 67109139 16385 1
+0 0 0 0 49
+9 150000 1
+A
+26 5
+S
+#190
+locker lockers~
+a collection of yellow lockers~
+A stack of twelve yellow lockers is resting against the wall.~
+~
+15 0 0 0
+1000 15 191 0 0
+0 0 0
+S
+#191
+voucher clan prize one~
+$Ba Clan Rewards Voucher$R~
+A voucher redeemable for clan costs has been left here.~
+~
+8 16 16385 1
+0 0 0 0 1
+1 100 1
+E
+voucher clan~
+This voucher is redeemable for 250 platinum coins worth of
+clan costs.  These costs can include clan creation fees, clan hall
+costs, clan guard costs, or any other clan expenses.
+~
+S
+#192
+catstink stink cat~
+a small bag of low quality catstink~
+A small pungent bag lies discarded on the ground.~
+none~
+27 16384 16385 1
+1 1 0 3 24
+1 50000 0
+E
+catstink cat stink~
+This pungent cat-stink is very useful to those who take
+a "liberal" approach to other's belongings.  It can be
+setup to ward off those who might try to track down a
+fleet-footed rogue within the city.
+~
+S
+#193
+document ancient copy~
+a copy of an ancient document~
+An imitation of a rare and ancient document lies here.~
+Fixed.~
+16 16 16385 1
+0 0 0 0 51
+1 100000 1
+E
+document ancient copy~
+$B$0After you unroll the document you find a strange series of poetic text:$R
+Hear ye the tale of darkest night and shadowed souls,
+Of cutting blades, sundered light, and burning coals.
+The sword of power torn and rendered.
+Its aspects scattered, no mercy tendered.
+This blade of ancients both shattered and split,
+Its cutting edge sought by Darkest Smith.
+Its crimson eye of treasure and power,
+Held by wizard in a deadly tower.
+Last be the hilt flown to a King,
+Doth bring to bear a song on wings.
+Once should the parts be gathered and made,
+Then bring ye forth the Shadowblade!
+~
+S
+#194
+voucher clan ten~
+$B$7Ten Clan Rewards Vouchers$R~
+Ten vouchers redeemable for clan costs have been left here~
+~
+8 16 16385 1
+0 0 0 0 1
+1 100 1
+E
+voucher clan~
+This voucher is redeemable for 250 platinum coins worth of
+clan costs.  These costs can include clan creation fees, clan hall
+costs, clan guard costs, or any other clan expenses.
+~
+S
+#199
+sanction mark kill~
+A grey sanction~
+You stare at the proof of a hit, a cold grey sanction.~
+~
+9 0 0 0
+0 0 0 0 1
+0 0 0
+A
+1 1
+S
+$~
