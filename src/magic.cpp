@@ -12304,10 +12304,9 @@ int spell_icestorm(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
   else if(world[ch->in_room].sector_type == SECT_DESERT)
        dam = dam * 1 / 2;
 
-  sprintf(buf, "%d", dam);
-
-  send_damage("Your voice raises to a crescendo as you call forth nature's $B$3icy wrath$R to engulf your enemies, dealing | damage!", ch, 0, 0, buf, "Your voice raises to a crescendo as you call forth nature's $B$3icy wrath$R to engulf your enemies!", TO_CHAR);
-  send_damage("$n raises $s voice mightily as $e calls forth nature's $B$3icy wrath$R to engulf $s enemies, dealing | damage!", ch, 0, 0, buf, "$n raises $s voice mightily as $e calls forth nature's $B$3icy wrath$R to engulf $s enemies!", TO_ROOM);
+ send_to_char("$B$3Ice$R erupts from the earth!\r\n", ch);
+	act("$n makes $B$3ice$R fall erupt from the earth!\r\n", ch, 0, 0, TO_ROOM, 0);
+	
 
 	auto &character_list = DC::instance().character_list;
 	for (auto& tmp_victim : character_list) {
