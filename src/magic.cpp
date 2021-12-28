@@ -1355,7 +1355,7 @@ int spell_firestorm(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
 	char_data *next_victim = 0;
 	
 	send_to_char("$B$4Fire$R falls from the heavens!\n\r", ch);
-	act("$n makes $B$4fire$R fall from the heavens!\n\r", ch, 0, 0, TO_ROOM, 0);
+	act("$n makes $B$4fire$R fall from the heavens!", ch, 0, 0, TO_ROOM, 0);
 
 	for (char_data *victim = world[ch->in_room].people; victim && victim != reinterpret_cast<char_data *>(0x95959595); victim = next_victim) {
 	        next_victim = victim->next_in_room;
@@ -12305,7 +12305,7 @@ int spell_icestorm(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
        dam = dam * 1 / 2;
 
  send_to_char("$B$3Ice$R erupts from the earth!\r\n", ch);
-	act("$n makes $B$3ice$R fall erupt from the earth!\r\n", ch, 0, 0, TO_ROOM, 0);
+	act("$n makes $B$3ice$R fall erupt from the earth!", ch, 0, 0, TO_ROOM, 0);
 	
 
 	auto &character_list = DC::instance().character_list;
