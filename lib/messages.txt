@@ -992,4 +992,18 @@ $n's eyes flash as $e pools the energy within $m!~
 Your purging doesn't purge $N at all.~
 $n tries to purge you with ki storm, heh, what a loser.~
 $n tries to purge $N's soul, not gonna happen.~
+M
+ 132
+Your all-consuming storm of $B$3ICE$R freezes $N, killing $M instantly!~
+An all-consuming storm of $B$3ICE$R freezes you solid, causing a painful end to your life!~
+$n brings forth an all-consuming storm of $B$3ICE$R that freezes $N solid!~
+$N seems unharmed by your frigid $B$3icestorm$R.~
+You are unharmed as $n's $B$3icestorm$R swirls around you.~
+$N seems quite comfortable within $n's frigid $B$3icestorm$R.~
+Your all-consuming storm of $B$3ICE$R erupts from the earth and surrounds $N!~
+$n's all-consuming storm of $B$3ICE$R erupts from the earth and surrounds you!~
+$n calls forth an all-consuming storm of $B$3ICE$R to freeze $N badly.~
+$N breaks out a parka at the sight of your $B$3icestorm$R.~
+You break out a parka at the sight of $n's $B$3icestorm$R.~
+$N breaks out a parka at the sight of $n's $B$3icestorm$R.~
 $~
