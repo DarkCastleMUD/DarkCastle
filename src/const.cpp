@@ -959,7 +959,7 @@ const char *extra_bits[] =
 const char *more_obj_bits[] =
 {
     "NO_RESTRING",
-    "UNUSED",
+    "LIMIT_SACRIFICE",
     "UNIQUE",
     "NO_TRADE",
     "NO_NOTICE",
