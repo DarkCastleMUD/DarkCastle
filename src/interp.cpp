@@ -209,7 +209,7 @@ struct command_info cmd_info[] =
         {"track", do_track, POSITION_STANDING, 0, CMD_TRACK, 0, 10},
         {"take", do_get, POSITION_RESTING, 0, CMD_DEFAULT, COM_CHARMIE_OK, 0},
         {"palm", do_get, POSITION_RESTING, 3, CMD_PALM, 0, 1},
-        {"sacrifice", do_tap, POSITION_RESTING, 0, CMD_SACRIFICE, COM_CHARMIE_OK, 25},
+        {"sacrifice", do_sacrifice, POSITION_RESTING, 0, CMD_SACRIFICE, COM_CHARMIE_OK, 25},
         {"taste", do_taste, POSITION_RESTING, 0, CMD_DEFAULT, COM_CHARMIE_OK, 25},
         {"unlock", do_unlock, POSITION_RESTING, 0, CMD_DEFAULT, COM_CHARMIE_OK, 25},
         {"use", do_use, POSITION_RESTING, 0, CMD_DEFAULT, COM_CHARMIE_OK, 25},
@@ -232,7 +232,7 @@ struct command_info cmd_info[] =
         {"smite", do_smite, POSITION_FIGHTING, 0, CMD_DEFAULT, 0, 0},
 
         // Junk movedso join precedes it
-        {"junk", do_tap, POSITION_RESTING, 0, CMD_SACRIFICE, COM_CHARMIE_OK, 25},
+        {"junk", do_sacrifice, POSITION_RESTING, 0, CMD_SACRIFICE, COM_CHARMIE_OK, 25},
 
         {"murder", do_murder, POSITION_FIGHTING, 0, CMD_DEFAULT, COM_CHARMIE_OK, 0},
         {"rescue", do_rescue, POSITION_FIGHTING, 0, CMD_DEFAULT, 0, 0},

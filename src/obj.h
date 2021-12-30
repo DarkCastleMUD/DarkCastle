@@ -121,7 +121,7 @@
 /* Bitvector for 'more_flags' */
 
 #define ITEM_NO_RESTRING        1U
-#define ITEM_UNUSED		        1U<<1
+#define ITEM_LIMIT_SACRIFICE    1U<<1
 #define ITEM_UNIQUE             1U<<2
 #define ITEM_NO_TRADE           1U<<3
 #define ITEM_NONOTICE           1U<<4  // Item doesn't show up on 'look' but

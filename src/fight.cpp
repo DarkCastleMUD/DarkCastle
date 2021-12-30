@@ -4032,7 +4032,7 @@ void make_scraps(CHAR_DATA *ch, struct obj_data *obj)
 
 void make_corpse(CHAR_DATA * ch)
 {
-  struct obj_data *corpse, *o, *tmp_o, *blah;
+  struct obj_data *corpse, *o, *o_in_container, *next_o_in_container;
   struct obj_data *money, *next_obj;
   extern struct obj_data *object_list;
   char buf[MAX_STRING_LENGTH];
@@ -4096,6 +4096,57 @@ void make_corpse(CHAR_DATA * ch)
     corpse->obj_flags.timer = MAX_PC_CORPSE_TIME;
     SET_BIT(GET_OBJ_EXTRA(corpse), ITEM_PC_CORPSE);
     GET_OBJ_VROOM(corpse) = GET_ROOM_VNUM(ch->in_room);
+  }
+
+  if (ch->mobdata)
+  {
+    // Charmie/golem corpses get flag ITEM_LIMIT_SACRIFICE which limits them from being sacrificed
+    // if they contain items
+    if (ISSET(ch->mobdata->actflags, ACT_CHARM) || GET_RACE(ch) == RACE_GOLEM)
+    {
+      SET_BIT(corpse->obj_flags.more_flags, ITEM_LIMIT_SACRIFICE);
+    }
+    else
+    {
+      // Mob corpses with level 50+ equipment also get flag ITEM_LIMIT_SACRIFICE
+      for (i = 0; i < MAX_WEAR; i++)
+      {
+        if (ch->equipment[i] && ch->equipment[i]->obj_flags.eq_level >= 50)
+        {
+          SET_BIT(corpse->obj_flags.more_flags, ITEM_LIMIT_SACRIFICE);
+          break;
+        }
+      }
+
+      // If the above didn't already set the corpse object with flag ITEM_LIMIT_SACRIFICE
+      // then we search its inventory including container contents
+      if (!IS_SET(corpse->obj_flags.more_flags, ITEM_LIMIT_SACRIFICE))
+      {
+        for (o = ch->carrying; o; o = next_obj)
+        {
+          next_obj = o->next_content;
+
+          if (o->obj_flags.eq_level >= 50)
+          {
+            SET_BIT(corpse->obj_flags.more_flags, ITEM_LIMIT_SACRIFICE);
+            break;
+          }
+
+          if (GET_ITEM_TYPE(o) == ITEM_CONTAINER)
+          {
+            for (o_in_container = o->contains; o_in_container; o_in_container = next_o_in_container)
+            {
+              next_o_in_container = o_in_container->next_content;
+              if (o_in_container->obj_flags.eq_level >= 50)
+              {
+                SET_BIT(corpse->obj_flags.more_flags, ITEM_LIMIT_SACRIFICE);
+                break;
+              }
+            } // if and for
+          }
+        } // for
+      }
+    }
   }
 
   // level 1-19 PC's can keep their eq
@@ -4194,10 +4245,10 @@ void make_corpse(CHAR_DATA * ch)
     
       if(IS_SET(o->obj_flags.extra_flags, ITEM_SPECIAL) &&
         (GET_ITEM_TYPE(o) == ITEM_CONTAINER))
-        for(tmp_o = o->contains; tmp_o; tmp_o = blah) {
-          blah = tmp_o->next_content;
-          if(!IS_SET(tmp_o->obj_flags.extra_flags, ITEM_SPECIAL)) {
-            move_obj(tmp_o, corpse);
+        for(o_in_container = o->contains; o_in_container; o_in_container = next_o_in_container) {
+          next_o_in_container = o_in_container->next_content;
+          if(!IS_SET(o_in_container->obj_flags.extra_flags, ITEM_SPECIAL)) {
+            move_obj(o_in_container, corpse);
           }
         } // if and for
       

@@ -65,7 +65,7 @@ void log_sacrifice(CHAR_DATA *ch, OBJ_DATA *obj, bool decay = FALSE)
   }
 }
 
-int do_tap(struct char_data *ch, char *argument, int cmd)
+int do_sacrifice(struct char_data *ch, char *argument, int cmd)
 {
   struct obj_data *obj;
   char name[MAX_INPUT_LENGTH+1];
@@ -130,6 +130,13 @@ int do_tap(struct char_data *ch, char *argument, int cmd)
   if (ch->in_room == real_room(3099)) {
      send_to_char("Not in the donation room.\n\r", ch);
      return(eFAILURE);
+  }
+
+  if (IS_SET(obj->obj_flags.more_flags, ITEM_LIMIT_SACRIFICE) && obj->contains)
+  {
+    act("You attempt to sacrifice $p to the gods but they refuse your foolish gift. Empty it first.", ch, obj, 0, TO_CHAR , 0);
+    act("$n attempts to foolishly sacrifices $p to $s god.", ch, obj, 0, TO_ROOM , 0);
+    return eFAILURE;
   }
 
   act("$n sacrifices $p to $s god.", ch, obj, 0, TO_ROOM , 0);
