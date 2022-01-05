@@ -4102,7 +4102,7 @@ void make_corpse(CHAR_DATA * ch)
   {
     // Charmie/golem corpses get flag ITEM_LIMIT_SACRIFICE which limits them from being sacrificed
     // if they contain items
-    if (ISSET(ch->mobdata->actflags, ACT_CHARM) || GET_RACE(ch) == RACE_GOLEM)
+    if (ISSET(ch->mobdata->actflags, ACT_CHARM))
     {
       SET_BIT(corpse->obj_flags.more_flags, ITEM_LIMIT_SACRIFICE);
     }
