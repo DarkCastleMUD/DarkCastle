@@ -1,0 +1,60 @@
+skill
+failure duration
+success duration
+
+
+bladeshield
+6
+12
+
+tactics
+0
+1 + learned/10
+
+make camp
+0
+1 + learned/9
+
+triage
+6
+6
+
+battlesense
+0
+1 + learned/11
+
+smite
+22 - learned/10
+22 - learned/10
+
+leadership
+0
+1 + learned/20
+
+perseverance
+0
+1 + learned/11
+
+do_defenders_stance
+0
+1 + learned/12
+
+do_onslaught
+7
+1 + learned/15
+
+-----------------
+bloodfury (gives HP based on skill level)
+30 - (level / 6) (changing to 1)
+42
+
+crazed assault (gives 5-25 hitroll)
+10 - learned / 10  (changing to 1)
+10 - learned / 10
+
+ferocity (increased regen and hp for group)
+0
+1 + learned / 10
+
+
+
