@@ -748,7 +748,7 @@ int do_bloodfury(struct char_data *ch, char *argument, int cmd)
   {
     act("$n starts breathing heavily, then chokes and tries to clear $s head.", ch, NULL, NULL, TO_ROOM, NOTVICT);
     send_to_char("You try to pysch yourself up and choke on the taste of blood.\r\n", ch);
-    duration = 30 - (GET_LEVEL(ch) / 6);
+    duration = 1;
   }
   else 
   {
@@ -793,7 +793,7 @@ int do_crazedassault(struct char_data *ch, char *argument, int cmd)
 
   if(!skill_success(ch,NULL,SKILL_CRAZED_ASSAULT)) {
     send_to_char("You try to psyche yourself up for it but just can't muster the concentration.\r\n", ch);
-    duration = 10 - has_skill(ch, SKILL_CRAZED_ASSAULT) / 10;
+    duration = 1;
   }
   else {
     send_to_char("Your mind focuses completely on hitting your opponent.\r\n", ch);
