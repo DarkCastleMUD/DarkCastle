@@ -2501,7 +2501,7 @@ void checkConsecrate(int pulseType)
                      continue;
                   }
 
-                  if (GET_LEVEL(tmp_ch) >= IMMORTAL)
+                  if (IS_PC(tmp_ch) && GET_LEVEL(tmp_ch) >= IMMORTAL)
                   {
                      continue;
                   }
@@ -2541,7 +2541,7 @@ void checkConsecrate(int pulseType)
             for (tmp_ch = world[obj->in_room].people; tmp_ch; tmp_ch = next_ch)
             {
                next_ch = tmp_ch->next_in_room;
-               if (GET_LEVEL(tmp_ch) >= IMMORTAL)
+               if (IS_PC(tmp_ch) && GET_LEVEL(tmp_ch) >= IMMORTAL)
                {
                   continue;
                }
