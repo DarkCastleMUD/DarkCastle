@@ -172,6 +172,7 @@ void weather_update();
 void send_hint();
 extern void pulse_command_lag();
 void checkConsecrate(int);
+void update_max_who(void);
 
 //extern char greetings1[MAX_STRING_LENGTH];
 //extern char greetings2[MAX_STRING_LENGTH];
@@ -415,6 +416,8 @@ void finish_hotboot()
     do_on_login_stuff(d->character);
 
     STATE(d) = conn::PLAYING;
+
+    update_max_who();
   }
 
   for (d = descriptor_list; d; d = d->next)
