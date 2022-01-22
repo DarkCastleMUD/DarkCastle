@@ -637,11 +637,6 @@ int do_who(struct char_data *ch, char *argument, int cmd)
     add_to_who(immbuf);
   }
 
-  if ((numPC + numImmort) > max_who)
-  {
-    max_who = numPC + numImmort;
-  }
-
   sprintf(buf, "\n\r"
                "    Visible Players Connected:   %d\n\r"
                "    Visible Immortals Connected: %d\n\r"
