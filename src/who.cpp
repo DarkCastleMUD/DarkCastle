@@ -532,45 +532,15 @@ int do_who(struct char_data *ch, char *argument, int cmd)
         infoField = infoBuf;
         sprintf(infoBuf, "    $5Moose$R    ");
       }
-      else if (!strcmp(GET_NAME(i), "Wendy"))
-      {
-        infoField = infoBuf;
-        sprintf(infoBuf, " $B$2Ital$7ian $4Chef$R");
-      }
       else if (!strcmp(GET_NAME(i), "Pirahna"))
       {
         infoField = infoBuf;
         sprintf(infoBuf, "   $B$4>$5<$1($2($1($5:$4>$R   ");
       }
-      else if (!strcmp(GET_NAME(i), "Wynn"))
-      {
-        infoField = infoBuf;
-        sprintf(infoBuf, "  $1$B//\\$4o.o$1/\\\\$R  ");
-      }
-      else if (!strcmp(GET_NAME(i), "Scyld"))
-      {
-        infoField = infoBuf;
-        sprintf(infoBuf, "    $B$4H$5i$2p$3p$1i$6e$R   ");
-      }
-      else if (!strcmp(GET_NAME(i), "Elder"))
-      {
-        infoField = infoBuf;
-        sprintf(infoBuf, " $B$5Fear$0The$5Beard$R");
-      }
-      else if (!strcmp(GET_NAME(i), "Sergio"))
-      {
-        infoField = infoBuf;
-        sprintf(infoBuf, " $4Evil Genius$R");
-      }
       else if (!strcmp(GET_NAME(i), "Petra"))
       {
         infoField = infoBuf;
         sprintf(infoBuf, "    $B$1R$2o$1a$2d$1i$2e$R   ");
-      }
-      else if (!strcmp(GET_NAME(i), "Zen"))
-      {
-        infoField = infoBuf;
-        sprintf(infoBuf, "  $2$BLead $5Dingo$R ");
       }
       else
       {
