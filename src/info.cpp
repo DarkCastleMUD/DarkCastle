@@ -2277,9 +2277,6 @@ int do_count(struct char_data *ch, char *arg, int cmd)
       total++;
    }
 
-   if(total > max_who)
-      max_who = total;
-
    csendf(ch, "There are %d visible players connected, %d of which are immortals.\n\r", total, immortal);
    csendf(ch, "%d warriors, %d clerics, %d mages, %d thieves, %d barbarians, %d monks,\n\r", clss[CLASS_WARRIOR], clss[CLASS_CLERIC], clss[CLASS_MAGIC_USER], clss[CLASS_THIEF], clss[CLASS_BARBARIAN], clss[CLASS_MONK]);
    csendf(ch, "%d paladins, %d antipaladins, %d bards, %d druids, and %d rangers.\n\r",
