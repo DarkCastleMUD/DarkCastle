@@ -358,6 +358,30 @@ OBJ_DATA *clan_altar(char_data *ch)
    return NULL;
 }
 
+void update_max_who(void)
+{
+   uint64_t players = 0;
+   for (auto d = descriptor_list; d != nullptr; d = d->next)
+   {
+      switch (d->connected)
+      {
+      case conn::PLAYING:
+      case conn::EDIT_MPROG:
+      case conn::EDITING:
+      case conn::EXDSCR:
+      case conn::SEND_MAIL:
+      case conn::WRITE_BOARD:
+         players++;
+         break;
+      }
+   }
+
+   if (players > max_who)
+   {
+      max_who = players;
+   }
+}
+
 // stuff that has to be done on both a normal login, as well as on
 // a hotboot login
 void do_on_login_stuff(char_data *ch)
@@ -1957,6 +1981,8 @@ void nanny(struct descriptor_data *d, string arg)
          check_maxes(ch); // Check skill maxes.
 
          STATE(d) = conn::PLAYING;
+         update_max_who();
+         
          if (GET_LEVEL(ch) == 0)
          {
             do_start(ch);
