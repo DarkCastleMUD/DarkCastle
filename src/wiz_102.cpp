@@ -5088,9 +5088,6 @@ int do_sockets(struct char_data *ch, char *argument, int cmd)
       
   } // for
 
-  if(num_can_see > max_who)
-    max_who = num_can_see;
-
   sprintf(buf + strlen(buf), "\n\r\n\rThere are %d connections.\n\r", num_can_see);
   page_string(ch->desc, buf, 1);
   return eSUCCESS;
