@@ -2069,44 +2069,44 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
             if (spl == SPELL_BURNING_HANDS || spl == SPELL_FIREBALL || spl == SPELL_FIRESTORM || spl == SPELL_HELLSTREAM)
             {
               if (fil == FILTER_MAGIC && fillvl > 50)
-                rel = 1.5;
+                rel = 1.25;
               else if (fil == FILTER_ENERGY && fillvl > 70)
-                rel = 2;
+                rel = 1.5;
               else if (fil == FILTER_COLD && fillvl > 90)
-                rel = 2.5;
+                rel = 1.75;
               else
                 fil = 0;
             }
             else if (spl == SPELL_MAGIC_MISSILE || spl == SPELL_METEOR_SWARM)
             {
               if (fil == FILTER_FIRE && fillvl > 50)
-                rel = 1.5;
+                rel = 1.25;
               else if (fil == FILTER_COLD && fillvl > 70)
-                rel = 2;
+                rel = 1.5;
               else if (fil == FILTER_ENERGY && fillvl > 90)
-                rel = 2.5;
+                rel = 1.75;
               else
                 fil = 0;
             }
             else if (spl == SPELL_LIGHTNING_BOLT)
             {
               if (fil == FILTER_COLD && fillvl > 50)
-                rel = 1.5;
+                rel = 1.25;
               else if (fil == FILTER_FIRE && fillvl > 70)
-                rel = 2;
+                rel = 1.5;
               else if (fil == FILTER_MAGIC && fillvl > 90)
-                rel = 2.5;
+                rel = 1.75;
               else
                 fil = 0;
             }
             else if (spl == SPELL_CHILL_TOUCH)
             {
               if (fil == FILTER_ENERGY && fillvl > 50)
-                rel = 1.5;
+                rel = 1.25;
               else if (fil == FILTER_MAGIC && fillvl > 70)
-                rel = 2;
+                rel = 1.5;
               else if (fil == FILTER_FIRE && fillvl > 90)
-                rel = 2.5;
+                rel = 1.75;
               else
                 fil = 0;
             }
