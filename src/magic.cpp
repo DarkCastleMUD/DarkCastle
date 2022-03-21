@@ -222,7 +222,7 @@ int spell_magic_missile(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct ob
   int weap_spell = obj?WIELD:0;
 
   set_cantquit( ch, victim );
-  dam = 50 + getRealSpellDamage(ch);
+  dam = 15 + getRealSpellDamage(ch);
     count += (skill > 15) + (skill > 35) + (skill > 55) + (skill > 75); 
 
 	/* Spellcraft Effect */
@@ -244,7 +244,7 @@ int spell_magic_missile(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct ob
 int spell_chill_touch(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
 {
   struct affected_type af;
-  int dam = 250;
+  int dam = 300;
   int save;
   int weap_spell = obj?WIELD:0;
   int retval;
@@ -288,7 +288,7 @@ int spell_burning_hands(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct ob
 {
   int dam;
   set_cantquit( ch, victim );
-  dam = 150;
+  dam = 165;
   if(level > 200) return damage(ch, victim, dam, TYPE_HIT + level - 200, SPELL_BURNING_HANDS, 0);
   else return damage(ch, victim, dam, TYPE_FIRE, SPELL_BURNING_HANDS, 0);
 }
@@ -311,7 +311,7 @@ int spell_lightning_bolt(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct o
   int dam;
   int weap_spell = obj?WIELD:0;
   set_cantquit( ch, victim );
-  dam = 200;
+  dam = 240;
   if(level > 200) return damage(ch, victim, dam, TYPE_HIT + level - 200, SPELL_LIGHTNING_BOLT, weap_spell);
   else return damage(ch, victim, dam, TYPE_ENERGY, SPELL_LIGHTNING_BOLT, weap_spell);
 }
@@ -327,7 +327,7 @@ spell_colour_spray(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim,
   int dam;
   int weap_spell = obj ? WIELD : 0;
   set_cantquit(ch, victim);
-  dam = 350;
+  dam = 370;
 
   if (number(1, 100) > get_saves(victim, SAVE_TYPE_MAGIC) + 40
       && (skill > 50 || IS_NPC(ch))) {
@@ -379,7 +379,7 @@ int spell_drown(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *
    }
 
    set_cantquit( ch, victim );
-   dam = 250;
+   dam = 265;
    retval = damage(ch, victim, dam, TYPE_WATER, SPELL_DROWN, weap_spell);
    if(SOMEONE_DIED(retval))
      return retval;
@@ -519,7 +519,7 @@ int spell_meteor_swarm(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
   int dam;
   int weap_spell = obj?WIELD:0;
   set_cantquit( ch, victim );
-  dam = 500;
+  dam = 600;
   int retval;
 
   if(level > 200) retval = damage(ch, victim, dam,TYPE_HIT + level - 200, SPELL_METEOR_SWARM, weap_spell);
@@ -546,7 +546,7 @@ int spell_fireball(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
    int dam;
    int weap_spell = obj?WIELD:0;
    set_cantquit( ch, victim );
-   dam = 300;
+   dam = 340;
    int retval;
 
    if(level > 200) retval = damage(ch, victim, dam, TYPE_HIT + level - 200, SPELL_FIREBALL, weap_spell);
@@ -1113,7 +1113,7 @@ int spell_solar_gate(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
         (!ARE_GROUPED(ch,tmp_victim)) && (can_be_attacked(ch, tmp_victim)))
      {
 
-       dam = 600;
+       dam = 660;
        retval = damage(ch, tmp_victim, dam,TYPE_FIRE, SPELL_SOLAR_GATE, 0);
        if(IS_SET(retval, eCH_DIED))
 	 return retval;
@@ -1142,7 +1142,7 @@ int spell_solar_gate(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
 	     (can_be_attacked(tmp_victim, tmp_victim)))
           {
 	   char buf[MAX_STRING_LENGTH];
-            dam = 300; //dice(level, 10) + skill/2;
+            dam = 360; //dice(level, 10) + skill/2;
 	    sprintf(buf,"You are ENVELOPED in a PAINFUL BRIGHT LIGHT pouring in %s.",desc_dirs[i]);
 	    act(buf, tmp_victim, 0, ch, TO_CHAR, 0);
 
@@ -1368,7 +1368,7 @@ int spell_firestorm(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_da
 			continue;
 		}
 
-		dam = 250;
+		dam = 300;
 
 		if (level > 200) {
 			retval2 = damage(ch, victim, dam, TYPE_HIT + level - 200, SPELL_FIRESTORM, 0);
@@ -1445,7 +1445,7 @@ int spell_dispel_evil(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
    }
    align = GET_ALIGNMENT(victim);
    if(align < 0) align = 0-align;
-   dam = 350 + align / 10;
+   dam = 370 + align / 10;
 
    return damage(ch, victim, dam, TYPE_COLD, SPELL_DISPEL_EVIL, weap_spell);
   }
@@ -1485,7 +1485,7 @@ int spell_dispel_good(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
    }
    align = GET_ALIGNMENT(victim);
    if(align < 0) align = 0-align;
-   dam = 350 + align / 10;
+   dam = 370 + align / 10;
 
    return damage(ch, victim, dam, TYPE_COLD, SPELL_DISPEL_GOOD, weap_spell);
   }
@@ -1516,7 +1516,7 @@ int spell_harm(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *o
   int dam;
   int weap_spell = obj?WIELD:0;
   set_cantquit( ch, victim );
-  dam = 150;
+  dam = 165;
 
   return damage(ch, victim, dam, TYPE_MAGIC, SPELL_HARM, weap_spell);
 }
@@ -1531,11 +1531,11 @@ int spell_power_harm(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
   set_cantquit( ch, victim );
 
   if(IS_EVIL(ch))
-     dam = 500;
+     dam = 530;
   else if(IS_NEUTRAL(ch))
-     dam = 400;
+     dam = 430;
   else
-     dam = 300;
+     dam = 330;
 
   return damage(ch, victim, dam, TYPE_MAGIC, SPELL_POWER_HARM, weap_spell);
 }
@@ -5589,7 +5589,7 @@ int spell_cause_light(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
    }
 
    set_cantquit(ch, victim);
-   dam = dice(1, 8) + (skill/3);
+   dam = dice(1, 9) + (skill/3);
    return damage(ch, victim, dam, TYPE_MAGIC, SPELL_CAUSE_LIGHT, weap_spell);
 }
 
@@ -5609,7 +5609,7 @@ int spell_cause_critical(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct o
 
     set_cantquit(ch, victim);
     
-    dam = dice(3,8)-6+skill/2;
+    dam = dice(3,9)+skill/1.5;
 
     return damage(ch, victim, dam, TYPE_MAGIC, SPELL_CAUSE_CRITICAL, weap_spell);
 }
@@ -5628,7 +5628,7 @@ int spell_cause_serious(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct ob
 
     set_cantquit(ch, victim);
 
-    dam = dice(2, 8) + (skill/2);
+    dam = dice(2, 9) + (skill/1.75);
 
    return damage(ch, victim, dam,TYPE_MAGIC, SPELL_CAUSE_SERIOUS, 0);
 }
@@ -5647,7 +5647,7 @@ int spell_flamestrike(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
    }
 
    set_cantquit (ch, victim);
-   dam = 375;
+   dam = 400;
 
    retval = damage(ch, victim, dam, TYPE_FIRE, SPELL_FLAMESTRIKE, weap_spell);
 
@@ -6069,7 +6069,7 @@ int spell_hellstream(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_d
    int dam;
 
    set_cantquit (ch, victim);
-   dam = 800;
+   dam = 950;
    if(level > 200) return damage(ch, victim, dam,TYPE_HIT + level - 200, SPELL_HELLSTREAM, 0);
    else return damage(ch, victim, dam,TYPE_FIRE, SPELL_HELLSTREAM, 0);
 }
@@ -12293,7 +12293,7 @@ int spell_icestorm(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_dat
   char buf[MAX_STRING_LENGTH];
 
   int learned = has_skill(ch, SPELL_ICESTORM);
-  dam = 25+learned*4;
+  dam = 25+learned*4.25;
 
   if(world[ch->in_room].sector_type == SECT_FROZEN_TUNDRA)
        dam = dam * 5 / 4;
