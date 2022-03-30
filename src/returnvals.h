@@ -7,7 +7,7 @@
 #ifndef _RETURNVALS_H_
 #define _RETURNVALS_H_
 
-enum {
+enum ReturnValue {
   eFAILURE          = 1U,
   eSUCCESS          = 1U<<1,
   eCH_DIED          = 1U<<2,
