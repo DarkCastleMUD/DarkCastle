@@ -47,7 +47,7 @@ struct ki_info_type ki_info [ ] = {
 },
 
 { /* 1 */
-	3*PULSE_TIMER, POSITION_FIGHTING, 15,
+	3*PULSE_TIMER, POSITION_FIGHTING, 12,
 	TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, ki_punch,
 	SKILL_INCREASE_HARD
 },
@@ -498,17 +498,16 @@ int ki_punch(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
   }
 
   set_cantquit(ch, vict);
-  int dam = vict->getHP() / 4, manadam = GET_MANA(vict) / 4;
-  int retval;
+  auto dam = number(500, 700);
+  auto manadam = GET_MANA(vict) / 4;
+  int retval = eFAILURE;
 
-  dam = MAX(350, dam);
-  dam = MIN(1000, dam);
   manadam = MAX(150, manadam);
   manadam = MIN(750, manadam);
   if (vict->getHP() < 500000)
   {
-    if (number(1, 101) <
-        GET_LEVEL(ch) / 5 + has_skill(ch, KI_OFFSET + KI_PUNCH) / 2 - GET_LEVEL(vict) / 5)
+    int success_chance = (GET_LEVEL(ch) / 5) + (has_skill(ch, KI_OFFSET + KI_PUNCH) * 0.75) - (GET_LEVEL(vict) / 5);
+    if (number(1, 101) < success_chance)
 
     {
       GET_MANA(vict) -= manadam;
