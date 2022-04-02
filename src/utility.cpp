@@ -225,6 +225,18 @@ int str_cmp( const char *arg1, const char *arg2 )
     return 0;
 }
 
+string space_to_underscore(string str)
+{
+  for_each(str.begin(), str.end(), [](auto c){
+    if (c == ' ')
+    {
+      c = '_';
+    }
+  });
+
+  return str;
+}
+
 char *str_nospace(const char *stri)
 {
   if (!stri) return "";
@@ -262,6 +274,29 @@ int str_n_nosp_cmp( const char *arg1, const char *arg2, int size)
   dc_free(tmp_arg1);
   
   return retval;
+}
+
+MatchType str_n_nosp_cmp_begin(string arg1, string arg2)
+{
+  auto tmp_arg1 = space_to_underscore(arg1);
+  auto tmp_arg2 = space_to_underscore(arg2);
+
+  // It matches
+  if (strncasecmp(tmp_arg1.c_str(), tmp_arg2.c_str(), tmp_arg1.length()) == 0)
+  {
+    if (tmp_arg1.length() == tmp_arg2.length())
+    {
+      return MatchType::Exact;
+    }
+    else
+    {
+      return MatchType::Subset;
+    }
+  }
+  else
+  {
+    return MatchType::Failure;
+  }
 }
 
 // TODO - Declare these in a more appropriate place
@@ -1662,7 +1697,7 @@ void double_dollars(char * destination, char * source)
 // convert char string to int
 // return true if successful, false if error
 // also check to make sure it's in the valid range
-bool check_range_valid_and_convert(int & value, char * buf, int begin, int end)
+bool check_range_valid_and_convert(int & value, const char * buf, int begin, int end)
 {
    value = atoi(buf);
    if(value == 0 && strcmp(buf, "0"))

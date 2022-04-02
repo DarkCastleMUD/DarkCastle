@@ -364,6 +364,8 @@ inline const short IS_ANONYMOUS(CHAR_DATA *ch)
 #define IS_NEUTRAL(ch) (!IS_GOOD(ch) && !IS_EVIL(ch))
 #define IS_SINGING(ch) (!((ch)->songs.empty()))
 
+enum MatchType { Failure, Subset, Exact };
+
 char *str_hsh(const char *);
 bool ishashed(char *);
 void double_dollars(char * destination, char * source);
@@ -377,6 +379,7 @@ int 	dice		(int number, int size);
 int	str_cmp		(const char *arg1, const char *arg2);
 int	str_nosp_cmp	(const char *arg1, const char *arg2);
 int     str_n_nosp_cmp  (const char *arg1, const char *arg2, int size);
+MatchType str_n_nosp_cmp_begin(string arg1, string arg2);
 char *  str_nospace     (const char *stri);
 char *	str_dup		(const char *str);
 char *	str_dup0	(const char *str);
@@ -486,7 +489,7 @@ int is_ignoring(struct char_data *ch, struct char_data *i);
 void colorCharSend(char* s, struct char_data* ch);
 void send_to_char_regardless(char *messg, struct char_data *ch);
 int csendf(struct char_data *ch, const char *arg, ...);
-bool check_range_valid_and_convert(int & value, char * buf, int begin, int end);
+bool check_range_valid_and_convert(int & value, const char * buf, int begin, int end);
 bool check_valid_and_convert(int & value, char * buf);
 void parse_bitstrings_into_int(const char * bits[], const char * strings, char_data * ch, uint32 value[]);
 void parse_bitstrings_into_int(const char * bits[], const char * strings, char_data * ch, uint32 & value);
