@@ -25,6 +25,7 @@
 #include <algorithm>
 #include <iostream>
 #include <sstream>
+#include <map>
 
 #include "magic.h"
 #include "spells.h"
@@ -3590,7 +3591,7 @@ void lastseen_targeted(char_data *ch, char_data *victim) {
 	return;
 }
 
-CHAR_DATA *get_char_room_vis(CHAR_DATA *ch, char *name) {
+CHAR_DATA *get_char_room_vis(CHAR_DATA *ch, const char *name) {
 	CHAR_DATA *i;
 	CHAR_DATA *partial_match;
 	CHAR_DATA *rnd;
@@ -3802,7 +3803,7 @@ CHAR_DATA *get_mob_vnum(int vnum) {
 	return NULL;
 }
 
-CHAR_DATA *get_char_vis(CHAR_DATA *ch, char *name) {
+CHAR_DATA *get_char_vis(CHAR_DATA *ch, const char *name) {
 	CHAR_DATA *i;
 	CHAR_DATA *partial_match;
 
@@ -4506,6 +4507,178 @@ bool charge_moves(char_data *ch, int skill, double modifier) {
 	}
 	GET_MOVE(ch) -= amt;
 	return TRUE;
+}
+
+
+MatchType add_matching_results(skill_results_t& results, const string& name, const string& key, uint64_t value)
+{
+	auto match = str_n_nosp_cmp_begin(name, key);
+	// If this is an exact match we want only a single result
+	if (match == MatchType::Exact)
+	{
+		results = {};
+	}
+
+	if (match != MatchType::Failure)
+	{
+		results[key] = value;
+	}
+
+	return match;
+}
+
+skill_results_t find_skills_by_name(string name)
+{
+	skill_results_t results = {};
+
+	if (name.empty())
+	{
+		return results;
+	}
+
+	for (auto i = 0; *ki[i] != '\n'; i++)
+	{
+		if (add_matching_results(results, name, ki[i], i + KI_OFFSET) == MatchType::Exact)
+		{
+			return results;
+		}
+	}
+
+	// try spells
+	for (auto i = 0; *spells[i] != '\n'; i++)
+	{
+		if (add_matching_results(results, name, spells[i], i + 1) == MatchType::Exact)
+		{
+			return results;
+		}
+	}
+
+	// try skills
+	for (auto i = 0; *skills[i] != '\n'; i++)
+	{
+		if (add_matching_results(results, name, skills[i], i + SKILL_BASE) == MatchType::Exact)
+		{
+			return results;
+		}
+	}
+
+	// try songs
+	for (auto i = 0; *songs[i] != '\n'; i++)
+	{
+		if (add_matching_results(results, name, songs[i], i + SKILL_SONG_BASE) == MatchType::Exact)
+		{
+			return results;
+		}
+	}
+
+	// sets?
+	for (auto i = 0; *set_list[i].SetName != '\n'; i++)
+	{
+		if (add_matching_results(results, name, set_list[i].SetName, i + BASE_SETS) == MatchType::Exact)
+		{
+			return results;
+		}
+	}
+
+	// timers/other stuff
+	switch (LOWER(name[0]))
+	{
+	case 'b':
+		if (add_matching_results(results, name, "blood fury reuse timer", SKILL_BLOOD_FURY) == MatchType::Exact)
+		{
+			return results;
+		}
+		break;
+
+	case 'c':
+		if (add_matching_results(results, name, "CANT_QUIT", FUCK_CANTQUIT) == MatchType::Exact)
+		{
+			return results;
+		}
+		if (add_matching_results(results, name, "clanarea claim timer", SKILL_CLANAREA_CLAIM) == MatchType::Exact)
+		{
+			return results;
+		}
+		if (add_matching_results(results, name, "clanarea challenge timer", SKILL_CLANAREA_CHALLENGE) == MatchType::Exact)
+		{
+			return results;
+		}
+		if (add_matching_results(results, name, "cannot cast timer", SPELL_NO_CAST_TIMER) == MatchType::Exact)
+		{
+			return results;
+		}
+		if (add_matching_results(results, name, "crazed assault reuse timer", SKILL_CRAZED_ASSAULT) == MatchType::Exact)
+		{
+			return results;
+		}
+		break;
+
+	case 'd':
+		if (add_matching_results(results, name, "DIRTY_THIEF/CANT_QUIT", FUCK_PTHIEF) == MatchType::Exact)
+		{
+			return results;
+		}
+		if (add_matching_results(results, name, "divine intervention timer", SPELL_DIV_INT_TIMER) == MatchType::Exact)
+		{
+			return results;
+		}
+		break;
+
+	case 'g':
+		if (add_matching_results(results, name, "GOLD_THIEF/CANT_QUIT", FUCK_GTHIEF) == MatchType::Exact)
+		{
+			return results;
+		}
+		break;
+
+	case 'h':
+		if (add_matching_results(results, name, "harmtouch reuse timer", SKILL_HARM_TOUCH) == MatchType::Exact)
+		{
+			return results;
+		}
+		if (add_matching_results(results, name, "holy aura timer", SPELL_HOLY_AURA_TIMER) == MatchType::Exact)
+		{
+			return results;
+		}
+		break;
+
+	case 'l':
+		if (add_matching_results(results, name, "layhands reuse timer", SKILL_LAY_HANDS) == MatchType::Exact)
+		{
+			return results;
+		}
+		break;
+
+	case 'n':
+		if (add_matching_results(results, name, "natural selection", SKILL_NAT_SELECT) == MatchType::Exact)
+		{
+			return results;
+		}
+		if (add_matching_results(results, name, "natural select timer", SPELL_NAT_SELECT_TIMER) == MatchType::Exact)
+		{
+			return results;
+		}
+		break;
+
+	case 'p':
+		if (add_matching_results(results, name, "profession", SKILL_PROFESSION) == MatchType::Exact)
+		{
+			return results;
+		}
+		break;
+
+	case 'q':
+		if (add_matching_results(results, name, "quiver reuse timer", SKILL_QUIVERING_PALM) == MatchType::Exact)
+		{
+			return results;
+		}
+		break;
+
+	default:
+		break;
+	};
+
+	return results;
 }
 
 int find_skill_num(char * name) {
