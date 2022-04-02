@@ -1138,195 +1138,216 @@ int do_zedit(struct char_data *ch, char *argument, int cmd)
 
 int do_sedit(struct char_data *ch, char *argument, int cmd)
 {
-  char buf[MAX_STRING_LENGTH];
-  char select[MAX_INPUT_LENGTH];
-  char target[MAX_INPUT_LENGTH+1];
-  char text[MAX_INPUT_LENGTH];
-  char_data * vict;
-  char_skill_data * skill;
-  char_skill_data * lastskill;
-  int16 field;
-  int16 skillnum;
-  int16 learned;
-  int i;
+  string buf;
+  string select;
+  string target;
+  string text;
+  string value;
+  char_data *vict = nullptr;
+  char_skill_data *skill = nullptr;
+  char_skill_data *lastskill = nullptr;
+  int16_t field = 0;
+  int16_t skillnum = 0;
+  int16_t learned = 0;
+  int i = 0;
 
-  const char * sedit_values[] = {
-    "add", 
-    "remove", 
-    "set", 
-    "list", 
-    "\n"
-  };
+  const char *sedit_values[] = {
+      "add",
+      "remove",
+      "set",
+      "list",
+      "\n"};
 
-  if(!has_skill(ch, COMMAND_SEDIT)) {
-      send_to_char("Huh?\r\n", ch);
-      return eFAILURE;
+  if (!has_skill(ch, COMMAND_SEDIT))
+  {
+    send_to_char("Huh?\r\n", ch);
+    return eFAILURE;
   }
 
-  half_chop(argument, target, text);
-  half_chop(text, select, text);
+  tie (target, text) = half_chop(argument);
+  tie (select, text) = half_chop(text);
   // at this point target is the character's name
   // select is the field, and text is any args
 
-  if(!(*select) || !(*target)) {
+  if (select.empty() || target.empty())
+  {
     send_to_char("$3Usage$R: sedit <character> <field> [args]\r\n"
                  "Use a field with no args to get help on that field.\r\n"
-                 "Fields are the following.\r\n"
-                 , ch);
-    strcpy(buf, "\r\n");
+                 "Fields are the following.\r\n",
+                 ch);
     display_string_list(sedit_values, ch);
     return eFAILURE;
   }
 
-  if(!(vict = get_char_vis(ch, target))) {
-    sprintf(buf, "Cannot find player '%s'.\r\n", target);
-    send_to_char(buf, ch);
+  if (!(vict = get_char_vis(ch, target.c_str())))
+  {
+    ch->send(fmt::format("Cannot find player '{}'.\r\n", target));
     return eFAILURE;
   }
 
-  if(GET_LEVEL(vict) > GET_LEVEL(ch)) {
-    send_to_char("You like to play dangerously don't you....\r\n", ch);
+  if (GET_LEVEL(vict) > GET_LEVEL(ch))
+  {
+    ch->send("You like to play dangerously don't you....\r\n");
     return eFAILURE;
   }
 
-  field = old_search_block(select, 0, strlen(select), sedit_values, 1);
-  if(field < 0) {
+  field = old_search_block(select.c_str(), 0, select.length(), sedit_values, 1);
+  if (field < 0)
+  {
     send_to_char("That field not recognized.\r\n", ch);
     return eFAILURE;
   }
   field--;
 
-  switch(field) {
-    case 0: /* add */
+  if (field == 2)
+  {
+    tie (value, text) = last_argument(text);
+  }
+
+  if (field == 0 || field == 1 || field == 2)
+  {
+    skill_results_t results = find_skills_by_name(text);
+
+    if (results.empty())
     {
-      if(!(*text))
-      {
-        send_to_char("$3Usage$R: sedit <character> add <skillname>\r\n"
-                     "This will give the skill to the character at learning 1.\r\n", ch);
-        return eFAILURE;
-      }
-
-      if((skillnum = find_skill_num(text)) < 0) {
-        sprintf(buf, "Cannot find skill '%s' in master skill list.\r\n", text);
-        send_to_char(buf, ch);
-        return eFAILURE;
-      }
-      if(has_skill(vict, skillnum)) {
-        sprintf(buf, "'%s' already has '%s'.\r\n", GET_NAME(vict), text);
-        send_to_char(buf, ch);
-        return eFAILURE;
-      }
-
-      learn_skill(vict, skillnum, 1, 1);
-
-      sprintf(buf, "'%s' has been given skill '%s' (%d) by %s.", GET_NAME(vict), text, skillnum, GET_NAME(ch));
-      log(buf, GET_LEVEL(ch), LOG_GOD);
-      sprintf(buf, "'%s' has been given skill '%s' (%d) by %s.\r\n", GET_NAME(vict), text, skillnum, GET_NAME(ch));
-      send_to_char(buf, ch);
-      break;
-    }
-    case 1: /* remove */
-    {
-      if(!(*text))
-      {
-        send_to_char("$3Usage$R: sedit <character> remove <skillname>\r\n"
-                     "This will remove the skill from the character.\r\n", ch);
-        return eFAILURE;
-      }
-      if((skillnum = find_skill_num(text)) < 0) {
-        sprintf(buf, "Cannot find skill '%s' in master skill list.\r\n", text);
-        send_to_char(buf, ch);
-        return eFAILURE;
-      }
-      lastskill = NULL;
-      for(skill = vict->skills; skill; lastskill = skill, skill = skill->next) {
-        if(skill->skillnum == skillnum)
-          break;
-      }
-
-      if(skill) {
-        if(lastskill) 
-          lastskill->next = skill->next;
-        else vict->skills = skill->next;
-
-        sprintf(buf, "Skill '%s'(%d) removed from %s by %s.", text, 
-                     skill->learned, GET_NAME(vict), GET_NAME(ch));
-        log(buf, GET_LEVEL(ch), LOG_GOD);
-        sprintf(buf, "Skill '%s'(%d) removed from %s.\r\n", text, 
-                     skill->learned, GET_NAME(vict));
-        send_to_char(buf, ch);
-      }
-      else {
-        sprintf(buf, "Cannot find skill '%s' on '%s'.\r\n", text, GET_NAME(vict));
-        send_to_char(buf, ch);
-        return eFAILURE;
-      }
-      break;
-    }
-    case 2: /* set */
-    {
-      if(!(*text))
-      {
-        send_to_char("$3Usage$R: sedit <character> set <skillname> <amount>\r\n"
-                     "This will set the character's skill to amount.\r\n", ch);
-        return eFAILURE;
-      }
-//      text = one_argument(text, target);
-      half_chop(text, target, select);
-//      chop_half(text, select, target);
-      if((skillnum = find_skill_num(target)) < 0) {
-        sprintf(buf, "Cannot find skill '%s' in master skill list.\r\n", text);
-        send_to_char(buf, ch);
-        return eFAILURE;
-      }
-      if(!(learned = has_skill(vict, skillnum))) {
-        sprintf(buf, "'%s' does not have skill '%s'.\r\n", GET_NAME(vict), text);
-        send_to_char(buf, ch);
-        return eFAILURE;
-      }
-      if(!check_range_valid_and_convert(i, select, 1, 100)) {
-        send_to_char("Invalid skill amount.  Must be 1 - 100.\r\n", ch);
-        return eFAILURE;
-      }
-
-      learn_skill(vict, skillnum, i, i);
-
-      sprintf(buf, "'%s's skill '%s' set to %d from %d by %s.", 
-                   GET_NAME(vict), target, i, learned, GET_NAME(ch));
-      log(buf, GET_LEVEL(ch), LOG_GOD);
-      sprintf(buf, "'%s' skill '%s' set to %d from %d.\r\n", GET_NAME(vict), target, i, learned);
-      send_to_char(buf, ch);
-      break;
-    }
-    case 3: /* list */
-    {
-      i = 0;
-      sprintf(buf, "$3Skills for$R:  %s\r\n"
-                   "  Skill          Learned\r\n"
-                   "$3---------------------------------$R\r\n", GET_NAME(vict));
-      send_to_char(buf, ch);
-      for(skill = vict->skills; skill; skill = skill->next)
-      {
-        const char * skillname = get_skill_name(skill->skillnum);
-
-        if(skillname) {
-          sprintf(buf, "  %-15s%d\r\n", skillname, skill->learned);
-        } else {
-          sprintf(buf, "  unknown (%d)  %d\r\n", skill->skillnum, skill->learned);
-        }
-
-        send_to_char(buf, ch);
-        i = 1;
-      }
-      if(!i)
-        send_to_char("  (none)\r\n", ch);
-      return eSUCCESS;
-      break;
+      ch->send(fmt::format("Cannot find skill '{}' in master skill list.\r\n", text));
+      return eFAILURE;
     }
 
-    default: 
-      send_to_char("Error:  Couldn't find item in switch (sedit).\r\n", ch);
-      break;
+    if (results.size() > 1)
+    {
+      ch->send(fmt::format("Skill '{}' is too ambiguous. Please specify one of the following:\r\n", text));
+      for (auto &result : results)
+      {
+        ch->send(fmt::format("{}\r\n", result.first));
+      }
+      ch->send("\r\n");
+
+      return eFAILURE;
+    }
+
+    skillnum = results.begin()->second;
+    text = results.begin()->first;
+  }
+
+  switch (field)
+  {
+  case 0: /* add */
+  {
+    if (text.empty())
+    {
+      ch->send("$3Usage$R: sedit <character> add <skillname>\r\n"
+               "This will give the skill to the character at learning 1.\r\n");
+                   
+      return eFAILURE;
+    }
+
+    if (has_skill(vict, skillnum))
+    {
+      ch->send(fmt::format("'{}' already has '{}'.\r\n", GET_NAME(vict), text));
+      return eFAILURE;
+    }
+
+    learn_skill(vict, skillnum, 1, 1);
+
+    buf = fmt::format("'{}' has been given skill '{}' ({}) by {}.", GET_NAME(vict), text, skillnum, GET_NAME(ch));
+    log(buf.c_str(), GET_LEVEL(ch), LOG_GOD);
+    ch->send(fmt::format("'{}' has been given skill '{}' ({}) by {}.\r\n", GET_NAME(vict), text, skillnum, GET_NAME(ch)));
+    break;
+  }
+  case 1: /* remove */
+  {
+    if (text.empty())
+    {
+      ch->send("$3Usage$R: sedit <character> remove <skillname>\r\n"
+               "This will remove the skill from the character.\r\n");
+      return eFAILURE;
+    }
+
+    lastskill = NULL;
+    for (skill = vict->skills; skill; lastskill = skill, skill = skill->next)
+    {
+      if (skill->skillnum == skillnum)
+        break;
+    }
+
+    if (skill)
+    {
+      if (lastskill)
+        lastskill->next = skill->next;
+      else
+        vict->skills = skill->next;
+
+      buf = fmt::format("Skill '{}' ({}) removed from {} by {}.", text, skillnum, GET_NAME(vict), GET_NAME(ch));
+      log(buf.c_str(), GET_LEVEL(ch), LOG_GOD);
+      ch->send(fmt::format("Skill '{}' ({}) removed from {}.\r\n", text, skillnum, GET_NAME(vict)));
+    }
+    else
+    {
+      ch->send(fmt::format("Cannot find skill '{}' on '{}'.\r\n", text, GET_NAME(vict)));
+      return eFAILURE;
+    }
+    break;
+  }
+  case 2: /* set */
+  {
+    if (text.empty())
+    {
+      ch->send("$3Usage$R: sedit <character> set <skillname> <amount>\r\n"
+               "This will set the character's skill to amount.\r\n");
+      return eFAILURE;
+    }
+    if (!(learned = has_skill(vict, skillnum)))
+    {
+      ch->send(fmt::format("'{}' does not have skill '{}'.\r\n", GET_NAME(vict), text));
+      return eFAILURE;
+    }
+    if (!check_range_valid_and_convert(i, value.c_str(), 1, 100))
+    {
+      send_to_char("Invalid skill amount.  Must be 1 - 100.\r\n", ch);
+      return eFAILURE;
+    }
+
+    learn_skill(vict, skillnum, i, i);
+
+    buf = fmt::format("'{}'s skill '{}' set to {} from {} by {}.", GET_NAME(vict), text, i, learned, GET_NAME(ch));
+    log(buf.c_str(), GET_LEVEL(ch), LOG_GOD);
+    ch->send(fmt::format("'{}' skill '{}' set to {} from {}.\r\n", GET_NAME(vict), text, i, learned));
+    break;
+  }
+  case 3: /* list */
+  {
+    i = 0;
+    ch->send(fmt::format("$3Skills for$R:  {}\r\n"
+                         "  {:<18}  {:<4}  Learned\r\n"
+                         "$3-------------------------------------$R\r\n",
+                        GET_NAME(vict), "Skill", "#"));
+    for (skill = vict->skills; skill; skill = skill->next)
+    {
+      const char *skillname = get_skill_name(skill->skillnum);
+
+      if (skillname)
+      {
+        ch->send(fmt::format("  {:<18}  {:<4}  {}\r\n", skillname, skill->skillnum, skill->learned));
+      }
+      else
+      {
+        ch->send(fmt::format("  {:<18}  {:<4}  {}\r\n", "unknown", skill->skillnum, skill->learned));
+      }
+
+      i = 1;
+    }
+    if (!i)
+    {
+      ch->send("  (none)\r\n");
+    }
+    return eSUCCESS;
+    break;
+  }
+
+  default:
+    ch->send("Error:  Couldn't find item in switch (sedit).\r\n");
+    break;
   }
 
   // make sure the changes stick
@@ -5155,18 +5176,6 @@ int do_setvote(struct char_data *ch, char *arg, int cmd)
   return eFAILURE;
 }
 
-
-#ifdef WIN32
-int strncasecmp(char *s1, const char *s2, int len)
-{
-	char buf[256];
-	strncpy(buf, s2, 255);
-	buf[255] = 0;
-	_strlwr(s1);
-	_strlwr(buf);
-	return(strncmp(s1, buf, len));
-}
-#endif
 	
 int do_punish(struct char_data *ch, char *arg, int cmd)
 {
