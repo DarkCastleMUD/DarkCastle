@@ -22,7 +22,7 @@
 char *remove_trailing_spaces(char *arg);
 int command_interpreter(CHAR_DATA *ch, char *argument, bool procced = 0);
 int search_block(const char *arg, const char **l, bool exact);
-int old_search_block(char *argument, int begin, int length, const char **list, int mode);
+int old_search_block(const char *argument, int begin, int length, const char **list, int mode);
 char lower(char c);
 void argument_interpreter(const char *argument, char *first_arg, char *second_arg);
 char *one_argument(char *argument, char *first_arg);
@@ -31,6 +31,7 @@ char *one_argument_long(char *argument, char *first_arg);
 char *one_argumentnolow(char *argument, char *first_arg);
 int fill_word(char *argument);
 void half_chop(char *string, char *arg1, char *arg2);
+tuple<string, string> last_argument(string arguments);
 tuple<string, string> half_chop(string arguments);
 tuple<string, string> half_chop(string arguments, const char token);
 void chop_half(char *string, char *arg1, char *arg2);

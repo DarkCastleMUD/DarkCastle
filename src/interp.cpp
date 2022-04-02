@@ -970,27 +970,33 @@ int command_interpreter(CHAR_DATA *ch, char *pcomm, bool procced)
   return eSUCCESS;
 }
 
-int old_search_block(char *arg, const char **list, bool exact)
+int old_search_block(const char *arg, const char **list, bool exact)
 {
-  int i,l;
-  
-  // Make into lower case and get length of string
-  for(l=0; *(arg+l); l++)*(arg+l)=LOWER(*(arg+l));
-    if (exact) {
-      for(i=0; **(list+i) != '\n'; i++)
-        if (!strcmp(arg, *(list+i)))
-          return(i);
-      }
-    else {
-      if (!l)
-        // Avoid "" to match the first available string
-        l=1;
-      for(i=0; **(list+i) != '\n'; i++)
-        if (!strncmp(arg, *(list+i), l))
-          return(i);
-      }
+  if (arg == nullptr)
+  {
+    return -1;
+  }
 
-  return(-1);
+  int i = 0;
+  int l = strlen(arg);
+
+  if (exact)
+  {
+    for (i = 0; **(list + i) != '\n'; i++)
+      if (!strcasecmp(arg, *(list + i)))
+        return (i);
+  }
+  else
+  {
+    if (!l)
+      // Avoid "" to match the first available string
+      l = 1;
+    for (i = 0; **(list + i) != '\n'; i++)
+      if (!strncasecmp(arg, *(list + i), l))
+        return (i);
+  }
+
+  return (-1);
 }
 
 int search_block(const char *orig_arg, const char **list, bool exact)
@@ -1069,7 +1075,7 @@ int do_boss(CHAR_DATA *ch, char *arg, int cmd)
 }
 
 
-int old_search_block(char *argument, int begin, int length, const char **list, int mode) {
+int old_search_block(const char *argument, int begin, int length, const char **list, int mode) {
 	int guess, found, search;
 
 	// If the word contains 0 letters, a match is already found
@@ -1364,6 +1370,37 @@ tuple<string,string> half_chop(string arguments)
   }
 
   return tuple<string,string>(arg1, arguments);
+}
+
+tuple<string, string> last_argument(string arguments)
+{
+  try
+  {
+    // remove leading spaces
+    auto first_non_space = arguments.find_first_not_of(' ');
+    arguments.erase(0, first_non_space);
+
+    // remove trailing spaces
+    auto last_non_space = arguments.find_last_not_of(' ');
+    arguments.erase(last_non_space + 1, arguments.length() + 1);
+
+    auto space_after_last_arg = arguments.find_last_of(' ');
+    auto last_arg = arguments.substr(space_after_last_arg + 1, arguments.length() + 1);
+
+    arguments.erase(space_after_last_arg, arguments.length() + 1);
+
+    // remove trailing spaces
+    last_non_space = arguments.find_last_not_of(' ');
+    arguments.erase(last_non_space + 1, arguments.length() + 1);
+    
+    return tuple<string, string>(last_arg, arguments);
+  }
+  catch (...)
+  {
+    logf(IMMORTAL, LOG_BUG, "Error in last_argument(%s)", arguments.c_str());
+  }
+
+  return tuple<string, string>(string(), string());
 }
 
 /* return first 'word' plus trailing substring of input string */
