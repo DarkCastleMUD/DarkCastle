@@ -17,9 +17,13 @@
 #ifndef HANDLER_H_
 #define HANDLER_H_
 
+#include <map>
+
 #include "structs.h" // ubyte, etc..
 #include "comm.h"
 #include "Trace.h"
+
+using namespace std;
 
 /* handling the affected-structures */
 void affect_total(CHAR_DATA *ch);
@@ -92,9 +96,9 @@ int  char_to_room(CHAR_DATA *ch, int room);
 CHAR_DATA *get_active_pc_vis(CHAR_DATA *ch, char *name);
 CHAR_DATA *get_active_pc(const char *name);
 CHAR_DATA *get_all_pc(char *name);
-CHAR_DATA *get_char_room_vis(CHAR_DATA *ch, char *name);
+CHAR_DATA *get_char_room_vis(CHAR_DATA *ch, const char *name);
 CHAR_DATA *get_rand_other_char_room_vis(CHAR_DATA *ch);
-CHAR_DATA *get_char_vis(CHAR_DATA *ch, char *name);
+CHAR_DATA *get_char_vis(CHAR_DATA *ch, const char *name);
 CHAR_DATA *get_pc_vis(CHAR_DATA *ch, char *name);
 CHAR_DATA *get_pc_vis_exact(CHAR_DATA *ch, char *name);
 CHAR_DATA *get_mob_vis(CHAR_DATA *ch, char *name);
@@ -111,6 +115,9 @@ struct obj_data *get_obj_vis(CHAR_DATA *ch, char *name, bool loc = FALSE);
 void extract_char(CHAR_DATA *ch, bool pull, Trace t = Trace("unknown"));
 /* wiz_102.cpp */
 int find_skill_num(char *name);
+
+typedef map<string, uint64_t> skill_results_t;
+skill_results_t find_skills_by_name(string name);
 
 /* Generic Find */
 
