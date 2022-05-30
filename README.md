@@ -6,7 +6,7 @@ The game is available to login via telnet dcastle.org over ports 23, 6969 or 808
 
 ## Local development
 
-Follow the instructions below to build and run DarkCastle MUD locally.
+Follow the instructions below to build and run DarkCastle MUD locally. Traditionally, Dark Castle is developed on openSUSE Tumbleweed or Leap. However, the following steps can be followed by anyone with native Ubuntu or Ubuntu within Windows 10 WSL2.
 
 These steps were performed in Ubuntu 20.04 environment running on Windows 10 WSL2.
 
