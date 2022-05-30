@@ -7,7 +7,6 @@ src/libdcastle.a
 src/.sconsign.dblite
 src/*~
 *~
-log/*
 lib/corpse.save
 save/*/*
 lib/onlinewho.txt
