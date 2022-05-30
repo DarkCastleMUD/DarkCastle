@@ -8,7 +8,6 @@ src/.sconsign.dblite
 src/*~
 *~
 lib/corpse.save
-save/*/*
 lib/onlinewho.txt
 lib/leaderboard.txt
 lib/onlinewho.txt
