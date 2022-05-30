@@ -62,7 +62,7 @@ scons -j4
 Run DarkCastle server
 
 ```
-cd ../lib/
+cd ../lib
 ../src/dcastle -p6969
 ```
 
