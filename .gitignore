@@ -11,3 +11,4 @@ lib/corpse.save
 lib/onlinewho.txt
 lib/leaderboard.txt
 lib/onlinewho.txt
+lib/objects/*.last
