@@ -391,14 +391,14 @@ char * funnybootmessages[] =
 				"Boosting random mob stats...\r\n",
 				"Finding something fun in game to remove...\r\n",
 				"Determining array dope vectors...\r\n",
-				"Divide By Cucumber Error. Please Reinstall Universe And Reboot\r\n"
-						"Removing Rubicon's genital warts....ERROR: Unable to remove warts!\r\n"
-						"Removing crash bugs...\r\n"
-						"Cooking Swedish meatballs...\r\n"
-						"Brewing Canadian beer...\r\n"
-						"Searching for intelligent players....searching....searching....searching\n\r"
-						"Coding bug...\r\n"
-						"Uploading Urizen's ABBA mp3s...\r\n",
+				"Divide By Cucumber Error. Please Reinstall Universe And Reboot\r\n",
+				"Removing Rubicon's genital warts....ERROR: Unable to remove warts!\r\n",
+				"Removing crash bugs...\r\n",
+				"Cooking Swedish meatballs...\r\n",
+				"Brewing Canadian beer...\r\n",
+				"Searching for intelligent players....searching....searching....searching\n\r",
+				"Coding bug...\r\n",
+				"Uploading Urizen's ABBA mp3s...\r\n",
 				"09 F9 11 02 9D 74 E3 5B D8 41 56 C5 63 56 88 C0\r\n",
 				"Error: Server just accidentally a whole pfile!\r\n",
 				"Redecorating the tavern...\r\n",

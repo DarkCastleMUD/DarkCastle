@@ -6,7 +6,47 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "(gdb) Launch using ../lib",
+            "name": "(gdb) (env: ../lib) Build and Launch",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/dcastle",
+            "args": [ "-P", "-p 6969"],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/lib/",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ],
+            "preLaunchTask": "build src using 32 threads"
+        },
+        {
+            "name": "(gdb) (env: ../lib) Debug Build and Launch",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/dcastle",
+            "args": [ "-P", "-p 6969"],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/lib/",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ],
+            "preLaunchTask": "build debug src using 32 threads"
+        },
+        {
+            "name": "(gdb) (env: ../lib) Launch",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/src/dcastle",
@@ -24,10 +64,88 @@
                 }
             ]
         },
-    
-
         {
-            "name": "(gdb) Launch",
+            "name": "(gdb) (env: ../lib) showplayerxp ../save/D/Dummy",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/showplayer",
+            "args": ["${workspaceFolder}/save/D/Dummy"], 
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/lib",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "logging": { "engineLogging": true, "trace": true, "traceResponse": true },
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
+            "name": "(gdb) (env: ../lib) showplayerxp leaderboard",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/showplayer",
+            "args": ["leaderboard"], 
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/lib",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "logging": { "engineLogging": true, "trace": true, "traceResponse": true },
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
+            "name": "(gdb) (env: ../../dcastle/lib) Debug - Tests only",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/dcastle",
+            "args": ["-d", "${workspaceFolder}/../../dcastle/lib", "-t", "-s"], 
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "logging": { "engineLogging": true, "trace": true, "traceResponse": true },
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
+            "name": "(gdb) (env: ../../dcastle/lib) showplayerxp using ../../dcastle/save/J/Julian",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/showplayer",
+            "args": ["${workspaceFolder}/../../dcastle/save/J/Julian"], 
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/../../dcastle/lib",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "logging": { "engineLogging": true, "trace": true, "traceResponse": true },
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
+            "name": "(gdb) (env: ../../dcastle.6969/lib) Launch",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/src/dcastle",
@@ -46,13 +164,13 @@
                 }            ]
         },
         {
-            "name": "(gdb) Launch tests only",
+            "name": "(gdb) (env: ../../dcastle.6969/lib) showplayerxp leaderboard",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/src/dcastle",
-            "args": ["-d", "${workspaceFolder}/../../dcastle/lib", "-t", "-s"], 
+            "program": "${workspaceFolder}/src/showplayer",
+            "args": ["leaderboard"], 
             "stopAtEntry": false,
-            "cwd": "${workspaceFolder}",
+            "cwd": "${workspaceFolder}/../../dcastle.6969/lib",
             "environment": [],
             "externalConsole": false,
             "MIMode": "gdb",
@@ -88,49 +206,6 @@
             "environment": [],
             "externalConsole": false,
             "MIMode": "gdb"
-        },
-        {
-            "name": "(gdb) showplayerxp",
-            "type": "cppdbg",
-            "request": "launch",
-            "program": "${workspaceFolder}/src/showplayer",
-            "args": ["${workspaceFolder}/../../dcastle/save/J/Julian"], 
-            "stopAtEntry": false,
-            "cwd": "${workspaceFolder}/../../dcastle/lib",
-            "environment": [],
-            "externalConsole": false,
-            "MIMode": "gdb",
-            "logging": { "engineLogging": true, "trace": true, "traceResponse": true },
-            "setupCommands": [
-                {
-                    "description": "Enable pretty-printing for gdb",
-                    "text": "-enable-pretty-printing",
-                    "ignoreFailures": true
-                }
-            ]
-        },
-        {
-            "name": "(gdb) showplayerxp leaderboard",
-            "type": "cppdbg",
-            "request": "launch",
-            "program": "${workspaceFolder}/src/showplayer",
-            "args": ["leaderboard"], 
-            "stopAtEntry": false,
-            "cwd": "${workspaceFolder}/../../dcastle.6969/lib",
-            "environment": [],
-            "externalConsole": false,
-            "MIMode": "gdb",
-            "logging": { "engineLogging": true, "trace": true, "traceResponse": true },
-            "setupCommands": [
-                {
-                    "description": "Enable pretty-printing for gdb",
-                    "text": "-enable-pretty-printing",
-                    "ignoreFailures": true
-                }
-            ]
-        },
-
-
-
+        }
     ]
 }
