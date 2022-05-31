@@ -6,7 +6,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "(gdb) (env: ../lib) Build and Launch",
+            "name": "(gdb)(../lib) Build and Launch",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/src/dcastle",
@@ -26,7 +26,7 @@
             "preLaunchTask": "build src using 32 threads"
         },
         {
-            "name": "(gdb) (env: ../lib) Debug Build and Launch",
+            "name": "(gdb)(../lib) Debug Build and Launch",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/src/dcastle",
@@ -46,7 +46,7 @@
             "preLaunchTask": "build debug src using 32 threads"
         },
         {
-            "name": "(gdb) (env: ../lib) Launch",
+            "name": "(gdb)(../lib) Launch",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/src/dcastle",
@@ -65,7 +65,7 @@
             ]
         },
         {
-            "name": "(gdb) (env: ../lib) showplayerxp ../save/D/Dummy",
+            "name": "(gdb)(../lib) showplayerxp ../save/D/Dummy",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/src/showplayer",
@@ -85,7 +85,7 @@
             ]
         },
         {
-            "name": "(gdb) (env: ../lib) showplayerxp leaderboard",
+            "name": "(gdb)(../lib) showplayerxp leaderboard",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/src/showplayer",
@@ -105,7 +105,7 @@
             ]
         },
         {
-            "name": "(gdb) (env: ../../dcastle/lib) Debug - Tests only",
+            "name": "(gdb)(../../dcastle/lib) Debug - Tests only",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/src/dcastle",
@@ -125,7 +125,7 @@
             ]
         },
         {
-            "name": "(gdb) (env: ../../dcastle/lib) showplayerxp using ../../dcastle/save/J/Julian",
+            "name": "(gdb)(../../dcastle/lib) showplayerxp using ../../dcastle/save/J/Julian",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/src/showplayer",
@@ -145,7 +145,7 @@
             ]
         },
         {
-            "name": "(gdb) (env: ../../dcastle.6969/lib) Launch",
+            "name": "(gdb)(../../dcastle.6969/lib) Launch",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/src/dcastle",
@@ -164,7 +164,7 @@
                 }            ]
         },
         {
-            "name": "(gdb) (env: ../../dcastle.6969/lib) showplayerxp leaderboard",
+            "name": "(gdb)(../../dcastle.6969/lib) showplayerxp leaderboard",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/src/showplayer",
