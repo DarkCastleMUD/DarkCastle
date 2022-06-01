@@ -8,8 +8,6 @@ The game is available to login via telnet dcastle.org over ports 23, 6969 or 808
 
 Follow the instructions below to build and run DarkCastle MUD locally. Traditionally, Dark Castle is developed on openSUSE Tumbleweed or Leap. However, the following steps can be followed by anyone with native Ubuntu or Ubuntu within Windows 10 WSL2.
 
-These steps were performed in Ubuntu 20.04 environment running on Windows 10 WSL2.
-
 From Ubuntu terminal
 
 ```
@@ -29,10 +27,10 @@ Now we follow most of the steps listed in .github/workflows/ccpp.yml
   sudo apt install libfmt-dev:i386
 ```
 
-Install cmake
+Install cmake and gdb
 
 ```
-sudo apt install cmake
+sudo apt install cmake gdb
 ```
 
 Need to set FLAGS to build 32 bit fmt lib
