@@ -59,16 +59,11 @@ cd ../src
 scons -j4
 ```
 
-Create required logs directory
-
-```
-mkdir ../logs
-```
-
 Run DarkCastle server
 
 ```
-./dcastle -p6969
+cd ../lib
+../src/dcastle -p6969
 ```
 
 Test server by connecting to it from another terminal

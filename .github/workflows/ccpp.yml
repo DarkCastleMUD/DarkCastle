@@ -24,6 +24,8 @@ jobs:
         sudo apt install libfmt-dev:i386
         git clone https://github.com/fmtlib/fmt.git
         cd fmt
+        export CFLAGS=" -m32"
+        export CXXFLAGS=" -m32"
         cmake .
         make -j4
         sudo make install
