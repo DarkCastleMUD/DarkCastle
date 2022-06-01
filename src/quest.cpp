@@ -1284,145 +1284,166 @@ int do_qedit(CHAR_DATA *ch, char *argument, int cmd)
 
 int quest_vendor(struct char_data *ch, struct obj_data *obj, int cmd, char *arg, struct char_data *owner)
 {
-    char buf[MAX_STRING_LENGTH];
-    int rnum = 0;
+   char buf[MAX_STRING_LENGTH];
+   int rnum = 0;
 
-    // list & buy & sell
-    if((cmd != 59) && (cmd != 56) && (cmd != 57))
-	return eFAILURE;
+   // list & buy & sell
+   if ((cmd != 59) && (cmd != 56) && (cmd != 57))
+      return eFAILURE;
 
-    if (!CAN_SEE(ch, owner))
-	return eFAILURE;
+   if (!CAN_SEE(ch, owner))
+      return eFAILURE;
 
-    if(IS_MOB(ch))
-	return eFAILURE;
+   if (IS_MOB(ch))
+      return eFAILURE;
 
-    if (!CAN_SEE(owner, ch)) {
-	do_say(owner, "I don't trade with people I can't see!",0);
-        return eSUCCESS;
-    }
+   if (!CAN_SEE(owner, ch))
+   {
+      do_say(owner, "I don't trade with people I can't see!", 0);
+      return eSUCCESS;
+   }
 
-  if(cmd == 59) { /* List */
+   if (cmd == 59)
+   { /* List */
       send_to_char("$B$2Orro tells you, 'This is what I can do for you...$R \n\r", ch);
-      send_to_char("$BQuest Equipment:$R\r\n",ch);
-      
+      send_to_char("$BQuest Equipment:$R\r\n", ch);
+
       int n = 0;
-      for (int qvnum=27975; qvnum < 28000; qvnum++) {
-	  rnum = real_object(qvnum);
-	  if (rnum) {
-	      char *buffer = gl_item((OBJ_DATA*)obj_index[rnum].item, n++, ch, FALSE);
-	      send_to_char(buffer, ch);
-	      dc_free(buffer);
-	  }
+      for (int qvnum = 27975; qvnum < 28000; qvnum++)
+      {
+         rnum = real_object(qvnum);
+         if (rnum)
+         {
+            char *buffer = gl_item((OBJ_DATA *)obj_index[rnum].item, n++, ch, FALSE);
+            send_to_char(buffer, ch);
+            dc_free(buffer);
+         }
       }
-      for (int qvnum=3124; qvnum <= 3127; qvnum++) {
-	  rnum = real_object(qvnum);
-	  if (rnum) {
-	      char *buffer = gl_item((OBJ_DATA*)obj_index[rnum].item, n++, ch, FALSE);
-	      send_to_char(buffer, ch);
-	      dc_free(buffer);
-	  }
+      for (int qvnum = 3124; qvnum <= 3127; qvnum++)
+      {
+         rnum = real_object(qvnum);
+         if (rnum)
+         {
+            char *buffer = gl_item((OBJ_DATA *)obj_index[rnum].item, n++, ch, FALSE);
+            send_to_char(buffer, ch);
+            dc_free(buffer);
+         }
       }
-  } else if (cmd == 56) { /* buy */
+   }
+   else if (cmd == 56)
+   { /* buy */
       char arg2[MAX_INPUT_LENGTH];
       one_argument(arg, arg2);
-      
-      if (!is_number(arg2)) {
-	  sprintf(buf, "%s Sorry, mate. You type buy <number> to specify what you want..",GET_NAME(ch));
-	  do_tell(owner, buf, 0);
-	  return eSUCCESS;
+
+      if (!is_number(arg2))
+      {
+         sprintf(buf, "%s Sorry, mate. You type buy <number> to specify what you want..", GET_NAME(ch));
+         do_tell(owner, buf, 0);
+         return eSUCCESS;
       }
 
       bool FOUND = false;
-      int want_num = atoi(arg2)-1;
+      int want_num = atoi(arg2) - 1;
       int n = 0;
-      for (int qvnum=27975; qvnum <= 27999; qvnum++) {
-          rnum = real_object(qvnum);
-	  if (rnum && n++ == want_num) {
-	      FOUND = true;
-	      break;
-	  }
+      for (int qvnum = 27975; qvnum <= 27999; qvnum++)
+      {
+         rnum = real_object(qvnum);
+         if (rnum && n++ == want_num)
+         {
+            FOUND = true;
+            break;
+         }
       }
-      if (!FOUND) {
-	  for (int qvnum=3124; qvnum <= 3127; qvnum++) {
-	      rnum = real_object(qvnum);
-	      if (rnum && n++ == want_num) {
-		  FOUND = true;
-		  break;
-	      }
-	  }
+      if (!FOUND)
+      {
+         for (int qvnum = 3124; qvnum <= 3127; qvnum++)
+         {
+            rnum = real_object(qvnum);
+            if (rnum && n++ == want_num)
+            {
+               FOUND = true;
+               break;
+            }
+         }
       }
 
-      if (!FOUND) {
-	  sprintf(buf, "%s Don't have that I'm afraid. Type \"list\" to see my wares.", GET_NAME(ch));
-	  do_tell(owner, buf, 0);
-	  return eSUCCESS;
+      if (!FOUND)
+      {
+         sprintf(buf, "%s Don't have that I'm afraid. Type \"list\" to see my wares.", GET_NAME(ch));
+         do_tell(owner, buf, 0);
+         return eSUCCESS;
       }
 
       struct obj_data *obj;
       obj = clone_object(rnum);
 
-/*      if (class_restricted(ch, obj)) {
-	  sprintf(buf, "%s That item is meant for another class.", GET_NAME(ch));
-	  do_tell(owner, buf, 0);
-	  extract_obj(obj);
-	  return eSUCCESS;
-      } else if (size_restricted(ch, obj)) {
-	  sprintf(buf, "%s That item would not fit you.", GET_NAME(ch));
-	  do_tell(owner, buf, 0);
-	  extract_obj(obj);
-	  return eSUCCESS;
-      } else */
+      /*      if (class_restricted(ch, obj)) {
+           sprintf(buf, "%s That item is meant for another class.", GET_NAME(ch));
+           do_tell(owner, buf, 0);
+           extract_obj(obj);
+           return eSUCCESS;
+            } else if (size_restricted(ch, obj)) {
+           sprintf(buf, "%s That item would not fit you.", GET_NAME(ch));
+           do_tell(owner, buf, 0);
+           extract_obj(obj);
+           return eSUCCESS;
+            } else */
       if (IS_SET(obj->obj_flags.more_flags, ITEM_UNIQUE) &&
-		 search_char_for_item(ch, obj->item_number, false)) {
-	  sprintf(buf, "%s You already have one of those.", GET_NAME(ch));
-	  do_tell(owner, buf, 0);
-	  extract_obj(obj);
-	  return eSUCCESS;
+          search_char_for_item(ch, obj->item_number, false))
+      {
+         sprintf(buf, "%s You already have one of those.", GET_NAME(ch));
+         do_tell(owner, buf, 0);
+         extract_obj(obj);
+         return eSUCCESS;
       }
 
-      if (GET_QPOINTS(ch) < (unsigned int)(obj->obj_flags.cost/10000)) {
-	  sprintf(buf, "%s Come back when you've got the qpoints.", GET_NAME(ch));
-	  do_tell(owner, buf, 0);
-	  extract_obj(obj);
-	  return eSUCCESS;
+      if (GET_QPOINTS(ch) < (unsigned int)(obj->obj_flags.cost / 10000))
+      {
+         sprintf(buf, "%s Come back when you've got the qpoints.", GET_NAME(ch));
+         do_tell(owner, buf, 0);
+         extract_obj(obj);
+         return eSUCCESS;
       }
 
-      GET_QPOINTS(ch) -= (obj->obj_flags.cost/10000);
+      GET_QPOINTS(ch) -= (obj->obj_flags.cost / 10000);
       obj_to_char(obj, ch);
-      sprintf(buf, "%s Here's your %s$B$2. Have a nice time with it.",GET_NAME(ch),obj->short_description);
+      sprintf(buf, "%s Here's your %s$B$2. Have a nice time with it.", GET_NAME(ch), obj->short_description);
       do_tell(owner, buf, 0);
       return eSUCCESS;
-  } else if (cmd == 57) { /* Sell */
+   }
+   else if (cmd == 57)
+   { /* Sell */
       char arg2[MAX_INPUT_LENGTH];
       one_argument(arg, arg2);
 
       OBJ_DATA *obj = get_obj_in_list_vis(ch, arg2, ch->carrying);
-      if (!obj) {
-	  sprintf(buf, "%s Try that on the kooky meta-physician..", GET_NAME(ch));
-	  do_tell(owner, buf, 0);
-	  return eSUCCESS;
+      if (!obj)
+      {
+         sprintf(buf, "%s Try that on the kooky meta-physician..", GET_NAME(ch));
+         do_tell(owner, buf, 0);
+         return eSUCCESS;
       }
 
       if (obj_index[obj->item_number].virt < 27975 ||
-	  obj_index[obj->item_number].virt > 27999 ||
-	  obj_index[obj->item_number].virt != 3124 ||
-	  obj_index[obj->item_number].virt != 3125 ||
-	  obj_index[obj->item_number].virt != 3126 ||
-	  obj_index[obj->item_number].virt != 3127) {
-	  sprintf(buf, "%s I don't deal in worthless junk.", GET_NAME(ch));
-	  do_tell(owner, buf, 0);
-	  return eSUCCESS;
+          obj_index[obj->item_number].virt > 27999 ||
+          obj_index[obj->item_number].virt != 3124 ||
+          obj_index[obj->item_number].virt != 3125 ||
+          obj_index[obj->item_number].virt != 3126 ||
+          obj_index[obj->item_number].virt != 3127)
+      {
+         sprintf(buf, "%s I don't deal in worthless junk.", GET_NAME(ch));
+         do_tell(owner, buf, 0);
+         return eSUCCESS;
       }
 
-      int cost = (obj->obj_flags.cost/10000.0)*0.7;
+      int cost = (obj->obj_flags.cost / 10000.0) * 0.7;
 
-      sprintf(buf, "%s I'll give you %d qpoints for that. Thanks for shoppin'.",GET_NAME(ch),cost);
+      sprintf(buf, "%s I'll give you %d qpoints for that. Thanks for shoppin'.", GET_NAME(ch), cost);
       do_tell(owner, buf, 0);
       extract_obj(obj);
       GET_QPOINTS(ch) += cost;
       return eSUCCESS;
-  }
+   }
 
-  return eSUCCESS;
+   return eSUCCESS;
 }
