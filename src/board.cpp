@@ -92,13 +92,13 @@ struct BOARD_INFO
 
 // These are the binary files in which to save/load messages
 
-void board_write_msg(CHAR_DATA *ch, char *arg, std::map<std::string, BOARD_INFO>::iterator board);
-int board_display_msg(CHAR_DATA *ch, char *arg, std::map<std::string, BOARD_INFO>::iterator board);
+void board_write_msg(CHAR_DATA *ch, const char *arg, std::map<std::string, BOARD_INFO>::iterator board);
+int board_display_msg(CHAR_DATA *ch, const char *arg, std::map<std::string, BOARD_INFO>::iterator board);
 char *fread_string(FILE *fl, int hasher);
-int board_remove_msg(CHAR_DATA *ch, char *arg, std::map<std::string, BOARD_INFO>::iterator board);
+int board_remove_msg(CHAR_DATA *ch, const char *arg, std::map<std::string, BOARD_INFO>::iterator board);
 void board_save_board(std::map<std::string, BOARD_INFO>::iterator board);
 void board_load_board();
-int board_show_board(CHAR_DATA *ch, char *arg, std::map<std::string, BOARD_INFO>::iterator board);
+int board_show_board(CHAR_DATA *ch, const char *arg, std::map<std::string, BOARD_INFO>::iterator board);
 int fwrite_string(char *buf, FILE *fl);
 void new_edit_board_unlock_board(CHAR_DATA *ch, int abort);
 
@@ -611,7 +611,7 @@ int save_boards()
 Entry function called from assign_proc.
 handles commands and calls appropriate functions
 */
-int board(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg, CHAR_DATA* invoker)
+int board(CHAR_DATA *ch, struct obj_data *obj, int cmd, const char *arg, CHAR_DATA* invoker)
 {
   static int has_loaded = 0;
   
@@ -719,7 +719,7 @@ void new_edit_board_unlock_board(CHAR_DATA *ch, int abort)
   delete reserve;
 }
 
-void board_write_msg(CHAR_DATA *ch, char *arg, std::map<string,BOARD_INFO>::iterator board) 
+void board_write_msg(CHAR_DATA *ch, const char *arg, std::map<string,BOARD_INFO>::iterator board) 
 {
   char buf[MAX_STRING_LENGTH];
   time_t timep; // clock time
@@ -802,7 +802,7 @@ void board_write_msg(CHAR_DATA *ch, char *arg, std::map<string,BOARD_INFO>::iter
 }
 
 
-int board_remove_msg(CHAR_DATA *ch, char *arg, std::map<std::string, BOARD_INFO>::iterator board) 
+int board_remove_msg(CHAR_DATA *ch, const char *arg, std::map<std::string, BOARD_INFO>::iterator board) 
 {
   unsigned int ind, tmessage;
   char buf[256], number[MAX_INPUT_LENGTH+1];
@@ -987,7 +987,7 @@ void board_load_board() {
   }
 }
 
-int board_display_msg(CHAR_DATA *ch, char *arg, std::map<std::string, BOARD_INFO>::iterator board)
+int board_display_msg(CHAR_DATA *ch, const char *arg, std::map<std::string, BOARD_INFO>::iterator board)
 {
   char buf[MAX_STRING_LENGTH], number[MAX_INPUT_LENGTH+1];
   std::string board_msg;
@@ -1086,7 +1086,7 @@ int board_display_msg(CHAR_DATA *ch, char *arg, std::map<std::string, BOARD_INFO
 }
 	
 	
-int board_show_board(CHAR_DATA *ch, char *arg, std::map<std::string, BOARD_INFO>::iterator board)
+int board_show_board(CHAR_DATA *ch, const char *arg, std::map<std::string, BOARD_INFO>::iterator board)
 {
   int i;
   std::string board_msg;

@@ -178,7 +178,7 @@ void setup_dir(FILE *fl, int room, int dir);
 void load_banned();
 void boot_world(void);
 void do_godlist();
-void half_chop(char *string, char *arg1, char *arg2);
+void half_chop(const char *string, char *arg1, char *arg2);
 void remove_memory(CHAR_DATA *ch, char type);
 world_file_list_item * new_mob_file_item(char * temp, long room_nr);
 world_file_list_item * new_obj_file_item(char * temp, long room_nr);

@@ -1282,14 +1282,16 @@ int do_qedit(CHAR_DATA *ch, char *argument, int cmd)
    return eSUCCESS;
 }
 
-int quest_vendor(struct char_data *ch, struct obj_data *obj, int cmd, char *arg, struct char_data *owner)
+int quest_vendor(char_data *ch, obj_data *obj, int cmd, const char *arg, char_data *owner)
 {
    char buf[MAX_STRING_LENGTH];
    int rnum = 0;
 
    // list & buy & sell
-   if ((cmd != 59) && (cmd != 56) && (cmd != 57))
+   if ((cmd != CMD_LIST) && (cmd != CMD_BUY) && (cmd != CMD_SELL))
+   {
       return eFAILURE;
+   }
 
    if (!CAN_SEE(ch, owner))
       return eFAILURE;

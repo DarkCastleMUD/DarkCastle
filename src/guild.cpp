@@ -23,7 +23,7 @@
 extern vector<profession> professions;
 
 int get_max(CHAR_DATA *ch, int skill);
-int guild(struct char_data *ch, struct obj_data *obj, int cmd, char *arg, struct char_data *owner);
+int guild(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg, struct char_data *owner);
 
 int do_practice(CHAR_DATA *ch, char *arg, int cmd)
 {
@@ -216,7 +216,7 @@ int search_skills2(int arg, class_skill_defines * list_skills)
   return -1;
 }
 
-int search_skills(char * arg, class_skill_defines * list_skills)
+int search_skills(const char * arg, class_skill_defines * list_skills)
 {
   for(int i = 0; *list_skills[i].skillname != '\n'; i++)
     if(is_abbrev(arg, list_skills[i].skillname))
@@ -500,7 +500,7 @@ void output_praclist(struct char_data *ch, class_skill_defines *skilllist)
   }
 }
 
-int skills_guild ( struct char_data *ch, char *arg, struct char_data *owner )
+int skills_guild ( struct char_data *ch, const char *arg, struct char_data *owner )
 {
   char buf[160];
   int known, x;
@@ -707,7 +707,7 @@ int skills_guild ( struct char_data *ch, char *arg, struct char_data *owner )
   return eSUCCESS;
 }
 
-int guild(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,        
+int guild(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
           struct char_data *owner)
 {
   int64 exp_needed;
@@ -869,7 +869,7 @@ int guild(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
   return eSUCCESS;
 }
 
-int skill_master(struct char_data *ch, struct obj_data *obj, int cmd, char *arg, 
+int skill_master(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg, 
                  struct char_data * invoker)
 {
   char buf[MAX_STRING_LENGTH];

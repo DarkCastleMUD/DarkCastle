@@ -1083,7 +1083,7 @@ void blackjack_prompt(CHAR_DATA *ch, char *prompt, bool ascii)
   }  
 }
 
-int blackjack_table(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
+int blackjack_table(CHAR_DATA *ch, struct obj_data *obj, int cmd, const char *arg,
 		CHAR_DATA *invoker) {
 	char arg1[MAX_INPUT_LENGTH];
 	arg = one_argument(arg, arg1);
@@ -2100,7 +2100,7 @@ void reel_spin(void *arg1, void *arg2, void *arg3)
    save_slot_machines();
 }
 
-int slot_machine(CHAR_DATA *ch, OBJ_DATA *obj, int cmd, char *arg, CHAR_DATA *invoker)
+int slot_machine(CHAR_DATA *ch, OBJ_DATA *obj, int cmd, const char *arg, CHAR_DATA *invoker)
 {
    char buf[MAX_STRING_LENGTH];
 
@@ -2456,7 +2456,7 @@ void pulse_countdown(void *arg1, void *arg2, void *arg3)
    }
 }
 
-int roulette_table(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg, CHAR_DATA *invoker)
+int roulette_table(CHAR_DATA *ch, struct obj_data *obj, int cmd, const char *arg, CHAR_DATA *invoker)
 {
    char arg1[MAX_INPUT_LENGTH], arg2[MAX_STRING_LENGTH], buf[MAX_STRING_LENGTH];
    uint32 bet=0;

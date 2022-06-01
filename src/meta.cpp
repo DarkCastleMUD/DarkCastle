@@ -641,7 +641,7 @@ int meta_get_ki_plat_cost(char_data * ch)
 	return (int)(cost * 0.9);
 }
 
-int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
+int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg,
 		struct char_data *owner)
 {
 	char argument[MAX_INPUT_LENGTH];
@@ -1519,7 +1519,7 @@ char *race_message(char_data *ch, int race)
 	return &buf[0];
 }
 
-int cardinal(struct char_data *ch, struct obj_data *obj, int cmd, char *argument, struct char_data *owner)
+int cardinal(struct char_data *ch, struct obj_data *obj, int cmd, const char *argument, struct char_data *owner)
 {
 	if (cmd == 59) // list
 			{

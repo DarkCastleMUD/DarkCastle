@@ -54,7 +54,7 @@ using namespace std;
 #define SKILL_HIDE 337
 
 int check_social( CHAR_DATA *ch, char *pcomm, int length, char *arg );
-int clan_guard(struct char_data *ch, struct obj_data *obj, int cmd, char *arg, struct char_data *owner);
+int clan_guard(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg, struct char_data *owner);
 int check_ethereal_focus(CHAR_DATA *ch, int trigger_type); // class/cl_mage.cpp
 
 extern struct index_data *mob_index;
@@ -1404,7 +1404,7 @@ tuple<string, string> last_argument(string arguments)
 }
 
 /* return first 'word' plus trailing substring of input string */
-void half_chop(char *string, char *arg1, char *arg2)
+void half_chop(const char *string, char *arg1, char *arg2)
 {
   // strip leading whitespace from original
   for (; isspace(*string); string++);

@@ -1974,7 +1974,7 @@ void vlog(const char *message, const char *name) {
  // system(cmd);
 }
 
-int sleazy_vault_guy(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
+int sleazy_vault_guy(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg,
           struct char_data *owner)
 {
   if (cmd != 59 && cmd != 56) return eFAILURE;

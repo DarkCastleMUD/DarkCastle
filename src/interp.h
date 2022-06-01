@@ -30,7 +30,7 @@ const char *one_argument(const char *argument, char *first_arg);
 char *one_argument_long(char *argument, char *first_arg);
 char *one_argumentnolow(char *argument, char *first_arg);
 int fill_word(char *argument);
-void half_chop(char *string, char *arg1, char *arg2);
+void half_chop(const char *string, char *arg1, char *arg2);
 tuple<string, string> last_argument(string arguments);
 tuple<string, string> half_chop(string arguments);
 tuple<string, string> half_chop(string arguments, const char token);

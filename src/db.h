@@ -261,8 +261,8 @@ struct index_data
 {
   int virt;                                                                         /* virt number of ths mob/obj           */
   int number;                                                                       /* number of existing units of ths mob/obj */
-  int (*non_combat_func)(CHAR_DATA *, struct obj_data *, int, char *, CHAR_DATA *); // non Combat special proc
-  int (*combat_func)(CHAR_DATA *, struct obj_data *, int, char *, CHAR_DATA *);     // combat special proc
+  int (*non_combat_func)(CHAR_DATA *, struct obj_data *, int, const char *, CHAR_DATA *); // non Combat special proc
+  int (*combat_func)(CHAR_DATA *, struct obj_data *, int, const char *, CHAR_DATA *);     // combat special proc
   void *item;                                                                       /* the mobile/object itself                 */
 
   MPROG_DATA *mobprogs;

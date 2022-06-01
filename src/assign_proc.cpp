@@ -18,8 +18,8 @@
 #include "player.h"
 #include "utility.h"
 
-typedef int    SPEC_FUN  (struct char_data * ch, struct obj_data *obj, int cmd, char *argument, 
-                          struct char_data * owner);
+typedef int    SPEC_FUN  (char_data * ch, obj_data *obj, int cmd, const char *argument, 
+                          char_data * owner);
 typedef int    ROOM_PROC (CHAR_DATA *ch, int cmd, char *arg);
 
 
@@ -52,7 +52,7 @@ void assign_mobiles(void)
 // The following four functions are just here to make sure when someone removes a mob
 // or object from the world, we don't try to assign procs to index[-1]
 
-void assign_one_mob_non(int mob_num, int (*func)(CHAR_DATA*, struct obj_data *, int, char*, CHAR_DATA*))
+void assign_one_mob_non(int mob_num, int (*func)(CHAR_DATA*, struct obj_data *, int, const char*, CHAR_DATA*))
 {
 	int mob = real_mobile(mob_num);
 
@@ -65,7 +65,7 @@ void assign_one_mob_non(int mob_num, int (*func)(CHAR_DATA*, struct obj_data *, 
 	else mob_index[mob].non_combat_func = func;
 }
 
-void assign_one_mob_com(int mob_num, int (*func)(CHAR_DATA*, struct obj_data *, int, char*, CHAR_DATA*))
+void assign_one_mob_com(int mob_num, int (*func)(CHAR_DATA*, struct obj_data *, int, const char*, CHAR_DATA*))
 {
 	int mob = real_mobile(mob_num);
 
@@ -76,7 +76,7 @@ void assign_one_mob_com(int mob_num, int (*func)(CHAR_DATA*, struct obj_data *, 
 	else mob_index[mob].combat_func = func;
 }
 
-void assign_one_obj_non(int obj_num, int (*func)(CHAR_DATA*, struct obj_data *, int, char*, CHAR_DATA*))
+void assign_one_obj_non(int obj_num, int (*func)(CHAR_DATA*, struct obj_data *, int, const char*, CHAR_DATA*))
 {
 	int obj = real_object(obj_num);
 
@@ -85,7 +85,7 @@ void assign_one_obj_non(int obj_num, int (*func)(CHAR_DATA*, struct obj_data *, 
 	else obj_index[obj].non_combat_func = func;
 }
 
-void assign_one_obj_com(int obj_num, int (*func)(CHAR_DATA*, struct obj_data *, int, char*, CHAR_DATA*))
+void assign_one_obj_com(int obj_num, int (*func)(CHAR_DATA*, struct obj_data *, int, const char*, CHAR_DATA*))
 {
 	int obj = real_object(obj_num);
 

@@ -468,7 +468,7 @@ void raw_kill(CHAR_DATA *ch, CHAR_DATA *victim);
 void check_killer( CHAR_DATA *ch, CHAR_DATA *victim );
 int map_eq_level( CHAR_DATA *mob );
 void disarm( CHAR_DATA *ch, CHAR_DATA *victim );
-int shop_keeper( CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg, CHAR_DATA * invoker );
+int shop_keeper( CHAR_DATA *ch, struct obj_data *obj, int cmd, const char *arg, CHAR_DATA * invoker );
 void send_to_all(char *messg);
 void ansi_color(char *txt, CHAR_DATA *ch);
 void send_to_char(string messg, struct char_data *ch);
