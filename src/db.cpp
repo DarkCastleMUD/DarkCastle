@@ -392,7 +392,6 @@ char * funnybootmessages[] =
 				"Finding something fun in game to remove...\r\n",
 				"Determining array dope vectors...\r\n",
 				"Divide By Cucumber Error. Please Reinstall Universe And Reboot\r\n",
-				"Removing Rubicon's genital warts....ERROR: Unable to remove warts!\r\n",
 				"Removing crash bugs...\r\n",
 				"Cooking Swedish meatballs...\r\n",
 				"Brewing Canadian beer...\r\n",
@@ -400,17 +399,14 @@ char * funnybootmessages[] =
 				"Coding bug...\r\n",
 				"Uploading Urizen's ABBA mp3s...\r\n",
 				"09 F9 11 02 9D 74 E3 5B D8 41 56 C5 63 56 88 C0\r\n",
-				"Error: Server just accidentally a whole pfile!\r\n",
 				"Redecorating the tavern...\r\n",
 				"Putting cover sheets on TPS reports.\r\n",
 				"Nerfing <insert class>...\r\n",
 				"Smash forehead on keyboard to continue.\r\n",
 				"Enter any 11-digit prime number to continue.\r\n",
-				"This will end your Windows session. Do you want to play another game?\n\r",
 				"Error saving file! Format drive now? (Y/Y)\r\n",
 				"User Error: Replace user.\r\n",
-				"Windows found. Delete? (Y/N)\r\n",
-				"Hard Drive scan indicates pirated software! The police have been notified.\r\n"
+				"Windows found. Delete? (Y/N)\r\n"
 		};
 
 void funny_boot_message()
