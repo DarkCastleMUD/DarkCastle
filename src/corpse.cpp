@@ -540,6 +540,7 @@ struct obj_data *create_obj_new(void)
 	GET_OBJ_VROOM(obj) = NOWHERE;
 	GET_OBJ_TIMER(obj) = 0;
 	obj->save_expiration = 0;
+	obj->no_sell_expiration = 0;
 	return obj;
 }
 

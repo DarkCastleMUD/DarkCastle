@@ -137,6 +137,7 @@
 #define ITEM_NO_DISARM		    1U<<12
 #define ITEM_TOGGLE		        1U<<13 // Toggles for certain items.
 #define ITEM_NO_CUSTOM          1U<<14
+#define ITEM_24H_NO_SELL        1U<<15 // Item can't be sold for 24 RL hours
 
 /* Bitvector for 'size' */
 #define SIZE_ANY		1U
@@ -246,7 +247,8 @@ struct obj_data {
 	table_data *table;
 	machine_data *slot;
 	wheel_data *wheel;
-	time_t save_expiration;
+	time_t save_expiration = {};
+    time_t no_sell_expiration = {};
 };
 
 /* For 'equipment' */

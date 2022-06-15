@@ -1294,10 +1294,14 @@ int quest_vendor(char_data *ch, obj_data *obj, int cmd, const char *arg, char_da
    }
 
    if (!CAN_SEE(ch, owner))
+   {
       return eFAILURE;
+   }
 
    if (IS_MOB(ch))
+   {
       return eFAILURE;
+   }
 
    if (!CAN_SEE(owner, ch))
    {
@@ -1305,7 +1309,7 @@ int quest_vendor(char_data *ch, obj_data *obj, int cmd, const char *arg, char_da
       return eSUCCESS;
    }
 
-   if (cmd == 59)
+   if (cmd == CMD_LIST)
    { /* List */
       send_to_char("$B$2Orro tells you, 'This is what I can do for you...$R \n\r", ch);
       send_to_char("$BQuest Equipment:$R\r\n", ch);
@@ -1332,7 +1336,7 @@ int quest_vendor(char_data *ch, obj_data *obj, int cmd, const char *arg, char_da
          }
       }
    }
-   else if (cmd == 56)
+   else if (cmd == CMD_BUY)
    { /* buy */
       char arg2[MAX_INPUT_LENGTH];
       one_argument(arg, arg2);
@@ -1408,12 +1412,17 @@ int quest_vendor(char_data *ch, obj_data *obj, int cmd, const char *arg, char_da
       }
 
       GET_QPOINTS(ch) -= (obj->obj_flags.cost / 10000);
+
+      SET_BIT(obj->obj_flags.more_flags, ITEM_24H_NO_SELL);
+      SET_BIT(obj->obj_flags.more_flags, ITEM_CUSTOM);
+      obj->no_sell_expiration = time(NULL) + (60 * 60 * 24);
+
       obj_to_char(obj, ch);
       sprintf(buf, "%s Here's your %s$B$2. Have a nice time with it.", GET_NAME(ch), obj->short_description);
       do_tell(owner, buf, 0);
       return eSUCCESS;
    }
-   else if (cmd == 57)
+   else if (cmd == CMD_SELL)
    { /* Sell */
       char arg2[MAX_INPUT_LENGTH];
       one_argument(arg, arg2);
@@ -1426,19 +1435,28 @@ int quest_vendor(char_data *ch, obj_data *obj, int cmd, const char *arg, char_da
          return eSUCCESS;
       }
 
-      if (obj_index[obj->item_number].virt < 27975 ||
-          obj_index[obj->item_number].virt > 27999 ||
-          obj_index[obj->item_number].virt != 3124 ||
-          obj_index[obj->item_number].virt != 3125 ||
-          obj_index[obj->item_number].virt != 3126 ||
+      if (!isname("quest", ((obj_data *)(obj_index[obj->item_number].item))->name) &&
+          obj_index[obj->item_number].virt != 3124 &&
+          obj_index[obj->item_number].virt != 3125 &&
+          obj_index[obj->item_number].virt != 3126 &&
           obj_index[obj->item_number].virt != 3127)
       {
-         sprintf(buf, "%s I don't deal in worthless junk.", GET_NAME(ch));
+         sprintf(buf, "%s I only buy quest equipment.", GET_NAME(ch));
          do_tell(owner, buf, 0);
          return eSUCCESS;
       }
 
-      int cost = (obj->obj_flags.cost / 10000.0) * 0.7;
+      if (IS_SET(obj->obj_flags.more_flags, ITEM_24H_NO_SELL)) {
+         time_t now = time(NULL);
+         time_t expires = obj->no_sell_expiration;
+         if (now < expires) {
+            sprintf(buf, "%s I won't buy that for another %u seconds.", GET_NAME(ch), expires-now);
+            do_tell(owner, buf, 0);
+            return eSUCCESS;
+         }
+      }
+
+      int cost = obj->obj_flags.cost / 10000.0;
 
       sprintf(buf, "%s I'll give you %d qpoints for that. Thanks for shoppin'.", GET_NAME(ch), cost);
       do_tell(owner, buf, 0);

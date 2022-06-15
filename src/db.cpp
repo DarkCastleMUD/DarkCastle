@@ -4255,7 +4255,8 @@ struct obj_data *clone_object(int nr)
 	obj->next = object_list;
 	object_list = obj;
 	obj_index[nr].number++;
-  obj->save_expiration = 0;
+  	obj->save_expiration = 0;
+	obj->no_sell_expiration = 0;
 
 	if (obj_index[obj->item_number].non_combat_func ||
 			obj->obj_flags.type_flag == ITEM_MEGAPHONE ||
@@ -5666,6 +5667,7 @@ void clear_object(struct obj_data *obj)
   obj->slot = nullptr;
   obj->wheel = nullptr;
   obj->save_expiration = 0;
+  obj->no_sell_expiration = 0;
 }
 
 // Roll up the random modifiers to saving throw for new character
@@ -6234,6 +6236,11 @@ void copySaveData(obj_data *target, obj_data *source)
 	if (IS_SET(source->obj_flags.more_flags, ITEM_24H_SAVE))
 	{
 		target->save_expiration = source->save_expiration;
+	}
+
+	if (IS_SET(source->obj_flags.more_flags, ITEM_24H_NO_SELL))
+	{
+		target->no_sell_expiration = source->no_sell_expiration;
 	}
 
 	return;

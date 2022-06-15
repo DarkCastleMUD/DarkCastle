@@ -973,6 +973,7 @@ const char *more_obj_bits[] =
 	"NO_DISARM",
     "PROCTOGGLE",
     "NO_CUSTOM",
+    "24H_NO_SELL"
     "\n"
 };
 

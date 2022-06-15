@@ -218,7 +218,11 @@ struct obj_data *my_obj_store_to_char(CHAR_DATA *ch, FILE *fpsave, struct obj_da
     fread(&obj->save_expiration, sizeof(time_t), 1, fpsave);
     fread(&mod_type, sizeof(char), 3, fpsave);
   }
-
+  if (!strcmp("SEL", mod_type))
+  {
+    fread(&obj->no_sell_expiration, sizeof(time_t), 1, fpsave);
+    fread(&mod_type, sizeof(char), 3, fpsave);
+  }
   // TODO - put extra desc support here
   // NEW READS GO HERE
 

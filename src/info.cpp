@@ -335,6 +335,22 @@ void show_obj_to_char(struct obj_data *object, struct char_data *ch, int mode)
     	  }
       }
 
+      if (IS_SET(object->obj_flags.more_flags, ITEM_24H_NO_SELL)) {
+    	  time_t now = time(NULL);
+    	  time_t expires = object->no_sell_expiration;
+    	  if (now >= expires || expires == 0) {
+    		  strcat(buffer, " $R($B$0sellable$R)");
+    	  } else {
+    		  char timebuffer[101] = {};
+#if __x86_64__
+    		  snprintf(timebuffer, 100, " $R($B$0No sell for %llu secs$R)", expires-now);
+#else
+    		  snprintf(timebuffer, 100, " $R($B$0No sell for %lu secs$R)", expires-now);
+#endif
+    		  strcat(buffer, timebuffer);
+    	  }
+      }
+
       if(mode == 0) // 'look'
          strcat(buffer, "$B$1"); // setup color background
    }
