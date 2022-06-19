@@ -14,6 +14,7 @@
  ***************************************************************************/
 /* $Id: mob_proc2.cpp,v 1.89 2012/05/25 02:15:46 jhhudso Exp $ */
 #include <string.h>
+#include <fmt/format.h>
 
 using namespace std;
 
@@ -458,84 +459,148 @@ int mortician(struct char_data *ch, struct obj_data *obj, int cmd, const char *a
 	return eSUCCESS;
 }
 
-char *gl_item(OBJ_DATA *obj, int number, CHAR_DATA *ch, bool platinum = TRUE) {
-	char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH], buf3[MAX_STRING_LENGTH];
-	int length, i = 0;
+char *gl_item(OBJ_DATA *obj, int number, CHAR_DATA *ch, bool platinum = TRUE)
+{
+	string buf = {}, buf2 = {}, buf3 = {};
+	size_t length = {};
+
 	if (platinum)
-		sprintf(buf, "$B$7%-2d$R) %s ", number + 1, obj->short_description);
-	else
-		sprintf(buf, "$B$7%-2d$R) $3$B%s$R ", number + 1, obj->short_description);
-
-	if (obj->obj_flags.type_flag == ITEM_WEAPON) { // weapon
-		sprintf(buf, "%s%dd%d, %s, ", buf, obj->obj_flags.value[1], obj->obj_flags.value[2],
-		IS_SET(obj->obj_flags.extra_flags, ITEM_TWO_HANDED) ? "Two-handed" : "One-handed");
+	{
+		buf = fmt::format("$B$7{:-2}$R) {} ", number + 1, obj->short_description);
 	}
-	length = strlen(buf);
-	for (; i < obj->num_affects; i++)
-		if ((obj->affected[i].location != APPLY_NONE) && (obj->affected[i].modifier != 0)) {
+	else
+	{
+		buf = fmt::format("$B$7{:-2}$R) $3$B{}$R ", number + 1, obj->short_description);
+	}
+
+	if (obj->obj_flags.type_flag == ITEM_WEAPON)
+	{ // weapon
+		buf = fmt::format("{}{}d{}, {}, ", buf, obj->obj_flags.value[1], obj->obj_flags.value[2], IS_SET(obj->obj_flags.extra_flags, ITEM_TWO_HANDED) ? "Two-handed" : "One-handed");
+	}
+
+	for (uint i = 0; i < obj->num_affects; i++)
+	{
+		if ((obj->affected[i].location != APPLY_NONE) && (obj->affected[i].modifier != 0))
+		{
 			if (obj->affected[i].location < 1000)
-				sprinttype(obj->affected[i].location, apply_types, buf2);
+			{
+				buf2 = sprinttype(obj->affected[i].location, apply_types);
+			}
 			else if (get_skill_name(obj->affected[i].location / 1000))
-				strcpy(buf2, get_skill_name(obj->affected[i].location / 1000));
+			{
+				buf2 = get_skill_name(obj->affected[i].location / 1000);
+			}
 			else
-				strcpy(buf2, "Invalid");
-
-			sprintf(buf3, "%s by %d, ", buf2, obj->affected[i].modifier);
-
-			for (unsigned int a = 0; a < strlen(buf3); a++)
-				buf3[a] = LOWER(buf3[a]); // these affects are all lowercase
-			if (length + strlen(buf3) > 90) {
-				length = 0;
-				sprintf(buf, "%s\r\n    %s", buf, buf3);
-			} else {
-				length += strlen(buf3);
-				sprintf(buf, "%s%s", buf, buf3);
+			{
+				buf2 = "Invalid";
 			}
 
-		}
-	if (ch->in_room != 3055) {
-		if (class_restricted(ch, obj) || size_restricted(ch, obj)) {
-			sprintf(buf2, "$4[restricted]$R, ");
-			if (length + strlen(buf2) > 90) {
-				length = 0;
-				sprintf(buf, "%s\r\n    %s", buf, buf2);
-			} else {
-				length += strlen(buf2);
-				sprintf(buf, "%s%s", buf, buf2);
+			buf3 = fmt::format("{} by {}, ", buf2, obj->affected[i].modifier);
+
+			for (auto &ch : buf3)
+			{
+				ch = LOWER(ch);
+			}
+
+			auto potential_buffer = buf + buf3;
+      		auto starting_point = potential_buffer.find_last_of("\n");
+			if (starting_point == potential_buffer.npos)
+			{
+				starting_point = 0;
+			}
+			length = nocolor_strlen(potential_buffer.substr(starting_point).c_str());
+
+			if (length > 79)
+			{
+				buf = fmt::format("{}\r\n    {}", buf, buf3);
+			}
+			else
+			{
+				buf = potential_buffer;
 			}
 		}
-	} else {
+	}
+
+	// Room where Orro, the Quest Guide is located
+	if (ch->in_room != 3055)
+	{
+		if (class_restricted(ch, obj) || size_restricted(ch, obj))
+		{
+			buf2 = "$4[restricted]$R, ";
+
+			auto potential_buffer = buf + buf2;
+      		auto starting_point = potential_buffer.find_last_of("\n");
+			if (starting_point == potential_buffer.npos)
+			{
+				starting_point = 0;
+			}
+			length = nocolor_strlen(potential_buffer.substr(starting_point).c_str());
+			if (length > 79)
+			{
+				buf = fmt::format("{}\r\n    {}", buf, buf2);
+			}
+			else
+			{
+				buf = potential_buffer;
+			}
+		}
+	}
+	else
+	{
 		uint32 a = obj->obj_flags.extra_flags;
 		a &= ALL_CLASSES;
-		sprintbit(a, extra_bits, buf2);
-		buf2[strlen(buf2) - 1] = '\0'; // remove extra space;
-		sprintf(buf2, "%s]$R, ", buf2);
-		if (a) {
-			if (length + strlen(buf2) + 1 > 90) {
-				length = 0;
-				sprintf(buf, "%s\r\n    $4[%s", buf, buf2);
-			} else {
-				length += strlen(buf2);
-				sprintf(buf, "%s$4[%s", buf, buf2);
+
+		buf2 = fmt::format("{}]$R, ", sprintbit(a, extra_bits));
+
+		if (a)
+		{
+			auto potential_buffer = fmt::format("{}$4[{}", buf, buf2);	
+      		auto starting_point = potential_buffer.find_last_of("\n");
+			if (starting_point == potential_buffer.npos)
+			{
+				starting_point = 0;
+			}
+			length = nocolor_strlen(potential_buffer.substr(starting_point).c_str());
+
+			if (length > 79)
+			{
+				buf = fmt::format("{}\r\n    $4[{}", buf, buf2);
+			}
+			else
+			{
+				buf = potential_buffer;
 			}
 		}
 	}
 
-	if (platinum) {
-		sprintf(buf2, "costing %d coins.\r\n", obj->obj_flags.cost / 10);
-	} else {
-		sprintf(buf2, "costing %d qpoints.\r\n", obj->obj_flags.cost / 10000);
+	if (platinum)
+	{
+		buf2 = fmt::format("costing {} coins.", obj->obj_flags.cost / 10);
+	}
+	else
+	{
+		buf2 = fmt::format("costing {} qpoints.", obj->obj_flags.cost / 10000);
 	}
 
-	if (length + strlen(buf2) > 90) {
-		length = 0;
-		sprintf(buf, "%s\r\n    %s", buf, buf2);
-	} else {
-		length += strlen(buf2);
-		sprintf(buf, "%s%s", buf, buf2);
+	auto potential_buffer = buf + buf2;
+	auto starting_point = potential_buffer.find_last_of("\n");
+	if (starting_point == potential_buffer.npos)
+	{
+		starting_point = 0;
+	}
+	length = nocolor_strlen(potential_buffer.substr(starting_point).c_str());
+
+	if (length > 79)
+	{
+		buf = fmt::format("{}\r\n    {}", buf, buf2);
+	}
+	else
+	{
+		buf = potential_buffer;
 	}
 
-	return str_dup(buf);
+	buf += "\r\n";
+	return str_dup(buf.c_str());
 }
 
 struct platsmith {
