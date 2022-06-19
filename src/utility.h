@@ -387,10 +387,19 @@ void    log   (const char *str, int god_level, long type);
 void    log		(const char *str, int god_level, long type, char_data *vict);
 void    logf            (int level, long type, const char *arg, ...);
 int     send_to_gods    (const char * str, int god_level, long type);
+
 void	sprintbit	(uint value[], const char *names[], char *result);
+std::string	sprintbit	(uint value[], const char *names[]);
+
 void    sprintbit	(unsigned long vektor, const char *names[], char *result);
-void    sprinttype	(int type, const char *names[], char *result);
-void    sprinttype	(int type, vector<const char *>, char *result);
+std::string sprintbit	(unsigned long vektor, const char *names[]);
+
+void        sprinttype	(int type, const char *names[], char *result);
+std::string sprinttype	(int type, const char *names[]);
+
+void        sprinttype	(int type, vector<const char *>, char *result);
+std::string sprinttype	(int type, vector<const char *>);
+
 int     consttype       (char * search_str, const char *names[]);
 const char *  constindex      (int index, const char *names[]);
 struct time_info_data

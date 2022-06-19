@@ -89,42 +89,52 @@ struct timer_data *timer_list = NULL;
 // local funcs
 void update_wizlist(CHAR_DATA *ch);
 
-
 size_t nocolor_strlen(const char *s)
 {
-    if (!s) {
-	return 0;
+  if (!s)
+  {
+    return 0;
+  }
+
+  size_t len = 0;
+
+  while (*s != '\0')
+  {
+    if (*s == '$')
+    {
+      s++;
+      if ((*s <= '9' && *s >= '0') ||
+          *s == 'I' ||
+          *s == 'L' ||
+          *s == '*' ||
+          *s == 'R' ||
+          *s == 'B')
+      {
+        // Do nothing
+      }
+      else if (*s == '$')
+      {
+        len++;
+      }
+      else if (*s == '\0')
+      {
+        len++;
+        break;
+      }
+      else
+      {
+        len += 2;
+      }
+      s++;
     }
-
-    size_t len = 0;
-
-    while (*s != '\0') {
-	if (*s == '$') {
-	    s++;
-	    if ((*s <= '9' && *s >= '0') ||
-		*s == 'I' ||
-		*s == 'L' || 
-		*s == '*' ||
-		*s == 'R' ||
-		*s == 'B')
-	    {
-		// Do nothing
-	    } else if (*s == '$') {
-		len++;
-	    } else if (*s == '\0') {
-		len++;
-		break;
-	    } else {
-		len+=2;
-	    }
-	    s++;
-	} else {
-	    len++;
-	    s++;
-	}
+    else
+    {
+      len++;
+      s++;
     }
+  }
 
-    return len;
+  return len;
 }
 
 // This function is like str_dup except it returns 0 if passed 0
@@ -470,6 +480,7 @@ void log(const char *str, int god_level, long type, char_data *vict)
 }
 
 // function for new SETBIT et al. commands
+// leading space until all calling functions cleaned up
 void sprintbit( uint value[], const char *names[], char *result )
 {
    int i;
@@ -490,6 +501,39 @@ void sprintbit( uint value[], const char *names[], char *result )
       strcat( result, "NoBits " );
 }
 
+// no leading space
+std::string sprintbit(uint value[], const char *names[])
+{
+  int i;
+  string result;
+
+  for (i = 0; *names[i] != '\n'; i++)
+  {
+    int a = i / ASIZE;
+    if (IS_SET(value[a], 1 << (i - a * 32)))
+    {
+      if (!strcmp(names[i], "UNUSED"))
+      {
+        continue;
+      }
+
+      if (!result.empty())
+      {
+        result += " ";
+      }
+      result += names[i];      
+    }
+  }
+
+  if (result.empty())
+  {
+    result = "NoBits";
+  }
+
+  return result;
+}
+
+// leading space until all calling functions cleaned up
 void sprintbit( unsigned long vektor, const char *names[], char *result )
 {
     long nr;
@@ -522,6 +566,52 @@ void sprintbit( unsigned long vektor, const char *names[], char *result )
 	strcat( result, "NoBits " );
 }
 
+// no leading space
+std::string sprintbit(unsigned long vektor, const char *names[])
+{
+  long nr;
+
+  string result = {};
+
+  if (vektor < 0)
+  {
+    logf(IMMORTAL, LOG_WORLD, "Negative value sent to sprintbit");
+    return result;
+  }
+
+  for (nr = 0; vektor; vektor >>= 1)
+  {
+    if (IS_SET(1, vektor))
+    {
+      if (!strcmp(names[nr], "unused"))
+      {
+        continue;
+      }
+
+      if (!result.empty())
+      {
+        result += " ";
+      }
+
+      if (*names[nr] != '\n')
+      {
+        result += names[nr];
+      } else {
+        result += "Undefined";
+      }
+
+    }
+
+    if (*names[nr] != '\n')
+      nr++;
+  }
+
+  if (result.empty())
+    result = "NoBits";
+
+    return result;
+}
+
 void sprinttype(int type, const char *names[], char *result)
 {
   int nr;
@@ -534,6 +624,18 @@ void sprinttype(int type, const char *names[], char *result)
     strcpy(result, "Undefined");
 }
 
+string sprinttype(int type, const char *names[])
+{
+  int nr;
+
+  for (nr = 0; *names[nr] != '\n'; nr++)
+    ;
+  if (type > -1 && type < nr)
+    return names[type];
+  else
+    return "Undefined";
+}
+
 void sprinttype(int type, item_types_t names, char *result)
 {
   int nr;
@@ -544,6 +646,18 @@ void sprinttype(int type, item_types_t names, char *result)
     strcpy(result, names[type]);
   else
     strcpy(result, "Undefined");
+}
+
+string sprinttype(int type, item_types_t names)
+{
+  int nr;
+
+  for (nr = 0; *names[nr] != '\n'; nr++)
+    ;
+  if (type > -1 && type < nr)
+    return names[type];
+  else
+    return "Undefined";
 }
 
 int consttype( char * search_str, const char *names[] )
