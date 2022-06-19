@@ -1318,7 +1318,7 @@ int quest_vendor(char_data *ch, obj_data *obj, int cmd, const char *arg, char_da
       for (int qvnum = 27975; qvnum < 28000; qvnum++)
       {
          rnum = real_object(qvnum);
-         if (rnum)
+         if (rnum >= 0)
          {
             char *buffer = gl_item((OBJ_DATA *)obj_index[rnum].item, n++, ch, FALSE);
             send_to_char(buffer, ch);
@@ -1328,7 +1328,7 @@ int quest_vendor(char_data *ch, obj_data *obj, int cmd, const char *arg, char_da
       for (int qvnum = 3124; qvnum <= 3127; qvnum++)
       {
          rnum = real_object(qvnum);
-         if (rnum)
+         if (rnum >= 0)
          {
             char *buffer = gl_item((OBJ_DATA *)obj_index[rnum].item, n++, ch, FALSE);
             send_to_char(buffer, ch);
