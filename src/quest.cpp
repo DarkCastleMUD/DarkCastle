@@ -1354,7 +1354,7 @@ int quest_vendor(char_data *ch, obj_data *obj, int cmd, const char *arg, char_da
       for (int qvnum = 27975; qvnum <= 27999; qvnum++)
       {
          rnum = real_object(qvnum);
-         if (rnum && n++ == want_num)
+         if (rnum >= 0 && n++ == want_num)
          {
             FOUND = true;
             break;
@@ -1365,7 +1365,7 @@ int quest_vendor(char_data *ch, obj_data *obj, int cmd, const char *arg, char_da
          for (int qvnum = 3124; qvnum <= 3127; qvnum++)
          {
             rnum = real_object(qvnum);
-            if (rnum && n++ == want_num)
+            if (rnum >= 0 && n++ == want_num)
             {
                FOUND = true;
                break;
