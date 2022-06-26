@@ -144,7 +144,6 @@ int send_to_gods(const char *str, int god_level, long type)
     return(0);
   }
   if ((god_level > IMP) || (god_level < 0)) { // Outside valid god levels
-    log("Invalid level sent to send_to_gods!", OVERSEER, LOG_BUG);
     return(0);
   }
   
