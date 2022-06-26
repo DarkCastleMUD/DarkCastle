@@ -744,7 +744,7 @@ void DC::game_loop(void)
           {
             sprintf(buf, "Connection attempt bailed from %s", d->host);
             printf(buf);
-            log(buf, OVERSEER, LOG_SOCKET);
+            log(buf, 111, LOG_SOCKET);
           }
           close_socket(d);
         }
@@ -2099,7 +2099,7 @@ int process_input(struct descriptor_data *t)
     {
       if (strcmp(t->host, "127.0.0.1"))
       {
-        log("EOF on socket read (connection broken by peer)", ANGEL, LOG_SOCKET);
+        log("EOF on socket read (connection broken by peer)", 111, LOG_SOCKET);
       }
       return -1;
     }
@@ -2400,7 +2400,7 @@ int close_socket(struct descriptor_data *d)
     {
       sprintf(buf, "Losing player: %s.",
               GET_NAME(d->character) ? GET_NAME(d->character) : "<null>");
-      log(buf, ANGEL, LOG_SOCKET);
+      log(buf, 111, LOG_SOCKET);
       if (d->connected == conn::WRITE_BOARD || d->connected == conn::EDITING || d->connected == conn::EDIT_MPROG)
       {
         //		sprintf(buf, "Suspicious: %s.",
