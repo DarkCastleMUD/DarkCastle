@@ -1407,9 +1407,9 @@ CHAR_DATA *get_charmie(CHAR_DATA *ch)
 void generate_prompt(CHAR_DATA *ch, char *prompt)
 {
   CHAR_DATA *charmie;
-  char gprompt[MAX_STRING_LENGTH];
-  char *source;
-  char *pro;
+  char gprompt[MAX_STRING_LENGTH] = {};
+  char *source = nullptr;
+  char *pro = nullptr;
   pro = gprompt;
   char *mobprompt = "HP: %i/%H %f >";
 
