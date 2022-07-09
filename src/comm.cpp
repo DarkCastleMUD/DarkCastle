@@ -1172,13 +1172,6 @@ int do_prompt(CHAR_DATA *ch, char *arg, int cmd)
     return eSUCCESS;
   }
 
-  // we only have 80 chars of storage in the pfile!
-  if (strlen(arg) > 78)
-  {
-    send_to_char("Prompts have a maximum of 78 characters.\n\r", ch);
-    return eFAILURE;
-  }
-
   if (GET_LAST_PROMPT(ch))
     dc_free(GET_LAST_PROMPT(ch));
 
@@ -1447,6 +1440,178 @@ void generate_prompt(CHAR_DATA *ch, char *prompt)
     default:
       strcat(prompt, "2There is a fucked up code in your prompt> ");
       return;
+    case 'a':
+      sprintf(pro, "%hd", GET_ALIGNMENT(ch));
+      break;
+    case 'A':
+      sprintf(pro, "%s%hd%s", calc_color_align(GET_ALIGNMENT(ch)), GET_ALIGNMENT(ch), NTEXT);
+      break;
+    // %b
+    case 'b':
+      try
+      {
+        char_data *peer = ch->getFollowers().at(0);
+        if (peer != nullptr)
+        {
+          if (CAN_SEE(ch, peer))
+          {
+            sprintf(pro, "%s", GET_NAME(peer));
+          }
+          else
+          {
+            sprintf(pro, "someone");
+          }
+        }
+      }
+      catch (...)
+      {
+      }
+      break;
+    // %B - group member 1 hitpoints
+    case 'B':
+      try
+      {
+        char_data *peer = ch->getFollowers().at(0);
+        if (peer != nullptr)
+        {
+          sprintf(pro, "%d", peer->getHP());
+        }
+      }
+      catch (...)
+      {
+      }
+      break;
+    case 'c':
+      if (ch->fighting)
+        sprintf(pro, "<%s>", calc_condition(ch));
+      /* added by pir to stop "prompt %c" crash bug */
+      else
+        sprintf(pro, " ");
+      break;
+    case 'C':
+      if (ch->fighting)
+        sprintf(pro, "<%s>", calc_condition(ch, TRUE));
+      /* added by pir to stop "prompt %c" crash bug */
+      else
+        sprintf(pro, " ");
+      break;
+    case 'd':
+      sprintf(pro, "%s", time_look[weather_info.sunlight]);
+      break;
+    // %D - indicate weather conditions
+    case 'D':
+      if (OUTSIDE(ch))
+        sprintf(pro, "%s", sky_look[weather_info.sky]);
+      else
+        sprintf(pro, "indoors");
+      break;
+    // %e
+    case 'e':
+      try
+      {
+        char_data *peer = ch->getFollowers().at(1);
+        if (peer != nullptr)
+        {
+          if (CAN_SEE(ch, peer))
+          {
+            sprintf(pro, "%s", GET_NAME(peer));
+          }
+          else
+          {
+            sprintf(pro, "someone");
+          }
+        }
+      }
+      catch (...)
+      {
+      }
+      break;
+    // %E
+    case 'E':
+      try
+      {
+        char_data *peer = ch->getFollowers().at(1);
+        if (peer != nullptr)
+        {
+          sprintf(pro, "%d", peer->getHP());
+        }
+      }
+      catch (...)
+      {
+      }
+      break;
+    // %f
+    // %F
+    case 'g':
+      sprintf(pro, "%lld", GET_GOLD(ch));
+      break;
+    case 'G':
+      sprintf(pro, "%d", (int32)(GET_GOLD(ch) / 20000));
+      break;
+    case 'h':
+      sprintf(pro, "%d", ch->getHP());
+      break;
+    // %H
+    case 'H':
+      sprintf(pro, "%d", GET_MAX_HIT(ch));
+      break;
+    // %i - color max hitpoints
+    case 'i':
+      sprintf(pro, "%s%d%s", calc_color(ch->getHP(), GET_MAX_HIT(ch)),
+              ch->getHP(), NTEXT);
+      break;
+    case 'I':
+      sprintf(pro, "%d", ((ch->getHP() * 100) / GET_MAX_HIT(ch)));
+      break;
+    // j
+    case 'j':
+      try
+      {
+        char_data *peer = ch->getFollowers().at(2);
+        if (peer != nullptr)
+        {
+          if (CAN_SEE(ch, peer))
+          {
+            sprintf(pro, "%s", GET_NAME(peer));
+          }
+          else
+          {
+            sprintf(pro, "someone");
+          }
+        }
+      }
+      catch (...)
+      {
+      }
+      break;
+    // J
+    case 'J':
+      try
+      {
+        char_data *peer = ch->getFollowers().at(2);
+        if (peer != nullptr)
+        {
+          sprintf(pro, "%d", peer->getHP());
+        }
+      }
+      catch (...)
+      {
+      }
+      break;
+    // k
+    // K
+    // l
+    case 'L':
+      sprintf(pro, "%d", ((GET_KI(ch) * 100) / GET_MAX_KI(ch)));
+      break;
+    // m
+    // M
+    // n
+    case 'N':
+      sprintf(pro, "%d", ((GET_MANA(ch) * 100) / GET_MAX_MANA(ch)));
+      break;
+    // o
+    // O
     case 'p':
       if (ch->fighting && ch->fighting->fighting)
       {
@@ -1479,35 +1644,97 @@ void generate_prompt(CHAR_DATA *ch, char *prompt)
       else
         sprintf(pro, " ");
       break;
-    case 'd':
-      sprintf(pro, "%s", time_look[weather_info.sunlight]);
+
+    // %k - indicate time of day
+    case 'k':
+      sprintf(pro, "%d", GET_KI(ch));
       break;
-    case 'D':
-      if (OUTSIDE(ch))
-        sprintf(pro, "%s", sky_look[weather_info.sky]);
-      else
-        sprintf(pro, "indoors");
+    case 'K':
+      sprintf(pro, "%d", GET_MAX_KI(ch));
       break;
-    case 'g':
-      sprintf(pro, "%lld", GET_GOLD(ch));
+    // %l - color current ki
+    case 'l':
+      sprintf(pro, "%s%d%s", calc_color(GET_KI(ch), GET_MAX_KI(ch)),
+              GET_KI(ch), NTEXT);
       break;
-    case 'G':
-      sprintf(pro, "%d", (int32)(GET_GOLD(ch) / 20000));
-      break;
-    case '$':
-      sprintf(pro, "%d", GET_PLATINUM(ch));
-      break;
-    case 'h':
-      sprintf(pro, "%d", ch->getHP());
-      break;
-    case 'H':
-      sprintf(pro, "%d", GET_MAX_HIT(ch));
-      break;
+    // %L
     case 'm':
       sprintf(pro, "%d", GET_MANA(ch));
       break;
     case 'M':
       sprintf(pro, "%d", GET_MAX_MANA(ch));
+      break;
+    case 'n':
+      sprintf(pro, "%s%d%s", calc_color(GET_MANA(ch), GET_MAX_MANA(ch)),
+              GET_MANA(ch), NTEXT);
+      break;
+    // %N
+    // %o
+    // %O
+    // %p
+    // %P
+    // q
+    // Q
+    case 'r':
+      sprintf(pro, "%c%c", '\n', '\r');
+      break;
+    // R
+    case 's':
+      if (world_array[ch->in_room])
+        sprintf(pro, "%s", sector_types[world[ch->in_room].sector_type]);
+      else
+        sprintf(pro, " ");
+      break;
+    // S
+    case 't':
+      if (ch->fighting && ch->fighting->fighting)
+        sprintf(pro, "[%s]",
+                calc_condition(ch->fighting->fighting));
+      /* added by pir to stop "prompt %c" crash bug */
+      else
+        sprintf(pro, " ");
+      break;
+    case 'T':
+      if (ch->fighting && ch->fighting->fighting)
+        sprintf(pro, "[%s]", calc_condition(ch->fighting->fighting, TRUE));
+      /* added by pir to stop "prompt %c" crash bug */
+      else
+        sprintf(pro, " ");
+      break;
+    // u
+    case 'u':
+      try
+      {
+        char_data *peer = ch->getFollowers().at(3);
+        if (peer != nullptr)
+        {
+          if (CAN_SEE(ch, peer))
+          {
+            sprintf(pro, "%s", GET_NAME(peer));
+          }
+          else
+          {
+            sprintf(pro, "someone");
+          }
+        }
+      }
+      catch (...)
+      {
+      }
+      break;
+    // U
+    case 'U':
+      try
+      {
+        char_data *peer = ch->getFollowers().at(3);
+        if (peer != nullptr)
+        {
+          sprintf(pro, "%d", peer->getHP());
+        }
+      }
+      catch (...)
+      {
+      }
       break;
     case 'v':
       sprintf(pro, "%d", GET_MOVE(ch));
@@ -1515,27 +1742,18 @@ void generate_prompt(CHAR_DATA *ch, char *prompt)
     case 'V':
       sprintf(pro, "%d", GET_MAX_MOVE(ch));
       break;
-    case 'k':
-      sprintf(pro, "%d", GET_KI(ch));
-      break;
-    case 'K':
-      sprintf(pro, "%d", GET_MAX_KI(ch));
-      break;
-    case 'l':
-      sprintf(pro, "%s%d%s", calc_color(GET_KI(ch), GET_MAX_KI(ch)),
-              GET_KI(ch), NTEXT);
-      break;
-    case 'i':
-      sprintf(pro, "%s%d%s", calc_color(ch->getHP(), GET_MAX_HIT(ch)),
-              ch->getHP(), NTEXT);
-      break;
-    case 'n':
-      sprintf(pro, "%s%d%s", calc_color(GET_MANA(ch), GET_MAX_MANA(ch)),
-              GET_MANA(ch), NTEXT);
+    case 'W':
+      sprintf(pro, "%d", ((GET_MOVE(ch) * 100) / GET_MAX_MOVE(ch)));
       break;
     case 'w':
       sprintf(pro, "%s%d%s", calc_color(GET_MOVE(ch), GET_MAX_MOVE(ch)),
               GET_MOVE(ch), NTEXT);
+      break;
+    case 'x':
+      sprintf(pro, "%lld", GET_EXP(ch));
+      break;
+    case 'X':
+      sprintf(pro, "%lld", (int64)(exp_table[(int)GET_LEVEL(ch) + 1] - (int64)GET_EXP(ch)));
       break;
     case 'y':
       charmie = get_charmie(ch);
@@ -1552,84 +1770,11 @@ void generate_prompt(CHAR_DATA *ch, char *prompt)
       else
         sprintf(pro, " ");
       break;
-    case 'I':
-      sprintf(pro, "%d", ((ch->getHP() * 100) / GET_MAX_HIT(ch)));
-      break;
-    case 'N':
-      sprintf(pro, "%d", ((GET_MANA(ch) * 100) / GET_MAX_MANA(ch)));
-      break;
-    case 'W':
-      sprintf(pro, "%d", ((GET_MOVE(ch) * 100) / GET_MAX_MOVE(ch)));
-      break;
-    case 'L':
-      sprintf(pro, "%d", ((GET_KI(ch) * 100) / GET_MAX_KI(ch)));
-      break;
-    case 'x':
-      sprintf(pro, "%lld", GET_EXP(ch));
-      break;
-    case 'X':
-      sprintf(pro, "%lld", (int64)(exp_table[(int)GET_LEVEL(ch) + 1] - (int64)GET_EXP(ch)));
-      break;
     case '%':
       sprintf(pro, "%%");
       break;
-    case 'a':
-      sprintf(pro, "%hd", GET_ALIGNMENT(ch));
-      break;
-    case 'A':
-      sprintf(pro, "%s%hd%s", calc_color_align(GET_ALIGNMENT(ch)), GET_ALIGNMENT(ch), NTEXT);
-      break;
-    case 'c':
-      if (ch->fighting)
-        sprintf(pro, "<%s>", calc_condition(ch));
-      /* added by pir to stop "prompt %c" crash bug */
-      else
-        sprintf(pro, " ");
-      break;
-    case 'C':
-      if (ch->fighting)
-        sprintf(pro, "<%s>", calc_condition(ch, TRUE));
-      /* added by pir to stop "prompt %c" crash bug */
-      else
-        sprintf(pro, " ");
-      break;
-
-    case 'f':
-      if (ch->fighting)
-        sprintf(pro, "(%s)", calc_condition(ch->fighting));
-      /* added by pir to stop "prompt %c" crash bug */
-      else
-        sprintf(pro, " ");
-      break;
-    case 'F':
-      if (ch->fighting)
-        sprintf(pro, "(%s)", calc_condition(ch->fighting, TRUE));
-      /* added by pir to stop "prompt %c" crash bug */
-      else
-        sprintf(pro, " ");
-      break;
-
-    case 't':
-      if (ch->fighting && ch->fighting->fighting)
-        sprintf(pro, "[%s]",
-                calc_condition(ch->fighting->fighting));
-      /* added by pir to stop "prompt %c" crash bug */
-      else
-        sprintf(pro, " ");
-      break;
-    case 'T':
-      if (ch->fighting && ch->fighting->fighting)
-        sprintf(pro, "[%s]", calc_condition(ch->fighting->fighting, TRUE));
-      /* added by pir to stop "prompt %c" crash bug */
-      else
-        sprintf(pro, " ");
-      break;
-
-    case 's':
-      if (world_array[ch->in_room])
-        sprintf(pro, "%s", sector_types[world[ch->in_room].sector_type]);
-      else
-        sprintf(pro, " ");
+    case '$':
+      sprintf(pro, "%d", GET_PLATINUM(ch));
       break;
     case '0':
       sprintf(pro, "%s", NTEXT);
@@ -1657,9 +1802,6 @@ void generate_prompt(CHAR_DATA *ch, char *prompt)
       break;
     case '8':
       sprintf(pro, "%s", BOLD);
-      break;
-    case 'r':
-      sprintf(pro, "%c%c", '\n', '\r');
       break;
     }
     ++source;
