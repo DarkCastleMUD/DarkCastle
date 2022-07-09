@@ -456,6 +456,7 @@ struct char_data
     void fillHP(void);
     void fillHPLimit(void);
     void send(string);
+    vector<char_data *> getFollowers(void);
 };
 
 // This structure is written to the disk.  DO NOT MODIFY THIS STRUCTURE

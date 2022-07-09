@@ -733,3 +733,35 @@ int do_autojoin(CHAR_DATA *ch, char *argument, int cmd)
   send_to_char(buf,ch);
   return eSUCCESS;
 }
+
+vector<char_data *> char_data::getFollowers(void)
+{
+  vector<char_data *> followers = {};
+  follow_type *f = {};
+  char_data *leader = nullptr;
+
+  if (!IS_AFFECTED(this, AFF_GROUP))
+  {
+    return followers;
+  }
+
+  if (this->master != nullptr)
+  {
+    leader = this->master;
+  }
+  else
+  {
+    leader = this;
+  }
+  followers.push_back(leader);
+
+  for (f = leader->followers; f != nullptr; f = f->next)
+  {
+    if (IS_AFFECTED(f->follower, AFF_GROUP))
+    {
+      followers.push_back(f->follower);
+    }
+  }
+
+  return followers;
+}
