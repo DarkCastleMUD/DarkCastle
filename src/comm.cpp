@@ -1540,8 +1540,20 @@ void generate_prompt(CHAR_DATA *ch, char *prompt)
       {
       }
       break;
-    // %f
-    // %F
+    case 'f':
+      if (ch->fighting)
+        sprintf(pro, "(%s)", calc_condition(ch->fighting));
+      /* added by pir to stop "prompt %c" crash bug */
+      else
+        sprintf(pro, " ");
+      break;
+    case 'F':
+      if (ch->fighting)
+        sprintf(pro, "(%s)", calc_condition(ch->fighting, TRUE));
+      /* added by pir to stop "prompt %c" crash bug */
+      else
+        sprintf(pro, " ");
+      break;
     case 'g':
       sprintf(pro, "%lld", GET_GOLD(ch));
       break;
