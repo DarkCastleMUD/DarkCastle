@@ -1474,7 +1474,7 @@ void generate_prompt(CHAR_DATA *ch, char *prompt)
         char_data *peer = ch->getFollowers().at(0);
         if (peer != nullptr)
         {
-          sprintf(pro, "%d", peer->getHP());
+          sprintf(pro, "%s%d%s", calc_color(peer->getHP(), GET_MAX_HIT(peer)), peer->getHP(), NTEXT);
         }
       }
       catch (...)
@@ -1533,7 +1533,7 @@ void generate_prompt(CHAR_DATA *ch, char *prompt)
         char_data *peer = ch->getFollowers().at(1);
         if (peer != nullptr)
         {
-          sprintf(pro, "%d", peer->getHP());
+          sprintf(pro, "%s%d%s", calc_color(peer->getHP(), GET_MAX_HIT(peer)), peer->getHP(), NTEXT);
         }
       }
       catch (...)
@@ -1596,34 +1596,49 @@ void generate_prompt(CHAR_DATA *ch, char *prompt)
       {
       }
       break;
-    // J
     case 'J':
       try
       {
         char_data *peer = ch->getFollowers().at(2);
         if (peer != nullptr)
         {
-          sprintf(pro, "%d", peer->getHP());
+          sprintf(pro, "%s%d%s", calc_color(peer->getHP(), GET_MAX_HIT(peer)), peer->getHP(), NTEXT);
         }
       }
       catch (...)
       {
       }
       break;
-    // k
-    // K
-    // l
+    // %k - indicate time of day
+    case 'k':
+      sprintf(pro, "%d", GET_KI(ch));
+      break;
+    case 'K':
+      sprintf(pro, "%d", GET_MAX_KI(ch));
+      break;
+    // %l - color current ki
+    case 'l':
+      sprintf(pro, "%s%d%s", calc_color(GET_KI(ch), GET_MAX_KI(ch)),
+              GET_KI(ch), NTEXT);
+      break;
     case 'L':
       sprintf(pro, "%d", ((GET_KI(ch) * 100) / GET_MAX_KI(ch)));
       break;
-    // m
-    // M
-    // n
+    case 'm':
+      sprintf(pro, "%d", GET_MANA(ch));
+      break;
+    case 'M':
+      sprintf(pro, "%d", GET_MAX_MANA(ch));
+      break;   
+   case 'n':
+      sprintf(pro, "%s%d%s", calc_color(GET_MANA(ch), GET_MAX_MANA(ch)),
+              GET_MANA(ch), NTEXT);
+      break;
     case 'N':
       sprintf(pro, "%d", ((GET_MANA(ch) * 100) / GET_MAX_MANA(ch)));
       break;
-    // o
-    // O
+    // o - unused
+    // O - unused
     case 'p':
       if (ch->fighting && ch->fighting->fighting)
       {
@@ -1656,48 +1671,17 @@ void generate_prompt(CHAR_DATA *ch, char *prompt)
       else
         sprintf(pro, " ");
       break;
-
-    // %k - indicate time of day
-    case 'k':
-      sprintf(pro, "%d", GET_KI(ch));
-      break;
-    case 'K':
-      sprintf(pro, "%d", GET_MAX_KI(ch));
-      break;
-    // %l - color current ki
-    case 'l':
-      sprintf(pro, "%s%d%s", calc_color(GET_KI(ch), GET_MAX_KI(ch)),
-              GET_KI(ch), NTEXT);
-      break;
-    // %L
-    case 'm':
-      sprintf(pro, "%d", GET_MANA(ch));
-      break;
-    case 'M':
-      sprintf(pro, "%d", GET_MAX_MANA(ch));
-      break;
-    case 'n':
-      sprintf(pro, "%s%d%s", calc_color(GET_MANA(ch), GET_MAX_MANA(ch)),
-              GET_MANA(ch), NTEXT);
-      break;
-    // %N
-    // %o
-    // %O
-    // %p
-    // %P
-    // q
-    // Q
     case 'r':
       sprintf(pro, "%c%c", '\n', '\r');
       break;
-    // R
+    // R - unused
     case 's':
       if (world_array[ch->in_room])
         sprintf(pro, "%s", sector_types[world[ch->in_room].sector_type]);
       else
         sprintf(pro, " ");
       break;
-    // S
+    // S - unused
     case 't':
       if (ch->fighting && ch->fighting->fighting)
         sprintf(pro, "[%s]",
@@ -1713,7 +1697,6 @@ void generate_prompt(CHAR_DATA *ch, char *prompt)
       else
         sprintf(pro, " ");
       break;
-    // u
     case 'u':
       try
       {
@@ -1734,14 +1717,13 @@ void generate_prompt(CHAR_DATA *ch, char *prompt)
       {
       }
       break;
-    // U
     case 'U':
       try
       {
         char_data *peer = ch->getFollowers().at(3);
         if (peer != nullptr)
         {
-          sprintf(pro, "%d", peer->getHP());
+          sprintf(pro, "%s%d%s", calc_color(peer->getHP(), GET_MAX_HIT(peer)), peer->getHP(), NTEXT);
         }
       }
       catch (...)
@@ -1782,6 +1764,8 @@ void generate_prompt(CHAR_DATA *ch, char *prompt)
       else
         sprintf(pro, " ");
       break;
+    // z - unused
+    // Z - unused
     case '%':
       sprintf(pro, "%%");
       break;
