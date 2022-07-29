@@ -799,7 +799,7 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, const char *a
 						"$B$320)$R Buy a practice session for 25 plats.\r\n"
 				, ch);
 		if (!IS_MOB(ch)) {
-			send_to_char("$B$321)$R Add -2 points of AC for 10 qpoints. (-50 Max)\r\n", ch);
+			csendf(ch, "$B$321)$R Add -2 points of AC for 10 qpoints. (-50 Max) (current -%d)\r\n", GET_AC_METAS(ch));
 			send_to_char("$B$322)$R Add 2,000,000 experience for 1 qpoint.\r\n", ch);
 		}
 
