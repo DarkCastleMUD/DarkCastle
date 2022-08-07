@@ -3245,8 +3245,8 @@ int mprog_process_cmnd( char *cmnd, CHAR_DATA *mob, CHAR_DATA *actor,
   }
   *point = '\0';
 
-  if(strlen(buf) > MAX_INPUT_LENGTH-1)
-    logf(IMMORTAL, LOG_WORLD, "Warning!  Mob '%s' has MobProg command longer than max input.", GET_NAME(mob));
+//  if(strlen(buf) > MAX_INPUT_LENGTH-1)
+//    logf(IMMORTAL, LOG_WORLD, "Warning!  Mob '%s' has MobProg command longer than max input.", GET_NAME(mob));
 
   return command_interpreter( mob, buf, TRUE );
 }
