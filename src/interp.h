@@ -142,7 +142,8 @@ typedef int DO_FUN(CHAR_DATA *ch, char *argument, int cmd);
 struct command_info
 {
     char *command_name;      /* Name of ths command             */
-    DO_FUN *command_pointer; /* Function that does it            */
+    int (*command_pointer)(CHAR_DATA *ch, char *argument, int cmd); /* Function that does it            */
+    int (*command_pointer2)(char_data *ch, string argument, int cmd); /* Function that does it            */
     ubyte minimum_position;  /* Position commander must be in    */
     ubyte minimum_level;     /* Minimum level needed             */
     int command_number;      /* Passed to function as argument   */
@@ -537,7 +538,7 @@ int do_tactics(CHAR_DATA *ch, char *argument, int cmd);
 int do_tame(CHAR_DATA *ch, char *argument, int cmd);
 int do_taste(CHAR_DATA *ch, char *argument, int cmd);
 int do_teleport(CHAR_DATA *ch, char *argument, int cmd);
-int do_tell(CHAR_DATA *ch, char *argument, int cmd);
+int do_tell(CHAR_DATA *ch, string argument, int cmd);
 int do_testhand(CHAR_DATA *ch, char *argument, int cmd);
 int do_testhit(CHAR_DATA *ch, char *argument, int cmd);
 int do_testport(CHAR_DATA *ch, char *argument, int cmd);

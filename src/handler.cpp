@@ -2483,6 +2483,25 @@ struct obj_data *unequip_char(CHAR_DATA *ch, int pos, int flag) {
 	return (obj);
 }
 
+int get_number(string name)
+{
+	size_t pos = name.find(".");
+	if (pos == name.npos)
+	{
+		return 1;
+	}
+
+	string number_str = name.substr(0, pos);
+
+	try
+	{
+		return stoi(number_str);
+	} catch (...)
+	{
+		return 1;
+	}
+}
+
 int get_number(char **name) {
 	unsigned i;
 	char *ppos = NULL;
@@ -2624,18 +2643,15 @@ CHAR_DATA *get_char_room(char *name, int room, bool careful) {
 }
 
 /* search all over the world for a char, and return a pointer if found */
-CHAR_DATA *get_char(const char *name) 
+CHAR_DATA *get_char(string name) 
 {
-	CHAR_DATA *partial_match;
+	CHAR_DATA *partial_match = nullptr;
 	int j = 0, number = 0;
-	char tmpname[MAX_INPUT_LENGTH];
-	char *tmp;
+	string tmpname = {}, tmp = {};
 
-	partial_match = 0;
-
-	strcpy(tmpname, name);
+	tmpname = name;
 	tmp = tmpname;
-	if ((number = get_number(&tmp)) < 0)
+	if ((number = get_number(tmp)) < 0)
 		return (0);
 
 	auto &character_list = DC::instance().character_list;
@@ -2646,7 +2662,7 @@ CHAR_DATA *get_char(const char *name)
 		{
 			if (isname(tmp, GET_NAME(i)))
 			return true;
-			else if (isname2(tmp, GET_NAME(i)))
+			else if (isname2(tmp.c_str(), GET_NAME(i)))
 			{
 				if (partial_match)
 				{
@@ -3923,7 +3939,7 @@ CHAR_DATA *get_all_pc(char *name) {
 	return 0;
 }
 
-CHAR_DATA *get_pc_vis(CHAR_DATA *ch, char *name) {
+CHAR_DATA *get_pc_vis(CHAR_DATA *ch, const char *name) {
 	CHAR_DATA *partial_match = 0;
 
 	auto &character_list = DC::instance().character_list;
@@ -3954,7 +3970,7 @@ CHAR_DATA *get_pc_vis(CHAR_DATA *ch, char *name) {
 	return partial_match;
 }
 
-char_data *get_pc_vis_exact(CHAR_DATA *ch, char *name) {
+char_data *get_pc_vis_exact(CHAR_DATA *ch, const char *name) {
 	auto &character_list = DC::instance().character_list;
 	auto result = find_if(character_list.begin(), character_list.end(), [&ch, &name](char_data * const &i) {
 		if(!IS_NPC(i) && CAN_SEE(ch, i))
@@ -3972,7 +3988,7 @@ char_data *get_pc_vis_exact(CHAR_DATA *ch, char *name) {
 	return 0;
 }
 
-CHAR_DATA *get_active_pc_vis(CHAR_DATA *ch, char *name) {
+CHAR_DATA *get_active_pc_vis(CHAR_DATA *ch, const char *name) {
 	CHAR_DATA *i;
 	CHAR_DATA *partial_match;
 	struct descriptor_data *d;

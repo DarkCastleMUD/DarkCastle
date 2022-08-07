@@ -38,8 +38,8 @@ void display_punishes(CHAR_DATA *ch, CHAR_DATA
 char *str_str(char *first, char *second);
 void setup_dir(FILE *fl, int room, int dir);
 struct time_info_data age(CHAR_DATA *ch);
-CHAR_DATA *get_pc_vis(CHAR_DATA *ch, char *name);
-CHAR_DATA *get_pc_vis_exact(CHAR_DATA *ch, char *name);
+CHAR_DATA *get_pc_vis(CHAR_DATA *ch, const char *name);
+CHAR_DATA *get_pc_vis_exact(CHAR_DATA *ch, const char *name);
 void update_wizlist(CHAR_DATA *ch);
 int real_roomb(int virt);
 void save_ban_list(void);

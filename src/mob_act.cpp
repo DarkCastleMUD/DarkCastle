@@ -106,6 +106,11 @@ void mobile_activity(void)
     // combat for stuff he shouldn't be able to do while fighting:)
     // And paralyze...
 
+    if (ch->mobdata == nullptr)
+    {
+      continue;
+    }
+
     if(mob_index[ch->mobdata->nr].non_combat_func) {
 
       PerfTimers["mprog"].start();

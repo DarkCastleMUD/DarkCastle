@@ -6,7 +6,7 @@
 #include <string>
 #include <sstream>
 
-#include <string.h> // strstr()
+#include <cstring> // strstr()
 
 #include "db.h"
 #include "fight.h"

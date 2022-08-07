@@ -21,7 +21,6 @@
 #include "character.h"
 #include "fileinfo.h"
 #include "connect.h"
-
 #include "Trace.h"
 
 using namespace std;

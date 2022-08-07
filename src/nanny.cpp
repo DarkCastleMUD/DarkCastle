@@ -1596,7 +1596,7 @@ void nanny(struct descriptor_data *d, string arg)
          GET_RAW_WIS(ch) = ch->desc->stats->wis[selection - 1];
          GET_RAW_DEX(ch) = ch->desc->stats->dex[selection - 1];
          GET_RAW_CON(ch) = ch->desc->stats->con[selection - 1];
-         dc_free(ch->desc->stats);
+         delete ch->desc->stats;
          ch->desc->stats = nullptr;
          SEND_TO_Q("\n\rChoose a race(races you can select are marked with a *).\n\r", d);
          sprintf(buf, "  %c1: Human\n\r  %c2: Elf\n\r  %c3: Dwarf\n\r"

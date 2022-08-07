@@ -512,7 +512,6 @@ int main(int argc, char **argv)
 	renum_zone_table();
 
   struct descriptor_data *d = new descriptor_data;
-  memset(d, 0, sizeof(descriptor_data));
 
   /* Create 1 blank obj to be used when playerfile loads */
   create_blank_item(1);
@@ -528,7 +527,6 @@ int main(int argc, char **argv)
   }
 
     d = new descriptor_data;
-    memset(d, 0, sizeof(descriptor_data));
     char_data* ch = new char_data;
     memset(ch, 0, sizeof(char_data));
     ch->pcdata = new pc_data;

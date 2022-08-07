@@ -126,7 +126,6 @@ int do_check(struct char_data *ch, char *arg, int cmd) {
     }
 
     // must be done to clear out "d" before it is used
-    memset((char *) &d, 0, sizeof(struct descriptor_data));
     if(!(load_char_obj(&d, buf))) {
       
       sprintf(tmp_buf, "../archive/%s.gz", buf);
@@ -345,7 +344,6 @@ int do_stat(struct char_data *ch, char *arg, int cmd)
     }
 
     // must be done to clear out "d" before it is used
-    memset((char *) &d, 0, sizeof(struct descriptor_data));
     if(!(load_char_obj(&d, name))) {
       send_to_char("Unable to load! (Character might not exist...)\n\r", ch);
       return eFAILURE; 

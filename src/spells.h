@@ -20,6 +20,8 @@
 #include "structs.h" // ubyte, int16
 #include "handler.h"
 #include "obj.h"
+#include "character.h"
+
 #include <map>
 
 #define MAX_BUF_LENGTH               240

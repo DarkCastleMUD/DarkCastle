@@ -3291,11 +3291,7 @@ CHAR_DATA *clone_mobile(int nr)
 	if (nr < 0)
 		return 0;
 
-#ifdef LEAK_CHECK
-	mob = (CHAR_DATA *)calloc(1, sizeof(CHAR_DATA));
-#else
-	mob = (CHAR_DATA *)dc_alloc(1, sizeof(CHAR_DATA));
-#endif
+	mob = new char_data;
 	auto &free_list = DC::instance().free_list;
 	free_list.erase(mob);
 
@@ -3304,11 +3300,7 @@ CHAR_DATA *clone_mobile(int nr)
 
 	*mob = *old;
 
-#ifdef LEAK_CHECK
-	mob->mobdata = (mob_data *)calloc(1, sizeof(mob_data));
-#else
-	mob->mobdata = (mob_data *)dc_alloc(1, sizeof(mob_data));
-#endif
+	mob->mobdata = new mob_data;
 
 	memcpy(mob->mobdata, old->mobdata, sizeof(mob_data));
 
@@ -5416,8 +5408,6 @@ void free_char(CHAR_DATA *ch, Trace trace)
 				dc_free(ch->pcdata->prompt);
 			if (ch->pcdata->last_prompt)
 				dc_free(ch->pcdata->last_prompt);
-			if (ch->pcdata->last_tell)
-				dc_free(ch->pcdata->last_tell);
 			if (ch->pcdata->golem)
 				log("Error, golem not released properly", ANGEL, LOG_BUG);
 			if (ch->pcdata->joining)
@@ -5444,7 +5434,7 @@ void free_char(CHAR_DATA *ch, Trace trace)
 			}
 
 
-			dc_free(ch->pcdata);
+			delete ch->pcdata;
 		}
 	}
 	else {
@@ -5457,7 +5447,7 @@ void free_char(CHAR_DATA *ch, Trace trace)
 			dc_free(ch->mobdata->mpact);
 			ch->mobdata->mpact = currmprog;
 		}
-		dc_free(ch->mobdata);
+		delete ch->mobdata;
 	}
 
 	if (ch->title)
@@ -5470,7 +5460,7 @@ void free_char(CHAR_DATA *ch, Trace trace)
 	while (ch->affected)
 		affect_remove(ch, ch->affected, SUPPRESS_ALL);
 
-	dc_free(ch);
+	delete ch;
 }
 
 /* release memory allocated for an obj struct */

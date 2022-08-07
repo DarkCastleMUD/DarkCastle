@@ -29,8 +29,8 @@ extern "C"
 #include "returnvals.h"
 #include "clan.h" // vault stuff
 
-extern char *drinks[];
-extern char *dirs[];
+extern const char *drinks[];
+extern const char *dirs[];
 extern int drink_aff[][3];
 extern CWorld world;
 
@@ -573,7 +573,7 @@ bool set_utility_mortar(struct char_data *ch, struct obj_data *obj, char *arg)
 void set_catstink(struct char_data *ch, struct obj_data *obj)
 {
   char buf[200];
-  extern char *sector_types[];
+  extern const char *sector_types[];
 
   sprintf(buf, "You sprinkle the %s all around you.\r\n", obj->short_description);
   send_to_char(buf, ch);

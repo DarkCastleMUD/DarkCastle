@@ -321,13 +321,13 @@ FILE * clan_log   = 0;
 FILE * objects_log = 0;
 FILE * quest_log = 0;
 
-void log(const char *str, int god_level, long type)
+void log(string str, int god_level, long type)
 {
   log(str, god_level, type, nullptr);
 }
 
 // writes a string to the log 
-void log(const char *str, int god_level, long type, char_data *vict)
+void log(string str, int god_level, long type, char_data *vict)
 {
   FILE **f = 0;
   int stream = 1;
@@ -338,12 +338,14 @@ void log(const char *str, int god_level, long type, char_data *vict)
   if (DC::instance().cf.bport)
   {
     logpath << "../blog/";
-  } else
+  }
+  else
   {
     logpath << "../log/";
   }
 
-  switch (type) {
+  switch (type)
+  {
   default:
     stream = 0;
     break;
@@ -359,9 +361,9 @@ void log(const char *str, int god_level, long type, char_data *vict)
     // TODO - need some sort of thing to automatically have bugs switch from file to
     //        to non-file when we're up in gdb
 
-    //stream = 0;
-    // I want bugs to be right in the gdblog.
-    // -Sadus
+    // stream = 0;
+    //  I want bugs to be right in the gdblog.
+    //  -Sadus
 
     break;
   case LOG_GOD:
@@ -400,7 +402,8 @@ void log(const char *str, int god_level, long type, char_data *vict)
       {
         fprintf(stderr, "Unable to open player log '%s'.\n", logpath.str().c_str());
       }
-    } else
+    }
+    else
     {
       logpath << PLAYER_LOG;
       if (!(*f = dc_fopen(logpath.str().c_str(), "a")))
@@ -463,20 +466,24 @@ void log(const char *str, int god_level, long type, char_data *vict)
 
   if (!stream)
   {
-    if (cf.stderr_timestamp == true) {
+    if (cf.stderr_timestamp == true)
+    {
 
-      fprintf(stderr, "%s :: %s\n", tmstr, str);
-    } else {
-      fprintf(stderr, "%s\n", str);
+      fprintf(stderr, "%s :: %s\n", tmstr, str.c_str());
     }
-  } else
+    else
   {
-    fprintf(*f, "%s :: %s\n", tmstr, str);
+      fprintf(stderr, "%s\n", str.c_str());
+    }
+  }
+  else
+  {
+    fprintf(*f, "%s :: %s\n", tmstr, str.c_str());
     dc_fclose(*f);
   }
 
   if (god_level >= IMMORTAL)
-    send_to_gods(str, god_level, type);
+    send_to_gods(str.c_str(), god_level, type);
 }
 
 // function for new SETBIT et al. commands

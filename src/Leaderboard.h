@@ -9,7 +9,7 @@
 #define LEADERBOARD_H_
 
 extern "C" {
-#include <stdio.h>
+#include <cstdio>
 }
 
 #include <sstream>

@@ -183,83 +183,83 @@ struct follow_type
 // first, or you will probably end up corrupting all the pfiles
 struct pc_data
 {
-    char pwd[PASSWORD_LEN+1];
-    char *ignoring;                 /* List of ignored names */
+    char pwd[PASSWORD_LEN+1] = {};
+    char *ignoring = {};                 /* List of ignored names */
 
-    struct char_player_alias * alias; /* Aliases */
+    struct char_player_alias * alias = {}; /* Aliases */
 
-    uint32 totalpkills;         // total number of pkills THIS LOGIN
-    uint32 totalpkillslv;       // sum of levels of pkills THIS LOGIN
-    uint32 pdeathslogin;        // pdeaths THIS LOGIN
+    uint32 totalpkills = {};         // total number of pkills THIS LOGIN
+    uint32 totalpkillslv = {};       // sum of levels of pkills THIS LOGIN
+    uint32 pdeathslogin = {};        // pdeaths THIS LOGIN
 
-    uint32 rdeaths;             // total number of real deaths
-    uint32 pdeaths;             // total number of times pkilled
-    uint32 pkills;              // # of pkills ever 
-    uint32 pklvl;               // # sum of levels of pk victims ever
-    uint32 group_kills;         // # of kills for group 
-    uint32 grplvl;              // sum of levels of group victims 
+    uint32 rdeaths = {};             // total number of real deaths
+    uint32 pdeaths = {};             // total number of times pkilled
+    uint32 pkills = {};              // # of pkills ever 
+    uint32 pklvl = {};               // # sum of levels of pk victims ever
+    uint32 group_kills = {};         // # of kills for group 
+    uint32 grplvl = {};              // sum of levels of group victims 
 
-    char *last_site;                /* Last login from.. */
-    struct time_data time;          // PC time data.  logon, played, birth
+    char *last_site = {};                /* Last login from.. */
+    struct time_data time = {};          // PC time data.  logon, played, birth
    
-    uint32 bad_pw_tries;        // How many times people have entered bad pws
+    uint32 bad_pw_tries = {};        // How many times people have entered bad pws
 
-     int16 statmetas;           // How many times I've metad a stat
+     int16 statmetas = {};           // How many times I've metad a stat
                                 // This number could go negative from stat loss
-    uint16 kimetas;             // How many times I've metad ki (pc only)
+    uint16 kimetas = {};             // How many times I've metad ki (pc only)
 
-    long wizinvis;
+    long wizinvis = {};
 
-    uint16 practices;         // How many can you learn yet this level
-    uint16 specializations;   // How many specializations a player has left
+    uint16 practices = {};         // How many can you learn yet this level
+    uint16 specializations = {};   // How many specializations a player has left
 
-     int16 saves_mods[SAVE_TYPE_MAX+1];  // Character dependant mods to saves (meta'able)
+     int16 saves_mods[SAVE_TYPE_MAX+1] = {};  // Character dependant mods to saves (meta'able)
 
-     uint32 bank;           /* gold in bank                            */
+     uint32 bank = {};           /* gold in bank                            */
 
-    uint32 toggles;            // Bitvector for toggles.  (Was specials.act)
-    uint32 punish;             // flags for punishments
-    uint32 quest_bv1;          // 1st bitvector for quests
+    uint32 toggles = {};            // Bitvector for toggles.  (Was specials.act)
+    uint32 punish = {};             // flags for punishments
+    uint32 quest_bv1 = {};          // 1st bitvector for quests
 
-    char *poofin;       /* poofin message */
-    char *poofout;      /* poofout message */    
-    char *prompt;       /* Sadus' disguise.. unused */
+    char *poofin = {};       /* poofin message */
+    char *poofout = {};      /* poofout message */    
+    char *prompt = {};       /* Sadus' disguise.. unused */
 
-    int16 buildLowVnum, buildHighVnum;
-    int16 buildMLowVnum, buildMHighVnum;
-    int16 buildOLowVnum, buildOHighVnum;
-    obj_data *skillchange; /* Skill changing equipment. */
+    int16 buildLowVnum = {}, buildHighVnum = {};
+    int16 buildMLowVnum = {}, buildMHighVnum = {};
+    int16 buildOLowVnum = {}, buildOHighVnum = {};
+    obj_data *skillchange = {}; /* Skill changing equipment. */
 
-     int32 last_mob_edit;       // vnum of last mob edited
-     int32 last_obj_edit;       // vnum of last obj edited
+     int32 last_mob_edit = {};       // vnum of last mob edited
+     int32 last_obj_edit = {};       // vnum of last obj edited
 
-    char *last_tell;          /* last person who told           */
-     int16 last_mess_read;     /* for reading messages */
+    string last_tell = {};          /* last person who told           */
+     int16 last_mess_read = {};     /* for reading messages */
 
     // TODO: these 3 need to become PLR toggles
-    bool holyLite;          // Holy lite mode
-    bool stealth;           // If on, you are more stealth then norm. (god)
-    bool incognito;         // invis imms will be seen by people in same room
+    bool holyLite = {};          // Holy lite mode
+    bool stealth = {};           // If on, you are more stealth then norm. (god)
+    bool incognito = {};         // invis imms will be seen by people in same room
 
-    bool possesing; 	      /*  is the person possessing? */
-    bool unjoinable;        // Do NOT autojoin
-    struct char_data *golem; // CURRENT golem. 
-    bool hide[MAX_HIDE];
-    CHAR_DATA *hiding_from[MAX_HIDE];
-    std::queue<char *> *away_msgs;
-    std::queue<std::string> *tell_history;
-    std::queue<std::string> *gtell_history;
-    char *joining;
-    uint32 quest_points;
-    int16  quest_current[QUEST_MAX];
-    uint32 quest_current_ticksleft[QUEST_MAX];
-    int16  quest_cancel[QUEST_CANCEL];
-    uint32 quest_complete[QUEST_TOTAL/ASIZE+1];
-    char *last_prompt;
-    std::multimap<int, std::pair<timeval, timeval> > *lastseen;
-    uint8_t profession;
-    bool multi;
-    std::map<string,string> *options;
+    bool possesing = {}; 	      /*  is the person possessing? */
+    bool unjoinable = {};        // Do NOT autojoin
+    struct char_data *golem = {}; // CURRENT golem. 
+    bool hide[MAX_HIDE] = {};
+    CHAR_DATA *hiding_from[MAX_HIDE] = {};
+    std::queue<string> *away_msgs = {};
+    std::queue<std::string> *tell_history = {};
+    std::queue<std::string> *gtell_history = {};
+    char *joining = {};
+    uint32 quest_points = {};
+    int16  quest_current[QUEST_MAX] = {};
+    uint32 quest_current_ticksleft[QUEST_MAX] = {};
+    int16  quest_cancel[QUEST_CANCEL] = {};
+    uint32 quest_complete[QUEST_TOTAL/ASIZE+1] = {};
+    char *last_prompt = {};
+    std::multimap<int, std::pair<timeval, timeval> > *lastseen = {};
+    uint8_t profession = {};
+    bool multi = {};
+    std::map<string,string> *options = {};
 };
 
 enum mob_type_t { MOB_NORMAL = 0, MOB_GUARD, MOB_CLAN_GUARD, MOB_TYPE_FIRST = MOB_NORMAL, MOB_TYPE_LAST = MOB_CLAN_GUARD };

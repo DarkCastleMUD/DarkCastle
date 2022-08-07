@@ -32,6 +32,7 @@ extern "C"
 #include "timeinfo.h"
 #include "DC.h"
 #include <algorithm>
+#include <fmt/format.h>
 
 using namespace std;
 
@@ -48,7 +49,6 @@ struct table_data;
 void addtimer(struct timer_data *add);
 int hand_number(struct player_data *plr);
 int hands(struct player_data *plr);
-void blackjack_prompt(CHAR_DATA *ch, char *prompt, bool ascii);
 bool charExists(CHAR_DATA *ch);
 void reel_spin(void *, void *, void *);
 
@@ -170,7 +170,7 @@ void nextturn(struct table_data *tbl)
 	}
 }
 
-void send_to_table(char *msg, struct table_data *tbl, struct player_data *plrSilent = NULL)
+void send_to_table(const string msg, struct table_data *tbl, struct player_data *plrSilent = nullptr)
 {
   //  struct player_data *plr;
 /*  for (plr = tbl->plr ; plr ; plr = plr->next)
@@ -211,8 +211,8 @@ bool verify(struct player_data *plr)
   {
 	if (result != character_list.end())
 	{
-	 char buf[MAX_STRING_LENGTH];
-	 sprintf(buf, "%s folds as %s leaves the room.\r\n", GET_NAME(plr->ch), HSSH(plr->ch));
+	 string buf;
+	 buf = fmt::format("{} folds as {} leaves the room.\r\n", GET_NAME(plr->ch), HSSH(plr->ch));
 	 send_to_table(buf, plr->table);
 	 send_to_char("Your hand is folded as you leave the room.\r\n",plr->ch);
 	}
@@ -696,7 +696,7 @@ void bj_dealer_ai(void *arg1, void *arg2, void *arg3)
 
 void check_blackjacks(struct table_data *tbl)
 {
-  char buf[MAX_STRING_LENGTH];
+  string buf;
   struct player_data *plr, *next;
   if (hand_strength(tbl) == 21)
   {
@@ -720,11 +720,10 @@ void check_blackjacks(struct table_data *tbl)
 	if (hand_strength(plr) == 21 &&
 		hand_strength(tbl) != 21)
 	{
-		sprintf(buf, "%s blackjacks!\r\n",GET_NAME(plr->ch));
+		buf = fmt::format("{} blackjacks!\r\n",GET_NAME(plr->ch));
 		send_to_table(buf,tbl, plr);
 		send_to_char("$BYou BLACKJACK!$R\r\n",plr->ch);
-		sprintf(buf, "The dealer gives you %d %s coins.\r\n", 
-		(int)(plr->bet*2.5), plr->table->gold?"gold":"platinum");
+		buf = fmt::format("The dealer gives you {} {} coins.\r\n", (int)(plr->bet*2.5), plr->table->gold?"gold":"platinum");
 
 		send_to_char(buf, plr->ch);
 		buf[0] = '\0';
@@ -961,29 +960,36 @@ int hand_number(struct player_data *plr)
   }
   return i;
 }
-
-void blackjack_prompt(CHAR_DATA *ch, char *prompt, bool ascii)
+void blackjack_prompt(CHAR_DATA *ch, string& prompt, bool ascii)
 {
   if (ch->in_room < 21902 || ch->in_room > 21905)
     if (ch->in_room != 44)
  	return;
   struct obj_data *obj;
-  for (obj = world[ch->in_room].contents;obj;obj = obj->next_content)
-	if (obj->table) break;
-  if (!obj || !obj->table->plr) return;
+   for (obj = world[ch->in_room].contents; obj; obj = obj->next_content)
+   {
+      if (obj->table)
+         break;
+   }
+   
+   if (!obj || !obj->table->plr)
+      return;
  // Prompt-time
   int plrsdone = 0;
   char buf[MAX_STRING_LENGTH];
   buf[0] = '\0';
   lineTwo[0] = '\0';
   lineTop[0] = '\0';
-  struct player_data *plr,*pnext;
+   struct player_data *plr, *pnext;
   for (plr = obj->table->plr; plr; plr = pnext)
   {
 	pnext = plr->next;
-	if (!verify(plr)) continue;
-	if (!plr->hand_data[0]) continue;
-	if (plr->ch == ch) {
+      if (!verify(plr))
+         continue;
+      if (!plr->hand_data[0])
+         continue;
+      if (plr->ch == ch)
+      {
   	  char buf2[MAX_STRING_LENGTH];
 	  buf2[0] = '\0';
           if (plr->table->cr == plr)
@@ -998,87 +1004,108 @@ void blackjack_prompt(CHAR_DATA *ch, char *prompt, bool ascii)
 		strcat(buf2, "SPLIT ");
 	  if (buf2[0] != '\0')
 	  {
-	    strcat(prompt, "You can: ");
-	    strcat(prompt, BOLD CYAN);
-	    strcat(prompt, buf2);
-	    strcat(prompt, NTEXT);
-	    strcat(prompt, "\r\n");
+            prompt += "You can: ";
+            prompt += BOLD CYAN;
+            prompt += buf2;
+            prompt += NTEXT;
+            prompt += "\r\n";
 	  }
 	if (hands(plr) > 1)
 	{
 	sprintf(tempBuf, "%s, hand %d: ", GET_NAME(plr->ch), hand_number(plr));
-       sprintf(buf,"%s%s%s%s, hand %d%s: %s = %d   ",buf, BOLD,  plr==plr->table->cr?GREEN:"",GET_NAME(plr->ch), hand_number(plr), NTEXT, show_hand(plr->hand_data, 0,ascii), hand_strength(plr));
-	padnext = hand_strength(plr) > 9 ? 8:7;
+            sprintf(buf, "%s%s%s%s, hand %d%s: %s = %d   ", buf, BOLD, plr == plr->table->cr ? GREEN : "", GET_NAME(plr->ch), hand_number(plr), NTEXT, show_hand(plr->hand_data, 0, ascii), hand_strength(plr));
+            padnext = hand_strength(plr) > 9 ? 8 : 7;
 	}
-	else {
+         else
+         {
 	sprintf(tempBuf, "%s: ", GET_NAME(plr->ch));
-       sprintf(buf,"%s%s%s%s%s: %s = %d   ",buf, BOLD, plr==plr->table->cr?GREEN:"",GET_NAME(plr->ch), NTEXT, show_hand(plr->hand_data, 0,ascii), hand_strength(plr));
-	padnext = hand_strength(plr) > 9 ? 8:7;
+            sprintf(buf, "%s%s%s%s%s: %s = %d   ", buf, BOLD, plr == plr->table->cr ? GREEN : "", GET_NAME(plr->ch), NTEXT, show_hand(plr->hand_data, 0, ascii), hand_strength(plr));
+            padnext = hand_strength(plr) > 9 ? 8 : 7;
         }
 	}
 //    }
-   else {
-   if (hands(plr) > 1) {
+      else
+      {
+         if (hands(plr) > 1)
+         {
   sprintf(tempBuf, "%s, hand %d: ", GET_NAME(plr->ch), hand_number(plr));
-    sprintf(buf,"%s%s%s, hand %d%s: %s ",buf, plr==plr->table->cr?BOLD GREEN:"",GET_NAME(plr->ch),hand_number(plr),
-	NTEXT, show_hand(plr->hand_data, 0,ascii));
+            sprintf(buf, "%s%s%s, hand %d%s: %s ", buf, plr == plr->table->cr ? BOLD GREEN : "", GET_NAME(plr->ch), hand_number(plr),
+                    NTEXT, show_hand(plr->hand_data, 0, ascii));
       padnext = 1;
     }
-   else {
+         else
+         {
   sprintf(tempBuf, "%s: ", GET_NAME(plr->ch));
     
-    sprintf(buf,"%s%s%s%s: %s ",buf,plr==plr->table->cr?BOLD GREEN:"", GET_NAME(plr->ch),
-	NTEXT,show_hand(plr->hand_data, 0,ascii));
+            sprintf(buf, "%s%s%s%s: %s ", buf, plr == plr->table->cr ? BOLD GREEN : "", GET_NAME(plr->ch),
+                    NTEXT, show_hand(plr->hand_data, 0, ascii));
       padnext = 1;
   }
    }
     if (++plrsdone % 3 == 0)
     {
-  if (buf[0]!= '\0'){
-  strcat(prompt,"\r\n");
-  if (ascii) {
-  strcat(prompt,lineTop);
-  strcat(prompt,"\r\n"); }
-  strcat(prompt,buf);
-  strcat(prompt,"\r\n");
-  if (ascii) {
-  strcat(prompt,lineTwo); 
-  strcat(prompt,"\r\n"); }
+         if (buf[0] != '\0')
+         {
+            prompt += "\r\n";
+            if (ascii)
+            {
+               prompt += lineTop;
+               prompt += "\r\n";
+            }
 
-  for (int z = 0; lineTop[z];z++)
-	if (lineTop[z] == ',') lineTop[z] = '\'';
-  if (ascii) {
-  strcat(prompt,lineTop);
-  strcat(prompt,"\r\n"); }
+            prompt += buf;
+            prompt += "\r\n";
+            if (ascii)
+            {
+               prompt += lineTwo;
+               prompt += "\r\n";
+            }
+
+            for (int z = 0; lineTop[z]; z++)
+               if (lineTop[z] == ',')
+                  lineTop[z] = '\'';
+            if (ascii)
+            {
+               prompt += lineTop;
+               prompt += "\r\n";
+            }
   buf[0] = '\0';
   lineTwo[0] = '\0';
   lineTop[0] = '\0';
   padnext = 0;
   }  
-	
     }
   }
-  if (obj->table->hand_data[0]) {
+   if (obj->table->hand_data[0])
+   {
   sprintf(tempBuf, "Dealer: ");
-  sprintf(buf, "%s%sDealer%s: %s",buf,BOLD YELLOW, NTEXT,obj->table->state < 2?
-	show_hand(obj->table->hand_data, 1,ascii):show_hand(obj->table->hand_data, 0,ascii));
-  sprintf(buf, "%s\r\n",buf); }
+      sprintf(buf, "%s%sDealer%s: %s", buf, BOLD YELLOW, NTEXT, obj->table->state < 2 ? show_hand(obj->table->hand_data, 1, ascii) : show_hand(obj->table->hand_data, 0, ascii));
+      sprintf(buf, "%s\r\n", buf);
+   }
   //fixPadding(&buf[0]);
-  if (buf[0]!= '\0'){
-  strcat(prompt,"\r\n");
-  if (ascii) {
-  strcat(prompt,lineTop);
-  strcat(prompt,"\r\n"); }
-  strcat(prompt,buf);
-  if (ascii) {
-  strcat(prompt,lineTwo);
-  strcat(prompt,"\r\n"); }
-  for (int z = 0; lineTop[z];z++)
-	if (lineTop[z] == ',') lineTop[z] = '\'';
-	else if (lineTop[z] == '_') lineTop[z] = '-';
-  if (ascii) {
-  strcat(prompt,lineTop);
-  strcat(prompt,"\r\n");
+   if (buf[0] != '\0')
+   {
+      prompt += "\r\n";
+      if (ascii)
+      {
+         prompt += lineTop;
+         prompt += "\r\n";
+      }
+      prompt += buf;
+      if (ascii)
+      {
+         prompt += lineTwo;
+         prompt += "\r\n";
+      }
+      for (int z = 0; lineTop[z]; z++)
+         if (lineTop[z] == ',')
+            lineTop[z] = '\'';
+         else if (lineTop[z] == '_')
+            lineTop[z] = '-';
+      if (ascii)
+      {
+         prompt += lineTop;
+         prompt += "\r\n";
   }
   }  
 }

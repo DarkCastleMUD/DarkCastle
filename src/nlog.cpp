@@ -14,8 +14,6 @@
 #include "player.h" // PLR_ANSI
 #include "utility.h"
 
-void send_to_char(const char *messg, CHAR_DATA *ch);
-
 /*
  * logf, str_hsh, and csendf by Sadus, others by Ysafar.
  */
@@ -129,86 +127,57 @@ int csendf(struct char_data *ch, const char *arg, ...)
 }
 
 
-char * handle_ansi(char * s, char_data * ch)
+string handle_ansi(string haystack, char_data * ch)
 {
-  char * t;
-  char* tp, *sp, *i;
+  map<size_t, bool> ignore;
+  map<string,string> rep;
+  rep["$$"] = "$";
+  rep["$0"] = BLACK;
+  rep["$1"] = BLUE;
+  rep["$2"] = GREEN;
+  rep["$3"] = CYAN;
+  rep["$4"] = RED;
+  rep["$5"] = YELLOW;
+  rep["$6"] = PURPLE;
+  rep["$7"] = GREY;
+  rep["$B"] = BOLD;
+  rep["$R"] = NTEXT;
+  rep["$L"] = FLASH;
+  rep["$K"] = BLINK;
+  rep["$I"] = INVERSE;
 
-  char nullstring[] = "";
-  char dollarstring[] = "$";
+  try
+  {
+    for (auto& key : rep)
+    {
+      string needle = key.first;
+      string replacement = key.second;
 
-  // Worse case scenario is a string of color codes that are all $R's.  These take up
-  // 11 characters each.  So to handle that, we'll count the number of $'s and multiply
-  // that by 11 for the amount of extra space we need.
-
-  int numdollars = 0;
-
-  t = s;
-  while((t = strstr(t, "$"))) {
-    numdollars++;
-    t++;
-  }
-  
-#ifdef LEAK_CHECK
-  t = (char *)calloc((strlen(s) + numdollars*11 + 1), sizeof(char));
-#else
-  t = (char *)dc_alloc((strlen(s) + numdollars*11 + 1), sizeof(char));
-#endif
-  *t = '\0';
-
-  i = nullstring;
-  tp = t;
-  sp = s;
-  while(*sp) {
-    if(*sp != '$') {
-      *tp++ = *sp++;
-    } else {
-       if(IS_MOB(ch) || IS_SET(ch->pcdata->toggles, PLR_ANSI) || (ch->desc && ch->desc->color)) {
-          switch(*++sp) {
-//             case 'B':  i = BLACK; break;
-//             case 'R':  i = RED; break;
-//             case 'g':  i = GREEN; break;
-//             case 'Y':  i = YELLOW; break;
-//             case 'b':  i = BLUE; break;
-//             case 'P':  i = PURPLE; break;
-//             case 'C':  i = CYAN; break;
-//             case 'G':  i = GREY; break;
-//             case '!':  i = BOLD; break;
-//             case 'N':  i = NTEXT; break;
-
-             case '0':  i = BLACK; break;
-             case '1':  i = BLUE; break;
-             case '2':  i = GREEN; break;
-             case '3':  i = CYAN; break;
-             case '4':  i = RED; break;
-             case '5':  i = YELLOW; break;
-             case '6':  i = PURPLE; break;
-             case '7':  i = GREY; break;
-             case 'B':  i = BOLD; break;
-             case 'R':  i = NTEXT; break;
-	     case 'L':  i = FLASH;break;
-	     case 'K':  i = BLINK;break;
-             case 'I':  i = INVERSE; break;
-             case '$':  i = dollarstring; break;
-             case '\0': // this happens if we end a line with $
-                        sp--; // back up to the $ char so we don't go past our \0
-                        // no break here so the default catchs it and uses a nullstring
-             default: i = nullstring; break;
+      size_t pos = 0;
+      while ((pos = haystack.find(needle)) != string::npos && !ignore.contains(pos))
+      {
+        if(ch == nullptr || IS_MOB(ch) || IS_SET(ch->pcdata->toggles, PLR_ANSI) || (ch->desc && ch->desc->color))
+        {
+          haystack.replace(pos, 2, replacement);
+          // $$ that are converted to $ should not be processed in subsequent searches
+          if (needle == "$$")
+          {
+            ignore[pos] = true;
           }
-       } else {
-         sp++;
-         if(*sp == '$')
-           i = dollarstring;
-         else i = nullstring;
-       }
-       while((*tp++ = *i++));
-       tp--;
-       sp++;
-    }
+        }
+        else
+        {
+          haystack.erase(pos, 2);
   }
-  *tp = '\0';
+          }
+       }
+    }
+  catch (...)
+  {
 
-  return t;
+  }
+
+  return haystack;
 }
 
 

@@ -16,6 +16,8 @@
 #ifndef OBJ_H_
 #define OBJ_H_
 
+#include <vector>
+
 #include "structs.h" // ubyte
 #include "character.h"
 

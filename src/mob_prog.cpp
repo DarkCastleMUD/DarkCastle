@@ -3538,7 +3538,7 @@ void mprog_percent_check( CHAR_DATA *mob, CHAR_DATA *actor, OBJ_DATA *obj,
  * make sure you remember to modify the variable names to the ones in the
  * trigger calls.
  */
-int mprog_act_trigger( const char *buf, CHAR_DATA *mob, CHAR_DATA *ch,
+int mprog_act_trigger(string buf, CHAR_DATA *mob, CHAR_DATA *ch,
 		       OBJ_DATA *obj, void *vo)
 {
 
@@ -3552,7 +3552,7 @@ int mprog_act_trigger( const char *buf, CHAR_DATA *mob, CHAR_DATA *ch,
 
   if ( IS_NPC( mob )
       && ( mob_index[mob->mobdata->nr].progtypes & ACT_PROG ) && isPaused(mob) == false)
-             mprog_wordlist_check( buf, mob, ch,
+             mprog_wordlist_check( buf.c_str(), mob, ch,
                        obj, vo, ACT_PROG );
 
 /* Why oh why was it like this? They can add lag themselves if needed.

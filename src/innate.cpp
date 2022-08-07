@@ -18,7 +18,7 @@
 #include "act.h"
 #include "mobile.h"
 #include "spells.h"
-#include <string.h> // strstr()
+#include <cstring> // strstr()
 #include "returnvals.h"
 #include "interp.h"
 #include "arena.h"

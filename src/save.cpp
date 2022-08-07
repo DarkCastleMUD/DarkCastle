@@ -528,11 +528,7 @@ int read_pc_or_mob_data(CHAR_DATA *ch, FILE *fpsave)
   }
   else {
     ch->mobdata = NULL;
-#ifdef LEAK_CHECK
-    ch->pcdata = (pc_data *)calloc(1, sizeof(pc_data));
-#else
-    ch->pcdata = (pc_data *)dc_alloc(1, sizeof(pc_data));
-#endif
+    ch->pcdata = new pc_data;
     read_pc_data(ch, fpsave);
   }
   return 1;
@@ -885,7 +881,7 @@ void load_char_obj_error(FILE * fpsave, char strsave[MAX_INPUT_LENGTH])
 }
 
 // Load a char and inventory into a new_new ch structure.
-bool load_char_obj( struct descriptor_data *d, char *name )
+bool load_char_obj( struct descriptor_data *d, const char *name )
 {
   FILE *  fpsave  = NULL;
   char    strsave[MAX_INPUT_LENGTH];
@@ -896,11 +892,7 @@ bool load_char_obj( struct descriptor_data *d, char *name )
   if(!name || !strcmp(name, ""))
     return FALSE;
 
-#ifdef LEAK_CHECK
-  ch = (CHAR_DATA *)calloc(1, sizeof(CHAR_DATA));
-#else
-  ch = (CHAR_DATA *)dc_alloc(1, sizeof(CHAR_DATA));
-#endif
+  ch = new char_data;
   auto &free_list = DC::instance().free_list;
 	free_list.erase(ch);
 

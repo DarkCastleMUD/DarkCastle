@@ -824,7 +824,7 @@ void add_vault_access(CHAR_DATA *ch, char *name, struct vault_data *vault) {
   }
 
   // must be done to clear out "d" before it is used
-  memset((char *) &d, 0, sizeof(struct descriptor_data));
+
   extern CHAR_DATA *get_pc(char *name);
 
   if (!get_pc(name))

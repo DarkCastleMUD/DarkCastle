@@ -82,7 +82,7 @@ void extract_obj(struct obj_data *obj);
 
 CHAR_DATA *get_char_room(char *name, int room, bool careful = FALSE);
 CHAR_DATA *get_char_num(int nr);
-CHAR_DATA *get_char(const char *name);
+CHAR_DATA *get_char(string name);
 CHAR_DATA *get_mob(char *name);
 
 CHAR_DATA *get_pc(char *name);
@@ -93,14 +93,14 @@ int  char_to_room(CHAR_DATA *ch, int room, bool stop_all_action);
 int  char_to_room(CHAR_DATA *ch, int room);
 
 /* find if character can see */
-CHAR_DATA *get_active_pc_vis(CHAR_DATA *ch, char *name);
+CHAR_DATA *get_active_pc_vis(CHAR_DATA *ch, const char *name);
 CHAR_DATA *get_active_pc(const char *name);
 CHAR_DATA *get_all_pc(char *name);
 CHAR_DATA *get_char_room_vis(CHAR_DATA *ch, const char *name);
 CHAR_DATA *get_rand_other_char_room_vis(CHAR_DATA *ch);
 CHAR_DATA *get_char_vis(CHAR_DATA *ch, const char *name);
-CHAR_DATA *get_pc_vis(CHAR_DATA *ch, char *name);
-CHAR_DATA *get_pc_vis_exact(CHAR_DATA *ch, char *name);
+CHAR_DATA *get_pc_vis(CHAR_DATA *ch, const char *name);
+CHAR_DATA *get_pc_vis_exact(CHAR_DATA *ch, const char *name);
 CHAR_DATA *get_mob_vis(CHAR_DATA *ch, char *name);
 CHAR_DATA *get_random_mob_vnum(int vnum);
 CHAR_DATA *get_mob_room_vis(CHAR_DATA *ch, char *name);
@@ -124,6 +124,7 @@ skill_results_t find_skills_by_name(string name);
 int generic_find(const char *arg, int bitvector, CHAR_DATA *ch, CHAR_DATA **tar_ch, struct obj_data **tar_obj, bool verbose = false);
 
 int get_number(char **name);
+int get_number(string name);
 
 #define FIND_CHAR_ROOM      1
 #define FIND_CHAR_WORLD     2

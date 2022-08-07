@@ -29,6 +29,7 @@ extern "C" {
 
 #include <string>
 #include <vector>
+#include <queue>
 
 #include "structs.h"
 #include "weather.h"
@@ -383,8 +384,8 @@ MatchType str_n_nosp_cmp_begin(string arg1, string arg2);
 char *  str_nospace     (const char *stri);
 char *	str_dup		(const char *str);
 char *	str_dup0	(const char *str);
-void    log   (const char *str, int god_level, long type);
-void    log		(const char *str, int god_level, long type, char_data *vict);
+void    log   (string str, int god_level, long type);
+void    log		(string str, int god_level, long type, char_data *vict);
 void    logf            (int level, long type, const char *arg, ...);
 int     send_to_gods    (const char * str, int god_level, long type);
 
@@ -456,7 +457,7 @@ void night_watchman( void );
 int special(CHAR_DATA *ch, int cmd, char *arg);
 int process_output(struct descriptor_data *t);
 int file_to_string(const char *name, char *buf);
-bool load_char_obj( struct descriptor_data *d, char *name );
+bool load_char_obj( struct descriptor_data *d, const char* name);
 void save_char_obj( CHAR_DATA *ch );
 
 #ifdef USE_SQL
@@ -483,11 +484,11 @@ void ansi_color(char *txt, CHAR_DATA *ch);
 void send_to_char(string messg, struct char_data *ch);
 void send_to_char(const char *messg, CHAR_DATA *ch);
 void send_to_char_nosp(const char *messg, CHAR_DATA *ch);
-void send_to_room(const char *messg, int room, bool awakeonly = FALSE, CHAR_DATA *nta = NULL);
+void send_to_room(string messg, int room, bool awakeonly = FALSE, CHAR_DATA *nta = NULL);
 void record_track_data(CHAR_DATA *ch, int cmd); 
-int write_to_descriptor(int desc, char *txt);
+int write_to_descriptor(int desc, string txt);
 int write_to_descriptor_fd(int desc, char *txt);
-void write_to_q(char *txt, struct txt_q *queue);
+void write_to_q(const string txt, queue<string>& queue);
 int use_mana( CHAR_DATA *ch, int sn );
 void automail(char *name);
 bool file_exists(const char *);
@@ -496,7 +497,7 @@ void util_unarchive(char *, CHAR_DATA *);
 int is_busy(CHAR_DATA *ch);
 int is_ignoring(struct char_data *ch, struct char_data *i);
 void colorCharSend(char* s, struct char_data* ch);
-void send_to_char_regardless(char *messg, struct char_data *ch);
+void send_to_char_regardless(string messg, struct char_data *ch);
 int csendf(struct char_data *ch, const char *arg, ...);
 bool check_range_valid_and_convert(int & value, const char * buf, int begin, int end);
 bool check_valid_and_convert(int & value, char * buf);
@@ -520,7 +521,7 @@ int     mprog_wordlist_check    ( const char * arg, CHAR_DATA *mob,
 void    mprog_percent_check     ( CHAR_DATA *mob, CHAR_DATA* actor,
 					OBJ_DATA* object, void* vo,
 					int type );
-int     mprog_act_trigger       ( const char* buf, CHAR_DATA* mob,
+int     mprog_act_trigger       (string buf, CHAR_DATA* mob,
 		                        CHAR_DATA* ch, OBJ_DATA* obj,
 					void* vo );
 int     mprog_bribe_trigger     ( CHAR_DATA* mob, CHAR_DATA* ch,
@@ -557,6 +558,8 @@ bool is_in_game(char_data *ch);
 int get_stat(CHAR_DATA *ch, int stat);
 char *pluralize(int qty, char ending[] = "s");
 size_t nocolor_strlen(const char *s);
+void make_prompt(struct descriptor_data *d, string& prompt);
+
 extern const char menu[];
 
 #define MAX_THROW_NAME     60
@@ -627,5 +630,8 @@ int random_percent_change(int from, int to, int value);
 bool identify(char_data *ch, obj_data *obj);
 extern void end_oproc(CHAR_DATA *ch, Trace trace = Trace("unknown"));
 void undo_race_saves(char_data * ch);
+string handle_ansi(string s, char_data * ch);
+void blackjack_prompt(CHAR_DATA *ch, string& prompt, bool ascii);
+void show_string(struct descriptor_data *d, const char *input);
 
 #endif /* UTILITY_H_ */

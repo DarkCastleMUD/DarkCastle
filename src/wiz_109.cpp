@@ -62,8 +62,6 @@ int do_linkload(struct char_data *ch, char *arg, int cmd)
     c++;
   }
 
-  // must be done to clear out "d" before it is used
-  memset((char *) &d, 0, sizeof(struct descriptor_data));
   if(!(load_char_obj(&d, buf))) {
     send_to_char("Unable to load! (Character might not exist...)\n\r", ch);
     return eFAILURE; 

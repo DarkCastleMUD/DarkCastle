@@ -10,6 +10,8 @@
 #include <sstream>
 #include <list>
 #include <queue>
+#include <tuple>
+#include <fmt/format.h>
 
 #include "structs.h"
 #include "player.h"
@@ -661,11 +663,11 @@ int do_dream(struct char_data *ch, char *argument, int cmd)
     return eSUCCESS;
 }
 
-int do_tell(struct char_data *ch, char *argument, int cmd)
+int do_tell(struct char_data *ch, string argument, int cmd)
 {
-  struct char_data *vict = nullptr;
-  char name[200] = {0}, message[200] = {0}, buf[200] = {0};
-  OBJ_DATA *tmp_obj =  nullptr;
+  char_data *vict = nullptr;
+  string  name = {}, message = {}, buf = {}, log_buf = {};
+  obj_data *tmp_obj =  nullptr;
 
   if (!IS_MOB(ch) && IS_SET(ch->pcdata->punish, PUNISH_NOTELL))
   {
@@ -686,12 +688,9 @@ int do_tell(struct char_data *ch, char *argument, int cmd)
     return eSUCCESS;
   }
 
-  half_chop(argument, name, message);
-  // these don't do anything that i can see -pir
-  name[199] = '\0';
-  message[199] = '\0';
+  tie(name, message) = half_chop(argument);
 
-  if (!*name || !*message)
+  if (name.empty() || message.empty())
   {
     if (ch->pcdata->tell_history == nullptr || ch->pcdata->tell_history->empty())
     {
@@ -714,26 +713,28 @@ int do_tell(struct char_data *ch, char *argument, int cmd)
 
   if (cmd == 9999)
   {
-    if (!(vict = get_active_pc(name)))
+    if (!(vict = get_active_pc(name.c_str())))
     {
       send_to_char("They seem to have left!\n\r", ch);
       return eSUCCESS;
     }
     cmd = 9;
   }
-  else if (!(vict = get_active_pc_vis(ch, name)))
+  else if (!(vict = get_active_pc_vis(ch, name.c_str())))
   {
-    vict = get_pc_vis(ch, name);
+    vict = get_pc_vis(ch, name.c_str());
     if ((vict != NULL) && GET_LEVEL(vict) >= IMMORTAL)
     {
       send_to_char("That person is busy right now.\r\n", ch);
       send_to_char("Your message has been saved.\r\n", ch);
-      sprintf(buf, "$2$B%s told you, '%s'$R\r\n", PERS(ch, vict), message);
+
+      buf = fmt::format("$2$B{} told you, '{}'$R\r\n", PERS(ch, vict), message);
       record_msg(buf, vict);
-      sprintf(buf, "$2$B%s told you, '%s'$R", PERS(ch, vict), message);
+
+      buf = fmt::format("$2$B{} told you, '{}'$R", PERS(ch, vict), message);
       vict->tell_history(buf);
 
-      sprintf(buf, "$2$BYou told %s, '%s'$R", GET_SHORT(vict), message);
+      buf = fmt::format("$2$BYou told {}, '{}'$R", GET_SHORT(vict), message);
       ch->tell_history(buf);
     }
     else
@@ -778,15 +779,16 @@ int do_tell(struct char_data *ch, char *argument, int cmd)
     {
       if (IS_MOB(vict))
       {
-        sprintf(buf, "%s tells you, '%s'", PERS(ch, vict), message);
+        buf = fmt::format("{} tells you, '{}'", PERS(ch, vict), message);
       }
       else
       {
-        sprintf(buf, "%s tells you, '%s'%c", PERS(ch, vict), message, IS_SET(vict->pcdata->toggles, PLR_BEEP) ? '\a' : '\0');
-        if (!IS_NPC(ch) && !IS_NPC(vict) && vict->pcdata->last_tell)
-          dc_free(vict->pcdata->last_tell);
+        buf = fmt::format("{} tells you, '{}'{}", PERS(ch, vict), message, IS_SET(vict->pcdata->toggles, PLR_BEEP) ? '\a' : '\0');
+
         if (!IS_NPC(ch) && !IS_NPC(vict))
-          vict->pcdata->last_tell = str_dup(GET_NAME(ch));
+        {
+          vict->pcdata->last_tell = GET_NAME(ch);
+        }
       }
 
       ansi_color(GREEN, vict);
@@ -794,40 +796,37 @@ int do_tell(struct char_data *ch, char *argument, int cmd)
       send_to_char_regardless(buf, vict);
       ansi_color(NTEXT, vict);
 
-      sprintf(buf, "$2$B%s tells you, '%s'$R", PERS(ch, vict), message);
+      buf = fmt::format("$2$B{} tells you, '{}'$R", PERS(ch, vict), message);
       vict->tell_history(buf);
 
-      sprintf(buf, "$2$BYou tell %s, '%s'$R", PERS(vict, ch), message);
+      buf = fmt::format("$2$BYou tell {}, '{}'$R", PERS(vict, ch), message);
       send_to_char(buf, ch);
     }
     else if (!is_busy(vict) && GET_POS(vict) > POSITION_SLEEPING)
     {
       if (IS_MOB(vict))
       {
-        sprintf(buf, "$2$B%s tells you, '%s'$R", PERS(ch, vict), message);
+        buf = fmt::format("$2$B{} tells you, '{}'$R", PERS(ch, vict), message);
       }
       else
       {
-        sprintf(buf, "$2$B%s tells you, '%s'$R%c", PERS(ch, vict), message, IS_SET(vict->pcdata->toggles, PLR_BEEP) ? '\a' : '\0');
-        if (vict->pcdata->last_tell && !IS_NPC(ch) && !IS_NPC(vict))
-          dc_free(vict->pcdata->last_tell);
+        buf = fmt::format("$2$B{} tells you, '{}'$R{}", PERS(ch, vict), message, IS_SET(vict->pcdata->toggles, PLR_BEEP) ? '\a' : '\0');
         if (!IS_NPC(ch) && !IS_NPC(vict))
-          vict->pcdata->last_tell = str_dup(GET_NAME(ch));
+          vict->pcdata->last_tell = GET_NAME(ch);
       }
       act(buf, vict, 0, 0, TO_CHAR, STAYHIDE);
 
-      sprintf(buf, "$2$B%s tells you, '%s'$R", PERS(ch, vict), message);
+      buf = fmt::format("$2$B{} tells you, '{}'$R", PERS(ch, vict), message);
       vict->tell_history(buf);
 
-      sprintf(buf, "$2$BYou tell %s, '%s'$R", PERS(vict, ch), message);
+      buf = fmt::format("$2$BYou tell {}, '{}'$R", PERS(vict, ch), message);
       act_return ar = act(buf, ch, 0, 0, TO_CHAR, STAYHIDE);
       ch->tell_history(ar.str);
 
       // Log what I told a logged player under their name
       if (!IS_MOB(vict) && IS_SET(vict->pcdata->punish, PUNISH_LOG))
       {
-        sprintf(log_buf, "Log %s: %s told them: %s", GET_NAME(vict),
-                GET_NAME(ch), message);
+        log_buf = fmt::format("Log {}: {} told them: {}", GET_NAME(vict), GET_NAME(ch), message);
         log(log_buf, IMP, LOG_PLAYER, vict);
       }
     }
@@ -836,25 +835,25 @@ int do_tell(struct char_data *ch, char *argument, int cmd)
     {
       send_to_char("A heavenly power intrudes on your subconcious dreaming...\r\n", vict);
       if (IS_MOB(vict))
-        sprintf(buf, "%s tells you, '%s'", PERS(ch, vict), message);
+      {
+        buf = fmt::format("{} tells you, '{}'", PERS(ch, vict), message);
+      }
       else
       {
-        sprintf(buf, "%s tells you, '%s'%c", PERS(ch, vict), message, IS_SET(vict->pcdata->toggles, PLR_BEEP) ? '\a' : '\0');
+        buf = fmt::format("{} tells you, '{}'{}", PERS(ch, vict), message, IS_SET(vict->pcdata->toggles, PLR_BEEP) ? '\a' : '\0');
 
-        if (vict->pcdata->last_tell && !IS_NPC(ch) && !IS_NPC(vict))
-          dc_free(vict->pcdata->last_tell);
         if (!IS_NPC(ch) && !IS_NPC(vict))
-          vict->pcdata->last_tell = str_dup(GET_NAME(ch));
+          vict->pcdata->last_tell = GET_NAME(ch);
       }
       ansi_color(GREEN, vict);
       ansi_color(BOLD, vict);
       send_to_char_regardless(buf, vict);
       ansi_color(NTEXT, vict);
 
-      sprintf(buf, "$2$B%s tells you, '%s'$R", PERS(ch, vict), message);
+      buf = fmt::format("$2$B{} tells you, '{}'$R", PERS(ch, vict), message);
       vict->tell_history(buf);
 
-      sprintf(buf, "$2$BYou tell %s, '%s'$R", PERS(vict, ch), message);
+      buf = fmt::format("$2$BYou tell {}, '{}'$R", PERS(vict, ch), message);
       act_return ar = act(buf, ch, 0, 0, TO_CHAR, STAYHIDE);
       ch->tell_history(ar.str);
 
@@ -862,14 +861,13 @@ int do_tell(struct char_data *ch, char *argument, int cmd)
       // Log what I told a logged player under their name
       if (!IS_MOB(vict) && IS_SET(vict->pcdata->punish, PUNISH_LOG))
       {
-        sprintf(log_buf, "Log %s: %s told them: %s", GET_NAME(vict),
-                GET_NAME(ch), message);
+        log_buf = fmt::format("Log {}: {} told them: {}", GET_NAME(vict), GET_NAME(ch), message);
         log(log_buf, IMP, LOG_PLAYER, vict);
       }
     }
     else
     {
-      sprintf(buf, "$2$B%s can't hear anything right now.$R", GET_SHORT(vict));
+      buf = fmt::format("$2$B%s can't hear anything right now.$R", GET_SHORT(vict));
       act(buf, ch, 0, 0, TO_CHAR, STAYHIDE);
     }
   }
@@ -881,7 +879,7 @@ int do_reply(struct char_data *ch, char *argument, int cmd)
   char buf[200];
   char_data *vict = NULL;
 
-  if (IS_MOB(ch) || !ch->pcdata->last_tell)
+  if (IS_MOB(ch) || ch->pcdata->last_tell.empty())
   {
     send_to_char("You have noone to reply to.\n\r", ch);
     return eSUCCESS;

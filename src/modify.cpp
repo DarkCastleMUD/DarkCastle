@@ -45,7 +45,6 @@ using namespace std;
 #define TP_OBJ    1
 #define TP_ERROR  2
 
-void show_string(struct descriptor_data *d, char *input);
 void check_for_awaymsgs(char_data *ch);
 void page_string_dep(struct descriptor_data *d, const char *str, int keep_internal);
 
@@ -633,7 +632,7 @@ void page_string_dep(struct descriptor_data *d, const char *str, int keep_intern
 }
 
 /* The call that displays the next page. */
-void show_string(struct descriptor_data *d, char *input) {
+void show_string(struct descriptor_data *d, const char *input) {
 	char buffer[MAX_STRING_LENGTH];
 	char buf[MAX_STRING_LENGTH];
 	int diff;

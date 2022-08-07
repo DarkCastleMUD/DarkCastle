@@ -22,6 +22,7 @@ extern "C"
 #include <algorithm>
 #include <netinet/in.h>
 #include <fmt/format.h>
+#include <locale>
 
 #include "db.h" // real_room
 #include "player.h"
@@ -1557,12 +1558,13 @@ void do_clan_list(CHAR_DATA *ch)
   }
   
 
+  std::locale("en_US.UTF-8");
   for(clan = clan_list; clan; clan = clan->next) {
      if (GET_LEVEL(ch) > 103)
      {
-    	 buf = fmt::format(std::locale("en_US.UTF-8"), "{:2} {:<20}$R {:<16} {:3} {:16L}\r\n", clan->number, clan->name, clan->leader, clan->tax, clan->getBalance());
+    	 buf = fmt::format("{:2} {:<20}$R {:<16} {:3} {:16L}\r\n", clan->number, clan->name, clan->leader, clan->tax, clan->getBalance());
      } else {
-    	 buf = fmt::format(std::locale("en_US.UTF-8"), "{:2} {:<20}$R {:<16}\r\n", clan->number, clan->name, clan->leader);
+    	 buf = fmt::format("{:2} {:<20}$R {:<16}\r\n", clan->number, clan->name, clan->leader);
      }
      send_to_char(buf, ch);
   }

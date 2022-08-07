@@ -15,6 +15,9 @@ extern "C" {
 #include <string>
 #include <vector>
 #include <map>
+
+using namespace std;
+
 FILE * dc_fopen(const char *filename, const char *type);
 int dc_fclose(FILE * fl);
 
@@ -48,9 +51,9 @@ typedef	struct obj_data		OBJ_DATA;
 /* ======================================================================== */
 struct txt_block
 {
-    char *text;
-    struct txt_block *next;
-    int aliased;
+    string text = {};
+    struct txt_block *next = {};
+    int aliased = {};
 };
 
 typedef struct txt_q
