@@ -1827,8 +1827,9 @@ string generate_prompt(CHAR_DATA *ch)
 }
 
 
-void write_to_q(const string txt, queue<string> &input_queue, int aliased)
+void write_to_q(const string txt, queue<string> &input_queue)
 {
+  //cerr << "Writing to queue '" << txt << "'" << endl;
   input_queue.push(txt);
 }
 
@@ -2284,7 +2285,6 @@ int process_input(struct descriptor_data *t)
       }
     }
     //cerr << t->inbuf.length() << " " << t->inbuf.size() << endl;
-
     erase = 0;
     size_t crnl_pos = t->inbuf.find("\r\n");
     if (crnl_pos != t->inbuf.npos)
@@ -2307,17 +2307,6 @@ int process_input(struct descriptor_data *t)
       eoc_pos = nl_pos;
       erase = 1;
     }
-
-    // Only search for pipe (|) when not editing
-    if (t->connected != conn::WRITE_BOARD && t->connected != conn::EDITING && t->connected != conn::EDIT_MPROG)
-    {
-      size_t pipe_pos = t->inbuf.find('|');
-      if (pipe_pos != t->inbuf.npos && pipe_pos < eoc_pos)
-      {
-        eoc_pos = pipe_pos;
-        erase = 1;
-      }
-    }
   } while (eoc_pos == t->inbuf.npos);
 
   //cerr << "old t->inbuf (" << t->inbuf.length() << ")\n[" << t->inbuf << "]" << endl;
@@ -2325,6 +2314,31 @@ int process_input(struct descriptor_data *t)
   t->inbuf.erase(0, eoc_pos + erase);
   //cerr << "new t->inbuf (" << t->inbuf.length() << ")\n[" << t->inbuf << "]" << endl;
   //cerr << "buffer (" << buffer.length() << ")\n[" << buffer << "]" << endl;
+
+  // Only search for pipe (|) when not editing
+  if (t->connected != conn::WRITE_BOARD && t->connected != conn::EDITING && t->connected != conn::EDIT_MPROG)
+  {
+    size_t pipe_pos = 0;
+    do
+    {
+      pipe_pos = buffer.find('|');
+      if (pipe_pos != buffer.npos)
+      {
+        string new_buffer = buffer.substr(0, pipe_pos);
+        write_to_q(new_buffer, t->input);
+
+        buffer.erase(0, pipe_pos + 1);
+      }
+      else
+      {
+        write_to_q(buffer, t->input);
+      }
+    } while (pipe_pos != buffer.npos);
+  }
+  else
+  {
+    write_to_q(buffer, t->input); 
+  }
 
   /*
           else
@@ -2415,7 +2429,7 @@ int process_input(struct descriptor_data *t)
     *write_point = '\0';
   */
 
-  write_to_q(buffer, t->input, 0);
+  
   return 1;
 }
 
