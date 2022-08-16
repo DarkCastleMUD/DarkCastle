@@ -6,9 +6,9 @@
                 "${workspaceFolder}/**"
             ],
             "defines": [],
-            "compilerPath": "/usr/bin/g++-10",
+            "compilerPath": "/usr/bin/g++-12",
             "cStandard": "c17",
-            "cppStandard": "gnu++20",
+            "cppStandard": "gnu++23",
             "intelliSenseMode": "gcc-x64",
             "compilerArgs": [
                 "-m32"
