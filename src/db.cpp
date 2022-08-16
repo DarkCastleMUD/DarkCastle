@@ -2697,6 +2697,10 @@ CHAR_DATA *read_mobile(int nr, FILE *fl)
 	mob->move = 100 + (mob->level * 10);
 	mob->max_move = 100 + (mob->level * 10);
 
+	mob->max_ki = 100.0 * (mob->level/60.0);
+	mob->ki = mob->max_ki;
+	mob->raw_ki = mob->max_ki;
+
 	mob->gold = fread_int(fl, 0, LONG_MAX);
 	mob->plat = 0;
 	GET_EXP(mob) = (int64)fread_int(fl, LONG_MIN, LONG_MAX);
