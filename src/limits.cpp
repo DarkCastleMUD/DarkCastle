@@ -85,11 +85,9 @@ int32 mana_limit(CHAR_DATA *ch) {
 	return (max);
 }
 
+// Previously any NPC got 0 returned.
 int32 ki_limit(CHAR_DATA *ch) {
-	if (!IS_NPC(ch))
-		return (ch->max_ki);
-	else
-		return (0);
+	return ch->max_ki;
 }
 
 int32 hit_limit(CHAR_DATA *ch) {
