@@ -8,6 +8,7 @@
 *  Copyright (C) 1993, 94 by the Trustees of the Johns Hopkins University *
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 ************************************************************************ */
+#define DEBUG_INPUT 0
 
 #include <errno.h>
 #include "terminal.h"
@@ -789,7 +790,11 @@ void DC::game_loop(void)
       }
       else if ((d->wait <= 0) && !d->input.empty())
       {
+        
         comm = get_from_q(d->input);
+#ifdef DEBUG_INPUT
+        cerr << "Got command [" << comm << "] from the d->input queue" << endl;
+#endif
         /* reset the idle timer & pull char back from void if necessary */
         d->wait = 1;
         d->prompt_mode = 1;
@@ -2310,13 +2315,11 @@ int process_input(struct descriptor_data *t)
   ssize_t bytes_read = 0;
   t->idle_time = 0;
 
-  do {
   do
   {
     char c_buffer[8193] = {};
     if ((bytes_read = read(t->descriptor, &c_buffer, sizeof(c_buffer) - 1)) < 0)
     {
-
 #ifdef EWOULDBLOCK
       if (errno == EWOULDBLOCK)
         errno = EAGAIN;
@@ -2340,92 +2343,87 @@ int process_input(struct descriptor_data *t)
     t->inbuf += buffer;
 
     // Search for telnet control codes
-    //cerr << t->inbuf.length() << " " << t->inbuf.size() << endl;
     process_iac(t);
     if (t->server_size_echo)
     {
       string new_buffer;
-      for (auto& c : buffer)
+      for (auto &c : buffer)
       {
         if ((c >= ' ' && c <= '~') || c == '\b')
         {
           new_buffer += c;
-        } else if (c == '\r')
+        }
+        else if (c == '\r')
         {
           new_buffer += "\r\n";
         }
         write_to_descriptor(t->descriptor, new_buffer);
       }
     }
-    //cerr << t->inbuf.length() << " " << t->inbuf.size() << endl;
+  } while (t->inbuf.find('\n') == t->inbuf.npos && t->inbuf.find('\r') == t->inbuf.npos);
 
-      erase = 0;
-      size_t crnl_pos = t->inbuf.find("\r\n");
-      if (crnl_pos != t->inbuf.npos)
-      {
-        eoc_pos = crnl_pos;
-        erase = 2;
-      }
+  do
+  {
+    erase = 0;
+    size_t crnl_pos = t->inbuf.find("\r\n");
+    if (crnl_pos != t->inbuf.npos)
+    {
+      eoc_pos = crnl_pos;
+      erase = 2;
+    }
 
-      // search for carriage return, new line or pipe representing end of command
-      size_t cr_pos = t->inbuf.find('\r');
-      if (cr_pos != t->inbuf.npos && cr_pos < eoc_pos)
-      {
-        eoc_pos = cr_pos;
-        erase = 1;
-      }
+    // search for carriage return, new line or pipe representing end of command
+    size_t cr_pos = t->inbuf.find('\r');
+    if (cr_pos != t->inbuf.npos && cr_pos < eoc_pos)
+    {
+      eoc_pos = cr_pos;
+      erase = 1;
+    }
 
-      size_t nl_pos = t->inbuf.find('\n');
-      if (nl_pos != t->inbuf.npos && nl_pos < eoc_pos)
-      {
-        eoc_pos = nl_pos;
-        erase = 1;
-      }
-    } while (eoc_pos == t->inbuf.npos);
+    size_t nl_pos = t->inbuf.find('\n');
+    if (nl_pos != t->inbuf.npos && nl_pos < eoc_pos)
+    {
+      eoc_pos = nl_pos;
+      erase = 1;
+    }
 
 #ifdef DEBUG_INPUT
-    cerr << "old t->inbuf [" << makePrintable(t->inbuf) << "]" << "(" << t->inbuf.length() << ")" << endl;
+    cerr << "old t->inbuf [" << makePrintable(t->inbuf) << "]"
+         << "(" << t->inbuf.length() << ")" << endl;
 #endif
     string buffer = t->inbuf.substr(0, eoc_pos);
-    if (buffer.empty())
+    t->inbuf.erase(0, eoc_pos + erase);
+#ifdef DEBUG_INPUT
+    cerr << "new t->inbuf [" << makePrintable(t->inbuf) << "]"
+         << "(" << t->inbuf.length() << ")" << endl;
+    cerr << "buffer [" << makePrintable(buffer) << "]"
+         << "(" << buffer.length() << ")" << endl;
+#endif
+    // Only search for pipe (|) when not editing
+    if (t->connected != conn::WRITE_BOARD && t->connected != conn::EDITING && t->connected != conn::EDIT_MPROG)
     {
-      t->inbuf.clear();
+      size_t pipe_pos = 0;
+      do
+      {
+        pipe_pos = buffer.find('|');
+        if (pipe_pos != buffer.npos)
+        {
+          string new_buffer = buffer.substr(0, pipe_pos);
+          write_to_q(new_buffer, t->input);
+
+          buffer.erase(0, pipe_pos + 1);
+        }
+        else
+        {
+          write_to_q(buffer, t->input);
+        }
+      } while (pipe_pos != buffer.npos);
     }
     else
     {
-      t->inbuf.erase(0, eoc_pos + erase); 
+      write_to_q(buffer, t->input);
     }
-#ifdef DEBUG_INPUT
-    cerr << "new t->inbuf [" << makePrintable(t->inbuf) << "]" << "(" << t->inbuf.length() << ")" << endl;
-    cerr << "buffer [" << makePrintable(buffer) << "]" << "(" << buffer.length() << ")" << endl;
-#endif
-      // Only search for pipe (|) when not editing
-      if (t->connected != conn::WRITE_BOARD && t->connected != conn::EDITING && t->connected != conn::EDIT_MPROG)
-      {
-        size_t pipe_pos = 0;
-        do
-        {
-          pipe_pos = buffer.find('|');
-          if (pipe_pos != buffer.npos)
-          {
-            string new_buffer = buffer.substr(0, pipe_pos);
-            write_to_q(new_buffer, t->input);
-
-            buffer.erase(0, pipe_pos + 1);
-          }
-          else
-          {
-            write_to_q(buffer, t->input);
-          }
-        } while (pipe_pos != buffer.npos);
-      }
-      else
-      {
-        write_to_q(buffer, t->input); 
-      }
-    
-
-  } while (t->inbuf.find('\n') || t->inbuf.find('\r'));
+  } while (t->inbuf.find('\n') != t->inbuf.npos && t->inbuf.find('\r') != t->inbuf.npos);
 
   /*
           else
@@ -2516,328 +2514,327 @@ int process_input(struct descriptor_data *t)
     *write_point = '\0';
   */
 
-  
   return 1;
 }
-
-/*
- * perform substitution for the '^..^' csh-esque syntax
- * orig is the orig string (i.e. the one being modified.
- * subst contains the substition string, i.e. "^telm^tell"
- */
-int perform_subst(struct descriptor_data *t, char *orig, char *subst)
-{
-  char new_subst[MAX_INPUT_LENGTH + 5];
-
-  char *first, *second, *strpos;
 
   /*
-   * first is the position of the beginning of the first string (the one
-   * to be replaced
+   * perform substitution for the '^..^' csh-esque syntax
+   * orig is the orig string (i.e. the one being modified.
+   * subst contains the substition string, i.e. "^telm^tell"
    */
-  first = subst + 1;
-
-  /* now find the second '^' */
-  if (!(second = strchr(first, '^')))
+  int perform_subst(struct descriptor_data * t, char *orig, char *subst)
   {
-    SEND_TO_Q("Invalid substitution.\r\n", t);
-    return 1;
-  }
-  /* terminate "first" at the position of the '^' and make 'second' point
-   * to the beginning of the second string */
-  *(second++) = '\0';
+    char new_subst[MAX_INPUT_LENGTH + 5];
 
-  /* now, see if the contents of the first string appear in the original */
-  if (!(strpos = strstr(orig, first)))
-  {
-    SEND_TO_Q("Invalid substitution.\r\n", t);
-    return 1;
-  }
-  /* now, we construct the new string for output. */
+    char *first, *second, *strpos;
 
-  /* first, everything in the original, up to the string to be replaced */
-  strncpy(new_subst, orig, (strpos - orig));
-  new_subst[(strpos - orig)] = '\0';
+    /*
+     * first is the position of the beginning of the first string (the one
+     * to be replaced
+     */
+    first = subst + 1;
 
-  /* now, the replacement string */
-  strncat(new_subst, second, (MAX_INPUT_LENGTH - strlen(new_subst) - 1));
-
-  /* now, if there's anything left in the original after the string to
-   * replaced, copy that too. */
-  if (((strpos - orig) + strlen(first)) < strlen(orig))
-    strncat(new_subst, strpos + strlen(first),
-            (MAX_INPUT_LENGTH - strlen(new_subst) - 1));
-
-  /* terminate the string in case of an overflow from strncat */
-  new_subst[MAX_INPUT_LENGTH - 1] = '\0';
-  strcpy(subst, new_subst);
-
-  return 0;
-}
-
-// return 1 on success
-// return 0 if we quit everyone out at the bottom
-int close_socket(struct descriptor_data *d)
-{
-  char buf[128], idiotbuf[128];
-  struct descriptor_data *temp;
-  // long target_idnum = -1;
-  if (!d)
-    return 0;
-  flush_queues(d);
-  CLOSE_SOCKET(d->descriptor);
-
-  /* Forget snooping */
-  if (d->snooping)
-    d->snooping->snoop_by = NULL;
-
-  if (d->snoop_by)
-  {
-    SEND_TO_Q("Your victim is no longer among us.\r\n", d->snoop_by);
-    d->snoop_by->snooping = NULL;
-  }
-  if (d->hashstr)
-  {
-    strcpy(idiotbuf, "\n\r~\n\r");
-    strcat(idiotbuf, "\0");
-    string_hash_add(d, idiotbuf);
-  }
-  if (d->strnew && (IS_MOB(d->character) || !IS_SET(d->character->pcdata->toggles, PLR_EDITOR_WEB)))
-  {
-    strcpy(idiotbuf, "/s\n\r");
-    strcat(idiotbuf, "\0");
-    new_string_add(d, idiotbuf);
-  }
-  if (d->character)
-  {
-    // target_idnum = GET_IDNUM(d->character);
-    if (d->connected == conn::PLAYING || d->connected == conn::WRITE_BOARD ||
-        d->connected == conn::EDITING || d->connected == conn::EDIT_MPROG)
+    /* now find the second '^' */
+    if (!(second = strchr(first, '^')))
     {
-      save_char_obj(d->character);
-      // clan area stuff
-      extern void check_quitter(CHAR_DATA * ch);
-      check_quitter(d->character);
-
-      // end any performances
-      if (IS_SINGING(d->character))
-        do_sing(d->character, "stop", 9);
-
-      act("$n has lost $s link.", d->character, 0, 0, TO_ROOM, 0);
-      sprintf(buf, "Closing link to: %s at %d.", GET_NAME(d->character),
-              world[d->character->in_room].number);
-      if (IS_AFFECTED(d->character, AFF_CANTQUIT))
-        sprintf(buf, "%s with CQ.", buf);
-      log(buf, GET_LEVEL(d->character) > SERAPH ? GET_LEVEL(d->character) : SERAPH, LOG_SOCKET);
-      d->character->desc = NULL;
+      SEND_TO_Q("Invalid substitution.\r\n", t);
+      return 1;
     }
-    else
+    /* terminate "first" at the position of the '^' and make 'second' point
+     * to the beginning of the second string */
+    *(second++) = '\0';
+
+    /* now, see if the contents of the first string appear in the original */
+    if (!(strpos = strstr(orig, first)))
     {
-      sprintf(buf, "Losing player: %s.",
-              GET_NAME(d->character) ? GET_NAME(d->character) : "<null>");
-      log(buf, 111, LOG_SOCKET);
-      if (d->connected == conn::WRITE_BOARD || d->connected == conn::EDITING || d->connected == conn::EDIT_MPROG)
+      SEND_TO_Q("Invalid substitution.\r\n", t);
+      return 1;
+    }
+    /* now, we construct the new string for output. */
+
+    /* first, everything in the original, up to the string to be replaced */
+    strncpy(new_subst, orig, (strpos - orig));
+    new_subst[(strpos - orig)] = '\0';
+
+    /* now, the replacement string */
+    strncat(new_subst, second, (MAX_INPUT_LENGTH - strlen(new_subst) - 1));
+
+    /* now, if there's anything left in the original after the string to
+     * replaced, copy that too. */
+    if (((strpos - orig) + strlen(first)) < strlen(orig))
+      strncat(new_subst, strpos + strlen(first),
+              (MAX_INPUT_LENGTH - strlen(new_subst) - 1));
+
+    /* terminate the string in case of an overflow from strncat */
+    new_subst[MAX_INPUT_LENGTH - 1] = '\0';
+    strcpy(subst, new_subst);
+
+    return 0;
+  }
+
+  // return 1 on success
+  // return 0 if we quit everyone out at the bottom
+  int close_socket(struct descriptor_data * d)
+  {
+    char buf[128], idiotbuf[128];
+    struct descriptor_data *temp;
+    // long target_idnum = -1;
+    if (!d)
+      return 0;
+    flush_queues(d);
+    CLOSE_SOCKET(d->descriptor);
+
+    /* Forget snooping */
+    if (d->snooping)
+      d->snooping->snoop_by = NULL;
+
+    if (d->snoop_by)
+    {
+      SEND_TO_Q("Your victim is no longer among us.\r\n", d->snoop_by);
+      d->snoop_by->snooping = NULL;
+    }
+    if (d->hashstr)
+    {
+      strcpy(idiotbuf, "\n\r~\n\r");
+      strcat(idiotbuf, "\0");
+      string_hash_add(d, idiotbuf);
+    }
+    if (d->strnew && (IS_MOB(d->character) || !IS_SET(d->character->pcdata->toggles, PLR_EDITOR_WEB)))
+    {
+      strcpy(idiotbuf, "/s\n\r");
+      strcat(idiotbuf, "\0");
+      new_string_add(d, idiotbuf);
+    }
+    if (d->character)
+    {
+      // target_idnum = GET_IDNUM(d->character);
+      if (d->connected == conn::PLAYING || d->connected == conn::WRITE_BOARD ||
+          d->connected == conn::EDITING || d->connected == conn::EDIT_MPROG)
       {
-        //		sprintf(buf, "Suspicious: %s.",
-        //			GET_NAME(d->character));
-        //		log(buf, 110, LOG_HMM);
+        save_char_obj(d->character);
+        // clan area stuff
+        extern void check_quitter(CHAR_DATA * ch);
+        check_quitter(d->character);
+
+        // end any performances
+        if (IS_SINGING(d->character))
+          do_sing(d->character, "stop", 9);
+
+        act("$n has lost $s link.", d->character, 0, 0, TO_ROOM, 0);
+        sprintf(buf, "Closing link to: %s at %d.", GET_NAME(d->character),
+                world[d->character->in_room].number);
+        if (IS_AFFECTED(d->character, AFF_CANTQUIT))
+          sprintf(buf, "%s with CQ.", buf);
+        log(buf, GET_LEVEL(d->character) > SERAPH ? GET_LEVEL(d->character) : SERAPH, LOG_SOCKET);
+        d->character->desc = NULL;
       }
-      free_char(d->character, Trace("close_socket"));
+      else
+      {
+        sprintf(buf, "Losing player: %s.",
+                GET_NAME(d->character) ? GET_NAME(d->character) : "<null>");
+        log(buf, 111, LOG_SOCKET);
+        if (d->connected == conn::WRITE_BOARD || d->connected == conn::EDITING || d->connected == conn::EDIT_MPROG)
+        {
+          //		sprintf(buf, "Suspicious: %s.",
+          //			GET_NAME(d->character));
+          //		log(buf, 110, LOG_HMM);
+        }
+        free_char(d->character, Trace("close_socket"));
+      }
+    }
+    //   Removed this log caues it's so fricken annoying
+    //   else
+    //    log("Losing descriptor without char.", ANGEL, LOG_SOCKET);
+
+    /* JE 2/22/95 -- part of my unending quest to make switch stable */
+    if (d->original && d->original->desc)
+      d->original->desc = NULL;
+
+    // if we're closing the socket that is next to be processed, we want to
+    // go ahead and move on to the next one
+    if (d == next_d)
+      next_d = d->next;
+
+    REMOVE_FROM_LIST(d, descriptor_list, next);
+
+    if (d->showstr_head)
+      dc_free(d->showstr_head);
+    if (d->showstr_count)
+      dc_free(d->showstr_vector);
+
+    delete d;
+    d = nullptr;
+
+    /*  if(descriptor_list == NULL)
+    {
+      // if there is NOONE on (everyone got disconnected) loop through and
+      // boot all of the linkdeads.  That way if the mud's link is cut, the
+      // first person back on can't RK everyone
+      char_data * next_i;
+      for(char_data * i = character_list; i; i = next_i) {
+         next_i = i->next;
+         if(IS_NPC(i))
+           continue;
+         do_quit(i, "", 666);
+      }
+      return 0;
+    }*/
+    return 1;
+  }
+
+  void check_idle_passwords(void)
+  {
+    struct descriptor_data *d, *next_d;
+
+    for (d = descriptor_list; d; d = next_d)
+    {
+      next_d = d->next;
+      if (STATE(d) != conn::GET_OLD_PASSWORD && STATE(d) != conn::GET_NAME)
+        continue;
+      if (!d->idle_tics)
+      {
+        d->idle_tics++;
+        continue;
+      }
+      else
+      {
+        echo_on(d);
+        SEND_TO_Q("\r\nTimed out... goodbye.\r\n", d);
+        STATE(d) = conn::CLOSE;
+      }
     }
   }
-  //   Removed this log caues it's so fricken annoying
-  //   else
-  //    log("Losing descriptor without char.", ANGEL, LOG_SOCKET);
 
-  /* JE 2/22/95 -- part of my unending quest to make switch stable */
-  if (d->original && d->original->desc)
-    d->original->desc = NULL;
+  /* ******************************************************************
+   *  signal-handling functions (formerly signals.c)                   *
+   ****************************************************************** */
 
-  // if we're closing the socket that is next to be processed, we want to
-  // go ahead and move on to the next one
-  if (d == next_d)
-    next_d = d->next;
-
-  REMOVE_FROM_LIST(d, descriptor_list, next);
-
-  if (d->showstr_head)
-    dc_free(d->showstr_head);
-  if (d->showstr_count)
-    dc_free(d->showstr_vector);
-
-  delete d;
-  d = nullptr;
-
-  /*  if(descriptor_list == NULL)
+  void checkpointing(int sig)
   {
-    // if there is NOONE on (everyone got disconnected) loop through and
-    // boot all of the linkdeads.  That way if the mud's link is cut, the
-    // first person back on can't RK everyone
-    char_data * next_i;
-    for(char_data * i = character_list; i; i = next_i) {
-       next_i = i->next;
-       if(IS_NPC(i))
-         continue;
-       do_quit(i, "", 666);
-    }
-    return 0;
-  }*/
-  return 1;
-}
-
-void check_idle_passwords(void)
-{
-  struct descriptor_data *d, *next_d;
-
-  for (d = descriptor_list; d; d = next_d)
-  {
-    next_d = d->next;
-    if (STATE(d) != conn::GET_OLD_PASSWORD && STATE(d) != conn::GET_NAME)
-      continue;
-    if (!d->idle_tics)
+    if (!tics)
     {
-      d->idle_tics++;
-      continue;
+      log("SYSERR: CHECKPOINT shutdown: tics not updated", ANGEL, LOG_BUG);
+      abort();
     }
     else
-    {
-      echo_on(d);
-      SEND_TO_Q("\r\nTimed out... goodbye.\r\n", d);
-      STATE(d) = conn::CLOSE;
-    }
-  }
-}
-
-/* ******************************************************************
- *  signal-handling functions (formerly signals.c)                   *
- ****************************************************************** */
-
-void checkpointing(int sig)
-{
-  if (!tics)
-  {
-    log("SYSERR: CHECKPOINT shutdown: tics not updated", ANGEL, LOG_BUG);
-    abort();
-  }
-  else
-    tics = 0;
-}
-
-void report_debug_logging()
-{
-  extern int last_char_room;
-
-  log("Last cmd:", ANGEL, LOG_BUG);
-  log(last_processed_cmd, ANGEL, LOG_BUG);
-  log("Owner's Name:", ANGEL, LOG_BUG);
-  log(last_char_name, ANGEL, LOG_BUG);
-  logf(ANGEL, LOG_BUG, "Last room: %d", last_char_room);
-}
-
-void crash_hotboot()
-{
-  struct descriptor_data *d = NULL;
-  extern int try_to_hotboot_on_crash;
-  extern int died_from_sigsegv;
-
-  // This can be dangerous, because if we had a SIGSEGV due to a descriptor being
-  // invalid, we're going to do it again.  That's why we put in extern int died_from_sigsegv
-  // sigsegv = # of times we've crashed from SIGSEGV
-
-  for (d = descriptor_list; d && died_from_sigsegv < 2; d = d->next)
-  {
-    write_to_descriptor(d->descriptor, "Mud crash detected.\n\r");
+      tics = 0;
   }
 
-  // attempt to hotboot
-  if (try_to_hotboot_on_crash)
+  void report_debug_logging()
   {
+    extern int last_char_room;
+
+    log("Last cmd:", ANGEL, LOG_BUG);
+    log(last_processed_cmd, ANGEL, LOG_BUG);
+    log("Owner's Name:", ANGEL, LOG_BUG);
+    log(last_char_name, ANGEL, LOG_BUG);
+    logf(ANGEL, LOG_BUG, "Last room: %d", last_char_room);
+  }
+
+  void crash_hotboot()
+  {
+    struct descriptor_data *d = NULL;
+    extern int try_to_hotboot_on_crash;
+    extern int died_from_sigsegv;
+
+    // This can be dangerous, because if we had a SIGSEGV due to a descriptor being
+    // invalid, we're going to do it again.  That's why we put in extern int died_from_sigsegv
+    // sigsegv = # of times we've crashed from SIGSEGV
+
     for (d = descriptor_list; d && died_from_sigsegv < 2; d = d->next)
     {
-      write_to_descriptor(d->descriptor, "Attempting to recover with a hotboot.\n\r");
+      write_to_descriptor(d->descriptor, "Mud crash detected.\n\r");
     }
-    log("Attempting to hotboot from the crash.", ANGEL, LOG_BUG);
-    write_hotboot_file(0);
-    // we shouldn't return from there unless we failed
-    log("Hotboot crash recovery failed.  Exiting.", ANGEL, LOG_BUG);
+
+    // attempt to hotboot
+    if (try_to_hotboot_on_crash)
+    {
+      for (d = descriptor_list; d && died_from_sigsegv < 2; d = d->next)
+      {
+        write_to_descriptor(d->descriptor, "Attempting to recover with a hotboot.\n\r");
+      }
+      log("Attempting to hotboot from the crash.", ANGEL, LOG_BUG);
+      write_hotboot_file(0);
+      // we shouldn't return from there unless we failed
+      log("Hotboot crash recovery failed.  Exiting.", ANGEL, LOG_BUG);
+      for (d = descriptor_list; d && died_from_sigsegv < 2; d = d->next)
+      {
+        write_to_descriptor(d->descriptor, "Hotboot failed giving up.\n\r");
+      }
+    }
+
     for (d = descriptor_list; d && died_from_sigsegv < 2; d = d->next)
     {
-      write_to_descriptor(d->descriptor, "Hotboot failed giving up.\n\r");
+      write_to_descriptor(d->descriptor, "Giving up, goodbye.\n\r");
     }
   }
 
-  for (d = descriptor_list; d && died_from_sigsegv < 2; d = d->next)
+  void crashill(int sig)
   {
-    write_to_descriptor(d->descriptor, "Giving up, goodbye.\n\r");
-  }
-}
-
-void crashill(int sig)
-{
-  report_debug_logging();
-  log("Recieved SIGFPE (Illegal Instruction)", ANGEL, LOG_BUG);
-  crash_hotboot();
-  log("Mud exiting from SIGFPE.", ANGEL, LOG_BUG);
-  exit(0);
-}
-
-void crashfpe(int sig)
-{
-  report_debug_logging();
-  log("Recieved SIGFPE (Arithmetic Error)", ANGEL, LOG_BUG);
-  crash_hotboot();
-  log("Mud exiting from SIGFPE.", ANGEL, LOG_BUG);
-  exit(0);
-}
-
-void crashsig(int sig)
-{
-  extern int died_from_sigsegv;
-  died_from_sigsegv++;
-  if (died_from_sigsegv > 3)
-  { // panic! error is in log...lovely  just give up
+    report_debug_logging();
+    log("Recieved SIGFPE (Illegal Instruction)", ANGEL, LOG_BUG);
+    crash_hotboot();
+    log("Mud exiting from SIGFPE.", ANGEL, LOG_BUG);
     exit(0);
   }
-  if (died_from_sigsegv > 2)
-  { // panic! try to log and get out
-    log("Hit 'died_from_sigsegv > 2'", ANGEL, LOG_BUG);
+
+  void crashfpe(int sig)
+  {
+    report_debug_logging();
+    log("Recieved SIGFPE (Arithmetic Error)", ANGEL, LOG_BUG);
+    crash_hotboot();
+    log("Mud exiting from SIGFPE.", ANGEL, LOG_BUG);
     exit(0);
   }
-  report_debug_logging();
-  log("Recieved SIGSEGV (Segmentation fault)", ANGEL, LOG_BUG);
-  crash_hotboot();
-  log("Mud exiting from SIGSEGV.", ANGEL, LOG_BUG);
-  exit(0);
-}
 
-void unrestrict_game(int sig)
-{
-  extern struct ban_list_element *ban_list;
-  extern int num_invalid;
-
-  log("Received SIGUSR2 - completely unrestricting game (emergent)",
-      ANGEL, LOG_GOD);
-  ban_list = NULL;
-  restrict = 0;
-  num_invalid = 0;
-}
-
-void hupsig(int sig)
-{
-  log("Received SIGHUP, SIGINT, or SIGTERM.  Shutting down...", 0, LOG_MISC);
-  abort(); /* perhaps something more elegant should
-            * substituted */
-}
-
-void sigusr1(int sig)
-{
-  do_not_save_corpses = 1;
-  log("Writing sockets to file for hotboot recovery.", 0, LOG_MISC);
-  if (!write_hotboot_file(nullptr))
+  void crashsig(int sig)
   {
-    log("Hotboot failed.  Closing all sockets.", 0, LOG_MISC);
+    extern int died_from_sigsegv;
+    died_from_sigsegv++;
+    if (died_from_sigsegv > 3)
+    { // panic! error is in log...lovely  just give up
+      exit(0);
+    }
+    if (died_from_sigsegv > 2)
+    { // panic! try to log and get out
+      log("Hit 'died_from_sigsegv > 2'", ANGEL, LOG_BUG);
+      exit(0);
+    }
+    report_debug_logging();
+    log("Recieved SIGSEGV (Segmentation fault)", ANGEL, LOG_BUG);
+    crash_hotboot();
+    log("Mud exiting from SIGSEGV.", ANGEL, LOG_BUG);
+    exit(0);
   }
-}
+
+  void unrestrict_game(int sig)
+  {
+    extern struct ban_list_element *ban_list;
+    extern int num_invalid;
+
+    log("Received SIGUSR2 - completely unrestricting game (emergent)",
+        ANGEL, LOG_GOD);
+    ban_list = NULL;
+    restrict = 0;
+    num_invalid = 0;
+  }
+
+  void hupsig(int sig)
+  {
+    log("Received SIGHUP, SIGINT, or SIGTERM.  Shutting down...", 0, LOG_MISC);
+    abort(); /* perhaps something more elegant should
+              * substituted */
+  }
+
+  void sigusr1(int sig)
+  {
+    do_not_save_corpses = 1;
+    log("Writing sockets to file for hotboot recovery.", 0, LOG_MISC);
+    if (!write_hotboot_file(nullptr))
+    {
+      log("Hotboot failed.  Closing all sockets.", 0, LOG_MISC);
+    }
+  }
 
 #ifndef WIN32
 void sigchld(int sig)
