@@ -1829,7 +1829,9 @@ string generate_prompt(CHAR_DATA *ch)
 
 void write_to_q(const string txt, queue<string> &input_queue)
 {
-  //cerr << "Writing to queue '" << txt << "'" << endl;
+#ifdef DEBUG_INPUT
+  cerr << "Writing to queue '" << txt << "'" << endl;
+#endif
   input_queue.push(txt);
 }
 
@@ -2227,6 +2229,76 @@ void process_iac(descriptor_data *t)
   }
 }
 
+string removeUnprintable(string input)
+{
+  size_t found_pos = input.npos;
+  do
+  {
+    found_pos = input.find('\n');
+    if (found_pos != input.npos)
+    {
+      input.erase(found_pos, 1);
+    }
+  } while(found_pos != input.npos);
+
+  do
+  {
+    found_pos = input.find('\r');
+    if (found_pos != input.npos)
+    {
+      input.erase(found_pos, 1);
+    }
+  } while(found_pos != input.npos);
+
+  do
+  {
+    found_pos = input.find('\b');
+    if (found_pos != input.npos)
+    {
+      input.erase(found_pos, 1);
+    }
+  } while(found_pos != input.npos);
+
+  return input;
+}
+
+
+string makePrintable(string input)
+{
+  size_t found_pos = input.npos;
+  do
+  {
+    found_pos = input.find('\n');
+    if (found_pos != input.npos)
+    {
+      input.erase(found_pos, 1);
+      input.insert(found_pos, "\\n");
+    }
+  } while(found_pos != input.npos);
+
+  do
+  {
+    found_pos = input.find('\r');
+    if (found_pos != input.npos)
+    {
+      input.erase(found_pos, 1);
+      input.insert(found_pos, "\\r");
+    }
+  } while(found_pos != input.npos);
+
+  do
+  {
+    found_pos = input.find('\b');
+    if (found_pos != input.npos)
+    {
+      input.erase(found_pos, 1);
+      input.insert(found_pos, "\\b");
+    }
+  } while(found_pos != input.npos);
+
+  return input;
+}
+
 /*
  * ASSUMPTION: There will be no newlines in the raw input buffer when this
  * function is called.  We must maintain that before returning.
@@ -2238,6 +2310,7 @@ int process_input(struct descriptor_data *t)
   ssize_t bytes_read = 0;
   t->idle_time = 0;
 
+  do {
   do
   {
     char c_buffer[8193] = {};
@@ -2285,60 +2358,74 @@ int process_input(struct descriptor_data *t)
       }
     }
     //cerr << t->inbuf.length() << " " << t->inbuf.size() << endl;
-    erase = 0;
-    size_t crnl_pos = t->inbuf.find("\r\n");
-    if (crnl_pos != t->inbuf.npos)
-    {
-      eoc_pos = crnl_pos;
-      erase = 2;
-    }
 
-    // search for carriage return, new line or pipe representing end of command
-    size_t cr_pos = t->inbuf.find('\r');
-    if (cr_pos != t->inbuf.npos && cr_pos < eoc_pos)
-    {
-      eoc_pos = cr_pos;
-      erase = 1;
-    }
-
-    size_t nl_pos = t->inbuf.find('\n');
-    if (nl_pos != t->inbuf.npos && nl_pos < eoc_pos)
-    {
-      eoc_pos = nl_pos;
-      erase = 1;
-    }
-  } while (eoc_pos == t->inbuf.npos);
-
-  //cerr << "old t->inbuf (" << t->inbuf.length() << ")\n[" << t->inbuf << "]" << endl;
-  string buffer = t->inbuf.substr(0, eoc_pos);
-  t->inbuf.erase(0, eoc_pos + erase);
-  //cerr << "new t->inbuf (" << t->inbuf.length() << ")\n[" << t->inbuf << "]" << endl;
-  //cerr << "buffer (" << buffer.length() << ")\n[" << buffer << "]" << endl;
-
-  // Only search for pipe (|) when not editing
-  if (t->connected != conn::WRITE_BOARD && t->connected != conn::EDITING && t->connected != conn::EDIT_MPROG)
-  {
-    size_t pipe_pos = 0;
-    do
-    {
-      pipe_pos = buffer.find('|');
-      if (pipe_pos != buffer.npos)
+      erase = 0;
+      size_t crnl_pos = t->inbuf.find("\r\n");
+      if (crnl_pos != t->inbuf.npos)
       {
-        string new_buffer = buffer.substr(0, pipe_pos);
-        write_to_q(new_buffer, t->input);
+        eoc_pos = crnl_pos;
+        erase = 2;
+      }
 
-        buffer.erase(0, pipe_pos + 1);
+      // search for carriage return, new line or pipe representing end of command
+      size_t cr_pos = t->inbuf.find('\r');
+      if (cr_pos != t->inbuf.npos && cr_pos < eoc_pos)
+      {
+        eoc_pos = cr_pos;
+        erase = 1;
+      }
+
+      size_t nl_pos = t->inbuf.find('\n');
+      if (nl_pos != t->inbuf.npos && nl_pos < eoc_pos)
+      {
+        eoc_pos = nl_pos;
+        erase = 1;
+      }
+    } while (eoc_pos == t->inbuf.npos);
+
+#ifdef DEBUG_INPUT
+    cerr << "old t->inbuf [" << makePrintable(t->inbuf) << "]" << "(" << t->inbuf.length() << ")" << endl;
+#endif
+    string buffer = t->inbuf.substr(0, eoc_pos);
+    if (buffer.empty())
+    {
+      t->inbuf.clear();
+    }
+    else
+    {
+      t->inbuf.erase(0, eoc_pos + erase); 
+    }
+#ifdef DEBUG_INPUT
+    cerr << "new t->inbuf [" << makePrintable(t->inbuf) << "]" << "(" << t->inbuf.length() << ")" << endl;
+    cerr << "buffer [" << makePrintable(buffer) << "]" << "(" << buffer.length() << ")" << endl;
+#endif
+      // Only search for pipe (|) when not editing
+      if (t->connected != conn::WRITE_BOARD && t->connected != conn::EDITING && t->connected != conn::EDIT_MPROG)
+      {
+        size_t pipe_pos = 0;
+        do
+        {
+          pipe_pos = buffer.find('|');
+          if (pipe_pos != buffer.npos)
+          {
+            string new_buffer = buffer.substr(0, pipe_pos);
+            write_to_q(new_buffer, t->input);
+
+            buffer.erase(0, pipe_pos + 1);
+          }
+          else
+          {
+            write_to_q(buffer, t->input);
+          }
+        } while (pipe_pos != buffer.npos);
       }
       else
       {
-        write_to_q(buffer, t->input);
+        write_to_q(buffer, t->input); 
       }
-    } while (pipe_pos != buffer.npos);
-  }
-  else
-  {
-    write_to_q(buffer, t->input); 
-  }
+    
+
+  } while (t->inbuf.find('\n') || t->inbuf.find('\r'));
 
   /*
           else
