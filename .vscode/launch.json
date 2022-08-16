@@ -5,8 +5,50 @@
     //valgrind --vgdb=yes --vgdb-error=0 ./dcastle -d ~/dcastle/lib/
     "version": "0.2.0",
     "configurations": [
+
+
         {
-            "name": "(gdb)(../lib) Build and Launch",
+            "name": "128 thread Build and Launch in lib/",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/dcastle",
+            "args": [ "-P", "-p 6969"],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/lib/",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ],
+            "preLaunchTask": "scons -C src -j 128"
+        },
+        {
+            "name": "128 thread Debug Build and Launch in lib/",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/dcastle",
+            "args": [ "-P", "-p 6969"],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/lib/",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ],
+            "preLaunchTask": "scons debug=1 -C src -j 128"
+        },
+        {
+            "name": "32 thread Build and Launch in lib/",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/src/dcastle",
@@ -26,7 +68,7 @@
             "preLaunchTask": "build src using 32 threads"
         },
         {
-            "name": "(gdb)(../lib) Debug Build and Launch",
+            "name": "32 thread Debug Build and Launch in lib/",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/src/dcastle",
@@ -46,7 +88,7 @@
             "preLaunchTask": "build debug src using 32 threads"
         },
         {
-            "name": "(gdb)(../lib) Launch",
+            "name": "Launch dcastle in lib/",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/src/dcastle",
@@ -65,7 +107,7 @@
             ]
         },
         {
-            "name": "(gdb)(../lib) showplayerxp ../save/D/Dummy",
+            "name": "showplayerxp ../save/D/Dummy in lib/",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/src/showplayer",
@@ -85,7 +127,7 @@
             ]
         },
         {
-            "name": "(gdb)(../lib) showplayerxp leaderboard",
+            "name": "showplayerxp leaderboard",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/src/showplayer",
@@ -105,7 +147,7 @@
             ]
         },
         {
-            "name": "(gdb)(../../dcastle/lib) Debug - Tests only",
+            "name": "dcastle tests only",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/src/dcastle",
@@ -125,7 +167,7 @@
             ]
         },
         {
-            "name": "(gdb)(../../dcastle/lib) showplayerxp using ../../dcastle/save/J/Julian",
+            "name": "showplayerxp ../../dcastle/save/J/Julian",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/src/showplayer",
@@ -145,7 +187,7 @@
             ]
         },
         {
-            "name": "(gdb)(../../dcastle.6969/lib) Launch",
+            "name": "dcastle in dcastle.6969/lib",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/src/dcastle",
@@ -164,7 +206,7 @@
                 }            ]
         },
         {
-            "name": "(gdb)(../../dcastle.6969/lib) showplayerxp leaderboard",
+            "name": "showplayerxp leaderboard in dcastle.6969/lib",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/src/showplayer",
@@ -184,7 +226,7 @@
             ]
         },
         {
-            "name": "(gdb) valgrind remote-target",
+            "name": "valgrind remote-target",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/src/dcastle",
