@@ -153,7 +153,7 @@ int process_output(struct descriptor_data *t);
 int process_input(struct descriptor_data *t);
 void flush_queues(struct descriptor_data *d);
 int perform_subst(struct descriptor_data *t, char *orig, char *subst);
-int perform_alias(struct descriptor_data *d, char *orig);
+string perform_alias(struct descriptor_data *d, string orig);
 void check_idle_passwords(void);
 void init_heartbeat();
 void heartbeat();
@@ -817,8 +817,7 @@ void DC::game_loop(void)
             d->prompt_mode = 0;
           else
           {
-            if (perform_alias(d, comm.data()))
-              comm = get_from_q(d->input);
+            comm = perform_alias(d, comm);
           }
           PerfTimers["command"].start();
           // Azrack's a chode.  Don't forget to check
@@ -3142,50 +3141,36 @@ int is_busy(CHAR_DATA *ch)
   return (0);
 }
 
-int perform_alias(struct descriptor_data *d, char *orig)
+string perform_alias(struct descriptor_data *d, string orig)
 {
-  char first_arg[MAX_INPUT_LENGTH], new_buf[MAX_INPUT_LENGTH], *ptr;
-  ptr = any_one_arg(orig, first_arg);
-  struct char_player_alias *x;
+  string first_arg, remainder, new_buf;
+  //ptr = any_one_arg(orig, first_arg);
+  tie(first_arg, remainder) = half_chop(orig);
+  struct char_player_alias *x = nullptr;
   int lengthpre;
   int lengthpost;
 
-  if (!*first_arg)
+  if (first_arg.empty())
   {
-    return (0);
+    return orig;
   }
   if (IS_MOB(d->character) || !d->character->pcdata->alias)
-    return (0);
+    return orig;
 
   for (x = d->character->pcdata->alias; x; x = x->next)
   {
     if (x->keyword)
-      if (!strcmp(x->keyword, first_arg))
+    {
+      if (x->keyword == first_arg)
       {
-        strcpy(new_buf, x->command);
-
-        // make sure the new command still fits in our buffers
-        lengthpre = strlen(new_buf);
-        lengthpost = strlen(ptr);
-        if (lengthpre + lengthpost > MAX_INPUT_LENGTH - 1)
-        {
-          ptr[MAX_INPUT_LENGTH - lengthpre - 1] = '\0'; // truncate it to fit
-          strcat(new_buf, ptr);
-          strcat(new_buf, "\0");
-          strcpy(orig, new_buf);
-          SEND_TO_Q("Line too long.  Truncated to:\r\n", d);
-          SEND_TO_Q(orig, d);
-          SEND_TO_Q("\r\n", d);
-        }
-        else
-        {
-          strcat(new_buf, ptr);
-          strcat(new_buf, "\0");
-          strcpy(orig, new_buf);
-        }
+        new_buf = string(x->command);
+        new_buf += " " + remainder;
+        return new_buf;
       }
+    }
   }
-  return (0);
+
+  return orig;
 }
 
 void skip_spaces(char **string)
