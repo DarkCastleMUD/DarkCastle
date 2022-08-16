@@ -283,7 +283,7 @@ int do_sing(CHAR_DATA *ch, char *arg, int cmd) {
 	int learned;
 	vector<songInfo>::iterator i;
 
-	if (!IS_NPC(ch) && GET_CLASS(ch) != CLASS_BARD && GET_LEVEL(ch) < IMMORTAL) {
+	if (IS_PC(ch) && GET_CLASS(ch) != CLASS_BARD && GET_LEVEL(ch) < IMMORTAL) {
 		check_social(ch, "sing", 0, arg); // do the social:)
 		return eSUCCESS;
 	}
@@ -359,7 +359,7 @@ int do_sing(CHAR_DATA *ch, char *arg, int cmd) {
 	}
 
 	if (song_info[spl].song_pointer) {
-		if (GET_POS(ch) < song_info[spl].minimum_position && !IS_NPC(ch) && spl != 2) {
+		if (GET_POS(ch) < song_info[spl].minimum_position && IS_PC(ch) && spl != 2) {
 			switch (GET_POS(ch)) {
 			case POSITION_SLEEPING:
 				send_to_char("You dream of beautiful music.\n\r", ch);
