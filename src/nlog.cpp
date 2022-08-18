@@ -126,11 +126,10 @@ int csendf(struct char_data *ch, const char *arg, ...)
   return(1);
 }
 
-
-string handle_ansi(string haystack, char_data * ch)
+string handle_ansi(string haystack, char_data *ch)
 {
   map<size_t, bool> ignore;
-  map<string,string> rep;
+  map<string, string> rep;
   rep["$$"] = "$";
   rep["$0"] = BLACK;
   rep["$1"] = BLUE;
@@ -148,36 +147,29 @@ string handle_ansi(string haystack, char_data * ch)
 
   try
   {
-    for (auto& key : rep)
+    for (auto &key : rep)
     {
       string needle = key.first;
       string replacement = key.second;
 
-      size_t pos = 0;
-      while ((pos = haystack.find(needle)) != string::npos && !ignore.contains(pos))
+      size_t pos = 0, found_pos = 0;
+      while ((found_pos = haystack.find(needle, pos)) != string::npos)
       {
-        if(ch == nullptr || IS_MOB(ch) || IS_SET(ch->pcdata->toggles, PLR_ANSI) || (ch->desc && ch->desc->color))
+        if (ch == nullptr || IS_MOB(ch) || IS_SET(ch->pcdata->toggles, PLR_ANSI) || (ch->desc && ch->desc->color))
         {
-          haystack.replace(pos, 2, replacement);
-          // $$ that are converted to $ should not be processed in subsequent searches
-          if (needle == "$$")
-          {
-            ignore[pos] = true;
-          }
+          haystack.replace(found_pos, 2, replacement);
+          pos = found_pos + 1;
         }
         else
         {
-          haystack.erase(pos, 2);
-  }
-          }
-       }
+          haystack.erase(found_pos, 2);
+        }
+      }
     }
+  }
   catch (...)
   {
-
   }
 
   return haystack;
 }
-
-
