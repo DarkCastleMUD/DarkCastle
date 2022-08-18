@@ -8,8 +8,6 @@
 *  Copyright (C) 1993, 94 by the Trustees of the Johns Hopkins University *
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 ************************************************************************ */
-#define DEBUG_INPUT 0
-
 #include <errno.h>
 #include "terminal.h"
 #include <string.h>
@@ -2303,22 +2301,102 @@ string makePrintable(string input)
   return input;
 }
 
-/*
- * ASSUMPTION: There will be no newlines in the raw input buffer when this
- * function is called.  We must maintain that before returning.
- */
-int process_input(struct descriptor_data *t)
-{
-  size_t eoc_pos = t->inbuf.npos;
-  size_t erase = 0;
-  ssize_t bytes_read = 0;
-  t->idle_time = 0;
 
-  do
+string remove_all_codes(string input)
+{
+  size_t pos = 0, found_pos = 0, skip = 0;
+  while ((found_pos = input.find("$", pos)) != input.npos)
   {
-    char c_buffer[8193] = {};
-    if ((bytes_read = read(t->descriptor, &c_buffer, sizeof(c_buffer) - 1)) < 0)
+    skip = 1;
+
+    if (found_pos + 1 <= input.length())
     {
+      try
+      {
+        input.replace(found_pos, 1, "$$");
+        skip = 2;
+      } catch(...)
+      {
+
+      }
+    }
+    pos = found_pos + skip;
+  }
+
+  return input;
+}
+
+string remove_non_color_codes(string input)
+{
+  string output = {};
+  size_t pos = 0, found_pos = 0;
+
+  try
+  {
+    while ((found_pos = input.find("$")) != input.npos)
+    {     
+      if (found_pos+1 == input.length())
+      {
+        output += input.substr(0, found_pos+1);
+        output += "$";
+        input.erase(0, found_pos+1);
+        output += input;
+        return output;
+      }
+
+      char code = input.at(found_pos + 1);
+      switch (code)
+      {
+      case '0':
+      case '1':
+      case '2':
+      case '3':
+      case '4':
+      case '5':
+      case '6':
+      case '7':
+      case '8':
+      case '9':
+      case 'I':
+      case 'L':
+      case '*':
+      case 'R':
+      case 'B':
+        output += input.substr(0, found_pos+2);
+        input.erase(0, found_pos+2);
+        break;
+      default:
+        output += input.substr(0, found_pos+1);
+        output += "$";
+        input.erase(0, found_pos+1);
+        break;
+      }      
+    }
+    output += input;
+  }
+  catch (...)
+  {
+  }
+
+  return output;
+}
+
+  /*
+   * ASSUMPTION: There will be no newlines in the raw input buffer when this
+   * function is called.  We must maintain that before returning.
+   */
+  int process_input(struct descriptor_data * t)
+  {
+    size_t eoc_pos = t->inbuf.npos;
+    size_t erase = 0;
+    ssize_t bytes_read = 0;
+    t->idle_time = 0;
+
+    do
+    {
+      char c_buffer[8193] = {};
+      if ((bytes_read = read(t->descriptor, &c_buffer, sizeof(c_buffer) - 1)) < 0)
+      {
 #ifdef EWOULDBLOCK
       if (errno == EWOULDBLOCK)
         errno = EAGAIN;
@@ -2398,6 +2476,20 @@ int process_input(struct descriptor_data *t)
     cerr << "buffer [" << makePrintable(buffer) << "]"
          << "(" << buffer.length() << ")" << endl;
 #endif
+    
+    if (t->character == nullptr || GET_LEVEL(t->character) < IMMORTAL)
+    {
+      buffer = remove_all_codes(buffer);
+    }
+    else
+    {
+      if (t->connected != conn::EDIT_MPROG && t->connected != conn::EDITING)
+      {
+        buffer = remove_non_color_codes(buffer);
+      }
+      
+    }
+
     // Only search for pipe (|) when not editing
     if (t->connected != conn::WRITE_BOARD && t->connected != conn::EDITING && t->connected != conn::EDIT_MPROG)
     {
