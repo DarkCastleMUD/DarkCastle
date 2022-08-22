@@ -2313,27 +2313,28 @@ int do_procedit(struct char_data *ch, char *argument, int cmd)
   // buf4 = args[1-+]
   if (!*buf)
   {
-    send_to_char("$3Syntax$R:  procedit [mob_num] [field] [arg]\r\n"
+    send_to_char("$3Syntax$R:  procedit [mob_vnum] [field] [arg]\r\n"
         "  Edit a field with no args for help on that field.\r\n\r\n"
         "  The field must be one of the following:\n\r", ch);
     display_string_list(fields, ch);
-    sprintf(buf2, "\n\r$3Current mob set to$R: %d\n\r", mob_index[ch->pcdata->last_mob_edit].virt);
+    sprintf(buf2, "\n\r$3Current mob vnum set to$R: %d\n\r", ch->pcdata->last_mob_edit);
     send_to_char(buf2, ch);
     return eFAILURE;
   }
   int mobvnum = -1;
   if (isdigit(*buf))
   {
-    mob_num = atoi(buf);
-    mobvnum = mob_num;
-    if (((mob_num = real_mobile(mob_num)) < 0) || (mob_num == 0 && *buf != '0'))
+    mobvnum = atoi(buf);
+    if (((mob_num = real_mobile(mobvnum)) < 0) || (mobvnum == 0 && *buf != '0'))
     {
-      send_to_char("Invalid mob number.\r\n", ch);
+      ch->send(fmt::format("{} is an invalid mob vnum.\r\n", mobvnum));
       return eSUCCESS;
     }
+    ch->setPlayerLastMob(mobvnum);
   } else
   {
-    mob_num = ch->pcdata->last_mob_edit;
+    mobvnum = ch->pcdata->last_mob_edit;
+    mob_num = real_mobile(mobvnum);
     // put the buffs where they should be
     sprintf(buf2, "%s %s", buf3, buf4);
     strcpy(buf4, buf2);
@@ -2350,12 +2351,7 @@ int do_procedit(struct char_data *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (mob_num != ch->pcdata->last_mob_edit)
-  {
-    sprintf(buf2, "$3Current mob set to$R: %d\n\r", mob_index[mob_num].virt);
-    send_to_char(buf2, ch);
-    ch->pcdata->last_mob_edit = mob_num;
-  }
+  ch->setPlayerLastMob(mobvnum);
 
   // no field
   if (!*buf3)
@@ -2668,10 +2664,10 @@ int do_mscore(struct char_data *ch, char *argument, int cmd)
       return eFAILURE;
     }
 
-    mob_num = atoi(buf);  // there is no mob 0, so this is okay.  Bad 0's get caught in real_mobile
-    if( ((mob_num = real_mobile(mob_num)) < 0))
+    int64_t mob_vnum = atoi(buf);  // there is no mob 0, so this is okay.  Bad 0's get caught in real_mobile    
+    if( ((mob_num = real_mobile(mob_vnum)) < 0))
     {
-      send_to_char("Invalid mob number.\r\n", ch);
+      ch->send(fmt::format("{} is an invalid mob vnum.\r\n", mob_vnum));
       return eSUCCESS;
     }
 
@@ -2726,13 +2722,13 @@ int do_medit(struct char_data *ch, char *argument, int cmd) {
 	if (isdigit(*buf)) {
 		mob_num = atoi(buf); // there is no mob 0, so this is okay.  Bad 0's get caught in real_mobile
 		mobvnum = mob_num;
-		if (((mob_num = real_mobile(mob_num)) < 0)) {
-			send_to_char("Invalid mob number.\r\n", ch);
+		if (((mob_num = real_mobile(mobvnum)) < 0)) {
+      ch->send(fmt::format("{} is an invalid mob vnum.\r\n", mobvnum));
 			return eSUCCESS;
 		}
 	} else {
-		mob_num = ch->pcdata->last_mob_edit;
-		mobvnum = mob_index[mob_num].virt;
+		mobvnum = ch->pcdata->last_mob_edit;
+		mob_num = real_mobile(mobvnum);
 		// put the buffs where they should be
 		if (*buf4)
 			sprintf(buf2, "%s %s", buf3, buf4);
@@ -2741,13 +2737,8 @@ int do_medit(struct char_data *ch, char *argument, int cmd) {
 
 		strcpy(buf4, buf2);
 		strcpy(buf3, buf);
-	}
-	if (mob_num != ch->pcdata->last_mob_edit) {
-		sprintf(buf2, "$3Current mob set to$R: %d\n\r",
-				mob_index[mob_num].virt);
-		send_to_char(buf2, ch);
-		ch->pcdata->last_mob_edit = mob_num;
-	}
+  }
+  ch->setPlayerLastMob(mobvnum);
 
 	if (!*buf3) // no field.  Stat the item.
 	{
@@ -4435,7 +4426,7 @@ int do_msave(struct char_data *ch, char *arg, int cmd)
     return eFAILURE;
   }
 
-  int v = mob_index[ch->pcdata->last_mob_edit].virt;
+  int v = ch->pcdata->last_mob_edit;
   if(!can_modify_mobile(ch, v)) {
     send_to_char("You may only msave inside of the room range you are assigned to.\n\r", ch);
     return eFAILURE;
