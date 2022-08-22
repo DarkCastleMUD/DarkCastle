@@ -2713,3 +2713,18 @@ void char_data::setPOSFighting(void)
     last_damage = 0;
   }
 }
+
+void char_data::setPlayerLastMob(u_int64_t mob_vnum)
+{
+  string buffer;
+  if (this->pcdata == nullptr)
+  {
+    return;
+  }
+
+  if (mob_vnum != this->pcdata->last_mob_edit)
+  {
+    send(fmt::format("Changing last mob vnum from {} to {}\r\n", this->pcdata->last_mob_edit, mob_vnum));
+    this->pcdata->last_mob_edit = mob_vnum;
+  }
+}

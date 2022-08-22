@@ -457,6 +457,7 @@ struct char_data
     void fillHPLimit(void);
     void send(string);
     vector<char_data *> getFollowers(void);
+    void setPlayerLastMob(u_int64_t mobvnum);
 };
 
 // This structure is written to the disk.  DO NOT MODIFY THIS STRUCTURE
