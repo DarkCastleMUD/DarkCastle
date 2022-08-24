@@ -14,11 +14,9 @@
  ***************************************************************************/
 /* $Id: shop.cpp,v 1.33 2014/07/04 22:00:04 jhhudso Exp $ */
 
-extern "C"
-{
-#include <stdio.h>
-#include <string.h>
-}
+#include <cstdio>
+#include <cstring>
+#include <fmt/format.h>
 
 #include "affect.h"
 #include "character.h"
@@ -1529,36 +1527,40 @@ void redo_shop_profit()
   }
 }
 
-struct obj_exchange {
+struct obj_exchange
+{
   int item_qty;
   int item_vnum;
   int cost_qty;
   int cost_vnum;
+  uint64_t cost_exp;
 };
 
-const int OBJ_APOCALYPSE=27905;
-const int OBJ_BROWNIE=27906;
-const int OBJ_MEATBALL=27908;
-const int OBJ_WINGDING=27909;
-const int OBJ_CLOVERLEAF=27910;
+const int OBJ_APOCALYPSE = 27905;
+const int OBJ_BROWNIE = 27906;
+const int OBJ_MEATBALL = 27908;
+const int OBJ_WINGDING = 27909;
+const int OBJ_CLOVERLEAF = 27910;
 
-const int MAX_EDDIE_ITEMS = 14;
+const int MAX_EDDIE_ITEMS = 15;
 
 obj_exchange eddie[MAX_EDDIE_ITEMS] = {
-  {1, OBJ_CLOVERLEAF,  2, OBJ_WINGDING}, 
-  {1, OBJ_CLOVERLEAF,  2, OBJ_MEATBALL}, 
-  {1, OBJ_CLOVERLEAF,  2, OBJ_APOCALYPSE},
-  {1, OBJ_WINGDING,    3, OBJ_CLOVERLEAF},
-  {1, OBJ_WINGDING,    2, OBJ_MEATBALL},
-  {1, OBJ_WINGDING,    2, OBJ_APOCALYPSE},
-  {1, OBJ_MEATBALL,    3, OBJ_CLOVERLEAF},
-  {1, OBJ_MEATBALL,    2, OBJ_WINGDING},
-  {1, OBJ_MEATBALL,    2, OBJ_APOCALYPSE},
-  {1, OBJ_APOCALYPSE,  3, OBJ_CLOVERLEAF},
-  {1, OBJ_APOCALYPSE,  2, OBJ_WINGDING},
-  {1, OBJ_APOCALYPSE,  2, OBJ_MEATBALL},
-  {1, OBJ_BROWNIE,    10, OBJ_CLOVERLEAF},
-  {2, OBJ_CLOVERLEAF,  1, OBJ_BROWNIE}
+    {1, OBJ_CLOVERLEAF, 2, OBJ_WINGDING, 0},
+    {1, OBJ_CLOVERLEAF, 2, OBJ_MEATBALL, 0},
+    {1, OBJ_CLOVERLEAF, 2, OBJ_APOCALYPSE, 0},
+    {1, OBJ_CLOVERLEAF, 0, 0, 5000000000},
+    {2, OBJ_CLOVERLEAF, 1, OBJ_BROWNIE, 0},
+    {1, OBJ_WINGDING, 3, OBJ_CLOVERLEAF, 0},
+    {1, OBJ_WINGDING, 2, OBJ_MEATBALL, 0},
+    {1, OBJ_WINGDING, 2, OBJ_APOCALYPSE, 0},
+    {1, OBJ_MEATBALL, 3, OBJ_CLOVERLEAF, 0},
+    {1, OBJ_MEATBALL, 2, OBJ_WINGDING, 0},
+    {1, OBJ_MEATBALL, 2, OBJ_APOCALYPSE, 0},
+    {1, OBJ_APOCALYPSE, 3, OBJ_CLOVERLEAF, 0},
+    {1, OBJ_APOCALYPSE, 2, OBJ_WINGDING, 0},
+    {1, OBJ_APOCALYPSE, 2, OBJ_MEATBALL, 0},
+    {1, OBJ_BROWNIE, 10, OBJ_CLOVERLEAF, 0}
+
 };
 
 int eddie_shopkeeper(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg, struct char_data *owner)
@@ -1567,38 +1569,67 @@ int eddie_shopkeeper(struct char_data *ch, struct obj_data *obj, int cmd, const 
     return eFAILURE;
 
   if (IS_AFFECTED(ch, AFF_BLIND))
+  {
+    ch->send("You're too blind to do that!\r\n");
     return eFAILURE;
+  }
 
   if (IS_NPC(ch))
     return eFAILURE;
 
-  if (cmd == CMD_LIST) {
+  if (cmd == CMD_LIST)
+  {
     csendf(ch, "$B$2%s tells you, 'This is what I can do for you...\n\r$R", GET_SHORT(owner));
     csendf(ch, "  | Item                              | Cost                                   |\n\r");
     csendf(ch, "--------------------------------------------------------------------------------\n\r");
-    int last_vnum=0;
-    for (int i=0; i < MAX_EDDIE_ITEMS; i++) {
-      char buf[1024];
-      char item_buf[1024];
-      char cost_buf[1024];
-      strncpy(item_buf, ((obj_data *)obj_index[real_object(eddie[i].item_vnum)].item)->short_description, 1024);
-      strncpy(cost_buf, ((obj_data *)obj_index[real_object(eddie[i].cost_vnum)].item)->short_description, 1024);
+    int last_vnum = 0;
+    for (int i = 0; i < MAX_EDDIE_ITEMS; i++)
+    {
+      char buf[1024] = {};
+      char item_buf[1024] = {};
+      char cost_buf[1024] = {};
+      if (eddie[i].item_vnum > 0)
+      {
+        strncpy(item_buf, ((obj_data *)obj_index[real_object(eddie[i].item_vnum)].item)->short_description, 1024);
+      }
+      else
+      {
+        continue;
+      }
 
-      if (last_vnum != 0 && last_vnum != eddie[i].item_vnum) {
-	csendf(ch, "--------------------------------------------------------------------------------\n\r");
+      if (eddie[i].cost_vnum > 0)
+      {
+        strncpy(cost_buf, ((obj_data *)obj_index[real_object(eddie[i].cost_vnum)].item)->short_description, 1024);
+      }
+      else if (eddie[i].cost_exp > 0)
+      {
+        snprintf(cost_buf, 1024, "%10lld experience", eddie[i].cost_exp);
+      }
+
+      if (last_vnum != 0 && last_vnum != eddie[i].item_vnum)
+      {
+        csendf(ch, "--------------------------------------------------------------------------------\n\r");
       }
 
       last_vnum = eddie[i].item_vnum;
       int item_qty = eddie[i].item_qty;
+      int cost_qty = eddie[i].cost_qty;
 
       // setup format specifier based length of item short descriptions
-      snprintf(buf, 1024, "$B$3%%2d$R|%%d x %%-%ds|%%2d x %%-%ds|\n\r",
-	       31+(strlen(item_buf) - nocolor_strlen(item_buf)),
-	       35+(strlen(cost_buf) - nocolor_strlen(cost_buf)));
-      csendf(ch, buf, i+1, item_qty,
-	     ((obj_data *)obj_index[real_object(eddie[i].item_vnum)].item)->short_description,
-	     eddie[i].cost_qty,
-	     ((obj_data *)obj_index[real_object(eddie[i].cost_vnum)].item)->short_description);
+      if (cost_qty > 0)
+      {
+        snprintf(buf, 1024, "$B$3%%2d$R|%%2d x %%-%ds|%%2d x %%-%ds|\n\r",
+                 30 + (strlen(item_buf) - nocolor_strlen(item_buf)),
+                 35 + (strlen(cost_buf) - nocolor_strlen(cost_buf)));
+        csendf(ch, buf, i + 1, item_qty, item_buf, cost_qty, cost_buf);
+      }
+      else
+      {
+        snprintf(buf, 1024, "$B$3%%2d$R|%%2d x %%-%ds|     %%-%ds|\n\r",
+                 30 + (strlen(item_buf) - nocolor_strlen(item_buf)),
+                 35 + (strlen(cost_buf) - nocolor_strlen(cost_buf)));
+        csendf(ch, buf, i + 1, item_qty, item_buf, cost_buf);
+      }
     }
     csendf(ch, "--------------------------------------------------------------------------------\n\r");
 
@@ -1621,57 +1652,79 @@ int eddie_shopkeeper(struct char_data *ch, struct obj_data *obj, int cmd, const 
     send_to_char("$B$312)$R Brownie Point         Cost: 10 Cloverleaf tokens.\n\r", ch);
     */
     return eSUCCESS;
-  } else if (cmd == CMD_BUY) {
+  }
+  else if (cmd == CMD_BUY)
+  {
     char arg1[MAX_STRING_LENGTH];
     char buf[MAX_STRING_LENGTH];
 
     one_argument(arg, arg1);
 
-    if (*arg1 == 0) {
+    if (*arg1 == 0)
+    {
       send_to_char("Buy what?\n\r", ch);
       return eSUCCESS;
     }
 
     int choice = atoi(arg1);
-    if (choice < 1 || choice > MAX_EDDIE_ITEMS) {
+    if (choice < 1 || choice > MAX_EDDIE_ITEMS)
+    {
       csendf(ch, "Invalid number. Choose between 1 and %d.\n\r", MAX_EDDIE_ITEMS);
       return eSUCCESS;
     }
 
-    int count = search_char_for_item_count(ch, real_object(eddie[choice-1].cost_vnum), false);
-
-    if (count < eddie[choice-1].cost_qty) {
-      send_to_char("You don't have enough to trade.\n\r", ch);
-      return eSUCCESS;
-    }
-
-    for (int i = 0; i < eddie[choice - 1].cost_qty; i++)
+    if ((eddie[choice - 1].cost_qty == 0 || eddie[choice - 1].cost_vnum < 1) && eddie[choice - 1].cost_exp > 0)
     {
-      obj_data *obj = search_char_for_item(ch, real_object(eddie[choice - 1].cost_vnum), false);
-      if (obj != 0)
+      if (GET_EXP(ch) >= eddie[choice - 1].cost_exp)
       {
-        if (obj->in_obj)
-        {
-          obj_from_obj(obj);
-        }
-        else
-        {
-          obj_from_char(obj);
-        }
-
-        act("$n gives $p to $N.", ch, obj, owner, TO_ROOM, INVIS_NULL | NOTVICT);
-        act("$n gives you $p.", ch, obj, owner, TO_VICT, 0);
-        act("You give $p to $N.", ch, obj, owner, TO_CHAR, 0);
-
-        sprintf(buf, "%s gives %s to %s (removed)", GET_NAME(ch), obj->name,
-                GET_NAME(owner));
-        log(buf, IMP, LOG_OBJECTS);
+        GET_EXP(ch) -= eddie[choice - 1].cost_exp;
+        ch->send(fmt::format("Eddie takes {} experience from you, leaving you with {} experience.\r\n", eddie[choice - 1].cost_exp, GET_EXP(ch)));
       }
       else
       {
-        csendf(ch, "An error occured.\n\r");
-        do_save(ch, "", 666);
+        ch->send(fmt::format("You do not have the {} experience to pay for that item. You need {} more experience.\r\n", eddie[choice - 1].cost_exp, eddie[choice - 1].cost_exp - GET_EXP(ch)));
         return eSUCCESS;
+      }
+    }
+    else
+    {
+
+      int count = search_char_for_item_count(ch, real_object(eddie[choice - 1].cost_vnum), false);
+
+      if (count < eddie[choice - 1].cost_qty)
+      {
+        send_to_char("You don't have enough to trade.\n\r", ch);
+        return eSUCCESS;
+      }
+
+      for (int i = 0; i < eddie[choice - 1].cost_qty; i++)
+      {
+        obj_data *obj = search_char_for_item(ch, real_object(eddie[choice - 1].cost_vnum), false);
+        if (obj != 0)
+        {
+          if (obj->in_obj)
+          {
+            obj_from_obj(obj);
+          }
+          else
+          {
+            obj_from_char(obj);
+          }
+
+          act("$n gives $p to $N.", ch, obj, owner, TO_ROOM, INVIS_NULL | NOTVICT);
+          act("$n gives you $p.", ch, obj, owner, TO_VICT, 0);
+          act("You give $p to $N.", ch, obj, owner, TO_CHAR, 0);
+
+          sprintf(buf, "%s gives %s to %s (removed)", GET_NAME(ch), obj->name,
+                  GET_NAME(owner));
+          log(buf, IMP, LOG_OBJECTS);
+        }
+        else
+        {
+          csendf(ch, "An error occured.\n\r");
+          do_save(ch, "", 666);
+          return eSUCCESS;
+        }
       }
     }
 
@@ -1696,11 +1749,9 @@ int eddie_shopkeeper(struct char_data *ch, struct obj_data *obj, int cmd, const 
         do_save(ch, "", 666);
         return eSUCCESS;
       }
-
-      do_save(ch, "", 0);
     }
+    do_save(ch, "", 0);
   }
 
   return eSUCCESS;
 }
-
