@@ -1542,7 +1542,7 @@ const int OBJ_MEATBALL=27908;
 const int OBJ_WINGDING=27909;
 const int OBJ_CLOVERLEAF=27910;
 
-const int MAX_EDDIE_ITEMS = 13;
+const int MAX_EDDIE_ITEMS = 14;
 
 obj_exchange eddie[MAX_EDDIE_ITEMS] = {
   {1, OBJ_CLOVERLEAF,  2, OBJ_WINGDING}, 
@@ -1557,7 +1557,8 @@ obj_exchange eddie[MAX_EDDIE_ITEMS] = {
   {1, OBJ_APOCALYPSE,  3, OBJ_CLOVERLEAF},
   {1, OBJ_APOCALYPSE,  2, OBJ_WINGDING},
   {1, OBJ_APOCALYPSE,  2, OBJ_MEATBALL},
-  {1, OBJ_BROWNIE,    10, OBJ_CLOVERLEAF}
+  {1, OBJ_BROWNIE,    10, OBJ_CLOVERLEAF},
+  {2, OBJ_CLOVERLEAF,  1, OBJ_BROWNIE}
 };
 
 int eddie_shopkeeper(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg, struct char_data *owner)
@@ -1588,10 +1589,13 @@ int eddie_shopkeeper(struct char_data *ch, struct obj_data *obj, int cmd, const 
       }
 
       last_vnum = eddie[i].item_vnum;
-      snprintf(buf, 1024, "$B$3%%2d$R|%%-%ds|%%2d x %%-%ds|\n\r",
-	       35+(strlen(item_buf) - nocolor_strlen(item_buf)),
+      int item_qty = eddie[i].item_qty;
+
+      // setup format specifier based length of item short descriptions
+      snprintf(buf, 1024, "$B$3%%2d$R|%%d x %%-%ds|%%2d x %%-%ds|\n\r",
+	       31+(strlen(item_buf) - nocolor_strlen(item_buf)),
 	       35+(strlen(cost_buf) - nocolor_strlen(cost_buf)));
-      csendf(ch, buf, i+1,
+      csendf(ch, buf, i+1, item_qty,
 	     ((obj_data *)obj_index[real_object(eddie[i].item_vnum)].item)->short_description,
 	     eddie[i].cost_qty,
 	     ((obj_data *)obj_index[real_object(eddie[i].cost_vnum)].item)->short_description);
@@ -1641,47 +1645,60 @@ int eddie_shopkeeper(struct char_data *ch, struct obj_data *obj, int cmd, const 
       return eSUCCESS;
     }
 
-    for (int i=0; i < eddie[choice-1].cost_qty; i++) {
-      obj_data *obj = search_char_for_item(ch, real_object(eddie[choice-1].cost_vnum), false);
-      if (obj != 0) {
-	if (obj->in_obj) {
-	  obj_from_obj(obj);
-	} else {
-	  obj_from_char(obj);
-	}
+    for (int i = 0; i < eddie[choice - 1].cost_qty; i++)
+    {
+      obj_data *obj = search_char_for_item(ch, real_object(eddie[choice - 1].cost_vnum), false);
+      if (obj != 0)
+      {
+        if (obj->in_obj)
+        {
+          obj_from_obj(obj);
+        }
+        else
+        {
+          obj_from_char(obj);
+        }
 
-	act("$n gives $p to $N.", ch, obj, owner, TO_ROOM, INVIS_NULL|NOTVICT);
-	act("$n gives you $p.", ch, obj, owner, TO_VICT, 0);
-	act("You give $p to $N.", ch, obj, owner, TO_CHAR, 0);
+        act("$n gives $p to $N.", ch, obj, owner, TO_ROOM, INVIS_NULL | NOTVICT);
+        act("$n gives you $p.", ch, obj, owner, TO_VICT, 0);
+        act("You give $p to $N.", ch, obj, owner, TO_CHAR, 0);
 
-	sprintf(buf, "%s gives %s to %s (removed)", GET_NAME(ch), obj->name,
+        sprintf(buf, "%s gives %s to %s (removed)", GET_NAME(ch), obj->name,
                 GET_NAME(owner));
-	log(buf, IMP, LOG_OBJECTS);
-      } else {
-	csendf(ch, "An error occured.\n\r");
-	do_save(ch, "", 666);
-	return eSUCCESS;
+        log(buf, IMP, LOG_OBJECTS);
+      }
+      else
+      {
+        csendf(ch, "An error occured.\n\r");
+        do_save(ch, "", 666);
+        return eSUCCESS;
       }
     }
 
-    obj_data *item = clone_object(real_object(eddie[choice-1].item_vnum));
-    if (item != 0) {
-      obj_to_char(item, ch);
+    for (int i = 0; i < eddie[choice - 1].item_qty; i++)
+    {
+      obj_data *item = clone_object(real_object(eddie[choice - 1].item_vnum));
+      if (item != 0)
+      {
+        obj_to_char(item, ch);
 
-      act("$n gives $p to $N.", owner, item, ch, TO_ROOM, INVIS_NULL|NOTVICT);
-      act("$n gives you $p.", owner, item, ch, TO_VICT, 0);
-      act("You give $p to $N.", owner, item, ch, TO_CHAR, 0);
-      
-      sprintf(buf, "%s gives %s to %s (created)", GET_NAME(owner), item->name,
-	      GET_NAME(ch));
-      log(buf, IMP, LOG_OBJECTS);
-    } else {
-      csendf(ch, "An error occured.\n\r");
-      do_save(ch, "", 666);
-      return eSUCCESS;
+        act("$n gives $p to $N.", owner, item, ch, TO_ROOM, INVIS_NULL | NOTVICT);
+        act("$n gives you $p.", owner, item, ch, TO_VICT, 0);
+        act("You give $p to $N.", owner, item, ch, TO_CHAR, 0);
+
+        sprintf(buf, "%s gives %s to %s (created)", GET_NAME(owner), item->name,
+                GET_NAME(ch));
+        log(buf, IMP, LOG_OBJECTS);
+      }
+      else
+      {
+        csendf(ch, "An error occured.\n\r");
+        do_save(ch, "", 666);
+        return eSUCCESS;
+      }
+
+      do_save(ch, "", 0);
     }
-
-    do_save(ch, "", 0);
   }
 
   return eSUCCESS;
