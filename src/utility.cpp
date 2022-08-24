@@ -1802,6 +1802,26 @@ const char* get_skill_name(int skillnum) {
   return NULL;
 }
 
+string double_dollars(string source)
+{
+  string destination = {};
+
+  for (auto& ch : source)
+  {
+    if (ch == '$')
+    {
+      destination += "$$";
+    }
+    else
+    {
+      destination += ch;
+    }
+  }
+
+  cerr << source << " becomes " << destination << endl;
+  return destination;
+}
+
 void double_dollars(char * destination, char * source)
 {
   while(*source != '\0')
@@ -2724,7 +2744,7 @@ void char_data::setPlayerLastMob(u_int64_t mob_vnum)
 
   if (mob_vnum != this->pcdata->last_mob_edit)
   {
-    send(fmt::format("Changing last mob vnum from {} to {}\r\n", this->pcdata->last_mob_edit, mob_vnum));
+    send(fmt::format("Changing last mob vnum from {} to {}.\r\n", this->pcdata->last_mob_edit, mob_vnum));
     this->pcdata->last_mob_edit = mob_vnum;
   }
 }

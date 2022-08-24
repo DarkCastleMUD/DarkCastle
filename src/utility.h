@@ -370,6 +370,7 @@ enum MatchType { Failure, Subset, Exact };
 char *str_hsh(const char *);
 bool ishashed(char *);
 void double_dollars(char * destination, char * source);
+string double_dollars(string source);
 
 void    clan_death      (char* b, char_data *ch);
 
@@ -559,6 +560,7 @@ int get_stat(CHAR_DATA *ch, int stat);
 char *pluralize(int qty, char ending[] = "s");
 size_t nocolor_strlen(const char *s);
 void make_prompt(struct descriptor_data *d, string& prompt);
+string remove_all_codes(string input);
 
 extern const char menu[];
 
