@@ -1907,7 +1907,7 @@ void write_to_output(string txt, struct descriptor_data *t)
   if (t->bufptr < 0)
     return;
 
-  if (t->connected != conn::EDITING && t->connected != conn::WRITE_BOARD && t->connected != conn::EDIT_MPROG)
+  if (t->allowColor && t->connected != conn::EDITING && t->connected != conn::WRITE_BOARD && t->connected != conn::EDIT_MPROG)
   {
     temp = txt = handle_ansi(txt, t->character);
   }
