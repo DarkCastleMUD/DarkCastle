@@ -1286,8 +1286,8 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
     }
     else if (*point == ' ')
     {
-	logf( IMMORTAL, LOG_WORLD,  "Mob: v%d r%d: ifchck syntax error: '%s'", mob_index[mob->mobdata->nr].virt, mob->mobdata->nr, ifchck ); 
-	return -1;
+		prog_error(mob, "ifchck syntax error: '%s'", ifchck);
+		return -1;
     }
     else if ( *point == '.' )
     {
@@ -1295,6 +1295,7 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
     }
     else if ( *point == '\0' ) 
       {
+		prog_error(mob, "ifchck syntax error");
 	logf( IMMORTAL, LOG_WORLD,  "Mob: v%d r%d: ifchck syntax error: '%s'", mob_index[mob->mobdata->nr].virt, mob->mobdata->nr, ifchck ); 
 	return -1;
       }   
