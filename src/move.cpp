@@ -327,6 +327,13 @@ int do_simple_move(CHAR_DATA *ch, int cmd, int following)
 	 return retval;
 	 */
 
+	if (ch == nullptr || ch->in_room < 1 || cmd < 0 || world[ch->in_room].dir_option[cmd] == nullptr || world[ch->in_room].dir_option[cmd]->to_room < 1)
+	{
+		logf(IMMORTAL, LOG_WORLD, "Error in room %d.", ch->in_room);
+		ch->send("There was an error performing that movement.\r\n");
+		return eFAILURE;
+	}
+
 	if (IS_AFFECTED(ch, AFF_FLYING))
 		need_movement = 1;
 	else
@@ -868,7 +875,15 @@ int attempt_move(CHAR_DATA *ch, int cmd, int is_retreat = 0) {
 	}
 
 	if (!ch->followers && !ch->master) {
-		return_val = do_simple_move(ch, cmd, FALSE);
+		try
+		{
+			return_val = do_simple_move(ch, cmd, FALSE);
+		} catch (...)
+		{
+			logf(IMMORTAL, LOG_WORLD, "Error performing movement in room %d.", ch->in_room);
+			return_val = eFAILURE;
+		}
+		
 		if (SOMEONE_DIED(return_val) || !IS_SET(return_val, eSUCCESS))
 			return return_val;
 		if (!IS_AFFECTED(ch, AFF_SNEAK))
@@ -898,7 +913,15 @@ int attempt_move(CHAR_DATA *ch, int cmd, int is_retreat = 0) {
 		return eFAILURE;
 	}
 
-	return_val = do_simple_move(ch, cmd, TRUE);
+	try
+	{
+		return_val = do_simple_move(ch, cmd, TRUE);
+	}
+	catch (...)
+	{
+		logf(IMMORTAL, LOG_WORLD, "Error performing movement in room %d.", ch->in_room);
+		return_val = eFAILURE;
+	}
 
 	// this may cause problems with leader being ambushed, dying, and group not moving
 	// but we have to be careful in case leader was a mob (no longer valid memory)
