@@ -2321,6 +2321,7 @@ int do_procedit(struct char_data *ch, char *argument, int cmd)
     send_to_char(buf2, ch);
     return eFAILURE;
   }
+
   int mobvnum = -1;
   if (isdigit(*buf))
   {
@@ -2335,6 +2336,13 @@ int do_procedit(struct char_data *ch, char *argument, int cmd)
   {
     mobvnum = ch->pcdata->last_mob_edit;
     mob_num = real_mobile(mobvnum);
+
+    if (mob_num < 0 || mobvnum <= 0)
+    {
+      ch->send(fmt::format("Last mob vnum {} is invalid.\r\n", mobvnum));
+      return eFAILURE;
+    }
+
     // put the buffs where they should be
     sprintf(buf2, "%s %s", buf3, buf4);
     strcpy(buf4, buf2);
@@ -2446,7 +2454,7 @@ int do_procedit(struct char_data *ch, char *argument, int cmd)
 
     update_mobprog_bits(mob_num);
 
-    send_to_char("Program deleted.\r\n", ch);
+    ch->send(fmt::format("Program {} deleted from mob vnum {}.\r\n", intval, mobvnum));
   }
     break;
 
