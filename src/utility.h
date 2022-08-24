@@ -561,6 +561,8 @@ char *pluralize(int qty, char ending[] = "s");
 size_t nocolor_strlen(const char *s);
 void make_prompt(struct descriptor_data *d, string& prompt);
 string remove_all_codes(string input);
+void prog_error(char_data *mob, char *format, ...);
+
 
 extern const char menu[];
 

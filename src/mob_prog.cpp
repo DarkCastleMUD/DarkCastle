@@ -96,7 +96,7 @@ int mprog_line_num = 0;
  * Local function prototypes
  */
 
-int	mprog_seval		( char* lhs, char* opr, char* rhs );
+int	mprog_seval		(char_data *ch, char* lhs, char* opr, char* rhs );
 int	mprog_veval		( int lhs, char* opr, int rhs );
 int	mprog_do_ifchck		( char* ifchck, CHAR_DATA* mob,
 				       CHAR_DATA* actor, OBJ_DATA* obj,
@@ -211,22 +211,23 @@ bool str_infix( const char *astr, const char *bstr
  *  still have trailing spaces so be careful when editing since:
  *  "guard" and "guard " are not equal.
  */
-int mprog_seval( char *lhs, char *opr, char *rhs )
+int mprog_seval(char_data *ch, char *lhs, char *opr, char *rhs)
 {
- if (!lhs || !rhs)
-     return FALSE;
- if ( !str_cmp( opr, "==" ) )
-    return ( !str_cmp( lhs, rhs ) );
-  if ( !str_cmp( opr, "!=" ) )
-    return ( str_cmp( lhs, rhs ) );
-  if ( !str_cmp( opr, "/" ) )
-    return ( !str_infix( rhs, lhs ) );
-  if ( !str_cmp( opr, "!/" ) )
-    return ( str_infix( rhs, lhs ) );
+	if (!lhs || !rhs)
+		return FALSE;
+	if (!str_cmp(opr, "=="))
+		return (!str_cmp(lhs, rhs));
+	if (!str_cmp(opr, "!="))
+		return (str_cmp(lhs, rhs));
+	if (!str_cmp(opr, "/"))
+		return (!str_infix(rhs, lhs));
+	if (!str_cmp(opr, "!/"))
+		return (str_infix(rhs, lhs));
+	
+	prog_error(ch, "Improper MOBprog operator");
 
-  logf( IMMORTAL, LOG_WORLD,  "Improper MOBprog operator\n\r", 0 );
-  return 0;
-
+	logf(IMMORTAL, LOG_WORLD, "Improper MOBprog operator\n\r", 0);
+	return 0;
 }
 
 int mprog_veval( int lhs, char *opr, int rhs ) 
@@ -1438,7 +1439,7 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
     if (lvalui)  return mprog_veval(*lvalui, opr, (uint)atoi(val));
     if (lvali64) return mprog_veval((int)*lvali64,opr, atoi(val));
     if (lvalb)   return mprog_veval((int)*lvalb, opr, atoi(val));  
-    if (lvalstr) return mprog_seval(*lvalstr, opr, val);
+    if (lvalstr) return mprog_seval(mob, *lvalstr, opr, val);
   } else {
     int16 *rvali = 0;
     uint32 *rvalui = 0;
@@ -1449,7 +1450,7 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
     int64 rval = 0;
     if (rvalstr || rvali || rvalui || rvali64 || rvalb)
     {
-      if (rvalstr && lvalstr) return mprog_seval(*lvalstr, opr, *rvalstr);
+      if (rvalstr && lvalstr) return mprog_seval(mob, *lvalstr, opr, *rvalstr);
       // The rest fit in an int64, so let's just use that.
       if (rvalstr) rval = atoi(*rvalstr);
       if (rvali) rval = *rvali;
@@ -2336,26 +2337,26 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
         mprog_translate(val[1], val, mob, actor, obj, vo, rndm);
 
       if (fvict)
-       return mprog_seval(getTemp(fvict, buf4), opr, val);
+       return mprog_seval(mob, getTemp(fvict, buf4), opr, val);
 	if (ye) return FALSE;
       switch ( arg[1] )  /* arg should be "$*" so just get the letter */
         {
 	case 'z': if (mob->beacon)
 	  {
-             return mprog_seval( getTemp(((CHAR_DATA*)mob->beacon), buf4), opr, val);
+             return mprog_seval(mob, getTemp(((CHAR_DATA*)mob->beacon), buf4), opr, val);
 	  }
            else return -1;
-        case 'i': return mprog_seval( getTemp(mob, buf4), opr, val );
+        case 'i': return mprog_seval(mob, getTemp(mob, buf4), opr, val );
         case 'n': if ( actor )
-                    return mprog_seval( getTemp(actor, buf4), opr, val );
+                    return mprog_seval(mob, getTemp(actor, buf4), opr, val );
                   else
                     return -1;
         case 't': if ( vict )
-                    return mprog_seval( getTemp(vict, buf4), opr, val );
+                    return mprog_seval(mob, getTemp(vict, buf4), opr, val );
                   else
                     return -1;
         case 'r': if ( rndm )
-                    return mprog_seval( getTemp(rndm, buf4), opr, val );
+                    return mprog_seval(mob, getTemp(rndm, buf4), opr, val );
                   else
                     return -1;
         case 'o': 
