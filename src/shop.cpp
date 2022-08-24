@@ -1603,7 +1603,8 @@ int eddie_shopkeeper(struct char_data *ch, struct obj_data *obj, int cmd, const 
       }
       else if (eddie[i].cost_exp > 0)
       {
-        snprintf(cost_buf, 1024, "%10lld experience", eddie[i].cost_exp);
+        string cost_buf_str = fmt::format(locale("en_US.UTF-8"), "{:L} experience", eddie[i].cost_exp);
+        snprintf(cost_buf, 1024, "%s", cost_buf_str.c_str());
       }
 
       if (last_vnum != 0 && last_vnum != eddie[i].item_vnum)
@@ -1678,11 +1679,11 @@ int eddie_shopkeeper(struct char_data *ch, struct obj_data *obj, int cmd, const 
       if (GET_EXP(ch) >= eddie[choice - 1].cost_exp)
       {
         GET_EXP(ch) -= eddie[choice - 1].cost_exp;
-        ch->send(fmt::format("Eddie takes {} experience from you, leaving you with {} experience.\r\n", eddie[choice - 1].cost_exp, GET_EXP(ch)));
+        ch->send(fmt::format(locale("en_US.UTF-8"), "Eddie takes {:L} experience from you, leaving you with {:L} experience.\r\n", eddie[choice - 1].cost_exp, GET_EXP(ch)));
       }
       else
       {
-        ch->send(fmt::format("You do not have the {} experience to pay for that item. You need {} more experience.\r\n", eddie[choice - 1].cost_exp, eddie[choice - 1].cost_exp - GET_EXP(ch)));
+        ch->send(fmt::format(locale("en_US.UTF-8"), "You do not have the {:L} experience to pay for that item. You need {:L} more experience.\r\n", eddie[choice - 1].cost_exp, eddie[choice - 1].cost_exp - GET_EXP(ch)));
         return eSUCCESS;
       }
     }
