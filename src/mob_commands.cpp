@@ -158,9 +158,7 @@ void mpstat( CHAR_DATA *ch, CHAR_DATA *victim)
       send_to_char("$R ", ch);
       sprintf( buf, "$B$5%s$R\n\r", mprg->arglist);
       send_to_char(buf, ch);
-      sprintf( buf, "%s\n\r", mprg->comlist );
-      double_dollars(buf2, buf);
-      send_to_char( buf2, ch );
+      ch->sendRaw(string(mprg->comlist) + "\r\n");
     }
 }
 

@@ -120,6 +120,7 @@ struct descriptor_data {
   int idle_time = {}; // How long the descriptor has been idle, overall.
   bool color = {};
   bool server_size_echo = false;
+  bool allowColor = 1;
 };
 
 #endif

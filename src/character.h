@@ -456,6 +456,7 @@ struct char_data
     void fillHP(void);
     void fillHPLimit(void);
     void send(string);
+    void sendRaw(string);
     vector<char_data *> getFollowers(void);
     void setPlayerLastMob(u_int64_t mobvnum);
 };

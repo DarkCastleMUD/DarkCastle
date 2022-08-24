@@ -7198,3 +7198,18 @@ void char_data::send(string buffer)
 {
   send_to_char(buffer, this);
 }
+
+void char_data::sendRaw(string buffer)
+{
+  if (this->desc != nullptr)
+  {
+    this->desc->allowColor = 0;
+  }
+
+  send_to_char(buffer, this);
+
+  if (this->desc != nullptr)
+  {
+    this->desc->allowColor = 1;
+  }
+}
