@@ -88,7 +88,6 @@ struct obj_data *get_object_in_equip_vis(struct char_data *ch, char *arg, struct
  */
 
 char *			mprog_type_to_name	( int type );
-void prog_error(char_data *ch, char *format, ...);
 
 /* This routine transfers between alpha and numeric forms of the
  *  mob_prog bitvector types. It allows the words to show up in mpstat to
