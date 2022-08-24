@@ -2183,15 +2183,20 @@ void prog_error(char_data *ch, char *format, ...)
   vsnprintf(buffer, MAX_STRING_LENGTH, format, ap);
   va_end(ap);
 
-  if (ch && IS_OBJ(ch)) {
+  if (ch && IS_OBJ(ch))
+  {
     logf(IMMORTAL, LOG_WORLD, "Obj %d, com %d, line %d: %s",
-	 obj_index[ch->objdata->item_number].virt, mprog_command_num,
-	 mprog_line_num, buffer);
-  } else if (ch && IS_MOB(ch)) {
+         obj_index[ch->objdata->item_number].virt, mprog_command_num,
+         mprog_line_num, buffer);
+  }
+  else if (ch && IS_MOB(ch))
+  {
     logf(IMMORTAL, LOG_WORLD, "Mob %d, com %d, line %d: %s",
-	 mob_index[ch->mobdata->nr].virt, mprog_command_num, mprog_line_num,
-	 buffer);
-  } else {
+         mob_index[ch->mobdata->nr].virt, mprog_command_num, mprog_line_num,
+         buffer);
+  }
+  else
+  {
     logf(IMMORTAL, LOG_WORLD, "Unknown prog: %s", buffer);
   }
 }
