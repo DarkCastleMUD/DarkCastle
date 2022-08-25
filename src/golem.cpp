@@ -69,7 +69,7 @@ const struct golem_data golem_list[] = {
     "Unable to sustain further damage, the iron golem falls into unrecoverable scrap.",
     "As the magic binding it is released, the iron golem rusts to pieces."
 },
- {  "stone","stone enchanted golem", "a enchanted stone golem", "A powerfully enchanted stone golem stands here, guarding its master.\r\n",
+ {  "stone","stone enchanted golem", "an enchanted stone golem", "A powerfully enchanted stone golem stands here, guarding its master.\r\n",
     "The stone golem is bound by its caster's magics.  A mindless automaton,\r\nthe stone golem is one of the sturdiest and most resilliant creatures\r\nknown in the realms.  Nearly a full 8 feet tall and weighing several\r\ntons, this mountain of rock is absolutely loyal to its master and\r\nsilently follows orders without fail.\r\n",
     2000, 5, 5, 25, 50, {104,105,106,0,7003}, -1, ISR_PIERCE, -100, "There is a deep rumbling as a stone golem slowly rises from the ground.\r\n",
     "Unable to sustain further damage, the stone golem shatters to pieces.",
