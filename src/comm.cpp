@@ -2458,7 +2458,7 @@ string remove_non_color_codes(string input)
     }
 
     size_t nl_pos = t->inbuf.find('\n');
-    if (nl_pos != t->inbuf.npos && nl_pos < eoc_pos)
+    if (nl_pos != t->inbuf.npos && nl_pos <= eoc_pos)
     {
       eoc_pos = nl_pos;
       erase = 1;
