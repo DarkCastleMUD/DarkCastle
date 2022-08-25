@@ -2437,10 +2437,13 @@ string remove_non_color_codes(string input)
         write_to_descriptor(t->descriptor, new_buffer);
       }
     }
+  // Keep looping until client sends us a \n or \r
+  // if read() above has nothing then we return
   } while (t->inbuf.find('\n') == t->inbuf.npos && t->inbuf.find('\r') == t->inbuf.npos);
 
   do
   {
+    eoc_pos = t->inbuf.npos;
     erase = 0;
     size_t crnl_pos = t->inbuf.find("\r\n");
     if (crnl_pos != t->inbuf.npos)
@@ -2487,7 +2490,6 @@ string remove_non_color_codes(string input)
       {
         buffer = remove_non_color_codes(buffer);
       }
-      
     }
 
     // Only search for pipe (|) when not editing
