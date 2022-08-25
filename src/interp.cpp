@@ -128,6 +128,7 @@ struct command_info cmd_info[] =
         {"stand", do_stand, nullptr, POSITION_RESTING, 0, CMD_DEFAULT, COM_CHARMIE_OK, 0},
         {"switch", do_switch, nullptr, POSITION_RESTING, 0, CMD_DEFAULT, 0, 25},
         {"tell", nullptr, do_tell, POSITION_RESTING, 0, CMD_TELL, 0, 1},
+        {"tellhistory", nullptr, do_tellhistory, POSITION_RESTING, 0, CMD_TELLH, 0, 1},
         {"wield", do_wield, nullptr, POSITION_RESTING, 0, CMD_DEFAULT, COM_CHARMIE_OK, 25},
         {"innate", do_innate, nullptr, POSITION_SLEEPING, 0, CMD_DEFAULT, 0, 1},
         {"orchestrate", do_sing, nullptr, POSITION_RESTING, 0, CMD_ORCHESTRATE, 0, 0},

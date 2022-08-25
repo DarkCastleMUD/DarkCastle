@@ -328,7 +328,8 @@ void save_pc_data(struct pc_data * i, FILE * fpsave, struct time_data tmpage)
     for (auto &opt : *i->options)
     {
       if (opt.first == "color.good" ||
-          opt.first == "color.bad")
+          opt.first == "color.bad" ||
+          opt.first == "tell.history.timestamp")
       {
         fwrite("OPT", sizeof(char),3, fpsave);
         fwrite_var_string(opt.first.c_str(),fpsave);
@@ -487,7 +488,7 @@ void read_pc_data(struct char_data *ch, FILE* fpsave)
 
     string key = fread_var_string(fpsave);
     string value = fread_var_string(fpsave);
-    if (key.empty() == false && (key == "color.good" || key == "color.bad"))
+    if (key.empty() == false && (key == "color.good" || key == "color.bad" || key == "tell.history.timestamp"))
     {
       (*i->options)[key] = value;
     }    

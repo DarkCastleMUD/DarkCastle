@@ -126,6 +126,7 @@ void add_command_lag(CHAR_DATA *ch, int cmdnum, int lag);
 #define CMD_IMMORT 208
 #define CMD_IMPCHAN 209
 #define CMD_TELL 210
+#define CMD_TELLH 211
 #define CMD_PRIZE 999
 #define CMD_GAZE 1820
 
@@ -539,6 +540,7 @@ int do_tame(CHAR_DATA *ch, char *argument, int cmd);
 int do_taste(CHAR_DATA *ch, char *argument, int cmd);
 int do_teleport(CHAR_DATA *ch, char *argument, int cmd);
 int do_tell(CHAR_DATA *ch, string argument, int cmd);
+int do_tellhistory(CHAR_DATA *ch, string argument, int cmd);
 int do_testhand(CHAR_DATA *ch, char *argument, int cmd);
 int do_testhit(CHAR_DATA *ch, char *argument, int cmd);
 int do_testport(CHAR_DATA *ch, char *argument, int cmd);

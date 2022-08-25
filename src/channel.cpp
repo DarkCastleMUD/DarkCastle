@@ -663,11 +663,65 @@ int do_dream(struct char_data *ch, char *argument, int cmd)
     return eSUCCESS;
 }
 
+int do_tellhistory(char_data *ch, string argument, int cmd)
+{
+  if (ch == nullptr)
+  {
+    return eFAILURE;
+  }
+
+  if (IS_NPC(ch))
+  {
+    return eFAILURE;
+  }
+
+  string arg1, remainder;
+  tie(arg1, remainder) = half_chop(argument);
+
+  if (arg1 == "timestamp")
+  {
+    auto result = ch->pcdata->options->find("tell.history.timestamp");
+    /*
+    if (result == ch->pcdata->options->end())
+    {
+      (*ch->pcdata->options)["tell.history.timestamp"] = "1";
+      result = ch->pcdata->options->find("tell.history.timestamp");
+      if (result == ch->pcdata->options->end())
+      {
+        ch->send("Error setting config tell.history.timestamp=1\r\n");
+        return eFAILURE;
+      }
+    }
+*/
+
+    string tell_history_timestamp;
+    if (result != ch->pcdata->options->end())
+    {
+      tell_history_timestamp = result->second;
+    }
+
+    if (tell_history_timestamp == "0" || tell_history_timestamp.empty())
+    {
+      (*ch->pcdata->options)["tell.history.timestamp"] = "1";
+      ch->send(fmt::format("tell history timestamp turned on\r\n"));
+    }
+    else if (tell_history_timestamp == "1")
+    {
+      (*ch->pcdata->options)["tell.history.timestamp"] = "0";
+      ch->send(fmt::format("tell history timestamp turned off\r\n"));
+    }
+
+    do_save(ch, "", 9);
+  }
+
+  return eSUCCESS;
+}
+
 int do_tell(struct char_data *ch, string argument, int cmd)
 {
   char_data *vict = nullptr;
-  string  name = {}, message = {}, buf = {}, log_buf = {};
-  obj_data *tmp_obj =  nullptr;
+  string name = {}, message = {}, buf = {}, log_buf = {};
+  obj_data *tmp_obj = nullptr;
 
   if (!IS_MOB(ch) && IS_SET(ch->pcdata->punish, PUNISH_NOTELL))
   {
@@ -699,10 +753,11 @@ int do_tell(struct char_data *ch, string argument, int cmd)
     }
 
     send_to_char("Here are the last 10 tell messages:\r\n", ch);
-    queue<string> tmp = *(ch->pcdata->tell_history);
+    history_t tmp = *(ch->pcdata->tell_history);
     while (!tmp.empty())
     {
-      string buf = tmp.front();
+      communication c = tmp.front();
+      string buf = c.message;
       buf += "\r\n";
       send_to_char(buf, ch);
       tmp.pop();
@@ -732,10 +787,10 @@ int do_tell(struct char_data *ch, string argument, int cmd)
       record_msg(buf, vict);
 
       buf = fmt::format("$2$B{} told you, '{}'$R", PERS(ch, vict), message);
-      vict->tell_history(buf);
+      vict->tell_history(ch, buf);
 
       buf = fmt::format("$2$BYou told {}, '{}'$R", GET_SHORT(vict), message);
-      ch->tell_history(buf);
+      ch->tell_history(ch, buf);
     }
     else
     {
@@ -797,7 +852,7 @@ int do_tell(struct char_data *ch, string argument, int cmd)
       ansi_color(NTEXT, vict);
 
       buf = fmt::format("$2$B{} tells you, '{}'$R", PERS(ch, vict), message);
-      vict->tell_history(buf);
+      vict->tell_history(ch, buf);
 
       buf = fmt::format("$2$BYou tell {}, '{}'$R", PERS(vict, ch), message);
       send_to_char(buf, ch);
@@ -817,11 +872,11 @@ int do_tell(struct char_data *ch, string argument, int cmd)
       act(buf, vict, 0, 0, TO_CHAR, STAYHIDE);
 
       buf = fmt::format("$2$B{} tells you, '{}'$R", PERS(ch, vict), message);
-      vict->tell_history(buf);
+      vict->tell_history(ch, buf);
 
       buf = fmt::format("$2$BYou tell {}, '{}'$R", PERS(vict, ch), message);
       act_return ar = act(buf, ch, 0, 0, TO_CHAR, STAYHIDE);
-      ch->tell_history(ar.str);
+      ch->tell_history(ch, ar.str);
 
       // Log what I told a logged player under their name
       if (!IS_MOB(vict) && IS_SET(vict->pcdata->punish, PUNISH_LOG))
@@ -851,11 +906,11 @@ int do_tell(struct char_data *ch, string argument, int cmd)
       ansi_color(NTEXT, vict);
 
       buf = fmt::format("$2$B{} tells you, '{}'$R", PERS(ch, vict), message);
-      vict->tell_history(buf);
+      vict->tell_history(ch, buf);
 
       buf = fmt::format("$2$BYou tell {}, '{}'$R", PERS(vict, ch), message);
       act_return ar = act(buf, ch, 0, 0, TO_CHAR, STAYHIDE);
-      ch->tell_history(ar.str);
+      ch->tell_history(ch, ar.str);
 
       send_to_char("They were sleeping btw...\r\n", ch);
       // Log what I told a logged player under their name
@@ -946,11 +1001,11 @@ int do_whisper(struct char_data *ch, char *argument, int cmd)
   {
     sprintf(buf, "$1$B$n whispers to you, '%s'$R", message);
     act_return ar = act(buf, ch, 0, vict, TO_VICT, STAYHIDE);
-    vict->tell_history(ar.str);
+    vict->tell_history(ch, ar.str);
 
     sprintf(buf, "$1$BYou whisper to $N, '%s'$R", message);
     ar = act(buf, ch, 0, vict, TO_CHAR, STAYHIDE);
-    ch->tell_history(ar.str);
+    ch->tell_history(ch, ar.str);
 
     act("$n whispers something to $N.", ch, 0, vict, TO_ROOM,
         NOTVICT | STAYHIDE);
@@ -992,11 +1047,11 @@ int do_ask(struct char_data *ch, char *argument, int cmd)
   {
     sprintf(buf, "$B$n asks you, '%s'$R", message);
     act_return ar = act(buf, ch, 0, vict, TO_VICT, 0);
-    vict->tell_history(ar.str);
+    vict->tell_history(ch, ar.str);
 
     sprintf(buf, "$BYou ask $N, '%s'$R", message);
     ar = act(buf, ch, 0, vict, TO_CHAR, 0);
-    ch->tell_history(ar.str);
+    ch->tell_history(ch, ar.str);
 
     act("$n asks $N a question.", ch, 0, vict, TO_ROOM, NOTVICT);
   }
@@ -1023,10 +1078,10 @@ int do_grouptell(struct char_data *ch, char *argument, int cmd)
       return eFAILURE;
     }
 
-    queue<string> copy = *(ch->pcdata->gtell_history);
+    history_t copy = *(ch->pcdata->gtell_history);
     send_to_char("Here are the last 10 group tells:\r\n", ch);
     while(!copy.empty()) {
-      csendf(ch, "%s\r\n", copy.front().c_str());
+      csendf(ch, "%s\r\n", copy.front().message.c_str());
       copy.pop();
     }
 
@@ -1055,18 +1110,9 @@ int do_grouptell(struct char_data *ch, char *argument, int cmd)
     return eSUCCESS;
   }
 
-  if (ch->pcdata->gtell_history == nullptr)
-  {
-    ch->pcdata->gtell_history = new queue<string>;
-  }
-
   sprintf(buf, "$B$1You tell the group, $7'%s'$R", argument);
   act_return ar = act(buf, ch, 0, 0, TO_CHAR, STAYHIDE | ASLEEP);
-  ch->pcdata->gtell_history->push(ar.str);
-  if (ch->pcdata->gtell_history->size() > 10)
-  {
-    ch->pcdata->gtell_history->pop();
-  }
+  ch->gtell_history(ch, ar.str);
 
   if (!(k = ch->master))
     k = ch;
@@ -1079,15 +1125,7 @@ int do_grouptell(struct char_data *ch, char *argument, int cmd)
 
     if (ch->master && ch->master->pcdata)
     {
-      if (ch->master->pcdata->gtell_history == nullptr)
-      {
-          ch->master->pcdata->gtell_history = new queue<string>;
-      }
-      ch->master->pcdata->gtell_history->push(ar.str);
-      if (ch->master->pcdata->gtell_history->size() > 10)
-      {
-        ch->master->pcdata->gtell_history->pop();
-      }
+      ch->master->gtell_history(ch, ar.str);
     }
   }
 
@@ -1108,15 +1146,7 @@ int do_grouptell(struct char_data *ch, char *argument, int cmd)
         act_return ar = act(buf, ch, 0, f->follower, TO_VICT, STAYHIDE | ASLEEP);
         if (f->follower && f->follower->pcdata)
         {
-          if (f->follower->pcdata->gtell_history == nullptr)
-          {
-             f->follower->pcdata->gtell_history = new queue<string>;
-          }
-          f->follower->pcdata->gtell_history->push(ar.str);
-          if (f->follower->pcdata->gtell_history->size() > 10)
-          {
-            f->follower->pcdata->gtell_history->pop();
-          }
+          f->follower->gtell_history(ch, ar.str);
         }
       }
     }
@@ -1201,7 +1231,7 @@ int do_newbie(struct char_data *ch, char *argument, int cmd)
     return eSUCCESS;
 }
 
-void char_data::tell_history(string message)
+void char_data::tell_history(char_data *ch, string message)
 {
   if (this->pcdata == nullptr)
   {
@@ -1210,12 +1240,44 @@ void char_data::tell_history(string message)
 
   if (this->pcdata->tell_history == nullptr)
   {
-    this->pcdata->tell_history = new std::queue<string>();
+    this->pcdata->tell_history = new history_t();
   }
 
-  this->pcdata->tell_history->push(message);
+  communication c(ch, message);
+
+  this->pcdata->tell_history->push(c);
   if (this->pcdata->tell_history->size() > 10)
   {
     this->pcdata->tell_history->pop();
   }
+}
+
+
+void char_data::gtell_history(char_data *ch, string message)
+{
+  if (this->pcdata == nullptr)
+  {
+    return;
+  }
+
+  if (this->pcdata->gtell_history == nullptr)
+  {
+    this->pcdata->gtell_history = new history_t();
+  }
+
+  communication c(ch, message);
+
+  this->pcdata->gtell_history->push(c);
+  if (this->pcdata->gtell_history->size() > 10)
+  {
+    this->pcdata->gtell_history->pop();
+  }
+}
+
+communication::communication(char_data *ch, string message)
+{
+  this->sender = GET_NAME(ch);
+  this->sender_ispc = IS_PC(ch);
+  this->message = message;
+  this->timestamp = time(nullptr);
 }

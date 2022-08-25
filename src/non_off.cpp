@@ -637,7 +637,7 @@ int do_config(char_data *ch, char *argument, int cmd)
   tie (key, value) = half_chop(argument, '=');
   size_t equal_position = orig_arguments.find('=');
 
-  if (key.empty() == false && key != "color.good" && key != "color.bad")
+  if (key.empty() == false && key != "color.good" && key != "color.bad" && key != "tell.history.timestamp")
   {
     csendf(ch, "Invalid configuration key specified.\r\n");
     return eFAILURE;

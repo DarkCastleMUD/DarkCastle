@@ -179,6 +179,9 @@ struct follow_type
     struct follow_type *next;
 };
 
+class communication;
+typedef std::queue<communication> history_t;
+
 // DO NOT change most of these types without checking the save files
 // first, or you will probably end up corrupting all the pfiles
 struct pc_data
@@ -248,8 +251,8 @@ struct pc_data
     bool hide[MAX_HIDE] = {};
     CHAR_DATA *hiding_from[MAX_HIDE] = {};
     std::queue<string> *away_msgs = {};
-    std::queue<std::string> *tell_history = {};
-    std::queue<std::string> *gtell_history = {};
+    history_t *tell_history = {};
+    history_t *gtell_history = {};
     char *joining = {};
     uint32 quest_points = {};
     int16  quest_current[QUEST_MAX] = {};
@@ -443,7 +446,8 @@ struct char_data
     int spec;
 
     struct room_direction_data *brace_at, *brace_exit; //exits affected by brace
-    void tell_history(string message);
+    void tell_history(char_data *sender, string message);
+    void gtell_history(char_data *sender, string message);
     time_t first_damage;
     uint64_t damage_done;
     uint64_t damages;
@@ -460,6 +464,16 @@ struct char_data
     void sendRaw(string);
     vector<char_data *> getFollowers(void);
     void setPlayerLastMob(u_int64_t mobvnum);
+};
+
+class communication
+{
+    public:
+    communication(char_data *ch, string message);
+    string sender;
+    bool sender_ispc;
+    string message;
+    time_t timestamp;
 };
 
 // This structure is written to the disk.  DO NOT MODIFY THIS STRUCTURE
