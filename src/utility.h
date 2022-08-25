@@ -177,8 +177,9 @@ bool IS_DARK( int room );
 #define GET_PKILLS_TOTAL_LOGIN(ch)  ((ch)->pcdata->totalpkillslv)
 #define GET_PDEATHS_LOGIN(ch)       ((ch)->pcdata->pdeathslogin)
 
-#define GET_GROUP_PKILLS(ch)        ((ch)->pcdata->group_kills)
-#define GET_GROUP_PKILLSTOTAL(ch)   ((ch)->pcdata->grplvl)
+#define GET_GROUP_KILLS(ch)         ((ch)->pcdata->group_kills)
+#define GET_GROUP_PKILLS(ch)        ((ch)->pcdata->group_pkills)
+#define GET_GROUP_PKILLSTOTAL(ch)   ((ch)->pcdata->grpplvl)
 
 #define GET_HP_METAS(ch)   ((ch)->hpmetas)
 #define GET_MANA_METAS(ch) ((ch)->manametas)

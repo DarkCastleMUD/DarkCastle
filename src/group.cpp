@@ -66,9 +66,10 @@ int do_abandon(CHAR_DATA *ch, char *argument, int cmd)
   sprintf(buf,"%s abandons: %s", GET_SHORT(ch), k->group_name);
   act(buf,ch,0,0,TO_ROOM, 0);
 
-  if(!IS_MOB(ch)) {
-    ch->pcdata->grplvl      = 0;
-    ch->pcdata->group_kills = 0;
+  if(IS_PC(ch)) {
+    ch->pcdata->group_pkills = 0;    
+    ch->pcdata->grpplvl      = 0;
+    ch->pcdata->group_kills  = 0;
   }
 
   stop_follower(ch, STOP_FOLLOW);
@@ -114,9 +115,10 @@ int do_found(CHAR_DATA *ch, char *argument, int cmd)
   sprintf(buf,"%s founds: %s", GET_SHORT(ch), argument);
   act(buf, ch, 0, 0, TO_ROOM, 0);
 
-  if(!IS_MOB(ch)) {
-    ch->pcdata->group_kills = 0;
-    ch->pcdata->grplvl      = 0;
+  if(IS_PC(ch)) {
+    ch->pcdata->group_pkills = 0;
+    ch->pcdata->grpplvl      = 0;
+    ch->pcdata->group_kills  = 0;
   }
 
   SETBIT(ch->affected_by, AFF_GROUP);
@@ -462,11 +464,13 @@ int do_promote(CHAR_DATA *ch, char *argument, int cmd)
           GET_SHORT(ch), GET_SHORT(new_new_leader), ch->group_name);
   act(buf, ch, 0, new_new_leader, TO_ROOM, NOTVICT);
 
-  if(!IS_MOB(ch) && !IS_MOB(new_new_leader)) {
-    new_new_leader->pcdata->grplvl      = ch->pcdata->grplvl;
-    new_new_leader->pcdata->group_kills = ch->pcdata->group_kills;
-    ch->pcdata->group_kills = 0;
-    ch->pcdata->grplvl      = 0;
+  if(IS_PC(ch) && IS_PC(new_new_leader)) {
+    new_new_leader->pcdata->grpplvl      = ch->pcdata->grpplvl;
+    new_new_leader->pcdata->group_pkills = ch->pcdata->group_pkills;
+    new_new_leader->pcdata->group_kills  = ch->pcdata->group_kills;
+    ch->pcdata->group_pkills = 0;
+    ch->pcdata->grpplvl      = 0;
+    ch->pcdata->group_kills  = 0;
   }
 
   if(ch->group_name) {
@@ -533,9 +537,10 @@ int do_disband(CHAR_DATA *ch, char *argument, int cmd)
     dc_free(k->group_name);
     k->group_name = 0;
 
-    if(!IS_MOB(k)) {
-      k->pcdata->group_kills = 0;
-      k->pcdata->grplvl      = 0;
+    if(IS_PC(k)) {
+      k->pcdata->group_pkills = 0;
+      k->pcdata->grpplvl      = 0;
+      k->pcdata->group_kills  = 0;
     }
 
     for(f = k->followers; f; f = next_f) { 
@@ -574,9 +579,10 @@ int do_disband(CHAR_DATA *ch, char *argument, int cmd)
   }
 
   stop_grouped_bards(adios,1);
-  if(!IS_MOB(adios)) {
-    adios->pcdata->grplvl      = 0;
-    adios->pcdata->group_kills = 0;
+  if(IS_PC(adios)) {
+    adios->pcdata->grpplvl      = 0;
+    adios->pcdata->group_pkills = 0;
+    adios->pcdata->group_kills  = 0;
   }
   stop_follower(adios, STOP_FOLLOW);
   return eSUCCESS;

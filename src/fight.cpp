@@ -5028,17 +5028,31 @@ void raw_kill(CHAR_DATA * ch, CHAR_DATA * victim)
   GET_POS(victim) = POSITION_STANDING;  
   int retval = mprog_death_trigger(victim, ch);
    if (SOMEONE_DIED(retval)) return;
-  GET_POS(victim) = POSITION_DEAD;  
-  
-  if(GET_RACE(victim) == RACE_UNDEAD ||
-     GET_RACE(victim) == RACE_GHOST ||
-     GET_RACE(victim) == RACE_ELEMENT ||
-     GET_RACE(victim) == RACE_ASTRAL ||
-     GET_RACE(victim) == RACE_SLIME ||
-     (IS_NPC(victim) && mob_index[victim->mobdata->nr].virt == 8)
-    )
+  GET_POS(victim) = POSITION_DEAD;
+
+  if (GET_RACE(victim) == RACE_UNDEAD ||
+      GET_RACE(victim) == RACE_GHOST ||
+      GET_RACE(victim) == RACE_ELEMENT ||
+      GET_RACE(victim) == RACE_ASTRAL ||
+      GET_RACE(victim) == RACE_SLIME ||
+      (IS_NPC(victim) && mob_index[victim->mobdata->nr].virt == 8))
     make_dust(victim);
-  else make_corpse(victim);
+  else
+    make_corpse(victim);
+
+  if (IS_AFFECTED(ch, AFF_GROUP))
+  {
+    char_data *master = ch->master ? ch->master : ch;
+    if (IS_PC(master))
+    {
+      if (IS_PC(victim))
+      {
+        master->pcdata->grpplvl += GET_LEVEL(victim);
+        master->pcdata->group_pkills += 1;
+      }
+      master->pcdata->group_kills += 1;
+    }
+  }
 
   if (IS_NPC(victim))
   {
@@ -5073,8 +5087,9 @@ void raw_kill(CHAR_DATA * ch, CHAR_DATA * victim)
       extract_char(victim->pcdata->golem, FALSE);
     }
   }
-  victim->pcdata->group_kills = 0;
-  victim->pcdata->grplvl      = 0;
+  victim->pcdata->group_pkills = 0;
+  victim->pcdata->grpplvl      = 0;
+  victim->pcdata->group_kills  = 0;
   if(IS_SET(victim->pcdata->punish, PUNISH_SPAMMER))
     REMOVE_BIT(victim->pcdata->punish, PUNISH_SPAMMER);
   if(affected_by_spell(victim, FUCK_PTHIEF)) {
@@ -6133,15 +6148,18 @@ void do_pkill(CHAR_DATA *ch, CHAR_DATA *victim, int type, bool vict_is_attacker)
         GET_PKILLS_LOGIN(ch)       += 1;
         GET_PKILLS_TOTAL(ch)       += GET_LEVEL(victim);
         GET_PKILLS_TOTAL_LOGIN(ch) += GET_LEVEL(victim);
-      
 
-        if(IS_AFFECTED(ch, AFF_GROUP)) 
+        if (IS_AFFECTED(ch, AFF_GROUP))
         {
-          char_data * master   = ch->master ? ch->master : ch;
-          if(!IS_MOB(master)) 
+          char_data *master = ch->master ? ch->master : ch;
+          if (IS_PC(master))
           {
-              master->pcdata->grplvl      += GET_LEVEL(victim);
-              master->pcdata->group_kills += 1;
+            if (IS_PC(victim))
+            {
+              master->pcdata->grpplvl += GET_LEVEL(victim);
+              master->pcdata->group_pkills += 1;
+            }
+            master->pcdata->group_kills += 1;
           }
         }
       }
@@ -6171,16 +6189,22 @@ void do_pkill(CHAR_DATA *ch, CHAR_DATA *victim, int type, bool vict_is_attacker)
          GET_PKILLS_TOTAL(ch->master)       += GET_LEVEL(victim);
          GET_PKILLS_TOTAL_LOGIN(ch->master) += GET_LEVEL(victim);
 
-        if(ch->master->master)
-          if(IS_AFFECTED(ch->master->master, AFF_GROUP)) 
-          {
-            char_data * master   = ch->master->master ? ch->master->master : ch->master;
-            if(!IS_MOB(master)) 
-            {
-              master->pcdata->grplvl      += GET_LEVEL(victim);
-              master->pcdata->group_kills += 1;
-            }
-          }
+         if (ch->master->master)
+         {
+           if (IS_AFFECTED(ch->master->master, AFF_GROUP))
+           {
+             char_data *master = ch->master->master ? ch->master->master : ch->master;
+             if (IS_PC(master))
+             {
+               if (IS_PC(victim))
+               {
+                 master->pcdata->grpplvl += GET_LEVEL(victim);
+                 master->pcdata->group_pkills += 1;
+               }
+               master->pcdata->group_kills += 1;
+             }
+           }
+         }
        }
     }
     if(IS_AFFECTED(ch, AFF_FAMILIAR) 
@@ -6208,16 +6232,22 @@ void do_pkill(CHAR_DATA *ch, CHAR_DATA *victim, int type, bool vict_is_attacker)
          GET_PKILLS_TOTAL(ch->master)       += GET_LEVEL(victim);
          GET_PKILLS_TOTAL_LOGIN(ch->master) += GET_LEVEL(victim);
 
-         if(ch->master->master)
-           if(IS_AFFECTED(ch->master->master, AFF_GROUP)) 
+         if (ch->master->master)
+         {
+           if (IS_AFFECTED(ch->master->master, AFF_GROUP))
            {
-             char_data * master   = ch->master->master ? ch->master->master : ch->master;
-             if(!IS_MOB(master)) 
+             char_data *master = ch->master->master ? ch->master->master : ch->master;
+             if (IS_PC(master))
              {
-               master->pcdata->grplvl      += GET_LEVEL(victim);
+               if (IS_PC(victim))
+               {
+                 master->pcdata->grpplvl += GET_LEVEL(victim);
+                 master->pcdata->group_pkills += 1;
+               }
                master->pcdata->group_kills += 1;
              }
            }
+         }
         }
     }
  // if (ch && ch != victim)

@@ -116,11 +116,11 @@ int do_whogroup(struct char_data *ch, char *argument, int cmd)
          k = i;
          sprintf(tempbuffer, "\n\r"
                              "   $B$7[$4: $5%s $4:$7]$R\n\r"
-                             "   Number of PKs: %-3d  Average level of victim: %d\n\r", 
-                             k->group_name,
-                             IS_MOB(k) ? 0 : k->pcdata->group_kills, 
-                             IS_MOB(k) ? 0 : (k->pcdata->group_kills ?  
-                                               (k->pcdata->grplvl/k->pcdata->group_kills) : 0));
+                             "   Player kills: %-3d  Average level of victim: %d  Total kills: %-3d\n\r",
+                 k->group_name,
+                 IS_MOB(k) ? 0 : k->pcdata->group_pkills,
+                 IS_MOB(k) ? 0 : (k->pcdata->group_pkills ? (k->pcdata->grpplvl / k->pcdata->group_pkills) : 0),
+                 IS_MOB(k) ? 0 : k->pcdata->group_kills);
          add_to_who(tempbuffer);
 
          // If we're searching, see if this is the target
