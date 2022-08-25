@@ -196,8 +196,9 @@ struct pc_data
     uint32 pdeaths = {};             // total number of times pkilled
     uint32 pkills = {};              // # of pkills ever 
     uint32 pklvl = {};               // # sum of levels of pk victims ever
-    uint32 group_kills = {};         // # of kills for group 
-    uint32 grplvl = {};              // sum of levels of group victims 
+    uint32 group_pkills = {};        // # of pkills for group 
+    uint32 grpplvl = {};              // sum of levels of group pkill victims 
+    uint32 group_kills = {};         // # of kills for group
 
     char *last_site = {};                /* Last login from.. */
     struct time_data time = {};          // PC time data.  logon, played, birth
