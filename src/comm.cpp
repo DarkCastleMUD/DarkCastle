@@ -2514,7 +2514,7 @@ string remove_non_color_codes(string input)
     {
       write_to_q(buffer, t->input);
     }
-  } while (t->inbuf.find('\n') != t->inbuf.npos && t->inbuf.find('\r') != t->inbuf.npos);
+  } while (t->inbuf.find('\n') != t->inbuf.npos || t->inbuf.find('\r') != t->inbuf.npos);
 
   /*
           else
