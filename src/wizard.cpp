@@ -21,6 +21,7 @@
 #include "comm.h"
 #include "const.h"
 #include "inventory.h"
+#include <fmt/format.h>
 
 #ifdef TWITTER
 #include <curl.h>
@@ -1915,7 +1916,7 @@ void pulse_hunts()
 
 int do_showhunt(CHAR_DATA *ch, char *arg, int cmd)
 {
-  char buf[MAX_STRING_LENGTH];
+  string buf;
   struct hunt_data *h;
   struct hunt_items *hi;
 
@@ -1923,7 +1924,7 @@ int do_showhunt(CHAR_DATA *ch, char *arg, int cmd)
   {
     send_to_char("There are no active hunts at the moment.\r\n", ch);
 
-    sprintf(buf, "Last hunt was run: %s \n\r", last_hunt_time(NULL));
+    ch->send(fmt::format("Last hunt was run: {}\n\r", last_hunt_time(NULL)));
 
     send_to_char(buf, ch);
   }
@@ -1933,32 +1934,29 @@ int do_showhunt(CHAR_DATA *ch, char *arg, int cmd)
   for (h = hunt_list; h; h = h->next)
   {
     if (h->huntname)
-      sprintf(buf, "\r\n%s for '%s'(%d minutes remaining):\r\n", h->huntname,
-              ((OBJ_DATA *)obj_index[real_object(h->itemnum)].item)->short_description, h->time);
+    {
+      ch->send(fmt::format("\r\n{} for '{}'({} minutes remaining):\r\n", h->huntname, ((OBJ_DATA *)obj_index[real_object(h->itemnum)].item)->short_description, h->time));
+    }
     else
-      sprintf(buf, "\r\nThe hunt for '%s'(%d minutes remaining):\r\n",
-              ((OBJ_DATA *)obj_index[real_object(h->itemnum)].item)->short_description, h->time);
-    send_to_char(buf, ch);
+    {
+      ch->send(fmt::format("\r\nThe hunt for '{}'({} minutes remaining):\r\n", ((OBJ_DATA *)obj_index[real_object(h->itemnum)].item)->short_description, h->time));
+    }
+
     int itemsleft = 0;
-    buf[0] = '\0';
     for (hi = hunt_items_list; hi; hi = hi->next)
     {
       if (hi->hunt != h)
+      {
         continue;
+      }
+
       itemsleft++;
-      sprintf(buf, "%s| %-35s  ",
-              buf, hi->mobname);
+      ch->send(fmt::format("{}| {:35}  ", buf, hi->mobname));
+
       if ((itemsleft % 2) == 0)
       {
-        sprintf(buf, "%s|\r\n", buf);
-        send_to_char(buf, ch);
-        buf[0] = '\0';
+        ch->send(fmt::format("{}|\r\n", buf));
       }
-    }
-    if (buf[0] != '\0')
-    {
-      sprintf(buf, "%s|\r\n", buf);
-      send_to_char(buf, ch);
     }
   }
   return eSUCCESS;
