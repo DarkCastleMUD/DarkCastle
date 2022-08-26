@@ -955,14 +955,14 @@ int do_reply(struct char_data *ch, char *argument, int cmd)
   {
     send_to_char("Reply what?\n\r", ch);
     if ((vict = get_char(ch->pcdata->last_tell)) && CAN_SEE(ch, vict))
-      sprintf(buf, "Last tell was from %s.\n\r", ch->pcdata->last_tell);
+      sprintf(buf, "Last tell was from %s.\n\r", ch->pcdata->last_tell.c_str());
     else
       sprintf(buf, "Last tell was from someone you cannot currently see.\n\r");
     send_to_char(buf, ch);
     return eSUCCESS;
   }
 
-  sprintf(buf, "%s %s", ch->pcdata->last_tell, argument);
+  sprintf(buf, "%s %s", ch->pcdata->last_tell.c_str(), argument);
   do_tell(ch, buf, 9999);
   return eSUCCESS;
 }
