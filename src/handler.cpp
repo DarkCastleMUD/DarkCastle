@@ -4103,14 +4103,8 @@ struct obj_data *create_money(int amount) {
 		return (0);
 	}
 
-#ifdef LEAK_CHECK
-	obj = (struct obj_data *)calloc(1, sizeof(struct obj_data));
-	new_new_descr = (struct extra_descr_data *)
-	calloc(1, sizeof(struct extra_descr_data));
-#else
-	obj = (struct obj_data *) dc_alloc(1, sizeof(struct obj_data));
-	new_new_descr = (struct extra_descr_data *) dc_alloc(1, sizeof(struct extra_descr_data));
-#endif
+	obj = new obj_data;
+	new_new_descr = new extra_descr_data;
 
 	clear_object(obj);
 
