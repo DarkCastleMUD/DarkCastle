@@ -1340,9 +1340,9 @@ void nanny(struct descriptor_data *d, string arg)
          SEND_TO_Q("Ok, what IS it, then? ", d);
          telnet_ga(d);
          // TODO - double check this to make sure we're free'ing properly
-         dc_free(GET_NAME(ch));
+         delete GET_NAME(ch);
          GET_NAME(ch) = NULL;
-         dc_free(d->character);
+         delete d->character;
          d->character = NULL;
          STATE(d) = conn::GET_NAME;
          break;
