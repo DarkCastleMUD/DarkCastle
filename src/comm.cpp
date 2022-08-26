@@ -1825,7 +1825,9 @@ string generate_prompt(CHAR_DATA *ch)
   *pro = ' ';
   *(pro + 1) = '\0';
 
-  return string(prompt);
+  string buffer = prompt;
+  delete [] prompt;
+  return buffer;
 }
 
 
