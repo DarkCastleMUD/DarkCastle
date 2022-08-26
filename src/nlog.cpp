@@ -140,7 +140,9 @@ string handle_ansi(string haystack, char_data *ch)
   rep["$6"] = PURPLE;
   rep["$7"] = GREY;
   rep["$B"] = BOLD;
+  rep["$b"] = BOLD;
   rep["$R"] = NTEXT;
+  rep["$r"] = NTEXT;
   rep["$L"] = FLASH;
   rep["$K"] = BLINK;
   rep["$I"] = INVERSE;
