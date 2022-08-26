@@ -3994,11 +3994,7 @@ void make_scraps(CHAR_DATA *ch, struct obj_data *obj)
   char buf[MAX_STRING_LENGTH];
   /*int i;*/
   
-#ifdef LEAK_CHECK
-  corpse = (struct obj_data *)calloc(1, sizeof(struct obj_data));
-#else
-  corpse = (struct obj_data *)dc_alloc(1, sizeof(struct obj_data));
-#endif
+  corpse = new obj_data;
   clear_object(corpse);
   
   corpse->item_number = -1;

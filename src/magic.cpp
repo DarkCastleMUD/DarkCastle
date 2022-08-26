@@ -6086,8 +6086,8 @@ void make_portal(CHAR_DATA * ch, CHAR_DATA * vict)
   int chance, destination;
   bool good_destination = false;
 
-  ch_portal   = (struct obj_data *)dc_alloc(1, sizeof(struct obj_data));
-  vict_portal = (struct obj_data *)dc_alloc(1, sizeof(struct obj_data));
+  ch_portal   = new obj_data;
+  vict_portal = new obj_data;
 
   clear_object(ch_portal);
   clear_object(vict_portal);
