@@ -2033,7 +2033,7 @@ void check_timer()
 
 int get_line(FILE * fl, char *buf)
 { 
-  char temp[256];
+  char temp[256] = {};
   int lines = 0;
 
   do {
