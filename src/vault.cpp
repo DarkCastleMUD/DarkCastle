@@ -627,14 +627,14 @@ void load_vaults(void) {
   struct vault_data *vault;
   struct vault_access_data *access;
   struct vault_items_data *items;
-  struct obj_data *obj;
-  struct stat statbuf;
-  FILE *fl, *index;
-  int vnum, full, count;
+  struct obj_data *obj = nullptr;
+  struct stat statbuf = {};
+  FILE *fl = nullptr, *index = nullptr;
+  int vnum = 0, full = 0, count = 0;
   long long unsigned int gold = 0;
-  char value[128], line[128], buf[MAX_STRING_LENGTH], fname[MAX_INPUT_LENGTH], type[128], tmp[10];
+  char value[128] = {}, line[128] = {}, buf[MAX_STRING_LENGTH] = {}, fname[MAX_INPUT_LENGTH] = {}, type[128] = {}, tmp[10] = {};
   bool saveChanges = FALSE;
-  char src_filename[256];
+  char src_filename[256] = {};
 
   if(!(index = dc_fopen(VAULT_INDEX_FILE, "r"))) {
     log ("boot_vaults: could not open vault index file, probably doesn't exist.", IMMORTAL, LOG_BUG);
