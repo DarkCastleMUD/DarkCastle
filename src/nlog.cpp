@@ -126,6 +126,89 @@ int csendf(struct char_data *ch, const char *arg, ...)
   return(1);
 }
 
+char * handle_ansi_(char * s, char_data * ch)
+{
+  char * t;
+  char* tp, *sp, *i;
+
+  char nullstring[] = "";
+  char dollarstring[] = "$";
+
+  // Worse case scenario is a string of color codes that are all $R's.  These take up
+  // 11 characters each.  So to handle that, we'll count the number of $'s and multiply
+  // that by 11 for the amount of extra space we need.
+
+  int numdollars = 0;
+
+  t = s;
+  while((t = strstr(t, "$"))) {
+    numdollars++;
+    t++;
+  }
+  
+#ifdef LEAK_CHECK
+  t = (char *)calloc((strlen(s) + numdollars*11 + 1), sizeof(char));
+#else
+  t = (char *)dc_alloc((strlen(s) + numdollars*11 + 1), sizeof(char));
+#endif
+  *t = '\0';
+
+  i = nullstring;
+  tp = t;
+  sp = s;
+  while(*sp) {
+    if(*sp != '$') {
+      *tp++ = *sp++;
+    } else {
+       if(IS_MOB(ch) || IS_SET(ch->pcdata->toggles, PLR_ANSI) || (ch->desc && ch->desc->color)) {
+          switch(*++sp) {
+//             case 'B':  i = BLACK; break;
+//             case 'R':  i = RED; break;
+//             case 'g':  i = GREEN; break;
+//             case 'Y':  i = YELLOW; break;
+//             case 'b':  i = BLUE; break;
+//             case 'P':  i = PURPLE; break;
+//             case 'C':  i = CYAN; break;
+//             case 'G':  i = GREY; break;
+//             case '!':  i = BOLD; break;
+//             case 'N':  i = NTEXT; break;
+
+             case '0':  i = BLACK; break;
+             case '1':  i = BLUE; break;
+             case '2':  i = GREEN; break;
+             case '3':  i = CYAN; break;
+             case '4':  i = RED; break;
+             case '5':  i = YELLOW; break;
+             case '6':  i = PURPLE; break;
+             case '7':  i = GREY; break;
+             case 'B':  i = BOLD; break;
+             case 'R':  i = NTEXT; break;
+	     case 'L':  i = FLASH;break;
+	     case 'K':  i = BLINK;break;
+             case 'I':  i = INVERSE; break;
+             case '$':  i = dollarstring; break;
+             case '\0': // this happens if we end a line with $
+                        sp--; // back up to the $ char so we don't go past our \0
+                        // no break here so the default catchs it and uses a nullstring
+             default: i = nullstring; break;
+          }
+       } else {
+         sp++;
+         if(*sp == '$')
+           i = dollarstring;
+         else i = nullstring;
+       }
+       while((*tp++ = *i++));
+       tp--;
+       sp++;
+    }
+  }
+  *tp = '\0';
+
+  return t;
+}
+
+
 string handle_ansi(string haystack, char_data *ch)
 {
   map<size_t, bool> ignore;
@@ -135,20 +218,20 @@ string handle_ansi(string haystack, char_data *ch)
   rep["$1"] = BLUE;
   rep["$2"] = GREEN;
   rep["$3"] = CYAN;
+
   rep["$4"] = RED;
   rep["$5"] = YELLOW;
   rep["$6"] = PURPLE;
   rep["$7"] = GREY;
   rep["$B"] = BOLD;
-  rep["$b"] = BOLD;
   rep["$R"] = NTEXT;
-  rep["$r"] = NTEXT;
   rep["$L"] = FLASH;
   rep["$K"] = BLINK;
   rep["$I"] = INVERSE;
 
   try
   {
+    // Search for valid codes first
     for (auto &key : rep)
     {
       string needle = key.first;
@@ -157,7 +240,7 @@ string handle_ansi(string haystack, char_data *ch)
       size_t pos = 0, found_pos = 0;
       while ((found_pos = haystack.find(needle, pos)) != string::npos)
       {
-        if (ch == nullptr || IS_MOB(ch) || IS_SET(ch->pcdata->toggles, PLR_ANSI) || (ch->desc && ch->desc->color))
+        if (ch == nullptr || IS_MOB(ch) || (ch->pcdata != nullptr && IS_SET(ch->pcdata->toggles, PLR_ANSI)) || (ch->desc && ch->desc->color))
         {
           haystack.replace(found_pos, 2, replacement);
           pos = found_pos + 1;
@@ -168,10 +251,24 @@ string handle_ansi(string haystack, char_data *ch)
         }
       }
     }
+
+    // Search and remove invalid codes second
+    string needle = "$";
+    size_t pos = 0, found_pos = 0;
+    while ((found_pos = haystack.find(needle, pos)) != string::npos)
+    {
+      if (haystack.at(found_pos+1) != '$')
+      {
+        haystack.erase(found_pos, 2);
+      }
+    }
   }
   catch (...)
   {
   }
+
+
+  
 
   return haystack;
 }

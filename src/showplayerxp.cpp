@@ -17,6 +17,7 @@
 #include "interp.h"
 #include "DC.h"
 #include <queue>
+#include <cassert>
 
 using namespace std;
 void load_char_obj_error(FILE *fpsave, char strsave[MAX_INPUT_LENGTH]);
@@ -35,6 +36,21 @@ extern Leaderboard leaderboard;
 CVoteData *DCVote;
 bool verbose_mode = FALSE;
 
+void test_handle_ansi(void)
+{
+  char_data *ch = new char_data;
+  ch->pcdata = new pc_data;
+  SET_BIT(ch->pcdata->toggles, PLR_ANSI);
+
+  string str1 = "$b$B$1test$R";
+  char *str2 = new char [1024];
+  strncpy(str2, str1.c_str(), 1024);
+  string result1 = handle_ansi(str1, ch);
+  string result2 = string(handle_ansi_(str2, ch));
+  cout << "[" << result1 << "]" << endl;
+  cout << "[" << result2 << "]" << endl;
+  assert(handle_ansi(str1, ch) == string(handle_ansi_(str2, ch)));
+}
 struct obj_data *my_obj_store_to_char(CHAR_DATA *ch, FILE *fpsave, struct obj_data *last_cont)
 {
   struct obj_data *obj;
@@ -475,6 +491,8 @@ void showObject(char_data* ch, obj_data* obj)
 
 int main(int argc, char **argv)
 {
+  test_handle_ansi();
+
   string orig_cwd, dclib;
   if (argc < 2)
     return 1;

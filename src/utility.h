@@ -636,6 +636,7 @@ bool identify(char_data *ch, obj_data *obj);
 extern void end_oproc(CHAR_DATA *ch, Trace trace = Trace("unknown"));
 void undo_race_saves(char_data * ch);
 string handle_ansi(string s, char_data * ch);
+char * handle_ansi_(char * s, char_data * ch);
 void blackjack_prompt(CHAR_DATA *ch, string& prompt, bool ascii);
 void show_string(struct descriptor_data *d, const char *input);
 
