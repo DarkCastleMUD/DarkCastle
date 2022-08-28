@@ -36,20 +36,25 @@ extern Leaderboard leaderboard;
 CVoteData *DCVote;
 bool verbose_mode = FALSE;
 
-void test_handle_ansi(void)
+void test_handle_ansi(string test)
 {
+  cout << "Testing '" << test << "'" << endl;
   char_data *ch = new char_data;
   ch->pcdata = new pc_data;
   SET_BIT(ch->pcdata->toggles, PLR_ANSI);
+  GET_LEVEL(ch) = 1;
 
-  string str1 = "$b$B$1test$R";
+  //string str1 = "$b$B$1test$R $ $$ $$$ $$$";
+  string str1 = test;
   char *str2 = new char [1024];
+  memset(str2, 1024, 0);
   strncpy(str2, str1.c_str(), 1024);
   string result1 = handle_ansi(str1, ch);
   string result2 = string(handle_ansi_(str2, ch));
-  cout << "[" << result1 << "]" << endl;
-  cout << "[" << result2 << "]" << endl;
+  cout << "Result1: [" << result1 << "]" << endl;
+  cout << "Result2: [" << result2 << "]" << endl;
   assert(handle_ansi(str1, ch) == string(handle_ansi_(str2, ch)));
+  delete str2;
 }
 struct obj_data *my_obj_store_to_char(CHAR_DATA *ch, FILE *fpsave, struct obj_data *last_cont)
 {
@@ -491,7 +496,15 @@ void showObject(char_data* ch, obj_data* obj)
 
 int main(int argc, char **argv)
 {
-  test_handle_ansi();
+  test_handle_ansi("");
+  test_handle_ansi("$");
+  test_handle_ansi("$$");
+  test_handle_ansi("$$$");
+  test_handle_ansi("$ $$ $$$");
+  test_handle_ansi("$$$$$$$$");
+  test_handle_ansi("$ ");
+  test_handle_ansi("$x");
+  test_handle_ansi("$1$2$5$B$b$rttessd$Rddd");
 
   string orig_cwd, dclib;
   if (argc < 2)
