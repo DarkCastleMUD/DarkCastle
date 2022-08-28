@@ -2526,12 +2526,14 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
         }
 
         ubyte level = GET_LEVEL(ch);
+        char *argument_ptr = nullptr;
 
         if (group_spell)
         {
           send_to_char("You utter a swift prayer to the gods to amplify your powers.\n\r", ch);
           act("$n utters a swift prayer to the gods to amplify $s powers.", ch, 0, 0, TO_ROOM, 0);
-          strcpy(argument, "communegroupspell");
+          argument = strdup("communegroupspell");
+          argument_ptr = argument;
         }
         else if (tar_char && affected_by_spell(tar_char, SPELL_IMMUNITY) && affected_by_spell(tar_char, SPELL_IMMUNITY)->modifier == spl - 1)
         {
@@ -2581,6 +2583,10 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
         }
 
         int retval = ((*spell_info[spl].spell_pointer)(level, ch, argument, SPELL_TYPE_SPELL, tar_char, tar_obj, learned));
+        if (argument_ptr != nullptr)
+        {
+          free(argument_ptr);
+        }
 
         if (oldroom && !IS_SET(retval, eCH_DIED))
         {
