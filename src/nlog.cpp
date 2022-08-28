@@ -13,7 +13,8 @@
 #include "terminal.h"
 #include "player.h" // PLR_ANSI
 #include "utility.h"
-
+#include <iostream>
+using namespace std;
 /*
  * logf, str_hsh, and csendf by Sadus, others by Ysafar.
  */
@@ -212,63 +213,54 @@ char * handle_ansi_(char * s, char_data * ch)
 string handle_ansi(string haystack, char_data *ch)
 {
   map<size_t, bool> ignore;
-  map<string, string> rep;
-  rep["$$"] = "$";
-  rep["$0"] = BLACK;
-  rep["$1"] = BLUE;
-  rep["$2"] = GREEN;
-  rep["$3"] = CYAN;
+  map<char, string> rep;
+  rep['$'] = "$";
+  rep['0'] = BLACK;
+  rep['1'] = BLUE;
+  rep['2'] = GREEN;
+  rep['3'] = CYAN;
+  rep['4'] = RED;
+  rep['5'] = YELLOW;
+  rep['6'] = PURPLE;
+  rep['7'] = GREY;
+  rep['B'] = BOLD;
+  rep['R'] = NTEXT;
+  rep['L'] = FLASH;
+  rep['K'] = BLINK;
+  rep['I'] = INVERSE;
 
-  rep["$4"] = RED;
-  rep["$5"] = YELLOW;
-  rep["$6"] = PURPLE;
-  rep["$7"] = GREY;
-  rep["$B"] = BOLD;
-  rep["$R"] = NTEXT;
-  rep["$L"] = FLASH;
-  rep["$K"] = BLINK;
-  rep["$I"] = INVERSE;
-
+  string result;
   try
   {
-    // Search for valid codes first
-    for (auto &key : rep)
+    bool code=false;
+    for (auto& c : haystack)
     {
-      string needle = key.first;
-      string replacement = key.second;
-
-      size_t pos = 0, found_pos = 0;
-      while ((found_pos = haystack.find(needle, pos)) != string::npos)
+      if (code == true)
       {
         if (ch == nullptr || IS_MOB(ch) || (ch->pcdata != nullptr && IS_SET(ch->pcdata->toggles, PLR_ANSI)) || (ch->desc && ch->desc->color))
         {
-          haystack.replace(found_pos, 2, replacement);
-          pos = found_pos + 1;
-        }
-        else
-        {
-          haystack.erase(found_pos, 2);
+          if (rep.find(c) != rep.end())
+          {
+            result += rep[c];                   
+          }
+          code = false;
+          continue;
         }
       }
-    }
 
-    // Search and remove invalid codes second
-    string needle = "$";
-    size_t pos = 0, found_pos = 0;
-    while ((found_pos = haystack.find(needle, pos)) != string::npos)
-    {
-      if (haystack.at(found_pos+1) != '$')
+      if (c == '$' && code == false)
       {
-        haystack.erase(found_pos, 2);
+        code = true;
+      }
+      else
+      {
+       result += c;
       }
     }
-  }
-  catch (...)
+  } catch(...)
   {
+
   }
 
-
-  
-
-  return haystack;
+  return result;
 }
