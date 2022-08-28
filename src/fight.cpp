@@ -5036,7 +5036,7 @@ void raw_kill(CHAR_DATA * ch, CHAR_DATA * victim)
   else
     make_corpse(victim);
 
-  if (IS_AFFECTED(ch, AFF_GROUP))
+  if (ch != nullptr && IS_AFFECTED(ch, AFF_GROUP))
   {
     char_data *master = ch->master ? ch->master : ch;
     if (IS_PC(master))
@@ -5054,7 +5054,14 @@ void raw_kill(CHAR_DATA * ch, CHAR_DATA * victim)
   {
     if (ch == victim)
     {
-      logf(0, LOG_BUG, "selfpurge on %s to %s", GET_NAME(ch), GET_NAME(victim));
+      if (ch == nullptr)
+      {
+        logf(0, LOG_BUG, "selfpurge on NULL to NULL");
+      }
+      else
+      {
+        logf(0, LOG_BUG, "selfpurge on %s to %s", GET_NAME(ch), GET_NAME(victim));
+      }
       selfpurge = true;
     }
     extract_char(victim, TRUE);
