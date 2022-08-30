@@ -2736,7 +2736,10 @@ int do_medit(struct char_data *ch, char *argument, int cmd) {
 		}
 	} else {
 		mobvnum = ch->pcdata->last_mob_edit;
-		mob_num = real_mobile(mobvnum);
+		if (((mob_num = real_mobile(mobvnum)) < 0)) {
+      ch->send(fmt::format("{} is an invalid mob vnum.\r\n", mobvnum));
+			return eSUCCESS;
+		}
 		// put the buffs where they should be
 		if (*buf4)
 			sprintf(buf2, "%s %s", buf3, buf4);
