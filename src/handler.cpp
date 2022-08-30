@@ -2483,7 +2483,7 @@ struct obj_data *unequip_char(CHAR_DATA *ch, int pos, int flag) {
 	return (obj);
 }
 
-int get_number(string name)
+int get_number(string &name)
 {
 	size_t pos = name.find(".");
 	if (pos == name.npos)
@@ -2495,6 +2495,8 @@ int get_number(string name)
 
 	try
 	{
+		string str_str = name.substr(pos+1);
+		name = str_str;
 		return stoi(number_str);
 	} catch (...)
 	{

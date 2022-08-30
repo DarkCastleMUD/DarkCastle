@@ -124,7 +124,7 @@ skill_results_t find_skills_by_name(string name);
 int generic_find(const char *arg, int bitvector, CHAR_DATA *ch, CHAR_DATA **tar_ch, struct obj_data **tar_obj, bool verbose = false);
 
 int get_number(char **name);
-int get_number(string name);
+int get_number(string & name);
 
 #define FIND_CHAR_ROOM      1
 #define FIND_CHAR_WORLD     2
