@@ -22,6 +22,7 @@
 #include "fileinfo.h"
 #include "connect.h"
 #include "Trace.h"
+#include "connect.h"
 
 using namespace std;
 
@@ -90,7 +91,7 @@ private:
   int init_socket(in_port_t port);
 };
 
-extern descriptor_data *descriptor_list;
+extern struct descriptor_data *descriptor_list;
 extern vector<string> continent_names;
 extern CVoteData *DCVote;
 extern struct room_data ** world_array;
