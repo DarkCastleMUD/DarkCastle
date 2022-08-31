@@ -917,10 +917,10 @@ ReturnValue do_tell(char_data *ch, string argument, int cmd)
   return eSUCCESS;
 }
 
-int do_reply(struct char_data *ch, char *argument, int cmd)
+ReturnValue do_reply(char_data *ch, string argument, int cmd)
 {
-  char buf[200];
-  char_data *vict = NULL;
+  string buf = {};
+  char_data *vict = nullptr;
 
   if (IS_MOB(ch) || ch->pcdata->last_tell.empty())
   {
@@ -936,21 +936,24 @@ int do_reply(struct char_data *ch, char *argument, int cmd)
       return eFAILURE;
     }
 
-  for (; *argument == ' '; argument++)
-    ;
+  argument = ltrim(argument);
 
-  if (!(*argument))
+  if (argument.empty())
   {
     send_to_char("Reply what?\n\r", ch);
     if ((vict = get_char(ch->pcdata->last_tell)) && CAN_SEE(ch, vict))
-      sprintf(buf, "Last tell was from %s.\n\r", ch->pcdata->last_tell.c_str());
+    {
+      ch->send(fmt::format("Last tell was from {}.\r\n", ch->pcdata->last_tell.c_str()));
+    }
     else
-      sprintf(buf, "Last tell was from someone you cannot currently see.\n\r");
-    send_to_char(buf, ch);
+    {
+      ch->send("Last tell was from someone you cannot currently see.\r\n");
+    }
+
     return eSUCCESS;
   }
 
-  sprintf(buf, "%s %s", ch->pcdata->last_tell.c_str(), argument);
+  buf = fmt::format("{} {}", ch->pcdata->last_tell.c_str(), argument);
   do_tell(ch, buf, 9999);
   return eSUCCESS;
 }

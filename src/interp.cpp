@@ -177,7 +177,7 @@ struct command_info cmd_info[] =
         {".", do_grouptell, nullptr, POSITION_DEAD, 0, CMD_GTELL, 0, 1},
         {"ignore", nullptr, do_ignore, POSITION_DEAD, 0, CMD_DEFAULT, 0, 1},
         {"insult", do_insult, nullptr, POSITION_RESTING, 0, CMD_DEFAULT, COM_CHARMIE_OK, 0},
-        {"reply", do_reply, nullptr, POSITION_RESTING, 0, CMD_REPLY, 0, 1},
+        {"reply", nullptr, do_reply, POSITION_RESTING, 0, CMD_REPLY, 0, 1},
         {"report", do_report, nullptr, POSITION_RESTING, 0, CMD_DEFAULT, COM_CHARMIE_OK, 0},
         {"say", do_say, nullptr, POSITION_RESTING, 0, CMD_SAY, COM_CHARMIE_OK, 0},
         {"psay", do_psay, nullptr, POSITION_RESTING, 0, CMD_SAY, COM_CHARMIE_OK, 0},
@@ -1338,11 +1338,45 @@ int is_abbrev(char *arg1, char *arg2) /* arg1 is short, arg2 is long */
   return(1);
 }
 
-tuple<string,string> half_chop(string arguments, const char token)
+string ltrim(string str)
 {
   // remove leading spaces
-  auto first_non_space = arguments.find_first_not_of(' ');
-  arguments.erase(0, first_non_space);
+  try
+  {
+    auto first_non_space = str.find_first_not_of(' ');
+    if (first_non_space != str.npos)
+    {
+      str.erase(0, first_non_space);
+    }
+  }
+  catch(...)
+  {
+  }
+  
+  return str;
+}
+
+string rtrim(string str)
+{
+  // remove leading spaces
+  try
+  {
+    auto first_non_space = str.find_first_not_of(' ');
+    if (first_non_space != str.npos)
+    {
+      str.erase(0, first_non_space);
+    }
+  }
+  catch(...)
+  {
+  }
+  
+  return str;
+}
+
+tuple<string,string> half_chop(string arguments, const char token)
+{
+  arguments = ltrim(arguments);
 
   auto space_after_arg1 = arguments.find_first_of(token);
   auto arg1 = arguments.substr(0, space_after_arg1);
@@ -1350,32 +1384,7 @@ tuple<string,string> half_chop(string arguments, const char token)
   // remove arg1 from arguments
   arguments.erase(0, space_after_arg1);
 
-  // remove leading spaces from arguments before returning it
-  first_non_space = arguments.find_first_not_of(token);
-  arguments.erase(0, first_non_space);
-
-  return tuple<string,string>(arg1, arguments);
-}
-
-
-tuple<string,string> half_chop(string arguments)
-{
-  // remove leading spaces
-  auto first_non_space = arguments.find_first_not_of(' ');
-  arguments.erase(0, first_non_space);
-
-  auto space_after_arg1 = arguments.find_first_of(' ');
-  auto arg1 = arguments.substr(0, space_after_arg1);
-
-  // remove arg1 from arguments
-  arguments.erase(0, space_after_arg1);
-
-  // remove leading spaces from arguments before returning it
-  first_non_space = arguments.find_first_not_of(' ');
-  if (first_non_space != string::npos)
-  {
-    arguments.erase(0, first_non_space);
-  }
+  arguments = ltrim(arguments);
 
   return tuple<string,string>(arg1, arguments);
 }

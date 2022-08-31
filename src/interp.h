@@ -33,14 +33,15 @@ char *one_argumentnolow(char *argument, char *first_arg);
 int fill_word(char *argument);
 void half_chop(const char *string, char *arg1, char *arg2);
 tuple<string, string> last_argument(string arguments);
-tuple<string, string> half_chop(string arguments);
-tuple<string, string> half_chop(string arguments, const char token);
+tuple<string, string> half_chop(string arguments, const char token = ' ');
 void chop_half(char *string, char *arg1, char *arg2);
 void nanny(struct descriptor_data *d, string arg = "");
 int is_abbrev(char *arg1, char *arg2);
 bool is_abbrev(const string &abbrev, const string &word);
 int len_cmp(char *s1, char *s2);
 void add_command_lag(CHAR_DATA *ch, int cmdnum, int lag);
+string ltrim(string str);
+string rtrim(string str);
 
 #define CMD_NORTH 1
 #define CMD_EAST 2
@@ -476,7 +477,7 @@ int do_redit(CHAR_DATA *ch, char *argument, int cmd);
 int do_remove(CHAR_DATA *ch, char *argument, int cmd);
 int do_rename_char(CHAR_DATA *ch, char *argument, int cmd);
 int do_rent(CHAR_DATA *ch, char *argument, int cmd);
-int do_reply(CHAR_DATA *ch, char *argument, int cmd);
+ReturnValue do_reply(char_data *ch, string argument, int cmd);
 int do_repop(CHAR_DATA *ch, char *argument, int cmd);
 int do_report(CHAR_DATA *ch, char *argument, int cmd);
 int do_rescue(CHAR_DATA *ch, char *argument, int cmd);
