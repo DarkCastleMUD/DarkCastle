@@ -18,6 +18,7 @@
 #define INTERP_H_
 
 #include "character.h"
+#include "returnvals.h"
 
 char *remove_trailing_spaces(char *arg);
 int command_interpreter(CHAR_DATA *ch, char *argument, bool procced = 0);
@@ -144,7 +145,7 @@ struct command_info
 {
     char *command_name;      /* Name of ths command             */
     int (*command_pointer)(CHAR_DATA *ch, char *argument, int cmd); /* Function that does it            */
-    int (*command_pointer2)(char_data *ch, string argument, int cmd); /* Function that does it            */
+    ReturnValue (*command_pointer2)(char_data *ch, string argument, int cmd); /* Function that does it            */
     ubyte minimum_position;  /* Position commander must be in    */
     ubyte minimum_level;     /* Minimum level needed             */
     int command_number;      /* Passed to function as argument   */
@@ -327,7 +328,7 @@ int do_holylite(CHAR_DATA *ch, char *argument, int cmd);
 int do_home(CHAR_DATA *ch, char *argument, int cmd);
 int do_idea(CHAR_DATA *ch, char *argument, int cmd);
 int do_identify(CHAR_DATA *ch, char *argument, int cmd);
-int do_ignore(CHAR_DATA *ch, char *argument, int cmd);
+ReturnValue do_ignore(char_data *ch, string argument, int cmd);
 int do_imotd(CHAR_DATA *ch, char *argument, int cmd);
 int do_imbue(CHAR_DATA *ch, char *argument, int cmd);
 int do_incognito(CHAR_DATA *ch, char *argument, int cmd);
@@ -539,8 +540,8 @@ int do_tactics(CHAR_DATA *ch, char *argument, int cmd);
 int do_tame(CHAR_DATA *ch, char *argument, int cmd);
 int do_taste(CHAR_DATA *ch, char *argument, int cmd);
 int do_teleport(CHAR_DATA *ch, char *argument, int cmd);
-int do_tell(CHAR_DATA *ch, string argument, int cmd);
-int do_tellhistory(CHAR_DATA *ch, string argument, int cmd);
+ReturnValue do_tell(char_data *ch, string argument, int cmd);
+ReturnValue do_tellhistory(char_data *ch, string argument, int cmd);
 int do_testhand(CHAR_DATA *ch, char *argument, int cmd);
 int do_testhit(CHAR_DATA *ch, char *argument, int cmd);
 int do_testport(CHAR_DATA *ch, char *argument, int cmd);

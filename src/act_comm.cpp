@@ -33,13 +33,12 @@ extern "C"
 #include "returnvals.h"
 #include "fileinfo.h"
 #include "const.h"
+#include <fmt/format.h>
 
 extern bool MOBtrigger;
 
 /* extern functions */
 int is_busy(struct char_data *ch);
-int is_ignoring(struct char_data *ch, struct char_data *i);
-
 
 int do_report(struct char_data *ch, char *argument, int cmd)
 {
@@ -367,83 +366,104 @@ int do_channel(struct char_data *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-int do_ignore(struct char_data *ch, char *arg, int cmd)
+ReturnValue do_ignore(char_data *ch, string args, int cmd)
 {
-  char buf[300], buf2[300], buf3[300], new_list[300];
-  char tmp_buf[300];
-  /*int x;*/
-
-  new_list[0] = '\0';
-
-  if(IS_MOB(ch)) {
-    send_to_char("You're a mob!  You can't ignore people.\r\n", ch);
+  if (ch == nullptr)
+  {
     return eFAILURE;
   }
 
-  if(!*arg) {
-    if(!ch->pcdata->ignoring) { 
-      send_to_char("Ignore who?\n\r", ch);
-      return eSUCCESS;
-    }
-    sprintf(tmp_buf,"Ignoring: %s\n\r", ch->pcdata->ignoring);
-    send_to_char(tmp_buf, ch);
-    return eSUCCESS;  
+  if (IS_MOB(ch))
+  {
+    ch->send("You're a mob! You can't ignore people.\r\n");
+    return eFAILURE;
   }
 
-  one_argument(arg, buf);
-
-  if(!(ch->pcdata->ignoring)) {
-    buf[0] = UPPER(buf[0]);
-    /* str_dup will ALWAYS succeed or the mud will abort() */
-    ch->pcdata->ignoring = str_dup(buf);
-    csendf(ch, "You now ignore anyone named %s.\n\r", buf);
-  }
-  else if(!isname(buf, ch->pcdata->ignoring)) {
-   // THIS will fix the problem -- don't know who did this
-    if(strlen(ch->pcdata->ignoring) + strlen(buf) > 100) {
-      send_to_char("If you want to ignore that many people, "
-                   "why are you mudding?\n\r", ch);
+  if (args.empty())
+  {
+    if (ch->pcdata->ignoring.empty())
+    {
+      ch->send("Ignore who?\r\n");
       return eSUCCESS;
     }
-    strcpy(buf2, ch->pcdata->ignoring);
-    strcat(buf2, " ");
-    buf[0] = UPPER(buf[0]);
-    strcat(buf2, buf);
-    dc_free(ch->pcdata->ignoring);
-    ch->pcdata->ignoring = str_dup(buf2);
-    csendf(ch, "You now ignore anyone named %s.\n\r", buf);
-  }
-  else {
-    strcpy(buf3, ch->pcdata->ignoring);
-    for(;;) {
-      half_chop(buf3, buf2, buf3);
-      if(!isname(buf, buf2))
-        strcat(new_list, buf2);
-      if(!*buf3)
-        break;
-      strcat(new_list, " ");
+
+    // convert ignoring map into "char1 char2 char3" format
+    string ignoreString = {};
+    for (auto& ignore : ch->pcdata->ignoring)
+    {
+      if (ignore.second.ignore)
+      {
+        if (ignoreString.empty())
+        {
+          ignoreString = ignore.first;
+        }
+        else
+        {
+          ignoreString = ignoreString + " " + ignore.first;
+        }
+      }      
     }
-    dc_free(ch->pcdata->ignoring);
-    ch->pcdata->ignoring = str_dup(new_list);
-    csendf(ch, "You stop ignoring %s\n\r", buf);
+    ch->send(fmt::format("Ignoring: {}\r\n", ignoreString));
+
+    return eSUCCESS;
+  }
+
+  string arg1 = {}, remainder_args = {};
+  tie(arg1, remainder_args) = half_chop(args);
+  if (arg1.empty())
+  {
+    ch->send("Ignore who?\r\n");
+    return eFAILURE;
+  }
+  arg1[0] = toupper(arg1[0]);
+
+  if (ch->pcdata->ignoring.contains(arg1) == false)
+  {
+    ch->pcdata->ignoring[arg1] = {true, 0};
+    ch->send(fmt::format("You now ignore anyone named {}.\r\n", arg1));
+  }
+  else
+  {
+    ch->pcdata->ignoring.erase(arg1);
+    ch->send(fmt::format("You stop ignoring {}.\r\n", arg1));
   }
   return eSUCCESS;
 }
 
-
-int is_ignoring(struct char_data *ch, struct char_data *i)
+int is_ignoring(const char_data *const ch, const char_data *const i)
 {
-  if(IS_MOB(ch) || (GET_LEVEL(i) >= IMMORTAL && IS_PC(i)) || !ch->pcdata->ignoring)
-    return(0);
-  
-   if(isname(GET_NAME(i), ch->pcdata->ignoring))
-     return(1);
-  
-  return(0);
+  if (IS_MOB(ch) || (GET_LEVEL(i) >= IMMORTAL && IS_PC(i)) || ch->pcdata->ignoring.empty())
+  {
+    return false;
+  }
+
+  if (GET_NAME(i) == nullptr)
+  {
+    return false;
+  }
+
+  if (ch->pcdata->ignoring.contains(GET_NAME(i)))
+  {
+    return true;
+  }
+
+  // Since it didn't match the whole name, see if it matches one of
+  // the name keywords used for a mob name
+  string names = GET_NAME(i);
+  string name1 = {}, remainder_names = {};
+  tie(name1, remainder_names) = half_chop(names);
+  while (name1.empty() == false)
+  {
+    if (ch->pcdata->ignoring.contains(name1))
+    {
+      return true;
+    }
+
+    tie(name1, remainder_names) = half_chop(remainder_names);
+  }
+
+  return false;
 }
-
-
-
 
 #define MAX_NOTE_LENGTH 1000      /* arbitrary */
 

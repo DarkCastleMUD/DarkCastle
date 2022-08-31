@@ -5402,8 +5402,8 @@ void free_char(CHAR_DATA *ch, Trace trace)
 			ch->pcdata->skillchange = 0;
 			if (ch->pcdata->last_site)
 				dc_free(ch->pcdata->last_site);
-			if (ch->pcdata->ignoring)
-				dc_free(ch->pcdata->ignoring);
+			if (!ch->pcdata->ignoring.empty())
+				ch->pcdata->ignoring.clear();
 			if (ch->pcdata->poofin)
 				dc_free(ch->pcdata->poofin);
 			if (ch->pcdata->poofout)

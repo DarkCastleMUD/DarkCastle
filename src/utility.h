@@ -36,6 +36,7 @@ extern "C" {
 #include "memory.h"
 #include "player.h"
 #include "obj.h"
+#include "character.h"
 
 #include "Trace.h"
 
@@ -497,7 +498,7 @@ bool file_exists(const char *);
 void util_archive(const char *, CHAR_DATA *);
 void util_unarchive(char *, CHAR_DATA *);
 int is_busy(CHAR_DATA *ch);
-int is_ignoring(struct char_data *ch, struct char_data *i);
+int is_ignoring(const char_data * const ch, const char_data * const i);
 void colorCharSend(char* s, struct char_data* ch);
 void send_to_char_regardless(string messg, struct char_data *ch);
 int csendf(struct char_data *ch, const char *arg, ...);

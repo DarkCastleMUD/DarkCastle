@@ -663,7 +663,7 @@ int do_dream(struct char_data *ch, char *argument, int cmd)
     return eSUCCESS;
 }
 
-int do_tellhistory(char_data *ch, string argument, int cmd)
+ReturnValue do_tellhistory(char_data *ch, string argument, int cmd)
 {
   if (ch == nullptr)
   {
@@ -681,18 +681,6 @@ int do_tellhistory(char_data *ch, string argument, int cmd)
   if (arg1 == "timestamp")
   {
     auto result = ch->pcdata->options->find("tell.history.timestamp");
-    /*
-    if (result == ch->pcdata->options->end())
-    {
-      (*ch->pcdata->options)["tell.history.timestamp"] = "1";
-      result = ch->pcdata->options->find("tell.history.timestamp");
-      if (result == ch->pcdata->options->end())
-      {
-        ch->send("Error setting config tell.history.timestamp=1\r\n");
-        return eFAILURE;
-      }
-    }
-*/
 
     string tell_history_timestamp;
     if (result != ch->pcdata->options->end())
@@ -717,7 +705,7 @@ int do_tellhistory(char_data *ch, string argument, int cmd)
   return eSUCCESS;
 }
 
-int do_tell(struct char_data *ch, string argument, int cmd)
+ReturnValue do_tell(char_data *ch, string argument, int cmd)
 {
   char_data *vict = nullptr;
   string name = {}, message = {}, buf = {}, log_buf = {};

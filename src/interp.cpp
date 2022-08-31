@@ -175,7 +175,7 @@ struct command_info cmd_info[] =
         {"trivia", do_trivia, nullptr, POSITION_DEAD, 0, CMD_DEFAULT, 0, 1},
         {"gtell", do_grouptell, nullptr, POSITION_DEAD, 0, CMD_GTELL, 0, 1},
         {".", do_grouptell, nullptr, POSITION_DEAD, 0, CMD_GTELL, 0, 1},
-        {"ignore", do_ignore, nullptr, POSITION_DEAD, 0, CMD_DEFAULT, 0, 1},
+        {"ignore", nullptr, do_ignore, POSITION_DEAD, 0, CMD_DEFAULT, 0, 1},
         {"insult", do_insult, nullptr, POSITION_RESTING, 0, CMD_DEFAULT, COM_CHARMIE_OK, 0},
         {"reply", do_reply, nullptr, POSITION_RESTING, 0, CMD_REPLY, 0, 1},
         {"report", do_report, nullptr, POSITION_RESTING, 0, CMD_DEFAULT, COM_CHARMIE_OK, 0},

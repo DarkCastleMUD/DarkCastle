@@ -166,22 +166,29 @@ void fwrite_var_string(const char * string, FILE * fpsave)
    }
 }
 
-char * fread_var_string(FILE * fpsave)
+char *fread_var_string(FILE *fpsave)
 {
-   uint16 tmp_size;
-   char * tmp_str = NULL;
+  uint16 tmp_size = 0;
+  char *tmp_str = nullptr;
 
-   fread(&tmp_size, sizeof (tmp_size), 1, fpsave);
-   if(tmp_size > 0) {
-#ifdef LEAK_CHECK
-     tmp_str = (char *) calloc(tmp_size, sizeof(char));
-#else
-     tmp_str = (char *) dc_alloc(tmp_size, sizeof(char));
-#endif
-     fread(tmp_str, sizeof(char), tmp_size, fpsave);
-     return tmp_str;
-   }
-   else return NULL;
+  size_t records_read = fread(&tmp_size, sizeof(tmp_size), 1, fpsave);
+  if (tmp_size > 0 && records_read > 0)
+  {
+    tmp_str = (char *)dc_alloc(tmp_size, sizeof(char));
+    if (tmp_str == nullptr)
+    {
+      return nullptr;
+    }
+
+    records_read = fread(tmp_str, sizeof(char), tmp_size, fpsave);
+    if (records_read > 0)
+    {
+      return tmp_str;
+    }
+    dc_free(tmp_str);
+  }
+
+  return nullptr;
 }
 
 void save_mob_data(struct mob_data * i, FILE * fpsave)
@@ -334,6 +341,18 @@ void save_pc_data(struct pc_data * i, FILE * fpsave, struct time_data tmpage)
         fwrite("OPT", sizeof(char),3, fpsave);
         fwrite_var_string(opt.first.c_str(),fpsave);
         fwrite_var_string(opt.second.c_str(),fpsave);
+      }
+    }
+    if (i->ignoring.empty() == false)
+    {
+      for (auto& name : i->ignoring)
+      {
+        if (name.second.ignore)
+        {
+          fwrite("IGN", sizeof(char),3, fpsave);
+          fwrite_var_string(name.first.c_str(),fpsave);
+          fwrite(&name.second.ignored_count, sizeof(name.second.ignored_count), 1, fpsave);
+        }
       }
     }
   }
@@ -493,6 +512,22 @@ void read_pc_data(struct char_data *ch, FILE* fpsave)
       (*i->options)[key] = value;
     }    
 
+    fread(&typeflag, sizeof(char), 3, fpsave);
+  }
+  while (!strcmp("IGN", typeflag))
+  {
+    char *var_string = fread_var_string(fpsave);
+    if (var_string != nullptr)
+    {
+      string name = var_string;
+      if (name.empty() == false)
+      {
+        ignore_entry ie = {true, 0};
+        fread(&ie.ignored_count, sizeof(ie.ignored_count), 1, fpsave);
+        i->ignoring[name] = ie;
+      }
+    }
+    
     fread(&typeflag, sizeof(char), 3, fpsave);
   }
 

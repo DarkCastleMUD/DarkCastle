@@ -14,7 +14,6 @@
 #include "timeinfo.h" // time data, etc..
 #include "event.h" // eventBrief
 #include "isr.h"   // SAVE_TYPE_MAX
-#include "utility.h"
 #include "mobile.h"
 #include "sing.h"
 #include "quest.h"
@@ -31,6 +30,34 @@ extern "C" {
 #include <string>
 #include <algorithm>
 #include "DC.h"
+#include <strings.h>
+
+struct strcasecmp_compare
+{
+    bool operator() (const string& l, const string& r) const
+    {
+        return strcasecmp(l.c_str(), r.c_str()) < 0;
+    }
+};
+
+struct ignore_entry
+{   
+    bool ignore;
+    uint64_t ignored_count;
+};
+
+/*
+bool ignore_entry::operator=(ignore_entry& a, ignore_entry& b)
+{
+    return ((a.ignore == b.ignore) && (a.ignored_count == b.ignored_count));
+}
+*/
+
+typedef std::map<std::string, ignore_entry, strcasecmp_compare> ignoring_t;
+#include "utility.h"
+
+class communication;
+typedef std::queue<communication> history_t;
 
 #define ASIZE 32
 #define MAX_GOLEMS           2 // amount of golems above +1
@@ -179,15 +206,12 @@ struct follow_type
     struct follow_type *next;
 };
 
-class communication;
-typedef std::queue<communication> history_t;
-
 // DO NOT change most of these types without checking the save files
 // first, or you will probably end up corrupting all the pfiles
 struct pc_data
 {
     char pwd[PASSWORD_LEN+1] = {};
-    char *ignoring = {};                 /* List of ignored names */
+    ignoring_t ignoring = {};                 /* List of ignored names */
 
     struct char_player_alias * alias = {}; /* Aliases */
 
