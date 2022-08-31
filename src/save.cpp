@@ -343,16 +343,16 @@ void save_pc_data(struct pc_data * i, FILE * fpsave, struct time_data tmpage)
         fwrite_var_string(opt.second.c_str(),fpsave);
       }
     }
-    if (i->ignoring.empty() == false)
+  }
+  if (i->ignoring.empty() == false)
+  {
+    for (auto& name : i->ignoring)
     {
-      for (auto& name : i->ignoring)
+      if (name.second.ignore)
       {
-        if (name.second.ignore)
-        {
-          fwrite("IGN", sizeof(char),3, fpsave);
-          fwrite_var_string(name.first.c_str(),fpsave);
-          fwrite(&name.second.ignored_count, sizeof(name.second.ignored_count), 1, fpsave);
-        }
+        fwrite("IGN", sizeof(char),3, fpsave);
+        fwrite_var_string(name.first.c_str(),fpsave);
+        fwrite(&name.second.ignored_count, sizeof(name.second.ignored_count), 1, fpsave);
       }
     }
   }
