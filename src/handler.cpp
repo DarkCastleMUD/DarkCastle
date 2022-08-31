@@ -1,4 +1,3 @@
-
 /***************************************************************************
  *  file: handler.c , Handler module.                      Part of DIKUMUD *
  *  Usage: Various routines for moving about objects/players               *
@@ -210,43 +209,6 @@ int isname(const char *str, const char *namelist)
 	   curname++;          /* first char of new_new name */
       }
 
-   return 0;
-}
-
-int isname_exact(char *str, char *namelist)
-{
-   char *curname, *curstr;
-
-   if (strlen(str) == 0)
-      return 0;
-
-
-   curname = namelist;    
-   
-   for (;;)
-      {
-	   for (curstr = str;; curstr++, curname++)
-	      {
-	      if (!*curstr && !isalpha(*curname))
-		      return(1);
-
-	      if (!*curname)
-		      return(0);
-
-	      if (!*curstr || *curname == ' ')
-		      break;
-
-	      if (LOWER(*curstr) != LOWER(*curname))
-		      break;
-	      }
-
-	   /* skip to next name */
-
-	   for (; isalpha(*curname); curname++);
-	   if (!*curname)
-		   return(0);
-	   curname++;          /* first char of new_new name */
-      }
    return 0;
 }
 
