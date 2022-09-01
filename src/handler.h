@@ -97,6 +97,7 @@ CHAR_DATA *get_active_pc_vis(CHAR_DATA *ch, const char *name);
 CHAR_DATA *get_active_pc(const char *name);
 CHAR_DATA *get_all_pc(char *name);
 CHAR_DATA *get_char_room_vis(CHAR_DATA *ch, const char *name);
+char_data *get_char_room_vis(char_data *ch, string name);
 CHAR_DATA *get_rand_other_char_room_vis(CHAR_DATA *ch);
 CHAR_DATA *get_char_vis(CHAR_DATA *ch, const char *name);
 CHAR_DATA *get_pc_vis(CHAR_DATA *ch, const char *name);
