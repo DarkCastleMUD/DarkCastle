@@ -3571,6 +3571,11 @@ void lastseen_targeted(char_data *ch, char_data *victim) {
 	return;
 }
 
+char_data *get_char_room_vis(char_data *ch, string name)
+{
+	return get_char_vis(ch, name.c_str());
+}
+
 CHAR_DATA *get_char_room_vis(CHAR_DATA *ch, const char *name) {
 	CHAR_DATA *i;
 	CHAR_DATA *partial_match;
