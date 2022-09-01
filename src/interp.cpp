@@ -179,9 +179,9 @@ struct command_info cmd_info[] =
         {"insult", do_insult, nullptr, POSITION_RESTING, 0, CMD_DEFAULT, COM_CHARMIE_OK, 0},
         {"reply", nullptr, do_reply, POSITION_RESTING, 0, CMD_REPLY, 0, 1},
         {"report", do_report, nullptr, POSITION_RESTING, 0, CMD_DEFAULT, COM_CHARMIE_OK, 0},
-        {"say", do_say, nullptr, POSITION_RESTING, 0, CMD_SAY, COM_CHARMIE_OK, 0},
-        {"psay", do_psay, nullptr, POSITION_RESTING, 0, CMD_SAY, COM_CHARMIE_OK, 0},
-        {"'", do_say, nullptr, POSITION_RESTING, 0, CMD_SAY, COM_CHARMIE_OK, 0},
+        {"say", nullptr, do_say, POSITION_RESTING, 0, CMD_SAY, COM_CHARMIE_OK, 0},
+        {"psay", nullptr, do_psay, POSITION_RESTING, 0, CMD_SAY, COM_CHARMIE_OK, 0},
+        {"'", nullptr, do_say, POSITION_RESTING, 0, CMD_SAY, COM_CHARMIE_OK, 0},
         {"shout", do_shout, nullptr, POSITION_RESTING, 0, CMD_DEFAULT, 0, 1},
         {"whisper", do_whisper, nullptr, POSITION_RESTING, 0, CMD_WHISPER, 0, 0},
 
