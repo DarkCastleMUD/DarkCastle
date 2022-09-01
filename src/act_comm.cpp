@@ -366,7 +366,7 @@ int do_channel(struct char_data *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-ReturnValue do_ignore(char_data *ch, string args, int cmd)
+command_return_t do_ignore(char_data *ch, string args, int cmd)
 {
   if (ch == nullptr)
   {
