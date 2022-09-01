@@ -2486,13 +2486,6 @@ string remove_non_color_codes(string input)
     {
       buffer = remove_all_codes(buffer);
     }
-    else
-    {
-      if (t->connected != conn::EDIT_MPROG && t->connected != conn::EDITING)
-      {
-        buffer = remove_non_color_codes(buffer);
-      }
-    }
 
     // Only search for pipe (|) when not editing
     if (t->connected != conn::WRITE_BOARD && t->connected != conn::EDITING && t->connected != conn::EDIT_MPROG)
