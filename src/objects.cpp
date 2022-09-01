@@ -513,8 +513,6 @@ bool set_utility_mortar(struct char_data *ch, struct obj_data *obj, char *arg)
   struct obj_data * trap_obj = NULL;
   int dir;
 
-  int do_say(struct char_data *ch, char *argument, int cmd);
-
   one_argument(arg, direct);
   if(!arg) {
     send_to_char("Set it off in which direction?\r\n", ch);
@@ -1541,7 +1539,6 @@ void wear(struct char_data *ch, struct obj_data *obj_object, int keyword)
 {
   struct obj_data *obj;
   char buffer[MAX_STRING_LENGTH];
-  int do_say(struct char_data *ch, char *argument, int cmd);
   if (!obj_object) return;
 
   obj = obj_object;
