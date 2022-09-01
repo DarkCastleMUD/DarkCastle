@@ -3875,7 +3875,7 @@ int mprog_can_see_trigger(CHAR_DATA *ch, CHAR_DATA *mob)
 	return mprog_cur_result;
 }
 
-int mprog_speech_trigger(char *txt, CHAR_DATA *mob)
+int mprog_speech_trigger(const char *txt, CHAR_DATA *mob)
 {
 	if (!mob || isDead(mob) || isNowhere(mob))
 	{
@@ -4129,7 +4129,7 @@ int oprog_can_see_trigger(CHAR_DATA *ch, OBJ_DATA *item)
 	return mprog_cur_result;
 }
 
-int oprog_speech_trigger(char *txt, CHAR_DATA *ch)
+int oprog_speech_trigger(const char *txt, CHAR_DATA *ch)
 {
 	if (!ch || isDead(ch) || isNowhere(ch))
 	{
@@ -4434,7 +4434,7 @@ int oprog_armour_trigger(CHAR_DATA *ch, OBJ_DATA *item)
 	return mprog_cur_result;
 }
 
-int oprog_command_trigger(char *txt, CHAR_DATA *ch, char *arg)
+int oprog_command_trigger(const char *txt, CHAR_DATA *ch, char *arg)
 {
 	if (!ch || isDead(ch) || isNowhere(ch))
 	{

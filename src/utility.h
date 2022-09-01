@@ -168,6 +168,7 @@ bool IS_DARK( int room );
 
 #define IS_MINLEVEL_PC(ch, level) (GET_LEVEL(ch) >= level && IS_PC(ch))
 #define IS_MINLEVEL_NPC(ch, level) (GET_LEVEL(ch) >= level && IS_NPC(ch))
+#define IS_IMMORTAL(ch) (IS_MINLEVEL_PC(ch, IMMORTAL))
 
 #define GET_RDEATHS(ch)      ((ch)->pcdata->rdeaths)
 #define GET_PDEATHS(ch)      ((ch)->pcdata->pdeaths)
@@ -538,7 +539,7 @@ int     mprog_hitprcnt_trigger  ( CHAR_DATA* mob, CHAR_DATA* ch );
 int    mprog_death_trigger     ( CHAR_DATA* mob, CHAR_DATA* killer );
 int     mprog_random_trigger    ( CHAR_DATA* mob );
 int     mprog_arandom_trigger   ( CHAR_DATA *mob);
-int     mprog_speech_trigger    ( char* txt, CHAR_DATA* mob );
+int     mprog_speech_trigger    (const char* txt, CHAR_DATA* mob );
 int 	mprog_catch_trigger	(char_data * mob, int catch_num, char 
 *var, int opt, char_data *actor,obj_data *obj, void *vo, char_data *rndm);
 int 	mprog_attack_trigger	(char_data * mob, CHAR_DATA* ch);
@@ -548,8 +549,8 @@ int mprog_damage_trigger( CHAR_DATA *mob, CHAR_DATA *ch, int amount );
 
 int oprog_catch_trigger(obj_data *obj, int catch_num, char *var, int opt, char_data *actor, obj_data *obj2, void *vo, char_data *rndm);
 int oprog_act_trigger( const char *txt, CHAR_DATA *ch );
-int oprog_speech_trigger( char *txt, CHAR_DATA *ch );
-int oprog_command_trigger( char *txt, CHAR_DATA *ch, char *arg );
+int oprog_speech_trigger(const  char *txt, CHAR_DATA *ch );
+int oprog_command_trigger(const char *txt, CHAR_DATA *ch, char *arg );
 int oprog_weapon_trigger( CHAR_DATA *ch, OBJ_DATA *item );
 int oprog_armour_trigger( CHAR_DATA *ch, OBJ_DATA *item );
 int oprog_rand_trigger( OBJ_DATA *item);
