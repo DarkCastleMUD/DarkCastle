@@ -18,7 +18,7 @@ extern "C"
 // DarkCastle header files
 #include "db.h"
 #include "room.h"
-#include "character.h" // CHAR_DATA
+#include "character.h" // char_data
 #include "obj.h"       // OBJ_DATA
 #include "levels.h"    // MIN_GOD
 #include "utility.h"   // GET_SHORT, GET_LEVEL, &c
@@ -143,11 +143,11 @@ void TokenList::Next()
 |   Zero is returned (0) if the string should not be sent -- either
 |   the send_to is asleep or the INVIS_NULL flag was used (for example).
 */
-char *TokenList::Interpret(CHAR_DATA *from, OBJ_DATA *obj, void *vict_obj, CHAR_DATA *send_to, int flags)
+string TokenList::Interpret(char_data *from, OBJ_DATA *obj, void *vict_obj, char_data *send_to, int flags)
 {
 
   // Reset the string
-  interp[0] = 0;
+  interp.clear();
 
   //--
   // Can't write to a mob!
@@ -164,18 +164,18 @@ char *TokenList::Interpret(CHAR_DATA *from, OBJ_DATA *obj, void *vict_obj, CHAR_
   // If they're not playing and force flag isn't set, don't send
   if (send_to == nullptr)
   {
-    return (0);
+    return "";
   }
   if (send_to->desc && send_to->desc->connected != conn::PLAYING && !(flags & FORCE))
-    return (0);
+    return "";
   if (IS_SET(world[send_to->in_room].room_flags, QUIET) && !(flags & FORCE))
-    return (0);
-  if ((send_to == (CHAR_DATA *)vict_obj) && (flags & NOTVICT))
-    return (0);
+    return "";
+  if ((send_to == (char_data *)vict_obj) && (flags & NOTVICT))
+    return "";
   if ((GET_LEVEL(send_to) < MIN_GOD) && (flags & GODS))
-    return (0);
+    return "";
   if ((GET_POS(send_to) <= POSITION_SLEEPING) && !(flags & ASLEEP))
-    return (0);
+    return "";
 
   // Ok, now bother
   for (Reset(); current != 0; Next())
@@ -197,7 +197,7 @@ char *TokenList::Interpret(CHAR_DATA *from, OBJ_DATA *obj, void *vict_obj, CHAR_
 #ifdef DEBUG_TOKEN
       cerr << "It's a text token" << endl;
 #endif
-      strcat(interp, current->GetBuf());
+      interp += current->GetBuf();
     }
     else if (current->IsAnsi() || current->IsVt100())
     {
@@ -211,46 +211,46 @@ char *TokenList::Interpret(CHAR_DATA *from, OBJ_DATA *obj, void *vict_obj, CHAR_
         switch (current->GetBuf()[1])
         {
         case '1':
-          strcat(interp, BLUE);
+          interp += BLUE;
           break;
         case '2':
-          strcat(interp, GREEN);
+          interp += GREEN;
           break;
         case '3':
-          strcat(interp, CYAN);
+          interp += CYAN;
           break;
         case '4':
-          strcat(interp, RED);
+          interp += RED;
           break;
         case '5':
-          strcat(interp, YELLOW);
+          interp += YELLOW;
           break;
         case '6':
-          strcat(interp, PURPLE);
+          interp += PURPLE;
           break;
         case '7':
-          strcat(interp, GREY);
+          interp += GREY;
           break;
         case '0':
-          strcat(interp, BLACK);
+          interp += BLACK;
           break;
         case 'B':
-          strcat(interp, BOLD);
+          interp += BOLD;
           break;
         case 'L':
-          strcat(interp, FLASH);
+          interp += FLASH;
           break;
         case 'I':
-          strcat(interp, INVERSE);
+          interp += INVERSE;
           break;
         case 'R':
-          strcat(interp, NTEXT);
+          interp += NTEXT;
           break;
         case '*':
-          strcat(interp, EEEE);
+          interp += EEEE;
           break;
         case '$':
-          strcat(interp, "$");
+          interp += "$";
           break;
         default:
           break;
@@ -265,117 +265,180 @@ char *TokenList::Interpret(CHAR_DATA *from, OBJ_DATA *obj, void *vict_obj, CHAR_
       switch ((current->GetBuf())[1])
       {
       case 'n':
-        if (!CAN_SEE(send_to, from, TRUE))
+        if (send_to == nullptr || from == nullptr || GET_SHORT(from) == nullptr)
+        {
+          break;
+        }
+
+        if (!CAN_SEE(send_to, from, true))
         {
           if (flags & INVIS_NULL)
-            return (0);
+            return {};
           else if (flags & INVIS_VISIBLE)
-            strcat(interp, GET_SHORT(from));
+            interp += GET_SHORT(from);
           else
-            strcat(interp, "someone");
+            interp += "someone";
         }
         else
         {
           if (GET_SHORT(from))
           {
-            strcat(interp, GET_SHORT(from));
+            interp += GET_SHORT(from);
           }
         }
         break;
       case 'N':
-        if (!CAN_SEE(send_to, (CHAR_DATA *)vict_obj, TRUE))
+        if (vict_obj == nullptr || GET_SHORT((char_data *)vict_obj) == nullptr)
+        {
+          break;
+        }
+        if (!CAN_SEE(send_to, (char_data *)vict_obj, true))
         {
           if (flags & INVIS_NULL)
-            return (0);
+            return {};
           else if (flags & INVIS_VISIBLE)
-            strcat(interp, GET_SHORT((CHAR_DATA *)vict_obj));
+            interp += GET_SHORT((char_data *)vict_obj);
           else
-            strcat(interp, "someone");
+            interp += "someone";
         }
         else
         {
-          strcat(interp, GET_SHORT((CHAR_DATA *)vict_obj));
+          if (vict_obj == nullptr || GET_SHORT((char_data *)vict_obj) == nullptr)
+          {
+            break;
+          }
+          interp += GET_SHORT((char_data *)vict_obj);
         }
         break;
       case 'm':
-        strcat(interp, HMHR(from));
+        if (from == nullptr)
+        {
+          break;
+        }
+        interp += HMHR(from);
         break;
       case 'M':
-        strcat(interp, HMHR((CHAR_DATA *)vict_obj));
+        if (vict_obj == nullptr)
+        {
+          break;
+        }
+        interp += HMHR((char_data *)vict_obj);
         break;
       case 's':
-        strcat(interp, HSHR(from));
+        if (from == nullptr)
+        {
+          break;
+        }
+        interp += HSHR(from);
         break;
       case 'S':
-        strcat(interp, HSHR((CHAR_DATA *)vict_obj));
+        if (vict_obj == nullptr)
+        {
+          break;
+        }
+        interp += HSHR((char_data *)vict_obj);
         break;
       case 'e':
-        strcat(interp, HSSH(from));
+        if (from == nullptr)
+        {
+          break;
+        }
+        interp += HSSH(from);
         break;
       case 'E':
-        strcat(interp, HSSH((CHAR_DATA *)vict_obj));
+        if (vict_obj == nullptr)
+        {
+          break;
+        }
+        interp += HSSH((char_data *)vict_obj);
         break;
       case 'o':
+        if (send_to == nullptr || obj == nullptr || obj->name == nullptr)
+        {
+          break;
+        }
+
         if (!CAN_SEE_OBJ(send_to, obj))
         {
           if (flags & INVIS_NULL)
-            return (0);
+            return {};
           else if (flags & INVIS_VISIBLE)
-            strcat(interp, fname(obj->name));
+          {
+            interp += fname(obj->name);
+          }
           else
-            strcat(interp, "something");
+            interp += "something";
         }
         else
         {
-          strcat(interp, fname(obj->name));
+          interp += fname(obj->name);
         }
         break;
       case 'O':
-        if (!CAN_SEE_OBJ(send_to, (OBJ_DATA *)vict_obj))
+        if (send_to == nullptr || vict_obj == nullptr || ((obj_data *)vict_obj)->name == nullptr)
+        {
+          break;
+        }
+        if (!CAN_SEE_OBJ(send_to, (obj_data *)vict_obj))
         {
           if (flags & INVIS_NULL)
-            return (0);
+            return {};
           else if (flags & INVIS_VISIBLE)
-            strcat(interp, fname(((OBJ_DATA *)vict_obj)->name));
+            interp += fname(((obj_data *)vict_obj)->name);
           else
-            strcat(interp, "something");
+            interp += "something";
         }
         else
         {
-          strcat(interp, fname(((OBJ_DATA *)vict_obj)->name));
+          interp += fname(((obj_data *)vict_obj)->name);
         }
         break;
       case 'p':
+        if (send_to == nullptr || obj == nullptr || obj->short_description == nullptr)
+        {
+          break;
+        }
+
         if (!CAN_SEE_OBJ(send_to, obj))
         {
           if (flags & INVIS_NULL)
-            return (0);
+            return {};
           else if (flags & INVIS_VISIBLE)
-            strcat(interp, obj->short_description);
+            interp += obj->short_description;
           else
-            strcat(interp, "something");
+            interp += "something";
         }
         else
         {
-          strcat(interp, obj->short_description);
+          interp += obj->short_description;
         }
         break;
       case 'P':
+        if (send_to == nullptr || vict_obj == nullptr || ((obj_data *)vict_obj)->short_description == nullptr)
+        {
+          break;
+        }
+
         if (!CAN_SEE_OBJ(send_to, (OBJ_DATA *)vict_obj))
         {
           if (flags & INVIS_NULL)
-            return (0);
+            return {};
           else if (flags & INVIS_VISIBLE)
-            strcat(interp, ((OBJ_DATA *)vict_obj)->short_description);
+            interp += ((OBJ_DATA *)vict_obj)->short_description;
           else
-            strcat(interp, "something");
+            interp += "something";
         }
         else
         {
-          strcat(interp, ((OBJ_DATA *)vict_obj)->short_description);
+          interp += ((OBJ_DATA *)vict_obj)->short_description;
         }
         break;
       case 'a':
+        if (obj == nullptr || obj->name == nullptr)
+        {
+          break;
+        }
+
         switch (*(obj)->name)
         {
         case 'a':
@@ -390,42 +453,53 @@ char *TokenList::Interpret(CHAR_DATA *from, OBJ_DATA *obj, void *vict_obj, CHAR_
         case 'U':
         case 'y':
         case 'Y':
-          strcat(interp, "an");
+          interp += "an";
           break;
         default:
-          strcat(interp, "a");
+          interp += "a";
           break;
         }
         break;
       case 'A':
-        switch (*((OBJ_DATA *)vict_obj)->name)
+        if (vict_obj != nullptr && ((obj_data *)vict_obj)->name != nullptr)
         {
-        case 'a':
-        case 'A':
-        case 'e':
-        case 'E':
-        case 'i':
-        case 'I':
-        case 'o':
-        case 'O':
-        case 'u':
-        case 'U':
-        case 'y':
-        case 'Y':
-          strcat(interp, "an");
-          /* no break */
-        default:
-          strcat(interp, "a");
+          switch (*((obj_data *)vict_obj)->name)
+          {
+          case 'a':
+          case 'A':
+          case 'e':
+          case 'E':
+          case 'i':
+          case 'I':
+          case 'o':
+          case 'O':
+          case 'u':
+          case 'U':
+          case 'y':
+          case 'Y':
+            interp += "an";
+            /* no break */
+          default:
+            interp += "a";
+          }
         }
         break;
       case 'T':
-        strcat(interp, (char *)vict_obj);
+        if (vict_obj != nullptr)
+        {
+          interp += (char *)vict_obj;
+        }
         break;
+
       case 'F':
-        strcat(interp, fname((char *)vict_obj));
+        if (vict_obj != nullptr)
+        {
+          interp += fname((char *)vict_obj);
+        }
         break;
+
       default: // Illegal code - just output it
-        strcat(interp, current->GetBuf());
+        interp += current->GetBuf();
         break;
       }  /* switch */
     }    /* if it's a code */
@@ -438,14 +512,14 @@ char *TokenList::Interpret(CHAR_DATA *from, OBJ_DATA *obj, void *vict_obj, CHAR_
 #endif
   } /* for loop */
 
-  strcat(interp, "\r\n");
+  interp += "\r\n";
 
 #ifdef DEBUG_TOKEN
   cerr << "Finished building interp; it is:" << endl;
   cerr << interp << endl;
 #endif
 
-  return (interp);
+  return interp;
 }
 
 /************************************************************************
