@@ -599,9 +599,9 @@ void new_string_add(struct descriptor_data *d, char *str) {
 			return;
 		}
 	}
-	if (str[a - 1] == '\r')
+	if (a >= 1 && str[a - 1] == '\r')
 		str[a - 1] = '\0';
-	if (str[a - 2] == '\r') {
+	if (a >= 2 && str[a - 2] == '\r') {
 		str[a - 1] = '\0';
 		str[a - 2] = '\n';
 	}
