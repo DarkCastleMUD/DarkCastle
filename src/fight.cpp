@@ -535,7 +535,6 @@ bool gets_dual_wield_attack(char_data * ch)
 // standard retvals
 int attack(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
 {
-  int do_say(struct char_data *ch, char *argument, int cmd);
   int result = 0;  
   int chance;
   obj_data * wielded = 0;
@@ -583,8 +582,8 @@ int attack(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
     remove_memory(vict, 't');
      stop_fighting(vict);
 	}
-    do_say(ch, "I'm sorry my fellow mob, I have seen the error of my ways.", 0);
-    do_say(vict, "It is okay my friend, let's go have a beer.", 0);
+    do_say(ch, string("I'm sorry my fellow mob, I have seen the error of my ways."), 0);
+    do_say(vict, string("It is okay my friend, let's go have a beer."), 0);
     return eFAILURE;
   }
   
@@ -1351,8 +1350,6 @@ int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
   int weapon_skill_dam_bonus = 0;  
  
   extern ubyte backstab_mult[];
-  
-  int do_say(struct char_data *ch, char *argument, int cmd);
   
   if(!vict || !ch) { 
     log("Null victim or char in one_hit!  This Crashes us!", -1, LOG_BUG);
