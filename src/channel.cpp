@@ -98,74 +98,85 @@ extern CWorld world;
 extern struct descriptor_data *descriptor_list;
 extern struct index_data *obj_index;
 
-int do_say(struct char_data *ch, char *argument, int cmd)
+command_return_t do_say(char_data *ch, string argument, int cmd)
 {
-   int i;
-   char buf[MAX_STRING_LENGTH];
-   int retval;
-   extern bool MOBtrigger;
+  int i;
+  string buf;
+  int retval;
+  extern bool MOBtrigger;
 
-   if (!IS_MOB(ch) && IS_SET(ch->pcdata->punish, PUNISH_STUPID)) {
-      send_to_char ("You try to speak but just look like an idiot!\r\n", ch);
-      return eSUCCESS;
-      }
+  if (!IS_MOB(ch) && IS_SET(ch->pcdata->punish, PUNISH_STUPID))
+  {
+    send_to_char("You try to speak but just look like an idiot!\r\n", ch);
+    return eSUCCESS;
+  }
 
-   if (IS_SET(world[ch->in_room].room_flags, QUIET)) {
-      send_to_char ("SHHHHHH!! Can't you see people are trying to read?\r\n",
-                    ch);
-      return eSUCCESS;
-      }
+  if (IS_SET(world[ch->in_room].room_flags, QUIET))
+  {
+    send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n",
+                 ch);
+    return eSUCCESS;
+  }
 
-   OBJ_DATA *tmp_obj;
-   for(tmp_obj = world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
-     if(obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER) {
-       send_to_char("The magical silence prevents you from speaking!\n\r", ch);
-       return eFAILURE;
-     }
+  OBJ_DATA *tmp_obj;
+  for (tmp_obj = world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
+    if (obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER)
+    {
+      send_to_char("The magical silence prevents you from speaking!\n\r", ch);
+      return eFAILURE;
+    }
 
-   for(i = 0; *(argument + i) == ' '; i++)
-      ;
+  argument = ltrim(argument);
 
-   if (!*(argument + i))
-      send_to_char("Yes, but WHAT do you want to say?\n\r", ch);
-   else {
-      if(!IS_NPC(ch))
-        MOBtrigger = FALSE;
-      sprintf(buf,"$B$n says '%s'$R", argument + i);
-      act(buf, ch, 0, 0, TO_ROOM, 0);
-      if(!IS_NPC(ch))
-        MOBtrigger = FALSE;
-      sprintf(buf,"$BYou say '%s'$R", argument + i);
-      act(buf, ch, 0, 0, TO_CHAR, 0);
+  if (argument.empty())
+    send_to_char("Yes, but WHAT do you want to say?\n\r", ch);
+  else
+  {
+    if (!IS_NPC(ch))
+      MOBtrigger = false;
 
-      if(!IS_NPC(ch)) {
-        MOBtrigger = TRUE;
-        retval = mprog_speech_trigger( argument, ch );
-        if(SOMEONE_DIED(retval))
-          return SWAP_CH_VICT(retval);
-      }
-       if(!IS_NPC(ch)) {
-        MOBtrigger = TRUE;
-        retval = oprog_speech_trigger( argument, ch );
-        if(SOMEONE_DIED(retval))
-          return SWAP_CH_VICT(retval);
-      }
+    if (IS_IMMORTAL(ch))
+    {
+      argument = remove_all_codes(argument);
+    }
 
-   }
-   return eSUCCESS;
+    buf = fmt::format("$B$7$n says '{}$B$7'$R", argument.c_str());
+    act(buf, ch, 0, 0, TO_ROOM, 0);
+
+    if (!IS_NPC(ch))
+      MOBtrigger = false;
+
+    buf = fmt::format("$B$7You say '{}$B$7'$R", argument.c_str());
+    act(buf, ch, 0, 0, TO_CHAR, 0);
+
+    if (!IS_NPC(ch))
+    {
+      MOBtrigger = true;
+      retval = mprog_speech_trigger(argument.c_str(), ch);
+      if (SOMEONE_DIED(retval))
+        return SWAP_CH_VICT(retval);
+    }
+
+    if (!IS_NPC(ch))
+    {
+      MOBtrigger = true;
+      retval = oprog_speech_trigger(argument.c_str(), ch);
+      if (SOMEONE_DIED(retval))
+        return SWAP_CH_VICT(retval);
+    }
+  }
+  return eSUCCESS;
 }
 
 // Psay works like 'say', just it's directed at a person
 // TODO - after this gets used alot, maybe switch speech triggers to it
-int do_psay(struct char_data *ch, char *argument, int cmd)
+command_return_t do_psay(struct char_data *ch, string argument, int cmd)
 {
-   char vict[MAX_INPUT_LENGTH];
-   char message[MAX_INPUT_LENGTH];
-   char buf[MAX_STRING_LENGTH];
-   char_data * victim;
+   string vict = {}, message = {}, buf = {};
+   char_data* victim = nullptr;
    extern bool MOBtrigger;
 
-   if (!IS_MOB(ch) && IS_SET(ch->pcdata->punish, PUNISH_STUPID)) {
+   if (IS_PC(ch) && IS_SET(ch->pcdata->punish, PUNISH_STUPID)) {
       send_to_char ("You try to speak but just look like an idiot!\r\n", ch);
       return eSUCCESS;
    }
@@ -175,16 +186,16 @@ int do_psay(struct char_data *ch, char *argument, int cmd)
       return eSUCCESS;
    }
 
-   OBJ_DATA *tmp_obj;
+   OBJ_DATA *tmp_obj = nullptr;
    for(tmp_obj = world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
-     if(obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER) {
+    if(tmp_obj && tmp_obj->item_number >= 0 && obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER) {
        send_to_char("The magical silence prevents you from speaking!\n\r", ch);
        return eFAILURE;
      }
 
-   half_chop(argument, vict, message);
+  tie(vict, message) = half_chop(argument);
 
-   if(!*vict || !*message) {
+   if(vict.empty() || message.empty()) {
       send_to_char("Say what to whom?  psay <target> <message>\r\n", ch);
       return eSUCCESS;
    }
@@ -194,24 +205,30 @@ int do_psay(struct char_data *ch, char *argument, int cmd)
       return eSUCCESS;
    }
 
+    string messageStr = message;
+    if (IS_IMMORTAL(ch))
+    {
+      messageStr = remove_all_codes(messageStr);
+    }
+
    if(!IS_NPC(ch))
-     MOBtrigger = FALSE;
-   sprintf(buf,"$B$n says (to $N) '%s'$R", message);
+     MOBtrigger = false;
+   buf = fmt::format("$B$n says (to $N) '{}'$R", messageStr.c_str());
    act(buf, ch, 0, victim, TO_ROOM, NOTVICT);
 
    if(!IS_NPC(ch))
-     MOBtrigger = FALSE;
-   sprintf(buf,"$B$n says (to $3you$7) '%s'$R", message);
+     MOBtrigger = false;
+   buf = fmt::format("$B$n says (to $3you$7) '{}'$R", messageStr.c_str());
    act(buf, ch, 0, victim, TO_VICT, 0);
 
    if(!IS_NPC(ch))
-     MOBtrigger = FALSE;
-   sprintf(buf,"$BYou say (to $N) '%s'$R", message);
+     MOBtrigger = false;
+   buf = fmt::format("$BYou say (to $N) '{}'$R", messageStr.c_str());
    act(buf, ch, 0, victim, TO_CHAR, 0);
-   MOBtrigger = TRUE;
+   MOBtrigger = true;
 //   if(!IS_NPC(ch)) {
 //     retval = mprog_speech_trigger( message, ch );
-//     MOBtrigger = TRUE;
+//     MOBtrigger = true;
 //     if(SOMEONE_DIED(retval))
 //       return SWAP_CH_VICT(retval);
 //   }
@@ -274,7 +291,7 @@ int do_gossip(struct char_data *ch, char *argument, int cmd)
     char buf2[MAX_STRING_LENGTH];
     struct descriptor_data *i;
     OBJ_DATA *tmp_obj;
-    bool silence = FALSE;
+    bool silence = false;
 
     if (IS_SET(world[ch->in_room].room_flags, QUIET)) {
       send_to_char ("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
@@ -348,7 +365,7 @@ int do_gossip(struct char_data *ch, char *argument, int cmd)
 	 if(i->character != ch && !i->connected && (IS_SET(i->character->misc, CHANNEL_GOSSIP)) && !is_ignoring(i->character, ch)) {
 	   for(tmp_obj = world[i->character->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content) {
 	     if(obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER) {
-	       silence = TRUE;
+	       silence = true;
 	       break;
 	     }
 	   }
@@ -368,7 +385,7 @@ int do_auction(struct char_data *ch, char *argument, int cmd)
     char buf2[MAX_STRING_LENGTH];
     struct descriptor_data *i;
     OBJ_DATA *tmp_obj;
-    bool silence = FALSE;
+    bool silence = false;
 
    if(IS_SET(world[ch->in_room].room_flags, QUIET)) {
      send_to_char ("SHHHHHH!! Can't you see people are trying to read?\r\n",
@@ -435,7 +452,7 @@ int do_auction(struct char_data *ch, char *argument, int cmd)
             !is_ignoring(i->character, ch)) {
           for(tmp_obj = world[i->character->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
             if(obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER) {
-              silence = TRUE;
+              silence = true;
               break;
             }
           if(!silence) act(buf1, ch, 0, i->character, TO_VICT, 0);
@@ -450,7 +467,7 @@ int do_shout(struct char_data *ch, char *argument, int cmd)
     char buf2[MAX_STRING_LENGTH];
     struct descriptor_data *i;
     OBJ_DATA *tmp_obj;
-    bool silence = FALSE;
+    bool silence = false;
 
     if(IS_SET(world[ch->in_room].room_flags, QUIET)) {
       send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n",
@@ -500,7 +517,7 @@ int do_shout(struct char_data *ch, char *argument, int cmd)
             !is_ignoring(i->character, ch)) {
           for(tmp_obj = world[i->character->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
             if(obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER) {
-              silence = TRUE;
+              silence = true;
               break;
             }
           if(!silence) act(buf1, ch, 0, i->character, TO_VICT, 0);
@@ -515,7 +532,7 @@ int do_trivia(struct char_data *ch, char *argument, int cmd)
   char buf2[MAX_STRING_LENGTH];
   struct descriptor_data *i;
   OBJ_DATA *tmp_obj;
-  bool silence = FALSE;
+  bool silence = false;
 
   if (IS_SET(world[ch->in_room].room_flags, QUIET)) {
     send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
@@ -591,7 +608,7 @@ int do_trivia(struct char_data *ch, char *argument, int cmd)
             !is_ignoring(i->character, ch)) {
           for(tmp_obj = world[i->character->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
             if(obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER) {
-              silence = TRUE;
+              silence = true;
               break;
             }
           if(!silence) act(buf1, ch, 0, i->character, TO_VICT, 0);
@@ -663,7 +680,7 @@ int do_dream(struct char_data *ch, char *argument, int cmd)
     return eSUCCESS;
 }
 
-ReturnValue do_tellhistory(char_data *ch, string argument, int cmd)
+command_return_t do_tellhistory(char_data *ch, string argument, int cmd)
 {
   if (ch == nullptr)
   {
@@ -705,7 +722,7 @@ ReturnValue do_tellhistory(char_data *ch, string argument, int cmd)
   return eSUCCESS;
 }
 
-ReturnValue do_tell(char_data *ch, string argument, int cmd)
+command_return_t do_tell(char_data *ch, string argument, int cmd)
 {
   char_data *vict = nullptr;
   string name = {}, message = {}, buf = {}, log_buf = {};
@@ -917,7 +934,7 @@ ReturnValue do_tell(char_data *ch, string argument, int cmd)
   return eSUCCESS;
 }
 
-ReturnValue do_reply(char_data *ch, string argument, int cmd)
+command_return_t do_reply(char_data *ch, string argument, int cmd)
 {
   string buf = {};
   char_data *vict = nullptr;
@@ -1055,7 +1072,7 @@ int do_grouptell(struct char_data *ch, char *argument, int cmd)
   struct char_data *k;
   struct follow_type *f;
   OBJ_DATA *tmp_obj;
-  bool silence = FALSE;
+  bool silence = false;
 
   if (ch == nullptr || ch->pcdata == nullptr)
   {
@@ -1128,7 +1145,7 @@ int do_grouptell(struct char_data *ch, char *argument, int cmd)
       {
         if (obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER)
         {
-          silence = TRUE;
+          silence = true;
           break;
         }
       }
@@ -1151,7 +1168,7 @@ int do_newbie(struct char_data *ch, char *argument, int cmd)
     char buf2[MAX_STRING_LENGTH];
     struct descriptor_data *i;
     OBJ_DATA *tmp_obj;
-    bool silence = FALSE;
+    bool silence = false;
 
     if (IS_SET(world[ch->in_room].room_flags, QUIET)) {
       send_to_char ("SHHHHHH!! Can't you see people are trying to read?\r\n",
@@ -1213,7 +1230,7 @@ int do_newbie(struct char_data *ch, char *argument, int cmd)
     	   (IS_SET(i->character->misc, CHANNEL_NEWBIE)) ) {
           for(tmp_obj = world[i->character->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
             if(obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER) {
-              silence = TRUE;
+              silence = true;
               break;
             }
           if(!silence) act(buf1, ch, 0, i->character, TO_VICT, 0);
