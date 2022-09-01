@@ -175,26 +175,30 @@ void send_message(const char *str, CHAR_DATA *to)
   SEND_TO_Q((char *)str, to->desc);
 }
 
+void send_message(string str, char_data *to)
+{
+  return send_message(str.c_str(), to);
+}
 
 send_tokens_return send_tokens(TokenList * tokens, CHAR_DATA *ch, OBJ_DATA * obj, void * vict_obj, int flags, CHAR_DATA *to)
 {
   int retval = 0;
-  char * buf = tokens->Interpret(ch, obj, vict_obj, to, flags);
+  string buf = tokens->Interpret(ch, obj, vict_obj, to, flags);
   
   // Uppercase first letter of sentence.
-  if (buf != nullptr && buf[0] != 0)
+  if (buf.empty() == false && buf[0] != 0)
   {
     buf[0] = toupper(buf[0]);
   }
   send_message(buf, to);
   
-  if (MOBtrigger && buf)
+  if (MOBtrigger && buf.empty() == false)
     retval |= mprog_act_trigger( buf, to, ch, obj, vict_obj );
-  if (MOBtrigger && buf)
-    retval |= oprog_act_trigger( buf, ch);
+  if (MOBtrigger && buf.empty() == false)
+    retval |= oprog_act_trigger( buf.c_str(), ch);
     
   MOBtrigger = TRUE;
-  if (buf == nullptr)
+  if (buf.empty())
   {
     send_tokens_return str;
     str.str = string();
@@ -202,14 +206,14 @@ send_tokens_return send_tokens(TokenList * tokens, CHAR_DATA *ch, OBJ_DATA * obj
     return str;
   }
 
-  size_t buf_len = strlen(buf);
+  size_t buf_len = buf.length();
   if (buf_len >= 2)
   {
     // Remove \r\n at end before returning string
     buf[buf_len-2] = '\0';    
   }
   send_tokens_return str;
-  str.str = string(buf);
+  str.str = buf;
   str.retval = retval;
   return str;
 }
