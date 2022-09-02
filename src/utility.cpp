@@ -1865,124 +1865,175 @@ bool check_valid_and_convert(int & value, char * buf)
 }
 
 // modified for new SETBIT et al. commands
-void parse_bitstrings_into_int(const char * bits[], const char * strings, char_data *ch, uint value[])
+void parse_bitstrings_into_int(const char *bits[], string remainder_args, char_data *ch, uint value[])
 {
-  bool found = FALSE;
-  string remainder_args(strings);
+  bool found = false;
 
-  if(!ch)
-    return;
-
-  for(;;) 
+  if (ch == nullptr)
   {
-    if(remainder_args.empty())
+    return;
+  }
+
+  for (;;)
+  {
+    if (remainder_args.empty())
+    {
       break;
+    }
 
     string arg1;
-    tie (arg1, remainder_args) = half_chop(remainder_args);
-                       
-    for(int x = 0 ;*bits[x] != '\n'; x++) 
+    tie(arg1, remainder_args) = half_chop(remainder_args);
+    if (arg1.empty())
     {
-      if (!strcmp("unused",bits[x])) continue;
-      if(is_abbrev(arg1, bits[x])) 
+      break;
+    }
+
+    for (int x = 0; *bits[x] != '\n'; x++)
+    {
+      if (!strcmp("unused", bits[x]))
+        continue;
+      if (is_abbrev(arg1, bits[x]))
       {
-        if(ISSET(value, x+1)) {
-          REMBIT(value, x+1);
-          csendf(ch, "%s flag REMOVED.\n\r", bits[x]);
+        if (ISSET(value, x + 1))
+        {
+          REMBIT(value, x + 1);
+          csendf(ch, "%s flag REMOVED.\r\n", bits[x]);
         }
-        else {
-          SETBIT(value, x+1);
-          csendf(ch, "%s flag ADDED.\n\r", bits[x]);
+        else
+        {
+          SETBIT(value, x + 1);
+          csendf(ch, "%s flag ADDED.\r\n", bits[x]);
         }
         found = TRUE;
         break;
       }
-    } 
+    }
   }
-  if(!found)
+  if (!found)
+  {
     send_to_char("No matching bits found.\r\n", ch);
+  }
+}
+
+void parse_bitstrings_into_int(const char *bits[], const char *remainder_args, char_data *ch, uint value[])
+{
+  return parse_bitstrings_into_int(bits, remainder_args, ch, value);
 }
 
 // calls below uint32 version
-void parse_bitstrings_into_int(const char * bits[], const char * strings, char_data * ch, uint16 & value)
+void parse_bitstrings_into_int(const char *bits[], string remainder_args, char_data *ch, uint16 &value)
 {
-  int  found = FALSE;
-  string remainder_args(strings);
+  int found = false;
 
-  if(!ch)
-    return;
-
-  for(;;) 
+  if (ch == nullptr)
   {
-    if(remainder_args.empty())
+    return;
+  }
+
+  for (;;)
+  {
+    if (remainder_args.empty())
+    {
       break;
+    }
 
     string arg1;
-    tie (arg1, remainder_args) = half_chop(remainder_args);
-                       
-    for(int x = 0 ;*bits[x] != '\n'; x++) 
+    tie(arg1, remainder_args) = half_chop(remainder_args);
+
+    if (arg1.empty())
     {
-      if (!strcmp("unused",bits[x])) continue;
-      if(is_abbrev(arg1, bits[x])) 
+      break;
+    }
+
+    for (int x = 0; *bits[x] != '\n'; x++)
+    {
+      if (!strcmp("unused", bits[x]))
+        continue;
+      if (is_abbrev(arg1, bits[x]))
       {
-        if(IS_SET(value, (1<<x))) {
-          REMOVE_BIT(value, (1<<x));
-          csendf(ch, "%s flag REMOVED.\n\r", bits[x]);
+        if (IS_SET(value, (1 << x)))
+        {
+          REMOVE_BIT(value, (1 << x));
+          csendf(ch, "%s flag REMOVED.\r\n", bits[x]);
         }
-        else {
-          SET_BIT(value, (1<<x));
-          csendf(ch, "%s flag ADDED.\n\r", bits[x]);
+        else
+        {
+          SET_BIT(value, (1 << x));
+          csendf(ch, "%s flag ADDED.\r\n", bits[x]);
         }
         found = TRUE;
         break;
       }
-    } 
+    }
   }
-  if(!found)
+  if (!found)
+  {
     send_to_char("No matching bits found.\r\n", ch);
+  }
+}
 
+void parse_bitstrings_into_int(const char *bits[], const char *remainder_args, char_data *ch, uint16 &value)
+{
+  return parse_bitstrings_into_int(bits, remainder_args, ch, value);
 }
 
 // Assumes bits is array of strings, ending with a "\n" string
 // Finds the bits[] strings listed in "strings" and toggles the bit in "value"
 // Informs 'ch' of what has happened
 //
-void parse_bitstrings_into_int(const char * bits[], const char * strings, char_data * ch, uint32 & value)
+void parse_bitstrings_into_int(const char *bits[], string remainder_args, char_data *ch, uint32 &value)
 {
-  int  found = FALSE;
-  string remainder_args(strings);
+  bool found = false;
 
-  if(!ch)
+  if (!ch)
     return;
 
-  for(;;) 
+  for (;;)
   {
-    if(remainder_args.empty())
+    if (remainder_args.empty())
+    {
       break;
+    }
 
     string arg1;
-    tie (arg1, remainder_args) = half_chop(remainder_args);
+    tie(arg1, remainder_args) = half_chop(remainder_args);
 
-    for(int x = 0 ;*bits[x] != '\n'; x++) 
+    if (arg1.empty())
     {
-      if (!strcmp("unused",bits[x])) continue;
-      if(is_abbrev(arg1, bits[x])) 
+      break;
+    }
+
+    for (auto x = 0; *bits[x] != '\n'; x++)
+    {
+      if (!strcmp("unused", bits[x]))
       {
-        if(IS_SET(value, (1<<x))) {
-          REMOVE_BIT(value, (1<<x));
-          csendf(ch, "%s flag REMOVED.\n\r", bits[x]);
+        continue;
+      }
+
+      if (is_abbrev(arg1, bits[x]))
+      {
+        if (IS_SET(value, (1 << x)))
+        {
+          REMOVE_BIT(value, (1 << x));
+          csendf(ch, "%s flag REMOVED.\r\n", bits[x]);
         }
-        else {
-          SET_BIT(value, (1<<x));
-          csendf(ch, "%s flag ADDED.\n\r", bits[x]);
+        else
+        {
+          SET_BIT(value, (1 << x));
+          csendf(ch, "%s flag ADDED.\r\n", bits[x]);
         }
         found = TRUE;
         break;
       }
-    } 
+    }
   }
-  if(!found)
-    send_to_char("No matching bits found.\r\n", ch);
+  if (!found)
+    send_to_char("No matching bits found.\n\n", ch);
+}
+
+void parse_bitstrings_into_int(const char *bits[], const char *remainder_args, char_data *ch, uint32 &value)
+{
+  return parse_bitstrings_into_int(bits, remainder_args, ch, value);
 }
 
 // Display a \n terminated list to the character
