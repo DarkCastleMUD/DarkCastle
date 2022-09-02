@@ -1348,11 +1348,15 @@ string ltrim(string str)
     {
       str.erase(0, first_non_space);
     }
+    else
+    {
+      str.clear();
+    }
   }
-  catch(...)
+  catch (...)
   {
   }
-  
+
   return str;
 }
 
@@ -1361,16 +1365,20 @@ string rtrim(string str)
   // remove leading spaces
   try
   {
-    auto first_non_space = str.find_first_not_of(' ');
-    if (first_non_space != str.npos)
+    auto last_non_space = str.find_last_not_of(' ');
+    if (last_non_space != str.npos)
     {
-      str.erase(0, first_non_space);
+      str.erase(last_non_space + 1, str.length() + 1);
+    }
+    else
+    {
+      str.clear();
     }
   }
-  catch(...)
+  catch (...)
   {
   }
-  
+
   return str;
 }
 
