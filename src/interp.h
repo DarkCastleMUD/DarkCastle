@@ -582,7 +582,7 @@ command_return_t do_whosolo(CHAR_DATA *ch, char *argument, int cmd);
 command_return_t do_wield(CHAR_DATA *ch, char *argument, int cmd);
 command_return_t do_fakelog(CHAR_DATA *ch, char *argument, int cmd);
 command_return_t do_wimpy(CHAR_DATA *ch, char *argument, int cmd);
-command_return_t do_wiz(CHAR_DATA *ch, char *argument, int cmd);
+command_return_t do_wiz(char_data *ch, string argument, int cmd);
 command_return_t do_wizhelp(CHAR_DATA *ch, char *argument, int cmd);
 command_return_t do_wizinvis(CHAR_DATA *ch, char *argument, int cmd);
 command_return_t do_wizlist(CHAR_DATA *ch, char *argument, int cmd);

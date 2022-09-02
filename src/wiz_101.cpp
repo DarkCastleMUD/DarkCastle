@@ -20,8 +20,10 @@
 #include "const.h"
 #include <queue>
 #include <string>
+#include <fmt/format.h>
 
 using namespace std;
+using namespace fmt;
 
 queue<string> imm_history;
 queue<string> imp_history;
@@ -535,13 +537,15 @@ int do_nohassle (struct char_data *ch, char *argument, int cmd)
 
 // cmd == 9 - imm
 // cmd == 8 - /
-int do_wiz(struct char_data *ch, char *argument, int cmd)
+command_return_t do_wiz(char_data *ch, string argument, int cmd)
 {
-  char buf1[MAX_STRING_LENGTH];
-  struct descriptor_data *i;
+  string buf1 = {};
+  descriptor_data *i = nullptr;
 
   if (IS_NPC(ch))
+  {
     return eFAILURE;
+  }
 
   if (cmd == CMD_IMPCHAN && !has_skill(ch, COMMAND_IMP_CHAN))
   {
@@ -549,10 +553,10 @@ int do_wiz(struct char_data *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  for (; *argument == ' '; argument++)
-    ;
+  argument = ltrim(argument);
+  argument = rtrim(argument);
 
-  if (!(*argument))
+  if (argument.empty())
   {
     queue<string> tmp;
     if (cmd == CMD_IMMORT)
@@ -573,22 +577,27 @@ int do_wiz(struct char_data *ch, char *argument, int cmd)
 
     while (!tmp.empty())
     {
-      send_to_char((tmp.front()).c_str(), ch);
+      ch->send(tmp.front());
       tmp.pop();
     }
   }
   else
   {
+    if (IS_IMMORTAL(ch))
+    {
+      argument = remove_all_codes(argument);
+    }
+
     if (cmd == CMD_IMMORT)
     {
-      sprintf(buf1, "$B$4%s$7: $7$B%s$R\n\r", GET_SHORT(ch), argument);
+      buf1 = fmt::format("$B$4{}$7: $7$B{}$R\r\n", GET_SHORT(ch), argument);
       imm_history.push(buf1);
       if (imm_history.size() > 10)
         imm_history.pop();
     }
     else
     {
-      sprintf(buf1, "$B$7%s> %s$R\n\r", GET_SHORT(ch), argument);
+      buf1 = fmt::format("$B$7{}> {}$R\r\n", GET_SHORT(ch), argument);
       imp_history.push(buf1);
       if (imp_history.size() > 10)
         imp_history.pop();
