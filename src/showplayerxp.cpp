@@ -506,6 +506,25 @@ int main(int argc, char **argv)
   test_handle_ansi("$x");
   test_handle_ansi("$1$2$5$B$b$rttessd$Rddd");
 
+  string arg1 = {}, remainder = "charm sleep ";
+  do
+  {
+    tie(arg1, remainder) = half_chop(remainder);
+    cerr << "[" << arg1 << "]" << "[" << remainder << "]" << endl;
+  } while (arg1.empty() == false);
+
+
+  char c_arg1[2048] = {}, c_arg2[2048] = {}, c_input[] = "charm sleep ";
+  do
+  {
+    half_chop(c_input, c_arg1, c_arg2);
+    cerr << "[" << c_arg1 << "]" << "[" << c_arg2 << "]" << endl;
+    strncpy(c_input, c_arg2, sizeof(c_input) - 1);
+  } while (c_arg1[0] != '\0');
+  
+  
+  
+
   string orig_cwd, dclib;
   if (argc < 2)
     return 1;
