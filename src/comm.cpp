@@ -2415,7 +2415,15 @@ string remove_non_color_codes(string input)
     }
     else if (bytes_read == 0)
     {
-      log("EOF on socket read (connection broken by peer)", ANGEL, LOG_SOCKET);
+      if (t->character != nullptr && GET_NAME(t->character) != nullptr)
+      {
+        log(fmt::format("Connection broken by peer {} playing {}.", t->host, GET_NAME(t->character)), ANGEL, LOG_SOCKET);
+      }
+      else
+      {
+        log(fmt::format("Connection broken by peer {} not playing a character.", t->host), ANGEL, LOG_SOCKET);
+      }
+      
       return -1;
     }
     string buffer = c_buffer;
