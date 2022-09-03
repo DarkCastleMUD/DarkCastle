@@ -21,8 +21,9 @@
 /**************************************************************************/
 /* $Id: mob_act.cpp,v 1.52 2014/07/04 22:00:04 jhhudso Exp $ */
 
-#include <cstdio>
 #include <string.h>
+
+#include <cstdio>
 
 #include "character.h"
 #include "room.h"
@@ -43,6 +44,7 @@
 #include "inventory.h"
 #include "const.h"
 #include "Timer.h"
+#include "move.h"
 
 int keywordfind(struct obj_data *obj_object);
 int hands_are_free(CHAR_DATA *ch, int number);
@@ -68,7 +70,6 @@ void mobile_activity(void)
   int done;
   int tmp_race, tmp_bitv;
   int retval;
-  int attempt_move(CHAR_DATA *ch, int cmd, int is_retreat = 0);
   extern int mprog_cur_result;
   
   /* Examine all mobs. */

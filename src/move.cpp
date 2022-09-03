@@ -31,8 +31,8 @@
 #include "innate.h"
 #include "weather.h"
 #include "const.h"
+#include "move.h"
 
-int ambush(CHAR_DATA *ch); // class/cl_ranger.C
 int check_ethereal_focus(CHAR_DATA *ch, int trigger_type); // class/cl_mage.cpp
 
 int move_player(char_data * ch, int room) {
@@ -841,7 +841,7 @@ int do_simple_move(CHAR_DATA *ch, int cmd, int following)
 	return eSUCCESS;
 }
 
-int attempt_move(CHAR_DATA *ch, int cmd, int is_retreat = 0) {
+int attempt_move(CHAR_DATA *ch, int cmd, int is_retreat) {
 	char tmp[80];
 	int return_val;
 	int was_in = ch->in_room;
@@ -1244,3 +1244,59 @@ int do_climb(struct char_data *ch, char *argument, int cmd) {
 
 // The End
 
+int ambush(CHAR_DATA *ch)
+{
+  CHAR_DATA *i, *next_i;
+  int retval;
+
+  for(i = world[ch->in_room].people; i; i = next_i) 
+  {
+     next_i = i->next_in_room;
+  
+     if(i == ch || !i->ambush || !CAN_SEE(i, ch) || i->fighting)
+       continue;
+
+     if(  GET_POS(i) <= POSITION_RESTING || 
+          GET_POS(i) == POSITION_FIGHTING ||
+          IS_AFFECTED(i, AFF_PARALYSIS) ||
+          ( IS_SET(world[i->in_room].room_flags, SAFE) &&
+	    !IS_AFFECTED(ch, AFF_CANTQUIT)
+          ))
+       continue;
+     if(!IS_MOB(i) && !i->desc) // don't work if I'm linkdead
+       continue;
+     if(isname(i->ambush, GET_NAME(ch)))
+     {
+
+			if (!canPerform(i, SKILL_AMBUSH)) {
+         continue;
+       }
+
+       if(IS_AFFECTED(ch, AFF_ALERT)) {
+          send_to_char("Your target is far too alert to accomplish an ambush!\r\n", i);
+          continue;
+       }
+
+
+       if (!charge_moves(ch, SKILL_AMBUSH)) return eSUCCESS;
+
+       if(skill_success(i,ch, SKILL_AMBUSH)) 
+       { 
+//         act("$n ambushes $N in a brilliant surprise attack!", i, 0, ch, TO_ROOM, NOTVICT);
+//         act("$n ambushes you as you enter the room!", i, 0, ch, TO_VICT, 0);
+//         act("You ambush $N with a brilliant surprise attack!", i, 0, ch, TO_CHAR, 0);
+         retval = damage(i, ch, GET_LEVEL(i) * 10, TYPE_HIT, SKILL_AMBUSH, 0); 
+         if(IS_SET(retval, eVICT_DIED))
+           return (eSUCCESS|eCH_DIED);  // ch = damage vict
+         if(IS_SET(retval, eCH_DIED))
+           return (eSUCCESS); // doesn't matter, but don't lag vict
+         if(!IS_MOB(i) && IS_SET(i->pcdata->toggles, PLR_WIMPY))
+            WAIT_STATE(i, PULSE_VIOLENCE * 3);
+         else WAIT_STATE(i, PULSE_VIOLENCE * 2);
+         WAIT_STATE(ch, PULSE_VIOLENCE * 1);
+       }
+       // we continue instead of breaking in case there are any OTHER rangers in the room
+     }
+  }
+  return eSUCCESS;
+}

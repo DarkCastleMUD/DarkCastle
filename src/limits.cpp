@@ -14,10 +14,8 @@
  ***************************************************************************/
 /* $Id: limits.cpp,v 1.99 2014/07/04 22:00:04 jhhudso Exp $ */
 
-extern "C" {
 #include <stdio.h>
 #include <string.h>
-}
 
 #ifdef BANDWIDTH
 #include "bandwidth.h"
@@ -45,10 +43,7 @@ extern "C" {
 #include "vault.h"
 #include "inventory.h"
 #include "const.h"
-
-/* External procedures */
-void save_corpses(void);
-struct time_info_data age(CHAR_DATA *ch);
+#include "corpse.h"
 
 /* When age < 15 return the value p0 */
 /* When age in 15..29 calculate the line between p1 & p2 */

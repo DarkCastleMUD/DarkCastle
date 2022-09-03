@@ -44,7 +44,6 @@ void update_wizlist(CHAR_DATA *ch);
 int real_roomb(int virt);
 void save_ban_list(void);
 void save_nonew_new_list(void);
-void remove_memory(CHAR_DATA *ch, char type);
 int is_in_range(CHAR_DATA *ch, int virt);
 int create_one_room(CHAR_DATA *ch, int vnum);
 int mana_gain(CHAR_DATA *ch);

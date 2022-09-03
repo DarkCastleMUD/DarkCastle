@@ -103,5 +103,6 @@ void free_member(struct clan_member_data * member);
 struct clan_member_data * get_member(char * strName, int nClanId);
 void show_clan_log(CHAR_DATA *ch);
 void log_clan(CHAR_DATA *ch, char *buffer);
+void clan_death (char_data *ch, char_data *killer);
 
 #endif /* CLAN_H_ */

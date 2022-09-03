@@ -31,6 +31,7 @@ extern "C" {
 #include "returnvals.h"
 #include "const.h"
 #include "inventory.h"
+#include "handler.h"
 
 extern CWorld world;
 extern index_data *mob_index;
@@ -39,7 +40,6 @@ char_data *origsing = NULL;
 using namespace std;
 
 extern struct zone_data *zone_table;
-void remove_memory(CHAR_DATA *ch, char type);
 extern int check_social(CHAR_DATA *ch, char *pcomm, int length, char *arg);
 void check_eq(CHAR_DATA *ch);
 

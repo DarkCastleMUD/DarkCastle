@@ -568,7 +568,8 @@ size_t nocolor_strlen(const char *s);
 void make_prompt(struct descriptor_data *d, string& prompt);
 string remove_all_codes(string input);
 void prog_error(char_data *mob, char *format, ...);
-
+bool str_prefix( const char *astr, const char *bstr );
+bool str_infix( const char *astr, const char *bstr);
 
 extern const char menu[];
 
@@ -644,5 +645,6 @@ string handle_ansi(string s, char_data * ch);
 char * handle_ansi_(char * s, char_data * ch);
 void blackjack_prompt(CHAR_DATA *ch, string& prompt, bool ascii);
 void show_string(struct descriptor_data *d, const char *input);
+void special_log(char *arg);
 
 #endif /* UTILITY_H_ */

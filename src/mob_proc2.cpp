@@ -14,9 +14,8 @@
  ***************************************************************************/
 /* $Id: mob_proc2.cpp,v 1.89 2012/05/25 02:15:46 jhhudso Exp $ */
 #include <string.h>
-#include <fmt/format.h>
 
-using namespace std;
+#include <fmt/format.h>
 
 #include "room.h"
 #include "obj.h"
@@ -34,15 +33,14 @@ using namespace std;
 #include "spells.h"
 #include "const.h"
 #include "inventory.h"
+#include "corpse.h"
+
+using namespace std;
 
 extern struct obj_data *object_list;
 extern struct index_data *obj_index;
 extern int class_restricted(char_data *ch, struct obj_data *obj);
 extern int size_restricted(char_data *ch, struct obj_data *obj);
-
-/* extern procedures */
-
-void save_corpses(void);
 
 void repair_shop_fix_eq(char_data * ch, char_data * owner, int price, obj_data * obj) {
 	char buf[256];

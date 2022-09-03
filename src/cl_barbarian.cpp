@@ -22,13 +22,12 @@
 #include "clan.h"
 #include "utility.h"
 #include "const.h"
+#include "inventory.h"
+#include "move.h"
 
 extern struct index_data *obj_index;
 extern int rev_dir[];
-extern bool str_prefix(const char *astr, const char *bstr);
 extern CWorld world;
-int attempt_move(CHAR_DATA *ch, int cmd, int is_retreat = 0);
-int find_door(CHAR_DATA *ch, char *type, char *dir);
 
 int do_batter(struct char_data *ch, char *argument, int cmd)
 {

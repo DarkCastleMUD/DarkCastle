@@ -8,22 +8,21 @@
 #include <stdint.h>
 uint64_t i= UINT64_MAX;
 
-extern "C"
-{
-  #include <string.h> // strcat
-  #include <stdio.h> // FILE *
-  #include <ctype.h> // isspace..
-}
+#include <string.h> // strcat
+#include <stdio.h> // FILE *
+#include <ctype.h> // isspace..
+#include <netinet/in.h>
+
 #include <fstream>
 #include <iostream>
 #include <sstream>
-#include "fileinfo.h"
 #include <stack>
 #include <algorithm>
-#include <netinet/in.h>
-#include <fmt/format.h>
 #include <locale>
 
+#include <fmt/format.h>
+
+#include "fileinfo.h"
 #include "db.h" // real_room
 #include "player.h"
 #include "utility.h"
@@ -38,9 +37,9 @@ extern "C"
 #include "room.h" // CLAN_ROOM flag
 #include "returnvals.h"
 #include "spells.h"
-
 #include "DC.h"
 #include "Trace.h"
+#include "clan.h"
 
 using namespace std;
 

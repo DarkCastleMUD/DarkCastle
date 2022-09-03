@@ -20,15 +20,15 @@
 // - Where is Spellcraft "reduced fireball lag" affect listed?
 //    - Apoc.
 
-
-extern "C"
-{
-#include <string.h>
 #include <stdio.h>
 #include <assert.h>
-  #include <stdlib.h>
+#include <stdlib.h>
 #include <math.h> // pow(double,double)
-}
+
+#include <cstring>
+#include <map>
+
+#include <fmt/format.h>
 
 #include "room.h"
 #include "connect.h"
@@ -56,16 +56,11 @@ extern "C"
 #include "arena.h"
 #include "const.h"
 #include "inventory.h"
+#include "obj.h"
 
-/* Extern Structures */
-
+using namespace std;
 
 #define BEACON_OBJ_NUMBER 405
-
-bool str_prefix(const char *astr, const char *bstr);
-void wear(struct char_data *ch, struct obj_data *obj_object, int keyword);
-
-/* Extern Procedures */
 
 int saves_spell(CHAR_DATA *ch, CHAR_DATA *vict, int spell_base, int16 save_type);
 clan_data * get_clan(struct char_data *);
@@ -875,9 +870,6 @@ int cast_greater_stone_shield( ubyte level, CHAR_DATA *ch, char *arg, int type, 
 	 }
   return eFAILURE;
 }
-
-#include <map>
-using namespace std;
 
 /* EARTHQUAKE */
 
@@ -9542,26 +9534,26 @@ bool elemental_score(char_data *ch, int level)
   char buf[MAX_STRING_LENGTH];
   extern char frills[];
   if (fire) {
-    sprintf(buf, "|%c| Affected by %-22s          Modifier %-16s  |%c|\n\r",
-               frills[level],"ENHANCED_FIRE_AURA","NONE",frills[level]);
+    sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\n\r",
+               frills[level],"Enhanced Fire Aura","NONE",frills[level]);
         send_to_char(buf,ch);
         if (++level == 4) level = 0;
   }
   if (ice) {
-    sprintf(buf, "|%c| Affected by %-22s          Modifier %-16s  |%c|\n\r",
-               frills[level],"ENHANCED_COLD_AURA","NONE",frills[level]);
+    sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\n\r",
+               frills[level],"Enhanced Cold Aura","NONE",frills[level]);
         send_to_char(buf,ch);
         if (++level == 4) level = 0;
   }
   if (energy) {
-    sprintf(buf, "|%c| Affected by %-22s          Modifier %-16s  |%c|\n\r",
-               frills[level],"ENHANCED_ENERGY_AURA","NONE",frills[level]);
+    sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\n\r",
+               frills[level],"Enhanced Energy Aura","NONE",frills[level]);
         send_to_char(buf,ch);
         if (++level == 4) level = 0;
   }
   if (earth) {
-    sprintf(buf, "|%c| Affected by %-22s          Modifier %-16s  |%c|\n\r",
-               frills[level],"ENHANCED_PHYSICAL_AURA","NONE",frills[level]);
+    sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\n\r",
+               frills[level],"Enhanced Physical Aura","NONE",frills[level]);
         send_to_char(buf,ch);
         if (++level == 4) level = 0;
   }
@@ -13344,12 +13336,24 @@ int spell_conjure_elemental(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vi
 		obj->obj_flags.value[1] >= 5)
 		break;
   }
-  if (!obj)
+  if (obj == nullptr)
   {
-     send_to_char("You do not have the required liquid ready.\r\n",ch);
-     return eFAILURE;
+    ch->send(fmt::format("You do not have a container filled with 5 units of {}.\r\n", drinks[liquid]));
+
+    if (IS_IMMORTAL(ch))
+    {
+      ch->send(fmt::format("Using your immortal powers you materialize the missing {}.\r\n", drinks[liquid]));
+    }
+    else
+    {
+      return eFAILURE;
+    }
   }
-  obj->obj_flags.value[1] -= 5;
+  else
+  {
+    obj->obj_flags.value[1] -= 5;
+  }
+  
   switch (virt)
   {
 	case FIRE_ELEMENTAL:

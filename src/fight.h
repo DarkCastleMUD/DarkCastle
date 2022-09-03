@@ -7,36 +7,30 @@
 | This file defines the header information for fight.
 */
 #include "structs.h" // ubyte, ubyte, etc..
-#include "obj.h" // WIELD, SECOND_WIELD
+#include "obj.h"     // WIELD, SECOND_WIELD
 #include "character.h"
 #include "utility.h" // FALSE
-#ifdef NeXT
-#ifndef bool
-#define bool int
-#endif
-#endif
 
 /* External prototype */
-void special_log(char *arg);
 void debug_point();
 
 /* Here are our function prototypes */
-int  damage(CHAR_DATA *ch, CHAR_DATA *victim, int dam, 
-            int weapon_type, int attacktype, int weapon, bool is_death_prog = false); 
-int noncombat_damage(CHAR_DATA * ch, int dam, char *char_death_msg,
+int damage(CHAR_DATA *ch, CHAR_DATA *victim, int dam,
+           int weapon_type, int attacktype, int weapon, bool is_death_prog = false);
+int noncombat_damage(CHAR_DATA *ch, int dam, char *char_death_msg,
                      char *room_death_msg, char *death_log_msg, int type);
 void send_damage(char const *, CHAR_DATA *, OBJ_DATA *, CHAR_DATA *, char const *, char const *, int);
 int getRealSpellDamage(CHAR_DATA *ch);
- 
-#define FIRST 	    WIELD
-#define SECOND 	    SECOND_WIELD
 
-#define COMBAT_MOD_FRENZY            1
-#define COMBAT_MOD_RESIST            1<<1
-#define COMBAT_MOD_SUSCEPT           1<<2
-#define COMBAT_MOD_IGNORE            1<<3
-#define COMBAT_MOD_REDUCED            1<<4
-void make_dust(CHAR_DATA * ch);
+#define FIRST WIELD
+#define SECOND SECOND_WIELD
+
+#define COMBAT_MOD_FRENZY 1
+#define COMBAT_MOD_RESIST 1 << 1
+#define COMBAT_MOD_SUSCEPT 1 << 2
+#define COMBAT_MOD_IGNORE 1 << 3
+#define COMBAT_MOD_REDUCED 1 << 4
+void make_dust(CHAR_DATA *ch);
 bool do_frostshield(CHAR_DATA *ch, CHAR_DATA *vict);
 int speciality_bonus(CHAR_DATA *ch, int attacktype, int level);
 void make_husk(CHAR_DATA *ch);
@@ -47,7 +41,6 @@ void make_leg(CHAR_DATA *ch);
 void make_bowels(CHAR_DATA *ch);
 void make_blood(CHAR_DATA *ch);
 void make_scraps(CHAR_DATA *ch, struct obj_data *obj);
-void remove_memory(CHAR_DATA *ch, char type);
 void room_mobs_only_hate(char_data *ch);
 void add_memory(CHAR_DATA *ch, char *victim, char type);
 void stop_follower(CHAR_DATA *ch, int cmd);
@@ -65,7 +58,7 @@ void trip(CHAR_DATA *ch, CHAR_DATA *vict);
 int checkCounterStrike(CHAR_DATA *, CHAR_DATA *);
 int doTumblingCounterStrike(CHAR_DATA *, CHAR_DATA *);
 
-int one_hit(CHAR_DATA*ch, CHAR_DATA *vict, int type, int weapon);
+int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon);
 int do_skewer(CHAR_DATA *ch, CHAR_DATA *vict, int dam, int wt, int wt2, int weapon);
 void do_combatmastery(CHAR_DATA *ch, CHAR_DATA *vict, int weapon);
 int do_behead_skill(CHAR_DATA *ch, CHAR_DATA *victim);
@@ -86,7 +79,20 @@ void do_pkill(CHAR_DATA *ch, CHAR_DATA *victim, int type, bool vict_is_attacker 
 void arena_kill(CHAR_DATA *ch, CHAR_DATA *victim, int type);
 void do_dead(CHAR_DATA *ch, CHAR_DATA *victim);
 bool ArenaIsOpen();
-void eq_destroyed(char_data * ch, obj_data * obj, int pos);
+void eq_destroyed(char_data *ch, obj_data *obj, int pos);
+int is_stunned(CHAR_DATA *ch);
+void update_flags(CHAR_DATA *vict);
+void update_stuns(CHAR_DATA *ch);
+void do_dam_msgs(CHAR_DATA *ch, CHAR_DATA *victim, int dam, int attacktype, int weapon, int filter = 0);
+int act_poisonous(CHAR_DATA *ch);
+int isHit(CHAR_DATA *ch, CHAR_DATA *victim, int attacktype, int &type, int &reduce);
+void inform_victim(CHAR_DATA *ch, CHAR_DATA *victim, int dam);
+CHAR_DATA *loop_followers(struct follow_type **f);
+CHAR_DATA *get_highest_level_killer(CHAR_DATA *leader, CHAR_DATA *killer);
+long count_xp_eligibles(CHAR_DATA *leader, CHAR_DATA *killer, long highest_level, long *total_levels);
+int64 scale_char_xp(CHAR_DATA *ch, CHAR_DATA *killer, CHAR_DATA *victim, long no_killers, long total_levels, long highest_level, int64 base_xp, int64 *bonus_xp);
+void remove_active_potato(CHAR_DATA *vict);
+int check_pursuit(char_data *ch, char_data *victim, char *dircommand);
 
 // These are so that we only need one copy of one_hit and weapon_spells and
 // skewer and behead
@@ -143,6 +149,5 @@ struct threat_struct
   int threat;
   char *name;
 };
-
 
 #endif

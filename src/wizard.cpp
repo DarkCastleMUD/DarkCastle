@@ -1500,19 +1500,6 @@ int do_restore(struct char_data *ch, char *argument, int cmd)
     return eSUCCESS;
 } 
 
-void special_log(char *arg)
-{
-  FILE *fl;
-
-  if(!(fl = dc_fopen("../lib/special.txt", "a"))) {
-    log("Unable to open SPECIAL LOG FILE in special_log.", IMP, LOG_GOD);
-    return;
-  }
-
-  fprintf(fl, "%s\n", arg);
-  dc_fclose(fl);
-}
-
 
 // Scavenger hunts..
 

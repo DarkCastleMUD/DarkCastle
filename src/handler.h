@@ -149,6 +149,9 @@ void die_follower(CHAR_DATA *ch);
 void remove_from_bard_list(char_data * ch);
 void stop_guarding_me(char_data * victim);
 void stop_guarding(char_data * guard);
+void remove_memory(CHAR_DATA *ch, char type);
+void remove_memory(CHAR_DATA *ch, char type, CHAR_DATA *vict);
+void add_memory(CHAR_DATA *ch, char *victim, char type);
 
 #endif
 

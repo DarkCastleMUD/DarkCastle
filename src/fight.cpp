@@ -23,10 +23,11 @@
  * $Id: fight.cpp,v 1.571 2015/06/16 04:10:54 pirahna Exp $               *
  **************************************************************************/
 
+#include <assert.h>
+
 #include <cstdio>
 #include <cstring>
 #include <cstdlib>
-#include <assert.h>
 #include <sstream>
 
 #include "fight.h"
@@ -56,6 +57,10 @@
 #include "vault.h"
 #include "arena.h"
 #include "const.h"
+#include "corpse.h"
+#include "stat.h"
+
+#define MAX_CHAMP_DEATH_MESSAGE		14
 
 extern bool selfpurge;
 extern int top_of_world;
@@ -63,44 +68,9 @@ extern CWorld world;
 extern struct index_data *mob_index;
 extern struct index_data *obj_index;
 extern struct zone_data *zone_table;
-
-void getAreaData(unsigned int zone, int mob, unsigned int xps, unsigned int gold);
-/* functions that nobody else should be calling */
-void save_corpses(void); 
-int act_poisonous(CHAR_DATA *ch);
-int is_stunned(CHAR_DATA *ch);
-int do_lightning_shield(CHAR_DATA *ch, CHAR_DATA *vict, int dam);
-int do_fireshield(CHAR_DATA *ch, CHAR_DATA *vict, int dam);
-int do_vampiric_aura(CHAR_DATA *ch, CHAR_DATA *vict);
-int do_boneshield(CHAR_DATA *ch, CHAR_DATA *vict, int dam);
-void do_dam_msgs(CHAR_DATA *ch, CHAR_DATA *victim, int dam, int attacktype, int weapon, int filter = 0);
-void inform_victim(CHAR_DATA *ch, CHAR_DATA *vict, int dam);
-void update_stuns(CHAR_DATA *ch);
-int is_fighting_mob(CHAR_DATA *ch);
-void remove_memory(CHAR_DATA *ch, char type, CHAR_DATA *vict);
-void clan_death (char_data *ch, char_data *victim);
-void remove_active_potato(CHAR_DATA *vict);
-
-// local
-void check_weapon_skill_bonus(char_data * ch, int type, obj_data *wielded, 
-                              int & weapon_skill_hit_bonus, int & weapon_skill_dam_bonus);
-
-void update_flags(CHAR_DATA *vict);
-int64 scale_char_xp(CHAR_DATA *ch, CHAR_DATA *killer, CHAR_DATA *victim,
-                   long no_killers, long total_levels, long highest_level,
-                   int64 base_xp, int64 *bonus_xp);
-CHAR_DATA *loop_followers(struct follow_type **f);
-long count_xp_eligibles(CHAR_DATA *leader, CHAR_DATA *killer,
-                        long highest_level, long *total_levels);
-CHAR_DATA *get_highest_level_killer(CHAR_DATA *leader, CHAR_DATA *killer);
  
 CHAR_DATA *combat_list = NULL, *combat_next_dude = NULL;
 
-
-int isHit(CHAR_DATA *ch, CHAR_DATA *victim, int attacktype, int &type, int &reduce);
-int check_pursuit(char_data *ch, char_data *victim, char *dircommand);
-
-#define MAX_CHAMP_DEATH_MESSAGE		14
 char *champ_death_messages[] = 
 {
 /*1*/	"\n\r##Somewhere a village has been deprived of their idiot.\n\r",

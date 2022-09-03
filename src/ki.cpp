@@ -29,15 +29,13 @@ extern "C"
 #include "db.h"
 #include "returnvals.h"
 #include <vector>
+#include "handler.h"
 
 using namespace std;
 
 extern CWorld world;
  
 extern int hit_gain(CHAR_DATA *, int);
-
-void remove_memory(CHAR_DATA *ch, char type);
-void add_memory(CHAR_DATA *ch, char *victim, char type);
 
 struct ki_info_type ki_info [ ] = {
 { /* 0 */

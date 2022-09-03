@@ -307,6 +307,7 @@ void remove_obj_affect_by_type(obj_data * obj, int loc);
 int recheck_height_wears(char_data *ch);
 bool fullSave(obj_data *obj);
 void heightweight(char_data *ch, bool add);
+void wear(struct char_data *ch, struct obj_data *obj_object, int keyword);
 
 typedef vector<const char *> item_types_t;
 

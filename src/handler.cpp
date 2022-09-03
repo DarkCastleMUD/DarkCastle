@@ -50,6 +50,7 @@
 #include "set.h"
 #include "DC.h"
 #include "const.h"
+#include "corpse.h"
 
 extern CWorld world;
 
@@ -66,12 +67,7 @@ int strncasecmp(char *s1, const char *s2, int len);
 #endif
 
 /* External procedures */
-void save_corpses(void);
 int do_fall(CHAR_DATA *ch, short dir);
-
-/* internal procedures */
-void remove_memory(CHAR_DATA *ch, char type);
-void add_memory(CHAR_DATA *ch, char *victim, char type);
 
 //TIMERS
 

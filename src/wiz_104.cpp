@@ -19,8 +19,7 @@
 #include "spells.h"
 #include "race.h"
 #include "const.h"
-
-void save_corpses(void);
+#include "corpse.h"
 
 int count_rooms(int start, int end)
 {

@@ -147,63 +147,6 @@ char *mprog_next_command( char *clist )
 
 }
 
-/*
- * Compare strings, case insensitive, for prefix matching.
- * Return TRUE if astr not a prefix of bstr
- *   (compatibility with historical functions).
- */
-bool str_prefix( const char *astr, const char *bstr )
-{
-    if ( astr == NULL )
-    {
-	logf( IMMORTAL, LOG_WORLD, "Str_prefix: null astr.", 0 );
-	return TRUE;
-    }
-
-    if ( bstr == NULL )
-    {
-	logf( IMMORTAL, LOG_WORLD, "Str_prefix: null bstr.", 0 );
-	return TRUE;
-    }
-
-    for ( ; *astr; astr++, bstr++ )
-    {
-	if ( LOWER(*astr) != LOWER(*bstr) )
-	    return TRUE;
-    }
-
-    return FALSE;
-}
-
-/*
- * Compare strings, case insensitive, for match anywhere.
- * Returns TRUE is astr not part of bstr.
- *   (compatibility with historical functions).
- */
-
-bool str_infix( const char *astr, const char *bstr 
-)
-{
-    int sstr1;
-    int sstr2;
-    int ichar;
-    char c0;
-
-    if ( ( c0 = LOWER(astr[0]) ) == '\0' )
-	return FALSE;
-
-    sstr1 = strlen(astr);
-    sstr2 = strlen(bstr);
-
-    for ( ichar = 0; ichar <= sstr2 - sstr1; ichar++ )
-    {
-	if ( c0 == LOWER(bstr[ichar]) && !str_prefix( astr, bstr + ichar ) )
-	    return FALSE;
-    }
-
-    return TRUE;
-}
-
 /* These two functions do the basic evaluation of ifcheck operators.
  *  It is important to note that the string operations are not what
  *  you probably expect.  Equality is exact and division is substring.

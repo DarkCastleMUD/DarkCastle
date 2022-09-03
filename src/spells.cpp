@@ -1433,7 +1433,6 @@ int do_release(CHAR_DATA *ch, char *argument, int cmd)
   struct affected_type *aff,*aff_next;
   bool printed = FALSE;
   argument = skip_spaces(argument);
-  extern bool str_prefix(const char *astr, const char *bstr);  
   bool done = FALSE;
   int learned = has_skill(ch,SKILL_RELEASE);
 

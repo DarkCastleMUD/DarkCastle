@@ -8,11 +8,9 @@
  *                      from charmies                                         *
  ******************************************************************************/
 
-extern "C"  {
-  #include <string.h>
-}
-//#include <iostream.h>
+#include <string.h>
 #include <stdio.h>
+
 #include "character.h"
 #include "affect.h"
 #include "mobile.h"
@@ -33,12 +31,14 @@ extern "C"  {
 #include "returnvals.h"
 #include "inventory.h"
 #include "const.h"
+#include "move.h"
+#include "corpse.h"
 
 extern CWorld world;
 extern struct zone_data *zone_table;
 extern struct obj_data *object_list; 
 extern int rev_dir[];
-void save_corpses(void);
+
 
 int saves_spell(CHAR_DATA *ch, CHAR_DATA *vict, int spell_base, int16 save_type);
 void check_eq(CHAR_DATA *ch);
@@ -124,11 +124,6 @@ int do_tame(CHAR_DATA *ch, char *arg, int cmd)
   struct affected_type af;
   CHAR_DATA *victim;
   char buf[MAX_INPUT_LENGTH];
-
-  void add_follower(CHAR_DATA *ch, CHAR_DATA *leader, int cmd);
-  void stop_follower(CHAR_DATA *ch, int cmd);
-  void remove_memory(CHAR_DATA *ch, char type, CHAR_DATA *vict);
-
 
   while(*arg == ' ')
     arg++;
@@ -485,63 +480,6 @@ int do_track(CHAR_DATA *ch, char *argument, int cmd)
             race,
             dirs[y]);
     send_to_char(buf, ch);
-  }
-  return eSUCCESS;
-}
-
-int ambush(CHAR_DATA *ch)
-{
-  CHAR_DATA *i, *next_i;
-  int retval;
-
-  for(i = world[ch->in_room].people; i; i = next_i) 
-  {
-     next_i = i->next_in_room;
-  
-     if(i == ch || !i->ambush || !CAN_SEE(i, ch) || i->fighting)
-       continue;
-
-     if(  GET_POS(i) <= POSITION_RESTING || 
-          GET_POS(i) == POSITION_FIGHTING ||
-          IS_AFFECTED(i, AFF_PARALYSIS) ||
-          ( IS_SET(world[i->in_room].room_flags, SAFE) &&
-	    !IS_AFFECTED(ch, AFF_CANTQUIT)
-          ))
-       continue;
-     if(!IS_MOB(i) && !i->desc) // don't work if I'm linkdead
-       continue;
-     if(isname(i->ambush, GET_NAME(ch)))
-     {
-
-			if (!canPerform(i, SKILL_AMBUSH)) {
-         continue;
-       }
-
-       if(IS_AFFECTED(ch, AFF_ALERT)) {
-          send_to_char("Your target is far too alert to accomplish an ambush!\r\n", i);
-          continue;
-       }
-
-
-       if (!charge_moves(ch, SKILL_AMBUSH)) return eSUCCESS;
-
-       if(skill_success(i,ch, SKILL_AMBUSH)) 
-       { 
-//         act("$n ambushes $N in a brilliant surprise attack!", i, 0, ch, TO_ROOM, NOTVICT);
-//         act("$n ambushes you as you enter the room!", i, 0, ch, TO_VICT, 0);
-//         act("You ambush $N with a brilliant surprise attack!", i, 0, ch, TO_CHAR, 0);
-         retval = damage(i, ch, GET_LEVEL(i) * 10, TYPE_HIT, SKILL_AMBUSH, 0); 
-         if(IS_SET(retval, eVICT_DIED))
-           return (eSUCCESS|eCH_DIED);  // ch = damage vict
-         if(IS_SET(retval, eCH_DIED))
-           return (eSUCCESS); // doesn't matter, but don't lag vict
-         if(!IS_MOB(i) && IS_SET(i->pcdata->toggles, PLR_WIMPY))
-            WAIT_STATE(i, PULSE_VIOLENCE * 3);
-         else WAIT_STATE(i, PULSE_VIOLENCE * 2);
-         WAIT_STATE(ch, PULSE_VIOLENCE * 1);
-       }
-       // we continue instead of breaking in case there are any OTHER rangers in the room
-     }
   }
   return eSUCCESS;
 }
@@ -977,8 +915,6 @@ int mob_arrow_response(struct char_data *ch, struct char_data *victim,
 {
   int dir2 = 0;
   int retval;
-
-  int attempt_move(CHAR_DATA *, int, int);
 
   /* this will make IS_STUPID mobs alot easier to kill with arrows,
      but then again, they _are_ 'stupid'.  Keeps people from tracking

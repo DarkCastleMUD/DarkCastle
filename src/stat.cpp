@@ -1,9 +1,7 @@
 #
-extern "C"
-{
 #include <ctype.h>
 #include <string.h>
-}
+
 #include <string>
 #include <map>
 #include <queue>
@@ -25,7 +23,6 @@ extern "C"
 #include "interp.h"
 
 using namespace std;
-
 
 extern int top_of_zone_table;
 extern zone_data *zone_table;

@@ -4,11 +4,11 @@
 |
 | Authors: DikuMUD, Pirahna, Staylor, Urizen, Rahz, Zaphod, Shane, Jhhudso, Heaven1 and others
 */
-extern "C"
-{
-  #include <ctype.h>
-}
+#include <ctype.h>
+#include <string.h>
+
 #include <queue>
+
 #include <fmt/format.h>
 
 #include "connect.h"
@@ -24,12 +24,12 @@ extern "C"
 #include "handler.h"
 #include "db.h"
 #include "act.h"
-#include <string.h>
 #include "returnvals.h"
 #include "spells.h"
 #include "clan.h"
 #include "arena.h"
 #include "inventory.h"
+#include "corpse.h"
 
 /* extern variables */
 
@@ -38,16 +38,6 @@ extern struct index_data *obj_index;
 extern struct index_data *mob_index;
 extern struct obj_data *object_list;
 extern int rev_dir[];
-
-/* extern functions */
-void save_corpses(void);
-char *fname(char *namelist);
-struct obj_data *create_money( int amount );
-int palm  (struct char_data *ch, struct obj_data *obj_object, struct obj_data *sub_object, bool has_consent);
-void special_log(char *arg);
-struct obj_data * bring_type_to_front(char_data * ch, int item_type);
-bool search_container_for_item(obj_data * obj, int item_number);
-bool search_container_for_vnum(obj_data * obj, int vnum);
 
 /* procedures related to get */
 void get(struct char_data *ch, struct obj_data *obj_object, struct obj_data *sub_object, bool has_consent, int cmd)
@@ -2503,3 +2493,151 @@ int do_unlock(CHAR_DATA *ch, char *argument, int cmd)
     return eSUCCESS;
 }
 
+int palm(CHAR_DATA *ch, struct obj_data *obj_object, struct obj_data *sub_object, bool has_consent)
+{
+  char buffer[MAX_STRING_LENGTH];
+
+  if (!has_skill(ch, SKILL_PALM) && !IS_NPC(ch))
+  {
+    send_to_char("You aren't THAT slick there, pal.\r\n", ch);
+    return eFAILURE;
+  }
+
+  if (!sub_object || sub_object->carried_by != ch)
+  {
+    if (IS_SET(obj_object->obj_flags.more_flags, ITEM_UNIQUE))
+      if (search_char_for_item(ch, obj_object->item_number, false))
+      {
+        send_to_char("The item's uniqueness prevents it!\r\n", ch);
+        return eFAILURE;
+      }
+    if (contents_cause_unique_problem(obj_object, ch))
+    {
+      send_to_char("Something inside the item is unique and prevents it!\n\r", ch);
+      return eFAILURE;
+    }
+  }
+
+  if (!charge_moves(ch, SKILL_PALM))
+    return eSUCCESS;
+
+  if (obj_index[obj_object->item_number].virt == CHAMPION_ITEM)
+  {
+    if (IS_NPC(ch) || GET_LEVEL(ch) <= 5)
+      return eFAILURE;
+    SETBIT(ch->affected_by, AFF_CHAMPION);
+    sprintf(buffer, "\n\r##%s has just picked up the Champion flag!\n\r", GET_NAME(ch));
+    send_info(buffer);
+  }
+
+  if (sub_object)
+  {
+    sprintf(buffer, "%s_consent", GET_NAME(ch));
+    if (has_consent && obj_object->obj_flags.type_flag != ITEM_MONEY)
+    {
+      if (isname("lootable", sub_object->name) && !isname(buffer, sub_object->name))
+      {
+        SET_BIT(sub_object->obj_flags.more_flags, ITEM_PC_CORPSE_LOOTED);
+        ;
+        struct affected_type pthiefaf;
+        WAIT_STATE(ch, PULSE_VIOLENCE * 2);
+        send_to_char("You suddenly feel very guilty...shame on you stealing from the dead!\r\n", ch);
+
+        pthiefaf.type = FUCK_PTHIEF;
+        pthiefaf.duration = 10;
+        pthiefaf.modifier = 0;
+        pthiefaf.location = APPLY_NONE;
+        pthiefaf.bitvector = -1;
+
+        if (affected_by_spell(ch, FUCK_PTHIEF))
+        {
+          affect_from_char(ch, FUCK_PTHIEF);
+          affect_to_char(ch, &pthiefaf);
+        }
+        else
+          affect_to_char(ch, &pthiefaf);
+      }
+    }
+    else if (has_consent && obj_object->obj_flags.type_flag == ITEM_MONEY && !isname(buffer, sub_object->name))
+    {
+      if (isname("lootable", sub_object->name))
+      {
+        struct affected_type pthiefaf;
+
+        pthiefaf.type = FUCK_GTHIEF;
+        pthiefaf.duration = 10;
+        pthiefaf.modifier = 0;
+        pthiefaf.location = APPLY_NONE;
+        pthiefaf.bitvector = -1;
+        WAIT_STATE(ch, PULSE_VIOLENCE);
+        send_to_char("You suddenly feel very guilty...shame on you stealing from the dead!\r\n", ch);
+
+        if (affected_by_spell(ch, FUCK_GTHIEF))
+        {
+          affect_from_char(ch, FUCK_GTHIEF);
+          affect_to_char(ch, &pthiefaf);
+        }
+        else
+          affect_to_char(ch, &pthiefaf);
+      }
+    }
+  }
+  move_obj(obj_object, ch);
+  char log_buf[MAX_STRING_LENGTH];
+  if (sub_object && sub_object->in_room && obj_object->obj_flags.type_flag != ITEM_MONEY)
+  { // Logging gold gets from corpses would just be too much.
+    sprintf(log_buf, "%s palms %s[%d] from %s", GET_NAME(ch), obj_object->name, obj_index[obj_object->item_number].virt,
+            sub_object->name);
+    log(log_buf, IMP, LOG_OBJECTS);
+    for (OBJ_DATA *loop_obj = obj_object->contains; loop_obj; loop_obj = loop_obj->next_content)
+      logf(IMP, LOG_OBJECTS, "The %s contained %s[%d]", obj_object->short_description, loop_obj->short_description,
+           obj_index[loop_obj->item_number].virt);
+  }
+  else if (!sub_object && obj_object->obj_flags.type_flag != ITEM_MONEY)
+  {
+    sprintf(log_buf, "%s palms %s[%d] from room %d", GET_NAME(ch), obj_object->name, obj_index[obj_object->item_number].virt,
+            ch->in_room);
+    log(log_buf, IMP, LOG_OBJECTS);
+    for (OBJ_DATA *loop_obj = obj_object->contains; loop_obj; loop_obj = loop_obj->next_content)
+      logf(IMP, LOG_OBJECTS, "The %s contained %s[%d]", obj_object->short_description, loop_obj->short_description,
+           obj_index[loop_obj->item_number].virt);
+  }
+
+  if (skill_success(ch, NULL, SKILL_PALM))
+  {
+    act("You successfully snag $p, no one saw you do it!", ch,
+        obj_object, 0, TO_CHAR, 0);
+    act("$n palms $p trying to hide it from your all knowing gaze.",
+        ch, obj_object, 0, TO_ROOM, GODS);
+  }
+  else
+  {
+    act("You clumsily take $p...", ch, obj_object, 0, TO_CHAR, 0);
+    if (sub_object)
+      act("$n gets $p from $P.", ch, obj_object, sub_object,
+          TO_ROOM, INVIS_NULL);
+    else
+      act("$n gets $p.", ch, obj_object, 0, TO_ROOM, INVIS_NULL);
+  }
+  if ((obj_object->obj_flags.type_flag == ITEM_MONEY) &&
+      (obj_object->obj_flags.value[0] >= 1))
+  {
+    obj_from_char(obj_object);
+    sprintf(buffer, "There was %d coins.\n\r",
+            obj_object->obj_flags.value[0]);
+    send_to_char(buffer, ch);
+    if (zone_table[world[ch->in_room].zone].clanowner > 0 && ch->clan !=
+                                                                 zone_table[world[ch->in_room].zone].clanowner)
+    {
+      int cgold = (int)((float)(obj_object->obj_flags.value[0]) * 0.1);
+      obj_object->obj_flags.value[0] -= cgold;
+      csendf(ch, "Clan %s collects %d bounty, leaving %d for you.\r\n", get_clan(zone_table[world[ch->in_room].zone].clanowner)->name, cgold,
+             obj_object->obj_flags.value[0]);
+      zone_table[world[ch->in_room].zone].gold += cgold;
+    }
+
+    GET_GOLD(ch) += obj_object->obj_flags.value[0];
+    extract_obj(obj_object);
+  }
+  return eSUCCESS;
+}

@@ -980,7 +980,6 @@ const char *host_list[] =
 bool allowed_host(char *host)
 { /* Wizlock uses hosts for wipe. */
    int i;
-   extern bool str_prefix(const char *astr, const char *bstr);
    for (i = 0; i < (int)((sizeof(host_list) / sizeof(char *))); i++)
       if (!str_prefix(host_list[i], host))
          return TRUE;
@@ -1034,10 +1033,6 @@ void nanny(struct descriptor_data *d, string arg)
    int y;
    char badclssmsg[] = "You must choose a class that matches your stats. These are marked by a '*'.\n\rSelect a class-> ";
    unsigned selection = 0;
-
-   CHAR_DATA *get_pc(char *name);
-   void remove_clan_member(int clannumber, struct char_data *ch);
-   extern bool str_prefix(const char *astr, const char *bstr);
    auto &character_list = DC::instance().character_list;
 
    ch = d->character;
