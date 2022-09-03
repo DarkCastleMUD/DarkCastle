@@ -2421,7 +2421,7 @@ string remove_non_color_codes(string input)
       }
       else
       {
-        log(fmt::format("Connection broken by peer {} not playing a character.", t->host), ANGEL, LOG_SOCKET);
+        log(fmt::format("Connection broken by peer {} not playing a character.", t->host), IMP+1, LOG_SOCKET);
       }
       
       return -1;
