@@ -534,7 +534,7 @@ int do_brew(char_data *ch, char *argument, int cmd)
     potion_color = "$B$1blue$R";
     break;
   case 6304:
-    potion_color = "$5brown$Rt";
+    potion_color = "$5brown$R";
     break;
   case 6305:
     potion_color = "$Bcrystalline$R";
