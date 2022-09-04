@@ -2687,9 +2687,9 @@ int do_cdeposit(CHAR_DATA *ch, char *arg, int cmd)
   GET_GOLD(ch) -= dep;
   get_clan(ch)->cdeposit(dep);
   if (dep == 1) {
-    csendf(ch,"You deposit 1 gold coin into your clan's account.\r\n");
+    csendf(ch,"You deposit 1 $B$5gold$R coin into your clan's account.\r\n");
   } else {
-    csendf(ch,"You deposit %d gold coins into your clan's account.\r\n",dep);
+    ch->send(fmt::format(locale("en_US.UTF-8"), "You deposit {:L} $B$5gold$R coins into your clan's account.\r\n", dep));
   }
   save_clans();
   do_save(ch,"",0);
