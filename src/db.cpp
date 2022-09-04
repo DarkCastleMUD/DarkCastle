@@ -1940,20 +1940,21 @@ void boot_world(void)
 
 	if (cf.test_world)
 	{
-    if (!(flWorldIndex = dc_fopen(WORLD_INDEX_FILE_TINY, "r")))
-	  {
-	    perror("dc_fopen");
-	    log("boot_world: could not open world index file tiny.", 0, LOG_BUG);
-	    abort();
-	  }
-	} else
+		if (!(flWorldIndex = dc_fopen(WORLD_INDEX_FILE_TINY, "r")))
+		{
+			perror("dc_fopen");
+			log("boot_world: could not open world index file tiny.", 0, LOG_BUG);
+			abort();
+		}
+	}
+	else
 	{
-    if (!(flWorldIndex = dc_fopen(WORLD_INDEX_FILE, "r")))
-    {
-      perror("dc_fopen");
-      log("boot_world: could not open world index file.", 0, LOG_BUG);
-      abort();
-    }
+		if (!(flWorldIndex = dc_fopen(WORLD_INDEX_FILE, "r")))
+		{
+			perror("dc_fopen");
+			log("boot_world: could not open world index file.", 0, LOG_BUG);
+			abort();
+		}
 	}
 
 	log("Booting individual world files", 0, LOG_MISC);
