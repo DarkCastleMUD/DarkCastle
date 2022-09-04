@@ -520,6 +520,7 @@ struct command_info cmd_info[] =
         {"maxcheck", do_findfix, nullptr, POSITION_DEAD, 103, CMD_DEFAULT, 0, 1},
         {"export", do_export, nullptr, POSITION_DEAD, IMP, CMD_DEFAULT, 0, 1},
         {"mscore", do_mscore, nullptr, POSITION_DEAD, 103, CMD_DEFAULT, 0, 1},
+        {"world", nullptr, do_world, POSITION_DEAD, IMP, CMD_DEFAULT, 0, 1},
 
         // Special procedure commands placed to not disrupt god commands
         {"setup", do_mortal_set, nullptr, POSITION_STANDING, 0, CMD_DEFAULT, 0, 1},

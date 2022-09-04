@@ -587,6 +587,7 @@ command_return_t do_wizhelp(CHAR_DATA *ch, char *argument, int cmd);
 command_return_t do_wizinvis(CHAR_DATA *ch, char *argument, int cmd);
 command_return_t do_wizlist(CHAR_DATA *ch, char *argument, int cmd);
 command_return_t do_wizlock(CHAR_DATA *ch, char *argument, int cmd);
+command_return_t do_world(char_data* ch, string args, int cmd);
 command_return_t do_write_skillquest(CHAR_DATA *ch, char *argument, int cmd);
 command_return_t do_write(CHAR_DATA *ch, char *argument, int cmd);
 command_return_t do_zap(CHAR_DATA *ch, char *argument, int cmd);

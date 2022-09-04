@@ -2,19 +2,20 @@
 | Level 110 wizard commands
 | 11/20/95 -- Azrack
 **********************/
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+
 #include <cstdlib>
 #include <cstring>
 #include <cctype>
 #include <cstdio>
-#include <sys/types.h>
-#include <sys/stat.h>
 #include <cassert>
-#include <unistd.h>
-
-
 #include <fstream>
 #include <iostream>
 #include <sstream>
+
+#include <fmt/format.h>
 
 #include "wizard.h"
 #include "utility.h"
@@ -960,4 +961,36 @@ int do_export(char_data *ch, char *args, int cmdnum)
 	logf(110, LOG_GOD, "Exported objects as %s.", filename);
 
 	return eSUCCESS;
+}
+
+command_return_t do_world(char_data* ch, string args, int cmd)
+{
+  
+  if (args == "rename")
+  {
+    auto world = world_file_list;
+    while (world != nullptr)
+    {    
+      stringstream potential_filename = {};
+      potential_filename << world->firstnum << "-" << world->lastnum << ".txt";
+      if (strcmp(world->filename, potential_filename.str().c_str()))
+      {
+        ch->send(fmt::format("filename: {} firstnum: {} lastnum: {} flag: {}\r\n", world->filename, world->firstnum, world->lastnum, world->flags));
+        ch->send(fmt::format("Renaming {} to {}\r\n", world->filename, potential_filename.str()));
+        
+        if (rename(world->filename,potential_filename.str().c_str()) == -1)
+        {
+          auto rename_errno = errno;
+          char* errStr = strerror(rename_errno);
+          if (errStr != nullptr)
+          {
+            ch->send(fmt::format("Error renaming {} to {} was {} {}", world->filename, potential_filename.str().c_str(), rename_errno, errStr));
+          }
+        }
+      }
+      world = world->next;
+    }
+  }
+
+  return eSUCCESS;
 }
