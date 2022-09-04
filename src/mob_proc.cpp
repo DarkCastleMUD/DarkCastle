@@ -842,58 +842,82 @@ int francis_guard(struct char_data *ch, struct obj_data *obj, int cmd, const cha
 *  Special procedures for mobiles                                      *
 ******************************************************************** */
 
-int guild_guard(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
-          struct char_data *owner)
+int guild_guard(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg,
+                struct char_data *owner)
 {
-    if (cmd>6 || cmd<1)
-	return eFAILURE;
-    int dir = 0,clas=0, align = 0, dir2 = 0;
-    // TODO - go through these and remove all of the ones that are in
-    // room that no longer exist on the mud
-    // 3 = south, 2 = east, 5 = up
-    // 1 = north, 4  = west, 6 = down
-
-    switch (world[ch->in_room].number)
-    {
-	case 1978:
-	  dir = 4; clas = CLASS_MAGIC_USER; break;
-	case 1910:
-	  dir = 1; clas = CLASS_THIEF; break;
-	case 3004:
-	  dir = 0; clas = CLASS_CLERIC; break;
-	case 1960:
-	  dir = 0; clas = CLASS_MONK; break;
-	case 1926:
-	  dir = 0; clas = CLASS_BARBARIAN; break;
-	case 1968:
-	  dir = 0; clas = CLASS_PALADIN; align = 3; break;
-	case 1942:
-	  dir = 2; clas = CLASS_WARRIOR; break;
-	case 1988:
-	  dir = 2; clas = CLASS_DRUID; break;
- 	case 1900:
-	  dir = 3; clas = CLASS_BARD; break;
-	case 1920:
-	  dir = 3; align = 1; clas = CLASS_ANTI_PAL; break;
-	case 1935:
-	  dir = 3; clas = CLASS_RANGER; break;
-        default: return eFAILURE;
-    }
-    dir++;
-//    cmd++;
-    if ((cmd == dir || cmd == dir2) && (
-        (!IS_MOB(ch) && (affected_by_spell(ch, FUCK_PTHIEF) || 
-affected_by_spell(ch, FUCK_GTHIEF) || IS_AFFECTED(ch, AFF_CHAMPION))) ||
-GET_CLASS(ch) != clas || (align == 1 && !IS_EVIL(ch)) || (align == 3 && 
-!IS_GOOD(ch)))) {
-	act( "The guard humiliates $n, and blocks $s way.",
-	    ch, 0, 0, TO_ROOM , 0);
-	send_to_char(
-	    "The guard humiliates you, and blocks your way.\n\r", ch );
-	return eSUCCESS;
-    }
-
+  if (cmd > 6 || cmd < 1)
     return eFAILURE;
+  int dir = 0, clas = 0, align = 0, dir2 = 0;
+  // TODO - go through these and remove all of the ones that are in
+  // room that no longer exist on the mud
+  // 3 = south, 2 = east, 5 = up
+  // 1 = north, 4  = west, 6 = down
+
+  switch (world[ch->in_room].number)
+  {
+  case 1978:
+    dir = 4;
+    clas = CLASS_MAGIC_USER;
+    break;
+  case 1910:
+    dir = 1;
+    clas = CLASS_THIEF;
+    break;
+  case 3004:
+    dir = 0;
+    clas = CLASS_CLERIC;
+    break;
+  case 1960:
+    dir = 0;
+    clas = CLASS_MONK;
+    break;
+  case 1926:
+    dir = 0;
+    clas = CLASS_BARBARIAN;
+    break;
+  case 1968:
+    dir = 0;
+    clas = CLASS_PALADIN;
+    align = 3;
+    break;
+  case 1942:
+    dir = 2;
+    clas = CLASS_WARRIOR;
+    break;
+  case 1988:
+    dir = 2;
+    clas = CLASS_DRUID;
+    break;
+  case 1900:
+    dir = 3;
+    clas = CLASS_BARD;
+    break;
+  case 1920:
+    dir = 3;
+    align = 1;
+    clas = CLASS_ANTI_PAL;
+    break;
+  case 1935:
+    dir = 3;
+    clas = CLASS_RANGER;
+    break;
+  default:
+    return eFAILURE;
+  }
+  dir++;
+  //    cmd++;
+  if ((cmd == dir || cmd == dir2) && ((!IS_MOB(ch) && (affected_by_spell(ch, FUCK_PTHIEF) ||
+                                                       affected_by_spell(ch, FUCK_GTHIEF) || IS_AFFECTED(ch, AFF_CHAMPION))) ||
+                                      GET_CLASS(ch) != clas || (align == 1 && !IS_EVIL(ch)) || (align == 3 && !IS_GOOD(ch))))
+  {
+    act("The guard humiliates $n, and blocks $s way.",
+        ch, 0, 0, TO_ROOM, 0);
+    send_to_char(
+        "The guard humiliates you, and blocks your way.\n\r", ch);
+    return eSUCCESS;
+  }
+
+  return eFAILURE;
 }
 
 int clan_guard(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg,
