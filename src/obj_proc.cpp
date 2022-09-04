@@ -701,10 +701,7 @@ int bank(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg,
 
   /* balance */
   if(cmd == CMD_BALANCE) {
-    stringstream ss;
-    ss.imbue(locale("en_US"));
-    ss << GET_BANK(ch);
-    csendf(ch, "You have %s $B$5gold$R coins in the bank.\r\n", ss.str().c_str());
+    ch->send(fmt::format(locale("en_US.UTF-8"), "You have {:L} $B$5gold$R coins in the bank.\r\n", GET_BANK(ch)));
     return eSUCCESS;
   }
 
@@ -733,6 +730,7 @@ int bank(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg,
     GET_GOLD(ch) -= x;
     GET_BANK(ch) += x;
     ch->send(fmt::format(locale("en_US.UTF-8"), "You deposit {:L} $B$5gold$R coins.\r\n", x));
+    do_save(ch, "", 9);
     return eSUCCESS;
   }
 
@@ -749,7 +747,7 @@ int bank(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg,
   GET_GOLD(ch) += x;
   GET_BANK(ch) -= x;
   ch->send(fmt::format(locale("en_US.UTF-8"), "You withdraw {:L} $B$5gold$R coins.\r\n", x));
-  save_char_obj(ch);
+  do_save(ch, "", 9);
   return eSUCCESS;
 }
 
@@ -786,10 +784,8 @@ int casino_atm(struct char_data *ch, struct obj_data *obj, int cmd, const char *
   }
   GET_GOLD(ch) += x;
   GET_BANK(ch) -= x;
-  //sprintf(buf, "You withdraw %d coins.\n\r", x);
-  //send_to_char(buf, ch);
   ch->send(fmt::format(locale("en_US.UTF-8"), "You withdraw {:L} $B$5gold$R coins.\r\n", x));
-  save_char_obj(ch);
+  do_save(ch, "", 9);
   return eSUCCESS;
 }
 
@@ -1719,7 +1715,7 @@ int restring_machine(struct char_data *ch, struct obj_data *obj, int cmd, const 
                "Your item looks new!\r\n\r\n"
                , ch);
 
-  save_char_obj(ch);
+  do_save(ch, "", 9);
   return eSUCCESS;
 }
 
