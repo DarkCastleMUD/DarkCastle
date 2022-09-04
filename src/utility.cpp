@@ -1743,7 +1743,19 @@ int do_home(struct char_data *ch, char *argument, int cmd)
 
 int do_not_here(struct char_data *ch, char *argument, int cmd)
 {
-    send_to_char("Sorry, but you cannot do that here!\n\r",ch);
+  switch(cmd)
+  {
+    case CMD_SELL:
+    ch->send("You can't sell anything here!\r\n");
+    break;
+    case CMD_ERASE:
+    ch->send("You can't erase anything here!\r\n");
+    break;
+    default:
+    ch->send("Sorry, but you cannot do that here!\r\n");
+    break;
+  }
+    
     return eSUCCESS;
 }
 
