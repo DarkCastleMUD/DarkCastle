@@ -1431,6 +1431,7 @@ string generate_prompt(CHAR_DATA *ch)
   char *pro = nullptr;
   char *prompt = nullptr;
   pro = prompt = new char[MAX_STRING_LENGTH];
+  memset(pro, 0, sizeof(pro));
   char *mobprompt = "HP: %i/%H %f >";
 
   if (IS_NPC(ch))
