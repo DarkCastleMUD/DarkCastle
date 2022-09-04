@@ -1,0 +1,1648 @@
+#9900
+bonfire~
+A bonfire~
+A bonfire burns brightly here.~
+~
+12 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#9995
+bank window teller~
+the bank window~
+A bank teller window protrudes from the wall... it deserves closer scrutiny.~
+~
+23 0 0 0
+0 0 0 0 0
+0 0 0
+E
+bank window teller~
+Commands:  balance, deposit, and withdraw.
+~
+S
+#9996
+board builder~
+The Builder's bulletin board~
+The Builder's bulletin board is mounted here for the Builders to use.~
+~
+23 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#9997
+board implementer~
+The Implementer's bulletin board~
+The Implementer's bulletin board is mounted here for the Imps to use.~
+~
+23 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#9999
+board wizard~
+The Wizard's bulletin board~
+The Wizard's bulletin board is mounted here for the Gods to use.~
+~
+23 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#10000
+beheader sword holy avenger~
+the HOLY Avenger~
+A huge sword of unmatched power lies here.~
+~
+5 8454208 8193 1
+0 5 7 3 48
+20 70000 4
+A
+18 7
+A
+19 6
+A
+403000 20
+S
+#10001
+beheader sword holy avenger~
+Azrack's HOLY Avenger~
+A huge sword of holy power lies here.~
+~
+5 8388672 8193 1
+0 5 7 3 48
+25 70000 0
+A
+18 7
+A
+19 6
+S
+#10002
+potion green~
+a $2$Bgreen$R potion of remove poison~
+A small $2$Bgreen$1$B potion has carelessly been left here.$R~
+~
+10 16 16385 1
+12 43 -1 -1 0
+1 30000 0
+E
+potion green~
+The potion has a small label 'Cure for the sick and dying.'
+~
+S
+#10003
+potion deep blue~
+a $B$1deep blue$R potion~
+A deep blue potion has carelessly been left here.~
+~
+10 16 16385 1
+30 28 28 28 0
+1 100 1
+E
+potion deep blue~
+The potion has a small label 'Mend them wounds.'
+~
+S
+#10004
+vial deep red~
+a $4deep red$R vial~
+A$R $4deep red$1$B vial has carelessly been left here.$R~
+~
+10 16 16385 1
+30 90 90 90 0
+1 100 1
+E
+deep red vial~
+The vial has a small label 'Revive the Mind.'
+~
+S
+#10008
+staff arch angel godload gl~
+the Arch-Angel's Staff~
+a staff of hardest wood emits a holy light.~
+~
+5 0 0 0
+0 5 8 7 0
+0 0 0
+E
+staff arch angel~
+Forged of a previously undiscovered tree bark, this tall thin staff
+is highly polished and smooth as the wind, except for a small area in
+the middle which is covered with a reddish-brown copper wire to aid in
+a solid grip.
+~
+A
+45 20
+A
+41 20
+A
+26 6
+S
+#10009
+poinard flickering godload gl~
+A Flickering Poinard~
+A thin dagger shoots off sparks from its tip.~
+~
+5 0 0 0
+0 5 7 9 0
+0 0 0
+E
+poinard flickering~
+Perhaps a foot in length, this dagger's blade is shaped like a lanceolate
+leaf, wider in the middle than beginning or end.  The metal of its
+surface corruscates with sparks, which chase along the blade from end to
+end in an endless dance.  The hilt is wrapped with soft leather braiding to
+form a sure grip.
+~
+A
+62 30
+A
+40 10
+A
+18 7
+A
+19 5
+S
+#10010
+hammer shartis spiritbane spirit bane godload gl~
+Shartis Spiritbane~
+A massive hammer lies here in silence.~
+~
+5 0 0 0
+0 6 8 5 0
+0 0 0
+E
+shartis spirit bane spiritbane hammer~
+The odd head of this hammer is pierced with a number of strange holes
+which reverberate as the wind created by the weapon's swing rush through
+them. The shaft is a black, iron hard wood, unadorned by any marking.
+~
+A
+26 7
+A
+60 10
+A
+44 35
+S
+#10011
+blade prankquean godload gl~
+the Prankquean's Blade~
+A blade carved from a single piece of oak lies here.~
+~
+5 0 0 0
+0 4 11 3 0
+0 0 0
+E
+blade prankquean~
+Carved from a single piece of well-aged oak wood, this sword's surface
+surface shines with a polished gleam.  The hilt is carved with a design of
+acorns and ivy leaves, and etched into the blade itself, almost
+imperceptible, is a spiderwebbing of indecipherable runes.
+~
+A
+49 10
+A
+18 5
+A
+19 7
+A
+44 15
+S
+#10012
+un-sword unsword godload gl~
+the Un-Sword~
+Something lies here that is probably not a sword.~
+~
+5 0 0 0
+0 10 5 6 0
+0 0 0
+E
+un-sword unsword~
+You see here something that is clearly not made to be used as a weapon and
+which only the most twisted of souls would try to use as such.
+~
+A
+30 100
+A
+34 100
+A
+26 7
+S
+#10013
+rune-sword runesword godload gl~
+an Ivory Hilted Rune-Sword~
+A long sword lies here, its pale blade covered with runes.
+~
+~
+5 0 0 0
+0 6 8 3 0
+0 0 0
+E
+rune-sword runesword~
+The hilt of this long slender sword is carved from pale ivory, the pommel
+wrapped with black leather braiding to provide a sure grip.  The blade
+itself is darkened steel, traced with ancient glyphs whose lines glimmer
+with mystic power.
+~
+A
+61 10
+A
+58 2
+A
+26 8
+S
+#10014
+dagger glass godload gl~
+a Glass Dagger~
+A slim dagger, its blade as clear as crystal, lies here.
+~
+~
+5 0 0 0
+0 3 14 11 0
+0 0 0
+E
+glass dagger~
+This slim dagger is fashioned from some glassy substance, so clear you can
+hold it to your eyes and view the world through it.  Even the hilt is
+glass, although smoothed to keep from cutting the unwary fingers of the
+wielder.
+~
+A
+54 5
+A
+49 8
+A
+26 5
+S
+#10015
+whip flaming phoenix godload gl~
+the Flaming Whip of the Phoenix~
+A whip, made of braided lines of flame, lies here.
+~
+~
+5 0 0 0
+0 4 9 1 0
+0 0 0
+E
+whip flaming phoenix~
+The shaft of this whip is a greenish leather, worn with age and handling.
+A coppery sheen lies along its surface.  Attached to it are three lengths
+of braided fire, crackling and sizzling as they twitch.
+~
+A
+57 15
+A
+26 7
+A
+43 15
+A
+44 5
+S
+#10016
+blade mirrors godload gl~
+the Blade of Mirrors~
+A sparkling blade reflects everything around it.
+~
+~
+5 0 0 0
+0 5 7 11 0
+0 0 0
+E
+blade mirrors~
+Made of some strange glassy substance, this short blade's shiny substance
+reflects everything around in perfect, undistorted lines.  The hilt is
+black, but reflects as well as the blade itself, although coloring
+everything
+it shows.
+~
+A
+73 5
+A
+26 7
+A
+67 100
+S
+#10017
+chaplet flame godload gl~
+a Chaplet of Flame~
+
+A circlet of living flame flickers here.~
+~
+9 0 0 0
+10 0 0 0 0
+0 0 0
+E
+chaplet flame~
+Fine lines of living flame, shaped by arcane magickal techniques into
+tangible form, have been woven into a circlet designed to be worn on the
+head.  The fire flickers in shades of red and purple and gold, dancing back
+and forth in endless motion.
+~
+A
+13 35
+A
+64 100
+A
+26 4
+A
+12 35
+S
+#10018
+crown spring blossoms godload gl~
+a Crown of Spring Blossoms~
+A crown of sweet smelling white flowers lies here wilting.~
+~
+9 0 0 0
+3 0 0 0 0
+0 0 0
+E
+crown spring blossoms~
+Sprays of white blossoms, smelling sweetly of honey and apples, have been
+woven into a fragile crown.  Several bees crawl from flower to flower,
+savoring the nectar there.
+~
+A
+13 100
+A
+17 10
+A
+26 5
+A
+12 50
+S
+#10019
+helm battles godload gl~
+The Helm of Battles~
+A stern battle helm, forged of unadorned iron, scowls here.~
+~
+9 0 0 0
+20 0 0 0 0
+0 0 0
+E
+helm battles~
+Dark steel has been forged into the shape of a helm, utterly unadorned,
+and clearly intended to protect its wearer's face in battle.
+Two thin eye slots allow the wearer to survey whatever battlefield he or
+she is master of.
+~
+A
+13 50
+A
+14 50
+A
+26 6
+S
+#10020
+crown carnival carnivals godload gl~
+the Crown of Carnivals~
+A crown of glittering colors, studded with gems, sits here.~
+~
+9 0 0 0
+3 0 0 0 0
+0 0 0
+E
+crown carnival carnivals~
+Bright and gaudy, this golden crown is covered with multifaceted gems in
+every color imaginable, which may or may not be real.  Elaborate filagree
+covers every fingerspan of metal not studded with glittering gems.
+~
+A
+74 100
+A
+26 5
+S
+#10021
+tabard rose embroidered godload gl~
+A Rose Embroidered Tabard~
+A silken tabard, embroidered with crimson blossoms, lies in a heap.~
+~
+9 0 0 0
+3 0 0 0 0
+0 0 0
+E
+tabard rose embroidered~
+A tabard woven of thick cream colored silk, this garment is designed to be
+worn on the body, coming down to mid thigh.  Dancing across its surface
+are countless lines of thorny vines, sporting complicated crimson blossoms, so
+real seeming you almost expect to prick a finger or smell their sweet scent.
+~
+A
+13 100
+A
+2 2
+A
+66 10
+A
+26 3
+S
+#10022
+tunic ebon godload gl~
+an Ebon Tunic~
+A tunic of black velvet lies here in graceful folds.~
+~
+9 0 0 0
+10 0 0 0 0
+0 0 0
+E
+tunic ebon~
+Sewn of unadorned black velvet, this tunic is simply cut, leaving arms and
+legs bare.  Its darkness is so absolute it seems to pull the eye into its
+fathomless depths.
+~
+A
+17 10
+A
+26 5
+A
+12 50
+S
+#10023
+breastplate plate dragonbone godload gl~
+a Dragonbone Breastplate~
+A breastplate carved of heavy gray bone sits here.~
+~
+9 0 0 0
+50 0 0 0 0
+0 0 0
+E
+breastplate dragonbone~
+This breastplate has been laboriously carved from a single piece of
+durable, magic-permeated dragonbone into a breastplate that is both thick
+and heavy.  Its surface is roughly hewn but serviceable, despite its lack of
+ornament.
+~
+A
+13 100
+A
+26 5
+S
+#10024
+vest pale leather godload gl~
+a Vest of Pale Leather~
+A vest, sewn of pale leather, lies here.~
+~
+9 0 0 0
+3 0 0 0 0
+0 0 0
+E
+vest pale leather~
+The leather of this vest seems ominously pale and hairless, as though it
+may have come from some humanoid.   The edges are untrimmed and rough, as
+though hastily made.
+~
+A
+13 40
+A
+65 100
+A
+26 4
+S
+#10025
+breastplate silver-etched steel black godload gl~
+a silver-etched black-steel breastplate~
+A breastplate of $0$Bblack$1$B steel, etched with lines of silver, lies here.$R~
+.~
+9 0 0 0
+20 0 0 0 0
+0 0 0
+E
+breastplate silver-etched steel black~
+Fashioned from dark steel, quenched in unknown waters, this breastplate
+has a surface covered with a writhing tangle of fine silver lines, which
+squirm uneasily beneath your gaze as you try to make out their patterns.
+~
+A
+72 100
+A
+25 30
+A
+26 5
+S
+#10026
+buckler copper godload gl~
+a Copper Buckler~
+A round copper shield is marked by the dents of battle.~
+~
+9 0 0 0
+3 0 0 0 0
+0 0 0
+E
+buckler copper~
+This round shield is made of beaten copper overlaid on steel.  A broad
+black leather strap is fastened across the back to allow it to be worn on
+one arm.  The boss in the very center is made of inlaid turquoise in a
+star-shaped pattern.
+~
+A
+1 3
+A
+17 40
+A
+26 7
+S
+#10027
+shield stormlord godload gl~
+the Shield of the Stormlord~
+A silver shield, blazoned with thunderbolts, lies here.~
+~
+9 0 0 0
+3 0 0 0 0
+0 0 0
+E
+shield stormlord~
+Oblong in shape, this shield has been forged from a silvery metal which
+appears harder than steel itself.
+~
+A
+72 100
+A
+73 5
+A
+17 50
+A
+26 5
+S
+#10028
+breeches stormlord stormlord's godload gl~
+the Stormlord's Breeches~
+A pair of grey breeches, embroidered with thunderbolts, lies here.~
+~
+9 0 0 0
+3 0 0 0 0
+0 0 0
+E
+breeches stormlord stormlord's~
+Made of a strange tough fabric, grey and silky in appearance, these tough
+pants have been embroidered from waist to ankle with silver bolts of
+lightning.  Strange sparkles dance along the surface, as though magic
+permeates the warp and woof of the fabric itself.
+~
+A
+1 2
+A
+17 10
+A
+26 5
+A
+74 100
+S
+#10029
+leggings woodswalker godload gl~
+the Leggings of the Woodswalker~
+A pair of leggings, made of woven strips of soft leather, lie here.~
+~
+9 0 0 0
+5 0 0 0 0
+0 0 0
+E
+leggings woodswalker~
+This pair of leggings are made from strips of a thin brown leather, tanned
+to the softness of clouds, woven together tightly.  They are cut full and
+comfortable through the waist and legs, but gather at the ankles,
+apparently so they can be tucked inside boots.
+~
+A
+29 100
+A
+26 4
+A
+67 50
+A
+12 100
+S
+#10030
+greaves steel gilded godload gl~
+Greaves of Gilded Steel~
+Greaves of steel, edges sparkling with golden gilt, lie here.~
+~
+9 0 0 0
+20 0 0 0 0
+0 0 0
+E
+greaves steel gilded~
+These greaves have been formed of steel which sparkles with its newness,
+as though they've never experienced the rigors of battle.  Their surface
+is chased with fine lines depicting the glories of the hunt, and traces of
+golden gilt run along their edges.
+~
+A
+13 75
+A
+26 6
+A
+5 2
+S
+#10031
+leggings ebon godload gl~
+Ebon Leggings~
+Black leather leggings, studded with silver, lie here.~
+~
+9 0 0 0
+3 0 0 0 0
+0 0 0
+E
+leggings ebon~
+These loose leggings are made of supple black leather, and reinforced with
+bands and studs of silver designed to turn a hasty blade.  The waist is
+reinforced with a chain of silver links, sewn to the leather  to shape and
+hold it, and silver bands hold the cuffs in place.
+~
+A
+29 100
+A
+13 100
+A
+26 5
+A
+28 100
+S
+#10032
+buskins boartooth studded godload gl~
+Boartooth Studded Buskins ~
+A pair of buskins, studded with jagged teeth, sit here.~
+~
+9 0 0 0
+0 0 0 0 0
+0 0 0
+E
+buskins boartooth studded~
+These laced half boots reach halfway to the knee.  Made of thick dark
+leather, they lack any adornment save the jagged line of teeth sewn along
+the outside edge.  Their toes are capped with brass, which glints dully in the
+light.
+~
+A
+13 100
+A
+14 100
+A
+19 7
+S
+#10033
+slippers dancer shadow godload gl~
+the Slippers of the Shadow Dancer~
+Slippers of soft velvet, sewn with tiny mirrors, sparkle here.~
+~
+9 0 0 0
+2 0 0 0 0
+0 0 0
+E
+slippers shadow dancer~
+This pair of slippers has been sewn of a dark red velvet, almost the color
+of dried blood, and soled in a soft black leather which provides a
+surefooted grip for the wearer.  Tiny silver mirrors are fastened all over
+the upper part, sparkling brilliantly with the wearer's every movement.
+~
+A
+77 100
+A
+30 100
+A
+73 5
+A
+26 4
+S
+#10034
+boots windwalker windwalker's godload gl~
+the Windwalker's Boots~
+Boots of pale blue leather, reaching mid-calf, lie here.~
+~
+9 0 0 0
+3 0 0 0 0
+0 0 0
+E
+boots windwalker windwalker's~
+These sturdy looking boots are fashioned of a supple blue leather, which
+appears to be its natural color, rather than dyed.  Their brief cuff
+reaches mid calf, fitting tightly, and they are laced with strands of misty
+white.
+~
+A
+69 100
+A
+26 5
+A
+12 100
+S
+#10035
+hooves ki-rin ki-rin's godload gl~
+the Ki-Rin's Hooves~
+A pair of hooves, sparkling in prismatic colors, lies here.~
+~
+9 0 0 0
+3 0 0 0 0
+0 0 0
+E
+hooves ki-rin ki-rin's~
+These hooves look as though they have been carefully preserved, perhaps
+through some sorcerous mean.  Leather straps have been attached to allow
+them to be fastened to someone's feet, although they look deceptively
+ungainly and ungraceful.
+~
+A
+14 100
+A
+25 30
+A
+4 3
+A
+26 5
+S
+#10036
+armbands durance godload gl~
+the Armbands of Durance~
+Plain black armbands spark with unknown energies.~
+~
+9 0 0 0
+10 0 0 0 0
+0 0 0
+E
+armbands durance~
+These thick black armbands have been forged of blackened iron, but they
+hum softly, almost glowing, with energy from some unknown, mystical
+source.  They are perfectly plain except for a small sigil on the right one,
+which looks like a tiny 'D' and 'C' combined.
+~
+A
+13 100
+A
+1 4
+A
+26 5
+S
+#10037
+bands thorn twisted godload gl~
+Bands of Twisted Thorn~
+Bands of dried and twisted thorny vines curl here.~
+~
+9 0 0 0
+3 0 0 0 0
+0 0 0
+E
+bands thorn twisted~
+Lengths of vines, long dead and tipped with cruel looking thorns, whose
+tips glisten with a faint trace of clear liquid, have been twisted into a
+pair of wickerwork armbands, meant to be worn high on the upper arm.
+~
+A
+13 100
+A
+78 100
+A
+26 4
+A
+5 3
+S
+#10038
+bracers north wind wind's godload gl~
+the North Wind's Bracers~
+Blue and white bracers, glimmering with frost, lie here.~
+~
+9 0 0 0
+3 0 0 0 0
+0 0 0
+E
+bracer north wind wind's~
+Covered with a pale coating of frost crystals, these bracers appear to
+have been carved out of wood and painted with pale blue and white hues,
+some
+of which has worn away, allowing the grain below to show through.  They
+fasten tightly with silver buckles.
+~
+A
+70 100
+A
+64 100
+A
+26 4
+S
+#10039
+wisp starlight godload gl~
+a Wisp of Starlight~
+A strip of starlight, impossibly thin, drifts here.~
+~
+9 0 0 0
+3 0 0 0 0
+0 0 0
+E
+wisp starlight~
+This scrap of aether, impossibly thin to the point of being almost
+intangible, is strewn with the dim sparkle of distant stars.   It looks as
+though it might have been torn from the sky by the arcane workings of some
+powerful sorcerer.
+~
+A
+29 100
+A
+32 100
+A
+66 5
+A
+26 3
+S
+#10040
+mask golem golem's godload gl~
+the Golem's Mask~
+A mask of blank brown leather scowls here.~
+~
+9 0 0 0
+30 0 0 0 0
+0 0 0
+E
+mask golem golem's~
+Thick brown leather, boiled and permeated with wax to give it an unnatural
+solidity, has been shaped into a large mask, consisting of two reinforced
+eyeholes and a wide frowning gap to serve as mouthpiece.
+~
+A
+13 100
+A
+17 30
+A
+26 5
+S
+#10041
+eyes stolen seaqueen godload gl~
+the Seaqueen's Stolen Eyes~
+Two cups of thin green glass sit here.~
+~
+9 0 0 0
+3 0 0 0 0
+0 0 0
+E
+eyes stolen seaqueen~
+Green glass, pale as new leaves, has been shaped into two tiny cups,
+apparently designed to fit over the wearer's eyes, covering them
+completely and allowing their sight new reaches.
+~
+A
+29 100
+A
+32 100
+A
+26 4
+A
+68 100
+S
+#10042
+goggles mason mason's mystical godload gl~
+the Mason's Mystical Goggles~
+A pair of purple lensed goggles sit here.~
+~
+9 0 0 0
+5 0 0 0 0
+0 0 0
+E
+goggles mason mason's mystical~
+Made of thick purple glass, the lenses of these bulky goggles are fastened
+in place with large clips of silver wire, which bind them into a brown
+leather framework which fits tightly around the wearer's skull.
+~
+A
+13 50
+A
+26 5
+A
+28 100
+A
+12 100
+S
+#10043
+necklace skulls hollow-eyed godload gl~
+a Necklace of Hollow-Eyed Skulls~
+A necklace of skulls, teeth chittering ominously, dangles here.~
+~
+9 0 0 0
+3 0 0 0 0
+0 0 0
+E
+necklace skulls hollow-eyed~
+A string of tiny humanoid skulls is linked together with loops of silver
+wire in an eerie necklace.  The skulls seem to still be animate, their
+minuscule pointed teeth clicking and gnashing in futile rage.
+~
+A
+13 100
+A
+72 100
+A
+73 5
+A
+26 4
+S
+#10044
+string jackal's teeth godload gl~
+a String of Jackal's Teeth~
+A necklace of long teeth, yellowed with age, lies here.~
+~
+9 0 0 0
+20 0 0 0 0
+0 0 0
+E
+string jackal's teeth~
+Jackals' teeth, long and pointed, have had holes bored in the upper root
+to allow them to be strung together by means of a thin leather thong in a
+double loop.
+~
+A
+17 10
+A
+26 5
+A
+12 100
+S
+#10045
+choker emerald studded emerald-studded godload gl~
+an Emerald-Studded Choker~
+A thin leather choker, studded with uncut emeralds, lies here.~
+~
+9 0 0 0
+3 0 0 0 0
+0 0 0
+E
+choker emerald studded emerald-studded~
+A half inch band of brown leather, edged with silver wire, has been made
+into a choker which fits tightly around the neck.  All over its length are
+fastened uncut emeralds, lumps of dull green the size of a fingertip.
+~
+A
+13 100
+A
+71 100
+A
+26 5
+S
+#10046
+lightning chain godload gl~
+a Chain of Lightning~
+A necklace of electricity, sizzling with arcane energy, lies here.~
+~
+9 0 0 0
+10 0 0 0 0
+0 0 0
+E
+lightning chain~
+The thin silver links of this necklace glimmer and gleam as tiny traces of
+electricity spark and hiss from link to link.  The workmanship is
+exceedingly fine, almost dwarvish in its quality.
+~
+A
+25 20
+A
+74 100
+A
+26 5
+A
+12 75
+S
+#10047
+necklace dryad dryad's godload gl~
+the Dryad's Necklace~
+A necklace of copper colored leaves of ivy crumbles here.
+~
+~
+9 0 0 0
+10 0 0 0 0
+0 0 0
+E
+necklace dryad dryad's~
+Tricornered leaves of ivy have been fashioned out of paper thin pieces of
+copper, linked together with almost imperceptible circles of gold in a
+long strand designed to be worn as a necklace.
+~
+A
+13 50
+A
+26 4
+A
+67 100
+A
+12 100
+S
+#10048
+heart mountain mountain's ring godload gl~
+the Mountain's Heart ~
+A stoney piece of rock, made into a crude circle, sits here.
+~
+~
+9 0 0 0
+10 0 0 0 0
+0 0 0
+E
+heart mountain mountain's ring~
+A piece of smooth grey marble, unmarked and unadorned by any irregularity
+in the mineral, has been shaped to form a perfect ring, sized to fit a
+broad finger.
+~
+A
+77 100
+A
+13 75
+A
+17 30
+A
+26 5
+S
+#10049
+ring stardaughter stardaughter's godload gl~
+the Stardaughter's Ring~
+A dainty loop of tri-colored gold sparkles here.~
+~
+9 0 0 0
+10 0 0 0 0
+0 0 0
+E
+ring stardaughter stardaughter's~
+Three colors of gold, pale, ruddy and yellow as sunlight, have been shaped
+into three strands, braided together in an intricate loop to be worn
+around
+the finger.
+~
+A
+13 100
+A
+4 3
+A
+26 5
+A
+12 100
+S
+#10050
+band starlight ring godload gl~
+a band of starlight~
+A fragile bit of starlight has been spun by arcane means into a ring.~
+~
+9 0 0 0
+3 0 0 0 0
+0 0 0
+E
+band starlight ring~
+Starlight, barely visible, has been somehow solidified, no doubt through
+powerful sorcery and its fragile substance formed into a slender,
+glimmering ring.
+~
+A
+69 100
+A
+26 6
+A
+12 75
+S
+#10051
+ivy loop godload gl~
+a loop of ivy~
+A strand of ivy, green leafed, grows in a perfect circle.~
+~
+9 0 0 0
+10 0 0 0 0
+0 0 0
+E
+ivy loop~
+This loop of plantlife manages to seem perfectly fresh and green, as
+though picked from the earth only seconds ago before being formed into a
+dainty ring.
+~
+A
+13 100
+A
+78 100
+A
+26 5
+S
+#10052
+twist mane braided godload gl~
+a Twist of Braided Mane~
+A loop of braided horsehair rolls on the ground here.~
+~
+9 0 0 0
+3 0 0 0 0
+0 0 0
+E
+twist mane braided~
+Horsehair, glimmering with the first colors of sunrise, yellow and ivory,
+has been braided into a bracelet.  A pair of turquoise beads, shaped like
+tiny crescent moons, function to hold its ends closed so retain its circular
+shape.
+~
+A
+13 100
+A
+14 100
+A
+25 20
+A
+26 5
+S
+#10053
+bangle gitana gitana's godload gl~
+the Gitana's Bangle~
+A silver bangle lies here, studded with bright glass.~
+~
+9 0 0 0
+10 0 0 0 0
+0 0 0
+E
+bangle gitana gitana's~
+This whisker thin bangle is made of silver, and all along its rim are
+mounted bright gems, glittering through all the shades of the spectrum.
+~
+A
+69 100
+A
+14 100
+A
+26 5
+A
+12 100
+S
+#10054
+bracer dragonscale godload gl~
+a dragonscale bracer~
+A thick scaled bracer lies here on the ground.~
+~
+9 0 0 0
+30 0 0 0 0
+0 0 0
+E
+bracer dragonscale~
+Thick red dragonhide has been shaped to make this bracer, and the scales,
+shining crimson and scarlet, have been left on its surface to provide
+additional protection.  Leather thongs serve to lace it tightly to the
+wearer's wrist, letting it fit snugly over the arm.
+~
+A
+13 100
+A
+26 6
+S
+#10055
+bracer godzilla godzilla's godload gl~
+Godzilla's Bracer~
+A bracer, crusted with warty lumps, lies here abandoned.~
+~
+9 0 0 0
+40 0 0 0 0
+0 0 0
+E
+bracer godzilla godzilla's~
+The leather of which this bracer has been fashioned is thick and warty,
+crusted with repugnant black outgrowths.  It fastens over the wrist with
+crude iron buckles and looks loose.
+~
+A
+26 7
+S
+#10056
+cloak comet comet's godload gl~
+the Comet's Cloak~
+A cloak of silky black, embroidered with a blazing comet, lies here.~
+~
+9 0 0 0
+3 0 0 0 0
+0 0 0
+E
+cloak comet comet's~
+This cloak of rough black silk draws the eye into its depths with its
+darkness.  Embroidered in gold and silver across its length is a blazing
+comet, depicted so realistically that you can almost see it move with
+every ripple of the fabric.
+~
+A
+14 100
+A
+34 100
+S
+#10057
+wind shadow godload gl~
+the Shadow of the Wind~
+The shadow of the wind, barely visible, glimmers here.~
+~
+9 16 1025 1
+3 0 0 0 0
+0 0 0
+E
+wind shadow~
+This cloak of fine almost white fabric is silky thin and translucent.
+Rainbow colors shift and gleam in its depths upon examination.  A diamond
+studded buckle holds the collar closed, letting the rest of the cloak flow
+freely around the wearer's body.
+~
+A
+75 100
+S
+#10058
+cape serpent living godload gl~
+a Cape of Living Serpents~
+A cape of living serpents wriggles and squirms here on the floor.~
+~
+9 0 0 0
+3 0 0 0 0
+0 0 0
+E
+cape serpent living~
+A band of thick black iron, fastened with a crudely wrought clasp, fits
+around the wearer's neck.  From its surface, fastened somehow through
+magical means, dangle dozens of serpents, hissing fiercely and forming a
+cloak of living, writhing flesh.
+~
+A
+13 100
+A
+71 100
+A
+26 4
+S
+#10059
+rucksack traveller traveller's godload gl~
+the Traveller's Rucksack~
+A crumpled rucksack, worn from usage, sits here.~
+~
+15 0 0 0
+300 1 0 0 0
+0 0 0
+E
+rucksack traveller traveller's~
+A bulky bag of leather, this rucksack is designed to be slung across the
+bag.  Squat and many-pocketed, it looks quite capable of holding all that
+an adventurer might ever need.
+~
+A
+26 3
+S
+#10060
+gloves razor tipped godload gl~
+Razor Tipped Gloves~
+Black gloves, tipped with glinting razors, lie here.~
+~
+9 0 0 0
+10 0 0 0 0
+0 0 0
+E
+gloves razor tipped~
+These elbow length gloves have been tailored from supple leather, dyed a
+midnight black.  Razor claws have been set in the fingertips, looking
+deadly and serviceable.
+~
+A
+14 100
+A
+2 3
+A
+26 5
+S
+#10061
+gloves duke silence silence's godload gl~
+the Duke of Silence's Gloves~
+Gray gloves made of soft suede, are embroidered with mystic runes.~
+~
+9 0 0 0
+10 0 0 0 0
+0 0 0
+E
+gloves duke silence silence's~
+These soft gloves reach only to the wrist, where their cuff fastens
+tightly by means of a pearl button, allowing a snug fit on the wearer's
+hands.  Their leather is a gray suede, brushed into softness, and glyphs,
+unreadable, have been stitched in black and silver thread across the palms.
+~
+A
+13 100
+A
+3 3
+A
+4 3
+A
+26 4
+S
+#10062
+gauntlets stoneking stoneking's godload gl~
+the Stoneking's Gauntlets~
+Thick white gloves have been dropped here.~
+~
+9 0 0 0
+3 0 0 0 0
+0 0 0
+E
+gauntlets stoneking stoneking's~
+These mid arm length gauntlets are made of a thick whitish leather, tanned
+to manageable flexibility.  Their stitching is crude but serviceable.
+~
+A
+13 100
+A
+1 3
+A
+26 5
+A
+5 3
+S
+#10063
+claws dragon godload gl~
+the Claws of the Dragon~
+Bright claws, shining with an inner fire, lie here.~
+~
+9 0 0 0
+10 0 0 0 0
+0 0 0
+E
+claws dragon~
+Golden claws, shining with an almost blinding fire, have been fastened
+onto a pair of dark leather gloves, extending along the fingers and
+protruding from beyond the tips in wicked curves.
+~
+A
+32 100
+A
+18 4
+A
+4 3
+A
+19 6
+S
+#10064
+sash bees embroidered godload gl~
+a sash embroidered with golden bees~
+A sash of sapphire silk, embroidered with bees, lies here.~
+~
+15 0 0 0
+300 1 0 0 0
+0 0 0
+E
+sash bees embroidered~
+This broad sash has been sewn of a brilliant, sapphire blue silk, three
+inches in width.  All along its length, embroidered in gold, fly
+fingernail sized bees, so lifelike they almost seem to be buzzing.
+~
+A
+64 100
+A
+4 3
+A
+26 5
+S
+#10065
+belt pouches golden godload gl~
+a Belt of Golden Pouches~
+A broad leather belt is sewn with tiny golden pockets.~
+~
+15 0 0 0
+300 1 0 0 0
+0 0 0
+E
+belt pouches golden~
+Made of supple, pale brown leather, this belt is a few fingerlengths in
+width and fastened with a bright brass buckle.   All along it are fastened
+pouches of gilded leather, looking capable of holding any amount of
+equipment.
+~
+A
+1 3
+A
+26 4
+S
+#10066
+girdle godling godload gl~
+the Godling's Girdle~
+A girdle woven of silvery hair lies here.~
+~
+9 0 0 0
+20 0 0 0 0
+0 0 0
+E
+girdle godling~
+This thick broad belt completely covers the wearer's abdomen, providing
+some amount of protection from blows.  The thick hair from which it has
+been woven is unidentifiable, but so tightly knit as to form a thick, almost
+unwieldy fabric.
+~
+A
+1 3
+A
+26 6
+A
+28 100
+S
+#10067
+globe prismatic light godload gl~
+a Globe of Prismatic Light~
+A ball of golden light flickers in the shadows.~
+~
+1 0 0 0
+0 0 10000 0 0
+0 0 0
+E
+globe prismatic light~
+The size of a human palm, this light shines from no discernible source.
+Released, it continues floating in the air, bobbling slightly with every
+motion of the wind.
+~
+A
+26 4
+S
+#10068
+demonbane godload gl~
+the Demonbane~
+A pure light, unflinching and true, shines here.~
+~
+1 0 0 0
+0 0 10000 0 0
+0 0 0
+E
+demonbane~
+Shining with a pure and indissoluble white brilliance, this light takes
+the form of a silver torch, mounted with star cut diamonds of the first
+water along the length of its handle.
+~
+A
+13 100
+A
+17 10
+A
+34 100
+A
+26 3
+S
+#10069
+teardrop maharani godload gl~
+the Maharani's Teardrop~
+A sparkling teardrop, carved from emerald, lies here.~
+~
+9 0 0 0
+5 0 0 0 0
+0 0 0
+E
+teardrop maharani~
+This flawless emerald has been cut by some skillfull jeweller's hand to
+resemble an elongated teardrop.  Within the depths of the jewel sparkles
+an
+inner light, touched with edges of crimson.
+~
+A
+26 5
+A
+12 75
+S
+#10070
+loop star-forged silver godload gl~
+a loop of star-forged silver~
+A loop of silver formed in an odd twist lies here in the dust.~
+~
+9 0 0 0
+3 0 0 0 0
+0 0 0
+E
+loop star-forged silver~
+A strand of fine silver, odd scintillations of light corruscating along
+its surface, has been formed into an odd and seemingly endless twist meant
+to
+be worn in the ear.
+~
+A
+17 10
+A
+66 5
+A
+26 3
+S
+#10071
+sphere solid light godload gl~
+a sphere of solid light~
+A globe of light, seemingly intangible, floats here in mid air.~
+~
+9 0 0 0
+20 0 0 0 0
+0 0 0
+E
+sphere solid light~
+A tiny globe of light has been imprisoned in a silver cage of wirework,
+attached to a stud designed to let it be worn hanging from the ear.  It
+shines with a subtle glow.
+~
+A
+13 75
+A
+26 5
+A
+28 100
+S
+#10072
+crystal poet poet's godload gl~
+the Poet's Crystal~
+A cylindrical crystal, glowing with an inner light, has been dropped
+here.~
+~
+9 0 0 0
+0 0 0 0 0
+0 0 0
+E
+crystal poet poet's~
+This cylindrical crystal has been polished to a luminous shine.  Its milky
+depths glimmer with a translucent glow.  A golden clasp encircling it
+allows it to be worn on the ear.
+~
+A
+69 100
+A
+26 4
+A
+12 50
+S
+#10073
+ruby eye cat's godload gl~
+a Cat's Eye Ruby~
+A ruby stud sits here, ready to be worn.~
+~
+9 0 0 0
+3 0 0 0 0
+0 0 0
+E
+ruby cat's eye~
+A bright red ruby, the size of an elven fingernail, holds a catseye shaped
+set of shimmers within it.  Mounted in reddish gold, the stud is worn on
+the
+ear.
+~
+A
+14 100
+A
+2 2
+A
+26 4
+A
+28 100
+S
+#10074
+talisman mercurial godload gl~
+a Mercurial Talisman~
+A round drop of mercury rolls elusively on the floor.~
+~
+9 0 0 0
+0 0 0 0 0
+0 0 0
+E
+talisman mercurial~
+This odd device seems to change its shape with every passing moment,
+flickering from form to form with an odd unpredictable rhythm.  Its silver
+surface reflects every bit of its surroundings, making it difficult to
+distinguish, and its slippery shifting makes it even more difficult to
+hold.
+~
+A
+2 2
+A
+73 5
+A
+17 20
+A
+26 3
+S
+#10075
+kiss prankquean godload gl~
+the Prankquean's Kiss~
+A silver talisman, wrought in the shape of a mocking smile, lies here.~
+~
+9 0 0 0
+0 0 0 0 0
+0 0 0
+E
+kiss prankquean~
+Small enough to be cupped in the hand, silvery blue metal has been shaped
+into the form of a pair of lips twisted into a slight, cynical smile.  The
+talisman seems intended not to be worn, but simply appreciated.
+~
+A
+72 100
+A
+66 5
+A
+26 4
+S
+#10076
+sphere stoneking godload gl~
+the Sphere of the StoneKing~
+A ball of rough grey stone rolls across the floor here.~
+~
+9 0 0 0
+3 0 0 0 0
+0 0 0
+E
+sphere stoneking~
+Carved roughly of worn grey stone, this ball is perhaps a palm's worth
+wide, its surface streaked with dark striations.  Heavy and solid, it is
+unmarked save for the natural grain of the mineral.
+~
+A
+13 100
+A
+17 25
+A
+26 3
+S
+#10099
+broken ladder~
+A broken ladder~
+A broken ladder leans against the wall here.~
+~
+13 0 0 0
+0 0 0 0 0
+0 0 0
+S
+$~
