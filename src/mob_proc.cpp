@@ -906,15 +906,72 @@ int guild_guard(struct char_data *ch, struct obj_data *obj, int cmd, const char 
   }
   dir++;
   //    cmd++;
-  if ((cmd == dir || cmd == dir2) && ((!IS_MOB(ch) && (affected_by_spell(ch, FUCK_PTHIEF) ||
-                                                       affected_by_spell(ch, FUCK_GTHIEF) || IS_AFFECTED(ch, AFF_CHAMPION))) ||
-                                      GET_CLASS(ch) != clas || (align == 1 && !IS_EVIL(ch)) || (align == 3 && !IS_GOOD(ch))))
+  if (cmd == dir || cmd == dir2)
   {
-    act("The guard humiliates $n, and blocks $s way.",
-        ch, 0, 0, TO_ROOM, 0);
-    send_to_char(
-        "The guard humiliates you, and blocks your way.\n\r", ch);
-    return eSUCCESS;
+    if (IS_PC(ch))
+    {
+      if (IS_IMMORTAL(ch))
+      {
+        if (affected_by_spell(ch, FUCK_PTHIEF) || affected_by_spell(ch, FUCK_GTHIEF))
+        {
+          send_to_char("Despite your crimes, the guard allows you to go through because you're an immortal.\r\n\r\n", ch);
+          return eFAILURE;
+        }
+        else if (IS_AFFECTED(ch, AFF_CHAMPION))
+        {
+          send_to_char("Despite having the Champion flag, the guard allows you to go through because you're an immortal.\r\n\r\n", ch);
+          return eFAILURE;
+        }
+        else if (GET_CLASS(ch) != clas)
+        {
+          send_to_char("Despite having the wrong class, the guard allows you to go through because you're an immortal.\r\n\r\n", ch);
+          return eFAILURE;
+        }
+        else if (align == 1 && !IS_EVIL(ch))
+        {
+          send_to_char("Despite not being evil, the guard allows you to go through because you're an immortal.\r\n\r\n", ch);
+          return eFAILURE;
+        }
+        else if (align == 3 && !IS_GOOD(ch))
+        {
+          send_to_char("Despite not being good, the guard allows you to go through because you're an immortal.\r\n\r\n", ch);
+          return eFAILURE;
+        }
+      }
+      else
+      {
+        if (affected_by_spell(ch, FUCK_PTHIEF) || affected_by_spell(ch, FUCK_GTHIEF))
+        {
+          act("The guard humiliates $n, and blocks $s way because of their crimes.", ch, 0, 0, TO_ROOM, 0);
+          send_to_char("The guard humiliates you, and blocks your way because of your crimes.\n\r", ch);
+          return eSUCCESS;
+        }
+        else if (IS_AFFECTED(ch, AFF_CHAMPION))
+        {
+          act("The guard humiliates $n, and blocks $s way because they have the Champion flag.", ch, 0, 0, TO_ROOM, 0);
+          send_to_char("The guard humiliates you, and blocks your way because you have the Champion flag.\n\r", ch);
+          return eSUCCESS;
+        }
+        else if (GET_CLASS(ch) != clas)
+        {
+          act("The guard humiliates $n, and blocks $s way because they are the wrong class.", ch, 0, 0, TO_ROOM, 0);
+          send_to_char("The guard humiliates you, and blocks your way because you are the wrong class.\n\r", ch);
+          return eSUCCESS;
+        }
+        else if (align == 1 && !IS_EVIL(ch))
+        {
+          act("The guard humiliates $n, and blocks $s way because they are not evil.", ch, 0, 0, TO_ROOM, 0);
+          send_to_char("The guard humiliates you, and blocks your way because you are not evil.\n\r", ch);
+          return eSUCCESS;
+        }
+        else if (align == 3 && !IS_GOOD(ch))
+        {
+          act("The guard humiliates $n, and blocks $s way because they are not good.", ch, 0, 0, TO_ROOM, 0);
+          send_to_char("The guard humiliates you, and blocks your way because you are not good.\n\r", ch);
+          return eSUCCESS;
+        }
+      }
+    }
   }
 
   return eFAILURE;
