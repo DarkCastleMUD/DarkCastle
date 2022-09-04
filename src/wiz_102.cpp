@@ -2736,7 +2736,7 @@ int do_medit(struct char_data *ch, char *argument, int cmd) {
 		}
 	} else {
 		mobvnum = ch->pcdata->last_mob_edit;
-		if (((mob_num = real_mobile(mobvnum)) < 0)) {
+		if (((mob_num = real_mobile(mobvnum)) < 0 && strcmp(buf, "new"))) {
       ch->send(fmt::format("{} is an invalid mob vnum.\r\n", mobvnum));
 			return eSUCCESS;
 		}
@@ -3478,6 +3478,7 @@ int do_medit(struct char_data *ch, char *argument, int cmd) {
 			return eFAILURE;
 		}
 		csendf(ch, "Mobile '%d' created successfully.\r\n", intval);
+    ch->setPlayerLastMob(intval);
 	}
 		break;
 	case 31: {
