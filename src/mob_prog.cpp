@@ -1134,6 +1134,7 @@ enum mprog_ifs
   eINSAMEZONE,
   eCLAN,
   eISDAYTIME,
+  eISRAINING,
   eNUMOFOBJSINWORLD
 
 };
@@ -2417,6 +2418,12 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
     if(weather_info.sunlight == SUN_DARK)
       return false;
     return true;
+  break;
+		 
+  case eISRAINING:
+	if(weather_info.sky == SKY_LIGHTNING||weather_info.sky == SKY_RAINING||weather_info.sky == SKY_HEAVY_RAIN)
+	  return true;
+	return false;
   break;
 
   default:
