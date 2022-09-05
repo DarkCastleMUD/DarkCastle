@@ -369,7 +369,7 @@ int show_one_quest(CHAR_DATA *ch, struct quest_info *quest, int count)
 {
    int i, amount = 0;
 
-   csendf(ch," $B$2Name:$7 %-35s    $B$2Quest Number:%d$R\n\r"
+   csendf(ch," $B$2Name:$7 %-35s    $B$2Quest Number:$7 %d$R\n\r"
              " $B$2Hint:$7 %-52s$R\n\r",
              quest->name, quest->number, quest->hint1);
    if(quest->hint2)
@@ -1315,7 +1315,17 @@ int quest_vendor(char_data *ch, obj_data *obj, int cmd, const char *arg, char_da
       send_to_char("$BQuest Equipment:$R\r\n", ch);
 
       int n = 0;
-      for (int qvnum = 27975; qvnum < 28000; qvnum++)
+      for (int qvnum = 27943; qvnum <= 27953; qvnum++)
+      {
+         rnum = real_object(qvnum);
+         if (rnum >= 0)
+         {
+            char *buffer = gl_item((OBJ_DATA *)obj_index[rnum].item, n++, ch, FALSE);
+            send_to_char(buffer, ch);
+            dc_free(buffer);
+         }
+      }
+      for (int qvnum = 27943; qvnum < 28000; qvnum++)
       {
          rnum = real_object(qvnum);
          if (rnum >= 0)
@@ -1358,6 +1368,30 @@ int quest_vendor(char_data *ch, obj_data *obj, int cmd, const char *arg, char_da
          {
             FOUND = true;
             break;
+         }
+      }
+      if (!FOUND)
+      {
+         for (int qvnum = 27943; qvnum <= 27953; qvnum++)
+      	 {
+            rnum = real_object(qvnum);
+            if (rnum >= 0 && n++ == want_num)
+            {
+               FOUND = true;
+               break;
+            }
+         }
+      }
+      if (!FOUND)
+      {
+         for (int qvnum = 27943; qvnum <= 27953; qvnum++)
+      	 {
+            rnum = real_object(qvnum);
+            if (rnum >= 0 && n++ == want_num)
+            {
+               FOUND = true;
+               break;
+            }
          }
       }
       if (!FOUND)
