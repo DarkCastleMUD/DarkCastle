@@ -1184,6 +1184,7 @@ std::map<std::string,mprog_ifs> load_ifchecks()
   ifcheck_tmp["clan"] = eCLAN;
 
   ifcheck_tmp["isdaytime"] = eISDAYTIME;
+  ifcheck_tmp["israining"] = eISRAINING;
 
   return ifcheck_tmp;
 }
@@ -2421,9 +2422,9 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
   break;
 		 
   case eISRAINING:
-	if(weather_info.sky == SKY_LIGHTNING||weather_info.sky == SKY_RAINING||weather_info.sky == SKY_HEAVY_RAIN)
-	  return true;
-	return false;
+    if(weather_info.sky == SKY_LIGHTNING||weather_info.sky == SKY_RAINING||weather_info.sky == SKY_HEAVY_RAIN)
+      return true;
+    return false;
   break;
 
   default:
