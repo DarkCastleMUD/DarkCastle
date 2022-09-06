@@ -1,0 +1,468 @@
+#3100
+tea cup~
+a cup of tea~
+A cup has been set here.~
+~
+17 16 16385 1
+2 2 11 0 1
+1 100 0
+E
+cup~
+It is a small simple cup.
+~
+S
+#3101
+cup coffee~
+a cup of coffee~
+A cup has been set here.~
+~
+17 16 16385 1
+2 2 12 0 1
+1 100 0
+E
+cup~
+It is a small simple cup.
+~
+S
+#3102
+water cup~
+a cup~
+A cup has been set here.~
+cup of water~
+17 16 16385 1
+2 2 0 0 0
+1 0 0
+E
+cup~
+It is a large simple cup.
+~
+S
+#3105
+bracer bronze~
+a $5bronze$R wrist-guard~
+A $5bronze$B$1 wrist-guard lies on the ground.$R~
+~
+9 1511424 4097 1
+3 0 0 0 45
+7 180000 0
+A
+18 3
+A
+19 1
+S
+#3120
+key iron~
+a key~
+An iron key has been left here.~
+~
+18 16 16385 1
+0 0 0 0 0
+1 100 2048
+E
+key iron~
+The iron key is not special.
+~
+S
+#3121
+key rusty~
+a key~
+A rusty key has been left here.~
+~
+18 16 16385 1
+0 0 0 0 0
+1 100 2048
+E
+key rusty~
+The key is a fairly large rusty key.  You notice some fresh dirt on it.
+~
+S
+#3122
+key wooden~
+a key~
+A wooden key has been left here.~
+~
+18 16 16385 1
+0 0 0 0 0
+1 100 2048
+E
+key wooden~
+The wooden key is not special.
+~
+S
+#3123
+key brass~
+a key~
+A brass key has been left here.~
+~
+18 16 16385 1
+0 0 0 0 0
+1 100 2048
+E
+key brass~
+The brass key is small and looks like it fits a very complicated lock.
+~
+S
+#3124
+wand wonder orro~
+Orro's Wand of Wonder~
+A wondrous looking wand enscribed "Orro" sits here humming quietly.~
+Fixed.~
+3 83 16385 1
+70 5 5 78 50
+3 100000 13
+E
+wand wonder orro~
+   Printed in incredibly small text upon the wand are a set of instructions:
+Hello and congratulations on your purchase of a Wand of Wonder(tm).  This wand
+comes with 5 charges of Full Heal.  Identify it to see how many charges remain.
+If your wand runs out of charges, simply collect 2 deep blue potions, 1 deep
+red vial and a shimmering diamond.  Then hold the wand and say "recharge" and
+it'll be good as new!  We sincerely home you enjoy your purchase!
+-Management
+~
+S
+#3125
+brew special orro~
+Orro's Special Brew~
+A batch of Orro's Special Brew sits here looking thirst-quenching.~
+Fixed.~
+10 80 16385 1
+90 78 90 128 15
+2 20000 13
+S
+#3126
+quest cloak~
+The Grandmaster's Cloak of the Ages~
+A cloak encompassing every age has been unknowingly discarded.~
+Fixed.~
+9 524288 1025 1
+10 0 0 0 60
+8 5000000 5
+A
+26 5
+A
+98 4
+A
+28 100
+A
+374000 5
+S
+#3127
+lyra whip triumph quest~
+Lyra's Whip of Triumph~
+A whip humming with power lay coiled here.~
+Fixed.~
+5 4194304 8193 1
+0 7 7 1 60
+6 5000000 5
+E
+lyra whip triumph quest~
+The shaft of this whip is a greenish leather, worn with age and handling.
+A coppery sheen lies along its surface.  Attached to it are three lengths
+of braided fire, crackling and sizzling as they twitch.
+~
+A
+26 7
+A
+40 4
+A
+54 4
+A
+85 4
+A
+62 4
+A
+59 2
+S
+#3129
+hand cuffs~
+a pair of hand cuffs~
+A pair of hand cuffs has been left here.~
+~
+13 0 1 0
+0 0 0 0 0
+1 1000 0
+S
+#3130
+desk drawer~
+the desk~
+A desk is set against the western wall.~
+The desk looks very sparse, there is a drawer in the left side.
+~
+15 0 0 0
+34 15 3122 0 0
+0 0 0
+E
+drawer~
+You notice a keyhole in the drawer.
+~
+S
+#3131
+safe~
+the safe~
+A safe is placed in a dark corner of the room.~
+The safe has a keyhole.
+~
+15 0 0 0
+250 15 3123 0 0
+0 0 0
+E
+safe~
+The safe is very heavy.
+~
+S
+#3132
+gold coins~
+a large pile of gold coins~
+A lot of gold is here.~
+Looks like at least 10,000 coins.
+~
+20 0 1 0
+150000 0 0 0 0
+0 0 0
+S
+#3133
+city key~
+the City Key~
+The very big City Key is lying here.~
+It is probably the biggest key you have seen in your life.  It is made from
+polished gold and has various patterns on it along with the Sorpigal Coat of
+Arms.
+~
+18 16 16385 1
+0 0 0 0 0
+1 100 2048
+S
+#3134
+bench~
+the Bench~
+A white-painted wooden bench is standing here.~
+~
+12 0 0 0
+0 0 0 0 0
+0 0 0
+E
+bench~
+It is a quite heavy but very comfortable bench.  It is placed with its front
+towards the river so you can sit and watch the river and the houses on the
+other side.
+~
+S
+#3135
+water fountain~
+a fountain~
+A small white fountain is standing here gurgling happily.~
+~
+25 0 0 0
+50 50 0 0 0
+0 0 0
+E
+fountain~
+It is very nice.  Made from fine white marble.
+~
+S
+#3136
+coins gold~
+a small pile of gold coins~
+A small pile of gold coins lies here.~
+~
+20 0 1 0
+20 0 0 0 0
+0 0 0
+S
+#3137
+key steel~
+a steel key~
+A large steel key has been left here.~
+~
+18 16 16385 1
+0 0 0 0 0
+1 100 2048
+E
+key steel~
+A key of this size must fit a very strong lock.
+~
+S
+#3138
+water skin waterskin buffalo~
+a buffalo waterskin~
+A bloated dead buffalo is on the floor.~
+~
+17 16 1 1
+100 100 0 0 0
+2 500 0
+S
+#3140
+macaroon cookie~
+a coconut macaroon~
+A coconut macaroon has been dropped here.~
+~
+19 0 1 0
+2 0 0 0 0
+1 140 0
+S
+#3141
+brownie fudge cookie~
+a fudge brownie~
+A fudge brownie dribbles frosting on the floor.~
+~
+19 0 1 0
+2 0 0 0 0
+1 150 0
+S
+#3142
+treat cookie~
+a rice krispie treat~
+A rice krispie treat looks delicious and sticky.~
+~
+19 0 1 0
+2 0 0 0 0
+1 100 0
+S
+#3143
+sign street direction~
+a street sign~
+A street sign is here providing you with directions.~
+~
+12 0 0 0
+0 0 0 0 0
+1 100 0
+E
+sign street directions~
+West - The Public Gardens
+-----
+North - The Tarrasque's Den
+-----
+South & down Park Road:
+  - The Bard's Guild
+  - The Sorpigal Museum
+-----
+South & on Emerald Avenue:
+  - The Holy Cathedral of Sorpigal
+  - City Hall
+-----
+Penny Lane - The Sorpigal Clock Tower
+~
+S
+#3144
+cookie peanutbutter~
+a peanut butter cookie~
+A brown cookie smells of peanut butter.~
+~
+19 0 1 0
+2 0 0 0 0
+1 110 0
+S
+#3145
+cookie sugar~
+a frosted sugar cookie~
+A plain sugar cookie is dabbed with pink frosting.~
+~
+19 0 1 0
+2 0 0 0 0
+1 110 0
+S
+#3146
+persimmon fruit~
+a persimmon~
+An orange persimmon looks ripe and ready to eat.~
+~
+19 0 1 0
+3 0 0 0 0
+1 150 0
+S
+#3147
+apple gala fruit~
+a gala apple~
+A gala apple shines in the sunlight.~
+~
+19 0 1 0
+3 0 0 0 0
+1 100 0
+S
+#3148
+peach fruit~
+a fuzzy peach~
+A fuzzy peach rolls on the floor here.~
+~
+19 0 1 0
+3 0 0 0 0
+1 110 0
+S
+#3149
+strawberries fruit~
+a handful of strawberries~
+A handful of strawberries sits in a small wicker basket.~
+~
+19 0 1 0
+3 0 0 0 0
+1 135 0
+S
+#3150
+salad fruit~
+a bowl of fruit salad~
+A bowl of fruit salad looks well tossed.~
+~
+19 0 1 0
+5 0 0 0 0
+1 210 0
+S
+#3154
+feather~
+an empty item~
+Forage items below here in the 3100 range.~
+~
+12 1314816 1 1
+9 12 0 12 0
+1 100 0
+A
+46 40
+S
+#3155
+empty obj~
+an empty item~
+An empty obj sits here dejectedly.~
+Fixed.~
+0 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#3156
+empty item~
+an empty item~
+An empty obj sits here dejectedly.~
+Fixed.~
+0 0 16385 0
+0 0 0 0 0
+0 0 0
+S
+#3157
+empty item~
+an empty item~
+An empty obj sits here dejectedly.~
+Fixed.~
+0 0 16385 0
+0 0 0 0 0
+0 0 0
+S
+#3158
+feather~
+an empty item~
+A slim $B$5yellow$1 fletched arrow lies here in the dust.$R~
+~
+12 1314816 1 1
+9 12 0 12 0
+1 100 0
+A
+46 40
+S
+#3159
+empty obj~
+an empty item~
+An empty obj sits here dejectedly.~
+Fixed.~
+0 0 0 0
+0 0 0 0 0
+0 0 0
+S
+$~

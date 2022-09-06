@@ -1,0 +1,1501 @@
+#27900
+white elixir prize~
+a $7$Bbright white$R elixir~
+A $7$Bglowing white$1$B elixir sits here looking delicious.$R~
+~
+10 17 16385 1
+50 36 34 3 1
+1 100 1
+E
+elixir white~
+A white potion is here labelled: "Protect the soul."
+~
+S
+#27901
+pill prize neon~
+a glowing $6$Bneon$R pill~
+A pill $6$Bglows$1$B brightly on the ground here.$R~
+~
+10 19 16385 1
+60 98 99 120 1
+1 100 1
+E
+pill neon~
+A glowing neon pill has the word "resistance" etched on its surface.
+~
+S
+#27902
+scroll humming prize~
+a loudly humming scroll~
+A magical scroll is here, humming with untapped power.~
+Fixed.~
+2 16 16385 1
+50 2 0 0 1
+1 100 0
+S
+#27903
+potion deep blue prize~
+a $1$Bdeep blue$R potion~
+A $1$Bdeep blue$1$B potion has been carelessly left here.$R~
+~
+10 16 16385 1
+30 28 28 28 1
+1 100 1
+E
+potion deep blue~
+The potion has a small label 'Mend them wounds.'
+~
+S
+#27904
+vial deep red prize~
+a $4deep red$R vial~
+A $4deep red$1$B vial has carelessly been left here.$R~
+~
+10 16 16385 1
+30 90 90 90 1
+1 100 1
+E
+vial deep red~
+The vial has a small label 'Revive the Mind.'
+~
+S
+#27905
+token symbol Apocalypse prize~
+a symbol of the $B$4Apocalypse$R~
+Someone must have done something pretty special to earn this token.~
+~
+8 339 16385 1
+0 0 0 0 1
+1 100 41
+E
+symbol token apocalypse~
+Read "help TOKEN" for details on how to redeem this powerful prize!
+~
+S
+#27906
+brownie point prize~
+$5a brownie point$R~
+A hard earned brownie point has been stupidly discarded here.~
+~
+8 19 16385 1
+0 0 0 0 1
+1 1 33
+E
+brownie point~
+This is a brownie point.
+They are redeemable across the world for many special prizes.
+Enough of them together have been said to earn you a quest
+from the Gods of Dark Castle themselves!
+~
+S
+#27907
+dagger death priceless prize illusion~
+an Illusionary Dagger of Death~
+A long-forgotten, priceless dagger lies here on the floor.~
+~
+5 83 24577 1
+0 7 6 11 6
+5 1000 2053
+E
+death dagger~
+The legendary Dagger of Death sits here with a price tag attached:
+One Hundred Dollars.
+~
+A
+83 3
+A
+26 6
+A
+13 25
+A
+14 100
+S
+#27908
+token immortal insight~
+a token of $BImmortal Insight$R~
+A token of $BImmortal Insight$R lies here.~
+Fixed.~
+8 18 16385 1
+0 0 0 0 1
+1 1 33
+E
+token immortal insight~
+Type "help TOKEN" for details on how to redeem this token of $BImmortal Insight$R
+~
+S
+#27909
+token wendy wingding prize~
+a Genuine Wendy $B$3W$5i$6n$3g$7d$4i$3n$5g$R~
+A token from Wendy is winging its ding here.~
+Fixed.~
+8 16 16385 1
+0 0 0 0 1
+1 1 33
+E
+token wingding~
+Read "help TOKEN" for details on how to redeem a wingding!
+~
+S
+#27910
+token prize cloverleaf immortal~
+a $B$2Cloverleaf$R of the Immortals~
+A valuable and obviously lucky cloverleaf has been left here!~
+Fixed.~
+8 81 16385 1
+0 0 0 0 1
+1 100 33
+E
+token cloverleaf immortal~
+oxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxo
+|                                                                   |
+| This "immortal" may be redeemed for one of the following:         |
+|                                                                   |
+| (1) ONE rename of a character.                                    |
+| (2) The re-creation and exchange of up to TWO pieces of equipment |
+|     that you currently own back onto the SAME character.          |
+| (3) ONE restring.                                                 |
+| (4) Three of THESE tokens may be redeemed for any one OTHER token.|
+| (5) TEN tokens may be redeemed for one Brownie Point              |
+|                                                                   |
+| The redemptions is valid only from an Implementor or Divinity who |
+| may at any time choose not to honor the request of the bearer in  |
+| instances where such redeption attempts are evaluated to be       |
+| suspicious. In the event such a redeption attempt is denied, the  |
+| token will still be valid for redeption.  Further clarifications  |
+| should be directed to an Implementor or Divinity.                 |
+|                                                                   |
+oxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxo
+~
+S
+#27911
+bouquet bridal~
+a bridal bouquet~
+A bouquet of flowers has been carefully arranged.~
+Fixed.~
+8 0 1 0
+50 0 0 0 0
+1 0 0
+S
+#27912
+belt garter~
+a garter belt~
+A silky garter belt is ready to be caught by some unsuspecting bachelor~
+Fixed.~
+8 0 1 0
+0 0 0 0 0
+1 0 0
+S
+#27913
+topper wedding female shemoose moose~
+a she-moose wedding cake topper~
+An adorable wedding topper is here.~
+Fixed.~
+8 0 1 0
+0 0 0 0 0
+1 0 0
+S
+#27914
+topper wedding cake male moose~
+a somewhat large wedding cake topper~
+A wedding topper in the form of a large moose? is here.~
+Fixed.~
+8 0 1 0
+0 0 0 0 0
+1 0 8
+S
+#27915
+pile gold prize~
+a pile of $B$5gold$R~
+A pile of $B$5gold$1 is here glittering.$R~
+Fixed.~
+8 0 1 0
+2000000 0 0 0 1
+0 0 0
+S
+#27916
+pile gold big prize~
+a big pile of $B$5gold$R~
+A big pile of $B$5gold$1 is here glittering.$R~
+Fixed.~
+8 0 1 0
+3000000 0 0 0 1
+0 0 0
+S
+#27917
+pile gold big prize~
+a really big pile of $B$5gold$R~
+A really big pile of $B$5gold$1 is here glittering.$R~
+Fixed.~
+8 0 1 0
+4000000 0 0 0 1
+0 0 0
+S
+#27918
+pile gold massive prize~
+a massive pile of $B$5gold$R~
+A massive pile of $B$5gold$1 is here glittering.$R~
+Fixed.~
+8 0 1 0
+5000000 0 0 0 1
+0 0 0
+S
+#27919
+egg blue easter~
+a $B$1blue$R egg~
+A blue egg is here.~
+Fixed.~
+8 67108864 1 0
+0 0 0 0 0
+1 0 12
+S
+#27920
+egg green easter~
+a $B$2green$R egg~
+A green egg is here.~
+Fixed.~
+8 67108864 1 0
+0 0 0 0 0
+1 0 12
+S
+#27921
+egg teal easter~
+a $B$3teal$R egg~
+A teal egg is here.~
+Fixed.~
+8 67108864 1 0
+0 0 0 0 0
+1 0 12
+S
+#27922
+egg red easter~
+a $B$4red$R egg~
+A red egg is here~
+Fixed.~
+8 67108864 1 0
+0 0 0 0 0
+1 0 12
+S
+#27923
+egg yellow easter~
+a $B$5yellow$R egg~
+A yellow egg is here.~
+Fixed.~
+8 67108864 1 0
+0 0 0 0 0
+1 0 12
+S
+#27924
+egg lilac easter~
+a $B$6lilac$R egg~
+A lilac egg is here.~
+Fixed.~
+8 67108864 1 0
+0 0 0 0 0
+1 0 12
+S
+#27925
+egg white easter~
+a $7$Bwhite$R egg~
+An egg is here.~
+Fixed.~
+8 67108864 1 0
+0 0 0 0 0
+1 0 12
+S
+#27926
+basket easter~
+an Easter basket~
+An Easter basket lies here.~
+Fixed.~
+15 67108864 1 0
+100 0 0 0 0
+0 0 12
+S
+#27927
+peeps bunny purple easter~
+some $B$6purple$R bunny peeps~
+Some delicious marshmallow peeps are here.~
+Fixed.~
+8 0 1 0
+0 0 0 0 0
+1 0 0
+S
+#27928
+peeps chick yellow easter~
+some $B$5yellow$R chick peeps~
+Some delicious marshmallow peeps are here.~
+Fixed.~
+8 0 1 0
+0 0 0 0 0
+1 0 0
+S
+#27929
+bunny chocolate~
+a magical chocolate bunny~
+A magical chocolate bunny is here, waiting to be quaffed.~
+~
+10 67109201 16385 1
+90 78 78 36 1
+1 0 5
+S
+#27930
+empty obj~
+An empty obj~
+An empty obj sits here dejectedly.~
+Fixed.~
+8 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#27943
+bracer godzilla godzilla's quest~
+Godzilla's Bracer~
+A bracer, crusted with warty lumps, lies here abandoned.~
+~
+9 4096 4097 1
+20 0 0 0 60
+3 5000000 5
+E
+bracer godzilla godzilla's~
+The leather of which this bracer has been fashioned is thick and warty,
+crusted with repugnant black outgrowths.  It fastens over the wrist with
+crude iron buckles and looks loose.
+~
+A
+26 5
+A
+98 3
+A
+345000 5
+A
+302000 5
+S
+#27944
+armbands durance quest~
+the Armbands of Durance~
+Plain black armbands spark with unknown energies.~
+~
+9 16384 257 1
+10 0 0 0 60
+3 5000000 5
+E
+armbands durance~
+These thick black armbands have been forged of blackened iron, but they
+hum softly, almost glowing, with energy from some unknown, mystical
+source.  They are perfectly plain except for a small sigil on the right one,
+which looks like a tiny 'D' and 'C' combined.
+~
+A
+26 5
+A
+98 3
+A
+90 5
+A
+407000 5
+S
+#27945
+bangle gitana gitana's quest~
+the Gitana's Bangle~
+A silver bangle lies here, studded with bright glass.~
+~
+9 1048576 4097 1
+10 0 0 0 60
+3 5000000 5
+E
+bangle gitana gitana's~
+This whisker thin bangle is made of silver, and all along its rim are
+mounted bright gems, glittering through all the shades of the spectrum.
+~
+A
+26 5
+A
+98 1
+A
+301000 5
+A
+345000 3
+S
+#27946
+loop star forged star-forged silver quest~
+a loop of star-forged silver~
+A loop of silver formed in an odd twist lies here in the dust.~
+~
+9 65536 262145 1
+3 0 0 0 60
+1 5000000 5
+E
+loop star-forged silver~
+A strand of fine silver, odd scintillations of light corruscating along
+its surface, has been formed into an odd and seemingly endless twist meant
+to
+be worn in the ear.
+~
+A
+26 4
+A
+99 4
+A
+103 5
+A
+91 5
+S
+#27947
+ring wormsilk quest~
+a ring of spun wormsilk~
+A piece of wormsilk has been intricatly spun to fit a finger.~
+~
+9 524288 3 1
+4 0 0 0 60
+1 5000000 5
+E
+ring wormsilk monk~
+    n
+The material of this ring is taken from the
+spinnerets of silkworms which live in the trees
+of an ancient faraway land.  The colorations are
+vibrant and seem to amazingly blend with any
+ascetic outfit which you may humble yourself with
+on a given day.
+~
+A
+26 5
+A
+93 4
+A
+301000 3
+A
+317000 3
+S
+#27948
+leggings gazelle quest~
+The leggings of the Gazelle~
+Powerful mechanical legwear lays on the ground here.~
+~
+9 8192 33 1
+3 0 0 0 60
+4 5000000 5
+A
+26 4
+A
+103 8
+A
+86000 6
+A
+66000 6
+S
+#27949
+plates cursed tasslehoff wrist quest~
+Tasslehoff's Cursed Wrist Plates~
+Two bands of shiny metal lay on the ground here awaiting you.~
+~
+9 2097152 4097 1
+5 0 0 0 60
+3 5000000 5
+A
+26 4
+A
+103 8
+A
+132000 6
+A
+103000 6
+S
+#27950
+leggings ebon quest~
+Ebon Leggings~
+Black leather leggings, studded with silver, lie here.~
+~
+9 32768 33 1
+3 0 0 0 60
+4 5000000 5
+E
+leggings ebon~
+These loose leggings are made of supple black leather, and reinforced with
+bands and studs of silver designed to turn a hasty blade.  The waist is
+reinforced with a chain of silver links, sewn to the leather  to shape and
+hold it, and silver bands hold the cuffs in place.
+~
+A
+26 4
+A
+103 8
+A
+93000 6
+A
+65000 6
+S
+#27951
+string jackal jackal's teeth quest~
+a String of Jackal's Teeth~
+A necklace of long teeth, yellowed with age, lies here.~
+~
+9 4194304 5 1
+20 0 0 0 60
+3 5000000 5
+E
+string jackal's teeth~
+Jackals' teeth, long and pointed, have had holes bored in the upper root
+to allow them to be strung together by means of a thin leather thong in a
+double loop.
+~
+A
+26 5
+A
+98 1
+A
+301000 3
+S
+#27952
+ring madman quest~
+A Madman's Ring~
+The ring on the ground makes your mind tilt and turn crazily.~
+~
+9 262144 3 1
+3 0 0 0 60
+2 5000000 5
+A
+26 5
+A
+302000 5
+A
+98 3
+S
+#27953
+bracers north wind wind's quest~
+the North Wind's Bracers~
+Blue and white bracers, glimmering with frost, lie here.~
+~
+9 131072 257 1
+20 0 0 0 60
+4 5000000 5
+E
+bracer north wind wind's~
+   Covered with a pale coating of frost crystals, these bracers appear to have
+been carved out of wood and painted with pale blue and white hues, some of
+which has worn away, allowing the grain below to show through.  They fasten
+tightly with silver buckles.
+~
+A
+26 5
+A
+103 4
+A
+98 3
+A
+50000 5
+S
+#27954
+empty obj~
+$B$0-= Illusionary / Quest items below this point =-$R~
+An empty obj sits here dejectedly.~
+Fixed.~
+0 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#27955
+helm illusion prize~
+the Glimmering Helm of Illusion~
+A helm of illusion lies on the ground here.~
+~
+9 83 17 1
+20 0 0 0 1
+5 0 2053
+E
+helm~
+The helm has a huge black dragon engraved on its fine black steel.
+~
+A
+26 4
+A
+102 4
+A
+34 100
+A
+13 50
+S
+#27958
+boots illusion mercury prize~
+the Mercury Boots of Illusion~
+A plain pair of silver boots are here.~
+~
+9 83 65 1
+5 0 0 0 1
+5 0 2053
+E
+boots~
+The boots appear to be normal, but something about them seems very powerful.
+~
+A
+17 -50
+A
+26 4
+A
+35 100
+S
+#27972
+bands shimmering illusion prize~
+the Shimmering Bands of Illusion~
+There are some shimmering bands on the ground here.~
+~
+9 83 257 1
+5 0 0 0 1
+5 0 2053
+E
+helm~
+The helm, made of the finest dwarven steel, shines brightly in the
+sunlight.
+~
+A
+30 100
+A
+26 4
+A
+28 100
+A
+12 50
+A
+103 6
+S
+#27973
+plate illusion prize~
+the Plate of Illusion~
+A brilliantly polished breast plate is here.~
+~
+9 83 9 1
+20 0 0 0 1
+20 0 2053
+E
+breast plate~
+You can see your own reflection in the polished steel breast plate.
+~
+A
+29 100
+A
+73 10
+A
+26 5
+A
+17 -50
+S
+#27974
+spellsword sword illusion prize~
+the Illusionary Spellsword~
+There is a huge, heavily enchanted sword on the ground here.~
+~
+5 19 8193 1
+0 7 6 3 1
+12 0 2053
+A
+18 7
+A
+19 6
+A
+44 20
+A
+43 20
+S
+#27975
+gnakk trollskin cloak quest~
+Gnakk's Cloak of $2Trollskin$R~
+A massive trollskin cloak rests uneasily here.~
+~
+9 4096 1025 1
+24 0 0 0 60
+8 5000000 5
+E
+embossed~
+   Forged in a smithy in the heart of Sorpigal, these
+embossed leggings bear witness to the master craft of
+the mighty Gireth.  They are perhaps his last, yet
+greatest, project.  The main body of these leggings
+are formed from a plate of burnished steel that is
+fully adorned by gold and bronzed steel.  The leggings
+give illustration to an ancient battle between a
+mighty beast and an armor-clad warrior.  As
+surrounding light shines on these leggings, the battle
+seems to come to life, as if it were still taking
+place right on these magical leggings.
+~
+E
+leggings~
+   Forged in a smithy in the heart of Sorpigal, these
+embossed leggings bear witness to the master craft of
+the mighty Gireth.  They are perhaps his last, yet
+greatest, project.  The main body of these leggings
+are formed from a plate of burnished steel that is
+fully adorned by gold and bronzed steel.  The leggings
+give illustration to an ancient battle between a
+mighty beast and an armor-clad warrior.  As
+surrounding light shines on these leggings, the battle
+seems to come to life, as if it were still taking
+place right on these magical leggings.
+~
+A
+26 5
+A
+98 5
+A
+99 4
+A
+411000 6
+A
+100 6
+S
+#27976
+belt gaiot authority quest~
+Gaiot's Belt of Authority~
+A steel belt is here, seeking a new master.~
+~
+9 4099 2049 1
+12 0 0 0 60
+4 5000000 5
+E
+belt~
+   Gaiot, once a great general in the armies of Elisidor,
+stumbled across this rather ordinary looking leather
+belt during his conquests.  Much is not known about
+its origin, although its effect upon Gaiot has been
+undeniable.  The power that this belt holds corrupts
+absolutely, yet it grants immense power.  Even those
+close to the so-called-master of this belt are not
+spared from its darkness.  Perhaps the generic, bland
+design of this belt is the perfect disguise for its
+evil purpose.
+~
+A
+26 6
+A
+98 4
+A
+317000 6
+A
+386000 6
+S
+#27977
+face rage berkthgar quest~
+Berkthgar's Rage~
+A bloody dark red face lays here.~
+~
+9 262144 131073 1
+18 0 0 0 60
+6 5000000 5
+E
+rage~
+   Few mortal men possess the strength of Berkthgar, both mentally to
+endure pain and physically to demand subservience.  In a frenzy, it is
+believed that a barbarian can lose all judgment and will fight by whatever
+means possible.  Few barbarians would go as far as to fight without a
+weapon though, save Berkthgar in dire need.  These gauntlets were forged
+for just such a situation,  although cumbersome they provide excellent
+protection for the hands.  They  have been forged out of iron, but contain a
+metallic impurity which gives them a deep red hue, almost like a fine ruby stone.
+~
+E
+face rage berkthgar quest~
+   Few mortal men possess the strength of Berkthgar, both mentally to endure
+pain and physically to demand subservience.  In a frenzy, it is believed that a
+barbarian can lose all judgment and will fight by whatever means possible.
+Few barbarians would go as far as to fight without a weapon, save Berkthgar
+who is known to terrify enemies with his gaze alone.  It is said that when
+Berkthgar takes the field wearing this mask, his rage is so great that he is
+able to recover from damage that would kill most mortal men.  Rumors
+persist that this war mask somehow boosts a barbarian's ability to recover
+health during combat, but then again, those are just rumors...
+~
+A
+26 6
+A
+29 100
+S
+#27978
+boots hades demonskin quest~
+Hades' Demonskin Boots~
+A tan pair of boots seem to be rotting here.~
+~
+9 262144 65 1
+18 0 0 0 60
+4 5000000 5
+E
+boots~
+   The bloodied skins of dead souls and demons were painfully removed
+from their former owners to make these fine boots fit for the King of the
+Underworld. Already weathered from years of torture and torment, deep
+scars in the tissue have made these quite durable.  Two laces have been
+fashioned out of the pearly white tendons of the dead that stitch up from
+the toes of the boots all the way up to the shins.  Somehow hair still grows
+out of several places in the boots.
+~
+A
+26 6
+A
+32 100
+A
+35 100
+A
+359000 6
+S
+#27979
+curse lu bey quest~
+Lu Bey's Curse~
+A black cloth mask is folded neatly here.~
+~
+9 16384 131073 1
+6 0 0 0 60
+2 5000000 5
+E
+curse~
+   For years, Lu Bey has hidden in secrecy behind this mask of deception.
+Even acquaintances that used to know the real identity of this master
+assassin would no longer recognize what has become of him.  This mask
+is rather remarkable in that it is impossible to focus clearly on.  When worn,
+the mask has a strange ability to mimic the face of anyone that its owner
+ desires. Although the deception isn't complete and perfect, many a foe
+has been deceived by such magic.  The wearer of this mask pays a small
+price as their soul is slowly drained to feed the mask, yet such power
+always has its sacrifices.
+~
+A
+26 5
+A
+24 6
+A
+20 6
+A
+29 100
+A
+28 100
+A
+22 6
+S
+#27980
+cape shadows vystir thief quest~
+Vystir's Cape of $B$0Shadows$R~
+This dusty cape melds seamlessly with the shadows as it sits in a heap here.~
+~
+9 16384 1025 1
+18 0 0 0 60
+4 5000000 5
+E
+cape shadows shadow vystir~
+This flowing black cape has given its service to the legendary thief
+Vystir.  It is rumored to be the same cloak that he wore when he brutally
+executed his former masters that disrespected him as a young boy, although
+only a few brave souls have ever had the courage to quest him about such
+matters.  Several small holes have been warn in the sleeves and armpits
+while rough scratches cover the main body of the cloak.  Originally it was
+probably quite black and shiny, though the years have made it look much
+more like a dirty blanket covered in dirt and dust.  This would make an
+excellent disguise for hiding amongst the poor beggars on the street corner.
+As you gaze upon the cloak, you hear an insidious whisper in your mind
+repeating the word "umbra" over and over...  Curious.
+~
+A
+26 5
+A
+25 6
+A
+339000 6
+A
+406000 6
+\speech_prog umbra~
+if isworn($n)
+  mpechoat $n You utter the command word and are partially obscured in a swirl of shadow...
+mpecharound $n mutters a few words, and blurs into a swirl of shadow.
+MPBESTOW $n shadowslip 6 24
+endif
+~
+|
+S
+#27981
+orb crystal flames quest~
+a Crystal Orb Engulfed in $B$4Flames$R~
+Burning brightly, an orb curiously floats in the air.~
+Crystal Orb~
+9 8192 16385 1
+0 0 0 0 60
+4 5000000 5
+E
+orb crystal flames quest~
+~
+E
+orb~
+   A perfectly smooth and round crystal orb shimmers a bright blue like the
+suns glare off of the ocean as it hovers slightly in the air.  Bright orange
+and red flames leap off of the sides of the orb and burn up high up into
+the air, although they seem to produce no heat.  The air reverberates
+and pulses with the energy given off by this powerful crystal, commanding
+the respect of all that are near it.
+~
+A
+26 5
+A
+98 3
+A
+102 8
+A
+99 2
+A
+91000 6
+A
+103 10
+S
+#27982
+circle radiating light quest~
+a Circle of $BRadiating Light$R~
+A circle is here giving off blindingly $Bbright light$1.$R~
+~
+9 8192 3 1
+3 0 0 0 60
+4 5000000 5
+E
+circle~
+   A shockingly bright conglomeration of light has been magically forged
+ in the shape of a small ring.  Bright enough to provide light to even the
+darkest corners of Sorpigal, it has the uncanny ability to turn the
+casual glance into an uncontrollable gaze as well. Though void of
+any visible solid material, there is definitely a noticeable weight to
+the ring.
+~
+A
+30 100
+A
+73 5
+A
+103 10
+A
+414000 6
+S
+#27983
+talisman drawan quest~
+Drawan's Talisman~
+A small piece of wood carved in the shape of a flower is here.~
+~
+9 32768 262145 1
+3 0 0 0 60
+4 5000000 5
+E
+talisman~
+   Drawan has discovered a way to place a small portion of his mighty
+power inside objects to draw upon in times of dire need.  This is one
+of two earrings that have successfully been made for this purpose.
+Drawing upon this talisman creates an unmatched power, able to
+overcome even the most savage of wounds. Indecipherable symbols
+cover the flower shaped talisman's entire body, while a small moonstone
+crystal has been inlayed in the center.  It is hard to tell what kind of
+material the talisman is made from, although it is looks like it was carved
+from a reddish colored wood.
+~
+A
+26 3
+A
+98 3
+A
+103 8
+A
+99 4
+A
+78000 6
+A
+80000 6
+S
+#27984
+ring elegant flowers quest~
+an Elegant Ring of $B$5F$6l$7o$2w$5e$6r$7s$R~
+Several small flowers lie here peacefully in a ring.~
+~
+9 32768 3 1
+3 0 0 0 60
+2 5000000 5
+E
+ring~
+   Four small flowers bound together by smooth dark green stems form
+this exquisite ring.  Soft white and yellow petals surround a bright orange
+interior that is partially obscured by long filaments protruding from the
+center of each flower.  For such a delicate ring, few would expect it to
+ contain such great power.
+~
+A
+26 3
+A
+103 8
+A
+98 3
+A
+6000 6
+A
+3000 6
+A
+24 2
+S
+#27985
+armbands bands roots tree yggradsil quest~
+Armbands of Woven Yggradsil Roots~
+Thick, verdant roots have been threaded into a pair of armbands here.~
+~
+9 2097152 257 1
+20 0 0 0 60
+6 5000000 5
+E
+armbands roots tree~
+   Born of the Yggradsil tree, these small roots are destined for
+greatness.  Clumps of dirt fill the magically sturdy weave, bonded
+by the magical water from the Urdar fountain.  The armbands are small,
+little over an inch wide, and the leaves closely resemble the massive
+and protective canopy of the tree they come from.  Smooth silver veins
+are visible on the leaves, and a glow from within pulsates faintly.
+~
+A
+26 4
+A
+103 8
+A
+17 -30
+A
+29 100
+A
+10000 6
+S
+#27986
+strips knotted bark quest~
+Strips of Knotted Bark~
+Several pieces of tree bark are stacked here.~
+~
+9 2097154 33 1
+24 0 0 0 60
+4 5000000 5
+E
+strip~
+   Several strips of knotted tree bark have been stacked side by side
+to create these earthy leggings. Swirling knots almost completely
+ cover the bark and reveal the old age of the tree that must have
+sacrificed itself for this worthy cause.  With a weight well below
+that of metal armor, these leggings allow for excellent movement
+as well as prove to be decent protection for the legs.
+~
+A
+26 3
+A
+103 8
+A
+98 4
+A
+157000 6
+A
+48000 6
+S
+#27987
+gauntlets judgement quest~
+The Gauntlets of Judgement~
+A dusty white pair of metal gauntlets rest here as piously as gauntlets can.~
+~
+9 65536 129 1
+18 0 0 0 60
+6 5000000 5
+E
+gauntlets~
+   These gauntlets were sought out by the legendary
+paladin, Jacques De'Mornay.  It is unclear who the
+actually blacksmith was who created these glorious
+gauntlets, yet their power is not in doubt.  Forged
+from a mysterious metal found deep underground by the
+dwarves, they radiate light outward causing anyone or
+anything that is unrighteous to flee in terror.
+~
+A
+26 5
+A
+98 5
+A
+91 5
+A
+158000 6
+A
+90 5
+A
+103 5
+S
+#27988
+leggings diamond plate quest~
+$BDiamond-Plated$R Leggings~
+A pair of leggings sparkle in the light.~
+~
+9 65537 33 1
+24 0 0 0 60
+8 5000000 5
+E
+leggings~
+   Long ago, several exquisite diamonds were acquired
+from a draconian jeweler in exchange for protection to
+and from Sorpigal.  These diamonds, which were only
+recently found buried in a chest in the Paladin's
+guild, have been cut and imbedded within some fine
+leather leggings.  While light and maneuverable, they
+provide exceptional protection from even the most
+furious strikes against them.
+~
+A
+26 6
+A
+99 3
+A
+98 3
+A
+100 3
+A
+173000 6
+A
+103 4
+S
+#27989
+soul innocent quest~
+The Soul of an Innocent~
+Writhing in pain, a small white soul floats here.~
+~
+9 131072 262145 1
+3 0 0 0 60
+1 5000000 5
+E
+soul~
+   Fighting and writhing in pure silent agony, the
+glowing white soul of some innocent victim is trapped
+and mysteriously held by this tarnished gold earring.
+Only the work of the utmost evil could have created
+such horrendous object.  This piece may grant some
+unknown power, or perhaps it is just for pure
+entertainment and enjoyment.
+~
+A
+18 5
+A
+19 5
+A
+102 4
+A
+172000 6
+A
+103 4
+S
+#27990
+leggings marrok abyss quest~
+Marrok's Leggings of the Abyss~
+Long blue leggings gleam in the light.~
+~
+9 131072 33 1
+24 0 0 0 60
+6 5000000 5
+E
+leggings marrok~
+   Out of the void of darkness these leggings were forged and brought into the
+world by some immensely evil power.  They appear to be metallic in nature, but
+seem to be flexible and fairly light.  Glowing slightly, dark blue light yearns
+to escape from within them but can not quite get away.  Able to draw power from
+the dark abyss that Marrok discovered, many evil souls would find immense power
+in these leggings if they somehow came to possess them.
+~
+A
+26 6
+A
+103 6
+A
+31 100
+A
+73 4
+A
+99 3
+A
+98 3
+S
+#27991
+feather giant eagle quest~
+a Giant Eagle Feather~
+A giant feather softly lays here.~
+~
+9 1048576 262145 1
+3 0 0 0 60
+2 5000000 5
+E
+feather~
+   This large feather must have been lost from one of the
+ancient race of eagles that once inhabited the lands
+near where the harpys have taken up their current
+home.  Golden rays of light reflect off the feather
+when it shimmers in the sun.  Being in close proximity
+to the feather seems to make everything feel lighter,
+as if a mighty updraft of wind appears out of nowhere.
+~
+A
+26 5
+A
+98 2
+A
+35 100
+A
+99 2
+S
+#27992
+gloves montolio animal quest~
+Montolio's Kirre Hide Gloves~
+An old pair of animal skin gloves have been forgotten here.~
+~
+9 1048576 129 1
+18 0 0 0 60
+4 5000000 5
+E
+gloves~
+   Formed from the fallen brethren that frequent his
+spring, these animal skins are made from the finest
+hides in all the lands.  The soft leather has been
+cured and tanned to perfection.  The fit of this glove
+is unmatched providing some protection from the
+elements as well as an extremely comfortable home for
+a hand.
+~
+A
+26 5
+A
+98 3
+A
+99 3
+A
+410000 6
+A
+104000 6
+A
+102 4
+S
+#27993
+bones istus quest~
+The Bones of Istus~
+A small pile of bones is stacked here.~
+~
+9 524288 5 1
+6 0 0 0 60
+6 5000000 5
+E
+bones~
+   For ages the wrath and anger of Istus crashed against
+the barrier that confined him within the magical
+circle.  Although he never found freedom, he did find
+death.  Only in the breaking of his will and utter
+defeat was he was finally reduced to a pile of bones
+as his soul relieved itself of his mortal body and
+this world, never to return again.  All that is left
+are a few bones, made into this necklace.  Sometimes,
+his infernal screams are still able to be heard
+resonating through his old bones.
+~
+A
+26 6
+A
+98 3
+A
+29 100
+A
+256000 6
+S
+#27994
+wraps hand grandmaster monk quest~
+The Grandmaster's Hand Wraps~
+A set of fibrous wraps lay on the ground.~
+~
+9 524288 129 1
+18 0 0 0 60
+4 5000000 5
+E
+wraps~
+   Once a present for a gifted student, these hand wraps
+used to belong to the Shao-lin grandmaster himself.
+Strips of a fibrous plant from the jungle were woven
+into seashell shaped knots covering the knuckles,
+while the main body of the wraps cover the entire
+hands and wrists.  Once worn, they seal in the hands
+are provide excellent protection from the brutality
+that will be dished out by a focused monk.  Only the
+most skilled masters possessed to ability to weave
+such fine wraps.
+~
+A
+26 6
+A
+45 7
+A
+363000 6
+A
+85 5
+A
+90 5
+S
+#27995
+mask blaine enchantment quest~
+Blaine's Mask of Enchantment~
+A painted mask draws attention to itself on the ground.~
+~
+9 4194304 131073 1
+6 0 0 0 60
+4 5000000 5
+E
+mask~
+   Having earned a reputation as being one of Sorpigal's
+finest bards and a lore master for many of the guilds
+and surrounding lands, Blaine spent much of his early
+years creating this magical mask to enchant those that
+listen to him.  So captivating were his stories, that
+people would feel as though they had experienced the
+tale, rather than just heard it.  A mysterious and
+powerful magic has been woven in this mask to grant
+such a mind altering experience.
+~
+A
+26 5
+A
+540000 6
+A
+533000 6
+A
+301000 4
+A
+29 100
+A
+98 2
+S
+#27996
+belt pink satin quest~
+a Belt of $B$6Pink Satin$R~
+A bright pink belt sparkles here.~
+blah~
+9 4194304 2049 1
+12 0 0 0 60
+4 5000000 5
+E
+belt~
+   This bright pink belt is made from the finest artisans
+that Sorpigal has to offer.   A very thick band of
+folded over satin has been sewn together to create the
+body of the belt, while the two ends have been left to
+hang down off the right side of the belt.  Several
+small sequins dot the front of the belt to make it
+sparkle in the light.  Although its hard to tell how
+much protection belt provides, it clearly can be seen
+as a fashion statement to wear something like this.
+~
+A
+26 5
+A
+539000 10
+A
+98 2
+A
+545000 6
+A
+416000 6
+A
+102 6
+S
+#27997
+sword ghaerad legends quest~
+Ghaerad, Sword of Legends~
+Gleaming in the distance, this large sword is hard to miss.~
+Fixed.~
+5 1380352 8193 1
+0 8 7 3 60
+10 5000000 5
+E
+sword legends legend ghaerad~
+Empty desc.
+A solo traveler will never find themselves in want of additional company
+while in possession of this mighty sword.  Although legendary in its power, its
+bark might be far worse than its bite.  An ornately decorated golden hilt gives
+way to a rather oversized blade that gleams in the light.  It appears to be in
+perfect condition even though the battles that it has fought in are truly
+breathtaking. Swift is its strike when wielded by a master swordsman, and
+sharp is the tongue lashing received for its misuse.
+A note from the manufacturer printed upon the hilt reads:
+We hope you enjoy your Ghaerad Sword of Legends(tm) and its
+endless witty barbs, however should you tire of the weapon's razor
+sharp wit, simply type 'gag sword' while wielding it to enjoy peace
+and quiet for a time."
+-Sincerely
+Mgmt
+~
+A
+26 7
+A
+54 1
+A
+43 1
+A
+58 1
+A
+59 2
+A
+81 2
+A
+82 3
+A
+44 3
+A
+40 3
+A
+57 3
+S
+#27998
+blade janikhel shadows quest~
+Janikhel's Blade of Shadows~
+This long blade blends into the shadows.~
+Fixed.~
+5 147456 8193 1
+0 7 7 11 60
+6 5000000 5
+E
+blade~
+   All but hidden within the shadows, and barely visible when surrounded by
+light, this long blade is quite a unique and deadly weapon.  It was brought
+into this world by a marriage of dark magic and Janikhel's soul united to forge
+this killer deep within the thieves guild.  The blade itself is hard to
+examine, it seems to move and sway as if by a passing wind, though only the
+foolish would discount its deadly effectiveness.  The very life and soul of its
+victim are ravaged and consumed by its deadly strike.
+~
+A
+26 7
+A
+83 3
+A
+50 6
+A
+45 6
+S
+#27999
+staff soul grinder antioch quest~
+The Soul Grinder of Antioch~
+This long staff rests here proudly.~
+Fixed.~
+5 2138112 8193 1
+0 7 5 7 60
+9 5000000 5
+E
+staff~
+   A smooth oak shaft extends below a long thick column of carved green jade to
+form this mighty staff.  Several ancient spells have been inscribed into the
+stone, while depictions of spirits being driven from prominent temples in
+Antioch are displayed on almost every inch of the staff body.  A smooth hand
+hold is located about three quarters of the way up the staff, and is the only
+place that shows any signs of wear.  This staff is as much a work of
+extraordinary craftsmanship as it is a weapon to be feared.
+~
+A
+26 5
+A
+103 7
+A
+44 4
+A
+61 4
+A
+40 4
+A
+57 4
+S
+$~
