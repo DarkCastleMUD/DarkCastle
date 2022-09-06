@@ -1635,7 +1635,10 @@ int do_mpbestow(CHAR_DATA *ch, char *argument, int cmd)
       arg3[MAX_INPUT_LENGTH];
   CHAR_DATA *victim, *owner = NULL;
   if (!IS_NPC(ch))
+  {
+    send_to_char("Huh?\r\n",ch);
     return eFAILURE;
+  }
   argument = one_argument(argument, arg);
   argument = one_argument(argument, arg1);
   argument = one_argument(argument, arg2);
@@ -1719,6 +1722,12 @@ int do_mpbestow(CHAR_DATA *ch, char *argument, int cmd)
 // stops prog, mpthrow a special kinda throw, picks it up again when delay is over
 int do_mppause( CHAR_DATA *ch, char *argument, int cmd )
 {
+  if (!IS_NPC(ch))
+  {
+    send_to_char("Huh?\r\n",ch);
+    return eFAILURE;
+  }
+
   struct mprog_throw_type * throwitem = NULL;
   int delay;
 
@@ -1903,6 +1912,12 @@ int do_mppeace( struct char_data *ch, char *argument, int cmd )
 
 int do_mpretval( struct char_data *ch, char *argument, int cmd )
 {
+  if (!IS_NPC(ch))
+  {
+    send_to_char("Huh?\r\n",ch);
+    return eFAILURE;
+  }
+
   char *retvals[] =
   {
      "true",
@@ -2079,6 +2094,12 @@ char *allowedData[] = {
 
 int do_mpsetmath(char_data *ch, char *arg, int cmd)
 {
+  if (!IS_NPC(ch))
+  {
+    send_to_char("Huh?\r\n",ch);
+    return eFAILURE;
+  }
+
   char_data *vict;
 //  if (activeActor) csendf(activeActor, "{%s}\r\n", arg);
 //  vict = get_pc("Urizen");
