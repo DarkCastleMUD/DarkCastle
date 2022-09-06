@@ -1325,7 +1325,7 @@ int quest_vendor(char_data *ch, obj_data *obj, int cmd, const char *arg, char_da
             dc_free(buffer);
          }
       }
-      for (int qvnum = 27943; qvnum < 28000; qvnum++)
+      for (int qvnum = 27975; qvnum < 28000; qvnum++)
       {
          rnum = real_object(qvnum);
          if (rnum >= 0)
@@ -1361,7 +1361,7 @@ int quest_vendor(char_data *ch, obj_data *obj, int cmd, const char *arg, char_da
       bool FOUND = false;
       int want_num = atoi(arg2) - 1;
       int n = 0;
-      for (int qvnum = 27943; qvnum <= 27999; qvnum++)
+      for (int qvnum = 27975; qvnum <= 27999; qvnum++)
       {
          rnum = real_object(qvnum);
          if (rnum >= 0 && n++ == want_num)
