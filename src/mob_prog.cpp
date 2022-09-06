@@ -447,7 +447,7 @@ void translate_value(char *leftptr, char *rightptr, int16 **vali,
 		}
 	}
 
-  if (!target && !otarget && ztarget == -1 && rtarget == -1 && !valset && str_cmp(right, "numpcs") && str_cmp(right, "hitpoints") && str_cmp(right, "move") && str_cmp(right, "mana"))
+  if (!target && !otarget && ztarget == -1 && rtarget == -1 && !valset && str_cmp(right, "numpcs") && str_cmp(right, "hitpoints") && str_cmp(right, "move") && str_cmp(right, "mana") && str_cmp(right, "isdaytime") && str_cmp(right, "israining"))
   {
     if (!silent)
     {
