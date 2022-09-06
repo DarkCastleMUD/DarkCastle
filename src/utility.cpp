@@ -1929,7 +1929,7 @@ void parse_bitstrings_into_int(const char *bits[], string remainder_args, char_d
 
 void parse_bitstrings_into_int(const char *bits[], const char *remainder_args, char_data *ch, uint value[])
 {
-  return parse_bitstrings_into_int(bits, remainder_args, ch, value);
+  return parse_bitstrings_into_int(bits, string(remainder_args), ch, value);
 }
 
 // calls below uint32 version
@@ -1986,7 +1986,7 @@ void parse_bitstrings_into_int(const char *bits[], string remainder_args, char_d
 
 void parse_bitstrings_into_int(const char *bits[], const char *remainder_args, char_data *ch, uint16 &value)
 {
-  return parse_bitstrings_into_int(bits, remainder_args, ch, value);
+  return parse_bitstrings_into_int(bits, string(remainder_args), ch, value);
 }
 
 // Assumes bits is array of strings, ending with a "\n" string
@@ -2045,7 +2045,7 @@ void parse_bitstrings_into_int(const char *bits[], string remainder_args, char_d
 
 void parse_bitstrings_into_int(const char *bits[], const char *remainder_args, char_data *ch, uint32 &value)
 {
-  return parse_bitstrings_into_int(bits, remainder_args, ch, value);
+  return parse_bitstrings_into_int(bits, string(remainder_args), ch, value);
 }
 
 // Display a \n terminated list to the character
