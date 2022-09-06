@@ -1325,7 +1325,7 @@ int quest_vendor(char_data *ch, obj_data *obj, int cmd, const char *arg, char_da
             dc_free(buffer);
          }
       }
-      for (int qvnum = 27943; qvnum < 28000; qvnum++)
+      for (int qvnum = 27975; qvnum < 28000; qvnum++)
       {
          rnum = real_object(qvnum);
          if (rnum >= 0)
