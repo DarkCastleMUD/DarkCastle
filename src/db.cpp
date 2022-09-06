@@ -3487,7 +3487,7 @@ int create_blank_mobile(int nr)
 	reset_char(mob);
 	mob->name = str_hsh("empty mob");
 	mob->short_desc = str_hsh("an empty mob");
-	mob->long_desc = str_hsh("an empty mob description");
+	mob->long_desc = str_hsh("an empty mob description\r\n");
 	mob->description = str_hsh("");
 	mob->title = 0;
 	mob->fighting = 0;
