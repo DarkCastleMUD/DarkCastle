@@ -1752,11 +1752,20 @@ int do_mppause( CHAR_DATA *ch, char *argument, int cmd )
     throwitem->data_num = -999;
   }
 
-  throwitem->target_mob_num = mob_index[ch->mobdata->nr].virt;
+  if (IS_MOB(ch))
+  {
+    throwitem->target_mob_num = mob_index[ch->mobdata->nr].virt;
+    throwitem->mob = TRUE; // This is, suprisingly, a mob
+  }
+  else
+  {
+    throwitem->target_mob_num = 0;
+    throwitem->mob = false;
+  }
+
   throwitem->target_mob_name[0] = '\0';
   throwitem->tMob = ch;
-  throwitem->delay = delay;
-  throwitem->mob = TRUE; // This is, suprisingly, a mob
+  throwitem->delay = delay;  
 
   extern CHAR_DATA *activeActor;
   extern CHAR_DATA *activeRndm;
