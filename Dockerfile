@@ -17,6 +17,6 @@ RUN scons -j128
 
 WORKDIR /srv/dcastle.6969/lib
 
-#CMD ["/srv/dcastle2/git/DarkCastle/src/dcastle", "-p6969"]
+CMD ["/srv/dcastle2/git/DarkCastle/src/dcastle", "-p6969", "-P"]
 
 LABEL Name=darkcastle Version=0.0.1
