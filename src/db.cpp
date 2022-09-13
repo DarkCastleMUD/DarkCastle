@@ -981,7 +981,7 @@ void reset_time(void)
 }
 
 /* generate index table for monster file */
-struct index_data *generate_mob_indices(int *top, struct index_data *index)
+index_data *generate_mob_indices(int *top, struct index_data *index)
 {
 	int i = 0;
 	char buf[82];
