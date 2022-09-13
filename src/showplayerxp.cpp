@@ -1,9 +1,12 @@
-#include <iostream>
 #include <string.h>
 #include <unistd.h>
+
+#include <iostream>
 #include <map>
 #include <cmath>
 #include <filesystem>
+#include <queue>
+#include <cassert>
 
 #include "spells.h"
 #include "connect.h"
@@ -16,10 +19,9 @@
 #include "Leaderboard.h"
 #include "interp.h"
 #include "DC.h"
-#include <queue>
-#include <cassert>
 
 using namespace std;
+
 void load_char_obj_error(FILE *fpsave, char strsave[MAX_INPUT_LENGTH]);
 void store_to_char(struct char_file_u *st, CHAR_DATA *ch);
 int store_to_char_variable_data(CHAR_DATA *ch, FILE *fpsave);
@@ -522,9 +524,6 @@ int main(int argc, char **argv)
     strncpy(c_input, c_arg2, sizeof(c_input) - 1);
   } while (c_arg1[0] != '\0');
   
-  
-  
-
   string orig_cwd, dclib;
   if (argc < 2)
     return 1;
@@ -558,6 +557,9 @@ int main(int argc, char **argv)
 	log("Generating object indices/loading all objects", 0, LOG_MISC);
 	generate_obj_indices(&top_of_objt, obj_index);
 
+  log("Generating mob indices/loading all mobiles", 0, LOG_MISC);
+	generate_mob_indices(&top_of_mobt, mob_index);
+
 	log("renumbering zone table", 0, LOG_MISC);
 	renum_zone_table();
 
@@ -569,6 +571,8 @@ int main(int argc, char **argv)
   load_vaults();
 
   chdir(orig_cwd.c_str());
+
+  cerr << real_mobile(0) << " " << real_mobile(1) << endl;
 
   int vnum = 0;
   if (argc >= 3)
