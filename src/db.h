@@ -149,6 +149,7 @@ char fread_char (FILE *fl);
 void add_mobspec(int i);
 void write_object_csv(obj_data * obj, ofstream &fout);
 index_data *generate_obj_indices(int *top, index_data *index);
+index_data *generate_mob_indices(int *top, struct index_data *index);
 
 extern struct skill_quest *skill_list; 
 extern index_data mob_index_array[MAX_INDEX];
