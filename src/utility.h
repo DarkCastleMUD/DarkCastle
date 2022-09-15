@@ -360,6 +360,7 @@ inline const short IS_ANONYMOUS(CHAR_DATA *ch)
 #define EXIT(ch, door)  (world[(ch)->in_room].dir_option[door])
 #define CAN_GO(ch, door) (EXIT(ch,door) \
 			  && (EXIT(ch,door)->to_room != NOWHERE) \
+           && (EXIT(ch,door)->to_room != -1) \
 			  && !IS_SET(EXIT(ch, door)->exit_info, EX_CLOSED))
 
 #define GET_ALIGNMENT(ch) ((ch)->alignment)
