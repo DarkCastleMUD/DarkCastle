@@ -1801,28 +1801,28 @@ int reroll_trader(char_data *ch, obj_data *obj, int cmd, const char *arg, char_d
     case CMD_LIST:
     if (r.state == reroll_t::reroll_states_t::PICKED_OBJ_TO_REROLL) 
     {
-      do_say(owner, fmt::format("You need to confirm or cancel rerolling {}.", GET_OBJ_SHORT(r.orig_obj)), CMD_SAY);
+      owner->tell(ch, fmt::format("You need to confirm or cancel rerolling {}.", GET_OBJ_SHORT(r.orig_obj)));
       return eSUCCESS;
     }
 
-    do_say(owner, "Type reroll <object keyword> to reroll that object.");
-    do_say(owner, "I will then ask you to confirm the object you want re-rolled.");
-    do_say(owner, "The cost will be 1 Cloverleaf token.");
-    do_say(owner, "You will get two re-rolled choices or the original to pick from.");
-    do_say(owner, "Type choose 1, 2 or 3 to choose either one of the two rerolls or the original.");
+     owner->tell(ch,"Type reroll <object keyword> to reroll that object.");
+    owner->tell(ch,"I will then ask you to confirm the object you want re-rolled.");
+    owner->tell(ch, "The cost will be 1 Cloverleaf token.");
+    owner->tell(ch, "You will get two re-rolled choices or the original to pick from.");
+    owner->tell(ch, "Type choose 1, 2 or 3 to choose either one of the two rerolls or the original.");
     return eSUCCESS;
     break;
 
     case CMD_REROLL:
     if (r.state == reroll_t::reroll_states_t::PICKED_OBJ_TO_REROLL)
     {
-      do_say(owner, fmt::format("You need to confirm or cancel rerolling {}.", GET_OBJ_SHORT(r.orig_obj)), CMD_SAY);
+      owner->tell(ch, fmt::format("You need to confirm or cancel rerolling {}.", GET_OBJ_SHORT(r.orig_obj)));
       return eSUCCESS;
     }
 
     if (arg1.empty())
     {
-      do_say(owner, fmt::format("You have to type reroll <object keyword> to reroll that object."), CMD_SAY);
+      owner->tell(ch, fmt::format("You have to type reroll <object keyword> to reroll that object."));
       return eSUCCESS;
     }
     else
@@ -1830,14 +1830,14 @@ int reroll_trader(char_data *ch, obj_data *obj, int cmd, const char *arg, char_d
       obj = get_obj_in_list_vis(ch, arg1.c_str(), ch->carrying);
       if (obj == nullptr)
       {
-        do_say(owner, fmt::format("I don't see anything on you matching \'{}\'", arg1), CMD_SAY);
+        owner->tell(ch, fmt::format("I don't see anything on you matching \'{}\'", arg1));
         return eSUCCESS;
       }
       else
       {
         if (GET_OBJ_TYPE(obj) != ITEM_WEAPON && GET_OBJ_TYPE(obj) != ITEM_ARMOR)
         {
-          do_say(owner, "I can only reroll weapons or armor.");
+          owner->tell(ch, "I can only reroll weapons or armor.");
           return eSUCCESS;
         }
 
@@ -1845,14 +1845,14 @@ int reroll_trader(char_data *ch, obj_data *obj, int cmd, const char *arg, char_d
             isname("gl", ((obj_data *)(obj_index[obj->item_number].item))->name) ||
             IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL))
         {
-          do_say(owner, "I can't reroll GL weapons or armor.");
+          owner->tell(ch, "I can't reroll GL weapons or armor.");
           return eSUCCESS;
         }
 
          if (isname("quest", ((obj_data *)(obj_index[obj->item_number].item))->name) ||
           obj_index[obj->item_number].virt >= 3124 && obj_index[obj->item_number].virt <= 3127)
           {
-            do_say(owner, "I can't reroll quest weapons or armor.");
+            owner->tell(ch, "I can't reroll quest weapons or armor.");
             return eSUCCESS;
           }
 
@@ -1861,8 +1861,8 @@ int reroll_trader(char_data *ch, obj_data *obj, int cmd, const char *arg, char_d
         r.orig_rnum = GET_OBJ_RNUM(obj);
         r.state = reroll_t::reroll_states_t::PICKED_OBJ_TO_REROLL;
         reroll_sessions[GET_NAME(ch)] = r;
-        do_say(owner, fmt::format("Are you sure you want me to reroll {} for you?", GET_OBJ_SHORT(obj)), CMD_SAY);
-        do_say(owner, "Type confirm and I'll reroll it otherwise type cancel if you changed your mind.", CMD_SAY);
+        owner->tell(ch, fmt::format("Are you sure you want me to reroll {} for you?", GET_OBJ_SHORT(obj)));
+        owner->tell(ch, "Type confirm and I'll reroll it otherwise type cancel if you changed your mind.");
       }
     }
     break;
@@ -1872,7 +1872,7 @@ int reroll_trader(char_data *ch, obj_data *obj, int cmd, const char *arg, char_d
     {
       if (search_char_for_item_count(ch, real_object(OBJ_CLOVERLEAF), false) < 1)
       {
-        do_say(owner, "You don't have the required cloverleaf token.");
+        owner->tell(ch, "You don't have the required cloverleaf token.");
         return eSUCCESS;
       }
 
@@ -1901,14 +1901,14 @@ int reroll_trader(char_data *ch, obj_data *obj, int cmd, const char *arg, char_d
       {
         if (r.choice1_obj == nullptr)
         {
-          do_say(owner, "Choice 1 is:");
+          owner->tell(ch, "Choice 1 is:");
           identify(ch, o);
           ch->send("\r\n");
           r.choice1_obj = o;
         }
         else if (r.choice2_obj == nullptr)
         {
-          do_say(owner, "Choice 2 is:");
+          owner->tell(ch, "Choice 2 is:");
           identify(ch, o);
           ch->send("\r\n");
           r.choice2_obj = o;
@@ -1916,7 +1916,7 @@ int reroll_trader(char_data *ch, obj_data *obj, int cmd, const char *arg, char_d
         r.state = reroll_t::reroll_states_t::REROLLED;
         reroll_sessions[GET_NAME(ch)] = r;
       }
-      do_say(owner, "Choice 3 is:");
+      owner->tell(ch, "Choice 3 is:");
       identify(ch, r.orig_obj);
     }
     else
@@ -1962,18 +1962,18 @@ int reroll_trader(char_data *ch, obj_data *obj, int cmd, const char *arg, char_d
     {
       extract_obj(r.choice1_obj);
       extract_obj(r.choice2_obj);
-      do_say(owner, fmt::format("Ok. You keep the original {}.", GET_OBJ_SHORT(r.orig_obj)), CMD_SAY);
+      owner->tell(ch, fmt::format("Ok. You keep the original {}.", GET_OBJ_SHORT(r.orig_obj)));
     }
     else
     {
-      do_say(owner, "Type choose 1, 2 or 3.");
+      owner->tell(ch, "Type choose 1, 2 or 3.");
       return eSUCCESS;
     }
     reroll_sessions.erase(GET_NAME(ch));
     break;
 
     case CMD_CANCEL:
-    do_say(owner, "I'm canceling this reroll.");
+    owner->tell(ch, "I'm canceling this reroll.");
 
     if (r.choice1_obj != nullptr)
     {
