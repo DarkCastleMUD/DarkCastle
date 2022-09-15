@@ -52,46 +52,64 @@ void assign_mobiles(void)
 // The following four functions are just here to make sure when someone removes a mob
 // or object from the world, we don't try to assign procs to index[-1]
 
-void assign_one_mob_non(int mob_num, int (*func)(CHAR_DATA*, struct obj_data *, int, const char*, CHAR_DATA*))
+void assign_one_mob_non(int vnum, special_function func)
 {
-	int mob = real_mobile(mob_num);
+  if (vnum >= 0)
+  {
+    DC::instance().mob_non_combat_functions[vnum] = func;
+  } 
 
-	if(mob < 0)
+	int rnum = real_mobile(vnum);
+
+	if(rnum >= 0)
+  {
+    mob_index[rnum].non_combat_func = func;
+  }
+}
+
+void assign_one_mob_com(int vnum, special_function func)
+{
+  if (vnum >= 0)
+  {
+    DC::instance().mob_non_combat_functions[vnum] = func;
+  }
+
+	int rnum = real_mobile(vnum);
+  
+	if(rnum >= 0)
+  {
+	  mob_index[rnum].combat_func = func;
+  }
+}
+
+void assign_one_obj_non(int vnum, special_function func)
+{
+  if (vnum >= 0)
+  {
+    DC::instance().obj_non_combat_functions[vnum] = func;
+  }
+
+	int rnum = real_object(vnum);
+
+	if(rnum >= 0)
+  {
+    obj_index[rnum].non_combat_func = func;
+  }
+}
+
+void assign_one_obj_com(int vnum, special_function func)
+{
+  if (vnum >= 0)
+  {
+    DC::instance().obj_combat_functions[vnum] = func;
+  }
+
+	int rnum = real_object(vnum);
+
+	if(rnum >= 0)
 	{
-	  if (DC::instance().cf.test_world == false) {
-	    logf(IMMORTAL, LOG_WORLD, "Assigning non_combat proc to non-existant mob '%d'.", mob_num);
-	  }
-	}
-	else mob_index[mob].non_combat_func = func;
-}
-
-void assign_one_mob_com(int mob_num, int (*func)(CHAR_DATA*, struct obj_data *, int, const char*, CHAR_DATA*))
-{
-	int mob = real_mobile(mob_num);
-
-	if(mob < 0)
-	{
-		logf(IMMORTAL, LOG_WORLD, "Assigning combat proc to non-existant mob '%d'.", mob_num);
-	}
-	else mob_index[mob].combat_func = func;
-}
-
-void assign_one_obj_non(int obj_num, int (*func)(CHAR_DATA*, struct obj_data *, int, const char*, CHAR_DATA*))
-{
-	int obj = real_object(obj_num);
-
-	if(obj < 0)
-		logf(IMMORTAL, LOG_WORLD, "Assigning non-combat proc to non-existant obj '%d'.", obj_num);
-	else obj_index[obj].non_combat_func = func;
-}
-
-void assign_one_obj_com(int obj_num, int (*func)(CHAR_DATA*, struct obj_data *, int, const char*, CHAR_DATA*))
-{
-	int obj = real_object(obj_num);
-
-	if(obj < 0)
-		logf(IMMORTAL, LOG_WORLD, "Assigning combat proc to non-existant obj '%d'.", obj_num);
-	else obj_index[obj].combat_func = func;
+    obj_index[rnum].combat_func = func;
+  }
 }
 
 void assign_non_combat_procs() {
@@ -142,6 +160,8 @@ void assign_non_combat_procs() {
     SPEC_FUN    startrek_miles;
     SPEC_FUN    cardinal;
     SPEC_FUN    eddie_shopkeeper;
+    SPEC_FUN  reroll_trader;
+
     assign_one_mob_non(3071, cardinal);
 
     assign_one_mob_non(501, arena_only);
@@ -278,6 +298,7 @@ void assign_non_combat_procs() {
     assign_one_mob_non(17805,  super_repair_guy);
     assign_one_mob_non(32047,  repair_shop);
     assign_one_mob_non(10031,  eddie_shopkeeper);
+    assign_one_mob_non(10032,  reroll_trader);
 
     return;
 }
