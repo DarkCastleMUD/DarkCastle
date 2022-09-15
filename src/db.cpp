@@ -3528,8 +3528,24 @@ int create_blank_mobile(int nr)
 	// insert
 	mob_index[cur_index].virt = nr;
 	mob_index[cur_index].number = 0;
-	mob_index[cur_index].non_combat_func = 0;
-	mob_index[cur_index].combat_func = 0;
+	if (DC::instance().mob_non_combat_functions.contains(nr))
+	{
+		mob_index[cur_index].non_combat_func = DC::instance().mob_non_combat_functions[nr];
+	}
+	else
+	{
+		mob_index[cur_index].non_combat_func = nullptr;
+	}
+
+	if (DC::instance().mob_combat_functions.contains(nr))
+	{
+		mob_index[cur_index].combat_func = DC::instance().mob_combat_functions[nr];
+	}
+	else
+	{
+		mob_index[cur_index].combat_func = nullptr;
+	}
+
 	mob_index[cur_index].item = mob;
 
 	mob_index[cur_index].mobprogs = 0;
