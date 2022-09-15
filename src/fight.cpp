@@ -7213,3 +7213,10 @@ void char_data::sendRaw(string buffer)
     this->desc->allowColor = 1;
   }
 }
+
+command_return_t char_data::tell(char_data* victim, string message)
+{
+  string buffer = string(GET_NAME(victim)) + " " + message;
+
+  return do_tell(this, buffer, CMD_TELL);
+}

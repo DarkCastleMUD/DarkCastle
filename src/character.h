@@ -5,9 +5,20 @@
 | Description: This file contains the header information for the character
 |   class implementation.
 */
-
 #define  COMPILE_WITH_CHANGES 1
 
+#include <sys/time.h>
+#include <stdint.h>
+#include <strings.h>
+
+#include <queue>
+#include <map>
+#include <string>
+#include <vector>
+#include <string>
+#include <algorithm>
+
+#include "DC.h"
 #include "affect.h"  /* MAX_AFFECTS, etc.. */
 #include "alias.h"   /* struct char_player_alias, MAX_ALIASES, etc.. */
 #include "structs.h" /* ubyte, ubyte, int16, etc.. */
@@ -17,20 +28,7 @@
 #include "mobile.h"
 #include "sing.h"
 #include "quest.h"
-
-extern "C" {
-#include <sys/time.h>
-#include <stdint.h>
-}
-
-#include <queue>
-#include <map>
-#include <string>
-#include <vector>
-#include <string>
-#include <algorithm>
-#include "DC.h"
-#include <strings.h>
+#include "interp.h"
 
 struct strcasecmp_compare
 {
@@ -485,6 +483,7 @@ struct char_data
     void fillHP(void);
     void fillHPLimit(void);
     void send(string);
+    command_return_t tell(char_data*, string);
     void sendRaw(string);
     vector<char_data *> getFollowers(void);
     void setPlayerLastMob(u_int64_t mobvnum);
