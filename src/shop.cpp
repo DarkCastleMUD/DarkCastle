@@ -36,6 +36,7 @@
 #include "spells.h"
 #include "inventory.h"
 #include "const.h"
+#include "wizard.h"
 
 extern struct index_data *mob_index;
 
@@ -1752,6 +1753,125 @@ int eddie_shopkeeper(struct char_data *ch, struct obj_data *obj, int cmd, const 
       }
     }
     do_save(ch, "", 0);
+  }
+
+  return eSUCCESS;
+}
+
+
+struct reroll_t
+{
+  string playerName = {};
+  uint64_t choice1_rnum = {};
+  obj_data* choice1_obj = nullptr;
+  uint64_t choice2_rnum = {};
+  obj_data* choice2_obj = nullptr;
+  uint64_t orig_rnum = {};
+  obj_data* orig_obj = nullptr;
+  vnum_t vnum = {};
+};
+
+map<string, reroll_t> reroll_sessions = {};
+
+int reroll_trader(char_data *ch, obj_data *obj, int cmd, const char *arg, char_data *owner)
+{
+  if (ch == nullptr || IS_MOB(ch))
+  {
+    return eFAILURE;
+  }
+
+  string arg1, remainder_args;
+  tie(arg1, remainder_args) = half_chop(arg);
+
+  reroll_t r = {};
+  if (reroll_sessions.contains(GET_NAME(ch)))
+  {
+    r = reroll_sessions[GET_NAME(ch)];
+  }
+  
+  obj_list_t obj_list = {};
+  switch(cmd)
+  {
+    case CMD_LIST:
+    if (r.orig_obj != nullptr && GET_OBJ_RNUM(r.orig_obj) == r.orig_rnum)
+    {
+      do_say(owner, fmt::format("You need to confirm or cancel rerolling {}.", GET_OBJ_SHORT(r.orig_obj)), CMD_SAY);
+      return eSUCCESS;
+    }
+
+    do_say(owner, "Type reroll <object keyword> to reroll that object.");
+    do_say(owner, "The cost is 1 Cloverleaf token.");
+    do_say(owner, "You will get two choices or the original to pick from.");
+    do_say(owner, "Type choose 1, 2 or 3 to choose either one of the two rerolls or the original.");
+    return eSUCCESS;
+    break;
+
+    case CMD_REROLL:
+    if (r.orig_obj != nullptr && GET_OBJ_RNUM(r.orig_obj) == r.orig_rnum)
+    {
+      do_say(owner, fmt::format("You need to confirm or cancel rerolling {}.", GET_OBJ_SHORT(r.orig_obj)), CMD_SAY);
+      return eSUCCESS;
+    }
+
+    if (arg1.empty())
+    {
+      do_say(owner, fmt::format("You have to type reroll <object keyword> to reroll that object."), CMD_SAY);
+      return eSUCCESS;
+    }
+    else
+    {
+      obj = get_obj_in_list_vis(ch, arg1.c_str(), ch->carrying);
+      if (obj == nullptr)
+      {
+        do_say(owner, fmt::format("I don't see anything on you matching \'{}\'", arg1), CMD_SAY);
+        return eSUCCESS;
+      }
+      else
+      {
+        r = {};
+        r.orig_obj = obj;
+        r.orig_rnum = GET_OBJ_RNUM(obj);
+        reroll_sessions[GET_NAME(ch)] = r;
+        do_say(owner, fmt::format("Are you sure you want me to reroll {} for you?", GET_OBJ_SHORT(obj)), CMD_SAY);
+        do_say(owner, "Type confirm and I'll reroll it otherwise type cancel if you changed your mind.", CMD_SAY);
+      }
+    }
+    break;
+    
+    case CMD_CONFIRM:
+    if (r.orig_obj != nullptr && GET_OBJ_RNUM(r.orig_obj) == r.orig_rnum)
+    {
+      if (r.choice1_obj == nullptr)
+      {
+        obj_list = oload(owner, GET_OBJ_RNUM(obj), 2, true);
+        for (auto& o : obj_list)
+        {
+          ch->send(fmt::format("n:{} s:{} v:{} r:{} {} {}\r\n", GET_OBJ_NAME(o), GET_OBJ_SHORT(o), GET_OBJ_VNUM(o), GET_OBJ_RNUM(o), fmt::ptr(o), GET_NAME(o->carried_by)));
+          if (r.choice1_obj == nullptr)
+          {
+            r.choice1_obj = o;
+            r.choice1_rnum = GET_OBJ_RNUM(o);
+          }
+          else if (r.choice2_obj == nullptr)
+          {
+            r.choice2_obj = o;
+            r.choice2_rnum = GET_OBJ_RNUM(o);
+          }
+          reroll_sessions[GET_NAME(ch)] = r;
+        }
+      }
+    }
+
+    break;
+
+    case CMD_CHOOSE:
+    ch->send("Choosing...\r\n");
+
+    break;
+
+    default:
+    return eFAILURE;
+    break;
   }
 
   return eSUCCESS;
