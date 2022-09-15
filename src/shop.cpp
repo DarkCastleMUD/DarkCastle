@@ -1761,15 +1761,21 @@ int eddie_shopkeeper(struct char_data *ch, struct obj_data *obj, int cmd, const 
 
 struct reroll_t
 {
-  string playerName = {};
-  uint64_t choice1_rnum = {};
   obj_data* choice1_obj = nullptr;
-  uint64_t choice2_rnum = {};
   obj_data* choice2_obj = nullptr;
   uint64_t orig_rnum = {};
+  vnum_t orig_vnum = {};
   obj_data* orig_obj = nullptr;
-  vnum_t vnum = {};
+
+  enum reroll_states_t {
+    BEGIN,
+    PICKED_OBJ_TO_REROLL,
+    REROLLED,
+    CHOSEN
+  } state = {};
 };
+
+
 
 map<string, reroll_t> reroll_sessions = {};
 
@@ -1793,21 +1799,22 @@ int reroll_trader(char_data *ch, obj_data *obj, int cmd, const char *arg, char_d
   switch(cmd)
   {
     case CMD_LIST:
-    if (r.orig_obj != nullptr && GET_OBJ_RNUM(r.orig_obj) == r.orig_rnum)
+    if (r.state == reroll_t::reroll_states_t::PICKED_OBJ_TO_REROLL) 
     {
       do_say(owner, fmt::format("You need to confirm or cancel rerolling {}.", GET_OBJ_SHORT(r.orig_obj)), CMD_SAY);
       return eSUCCESS;
     }
 
     do_say(owner, "Type reroll <object keyword> to reroll that object.");
-    do_say(owner, "The cost is 1 Cloverleaf token.");
-    do_say(owner, "You will get two choices or the original to pick from.");
+    do_say(owner, "I will then ask you to confirm the object you want re-rolled.");
+    do_say(owner, "The cost will be 1 Cloverleaf token.");
+    do_say(owner, "You will get two re-rolled choices or the original to pick from.");
     do_say(owner, "Type choose 1, 2 or 3 to choose either one of the two rerolls or the original.");
     return eSUCCESS;
     break;
 
     case CMD_REROLL:
-    if (r.orig_obj != nullptr && GET_OBJ_RNUM(r.orig_obj) == r.orig_rnum)
+    if (r.state == reroll_t::reroll_states_t::PICKED_OBJ_TO_REROLL)
     {
       do_say(owner, fmt::format("You need to confirm or cancel rerolling {}.", GET_OBJ_SHORT(r.orig_obj)), CMD_SAY);
       return eSUCCESS;
@@ -1828,9 +1835,31 @@ int reroll_trader(char_data *ch, obj_data *obj, int cmd, const char *arg, char_d
       }
       else
       {
+        if (GET_OBJ_TYPE(obj) != ITEM_WEAPON && GET_OBJ_TYPE(obj) != ITEM_ARMOR)
+        {
+          do_say(owner, "I can only reroll weapons or armor.");
+          return eSUCCESS;
+        }
+
+        if (isname("godload", ((obj_data *)(obj_index[obj->item_number].item))->name) ||
+            isname("gl", ((obj_data *)(obj_index[obj->item_number].item))->name) ||
+            IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL))
+        {
+          do_say(owner, "I can't reroll GL weapons or armor.");
+          return eSUCCESS;
+        }
+
+         if (isname("quest", ((obj_data *)(obj_index[obj->item_number].item))->name) ||
+          obj_index[obj->item_number].virt >= 3124 && obj_index[obj->item_number].virt <= 3127)
+          {
+            do_say(owner, "I can't reroll quest weapons or armor.");
+            return eSUCCESS;
+          }
+
         r = {};
         r.orig_obj = obj;
         r.orig_rnum = GET_OBJ_RNUM(obj);
+        r.state = reroll_t::reroll_states_t::PICKED_OBJ_TO_REROLL;
         reroll_sessions[GET_NAME(ch)] = r;
         do_say(owner, fmt::format("Are you sure you want me to reroll {} for you?", GET_OBJ_SHORT(obj)), CMD_SAY);
         do_say(owner, "Type confirm and I'll reroll it otherwise type cancel if you changed your mind.", CMD_SAY);
@@ -1839,34 +1868,122 @@ int reroll_trader(char_data *ch, obj_data *obj, int cmd, const char *arg, char_d
     break;
     
     case CMD_CONFIRM:
-    if (r.orig_obj != nullptr && GET_OBJ_RNUM(r.orig_obj) == r.orig_rnum)
+    if (r.state == reroll_t::reroll_states_t::PICKED_OBJ_TO_REROLL)
     {
-      if (r.choice1_obj == nullptr)
+      if (search_char_for_item_count(ch, real_object(OBJ_CLOVERLEAF), false) < 1)
       {
-        obj_list = oload(owner, GET_OBJ_RNUM(obj), 2, true);
-        for (auto& o : obj_list)
-        {
-          ch->send(fmt::format("n:{} s:{} v:{} r:{} {} {}\r\n", GET_OBJ_NAME(o), GET_OBJ_SHORT(o), GET_OBJ_VNUM(o), GET_OBJ_RNUM(o), fmt::ptr(o), GET_NAME(o->carried_by)));
-          if (r.choice1_obj == nullptr)
-          {
-            r.choice1_obj = o;
-            r.choice1_rnum = GET_OBJ_RNUM(o);
-          }
-          else if (r.choice2_obj == nullptr)
-          {
-            r.choice2_obj = o;
-            r.choice2_rnum = GET_OBJ_RNUM(o);
-          }
-          reroll_sessions[GET_NAME(ch)] = r;
-        }
+        do_say(owner, "You don't have the required cloverleaf token.");
+        return eSUCCESS;
       }
+
+      obj = search_char_for_item(ch, real_object(OBJ_CLOVERLEAF), false);
+      if (obj != 0)
+      {
+        if (obj->in_obj)
+        {
+          obj_from_obj(obj);
+        }
+        else
+        {
+          obj_from_char(obj);
+        }
+
+        act("$n gives $p to $N.", ch, obj, owner, TO_ROOM, INVIS_NULL | NOTVICT);
+        act("$n gives you $p.", ch, obj, owner, TO_VICT, 0);
+        act("You give $p to $N.", ch, obj, owner, TO_CHAR, 0);
+
+        log(fmt::format("{} gives {} to {} (removed)", GET_NAME(ch), obj->name, GET_NAME(owner)), IMP, LOG_OBJECTS);
+      }
+
+      obj = r.orig_obj;
+      obj_list = oload(owner, GET_OBJ_RNUM(obj), 2, true);
+      for (auto& o : obj_list)
+      {
+        if (r.choice1_obj == nullptr)
+        {
+          do_say(owner, "Choice 1 is:");
+          identify(ch, o);
+          ch->send("\r\n");
+          r.choice1_obj = o;
+        }
+        else if (r.choice2_obj == nullptr)
+        {
+          do_say(owner, "Choice 2 is:");
+          identify(ch, o);
+          ch->send("\r\n");
+          r.choice2_obj = o;
+        }
+        r.state = reroll_t::reroll_states_t::REROLLED;
+        reroll_sessions[GET_NAME(ch)] = r;
+      }
+      do_say(owner, "Choice 3 is:");
+      identify(ch, r.orig_obj);
+    }
+    else
+    {
+      return eFAILURE;
     }
 
     break;
 
     case CMD_CHOOSE:
-    ch->send("Choosing...\r\n");
+    if (r.state != reroll_t::reroll_states_t::REROLLED)
+    {
+      return eFAILURE;
+    }
 
+    if (arg1 == "1")
+    {
+      obj_to_char(r.choice1_obj, ch);
+      extract_obj(r.choice2_obj);
+      extract_obj(r.orig_obj);
+      act("$n gives the original $p to $N.", ch, r.orig_obj, owner, TO_ROOM, INVIS_NULL | NOTVICT);
+      act("$n gives you the original $p.", ch, r.orig_obj, owner, TO_VICT, 0);
+      act("You give the original $p to $N.", ch, r.orig_obj, owner, TO_CHAR, 0);
+
+      act("$n gives the new $p to $N.", ch, r.choice1_obj, owner, TO_ROOM, INVIS_NULL | NOTVICT);
+      act("$n gives you the new $p.", ch, r.choice1_obj, owner, TO_VICT, 0);
+      act("You give the new $p to $N.", ch, r.choice1_obj, owner, TO_CHAR, 0);
+    }
+    else if (arg1 == "2")
+    {
+      obj_to_char(r.choice2_obj, ch);
+      extract_obj(r.choice1_obj);
+      extract_obj(r.orig_obj);
+      act("$n gives the original $p to $N.", ch, r.orig_obj, owner, TO_ROOM, INVIS_NULL | NOTVICT);
+      act("$n gives you the original $p.", ch, r.orig_obj, owner, TO_VICT, 0);
+      act("You give the original $p to $N.", ch, r.orig_obj, owner, TO_CHAR, 0);
+
+      act("$n gives the new $p to $N.", ch, r.choice2_obj, owner, TO_ROOM, INVIS_NULL | NOTVICT);
+      act("$n gives you the new $p.", ch, r.choice2_obj, owner, TO_VICT, 0);
+      act("You give the new $p to $N.", ch, r.choice2_obj, owner, TO_CHAR, 0);
+    }
+    else if (arg1 == "3")
+    {
+      extract_obj(r.choice1_obj);
+      extract_obj(r.choice2_obj);
+      do_say(owner, fmt::format("Ok. You keep the original {}.", GET_OBJ_SHORT(r.orig_obj)), CMD_SAY);
+    }
+    else
+    {
+      do_say(owner, "Type choose 1, 2 or 3.");
+      return eSUCCESS;
+    }
+    reroll_sessions.erase(GET_NAME(ch));
+    break;
+
+    case CMD_CANCEL:
+    do_say(owner, "I'm canceling this reroll.");
+
+    if (r.choice1_obj != nullptr)
+    {
+      extract_obj(r.choice1_obj);
+    }
+    if (r.choice2_obj != nullptr)
+    {
+      extract_obj(r.choice2_obj);
+    }
+    reroll_sessions.erase(GET_NAME(ch));
     break;
 
     default:
