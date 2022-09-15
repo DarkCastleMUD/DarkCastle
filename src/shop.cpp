@@ -1758,24 +1758,22 @@ int eddie_shopkeeper(struct char_data *ch, struct obj_data *obj, int cmd, const 
   return eSUCCESS;
 }
 
-
 struct reroll_t
 {
-  obj_data* choice1_obj = nullptr;
-  obj_data* choice2_obj = nullptr;
+  obj_data *choice1_obj = nullptr;
+  obj_data *choice2_obj = nullptr;
   uint64_t orig_rnum = {};
   vnum_t orig_vnum = {};
-  obj_data* orig_obj = nullptr;
+  obj_data *orig_obj = nullptr;
 
-  enum reroll_states_t {
+  enum reroll_states_t
+  {
     BEGIN,
     PICKED_OBJ_TO_REROLL,
     REROLLED,
     CHOSEN
   } state = {};
 };
-
-
 
 map<string, reroll_t> reroll_sessions = {};
 
@@ -1794,26 +1792,26 @@ int reroll_trader(char_data *ch, obj_data *obj, int cmd, const char *arg, char_d
   {
     r = reroll_sessions[GET_NAME(ch)];
   }
-  
+
   obj_list_t obj_list = {};
-  switch(cmd)
+  switch (cmd)
   {
-    case CMD_LIST:
-    if (r.state == reroll_t::reroll_states_t::PICKED_OBJ_TO_REROLL) 
+  case CMD_LIST:
+    if (r.state == reroll_t::reroll_states_t::PICKED_OBJ_TO_REROLL)
     {
       owner->tell(ch, fmt::format("You need to confirm or cancel rerolling {}.", GET_OBJ_SHORT(r.orig_obj)));
       return eSUCCESS;
     }
 
-     owner->tell(ch,"Type reroll <object keyword> to reroll that object.");
-    owner->tell(ch,"I will then ask you to confirm the object you want re-rolled.");
+    owner->tell(ch, "Type reroll <object keyword> to reroll that object.");
+    owner->tell(ch, "I will then ask you to confirm the object you want re-rolled.");
     owner->tell(ch, "The cost will be 1 Cloverleaf token.");
     owner->tell(ch, "You will get two re-rolled choices or the original to pick from.");
     owner->tell(ch, "Type choose 1, 2 or 3 to choose either one of the two rerolls or the original.");
     return eSUCCESS;
     break;
 
-    case CMD_REROLL:
+  case CMD_REROLL:
     if (r.state == reroll_t::reroll_states_t::PICKED_OBJ_TO_REROLL)
     {
       owner->tell(ch, fmt::format("You need to confirm or cancel rerolling {}.", GET_OBJ_SHORT(r.orig_obj)));
@@ -1849,12 +1847,18 @@ int reroll_trader(char_data *ch, obj_data *obj, int cmd, const char *arg, char_d
           return eSUCCESS;
         }
 
-         if (isname("quest", ((obj_data *)(obj_index[obj->item_number].item))->name) ||
-          obj_index[obj->item_number].virt >= 3124 && obj_index[obj->item_number].virt <= 3127)
-          {
-            owner->tell(ch, "I can't reroll quest weapons or armor.");
-            return eSUCCESS;
-          }
+        if (isname("quest", ((obj_data *)(obj_index[obj->item_number].item))->name) ||
+            obj_index[obj->item_number].virt >= 3124 && obj_index[obj->item_number].virt <= 3127)
+        {
+          owner->tell(ch, "I can't reroll quest weapons or armor.");
+          return eSUCCESS;
+        }
+
+        if (IS_SET(obj->obj_flags.more_flags, ITEM_NO_CUSTOM))
+        {
+          owner->tell(ch, "I can't reroll objects with the NO_CUSTOM flag set on them.");
+          return eSUCCESS;
+        }
 
         r = {};
         r.orig_obj = obj;
@@ -1866,8 +1870,8 @@ int reroll_trader(char_data *ch, obj_data *obj, int cmd, const char *arg, char_d
       }
     }
     break;
-    
-    case CMD_CONFIRM:
+
+  case CMD_CONFIRM:
     if (r.state == reroll_t::reroll_states_t::PICKED_OBJ_TO_REROLL)
     {
       if (search_char_for_item_count(ch, real_object(OBJ_CLOVERLEAF), false) < 1)
@@ -1897,7 +1901,7 @@ int reroll_trader(char_data *ch, obj_data *obj, int cmd, const char *arg, char_d
 
       obj = r.orig_obj;
       obj_list = oload(owner, GET_OBJ_RNUM(obj), 2, true);
-      for (auto& o : obj_list)
+      for (auto &o : obj_list)
       {
         if (r.choice1_obj == nullptr)
         {
@@ -1918,6 +1922,7 @@ int reroll_trader(char_data *ch, obj_data *obj, int cmd, const char *arg, char_d
       }
       owner->tell(ch, "Choice 3 is:");
       identify(ch, r.orig_obj);
+      owner->tell(ch, "Type choose 1, 2 or 3.");
     }
     else
     {
@@ -1926,7 +1931,7 @@ int reroll_trader(char_data *ch, obj_data *obj, int cmd, const char *arg, char_d
 
     break;
 
-    case CMD_CHOOSE:
+  case CMD_CHOOSE:
     if (r.state != reroll_t::reroll_states_t::REROLLED)
     {
       return eFAILURE;
@@ -1941,9 +1946,9 @@ int reroll_trader(char_data *ch, obj_data *obj, int cmd, const char *arg, char_d
       act("$n gives you the original $p.", ch, r.orig_obj, owner, TO_VICT, 0);
       act("You give the original $p to $N.", ch, r.orig_obj, owner, TO_CHAR, 0);
 
-      act("$n gives the new $p to $N.", ch, r.choice1_obj, owner, TO_ROOM, INVIS_NULL | NOTVICT);
-      act("$n gives you the new $p.", ch, r.choice1_obj, owner, TO_VICT, 0);
-      act("You give the new $p to $N.", ch, r.choice1_obj, owner, TO_CHAR, 0);
+      act("$n gives the new $p to $N.", owner, r.choice1_obj, ch, TO_ROOM, INVIS_NULL | NOTVICT);
+      act("$n gives you the new $p.", owner, r.choice1_obj, ch, TO_VICT, 0);
+      act("You give the new $p to $N.", owner, r.choice1_obj, ch, TO_CHAR, 0);
     }
     else if (arg1 == "2")
     {
@@ -1954,9 +1959,9 @@ int reroll_trader(char_data *ch, obj_data *obj, int cmd, const char *arg, char_d
       act("$n gives you the original $p.", ch, r.orig_obj, owner, TO_VICT, 0);
       act("You give the original $p to $N.", ch, r.orig_obj, owner, TO_CHAR, 0);
 
-      act("$n gives the new $p to $N.", ch, r.choice2_obj, owner, TO_ROOM, INVIS_NULL | NOTVICT);
-      act("$n gives you the new $p.", ch, r.choice2_obj, owner, TO_VICT, 0);
-      act("You give the new $p to $N.", ch, r.choice2_obj, owner, TO_CHAR, 0);
+      act("$n gives the new $p to $N.", owner, r.choice2_obj, ch, TO_ROOM, INVIS_NULL | NOTVICT);
+      act("$n gives you the new $p.", owner, r.choice2_obj, ch, TO_VICT, 0);
+      act("You give the new $p to $N.", owner, r.choice2_obj, ch, TO_CHAR, 0);
     }
     else if (arg1 == "3")
     {
@@ -1972,7 +1977,7 @@ int reroll_trader(char_data *ch, obj_data *obj, int cmd, const char *arg, char_d
     reroll_sessions.erase(GET_NAME(ch));
     break;
 
-    case CMD_CANCEL:
+  case CMD_CANCEL:
     owner->tell(ch, "I'm canceling this reroll.");
 
     if (r.choice1_obj != nullptr)
@@ -1986,7 +1991,7 @@ int reroll_trader(char_data *ch, obj_data *obj, int cmd, const char *arg, char_d
     reroll_sessions.erase(GET_NAME(ch));
     break;
 
-    default:
+  default:
     return eFAILURE;
     break;
   }
