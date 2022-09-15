@@ -2418,7 +2418,7 @@ string remove_non_color_codes(string input)
     {
       if (t->character != nullptr && GET_NAME(t->character) != nullptr)
       {
-        log(fmt::format("Connection broken by peer {} playing {}.", t->host, GET_NAME(t->character)), ANGEL, LOG_SOCKET);
+        log(fmt::format("Connection broken by peer {} playing {}.", t->host, GET_NAME(t->character)), IMP+1, LOG_SOCKET);
       }
       else
       {
