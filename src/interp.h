@@ -83,6 +83,7 @@ string rtrim(string str);
 #define CMD_REROLL 81
 #define CMD_CHOOSE 82
 #define CMD_CONFIRM 83
+#define CMD_CANCEL 84
 #define CMD_SLIP 87
 #define CMD_GIVE 88
 #define CMD_DROP 89

@@ -399,6 +399,7 @@ struct command_info cmd_info[] =
         {"reroll", do_not_here, nullptr, POSITION_RESTING, 0, CMD_REROLL, 0, 0},
         {"choose", do_not_here, nullptr, POSITION_RESTING, 0, CMD_CHOOSE, 0, 0},
         {"confirm", do_not_here, nullptr, POSITION_RESTING, 0, CMD_CONFIRM, 0, 0},
+        {"cancel", do_not_here, nullptr, POSITION_RESTING, 0, CMD_CANCEL, 0, 0},
 
         // Immortal commands
         {"voteset", do_setvote, nullptr, POSITION_DEAD, 108, CMD_SETVOTE, 0, 1},
