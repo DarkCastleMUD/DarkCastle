@@ -144,6 +144,55 @@ void do_mload(struct char_data *ch, int rnum, int cnt)
  }
 }
 
+obj_list_t oload(char_data *ch, int rnum, int cnt, bool random)
+{
+  obj_data *obj = nullptr;
+  obj_list_t obj_list = {};
+  string buf;
+
+  if (cnt == 0)
+  {
+    cnt = 1;
+  }
+
+  act("$n makes a strange magical gesture.", ch, 0, 0, TO_ROOM, INVIS_NULL);
+  for (auto i = 1; i <= cnt; i++)
+  {
+    obj = clone_object(rnum);
+    act("$n has created $p!", ch, obj, 0, TO_ROOM, 0);
+    if (random == true)
+    {
+      randomize_object(obj);
+    }
+
+    if ((obj->obj_flags.type_flag == ITEM_MONEY) &&
+        (GET_LEVEL(ch) < IMP || !IS_IMMORTAL(ch)))
+    {
+      extract_obj(obj);
+      ch->send("Denied.\r\n");
+    }
+    else
+    {
+      obj_list.insert(obj);
+      obj_to_char(obj, ch);
+    }
+  }
+
+  ch->send(fmt::format("You create {} {}{}.\n\r", cnt, random ? "randomized " : "", obj->short_description));
+
+  buf = fmt::format("{} loads {} {}{} of obj {} ({}) at room {} ({}).",
+                    GET_NAME(ch),
+                    cnt,
+                    random ? "randomized " : "",
+                    cnt > 1 ? "copies" : "copy",
+                    GET_OBJ_VNUM(obj),
+                    obj->short_description,
+                    world[ch->in_room].number,
+                    world[ch->in_room].name);
+  log(buf, GET_LEVEL(ch), LOG_GOD);
+
+  return obj_list;
+}
 
 void do_oload(struct char_data *ch, int rnum, int cnt, bool random)
 {    
@@ -152,9 +201,11 @@ void do_oload(struct char_data *ch, int rnum, int cnt, bool random)
   int i;
      
   if (cnt == 0) cnt = 1;
-     
+
+  act("$n makes a strange magical gesture.", ch, 0, 0, TO_ROOM, INVIS_NULL);
   for (i=1; i<= cnt; i++) {
     obj = clone_object(rnum);
+    act("$n has created $p!", ch, obj, 0, TO_ROOM, 0);
     if (random == true) {
     	randomize_object(obj);
     }
@@ -166,10 +217,12 @@ void do_oload(struct char_data *ch, int rnum, int cnt, bool random)
        return;
        }
     else 
-       obj_to_char(obj, ch);
+    {
+       obj_to_char(obj, ch);       
+    }
   }  
-  act("$n makes a strange magical gesture.", ch, 0, 0, TO_ROOM, INVIS_NULL);
-  act("$n has created $p!", ch, obj, 0, TO_ROOM, 0);
+  
+  
 
   snprintf(buf, MAX_STRING_LENGTH, "You create %i %s%s.\n\r", cnt, random?"randomized ":"", obj->short_description);
 

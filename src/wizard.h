@@ -60,7 +60,7 @@ int obj_in_index(char *name, int index);
 void do_oload(CHAR_DATA *ch, int rnum, int cnt, bool random = false);
 void do_mload(CHAR_DATA *ch, int rnum, int cnt);
 void colorCharSend(char* s, struct char_data* ch);
-
+obj_list_t oload(char_data *ch, int rnum, int cnt, bool random);
 
 /* Our own constants */
 const int MAX_MESSAGE_LENGTH = 4096;
