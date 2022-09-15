@@ -80,6 +80,9 @@ string rtrim(string str);
 #define CMD_ERASE 70
 #define CMD_ESTIMATE 71
 #define CMD_REMORT 80
+#define CMD_REROLL 81
+#define CMD_CHOOSE 82
+#define CMD_CONFIRM 83
 #define CMD_SLIP 87
 #define CMD_GIVE 88
 #define CMD_DROP 89
@@ -491,7 +494,7 @@ command_return_t do_rsave(CHAR_DATA *ch, char *argument, int cmd);
 command_return_t do_rstat(CHAR_DATA *ch, char *argument, int cmd);
 command_return_t do_sacrifice(CHAR_DATA *ch, char *argument, int cmd);
 command_return_t do_save(CHAR_DATA *ch, char *argument, int cmd);
-command_return_t do_say(char_data *ch, string argument, int cmd);
+command_return_t do_say(char_data *ch, string argument, int cmd = CMD_SAY);
 command_return_t do_scan(CHAR_DATA *ch, char *argument, int cmd);
 command_return_t do_score(CHAR_DATA *ch, char *argument, int cmd);
 command_return_t do_scribe(CHAR_DATA *ch, char *argument, int cmd);
