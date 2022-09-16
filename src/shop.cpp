@@ -1883,14 +1883,7 @@ int reroll_trader(char_data *ch, obj_data *obj, int cmd, const char *arg, char_d
       obj = search_char_for_item(ch, real_object(OBJ_CLOVERLEAF), false);
       if (obj != 0)
       {
-        if (obj->in_obj)
-        {
-          obj_from_obj(obj);
-        }
-        else
-        {
-          obj_from_char(obj);
-        }
+        obj_from(obj);
 
         act("$n gives $p to $N.", ch, obj, owner, TO_ROOM, INVIS_NULL | NOTVICT);
         act("$n gives you $p.", ch, obj, owner, TO_VICT, 0);
@@ -1940,8 +1933,6 @@ int reroll_trader(char_data *ch, obj_data *obj, int cmd, const char *arg, char_d
     if (arg1 == "1")
     {
       obj_to_char(r.choice1_obj, ch);
-      extract_obj(r.choice2_obj);
-      extract_obj(r.orig_obj);
       act("$n gives the original $p to $N.", ch, r.orig_obj, owner, TO_ROOM, INVIS_NULL | NOTVICT);
       act("$n gives you the original $p.", ch, r.orig_obj, owner, TO_VICT, 0);
       act("You give the original $p to $N.", ch, r.orig_obj, owner, TO_CHAR, 0);
@@ -1949,12 +1940,12 @@ int reroll_trader(char_data *ch, obj_data *obj, int cmd, const char *arg, char_d
       act("$n gives the new $p to $N.", owner, r.choice1_obj, ch, TO_ROOM, INVIS_NULL | NOTVICT);
       act("$n gives you the new $p.", owner, r.choice1_obj, ch, TO_VICT, 0);
       act("You give the new $p to $N.", owner, r.choice1_obj, ch, TO_CHAR, 0);
+      obj_from(r.choice2_obj);
+      obj_from(r.orig_obj);
     }
     else if (arg1 == "2")
     {
       obj_to_char(r.choice2_obj, ch);
-      extract_obj(r.choice1_obj);
-      extract_obj(r.orig_obj);
       act("$n gives the original $p to $N.", ch, r.orig_obj, owner, TO_ROOM, INVIS_NULL | NOTVICT);
       act("$n gives you the original $p.", ch, r.orig_obj, owner, TO_VICT, 0);
       act("You give the original $p to $N.", ch, r.orig_obj, owner, TO_CHAR, 0);
@@ -1962,11 +1953,13 @@ int reroll_trader(char_data *ch, obj_data *obj, int cmd, const char *arg, char_d
       act("$n gives the new $p to $N.", owner, r.choice2_obj, ch, TO_ROOM, INVIS_NULL | NOTVICT);
       act("$n gives you the new $p.", owner, r.choice2_obj, ch, TO_VICT, 0);
       act("You give the new $p to $N.", owner, r.choice2_obj, ch, TO_CHAR, 0);
+      obj_from(r.choice1_obj);
+      obj_from(r.orig_obj);
     }
     else if (arg1 == "3")
     {
-      extract_obj(r.choice1_obj);
-      extract_obj(r.choice2_obj);
+      obj_from(r.choice1_obj);
+      obj_from(r.choice2_obj);
       owner->tell(ch, fmt::format("Ok. You keep the original {}.", GET_OBJ_SHORT(r.orig_obj)));
     }
     else
@@ -1982,11 +1975,11 @@ int reroll_trader(char_data *ch, obj_data *obj, int cmd, const char *arg, char_d
 
     if (r.choice1_obj != nullptr)
     {
-      extract_obj(r.choice1_obj);
+      obj_from(r.choice1_obj);
     }
     if (r.choice2_obj != nullptr)
     {
-      extract_obj(r.choice2_obj);
+      obj_from(r.choice2_obj);
     }
     reroll_sessions.erase(GET_NAME(ch));
     break;
