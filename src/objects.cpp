@@ -2472,3 +2472,23 @@ void heightweight(char_data *ch, bool add)
       }
   }
 }
+
+int obj_from(obj_data* obj)
+{
+  if (obj->in_obj)
+  {
+    return obj_from_obj(obj);
+  }
+
+  if (obj->in_room)
+  {
+    return obj_from_room(obj);
+  }
+
+  if (obj->carried_by)
+  {
+    return obj_from_char(obj);
+  }
+
+  return false;
+}
