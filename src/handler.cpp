@@ -2969,7 +2969,10 @@ int obj_from_char(struct obj_data *object) {
 		for (tmp = object->carried_by->carrying; tmp && (tmp->next_content != object); tmp = tmp->next_content)
 			;
 
-		tmp->next_content = object->next_content;
+		if (tmp != nullptr)
+		{
+			tmp->next_content = object->next_content;
+		}
 	}
 
 	IS_CARRYING_W(object->carried_by) -= GET_OBJ_WEIGHT(object);
