@@ -1,0 +1,1130 @@
+#21900
+table blackjack proc obj casino~
+a blackjack table~
+A blackjack table covered in deep purple felt stands here.~
+P휗~
+12 0 0 0
+500 50000 0 0 0
+0 0 0
+E
+blackjack table~
+@---------------------------------@
+|    $BPlatinum Towers Blackjack$R    |
+|                                 |
+|       Min Bet: $B$5500 gold$R         |
+|      Max Bet: $B$550000 gold$R        |
+|                                 |
+@---------------------------------@
+Limits are subject to change at the house's discretion.
+Enter "help CASINO" for more information.
+Enter $BBET <amount>$R to place a bet.
+~
+S
+#21901
+table blackjack proc obj casino~
+a blackjack table~
+A table covered in deep purple felt stands here.~
+P휗~
+12 0 0 0
+50000 100000 0 0 0
+0 0 0
+E
+blackjack table~
+@---------------------------------@
+|    $BPlatinum Towers Blackjack$R    |
+|                                 |
+|      Min Bet: $B$550000 gold$R        |
+|      Max Bet: $B$5100000 gold$R       |
+|                                 |
+@---------------------------------@
+Limits are subject to change at the house's discretion.
+Enter "help CASINO" for more information.
+Enter $BBET <amount>$R to place a bet.
+~
+S
+#21902
+table blackjack proc obj casino~
+a blackjack table~
+A table covered in deep purple felt stands here.~
+P휗~
+12 0 0 0
+100000 500000 0 0 0
+0 0 0
+E
+blackjack table~
+@---------------------------------@
+|    $BPlatinum Towers Blackjack$R    |
+|                                 |
+|      Min Bet: $B$5100000 gold$R       |
+|      Max Bet: $B$5500000 gold$R       |
+|                                 |
+@---------------------------------@
+Limits are subject to change at the house's discretion.
+Enter "help CASINO" for more information.
+Enter $BBET <amount>$R to place a bet.
+~
+S
+#21903
+table blackjack proc obj casino~
+a blackjack table~
+A table covered in deep purple felt stands here.~
+P휗~
+12 0 0 0
+500000 1000000 5 250 0
+0 0 0
+E
+blackjack table~
+@---------------------------------@
+|    $BPlatinum Towers Blackjack$R    |
+|                                 |
+|      Min Bet: $B5 platinum$R        |
+|     Max Bet: $B250 platinum$R       |
+|                                 |
+@---------------------------------@
+Enter "help CASINO" for more information
+or $BBET <amount>$R to place a bet.
+~
+\all_greet_prog 100~
+if isimmort($n)
+else
+   if ispc($n)
+      if tempvar($n[SpaPaid]) == true
+         else
+         mpechoat $n A husky security guard draws you back into the lounge.
+         mpat 21906 mptrans 0.$n
+         mpat 21906 mpthrow 21903 1 0
+         mpat 21906 mpforce $n look
+      endif
+   endif
+endif
+~
+|
+S
+#21904
+ATM teller machine~
+an ATM machine~
+An automatic teller machine is here waiting for customers.~
+P휗~
+12 0 0 0
+0 0 0 0 0
+0 0 0
+E
+ATM machine teller~
+The ATM machine is ready to spit out any amount of gold coins
+to help facilitate your gambling addi....err enjoyment.
+Simply WITHDRAW <amount> to debit your bank account directly.
+~
+S
+#21905
+fountain casino~
+a fountain~
+An elaborate fountain bubbles here.~
+P휗~
+25 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#21906
+slot machine casino~
+a slot machine~
+A slot machine which displays '$R$BJackpot: 1022800 coins!$1' sits here.~
+slot machine~
+12 0 0 0
+1000 1022800 0 21906 0
+0 0 0
+E
+slot machine~
+@---------------------------------@
+|      Platinum Towers Slots      |
+|                                 |
+|       Min Bet: $5$B1000 gold$R        |
+|       Max Bet: $5$B5000 gold$R        |
+|                                 |
+@---------------------------------@
+Enter "help CASINO" for more information.
+Enter Pull handle to place money into the machine and start it!
+Enter BET <multiplier> to bet 1, 2, 3, 4, or 5 times the Min Bet.
+~
+S
+#21907
+slot machine casino~
+a slot machine~
+A slot machine which displays '$R$BJackpot: 10690000 coins!$1' sits here.~
+P휗~
+12 0 0 0
+10000 10690000 0 21907 0
+0 0 0
+E
+slot machine~
+@---------------------------------@
+|      Platinum Towers Slots      |
+|                                 |
+|       Min Bet: $5$B10000 gold$R       |
+|       Max Bet: $5$B50000 gold$R       |
+|                                 |
+@---------------------------------@
+Enter "help CASINO" for more information.
+Enter Pull handle to place money into the machine and start it!
+Enter BET <multiplier> to bet 1, 2, 3, 4, or 5 times the Min Bet.
+~
+S
+#21908
+slot machine casino~
+a slot machine~
+A slot machine which displays '$R$BJackpot: 180444000 coins!$1' sits here.~
+slot machine which displays '$B$7 Jackpot: 0 coins!$B$1' sits here.~
+12 0 0 0
+100000 180444000 0 21908 0
+0 0 0
+E
+slot machine~
+@---------------------------------@
+|      Platinum Towers Slots      |
+|                                 |
+|       Min Bet: $5$B100000 gold$R      |
+|       Max Bet: $5$B500000 gold$R      |
+|                                 |
+@---------------------------------@
+Enter "help CASINO" for more information.
+Enter Pull handle to place money into the machine and start it!
+Enter BET <multiplier> to bet 1, 2, 3, 4, or 5 times the Min Bet.
+~
+S
+#21909
+slot machine casino~
+a slot machine~
+A slot machine which displays '$R$BJackpot: 5655 plats!$1' sits here.~
+slot machine which displays '$B$7 Jackpot: 0 coins!$B$1' sits here.~
+12 0 0 0
+5 5655 1 21909 0
+0 0 0
+E
+slot machine~
+@---------------------------------@
+|      Platinum Towers Slots      |
+|                                 |
+|       Min Bet: $B5 platinum$R       |
+|       Max Bet: $B25 platinum$R      |
+|                                 |
+@---------------------------------@
+Enter "help CASINO" for more information.
+Enter $BPull handle$R to place money into the machine and start it!
+Enter $BBET <multiplier>$R to bet 1, 2, 3, 4, or 5 times the Min Bet.
+~
+\all_greet_prog 100~
+if isnpc($n)
+else
+  if isimmort($n)
+  else
+    if tempvar($n[SpaPaid]) == true
+    else
+      mpechoat $n A husky security guard draws you back into the lounge.
+      mpat 21914 mptrans 0.$n
+      mpat 21914 mpthrow 21903 1 0
+      mpat 21914 mpforce 0.$n look
+    endif
+  endif
+endif
+~
+|
+S
+#21910
+slot machine~
+a slot machine~
+A slot machine which displays '$R$BJackpot: 1022800 coins!$1' sits here.~
+P휗~
+12 0 0 0
+1000 1022800 0 21906 0
+0 0 0
+E
+slot machine~
+@---------------------------------@
+|      Platinum Towers Slots      |
+|                                 |
+|       Min Bet: $5$B1000 gold$R        |
+|       Max Bet: $5$B5000 gold$R        |
+|                                 |
+@---------------------------------@
+Enter "help CASINO" for more information.
+Enter Pull handle to place money into the machine and start it!
+Enter BET <multiplier> to bet 1, 2, 3, 4, or 5 times the Min Bet.
+~
+S
+#21911
+slot machine~
+a slot machine~
+A slot machine which displays '$R$BJackpot: 10690000 coins!$1' sits here.~
+P휗~
+12 0 0 0
+10000 10690000 0 21907 0
+0 0 0
+E
+slot machine~
+@---------------------------------@
+|      Platinum Towers Slots      |
+|                                 |
+|       Min Bet: $5$B10000 gold$R       |
+|       Max Bet: $5$B50000 gold$R       |
+|                                 |
+@---------------------------------@
+Enter "help CASINO" for more information.
+Enter Pull handle to place money into the machine and start it!
+Enter BET <multiplier> to bet 1, 2, 3, 4, or 5 times the Min Bet.
+~
+S
+#21912
+slot machine~
+a slot machine~
+A slot machine which displays '$R$BJackpot: 180444000 coins!$1' sits here.~
+P휗~
+12 0 0 0
+100000 180444000 0 21908 0
+0 0 1073741824
+E
+slot machine~
+@---------------------------------@
+|      Platinum Towers Slots      |
+|                                 |
+|       Min Bet: $B$5100000 gold$R      |
+|       Max Bet: $B$5500000 gold$R      |
+|                                 |
+@---------------------------------@
+Enter "help CASINO" for more information.
+Enter Pull handle to place money into the machine and start it!
+Enter BET <multiplier> to bet 1, 2, 3, 4, or 5 times the Min Bet.
+~
+S
+#21913
+slot machine~
+a slot machine~
+A slot machine which displays '$R$BJackpot: 5655 plats!$1' sits here.~
+P휗~
+12 0 0 0
+5 5655 1 21909 0
+0 0 0
+E
+slot machine~
+@---------------------------------@
+|      Platinum Towers Slots      |
+|                                 |
+|       Min Bet: $7$B5 Platinum$R       |
+|       Max Bet: $7$B25 Platinum$R      |
+|                                 |
+@---------------------------------@
+Enter "help CASINO" for more information.
+Enter Pull handle to place money into the machine and start it!
+Enter BET <multiplier> to bet 1, 2, 3, 4, or 5 times the Min Bet.
+~
+S
+#21914
+slot machine~
+an empty obj~
+An empty obj sits here waiting to be created.~
+P휗~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#21915
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+P휗~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#21916
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+P휗~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#21917
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+P휗~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#21918
+roulette table casino~
+a roulette table~
+An enormous, velvet roulette table stands here.~
+P휗~
+12 0 0 0
+0 0 0 0 0
+0 0 0
+E
+roulette table~
+$2$B0$R  $4$B1$R  $0$B2$R  $4$B3$R  $0$B4$R  $4$B5$R  $0$B6$R  $4$B7$R  $0$B8$R  $4$B9$R $0$B10$R $0$B11$R $4$B12$R
+  $0$B13$R $4$B14$R $0$B15$R $4$B16$R $0$B17$R $4$B18$R $4$B19$R $0$B20$R $4$B21$R $0$B22$R $4$B23$R $0$B24$R
+  $4$B25$R $0$B26$R $4$B27$R $0$B28$R $0$B29$R $4$B30$R $0$B31$R $4$B32$R $0$B33$R $4$B34$R $0$B35$R $4$B36$R
+$BTo place your bet:$R BET <keyword>/<range (1-12)>/<number>  <amount>
+1) Bet $B$4RED$R or $B$0BLACK$R (pays 2:1)
+2) Bet EVEN or ODD (pays 2:1)
+3) Bet 1-12, 13-24, or 25-36 (pays 3:1)
+4) Bet 1-9, 10-18, 19-27, 28-36 (pays 4:1)
+5) Bet any single number 0 to 36 (pays 36:1)
+~
+S
+#21919
+imm obj~
+get this replaced by an imm~
+An empty obj sits here waiting to be created.~
+P휗~
+1 0 1 0
+0 0 0 0 0
+0 0 0
+S
+#21920
+device security casino~
+a security device made of platinum~
+A platinum bauble has been left here.~
+P휗~
+1 134217728 0 0
+0 0 0 0 0
+0 0 48
+\command_prog east eas ea e~
+if inroom($i) == 21908
+    if tempvar($n[PlatPaid]) == true
+        else
+       MPTHROW 21904 1 0
+       MPRETVAL true
+endif
+endif
+~
+\all_greet_prog 100~
+if ispc($n)
+    if isimmort($n)
+        else
+        if inroom($n) != 21908
+            MPSETTEMP $n casino null
+            endif
+endif
+endif
+~
+|
+S
+#21921
+sign~
+the sign~
+A small sign with ornate lettering has been placed in the corner here.~
+P휗~
+12 0 0 0
+0 0 0 0 0
+0 0 0
+E
+sign~
+To interact with Eddie, use $BLIST$R to see his inventory and $BBUY <#>$R to make
+your purchase.
+~
+S
+#21922
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+P휗~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#21923
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+P휗~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#21924
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+P휗~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#21925
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+P휗~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#21926
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+P휗~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#21927
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+P휗~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#21928
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+P휗~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#21929
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+P휗~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#21930
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+P휗~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#21931
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+P휗~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#21932
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+P휗~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#21933
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+P휗~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#21934
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+P휗~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#21935
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+P휗~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#21936
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+P휗~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#21937
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+P휗~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#21938
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+P휗~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#21939
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+P휗~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#21940
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+P휗~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#21941
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+P휗~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#21942
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+P휗~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#21943
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+P휗~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#21944
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+P휗~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#21945
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+P휗~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#21946
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+P휗~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#21947
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+P휗~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#21948
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+P휗~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#21949
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+P휗~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#21950
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+P휗~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#21951
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+P휗~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#21952
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+P휗~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#21953
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+P휗~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#21954
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+P휗~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#21955
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+P휗~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#21956
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+P휗~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#21957
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+P휗~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#21958
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+P휗~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#21959
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+P휗~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#21960
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+P휗~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#21961
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+P휗~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#21962
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+P휗~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#21963
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+P휗~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#21964
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+P휗~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#21965
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+P휗~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#21966
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+P휗~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#21967
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+P휗~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#21968
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+P휗~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#21969
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+P휗~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#21970
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+P휗~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#21971
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+P휗~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#21972
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+P휗~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#21973
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+P휗~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#21974
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+P휗~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#21975
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+P휗~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#21976
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+P휗~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#21977
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+P휗~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#21978
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+P휗~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#21979
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+P휗~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#21980
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+P휗~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#21981
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+P휗~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#21982
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+P휗~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#21983
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+P휗~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#21984
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+P휗~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#21985
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+P휗~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#21986
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+P휗~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#21987
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+P휗~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#21988
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+P휗~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#21989
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+P휗~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#21990
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+P휗~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#21991
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+P휗~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#21992
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+P휗~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#21993
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+P휗~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#21994
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+P휗~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#21995
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+P휗~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#21996
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+P휗~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#21997
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+P휗~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#21998
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+P휗~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#21999
+fountain~
+A marble fountain~
+A marble fountain has been chiseled into the shape of a busty cocktail waitress.~
+P휗~
+25 0 0 0
+0 0 0 0 0
+0 0 0
+S
+$~
