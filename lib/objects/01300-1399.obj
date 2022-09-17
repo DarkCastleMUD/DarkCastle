@@ -1,0 +1,802 @@
+#1300
+statue~
+a statue~
+A large statue is here~
+~
+17 0 0 0
+100000 100000 0 0 0
+0 0 0
+S
+#1301
+oven black~
+an oven~
+A huge black oven is here.~
+~
+15 0 0 0
+1000 5 -1 0 0
+0 0 0
+S
+#1302
+locker~
+a meat locker~
+An enormous meat locker is here.~
+~
+15 0 0 0
+1000 5 -1 0 0
+0 0 0
+E
+locker~
+You just had the horrid thought that a cadaver might be in there.
+~
+S
+#1303
+spice rack~
+a spice rack~
+A spice rack floats in the air here.~
+~
+15 0 0 0
+50 0 -1 0 0
+0 0 0
+S
+#1304
+pizza slice~
+a slice of pizza~
+A slice of pizza is here looking very tasty.~
+~
+19 16 16385 1
+15 0 0 0 0
+1 50 0
+S
+#1306
+sandwich~
+a finger sandwich~
+A finger sandwich is here.~
+~
+19 16 16385 1
+20 0 0 0 0
+1 50 0
+E
+sandwich finger~
+It would look quite tasty if someone had first removed the finger nails!
+~
+S
+#1307
+broom straw~
+a straw broom~
+A straw broom is here leaning against the wall.~
+~
+13 16 16385 1
+0 0 0 0 0
+1 200 0
+E
+broom straw~
+A magical flying broomstick?  Nah!  Not here.
+~
+S
+#1308
+machine coffee~
+a coffee machine~
+A coffee machine is here.~
+~
+15 0 0 0
+10000 0 -1 0 0
+0 0 0
+S
+#1309
+cabinet~
+a cabinet~
+A cabinet is here.~
+~
+15 0 0 0
+5000 5 -1 0 0
+0 0 0
+S
+#1310
+bar silver~
+a bar of silver~
+A bar of silver has been left here.~
+~
+8 16 16385 1
+0 0 0 0 0
+4 50000 0
+S
+#1311
+bar gold~
+a heavy bar of $B$5gold$R~
+A heavy bar of $B$5gold$1 has been left here.$R~
+~
+8 16 16385 1
+0 0 0 0 0
+4 80000 0
+S
+#1312
+bar mithril~
+a bar of $Bmithril$R~
+A bar of mithril has been left here.~
+~
+8 16 16385 1
+0 0 0 0 0
+4 100000 0
+S
+#1313
+bar adamantite~
+a bar of adamantite~
+A bar of adamantite has been left here.~
+~
+8 16 16385 1
+0 0 0 0 0
+4 120000 0
+S
+#1314
+hammer mithril~
+a $Bmithril$R smithy hammer~
+A mithril hammer has been left here.~
+~
+12 16 16385 1
+0 2 6 7 0
+8 50000 0
+S
+#1315
+chest~
+a chest~
+A chest is here.~
+~
+15 0 0 0
+5000 15 1316 0 0
+0 0 0
+S
+#1316
+key~
+a small key~
+A small key has been left here.~
+~
+18 16 16385 1
+1315 0 0 0 0
+1 100 0
+S
+#1318
+dagger silver~
+a silver dagger~
+A finely crafted dagger made of silver is on the ground here.~
+~
+5 5394432 8193 1
+0 4 4 11 35
+9 60000 0
+A
+26 2
+S
+#1320
+staff wooden~
+a wooden staff~
+A wooden staff is against the wall here.~
+~
+5 16 8193 1
+0 1 4 7 5
+7 5000 0
+S
+#1321
+cabinet silver~
+a silver chased cabinet~
+A large cabinet with a silver finish is here.~
+~
+15 0 0 0
+5000 15 1325 0 0
+0 0 0
+S
+#1322
+cabinet silver~
+a silver chased cabinet~
+A large cabinet with a silver finish is here.~
+~
+15 0 0 0
+5000 15 1325 0 0
+0 0 0
+S
+#1323
+key old~
+an old key~
+An old key is here.~
+~
+18 16 16385 1
+0 0 0 0 0
+1 0 0
+S
+#1325
+silvery key~
+a silvery key~
+A silvery key has been left here.~
+~
+18 16 16385 1
+1322 0 0 0 0
+0 0 0
+S
+#1326
+scimitar chipped damaged~
+a chipped and damaged scimitar~
+A chipped and damaged scimitar lies here smouldering.~
+Fixed.~
+5 16 8193 1
+0 2 2 0 10
+6 0 0
+A
+26 1
+S
+#1327
+staff burnt~
+a burnt staff~
+A burnt staff is leaning against the wall here.~
+~
+4 16 16385 1
+20 1 1 4 35
+10 50000 0
+S
+#1328
+rod black~
+a $0$Bblack$R rod~
+A $0$Bblack$1$B rod has been left here.$R~
+~
+3 16 16385 1
+20 5 5 22 0
+1 50000 0
+S
+#1329
+stick wooden wand~
+a wooden stick~
+a wooden stick is here.~
+~
+3 16 16385 1
+20 10 10 3 0
+1 50000 0
+S
+#1330
+wand metal~
+a metal wand~
+A metal wand is here.~
+~
+3 16 16385 1
+20 1 1 2 0
+1 50000 0
+S
+#1331
+cauldron black~
+a $0$Bblack$R cauldron~
+A large $0$Bblack$1$B cauldron is here bubbling.$R~
+~
+15 0 0 0
+800 0 -1 0 0
+0 0 0
+S
+#1332
+wings~
+a small pair of bat wings~
+A small pair of bat wings is here.~
+~
+13 16 16385 1
+0 0 0 0 0
+1 2000 0
+S
+#1333
+wand invisibility invis~
+a wand of invisibility~
+A wand of invisibility is sitting here, looking invisible.~
+Fixed.~
+3 16 16385 1
+20 5 5 29 15
+1 10020 0
+S
+#1334
+book tome~
+the book of magic~
+An enormous book is lying open here.~
+~
+15 16 16385 1
+10 0 -1 0 0
+2 30000 0
+S
+#1335
+spectacles glasses~
+a pair of spectacles~
+A pair of wire rimed spectacles has been left here.~
+~
+9 16 131073 4
+1 0 0 0 5
+1 30000 0
+A
+3 1
+A
+4 1
+S
+#1336
+altar~
+a golden altar~
+A gleaming altar of gold glows radiantly here.~
+~
+15 0 0 0
+1000 5 -1 0 0
+0 0 0
+S
+#1337
+medallion heart~
+a heart shaped medallion~
+A heart shaped medallion is here.~
+~
+9 16 5 1
+0 0 0 0 20
+1 40000 0
+A
+13 25
+A
+5 1
+S
+#1338
+chest~
+a large chest~
+A large chest is here.~
+~
+15 0 0 0
+2000 15 1339 0 0
+0 0 0
+S
+#1339
+key intricate~
+an intricately carved key~
+An intricately carved key has been left here.~
+~
+18 16 16385 1
+1338 0 0 0 0
+1 0 0
+A
+24 1
+S
+#1340
+a pile of coins~
+a pile of coins~
+A pile of coins is here.~
+~
+20 0 1 0
+123456 0 0 0 0
+0 0 0
+S
+#1342
+chameleon poncho cloth multicolored~
+a chameleon poncho~
+Some multicolored cloth is on the ground here.~
+~
+9 16 1025 2
+5 0 0 0 17
+4 70000 0
+A
+2 2
+A
+103 2
+S
+#1344
+ring seashell~
+a seashell ring~
+A small seashell has been left here.~
+~
+22 16 3 1
+0 0 0 0 12
+1 40000 0
+A
+4 2
+S
+#1345
+backpack leather pack~
+a leather backpack~
+A leather backpack is here.~
+~
+15 16 1025 1
+150 0 -1 0 1
+4 5000 0
+S
+#1351
+cup brew herbal~
+an herbal brew~
+An herbal brew is here.~
+~
+17 16 16385 1
+5 5 11 1 0
+1 300 0
+S
+#1352
+waybread~
+a waybread~
+A loaf of waybread has been left here.~
+~
+19 16 16385 1
+32 0 0 0 0
+1 3000 0
+S
+#1355
+cleaver~
+a meat cleaver~
+A meat cleaver is sticking in the wall here.~
+~
+5 5640192 8193 6
+0 3 3 5 23
+4 30000 0
+A
+18 1
+A
+19 2
+A
+2 1
+S
+#1356
+shackles chain~
+some chain shackles~
+Some chain shackles have been discarded here.~
+~
+9 16 4097 1
+0 0 0 0 7
+3 2000 0
+A
+13 20
+A
+12 15
+A
+14 -10
+S
+#1358
+golden quill feather~
+a $B$5golden$R feather quill~
+A $B$5golden$1 feather quill has been left here.$R~
+~
+21 16 16385 1
+0 0 0 0 0
+1 4000 0
+A
+3 1
+S
+#1360
+scroll bound~
+a bound scroll~
+A bound scroll is here blowing in the breeze.~
+~
+2 16 16385 1
+16 1 2 34 1
+1 50000 8
+S
+#1361
+tube~
+a long cylindrical tube~
+A long cylindrical tube is rolling around here.~
+~
+15 16 16385 1
+100 5 -1 0 0
+1 40000 0
+S
+#1362
+scroll old~
+an old scroll~
+An old scroll has been left here.~
+~
+2 16 16385 1
+48 143 -1 -1 45
+1 51200 0
+S
+#1364
+pouch leather~
+a leather pouch~
+A leather pouch is on the ground here.~
+~
+15 16 2049 1
+30 0 -1 0 15
+1 5000 0
+A
+17 -3
+A
+5 1
+S
+#1365
+spoon silver~
+a silver stirring spoon~
+A silver stirring spoon has been left here.~
+~
+12 16 16385 1
+0 0 0 0 0
+1 100000 0
+A
+24 1
+S
+#1367
+potion red~
+a $4$Bbright red$R potion~
+A $4$Bbright red$1$B potion is here.$R~
+~
+10 16 16385 1
+15 15 15 15 5
+1 5000 0
+S
+#1369
+potion incandescent~
+an $B$3incandescent$R potion~
+An $B$3incandescent$1 potion simmers here quietly.$R~
+~
+10 16 16385 1
+16 18 19 20 5
+1 5000 0
+E
+potion incandescent~
+Ahh!  Schwepes Sparkling Soda a refreshing drink.
+~
+S
+#1370
+white milky potion~
+a $7$Bmilky white$R potion~
+A $7$Bmilky white$1$B potion is here.$R~
+~
+10 16 16385 1
+14 42 -1 -1 5
+1 5000 0
+S
+#1372
+flute golden instrument~
+a $B$5golden$R flute~
+A $B$5golden$1 flute is discarded here on the ground.$R~
+~
+26 16 16385 1
+1 1 1 7 15
+1 10000 0
+A
+3 2
+S
+#1374
+belt holster~
+a holstered belt~
+A holstered belt is here.~
+~
+15 16 2049 1
+20 0 -1 0 2
+5 4000 0
+A
+2 1
+A
+1 1
+S
+#1375
+wand blackened~
+a blackened wand~
+A blackened wand is here.~
+~
+3 16 16385 1
+17 3 3 26 20
+1 5000 0
+S
+#1376
+chisel runed~
+a runed chisel~
+A runed chisel is here.~
+~
+5 16 8193 1
+0 2 3 11 10
+1 40000 0
+A
+2 1
+S
+#1377
+pouch belt beltpouch~
+a beltpouch~
+A beltpouch is here.~
+~
+15 16 2049 1
+25 0 -1 0 0
+1 3000 0
+A
+3 1
+A
+4 1
+S
+#1378
+dust sparkling~
+some sparkling dust~
+Some sparkling dust is in a pile here.~
+~
+4 16 16385 1
+20 1 1 36 20
+1 5000 12
+S
+#1379
+cowl dark~
+a $B$0dark$R cowl~
+A $B$0dark$1 cowl lies here in a pile.$R~
+~
+9 2275840 5 1
+7 0 0 0 20
+1 80000 0
+A
+3 3
+S
+#1380
+wand ashen~
+an ashen wand~
+An ashen wand is here.~
+~
+3 16 16385 1
+20 3 3 63 0
+1 5000 0
+S
+#1382
+robe grey~
+a grey robe~
+A pile of grey cloth has been left here.~
+~
+15 6333952 1025 1
+50 0 -1 0 15
+3 40000 0
+A
+21 3
+A
+17 -5
+A
+103 2
+S
+#1383
+cloak grey~
+a long grey cloak~
+A pile of grey cloth has been left here.~
+~
+9 6333952 5 1
+2 0 0 0 23
+4 50000 0
+A
+24 4
+A
+17 -3
+S
+#1384
+bracelet silver~
+a $B$7glinting silver$R bracelet~
+A shining hoop of $B$7silver$1 metal is here.$R~
+~
+9 16 4097 1
+3 0 0 0 6
+1 4000 0
+A
+18 1
+A
+103 1
+S
+#1386
+minor ward cube clear~
+a ward minor~
+A small clear cube is sitting here.~
+~
+9 80 16385 1
+2 0 0 0 25
+1 30000 0
+A
+20 3
+A
+26 1
+S
+#1387
+robe black~
+a $0$Bblack$R robe~
+A pile of $0$Bblack$1$B cloth is on the ground here.$R~
+~
+15 6334976 1025 1
+50 0 -1 0 15
+4 30000 0
+A
+25 2
+A
+17 -1
+A
+103 2
+S
+#1388
+bracelet onyx~
+an $0$Bonyx$R bracelet~
+A hoop of $0$Bblack onyx$1$B is here.$R~
+~
+9 2576 4097 1
+0 0 0 0 15
+4 40000 0
+A
+18 -1
+A
+19 1
+S
+#1389
+cloak black dark~
+a $0$Bdark black$R cloak~
+A pile of $0$Bblack$1$B cloth is on the ground here.$R~
+~
+9 6334976 5 1
+2 0 0 0 20
+4 20000 4
+A
+24 4
+S
+#1391
+robe white~
+a $7$Bwhite$R robe~
+A pile of $7$Bwhite$1$B cloth is on the ground here.$R~
+~
+15 6335488 1025 1
+50 0 -1 0 12
+4 30000 0
+A
+3 2
+A
+103 1
+S
+#1392
+bracelet white gold~
+a $B$7white-gold$R bracelet~
+A bracelet of silvery metal is here.~
+~
+9 3088 4097 1
+0 0 0 0 15
+1 40000 0
+A
+18 3
+S
+#1393
+cloak white~
+a $B$7white$R cloak~
+A pile of $7$Bwhite$1$B cloth is on the ground here.$R~
+~
+9 2206720 5 1
+2 0 0 0 10
+4 40000 0
+A
+91 1
+A
+12 10
+S
+#1395
+collar spiked~
+a spiked collar~
+A small spiked collar is here.~
+~
+9 16 5 2
+3 0 0 0 23
+4 30000 0
+A
+13 15
+A
+26 1
+S
+#1397
+ring emerald master grand~
+the Grand Master's $B$2emerald$R ring~
+A small ring with a $2$Bgreen$1$B gemstone is here.$R~
+~
+9 16 3 1
+3 0 0 0 50
+1 150000 4
+A
+13 60
+A
+12 60
+S
+#1398
+bracelet emerald~
+an $2$Bemerald$R bracelet~
+A beautifully crafted hoop of $2$Bemerald$1$B is here.$R~
+~
+9 16 4097 1
+2 0 0 0 50
+4 150000 0
+A
+13 30
+A
+26 3
+S
+#1399
+ward major clear crystal~
+a ward major~
+A large clear crystal cube is here.~
+~
+9 16 16385 1
+3 0 0 0 45
+1 20000 4
+A
+58 3
+A
+26 2
+S
+$~
