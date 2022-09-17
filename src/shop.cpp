@@ -1892,6 +1892,8 @@ int reroll_trader(char_data *ch, obj_data *obj, int cmd, const char *arg, char_d
         log(fmt::format("{} gives {} to {} (removed)", GET_NAME(ch), obj->name, GET_NAME(owner)), IMP, LOG_OBJECTS);
       }
 
+      move_obj(r.orig_obj, owner);
+
       obj = r.orig_obj;
       obj_list = oload(owner, GET_OBJ_RNUM(obj), 2, true);
       for (auto &o : obj_list)
@@ -1932,7 +1934,7 @@ int reroll_trader(char_data *ch, obj_data *obj, int cmd, const char *arg, char_d
 
     if (arg1 == "1")
     {
-      obj_to_char(r.choice1_obj, ch);
+      move_obj(r.choice1_obj, ch);
       act("$n gives the original $p to $N.", ch, r.orig_obj, owner, TO_ROOM, INVIS_NULL | NOTVICT);
       act("$n gives you the original $p.", ch, r.orig_obj, owner, TO_VICT, 0);
       act("You give the original $p to $N.", ch, r.orig_obj, owner, TO_CHAR, 0);
@@ -1945,7 +1947,7 @@ int reroll_trader(char_data *ch, obj_data *obj, int cmd, const char *arg, char_d
     }
     else if (arg1 == "2")
     {
-      obj_to_char(r.choice2_obj, ch);
+      move_obj(r.choice2_obj, ch);
       act("$n gives the original $p to $N.", ch, r.orig_obj, owner, TO_ROOM, INVIS_NULL | NOTVICT);
       act("$n gives you the original $p.", ch, r.orig_obj, owner, TO_VICT, 0);
       act("You give the original $p to $N.", ch, r.orig_obj, owner, TO_CHAR, 0);
