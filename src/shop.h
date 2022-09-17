@@ -52,4 +52,23 @@ struct shop_data
 
 void redo_shop_profit(void);
 
+struct reroll_t
+{
+  obj_data *choice1_obj = nullptr;
+  obj_data *choice2_obj = nullptr;
+  uint64_t orig_rnum = {};
+  vnum_t orig_vnum = {};
+  obj_data *orig_obj = nullptr;
+
+  enum reroll_states_t
+  {
+    BEGIN,
+    PICKED_OBJ_TO_REROLL,
+    REROLLED,
+    CHOSEN
+  } state = {};
+};
+
+extern map<string, reroll_t> reroll_sessions;
+
 #endif
