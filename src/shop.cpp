@@ -1884,15 +1884,17 @@ int reroll_trader(char_data *ch, obj_data *obj, int cmd, const char *arg, char_d
       if (obj != 0)
       {
         obj_from(obj);
-
         act("$n gives $p to $N.", ch, obj, owner, TO_ROOM, INVIS_NULL | NOTVICT);
         act("$n gives you $p.", ch, obj, owner, TO_VICT, 0);
         act("You give $p to $N.", ch, obj, owner, TO_CHAR, 0);
-
-        log(fmt::format("{} gives {} to {} (removed)", GET_NAME(ch), obj->name, GET_NAME(owner)), IMP, LOG_OBJECTS);
+        log(fmt::format("{} gives {} to {}", GET_NAME(ch), obj->name, GET_NAME(owner)), IMP, LOG_OBJECTS);
       }
 
       move_obj(r.orig_obj, owner);
+      act("$n gives $p to $N.", ch, r.orig_obj, owner, TO_ROOM, INVIS_NULL | NOTVICT);
+      act("$n gives you $p.", ch, r.orig_obj, owner, TO_VICT, 0);
+      act("You give $p to $N.", ch, r.orig_obj, owner, TO_CHAR, 0);
+      log(fmt::format("{} gives {} to {}", GET_NAME(ch), r.orig_obj->name, GET_NAME(owner)), IMP, LOG_OBJECTS);
 
       obj = r.orig_obj;
       obj_list = oload(owner, GET_OBJ_RNUM(obj), 2, true);
@@ -1935,34 +1937,32 @@ int reroll_trader(char_data *ch, obj_data *obj, int cmd, const char *arg, char_d
     if (arg1 == "1")
     {
       move_obj(r.choice1_obj, ch);
-      act("$n gives the original $p to $N.", ch, r.orig_obj, owner, TO_ROOM, INVIS_NULL | NOTVICT);
-      act("$n gives you the original $p.", ch, r.orig_obj, owner, TO_VICT, 0);
-      act("You give the original $p to $N.", ch, r.orig_obj, owner, TO_CHAR, 0);
-
-      act("$n gives the new $p to $N.", owner, r.choice1_obj, ch, TO_ROOM, INVIS_NULL | NOTVICT);
-      act("$n gives you the new $p.", owner, r.choice1_obj, ch, TO_VICT, 0);
-      act("You give the new $p to $N.", owner, r.choice1_obj, ch, TO_CHAR, 0);
+      log(fmt::format("{} gives {} to {}", GET_NAME(owner), r.choice1_obj->name, GET_NAME(ch)), IMP, LOG_OBJECTS);
+      act("$n gives $p to $N.", owner, r.choice1_obj, ch, TO_ROOM, INVIS_NULL | NOTVICT);
+      act("$n gives you $p.", owner, r.choice1_obj, ch, TO_VICT, 0);
+      act("You give $p to $N.", owner, r.choice1_obj, ch, TO_CHAR, 0);
       obj_from(r.choice2_obj);
       obj_from(r.orig_obj);
     }
     else if (arg1 == "2")
     {
       move_obj(r.choice2_obj, ch);
-      act("$n gives the original $p to $N.", ch, r.orig_obj, owner, TO_ROOM, INVIS_NULL | NOTVICT);
-      act("$n gives you the original $p.", ch, r.orig_obj, owner, TO_VICT, 0);
-      act("You give the original $p to $N.", ch, r.orig_obj, owner, TO_CHAR, 0);
-
-      act("$n gives the new $p to $N.", owner, r.choice2_obj, ch, TO_ROOM, INVIS_NULL | NOTVICT);
-      act("$n gives you the new $p.", owner, r.choice2_obj, ch, TO_VICT, 0);
-      act("You give the new $p to $N.", owner, r.choice2_obj, ch, TO_CHAR, 0);
+      log(fmt::format("{} gives {} to {}", GET_NAME(owner), r.choice2_obj->name, GET_NAME(ch)), IMP, LOG_OBJECTS);
+      act("$n gives $p to $N.", owner, r.choice2_obj, ch, TO_ROOM, INVIS_NULL | NOTVICT);
+      act("$n gives you $p.", owner, r.choice2_obj, ch, TO_VICT, 0);
+      act("You give $p to $N.", owner, r.choice2_obj, ch, TO_CHAR, 0);
       obj_from(r.choice1_obj);
       obj_from(r.orig_obj);
     }
     else if (arg1 == "3")
     {
+      move_obj(r.orig_obj, ch);
+      log(fmt::format("{} gives {} to {}", GET_NAME(owner), r.orig_obj->name, GET_NAME(ch)), IMP, LOG_OBJECTS);
+      act("$n gives $p to $N.", owner, r.orig_obj, ch, TO_ROOM, INVIS_NULL | NOTVICT);
+      act("$n gives you $p.", owner, r.orig_obj, ch, TO_VICT, 0);
+      act("You give $p to $N.", owner, r.orig_obj, ch, TO_CHAR, 0);
       obj_from(r.choice1_obj);
-      obj_from(r.choice2_obj);
-      owner->tell(ch, fmt::format("Ok. You keep the original {}.", GET_OBJ_SHORT(r.orig_obj)));
+      obj_from(r.choice2_obj);      
     }
     else
     {
@@ -1983,6 +1983,11 @@ int reroll_trader(char_data *ch, obj_data *obj, int cmd, const char *arg, char_d
     {
       obj_from(r.choice2_obj);
     }
+    move_obj(r.orig_obj, ch);
+    log(fmt::format("{} gives {} to {}", GET_NAME(owner), r.orig_obj->name, GET_NAME(ch)), IMP, LOG_OBJECTS);
+    act("$n gives $p to $N.", owner, r.orig_obj, ch, TO_ROOM, INVIS_NULL | NOTVICT);
+    act("$n gives you $p.", owner, r.orig_obj, ch, TO_VICT, 0);
+    act("You give $p to $N.", owner, r.orig_obj, ch, TO_CHAR, 0);
     reroll_sessions.erase(GET_NAME(ch));
     break;
 
