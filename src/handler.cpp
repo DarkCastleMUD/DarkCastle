@@ -51,6 +51,7 @@
 #include "DC.h"
 #include "const.h"
 #include "corpse.h"
+#include "shop.h"
 
 extern CWorld world;
 
@@ -3245,6 +3246,22 @@ void extract_obj(struct obj_data *obj) {
 
 	if (obj->item_number >= 0) {
 		(obj_index[obj->item_number].number)--;
+	}
+
+	for (auto& r : reroll_sessions)
+	{
+		if (r.second.choice1_obj == obj)
+		{
+			r.second.choice1_obj = nullptr;
+		}
+		if (r.second.choice2_obj == obj)
+		{
+			r.second.choice2_obj = nullptr;
+		}
+		if (r.second.orig_obj == obj)
+		{
+			r.second.orig_obj = nullptr;
+		}
 	}
 
 	DC::instance().obj_free_list.insert(obj);
