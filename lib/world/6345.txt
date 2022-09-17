@@ -1,0 +1,7 @@
+#6345
+** END OF ARACHNOS ROOMS - Begin Mini-Quest Rooms **~
+   Do not use this room.  Used by scavenger hunts as a temporary storage spot
+for items that are gonna get cleared.
+~
+52 33554432 2
+S
