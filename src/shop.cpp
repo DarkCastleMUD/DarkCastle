@@ -53,6 +53,8 @@ int max_shop;
 // extern function
 int fwrite_string(char *buf, FILE *fl);
 
+map<string, reroll_t> reroll_sessions = {};
+
 /*
  * See if a shop keeper wants to trade.
  */
@@ -1758,25 +1760,6 @@ int eddie_shopkeeper(struct char_data *ch, struct obj_data *obj, int cmd, const 
   return eSUCCESS;
 }
 
-struct reroll_t
-{
-  obj_data *choice1_obj = nullptr;
-  obj_data *choice2_obj = nullptr;
-  uint64_t orig_rnum = {};
-  vnum_t orig_vnum = {};
-  obj_data *orig_obj = nullptr;
-
-  enum reroll_states_t
-  {
-    BEGIN,
-    PICKED_OBJ_TO_REROLL,
-    REROLLED,
-    CHOSEN
-  } state = {};
-};
-
-map<string, reroll_t> reroll_sessions = {};
-
 int reroll_trader(char_data *ch, obj_data *obj, int cmd, const char *arg, char_data *owner)
 {
   if (ch == nullptr || IS_MOB(ch))
@@ -1890,11 +1873,18 @@ int reroll_trader(char_data *ch, obj_data *obj, int cmd, const char *arg, char_d
         log(fmt::format("{} gives {} to {}", GET_NAME(ch), obj->name, GET_NAME(owner)), IMP, LOG_OBJECTS);
       }
 
-      move_obj(r.orig_obj, owner);
-      act("$n gives $p to $N.", ch, r.orig_obj, owner, TO_ROOM, INVIS_NULL | NOTVICT);
-      act("$n gives you $p.", ch, r.orig_obj, owner, TO_VICT, 0);
-      act("You give $p to $N.", ch, r.orig_obj, owner, TO_CHAR, 0);
-      log(fmt::format("{} gives {} to {}", GET_NAME(ch), r.orig_obj->name, GET_NAME(owner)), IMP, LOG_OBJECTS);
+      if (r.orig_obj != nullptr)
+      {
+        move_obj(r.orig_obj, owner);
+        act("$n gives $p to $N.", ch, r.orig_obj, owner, TO_ROOM, INVIS_NULL | NOTVICT);
+        act("$n gives you $p.", ch, r.orig_obj, owner, TO_VICT, 0);
+        act("You give $p to $N.", ch, r.orig_obj, owner, TO_CHAR, 0);
+        log(fmt::format("{} gives {} to {}", GET_NAME(ch), r.orig_obj->name, GET_NAME(owner)), IMP, LOG_OBJECTS);
+      }
+      else
+      {
+        ch->send("An error occurred. The object is missing.\r\n");
+      }
 
       obj = r.orig_obj;
       obj_list = oload(owner, GET_OBJ_RNUM(obj), 2, true);
@@ -1936,31 +1926,53 @@ int reroll_trader(char_data *ch, obj_data *obj, int cmd, const char *arg, char_d
 
     if (arg1 == "1")
     {
-      move_obj(r.choice1_obj, ch);
-      log(fmt::format("{} gives {} to {}", GET_NAME(owner), r.choice1_obj->name, GET_NAME(ch)), IMP, LOG_OBJECTS);
-      act("$n gives $p to $N.", owner, r.choice1_obj, ch, TO_ROOM, INVIS_NULL | NOTVICT);
-      act("$n gives you $p.", owner, r.choice1_obj, ch, TO_VICT, 0);
-      act("You give $p to $N.", owner, r.choice1_obj, ch, TO_CHAR, 0);
+      if (r.choice1_obj != nullptr)
+      {
+        move_obj(r.choice1_obj, ch);
+        log(fmt::format("{} gives {} to {}", GET_NAME(owner), r.choice1_obj->name, GET_NAME(ch)), IMP, LOG_OBJECTS);
+        act("$n gives $p to $N.", owner, r.choice1_obj, ch, TO_ROOM, INVIS_NULL | NOTVICT);
+        act("$n gives you $p.", owner, r.choice1_obj, ch, TO_VICT, 0);
+        act("You give $p to $N.", owner, r.choice1_obj, ch, TO_CHAR, 0);
+      }
+      else
+      {
+        ch->send("An error occurred. The object is missing.\r\n");
+      }
       obj_from(r.choice2_obj);
       obj_from(r.orig_obj);
     }
     else if (arg1 == "2")
     {
-      move_obj(r.choice2_obj, ch);
-      log(fmt::format("{} gives {} to {}", GET_NAME(owner), r.choice2_obj->name, GET_NAME(ch)), IMP, LOG_OBJECTS);
-      act("$n gives $p to $N.", owner, r.choice2_obj, ch, TO_ROOM, INVIS_NULL | NOTVICT);
-      act("$n gives you $p.", owner, r.choice2_obj, ch, TO_VICT, 0);
-      act("You give $p to $N.", owner, r.choice2_obj, ch, TO_CHAR, 0);
+      if (r.choice2_obj != nullptr)
+      {
+        move_obj(r.choice2_obj, ch);
+        log(fmt::format("{} gives {} to {}", GET_NAME(owner), r.choice2_obj->name, GET_NAME(ch)), IMP, LOG_OBJECTS);
+        act("$n gives $p to $N.", owner, r.choice2_obj, ch, TO_ROOM, INVIS_NULL | NOTVICT);
+        act("$n gives you $p.", owner, r.choice2_obj, ch, TO_VICT, 0);
+        act("You give $p to $N.", owner, r.choice2_obj, ch, TO_CHAR, 0);
+      }
+      else
+      {
+        ch->send("An error occurred. The object is missing.\r\n");
+      }
+
       obj_from(r.choice1_obj);
       obj_from(r.orig_obj);
     }
     else if (arg1 == "3")
     {
-      move_obj(r.orig_obj, ch);
-      log(fmt::format("{} gives {} to {}", GET_NAME(owner), r.orig_obj->name, GET_NAME(ch)), IMP, LOG_OBJECTS);
-      act("$n gives $p to $N.", owner, r.orig_obj, ch, TO_ROOM, INVIS_NULL | NOTVICT);
-      act("$n gives you $p.", owner, r.orig_obj, ch, TO_VICT, 0);
-      act("You give $p to $N.", owner, r.orig_obj, ch, TO_CHAR, 0);
+      if (r.orig_obj != nullptr)
+      {
+        move_obj(r.orig_obj, ch);
+        log(fmt::format("{} gives {} to {}", GET_NAME(owner), r.orig_obj->name, GET_NAME(ch)), IMP, LOG_OBJECTS);
+        act("$n gives $p to $N.", owner, r.orig_obj, ch, TO_ROOM, INVIS_NULL | NOTVICT);
+        act("$n gives you $p.", owner, r.orig_obj, ch, TO_VICT, 0);
+        act("You give $p to $N.", owner, r.orig_obj, ch, TO_CHAR, 0);
+      }
+      else
+      {
+        ch->send("An error occurred. The object is missing.\r\n");
+      }
       obj_from(r.choice1_obj);
       obj_from(r.choice2_obj);      
     }
@@ -1975,19 +1987,20 @@ int reroll_trader(char_data *ch, obj_data *obj, int cmd, const char *arg, char_d
   case CMD_CANCEL:
     owner->tell(ch, "I'm canceling this reroll.");
 
-    if (r.choice1_obj != nullptr)
+    obj_from(r.choice1_obj);
+    obj_from(r.choice2_obj);
+    if (r.orig_obj != nullptr)
     {
-      obj_from(r.choice1_obj);
+      move_obj(r.orig_obj, ch);
+      log(fmt::format("{} gives {} to {}", GET_NAME(owner), r.orig_obj->name, GET_NAME(ch)), IMP, LOG_OBJECTS);
+      act("$n gives $p to $N.", owner, r.orig_obj, ch, TO_ROOM, INVIS_NULL | NOTVICT);
+      act("$n gives you $p.", owner, r.orig_obj, ch, TO_VICT, 0);
+      act("You give $p to $N.", owner, r.orig_obj, ch, TO_CHAR, 0);
     }
-    if (r.choice2_obj != nullptr)
+    else
     {
-      obj_from(r.choice2_obj);
+      ch->send("An error occurred. The object is missing.\r\n");
     }
-    move_obj(r.orig_obj, ch);
-    log(fmt::format("{} gives {} to {}", GET_NAME(owner), r.orig_obj->name, GET_NAME(ch)), IMP, LOG_OBJECTS);
-    act("$n gives $p to $N.", owner, r.orig_obj, ch, TO_ROOM, INVIS_NULL | NOTVICT);
-    act("$n gives you $p.", owner, r.orig_obj, ch, TO_VICT, 0);
-    act("You give $p to $N.", owner, r.orig_obj, ch, TO_CHAR, 0);
     reroll_sessions.erase(GET_NAME(ch));
     break;
 
