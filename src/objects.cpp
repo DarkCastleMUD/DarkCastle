@@ -2475,6 +2475,11 @@ void heightweight(char_data *ch, bool add)
 
 int obj_from(obj_data* obj)
 {
+  if (obj == nullptr)
+  {
+    return false;
+  }
+  
   if (obj->in_obj)
   {
     return obj_from_obj(obj);
