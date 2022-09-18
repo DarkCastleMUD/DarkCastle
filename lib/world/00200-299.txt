@@ -437,11 +437,11 @@ D1
 D2
 ~
 ~
-0 -1 -1
+0 -1 0
 D3
 ~
 ~
-0 -1 -1
+0 -1 0
 S
 #257
 The Dark Castle Academy ~
@@ -469,7 +469,7 @@ $B$4Do not edit room 257$R~
 D0
 ~
 ~
-0 -1 -1
+0 -1 0
 D1
 ~
 ~
@@ -487,11 +487,11 @@ $4$BDo not edit room 259$R~
 D1
 ~
 ~
-0 -1 -1
+0 -1 0
 D2
 ~
 ~
-0 -1 -1
+0 -1 0
 D3
 You see the room you came from and the room you should go to.
 ~
@@ -750,6 +750,6 @@ $B$4End of Platsmith and Special Proc Range$R~
 D0
 ~
 ~
-0 -1 -1
+0 -1 0
 S
 $~

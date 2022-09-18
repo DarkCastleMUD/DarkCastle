@@ -622,7 +622,7 @@ D0
 The wall seems worn to the north here.
 ~
 wall hidden~
-15 1 -1
+15 1 0
 D2
 There appears to be some kind of door in the tunnel to the south.
 ~
@@ -732,7 +732,7 @@ D0
 D1
 ~
 obelisk~
-11 -1 -1
+11 -1 0
 E
 sign~
 The sign reads:
@@ -1459,7 +1459,7 @@ betting on the size and the shape of the next.
 D0
 ~
 ~
-0 -1 -1
+0 -1 0
 D2
 ~
 ~
@@ -1483,7 +1483,7 @@ The busy street of Sativa bustles with activity.
 D2
 ~
 ~
-0 -1 -1
+0 -1 0
 E
 device~
 The device has a handle on one side and consists of two wood partitions
@@ -1946,7 +1946,7 @@ a hurry, spilling the contents onto the floor in piles.
 D1
 ~
 cabinet~
-1 -1 -1
+1 -1 0
 D5
 ~
 ~
