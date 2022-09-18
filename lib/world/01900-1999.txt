@@ -1,0 +1,2061 @@
+#1900
+The Entrance to the Bard's Academy~
+   Two huge granite pillars frame the entrance to the famous Academy of Music.
+It is here that bards travel to from all over the realms to learn and study
+their craft.  The building itself is quite beautiful.  Over three stories high,
+each of the outside facing walls is delicately carved with murals depicting the
+escapades of some of the realms more famous bards.  The sound of vocals
+harmonizing and instruments being strummed floats gently out of the open
+windows.
+~
+19 1140852932 0
+D1
+~
+~
+0 -1 3118
+D3
+~
+~
+0 -1 1901
+S
+#1901
+The Bard's Academy~
+   The sound of music echoes off of the ornately decorated walls.  Statues,
+both large and small, seem to be crammed into every corner, while paintings
+cover the walls from the floor to the ceiling, giving this rooms design an
+almost garish feeling.  One painting that immediately stands out from all of
+the rest is a six foot tall painting on the north wall that depicts the
+ever-smiling and ever-vain likeness of Lance the Headmaster.  Nestled in
+between a number of statues, a fountain bubbles quietly with crystal clear
+water.  An ornate stairway leads up.
+~
+19 1174416588 0
+D1
+~
+~
+0 -1 1900
+D4
+~
+~
+0 -1 1902
+C10
+S
+#1902
+A Hallway in the Academy~
+   Paintings cover every square inch of the walls in this hallway, and statues
+and busts cover whatever open space is left.  The sound of music echoes through
+the hallway, originating from the classroom that lies to the west.  To the
+north you can find a study room, as well as the headmaster's office.  The sound
+of a saw can be heard coming from above you.
+~
+19 1107307720 0
+D0
+~
+~
+0 -1 1903
+D3
+~
+~
+0 -1 1905
+D4
+~
+~
+0 -1 1906
+D5
+~
+~
+0 -1 1901
+C10
+S
+#1903
+The Study~
+   Large and ornate couches fill this room, which is somehow magically
+sheltered from the constant sound of music that fills the rest of the Academy.
+It is here that the students can come to relax and study in peace and quiet.
+A large bulletin board is resting on the north wall for students and teachers
+alike to post notices and information for each other.  In keeping with the
+interior design of the rest of the Academy, paintings and statues cover the
+walls from floor to ceiling.
+~
+19 1107307720 0
+D2
+~
+~
+0 -1 1902
+D3
+~
+~
+0 -1 1904
+C10
+S
+#1904
+The Headmaster's Office~
+   Scrolls and sheets of parchment cover the huge oak table shoved up against a
+large window.  The samples of songs and melodies gathered from across the
+breadth of the realm of Dark Castle flutter gently in the breeze coming from
+the outside.  In accordance with the rest of the Academy's decoration, the
+Headmaster's office is covered from floor to ceiling in ornate paintings and
+statues of all sizes.  A large tapestry is draped on the north wall which
+depicts the founding of the Academy, while another shows the exploits of the
+Headmaster himself.
+~
+19 1107307720 0
+D1
+~
+~
+0 -1 1903
+C10
+S
+#1905
+A Classroom~
+   Tweets and twangs, both melodious and otherwise, fill this spacious chamber
+from the crowds of bards practicing their various instruments here and there at
+small tables.  Large windows allow fresh air and bird song from the outside
+into the room, whose brightly painted walls depict the nine Muses bestowing
+instruments upon their favored followers.
+~
+19 1107306584 0
+D1
+~
+~
+0 -1 1902
+C10
+S
+#1906
+An Instrument Maker's Workshop~
+   Wood shavings and bits of twisted metal litter the floor of this room, whose
+air smells of pine, cedar, and other freshly cut wood.  Various tools are
+scattered throughout the room, and an assortment of instruments line the walls.
+~
+19 1107307720 0
+D5
+~
+~
+0 -1 1902
+C10
+S
+#1907
+An empty room~
+   Empty description.
+~
+19 1107306560 0
+S
+#1908
+Room 1908~
+   Empty description.
+~
+19 1107306560 0
+S
+#1909
+Room 1909~
+   Empty description.
+~
+19 1107306688 0
+S
+#1910
+Skiv's Shack~
+   This sordid and opprobrious establishment is a favorite among Sorpigal's
+reprobate crowd.  It tends to attract the kind of people who would gamble with
+your life even if they'd never met you.  A thick haze of nearly asphyxiating
+smoke disturbs your view of the other customers, making them into little more
+than vaguely formed shadows.  Compared to the other drinking houses in town,
+this one appears unusually calm, almost disturbingly so--that is, there is a
+lot of drinking, but absent is the accompanying mirth and laughter.  The
+atmosphere is cold and callous.  In the back of the room an unremarkable
+doorway tries to conceal its existence.
+~
+19 1140853836 0
+D1
+In the back corner of the room, behind the series of stacked crates that
+Skiv uses as his bar, is a shadowy doorway. Instead of an actual door it
+has a curtain, which is at the moment pulled halfway to the side and
+pinned to the door frame with a cheap dagger. Something about the curtain
+catches your eye every so often, but you can't immediately place what it
+is. Along the door frame is a pattern of sinuous glpyhs and obscure runes:
+magic wards, to protect whatever might be in there from the magiks of the
+outside world.
+~
+~
+0 -1 1912
+D2
+~
+~
+0 -1 3070
+D5
+Examining the floor almost makes you ill. It is covered with a sticky
+film of spilled alcohol and other unidentifiable fluids. In one corner
+you notice the outline to what would otherwise be an unrecognizable trapdoor
+had not pitcher after pitcher of tipped ale cause the edges of its boards
+to begin to rot.
+~
+trapdoor~
+15 -1 1911
+E
+curtain~
+Certain areas of the curtain appear to shimmer when struck at a certain
+angle by the light. After a ten minute investigation you discover that
+ordinary light does not have any affect, but only magically created light
+such as the kind that forms the dull glow around many adventurers' equipment.
+Cleverly you position yourself at just the right angle to this curtain
+so that the luminescence from a large obsidian earring worn by a surly
+elf will be reflected off the curtain straight to you. You are rewarded
+as you behold a glistening pattern of wavy bladed dirks--the symbol of
+Sorpigal's thieves guild.
+~
+S
+#1911
+A tunnel below the north wall of Sorpigal~
+   You find yourself in a cleverly disguised and dingy tunnel that appears to
+lead under the north wall of the city of Sorpigal.  This must be the secret
+passage that Sorpigal's "less desireable" elements utilize to travel unnoticed
+past the prying eyes of the law.  Occasionally footsteps can be heard from
+above.
+~
+19 1107306560 0
+D0
+The wall looks discolored at certain points, almost as if there could
+be a passageway through it.
+~
+tunnel~
+15 -1 380
+D4
+Above you is the thin outline of a trapdoor.
+~
+trapdoor~
+15 -1 1910
+S
+#1912
+The back room of Skiv's Shack~
+   This space appears to connect the shack with an adjacent building--one that
+has been hidden away among the high rises common to this section of town and
+whose only entrance is through the room you're in right now.  Barrels filled
+with various low-grade ales line the south wall underneath a shelf holding some
+of the most disgusting liquors you've ever heard of.  Skiv must have a
+penchant, for knives for the north wall holds quite a fine collection of wicked
+blades, and in one corner is set up a high quality whetstone.  The sounds of
+the front room are curiously muted here, as if a kind of aural boundry has been
+crossed.  Something about this room makes it very strange.  Thinking about it
+some more, it becomes increasingly clear that Skiv's establishment serves
+another entirely different purpose: a front for Sorpigal's thieves guild.
+~
+19 1107307724 0
+D1
+~
+~
+0 -1 1913
+D3
+You see back into Skiv's Shack.
+~
+~
+0 -1 1910
+E
+whetstone~
+This whetstone, made of the smallest grind avaliable, is one of few in
+town which can produce an edge fine enough to meet the standards guild.
+~
+C3
+S
+#1913
+The Great Hall of the Thieves' Guild~
+   Concealed from the rest of the world by the weathered and unremarkable
+building is this lavishly decorated two story chamber.  A reflective floor of
+rare black marble stretches confidently from wall to wall.  Beginning at the
+western end of the room, near the exit back to Skiv's shack, and continuing all
+the way to a balcony at the opposite end of the room is a great gilded double
+staircase.  Fine tapestries serving as backgrounds for rows of delicately caved
+statues cover the north and south walls.  The spoils from years of illicit
+activity have made the treasures of this room rival the palaces of Sorpigal in
+riches and decor.
+~
+19 1174416588 0
+D3
+~
+~
+0 -1 1912
+D4
+~
+~
+0 -1 1915
+D5
+~
+~
+0 -1 1914
+E
+tapestry tapestries wall walls~
+The collection of tapestries are just another of the disturbing amenities
+that lavish this hall. They illustrate brutal massacares and insidious
+treacharies to the point that the most hardened guild member is liable
+to scream indecency. Innocent creatures are tortured with methods so subtle
+and exacting that crafting their expressions of suffering has become a
+fine art to be relished in by the wicked members of this guild.
+~
+E
+statues~
+Three sets of grandiose and extravagant statues flank you from both the
+north and south wall of this room. Their placement in front of the magnificent
+tapestries create the illusion that you stand not in the thieves' guild
+of Sorpigal but instead on some otherworldly plane looking directly at
+the most awe-demanding beings imaginable to your race's puny mental capacity.
+On the south wall, between the two easternmost statues, and partially
+concealed by the fine tapestry is a stairway that descends down into darkness.
+~
+E
+statue 1.statue~
+Cast from solid gold and weighing more than the gross weight of a dozen
+average-sized draconians, this statue resembles an enraged orcish rogue
+mistress. Her veins rise out of her tightened skin to the size of strong
+cords and indicate the inordinate ammount of unnatrual hormones in her
+already too masculine body. The statue glistens in a stongly hypnotic
+manner, making you wonder about its magical properties.
+~
+E
+2.statue statue~
+A precious acumulation of midnight onyx has been carved into the appearance
+of a feral scoundral. A primordial predecessor to today's sophisticated
+rogues, he has triumphed over his contemporary brutes and beasts. In his
+hands and hanging from a scruffed waistcloth are various crude but efficient
+weapons. The mere thought of his day-to-day life shatters any notion one
+might have had of a noble savage. His type were quickly rewarded for devising
+a mode of survival that preyed on the injured and indigent.
+~
+E
+3.statue~
+This statute is made of diamond-inlaid white marble. It depicts a strongly
+built man from the long-forgotten Enfanian civilization. He has a dagger
+in each hand and is poised to bury them into some unsuspecting reptilian skin.
+~
+E
+4.statue~
+Meticulously trimmed coral rests upon the fourth pedestal. It blends together
+patches of amber, lavender, and green into an amorphous resemblance of
+the demon Thola'reshk. The only component of his honorarium standing before
+you that is not torturously vague are the two completely empty and distinctly
+formed eye sockets, that strike you as orbs emptiness rather than space
+to be filled by the demon's piercing organs.
+~
+E
+5.statue~
+A statue of black marble, larger than the rest, appears to jut out of
+the equally composed floor. It depicts a sinister drow smirking in pleasure
+as he holds an irregurarly-toothed blade that, thanks to some impressive
+magic, actually drips real blood. It collects in a pool at the dark elf's
+feet next to the ravaged bodies of three corpulent men of apparent power;
+one grasps in his dead hands a pair of dice, and on his belt is a pouch
+loaded with valuable coins; another wears the insignia of the clergy,
+symbolizing the ability to appeal to the gods; and the final slain man
+bears a cloak embroidered with the name Zugg. The artist's message for
+this scene is clear: that whatever other aides may be available, there
+is no substitute for pure skill.
+~
+E
+6.statue~
+The sixth and last statue is of bronze speckled with invaluable pearls.
+Unfortunately it is impossible to determine what this work was meant to
+present, for it has been melted into a shapeless stump. Creases of molten
+metal create rifts all through its surface and end in tendrals that rap
+down the edge of the pedestal. Large patches of discoloration attest to
+the high ammount of heat this thing has been put to, but curiously the
+pearls have survived completely untouched. It somehow makes sense although
+it shouldn't, as if the destruction was a deliberate act by its creator,
+a final touch to a priceless masterpiece. Engraved on the top is a strangely
+organic hand are the words: Nullum magnum ingenium sine mixtura dementiae fuit.
+~
+C3
+S
+#1914
+A pitch-black basement~
+   This is the only room in the guild whose decor matches that of the
+building's external appearances.  Nothing in the way of material luxuries can
+be found in this dire chamber.  Other than two low burning torches on either
+wall, no light source exists to illuminate the greater portion of this room.
+The walls are constructed of stone, crumbling mortar, and what appears to be
+random bone fragments.  Down here you can hear the rush of Sorpigal's abject
+sewer system, and even more noticeably smell its fetid stench.  This room must
+have been designed to emulate the working conditions of most guild members, for
+this serves as the training room of the guild.
+~
+19 33564761 0
+D4
+~
+~
+0 -1 1913
+C3
+S
+#1915
+Balcony at the top of the stairs~
+   Like the arms of a protective mother giant, the two sets of stairs from
+below hold up this large expanse.  The edge of the balcony is marked by an
+intricately fitted coral banister.  Looking over its side, one feels as if they
+are on a luxurious vessel crossing a sea of inky blackness.  On opposite sides
+of a richly decorated steel door to the east are a cluttered table and a glass
+case containing several brightly colored snakes.  The smell of expensive
+incenses and exotic herbs wafts around up here.  Above you is a grand dome.
+~
+19 1107307720 0
+D0
+~
+~
+0 -1 1916
+D5
+~
+~
+0 -1 1913
+E
+u up~
+Two small slits in the ceiling, unreachable from even this height, bring
+fresh air into the building. Occassionaly a ray of sunlight (or moonlight)
+will make it through and give a remarkable light show as it dances across
+the many treasures below.
+~
+E
+table~
+Diagrams of some of the most popular lock designs lay spread out across
+the cluttered table. Weighing down a half finished diagram is a deconstructed
+safe lock, it's pins, springs, and tumbler speckling the mess of papers.
+~
+E
+case cage snake snakes~
+Inside the glass case are three saliently orange snakes: the dreaded
+"Two-Step" Thesali vipers. Their method of execution is efficient and
+beautiful; a bite from one of these snakes would cause the victim to yell,
+take two steps, and fall over dead. Next to the cage rests a set of small
+milking vials and a pair of heavy gloves--gloves, the milker will tell
+you, which are but a small insurance against the dread imposed by handling
+these deadly reptiles. Native to the distant Vhryllian cliffs, they are
+extremely rare and near impossible to catch. Their presence here attests
+to the seriousness with which the thieves guild takes its poisons.
+~
+E
+above dome~
+Two small slits in the ceiling, unreachable from even this height, bring
+fresh air into the building. Occassionaly a ray of sunlight (or moonlight)
+will make it through and give a remarkable light show as it dances across
+the many treasures below.
+~
+C3
+S
+#1916
+Janikhel's Room~
+   This room overwhelms you with its opulent decor.  The flayed skin of a
+massive tiger forms a rug covering half the room.  In the walls, where windows
+would have been, are now solid gold engravings whose intracacies are so minute
+that the unaided eye is unable to fully appreciate it.  From a set of solid
+platinum braziers burns a pungent incense.  Strung along the wall is a thin
+chain which has been threaded through a medley of various earrings and hoops
+(ears still attached) as a modest remembrance to those who have disrespected
+their audience with the guildmaster.
+~
+19 1107307724 0
+D2
+~
+~
+0 -1 1915
+E
+engraving engravings~
+This engraving shows an aerial view of the city shortly after its founding.
+~
+E
+rug floor tiger~
+This is the skin of brutally slaughtered Serbian tiger. It looks as if
+it was killed by a lightning bolt strike right between its eyes.
+~
+C3
+S
+#1917
+Room 1917~
+   Empty description.
+~
+19 1107306560 0
+S
+#1918
+Room 1918~
+   Empty description.
+~
+19 1107306496 0
+S
+#1919
+Room 1919~
+   Empty description.
+~
+19 1107306496 0
+S
+#1920
+Before a Shady Building~
+   Stepping out of the alley into a shadowy niche has landed you in front of
+what appears to be a two story brick building.  You recognize the symbol of the
+Anti-Paladin's guild carved into one of the less noticeable bricks.  A single
+entrance to your west is ostensibly unguarded.  However, you get the feeling
+that you shouldn't dare to go through it without having business inside.  A
+chilling breeze drifts from an unlit upper window bringing with it the stench
+of charred flesh.
+~
+19 1140852932 1
+D0
+~
+~
+0 -1 3026
+D3
+~
+~
+0 -1 1921
+S
+#1921
+Inside the Anti-Paladin's Guild~
+   You are standing in the main lobby of the guild.  It is a simple room,
+immaculate and sparse.  The only decoration is a giant vampire statue in the
+middle of the room which doubles as fountain.  A doorway to the south leads to
+the training room and a spiral stairway in the northeast corner goes upstairs.
+An unsettling drone-like chanting can be heard but not placed.
+~
+19 1174416588 0
+D1
+~
+~
+0 -1 1920
+D2
+~
+door~
+3 -1 1922
+D4
+~
+~
+0 -1 1923
+C5
+S
+#1922
+The Anti-Paladin Training Room ~
+   You barely miss stepping into a puddle of acid as you enter the room.  This
+is where members hone their skills when they wish not to leave the safety of
+their guild.  Practice dummies, with their most vulenerable spots circled in
+dried blood, line the southern wall.  A medley of various weapons hang from a
+rack to the east, and the western wall is charred from a countless barrages of
+fireballs and lightning bolts.
+~
+19 1107306584 0
+D0
+~
+door~
+3 -1 1921
+C5
+S
+#1923
+The Second Floor of the Anti-Paladin's Guild~
+   This story of the guildhouse seems dedicated to mental and spirital
+pursuits.  A gilded chandelier hangs from the ceiling, its flames an eerie
+green and red.  There is an impressive collection of books filling the west
+wall.  A group of melancholy antipaladins sit in reading chairs discussing a
+prospective unholy adventure.  Through a window to the north you can spy
+Midwitch and its glamourous Madame.  A $5wooden ladder$R extends to a hatch in
+the ceiling.
+~
+19 1107307720 0
+D2
+~
+~
+0 -1 1925
+D5
+~
+~
+0 -1 1921
+E
+bookcase w we wes west wall~
+The western wall is one giant bookshelf filled with aging tomes. Some
+appear to have been around for over a millennia. You peruse the titles
+and find, among others, "Midnight City: A history of Dark Magiks in and
+around Sorpigal," "Corpse Animation, the dark elf approach," and "What
+to do when you've reached pure evil." Further along you find the section
+on the philosophy of evil. A tanned leather-bound tome questions the
+existance of a dark lord, while another purports that you are your own
+dark lord and that selfishness should be the supreme virtue. However,
+for each of these skeptical books you find ten others to refute their
+claims and provide evidence for the wonders of an evil diety.
+~
+C5
+S
+#1924
+The Roof of the Anti-Paladin's Guild~
+   The roof is littered with empty ale bottles and the remains of smoked
+pipeweed.  Apparently, this is where guild members come to relax while spying
+on the rest of northern Sorpigal.  A rotting ledge about a foot high lines the
+edges of the building, not much to prevent one from falling...  Or getting
+pushed...  Off the side.  Looking south you can make out, across the river, the
+myriad statues decorating the public gardens of Sorpigal.  North you can see as
+far as Sativa street.  A $5wooden ladder$R leads back down into the guild.
+~
+19 1107307712 1
+C5
+S
+#1925
+The Shrine~
+   As you enter facing down the long axis of this ovalesque chamber, a
+discomfort instantly arises in your stomach.  Never before have you seen so
+many signs of extravagant hatred in one place.  Darkness predominates but you
+can still make out body parts belonging to at least three dozen different
+creatures, some of them unrecoginzable.  Red and purple curtains with images
+glorifying the slaughter of innocent elves line the sidewalls.  A large altar
+occupies the opposite end of the room.
+~
+19 1107307720 0
+D0
+~
+~
+0 -1 1923
+E
+curtain curtains~
+The deep red hue comprising the background of these curtains can only
+be described as resembling freshly spilt blood, while the purple threads
+trace out the embroidered pictures. Scenes depecting the death of virtuous
+monks are shown alongside the mass execution of pixie children.
+~
+E
+altar~
+The south end of this room is the location for a very elaborate altarpiece.
+It seems to be mainly comprised of a large slab of obsidian serving as a
+sacrifical table. A bronze bowl stands underneath collecting blood from the
+remains of a recently sacrificed dwarven youth from the kingdom of Jundleheim.
+~
+C5
+S
+#1926
+Entrance to the Barbarian's Guild~
+   You are standing in the middle of a short path leading to a large wooden
+structure that appears out of place among Sorpigal's urban architecture.  This
+building has been constructed entirely of timber from only the most massive of
+trees.  Its east side extends all the way to the city wall, while its western
+end stops short of the weapons shop to make way for a training ground from
+which you can hear a cacophony of coarse grunts and shouts.  A front door at
+least ten feet high is nearly filled by a giant uncouth guard.  On either side
+of the front door stand poles bearing banners made from the hide of some huge
+beast.  These banners display the symbol of the Sorpigal barbarian's guild.
+~
+19 1140852804 1
+D0
+~
+~
+0 -1 1927
+D2
+~
+~
+0 -1 3041
+E
+banner banners~
+You see the symbol for the Sorpigal barbarian's guild: a two headed warhammer
+crossed with a giant battle axe emblazoned on a studded wooden shield.
+Underneath are the words, written in some tribal language, "Tempum yr
+morada, mortum yr oppeum"
+~
+S
+#1927
+South End of an Enormous Mead Hall~
+   This is the largest indoor space in all of Sorpigal.  The height of this
+room alone is enough to make you nauseous.  From the walls hang an inordinate
+number of stuffed animal heads and fighting implements.  The main feature of
+this room is an immense banquet table, which could easily sit a hundred hungry
+barbarians.  Judging by the mess left on the table one would think a feast had
+just occured, but really the table seems to remain in this state year round.
+An elaborately decorated war drum stands in the corner looking as if it could
+produce enough sound to shatter the city walls.
+~
+19 1107307660 0
+D0
+~
+~
+0 -1 1928
+D2
+~
+~
+0 -1 1926
+C7
+S
+#1928
+North End of an Enormous Mead Hall~
+   The scent of ale pervades this end of the hall.  Perhaps it comes from that
+fountain, where three guild members are currently approaching a brawl trying to
+decide who should fill his mug first.  The table continues from the south, a
+mammoth unoccupied chair at its head.  An amazing display of various battle
+trophies fills the north wall.  Its centerpiece is a monstorous stuffed boar's
+head with conspicuously long tusks.  The only other exit to the building is a
+door on the west that leads to the courtyard.
+~
+19 1107307720 0
+D0
+You see the head of an enormous boar. It looks as if it was once able to
+swallow a man whole. Whoever killed this beast must have been very proud,
+for he carved his initials into his two front teeth: C.F. One of its tusks
+looks very loose and a bit worn down, almost as if someone has gotten used
+to pulling on it.
+~
+DoorToHiddenBarbGuildRoom~
+47 1930 1931
+D2
+~
+~
+0 -1 1927
+D3
+~
+~
+0 -1 1929
+C7
+S
+#1929
+The Courtyard~
+   A thick line of bushes to the south shields this courtyard from Sativa
+street.  To the north is a small garden and just before that are two sparring
+pits.  In one of the pits there are two guild members fighting headlong with
+padded hammers.  They are also getting harangued by a very loud and very very
+big master sitting in the garden.  Trainees in the rest of the courtyard seem
+similarly animated.  There is an enticing punching bag and three thick poles
+planted in the ground for one to plant an axe in.  Next to the weapon shop on
+the western end of the yard lie boulders of increasing size, which members can
+lift in order to bulk up.
+~
+19 1107306576 2
+D0
+~
+~
+0 -1 1930
+D1
+You see the mead hall. You can swear it's looks longer from out here than
+it did from the inside. Maybe there's a hidden room in there.
+~
+~
+0 -1 1928
+C7
+S
+#1930
+A Bench in the Courtyard~
+   The northern end of the training yard is the site of a small garden.  Two
+grand oak trees stand in each corner, casting their shadow upon a tiny gravel
+bench that looks as if it wouldn't support the weight of the huge man sitting
+upon it.  The battle cries from the practicing barbarians are noticeably muted
+from here.  To the east you see a small extention protruding from the back of
+the mead hall.
+~
+19 1107307712 3
+D2
+~
+~
+0 -1 1929
+C7
+S
+#1931
+Berkthgar's Chamber~
+   This must be a new addition to the back of the mead hall, specially designed
+to provide the guildmaster with his unique comforts.  A very long bed, covered
+by at least half a dozen different furs, takes up the entire length of the
+north wall.
+~
+19 1107306696 0
+D2
+~
+DoorToHiddenBarbGuildRoom~
+43 1930 1928
+C7
+S
+#1932
+Room 1932~
+   Empty description.
+~
+19 1107306496 0
+S
+#1933
+Room 1933~
+   Empty description.
+~
+19 1107306496 0
+S
+#1934
+A Dead End Off the Main Trail~
+   A small path spawns off the main trail out of the city and seems to dead end
+right spontaneously.  The plant growth around here is thick enough for you to
+consider it impassable without some serious bushwhacking efforts.  You are
+about to turn around and go back when a small squirrel nips on your ankle and
+shows you a tiny space between the foliage to the south that you might be able
+to fit through.
+~
+19 1140852932 9
+D0
+~
+~
+0 -1 6001
+D2
+~
+~
+8 -1 1935
+S
+#1935
+A Secluded Clearing in the Forest~
+   This glen is entirely undetectable from the path to the north.  You would
+think this was a nice place to rest if it weren't for the feeling that there
+are eyes upon you.  Nevertheless your experience here is plesent.  Sunlight,
+dimmed just the right ammount by the overhead canopy, warms your face.  The
+woodland creatures around here seem unusally friendly, as if they are used to
+interacting with travellers.  A nearby tree has some interesting scratches on
+it.  Next to it a trail leads west.
+~
+19 1140852932 0
+D0
+~
+~
+0 -1 1934
+D3
+~
+~
+0 -1 1936
+E
+tree scratches~
+You see a very ornate illustration carved into the trunk of the tree. It
+is a unicorn's head, the symbol of Sorpigal's ranger guild.
+~
+E
+d do dow down~
+The ground is covered with polar bear tracks. What on earth would polar
+bears be doing in this part of the woods?
+~
+S
+#1936
+The Ranger Guild~
+   The Hoan-Dor forest opens up here to reveal what appears to be a campsite, a
+permanent one.  Wooden benches, occupied by a couple of weary guild members,
+are arranged around the circle of stones that forms a firepit.  The ground here
+must be enchanted, for no matter how hard you step on the leaves below your
+feet no sound is produced.  A large cluster of bushes, looking as if they could
+be concealing something, stands next to a giant boulder upon which a small
+dwarven ranger sits while conversing with an eagle.  A path to the east goes
+back to the clearing and the trail to town.
+~
+19 1174416580 0
+D0
+~
+~
+0 -1 1939
+D1
+~
+~
+0 -1 1935
+D2
+~
+~
+0 -1 1938
+C9
+S
+#1937
+A Hidden Spot in the Bushes~
+   As you climb into the bushes you nearly fall into a shallow dug up hole.
+After you regain you balance and resituate yourself, you realize that this
+makes a fine hiding spot.  You can watch everybody outside without being
+noticed.  It is quite cool down here as well, and dark.  You feel all sorts of
+insects crawling around your legs, plus something wet and slithery makes your
+inner thigh the sole object of its desire.
+~
+19 1107307713 0
+C9
+S
+#1938
+Montolio's $B$3S$1p$3r$1i$B$3n$1g$7$R~
+   The path ends here before one of the treasures of Hoan-Dor: the beautiful
+Montolio's Spring.  It consists of a short cliff face from which a glistening
+stream of water makes its way to a perfectly reflective pond at the cliff's
+base.  Deer, racoons, and other denziens of the forest haunt this spring
+frequently, finding it an ideal place to replenish their sublunary thirsts.  A
+trail north goes back to the main guild clearing.
+~
+19 1174416576 0
+D0
+~
+~
+0 -1 1936
+E
+pond~
+You see a reflection of yourself.
+~
+C9
+S
+#1939
+Study Grove of the Ranger's Guild~
+   A fairly large section of the forest has been marked off as the designated
+training area.  Leaning against a tree, an assortment of weapons, ranging from
+a quarterstaff to a pair of scimitars, are offered to members for practicing
+puprposes.  The footprints of various animals have been carved into a series of
+tree trunks to aid students in the art of tracking.  An archery target has been
+set up a ways off to the west.  A platform has been suspended from the trunk of
+a medium sized tree in order to allow for the honing of ambushing techniques.
+~
+19 1174415440 0
+D2
+~
+~
+0 -1 1936
+D3
+At the long end of the archery range you see a practice target.
+~
+~
+16 -1 1940
+C9
+S
+#1940
+Target end of the shooting range~
+  You shouldn't be here.
+~
+19 1107323072 0
+D3
+~
+~
+0 -1 1941
+C9
+S
+#1941
+The end of the archery range.~
+You REALLY shouldn't be here.
+~
+19 1107323072 0
+C9
+S
+#1942
+Entrance Hall to the Guild of Swordsmen~
+   It is refreshingly cool in this hall, a stark contrast to the hot, crowded
+humidity of the street.  The milieu of this guild is an ambivalent mixture of
+two opposing social realities: that of the swordsman--highbrow, refined, and an
+entire life devoted to crafting a gallant reputation--and that of the
+warrior--lowly, disrespected, and striving for little else than proof that his
+physical prowess is greater than any other's.  Thus, from the richly panelled
+walls there are displayed images of battle so grotesque and of such bad taste
+that the common anti-paladin would be offended.  A broad doorway to the south
+leads to the main hall of the guild.  A series of alternating banners hang from
+the ceiling.
+~
+19 1140852812 0
+D0
+~
+~
+0 -1 3016
+D2
+~
+~
+0 -1 1943
+E
+banner banners ceiling~
+You see twelve banners strung at intervals across the ceiling. They are of
+two types. The first depicts a broadsword and shield on a violet background.
+This is the symbol of the guild. The second type of banner is for a recent
+fighter's tournament held in the guild.
+~
+S
+#1943
+Main Hall of the Swordsmen's Guild~
+   The entrance hall ends here at this octagonal chamber, the centerpoint and
+main intersection for all guild traffic.  There is enough frivilous decor in
+this room to make it a veritable museum.  Crests of ranking guild members line
+the ceiling, while dates and locations of infamous battles pattern the floor.
+On each of the four walls that do not contain passageways there are enormous
+paintings just above glass cases full of artifacts.  Standing in this room,
+you feel as if you are absorbing pride in your chosen calling and you
+immediately understand why this is where guild members choose to steel
+themselves for the illustrious adventures ahead.
+~
+19 1174416588 0
+D0
+~
+~
+0 -1 1942
+D1
+~
+~
+0 -1 1946
+D2
+~
+~
+0 -1 1945
+D3
+~
+~
+0 -1 1944
+C4
+S
+#1944
+The Swordsman's Armory~
+   The north wall here is filled with armor arranged by quality, that is, by
+price.  By the door are the cast off training jerkins and low-quality
+chainmail.  Near the back of the room are the fine platemails and intricate
+scale mail suits.  The south wall holds weapons of every concievable type:
+battle axes, scimitars, broadswords, and even a few longbows.  Behind the
+counter metalsmithing implements are in abundence.  Across a great anvil lies a
+delicate little longsword, misshapen and obviously here for repair.  Smoke
+bellows from a small forge, forming humorous images across a background of
+leathers apron hanging from the back wall.
+~
+19 1107307720 0
+D1
+~
+~
+0 -1 1943
+C4
+S
+#1945
+The Warrior's Gymnasium~
+   This large room stretches well across the back side of the building, its
+sole purpose: to train guild members as efficiently as possible.  A ringed
+platform stands in the center of the room, for duels and tournaments, while an
+indoor archery range is set up to fill the entire length of the southern wall,
+providing maximum distance.  An awkward looking machine designed to promote
+proper jousting form is in use by a stocky, black-bearded dwarf.  Burlap
+dummies of various shapes and statures, and with their most vulnerable points
+marked by an extra bundle of thick red padding, are supported by thick wood
+poles.
+~
+19 1107307608 0
+D0
+~
+~
+0 -1 1943
+C4
+S
+#1946
+Swordsman's Lounge~
+   The walls here are a warm wood panelling, creating an inviting atmosphere
+for relaxation and spirited discussion.  Leather studded furniture--a couple
+sofas, plenty of chairs, and a table--are conveniently set about the room as an
+enticement to get to know your fellow warriors.  This is where the elder
+adventurers, years beyond their prime, enjoy telling stories of their past
+accomplishments to the younger guild members.  Through a window to the north
+you can see across Sativa street and into the weapons shop.  A moderate
+collection of books rests on a bookshelf embedded in the southern wall and an
+unused fireplace stands in the center of the east wall.
+~
+19 1107307720 0
+D2
+~
+bookshelf lever shelf bookcase~
+11 -1 1947
+D3
+~
+~
+0 -1 1943
+E
+fireplace fire~
+Just opposite of the entrence to the room, on the east wall, is a massive
+fireplace. There was once a time when fires from this hearth were used to
+heat the entire guild. Now it lays dormant.
+~
+E
+book~
+This book slightly leans off the shelf, but doesnt fall, as if it were held
+in place by some string from behind. You have a funny inclination of giving
+gravity a little help and pulling the book down.
+~
+C4
+S
+#1947
+Secret Chamber Behind the Bookcase~
+   The room in which you find yourself is dim and unfinished.  The ground
+beneath you is nothing more than dirt and pebbles.  On a table in the middle of
+the room a low burning candle illuminates a few large sheets of paper, battle
+plans of some sort.  The gleam off of a heavy two-handed axe catches your eye.
+It leans against the wall next to a blood stained wooden block, whose only
+possible use could be for executions--death by beheading.  From the general
+atmosphere here you judge that this must be the gathering place of the more
+pernicious members of the guild.  Coming from the other side of the east wall
+you can hear raucous shouts and laughter.  A lever protrudes from a discolored
+section of the north wall, obviously part of the mechanisim by which you got
+here in the first place.
+~
+19 1107307721 0
+D0
+~
+bookshelf lever shelf bookcase~
+11 -1 1946
+C4
+S
+#1948
+Room 1948~
+   Empty description.
+~
+19 1107306496 0
+S
+#1949
+Room 1949~
+   Empty description.
+~
+19 1107306496 0
+S
+#1950
+Inside the Cleric's Guild~
+   From six shining braziers arranged in a hexagon burn a pleasant smelling and
+indigo-colored incense.  They each rest upon thin poles and at their feet are
+circular sigils, the corners to a star of David inscribed in the floor.  On the
+walls are painted elaborate frescoes that invite you to learn more about the
+history of the clerics.  Being in this room, by some undetectable power, makes
+you firm of purpose; a new devotion, and even pride, in your chosen profession
+fills you with resolution.  In the corner of the room a spiral staircase goes
+up to a second floor, while catchy music reaches you from a doorway to the
+west.
+~
+19 1107307724 0
+D2
+~
+~
+0 -1 3004
+D3
+~
+~
+0 -1 1951
+D4
+~
+~
+0 -1 1953
+E
+fresco frescoes frescos wall walls~
+The history of Dark Castle clerics is played out before you in a series of
+involved frescos that cover every square inch of this room's walls. A few
+images are given particular emphasis and detail. One depicts clerics surrounded
+by flames being struck down by the gods, as though their presumption had
+brought immortal wrath upon them. Another shows clerics battling mighty
+demons and angels, filling the skies with the sounds of battle. In a freshly
+painted fresco, a fish-headed god dims the white aura surrounding a confused
+cleric, only to briefly offer him yet another protective shield just as
+powerful as the original.
+~
+C2
+S
+#1951
+The Cleric Cabaret~
+   Half a dozen high tables and a bar constitute this popular gathering place,
+which every cleric is sure to frequent at least once during any trip to
+Sorpigal.  Surprisingly, the music which is being played (on an enchanted
+forepaino and accompying harp) is that which is popular among the lower masses,
+not something one would expect to be enjoyed by the sophisticated order of the
+clergy.  Most customers at the moment are by themselves, reading in their
+specialized perodicals about which gods are currently in style and which are in
+disfavor.  Three young clerical students, stressed and weary from a fortnight
+of intense study, occupy a table in the back where they eagerly imbibe whatever
+liquor they can get their hands on.  Another spiral staircase, mirroring the
+one in the room to the east, leads up to the guildmaster's room.
+~
+19 1107307720 0
+D1
+~
+~
+0 -1 1950
+D4
+~
+~
+0 -1 1952
+C2
+S
+#1952
+The Moonchamber~
+   Your ascent ends at this immaculate room at the top of the guild.  Every
+surface here has the shine of being freshly scrubbed down.  A smell unknown to
+the rest of the city, that of utter cleanliness, overwhelms all your other
+senses.  There is an unoccupied bed flush against the north wall.  The sickest
+patients, their lives obviously retaining great worth, get their treatment
+here, directly from the guildmaster.  The ceiling has been imbued with a
+marvelous enchantment--during the day it is indistinguishable from any other
+ceiling, as opaque as a paladin's trusty shield; but during the night it
+becomes translucent when exposed to the lunar light.  On the south wall,
+between the stairs and a corner desk, is an artfully-stocked bookcase that
+would send almost any passionate scholar into immediate ecstasy.
+~
+19 1107307712 0
+D5
+~
+~
+0 -1 1951
+E
+book books tome tomes bookcase bookshelf~
+You see that the guildmaster has amassed quite a substantial personal
+library. Topics from the most general to the most obscure (more of the
+latter than the former) are represented here. There are numerous books
+devoted just to the art of gathering the right components for ward
+preparation. Almanacs of astrological projections share a shelf with an
+encyclopedia set that contains full biographies of the gods--anything
+can be useful when trying to gain their favor. The top shelf has been
+relegated to tomes of long forgotten rune lore, where they await Drawan's
+next attempt at their interpretation.
+~
+C2
+S
+#1953
+The Sanctum of Salubrity~
+   From this room the clerics of Sorpigal orchestrate a full-scale war on
+sickness and injury, pain and disease--or, for some, on the immutability of
+death.  A set of windows in the east wall casts light across the floor and
+halfway up the grand altar that takes up the complete western end of the room.
+Flanking the altar is a giant triptych displaying the multiple devotions
+available to the cleric.  The predominating feature of the north wall is a
+laboratory bench where balms and elixirs are concocted from a broad offering of
+strange herbs and rare minerals.
+~
+19 1107306568 0
+D5
+~
+~
+0 -1 1950
+E
+window windows~
+Four large double windows set into the thick eastern wall bring to your eyes
+the images of Indica way. You see a large procession of spelled-up adventurers
+heading for Stonewitch to do battle with another similarly prepared group of
+characters. "What needless pain and suffering they will cause!" you lament to
+yourself as you hear the first of the many soon-to-come death cries. You
+quickly push aside all thoughts of sympathy, however, when you realize that
+your services will be in severe need soon. Perhaps even a fee will be in
+order...
+~
+E
+triptych altar altarpiece~
+The altarpiece is a large unfolded wooden triptych with three panels. The
+left panel shows the powers of an evil cleric. It portrays a black robed
+necromancer creating an army of zombies from a field of fallen warriors.
+The center, and largest, of the the panels shows a grey robed cleric in
+the throes of battle, providing health and sanctuary to a group of adventuring
+comrades. The right panel displays a white robed cleric allied with a paladin
+in somehow managing to keep alive a barbarian that is taking all but fatal
+damage from the onslaught of a giant demon.
+~
+C2
+S
+#1954
+An ethereal beach~
+   You awake on a shore of $5alabaster$R sand, in a place unplaceable with
+regard to your mortal concepts of $B$1time$R and $B$6space$R.  This would be
+true paradise, if only a creature of $3temporal existence$R like yourself could
+learn to accept and enjoy it.  A gossamer thread of $B$7foam$R marks the ever
+changing water's edge.  Dipping your foot into the $1unending sea$R does not
+disturb its surface in the least; all you can feel is a slight $B$5tickle$R in
+the submurged toes.  This illusion continues infinately up and down the beach.
+~
+19 1644702912 8
+D0
+All that exists in this direction is a repeat of your current location.
+~
+~
+0 -1 1954
+D2
+All that exists in this direction is a repeat of your current location.
+~
+~
+0 -1 1954
+S
+#1955
+Top of the $2weeping willow$R~
+   The strange trip Drawan has sent you on ends here, just above the giant
+weeping willow in the center of Healer's plaza.
+~
+19 1912645824 13
+D5
+~
+~
+0 -1 3004
+S
+#1956
+Room 1956~
+   Empty description.
+~
+19 1107306496 0
+S
+#1957
+Room 1957~
+   Empty description.
+~
+19 1107306496 0
+S
+#1958
+Room 1958~
+   Empty description.
+~
+19 1107306496 0
+S
+#1959
+Room 1959~
+   Empty description.
+~
+19 1107306496 0
+S
+#1960
+Trail to the Monastary~
+   A quaint little dirt road diverges here from the main forest trail and
+weaves its way through the fields for about half a mile until it stops before a
+low-roofed wooden building.  Lining the path on either side as you near the
+monastary are two ordered trails of multicolored lotus flowers: indigo,
+crimson, blue, and occasionaly a rare black one.  A beautiful, harmonic
+chanting comes from inside and attracts a few curious woodland creatures to the
+edge of the Hoan-dor forest, which lies to the west.  Through a thin cluster of
+foilage to the east you can spy archers atop the city walls, their boredom
+evident in their sloven composures.
+~
+19 1140852932 9
+D0
+~
+~
+0 -1 1961
+D2
+~
+~
+0 -1 6001
+S
+#1961
+Intersection in the Monastary~
+   The main room presents an atmosphere that is both spartan and relaxing.  A
+simple low-lying table, upon which rests a sole plant, stands against the back
+of the room.  The wall opposite the entrance is completely plain except for
+minute swrils of thin organic lines that fluildly trace across its surface.
+The floor consists of black tiles with a rough gravely texture that
+nevertheless have been immaculately swept of any free-lying debris.  The low
+ceiling, which could only painfully admit the occasional giant monk, makes the
+space somewhat claustrophobic, but this doesn't bother the members of this
+guild, who have somehow managed to transcend such corporeal discomforts.
+~
+19 1107307724 0
+D1
+~
+~
+0 -1 1964
+D2
+~
+~
+0 -1 1960
+D3
+~
+~
+0 -1 1962
+C8
+S
+#1962
+Meditation Chamber~
+   The floor of this room is a good foot and a half higher than the adjacent
+room, further cramping your vertical freedom.  Nevertheless, a comforting
+dearth of aural sensation makes this a prime place for either relaxation or
+intense focus.  Situated sporadically around the cold floor are intricately
+weaved mats, a few of which are occupied by aged monks vested with deep
+concentrations.  They may have been here a just few minutes or an expansive
+stretch of days, so ambiguous are their countenance and manner.  You find
+yourself unable to speak or to simply make a noise in this place, for even if
+you wanted to, it somehow would be a violation of an eternal order, which
+infinitely established, could never be altered by a mortal such as yourself.
+Two large ornamental tapestries embellish nooks in the north wall.
+~
+19 1107438792 0
+D0
+A pair of nooks are set into the north wall and inside each is a nice <tapestry>.
+~
+tapestry~
+11 -1 1963
+D1
+~
+~
+0 -1 1961
+E
+nook nooks tapestries~
+Two identical alcoves cut into the north wall. They are are at the same ground
+level as that of the rest of the guild, so to enter one you would have to
+step down from the raised floor of the meditation chamber. In each of the nooks
+a large tapestry hangs from ceiling to floor and depicts an innordinate ammount
+of swirls and symbols in an undistinguishable pattern. The bottom of the left
+tapestry is swinging back and forth, as if from an impossible breeze, and
+betrays what may be a hidden exit.
+~
+C8
+S
+#1963
+An Unexpected Annex~
+   The room before you appears to have been lost from an earlier time.
+Everything in here must be at least seventy years old.  The differences
+between this room and the main building are so subtle that you would either
+think it was part of the original structure or at most an ancient addition,
+the existence of which was, at the time, never meant to be inconspicious.
+Its concealment had to have been a deliberate act by somebody with something
+to hide.  They obviously did a good job, for this room hasn't been used in ages.
+A thick blanket of dust has settled on everything: a bamboo rack holding a set
+of hallowed scrolls, an oak writing table, and even a glass case containing an
+odd-looking stringed instrument.  Contrary to expectations, the air here is not
+stale thanks to two pairs of windows raised high off the ground and which also
+provide the room its only source of illumination.  A sliver of light from one
+of the windows strikes the floor at your feet and uncovers a daedal and
+ceremonial mosiac.  Perhaps this room once held a religious significance in the
+function of the guild.
+~
+19 1107307720 0
+D2
+~
+tapestry~
+11 -1 1962
+C8
+S
+#1964
+Samoht's Study~
+   This study has all the furnishings necessary to accomadate one in peaceful
+solitude.  A messy book, its pages marked up and dog-eared, tops a stack of
+papers and scrolls that sit upon a waist-high table.  A few extra robes hang on
+a set of hooks on the east wall, and a large basket filled to the brim with an
+assortment of vegetables and fruits is on the ground by the north door.  A
+misty painting of a mountain landscape hangs from the east wall.  There is a
+pot of tea brewing on a small stove in the corner and the room is graciously
+enlivened by its earthy aroma.  On the south wall, a large bookcase frames a
+window that looks out to the front of the guild.
+~
+19 1107307720 0
+D0
+~
+~
+0 -1 1965
+D3
+~
+~
+0 -1 1961
+E
+painting landscape~
+The modest painting looks like it was crafted by dipping weeds in ink and
+slapping them on the canvas in an ametuer attempt at Zen expressionism. It
+has as its subject an enchanting tiered mountain jutting out from amidst a
+thick forest. Counting the ledges you see that it is clearly sectioned into
+seven distinct stories. In the bottom righthand corner are the initials T.M.
+~
+C8
+S
+#1965
+The Monk Practice Hall~
+   The hall is quite long, going far enough back to accommodate about eight
+different stations on either side.  The roof is triangular shaped and forms a
+gable by divering from the walls about six feet off the ground.  Monks of
+various skill levels come here to practice their maneuvers.  Strong-nerved
+trainers calmly instruct inspiring monks is the ways of good engagement and
+stance.  There is much talk about ki focusing, as an experienced monk with
+great ki abilities is chastised for being unable to use it in its proper way.
+A row of five monks simultaneously go to work on punching bags, starting with a
+slow pace and focusing on full technique, then working up to lightning- quick
+punches that deafen the ears of any nearby observers.  It is acceptable here to
+challenge other guild members to a match.
+~
+19 1107306584 0
+D2
+~
+~
+0 -1 1964
+C8
+S
+#1966
+Room 1966~
+   Empty description.
+~
+19 1107306496 0
+S
+#1967
+Room 1967~
+   Empty description.
+~
+19 1107306496 0
+S
+#1968
+A somber courtyard~
+   The grass here is lush and has been flawlessly trimmed to equal levels
+throughout this courtyard.  A waist-high wrought iron fence, much like the kind
+that would enclose a small graveyard, seperates this area from Sativa Street.
+On the near side of the fence grows a line of shrubbery that appears to be home
+to a substantial population of winged insects.  These bees and cicadas live in
+a state perpetual pilgrimage to and from a redolent flower bed at the western
+border of the courtyard near the base of the towering city wall.  At the north
+end of the courtyard, expanding to fill the entire space between the wall and
+the Meta Shop, looms an imposing church.  Its facade is weathered and covered
+with ivy, but shows traces of its original coat of white paint.  The large
+wooden doors are raised off the ground, requiring the ascent of a small set of
+steps.  A banner hangs over the entry portal.
+~
+19 1140852932 1
+D0
+~
+~
+0 -1 1969
+D2
+~
+~
+0 -1 3040
+E
+banner~
+The red banner is embroidered with blue and gold thread in the depiction of
+a lengthened crest. It is of a large-maned lion on a background of two crossed
+swords. It is the symbol of the Sorpigal Paladin Guild.
+~
+S
+#1969
+The guild narthex~
+   Upon entering the guild you notice that a balmy music wafts around its
+interior.  The air here is chilly and dry, just the thing to keep a solemn
+attitude present here in the guild.  A few paladins pass through here
+occasionally to and from other parts of the guild.  Many remove their heavier
+pieces of armor and place them on a specially equipment designed rack.
+Religious symbolism is ubiquitous in this part of the guild.  Crosses, many
+draped in fine cloths, and candles are sporadically placed about.  Banners
+depicting important events in the history of the church hang from the ceiling.
+On the wall is a quite large painting and below it hangs a sign.
+~
+19 1107307724 0
+D0
+~
+~
+0 -1 1971
+D1
+~
+~
+0 -1 1970
+D2
+~
+~
+0 -1 1968
+E
+sign~
+Glaive's Ways to Tell If You're Buff:
+1)  You start to heal the mobs you're fighting.
+2)  You like to summon as many suras as you can, then get Tiamat and have a tea party.
+3)  You like to see how many times you can backstab the Tarrasque before it starts teleporting you.
+4)  You give the mob sanctuary when you dispel it.
+5)  You don't want to immort because you'll lose too many hit points.
+6)  You get frequent flyer miles with each meta.
+7)  You can kill an Implementor.
+8)  You like to see how many hellstreams it takes to kill yourself.
+9)  You wait till Michael and the Tarrasque are in Stonewitch, then cast solar gate.
+10)  You can last more than three rounds in the arena against one of Phire's mobs.
+11)  They name a soft drink after you.
+12)  You are one of "those" paladins.
+13)  You can kill one of "those" paladins.
+14)  You tame a fat lady so she can sing when you start fighting.
+15)  You have no gold, only meta points.
+16)  Phire wants you in her arena.
+17)  You BTLS naked.
+18)  Your +damage equals your hit points.
+19)  You poison yourself before every fight.
+20)  Your AC is 100 but you never get hit.
+~
+C6
+S
+#1970
+A cluttered apse~
+   This end of the church is packed with equipment and oddities for which the
+guild has found no other place to store.  The floor suffers from such a lack of
+walking space that it is surprising this room is even functional.  Innumerable
+longswords, battle axes, maces, and even a few lances are stacked upright in
+the southern corner.  Tithe coffers collected from congregations throughout the
+city have been looted and piled up in the other corner.  You spot the source of
+the music you heard upon entering the guild: a player-less pipe organ almost
+invisible among some marble statues of famous ex-paladins.  A magical
+enchantment of sorts must keep it going.  A weary guild member could easily
+find a secluded spot here amidst the piles of tossed-off armor in which to rest
+and listen to the relaxing music.  A taut chord, designed for hanging banners,
+attaches to the wall next to the organ and ascends up to a trapdoor in the
+ceiling.
+~
+19 1107307720 0
+D3
+~
+~
+0 -1 1969
+C6
+S
+#1971
+Nave of the Paladin Guild~
+   This is the central space of the church.  From here you can get a full view
+of the guild's architecture.  It is more modest than many smiliar buildings
+throughout the realm, but impressive nonetheless.  The ceiling is done in a
+ribbed vaulted manner and capped by a dome of about fifteen feet in diameter.
+Shields, bearing crests of ranking knights within the guild, line the rim of
+the dome.  On the ground, in the exact center of the guild, is a small elevated
+platform draped with red silk.  This is where new members are expected to kneel
+when initiated.  The wall to the west is nearly filled by a humongous stained
+glass window.
+~
+19 1107307720 0
+D0
+~
+~
+0 -1 1973
+D1
+~
+~
+0 -1 1972
+D2
+~
+~
+0 -1 1969
+C6
+S
+#1972
+The training cloisters~
+   A set of sequestered cloisters sits here behind the church, where a moldy,
+isolated stench haunts the air.  These cloisters were once restricted to
+relgious activity, but recently the guild has allowed their use for training
+purposes.  Now, hundreds of enthusiastic young humans and elves regularly submit
+themselves to grueling physical torture in hopes of fully indoctrinating
+themselves in the ways of the guild.  The moss-covered city wall stands to the
+north and at its base rest dozens of discarded shields, all aglimmer from the
+radiance above.  Paladins who have achieved senority in the guild brazenly walk
+about shouting abusive orders in the name of such vague and unobtainable
+concepts as deliverance, rapture, and revelation.  It is enough to give you a
+sense of insecurity here.
+~
+19 1107307600 0
+D3
+~
+~
+0 -1 1971
+C6
+S
+#1973
+The Sanctuary~
+   Here is the holiest spot in the guild, the place for members to seek direct
+communication with their God.  A large altar dominates this space.  Two
+ceremonial candles, one blue and one white, are burning in ornate candlesticks
+on its surface.  A few modest wreaths hang on the various walls and lay at
+certain points on the ground.  To the left of the altar is a basin of holy
+water, to the right, a heavy bible sits on a pedestal open to some important
+passage.  Kneeling around the altar in fixed concentration are a few guild
+members trying to garnish extra favor from their God.
+~
+19 1107307720 0
+D2
+~
+~
+0 -1 1971
+C6
+S
+#1974
+Room 1974~
+   Empty description.
+~
+19 1107306496 0
+S
+#1975
+Room 1975~
+   Empty description.
+~
+19 1107306496 0
+S
+#1976
+Room 1976~
+   Empty description.
+~
+19 1107306496 0
+S
+#1977
+Room 1977~
+   Empty description.
+~
+19 1107306496 0
+S
+#1978
+Beneath the Sorpigal Mage Guild~
+   You are precariously underneath a large three-story tower that houses as the
+Sorpigal Mage Guild.  Just east of the entrance, an unadorned staircase begins
+wrapping around the room next to the wall, before disappearing into the tower
+at the southwest corner of the ceiling.  Directly beneath the center axis of
+the tower, a large ornate medallion is nested into the floor.  Senescent
+sorcerers and venerable wizards continuously filter in and out from above in a
+quiet and determined manner, completely unconcerned by your presence.  An
+archway to the south leads back to Arcanus way, where garrulous passers-by
+immediately quiet upon realizing they are in the vicinity of some of Sorpigal's
+most powerful magics.  At odd intervals the lighting fluxuates and
+discomforting surges of energy pulse through your body.  Mages--and Sorpigal
+mages are no exception--are often know for their caprice and unpredicability.
+So unless you have business here, it may be wisest to quickly move along.
+~
+19 1140852932 0
+D2
+~
+~
+0 -1 3061
+D4
+~
+~
+0 -1 1980
+E
+medallion~
+The medallion is about five foot in diameter and is emblazoned with the image
+of an idealized disembodied hand firmly holding up high a magical orb. Inside
+the orb is the picture of a fledging city basking undeneath a glowing star.
+The hand and orb constitute the symbol of Sorpigal's mage guild and desginate
+this as its home. The picture inside the orb further establishes the current
+guildmaster as great mage Alianna, who discovered the gem that is now known
+as the Jewel of Sorpigal.
+~
+S
+#1979
+The Laboratory~
+   Nausea rises within your stomach upon entering this room and sensing its wild
+and out-of-control magics.  Here, neophile spellcrafters are given free range
+to conjure any potentially disasterous incantation they may wish.  Above lab
+benches periodically spaced along walls are shelves offering complementary
+spell components to any interested guild member.  Jars stocked with disgusting
+and unidentifiable eyeballs sit next to canisters of dried herbs and decanters
+of putrid-smelling liquids.  In the west side of the room, safely caged in by a
+magical barrier, a deplorable golem trashes about in madness.  The portal back
+south to the rest of the tower is framed by extremely powerful runes designed
+to constrain all undesired magic to this room.
+~
+19 1107306576 0
+D2
+~
+~
+0 -1 1980
+C1
+S
+#1980
+Inside the Mage Guild~
+   The first floor of the tower is cool and quiet.  Safely inside the guild,
+many mages collapse on the various sofas here, sleeping off their heavy mental
+fatigue.  Other guild members share a pot of fresh tea and discuss their
+adventures in an unabashedly elitist and egotistical manner.  A couple of imp
+familiars take turns throwing fire at eachother's faces and laughing in
+guttural snorts and chortles.  Fixed to the south wall underneath a circular
+window is a silver plaque.  A door in the north wall leads to the spell
+laboratory, and on the west side of the room, a staircase cuts through the
+entire floor, going from Arcanus way below to the Sorcerer's Lounge above.
+There is a mural on the wall to the east.
+~
+19 1107307716 0
+D0
+~
+~
+0 -1 1979
+D4
+~
+~
+0 -1 1982
+D5
+~
+~
+0 -1 1978
+E
+mural~
+The mural details the history of Dark Castle mages. It begins with a series
+of images depicting a mage having two of his four followers struck down. It
+then segues into the same mage watching in disgust as one of his weapons
+melts out of his hands. This is followed by a dimming of the firery aura
+which surrounds the the spellcaster. Next, a group of mages look forlorn as
+as their final two followers are reduced first to one, then to nothing at all.
+They howl in anger as the immortals, begging for forgiveness, offer a
+moribund-looking imp. This placates the mages for awhile, but watching as their
+old position is usurped by clerics, anti-paladins, and particurarly rangers,
+they demand more. Finally they are given the choice of two golems: iron and
+stone. It is at this point that the mural has yet to be complete, its edges
+fading into the brick wall.
+~
+C1
+S
+#1981
+The Library~
+   The dimly lit library of the Sorpigal Mage Guild appears impossibly larger
+on the inside than its allocation in the tower would allow.  Clearly some magic
+is at work.  A row of two- and six-seat tables covers the space just inside the
+door.  Bookshelves stocked with innumerable tomes and volumes are just beyond
+the tables, and at the opposite end of the room glass cases hold the
+collection's most precious documents.  The east wall is covered with wooden
+shelves in a honeycomb pattern, the cell of which are filled with tubes
+containing scrolls, maps, and parchments.  Despite its tenebrous atmosphere,
+this library gets an incredible ammount of use.  All around guild members are
+scavenging the stacks, sitting at tables absorbed in ancient tomes, and
+transcribing spellbooks--all too preoccupied to take notice of anyone else.
+Chancing upon a random book, you notice that it has been meticulously bound by
+hand and that its spine is complete with intricate patterns--indicators that
+this tome, which is no more than average for this collection, has a value
+incomprehensible to the majority of Sorpigal's citizens.
+~
+19 1107307712 0
+D2
+~
+~
+0 -1 1982
+C1
+S
+#1982
+The Sorcerer's Lounge~
+   This celebrated outfit is beloved by mages across the realm and doubles as
+the hub for all guild activity.  Drinking and socializing in a gratuitously
+pretentious manner, the clientele are enough to make one feel vastly inferior
+in both wealth and intellect.  An assortment of all the priceless artifacts
+currently within this room could probably be used to buy the rest of the city
+many times over.  The majority of these guild members are speaking in
+undecipherable tongues, while those speaking in languages which you do
+recognize seem to be discussing such things as the merits of various familiars,
+the best places to aquire spell components, or strategies for battling
+different classes of elementals.  From the various vestments worn by the
+occupants of this room, a medley of colors and patterns emerge to designate
+affiliations and allegiances.  It is a somewhat comforting thought that,
+despite their ostensible calm and indifference, every person here seems
+frightfully suspicious of their neighbor, as if their careless attitude were no
+more than a necessary veneer to survive in this harsh realm.
+~
+19 1107307712 0
+D0
+~
+~
+0 -1 1981
+D2
+~
+door~
+1 -1 1984
+D4
+~
+~
+0 -1 1983
+D5
+~
+~
+0 -1 1980
+C1
+S
+#1983
+Top of Mage Guild~
+   The top of the mage guild is one of the higest points in the city.  It is
+covered by an unsupported roof somehow kept in place by unseen magical forces.
+The sides are completely exposed to the open air, and walking up to the edge
+gives you a horrible feeling of vertigo.  At this height it is possible to view
+over the city walls.  North of the city, vast plains stretch upward toward a
+large crimson mountain range.  To the east, a large desert looms in the
+distance with two large towers, barely visible, rising out of it.  Southward, a
+great expanse of vegetation meets the horizon at the hazy blue line that is the
+Sea of Dreams.  Toward the west, you can see nothing but the forest of
+Haon-Dor, bifurcated by a narrow trail and speckled by various settlements.  A
+few guild members have come up here in attempts to get the greatest effect from
+their scrying spells.  Next to the stairway leading down into the tower is an
+obsidian pedestal.
+~
+19 1107307712 0
+D5
+~
+~
+0 -1 1982
+E
+pedestal~
+It is about two and a half feet high and three feet in diameter. Enscribed
+into its surface is a message:
+There is more than one way to $Bleave$R the top of this tower.
+~
+C1
+S
+#1984
+Alianna's Chamber~
+   Alianna's chamber occupies a small turret extending from the south face of
+the main guild tower.  It is a quaint little space, filled with the revered
+mage's private possessions.  Alianna's desk sits directly in front of a window
+in the south wall.  A person sitting at it would have, in front of them, an
+excellent view of Arcanus way; to their right, a series of abstruse paintings
+hang above a modest bed; and a heavily stocked bookcase to their left.  Below a
+low-hanging chandelier, a circular table sits in the center of the room.  An
+owl perch, currently unoccupied, stands next to the desk.
+~
+19 1107307716 0
+D0
+~
+door~
+1 -1 1982
+E
+bookcase bookshelf~
+A laden bookcase hand-carved from the richest woods takes up a greater part of
+the chamber's east wall. It is stocked mostly of leather bound volumes with
+titles in esoteric languages. Their placement is jutted and irregular, hinting
+at their constant use. On the bottom shelf a series of books entitled "$4Magical
+Dark Ages during The War of Eternal Shadow$R" and written in Alianna's own hand
+are lined perfectly flush. They tell of a subject she must no longer need or
+wish to revisit. The top shelf of the bookcase has no books, but instead is
+full of miniature portrats of Alianna's famous friends and acquaintances:
+Intamin, Ellisdel, Shyntoa, and Magnus just to name a few. One portrait has
+been turned face down. It is of the traitor Tek'lul.
+~
+C1
+S
+#1985
+Pocket of Existence~
+   Somehow you've left the world as organized by the directional consciousness
+and retreated back into your non-thetic, non-intentional, pre-reflective cogio.
+Every conscious existence must exist as both consciousness of existing and
+consciousness of a being which is not itself, but you can only wonder why it is
+that this particular latter consciousness happens to be the top of the mage
+guild.  Regardless, never before have you been so sure of your own existence as
+a non-passive being-for-yourself.
+~
+19 1107830977 13
+C1
+S
+#1986
+Room 1986~
+   Empty description.
+~
+19 1107306496 0
+S
+#1987
+Room 1987~
+   Empty description.
+~
+19 1107306496 0
+S
+#1988
+A Bridge to the Druid's Grove~
+   A narrow cobblestone bridge extends over a small river that lies between
+Urania's Garden and the island of the Druid's Grove.  The stonework that
+constitutes the bridge is both simple and beautiful.  To the north you can see
+the Sorpigal's southern district, while to the south lies the famous Druid's
+Grove.
+~
+19 1140852868 9
+D0
+~
+~
+0 -1 3151
+D2
+~
+~
+0 -1 1989
+S
+#1989
+The Druid's Grove~
+   While quite small in size, the island of the Druid's Grove is lush and
+beautiful with its amazing array of flora and fauna.  Ancient greying trees
+tower above the island's diverse population of inhabitants, who are themselves
+quite mysterious.  Only those who protect and serve nature are allowed within
+the grove, and even they must possess great power to study here.  That you are
+allowed in the Grove is both an honor and a blessing.  It is here that you will
+fully develop your skills and become one of nature's greatest servants.
+~
+19 1107307716 9
+D0
+~
+~
+0 -1 1988
+D2
+~
+~
+0 -1 1990
+C11
+S
+#1990
+The Center of the Druid's Grove~
+   Various druids of all levels of experience and expertise roam about,
+discussing the merits of certain techniques and spells in defending the great
+Mother Nature.  The ground is covered with lush green plats of various kinds.
+To the west lies an area of meditation in the middle of a circle of ancient
+greying trees.  To the east a waterfall can be heard flowing steadily from the
+top of an eastern mountain.  To the south a small and simple hut can be seen.
+~
+19 1107307712 0
+D0
+~
+~
+0 -1 1989
+D1
+~
+~
+0 -1 1993
+D2
+~
+~
+0 -1 1991
+D3
+~
+~
+0 -1 1992
+E
+east 1993~
+~
+C11
+S
+#1991
+The Dwelling of the Grand Druid Seamus~
+   With only a floor and a ceiling, this small dwelling is the paragon of
+simplicity.  There are no man-made objects to be found anywhere.  If the Grand
+Druid is thirsty he simply goes to a stream.  If he is hungry he need only to
+grab a fruit off a nearby tree.  The only really curious thing about this hut
+at all is the single chair that sits in the middle of the room.  At first
+glance it looks normal, but upon closer inspection you can see that it is made
+of living plants that have grown through the floorboards of the hut.
+~
+19 1107307716 0
+D0
+~
+~
+0 -1 1990
+C11
+S
+#1992
+A Circle of Ancient Trees~
+   Giant greying trees grow around a circle of lush grass, in which a sheet of
+papyrus lays on a long flat rock.  The chirping of birds and the echo of water
+crashing over rocks are the only sounds that can be heard once you have stepped
+inside the circle of trees.  You feel as if this place will allow you to hone
+your mental skills for your lifelong task of defending the great Mother Nature.
+~
+19 1107306576 0
+D1
+~
+~
+0 -1 1990
+C11
+S
+#1993
+At a Cascading $1$BW$3$Ba$7$Bt$1$Be$3$Br$7$Bf$1$Ba$3$Bl$7$Bl$R~
+   A small lake catches the crystal clear water that falls steadily from the
+rocky hills above.  While one would think that the sound of crashing water
+would be nearly unbearable, here it is rather soothing to the soul.  By looking
+at the waterfall, you think that you can see a cave behind it.  Perhaps you
+should enter the waterfall and find out.
+~
+19 1107307712 0
+D3
+~
+~
+0 -1 1990
+C11
+S
+#1994
+An empty room.~
+
+~
+19 1107306496 0
+S
+#1995
+Behind the Cascading $1$BW$3$Ba$7$Bt$1$Be$3$Br$7$Bf$1$Ba$3$Bl$7$Bl$R~
+   The moment that you step behind the waterfall and into this cave-like
+alcove, all becomes silent.  The chirping of the birds outside cannot be heard,
+nor can the rushing of the water into the lake below.  While one would think
+that this alcove should be bathed in darkness, the walls glow with an unearthly
+light.  For no readily apparent reason, this alcove exudes a feeling of peace
+and comfort.
+~
+19 1107307976 0
+C11
+S
+#1996
+At the Top of the $1$BW$3$Ba$7$Bt$1$Be$3$Br$7$Bf$1$Ba$3$Bl$7$Bl$R~
+   Small patches of grass dot the surface of this rocky outcropping.  About ten
+feet to the east an impenetrable wall of trees hide the source of the water
+which flows steadily over the ledge and into the lake below.  There are no
+visible paths down to the Grove below.  From this height, however, much of the
+realms can be seen.  To your north you see the city of Sorpigal bustling with
+activity.  To your east lies the great eastern desert and all of the mysteries
+that lie therein.  An immense forest stretches to the west, and the crystal
+clear waters of the Sea of Dreams meets the horizon to the south.
+~
+19 1107307712 9
+D5
+~
+~
+0 -1 1993
+C11
+S
+#1997
+Room 1997~
+   Empty description.
+~
+19 1107306496 0
+S
+#1998
+Room 1998~
+   Empty description.
+~
+19 1107306496 0
+S
+#1999
+Trans room - IMMORTALS ONLY~
+   This is a special room for Mprocs, don't alter it
+~
+19 33564672 0
+S
+$~

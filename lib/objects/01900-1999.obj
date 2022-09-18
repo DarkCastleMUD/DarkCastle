@@ -1,0 +1,1314 @@
+#1900
+basin fountain~
+Mage Guild Fountain~
+A resplendent basin floats in midair, supplying drink to thirsty spellcasters.~
+cf~
+25 1 0 0
+0 0 0 0 0
+1 1 0
+E
+basin fountain~
+All that shimmers is not gold, but this both shimmers and is gold.
+~
+S
+#1901
+fountain tap spout~
+Thief Guild Fountain~
+From a rusty tap here drips a viscous and dirty stream of unnatural water.~
+cf~
+25 0 0 0
+1 5 0 0 0
+1 0 0
+S
+#1902
+fountain statue vampyre vampire~
+Anti Guild Fountain~
+A black marble fountain stands at the base of the statue.~
+cf~
+25 0 0 0
+0 0 0 0 0
+1 0 0
+E
+statue~
+Whip in one hand, flaming black sword in the other, the vampire this statue
+portrays must be at least ten feet tall. Out of his mouth flows a stream
+of blue blood that magically turns red in midfall and collects in the pool
+of the fountain at the bottom.
+~
+S
+#1903
+fountain~
+Barbarian Guild Fountain~
+A fountain on the east wall pours out a foamy liquid.~
+cf~
+25 0 0 0
+100000000 100000000 0 0 0
+0 0 0
+S
+#1904
+fountain~
+Warrior Guild Fountain~
+A fountain provides drink for the exhausted warriors.~
+cf~
+25 0 0 0
+0 0 0 0 0
+0 0 0
+E
+fountain~
+It's insignificant damnit. It needs no description!
+~
+S
+#1905
+fountain spring~
+Ranger Guild Fountain~
+Water trickles down from the spring, anxious to abate your thirst.~
+cf~
+25 0 0 0
+0 0 0 0 0
+0 0 0
+E
+spring fountain~
+The flow of water over the years has worn smooth the stone and given it an
+illustrious $4crimson$7 hue. The water itself seems to be of an unmatched
+purity. The underground source of this spring is said to be magical, the
+enchanted burial site of some preworldly immortal.
+~
+S
+#1906
+fountain well~
+Cleric Guild Fountain~
+A well brings up water from the underground streams deep below the city.~
+cf~
+25 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#1907
+fountain pond~
+Monk Guild Fountain~
+A miniature stone-enclosed pond forms a fountain in the center of the room.~
+cf~
+25 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#1908
+fountain pond~
+Druid Guild Fountain~
+A small fountain is here, bubbling with crystal clear water.~
+cf~
+25 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#1909
+fountain~
+Bard Guild Fountain~
+A fountain in the shape of a lute is here, filled with a clear liquid.~
+cf~
+25 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#1910
+ladder up~
+the ladder to the top of the Anti Paladin guild~
+A wooden ladder extends to a hatch in the ceiling.~
+cf~
+30 0 0 0
+1924 0 0 0 0
+0 0 16
+E
+ladder up~
+Following the ladder up the wall you notice that the hatch is open. An
+instinctual appeal to curiosity encourages you to climb the ladder.
+~
+S
+#1911
+telescope spyglass~
+A spyglass to Stonewitch~
+A rusty telescope is fixed to the northwest corner pointing towards Stonewitch.~
+This well-worn spyglass is set up so as to be imperceptable from the street blow. It is pointed north towards Stonewitch.~
+24 0 0 0
+3014 3 -1 0 0
+0 0 0
+E
+spyglass telescope~
+This well-worn spyglass is set up so as to be imperceptable from the street
+blow. It is pointed north towards Stonewitch.
+~
+S
+#1912
+ladder long the ladder down from the anti guild~
+the ladder from the top of the Anti Paladin guild~
+A wooden ladder extends down through a hatch in the floor.~
+Fixed.~
+30 0 0 0
+1923 0 0 0 0
+0 0 16
+S
+#1913
+hammer fang devil devilfang cestus~
+The Devilfang Cestus~
+Hanging from a some poor animal's antlers, is the legendary Devilfang Cestus. ~
+Fixed.~
+8 0 0 0
+0 0 0 0 0
+0 0 0
+E
+hammer fang devil devilfang cestus~
+This weapon, part glove, part hammer, is engraved with hideous demonic faces.
+As the story goes, it was given to a brave warrior from the first of gods for
+vanquishing a hoarde of orcs from the hinterlands of Sorpigal. It passed
+through innumerable hands after that, making it one of the world's most well-
+travelled, as well as most sought after, weapons. The Cestus is now retired,
+having made its final resting place the most prized item in Berkthgar's
+collection.
+~
+S
+#1914
+bushes~
+a clump of bushes~
+a hidden entrance to the secret ranger guild room~
+Fixed.~
+24 0 0 0
+1937 1 -1 0 0
+0 0 48
+S
+#1915
+etala blade shadowblade~
+the first of the Etala~
+In the center of the room, encased in glass, rests the original Etala.~
+Fixed.~
+0 67108864 0 0
+0 0 0 0 0
+0 0 0
+E
+etala blade shadowblade~
+This magnificant weapon was re-crafted from the three pieces of the
+the original legendary blade that was shattered in the great battle
+between Ghaura'sun and the Daine.
+~
+S
+#1916
+peep peephole~
+A peephole to Uncle Juan's~
+A peephole to Uncle Juan's~
+Fixed.~
+24 0 0 0
+3056 3 -1 0 0
+0 0 48
+E
+e ea eas east peep peephole ~
+The east wall of this room is shared with Uncle Juan's Eatery. Directly
+above an upturned crate at the wall's base is a small hole through which
+the movements next door cast shadows over your head. Apparently somebody
+has been using this as a peephole.
+~
+S
+#1917
+window bookcase~
+monk guild window~
+A window to the entrance to the monastary~
+Fixed.~
+24 0 0 0
+1960 3 -1 0 0
+0 0 16
+E
+window south bookcase~
+A window, framed by a bookcase, looks out upon the entrance to the monastary.
+~
+S
+#1918
+dasein being existence portal consciousness~
+being itself~
+a paradoxical dirrected nonthetic consciousness~
+Fixed.~
+24 0 0 0
+1983 1 -1 0 0
+0 0 0
+S
+#1919
+glasses spectacles malachite~
+a pair of heavy malachite-carved spectacles~
+A pair of heavy spectacles carved from raw malachite rest on the desk.~
+Fixed.~
+8 67108948 131073 1
+0 0 0 0 20
+10 100000 0
+A
+87 100
+S
+#1920
+malachiteportal~
+a bag of powder that sprinkles across the room~
+$0Portal for Alianna's Glasses, MORTALS SHOULD NOT HAVE, Can not be NO_SEE, needs to be NONOTICE$R~
+Fixed.~
+24 67108864 0 0
+1999 1 -1 2 0
+0 0 48
+S
+#1921
+akkahad tablets cral~
+the Akkahad~
+A set of heavy stone tablets, the Akkahad, rest here.~
+It is the infamed Akkahad. Perhaps you should inspect it closer.~
+16 67108881 16385 1
+0 0 0 0 0
+21 210000 0
+E
+akkahad~
+Upon a set of seven massive stone tablets is engraved:
+The Akkahad : The Crafting of the Cral    Part I of II
+The Dwarven Creation Myth as transcribed by Eleyre
+The elves will tell you their legends of the beginning.  Legends which
+speak of the gems of power and how they were used to sculpt the world.
+And they are right, in the way the elves are always right.  But this is
+how the world came to be, before elves found their voices on the skins of
+trees and in their curly-scripts.
+In the beginning, there was Sadus, and only Sadus.  And in his solitude,
+he longed to create.  And from his side he rent a piece of his godflesh,
+and in his clenched fist it became as stone.  And from that stone he
+fashioned a sphere of stone, called it Cral, and cast it into the
+nothing.  It was a barren husk, with enormous caverns and voids within
+its folds.  In those folds, Sadus placed things he knew would be precious
+to those who would come.  Iron, Adamantium, Mithril, Gold, Silver, Gems
+of all size and hue.  And the last he placed was Platinum, the godmetal.
+Of all things, Sadus hid this best, for it was this metal that used
+wisely could challenge the might of the gods themselves.
+Looking down on the world, Sadus found pride in his creation, but found
+none with whom he could share it.  So from his heart he drew a portion of
+himself, and made Erandus, which in the tongues of old meant 'second.'
+And together, he and Erandus crafted Kate, Eleyre, Pirahna, Azrack,
+Liriel, and Apshai.  And then those begotten by Sadus and Erandus made
+still more divinities, until the heavens were filled with their silver
+gleamings.
+It was then that Azrack came to Sadus and asked to craft lesser
+creatures, and place them within the world, to enjoy the work of the gods
+and to craft the raw stuff of Cral into what shapes they desired, paying
+homage to Sadus and his begotten.  Sadus was glad of this and gave Azrack
+his blessing.  Azrack tore the heart from Cral, and from that sternest of
+stone, he made a soul of such power that the gods bade him to sever it
+into many.  And Azrack did, portioning it twelve ways, and shaping strong
+vessels in which these souls of stone might work the stuff of the world.
+These were the first, those who came before.  These were the first of
+firsts.  This was the High Clan.  They were as one with the stone as
+Eleyre, the Sculpter of Worlds.  In their hands, the godmetal was forged
+into ornate spires and temples for the glory of the gods.  And there was
+no time when the dwarves and gods lived in such harmony since those days.
+But Erandus grew jealous of Azrack's creations.  And from his jealous
+heart, he wrought in secret creatures of great power and covetous,
+without the will of Sadus.  These he placed into the world in those
+caverns the dwarves had not yet found.  And when the dwarves found them,
+they named them wurm and dragon.  These fell creatures were the darkest
+of things, made as they were from the spite of a god, and in them Erandus
+had placed power enough that the children of Azrack were threatened.
+And so the High Clan called on Pirahna to aid them, and through the
+permission of Sadus, Pirahna instructed the eldest of the High Clan with
+the means of crafting the godmetal into forms that would strike the
+scaled hides of the spawn of erandus with the force of a thunder.  And
+the wurms were driven into the deepest bowels of Cral, where no gems
+would glimmer, and the dragons were forced into the gardens of built by
+Eleyre and Kate and Liriel beneath the stars.
+~
+S
+#1922
+akkahaza tablets cral~
+the Akkahaza~
+A set of heavy stone tablets, the Akkahaza, rest here.~
+It is the infamed Akkahaza. Perhaps you should inspect it closer.~
+16 67108881 16385 1
+0 0 0 0 0
+15 150000 0
+E
+akkahaza~
+Upon a set of five massive stone tablets is engraved:
+The Akkahaza : The Crafting of the Cral    Part II of II
+The Dwarven Creation Myth as transcribed by Eleyre
+It was then that the elves came.  To defend these fragile gardens, the
+gods needed people of wood, not of stone.  And so the elves rose from the
+tears of Eleyre, Liriel, and Kate.  And they battled the dragons with
+what power they had, driving them into the mountains where the elves in
+their foolishness thought they would do no harm, driving them back to the
+upper reaches of Bara'tivnarak, the First Kingdom.
+It was then that the dragons shook the First Kingdom, and made their
+lairs amongst its heart, scattering the Clan.  In their exile, new Thains
+and Kings were proclaimed to rule in the Emperor's stead.  And thus rose
+the early kingdoms of the dwarves: Tivnaruuk, Khromilldor, Ascalbarad,
+Khazadturuk, Kher'khirai and Kher'rotuk.
+These kingdoms, mighty as they were, had lost great numbers to the
+wurmkin and dragons of Erandus, and in their battles with the elves, who
+feared their weapons of godmetal and hurled sorcerous thunder into the
+mountains to scatter what few dwarves still sought trade with them.
+And still Erandus was not satisfied, and from those elves he found black
+hearts in, he placed small bits of stone, and created the goblins and
+their kin, the orcs.  And in mockery of the stout but humble form from
+which Azrack crafted the dwarves, Erandus hewed great cliffs of granite
+and sculpted giants.  All of these he cast into and onto Cral, like the
+scattering of so many wurm scales in a pitched battle.
+It was then that Erandus was cast from Sadus, and the gods made war.  The
+earth shook mightily, and the dwarves were driven nearer the surface.  It
+was then that the dwarves of Kher'khirai and Tivnaruuk met with the Elves
+of Kabeth-Nel in the land of the Daine, and that the history of Elfkind
+records our emergence from the heart of Cral, as if new and unknown to its
+touch.
+~
+S
+#1923
+scroll alhaglith al'haglith~
+the Al'haglith~
+A tightly bound scroll, the Al'haglith, sits here.~
+It is the infamous Al'haglith and it invites closer inspection.~
+16 67108947 16385 0
+0 0 0 0 0
+2 200000 0
+E
+alhaglith al'haglith~
+Al'haglith - The Creation of the World         Part I of III
+The elven creation myth as transcribed by Eleyre.
+Before there was Elesthia, before any elves walked this land we now call
+home, there was the Void.  For countless ages it had existed, since even
+before the creation of time itself.  And within this Void existed he who
+is called Sadus.  And the spirit of this being moved within the Void, its
+emptiness filling his heart with sorrow and pain.  Consumed by grief,
+Sadus tore open his heart and poured out his lifeblood.  Where it fell
+arose the first of his offspring.  Kate, Eas, and Erandus are they known
+as in the tongues of man.  But amongst the elves they are known as
+Mirith, Telrik, and Aelrith.  Born out of Sadus' grief, they were the most
+passionate of all the gods.
+But eventually Sadus withdrew into himself, leaving this existence to his
+offspring.  Mirith and Telrik drew ever closer and through their union bore
+other children whom the humans call Azrack, Eleyre, Llevity, and Pirahna.
+But in the High Tongue they are called Visrith, Thaere, Elesthir, and
+Sirisin.  They too prospered and grew, gaining strength from the bonds
+they shared and the bond of their progenitors. And Aelrith saw this and
+grew jealous, but hid it away within him so that none of his brethren might
+see.
+Together, Mirith and Telrik spread their hands and created the land,
+called Elesthia.  But it was barren and without life and so Mirith took a
+portion of her essence and opened up the land, placing it within a crevice.
+And where it touched the land, trees and grass began to blossom.  Telrik,
+too, took part in this and spread his hand across the land.  Where the breeze
+of his passing touched, fauna emerged to walk the land.  And for a time,
+this was good.  But their children looked upon their workings and were
+dissatisfied.
+~
+S
+#1924
+scroll eyl'haglith eylhaglith~
+the Eyl'haglith~
+The Eyl'haglith, an invaluable scroll, sits here.~
+It is the infamous Eyl'haglith and it invites closer inspection.~
+16 67108947 16385 0
+0 0 0 0 0
+2 200000 0
+E
+eylhaglith eyl'haglith~
+Eyl'haglith - The Creation of the World        Part II of III
+The elven creation myth as transcribed by Eleyre.
+So Thaere left her brethren and walked upon the land that her mother and
+father had created.  For a countless time she travelled until she at
+last came to its edge.  And there she plucked a magnificent gem from the
+heart of a volcano and filled it with her energies and emotions.  But such
+was the joy within her that the gem could not contain that which she
+had placed within it.  And thus the Daine, first among elvenkind, were
+born from the energies of the gem known as the Tir.  Thaere looked upon
+those that were her children and found delight in their creation.  And so
+she placed them as guardians of the land, entrusting the Tir to their
+protection.  But all this Aelrith observed and his heart grew ever harder.
+Visrith took to Elesthia as well, but he was content to dig deep within
+the land.  And from the clay he found there he molded the dwarfkin.  But
+Visrith believed more in practicality than in beauty and this he passed on
+to his children.  Born of his spirit, they lack the beauty and
+creativity of elvenkind but mastered the tools necessary to shape the
+land.  And Aelrith saw this and his heart grew ever harder.
+Elesthir looked on the children of Visrith and Thaere and smiled.  He too
+took to the lands and from the barren earth he fashioned humanity.  But
+they lacked the vision of the elves and the practicality of the dwarves.
+So that his children would not be endangered, he enhanced their
+reproductive abilities so that they might populate the land a hundred
+times over.  And Aelrith saw this and his heart grew ever harder.
+But Sirisin's delight was humor and jest and so he molded creatures to
+resemble the children of his brothers and sister.  But to them he bestowed
+the gift of eternal mirth and curiosity.  Such were born the halflings and
+gnomes and faeries.  And Aelrith saw all this and his black heart could
+take no more.
+Silently and swiftly he kidnapped several of these newborn races and took
+them back to his lair.  There he worked his foul magicks on them,
+corrupting and transforming them into hideous mockeries of what they once
+were.  From the humans were born the goblins and the kobolds, from the
+elves the orcs, and from dwarves he created the trolls.  Filling them with
+a hatred for all living things, he sent them into Elesthia.
+Like a black shadow they swarmed across the land, leaving behind them
+barren and broken land.  The children Of Thaere and Visrith and Elesthir
+were ignorant of such things and welcomed these creatures with open arms,
+only to discover too late the darkness in these creatures' hearts.
+Enraged by the slaughter of her children, Thaere travelled to Aelrith's
+lair to confront him.  But the Firstborn of Sadus knew of her comings and
+had already spawned his own kin.  Vile and rank beasts, with hides of
+scales and breath of flame, these wyrms quickly overcame the goddess for
+they were great in number and she still weak from her journeys.  In
+triumph, the wyrms brought her broken body back to their master and father
+and laid her out before him.
+The news travelled swiftly and it was not long before it came to the ears
+of Mirith and Telrik.  A white hot rage swept through Telrik and in his
+anger he caused the deaths of a million stars, their lifeglow fading into
+nothingness.  Mirith merely wept, her tears filling the valleys and cracks
+of the land to form the fickle seas.  Together they summoned their
+offspring and made council, knowing that if they did not act quickly that
+their creation would be destroyed.
+~
+S
+#1925
+scroll Tyr'haglithos tyrhaglithos~
+the Tyr'haglithos~
+The priceless Tyr'haglithos is here.~
+It is the infamous Tyr'haglithos and it invites closer inspection.~
+16 67108947 16385 0
+0 0 0 0 0
+2 200000 0
+E
+tyrhaglithos tyr'haglithos~
+Tyr'haglithos - The Creation of the World      Part III of III
+The elven creation myth as transcribed by Eleyre.
+It is said that the Final Battle was not long lasting.  Visrith summoned a
+host of dwarfkin to burrow beneath Aelrith's lair.  But there they met the
+wyrms, those vilest of godkin.  Many dwarves perished and those that
+survived were seared so badly that the slightest light singed their eyes.
+Thus they were cursed to remain eternally within the darkness of the land.
+Telrik and Mirith approached the gates of Aelrith's lair, grieving at the
+stench of death and decay that surrounded it.  And when they arrived they
+discovered the figure of Thaere impaled upon the gate's spikes.  Through
+their combined might they forced open the gates and gently lifed their
+child from her prison, laying her body beside the walls.  That done, they
+turned the blunt of their anger against their brother.  Horde after horde
+of wyrmkin threw themselves at the Children of Sadus, yet none could
+stand long beneath their onslaught.  It was not long before Aelrith lay
+subdued, his children scattered into the depths of the underground.
+Aelrith was taken back to the dwellingplace of Telrik and Mirith, known in
+the High Tongue as Kabeth-Myr, and there he was executed.  His body was
+cast into the void, to drift for eternity.  Saddened by the loss of their
+child, Telrik and Mirith one again joined to produce two more offspring,
+known by man as Liriel and Apshai.  But in the High Tongue they are called
+Tyani and Misignor.  Quickly they established themselves in Elesthia,
+fortifying the broken and cracked places of the land so that the minions
+of Aelrith could never return.
+But Thaere was brought to the land of her children, known in the High
+Tongue as Kabeth-Nel.  And there she was entombed beneath a young sapling.
+And from her flesh the sapling grew strength and power.  And the Daine
+called it the Ellcrys, meaning "Sacrifice" in the High Tongue.
+Thus ended the Time of Beginnings.  The firstborn of the gods prospered,
+growing in power if not in number.  And as they wandered the realms of
+Elesthia they brought the gift of knowledge and inspiration to the
+sun-fearing children of Visrith and to the barbaric offspring of Elesthir.
+And the Ellcrys stood within the center of Kabeth-Nel, an eternal symbol
+of the light of compassion.
+~
+S
+#1926
+case glass~
+a glass case~
+A glass case contains precious documents describing elven and dwarvish creation mythology.~
+Fixed.~
+15 0 0 0
+0 0 0 0 0
+0 0 16
+S
+#1927
+window~
+mage guild window to arcanus way~
+a window to Arcanus way~
+Fixed.~
+24 0 0 0
+3062 3 -1 0 0
+0 0 16
+S
+#1928
+book~
+pull book in warrior guild~
+pull book in warrior guild~
+Fixed.~
+0 0 0 0
+0 0 0 0 0
+0 0 16
+S
+#1929
+empty obj~
+An empty obj~
+An empty obj sits here dejectedly.~
+Fixed.~
+0 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#1930
+tusk tusks~
+the tusks of an enormous boar~
+a secret lever made of boar's tusks~
+Fixed.~
+13 0 0 0
+0 0 0 0 0
+0 0 48
+E
+boar tusk tusks n no nor nort north~
+You see the head of an enormous boar. It looks as if it was once able to
+swallow a man whole. Whoever killed this beast must have been very proud,
+for he carved his initials into his two front teeth: C.F. One of its tusks
+looks very loose and a bit worn down, almost as if someone has gotten used
+to pulling on it.~
+S
+#1931
+rack case~
+FINISHTHIS: A glass case~
+a glass case witha  sitar in it~
+Fixed.~
+15 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#1932
+sitar~
+FINISHTHIS: sitar~
+FINISHTHIS: sitar~
+Fixed.~
+15 0 1 0
+0 0 0 0 0
+0 0 0
+S
+#1933
+fountain~
+Paladin Guild Fountain~
+An aged stone fountain lies in a bed of fresh mint springs.~
+Fixed.~
+25 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#1934
+blade torture nethrol rubber quest~
+a torturous blade~
+A vicious blade rests here designed for torturing a hapless victim.~
+This horrible blade is very sharp with jagged edges.  It has been designed
+to inflict great pain on whomever or whatever it is used on.
+~
+5 1511424 8193 1
+0 5 4 1 45
+8 6000 2592
+E
+blade torture nethrol rubber quest~
+The blade is made of rubber.  Thoughts of getting
+whipped with a rubber garden hose come to mind.
+~
+S
+#1935
+flail fire zamar quest~
+a Flail of $B$4Fire$R~
+A flail of $B$4fire$R rests on the ground.~
+Fixed.~
+5 3706883 8193 1
+0 3 4 5 27
+8 3200 2592
+E
+flail fire zamar quest~
+There is an inscription:
+The bearer of this flail is clearly a warrior who has proven to be worthy.
+~
+A
+26 1
+A
+43 3
+A
+12 20
+S
+#1936
+talons ghoul quest~
+the Talons of the Ghoul~
+A pair of deadly ghoul talons lie here, bleeding green ghoul blood.~
+~
+5 6451200 8193 1
+0 3 5 9 40
+5 15000 2592
+E
+talons ghoul quest~
+This particular set of talons appears to be larger and sharper than usual,
+and also the green blood dripping from the tips seems to be brighter and
+more phosphorescent than you are used to seeing.
+~
+A
+26 3
+A
+81 5
+S
+#1937
+phaser type-I startrek quest~
+a Type-I Phaser~
+A Starfleet Security issue phaser is here.~
+~
+5 6082562 8193 1
+0 3 3 7 25
+15 2600 2592
+E
+phaser type-I startrek quest~
+Upon closer inspection, the reason this phaser is so heavy becomes
+clear.  It would seem this phaser is actually carved from a block
+of lead and painted to look like a real phaser.  This phaser would
+be better suited for use in simple bludgeoning than shooting.
+~
+A
+19 3
+S
+#1938
+lyre wooden instrument~
+a small wooden lyre~
+A small wooden lyre is resting on the ground.~
+Fixed.~
+26 536870928 16385 1
+0 1 0 0 0
+2 0 0
+S
+#1939
+lute wooden instrument~
+a small wooden lute~
+A small wooden lute is lying on the ground.~
+Fixed.~
+26 536870928 16385 1
+1 0 0 0 0
+2 0 0
+S
+#1940
+board guild thief~
+Thief Guild Board~
+A board contains the most up-to-date information from the Sorpigal underground.~
+~
+23 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#1941
+board guild anti journal~
+Anti Guild Board~
+A heavy journal resting on a table serves as the guild message board.~
+Fixed.~
+23 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#1942
+board guild barb~
+Barbarian Guild Board~
+A board is here, holding important messages for the guild.~
+Fixed.~
+23 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#1943
+board guild ranger notes tree~
+Ranger Guild Board~
+A series of notes penned to a moss-covered tree serves as the guild board.~
+Fixed.~
+23 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#1944
+board guild warrior~
+Warrior Guild Board~
+A board stands in the middle of the room, with messages from guild members.~
+Fixed.~
+23 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#1945
+board guild monk~
+Monk Guild Board~
+The message board is attached to the wall next to the entrance.~
+Fixed.~
+23 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#1946
+board guild cleric~
+Cleric Guild Board~
+A message board is here with all the current clerical gossip.~
+Fixed.~
+23 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#1947
+board guild mage glyph glyphs column~
+Mage Guild Board~
+Magical glyphs cover a stone column rising up through the middle of the room.~
+Fixed.~
+23 2 0 0
+0 0 0 0 0
+0 0 0
+S
+#1948
+board guild druid sheet papyrus~
+Druid Guild Board~
+A sheet of papyrus is laying on a large and flat rock.~
+Fixed.~
+23 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#1949
+board guild bard bulletin~
+Bard Guild Board~
+A bulletin board is resting against the wall.~
+Fixed.~
+23 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#1950
+board guild paladin register~
+Paladin Guild Board~
+A thick register rests on a small writing table near the west wall.~
+Fixed.~
+23 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#1951
+arrow sanid twig~
+a twig crafted into an arrow~
+an arrow lies here, crafted from a twig by some poor creature.~
+Fixed.~
+7 0 1 0
+1 10 1 1 1
+1 10 0
+S
+#1952
+corpse virgin vestal cadaver~
+the corpse of a vestal virgin~
+the corpse of a vestal virgin lies here violated.~
+Fixed.~
+13 0 1 0
+0 0 0 0 0
+20 0 0
+S
+#1953
+corpse hog cadaver~
+the corpse of a wild hog~
+the corpse of a wild hog lies here, its edible parts already removed.~
+Fixed.~
+13 0 1 0
+0 0 0 0 0
+20 0 0
+S
+#1954
+corpse warrior cadaver~
+the corpse of a fallen warrior~
+the corpse of a fallen warrior lies here.~
+Fixed.~
+13 0 1 0
+0 0 0 0 0
+50 0 0
+S
+#1955
+rack~
+a cadaver storage rack~
+A cadaver storage rack rests against the east wall,~
+Fixed.~
+15 0 0 0
+0 0 0 0 0
+0 0 0
+E
+rack cadaver e ea eas east~
+A wooden cadaver storage rack occupies the east wall of the room. Fresh
+corpses appear to be added daily. A sign attached to it reads:
+Courtesy corpses available to guild members. Please see attendant for
+animation.
+~
+S
+#1956
+thing object portal~
+Drawan's creation~
+A strang object floats in the middle of the room next to Drawan~
+Fixed.~
+24 0 0 0
+1954 2 -1 0 0
+0 0 0
+S
+#1957
+portal reality~
+A portal back to reality~
+A portal floats here, waiting to eject you back to reality.~
+Fixed.~
+24 0 0 0
+1955 1 -1 0 0
+0 0 32
+S
+#1958
+diploma parchment combat-mastery~
+an OFFICIAL Dark Castle Combat Mastery Diploma~
+You see a Combat Mastery Diploma here.~
+~
+8 4354 16385 1
+0 0 0 0 50
+2 100000 5
+E
+diploma parchment combat-mastery~
+This parchment shows that you have achieved the minimum requirements
+to begin the long journey towards becoming a true Master in Combat.
+~
+S
+#1959
+empty obj~
+An empty obj~
+An empty obj sits here dejectedly.~
+Fixed.~
+0 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#1960
+hut portal~
+Seamus' Hut~
+A small and simple hut is here, raised a foot off of the ground.~
+Fixed.~
+24 0 0 0
+1994 1 -1 0 0
+0 0 0
+S
+#1961
+waterfall water portal~
+a waterfall~
+A stream of water flows steadily down the mountainside.~
+Fixed.~
+24 0 0 0
+1995 1 -1 0 0
+0 0 0
+S
+#1962
+phonemega~
+An empty obj~
+An empty obj sits here dejectedly.~
+Fixed.~
+0 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#1963
+empty obj~
+An empty obj~
+An empty obj sits here dejectedly.~
+Fixed.~
+0 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#1964
+empty obj~
+An empty obj~
+An empty obj sits here dejectedly.~
+Fixed.~
+0 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#1965
+empty obj~
+a sneak item~
+An empty obj sits here dejectedly.~
+Fixed.~
+15 0 0 0
+0 0 0 0 100
+0 0 0
+A
+31 100
+S
+#1966
+empty obj~
+An empty obj~
+An empty obj sits here dejectedly.~
+Fixed.~
+0 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#1967
+empty obj~
+An empty obj~
+An empty obj sits here dejectedly.~
+Fixed.~
+0 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#1968
+empty obj~
+An empty obj~
+An empty obj sits here dejectedly.~
+Fixed.~
+0 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#1969
+empty obj~
+An empty obj~
+An empty obj sits here dejectedly.~
+Fixed.~
+0 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#1970
+hoop iron~
+a sun-tarnished $B$0iron$R hoop~
+An $B$0iron$1 hoop, stained by constant exposure to the sun, sits here.$R~
+Fixed.~
+9 536875008 262145 0
+0 0 0 0 1
+1 1 12
+A
+19 1
+A
+5 1
+S
+#1971
+pince-nez pince nez~
+The warrior-styled lightweight pince-nez~
+Someone's pince-nez has fallen off!~
+Fixed.~
+9 4096 131073 0
+0 0 0 0 16
+0 0 12
+A
+18 2
+A
+19 1
+A
+3 1
+S
+#1972
+scimitar warrior~
+A heavy well-tempered scimitar~
+A large scimitar has been forgotton on the ground.~
+Fixed.~
+5 8392704 8193 0
+6 2 0 0 30
+0 0 12
+A
+26 2
+S
+#1973
+empty obj~
+An empty obj~
+An empty obj sits here dejectedly.~
+Fixed.~
+0 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#1974
+empty obj~
+An empty obj~
+An empty obj sits here dejectedly.~
+Fixed.~
+0 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#1975
+empty obj~
+An empty obj~
+An empty obj sits here dejectedly.~
+Fixed.~
+0 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#1976
+empty obj~
+An empty obj~
+An empty obj sits here dejectedly.~
+Fixed.~
+0 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#1977
+empty obj~
+An empty obj~
+An empty obj sits here dejectedly.~
+Fixed.~
+0 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#1978
+empty obj~
+An empty obj~
+An empty obj sits here dejectedly.~
+Fixed.~
+0 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#1979
+empty obj~
+An empty obj~
+An empty obj sits here dejectedly.~
+Fixed.~
+0 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#1980
+phonemega~
+Megaphone: Skiv makes an impossibly fast movement, all you see is a dull gleam.~
+Megaphone: Skiv makes an impossibly fast movement, all you see is a dull gleam.~
+Fixed.~
+31 134217728 0 0
+10 30 0 0 0
+0 0 0
+E
+megamsg~
+Skiv makes an impossibly fast movement, all you see is a dull gleam.
+Skiv is now grinning with his dagger through the back of a revolting rat.
+~
+S
+#1981
+phonemega~
+Megaphone: You watch in awe as two blindfolded guild members skillfully duel, performing an intrica~
+Megaphone: You watch in awe as two blindfolded guild members skillfully duel, performing an intricate dance with their blades.~
+Fixed.~
+31 134217728 0 0
+5 40 0 0 0
+0 0 0
+E
+megamsg~
+You watch in awe as two blindfolded guild members skillfully duel, performing an intricate dance with their blades.
+~
+S
+#1982
+phonemega~
+Megaphone: Insence~
+Megaphone: The soothing smell of the incense makes you feel drowsy. Perhaps it is time for a nap.~
+Fixed.~
+31 134217728 0 0
+5 120 0 0 0
+0 0 0
+E
+megamsg~
+The soothing smell of the incense makes you feel drowsy. Perhaps it is time for a nap.
+~
+S
+#1983
+phonemega~
+Megaphone: Anti Fountain Statue Turns Head~
+Megaphone: As you walk across the room, the statue turns its head to follow you.~
+Fixed.~
+31 134217728 0 0
+5 120 0 0 0
+0 0 0
+E
+megamsg~
+As you walk across the room, the statue turns its head to follow you.
+~
+S
+#1984
+phonemega~
+Megaphone: dismembered anti chode~
+Megaphone: A foolish member makes you chuckle as he dismembers one of his toes in a blundered maneuver.~
+Fixed.~
+31 134217728 0 0
+10 120 0 1 0
+0 0 0
+E
+megamsg~
+A foolish member makes you chuckle as he dismembers one of his toes in a blundered maneuver.
+~
+S
+#1985
+phonemega~
+Megaphone: Anti Guild Master Altar Corpse~
+Megaphone: The corpse at the altar arches its back and mutters, 'Glory to Jundleheim, I will stand by Tharkes til the end!'~
+no_see~
+31 134217728 0 0
+20 200 0 0 0
+0 0 0
+E
+megamsg~
+The corpse at the altar arches its back and mutters, 'Glory to Jundleheim, I will stand by Tharkes til the end!'
+~
+S
+#1986
+phonemega~
+Megaphone: Monk Group~
+Mega: A group of monks file in and speachlessly congregate in a corner where they exchange~
+Fixed.~
+31 134217728 0 0
+35 100 0 0 0
+0 0 0
+E
+megamsg~
+A group of monks file in and speachlessly congregate in a corner where they exchange uninterpretable
+expressions for a bit before exiting the way in which they came.
+~
+S
+#1987
+phonemega~
+Megaphone: Intoxicating fumes emanate from some careless experimenter's bench and incites a momenta~
+Megaphone: A disobedient familiar escapes its master only to vanquish in a ball of fire moments lat~
+Fixed.~
+31 134217728 0 0
+5 55 0 0 0
+0 0 0
+E
+megamsg~
+Intoxicating fumes emanate from some careless experimenter's bench and incites a momentary chaos.
+~
+S
+#1988
+phonemega~
+Megaphone: A disobedient familiar escapes its master only to vanquish in a ball of fire moments lat~
+~
+Fixed.~
+31 134217728 0 0
+10 105 0 0 0
+0 0 0
+E
+megamsg~
+A disobedient familiar escapes its master only to vanquish in a ball of fire moments later.
+~
+S
+#1989
+phonemega~
+Megaphone~
+Megaphone: Pages alight in a spellbook resting on a mage's lap, the result of an out-of-control cantrip.~
+Fixed.~
+31 134217728 0 0
+17 77 0 0 0
+0 0 0
+E
+megamsg~
+Pages alight in a spellbook resting on a mage's lap, the result of an out-of-control cantrip.
+~
+S
+#1990
+phonemega~
+Megaphone: Two barbarians wrestling so fiercely that you think they will go to the death suddenly s~
+Megaphone: Two barbarians wrestling so fiercely that you think they will go to the death suddenly stop and pat eachother on the back.~
+Fixed.~
+31 134217728 0 0
+10 100 0 0 0
+0 0 0
+E
+megamsg~
+Two barbarians, wrestling so fiercely that you think they will go to the death, suddenly stop and pat each other on the back.
+~
+S
+#1991
+phonemega~
+Megaphone: Spontaneously, venom-flecked fangs grow and bristle from the bedeviled Cestus!~
+Megaphone: Spontaneously, venom-flecked fangs grow and bristle from the bedeviled Cestus!~
+Fixed.~
+31 134217728 0 0
+20 100 0 0 0
+0 0 0
+E
+megamsg~
+Spontaneously, venom-flecked fangs grow and bristle from the bedeviled Cestus!
+~
+S
+#1992
+phonemega~
+Megaphone: The fangs of the Cestus retract magically into the metal.~
+Megaphone: The fangs of the Cestus retract magically into the metal.~
+Fixed.~
+31 134217728 0 0
+40 100 0 0 0
+0 0 0
+E
+megamsg~
+The fangs of the Cestus retract magically into the metal.
+~
+S
+#1993
+phonemega~
+Megaphone: A whimsical melody, sung by the birds overhead, picks up your spirits~
+Megaphone: A whimsical melody, sung by the birds overhead, picks up your spirits.~
+Fixed.~
+31 134217728 0 0
+0 50 0 0 0
+0 0 0
+E
+megamsg~
+A whimsical melody, sung by the birds overhead, picks up your spirits.
+~
+S
+#1994
+phonemega~
+Megaphone: Trumpets bray for some distinguished guild member returning from an expedition.~
+Megaphone: Trumpets bray for some distinguished guild member returning from an expedition.~
+Fixed.~
+31 134217728 0 0
+5 120 0 0 0
+0 0 0
+E
+megamsg~
+Trumpets bray for some distinguished guild member returning from an expedition.
+~
+S
+#1995
+phonemega~
+Megaphone: Howls of laughter erupt from a crowd of spectators as a female swordsman bests a confuse~
+Megaphone: Howls of laughter erupt from a crowd of spectators as a female swordsman bests a confused male giant in a duel.~
+Fixed.~
+31 134217728 0 0
+45 100 0 0 0
+0 0 0
+E
+megamsg~
+Howls of laughter erupt from a crowd of spectators as a female swordsman bests a confused male giant in a duel.
+~
+S
+#1996
+empty obj~
+An empty obj~
+An empty obj sits here dejectedly.~
+Fixed.~
+0 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#1997
+empty obj~
+An empty obj~
+An empty obj sits here dejectedly.~
+Fixed.~
+0 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#1998
+bbb~
+TESTY~
+TESTY~
+Fixed.~
+0 16 5 1
+0 0 0 0 0
+0 0 0
+A
+13 -23
+S
+#1999
+wand crazy~
+CrAzY wAnD~
+a crazy wand~
+Fixed.~
+2 134217744 147457 1
+9999 9999 0 77 1
+0 0 0
+A
+13 -100
+S
+$~

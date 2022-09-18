@@ -1,0 +1,3439 @@
+#1900
+waif waiter child~
+a poor waif~
+A waif wearing ragged, oversized clothes touts liquors from table to table.
+~
+This poor child looks as if he hasn't bathed in his entire life. His clothes
+are not much more than a patchwork of torn and stained rags, something that
+looks as if it were taken off the back of a drunkard passed out in a back
+alley. He was probably 'adopted' by Skiv under the pretenses that he would
+be taught some things and generally taken care of, but all he does now is
+toil about dealing with the city's most dangerous topers.
+~
+33090 0 -1
+18874368 0 0 -1
+0 1 100
+19 0 20000d1+0 5d10+1
+0 0
+8 8 1 0 0 0
+S
+#1901
+gratz dog~
+Gratz, the rabid dog~
+Gratz, the rabid dog, is chained to the wall having a fit.
+~
+Here is the guild "pet," or rather a disgusting combination of watchdog
+and toy. The poor creature is obviously in a state of perpetual pain and
+agony. Patches of missing hair reveal rough red raw skin, the result of
+an incessant and uncared for flea infestation. Though his foaming mouth
+makes it hard to notice, you can see that most of his teeth are rotted
+out and his gums infected with some repulsive disease. A plethora of scars
+across Gratz's body betray another one of his woes: the unfortunate outlet
+for any livid guild member's anger. No wonder this thing acts so aggressively.
+Could anyone blame him?
+~
+33090 0 -1
+18874400 0 0 -1
+900 21 100
+14 9 20000d1+0 5d10+1
+0 0
+8 8 1 0 128 0
+>greet_prog 50~
+if cansee($n)
+  MPECHOAT 0.$n Gratz howls as he charges for your legs. Luckly his chain catches him and he stops just inches away.
+MPECHOAROUND 0.$n $n gets a disgusted look on $s face at the cold greeting Gratz gives $m
+endif
+~
+|
+S
+#1902
+vystir shifty figure~
+Vystir~
+A shifty figure inspires awe as he wanders about overseeing the guild.
+~
+The story of this infamous thief is long and impressive. Born to a savage
+Hu'uti family--some say he was the son of a highly skilled weaponsmith--he
+was captured at the age of three by a conqurering expediton seeking the
+riches of his island homeland. He was immediately sold into slavery and
+for eight years he travelled with a band of desert merchants who were
+very liberal in taking advantage of his lithe little body. One night when
+his company was camped outside of Sorpigal he took his revenge, ending
+the lives of those who most disrespected him. The rest awakened to witness
+the results of the beautiful execution, unparalled in its brutality, and
+fled from the spot in insane furvor. The young Vystir scaled the town walls
+that very night and wandered into parts of the city that most people rarely
+think of and never visit. By the age of fifteen he had staked out a large
+part of the city and aquired a remarkable reputation. Mere mention of the
+finely tones adolescent, weighing barely 130 pounds, was enough for most
+residents to lock their doors and shudder their windows. The story of
+how he was admitted to the guild by dispatching the scouts who were sent
+to "interview" him is recounted more often than those of slaying the tarrasque.
+Though he barely remembers the events of his childhood, the greed which
+guided all those who he came to hate has turned him into a very unmaterialistic
+rogue. His prowess could make him one of the richest men in the realms,
+but he scorns such objectives as he scorns friendship, happiness and nearly
+any other emotion. An unending reputation and pure undeviating power are
+his only desires. Vystir is the guildmaster's treasured henchman and second
+in command of the guild.
+~
+295232 0 -1
+20447232 4096 0 -1
+-1000 1 100
+14 9 20000d1+0 5d10+1
+0 0
+8 8 1 0 0 0
+C 3
+>bribe_prog 60000~
+if ispc($n)
+  if class($n) == 3
+    MPOLOAD 192
+    give stink $n
+    break
+  endif
+endif
+~
+>speech_prog yes yeah sure okay ok~
+if ispc($n)
+  if class($n) == 3
+    say For only 60k gold, I'll sell you a bag of low quality catstink.
+    say It removes the tracks from a room... letting you sneak out quietly.
+    break
+  endif
+endif
+~
+>greet_prog 75~
+if ispc($n)
+  if class($n) == 3
+    say Pssstt...
+    say Are you interested in something to cover your tracks?
+    break
+  endif
+endif
+~
+|
+S
+#1903
+attendant animator~
+the training room attendant~
+The training room attendant animates corpses for guild members to practice on.
+~
+The training room attendant is a high-level student of Lord Soth. His
+physical skills are unimpressive but redeemed by his masterful abilities in
+the dark art of necromancy. A tight fitting black outfit, which matches his
+excessively long and pointy black fingernails, conforms to his slender body.
+~
+295746 0 -1
+19398696 0 0 -1
+-1000 1 100
+14 9 20000d1+0 5d10+1
+0 0
+8 8 1 0 0 0
+C 5
+T 25 11 11 11 11 0
+>catch_prog 3~
+catch_proc 3
+MPECHO The attendant drops the corpse to the ground, and begins his incantations.
+MPECHO Suddenly, the corpse begins to twitch with life and rises to its feet.
+MPMLOAD 1911
+~
+>catch_prog 2~
+MPECHO The attendant drops the corpse to the ground, and begins his incantations.
+MPECHO Suddenly, the corpse begins to twitch with life and rises to its feet.
+MPMLOAD 1910
+~
+>catch_prog 1~
+MPECHO The attendant drops the corpse to the ground, and begins his incantations.
+MPECHO Suddenly, the corpse begins to twitch with life and rises to its feet.
+MPMLOAD 1909
+~
+>give_prog corpse warrior cadaver~
+if ispc($n)
+  if class($n) == 5
+    if ismobvnuminroom(1911)
+      say I will only allow one type of this corpse to be animated at once.
+      say I suggest you practice on the one that I have created for you.
+      MPPURGE cadaver
+      break
+    endif
+    MPECHO The training room attendant forms a dark and evil grin on his face.
+    say The Dark Lord Soth eats warriors for breakfast.
+    spit
+    say One moment.
+    MPPURGE cadaver
+    MPTHROW 1903 3 2
+    break
+  endif
+endif
+~
+>give_prog corpse hog cadaver~
+if ispc($n)
+  if class($n) == 5
+    if ismobvnuminroom(1910)
+      say I will only allow one type of this corpse to be animated at once.
+      say I suggest you practice on the one that I have created for you.
+      MPPURGE cadaver
+      break
+    endif
+    MPECHO The training room attendant forms a dark and evil grin on his face.
+    say Stupid creatures these hogs.
+    spit
+    say One moment.
+    MPPURGE cadaver
+    MPTHROW 1903 2 2
+    break
+  endif
+endif
+~
+>give_prog corpse virgin vestal cadaver~
+if ispc($n)
+  if class($n) == 5
+    if ismobvnuminroom(1909)
+      say I will only allow one type of this corpse to be animated at once.
+      say I suggest you practice on the one that I have created for you.
+      MPPURGE cadaver
+      break
+    endif
+    MPECHO The training room attendant forms a dark and evil grin on his face.
+    say Ahh, the corpse of a vestal virgin... good choice.
+    grin
+    say One moment.
+    MPPURGE cadaver
+    MPTHROW 1903 1 2
+    break
+  endif
+endif
+~
+|
+S
+#1904
+target archery~
+a far-off archery target~
+an archery target hangs here from a tree.
+~
+Szandor~
+32834 0 -1
+18874368 0 0 -1
+900 26 5
+14 9 30000d1+0 2d2+1
+0 0
+8 8 1 258 64 128
+>act_prog p You get shot~
+if rand(20)
+  MPAT 1939 MPECHO You hear a voice from the west say 'OUCH! My eye! Meanie!'
+  break
+endif
+if rand(20)
+  MPAT 1939 MPECHO You hear a voice from the west say 'Do you HAVE to aim for my crotch?!'
+  break
+endif
+if rand(20)
+  MPAT 1939 MPECHO You hear a voice from the west say 'Oooh, that's gonna leave a mark.'
+  break
+endif
+if rand(20)
+  MPAT 1939 MPECHO You hear a voice from the west say 'Take it out, it's too big!'
+  break
+endif
+if rand(20)
+  MPAT 1939 MPECHO You hear a voice from the west say 'I better put some Windex(tm) on that cut.'
+  break
+endif
+~
+>act_prog p A quiet whistle~
+if rand(20)
+  MPAT 1939 MPECHO You hear a voice from the west say 'Oh snap! You SUCK!'
+  break
+endif
+if rand(20)
+  MPAT 1939 MPECHO You hear a voice from the west say 'Get it together, LOSER!'
+  break
+endif
+if rand(20)
+  MPAT 1939 MPECHO You hear a voice from the west say 'SOMEONE's shooting blanks! *cough*'
+  break
+endif
+if rand(20)
+  MPAT 1939 MPECHO You hear a voice from the west say 'Here's a dollar, go buy some talent!'
+  break
+endif
+if rand(20)
+  MPAT 1939 MPECHO You hear a voice from the west say 'Damn, you shoot like Moroso!'
+  break
+endif
+~
+|
+S
+#1905
+Sanid ranger sprite~
+Sanid, the forest sprite~
+Sanid, the forest sprite, runs through the bushes chasing the squirrels.
+~
+A short elf-like creature with the $B$4e$Ry$B$4e$Rs of a racoon. Sanid makes his
+home in these bushes where the squirrels provide abundant entertainment
+and he can keep himself fed on the rangers' leftover meals.
+~
+33090 0 -1
+320864256 0 0 -1
+900 5 100
+14 9 20000d1+0 10d5+1
+0 0
+8 8 0 0 0 0
+>give_prog leg centipede~
+if ispc($n)
+  say A centipede leg! Where ever did you find such a delicacy?
+  eat leg
+  say I must give you something in exchange.
+  MPECHO Sanid rumbles around in the bushes for a moment.
+  MPOLOAD 1951
+  give arrow $n
+  break
+endif
+~
+>catch_prog 1~
+say Or okay, you can stay. But give me something to eat.
+say I do enjoy centipede legs.
+~
+>act_prog p has entered a clump of bushes.~
+if rand(25)
+  MPECHOAT $n Sanid twitches his nose at you and begins to encircle your legs.
+  MPECHOAROUND $n Sanid twitches his nose at $n and begins to enircle $s legs.
+  break
+endif
+if rand(25)
+  say What are you doing in my home? Get out!
+  MPTHROW 1905 1 2
+  break
+endif
+~
+|
+S
+#1906
+Gireth weaponsmith armourer~
+Gireth, the arms expert~
+Gireth, the guild weapons and arms expert, dispenses advice and equipment.
+~
+He's a blacksmith, one of Sorpgial's finest. He used to work across the
+street at Waz's until the guild offered him an unrefusable salary to become
+their private armourer. His years of experience have brought him in contact
+with equipment from all over the realms and have made him one of the world's
+foremost experts on fighter outfitting.
+~
+558914 0 -1
+18874368 0 0 -1
+900 1 100
+14 9 20000d1+0 5d10+1
+0 0
+8 8 1 0 0 0
+C 4
+S
+#1907
+waiter~
+a snooty waiter~
+A snooty waiter in fine garments punctually manages to keep every mug filled.
+~
+The waiter here is a smug looking, sharply dressed young man with a terribly
+arrogant attitute. Any attempt to be friendly with him results in a polite,
+but intentionally obvious look of displeasure. Perhaps this is why he wasn't
+admitted to the academy and has to resort to this close-ended job. The waiter's
+only goal appears to be filling customer's glasses up as soon as possible so
+he can get back to being better than everyone.
+~
+33090 0 -1
+18874368 0 0 -1
+900 1 100
+14 9 20000d1+0 5d10+1
+0 0
+8 8 1 0 0 0
+S
+#1908
+archery target~
+a really far away archery target~
+a weakened archery target hangs here from a tree.
+~
+Szandor~
+32770 0 -1
+18874368 0 0 -1
+900 26 5
+14 9 30000d1+0 2d2+1
+2500 2500
+8 8 1 256 64 128
+S
+#1909
+corpse virgin vest animated~
+the corpse of a vestal virgin~
+the corpse of a vestal virgin slowly staggers around.
+~
+She's dead. Hot...but dead :(
+~
+2146306 0 -1
+35651624 0 0 -1
+900 24 5
+14 9 150d1+0 2d2+2
+0 0
+8 8 2 393 64 0
+S
+#1910
+corpse hog animated~
+the corpse of a wild hog~
+the corpse of a wild hog slowly staggers around.
+~
+It's dead.
+~
+2146306 0 -1
+35651624 0 0 -1
+900 24 10
+14 9 200d1+0 2d2+2
+0 0
+8 8 1 393 64 0
+S
+#1911
+corpse warrior animated~
+the corpse of a fallen warrior~
+the corpse of a fallen warrior slowly staggers around.
+~
+It's dead.
+~
+49154 0 -1
+35651624 0 0 -1
+0 24 15
+20 10 300d1+0 1d1+0
+0 0
+8 8 0 393 64 0
+S
+#1912
+seymour owl superawesomealiannaowl~
+Seymour, Alianna's pet owl~
+Seymour, Alianna's pet owl, is here serving as his master's second set of eyes.
+~
+This is the pet owl of the great mage Alianna, who also happens to be the
+master of the Sorpigal mage guild. The owl is brown, just like any other
+normal boring owl, except this one is wearing glasses. It is said that he
+shares his visual perceptions with his master through a telepathic connection.
+~
+8421378 0 -1
+270794816 0 0 -1
+0 15 30
+20 10 5000d1+0 5d10+10
+0 0
+8 8 0 0 0 2097152
+>arand_prog 1~
+MPPURGE malachiteportal
+MPPURGE malachiteportal
+MPPURGE malachiteportal
+MPGOTO 1983
+~
+>death_prog 100~
+MPPURGE malachiteportal
+MPPURGE malachiteportal
+MPPURGE malachiteportal
+echo The room returns to normal.
+~
+>arand_prog 25~
+MPPURGE malachiteportal
+MPPURGE malachiteportal
+emote flies off restoring the room to its normal state.
+MPGOTO 1999
+drop all
+MPPURGE malachiteportal
+MPPURGE malachiteportal
+MPPURGE malachiteportal
+MPOLOAD 6446
+quaf expl
+emote flies into the room, draining it of its magic potential.
+MPOLOAD 1920
+drop malachiteportal
+~
+|
+S
+#1913
+Jenamen golem~
+Jenamen, the patchwork golem~
+Jenamen, the patchwork golem, helplessly receives the brunt of countless spells.
+~
+This golem absolutely wretched. He appears to be an amalgamation of odd parts
+and pieces that were readily available to his creator, who was clearly
+unconcerned about his well being. The poor thing oozes bile, and parts of
+his body are continuously falling off. It certainly doesn't help that every
+five minutes he gets smacked directly in the face with a spell from some
+cruel practicing mage. Despite the poor creature's total helplessness, you
+can't help smirking a little at how pathetic he is.
+~
+32770 0 -1
+18875393 0 0 -1
+0 26 20
+20 10 100d1+0 1d1+1
+0 0
+8 8 0 385 64 128
+>fight_prog 5~
+say Marsh u lepo peechka materina ti yebeni prokliti derkagia!
+~
+>fight_prog 5~
+say Gle kurtsa ti na biciklu!
+~
+>fight_prog 5~
+say Seva mi levo jaje!
+~
+>fight_prog 5~
+say Yebem ti otsa na mrtwoy materi!
+~
+>fight_prog 5~
+say Bem ti dete u usta krwawa!
+~
+>fight_prog 5~
+say Idi u picku materinu!
+~
+>fight_prog 5~
+say Popasi me chmarne dlachitse!
+~
+>fight_prog 5~
+say Jebem te usta!
+~
+>fight_prog 5~
+say Jebo te Papa!
+~
+>fight_prog 5~
+say Jebo ti pas mater!
+~
+>fight_prog 5~
+say Popusis mi kurac krasni!
+~
+>fight_prog 5~
+say Yedi govna, maymune!
+~
+>fight_prog 5~
+say Rdjo belosvetska!
+~
+>fight_prog 5~
+say Yebachu ti sve po spisku!
+~
+|
+S
+#1914
+alaedan druid~
+Alaedan the druid~
+A human druid is sitting on the ground, deep in meditation.
+~
+Szandor~
+33090 0 -1
+52428832 32 0 -1
+0 1 100
+20 10 20000d1+0 5d10+1
+0 0
+8 8 0 0 0 0
+C 11
+>act_prog p leaves down.~
+if ispc($n)
+  MPECHOAT $n After searching earnestly for a dry path down you eventually
+  MPECHOAT $n decide that your only way out is going to be down the waterfall.
+  MPECHOAT $n Taking a deep breath you jump into the water and let the current
+  MPECHOAT $n take you over the edge.
+  MPECHOAT $n .
+  MPECHOAT $n      .
+  MPECHOAT $n           .
+  MPECHOAT $n                *SPLASH*
+  MPGOTO 1993
+  MPECHO *SPLASH*
+  MPGOTO 1996
+  break
+endif
+~
+>fight_prog 100~
+say I have had quite enough of this. You are ruining my studies.
+MPGOTO 1999
+drop all
+MPAT 1996 MPMLOAD 1914
+MPPURGE
+MPPURGE $i
+~
+|
+S
+#1915
+naiad vikela~
+Vikela the naiad~
+A beautiful naiad swims gracefully through the water.
+~
+~
+4227394 0 -1
+320864288 32 0 -1
+0 5 100
+20 10 20000d1+0 5d10+1
+0 0
+8 8 2 0 0 0
+C 11
+>greet_prog 10~
+if ispc($n)
+  if carries($n) keep 3010
+    say Hm.. I smell a chewy salted fish.
+    say $n, if you give me one I'll transport you to the top of the waterfall.
+    break
+  endif
+endif
+~
+>give_prog fish salty~
+if ispc($n)
+  if class($n) == 3
+  of class($n) == 5
+    break
+  else
+    say Okay, let me swim up the waterfall and tell Rocestas
+    say that you would like to join him.  He will have to
+    say summon you to the top of the waterfall.
+    MPECHOAT $n Alaedan has summoned you!
+    MPECHOAROUND $n $n disappears in a puff of smoke.
+    MPAT 1996 MPECHO $n appears out of nowhere as a result of Alaedan's magic.
+    MPTRANSFER $n 1996
+    break
+  endif
+endif
+~
+|
+S
+#1916
+centaur Kentauros~
+Kentauros~
+A tall and powerful centaur stands before you, watching as you pass.
+~
+~
+33088 0 -1
+52428832 32 0 -1
+0 14 100
+20 10 20000d1+0 5d10+1
+0 0
+8 8 1 0 0 0
+C 11
+>speech_prog p conjure elemental~
+if ispc($n)
+  if class($n) == 11
+    if level($n) > 49
+    say Well met! So you wish to learn where to gain components for conjuring elementals?
+    say Very well...
+    say The blood for FIRE elementals can be purchased from Tatorious in the Tower of Sorcery.
+    say The wine to call ENERGY elementals can be purchased from Kris in Paradise.
+    say The holy water to call ICE elementals is sold by Quark in Sorpigal!
+    say The dirty water for EARTH elementals can be bought from a shopkeep in Newtonia!
+    say Keep in mind there are many more places the appropriate liquids CAN be found, these are but a few!
+  endif
+endif
+~
+|
+S
+#1917
+sael worksman maker~
+Sael the instrument maker~
+Sael the instrument maker is busy working on his latest creation.
+~
+~
+295746 0 -1
+18874496 0 0 -1
+0 1 100
+20 10 20000d1+0 10d5+1
+0 0
+8 8 0 0 0 0
+C 10
+>speech_prog lyre~
+if ispc($n)
+  if class($n) == 10
+    if level($n) < 21
+      say A lyre it is then.  Give me one moment.
+      MPECHO $I studies the array of instruments on the wall.
+      MPOLOAD 1938
+      give lyre $n
+      say There, that should work just fine for you.
+      MPECHO $I goes back to his work.
+      break
+    else
+      say Sorry, you're not a new student anymore.
+      say I suggest you go out into the world and
+      say find yourself an instrument.
+      break
+    endif
+  endif
+endif
+~
+>speech_prog lute~
+if ispc($n)
+  if class($n) == 10
+    if level($n) < 21
+      say A lute it is then.  Give me one moment.
+      MPECHO $I studies the array of instruments on the wall.
+      MPOLOAD 1939
+      give lute $n
+      say There, that should work just fine for you.
+      MPECHO $I goes back to his work.
+      break
+    else
+      say Sorry, you're not a new student anymore.
+      say I suggest you go out into the world and
+      say find yourself an instrument.
+      break
+    endif
+  endif
+endif
+~
+>speech_prog yes sure okay please yup~
+if ispc($n)
+  if class($n) == 10
+    if level($n) < 21
+      say Would you like a new lute or a new lyre?
+      say The lute will give you a bonus to your
+      say non-combat songs, while a lyre will give
+      say a bonus to your combat-based songs.
+      break
+    else
+      say Sorry, you're not a new student anymore.
+      say I suggest you go out into the world and
+      say find yourself an instrument.
+      break
+    endif
+  endif
+endif
+~
+>greet_prog 25~
+if ispc($n)
+  if class($n) == 10
+    if level($n) < 21
+      emote looks up from his work.
+      say Well hello young one, nice to have a visitor up here.
+      say Would you like an instrument to help get you started?
+      break
+    else
+      MPECHOAT $n $I tips his hat to you.
+      MPECHOAROUND $n $I tips his hat to $n
+      break
+    endif
+  endif
+endif
+~
+|
+S
+#1918
+lyra teacher instructor~
+Lyra~
+Lyra is here, instructing her students about proper musicianship.
+~
+~
+295234 0 -1
+52428800 0 0 -1
+0 2 100
+20 10 20000d1+0 5d10+0
+0 0
+8 8 2 0 0 264
+>speech_prog p put out~
+if ispc($n)
+  slap $n
+endif
+~
+>rand_prog 1~
+say As bards, we have two ways of soothing our hitters and casters-
+say Healing Melody and Soothing Rememberance.
+~
+>rand_prog 1~
+say Terrible Clef is one of our main offensive weapons.
+say Use it carefully and use it wisely.
+MPECHO $I looks around the classroom to make sure that she got her point across.
+~
+>catch_prog 1~
+say Students! If you have something to say, please raise your hand.
+~
+>rand_prog 1~
+MPECHO The sound of whispering can be heard from the back row.
+MPTHROW 1918 1 1
+~
+>rand_prog 1~
+say The secret to excellent musicianship is practice, practice, practice.
+MPECHO $I hits the chalkboard with her baton for emphasis.
+~
+>rand_prog 1~
+say Anthais, your lute looks as if its about to fall apart.
+say March yourself up to Sael and get a new one.
+MPECHO Anthais gets up from his desk and leaves the room.
+~
+|
+S
+#1919
+soth black knight guard guildguard~
+Lord Soth, the Black Knight~
+An ominous black knight secures the entrance to the guild from the shadows.
+~
+Soth conceals himself away from the entryway yet somehow manages to
+control all traffic into the guild. Purple tattoos cover this man's bald
+head while midnight black armor covers the rest of his body. Nothing you
+do will make him change his stoic expression, but you do notice that the
+closer you get to the entrance to the building the deeper his gaze penetrates.
+~
+17088834 0 -1
+52691496 4096 0 -1
+-1000 24 80
+-60 -80 6000d1+0 8d10+70
+0 0
+8 8 1 392 64 0
+C 13
+T 18 18 18 18 18 0
+>give_prog vasa sagola lance~
+if ispc($n)
+ if class($n) == 5
+  if level($n) > 49
+  say Well done young one.
+  grin
+  say There is but one task left that you must accomplish for me.
+  MPOLOAD 17374
+  give stone $n
+  say Deliver this to the Vampire that dwells deep in the catacombs of Sorpigal.
+  say When this is done, return to me.
+  MPPURGE lance
+  break
+  endif
+ endif
+endif
+~
+>give_prog vampire ashes~
+if ispc($n)
+ if class($n) == 5
+  if level($n) > 49
+  say You have chosen a darkened path, that few dare to tread and even fewer survive.
+  MECHOAT $n As Lord Soth speaks, he pours the ashes onto the Vasa Sagola lance.
+  say I grant upon you now the most feared power of the anti-paladin.
+  say The power of the ancient vampire is now..YOURS!
+  MPECHOAT $n You watch helplessly as Lord Soth raises the Vasa Sagola lance and aims it towards
+  MPECHOAT $n your chest. Suddenly, he thrusts the lance forward, deep into your chest, causing
+  MPECHOAT $n a searing pain to wash over you.
+  MPECHOAT $n As everything goes black, you hear only the evil laughter of your Master.
+  MPTEACHSKILL $n 137
+  MPTRANS $n 3059
+  MPPURGE ashes
+  break
+  endif
+ endif
+endif
+~
+>catch_prog 3~
+say Most impressive, yet these ingredients are only the start.
+say I still need an ancient weapon that only a collector of rarities would have.
+say Seek out the seller of ancient goods and retrieve the weapon from him.
+say Present him with this idol. It should...persuade him to assist you.
+grin
+say He will know what you seek.
+emote turns away and begins casting an enchantment on the two hearts.
+~
+>give_prog heart seraph~
+if ispc($n)
+ if class($n) == 5
+  if level($n) > 49
+  smirk
+  say Foolish seraph.
+  say Angels truly rush in where fools fear to travel, but the fool still has his heart.
+  MPJUNK heart
+  MPOLOAD 17373
+  give idol $n
+  MPTHROW 1919 3 2
+  break
+  endif
+ endif
+endif
+~
+>give_prog heart holy crusader~
+if ispc($n)
+ if class($n) == 5
+  if level($n) > 49
+  cackle
+  say Ah, I do so love to see the still beating heart of a paladin in my hands.
+  grin
+  say The next component I require is carried by a demonic giant.
+  say He tore it from a foolish seraph who tried to gain entry to a shimmering
+  say dark dragon's lair. Find this and return it to me.
+  MPJUNK heart
+  MPTHROW 24803 1 0
+  break
+  endif
+ endif
+endif
+~
+>speech_prog p components~
+if ispc($n)
+ if class($n) == 5
+  if level($n) > 49
+  say I require the source of life of two creatures.
+  say First, you must bring me the heart of our
+  say most hated enemies- the warriors of the light.
+  say This crusader stands guard over the Norse afterlife.
+  say Bring me his life's blood.
+  MPTHROW 16905 1 0
+  break
+  endif
+ endif
+endif
+~
+>speech_prog yes sure nods okie yup okay~
+if ispc($n)
+ if class($n) == 5
+  if level($n) > 49
+  nod
+  say Very well then.
+  say Bring me the components I shall require to imbue you with this spell.
+  say Find these components, bring them to me. Only then may we continue.
+  break
+  endif
+ endif
+endif
+~
+>catch_prog 2~
+say The path before you is long and arduous.
+say Once it has reached its end, never will you be the same.
+say Are you sure you wish to continue with this fool's errand?
+~
+>speech_prog p vampiric aura~
+if ispc($n)
+ if class($n) == 5
+  if level($n) > 49
+  say You dare to speak that name to me?
+  say Are you truly foolish enough to believe that you can control this power?
+  say As you are foolish enough to speaks its name, you must believe you can.
+  MPTHROW 1919 2 3
+  break
+  endif
+ endif
+endif
+~
+>catch_prog 1~
+Say Seek the an evil black mage who resides in a chamber of darkness atop a
+Say tower surrounded by magi.
+say Bring me his essence and perhaps I will expand your knowledge of hatred.
+MPECHO The death knight gazes off into the distance, renewing his vigilance.
+~
+>give_prog hate essence~
+if ispc($n)
+  if class($n) == 5
+    MPECHO The black knight reaches forth and grasps the essence tightly.
+    MPECHOAT $n A searing pain rips through your mind.
+    say Now your knowledge of hatred can grow, $n.
+    MPPURGE hate
+    MPTEACHSKILL $n 142
+    break
+  endif
+endif
+say This will not help you $n, you are not of the darkness...depart lest I show you true hatred.
+MPPURGE hate
+~
+>speech_prog p visage of hate~
+if ispc($n)
+  if class($n) == 5
+    MPECHOAT $n Lord Soth glowers at you in distain.
+    say Puny fleshling, you know nothing of the *true* nature of hatred.
+    say You will learn in time or your soul will feed my unending torment.
+    frown
+    MPTHROW 1919 1 4
+    break
+  endif
+endif
+say Foolish mortal, you are not a follower of the darkness...begone!
+~
+|
+S
+#1920
+marrok anti guildmaster master~
+Marrok, the Grand Anti-Paladin~
+The legendary Marrok is kneeling before the altar.
+~
+The antipaladin guildmaster strains to suppress his baneful glee. He appears
+to take all his amusement from vanquishing any existance of good from the
+world. A nearby assortment of disfigured crosses and mutilated kitten corpses
+attests to his predilections. Despite his seemingly immature hobbies he is
+obviously one of the wisest dark warriors you've ever seen. You wonder what
+sorts of malicious skills he has to teach.
+~
+295746 0 -1
+53215784 4096 0 -1
+-1000 8 80
+-60 -80 6000d1+0 8d10+70
+0 0
+8 8 1 0 0 0
+C 5
+T 18 18 18 18 18 0
+>greet_prog 15~
+if ispc($n)
+   if level($n) <= 40
+   whisper $n Psst! If you are looking for a little help to the Diamond Isle, visit the Meta-Priest for a shortcut!
+      endif
+    endif
+~
+|
+S
+#1921
+hengorot guard guildguard~
+Hengorot the barbarian~
+Hengorot, the barbarian guild guard, stands in front of you with folded arms.
+~
+Hengorot grew up in the northern tundra. He spent his youth hunting polar bears
+and raiding duergar trading parties. Eventually, however, his tribe was
+vanquished in a spout with a neighboring clan. Poor Hengorot found himself an
+orphan until he was adopted by Berkthgar on his eighteenth birthday. Now he
+is one of the most respected members of Soprigal's barbarian guild and is proud
+to protect its entrance. Physically, he is a very imposing man. Swoll like a
+boulder they say about him.
+~
+8947522 0 -1
+52691496 4096 0 -1
+0 6 80
+-60 -80 6000d1+0 8d10+70
+0 0
+8 8 1 0 0 0
+C 7
+T 18 18 18 18 18 0
+>speech_prog p tempum yr morada, mortum yr oppeum~
+say Ah yes, "Strength to my friends, and death to my foes"!
+say A simple saying to most, but we are fond of it.
+say It is our guild motto.
+~
+>give_prog seal everwinter tribe~
+MPJUNK all.seal
+if ispc($n)
+ if class($n) == 7
+  if level($n) > 49
+  say Ahh, the Seal of Clan Everwinter. This is only given to those
+  say who prove their worth on the field of battle!  Truly you are
+  say a barbarian fighter of the highest class!
+  say It would be my pleasure to learn you in the ways of Bullrush.
+  MPTEACHSKILL $n 364
+  break
+  endif
+ endif
+endif
+~
+>speech_prog sure yes fine okay okie yup nods~
+if ispc($n)
+ if class($n) == 7
+  if level($n) > 49
+  say Aye, now that's what I needed to hear. A good, strong lad
+  say ye are.  Make ye way to Everwinter, find Ulohar, one of the
+  say snow barbarians, and give him this parchment with my seal.
+  MPOLOAD 17365
+  give parchment $n
+  break
+  endif
+ endif
+endif
+~
+>speech_prog no nay nope fuckoff~
+if ispc($n)
+ if class($n) == 7
+  if level($n) > 49
+  say To the nine hells with ye then. You'll never learn the
+  say skills of the warlord barbarians by leaving ye kin to die.
+  break
+  endif
+ endif
+endif
+~
+>catch_prog 2~
+hmm
+say You, however. You appear to have some battle scars
+say about ye. Perhaps you can aid the clansman of Everwinter
+say in their time of need. Will ye go to them?
+~
+>catch_prog 1~
+say Aye, the foul bird beasts have come from the clouds
+say stealing livestock and clansmen alike. And here I am,
+say locked away in this damned guild, unable to leave for
+say fear of leaving the students unprotected.
+emote stops and looks at you.
+MPTHROW 1921 2 5
+~
+>speech_prog bullrush~
+if ispc($n)
+ if class($n) == 7
+  if level($n) > 49
+  say Bullrush? Lad I have no time to teach you this now.
+  say Our brethren to the north have fallen on harsh days
+  say as their clans are being slaughtered by the damned harpies.
+  MPTHROW 1921 1 5
+  break
+  endif
+ endif
+endif
+~
+>give_prog ferocity essence~
+if ispc($n)
+  if class($n) == 7
+    MPECHOAROUND $n Grasping the essence firmly Hengorot crushes it between his mighty fingers.
+    MPECHOAT $n Hengorot sprinkles the resulting dust over your shoulders.
+    say You be big help for friends in fight now $n... go kill!
+    MPPURGE ferocity
+    MPTEACHSKILL $n 365
+    break
+  endif
+endif
+say YOU NOT BARBARIAN...you go now before Gorgar get MAD!
+MPPURGE ferocity
+~
+>speech_prog p ferocity~
+if ispc($n)
+  if class($n) == 7
+    MPECHOAT $n Hengorot frowns thoughtfully at you and grunts...
+    say So $n, you want make friends angry in big fight! Hah!
+    say You get me Highland Clan Chief soul...him know how to fight good!
+    say You go!
+    grunt
+    break
+  endif
+endif
+say Hrm...you not big barbarian...you puny...go now!
+~
+|
+S
+#1922
+berkthgar guildmaster master~
+Berkthgar~
+Berkthgar sits here on a bench drinking ale and shouting at the trainees.
+~
+The guildmaster appears visibally tired from attempting to get his techniques
+through the thick skulls of his guild members. He usually has a warm, jovial
+personality, but when he gets upset all the soldiers in Sorpigal wouldn't be
+enough to make one feel safe around him. Only the already strong are able to
+stay friends with him for very long. Berkthgar has no tolerance for weakness.
+His disheveled hair hangs down to his shoulders in long braided locks and an
+umkempt beard suggests that hygiene and might do not necessarly go hand in hand.
+~
+558914 0 -1
+52691496 4096 0 -1
+500 6 80
+-60 -80 6000d1+0 8d10+70
+0 0
+8 8 1 0 0 0
+C 7
+T 18 18 18 18 18 0
+>greet_prog 15~
+if ispc($n)
+   if level($n) <= 40
+   whisper $n Psst! If you are looking for a little help to the Diamond Isle, visit the Meta-Priest for a shortcut!
+      endif
+    endif
+~
+|
+S
+#1923
+fret falconhand guard guildguard~
+Fret Falconhand~
+A reputable woodsman rests by a tree, scrutinizing your movements.
+~
+A seasoned hunter, known for his feats in tracking the most elusive of
+Sorpigal's miscreants. Fret is dressed simply, wearing not much more than
+some boots, a travelling cloak, and a cap adorned with an eagle's feather.
+Fret loves the forest, but his loyality is to the ranger guild.
+~
+557890 0 -1
+52693544 4096 0 -1
+900 3 80
+-60 -80 6000d1+0 8d10+70
+0 0
+8 8 1 0 0 128
+T 18 18 18 18 18 0
+>speech_prog p lighted path~
+if ispc($n)
+  if class($n) == 11
+   say Greetings noble druid.  It would be my pleasure to teach you of tracking.
+   say However, to finalize your new ability you must also gain knowledge
+   say from a cleric who is at one with the light.
+   say Oh! Make sure you say to him "Fret sent me".
+   break
+  endif
+  say I am sorry, but only a druid may learn the skill I teach.
+  break
+endif
+~
+>speech_prog p teach me please~
+if ispc($n)
+  if class($n) == 11
+   say Greetings noble druid.  It would be my pleasure to teach you of tracking.
+   say However, to finalize your new ability you must also gain knowledge
+   say from a cleric who is at one with the light.
+   say Oh! Make sure you say to him "Fret sent me".
+   break
+  endif
+  say I am sorry, but only a druid may learn the skill I teach.
+  break
+endif
+~
+|
+S
+#1924
+montolio debrouchee master guildmaster~
+Montolio DeBrouchee~
+Montolio DeBrouchee wades here in the pond by his spring.
+~
+   You see an aged man with a surprising degree of youthful wit and vitality.
+It is immediately obvious from his inattentive stare that he is blind.
+However, he has no trouble recognizing your presence.  Montolio supposedly
+discovered this spring and has been here as long as the oldest memories can
+tell.  As the story goes, he was first dismissed as an absurd tree hugger by
+the founders of Sorpigal until he won their good standing by offering them
+access to his spring during a devastating drought.  Montolio knows the ways of
+this forest better than anybody and is willing to teach his skills to those he
+deems worthy.
+~
+557890 0 -1
+52693544 4096 0 -1
+600 1 80
+-60 -80 6000d1+0 8d10+70
+0 0
+8 8 1 0 0 0
+C 9
+>greet_prog 15~
+if ispc($n)
+   if level($n) <= 40
+   whisper $n Psst! If you are looking for a little help to the Diamond Isle, visit the Meta-Priest for a shortcut!
+      endif
+    endif
+~
+>catch_prog 6~
+MPECHOAT $v[throw] The spirit of an ancient ranger smiles kindly down upon you.
+MPECHOAROUND $v[throw] The spirit of an ancient ranger smiles kindly down upon you.
+MPMLOAD 3078
+MPTHROW 3078 1 2 $v[throw]
+~
+>catch_prog 5~
+MPECHOAT $v[throw] The essence shimmers one last time and a glowing figure stands before you.
+MPECHOAROUND $v[throw] The essence shimmers one last time and a glowing figure stands before you.
+MPTHROW 1924 6 1
+~
+>catch_prog 4~
+MPECHOAT $v[throw] Quickly, the essence gains more substance and grows...
+MPTHROW 1924 5 1
+~
+>catch_prog 3~
+MPECHOAT $v[throw] Standing up and quickly moving back, Montolio watches the air intently.
+MPECHOAROUND $v[throw] Standing up and quickly moving back, Montolio watches the air intently.
+MPECHOAT $v[throw] An essence begins to glow and take shape...
+MPECHOAROUND $v[throw] An essence begins to glow and take shape...
+MPTHROW 1924 4 2
+~
+>catch_prog 2~
+MPECHOAT $v[throw] A gentle breeze passes through the room and the shimmering intensifies.
+MPECHOAROUND $v[throw] A gentle breeze passes through the room and the shimmering intensifies.
+MPTHROW 1924 3 2 $v[throw]
+~
+>catch_prog 1~
+MPECHOAT $v[throw] The air near Montolio begins to shimmer.
+MPECHOAROUND $v[throw] The air near Montolio begins to shimmer.
+emote continues to focus, extending his hands and spreading his fingers.
+MPECHOAT $v[throw] Montolio closes his eyes again and focuses intently on the spirit realm.
+MPECHOAROUND $v[throw] Montolio closes his eyes again and focuses intently on the spirit realm.
+MPECHOAT $v[throw] Montolio mumbles something unintelligible.
+MPECHOAROUND $v[throw] Montolio mumbles something unintelligible.
+MPTHROW 1924 2 4 $v[throw]
+~
+>speech_prog p natural selection~
+if ispc($n)
+if class($n) == 9
+if level($n) > 49
+   MPSETTEMP $n natural_sq true
+   if ismobvnuminroom(3078)
+      MPTHROW 3078 1 0 $n
+   else
+      emote closes his eyes and sinks into a trance-like state.
+      emote focuses on the sounds of nature for a moment.
+      mumble
+      MPTHROW 1924 1 3 $n
+   endif
+endif
+endif
+endif
+~
+|
+S
+#1925
+endris guard guildguard~
+Endris the ex-sailor~
+Endris leans against the entryway, eyeing travellers on Sativa Street.
+~
+Upon closer look you notice that this man is much stronger than his small
+physique would betray. A golden sailor's hoop hangs from his right ear,
+adding to an already intimidating countenance. One wouldn't want to cross
+this man unless for a very worthwhile pursuit. Endris takes his duty seriously,
+but nevertheless seems approachable.
+~
+8947522 0 -1
+52691496 4096 0 -1
+0 7 80
+-60 -80 6000d1+0 8d10+70
+0 0
+8 8 1 0 0 0
+C 4
+T 18 18 18 18 18 0
+>catch_prog 4~
+if inroom($i[throw]) == 1942
+ if $i[throw].class == 4
+  if tempvar($n[informed]) == true
+    if tempvar($n[combat_mastery_bludged]) != done
+        #   if weapon = bludgeoning
+        if  isweappri($n) == 6
+        or  isweappri($n) == 7
+        or  isweapsec($n) == 6
+        or  isweapsec($n) == 7
+            MPSETTEMP $v[throw] combat_mastery_bludged questing
+            say As another weapon, I see ye have chosen some kind
+            say o'club... Warriors o'the future ridin' a sea o'stars
+            say collect others for their society.  Should ye wander
+            say into their path, resistance would be futile.  Among
+            say 'em all, one alone has a name.  Bring me his weapon,
+            say and try not t'get smacked wi'it in the process.
+            break
+        endif
+    endif
+  endif
+ endif
+endif
+~
+>catch_prog 3~
+if inroom($i[throw]) == 1942
+ if $i[throw].class == 4
+  if tempvar($n[informed]) == true
+    if tempvar($n[combat_mastery_stung]) != done
+        #   if weapon = stinging
+        if  isweappri($n) == 8
+        or  isweappri($n) == 9
+        or  isweapsec($n) == 8
+        or  isweapsec($n) == 9
+            MPSETTEMP $v[throw] combat_mastery_stung questing
+            say As another weapon, I see ye have chosen some kind
+            say o'stinger... A ghoul that has long been valued
+            say for its talons should prove t'be a worthy test.
+            say The chilling sting of its claws is formidable,
+            say so do not underestimate its power when used
+            say against ye.  The talons you'll be lookin'
+            say for will be larger, sharper, an'drippin'a
+            say brighter green than you usually see bleedin'
+            say from a ghoul.  Bring the talons back t'me.
+            break
+        endif
+    endif
+    if tempvar($n[combat_mastery_bludged]) != done
+        #   if weapon = bludgeoning
+        if  isweappri($n) == 6
+        or  isweappri($n) == 7
+        or  isweapsec($n) == 6
+        or  isweapsec($n) == 7
+            MPSETTEMP $v[throw] combat_mastery_bludged questing
+            say As another weapon, I see ye have chosen some kind
+            say o'club... Warriors o'the future ridin' a sea o'stars
+            say collect others for their society.  Should ye wander
+            say into their path, resistance would be futile.  Among
+            say 'em all, one alone has a name.  Bring me his weapon,
+            say and try not t'get smacked wi'it in the process.
+            break
+        endif
+    endif
+  endif
+ endif
+endif
+~
+>catch_prog 2~
+if inroom($i[throw]) == 1942
+ if $i[throw].class == 4
+  if tempvar($n[informed]) == true
+    if tempvar($n[combat_mastery_crushed]) != done
+        #   if weapon = crushing
+        if  isweappri($n) == 4
+        or  isweappri($n) == 5
+        or  isweapsec($n) == 4
+        or  isweapsec($n) == 5
+            MPSETTEMP $v[throw] combat_mastery_crushed questing
+            say As another weapon, I see ye have chosen...
+            say What the hell kind o'weapon is that!?
+            say I would hate for that t'fall on me, it would
+            say surely crush me.  Priests o'the Crimson Order
+            say are almost as zealous w'their flail as they
+            say are in their devotion t'the order.
+            say One among 'em all will have a special flail
+            say for ya.  Bring the special flail back t'me.
+            break
+        endif
+    endif
+    if tempvar($n[combat_mastery_stung]) != done
+        #   if weapon = stinging
+        if  isweappri($n) == 8
+        or  isweappri($n) == 9
+        or  isweapsec($n) == 8
+        or  isweapsec($n) == 9
+            MPSETTEMP $v[throw] combat_mastery_stung questing
+            say As another weapon, I see ye have chosen some kind
+            say o'stinger... A ghoul that has long been valued
+            say for its talons should prove t'be a worthy test.
+            say The chilling sting of its claws is formidable,
+            say so do not underestimate its power when used
+            say against ye.  The talons you'll be lookin'
+            say for will be larger, sharper, an'drippin'a
+            say brighter green than you usually see bleedin'
+            say from a ghoul.  Bring the talons back t'me.
+            break
+        endif
+    endif
+    if tempvar($n[combat_mastery_bludged]) != done
+        #   if weapon = bludgeoning
+        if  isweappri($n) == 6
+        or  isweappri($n) == 7
+        or  isweapsec($n) == 6
+        or  isweapsec($n) == 7
+            MPSETTEMP $v[throw] combat_mastery_bludged questing
+            say As another weapon, I see ye have chosen some kind
+            say o'club... Warriors o'the future ridin' a sea o'stars
+            say collect others for their society.  Should ye wander
+            say into their path, resistance would be futile.  Among
+            say 'em all, one alone has a name.  Bring me his weapon,
+            say and try not t'get smacked wi'it in the process.
+            break
+        endif
+    endif
+  endif
+ endif
+endif
+~
+>give_prog all~
+MPJUNK all
+thank $n
+~
+>give_prog phaser type-I startrek~
+emote carefully inspects the phaser.
+MPJUNK phaser
+if tempvar($n[combat_mastery_bludged]) == questing
+    say This looks like a poorly crafted ferengi phasor.
+    say Now go back and get a real phaser.
+    say Don't forget the clue I gave you before.
+  else
+    thank $n
+endif
+~
+>give_prog phaser type-I startrek quest~
+emote carefully inspects the phaser.
+MPJUNK quest
+if tempvar($n[combat_mastery_bludged]) == questing
+    MPSETTEMP $n combat_mastery_bludged done PC done with me for this part
+    MPSETTEMP $n combat_mastery_bludgeon worthy PC ready for Hydel
+    say Ahh, well done.
+    MPOLOAD 3023
+    say Wield this or any bludgeoning weapon
+    say so he can see ye are ready,
+give club $n
+    drop club
+    say and go tell Hydel you are worthy.
+    say He'll be expectin'ya.
+  else
+    thank $n
+endif
+~
+>give_prog talons ghoul~
+emote carefully inspects the ghoul's talons.
+MPJUNK zamar
+if tempvar($n[combat_mastery_stung]) == questing
+    say These talons are old and heavily worn.
+    say Now go back and get a proper fresh set.
+  else
+    thank $n
+endif
+~
+>give_prog talons ghoul quest~
+emote carefully inspects the ghoul's talons.
+MPJUNK quest
+if tempvar($n[combat_mastery_stung]) == questing
+    MPSETTEMP $n combat_mastery_stung done PC done with me for this part
+    MPSETTEMP $n combat_mastery_sting worthy PC ready for Hydel
+    say Ahh, well done.
+    MPOLOAD 19414
+    say Wield this or any stinging weapon
+    say so he can see ye are ready,
+give sting $n
+    drop sting
+    say and go tell Hydel you are worthy.
+    say He'll be expectin'ya.
+  else
+    thank $n
+endif
+~
+>give_prog flail fire zamar~
+emote carefully inspects the flail.
+MPJUNK zamar
+if tempvar($n[combat_mastery_crushed]) == questing
+    say This piece is a poorly crafted counterfeit.
+    say Now go back and get the right one.
+  else
+    thank $n
+endif
+~
+>give_prog flail fire zamar quest~
+emote carefully inspects the flail.
+MPJUNK quest
+if tempvar($n[combat_mastery_crushed]) == questing
+    MPSETTEMP $n combat_mastery_crushed done PC done with me for this part
+    MPSETTEMP $n combat_mastery_crush worthy PC ready for Hydel
+    say Ahh, well done.
+    MPOLOAD  3026
+    say Wield this mace or any crushing
+    say weapon so he can see ye are ready,
+give mace $n
+    drop mace
+    say and go tell Hydel you are worthy.
+    say He'll be expectin'ya.
+  else
+    thank $n
+endif
+~
+>give_prog blade torture nethrol~
+emote carefully inspects the shiny blade.
+MPJUNK blade
+if tempvar($n[combat_mastery_whipped]) == questing
+    say Ahh, well done.
+    say Now go back and get the whippy one.
+  else
+    thank $n
+endif
+~
+>give_prog blade torture nethrol rubber quest~
+emote carefully inspects the rubbery blade.
+MPJUNK quest
+if tempvar($n[combat_mastery_whipped]) == questing
+    MPSETTEMP $n combat_mastery_whipped done PC done with me for this part
+    MPSETTEMP $n combat_mastery_whip worthy PC ready for Hydel
+    say Ahh, well done.
+    MPOLOAD 3021
+    say Wield this or any whip so he can see ye are ready,
+give whip $n
+    drop whip
+    say and go tell Hydel ye be worthy. He'll be expectin'ya.
+  else
+    thank $n
+endif
+~
+>greet_prog 100~
+MPTHROW 1925 1 1 $n Check if weapon wielded is a valid one
+~
+>act_prog wields~
+MPTHROW 1925 1 1 $n Check if weapon wielded is a valid one
+~
+>catch_prog 1~
+if inroom($i[throw]) == 1942
+ if $i[throw].class == 4
+  if tempvar($n[informed]) == true
+   if tempvar($n[combat_mastery_whipped]) != done
+        #   if weapon = whipping
+        if  isweappri($n) == 0
+        or  isweappri($n) == 1
+        or  isweapsec($n) == 0
+        or  isweapsec($n) == 1
+            MPSETTEMP $v[throw] combat_mastery_whipped questing
+            say I see ye have chosen some kind o'whip...
+            say Seek out a dungeonmaster who works under a pyramid.
+            say He often employs a blade t'inflict punishment on his
+            say prisoners.  The blade sometimes acts like a whip.
+            say Bring the whippy blade back t'me.
+            MPTHROW 1925 2 2 $v[throw] Check if another weapon is wielded
+            break
+        endif
+  endif
+  if tempvar($n[combat_mastery_crushed]) != done
+        #   if weapon = crushing
+        if  isweappri($n) == 4
+        or  isweappri($n) == 5
+        or  isweapsec($n) == 4
+        or  isweapsec($n) == 5
+            MPSETTEMP $v[throw] combat_mastery_crushed questing
+            say I see ye have chosen...
+            say What the hell kind o'weapon is that!?
+            say I would hate for that t'fall on me, it would
+            say surely crush me.  Priests o'the Crimson Order
+            say are almost as zealous w'their flail as they
+            say are in their devotion t'the order.
+            say One among 'em all will have a special flail
+            say for ya.  Bring the special flail back t'me.
+            MPTHROW 1925 3 2 $v[throw] Check if another weapon is wielded
+            break
+        endif
+  endif
+  if tempvar($n[combat_mastery_stung]) != done
+        #   if weapon = stinging
+        if  isweappri($n) == 8
+        or  isweappri($n) == 9
+        or  isweapsec($n) == 8
+        or  isweapsec($n) == 9
+            MPSETTEMP $v[throw] combat_mastery_stung questing
+            say I see ye have chosen some kind o'stinger...
+            say A ghoul that has long been valued for its
+            say talons should prove t'be a worthy test.
+            say The chilling sting of its claws is formidable,
+            say so do not underestimate its power when used
+            say against ye.  The talons you'll be lookin'
+            say for will be larger, sharper, an'drippin'a
+            say brighter green than you usually see bleedin'
+            say from a ghoul.  Bring the talons back t'me.
+            MPTHROW 1925 4 2 $v[throw] Check if another weapon is wielded
+            break
+        endif
+  endif
+  if tempvar($n[combat_mastery_bludged]) != done
+        #   if weapon = bludgeoning
+        if  isweappri($n) == 6
+        or  isweappri($n) == 7
+        or  isweapsec($n) == 6
+        or  isweapsec($n) == 7
+            MPSETTEMP $v[throw] combat_mastery_bludged questing
+            say I see ye have chosen some kind o'club...
+            say Warriors o'the future ridin' a sea o'stars collect
+            say others for their society.  Should ye wander into
+            say their path, resistance would be futile.  Among 'em
+            say all, one alone has a name.  Bring me his weapon,
+            say and try not t'get smacked wi'it in the process.
+            break
+        endif
+   endif
+  endif
+ endif
+endif
+~
+>speech_prog worthiness worthy~
+if ispc($n)
+  if $n.class == 4
+    if tempvar($n[worthy]) == true
+      say In order t'become a master in combat, ye will
+      say need t'be skilled in the use o'weapons which crush,
+      say sting, whip, and bludgeon.  Now wield a weapon
+      say the likes o'one o'those thar.  Ye'll need t'impress
+      say your opponent wi'it, who will be expectin' ye.
+      MPSETTEMP $n informed true It means I have told this guy all this stuff.
+        if tempvar($n[combat_mastery_whipped]) == questing
+        or tempvar($n[combat_mastery_whipped]) == done
+    # do nothing quester has already gotten this clue.
+          else
+            MPSETTEMP $n combat_mastery_whipped NOT_DONE This just needs to be initialized.
+        endif
+        if tempvar($n[combat_mastery_crushed]) == questing
+        or tempvar($n[combat_mastery_crushed]) == done
+    # do nothing quester has already gotten this clue.
+          else
+            MPSETTEMP $n combat_mastery_crushed NOT_DONE This just needs to be initialized.
+        endif
+        if tempvar($n[combat_mastery_stung]) == questing
+        or tempvar($n[combat_mastery_stung]) == done
+    # do nothing quester has already gotten this clue.
+          else
+            MPSETTEMP $n combat_mastery_stung NOT_DONE This just needs to be initialized.
+        endif
+        if tempvar($n[combat_mastery_bludged]) == questing
+        or tempvar($n[combat_mastery_bludged]) == done
+    # do nothing quester has already gotten this clue.
+          else
+            MPSETTEMP $n combat_mastery_bludged NOT_DONE This just needs to be initialized.
+        endif
+        MPTHROW 1925 1 2 $n Check if weapon is wielded in a moment
+break
+    else
+      if tempvar($n[worthy]) == maybe
+        MPSETTEMP $n worthy true This will result in a one time only message
+        say So ye think ye are worthy o'the Arts o'Combat, so
+        say much so, that ye might one day be a master?
+        MPPAUSE 1
+        hmm
+        MPPAUSE 1
+        say Ye'll need t'prove it by being skilled in the use
+        say o'weapons which crush, sting, whip, and bludgeon.
+        say Now wield a weapon the likes o'one o'those thar.
+        say Ye'll need t'impress your opponent wi'it, who will be expectin' ye.
+        MPSETTEMP $n informed true It means I have told this guy all this stuff.
+        if tempvar($n[combat_mastery_whipped]) == questing
+        or tempvar($n[combat_mastery_whipped]) == done
+    # do nothing quester has already gotten this clue.
+          else
+            MPSETTEMP $n combat_mastery_whipped NOT_DONE This just needs to be initialized.
+        endif
+        if tempvar($n[combat_mastery_crushed]) == questing
+        or tempvar($n[combat_mastery_crushed]) == done
+    # do nothing quester has already gotten this clue.
+          else
+            MPSETTEMP $n combat_mastery_crushed NOT_DONE This just needs to be initialized.
+        endif
+        if tempvar($n[combat_mastery_stung]) == questing
+        or tempvar($n[combat_mastery_stung]) == done
+    # do nothing quester has already gotten this clue.
+          else
+            MPSETTEMP $n combat_mastery_stung NOT_DONE This just needs to be initialized.
+        endif
+        if tempvar($n[combat_mastery_bludged]) == questing
+        or tempvar($n[combat_mastery_bludged]) == done
+    # do nothing quester has already gotten this clue.
+          else
+            MPSETTEMP $n combat_mastery_bludged NOT_DONE This just needs to be initialized.
+        endif
+        MPTHROW 1925 1 2 $n Check if weapon is wielded in a moment
+      endif
+    endif
+  endif
+endif
+~
+>speech_prog p prove my worth~
+if ispc($n)
+  if $n.class == 4
+    if tempvar($n[worthy]) == true
+      say In order t'become a master in combat, ye will
+      say need t'be skilled in the use o'weapons which crush,
+      say sting, whip, and bludgeon.  Now wield a weapon
+      say the likes o'one o'those thar.  Ye'll need t'impress
+      say your opponent wi'it, who will be expectin' ye.
+      MPSETTEMP $n informed true It means I have told this guy all this stuff.
+        if tempvar($n[combat_mastery_whipped]) == questing
+        or tempvar($n[combat_mastery_whipped]) == done
+            # do nothing quester has already gotten this clue.
+          else
+            MPSETTEMP $n combat_mastery_whipped NOT_DONE This just needs to be initialized.
+        endif
+        if tempvar($n[combat_mastery_crushed]) == questing
+        or tempvar($n[combat_mastery_crushed]) == done
+            # do nothing quester has already gotten this clue.
+          else
+            MPSETTEMP $n combat_mastery_crushed NOT_DONE This just needs to be initialized.
+        endif
+        if tempvar($n[combat_mastery_stung]) == questing
+        or tempvar($n[combat_mastery_stung]) == done
+            # do nothing quester has already gotten this clue.
+          else
+            MPSETTEMP $n combat_mastery_stung NOT_DONE This just needs to be initialized.
+        endif
+        if tempvar($n[combat_mastery_bludged]) == questing
+        or tempvar($n[combat_mastery_bludged]) == done
+            # do nothing quester has already gotten this clue.
+          else
+            MPSETTEMP $n combat_mastery_bludged NOT_DONE This just needs to be initialized.
+        endif
+        MPTHROW 1925 1 2 $n Check if weapon is wielded in a moment
+break
+    else
+      if tempvar($n[worthy]) == maybe
+        MPSETTEMP $n worthy true This will result in a one time only message
+        say So ye think ye are worthy o'the Arts o'Combat, so
+        say much so, that ye might one day be a master?
+        MPPAUSE 1
+        hmm
+        MPPAUSE 1
+        say Ye'll need t'prove it by being skilled in the use
+        say o'weapons which crush, sting, whip, and bludgeon.
+        say Now wield a weapon the likes o'one o'those thar.
+        say Ye'll need t'impress your opponent wi'it, who will be expectin' ye.
+        MPSETTEMP $n informed true It means I have told this guy all this stuff.
+        if tempvar($n[combat_mastery_whipped]) == questing
+        or tempvar($n[combat_mastery_whipped]) == done
+            # do nothing quester has already gotten this clue.
+          else
+            MPSETTEMP $n combat_mastery_whipped NOT_DONE This just needs to be initialized.
+        endif
+        if tempvar($n[combat_mastery_crushed]) == questing
+        or tempvar($n[combat_mastery_crushed]) == done
+            # do nothing quester has already gotten this clue.
+          else
+            MPSETTEMP $n combat_mastery_crushed NOT_DONE This just needs to be initialized.
+        endif
+        if tempvar($n[combat_mastery_stung]) == questing
+        or tempvar($n[combat_mastery_stung]) == done
+            # do nothing quester has already gotten this clue.
+          else
+            MPSETTEMP $n combat_mastery_stung NOT_DONE This just needs to be initialized.
+        endif
+        if tempvar($n[combat_mastery_bludged]) == questing
+        or tempvar($n[combat_mastery_bludged]) == done
+            # do nothing quester has already gotten this clue.
+          else
+            MPSETTEMP $n combat_mastery_bludged NOT_DONE This just needs to be initialized.
+        endif
+        MPTHROW 1925 1 2 $n Check if weapon is wielded in a moment
+      endif
+    endif
+  endif
+endif
+~
+>give_prog essence tactics~
+if ispc($n)
+  if class($n) == 4
+    MPECHOAT $n Grasping it firmly, Endris presses the essence forcefully against your chest.
+    MPECHOAT $n The essence slowly dissapates into your body.
+    say Aye laddy! NOW ye be ready to fight as a true commander.
+    MPPURGE tactics
+    MPTEACHSKILL $n 366
+    break
+  endif
+endif
+say Hah! Ye seek to deceive a true warrior? Begone peon.
+MPPURGE tactics
+~
+>speech_prog p tactics~
+if ispc($n)
+  if class($n) == 4
+    MPECHOAT $n Endris looks you up and down as he takes stock of your qualifications.
+    frown
+    say Aye $n, I s'pose ye be ready to learn o'the commandin' of troops.
+    say A filthy ork leader lays seige to the town o'Silverdale, slay it and bring me its essence.
+    break
+  endif
+endif
+say Yar! Ye be no warrior, begone from this place o' the true fighter.
+~
+|
+S
+#1926
+Hydel Ampratines master guildmaster~
+Hydel~
+Hydel Ampratines devotes all his energies to instructing his trainees.
+~
+Hydel maintains a delicate ballance between puissance and perspicacity: a body
+honed to physical perfection and a discretion that never fails. He has given
+lessons to many renowned fighters the world over. Legend has it he once even
+instructed the sons of Gaiot. These days Hydel is devoted not so much to
+devising new battle skills as he is to working with guild members in hopes that
+some day he will find a suitable heir to whom he can hand down his massive
+stock of combat knowledge.
+~
+558914 0 -1
+52691496 4096 0 -1
+0 2 80
+-60 -80 6000d1+0 8d10+70
+0 0
+8 8 1 0 0 264
+C 4
+T 18 18 18 18 18 0
+>catch_prog 4~
+if inroom($n) == 1945
+  MPECHOAT $n $I shows you a thing or two you did not know about your other weapon.
+  if sex($n) == 2
+    MPECHOAROUND $n $I shows $N a thing or two she did not know about her other weapon.
+   else
+    MPECHOAROUND $n $I shows $N a thing or two he did not know about his other weapon.
+  endif
+ else
+  MPAT $n MPECHOAT $n You feel a bit dizzy as you have a strange vision...
+  MPAT $n MPECHOAT $n In your vision, $I shows you a thing or two you did not know about your other weapon.
+endif
+MPTHROW 1926 5 1 $n Throw to myself with delay of one second
+~
+>catch_prog 2~
+#   if weapon = whipping
+if  isweappri($n) == 0
+or  isweappri($n) == 1
+or  isweapsec($n) == 0
+or  isweapsec($n) == 1
+  if tempvar($n[combat_mastery_whip]) == worthy
+    MPSETTEMP $n combat_mastery_whip true if all four types = true, player will learn
+    MPTHROW 1926 4 0 $n Throw to myself with no delay
+    break
+  endif
+endif
+look $n
+#   if weapon = crushing
+if  isweappri($n) == 4
+or  isweappri($n) == 5
+or  isweapsec($n) == 4
+or  isweapsec($n) == 5
+  if tempvar($n[combat_mastery_crush]) == worthy
+    MPSETTEMP $n combat_mastery_crush true if all four types = true, player will learn
+    MPTHROW 1926 4 0 $n Throw to myself with no delay
+    break
+  endif
+endif
+look $n
+#   if weapon = stinging
+if  isweappri($n) == 8
+or  isweappri($n) == 9
+or  isweapsec($n) == 8
+or  isweapsec($n) == 9
+  if tempvar($n[combat_mastery_sting]) == worthy
+    MPSETTEMP $n combat_mastery_sting true if all four types = true, player will learn
+    MPTHROW 1926 4 0 $n Throw to myself with no delay
+    break
+  endif
+endif
+look $n
+#   if weapon = bludgeoning
+if  isweappri($n) == 6
+or  isweappri($n) == 7
+or  isweapsec($n) == 6
+or  isweapsec($n) == 7
+  if tempvar($n[combat_mastery_bludgeon]) == worthy
+    MPSETTEMP $n combat_mastery_bludgeon true if all four types = true, player will learn
+    MPTHROW 1926 4 0 $n Throw to myself with no delay
+    break
+  endif
+endif
+MPTHROW 1926 5 0 $n Throw to myself with no delay
+~
+>greet_prog 100~
+if ispc($n)
+   if level($n) <= 40
+       if rand(20)
+          whisper $n Psst! If you are looking for a little help to the Diamond Isle, visit the Meta-Priest for a shortcut!
+          endif
+      endif
+    endif
+if carries($i) keep 1958
+  if tempvar($n[ready4diploma]) == true
+    give combat-mastery $n
+    MPSETTEMP $n ready4diploma complete PC has completed the quest
+    MPTEACHSKILL $n 386
+    if carries($n) keep 1958
+      emote turns away as he ponders the worth of a few of your fellow warriors.
+     else
+      drop combat-mastery
+      say I can't give you your diploma, you are carrying too much stuff or something.  So I dropped it.  Don't forget to take it with you.
+    endif
+  endif
+endif
+~
+>catch_prog 3~
+emote takes a seat and begins scribing something on a roll of parchment.
+MPOLOAD 1958
+~
+>catch_prog 5~
+if tempvar($n[combat_mastery_whip]) == true
+  if tempvar($n[combat_mastery_crush]) == true
+    if tempvar($n[combat_mastery_sting]) == true
+      if tempvar($n[combat_mastery_bludgeon]) == true
+        if $n.class  == 4
+          if ispc($n)
+          MPSETTEMP $n ready4diploma true mortal will get diploma on next entry
+          MPTHROW 1926 3 1 self
+            if inroom($n) == 1945
+              MPAT $n say Come back in a bit for your diploma... I have to prepare it first.
+                else
+              MPAT $n MPECHOAT $n $I says, 'Come back in a bit for your diploma... I have to prepare it first.'
+            endif
+          endif
+        endif
+      endif
+    endif
+  endif
+endif
+~
+>catch_prog 1~
+nod
+if inroom($n) == 1945
+  MPECHOAT $n $I shows you a thing or two you did not know about your weapon.
+  if sex($n) == 2
+    MPECHOAROUND $n $I shows $N a thing or two she did not know about her weapon.
+   else
+    MPECHOAROUND $n $I shows $N a thing or two he did not know about his weapon.
+  endif
+ else
+  MPAT $n MPECHOAT $n You feel a bit dizzy as you have a strange vision...
+  MPAT $n MPECHOAT $n In your vision, $I shows you a thing or two you did not know about your weapon.
+endif
+MPTHROW 1926 2 1 $n Throw to myself with delay of one second
+~
+>speech_prog p I am worthy~
+look $n
+#   if weapon = whipping
+if  isweappri($n) == 0
+or  isweappri($n) == 1
+or  isweapsec($n) == 0
+or  isweapsec($n) == 1
+  if tempvar($n[combat_mastery_whip]) == worthy
+    MPSETTEMP $n combat_mastery_whip true if all four types = true, player will learn
+    MPTHROW 1926 1 1 $n Throw to myself with delay of one second
+    break
+  endif
+endif
+look $n
+#   if weapon = crushing
+if  isweappri($n) == 4
+or  isweappri($n) == 5
+or  isweapsec($n) == 4
+or  isweapsec($n) == 5
+  if tempvar($n[combat_mastery_crush]) == worthy
+    MPSETTEMP $n combat_mastery_crush true if all four types = true, player will learn
+    MPTHROW 1926 1 1 $n Throw to myself with delay of one second
+    break
+  endif
+endif
+look $n
+#   if weapon = stinging
+if  isweappri($n) == 8
+or  isweappri($n) == 9
+or  isweapsec($n) == 8
+or  isweapsec($n) == 9
+  if tempvar($n[combat_mastery_sting]) == worthy
+    MPSETTEMP $n combat_mastery_sting true if all four types = true, player will learn
+    MPTHROW 1926 1 1 $n Throw to myself with delay of one second
+    break
+  endif
+endif
+look $n
+#   if weapon = bludgeoning
+if  isweappri($n) == 6
+or  isweappri($n) == 7
+or  isweapsec($n) == 6
+or  isweapsec($n) == 7
+  if tempvar($n[combat_mastery_bludgeon]) == worthy
+    MPSETTEMP $n combat_mastery_bludgeon true if all four types = true, player will learn
+    MPTHROW 1926 1 1 $n Throw to myself with delay of one second
+    break
+  endif
+endif
+~
+|
+S
+#1927
+skiv guard guildguard~
+Skiv~
+Skiv moves around his shack with surreptitious efficiency.
+~
+The proprietor of this infamous establishment is a man of no small reputation
+himself. Known for his cruel, dry wit and impressive slight-of-the-hand
+tricks, Skiv demands an unspoken respect and somehow manages to gain it from
+those you would least expect to be respectful. He is not a traditonally
+acknowledged individual among Sorpigal's higher ups, but he has enough
+connections--through his customers here and from other various 'services'
+he provides--that he can pull the right strings and cause quite a disturbance
+in the city should it be his will. For the most part he wanders around dressed
+in beggar's clothes and occasionally converses with customers in suppressed
+whispers. Skiv seems to have an especial concern with noting who passes
+through a doorway in the back of the shack.
+~
+8683842 0 -1
+1126957608 4096 0 -1
+0 1 80
+-60 -80 6000d1+0 8d10+70
+0 0
+8 8 1 0 0 0
+>catch_prog 1~
+MPECHO $I looks around suspiciously.
+say Seek the essence of deceit from the shadow guardians and I will further your studies.
+say Beware though, those pesky mages don't like our kind lurking about their property.
+~
+>give_prog deceit essence~
+if ispc($n)
+  if class($n) == 3
+    MPECHO The master thief wrings his hands in glee at the sight of the essence.
+    say Excellent work friend! I suppose honor among thieves dictates I keep my word.
+    MPECHOAT $n The skilled rogue takes some time to further your studies...
+    MPPURGE deceit
+    MPTEACHSKILL $n 367
+    break
+  endif
+endif
+say Ahh, many thanks...unfortunately you are not a guild member so I cannot help you.
+pat $n
+MPPURGE deceit
+~
+>speech_prog deceit~
+if ispc($n)
+  if class($n) == 3
+    MPECHOAT $n The shady thief squints at you closely.
+    whisper $n Ahh effendi, you wish to further your studies of the rogue arts?
+    whisper $n A clever footpad is both stealthy and deceitful...
+    MPTHROW 1927 1 4
+    break
+  endif
+endif
+say Ahh my friend, you are not a guild member I am afraid.
+~
+|
+S
+#1928
+janikhel inzha xungia guildmaster master~
+Janikhel~
+Janikhel Inzha'Xungia languishes here in a seat of pillows.
+~
+Janikhel is a rather corpulent man of Arabian descent. He appears to have
+no physical skills of merit, and if it weren't for his illustrious title
+most would have no idea how he came to a position of such power. His real
+name is actually known to few--the name Janikhel itself might even be
+made up. The Prince of Lies is how he is referred to by most. A razor
+sharp wit, cunning intuition, and the ability to manipulate others with
+his silver-tongued words is what have made him one of the most influential
+men in Sorpigal. Janikhel has an intricate network of associates and
+informants. Nothing goes down in this city without his first knowing about
+it--and likely interfering in it for his own benefit. His slothful image
+is a deception to most, for not only can the guild master outsmart some of
+the best mages around, but he can also outmaneuver the quickest rogues
+in his guild.
+~
+295234 0 -1
+1126957608 4096 0 -1
+0 1 80
+-60 -80 6000d1+0 8d10+70
+0 0
+8 8 1 0 0 0
+C 3
+>give_prog wine bottle horny component~
+* Object Vnum 7013 *
+say This wine isn't for me! It's for Llewellyn.
+MPJUNK all
+MPOLOAD 7013
+give wine $n
+~
+>catch_prog 3~
+rofl
+say HaHa! That bitch never shoulda turned down my proposal!
+say Now that ass is mine...
+MPPAUSE 1
+say Well, good job kid. As promised here's your reward.
+MPTEACHSKILL $n 389
+~
+>all_greet_prog 100~
+if ispc($n)
+    if tempvar($n[llewellyn]) == horny
+        MPSETTEMP $n llewellyn false
+        MPTHROW 1928 3 0
+        else
+        if level($n) <= 40
+            if rand(20)
+                whisper $n Psst! If you are looking for a little help to the Diamond Isle, visit the Meta-Priest for a shortcut!
+                 endif
+             endif
+         endif
+     endif
+~
+>catch_prog 2~
+say Oh you actually got it?
+say I would have thought that money I owed him would have been a problem.
+chuckle
+say Well, okay one last thing and we will be square.
+emote produces an old looking wine bottle.
+emote fills the bottle with "wine" from the waterskin and then corks the bottle.
+MPJUNK all
+MPOLOAD 7010
+MPOLOAD 7012
+give note $n
+give bottle $n
+MPPAUSE 1
+say Seek out Kayilah of the dark ones and give her this note.
+say Provide her with whatever she asks for in return for her services.
+say When she has worked her magic, give this gift to Llewellyn.
+grin
+say Return here when you're done and I will fulfil our bargain.
+~
+>give_prog component black water waterskin~
+* Object Vnum 7011 *
+MPTHROW 1928 2 0
+~
+>catch_prog 1~
+say Hold it right there.
+emote glances around and then scribbles a quick note on a piece of parchment.
+MPJUNK all
+MPOLOAD 7009
+give note $n
+MPPAUSE 2
+* Mob Vnum 17225 *
+whisper $n Take that to a weasley little man who trades in trinkets.
+whisper $n He's in a tent near a bazaar.
+~
+>speech_prog p cripple~
+if ispc($n)
+    if class($n) == 3
+        if $n.level > 49
+            MPSETTEMP $n thief_sq true
+            MPTHROW 1928 1 0
+            endif
+        else
+        say I only help fellow rogues my friend...you'd best be leaving now.
+        endif
+   endif
+~
+|
+S
+#1929
+llewellyn clergywoman guard guildguard~
+Llewellyn the young cleric~
+A shimmering light of energy radiates pure energy.
+~
+Llewellyn is an astutely dressed young lady. She has a wit and charm unmatched
+by any of her age. Nevertheless, she is devoted to the unfortunate and has
+taken up this position voluntarily, out of true kindness. The gods have chosen
+to reward her for her sacrifices by imbuing her with a strength and resiliency
+that most take years to acquire. Despite her age, Llewellyn is a very formidable
+opponent.
+~
+33090 0 -1
+52691496 4096 0 -1
+0 2 80
+-60 -80 6000d1+0 8d10+70
+0 0
+8 8 2 0 0 264
+C 2
+T 18 18 18 18 18 0
+>catch_prog 5~
+shout Janikhel! Where you at, you sexy beast? I need your lovin NOW!
+~
+>catch_prog 4~
+say I feel kind of funny...
+MPTHROW 1929 5 2 $v[throw]
+~
+>catch_prog 3~
+say I don't know what's come over me...
+blush
+MPTHROW 1929 4 2 $v[throw]
+~
+>catch_prog 2~
+hiccup
+MPTHROW 1929 3 2 $v[throw]
+~
+>catch_prog 1~
+say He knows how I love my wine!
+drink bottle
+drink bottle
+MPTHROW 1929 2 2 $v[throw]
+~
+>give_prog wine bottle horny component~
+MPJUNK all
+MPSETTEMP $n llewellyn horny
+say Ohh this must be from my little Janky!
+MPTHROW 1929 1 2 $n
+~
+|
+S
+#1930
+drawan corindon master guildmaster~
+Drawan Corindon~
+Drawan Corindon sits here, eyes fixed on a scroll of indecipherable symbols.
+~
+This aged gnome has survived ten times as many battles as one of the most
+emminent adventurers will in their entire lifetime. He stands tall for his
+race, approaching four and a half feet, and the spritelyness of his movements,
+combined with the passion he exudes in his study, indicate that a powerful
+youth-retaining magic might be in effect. For one of such high stature, his
+clerical regalia is surprisingly modest. Two imposing talismans--one black
+with the face of a demon and one red with the shape of a flower--overlay plain
+white robes. Drawan's finger plays out a Sisyphean drama with his spectacles,
+continualy pushing them back up his nose after which they inevitablly creep
+their way back down to the point of almost falling off.
+~
+33090 0 -1
+52691496 4096 0 -1
+0 7 80
+-60 -80 6000d1+0 8d10+70
+0 0
+8 8 1 0 0 0
+C 2
+T 18 18 18 18 18 0
+>greet_prog 15~
+if ispc($n)
+   if level($n) <= 40
+       whisper $n Psst! If you are looking for a little help to the Diamond Isle, visit the Meta-Priest for a shortcut!
+       endif
+    endif
+~
+>catch_prog 4~
+if cansee($n)
+  MPECHO From his pocket Drawan produces A small amulet.
+  MPJUNK all
+  MPOLOAD 7025
+  give amulet 0.$n
+  say Take this to the high priestess, Shayalla.
+  say She can instruct you further in this matter.
+  MPECHO Drawan returns to his desk and opens his book.
+endif
+~
+>catch_prog 3~
+if cansee($n)
+  MPECHO Drawan's face lights up with a warm smile.
+  say As I'm sure you must know, one can never be too sure in a world such as ours.
+  say Were your request not genuine, that vibration would have stopped your heart from beating.
+  MPTHROW 1930 4 3 $n
+endif
+~
+>catch_prog 2~
+if cansee($n)
+  MPECHOAT 0.$n You feel a strange vibration begin rippling inward, from the point of contact.
+  MPECHOAT 0.$n Quickly you find yourself filled with a feeling of great relaxition as your body begins to harmonize with the vibration.
+  MPECHOAROUND 0.$n $n starts vibrating strangely.
+  MPTHROW 1930 3 3 $n
+endif
+~
+>catch_prog 1~
+if ispc($n)
+  if level($n) >= 50
+    if class($n) == 2
+      if cansee($n)
+MPSETTEMP 0.$n divinequest true
+        MPECHOAT 0.$n Drawan closes his book and stands to look you in the eyes.
+        MPECHOAT 0.$n Without breaking eye contact, Drawan raises his hand and gently touches your forehead.
+        MPECHOAROUND 0.$n Drawan closes his book and stands to look $n in the eyes.
+        MPECHOAROUND 0.$n Without breaking eye contact, Drawan raises his hand and gently touches $n's forehead.
+        MPTHROW 1930 2 3 $n
+      else
+        say If you want to learn Divine Intervention, you must show yourself to me.
+      endif
+    else
+      say Only a cleric can learn Divine Intervention.
+    endif
+  else
+    say You must be level 50 or greater to learn Divine Intervention.
+  endif
+else
+  say A mob cannot learn Divine Intervention.
+endif
+~
+|
+S
+#1931
+yokuri guard guildguard~
+Yokuri, the modest monk~
+Yokuri stands outside the front door admiring the landscape and yourself.
+~
+Yokuri wears a faded brown robe, with its hood pulled back to reveal a youthful
+and very handsome face. A beautifully cut, thin nose protrudes from underneath
+a warm and welcoming set of eyes. You are taken aback in perplexity as to why
+such a good looking man would resign himself to the ascetic existence of a
+monastic lifestyle. His order does not permit him to speak outside of the
+ordered boundries of ritual. Yokuri has therefore learned to express himself
+by means of a highly nuanced and practically artistic set of complex facial
+expressions. Being in his presence gives you a curious sense of protection.
+~
+296770 0 -1
+1126433320 4096 0 -1
+0 6 80
+-60 -80 6000d1+0 8d10+70
+0 0
+8 8 1 0 0 0
+C 8
+T 18 18 18 18 18 0
+>act_prog p has entered a mountaintop portal.~
+MPECHOAT $n $$B$$7Although startled by your sudden appearance, Yokuri bows deeply.$$R
+MPECHOAT $n $$B$$7Yokuri says, 'And with that, you are one step closer to enlightenment.$$R
+~
+>give_prog agility essence~
+if ispc($n)
+  if class($n) == 8
+    MPECHO Yokuri twists the essence in his nimble fingers and breaks it into tiny pieces.
+    MPECHOAT $n He deposits these pieces in a decanter and pours the resulting liquid over your hands.
+    say Now you are ready to continue your lessons young pupil.
+    MPPURGE agility
+    MPTEACHSKILL $n 258
+    break
+  endif
+endif
+say Many thanks for this teaching aid, but there is little I can do for you.
+MPPURGE agility
+~
+>speech_prog p agility~
+if ispc($n)
+  if class($n) == 8
+    MPECHOAT $n The guardian gazes at you intensely as he judges your progress.
+    hmm
+    say Yes $n, I deem you ready to advance your agility.
+    say Clear as ice and hard as diamond, this monk will break not bend!
+    say Bring me his essence and you shall learn much grasshopper.
+    break
+  endif
+endif
+say Alas, you are not of sufficient calibre to learn that which I teach.
+~
+>give_prog stinger bee small~
+MPPURGE stinger
+if ispc($n)
+  if class($n) == 7
+    say Ahh, you found it.
+    MPECHOAT $n $I has you attack him using the tiny bee stinger.  His quick evasive movements humiliate you!
+    MPECHOAROUND $n $I has $n attack him using the tiny bee stinger.  Of course $I evades him easily.
+    MPECHOAT $n After several minutes you become more aware of how to hit the target with accuracy.
+    MPTEACHSKILL $n 355
+    break
+  endif
+endif
+say I know not what for you bring me a stinger, shoo pestilence shoo.
+~
+>speech_prog p teach me please~
+if ispc($n)
+  if class($n) == 7
+    say To me, bring a stinger, for precision is key to the nature of hitting one's opponent.
+  endif
+endif
+~
+|
+S
+#1932
+samoht notrem master guildmaster~
+Samoht Notrem~
+Samoht sits here at his table awaiting your discipleship.
+~
+This complex middle-aged man, whose current attire makes him look more like
+a humble pipeweed farmer than a highly respected monk, has been described as
+all things to all men: the pious head of the monastary, the gregarious friend
+to all in need, the outspoken dissenter against the popularity and misdirection
+of organized religion, the prolific author of innumerable insightful tracts.
+His combination of a worn and soiled habit with a hat that is currently at
+the height of Sorpigallian fashion is just enough to disturb you rather than
+laugh at this man's peculiar facial features: a bald head accentuated by
+strongly stuck-out ears. Samoht's manner and apperance have a very idiosyncratic
+quality that somehow brings you a curious sense of secure relaxation.
+~
+296770 0 -1
+1126433320 4096 0 -1
+0 1 80
+-60 -80 6000d1+0 8d10+70
+0 0
+8 8 1 0 0 0
+C 8
+>greet_prog 15~
+if ispc($n)
+   if level($n) <= 40
+   whisper $n Psst! If you are looking for a little help to the Diamond Isle, visit the Meta-Priest for a shortcut!
+      endif
+    endif
+~
+>catch_prog 6~
+MPECHOAT $v[throw] The spirit of the Grand Master smiles kindly down upon you.
+MPMLOAD 3077
+MPTHROW 3077 1 2 $v[throw]
+~
+>catch_prog 5~
+MPECHOAT $v[throw] The essence shimmers one last time and a glowing figure stands before you.
+MPTHROW 1932 6 1
+~
+>catch_prog 4~
+MPECHOAT $v[throw] Quickly, the essence gains more substance and grows...
+MPTHROW 1932 5 1
+~
+>catch_prog 3~
+MPECHOAT $v[throw] Standing up and quickly moving back, Samoht watches the air intently.
+MPECHOAT $v[throw] An essence begins to glow and take shape...
+MPTHROW 1932 4 2
+~
+>catch_prog 2~
+MPECHOAT $v[throw] A gentle breeze passes through the room and the shimmering intensifies.
+MPTHROW 1932 3 2 $v[throw]
+~
+>catch_prog 1~
+MPECHOAT $v[throw] The air near Samoht begins to shimmer.
+emote continues to meditate, extending his hands and spreading his fingers.
+MPECHOAT $v[throw] Samoht closes his eyes again and focuses intently on the spirit realm.
+MPECHOAT $v[throw] Samoht mumbles something unintelligible.
+MPTHROW 1932 2 4 $v[throw]
+~
+>speech_prog meditation~
+if ispc($n)
+if class($n) == 8
+if level($n) > 49
+   MPSETTEMP $n meditation_sq true
+   if ismobvnuminroom(3077)
+      MPTHROW 3077 1 0 $n
+   else
+      emote closes his eyes and sinks into a trance-like state.
+      emote meditates deeply for a moment.
+      mumble
+      MPTHROW 1932 1 3 $n
+   endif
+endif
+endif
+endif
+~
+>rand_prog 1~
+say Nothing is more upsetting to me than a student to whom spirituality is only
+say the means to a selfish end, like an everlasting afterlife for example.
+~
+|
+S
+#1933
+dwayne guard guildguard~
+Dwayne, the cavalier paladin~
+Dwayne, the cavalier paladin, stands to the left of the portal making jest.
+~
+Dwayne is impossible to take seriously. His standard guild issue armor has
+been accessorized with patches spouting meaningless slogans and his doffed
+helmet sports an assortment of rainbow-colored plumes. How he initially got
+his position as guard is uncertain--perhaps it had something to do with his
+brother Gaarth--but his presence here has come to be appreciated as he adds
+a much needed crude flair to the all too grave atmosphere of the guild.
+~
+558914 0 -1
+52699816 4096 0 -1
+0 1 80
+-60 -80 6000d1+0 8d10+70
+0 0
+8 8 1 0 0 0
+C 6
+>speech_prog highest order~
+if carries($n) keep 30094
+MPECHOAT $n $$B$$7Dwayne says, 'No, not Jacques.  Bless his soul.'
+MPECHOAT $n $$RDwayne, the cavalier paladin chuckles politely.
+MPPAUSE 3
+MPECHOAT $n $$B$$7Dwayne says, 'Great with a ledger, but not who I'd want at my back in a fight.'$$R
+MPPAUSE 2
+MPECHOAT $n $$B$$7Dwayne says, 'You want Gerard, chief among the more...militant arm of our order.
+MPECHOAT $n $$B$$7He resides far to the east, fighting a losing battle against the encroaching darkness.
+MPECHOAT $n $$B$$7Seek him out and hail him.  He is a stickler for formalities, so be sure to hail
+MPECHOAT $n $$B$$7him by his full name.'  Best of luck to you!
+endif
+~
+>speech_prog sword lost~
+if carries($n) keep 30094
+MPECHOAT $n $$B$$7Dwayne says, 'That sword you carry bears a striking resemblance to one lost by our order
+MPECHOAT $n $$B$$7long ago but it cannot be.  It's just a fairy tale.  If that truly be Durendal you hold
+MPECHOAT $n $$B$$7then that would mean...'$$R
+MPECHOAT $n Dwayne trails off, lost in thought.
+MPPAUSE 3
+MPECHOAT $n $$B$$7Dwayne says, 'See here.  Seek ye the highest of our order.  According to legend, Durendal
+MPECHOAT $n $$B$$7is only bestowed upon mortals in times of dire need.  Make haste!  The fate of the world
+MPECHOAT $n $$B$$7may well depend on you!$$R
+endif
+~
+>greet_prog 40~
+if carries($n) keep 30094
+MPECHOAT $n $$B$$7Dwayne, the cavalier paladin gasps in astonishment!$$R
+MPECHOAT $n $$B$$7Dwayne says, 'No, it cannot be!  It was lost so very long ago!'
+MPECHOAT $n $$B$$7Dwayne says, 'You there, come here!  I would speak to you of the sword you carry.'
+endif
+~
+>rand_prog 2~
+say Woah dude! I was like *woah*, and then you were like WOAH, and then I was like woooaaahhh!
+~
+>greet_prog 10~
+surf dwayne
+~
+>give_prog righteousness essence~
+if ispc($n)
+  if class($n) == 6
+    MPECHO The mighty paladin raises the essence towards the heavens in a gesture of supplication.
+    MPECHOAT $n The warrior of light lowers his arms and presses the essence into your forehead.
+    say Go my son, you have been blessed with a new ability to help your companions.
+    c 'bless' $n
+    MPPURGE righteousness
+    MPTEACHSKILL $n 141
+    break
+  endif
+endif
+say Alas, you are not a holy warrior of the paladin order. I cannot help thee.
+MPPURGE righteousness
+~
+>speech_prog p blessed halo~
+if ispc($n)
+  if class($n) == 6
+    MPECHOAT $n The holy paladin regards you solemnly....then winks.
+    say A true warrior of light must be willing to sacrifice his own needs for those of his compatriots.
+    say Seek for me the essence of righteousness.
+    say The greatest of all Paladins is the one who can give this to you if you ask his favour.  He lies near the shores of Hu'uti.
+    bow
+    break
+  endif
+endif
+say Alas only the most holy of the paladin order may learn this skill.
+~
+|
+S
+#1934
+gaarth cavalier~
+Gaarth, the paladin cavalier~
+Gaarth, the paladin cavalier, stands to the right of the portal full of gravity.
+~
+Dwayne's brother Gaarth has fully adopted the role of guild guard, almost too
+much so. He vets you over with condescending eyes, probably thinking of the
+many ways he can slay such an unworthy infandel in the name of his God. Moral
+stewardship and virtue are expressed in his haughty and devoted manner. Looking
+at him makes you feel guilty for every wicked thing you've ever done. His
+attitude assures you that, come judgement day, you're either with him or
+you're with the sinners.
+~
+558914 0 -1
+52699816 4096 0 -1
+1000 1 80
+-60 -80 6000d1+0 8d10+70
+0 0
+8 8 1 0 0 0
+C 6
+S
+#1935
+gladius boyle guildmaster master~
+Gladius Warner Boyle~
+An dignified knight of incorrigible faith waits to pass on his wisdom.
+~
+A man steadfast in faith but questionable in its application. His worldview
+is made of a black and white moral cast: good and evil with no intermediate.
+His reasoning is simplistic, dogmatic, and--since he absurdly holds a position
+of such great power--very, very dangerous. If salvation is not absolute and
+redemption not unbounded, then the only other option is final extermination
+of the sinner; and to that task he has devoted his life.
+~
+558914 0 -1
+52699816 4096 0 -1
+0 1 80
+-60 -80 6000d1+0 8d10+70
+0 0
+8 8 1 0 0 0
+C 6
+>greet_prog 15~
+if ispc($n)
+    if level($n) <= 40
+        whisper $n Psst! If you are looking for a little help to the Diamond Isle, visit the Meta-Priest for a shortcut!
+        endif
+    endif
+~
+|
+S
+#1936
+manix guard guildguard~
+Manix~
+A reassured sorcerer casts fear into the hearts of his onlookers.
+~
+Manix was the quintessence of what it is to be a pernicious sorcerer.
+Completely indifferent to the plight of others, he took wicked satisfaction
+in bringing destruction and chaos to the city of Sorpigal. Had he his way,
+all its denizens would be marred and naked, their equipment hoarded on
+unreachable planes for no other reason than pure spite. Amazingly he has
+achieved such acts in the past with the aid of great dragons and savage
+canines. Fortunately, that was ages ago and his time has well passed. His
+spirit has long ago departed. Now he stands imposingly as the guard to
+the mage guild.
+~
+33090 0 -1
+52757032 4096 0 -1
+0 1 80
+-60 -80 6000d1+0 8d10+70
+0 0
+8 8 1 0 0 0
+C 1
+>greet_prog 5~
+if ispc($n)
+  if class($n) == 1
+    MPECHOAROUND $n $I smiles at $n and makes way for $m to pass.
+    MPECHOAT $n $I smiles at you, making way for you to pass.
+    break
+  else
+    if rand(85)
+      MPECHOAROUND $n $I glares at $n distrustfully.
+      MPECHOAT $n $I glares at you distrustfully.
+      break
+    else
+      say Begone miscreant!
+      emote utters the words, 'sylle sutabuj'
+      MPFORCE $n flee
+      break
+    endif
+  break
+  endif
+endif
+~
+|
+S
+#1937
+alianna guildmaster~
+Alianna~
+A young lady muses about displaying little evidence of her magical potence.
+~
+A vibrant firey-haired young woman to all appearances. Her mannerisms are
+imbued with passion for her chosen devotion: the study and advancement of
+the magical arts. Perhaps this is the primary characteristic of all great
+persons, the ability to recurrently approach their subject as if stumbling
+upon it anew for the first time. Maybe this is why the foresighted Alianna
+chose first to focus on the magicks of juvenescence as a beginning sorceress.
+It is only her eyes that betray her true age. Wearied and saddened, they look
+upon you with the appreciation of one who remembers and longs for what it was
+like to truly expose oneself to the magical arts for the first time, untempered
+by the cynicism that comes with shedding one's ignorance.
+Alianna's story is perhaps one of the best known. Born in year 9150 of the
+old calander to a demanding family of prodigious young talents, she was the
+only one of her siblings recognized as having no particular bent. It wasn't
+long until she was forsaken by her kin as unworthy of the family name and
+thrown to the wilderness to fend for her own. Fortunately, she was picked up
+by a tribe of wandering humans with whom she learned to harvest her growing
+magical powers and massive intellect. By the age of seventeen Alianna was
+approached to lead her tribe through the world which had recently been upset
+by the breaking of the Tir. She accepted and thus began her impressive career.
+Discoverer of Sadus' gem, founder of the line of enforcers, mother to Nyris,
+and conqurer of the Circle of Five, Alianna is perhaps the greatest mage to
+ever grace the realms. But the great wars and chaotic magicks that determined
+the formation of the world have all but become long lost history, and Alianna
+is content to settle here in Sorpigal where she is greatly revered and can
+impart her particular wisdom on fledging young students of her art. It will
+be a shame when she passes, for she is only human and no magic can ever
+ultimately withstand the mortality that curses that particular race.
+~
+33090 0 -1
+52757032 4096 0 -1
+0 1 80
+-60 -80 6000d1+0 8d10+70
+0 0
+8 8 2 0 0 0
+C 1
+>act_prog p gets a pair of heavy malachite-carved spectacles.~
+if ispc($n)
+  if inroom($n) == 1984
+    MPECHOAT $n Upon picking up the spectacles you feel compelled to place them on your head.
+  else
+    MPTRANS $n 1984
+    say Come back here with my spectacles!
+    MPECHOAT $n In defiance of Alianna, you feel compelled to look through the glasses.
+  endif
+  MPECHOAT $n You look through the lenses and notice a different space on the other side.
+  MPTRANSFER $n 1999
+  MPAT 1999 MPFORCE $n look out
+  MPAT 1999 MPTRANSFER $n 1984
+  MPECHOAT $n The strong magic embedded in the spectacles force you to set them down.
+  MPFORCE $n drop glasses
+  MPECHOAROUND $n $n looks through the glasses and, startled, places them back quickly.
+  break
+endif
+~
+>catch_prog 1~
+MPECHO Alianna straightens up and looks a bit more serious.
+say But nevermind that for now, you can find Intamin on your own for your studies.
+say Lets get back to practicing your mystic talents!
+~
+>speech_prog intamin~
+say Oh Intamin is a great explorer and full of knowledge.
+say I just wish he spent more time in the guildhouse with me...
+sigh
+MPTHROW 3020 1 3
+~
+>speech_prog friend~
+say Oh! Hi there. I hope I wasn't disturbing you with my thinking out loud.
+say Yes, my friend Intamin, he's always off searching the world for new magicks.
+~
+>greet_prog 50~
+MPECHO Alianna sighs mournfully and looks around with searching eyes.
+say I wish my friend didn't spend so much time away from the guildhouse.
+if ispc($n)
+   if level($n) <= 40
+       if rand(20)
+          whisper $n Psst! If you are looking for a little help to the Diamond Isle, visit the Meta-Priest for a shortcut!
+          endif
+      endif
+    endif
+~
+>give_prog earring ring glass~
+say Excellent, you have served me well and I will reward you by
+say teaching you the debility spell if you are able to learn.
+MPJUNK earring
+if ispc($n)
+  if class($n) == 1
+    emote goes through some arcane gestures and speaks to you softly.
+    MPTEACHSKILL $n 135
+    break
+  endif
+endif
+say You are unable to learn.
+~
+|
+S
+#1938
+disco stu guard guildguard~
+Disco Stu~
+Disco Stu is here guarding the Academy, absentmindedly humming some ABBA.
+~
+Disco Stu, legend of many a dancehall is here guarding the halls
+of Dark Castle's most skilled musicians.  Though of somewhat dubious
+musical talents himself, Stu is none the less an excellent and
+observant protector of his guild.  He wears a shirt with an
+absolutely tremendous collar, some wide white bell-bottoms, and
+a pair of very serious platform shoes.
+~
+295746 0 -1
+52691496 4096 0 -1
+0 1 80
+-60 -80 6000d1+0 8d10+70
+0 0
+8 8 1 0 0 0
+>catch_prog 1~
+say Seek you the greatest, he taught me to sing.
+say He normally only will answer to King.
+say Give him this sandwich, for it is the key,
+say Give you this sandwich to the King, Presley.
+~
+>speech_prog p Hypnotic Harmony~
+if ispc($n)
+  if class($n) == 10
+    if level($n) > 49
+      MPECHO $I grabs hit lute and clears his throat.
+      MPECHO $I begins to sing.
+      say So you wish to learn the glories song,
+      say That convinces some to follow along,
+      say And do what you say and do as you do,
+      say I can not teach this but I'll tell you who.
+      MPTHROW 1938 1 5
+      MPOLOAD 6361
+      give sandwich $n
+      break
+    endif
+  endif
+endif
+~
+>rand_prog 2~
+say Disco Stu has Ouzo for Twozo!
+~
+>rand_prog 2~
+say Disco Stu says Urizen better return his ABBA compilation or he's in for a dance-off.
+say Oooh yeah!
+~
+>greet_prog 2~
+say Disco Stu needs a fox-y lad-y! Oooh yeah!
+~
+>rand_prog 2~
+boogie
+~
+>rand_prog 2~
+say Disco Stu does not advertise.
+~
+|
+S
+#1939
+lance master guildmaster~
+Lance, the very merry minstrel~
+The headmaster of the Academy stands here, wand in the ready position.
+~
+We meant his conductor's wand of course.  What did you think we were
+talking about?  Pervert.  Lance is a little effeminate around the edges,
+but he's been in many a skirmish and it would behoove you, the student, to
+pay a little closer attention to him and try not to notice that on the back
+of his shirt, "Fairy Princess" is spelled out in silver sequins.
+~
+295746 0 -1
+52691496 4096 0 -1
+0 1 80
+-60 -80 6000d1+0 8d10+70
+0 0
+8 8 1 0 0 0
+C 10
+>greet_prog 15~
+if ispc($n)
+   if level($n) <= 40
+   whisper $n Psst! If you are looking for a little help to the Diamond Isle, visit the Meta-Priest for a shortcut!
+      endif
+    endif
+~
+>give_prog scimitar chipped damaged~
+if ispc($n)
+  if class($n) == 10
+    say You have done well my young pupil.  The scimitar is one of the fastest
+    say swords out there.  Using the remains of this scimitar, I will teach you
+    say a song that will allow you and your comrades to move with the utmost
+    say quickness.  Now, pay close attention...
+    MPTEACHSKILL $n 537
+    MPPURGE scimitar
+    break
+  endif
+endif
+~
+>give_prog eyes orbs skeet waterskeet caves~
+if ispc($n)
+  if class($n) == 10
+    say Ah, thank you very much.  With this pair of eyes, I will now imbue you
+    say with the power to send your voice searching over the realm, scouring
+    say the terrain for whomever you are looking for.
+    MPTEACHSKILL $n 542
+    MPPURGE eyes
+    break
+  endif
+endif
+~
+|
+S
+#1940
+treant guard guildguard~
+A Large Treant Guardian~
+A very large Treant guards the bridge to the Druid's Grove.
+~
+This guild guard is like few others.  A friend of nature, and natural
+foe of none, he prefers to see the good in others rather than the faults.
+Fortunately, to make up for this lacking, when he does see that one is
+set to harm him or one of his kind, he is lightning quick and can become
+a warrior in an instant.  He also looks darn good in a kilt.
+~
+33090 0 -1
+52691496 135200 0 -1
+0 22 80
+-60 -80 6000d1+0 8d10+70
+0 0
+8 8 1 0 16 4194304
+C 11
+T 18 18 18 18 18 0
+S
+#1941
+seamus master guildmaster~
+Seamus, the Grand Druid~
+Seamus, the Grand Druid, is sitting on a chair of living plants.
+~
+~
+33090 0 -1
+52691496 135200 0 -1
+0 1 80
+-60 -80 6000d1+0 8d10+70
+0 0
+8 8 1 0 0 0
+C 11
+>greet_prog 15~
+if ispc($n)
+   if level($n) <= 40
+   whisper $n Psst! If you are looking for a little help to the Diamond Isle, visit the Meta-Priest for a shortcut!
+      endif
+    endif
+~
+>catch_prog 6~
+MPECHOAT $v[throw] You see a brief shimmering glow settle in a large hollowed out tree.
+MPMLOAD 3076
+MPTHROW 3076 1 2 $v[throw]
+~
+>catch_prog 5~
+MPECHOAT $vthrow The sapling grows into a large hollowed tree before your eyes.
+MPTHROW 1941 6 1
+~
+>catch_prog 4~
+MPECHOAT $v[throw] Quickly, the shoot becomes a sapling.
+MPTHROW 1941 5 1
+~
+>catch_prog 3~
+MPECHOAT $v[throw] Standing up and quickly moving back, Seamus watches the ground intently.
+MPECHOAT $v[throw] A small shoot pushes itself out of the grown.
+MPTHROW 1941 4 2
+~
+>catch_prog 2~
+MPECHOAT $v[throw] A gentle breeze rustles the leaves around your feet.
+MPTHROW 1941 3 2 $v[throw]
+~
+>catch_prog 1~
+   MPECHOAT $v[throw] Inside Seamus' cupped hands something glows brightly for a moment and he uncovers them unveiling an acorn.
+   emote bends down and plants the acorn in the ground.
+   MPECHOAT $v[throw] Holding his hands over the ground, Seamus closes his eyes again.
+   MPECHOAT $v[throw] Seamus mumbles something unintelligible.
+   MPTHROW 1941 2 4 $v[throw]
+~
+>speech_prog p conjure elemental~
+if ispc($n)
+if class($n) == 11
+if level($n) > 49
+   MPSETTEMP $n conjure_sq true
+   if ismobvnuminroom(3076)
+      MPTHROW 3076 1 0 $n
+   else
+      emote cups his hands in front of him and closes his eyes.
+      emote appears to meditate for a moment.
+      mumble
+      MPTHROW 1941 1 3 $n
+   endif
+endif
+endif
+endif
+~
+>give_prog acorn forest component~
+say Ahh, excellent work, I'll return this nut to Joker right away!
+MPJUNK acorn
+if ispc($n)
+  if class($n) == 11
+    say For this deed I shall teach you of the way of the chipmunk.
+    emote teaches you the way of the chipmunk.
+    MPTEACHSKILL $n 45
+    break
+  endif
+endif
+~
+>give_prog earring peacock feather~
+say I will return this to the poor peacock that had it's tail
+say defiled.  Thank you for your help young one.
+MPJUNK earring
+if ispc($n)
+  if class($n) == 11
+    emote explains about the body's natural healing process.
+    MPTEACHSKILL $n 49
+    break
+  endif
+endif
+~
+|
+S
+#1942
+empty mob~
+an empty mob~
+an empty mob description~
+•••••••• ~
+0 0 -1
+2097152 0 0 -1
+0 0 0
+20 10 0d1+0 1d1+0
+0 0
+8 1 0 0 0 0
+S
+#1943
+empty mob~
+an empty mob~
+an empty mob description~
+Morgoth~
+0 0 -1
+2097152 0 0 -1
+0 0 0
+20 10 0d1+0 1d1+0
+0 0
+8 1 0 0 0 0
+S
+#1945
+misira scholar mage~
+Misira the Scholar~
+A lithe human woman is intently studying an ancient scroll.
+~
+She's pretty cute for a bookish mage.
+~
+32834 0 -1
+52690984 0 0 -1
+0 1 51
+20 10 5000d1+0 5d10+0
+0 0
+8 8 2 20 0 0
+C 1
+>catch_prog 7~
+say And finally:
+say The Astorian Academy of Magics is home to many of tomorrows great wizards.
+say These students often carry valuable components on their persons.
+MPTHROW 1945 4 3
+~
+>catch_prog 6~
+say Second:
+say The riches of Ironforge are guarded by beasts of steel. You
+say will need one of their hearts to complete your enchantment.
+MPTHROW 1945 7 3
+~
+>catch_prog 5~
+say First:
+say Tatorious, a proprietor of magics in the Tower of High Sorcery
+say has one of the materials you seek for sale.
+MPTHROW 1945 6 3
+~
+>catch_prog 4~
+say Oh, and I musn't forget one other detail.  There are also essences
+say that will enchant your golem with extra powers, though the spell
+say will still be effective without.  These are the essences of Stone
+say and Lightning.
+MPSETTEMP $i istalk false
+~
+>catch_prog 3~
+say And finally:
+say Deep within the giant forest there dwell a people of stone.
+say You require one of their bodies to lend substance to your magic.
+MPTHROW 1945 4 3
+~
+>catch_prog 2~
+say Second:
+say A rock minion's spirit is required to infuse life into your creation.
+say Know that these spirits will not depart with you when you leave.
+MPTHROW 1945 3 3
+~
+>catch_prog 1~
+say First:
+say The Sedryte are well known for their love of granite constructs.
+say Purchase a pouch of such powder from one of their shoppes.
+MPTHROW 1945 2 3
+~
+>speech_prog iron~
+if ispc($n)
+  if class($n) == 1
+    if tempvar($i[istalk]) == true
+      break
+    else
+      say Okay, listen close. I'll give you three clues.
+      say If you want me to repeat them, say 'iron' again.
+      MPSETTEMP $i istalk true
+      MPTHROW 1945 5 3
+      break
+    endif
+  endif
+endif
+~
+>speech_prog stone~
+if ispc($n)
+  if class($n) == 1
+    if tempvar($i[istalk]) == true
+      break
+    else
+      say Okay, listen close. I'll give you three clues.
+      say If you want me to repeat them, say 'stone' again.
+      MPSETTEMP $i istalk true
+      MPTHROW 1945 1 3
+      break
+    endif
+  endif
+endif
+~
+>speech_prog components~
+if ispc($n)
+  if class($n) == 1
+    MPECHO $I looks up from her work.
+    say You seek the components for creating a golem eh?
+    say Finding and assembling these items is not an easy
+    say task, but it is rewarding... to say the least.
+    say Which kind of golem are you inquiring about? Iron
+    say or Stone?
+    break
+  endif
+endif
+~
+|
+S
+#1946
+empty mob~
+an empty mob~
+an empty mob description~
+~
+0 0 -1
+2097152 0 0 -1
+0 0 0
+20 10 0d1+0 1d1+0
+0 0
+8 1 0 0 0 0
+S
+#1947
+empty mob~
+an empty mob~
+an empty mob description~
+•••••••••••••×••(~
+0 0 -1
+2097152 0 0 -1
+0 0 0
+20 10 0d1+0 1d1+0
+0 0
+8 1 0 0 0 0
+S
+#1948
+empty mob~
+an empty mob~
+an empty mob description~
+Morgoth~
+0 0 -1
+2097152 0 0 -1
+0 0 0
+20 10 0d1+0 1d1+0
+0 0
+8 1 0 0 0 0
+S
+#1949
+empty mob~
+an empty mob~
+an empty mob description~
+•••••••• ~
+0 0 -1
+2097152 0 0 -1
+0 0 0
+20 10 0d1+0 1d1+0
+0 0
+8 1 0 0 0 0
+S
+#1950
+empty mob~
+an empty mob~
+an empty mob description~
+•••••••• ~
+0 0 -1
+2097152 0 0 -1
+0 0 0
+20 10 0d1+0 1d1+0
+0 0
+8 1 0 0 0 0
+S
+#1951
+empty mob~
+an empty mob~
+an empty mob description~
+•••••••• ~
+0 0 -1
+2097152 0 0 -1
+0 0 0
+20 10 0d1+0 1d1+0
+0 0
+8 1 0 0 0 0
+S
+#1952
+empty mob~
+an empty mob~
+an empty mob description~
+~
+0 0 -1
+2097152 0 0 -1
+0 0 0
+20 10 0d1+0 1d1+0
+0 0
+8 1 0 0 0 0
+S
+#1953
+empty mob~
+an empty mob~
+an empty mob description~
+c 'infravision'~
+0 0 -1
+2097152 0 0 -1
+0 0 0
+20 10 0d1+0 1d1+0
+0 0
+8 1 0 0 0 0
+S
+#1954
+empty mob~
+an empty mob~
+an empty mob description~
+Morgoth~
+0 0 -1
+2097152 0 0 -1
+0 0 0
+20 10 0d1+0 1d1+0
+0 0
+8 1 0 0 0 0
+S
+#1955
+empty mob~
+an empty mob~
+an empty mob description~
+•••••••• ~
+0 0 -1
+2097152 0 0 -1
+0 0 0
+20 10 0d1+0 1d1+0
+0 0
+8 1 0 0 0 0
+S
+#1956
+empty mob~
+an empty mob~
+an empty mob description~
+~
+0 0 -1
+2097152 0 0 -1
+0 0 0
+20 10 0d1+0 1d1+0
+0 0
+8 1 0 0 0 0
+S
+#1957
+empty mob~
+an empty mob~
+an empty mob description~
+•••••••• ~
+0 0 -1
+2097152 0 0 -1
+0 0 0
+20 10 0d1+0 1d1+0
+0 0
+8 1 0 0 0 0
+S
+#1958
+empty mob~
+an empty mob~
+an empty mob description~
+Morgoth~
+0 0 -1
+2097152 0 0 -1
+0 0 0
+20 10 0d1+0 1d1+0
+0 0
+8 1 0 0 0 0
+S
+#1959
+empty mob~
+an empty mob~
+an empty mob description~
+2z	~
+0 0 -1
+2097152 0 0 -1
+0 0 0
+20 10 0d1+0 1d1+0
+0 0
+8 1 0 0 0 0
+S
+#1960
+empty mob~
+an empty mob~
+an empty mob description~
+Morgoth~
+0 0 -1
+2097152 0 0 -1
+0 0 0
+20 10 0d1+0 1d1+0
+0 0
+8 1 0 0 0 0
+S
+#1961
+empty mob~
+an empty mob~
+an empty mob description~
+c 'infravision'~
+0 0 -1
+2097152 0 0 -1
+0 0 0
+20 10 0d1+0 1d1+0
+0 0
+8 1 0 0 0 0
+S
+#1962
+empty mob~
+an empty mob~
+an empty mob description~
+~
+0 0 -1
+2097152 0 0 -1
+0 0 0
+20 10 0d1+0 1d1+0
+0 0
+8 1 0 0 0 0
+S
+#1963
+empty mob~
+an empty mob~
+an empty mob description~
+~
+0 0 -1
+2097152 0 0 -1
+0 0 0
+20 10 0d1+0 1d1+0
+0 0
+8 1 0 0 0 0
+S
+#1964
+empty mob~
+an empty mob~
+an empty mob description~
+~
+0 0 -1
+2097152 0 0 -1
+0 0 0
+20 10 0d1+0 1d1+0
+0 0
+8 1 0 0 0 0
+S
+#1965
+empty mob~
+an empty mob~
+an empty mob description~
+•••••••• ~
+0 0 -1
+2097152 0 0 -1
+0 0 0
+20 10 0d1+0 1d1+0
+0 0
+8 1 0 0 0 0
+S
+#1966
+empty mob~
+an empty mob~
+an empty mob description~
+Morgoth~
+0 0 -1
+2097152 0 0 -1
+0 0 0
+20 10 0d1+0 1d1+0
+0 0
+8 1 0 0 0 0
+S
+#1967
+empty mob~
+an empty mob~
+an empty mob description~
+c 'infravision'~
+0 0 -1
+2097152 0 0 -1
+0 0 0
+20 10 0d1+0 1d1+0
+0 0
+8 1 0 0 0 0
+S
+#1968
+empty mob~
+an empty mob~
+an empty mob description~
+~
+0 0 -1
+2097152 0 0 -1
+0 0 0
+20 10 0d1+0 1d1+0
+0 0
+8 1 0 0 0 0
+S
+#1969
+empty mob~
+an empty mob~
+an empty mob description~
+•••••••• ~
+0 0 -1
+2097152 0 0 -1
+0 0 0
+20 10 0d1+0 1d1+0
+0 0
+8 1 0 0 0 0
+S
+#1970
+empty mob~
+an empty mob~
+an empty mob description~
+Morgoth~
+0 0 -1
+2097152 0 0 -1
+0 0 0
+20 10 0d1+0 1d1+0
+0 0
+8 1 0 0 0 0
+S
+#1971
+empty mob~
+an empty mob~
+an empty mob description~
+•••••••• ~
+0 0 -1
+2097152 0 0 -1
+0 0 0
+20 10 0d1+0 1d1+0
+0 0
+8 1 0 0 0 0
+S
+#1972
+empty mob~
+an empty mob~
+an empty mob description~
+2z	~
+0 0 -1
+2097152 0 0 -1
+0 0 0
+20 10 0d1+0 1d1+0
+0 0
+8 1 0 0 0 0
+S
+#1973
+empty mob~
+an empty mob~
+an empty mob description~
+•••••×•• ~
+0 0 -1
+2097152 0 0 -1
+0 0 0
+20 10 0d1+0 1d1+0
+0 0
+8 1 0 0 0 0
+S
+#1974
+empty mob~
+an empty mob~
+an empty mob description~
+Morgoth~
+0 0 -1
+2097152 0 0 -1
+0 0 0
+20 10 0d1+0 1d1+0
+0 0
+8 1 0 0 0 0
+S
+#1975
+Alianna~
+DUMMY ALIANNA~
+A DUMMY ALIANNA
+~
+•••••••• ~
+2 0 -1
+2097152 0 0 -1
+0 0 50
+20 10 0d1+0 1d1+0
+0 0
+8 1 0 0 0 0
+>act_prog p gets a pair of heavy malachite-carved spectacles.~
+if ispc($n)
+  if inroom($n) == 1984
+    MPECHOAT $n Upon picking up the spectacles you feel compelled to place them on your head.
+  else
+    MPTRANS $n 1984
+    say Come back here with my spectacles!
+    MPECHOAT $n In defiance of Alianna, you feel compelled to look through the glasses.
+  endif
+  MPECHOAT $n You look through the lenses and notice a different space on the other side.
+  MPTRANSFER $n 1999
+  MPAT 1999 MPFORCE $n look out
+  MPAT 1999 MPTRANSFER $n 1984
+  MPECHOAT $n The strong magic embedded in the spectacles force you to set them down.
+  MPFORCE $n drop glasses
+  MPECHOAROUND $n $n looks through the glasses and, startled, places them back quickly.
+  break
+endif
+~
+|
+S
+$~
