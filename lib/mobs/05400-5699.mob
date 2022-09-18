@@ -1,0 +1,2666 @@
+#5400
+jim receptionist secretary~
+Jim the Receptionist~
+Jim the Dark Castle Academy receptionist is busy filing some documents.
+~
+  Jim looks rather busy, always moving stacks of paper from one side
+of his desk to the other, then back again.  Occasionally he'll start
+posting to-do lists on various boards for other workers, though he
+seems to get very little done himself.  Occasionally he'll direct a
+newbie using a very sarcastic and condescending tone though more often
+he pretends not to notice them.
+~
+33090 0 -1
+52691624 4096 0 -1
+1000 1 80
+-60 -80 6000d1+0 8d10+70
+0 0
+8 8 1 0 0 264
+>all_greet_prog 100~
+if ispc($n)
+   if carries($n) take 45
+       say Sorry $n, no champions allowed in the Academy.
+       else
+        say Be sure you read the following helpfiles: 'help newbie',
+        say 'help newbie equipment', 'help newbie money', 'help newbie
+        say areas', 'help newbie communication', and 'help getting started.'
+     endif
+endif~
+|
+S
+#5401
+sheila guidance counselor~
+Sheila the Communications Instructor~
+Sheila is here, waiting to help her students.
+~
+  Sheila looks insufferably polite and nice, though years of fielding
+silly newbie questions and having to deal with those players who just
+refuse to grow up have taken a toll on her.  She's the least-likely
+employee here to go postal and zap everyone, though to those who don't
+know her she seems the most-likely.
+~
+33090 0 -1
+52691624 4096 0 -1
+1000 7 80
+-60 -80 6000d1+0 8d10+70
+0 0
+8 8 2 0 0 264
+T 18 18 18 18 18 0
+S
+#5402
+hilda physical education teacher~
+Hilda~
+The physical education teacher is waiting for her students to pay attention.
+~
+  Hilda looks ready to kick ass and take names, though it seems she
+missed her calling as a warrior goddess and decided to teach physical
+education.  She seems eager enough to help, yet many mistake her gruff
+and occasionally blunt demeanor for something it's not.
+~
+33090 0 -1
+52691624 4096 0 -1
+1000 6 80
+-60 -80 6000d1+0 8d10+70
+0 0
+8 8 2 0 0 264
+T 18 18 18 18 18 0
+>speech_prog donations~
+say You can donate money to Dark Castle which helps pay for the hardware
+say and bandwidth that Dark Castle uses. For every penny you donate, a
+say character of your choosing will receive 1 platinum coin. So, for 1 US
+say dollar you will receive 100 platinum coins. To learn more type "help
+say donations".
+~
+>speech_prog meta~
+say The Meta-physician is located in The Meta Shop. To go to this
+say shop, go south of The Albatross Tavern, then 2 west and 1 north.
+say The Meta-physician will convert gold to platinum and vica-versa.
+say In addition he sells upgrades to your hit points, move points,
+say mana points and for some ki points. He also sells increases to
+say your strength, dexterity, constitution, intelligence and wisdom
+say points. You can also get platinum coins by donating to DC. To
+say learn more DONATIONS.
+~
+>catch_prog 2~
+say The undertaker only takes platinum coins as payment. You can
+say convert gold to platinum at the Meta-physician. If you'd like to
+say learn more about the Meta-physician, platinum and metaing META.
+say To learn more type "help morgue".
+~
+>catch_prog 1~
+say It's times like these when the morgue can help you. The morgue is
+say located above the Chamber of Charity which is east of The
+say Albatross Tavern. In the morgue there is an undertaker who can
+say retrieve your corpse for you, but for a price. To know the price
+say of a corpse retrieval ahead of time go to the morgue and type
+say VALUE. The value of your corpse is based on the equipment you
+say carry on you...
+MPTHROW 5402 2 12
+~
+>speech_prog morgue~
+say Once you reach level 10 you will leave a corpse with all your
+say equipment when you die from fighting a mob. Since there is a
+say limited amount of time to get back to your corpse before maggots
+say consume it, you must hurry. Sometimes you cannot get back to your
+say corpse because you do not know where you died. Other times you may
+say not be able to get back to your corpse because the mob that killed
+say you last time will do it again...
+MPTHROW 5402 1 15
+~
+>greet_prog 100~
+say I can teach you three subjects. Say MORGUE if you'd like to know
+say more about the morgue. Say META if you'd like to know more about
+say metaing. Say DONATIONS if you'd like to know more about donating.
+~
+|
+S
+#5403
+bob cafeteria worker~
+Bob the Cafeteria Worker~
+Bob the cafeteria worker is here, cooking up a batch of meatballs.
+~
+  Bob seems uninterested in his work, being forced by the DC Academy
+authorities to serve food he knows its students hate.  Occasionally
+he'll pull a shiny glowing flask from his back pocket and take a swig,
+highlighting him in a spectrum of colors before settling back down to
+normal.  He may once have been a great adventurer but now he's just
+an oppressed lunchlady.
+~
+2130242 0 -1
+52691624 4096 0 -1
+900 1 80
+-60 -80 6000d1+0 8d10+70
+0 0
+8 8 1 0 0 264
+>speech_prog sandwich sub~
+if ispc($n)
+  say A sandwich it is!
+  MPOLOAD 217
+  drop sandwich
+  say Enjoy!
+endif
+~
+>speech_prog beer~
+if ispc($n)
+  say A beer it is!
+  MPOLOAD 218
+  drop beer
+  emote places a beer on the table in front of you.
+  say Enjoy!
+endif
+~
+>greet_prog 100~
+if ispc($n)
+  say Howdy $n! Would you like a tasty sandwich or icy cold non-alcoholic beer?
+  say Say either 'sandwich' or 'beer' and I'll give you one.
+endif
+~
+|
+S
+#5404
+samantha druid instructor~
+Samantha, the druid teacher~
+Samantha, the friend of nature, is here watering some plants.
+~
+Laikos~
+33090 0 -1
+52691496 4128 0 -1
+900 2 80
+-60 -80 6000d1+0 8d10+70
+0 0
+8 8 2 0 0 264
+C 11
+T 18 18 18 18 18 0
+S
+#5405
+abby student~
+Abby~
+Abby, a student of magic, is here directing students to their proper classrooms.
+~
+Abby, one of the advanced students of magic, is directing
+students to their respective classrooms.  While one may be
+inclined to dismiss her from appearance alone, any amount
+of time spent studying her would immediately show that she
+is quite advanced for her level.  It would be wise to heed
+her advice.
+~
+2130242 0 -1
+321126440 4096 0 -1
+900 2 80
+-61 9 6000d1+0 8d10+71
+0 0
+8 8 2 0 0 264
+C 1
+>speech_prog directions~
+if ispc($n)
+  if class($n) == 1
+  or class($n) == 2
+  or class($n) == 11
+    say Welcome $n to the 2nd Floor of the Dark Castle Academy.
+    say On this floor are the classrooms for magic using classes.
+    if class($n) == 1
+      say You seem to be a mage, so you want to go west and then south
+      say to find your classroom.
+      break
+    else
+       if class($n) == 2
+         say You seem to be a cleric, so you want to go east and then south
+         say to find your classroom.  Watch out though, the Friar seems to
+         say be a bit 'finnicky' today.
+         break
+       else
+         if class($n) == 11
+           say You seem to be a druid, so you want to go all north to find
+           say your classroom.  Good luck!
+           break
+         endif
+      endif
+    endif
+  else
+    say On this floor of the Academy are the classrooms for magic-using classes.
+    say Your classroom, however, is upstairs.  Good luck!
+    break
+  endif
+endif
+~
+|
+S
+#5406
+marzel mysterious mage instructor~
+Marzel, the Mysterious~
+Marzel, the Mysterious, is trying to make sparks shoot from his fingertips.
+~
+Laikos~
+33090 0 -1
+52691496 4096 0 -1
+900 2 80
+-61 9 6000d1+0 8d10+71
+0 0
+8 8 1 0 0 264
+C 1
+S
+#5407
+friar finnegan cleric instructor~
+Friar Finnegan~
+Friar Finnegan is here, trying to hold himself steady while he prays.
+~
+Laikos~
+33090 0 -1
+52691496 4096 0 -1
+1000 3 80
+-61 9 6000d1+0 8d10+71
+2500 2500
+8 8 1 0 0 392
+C 2
+>rand_prog 2~
+MPECHO $I looks about for a nice juicy.... altar boy.
+~
+>rand_prog 2~
+MPECHO $I looks around cautiously and then takes a swig off a bottle of 'wine'.
+~
+>rand_prog 2~
+hiccup
+~
+|
+S
+#5408
+sonja barbarian instructor~
+Sonja Hammerfist~
+Sonja Hammerfist, the barbarian instructor, is flexing to show off her muscles.
+~
+Laikos~
+558914 0 -1
+52691496 4096 0 -1
+350 6 80
+-61 9 6000d1+0 8d10+71
+0 0
+8 8 2 0 0 264
+C 7
+S
+#5409
+mort warrior instructor~
+Mort, the Mutilated~
+Mort, the Mutilated, is looking around for his extra peg leg.
+~
+~
+558914 0 -1
+52691496 4096 0 -1
+350 1 80
+-61 9 6000d1+0 8d10+71
+0 0
+8 8 1 0 0 264
+C 4
+>rand_prog 1~
+say HAR! This ship's steerin' wheel on me pants be drivin' me nuts!
+~
+>rand_prog 1~
+say Ye best be leavin' this ol' seadog alone! I be an -unarmed- man!
+~
+>rand_prog 1~
+say YAR! 'scuse me, would ye be havin' a limb er two ta spare a feller?
+~
+>rand_prog 1~
+say Yo ho ho and a bottle of Ouzo!
+~
+>rand_prog 1~
+say YAR! Whar be me balls!?
+~
+|
+S
+#5410
+mack thief rogue instructor~
+Mack, the Knife~
+Mack, the Knife, is busy polishing a set of lock picks.
+~
+Laikos~
+33090 0 -1
+52691496 4096 0 -1
+-350 1 80
+-61 9 6000d1+0 2d2+71
+0 0
+8 8 1 0 0 264
+S
+#5411
+bobby pixie barbarian student~
+Bobby the Pixie Barbarian~
+Bobby, the pixie barbarian, is flying around and giving directions.
+~
+Laikos~
+558914 0 -1
+321126952 4096 0 -1
+350 5 80
+-61 9 6000d1+0 8d10+71
+0 0
+8 8 1 0 0 264
+C 7
+>speech_prog directions~
+if ispc($n)
+  if class($n) == 3
+  or class($n) == 4
+  or class($n) == 7
+    MPECHOAT $n $I makes a few fake jab moves at you.
+    say Hey $n!  Scared ya didn't I!  I know I did.. I'm tough.
+    say Anyway, this is the 3rd Floor of the Dark Castle Academy.
+    if class($n) == 3
+      say You are a rogue, so go all north if yer looking for your classroom.
+      say Good luck! You'll need it if you ever want to get as BUFF as I am.
+      snicker
+      break
+    else
+       if class($n) == 4
+         say You are a warrior, so go north and then west to find your class.
+         say Good luck! You'll need it if you ever want to get as BUFF as I am.
+         snicker
+         break
+       else
+         if class($n) == 7
+           say You are a barbarian, so go two north and then east to find your class.
+           say Good luck! You'll need it if you ever want to get as BUFF as I am.
+           snicker
+           break
+         endif
+      endif
+    endif
+  else
+    MPECHOAT $n $I makes a few fake jab moves at you.
+    say Move along now, this floor is only for warriors, barbarians, and rogues.
+    say Your profession's classrooms are either up or down from here.
+    break
+  endif
+endif
+~
+|
+S
+#5412
+simon antipaladin student~
+Simon~
+Simon, the Antipaladin student, is sneering as he gives directions.
+~
+““×~
+32834 0 -1
+52691496 4096 0 -1
+-1000 1 80
+-61 9 6000d1+0 8d10+71
+0 0
+8 8 1 0 0 264
+>arand_prog 1~
+if isspelled($i) acid_shield
+else
+  cast 'acid shield' $i
+  break
+endif
+~
+>load_prog 100~
+cast 'acid shield' $i
+~
+>speech_prog directions~
+if ispc($n)
+  if class($n) == 5
+    MPECHO $I rubs his hands together with an evil delight.
+    say Ah, so we have another student of the dark arts?
+    say Excellent.  Go all east to find our classroom.
+    grin
+    break
+  else
+     if class($n) == 6
+       spit
+       say Move it along Paladin.  You can find your other goody-goody
+       say friends all west in the Paladin's classroom.
+       MPECHOAT $n $I contorts his face into an evil sneer.
+       break
+     else
+       if class($n) == 9
+         spit
+         say Move it a long hippie.  You can find your other tree-hugging
+         say friends all the way to to the north in the Ranger's classroom.
+         MPECHOAT $n $I contorts his face into an evil sneer.
+         break
+       else
+         MPECHOAT $n $I contorts his face into an evil sneer.
+         say This floor of the Dark Castle Academy is for the Paladin, Anti-Paladin
+         say and Ranger classes.  Since you're not any of these, you need to go either
+         say up or down the stairs to find your classroom.
+         break
+       endif
+    endif
+  endif
+endif
+~
+|
+S
+#5413
+desoto antipaladin instructor~
+Desoto, the Dark~
+Desoto, the Dark, is kneeling before an altar to Lord Marrok.
+~
+Laikos~
+558914 0 -1
+52691496 4096 0 -1
+-1000 8 80
+-61 9 6000d1+0 8d10+71
+0 0
+8 8 1 0 0 264
+>arand_prog 5~
+if isspelled($i) acid_shield
+  else
+    cast 'acid shield' $i
+  break
+endif
+~
+>load_prog 100~
+cast 'acid shield' $i
+~
+|
+S
+#5414
+torick paladin instructor~
+Torick~
+Torick Lionheart is here, instructing his pupils on the art of chivalry.
+~
+Laikos~
+558914 0 -1
+52691496 4096 0 -1
+1000 2 80
+-61 9 6000d1+0 8d10+71
+0 0
+8 8 1 0 0 264
+C 6
+S
+#5415
+woody ranger instructor~
+Woody~
+Woody, the ranger, is here reading a book on herbology.
+~
+Laikos~
+32834 0 -1
+52691496 4096 0 -1
+350 1 80
+-61 9 6000d1+0 8d10+71
+0 0
+8 8 1 0 0 264
+>speech_prog yes sure find okay great go yep~
+if ispc($n)
+  if level($n) < 106
+    if class($n) == 9
+      if tempvar($i) == $n
+        break
+      else
+        MPSETTEMP $n newbiequest
+        MPSETTEMP $i $n
+        nod
+        say Okay, let's begin.
+      break
+    endif
+  endif
+endif
+~
+>speech_prog p teach me please~
+if ispc($n)
+  if level($n) < 106
+    if class($n) == 9
+      MPECHO $I looks up from his book about herbology.
+      say Hello friend of nature.  Would you like to hear a lesson?
+      say In my lesson, I will tell you a little bit about the realm
+      say of Dark Castle and the Ranger profession that you have chosen.
+      say If you would like to take the lesson, please say 'yes'.
+      break
+    endif
+  endif
+endif
+~
+>arand_prog 5~
+if isspelled($i) barkskin
+else
+  cast 'barkskin' $i
+  break
+endif
+~
+>load_prog 100~
+cast 'barkskin' $i
+~
+|
+S
+#5416
+lazlar lyricon bard instructor~
+Lazlar Lyricon~
+Lazlar Lyricon is staring intently at a sheet of music.
+~
+Laikos~
+33602 0 -1
+52691496 4096 0 -1
+350 7 80
+-61 9 6000d1+0 8d10+71
+0 0
+8 8 1 0 0 264
+S
+#5417
+tetsuo masai monk instructor~
+Tetsuo-masai~
+Tetsuo-masai, the Ironfist, is sitting in the center of the room meditating.
+~
+Laikos~
+296770 0 -1
+1126433320 4096 0 -1
+0 1 80
+-61 9 6000d1+0 8d10+71
+0 0
+8 8 1 0 0 0
+C 8
+S
+#5418
+mob empty~
+an empty mob~
+An empty mob is waiting to be detailed.
+~
+Laikos~
+296770 0 -1
+1126433320 4096 0 -1
+0 1 80
+-61 9 6000d1+0 8d10+71
+0 0
+8 8 1 0 0 264
+C 8
+S
+#5419
+zarr information archmage~
+Zarr the Archmage~
+Zarr the Archmage has been banished to this realm to work the Information Desk.
+~
+  White wings tip his temples in his well-groomed coif of shock-black
+hair.  The untold powers of the universe seem to swirl about him and
+heed his call, yet for all his powers he's stuck doing the shit job
+none of the paid employees will do.  Every now and then Zarr throws
+back his purple cape and shrieks something dramatic and frightening,
+but "gentle" bolts of electricity from nowhere in particular remind
+him why he's here in the first place.
+~
+66 0 -1
+52691496 0 0 -1
+0 1 80
+-61 9 50d1+0 8d10+71
+0 0
+8 8 1 0 0 264
+C 1
+>rand_prog 1~
+mumble
+~
+>rand_prog 1~
+grumble
+~
+|
+S
+#5420
+movement teacher~
+movement teacher~
+An empty mob is waiting to be detailed.
+~
+Laikos~
+2097152 0 -1
+2097152 0 0 -1
+900 1 5
+14 9 50d1+0 2d2+2
+2500 2500
+8 8 1 0 0 0
+S
+#5421
+newbie enfan monster mini~
+a play-dough enfan~
+A small enfan made out of play-dough is lurking about.
+~
+  Long ago a city-state was founded in the Haon'dor forest as a gateway
+between the trade hub of Sorpigal and the distant shore settlements to
+the far west.  At some point a race of powerful lizard-like humanoids
+overran the populous and tainted the once-proud city of Enfania with
+their dark rituals and bloody ways.  These lizard people are now known
+as the Enfans, as no one's managed to survive an encounter with one long
+enough to find their true name.  This strikingly-realistic model of one
+would perhaps be convincing, if not constructed entirely of a soft
+yellow play-dough.
+~
+64 0 -1
+2097152 0 0 -1
+0 0 1
+20 9 6d1+0 1d2+0
+1000 100
+8 8 1 0 0 0
+S
+#5422
+newbie monster clutch insect~
+a play-dough clutch insect~
+A tiny clutch insect made out of play-dough is wandering around.
+~
+  Among the many mysteries and curiosities in the realms, the clutch
+of qritcil insects has seemingly existed longer than the recorded
+histories of any race.  Though the insect itself is modeled in shock
+blue, the detail is so exacting one can see the various swirls of
+camouflage on the shell of its carapace...though of course all the
+swirls are the same shade of unnatural blue.
+~
+64 0 -1
+2097152 0 0 -1
+0 0 1
+20 9 6d1+0 1d2+0
+1000 100
+8 8 0 0 0 0
+S
+#5423
+newbie monster sahuagin raider~
+a play-dough Sahuagin raider~
+A play-dough model of a Sahuagin raider from the deep seas stalks about.
+~
+  Legends of the Al'Aglir dynasty are for the most part unverifyable,
+though at least one part of the tale is true: the kingdom of Naryia
+is quite real.  The journey is long and perilous, taking travellers
+through the neighboring territory of the vicious Sahuagin.  This odd
+doppelganger is comprised of a bright orange play-dough, which detracts
+very little from the realistic way its hooded eyes scan the area and
+its gills try to pump water.
+~
+64 0 -1
+2097152 0 0 -1
+0 0 1
+20 9 6d1+0 1d2+0
+1000 100
+8 8 1 0 0 0
+S
+#5424
+newbie monster duergar dwarf~
+a play-dough duergar~
+A hunched play-dough dwarf silently scampers about, avoiding detection.
+~
+  This hunched dwarf scuttles about, its beady eyes darting back and
+forth as it tries its best not to be torn apart by the more powerful
+play-dough creatures.  Once these dark dwarves were proud members of
+the Khazadturuk clan, though the corruption of a shadow dragon of
+vast power has forever tainted their souls.  Some smartass deity has
+molded this replica of pure white play-dough, bringing some llevity
+to the face of a rather dour evil.
+~
+64 0 -1
+2097152 0 0 -1
+0 0 1
+20 9 6d1+0 1d2+0
+1000 100
+8 8 1 0 0 0
+S
+#5425
+newbie monster wizard phyraz~
+a play-dough wizard~
+A play-dough wizard storms around, seeking his master Phyraz.
+~
+  Phyraz was once a proud arch-mage, capable of magic beyond the level
+most can even dream of.  In his arrogance he challenged Tek'lul and the
+Circle of Five.  While whispers in the tavern say the wizard is still
+alive, most reports claim he was driven quite mad by the encounter and
+now spends his time designing perverse magicks and training his army of
+disciple wizards to gate in the most foul of demons and elementals.
+Perhaps someday you'll be in the position to meet him yourself.
+~
+64 0 -1
+2097152 0 0 -1
+0 0 1
+20 9 6d1+0 1d3+0
+1500 150
+8 8 1 0 0 0
+S
+#5426
+newbie monster harpy screaming filthy~
+a play-dough harpy~
+A screaming, filthy harpy made of play-dough flaps her clay wings.
+~
+  Somewhere near the skies guarded by the stoic cloud giants are
+the screaming, filthy harpies of Dark Castle legend.  A test for any
+brave veteran, these wicked she-birds live only to torment the righteous
+and slay the living.  No one is quite sure where they came from;
+perhaps one day when you're a bit tougher you may be the one to discover
+the secret.  The play-dough clone has been molded from a bright red,
+far brighter than even a crimson spray of fresh blood.
+~
+64 0 -1
+2097152 0 0 -1
+0 0 1
+20 9 6d1+0 1d3+0
+1500 150
+8 8 2 0 0 0
+S
+#5427
+newbie monster birdman guard~
+a play-dough birdman guard~
+A birdman guard made out of play-dough is flying around in circles.
+~
+  The Avian kingdom keeps mostly to itself, though it's rumored some
+rather unlucky adventurers once caused some bad blood between the
+birdmen and the civilized world.  While they seem a rather kind and
+jovial sort, they're just as vicious as a headhunter if pressed into
+a corner.  The impressively-detailed simulacrum has been crafted out
+of a blaring green play-dough, each individual feather detailed enough
+to look quite real.
+~
+64 0 -1
+270532608 0 0 -1
+0 0 1
+20 9 6d1+0 1d3+0
+1500 150
+8 8 1 0 0 2097152
+S
+#5428
+newbie monster sura~
+a play-dough sura~
+A play-dough sura is here, trying to keep to the shadows.
+~
+  Some enterprising godling has molded a striking duplicate of a sura
+from Death Kingdom.  Normally these trained martial artists are among
+the most lethal of combatants...but of course, this one's made of play-
+dough.  The stealthy imposter has incredible detail to it, but the neon
+purple hue reveals it as someone's deific plaything.  It's said Gaiot's
+army of suras only moves to serve the most dark and heinous of evils,
+though not many adventurers have survived a trip to Death Kingdom to
+say how true this is.
+~
+64 0 -1
+2097152 0 0 -1
+0 0 1
+20 9 6d1+0 1d3+0
+1500 150
+8 8 1 0 0 0
+S
+#5429
+verysupersecretkeywordsonewbiesdontdie~
+an acolyte of Pirahna~
+An acolyte of Pirahna is here, helping out the wounded.
+~
+  Much like his patron, this devotee of the phish's faith has given
+himself fully to being a full-time lecher.  As students pass, he
+quickly appraises them according to the tenants of Pirahna:
+  (a) is she a lesbian?
+  (b) is she Asian?
+  (c) would she look good in some Anime with some tentacles?
+  (d) OMG do all of the above apply?
+Occasionally the acolyte mutters his greetings to non-Asian lesbian
+Anime-star students, though more often than not seems to be "communing"
+with himself.
+~
+688962 0 -1
+858065576 4096 0 -1
+900 1 101
+-70 9 12000d1+0 8d10+80
+0 0
+8 8 1 0 0 0
+C 9
+>all_greet_prog 25~
+if ispc($r)
+cast 'refresh' $r
+endif
+~
+>all_greet_prog 25~
+if ispc($r)
+  cast 'cure light' $r
+endif
+~
+>all_greet_prog 25~
+if ispc($r)
+  cast 'strength' $r
+endif
+~
+>all_greet_prog 25~
+if ispc($r)
+  cast 'armor' $r
+endif
+~
+>all_greet_prog 25~
+if ispc($r)
+  cast 'bless' $r
+endif
+~
+|
+S
+#5430
+monitor hall newbie~
+the Hall Monitor~
+A burly Hall Monitor is here, directing the students to their classrooms.
+~
+~
+558914 0 -1
+52691624 0 0 -1
+1000 6 80
+20 10 0d1+0 8d10+0
+0 0
+8 8 1 0 0 264
+C 7
+S
+#5431
+guildmaster headmaster head master newbie~
+the Dark Castle Academy Headmaster~
+An old and graying elf is relaxing in his chair, contemplating the universe.
+~
+~
+33090 0 -1
+589638312 0 0 -1
+1000 2 100
+20 10 0d1+0 8d10+0
+0 0
+8 8 0 0 0 264
+C 1
+S
+#5432
+apprentice guildmaster newbie~
+the Headmaster's Apprentice~
+The apprentice to the Academy's Headmaster is busy organizing scrolls.
+~
+~
+33090 0 -1
+52691624 0 0 -1
+1000 1 80
+20 10 0d1+0 8d10+0
+0 0
+8 8 0 0 0 0
+S
+#5433
+farmer~
+a farmer lady~
+A farmer lady stands here, shivering.
+~
+~
+0 0 -1
+0 0 0 -1
+0 0 80
+20 10 0d1+0 1d1+0
+0 0
+8 8 0 0 0 0
+>act_prog p wears an old hat~
+MPPAUSE 1
+gasp
+say You look amazing!
+MPPAUSE 1
+say You can check your EQUIPMENT (EQ for short) anytime.
+MPPAUSE 1
+say Be careful not to let any of your equipment fall to pieces.
+say You may need to repair items that are are Falling Apart and
+say no longer in Excellent Condition.
+MPPAUSE 1
+say You may also wish check your INVENTORY (I or INV for short)
+say during your travels.  Be careful not to become too encumbered,
+say as you will no longer be able to pick anything up, due to
+say the weight or the number of items you are carrying.
+MPPAUSE 5
+say In the lower right hand quarter of your SCORE (SC for short) sheet,
+say you will find the information regarding your items and equipment.
+MPPAUSE 3
+say That's all of the information I have for you, $n.
+say I suggest you go back to STARTGUYSNAME and continue your journey.
+say You may leave whenever you wish.
+~
+>fight_prog 100~
+say Now, now.  I'm trying to help you.
+peace
+~
+>give_prog sweater~
+MPPAUSE 1
+wear sweater
+say That feels better, now I'm not stuck by the fireplace.
+MPSET 5433 long {A farmer lady stands here, shivering.}
+MPPAUSE 2
+say One second...
+MPPAUSE 1
+emote searches around the room for a bit.
+MPPAUSE 2
+say Here it is!
+emote gets an old hat from the closet.
+MPOLOAD oldhat
+MPPAUSE 1
+say Here you go, for helping me.
+give hat $n
+MPPAUSE 1
+say Go on and WEAR the HAT, pretty please?  You'll look so good in it!
+~
+>act_prog p closes the door.~
+if ispc($n)
+  if inroom($n) == outsideroom
+    say Thank you so much!  The heating bill has been outrageous with the fuel prices as high as they are.
+    break
+  endif
+  if inroom($n) == insideroom
+    say Thanks $n, how kind of you.
+    MPPAUSE 2
+    emote shudders and rubs her hands near the fire.
+    MPPAUSE 1
+    say Would you mind getting my sweater for me?  It's in the chest.
+    MPPAUSE 1
+    say The key to the chest is in the desk.  GET the KEY from the DESK.
+    MPPAUSE 2
+    say Would you UNLOCK the CHEST, and then OPEN the CHEST please.
+    MPPAUSE 2
+    say Then could you GET the SWEATER from the CHEST.
+    MPPAUSE 2
+    say Finally, GIVE the SWEATER to me, LADYSNAME.
+    break
+  endif
+  break
+endif
+~
+>greet_prog 100~
+if ispc($n)
+  if inroom($n) == outsideroom
+    say Hello $n, how are you doing?
+    MPPAUSE 2
+    say My, I'm quite cold.  Let us continue this conversation inside.
+    MPPAUSE 1
+    open door
+    n
+    MPSET 5433 long {A farmer lady is here, huddled by the fire.}
+    break
+  endif
+  if inroom($n) == insideroom
+    say Welcome to my humble abode, $n.
+    MPPAUSE 1
+    say Won't you please CLOSE the DOOR?  I'm freezing!
+    break
+  endif
+  break
+endif
+~
+|
+S
+#5434
+proud warrior~
+a proud warrior~
+A proud warrior sits here, sulking.
+~
+~
+0 0 -1
+0 0 0 -1
+0 0 0
+20 10 0d1+0 1d1+0
+0 0
+8 8 0 0 0 0
+>act_prog p starts following you.~
+if ispc($n)
+  say Excellent, let's head out.
+  e
+~
+>speech_prog p yes~
+if ispc($n)
+  if inroom($n) == originalroom
+    jump
+    say Thank you so much!
+    MPPAUSE 1
+    boggle
+    say Ok, the first thing we have to do is group up.
+    say FOLLOW me, the WARRIOR, please.
+    break
+  endif
+  break
+endif
+~
+>speech_prog p wrong~
+if ispc($n)
+  if inroom($n) == originalroom
+    tear
+    say I think somebody stole my favorite sword.
+    say I've looked everywhere for it.
+    say I don't know what to do.
+    MPPAUSE 2
+    say Wait a second, will you help me find it?
+    break
+  endif
+  break
+endif
+~
+>rand_prog 60~
+if ispc($n)
+  if inroom($n) == originalroom
+    sigh
+    say I wish somebody would ask me what's wrong.
+    break
+  endif
+  break
+endif
+~
+|
+S
+#5435
+ultimate teacher newbie guide~
+Teacher, The Ultimate Newbie Guide~
+Teacher, the ultimate newbie stands here awaiting a pupil.
+~
+Teacher stands here with s his book 'Chode for Dummies' and wait his next newbie to school.
+~
+0 0 -1
+0 0 0 -1
+0 1 101
+20 10 0d1+0 10d10+0
+0 0
+8 8 1 0 0 0
+S
+#5470
+empty mob~
+an empty mob~
+an empty mob description
+~
+an empty mob description
+~
+262400 0 -1
+2621440 0 0 -1
+0 0 15
+20 10 0d1+0 1d1+0
+0 0
+8 8 0 0 0 0
+C 3
+T 28 11 11 11 11 0
+>act_prog p ARGGGGG!!!! *** K I L L ***!!!!.~
+say act_prog p ARG....
+~
+>act_prog p attack and attempt to make good your escape!~
+say act_prog p attack....
+~
+>fight_prog 100~
+say fight_prog 100
+~
+>attack_prog 100~
+say attack_prog 100
+say im backstabing you now
+backstab $n
+~
+>load_prog 100~
+say load_prog 100
+~
+>death_prog 100~
+say death_prog 100
+~
+>rand_prog 0~
+say rand_prog 100
+if numpcs()>0
+say numpcs()>0
+endif
+~
+>greet_prog 100~
+say greet_prog 100
+if ispc($n)
+ say hello pc
+ if class($n) == 2
+  say hello class 2
+ else
+  say hello not class 2
+ endif
+else
+ say hello npc
+endif
+~
+|
+S
+#5500
+Emperor Tharkes Mad Reaver Khromilldor~
+Emperor Tharkes the Mad~
+The now-mad Emperor of Khromilldor and all of Jundlehem shrieks and wails at nothing in particular.
+~
+  A withered sack of leathered flesh stands in regal robes of state,
+his once-firey red beard now streaked with ash grey.  The old dwarf's
+fevered eyes dart back and forth, examining everything...and in some
+cases examining what isn't there.  While many legends and rumors have
+been told of Tharkes the Reaver, few seem to pass the test of veracity,
+save one: he is indeed quite mad.  Just ask him.
+~
+270288642 0 -1
+1126500544 53 0 -1
+-650 3 104
+14 9 50d1+0 9d8+2
+2500 2500
+8 8 1 11531 4194816 3145968
+T 28 28 28 28 28 0
+>catch_prog 4~
+MPECHO Reality wavers for an instant as Emperor Tharkes the Mad wills an anti-magus shocktrooper to come to his aid!
+MPMLOAD 5597
+~
+>fight_prog 8~
+if numpcs() <= 6
+  say Ye must feel mighty brave, showin' yerselves so few in number...
+  MPTHROW 5500 3 2
+  break
+endif
+~
+>catch_prog 3~
+say Dances of elders, songs of the old;
+say Rituals of power, ceremonies of yore;
+say Grant the strength of the mountains, of a giant ten-fold;
+shout Give me thunder to wield like the lion's proud roar!
+MPECHO A $$B$$7shockwave$$R of $$B$$7sonic$$R energy thunders from Emperor Tharkes the Mad, crashing into you!
+MPDAMAGE all 370d1 song
+MPDAMAGE all 1d230 song
+~
+>act_prog p You don't feel so invulnerable anymore~
+if ispc($n)
+psay $n Ah, ye'd like t' undo all me magicks, eh?
+psay $n Tell ye what, I might know a fella ye'd git right on with.
+wink
+MPTHROW 5500 4 2
+break
+endif
+~
+>fight_prog 10~
+if numpcs() >= 6
+  say So many...
+  say ...why are there so many of you?!
+  MPTHROW 5500 2 3
+  break
+endif
+~
+>fight_prog 5~
+say Meditations in strength, grace, and form;
+say Endless miles of stone and rock, tender only to some;
+say Titans who courted my ancestors, bore them children as ore;
+shout Their wrath is unleashed, and with your doom it shall come!
+MPECHO The chamber wavers, becoming a cascading $$B$$5avalanche$$R of rock and debris!
+MPDAMAGE all 1d750 magic
+MPDAMAGE all 100d1 magic
+~
+>catch_prog 2~
+say Mother's mercy, life borrowed from surf
+say The lament of the oceans, too proud to cry
+say The rage of the planet, the scream of the earth
+shout Wash away the sin the infidels, condemn them to die!
+MPECHO A $$B$$1maelstrom$$3 whirls $$Rinto existence, crushing your bones and flooding your lungs!
+MPDAMAGE all 400d1 water
+MPDAMAGE all 1d25 water
+~
+>fight_prog 5~
+say Circles upon circles of endless fire;
+say Fields of burning consuming all who dare tread;
+say Intentions and feelings surface most dire;
+shout Bringing this fiery curse on your head!
+MPECHOAT $n $$B$$4Flames$$R swirl and coalesce, coming to sear into your tender flesh!
+MPECHOAROUND $n $$B$$4Flames$$R fill the room, swirling and coalescing onto $n's vulnerable body!
+MPDAMAGE $n 800d1 fire
+MPDAMAGE $n 1d75 fire
+~
+>death_prog 100~
+say Urgh...the power wasn't enough, Sshar'aak...
+say...my...people...what did you do...?
+shout BETRAYER!!
+MPECHO Emperor Tharkes the Mad disappears in a blossoming ball of fiery rage, $$B$$4immolating$$R the entire room.
+MPDAMAGE all 375d1 fire
+MPDAMAGE all 1d150 fire
+~
+>act_prog p You SCREAM in pain as~
+if ispc($n)
+  whisper $n Like th' fire do ye?
+  shout Th' fires of th' nine hells:
+  shout ...burn th' flesh from eternity an' cleanse this soiled earth!
+  MPECHOAT $n Emperor Tharkes the Mad points a gnarled finger at you, causing your flesh to erupt in $$B$$4flame$$R!
+  EMPECHOAROUND $n Emperor Tharkes the Mad cackles wildly, magically $$B$$4immolating$$R $n in a cascade of $$B$$4fire$$R!
+  MPDAMAGE $n 180d5 fire
+  break
+endif
+~
+>catch_prog 1~
+grin
+say 'at's a good pally.
+~
+>act_prog wields~
+
+if class($n) == 6
+  if number($o) == 10000
+    snarl $n
+    psay $n Yer not seriously thinkin' ye'll take m'head now, are ye?
+    psay $n Jes' in case ye are, why don't ye kindly reconsider?
+    MPFORCE $n remove all
+    MPTHROW 5500 1 1
+    break
+  endif
+  break
+endif
+~
+>act_prog p power heals~
+if isfight($i)
+  if ispc($n)
+    if class($n) == 11
+      if rand(100) <= 90
+        psay $n I knows ye nature-lovers hate th' establishment and all...
+        psay $n But really, y'should be a little more careful about which man ye try t'bring down!
+        MPECHOAT $n Emperor Tharkes the Mad's fevered thoughts pour through your head, searing your mind!
+        MPECHOAROUND $n Emperor Tharkes the Mad glares intently at $n, who screams, apparently wracked with pain!
+        MPDAMAGE $n 250d1 physicalmagic
+        MPDAMAGE $n 1d150 physicalmagic
+        break
+      endif
+      break
+    endif
+    break
+  endif
+  break
+endif
+~
+>act_prog p You are ENVELOPED in a PAINFUL BRIGHT LIGHT~
+if ispc($n)
+  tell $n Fancy yerself more ken with th' gates than Tharkes, eh?
+  tell $n SEE HOW YE LIKE THIS ONE.
+  MPAT 5598 cast 'souldrain' $n
+  MPAT 5598 MPECHOAT $n Ok.
+  MPAT 5598 MPECHOAT $n A Bright light comes down from the heavens.
+  MPAT 5598 MPECHOAROUND $n $n utters the words, 'garandoa oahz'
+  MPAT 5598 MPECHOAROUND $n $n opens a Solar Gate.
+  MPAT 5598 MPECHOARUOND $n $$BYou are ENVELOPED in a PAINFUL BRIGHT LIGHT.$$R
+  MPAT 5598 MPDAMAGE all 400d1 physicalmagic
+  MPAT 5598 MPDAMAGE all 1d100 physicalmagic
+  break
+endif
+~
+>act_prog p FULL heals~
+if isfight($i)
+  if ispc($n)
+    if class($n) == 2
+      if rand(100) <= 80
+        psay $n Ah, ah, ah.  Yer shouldn't be doin' that...
+        psay $n Regicide, after all, is an offense punishable by death!
+        MPECHOAT $n Emperor Tharkes the Mad's fevered thoughts pour through your head, searing your mind!
+        MPECHOAROUND $n Emperor Tharkes the Mad glares intently at $N, who screams, apparently wracked with pain!
+        MPDAMAGE $n 100d5 physicalmagic
+        break
+      endif
+      break
+    endif
+    break
+  endif
+  break
+endif
+~
+|
+S
+#5501
+guard dwarf dwarven Khromilldor~
+a Khromilldor guard~
+A guard of the Khromilldor army moves regimentally and precisely to intercept your advance.
+~
+  Though the duergar are known for their oddly grey complexions, the
+ashy look of these guards doesn't seem like the product of cross-
+breeding.  This guard in particular is stout like a normal dwarf,
+standing taller than a duergar yet still shorter than an elf.  His
+dark brown beard now seems sooty and dusty, though not naturally
+grey from age.  The armor he wears seems in good repair, though it
+obviously hasn't been oiled or cleaned for quite some time.
+~
+804704 0 -1
+35651592 0 0 -1
+-5 3 60
+14 9 50d1+0 4d12+2
+2500 2500
+8 8 1 66952 0 144
+S
+#5502
+Parry ranger~
+Parry the tree-hugging Ranger~
+A familiar-looking ranger endlessly forages, hoping one day to find a grub.
+~
+  Parry recites epic poetry from some faraway place he calls "Grease",
+and occasionally he'll reference the "Empire of Roam".  As he tells
+you all about nymphs, eye-gougings, incest, and the occasional brutal
+assassination, he roots around the area for impossible-to-get forage
+items.  Every now and then he'll jump up as though he's ambushing someone,
+only to stand up in the Albatross Tavern.
+~
+135005060 0 -1
+53485632 0 0 -1
+900 1 50
+14 9 5000d1+0 8d5+128
+2500 2500
+8 8 1 3147656 0 19
+C 9
+T 25 25 25 25 25 0
+>rand_prog 80~
+if rand(2)
+  say OMG!!  I foraged a grub!!!
+  break
+endif
+if rand(2)
+  say Stromboli lifted my bag of puffballs. :(
+  break
+endif
+if rand(2)
+  say Rangers: putting the "bush" back in "ambush"!
+  break
+endif
+if rand(2)
+  say Using Feline Agility does NOT make me a pussy!!
+  break
+endif
+if rand(2)
+  say I really think Monks are a super-balanced class.
+  break
+endif
+if rand(2)
+  say Apoc ruined my life when he made it so I couldn't tame Kalain and make her skronk me.
+  break
+else
+if rand(2)
+  say They give me woody powers but I can't even penetrate a poodle with my "arrow".  Fix rangers!
+  break
+endif
+if rand(2)
+  say Holy crap, one of my skills works now!  I better not use it in public or the imms will tone it down.
+  break
+endif
+~
+|
+S
+#5503
+sentry guard dwarf dwarven Khromilldor~
+a Khromilldor guard~
+A sentry stands guard, his vacant gaze staring outward from beneath a Khromilldor helm.
+~
+  Glazed eyes stare outward, never seeming to focus on anything.  The
+sentry seems to be following orders very precisely, admitting only other
+(and equally-odd) Tharkesian dwarves while attacking any other creatures--
+even scuttling insects.  Aside from the occasional quick kill it doesn't
+look like he's moved from this spot in quite awhile.
+~
+4999010 0 -1
+35651592 0 0 -1
+-5 3 70
+14 9 50d1+0 5d11+2
+2500 2500
+8 8 1 66952 0 144
+C 4
+S
+#5504
+guard dwarf dwarven Khromilldor~
+a Khromilldor patrol~
+A slack-jawed dwarf endlessly patrols the keep.
+~
+  Though his armor and garments seem in good repair, his expression
+belies a vacancy within.  He moves slowly about the keep, his head
+periodically twisting this way or that; he searches for intruders,
+but sees nothing else.  This patrolman seems to be endlessly guarding
+the same route.  If observed long enough, he might even step in the
+exact same footfalls each time.
+~
+4999008 0 -1
+35651592 0 0 -1
+-5 3 70
+14 9 50d1+0 10d5+2
+2500 2500
+8 8 1 66952 0 144
+S
+#5505
+sentry guard dwarf dwarven Khromilldor~
+a Khromilldor guard~
+Grime and dust covers this sentry, who methodically moves to intercept.
+~
+The sentry wears a mask of apathy, his facial muscles completely
+relaxed, his posture very much at ease.  Though his movements are
+crisp and precise as though he were freshly-dispatched for duty,
+tarnish and dust covers every inch of his uniform and exposed skin.
+Even his beard - the pride and joy of any dwarf - is frazzled and un-
+brushed, as though years of wind has eroded and corroded it into a
+rat's nest.
+~
+4999010 0 -1
+35651592 0 0 -1
+-5 3 70
+14 9 50d1+0 7d8+2
+2500 2500
+8 8 1 66952 0 144
+C 4
+S
+#5543
+razor backed razor-backed dire rat~
+a razor-backed dire rat~
+A dire rat the size of a portly orcish woman rears up and prepares to attack!
+~
+  Gleaming black eyes, whiskers like miniature rapiers, teeth capable
+of tearing a halfling's head straight off, and razor-edged backspines
+like polearms are all reasons the sane seek to avoid deep dire rats.
+Unfortunately for you, it seems you've stumbled upon one and done quite
+the opposite of the sane thing.  Pity, that.  Good luck with future
+endeavors.
+~
+0 0 -1
+2097152 0 0 -1
+900 16 65
+14 9 50d1+0 2d2+2
+2500 2500
+8 8 1 0 128 0
+S
+#5544
+razor backed razor-backed dire rat~
+a razor-backed dire rat~
+A stinking rat with back-quills the size of polearms hisses and poises to attack.
+~
+  Gnomish scholars have spent uninterrupted decades debating how it
+is dire rats have evolved the way they have.  Given the gnomish
+propensity to disbelive thaumaturgy in general, the leading theory
+is that the dire rats are actually the offspring of wererats and
+some yet-undiscovered inhabitant of the underdark.  Of the four-legged
+variety, of course...the gnomes are also known for their rediculously
+filthy minds.
+~
+0 0 -1
+2097152 0 0 -1
+900 16 65
+14 9 50d1+0 2d2+2
+2500 2500
+8 8 1 0 128 0
+S
+#5555
+test mob brixton~
+Brixton's test mobbiepoo~
+A test mobile stoically awaits the impending punishment of QA testing.
+~
+~
+141328402 0 -1
+2097152 0 0 -1
+0 0 5
+70 10 30000d1+0 1d1+0
+0 0
+8 8 0 1408 0 6290039
+>death_prog 100~
+MPOLOAD 5681
+MPAT 5683 unlock footlocker
+MPJUNK doesnotloadyoucheatingfuck
+MPECHO $I clutches $k midsection, glaring with malice undiluted by $k mortal wounds.
+say This isn't the last you've seen of me...
+if iswielding($i)
+    MPECHO $I raises $k broadsword, which gleams with a $$B$$0dark$$R, $$B$$0unearthly$$R power...
+    MPECHO $I slices RIGHT THROUGH you, dropping $l sword in the process though it allows $k an escape!
+    MPDAMAGE all 10d10 undefined
+    remove sword
+    drop sword
+    MPPURGE $i
+    else
+    chuckle
+    say Well, I guess I can't take you wear I'm going.  'Tis a shame.
+    drop sword
+    MPECHO $I mutters something under his breath and disappears in a wave of shadows.
+    MPPURGE $i
+endif
+~
+|
+S
+#5576
+Sshar'aak sshar greater demon reaver Khromilldor~
+Sshar'aak, Black Reaver of Souls~
+A massive demon rakes his claws along the floor before charging.
+~
+  A massive coal-black form looms above the sundered earth, ready to
+kill...after having a little fun first.  One of the Greater Demonlords
+from some layer of the Abyss, Sshar'aak exists only to torment and to
+consume souls.  Apparently Emperor Tharkes long ago made a pact with
+Sshar'aak...freeing him from the Abyss but binding him to Tharkes.  In
+return for the humiliation Tharkes promised to feed him dwarven souls...
+the souls of his enemies.  Unfortunately his incantation was imperfect,
+and after the carnage Sshar'aak had his feast--only without bothering
+to discern supposed friend from foe.
+~
+269354786 0 -1
+320930408 0 0 -1
+-1000 28 108
+14 9 50d1+0 19d5+2
+2500 2500
+8 8 1 99833 4194336 4
+>hitprcnt_prog 60~
+if numpcs() >= 8
+   if numofmobsinroom(5577) < 2
+      MPECHO $I shrieks, piercing the air with the $$B$$7screams$$R of a thousand dying innocents.
+      MPECHO A lesser demon-spawn arrives to serve its master!
+      MPMLOAD 5577
+      endif
+else
+if numofmobsinroom(5577) < 1
+   MPECHO $I shrieks, piercing the air with the $$B$$7screams$$R of a thousand dying innocents.
+   MPECHO A lesser demon-spawn arrives to serve its master!
+   MPMLOAD 5577
+endif
+endif~
+>hitprcnt_prog 45~
+if numpcs() >= 10
+   if numofmobsinroom(5578) < 2
+      MPECHO $I shrieks, piercing the air with the $$B$$7screams$$R of a thousand dying innocents.
+      MPECHO A greater demon-spawn arrives to serve its master!
+      MPMLOAD 5578
+      endif
+else
+if numofmobsinroom(5578) < 1
+   MPECHO $I shrieks, piercing the air with the $$B$$7screams$$R of a thousand dying innocents.
+   MPECHO A greater demon-spawn arrives to serve its master!
+   MPMLOAD 5578
+endif
+endif~
+>hitprcnt_prog 30~
+if numpcs() >= 8
+   if numofmobsinroom(5579) < 2
+      MPECHO $I shrieks, piercing the air with the $$B$$7screams$$R of a thousand dying innocents.
+      MPECHO A lesser demon-spawn arrives to serve its master!
+      MPMLOAD 5579
+      endif
+else
+if numofmobsinroom(5579) < 1
+    MPECHO $I shrieks, piercing the air with the $$B$$7screams$$R of a thousand dying innocents.
+    MPECHO A lesser demon-spawn arrives to serve its master!
+    MPMLOAD 5579
+endif
+endif
+~
+>hitprcnt_prog 15~
+if numpcs() >= 10
+   if numofmobsinroom(5580) < 2
+      MPECHO $I shrieks, piercing the air with the $$B$$7screams$$R of a thousand dying innocents.
+      MPECHO A greater demon-spawn arrives to serve its master!
+      MPMLOAD 5580
+      endif
+   else
+if numofmobsinroom(5580) < 1
+   MPECHO $I shrieks, piercing the air with the $$B$$7screams$$R of a thousand dying innocents.
+   MPECHO A greater demon-spawn arrives to serve its master!
+   MPMLOAD 5580
+endif
+endif~
+>hitprcnt_prog 10~
+MPECHO $I squints $l six eyes, rumbling deeply in a demonic tongue.
+MPTHROW 5576 5 2
+~
+>catch_prog 5~
+MPECHO The light begins to fade away as $I finishes $l most powerful incantation.
+MPECHO A gate to the endless sorrow of $$B$$0oblivion $$Ropens, exchanging solid matter with the $$B$$7pallid shade $$Rof absolute nothingness.
+MPDAMAGE all 1d251 magic
+MPDAMAGE all 749d1 magic
+~
+>death_prog 100~
+remove uuruuk
+MPJUNK uuruuk
+~
+>catch_prog 4~
+MPECHO $I spins and hammers the ground with a powerful claw, the vibrations enhanced by $l terrible magic.
+MPECHO A $$5yawning chasm $$Ropens up, dropping you down a seemlingly endless cliff only to fall broken at $I's merciless feet.
+MPDAMAGE all 4d202 physicalmagic
+MPDAMAGE all 1d2 physicalmagic
+~
+>catch_prog 3~
+MPECHO $I abrubtly ceases chanting and raises $l fists at the enclosed ceiling, ending one of Naerion's elemental incantations!.
+MPECHO A rain of infernal $$1sleet$$R hammers down, searing and freezing with icy drops of hellish water!
+MPDAMAGE all 4d150 water
+MPDAMAGE all 50d2 water
+~
+>catch_prog 2~
+MPECHO $I unfurls $l wings and waves a powerful claw, ending $l incantation.
+MPECHO A howling $$5dust storm$$R swirls into existence, scouring the flesh from your very bones!
+MPDAMAGE all 120d4 acid
+MPDAMAGE all 4d20 acid
+~
+>catch_prog 1~
+MPECHO $I raises a clawed hand, shrieking the final words of power to one of Magnus's greatest spells!
+MPECHO A swirling cascade of lights douses the chamber in a $$3freezing $$B$$3aurora$$R nightmare!
+MPDAMAGE all 15d20 cold
+MPDAMAGE all 30d10 cold
+~
+>fight_prog 8~
+MPECHO $I squints $l six eyes, rumbling deeply in a demonic tongue.
+if rand(25)
+  MPTHROW 5576 1 2
+else
+  if rand(50) == 2
+    MPTHROW 5576 2 2
+  else
+    if rand(75) == 3
+      MPTHROW 5576 3 2
+    else
+      MPTHROW 5576 4 2
+    endif
+  endif
+endif
+~
+>fight_prog 3~
+MPECHOAT $n $I lashes out one of $l powerful talons, a searing $$2caustic $$Rwound where $l claws touched.
+MPECHOAROUND $n $I lashes out at $n, leaving a nasty-looking $$2infected$$R wound where $n was touched.
+MPDAMAGE $n 1d155 poison
+MPDAMAGE $n 9d5 poison
+MPBESTOW $n poison 20
+~
+|
+S
+#5577
+lesser yrnali demon~
+a lesser yrnali demon~
+A shadow passes quickly, coalescing to form a minor demon.
+~
+  Though few know where the yrnali scourge came from, excerpts taken
+from the diary of Shyntoa Al'Aglir suggest they may be common denizens
+of the Nine Hells.  Though no mages alive today are expert enough in
+planeswalking to say from which circle they come, it's clear that like
+most demonspawn they crave little more than destruction and suffering.
+~
+4458336 0 -1
+35651624 0 0 -1
+-500 30 65
+14 9 50d1+0 5d10+2
+2500 2500
+8 8 0 3147160 1048576 8
+S
+#5578
+greater yrnali demon~
+a greater yrnali demon~
+Fire and gloom harmonize to form a destructive demon of significant power.
+~
+  Shadowy and fiery both, this yrnali seems larger and more vicious
+than others around it.  Though little research has been done on the
+life cycle of demonkind, it's clear that size does matter in their
+food chain.  With any luck, its next meal won't be any time soon.
+~
+21235552 0 -1
+35651624 0 0 -1
+-500 30 70
+14 9 50d1+0 6d10+2
+2500 2500
+8 8 0 3147160 1048576 8
+S
+#5579
+lesser tholara demon~
+a lesser tholara demon~
+A demon black as jet and sinister as a friendly Necromancer skitters toward you.
+~
+  Tholara demons hail from one of the many circles of Hell, where
+the greatest of their kind, Thola'resk, dominates with cruelty and
+sheer evil.  The demon itself is coal-black, marbled with greyish
+veins.  Its wings allow it flight, though it seems perfectly content
+to use its powerful claws to intercept its prey.
+~
+263008 0 -1
+35651616 0 0 -1
+-500 29 65
+14 9 50d1+0 5d10+2
+2500 2500
+8 8 0 3147160 1048576 8
+S
+#5580
+greater tholara demon~
+a greater tholara demon~
+A large tholara demon quietly pads towards its intended prey: you.
+~
+  Only recently have tholara demon citings been recorded.  The cause
+of their appearance and their seeming growth in numbers remains a
+mystery.  Thaumaturgy still does not grant even the most powerful of
+mages the ability to scrye the lower planes, and no priests commune
+with the terrible powers of Hell.  Perhaps in time, their secret
+will be revealed.
+~
+23068672 0 -1
+35651616 0 0 -1
+-500 29 70
+14 9 50d1+0 6d10+2
+2500 2500
+8 8 1 16 1048576 8
+S
+#5597
+anti magus anti-magus shocktrooper Khromilldor~
+an anti-magus shocktrooper~
+Wearing numerous protective anti-magic charms and wards, this soldier seems to specialize in killing mages.
+~
+  Many tales of the War of Jundlehem cite these terrible elite soldiers,
+trained specifically to endure the onslaught of any thaumaturgy summoned
+against them.  Though nigh-impervious to mystical assault they're known
+to bleed just like any other dwarf.  That is, they were known to bleed
+at some point...now just may be a bad time for them.
+~
+5130082 0 -1
+35913768 0 0 -1
+-25 3 75
+14 9 50d1+0 4d4+2
+2500 2500
+8 8 1 4261884 0 3145856
+C 1
+S
+#5598
+elite berserker shocktrooper Khromilldor~
+an elite berserker~
+A battlerager of the elite Khromilldor berserker corps wears a mask of apathy.
+~
+  Emperor Tharkes' pride and joy before the onslaught of demonic powers,
+the famed berserkers of Khromilldor, were renowned for their ferocity in
+battle and their ability to pound the fuck out of any piece of meat who
+so happened in their paths.  Those who survived long enough during the
+war to document encounters suggest shooting at them from a distance.  A
+very, very long distance.
+~
+935778 0 -1
+35651584 0 0 -1
+900 3 75
+14 9 50d1+0 5d7+2
+2500 2500
+8 8 1 66952 0 144
+C 7
+>death_prog 100~
+remove all
+mpecho an anti-militia shocktrooper gurgles and staggers, collapsing to the floor in a bloody heap.
+mpjunk spikeblade
+~
+|
+S
+#5599
+anti militia anti-militia shocktrooper Khromilldor~
+an anti-militia shocktrooper~
+A veteran of a thousand battles and even more fistfights impassively stands guard.
+~
+  Decendants of those who fought in the War of Jundlehem still spin
+yarns about elite soldiers in the Tharkesian Horde who were able to
+endure any physical assault.  The bane of Coar Fist's human warriors
+and the Daine rangers alike, they were still very susceptable to any
+mage who had the leisure to target them.
+~
+5130082 0 -1
+1109393440 0 0 -1
+900 3 75
+14 9 50d1+0 2d2+2
+2500 2500
+8 8 1 1047947 4194816 144
+C 8
+>death_prog 100~
+remove all
+mpecho an anti-militia shocktrooper gurgles and staggers, collapsing to the floor in a bloody heap.
+mpjunk spikeblade
+~
+|
+S
+#5600
+pirate surly jack git~
+a surly pirate~
+A surly jack lifts his voice in song and his blade in salute.
+~
+Though curt in expression and manner, this rather chivalrous pirate
+gives a quick salute before bellowing out more of his (rather foul-
+languaged) chanties and jigs.  He seems quite willing to fight and
+die for whatever the Captain has decided he should be fighting and
+dying for.
+~
+788224 0 -1
+2097192 0 0 -1
+150 1 60
+20 10 0d1+0 5d5+0
+30000 0
+8 8 1 0 2097664 48
+C 6
+S
+#5601
+pirate burly git~
+a burly pirate~
+A burly pirate grins and waves his blade, barely drawing attention away from his pistol.
+~
+More of a lovable oaf than a frightening thug, this barrel-chested
+man seems to think himself clever by distracting his opponents with
+his sword while firing his loud pistol...which he happens to hold out
+directly in front of him.  While he may not be fooling anyone, he seems
+to be taking care of himself and his mates in battle.
+~
+788224 0 -1
+2097152 0 0 -1
+100 1 63
+20 10 0d1+0 4d6+0
+30000 0
+8 8 1 0 2097664 48
+C 7
+S
+#5602
+pirate swashbuckler git~
+a laughing pirate~
+A laughing swashbuckler leaps into action, his blade trailing flashes of light.
+~
+This laughing swordsman seems impeccably-groomed for such a rough
+life on the seas...but to him it seems more an opportunity to show
+off for any ladies who might be passing by.  He seems rather adept at
+swordplay and acrobatics, though he seems to walk with an odd spring
+in his step.
+~
+788224 0 -1
+2097152 0 0 -1
+50 1 61
+20 10 0d1+0 15d2+0
+30000 0
+8 8 1 0 2097664 48
+C 4
+S
+#5603
+pirate burly thug lily~
+a burly pirate~
+A burly thug assumes a stance, ready to fight to the end.
+~
+A brutish hulk of fur and muscle, this brigand seems quite ready and
+willing to exercise using any living equipment that might happen by.
+His meaty fists clench furiously, ready to draw his weapon and kill for
+his beloved captain.
+~
+263936 0 -1
+2097152 0 0 -1
+0 1 63
+20 10 0d1+0 5d5+0
+30000 0
+8 8 1 0 48 6291968
+S
+#5604
+pirate shouting lily~
+a shouting pirate~
+A shouting pirate aims a crossbow, calling to his mates for support.
+~
+A mousey man scurries along the railings and skirting the mast, firing
+arrows into combat.  Though wiry and scruffy, he's hardened enough to
+know how to be effective in combat.  He quickly calls to the less-
+strategic of his mates, giving them ad-hoc orders and organization.
+~
+263936 0 -1
+2621440 4096 0 -1
+0 1 60
+20 10 0d1+0 9d3+0
+30000 0
+8 8 1 0 48 6291968
+C 3
+S
+#5605
+lady pirate sailor lily~
+a lady pirate~
+Whirling and dancing, a lady pirate kicks and slashes anyone close enough to kill.
+~
+Dressed rather scantily for such a disarmingly capable warrior, this
+she-pirate seems more intent on catching alluring looks than killing.
+Well, except for the part where she's killing.  Given the rarity of
+women on the open sea, it's likely this lady knows how to handle
+unwanted affection...as demonstrated by her rather deadly dance with
+every man she meets.
+~
+788224 0 -1
+2097152 0 0 -1
+0 1 61
+20 10 0d1+0 3d8+0
+30000 0
+8 8 2 0 48 6291968
+C 4
+S
+#5610
+pirate captain jaelgreth one-eye git~
+Captain Jaelgreth One-Eye~
+A garishly-dressed, one-eyed man barks orders to his crew.
+~
+Dressed in garishly-coloured leather armor, Captain Jaelgreth barks
+orders to his oddly-cheerful crew.  While he does his share of melee
+fighting, he tends to slip away to invoke powerful natural magicks
+to summon elementals and creatures to battle his enemy.  Gifted long
+ago with an affinity for the realm of the natural, Jaelgreth found
+his heart belonged to the sea.  Many years as an outlaw and pirate
+captain have hardened him, but life retains its good humour in his
+eyes.  Every day may be his last...it seems he'll be damned before
+he stops laughing.
+~
+788420 0 -1
+1663041704 262177 0 -1
+450 1 73
+20 10 0d1+0 7d9+0
+50000 0
+8 8 1 4194448 544 2359296
+C 11
+>catch_prog 1~
+say Mistress of waters;
+say I beeseech thee for aid;
+say Queen of the seas;
+say Grant me the aid of the Cilloughai!
+MPECHO $$BA crystalline entity thunders up from the side of the ship, blasting the Captain's enemies with scalding $$3vapour$$7!$$R
+MPDAMAGE allpc 3d200 water
+~
+>fight_prog 5~
+say Really, friend...I have no time for this.
+MPTHROW 5610 1 3
+~
+>death_prog 100~
+say Hahaha, good show!
+say Forgive my bad form, but I'm afraid I'm indisposed with...a rather important matter.
+say I'll be lowering my weapon for now...
+emote grins mischievously.
+if iswielding($i)
+  remove scimitar
+  drop scimitar
+endif
+say Do feel free to visit my quarters and enjoy my hospitality.
+say ...as it were.
+if carries($i) keep 5640
+  drop key
+endif
+emote tips his hat and springs off, heading below deck.
+mppurge $i
+~
+|
+S
+#5611
+phoebe phoralae priestess water naiad git~
+Phoebe Phoralae~
+A breathtakingly-beautiful naiad gracefully weaves protective wards and heals her mates.
+~
+Complexion as smooth as an undisturbed pond and icy-blue as the glacial
+icecaps, Phoebe glides about the deck offering aid to the wounded and
+protecting her vessel and crew from the magickal onslaught coming from
+the Black Lily.  Occasionally she mutters a fervent prayer to her
+Goddess (and incidentally, her mother) to dismiss one of the horrible
+summoned sea creatures the mage on the opposing vessel binds.  Though
+there are many rumors as to how the captain and she met and what their
+true relationship is, none dare speak of it aloud.  Jaelgreth is a
+fair man, but it's always best not to piss off the most powerful
+sea-druid in the realms.
+~
+264132 0 -1
+19136744 262145 0 -1
+650 27 110
+20 10 0d1+0 10d10+0
+50000 0
+8 8 2 4194944 44 1027
+C 2
+>act_prog p delivers a HARD BLOW into your solar plexus!  You are STUNNED!~
+if isfight($n)
+MPECHOAROUND $n $I's $$3elemental aura$$R hums to a crescendo, cascading $$B$$7pure force$$R over $n!
+MPECHOAT $n $I's $$3pale blue aura$$R hums and grows, lashing out at you with a wave of $$B$$7pure force$$R!
+MPDAMAGE $n 15d1% water hitpoints
+break
+endif
+~
+>act_prog p trips you and you go down!~
+if isfight($i)
+MPECHOAROUND $n As $n sweeps $s leg to trip $I, $l legs become columns of $$B$$1scalding water$$R, $$B$$7searing$$R $n!
+MPECHOAT $n As you crouch and sweep your leg to trip $I, $j causes her legs to become columns of $$B$$1boiling water$$R!  OUCH!
+MPDAMAGE $n 10d1%  water hitpoints
+break
+endif
+~
+>catch_prog 3~
+if ispc($r)
+  MPECHO $I closes $l eyes, summoning a host of $$B$$0stormclouds$$R.
+  MPECHOAT $r SHIT!  A massive bolt of $$B$$5lightning$$R crashes into you, causing pain and uncontrolled underwear $$5stainage$$R.
+  MPECHOAROUND $r $r $$5soils$$R $Kself as a massive $$B$$55bolt of lightning$$R crashes into $K!
+  MPDAMAGE $r 100d10 energy
+  break
+else
+  MPTHROW 5611 3 1
+  break
+endif
+~
+>fight_prog 10~
+if numpcs() >= 6
+  say Perhaps $$B$$4this$$7 will teach you to fight more fairly...$R
+  MPECHO $I collects $l energy, glowing with a brilliant $$B$$3aura$$R...
+  MPTHROW 5611 3 2
+  break
+endif
+~
+|
+S
+#5612
+pirate laeradon al'aglir elf elflord git~
+Laeradon Al'Aglir~
+A fair-skinned elf whose eyes give question to his heritage tries to stay out of the way.
+~
+Impossibly-blue eyes sparkle with wisdom and curiosity, their hue
+giving cause for the skies and the seas to weep for the treasure of
+which they've been robbed.  The eldest son of Nyris, Laeradon seeks
+passage to the new continent, where he's heard rumblings of awakening
+magicks and lost relics of power belonging to his people.  Schooled
+in the ways of the battle-harper, he stands ready to fight alongside
+the crew of the Cheerful Git...assuming they need him, of course.
+~
+266180 0 -1
+53477384 262144 0 -1
+850 2 90
+20 10 0d1+0 8d10+0
+50000 0
+8 8 1 6291840 544 280
+C 10
+S
+#5613
+pirate captain darkblade lily~
+Captain Darkblade~
+The Captain of the Black Lily casually barks orders to his men.
+~
+   The captain of the Black Lily seems quite annoyed at the inconvenience of
+encountering Jaelgreth on the open seas.  His gleaming armor quietly rustles as
+he barks orders and gives directions, pausing only slightly to brutally
+assassinate the occasional would-be assassin.  His cold eyes survey the
+cheerful do-gooder buccaneers with contempt, his open sneer an open and
+personal invitation to Jaelgreth himself to board his vessel and meet his
+equal.
+~
+788256 0 -1
+2097152 1 0 -1
+-900 1 73
+20 10 0d1+0 9d7+0
+50000 0
+8 8 1 6291616 528 262144
+>catch_prog 1~
+if iswielding($i)
+    MPECHO $$B$I draws a longsword that glows with a burning bright light from $l hip scabbard.$$R
+    MPECHO $$BSwitching $l wields, $j quickly attacks, using the blades to create a tempest of pain and agony.$$R
+    MPDAMAGE all 3d200 undefined hitpoints
+    else
+    MPECHO $$B$I mouths something incomprehensible in the din of the battle.$$R
+    MPPAUSE 1
+    MPECHO $$BEthereal blades of $$0darkness$$7 burst forth from the $$0shadows$$7.$$R
+    MPECHO $$BAt $I's command, the blades spin, shredding everything that stands in $l way.$$R
+    MPDAMAGE allpc 3d200 undefined hitpoints
+endif~
+>fight_prog 5~
+say Amateurs...I have no time for your incompetence.
+MPTHROW 5613 1 3~
+>death_prog 100~
+say Insignificant fools!  Lucky for you I have more pressing matters to take care of first.
+say But fret not, I'll have you keelhauled to my pleasure.
+say Do enjoy these extra few minutes of life while you can.
+emote lets loose a demonic laugh.
+if iswielding($i)
+  remove scimitar
+  drop scimitar
+endif
+say I'll not be so charitable next time we meet.
+if carries($i) keep 5683
+  drop key
+endif
+emote spits before heading below deck, killing an enemy boarder or two on his way.
+mppurge $i~
+|
+S
+#5614
+pirate mishra midnight sorceress lily~
+Mishra of the Midnight~
+A sorceress weaves summoning magicks to ravage the vessel to the west.
+~
+  Directing the pyrotechnic displays overhead and calling beasts to
+wage war for her, Mishra seems to have no problem with her casting
+while bobbing around in a frantic ship-to-ship battle.  Between long-
+winded incantations she shouts orders to those around her, directing
+their attacks and bolstering their defenses.  It's no surprise
+Darkblade finds her particular combination of beauty and deadly
+confidence so alluring.
+~
+264132 0 -1
+1109721194 1 0 -1
+-350 1 73
+20 10 0d1+0 7d9+0
+50000 0
+8 8 2 48 2359808 4194304
+C 1
+>catch_prog 1~
+say Master of Shadows;
+say Hear my call;
+say Lord of Midnight;
+say I summon thy servant Kazrin Shin!
+MPECHO $$BA dark figure emerges from the $$0shadows$$7, blasting Mishra's enemies with a wave of $$0bale$$4fire$$7!$$R
+MPDAMAGE allpc 3d200 undefined hitpoints
+~
+>fight_prog 5~
+say The Darkness take your eyes!  I should be aiding my beloved not toying around with a bunch of pups.
+MPTHROW 5614 1 3
+~
+>death_prog 100~
+say Your impudence is trying my patience.
+say I think we shall finish this another time.
+scowl
+if wears($i) keep 5614
+   remove rod
+   drop rod
+endif
+say Next time we meet I shall feed your corpses to the Midnight God.
+if carries($i) keep 5684
+    drop key
+endif
+emote abruptly turns, shouting out orders before heading below deck.
+mppurge $i
+~
+|
+S
+#5615
+pirate kagato manslayer first mate lily~
+Kagato the Manslayer~
+A renegade of the Stonefist clan silently brings swift death to his foes.
+~
+The Manslayer is the first mate aboard the Black Lily, his exotic
+heritage marking him rather clearly as a renegade of the Stonefist
+clan.  Billowing black robes cover his body, concealing any weapons
+he may carry save his broad-bladed katana, which he wields carefully
+and precisely with two hands.  Silent footfalls take him from enemy
+to enemy, then away from the still-warm corpses moments later.
+~
+17569728 0 -1
+54263850 262145 0 -1
+-1 1 80
+20 10 0d1+0 35d1+0
+50000 0
+8 8 1 0 0 0
+C 13
+S
+#5640
+captain jaelgreth one-eye druid git~
+Captain Jaelgreth One-Eye~
+The one-eyed captain smirks and draws his scimitar, ready to dance with the devil.
+~
+   Dressed in garishly-coloured leather armor, Captain Jaelgreth barks orders
+to his oddly-cheerful crew.  While he does his share of melee fighting, he
+tends to slip away to invoke powerful natural magicks to summon elementals and
+creatures to battle his enemy.  Gifted long ago with an affinity for the realm
+of the natural, Jaelgreth found his heart belonged to the sea.  Many years as
+an outlaw and pirate captain have hardened him, but life retains its good
+humour in his eyes..  Every day may be his last...  It seems he'll be damned
+before he stops laughing.
+~
+269353860 0 -1
+539230408 262144 0 -1
+0 0 110
+20 10 0d1+0 6d9+0
+250000 0
+8 8 1 262272 3145728 563
+>death_prog 100~
+MPSETMATH $$i.affected1 33816776
+MPOLOAD 5647
+MPAT 5640 unlock chest
+JUNK doesnotloadyoucheatingfuck
+MPECHO $I chuckles half-heartedly, taking note of just how much of the $$B$$4blood$$R on the floor is his.
+say Valiant effort good sirs...but I'm afraid I have at least one more score to settle before I let go.
+MPECHO $I gestures quickly, trails of light following $l nimble fingers.
+MPECHO $$3B$$Br$$2i$$1l$$R$$6l$$i$$Ba$$5n$$R$$5t$$R colors streak across the room, dazzling everyone enough for $I to escape!
+MPSETMATH $$i.immune 112
+MPDAMAGE all 30d20 charm
+MPPURGE $i
+~
+>fight_prog 15~
+MPECHO $I gets a $$B$$0smokey$$R potion from his bandolier.
+MPECHO $I quaffs a $$B$$0smokey$$R potion.
+MPBESTOW $i sanctuary 100 1
+MPBESTOW $i acid_shield 100 1
+MPBESTOW $i fireshield 100 1
+~
+>fight_prog 5~
+MPECHOAROUND $n $I laughs heartily, waving his arms and abruptly bringing them together to point at $n.
+MPECHOAT $n $I laughs, gesturing mysteriously then pointing abruptly at you!
+cast 'entangle' $n
+MPBESTOW $n paralysis 5 0
+MPECHOAROUND $n $n yelps as $e is quickly immobilized by $I's vicious $$2vegetation$$R!
+MPDAMAGE $n 35d30 poison
+~
+>fight_prog 5~
+MPECHO $I finishes $l gutteral incantation, the ship resounding with its raw power...
+MPECHO The ship fades from view as a deluge of massive head-sized $$B$$7stones$$R rain down upon everyone!
+MPECHO The $$B$$7titanstone$$R crushes and sears everything it touches...including you!
+MPDAMAGE all 150d3 physicalmagic
+MPDAMAGE That really did HURT!!
+~
+>fight_prog 5~
+MPECHO $I looks up, $l eyes growing as misty as the room around $l as $j completes one of Thaaleor's mightiest magicks...
+MPECHOAT $r A $$5cloud of dust$$R swirls around $I, forming razor-sharp blades...
+MPECHOAT $r all of which spin and slice directly at you!
+MPECHOAROUND $r Blades of razor-fine $$5dust$$R swirl and spin right through $r...and continue on to slash you!
+MPDAMAGE all 20d30 physicalmagic
+MPECHO That really did HURT!!
+~
+>fight_prog 5~
+MPECHO $I gestures rapidly, glowing trails following the symbols he draws in the air...
+if ispc($r)
+    MPECHOAT $r An uneasy feeling grips you as Nature's favor turns against you...
+    cast 'curse' $r
+    cast 'debility' $r
+    cast 'attrition' $r
+    cast 'globe of darkness'
+    MPDAMAGE all 20d1 physicalmagic
+endif
+~
+>fight_prog 5~
+MPECHO $I claps $l hands together, summoning a surge of briney water...
+MPECHOAROUND $n $I points at $n, $l primal scream signaling a bone-crushing jet of $$B$$1water$$R to slam into $n!
+MPECHOAT $n $I points at you accusingly, $l echoing shout accompanied by a jet of bone-crushing $$B$$1water$$R!
+MPDAMAGE $n 350d1 water
+MPECHOAT $n Glug!
+~
+|
+S
+#5683
+captain darkblade pirate lily~
+Captain Darkblade~
+An angry-looking swashbuckler prepares to run you through for boarding his vessel!
+~
+   The captain of the Black Lily seems quite annoyed at the inconvenience of
+encountering Jaelgreth on the open seas.  His gleaming armor quietly rustles as
+he barks orders and gives directions, pausing only slightly to brutally
+assassinate the occasional would-be assassin.  His cold eyes survey the
+cheerful do-gooder buccaneers with contempt, his open sneer an open and
+personal invitation to Jaelgreth himself to board his vessel and meet his
+equal.
+~
+269354852 0 -1
+19136712 0 0 -1
+-950 1 110
+20 10 0d1+0 3d20+0
+250000 0
+8 8 1 131 64 4457008
+C 4
+>catch_prog 2~
+if rand(11)
+    if ispc($r)
+       MPECHOAROUND $r $I EVISCERATES $r with $k a downward forehand slash!
+       MPECHOAT $r $I swings his weapon in a downward slash, raking your body with $$B$$7white-hot$$R pain!
+       MPDAMAGE $r 15d10 fire
+       MPDAMAGE $r 8d10 fire
+       endif
+       else
+if rand(12)
+    if ispc($r)
+      MPECHOAROUND $r $I unleashes a vicious backhand with $k Captain Darkblade's curved broadsword, spinning $r in a full circle with its force!
+      MPECHOAT $r $I brings his Captain Darkblade's curved broadsword across with a vertical slash, spinning you in a circle!
+      MPDAMAGE $r 15d20 energy
+      endif
+      else
+if rand(14)
+    if ispc($r)
+      MPECHOAROUND $r A series of heavy-sounding thuds erupt as $I releases a flurry of side-kicks at $r's chest.
+      MPECHOAT $r Your body jerks about as though being controlled by puppetstrings as $I begins rapidly kicking you in the chest!
+      MPDAMAGE $r 20d15 cold
+      MPDAMAGE $r 10d25 cold
+      endif
+      else
+if rand(17)
+    if ispc($r)
+      MPECHOAROUND $r $I rams $k shoulder into $r, sending $m staggering back in pain!
+      MPECHOAT $r $I sends you sprawling with a powerful bash!
+      MPDAMAGE $r 20d10 magic
+      endif
+      else
+if rand(20)
+    if ispc($r)
+      MPECHOAROUND $r $r screams in pain as $I strikes $s kidneys with the hilt of $k weapon!
+      MPECHOAT $r $I slams the hilt of $k weapon into your back, re-arranging your organs with a sickening crunch.
+      MPDAMAGE $r 30d10 cold
+      MPDAMAGE $r 10d10 cold
+      MPECHOAT $r That REALLY did HURT!!
+      endif
+      else
+if rand(25)
+    if ispc($r)
+      MPECHO An arc of blinding light flashes as $I unleashes an upward backhand slash!
+      MPDAMAGE $r 30d10 fire
+      MPDAMAGE $r 10d10 fire
+      endif
+      else
+if rand(33)
+    if ispc($r)
+      MPECHOAROUND $r A skin-chilling crunch sounds as $I SLAMS $k head into $r!
+      MPECHOAT $r $$B$$4Red$$R is all you see as a crunching noise echoes through your aching head!
+      MPDAMAGE $r 50d10 physicalmagic
+      endif
+     else
+if rand(50)
+    if ispc($r)
+      MPECHOAROUND $r $I flourishes with a spinning slash, splattering $r's $$4blood$$R on the floor.
+      MPECHOAT $r $I flourishes with a spinning slash, splattering your $$4blood$$R on the floor.
+      MPDAMAGE $r 15d10 charm
+      MPDAMAGE $r 5d10 charm
+      endif
+     else
+    if ispc($r)
+      MPECHOAROUND $r $I spins abruptly, depositing $k blade viper-quick in $r's abdomen.
+      MPECHOAT $r $I spins on $k heels, somehow skewering $k blade right in your belly.
+      MPDAMAGE $r 10d10 fire
+      MPDAMAGE $r 20d25 fire
+      MPECHOAT $r That REALLY did HURT!!
+      endif
+endif
+endif
+endif
+endif
+endif
+endif
+endif
+endif
+MPECHO $I handsprings backward into a defensive position, assessing the carnage.
+~
+>death_prog 100~
+MPSETMATH $$i.affected1 33816776
+MPOLOAD 5681
+MPAT 5683 unlock footlocker
+MPJUNK doesnotloadyoucheatingfuck
+MPECHO $I clutches $k midsection, glaring with malice undiluted by $k mortal wounds.
+say This isn't the last you've seen of me...
+if iswielding($i)
+    MPECHO $I raises $k broadsword, which gleams with a $$B$$0dark$$R, $$B$$0unearthly$$R power...
+    MPECHO $I slices RIGHT THROUGH you, dropping $l sword in the process though it allows $k an escape!
+    MPSETMATH $$i.immune 112
+    MPDAMAGE all 100d10 undefined
+    remove sword
+    drop sword
+    MPPURGE $i
+    endif
+if carries($i) keep 5693
+    chuckle
+    say Well, I guess I can't take you where I'm going.  'Tis a shame.
+    drop sword
+    MPECHO $I mutters something under his breath and disappears in a wave of shadows.
+    MPPURGE $i
+else
+    MPECHO $I mutters something under his breath and disappears in a wave of shadows.
+    MPPURGE $i
+endif
+~
+>catch_prog 1~
+if rand(11)
+    if ispc($r)
+        MPECHOAROUND $r $I EVISCERATES $r with $k a downward forehand slash!
+        MPECHOAT $r $I swings his weapon in a downward slash, raking your body with $$B$$7white-hot$$R pain!
+        MPDAMAGE $r 30d10 fire
+        MPDAMAGE $r 10d10 fire
+        endif
+        else
+if rand(12)
+    if ispc($r)
+        MPECHOAROUND $r $I unleashes a vicious backhand with $k Captain Darkblade's curved broadsword, spinning $r in a full circle with its force!
+        MPECHOAT $r $I brings his Captain Darkblade's curved broadsword across with a vertical slash, spinning you in a circle!
+        MPDAMAGE $r 20d30 energy
+        endif
+        else
+ if rand(14)
+     if ispc($r)
+         MPECHOAROUND $r A series of heavy-sounding thuds erupt as $I releases a flurry of side-kicks at $r's chest.
+         MPECHOAT $r Your body jerks about as though being controlled by puppetstrings as $I begins rapidly kicking you in the chest!
+         MPDAMAGE $r 30d30 cold
+         MPDAMAGE $r 10d50 cold
+         endif
+         else
+if rand(17)
+    if ispc($r)
+         MPECHOAROUND $r $I rams $k shoulder into $r, sending $m staggering back in pain!
+         MPECHOAT $r $I sends you sprawling with a powerful bash!
+         MPDAMAGE $r 25d20 magic
+         endif
+        else
+if rand(20)
+    if ispc($r)
+        MPECHOAROUND $r $r screams in pain as $I strikes $s kidneys with the hilt of $k weapon!
+        MPECHOAT $r $I slams the hilt of $k weapon into your back, re-arranging your organs with a sickening crunch.
+        MPDAMAGE $r 80d10 cold
+        MPDAMAGE $r 15d10 cold
+        MPECHOAT $r That REALLY did HURT!!
+        endif
+        else
+if rand(25)
+    if ispc($r)
+        MPECHO An arc of blinding light flashes as $I unleashes an upward backhand slash!
+        MPDAMAGE $r 30d10 fire
+        MPDAMAGE $r 10d10 fire
+        endif
+        else
+if rand(33)
+    if ispc($r)
+        MPECHOAROUND $r A skin-chilling crunch sounds as $I SLAMS $k head into $r!
+        MPECHOAT $r $$B$$4Red$$R is all you see as a crunching noise echoes through your aching head!
+        MPDAMAGE $r 50d10 physicalmagic
+        endif
+       else
+if rand(50)
+    if ispc($r)
+      MPECHOAROUND $r $I flourishes with a spinning slash, splattering $r's $$4blood$$R on the floor.
+      MPECHOAT $r $I flourishes with a spinning slash, splattering your $$4blood$$R on the floor.
+      MPDAMAGE $r 30d10 charm
+      MPDAMAGE $r 10d10 charm
+      endif
+      else
+    if ispc($r)
+      MPECHOAROUND $r $I spins abruptly, depositing $k blade viper-quick in $r's abdomen.
+      MPECHOAT $r $I spins on $k heels, somehow skewering $k blade right in your belly.
+      MPDAMAGE $r 10d10 fire
+      MPDAMAGE $r 40d45 fire
+      MPECHOAT $r That REALLY did HURT!!
+     endif
+endif
+endif
+endif
+endif
+endif
+endif
+endif
+endif
+MPECHO $I handsprings backward into a defensive position, assessing the carnage.
+~
+>fight_prog 10~
+if numpcs()>=6
+   snort
+   say Even Jaelgreth has more class than to duel me with an army.
+   MPECHO $I $$B$$3glares$$R around $l, disgust clearly painted on his face.
+   MPTHROW 5683 1 3
+   MPECHO Time begins to slow to a crawl...
+    else
+    snort
+    MPECHO $I $$B$$3glares$$R around $l, disgust clearly painted on his face.
+    MPTHROW 5683 2 3
+    MPECHO Time begins to slow to a crawl...
+endif
+~
+|
+S
+#5684
+mishra midnight mage sorceress lily~
+Mishra of the Midnight~
+A provocatively-dressed sorceress chants quietly with her eyes closed.
+~
+  Darkblade first encountered his mistress during a raid on a far-away
+island, somewhere near where the Sea of Dreams seeps into Gaiot's
+domain.  While slaughtering the weak and press-ganging those strong
+enough to survive, he found himself locked in mortal combat with a
+troupe of heroes who far outmatched him.  His savior, a then-slave
+who had been cleaning the chamberpots of said heroes at a local inn,
+erupted into action, calling forth dread magicks the likes of which
+Darkblade had never seen.  Impressed by her power and taken with her
+beauty, he offered her the choice of serving at his side or dying the
+same cruel and sadistic death he'd chosen for her master.  Mishra didn't
+think before answering; Darkblade had stolen her heart far before he
+had her sworn allegiance.
+~
+268830500 0 -1
+1126500392 262144 0 -1
+-350 1 110
+20 10 0d1+0 8d7+0
+250000 0
+8 8 2 262288 4194816 0
+C 1
+>death_prog 100~
+MPSETMATH $$i.affected1 33816776
+MPOLOAD 5682
+MPAT 5684 unlock chest
+MPJUNK doesnotloadyoucheatingfuck
+MPECHO $I grimaces as $j clutches $l wounds.
+say The Lord of Midnight take your souls!
+MPECHO $I closes $l eyes, chanting in an indecipherable tongue. . .
+say Kazrin Shin, if you will. . .
+MPECHO An impenetrable $$B$$0darkness$$R floods the room, swallowing $I while tearing at your soul.
+MPSETMATH $$i.immune 112
+MPDAMAGE all 30d20 undefined
+MPECHO And as suddenly as it appeared, the darkness recedes leaving no trace of $I.
+MPPURGE $i
+~
+>catch_prog 5~
+MPECHO $I abrubtly ceases chanting and raises $l hands toward the sky, ending one of Naerion's elemental incantations!.
+MPECHO A rain of infernal $$1sleet$$R hammers down, searing and freezing with icy drops of hellish water!
+MPDAMAGE all 4d50 water
+MPDAMAGE all 50d2 water
+~
+>catch_prog 4~
+MPECHO $I finishes her spell, $l eyes replaced with globes of pure white.
+MPECHO $$B$$3Chill winds$$R pick up and swirl around $I, accelerating to flesh-rending speeds!
+MPDAMAGE all 80d4 cold
+MPECHO $$4Blood$$R and $$B$$3ice$$R flurry around the room, temporarily staining everything with a gory slush.
+~
+>catch_prog 3~
+MPECHO $I's chanting quietly fades, the cabin around $l slowly transforming into a volcanic field...
+MPECHO A cascade of $$B$$4molten$$R rock erupts from the dusty earth, raining down $$4fire$$R and pain!
+MPDAMAGE all 100d1 fire
+MPDAMAGE all 1d100 fire
+MPECHO Screams of anguish drown out the fading eruptions as the rocky earth slowly transmutes back to a cabin in the Black Lily.
+~
+>catch_prog 2~
+MPECHO $I stops chanting and brings $l dark spellweaving to an end...
+MPECHOAROUND $n Time stops as $I slowly strides toward $n and lays $l cream-colored hands on $s neck.
+MPECHOAROUND $n $$B$$0Shadow$$R blossoms like a fire, consuming $n!
+MPECHOAT $n Time stops as $I walks seductively toward you, caressing your neck with a spine-shuddering touch.
+MPECHOAT $n $$B$$0Shadow$$R consumes and sears your being like a raging fire of pure darkness!
+MPDAMAGE $n 100d5 poison
+MPDAMAGE $n 100d10 poison
+~
+>catch_prog 1~
+MPECHOAROUND $n $I jerks $l head and points toward $n, ending one of Naerion's elemental incantations!
+MPECHOAT $n $I suddenly jerks her head and stops chanting, channeling her magical energies at you!
+MPECHOAROUND $n A lance of $$B$$7crystal-clear$$R $$B$$3ice$$R screams from $I's hand toward $n.
+MPECHOAROUND $n $n shrieks in agony as it pierces $s chest!
+MPECHOAT $n $I conjures a lance of crystal-clear $$B$$3ice$$R, which fits nicely in your chest.
+MPDAMAGE $n 100d30 water
+MPECHOAT $n FUCKING OUCH.
+~
+>fight_prog 5~
+$I closes $l eyes, chanting in an undecipherable tongue...
+MPTHROW 5684 5 2
+~
+>fight_prog 5~
+$I closes $l eyes, chanting in an undecipherable tongue...
+MPTHROW 5684 4 2
+~
+>fight_prog 5~
+$I closes $l eyes, chanting in an undecipherable tongue...
+MPTHROW 5684 3 2
+~
+>fight_prog 5~
+$I closes $l eyes, chanting in an undecipherable tongue...
+MPTHROW 5684 2 2
+~
+>fight_prog 5~
+$I closes $l eyes, chanting in an undecipherable tongue...
+MPTHROW 5684 1 2
+~
+|
+S
+#5685
+dutchman lilygit helmsman procassistant~
+The Flying Dutchman~
+A ghostly sailor hovers above the waves here.
+~
+~
+0 0 -1
+0 0 0 -1
+0 25 100
+20 10 0d1+0 1d1+0
+0 0
+8 8 0 904 36 80
+>catch_prog 2~
+if rand(10)
+   MPSETTEMP $i position one
+   MPAT 29092 MPOLOAD 5644
+   MPSETTEMP $i waiting true
+   MPTHROW 5685 1 0
+   else
+if rand(11)
+   MPSETTEMP $i position two
+   MPAT 29079 MPOLOAD 5644
+   MPSETTEMP $i waiting true
+   MPTHROW 5685 1 0
+   else
+if rand(12)
+   MPSETTEMP $i position three
+   MPAT 29061 MPOLOAD 5644
+   MPSETTEMP $i waiting true
+   MPTHROW 5685 1 0
+   else
+if rand(14)
+   MPSETTEMP $i position four
+   MPAT 29057 MPOLOAD 5644
+   MPSETTEMP $i waiting true
+   MPTHROW 5685 1 0
+   else
+if rand(17)
+   MPSETTEMP $i position five
+   MPAT 29042 MPOLOAD 5644
+   MPSETTEMP $i waiting true
+   MPTHROW 5685 1 0
+   else
+if rand(20)
+   MPSETTEMP $i position six
+   MPAT 29004 MPOLOAD 5644
+   MPSETTEMP $i waiting true
+   MPTHROW 5685 1 0
+   else
+if rand(25)
+   MPSETTEMP $i position seven
+   MPAT 29031 MPOLOAD 5644
+   MPSETTEMP $i waiting true
+   MPTHROW 5685 1 0
+   else
+if rand(33)
+   MPSETTEMP $i position eight
+   MPAT 29038 MPOLOAD 5644
+   MPSETTEMP $i waiting true
+   MPTHROW 5685 1 0
+   else
+if rand(50)
+   MPSETTEMP $i position nine
+   MPAT 29095 MPOLOAD 5644
+   MPSETTEMP $i waiting true
+   MPTHROW 5685 1 0
+   else
+   MPSETTEMP $i position ten
+   MPAT 29048 MPOLOAD 5644
+   MPSETTEMP $i waiting true
+   MPTHROW 5685 1 0
+   endif
+endif
+endif
+endif
+endif
+endif
+endif
+endif
+endif
+~
+>arand_prog 100~
+if tempvar($i[waiting]) == false
+   if tempvar($i[position]) == one
+      MPAT 29092 MPPURGE crossfire
+      MPTHROW 5685 2 0
+      endif
+   if tempvar($i[position]) == two
+      MPAT 29079 MPPURGE crossfire
+      MPTHROW 5685 2 0
+      endif
+   if tempvar($i[position]) == three
+      MPAT 29061 MPPURGE crossfire
+      MPTHROW 5685 2 0
+      endif
+   if tempvar($i[position]) == four
+      MPAT 29057 MPPURGE crossfire
+      MPTHROW 5685 2 0
+      endif
+  if tempvar($i[position]) == five
+     MPAT 29042 MPPURGE crossfire
+     MPTHROW 5685 2 0
+     endif
+  if tempvar($i[position]) == six
+     MPAT 29004 MPPURGE crossfire
+     MPTHROW 5685 2 0
+     endif
+  if tempvar($i[position]) == seven
+     MPAT 29031 MPPURGE crossfire
+     MPTHROW 5685 2 0
+     endif
+  if tempvar($i[position]) == eight
+     MPAT 29038 MPPURGE crossfire
+     MPTHROW 5685 2 0
+     endif
+  if tempvar($i[position]) == nine
+     MPAT 29095 MPPURGE crossfire
+     MPTHROW 5685 2 0
+     endif
+  if tempvar($i[position]) == ten
+     MPAT 29048 MPPURGE crossfire
+     MPTHROW 5685 2 0
+     endif
+endif~
+>catch_prog 1~
+MPPAUSE 90
+MPSETTEMP $i waiting false
+~
+>load_prog 100~
+MPSETTEMP $i position one
+MPAT 29092 MPOLOAD 5644
+MPSETTEMP $i waiting true
+MPTHROW 5685 1 0
+~
+|
+S
+$~

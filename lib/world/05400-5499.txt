@@ -1,0 +1,1129 @@
+#5400
+DC ACADEMY RANGE STARTS HERE (null room)~
+   You stand at the gates of the newly constructed Dark Castle University.  It
+is an immense brick building four stories high.  Fellow students mill about,
+going about their studies.  A flagpole stands erect in the center of this small
+courtyard, and a flag adorned with a mean looking fish waves gently.  The bell
+rings indicating the start of class.
+~
+45 570435712 0
+D0
+~
+~
+0 -1 5401
+S
+#5401
+At the receptionist's desk~
+   The reception area looks to be the perfect place to lounge around before
+class, as several of the students seem to be.  An espresso machine stands in a
+corner, and a few students stand in line, waiting to make their drinks.  The
+receptionist's desk is situated off to the left, where a pleasant looking young
+man assists new students in finding their classes.
+~
+45 1174415500 0
+D0
+~
+~
+0 -1 5451
+D2
+~
+~
+0 -1 257
+S
+#5402
+Physiology 101 - The Basics of Locomotion~
+   The multi-purpose room is nothing more than a small auditorium.  Just a few
+benches on either side of the room, a stand-up chalkboardis all that is really
+needed here.  A lesson on the basics of movement has been carefully written on
+a large chalkboard.  To read the lesson, type 'look chalkboard'.
+~
+45 1174415372 0
+D1
+~
+~
+0 -1 5451
+S
+#5403
+Communication 101 - The Basics of Interlocution~
+   This small and intimate classroom is brightly lit, with four rows of desks
+and a podium at the north end.  Students are milling about, finding their desks
+and waiting for the lecture to begin.  In this room, you can learn about the
+basics of communication.  A large chalkboard stands behind the podium, with
+today's lesson carefully written on it.  To read a lesson in communication,
+type '$7$Blook board$R.'
+~
+45 1174415372 0
+D3
+~
+~
+0 -1 5452
+S
+#5404
+The stairwell~
+   Several students are lounging around the main hallway and the stairwell that
+leads to the rest of the University.  Lockers line the walls up and down the
+hallway.  A small barricade has been erected at the entrance to a stairwell
+leading upwards as construction continues.
+~
+45 1174415372 0
+D0
+~
+~
+0 -1 5454
+D2
+~
+~
+0 -1 5452
+D3
+~
+~
+0 -1 5453
+D4
+~
+stairwell~
+23 -1 5415
+S
+#5405
+The second floor~
+   The second floor is dedicated to the art of spellcasting.  The hallway is
+well-lit, and it is fairly easy to find your way around.  A large sign hangs
+above the doorway which reads, 'Mages Laboratory'.
+~
+45 33564672 0
+D1
+~
+~
+0 -1 5415
+D2
+~
+door~
+1 -1 5406
+S
+#5406
+Mages Laboratory~
+   You are standing inside the mages' classroom.  If you are not a mage, you
+should go back outside and ask someone directions.  A large whiteboard hangs on
+one of the walls with today's lesson written on it.
+~
+45 33564672 0
+D0
+~
+door~
+1 -1 5405
+S
+#5407
+Second floor~
+   The second floor is dedicated to the art of spellcasting.  The hallway is
+well-lit, and it is fairly easy to find your way around.  A large sign hangs
+above the doorway which reads, 'Clerics Prayer Hall'.
+~
+45 33564672 0
+D2
+~
+door~
+1 -1 5408
+D3
+~
+~
+0 -1 5415
+S
+#5408
+Clerics Classroom~
+   You are standing inside the clerics' classroom.  If you are not a cleric,
+you should go back outside and ask someone directions.  A large whiteboard
+hangs on one of the walls with today's lesson written on it.
+~
+45 33564672 0
+D0
+~
+door~
+1 -1 5407
+S
+#5409
+The second floor~
+   The second floor is dedicated to the art of spellcasting.  The hallway is
+well-lit, and it is fairly easy to find your way around.  A large sign hangs
+above the doorway which reads, 'Druids Arboretum'.
+~
+45 33564672 0
+D0
+~
+door~
+1 -1 5410
+D2
+~
+~
+0 -1 5415
+S
+#5410
+Druids Arboretum~
+   You are standing inside the druids' classroom.  If you are not a druid, you
+should go back outside and ask someone directions.  A large whiteboard hangs on
+one of the walls with today's lesson written on it.
+~
+45 33564672 0
+D2
+~
+door~
+1 -1 5409
+S
+#5411
+The third floor~
+   The third floor is dedicated to the art of fighting.  Other than the
+occasional student and a small sign directing people to their respective
+classes, there is nothing much to see here.
+~
+45 33564672 0
+D0
+~
+~
+0 -1 5412
+D4
+~
+~
+0 -1 5419
+D5
+~
+~
+0 -1 5415
+S
+#5412
+The third floor~
+   The third floor is dedicated to the art of fighting.  The hallway is
+well-lit, and it is fairly easy to find your way around.  A large sign hangs
+above the doorway which reads, 'Warriors Gymnasium'.
+~
+45 33564672 0
+D0
+~
+~
+0 -1 5414
+D2
+~
+~
+0 -1 5411
+D3
+~
+~
+0 -1 5413
+S
+#5413
+Warriors training gym~
+   You are standing inside the warriors' classroom.  If you are not a warrior,
+you should go back outside and ask someone directions.  A large whiteboard
+hangs on one of the walls with today's lesson written on it.
+~
+45 33564672 0
+D1
+~
+~
+0 -1 5412
+S
+#5414
+The third floor~
+   The third floor is dedicated to the art of fighting.  The hallway is
+well-lit, and it is fairly easy to find your way around.  A large sign hangs
+above the doorway which reads, 'Barbarians Practice Yard'.
+~
+45 33564672 0
+D0
+~
+~
+0 -1 5417
+D1
+~
+~
+0 -1 5416
+D2
+~
+~
+0 -1 5412
+S
+#5415
+The second floor~
+   The second floor is dedicated to the art of spellcasting.  Other than the
+occasional student and a small sign directing people to their respective
+classes, there is nothing much to see here.
+~
+45 33564672 0
+D0
+~
+~
+0 -1 5409
+D1
+~
+~
+0 -1 5407
+D3
+~
+~
+0 -1 5405
+D4
+~
+~
+0 -1 5411
+D5
+~
+~
+0 -1 5404
+S
+#5416
+Barbarians Practice yard~
+   You are standing inside the barbarians' classroom.  If you are not a
+barbarian, you should go back outside and ask someone directions.  A large
+whiteboard hangs on one of the walls with today's lesson written on it.
+~
+45 33564672 0
+D3
+~
+~
+0 -1 5414
+S
+#5417
+The third floor~
+   The third floor is dedicated to the art of fighting.  The hallway is
+well-lit, and it is fairly easy to find your way around.  A large sign hangs
+above the doorway which reads, 'Thieves Classroom'.
+~
+45 33564672 0
+D0
+~
+~
+0 -1 5418
+D2
+~
+~
+0 -1 5414
+S
+#5418
+Thieves' Classroom~
+   You are standing inside the thieves' classroom.  If you are not a thief, you
+should go back outside and ask someone directions.  A large whiteboard hangs on
+one of the walls with today's lesson written on it.
+~
+45 33564672 0
+D2
+~
+~
+0 -1 5417
+S
+#5419
+The fourth floor~
+   The fourth floor is dedicated to the hybrid art of combining magic and
+skills.  Other than the occasional student and a small sign directing people to
+their respective classes, there is nothing much to see here.
+~
+45 33564672 0
+D0
+~
+~
+0 -1 5424
+D1
+~
+~
+0 -1 5422
+D3
+~
+~
+0 -1 5420
+D4
+~
+~
+0 -1 5426
+D5
+~
+~
+0 -1 5411
+E
+no_portal~
+~
+S
+#5420
+The fourth floor~
+   The fourth floor is dedicated to the hybrid art of combining magic and
+skills.  The hallway is well-lit, and it is fairly easy to find your way
+around.  A large sign hangs above the doorway which reads, 'The Paladin
+Palladium'.
+~
+45 33564672 0
+D1
+~
+~
+0 -1 5419
+D3
+~
+~
+0 -1 5421
+S
+#5421
+The sacred training room of the Paladin~
+   You are standing inside the paladins' classroom.  If you are not a paladin,
+you should go back outside and ask someone directions.  A large whiteboard
+hangs on one of the walls with today's lesson written on it.
+~
+45 33564672 0
+D1
+~
+~
+0 -1 5420
+S
+#5422
+The fourth floor~
+   The fourth floor is dedicated to the hybrid art of combining magic and
+skills.  The hallway is well-lit, and it is fairly easy to find your way
+around.  A large sign hangs above the doorway which reads, 'Anti-Paladins
+Only'.
+~
+45 33564672 0
+D1
+~
+~
+0 -1 5423
+D3
+~
+~
+0 -1 5419
+S
+#5423
+The dark hall of the Anti-Paladin~
+   You are standing inside the anti-paladins' classroom.  If you are not an
+anti-paladin, you should go back outside and ask someone directions.  A large
+whiteboard hangs on one of the walls with today's lesson written on it.
+~
+45 33564672 0
+D3
+~
+~
+0 -1 5422
+S
+#5424
+The fourth floor~
+   The fourth floor is dedicated to the hybrid art of combining magic and
+skills.  The hallway is well-lit, and it is fairly easy to find your way
+around.  A large sign hangs above the doorway which reads, 'Rangers Hall of
+Wood'.
+~
+45 33564672 0
+D0
+~
+~
+0 -1 5425
+D2
+~
+~
+0 -1 5419
+S
+#5425
+A forest-like room~
+   You are standing inside the rangers' classroom.  If you are not a ranger,
+you should go back outside and ask someone directions.  A large whiteboard
+hangs on one of the walls with today's lesson written on it.
+~
+45 33564672 0
+D2
+~
+~
+0 -1 5424
+E
+whiteboard board~
+Welcome friend of nature!
+.
+To begin your lesson, please say 'teach me please'.
+~
+S
+#5426
+The fifth floor~
+   The fifth floor is dedicated to those students pursuing mastery of ki powers
+and skills.  Other than the occasional student and a small sign directing
+people to their respective classes, there is nothing much to see here.
+~
+45 33564672 0
+D1
+~
+~
+0 -1 5429
+D3
+~
+~
+0 -1 5427
+D5
+~
+~
+0 -1 5419
+S
+#5427
+The fifth floor~
+   The fifth floor is dedicated to those students pursuing mastery of ki powers
+and skills.  The hallway is well-lit, and it is fairly easy to find your way
+around.  A large sign hangs above the doorway which reads, 'The Monks
+Meditating Room'.
+~
+45 33564672 0
+D0
+~
+~
+0 -1 5428
+D1
+~
+~
+0 -1 5426
+S
+#5428
+The meditation room~
+   You are standing inside the monks' classroom.  If you are not a monk, you
+should go back outside and ask someone directions.  A large whiteboard hangs on
+one of the walls with today's lesson written on it.
+~
+45 33564672 0
+D2
+~
+~
+0 -1 5427
+S
+#5429
+The fifth floor~
+   The fifth floor is dedicated to those students puruing mastery of ki powers
+and skills.  The hallway is well-lit, and it is fairly easy to find your way
+around.  A large sign hangs above the doorway which reads, 'The Bardic
+Auditorium'.
+~
+45 33564672 0
+D0
+~
+~
+0 -1 5430
+D3
+~
+~
+0 -1 5426
+S
+#5430
+Bards' Auditorium~
+   You are standing inside the bards' classroom.  If you are not a bard, you
+should go back outside and ask someone directions.  A large whiteboard hangs on
+one of the walls with today's lesson written on it.
+~
+45 33564672 0
+D2
+~
+~
+0 -1 5429
+S
+#5431
+The end of the hallway~
+   More lockers adorn the walls of the hallway.  There are doors to the east
+and west, and the smell of cafeteria food wafts through the hallway.  To the
+north, you hear the sounds of construction coupled with what seems to be noise
+from several small skirmishes.
+~
+45 1174415372 0
+D0
+~
+door~
+3 -1 5434
+D1
+~
+~
+0 -1 5433
+D2
+~
+~
+0 -1 5454
+D3
+~
+~
+0 -1 5432
+S
+#5432
+Cafeteria~
+   A few students sit at two of the tables in the cafeteria.  One wall is
+filled with shelves of the different types of food sold here.  A row of soda
+machines and snack machines lines another wall.  There is a cashier at the
+other end of room, just past the food.
+~
+45 1174415372 0
+D1
+~
+~
+0 -1 5431
+S
+#5433
+School Supplies~
+   Tremendous piles of school supplies are strewn haphazardly about the room
+here.  It is obvious the students have been rummaging through the equipment
+unsupervised.  One can only hope that a faculty member returns soon to restore
+order.  There are rumors that more equipment can be found in the Fighting
+Arena.
+~
+45 1174415372 0
+D3
+~
+~
+0 -1 5431
+S
+#5434
+The fighting arena~
+   You have entered a large, domed arena.  Designed for the sole purpose of
+providing inexperienced adventurers a place to hone their fledgling powers,
+sounds of combat and misfiring magic can be heard from all sides.  Errant bits
+of play-dough fly by as Dark Castle's newest members hack-and-slash their way
+through the assorted constructs designed for practice.  Tiny replicas of
+vicious monsters run about in terror and spray bits of dough in all directions
+as young players hack away at them.
+~
+45 33564672 0
+D0
+~
+~
+0 -1 5438
+D1
+~
+~
+0 -1 5435
+D2
+~
+door~
+3 -1 5431
+S
+#5435
+The fighting arena~
+   You are within a large, domed arena.  Designed for the sole purpose of
+providing inexperienced adventurers a place to hone their fledgling powers,
+sounds of combat and misfiring magic can be heard from all sides.  Errant bits
+of play-dough fly by as Dark Castle's newest members hack-and-slash their way
+through the assorted constructs designed for practice.  Tiny replicas of
+vicious monsters run about in terror and spray bits of dough in all directions
+as young players hack away at them.
+~
+45 33564672 0
+D0
+~
+~
+0 -1 5439
+D1
+~
+~
+0 -1 5436
+D3
+~
+~
+0 -1 5434
+S
+#5436
+The fighting arena~
+   You are within a large, domed arena.  Designed for the sole purpose of
+providing inexperienced adventurers a place to hone their fledgling powers,
+sounds of combat and misfiring magic can be heard from all sides.  Errant bits
+of play-dough fly by as Dark Castle's newest members hack-and-slash their way
+through the assorted constructs designed for practice.  Tiny replicas of
+vicious monsters run about in terror and spray bits of dough in all directions
+as young players hack away at them.
+~
+45 33564672 0
+D0
+~
+~
+0 -1 5440
+D1
+~
+~
+0 -1 5437
+D3
+~
+~
+0 -1 5435
+S
+#5437
+The fighting arena~
+   You are within a large, domed arena.  Designed for the sole purpose of
+providing inexperienced adventurers a place to hone their fledgling powers,
+sounds of combat and misfiring magic can be heard from all sides.  Errant bits
+of play-dough fly by as Dark Castle's newest members hack-and-slash their way
+through the assorted constructs designed for practice.  Tiny replicas of
+vicious monsters run about in terror and spray bits of dough in all directions
+as young players hack away at them.
+~
+45 33564672 0
+D0
+~
+~
+0 -1 5441
+D3
+~
+~
+0 -1 5436
+S
+#5438
+The fighting arena~
+   You are within a large, domed arena.  Designed for the sole purpose of
+providing inexperienced adventurers a place to hone their fledgling powers,
+sounds of combat and misfiring magic can be heard from all sides.  Errant bits
+of play-dough fly by as Dark Castle's newest members hack-and-slash their way
+through the assorted constructs designed for practice.  Tiny replicas of
+vicious monsters run about in terror and spray bits of dough in all directions
+as young players hack away at them.
+~
+45 33564672 0
+D0
+~
+~
+0 -1 5442
+D1
+~
+~
+0 -1 5439
+D2
+~
+~
+0 -1 5434
+S
+#5439
+The fighting arena~
+   You are within a large, domed arena.  Designed for the sole purpose of
+providing inexperienced adventurers a place to hone their fledgling powers,
+sounds of combat and misfiring magic can be heard from all sides.  Errant bits
+of play-dough fly by as Dark Castle's newest members hack-and-slash their way
+through the assorted constructs designed for practice.  Tiny replicas of
+vicious monsters run about in terror and spray bits of dough in all directions
+as young players hack away at them.
+~
+45 33564672 0
+D0
+~
+~
+0 -1 5443
+D1
+~
+~
+0 -1 5440
+D2
+~
+~
+0 -1 5435
+D3
+~
+~
+0 -1 5438
+S
+#5440
+The fighting arena~
+   You are within a large, domed arena.  Designed for the sole purpose of
+providing inexperienced adventurers a place to hone their fledgling powers,
+sounds of combat and misfiring magic can be heard from all sides.  Errant bits
+of play-dough fly by as Dark Castle's newest members hack-and-slash their way
+through the assorted constructs designed for practice.  Tiny replicas of
+vicious monsters run about in terror and spray bits of dough in all directions
+as young players hack away at them.
+~
+45 33564672 0
+D0
+~
+~
+0 -1 5444
+D1
+~
+~
+0 -1 5441
+D2
+~
+~
+0 -1 5436
+D3
+~
+~
+0 -1 5439
+S
+#5441
+The fighting arena~
+   You are within a large, domed arena.  Designed for the sole purpose of
+providing inexperienced adventurers a place to hone their fledgling powers,
+sounds of combat and misfiring magic can be heard from all sides.  Errant bits
+of play-dough fly by as Dark Castle's newest members hack-and-slash their way
+through the assorted constructs designed for practice.  Tiny replicas of
+vicious monsters run about in terror and spray bits of dough in all directions
+as young players hack away at them.
+~
+45 33564672 0
+D0
+~
+~
+0 -1 5445
+D2
+~
+~
+0 -1 5437
+D3
+~
+~
+0 -1 5440
+S
+#5442
+The fighting arena~
+   You are within a large, domed arena.  Designed for the sole purpose of
+providing inexperienced adventurers a place to hone their fledgling powers,
+sounds of combat and misfiring magic can be heard from all sides.  Errant bits
+of play-dough fly by as Dark Castle's newest members hack-and-slash their way
+through the assorted constructs designed for practice.  Tiny replicas of
+vicious monsters run about in terror and spray bits of dough in all directions
+as young players hack away at them.
+~
+45 33564672 0
+D0
+~
+~
+0 -1 5446
+D1
+~
+~
+0 -1 5443
+D2
+~
+~
+0 -1 5438
+S
+#5443
+The fighting arena~
+   You are within a large, domed arena.  Designed for the sole purpose of
+providing inexperienced adventurers a place to hone their fledgling powers,
+sounds of combat and misfiring magic can be heard from all sides.  Errant bits
+of play-dough fly by as Dark Castle's newest members hack-and-slash their way
+through the assorted constructs designed for practice.  Tiny replicas of
+vicious monsters run about in terror and spray bits of dough in all directions
+as young players hack away at them.
+~
+45 33564672 0
+D0
+~
+~
+0 -1 5447
+D1
+~
+~
+0 -1 5444
+D2
+~
+~
+0 -1 5439
+D3
+~
+~
+0 -1 5442
+S
+#5444
+The fighting arena~
+   You are within a large, domed arena.  Designed for the sole purpose of
+providing inexperienced adventurers a place to hone their fledgling powers,
+sounds of combat and misfiring magic can be heard from all sides.  Errant bits
+of play-dough fly by as Dark Castle's newest members hack-and-slash their way
+through the assorted constructs designed for practice.  Tiny replicas of
+vicious monsters run about in terror and spray bits of dough in all directions
+as young players hack away at them.
+~
+45 33564672 0
+D0
+~
+~
+0 -1 5448
+D1
+~
+~
+0 -1 5445
+D2
+~
+~
+0 -1 5440
+D3
+~
+~
+0 -1 5443
+S
+#5445
+The fighting arena~
+   You are within a large, domed arena.  Designed for the sole purpose of
+providing inexperienced adventurers a place to hone their fledgling powers,
+sounds of combat and misfiring magic can be heard from all sides.  Errant bits
+of play-dough fly by as Dark Castle's newest members hack-and-slash their way
+through the assorted constructs designed for practice.  Tiny replicas of
+vicious monsters run about in terror and spray bits of dough in all directions
+as young players hack away at them.
+~
+45 33564672 0
+D0
+~
+~
+0 -1 5449
+D2
+~
+~
+0 -1 5441
+D3
+~
+~
+0 -1 5444
+S
+#5446
+The fighting arena~
+   You are within a large, domed arena.  Designed for the sole purpose of
+providing inexperienced adventurers a place to hone their fledgling powers,
+sounds of combat and misfiring magic can be heard from all sides.  Errant bits
+of play-dough fly by as Dark Castle's newest members hack-and-slash their way
+through the assorted constructs designed for practice.  Tiny replicas of
+vicious monsters run about in terror and spray bits of dough in all directions
+as young players hack away at them.
+~
+45 33564672 0
+D1
+~
+~
+0 -1 5447
+D2
+~
+~
+0 -1 5442
+S
+#5447
+The fighting arena~
+   You are within a large, domed arena.  Designed for the sole purpose of
+providing inexperienced adventurers a place to hone their fledgling powers,
+sounds of combat and misfiring magic can be heard from all sides.  Errant bits
+of play-dough fly by as Dark Castle's newest members hack-and-slash their way
+through the assorted constructs designed for practice.  Tiny replicas of
+vicious monsters run about in terror and spray bits of dough in all directions
+as young players hack away at them.
+~
+45 33564672 0
+D1
+~
+~
+0 -1 5448
+D2
+~
+~
+0 -1 5443
+D3
+~
+~
+0 -1 5446
+S
+#5448
+The fighting arena~
+   You are within a large, domed arena.  Designed for the sole purpose of
+providing inexperienced adventurers a place to hone their fledgling powers,
+sounds of combat and misfiring magic can be heard from all sides.  Errant bits
+of play-dough fly by as Dark Castle's newest members hack-and-slash their way
+through the assorted constructs designed for practice.  Tiny replicas of
+vicious monsters run about in terror and spray bits of dough in all directions
+as young players hack away at them.
+~
+45 33564672 0
+D1
+~
+~
+0 -1 5449
+D2
+~
+~
+0 -1 5444
+D3
+~
+~
+0 -1 5447
+S
+#5449
+The fighting arena~
+   You are within a large, domed arena.  Designed for the sole purpose of
+providing inexperienced adventurers a place to hone their fledgling powers,
+sounds of combat and misfiring magic can be heard from all sides.  Errant bits
+of play-dough fly by as Dark Castle's newest members hack-and-slash their way
+through the assorted constructs designed for practice.  Tiny replicas of
+vicious monsters run about in terror and spray bits of dough in all directions
+as young players hack away at them.
+~
+45 33564672 0
+D2
+~
+~
+0 -1 5445
+D3
+~
+~
+0 -1 5448
+S
+#5450
+Conflict 101 - The Rules of Engagement~
+   As you step through the door you enter a small practice yard.  The grass
+here is somewhat barren from constantly being trampled, and there are a number
+of different surfaces with which to practice your skills.  The yard is
+carefully gated off to prevent those pesky Uln'hyrr from bothering you while
+you're practicing.  A large whiteboard is leaning against one of the outer
+walls with a lesson on combat scrawled across it.  To read the lesson, type
+'$7$Blook board$R.'
+~
+45 1174415372 0
+D3
+~
+~
+0 -1 5454
+S
+#5451
+A hallway within the Academy~
+   This is the main hallway of the Dark Castle Academy.  The atmosphere here is
+one of academia, complete with students milling about and discussing what they
+have just learned.  There is a room to the west, and the hall continues to the
+north.
+~
+45 33564672 0
+D0
+~
+~
+0 -1 5452
+D2
+~
+~
+0 -1 5401
+D3
+~
+~
+0 -1 5402
+S
+#5452
+A hallway within the Academy~
+   This is the main hallway of the Dark Castle Academy.  The atmosphere here is
+one of academia, complete with students milling about and discussing what they
+have just learned.  There is a room to the east, and the hall continues to the
+north and ends at the Fighting Arena.
+~
+45 1174415372 0
+D0
+~
+~
+0 -1 5404
+D1
+~
+~
+0 -1 5403
+D2
+~
+~
+0 -1 5451
+S
+#5453
+General Ed. 101 - Introduction to Information Gathering~
+   A small alcove dominates this corner of the main academy.  Centered in the
+alcove is a long desk covered with pamphlets, brochures, and forms.  A bulletin
+board behind the desk outlines many of the courses and information available to
+students.  The information available here appears to outline important
+commands that students will require when they graduate from the academy and
+face the "real world".  To read the lesson in information gathering, type
+'look board.'
+~
+45 1174415372 0
+D1
+~
+~
+0 -1 5404
+S
+#5454
+A hallway within the Academy~
+   This is the main hallway of the Dark Castle Academy.  The atmosphere here is
+one of academia, complete with students milling about and discussing what they
+have just learned.  There is a room to the east, and the hall continues to the
+north and ends at the Fighting Arena.
+~
+45 1174415372 0
+D0
+~
+~
+0 -1 5431
+D1
+~
+~
+0 -1 5450
+D2
+~
+~
+0 -1 5404
+S
+#5455
+The Guildmaster's Office~
+   Empty description.
+~
+45 8 0
+D1
+~
+~
+0 -1 5456
+S
+#5456
+The Guildmaster's Quarters~
+   Empty description.
+~
+45 0 0
+D3
+~
+~
+0 -1 5455
+S
+#5470
+Room 5470~
+Empty description.
+~
+45 0 0
+D0
+~
+~
+0 -1 5471
+D1
+~
+~
+0 -1 5473
+D2
+~
+~
+0 -1 5472
+D3
+~
+~
+0 -1 5474
+S
+#5471
+Room 5471~
+Empty description.
+~
+45 0 0
+D2
+~
+~
+0 -1 5470
+S
+#5472
+Room 5472~
+Empty description.
+~
+45 0 0
+D0
+~
+~
+0 -1 5470
+S
+#5473
+Room 5473~
+Empty description.
+~
+45 0 0
+D3
+~
+~
+0 -1 5470
+S
+#5474
+Room 5474~
+Empty description.
+~
+45 0 0
+D1
+~
+~
+0 -1 5470
+S
+$~

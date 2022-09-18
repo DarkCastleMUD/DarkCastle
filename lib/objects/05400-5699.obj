@@ -1,0 +1,2776 @@
+#5400
+megaphone~
+Megaphone~
+Megaphone: You can hear the sounds of construction echoing from above.~
+~
+31 134217728 0 0
+10 10 0 0 0
+0 0 0
+E
+megamsg~
+You can hear the sounds of construction echoing from above.
+~
+S
+#5401
+sign signpost board academy newbie~
+a sign~
+An important looking sign is posted on the wall.~
+~
+12 0 0 0
+0 0 0 0 0
+0 0 0
+E
+board sign signpost~
+<------------------------------------------------------------------------>
+[                                                                        ]
+[               $7$B-=$4$BWelcome to the Dark Castle Academy$7$B=-$R                   ]
+[                                                                        ]
+[ If you are a new player here, the first thing you should is to read    ]
+[ the following helpfiles:   help rules                                  ]
+[                            help multiplay                              ]
+[                            help newbie                                 ]
+[                            help newbie areas                           ]
+[                            help newbie communication                   ]
+[                            help newbie equipment                       ]
+[                            help guilds                                 ]
+[                                                                        ]
+[ You are now in the Dark Castle Academy.  In the hallway to the north   ]
+[ you will find various rooms and signs that you ought to read.  At the  ]
+[ end of this hallway is the battle arena where you may fight creatures  ]
+[ to earn experience.  Upstairs are individual classrooms where you may  ]
+[ learn a little bit about your chosen profression.  In order to gain or ]
+[ practice, however, you will need to leave the Academy and find your    ]
+[ guild (type help guild for directions).                                ]
+<------------------------------------------------------------------------>
+~
+S
+#5402
+sign signpost board newbie academy~
+a sign~
+An important sign has been posted on the wall.~
+~
+12 0 0 0
+0 0 0 0 0
+0 0 0
+E
+sign board signpost~
+<------------------------------------------------------------------------>
+[                                                                        ]
+[                            -=Hello Student=-                           ]
+[                                                                        ]
+[ To the west you will find the Multi-Purpose room and a lesson on basic ]
+[ movement commands.  To the north are more instruction rooms and the    ]
+[ fighting arena.  If you would like to get some equipment, go all north ]
+[ and then east.  To find more equipment you will need to slay some of   ]
+[ of the vile beasts in the Fighting Arena.                              ]
+[                                                                        ]
+[ Good luck!                                                             ]
+<------------------------------------------------------------------------>
+~
+S
+#5403
+board blackboard chalkboard newbie academy sign~
+a chalkboard~
+A chalkboard with some writing on it is leaning against the wall.~
+~
+12 0 0 0
+0 0 0 0 0
+0 0 0
+E
+board blackboard chalkboard sign~
+<------------------------------------------------------------------------>
+[                                                                        ]
+[                        -=Movement Instruction=-                        ]
+[                                                                        ]
+[ To maneuver your way through the realms of Dark Castle, one should     ]
+[ have a basic grasp of the following movement commands:                 ]
+[                                                                        ]
+[ 1. Directional Movement- $7$BNorth, East, South, West, Up, Down$R            ]
+[    These commands are used to move from one room to another.           ]
+[                                                                        ]
+[ 2. Object Manipulation- $7$BOpen, Close, Lock, Unlock, Push, Pull, Enter,$R  ]
+[                         $7$BLeave, Climb, Get, Take, Wear, Wield$R           ]
+[    These commands are used for a variety of reasons.  Doors may be     ]
+[    both opened and closed, locked and unlocked.  Often you will run    ]
+[    across objects that need to be '$7$Bclimbed$R', '$7$Bentered$R', '$7$Bpushed$R' or    ]
+[    '$7$Bpulled$R'.  In order to wear pieces of equipment, you can '$7$Bget$R' the  ]
+[    item, '$7$Bwear$R' it, '$7$Bwield$R' it, or '$7$Bhold$R' it.  The '$7$Bremove$R' command    ]
+[    will remove the object from a worn position on your body to your    ]
+[    inventory.                                                          ]
+[                                                                        ]
+[ 3. Personal Position- $7$BWake, Sleep, Rest, Sit$R                           ]
+[    Your personal position has a bearing on how much you hitpoints,     ]
+[    mana, and movement you regenerate per tick.  While you will         ]
+[    regenerate standing, you will regain more by resting or sleeping.   ]
+[    Be careful where you sleep though, as thieves can steal from you    ]
+[    while you are deep in slumber.                                      ]
+[                                                                        ]
+<------------------------------------------------------------------------>
+~
+S
+#5404
+whiteboard board chalkboard sign~
+a whiteboard~
+A whiteboard with some writing on it is leaning against the wall.~
+~
+12 0 0 0
+0 0 0 0 0
+0 0 0
+E
+board whiteboard blackboard chalkboard sign~
+<------------------------------------------------------------------------>
+[                                                                        ]
+[                    -=Communication Instruction=-                       ]
+[                                                                        ]
+[ To maneuver your way through the realms of Dark Castle, one should     ]
+[ have a basic grasp of the following communication commands:            ]
+[                                                                        ]
+[ 1. Room Based Communication- $7$BSay, Psay, Whisper, Ask$R                   ]
+[    These commands are used to talk to people in the same room as you   ]
+[    are.  You can type '$7$Bsay$R' to say something to everyone in your room. ]
+[    The '$7$Bpsay$R' command can be used to talk directly to a single person  ]
+[    in your room, but everyone can see it.  You can use '$7$Bwhisper$R' and   ]
+[    '$7$Bask$R' to talk to someone in your room without anyone else seeing    ]
+[    the communication.                                                  ]
+[                                                                        ]
+[ 2. PC to PC Communication- $7$BTell, Reply$R                                 ]
+[    These commands are used to communicate with another PC regardless   ]
+[    of where they are (with a few exceptions).  The '$7$Btell$R' command is   ]
+[    used to send a message to another PC.  The '$7$Breply$R' command can be   ]
+[    used to send a message to the last person who sent you a tell.      ]
+[                                                                        ]
+[ 3. Global Communication- $7$BGossip, Auction, Newbie, Trivia, Shout$R        ]
+[    These commands are used to send a message to anyone with that       ]
+[    channel on.  If you type '$7$Bgossip Hello$R', everyone with the gossip   ]
+[    channel turned on will be able to see your message.  All of the     ]
+[    commands given above have a (more or less) specific function.  The  ]
+[    '$7$Bgossip$R' channel is used for normal everyday chat.  '$7$BAuction$R' is    ]
+[    used for players to buy and sell equipment from each other.  The    ]
+[    '$7$Bnewbie$R' channel is for new players to get help from other new or   ]
+[    old players.  The '$7$Btrivia$R' channel is used for trivia contests      ]
+[    held by the Immortal staff.  Finally, the '$7$Bshout$R' command allows    ]
+[    you to send a message to all those players who are in the same      ]
+[    zone as you are.                                                    ]
+[                                                                        ]
+<------------------------------------------------------------------------>
+~
+S
+#5405
+sign board whiteboard chalkboard blackboard~
+a whiteboard~
+A whiteboard with writing on it is leaning against the wall.~
+~
+12 0 0 0
+0 0 0 0 0
+0 0 0
+E
+sign board whiteboard chalkboard blackboard~
+<------------------------------------------------------------------------>
+[                                                                        ]
+[                      -=Information Instruction=-                       ]
+[                                                                        ]
+[ To maneuver your way through the realms of Dark Castle, one should     ]
+[ have a basic grasp of the following information commands:              ]
+[                                                                        ]
+[ 1. Personal Information Commands- $7$BScore, Practice, Eq, Inventory$R       ]
+[    These commands are used to show yourself personal information.      ]
+[    The '$7$Bscore$R' command shows basic information about yourself, such    ]
+[    as your hitpoints, mana, regeneration rates, how much experience    ]
+[    until you gain a level, and much more.  The '$7$Bpractice$R' command is   ]
+[    used to show your current skill level in your various abilities     ]
+[    (remember you must be at a guildmaster to actually practice).       ]
+[    To view what equipment you are currently wearing type '$7$Beq$R'.  This   ]
+[    will show you what equipment you have on as well as their physical  ]
+[    condition (equipment must repaired over time).  The '$7$Binventory$R'     ]
+[    command is used to show what items you are currently carrying       ]
+[    around.                                                             ]
+[                                                                        ]
+[ 2. More Personal Information Commands- $7$BToggle, Channel$R                 ]
+[    These commands are used to show more information about your         ]
+[    personal settings.  The '$7$Btoggle$R' command shows you what various     ]
+[    settings you have toggled on or off.  Type '$7$Bhelp toggle$R' to         ]
+[    show what each of the settings do.  The '$7$Bchannel$R' command allows    ]
+[    you to turn various communication channels off and on.  For         ]
+[    instance, if you do not want to hear the gossip channel, you can    ]
+[    turn it off by typing '$7$Bchannel gossip$R'.  On a side note, the '$7$Binfo$R' ]
+[    channel is used to convey various messages from the mud to the PC,  ]
+[    such as PKILL messages.                                             ]
+[                                                                        ]
+[ 3. World Information Commands- $7$BWho, Count, Time, Story, Weather, News$R  ]
+[    These commands are used to show you various pieces of information   ]
+[    about the world of Dark Castle.  The '$7$Bwho$R' command shows you a      ]
+[    list of visible connected mortals and immortals.  Typing '$7$Bcount$R'    ]
+[    will show you how many of each class is currently connected.  The   ]
+[    '$7$Btime$R' command shows how long Dark Castle has been up since the     ]
+[    last reboot, as well as what time it is in the 'realms'.  '$7$BStory$R'   ]
+[    gives a timeline of the Dark Castle storyline and history.  The     ]
+[    '$7$Bweather$R' command shows you the current weather status.  The '$7$Bnews$R' ]
+[    command lists out the latest Dark Castle news, and usually features ]
+[    recent fixes and additions. There are other information commands    ]
+[    so please be sure to browse our extensive helpfile system.          ]
+[                                                                        ]
+<------------------------------------------------------------------------>
+~
+S
+#5406
+sign board chalkboard whiteboard blackboard~
+a whiteboard~
+A whiteboard is leaning against the Academy's outer wall.~
+~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+E
+board whiteboard chalkboard blackboard sign~
+<------------------------------------------------------------------------>
+[                                                                        ]
+[                         -=Combat Instruction=-                         ]
+[                                                                        ]
+[ To maneuver your way through the realms of Dark Castle, one should     ]
+[ have a basic grasp of the following combat commands:                   ]
+[                                                                        ]
+[ 1. Combat Information- $7$BConsider, Scan$R                                  ]
+[    These commands are used to give you information before a poential   ]
+[    battle.  Typing '$7$Bscan$R' will show you all of the mobiles and PCs     ]
+[    that inhabit the rooms around you.  The '$7$Bconsider$R' command gives    ]
+[    some basic information about the mobile or PC that you are up       ]
+[    against.  On a side note, the higher that both of these commands    ]
+[    are practiced, the more information it will give you.  In the case  ]
+[    of scan, you will more accurately see whats around you.  In the     ]
+[    case of consider, you will be able to glean more information about  ]
+[    the mobile or PC you are facing.                                    ]
+[                                                                        ]
+[ 2. Combat Initiation- $7$BKill, Hit, Murder$R                                ]
+[    These commands are used to initiate combat against mobiles and      ]
+[    PCs.  For example, you can type '$7$Bkill slime$R' to begin battle        ]
+[    against a slime monster.  The '$7$Bkill$R' command can be used against    ]
+[    PCs as well, but to make sure you only hit a PC, you can use the    ]
+[    '$7$Bmurder$R' command.  Also, you may initiate combat with any combat    ]
+[    skills or spells you have.  A mage may begin combat by typing       ]
+[    '$7$Bcast 'magic missile' slime$R', while a warrior could type '$7$Bkick      ]
+[    slime$R'.                                                             ]
+[                                                                        ]
+[ 3. Ending Combat- $7$BFlee, Recall$R                                         ]
+[    These commands are used to escape from combat if things are not     ]
+[    going as well as you hoped they would.  The '$7$Bflee$R' command will     ]
+[    take you out of combat and move you one room away from the mob.     ]
+[    The '$7$Brecall$R' command can be used both in and out of combat, and     ]
+[    will transport you to your 'homed' room.  Remember that both of     ]
+[    these commands, viz. flee and recall, have a chance of failure.     ]
+[    Please read our extensive set of helpfiles to learn about PC vs.    ]
+[    PC combat.                                                          ]
+[                                                                        ]
+<------------------------------------------------------------------------>
+~
+S
+#5407
+sign warning signpost board~
+a warning sign~
+A sign that you probably ought to read is posted on the wall.~
+~
+12 0 0 0
+0 0 0 0 0
+0 0 0
+E
+sign warning signpost board~
+<------------------------------------------------------------->
+[                                                             ]
+[                         $7$B-=$4$BWARNING$7$B=-$R                         ]
+[                                                             ]
+[  You have entered the Dark Castle Academy Fighting Arena.   ]
+[  Be warned!  The mobiles in this room are re-creations of   ]
+[  some of the toughest and most evil creatures that wander   ]
+[  these realms.  If you see any of these creatures after     ]
+[  you have left the Academy, run!  Flee!  Recall!  Escape!   ]
+[  In other words, do what you must to steer clear of them.   ]
+[  Only the more advanced adventurers has even a chance of    ]
+[  destroying them...                                         ]
+[                                                             ]
+<------------------------------------------------------------->
+~
+S
+#5408
+globe obsidan magic magicball~
+a glowing obsidian globe~
+A strange obsidian globe is hovering three feet off the ground.~
+~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+E
+globe obsidian ball magicball~
+This strange object radiants a dark glow, while slowly turning
+as it floats in the air. The surface of the globe looks amazingly
+deep... as if you could lost within its depths.
+~
+\speech_prog p teach me please~
+if ispc($n)
+  if class($n) == 11
+    MPECHOAT $n The obsidian globe begins to spin quickly in the air, and a
+    MPECHOAT $n bright flash of light momentarily blinds you. As your vision
+    MPECHOAT $n begins to come back, you think you can see a blue bird fly
+    MPECHOAT $n through an open window...
+    MPTEACHSKILL $n 134
+    break
+  else
+    if class($n) == 4
+    or class($n) == 5
+    or class($n) == 6
+    or class($n) == 7
+    or class($n) == 8
+    or class($n) == 9
+      MPECHOAT $n The obsidian globe begins to spin quickly in the air, and a
+      MPECHOAT $n bright flash of light momentarily blinds you. As your vision
+      MPECHOAT $n begins to come back, you see an image of yourself snapping a
+      MPECHOAT $n fierce kick into the neck of a goblin...
+      MPTEACHSKILL $n 341
+      break
+    endif
+  endif
+endif
+~
+|
+S
+#5409
+sign signpost board academy newbie~
+a sign~
+An important looking sign is posted on the wall.~
+~
+12 0 0 0
+0 0 0 0 0
+0 0 0
+E
+sign signpost board academy newbie~
+Information about platinum coins, the morgue, metaing and donations is taught to the east.
+~
+S
+#5410
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#5411
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#5412
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#5413
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#5414
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#5415
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#5416
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#5417
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#5418
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#5419
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#5420
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#5421
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#5422
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#5423
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#5424
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#5425
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#5426
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#5427
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#5428
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#5429
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#5430
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#5431
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#5432
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#5433
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#5434
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#5435
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#5436
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#5437
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#5438
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#5439
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#5440
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#5441
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#5442
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#5443
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#5444
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#5445
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#5446
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#5447
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#5448
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#5449
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#5450
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#5451
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#5452
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#5453
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#5454
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#5455
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#5456
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#5457
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#5458
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#5459
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#5460
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#5461
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#5462
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#5463
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#5464
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#5465
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#5466
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#5467
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#5468
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#5469
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#5470
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#5471
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#5472
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#5473
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#5474
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#5475
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#5476
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#5477
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#5478
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#5479
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#5480
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#5481
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#5482
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#5483
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#5484
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#5485
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#5486
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#5487
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#5488
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#5489
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#5490
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#5491
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#5492
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#5493
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#5494
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#5495
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#5496
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#5497
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#5498
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#5499
+empty obj~
+an empty obj~
+An empty obj sits here waiting to be created.~
+~
+1 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#5500
+token brixton IOU~
+an IOU from Brixton *OLD - See description*~
+A scrawled note from Brixton lies amid the debris.~
+~
+8 16 16385 1
+0 0 0 0 1
+1 1 33
+E
+token brixton iou note~
+Due to the retirement of this member of the Pantheon, any
+rewards can now be exchanged for 1 of the following:
+1) A Symbol of the Apocalypse
+2) Urizen's Giant Swedish Meatball
+3) A Piece of Dasein's Existenz
+Please see a Divinity or Implementor for redemption and exchange.
+~
+S
+#5501
+short sword shortsword Khromilldor~
+a shortsword of dwarven make~
+A finely-crafted shortsword from the Empire of Khromilldor yearns to taste blood.~
+~
+5 268435456 8193 0
+0 5 4 2 50
+6 25000 0
+E
+short sword shortsword Khromilldor~
+  Stout in girth and razor-sharp on edge, this shortsword from the
+  forges of Khromilldor seems as well-honed as the day it left its
+  maker's anvil.  High dwarfish runes play across the blade, perhaps
+  the blessing of a forgotten god unreadable by any alive today.
+~
+A
+26 3
+A
+50 1
+A
+46 1
+S
+#5502
+spike spear spikespear Khromilldor~
+a dwarven spikespear~
+A finely-crafted spear lies, cast spike-point down into the earth.~
+~
+5 273764352 8193 6
+0 2 14 11 48
+25 180000 0
+E
+spike spear spikespear Khromilldor~
+Empty desc.
+    A wicked drop-point spike sits atop a pole of carefully-brushed
+    Khromilldor steel.  The spearhead resembles a teardrop; wide and
+    somewhat bulbous near the shaft, tapering to a long thin point.
+    While the spear itself has likely seen much combat, the finish
+    on the shaft and spike seems completely unscratched or otherwise
+    in less-than-perfect condition.
+~
+A
+26 3
+A
+2 2
+S
+#5503
+plated spint mail splintmail Khromilldor~
+a set of plated Khromilldor splintmail~
+An empty obj sits here waiting to be created.~
+~
+9 3510272 9 6
+20 0 0 0 35
+65 250000 0
+E
+plated splint mail splintmail Khromilldor~
+Empty desc.
+    Bands of metal cross each other, providing a brace for the weave
+    of leather and plates that provide the protection in this armor.
+    On the right shoulder of second splint is a shield with a crossed
+    warhammer and battleaxe, signifying the Tharkesian Horde...the
+    army of Khromilldor.
+~
+A
+26 2
+A
+18 1
+A
+13 25
+A
+17 -25
+S
+#5504
+plated gauntlets Khromilldor~
+a set of plated Khromilldor gauntlets~
+A pair of fine plated gauntlets from the Empire of Khromilldor beg to be taken.~
+~
+9 7704576 129 6
+5 0 0 0 35
+5 100000 0
+E
+plated gauntlets Khromilldor~
+Empty desc.
+  The gauntlets themselves are plated over each finger, hinged with
+  chain.  The joints are woven very tightly, yet allow excellent
+  flexibility.  Under each plate is a series of crossing horizontal
+  and vertical bands of metal; periodically it has thin, wide holes
+  to allow strips of leather to bind down the plating of the gauntlet.
+~
+A
+26 2
+A
+18 1
+A
+13 15
+S
+#5505
+spiked field plate Khromilldor~
+a set of spiked Khromilldor field plate~
+A full suit of dwarven armor gathers dust, its spiked plates shining dully.~
+~
+9 5574656 9 6
+15 0 0 0 35
+50 200000 8
+E
+spiked field plate Khromilldor~
+Empty desc.
+  Cruel black spikes rise from the polished plates, each designed
+  carefully to catch blows and direct them to the sturdiest part of
+  an armor segment.  Somehow the smiths of the Khromilldor have
+  managed to give the armor a graphite-grey finish not unlike that
+  of polished hematite.
+~
+A
+11 10
+A
+90 3
+A
+26 2
+A
+17 -25
+S
+#5506
+Flesh Reaver Fleshreaver spike blade spikeblade Khromilldor~
+a Fleshreaver spikeblade~
+A spikeblade forged in the far northern reaches of Jundlehem shines with a deadly gleam.~
+~
+5 1527808 8193 6
+0 3 9 3 48
+18 140000 0
+E
+Flesh Reaver Fleshreaver spike blade spikeblade Khromilldor~
+Empty desc.
+    While about the size of a shortsword, this weapon seems specially-
+    designed to slip between armor segments.  The blade itself is
+    primarily conical, with slight imperfections along the way to
+    allow attacks to slip a bit if deflected by weapons or armor.
+    The hilt of the blade sports the crossed warhammer and battleaxe
+    of the Khromilldor Empire.
+~
+A
+19 4
+A
+52 3
+A
+45 2
+S
+#5510
+Uuruuk lightcleaver bastard sword~
+$B$0Uuruuk the Lightcleaver$R~
+A bastard sword of impressive girth soaks up the light and goodness.~
+~
+5 8720578 8193 12
+0 18 4 3 60
+24 500000 37
+E
+Uuruuk lightcleaver bastard sword~
+    Forged in the depths of Hell itself, the broad black blade of this
+    bastard sword seems to absorb any light around it, radiating a deep
+    resonance of toxic evil.  The blade of the sword sweeps in an
+    inverted curve along each edge, sliding back outward near the tip
+    and crowning in a cruel diamond shape.  The hilt seems crafted of
+    polished bone, though no shine graces it.  In fact, the normal
+    ivory hue of skeletal remains is unnaturally replaced with a flat
+    black, the handle wrapped in the hide of some abombination.
+~
+A
+18 12
+A
+19 10
+A
+305000 5
+A
+17 -40
+A
+97 100
+S
+#5512
+Tharkes Reaver flame red flame-red beard Khromilldor~
+Tharkes the Reaver's $B$4flame-red$R beard~
+A thick $B$4red$1 beard, brutally-shorn from some dwarf's face lies in the dust.$R~
+~
+9 1380352 131073 6
+5 0 0 0 50
+3 100000 0
+E
+Tharkes Reaver flame red flame-red beard~
+    A beard of brilliant red, streaked with wizened grey wisps has been
+    torn from the face of some likely-slaughtered dwarf.  Woven in the
+    long beard are intricately-etched metal beads, each bearing runes of
+    some significance; perhaps a self-indulgant reminder of glory,
+    possibly even some actual magical enhancement.
+~
+A
+26 3
+A
+9 10
+A
+90 5
+A
+103 4
+S
+#5513
+vambraces nightsteel tharkes reaver khromilldor~
+Tharkes the Reaver's $B$0nightsteel$R vambraces~
+A pair of $B$0impossibly-black$1 vambraces soak up the light.$R~
+~
+9 5308608 257 2
+15 0 0 0 50
+5 200000 4
+E
+Tharkes Reaver blacksteel vambraces Khromilldor~
+    Forged from fine dwarfsilver, these vambraces have somehow been hued
+    to various shades of black.  They don't seem to reflect any light,
+    regardless of the brightness.  The joints are well-oiled and cunningly
+    crafted such that they don't make the slightest noise when worn.
+~
+A
+26 3
+A
+90 5
+A
+9 5
+A
+103 4
+S
+#5514
+greaves nightsteel tharkes reaver khromilldor~
+Tharkes the Reaver's $B$0nightsteel$R greaves~
+A set of $B$0extraordinarily-black$1 greaves absorb any ambient light.$R~
+~
+9 5308608 33 2
+15 0 0 0 50
+10 250000 4
+A
+26 3
+A
+91 5
+A
+93 1
+A
+103 3
+S
+#5515
+demon prince black wings Khromilldor~
+a demon prince's $B$0deep black$R wings~
+The wings of a demonlord lie in a mess of congealing blood and gore.~
+~
+9 1380480 1025 1
+15 0 0 0 53
+35 200000 36
+E
+demon prince black wings Khromilldor~
+    An impressive wingspan indeed--though it must not be much of a
+    point of pride for the unfortunate demon who lost them.  The
+    wings still seem to radiate demonic magicks and occasionally
+    flutter to life on their own.  Perhaps they could be used to
+    grant some form of limited flight,
+~
+A
+69 100
+A
+9 10
+A
+10 25
+A
+26 3
+S
+#5516
+demon black gnarled hide Khromilldor~
+a demon's $B$0black$R and gnarled hide~
+The black and gnarled hide of a demon still drips with the ichor from its brutal removal.~
+~
+9 5914688 1 8
+15 0 0 0 58
+33 195000 0
+E
+demon black gnarled hide Khromilldor~
+    Though the skin itself may not be fresh, it seems to constantly
+    regenerate itself...at least enough to keep oozing all over itself.
+    The hide is tough and pocked with many scars and flaws, though
+    offers protection from any threat.  The demon from whom this was
+    harvested must have been powerful indeed.
+~
+A
+26 4
+A
+13 40
+A
+66 5
+A
+17 -30
+S
+#5517
+hammer warhammer Tharkes Reaver Khromilldor~
+Tharkes the Reaver's solid warhammer~
+The fabled warhammer of Tharkes the Reaver awaits a hand worthy of crushing the weak.~
+~
+5 331968 8193 6
+0 7 5 7 54
+24 425000 37
+E
+hammer warhammer Tharkes Reaver Khromilldor~
+    A head of flawless mithril-platinum alloy shines atop a haft of
+    deep black.  Just under hammerhead the crest of the Khromilldor
+    empire is carved.  Leather wraps of deep crimson wrap about the
+    handle, tied and obscured somewhere beneath a haft-spike.
+~
+A
+82 3
+A
+45 3
+A
+60 1
+A
+26 5
+S
+#5518
+axe battleaxe Tharkes Reaver Khromilldor~
+Tharkes the Reaver's mighty battleaxe~
+A legendary battleaxe lies on the ground, the evil it's caused radiating like an aura.~
+~
+5 5374080 8193 6
+0 7 5 3 52
+21 425000 36
+E
+axe battleaxe Tharkes Reaver Khromilldor~
+    A hard-forged blade slides effortlessly out from a deep black
+    haft.  The blade has a counterweight attached in the form of a
+    spike, cruelly designed so pulling it out will cause far more
+    damage than driving it in.  The matted black handle absorbs light,
+    though even that cannot hide the proud crest of the Khromilldor
+    empire carved below the axeblade.
+~
+A
+82 3
+A
+45 3
+A
+46 2
+A
+26 5
+S
+#5526
+demon black gnarled hide Khromilldor~
+a demon's $B$0black$R and gnarled hide~
+The black and gnarled hide of a demon still drips with the ichor from its brutal removal.~
+~
+9 5914688 9 8
+15 0 0 0 58
+33 195000 0
+E
+demon black gnarled hide Khromilldor~
+    Though the skin itself may not be fresh, it seems to constantly
+    regenerate itself...at least enough to keep oozing all over itself.
+    The hide is tough and pocked with many scars and flaws, though
+    offers protection from any threat.  The demon from whom this was
+    harvested must have been powerful indeed.
+~
+A
+26 4
+A
+13 40
+A
+66 5
+A
+17 -30
+S
+#5550
+hooded robe alabaster Brixton~
+a hooded $Balabaster$R robe edged in $B$4crimson$R~
+An off-white robe edged with deep red geometric patterns lies in a pile.~
+~
+9 16 1025 1
+1000 0 0 0 101
+0 0 8
+A
+27 100
+A
+35 100
+A
+67 100
+A
+31 100
+S
+#5555
+chunk platinum~
+a chunk of unrefined platinum ore~
+An sizeable chunk of unrefined platinum ore has fallen from a larger vein.~
+~
+8 199 16384 0
+0 0 0 0 0
+150 0 44
+E
+platinum~
+    Platinum has many odd alchemal properties; those sufficiently
+    talented and knowledgeable in the Art can suffuse objects crafted
+    of the metal with powers otherwise unretainable by more mundane
+    metal.  While any harlequin magician can enchant a longsword to
+    retain fire, only a true master could forge a blade worthy of the
+    name Spellbinder.
+    This piece of ore is no longer than a baby's arm and no wider
+    than an apple.  While the gleam typically associated with refined
+    platinum is not present, the ore still glows with a supernatural
+    light.  Potential, it seems, cares little for outward appearance.
+~
+S
+#5560
+cart ironshod~
+an ironshod cart~
+An old mining cart sits on its tracks, going nowhere and slated to arrive on time.~
+~
+12 0 0 0
+0 0 0 0 0
+580 0 0
+E
+cart~
+    Each cart is ironshod, bindings embracing and wrapping at regular
+    intervals over well-used (and stained) wood of some sort.  They
+    seem in good repair, though without intricate knowledge of how
+    the cart system works there's no real hope of getting them to go.
+    The iron shodding hasn't a speck of rust, though it's quite
+    apparent this cart hasn't been used in some time.
+~
+S
+#5574
+pendant trophies key Khromilldor~
+a gruesome pendant of trophies~
+A gruesome pendant of ears, knuckles, withered eyes, and pieces of hide lies amid the gore.~
+~
+18 208 5 6
+0 0 0 0 50
+0 550000 2061
+A
+34 100
+A
+97 100
+S
+#5580
+megaphone brixton khromilldor~
+OMG!! A megaphone for room 5581!~
+OMG!! Brixton megaphone SUPER GO!!~
+Fixed.~
+12 134217728 0 0
+0 0 0 0 0
+5 0 48
+\catch_prog 1~
+if rand(7)==1
+MPECHO A deep, parched voice shouts, 'Burn, FOOLS BURN!  GHAURA'SUN, BURN THEM ALL!'
+break
+else
+if rand(7)==2
+MPECHO A deep, parched voice shouts, 'Rhortek, you cannot run forever!  You and your cursed elf-friends will feel torment beyond description!'
+break
+else
+if rand(7)==3
+MPECHO A deep, parched voice shouts, 'Cindomir, join with me.  Our combined might could re-shape the world.'
+break
+else
+if rand(7)==4
+MPECHO A deep, parched voice shouts, 'Stupid elven bastard, I will toy with your soul as Ghaura has so enjoyed your father's.'
+break
+else
+if rand(7)==5
+MPECHO A deep, parched voice shouts, 'Gher-khaa!  Yufz yn pzrr m'thraau!!'
+break
+else
+if rand(7)==6
+MPECHO A deep, parched voice shouts, '...where...where are my people...?  What have you done?!'
+break
+else
+if rand(7)==7
+MPECHO A deep, parched voice shouts, 'No, NO!  That was not part of the pact!  You cannot-!'
+break
+endif
+endif
+endif
+endif
+endif
+endif
+break
+endif
+~
+\rand_prog 20~
+MPOTHROW 5580 1 15
+~
+|
+S
+#5581
+megaphone brixton~
+OMG!! A megaphone for room 5582!~
+OMG!! A megaphone for room 5582!~
+Fixed.~
+12 134217728 0 0
+0 0 0 0 0
+0 0 48
+E
+megaphone brixton~
+~
+\catch_prog 15~
+if rand(7)==1
+  MPECHO A deep, parched voice shouts, 'Burn, FOOLS BURN!  GHAURA'SUN, BURN THEM ALL!'
+  break
+else
+  if rand(7)==2
+    MPECHO A deep, parched voice shouts, 'Rhortek, you cannot run forever!  You and your cursed elf-friends will feel torment beyond description!'
+    break
+  else
+    if rand(7)==3
+      MPECHO A deep, parched voice shouts, 'Cindomir, join with me.  Our combined might could re-shape the world.'
+      break
+    else
+      if rand(7)==4
+        MPECHO A deep, parched voice shouts, 'Stupid elven bastard, I will toy with your soul as Ghaura has so enjoyed your father's.'
+        break
+      else
+        if rand(7)==5
+          MPECHO A deep, parched voice shouts, 'Gher-khaa!  Yufz yn pzrr m'thraau!!'
+          break
+        else
+          if rand(7)==6
+            MPECHO A deep, parched voice shouts, '...where...where are my people...?  What have you done?!'
+            break
+          else
+            if rand(7)==7
+              MPECHO A deep, parched voice shouts, 'No, NO!  That was not part of the pact!  You cannot-!'
+              break
+            endif
+          endif
+        endif
+      endif
+    endif
+  endif
+endif
+~
+\rand_prog 80~
+MPOTHROW 5581 1 15
+~
+|
+S
+#5582
+wisp green smoke~
+a thin wisp of $2greenish$R gas~
+A thin wisp of $2greenish$B$1 gas spins and twirls, almost as if sentient.$R~
+~
+13 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#5583
+megaphone brixton~
+OMG!! A megaphone for room 5583!~
+OMG!! A megaphone for room 5583!~
+Fixed.~
+12 134217728 0 0
+0 0 0 0 0
+0 0 48
+\catch_prog 1~
+if rand(7)==1
+MPECHO A deep, parched voice shouts, 'Burn, FOOLS BURN!  GHAURA'SUN, BURN THEM ALL!'
+break
+else
+if rand(7)==2
+MPECHO A deep, parched voice shouts, 'Rhortek, you cannot run forever!  You and your cursed elf-friends will feel torment beyond description!'
+break
+else
+if rand(7)==3
+MPECHO A deep, parched voice shouts, 'Cindomir, join with me.  Our combined might could re-shape the world.'
+break
+else
+if rand(7)==4
+MPECHO A deep, parched voice shouts, 'Stupid elven bastard, I will toy with your soul as Ghaura has so enjoyed your father's.'
+break
+else
+if rand(7)==5
+MPECHO A deep, parched voice shouts, 'Gher-khaa!  Yufz yn pzrr m'thraau!!'
+break
+else
+if rand(7)==6
+MPECHO A deep, parched voice shouts, '...where...where are my people...?  What have you done?!'
+break
+else
+if rand(7)==7
+MPECHO A deep, parched voice shouts, 'No, NO!  That was not part of the pact!  You cannot-!'
+break
+endif
+endif
+endif
+endif
+endif
+endif
+endif
+~
+\rand_prog 5~
+MPOTHROW 5583 1 15
+~
+|
+S
+#5584
+megaphone brixton~
+OMG!! A megaphone for room 5584!~
+OMG!! A megaphone for room 5584!~
+Fixed.~
+12 134217728 0 0
+0 0 0 0 0
+0 0 48
+\catch_prog 1~
+if rand(7)==1
+MPECHO A deep, parched voice shouts, 'Burn, FOOLS BURN!  GHAURA'SUN, BURN THEM ALL!'
+break
+else
+if rand(7)==2
+MPECHO A deep, parched voice shouts, 'Rhortek, you cannot run forever!  You and your cursed elf-friends will feel torment beyond description!'
+break
+else
+if rand(7)==3
+MPECHO A deep, parched voice shouts, 'Cindomir, join with me.  Our combined might could re-shape the world.'
+break
+else
+if rand(7)==4
+MPECHO A deep, parched voice shouts, 'Stupid elven bastard, I will toy with your soul as Ghaura has so enjoyed your father's.'
+break
+else
+if rand(7)==5
+MPECHO A deep, parched voice shouts, 'Gher-khaa!  Yufz yn pzrr m'thraau!!'
+break
+else
+if rand(7)==6
+MPECHO A deep, parched voice shouts, '...where...where are my people...?  What have you done?!'
+break
+else
+if rand(7)==7
+MPECHO A deep, parched voice shouts, 'No, NO!  That was not part of the pact!  You cannot-!'
+break
+endif
+endif
+endif
+endif
+endif
+endif
+endif
+~
+\rand_prog 5~
+MPOTHROW 5584 1 15
+~
+|
+S
+#5585
+megaphone brixton~
+OMG!! A megaphone for room 5585!~
+OMG!! A megaphone for room 5585!~
+Fixed.~
+12 134217728 0 0
+0 0 0 0 0
+0 0 48
+\catch_prog 1~
+if rand(7)==1
+MPECHO A deep, parched voice shouts, 'Burn, FOOLS BURN!  GHAURA'SUN, BURN THEM ALL!'
+break
+else
+if rand(7)==2
+MPECHO A deep, parched voice shouts, 'Rhortek, you cannot run forever!  You and your cursed elf-friends will feel torment beyond description!'
+break
+else
+if rand(7)==3
+MPECHO A deep, parched voice shouts, 'Cindomir, join with me.  Our combined might could re-shape the world.'
+break
+else
+if rand(7)==4
+MPECHO A deep, parched voice shouts, 'Stupid elven bastard, I will toy with your soul as Ghaura has so enjoyed your father's.'
+break
+else
+if rand(7)==5
+MPECHO A deep, parched voice shouts, 'Gher-khaa!  Yufz yn pzrr m'thraau!!'
+break
+else
+if rand(7)==6
+MPECHO A deep, parched voice shouts, '...where...where are my people...?  What have you done?!'
+break
+else
+if rand(7)==7
+MPECHO A deep, parched voice shouts, 'No, NO!  That was not part of the pact!  You cannot-!'
+break
+endif
+endif
+endif
+endif
+endif
+endif
+endif
+~
+\rand_prog 5~
+MPOTHROW 5585 1 15
+~
+|
+S
+#5586
+megaphone brixton~
+OMG!! A megaphone for room 5586!~
+OMG!! A megaphone for room 5586!~
+Fixed.~
+12 134217728 0 0
+0 0 0 0 0
+0 0 48
+\catch_prog 1~
+if rand(7)==1
+MPECHO A deep, parched voice shouts, 'Burn, FOOLS BURN!  GHAURA'SUN, BURN THEM ALL!'
+break
+else
+if rand(7)==2
+MPECHO A deep, parched voice shouts, 'Rhortek, you cannot run forever!  You and your cursed elf-friends will feel torment beyond description!'
+break
+else
+if rand(7)==3
+MPECHO A deep, parched voice shouts, 'Cindomir, join with me.  Our combined might could re-shape the world.'
+break
+else
+if rand(7)==4
+MPECHO A deep, parched voice shouts, 'Stupid elven bastard, I will toy with your soul as Ghaura has so enjoyed your father's.'
+break
+else
+if rand(7)==5
+MPECHO A deep, parched voice shouts, 'Gher-khaa!  Yufz yn pzrr m'thraau!!'
+break
+else
+if rand(7)==6
+MPECHO A deep, parched voice shouts, '...where...where are my people...?  What have you done?!'
+break
+else
+if rand(7)==7
+MPECHO A deep, parched voice shouts, 'No, NO!  That was not part of the pact!  You cannot-!'
+break
+endif
+endif
+endif
+endif
+endif
+endif
+endif
+~
+\rand_prog 5~
+MPOTHROW 5586 1 15
+~
+|
+S
+#5587
+megaphone brixton~
+OMG!! A megaphone for room 5587!~
+OMG!! A megaphone for room 5587!~
+Fixed.~
+12 134217728 0 0
+0 0 0 0 0
+0 0 48
+\catch_prog 1~
+if rand(7)==1
+MPECHO A deep, parched voice shouts, 'Burn, FOOLS BURN!  GHAURA'SUN, BURN THEM ALL!'
+break
+else
+if rand(7)==2
+MPECHO A deep, parched voice shouts, 'Rhortek, you cannot run forever!  You and your cursed elf-friends will feel torment beyond description!'
+break
+else
+if rand(7)==3
+MPECHO A deep, parched voice shouts, 'Cindomir, join with me.  Our combined might could re-shape the world.'
+break
+else
+if rand(7)==4
+MPECHO A deep, parched voice shouts, 'Stupid elven bastard, I will toy with your soul as Ghaura has so enjoyed your father's.'
+break
+else
+if rand(7)==5
+MPECHO A deep, parched voice shouts, 'Gher-khaa!  Yufz yn pzrr m'thraau!!'
+break
+else
+if rand(7)==6
+MPECHO A deep, parched voice shouts, '...where...where are my people...?  What have you done?!'
+break
+else
+if rand(7)==7
+MPECHO A deep, parched voice shouts, 'No, NO!  That was not part of the pact!  You cannot-!'
+break
+endif
+endif
+endif
+endif
+endif
+endif
+endif
+~
+\rand_prog 5~
+MPOTHROW 5587 1 15
+~
+|
+S
+#5588
+megaphone brixton~
+OMG!! A megaphone for room 5588!~
+OMG!! A megaphone for room 5588!~
+Fixed.~
+12 134217728 0 0
+0 0 0 0 0
+0 0 48
+\catch_prog 1~
+if rand(7)==1
+MPECHO A deep, parched voice shouts, 'Burn, FOOLS BURN!  GHAURA'SUN, BURN THEM ALL!'
+break
+else
+if rand(7)==2
+MPECHO A deep, parched voice shouts, 'Rhortek, you cannot run forever!  You and your cursed elf-friends will feel torment beyond description!'
+break
+else
+if rand(7)==3
+MPECHO A deep, parched voice shouts, 'Cindomir, join with me.  Our combined might could re-shape the world.'
+break
+else
+if rand(7)==4
+MPECHO A deep, parched voice shouts, 'Stupid elven bastard, I will toy with your soul as Ghaura has so enjoyed your father's.'
+break
+else
+if rand(7)==5
+MPECHO A deep, parched voice shouts, 'Gher-khaa!  Yufz yn pzrr m'thraau!!'
+break
+else
+if rand(7)==6
+MPECHO A deep, parched voice shouts, '...where...where are my people...?  What have you done?!'
+break
+else
+if rand(7)==7
+MPECHO A deep, parched voice shouts, 'No, NO!  That was not part of the pact!  You cannot-!'
+break
+endif
+endif
+endif
+endif
+endif
+endif
+endif
+~
+\rand_prog 5~
+MPOTHROW 5588 1 15
+~
+|
+S
+#5589
+megaphone brixton~
+OMG!! A megaphone for room 5589!~
+OMG!! A megaphone for room 5589!~
+Fixed.~
+12 134217728 0 0
+0 0 0 0 0
+0 0 48
+\catch_prog 1~
+if rand(7)==1
+MPECHO A deep, parched voice shouts, 'Burn, FOOLS BURN!  GHAURA'SUN, BURN THEM ALL!'
+break
+else
+if rand(7)==2
+MPECHO A deep, parched voice shouts, 'Rhortek, you cannot run forever!  You and your cursed elf-friends will feel torment beyond description!'
+break
+else
+if rand(7)==3
+MPECHO A deep, parched voice shouts, 'Cindomir, join with me.  Our combined might could re-shape the world.'
+break
+else
+if rand(7)==4
+MPECHO A deep, parched voice shouts, 'Stupid elven bastard, I will toy with your soul as Ghaura has so enjoyed your father's.'
+break
+else
+if rand(7)==5
+MPECHO A deep, parched voice shouts, 'Gher-khaa!  Yufz yn pzrr m'thraau!!'
+break
+else
+if rand(7)==6
+MPECHO A deep, parched voice shouts, '...where...where are my people...?  What have you done?!'
+break
+else
+if rand(7)==7
+MPECHO A deep, parched voice shouts, 'No, NO!  That was not part of the pact!  You cannot-!'
+break
+endif
+endif
+endif
+endif
+endif
+endif
+endif
+~
+\rand_prog 5~
+MPOTHROW 5589 1 15
+~
+|
+S
+#5590
+megaphone brixton~
+OMG!! A megaphone for room 5590!~
+OMG!! A megaphone for room 5590!~
+Fixed.~
+12 134217728 0 0
+0 0 0 0 0
+0 0 48
+\catch_prog 1~
+if rand(7)==1
+MPECHO A deep, parched voice shouts, 'Burn, FOOLS BURN!  GHAURA'SUN, BURN THEM ALL!'
+break
+else
+if rand(7)==2
+MPECHO A deep, parched voice shouts, 'Rhortek, you cannot run forever!  You and your cursed elf-friends will feel torment beyond description!'
+break
+else
+if rand(7)==3
+MPECHO A deep, parched voice shouts, 'Cindomir, join with me.  Our combined might could re-shape the world.'
+break
+else
+if rand(7)==4
+MPECHO A deep, parched voice shouts, 'Stupid elven bastard, I will toy with your soul as Ghaura has so enjoyed your father's.'
+break
+else
+if rand(7)==5
+MPECHO A deep, parched voice shouts, 'Gher-khaa!  Yufz yn pzrr m'thraau!!'
+break
+else
+if rand(7)==6
+MPECHO A deep, parched voice shouts, '...where...where are my people...?  What have you done?!'
+break
+else
+if rand(7)==7
+MPECHO A deep, parched voice shouts, 'No, NO!  That was not part of the pact!  You cannot-!'
+break
+endif
+endif
+endif
+endif
+endif
+endif
+endif
+~
+\rand_prog 5~
+MPOTHROW 5590 1 15
+~
+|
+S
+#5591
+megaphone brixton~
+OMG!! A megaphone for room 5591!~
+OMG!! A megaphone for room 5591!~
+Fixed.~
+12 134217728 0 0
+0 0 0 0 0
+0 0 48
+\catch_prog 1~
+if rand(7)==1
+MPECHO A deep, parched voice shouts, 'Burn, FOOLS BURN!  GHAURA'SUN, BURN THEM ALL!'
+break
+else
+if rand(7)==2
+MPECHO A deep, parched voice shouts, 'Rhortek, you cannot run forever!  You and your cursed elf-friends will feel torment beyond description!'
+break
+else
+if rand(7)==3
+MPECHO A deep, parched voice shouts, 'Cindomir, join with me.  Our combined might could re-shape the world.'
+break
+else
+if rand(7)==4
+MPECHO A deep, parched voice shouts, 'Stupid elven bastard, I will toy with your soul as Ghaura has so enjoyed your father's.'
+break
+else
+if rand(7)==5
+MPECHO A deep, parched voice shouts, 'Gher-khaa!  Yufz yn pzrr m'thraau!!'
+break
+else
+if rand(7)==6
+MPECHO A deep, parched voice shouts, '...where...where are my people...?  What have you done?!'
+break
+else
+if rand(7)==7
+MPECHO A deep, parched voice shouts, 'No, NO!  That was not part of the pact!  You cannot-!'
+break
+endif
+endif
+endif
+endif
+endif
+endif
+endif
+~
+\rand_prog 5~
+MPOTHROW 5591 1 15
+~
+|
+S
+#5597
+key iron battleaxe~
+the iron battleaxe key~
+A key forged of cold iron in the likeness of a tiny battleaxe lies in the cooling blood.~
+~
+18 0 1 0
+0 0 0 0 0
+0 0 2048
+S
+#5598
+imperial key iron~
+an imperial iron key~
+A rather regal-looking key of black wrought iron lies in a pool of blood.~
+~
+18 0 1 0
+0 0 0 0 0
+0 0 2048
+S
+#5599
+iron key warhammer~
+the iron warhammer key~
+An iron key in the shape of a miniature warhammer sits stoically amid the gore.~
+~
+18 0 1 0
+0 0 0 0 0
+0 0 2048
+S
+#5600
+cutlass bright sword git~
+a bright cutlass~
+Gleaming brightly, this short sword has a slightly curved blade.~
+Fixed.~
+5 5263360 8193 1
+0 4 5 3 41
+6 125000 0
+A
+26 2
+A
+62 4
+S
+#5601
+pistol flint git~
+a flint-lock pistol~
+A pistol of cast iron attached to a sandwood stock has been dropped here.~
+null~
+5 7598080 8193 1
+0 8 2 5 44
+4 142000 0
+A
+43 3
+A
+62 2
+S
+#5602
+rapier git~
+a notched rapier~
+A worn and battered rapier has been abandoned here.~
+Fixed.~
+5 5263360 8193 6
+0 2 12 10 42
+3 96000 0
+A
+18 4
+A
+19 3
+A
+2 2
+S
+#5603
+crossbow lily~
+an auto-loading heavy crossbow~
+An oak crossbow with an iron box attached to it has been left here.~
+Fixed.~
+5 5459968 8193 12
+0 4 6 8 48
+12 105000 0
+A
+19 4
+A
+36 3
+A
+43 1
+S
+#5604
+whip bullwhip lily~
+a vicious bullwhip~
+The metal tip of a blood-stained whip glints dully in the light here.~
+Fixed.~
+5 7606272 8193 1
+0 3 8 1 48
+3 88000 0
+A
+26 3
+A
+52 2
+S
+#5610
+scimitar gleaming git~
+a gleaming scimitar~
+A scimitar with a fine razor edge gleams under the starlight.~
+Fixed.~
+5 7389184 8193 1
+4 5 5 3 49
+5 96000 0
+A
+26 3
+A
+51 9
+S
+#5611
+pendant aqualock git~
+the $B$3Aqualock$R pendant~
+A turquoise pendant shaped like a crescent moon waits for its other half.~
+Fixed.~
+9 16 5 4
+3 0 0 0 50
+3 80000 5
+E
+pendant aqualock git~
+    A glittering chain - radiant as the moon and sea dancing at night -
+    clasps together, supporting a turquoise crescent made of some
+    unknown stone.  Grooving and wear inside the C suggests perhaps it's
+    meant to have another piece inserted.  Perhaps the pendant is only
+    ornamental without its heart.
+~
+A
+18 1
+A
+19 2
+A
+13 20
+A
+66 5
+S
+#5612
+concertina instrument git~
+a $4bri$5ght$2ly-$3col$1our$6ed$R concertina~
+A concertina lies cast aside, yearning to wail with some drunk and rowdy sailors.~
+Fixed.~
+26 6332416 16385 2
+3 3 0 0 55
+5 45000 0
+E
+concertina instrument~
+    It doesn't really seem the fitting instrument of an elflord versed
+    in the lore of the battle-harper, but then not many crown princes
+    of the ancient Daine travel on pirate ships.  Wretchedly-bright
+    colours scream across the crinkly concertina, a mutated rainbow
+    you'll never find after any kind of storm--except for that thrown
+    by raging painters.
+~
+A
+26 4
+A
+93 2
+A
+66 4
+S
+#5613
+broadsword git~
+a slightly-curved broadsword~
+This broadsword has a slight curve to its blade for better slashing.~
+Fixed.~
+5 5705728 8193 1
+0 5 4 3 45
+6 75000 0
+A
+26 3
+A
+359000 4
+S
+#5614
+rod smokey summoner lily~
+a summoner's smokey rod~
+A rod of smokey quartz lies dejectedly, catalyzing its own power.~
+Fixed.~
+1 2138368 65537 1
+1 1 -1 0 43
+12 350000 4
+A
+12 30
+A
+103 6
+A
+44 1
+S
+#5615
+sword katana broad bladed broad-bladed lily~
+an oversized, broad-bladed katana~
+An exotic sword with an almost ridiculously-oversized blade sticks in the ground.~
+Fixed.~
+5 9900032 8193 1
+0 1 50 3 56
+24 75000 0
+E
+sword katana broad bladed broad-bladed~
+    Seemingly a novelty, the blade of this deep-forged katana is
+    nearly as wide as a man's forearm is long.  It's much lighter
+    than it appears, though ungainly enough to require two hands
+    for anyone not familiar with the esoteric fighting styles of
+    the Stonefist clan.
+~
+A
+19 9
+S
+#5620
+megaphone brixton lily~
+Megaphone: Black Lily summon~
+Megaphone: Black Lily summon~
+Fixed.~
+31 134217728 0 0
+10 5 0 0 0
+0 0 48
+E
+megaphone2~
+A volatile elemental dripping acid and seaspray surges toward the Cheerful Git, intent on capsizing her.
+~
+S
+#5621
+megaphone brixton git lily~
+Megaphone: Cheerful Git summon~
+Megaphone: Cheerful Git summon~
+Fixed.~
+31 134217728 0 0
+10 5 0 0 0
+0 0 48
+E
+megaphone~
+A gigantic entity comprised of crystalline seasalt and vapour thunders toward the Black Lily, howling in rage.
+~
+S
+#5622
+megaphone brixton git lily~
+Megaphone: Above-deck msg 1 (tentacles)~
+Megaphone: Above-deck msg 1 (tentacles)~
+Fixed.~
+31 134217728 0 0
+10 5 0 0 0
+0 0 48
+E
+megaphone~
+Tentacles shoot up from the waters, only to be driven back down by flurries of fire and lightning.
+~
+S
+#5623
+megaphone brixton git lily~
+Megaphone: Above-deck msg 2 (water/counterspell)~
+Megaphone: Above-deck msg 2 (water/counterspell)~
+Fixed.~
+31 134217728 0 0
+5 7 0 0 0
+0 0 48
+E
+megaphone~
+A muffled shout thunders across the deck, followed by a fist-shaped column of water...which soon evaporates to steam after another incantation.
+~
+S
+#5624
+megaphone brixton git lily~
+Megaphone: Above-deck msg 3 (cannons/shield)~
+Megaphone: Above-deck msg 3 (cannons/shield)~
+Fixed.~
+31 134217728 0 0
+4 5 0 0 0
+0 0 48
+E
+megaphone~
+Explosions rock the air as a volley of cannonballs hit a shield of magickal energy.
+~
+S
+#5625
+megaphone brixton git lily~
+Megaphone: Above-deck msg 4 (lightning rain)~
+Megaphone: Above-deck msg 4 (lightning rain)~
+Fixed.~
+31 134217728 0 0
+10 2 0 0 0
+0 0 48
+E
+megaphone~
+Lightning bolts rain down on the deck, causing a symphony of screams and thunderclaps.
+~
+S
+#5626
+megaphone brixton git lily~
+Megaphone: Above-deck msg 5 (fireball)~
+Megaphone: Above-deck msg 5 (fireball)~
+Fixed.~
+31 134217728 0 0
+5 3 0 0 0
+0 0 48
+E
+megaphone~
+A fireball detonates above near the keel, sending down a rain of flaming sailors.
+~
+S
+#5627
+megaphone brixton git lily~
+Megaphone: Below-deck msg 1 (kraken)~
+Megaphone: Below-deck msg 1 (kraken)~
+Fixed.~
+31 134217728 0 0
+5 4 0 0 0
+0 0 48
+E
+megaphone~
+Planks and boards crack under the assault of a summoned kraken.
+~
+S
+#5628
+megaphone brixton git lily~
+Megaphone: Below-deck msg 2 (boat rocking)~
+Megaphone: Below-deck msg 2 (boat rocking)~
+Fixed.~
+31 134217728 0 0
+4 3 0 0 0
+0 0 48
+E
+megaphone~
+The boat rocks violently as the magicians above exchange another round of brilliant thaumaturgy.
+~
+S
+#5629
+megaphone brixton git lily~
+Megaphone: Below-deck msg 3 (ice storm)~
+Megaphone: Below-deck msg 3 (ice storm)~
+Fixed.~
+31 134217728 0 0
+5 5 0 0 0
+0 0 48
+E
+megaphone~
+The deck above shudders from the barrage of a magickal ice storm.
+~
+S
+#5630
+mast pole git~
+the Cheerful Git's mast~
+The Cheerful Git's mast looms above the deck.~
+Fixed.~
+30 0 0 0
+5622 0 0 0 0
+500 0 48
+S
+#5631
+mast pole lily~
+the Black Lily's mast~
+The Black Lily's mast looms overhead.~
+Fixed.~
+30 0 0 0
+5665 0 0 0 0
+0 0 48
+S
+#5632
+gangplank plank wobbly git lily~
+a wobbly gangplank~
+A gangplank wobbles precariously overhead as pirates scurry between ships.~
+Fixed.~
+30 0 0 0
+5642 0 0 0 0
+0 0 32
+S
+#5640
+key captain jaelgreth git~
+a non-descript key~
+An unremarkable key lies amid some debris.~
+Fixed.~
+18 0 1 0
+0 0 0 0 1
+1 100 2048
+S
+#5641
+chest captain brass git~
+the Captain's chest~
+A chest hinged and cornered with cold-forged brass hides amid the clutter.~
+Fixed.~
+15 0 0 0
+500 15 5647 0 0
+500 0 48
+S
+#5642
+band sea salt seasalt git~
+a smooth band of seasalt~
+A $B$7white$1 circlet of cultured crystal has been left here.$R~
+Fixed.~
+9 2139136 4097 1
+4 0 0 0 53
+2 723000 0
+A
+103 5
+A
+91 4
+A
+12 45
+S
+#5643
+pendant aquacore git~
+the $B$3Aquacore$R pendant~
+A smooth circular turqoise stone has been strung to be worn as a pendant.~
+Fixed.~
+9 16 5 4
+3 0 0 0 50
+3 85000 16389
+E
+pendant aquacore ~
+    The naiad Phoebe gave this, the core of the Aquaheart pendant, to
+    the one man she felt would truly appreciate it.  A very profound
+    gift indeed, given that few naiads ever come to love another even
+    nearly as much as they love the seas.  When this circular
+    disc of turquoise stone is snapped into the Aqualock pendant, it
+    supposedly grants its wearer the ability to commune with the Sea
+    herself.  Perhaps she's kept the pieces seperated so neither her
+    nor her Captain can abandon the other over their love of their
+    common mistress.
+~
+A
+18 2
+A
+19 1
+A
+13 20
+A
+103 5
+S
+#5644
+ship ships battle crossfire~
+the crossfire~
+A ship-to-ship battle blazes here, sending magicks and cannonballs to the five horizons!~
+Fixed.~
+24 0 0 0
+5644 1 -1 0 0
+0 0 32
+S
+#5645
+gauntlets demi jaelgreth git~
+a pair of garishly-coloured demi-gauntlets~
+A flash pair of flexible-looking gauntlets have been left here.~
+Fixed.~
+9 5390336 129 12
+13 0 0 0 55
+4 835000 8
+A
+26 3
+A
+22 6
+A
+301000 2
+S
+#5646
+gold git lily~
+a pile of gold~
+A mass pile of gold is here.~
+Fixed.~
+20 0 16385 0
+5000000 0 0 0 1
+1 5000000 0
+S
+#5647
+key captain jaelgreth git doesnotloadyoucheatingfuck~
+a non-descript key~
+An unremarkable key lies amid some debris.~
+Fixed.~
+18 0 1 0
+5641 0 0 0 1
+1 100 2048
+S
+#5681
+captain darkblade lily doesnotloadyoucheatingfuck~
+a non-descript key~
+An unremarkable key lies amid some debris.~
+Fixed.~
+18 0 1 0
+5685 0 0 0 1
+1 100 2048
+S
+#5682
+key mishra lily doesnotloadyoucheatingfuck~
+a non-descript key~
+An unremarkable key lies amid some debris.~
+Fixed.~
+18 0 1 0
+5686 0 0 0 1
+1 100 2048
+S
+#5683
+key captain darkblade lily~
+a non-descript key~
+An unremarkable key lies amid some debris.~
+Fixed.~
+18 0 1 0
+0 0 0 0 1
+1 100 2048
+S
+#5684
+key mishra lily~
+a non-descript key~
+An unremarkable key lies amid some debris.~
+Fixed.~
+18 0 1 0
+0 0 0 0 1
+1 100 2048
+S
+#5685
+footlocker locker captain lily~
+the Captain's footlocker~
+A large footlocker braced in an oddly-hued metal is here.~
+Fixed.~
+15 0 0 0
+500 15 5681 0 0
+0 0 48
+S
+#5686
+chest magician mishra lily~
+the magician's chest~
+A chest edged in an odd-coloured metal sits in plain view here.~
+Fixed.~
+15 0 0 0
+500 15 5682 0 0
+0 0 48
+S
+#5687
+shirt titanium darkblade lily~
+a shirt of titanium ring mail~
+A heap of shiny, interlocking metal rings has been tossed here.~
+Fixed.~
+9 65793 9 1
+38 0 0 0 56
+6 850000 8
+A
+26 4
+A
+73 1
+A
+158000 3
+S
+#5688
+bracer titanium darkblade lily~
+a titanium bracer~
+A metallic bracer shines brightly here.~
+Fixed.~
+9 1249280 4097 1
+4 0 0 0 52
+3 1100000 0
+A
+26 3
+A
+103 4
+A
+100 2
+S
+#5689
+circlet guard neck titanium darkblade lily~
+a titanium neck guard~
+A circlet of some strange metal has been discarded here.~
+Fixed.~
+9 1245184 5 1
+5 0 0 0 54
+3 250000 0
+A
+26 3
+A
+17 -25
+A
+99 2
+S
+#5691
+bracers mishra lily~
+Mishra's Midnight Bracers~
+A set of bracers seem to defy physics, absorbing all nearby light.~
+Fixed.~
+9 2138816 257 4
+20 0 0 0 54
+5 560000 12
+A
+26 1
+A
+98 3
+A
+103 7
+S
+#5692
+cowl mishra lily~
+Mishra's Midnight Cowl~
+Some fabric collects shadows in the corner here.~
+Fixed.~
+9 2138752 17 4
+20 0 0 0 55
+2 300000 12
+A
+103 8
+A
+91 3
+A
+9 18
+S
+#5693
+sword erian white light~
+$B$7Erian$R, Sword of $B$7White Light$R~
+This longsword glows with a burning $B$7white light$R.~
+Fixed.~
+5 1380483 8193 1
+0 6 5 2 59
+20 1800000 1
+A
+26 5
+A
+82 10
+A
+98 -5
+A
+71 100
+S
+$~
