@@ -14288,8 +14288,11 @@ int spell_consecrate(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim,
     }
   }
 
-  component->obj_flags.value[1]--;
-  GET_MOVE(ch) -= 100;
+  if (IS_MORTAL(ch))
+  {
+    component->obj_flags.value[1]--;
+    GET_MOVE(ch) -= 100;
+  }
 
   act(
       "You chant softy, etching runes upon the ground in a large circle and sprinkle them with holy water.",
@@ -14455,8 +14458,11 @@ int spell_desecrate(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim,
     }
   }
 
-  component->obj_flags.value[1]--;
-  GET_MOVE(ch) -= 100;
+  if (IS_MORTAL(ch))
+  {
+    component->obj_flags.value[1]--;
+    GET_MOVE(ch) -= 100;
+  }
 
   act(
       "You chant darkly, etching a large circle of runes upon the ground in blood.",
