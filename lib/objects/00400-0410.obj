@@ -1,0 +1,127 @@
+#400
+island lush tropical~
+a tropical island~
+A lush, tropical island rises gracefully up out of the clouds.~
+~
+24 0 0 0
+400 1 -1 0 0
+0 0 0
+S
+#401
+case glass~
+the glass case~
+A large glass case sits here, half open.~
+~
+15 0 0 0
+500 13 5226 0 0
+0 0 0
+S
+#402
+chalice cup~
+a chalice~
+An ornate chalice has been left on the altar.~
+~
+17 16 16385 1
+16 16 0 0 0
+1 12000 0
+E
+chalice~
+It is a large and beautifully ornate chalice.  There is an inscription on the
+base reading "To the king with love".
+~
+S
+#403
+earring glass~
+the glass earring~
+You see a funky looking glass earring here in the mud.~
+~
+9 16 262145 1
+0 0 0 0 6
+1 20000 0
+A
+19 1
+A
+103 1
+S
+#404
+mirror~
+a wall mirror~
+A tall mirror mounted to the wall warps the light strangely here.~
+~
+24 0 0 0
+17150 1 -1 0 0
+0 0 0
+S
+#405
+beacon~
+a magical beacon~
+A magical beacon pulsates here barely visible.~
+~
+28 100 0 0
+0 0 0 0 0
+0 0 0
+S
+#406
+cloak purple~
+a $6purple$R cloak~
+A $6purple$B$1 cloak lies on the floor.$R~
+~
+9 16 1025 6
+4 0 0 0 15
+3 2000 0
+E
+cloak purple~
+This is a very fine made cloak from an unknown material, in a nice purple
+color.
+~
+A
+21 5
+A
+103 1
+S
+#407
+silence~
+a room silencing object~
+A room silencing object pulsates here.~
+~
+28 134217828 0 0
+-1 0 0 0 0
+0 0 48
+S
+#408
+spirit shield~
+a spirit shield~
+A magical shield pulses bright white here.~
+~
+9 68609 16897 1
+0 0 0 0 15
+1 0 45
+S
+#409
+consecrateitem runes~
+consecrate desecrate runes~
+A circle of softly glowing holy runes are etched upon the ground here.~
+~
+28 134217828 0 0
+-1 0 0 0 0
+0 0 48
+S
+#410
+sign sorpigal campaign~
+a "Re-Elect Mayor Flinn 2012!" campaign sign~
+Re-Elect Mayor Flinn 2012!~
+Fixed.~
+0 0 0 0
+0 0 0 0 0
+0 0 0
+S
+#411
+sign sorpigal campaign~
+a "Elect the Madam for Mayor 2012!" campaign sign~
+Elect the Madam for Mayor 2012!~
+Fixed.~
+0 0 0 0
+0 0 0 0 0
+0 0 0
+S
+$~
