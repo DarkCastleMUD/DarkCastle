@@ -14199,106 +14199,133 @@ int cast_heroism( ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *ta
 /* CONSERATE */
 
 int spell_consecrate(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim,
-		struct obj_data *obj, int skill) {
-	int spl = SPELL_CONSECRATE;
-	int compNum = CONSECRATE_COMP_OBJ_NUMBER;
-	OBJ_DATA *component = NULL;
+                     struct obj_data *obj, int skill)
+{
+  int spl = SPELL_CONSECRATE;
+  int compNum = CONSECRATE_COMP_OBJ_NUMBER;
+  OBJ_DATA *component = NULL;
 
-	if (!(component = get_obj_in_list_vis(ch, compNum, ch->carrying))) {
-		component = ch->equipment[HOLD];
-		if ((component == 0) || (compNum != obj_index[component->item_number].virt)) {
-			component = ch->equipment[HOLD2];
-			if ((component == 0)
-					|| (compNum != obj_index[component->item_number].virt)) {
-				send_to_char("You do not have the required components.\r\n",
-						ch);
-				return eFAILURE;
-			}
-		}
-	}
-	if (component->obj_flags.value[1] <= 0) {
-		send_to_char("There is nothing left in the container.\r\n", ch);
-		return eFAILURE;
-	}
-	if (component->obj_flags.value[2] != 13 && component->obj_flags.value[2] != 17) {
-		send_to_char("You do not have the required components,\r\n", ch);
-		return eFAILURE;
-	}
+  if (IS_MORTAL(ch))
+  {
+    if (!(component = get_obj_in_list_vis(ch, compNum, ch->carrying)))
+    {
+      component = ch->equipment[HOLD];
+      if ((component == 0) || (compNum != obj_index[component->item_number].virt))
+      {
+        component = ch->equipment[HOLD2];
+        if ((component == 0) || (compNum != obj_index[component->item_number].virt))
+        {
+          send_to_char("You do not have the required components.\r\n",
+                       ch);
+          return eFAILURE;
+        }
+      }
+    }
+    if (component->obj_flags.value[1] <= 0)
+    {
+      send_to_char("There is nothing left in the container.\r\n", ch);
+      return eFAILURE;
+    }
+    if (component->obj_flags.value[2] != 13 && component->obj_flags.value[2] != 17)
+    {
+      send_to_char("You do not have the required components,\r\n", ch);
+      return eFAILURE;
+    }
 
-	if (GET_MOVE(ch) < 100) {
-		send_to_char(
-				"You do not have enough energy to complete the incantation.\r\n",
-				ch);
-		return eFAILURE;
-	}
+    if (GET_MOVE(ch) < 100)
+    {
+      send_to_char(
+          "You do not have enough energy to complete the incantation.\r\n",
+          ch);
+      return eFAILURE;
+    }
+  }
+  else if (IS_IMMORTAL(ch))
+  {
+    ch->send("You manifest the missing components.\r\n");
+  }
 
-	if ( IS_SET(world[ch->in_room].room_flags,
-			CLAN_ROOM) || IS_SET(world[ch->in_room].room_flags, SAFE) ||
-			IS_SET(world[ch->in_room].room_flags, NOLEARN)) {
-		send_to_char(
-				"Something about this room prohibits your incantation from being completed.\r\n",
-				ch);
-		return eSUCCESS;
-	}
+  if (IS_SET(world[ch->in_room].room_flags,
+             CLAN_ROOM) ||
+      IS_SET(world[ch->in_room].room_flags, SAFE) ||
+      IS_SET(world[ch->in_room].room_flags, NOLEARN))
+  {
+    if (IS_MORTAL(ch))
+    {
+      send_to_char(
+          "Something about this room prohibits your incantation from being completed.\r\n",
+          ch);
+      return eSUCCESS;
+    }
+    else if (IS_IMMORTAL(ch))
+    {
+      ch->send("Bypassing room restrictions.\r\n");
+    }
+  }
 
-	OBJ_DATA *cItem = NULL;
+  OBJ_DATA *cItem = NULL;
 
-	if ((cItem = get_obj_in_list("consecrateitem",world[ch->in_room].contents))) {
-		if (ch
-				== ((CHAR_DATA*) (cItem->obj_flags.value[3])) && spl == SPELL_CONSECRATE) {
-			send_to_char("You have already consecrated the ground here!\r\n",
-					ch);
-			return eSUCCESS;
-		}
+  if ((cItem = get_obj_in_list("consecrateitem", world[ch->in_room].contents)))
+  {
+    if (ch == ((CHAR_DATA *)(cItem->obj_flags.value[3])) && spl == SPELL_CONSECRATE)
+    {
+      send_to_char("You have already consecrated the ground here!\r\n",
+                   ch);
+      return eSUCCESS;
+    }
 
-		if (cItem->obj_flags.value[0] == SPELL_DESECRATE) {
-			send_to_char(
-					"A foul taint prevents you from consecrating the ground here!",
-					ch);
-			return eSUCCESS;
-		}
-		if (cItem->obj_flags.value[0] == SPELL_CONSECRATE) {
-			send_to_char("The ground here has already been consecrated!", ch);
-			return eSUCCESS;
-		}
-	}
+    if (cItem->obj_flags.value[0] == SPELL_DESECRATE)
+    {
+      send_to_char(
+          "A foul taint prevents you from consecrating the ground here!",
+          ch);
+      return eSUCCESS;
+    }
+    if (cItem->obj_flags.value[0] == SPELL_CONSECRATE)
+    {
+      send_to_char("The ground here has already been consecrated!", ch);
+      return eSUCCESS;
+    }
+  }
 
-	component->obj_flags.value[1]--;
-	GET_MOVE(ch) -= 100;
+  component->obj_flags.value[1]--;
+  GET_MOVE(ch) -= 100;
 
-	act(
-			"You chant softy, etching runes upon the ground in a large circle and sprinkle them with holy water.",
-			ch, 0, 0, TO_CHAR, 0);
-	act(
-			"$n chants softy, etching runes upon the ground in a large circle and sprinkling them with holy water.",
-			ch, 0, 0, TO_ROOM, 0);
+  act(
+      "You chant softy, etching runes upon the ground in a large circle and sprinkle them with holy water.",
+      ch, 0, 0, TO_CHAR, 0);
+  act(
+      "$n chants softy, etching runes upon the ground in a large circle and sprinkling them with holy water.",
+      ch, 0, 0, TO_ROOM, 0);
 
-	if (ch->cRooms >= 1 + skill / 25) {
-		send_to_char("You cannot keep up this many consecrated areas.\r\n", ch);
-		return eSUCCESS;
-	}
+  if (ch->cRooms >= 1 + skill / 25)
+  {
+    send_to_char("You cannot keep up this many consecrated areas.\r\n", ch);
+    return eSUCCESS;
+  }
 
-	send_to_room(
-			"The runes begin to glow brightly upon the ground, then softly fade from view.\r\n",
-			ch->in_room);
+  send_to_room(
+      "The runes begin to glow brightly upon the ground, then softly fade from view.\r\n",
+      ch->in_room);
 
-	WAIT_STATE(ch, PULSE_VIOLENCE*2);
+  WAIT_STATE(ch, PULSE_VIOLENCE * 2);
 
-	ch->cRooms++;
+  ch->cRooms++;
 
-	cItem = clone_object(real_object(CONSECRATE_OBJ_NUMBER));
-	if (!cItem) {
-		send_to_char("Consecrate item doesn't exist. Tell an imm.\r\n", ch);
-		return eFAILURE;
-	}
-	cItem->obj_flags.value[0] = spl;
-	cItem->obj_flags.value[1] = 2 + skill / 50;
-	cItem->obj_flags.value[2] = skill;
-	cItem->obj_flags.value[3] = (int) (ch);
+  cItem = clone_object(real_object(CONSECRATE_OBJ_NUMBER));
+  if (cItem == nullptr)
+  {
+    send_to_char("Consecrate item doesn't exist. Tell an imm.\r\n", ch);
+    return eFAILURE;
+  }
+  cItem->obj_flags.value[0] = spl;
+  cItem->obj_flags.value[1] = 2 + skill / 50;
+  cItem->obj_flags.value[2] = skill;
+  cItem->obj_flags.value[3] = (int)(ch);
 
-	obj_to_room(cItem, ch->in_room);
+  obj_to_room(cItem, ch->in_room);
 
-	return eSUCCESS;
+  return eSUCCESS;
 }
 
 int cast_consecrate(ubyte level, CHAR_DATA *ch, char *arg, int type,
@@ -14331,222 +14358,250 @@ int cast_consecrate(ubyte level, CHAR_DATA *ch, char *arg, int type,
 /* DESECRATE */
 
 int spell_desecrate(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim,
-		struct obj_data *obj, int skill) {
-	int spl = SPELL_DESECRATE;
-	int compNum = DESECRATE_COMP_OBJ_NUMBER;
-	char buf[MAX_STRING_LENGTH];
-	OBJ_DATA *component = NULL;
-
-	if (!(component = get_obj_in_list_vis(ch, compNum, ch->carrying))) {
-		component = ch->equipment[HOLD];
-		if ((component == 0) || (compNum != obj_index[component->item_number].virt)) {
-			component = ch->equipment[HOLD2];
-			if ((component == 0)
-					|| (compNum != obj_index[component->item_number].virt)) {
-				send_to_char("You do not have the required components.\r\n",
-						ch);
-				return eFAILURE;
-			}
-		}
-	}
-
-	if (component->obj_flags.value[1] <= 0) {
-		send_to_char("There is nothing left in the container.\r\n", ch);
-		return eFAILURE;
-	}
-
-	if (component->obj_flags.value[2] != 13 && component->obj_flags.value[2] != 17) {
-		send_to_char("You do not have the required components,\r\n", ch);
-		return eFAILURE;
-	}
-
-	if (GET_MOVE(ch) < 100) {
-		send_to_char(
-				"You do not have enough energy to complete the incantation.\r\n",
-				ch);
-		return eFAILURE;
-	}
-
-	if ( IS_SET(world[ch->in_room].room_flags,
-			CLAN_ROOM) || IS_SET(world[ch->in_room].room_flags, SAFE) ||
-			IS_SET(world[ch->in_room].room_flags, NOLEARN)) {
-		send_to_char(
-				"Something about this room prohibits your incantation from being completed.\r\n",
-				ch);
-		return eSUCCESS;
-	}
-
-	if (ch->cRooms >= 1 + skill / 25) {
-		send_to_char("You cannot keep up this many desecrated areas.\r\n", ch);
-		return eSUCCESS;
-	}
-
-	OBJ_DATA *cItem = NULL;
-	if ((cItem = get_obj_in_list("consecrateitem", world[ch->in_room].contents))) {
-		if (ch == ((CHAR_DATA *) (cItem->obj_flags.value[3]))) {
-			send_to_char("You have already desecrated the ground here!\r\n",
-					ch);
-			return eSUCCESS;
-		}
-
-		if (cItem->obj_flags.value[0] == SPELL_CONSECRATE) {
-			send_to_char(
-					"A powerful aura of goodness prevents you from desecrating the ground here!",
-					ch);
-			return eSUCCESS;
-		}
-		if (cItem->obj_flags.value[0] == SPELL_DESECRATE) {
-			send_to_char("The ground here has already been desecrated!", ch);
-			return eSUCCESS;
-		}
-	}
-
-	component->obj_flags.value[1]--;
-	GET_MOVE(ch) -= 100;
-
-	act(
-			"You chant darkly, etching a large circle of runes upon the ground in blood.",
-			ch, 0, 0, TO_CHAR, 0);
-	act(
-			"$n chants darkly, etching a large circle of runes upon the ground in blood.",
-			ch, 0, 0, TO_ROOM, 0);
-
-	send_to_room(
-			"The runes begin to hum ominously, then softly fade from view.\r\n",
-			ch->in_room);
-
-	WAIT_STATE(ch, PULSE_VIOLENCE*2);
-
-	ch->cRooms++;
-
-	cItem = clone_object(real_object(CONSECRATE_OBJ_NUMBER));
-	if (!cItem) {
-		send_to_char("Consecrate item doesn't exist. Tell an imm.\r\n", ch);
-		return eFAILURE;
-	}
-	sprintf(buf, "%s",
-			"A circle of ominously humming blood runes are etched upon the ground here.");
-	cItem->description = str_hsh(buf);
-	cItem->obj_flags.value[0] = spl;
-	cItem->obj_flags.value[1] = 2 + skill / 50;
-	cItem->obj_flags.value[2] = skill;
-	cItem->obj_flags.value[3] = (int) (ch);
-
-	obj_to_room(cItem, ch->in_room);
-
-	return eSUCCESS;
-}
-
-int cast_desecrate(ubyte level, CHAR_DATA *ch, char *arg, int type,
-		CHAR_DATA *tar_ch, struct obj_data *tar_obj, int skill) {
-	switch (type) {
-	case SPELL_TYPE_SPELL:
-		return spell_desecrate(level, ch, 0, 0, skill);
-		break;
-	case SPELL_TYPE_POTION:
-		return spell_desecrate(level, ch, 0, 0, skill);
-		break;
-	case SPELL_TYPE_SCROLL:
-		if (tar_obj)
-			return eFAILURE;
-		return spell_desecrate(level, ch, 0, 0, skill);
-		break;
-	case SPELL_TYPE_WAND:
-		if (tar_obj)
-			return eFAILURE;
-		return spell_desecrate(level, ch, 0, 0, skill);
-		break;
-	default:
-		log("Serious screw-up in desecrate!", ANGEL, LOG_BUG);
-		break;
-	}
-
-	return eFAILURE;
-}
-
-/* ELEMENTAL_WALL */
-
-int spell_elemental_wall(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
+                    struct obj_data *obj, int skill)
 {
-  send_to_char("Pirahna is still working on this.\r\n", ch);
-  return eFAILURE;
-}
+  int spl = SPELL_DESECRATE;
+  int compNum = DESECRATE_COMP_OBJ_NUMBER;
+  char buf[MAX_STRING_LENGTH];
+  OBJ_DATA *component = NULL;
 
-int cast_elemental_wall( ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *tar_ch, struct obj_data *tar_obj, int skill )
-{
-  switch (type) {
-	case SPELL_TYPE_SPELL:
-		 return spell_elemental_wall(level,ch,tar_ch,0, skill);
-		 break;
-	case SPELL_TYPE_WAND:
-	case SPELL_TYPE_SCROLL:
-	case SPELL_TYPE_POTION:
-	default :
-	 log("Serious screw-up in elemental_wall!", ANGEL, LOG_BUG);
-	 break;
-  }
-  return eFAILURE;
-}
-
-
-/* ETHEREAL FOCUS */
-
-int spell_ethereal_focus(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
-{
-  struct affected_type af;
-  CHAR_DATA *ally, *next_ally;
-
-  // Set the spell on the caster to mark that they have the spell running
-  if(affected_by_spell(ch, SPELL_ETHEREAL_FOCUS))
-   affect_from_char(ch, SPELL_ETHEREAL_FOCUS);
-
-  af.type      = SPELL_ETHEREAL_FOCUS;
-  af.duration  = 1;
-  af.modifier  = 0;
-  af.location  = APPLY_NONE;
-  af.bitvector = -1;
-
-  affect_to_char(ch, &af);
-
-  send_to_char("You focus the minds of your allies to react to the slightest movement...\n\r", ch);
-  act("$n's magic attempts to focus $s allies minds into a unified supernatural focus...", ch, 0, 0, TO_ROOM, INVIS_NULL);
-  // loop through group members in room
-  for(ally = world[ch->in_room].people; ally; ally = next_ally) {
-    next_ally = ally->next_in_room;
-
-    if( !IS_NPC(ally) && GET_POS(ally) > POSITION_SLEEPING &&
-        ( ally->master == ch || ch->master == ally || (ch->master && ch->master == ally->master) ) 
-      )
+  if (IS_MORTAL(ch))
+  {
+    if (!(component = get_obj_in_list_vis(ch, compNum, ch->carrying)))
     {
-      send_to_char("Your mind's eye focuses, you still your body, and poise yourself to react to anything!\r\n", ally);
+      component = ch->equipment[HOLD];
+      if ((component == 0) || (compNum != obj_index[component->item_number].virt))
+      {
+        component = ch->equipment[HOLD2];
+        if ((component == 0) || (compNum != obj_index[component->item_number].virt))
+        {
+          send_to_char("You do not have the required components.\r\n",
+                       ch);
+          return eFAILURE;
+        }
+      }
     }
-  // TODO if not toggle set
-  //    send_to_char("You refuse to be affected by %s's magic but you probably shouldn't move or do anything right now.\r\n"
+
+    if (component->obj_flags.value[1] <= 0)
+    {
+      send_to_char("There is nothing left in the container.\r\n", ch);
+      return eFAILURE;
+    }
+
+    if (component->obj_flags.value[2] != 13 && component->obj_flags.value[2] != 17)
+    {
+      send_to_char("You do not have the required components,\r\n", ch);
+      return eFAILURE;
+    }
+
+    if (GET_MOVE(ch) < 100)
+    {
+      send_to_char(
+          "You do not have enough energy to complete the incantation.\r\n",
+          ch);
+      return eFAILURE;
+    }
+    else if (IS_IMMORTAL(ch))
+    {
+      ch->send("You manifest the missing components.\r\n");
+    }
+
+    if (IS_SET(world[ch->in_room].room_flags,
+               CLAN_ROOM) ||
+        IS_SET(world[ch->in_room].room_flags, SAFE) ||
+        IS_SET(world[ch->in_room].room_flags, NOLEARN))
+    {
+      if (IS_MORTAL(ch))
+      {
+        send_to_char(
+            "Something about this room prohibits your incantation from being completed.\r\n",
+            ch);
+        return eSUCCESS;
+      }
+      else if (IS_IMMORTAL(ch))
+      {
+        ch->send("You bypass the room restrictions.\r\n");
+      }
+    }
+
+    if (ch->cRooms >= 1 + skill / 25)
+    {
+      send_to_char("You cannot keep up this many desecrated areas.\r\n", ch);
+      return eSUCCESS;
+    }
+
+    OBJ_DATA *cItem = NULL;
+    if ((cItem = get_obj_in_list("consecrateitem", world[ch->in_room].contents)))
+    {
+      if (ch == ((CHAR_DATA *)(cItem->obj_flags.value[3])))
+      {
+        send_to_char("You have already desecrated the ground here!\r\n",
+                     ch);
+        return eSUCCESS;
+      }
+
+      if (cItem->obj_flags.value[0] == SPELL_CONSECRATE)
+      {
+        send_to_char(
+            "A powerful aura of goodness prevents you from desecrating the ground here!",
+            ch);
+        return eSUCCESS;
+      }
+      if (cItem->obj_flags.value[0] == SPELL_DESECRATE)
+      {
+        send_to_char("The ground here has already been desecrated!", ch);
+        return eSUCCESS;
+      }
+    }
+
+    component->obj_flags.value[1]--;
+    GET_MOVE(ch) -= 100;
+
+    act(
+        "You chant darkly, etching a large circle of runes upon the ground in blood.",
+        ch, 0, 0, TO_CHAR, 0);
+    act(
+        "$n chants darkly, etching a large circle of runes upon the ground in blood.",
+        ch, 0, 0, TO_ROOM, 0);
+
+    send_to_room(
+        "The runes begin to hum ominously, then softly fade from view.\r\n",
+        ch->in_room);
+
+    WAIT_STATE(ch, PULSE_VIOLENCE * 2);
+
+    ch->cRooms++;
+
+    cItem = clone_object(real_object(CONSECRATE_OBJ_NUMBER));
+    if (!cItem)
+    {
+      send_to_char("Consecrate item doesn't exist. Tell an imm.\r\n", ch);
+      return eFAILURE;
+    }
+    sprintf(buf, "%s",
+            "A circle of ominously humming blood runes are etched upon the ground here.");
+    cItem->description = str_hsh(buf);
+    cItem->obj_flags.value[0] = spl;
+    cItem->obj_flags.value[1] = 2 + skill / 50;
+    cItem->obj_flags.value[2] = skill;
+    cItem->obj_flags.value[3] = (int)(ch);
+
+    obj_to_room(cItem, ch->in_room);
+
+    return eSUCCESS;
   }
 
-  // Lastly, set the current room to flag that someone in it is using ethereal_focus
-  // We do this last because this is the trigger for the spell.  If we did this before the act() call we would trigger it
-  // on ourself immediately which would probably make the spell not very useful.
-  // NOTICE:  This is a TEMP_room_flag
-  SET_BIT(world[ch->in_room].temp_room_flags, ROOM_ETHEREAL_FOCUS);
+  int cast_desecrate(ubyte level, CHAR_DATA * ch, char *arg, int type,
+                     CHAR_DATA *tar_ch, struct obj_data *tar_obj, int skill)
+  {
+    switch (type)
+    {
+    case SPELL_TYPE_SPELL:
+      return spell_desecrate(level, ch, 0, 0, skill);
+      break;
+    case SPELL_TYPE_POTION:
+      return spell_desecrate(level, ch, 0, 0, skill);
+      break;
+    case SPELL_TYPE_SCROLL:
+      if (tar_obj)
+        return eFAILURE;
+      return spell_desecrate(level, ch, 0, 0, skill);
+      break;
+    case SPELL_TYPE_WAND:
+      if (tar_obj)
+        return eFAILURE;
+      return spell_desecrate(level, ch, 0, 0, skill);
+      break;
+    default:
+      log("Serious screw-up in desecrate!", ANGEL, LOG_BUG);
+      break;
+    }
 
-  return eSUCCESS;
-}
-
-int cast_ethereal_focus( ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *tar_ch, struct obj_data *tar_obj, int skill )
-{
-  switch (type) {
-	case SPELL_TYPE_SPELL:
-		 return spell_ethereal_focus(level,ch,tar_ch,0, skill);
-		 break;
-	case SPELL_TYPE_POTION:
-	case SPELL_TYPE_SCROLL:
-	case SPELL_TYPE_WAND:
-	default :
-	 log("Serious screw-up in ethereal_focus!", ANGEL, LOG_BUG);
-	 break;
+    return eFAILURE;
   }
-  return eFAILURE;
-}
 
+  /* ELEMENTAL_WALL */
 
+  int spell_elemental_wall(ubyte level, CHAR_DATA * ch, CHAR_DATA * victim, struct obj_data * obj, int skill)
+  {
+    send_to_char("Pirahna is still working on this.\r\n", ch);
+    return eFAILURE;
+  }
+
+  int cast_elemental_wall(ubyte level, CHAR_DATA * ch, char *arg, int type, CHAR_DATA *tar_ch, struct obj_data *tar_obj, int skill)
+  {
+    switch (type)
+    {
+    case SPELL_TYPE_SPELL:
+      return spell_elemental_wall(level, ch, tar_ch, 0, skill);
+      break;
+    case SPELL_TYPE_WAND:
+    case SPELL_TYPE_SCROLL:
+    case SPELL_TYPE_POTION:
+    default:
+      log("Serious screw-up in elemental_wall!", ANGEL, LOG_BUG);
+      break;
+    }
+    return eFAILURE;
+  }
+
+  /* ETHEREAL FOCUS */
+
+  int spell_ethereal_focus(ubyte level, CHAR_DATA * ch, CHAR_DATA * victim, struct obj_data * obj, int skill)
+  {
+    struct affected_type af;
+    CHAR_DATA *ally, *next_ally;
+
+    // Set the spell on the caster to mark that they have the spell running
+    if (affected_by_spell(ch, SPELL_ETHEREAL_FOCUS))
+      affect_from_char(ch, SPELL_ETHEREAL_FOCUS);
+
+    af.type = SPELL_ETHEREAL_FOCUS;
+    af.duration = 1;
+    af.modifier = 0;
+    af.location = APPLY_NONE;
+    af.bitvector = -1;
+
+    affect_to_char(ch, &af);
+
+    send_to_char("You focus the minds of your allies to react to the slightest movement...\n\r", ch);
+    act("$n's magic attempts to focus $s allies minds into a unified supernatural focus...", ch, 0, 0, TO_ROOM, INVIS_NULL);
+    // loop through group members in room
+    for (ally = world[ch->in_room].people; ally; ally = next_ally)
+    {
+      next_ally = ally->next_in_room;
+
+      if (!IS_NPC(ally) && GET_POS(ally) > POSITION_SLEEPING &&
+          (ally->master == ch || ch->master == ally || (ch->master && ch->master == ally->master)))
+      {
+        send_to_char("Your mind's eye focuses, you still your body, and poise yourself to react to anything!\r\n", ally);
+      }
+      // TODO if not toggle set
+      //    send_to_char("You refuse to be affected by %s's magic but you probably shouldn't move or do anything right now.\r\n"
+    }
+
+    // Lastly, set the current room to flag that someone in it is using ethereal_focus
+    // We do this last because this is the trigger for the spell.  If we did this before the act() call we would trigger it
+    // on ourself immediately which would probably make the spell not very useful.
+    // NOTICE:  This is a TEMP_room_flag
+    SET_BIT(world[ch->in_room].temp_room_flags, ROOM_ETHEREAL_FOCUS);
+
+    return eSUCCESS;
+  }
+
+  int cast_ethereal_focus(ubyte level, CHAR_DATA * ch, char *arg, int type, CHAR_DATA *tar_ch, struct obj_data *tar_obj, int skill)
+  {
+    switch (type)
+    {
+    case SPELL_TYPE_SPELL:
+      return spell_ethereal_focus(level, ch, tar_ch, 0, skill);
+      break;
+    case SPELL_TYPE_POTION:
+    case SPELL_TYPE_SCROLL:
+    case SPELL_TYPE_WAND:
+    default:
+      log("Serious screw-up in ethereal_focus!", ANGEL, LOG_BUG);
+      break;
+    }
+    return eFAILURE;
+  }
