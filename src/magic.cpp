@@ -14401,95 +14401,96 @@ int spell_desecrate(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim,
           ch);
       return eFAILURE;
     }
+  }
+  else if (IS_IMMORTAL(ch))
+  {
+    ch->send("You manifest the missing components.\r\n");
+  }
+
+  if (IS_SET(world[ch->in_room].room_flags,
+             CLAN_ROOM) ||
+      IS_SET(world[ch->in_room].room_flags, SAFE) ||
+      IS_SET(world[ch->in_room].room_flags, NOLEARN))
+  {
+    if (IS_MORTAL(ch))
+    {
+      send_to_char(
+          "Something about this room prohibits your incantation from being completed.\r\n",
+          ch);
+      return eSUCCESS;
+    }
     else if (IS_IMMORTAL(ch))
     {
-      ch->send("You manifest the missing components.\r\n");
+      ch->send("You bypass the room restrictions.\r\n");
     }
+  }
 
-    if (IS_SET(world[ch->in_room].room_flags,
-               CLAN_ROOM) ||
-        IS_SET(world[ch->in_room].room_flags, SAFE) ||
-        IS_SET(world[ch->in_room].room_flags, NOLEARN))
-    {
-      if (IS_MORTAL(ch))
-      {
-        send_to_char(
-            "Something about this room prohibits your incantation from being completed.\r\n",
-            ch);
-        return eSUCCESS;
-      }
-      else if (IS_IMMORTAL(ch))
-      {
-        ch->send("You bypass the room restrictions.\r\n");
-      }
-    }
+  if (ch->cRooms >= 1 + skill / 25)
+  {
+    send_to_char("You cannot keep up this many desecrated areas.\r\n", ch);
+    return eSUCCESS;
+  }
 
-    if (ch->cRooms >= 1 + skill / 25)
+  OBJ_DATA *cItem = NULL;
+  if ((cItem = get_obj_in_list("consecrateitem", world[ch->in_room].contents)))
+  {
+    if (ch == ((CHAR_DATA *)(cItem->obj_flags.value[3])))
     {
-      send_to_char("You cannot keep up this many desecrated areas.\r\n", ch);
+      send_to_char("You have already desecrated the ground here!\r\n",
+                   ch);
       return eSUCCESS;
     }
 
-    OBJ_DATA *cItem = NULL;
-    if ((cItem = get_obj_in_list("consecrateitem", world[ch->in_room].contents)))
+    if (cItem->obj_flags.value[0] == SPELL_CONSECRATE)
     {
-      if (ch == ((CHAR_DATA *)(cItem->obj_flags.value[3])))
-      {
-        send_to_char("You have already desecrated the ground here!\r\n",
-                     ch);
-        return eSUCCESS;
-      }
-
-      if (cItem->obj_flags.value[0] == SPELL_CONSECRATE)
-      {
-        send_to_char(
-            "A powerful aura of goodness prevents you from desecrating the ground here!",
-            ch);
-        return eSUCCESS;
-      }
-      if (cItem->obj_flags.value[0] == SPELL_DESECRATE)
-      {
-        send_to_char("The ground here has already been desecrated!", ch);
-        return eSUCCESS;
-      }
+      send_to_char(
+          "A powerful aura of goodness prevents you from desecrating the ground here!",
+          ch);
+      return eSUCCESS;
     }
-
-    component->obj_flags.value[1]--;
-    GET_MOVE(ch) -= 100;
-
-    act(
-        "You chant darkly, etching a large circle of runes upon the ground in blood.",
-        ch, 0, 0, TO_CHAR, 0);
-    act(
-        "$n chants darkly, etching a large circle of runes upon the ground in blood.",
-        ch, 0, 0, TO_ROOM, 0);
-
-    send_to_room(
-        "The runes begin to hum ominously, then softly fade from view.\r\n",
-        ch->in_room);
-
-    WAIT_STATE(ch, PULSE_VIOLENCE * 2);
-
-    ch->cRooms++;
-
-    cItem = clone_object(real_object(CONSECRATE_OBJ_NUMBER));
-    if (!cItem)
+    if (cItem->obj_flags.value[0] == SPELL_DESECRATE)
     {
-      send_to_char("Consecrate item doesn't exist. Tell an imm.\r\n", ch);
-      return eFAILURE;
+      send_to_char("The ground here has already been desecrated!", ch);
+      return eSUCCESS;
     }
-    sprintf(buf, "%s",
-            "A circle of ominously humming blood runes are etched upon the ground here.");
-    cItem->description = str_hsh(buf);
-    cItem->obj_flags.value[0] = spl;
-    cItem->obj_flags.value[1] = 2 + skill / 50;
-    cItem->obj_flags.value[2] = skill;
-    cItem->obj_flags.value[3] = (int)(ch);
-
-    obj_to_room(cItem, ch->in_room);
-
-    return eSUCCESS;
   }
+
+  component->obj_flags.value[1]--;
+  GET_MOVE(ch) -= 100;
+
+  act(
+      "You chant darkly, etching a large circle of runes upon the ground in blood.",
+      ch, 0, 0, TO_CHAR, 0);
+  act(
+      "$n chants darkly, etching a large circle of runes upon the ground in blood.",
+      ch, 0, 0, TO_ROOM, 0);
+
+  send_to_room(
+      "The runes begin to hum ominously, then softly fade from view.\r\n",
+      ch->in_room);
+
+  WAIT_STATE(ch, PULSE_VIOLENCE * 2);
+
+  ch->cRooms++;
+
+  cItem = clone_object(real_object(CONSECRATE_OBJ_NUMBER));
+  if (!cItem)
+  {
+    send_to_char("Consecrate item doesn't exist. Tell an imm.\r\n", ch);
+    return eFAILURE;
+  }
+  sprintf(buf, "%s",
+          "A circle of ominously humming blood runes are etched upon the ground here.");
+  cItem->description = str_hsh(buf);
+  cItem->obj_flags.value[0] = spl;
+  cItem->obj_flags.value[1] = 2 + skill / 50;
+  cItem->obj_flags.value[2] = skill;
+  cItem->obj_flags.value[3] = (int)(ch);
+
+  obj_to_room(cItem, ch->in_room);
+
+  return eSUCCESS;
+}
 
   int cast_desecrate(ubyte level, CHAR_DATA * ch, char *arg, int type,
                      CHAR_DATA *tar_ch, struct obj_data *tar_obj, int skill)
