@@ -169,6 +169,7 @@ bool IS_DARK( int room );
 #define IS_MINLEVEL_PC(ch, level) (GET_LEVEL(ch) >= level && IS_PC(ch))
 #define IS_MINLEVEL_NPC(ch, level) (GET_LEVEL(ch) >= level && IS_NPC(ch))
 #define IS_IMMORTAL(ch) (IS_MINLEVEL_PC(ch, IMMORTAL))
+#define IS_MORTAL(ch) (!IS_IMMORTAL(ch))
 
 #define GET_RDEATHS(ch)      ((ch)->pcdata->rdeaths)
 #define GET_PDEATHS(ch)      ((ch)->pcdata->pdeaths)
