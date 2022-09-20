@@ -107,10 +107,10 @@
             ]
         },
         {
-            "name": "showplayerxp ../save/D/Dummy in lib/",
+            "name": "debug ../save/D/Dummy in lib/",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/src/showplayer",
+            "program": "${workspaceFolder}/src/debug",
             "args": ["${workspaceFolder}/save/D/Dummy"], 
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}/lib",
@@ -127,11 +127,11 @@
             ]
         },
         {
-            "name": "showplayerxp leaderboard",
+            "name": "debug all om lib/",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/src/showplayer",
-            "args": ["leaderboard"], 
+            "program": "${workspaceFolder}/src/debug",
+            "args": ["all"], 
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}/lib",
             "environment": [],
@@ -147,13 +147,13 @@
             ]
         },
         {
-            "name": "dcastle tests only",
+            "name": "debug all in dcastle.6969/lib",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/src/dcastle",
-            "args": ["-d", "${workspaceFolder}/../../dcastle/lib", "-t", "-s"], 
+            "program": "${workspaceFolder}/src/debug",
+            "args": ["all"], 
             "stopAtEntry": false,
-            "cwd": "${workspaceFolder}",
+            "cwd":"${workspaceFolder}/../../dcastle.6969/lib",
             "environment": [],
             "externalConsole": false,
             "MIMode": "gdb",
@@ -167,10 +167,10 @@
             ]
         },
         {
-            "name": "showplayerxp ../../dcastle/save/J/Julian",
+            "name": "debug ../../dcastle/save/J/Julian",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/src/showplayer",
+            "program": "${workspaceFolder}/src/debug",
             "args": ["${workspaceFolder}/../../dcastle/save/J/Julian"], 
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}/../../dcastle/lib",
@@ -191,9 +191,9 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/src/dcastle",
-            "args": ["-d", "${workspaceFolder}/../../dcastle.6969/lib", "-P", "-p 6969"], 
+            "args": ["-P", "-p 6969"], 
             "stopAtEntry": false,
-            "cwd": "${workspaceFolder}",
+            "cwd": "${workspaceFolder}/../../dcastle.6969/lib",
             "environment": [],
             "externalConsole": false,
             "MIMode": "gdb",
@@ -206,10 +206,10 @@
                 }            ]
         },
         {
-            "name": "showplayerxp leaderboard in dcastle.6969/lib",
+            "name": "debug leaderboard in dcastle.6969/lib",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/src/showplayer",
+            "program": "${workspaceFolder}/src/debug",
             "args": ["leaderboard"], 
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}/../../dcastle.6969/lib",
