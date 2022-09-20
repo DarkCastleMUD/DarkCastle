@@ -83,8 +83,8 @@ dcastle=env.Clone()
 dcastle.MergeFlags({'LIBS' : ['dcastle', 'crypt', 'mcheck', 'z', 'pq', 'fmt']})
 dcastle.Program('dcastle', ['dcastle.cpp'])
 
-showplayerexp=env.Clone()
-showplayerexp.MergeFlags({'LIBS' : ['dcastle', 'crypt', 'mcheck', 'z', 'pq', 'fmt']})
-showplayerexp.Program('showplayer', ['showplayerxp.cpp'])
+debug=env.Clone()
+debug.MergeFlags({'LIBS' : ['dcastle', 'crypt', 'mcheck', 'z', 'pq', 'fmt']})
+debug.Program('debug', ['debug.cpp'])
 
 
