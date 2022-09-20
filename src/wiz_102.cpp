@@ -544,6 +544,7 @@ int do_zone_single_edit(struct char_data * ch, char * argument, int zone)
         return eFAILURE;
       }
 
+      int vnum = 0;
       if(isname(select, "1"))
       {
         switch(zone_table[zone].cmd[cmd].command) {
@@ -588,6 +589,7 @@ int do_zone_single_edit(struct char_data * ch, char * argument, int zone)
         switch(zone_table[zone].cmd[cmd].command) {
           case 'M':
           case 'O':
+            vnum = i;
             i = real_room(i);
             break;
           case '%':
@@ -598,6 +600,7 @@ int do_zone_single_edit(struct char_data * ch, char * argument, int zone)
             send_to_char("There is no arg3 for X commands.\r\n", ch);
             return eFAILURE;
           case 'P':
+            vnum = i;
             i = real_object(i);
             break;
           case 'G':
@@ -608,7 +611,7 @@ int do_zone_single_edit(struct char_data * ch, char * argument, int zone)
             break;
         }
         zone_table[zone].cmd[cmd].arg3 = i;
-        sprintf(select, "Arg 3 set to %ld.\r\n", i);
+        sprintf(select, "Arg 3 set to %ld.\r\n", vnum);
         send_to_char(select, ch);
       }
     }
