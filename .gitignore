@@ -14,3 +14,4 @@ lib/objects/*.last
 lib/wizlist.txt
 lib/mobs/*.last
 lib/special.txt
+src/debug
