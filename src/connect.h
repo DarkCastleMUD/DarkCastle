@@ -107,10 +107,6 @@ struct descriptor_data {
   int tick_wait = {}; /* # ticks desired to wait	*/
   int reallythere = {}; /* Goddamm #&@$*% sig 13 (hack) */
   int prompt_mode = {};
-  txt_block *large_outbuf = {};
-  int bufptr = {};
-  int bufspace = {};
-  char small_outbuf[SMALL_BUFSIZE] = {};
   ubyte idle_tics = {};
   time_t login_time = {};
   stat_data *stats = {};            // for rolling up a char

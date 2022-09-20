@@ -593,7 +593,7 @@ int main(int argc, char **argv)
   ch->level = 110;
   d->descriptor = 1;
   d->character = ch;
-  d->output = d->small_outbuf;
+  d->output = {};
   do_stand(ch, "", CMD_DEFAULT);
   char_to_room(ch, 3001);
   do_toggle(ch, "pager", CMD_DEFAULT);

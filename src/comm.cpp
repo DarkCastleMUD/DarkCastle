@@ -351,13 +351,11 @@ int load_hotboot_descs()
       d->idle_time = 0;
       d->idle_tics = 0;
       d->wait = 1;
-      d->bufptr = 0;
       d->prompt_mode = 1;
-      d->output = d->small_outbuf;
+      d->output = {};
       //    *d->output                 = '\0';
       d->input = queue<string>();
       d->output = chr; // store it for later
-      d->bufspace = SMALL_BUFSIZE - 1;
       d->login_time = time(0);
 
       if (write_to_descriptor(desc, "Recovering...\r\n") == -1)
@@ -1859,11 +1857,6 @@ void flush_queues(struct descriptor_data *d)
   int dummy;
   string buf2 = {};
 
-  if (d->large_outbuf)
-  {
-    d->large_outbuf->next = bufpool;
-    bufpool = d->large_outbuf;
-  }
   while (!get_from_q(d->input).empty())
     ;
   if (!d->output.empty())
@@ -1898,16 +1891,11 @@ void scramble_text(string &txt)
 
 void write_to_output(string txt, struct descriptor_data *t)
 {
-  int size;
   string buf = {};
   string temp = {};
 
   /* if there's no descriptor, don't worry about output */
   if (t->descriptor == 0)
-    return;
-
-  /* if we're in the overflow state already, ignore this new output */
-  if (t->bufptr < 0)
     return;
 
   if (t->allowColor && t->connected != conn::EDITING && t->connected != conn::WRITE_BOARD && t->connected != conn::EDIT_MPROG)
@@ -1916,60 +1904,12 @@ void write_to_output(string txt, struct descriptor_data *t)
   }
 
   buf = txt;
-  size = buf.size();
-
   if (t->character && IS_AFFECTED(t->character, AFF_INSANE) && t->connected == conn::PLAYING)
   {
-    //    temp = str_dup(txt);
-    //    scramble_text(temp);
-    //    txt = temp;
-
     scramble_text(buf);
   }
 
-  /* if we have enough space, just write to buffer and that's it! */
-  if (t->bufspace >= size)
-  {
-    t->output += buf;
-    t->bufspace -= size;
-    t->bufptr += size;
-
-    return;
-  }
-  /*
-   * If we're already using the large buffer, or if even the large buffer
-   * is too small to handle this new text, chuck the text and switch to the
-   * overflow state.
-   */
-  if (t->large_outbuf || ((size + t->output.size()) > LARGE_BUFSIZE))
-  {
-    t->bufptr = -1;
-    buf_overflows++;
-    return;
-  }
-  buf_switches++;
-
-  /* if the pool has a buffer in it, grab it */
-  if (bufpool != NULL)
-  {
-    t->large_outbuf = bufpool;
-    bufpool = bufpool->next;
-  }
-  else
-  { /* else create a new one */
-    t->large_outbuf = new struct txt_block;
-    buf_largecount++;
-  }
-
-  t->large_outbuf->text = t->output; /* copy to big buffer */
-  t->output = t->large_outbuf->text; /* make big buffer primary */
-  t->output += buf;                  /* now add new text */
-
-  /* calculate how much space is left in the buffer */
-  t->bufspace = LARGE_BUFSIZE - 1 - t->output.size();
-
-  /* set the pointer for the next write */
-  t->bufptr = t->output.size();
+  t->output += buf; 
 }
 
 /* ******************************************************************
@@ -2040,7 +1980,6 @@ int new_descriptor(int s)
   newd->idle_time = 0;
   newd->wait = 1;
   newd->output = {};
-  newd->bufspace = SMALL_BUFSIZE - 1;
   newd->next = descriptor_list;
   newd->login_time = time(0);
   newd->astr = 0;
@@ -2070,10 +2009,6 @@ int process_output(struct descriptor_data *t)
     blackjack_prompt(t->character, i, t->character->pcdata && !IS_SET(t->character->pcdata->toggles, PLR_ASCII));
   make_prompt(t, i);
 
-  /* if we're in the overflow state, notify the user */
-  if (t->bufptr < 0)
-    i += "**OVERFLOW**";
-
   /*
    * now, send the output.  If this is an 'interruption', use the prepended
    * CRLF, otherwise send the straight output sans CRLF.
@@ -2096,20 +2031,6 @@ int process_output(struct descriptor_data *t)
     SEND_TO_Q("%%", t->snoop_by);
   }
 
-  /*
-   * if we were using a large buffer, put the large buffer on the buffer pool
-   * and switch back to the small one
-   */
-  if (t->large_outbuf)
-  {
-    t->large_outbuf->next = bufpool;
-    bufpool = t->large_outbuf;
-    t->large_outbuf = NULL;
-    t->output = t->small_outbuf;
-  }
-  /* reset total bufspace back to that of a small buffer */
-  t->bufspace = SMALL_BUFSIZE - 1;
-  t->bufptr = 0;
   t->output = {};
 
   return result;
