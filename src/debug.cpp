@@ -730,6 +730,10 @@ int main(int argc, char **argv)
     }
     do_look(ch, "", CMD_LOOK);
     process_output(d);
+    do_bestow(ch, "julian force", CMD_DEFAULT);
+    process_output(d);
+    do_force(ch, "all save", CMD_FORCE);
+    process_output(d);
   }
   else
   {
