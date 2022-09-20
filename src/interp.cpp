@@ -406,7 +406,7 @@ struct command_info cmd_info[] =
         {"thunder", do_thunder, nullptr, POSITION_DEAD, IMP, CMD_DEFAULT, 0, 1},
         {"wizlock", do_wizlock, nullptr, POSITION_DEAD, IMP, CMD_DEFAULT, 0, 1},
         {"processes", do_processes, nullptr, POSITION_DEAD, 108, CMD_DEFAULT, 0, 1},
-        {"bestow", do_bestow, nullptr, POSITION_DEAD, IMP, CMD_DEFAULT, 0, 1},
+        {"bestow", nullptr, do_bestow, POSITION_DEAD, IMP, CMD_DEFAULT, 0, 1},
         {"oclone", do_oclone, nullptr, POSITION_DEAD, 103, CMD_DEFAULT, 0, 1},
         {"mclone", do_mclone, nullptr, POSITION_DEAD, 103, CMD_DEFAULT, 0, 1},
         {"huntclear", do_huntclear, nullptr, POSITION_DEAD, 105, CMD_DEFAULT, 0, 1},

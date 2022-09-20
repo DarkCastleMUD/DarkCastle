@@ -224,7 +224,7 @@ command_return_t do_beep(CHAR_DATA *ch, char *argument, int cmd);
 command_return_t do_beep_set(CHAR_DATA *ch, char *argument, int cmd);
 command_return_t do_behead(CHAR_DATA *ch, char *argument, int cmd);
 command_return_t do_berserk(CHAR_DATA *ch, char *argument, int cmd);
-command_return_t do_bestow(CHAR_DATA *ch, char *argument, int cmd);
+command_return_t do_bestow(CHAR_DATA *ch, string argument, int cmd);
 command_return_t do_bladeshield(CHAR_DATA *ch, char *argument, int cmd);
 command_return_t do_bloodfury(CHAR_DATA *ch, char *argument, int cmd);
 command_return_t do_boot(CHAR_DATA *ch, char *argument, int cmd);

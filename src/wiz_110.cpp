@@ -120,85 +120,83 @@ int do_maxes(struct char_data *ch, char *argument, int cmd)
 }
 
 // give a command to a god
-int do_bestow(struct char_data *ch, char *arg, int cmd)
+command_return_t do_bestow(char_data *ch, string arg, int cmd)
 {
-   char_data * vict = NULL;
-   char buf[MAX_INPUT_LENGTH];
-   char command[MAX_INPUT_LENGTH];
-   int i;
+  char_data *vict = nullptr;
+  string buf;
+  string command;
+  int i;
 
-   half_chop(arg, arg, command);
+  tie(arg, command) = half_chop(arg);
 
-   if(!*arg) {
-      send_to_char("Bestow gives a god command to a god.\r\n"
-                   "Syntax:  bestow <god> <command>\r\n"
-                   "Just 'bestow <god>' will list all available commands for that god.\r\n", ch);
-      return eSUCCESS;
-   }
+  if (arg.empty())
+  {
+    send_to_char("Bestow gives a god command to a god.\r\n"
+                 "Syntax:  bestow <god> <command>\r\n"
+                 "Just 'bestow <god>' will list all available commands for that god.\r\n",
+                 ch);
+    return eSUCCESS;
+  }
 
-   if(!(vict = get_pc_vis(ch, arg))) {
-      sprintf(buf, "You don't see anyone named '%s'.", arg);
-      send_to_char(buf, ch);
-      return eSUCCESS;
-   }
+  if (!(vict = get_pc_vis(ch, arg.c_str())))
+  {
+    ch->send(fmt::format("You don't see anyone named '{}'.\r\n", arg));
+    return eSUCCESS;
+  }
 
-   if(!*command) {
-      send_to_char("Command                Has command?\r\n"
-                   "-----------------------------------\r\n\r\n", ch);
-      for(i = 0; *bestowable_god_commands[i].name != '\n'; i++)
+  if (command.empty())
+  {
+    send_to_char("Command                Has command?\r\n"
+                 "-----------------------------------\r\n\r\n",
+                 ch);
+    for (i = 0; *bestowable_god_commands[i].name != '\n'; i++)
+    {
+      if (bestowable_god_commands[i].testcmd == false)
       {
-	if (bestowable_god_commands[i].testcmd == false) {
-	  sprintf(buf, "%22s %s\r\n", bestowable_god_commands[i].name,
-		  has_skill(vict, bestowable_god_commands[i].num) ? "YES" : "---");
-	  send_to_char(buf, ch);
-	}
+        ch->send(fmt::format("{:22} {}\r\n", bestowable_god_commands[i].name, has_skill(vict, bestowable_god_commands[i].num) ? "YES" : "---"));
       }
+    }
 
-      send_to_char("\n\r", ch);
-      send_to_char("Test Command           Has command?\r\n"
-                   "-----------------------------------\r\n\r\n", ch);
-      for(i = 0; *bestowable_god_commands[i].name != '\n'; i++)
+    send_to_char("\r\n", ch);
+    send_to_char("Test Command           Has command?\r\n"
+                 "-----------------------------------\r\n\r\n",
+                 ch);
+    for (i = 0; *bestowable_god_commands[i].name != '\n'; i++)
+    {
+      if (bestowable_god_commands[i].testcmd == true)
       {
-	if (bestowable_god_commands[i].testcmd == true) {
-	  sprintf(buf, "%22s %s\r\n", bestowable_god_commands[i].name,
-		  has_skill(vict, bestowable_god_commands[i].num) ? "YES" : "---");
-	  send_to_char(buf, ch);
-	}
+        ch->send(fmt::format("{:22} {}\r\n", bestowable_god_commands[i].name, has_skill(vict, bestowable_god_commands[i].num) ? "YES" : "---"));
       }
+    }
 
-      return eSUCCESS;
-   }
+    return eSUCCESS;
+  }
 
-   for(i = 0; *bestowable_god_commands[i].name != '\n'; i++)
-     if(!strcmp(bestowable_god_commands[i].name, command))
-       break;
+  for (i = 0; *bestowable_god_commands[i].name != '\n'; i++)
+    if (bestowable_god_commands[i].name == command)
+      break;
 
-   if(*bestowable_god_commands[i].name == '\n') {
-     sprintf(buf, "There is no god command named '%s'.\r\n", command);
-     send_to_char(buf, ch);
-     return eSUCCESS;
-   }
+  if (*bestowable_god_commands[i].name == '\n')
+  {
+    ch->send(fmt::format("There is no god command named '{}'.\r\n", command));
+    return eSUCCESS;
+  }
 
-   // if has
-   if(has_skill(vict, bestowable_god_commands[i].num)) {
-     sprintf(buf, "%s already has that command.\r\n", GET_NAME(vict));
-     send_to_char(buf, ch);
-     return eSUCCESS;
-   }
+  // if has
+  if (has_skill(vict, bestowable_god_commands[i].num))
+  {
+    ch->send(fmt::format("{} already has that command.\r\n", GET_NAME(vict)));
+    return eSUCCESS;
+  }
 
-   // give it
-   learn_skill(vict, bestowable_god_commands[i].num, 1, 1);
+  // give it
+  learn_skill(vict, bestowable_god_commands[i].num, 1, 1);
+  buf = fmt::format("{} has been bestowed {} by {}.", GET_NAME(vict), bestowable_god_commands[i].name, GET_NAME(ch));
+  log(buf, GET_LEVEL(ch), LOG_GOD);
 
-   sprintf(buf, "%s has been bestowed %s.\r\n", GET_NAME(vict), 
-                bestowable_god_commands[i].name);
-   send_to_char(buf, ch);
-   sprintf(buf, "%s has been bestowed %s by %s.", GET_NAME(vict), 
-                bestowable_god_commands[i].name, GET_NAME(ch));
-   log(buf, GET_LEVEL(ch), LOG_GOD);
-   sprintf(buf, "%s has bestowed %s upon you.\r\n", GET_NAME(ch), 
-                bestowable_god_commands[i].name);
-   send_to_char(buf, vict);
-   return eSUCCESS;
+  ch->send(fmt::format("{} has been bestowed {}.\r\n", GET_NAME(vict), bestowable_god_commands[i].name));
+  ch->send(fmt::format("{} has bestowed {} upon you.\r\n", GET_NAME(ch), bestowable_god_commands[i].name));
+  return eSUCCESS;
 }
 
 // take away a command from a god
