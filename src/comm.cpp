@@ -2901,7 +2901,6 @@ void signal_handler(int signal, siginfo_t *si, void *)
     send_to_all(buf.data());
     log(buf.c_str(), ANGEL, LOG_GOD);
     log("Writing sockets to file for hotboot recovery.", 0, LOG_MISC);
-    // do_force(nullptr, "all save", 123);
     if (!write_hotboot_file(new_argv))
     {
       log("Hotboot failed.  Closing all sockets.", 0, LOG_MISC);
