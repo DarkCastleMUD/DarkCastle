@@ -34,7 +34,6 @@ extern struct index_data *obj_index;
 extern struct vault_data *vault_table;
 extern Leaderboard leaderboard;
 
-
 CVoteData *DCVote;
 bool verbose_mode = FALSE;
 
@@ -46,9 +45,9 @@ void test_handle_ansi(string test)
   SET_BIT(ch->pcdata->toggles, PLR_ANSI);
   GET_LEVEL(ch) = 1;
 
-  //string str1 = "$b$B$1test$R $ $$ $$$ $$$";
+  // string str1 = "$b$B$1test$R $ $$ $$$ $$$";
   string str1 = test;
-  char *str2 = new char [1024];
+  char *str2 = new char[1024];
   memset(str2, 1024, 0);
   strncpy(str2, str1.c_str(), 1024);
   string result1 = handle_ansi(str1, ch);
@@ -311,7 +310,7 @@ bool my_load_char_obj(struct descriptor_data *d, const char *name)
   ch = (CHAR_DATA *)dc_alloc(1, sizeof(CHAR_DATA));
 #endif
   auto &free_list = DC::instance().free_list;
-	free_list.erase(ch);
+  free_list.erase(ch);
 
   if (d->character)
     free_char(d->character, Trace("my_load_char_obj"));
@@ -356,7 +355,7 @@ bool my_load_char_obj(struct descriptor_data *d, const char *name)
     last_cont = my_obj_store_to_char(ch, fpsave, last_cont);
     if (last_cont)
     {
-      //printf("%d: %s\n", obj_index[last_cont->item_number].virt, last_cont->short_description);
+      // printf("%d: %s\n", obj_index[last_cont->item_number].virt, last_cont->short_description);
     }
   }
 
@@ -417,18 +416,18 @@ void test_random_stats(void)
     int result = random_percent_change(33, 6);
     results[result]++;
   }
-  //printf("%d\n", result);
+  // printf("%d\n", result);
   for (auto &cur : results)
   {
     cout << cur.first << "=" << cur.second << endl;
   }
 }
 
-void showObjectAffects(obj_data* obj)
+void showObjectAffects(obj_data *obj)
 {
-    for (int i=0; i < obj->num_affects; ++i)
+  for (int i = 0; i < obj->num_affects; ++i)
   {
-    if (i>0)
+    if (i > 0)
     {
       cout << ", ";
     }
@@ -452,7 +451,7 @@ void showObjectAffects(obj_data* obj)
   }
 }
 
-void showObjectVault(const char* owner, obj_data* obj)
+void showObjectVault(const char *owner, obj_data *obj)
 {
   cout << obj_index[obj->item_number].virt << ":";
   char buf[255];
@@ -460,7 +459,7 @@ void showObjectVault(const char* owner, obj_data* obj)
   sprintbit(obj->obj_flags.wear_flags, wear_bits, buf);
   cout << buf << ":";
 
-  sprintbit(obj->obj_flags.size, size_bits, buf);                     
+  sprintbit(obj->obj_flags.size, size_bits, buf);
   cout << buf << ":";
 
   sprintbit(obj->obj_flags.extra_flags, extra_bits, buf);
@@ -474,7 +473,7 @@ void showObjectVault(const char* owner, obj_data* obj)
   cout << " " << obj->short_description << " in " << owner << "'s vault." << endl;
 }
 
-void showObject(char_data* ch, obj_data* obj)
+void showObject(char_data *ch, obj_data *obj)
 {
   cout << obj_index[obj->item_number].virt << ":";
   char buf[255];
@@ -482,7 +481,7 @@ void showObject(char_data* ch, obj_data* obj)
   sprintbit(obj->obj_flags.wear_flags, wear_bits, buf);
   cout << buf << ":";
 
-  sprintbit(obj->obj_flags.size, size_bits, buf);                     
+  sprintbit(obj->obj_flags.size, size_bits, buf);
   cout << buf << ":";
 
   sprintbit(obj->obj_flags.extra_flags, extra_bits, buf);
@@ -498,36 +497,40 @@ void showObject(char_data* ch, obj_data* obj)
 
 int main(int argc, char **argv)
 {
-  test_handle_ansi("");
-  test_handle_ansi("$");
-  test_handle_ansi("$$");
-  test_handle_ansi("$$$");
-  test_handle_ansi("$ $$ $$$");
-  test_handle_ansi("$$$$$$$$");
-  test_handle_ansi("$ ");
-  test_handle_ansi("$x");
-  test_handle_ansi("$1$2$5$B$b$rttessd$Rddd");
-
-  string arg1 = {}, remainder = "charm sleep ";
-  do
-  {
-    tie(arg1, remainder) = half_chop(remainder);
-    cerr << "[" << arg1 << "]" << "[" << remainder << "]" << endl;
-  } while (arg1.empty() == false);
-
-
-  char c_arg1[2048] = {}, c_arg2[2048] = {}, c_input[] = "charm sleep ";
-  do
-  {
-    half_chop(c_input, c_arg1, c_arg2);
-    cerr << "[" << c_arg1 << "]" << "[" << c_arg2 << "]" << endl;
-    strncpy(c_input, c_arg2, sizeof(c_input) - 1);
-  } while (c_arg1[0] != '\0');
-  
-  string orig_cwd, dclib;
+  // Tests only
   if (argc < 2)
-    return 1;
+  {
+    test_handle_ansi("");
+    test_handle_ansi("$");
+    test_handle_ansi("$$");
+    test_handle_ansi("$$$");
+    test_handle_ansi("$ $$ $$$");
+    test_handle_ansi("$$$$$$$$");
+    test_handle_ansi("$ ");
+    test_handle_ansi("$x");
+    test_handle_ansi("$1$2$5$B$b$rttessd$Rddd");
 
+    string arg1 = {}, remainder = "charm sleep ";
+    do
+    {
+      tie(arg1, remainder) = half_chop(remainder);
+      cerr << "[" << arg1 << "]"
+           << "[" << remainder << "]" << endl;
+    } while (arg1.empty() == false);
+
+    char c_arg1[2048] = {}, c_arg2[2048] = {}, c_input[] = "charm sleep ";
+    do
+    {
+      half_chop(c_input, c_arg1, c_arg2);
+      cerr << "[" << c_arg1 << "]"
+           << "[" << c_arg2 << "]" << endl;
+      strncpy(c_input, c_arg2, sizeof(c_input) - 1);
+    } while (c_arg1[0] != '\0');
+
+    exit(0);
+  }
+
+  string orig_cwd, dclib;
   if (getenv("DCLIB"))
   {
     dclib = string(getenv("DCLIB"));
@@ -537,31 +540,31 @@ int main(int argc, char **argv)
       chdir(dclib.c_str());
     }
   }
-  
+
   log("Loading the zones", 0, LOG_MISC);
-	boot_zones();
+  boot_zones();
 
-	log("Loading the world.", 0, LOG_MISC);
-	world_array = (room_data **)realloc(world_array, 2000 * sizeof(room_data *));
-	extern int top_of_world_alloc;
+  log("Loading the world.", 0, LOG_MISC);
+  world_array = (room_data **)realloc(world_array, 2000 * sizeof(room_data *));
+  extern int top_of_world_alloc;
   top_of_world_alloc = 2000;
-	// clear it (realloc = malloc, not calloc)
-	for (int counter = 0; counter < top_of_world_alloc; counter++)
-		world_array[counter] = 0;
+  // clear it (realloc = malloc, not calloc)
+  for (int counter = 0; counter < top_of_world_alloc; counter++)
+    world_array[counter] = 0;
 
-	boot_world();
+  boot_world();
 
-	log("Renumbering the world.", 0, LOG_MISC);
-	renum_world();
+  log("Renumbering the world.", 0, LOG_MISC);
+  renum_world();
 
-	log("Generating object indices/loading all objects", 0, LOG_MISC);
-	generate_obj_indices(&top_of_objt, obj_index);
+  log("Generating object indices/loading all objects", 0, LOG_MISC);
+  generate_obj_indices(&top_of_objt, obj_index);
 
   log("Generating mob indices/loading all mobiles", 0, LOG_MISC);
-	generate_mob_indices(&top_of_mobt, mob_index);
+  generate_mob_indices(&top_of_mobt, mob_index);
 
-	log("renumbering zone table", 0, LOG_MISC);
-	renum_zone_table();
+  log("renumbering zone table", 0, LOG_MISC);
+  renum_zone_table();
 
   struct descriptor_data *d = new descriptor_data;
 
@@ -580,25 +583,25 @@ int main(int argc, char **argv)
     vnum = atoi(argv[2]);
   }
 
-    d = new descriptor_data;
-    char_data* ch = new char_data;
-    memset(ch, 0, sizeof(char_data));
-    ch->pcdata = new pc_data;
-    memset(ch->pcdata, 0, sizeof(pc_data));
+  d = new descriptor_data;
+  char_data *ch = new char_data;
+  memset(ch, 0, sizeof(char_data));
+  ch->pcdata = new pc_data;
+  memset(ch->pcdata, 0, sizeof(pc_data));
 
-    ch->desc = d;
-    ch->level = 110;
-    d->descriptor = 1;
-    d->character = ch;
-    d->output = d->small_outbuf;
-    do_stand(ch, "", CMD_DEFAULT);
-    char_to_room(ch, 3001);
-    do_toggle(ch, "pager", CMD_DEFAULT);
-    do_toggle(ch, "ansi", CMD_DEFAULT);
-    do_toggle(ch, "", CMD_DEFAULT);
-    //do_goto(ch, "23", CMD_DEFAULT);
-    do_look(ch, "", CMD_LOOK);
-    process_output(d);
+  ch->desc = d;
+  ch->level = 110;
+  d->descriptor = 1;
+  d->character = ch;
+  d->output = d->small_outbuf;
+  do_stand(ch, "", CMD_DEFAULT);
+  char_to_room(ch, 3001);
+  do_toggle(ch, "pager", CMD_DEFAULT);
+  do_toggle(ch, "ansi", CMD_DEFAULT);
+  // do_toggle(ch, "", CMD_DEFAULT);
+  //  do_goto(ch, "23", CMD_DEFAULT);
+  do_look(ch, "", CMD_LOOK);
+  process_output(d);
 
   if (argv[1] == string("all") || argv[1] == string("leaderboard"))
   {
@@ -609,17 +612,22 @@ int main(int argc, char **argv)
       if (entry.is_directory() && entry.path() != "../save/qdata" && entry.path() != "../save/deleted")
       {
         for (const auto &pfile : filesystem::directory_iterator(entry.path().c_str()))
-        {          
-          
-          //cout << pfile.path().c_str() << endl;
-
+        {
           try
           {
             string path = pfile.path().string();
-            path.erase(0, path.find_last_of('/')+1);            
-            do_linkload(ch, path.data(), CMD_DEFAULT);
-            process_output(d);
-            
+            path.erase(0, path.find_last_of('/') + 1);
+            if (path.empty() == false && path[0] != '.')
+            {
+              cerr << pfile.path().c_str() << endl;
+              do_linkload(ch, path.data(), CMD_DEFAULT);
+              process_output(d);
+            }
+            else
+            {
+              continue;
+            }
+
             if (argv[1] == string("all"))
             {
               char_data *ch = d->character;
@@ -635,7 +643,6 @@ int main(int argc, char **argv)
                       showObject(ch, obj);
                     }
                   }
-
                 }
               }
 
@@ -665,69 +672,71 @@ int main(int argc, char **argv)
         }
       }
     }
-    
-    do_leaderboard(ch, "scan", CMD_DEFAULT);
-    process_output(d);
-    do_leaderboard(ch, "", CMD_DEFAULT);
-    process_output(d);
-/*
-    multimap<int32, string> hp_leaders;
-    for (auto& ch : DC::instance().character_list)
+
+    if (argv[1] == string("leaderboard"))
     {
-      if (IS_PC(ch))
-      {
-        hp_leaders.insert(pair<int32,string>(ch->max_hit, ch->name));
-      }
+      do_leaderboard(ch, "scan", CMD_DEFAULT);
+      process_output(d);
+      do_leaderboard(ch, "", CMD_DEFAULT);
+      process_output(d);
     }
+    /*
+        multimap<int32, string> hp_leaders;
+        for (auto& ch : DC::instance().character_list)
+        {
+          if (IS_PC(ch))
+          {
+            hp_leaders.insert(pair<int32,string>(ch->max_hit, ch->name));
+          }
+        }
 
-    queue<pair<int32,string>> top_hp_leaders;
-    for (auto& l : hp_leaders)
-    {
-      //cout << l.first << " " << l.second << endl;
-      top_hp_leaders.push(l);
-      if (top_hp_leaders.size() > 5)
-      {
-        top_hp_leaders.pop();
-      }
-    }
+        queue<pair<int32,string>> top_hp_leaders;
+        for (auto& l : hp_leaders)
+        {
+          //cout << l.first << " " << l.second << endl;
+          top_hp_leaders.push(l);
+          if (top_hp_leaders.size() > 5)
+          {
+            top_hp_leaders.pop();
+          }
+        }
 
-    unsigned int placement = 0;
-    while (top_hp_leaders.size() > 0)
-    {
-      cout << top_hp_leaders.front().first << " " << top_hp_leaders.front().second << endl;
-      leaderboard.setHP(placement++, top_hp_leaders.front().second, top_hp_leaders.front().first);
-      top_hp_leaders.pop();
-    }
-*/
+        unsigned int placement = 0;
+        while (top_hp_leaders.size() > 0)
+        {
+          cout << top_hp_leaders.front().first << " " << top_hp_leaders.front().second << endl;
+          leaderboard.setHP(placement++, top_hp_leaders.front().second, top_hp_leaders.front().first);
+          top_hp_leaders.pop();
+        }
+    */
 
-
-    //leaderboard.check_offline();
-    //cout << DC::instance().character_list.size() << endl;
-    //do_leaderboard(ch, "", CMD_DEFAULT);
-    //process_output(d);
-    exit(0);
-
+    // leaderboard.check_offline();
+    // cout << DC::instance().character_list.size() << endl;
+    // do_leaderboard(ch, "", CMD_DEFAULT);
+    // process_output(d);
 
     struct vault_data *vault;
 
-    for (vault = vault_table;vault;vault = vault->next)
+    for (vault = vault_table; vault; vault = vault->next)
     {
-      for (vault_items_data* items = vault->items;items;items = items->next)
+      for (vault_items_data *items = vault->items; items; items = items->next)
       {
-        obj_data* obj = items->obj ? items->obj : get_obj(items->item_vnum);
+        obj_data *obj = items->obj ? items->obj : get_obj(items->item_vnum);
         if (vnum > 0 && obj_index[obj->item_number].virt == vnum)
         {
           showObjectVault(vault->owner, obj);
         }
       }
     }
+    do_look(ch, "", CMD_LOOK);
+    process_output(d);
   }
   else
   {
     try
     {
       obj_data *obj;
-      my_load_char_obj(d, argv[1]);
+      load_char_obj(d, argv[1]);
 
       char_data *ch = d->character;
       for (int iWear = 0; iWear < MAX_WEAR; iWear++)
@@ -758,7 +767,6 @@ int main(int argc, char **argv)
     catch (...)
     {
     }
-
   }
 
   return 0;
