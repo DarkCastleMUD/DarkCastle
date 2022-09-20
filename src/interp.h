@@ -93,6 +93,7 @@ string rtrim(string str);
 #define CMD_PUT 93
 #define CMD_OPEN 98
 #define CMD_EDITOR 100
+#define CMD_FORCE 123
 #define CMD_WRITE 128
 #define CMD_WATCH 155
 #define CMD_PRACTICE 164
