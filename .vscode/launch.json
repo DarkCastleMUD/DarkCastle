@@ -127,7 +127,7 @@
             ]
         },
         {
-            "name": "debug all om lib/",
+            "name": "debug all in lib/",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/src/debug",
