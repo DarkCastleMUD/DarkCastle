@@ -17,6 +17,7 @@
 #include <vector>
 #include <string>
 #include <algorithm>
+#include <set>
 
 #include "DC.h"
 #include "affect.h"  /* MAX_AFFECTS, etc.. */
@@ -112,6 +113,8 @@ typedef struct char_data CHAR_DATA;
 
 typedef struct  mob_prog_data           MPROG_DATA;
 typedef struct  mob_prog_act_list       MPROG_ACT_LIST;
+typedef int16_t skill_t;
+typedef map<skill_t, struct char_skill_data> skill_list_t;
 
 struct tempvariable
 {
@@ -167,11 +170,9 @@ struct  mob_prog_data
 
 struct char_skill_data
 {
-    int16  skillnum;          // ID # of skill.
+    skill_t  skillnum;          // ID # of skill.
     int16  learned;           // % chance for success must be > 0
     int32  unused[5];         // for future use
-
-    char_skill_data * next;   // Next skill in ch's skill list    
 };
 
 struct class_skill_defines
@@ -416,7 +417,7 @@ struct char_data
 
     struct obj_data *equipment[MAX_WEAR]; // Equipment List
 
-    struct char_skill_data * skills;   // Skills List
+    skill_list_t skills;   // Skills List
     struct affected_type *affected;    // Affected by list
     struct obj_data *carrying;         // Inventory List
 
@@ -487,6 +488,8 @@ struct char_data
     void sendRaw(string);
     vector<char_data *> getFollowers(void);
     void setPlayerLastMob(u_int64_t mobvnum);
+    void swapSkill(skill_t oldSkill, skill_t newSkill);
+    void setSkillMin(skill_t skill, int value);
 };
 
 class communication
