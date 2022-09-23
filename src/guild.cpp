@@ -167,44 +167,36 @@ char *how_good(int percent)
 
 // return a 1 if I just learned skill for first time
 // else 0
-int learn_skill(char_data * ch, int skill, int amount, int maximum)
+int learn_skill(char_data *ch, int skill, int amount, int maximum)
 {
-  struct char_skill_data * curr = ch->skills;
-  int old;
-  while(curr)
-    if(curr->skillnum == skill)
-      break;
-    else curr = curr->next;
+  if (ch->skills.contains(skill))
+  {
+    auto& learned = ch->getSkill(skill).learned;
+    auto old = learned;
+    learned += amount;
 
-  if(curr) 
-  {
-    old = curr->learned;
-    curr->learned += amount;
     if (skill == SKILL_MAGIC_RESIST)
-      barb_magic_resist(ch, old, curr->learned);
-    if(curr->learned > maximum)
-      curr->learned = maximum;
+    {
+      barb_magic_resist(ch, old, learned);
+    }
+
+    if (learned > maximum)
+    {
+      learned = maximum;
+    }
   }
-  else 
+  else
   {
-#ifdef LEAK_CHECK
-    curr = (char_skill_data *)calloc(1, sizeof(char_skill_data));
-#else
-    curr = (char_skill_data *)dc_alloc(1, sizeof(char_skill_data));
-#endif
     if (skill == SKILL_MAGIC_RESIST)
+    {
       barb_magic_resist(ch, 0, amount);
-    curr->skillnum = skill;
-    curr->learned = amount;
-    curr->next = ch->skills;
-    ch->skills = curr;
-
-   // could save processing power by making it's own function since skillnum is already known
-   // but *shrug*
+    }
+    ch->setSkill(skill, amount);
     prepare_character_for_sixty(ch);
-    return 1;
+    return true;
   }
-  return 0;
+
+  return false;
 }
 
 int search_skills2(int arg, class_skill_defines * list_skills)
@@ -822,16 +814,14 @@ int guild(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg,
     }
 
     send_to_char("Your profession skills have been reset.\n\r", ch);
-    struct class_skill_defines * skilllist = get_skill_list(ch);
+    struct class_skill_defines * class_skills = get_skill_list(ch);
     struct char_skill_data * skill;
 
-    for(int i = 0; *skilllist[i].skillname != '\n'; i++) 
-      if(skilllist[i].group == groupnumber) {
-        skill = ch->skills;
-        while(skill) {
-          if(skill->skillnum == skilllist[i].skillnum)
-            skill->learned = 0;
-          skill = skill->next;
+    for(int i = 0; *class_skills[i].skillname != '\n'; i++) 
+      if(class_skills[i].group == groupnumber) {
+        if (ch->skills.contains(class_skills[i].skillnum))
+        {
+          ch->skills[class_skills[i].skillnum].learned = 0;          
         }
       }
 
@@ -1236,17 +1226,15 @@ void skill_increase_check(char_data *ch, int skill, int learned, int difficulty)
   csendf(ch, "$R$B$5You feel more competent in your %s ability. It increased to %d out of %d.$R\r\n", skillname, learned, get_max(ch, skill));
 }
 
-void verify_max_stats(CHAR_DATA *ch)
+void verify_max_stats(char_data *ch)
 {
-          struct char_skill_data * curr = ch->skills;
-          while(curr) {
-
-	   if (get_max(ch, curr->skillnum) && get_max(ch, curr->skillnum) < curr->learned)
-		curr->learned = get_max(ch, curr->skillnum);
-	
-	   curr = curr->next;
-          }
-  
+  for (auto &curr : ch->skills)
+  {
+    if (get_max(ch, curr.first) && get_max(ch, curr.first) < curr.second.learned)
+    {
+      curr.second.learned = get_max(ch, curr.first);
+    }
+  }
 }
 
 int get_max(CHAR_DATA *ch, int skill)
@@ -1290,60 +1278,52 @@ int get_max(CHAR_DATA *ch, int skill)
 
 void check_maxes(CHAR_DATA *ch)
 {
-   int maximum;
-   class_skill_defines * skilllist = get_skill_list(ch);
-   if(!skilllist)
-     return;  // class has no skills by default
-   maximum = 0;
-   int i;
-   for(i = 0; *skilllist[i].skillname != '\n'; i++)
-     {
-       maximum = skilllist[i].maximum;
-       float percent = maximum*0.75;
-       if (skilllist[i].attrs)
-            percent += maximum/100.0 * get_stat_bonus(ch,skilllist[i].attrs);
+  int maximum;
+  class_skill_defines *skilllist = get_skill_list(ch);
+  if (!skilllist)
+    return; // class has no skills by default
+  maximum = 0;
+  int i;
+  for (i = 0; *skilllist[i].skillname != '\n'; i++)
+  {
+    maximum = skilllist[i].maximum;
+    float percent = maximum * 0.75;
+    if (skilllist[i].attrs)
+      percent += maximum / 100.0 * get_stat_bonus(ch, skilllist[i].attrs);
 
-       percent = MIN(maximum, percent);
-       percent = MAX(maximum*0.75, percent);
+    percent = MIN(maximum, percent);
+    percent = MAX(maximum * 0.75, percent);
 
-       percent = (int)percent;
+    percent = (int)percent;
 
-       if (has_skill(ch,skilllist[i].skillnum) > percent)
-       {
-	  struct char_skill_data * curr = ch->skills;
+    if (has_skill(ch, skilllist[i].skillnum) > percent)
+    {
+      if (ch->skills.contains(skilllist[i].skillnum))
+      {
+        ch->skills[skilllist[i].skillnum].learned = (int)percent;
+      }
+    }
+  }
 
-  	  while(curr)
-    	  if(curr->skillnum == skilllist[i].skillnum)
-      	  break;
-    	  else curr = curr->next;
+  skilllist = g_skills;
+  for (i = 0; *skilllist[i].skillname != '\n'; i++)
+  {
+    maximum = skilllist[i].maximum;
+    float percent = maximum * 0.75;
+    if (skilllist[i].attrs)
+      percent += maximum / 100.0 * get_stat_bonus(ch, skilllist[i].attrs);
 
-	  if (curr) curr->learned = (int)percent;
-       }
-   }
-   skilllist = g_skills;
-   for(i = 0; *skilllist[i].skillname != '\n'; i++)
-     {
-       maximum = skilllist[i].maximum;
-       float percent = maximum*0.75;
-       if (skilllist[i].attrs)
-            percent += maximum/100.0 * get_stat_bonus(ch,skilllist[i].attrs);
+    percent = MIN(maximum, percent);
+    percent = MAX(maximum * 0.75, percent);
 
-       percent = MIN(maximum, percent);
-       percent = MAX(maximum*0.75, percent);
+    percent = (int)percent;
 
-       percent = (int)percent;
-
-       if (has_skill(ch,skilllist[i].skillnum) > percent)
-       {
-	  struct char_skill_data * curr = ch->skills;
-
-  	  while(curr)
-    	  if(curr->skillnum == skilllist[i].skillnum)
-      	  break;
-    	  else curr = curr->next;
-
-	  if (curr) curr->learned = (int)percent;
-       }
-   }
-
+    if (has_skill(ch, skilllist[i].skillnum) > percent)
+    {
+      if (ch->skills.contains(skilllist[i].skillnum))
+      {
+        ch->skills[skilllist[i].skillnum].learned = (int)percent;
+      }
+    }
+  }
 }
