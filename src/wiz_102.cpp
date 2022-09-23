@@ -1265,19 +1265,9 @@ int do_sedit(struct char_data *ch, char *argument, int cmd)
       return eFAILURE;
     }
 
-    lastskill = NULL;
-    for (skill = vict->skills; skill; lastskill = skill, skill = skill->next)
+    if (ch->skills.contains(skillnum))
     {
-      if (skill->skillnum == skillnum)
-        break;
-    }
-
-    if (skill)
-    {
-      if (lastskill)
-        lastskill->next = skill->next;
-      else
-        vict->skills = skill->next;
+      ch->skills.erase(skillnum);
 
       buf = fmt::format("Skill '{}' ({}) removed from {} by {}.", text, skillnum, GET_NAME(vict), GET_NAME(ch));
       log(buf.c_str(), GET_LEVEL(ch), LOG_GOD);
@@ -1323,17 +1313,17 @@ int do_sedit(struct char_data *ch, char *argument, int cmd)
                          "  {:<18}  {:<4}  Learned\r\n"
                          "$3-------------------------------------$R\r\n",
                         GET_NAME(vict), "Skill", "#"));
-    for (skill = vict->skills; skill; skill = skill->next)
+    for (auto& skill : ch->skills)
     {
-      const char *skillname = get_skill_name(skill->skillnum);
+      const char *skillname = get_skill_name(skill.first);
 
       if (skillname)
       {
-        ch->send(fmt::format("  {:<18}  {:<4}  {}\r\n", skillname, skill->skillnum, skill->learned));
+        ch->send(fmt::format("  {:<18}  {:<4}  {}\r\n", skillname, skill.first, skill.second.learned));
       }
       else
       {
-        ch->send(fmt::format("  {:<18}  {:<4}  {}\r\n", "unknown", skill->skillnum, skill->learned));
+        ch->send(fmt::format("  {:<18}  {:<4}  {}\r\n", "unknown", skill.first, skill.second.learned));
       }
 
       i = 1;
