@@ -2,6 +2,14 @@
 | Level 109 wizard commands
 | 11/20/95 -- Azrack
 **********************/
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <errno.h>
+#include <signal.h>
+
+#include <fmt/format.h>
+
 #include "wizard.h"
 #include "spells.h"
 #include "fileinfo.h"
@@ -17,12 +25,6 @@
 #include "comm.h"
 #include "vault.h"
 #include "utility.h"
-
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <errno.h>
-#include <signal.h>
 
 #ifdef BANDWIDTH
   #include "bandwidth.h"
@@ -619,8 +621,6 @@ int do_skilledit(struct char_data *ch, char *argument, int cmd)
   char name[MAX_INPUT_LENGTH];
   char type[MAX_INPUT_LENGTH];
   char value[MAX_INPUT_LENGTH];
-  char buf[180];
-  struct char_skill_data * curr = NULL;
 
   if(!(*argument)) {
     send_to_char("Syntax:  skilledit <character> <action> <value>\n\r"
@@ -637,20 +637,15 @@ int do_skilledit(struct char_data *ch, char *argument, int cmd)
 
   if(isname(type, "list"))
   {
-    curr = victim->skills;
-    if(!curr) {
-      sprintf(buf, "%s has no skills.\r\n", GET_NAME(victim));
-      send_to_char(buf, ch);
+    if(victim->skills.empty()) {
+      ch->send(fmt::format("{} has no skills.\r\n", GET_NAME(victim)));
       return eSUCCESS;
     }
 
-    sprintf(buf, "Skills for %s:\r\n", GET_NAME(victim));
-    send_to_char(buf, ch);
-    while(curr) {
-      sprintf(buf, "  %d  -  %d  [%d] [%d] [%d] [%d] [%d]\r\n", curr->skillnum, curr->learned,
-                   curr->unused[0], curr->unused[1], curr->unused[2], curr->unused[3], curr->unused[4]);
-      send_to_char(buf, ch);
-      curr = curr->next;
+    ch->send(fmt::format("Skills for {}:\r\n", GET_NAME(victim)));
+    for(auto& curr : ch->skills)
+    {
+      ch->send(fmt::format("  {}  -  {}  [{}] [{}] [{}] [{}] [{}]\r\n", curr.first, curr.second.learned, curr.second.unused[0], curr.second.unused[1], curr.second.unused[2], curr.second.unused[3], curr.second.unused[4]));
     }
   }
   else if(isname(type, "add"))
@@ -661,8 +656,7 @@ int do_skilledit(struct char_data *ch, char *argument, int cmd)
   }
   else
   {
-    sprintf(buf, "Invalid action '%s'.  Must be 'list', 'add', or 'delete'.\r\n", type);
-    send_to_char(buf, ch);
+    ch->send(fmt::format("Invalid action '{}'.  Must be 'list', 'add', or 'delete'.\r\n", type));
   }
 
   return eSUCCESS;
