@@ -488,8 +488,12 @@ struct char_data
     void sendRaw(string);
     vector<char_data *> getFollowers(void);
     void setPlayerLastMob(u_int64_t mobvnum);
+
     void swapSkill(skill_t oldSkill, skill_t newSkill);
     void setSkillMin(skill_t skill, int value);
+    char_skill_data& getSkill(skill_t skill);
+    void setSkill(skill_t, int value = 0);
+    void upSkill(skill_t skillnum, int learned = 1);
 };
 
 class communication
