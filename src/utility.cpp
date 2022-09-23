@@ -20,8 +20,6 @@
  ***************************************************************************/
 /* $Id: utility.cpp,v 1.129 2014/07/04 22:00:04 jhhudso Exp $ */
 
-extern "C"
-{
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -38,13 +36,13 @@ extern "C"
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
-}
 
 #include <iostream>
 #include <sstream>
 #include <map>
-#include <fmt/format.h>
 #include <algorithm>
+
+#include <fmt/format.h>
 
 #include "innate.h"
 #include "structs.h"
@@ -2879,4 +2877,46 @@ void special_log(char *arg)
 
   fprintf(fl, "%s\n", arg);
   dc_fclose(fl);
+}
+
+void char_data::swapSkill(skill_t origSkill, skill_t newSkill)
+{
+  if (skills.contains(SPELL_ARMOR))
+  {
+    skills[SPELL_AEGIS] = skills[SPELL_ARMOR];
+    skills[SPELL_AEGIS].skillnum = SPELL_AEGIS;
+    skills.erase(SPELL_ARMOR);
+  }
+}
+
+void char_data::setSkillMin(skill_t skillnum, int minimum_learned)
+{
+  if (skills.contains(skillnum))
+  {
+    skills[skillnum].learned = MIN(skills[skillnum].learned, minimum_learned);
+  }
+}
+
+char_skill_data& char_data::getSkill(skill_t skillnum)
+{
+  if (skills.contains(skillnum))
+  {
+    return skills[skillnum];
+  }
+
+  static char_skill_data empty;
+  empty = {};
+  return empty;
+}
+
+void char_data::setSkill(skill_t skillnum, int learned)
+{
+  skills[skillnum].skillnum = skillnum;
+  skills[skillnum].learned = learned;
+}
+
+void char_data::upSkill(skill_t skillnum, int learned)
+{
+  skills[skillnum].skillnum = skillnum;
+  skills[skillnum].learned += learned;
 }

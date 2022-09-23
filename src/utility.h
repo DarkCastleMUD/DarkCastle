@@ -21,11 +21,9 @@
 #ifndef UTILITY_H_
 #define UTILITY_H_
 
-extern "C" {
 #include <time.h>
 #include <stdlib.h>
 #include <stdint.h>
-}
 
 #include <string>
 #include <vector>
@@ -37,7 +35,6 @@ extern "C" {
 #include "player.h"
 #include "obj.h"
 #include "character.h"
-
 #include "Trace.h"
 
 using namespace std;
@@ -427,7 +424,8 @@ int32	move_limit	(CHAR_DATA *ch);
 int32	mana_limit	(CHAR_DATA *ch);
 int32	ki_limit	(CHAR_DATA *ch);
 int32	hit_limit	(CHAR_DATA *ch);
-int	has_skill	(CHAR_DATA *ch, int16 skill);
+typedef int16_t skill_t;
+int	has_skill	(CHAR_DATA *ch, skill_t skill);
 const char *  get_skill_name  (int skillnum);
 void	gain_exp_regardless	(CHAR_DATA *ch, int gain);
 void	advance_level	(CHAR_DATA *ch, int is_conversion);
