@@ -600,15 +600,14 @@ int char_to_store_variable_data(CHAR_DATA * ch, FILE * fpsave)
   if (!has_skill(ch, NEW_SAVE)) // New save.
      learn_skill(ch, NEW_SAVE, 1, 100);    
 
-  char_skill_data * skill = ch->skills;
-
-  while(skill) {
+  for(auto& skill : ch->skills)
+  {
     fwrite("SKL", sizeof(char), 3, fpsave);
-    fwrite(&(skill->skillnum), sizeof(skill->skillnum), 1, fpsave);
-    fwrite(&(skill->learned), sizeof(skill->learned), 1, fpsave);
+    fwrite(&(skill.first), sizeof(skill.first), 1, fpsave);
+    //cerr << "SKL " << skill->skillnum << endl;
+    fwrite(&(skill.second.learned), sizeof(skill.second.learned), 1, fpsave);
     // this writes all 5 of them
-    fwrite(&(skill->unused), sizeof(skill->unused[0]), 5, fpsave);
-    skill = skill->next;
+    fwrite(&(skill.second.unused), sizeof(skill.second.unused[0]), 5, fpsave);
   }
   fwrite("END", sizeof(char), 3, fpsave);
 
@@ -652,28 +651,20 @@ int char_to_store_variable_data(CHAR_DATA * ch, FILE * fpsave)
   return 1;
 }
 
-void read_skill(CHAR_DATA * ch, FILE * fpsave)
+void read_skill(CHAR_DATA *ch, FILE *fpsave)
 {
-  struct char_skill_data * curr;
+  char_skill_data curr = {};
 
-#ifdef LEAK_CHECK
-  curr = (char_skill_data *) calloc(1, sizeof(char_skill_data));
-#else
-  curr = (char_skill_data *) dc_alloc(1, sizeof(char_skill_data));
-#endif
+  fread(&(curr.skillnum), sizeof(curr.skillnum), 1, fpsave);
+  fread(&(curr.learned), sizeof(curr.learned), 1, fpsave);
+  fread(&(curr.unused), sizeof(curr.unused[0]), 5, fpsave);
 
-  fread(&(curr->skillnum), sizeof(curr->skillnum), 1, fpsave);
-  fread(&(curr->learned), sizeof(curr->learned), 1, fpsave);
-  fread(&(curr->unused), sizeof(curr->unused[0]), 5, fpsave);
-
-//  The above line takes care of these four.  They are here for future use
-//  fread(&(curr->unused[1]), sizeof(curr->unused[1]), 1, fpsave);
-//  fread(&(curr->unused[2]), sizeof(curr->unused[2]), 1, fpsave);
-//  fread(&(curr->unused[3]), sizeof(curr->unused[3]), 1, fpsave);
-//  fread(&(curr->unused[4]), sizeof(curr->unused[4]), 1, fpsave);
-
-  curr->next = ch->skills;
-  ch->skills = curr;
+  //  The above line takes care of these four.  They are here for future use
+  //  fread(&(curr.unused[1]), sizeof(curr.unused[1]), 1, fpsave);
+  //  fread(&(curr.unused[2]), sizeof(curr.unused[2]), 1, fpsave);
+  //  fread(&(curr.unused[3]), sizeof(curr.unused[3]), 1, fpsave);
+  //  fread(&(curr.unused[4]), sizeof(curr.unused[4]), 1, fpsave);
+  ch->skills[curr.skillnum] = curr;
 }
 
 int store_to_char_variable_data(CHAR_DATA * ch, FILE * fpsave)
