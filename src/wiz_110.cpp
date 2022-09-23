@@ -222,15 +222,10 @@ int do_revoke(struct char_data *ch, char *arg, int cmd)
       return eSUCCESS;
    }
 
-   struct char_skill_data * curr = vict->skills;
    struct char_skill_data * last = NULL;
 
    if(!strcmp(command, "all")) {
-     while(curr) {
-       vict->skills = curr->next;
-       dc_free(curr);
-       curr = vict->skills;
-     } 
+    vict->skills.clear();
      
      sprintf(buf, "%s has had all comands revoked.\r\n", GET_NAME(vict));
      send_to_char(buf, ch);
@@ -252,29 +247,13 @@ int do_revoke(struct char_data *ch, char *arg, int cmd)
      return eSUCCESS;
    }
 
-  while(curr) {
-    if(curr->skillnum == bestowable_god_commands[i].num)
-      break;
-    last = curr;
-    curr = curr->next;
-  }
-
-  if(!curr) {
+  if(vict->skills.contains(bestowable_god_commands[i].num) == false) {
     sprintf(buf, "%s does not have %s.\r\n", GET_NAME(vict), bestowable_god_commands[i].name);
     send_to_char(buf, ch);
     return eSUCCESS;
   }
 
-  // remove from list
-  if(last) {
-    last->next = curr->next;
-    dc_free(curr);
-  }
-  else {
-    vict->skills = curr->next;
-    dc_free(curr);
-  }
-
+  vict->skills.erase(bestowable_god_commands[i].num);
    sprintf(buf, "%s has had %s revoked.\r\n", GET_NAME(vict), 
                 bestowable_god_commands[i].name);
    send_to_char(buf, ch);
