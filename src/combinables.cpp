@@ -1,6 +1,14 @@
 // This file takes care of all the skills that make stuff by combining it
 // in it's container type.  For example, poison making.
 
+#include <vector>
+#include <algorithm>
+#include <iostream>
+#include <fstream>
+#include <iterator>
+#include <utility>
+#include <string>
+#include <sstream>
 
 #include "db.h"
 #include "fight.h"
@@ -22,15 +30,7 @@
 #include "returnvals.h"
 #include "combinables.h"
 #include "const.h"
-
-#include <vector>
-#include <algorithm>
-#include <iostream>
-#include <fstream>
-#include <iterator>
-#include <utility>
-#include <string>
-#include <sstream>
+#include "guild.h"
 
 using namespace std;
 using namespace Combinables;
@@ -328,8 +328,6 @@ int determine_trade_skill_chance(int learned, int trivial)
 
 void determine_trade_skill_increase(char_data * ch, int skillnum, int learned, int trivial)
 {
-   int learn_skill(char_data * ch, int skill, int amount, int maximum);
-
    // can't learn past item's trivial value
    if(learned >= trivial) {
       send_to_char("You have learned all you can from making this item.\r\n", ch);
