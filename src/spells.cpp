@@ -1526,13 +1526,11 @@ int do_release(CHAR_DATA *ch, char *argument, int cmd)
 
 int skill_value(CHAR_DATA *ch, int skillnum, int min = 33)
 {
-  struct char_skill_data * curr = ch->skills;
-
-  while(curr) {
-    if(curr->skillnum == skillnum)
-      return MAX(min, (int)curr->learned);
-    curr = curr->next;
+  if (ch->skills.contains(skillnum))
+  {
+    return MAX(min, (int)ch->skills[skillnum].learned);
   }
+
   return 0;
 }
 
@@ -2929,4 +2927,46 @@ int spl_lvl(int lev)
   if(lev >= MIN_GOD)
     return 0;
   return lev;
+}
+
+// search through a character's list to see if they have a particular skill
+// if so, return their level of knowledge
+// if not, return 0
+int has_skill(char_data *ch, skill_t skill)
+{
+	struct obj_data *o;
+	int bonus = 0;
+
+	if (IS_MOB(ch))
+		return 0;
+
+	if (affected_by_spell(ch, SKILL_DEFENDERS_STANCE) && skill == SKILL_DODGE)
+		return affected_by_spell(ch, SKILL_DEFENDERS_STANCE)->modifier;
+
+	if (affected_by_spell(ch, SPELL_VILLAINY))
+		bonus += affected_by_spell(ch, SPELL_VILLAINY)->modifier / 5;
+
+	if (affected_by_spell(ch, SPELL_HEROISM))
+		bonus += affected_by_spell(ch, SPELL_HEROISM)->modifier / 5;
+
+	if (ch->skills.contains(skill))
+	{
+		auto& curr = ch->skills[skill];
+		for (o = ch->pcdata->skillchange; o; o = o->next_skill)
+		{
+			int a;
+			for (a = 0; a < o->num_affects; a++)
+			{
+				if (o->affected[a].location == skill * 1000)
+				{
+					bonus += o->affected[a].modifier;
+					if ((int)curr.learned + bonus > 150)
+						bonus = 150 - curr.learned;
+				}
+			}
+		}
+		return ((int)curr.learned) + bonus;
+	}
+
+	return 0;
 }
