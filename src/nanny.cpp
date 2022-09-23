@@ -546,281 +546,86 @@ void do_on_login_stuff(char_data *ch)
 
    if (GET_CLASS(ch) == CLASS_MONK && GET_LEVEL(ch) > 10)
    {
-      struct char_skill_data *curr = ch->skills;
-      while (curr)
-      {
-         if (curr->skillnum == SKILL_SHIELDBLOCK)
-            curr->skillnum = SKILL_DEFENSE;
-         curr = curr->next;
-      }
+      ch->swapSkill(SKILL_SHIELDBLOCK, SKILL_DEFENSE);
    }
    if (GET_CLASS(ch) == CLASS_PALADIN && GET_LEVEL(ch) >= 41)
    {
-      struct char_skill_data *curr = ch->skills;
-      while (curr)
-      {
-         if (curr->skillnum == SPELL_ARMOR)
-            curr->skillnum = SPELL_AEGIS;
-         if (curr->skillnum == SPELL_POWER_HARM)
-            curr->skillnum = SPELL_DIVINE_FURY;
-         curr = curr->next;
-      }
+      ch->swapSkill(SPELL_ARMOR, SPELL_AEGIS);
+      ch->swapSkill(SPELL_POWER_HARM, SPELL_DIVINE_FURY);
    }
    if (GET_CLASS(ch) == CLASS_RANGER && GET_LEVEL(ch) > 9)
    {
-      struct char_skill_data *curr = ch->skills;
-      while (curr)
-      {
-         if (curr->skillnum == SKILL_SHIELDBLOCK)
-         {
-            curr->skillnum = SKILL_DODGE;
-            curr->learned = MIN(curr->learned, 50);
-         }
-         curr = curr->next;
-      }
+      ch->swapSkill(SKILL_SHIELDBLOCK, SKILL_DODGE);
+      ch->setSkillMin(SKILL_DODGE, 50);
    }
    if (GET_CLASS(ch) == CLASS_ANTI_PAL && GET_LEVEL(ch) >= 44)
    {
-      struct char_skill_data *curr = ch->skills;
-      while (curr)
-      {
-         if (curr->skillnum == SPELL_STONE_SKIN)
-            curr->skillnum = SPELL_U_AEGIS;
-         curr = curr->next;
-      }
+      ch->swapSkill(SPELL_STONE_SKIN, SPELL_U_AEGIS);
    }
    if (GET_CLASS(ch) == CLASS_BARD && GET_LEVEL(ch) >= 30)
    {
-      struct char_skill_data *curr = ch->skills;
-      while (curr)
-      {
-         if (curr->skillnum == SKILL_BLUDGEON_WEAPONS)
-            curr->skillnum = SKILL_STINGING_WEAPONS;
-         curr = curr->next;
-      }
+      ch->swapSkill(SKILL_BLUDGEON_WEAPONS, SKILL_STINGING_WEAPONS);
    }
    if (GET_CLASS(ch) == CLASS_CLERIC && GET_LEVEL(ch) >= 42)
    {
-      struct char_skill_data *curr = ch->skills, *prev = NULL;
-      while (curr)
-      {
-         if (curr->skillnum == SPELL_RESIST_FIRE)
-            curr->skillnum = SPELL_RESIST_MAGIC;
-         if (curr->skillnum == SPELL_RESIST_COLD)
-         {
-            if (prev)
-               prev->next = curr->next;
-            else
-               ch->skills = curr->next;
-            struct char_skill_data *o = curr;
-            curr = curr->next;
-            dc_free(o); // so little memory, why do I even bother.
-            continue;
-         }
-         prev = curr;
-         curr = curr->next;
-      }
+      ch->swapSkill(SPELL_RESIST_FIRE, SPELL_RESIST_MAGIC);
+      ch->skills.erase(SPELL_RESIST_COLD);
    }
    if (GET_CLASS(ch) == CLASS_MAGIC_USER)
    {
-      struct char_skill_data *curr = ch->skills, *prev = NULL;
-      while (curr)
-      {
-         if (curr->skillnum == SPELL_SLEEP)
-         {
-            if (prev)
-               prev->next = curr->next;
-            else
-               ch->skills = curr->next;
-            struct char_skill_data *o = curr;
-            curr = curr->next;
-            dc_free(o); // so little memory, why do I even bother.
-            continue;
-         }
-         if (curr->skillnum == SPELL_RESIST_COLD)
-         {
-            if (prev)
-               prev->next = curr->next;
-            else
-               ch->skills = curr->next;
-            struct char_skill_data *o = curr;
-            curr = curr->next;
-            dc_free(o); // so little memory, why do I even bother.
-            continue;
-         }
-         if (curr->skillnum == SPELL_KNOW_ALIGNMENT)
-         {
-            if (prev)
-               prev->next = curr->next;
-            else
-               ch->skills = curr->next;
-            struct char_skill_data *o = curr;
-            curr = curr->next;
-            dc_free(o); // so little memory, why do I even bother.
-            continue;
-         }
-         prev = curr;
-         curr = curr->next;
-      }
+      ch->skills.erase(SPELL_SLEEP);
+      ch->skills.erase(SPELL_RESIST_COLD);
+      ch->skills.erase(SPELL_KNOW_ALIGNMENT);
    }
    // Remove pick if they're no longer allowed to have it.
-   if (GET_CLASS(ch) == CLASS_THIEF && GET_LEVEL(ch) < 22 &&
-       has_skill(ch, SKILL_PICK_LOCK))
+   if (GET_CLASS(ch) == CLASS_THIEF && GET_LEVEL(ch) < 22 && has_skill(ch, SKILL_PICK_LOCK))
    {
-      struct char_skill_data *curr = ch->skills, *prev = NULL;
-      while (curr)
-         if (curr->skillnum == SKILL_PICK_LOCK)
-         {
-            if (prev)
-               prev->next = curr->next;
-            else
-               ch->skills = curr->next;
-            FREE(curr);
-            break;
-         }
-         else
-         {
-            prev = curr;
-            curr = curr->next;
-         }
+      ch->skills.erase(SKILL_PICK_LOCK);
    }
    if (GET_CLASS(ch) == CLASS_BARD && has_skill(ch, SKILL_HIDE))
    {
-      struct char_skill_data *curr = ch->skills, *prev = NULL;
-      while (curr)
-         if (curr->skillnum == SKILL_HIDE)
-         {
-            if (prev)
-               prev->next = curr->next;
-            else
-               ch->skills = curr->next;
-            FREE(curr);
-            break;
-         }
-         else
-         {
-            prev = curr;
-            curr = curr->next;
-         }
+      ch->skills.erase(SKILL_HIDE);
    }
    // Remove listsongs
    if (GET_CLASS(ch) == CLASS_BARD && has_skill(ch, SKILL_SONG_LIST_SONGS))
    {
-      struct char_skill_data *curr = ch->skills, *prev = NULL;
-      while (curr)
-         if (curr->skillnum == SKILL_SONG_LIST_SONGS)
-         {
-            if (prev)
-               prev->next = curr->next;
-            else
-               ch->skills = curr->next;
-            FREE(curr);
-            break;
-         }
-         else
-         {
-            prev = curr;
-            curr = curr->next;
-         }
+      ch->skills.erase(SKILL_SONG_LIST_SONGS);
    }
    // Replace shieldblock on barbs
    if (GET_CLASS(ch) == CLASS_BARBARIAN && has_skill(ch, SKILL_SHIELDBLOCK))
    {
-      struct char_skill_data *curr = ch->skills;
-      while (curr)
-         if (curr->skillnum == SKILL_SHIELDBLOCK)
-         {
-            curr->skillnum = SKILL_DODGE;
-            break;
-         }
-         else
-         {
-            curr = curr->next;
-         }
+      ch->swapSkill(SKILL_SHIELDBLOCK, SKILL_DODGE);
    }
-   // Replace eagleeye on druids
+   // Replace eagle-eye on druids
    if (GET_CLASS(ch) == CLASS_DRUID && has_skill(ch, SPELL_EAGLE_EYE))
    {
-      struct char_skill_data *curr = ch->skills;
-      while (curr)
-         if (curr->skillnum == SPELL_EAGLE_EYE)
-         {
-            curr->skillnum = SPELL_GHOSTWALK;
-            break;
-         }
-         else
-         {
-            curr = curr->next;
-         }
+      ch->swapSkill(SPELL_EAGLE_EYE, SPELL_GHOSTWALK);
    }
    // Replace crushing on bards
    if (GET_CLASS(ch) == CLASS_BARD && has_skill(ch, SKILL_CRUSHING_WEAPONS))
    {
-      struct char_skill_data *curr = ch->skills;
-      while (curr)
-         if (curr->skillnum == SKILL_CRUSHING_WEAPONS)
-         {
-            curr->skillnum = SKILL_WHIPPING_WEAPONS;
-            break;
-         }
-         else
-         {
-            curr = curr->next;
-         }
+      ch->swapSkill(SKILL_CRUSHING_WEAPONS, SKILL_WHIPPING_WEAPONS);
    }
    // Replace crushing on thieves
    if (GET_CLASS(ch) == CLASS_THIEF && has_skill(ch, SKILL_CRUSHING_WEAPONS))
    {
-      struct char_skill_data *curr = ch->skills;
-      while (curr)
-         if (curr->skillnum == SKILL_CRUSHING_WEAPONS)
-         {
-            curr->skillnum = SKILL_STINGING_WEAPONS;
-            break;
-         }
-         else
-         {
-            curr = curr->next;
-         }
+      ch->swapSkill(SKILL_CRUSHING_WEAPONS, SKILL_STINGING_WEAPONS);
    }
    // Replace firestorm on antis
    if (GET_CLASS(ch) == CLASS_ANTI_PAL && has_skill(ch, SPELL_FIRESTORM))
    {
-      struct char_skill_data *curr = ch->skills;
-      while (curr)
-         if (curr->skillnum == SPELL_FIRESTORM)
-         {
-            curr->skillnum = SPELL_LIFE_LEECH;
-            break;
-         }
-         else
-         {
-            curr = curr->next;
-         }
+      ch->swapSkill(SPELL_FIRESTORM, SPELL_LIFE_LEECH);
    }
 
-   struct char_skill_data *curr = ch->skills;
-   struct char_skill_data *prev = NULL;
-   struct class_skill_defines *a = get_skill_list(ch);
+   class_skill_defines *c_skills = get_skill_list(ch);
 
-   while (curr)
+   for(auto& curr : ch->skills)
    {
-      if (curr->skillnum < 600 && search_skills2(curr->skillnum, a) == -1 && search_skills2(curr->skillnum, g_skills) == -1 && curr->skillnum != 385)
+      if (curr.first < 600 && search_skills2(curr.first, c_skills) == -1 && search_skills2(curr.first, g_skills) == -1 && curr.first != 385)
       {
-         printf("Removing skill %d from %s\n", curr->skillnum, GET_NAME(ch));
-         struct char_skill_data *a = curr->next;
-         if (prev)
-            prev->next = curr->next;
-         else
-            ch->skills = curr->next;
-
-         FREE(curr);
-         curr = a;
-      }
-      else
-      {
-         prev = curr;
-         curr = curr->next;
+         log(fmt::format("Removing skill {} from {}", curr.first, GET_NAME(ch)), IMMORTAL, LOG_PLAYER);
+         ch->send(fmt::format("Removing skill {}\r\n", curr.first));
+         ch->skills.erase(curr.first);
       }
    }
 
