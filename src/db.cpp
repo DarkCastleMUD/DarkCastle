@@ -2615,11 +2615,7 @@ CHAR_DATA *read_mobile(int nr, FILE *fl)
 
 	i = nr;
 
-#ifdef LEAK_CHECK
-	mob = (CHAR_DATA *)calloc(1, sizeof(CHAR_DATA));
-#else
-	mob = (CHAR_DATA *)dc_alloc(1, sizeof(CHAR_DATA));
-#endif
+	mob = new char_data;
 	auto &free_list = DC::instance().free_list;
 	free_list.erase(mob);
 
@@ -5641,8 +5637,12 @@ void reset_char(CHAR_DATA *ch)
  */
 void clear_char(CHAR_DATA *ch)
 {
-	memset((char *)ch, (char)'\0', (int)sizeof(CHAR_DATA));
+	if (ch == nullptr)
+	{
+		return;
+	}
 
+	*ch = {};
 	ch->in_room = NOWHERE;
 	ch->position = POSITION_STANDING;
 	GET_HOME(ch) = START_ROOM;
@@ -5651,33 +5651,39 @@ void clear_char(CHAR_DATA *ch)
 
 void clear_object(struct obj_data *obj)
 {
-	//memset((char *)obj, (char)'\0', (int)sizeof(struct obj_data));
+	if (obj == nullptr)
+	{
+		return;
+	}
+
+	*obj = {};
 	obj->item_number = -1;
 	obj->in_room = NOWHERE;
-  obj->vroom = 0;
-  obj->obj_flags = obj_flag_data();
-  obj->num_affects = 0;
-  obj->affected = nullptr;
+	obj->vroom = 0;
+	obj->obj_flags = obj_flag_data();
+	obj->num_affects = 0;
+	obj->affected = nullptr;
 
-  obj->name = nullptr;
-  obj->description = nullptr;
-  obj->short_description = nullptr;
-  obj->action_description = nullptr;
-  obj->ex_description = nullptr;
-  obj->carried_by = nullptr;
-  obj->equipped_by = nullptr;
+	obj->name = nullptr;
+	obj->description = nullptr;
+	obj->short_description = nullptr;
+	obj->action_description = nullptr;
+	obj->ex_description = nullptr;
+	obj->carried_by = nullptr;
+	obj->equipped_by = nullptr;
 
-  obj->in_obj = nullptr;
-  obj->contains = nullptr;
+	obj->in_obj = nullptr;
+	obj->contains = nullptr;
 
-  obj->next_content = nullptr;
-  obj->next = nullptr;
-  obj->next_skill = nullptr;;
-  obj->table = nullptr;
-  obj->slot = nullptr;
-  obj->wheel = nullptr;
-  obj->save_expiration = 0;
-  obj->no_sell_expiration = 0;
+	obj->next_content = nullptr;
+	obj->next = nullptr;
+	obj->next_skill = nullptr;
+	;
+	obj->table = nullptr;
+	obj->slot = nullptr;
+	obj->wheel = nullptr;
+	obj->save_expiration = 0;
+	obj->no_sell_expiration = 0;
 }
 
 // Roll up the random modifiers to saving throw for new character
