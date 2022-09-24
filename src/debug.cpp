@@ -277,9 +277,7 @@ int main(int argc, char **argv)
 
   d = new descriptor_data;
   char_data *ch = new char_data;
-  memset(ch, 0, sizeof(char_data));
   ch->pcdata = new pc_data;
-  memset(ch->pcdata, 0, sizeof(pc_data));
 
   ch->desc = d;
   ch->level = 110;
