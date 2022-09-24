@@ -20,6 +20,8 @@
 #include <ctype.h>
 #include <string.h>
 
+#include <fmt/format.h>
+
 #include "obj.h"
 #include "room.h"
 #include "character.h"
@@ -655,10 +657,23 @@ void read_skill(CHAR_DATA *ch, FILE *fpsave)
 {
   char_skill_data curr = {};
 
-  fread(&(curr.skillnum), sizeof(curr.skillnum), 1, fpsave);
-  fread(&(curr.learned), sizeof(curr.learned), 1, fpsave);
-  fread(&(curr.unused), sizeof(curr.unused[0]), 5, fpsave);
+  if (fread(&(curr.skillnum), sizeof(curr.skillnum), 1, fpsave) != 1)
+  {
+    log(fmt::format("Unable to read a skill from player file for {}.", GET_NAME(ch)), LOG_BUG, IMMORTAL);
+    return;
+  }
 
+  if (fread(&(curr.learned), sizeof(curr.learned), 1, fpsave) != 1)
+  {
+    log(fmt::format("Unable to read a skill from player file for {}.", GET_NAME(ch)), LOG_BUG, IMMORTAL);
+    return;
+  }
+
+  if (fread(&(curr.unused), sizeof(curr.unused[0]), 5, fpsave) != 5)
+  {
+    log(fmt::format("Unable to read a skill from player file for {}.", GET_NAME(ch)), LOG_BUG, IMMORTAL);
+    return;
+  }
 
   //  The above line takes care of these four.  They are here for future use
   //  fread(&(curr.unused[1]), sizeof(curr.unused[1]), 1, fpsave);
