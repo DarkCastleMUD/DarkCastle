@@ -375,7 +375,7 @@ void fread_to_tilde(FILE *fpsave)
 
 void read_pc_data(struct char_data *ch, FILE* fpsave)
 {
-  char typeflag[4];
+  char typeflag[4] = {};
   struct pc_data * i = ch->pcdata;
 
   i->golem = 0;
@@ -411,7 +411,7 @@ void read_pc_data(struct char_data *ch, FILE* fpsave)
     tmp = fread_var_string(fpsave);
   }
   i->skillchange = 0;
-  typeflag[3] = '\0';
+
   fread(&typeflag, sizeof(char), 3, fpsave);
 
   if(!strcmp("QS1", typeflag))
@@ -658,6 +658,7 @@ void read_skill(CHAR_DATA *ch, FILE *fpsave)
   fread(&(curr.skillnum), sizeof(curr.skillnum), 1, fpsave);
   fread(&(curr.learned), sizeof(curr.learned), 1, fpsave);
   fread(&(curr.unused), sizeof(curr.unused[0]), 5, fpsave);
+
 
   //  The above line takes care of these four.  They are here for future use
   //  fread(&(curr.unused[1]), sizeof(curr.unused[1]), 1, fpsave);
