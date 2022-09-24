@@ -9,9 +9,7 @@
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 ************************************************************************ */
 #include <errno.h>
-#include "terminal.h"
 #include <string.h>
-
 #include <unistd.h>
 #include <sys/wait.h>
 #include <sys/socket.h>
@@ -22,12 +20,20 @@
 #include <arpa/telnet.h>
 #include <arpa/inet.h>
 #include <fcntl.h>
-
 #include <sys/types.h>
-
 #include <signal.h>
 #include <ctype.h>
 
+#include <sstream>
+#include <iostream>
+#include <list>
+#include <algorithm>
+#include <string>
+#include <queue>
+
+#include <fmt/format.h>
+
+#include "terminal.h"
 #include "fileinfo.h"
 #include "act.h"
 #include "player.h"
@@ -48,17 +54,9 @@
 #ifdef USE_SQL
 #include "Backend/Database.h"
 #endif
-
-#include <sstream>
-#include <iostream>
-#include <list>
 #include "Timer.h"
 #include "DC.h"
 #include "CommandStack.h"
-#include <algorithm>
-#include <fmt/format.h>
-#include <string>
-#include <queue>
 
 using namespace std;
 
@@ -100,6 +98,7 @@ extern char *sky_look[];
 extern struct room_data **world_array;
 extern char last_char_name[MAX_INPUT_LENGTH];
 extern char last_processed_cmd[MAX_INPUT_LENGTH];
+extern struct index_data *obj_index;
 
 void check_champion_and_website_who_list(void);
 void save_slot_machines(void);
@@ -1415,7 +1414,16 @@ string generate_prompt(CHAR_DATA *ch)
   pro = prompt = new char[MAX_STRING_LENGTH];
   memset(pro, 0, sizeof(pro));
   char *mobprompt = "HP: %i/%H %f >";
-
+  room_data *rm = nullptr;
+  try
+  {
+    rm = &world[ch->in_room];
+  }
+  catch(...)
+  {
+    rm = nullptr;
+  }
+  
   if (IS_NPC(ch))
     source = mobprompt;
   else
@@ -1639,7 +1647,16 @@ string generate_prompt(CHAR_DATA *ch)
       sprintf(pro, "%d", ((GET_MANA(ch) * 100) / GET_MAX_MANA(ch)));
       break;
     // o - unused
-    // O - unused
+    // O - Last object edited
+    case 'O':
+    if (IS_PC(ch))
+    {
+      if (ch->pcdata->last_obj_edit >= 0)
+      {
+        sprintf(pro, "%d", obj_index[ch->pcdata->last_obj_edit ].virt);
+      }
+    }
+    break;
     case 'p':
       if (ch->fighting && ch->fighting->fighting)
       {
@@ -1675,14 +1692,25 @@ string generate_prompt(CHAR_DATA *ch)
     case 'r':
       sprintf(pro, "%c%c", '\n', '\r');
       break;
-    // R - unused
+    case 'R':    
+    if (rm != nullptr)
+    {
+      sprintf(pro, "%s%d%s", GREEN, rm->number, NTEXT);
+    }
+    break;
     case 's':
       if (world_array[ch->in_room])
         sprintf(pro, "%s", sector_types[world[ch->in_room].sector_type]);
       else
         sprintf(pro, " ");
       break;
-    // S - unused
+    // S - Last mob edited
+    case 'S':
+    if (IS_PC(ch))
+    {
+      sprintf(pro, "%d", ch->pcdata->last_mob_edit);
+    }
+    break;
     case 't':
       if (ch->fighting && ch->fighting->fighting)
         sprintf(pro, "[%s]",
@@ -1765,8 +1793,20 @@ string generate_prompt(CHAR_DATA *ch)
       else
         sprintf(pro, " ");
       break;
-    // z - unused
-    // Z - unused
+    // z - wizinvis level
+    case 'z':
+    if (IS_IMMORTAL(ch))
+    {
+      sprintf(pro, "%s%d%s", YELLOW, ch->pcdata->wizinvis, NTEXT);
+    }
+    break;
+    // Z - zone number
+    case 'Z':
+    if (rm != nullptr)
+    {
+      sprintf(pro, "%s%d%s", RED, rm->zone, NTEXT);
+    }
+    break;
     case '%':
       sprintf(pro, "%%");
       break;
