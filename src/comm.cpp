@@ -1379,7 +1379,7 @@ void make_prompt(struct descriptor_data *d, string &prompt)
   {
     prompt += generate_prompt(d->character);
   }
-  else if (GET_LEVEL(d->character) < IMMORTAL)
+  else
   {
     if (!IS_SET(GET_TOGGLES(d->character), PLR_COMPACT))
       prompt += "\n\r";
@@ -1387,22 +1387,6 @@ void make_prompt(struct descriptor_data *d, string &prompt)
       prompt += "type 'help prompt'> ";
     else
       prompt += generate_prompt(d->character);
-  }
-  else //immortals
-  {
-    if (!IS_SET(GET_TOGGLES(d->character), PLR_COMPACT))
-      prompt += "\r\n";
-
-    struct room_data *rm = &world[d->character->in_room];
-    if (IS_SET(GET_TOGGLES(d->character), PLR_ANSI))
-    {
-      buf = fmt::format("Z:" RED "{} " NTEXT "R:" GREEN "{} " NTEXT "I:" YELLOW "{}" NTEXT "> ", rm->zone, rm->number, d->character->pcdata->wizinvis);
-    }
-    else
-    {
-      buf = fmt::format("Z:{} R:{} I:{}> ", rm->zone, rm->number, d->character->pcdata->wizinvis);
-    }
-    prompt += buf;
   }
   char go_ahead[] = {(char)IAC, (char)GA, (char)0};
   prompt += go_ahead;
