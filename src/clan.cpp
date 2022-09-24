@@ -1003,7 +1003,7 @@ int do_outcast(CHAR_DATA *ch, char *arg, int cmd)
   if(!(victim = get_char(buf))) {
 
     // must be done to clear out "d" before it is used
-    memset((char *) &d, 0, sizeof(struct descriptor_data));
+    d = {};
 
     if(!(load_char_obj(&d, buf))) {
       
