@@ -84,12 +84,18 @@ int do_spec(CHAR_DATA *ch, char *argument, int cmd)
     }
     for (int i = 0; i < 10; i++)
     { // Free up skills tied to the specilization.
+      queue<skill_t> skills_to_delete = {};
       for (auto &curr : ch->skills)
       {
         if (curr.first == spec_list[ch->spec].skills[i])
         {
-          ch->skills.erase(curr.first);
+          skills_to_delete.push(curr.first);
         }
+      }
+      while(skills_to_delete.empty() == false)
+      {
+        ch->skills.erase(skills_to_delete.front());
+        skills_to_delete.pop();
       }
     }
     ch->spec = 0;
