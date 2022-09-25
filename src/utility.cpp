@@ -2881,11 +2881,11 @@ void special_log(char *arg)
 
 void char_data::swapSkill(skill_t origSkill, skill_t newSkill)
 {
-  if (skills.contains(SPELL_ARMOR))
+  if (skills.contains(origSkill))
   {
-    skills[SPELL_AEGIS] = skills[SPELL_ARMOR];
-    skills[SPELL_AEGIS].skillnum = SPELL_AEGIS;
-    skills.erase(SPELL_ARMOR);
+    skills[newSkill] = skills[origSkill];
+    skills[newSkill].skillnum = newSkill;
+    skills.erase(origSkill);
   }
 }
 
