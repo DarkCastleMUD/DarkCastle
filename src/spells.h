@@ -358,7 +358,7 @@ void check_maxes(CHAR_DATA *ch);
 #define SKILL_ICE_ARROW              381
 #define SKILL_TEMPEST_ARROW          382
 #define SKILL_GRANITE_ARROW          383
-#define DO_NOT_USE_I_SUCK	     384 // Oh how convenient skills are for this, 
+#define DO_NOT_USE	     384 // Oh how convenient skills are for this, 
 					// and so bad looking. yay. I want mysql.
 #define META_REIMB		     385
 #define SKILL_COMBAT_MASTERY		     386
