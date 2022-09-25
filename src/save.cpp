@@ -606,9 +606,7 @@ int char_to_store_variable_data(CHAR_DATA * ch, FILE * fpsave)
   {
     fwrite("SKL", sizeof(char), 3, fpsave);
     fwrite(&(skill.first), sizeof(skill.first), 1, fpsave);
-    //cerr << "SKL " << skill->skillnum << endl;
     fwrite(&(skill.second.learned), sizeof(skill.second.learned), 1, fpsave);
-    // this writes all 5 of them
     fwrite(&(skill.second.unused), sizeof(skill.second.unused[0]), 5, fpsave);
   }
   fwrite("END", sizeof(char), 3, fpsave);
