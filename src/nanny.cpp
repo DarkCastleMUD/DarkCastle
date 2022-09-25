@@ -555,8 +555,11 @@ void do_on_login_stuff(char_data *ch)
    }
    if (GET_CLASS(ch) == CLASS_RANGER && GET_LEVEL(ch) > 9)
    {
-      ch->swapSkill(SKILL_SHIELDBLOCK, SKILL_DODGE);
-      ch->setSkillMin(SKILL_DODGE, 50);
+      if (ch->skills.contains(SKILL_SHIELDBLOCK))
+      {
+         ch->swapSkill(SKILL_SHIELDBLOCK, SKILL_DODGE);
+         ch->setSkillMin(SKILL_DODGE, 50);
+      }
    }
    if (GET_CLASS(ch) == CLASS_ANTI_PAL && GET_LEVEL(ch) >= 44)
    {
