@@ -619,20 +619,23 @@ void do_on_login_stuff(char_data *ch)
 
    class_skill_defines *c_skills = get_skill_list(ch);
 
-   queue<skill_t> skills_to_delete = {};
-   for(auto& curr : ch->skills)
+   if (IS_MORTAL(ch))
    {
-      if (curr.first < 600 && search_skills2(curr.first, c_skills) == -1 && search_skills2(curr.first, g_skills) == -1 && curr.first != 385)
+      queue<skill_t> skills_to_delete = {};
+      for(auto& curr : ch->skills)
       {
-         log(fmt::format("Removing skill {} from {}", curr.first, GET_NAME(ch)), IMMORTAL, LOG_PLAYER);
-         ch->send(fmt::format("Removing skill {}\r\n", curr.first));
-         skills_to_delete.push(curr.first);
+         if (curr.first < 600 && search_skills2(curr.first, c_skills) == -1 && search_skills2(curr.first, g_skills) == -1 && curr.first != META_REIMB && curr.first != NEW_SAVE)
+         {
+            log(fmt::format("Removing skill {} from {}", curr.first, GET_NAME(ch)), IMMORTAL, LOG_PLAYER);
+            //ch->send(fmt::format("Removing skill {}\r\n", curr.first));
+            skills_to_delete.push(curr.first);
+         }
       }
-   }
-   while(skills_to_delete.empty() == false)
-   {
-      ch->skills.erase(skills_to_delete.front());
-      skills_to_delete.pop();
+      while(skills_to_delete.empty() == false)
+      {
+         ch->skills.erase(skills_to_delete.front());
+         skills_to_delete.pop();
+      }
    }
 
    barb_magic_resist(ch, 0, has_skill(ch, SKILL_MAGIC_RESIST));
