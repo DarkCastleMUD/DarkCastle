@@ -1313,7 +1313,7 @@ int do_sedit(struct char_data *ch, char *argument, int cmd)
                          "  {:<18}  {:<4}  Learned\r\n"
                          "$3-------------------------------------$R\r\n",
                         GET_NAME(vict), "Skill", "#"));
-    for (auto& skill : ch->skills)
+    for (auto& skill : vict->skills)
     {
       const char *skillname = get_skill_name(skill.first);
 
