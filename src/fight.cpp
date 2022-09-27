@@ -5088,6 +5088,8 @@ void raw_kill(CHAR_DATA * ch, CHAR_DATA * victim)
   if (GET_CLASS(victim) == CLASS_MONK)
     GET_AC(victim) -= (GET_LEVEL(victim) * 2);
   GET_AC(victim) -= has_skill(victim, SKILL_COMBAT_MASTERY)/2;
+  GET_COND(victim,FULL) = 0;
+  GET_COND(victim,THIRST) = 0;
 
   if (victim && IS_SET(victim->combat, COMBAT_BERSERK))
   {
@@ -5997,6 +5999,8 @@ void do_pkill(CHAR_DATA *ch, CHAR_DATA *victim, int type, bool vict_is_attacker)
   
   GET_POS(victim) = POSITION_RESTING;
   GET_COND(victim, DRUNK) = 0;
+  GET_COND(victim,FULL) = 0;
+  GET_COND(victim,THIRST) = 0;
 
   save_char_obj(victim);
 
