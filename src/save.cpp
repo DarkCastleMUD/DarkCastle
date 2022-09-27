@@ -55,7 +55,7 @@ extern CWorld world;
 struct obj_data * obj_store_to_char( CHAR_DATA *ch, FILE *fpsave, struct obj_data * last_cont );
 bool put_obj_in_store( struct obj_data *obj, CHAR_DATA *ch, FILE *fpsave, int wear_pos);
 void restore_weight(struct obj_data *obj);
-void store_to_char(struct char_file_u *st, CHAR_DATA *ch);
+void store_to_char(struct char_file_u4 *st, CHAR_DATA *ch);
 char *fread_alias_string(FILE *fpsave);
 
 // return 1 on success
@@ -768,7 +768,7 @@ void save_char_obj_db(CHAR_DATA *ch)
   // so weapons stop falling off
   SETBIT(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT); 
   
-  char_file_u uchar;
+  char_file_u4 uchar;
   time_data tmpage;
   memset(&uchar, 0, sizeof(uchar));
   memset(&tmpage, 0, sizeof(tmpage));
@@ -830,7 +830,7 @@ void save_char_obj_db(CHAR_DATA *ch)
 // maybe modify it to save mobs for quest purposes too
 void save_char_obj (CHAR_DATA *ch)
 {
-  char_file_u uchar;
+  char_file_u4 uchar;
   time_data tmpage;
   FILE * fpsave  = 0;
   char strsave[MAX_INPUT_LENGTH] = {0};
@@ -926,7 +926,7 @@ bool load_char_obj( struct descriptor_data *d, const char *name )
 {
   FILE *  fpsave  = NULL;
   char    strsave[MAX_INPUT_LENGTH];
-  struct  char_file_u   uchar;
+  struct  char_file_u4   uchar;
   struct obj_data * last_cont = NULL;
   struct  char_data *ch;
 
@@ -1513,7 +1513,7 @@ void restore_weight(struct obj_data *obj)
 
 void donothin() {}
 // Read shared data from pfile
-void store_to_char(struct char_file_u *st, CHAR_DATA *ch)
+void store_to_char(struct char_file_u4 *st, CHAR_DATA *ch)
 {
     int i;
 
@@ -1597,7 +1597,7 @@ void store_to_char(struct char_file_u *st, CHAR_DATA *ch)
 
 // copy vital data from a players char-structure to the file structure 
 // return 'age' of character unmodified
-void char_to_store(CHAR_DATA *ch, struct char_file_u *st, struct time_data & tmpage)
+void char_to_store(CHAR_DATA *ch, struct char_file_u4 *st, struct time_data & tmpage)
 {
   int i;
   int x;

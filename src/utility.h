@@ -470,7 +470,7 @@ void save_char_obj_db(CHAR_DATA *ch);
 #endif
 
 void unique_scan(struct char_data *victim);
-void char_to_store(CHAR_DATA *ch, struct char_file_u *st, struct time_data & tmpage);
+void char_to_store(CHAR_DATA *ch, struct char_file_u4 *st, struct time_data & tmpage);
 bool obj_to_store( struct obj_data *obj, CHAR_DATA *ch, FILE *fpsave, int wear_pos );
 void check_idling(CHAR_DATA *ch);
 void stop_follower(CHAR_DATA *ch, int cmd);

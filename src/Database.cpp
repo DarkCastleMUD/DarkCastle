@@ -32,7 +32,7 @@ Database::Database()
   }
 }
 
-  /* PQprepare(conn, "char_file_u_INSERT", "UPDATE players 
+  /* PQprepare(conn, "char_file_u4_INSERT", "UPDATE players 
 
   const char *players_cols[] = {"sex", "c_class", "race", "level",
 			      "raw_str", "raw_intel", "raw_wiz", "raw_dex",
@@ -115,7 +115,7 @@ int Database::createPlayerID(char *name)
   return player_id;         
 }
 
-void Database::save(CHAR_DATA *ch, char_file_u *st)
+void Database::save(CHAR_DATA *ch, char_file_u4 *st)
 {
   if (ch == 0 || st == 0 || IS_NPC(ch))
     return;
@@ -133,7 +133,7 @@ void Database::save(CHAR_DATA *ch, char_file_u *st)
     }    
   }
 
-  Prepare p = createPrepare("char_file_u_update");
+  Prepare p = createPrepare("char_file_u4_update");
   p.setTableName("players");
   p.addCol("sex", st->sex);
   p.addCol("c_class", st->c_class);
@@ -194,7 +194,7 @@ void Database::save(CHAR_DATA *ch, char_file_u *st)
   if (false && p.lastResult) {
     char *buffer = PQcmdTuples(p.lastResult);
     if (buffer && !strcmp("0", buffer)) {
-      Prepare p2 = createPrepare("char_file_u_insert");
+      Prepare p2 = createPrepare("char_file_u4_insert");
       p2.setTableName("players");
       p2.addCol("sex", st->sex);
       p2.addCol("c_class", st->c_class);

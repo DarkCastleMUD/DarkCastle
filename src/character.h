@@ -513,59 +513,70 @@ class communication
 // a 'saved' mob, and for a player
 // Note, any "strings" are done afterwards in the functions.  Since these
 // are variable length, we can't do them with a single write
-struct char_file_u
-{
-    sbyte sex;         /* Sex */
-    sbyte c_class;     /* Class */
-    sbyte race;        /* Race */
-    sbyte level;       /* Level */
-   
-    sbyte raw_str;
-    sbyte raw_intel;
-    sbyte raw_wis;
-    sbyte raw_dex;
-    sbyte raw_con;
-    sbyte conditions[3]; 
 
-    ubyte weight;
-    ubyte height;
+// This structure was created as a replacement for char_file_u4 so that it
+// would be portable between 32-bit and 64-bit code unlike char_file_u4.
+struct char_file_u4
+{    
+    char_file_u4();
+    sbyte sex = {};     /* Sex */
+    sbyte c_class = {}; /* Class */
+    sbyte race = {};    /* Race */
+    sbyte level = {};   /* Level */
 
-    int16 hometown;
-    uint32 gold;
-    uint32 plat;
-    int64 exp;
-    uint32 immune;
-    uint32 resist;
-    uint32 suscept;
+    sbyte raw_str = {};
+    sbyte raw_intel = {};
+    sbyte raw_wis = {};
+    sbyte raw_dex = {};
 
-    int32 mana;        // current
-    int32 raw_mana;    // max without eq/stat bonuses
-    int32 hit;
-    int32 raw_hit;
-    int32 move;
-    int32 raw_move;
-    int32 ki;
-    int32 raw_ki;
+    sbyte raw_con = {};
+    sbyte conditions[3] = {};
 
-    int16 alignment;
-   uint32 hpmetas; // Used by familiars too... why not.
-   uint32 manametas;
-   uint32 movemetas;
+    ubyte weight = {};
+    ubyte height = {};
+    int16 hometown = {};
 
-    int16 armor;       // have to save these since mobs have different bases
-    int16 hitroll;
-    int16 damroll;
-    int32 afected_by;
-    int32 afected_by2;
-    uint32 misc;          // channel flags
+    uint32 gold = {};
+    uint32 plat = {};
+    int64 exp = {};
+    uint32 immune = {};
+    uint32 resist = {};
+    uint32 suscept = {};
 
-    int16 clan; 
-    int32 load_room;                  // Which room to place char in
+    int32 mana = {};     // current
+    int32 raw_mana = {}; // max without eq/stat bonuses
+    int32 hit = {};
+    int32 raw_hit = {};
+    int32 move = {};
+    int32 raw_move = {};
+    int32 ki = {};
+    int32 raw_ki = {};
 
-    uint32 acmetas;
-    int32 agemetas;
-    int32 extra_ints[3];             // available just in case
-};
+    int16 alignment = {};
+    int16 unused1 = {};
+
+    uint32 hpmetas = {}; // Used by familiars too... why not.
+    uint32 manametas = {};
+    uint32 movemetas = {};
+
+    int16 armor = {}; // have to save these since mobs have different bases
+    int16 hitroll = {};
+
+    int16 damroll = {};
+    int16 unused2 = {};
+
+    int32 afected_by = {};
+    int32 afected_by2 = {};
+    uint32 misc = {}; // channel flags
+
+    int16 clan = {};
+    int16 unused3 = {};
+    int32 load_room = {}; // Which room to place char in
+
+    uint32 acmetas = {};
+    int32 agemetas = {};
+    int32 extra_ints[3] = {}; // available just in case
+} __attribute__((packed));
 
 struct profession {
 	std::string name;
