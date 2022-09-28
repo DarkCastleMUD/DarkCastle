@@ -3039,7 +3039,7 @@ void check_victory(struct takeover_pulse_data *take)
 
 void check_quitter(void *arg1, void *arg2,void *arg3)
 {
-  int clan = (int)arg1;
+  int clan = (int64_t)arg1;
   char buf[MAX_STRING_LENGTH];
   if (count_controlled_areas(clan) > online_clan_members(clan))
   { // One needs to go.
