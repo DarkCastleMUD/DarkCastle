@@ -680,7 +680,7 @@ void show_string(struct descriptor_data *d, const char *input) {
 	}
 	/* Or if we have more to show.... */
 	else {
-		strncpy(buffer, d->showstr_vector[d->showstr_page], diff = ((int) d->showstr_vector[d->showstr_page + 1]) - ((int) d->showstr_vector[d->showstr_page]));
+		strncpy(buffer, d->showstr_vector[d->showstr_page], diff = (d->showstr_vector[d->showstr_page + 1]) - (d->showstr_vector[d->showstr_page]));
 		buffer[diff] = '\0';
 		send_to_char(buffer, d->character);
 		d->showstr_page++;
