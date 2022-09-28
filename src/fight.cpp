@@ -1366,7 +1366,7 @@ int one_hit(CHAR_DATA *ch, CHAR_DATA *vict, int type, int weapon)
     w_type = SKILL_JAB;
   
   if(wielded)  {
-    if(affected_by_spell(ch, SKILL_SMITE) && affected_by_spell(ch, SKILL_SMITE)->modifier == (int)vict)
+    if(affected_by_spell(ch, SKILL_SMITE) && affected_by_spell(ch, SKILL_SMITE)->victim == vict)
       for(int i = 0; i < wielded->obj_flags.value[1]; i++)
         dam += wielded->obj_flags.value[2] - number(0,1);
     else 
@@ -5963,7 +5963,7 @@ void do_pkill(CHAR_DATA *ch, CHAR_DATA *victim, int type, bool vict_is_attacker)
   if(type == KILL_POISON && affected_by_spell(victim, SPELL_POISON)->modifier > 0) {
 		auto &character_list = DC::instance().character_list;
 		for (auto& findchar : character_list) {
-      if ((int)findchar == affected_by_spell(victim, SPELL_POISON)->modifier)
+      if (findchar == affected_by_spell(victim, SPELL_POISON)->origin)
         ch = findchar;
 		}
   }
