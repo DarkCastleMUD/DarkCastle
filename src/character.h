@@ -300,26 +300,34 @@ struct mob_flag_data
 
 struct mob_data
 {
-    int32 nr;
-    sbyte default_pos;    // Default position for NPC
-    sbyte last_direction; // Last direction the mobile went in
-    uint32 attack_type;    // Bitvector of damage type for bare-handed combat
-    uint32 actflags[ACT_MAX/ASIZE+1]; // flags for NPC behavior
+    public:
+    int32 nr = {};
+    sbyte default_pos = {};    // Default position for NPC
+    sbyte last_direction = {}; // Last direction the mobile went in
+    uint32 attack_type = {};    // Bitvector of damage type for bare-handed combat
+    uint32 actflags[ACT_MAX/ASIZE+1] = {}; // flags for NPC behavior
 
-    int16 damnodice;         // The number of damage dice's           
-    int16 damsizedice;       // The size of the damage dice's         
+    int16 damnodice = {};         // The number of damage dice's           
+    int16 damsizedice = {};       // The size of the damage dice's         
 
-    char *fears;       /* will flee from ths person on sight     */
-    char *hatred;      /* List of PC's I hate */
+    char *fears = {};       /* will flee from ths person on sight     */
+    char *hatred = {};      /* List of PC's I hate */
 
-    MPROG_ACT_LIST *    mpact; // list of MOBProgs
-     int16                 mpactnum; // num
-    int32 last_room; // Room rnum the mob was last in. Used
+    MPROG_ACT_LIST *    mpact = {}; // list of MOBProgs
+     int16                 mpactnum = {}; // num
+    int32 last_room = {}; // Room rnum the mob was last in. Used
 		      // For !magic,!track changing flags.
-    struct threat_struct *threat;
-    struct reset_com *reset;
-	mob_flag_data mob_flags;            /* Mobile information               */
-    bool paused;
+    struct threat_struct *threat = {};
+    struct reset_com *reset = {};
+	mob_flag_data mob_flags = {};            /* Mobile information               */
+    bool paused = {};
+
+    void setObject(obj_data *);
+    obj_data* getObject(void);
+    bool isObject(void);
+    
+    private:
+    obj_data *object = {};
 };
 
 // CHAR_DATA, char_data

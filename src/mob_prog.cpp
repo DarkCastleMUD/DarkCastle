@@ -1730,8 +1730,10 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
     case eISWORN:
     {
         OBJ_DATA *o = NULL;
-	if ((unsigned int)mob->mobdata->last_room > 50000) // an object
-	 o = (OBJ_DATA*) mob->mobdata->last_room;
+		if (mob->mobdata->isObject())
+		{
+			o = mob->mobdata->getObject();
+		}
 	if (fvict)
    	  return is_wearing(fvict, o);
 	if (ye) return FALSE;
@@ -4020,7 +4022,7 @@ CHAR_DATA *initiate_oproc(CHAR_DATA *ch, OBJ_DATA *obj)
   if (ch)    char_to_room(temp, ch->in_room);
   else       char_to_room(temp,obj->in_room);
   if (ch) temp->beacon = (OBJ_DATA*) ch;
-  temp->mobdata->last_room = (int)obj;
+  temp->mobdata->setObject(obj);
 //  temp->master = ch;
  // dc_free(temp->short_desc);
   temp->short_desc = str_hsh(obj->short_description);
