@@ -188,14 +188,16 @@ struct class_skill_defines
 /* Used in CHAR_FILE_U *DO*NOT*CHANGE* */
 struct affected_type
 {
-    uint32 type;           /* The type of spell that caused ths      */
-    int16  duration;       /* For how long its effects will last      */
-    int32  duration_type;  
-    int32  modifier;       /* This is added to apropriate ability     */
-    int32  location;       /* Tells which ability to change(APPLY_XXX)*/
-    int32 bitvector;      /* Tells which bits to set (AFF_XXX)       */
-    std::string caster;
-    struct affected_type *next;
+    uint32 type = {};           /* The type of spell that caused ths      */
+    int16  duration = {};       /* For how long its effects will last      */
+    int32  duration_type = {};  
+    int32  modifier = {};       /* This is added to apropriate ability     */
+    int32  location = {};       /* Tells which ability to change(APPLY_XXX)*/
+    int32 bitvector = {};      /* Tells which bits to set (AFF_XXX)       */
+    std::string caster = {};
+    struct affected_type *next = {};
+    char_data *origin = {};    
+    char_data *victim = {};
 };
 
 
