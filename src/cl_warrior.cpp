@@ -1338,7 +1338,8 @@ int do_smite(struct char_data *ch, char *argument, int cmd)
 
     af.type = SKILL_SMITE;
     af.location = 0;
-    af.modifier = (int)vict;
+    af.modifier = 0;
+    af.victim = vict;
     af.duration = 1 + learned/16;
     af.bitvector = -1;
 
