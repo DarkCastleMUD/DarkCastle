@@ -611,7 +611,7 @@ int do_zone_single_edit(struct char_data * ch, char * argument, int zone)
             break;
         }
         zone_table[zone].cmd[cmd].arg3 = i;
-        sprintf(select, "Arg 3 set to %ld.\r\n", vnum);
+        sprintf(select, "Arg 3 set to %ld.\r\n", i);
         send_to_char(select, ch);
       }
     }
