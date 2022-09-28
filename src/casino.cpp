@@ -426,7 +426,7 @@ void check_active(void *arg1, void *arg2, void *arg3)
   if (!ptmp) return; // handled elsewhere
   if (!verify(plr) ) return;
 
-  if ((int)arg2 == plr->table->handnr || (int)arg2 == (plr->table->handnr+100) *2)
+  if ((int64_t)arg2 == plr->table->handnr || (int64_t)arg2 == (plr->table->handnr+100) *2)
   {
 	  struct timer_data *timer;
  #ifdef LEAK_CHECK
@@ -435,7 +435,7 @@ void check_active(void *arg1, void *arg2, void *arg3)
 	  timer = (struct timer_data *)dc_alloc(1, sizeof(struct timer_data));
  #endif
 	  timer->arg1 = (void*)plr;
-	  timer->arg2 = (void*)(((int)arg2 + 100)*2);
+	  timer->arg2 = (void*)(((int64_t)arg2 + 100)*2);
 	  timer->arg3 = (void*)plr->table;
 	  timer->function = check_active;
 	  timer->timeleft = 10;
@@ -445,7 +445,7 @@ void check_active(void *arg1, void *arg2, void *arg3)
 	  send_to_table(buf, plr->table, plr);
 	  send_to_char("The dealer nudges you.\r\n",plr->ch);	  
   }
-  if ((int)arg2 == (((plr->table->handnr+100)*2+100)*2))
+  if ((uint64_t)arg2 == (((plr->table->handnr+100)*2+100)*2))
   {// inactive
 	struct table_data *tbl = plr->table;
 	CHAR_DATA *ch = plr->ch;
@@ -485,7 +485,7 @@ void add_timer(struct player_data *plr)
   timer = (struct timer_data *)dc_alloc(1, sizeof(struct timer_data));
  #endif
   timer->arg1 = (void*)plr;
-  timer->arg2 = (void*)plr->table->handnr;
+  timer->arg2 = (void*)(int64_t)plr->table->handnr;
   timer->arg3 = (void*)plr->table;
   timer->function = check_active;
 //  timer->next = timer_list;
@@ -528,9 +528,9 @@ void add_timer_bj_dealer2(struct table_data *tbl, int time = 10)
   timer = (struct timer_data *)dc_alloc(1, sizeof(struct timer_data));
  #endif
   timer->arg1 = (void*)tbl;
-  timer->arg2 = (void*)(++tbl->handnr);
+  timer->arg2 = (void*)(int64_t)(++tbl->handnr);
   if (tbl->handnr == 0) // not plausible, but possible
-    timer->arg2 = (void*)(++tbl->handnr);
+    timer->arg2 = (void*)(int64_t)(++tbl->handnr);
   timer->function = bj_dealer_ai;
   timer->timeleft = time;
   addtimer(timer);
@@ -637,7 +637,7 @@ void check_winner(struct table_data *tbl)
 void bj_dealer_ai(void *arg1, void *arg2, void *arg3)
 {
   struct table_data *tbl = (table_data *) arg1;
-  int a = (int)arg2;
+  int a = (int64_t)arg2;
   char buf[MAX_STRING_LENGTH];
   if (a && tbl->handnr != a) return; // handled earlier
   bool cont = FALSE;
@@ -2023,8 +2023,8 @@ void slot_timer(struct machine_data *machine, int stop1, int stop2, int delay)
  #endif
 
    timer->arg1 = (void*)machine;
-   timer->arg2 = (void*)stop1;
-   timer->arg3 = (void*)stop2;
+   timer->arg2 = (void *)(int64_t)stop1;
+   timer->arg3 = (void*)(int64_t)stop2;
    timer->function = reel_spin;
    timer->timeleft = delay;
    addtimer(timer);
@@ -2033,8 +2033,8 @@ void slot_timer(struct machine_data *machine, int stop1, int stop2, int delay)
 void reel_spin(void *arg1, void *arg2, void *arg3)
 {
    struct machine_data *machine = (struct machine_data *) arg1;
-   int stop1 = (int)arg2;
-   int stop2 = (int)arg3;
+   int stop1 = (int64_t)arg2;
+   int stop2 = (int64_t)arg3;
 
    char buf[MAX_STRING_LENGTH];
 
@@ -2450,7 +2450,7 @@ void roulette_timer(struct wheel_data *wheel, int spin)
  #endif
 
    timer->arg1 = (void*)wheel;
-   timer->arg2 = (void*)spin;
+   timer->arg2 = (void*)(int64_t)spin;
    timer->function = pulse_countdown;
    timer->timeleft = 4;
    addtimer(timer);
@@ -2459,7 +2459,7 @@ void roulette_timer(struct wheel_data *wheel, int spin)
 void pulse_countdown(void *arg1, void *arg2, void *arg3)
 {
    struct wheel_data *wheel = (struct wheel_data *) arg1;
-   int spin = (int) arg2;
+   int spin = (int64_t)arg2;
    char buf[MAX_STRING_LENGTH];
 
    if(wheel->countdown <= 0 && !spin) {
