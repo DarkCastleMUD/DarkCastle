@@ -830,13 +830,12 @@ void save_char_obj_db(CHAR_DATA *ch)
 // maybe modify it to save mobs for quest purposes too
 void save_char_obj (CHAR_DATA *ch)
 {
-  char_file_u4 uchar;
+  char_file_u4 uchar = {};
   time_data tmpage;
   FILE * fpsave  = 0;
   char strsave[MAX_INPUT_LENGTH] = {0};
   char name[200] = {0};
 
-  memset(&uchar, 0, sizeof(uchar));
   memset(&tmpage, 0, sizeof(tmpage));
 
   if(IS_NPC(ch) || GET_LEVEL(ch) < 1)
