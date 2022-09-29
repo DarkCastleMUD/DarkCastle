@@ -473,6 +473,7 @@ command_return_t do_qui(CHAR_DATA *ch, char *argument, int cmd);
 command_return_t do_quivering_palm(CHAR_DATA *ch, char *argument, int cmd);
 command_return_t do_quit(CHAR_DATA *ch, char *argument, int cmd);
 command_return_t do_rage(CHAR_DATA *ch, char *argument, int cmd);
+command_return_t do_random(CHAR_DATA *ch, char *argument, int cmd);
 command_return_t do_range(CHAR_DATA *ch, char *argument, int cmd);
 command_return_t do_rdelete(CHAR_DATA *ch, char *argument, int cmd);
 command_return_t do_read(CHAR_DATA *ch, char *argument, int cmd);
