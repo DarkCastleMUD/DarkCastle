@@ -25,9 +25,9 @@ namespace Combinables {
 	  
 	return false;	      
       }
-      int32_t herb;
-      int32_t liquid;
-      int32_t container;
+      int32_t herb = {};
+      int64_t liquid = {};
+      int32_t container = {};
     };
 
     Brew();
