@@ -662,7 +662,7 @@ void update_bard_singing() {
 				}
 				(*j).song_timer = 0;
 				if ((*j).song_data) {
-					if ((int) (*j).song_data > 10) // Otherwise it's a temp variable.
+					if ((int64_t) (*j).song_data > 10) // Otherwise it's a temp variable.
 			dc_free((*j).song_data);
 			(*j).song_data = 0;
 		}
@@ -700,7 +700,7 @@ void update_bard_singing() {
 				}
 			}
 			if ((*j).song_data) {
-				if ((int) (*j).song_data > 10) // Otherwise it's a temp variable.
+				if ((int64_t) (*j).song_data > 10) // Otherwise it's a temp variable.
 				dc_free((*j).song_data);
 				(*j).song_data = 0;
 			}
@@ -728,7 +728,7 @@ void update_bard_singing() {
 				}
 			}
 			if ((*j).song_data) {
-				if ((int) (*j).song_data > 10) // Otherwise it's a temp variable.
+				if ((int64_t) (*j).song_data > 10) // Otherwise it's a temp variable.
 				dc_free((*j).song_data);
 				(*j).song_data = 0;
 			}
@@ -751,7 +751,7 @@ void update_bard_singing() {
 				}
 				(*j).song_timer = 0;
 				if ((*j).song_data) {
-					if ((int) (*j).song_data > 10) // Otherwise it's a temp variable.
+					if ((int64_t) (*j).song_data > 10) // Otherwise it's a temp variable.
 					dc_free((*j).song_data);
 					(*j).song_data = 0;
 				}
@@ -2941,11 +2941,11 @@ int execute_song_crushing_crescendo(ubyte level, CHAR_DATA *ch, char *arg, CHAR_
 
 	int j;
 	dam = ((has_skill(ch, SKILL_SONG_CRUSHING_CRESCENDO)) + 25);
-	for (j = 0; j < (int) (*i).song_data; j++)
+	for (j = 0; j < (int64_t) (*i).song_data; j++)
 		dam = dam * 2;
 	dam += combat * 5; // Make it hurt some more.
 //   if ((int)(*i).song_data < 3) // Doesn't help beyond that.
-	(*i).song_data = (char*) ((int) (*i).song_data + 1); // Add one round.
+	(*i).song_data = (char*) ((int64_t) (*i).song_data + 1); // Add one round.
 	// Bleh, C allows easier pointer manipulation
 	if (IS_SET(victim->immune, ISR_SONG)) {
 		act("$N laughs at your crushing crescendo!", ch, 0, victim, TO_CHAR, 0);
@@ -2960,7 +2960,7 @@ int execute_song_crushing_crescendo(ubyte level, CHAR_DATA *ch, char *arg, CHAR_
 		}
 		char dmgmsg[MAX_STRING_LENGTH];
 		sprintf(dmgmsg, "$B%d$R", dam);
-		switch ((int) (*i).song_data) {
+		switch ((int64_t) (*i).song_data) {
 		case 1:
 			send_damage("$N is injured for | damage by the strength of your music!", ch, 0, victim, dmgmsg, "$N is injured by the strength of your music!",
 			TO_CHAR);
@@ -3014,13 +3014,13 @@ int execute_song_crushing_crescendo(ubyte level, CHAR_DATA *ch, char *arg, CHAR_
 		return retval;
 	}
 
-	if ((int) (*i).song_data > has_skill(ch, SKILL_SONG_CRUSHING_CRESCENDO) / 20 || (int) (*i).song_data > 3) {
+	if ((int64_t) (*i).song_data > has_skill(ch, SKILL_SONG_CRUSHING_CRESCENDO) / 20 || (int64_t) (*i).song_data > 3) {
 		send_to_char("You run out of lyrics and end the song.\r\n", ch);
 		ch->songs.erase(i);
 		return eEXTRA_VALUE;
 	}
 
-	if (((int) (*i).song_data) != 3) {
+	if (((int64_t) (*i).song_data) != 3) {
 		if (GET_KI(ch) < song_info[(*i).song_number].min_useski) {
 			send_to_char("Having run out of ki, your song ends abruptly.\r\n", ch);
 			(*i).song_data = 0; // Reset, just in case.
