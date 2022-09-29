@@ -210,6 +210,7 @@ struct obj_flag_data
     uint32 more_flags;     /* A second bitvector (extra_flags2)*/
      int16 eq_level;	/* Min level to use it for eq       */
      int16 timer;          /* Timer for object                 */
+     char_data *origin;    /* Creator of object, previously was stored at value[3] */
 };
 
 struct obj_affected_type
