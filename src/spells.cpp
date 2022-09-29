@@ -2016,7 +2016,7 @@ int do_cast(CHAR_DATA *ch, char *argument, int cmd)
       {
         argument = skip_spaces(argument);
 
-        for (int i = 0; i < MAX_SPL_LIST; i++)
+        for (int64_t i = 0; i < MAX_SPL_LIST; i++)
         {
           if (!strcmp(spells[i], argument))
           {
