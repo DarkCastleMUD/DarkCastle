@@ -1983,13 +1983,13 @@ affected_type * affected_by_spell(CHAR_DATA *ch, int skill) {
 	struct affected_type *curr;
 
 	if (skill < 0)  // all affect types are unsigned
-		return NULL;
+		return nullptr;
 
 	for (curr = ch->affected; curr; curr = curr->next)
 		if (curr->type == (unsigned) skill)
 			return curr;
 
-	return NULL;
+	return nullptr;
 }
 
 affected_type * affected_by_random(CHAR_DATA *ch) {
