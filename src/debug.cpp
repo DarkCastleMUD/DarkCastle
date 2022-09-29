@@ -219,6 +219,8 @@ int main(int argc, char **argv)
       strncpy(c_input, c_arg2, sizeof(c_input) - 1);
     } while (c_arg1[0] != '\0');
 
+    cerr << sizeof(char_file_u) << " " << sizeof(char_file_u4) << endl;
+
     exit(0);
   }
 
