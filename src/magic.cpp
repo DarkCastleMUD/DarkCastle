@@ -1409,13 +1409,16 @@ int spell_dispel_evil(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
 {
   if(obj && obj->in_room && obj->obj_flags.value[0] == SPELL_DESECRATE) { // desecrate object
    CHAR_DATA *pal=NULL;
-   if( (pal = ((CHAR_DATA *)(obj->obj_flags.value[3]) )  )  && charExists(pal)) {
-    pal->cRooms--;
-    if(pal->in_room == obj->in_room) {
-     send_to_char("The runes upon the ground shatter with a burst of magic!\r\nYour unholy desecration has been destroyed!\r\n", pal);
-     victim = pal;
-    }
-    else csendf(pal, "You sense your desecration of %s has been destroyed!", world[obj->in_room].name);
+   if ((pal = obj->obj_flags.origin) && charExists(pal))
+   {
+     pal->cRooms--;
+     if (pal->in_room == obj->in_room)
+     {
+       send_to_char("The runes upon the ground shatter with a burst of magic!\r\nYour unholy desecration has been destroyed!\r\n", pal);
+       victim = pal;
+     }
+     else
+       csendf(pal, "You sense your desecration of %s has been destroyed!", world[obj->in_room].name);
    }
    send_to_char("The runes upon the ground shatter with a burst of magic!\r\nThe unholy desecration has been destroyed!\r\n", ch);
    act("The runes upon the ground shatter with a burst of magic!\n\r$n has destroyed the unholy desecration here!", ch, 0, victim, TO_ROOM, NOTVICT);
@@ -1450,7 +1453,7 @@ int spell_dispel_good(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_
 {
   if(obj && obj->in_room && obj->obj_flags.value[0] == SPELL_CONSECRATE) { // consecrate object
    CHAR_DATA *pal=NULL;
-   if( (pal = (CHAR_DATA *)(obj->obj_flags.value[3])) && charExists(pal) ) {
+   if( (pal = obj->obj_flags.origin) && charExists(pal) ) {
     pal->cRooms--;
     if(pal->in_room == obj->in_room) {
      send_to_char("The runes upon the ground glow brightly, then fade to nothing.\r\nYour holy consecration has been destroyed!\r\n", pal);
@@ -2891,7 +2894,16 @@ int spell_poison(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data 
      if (!endy) {
         af.type = SPELL_POISON;
         af.duration = skill / 10;
-        af.modifier = IS_NPC(ch)?-123:(int)ch;
+        if (IS_NPC(ch))
+        {
+          af.modifier = -123;
+          af.origin = {};
+        }
+        else
+        {
+          af.modifier = {};
+          af.origin = ch;
+        }
         af.location = APPLY_NONE;
         af.bitvector = AFF_POISON;
         affect_join(victim, &af, FALSE, FALSE);
@@ -5008,7 +5020,7 @@ int spell_dispel_minor(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
    int done = FALSE;
    int retval;
 
-   if(obj && (unsigned int)obj > 100) /* Trying to dispel_minor an obj */
+   if(obj && (uint64_t)obj > 100) /* Trying to dispel_minor an obj */
    {   // Heh, it passes spell cast through obj now too. Less than 100 = not 
        // an actual obj.
       if(GET_ITEM_TYPE(obj) != ITEM_BEACON) {
@@ -5049,7 +5061,7 @@ int spell_dispel_minor(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
       extract_obj(obj);
       return eSUCCESS;
    }
-   int spell = (int) obj;
+   int spell = (int64_t) obj;
    if(!ch || !victim)
    {
       log("Null ch or victim sent to dispel_minor!", ANGEL, LOG_BUG);
@@ -5288,12 +5300,11 @@ int spell_dispel_minor(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj
 
 /* DISPEL MAGIC */
 
-int spell_dispel_magic(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill)
+int spell_dispel_magic(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, struct obj_data *obj, int skill, int spell)
 {
    int rots = 0;
    int done = FALSE;
    int retval;
-   int spell = (int) obj;
 
    if(!ch || !victim)
    {
@@ -9330,7 +9341,7 @@ int cast_dispel_magic( ubyte level, CHAR_DATA *ch, char *arg, int type,
   }
   switch (type) {
   case SPELL_TYPE_SPELL:
-	 return spell_dispel_magic(level, ch, tar_ch, (obj_data*) spell, skill);
+	 return spell_dispel_magic(level, ch, tar_ch, 0, skill, spell);
 	 break;
   case SPELL_TYPE_POTION:
 	 tar_ch = ch;
@@ -9375,15 +9386,17 @@ int cast_dispel_minor( ubyte level, CHAR_DATA *ch, char *arg, int type,
   one_argument(arg, buffer);
   if (!tar_obj && type == SPELL_TYPE_SPELL && arg && *arg)
   {
-    int i;
+    int i = {};
     for (i = 1; *dispel_minor_spells[i] != '\n'; i++)
     {
        if (!str_prefix(buffer, dispel_minor_spells[i]))
-	 spell = i;
+       {
+	      spell = i;
+       }
     }
-    if (spell)
-	   tar_obj = (struct obj_data *) spell;
-    else {
+
+    if (spell == 0)
+    {
       send_to_char("You cannot target that spell.\r\n",ch);
       return eFAILURE;
     }
@@ -10458,7 +10471,16 @@ int cast_creeping_death(ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DA
      if (dice(1, 100) <= poison && !IS_SET(victim->immune, ISR_POISON)) {
         af.type = SPELL_POISON;
         af.duration = skill / 27;
-        af.modifier = IS_NPC(ch)?-123:(int)ch;
+        if (IS_NPC(ch))
+        {
+          af.modifier = -123;
+        }
+        else
+        {
+          af.modifier = 0;
+          af.origin = ch;
+        }
+        
         af.location = APPLY_NONE;
         af.bitvector = AFF_POISON;
         affect_join(victim, &af, FALSE, FALSE);
@@ -11187,13 +11209,13 @@ int check_components(CHAR_DATA *ch, int destroy, int item_one = 0,
   all_ok = ((item_one != 0) && (ptr_one != 0));                                 
 
   if(all_ok && item_one)                                                        
-     all_ok = (int) ptr_one;                                                    
+     all_ok = (int64_t) ptr_one;                                                    
   if(all_ok && item_two)                                                        
-     all_ok = (int) ptr_two;                                                    
+     all_ok = (int64_t) ptr_two;                                                    
   if(all_ok && item_three)                                                      
-     all_ok = (int) ptr_three;                                                  
+     all_ok = (int64_t) ptr_three;                                                  
   if(all_ok && item_four)                                                       
-     all_ok = (int) ptr_four;                                                   
+     all_ok = (int64_t) ptr_four;                                                   
 
   if(GET_LEVEL(ch) > ARCHANGEL && !all_ok && !silent) {
      send_to_char("You didn't have the right components, but yer a god:)\r\n", ch);
@@ -13629,9 +13651,8 @@ int cast_silence(ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *tar
 
 /* IMMUNITY */
 
-int spell_immunity(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, OBJ_DATA *obj, int skill)
+int spell_immunity(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, OBJ_DATA *obj, int skill, int spl = 0)
 {
-  int spl = (int)victim;
   struct affected_type af;
 
   if( (spell_info[spl].targets & TAR_IGNORE) ) {
@@ -13723,9 +13744,8 @@ int cast_boneshield(ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *
 
 /* CHANNEL */
 
-int spell_channel(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, OBJ_DATA *obj, int skill)
+int spell_channel(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim, OBJ_DATA *obj, int skill, int heal = 0)
 {
-  int heal = (int)obj;
   char buf[MAX_STRING_LENGTH];
 
   if(!can_heal(ch, victim, SPELL_CHANNEL))
@@ -13752,7 +13772,7 @@ int cast_channel(ubyte level, CHAR_DATA *ch, char *arg, int type, CHAR_DATA *tar
     case SPELL_TYPE_WAND:
     case SPELL_TYPE_SCROLL:
     case SPELL_TYPE_STAFF:
-      return spell_channel(level, ch, tar_ch, (OBJ_DATA *)atoi(arg), skill);
+      return spell_channel(level, ch, tar_ch, 0, skill, atoi(arg));
       break;
     default:
       log("Serious screw-up in channel!", ANGEL, LOG_BUG);
@@ -14324,7 +14344,8 @@ int spell_consecrate(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim,
   cItem->obj_flags.value[0] = spl;
   cItem->obj_flags.value[1] = 2 + skill / 50;
   cItem->obj_flags.value[2] = skill;
-  cItem->obj_flags.value[3] = (int)(ch);
+  cItem->obj_flags.value[3] = {};
+  cItem->obj_flags.origin = ch;
 
   obj_to_room(cItem, ch->in_room);
 
@@ -14491,7 +14512,8 @@ int spell_desecrate(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim,
   cItem->obj_flags.value[0] = spl;
   cItem->obj_flags.value[1] = 2 + skill / 50;
   cItem->obj_flags.value[2] = skill;
-  cItem->obj_flags.value[3] = (int)(ch);
+  cItem->obj_flags.value[3] = {};
+  cItem->obj_flags.origin = ch;
 
   obj_to_room(cItem, ch->in_room);
 
