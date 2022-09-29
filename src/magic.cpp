@@ -9465,7 +9465,7 @@ int elemental_damage_bonus(int spell, char_data *ch)
         case SPELL_BURNING_HANDS:
         case SPELL_SOLAR_GATE:
         case SPELL_SPARKS:
-	   if (fire) return dice(5,6);
+	   if (fire) return dice(9,11);
 	   else return 0;
         case SPELL_METEOR_SWARM:
         case SPELL_BEE_STING:
@@ -9474,13 +9474,13 @@ int elemental_damage_bonus(int spell, char_data *ch)
   case SPELL_COLOUR_SPRAY:
   case SPELL_MAGIC_MISSILE:
   case SPELL_BEE_SWARM:
-	   if (earth) return dice(8,4);
+	   if (earth) return dice(13,7);
 	   else return 0;
 	case SPELL_CALL_LIGHTNING:
 	case SPELL_SUN_RAY:
 	case SPELL_SHOCKING_GRASP:
 	case SPELL_LIGHTNING_BOLT:
-	   if (energy) return dice(1,50);
+	   if (energy) return dice(2,60);
 	   else return 0;
 	case SPELL_DROWN:
 	case SPELL_VAMPIRIC_TOUCH:
@@ -9488,7 +9488,7 @@ int elemental_damage_bonus(int spell, char_data *ch)
 	case SPELL_DISPEL_GOOD:
 	case SPELL_CHILL_TOUCH:
   case SPELL_ICESTORM:
-	    if (ice) return dice(6,5);
+	    if (ice) return dice(11,9);
 	    else return 0;
         default: return 0;
   }
