@@ -629,7 +629,7 @@ void mob_stat(struct char_data *ch, struct char_data *k)
   }
   if (IS_NPC(k))
   {
-    sprintf(buf, "$3Mobspec$R: %d  $3Progtypes$R: %d\r\n", (int)(mob_index[k->mobdata->nr].mobspec), mob_index[k->mobdata->nr].progtypes);
+    sprintf(buf, "$3Mobspec$R: %p  $3Progtypes$R: %p\r\n", (int64_t)(mob_index[k->mobdata->nr].mobspec), mob_index[k->mobdata->nr].progtypes);
     send_to_char(buf,ch);
   }
  sprintf(buf, "$3Height$R:[%d]  $3Weight$R:[%d]  $3Sex$R:[", GET_HEIGHT(k), GET_WEIGHT(k));
