@@ -97,7 +97,7 @@ int mprog_line_num = 0;
  */
 
 int	mprog_seval		(char_data *ch, char* lhs, char* opr, char* rhs );
-int	mprog_veval		( int lhs, char* opr, int rhs );
+int	mprog_veval		( int64_t lhs, char* opr, int64_t rhs );
 int	mprog_do_ifchck		( char* ifchck, CHAR_DATA* mob,
 				       CHAR_DATA* actor, OBJ_DATA* obj,
 				       void* vo, CHAR_DATA* rndm );
@@ -173,6 +173,7 @@ int mprog_seval(char_data *ch, char *lhs, char *opr, char *rhs)
 	return 0;
 }
 
+/*
 int mprog_veval( int lhs, char *opr, int rhs ) 
 {
 
@@ -197,8 +198,8 @@ int mprog_veval( int lhs, char *opr, int rhs )
   return 0;
 
 }
-
-int mprog_veval( int64 lhs, char *opr, int rhs ) 
+*/
+int mprog_veval( int64_t lhs, char *opr, int64_t rhs ) 
 {
 
   if ( !str_cmp( opr, "==" ) )
@@ -222,8 +223,8 @@ int mprog_veval( int64 lhs, char *opr, int rhs )
   return 0;
 
 }
-
-int mprog_veval( uint32 lhs, char *opr, uint rhs ) 
+/*
+int mprog_veval( uint64_t lhs, char *opr, uint64_t rhs ) 
 {
   if ( !str_cmp( opr, "==" ) )
     return ( lhs == rhs );
@@ -246,6 +247,7 @@ int mprog_veval( uint32 lhs, char *opr, uint rhs )
   return 0;
 
 }
+*/
 
 bool istank(CHAR_DATA *ch)
 {
@@ -1938,33 +1940,33 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
 	}
 
 	if (fvict)
-	  return (int)(affected_by_spell(fvict, find_skill_num(val)));
+	  return (int64_t)(affected_by_spell(fvict, find_skill_num(val)));
 	if (ye) return FALSE;
      switch (arg[1]) 
      {
         case 'i': // mob
-		return (int)(affected_by_spell(mob, find_skill_num(val)));
+		return (int64_t)(affected_by_spell(mob, find_skill_num(val)));
 	case 'z': if (mob->beacon)
-             return (int)(affected_by_spell(((CHAR_DATA*)mob->beacon), find_skill_num(val)));
+             return (int64_t)(affected_by_spell(((CHAR_DATA*)mob->beacon), find_skill_num(val)));
            else return -1;
 
 	case 'n': // actor
 	 	if (actor)
-                return (int)(affected_by_spell(actor, find_skill_num(val)));
+                return (int64_t)(affected_by_spell(actor, find_skill_num(val)));
 		else return -1;
 	case 't': // vict
 		if (vict)
-                return (int)(affected_by_spell(vict, find_skill_num(val)));
+                return (int64_t)(affected_by_spell(vict, find_skill_num(val)));
 		else return -1;
 	case 'r': //rand
 		if (rndm)
-                return (int)(affected_by_spell(rndm, find_skill_num(val)));
+                return (int64_t)(affected_by_spell(rndm, find_skill_num(val)));
 		return -1;
         case 'f': if (actor && actor->fighting)
-                    return (int)(affected_by_spell(actor->fighting, find_skill_num(val)));
+                    return (int64_t)(affected_by_spell(actor->fighting, find_skill_num(val)));
                   else return -1;
         case 'g': if (mob && mob->fighting)
-                    return (int)(affected_by_spell(mob->fighting, find_skill_num(val)));
+                    return (int64_t)(affected_by_spell(mob->fighting, find_skill_num(val)));
                   else return 0;
 	default:
 	  logf( IMMORTAL, LOG_WORLD,  "Mob: %d bad argument to 'isspelled'",
