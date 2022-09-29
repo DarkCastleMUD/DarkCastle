@@ -241,8 +241,7 @@ int spell_fly(ubyte level, CHAR_DATA * ch,
    CHAR_DATA * victim, struct obj_data * obj, int skill);
 int spell_know_alignment(ubyte level, CHAR_DATA * ch,
    CHAR_DATA * victim, struct obj_data * obj, int skill);
-int spell_dispel_magic(ubyte level, CHAR_DATA * ch,
-   CHAR_DATA * victim, struct obj_data * obj, int skill);
+int spell_dispel_magic(ubyte level, CHAR_DATA * ch, CHAR_DATA * victim, struct obj_data * obj, int skill, int spell = 0);
 int spell_flamestrike(ubyte level, CHAR_DATA * ch,
    CHAR_DATA * victim, struct obj_data * obj, int skill);
 int spell_stone_skin(ubyte level, CHAR_DATA * ch,
