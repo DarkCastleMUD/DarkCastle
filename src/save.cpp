@@ -937,7 +937,7 @@ bool load_char_obj( struct descriptor_data *d, const char *name )
   if(!name || !strcmp(name, ""))
     return FALSE;
 
-  ch = new struct char_data;
+  ch = new char_data;
   auto &free_list = DC::instance().free_list;
 	free_list.erase(ch);
 
