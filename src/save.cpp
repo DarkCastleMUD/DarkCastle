@@ -804,7 +804,7 @@ void save_char_obj_db(CHAR_DATA *ch)
   {
     if(fpsave != NULL)
       dc_fclose(fpsave);
-    sprintf(log_buf, "mv %s %s", strsave, name); 
+    sprintf(log_buf, "mv -f %s %s", strsave, name); 
     system(log_buf);
   }
   else
@@ -841,6 +841,11 @@ void save_char_obj (CHAR_DATA *ch)
   if(IS_NPC(ch) || GET_LEVEL(ch) < 1)
   {
     return;
+  }
+
+  if (ch->name == nullptr)
+  {
+    ch->name = strdup("Unknown");
   }
 
   // TODO - figure out a way for mob's to save...maybe <mastername>.pet ?
@@ -891,7 +896,7 @@ void save_char_obj (CHAR_DATA *ch)
   {
     if(fpsave != NULL)
       dc_fclose(fpsave);
-    sprintf(log_buf, "mv %s %s", strsave, name); 
+    sprintf(log_buf, "mv -f %s %s", strsave, name); 
     system(log_buf);
   }
   else
