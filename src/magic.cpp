@@ -14291,7 +14291,7 @@ int spell_consecrate(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim,
 
   if ((cItem = get_obj_in_list("consecrateitem", world[ch->in_room].contents)))
   {
-    if (ch == ((CHAR_DATA *)(cItem->obj_flags.value[3])) && spl == SPELL_CONSECRATE)
+    if (ch == ((CHAR_DATA *)(cItem->obj_flags.origin)) && spl == SPELL_CONSECRATE)
     {
       send_to_char("You have already consecrated the ground here!\r\n",
                    ch);
@@ -14462,7 +14462,7 @@ int spell_desecrate(ubyte level, CHAR_DATA *ch, CHAR_DATA *victim,
   OBJ_DATA *cItem = NULL;
   if ((cItem = get_obj_in_list("consecrateitem", world[ch->in_room].contents)))
   {
-    if (ch == ((CHAR_DATA *)(cItem->obj_flags.value[3])))
+    if (ch == ((CHAR_DATA *)(cItem->obj_flags.origin)))
     {
       send_to_char("You have already desecrated the ground here!\r\n",
                    ch);
