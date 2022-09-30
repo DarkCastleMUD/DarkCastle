@@ -671,8 +671,8 @@ int do_headbutt(struct char_data *ch, char *argument, int cmd)
   if (mod > 0)
     mod = 0;
  
-  long int get_weapon_bit(int weapon_type);
-  long weapon_bit; 
+  int32_t get_weapon_bit(int weapon_type);
+  int32_t weapon_bit; 
   weapon_bit = get_weapon_bit(TYPE_CRUSH);
   
 

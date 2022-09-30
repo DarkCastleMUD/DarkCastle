@@ -561,7 +561,7 @@ int ki_storm( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
   dam = number(135,165);
 //  send_to_char("Your wholeness of spirit purges the souls of those around you!\n\r", ch);
 //  act("$n's eyes flash as $e pools the energy within $m!\n\rA burst of energy slams into you!\r\n",
-  int32 room = ch->in_room;
+  int32_t room = ch->in_room;
   for(tmp_victim = world[ch->in_room].people; tmp_victim && tmp_victim != (char_data *)0x95959595; tmp_victim = temp)
   {
 	 temp = tmp_victim->next_in_room;

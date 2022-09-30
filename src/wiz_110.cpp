@@ -738,15 +738,15 @@ int do_range(struct char_data *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-extern int r_new_meta_platinum_cost(int start, long long plats);
-extern int r_new_meta_exp_cost(int start, long long exp);
+extern int r_new_meta_platinum_cost(int start, int64_t plats);
+extern int r_new_meta_exp_cost(int start, int64_t exp);
 
-extern long long moves_exp_spent(char_data * ch);
-extern long long moves_plats_spent(char_data * ch);
-extern long long hps_exp_spent(char_data * ch);
-extern long long hps_plats_spent(char_data * ch);
-extern long long mana_exp_spent(char_data * ch);
-extern long long mana_plats_spent(char_data * ch);
+extern int64_t moves_exp_spent(char_data * ch);
+extern int64_t moves_plats_spent(char_data * ch);
+extern int64_t hps_exp_spent(char_data * ch);
+extern int64_t hps_plats_spent(char_data * ch);
+extern int64_t mana_exp_spent(char_data * ch);
+extern int64_t mana_plats_spent(char_data * ch);
 
 
 

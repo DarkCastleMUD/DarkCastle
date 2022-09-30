@@ -48,7 +48,7 @@ struct vault_data {
    char *owner;
    unsigned int size;
    unsigned int weight;
-   long long unsigned int gold;
+   uint64_t gold;
 
    struct vault_access_data *access;
    struct vault_items_data *items;

@@ -694,7 +694,7 @@ int bank(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg,
                    CHAR_DATA *invoker)
 {
   char buf[MAX_INPUT_LENGTH];
-  int32 x;
+  int32_t x;
 
   if(cmd != CMD_BALANCE && cmd != CMD_DEPOSIT && cmd != CMD_WITHDRAW)
     return eFAILURE;
@@ -755,7 +755,7 @@ int casino_atm(struct char_data *ch, struct obj_data *obj, int cmd, const char *
                    CHAR_DATA *invoker)
 {
   char buf[MAX_INPUT_LENGTH];
-  int32 x;
+  int32_t x;
 
   if(cmd != CMD_BALANCE && cmd != CMD_DEPOSIT && cmd != CMD_WITHDRAW)
     return eFAILURE;
@@ -1613,7 +1613,7 @@ int arenaporter(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg,
 int movingarenaporter(CHAR_DATA *ch, struct obj_data *obj, int cmd, char *arg, 
                    CHAR_DATA *invoker)
 {
-   long room = 17840;
+   int32_t room = 17840;
 
    if(!cmd)
    {

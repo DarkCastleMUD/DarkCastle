@@ -631,7 +631,7 @@ void load_vaults(void) {
   struct stat statbuf = {};
   FILE *fl = nullptr, *index = nullptr;
   int vnum = 0, full = 0, count = 0;
-  long long unsigned int gold = 0;
+  uint64_t gold = 0;
   char value[128] = {}, line[128] = {}, buf[MAX_STRING_LENGTH] = {}, fname[MAX_INPUT_LENGTH] = {}, type[128] = {}, tmp[10] = {};
   bool saveChanges = FALSE;
   char src_filename[256] = {};
@@ -1407,7 +1407,7 @@ void vault_withdraw(CHAR_DATA *ch, unsigned int amount, char *owner) {
     return;
   }
 
-  if (vault->gold >= (long long unsigned int)amount) {
+  if (vault->gold >= (uint64_t)amount) {
 /*    if (amount + GET_GOLD(ch) > 2000000000) {
       csendf(ch, "You can't hold that much gold.  The most you could get is %ld.\r\n", 2000000000 - GET_GOLD(ch));
       return;

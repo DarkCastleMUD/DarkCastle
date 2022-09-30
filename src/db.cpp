@@ -179,12 +179,12 @@ void load_banned();
 void boot_world(void);
 void do_godlist();
 void half_chop(const char *string, char *arg1, char *arg2);
-world_file_list_item * new_mob_file_item(char * temp, long room_nr);
-world_file_list_item * new_obj_file_item(char * temp, long room_nr);
+world_file_list_item * new_mob_file_item(char * temp, int32_t room_nr);
+world_file_list_item * new_obj_file_item(char * temp, int32_t room_nr);
 
 char * read_next_worldfile_name(FILE * flWorldIndex);
-int fread_bitvector(FILE *fl, long minval, long maxval);
-int fread_bitvector(ifstream &fl, long minval, long maxval);
+int fread_bitvector(FILE *fl, int32_t minval, int32_t maxval);
+int fread_bitvector(ifstream &fl, int32_t minval, int32_t maxval);
 void fread_new_newline(FILE *fl)
 {
 }
@@ -201,7 +201,7 @@ void clear_char(CHAR_DATA *ch);
 // MOBprogram locals
 int mprog_name_to_type(char* name);
 //void		load_mobprogs           ( FILE* fp );
-void mprog_read_programs(FILE* fp, long i, bool zz);
+void mprog_read_programs(FILE* fp, int32_t i, bool zz);
 
 extern bool MOBtrigger;
 
@@ -903,7 +903,7 @@ int do_wizlist(CHAR_DATA *ch, char *argument, int cmd)
 /* reset the time in the game from file */
 void reset_time(void)
 {
-	long beginning_of_time = 650336715;
+	int32_t beginning_of_time = 650336715;
 
 	struct time_info_data mud_time_passed(time_t t2, time_t t1);
 
@@ -1639,7 +1639,7 @@ char * read_next_worldfile_name(FILE * flWorldIndex)
 	return temp;
 }
 
-bool can_modify_this_room(char_data * ch, long vnum)
+bool can_modify_this_room(char_data * ch, int32_t vnum)
 {
 	if (has_skill(ch, COMMAND_RANGE))
 		return TRUE;
@@ -1653,7 +1653,7 @@ bool can_modify_this_room(char_data * ch, long vnum)
 	return TRUE;
 }
 
-bool can_modify_room(char_data * ch, long vnum)
+bool can_modify_room(char_data * ch, int32_t vnum)
 {
 	if (has_skill(ch, COMMAND_RANGE))
 		return TRUE;
@@ -1667,7 +1667,7 @@ bool can_modify_room(char_data * ch, long vnum)
 	return TRUE;
 }
 
-bool can_modify_this_mobile(char_data * ch, long vnum)
+bool can_modify_this_mobile(char_data * ch, int32_t vnum)
 {
 	if (has_skill(ch, COMMAND_RANGE))
 		return TRUE;
@@ -1681,12 +1681,12 @@ bool can_modify_this_mobile(char_data * ch, long vnum)
 	return TRUE;
 }
 
-bool can_modify_mobile(char_data * ch, long mob)
+bool can_modify_mobile(char_data * ch, int32_t mob)
 {
 	return can_modify_this_mobile(ch, mob);
 }
 
-bool can_modify_this_object(char_data * ch, long vnum)
+bool can_modify_this_object(char_data * ch, int32_t vnum)
 {
 	if (has_skill(ch, COMMAND_RANGE))
 		return TRUE;
@@ -1701,24 +1701,24 @@ bool can_modify_this_object(char_data * ch, long vnum)
 
 }
 
-bool can_modify_object(char_data * ch, long obj)
+bool can_modify_object(char_data * ch, int32_t obj)
 {
 	return can_modify_this_object(ch, obj);
 }
 
-void set_zone_saved_zone(long room)
+void set_zone_saved_zone(int32_t room)
 {
 	int zone = world[room].zone;
 	REMOVE_BIT(zone_table[zone].zone_flags, ZONE_MODIFIED);
 }
 
-void set_zone_modified_zone(long room)
+void set_zone_modified_zone(int32_t room)
 {
 	int zone = world[room].zone;
 	SET_BIT(zone_table[zone].zone_flags, ZONE_MODIFIED);
 }
 
-void set_zone_modified(long modnum, world_file_list_item * list)
+void set_zone_modified(int32_t modnum, world_file_list_item * list)
 {
 	world_file_list_item * curr = list;
 
@@ -1736,7 +1736,7 @@ void set_zone_modified(long modnum, world_file_list_item * list)
 	curr->flags = WORLD_FILE_MODIFIED;
 }
 
-void set_zone_modified_world(long room)
+void set_zone_modified_world(int32_t room)
 {
 	extern world_file_list_item * world_file_list;
 
@@ -1744,7 +1744,7 @@ void set_zone_modified_world(long room)
 }
 
 // rnum of mob
-void set_zone_modified_mob(long mob)
+void set_zone_modified_mob(int32_t mob)
 {
 	extern world_file_list_item * mob_file_list;
 
@@ -1752,14 +1752,14 @@ void set_zone_modified_mob(long mob)
 }
 
 // rnum of mob
-void set_zone_modified_obj(long obj)
+void set_zone_modified_obj(int32_t obj)
 {
 	extern world_file_list_item * obj_file_list;
 
 	set_zone_modified(obj, obj_file_list);
 }
 
-void set_zone_saved(long modnum, world_file_list_item * list)
+void set_zone_saved(int32_t modnum, world_file_list_item * list)
 {
 	world_file_list_item * curr = list;
 
@@ -1777,21 +1777,21 @@ void set_zone_saved(long modnum, world_file_list_item * list)
 	REMOVE_BIT(curr->flags, WORLD_FILE_MODIFIED);
 }
 
-void set_zone_saved_world(long room)
+void set_zone_saved_world(int32_t room)
 {
 	extern world_file_list_item * world_file_list;
 
 	set_zone_saved(room, world_file_list);
 }
 
-void set_zone_saved_mob(long mob)
+void set_zone_saved_mob(int32_t mob)
 {
 	extern world_file_list_item * mob_file_list;
 
 	set_zone_saved(mob, mob_file_list);
 }
 
-void set_zone_saved_obj(long obj)
+void set_zone_saved_obj(int32_t obj)
 {
 	extern world_file_list_item * obj_file_list;
 
@@ -1875,7 +1875,7 @@ void free_objs_from_memory()
 		}
 }
 
-world_file_list_item * one_new_world_file_item(char * temp, long room_nr)
+world_file_list_item * one_new_world_file_item(char * temp, int32_t room_nr)
 {
 	world_file_list_item * curr = NULL;
 
@@ -1893,7 +1893,7 @@ world_file_list_item * one_new_world_file_item(char * temp, long room_nr)
 	return curr;
 }
 
-world_file_list_item * new_w_file_item(char * temp, long room_nr, world_file_list_item *& list)
+world_file_list_item * new_w_file_item(char * temp, int32_t room_nr, world_file_list_item *& list)
 {
 	world_file_list_item * curr = list;
 
@@ -1909,17 +1909,17 @@ world_file_list_item * new_w_file_item(char * temp, long room_nr, world_file_lis
 	return curr->next;
 }
 
-world_file_list_item * new_world_file_item(char * temp, long room_nr)
+world_file_list_item * new_world_file_item(char * temp, int32_t room_nr)
 {
 	return new_w_file_item(temp, room_nr, world_file_list);
 }
 
-world_file_list_item * new_mob_file_item(char * temp, long room_nr)
+world_file_list_item * new_mob_file_item(char * temp, int32_t room_nr)
 {
 	return new_w_file_item(temp, room_nr, mob_file_list);
 }
 
-world_file_list_item * new_obj_file_item(char * temp, long room_nr)
+world_file_list_item * new_obj_file_item(char * temp, int32_t room_nr)
 {
 	return new_w_file_item(temp, room_nr, obj_file_list);
 }
@@ -2609,7 +2609,7 @@ CHAR_DATA *read_mobile(int nr, FILE *fl)
 {
 	char buf[200];
 	int i, j;
-	long tmp, tmp2, tmp3;
+	int32_t tmp, tmp2, tmp3;
 	CHAR_DATA *mob;
 	char letter;
 
@@ -2699,7 +2699,7 @@ CHAR_DATA *read_mobile(int nr, FILE *fl)
 
 	mob->gold = fread_int(fl, 0, LONG_MAX);
 	mob->plat = 0;
-	GET_EXP(mob) = (int64)fread_int(fl, LONG_MIN, LONG_MAX);
+	GET_EXP(mob) = (int64_t)fread_int(fl, LONG_MIN, LONG_MAX);
 
 	mob->position = fread_int(fl, 0, 10);
 	mob->mobdata->default_pos = fread_int(fl, 0, 10);
@@ -3336,7 +3336,7 @@ CHAR_DATA *clone_mobile(int nr)
 			mult = 1.1;
 		}
 	}
-	mob->max_hit = mob->raw_hit = mob->hit = (int32)(mob->max_hit * mult);
+	mob->max_hit = mob->raw_hit = mob->hit = (int32_t)(mob->max_hit * mult);
 	mob->mobdata->damnodice = (int16)(mob->mobdata->damnodice * mult);
 	mob->mobdata->damsizedice = (int16)(mob->mobdata->damsizedice * mult);
 	mob->damroll = (int16)(mob->damroll * mult);
@@ -4144,7 +4144,7 @@ string lf_to_crlf(string &s1)
 	return s1;
 }
 
-void write_bitvector_csv(unsigned long vector, const char * const *array, ofstream &fout)
+void write_bitvector_csv(uint32_t vector, const char * const *array, ofstream &fout)
 {
 	int nr = 0;
 	while (*array[nr] != '\n') {
@@ -5025,11 +5025,11 @@ char *fread_word(FILE *fl, int hasher)
 // or as a string of characters.  ie, 4, and c are the same.
 // 5 (1+4) would be the same at 'ac'
 
-int fread_bitvector(FILE *fl, long beg_range, long end_range)
+int fread_bitvector(FILE *fl, int32_t beg_range, int32_t end_range)
 {
 	char buf[200];
 	int ch;
-	long i = 0;
+	int32_t i = 0;
 
 	// eat space till we hit the next one
 	while ((ch = getc(fl))) {
@@ -5091,10 +5091,10 @@ int fread_bitvector(FILE *fl, long beg_range, long end_range)
 	return (0);
 }
 
-int fread_bitvector(ifstream &in, long beg_range, long end_range)
+int fread_bitvector(ifstream &in, int32_t beg_range, int32_t end_range)
 {
 	int ch;
-	long i = 0;
+	int32_t i = 0;
 
 	// Save original exception mask so we can restore it later
 	ios_base::iostate orig_exceptions = in.exceptions();
@@ -5957,7 +5957,7 @@ int mprog_name_to_type(char *name)
 
 /* This routine reads in scripts of MOBprograms from a file */
 
-void mprog_file_read(char *f, long i)
+void mprog_file_read(char *f, int32_t i)
 {
 	MPROG_DATA *mprog;
 	FILE *fp;
@@ -6033,7 +6033,7 @@ void load_mobprogs(FILE *fp)
 	return;
 }
 
-void mprog_read_programs(FILE *fp, long i, bool zz)
+void mprog_read_programs(FILE *fp, int32_t i, bool zz)
 {
 	MPROG_DATA *mprog;
 	char letter;

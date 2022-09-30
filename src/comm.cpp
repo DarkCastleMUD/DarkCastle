@@ -30,6 +30,7 @@
 #include <algorithm>
 #include <string>
 #include <queue>
+#include <cstdint>
 
 #include <fmt/format.h>
 
@@ -160,7 +161,7 @@ void report_debug_logging();
 void pulse_takeover(void);
 void boot_db(void);
 void zone_update(void);
-void affect_update(int32 duration_type); /* In spells.c */
+void affect_update(int32_t duration_type); /* In spells.c */
 void point_update(void);                 /* In limits.c */
 void food_update(void);                  /* In limits.c */
 void mobile_activity(void);
@@ -648,7 +649,7 @@ int DC::init_socket(in_port_t port)
 // it if we are closing the socket that is next to be processed.
 struct descriptor_data *next_d;
 stringstream timingDebugStr;
-unsigned long long pulseavg = 0;
+uint64_t pulseavg = 0;
 
 /*
  * game_loop contains the main loop which drives the entire MUD.  It
@@ -661,7 +662,7 @@ void DC::game_loop(void)
 
   fd_set input_set = {}, output_set = {}, exc_set = {}, null_set = {};
   struct timeval last_time = {}, delay_time = {}, now_time = {};
-  long secDelta = {}, usecDelta = {};
+  int32_t secDelta = {}, usecDelta = {};
 
   // comm must be much longer than MAX_INPUT_LENGTH since we allow aliases in-game
   // otherwise an alias'd command could easily overrun the buffer
@@ -1567,7 +1568,7 @@ string generate_prompt(CHAR_DATA *ch)
       sprintf(pro, "%lld", GET_GOLD(ch));
       break;
     case 'G':
-      sprintf(pro, "%d", (int32)(GET_GOLD(ch) / 20000));
+      sprintf(pro, "%d", (int32_t)(GET_GOLD(ch) / 20000));
       break;
     case 'h':
       sprintf(pro, "%d", ch->getHP());
@@ -1776,7 +1777,7 @@ string generate_prompt(CHAR_DATA *ch)
       sprintf(pro, "%lld", GET_EXP(ch));
       break;
     case 'X':
-      sprintf(pro, "%lld", (int64)(exp_table[(int)GET_LEVEL(ch) + 1] - (int64)GET_EXP(ch)));
+      sprintf(pro, "%lld", (int64_t)(exp_table[(int)GET_LEVEL(ch) + 1] - (int64_t)GET_EXP(ch)));
       break;
     case 'y':
       charmie = get_charmie(ch);
@@ -1970,7 +1971,7 @@ int new_descriptor(int s)
     exit(1);
   }
 #else
-  unsigned long int nb = 1;
+  uint32_t nb = 1;
   if (ioctlsocket(desc, FIONBIO, &nb) < 0)
   {
     perror("init_socket : ioctl : nonblock");
@@ -2620,7 +2621,7 @@ string remove_non_color_codes(string input)
   {
     char buf[128], idiotbuf[128];
     struct descriptor_data *temp;
-    // long target_idnum = -1;
+    // int32_t target_idnum = -1;
     if (!d)
       return 0;
     flush_queues(d);

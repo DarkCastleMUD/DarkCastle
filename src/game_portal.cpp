@@ -60,7 +60,7 @@ void load_game_portals()
   extern struct game_portal game_portals[MAX_GAME_PORTALS];
   int i, j;
   int num_lines = 0;       /* Temporary to count lines */
-  long int file_pos;   /* Used to store position before counting length */
+  int32_t file_pos;   /* Used to store position before counting length */
   FILE *cur_file;
   char buf[256];       /* Stores temp file names */
   char log_buf[256];

@@ -15,6 +15,7 @@ extern "C" {
 #include <string>
 #include <vector>
 #include <map>
+#include <cstdint>
 
 using namespace std;
 
@@ -28,13 +29,8 @@ typedef signed char		 byte;
 typedef signed short int         int16;
 typedef unsigned short int      uint16;
 
-typedef signed int               int32;
+typedef signed int               int32_t;
 typedef unsigned int            uint32;
-
-// Can't use these unfortunatly because long longs just don't work right
-// for some reason.
-typedef signed long long         int64;
-typedef unsigned long long      uint64;
 
 typedef	struct char_data	CHAR_DATA;
 typedef	struct obj_data		OBJ_DATA;

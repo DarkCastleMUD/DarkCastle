@@ -779,7 +779,7 @@ const char *fullness[] =
 
 #define K    * 1000
 #define M    K K
-#define L  (long)
+#define L  (int32_t)
 
 int exp_table[ ] =
 {
@@ -2050,12 +2050,12 @@ struct race_shit
   char *singular_name;  // dwarf, elf, etc.
   char *plural_name;     // dwarves, elves, etc.
 
-  long body_parts;  // bitvector for body parts
-  long immune;      // bitvector for immunities
-  long resist;      // bitvector for resistances
-  long suscept;     // bitvector for susceptibilities
-  long hate_fear;   // bitvector for hate/fear
-  long friendly;    // bitvector for friendliness
+  int32_t body_parts;  // bitvector for body parts
+  int32_t immune;      // bitvector for immunities
+  int32_t resist;      // bitvector for resistances
+  int32_t suscept;     // bitvector for susceptibilities
+  int32_t hate_fear;   // bitvector for hate/fear
+  int32_t friendly;    // bitvector for friendliness
   int  weight;      // average weight of ths race
   int  height;      // average height for ths race
 };

@@ -1590,12 +1590,12 @@ int do_look(struct char_data *ch, char *argument, int cmd) {
 			if (!IS_MOB(ch) && ch->pcdata->holyLite) {
 				sprinttype(world[ch->in_room].sector_type, sector_types,
 						sector_buf);
-				sprintbit((long) world[ch->in_room].room_flags, room_bits,
+				sprintbit((int32_t) world[ch->in_room].room_flags, room_bits,
 						rflag_buf);
 				csendf(ch, " Light[%d] <%s> [ %s]", DARK_AMOUNT(ch->in_room),
 						sector_buf, rflag_buf);
                                 if(world[ch->in_room].temp_room_flags) {
-				    sprintbit((long) world[ch->in_room].temp_room_flags, temp_room_bits,
+				    sprintbit((int32_t) world[ch->in_room].temp_room_flags, temp_room_bits,
 						tempflag_buf);
 				    csendf(ch, " [ %s]", tempflag_buf);
                                 }
@@ -1786,7 +1786,7 @@ int do_score(struct char_data *ch, char *argument, int cmd)
 
    struct affected_type *aff;
 
-   int64 exp_needed;
+   int64_t exp_needed;
    uint32 immune=0,suscept=0,resist=0;
    string isrString;
    //int i;
@@ -2087,8 +2087,8 @@ int do_time(struct char_data *ch, char *argument, int cmd)
    char const *suf;
    int weekday, day;
    time_t timep;
-   long h,m;
-   // long s;
+   int32_t h,m;
+   // int32_t s;
    extern struct time_info_data time_info;
    extern char *weekdays[];
    extern char *month_name[];
@@ -2869,7 +2869,7 @@ int do_scan(struct char_data *ch, char *argument, int cmd)
    int i;
    struct char_data *vict;
    struct room_data *room;
-   long was_in;
+   int32_t was_in;
 
    char *possibilities[] =
    {
@@ -3164,8 +3164,8 @@ struct search
    uint8_t o_min_level;
    uint8_t o_max_level;
 
-	int32 o_item_number;                   /* Where in data-base               */
-	int32 o_in_room;                       /* In what room -1 when conta/carr  */
+	int32_t o_item_number;                   /* Where in data-base               */
+	int32_t o_in_room;                       /* In what room -1 when conta/carr  */
 	int o_vroom;                           /* for corpse saving */
 	struct obj_flag_data obj_flags;             /* Object information               */
 	int16 o_num_affects;

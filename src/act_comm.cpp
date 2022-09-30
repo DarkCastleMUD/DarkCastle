@@ -34,6 +34,7 @@ extern "C"
 #include "fileinfo.h"
 #include "const.h"
 #include <fmt/format.h>
+#include <cstdint>
 
 extern bool MOBtrigger;
 
@@ -89,7 +90,7 @@ int do_report(struct char_data *ch, char *argument, int cmd)
 
       snprintf(report, 200, "XP: %lld, XP till level: %lld, Levels to gain: %u",
                GET_EXP(ch),
-               (int64)(exp_table[(int)GET_LEVEL(ch) + 1] - (int64)GET_EXP(ch)),
+               (int64_t)(exp_table[(int)GET_LEVEL(ch) + 1] - (int64_t)GET_EXP(ch)),
                levels_to_gain);
 
       sprintf(buf, "$n reports '%s'", report);
@@ -131,7 +132,7 @@ int do_report(struct char_data *ch, char *argument, int cmd)
 | Returns: 0 on failure, non-zero on success
 | Notes:
 */
-int send_to_gods(const char *str, int god_level, long type)
+int send_to_gods(const char *str, int god_level, int32_t type)
 {
   char buf1[MAX_STRING_LENGTH];
   char buf[MAX_STRING_LENGTH];

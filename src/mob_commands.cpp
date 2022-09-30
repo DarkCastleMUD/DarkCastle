@@ -166,7 +166,7 @@ void mpstat( CHAR_DATA *ch, CHAR_DATA *victim)
 int do_mpasound( CHAR_DATA *ch, char *argument, int cmd )
 {
 
-  long was_in_room;
+  int32_t was_in_room;
   int              door;
 
     if ( !IS_NPC( ch ) )
@@ -694,7 +694,7 @@ int do_mppurge( CHAR_DATA *ch, char *argument, int cmd )
 int do_mpgoto( CHAR_DATA *ch, char *argument, int cmd )
 {
     char             arg[ MAX_INPUT_LENGTH ];
-    long location = -1;
+    int32_t location = -1;
 
     if ( !IS_NPC( ch ) )
     {
@@ -773,8 +773,8 @@ int do_mpgoto( CHAR_DATA *ch, char *argument, int cmd )
 int do_mpat( CHAR_DATA *ch, char *argument, int cmd )
 {
     char             arg[ MAX_INPUT_LENGTH ];
-    long             location;
-    long             original;
+    int32_t             location;
+    int32_t             original;
     int              result;
 
     if ( !IS_NPC( ch ) )
@@ -874,7 +874,7 @@ int do_mptransfer( CHAR_DATA *ch, char *argument, int cmd )
 {
     char             arg1[ MAX_INPUT_LENGTH ];
     char             arg2[ MAX_INPUT_LENGTH ];
-    long             location;
+    int32_t             location;
     descriptor_data *d;
     CHAR_DATA       *victim;
 
@@ -1348,7 +1348,7 @@ int do_mpdamage( CHAR_DATA *ch, char *argument, int cmd )
   char temp[ MAX_INPUT_LENGTH ];
   char damroll[ MAX_INPUT_LENGTH ];
   char attacktype[ MAX_INPUT_LENGTH ];
-  int32 hitpoints = 0;
+  int32_t hitpoints = 0;
 
     free_dmg_list();
     if ( !IS_NPC( ch ) )
@@ -2047,7 +2047,7 @@ char *expand_data(char_data *ch, char *orig)
     int16 *lvali = 0;
     uint32 *lvalui = 0;
     char **lvalstr = 0;
-    int64 *lvali64 = 0;
+    int64_t *lvali64 = 0;
     sbyte *lvalb = 0;
     translate_value(left,right,&lvali,&lvalui, &lvalstr,&lvali64, &lvalb,ch,activeActor, activeObj, activeVo, activeRndm);
 
@@ -2126,7 +2126,7 @@ int do_mpsetmath(char_data *ch, char *arg, int cmd)
   int16 *lvali = 0;
   uint32 *lvalui = 0;
   char **lvalstr = 0;
-  int64 *lvali64 = 0;
+  int64_t *lvali64 = 0;
   sbyte *lvalb = 0;
   translate_value(arg1,r,&lvali,&lvalui, &lvalstr,&lvali64, &lvalb,ch,activeActor, activeObj, activeVo, activeRndm);
 

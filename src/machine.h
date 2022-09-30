@@ -20,7 +20,7 @@ extern "C"
 time_t time(time_t *t);
 #ifndef LINUX
   void srandom(unsigned int);
-  long int random	(void);
+  int32_t random	(void);
 #endif
 #endif
 
@@ -34,12 +34,12 @@ extern "C"
   /* int  fwrite	(void *ptr, int size, int nitems, FILE *stream);*/
   char *	index		(const char *s, int c);
   /* void	fclose		(FILE *stream); */
-  int	fseek		(FILE *stream, long offset, int ptrname);
+  int	fseek		(FILE *stream, int32_t offset, int ptrname);
   /* int	fputs		(char *s, FILE *stream); */
   /* int	fscanf		(FILE *stream, char *format, ...); */
   /* int	sscanf		(char *s, char *format, ...); */
   /* int	fprintf		(FILE *stream, char *format, ...); */
-  long	random		(void);
+  int32_t	random		(void);
   void	srandom		(int seed);
   /* int	printf		(char *format, ...); */
   int	sigsetmask	(int mask);
@@ -51,7 +51,7 @@ extern "C"
 #if	(0)	//defined(ultrix)
 int	gethostname	(char *name, int namelen);
 char *	index		(char *s, int c);
-long	random		(void);
+int32_t	random		(void);
 int	sigsetmask	(int mask);
 void	srandom		(int seed);
 time_t	time		(time_t *tloc);

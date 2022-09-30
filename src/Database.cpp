@@ -154,19 +154,19 @@ void Database::save(CHAR_DATA *ch, char_file_u4 *st)
     int16 hometown;
     uint32 gold;
     uint32 plat;
-    int64 exp;
+    int64_t exp;
     uint32 immune;
     uint32 resist;
     uint32 suscept;
 
-    int32 mana;        // current
-    int32 raw_mana;    // max without eq/stat bonuses
-    int32 hit;
-    int32 raw_hit;
-    int32 move;
-    int32 raw_move;
-    int32 ki;
-    int32 raw_ki;
+    int32_t mana;        // current
+    int32_t raw_mana;    // max without eq/stat bonuses
+    int32_t hit;
+    int32_t raw_hit;
+    int32_t move;
+    int32_t raw_move;
+    int32_t ki;
+    int32_t raw_ki;
 
     int16 alignment;
    uint32 hpmetas; // Used by familiars too... why not.
@@ -176,14 +176,14 @@ void Database::save(CHAR_DATA *ch, char_file_u4 *st)
     int16 armor;       // have to save these since mobs have different bases
     int16 hitroll;
     int16 damroll;
-    int32 afected_by;
-    int32 afected_by2;
+    int32_t afected_by;
+    int32_t afected_by2;
     uint32 misc;          // channel flags
 
     int16 clan; 
-    int32 load_room;                  // Which room to place char in
+    int32_t load_room;                  // Which room to place char in
 
-    int32 extra_ints[5];             // available just in case
+    int32_t extra_ints[5];             // available just in case
 */
 
 

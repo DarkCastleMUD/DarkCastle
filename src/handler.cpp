@@ -843,7 +843,7 @@ void check_weapon_weights(char_data * ch) {
 
 }
 
-void affect_modify(CHAR_DATA *ch, int32 loc, int32 mod, long bitv, bool add, int flag) {
+void affect_modify(CHAR_DATA *ch, int32_t loc, int32_t mod, int32_t bitv, bool add, int flag) {
 	char log_buf[256];
 	int i;
 
@@ -977,7 +977,7 @@ void affect_modify(CHAR_DATA *ch, int32 loc, int32 mod, long bitv, bool add, int
 
 	case APPLY_AGE:
 		if (!IS_MOB(ch))
-			ch->pcdata->time.birth -= ((long) SECS_PER_MUD_YEAR * (long) mod);
+			ch->pcdata->time.birth -= ((int32_t) SECS_PER_MUD_YEAR * (int32_t) mod);
 		break;
 
 	case APPLY_CHAR_WEIGHT:
@@ -1493,7 +1493,7 @@ void affect_total(CHAR_DATA *ch) {
 
 /* Insert an affect_type in a char_data structure
  Automatically sets apropriate bits and apply's */
-void affect_to_char(CHAR_DATA *ch, struct affected_type *af, int32 duration_type) {
+void affect_to_char(CHAR_DATA *ch, struct affected_type *af, int32_t duration_type) {
 //    bool secFix;
 	struct affected_type *affected_alloc;
 	if (af->location >= 1000)

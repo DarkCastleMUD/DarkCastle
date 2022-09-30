@@ -260,7 +260,7 @@ bool istank(CHAR_DATA *ch)
 }
 
 void translate_value(char *leftptr, char *rightptr, int16 **vali,
-		uint32 **valui, char ***valstr, int64 **vali64, sbyte **valb,
+		uint32 **valui, char ***valstr, int64_t **vali64, sbyte **valb,
 		CHAR_DATA *mob, CHAR_DATA *actor, OBJ_DATA *obj, void *vo,
 		CHAR_DATA *rndm) {
 	/*
@@ -471,7 +471,7 @@ void translate_value(char *leftptr, char *rightptr, int16 **vali,
 	int16 *intval = NULL;
 	uint32 *uintval = NULL;
 	char **stringval = NULL;
-	int64 *llval = NULL;
+	int64_t *llval = NULL;
 	sbyte *sbval = NULL;
 	bool tError = FALSE;
 
@@ -1368,7 +1368,7 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
   int16 *lvali = 0;
   uint32 *lvalui = 0;
   char **lvalstr = 0;
-  int64 *lvali64 = 0;
+  int64_t *lvali64 = 0;
   sbyte *lvalb = 0; 
   //  int type = 0;
 
@@ -1392,14 +1392,14 @@ int mprog_do_ifchck( char *ifchck, CHAR_DATA *mob, CHAR_DATA *actor,
     int16 *rvali = 0;
     uint32 *rvalui = 0;
     char **rvalstr = 0;
-    int64 *rvali64 = 0;
+    int64_t *rvali64 = 0;
     sbyte *rvalb = 0; 
     translate_value(val,val2,&rvali,&rvalui, &rvalstr,&rvali64, &rvalb,mob,actor, obj, vo, rndm);
-    int64 rval = 0;
+    int64_t rval = 0;
     if (rvalstr || rvali || rvalui || rvali64 || rvalb)
     {
       if (rvalstr && lvalstr) return mprog_seval(mob, *lvalstr, opr, *rvalstr);
-      // The rest fit in an int64, so let's just use that.
+      // The rest fit in an int64_t, so let's just use that.
       if (rvalstr) rval = atoi(*rvalstr);
       if (rvali) rval = *rvali;
       if (rvalui) rval = *rvalui;
@@ -3097,7 +3097,7 @@ int mprog_process_cmnd( char *cmnd, CHAR_DATA *mob, CHAR_DATA *actor,
 	  int16 *lvali = 0;
 	  uint32 *lvalui = 0;
 	  char **lvalstr = 0;
-	  int64 *lvali64 = 0;
+	  int64_t *lvali64 = 0;
 	  sbyte *lvalb = 0; 
 	  *str = '\0';
 	  if (do_bufs(&buf[0], &tmp[0], cmnd)) 
@@ -3146,7 +3146,7 @@ int mprog_process_cmnd( char *cmnd, CHAR_DATA *mob, CHAR_DATA *actor,
 	int16 *lvali = 0;
 	uint32 *lvalui = 0;
 	char **lvalstr = 0;
-	int64 *lvali64 = 0;
+	int64_t *lvali64 = 0;
 	sbyte *lvalb = 0;
 	char left[MAX_INPUT_LENGTH], right[MAX_INPUT_LENGTH];
         left[0] = '$'; left[1] = *str; left[2] = '\0';

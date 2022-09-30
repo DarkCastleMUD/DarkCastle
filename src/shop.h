@@ -20,9 +20,9 @@ struct player_shop_item {
 
 struct player_shop {
    char owner[PC_SHOP_OWNER_SIZE];              // name of player that owns shop (max is 12, but oh well)
-   long   room_num;                             // number of room players shop is in
+   int32_t   room_num;                             // number of room players shop is in
    char sell_message[PC_SHOP_SELL_MESS_SIZE];   // special message (if any) when someone buys something
-   long   money_on_hand;                        // cash the player has in the bank right now
+   int32_t   money_on_hand;                        // cash the player has in the bank right now
    
    player_shop_item * sale_list; // list of items player has for sale
 

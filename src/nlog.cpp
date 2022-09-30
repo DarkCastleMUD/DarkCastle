@@ -100,7 +100,7 @@ char *str_hsh(const char *arg)
 
 
 /* logf(GET_LEVEL(ch), LOG_GOD, "%s restored all!", GET_NAME(ch)); */
-void logf(int level, long type, const char *arg, ...)
+void logf(int level, int32_t type, const char *arg, ...)
 { 
   va_list args;
   char s[MAX_STRING_LENGTH];

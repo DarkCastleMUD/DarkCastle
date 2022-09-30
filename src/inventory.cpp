@@ -1540,7 +1540,7 @@ int do_give(struct char_data *ch, char *argument, int cmd)
 {
   char obj_name[MAX_INPUT_LENGTH+1], vict_name[MAX_INPUT_LENGTH+1], buf[200];
   char arg[80], allbuf[80];
-  long long amount;
+  int64_t amount;
   int retval;
   extern int top_of_world;
   struct char_data *vict;

@@ -46,7 +46,7 @@ void add_memory(CHAR_DATA *ch, char *victim, char type);
 void stop_follower(CHAR_DATA *ch, int cmd);
 int attack(CHAR_DATA *ch, CHAR_DATA *vict, int type, int attack = FIRST);
 void perform_violence(void);
-void dam_message(int dam, CHAR_DATA *ch, CHAR_DATA *vict, int w_type, long modifier);
+void dam_message(int dam, CHAR_DATA *ch, CHAR_DATA *vict, int w_type, int32_t modifier);
 void group_gain(CHAR_DATA *ch, CHAR_DATA *vict);
 int check_magic_block(CHAR_DATA *ch, CHAR_DATA *victim, int attacktype);
 int check_riposte(CHAR_DATA *ch, CHAR_DATA *vict, int attacktype);
@@ -89,8 +89,8 @@ int isHit(CHAR_DATA *ch, CHAR_DATA *victim, int attacktype, int &type, int &redu
 void inform_victim(CHAR_DATA *ch, CHAR_DATA *victim, int dam);
 CHAR_DATA *loop_followers(struct follow_type **f);
 CHAR_DATA *get_highest_level_killer(CHAR_DATA *leader, CHAR_DATA *killer);
-long count_xp_eligibles(CHAR_DATA *leader, CHAR_DATA *killer, long highest_level, long *total_levels);
-int64 scale_char_xp(CHAR_DATA *ch, CHAR_DATA *killer, CHAR_DATA *victim, long no_killers, long total_levels, long highest_level, int64 base_xp, int64 *bonus_xp);
+int32_t count_xp_eligibles(CHAR_DATA *leader, CHAR_DATA *killer, int32_t highest_level, int32_t *total_levels);
+int64_t scale_char_xp(CHAR_DATA *ch, CHAR_DATA *killer, CHAR_DATA *victim, int32_t no_killers, int32_t total_levels, int32_t highest_level, int64_t base_xp, int64_t *bonus_xp);
 void remove_active_potato(CHAR_DATA *vict);
 int check_pursuit(char_data *ch, char_data *victim, char *dircommand);
 

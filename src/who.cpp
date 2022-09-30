@@ -33,12 +33,12 @@ clan_data * get_clan(struct char_data *);
 // That way we never have to worry about having a bunch of players on, and overflowing it.
 // -pir 2/20/01
 char * gWhoBuffer = NULL;
-long gWhoBufferCurSize = 0;
-long gWhoBufferMaxSize = 0;
+int32_t gWhoBufferCurSize = 0;
+int32_t gWhoBufferMaxSize = 0;
  
 void add_to_who(char * strAdd)
 {
-   long strLength = 0;
+   int32_t strLength = 0;
 
    if(!strAdd)                                    return;
    if(!(strLength = strlen(strAdd)))              return;

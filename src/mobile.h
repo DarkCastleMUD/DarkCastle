@@ -81,12 +81,12 @@ struct race_data
   string lowercase_name; /* dwarf, elf, etc.     */
   char *plural_name;     /* dwarves, elves, etc. */
   bool playable;    /* Can a player play as this race? */
-  long body_parts;  /* bitvector for body parts       */
-  long immune;      /* bitvector for immunities       */
-  long resist;      /* bitvector for resistances      */
-  long suscept;     /* bitvector for susceptibilities */
-  long hate_fear;   /* bitvector for hate/fear        */
-  long friendly;    /* bitvector for friendliness     */
+  int32_t body_parts;  /* bitvector for body parts       */
+  int32_t immune;      /* bitvector for immunities       */
+  int32_t resist;      /* bitvector for resistances      */
+  int32_t suscept;     /* bitvector for susceptibilities */
+  int32_t hate_fear;   /* bitvector for hate/fear        */
+  int32_t friendly;    /* bitvector for friendliness     */
   int  min_weight;      /* min weight */
   int  max_weight;
   
@@ -119,7 +119,7 @@ struct race_data
 
 struct mob_matrix_data
 {
-  long long experience;
+  int64_t experience;
   int hitpoints;
   int tohit;
   int todam;
@@ -129,7 +129,7 @@ struct mob_matrix_data
 
 
 void translate_value(char *leftptr, char *rightptr, int16 **vali, uint32 **valui,
-                char ***valstr, int64 **vali64, sbyte **valb, CHAR_DATA *mob, CHAR_DATA *actor,
+                char ***valstr, int64_t **vali64, sbyte **valb, CHAR_DATA *mob, CHAR_DATA *actor,
                 OBJ_DATA *obj, void *vo, CHAR_DATA *rndm);
 
 void save_golem_data(CHAR_DATA *ch);

@@ -215,7 +215,7 @@ bool IS_DARK( int room );
                                  obj_index[GET_OBJ_RNUM(obj)].virt : -1)
 #define VALID_ROOM_RNUM(rnum)   ((rnum) != NOWHERE && (rnum) <= top_of_world)
 #define GET_ROOM_VNUM(rnum) \
-        ((long)(VALID_ROOM_RNUM(rnum) ? world[(rnum)].number : NOWHERE))
+        ((int32_t)(VALID_ROOM_RNUM(rnum) ? world[(rnum)].number : NOWHERE))
 
 #define GET_PROMPT(ch)  ((ch)->pcdata->prompt)
 #define GET_LAST_PROMPT(ch)  ((ch)->pcdata->last_prompt)
@@ -388,16 +388,16 @@ MatchType str_n_nosp_cmp_begin(string arg1, string arg2);
 char *  str_nospace     (const char *stri);
 char *	str_dup		(const char *str);
 char *	str_dup0	(const char *str);
-void    log   (string str, int god_level, long type);
-void    log		(string str, int god_level, long type, char_data *vict);
-void    logf            (int level, long type, const char *arg, ...);
-int     send_to_gods    (const char * str, int god_level, long type);
+void    log   (string str, int god_level, int32_t type);
+void    log		(string str, int god_level, int32_t type, char_data *vict);
+void    logf            (int level, int32_t type, const char *arg, ...);
+int     send_to_gods    (const char * str, int god_level, int32_t type);
 
 void	sprintbit	(uint value[], const char *names[], char *result);
 std::string	sprintbit	(uint value[], const char *names[]);
 
-void    sprintbit	(unsigned long vektor, const char *names[], char *result);
-std::string sprintbit	(unsigned long vektor, const char *names[]);
+void    sprintbit	(uint32_t vektor, const char *names[], char *result);
+std::string sprintbit	(uint32_t vektor, const char *names[]);
 
 void        sprinttype	(int type, const char *names[], char *result);
 std::string sprinttype	(int type, const char *names[]);
@@ -420,10 +420,10 @@ void	set_fighting	(CHAR_DATA *ch, CHAR_DATA *vict);
 void	stop_fighting	(CHAR_DATA *ch, int clearlag = 1);
 int	do_simple_move	(CHAR_DATA *ch, int cmd, int following);
 // int	attempt_move	(CHAR_DATA *ch, int cmd, int is_retreat = 0);
-int32	move_limit	(CHAR_DATA *ch);
-int32	mana_limit	(CHAR_DATA *ch);
-int32	ki_limit	(CHAR_DATA *ch);
-int32	hit_limit	(CHAR_DATA *ch);
+int32_t	move_limit	(CHAR_DATA *ch);
+int32_t	mana_limit	(CHAR_DATA *ch);
+int32_t	ki_limit	(CHAR_DATA *ch);
+int32_t	hit_limit	(CHAR_DATA *ch);
 typedef int16_t skill_t;
 int	has_skill	(CHAR_DATA *ch, skill_t skill);
 const char *  get_skill_name  (int skillnum);
@@ -434,7 +434,7 @@ int isname    (string arg, const char *arg2);
 int	isname		(const char *arg, const char *arg2);
 void	page_string	(struct descriptor_data *d, const char *str,
 			    int keep_internal);
-void	gain_exp	(CHAR_DATA *ch, int64 gain);
+void	gain_exp	(CHAR_DATA *ch, int64_t gain);
 void	redo_hitpoints  (CHAR_DATA *ch);       /* Rua's put in  */
 void	redo_mana	(CHAR_DATA *ch);       /* Rua's put in  */
 void    redo_ki		(CHAR_DATA *ch);	/* And Urizen*/
@@ -583,7 +583,7 @@ struct mprog_throw_type {
    char target_mob_name[MAX_THROW_NAME]; // string used to find target name
    
    int data_num;               // number of catch call to activate on target
-   int delay;                  // how long until the mob gets it
+   int delay;                  // how int32_t until the mob gets it
 
    int pitcher;                // vnum of mob that threw the call
    int opt;

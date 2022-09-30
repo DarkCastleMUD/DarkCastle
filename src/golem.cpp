@@ -361,13 +361,13 @@ int do_golem_score(struct char_data *ch, char *argument, int cmd)
    ch = ch->pcdata->golem;
    struct affected_type *aff;
 
-   int64 exp_needed;
+   int64_t exp_needed;
 
    uint32 immune=0,suscept=0,resist=0;
    string isrString;
 
    sprintf(race, "%s", races[(int)GET_RACE(ch)].singular_name);
-   exp_needed = (int)(exp_table[(int)GET_LEVEL(ch) + 19] - (int64)GET_EXP(ch));
+   exp_needed = (int)(exp_table[(int)GET_LEVEL(ch) + 19] - (int64_t)GET_EXP(ch));
 
    to_hit = GET_REAL_HITROLL(ch);
    to_dam = GET_REAL_DAMROLL(ch);

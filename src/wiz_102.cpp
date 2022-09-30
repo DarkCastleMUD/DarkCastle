@@ -434,7 +434,7 @@ int do_zone_single_edit(struct char_data * ch, char * argument, int zone)
   char cmdnum[MAX_INPUT_LENGTH];
   char select[MAX_INPUT_LENGTH];
   char last[MAX_INPUT_LENGTH];
-  long i, j;
+  int32_t i, j;
   int cmd = 0;
 
   argument = one_argument(argument, cmdnum);  
@@ -4857,7 +4857,7 @@ int do_rstat(struct char_data *ch, char *argument, int cmd)
             send_to_char(buf, ch);
 
             send_to_char("Room flags: ", ch);
-            sprintbit((long) rm->room_flags,room_bits,buf);
+            sprintbit((int32_t) rm->room_flags,room_bits,buf);
             string buffer = fmt::format("{} [ {} ]\r\n", buf, rm->room_flags);
             send_to_char(buffer.c_str(),ch);
 

@@ -200,13 +200,13 @@ struct extra_descr_data
 
 struct obj_flag_data
 {
-    int32 value[4];       /* Values of the item (see list)    */
+    int32_t value[4];       /* Values of the item (see list)    */
     ubyte type_flag;     /* Type of item                     */
     uint32 wear_flags;     /* Where you can wear it            */
     uint16 size;           /* Race restrictions                */
     uint32 extra_flags;    /* If it hums, glows etc            */
      int16 weight;         /* Weight what else                 */
-     int32 cost;           /* Value when sold (gp.)            */
+     int32_t cost;           /* Value when sold (gp.)            */
     uint32 more_flags;     /* A second bitvector (extra_flags2)*/
      int16 eq_level;	/* Min level to use it for eq       */
      int16 timer;          /* Timer for object                 */
@@ -215,8 +215,8 @@ struct obj_flag_data
 
 struct obj_affected_type
 {
-     int32 location;      /* Which ability to change (APPLY_XXX) */
-     int32 modifier;     /* How much it changes by              */
+     int32_t location;      /* Which ability to change (APPLY_XXX) */
+     int32_t modifier;     /* How much it changes by              */
 };
 
 struct tab_data;
@@ -226,8 +226,8 @@ struct wheel_data;
 
 /* ======================== Structure for object ========================= */
 struct obj_data {
-	int32 item_number;                  /* Where in data-base               */
-	int32 in_room;                      /* In what room -1 when conta/carr  */
+	int32_t item_number;                  /* Where in data-base               */
+	int32_t in_room;                      /* In what room -1 when conta/carr  */
 	int vroom;                          /* for corpse saving */
 	obj_flag_data obj_flags;            /* Object information               */
 	int16 num_affects;
@@ -290,11 +290,11 @@ struct obj_data {
 struct obj_file_elem 
 {
     int16 version;
-    int32 item_number;
+    int32_t item_number;
     int16 timer;
     int16 wear_pos;
     int16 container_depth;
-    int32 other[5];        // unused
+    int32_t other[5];        // unused
 };
 
 // functions from objects.cpp

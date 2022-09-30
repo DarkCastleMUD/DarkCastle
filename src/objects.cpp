@@ -169,7 +169,7 @@ void object_activity(uint64_t pulse_type)
 {
   for (auto &obj : DC::instance().active_obj_list)
   {
-    int32 item_number = obj->item_number;
+    int32_t item_number = obj->item_number;
 
     if (obj_index[item_number].non_combat_func)
     {

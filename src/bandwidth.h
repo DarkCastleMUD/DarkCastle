@@ -7,8 +7,8 @@ void add_bandwidth(int amount);
 struct bandwidth_type read_bandwidth(const char *file);
 int write_bandwidth();
 
-long int get_bandwidth_start();
-long int get_bandwidth_amount();
+int32_t get_bandwidth_start();
+int32_t get_bandwidth_amount();
 
 #endif /* #ifndef BANDWIDTH_H_ */
 #endif /* #ifdef BANDWIDTH */

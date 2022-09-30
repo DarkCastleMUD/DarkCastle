@@ -646,16 +646,16 @@ void do_on_login_stuff(char_data *ch)
    if (!has_skill(ch, META_REIMB))
    {
       learn_skill(ch, META_REIMB, 1, 100);
-      extern long long new_meta_platinum_cost(int start, int end);
-      extern int r_new_meta_platinum_cost(int start, long long plats);
-      extern int r_new_meta_exp_cost(int start, long long exp);
+      extern int64_t new_meta_platinum_cost(int start, int end);
+      extern int r_new_meta_platinum_cost(int start, int64_t plats);
+      extern int r_new_meta_exp_cost(int start, int64_t exp);
 
-      extern long long moves_exp_spent(char_data * ch);
-      extern long long moves_plats_spent(char_data * ch);
-      extern long long hps_exp_spent(char_data * ch);
-      extern long long hps_plats_spent(char_data * ch);
-      extern long long mana_exp_spent(char_data * ch);
-      extern long long mana_plats_spent(char_data * ch);
+      extern int64_t moves_exp_spent(char_data * ch);
+      extern int64_t moves_plats_spent(char_data * ch);
+      extern int64_t hps_exp_spent(char_data * ch);
+      extern int64_t hps_plats_spent(char_data * ch);
+      extern int64_t mana_exp_spent(char_data * ch);
+      extern int64_t mana_plats_spent(char_data * ch);
       int new_ = MIN(r_new_meta_platinum_cost(0, hps_plats_spent(ch)), r_new_meta_exp_cost(0, hps_exp_spent(ch)));
       int ometa = GET_HP_METAS(ch);
       GET_HP_METAS(ch) = new_;
@@ -2310,7 +2310,7 @@ void checkConsecrate(int pulseType)
             obj->obj_flags.value[1]--;
             if (obj->obj_flags.value[1] <= 0)
             {
-               if ((ch = (CHAR_DATA *)(obj->obj_flags.value[3])) && charExists(ch))
+               if ((ch = obj->obj_flags.origin) && charExists(ch))
                {
                   ch->cRooms--;
                   if (ch->desc)
@@ -2372,9 +2372,9 @@ void checkConsecrate(int pulseType)
          if (obj_index[obj->item_number].virt == CONSECRATE_OBJ_NUMBER)
          {
             spl = obj->obj_flags.value[0];
-            if (charExists((CHAR_DATA *)obj->obj_flags.value[3]))
+            if (charExists(obj->obj_flags.origin))
             {
-               ch = (CHAR_DATA *)obj->obj_flags.value[3];
+               ch = obj->obj_flags.origin;
             }
             for (tmp_ch = world[obj->in_room].people; tmp_ch; tmp_ch = next_ch)
             {
@@ -2580,7 +2580,7 @@ bool handle_get_race(descriptor_data* d, string arg)
       }
    }
 
-   unsigned long race = 0;
+   uint32_t race = 0;
    try 
    {
       race = stoul(arg);
@@ -2668,7 +2668,7 @@ bool handle_get_class(descriptor_data* d, string arg)
       }
    }
 
-   unsigned long clss = 0;
+   uint32_t clss = 0;
    try 
    {
       clss = stoul(arg);
@@ -2723,7 +2723,7 @@ void show_question_stats(descriptor_data *d)
       d->stats = new stat_data;
 
       char_data* ch = d->character;
-      int32 race = d->stats->race = GET_RACE(ch);
+      int32_t race = d->stats->race = GET_RACE(ch);
       sbyte clss = d->stats->clss = GET_CLASS(ch);
 
       // Current

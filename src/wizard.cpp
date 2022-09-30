@@ -282,7 +282,7 @@ void boro_mob_stat(struct char_data *ch, struct char_data *k)
 	/* end of first line */
 	
 	(k->short_desc ? k->short_desc : "None"),
-	(long)(IS_NPC(k) ? k->mobdata->nr : 0),
+	(int32_t)(IS_NPC(k) ? k->mobdata->nr : 0),
 	/* end of second line */
 	
 	(k->long_desc ? k->long_desc : "None"),
@@ -465,7 +465,7 @@ void boro_mob_stat(struct char_data *ch, struct char_data *k)
 		sprintf(buf, "$3Birth$R: [%ld]secs  $3Logon$R:[%ld]secs $3Played$R[%ld]secs\n\r",
 			k->pcdata->time.birth,
 			k->pcdata->time.logon,
-			(long)(k->pcdata->time.played));
+			(int32_t)(k->pcdata->time.played));
 		send_to_char(buf, ch);
 
 		sprintf(buf, "$3Age$R:[%d] Years [%d] Months [%d] Days [%d] Hours\n\r",
@@ -620,7 +620,7 @@ void mob_stat(struct char_data *ch, struct char_data *k)
     sprintf(buf, "$3Birth$R: [%ld]secs  $3Logon$R:[%ld]secs  $3Played$R[%ld]secs\n\r",
           k->pcdata->time.birth,
           k->pcdata->time.logon,
-          (long)(k->pcdata->time.played));
+          (int32_t)(k->pcdata->time.played));
     send_to_char(buf, ch);
 
     sprintf(buf, "$3Age$R:[%d] Years [%d] Months [%d] Days [%d] Hours\n\r",
@@ -1427,10 +1427,10 @@ int do_linkdead(struct char_data *ch, char *arg, int cmd)
  
      if (i->pcdata->possesing)
         sprintf(buf, "%14s -- [%ld] %s  *possessing*\n\r", GET_NAME(i),
-             (long)(world[i->in_room].number), (world[i->in_room].name));
+             (int32_t)(world[i->in_room].number), (world[i->in_room].name));
      else
         sprintf(buf, "%14s -- [%ld] %s\n\r", GET_NAME(i),
-             (long)(world[i->in_room].number), (world[i->in_room].name));
+             (int32_t)(world[i->in_room].number), (world[i->in_room].name));
      send_to_char(buf, ch);
   }  
   

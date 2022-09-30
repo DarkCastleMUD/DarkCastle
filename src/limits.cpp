@@ -69,7 +69,7 @@ int graf(int age, int p0, int p1, int p2, int p3, int p4, int p5, int p6) {
 
 /* The three MAX functions define a characters Effective maximum */
 /* Which is NOT the same as the ch->max_xxxx !!!          */
-int32 mana_limit(CHAR_DATA *ch) {
+int32_t mana_limit(CHAR_DATA *ch) {
 	int max;
 
 	if (!IS_NPC(ch))
@@ -81,11 +81,11 @@ int32 mana_limit(CHAR_DATA *ch) {
 }
 
 // Previously any NPC got 0 returned.
-int32 ki_limit(CHAR_DATA *ch) {
+int32_t ki_limit(CHAR_DATA *ch) {
 	return ch->max_ki;
 }
 
-int32 hit_limit(CHAR_DATA *ch) {
+int32_t hit_limit(CHAR_DATA *ch) {
 	int max;
 
 	if (!IS_NPC(ch))
@@ -100,7 +100,7 @@ int32 hit_limit(CHAR_DATA *ch) {
 	return (max);
 }
 
-int32 move_limit(CHAR_DATA *ch) {
+int32_t move_limit(CHAR_DATA *ch) {
 	int max;
 
 	if (!IS_NPC(ch))
@@ -603,9 +603,9 @@ void advance_level(CHAR_DATA *ch, int is_conversion) {
 		send_to_char("The protective covenant of your corpse weakens, upon death players may steal 1 item from you. (See help LOOT for details)\r\n", ch);
 }
 
-void gain_exp(CHAR_DATA *ch, int64 gain) {
+void gain_exp(CHAR_DATA *ch, int64_t gain) {
 	int x = 0;
-	int64 y;
+	int64_t y;
 
 	if (!IS_NPC(ch) && GET_LEVEL(ch) >= IMMORTAL)
 		return;
@@ -646,7 +646,7 @@ void gain_exp(CHAR_DATA *ch, int64 gain) {
 }
 
 void gain_exp_regardless(CHAR_DATA *ch, int gain) {
-	GET_EXP(ch) += (int64) gain;
+	GET_EXP(ch) += (int64_t) gain;
 
 	if (GET_EXP(ch) < 0)
 		GET_EXP(ch) = 0;
@@ -654,7 +654,7 @@ void gain_exp_regardless(CHAR_DATA *ch, int gain) {
 	if (IS_NPC(ch))
 		return;
 
-	while (GET_EXP(ch) >= (int32) exp_table[GET_LEVEL(ch) + 1]) {
+	while (GET_EXP(ch) >= (int32_t) exp_table[GET_LEVEL(ch) + 1]) {
 		send_to_char("You raise a level!!  ", ch);
 		GET_LEVEL(ch) += 1;
 		advance_level(ch, 0);

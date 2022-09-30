@@ -27,8 +27,8 @@ using namespace std;
 
 /* handling the affected-structures */
 void affect_total(CHAR_DATA *ch);
-void affect_modify(CHAR_DATA *ch, int32 loc, int32 mod, long bitv, bool add, int flag = 0);
-void affect_to_char( CHAR_DATA *ch, struct affected_type *af, int32 duration_type = PULSE_TIME);
+void affect_modify(CHAR_DATA *ch, int32_t loc, int32_t mod, int32_t bitv, bool add, int flag = 0);
+void affect_to_char( CHAR_DATA *ch, struct affected_type *af, int32_t duration_type = PULSE_TIME);
 void affect_from_char( CHAR_DATA *ch, int skill, int flags = 0);
 void affect_remove( CHAR_DATA *ch, struct affected_type *af, int flags);
 affected_type * affected_by_spell( CHAR_DATA *ch, int skill );

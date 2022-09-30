@@ -27,7 +27,7 @@
 
 struct clan_room_data
 {
-   int32 room_number;
+   int32_t room_number;
   struct clan_room_data * next;
 };
 
@@ -35,10 +35,10 @@ struct clan_member_data
 {
   char * member_name;
   uint32 member_rights;
-   int32 member_rank;
+   int32_t member_rank;
   
-   int32 unused1;
-   int32 unused2;
+   int32_t unused1;
+   int32_t unused2;
   uint32 unused3;
   char * unused4; // this is saved as a variable length string
   

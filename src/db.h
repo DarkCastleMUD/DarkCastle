@@ -107,18 +107,18 @@ enum Continents
 };
 
 /* public procedures in db.c */
-void set_zone_modified_zone(long room);
-void set_zone_saved_zone(long room);
-void set_zone_modified_world(long room);
-void set_zone_saved_world(long room);
-void set_zone_modified_mob(long room);
-void set_zone_saved_mob(long room);
-void set_zone_modified_obj(long room);
-void set_zone_saved_obj(long room);
-bool can_modify_this_room(char_data * ch, long room);
-bool can_modify_room(char_data * ch, long room);
-bool can_modify_mobile(char_data * ch, long room);
-bool can_modify_object(char_data * ch, long room);
+void set_zone_modified_zone(int32_t room);
+void set_zone_saved_zone(int32_t room);
+void set_zone_modified_world(int32_t room);
+void set_zone_saved_world(int32_t room);
+void set_zone_modified_mob(int32_t room);
+void set_zone_saved_mob(int32_t room);
+void set_zone_modified_obj(int32_t room);
+void set_zone_saved_obj(int32_t room);
+bool can_modify_this_room(char_data * ch, int32_t room);
+bool can_modify_room(char_data * ch, int32_t room);
+bool can_modify_mobile(char_data * ch, int32_t room);
+bool can_modify_object(char_data * ch, int32_t room);
 void write_one_zone(FILE * fl, int zon);
 void write_one_room(FILE * fl, int nr);
 void write_mobile(char_data * mob, FILE * fl);
@@ -218,7 +218,7 @@ struct zone_data
     int top;                /* upper limit for room vnums in this zone */
     int bottom_rnum;
     int top_rnum;
-    long zone_flags;        /* flags for the entire zone eg: !teleport */
+    int32_t zone_flags;        /* flags for the entire zone eg: !teleport */
 
     int players;            // Number of PCs in the zone
 
@@ -274,7 +274,7 @@ struct index_data
 struct help_index_element
 {
     char *keyword;
-    long pos;
+    int32_t pos;
 };
 
 extern int exp_table[61+1];
@@ -287,9 +287,9 @@ extern int exp_table[61+1];
 struct world_file_list_item
 {
     char * filename;
-    long firstnum;
-    long lastnum;
-    long flags;
+    int32_t firstnum;
+    int32_t lastnum;
+    int32_t flags;
     world_file_list_item * next;
 };
 

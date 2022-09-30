@@ -172,7 +172,7 @@ struct char_skill_data
 {
     skill_t  skillnum;          // ID # of skill.
     int16  learned;           // % chance for success must be > 0
-    int32  unused[5];         // for future use
+    int32_t  unused[5];         // for future use
 };
 
 struct class_skill_defines
@@ -190,10 +190,10 @@ struct affected_type
 {
     uint32 type = {};           /* The type of spell that caused ths      */
     int16  duration = {};       /* For how long its effects will last      */
-    int32  duration_type = {};  
-    int32  modifier = {};       /* This is added to apropriate ability     */
-    int32  location = {};       /* Tells which ability to change(APPLY_XXX)*/
-    int32 bitvector = {};      /* Tells which bits to set (AFF_XXX)       */
+    int32_t  duration_type = {};  
+    int32_t  modifier = {};       /* This is added to apropriate ability     */
+    int32_t  location = {};       /* Tells which ability to change(APPLY_XXX)*/
+    int32_t bitvector = {};      /* Tells which bits to set (AFF_XXX)       */
     std::string caster = {};
     struct affected_type *next = {};
     char_data *origin = {};    
@@ -237,7 +237,7 @@ struct pc_data
                                 // This number could go negative from stat loss
     uint16 kimetas = {};             // How many times I've metad ki (pc only)
 
-    long wizinvis = {};
+    int32_t wizinvis = {};
 
     uint16 practices = {};         // How many can you learn yet this level
     uint16 specializations = {};   // How many specializations a player has left
@@ -259,8 +259,8 @@ struct pc_data
     int16 buildOLowVnum = {}, buildOHighVnum = {};
     obj_data *skillchange = {}; /* Skill changing equipment. */
 
-     int32 last_mob_edit = {};       // vnum of last mob edited
-     int32 last_obj_edit = {};       // vnum of last obj edited
+     int32_t last_mob_edit = {};       // vnum of last mob edited
+     int32_t last_obj_edit = {};       // vnum of last obj edited
 
     string last_tell = {};          /* last person who told           */
      int16 last_mess_read = {};     /* for reading messages */
@@ -296,14 +296,14 @@ const int MAX_MOB_VALUES = 4;
 
 struct mob_flag_data
 {
-    int32 value[MAX_MOB_VALUES]; /* Mob type-specific value numbers */
+    int32_t value[MAX_MOB_VALUES]; /* Mob type-specific value numbers */
     mob_type_t type;             /* Type of mobile                     */
 };
 
 struct mob_data
 {
     public:
-    int32 nr = {};
+    int32_t nr = {};
     sbyte default_pos = {};    // Default position for NPC
     sbyte last_direction = {}; // Last direction the mobile went in
     uint32 attack_type = {};    // Bitvector of damage type for bare-handed combat
@@ -317,7 +317,7 @@ struct mob_data
 
     MPROG_ACT_LIST *    mpact = {}; // list of MOBProgs
      int16                 mpactnum = {}; // num
-    int32 last_room = {}; // Room rnum the mob was last in. Used
+    int32_t last_room = {}; // Room rnum the mob was last in. Used
 		      // For !magic,!track changing flags.
     struct threat_struct *threat = {};
     struct reset_com *reset = {};
@@ -368,29 +368,28 @@ struct char_data
     ubyte height = {};       /* PC/NPC's height */
 
     int16 hometown = {};      /* PC/NPC home town */
-    int64 gold = {};           /* Money carried                           */
+    int64_t gold = {};           /* Money carried                           */
     uint32 plat = {};           /* Platinum                                */
-     int64 exp = {};            /* The experience of the player            */
-			   /* Changed to a long long */
-     int32 in_room = {};
+     int64_t exp = {};            /* The experience of the player            */
+     int32_t in_room = {};
 
     uint32 immune = {};         // Bitvector of damage types I'm immune to
     uint32 resist = {};         // Bitvector of damage types I'm resistant to
     uint32 suscept = {};        // Bitvector of damage types I'm susceptible to
      int16 saves[SAVE_TYPE_MAX+1] = {};  // Saving throw bonuses
 
-     int32 mana = {};         
-     int32 max_mana = {};     /* Not useable                             */
-     int32 raw_mana = {};     /* before int bonus                        */
-     int32 hit = {};   
-     int32 max_hit = {};      /* Max hit for NPC                         */
-     int32 raw_hit = {};      /* before con bonus                        */
-     int32 move = {};  
-     int32 raw_move = {};
-     int32 max_move = {};     /* Max move for NPC                        */
-     int32 ki = {};
-     int32 max_ki = {};
-     int32 raw_ki = {};
+     int32_t mana = {};         
+     int32_t max_mana = {};     /* Not useable                             */
+     int32_t raw_mana = {};     /* before int bonus                        */
+     int32_t hit = {};   
+     int32_t max_hit = {};      /* Max hit for NPC                         */
+     int32_t raw_hit = {};      /* before con bonus                        */
+     int32_t move = {};  
+     int32_t raw_move = {};
+     int32_t max_move = {};     /* Max move for NPC                        */
+     int32_t ki = {};
+     int32_t max_ki = {};
+     int32_t raw_ki = {};
 
      int16 alignment = {};          // +-1000 for alignments                 
 
@@ -398,7 +397,7 @@ struct char_data
     uint32 manametas = {};           // total number of times meta'd mana
     uint32 movemetas = {};           // total number of times meta'd moves
     uint32 acmetas = {};             // total number of times meta'd ac
-     int32 agemetas = {};            // number of years age has been meta'd
+     int32_t agemetas = {};            // number of years age has been meta'd
 
      int16 hit_regen = {};           // modifier to hp regen
      int16 mana_regen = {};          // modifier to mana regen
@@ -455,17 +454,17 @@ struct char_data
     CHAR_DATA *master = {};              /* Who is char following? */
     char *group_name = {};                /* Name of group */
     
-    int32 timer = {};                         // Timer for update
-    int32 shotsthisround = {};                // Arrows fired this round
-    int32 spellcraftglyph = {};               // Used for spellcraft glyphs
+    int32_t timer = {};                         // Timer for update
+    int32_t shotsthisround = {};                // Arrows fired this round
+    int32_t spellcraftglyph = {};               // Used for spellcraft glyphs
     bool  changeLeadBonus = {};
-    int32 curLeadBonus = {};
+    int32_t curLeadBonus = {};
     int   cRooms = {};			// number of rooms consecrated/desecrated
 
 // TODO - see if we can move the "wait" timer from desc to char
 // since we need something to lag mobs too
 
-    int32 deaths = {};                   /* deaths is reused for mobs as a
+    int32_t deaths = {};                   /* deaths is reused for mobs as a
                                        timer to check for WAIT_STATE */
 
     int cID = {}; // character ID
@@ -487,7 +486,7 @@ struct char_data
     time_t last_damage = {};
     uint64_t damage_per_second = {};
     void setPOSFighting();
-    int32 getHP(void);
+    int32_t getHP(void);
     void setHP(int hp, char_data* causer = nullptr);
     void addHP(int hp, char_data* causer = nullptr);
     void removeHP(int dam, char_data* causer = nullptr);
@@ -548,19 +547,19 @@ struct char_file_u4
 
     uint32 gold = {};
     uint32 plat = {};
-    int64 exp = {};
+    int64_t exp = {};
     uint32 immune = {};
     uint32 resist = {};
     uint32 suscept = {};
 
-    int32 mana = {};     // current
-    int32 raw_mana = {}; // max without eq/stat bonuses
-    int32 hit = {};
-    int32 raw_hit = {};
-    int32 move = {};
-    int32 raw_move = {};
-    int32 ki = {};
-    int32 raw_ki = {};
+    int32_t mana = {};     // current
+    int32_t raw_mana = {}; // max without eq/stat bonuses
+    int32_t hit = {};
+    int32_t raw_hit = {};
+    int32_t move = {};
+    int32_t raw_move = {};
+    int32_t ki = {};
+    int32_t raw_ki = {};
 
     int16 alignment = {};
     int16 unused1 = {};
@@ -575,17 +574,17 @@ struct char_file_u4
     int16 damroll = {};
     int16 unused2 = {};
 
-    int32 afected_by = {};
-    int32 afected_by2 = {};
+    int32_t afected_by = {};
+    int32_t afected_by2 = {};
     uint32 misc = {}; // channel flags
 
     int16 clan = {};
     int16 unused3 = {};
-    int32 load_room = {}; // Which room to place char in
+    int32_t load_room = {}; // Which room to place char in
 
     uint32 acmetas = {};
-    int32 agemetas = {};
-    int32 extra_ints[3] = {}; // available just in case
+    int32_t agemetas = {};
+    int32_t extra_ints[3] = {}; // available just in case
 } __attribute__((packed));
 
 struct char_file_u
@@ -608,19 +607,19 @@ struct char_file_u
     int16 hometown;
     uint32 gold;
     uint32 plat;
-    int64 exp;
+    int64_t exp;
     uint32 immune;
     uint32 resist;
     uint32 suscept;
 
-    int32 mana;        // current
-    int32 raw_mana;    // max without eq/stat bonuses
-    int32 hit;
-    int32 raw_hit;
-    int32 move;
-    int32 raw_move;
-    int32 ki;
-    int32 raw_ki;
+    int32_t mana;        // current
+    int32_t raw_mana;    // max without eq/stat bonuses
+    int32_t hit;
+    int32_t raw_hit;
+    int32_t move;
+    int32_t raw_move;
+    int32_t ki;
+    int32_t raw_ki;
 
     int16 alignment;
    uint32 hpmetas; // Used by familiars too... why not.
@@ -630,16 +629,16 @@ struct char_file_u
     int16 armor;       // have to save these since mobs have different bases
     int16 hitroll;
     int16 damroll;
-    int32 afected_by;
-    int32 afected_by2;
+    int32_t afected_by;
+    int32_t afected_by2;
     uint32 misc;          // channel flags
 
     int16 clan; 
-    int32 load_room;                  // Which room to place char in
+    int32_t load_room;                  // Which room to place char in
 
     uint32 acmetas;
-    int32 agemetas;
-    int32 extra_ints[3];             // available just in case
+    int32_t agemetas;
+    int32_t extra_ints[3];             // available just in case
 };
 
 struct profession {

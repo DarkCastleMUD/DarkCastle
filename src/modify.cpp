@@ -434,7 +434,7 @@ struct help_index_element *build_help_index(FILE *fl, int *num) {
 	int nr = -1, issorted, i;
 	struct help_index_element *list = 0, mem;
 	char buf[81], tmp[81], *scan;
-	long pos;
+	int32_t pos;
 
 #ifdef LEAK_CHECK
 	list = (struct help_index_element *)

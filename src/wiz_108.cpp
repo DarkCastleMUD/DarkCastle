@@ -368,7 +368,7 @@ int do_set(struct char_data *ch, char *argument, int cmd)
                 log(buf2, IMP, LOG_GOD);
                 /* set age of victim */
                 vict->pcdata->time.birth = 
-                    time(0) - (long)value*(long)SECS_PER_MUD_YEAR;
+                    time(0) - (int32_t)value*(int32_t)SECS_PER_MUD_YEAR;
             };
             break;
             case 1: /* sex */
@@ -548,9 +548,9 @@ int do_set(struct char_data *ch, char *argument, int cmd)
             break;
             case 13: /* exp */
             {
-              int64 val;
+              int64_t val;
               val = atoll(buf);
-              int64 before_exp = vict->exp;
+              int64_t before_exp = vict->exp;
               vict->exp = val;
               logf(GET_LEVEL(ch), LOG_GOD, "%s sets %s's exp from %lld to %lld.",
                    GET_NAME(ch), GET_NAME(vict), before_exp, vict->exp);

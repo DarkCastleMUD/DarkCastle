@@ -1458,7 +1458,7 @@ void half_chop(const char *string, char *arg1, char *arg2)
 /* return last 'word' plus leading substring of input string */
 void chop_half(char *string, char *arg1, char *arg2)
 {
-  long i, j;
+  int32_t i, j;
   
   // skip over trailing space
   i = strlen(string)-1;

@@ -1792,7 +1792,7 @@ int getRealSpellDamage( CHAR_DATA * ch)
    return spell_dam;
 }
 
-int32 char_data::getHP(void)
+int32_t char_data::getHP(void)
 {
   return hit;
 }
@@ -1846,12 +1846,12 @@ int damage(CHAR_DATA *ch, CHAR_DATA *victim,
            int dam, int weapon_type, int attacktype, int weapon, bool is_death_prog)
 {
   int can_miss = 1;
-  long weapon_bit;
+  int32_t weapon_bit;
   struct obj_data *wielded;
   int typeofdamage;
   int damage_type(int weapon_type);
-  long int get_weapon_bit(int weapon_type);
-  int32 hit_limit(CHAR_DATA * ch);
+  int32_t get_weapon_bit(int weapon_type);
+  int32_t hit_limit(CHAR_DATA * ch);
   int retval = 0;
   int modifier = 0;
   int percent;
@@ -5356,7 +5356,7 @@ void raw_kill(CHAR_DATA * ch, CHAR_DATA * victim)
     if (ch)
        penalty += GET_LEVEL(ch) * .05;
     penalty = MIN(penalty, 2);
-    GET_EXP(victim) = (int64) (GET_EXP(victim) / penalty);
+    GET_EXP(victim) = (int64_t) (GET_EXP(victim) / penalty);
   } // !IS_NPC
 }
 
@@ -5365,9 +5365,9 @@ void raw_kill(CHAR_DATA * ch, CHAR_DATA * victim)
 void group_gain(CHAR_DATA * ch, CHAR_DATA * victim)
 {
   char buf[256];
-  long no_members = 0, total_levels = 0;
-  int64 share, total_share = 0;
-  int64 base_xp = 0, bonus_xp = 0;
+  int32_t no_members = 0, total_levels = 0;
+  int64_t share, total_share = 0;
+  int64_t base_xp = 0, bonus_xp = 0;
   CHAR_DATA *leader, *highest, *tmp_ch;
   struct follow_type *f;
   
@@ -5464,11 +5464,11 @@ CHAR_DATA *get_highest_level_killer(CHAR_DATA *leader, CHAR_DATA *killer)
 }
 
 /* count the number of group members eligible for XP from a kill */
-long count_xp_eligibles(CHAR_DATA *leader, CHAR_DATA *killer,
-                        long highest_level, long *total_levels)
+int32_t count_xp_eligibles(CHAR_DATA *leader, CHAR_DATA *killer,
+                        int32_t highest_level, int32_t *total_levels)
 {
   struct follow_type *f;
-  long num_eligibles = 0;
+  int32_t num_eligibles = 0;
 
   *total_levels = 0;
 
@@ -5495,11 +5495,11 @@ long count_xp_eligibles(CHAR_DATA *leader, CHAR_DATA *killer,
 }
 
 /* scale character XP based on various factors */
-int64 scale_char_xp(CHAR_DATA *ch, CHAR_DATA *killer, CHAR_DATA *victim,
-                  long no_killers, long total_levels, long highest_level,
-                  int64 base_xp, int64 *bonus_xp)
+int64_t scale_char_xp(CHAR_DATA *ch, CHAR_DATA *killer, CHAR_DATA *victim,
+                  int32_t no_killers, int32_t total_levels, int32_t highest_level,
+                  int64_t base_xp, int64_t *bonus_xp)
 {
-    long scaled_share;
+    int32_t scaled_share;
     *bonus_xp = 0;
 
 	scaled_share = ((base_xp + *bonus_xp) * GET_LEVEL(ch)) / total_levels;
@@ -5536,7 +5536,7 @@ CHAR_DATA *loop_followers(struct follow_type **f)
 	};
 
 void dam_message(int dam, CHAR_DATA * ch, CHAR_DATA * victim,
-                 int w_type, long modifier)
+                 int w_type, int32_t modifier)
 {
   static const char *attack_table[] =
   {
@@ -7033,7 +7033,7 @@ int check_pursuit(char_data *ch, char_data *victim, char *dircommand)
 }
   
 
-long int get_weapon_bit(int weapon_type)
+int32_t get_weapon_bit(int weapon_type)
 {
   switch (weapon_type)
   {

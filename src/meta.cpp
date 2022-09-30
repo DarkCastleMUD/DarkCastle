@@ -45,10 +45,10 @@
  START META-PHYSICIAN
 
  */
-long long new_meta_platinum_cost(int start, int end)
+int64_t new_meta_platinum_cost(int start, int end)
 { // This is the laziest function ever. I didn't feel like
 // figuring out a formulae to work with the ranges, so I didn't.
-	long long platcost = 0;
+	int64_t platcost = 0;
 	if (end <= start || end < 0 || start < 0)
 		return 0; // That's cheap!
 	while (start < end)
@@ -78,10 +78,10 @@ long long new_meta_platinum_cost(int start, int end)
 	return platcost;
 }
 
-int r_new_meta_platinum_cost(int start, long long plats)
+int r_new_meta_platinum_cost(int start, int64_t plats)
 { // This is a copy of the laziest function ever. I didn't feel like
 // figuring out a formulae to work with the ranges, so I didn't.
-	long long platcost = 0;
+	int64_t platcost = 0;
 	if (plats <= 0 || start < 0)
 		return 0;
 	while (platcost < plats)
@@ -111,7 +111,7 @@ int r_new_meta_platinum_cost(int start, long long plats)
 	return start - 5;
 }
 
-int r_new_meta_exp_cost(int start, long long exp)
+int r_new_meta_exp_cost(int start, int64_t exp)
 {
 	if (exp <= 0)
 		return start;
@@ -123,17 +123,17 @@ int r_new_meta_exp_cost(int start, long long exp)
 	return start - 5;
 }
 
-long long new_meta_exp_cost_one(int start)
+int64_t new_meta_exp_cost_one(int start)
 {
 	if (start < 0)
 		return 0;
 	return new_meta_platinum_cost(start, start + 1) * 51523;
 }
 
-long long moves_exp_spent(char_data * ch)
+int64_t moves_exp_spent(char_data * ch)
 {
 	int start = GET_MAX_MOVE(ch) - GET_MOVE_METAS(ch);
-	long long expcost = 0;
+	int64_t expcost = 0;
 	while (start < GET_MAX_MOVE(ch))
 	{
 		expcost += (int)((5000000 + (start * 2500)) * 1.2);
@@ -142,21 +142,21 @@ long long moves_exp_spent(char_data * ch)
 	return expcost;
 }
 
-long long moves_plats_spent(char_data * ch)
+int64_t moves_plats_spent(char_data * ch)
 {
-	long long expcost = 0;
+	int64_t expcost = 0;
 	int start = GET_MAX_MOVE(ch) - GET_MOVE_METAS(ch);
 	while (start < GET_MAX_MOVE(ch))
 	{
-		expcost += (long long)(((int)(125 + (int)((0.025 * start * (start / 1000 == 0 ? 1 : start / 1000)))) * 0.9));
+		expcost += (int64_t)(((int)(125 + (int)((0.025 * start * (start / 1000 == 0 ? 1 : start / 1000)))) * 0.9));
 		start++;
 	}
 	return expcost;
 }
 
-long long hps_exp_spent(char_data * ch)
+int64_t hps_exp_spent(char_data * ch)
 {
-	long long expcost = 0;
+	int64_t expcost = 0;
 	int cost;
 	switch (GET_CLASS(ch))
 	{
@@ -200,16 +200,16 @@ long long hps_exp_spent(char_data * ch)
 	int base = GET_MAX_HIT(ch) - GET_HP_METAS(ch);
 	while (base < GET_MAX_HIT(ch))
 	{
-		expcost += (long long)((5000000 + (cost * base)) * 1.2);
+		expcost += (int64_t)((5000000 + (cost * base)) * 1.2);
 		base++;
 	}
 	return expcost;
 }
 
-long long hps_plats_spent(char_data * ch)
+int64_t hps_plats_spent(char_data * ch)
 {
 	int cost;
-	long long platcost = 0;
+	int64_t platcost = 0;
 	switch (GET_CLASS(ch))
 	{
 	case CLASS_BARBARIAN:
@@ -252,16 +252,16 @@ long long hps_plats_spent(char_data * ch)
 	int base = GET_MAX_HIT(ch) - GET_HP_METAS(ch);
 	while (base < GET_MAX_HIT(ch))
 	{
-		platcost += (long long)((100 + cost + (int)(0.025 * base * (base / 1000 == 0 ? 1 : base / 1000))) * 0.9);
+		platcost += (int64_t)((100 + cost + (int)(0.025 * base * (base / 1000 == 0 ? 1 : base / 1000))) * 0.9);
 		base++;
 	}
 	return platcost;
 }
 
-long long mana_exp_spent(char_data * ch)
+int64_t mana_exp_spent(char_data * ch)
 {
 	int cost;
-	long long expcost = 0;
+	int64_t expcost = 0;
 	switch (GET_CLASS(ch))
 	{
 	case CLASS_PALADIN:
@@ -288,16 +288,16 @@ long long mana_exp_spent(char_data * ch)
 	int base = GET_MAX_MANA(ch) - GET_MANA_METAS(ch);
 	while (base < GET_MAX_MANA(ch))
 	{
-		expcost += (long long)((5000000 + (cost * base)) * 1.2);
+		expcost += (int64_t)((5000000 + (cost * base)) * 1.2);
 		base++;
 	}
 	return expcost;
 }
 
-long long mana_plats_spent(char_data * ch)
+int64_t mana_plats_spent(char_data * ch)
 {
 	int cost;
-	long long platcost = 0;
+	int64_t platcost = 0;
 	switch (GET_CLASS(ch))
 	{
 	case CLASS_PALADIN:
@@ -324,7 +324,7 @@ long long mana_plats_spent(char_data * ch)
 	int base = GET_MAX_MANA(ch) - GET_MANA_METAS(ch);
 	while (base < GET_MAX_MANA(ch))
 	{
-		platcost += (long long)((100 + cost + (int)(0.025 * base * (base / 1000 == 0 ? 1 : base / 1000))) * 0.9);
+		platcost += (int64_t)((100 + cost + (int)(0.025 * base * (base / 1000 == 0 ? 1 : base / 1000))) * 0.9);
 		base++;
 	}
 	return platcost;
@@ -503,7 +503,7 @@ void meta_list_stats(char_data * ch)
 
 }
 
-long long meta_get_moves_exp_cost(char_data * ch)
+int64_t meta_get_moves_exp_cost(char_data * ch)
 {
 	int meta = GET_MOVE_METAS(ch);
 	if (GET_MAX_MOVE(ch) - GET_RAW_MOVE(ch) < 0)
@@ -511,7 +511,7 @@ long long meta_get_moves_exp_cost(char_data * ch)
 	return new_meta_exp_cost_one(MAX(0, meta));
 }
 
-long long meta_get_moves_plat_cost(char_data * ch, int amount)
+int64_t meta_get_moves_plat_cost(char_data * ch, int amount)
 {
 	int meta = GET_MOVE_METAS(ch);
 	if (GET_MAX_MOVE(ch) - GET_RAW_MOVE(ch) < 0)
@@ -519,7 +519,7 @@ long long meta_get_moves_plat_cost(char_data * ch, int amount)
 	return new_meta_platinum_cost(MAX(0, meta), MAX(0,meta) + amount);
 }
 
-long long meta_get_hps_exp_cost(char_data * ch)
+int64_t meta_get_hps_exp_cost(char_data * ch)
 {
 	int meta = GET_HP_METAS(ch);
 	int bonus = 0;
@@ -535,7 +535,7 @@ long long meta_get_hps_exp_cost(char_data * ch)
 	return new_meta_exp_cost_one(MAX(0, meta));
 }
 
-long long meta_get_hps_plat_cost(char_data * ch, int amount)
+int64_t meta_get_hps_plat_cost(char_data * ch, int amount)
 {
 	int meta = GET_HP_METAS(ch);
 	int bonus = 0;
@@ -551,7 +551,7 @@ long long meta_get_hps_plat_cost(char_data * ch, int amount)
 	return new_meta_platinum_cost(MAX(0, meta), MAX(0,meta) + amount);
 }
 
-long long meta_get_mana_exp_cost(char_data * ch)
+int64_t meta_get_mana_exp_cost(char_data * ch)
 {
 	int meta = GET_MANA_METAS(ch);
 	int stat, bonus = 0;
@@ -574,7 +574,7 @@ long long meta_get_mana_exp_cost(char_data * ch)
 	return new_meta_exp_cost_one(MAX(0, meta));
 }
 
-long long meta_get_mana_plat_cost(char_data * ch, int amount)
+int64_t meta_get_mana_plat_cost(char_data * ch, int amount)
 {
 	int meta = GET_MANA_METAS(ch);
 	int stat, bonus = 0;
@@ -649,7 +649,7 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, const char *a
 	int stat;
 	int choice;
 	int increase;
-	long long hit_cost, mana_cost, move_cost, ki_cost = 0, hit_exp, move_exp, mana_exp, ki_exp = 0;
+	int64_t hit_cost, mana_cost, move_cost, ki_cost = 0, hit_exp, move_exp, mana_exp, ki_exp = 0;
 	int statplatprice = 0, max_stat = 0;
 
 	sbyte *pstat = 0;
@@ -714,8 +714,8 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, const char *a
 
 		}
 
-		long long platcost;
-		long long expcost;
+		int64_t platcost;
+		int64_t expcost;
 		switch (choice)
 		{
 			case 1:
@@ -750,7 +750,7 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, const char *a
 
 		if (hit_exp && hit_cost)
 			csendf(ch, "$B$37)$R Add 1 point to your hit points:   %lld experience points and %lld"
-					" Platinum coins.\n\r", (long long)(hit_exp / 5 * 1.1), (long long)(hit_cost / 5 * 1.1));
+					" Platinum coins.\n\r", (int64_t)(hit_exp / 5 * 1.1), (int64_t)(hit_cost / 5 * 1.1));
 		else
 			csendf(ch, "$B$37)$R Add to your hit points:   You cannot do this.\r\n");
 
@@ -762,7 +762,7 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, const char *a
 
 		if (mana_exp && mana_cost)
 			csendf(ch, "$B$39)$R Add 1 point to your mana points:   %lld experience points and %lld"
-					" Platinum coins.\n\r", (long long)(mana_exp / 5 * 1.1), (long long)(mana_cost / 5 * 1.1));
+					" Platinum coins.\n\r", (int64_t)(mana_exp / 5 * 1.1), (int64_t)(mana_cost / 5 * 1.1));
 		else
 			csendf(ch, "$B$39)$R Add to your mana points:   You cannot do this.\r\n");
 
@@ -774,7 +774,7 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, const char *a
 
 		if (move_exp && move_cost)
 			csendf(ch, "$B$311)$R Add 1 points to your movement points:   %lld experience points and %lld"
-					" Platinum coins.\n\r", (long long)(move_exp / 5 * 1.1), (long long)(move_cost / 5 * 1.1));
+					" Platinum coins.\n\r", (int64_t)(move_exp / 5 * 1.1), (int64_t)(move_cost / 5 * 1.1));
 		else
 			csendf(ch, "$B$311)$R Add to your movement points:   You cannot do this.\r\n");
 

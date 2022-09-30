@@ -84,7 +84,7 @@ public:
 
 private:
   string name;
-  long wizinvis;
+  int32_t wizinvis;
   int32_t type;
   string msg;
 };

@@ -319,13 +319,13 @@ FILE * clan_log   = 0;
 FILE * objects_log = 0;
 FILE * quest_log = 0;
 
-void log(string str, int god_level, long type)
+void log(string str, int god_level, int32_t type)
 {
   log(str, god_level, type, nullptr);
 }
 
 // writes a string to the log 
-void log(string str, int god_level, long type, char_data *vict)
+void log(string str, int god_level, int32_t type, char_data *vict)
 {
   FILE **f = 0;
   int stream = 1;
@@ -539,9 +539,9 @@ std::string sprintbit(uint value[], const char *names[])
 }
 
 // leading space until all calling functions cleaned up
-void sprintbit( unsigned long vektor, const char *names[], char *result )
+void sprintbit( uint32_t vektor, const char *names[], char *result )
 {
-    long nr;
+    int32_t nr;
 
     *result = '\0';
 
@@ -572,9 +572,9 @@ void sprintbit( unsigned long vektor, const char *names[], char *result )
 }
 
 // no leading space
-std::string sprintbit(unsigned long vektor, const char *names[])
+std::string sprintbit(uint32_t vektor, const char *names[])
 {
-  long nr;
+  int32_t nr;
 
   string result = {};
 
@@ -691,10 +691,10 @@ const char * constindex( int index, const char *names[] )
 // Calculate the MUD time passed over the last t2-t1 centuries (secs) 
 struct time_info_data mud_time_passed(time_t t2, time_t t1)
 {
-    long secs;
+    int32_t secs;
     struct time_info_data now;
 
-    secs = (long) (t2 - t1);
+    secs = (int32_t) (t2 - t1);
 
     now.hours = (secs/SECS_PER_MUD_HOUR) % 24;  /* 0..23 hours */
     secs -= SECS_PER_MUD_HOUR*now.hours;
@@ -1594,7 +1594,7 @@ mob_index[fol->follower->mobdata->nr].virt == 8)
    for(obj = object_list; obj; obj = tmp_obj) {
     tmp_obj = obj->next;
     if(obj_index[obj->item_number].virt == CONSECRATE_OBJ_NUMBER)
-      if(ch == (CHAR_DATA *)(obj->obj_flags.value[3]) )
+      if(ch == (CHAR_DATA *)(obj->obj_flags.origin) )
        extract_obj(obj);
    }
   }

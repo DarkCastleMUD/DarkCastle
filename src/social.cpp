@@ -26,8 +26,8 @@ extern CWorld world;
  
 // storage of socials
 struct social_messg * soc_mess_list;  // head of social array
-long int num_socials;                 // number of actual socials (50 = 0-49)
-long int social_array_size;           // size of actual array (since we allocate in chunks)
+int32_t num_socials;                 // number of actual socials (50 = 0-49)
+int32_t social_array_size;           // size of actual array (since we allocate in chunks)
 
 struct social_messg *find_social(char *arg);
 
@@ -140,7 +140,7 @@ char *fread_social_string(FILE *fl)
 // read one social
 // return TRUE on success
 // return FALSE on 'EOF'
-int read_social_from_file(long int num_social, FILE * fl)
+int read_social_from_file(int32_t num_social, FILE * fl)
 {
   char tmp[MAX_INPUT_LENGTH];
   int hide, min_pos;

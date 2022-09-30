@@ -702,7 +702,7 @@ int skills_guild ( struct char_data *ch, const char *arg, struct char_data *owne
 int guild(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
           struct char_data *owner)
 {
-  int64 exp_needed;
+  int64_t exp_needed;
   int x = 0;
 
   if(cmd == 171 && !IS_MOB(ch)) {         /*   gain crap...  */

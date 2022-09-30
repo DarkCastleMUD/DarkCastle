@@ -65,7 +65,7 @@ bool test_rolls(uint8_t total)
 
   init_random();
 
-  unsigned long long attempts = 0;
+  uint64_t attempts = 0;
   while (1)
   {
     attempts++;
@@ -373,16 +373,16 @@ int main(int argc, char **argv)
       process_output(d);
     }
     /*
-        multimap<int32, string> hp_leaders;
+        multimap<int32_t, string> hp_leaders;
         for (auto& ch : DC::instance().character_list)
         {
           if (IS_PC(ch))
           {
-            hp_leaders.insert(pair<int32,string>(ch->max_hit, ch->name));
+            hp_leaders.insert(pair<int32_t,string>(ch->max_hit, ch->name));
           }
         }
 
-        queue<pair<int32,string>> top_hp_leaders;
+        queue<pair<int32_t,string>> top_hp_leaders;
         for (auto& l : hp_leaders)
         {
           //cout << l.first << " " << l.second << endl;

@@ -128,7 +128,7 @@ int do_found(CHAR_DATA *ch, char *argument, int cmd)
 
 int do_split(CHAR_DATA *ch, char *argument, int cmd)
 {
-  int32 amount, share, extra;
+  int32_t amount, share, extra;
   char buf[256], number[MAX_INPUT_LENGTH+1];
   int no_members;
   CHAR_DATA *k;

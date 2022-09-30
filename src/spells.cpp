@@ -961,7 +961,7 @@ int use_mana( CHAR_DATA *ch, int sn )
 }
 
 
-void affect_update(int32 duration_type) {
+void affect_update(int32_t duration_type) {
 	static struct affected_type *af, *next_af_dude;
 	void update_char_objects(CHAR_DATA *ch); /* handler.c */
 
