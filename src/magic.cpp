@@ -9421,7 +9421,8 @@ int elemental_damage_bonus(int spell, char_data *ch)
   fire = ice = earth = energy = FALSE;
   for (f=mst->followers; f; f=f->next)
   {
-    if (IS_NPC(f->follower) && f->follower->height == 77)
+    // if (IS_NPC(f->follower) && f->follower->height == 77) 
+    if (IS_NPC(f->follower) && f->follower->mobdata->mob_flags.value[3] == 77)
     {
 	switch (mob_index[f->follower->mobdata->nr].virt)
 	{
@@ -9437,7 +9438,8 @@ int elemental_damage_bonus(int spell, char_data *ch)
 	}
     } else {
 	  for (t=f->follower->followers; t; t=t->next)
-    	    if (IS_NPC(t->follower) && t->follower->height == 77)
+    	    // if (IS_NPC(t->follower) && t->follower->height == 77)
+            if (IS_NPC(f->follower) && f->follower->mobdata->mob_flags.value[3] == 77)
     	    {
 		switch (mob_index[t->follower->mobdata->nr].virt)
 		{
@@ -9465,7 +9467,7 @@ int elemental_damage_bonus(int spell, char_data *ch)
         case SPELL_BURNING_HANDS:
         case SPELL_SOLAR_GATE:
         case SPELL_SPARKS:
-	   if (fire) return dice(5,6);
+	   if (fire) return dice(9,11);
 	   else return 0;
         case SPELL_METEOR_SWARM:
         case SPELL_BEE_STING:
@@ -9474,13 +9476,13 @@ int elemental_damage_bonus(int spell, char_data *ch)
   case SPELL_COLOUR_SPRAY:
   case SPELL_MAGIC_MISSILE:
   case SPELL_BEE_SWARM:
-	   if (earth) return dice(8,4);
+	   if (earth) return dice(13,7);
 	   else return 0;
 	case SPELL_CALL_LIGHTNING:
 	case SPELL_SUN_RAY:
 	case SPELL_SHOCKING_GRASP:
 	case SPELL_LIGHTNING_BOLT:
-	   if (energy) return dice(1,50);
+	   if (energy) return dice(2,60);
 	   else return 0;
 	case SPELL_DROWN:
 	case SPELL_VAMPIRIC_TOUCH:
@@ -9488,7 +9490,7 @@ int elemental_damage_bonus(int spell, char_data *ch)
 	case SPELL_DISPEL_GOOD:
 	case SPELL_CHILL_TOUCH:
   case SPELL_ICESTORM:
-	    if (ice) return dice(6,5);
+	    if (ice) return dice(11,9);
 	    else return 0;
         default: return 0;
   }
@@ -9505,7 +9507,8 @@ bool elemental_score(char_data *ch, int level)
   {
     if (IS_NPC(f->follower))
     {
-	if (f->follower->height == 77) // improved
+	// if (f->follower->height == 77) // improved
+  if (f->follower->mobdata->mob_flags.value[3] == 77)
 	switch (mob_index[f->follower->mobdata->nr].virt)
 	{
 		case 88:
@@ -9520,7 +9523,8 @@ bool elemental_score(char_data *ch, int level)
 	}
     } else {
 	  for (t=f->follower->followers; t; t=t->next)
-   	   if (t->follower->height == 77) // improved
+   	  //  if (t->follower->height == 77) // improved
+       if (f->follower->mobdata->mob_flags.value[3] == 77)
     	    if (IS_NPC(t->follower))
     	    {
 		switch (mob_index[t->follower->mobdata->nr].virt)
@@ -13395,7 +13399,7 @@ TO_ROOM, 0);
   char_to_room(mob, ch->in_room);
   mob->max_hit += skill*5;
   mob->hit = mob->max_hit;
-  if (skill > 80) mob->height = 77;
+  if (skill > 80) mob->mobdata->mob_flags.value[3] = 77;
   IS_CARRYING_W(mob) = 0;
   IS_CARRYING_N(mob) = 0;
 

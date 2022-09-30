@@ -353,6 +353,7 @@ struct command_info cmd_info[] =
         {"suicide", do_suicide, nullptr, POSITION_RESTING, 0, CMD_DEFAULT, 0, 0},
         {"vote", do_vote, nullptr, POSITION_RESTING, 0, CMD_VOTE, 0, 0},
         {"huntitems", do_showhunt, nullptr, POSITION_RESTING, 0, CMD_DEFAULT, 0, 0},
+	{"random", do_random, nullptr, POSITION_RESTING, 0, CMD_DEFAULT, 0, 0},
         // Special procedure commands
 
         {"vend", do_vend, nullptr, POSITION_STANDING, 2, CMD_VEND, 0, 0},
