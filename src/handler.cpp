@@ -1809,7 +1809,7 @@ void affect_remove(CHAR_DATA *ch, struct affected_type *af, int flags) {
 		break;
 	case BASE_TIMERS + SPELL_PARALYZE:
 		if (!(flags & SUPPRESS_MESSAGES))
-			send_to_char("The ring's magical energy has recharged.\n\r", ch);
+			send_to_char("The paralytic's magical energy has recharged.\n\r", ch);
 		break;
 	case BASE_TIMERS + SPELL_GLOBE_OF_DARKNESS:
 		if (!(flags & SUPPRESS_MESSAGES))

@@ -1743,3 +1743,20 @@ int do_vote(struct char_data *ch, char *arg, int cmd)
 
 }
 
+int do_random(CHAR_DATA *ch, char *argument, int cmd)
+{
+char buf[MAX_STRING_LENGTH];
+ int i = 0;
+ 
+    if (IS_SET(world[ch->in_room].room_flags, QUIET))
+      {
+      send_to_char ("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
+      return eFAILURE;
+      }
+
+    i = number(1,100);
+               csendf(ch, "You roll a random number between 1 and 100 resulting in: $B%u$R.\r\n", i);
+               sprintf(buf, "$n rolls a number between 1 and 100 resulting in: $B%u$R.\r\n", i);
+	             act(buf, ch, 0, 0, TO_ROOM, 0);
+    return eSUCCESS;
+}
