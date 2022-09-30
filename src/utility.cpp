@@ -2277,7 +2277,7 @@ void remove_character(char *name, BACKUP_TYPE backup)
   
   if (0 == stat(src_filename, &statbuf)) { 
     if (dst_dir[0] != 0) {
-      snprintf(syscmd, 512, "mv %s %s", src_filename, dst_dir);
+      snprintf(syscmd, 512, "mv -f %s %s", src_filename, dst_dir);
       system(syscmd);
     } else {
       unlink(src_filename);
@@ -2292,7 +2292,7 @@ void remove_character(char *name, BACKUP_TYPE backup)
   
   if (0 == stat(src_filename, &statbuf)) { 
     if (dst_dir[0] != 0) {
-      snprintf(syscmd, 512, "mv %s %s", src_filename, dst_dir);
+      snprintf(syscmd, 512, "mv -f %s %s", src_filename, dst_dir);
       system(syscmd);
     } else {
       unlink(src_filename);
@@ -2337,7 +2337,7 @@ void remove_familiars(char *name, BACKUP_TYPE backup)
     
     if (0 == stat(src_filename, &statbuf)) { 
       if (dst_dir[0] != 0) {
-	snprintf(syscmd, 512, "mv %s %s", src_filename, dst_dir);
+	snprintf(syscmd, 512, "mv -f %s %s", src_filename, dst_dir);
 	system(syscmd);
       } else {
 	unlink(src_filename);

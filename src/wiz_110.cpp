@@ -510,7 +510,7 @@ int do_rename_char(struct char_data *ch, char *arg, int cmd)
       
       // Rename
       snprintf(dst_filename, 256, "%s/%c/%s.%d", FAMILIAR_DIR, newname[0], newname, i);
-      sprintf(name, "mv %s %s", src_filename, dst_filename);
+      sprintf(name, "mv -f %s %s", src_filename, dst_filename);
       system(name);
     }
   }
