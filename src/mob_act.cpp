@@ -47,12 +47,12 @@
 #include "move.h"
 
 int keywordfind(struct obj_data *obj_object);
-int hands_are_free(char_data *ch, int number);
-void perform_wear(char_data *ch, struct obj_data *obj_object,
+int hands_are_free(struct char_data *ch, int number);
+void perform_wear(struct char_data *ch, struct obj_data *obj_object,
                   int keyword);
 bool is_protected(struct char_data *vict, struct char_data *ch);
 void scavenge(struct char_data *ch);
-bool is_r_denied(char_data *ch, int room)
+bool is_r_denied(struct char_data *ch, int room)
 {
   struct deny_data *d;
   if (!IS_NPC(ch)) return FALSE;
@@ -63,7 +63,7 @@ bool is_r_denied(char_data *ch, int room)
 }
 void mobile_activity(void)
 {
-	char_data *tmp_ch, *pch;
+	struct char_data *tmp_ch, *pch;
   struct obj_data *obj, *best_obj;
   char buf[1000];
   int door, max;
@@ -161,7 +161,7 @@ void mobile_activity(void)
     // activate mprog act triggers
     if ( ch->mobdata->mpactnum > 0 )  // we check to make sure ch is mob in very beginning, so safe
     {
-        MPROG_ACT_LIST * tmp_act, *tmp2_act;
+        mob_prog_act_list * tmp_act, *tmp2_act;
         for ( tmp_act = ch->mobdata->mpact; tmp_act != NULL; tmp_act = tmp_act->next )
         {
             PerfTimers["mprog_wordlist"].start();
@@ -268,8 +268,8 @@ void mobile_activity(void)
     if((ch->mobdata->hatred != NULL))    //  && (!ch->fighting)) (we check fighting earlier)
     {
       send_to_char("You're hating.\r\n",ch);
-      char_data *next_blah;
-//      char_data *temp = get_char(get_random_hate(ch));    
+      struct char_data *next_blah;
+//      struct char_data *temp = get_char(get_random_hate(ch));    
       done = 0;
     
       for(tmp_ch = world[ch->in_room].people; tmp_ch; tmp_ch = next_blah) 
@@ -329,7 +329,7 @@ void mobile_activity(void)
     if(ISSET(ch->mobdata->actflags, ACT_AGGRESSIVE) &&
       !IS_SET(world[ch->in_room].room_flags, SAFE)) 
     {
-      char_data * next_aggro; 
+      struct char_data * next_aggro; 
       int targets = 1;
       done = 0;
  
@@ -592,7 +592,7 @@ void mobile_activity(void)
 // Just a function to have mobs say random stuff when they are "suprised"
 // about finding a player doing something and decide to attack them.
 // For example, when a mob finds a player casting "spell" on them.
-void mob_suprised_sayings(char_data * ch, char_data * aggressor)
+void mob_suprised_sayings(struct char_data * ch, struct char_data * aggressor)
 {
    switch(number(0, 6))
    {
@@ -940,10 +940,10 @@ void scavenge(struct char_data *ch)
 
 void clear_hunt(void *arg1, void *arg2, void *arg3)
 {
-  clear_hunt((char*)arg1, (char_data*)arg2,NULL);
+  clear_hunt((char*)arg1, (struct char_data*)arg2,NULL);
 }
 
-void clear_hunt(char *arg1, char_data *arg2, void *arg3) {
+void clear_hunt(char *arg1, struct char_data *arg2, void *arg3) {
 	auto &character_list = DC::instance().character_list;
 	for (auto& curr : character_list) {
 		if (curr == arg2) {

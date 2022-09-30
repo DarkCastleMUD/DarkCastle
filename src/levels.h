@@ -44,7 +44,7 @@
 struct bestowable_god_commands_type
 {
   char * name;  // name of command
-  int16 num;    // ID # of command
+  int16_t num;    // ID # of command
   bool testcmd; // true = test command, false = normal command
 };
 

@@ -196,7 +196,7 @@ void reset_zone(int zone);
 void fix_shopkeepers_inventory();
 int file_to_string(const char *name, char *buf);
 void reset_time(void);
-void clear_char(char_data *ch);
+void clear_char(struct char_data *ch);
 
 // MOBprogram locals
 int mprog_name_to_type(char* name);
@@ -271,7 +271,7 @@ room_track_data * room_data::TrackItem(int nIndex)
 	return 0;
 }
 
-void add_to_bard_list(char_data * ch)
+void add_to_bard_list(struct char_data * ch)
 {
 	pulse_data * curr = NULL;
 
@@ -291,7 +291,7 @@ void add_to_bard_list(char_data * ch)
 	bard_list = curr;
 }
 
-void remove_from_bard_list(char_data * ch)
+void remove_from_bard_list(struct char_data * ch)
 {
 	pulse_data * curr = NULL;
 	pulse_data * last = NULL;
@@ -695,7 +695,7 @@ void boot_db(void)
 }
 
 /*
- int do_motdload(char_data *ch, char *argument, int cmd)
+ int do_motdload(struct char_data *ch, char *argument, int cmd)
  {
  file_to_string(MOTD_FILE, motd);
  file_to_string(IMOTD_FILE, imotd);
@@ -778,7 +778,7 @@ void write_wizlist(const char filename[])
 	dc_fclose(fl);
 }
 
-void update_wizlist(char_data *ch)
+void update_wizlist(struct char_data *ch)
 {
 	int x;
 
@@ -817,7 +817,7 @@ void update_wizlist(char_data *ch)
 	write_wizlist(ssbuffer.str().c_str());
 }
 
-int do_wizlist(char_data *ch, char *argument, int cmd)
+int do_wizlist(struct char_data *ch, char *argument, int cmd)
 {
   char buf[MAX_STRING_LENGTH], lines[500], space[80];
   int x, current_level, z = 1;
@@ -1048,7 +1048,7 @@ index_data *generate_mob_indices(int *top, struct index_data *index)
 					index[i].mobspec = NULL;
 					index[i].progtypes = 0;
 					curr_virtno = index[i].virt;
-					if (!(index[i].item = (char_data *)read_mobile(i, fl))) {
+					if (!(index[i].item = (struct char_data *)read_mobile(i, fl))) {
 
 						sprintf(log_buf, "Unable to load mobile %d!\n\r",
 								index[i].virt);
@@ -1091,14 +1091,14 @@ void add_mobspec(int i)
 	if (i < 0)
 		return;
 
-	char_data *a = (char_data *)mob_index[i].item;
+	struct char_data *a = (struct char_data *)mob_index[i].item;
 	if (!a)
 		return;
 	if (!a->c_class)
 		return;
 
 	int mob = 0;
-	MPROG_DATA *mprg;
+	mob_prog_data *mprg;
 
 	switch (a->c_class)
 	{
@@ -1240,13 +1240,13 @@ void add_mobspec(int i)
 		mob_index[i].mobspec = mob_index[real_mobile(mob)].mobprogs;
 
 		for (int j = 0; j < ACT_MAX / ASIZE + 1; j++) {
-			SET_BIT(((char_data *)mob_index[i].item)->mobdata->actflags[j],
-					((char_data *)mob_index[real_mobile(mob)].item)->mobdata->actflags[j]);
+			SET_BIT(((struct char_data *)mob_index[i].item)->mobdata->actflags[j],
+					((struct char_data *)mob_index[real_mobile(mob)].item)->mobdata->actflags[j]);
 		}
 
 		for (int j = 0; j < AFF_MAX / ASIZE + 1; j++) {
-			SET_BIT(((char_data *)mob_index[i].item)->affected_by[j],
-					((char_data *)mob_index[real_mobile(mob)].item)->affected_by[j]);
+			SET_BIT(((struct char_data *)mob_index[i].item)->affected_by[j],
+					((struct char_data *)mob_index[real_mobile(mob)].item)->affected_by[j]);
 		}
 	}
 
@@ -1260,7 +1260,7 @@ void remove_all_mobs_from_world()
 	auto &character_list = DC::instance().character_list;
 
 	for_each(character_list.begin(), character_list.end(),
-			[](char_data * const &curr) {
+			[](struct char_data * const &curr) {
 				if (IS_NPC(curr))
 					extract_char(curr, TRUE);
 				else
@@ -1639,7 +1639,7 @@ char * read_next_worldfile_name(FILE * flWorldIndex)
 	return temp;
 }
 
-bool can_modify_this_room(char_data * ch, int32_t vnum)
+bool can_modify_this_room(struct char_data * ch, int32_t vnum)
 {
 	if (has_skill(ch, COMMAND_RANGE))
 		return TRUE;
@@ -1653,7 +1653,7 @@ bool can_modify_this_room(char_data * ch, int32_t vnum)
 	return TRUE;
 }
 
-bool can_modify_room(char_data * ch, int32_t vnum)
+bool can_modify_room(struct char_data * ch, int32_t vnum)
 {
 	if (has_skill(ch, COMMAND_RANGE))
 		return TRUE;
@@ -1667,7 +1667,7 @@ bool can_modify_room(char_data * ch, int32_t vnum)
 	return TRUE;
 }
 
-bool can_modify_this_mobile(char_data * ch, int32_t vnum)
+bool can_modify_this_mobile(struct char_data * ch, int32_t vnum)
 {
 	if (has_skill(ch, COMMAND_RANGE))
 		return TRUE;
@@ -1681,12 +1681,12 @@ bool can_modify_this_mobile(char_data * ch, int32_t vnum)
 	return TRUE;
 }
 
-bool can_modify_mobile(char_data * ch, int32_t mob)
+bool can_modify_mobile(struct char_data * ch, int32_t mob)
 {
 	return can_modify_this_mobile(ch, mob);
 }
 
-bool can_modify_this_object(char_data * ch, int32_t vnum)
+bool can_modify_this_object(struct char_data * ch, int32_t vnum)
 {
 	if (has_skill(ch, COMMAND_RANGE))
 		return TRUE;
@@ -1701,7 +1701,7 @@ bool can_modify_this_object(char_data * ch, int32_t vnum)
 
 }
 
-bool can_modify_object(char_data * ch, int32_t obj)
+bool can_modify_object(struct char_data * ch, int32_t obj)
 {
 	return can_modify_this_object(ch, obj);
 }
@@ -2049,7 +2049,7 @@ void setup_dir(FILE *fl, int room, int dir)
 }
 
 // return true for success
-int create_one_room(char_data *ch, int vnum)
+int create_one_room(struct char_data *ch, int vnum)
 {
 	struct room_data *rp;
 	extern int top_of_zone_table;
@@ -2605,17 +2605,17 @@ void boot_zones(void)
  *********************************************************************** */
 
 /* read a mobile from MOB_FILE */
-char_data *read_mobile(int nr, FILE *fl)
+struct char_data *read_mobile(int nr, FILE *fl)
 {
 	char buf[200];
 	int i, j;
 	int32_t tmp, tmp2, tmp3;
-	char_data *mob;
+	struct char_data *mob;
 	char letter;
 
 	i = nr;
 
-	mob = new char_data;
+	mob = new struct char_data;
 	auto &free_list = DC::instance().free_list;
 	free_list.erase(mob);
 
@@ -2816,7 +2816,7 @@ char_data *read_mobile(int nr, FILE *fl)
 }
 
 // we write them recursively so they read in properly
-void write_mprog_recur(FILE *fl, MPROG_DATA *mprg, bool mob)
+void write_mprog_recur(FILE *fl, mob_prog_data *mprg, bool mob)
 {
 	char *mprog_type_to_name(int type);
 
@@ -2836,7 +2836,7 @@ void write_mprog_recur(FILE *fl, MPROG_DATA *mprg, bool mob)
 		string_to_file(fl, "Saved During Edit");
 }
 
-void write_mprog_recur(ofstream &fl, MPROG_DATA *mprg, bool mob)
+void write_mprog_recur(ofstream &fl, mob_prog_data *mprg, bool mob)
 {
 	if (mprg->next) {
 		write_mprog_recur(fl, mprg->next, mob);
@@ -2864,7 +2864,7 @@ void write_mprog_recur(ofstream &fl, MPROG_DATA *mprg, bool mob)
 // Write a mob to file
 // Assume valid mob, and file open for writing
 //
-void write_mobile(char_data * mob, FILE *fl)
+void write_mobile(struct char_data * mob, FILE *fl)
 {
 	int i = 0;
 
@@ -2946,7 +2946,7 @@ void write_mobile(char_data * mob, FILE *fl)
 // If a mob is set to 0d0 we need to give it hps depending upon it's level
 // and class.  And then since it's a mob, a bonus:)
 //
-void handle_automatic_mob_damdice(char_data * mob)
+void handle_automatic_mob_damdice(struct char_data * mob)
 {
 	int nodice = 1;
 	int sizedice = 1;
@@ -3032,7 +3032,7 @@ void handle_automatic_mob_damdice(char_data * mob)
 	mob->mobdata->damsizedice = sizedice;
 }
 
-void handle_automatic_mob_hitpoints(char_data * mob)
+void handle_automatic_mob_hitpoints(struct char_data * mob)
 {
 	int base;
 
@@ -3094,7 +3094,7 @@ void handle_automatic_mob_hitpoints(char_data * mob)
 }
 
 // currently hit and dam are the same
-void handle_automatic_mob_hitdamroll(char_data * mob)
+void handle_automatic_mob_hitdamroll(struct char_data * mob)
 {
 	int curhit;
 
@@ -3128,7 +3128,7 @@ void handle_automatic_mob_hitdamroll(char_data * mob)
 	mob->damroll = curhit;
 }
 
-void handle_automatic_mob_settings(char_data * mob)
+void handle_automatic_mob_settings(struct char_data * mob)
 {
 	extern struct mob_matrix_data mob_matrix[];
 	// New matrix is handled here.
@@ -3283,20 +3283,20 @@ void handle_automatic_mob_settings(char_data * mob)
 			+ ((mob_matrix[baselevel].hitpoints / 100) * percent);
 }
 
-char_data *clone_mobile(int nr)
+struct char_data *clone_mobile(int nr)
 {
 	int i;
-	char_data *mob, *old;
+	struct char_data *mob, *old;
 
 	if (nr < 0)
 		return 0;
 
-	mob = new char_data;
+	mob = new struct char_data;
 	auto &free_list = DC::instance().free_list;
 	free_list.erase(mob);
 
 	clear_char(mob);
-	old = ((char_data *)(mob_index[nr].item)); /* cast void pointer */
+	old = ((struct char_data *)(mob_index[nr].item)); /* cast void pointer */
 
 	*mob = *old;
 
@@ -3337,9 +3337,9 @@ char_data *clone_mobile(int nr)
 		}
 	}
 	mob->max_hit = mob->raw_hit = mob->hit = (int32_t)(mob->max_hit * mult);
-	mob->mobdata->damnodice = (int16)(mob->mobdata->damnodice * mult);
-	mob->mobdata->damsizedice = (int16)(mob->mobdata->damsizedice * mult);
-	mob->damroll = (int16)(mob->damroll * mult);
+	mob->mobdata->damnodice = (int16_t)(mob->mobdata->damnodice * mult);
+	mob->mobdata->damsizedice = (int16_t)(mob->mobdata->damsizedice * mult);
+	mob->damroll = (int16_t)(mob->damroll * mult);
 	mob->hometown = old->in_room;
 	return (mob);
 }
@@ -3451,7 +3451,7 @@ int create_blank_item(int nr)
 //  Hack of create_blank_item.. Uriz
 int create_blank_mobile(int nr)
 {
-	char_data *mob;
+	struct char_data *mob;
 	int cur_index = 0;
 
 	// check if room available in index
@@ -3551,7 +3551,7 @@ int create_blank_mobile(int nr)
 	// update index of all mobiles in game
 	auto &character_list = DC::instance().character_list;
 	for_each(character_list.begin(), character_list.end(),
-	        [&cur_index](char_data * const &curr) {
+	        [&cur_index](struct char_data * const &curr) {
 		if (IS_MOB(curr))
 			if (curr->mobdata->nr >= cur_index)
 				curr->mobdata->nr++;
@@ -3560,7 +3560,7 @@ int create_blank_mobile(int nr)
 
 	// update index of all the mob prototypes
 	for (i = cur_index + 1; i <= top_of_mobt; i++)
-		((char_data *)mob_index[i].item)->mobdata->nr++;
+		((struct char_data *)mob_index[i].item)->mobdata->nr++;
 
 	// update obj file indices
 	world_file_list_item * wcurr = NULL;
@@ -3620,14 +3620,14 @@ void delete_mob_from_index(int nr)
 	// update index of all mobiles in game - these store rnums
 	auto &character_list = DC::instance().character_list;
 	for_each(character_list.begin(), character_list.end(),
-	        [&nr](char_data * const &curr) {
+	        [&nr](struct char_data * const &curr) {
 		if (IS_NPC(curr) && curr->mobdata->nr >= nr)
 			curr->mobdata->nr--;
 	});
 
 	// update index of all the mob prototypes
 	for (i = nr; i <= top_of_mobt; i++)
-		((char_data *)mob_index[i].item)->mobdata->nr--;
+		((struct char_data *)mob_index[i].item)->mobdata->nr--;
 
 	// update mob file indices - these store rnums
 	world_file_list_item * wcurr = NULL;
@@ -4208,7 +4208,7 @@ void write_object_csv(obj_data * obj, ofstream &fout)
 	fout << endl;
 }
 
-bool has_random(OBJ_DATA *obj)
+bool has_random(obj_data *obj)
 {
 
 	return ((obj_index[obj->item_number].progtypes & RAND_PROG) || (obj_index[obj->item_number].progtypes & ARAND_PROG));
@@ -4455,7 +4455,7 @@ void reset_zone(int zone)
 	extern int top_of_world;
 	int cmd_no, last_cmd, last_mob, last_obj, last_percent;
 	int last_no;
-	char_data *mob = NULL;
+	struct char_data *mob = NULL;
 	struct obj_data *obj, *obj_to;
 	last_cmd = last_mob = last_obj = last_percent = -1;
 
@@ -5341,13 +5341,13 @@ char fread_char(FILE *fl)
 }
 
 /* release memory allocated for a char struct */
-void free_char(char_data *ch, Trace trace)
+void free_char(struct char_data *ch, Trace trace)
 {
 	int iWear;
 //  struct affected_type *af;
 	struct char_player_alias * x;
 	struct char_player_alias * next;
-	MPROG_ACT_LIST * currmprog;
+	mob_prog_act_list * currmprog;
 	auto &character_list = DC::instance().character_list;
 	auto &free_list = DC::instance().free_list;
 
@@ -5356,17 +5356,17 @@ void free_char(char_data *ch, Trace trace)
 		Trace trace = free_list.at(ch);
 		stringstream ss;
 		ss << trace;
-		logf(IMMORTAL, LOG_BUG, "free_char: previously freed char_data %p found in free_list from %s", ch, ss.str().c_str());
+		logf(IMMORTAL, LOG_BUG, "free_char: previously freed struct char_data %p found in free_list from %s", ch, ss.str().c_str());
 
 		if (character_list.contains(ch))
 		{
-			logf(IMMORTAL, LOG_BUG, "free_char: previously freed char_data %p found in character_list", ch);
+			logf(IMMORTAL, LOG_BUG, "free_char: previously freed struct char_data %p found in character_list", ch);
 		}
 
 		auto &shooting_list = DC::instance().shooting_list;
 		if (shooting_list.contains(ch))
 		{
-			logf(IMMORTAL, LOG_BUG, "free_char: previously freed char_data %p found in shooting_list", ch);
+			logf(IMMORTAL, LOG_BUG, "free_char: previously freed struct char_data %p found in shooting_list", ch);
 		}
 
 		produce_coredump(ch);
@@ -5536,7 +5536,7 @@ int file_to_string(const char *name, char *buf)
 }
 
 /* clear some of the the working variables of a char */
-void reset_char(char_data *ch)
+void reset_char(struct char_data *ch)
 {
 	int i;
 
@@ -5635,7 +5635,7 @@ void reset_char(char_data *ch)
 /*
  * Clear but do not de-alloc.
  */
-void clear_char(char_data *ch)
+void clear_char(struct char_data *ch)
 {
 	if (ch == nullptr)
 	{
@@ -5687,7 +5687,7 @@ void clear_object(struct obj_data *obj)
 }
 
 // Roll up the random modifiers to saving throw for new character
-void apply_initial_saves(char_data *ch)
+void apply_initial_saves(struct char_data *ch)
 {
 	for (int i = 0; i <= SAVE_TYPE_MAX; i++)
 		if (number(0, 1))
@@ -5696,7 +5696,7 @@ void apply_initial_saves(char_data *ch)
 			ch->pcdata->saves_mods[i] = 0;
 }
 
-void init_char(char_data *ch)
+void init_char(struct char_data *ch)
 {
 	GET_TITLE(ch) = str_dup("is still a virgin.");
 
@@ -5959,7 +5959,7 @@ int mprog_name_to_type(char *name)
 
 void mprog_file_read(char *f, int32_t i)
 {
-	MPROG_DATA *mprog;
+	mob_prog_data *mprog;
 	FILE *fp;
 	char letter;
 	char name[128];
@@ -5991,9 +5991,9 @@ void mprog_file_read(char *f, int32_t i)
 		default:
 			SET_BIT(mob_index[i].progtypes, type);
 #ifdef LEAK_CHECK
-			mprog = (MPROG_DATA *) calloc(1, sizeof(MPROG_DATA));
+			mprog = (mob_prog_data *) calloc(1, sizeof(mob_prog_data));
 #else
-			mprog = (MPROG_DATA *)dc_alloc(1, sizeof(MPROG_DATA));
+			mprog = (mob_prog_data *)dc_alloc(1, sizeof(mob_prog_data));
 #endif
 			mprog->type = type;
 			mprog->arglist = fread_string(fp, 0);
@@ -6035,10 +6035,10 @@ void load_mobprogs(FILE *fp)
 
 void mprog_read_programs(FILE *fp, int32_t i, bool zz)
 {
-	MPROG_DATA *mprog;
+	mob_prog_data *mprog;
 	char letter;
 	int type;
-	MPROG_DATA lmprog;
+	mob_prog_data lmprog;
 	for (;;)
 			{
 		if ((letter = fread_char(fp)) == '|')
@@ -6067,9 +6067,9 @@ void mprog_read_programs(FILE *fp, int32_t i, bool zz)
 			}
 			if (!zz) {
 #ifdef LEAK_CHECK
-				mprog = (MPROG_DATA *) calloc(1, sizeof(MPROG_DATA));
+				mprog = (mob_prog_data *) calloc(1, sizeof(mob_prog_data));
 #else
-				mprog = (MPROG_DATA *)dc_alloc(1, sizeof(MPROG_DATA));
+				mprog = (mob_prog_data *)dc_alloc(1, sizeof(mob_prog_data));
 #endif
 			} else
 				mprog = &lmprog;
@@ -6201,7 +6201,7 @@ void copySaveData(obj_data *target, obj_data *source)
 		target->obj_flags.value[0] = source->obj_flags.value[0];
 	}
 	
-	ubyte type_flag = source->obj_flags.type_flag;
+	uint8_t type_flag = source->obj_flags.type_flag;
 	if ((custom || type_flag == ITEM_DRINKCON) && (source->obj_flags.value[1] != target->obj_flags.value[1]))
 	{
 		target->obj_flags.value[1] = source->obj_flags.value[1];

@@ -40,7 +40,7 @@ extern CWorld world;
 extern struct index_data *obj_index;
 extern CVoteData *DCVote;
    
-void log_sacrifice(char_data *ch, OBJ_DATA *obj, bool decay = FALSE)
+void log_sacrifice(struct char_data *ch, obj_data *obj, bool decay = FALSE)
 { //decay variable means it's from a decaying corpse, not a player
   time_t timep;
   char *tmstr;
@@ -54,10 +54,10 @@ void log_sacrifice(char_data *ch, OBJ_DATA *obj, bool decay = FALSE)
   {
     logf(IMP, LOG_OBJECTS, "%s just sacrificed %s[%d] in room %d\n", GET_NAME(ch), GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj), GET_ROOM_VNUM(ch->in_room));
   } else {
-    logf(IMP, LOG_OBJECTS, "%s just poofed from decaying corpse %s[%d] in room %d\n", GET_OBJ_SHORT((OBJ_DATA*)ch), GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj), GET_ROOM_VNUM(obj->in_room));
+    logf(IMP, LOG_OBJECTS, "%s just poofed from decaying corpse %s[%d] in room %d\n", GET_OBJ_SHORT((obj_data*)ch), GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj), GET_ROOM_VNUM(obj->in_room));
   }
 
-  for(OBJ_DATA *loop_obj = obj->contains; loop_obj; loop_obj = loop_obj->next_content) {
+  for(obj_data *loop_obj = obj->contains; loop_obj; loop_obj = loop_obj->next_content) {
     logf(IMP, LOG_OBJECTS, "The %s contained %s[%d]\n",
 	    GET_OBJ_SHORT(obj),
 	    GET_OBJ_SHORT(loop_obj),
@@ -285,7 +285,7 @@ int do_donate(struct char_data *ch, char *argument, int cmd)
   {
      sprintf(log_buf, "%s donates %s[%d]", GET_NAME(ch), obj->name, obj_index[obj->item_number].virt);
      log(log_buf, IMP, LOG_OBJECTS);
-     for(OBJ_DATA *loop_obj = obj->contains; loop_obj; loop_obj = loop_obj->next_content)
+     for(obj_data *loop_obj = obj->contains; loop_obj; loop_obj = loop_obj->next_content)
        logf(IMP, LOG_OBJECTS, "The %s contained %s[%d]", obj->short_description,
                           loop_obj->short_description,
                           obj_index[loop_obj->item_number].virt);
@@ -597,7 +597,7 @@ int do_toggle(struct char_data *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-int do_config(char_data *ch, char *argument, int cmd)
+int do_config(struct char_data *ch, char *argument, int cmd)
 {
   if (ch == nullptr || ch->pcdata == nullptr || IS_MOB(ch))
   {
@@ -993,7 +993,7 @@ int do_autoeat(struct char_data *ch, char *argument, int cmd)
     return eSUCCESS;
 }
 
-int do_anonymous(char_data *ch, char *argument, int cmd)
+int do_anonymous(struct char_data *ch, char *argument, int cmd)
 {
   if(ch == 0)
   {
@@ -1059,7 +1059,7 @@ int do_bard_song_toggle(struct char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_nodupekeys_toggle(char_data *ch, char *argument, int cmd)
+int do_nodupekeys_toggle(struct char_data *ch, char *argument, int cmd)
 {
   if (IS_SET(ch->pcdata->toggles, PLR_NODUPEKEYS))
   {
@@ -1090,7 +1090,7 @@ int do_beep_set(struct char_data *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-int do_stand(char_data *ch, char *argument, int cmd)
+int do_stand(struct char_data *ch, char *argument, int cmd)
 {
     switch(GET_POS(ch)) {
         case POSITION_STANDING : {
@@ -1126,7 +1126,7 @@ int do_stand(char_data *ch, char *argument, int cmd)
 }
  
  
-int do_sit(char_data *ch, char *argument, int cmd)
+int do_sit(struct char_data *ch, char *argument, int cmd)
 {
  
     if (IS_SET(world[ch->in_room].room_flags, QUIET)) {
@@ -1167,7 +1167,7 @@ int do_sit(char_data *ch, char *argument, int cmd)
 }
  
  
-int do_rest(char_data *ch, char *argument, int cmd)
+int do_rest(struct char_data *ch, char *argument, int cmd)
 {
  
  
@@ -1208,7 +1208,7 @@ int do_rest(char_data *ch, char *argument, int cmd)
 }
  
  
-int do_sleep(char_data *ch, char *argument, int cmd)
+int do_sleep(struct char_data *ch, char *argument, int cmd)
 {
    struct affected_type *paf;
     if (IS_SET(world[ch->in_room].room_flags, QUIET)) {
@@ -1267,9 +1267,9 @@ int do_sleep(char_data *ch, char *argument, int cmd)
 }
  
  
-int do_wake(char_data *ch, char *argument, int cmd)
+int do_wake(struct char_data *ch, char *argument, int cmd)
 {
-    char_data *tmp_char;
+    struct char_data *tmp_char;
     char arg[MAX_STRING_LENGTH];
     struct affected_type * af;
     
@@ -1344,12 +1344,12 @@ int do_wake(char_data *ch, char *argument, int cmd)
 }
  
 // global tag var
-char_data * tagged_person;
+struct char_data * tagged_person;
 
-int do_tag(char_data *ch, char *argument, int cmd)
+int do_tag(struct char_data *ch, char *argument, int cmd)
 {
    char name[MAX_INPUT_LENGTH];
-   char_data * victim;
+   struct char_data * victim;
 
    one_argument(name, argument);
 
@@ -1743,7 +1743,7 @@ int do_vote(struct char_data *ch, char *arg, int cmd)
 
 }
 
-int do_random(char_data *ch, char *argument, int cmd)
+int do_random(struct char_data *ch, char *argument, int cmd)
 {
 char buf[MAX_STRING_LENGTH];
  int i = 0;

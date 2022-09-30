@@ -7,10 +7,10 @@
 |   etc...
 */
 #include "punish.h" // punishment vectors
-#include "structs.h" // ubyte
+#include "structs.h" // uint8_t
 #include "class.h"
 /************************************************************************
-| char_data.misc vector
+| struct char_data.misc vector
 |  These should probably not be combined, and they probably shouldn't
 |  be here, but they are.  Morc XXX
 |  I really shouldn't have the flag here to differentiate mob's from PC's
@@ -58,7 +58,7 @@
 
 /************************************************************************
 | Player vectors
-| char_data->pcdata->toggles
+| struct char_data->pcdata->toggles
 */
 #define PLR_BRIEF        1U
 #define PLR_COMPACT      1U<<1
@@ -258,52 +258,52 @@
 // Constructor commented out for const.C initialization purposes
 struct str_app_type
 {
-    int16 todam;    /* Damage Bonus/Penalty                */
-    int16 carry_w;  /* Maximum weight that can be carrried */
-    int16 cold_resistance; /* Cold resistance */
+    int16_t todam;    /* Damage Bonus/Penalty                */
+    int16_t carry_w;  /* Maximum weight that can be carrried */
+    int16_t cold_resistance; /* Cold resistance */
 };
 
 struct dex_app_type
 {
-  int16 tohit;
-  int16 ac_mod;
-  int16 move_gain;
-  int16 fire_resistance;
+  int16_t tohit;
+  int16_t ac_mod;
+  int16_t move_gain;
+  int16_t fire_resistance;
 };
 
 // Constructor commented out for const.C initialization purposes
 struct wis_app_type
 {
-    int16 mana_regen;
-    int16 ki_regen;
-    int16 bonus;       /* how many bonus skills a player can */
+    int16_t mana_regen;
+    int16_t ki_regen;
+    int16_t bonus;       /* how many bonus skills a player can */
 		      /* practice pr. level                 */
-    int16 energy_resistance;
-    int16 conc_bonus;
-    int16 spell_dam_bonus; // For Cleric/Druid/Paladins naturally
+    int16_t energy_resistance;
+    int16_t conc_bonus;
+    int16_t spell_dam_bonus; // For Cleric/Druid/Paladins naturally
 };
 
 // Constructor commented out for const.C initialization purposes
 struct int_app_type
 {
-    int16 mana_regen;
-    int16 ki_regen;
-    int16 easy_bonus;
-    int16 medium_bonus;
-    int16 hard_bonus;
-    int16 learn_bonus;
-    int16 magic_resistance;
-    int16 conc_bonus;
-    int16 spell_dam_bonus; // For Mage/Anti/Bard
+    int16_t mana_regen;
+    int16_t ki_regen;
+    int16_t easy_bonus;
+    int16_t medium_bonus;
+    int16_t hard_bonus;
+    int16_t learn_bonus;
+    int16_t magic_resistance;
+    int16_t conc_bonus;
+    int16_t spell_dam_bonus; // For Mage/Anti/Bard
 };
 
 // Constructor commented out for const.C initialization purposes
 struct con_app_type
 {
-    int16 hp_regen;
-    int16 move_regen;
-    int16 hp_gain;
-    int16 poison_resistance;
+    int16_t hp_regen;
+    int16_t move_regen;
+    int16_t hp_gain;
+    int16_t poison_resistance;
 };
 
 /* Extern definitions. These are all in const.cpp. */
@@ -314,7 +314,7 @@ extern const struct str_app_type str_app[];
 extern const struct wis_app_type wis_app[];
 
 /* Various function declarations */
-int get_saves(char_data *ch, int savetype);
+int get_saves(struct char_data *ch, int savetype);
 
 
 #endif

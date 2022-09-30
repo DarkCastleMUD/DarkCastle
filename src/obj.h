@@ -18,7 +18,7 @@
 
 #include <vector>
 
-#include "structs.h" // ubyte
+#include "structs.h" // uint8_t
 #include "character.h"
 
 /* The following defs are for obj_data  */
@@ -201,16 +201,16 @@ struct extra_descr_data
 struct obj_flag_data
 {
     int32_t value[4];       /* Values of the item (see list)    */
-    ubyte type_flag;     /* Type of item                     */
+    uint8_t type_flag;     /* Type of item                     */
     uint32_t wear_flags;     /* Where you can wear it            */
-    uint16 size;           /* Race restrictions                */
+    uint16_t size;           /* Race restrictions                */
     uint32_t extra_flags;    /* If it hums, glows etc            */
-     int16 weight;         /* Weight what else                 */
+     int16_t weight;         /* Weight what else                 */
      int32_t cost;           /* Value when sold (gp.)            */
     uint32_t more_flags;     /* A second bitvector (extra_flags2)*/
-     int16 eq_level;	/* Min level to use it for eq       */
-     int16 timer;          /* Timer for object                 */
-     char_data *origin;    /* Creator of object, previously was stored at value[3] */
+     int16_t eq_level;	/* Min level to use it for eq       */
+     int16_t timer;          /* Timer for object                 */
+     struct char_data *origin;    /* Creator of object, previously was stored at value[3] */
 };
 
 struct obj_affected_type
@@ -230,7 +230,7 @@ struct obj_data {
 	int32_t in_room;                      /* In what room -1 when conta/carr  */
 	int vroom;                          /* for corpse saving */
 	obj_flag_data obj_flags;            /* Object information               */
-	int16 num_affects;
+	int16_t num_affects;
 	obj_affected_type *affected;        /* Which abilities in PC to change  */
 
 	char *name;                         /* Title of object :get etc.        */
@@ -238,8 +238,8 @@ struct obj_data {
 	char *short_description;            /* when worn/carry/in cont.         */
 	char *action_description;           /* What to write when used          */
 	extra_descr_data *ex_description;   /* extra descriptions     */
-	char_data *carried_by;              /* Carried by :NULL in room/conta   */
-	char_data *equipped_by;             /* so I can access the player :)    */
+	struct char_data *carried_by;              /* Carried by :NULL in room/conta   */
+	struct char_data *equipped_by;             /* so I can access the player :)    */
 
 	obj_data *in_obj;                   /* In what object NULL when none    */
 	obj_data *contains;                 /* Contains objects                 */
@@ -289,11 +289,11 @@ struct obj_data {
 
 struct obj_file_elem 
 {
-    int16 version;
+    int16_t version;
     int32_t item_number;
-    int16 timer;
-    int16 wear_pos;
-    int16 container_depth;
+    int16_t timer;
+    int16_t wear_pos;
+    int16_t container_depth;
     int32_t other[5];        // unused
 };
 
@@ -305,9 +305,9 @@ void eq_remove_damage(obj_data * obj);
 void add_obj_affect(obj_data * obj, int loc, int mod);
 void remove_obj_affect_by_index(obj_data * obj, int index);
 void remove_obj_affect_by_type(obj_data * obj, int loc);
-int recheck_height_wears(char_data *ch);
+int recheck_height_wears(struct char_data *ch);
 bool fullSave(obj_data *obj);
-void heightweight(char_data *ch, bool add);
+void heightweight(struct char_data *ch, bool add);
 void wear(struct char_data *ch, struct obj_data *obj_object, int keyword);
 int obj_from(obj_data* obj);
 

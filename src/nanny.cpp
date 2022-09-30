@@ -59,8 +59,8 @@ using namespace std;
 #define STATE(d) ((d)->connected)
 
 void AuctionHandleDelete(string name);
-bool is_bracing(char_data *bracee, struct room_direction_data *exit);
-void check_for_sold_items(char_data *ch);
+bool is_bracing(struct char_data *bracee, struct room_direction_data *exit);
+void check_for_sold_items(struct char_data *ch);
 void show_question_race(descriptor_data *d);
 
 const char menu[] = "\n\rWelcome to Dark Castle Mud\n\r\n\r"
@@ -82,7 +82,7 @@ extern char webpage[MAX_STRING_LENGTH];
 extern char motd[MAX_STRING_LENGTH];
 extern char imotd[MAX_STRING_LENGTH];
 extern struct descriptor_data *descriptor_list;
-extern OBJ_DATA *object_list;
+extern obj_data *object_list;
 extern struct index_data *obj_index;
 extern CWorld world;
 extern CVoteData *DCVote;
@@ -90,24 +90,24 @@ extern CVoteData *DCVote;
 int isbanned(char *hostname);
 int _parse_email(char *arg);
 bool check_deny(struct descriptor_data *d, char *name);
-void update_wizlist(char_data *ch);
-void isr_set(char_data *ch);
+void update_wizlist(struct char_data *ch);
+void isr_set(struct char_data *ch);
 bool check_reconnect(struct descriptor_data *d, char *name, bool fReconnect);
 bool check_playing(struct descriptor_data *d, char *name);
 bool on_forbidden_name_list(char *name);
-void check_hw(char_data *ch);
+void check_hw(struct char_data *ch);
 char *str_str(char *first, char *second);
-bool apply_race_attributes(char_data *ch, int race = 0);
-bool check_race_attributes(char_data *ch, int race = 0);
+bool apply_race_attributes(struct char_data *ch, int race = 0);
+bool check_race_attributes(struct char_data *ch, int race = 0);
 bool handle_get_race(descriptor_data *d, string arg);
 void show_question_race(descriptor_data *d);
 void show_question_class(descriptor_data *d);
 bool handle_get_class(descriptor_data* d, string arg);
-int is_clss_race_compat(char_data *ch, int clss);
+int is_clss_race_compat(struct char_data *ch, int clss);
 void show_question_stats(descriptor_data *d);
 bool handle_get_stats(descriptor_data* d, string arg);
 
-int is_race_eligible(char_data *ch, int race)
+int is_race_eligible(struct char_data *ch, int race)
 {
    if (race == 2 && (GET_RAW_DEX(ch) < 10 || GET_RAW_INT(ch) < 10))
       return FALSE;
@@ -128,7 +128,7 @@ int is_race_eligible(char_data *ch, int race)
    return TRUE;
 }
 
-int is_clss_race_compat(const char_data* ch, int clss, int race)
+int is_clss_race_compat(const struct char_data* ch, int clss, int race)
 {
    bool compat = false;
 
@@ -183,7 +183,7 @@ int is_clss_race_compat(const char_data* ch, int clss, int race)
    return (compat);
 }
 
-int is_clss_eligible(char_data *ch, int clss)
+int is_clss_eligible(struct char_data *ch, int clss)
 {
    int x = 0;
 
@@ -240,7 +240,7 @@ int is_clss_eligible(char_data *ch, int clss)
    return (x);
 }
 
-void do_inate_race_abilities(char_data *ch)
+void do_inate_race_abilities(struct char_data *ch)
 {
 
    // Add race base saving throw mods
@@ -333,7 +333,7 @@ void do_inate_race_abilities(char_data *ch)
    }
 }
 
-OBJ_DATA *clan_altar(char_data *ch)
+obj_data *clan_altar(struct char_data *ch)
 {
    clan_data *clan;
    struct clan_room_data *room;
@@ -347,7 +347,7 @@ OBJ_DATA *clan_altar(char_data *ch)
             {
                if (real_room(room->room_number) == -1)
                   continue;
-               OBJ_DATA *t = world[real_room(room->room_number)].contents;
+               obj_data *t = world[real_room(room->room_number)].contents;
                for (; t; t = t->next_content)
                {
                   if (t->obj_flags.type_flag == ITEM_ALTAR)
@@ -384,9 +384,9 @@ void update_max_who(void)
 
 // stuff that has to be done on both a normal login, as well as on
 // a hotboot login
-void do_on_login_stuff(char_data *ch)
+void do_on_login_stuff(struct char_data *ch)
 {
-   void add_to_bard_list(char_data * ch);
+   void add_to_bard_list(struct char_data * ch);
 
    add_to_bard_list(ch);
    ch->pcdata->bad_pw_tries = 0;
@@ -650,12 +650,12 @@ void do_on_login_stuff(char_data *ch)
       extern int r_new_meta_platinum_cost(int start, int64_t plats);
       extern int r_new_meta_exp_cost(int start, int64_t exp);
 
-      extern int64_t moves_exp_spent(char_data * ch);
-      extern int64_t moves_plats_spent(char_data * ch);
-      extern int64_t hps_exp_spent(char_data * ch);
-      extern int64_t hps_plats_spent(char_data * ch);
-      extern int64_t mana_exp_spent(char_data * ch);
-      extern int64_t mana_plats_spent(char_data * ch);
+      extern int64_t moves_exp_spent(struct char_data * ch);
+      extern int64_t moves_plats_spent(struct char_data * ch);
+      extern int64_t hps_exp_spent(struct char_data * ch);
+      extern int64_t hps_plats_spent(struct char_data * ch);
+      extern int64_t mana_exp_spent(struct char_data * ch);
+      extern int64_t mana_plats_spent(struct char_data * ch);
       int new_ = MIN(r_new_meta_platinum_cost(0, hps_plats_spent(ch)), r_new_meta_exp_cost(0, hps_exp_spent(ch)));
       int ometa = GET_HP_METAS(ch);
       GET_HP_METAS(ch) = new_;
@@ -701,7 +701,7 @@ void do_on_login_stuff(char_data *ch)
    }
 }
 
-void roll_and_display_stats(char_data *ch)
+void roll_and_display_stats(struct char_data *ch)
 {
    int x, a, b;
    char buf[MAX_STRING_LENGTH];
@@ -803,7 +803,7 @@ bool allowed_host(char *host)
    return FALSE;
 }
 
-void check_hw(char_data *ch)
+void check_hw(struct char_data *ch)
 {
    heightweight(ch, FALSE);
    if (ch->height > races[ch->race].max_height)
@@ -830,7 +830,7 @@ void check_hw(char_data *ch)
    heightweight(ch, TRUE);
 }
 
-void set_hw(char_data *ch)
+void set_hw(struct char_data *ch)
 {
    ch->height = number(races[ch->race].min_height, races[ch->race].max_height);
    logf(ANGEL, LOG_MORTAL, "%s's height set to %d", GET_NAME(ch), GET_HEIGHT(ch));
@@ -1809,7 +1809,7 @@ void nanny(struct descriptor_data *d, string arg)
                             ch);
             }
          }
-         extern void zap_eq_check(char_data * ch);
+         extern void zap_eq_check(struct char_data * ch);
          zap_eq_check(ch);
          break;
 
@@ -2097,7 +2097,7 @@ bool check_reconnect(struct descriptor_data *d, char *name, bool fReconnect)
 bool check_playing(struct descriptor_data *d, char *name)
 {
    struct descriptor_data *dold, *next_d;
-   char_data *compare = 0;
+   struct char_data *compare = 0;
 
    for (dold = descriptor_list; dold; dold = next_d)
    {
@@ -2155,18 +2155,18 @@ void short_activity()
 
 // these are for my special lag that only keeps you from doing certain
 // commands, while still allowing other.
-void add_command_lag(char_data *ch, int amount)
+void add_command_lag(struct char_data *ch, int amount)
 {
    if (GET_LEVEL(ch) < IMMORTAL)
       ch->timer += amount;
 }
 
-int check_command_lag(char_data *ch)
+int check_command_lag(struct char_data *ch)
 {
    return ch->timer;
 }
 
-void remove_command_lag(char_data *ch)
+void remove_command_lag(struct char_data *ch)
 {
    ch->timer = 0;
 }
@@ -2275,7 +2275,7 @@ void update_characters()
 
 void check_silence_beacons(void)
 {
-   OBJ_DATA *obj, *tmp_obj;
+   obj_data *obj, *tmp_obj;
 
    for (obj = object_list; obj; obj = tmp_obj)
    {
@@ -2294,8 +2294,8 @@ void check_silence_beacons(void)
 
 void checkConsecrate(int pulseType)
 {
-   OBJ_DATA *obj, *tmp_obj;
-   char_data *ch = NULL, *tmp_ch, *next_ch;
+   obj_data *obj, *tmp_obj;
+   struct char_data *ch = NULL, *tmp_ch, *next_ch;
    int align, amount, spl = 0;
    char buf[MAX_STRING_LENGTH];
 
@@ -2540,7 +2540,7 @@ void show_question_race(descriptor_data *d)
       return;
    }
 
-   char_data* ch = d->character;
+   struct char_data* ch = d->character;
    string buffer, races_buffer;
    buffer += "\r\nRacial Bonuses and Pentalties:\r\n";
    buffer += "$B$7   Race   STR DEX CON INT WIS$R\r\n";
@@ -2607,7 +2607,7 @@ void show_question_class(descriptor_data *d)
       return;
    }
 
-   char_data* ch = d->character;
+   struct char_data* ch = d->character;
    string buffer, classes_buffer;
    buffer += "\r\n   Class$R\r\n";
    int clss;
@@ -2650,7 +2650,7 @@ bool handle_get_class(descriptor_data* d, string arg)
       return false;
    }
 
-   const char_data* ch = d->character;
+   const struct char_data* ch = d->character;
 
    for(unsigned clss=1; clss <= CLASS_MAX_PROD; clss++)
    {
@@ -2722,9 +2722,9 @@ void show_question_stats(descriptor_data *d)
    {
       d->stats = new stat_data;
 
-      char_data* ch = d->character;
+      struct char_data* ch = d->character;
       int32_t race = d->stats->race = GET_RACE(ch);
-      sbyte clss = d->stats->clss = GET_CLASS(ch);
+      int8_t clss = d->stats->clss = GET_CLASS(ch);
 
       // Current
       d->stats->str[0] = 12;
@@ -2738,7 +2738,7 @@ void show_question_stats(descriptor_data *d)
       d->stats->setMin();
    }
 
-   char_data* ch = d->character;
+   struct char_data* ch = d->character;
    unsigned race = GET_RACE(ch);
    unsigned clss = GET_CLASS(ch);
    string buffer = fmt::format("\r\nRace: {}\r\n", races[race].singular_name);
@@ -2937,7 +2937,7 @@ bool handle_get_stats(descriptor_data* d, string arg)
             return false;
          }
 
-         char_data* ch = d->character;
+         struct char_data* ch = d->character;
          unsigned race = GET_RACE(ch);
          GET_RAW_STR(ch) = d->stats->str[0];
          GET_RAW_DEX(ch) = d->stats->dex[0];
@@ -2966,7 +2966,7 @@ bool handle_get_stats(descriptor_data* d, string arg)
 }
 
 
-bool apply_race_attributes(char_data *ch, int race)
+bool apply_race_attributes(struct char_data *ch, int race)
 {
    if (ch == nullptr)
    {
@@ -3080,7 +3080,7 @@ bool apply_race_attributes(char_data *ch, int race)
    return false;
 }
 
-bool check_race_attributes(char_data *ch, int race)
+bool check_race_attributes(struct char_data *ch, int race)
 {
    if (ch == nullptr)
    {

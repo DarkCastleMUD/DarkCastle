@@ -36,7 +36,7 @@ extern "C"
 
 using namespace std;
 
-extern OBJ_DATA *object_list;
+extern obj_data *object_list;
 extern CWorld world;
 extern struct index_data *obj_index;
 
@@ -49,7 +49,7 @@ struct table_data;
 void addtimer(struct timer_data *add);
 int hand_number(struct player_data *plr);
 int hands(struct player_data *plr);
-bool charExists(char_data *ch);
+bool charExists(struct char_data *ch);
 void reel_spin(void *, void *, void *);
 
 /*
@@ -60,7 +60,7 @@ struct player_data
 {
   struct player_data *next;
   struct table_data *table;
-  char_data *ch;
+  struct char_data *ch;
   int hand_data[21];
 // theoretical cardmax is lower than 21, but whatever
   int bet;
@@ -85,7 +85,7 @@ struct table_data
   struct player_data *cr; // current
   bool gold;
   int options;
-  char_data *dealer;
+  struct char_data *dealer;
   int hand_data[21]; // dealer
   int handnr;
   int state;
@@ -181,7 +181,7 @@ if (tbl->obj->in_room)
   send_to_room(msg, tbl->obj->in_room, TRUE, plrSilent?plrSilent->ch:0);
 }
 
-bool charExists(char_data *ch)
+bool charExists(struct char_data *ch)
 {
   auto &character_list = DC::instance().character_list;
 
@@ -195,11 +195,11 @@ bool charExists(char_data *ch)
 bool verify(struct player_data *plr)
 {
   // make sure player didn't quit, die, or whatever
-  //char_data *ch;
+  //struct char_data *ch;
 
   auto &character_list = DC::instance().character_list;
 
-  auto result = find_if(character_list.begin(), character_list.end(),[&plr](char_data * const &ch){
+  auto result = find_if(character_list.begin(), character_list.end(),[&plr](struct char_data * const &ch){
 	  if (ch == plr->ch) {
 		  return true;
 	  } else {
@@ -310,7 +310,7 @@ bool canSplit(struct player_data *plr)
   return FALSE;
 }
 
-struct player_data *createPlayer(char_data *ch, struct table_data *tbl, int noadd = 0)
+struct player_data *createPlayer(struct char_data *ch, struct table_data *tbl, int noadd = 0)
 {
   struct player_data *plr;
  #ifdef LEAK_CHECK
@@ -448,7 +448,7 @@ void check_active(void *arg1, void *arg2, void *arg3)
   if ((uint64_t)arg2 == (((plr->table->handnr+100)*2+100)*2))
   {// inactive
 	struct table_data *tbl = plr->table;
-	char_data *ch = plr->ch;
+	struct char_data *ch = plr->ch;
 	
 	char buf[MAX_STRING_LENGTH];
 	sprintf(buf, "Security removes a sleepy %s from the table.\r\n",GET_NAME(plr->ch));
@@ -731,9 +731,9 @@ void check_blackjacks(struct table_data *tbl)
 		send_to_char(buf, plr->ch);
 
 		if (plr->table->gold)
-		GET_GOLD(plr->ch) += (uint32)(plr->bet*2.5);
+		GET_GOLD(plr->ch) += (uint32_t)(plr->bet*2.5);
 		else
-		GET_PLATINUM(plr->ch) += (uint32)(plr->bet*2.5);
+		GET_PLATINUM(plr->ch) += (uint32_t)(plr->bet*2.5);
 //        	nextturn(plr->table);
 		if (tbl->plr == plr && !plr->next)
 		{ // all players blackjacked
@@ -868,7 +868,7 @@ void destroy_table(struct table_data *tbl)
   dc_free(tbl);
 }
 
-bool playing(char_data *ch, struct table_data *tbl)
+bool playing(struct char_data *ch, struct table_data *tbl)
 {
   struct player_data *plr;
   for (plr = tbl->plr;plr;plr = plr->next)
@@ -877,7 +877,7 @@ bool playing(char_data *ch, struct table_data *tbl)
   return FALSE;
 }
 
-struct player_data *getPlayer(char_data *ch, struct table_data *tbl)
+struct player_data *getPlayer(struct char_data *ch, struct table_data *tbl)
 {
   struct player_data *plr;
   if (tbl->cr && tbl->cr->ch == ch) return tbl->cr; // priority on current hand
@@ -960,7 +960,7 @@ int hand_number(struct player_data *plr)
   }
   return i;
 }
-void blackjack_prompt(char_data *ch, string& prompt, bool ascii)
+void blackjack_prompt(struct char_data *ch, string& prompt, bool ascii)
 {
   if (ch->in_room < 21902 || ch->in_room > 21905)
     if (ch->in_room != 44)
@@ -1110,8 +1110,8 @@ void blackjack_prompt(char_data *ch, string& prompt, bool ascii)
   }  
 }
 
-int blackjack_table(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
-		char_data *invoker) {
+int blackjack_table(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg,
+		struct char_data *invoker) {
 	char arg1[MAX_INPUT_LENGTH];
 	arg = one_argument(arg, arg1);
 	if (cmd < 189 || cmd > 194) {
@@ -1168,12 +1168,12 @@ int blackjack_table(char_data *ch, struct obj_data *obj, int cmd, const char *ar
 				return eSUCCESS;
 			}
 		}
-		if (obj->table->gold && (uint32) amt > GET_GOLD(ch)) {
+		if (obj->table->gold && (uint32_t) amt > GET_GOLD(ch)) {
 			send_to_char(
 					"You cannot afford that.\r\n$B$7The dealer whispers to you, 'You can find an ATM machine in the lobby, buddy.'$R\r\n",
 					ch);
 			return eSUCCESS;
-		} else if (!obj->table->gold && (uint32) amt > GET_PLATINUM(ch)) {
+		} else if (!obj->table->gold && (uint32_t) amt > GET_PLATINUM(ch)) {
 			send_to_char("You cannot afford that.\r\n", ch);
 			return eSUCCESS;
 		}
@@ -1192,7 +1192,7 @@ int blackjack_table(char_data *ch, struct obj_data *obj, int cmd, const char *ar
 		sprintf(buf, "%s bets %d.\r\n", GET_NAME(ch), amt);
 		send_to_table(buf, obj->table, plr);
 		if (obj->table->state == 0) {
-			char_data *tmpch;
+			struct char_data *tmpch;
 			int i = 0;
 			for (tmpch = world[ch->in_room].people; tmpch;
 					tmpch = tmpch->next_in_room)
@@ -1204,7 +1204,7 @@ int blackjack_table(char_data *ch, struct obj_data *obj, int cmd, const char *ar
 				add_timer_bj_dealer2(obj->table); // end bets in 10 secs
 			obj->table->state = 1;
 		} else {
-			char_data *tmpch;
+			struct char_data *tmpch;
 			int i = 0;
 			for (tmpch = world[ch->in_room].people; tmpch;
 					tmpch = tmpch->next_in_room)
@@ -1229,12 +1229,12 @@ int blackjack_table(char_data *ch, struct obj_data *obj, int cmd, const char *ar
 					ch);
 			return eSUCCESS;
 		}
-		if (plr->table->gold && GET_GOLD(ch) < (uint32) (plr->bet / 2)) {
+		if (plr->table->gold && GET_GOLD(ch) < (uint32_t) (plr->bet / 2)) {
 			send_to_char("You cannot afford an insurance bet right now.\r\n",
 					ch);
 			return eSUCCESS;
 		}
-		if (!plr->table->gold && GET_PLATINUM(ch) < (uint32) (plr->bet / 2)) {
+		if (!plr->table->gold && GET_PLATINUM(ch) < (uint32_t) (plr->bet / 2)) {
 			send_to_char("You cannot afford an insurance bet right now.\r\n",
 					ch);
 			return eSUCCESS;
@@ -1260,9 +1260,9 @@ int blackjack_table(char_data *ch, struct obj_data *obj, int cmd, const char *ar
 			send_to_char("It is not currently your turn.\r\n", ch);
 			return eSUCCESS;
 		}
-		if ((plr->table->gold && GET_GOLD(plr->ch) < (uint32) plr->bet)
+		if ((plr->table->gold && GET_GOLD(plr->ch) < (uint32_t) plr->bet)
 				|| (!plr->table->gold
-						&& GET_PLATINUM(plr->ch) < (uint32) plr->bet)) {
+						&& GET_PLATINUM(plr->ch) < (uint32_t) plr->bet)) {
 			send_to_char("You cannot afford to double your bet.\r\n", ch);
 			return eSUCCESS;
 		}
@@ -1333,8 +1333,8 @@ int blackjack_table(char_data *ch, struct obj_data *obj, int cmd, const char *ar
 			send_to_char("You cannot split right now.\r\n", ch);
 			return eSUCCESS;
 		}
-		if ((GET_GOLD(ch) < (uint32) plr->bet && plr->table->gold)
-				|| (GET_PLATINUM(ch) < (uint32) plr->bet && !plr->table->gold)) {
+		if ((GET_GOLD(ch) < (uint32_t) plr->bet && plr->table->gold)
+				|| (GET_PLATINUM(ch) < (uint32_t) plr->bet && !plr->table->gold)) {
 			send_to_char("You cannot afford to split.\r\n", ch);
 			return eSUCCESS;
 		}
@@ -1718,7 +1718,7 @@ int handcompare(int hand1[5], int hand2[5])
   return -1;
 }
 
-int do_testhand(char_data *ch, char *argument, int cmd)
+int do_testhand(struct char_data *ch, char *argument, int cmd)
 {
   char arg[MAX_INPUT_LENGTH];
   one_argument(argument, arg);
@@ -1818,9 +1818,9 @@ void pulse_holdem(struct ttbl *tbl)
 
 struct machine_data
 {
-   OBJ_DATA *obj;
-   char_data *prch;
-   char_data *ch;
+   obj_data *obj;
+   struct char_data *prch;
+   struct char_data *ch;
    uint cost;
    uint lastwin;
    int bet;
@@ -1942,7 +1942,7 @@ void save_slot_machines()
   dc_fclose(f);
 }
 
-void create_slot(OBJ_DATA *obj)
+void create_slot(obj_data *obj)
 {
    struct machine_data *slot;
  #ifdef LEAK_CHECK
@@ -1985,7 +1985,7 @@ void update_linked_slots(struct machine_data *machine)
 
    // Find all the slot machines
    for(int i=21906; i<21918; i++) {
-     OBJ_DATA *slot_obj = (OBJ_DATA *)obj_index[real_object(i)].item;
+     obj_data *slot_obj = (obj_data *)obj_index[real_object(i)].item;
 
      // Find all the slot machines linked to the same slot machine as us
      // and update their v1 jackpot, their machine's jackpot (if applicable)
@@ -1999,7 +1999,7 @@ void update_linked_slots(struct machine_data *machine)
 	   slot_obj->slot->jackpot = machine->jackpot;
 
 	 // Update instances of the original slot obj
-         for(OBJ_DATA *j=object_list; j; j = j->next) {
+         for(obj_data *j=object_list; j; j = j->next) {
 	   if(j->item_number == real_object(i)) {
              //if(!ishashed(j->description)) dc_free(j->description);
 	     j->description = str_dup(ldesc);
@@ -2074,13 +2074,13 @@ void reel_spin(void *arg1, void *arg2, void *arg3)
          if(machine->linkedto) {
             update_linked_slots(machine);
          } else {
-            ((OBJ_DATA *)obj_index[machine->obj->item_number].item)->obj_flags.value[1] = (int)machine->jackpot;
+            ((obj_data *)obj_index[machine->obj->item_number].item)->obj_flags.value[1] = (int)machine->jackpot;
             sprintf(buf, "A slot machine which displays '$R$BJackpot: %d %s!$1' sits here.", (int)machine->jackpot, machine->gold?"coins":"plats");
             //if(!ishashed(machine->obj->description)) dc_free(machine->obj->description);
             machine->obj->description = str_dup(buf);
-            if(!ishashed(((OBJ_DATA*)obj_index[machine->obj->item_number].item)->description))
-               dc_free(((OBJ_DATA *)obj_index[machine->obj->item_number].item)->description);
-            ((OBJ_DATA *)obj_index[machine->obj->item_number].item)->description = str_dup(buf);
+            if(!ishashed(((obj_data*)obj_index[machine->obj->item_number].item)->description))
+               dc_free(((obj_data *)obj_index[machine->obj->item_number].item)->description);
+            ((obj_data *)obj_index[machine->obj->item_number].item)->description = str_dup(buf);
          }
       }
 
@@ -2099,13 +2099,13 @@ void reel_spin(void *arg1, void *arg2, void *arg3)
          if(machine->linkedto) {
             update_linked_slots(machine);
          } else {
-            ((OBJ_DATA *)obj_index[machine->obj->item_number].item)->obj_flags.value[1] = (int)machine->jackpot;
+            ((obj_data *)obj_index[machine->obj->item_number].item)->obj_flags.value[1] = (int)machine->jackpot;
             sprintf(buf, "A slot machine which displays '$R$BJackpot: %d %s!$1' sits here.", (int)machine->jackpot, machine->gold?"coins":"plats");
             //if(!ishashed(machine->obj->description)) dc_free(machine->obj->description);
             machine->obj->description = str_dup(buf);
-            //if(!ishashed(((OBJ_DATA *)obj_index[machine->obj->item_number].item)->description))
-            //   dc_free(((OBJ_DATA*)obj_index[machine->obj->item_number].item)->description);
-            ((OBJ_DATA *)obj_index[machine->obj->item_number].item)->description = str_dup(buf);
+            //if(!ishashed(((obj_data *)obj_index[machine->obj->item_number].item)->description))
+            //   dc_free(((obj_data*)obj_index[machine->obj->item_number].item)->description);
+            ((obj_data *)obj_index[machine->obj->item_number].item)->description = str_dup(buf);
          }
       } else if(payout) {
          send_to_room("Lights flash and noises emanate from the slot machine!\n\r", machine->obj->in_room);
@@ -2127,7 +2127,7 @@ void reel_spin(void *arg1, void *arg2, void *arg3)
    save_slot_machines();
 }
 
-int slot_machine(char_data *ch, OBJ_DATA *obj, int cmd, const char *arg, char_data *invoker)
+int slot_machine(struct char_data *ch, obj_data *obj, int cmd, const char *arg, struct char_data *invoker)
 {
    char buf[MAX_STRING_LENGTH];
 
@@ -2234,19 +2234,19 @@ char *roulette_display[] = {
 
 struct roulette_player
 {
-   char_data *ch;
+   struct char_data *ch;
    uint32_t bet_array[48];
 };
 
 struct wheel_data
 {
-   OBJ_DATA *obj;
+   obj_data *obj;
    struct roulette_player *plr[6];
    int countdown;
    bool spinning;
 };
 
-void create_wheel(OBJ_DATA *obj)
+void create_wheel(obj_data *obj)
 {
    struct wheel_data *wheel;
  #ifdef LEAK_CHECK
@@ -2270,7 +2270,7 @@ void create_wheel(OBJ_DATA *obj)
    obj->wheel = wheel;
 }
 
-void send_wheel_bets(char_data *ch, struct wheel_data *wheel)
+void send_wheel_bets(struct char_data *ch, struct wheel_data *wheel)
 {
    int i,j;
    bool found = FALSE;
@@ -2483,7 +2483,7 @@ void pulse_countdown(void *arg1, void *arg2, void *arg3)
    }
 }
 
-int roulette_table(char_data *ch, struct obj_data *obj, int cmd, const char *arg, char_data *invoker)
+int roulette_table(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg, struct char_data *invoker)
 {
    char arg1[MAX_INPUT_LENGTH], arg2[MAX_STRING_LENGTH], buf[MAX_STRING_LENGTH];
    uint32_t bet=0;

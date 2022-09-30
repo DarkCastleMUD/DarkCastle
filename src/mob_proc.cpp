@@ -47,7 +47,7 @@ extern CWorld world;
 extern struct index_data *obj_index;
 extern struct index_data *mob_index;
 
-int check_components(char_data *ch, int destroy, int item_one = 0,
+int check_components(struct char_data *ch, int destroy, int item_one = 0,
 	int item_two = 0, int item_three = 0, int item_four = 0,
 	bool silent = FALSE);
 /* extern procedures */
@@ -163,9 +163,9 @@ int protect(struct char_data *ch, int iFriendId)
 // or NULL.
 
 //Pagoda place uses this
-char_data * find_random_player_in_room(char_data * ch)
+struct char_data * find_random_player_in_room(struct char_data * ch)
 {
-    char_data * vict = NULL;
+    struct char_data * vict = NULL;
     int count = 0;
 
     // Count the number of players in room
@@ -196,9 +196,9 @@ char_data * find_random_player_in_room(char_data * ch)
 // and the call this function to deal the damage you want to do
 void damage_all_players_in_room(struct char_data *ch, int damage)
 {
-    char_data * vict = NULL;
-    char_data * next_vict = NULL;
-    void inform_victim(char_data *ch, char_data *vict, int dam);
+    struct char_data * vict = NULL;
+    struct char_data * next_vict = NULL;
+    void inform_victim(struct char_data *ch, struct char_data *vict, int dam);
 
     for (vict = world[ch->in_room].people; vict; vict = next_vict)
     {    
@@ -246,7 +246,7 @@ void summon_all_of_mob_to_room(struct char_data * ch, int iFriendId)
 // want to find, and it will return his pointer if he's in the room.
 // If we find him, return his pointer
 // If it doesn't, return NULL
-char_data * find_mob_in_room(struct char_data *ch, int iFriendId)
+struct char_data * find_mob_in_room(struct char_data *ch, int iFriendId)
 {
   struct char_data * ally = NULL;
 
@@ -354,10 +354,10 @@ int fighter(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg
 }
 
 
-int active_tarrasque(char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
+int active_tarrasque(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
           struct char_data *owner) 
 {
-    char_data *vict;
+    struct char_data *vict;
 
     if((GET_POS(ch) != POSITION_FIGHTING) || (!ch->fighting)) {
         return eFAILURE;
@@ -406,10 +406,10 @@ int active_tarrasque(char_data *ch, struct obj_data *obj, int cmd, const char *a
 }
 
 
-int active_grandmaster(char_data *ch, struct obj_data *obj, int command, const char *arg,        
+int active_grandmaster(struct char_data *ch, struct obj_data *obj, int command, const char *arg,        
           struct char_data *owner) 
 {
-    char_data *vict;
+    struct char_data *vict;
     /* Find a dude to do evil things upon ! */
     if((GET_POS(ch) != POSITION_FIGHTING)) {
         return eFAILURE;
@@ -1875,7 +1875,7 @@ vector<string> ChainSayText =
 
 // ENDOFCHAIN
 
-int chain_gossips(char_data *ch, struct obj_data *obj, int cmd, const char *arg, char_data *owner)
+int chain_gossips(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg, struct char_data *owner)
 {
   int x;
 
@@ -2229,7 +2229,7 @@ int pet_shops(struct char_data *ch, int cmd, char *arg)
 	    return eSUCCESS;
 	}
 
-	if (GET_GOLD(ch) < (uint32)(GET_EXP(pet)*3)) {
+	if (GET_GOLD(ch) < (uint32_t)(GET_EXP(pet)*3)) {
 	    send_to_char("You don't have enough gold!\n\r", ch);
 	    return eSUCCESS;
 	}
@@ -2327,10 +2327,10 @@ int newbie_zone_guard(struct char_data *ch, struct obj_data *obj, int cmd, const
 
 
 // I just like to hellstream every other round.
-int hellstreamer(char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
+int hellstreamer(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
           struct char_data *owner)
 {
-    char_data *vict;
+    struct char_data *vict;
     // int percent; 
     /* Find a dude to do evil things upon ! */
 
@@ -2363,10 +2363,10 @@ int hellstreamer(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
 }
 
 // I just firestorm every round...stupid groupies!
-int firestormer(char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
+int firestormer(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
           struct char_data *owner)
 {
-    char_data *vict = NULL;
+    struct char_data *vict = NULL;
     // int percent; 
 
     act("$n utters the words 'Fry bitch!'.", ch, 0, 0, 
@@ -2667,10 +2667,10 @@ int panicprisoner (struct char_data*ch, struct obj_data *obj, int cmd, const cha
 
 
 // let's teleport people around the mud:)
-int bounder(char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
+int bounder(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
           struct char_data *owner)
 {
-    char_data *vict;
+    struct char_data *vict;
     // int percent; 
 
     /* Find a dude to do evil things upon ! */
@@ -2697,10 +2697,10 @@ int bounder(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
 }
 
 // I love to dispel stuff!
-int dispelguy(char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
+int dispelguy(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
           struct char_data *owner)
 {
-    char_data *vict;
+    struct char_data *vict;
     // int percent; 
 
     if((GET_POS(ch) != POSITION_FIGHTING)) {
@@ -2940,7 +2940,7 @@ int koban_combat(struct char_data *ch, struct obj_data *obj, int cmd, const char
 int koban_non_combat(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
           struct char_data *owner)
 {
-    char_data * iasenko = NULL;
+    struct char_data * iasenko = NULL;
 
     if(cmd)
       return eFAILURE;
@@ -3129,7 +3129,7 @@ int surimoto_combat(struct char_data *ch, struct obj_data *obj, int cmd, const c
 int hiryushi_combat(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
           struct char_data *owner)
 {
-    char_data * victim = NULL;
+    struct char_data * victim = NULL;
 
     if(cmd)
       return eFAILURE;

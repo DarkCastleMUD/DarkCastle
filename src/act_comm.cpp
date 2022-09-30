@@ -367,7 +367,7 @@ int do_channel(struct char_data *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-command_return_t do_ignore(char_data *ch, string args, int cmd)
+command_return_t do_ignore(struct char_data *ch, string args, int cmd)
 {
   if (ch == nullptr)
   {
@@ -431,7 +431,7 @@ command_return_t do_ignore(char_data *ch, string args, int cmd)
   return eSUCCESS;
 }
 
-int is_ignoring(const char_data *const ch, const char_data *const i)
+int is_ignoring(const struct char_data *const ch, const struct char_data *const i)
 {
   if (IS_MOB(ch) || (GET_LEVEL(i) >= IMMORTAL && IS_PC(i)) || ch->pcdata->ignoring.empty())
   {

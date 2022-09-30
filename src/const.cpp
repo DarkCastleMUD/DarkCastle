@@ -2583,7 +2583,7 @@ const struct str_app_type str_app[] = {
 };
 
 /* [level] backstab multiplyer (thieves / antis only) */
-ubyte backstab_mult[71] =
+uint8_t backstab_mult[71] =
 {
     1,   /* 0 */
     6,   /* 1 */

@@ -68,10 +68,10 @@ extern struct descriptor_data *descriptor_list;
 extern bool MOBtrigger;
 extern struct mprog_throw_type *g_mprog_throw_list;
 
-extern char_data *activeActor;
-extern char_data *activeRndm;
-extern char_data *activeTarget;
-extern OBJ_DATA *activeObj;
+extern struct char_data *activeActor;
+extern struct char_data *activeRndm;
+extern struct char_data *activeTarget;
+extern obj_data *activeObj;
 extern void *activeVo;
 
 extern struct zone_data *zone_table;
@@ -126,11 +126,11 @@ char *mprog_type_to_name( int type )
  * show the MOBprograms which are set.
  */
 
-void mpstat( char_data *ch, char_data *victim)
+void mpstat( struct char_data *ch, struct char_data *victim)
 {
     char        buf[ MAX_STRING_LENGTH ];
     char        buf2[ MAX_STRING_LENGTH ];
-    MPROG_DATA *mprg;
+    mob_prog_data *mprg;
     int i;
 
     sprintf( buf, "$3Name$R: %s  $3Vnum$R: %d.\n\r",
@@ -163,7 +163,7 @@ void mpstat( char_data *ch, char_data *victim)
 
 /* prints the argument to all the rooms aroud the mobile */
 
-int do_mpasound( char_data *ch, char *argument, int cmd )
+int do_mpasound( struct char_data *ch, char *argument, int cmd )
 {
 
   int32_t was_in_room;
@@ -203,10 +203,10 @@ int do_mpasound( char_data *ch, char *argument, int cmd )
 
 /* lets the mobile kill any player or mobile without murder*/
 
-int do_mpkill( char_data *ch, char *argument, int cmd )
+int do_mpkill( struct char_data *ch, char *argument, int cmd )
 {
     char      arg[ MAX_INPUT_LENGTH ];
-    char_data *victim;
+    struct char_data *victim;
 
     if ( !IS_NPC( ch ) )
     {
@@ -250,10 +250,10 @@ int do_mpkill( char_data *ch, char *argument, int cmd )
 }
 
 
-int do_mphit( char_data *ch, char *argument, int cmd )
+int do_mphit( struct char_data *ch, char *argument, int cmd )
 {
     char      arg[ MAX_INPUT_LENGTH ];
-    char_data *victim;
+    struct char_data *victim;
 
     if ( !IS_NPC( ch ) )
     {
@@ -296,11 +296,11 @@ int do_mphit( char_data *ch, char *argument, int cmd )
     return one_hit( ch, victim, TYPE_UNDEFINED, FIRST );
 }
 
-int do_mpaddlag( char_data *ch, char *argument, int cmd )
+int do_mpaddlag( struct char_data *ch, char *argument, int cmd )
 {
     char      arg[ MAX_INPUT_LENGTH ];
     char      arg1[ MAX_INPUT_LENGTH ];
-    char_data *victim;
+    struct char_data *victim;
 
     if ( !IS_NPC( ch ) )
     {
@@ -336,10 +336,10 @@ int do_mpaddlag( char_data *ch, char *argument, int cmd )
    it can also destroy a worn object and it can destroy 
    just plain everything  */
 
-int do_mpjunk( char_data *ch, char *argument, int cmd )
+int do_mpjunk( struct char_data *ch, char *argument, int cmd )
 {
     char      arg[ MAX_INPUT_LENGTH ];
-    OBJ_DATA *obj;
+    obj_data *obj;
     int location;
     bool dot = FALSE;
     char dotbuf[MAX_INPUT_LENGTH];
@@ -381,7 +381,7 @@ int do_mpjunk( char_data *ch, char *argument, int cmd )
 	   if (!dot || isname(dotbuf, ch->equipment[l]->name))
             extract_obj(unequip_char(ch,l));
 
-  	OBJ_DATA *x,*v;
+  	obj_data *x,*v;
         for (x = ch->carrying; x; x =v)
 	{
 	   v = x->next_content;
@@ -397,10 +397,10 @@ int do_mpjunk( char_data *ch, char *argument, int cmd )
 
 /* prints the message to everyone in the room other than the mob and victim */
 
-int do_mpechoaround( char_data *ch, char *argument, int cmd )
+int do_mpechoaround( struct char_data *ch, char *argument, int cmd )
 {
   char       arg[ MAX_INPUT_LENGTH ];
-  char_data *victim;
+  struct char_data *victim;
 
     if ( !IS_NPC( ch ) )
     {
@@ -426,10 +426,10 @@ int do_mpechoaround( char_data *ch, char *argument, int cmd )
     return eSUCCESS;
 }
 
-int do_mpechoaroundnotbad( char_data *ch, char *argument, int cmd )
+int do_mpechoaroundnotbad( struct char_data *ch, char *argument, int cmd )
 {
   char       arg[ MAX_INPUT_LENGTH ], arg1[MAX_INPUT_LENGTH];
-  char_data *victim, *victim2;
+  struct char_data *victim, *victim2;
 
     if ( !IS_NPC( ch ) )
     {
@@ -464,10 +464,10 @@ int do_mpechoaroundnotbad( char_data *ch, char *argument, int cmd )
 
 /* prints the message to only the victim */
 
-int do_mpechoat( char_data *ch, char *argument, int cmd )
+int do_mpechoat( struct char_data *ch, char *argument, int cmd )
 {
   char       arg[ MAX_INPUT_LENGTH ];
-  char_data *victim;
+  struct char_data *victim;
 
     if ( !IS_NPC( ch ) )
     {
@@ -495,7 +495,7 @@ int do_mpechoat( char_data *ch, char *argument, int cmd )
 
 /* prints the message to the room at large */
 
-int do_mpecho( char_data *ch, char *argument, int cmd )
+int do_mpecho( struct char_data *ch, char *argument, int cmd )
 {
     if ( !IS_NPC(ch) )
     {
@@ -517,11 +517,11 @@ int do_mpecho( char_data *ch, char *argument, int cmd )
 are loaded into inventory.  you can specify a level with
 the load object portion as well. */
 
-int do_mpmload( char_data *ch, char *argument, int cmd )
+int do_mpmload( struct char_data *ch, char *argument, int cmd )
 {
     char            arg[ MAX_INPUT_LENGTH ];
     int realnum;
-    char_data      *victim;
+    struct char_data      *victim;
 
     if ( !IS_NPC( ch ) )
     {
@@ -551,11 +551,11 @@ int do_mpmload( char_data *ch, char *argument, int cmd )
     return eSUCCESS;
 }
 
-int do_mpoload(char_data *ch, char *argument, int cmd)
+int do_mpoload(struct char_data *ch, char *argument, int cmd)
 {
   char arg1[ MAX_INPUT_LENGTH] = { 0 };
   char arg2[ MAX_INPUT_LENGTH] = { 0 };
-  OBJ_DATA *obj;
+  obj_data *obj;
   int realnum;
   extern struct index_data *obj_index;
 
@@ -606,11 +606,11 @@ int do_mpoload(char_data *ch, char *argument, int cmd)
    itself, but this had best be the last command in the MOBprogram
    otherwise ugly stuff will happen */
 
-int do_mppurge( char_data *ch, char *argument, int cmd )
+int do_mppurge( struct char_data *ch, char *argument, int cmd )
 {
     char       arg[ MAX_INPUT_LENGTH ];
-    char_data *victim;
-    OBJ_DATA  *obj;
+    struct char_data *victim;
+    obj_data  *obj;
 
     if ( !IS_NPC( ch ) )
     {
@@ -623,8 +623,8 @@ int do_mppurge( char_data *ch, char *argument, int cmd )
     if ( arg[0] == '\0' )
     {
         /* 'purge' */
-        char_data *vnext;
-        OBJ_DATA  *obj_next;
+        struct char_data *vnext;
+        obj_data  *obj_next;
 
 	for ( victim = world[ch->in_room].people; victim != NULL; victim = vnext )
 	{
@@ -691,7 +691,7 @@ int do_mppurge( char_data *ch, char *argument, int cmd )
 
 /* lets the mobile goto any location it wishes that is not private */
 
-int do_mpgoto( char_data *ch, char *argument, int cmd )
+int do_mpgoto( struct char_data *ch, char *argument, int cmd )
 {
     char             arg[ MAX_INPUT_LENGTH ];
     int32_t location = -1;
@@ -711,7 +711,7 @@ int do_mpgoto( char_data *ch, char *argument, int cmd )
 
 // TODO - make this work with strings (goto chode) too
 
-   char_data *vict;
+   struct char_data *vict;
    if (!str_cmp(arg, "mob"))
    {
       one_argument(argument, arg);
@@ -731,12 +731,12 @@ int do_mpgoto( char_data *ch, char *argument, int cmd )
 	prog_error(ch, "Mpgoto - Missing arg after 'pc' argument.");
 	return eFAILURE|eINTERNAL_ERROR;
       }
-      extern char_data *get_pc(char *name);
+      extern struct char_data *get_pc(char *name);
       if (!(vict = get_pc(arg)))
 	location = -1;
       else location = vict->in_room;
    } else {
-     OBJ_DATA *obj;
+     obj_data *obj;
      if ((vict = get_char_vis(ch, arg)))
      {
         location = vict->in_room; 
@@ -770,7 +770,7 @@ int do_mpgoto( char_data *ch, char *argument, int cmd )
 
 /* lets the mobile do a command at another location. Very useful */
 
-int do_mpat( char_data *ch, char *argument, int cmd )
+int do_mpat( struct char_data *ch, char *argument, int cmd )
 {
     char             arg[ MAX_INPUT_LENGTH ];
     int32_t             location;
@@ -792,7 +792,7 @@ int do_mpat( char_data *ch, char *argument, int cmd )
     }
 
 // TODO - make location take args
-   char_data *vict;
+   struct char_data *vict;
    if (!(vict = get_char_vis(ch, arg)))
    {
        location = atoi(arg);
@@ -826,14 +826,14 @@ int do_mpat( char_data *ch, char *argument, int cmd )
 
 // Reward the player with some XP
 // Also works with -xp to penalize
-int do_mpxpreward( char_data *ch, char *argument, int cmd )
+int do_mpxpreward( struct char_data *ch, char *argument, int cmd )
 {
     char             arg[ MAX_INPUT_LENGTH ];
     char             buf[ MAX_INPUT_LENGTH ];
     int              reward;
-    char_data *      vict;
+    struct char_data *      vict;
     
-    char_data *get_pc_room_vis_exact(char_data *ch, const char *name);
+    struct char_data *get_pc_room_vis_exact(struct char_data *ch, const char *name);
 
     if ( !IS_NPC( ch ) )
     {
@@ -870,13 +870,13 @@ int do_mpxpreward( char_data *ch, char *argument, int cmd )
 /* lets the mobile transfer people.  the all argument transfers
    everyone in the current room to the specified location */
 
-int do_mptransfer( char_data *ch, char *argument, int cmd )
+int do_mptransfer( struct char_data *ch, char *argument, int cmd )
 {
     char             arg1[ MAX_INPUT_LENGTH ];
     char             arg2[ MAX_INPUT_LENGTH ];
     int32_t             location;
     descriptor_data *d;
-    char_data       *victim;
+    struct char_data       *victim;
 
     if ( !IS_NPC( ch ) )
     {
@@ -958,7 +958,7 @@ int do_mptransfer( char_data *ch, char *argument, int cmd )
 /* lets the mobile force someone to do something.  must be mortal level
    and the all argument only affects those in the room with the mobile */
 
-int do_mpforce( char_data *ch, char *argument, int cmd )
+int do_mpforce( struct char_data *ch, char *argument, int cmd )
 {
     char arg[ MAX_INPUT_LENGTH ];
 
@@ -981,8 +981,8 @@ int do_mpforce( char_data *ch, char *argument, int cmd )
 
     if ( !str_cmp( arg, "all" ) )
     {
-        char_data *vch;
-        char_data *vch_next;
+        struct char_data *vch;
+        struct char_data *vch_next;
 
 	for ( vch = world[ch->in_room].people; vch != NULL; vch = vch_next )
 	{
@@ -997,7 +997,7 @@ int do_mpforce( char_data *ch, char *argument, int cmd )
     }
     else
     {
-	char_data *victim;
+	struct char_data *victim;
 
 	if ( ( victim = get_char_room_vis( ch, arg ) ) == NULL )
 	{
@@ -1028,7 +1028,7 @@ int do_mpforce( char_data *ch, char *argument, int cmd )
 // "Throw" a message to another mob.  Right now, it's only an int specifying which
 // 'catch' should handle it
 // argument should be <mob> <catchnum> <delay>
-int do_mpthrow( char_data *ch, char *argument, int cmd )
+int do_mpthrow( struct char_data *ch, char *argument, int cmd )
 {
   struct mprog_throw_type * throwitem = NULL;
   int mob_num;
@@ -1100,7 +1100,7 @@ int do_mpthrow( char_data *ch, char *argument, int cmd )
 }
 
 
-int do_mpteachskill( char_data *ch, char *argument, int cmd )
+int do_mpteachskill( struct char_data *ch, char *argument, int cmd )
 {
     char arg[ MAX_INPUT_LENGTH ];
     char skill[ MAX_INPUT_LENGTH ];
@@ -1119,7 +1119,7 @@ int do_mpteachskill( char_data *ch, char *argument, int cmd )
 	return eFAILURE|eINTERNAL_ERROR;
     }
 
-    char_data *victim;
+    struct char_data *victim;
 
     if ( ( victim = get_char_room( arg, ch->in_room ) ) == NULL )
     {
@@ -1187,7 +1187,7 @@ int determine_attack_type(char * attacktype)
     return 0;
 }
 
-char *getTemp(char_data *ch, char *name)
+char *getTemp(struct char_data *ch, char *name)
 {
   struct tempvariable *eh;
   for (eh = ch->tempVariable; eh; eh = eh->next)
@@ -1196,13 +1196,13 @@ char *getTemp(char_data *ch, char *name)
   return NULL;
 }
 
-int do_mpsettemp(char_data *ch, char *argument, int cmd)
+int do_mpsettemp(struct char_data *ch, char *argument, int cmd)
 {
   char arg[MAX_INPUT_LENGTH];
   char temp[MAX_INPUT_LENGTH];
   char arg2[MAX_INPUT_LENGTH];
   char arg3[MAX_INPUT_LENGTH];
-  char_data *victim;
+  struct char_data *victim;
   if (!IS_NPC(ch) && cmd != 999) {
     send_to_char("Huh?\r\n",ch);
     return eFAILURE;
@@ -1270,9 +1270,9 @@ int do_mpsettemp(char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_mpsetalign(char_data *ch, char *argument, int cmd)
+int do_mpsetalign(struct char_data *ch, char *argument, int cmd)
 {
-  char_data *victim;
+  struct char_data *victim;
   char arg[MAX_INPUT_LENGTH], align[MAX_INPUT_LENGTH];
   if (!IS_NPC(ch))
   {
@@ -1313,7 +1313,7 @@ void free_dmg_list()
   dmg_list = NULL;
 }
 
-void add_dmg(char_data *ch, int dmg)
+void add_dmg(struct char_data *ch, int dmg)
 {
   struct damage_list *c;
 
@@ -1342,7 +1342,7 @@ void add_dmg(char_data *ch, int dmg)
   dmg_list = c;
 }
 
-int do_mpdamage( char_data *ch, char *argument, int cmd )
+int do_mpdamage( struct char_data *ch, char *argument, int cmd )
 {
   char arg[ MAX_INPUT_LENGTH ];
   char temp[ MAX_INPUT_LENGTH ];
@@ -1366,7 +1366,7 @@ int do_mpdamage( char_data *ch, char *argument, int cmd )
 	return eFAILURE|eINTERNAL_ERROR;
     }
 
-    char_data *victim = NULL;
+    struct char_data *victim = NULL;
 
     // if it's 'all' leave victim NULL and skip
     if(strcmp(arg, "all") && strcmp(arg, "allpc"))
@@ -1490,7 +1490,7 @@ int do_mpdamage( char_data *ch, char *argument, int cmd )
 	      continue;
       }
       
-      char_data * next_vict;
+      struct char_data * next_vict;
       for(victim = world[ch->in_room].people; victim; victim = next_vict)
       {
         next_vict = victim->next_in_room;
@@ -1549,7 +1549,7 @@ int do_mpdamage( char_data *ch, char *argument, int cmd )
 }
 
 
-int do_mpothrow( char_data *ch, char *argument, int cmd )
+int do_mpothrow( struct char_data *ch, char *argument, int cmd )
 {
   struct mprog_throw_type * throwitem = NULL;
   int mob_num;
@@ -1629,11 +1629,11 @@ int skill_aff[] =
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 };
 
-int do_mpbestow(char_data *ch, char *argument, int cmd)
+int do_mpbestow(struct char_data *ch, char *argument, int cmd)
 {
   char arg[MAX_INPUT_LENGTH], arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH],
       arg3[MAX_INPUT_LENGTH];
-  char_data *victim, *owner = NULL;
+  struct char_data *victim, *owner = NULL;
   if (!IS_NPC(ch))
   {
     send_to_char("Huh?\r\n",ch);
@@ -1657,7 +1657,7 @@ int do_mpbestow(char_data *ch, char *argument, int cmd)
   check_range_valid_and_convert(o, arg3, 0, 10000);
   int a = 0;
   if (ch->beacon)
-    owner = (char_data *)ch->beacon;
+    owner = (struct char_data *)ch->beacon;
 
   if (!victim)
     victim = world[ch->in_room].people;
@@ -1720,7 +1720,7 @@ int do_mpbestow(char_data *ch, char *argument, int cmd)
 
 // simulate a pause in proc execution
 // stops prog, mpthrow a special kinda throw, picks it up again when delay is over
-int do_mppause( char_data *ch, char *argument, int cmd )
+int do_mppause( struct char_data *ch, char *argument, int cmd )
 {
   if (!IS_NPC(ch))
   {
@@ -1776,9 +1776,9 @@ int do_mppause( char_data *ch, char *argument, int cmd )
   throwitem->tMob = ch;
   throwitem->delay = delay;  
 
-  extern char_data *activeActor;
-  extern char_data *activeRndm;
-  extern OBJ_DATA *activeObj;
+  extern struct char_data *activeActor;
+  extern struct char_data *activeRndm;
+  extern obj_data *activeObj;
   extern void *activeVo;
   throwitem->actor = activeActor;
   throwitem->obj = activeObj;
@@ -1939,7 +1939,7 @@ int do_mpretval( struct char_data *ch, char *argument, int cmd )
 
 
 // Yes, I'm sure there's a better way to do this. Stop whining.
-int process_math(char_data *ch, char *string)
+int process_math(struct char_data *ch, char *string)
 {
   int result = 0,curr = 0; 
   char lastsign = '\0';
@@ -1993,7 +1993,7 @@ int process_math(char_data *ch, char *string)
 
 
 // Unreadable code > you
-char *expand_data(char_data *ch, char *orig)
+char *expand_data(struct char_data *ch, char *orig)
 {
   static char buf[MAX_STRING_LENGTH];
   char buf1[MAX_STRING_LENGTH];
@@ -2044,11 +2044,11 @@ char *expand_data(char_data *ch, char *orig)
     if (!c == '\0')
       *(ptr+r) = '~';
     
-    int16 *lvali = 0;
+    int16_t *lvali = 0;
     uint32_t *lvalui = 0;
     char **lvalstr = 0;
     int64_t *lvali64 = 0;
-    sbyte *lvalb = 0;
+    int8_t *lvalb = 0;
     translate_value(left,right,&lvali,&lvalui, &lvalstr,&lvali64, &lvalb,ch,activeActor, activeObj, activeVo, activeRndm);
 
     if (!lvali && !lvalui && !lvalb)
@@ -2092,7 +2092,7 @@ char *allowedData[] = {
  "hitpoints", "mana", "move", NULL
 };
 
-int do_mpsetmath(char_data *ch, char *arg, int cmd)
+int do_mpsetmath(struct char_data *ch, char *arg, int cmd)
 {
   if (!IS_NPC(ch))
   {
@@ -2100,7 +2100,7 @@ int do_mpsetmath(char_data *ch, char *arg, int cmd)
     return eFAILURE;
   }
 
-  char_data *vict;
+  struct char_data *vict;
 //  if (activeActor) csendf(activeActor, "{%s}\r\n", arg);
 //  vict = get_pc("Urizen");
 //  if (vict) csendf(vict, "{%s}\r\n", arg);
@@ -2123,11 +2123,11 @@ int do_mpsetmath(char_data *ch, char *arg, int cmd)
   }
   bool allowed = FALSE;
 
-  int16 *lvali = 0;
+  int16_t *lvali = 0;
   uint32_t *lvalui = 0;
   char **lvalstr = 0;
   int64_t *lvali64 = 0;
-  sbyte *lvalb = 0;
+  int8_t *lvalb = 0;
   translate_value(arg1,r,&lvali,&lvalui, &lvalstr,&lvali64, &lvalb,ch,activeActor, activeObj, activeVo, activeRndm);
 
   vict = activeTarget;
@@ -2183,7 +2183,7 @@ int do_mpsetmath(char_data *ch, char *arg, int cmd)
   }
   if (lvalb)
   {
-    *lvalb = (sbyte)i;
+    *lvalb = (int8_t)i;
     //    prog_error(ch, "Mpsetmath - %s set to %d.");
     //  	r, i, mob_index[ch->mobdata->nr].virt );
   }
@@ -2204,7 +2204,7 @@ int do_mpsetmath(char_data *ch, char *arg, int cmd)
   */return eSUCCESS;
 }
 
-void prog_error(char_data *ch, char *format, ...)
+void prog_error(struct char_data *ch, char *format, ...)
 {
   va_list ap;
   char buffer[MAX_STRING_LENGTH];

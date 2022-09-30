@@ -57,8 +57,8 @@ class Database : public Backend {
 
  public:
   Database();
-  virtual void save(char_data *ch, char_file_u4 *st);
-  virtual char_data *load(void);
+  virtual void save(struct char_data *ch, char_file_u4 *st);
+  virtual struct char_data *load(void);
   Prepare createPrepare(string prepare_id);
   int lookupPlayerID(const char *name);
   int createPlayerID(char *name);  

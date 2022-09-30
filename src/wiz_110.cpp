@@ -35,9 +35,9 @@
 #include "const.h"
 
 
-void AuctionHandleRenames(char_data *ch, string old_name, string new_name);
+void AuctionHandleRenames(struct char_data *ch, string old_name, string new_name);
 
-int get_max_stat_bonus(char_data *ch, int attrs)
+int get_max_stat_bonus(struct char_data *ch, int attrs)
 {
   int bonus = 0;
 
@@ -120,9 +120,9 @@ int do_maxes(struct char_data *ch, char *argument, int cmd)
 }
 
 // give a command to a god
-command_return_t do_bestow(char_data *ch, string arg, int cmd)
+command_return_t do_bestow(struct char_data *ch, string arg, int cmd)
 {
-  char_data *vict = nullptr;
+  struct char_data *vict = nullptr;
   string buf;
   string command;
   int i;
@@ -202,7 +202,7 @@ command_return_t do_bestow(char_data *ch, string arg, int cmd)
 // take away a command from a god
 int do_revoke(struct char_data *ch, char *arg, int cmd)
 {
-   char_data * vict = NULL;
+   struct char_data * vict = NULL;
    char buf[MAX_INPUT_LENGTH];
    char command[MAX_INPUT_LENGTH];
    int i;
@@ -465,7 +465,7 @@ int do_rename_char(struct char_data *ch, char *arg, int cmd)
     }
     if(GET_ITEM_TYPE(obj) == ITEM_CONTAINER)
     {
-      OBJ_DATA *obj2;
+      obj_data *obj2;
       for(obj2 = obj->contains; obj2 ; obj2 = obj2->next_content) {
         if(IS_SET(obj2->obj_flags.extra_flags, ITEM_SPECIAL)) {
           char tmp[256];
@@ -741,19 +741,19 @@ int do_range(struct char_data *ch, char *arg, int cmd)
 extern int r_new_meta_platinum_cost(int start, int64_t plats);
 extern int r_new_meta_exp_cost(int start, int64_t exp);
 
-extern int64_t moves_exp_spent(char_data * ch);
-extern int64_t moves_plats_spent(char_data * ch);
-extern int64_t hps_exp_spent(char_data * ch);
-extern int64_t hps_plats_spent(char_data * ch);
-extern int64_t mana_exp_spent(char_data * ch);
-extern int64_t mana_plats_spent(char_data * ch);
+extern int64_t moves_exp_spent(struct char_data * ch);
+extern int64_t moves_plats_spent(struct char_data * ch);
+extern int64_t hps_exp_spent(struct char_data * ch);
+extern int64_t hps_plats_spent(struct char_data * ch);
+extern int64_t mana_exp_spent(struct char_data * ch);
+extern int64_t mana_plats_spent(struct char_data * ch);
 
 
 
-int do_metastat(char_data *ch, char *argument, int cmd)
+int do_metastat(struct char_data *ch, char *argument, int cmd)
 {
   char arg[MAX_INPUT_LENGTH];
-  char_data *victim;
+  struct char_data *victim;
   argument = one_argument(argument, arg);
   if (arg[0] == '\0' || !(victim = get_pc_vis(ch, arg)))
   {
@@ -802,7 +802,7 @@ r_new_meta_platinum_cost(0,moves_plats_spent(victim))+GET_RAW_MOVE(victim)-GET_M
 }
 
 
-int do_acfinder(char_data *ch, char *argument, int cmdnum)
+int do_acfinder(struct char_data *ch, char *argument, int cmdnum)
 {
   char arg[MAX_STRING_LENGTH];
   argument = one_argument(argument,arg);
@@ -824,11 +824,11 @@ int do_acfinder(char_data *ch, char *argument, int cmdnum)
   }
   i = 1 << i;
   int r,o = 1;
-  OBJ_DATA *obj;
+  obj_data *obj;
   char buf[MAX_STRING_LENGTH];
   for (r = 0; r < top_of_objt; r++)
   {
-    obj = (OBJ_DATA*) obj_index[r].item;
+    obj = (obj_data*) obj_index[r].item;
     if (GET_ITEM_TYPE(obj) != ITEM_ARMOR) continue;
     if (!CAN_WEAR(obj, i)) continue;
     int ac = 0 - obj->obj_flags.value[0];
@@ -844,7 +844,7 @@ int do_acfinder(char_data *ch, char *argument, int cmdnum)
   return eSUCCESS;
 }
 
-int do_testhit(char_data *ch, char *argument, int cmd)
+int do_testhit(struct char_data *ch, char *argument, int cmd)
 {
  char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH];
  argument = one_argument(argument, arg1);
@@ -892,7 +892,7 @@ void write_array_csv(const char * const *array, ofstream &fout) {
 	}
 }
 
-int do_export(char_data *ch, char *args, int cmdnum)
+int do_export(struct char_data *ch, char *args, int cmdnum)
 {
 	char export_type[MAX_INPUT_LENGTH], filename[MAX_INPUT_LENGTH];
 	world_file_list_item * curr = obj_file_list;
@@ -940,7 +940,7 @@ int do_export(char_data *ch, char *args, int cmdnum)
 	return eSUCCESS;
 }
 
-command_return_t do_world(char_data* ch, string args, int cmd)
+command_return_t do_world(struct char_data* ch, string args, int cmd)
 {
   
   if (args == "rename")

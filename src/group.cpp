@@ -29,9 +29,9 @@ extern "C"
 extern CWorld world;
 char * calc_color(int hit, int max_hit);
 
-int do_abandon(char_data *ch, char *argument, int cmd)
+int do_abandon(struct char_data *ch, char *argument, int cmd)
 {
-  char_data *k;
+  struct char_data *k;
   char buf[MAX_INPUT_LENGTH+1];
 
 
@@ -77,7 +77,7 @@ int do_abandon(char_data *ch, char *argument, int cmd)
 }
 
   
-int do_found(char_data *ch, char *argument, int cmd)
+int do_found(struct char_data *ch, char *argument, int cmd)
 {
   char buf[MAX_INPUT_LENGTH+1];
 
@@ -126,12 +126,12 @@ int do_found(char_data *ch, char *argument, int cmd)
   return eSUCCESS;  
 }
 
-int do_split(char_data *ch, char *argument, int cmd)
+int do_split(struct char_data *ch, char *argument, int cmd)
 {
   int32_t amount, share, extra;
   char buf[256], number[MAX_INPUT_LENGTH+1];
   int no_members;
-  char_data *k;
+  struct char_data *k;
   struct follow_type *f;
 
   if (!*argument){
@@ -163,7 +163,7 @@ int do_split(char_data *ch, char *argument, int cmd)
     return eSUCCESS;
   }
 
-  if (GET_GOLD(ch) < (uint32) amount) {
+  if (GET_GOLD(ch) < (uint32_t) amount) {
     send_to_char( "You don't have that much gold!\n\r", ch );
     return eFAILURE;
   }
@@ -249,7 +249,7 @@ int do_split(char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-void setup_group_buf(char * report, char_data * j, char_data *i)
+void setup_group_buf(char * report, struct char_data * j, struct char_data *i)
 {
   if(IS_NPC(j) || (IS_ANONYMOUS(j) && (i->clan != j->clan || !i->clan)))
   {
@@ -405,11 +405,11 @@ int do_group(struct char_data *ch, char *argument, int cmd)
   return eFAILURE;
 }
 
-int do_promote(char_data *ch, char *argument, int cmd)
+int do_promote(struct char_data *ch, char *argument, int cmd)
 {
   char name[MAX_INPUT_LENGTH+1];
   char buf[250];
-  char_data *new_new_leader, *k;
+  struct char_data *new_new_leader, *k;
   struct follow_type *f, *next_f;
 
   one_argument(argument, name);
@@ -496,11 +496,11 @@ int do_promote(char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_disband(char_data *ch, char *argument, int cmd)
+int do_disband(struct char_data *ch, char *argument, int cmd)
 {
   char name[MAX_INPUT_LENGTH+1];
   char buf[200];
-  char_data *adios, *k;
+  struct char_data *adios, *k;
   struct follow_type *f, *next_f;
 
   if(IS_SET(world[ch->in_room].room_flags, QUIET)) {
@@ -589,14 +589,14 @@ int do_disband(char_data *ch, char *argument, int cmd)
 }
 
 
-int do_follow(char_data *ch, char *argument, int cmd)
+int do_follow(struct char_data *ch, char *argument, int cmd)
 {
     char name[MAX_INPUT_LENGTH+1];
-    char_data *leader;
+    struct char_data *leader;
 
 
-    void stop_follower(char_data *ch, int cmd);
-    void add_follower(char_data *ch, char_data *leader, int cmd);
+    void stop_follower(struct char_data *ch, int cmd);
+    void add_follower(struct char_data *ch, struct char_data *leader, int cmd);
 
     if (IS_SET(world[ch->in_room].room_flags, QUIET))
     {
@@ -663,7 +663,7 @@ int do_follow(char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_autojoin(char_data *ch, char *argument, int cmd)
+int do_autojoin(struct char_data *ch, char *argument, int cmd)
 {
   if (!ch->pcdata) return eFAILURE;
   char buf[MAX_STRING_LENGTH];
@@ -740,11 +740,11 @@ int do_autojoin(char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-vector<char_data *> char_data::getFollowers(void)
+vector<struct char_data *> char_data::getFollowers(void)
 {
-  vector<char_data *> followers = {};
+  vector<struct char_data *> followers = {};
   follow_type *f = {};
-  char_data *leader = nullptr;
+  struct char_data *leader = nullptr;
 
   if (!IS_AFFECTED(this, AFF_GROUP))
   {

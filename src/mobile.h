@@ -13,15 +13,15 @@ using namespace std;
 
 
 void rebuild_rnum_references(int startAt, int type);
-void    mprog_driver            ( char* com_list, char_data* mob,
-                                       char_data* actor, OBJ_DATA* obj,
-                                       void* vo, struct mprog_throw_type *thrw, char_data *rndm );
+void    mprog_driver            ( char* com_list, struct char_data* mob,
+                                       struct char_data* actor, obj_data* obj,
+                                       void* vo, struct mprog_throw_type *thrw, struct char_data *rndm );
 char *  mprog_next_command      ( char* clist );
 
 
-bool charExists(char_data *ch);
+bool charExists(struct char_data *ch);
 
-char *getTemp(char_data *ch, char *name);
+char *getTemp(struct char_data *ch, char *name);
 
 
 #define BASE_STAT      0
@@ -128,11 +128,11 @@ struct mob_matrix_data
 };
 
 
-void translate_value(char *leftptr, char *rightptr, int16 **vali, uint32_t **valui,
-                char ***valstr, int64_t **vali64, sbyte **valb, char_data *mob, char_data *actor,
-                OBJ_DATA *obj, void *vo, char_data *rndm);
+void translate_value(char *leftptr, char *rightptr, int16_t **vali, uint32_t **valui,
+                char ***valstr, int64_t **vali64, int8_t **valb, struct char_data *mob, struct char_data *actor,
+                obj_data *obj, void *vo, struct char_data *rndm);
 
-void save_golem_data(char_data *ch);
-void save_charmie_data(char_data *ch);
+void save_golem_data(struct char_data *ch);
+void save_charmie_data(struct char_data *ch);
 
 #endif

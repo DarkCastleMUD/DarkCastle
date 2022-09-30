@@ -28,7 +28,7 @@
 #include <twitcurl.h>
 #endif
 
-int getRealSpellDamage(char_data * ch);
+int getRealSpellDamage(struct char_data * ch);
 
 int number_or_name(char **name, int *num)
 {
@@ -144,7 +144,7 @@ void do_mload(struct char_data *ch, int rnum, int cnt)
  }
 }
 
-obj_list_t oload(char_data *ch, int rnum, int cnt, bool random)
+obj_list_t oload(struct char_data *ch, int rnum, int cnt, bool random)
 {
   obj_data *obj = nullptr;
   obj_list_t obj_list = {};
@@ -1608,14 +1608,14 @@ void check_end_of_hunt(struct hunt_data *h, bool forced = FALSE)
        if (h->time <= 0) sprintf(buf,"\r\n## The time limit on hunt '%s' has expired and all unrecovered prizes have been removed.\r\n",h->huntname);
        else sprintf(buf,"\r\n## All prizes have been recovered on hunt '%s'\r\n",h->huntname);
 	} else {
-       if (h->time <= 0) sprintf(buf,"\r\n## The time limit on the hunt for '%s' has expired and all unrecovered prizes have been removed.\r\n",((OBJ_DATA*)obj_index[real_object(h->itemnum)].item)->short_description);
-       else sprintf(buf,"\r\n## All prizes have been recovered on the hunt for '%s'\r\n",((OBJ_DATA*)obj_index[real_object(h->itemnum)].item)->short_description);
+       if (h->time <= 0) sprintf(buf,"\r\n## The time limit on the hunt for '%s' has expired and all unrecovered prizes have been removed.\r\n",((obj_data*)obj_index[real_object(h->itemnum)].item)->short_description);
+       else sprintf(buf,"\r\n## All prizes have been recovered on the hunt for '%s'\r\n",((obj_data*)obj_index[real_object(h->itemnum)].item)->short_description);
 	}
       } else {
       if (h->huntname) {
          sprintf(buf,"\r\n## Hunt '%s' has been ended.\r\n",h->huntname);
 	} else {
-        sprintf(buf,"\r\n## The hunt for '%s' has been ended.\r\n",((OBJ_DATA*)obj_index[real_object(h->itemnum)].item)->short_description);
+        sprintf(buf,"\r\n## The hunt for '%s' has been ended.\r\n",((obj_data*)obj_index[real_object(h->itemnum)].item)->short_description);
 	}
       }
      send_info(buf);
@@ -1798,7 +1798,7 @@ void begin_hunt(int item, int duration, int amount, char *huntname)
   for (int i = 0; i < amount; i++)
   {
     int mob = -1;
-    char_data *vict;
+    struct char_data *vict;
     while (1)
     {
       mob = number(1, top_of_mobt);
@@ -1954,7 +1954,7 @@ void pulse_hunts()
   }
 }
 
-int do_showhunt(char_data *ch, char *arg, int cmd)
+int do_showhunt(struct char_data *ch, char *arg, int cmd)
 {
   string buf;
   struct hunt_data *h;
@@ -1975,11 +1975,11 @@ int do_showhunt(char_data *ch, char *arg, int cmd)
   {
     if (h->huntname)
     {
-      ch->send(fmt::format("\r\n{} for '{}'({} minutes remaining):\r\n", h->huntname, ((OBJ_DATA *)obj_index[real_object(h->itemnum)].item)->short_description, h->time));
+      ch->send(fmt::format("\r\n{} for '{}'({} minutes remaining):\r\n", h->huntname, ((obj_data *)obj_index[real_object(h->itemnum)].item)->short_description, h->time));
     }
     else
     {
-      ch->send(fmt::format("\r\nThe hunt for '{}'({} minutes remaining):\r\n", ((OBJ_DATA *)obj_index[real_object(h->itemnum)].item)->short_description, h->time));
+      ch->send(fmt::format("\r\nThe hunt for '{}'({} minutes remaining):\r\n", ((obj_data *)obj_index[real_object(h->itemnum)].item)->short_description, h->time));
     }
 
     int itemsleft = 0;

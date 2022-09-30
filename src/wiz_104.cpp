@@ -1690,7 +1690,7 @@ int do_teleport(struct char_data *ch, char *argument, int cmd)
       }
 //      for (loop = 0; loop <= top_of_world; loop++) {
 //         if (world[loop].number == target) {
-//            target = (int16)loop;
+//            target = (int16_t)loop;
 //            break;
 //      } else if (loop == top_of_world) {
 //            send_to_char("No room exists with that number.\n\r", ch);
@@ -1814,17 +1814,17 @@ char *oprog_type_to_name(int type)
   }
 }
 
-void opstat(char_data *ch, int vnum)
+void opstat(struct char_data *ch, int vnum)
 {
   int num = real_object(vnum);
-  OBJ_DATA *obj;
+  obj_data *obj;
   char buf[MAX_STRING_LENGTH];
   if (num < 0)
   {
     send_to_char("Error, non-existant object.\r\n",ch);
     return;
   }
-  obj = (OBJ_DATA*)obj_index[num].item;
+  obj = (obj_data*)obj_index[num].item;
   sprintf(buf,"$3Object$R: %s   $3Vnum$R: %d.\r\n",
 	 obj->name, vnum);
   send_to_char(buf,ch);
@@ -1834,7 +1834,7 @@ void opstat(char_data *ch, int vnum)
      return;
   }
   send_to_char("\r\n",ch);
-  MPROG_DATA *mprg;
+  mob_prog_data *mprg;
    int i;
    char buf2[MAX_STRING_LENGTH];
     for ( mprg = obj_index[num].mobprogs, i = 1; mprg != NULL;
@@ -1852,7 +1852,7 @@ void opstat(char_data *ch, int vnum)
     }
 }
 
-int do_opstat(char_data *ch, char *argument, int cmd)
+int do_opstat(struct char_data *ch, char *argument, int cmd)
 {
   char buf[MAX_STRING_LENGTH];
   int vnum = -1;
@@ -1880,7 +1880,7 @@ int do_opstat(char_data *ch, char *argument, int cmd)
 
 void update_objprog_bits(int num)
 {
-    MPROG_DATA * prog = obj_index[num].mobprogs;
+    mob_prog_data * prog = obj_index[num].mobprogs;
     obj_index[num].progtypes = 0;
 
     while(prog) {
@@ -1890,7 +1890,7 @@ void update_objprog_bits(int num)
 }
 
 
-int do_opedit(char_data *ch, char *argument, int cmd)
+int do_opedit(struct char_data *ch, char *argument, int cmd)
 {
   int num = -1,vnum = -1,i=-1,a=-1;
   char arg[MAX_INPUT_LENGTH];
@@ -1921,7 +1921,7 @@ int do_opedit(char_data *ch, char *argument, int cmd)
     opstat(ch, vnum);
     return eSUCCESS;
   }*/
-  MPROG_DATA *prog, *currprog;
+  mob_prog_data *prog, *currprog;
   if (!str_cmp(arg, "add"))
   {
      argument = one_argument(argument, arg);
@@ -1932,9 +1932,9 @@ int do_opedit(char_data *ch, char *argument, int cmd)
 	return eFAILURE;
      }
 #ifdef LEAK_CHECK
-        prog = (MPROG_DATA *) calloc(1, sizeof(MPROG_DATA));
+        prog = (mob_prog_data *) calloc(1, sizeof(mob_prog_data));
 #else
-        prog = (MPROG_DATA *) dc_alloc(1, sizeof(MPROG_DATA));
+        prog = (mob_prog_data *) dc_alloc(1, sizeof(mob_prog_data));
 #endif
         prog->type = ALL_GREET_PROG;
         prog->arglist = strdup("80");
@@ -2119,7 +2119,7 @@ int do_oclone(struct char_data *ch, char *argument, int cmd)
     send_to_char("Syntax: oclone <source vnum> <destination vnum>\n\r",ch);
     return eFAILURE;
   }
-  OBJ_DATA *obj,*otmp;
+  obj_data *obj,*otmp;
   int v1 = atoi(arg1), v2 = atoi(arg2);
   int r1 = real_object(v1), r2 = real_object(v2);
   if (r1 < 0)
@@ -2158,11 +2158,11 @@ int do_oclone(struct char_data *ch, char *argument, int cmd)
 */
 
   csendf(ch, "Ok.\n\rYou copied item %d (%s) and replaced item %d (%s).\n\r",
-	 v1, ((OBJ_DATA*)obj_index[real_object(v1)].item)->short_description,
-	 v2, ((OBJ_DATA*)obj_index[real_object(v2)].item)->short_description);
+	 v1, ((obj_data*)obj_index[real_object(v1)].item)->short_description,
+	 v2, ((obj_data*)obj_index[real_object(v2)].item)->short_description);
 
   object_list = object_list->next;
-  otmp = (OBJ_DATA*)obj_index[r2].item;
+  otmp = (obj_data*)obj_index[r2].item;
   obj->item_number = r2;
   obj_index[r2].item = (void*)obj;
   obj_index[r2].non_combat_func = 0;
@@ -2189,7 +2189,7 @@ int do_mclone(struct char_data *ch, char *argument, int cmd)
     send_to_char("Syntax: mclone <source vnum> <destination vnum>\n\r",ch);
     return eFAILURE;
   }
-  char_data *mob;
+  struct char_data *mob;
   int vdst = atoi(arg2), vsrc = atoi(arg1);
   int dst = real_mobile(vdst), src = real_mobile(vsrc);
   if (src < 0)
@@ -2228,7 +2228,7 @@ int do_mclone(struct char_data *ch, char *argument, int cmd)
   mob->mobdata->nr = dst;
 
    // Find old mobile in world and remove
-  char_data *old_mob = (char_data*)mob_index[dst].item;
+  struct char_data *old_mob = (struct char_data*)mob_index[dst].item;
   if (old_mob && old_mob->mobdata) {
 		auto &character_list = DC::instance().character_list;
 		for (auto& tmpch : character_list) {
@@ -2238,8 +2238,8 @@ int do_mclone(struct char_data *ch, char *argument, int cmd)
   }
 
   csendf(ch, "Ok.\n\rYou copied mob %d (%s) and replaced mob %d (%s).\n\r",
-	 vsrc, ((char_data*)mob_index[src].item)->short_desc,
-	 vdst, ((char_data*)mob_index[dst].item)->short_desc);
+	 vsrc, ((struct char_data*)mob_index[src].item)->short_desc,
+	 vdst, ((struct char_data*)mob_index[dst].item)->short_desc);
 
   // Overwrite old mob with new mob
   mob_index[dst].item = (void*)mob;

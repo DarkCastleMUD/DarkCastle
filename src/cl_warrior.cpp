@@ -249,9 +249,9 @@ int do_retreat(struct char_data *ch, char *argument, int cmd)
    char buf[MAX_INPUT_LENGTH];
    // Azrack -- retval should be initialized to something
    int retval = 0;
-   char_data *chTemp, *loop_ch;
+   struct char_data *chTemp, *loop_ch;
 
-   int is_stunned(char_data *ch);
+   int is_stunned(struct char_data *ch);
 
    if (is_stunned(ch))
       return eFAILURE;
@@ -380,8 +380,8 @@ int do_hitall(struct char_data *ch, char *argument, int cmd) {
 		WAIT_STATE(ch, PULSE_VIOLENCE*3);
 
 		auto &character_list = DC::instance().character_list;
-        for_each(character_list.begin(), character_list.end(), [&ch](char_data *vict){
-			if (vict && vict != (char_data *) 0x95959595 && ch->in_room == vict->in_room && !ARE_GROUPED(ch, vict) && vict != ch && can_be_attacked(ch, vict)) {
+        for_each(character_list.begin(), character_list.end(), [&ch](struct char_data *vict){
+			if (vict && vict != (struct char_data *) 0x95959595 && ch->in_room == vict->in_room && !ARE_GROUPED(ch, vict) && vict != ch && can_be_attacked(ch, vict)) {
 				int retval = one_hit(ch, vict, TYPE_UNDEFINED, FIRST);
 				if (IS_SET(retval, eCH_DIED)) {
 					REMOVE_BIT(ch->combat, COMBAT_HITALL);
@@ -872,17 +872,17 @@ int do_bladeshield(struct char_data *ch, char *argument, int cmd)
 
 // return TRUE on guard doing anything
 // otherwise FALSE
-int handle_any_guard(char_data * ch)
+int handle_any_guard(struct char_data * ch)
 {
    if(!ch->guarded_by)
       return FALSE;
 
-   char_data * guard = NULL;
+   struct char_data * guard = NULL;
 
    // search the room for my guard
    for(follow_type * curr = ch->guarded_by; curr;) 
    {
-      for(char_data * vict = world[ch->in_room].people; vict; vict = vict->next_in_room)
+      for(struct char_data * vict = world[ch->in_room].people; vict; vict = vict->next_in_room)
          if(vict == curr->follower) 
          {
             curr = NULL;
@@ -905,7 +905,7 @@ int handle_any_guard(char_data * ch)
    return FALSE;
 }
 
-char_data * is_guarding_me(char_data * ch, char_data * guard)
+struct char_data * is_guarding_me(struct char_data * ch, struct char_data * guard)
 {
    follow_type * curr = ch->guarded_by;
 
@@ -918,12 +918,12 @@ char_data * is_guarding_me(char_data * ch, char_data * guard)
    return NULL;
 }
 
-void stop_guarding(char_data * guard)
+void stop_guarding(struct char_data * guard)
 {
    if(!guard->guarding) // i'm not guarding anyone:)  get out
       return;
 
-   char_data   * victim = guard->guarding;
+   struct char_data   * victim = guard->guarding;
    follow_type * curr = victim->guarded_by;
    follow_type * last = NULL;
 
@@ -943,7 +943,7 @@ void stop_guarding(char_data * guard)
    guard->guarding = NULL;
 }
 
-void start_guarding(char_data * guard, char_data * victim)
+void start_guarding(struct char_data * guard, struct char_data * victim)
 {
    follow_type * curr = (struct follow_type *) dc_alloc(1, sizeof(struct follow_type));
 
@@ -954,7 +954,7 @@ void start_guarding(char_data * guard, char_data * victim)
    guard->guarding = victim;
 }
 
-void stop_guarding_me(char_data * victim)
+void stop_guarding_me(struct char_data * victim)
 {
    char buf[200];
    follow_type * curr = victim->guarded_by;
@@ -977,7 +977,7 @@ void stop_guarding_me(char_data * victim)
 int do_guard(struct char_data *ch, char *argument, int cmd)
 {
    char name[MAX_INPUT_LENGTH];
-   char_data * victim = NULL;
+   struct char_data * victim = NULL;
 
    if(!IS_MOB(ch) && (!has_skill(ch, SKILL_GUARD) || !has_skill(ch, SKILL_RESCUE))) {
      send_to_char("You have no idea how to be a full time bodyguard.\r\n", ch);
@@ -1039,7 +1039,7 @@ int do_tactics(struct char_data *ch, char *argument, int cmd)
      
 
   int grpsize = 0;
-  for(char_data * tmp_char = world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
+  for(struct char_data * tmp_char = world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
   {
     if(tmp_char == ch)
       continue;
@@ -1065,7 +1065,7 @@ int do_tactics(struct char_data *ch, char *argument, int cmd)
     af.bitvector = -1;
     affect_to_char(ch, &af);
     
-    for(char_data * tmp_char = world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
+    for(struct char_data * tmp_char = world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
     { 
       if(tmp_char == ch)
         continue;
@@ -1094,7 +1094,7 @@ int do_tactics(struct char_data *ch, char *argument, int cmd)
 
 int do_make_camp(struct char_data *ch, char *argument, int cmd)
 {
-  char_data *i, *next_i;
+  struct char_data *i, *next_i;
   int learned = has_skill(ch, SKILL_MAKE_CAMP);
   struct affected_type af;
 
@@ -1276,7 +1276,7 @@ int do_battlesense(struct char_data *ch, char *argument, int cmd)
 
 int do_smite(struct char_data *ch, char *argument, int cmd)
 {
-  char_data *vict = NULL;
+  struct char_data *vict = NULL;
   char name[MAX_STRING_LENGTH];
   int learned = has_skill(ch, SKILL_SMITE);
   struct affected_type af;
@@ -1438,7 +1438,7 @@ int do_perseverance(struct char_data *ch, char *argument, int cmd)
 
 int do_defenders_stance(struct char_data *ch, char *argument, int cmd)
 {
-  char_data *vict = NULL;
+  struct char_data *vict = NULL;
   int learned = has_skill(ch, SKILL_DEFENDERS_STANCE);
   struct affected_type af;
 

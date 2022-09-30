@@ -74,7 +74,7 @@ bool Path::isRoomPathed(int room)
 }
 
 
-char *Path::determineRoute(char_data *ch, int from, int to)
+char *Path::determineRoute(struct char_data *ch, int from, int to)
 {
   int i;
 
@@ -159,7 +159,7 @@ bool Path::isPathConnected(class Path *pa)
   return FALSE;
 }
 
-void Path::addRoom(char_data *ch, int room, bool IgnoreConnectingIssues)
+void Path::addRoom(struct char_data *ch, int room, bool IgnoreConnectingIssues)
 {
 
  // Used at times with ch == NULL
@@ -221,7 +221,7 @@ void Path::addRoom(char_data *ch, int room, bool IgnoreConnectingIssues)
 }
 
 
-int do_newPath(char_data *ch, char *argument, int cmd)
+int do_newPath(struct char_data *ch, char *argument, int cmd)
 {
   char arg1[MAX_INPUT_LENGTH];
   argument = one_argument(argument, arg1);
@@ -247,7 +247,7 @@ int do_newPath(char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_listPathsByZone(char_data *ch, char *argument, int cmd)
+int do_listPathsByZone(struct char_data *ch, char *argument, int cmd)
 {
   int i = world[ch->in_room].zone, low = zone_table[i].bottom_rnum, high = zone_table[i].top_rnum;
 
@@ -271,7 +271,7 @@ int do_listPathsByZone(char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_listAllPaths(char_data *ch, char *argument, int cmd)
+int do_listAllPaths(struct char_data *ch, char *argument, int cmd)
 {
   class Path *p;
   bool found = FALSE;
@@ -291,7 +291,7 @@ int do_listAllPaths(char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_addRoom(char_data *ch, char *argument, int cmd)
+int do_addRoom(struct char_data *ch, char *argument, int cmd)
 {
   char arg1[MAX_INPUT_LENGTH];
   argument = one_argument(argument, arg1);
@@ -313,7 +313,7 @@ int do_addRoom(char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_findPath(char_data *ch, char *argument, int cmd)
+int do_findPath(struct char_data *ch, char *argument, int cmd)
 {
   char arg1[MAX_INPUT_LENGTH];
   argument = one_argument(argument, arg1);
@@ -389,7 +389,7 @@ bool determinePath(class Path *goal, class Path *at, int beststeps, int steps, c
 }
 
 
-int do_pathpath(char_data *ch, char *argument, int cmd)
+int do_pathpath(struct char_data *ch, char *argument, int cmd)
 {
   char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
   argument = one_argument(argument, arg1);
@@ -477,7 +477,7 @@ int Path::connectRoom(class Path *z)
 }
 
 
-char *findPath(int from, int to, char_data *ch = NULL)
+char *findPath(int from, int to, struct char_data *ch = NULL)
 {
   char buf[MAX_STRING_LENGTH];
   static char endbuf[MAX_STRING_LENGTH];
@@ -544,14 +544,14 @@ char *findPath(int from, int to, char_data *ch = NULL)
         else to = endto;
 	strcat(endbuf, p[z]->determineRoute(ch, from, to));
 	from = to;
-//	char *Path::determineRoute(char_data *ch, int from, int to)
+//	char *Path::determineRoute(struct char_data *ch, int from, int to)
         
   }
   return &endbuf[0];
   
 }
 
-int do_findpath(char_data *ch, char *argument, int cmd)
+int do_findpath(struct char_data *ch, char *argument, int cmd)
 {
   Path *p;
   for (p = mPathList; p; p = p->next)

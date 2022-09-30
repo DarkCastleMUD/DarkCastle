@@ -74,17 +74,17 @@ extern struct index_data *obj_index;
 int spl_lvl(int lev);
 
 // Extern procedures 
-void make_dust(char_data * ch);
-int say_spell( char_data *ch, int si, int room = 0);
+void make_dust(struct char_data * ch);
+int say_spell( struct char_data *ch, int si, int room = 0);
 extern struct index_data *mob_index;
 
 #if(0)
-    ubyte        beats;                  /* Waiting time after spell     */
-    ubyte        minimum_position;       /* Position for caster          */
-    ubyte       min_usesmana;           /* Mana used                    */
-    int16      targets;                /* Legal targets                */
+    uint8_t        beats;                  /* Waiting time after spell     */
+    uint8_t        minimum_position;       /* Position for caster          */
+    uint8_t       min_usesmana;           /* Mana used                    */
+    int16_t      targets;                /* Legal targets                */
     SPELL_FUN * spell_pointer;          /* Function to call             */
-    int16      difficulty;
+    int16_t      difficulty;
 #endif
 
 
@@ -112,13 +112,13 @@ struct spell_info_type spell_info [] =
 
  { /* 10 */ 3*PULSE_TIMER, POSITION_FIGHTING, 40, TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, cast_colour_spray, SKILL_INCREASE_HARD },
 
- { /* 11 */ (ubyte)(4.5*PULSE_TIMER), POSITION_STANDING, 25, TAR_IGNORE, cast_control_weather, SKILL_INCREASE_MEDIUM },
+ { /* 11 */ (uint8_t)(4.5*PULSE_TIMER), POSITION_STANDING, 25, TAR_IGNORE, cast_control_weather, SKILL_INCREASE_MEDIUM },
 
- { /* 12 */ (ubyte)(4.5*PULSE_TIMER), POSITION_STANDING,  5, TAR_IGNORE, cast_create_food, SKILL_INCREASE_MEDIUM },
+ { /* 12 */ (uint8_t)(4.5*PULSE_TIMER), POSITION_STANDING,  5, TAR_IGNORE, cast_create_food, SKILL_INCREASE_MEDIUM },
 
- { /* 13 */ (ubyte)(4.5*PULSE_TIMER), POSITION_STANDING,  5, TAR_OBJ_INV|TAR_OBJ_EQUIP, cast_create_water, SKILL_INCREASE_MEDIUM },
+ { /* 13 */ (uint8_t)(4.5*PULSE_TIMER), POSITION_STANDING,  5, TAR_OBJ_INV|TAR_OBJ_EQUIP, cast_create_water, SKILL_INCREASE_MEDIUM },
 
- { /* 14 */  (ubyte)(2.25*PULSE_TIMER), POSITION_FIGHTING, 15, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_remove_blind, SKILL_INCREASE_MEDIUM },
+ { /* 14 */  (uint8_t)(2.25*PULSE_TIMER), POSITION_FIGHTING, 15, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_remove_blind, SKILL_INCREASE_MEDIUM },
 
  { /* 15 */ 3*PULSE_TIMER, POSITION_FIGHTING, 20, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_cure_critic, SKILL_INCREASE_MEDIUM },
 
@@ -160,13 +160,13 @@ struct spell_info_type spell_info [] =
 
  { /* 34 */ 3*PULSE_TIMER, POSITION_STANDING, 50, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_protection_from_evil, SKILL_INCREASE_MEDIUM },
 
- { /* 35 */ (ubyte)(2.25*PULSE_TIMER), POSITION_FIGHTING, 18, TAR_CHAR_ROOM|TAR_OBJ_INV|TAR_OBJ_EQUIP|TAR_OBJ_ROOM|TAR_SELF_DEFAULT, cast_remove_curse, SKILL_INCREASE_MEDIUM },
+ { /* 35 */ (uint8_t)(2.25*PULSE_TIMER), POSITION_FIGHTING, 18, TAR_CHAR_ROOM|TAR_OBJ_INV|TAR_OBJ_EQUIP|TAR_OBJ_ROOM|TAR_SELF_DEFAULT, cast_remove_curse, SKILL_INCREASE_MEDIUM },
 
  { /* 36 */ 3*PULSE_TIMER, POSITION_STANDING, 60, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_sanctuary, SKILL_INCREASE_HARD },
 
  { /* 37 */ 3*PULSE_TIMER, POSITION_FIGHTING, 15, TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, cast_shocking_grasp, SKILL_INCREASE_MEDIUM },
 
- { /* 38 */ (ubyte)(4.5*PULSE_TIMER), POSITION_STANDING, 33, TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, cast_sleep, SKILL_INCREASE_HARD },
+ { /* 38 */ (uint8_t)(4.5*PULSE_TIMER), POSITION_STANDING, 33, TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, cast_sleep, SKILL_INCREASE_HARD },
 
  { /* 39 */ 3*PULSE_TIMER, POSITION_STANDING, 20, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_strength, SKILL_INCREASE_MEDIUM },
 
@@ -174,13 +174,13 @@ struct spell_info_type spell_info [] =
 
  { /* 41 */ 3*PULSE_TIMER, POSITION_FIGHTING,  5, TAR_CHAR_ROOM|TAR_OBJ_ROOM|TAR_SELF_NONO, cast_ventriloquate, SKILL_INCREASE_EASY },
 
- { /* 42 */ (ubyte)(2.25*PULSE_TIMER), POSITION_FIGHTING, 40, TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_word_of_recall, SKILL_INCREASE_MEDIUM },
+ { /* 42 */ (uint8_t)(2.25*PULSE_TIMER), POSITION_FIGHTING, 40, TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_word_of_recall, SKILL_INCREASE_MEDIUM },
 
- { /* 43 */ (ubyte)(2.25*PULSE_TIMER), POSITION_FIGHTING, 12, TAR_CHAR_ROOM|TAR_OBJ_INV|TAR_OBJ_ROOM|TAR_SELF_DEFAULT, cast_remove_poison, SKILL_INCREASE_MEDIUM },
+ { /* 43 */ (uint8_t)(2.25*PULSE_TIMER), POSITION_FIGHTING, 12, TAR_CHAR_ROOM|TAR_OBJ_INV|TAR_OBJ_ROOM|TAR_SELF_DEFAULT, cast_remove_poison, SKILL_INCREASE_MEDIUM },
 
  { /* 44 */ 3*PULSE_TIMER, POSITION_STANDING, 15, TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_sense_life, SKILL_INCREASE_EASY },
 
- { /* 45 */ (ubyte)(4.5*PULSE_TIMER), POSITION_STANDING, 45, TAR_IGNORE, cast_summon_familiar, SKILL_INCREASE_MEDIUM },
+ { /* 45 */ (uint8_t)(4.5*PULSE_TIMER), POSITION_STANDING, 45, TAR_IGNORE, cast_summon_familiar, SKILL_INCREASE_MEDIUM },
 
  { /* 46 */ 3*PULSE_TIMER, POSITION_STANDING, 30, TAR_IGNORE, cast_lighted_path, SKILL_INCREASE_HARD },
 
@@ -190,7 +190,7 @@ struct spell_info_type spell_info [] =
 
  { /* 49 */ 3*PULSE_TIMER, POSITION_STANDING, 30, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_rapid_mend, SKILL_INCREASE_HARD },
 
- { /* 50 */ (ubyte)(4.5*PULSE_TIMER), POSITION_STANDING, 120, TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_acid_shield, SKILL_INCREASE_HARD },
+ { /* 50 */ (uint8_t)(4.5*PULSE_TIMER), POSITION_STANDING, 120, TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_acid_shield, SKILL_INCREASE_HARD },
 
  { /* 51 */ 3*PULSE_TIMER, POSITION_STANDING, 22, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_water_breathing, SKILL_INCREASE_EASY },
 
@@ -228,7 +228,7 @@ struct spell_info_type spell_info [] =
 
  { /* 68 */ 3*PULSE_TIMER, POSITION_FIGHTING, 20, TAR_CHAR_ROOM|TAR_FIGHT_VICT, cast_weaken, SKILL_INCREASE_HARD },
 
- { /* 69 */ (ubyte)(4.5*PULSE_TIMER), POSITION_STANDING, 33, TAR_IGNORE, cast_mass_invis, SKILL_INCREASE_MEDIUM },
+ { /* 69 */ (uint8_t)(4.5*PULSE_TIMER), POSITION_STANDING, 33, TAR_IGNORE, cast_mass_invis, SKILL_INCREASE_MEDIUM },
 
  { /* 70 */ 3*PULSE_TIMER, POSITION_FIGHTING, 45, TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, cast_acid_blast, SKILL_INCREASE_HARD },
 
@@ -256,13 +256,13 @@ struct spell_info_type spell_info [] =
 
  { /* 82 */ 3*PULSE_TIMER, POSITION_FIGHTING, 33, TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, cast_vampiric_touch, SKILL_INCREASE_HARD },
 
- { /* 83 */ (ubyte)(4.5*PULSE_TIMER), POSITION_FIGHTING, 40, TAR_IGNORE, cast_life_leech, SKILL_INCREASE_MEDIUM },
+ { /* 83 */ (uint8_t)(4.5*PULSE_TIMER), POSITION_FIGHTING, 40, TAR_IGNORE, cast_life_leech, SKILL_INCREASE_MEDIUM },
 
  { /* 84 */ 3*PULSE_TIMER, POSITION_FIGHTING, 33, TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, cast_paralyze, SKILL_INCREASE_HARD },
 
- { /* 85 */ (ubyte)(2.25*PULSE_TIMER), POSITION_FIGHTING, 18, TAR_CHAR_ROOM, cast_remove_paralysis, SKILL_INCREASE_MEDIUM },
+ { /* 85 */ (uint8_t)(2.25*PULSE_TIMER), POSITION_FIGHTING, 18, TAR_CHAR_ROOM, cast_remove_paralysis, SKILL_INCREASE_MEDIUM },
 
- { /* 86 */ (ubyte)(4.5*PULSE_TIMER), POSITION_STANDING, 160, TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_fireshield, SKILL_INCREASE_MEDIUM },
+ { /* 86 */ (uint8_t)(4.5*PULSE_TIMER), POSITION_STANDING, 160, TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_fireshield, SKILL_INCREASE_MEDIUM },
 
  { /* 87 */ 3*PULSE_TIMER, POSITION_FIGHTING, 40, TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, cast_meteor_swarm, SKILL_INCREASE_HARD },
 
@@ -272,7 +272,7 @@ struct spell_info_type spell_info [] =
 
  { /* 90 */ 3*PULSE_TIMER, POSITION_STANDING,  0, TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_mana, 0 },
 
- { /* 91 */ (ubyte)(4.5*PULSE_TIMER), POSITION_FIGHTING, 200, TAR_IGNORE, cast_solar_gate, SKILL_INCREASE_MEDIUM },
+ { /* 91 */ (uint8_t)(4.5*PULSE_TIMER), POSITION_FIGHTING, 200, TAR_IGNORE, cast_solar_gate, SKILL_INCREASE_MEDIUM },
 
  { /* 92 */ 3*PULSE_TIMER, POSITION_STANDING, 30, TAR_IGNORE, cast_heroes_feast, SKILL_INCREASE_EASY },
 
@@ -346,7 +346,7 @@ struct spell_info_type spell_info [] =
 
  { /* 127 */ 3*PULSE_TIMER, POSITION_STANDING, 40, TAR_CHAR_ROOM|TAR_SELF_DEFAULT, cast_stone_shield, SKILL_INCREASE_HARD },
 
- { /* 128 */ (ubyte)(4.5*PULSE_TIMER), POSITION_STANDING, 55, TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_greater_stone_shield, SKILL_INCREASE_HARD },
+ { /* 128 */ (uint8_t)(4.5*PULSE_TIMER), POSITION_STANDING, 55, TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_greater_stone_shield, SKILL_INCREASE_HARD },
 
  { /* 129 */ 3*PULSE_TIMER, POSITION_FIGHTING, 15, TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_iron_roots, SKILL_INCREASE_HARD },
 
@@ -356,17 +356,17 @@ struct spell_info_type spell_info [] =
 
  { /* 132 */ 3*PULSE_TIMER, POSITION_FIGHTING, 90, TAR_IGNORE, cast_icestorm, SKILL_INCREASE_HARD },
 
- { /* 133 */ (ubyte)(4.5*PULSE_TIMER), POSITION_STANDING, 65, TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_lightning_shield, SKILL_INCREASE_HARD },
+ { /* 133 */ (uint8_t)(4.5*PULSE_TIMER), POSITION_STANDING, 65, TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_lightning_shield, SKILL_INCREASE_HARD },
 
- { /* 134 */  (ubyte)(2.25*PULSE_TIMER), POSITION_FIGHTING, 10, TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, cast_blue_bird, SKILL_INCREASE_EASY },
+ { /* 134 */  (uint8_t)(2.25*PULSE_TIMER), POSITION_FIGHTING, 10, TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, cast_blue_bird, SKILL_INCREASE_EASY },
 
  { /* 135 */ 3*PULSE_TIMER, POSITION_FIGHTING, 15, TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, cast_debility, SKILL_INCREASE_MEDIUM },
 
  { /* 136 */ 3*PULSE_TIMER, POSITION_FIGHTING, 30, TAR_CHAR_ROOM|TAR_FIGHT_VICT|TAR_SELF_NONO, cast_attrition, SKILL_INCREASE_MEDIUM },
 
- { /* 137 */ (ubyte)(4.5*PULSE_TIMER), POSITION_FIGHTING, 120, TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_vampiric_aura, SKILL_INCREASE_EASY },
+ { /* 137 */ (uint8_t)(4.5*PULSE_TIMER), POSITION_FIGHTING, 120, TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_vampiric_aura, SKILL_INCREASE_EASY },
 
- { /* 138 */ (ubyte)(4.5*PULSE_TIMER), POSITION_FIGHTING, 200, TAR_IGNORE, cast_holy_aura, SKILL_INCREASE_EASY },
+ { /* 138 */ (uint8_t)(4.5*PULSE_TIMER), POSITION_FIGHTING, 200, TAR_IGNORE, cast_holy_aura, SKILL_INCREASE_EASY },
 
  { /* 139 */ 3*PULSE_TIMER, POSITION_STANDING,  5, TAR_IGNORE, cast_dismiss_familiar, SKILL_INCREASE_MEDIUM },
 
@@ -434,13 +434,13 @@ struct spell_info_type spell_info [] =
 
  { /* 171 */ 3*PULSE_TIMER, POSITION_FIGHTING, 125, TAR_IGNORE, cast_spirit_shield, SKILL_INCREASE_HARD },
 
- { /* 172 */ (ubyte)(4.5*PULSE_TIMER), POSITION_STANDING, 80, TAR_CHAR_ROOM|TAR_SELF_DEFAULT|TAR_SELF_ONLY, cast_villainy, SKILL_INCREASE_HARD },
+ { /* 172 */ (uint8_t)(4.5*PULSE_TIMER), POSITION_STANDING, 80, TAR_CHAR_ROOM|TAR_SELF_DEFAULT|TAR_SELF_ONLY, cast_villainy, SKILL_INCREASE_HARD },
 
- { /* 173 */ (ubyte)(4.5*PULSE_TIMER), POSITION_STANDING, 80, TAR_CHAR_ROOM|TAR_SELF_DEFAULT|TAR_SELF_ONLY, cast_heroism, SKILL_INCREASE_HARD },
+ { /* 173 */ (uint8_t)(4.5*PULSE_TIMER), POSITION_STANDING, 80, TAR_CHAR_ROOM|TAR_SELF_DEFAULT|TAR_SELF_ONLY, cast_heroism, SKILL_INCREASE_HARD },
 
- { /* 174 */ (ubyte)(4.5*PULSE_TIMER), POSITION_FIGHTING, 100, TAR_IGNORE, cast_consecrate, SKILL_INCREASE_HARD },
+ { /* 174 */ (uint8_t)(4.5*PULSE_TIMER), POSITION_FIGHTING, 100, TAR_IGNORE, cast_consecrate, SKILL_INCREASE_HARD },
 
- { /* 175 */ (ubyte)(4.5*PULSE_TIMER), POSITION_FIGHTING, 100, TAR_IGNORE, cast_desecrate, SKILL_INCREASE_HARD },
+ { /* 175 */ (uint8_t)(4.5*PULSE_TIMER), POSITION_FIGHTING, 100, TAR_IGNORE, cast_desecrate, SKILL_INCREASE_HARD },
  { /* 176 */ 3*PULSE_TIMER, POSITION_STANDING, 100, TAR_ROOM_EXIT, cast_elemental_wall, SKILL_INCREASE_MEDIUM },
  { /* 177 */ 3*PULSE_TIMER, POSITION_STANDING, 100, TAR_IGNORE, cast_ethereal_focus, SKILL_INCREASE_EASY }
 };
@@ -900,7 +900,7 @@ const char *spells[]=
    "\n"
 };
 
-bool canPerform(char_data * const &ch, const int_fast32_t &skillType,
+bool canPerform(struct char_data * const &ch, const int_fast32_t &skillType,
 		string failMessage) {
 	if (IS_PC(ch) && has_skill(ch, skillType) == 0 && GET_LEVEL(ch) < ARCHANGEL) {
 		send_to_char(
@@ -924,7 +924,7 @@ int dam_percent(int learned, int damage)
   return (int)((float)damage * (float)percent/100.0);
 }
 
-int use_mana( char_data *ch, int sn )
+int use_mana( struct char_data *ch, int sn )
 {
     int base = spell_info[sn].min_usesmana;
 
@@ -963,7 +963,7 @@ int use_mana( char_data *ch, int sn )
 
 void affect_update(int32_t duration_type) {
 	static struct affected_type *af, *next_af_dude;
-	void update_char_objects(char_data *ch); /* handler.c */
+	void update_char_objects(struct char_data *ch); /* handler.c */
 
 	if (duration_type != PULSE_REGEN && duration_type != PULSE_TIMER && duration_type != PULSE_VIOLENCE && duration_type != PULSE_TIME) // Default
 		return;
@@ -991,8 +991,8 @@ void affect_update(int32_t duration_type) {
 					af->modifier = 0 - af->duration;
 				if (!(af->caster).empty()) //means bard song
 				{
-					char_data *get_pc_room_vis_exact(char_data *ch, const char *name);
-					char_data *bard = get_pc_room_vis_exact(i, (af->caster).c_str());
+					struct char_data *get_pc_room_vis_exact(struct char_data *ch, const char *name);
+					struct char_data *bard = get_pc_room_vis_exact(i, (af->caster).c_str());
 					if (!bard || !ARE_GROUPED(i, bard)) {
 						send_to_char("Away from the music, the effect weakens...\n\r", i);
 						af->duration = 1;
@@ -1034,7 +1034,7 @@ void affect_update(int32_t duration_type) {
 }
 
 // Sets any ISR's that go with a spell..  (ISR's arent saved)
-void isr_set(char_data *ch)
+void isr_set(struct char_data *ch)
 {
   // char buf[100];
   static struct affected_type *afisr;
@@ -1057,7 +1057,7 @@ void isr_set(char_data *ch)
   }
 }
 
-bool many_charms(char_data *ch)
+bool many_charms(struct char_data *ch)
 {
   struct follow_type *k;
   for(k = ch->followers; k; k = k->next) {
@@ -1068,9 +1068,9 @@ bool many_charms(char_data *ch)
   return FALSE;
 }
 /* Stop the familiar without a master floods*/
-void extractFamiliar(char_data *ch)
+void extractFamiliar(struct char_data *ch)
 {
-    char_data *victim = NULL;
+    struct char_data *victim = NULL;
     for(struct follow_type *k = ch->followers; k; k = k->next)
      if(IS_MOB(k->follower) && IS_AFFECTED(k->follower, AFF_FAMILIAR))
      {
@@ -1085,7 +1085,7 @@ void extractFamiliar(char_data *ch)
    extract_char(victim, TRUE);
 }
 
-bool any_charms(char_data *ch)
+bool any_charms(struct char_data *ch)
 {
   return many_charms(ch);
 /*
@@ -1107,9 +1107,9 @@ bool any_charms(char_data *ch)
 
 // check if making ch follow victim will create an illegal 
 // follow "Loop/circle"
-bool circle_follow(char_data *ch, char_data *victim)
+bool circle_follow(struct char_data *ch, struct char_data *victim)
 {
-    char_data *k;
+    struct char_data *k;
 
     for(k=victim; k; k=k->master) {
 	if (k == ch)
@@ -1121,7 +1121,7 @@ bool circle_follow(char_data *ch, char_data *victim)
 
 // Called when stop following persons, or stopping charm
 // This will NOT do if a character quits/dies!!
-void stop_follower(char_data *ch, int cmd)
+void stop_follower(struct char_data *ch, int cmd)
 {
   struct follow_type *j, *k;
 
@@ -1207,10 +1207,10 @@ void stop_follower(char_data *ch, int cmd)
 
 
 /* Called when a character that follows/is followed dies */
-void die_follower(char_data *ch)
+void die_follower(struct char_data *ch)
 {
     struct follow_type *j, *k;
-    char_data * zombie;
+    struct char_data * zombie;
     
     if (ch->master)
 	stop_follower(ch, STOP_FOLLOW);
@@ -1239,7 +1239,7 @@ void die_follower(char_data *ch)
 
 /* Do NOT call ths before having checked if a circle of followers */
 /* will arise. CH will follow leader                               */
-void add_follower(char_data *ch, char_data *leader, int cmd)
+void add_follower(struct char_data *ch, struct char_data *leader, int cmd)
 {
     struct follow_type *k;
 
@@ -1274,13 +1274,13 @@ void add_follower(char_data *ch, char_data *leader, int cmd)
 }
 
 
-int say_spell( char_data *ch, int si, int room )
+int say_spell( struct char_data *ch, int si, int room )
 {
     char buf[MAX_STRING_LENGTH], splwd[MAX_BUF_LENGTH];
     char buf2[MAX_STRING_LENGTH];
 
     int j, offs, retval = 0;
-    char_data *temp_char;
+    struct char_data *temp_char;
 
 
     struct syllable {
@@ -1338,7 +1338,7 @@ int say_spell( char_data *ch, int si, int room )
     sprintf(buf2,"$n utters the words, '%s'", buf);
     sprintf(buf, "$n utters the words, '%s'", spells[si-1]);
 
-    char_data *people;
+    struct char_data *people;
     if (room > 0) {
       people = world[room].people;
     } else {
@@ -1369,7 +1369,7 @@ int say_spell( char_data *ch, int si, int room )
 // returns 0 or positive if saving throw is made. The more, the higher it was made.
 // return -number of failure.   The lower, the more it was failed.
 //
-int saves_spell(char_data *ch, char_data *vict, int spell_base, int16 save_type)
+int saves_spell(struct char_data *ch, struct char_data *vict, int spell_base, int16_t save_type)
 {
     double save = 0;
 
@@ -1428,7 +1428,7 @@ char *skip_spaces(char *string)
 /* 
     Release command. 
 */
-int do_release(char_data *ch, char *argument, int cmd)
+int do_release(struct char_data *ch, char *argument, int cmd)
 {
   struct affected_type *aff,*aff_next;
   bool printed = FALSE;
@@ -1524,7 +1524,7 @@ int do_release(char_data *ch, char *argument, int cmd)
     return eSUCCESS;
 }
 
-int skill_value(char_data *ch, int skillnum, int min = 33)
+int skill_value(struct char_data *ch, int skillnum, int min = 33)
 {
   if (ch->skills.contains(skillnum))
   {
@@ -1558,11 +1558,11 @@ int get_difficulty(int skillnum)
 }
 
 
-bool skill_success(char_data *ch, char_data *victim, int skillnum, int mod )
+bool skill_success(struct char_data *ch, struct char_data *victim, int skillnum, int mod )
 {
 //  extern int stat_mod[];
 //  int modifier = 0;
-  extern int get_stat(char_data *ch, int stat);
+  extern int get_stat(struct char_data *ch, int stat);
   //struct class_skill_defines *t;
   int stat=0;
 
@@ -1707,7 +1707,7 @@ skillnum <= SKILL_SONG_MAX) || (skillnum >= KI_OFFSET && skillnum <= (KI_OFFSET+
   }
 }
 
-void set_conc_loss(char_data *ch, int spl)
+void set_conc_loss(struct char_data *ch, int spl)
 {
   struct affected_type af;
   af.type      = CONC_LOSS_FIXER;
@@ -1720,7 +1720,7 @@ void set_conc_loss(char_data *ch, int spl)
   return;
   
 }
-bool check_conc_loss(char_data *ch, int spl)
+bool check_conc_loss(struct char_data *ch, int spl)
 {
   struct affected_type *af;
   int afspl;
@@ -1738,10 +1738,10 @@ bool check_conc_loss(char_data *ch, int spl)
 }
 
 // Assumes that *argument does start with first letter of chopped string
-int do_cast(char_data *ch, char *argument, int cmd)
+int do_cast(struct char_data *ch, char *argument, int cmd)
 {
   struct obj_data *tar_obj;
-  char_data *tar_char;
+  struct char_data *tar_char;
   char name[MAX_STRING_LENGTH], filter[MAX_STRING_LENGTH];
   int qend, spl, i, learned;
   bool target_ok;
@@ -1762,7 +1762,7 @@ int do_cast(char_data *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  OBJ_DATA *tmp_obj;
+  obj_data *tmp_obj;
   for (tmp_obj = world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
     if (obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER)
     {
@@ -2339,7 +2339,7 @@ int do_cast(char_data *ch, char *argument, int cmd)
           chance += int_app[GET_INT(ch)].conc_bonus;
         else
           chance += wis_app[GET_WIS(ch)].conc_bonus;
-        extern int get_max(char_data * ch, int skill);
+        extern int get_max(struct char_data * ch, int skill);
 
         if (GET_RACE(ch) == RACE_HUMAN)
           chance = MIN(95, chance);
@@ -2385,7 +2385,7 @@ int do_cast(char_data *ch, char *argument, int cmd)
 
         if (group_spell)
         {
-          char_data *leader;
+          struct char_data *leader;
           if (ch->master)
             leader = ch->master;
           else
@@ -2522,7 +2522,7 @@ int do_cast(char_data *ch, char *argument, int cmd)
           }
         }
 
-        ubyte level = GET_LEVEL(ch);
+        uint8_t level = GET_LEVEL(ch);
         char *argument_ptr = nullptr;
 
         if (group_spell)
@@ -2632,7 +2632,7 @@ int do_cast(char_data *ch, char *argument, int cmd)
   return eFAILURE;
 }
 
-int do_skills(char_data *ch, char *arg, int cmd)
+int do_skills(struct char_data *ch, char *arg, int cmd)
 {
    char buf[16384];
    char buf2[MAX_STRING_LENGTH],buf3[MAX_STRING_LENGTH];
@@ -2796,7 +2796,7 @@ int do_skills(char_data *ch, char *arg, int cmd)
    return eSUCCESS;
 }
 
-int do_songs(char_data *ch, char *arg, int cmd)
+int do_songs(struct char_data *ch, char *arg, int cmd)
 {
    char buf[16384];
 
@@ -2821,7 +2821,7 @@ int do_songs(char_data *ch, char *arg, int cmd)
    return eSUCCESS;
 }
 
-int do_spells(char_data *ch, char *arg, int cmd)
+int do_spells(struct char_data *ch, char *arg, int cmd)
 {
    char buf[16384];
    char buf2[MAX_STRING_LENGTH],buf3[MAX_STRING_LENGTH];
@@ -2932,7 +2932,7 @@ int spl_lvl(int lev)
 // search through a character's list to see if they have a particular skill
 // if so, return their level of knowledge
 // if not, return 0
-int has_skill(char_data *ch, skill_t skill)
+int has_skill(struct char_data *ch, skill_t skill)
 {
 	struct obj_data *o;
 	int bonus = 0;

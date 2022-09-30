@@ -127,7 +127,7 @@ int csendf(struct char_data *ch, const char *arg, ...)
   return(1);
 }
 
-char * handle_ansi_(char * s, char_data * ch)
+char * handle_ansi_(char * s, struct char_data * ch)
 {
   char * t;
   char* tp, *sp, *i;
@@ -210,7 +210,7 @@ char * handle_ansi_(char * s, char_data * ch)
 }
 
 
-string handle_ansi(string haystack, char_data *ch)
+string handle_ansi(string haystack, struct char_data *ch)
 {
   map<size_t, bool> ignore;
   map<char, string> rep;

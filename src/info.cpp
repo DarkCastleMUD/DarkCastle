@@ -75,17 +75,17 @@ extern int max_who;
 struct time_info_data age(struct char_data *ch);
 void page_string(struct descriptor_data *d, const char *str, int keep_internal);
 clan_data * get_clan(struct char_data *);
-extern int hit_gain(char_data *ch, int position);
-extern int mana_gain(char_data*ch);
-extern int ki_gain(char_data *ch);
-extern int move_gain(char_data *ch, int extra);
-extern int getRealSpellDamage(char_data *ch);
+extern int hit_gain(struct char_data *ch, int position);
+extern int mana_gain(struct char_data*ch);
+extern int ki_gain(struct char_data *ch);
+extern int move_gain(struct char_data *ch, int extra);
+extern int getRealSpellDamage(struct char_data *ch);
 
 /* intern functions */
 
 void list_obj_to_char(struct obj_data *list,struct char_data *ch, int mode, bool show);
 
-int get_saves(char_data *ch, int savetype)
+int get_saves(struct char_data *ch, int savetype)
 {
   int save = ch->saves[savetype];
   switch (savetype)
@@ -390,7 +390,7 @@ void list_obj_to_char(struct obj_data *list, struct char_data *ch, int mode,
       send_to_char("Nothing\n\r", ch);
 }
 
-void show_spells(char_data * i, char_data * ch)
+void show_spells(struct char_data * i, struct char_data * ch)
 {
     string strbuf;
 
@@ -677,7 +677,7 @@ void show_char_to_char(struct char_data *i, struct char_data *ch, int mode)
 
 int do_botcheck(struct char_data *ch, char *argument, int cmd)
 {
-  char_data *victim;
+  struct char_data *victim;
   char name[MAX_STRING_LENGTH];
   argument = one_argument(argument, name);
   if (!*name) {
@@ -690,7 +690,7 @@ int do_botcheck(struct char_data *ch, char *argument, int cmd)
 
   if (victim == NULL && name != NULL && !strcmp(name, "all")) {
     descriptor_data *d;
-    char_data *i;
+    struct char_data *i;
 
     for(d = descriptor_list; d; d = d->next) {
       if(d->connected || !d->character)
@@ -841,7 +841,7 @@ void try_to_peek_into_container(struct char_data *vict, struct char_data *ch,
       send_to_char("You don't see anything inside it.\r\n", ch);
 }
 
-void showStatDiff(char_data *ch, int base, int random, bool swapcolors=false)
+void showStatDiff(struct char_data *ch, int base, int random, bool swapcolors=false)
 {
    char buf[MAX_STRING_LENGTH] = { 0 }, buf2[256] = { 0 };
    string color_good="$2";
@@ -928,7 +928,7 @@ void showStatDiff(char_data *ch, int base, int random, bool swapcolors=false)
    return;
 }
 
-bool identify(char_data *ch, obj_data *obj)
+bool identify(struct char_data *ch, obj_data *obj)
 {
    if (ch == nullptr || obj == nullptr)
    {
@@ -1163,7 +1163,7 @@ bool identify(char_data *ch, obj_data *obj)
    return true;
 }
 
-int do_identify(char_data *ch, char *argument, int cmd)
+int do_identify(struct char_data *ch, char *argument, int cmd)
 {
    string arg1, remainder_args;
    tie (arg1, remainder_args) = half_chop(argument);
@@ -1174,7 +1174,7 @@ int do_identify(char_data *ch, char *argument, int cmd)
       return eFAILURE;
    }
 
-   char_data *tmp_char;
+   struct char_data *tmp_char;
    obj_data *obj;
    int bits = generic_find(arg1.c_str(), FIND_OBJ_INV | FIND_OBJ_EQUIP | FIND_OBJ_ROOM, ch, &tmp_char, &obj, true);
    if (bits && obj)
@@ -2018,7 +2018,7 @@ int do_score(struct char_data *ch, char *argument, int cmd)
      if(++level == 4)
        level = 0;
    }*/
-   extern bool elemental_score(char_data *ch, int level);
+   extern bool elemental_score(struct char_data *ch, int level);
    if (!found) found = elemental_score(ch, level);
    else elemental_score(ch,level);
 
@@ -3030,7 +3030,7 @@ int do_tick( struct char_data *ch, char *argument, int cmd )
 }
 
 
-int do_show_exp(char_data *ch, char *arg, int cmd)
+int do_show_exp(struct char_data *ch, char *arg, int cmd)
 {
    if(GET_LEVEL(ch) < MAX_MORTAL) {
      csendf(ch, "You require %ld experience to advance to level",
@@ -3044,7 +3044,7 @@ int do_show_exp(char_data *ch, char *arg, int cmd)
 
 void check_champion_and_website_who_list()
 {
-   OBJ_DATA *obj;
+   obj_data *obj;
    stringstream buf, buf2;
    int addminute=0;
    string name;
@@ -3102,7 +3102,7 @@ void check_champion_and_website_who_list()
 
 }
 
-int do_sector(char_data *ch, char *arg, int cmd)
+int do_sector(struct char_data *ch, char *arg, int cmd)
 {
    string art = "a";
 
@@ -3125,7 +3125,7 @@ int do_sector(char_data *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-int do_version(char_data *ch, char *arg, int cmd)
+int do_version(struct char_data *ch, char *arg, int cmd)
 {
 	if (ch) {
 		csendf(ch, "Version: %s Build time: %s\n", DC::getVersion().c_str(), DC::getBuildTime().c_str());
@@ -3168,7 +3168,7 @@ struct search
 	int32_t o_in_room;                       /* In what room -1 when conta/carr  */
 	int o_vroom;                           /* for corpse saving */
 	struct obj_flag_data obj_flags;             /* Object information               */
-	int16 o_num_affects;
+	int16_t o_num_affects;
 	obj_affected_type o_affected;          /* Which abilities in PC to change  */
 
 	string o_name;                         /* Title of object :get etc.        */
@@ -3272,7 +3272,7 @@ bool search::operator==(const obj_data* obj)
 }
 
 
-int do_search(char_data* ch, char *argument_buffer, int cmd)
+int do_search(struct char_data* ch, char *argument_buffer, int cmd)
 {
    if (ch == nullptr || GET_LEVEL(ch) < IMMORTAL)
    {

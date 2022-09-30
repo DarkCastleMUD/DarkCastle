@@ -37,7 +37,7 @@ extern CWorld world;
 extern struct spell_info_type spell_info[MAX_SPL_LIST];
 extern struct index_data *obj_index;
 extern struct index_data *mob_index;
-int hands_are_free(char_data *ch, int number);
+int hands_are_free(struct char_data *ch, int number);
 struct obj_data *get_object_in_equip_vis(struct char_data *ch,
     char *arg, struct obj_data *equipment[], int *j, bool blindfighting);
 
@@ -326,7 +326,7 @@ int do_quaff(struct char_data *ch, char *argument, int cmd)
         {
            lvl = (int) (1.5 * temp->obj_flags.value[0]); 
            retval = ((*spell_info[temp->obj_flags.value[i]].spell_pointer)
-              ((ubyte) temp->obj_flags.value[0], ch, "", SPELL_TYPE_POTION, ch, 0, lvl));
+              ((uint8_t) temp->obj_flags.value[0], ch, "", SPELL_TYPE_POTION, ch, 0, lvl));
         }
      }
      if(IS_SET(retval, eCH_DIED))
@@ -436,7 +436,7 @@ int do_recite(struct char_data *ch, char *argument, int cmd)
 		  else
 		  {
 			retval = ((*spell_info[scroll->obj_flags.value[i]].spell_pointer)
-					  ((ubyte) scroll->obj_flags.value[0], ch, "", SPELL_TYPE_SCROLL, victim, obj, lvl));
+					  ((uint8_t) scroll->obj_flags.value[0], ch, "", SPELL_TYPE_SCROLL, victim, obj, lvl));
 			if(SOMEONE_DIED(retval))
 			{
 			  break;
@@ -714,7 +714,7 @@ int do_use(struct char_data *ch, char *argument, int cmd)
 	int retval = 0;
       if (spell_info[stick->obj_flags.value[3]].spell_pointer)
       retval = ((*spell_info[stick->obj_flags.value[3]].spell_pointer)
-        ((ubyte) stick->obj_flags.value[0], ch, xtra_arg, SPELL_TYPE_STAFF, 0, 0, lvl));
+        ((uint8_t) stick->obj_flags.value[0], ch, xtra_arg, SPELL_TYPE_STAFF, 0, 0, lvl));
 	else retval= eFAILURE;
       return retval;
     } else {
@@ -740,7 +740,7 @@ int do_use(struct char_data *ch, char *argument, int cmd)
 	int retval;
         if (spell_info[stick->obj_flags.value[3]].spell_pointer)
 	retval= ((*spell_info[stick->obj_flags.value[3]].spell_pointer)
-          ((ubyte) stick->obj_flags.value[0], ch, xtra_arg, SPELL_TYPE_WAND, tmp_char, tmp_object, lvl));
+          ((uint8_t) stick->obj_flags.value[0], ch, xtra_arg, SPELL_TYPE_WAND, tmp_char, tmp_object, lvl));
 	else
 	retval = eFAILURE;
 	return retval;
@@ -1471,7 +1471,7 @@ int size_restricted(struct char_data *ch, struct obj_data *obj)
 // it wearing in terms of sizes vs. height
 // ch = player obj = obj to remove/wear add = 1(wear) or 0(remove)
 // function WILL tell the character if anything is wrong
-int will_screwup_worn_sizes(char_data * ch, obj_data * obj, int add)
+int will_screwup_worn_sizes(struct char_data * ch, obj_data * obj, int add)
 {
   int j;
   int mod = 0;
@@ -2380,7 +2380,7 @@ int do_remove(struct char_data *ch, char *argument, int cmd)
 // Urizen, hack of will_screwup_worn_sizes
 // Checks for, and removes items that are no longer
 // wear-able, because of disarm, scrap etc.
-int recheck_height_wears(char_data * ch)
+int recheck_height_wears(struct char_data * ch)
 {
   int j;
   struct obj_data *obj = NULL;
@@ -2453,7 +2453,7 @@ bool fullSave(obj_data *obj)
   return 0;
 }
 
-void heightweight(char_data *ch, bool add)
+void heightweight(struct char_data *ch, bool add)
 {
   int i, j;
   for (i=0; i<MAX_WEAR; i++)

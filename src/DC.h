@@ -26,19 +26,19 @@
 
 using namespace std;
 
-using special_function = int (*)(char_data*, obj_data*, int, const char*, char_data*);
+using special_function = int (*)(struct char_data*, obj_data*, int, const char*, struct char_data*);
 
-typedef set<char_data *> character_list_t;
+typedef set<struct char_data *> character_list_t;
 typedef set<obj_data*> obj_list_t;
 typedef set<int> client_descriptor_list_t;
 typedef set<int> server_descriptor_list_t;
 typedef vector<in_port_t> port_list_t;
-typedef set<char_data *>::iterator character_list_i;
+typedef set<struct char_data *>::iterator character_list_i;
 typedef set<int>::iterator client_descriptor_list_i;
 typedef set<int>::iterator server_descriptor_list_i;
 typedef vector<in_port_t>::iterator port_list_i;
-typedef unordered_map<char_data*, Trace> death_list_t;
-typedef unordered_map<char_data *, Trace> free_list_t;
+typedef unordered_map<struct char_data*, Trace> death_list_t;
+typedef unordered_map<struct char_data *, Trace> free_list_t;
 typedef uint64_t vnum_t;
 typedef map<vnum_t, special_function> special_function_list_t;
 
@@ -60,7 +60,7 @@ public:
   death_list_t death_list;
   obj_list_t active_obj_list;
   obj_list_t obj_free_list;
-  unordered_set<char_data*> shooting_list;
+  unordered_set<struct char_data*> shooting_list;
   special_function_list_t mob_non_combat_functions;
   special_function_list_t mob_combat_functions;
   special_function_list_t obj_non_combat_functions;

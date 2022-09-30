@@ -85,7 +85,7 @@ int spellcraft(struct char_data *ch, int spell)
 
 int do_focused_repelance(struct char_data *ch, char *argument, int cmd)
 {
-  //ubyte percent;
+  //uint8_t percent;
   struct affected_type af;
   int duration = 40;
 
@@ -133,7 +133,7 @@ int do_imbue(struct char_data *ch, char *argument, int cmd)
   char buf[MAX_STRING_LENGTH];
   int lvl = has_skill(ch, SKILL_IMBUE);
   int charges = 0, manacost = 0;
-  OBJ_DATA *wand;
+  obj_data *wand;
   struct affected_type af;
 
   *buf = '\0';
@@ -279,9 +279,9 @@ int do_imbue(struct char_data *ch, char *argument, int cmd)
 // Remember that ch is the person triggering the call, meaning they are actually the victim
 // eSUCCESS means the character is unaffected and can keep doing whatever.
 // eFAILURE means the character was interrupted
-int check_ethereal_focus(char_data *ch, int trigger_type)
+int check_ethereal_focus(struct char_data *ch, int trigger_type)
 {
-  char_data *i, *next_i, *ally, *next_ally;
+  struct char_data *i, *next_i, *ally, *next_ally;
   char buf[MAX_STRING_LENGTH];
   int retval;
 

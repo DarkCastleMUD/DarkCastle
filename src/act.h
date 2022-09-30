@@ -21,11 +21,11 @@ struct act_return
   int retval;
 };
 
-act_return act(const char *str, char_data *ch, OBJ_DATA *obj, void *vict_obj,
-          int16 destination, int16 flags);
+act_return act(const char *str, struct char_data *ch, obj_data *obj, void *vict_obj,
+          int16_t destination, int16_t flags);
 
-act_return act(const std::string &str, char_data *ch, OBJ_DATA *obj, void *vict_obj,
-	 int16 destination, int16 flags);
+act_return act(const std::string &str, struct char_data *ch, obj_data *obj, void *vict_obj,
+	 int16_t destination, int16_t flags);
 
 struct send_tokens_return
 {
@@ -33,9 +33,9 @@ struct send_tokens_return
   int retval;
 };
 
-send_tokens_return send_tokens(TokenList * tokens, char_data *ch, OBJ_DATA * obj, void * vch, int flags, char_data *to);
+send_tokens_return send_tokens(TokenList * tokens, struct char_data *ch, obj_data * obj, void * vch, int flags, struct char_data *to);
 
-void send_message(const char *str, char_data *to);
+void send_message(const char *str, struct char_data *to);
 
 //--
 // Constants

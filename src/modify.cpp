@@ -45,7 +45,7 @@ using namespace std;
 #define TP_OBJ    1
 #define TP_ERROR  2
 
-void check_for_awaymsgs(char_data *ch);
+void check_for_awaymsgs(struct char_data *ch);
 void page_string_dep(struct descriptor_data *d, const char *str, int keep_internal);
 
 const char *string_fields[] = { "name", "short", "long", "description", "title", "delete-description", "\n" };
@@ -63,7 +63,7 @@ const char *skill_fields[] = { "learned", "recognize", "\n" };
 void string_hash_add(struct descriptor_data *d, char *str) {
 	char *scan;
 	int terminator = 0;
-	char_data *ch = d->character;
+	struct char_data *ch = d->character;
 
 	scan = str;
 	while (*scan) {
@@ -152,11 +152,11 @@ void quad_arg(char *arg, int *type, char *name, int *field, char *string) {
 }
 
 /* modification of malloc'ed strings in chars/objects */
-int do_string(char_data *ch, char *arg, int cmd) {
+int do_string(struct char_data *ch, char *arg, int cmd) {
 	char name[MAX_STRING_LENGTH], string[MAX_STRING_LENGTH];
 	char message[100];
 	int field, type, ctr;
-	char_data *mob = NULL;
+	struct char_data *mob = NULL;
 	struct obj_data *obj;
 	struct extra_descr_data *ed, *tmp;
 

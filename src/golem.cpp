@@ -29,17 +29,17 @@ using namespace std;
 #include "const.h"
 
 // Locals
-void advance_golem_level(char_data *golem);
+void advance_golem_level(struct char_data *golem);
 
 // save.cpp
-int store_worn_eq(char_data * ch, FILE * fpsave);
-struct obj_data *  obj_store_to_char(char_data *ch, FILE *fpsave, struct obj_data * last_cont );
+int store_worn_eq(struct char_data * ch, FILE * fpsave);
+struct obj_data *  obj_store_to_char(struct char_data *ch, FILE *fpsave, struct obj_data * last_cont );
 
 // limits.cpp
-extern int hit_gain(char_data *ch);
-extern int mana_gain(char_data*ch);
-extern int ki_gain(char_data *ch);
-extern int move_gain(char_data *ch, int extra);
+extern int hit_gain(struct char_data *ch);
+extern int mana_gain(struct char_data*ch);
+extern int ki_gain(struct char_data *ch);
+extern int move_gain(struct char_data *ch, int extra);
 
 
 struct golem_data
@@ -77,18 +77,18 @@ const struct golem_data golem_list[] = {
    }
 };
 
-void shatter_message(char_data *ch)
+void shatter_message(struct char_data *ch)
 {
    int golemtype = !IS_AFFECTED(ch, AFF_GOLEM); // 0 or 1
    act(golem_list[golemtype].shatter_message, ch, 0, 0, TO_ROOM,0);
 }
-void release_message(char_data *ch)
+void release_message(struct char_data *ch)
 {
    int golemtype = !IS_AFFECTED(ch, AFF_GOLEM);
    act(golem_list[golemtype].release_message, ch, 0, 0, TO_ROOM, 0);
 }
 
-void golem_gain_exp(char_data *ch)
+void golem_gain_exp(struct char_data *ch)
 {
 //  extern int exp_table[~];
   int level = 19 + ch->level;
@@ -103,7 +103,7 @@ void golem_gain_exp(char_data *ch)
   }
 }
 
-int  verify_existing_components(char_data *ch, int golemtype)
+int  verify_existing_components(struct char_data *ch, int golemtype)
 { 
   int retval = 0;
 
@@ -159,7 +159,7 @@ int  verify_existing_components(char_data *ch, int golemtype)
   return retval;
 }
 
-void save_golem_data(char_data *ch)
+void save_golem_data(struct char_data *ch)
 {
   char file[200];
   FILE *fpfile = NULL;
@@ -181,7 +181,7 @@ void save_golem_data(char_data *ch)
   dc_fclose(fpfile);
 }
 
-void save_charmie_data(char_data *ch)
+void save_charmie_data(struct char_data *ch)
 {
   char file[200];
   FILE *fpfile = nullptr;
@@ -193,7 +193,7 @@ void save_charmie_data(char_data *ch)
 
   for (follow_type *followers = ch->followers; followers != nullptr; followers = followers->next)
   {
-    char_data *follower = followers->follower;
+    struct char_data *follower = followers->follower;
 
     if (follower == nullptr || IS_PC(follower) || follower->master == nullptr || !IS_AFFECTED(follower, AFF_CHARM))
     {
@@ -214,7 +214,7 @@ void save_charmie_data(char_data *ch)
 }
 
 
-void advance_golem_level(char_data *golem)
+void advance_golem_level(struct char_data *golem)
 {
   int golemtype = !IS_AFFECTED(golem, AFF_GOLEM); // 0 or 1
   golem->max_hit = golem->raw_hit = (golem->raw_hit + (golem_list[golemtype].max_hp/20));
@@ -226,7 +226,7 @@ void advance_golem_level(char_data *golem)
   redo_hitpoints(golem);
 }
 
-void set_golem(char_data *golem, int golemtype)
+void set_golem(struct char_data *golem, int golemtype)
 { // Set the basics.
         GET_RACE(golem) = RACE_GOLEM;
         golem->short_desc = str_hsh(golem_list[golemtype].short_desc);
@@ -262,7 +262,7 @@ void set_golem(char_data *golem, int golemtype)
         golem->weight = 255; // Was 530, ditto
 }
 
-void load_golem_data(char_data *ch, int golemtype)
+void load_golem_data(struct char_data *ch, int golemtype)
 {
   char file[200];
   FILE *fpfile = NULL;
@@ -293,7 +293,7 @@ void load_golem_data(char_data *ch, int golemtype)
   dc_fclose(fpfile);
 }
 
-int cast_create_golem(ubyte level, char_data *ch, char *arg, int type, char_data *tar_ch, struct obj_data *tar_obj, int skill)
+int cast_create_golem(uint8_t level, struct char_data *ch, char *arg, int type, struct char_data *tar_ch, struct obj_data *tar_obj, int skill)
 {
   struct char_data *golem;
   int i;
@@ -537,7 +537,7 @@ int do_golem_score(struct char_data *ch, char *argument, int cmd)
    return eSUCCESS;
 }
 
-int spell_release_golem(ubyte level, char_data *ch, char *arg, int type, char_data *tar_ch, struct obj_data *tar_obj, int skill)
+int spell_release_golem(uint8_t level, struct char_data *ch, char *arg, int type, struct char_data *tar_ch, struct obj_data *tar_obj, int skill)
 {
   struct follow_type *fol;
   for (fol = ch->followers; fol; fol = fol->next)

@@ -6,8 +6,8 @@
 | Description:  This file contains all of the room header file/constant
 |   information.  It also contains information about the 'world' structs.
 */
-#include "structs.h" // ubyte
-#include "obj.h" // ubyte
+#include "structs.h" // uint8_t
+#include "obj.h" // uint8_t
 #include "MobActivity.h" // struct path_data
 #include "player.h" // CLASS_MAX
 
@@ -106,10 +106,10 @@ struct room_direction_data
 {
     char *general_description;      /* When look DIR.                  */ 
     char *keyword;                  /* for open/close                  */  
-    int16 exit_info;                /* Exit info                       */
-    char_data *bracee;		    /* This is who is bracing the door */
-    int16 key;                      /* Key's number (-1 for no key)    */
-    int16 to_room;                  /* Where direction leeds (NOWHERE) */
+    int16_t exit_info;                /* Exit info                       */
+    struct char_data *bracee;		    /* This is who is bracing the door */
+    int16_t key;                      /* Key's number (-1 for no key)    */
+    int16_t to_room;                  /* Where direction leeds (NOWHERE) */
 };
 
 struct room_track_data
@@ -134,8 +134,8 @@ struct deny_data
 // ========================= Structure for room ==========================
 struct room_data
 {
-    int16 number;                       // Rooms number
-    int16 zone;                         // Room zone (for resetting)
+    int16_t number;                       // Rooms number
+    int16_t zone;                         // Room zone (for resetting)
     int sector_type;                     // sector type (move/hide)
     struct deny_data *denied;
     char * name;                         // Rooms name 'You are ...'
@@ -144,12 +144,12 @@ struct room_data
     room_direction_data * dir_option[MAX_DIRS]; // Directions
     uint32_t room_flags;                     // DEATH, DARK ... etc
     uint32_t temp_room_flags;             // A second bitvector for flags that do NOT get saved.  These are temporary runtime flags.
-    int16 light;                        // Light factor of room
+    int16_t light;                        // Light factor of room
     
-    int (*funct)(char_data*, int, char*);  // special procedure
+    int (*funct)(struct char_data*, int, char*);  // special procedure
 	 
     struct obj_data *contents;   // List of items in room
-    char_data *people;           // List of NPC / PC in room
+    struct char_data *people;           // List of NPC / PC in room
     
     int              nTracks;    // number of tracks in the room
     room_track_data* tracks;     // beginning of the list of scents

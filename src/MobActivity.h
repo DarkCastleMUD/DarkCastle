@@ -28,8 +28,8 @@ class Path : public map<int, int>
   public:
     class Path *next;		       // main Path list
 
-    char* determineRoute(char_data *, int, int); // ch, from, to
-    void addRoom(char_data *, int, bool);           // ch, room, IgnoreConnectingIssues
+    char* determineRoute(struct char_data *, int, int); // ch, from, to
+    void addRoom(struct char_data *, int, bool);           // ch, room, IgnoreConnectingIssues
     
     bool isRoomPathed(int room);
     bool isRoomConnected(int room);

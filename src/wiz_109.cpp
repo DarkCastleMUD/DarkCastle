@@ -39,7 +39,7 @@ int do_linkload(struct char_data *ch, char *arg, int cmd)
   char buf[100];
   char *c;
 
-  void add_to_bard_list(char_data * ch);
+  void add_to_bard_list(struct char_data * ch);
 
   while(*arg == ' ')
     arg++;
@@ -454,7 +454,7 @@ int do_shutdown(struct char_data *ch, char *argument, int cmd)
     }
     else if(!strcmp(arg1, "crash")) {
         // let's crash the mud!
-        char_data * crashus = NULL;
+        struct char_data * crashus = NULL;
         if (crashus->in_room == NOWHERE) {
         	return eFAILURE; // this should never be reached
         }
@@ -468,7 +468,7 @@ int do_shutdown(struct char_data *ch, char *argument, int cmd)
         try_to_hotboot_on_crash = 0;
 
         // let's crash the mud!
-        char_data * crashus = NULL;
+        struct char_data * crashus = NULL;
         if (crashus->in_room == NOWHERE) {
         	return eFAILURE; // this should never be reached
         }
@@ -489,7 +489,7 @@ int do_shutdow(struct char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_testport(char_data *ch, char *argument, int cmd)
+int do_testport(struct char_data *ch, char *argument, int cmd)
 {
   int errnosave = 0;
   static pid_t child = 0;
@@ -542,7 +542,7 @@ int do_testport(char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_testuser(char_data *ch, char *argument, int cmd)
+int do_testuser(struct char_data *ch, char *argument, int cmd)
 {
     char arg1[MAX_INPUT_LENGTH];
     char arg2[MAX_INPUT_LENGTH];

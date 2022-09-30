@@ -322,7 +322,7 @@ int do_matrixinfo(struct char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int lookupClass(char_data *ch, char *str)
+int lookupClass(struct char_data *ch, char *str)
 {
   int c_class;
 
@@ -346,7 +346,7 @@ int lookupClass(char_data *ch, char *str)
   return -1;
 }
 
-int lookupRoom(char_data *ch, char *str)
+int lookupRoom(struct char_data *ch, char *str)
 {
   if (str == 0)
     return -1;

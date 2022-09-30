@@ -22,7 +22,7 @@
 #include "DC.h"
 #include "affect.h"  /* MAX_AFFECTS, etc.. */
 #include "alias.h"   /* struct char_player_alias, MAX_ALIASES, etc.. */
-#include "structs.h" /* ubyte, ubyte, int16, etc.. */
+#include "structs.h" /* uint8_t, uint8_t, int16_t, etc.. */
 #include "timeinfo.h" // time data, etc..
 #include "event.h" // eventBrief
 #include "isr.h"   // SAVE_TYPE_MAX
@@ -78,7 +78,7 @@ typedef std::queue<communication> history_t;
 #define MAX_WEAR     23
 
 struct char_data;
-//typedef struct char_data char_data;
+//typedef struct char_data struct char_data;
 
 #define SEX_NEUTRAL   0
 #define SEX_MALE      1
@@ -111,8 +111,8 @@ struct char_data;
 
 // * ------- Begin MOBProg stuff ----------- *
 
-typedef struct  mob_prog_data           MPROG_DATA;
-typedef struct  mob_prog_act_list       MPROG_ACT_LIST;
+typedef struct  mob_prog_data           mob_prog_data;
+typedef struct  mob_prog_act_list       mob_prog_act_list;
 typedef int16_t skill_t;
 typedef map<skill_t, struct char_skill_data> skill_list_t;
 
@@ -121,21 +121,21 @@ struct tempvariable
   struct tempvariable *next;
   char *name;
   char *data;
-  int16 save; // save or not
+  int16_t save; // save or not
 };
 
 struct  mob_prog_act_list
 {
-    MPROG_ACT_LIST * next;
+    mob_prog_act_list * next;
     char *           buf;
-    char_data *      ch;
-    OBJ_DATA *       obj;
+    struct char_data *      ch;
+    obj_data *       obj;
     void *           vo;
 };
 
 struct  mob_prog_data
 {
-    MPROG_DATA *next;
+    mob_prog_data *next;
     int         type;
     char *      arglist;
     char *      comlist;
@@ -171,39 +171,39 @@ struct  mob_prog_data
 struct char_skill_data
 {
     skill_t  skillnum;          // ID # of skill.
-    int16  learned;           // % chance for success must be > 0
+    int16_t  learned;           // % chance for success must be > 0
     int32_t  unused[5];         // for future use
 };
 
 struct class_skill_defines
 {
     char * skillname;         // name of skill
-    int16  skillnum;          // ID # of skill
-    int16  levelavailable;    // what level class can get it
-    int16  maximum;           // maximum value PC can train it to (1-100)
+    int16_t  skillnum;          // ID # of skill
+    int16_t  levelavailable;    // what level class can get it
+    int16_t  maximum;           // maximum value PC can train it to (1-100)
     uint8_t group;             // which class tree group it is assigned
-    int16  attrs;	      // What attributes the skill is based on
+    int16_t  attrs;	      // What attributes the skill is based on
 };
 
 /* Used in CHAR_FILE_U *DO*NOT*CHANGE* */
 struct affected_type
 {
     uint32_t type = {};           /* The type of spell that caused ths      */
-    int16  duration = {};       /* For how long its effects will last      */
+    int16_t  duration = {};       /* For how long its effects will last      */
     int32_t  duration_type = {};  
     int32_t  modifier = {};       /* This is added to apropriate ability     */
     int32_t  location = {};       /* Tells which ability to change(APPLY_XXX)*/
     int32_t bitvector = {};      /* Tells which bits to set (AFF_XXX)       */
     std::string caster = {};
     struct affected_type *next = {};
-    char_data *origin = {};    
-    char_data *victim = {};
+    struct char_data *origin = {};    
+    struct char_data *victim = {};
 };
 
 
 struct follow_type
 {
-    char_data *follower;
+    struct char_data *follower;
     struct follow_type *next;
 };
 
@@ -233,16 +233,16 @@ struct pc_data
    
     uint32_t bad_pw_tries = {};        // How many times people have entered bad pws
 
-     int16 statmetas = {};           // How many times I've metad a stat
+     int16_t statmetas = {};           // How many times I've metad a stat
                                 // This number could go negative from stat loss
-    uint16 kimetas = {};             // How many times I've metad ki (pc only)
+    uint16_t kimetas = {};             // How many times I've metad ki (pc only)
 
     int32_t wizinvis = {};
 
-    uint16 practices = {};         // How many can you learn yet this level
-    uint16 specializations = {};   // How many specializations a player has left
+    uint16_t practices = {};         // How many can you learn yet this level
+    uint16_t specializations = {};   // How many specializations a player has left
 
-     int16 saves_mods[SAVE_TYPE_MAX+1] = {};  // Character dependant mods to saves (meta'able)
+     int16_t saves_mods[SAVE_TYPE_MAX+1] = {};  // Character dependant mods to saves (meta'able)
 
      uint32_t bank = {};           /* gold in bank                            */
 
@@ -254,16 +254,16 @@ struct pc_data
     char *poofout = {};      /* poofout message */    
     char *prompt = {};       /* Sadus' disguise.. unused */
 
-    int16 buildLowVnum = {}, buildHighVnum = {};
-    int16 buildMLowVnum = {}, buildMHighVnum = {};
-    int16 buildOLowVnum = {}, buildOHighVnum = {};
+    int16_t buildLowVnum = {}, buildHighVnum = {};
+    int16_t buildMLowVnum = {}, buildMHighVnum = {};
+    int16_t buildOLowVnum = {}, buildOHighVnum = {};
     obj_data *skillchange = {}; /* Skill changing equipment. */
 
      int32_t last_mob_edit = {};       // vnum of last mob edited
      int32_t last_obj_edit = {};       // vnum of last obj edited
 
     string last_tell = {};          /* last person who told           */
-     int16 last_mess_read = {};     /* for reading messages */
+     int16_t last_mess_read = {};     /* for reading messages */
 
     // TODO: these 3 need to become PLR toggles
     bool holyLite = {};          // Holy lite mode
@@ -274,15 +274,15 @@ struct pc_data
     bool unjoinable = {};        // Do NOT autojoin
     struct char_data *golem = {}; // CURRENT golem. 
     bool hide[MAX_HIDE] = {};
-    char_data *hiding_from[MAX_HIDE] = {};
+    struct char_data *hiding_from[MAX_HIDE] = {};
     std::queue<string> *away_msgs = {};
     history_t *tell_history = {};
     history_t *gtell_history = {};
     char *joining = {};
     uint32_t quest_points = {};
-    int16  quest_current[QUEST_MAX] = {};
+    int16_t  quest_current[QUEST_MAX] = {};
     uint32_t quest_current_ticksleft[QUEST_MAX] = {};
-    int16  quest_cancel[QUEST_CANCEL] = {};
+    int16_t  quest_cancel[QUEST_CANCEL] = {};
     uint32_t quest_complete[QUEST_TOTAL/ASIZE+1] = {};
     char *last_prompt = {};
     std::multimap<int, std::pair<timeval, timeval> > *lastseen = {};
@@ -304,19 +304,19 @@ struct mob_data
 {
     public:
     int32_t nr = {};
-    sbyte default_pos = {};    // Default position for NPC
-    sbyte last_direction = {}; // Last direction the mobile went in
+    int8_t default_pos = {};    // Default position for NPC
+    int8_t last_direction = {}; // Last direction the mobile went in
     uint32_t attack_type = {};    // Bitvector of damage type for bare-handed combat
     uint32_t actflags[ACT_MAX/ASIZE+1] = {}; // flags for NPC behavior
 
-    int16 damnodice = {};         // The number of damage dice's           
-    int16 damsizedice = {};       // The size of the damage dice's         
+    int16_t damnodice = {};         // The number of damage dice's           
+    int16_t damsizedice = {};       // The size of the damage dice's         
 
     char *fears = {};       /* will flee from ths person on sight     */
     char *hatred = {};      /* List of PC's I hate */
 
-    MPROG_ACT_LIST *    mpact = {}; // list of MOBProgs
-     int16                 mpactnum = {}; // num
+    mob_prog_act_list *    mpact = {}; // list of MOBProgs
+     int16_t                 mpactnum = {}; // num
     int32_t last_room = {}; // Room rnum the mob was last in. Used
 		      // For !magic,!track changing flags.
     struct threat_struct *threat = {};
@@ -332,7 +332,7 @@ struct mob_data
     obj_data *object = {};
 };
 
-// char_data, char_data
+// struct char_data, struct char_data
 // This contains all memory items for a player/mob
 // All non-specific data is held in this structure
 // PC/MOB specific data are held in the appropriate pointed-to structs
@@ -350,24 +350,24 @@ struct char_data
     char *description = nullptr;  // For 'look mob'
     char *title = nullptr;
 
-    sbyte sex = {};
-    sbyte c_class = {};
-    sbyte race = {};
-    sbyte level = {};
-    sbyte position = {};      // Standing, sitting, fighting
+    int8_t sex = {};
+    int8_t c_class = {};
+    int8_t race = {};
+    int8_t level = {};
+    int8_t position = {};      // Standing, sitting, fighting
 
-    sbyte str = {};         sbyte raw_str = {};        sbyte str_bonus = {};
-    sbyte intel = {};       sbyte raw_intel = {};      sbyte intel_bonus = {};
-    sbyte wis = {};         sbyte raw_wis = {};        sbyte wis_bonus = {};
-    sbyte dex = {};         sbyte raw_dex = {};        sbyte dex_bonus = {};
-    sbyte con = {};         sbyte raw_con = {};        sbyte con_bonus = {};
+    int8_t str = {};         int8_t raw_str = {};        int8_t str_bonus = {};
+    int8_t intel = {};       int8_t raw_intel = {};      int8_t intel_bonus = {};
+    int8_t wis = {};         int8_t raw_wis = {};        int8_t wis_bonus = {};
+    int8_t dex = {};         int8_t raw_dex = {};        int8_t dex_bonus = {};
+    int8_t con = {};         int8_t raw_con = {};        int8_t con_bonus = {};
 
-    sbyte conditions[3] = {};      // Drunk full etc.                       
+    int8_t conditions[3] = {};      // Drunk full etc.                       
 
-    ubyte weight = {};       /* PC/NPC's weight */
-    ubyte height = {};       /* PC/NPC's height */
+    uint8_t weight = {};       /* PC/NPC's weight */
+    uint8_t height = {};       /* PC/NPC's height */
 
-    int16 hometown = {};      /* PC/NPC home town */
+    int16_t hometown = {};      /* PC/NPC home town */
     int64_t gold = {};           /* Money carried                           */
     uint32_t plat = {};           /* Platinum                                */
      int64_t exp = {};            /* The experience of the player            */
@@ -376,7 +376,7 @@ struct char_data
     uint32_t immune = {};         // Bitvector of damage types I'm immune to
     uint32_t resist = {};         // Bitvector of damage types I'm resistant to
     uint32_t suscept = {};        // Bitvector of damage types I'm susceptible to
-     int16 saves[SAVE_TYPE_MAX+1] = {};  // Saving throw bonuses
+     int16_t saves[SAVE_TYPE_MAX+1] = {};  // Saving throw bonuses
 
      int32_t mana = {};         
      int32_t max_mana = {};     /* Not useable                             */
@@ -391,7 +391,7 @@ struct char_data
      int32_t max_ki = {};
      int32_t raw_ki = {};
 
-     int16 alignment = {};          // +-1000 for alignments                 
+     int16_t alignment = {};          // +-1000 for alignments                 
 
     uint32_t hpmetas = {};             // total number of times meta'd hps
     uint32_t manametas = {};           // total number of times meta'd mana
@@ -399,29 +399,29 @@ struct char_data
     uint32_t acmetas = {};             // total number of times meta'd ac
      int32_t agemetas = {};            // number of years age has been meta'd
 
-     int16 hit_regen = {};           // modifier to hp regen
-     int16 mana_regen = {};          // modifier to mana regen
-     int16 move_regen = {};          // modifier to move regen
-     int16 ki_regen = {};            // modifier to ki regen
+     int16_t hit_regen = {};           // modifier to hp regen
+     int16_t mana_regen = {};          // modifier to mana regen
+     int16_t move_regen = {};          // modifier to move regen
+     int16_t ki_regen = {};            // modifier to ki regen
 
-     int16 melee_mitigation = {};    // modifies melee damage
-     int16 spell_mitigation = {};    // modified spell damage
-     int16 song_mitigation = {};     // modifies song damage
-     int16 spell_reflect = {};
+     int16_t melee_mitigation = {};    // modifies melee damage
+     int16_t spell_mitigation = {};    // modified spell damage
+     int16_t song_mitigation = {};     // modifies song damage
+     int16_t spell_reflect = {};
 
      intptr_t clan = {};                       /* Clan the char is in */
 
-     int16 armor = {};                 // Armor class
-     int16 hitroll = {};               // Any bonus or penalty to the hit roll
-     int16 damroll = {};               // Any bonus or penalty to the damage roll
+     int16_t armor = {};                 // Armor class
+     int16_t hitroll = {};               // Any bonus or penalty to the hit roll
+     int16_t damroll = {};               // Any bonus or penalty to the damage roll
 
-     int16 glow_factor = {};           // Amount that the character glows
+     int16_t glow_factor = {};           // Amount that the character glows
 
     obj_data * beacon = nullptr;       /* pointer to my beacon */
 
      std::vector<songInfo> songs = {};          // Song list
-//     int16 song_timer = {};       /* status for songs being sung */
-//     int16 song_number = {};      /* number of song being sung */
+//     int16_t song_timer = {};       /* status for songs being sung */
+//     int16_t song_number = {};      /* number of song being sung */
 //     char * song_data = {};        /* args for the songs */
 
     struct obj_data *equipment[MAX_WEAR] = {}; // Equipment List
@@ -430,28 +430,28 @@ struct char_data
     struct affected_type *affected = nullptr;    // Affected by list
     struct obj_data *carrying = nullptr;         // Inventory List
 
-     int16 poison_amount = {};              // How much poison damage I'm taking every few seconds
+     int16_t poison_amount = {};              // How much poison damage I'm taking every few seconds
 
-     int16 carry_weight = {};               // Carried weight
-     int16 carry_items = {};                // Number of items carried                
+     int16_t carry_weight = {};               // Carried weight
+     int16_t carry_items = {};                // Number of items carried                
 
     char *hunting = {};                     // Name of "track" target
     char *ambush = {};                      // Name of "ambush" target
 
-    char_data * guarding = {};              // Pointer to who I am guarding
+    struct char_data * guarding = {};              // Pointer to who I am guarding
     follow_type * guarded_by = {};          // List of people guarding me
 
     uint32_t affected_by[AFF_MAX/ASIZE+1] = {}; // Quick reference bitvector for spell affects
     uint32_t combat = {};                     // Bitvector for combat related flags (bash, stun, shock)
     uint32_t misc = {};                       // Bitvector for IS_MOB/logs/channels.  So possessed mobs can channel
 
-    char_data *fighting = {};                 /* Opponent     */
-    char_data *next = {};                     /* Next anywhere in game */
-    char_data *next_in_room = {};             /* Next in room */
-    char_data *next_fighting = {};            /* Next fighting */
-    OBJ_DATA *altar = {};
+    struct char_data *fighting = {};                 /* Opponent     */
+    struct char_data *next = {};                     /* Next anywhere in game */
+    struct char_data *next_in_room = {};             /* Next in room */
+    struct char_data *next_fighting = {};            /* Next fighting */
+    obj_data *altar = {};
     struct follow_type *followers = {};  /* List of followers */
-    char_data *master = {};              /* Who is char following? */
+    struct char_data *master = {};              /* Who is char following? */
     char *group_name = {};                /* Name of group */
     
     int32_t timer = {};                         // Timer for update
@@ -478,8 +478,8 @@ struct char_data
     int spec = {};
 
     struct room_direction_data *brace_at, *brace_exit; //exits affected by brace
-    void tell_history(char_data *sender, string message);
-    void gtell_history(char_data *sender, string message);
+    void tell_history(struct char_data *sender, string message);
+    void gtell_history(struct char_data *sender, string message);
     time_t first_damage = {};
     uint64_t damage_done = {};
     uint64_t damages = {};
@@ -487,15 +487,15 @@ struct char_data
     uint64_t damage_per_second = {};
     void setPOSFighting();
     int32_t getHP(void);
-    void setHP(int hp, char_data* causer = nullptr);
-    void addHP(int hp, char_data* causer = nullptr);
-    void removeHP(int dam, char_data* causer = nullptr);
+    void setHP(int hp, struct char_data* causer = nullptr);
+    void addHP(int hp, struct char_data* causer = nullptr);
+    void removeHP(int dam, struct char_data* causer = nullptr);
     void fillHP(void);
     void fillHPLimit(void);
     void send(string);
-    command_return_t tell(char_data*, string);
+    command_return_t tell(struct char_data*, string);
     void sendRaw(string);
-    vector<char_data *> getFollowers(void);
+    vector<struct char_data *> getFollowers(void);
     void setPlayerLastMob(u_int64_t mobvnum);
 
     void swapSkill(skill_t oldSkill, skill_t newSkill);
@@ -508,7 +508,7 @@ struct char_data
 class communication
 {
     public:
-    communication(char_data *ch, string message);
+    communication(struct char_data *ch, string message);
     string sender;
     bool sender_ispc;
     string message;
@@ -528,22 +528,22 @@ class communication
 struct char_file_u4
 {    
     char_file_u4();
-    sbyte sex = {};     /* Sex */
-    sbyte c_class = {}; /* Class */
-    sbyte race = {};    /* Race */
-    sbyte level = {};   /* Level */
+    int8_t sex = {};     /* Sex */
+    int8_t c_class = {}; /* Class */
+    int8_t race = {};    /* Race */
+    int8_t level = {};   /* Level */
 
-    sbyte raw_str = {};
-    sbyte raw_intel = {};
-    sbyte raw_wis = {};
-    sbyte raw_dex = {};
+    int8_t raw_str = {};
+    int8_t raw_intel = {};
+    int8_t raw_wis = {};
+    int8_t raw_dex = {};
 
-    sbyte raw_con = {};
-    sbyte conditions[3] = {};
+    int8_t raw_con = {};
+    int8_t conditions[3] = {};
 
-    ubyte weight = {};
-    ubyte height = {};
-    int16 hometown = {};
+    uint8_t weight = {};
+    uint8_t height = {};
+    int16_t hometown = {};
 
     uint32_t gold = {};
     uint32_t plat = {};
@@ -561,25 +561,25 @@ struct char_file_u4
     int32_t ki = {};
     int32_t raw_ki = {};
 
-    int16 alignment = {};
-    int16 unused1 = {};
+    int16_t alignment = {};
+    int16_t unused1 = {};
 
     uint32_t hpmetas = {}; // Used by familiars too... why not.
     uint32_t manametas = {};
     uint32_t movemetas = {};
 
-    int16 armor = {}; // have to save these since mobs have different bases
-    int16 hitroll = {};
+    int16_t armor = {}; // have to save these since mobs have different bases
+    int16_t hitroll = {};
 
-    int16 damroll = {};
-    int16 unused2 = {};
+    int16_t damroll = {};
+    int16_t unused2 = {};
 
     int32_t afected_by = {};
     int32_t afected_by2 = {};
     uint32_t misc = {}; // channel flags
 
-    int16 clan = {};
-    int16 unused3 = {};
+    int16_t clan = {};
+    int16_t unused3 = {};
     int32_t load_room = {}; // Which room to place char in
 
     uint32_t acmetas = {};
@@ -589,22 +589,22 @@ struct char_file_u4
 
 struct char_file_u
 {
-    sbyte sex;         /* Sex */
-    sbyte c_class;     /* Class */
-    sbyte race;        /* Race */
-    sbyte level;       /* Level */
+    int8_t sex;         /* Sex */
+    int8_t c_class;     /* Class */
+    int8_t race;        /* Race */
+    int8_t level;       /* Level */
    
-    sbyte raw_str;
-    sbyte raw_intel;
-    sbyte raw_wis;
-    sbyte raw_dex;
-    sbyte raw_con;
-    sbyte conditions[3]; 
+    int8_t raw_str;
+    int8_t raw_intel;
+    int8_t raw_wis;
+    int8_t raw_dex;
+    int8_t raw_con;
+    int8_t conditions[3]; 
 
-    ubyte weight;
-    ubyte height;
+    uint8_t weight;
+    uint8_t height;
 
-    int16 hometown;
+    int16_t hometown;
     uint32_t gold;
     uint32_t plat;
     int64_t exp;
@@ -621,19 +621,19 @@ struct char_file_u
     int32_t ki;
     int32_t raw_ki;
 
-    int16 alignment;
+    int16_t alignment;
    uint32_t hpmetas; // Used by familiars too... why not.
    uint32_t manametas;
    uint32_t movemetas;
 
-    int16 armor;       // have to save these since mobs have different bases
-    int16 hitroll;
-    int16 damroll;
+    int16_t armor;       // have to save these since mobs have different bases
+    int16_t hitroll;
+    int16_t damroll;
     int32_t afected_by;
     int32_t afected_by2;
     uint32_t misc;          // channel flags
 
-    int16 clan; 
+    int16_t clan; 
     int32_t load_room;                  // Which room to place char in
 
     uint32_t acmetas;
@@ -650,8 +650,8 @@ struct profession {
 
 
 void clear_hunt(void *arg1, void *arg2, void *arg3);
-void clear_hunt(char *arg1, char_data *arg2, void *arg3);
-void prepare_character_for_sixty(char_data *ch);
-bool isPaused(char_data *mob);
+void clear_hunt(char *arg1, struct char_data *arg2, void *arg3);
+void prepare_character_for_sixty(struct char_data *ch);
+bool isPaused(struct char_data *mob);
 
 #endif

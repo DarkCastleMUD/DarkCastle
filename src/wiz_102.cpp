@@ -377,7 +377,7 @@ int do_mpstat(struct char_data *ch, char *arg, int cmd)
   char name[MAX_INPUT_LENGTH];
   int x;
 
-  void mpstat(char_data * ch, char_data * victim);
+  void mpstat(struct char_data * ch, struct char_data * victim);
 
   if(IS_NPC(ch))
     return eFAILURE;
@@ -425,7 +425,7 @@ int do_mpstat(struct char_data *ch, char *arg, int cmd)
     }
   }
 */
-  mpstat(ch, (char_data *) mob_index[x].item);
+  mpstat(ch, (struct char_data *) mob_index[x].item);
   return eSUCCESS;
 }
 
@@ -642,7 +642,7 @@ int do_zedit(struct char_data *ch, char *argument, int cmd)
   char buf[MAX_STRING_LENGTH];
   char select[MAX_INPUT_LENGTH];
   char text[MAX_INPUT_LENGTH];
-  int16 skill;
+  int16_t skill;
   int i = 0, j = 0;
   int zone, last_cmd;
   int robj, rmob;
@@ -1144,7 +1144,7 @@ int do_sedit(struct char_data *ch, char *argument, int cmd)
   string target;
   string text;
   string value;
-  char_data *vict = nullptr;
+  struct char_data *vict = nullptr;
   char_skill_data *skill = nullptr;
   char_skill_data *lastskill = nullptr;
   int16_t field = 0;
@@ -1347,7 +1347,7 @@ int do_sedit(struct char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int oedit_exdesc(char_data * ch, int item_num, char * buf)
+int oedit_exdesc(struct char_data * ch, int item_num, char * buf)
 {
     char type[MAX_INPUT_LENGTH];
     char buf2[MAX_INPUT_LENGTH];
@@ -1513,7 +1513,7 @@ int oedit_exdesc(char_data * ch, int item_num, char * buf)
     return eSUCCESS;
 }
 
-int oedit_affects(char_data * ch, int item_num, char * buf)
+int oedit_affects(struct char_data * ch, int item_num, char * buf)
 {
     char type[MAX_INPUT_LENGTH];
     char buf2[MAX_INPUT_LENGTH];
@@ -2264,7 +2264,7 @@ int do_oedit(struct char_data *ch, char *argument, int cmd)
 
 void update_mobprog_bits(int mob_num)
 {
-    MPROG_DATA * prog = mob_index[mob_num].mobprogs;
+    mob_prog_data * prog = mob_index[mob_num].mobprogs;
     mob_index[mob_num].progtypes = 0;
 
     while(prog) {
@@ -2282,10 +2282,10 @@ int do_procedit(struct char_data *ch, char *argument, int cmd)
   int mob_num = -1;
   int intval = 0;
   int x, i;
-  MPROG_DATA *prog;
-  MPROG_DATA *currprog;
+  mob_prog_data *prog;
+  mob_prog_data *currprog;
 
-  void mpstat(char_data *ch, char_data *victim);
+  void mpstat(struct char_data *ch, struct char_data *victim);
 
   const char *fields[] = { "add", "remove", "type", "arglist", "command", "list", "\n" };
 
@@ -2357,7 +2357,7 @@ int do_procedit(struct char_data *ch, char *argument, int cmd)
   // no field
   if (!*buf3)
   {
-    mpstat(ch, (char_data*) mob_index[mob_num].item);
+    mpstat(ch, (struct char_data*) mob_index[mob_num].item);
     return eSUCCESS;
   }
 
@@ -2383,9 +2383,9 @@ int do_procedit(struct char_data *ch, char *argument, int cmd)
       return eFAILURE;
     }
 #ifdef LEAK_CHECK
-    prog = (MPROG_DATA *) calloc(1, sizeof(MPROG_DATA));
+    prog = (mob_prog_data *) calloc(1, sizeof(mob_prog_data));
 #else
-    prog = (MPROG_DATA*) dc_alloc(1, sizeof(MPROG_DATA));
+    prog = (mob_prog_data*) dc_alloc(1, sizeof(mob_prog_data));
 #endif
     prog->type = GREET_PROG;
     prog->arglist = strdup("80");
@@ -2641,7 +2641,7 @@ int do_procedit(struct char_data *ch, char *argument, int cmd)
 
     // list
   case 5:
-    mpstat(ch, (char_data*) mob_index[mob_num].item);
+    mpstat(ch, (struct char_data*) mob_index[mob_num].item);
     return eFAILURE;
   }
   set_zone_modified_mob(mob_num);
@@ -2672,7 +2672,7 @@ int do_mscore(struct char_data *ch, char *argument, int cmd)
       return eSUCCESS;
     }
 
-    boro_mob_stat(ch, (char_data *) mob_index[mob_num].item);
+    boro_mob_stat(ch, (struct char_data *) mob_index[mob_num].item);
     return eSUCCESS;
 }
 
@@ -2746,7 +2746,7 @@ int do_medit(struct char_data *ch, char *argument, int cmd) {
 
 	if (!*buf3) // no field.  Stat the item.
 	{
-		mob_stat(ch, (char_data *) mob_index[mob_num].item);
+		mob_stat(ch, (struct char_data *) mob_index[mob_num].item);
 		return eSUCCESS;
 	}
 
@@ -2782,7 +2782,7 @@ int do_medit(struct char_data *ch, char *argument, int cmd) {
 					ch);
 			return eFAILURE;
 		}
-		((char_data *) mob_index[mob_num].item)->name = str_hsh(buf4);
+		((struct char_data *) mob_index[mob_num].item)->name = str_hsh(buf4);
 		sprintf(buf, "Mob keywords set to '%s'.\r\n", buf4);
 		send_to_char(buf, ch);
 	}
@@ -2795,7 +2795,7 @@ int do_medit(struct char_data *ch, char *argument, int cmd) {
 					ch);
 			return eFAILURE;
 		}
-		((char_data *) mob_index[mob_num].item)->short_desc = str_hsh(buf4);
+		((struct char_data *) mob_index[mob_num].item)->short_desc = str_hsh(buf4);
 		sprintf(buf, "Mob shortdesc set to '%s'.\r\n", buf4);
 		send_to_char(buf, ch);
 	}
@@ -2808,7 +2808,7 @@ int do_medit(struct char_data *ch, char *argument, int cmd) {
 			return eFAILURE;
 		}
 		strcat(buf4, "\r\n");
-		((char_data *) mob_index[mob_num].item)->long_desc = str_hsh(buf4);
+		((struct char_data *) mob_index[mob_num].item)->long_desc = str_hsh(buf4);
 		sprintf(buf, "Mob longdesc set to '%s'.\r\n", buf4);
 		send_to_char(buf, ch);
 	}
@@ -2826,11 +2826,11 @@ int do_medit(struct char_data *ch, char *argument, int cmd) {
 		send_to_char("Enter the mob's description below."
 				" Terminate with '/s' on a new line.\n\r\n\r", ch);
 // TODO - this causes a memory leak if you edit the desc twice (first one is hsh'd)
-//        ((char_data *)mob_index[mob_num].item)->description = NULL;
+//        ((struct char_data *)mob_index[mob_num].item)->description = NULL;
 		ch->desc->connected = conn::EDITING;
-		((char_data*) mob_index[mob_num].item)->description = str_dup("");
+		((struct char_data*) mob_index[mob_num].item)->description = str_dup("");
 		ch->desc->strnew =
-				&(((char_data *) mob_index[mob_num].item)->description);
+				&(((struct char_data *) mob_index[mob_num].item)->description);
 		ch->desc->max_str = MAX_MESSAGE_LENGTH;
 	}
 		break;
@@ -2844,13 +2844,13 @@ int do_medit(struct char_data *ch, char *argument, int cmd) {
 			return eFAILURE;
 		}
 		if (is_abbrev(buf4, "male")) {
-			((char_data *) mob_index[mob_num].item)->sex = SEX_MALE;
+			((struct char_data *) mob_index[mob_num].item)->sex = SEX_MALE;
 			send_to_char("Mob sex set to male.\r\n", ch);
 		} else if (is_abbrev(buf4, "female")) {
-			((char_data *) mob_index[mob_num].item)->sex = SEX_FEMALE;
+			((struct char_data *) mob_index[mob_num].item)->sex = SEX_FEMALE;
 			send_to_char("Mob sex set to female.\r\n", ch);
 		} else if (is_abbrev(buf4, "neutral")) {
-			((char_data *) mob_index[mob_num].item)->sex = SEX_NEUTRAL;
+			((struct char_data *) mob_index[mob_num].item)->sex = SEX_NEUTRAL;
 			send_to_char("Mob sex set to neutral.\r\n", ch);
 		} else
 			send_to_char(
@@ -2865,7 +2865,7 @@ int do_medit(struct char_data *ch, char *argument, int cmd) {
 			send_to_char("$3Syntax$R: medit [mob_num] class <class>\n\r"
 					"$3Current$R: ", ch);
 			sprintf(buf, "%s\n",
-					pc_clss_types[((char_data *) mob_index[mob_num].item)->c_class]);
+					pc_clss_types[((struct char_data *) mob_index[mob_num].item)->c_class]);
 			send_to_char(buf, ch);
 			send_to_char("\r\n$3Valid types$R:\r\n", ch);
 			for (i = 0; *pc_clss_types[i] != '\n'; i++) {
@@ -2878,7 +2878,7 @@ int do_medit(struct char_data *ch, char *argument, int cmd) {
 			send_to_char("Value out of valid range.\r\n", ch);
 			return eFAILURE;
 		}
-		((char_data *) mob_index[mob_num].item)->c_class = intval;
+		((struct char_data *) mob_index[mob_num].item)->c_class = intval;
 		sprintf(buf, "Mob class set to %d.\r\n", intval);
 		send_to_char(buf, ch);
 	}
@@ -2891,7 +2891,7 @@ int do_medit(struct char_data *ch, char *argument, int cmd) {
 					"$3Current$R: ", ch);
 			sprintf(buf, "%s\n\r\n\r"
 					"Available types:\r\n",
-					races[((char_data *) mob_index[mob_num].item)->race].singular_name);
+					races[((struct char_data *) mob_index[mob_num].item)->race].singular_name);
 			send_to_char(buf, ch);
 			for (i = 0; i <= MAX_RACE; i++)
 				csendf(ch, "  %s\r\n", races[i].singular_name);
@@ -2903,34 +2903,34 @@ int do_medit(struct char_data *ch, char *argument, int cmd) {
 			if (is_abbrev(buf4, races[i].singular_name)) {
 				csendf(ch, "Mob race set to %s.\r\n",
 						races[i].singular_name);
-				((char_data *) mob_index[mob_num].item)->race = i;
+				((struct char_data *) mob_index[mob_num].item)->race = i;
 				race_set = 1;
 
-				((char_data *) mob_index[mob_num].item)->raw_str =
-						((char_data *) mob_index[mob_num].item)->str =
+				((struct char_data *) mob_index[mob_num].item)->raw_str =
+						((struct char_data *) mob_index[mob_num].item)->str =
 								BASE_STAT
 										+ mob_race_mod[GET_RACE(
-												((char_data * )mob_index[mob_num].item))][0];
-				((char_data *) mob_index[mob_num].item)->raw_dex =
-						((char_data *) mob_index[mob_num].item)->dex =
+												((struct char_data * )mob_index[mob_num].item))][0];
+				((struct char_data *) mob_index[mob_num].item)->raw_dex =
+						((struct char_data *) mob_index[mob_num].item)->dex =
 								BASE_STAT
 										+ mob_race_mod[GET_RACE(
-												((char_data * )mob_index[mob_num].item))][1];
-				((char_data *) mob_index[mob_num].item)->raw_con =
-						((char_data *) mob_index[mob_num].item)->con =
+												((struct char_data * )mob_index[mob_num].item))][1];
+				((struct char_data *) mob_index[mob_num].item)->raw_con =
+						((struct char_data *) mob_index[mob_num].item)->con =
 								BASE_STAT
 										+ mob_race_mod[GET_RACE(
-												((char_data * )mob_index[mob_num].item))][2];
-				((char_data *) mob_index[mob_num].item)->raw_intel =
-						((char_data *) mob_index[mob_num].item)->intel =
+												((struct char_data * )mob_index[mob_num].item))][2];
+				((struct char_data *) mob_index[mob_num].item)->raw_intel =
+						((struct char_data *) mob_index[mob_num].item)->intel =
 								BASE_STAT
 										+ mob_race_mod[GET_RACE(
-												((char_data * )mob_index[mob_num].item))][3];
-				((char_data *) mob_index[mob_num].item)->raw_wis =
-						((char_data *) mob_index[mob_num].item)->wis =
+												((struct char_data * )mob_index[mob_num].item))][3];
+				((struct char_data *) mob_index[mob_num].item)->raw_wis =
+						((struct char_data *) mob_index[mob_num].item)->wis =
 								BASE_STAT
 										+ mob_race_mod[GET_RACE(
-												((char_data * )mob_index[mob_num].item))][4];
+												((struct char_data * )mob_index[mob_num].item))][4];
 
 			}
 		}
@@ -2947,7 +2947,7 @@ int do_medit(struct char_data *ch, char *argument, int cmd) {
 			send_to_char("$3Syntax$R: medit [mob_num] level <levelnum>\n\r"
 					"$3Current$R: ", ch);
 			sprintf(buf, "%d\n",
-					((char_data *) mob_index[mob_num].item)->level);
+					((struct char_data *) mob_index[mob_num].item)->level);
 			send_to_char(buf, ch);
 			return eFAILURE;
 		}
@@ -2955,7 +2955,7 @@ int do_medit(struct char_data *ch, char *argument, int cmd) {
 			send_to_char("Value out of valid range.\r\n", ch);
 			return eFAILURE;
 		}
-		((char_data *) mob_index[mob_num].item)->level = intval;
+		((struct char_data *) mob_index[mob_num].item)->level = intval;
 		sprintf(buf, "Mob level set to %d.\r\n", intval);
 		send_to_char(buf, ch);
 	}
@@ -2967,7 +2967,7 @@ int do_medit(struct char_data *ch, char *argument, int cmd) {
 			send_to_char("$3Syntax$R: medit [mob_num] alignment <alignnum>\n\r"
 					"$3Current$R: ", ch);
 			sprintf(buf, "%d\n",
-					((char_data *) mob_index[mob_num].item)->alignment);
+					((struct char_data *) mob_index[mob_num].item)->alignment);
 			send_to_char(buf, ch);
 			return eFAILURE;
 		}
@@ -2975,7 +2975,7 @@ int do_medit(struct char_data *ch, char *argument, int cmd) {
 			send_to_char("Value out of valid range.\r\n", ch);
 			return eFAILURE;
 		}
-		((char_data *) mob_index[mob_num].item)->alignment = intval;
+		((struct char_data *) mob_index[mob_num].item)->alignment = intval;
 		sprintf(buf, "Mob alignment set to %d.\r\n", intval);
 		send_to_char(buf, ch);
 	}
@@ -2988,7 +2988,7 @@ int do_medit(struct char_data *ch, char *argument, int cmd) {
 					"$3Syntax$R: medit [mob_num] loadposition <position>\n\r"
 							"$3Current$R: ", ch);
 			sprintf(buf, "%s\n",
-					position_types[((char_data *) mob_index[mob_num].item)->position]);
+					position_types[((struct char_data *) mob_index[mob_num].item)->position]);
 			send_to_char(buf, ch);
 			send_to_char("$3Valid positions$R:\r\n"
 					"  1 = Standing\r\n"
@@ -3015,7 +3015,7 @@ int do_medit(struct char_data *ch, char *argument, int cmd) {
 			intval = POSITION_SLEEPING;
 			break;
 		}
-		((char_data *) mob_index[mob_num].item)->position = intval;
+		((struct char_data *) mob_index[mob_num].item)->position = intval;
 		sprintf(buf, "Mob default position set to %s.\r\n",
 				position_types[intval]);
 		send_to_char(buf, ch);
@@ -3029,7 +3029,7 @@ int do_medit(struct char_data *ch, char *argument, int cmd) {
 					"$3Syntax$R: medit [mob_num] defaultposition <position>\n\r"
 							"$3Current$R: ", ch);
 			sprintf(buf, "%s\n",
-					position_types[((char_data *) mob_index[mob_num].item)->mobdata->default_pos]);
+					position_types[((struct char_data *) mob_index[mob_num].item)->mobdata->default_pos]);
 			send_to_char(buf, ch);
 			send_to_char("$3Valid positions$R:\r\n"
 					"  1 = Standing\r\n"
@@ -3056,7 +3056,7 @@ int do_medit(struct char_data *ch, char *argument, int cmd) {
 			intval = POSITION_SLEEPING;
 			break;
 		}
-		((char_data *) mob_index[mob_num].item)->mobdata->default_pos = intval;
+		((struct char_data *) mob_index[mob_num].item)->mobdata->default_pos = intval;
 		sprintf(buf, "Mob default position set to %s.\r\n",
 				position_types[intval]);
 		send_to_char(buf, ch);
@@ -3070,7 +3070,7 @@ int do_medit(struct char_data *ch, char *argument, int cmd) {
 					"$3Syntax$R: medit [mob_num] actflags <location[s]>\n\r"
 							"$3Current$R: ", ch);
 			sprintbit(
-					((char_data *) mob_index[mob_num].item)->mobdata->actflags,
+					((struct char_data *) mob_index[mob_num].item)->mobdata->actflags,
 					action_bits, buf);
 			send_to_char(buf, ch);
 			send_to_char("\r\n$3Valid types$R:\r\n", ch);
@@ -3081,7 +3081,7 @@ int do_medit(struct char_data *ch, char *argument, int cmd) {
 			return eFAILURE;
 		}
 		parse_bitstrings_into_int(action_bits, buf4, ch,
-				((char_data *) mob_index[mob_num].item)->mobdata->actflags);
+				((struct char_data *) mob_index[mob_num].item)->mobdata->actflags);
 	}
 		break;
 
@@ -3091,7 +3091,7 @@ int do_medit(struct char_data *ch, char *argument, int cmd) {
 			send_to_char(
 					"$3Syntax$R: medit [mob_num] affectflags <location[s]>\n\r"
 							"$3Current$R: ", ch);
-			sprintbit(((char_data *) mob_index[mob_num].item)->affected_by[0],
+			sprintbit(((struct char_data *) mob_index[mob_num].item)->affected_by[0],
 					affected_bits, buf);
 			send_to_char(buf, ch);
 			send_to_char("\r\n$3Valid types$R:\r\n", ch);
@@ -3102,8 +3102,8 @@ int do_medit(struct char_data *ch, char *argument, int cmd) {
 			return eFAILURE;
 		}
 		parse_bitstrings_into_int(affected_bits, buf4, ch,
-				&(((char_data *) mob_index[mob_num].item)->affected_by[0]));
-//                             &((((char_data *)mob_index[mob_num].item)->affected_by[0])));
+				&(((struct char_data *) mob_index[mob_num].item)->affected_by[0]));
+//                             &((((struct char_data *)mob_index[mob_num].item)->affected_by[0])));
 	}
 		break;
 
@@ -3113,7 +3113,7 @@ int do_medit(struct char_data *ch, char *argument, int cmd) {
 			send_to_char("$3Syntax$R: medit [mob_num] numdamdice <amount>\n\r"
 					"$3Current$R: ", ch);
 			sprintf(buf, "%d\n",
-					((char_data *) mob_index[mob_num].item)->mobdata->damnodice);
+					((struct char_data *) mob_index[mob_num].item)->mobdata->damnodice);
 			send_to_char(buf, ch);
 			send_to_char("$3Valid Range$R: 1 to 400\r\n", ch);
 			return eFAILURE;
@@ -3122,7 +3122,7 @@ int do_medit(struct char_data *ch, char *argument, int cmd) {
 			send_to_char("Value out of valid range.\r\n", ch);
 			return eFAILURE;
 		}
-		((char_data *) mob_index[mob_num].item)->mobdata->damnodice = intval;
+		((struct char_data *) mob_index[mob_num].item)->mobdata->damnodice = intval;
 		sprintf(buf, "Mob number dice for damage set to %d.\r\n", intval);
 		send_to_char(buf, ch);
 	}
@@ -3134,7 +3134,7 @@ int do_medit(struct char_data *ch, char *argument, int cmd) {
 			send_to_char("$3Syntax$R: medit [mob_num] sizedamdice <amount>\n\r"
 					"$3Current$R: ", ch);
 			sprintf(buf, "%d\n",
-					((char_data *) mob_index[mob_num].item)->mobdata->damsizedice);
+					((struct char_data *) mob_index[mob_num].item)->mobdata->damsizedice);
 			send_to_char(buf, ch);
 			send_to_char("$3Valid Range$R: 1 to 400\r\n", ch);
 			return eFAILURE;
@@ -3143,7 +3143,7 @@ int do_medit(struct char_data *ch, char *argument, int cmd) {
 			send_to_char("Value out of valid range.\r\n", ch);
 			return eFAILURE;
 		}
-		((char_data *) mob_index[mob_num].item)->mobdata->damsizedice = intval;
+		((struct char_data *) mob_index[mob_num].item)->mobdata->damsizedice = intval;
 		sprintf(buf, "Mob size dice for damage set to %d.\r\n", intval);
 		send_to_char(buf, ch);
 	}
@@ -3155,7 +3155,7 @@ int do_medit(struct char_data *ch, char *argument, int cmd) {
 			send_to_char("$3Syntax$R: medit [mob_num] damroll <damrollnum>\n\r"
 					"$3Current$R: ", ch);
 			sprintf(buf, "%d\n",
-					((char_data *) mob_index[mob_num].item)->damroll);
+					((struct char_data *) mob_index[mob_num].item)->damroll);
 			send_to_char(buf, ch);
 			send_to_char("$3Valid Range$R: -50 to 400\r\n", ch);
 			return eFAILURE;
@@ -3164,7 +3164,7 @@ int do_medit(struct char_data *ch, char *argument, int cmd) {
 			send_to_char("Value out of valid range.\r\n", ch);
 			return eFAILURE;
 		}
-		((char_data *) mob_index[mob_num].item)->damroll = intval;
+		((struct char_data *) mob_index[mob_num].item)->damroll = intval;
 		sprintf(buf, "Mob damroll set to %d.\r\n", intval);
 		send_to_char(buf, ch);
 	}
@@ -3176,7 +3176,7 @@ int do_medit(struct char_data *ch, char *argument, int cmd) {
 			send_to_char("$3Syntax$R: medit [mob_num] hitroll <levelnum>\n\r"
 					"$3Current$R: ", ch);
 			sprintf(buf, "%d\n",
-					((char_data *) mob_index[mob_num].item)->hitroll);
+					((struct char_data *) mob_index[mob_num].item)->hitroll);
 			send_to_char(buf, ch);
 			send_to_char("$3Valid Range$R: -50 to 100\r\n", ch);
 			return eFAILURE;
@@ -3185,7 +3185,7 @@ int do_medit(struct char_data *ch, char *argument, int cmd) {
 			send_to_char("Value out of valid range.\r\n", ch);
 			return eFAILURE;
 		}
-		((char_data *) mob_index[mob_num].item)->hitroll = intval;
+		((struct char_data *) mob_index[mob_num].item)->hitroll = intval;
 		sprintf(buf, "Mob hitroll set to %d.\r\n", intval);
 		send_to_char(buf, ch);
 	}
@@ -3197,7 +3197,7 @@ int do_medit(struct char_data *ch, char *argument, int cmd) {
 			send_to_char("$3Syntax$R: medit [mob_num] hphitpoints <hp>\n\r"
 					"$3Current$R: ", ch);
 			sprintf(buf, "%d\n",
-					((char_data *) mob_index[mob_num].item)->raw_hit);
+					((struct char_data *) mob_index[mob_num].item)->raw_hit);
 			send_to_char(buf, ch);
 			send_to_char("$3Valid Range$R: 1 to 64000\r\n", ch);
 			return eFAILURE;
@@ -3206,8 +3206,8 @@ int do_medit(struct char_data *ch, char *argument, int cmd) {
 			send_to_char("Value out of valid range.\r\n", ch);
 			return eFAILURE;
 		}
-		((char_data *) mob_index[mob_num].item)->raw_hit = intval;
-		((char_data *) mob_index[mob_num].item)->max_hit = intval;
+		((struct char_data *) mob_index[mob_num].item)->raw_hit = intval;
+		((struct char_data *) mob_index[mob_num].item)->max_hit = intval;
 		sprintf(buf, "Mob hitpoints set to %d.\r\n", intval);
 		send_to_char(buf, ch);
 	}
@@ -3219,7 +3219,7 @@ int do_medit(struct char_data *ch, char *argument, int cmd) {
 			send_to_char("$3Syntax$R: medit [mob_num] gold <goldamount>\n\r"
 					"$3Current$R: ", ch);
 			sprintf(buf, "%lld\n",
-					((char_data *) mob_index[mob_num].item)->gold);
+					((struct char_data *) mob_index[mob_num].item)->gold);
 			send_to_char(buf, ch);
 			send_to_char("$3Valid Range$R: 0 to 10000000\r\n", ch);
 			return eFAILURE;
@@ -3234,7 +3234,7 @@ int do_medit(struct char_data *ch, char *argument, int cmd) {
 					ch);
 			return eFAILURE;
 		}
-		((char_data *) mob_index[mob_num].item)->gold = intval;
+		((struct char_data *) mob_index[mob_num].item)->gold = intval;
 		sprintf(buf, "Mob gold set to %d.\r\n", intval);
 		send_to_char(buf, ch);
 	}
@@ -3247,7 +3247,7 @@ int do_medit(struct char_data *ch, char *argument, int cmd) {
 					"$3Syntax$R: medit [mob_num] experiencepoints <xpamount>\n\r"
 							"$3Current$R: ", ch);
 			sprintf(buf, "%d\n",
-					(int) ((char_data *) mob_index[mob_num].item)->exp);
+					(int) ((struct char_data *) mob_index[mob_num].item)->exp);
 			send_to_char(buf, ch);
 			send_to_char("$3Valid Range$R: 0 to 20000000\r\n", ch);
 			return eFAILURE;
@@ -3256,7 +3256,7 @@ int do_medit(struct char_data *ch, char *argument, int cmd) {
 			send_to_char("Value out of valid range.\r\n", ch);
 			return eFAILURE;
 		}
-		((char_data *) mob_index[mob_num].item)->exp = intval;
+		((struct char_data *) mob_index[mob_num].item)->exp = intval;
 		sprintf(buf, "Mob experience set to %d.\r\n", intval);
 		send_to_char(buf, ch);
 	}
@@ -3267,7 +3267,7 @@ int do_medit(struct char_data *ch, char *argument, int cmd) {
 		if (!*buf4) {
 			send_to_char("$3Syntax$R: medit [mob_num] immune <location[s]>\n\r"
 					"$3Current$R: ", ch);
-			sprintbit(((char_data *) mob_index[mob_num].item)->immune, isr_bits,
+			sprintbit(((struct char_data *) mob_index[mob_num].item)->immune, isr_bits,
 					buf);
 			send_to_char(buf, ch);
 			send_to_char("\r\n$3Valid types$R:\r\n", ch);
@@ -3278,7 +3278,7 @@ int do_medit(struct char_data *ch, char *argument, int cmd) {
 			return eFAILURE;
 		}
 		parse_bitstrings_into_int(isr_bits, buf4, ch,
-				((char_data *) mob_index[mob_num].item)->immune);
+				((struct char_data *) mob_index[mob_num].item)->immune);
 	}
 		break;
 
@@ -3287,7 +3287,7 @@ int do_medit(struct char_data *ch, char *argument, int cmd) {
 		if (!*buf4) {
 			send_to_char("$3Syntax$R: medit [mob_num] suscept <location[s]>\n\r"
 					"$3Current$R: ", ch);
-			sprintbit(((char_data *) mob_index[mob_num].item)->suscept,
+			sprintbit(((struct char_data *) mob_index[mob_num].item)->suscept,
 					isr_bits, buf);
 			send_to_char(buf, ch);
 			send_to_char("\r\n$3Valid types$R:\r\n", ch);
@@ -3298,7 +3298,7 @@ int do_medit(struct char_data *ch, char *argument, int cmd) {
 			return eFAILURE;
 		}
 		parse_bitstrings_into_int(isr_bits, buf4, ch,
-				((char_data *) mob_index[mob_num].item)->suscept);
+				((struct char_data *) mob_index[mob_num].item)->suscept);
 	}
 		break;
 
@@ -3307,7 +3307,7 @@ int do_medit(struct char_data *ch, char *argument, int cmd) {
 		if (!*buf4) {
 			send_to_char("$3Syntax$R: medit [mob_num] resist <location[s]>\n\r"
 					"$3Current$R: ", ch);
-			sprintbit(((char_data *) mob_index[mob_num].item)->resist, isr_bits,
+			sprintbit(((struct char_data *) mob_index[mob_num].item)->resist, isr_bits,
 					buf);
 			send_to_char(buf, ch);
 			send_to_char("\r\n$3Valid types$R:\r\n", ch);
@@ -3318,7 +3318,7 @@ int do_medit(struct char_data *ch, char *argument, int cmd) {
 			return eFAILURE;
 		}
 		parse_bitstrings_into_int(isr_bits, buf4, ch,
-				((char_data *) mob_index[mob_num].item)->resist);
+				((struct char_data *) mob_index[mob_num].item)->resist);
 	}
 		break;
 
@@ -3328,7 +3328,7 @@ int do_medit(struct char_data *ch, char *argument, int cmd) {
 			send_to_char("$3Syntax$R: medit [mob_num] armorclass <ac>\n\r"
 					"$3Current$R: ", ch);
 			sprintf(buf, "%d\n",
-					((char_data *) mob_index[mob_num].item)->armor);
+					((struct char_data *) mob_index[mob_num].item)->armor);
 			send_to_char(buf, ch);
 			send_to_char("$3Valid Range$R: 100 to $B-$R2000\r\n", ch);
 			return eFAILURE;
@@ -3337,7 +3337,7 @@ int do_medit(struct char_data *ch, char *argument, int cmd) {
 			send_to_char("Value out of valid range.\r\n", ch);
 			return eFAILURE;
 		}
-		((char_data *) mob_index[mob_num].item)->armor = intval;
+		((struct char_data *) mob_index[mob_num].item)->armor = intval;
 		sprintf(buf, "Mob armorclass(ac) set to %d.\r\n", intval);
 		send_to_char(buf, ch);
 	}
@@ -3345,7 +3345,7 @@ int do_medit(struct char_data *ch, char *argument, int cmd) {
 
 		// stat
 	case 24: {
-		mob_stat(ch, (char_data *) mob_index[mob_num].item);
+		mob_stat(ch, (struct char_data *) mob_index[mob_num].item);
     return eSUCCESS;
 		break;
 	}
@@ -3355,7 +3355,7 @@ int do_medit(struct char_data *ch, char *argument, int cmd) {
 			send_to_char("$3Syntax$R: medit [mob_num] strength <str>\n\r"
 					"$3Current$R: ", ch);
 			sprintf(buf, "%d\n",
-					((char_data *) mob_index[mob_num].item)->raw_str);
+					((struct char_data *) mob_index[mob_num].item)->raw_str);
 			send_to_char(buf, ch);
 			send_to_char("$3Valid Range$R: 1 to 28\r\n", ch);
 			return eFAILURE;
@@ -3364,7 +3364,7 @@ int do_medit(struct char_data *ch, char *argument, int cmd) {
 			send_to_char("Value out of valid range.\r\n", ch);
 			return eFAILURE;
 		}
-		((char_data *) mob_index[mob_num].item)->raw_str = intval;
+		((struct char_data *) mob_index[mob_num].item)->raw_str = intval;
 		sprintf(buf, "Mob raw strength set to %d.\r\n", intval);
 		send_to_char(buf, ch);
 	}
@@ -3375,7 +3375,7 @@ int do_medit(struct char_data *ch, char *argument, int cmd) {
 			send_to_char("$3Syntax$R: medit [mob_num] dexterity <dex>\n\r"
 					"$3Current$R: ", ch);
 			sprintf(buf, "%d\n",
-					((char_data *) mob_index[mob_num].item)->raw_dex);
+					((struct char_data *) mob_index[mob_num].item)->raw_dex);
 			send_to_char(buf, ch);
 			send_to_char("$3Valid Range$R: 1 to 28\r\n", ch);
 			return eFAILURE;
@@ -3384,7 +3384,7 @@ int do_medit(struct char_data *ch, char *argument, int cmd) {
 			send_to_char("Value out of valid range.\r\n", ch);
 			return eFAILURE;
 		}
-		((char_data *) mob_index[mob_num].item)->raw_dex = intval;
+		((struct char_data *) mob_index[mob_num].item)->raw_dex = intval;
 		sprintf(buf, "Mob raw dexterity set to %d.\r\n", intval);
 		send_to_char(buf, ch);
 	}
@@ -3395,7 +3395,7 @@ int do_medit(struct char_data *ch, char *argument, int cmd) {
 			send_to_char("$3Syntax$R: medit [mob_num] intelligence <int>\n\r"
 					"$3Current$R: ", ch);
 			sprintf(buf, "%d\n",
-					((char_data *) mob_index[mob_num].item)->raw_intel);
+					((struct char_data *) mob_index[mob_num].item)->raw_intel);
 			send_to_char(buf, ch);
 			send_to_char("$3Valid Range$R: 1 to 28\r\n", ch);
 			return eFAILURE;
@@ -3404,7 +3404,7 @@ int do_medit(struct char_data *ch, char *argument, int cmd) {
 			send_to_char("Value out of valid range.\r\n", ch);
 			return eFAILURE;
 		}
-		((char_data *) mob_index[mob_num].item)->raw_intel = intval;
+		((struct char_data *) mob_index[mob_num].item)->raw_intel = intval;
 		sprintf(buf, "Mob raw intelligence set to %d.\r\n", intval);
 		send_to_char(buf, ch);
 	}
@@ -3415,7 +3415,7 @@ int do_medit(struct char_data *ch, char *argument, int cmd) {
 			send_to_char("$3Syntax$R: medit [mob_num] wisdom <wis>\n\r"
 					"$3Current$R: ", ch);
 			sprintf(buf, "%d\n",
-					((char_data *) mob_index[mob_num].item)->raw_wis);
+					((struct char_data *) mob_index[mob_num].item)->raw_wis);
 			send_to_char(buf, ch);
 			send_to_char("$3Valid Range$R: 1 to 28\r\n", ch);
 			return eFAILURE;
@@ -3424,7 +3424,7 @@ int do_medit(struct char_data *ch, char *argument, int cmd) {
 			send_to_char("Value out of valid range.\r\n", ch);
 			return eFAILURE;
 		}
-		((char_data *) mob_index[mob_num].item)->raw_wis = intval;
+		((struct char_data *) mob_index[mob_num].item)->raw_wis = intval;
 		sprintf(buf, "Mob raw wisdom set to %d.\r\n", intval);
 		send_to_char(buf, ch);
 	}
@@ -3435,7 +3435,7 @@ int do_medit(struct char_data *ch, char *argument, int cmd) {
 			send_to_char("$3Syntax$R: medit [mob_num] constitution <con>\n\r"
 					"$3Current$R: ", ch);
 			sprintf(buf, "%d\n",
-					((char_data *) mob_index[mob_num].item)->raw_con);
+					((struct char_data *) mob_index[mob_num].item)->raw_con);
 			send_to_char(buf, ch);
 			send_to_char("$3Valid Range$R: 1 to 28\r\n", ch);
 			return eFAILURE;
@@ -3444,7 +3444,7 @@ int do_medit(struct char_data *ch, char *argument, int cmd) {
 			send_to_char("Value out of valid range.\r\n", ch);
 			return eFAILURE;
 		}
-		((char_data *) mob_index[mob_num].item)->raw_con = intval;
+		((struct char_data *) mob_index[mob_num].item)->raw_con = intval;
 		sprintf(buf, "Mob raw constituion set to %d.\r\n", intval);
 		send_to_char(buf, ch);
 	}
@@ -3495,7 +3495,7 @@ int do_medit(struct char_data *ch, char *argument, int cmd) {
 			send_to_char("$3Syntax$R: medit [mob_vnum] type <type id>\n\r"
 					"$3Current$R: ", ch);
 			sprintf(buf, "%s\n",
-					mob_types[((char_data *) mob_index[mob_num].item)->mobdata->mob_flags.type]);
+					mob_types[((struct char_data *) mob_index[mob_num].item)->mobdata->mob_flags.type]);
 			send_to_char(buf, ch);
 			send_to_char("\r\n$3Valid types$R:\r\n", ch);
 			for (i = 0; *mob_types[i] != '\n'; i++) {
@@ -3510,7 +3510,7 @@ int do_medit(struct char_data *ch, char *argument, int cmd) {
 			send_to_char("Value out of valid range.\r\n", ch);
 			return eFAILURE;
 		}
-		((char_data *) mob_index[mob_num].item)->mobdata->mob_flags.type =
+		((struct char_data *) mob_index[mob_num].item)->mobdata->mob_flags.type =
 				(mob_type_t) intval;
 		sprintf(buf, "Mob type set to %d.\r\n", intval);
 		send_to_char(buf, ch);
@@ -3526,7 +3526,7 @@ int do_medit(struct char_data *ch, char *argument, int cmd) {
 			send_to_char("Please specify a valid number.\r\n", ch);
 			return eFAILURE;
 		}
-		((char_data *) mob_index[mob_num].item)->mobdata->mob_flags.value[0] = intval;
+		((struct char_data *) mob_index[mob_num].item)->mobdata->mob_flags.value[0] = intval;
 		sprintf(buf, "Mob value 1 set to %d.\r\n", intval);
 		send_to_char(buf, ch);
 	}
@@ -3542,7 +3542,7 @@ int do_medit(struct char_data *ch, char *argument, int cmd) {
 			send_to_char("Please specify a valid number.\r\n", ch);
 			return eFAILURE;
 		}
-		((char_data *) mob_index[mob_num].item)->mobdata->mob_flags.value[1] = intval;
+		((struct char_data *) mob_index[mob_num].item)->mobdata->mob_flags.value[1] = intval;
 		sprintf(buf, "Mob value 2 set to %d.\r\n", intval);
 		send_to_char(buf, ch);
 	}
@@ -3558,7 +3558,7 @@ int do_medit(struct char_data *ch, char *argument, int cmd) {
 			send_to_char("Please specify a valid number.\r\n", ch);
 			return eFAILURE;
 		}
-		((char_data *) mob_index[mob_num].item)->mobdata->mob_flags.value[2] = intval;
+		((struct char_data *) mob_index[mob_num].item)->mobdata->mob_flags.value[2] = intval;
 		sprintf(buf, "Mob value 3 set to %d.\r\n", intval);
 		send_to_char(buf, ch);
 	}
@@ -3574,7 +3574,7 @@ int do_medit(struct char_data *ch, char *argument, int cmd) {
 			send_to_char("Please specify a valid number.\r\n", ch);
 			return eFAILURE;
 		}
-		((char_data *) mob_index[mob_num].item)->mobdata->mob_flags.value[3] = intval;
+		((struct char_data *) mob_index[mob_num].item)->mobdata->mob_flags.value[3] = intval;
 		sprintf(buf, "Mob value 4 set to %d.\r\n", intval);
 		send_to_char(buf, ch);
 	}
@@ -3731,7 +3731,7 @@ int do_redit(struct char_data *ch, char *argument, int cmd)
             return eFAILURE;
           }
 
-          int16 destination_room = world[ch->in_room].dir_option[x]->to_room;
+          int16_t destination_room = world[ch->in_room].dir_option[x]->to_room;
           csendf(ch, "Deleting %s exit from room %d to %d.\r\n", dirs[x], ch->in_room, destination_room);
           free(world[ch->in_room].dir_option[x]);
           world[ch->in_room].dir_option[x] = nullptr;
@@ -4466,7 +4466,7 @@ int do_msave(struct char_data *ch, char *arg, int cmd)
   }
 
   for(int x = curr->firstnum; x <= curr->lastnum; x++) 
-     write_mobile((char_data *)mob_index[x].item, f);
+     write_mobile((struct char_data *)mob_index[x].item, f);
 
   // end file
   fprintf(f, "$~\n");
@@ -4885,7 +4885,7 @@ int do_rstat(struct char_data *ch, char *argument, int cmd)
 	      if (real_mobile(d->vnum) == -1)
 		csendf(ch, "UNKNOWN(%d)\r\n",d->vnum);
 		else
-  	      csendf(ch, "%s(%d)\r\n",((char_data*)mob_index[real_mobile(d->vnum)].item)->short_desc,d->vnum);
+  	      csendf(ch, "%s(%d)\r\n",((struct char_data*)mob_index[real_mobile(d->vnum)].item)->short_desc,d->vnum);
 	     a++;
 	    }
 	send_to_char("\r\n",ch);	
@@ -5174,7 +5174,7 @@ int do_setvote(struct char_data *ch, char *arg, int cmd)
 int do_punish(struct char_data *ch, char *arg, int cmd)
 {
    char name[100], buf[150];
-   char_data *vict;
+   struct char_data *vict;
 
    int i;
 

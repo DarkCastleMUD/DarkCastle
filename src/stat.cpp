@@ -56,9 +56,9 @@ class AreaData
 		AreaData();
 		~AreaData() {}
 		void GetAreaData(unsigned int zone, int mob, int64_t xps, int64_t gold);
-		void DisplaySingleArea(char_data *ch, int area);
-		void DisplayAreaData(char_data *ch);
-		void SortAreaData(char_data *ch, SortState state);
+		void DisplaySingleArea(struct char_data *ch, int area);
+		void DisplayAreaData(struct char_data *ch);
+		void SortAreaData(struct char_data *ch, SortState state);
 		void Load() {}
 		void Save() {}
 	private:
@@ -79,7 +79,7 @@ bool CompareAreaGoldStats( AreaStats first, AreaStats second)
 	return first.gold > second.gold;
 }
 
-void AreaData::SortAreaData(char_data *ch, SortState state)
+void AreaData::SortAreaData(struct char_data *ch, SortState state)
 {
 	list<AreaStats> lAreaStats;
 	map<unsigned int,AreaStats>::iterator it;
@@ -124,14 +124,14 @@ void AreaData::SortAreaData(char_data *ch, SortState state)
 	return;	
 }
 
-void AreaData::DisplaySingleArea(char_data *ch, int area)
+void AreaData::DisplaySingleArea(struct char_data *ch, int area)
 {
 	
 	char buf[MAX_STRING_LENGTH];
 	string output_buf;
 	vector<MobKills>::iterator mobs;
-	char_data *get_mob_vnum(int vnum);
-	char_data *tmpchar;
+	struct char_data *get_mob_vnum(int vnum);
+	struct char_data *tmpchar;
 
 	if( (area <0) || (area > top_of_zone_table))
 	{
@@ -158,7 +158,7 @@ void AreaData::DisplaySingleArea(char_data *ch, int area)
 	page_string(ch->desc, output_buf.c_str(), 1);
 	return;	
 }
-void AreaData::DisplayAreaData(char_data *ch) 
+void AreaData::DisplayAreaData(struct char_data *ch) 
 {
 	int i;
 	char buf[MAX_STRING_LENGTH];
@@ -209,7 +209,7 @@ void AreaData::GetAreaData(unsigned int zone, int mob, int64_t xps, int64_t gold
 
 AreaData areaData;
 
-int do_areastats(char_data *ch, char *argument, int cmd)
+int do_areastats(struct char_data *ch, char *argument, int cmd)
 {
 	char buf[MAX_STRING_LENGTH];
 

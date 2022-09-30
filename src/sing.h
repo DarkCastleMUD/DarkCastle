@@ -8,20 +8,20 @@
 #ifndef SING_H_
 #define SING_H_
 
-#include "structs.h" // ubyte, ubyte, etc..
+#include "structs.h" // uint8_t, uint8_t, etc..
 
 #define BARD_MAX_RATING 3
 
-typedef int	SING_FUN		( ubyte level, char_data *ch, char *arg, char_data *victim, int skill);
+typedef int	SING_FUN		( uint8_t level, struct char_data *ch, char *arg, struct char_data *victim, int skill);
 
 struct song_info_type
 {
-	ubyte beats;	/* Waiting time after ki */
-	ubyte minimum_position; /* min position for use */
-	ubyte min_useski;	/* minimum ki used */
-        int16 skill_num;       /* skill number of the song */
-	int16 targets;		/* Legal targets */
-        int16 rating;		/* Rating for orchestrate */
+	uint8_t beats;	/* Waiting time after ki */
+	uint8_t minimum_position; /* min position for use */
+	uint8_t min_useski;	/* minimum ki used */
+        int16_t skill_num;       /* skill number of the song */
+	int16_t targets;		/* Legal targets */
+        int16_t rating;		/* Rating for orchestrate */
 	SING_FUN *song_pointer;	/* function to call */
         SING_FUN *exec_pointer; /* other function to call */
         SING_FUN *song_pulse;    /* other other function to call */
@@ -31,8 +31,8 @@ struct song_info_type
 
 struct songInfo
 {
-	int16 song_timer; /* status for songs being sung */
-	int16 song_number; /* number of song being sung */
+	int16_t song_timer; /* status for songs being sung */
+	int16_t song_number; /* number of song being sung */
 	char * song_data; 
 };
 
@@ -41,7 +41,7 @@ struct songInfo
 */
 
 char * skip_spaces(char *string);
-void stop_grouped_bards(char_data *ch, int action);
+void stop_grouped_bards(struct char_data *ch, int action);
 
 SING_FUN song_whistle_sharp;
 SING_FUN song_disrupt;

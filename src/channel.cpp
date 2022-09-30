@@ -32,14 +32,14 @@ using namespace std;
 
 class channel_msg {
 public:
-  channel_msg(const char_data *sender, const int32_t type, const char *msg) 
+  channel_msg(const struct char_data *sender, const int32_t type, const char *msg) 
     : type(type), msg(string(msg))
   { 
     set_wizinvis(sender);
     set_name(sender);
   }
 
-  channel_msg(const char_data *sender, const int32_t type, const string &msg) 
+  channel_msg(const struct char_data *sender, const int32_t type, const string &msg) 
     : type(type), msg(msg)
   { 
     set_wizinvis(sender);
@@ -65,7 +65,7 @@ public:
     return output.str();
   }
 
-  inline void set_wizinvis(const char_data *sender) {
+  inline void set_wizinvis(const struct char_data *sender) {
     if (sender && IS_PC(sender)) {
       wizinvis = sender->pcdata->wizinvis;
     } else {
@@ -73,7 +73,7 @@ public:
     }
   }
 
-  inline void set_name(const char_data *sender) {
+  inline void set_name(const struct char_data *sender) {
     if (sender) {
       name = string(GET_SHORT(sender));
     } else {
@@ -98,7 +98,7 @@ extern CWorld world;
 extern struct descriptor_data *descriptor_list;
 extern struct index_data *obj_index;
 
-command_return_t do_say(char_data *ch, string argument, int cmd)
+command_return_t do_say(struct char_data *ch, string argument, int cmd)
 {
   int i;
   string buf;
@@ -118,7 +118,7 @@ command_return_t do_say(char_data *ch, string argument, int cmd)
     return eSUCCESS;
   }
 
-  OBJ_DATA *tmp_obj;
+  obj_data *tmp_obj;
   for (tmp_obj = world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
     if (obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER)
     {
@@ -173,7 +173,7 @@ command_return_t do_say(char_data *ch, string argument, int cmd)
 command_return_t do_psay(struct char_data *ch, string argument, int cmd)
 {
    string vict = {}, message = {}, buf = {};
-   char_data* victim = nullptr;
+   struct char_data* victim = nullptr;
    extern bool MOBtrigger;
 
    if (IS_PC(ch) && IS_SET(ch->pcdata->punish, PUNISH_STUPID)) {
@@ -186,7 +186,7 @@ command_return_t do_psay(struct char_data *ch, string argument, int cmd)
       return eSUCCESS;
    }
 
-   OBJ_DATA *tmp_obj = nullptr;
+   obj_data *tmp_obj = nullptr;
    for(tmp_obj = world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
     if(tmp_obj && tmp_obj->item_number >= 0 && obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER) {
        send_to_char("The magical silence prevents you from speaking!\n\r", ch);
@@ -290,7 +290,7 @@ int do_gossip(struct char_data *ch, char *argument, int cmd)
 {
     char buf2[MAX_STRING_LENGTH];
     struct descriptor_data *i;
-    OBJ_DATA *tmp_obj;
+    obj_data *tmp_obj;
     bool silence = false;
 
     if (IS_SET(world[ch->in_room].room_flags, QUIET)) {
@@ -384,7 +384,7 @@ int do_auction(struct char_data *ch, char *argument, int cmd)
     char buf1[MAX_STRING_LENGTH];
     char buf2[MAX_STRING_LENGTH];
     struct descriptor_data *i;
-    OBJ_DATA *tmp_obj;
+    obj_data *tmp_obj;
     bool silence = false;
 
    if(IS_SET(world[ch->in_room].room_flags, QUIET)) {
@@ -466,7 +466,7 @@ int do_shout(struct char_data *ch, char *argument, int cmd)
     char buf1[MAX_STRING_LENGTH];
     char buf2[MAX_STRING_LENGTH];
     struct descriptor_data *i;
-    OBJ_DATA *tmp_obj;
+    obj_data *tmp_obj;
     bool silence = false;
 
     if(IS_SET(world[ch->in_room].room_flags, QUIET)) {
@@ -531,7 +531,7 @@ int do_trivia(struct char_data *ch, char *argument, int cmd)
   char buf1[MAX_STRING_LENGTH];
   char buf2[MAX_STRING_LENGTH];
   struct descriptor_data *i;
-  OBJ_DATA *tmp_obj;
+  obj_data *tmp_obj;
   bool silence = false;
 
   if (IS_SET(world[ch->in_room].room_flags, QUIET)) {
@@ -680,7 +680,7 @@ int do_dream(struct char_data *ch, char *argument, int cmd)
     return eSUCCESS;
 }
 
-command_return_t do_tellhistory(char_data *ch, string argument, int cmd)
+command_return_t do_tellhistory(struct char_data *ch, string argument, int cmd)
 {
   if (ch == nullptr)
   {
@@ -722,9 +722,9 @@ command_return_t do_tellhistory(char_data *ch, string argument, int cmd)
   return eSUCCESS;
 }
 
-command_return_t do_tell(char_data *ch, string argument, int cmd)
+command_return_t do_tell(struct char_data *ch, string argument, int cmd)
 {
-  char_data *vict = nullptr;
+  struct char_data *vict = nullptr;
   string name = {}, message = {}, buf = {}, log_buf = {};
   obj_data *tmp_obj = nullptr;
 
@@ -934,10 +934,10 @@ command_return_t do_tell(char_data *ch, string argument, int cmd)
   return eSUCCESS;
 }
 
-command_return_t do_reply(char_data *ch, string argument, int cmd)
+command_return_t do_reply(struct char_data *ch, string argument, int cmd)
 {
   string buf = {};
-  char_data *vict = nullptr;
+  struct char_data *vict = nullptr;
 
   if (IS_MOB(ch) || ch->pcdata->last_tell.empty())
   {
@@ -945,7 +945,7 @@ command_return_t do_reply(char_data *ch, string argument, int cmd)
     return eSUCCESS;
   }
 
-  OBJ_DATA *tmp_obj;
+  obj_data *tmp_obj;
   for (tmp_obj = world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
     if (obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER)
     {
@@ -981,7 +981,7 @@ int do_whisper(struct char_data *ch, char *argument, int cmd)
   char name[MAX_INPUT_LENGTH + 1], message[MAX_STRING_LENGTH],
       buf[MAX_STRING_LENGTH];
 
-  OBJ_DATA *tmp_obj;
+  obj_data *tmp_obj;
   for (tmp_obj = world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
     if (obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER)
     {
@@ -1026,7 +1026,7 @@ int do_ask(struct char_data *ch, char *argument, int cmd)
   struct char_data *vict;
   char name[MAX_INPUT_LENGTH + 1], message[MAX_INPUT_LENGTH + 1], buf[MAX_STRING_LENGTH];
 
-  OBJ_DATA *tmp_obj;
+  obj_data *tmp_obj;
   for (tmp_obj = world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
     if (obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER)
     {
@@ -1071,7 +1071,7 @@ int do_grouptell(struct char_data *ch, char *argument, int cmd)
   char buf[MAX_STRING_LENGTH];
   struct char_data *k;
   struct follow_type *f;
-  OBJ_DATA *tmp_obj;
+  obj_data *tmp_obj;
   bool silence = false;
 
   if (ch == nullptr || ch->pcdata == nullptr)
@@ -1167,7 +1167,7 @@ int do_newbie(struct char_data *ch, char *argument, int cmd)
     char buf1[MAX_STRING_LENGTH];
     char buf2[MAX_STRING_LENGTH];
     struct descriptor_data *i;
-    OBJ_DATA *tmp_obj;
+    obj_data *tmp_obj;
     bool silence = false;
 
     if (IS_SET(world[ch->in_room].room_flags, QUIET)) {
@@ -1239,7 +1239,7 @@ int do_newbie(struct char_data *ch, char *argument, int cmd)
     return eSUCCESS;
 }
 
-void char_data::tell_history(char_data *ch, string message)
+void char_data::tell_history(struct char_data *ch, string message)
 {
   if (this->pcdata == nullptr)
   {
@@ -1261,7 +1261,7 @@ void char_data::tell_history(char_data *ch, string message)
 }
 
 
-void char_data::gtell_history(char_data *ch, string message)
+void char_data::gtell_history(struct char_data *ch, string message)
 {
   if (this->pcdata == nullptr)
   {
@@ -1282,7 +1282,7 @@ void char_data::gtell_history(char_data *ch, string message)
   }
 }
 
-communication::communication(char_data *ch, string message)
+communication::communication(struct char_data *ch, string message)
 {
   this->sender = GET_NAME(ch);
   this->sender_ispc = IS_PC(ch);

@@ -537,7 +537,7 @@ int do_nohassle (struct char_data *ch, char *argument, int cmd)
 
 // cmd == 9 - imm
 // cmd == 8 - /
-command_return_t do_wiz(char_data *ch, string argument, int cmd)
+command_return_t do_wiz(struct char_data *ch, string argument, int cmd)
 {
   string buf1 = {};
   descriptor_data *i = nullptr;
@@ -627,7 +627,7 @@ command_return_t do_wiz(char_data *ch, string argument, int cmd)
   return eSUCCESS;
 }
 
-int do_findfix(char_data *ch, char *argument, int cmd)
+int do_findfix(struct char_data *ch, char *argument, int cmd)
 {
   int i, j, z;
 
@@ -675,11 +675,11 @@ int do_findfix(char_data *ch, char *argument, int cmd)
 }
 
 
-int do_varstat(char_data *ch, char *argument, int cmd)
+int do_varstat(struct char_data *ch, char *argument, int cmd)
 {
     char arg[MAX_INPUT_LENGTH];
     argument = one_argument(argument, arg);
-    char_data *vict;
+    struct char_data *vict;
 
     if ( ( vict = get_char_vis(ch, arg) ) == NULL )
     {

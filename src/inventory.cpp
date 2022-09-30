@@ -138,7 +138,7 @@ void get(struct char_data *ch, struct obj_data *obj_object, struct obj_data *sub
 		    sub_object->name,
 		    obj_index[sub_object->item_number].virt);
 	    log(log_buf, 110, LOG_OBJECTS);
- 	    for(OBJ_DATA *loop_obj = obj_object->contains; loop_obj; loop_obj = loop_obj->next_content)
+ 	    for(obj_data *loop_obj = obj_object->contains; loop_obj; loop_obj = loop_obj->next_content)
               logf(IMP, LOG_OBJECTS, "The %s[%d] contained %s[%d]",
                           obj_object->short_description,
 		          obj_index[obj_object->item_number].virt,
@@ -163,7 +163,7 @@ void get(struct char_data *ch, struct obj_data *obj_object, struct obj_data *sub
             sprintf(log_buf, "%s gets %s[%d] from room %d", GET_NAME(ch), obj_object->name, obj_index[obj_object->item_number].virt,
                 ch->in_room);
             log(log_buf, IMP, LOG_OBJECTS);
-            for(OBJ_DATA *loop_obj = obj_object->contains; loop_obj; loop_obj = loop_obj->next_content)
+            for(obj_data *loop_obj = obj_object->contains; loop_obj; loop_obj = loop_obj->next_content)
               logf(IMP, LOG_OBJECTS, "The %s contained %s[%d]",
                           obj_object->short_description,
                           loop_obj->short_description,
@@ -1033,7 +1033,7 @@ int do_consent(struct char_data *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-int contents_cause_unique_problem(obj_data * obj, char_data * vict)
+int contents_cause_unique_problem(obj_data * obj, struct char_data * vict)
 {
   int lastnum = -1;
 
@@ -1106,7 +1106,7 @@ int do_drop(struct char_data *ch, char *argument, int cmd)
       send_to_char("Sorry, you can't do that!\r\n",ch);
       return eFAILURE;
     }
-    if(GET_GOLD(ch) < (uint32)amount) {
+    if(GET_GOLD(ch) < (uint32_t)amount) {
       send_to_char("You haven't got that many coins!\r\n",ch);
       return eFAILURE;
     }
@@ -1166,7 +1166,7 @@ int do_drop(struct char_data *ch, char *argument, int cmd)
             {
               sprintf(log_buf, "%s drops %s[%d] in room %d", GET_NAME(ch), tmp_object->name, obj_index[tmp_object->item_number].virt,ch->in_room);
               log(log_buf, IMP, LOG_OBJECTS);
-              for(OBJ_DATA *loop_obj = tmp_object->contains; loop_obj; loop_obj = loop_obj->next_content)
+              for(obj_data *loop_obj = tmp_object->contains; loop_obj; loop_obj = loop_obj->next_content)
                 logf(IMP, LOG_OBJECTS, "The %s contained %s[%d]",
                           tmp_object->short_description,
                           loop_obj->short_description,
@@ -1224,7 +1224,7 @@ int do_drop(struct char_data *ch, char *argument, int cmd)
           {
             sprintf(log_buf, "%s drops %s[%d] in room %d", GET_NAME(ch), tmp_object->name, obj_index[tmp_object->item_number].virt,ch->in_room);
             log(log_buf, IMP, LOG_OBJECTS);
-            for(OBJ_DATA *loop_obj = tmp_object->contains; loop_obj; loop_obj = loop_obj->next_content)
+            for(obj_data *loop_obj = tmp_object->contains; loop_obj; loop_obj = loop_obj->next_content)
               logf(IMP, LOG_OBJECTS, "The %s contained %s[%d]",
                           tmp_object->short_description,
                           loop_obj->short_description,
@@ -1509,7 +1509,7 @@ int do_put(struct char_data *ch, char *argument, int cmd)
   return eFAILURE;
 }
 
-void do_givealldot(char_data *ch, char *name, char *target, int cmd)
+void do_givealldot(struct char_data *ch, char *name, char *target, int cmd)
 {
   struct obj_data *tmp_object;
   struct obj_data *next_object;
@@ -1816,7 +1816,7 @@ int do_give(struct char_data *ch, char *argument, int cmd)
     sprintf(buf, "%s gives %s to %s", GET_NAME(ch), obj->name,
                 GET_NAME(vict));
     log(buf, IMP, LOG_OBJECTS);
-    for(OBJ_DATA *loop_obj = obj->contains; loop_obj; loop_obj = loop_obj->next_content)
+    for(obj_data *loop_obj = obj->contains; loop_obj; loop_obj = loop_obj->next_content)
               logf(IMP, LOG_OBJECTS, "The %s[%d] contained %s[%d]", 
                           obj->short_description,
 		          obj_index[obj->item_number].virt,
@@ -1836,7 +1836,7 @@ int do_give(struct char_data *ch, char *argument, int cmd)
     // otherwise it defeats the purpose of no_trade:)
 
     retval = mprog_give_trigger( vict, ch, obj );
-bool objExists(OBJ_DATA *obj);
+bool objExists(obj_data *obj);
     if(!IS_SET(retval, eEXTRA_VALUE) && IS_SET(obj->obj_flags.more_flags, ITEM_NO_TRADE) && IS_NPC(vict) && 
 		objExists(obj))
        extract_obj(obj);
@@ -1851,7 +1851,7 @@ bool objExists(OBJ_DATA *obj);
 
 // Find an item on a character (in inv, or containers in inv (NOT WORN!))
 // and try to put it in his inv.  If sucessful, return pointer to the item.
-struct obj_data * bring_type_to_front(char_data * ch, int item_type)
+struct obj_data * bring_type_to_front(struct char_data * ch, int item_type)
 {
   struct obj_data *item_carried = NULL;
   struct obj_data *container_item = NULL;
@@ -1887,7 +1887,7 @@ struct obj_data * bring_type_to_front(char_data * ch, int item_type)
 }
 
 // Find an item on a character
-struct obj_data * search_char_for_item(char_data * ch, int16 item_number, bool wearonly)
+struct obj_data * search_char_for_item(struct char_data * ch, int16_t item_number, bool wearonly)
 {
   struct obj_data *i = NULL;
   struct obj_data *j = NULL;
@@ -1923,7 +1923,7 @@ struct obj_data * search_char_for_item(char_data * ch, int16 item_number, bool w
 }
 
 // Find out how many of an item exists on character
-int search_char_for_item_count(char_data * ch, int16 item_number, bool wearonly)
+int search_char_for_item_count(struct char_data * ch, int16_t item_number, bool wearonly)
 {
   struct obj_data *i = NULL;
   struct obj_data *j = NULL;
@@ -2006,7 +2006,7 @@ bool search_container_for_vnum(obj_data *obj, int vnum)
   return false;
 }
 
-int find_door(char_data *ch, char *type, char *dir)
+int find_door(struct char_data *ch, char *type, char *dir)
 {
     int door;
     const char *dirs[] =
@@ -2059,7 +2059,7 @@ int find_door(char_data *ch, char *type, char *dir)
 in_room == exit->in_room
 
 */
-bool is_bracing(char_data *bracee, struct room_direction_data *exit)
+bool is_bracing(struct char_data *bracee, struct room_direction_data *exit)
 {
   //this could happen on a repop of the zone
   if(!IS_SET(exit->exit_info, EX_CLOSED))
@@ -2090,17 +2090,17 @@ bool is_bracing(char_data *bracee, struct room_direction_data *exit)
   return false;
 }
 
-int do_open(char_data *ch, char *argument, int cmd)
+int do_open(struct char_data *ch, char *argument, int cmd)
 {
   bool found = false;
    int door, other_room, retval;
    char type[MAX_INPUT_LENGTH], dir[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
    struct room_direction_data *back;
    struct obj_data *obj;
-   char_data *victim;
-   char_data *next_vict;
+   struct char_data *victim;
+   struct char_data *next_vict;
             
-   int do_fall(char_data *ch, short dir);
+   int do_fall(struct char_data *ch, short dir);
             
    retval = 0;
          
@@ -2242,14 +2242,14 @@ int do_open(char_data *ch, char *argument, int cmd)
    return eSUCCESS;
 }
 
-int do_close(char_data *ch, char *argument, int cmd)
+int do_close(struct char_data *ch, char *argument, int cmd)
 {
   bool found = false;
    int door, other_room;
    char type[MAX_INPUT_LENGTH], dir[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
    struct room_direction_data *back;
    struct obj_data *obj;
-   char_data *victim;   
+   struct char_data *victim;   
     
    argument_interpreter(argument, type, dir);
     
@@ -2316,7 +2316,7 @@ int do_close(char_data *ch, char *argument, int cmd)
    return eSUCCESS;
 }
 
-bool has_key(char_data *ch, int key)
+bool has_key(struct char_data *ch, int key)
 {
  //if key vnum is 0, there is no key
   if (key == 0)
@@ -2349,13 +2349,13 @@ bool has_key(char_data *ch, int key)
   return false;
 }
 
-int do_lock(char_data *ch, char *argument, int cmd)
+int do_lock(struct char_data *ch, char *argument, int cmd)
 {
     int door, other_room;
     char type[MAX_INPUT_LENGTH], dir[MAX_INPUT_LENGTH];
     struct room_direction_data *back;
     struct obj_data *obj;
-    char_data *victim;   
+    struct char_data *victim;   
     
     argument_interpreter(argument, type, dir);
     
@@ -2421,13 +2421,13 @@ int do_lock(char_data *ch, char *argument, int cmd)
 }
  
  
-int do_unlock(char_data *ch, char *argument, int cmd)
+int do_unlock(struct char_data *ch, char *argument, int cmd)
 {
     int door, other_room;
     char type[MAX_INPUT_LENGTH], dir[MAX_INPUT_LENGTH];
     struct room_direction_data *back;
     struct obj_data *obj;
-    char_data *victim;   
+    struct char_data *victim;   
     
     argument_interpreter(argument, type, dir);
     
@@ -2493,7 +2493,7 @@ int do_unlock(char_data *ch, char *argument, int cmd)
     return eSUCCESS;
 }
 
-int palm(char_data *ch, struct obj_data *obj_object, struct obj_data *sub_object, bool has_consent)
+int palm(struct char_data *ch, struct obj_data *obj_object, struct obj_data *sub_object, bool has_consent)
 {
   char buffer[MAX_STRING_LENGTH];
 
@@ -2589,7 +2589,7 @@ int palm(char_data *ch, struct obj_data *obj_object, struct obj_data *sub_object
     sprintf(log_buf, "%s palms %s[%d] from %s", GET_NAME(ch), obj_object->name, obj_index[obj_object->item_number].virt,
             sub_object->name);
     log(log_buf, IMP, LOG_OBJECTS);
-    for (OBJ_DATA *loop_obj = obj_object->contains; loop_obj; loop_obj = loop_obj->next_content)
+    for (obj_data *loop_obj = obj_object->contains; loop_obj; loop_obj = loop_obj->next_content)
       logf(IMP, LOG_OBJECTS, "The %s contained %s[%d]", obj_object->short_description, loop_obj->short_description,
            obj_index[loop_obj->item_number].virt);
   }
@@ -2598,7 +2598,7 @@ int palm(char_data *ch, struct obj_data *obj_object, struct obj_data *sub_object
     sprintf(log_buf, "%s palms %s[%d] from room %d", GET_NAME(ch), obj_object->name, obj_index[obj_object->item_number].virt,
             ch->in_room);
     log(log_buf, IMP, LOG_OBJECTS);
-    for (OBJ_DATA *loop_obj = obj_object->contains; loop_obj; loop_obj = loop_obj->next_content)
+    for (obj_data *loop_obj = obj_object->contains; loop_obj; loop_obj = loop_obj->next_content)
       logf(IMP, LOG_OBJECTS, "The %s contained %s[%d]", obj_object->short_description, loop_obj->short_description,
            obj_index[loop_obj->item_number].virt);
   }

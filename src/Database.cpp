@@ -115,7 +115,7 @@ int Database::createPlayerID(char *name)
   return player_id;         
 }
 
-void Database::save(char_data *ch, char_file_u4 *st)
+void Database::save(struct char_data *ch, char_file_u4 *st)
 {
   if (ch == 0 || st == 0 || IS_NPC(ch))
     return;
@@ -149,9 +149,9 @@ void Database::save(char_data *ch, char_file_u4 *st)
   p.addCol("conditions_2", st->conditions[2]); 
   p.addCol("weight", st->weight);
 /*
-  p.addCol(ubyte height;
+  p.addCol(uint8_t height;
 
-    int16 hometown;
+    int16_t hometown;
     uint32_t gold;
     uint32_t plat;
     int64_t exp;
@@ -168,19 +168,19 @@ void Database::save(char_data *ch, char_file_u4 *st)
     int32_t ki;
     int32_t raw_ki;
 
-    int16 alignment;
+    int16_t alignment;
    uint32_t hpmetas; // Used by familiars too... why not.
    uint32_t manametas;
    uint32_t movemetas;
 
-    int16 armor;       // have to save these since mobs have different bases
-    int16 hitroll;
-    int16 damroll;
+    int16_t armor;       // have to save these since mobs have different bases
+    int16_t hitroll;
+    int16_t damroll;
     int32_t afected_by;
     int32_t afected_by2;
     uint32_t misc;          // channel flags
 
-    int16 clan; 
+    int16_t clan; 
     int32_t load_room;                  // Which room to place char in
 
     int32_t extra_ints[5];             // available just in case
@@ -214,7 +214,7 @@ void Database::save(char_data *ch, char_file_u4 *st)
   }  
 }
 
-char_data *Database::load(void)
+struct char_data *Database::load(void)
 {
 
   return 0;

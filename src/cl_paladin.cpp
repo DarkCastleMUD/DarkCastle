@@ -196,7 +196,7 @@ int do_behead(struct char_data *ch, char *argument, int cmd)
   int chance = 0;
   int retval = eSUCCESS;
   char buf[MAX_STRING_LENGTH];
-  char_data *vict;
+  struct char_data *vict;
   extern struct index_data *obj_index;
   
   one_argument(argument, buf);

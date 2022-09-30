@@ -39,10 +39,10 @@ using namespace std;
 
 extern struct obj_data *object_list;
 extern struct index_data *obj_index;
-extern int class_restricted(char_data *ch, struct obj_data *obj);
-extern int size_restricted(char_data *ch, struct obj_data *obj);
+extern int class_restricted(struct char_data *ch, struct obj_data *obj);
+extern int size_restricted(struct char_data *ch, struct obj_data *obj);
 
-void repair_shop_fix_eq(char_data * ch, char_data * owner, int price, obj_data * obj) {
+void repair_shop_fix_eq(struct char_data * ch, struct char_data * owner, int price, obj_data * obj) {
 	char buf[256];
 
 	GET_GOLD(ch) -= price;
@@ -56,7 +56,7 @@ void repair_shop_fix_eq(char_data * ch, char_data * owner, int price, obj_data *
 	act("$N gives $n $p.", ch, obj, owner, TO_ROOM, INVIS_NULL);
 }
 
-void repair_shop_complain_no_cash(char_data * ch, char_data * owner, int price, obj_data * obj) {
+void repair_shop_complain_no_cash(struct char_data * ch, struct char_data * owner, int price, obj_data * obj) {
 	char buf[256];
 
 	do_say(owner, "Trying to sucker me for a free repair job?", 9);
@@ -66,7 +66,7 @@ void repair_shop_complain_no_cash(char_data * ch, char_data * owner, int price, 
 	act("$N gives $n $p.", ch, obj, owner, TO_ROOM, INVIS_NULL);
 }
 
-void repair_shop_price_check(char_data * ch, char_data * owner, int price, obj_data * obj) {
+void repair_shop_price_check(struct char_data * ch, struct char_data * owner, int price, obj_data * obj) {
 	char buf[256];
 
 	sprintf(buf, "It will only cost you %d coins to repair %s.'", price, obj->short_description);
@@ -136,7 +136,7 @@ int repair_guy(struct char_data *ch, struct obj_data *obj, int cmd, const char *
 		return eSUCCESS;
 	}
 
-	if (GET_GOLD(ch) < (uint32) price) {
+	if (GET_GOLD(ch) < (uint32_t) price) {
 		repair_shop_complain_no_cash(ch, owner, price, obj);
 		return eSUCCESS;
 	}
@@ -221,7 +221,7 @@ int super_repair_guy(struct char_data *ch, struct obj_data *obj, int cmd, const 
 		return eSUCCESS;
 	}
 
-	if (GET_GOLD(ch) < (uint32) price) {
+	if (GET_GOLD(ch) < (uint32_t) price) {
 		repair_shop_complain_no_cash(ch, owner, price, obj);
 		return eSUCCESS;
 	} else {
@@ -314,7 +314,7 @@ int repair_shop(struct char_data *ch, struct obj_data *obj, int cmd, const char 
 		return eSUCCESS;
 	}
 
-	if (GET_GOLD(ch) < (uint32) price) {
+	if (GET_GOLD(ch) < (uint32_t) price) {
 		repair_shop_complain_no_cash(ch, owner, price, obj);
 		return eSUCCESS;
 	} else {
@@ -323,7 +323,7 @@ int repair_shop(struct char_data *ch, struct obj_data *obj, int cmd, const char 
 	}
 }
 
-int corpse_cost(char_data * ch) {
+int corpse_cost(struct char_data * ch) {
 	int cost = 0;
 	obj_data * curr_cont;
 
@@ -439,7 +439,7 @@ int mortician(struct char_data *ch, struct obj_data *obj, int cmd, const char *a
 		cost = corpse_cost(obj);
 		cost /= 20000;
 		cost = MAX(cost, 30);
-		if (GET_PLATINUM(ch) < (uint32) cost) {
+		if (GET_PLATINUM(ch) < (uint32_t) cost) {
 			send_to_char("You can't afford that!\n\r", ch);
 			return eSUCCESS;
 		}
@@ -457,7 +457,7 @@ int mortician(struct char_data *ch, struct obj_data *obj, int cmd, const char *a
 	return eSUCCESS;
 }
 
-char *gl_item(OBJ_DATA *obj, int number, char_data *ch, bool platinum = TRUE)
+char *gl_item(obj_data *obj, int number, struct char_data *ch, bool platinum = TRUE)
 {
 	string buf = {}, buf2 = {}, buf3 = {};
 	size_t length = {};
@@ -637,7 +637,7 @@ int godload_sales(struct char_data *ch, struct obj_data *obj, int cmd, const cha
 		sprintf(buf, "%s Here's what I can do for you, %s.", GET_NAME(ch), pc_clss_types3[GET_CLASS(ch)]);
 		do_tell(owner, buf, 0);
 		for (int z = 0; z < 13 && platsmith_list[o].sales[z] != 0; z++) {
-			char *tmp = gl_item((OBJ_DATA*) obj_index[real_object(platsmith_list[o].sales[z])].item, z, ch);
+			char *tmp = gl_item((obj_data*) obj_index[real_object(platsmith_list[o].sales[z])].item, z, ch);
 			send_to_char(tmp, ch);
 			dc_free(tmp);
 		}
@@ -692,7 +692,7 @@ int godload_sales(struct char_data *ch, struct obj_data *obj, int cmd, const cha
 		do_tell(owner, buf, 0);
 		return eSUCCESS;
 	} else if (cmd == 57) {
-		OBJ_DATA *obj;
+		obj_data *obj;
 		char arg2[MAX_INPUT_LENGTH];
 		one_argument(arg, arg2);
 		obj = get_obj_in_list_vis(ch, arg2, ch->carrying);
@@ -814,7 +814,7 @@ int gl_repair_shop(struct char_data *ch, struct obj_data *obj, int cmd, const ch
 		return eSUCCESS;
 	}
 
-	if (GET_GOLD(ch) < (uint32) price) {
+	if (GET_GOLD(ch) < (uint32_t) price) {
 		repair_shop_complain_no_cash(ch, owner, price, obj);
 		return eSUCCESS;
 	} else {

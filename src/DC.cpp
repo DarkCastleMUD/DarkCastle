@@ -43,7 +43,7 @@ void DC::removeDead(void) {
 }
 
 void DC::handleShooting(void) {
-	unordered_set<char_data *> remove_list;
+	unordered_set<struct char_data *> remove_list;
 
 	for (auto &ch : shooting_list) {
 		// ignore the dead

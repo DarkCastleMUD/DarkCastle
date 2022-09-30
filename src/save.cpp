@@ -52,10 +52,10 @@ using namespace std;
 extern struct index_data *obj_index;
 extern CWorld world;
 
-struct obj_data * obj_store_to_char( char_data *ch, FILE *fpsave, struct obj_data * last_cont );
-bool put_obj_in_store( struct obj_data *obj, char_data *ch, FILE *fpsave, int wear_pos);
+struct obj_data * obj_store_to_char( struct char_data *ch, FILE *fpsave, struct obj_data * last_cont );
+bool put_obj_in_store( struct obj_data *obj, struct char_data *ch, FILE *fpsave, int wear_pos);
 void restore_weight(struct obj_data *obj);
-void store_to_char(struct char_file_u4 *st, char_data *ch);
+void store_to_char(struct char_file_u4 *st, struct char_data *ch);
 char *fread_alias_string(FILE *fpsave);
 
 // return 1 on success
@@ -154,7 +154,7 @@ char *fread_alias_string(FILE *fpsave)
 
 void fwrite_var_string(const char * string, FILE * fpsave)
 {
-   uint16 tmp_size;
+   uint16_t tmp_size;
 
    if(string) {
      tmp_size = strlen(string);
@@ -170,7 +170,7 @@ void fwrite_var_string(const char * string, FILE * fpsave)
 
 char *fread_var_string(FILE *fpsave)
 {
-  uint16 tmp_size = 0;
+  uint16_t tmp_size = 0;
   char *tmp_str = nullptr;
 
   size_t records_read = fread(&tmp_size, sizeof(tmp_size), 1, fpsave);
@@ -543,7 +543,7 @@ void read_pc_data(struct char_data *ch, FILE* fpsave)
   // at this point, typeflag should = "STP", and we're done reading mob data
 }
 
-int save_pc_or_mob_data(char_data *ch, FILE * fpsave, struct time_data tmpage)
+int save_pc_or_mob_data(struct char_data *ch, FILE * fpsave, struct time_data tmpage)
 {
   if(IS_MOB(ch))
     save_mob_data(ch->mobdata, fpsave);
@@ -553,7 +553,7 @@ int save_pc_or_mob_data(char_data *ch, FILE * fpsave, struct time_data tmpage)
   return 1;
 }
 
-int read_pc_or_mob_data(char_data *ch, FILE *fpsave)
+int read_pc_or_mob_data(struct char_data *ch, FILE *fpsave)
 {
   if(IS_MOB(ch)) {
     ch->pcdata = NULL;
@@ -574,7 +574,7 @@ int read_pc_or_mob_data(char_data *ch, FILE *fpsave)
 
 // return 1 on success
 // return 0 on failure
-int store_worn_eq(char_data * ch, FILE * fpsave)
+int store_worn_eq(struct char_data * ch, FILE * fpsave)
 {
   int wear_pos = -1;
   int iWear = 0;
@@ -591,7 +591,7 @@ int store_worn_eq(char_data * ch, FILE * fpsave)
   return 1;
 }
 
-int char_to_store_variable_data(char_data * ch, FILE * fpsave)
+int char_to_store_variable_data(struct char_data * ch, FILE * fpsave)
 {
   fwrite_var_string(ch->name, fpsave);
   fwrite_var_string(ch->short_desc, fpsave);
@@ -612,7 +612,7 @@ int char_to_store_variable_data(char_data * ch, FILE * fpsave)
   fwrite("END", sizeof(char), 3, fpsave);
 
   struct affected_type *af;
-  int16 aff_count = 0; // do not change from int16
+  int16_t aff_count = 0; // do not change from int16_t
 
   for(af = ch->affected; af; af = af->next)
     aff_count++;
@@ -651,7 +651,7 @@ int char_to_store_variable_data(char_data * ch, FILE * fpsave)
   return 1;
 }
 
-void read_skill(char_data *ch, FILE *fpsave)
+void read_skill(struct char_data *ch, FILE *fpsave)
 {
   char_skill_data curr = {};
 
@@ -681,7 +681,7 @@ void read_skill(char_data *ch, FILE *fpsave)
   ch->skills[curr.skillnum] = curr;
 }
 
-int store_to_char_variable_data(char_data * ch, FILE * fpsave)
+int store_to_char_variable_data(struct char_data * ch, FILE * fpsave)
 {
   char typeflag[4];
 
@@ -703,10 +703,10 @@ int store_to_char_variable_data(char_data * ch, FILE * fpsave)
 
   if(!strncmp(typeflag, "AFS", 3)) // affects
   {
-    int16 aff_count; // do not change form int16
+    int16_t aff_count; // do not change form int16_t
     fread(&aff_count, sizeof(aff_count), 1, fpsave);
     ch->affected = NULL;
-    for(int16 i = 0; i < aff_count; i++)
+    for(int16_t i = 0; i < aff_count; i++)
     {
        affected_type * af = new (nothrow) affected_type;
        af->duration_type = 0;
@@ -757,7 +757,7 @@ int store_to_char_variable_data(char_data * ch, FILE * fpsave)
 
 
 #ifdef USE_SQL
-void save_char_obj_db(char_data *ch)
+void save_char_obj_db(struct char_data *ch)
 {
   if (ch == 0)
     return;
@@ -828,7 +828,7 @@ void save_char_obj_db(char_data *ch)
 
 // save a character and inventory.
 // maybe modify it to save mobs for quest purposes too
-void save_char_obj (char_data *ch)
+void save_char_obj (struct char_data *ch)
 {
   char_file_u4 uchar = {};
   time_data tmpage;
@@ -937,7 +937,7 @@ bool load_char_obj( struct descriptor_data *d, const char *name )
   if(!name || !strcmp(name, ""))
     return FALSE;
 
-  ch = new char_data;
+  ch = new struct char_data;
   auto &free_list = DC::instance().free_list;
 	free_list.erase(ch);
 
@@ -997,7 +997,7 @@ bool load_char_obj( struct descriptor_data *d, const char *name )
 }
 
 // read data from file for an item.
-struct obj_data *  obj_store_to_char(char_data *ch, FILE *fpsave, struct obj_data * last_cont )
+struct obj_data *  obj_store_to_char(struct char_data *ch, FILE *fpsave, struct obj_data * last_cont )
 {
   struct obj_data *obj;
 //  struct extra_descr_data *new_new_descr;
@@ -1005,7 +1005,7 @@ struct obj_data *  obj_store_to_char(char_data *ch, FILE *fpsave, struct obj_dat
 
   int j;
   int nr;
-  uint16 length;  // do not change this type
+  uint16_t length;  // do not change this type
   int wear_pos;
   char mod_type[4];
   char buf[MAX_STRING_LENGTH];
@@ -1235,7 +1235,7 @@ struct obj_data *  obj_store_to_char(char_data *ch, FILE *fpsave, struct obj_dat
 
 
 
-bool obj_to_store (struct obj_data *obj, char_data *ch, FILE *fpsave, int wear_pos)
+bool obj_to_store (struct obj_data *obj, struct char_data *ch, FILE *fpsave, int wear_pos)
 {
  // struct obj_data *tmp;
 
@@ -1260,11 +1260,11 @@ bool obj_to_store (struct obj_data *obj, char_data *ch, FILE *fpsave, int wear_p
 // return true on success
 // return false on error
 // write one object to file
-bool put_obj_in_store (struct obj_data *obj, char_data *ch, FILE *fpsave, int wear_pos)
+bool put_obj_in_store (struct obj_data *obj, struct char_data *ch, FILE *fpsave, int wear_pos)
 {
   obj_file_elem object;
   obj_data *standard_obj = 0;
-  uint16 length = 0;  // do not change this type
+  uint16_t length = 0;  // do not change this type
 
   memset(&object, 0, sizeof(object));
 
@@ -1517,7 +1517,7 @@ void restore_weight(struct obj_data *obj)
 
 void donothin() {}
 // Read shared data from pfile
-void store_to_char(struct char_file_u4 *st, char_data *ch)
+void store_to_char(struct char_file_u4 *st, struct char_data *ch)
 {
     int i;
 
@@ -1601,7 +1601,7 @@ void store_to_char(struct char_file_u4 *st, char_data *ch)
 
 // copy vital data from a players char-structure to the file structure 
 // return 'age' of character unmodified
-void char_to_store(char_data *ch, struct char_file_u4 *st, struct time_data & tmpage)
+void char_to_store(struct char_data *ch, struct char_file_u4 *st, struct time_data & tmpage)
 {
   int i;
   int x;

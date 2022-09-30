@@ -17,7 +17,7 @@
 #ifndef SPELLS_H_
 #define SPELLS_H_
 
-#include "structs.h" // ubyte, int16
+#include "structs.h" // uint8_t, int16_t
 #include "handler.h"
 #include "obj.h"
 #include "character.h"
@@ -30,10 +30,10 @@ std::map<int,int> fill_skill_cost();
 
 const std::map<int,int> skill_cost = fill_skill_cost();
 
-void extractFamiliar(char_data *ch);
+void extractFamiliar(struct char_data *ch);
 
-bool skill_success(char_data *ch, char_data *victim, int skillnum, int mod=0);
-bool canPerform(char_data * const &ch, const int_fast32_t &learned, std::string failMessage = std::string());
+bool skill_success(struct char_data *ch, struct char_data *victim, int skillnum, int mod=0);
+bool canPerform(struct char_data * const &ch, const int_fast32_t &learned, std::string failMessage = std::string());
 
 /* New skill quest thingy. */
 struct skill_quest
@@ -51,11 +51,11 @@ struct skill_stuff
   int difficulty;
 };
 
-void barb_magic_resist(char_data *ch, int old, int nw);
+void barb_magic_resist(struct char_data *ch, int old, int nw);
 struct skill_quest *find_sq(int sq);
 struct skill_quest *find_sq(char *);
 int dam_percent(int learned, int damage);
-void check_maxes(char_data *ch);
+void check_maxes(struct char_data *ch);
 
 /*
  * Spell numbers are well known.
@@ -641,9 +641,9 @@ void check_maxes(char_data *ch);
 
 
 
-typedef	int	SPELL_FUN	( ubyte level, char_data *ch,
+typedef	int	SPELL_FUN	( uint8_t level, struct char_data *ch,
 				  char *arg, int type,
-				  char_data *tar_ch,
+				  struct char_data *tar_ch,
 				  struct obj_data *tar_obj,
                                   int skill );
 
@@ -653,11 +653,11 @@ typedef	int	SPELL_FUN	( ubyte level, char_data *ch,
 struct spell_info_type
 {
     uint32_t	beats;			/* Waiting time after spell	*/
-    ubyte	minimum_position;	/* Position for caster		*/
-    ubyte	min_usesmana;		/* Mana used			*/
-    int16	targets;		/* Legal targets		*/
+    uint8_t	minimum_position;	/* Position for caster		*/
+    uint8_t	min_usesmana;		/* Mana used			*/
+    int16_t	targets;		/* Legal targets		*/
     SPELL_FUN *	spell_pointer;		/* Function to call		*/
-    int16      difficulty; 		/* Spell difficulty */
+    int16_t      difficulty; 		/* Spell difficulty */
 };
 
 
@@ -740,6 +740,6 @@ struct attack_hit_type
   #define HASTE_VNUM 6312
   #define TRUE_VNUM 6305
 
-int has_skill(char_data *ch, skill_t skill);
+int has_skill(struct char_data *ch, skill_t skill);
 
 #endif

@@ -674,7 +674,7 @@ int wear_bitv[MAX_WEAR] = {
 
 int do_eqmax(struct char_data *ch, char *argument, int cmd)
 {
-  char_data *vict;
+  struct char_data *vict;
   char arg[MAX_INPUT_LENGTH];
   int a = 0,o;
   argument = one_argument(argument, arg);
@@ -845,7 +845,7 @@ int do_reload(struct char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_listproc(char_data *ch, char *argument, int a)
+int do_listproc(struct char_data *ch, char *argument, int a)
 {
   char arg[MAX_INPUT_LENGTH], arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
   int start,i,end, tot;
@@ -872,7 +872,7 @@ int do_listproc(char_data *ch, char *argument, int a)
       if (mob)
       {
         sprintf(buf,"%s[%-3d] [%-3d] %s\r\n", buf,tot, 
-i,((char_data*)mob_index[real_mobile(i)].item)->name);
+i,((struct char_data*)mob_index[real_mobile(i)].item)->name);
       } else {
         sprintf(buf,"%s[%-3d] [%-3d] %s\r\n", buf,tot,i,((obj_data*)obj_index[real_object(i)].item)->name);
       }

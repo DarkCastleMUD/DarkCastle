@@ -142,8 +142,8 @@ void short_activity();
 void skip_spaces(char **string);
 char *any_one_arg(char *argument, char *first_arg);
 char *calc_color(int hit, int max_hit);
-string generate_prompt(char_data *ch);
-//string generate_prompt(char_data *ch);
+string generate_prompt(struct char_data *ch);
+//string generate_prompt(struct char_data *ch);
 string get_from_q(queue<string> &input_queue);
 void signal_setup(void);
 int new_descriptor(int s);
@@ -405,7 +405,7 @@ void finish_hotboot()
   struct descriptor_data *d;
   char buf[MAX_STRING_LENGTH];
 
-  void do_on_login_stuff(char_data * ch);
+  void do_on_login_stuff(struct char_data * ch);
 
   for (d = descriptor_list; d; d = d->next)
   {
@@ -1143,7 +1143,7 @@ void telnet_ga(descriptor_data *d)
   SEND_TO_Q(go_ahead, d);
 }
 
-int do_lastprompt(char_data *ch, char *arg, int cmd)
+int do_lastprompt(struct char_data *ch, char *arg, int cmd)
 {
   if (GET_LAST_PROMPT(ch))
     csendf(ch, "Last prompt: %s\n\r", GET_LAST_PROMPT(ch));
@@ -1153,7 +1153,7 @@ int do_lastprompt(char_data *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-int do_prompt(char_data *ch, char *arg, int cmd)
+int do_prompt(struct char_data *ch, char *arg, int cmd)
 {
   while (*arg == ' ')
     arg++;
@@ -1272,7 +1272,7 @@ char *cond_colorcodes[] = {
     BOLD GREY,
 };
 
-string calc_name(char_data *ch, bool colour = FALSE)
+string calc_name(struct char_data *ch, bool colour = FALSE)
 {
   int percent;
   string name;
@@ -1310,7 +1310,7 @@ string calc_name(char_data *ch, bool colour = FALSE)
   return name;
 }
 
-char *calc_condition(char_data *ch, bool colour = FALSE)
+char *calc_condition(struct char_data *ch, bool colour = FALSE)
 {
   int percent;
   char *cond_txt[8]; // = cond_txtz;
@@ -1392,7 +1392,7 @@ void make_prompt(struct descriptor_data *d, string &prompt)
   prompt += go_ahead;
 }
 
-char_data *get_charmie(char_data *ch)
+struct char_data *get_charmie(struct char_data *ch)
 {
   if (!ch)
     return 0;
@@ -1406,9 +1406,9 @@ char_data *get_charmie(char_data *ch)
   return NULL;
 }
 
-string generate_prompt(char_data *ch)
+string generate_prompt(struct char_data *ch)
 {
-  char_data *charmie = nullptr;
+  struct char_data *charmie = nullptr;
   char *source = nullptr;
   char *pro = nullptr;
   char *prompt = nullptr;
@@ -1460,7 +1460,7 @@ string generate_prompt(char_data *ch)
     case 'b':
       try
       {
-        char_data *peer = ch->getFollowers().at(0);
+        struct char_data *peer = ch->getFollowers().at(0);
         if (peer != nullptr)
         {
           if (CAN_SEE(ch, peer))
@@ -1481,7 +1481,7 @@ string generate_prompt(char_data *ch)
     case 'B':
       try
       {
-        char_data *peer = ch->getFollowers().at(0);
+        struct char_data *peer = ch->getFollowers().at(0);
         if (peer != nullptr)
         {
           sprintf(pro, "%s%d%s", calc_color(peer->getHP(), GET_MAX_HIT(peer)), peer->getHP(), NTEXT);
@@ -1519,7 +1519,7 @@ string generate_prompt(char_data *ch)
     case 'e':
       try
       {
-        char_data *peer = ch->getFollowers().at(1);
+        struct char_data *peer = ch->getFollowers().at(1);
         if (peer != nullptr)
         {
           if (CAN_SEE(ch, peer))
@@ -1540,7 +1540,7 @@ string generate_prompt(char_data *ch)
     case 'E':
       try
       {
-        char_data *peer = ch->getFollowers().at(1);
+        struct char_data *peer = ch->getFollowers().at(1);
         if (peer != nullptr)
         {
           sprintf(pro, "%s%d%s", calc_color(peer->getHP(), GET_MAX_HIT(peer)), peer->getHP(), NTEXT);
@@ -1589,7 +1589,7 @@ string generate_prompt(char_data *ch)
     case 'j':
       try
       {
-        char_data *peer = ch->getFollowers().at(2);
+        struct char_data *peer = ch->getFollowers().at(2);
         if (peer != nullptr)
         {
           if (CAN_SEE(ch, peer))
@@ -1609,7 +1609,7 @@ string generate_prompt(char_data *ch)
     case 'J':
       try
       {
-        char_data *peer = ch->getFollowers().at(2);
+        struct char_data *peer = ch->getFollowers().at(2);
         if (peer != nullptr)
         {
           sprintf(pro, "%s%d%s", calc_color(peer->getHP(), GET_MAX_HIT(peer)), peer->getHP(), NTEXT);
@@ -1730,7 +1730,7 @@ string generate_prompt(char_data *ch)
     case 'u':
       try
       {
-        char_data *peer = ch->getFollowers().at(3);
+        struct char_data *peer = ch->getFollowers().at(3);
         if (peer != nullptr)
         {
           if (CAN_SEE(ch, peer))
@@ -1750,7 +1750,7 @@ string generate_prompt(char_data *ch)
     case 'U':
       try
       {
-        char_data *peer = ch->getFollowers().at(3);
+        struct char_data *peer = ch->getFollowers().at(3);
         if (peer != nullptr)
         {
           sprintf(pro, "%s%d%s", calc_color(peer->getHP(), GET_MAX_HIT(peer)), peer->getHP(), NTEXT);
@@ -2656,7 +2656,7 @@ string remove_non_color_codes(string input)
       {
         save_char_obj(d->character);
         // clan area stuff
-        extern void check_quitter(char_data * ch);
+        extern void check_quitter(struct char_data * ch);
         check_quitter(d->character);
 
         // end any performances
@@ -2713,8 +2713,8 @@ string remove_non_color_codes(string input)
       // if there is NOONE on (everyone got disconnected) loop through and
       // boot all of the linkdeads.  That way if the mud's link is cut, the
       // first person back on can't RK everyone
-      char_data * next_i;
-      for(char_data * i = character_list; i; i = next_i) {
+      struct char_data * next_i;
+      for(struct char_data * i = character_list; i; i = next_i) {
          next_i = i->next;
          if(IS_NPC(i))
            continue;
@@ -2976,7 +2976,7 @@ void signal_setup(void)
  *       Public routines for system-to-player-communication        *
  **************************************************************** */
 
-void send_to_char_regardless(string messg, char_data *ch)
+void send_to_char_regardless(string messg, struct char_data *ch)
 {
   if (ch->desc && !messg.empty())
   {
@@ -3007,7 +3007,7 @@ void record_msg(string messg, struct char_data *ch)
   }
 }
 
-int do_awaymsgs(char_data *ch, char *argument, int cmd)
+int do_awaymsgs(struct char_data *ch, char *argument, int cmd)
 {
   int lines = 0;
   string tmp;
@@ -3085,7 +3085,7 @@ void send_to_all(char *messg)
         SEND_TO_Q(messg, i);
 }
 
-void ansi_color(char *txt, char_data *ch)
+void ansi_color(char *txt, struct char_data *ch)
 {
   // mobs don't have toggles, so they automatically get ansi on
   if (txt != NULL && ch->desc != NULL)
@@ -3152,9 +3152,9 @@ void send_to_zone(char *messg, int zone)
   }
 }
 
-void send_to_room(string messg, int room, bool awakeonly, char_data *nta)
+void send_to_room(string messg, int room, bool awakeonly, struct char_data *nta)
 {
-  char_data *i = NULL;
+  struct char_data *i = NULL;
 
   // If a megaphone goes off when in someone's inventory this happens
   if (room == NOWHERE)
@@ -3171,7 +3171,7 @@ void send_to_room(string messg, int room, bool awakeonly, char_data *nta)
           SEND_TO_Q(messg, i->desc);
 }
 
-int is_busy(char_data *ch)
+int is_busy(struct char_data *ch)
 {
 
   if (ch->desc &&
@@ -3236,7 +3236,7 @@ char *any_one_arg(char *argument, char *first_arg)
   return argument;
 }
 
-bool is_multi(char_data *ch)
+bool is_multi(struct char_data *ch)
 {
   for (descriptor_data *d = descriptor_list; d; d = d->next)
   {
@@ -3251,7 +3251,7 @@ bool is_multi(char_data *ch)
   return false;
 }
 
-void warn_if_duplicate_ip(char_data *ch)
+void warn_if_duplicate_ip(struct char_data *ch)
 {
   char buf[256];
   int highlev = 51;
@@ -3294,7 +3294,7 @@ void warn_if_duplicate_ip(char_data *ch)
   }
 }
 
-int do_editor(char_data *ch, char *argument, int cmd)
+int do_editor(struct char_data *ch, char *argument, int cmd)
 {
   char arg1[MAX_INPUT_LENGTH];
   if (argument == 0)

@@ -99,15 +99,15 @@ struct descriptor_data {
   string output = {}; /* queue of strings to send	*/
   string inbuf = {};
   queue<string> input = {}; /* queue of unprocessed input	*/
-  char_data *character = {}; /* linked to char		*/
-  char_data *original = {}; /* for switch / return		*/
+  struct char_data *character = {}; /* linked to char		*/
+  struct char_data *original = {}; /* for switch / return		*/
   struct descriptor_data *snooping = {}; /* Who is this char snooping       */
   struct descriptor_data *snoop_by = {}; /* And who is snooping this char   */
   struct descriptor_data *next = {}; /* link to next descriptor	*/
   int tick_wait = {}; /* # ticks desired to wait	*/
   int reallythere = {}; /* Goddamm #&@$*% sig 13 (hack) */
   int prompt_mode = {};
-  ubyte idle_tics = {};
+  uint8_t idle_tics = {};
   time_t login_time = {};
   stat_data *stats = {};            // for rolling up a char
 

@@ -5,7 +5,7 @@
 #ifndef SHOP_H_
 #define SHOP_H_
 
-#include "structs.h" // ubyte, ubyte, etc..
+#include "structs.h" // uint8_t, uint8_t, etc..
 
 struct player_shop_item {
    int item_vnum;               // id of item for sale

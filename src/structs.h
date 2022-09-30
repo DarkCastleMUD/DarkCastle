@@ -22,18 +22,7 @@ using namespace std;
 FILE * dc_fopen(const char *filename, const char *type);
 int dc_fclose(FILE * fl);
 
-typedef signed char		 sbyte;
-typedef unsigned char		 ubyte;
-typedef signed char		 byte;
-
-typedef signed short int         int16;
-typedef unsigned short int      uint16;
-
-typedef signed int               int32_t;
-typedef unsigned int            uint32;
-
-typedef	struct char_data	char_data;
-typedef	struct obj_data		OBJ_DATA;
+typedef	struct obj_data		obj_data;
 
 #define MAX_STRING_LENGTH   8192
 #define MAX_INPUT_LENGTH     160
@@ -60,8 +49,8 @@ typedef struct txt_q
 
 struct snoop_data
 {
-    char_data *snooping; 
-    char_data *snoop_by;
+    struct char_data *snooping; 
+    struct char_data *snoop_by;
 };
 
 

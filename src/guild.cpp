@@ -22,10 +22,10 @@
 
 extern vector<profession> professions;
 
-int get_max(char_data *ch, int skill);
+int get_max(struct char_data *ch, int skill);
 int guild(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg, struct char_data *owner);
 
-int do_practice(char_data *ch, char *arg, int cmd)
+int do_practice(struct char_data *ch, char *arg, int cmd)
 {
   /* Call "guild" with a null string for an argument.
      This displays the character's skills. */
@@ -39,7 +39,7 @@ int do_practice(char_data *ch, char *arg, int cmd)
 }
 
 
-int do_profession(char_data *ch, char *args, int cmdnum)
+int do_profession(struct char_data *ch, char *args, int cmdnum)
 {
 	// Command is enabled by giving someone the profession skill
 	if (!has_skill(ch, SKILL_PROFESSION)) {
@@ -48,7 +48,7 @@ int do_profession(char_data *ch, char *args, int cmdnum)
 	}
 
 	// You can only use the command in the same room of a mob named guildmaster
-	char_data *victim = get_mob_room_vis(ch, "guildmaster");
+	struct char_data *victim = get_mob_room_vis(ch, "guildmaster");
 	if (victim == NULL) {
 		csendf(ch, "You can't pick a profession here. You need to find a Guild Master.\n\r");
 		return eFAILURE;
@@ -167,7 +167,7 @@ char *how_good(int percent)
 
 // return a 1 if I just learned skill for first time
 // else 0
-int learn_skill(char_data *ch, int skill, int amount, int maximum)
+int learn_skill(struct char_data *ch, int skill, int amount, int maximum)
 {
   if (ch->skills.contains(skill))
   {
@@ -218,7 +218,7 @@ int search_skills(const char * arg, class_skill_defines * list_skills)
 }
 
 
-class_skill_defines * get_skill_list(char_data * ch)
+class_skill_defines * get_skill_list(struct char_data * ch)
 {
   class_skill_defines * skilllist = NULL;
 
@@ -928,7 +928,7 @@ int skill_master(struct char_data *ch, struct obj_data *obj, int cmd, const char
     do_say(invoker, "Okay, you've got a deal!",9);
     learn_skill(ch, skl, 1, 1);
 
-    extern void prepare_character_for_sixty(char_data *ch);
+    extern void prepare_character_for_sixty(struct char_data *ch);
     prepare_character_for_sixty(ch);
     sprintf(buf, "$BYou have learned the basics of %s.$R\n\r", get_skill_name(skl));
     send_to_char(buf,ch);
@@ -999,7 +999,7 @@ int skill_master(struct char_data *ch, struct obj_data *obj, int cmd, const char
     return eSUCCESS;
 }
 
-int get_stat(char_data *ch, int stat)
+int get_stat(struct char_data *ch, int stat)
 {
       switch (stat)
       {
@@ -1022,7 +1022,7 @@ int get_stat(char_data *ch, int stat)
  return 0;
 }
 
-int get_stat_bonus(char_data *ch, int stat)
+int get_stat_bonus(struct char_data *ch, int stat)
 {
   int bonus = 0;
   switch(stat) {
@@ -1058,7 +1058,7 @@ int get_stat_bonus(char_data *ch, int stat)
 // object affects someone that doesn't have the skill is getting a
 // valid amount passed in.
 
-void skill_increase_check(char_data *ch, int skill, int learned, int difficulty)
+void skill_increase_check(struct char_data *ch, int skill, int learned, int difficulty)
 {
   int chance, maximum;
 
@@ -1226,7 +1226,7 @@ void skill_increase_check(char_data *ch, int skill, int learned, int difficulty)
   csendf(ch, "$R$B$5You feel more competent in your %s ability. It increased to %d out of %d.$R\r\n", skillname, learned, get_max(ch, skill));
 }
 
-void verify_max_stats(char_data *ch)
+void verify_max_stats(struct char_data *ch)
 {
   for (auto &curr : ch->skills)
   {
@@ -1237,7 +1237,7 @@ void verify_max_stats(char_data *ch)
   }
 }
 
-int get_max(char_data *ch, int skill)
+int get_max(struct char_data *ch, int skill)
 {
   class_skill_defines *skilllist = get_skill_list(ch);
   if (!skilllist)
@@ -1276,7 +1276,7 @@ int get_max(char_data *ch, int skill)
   return (int)percent;
 }
 
-void check_maxes(char_data *ch)
+void check_maxes(struct char_data *ch)
 {
   int maximum;
   class_skill_defines *skilllist = get_skill_list(ch);

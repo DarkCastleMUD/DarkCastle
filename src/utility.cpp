@@ -77,15 +77,15 @@ using namespace std;
 extern std::map<int, std::map<uint8_t, std::string> > professions;
 
 // extern funcs
-clan_data * get_clan(char_data *);
-void release_message(char_data *ch);
+clan_data * get_clan(struct char_data *);
+void release_message(struct char_data *ch);
 
 // local vars
 char    log_buf[MAX_STRING_LENGTH];
 struct timer_data *timer_list = NULL;
 
 // local funcs
-void update_wizlist(char_data *ch);
+void update_wizlist(struct char_data *ch);
 
 size_t nocolor_strlen(const char *s)
 {
@@ -325,7 +325,7 @@ void log(string str, int god_level, int32_t type)
 }
 
 // writes a string to the log 
-void log(string str, int god_level, int32_t type, char_data *vict)
+void log(string str, int god_level, int32_t type, struct char_data *vict)
 {
   FILE **f = 0;
   int stream = 1;
@@ -710,7 +710,7 @@ struct time_info_data mud_time_passed(time_t t2, time_t t1)
     return now;
 }
 
-struct time_info_data age(char_data *ch)
+struct time_info_data age(struct char_data *ch)
 {
     struct time_info_data player_age;
 
@@ -740,7 +740,7 @@ bool file_exists(const char *filename)
   return(r);
 }
 
-void util_archive(const char *char_name, char_data *caller)
+void util_archive(const char *char_name, struct char_data *caller)
 {
   char buf[256];
   char buf2[256];
@@ -789,7 +789,7 @@ void util_archive(const char *char_name, char_data *caller)
   log(buf, IMMORTAL, LOG_GOD);
 }
 
-void util_unarchive(char *char_name, char_data *caller)
+void util_unarchive(char *char_name, struct char_data *caller)
 {
   char buf[256];
   char buf2[256];
@@ -1279,11 +1279,11 @@ int do_bug(struct char_data *ch, char *argument, int cmd)
     return eSUCCESS;
 }
 
-int do_recall( char_data *ch, char *argument, int cmd )
+int do_recall( struct char_data *ch, char *argument, int cmd )
 {
   int location, percent, level, cost = 0, x;
-  char_data *victim;
-  char_data *loop_ch;
+  struct char_data *victim;
+  struct char_data *loop_ch;
   float cf;
   char name[256] = "";
   clan_data * clan;
@@ -1428,7 +1428,7 @@ int do_recall( char_data *ch, char *argument, int cmd )
       cost *= 2;
     }
 
-    if (GET_GOLD(ch) < (uint32)cost)
+    if (GET_GOLD(ch) < (uint32_t)cost)
     {
          csendf(ch, "You don't have %d gold!\n\r", cost);
          return eFAILURE;
@@ -1472,9 +1472,9 @@ int do_quit(struct char_data *ch, char *argument, int cmd)
    struct clan_room_data * room;
    int found = 0;
   char buf[MAX_STRING_LENGTH];
-  OBJ_DATA *obj, *tmp_obj;
+  obj_data *obj, *tmp_obj;
 
-  void find_and_remove_player_portal(char_data * ch);
+  void find_and_remove_player_portal(struct char_data * ch);
 
   /*
   | Code inserted by Morc 9 Apr 1997 to fix crasher
@@ -1594,7 +1594,7 @@ mob_index[fol->follower->mobdata->nr].virt == 8)
    for(obj = object_list; obj; obj = tmp_obj) {
     tmp_obj = obj->next;
     if(obj_index[obj->item_number].virt == CONSECRATE_OBJ_NUMBER)
-      if(ch == (char_data *)(obj->obj_flags.origin) )
+      if(ch == (struct char_data *)(obj->obj_flags.origin) )
        extract_obj(obj);
    }
   }
@@ -1875,7 +1875,7 @@ bool check_valid_and_convert(int & value, char * buf)
 }
 
 // modified for new SETBIT et al. commands
-void parse_bitstrings_into_int(const char *bits[], string remainder_args, char_data *ch, uint value[])
+void parse_bitstrings_into_int(const char *bits[], string remainder_args, struct char_data *ch, uint value[])
 {
   bool found = false;
 
@@ -1925,13 +1925,13 @@ void parse_bitstrings_into_int(const char *bits[], string remainder_args, char_d
   }
 }
 
-void parse_bitstrings_into_int(const char *bits[], const char *remainder_args, char_data *ch, uint value[])
+void parse_bitstrings_into_int(const char *bits[], const char *remainder_args, struct char_data *ch, uint value[])
 {
   return parse_bitstrings_into_int(bits, string(remainder_args), ch, value);
 }
 
 // calls below uint32_t version
-void parse_bitstrings_into_int(const char *bits[], string remainder_args, char_data *ch, uint16 &value)
+void parse_bitstrings_into_int(const char *bits[], string remainder_args, struct char_data *ch, uint16_t &value)
 {
   int found = false;
 
@@ -1982,7 +1982,7 @@ void parse_bitstrings_into_int(const char *bits[], string remainder_args, char_d
   }
 }
 
-void parse_bitstrings_into_int(const char *bits[], const char *remainder_args, char_data *ch, uint16 &value)
+void parse_bitstrings_into_int(const char *bits[], const char *remainder_args, struct char_data *ch, uint16_t &value)
 {
   return parse_bitstrings_into_int(bits, string(remainder_args), ch, value);
 }
@@ -1991,7 +1991,7 @@ void parse_bitstrings_into_int(const char *bits[], const char *remainder_args, c
 // Finds the bits[] strings listed in "strings" and toggles the bit in "value"
 // Informs 'ch' of what has happened
 //
-void parse_bitstrings_into_int(const char *bits[], string remainder_args, char_data *ch, uint32_t &value)
+void parse_bitstrings_into_int(const char *bits[], string remainder_args, struct char_data *ch, uint32_t &value)
 {
   bool found = false;
 
@@ -2041,14 +2041,14 @@ void parse_bitstrings_into_int(const char *bits[], string remainder_args, char_d
     send_to_char("No matching bits found.\n\n", ch);
 }
 
-void parse_bitstrings_into_int(const char *bits[], const char *remainder_args, char_data *ch, uint32_t &value)
+void parse_bitstrings_into_int(const char *bits[], const char *remainder_args, struct char_data *ch, uint32_t &value)
 {
   return parse_bitstrings_into_int(bits, string(remainder_args), ch, value);
 }
 
 // Display a \n terminated list to the character
 //
-void display_string_list(const char * list[], char_data *ch)
+void display_string_list(const char * list[], struct char_data *ch)
 {
   char buf[MAX_STRING_LENGTH];
   *buf = '\0';
@@ -2173,7 +2173,7 @@ int random_percent_change(int from, int to, int value) {
 }
 
 
-bool is_in_game(char_data *ch)
+bool is_in_game(struct char_data *ch)
 {
   // Bug in code if this happens
   if (ch == 0) {
@@ -2349,7 +2349,7 @@ void remove_familiars(char *name, BACKUP_TYPE backup)
 
 bool check_make_camp(int room)
 {
-  char_data *i, *next_i;
+  struct char_data *i, *next_i;
   bool campok = FALSE;
 
   for(i = world[room].people; i; i = next_i) {
@@ -2366,9 +2366,9 @@ bool check_make_camp(int room)
   return campok;
 }
 
-int get_leadership_bonus(char_data *ch)
+int get_leadership_bonus(struct char_data *ch)
 {
-  char_data *leader;
+  struct char_data *leader;
   struct follow_type *f, *next_f;
   int highlevel = 0, bonus = 0;
 
@@ -2409,7 +2409,7 @@ void update_make_camp_and_leadership(void)
 	auto &character_list = DC::instance().character_list;
 
   for_each(character_list.begin(), character_list.end(),
-  				[&af, &bonus](char_data *i) {
+  				[&af, &bonus](struct char_data *i) {
 
     if(!i->fighting) {
       if(affected_by_spell(i, SKILL_SMITE))
@@ -2484,7 +2484,7 @@ void unique_scan(struct char_data *victim)
   struct obj_data *j = NULL;
   int k;
   map<int, int> virtnums;
-  queue<OBJ_DATA *> found_items;
+  queue<obj_data *> found_items;
 
   for (k=0; k< MAX_WEAR; k++) 
   {
@@ -2744,12 +2744,12 @@ string get_isr_string(uint32_t isr, int8_t loc)
    }
 }
 
-bool isDead(char_data *ch)
+bool isDead(struct char_data *ch)
 {
 	return (ch && ch->position == POSITION_DEAD);
 }
 
-bool isNowhere(char_data *ch)
+bool isNowhere(struct char_data *ch)
 {
 	return (ch && ch->in_room == NOWHERE);
 }

@@ -72,7 +72,7 @@ int do_whogroup(struct char_data *ch, char *argument, int cmd)
 {
 
    descriptor_data *d;
-   char_data *k, *i;
+   struct char_data *k, *i;
    follow_type *f;
    char target[MAX_INPUT_LENGTH];
    char tempbuffer[800];
@@ -191,7 +191,7 @@ int do_whogroup(struct char_data *ch, char *argument, int cmd)
 int do_whosolo(struct char_data *ch, char *argument, int cmd)
 {
    descriptor_data *d;
-   char_data *i;
+   struct char_data *i;
    char tempbuffer[800];
    char buf[MAX_INPUT_LENGTH+1];
    bool foundtarget;

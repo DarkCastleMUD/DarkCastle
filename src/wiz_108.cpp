@@ -29,7 +29,7 @@ int do_zoneexits(struct char_data *ch, char *argument, int cmd)
     struct room_direction_data *curExits;
     int curZone = GET_ZONE(ch);
     int curRoom = ch->in_room;
-    OBJ_DATA *portal;
+    obj_data *portal;
     int i, dir;
     int low, high;
     int last_good = curRoom;
@@ -274,7 +274,7 @@ int do_set(struct char_data *ch, char *argument, int cmd)
 //      return;
 //    }
 
-    void add_to_bard_list(char_data * ch);
+    void add_to_bard_list(struct char_data * ch);
 
     /* from spell_parser.c */
 
