@@ -142,8 +142,8 @@ void short_activity();
 void skip_spaces(char **string);
 char *any_one_arg(char *argument, char *first_arg);
 char *calc_color(int hit, int max_hit);
-string generate_prompt(CHAR_DATA *ch);
-//string generate_prompt(CHAR_DATA *ch);
+string generate_prompt(char_data *ch);
+//string generate_prompt(char_data *ch);
 string get_from_q(queue<string> &input_queue);
 void signal_setup(void);
 int new_descriptor(int s);
@@ -1143,7 +1143,7 @@ void telnet_ga(descriptor_data *d)
   SEND_TO_Q(go_ahead, d);
 }
 
-int do_lastprompt(CHAR_DATA *ch, char *arg, int cmd)
+int do_lastprompt(char_data *ch, char *arg, int cmd)
 {
   if (GET_LAST_PROMPT(ch))
     csendf(ch, "Last prompt: %s\n\r", GET_LAST_PROMPT(ch));
@@ -1153,7 +1153,7 @@ int do_lastprompt(CHAR_DATA *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-int do_prompt(CHAR_DATA *ch, char *arg, int cmd)
+int do_prompt(char_data *ch, char *arg, int cmd)
 {
   while (*arg == ' ')
     arg++;
@@ -1272,7 +1272,7 @@ char *cond_colorcodes[] = {
     BOLD GREY,
 };
 
-string calc_name(CHAR_DATA *ch, bool colour = FALSE)
+string calc_name(char_data *ch, bool colour = FALSE)
 {
   int percent;
   string name;
@@ -1310,7 +1310,7 @@ string calc_name(CHAR_DATA *ch, bool colour = FALSE)
   return name;
 }
 
-char *calc_condition(CHAR_DATA *ch, bool colour = FALSE)
+char *calc_condition(char_data *ch, bool colour = FALSE)
 {
   int percent;
   char *cond_txt[8]; // = cond_txtz;
@@ -1392,7 +1392,7 @@ void make_prompt(struct descriptor_data *d, string &prompt)
   prompt += go_ahead;
 }
 
-CHAR_DATA *get_charmie(CHAR_DATA *ch)
+char_data *get_charmie(char_data *ch)
 {
   if (!ch)
     return 0;
@@ -1406,9 +1406,9 @@ CHAR_DATA *get_charmie(CHAR_DATA *ch)
   return NULL;
 }
 
-string generate_prompt(CHAR_DATA *ch)
+string generate_prompt(char_data *ch)
 {
-  CHAR_DATA *charmie = nullptr;
+  char_data *charmie = nullptr;
   char *source = nullptr;
   char *pro = nullptr;
   char *prompt = nullptr;
@@ -2656,7 +2656,7 @@ string remove_non_color_codes(string input)
       {
         save_char_obj(d->character);
         // clan area stuff
-        extern void check_quitter(CHAR_DATA * ch);
+        extern void check_quitter(char_data * ch);
         check_quitter(d->character);
 
         // end any performances
@@ -2976,7 +2976,7 @@ void signal_setup(void)
  *       Public routines for system-to-player-communication        *
  **************************************************************** */
 
-void send_to_char_regardless(string messg, CHAR_DATA *ch)
+void send_to_char_regardless(string messg, char_data *ch)
 {
   if (ch->desc && !messg.empty())
   {
@@ -3007,7 +3007,7 @@ void record_msg(string messg, struct char_data *ch)
   }
 }
 
-int do_awaymsgs(CHAR_DATA *ch, char *argument, int cmd)
+int do_awaymsgs(char_data *ch, char *argument, int cmd)
 {
   int lines = 0;
   string tmp;
@@ -3085,7 +3085,7 @@ void send_to_all(char *messg)
         SEND_TO_Q(messg, i);
 }
 
-void ansi_color(char *txt, CHAR_DATA *ch)
+void ansi_color(char *txt, char_data *ch)
 {
   // mobs don't have toggles, so they automatically get ansi on
   if (txt != NULL && ch->desc != NULL)
@@ -3152,9 +3152,9 @@ void send_to_zone(char *messg, int zone)
   }
 }
 
-void send_to_room(string messg, int room, bool awakeonly, CHAR_DATA *nta)
+void send_to_room(string messg, int room, bool awakeonly, char_data *nta)
 {
-  CHAR_DATA *i = NULL;
+  char_data *i = NULL;
 
   // If a megaphone goes off when in someone's inventory this happens
   if (room == NOWHERE)
@@ -3171,7 +3171,7 @@ void send_to_room(string messg, int room, bool awakeonly, CHAR_DATA *nta)
           SEND_TO_Q(messg, i->desc);
 }
 
-int is_busy(CHAR_DATA *ch)
+int is_busy(char_data *ch)
 {
 
   if (ch->desc &&
@@ -3294,7 +3294,7 @@ void warn_if_duplicate_ip(char_data *ch)
   }
 }
 
-int do_editor(CHAR_DATA *ch, char *argument, int cmd)
+int do_editor(char_data *ch, char *argument, int cmd)
 {
   char arg1[MAX_INPUT_LENGTH];
   if (argument == 0)

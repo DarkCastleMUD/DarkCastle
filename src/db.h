@@ -127,11 +127,11 @@ void load_emoting_objects(void);
 void boot_db(void);
 int  create_entry(char *name);
 void zone_update(void);
-void init_char(CHAR_DATA *ch);
-void clear_char(CHAR_DATA *ch);
+void init_char(char_data *ch);
+void clear_char(char_data *ch);
 void clear_object(struct obj_data *obj);
-void reset_char(CHAR_DATA *ch);
-void free_char(CHAR_DATA *ch, Trace trace = Trace("Unknown"));
+void reset_char(char_data *ch);
+void free_char(char_data *ch, Trace trace = Trace("Unknown"));
 int  real_room(int virt);
 char *fread_string(FILE *fl, int hasher);
 char *fread_string(ifstream &in, int hasher);
@@ -157,9 +157,9 @@ extern index_data mob_index_array[MAX_INDEX];
 #define VIRTUAL 1
 
 struct obj_data  *read_object(int nr, FILE *fl, bool zz);
-CHAR_DATA *read_mobile(int nr, FILE *fl);
+char_data *read_mobile(int nr, FILE *fl);
 struct obj_data  *clone_object(int nr);
-CHAR_DATA *clone_mobile(int nr);
+char_data *clone_mobile(int nr);
 void randomize_object(obj_data *obj);
 void string_to_file(FILE *f, char *string);
 void string_to_file(ofstream &f, char *string);
@@ -190,7 +190,7 @@ struct reset_com
     char * comment; /* Any comments that went with the command */
     int active; // is it active? alot aren't on the builders' port
     time_t last; // when was it last reset
-    CHAR_DATA *lastPop;
+    char_data *lastPop;
     time_t lastSuccess;
     uint64_t attempts;
     uint64_t successes;
@@ -262,8 +262,8 @@ struct index_data
 {
   int virt;                                                                         /* virt number of ths mob/obj           */
   int number;                                                                       /* number of existing units of ths mob/obj */
-  int (*non_combat_func)(CHAR_DATA *, struct obj_data *, int, const char *, CHAR_DATA *); // non Combat special proc
-  int (*combat_func)(CHAR_DATA *, struct obj_data *, int, const char *, CHAR_DATA *);     // combat special proc
+  int (*non_combat_func)(char_data *, struct obj_data *, int, const char *, char_data *); // non Combat special proc
+  int (*combat_func)(char_data *, struct obj_data *, int, const char *, char_data *);     // combat special proc
   void *item;                                                                       /* the mobile/object itself                 */
 
   MPROG_DATA *mobprogs;

@@ -47,12 +47,12 @@
 #include "move.h"
 
 int keywordfind(struct obj_data *obj_object);
-int hands_are_free(CHAR_DATA *ch, int number);
-void perform_wear(CHAR_DATA *ch, struct obj_data *obj_object,
+int hands_are_free(char_data *ch, int number);
+void perform_wear(char_data *ch, struct obj_data *obj_object,
                   int keyword);
 bool is_protected(struct char_data *vict, struct char_data *ch);
 void scavenge(struct char_data *ch);
-bool is_r_denied(CHAR_DATA *ch, int room)
+bool is_r_denied(char_data *ch, int room)
 {
   struct deny_data *d;
   if (!IS_NPC(ch)) return FALSE;
@@ -63,7 +63,7 @@ bool is_r_denied(CHAR_DATA *ch, int room)
 }
 void mobile_activity(void)
 {
-	CHAR_DATA *tmp_ch, *pch;
+	char_data *tmp_ch, *pch;
   struct obj_data *obj, *best_obj;
   char buf[1000];
   int door, max;
@@ -268,8 +268,8 @@ void mobile_activity(void)
     if((ch->mobdata->hatred != NULL))    //  && (!ch->fighting)) (we check fighting earlier)
     {
       send_to_char("You're hating.\r\n",ch);
-      CHAR_DATA *next_blah;
-//      CHAR_DATA *temp = get_char(get_random_hate(ch));    
+      char_data *next_blah;
+//      char_data *temp = get_char(get_random_hate(ch));    
       done = 0;
     
       for(tmp_ch = world[ch->in_room].people; tmp_ch; tmp_ch = next_blah) 
@@ -329,7 +329,7 @@ void mobile_activity(void)
     if(ISSET(ch->mobdata->actflags, ACT_AGGRESSIVE) &&
       !IS_SET(world[ch->in_room].room_flags, SAFE)) 
     {
-      CHAR_DATA * next_aggro; 
+      char_data * next_aggro; 
       int targets = 1;
       done = 0;
  
@@ -940,10 +940,10 @@ void scavenge(struct char_data *ch)
 
 void clear_hunt(void *arg1, void *arg2, void *arg3)
 {
-  clear_hunt((char*)arg1, (CHAR_DATA*)arg2,NULL);
+  clear_hunt((char*)arg1, (char_data*)arg2,NULL);
 }
 
-void clear_hunt(char *arg1, CHAR_DATA *arg2, void *arg3) {
+void clear_hunt(char *arg1, char_data *arg2, void *arg3) {
 	auto &character_list = DC::instance().character_list;
 	for (auto& curr : character_list) {
 		if (curr == arg2) {

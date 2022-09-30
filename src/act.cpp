@@ -39,14 +39,14 @@ extern CWorld world;
 extern struct descriptor_data *descriptor_list;
 extern bool MOBtrigger;
 
-act_return act(const string &str, CHAR_DATA *ch, OBJ_DATA *obj, void *vict_obj, int16 destination, int16 flags)
+act_return act(const string &str, char_data *ch, OBJ_DATA *obj, void *vict_obj, int16 destination, int16 flags)
 {
   return act(str.c_str(), ch, obj, vict_obj, destination, flags);
 }
 
 act_return act(
     const char *str,   // Buffer
-    CHAR_DATA *ch,     // Character from
+    char_data *ch,     // Character from
     OBJ_DATA *obj,     // Object
     void *vict_obj,    // Victim object
     int16 destination, // Destination flags
@@ -85,7 +85,7 @@ act_return act(
 
   if (destination == TO_VICT)
   {
-    st_return = send_tokens(tokens, ch, obj, vict_obj, flags, (CHAR_DATA *)vict_obj);
+    st_return = send_tokens(tokens, ch, obj, vict_obj, flags, (char_data *)vict_obj);
     retval |= st_return.retval;
     ar.str = st_return.str;
     ar.retval = retval;
@@ -165,7 +165,7 @@ act_return act(
 | Description:  This function just sends the message to the character,
 |   with no interpretation and no checks.
 */
-void send_message(const char *str, CHAR_DATA *to)
+void send_message(const char *str, char_data *to)
 {
   // This will happen when a token shouldn't be interpreted
   if(str == 0)  return;
@@ -180,7 +180,7 @@ void send_message(string str, char_data *to)
   return send_message(str.c_str(), to);
 }
 
-send_tokens_return send_tokens(TokenList * tokens, CHAR_DATA *ch, OBJ_DATA * obj, void * vict_obj, int flags, CHAR_DATA *to)
+send_tokens_return send_tokens(TokenList * tokens, char_data *ch, OBJ_DATA * obj, void * vict_obj, int flags, char_data *to)
 {
   int retval = 0;
   string buf = tokens->Interpret(ch, obj, vict_obj, to, flags);

@@ -75,17 +75,17 @@ extern int max_who;
 struct time_info_data age(struct char_data *ch);
 void page_string(struct descriptor_data *d, const char *str, int keep_internal);
 clan_data * get_clan(struct char_data *);
-extern int hit_gain(CHAR_DATA *ch, int position);
-extern int mana_gain(CHAR_DATA*ch);
-extern int ki_gain(CHAR_DATA *ch);
-extern int move_gain(CHAR_DATA *ch, int extra);
-extern int getRealSpellDamage(CHAR_DATA *ch);
+extern int hit_gain(char_data *ch, int position);
+extern int mana_gain(char_data*ch);
+extern int ki_gain(char_data *ch);
+extern int move_gain(char_data *ch, int extra);
+extern int getRealSpellDamage(char_data *ch);
 
 /* intern functions */
 
 void list_obj_to_char(struct obj_data *list,struct char_data *ch, int mode, bool show);
 
-int get_saves(CHAR_DATA *ch, int savetype)
+int get_saves(char_data *ch, int savetype)
 {
   int save = ch->saves[savetype];
   switch (savetype)
@@ -3030,7 +3030,7 @@ int do_tick( struct char_data *ch, char *argument, int cmd )
 }
 
 
-int do_show_exp(CHAR_DATA *ch, char *arg, int cmd)
+int do_show_exp(char_data *ch, char *arg, int cmd)
 {
    if(GET_LEVEL(ch) < MAX_MORTAL) {
      csendf(ch, "You require %ld experience to advance to level",
@@ -3102,7 +3102,7 @@ void check_champion_and_website_who_list()
 
 }
 
-int do_sector(CHAR_DATA *ch, char *arg, int cmd)
+int do_sector(char_data *ch, char *arg, int cmd)
 {
    string art = "a";
 
@@ -3125,7 +3125,7 @@ int do_sector(CHAR_DATA *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-int do_version(CHAR_DATA *ch, char *arg, int cmd)
+int do_version(char_data *ch, char *arg, int cmd)
 {
 	if (ch) {
 		csendf(ch, "Version: %s Build time: %s\n", DC::getVersion().c_str(), DC::getBuildTime().c_str());

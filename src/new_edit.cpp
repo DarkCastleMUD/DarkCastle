@@ -24,7 +24,7 @@
 using namespace std;
 
 // send_to_char("Write your note.  (/s saves /h for help)
-void new_edit_board_unlock_board(CHAR_DATA *ch, int abort);
+void new_edit_board_unlock_board(char_data *ch, int abort);
 void format_text(char **ptr_string, int mode, struct descriptor_data *d, int maxlen);
 int replace_str(char **string, char *pattern, char *replacement, int rep_all, int max_size);
 void check_for_awaymsgs(char_data *);
@@ -588,7 +588,7 @@ void format_text(char **ptr_string, int mode, struct descriptor_data *d, int max
 void new_string_add(struct descriptor_data *d, char *str) {
 	// char *scan;
 	int terminator = 0, action = 0;
-	CHAR_DATA *ch = d->character;
+	char_data *ch = d->character;
 	int i = 2, j = 0;
 	char actions[MAX_INPUT_LENGTH];
 

@@ -43,7 +43,7 @@ extern struct weather_data weather_info;
 extern char log_buf[MAX_STRING_LENGTH];
 
 //extern struct char_data;
-//typedef struct char_data CHAR_DATA;
+//typedef struct char_data char_data;
 
 void check_timer();
 
@@ -76,7 +76,7 @@ char *index(char *buf, char op);
 void check_timer();
 
 void skill_increase_check(char_data * ch, int skill, int learned, int difficulty);
-bool is_hiding(CHAR_DATA *ch, CHAR_DATA *vict);
+bool is_hiding(char_data *ch, char_data *vict);
 
 // End defines for gradual skill increase code
 
@@ -286,7 +286,7 @@ bool IS_DARK( int room );
 
 #define IS_ANONYMOUS(ch) (IS_MOB(ch) ? 1 : ( (GET_LEVEL(ch) >= 101) ? 0 : IS_SET((ch)->pcdata->toggles, PLR_ANONYMOUS)))
 /*
-inline const short IS_ANONYMOUS(CHAR_DATA *ch)
+inline const short IS_ANONYMOUS(char_data *ch)
 {
   if (IS_MOB(ch))
      // this should really never be called on mobs
@@ -377,8 +377,8 @@ string double_dollars(string source);
 
 void    clan_death      (char* b, char_data *ch);
 
-int     move_char       (CHAR_DATA *ch, int dest);
-int     move_char       (CHAR_DATA *ch, int dest, bool stop_all_fighting);
+int     move_char       (char_data *ch, int dest);
+int     move_char       (char_data *ch, int dest, bool stop_all_fighting);
 int	number		(int from, int to);
 int 	dice		(int number, int size);
 int	str_cmp		(const char *arg1, const char *arg2);
@@ -410,96 +410,96 @@ const char *  constindex      (int index, const char *names[]);
 struct time_info_data
 	mud_time_passed	(time_t t2, time_t t1);
 struct time_info_data
-	age		(CHAR_DATA *ch);
-bool	circle_follow   (CHAR_DATA *ch, CHAR_DATA *victim);
+	age		(char_data *ch);
+bool	circle_follow   (char_data *ch, char_data *victim);
 bool ARE_GROUPED( struct char_data *sub, struct char_data *obj); 
 bool ARE_CLANNED( struct char_data *sub, struct char_data *obj); 
 int	is_number	(const char *str);
-void	gain_condition	(CHAR_DATA *ch, int condition, int value);
-void	set_fighting	(CHAR_DATA *ch, CHAR_DATA *vict);
-void	stop_fighting	(CHAR_DATA *ch, int clearlag = 1);
-int	do_simple_move	(CHAR_DATA *ch, int cmd, int following);
-// int	attempt_move	(CHAR_DATA *ch, int cmd, int is_retreat = 0);
-int32_t	move_limit	(CHAR_DATA *ch);
-int32_t	mana_limit	(CHAR_DATA *ch);
-int32_t	ki_limit	(CHAR_DATA *ch);
-int32_t	hit_limit	(CHAR_DATA *ch);
+void	gain_condition	(char_data *ch, int condition, int value);
+void	set_fighting	(char_data *ch, char_data *vict);
+void	stop_fighting	(char_data *ch, int clearlag = 1);
+int	do_simple_move	(char_data *ch, int cmd, int following);
+// int	attempt_move	(char_data *ch, int cmd, int is_retreat = 0);
+int32_t	move_limit	(char_data *ch);
+int32_t	mana_limit	(char_data *ch);
+int32_t	ki_limit	(char_data *ch);
+int32_t	hit_limit	(char_data *ch);
 typedef int16_t skill_t;
-int	has_skill	(CHAR_DATA *ch, skill_t skill);
+int	has_skill	(char_data *ch, skill_t skill);
 const char *  get_skill_name  (int skillnum);
-void	gain_exp_regardless	(CHAR_DATA *ch, int gain);
-void	advance_level	(CHAR_DATA *ch, int is_conversion);
+void	gain_exp_regardless	(char_data *ch, int gain);
+void	advance_level	(char_data *ch, int is_conversion);
 int	close_socket	(struct descriptor_data *d);
 int isname    (string arg, const char *arg2);
 int	isname		(const char *arg, const char *arg2);
 void	page_string	(struct descriptor_data *d, const char *str,
 			    int keep_internal);
-void	gain_exp	(CHAR_DATA *ch, int64_t gain);
-void	redo_hitpoints  (CHAR_DATA *ch);       /* Rua's put in  */
-void	redo_mana	(CHAR_DATA *ch);       /* Rua's put in  */
-void    redo_ki		(CHAR_DATA *ch);	/* And Urizen*/
+void	gain_exp	(char_data *ch, int64_t gain);
+void	redo_hitpoints  (char_data *ch);       /* Rua's put in  */
+void	redo_mana	(char_data *ch);       /* Rua's put in  */
+void    redo_ki		(char_data *ch);	/* And Urizen*/
 void assign_rooms(void);
 void assign_objects(void);
 void assign_mobiles(void);
 void free_obj(struct obj_data *obj);
 
-int char_to_room(CHAR_DATA *ch, int room);
-int char_from_room(CHAR_DATA *ch, bool stop_fighting);
-int char_from_room(CHAR_DATA *ch);
-void do_start(CHAR_DATA *ch);
+int char_to_room(char_data *ch, int room);
+int char_from_room(char_data *ch, bool stop_fighting);
+int char_from_room(char_data *ch);
+void do_start(char_data *ch);
 
-void update_pos( CHAR_DATA *victim );
+void update_pos( char_data *victim );
 void clear_object(struct obj_data *obj);
-void death_cry( CHAR_DATA *ch );
+void death_cry( char_data *ch );
 std::vector<std::string> splitstring(std::string splitme, std::string delims, bool ignore_empty = false);
 std::string joinstring(std::vector<std::string> joinme, std::string delims, bool ignore_empty = false);
 
-void add_follower( CHAR_DATA *ch, CHAR_DATA *leader, int cmd);
+void add_follower( char_data *ch, char_data *leader, int cmd);
 void send_to_outdoor( char *messg );
 void send_to_zone(char *messg, int zone);
 void weather_and_time(int mode);
 void night_watchman( void );
-int special(CHAR_DATA *ch, int cmd, char *arg);
+int special(char_data *ch, int cmd, char *arg);
 int process_output(struct descriptor_data *t);
 int file_to_string(const char *name, char *buf);
 bool load_char_obj( struct descriptor_data *d, const char* name);
-void save_char_obj( CHAR_DATA *ch );
+void save_char_obj( char_data *ch );
 
 #ifdef USE_SQL
-void save_char_obj_db(CHAR_DATA *ch);
+void save_char_obj_db(char_data *ch);
 #endif
 
 void unique_scan(struct char_data *victim);
-void char_to_store(CHAR_DATA *ch, struct char_file_u4 *st, struct time_data & tmpage);
-bool obj_to_store( struct obj_data *obj, CHAR_DATA *ch, FILE *fpsave, int wear_pos );
-void check_idling(CHAR_DATA *ch);
-void stop_follower(CHAR_DATA *ch, int cmd);
-bool CAN_SEE( CHAR_DATA *sub, CHAR_DATA *obj, bool noprog = FALSE );
+void char_to_store(char_data *ch, struct char_file_u4 *st, struct time_data & tmpage);
+bool obj_to_store( struct obj_data *obj, char_data *ch, FILE *fpsave, int wear_pos );
+void check_idling(char_data *ch);
+void stop_follower(char_data *ch, int cmd);
+bool CAN_SEE( char_data *sub, char_data *obj, bool noprog = FALSE );
 int  SWAP_CH_VICT(int value);
 bool SOMEONE_DIED(int value);
-bool CAN_SEE_OBJ( CHAR_DATA *sub, struct obj_data *obj, bool bf = FALSE);
-bool check_blind( CHAR_DATA *ch );
-void raw_kill(CHAR_DATA *ch, CHAR_DATA *victim);
-void check_killer( CHAR_DATA *ch, CHAR_DATA *victim );
-int map_eq_level( CHAR_DATA *mob );
-void disarm( CHAR_DATA *ch, CHAR_DATA *victim );
-int shop_keeper( CHAR_DATA *ch, struct obj_data *obj, int cmd, const char *arg, CHAR_DATA * invoker );
+bool CAN_SEE_OBJ( char_data *sub, struct obj_data *obj, bool bf = FALSE);
+bool check_blind( char_data *ch );
+void raw_kill(char_data *ch, char_data *victim);
+void check_killer( char_data *ch, char_data *victim );
+int map_eq_level( char_data *mob );
+void disarm( char_data *ch, char_data *victim );
+int shop_keeper( char_data *ch, struct obj_data *obj, int cmd, const char *arg, char_data * invoker );
 void send_to_all(char *messg);
-void ansi_color(char *txt, CHAR_DATA *ch);
+void ansi_color(char *txt, char_data *ch);
 void send_to_char(string messg, struct char_data *ch);
-void send_to_char(const char *messg, CHAR_DATA *ch);
-void send_to_char_nosp(const char *messg, CHAR_DATA *ch);
-void send_to_room(string messg, int room, bool awakeonly = FALSE, CHAR_DATA *nta = NULL);
-void record_track_data(CHAR_DATA *ch, int cmd); 
+void send_to_char(const char *messg, char_data *ch);
+void send_to_char_nosp(const char *messg, char_data *ch);
+void send_to_room(string messg, int room, bool awakeonly = FALSE, char_data *nta = NULL);
+void record_track_data(char_data *ch, int cmd); 
 int write_to_descriptor(int desc, string txt);
 int write_to_descriptor_fd(int desc, char *txt);
 void write_to_q(const string txt, queue<string>& queue);
-int use_mana( CHAR_DATA *ch, int sn );
+int use_mana( char_data *ch, int sn );
 void automail(char *name);
 bool file_exists(const char *);
-void util_archive(const char *, CHAR_DATA *);
-void util_unarchive(char *, CHAR_DATA *);
-int is_busy(CHAR_DATA *ch);
+void util_archive(const char *, char_data *);
+void util_unarchive(char *, char_data *);
+int is_busy(char_data *ch);
 int is_ignoring(const char_data * const ch, const char_data * const i);
 void colorCharSend(char* s, struct char_data* ch);
 void send_to_char_regardless(string messg, struct char_data *ch);
@@ -516,54 +516,54 @@ void display_string_list(const char * list[], char_data *ch);
 int contains_no_trade_item(obj_data * obj);
 int contents_cause_unique_problem(obj_data * obj, char_data * vict);
 bool check_make_camp(int);
-int get_leadership_bonus(CHAR_DATA *);
+int get_leadership_bonus(char_data *);
 void update_make_camp_and_leadership(void);
 int _parse_name(const char *arg, char *name);
 
 void mob_suprised_sayings(char_data * ch, char_data * aggressor);
 
 // MOBProgs prototypes
-int     mprog_wordlist_check    ( const char * arg, CHAR_DATA *mob,
-                			CHAR_DATA* actor, OBJ_DATA* object,
+int     mprog_wordlist_check    ( const char * arg, char_data *mob,
+                			char_data* actor, OBJ_DATA* object,
 					void* vo, int type, bool reverse = FALSE );
-void    mprog_percent_check     ( CHAR_DATA *mob, CHAR_DATA* actor,
+void    mprog_percent_check     ( char_data *mob, char_data* actor,
 					OBJ_DATA* object, void* vo,
 					int type );
-int     mprog_act_trigger       (string buf, CHAR_DATA* mob,
-		                        CHAR_DATA* ch, OBJ_DATA* obj,
+int     mprog_act_trigger       (string buf, char_data* mob,
+		                        char_data* ch, OBJ_DATA* obj,
 					void* vo );
-int     mprog_bribe_trigger     ( CHAR_DATA* mob, CHAR_DATA* ch,
+int     mprog_bribe_trigger     ( char_data* mob, char_data* ch,
 		                        int amount );
-int     mprog_entry_trigger     ( CHAR_DATA* mob );
-int     mprog_give_trigger      ( CHAR_DATA* mob, CHAR_DATA* ch,
+int     mprog_entry_trigger     ( char_data* mob );
+int     mprog_give_trigger      ( char_data* mob, char_data* ch,
                 		        OBJ_DATA* obj );
-int     mprog_greet_trigger     ( CHAR_DATA* mob );
-int     mprog_fight_trigger     ( CHAR_DATA* mob, CHAR_DATA* ch );
-int     mprog_hitprcnt_trigger  ( CHAR_DATA* mob, CHAR_DATA* ch );
-int    mprog_death_trigger     ( CHAR_DATA* mob, CHAR_DATA* killer );
-int     mprog_random_trigger    ( CHAR_DATA* mob );
-int     mprog_arandom_trigger   ( CHAR_DATA *mob);
-int     mprog_speech_trigger    (const char* txt, CHAR_DATA* mob );
+int     mprog_greet_trigger     ( char_data* mob );
+int     mprog_fight_trigger     ( char_data* mob, char_data* ch );
+int     mprog_hitprcnt_trigger  ( char_data* mob, char_data* ch );
+int    mprog_death_trigger     ( char_data* mob, char_data* killer );
+int     mprog_random_trigger    ( char_data* mob );
+int     mprog_arandom_trigger   ( char_data *mob);
+int     mprog_speech_trigger    (const char* txt, char_data* mob );
 int 	mprog_catch_trigger	(char_data * mob, int catch_num, char 
 *var, int opt, char_data *actor,obj_data *obj, void *vo, char_data *rndm);
-int 	mprog_attack_trigger	(char_data * mob, CHAR_DATA* ch);
-int     mprog_load_trigger      (CHAR_DATA *mob);
-int mprog_can_see_trigger( CHAR_DATA *ch, CHAR_DATA *mob );
-int mprog_damage_trigger( CHAR_DATA *mob, CHAR_DATA *ch, int amount );
+int 	mprog_attack_trigger	(char_data * mob, char_data* ch);
+int     mprog_load_trigger      (char_data *mob);
+int mprog_can_see_trigger( char_data *ch, char_data *mob );
+int mprog_damage_trigger( char_data *mob, char_data *ch, int amount );
 
 int oprog_catch_trigger(obj_data *obj, int catch_num, char *var, int opt, char_data *actor, obj_data *obj2, void *vo, char_data *rndm);
-int oprog_act_trigger( const char *txt, CHAR_DATA *ch );
-int oprog_speech_trigger(const  char *txt, CHAR_DATA *ch );
-int oprog_command_trigger(const char *txt, CHAR_DATA *ch, char *arg );
-int oprog_weapon_trigger( CHAR_DATA *ch, OBJ_DATA *item );
-int oprog_armour_trigger( CHAR_DATA *ch, OBJ_DATA *item );
+int oprog_act_trigger( const char *txt, char_data *ch );
+int oprog_speech_trigger(const  char *txt, char_data *ch );
+int oprog_command_trigger(const char *txt, char_data *ch, char *arg );
+int oprog_weapon_trigger( char_data *ch, OBJ_DATA *item );
+int oprog_armour_trigger( char_data *ch, OBJ_DATA *item );
 int oprog_rand_trigger( OBJ_DATA *item);
 int oprog_arand_trigger( OBJ_DATA *item);
-int oprog_greet_trigger( CHAR_DATA *ch);
+int oprog_greet_trigger( char_data *ch);
 int oprog_load_trigger( OBJ_DATA *item);
-int oprog_can_see_trigger( CHAR_DATA *ch, OBJ_DATA *item );
+int oprog_can_see_trigger( char_data *ch, OBJ_DATA *item );
 bool is_in_game(char_data *ch);
-int get_stat(CHAR_DATA *ch, int stat);
+int get_stat(char_data *ch, int stat);
 char *pluralize(int qty, char ending[] = "s");
 size_t nocolor_strlen(const char *s);
 void make_prompt(struct descriptor_data *d, string& prompt);
@@ -590,13 +590,13 @@ struct mprog_throw_type {
    mprog_throw_type * next;
    bool mob;			// Mob or object.
    char *var;			// temporary variable
-   CHAR_DATA *actor;
+   char_data *actor;
    obj_data *obj;
    void *vo;
-   CHAR_DATA *rndm; // $r
+   char_data *rndm; // $r
 
  // new mppause crap below..
-   CHAR_DATA *tMob; // it should NOT throw it to another similar mob :P
+   char_data *tMob; // it should NOT throw it to another similar mob :P
    int ifchecks[256]; // Let's hope noone nests more ifs than that.
    int startPos;
    int cPos;
@@ -640,11 +640,11 @@ const char *item_condition(struct obj_data *obj);
 int random_percent_change(uint percentage, int value);
 int random_percent_change(int from, int to, int value);
 bool identify(char_data *ch, obj_data *obj);
-extern void end_oproc(CHAR_DATA *ch, Trace trace = Trace("unknown"));
+extern void end_oproc(char_data *ch, Trace trace = Trace("unknown"));
 void undo_race_saves(char_data * ch);
 string handle_ansi(string s, char_data * ch);
 char * handle_ansi_(char * s, char_data * ch);
-void blackjack_prompt(CHAR_DATA *ch, string& prompt, bool ascii);
+void blackjack_prompt(char_data *ch, string& prompt, bool ascii);
 void show_string(struct descriptor_data *d, const char *input);
 void special_log(char *arg);
 

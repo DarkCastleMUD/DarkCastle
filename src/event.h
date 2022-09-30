@@ -16,7 +16,7 @@
 
 typedef struct  room_data     roomData;
 typedef struct  char_data     charData;
-typedef struct  char_data     CHAR_DATA;
+typedef struct  char_data     char_data;
 typedef struct  obj_data      objData;
 
 typedef struct  event_params  eventParams;
@@ -25,7 +25,7 @@ typedef struct  event_brief   eventBrief;
 typedef struct  event_bucket  eventBucket;
 typedef struct  event_handler eventHandler;
 typedef void                  (*eventFunc)(eventParams*);
-typedef int                   (*eventKiller)(CHAR_DATA*, eventData*);
+typedef int                   (*eventKiller)(char_data*, eventData*);
 
 #define EVT_NORMAL       0
 #define EVT_DEAD         1
@@ -70,9 +70,9 @@ eventData* getNewEvent();
 void initHandler();
 void queueEvent(eventData* event, int time);
 void processEvents();
-void killBrief(CHAR_DATA* ch, eventFunc func);
-eventBrief* addBrief(CHAR_DATA* ch, eventData* event);
-eventBrief* foundBrief(CHAR_DATA* ch, eventFunc func);
-void killCharEvents(CHAR_DATA* ch);
+void killBrief(char_data* ch, eventFunc func);
+eventBrief* addBrief(char_data* ch, eventData* event);
+eventBrief* foundBrief(char_data* ch, eventFunc func);
+void killCharEvents(char_data* ch);
 
 #endif

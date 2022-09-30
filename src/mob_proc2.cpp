@@ -457,7 +457,7 @@ int mortician(struct char_data *ch, struct obj_data *obj, int cmd, const char *a
 	return eSUCCESS;
 }
 
-char *gl_item(OBJ_DATA *obj, int number, CHAR_DATA *ch, bool platinum = TRUE)
+char *gl_item(OBJ_DATA *obj, int number, char_data *ch, bool platinum = TRUE)
 {
 	string buf = {}, buf2 = {}, buf3 = {};
 	size_t length = {};

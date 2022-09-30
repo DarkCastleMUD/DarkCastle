@@ -37,7 +37,7 @@ extern CWorld world;
 extern struct spell_info_type spell_info[MAX_SPL_LIST];
 extern struct index_data *obj_index;
 extern struct index_data *mob_index;
-int hands_are_free(CHAR_DATA *ch, int number);
+int hands_are_free(char_data *ch, int number);
 struct obj_data *get_object_in_equip_vis(struct char_data *ch,
     char *arg, struct obj_data *equipment[], int *j, bool blindfighting);
 

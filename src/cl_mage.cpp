@@ -279,9 +279,9 @@ int do_imbue(struct char_data *ch, char *argument, int cmd)
 // Remember that ch is the person triggering the call, meaning they are actually the victim
 // eSUCCESS means the character is unaffected and can keep doing whatever.
 // eFAILURE means the character was interrupted
-int check_ethereal_focus(CHAR_DATA *ch, int trigger_type)
+int check_ethereal_focus(char_data *ch, int trigger_type)
 {
-  CHAR_DATA *i, *next_i, *ally, *next_ally;
+  char_data *i, *next_i, *ally, *next_ally;
   char buf[MAX_STRING_LENGTH];
   int retval;
 

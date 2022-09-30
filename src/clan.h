@@ -81,16 +81,16 @@ private:
 
 void add_totem(OBJ_DATA *altar, OBJ_DATA *totem);
 void remove_totem(OBJ_DATA *altar, OBJ_DATA *totem);
-void add_totem_stats(CHAR_DATA *ch, int stat = 0);
-void remove_totem_stats(CHAR_DATA *ch, int stat = 0);
+void add_totem_stats(char_data *ch, int stat = 0);
+void remove_totem_stats(char_data *ch, int stat = 0);
 bool others_clan_room(char_data *ch, room_data *room);
 void clan_login(char_data * ch);
 void clan_logout(char_data * ch);
 int has_right(char_data * ch, uint32 bit);
 clan_data * get_clan(int nClan);
-clan_data * get_clan(CHAR_DATA *ch);
+clan_data * get_clan(char_data *ch);
 char *get_clan_name(int nClan);
-char *get_clan_name(CHAR_DATA *ch);
+char *get_clan_name(char_data *ch);
 char *get_clan_name(clan_data *clan);
 void save_clans();
 int plr_rights(struct char_data * ch);
@@ -101,8 +101,8 @@ void remove_clan_member(clan_data * theClan, struct char_data * ch);
 void remove_clan_member(int clannumber, struct char_data * ch);
 void free_member(struct clan_member_data * member);
 struct clan_member_data * get_member(char * strName, int nClanId);
-void show_clan_log(CHAR_DATA *ch);
-void log_clan(CHAR_DATA *ch, char *buffer);
+void show_clan_log(char_data *ch);
+void log_clan(char_data *ch, char *buffer);
 void clan_death (char_data *ch, char_data *killer);
 
 #endif /* CLAN_H_ */

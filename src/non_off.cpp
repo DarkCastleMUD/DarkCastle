@@ -40,7 +40,7 @@ extern CWorld world;
 extern struct index_data *obj_index;
 extern CVoteData *DCVote;
    
-void log_sacrifice(CHAR_DATA *ch, OBJ_DATA *obj, bool decay = FALSE)
+void log_sacrifice(char_data *ch, OBJ_DATA *obj, bool decay = FALSE)
 { //decay variable means it's from a decaying corpse, not a player
   time_t timep;
   char *tmstr;
@@ -993,7 +993,7 @@ int do_autoeat(struct char_data *ch, char *argument, int cmd)
     return eSUCCESS;
 }
 
-int do_anonymous(CHAR_DATA *ch, char *argument, int cmd)
+int do_anonymous(char_data *ch, char *argument, int cmd)
 {
   if(ch == 0)
   {
@@ -1090,7 +1090,7 @@ int do_beep_set(struct char_data *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-int do_stand(CHAR_DATA *ch, char *argument, int cmd)
+int do_stand(char_data *ch, char *argument, int cmd)
 {
     switch(GET_POS(ch)) {
         case POSITION_STANDING : {
@@ -1126,7 +1126,7 @@ int do_stand(CHAR_DATA *ch, char *argument, int cmd)
 }
  
  
-int do_sit(CHAR_DATA *ch, char *argument, int cmd)
+int do_sit(char_data *ch, char *argument, int cmd)
 {
  
     if (IS_SET(world[ch->in_room].room_flags, QUIET)) {
@@ -1167,7 +1167,7 @@ int do_sit(CHAR_DATA *ch, char *argument, int cmd)
 }
  
  
-int do_rest(CHAR_DATA *ch, char *argument, int cmd)
+int do_rest(char_data *ch, char *argument, int cmd)
 {
  
  
@@ -1208,7 +1208,7 @@ int do_rest(CHAR_DATA *ch, char *argument, int cmd)
 }
  
  
-int do_sleep(CHAR_DATA *ch, char *argument, int cmd)
+int do_sleep(char_data *ch, char *argument, int cmd)
 {
    struct affected_type *paf;
     if (IS_SET(world[ch->in_room].room_flags, QUIET)) {
@@ -1267,9 +1267,9 @@ int do_sleep(CHAR_DATA *ch, char *argument, int cmd)
 }
  
  
-int do_wake(CHAR_DATA *ch, char *argument, int cmd)
+int do_wake(char_data *ch, char *argument, int cmd)
 {
-    CHAR_DATA *tmp_char;
+    char_data *tmp_char;
     char arg[MAX_STRING_LENGTH];
     struct affected_type * af;
     
@@ -1346,7 +1346,7 @@ int do_wake(CHAR_DATA *ch, char *argument, int cmd)
 // global tag var
 char_data * tagged_person;
 
-int do_tag(CHAR_DATA *ch, char *argument, int cmd)
+int do_tag(char_data *ch, char *argument, int cmd)
 {
    char name[MAX_INPUT_LENGTH];
    char_data * victim;
@@ -1743,7 +1743,7 @@ int do_vote(struct char_data *ch, char *arg, int cmd)
 
 }
 
-int do_random(CHAR_DATA *ch, char *argument, int cmd)
+int do_random(char_data *ch, char *argument, int cmd)
 {
 char buf[MAX_STRING_LENGTH];
  int i = 0;

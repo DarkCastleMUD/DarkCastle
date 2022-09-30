@@ -1258,7 +1258,7 @@ void Leaderboard::write_file(const char filename[]) {
 	dc_fclose(fl);
 }
 
-int Leaderboard::pdscore(CHAR_DATA * ch) {
+int Leaderboard::pdscore(char_data * ch) {
 	return ch->pcdata->pdeaths;
 }
 

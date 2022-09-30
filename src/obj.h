@@ -238,8 +238,8 @@ struct obj_data {
 	char *short_description;            /* when worn/carry/in cont.         */
 	char *action_description;           /* What to write when used          */
 	extra_descr_data *ex_description;   /* extra descriptions     */
-	CHAR_DATA *carried_by;              /* Carried by :NULL in room/conta   */
-	CHAR_DATA *equipped_by;             /* so I can access the player :)    */
+	char_data *carried_by;              /* Carried by :NULL in room/conta   */
+	char_data *equipped_by;             /* so I can access the player :)    */
 
 	obj_data *in_obj;                   /* In what object NULL when none    */
 	obj_data *contains;                 /* Contains objects                 */

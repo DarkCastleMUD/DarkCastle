@@ -32,7 +32,7 @@ typedef unsigned short int      uint16;
 typedef signed int               int32_t;
 typedef unsigned int            uint32;
 
-typedef	struct char_data	CHAR_DATA;
+typedef	struct char_data	char_data;
 typedef	struct obj_data		OBJ_DATA;
 
 #define MAX_STRING_LENGTH   8192
@@ -60,8 +60,8 @@ typedef struct txt_q
 
 struct snoop_data
 {
-    CHAR_DATA *snooping; 
-    CHAR_DATA *snoop_by;
+    char_data *snooping; 
+    char_data *snoop_by;
 };
 
 

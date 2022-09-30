@@ -59,8 +59,8 @@ using namespace std;
 #define STATE(d) ((d)->connected)
 
 void AuctionHandleDelete(string name);
-bool is_bracing(CHAR_DATA *bracee, struct room_direction_data *exit);
-void check_for_sold_items(CHAR_DATA *ch);
+bool is_bracing(char_data *bracee, struct room_direction_data *exit);
+void check_for_sold_items(char_data *ch);
 void show_question_race(descriptor_data *d);
 
 const char menu[] = "\n\rWelcome to Dark Castle Mud\n\r\n\r"
@@ -90,8 +90,8 @@ extern CVoteData *DCVote;
 int isbanned(char *hostname);
 int _parse_email(char *arg);
 bool check_deny(struct descriptor_data *d, char *name);
-void update_wizlist(CHAR_DATA *ch);
-void isr_set(CHAR_DATA *ch);
+void update_wizlist(char_data *ch);
+void isr_set(char_data *ch);
 bool check_reconnect(struct descriptor_data *d, char *name, bool fReconnect);
 bool check_playing(struct descriptor_data *d, char *name);
 bool on_forbidden_name_list(char *name);
@@ -103,11 +103,11 @@ bool handle_get_race(descriptor_data *d, string arg);
 void show_question_race(descriptor_data *d);
 void show_question_class(descriptor_data *d);
 bool handle_get_class(descriptor_data* d, string arg);
-int is_clss_race_compat(CHAR_DATA *ch, int clss);
+int is_clss_race_compat(char_data *ch, int clss);
 void show_question_stats(descriptor_data *d);
 bool handle_get_stats(descriptor_data* d, string arg);
 
-int is_race_eligible(CHAR_DATA *ch, int race)
+int is_race_eligible(char_data *ch, int race)
 {
    if (race == 2 && (GET_RAW_DEX(ch) < 10 || GET_RAW_INT(ch) < 10))
       return FALSE;
@@ -183,7 +183,7 @@ int is_clss_race_compat(const char_data* ch, int clss, int race)
    return (compat);
 }
 
-int is_clss_eligible(CHAR_DATA *ch, int clss)
+int is_clss_eligible(char_data *ch, int clss)
 {
    int x = 0;
 
@@ -701,7 +701,7 @@ void do_on_login_stuff(char_data *ch)
    }
 }
 
-void roll_and_display_stats(CHAR_DATA *ch)
+void roll_and_display_stats(char_data *ch)
 {
    int x, a, b;
    char buf[MAX_STRING_LENGTH];
@@ -2097,7 +2097,7 @@ bool check_reconnect(struct descriptor_data *d, char *name, bool fReconnect)
 bool check_playing(struct descriptor_data *d, char *name)
 {
    struct descriptor_data *dold, *next_d;
-   CHAR_DATA *compare = 0;
+   char_data *compare = 0;
 
    for (dold = descriptor_list; dold; dold = next_d)
    {
@@ -2155,18 +2155,18 @@ void short_activity()
 
 // these are for my special lag that only keeps you from doing certain
 // commands, while still allowing other.
-void add_command_lag(CHAR_DATA *ch, int amount)
+void add_command_lag(char_data *ch, int amount)
 {
    if (GET_LEVEL(ch) < IMMORTAL)
       ch->timer += amount;
 }
 
-int check_command_lag(CHAR_DATA *ch)
+int check_command_lag(char_data *ch)
 {
    return ch->timer;
 }
 
-void remove_command_lag(CHAR_DATA *ch)
+void remove_command_lag(char_data *ch)
 {
    ch->timer = 0;
 }
@@ -2295,7 +2295,7 @@ void check_silence_beacons(void)
 void checkConsecrate(int pulseType)
 {
    OBJ_DATA *obj, *tmp_obj;
-   CHAR_DATA *ch = NULL, *tmp_ch, *next_ch;
+   char_data *ch = NULL, *tmp_ch, *next_ch;
    int align, amount, spl = 0;
    char buf[MAX_STRING_LENGTH];
 

@@ -10,7 +10,7 @@
 
 #include "structs.h" // ubyte, ubyte, etc..
 
-typedef int	KI_FUN		( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict);
+typedef int	KI_FUN		( ubyte level, char_data *ch, char *arg, char_data *vict);
 
 /************************************************************************
 | These are pretty worthless, since I never did anything with them
@@ -41,9 +41,9 @@ struct ki_info_type
 | Function declarations
 */
 
-int ki_gain(CHAR_DATA *ch);
-int ki_check(CHAR_DATA *ch);
-void reduce_ki(CHAR_DATA *ch, int type);
+int ki_gain(char_data *ch);
+int ki_check(char_data *ch);
+void reduce_ki(char_data *ch, int type);
 char * skip_spaces(char *string);
 
 KI_FUN ki_blast;

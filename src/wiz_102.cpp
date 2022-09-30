@@ -2285,7 +2285,7 @@ int do_procedit(struct char_data *ch, char *argument, int cmd)
   MPROG_DATA *prog;
   MPROG_DATA *currprog;
 
-  void mpstat(CHAR_DATA *ch, CHAR_DATA *victim);
+  void mpstat(char_data *ch, char_data *victim);
 
   const char *fields[] = { "add", "remove", "type", "arglist", "command", "list", "\n" };
 
@@ -4885,7 +4885,7 @@ int do_rstat(struct char_data *ch, char *argument, int cmd)
 	      if (real_mobile(d->vnum) == -1)
 		csendf(ch, "UNKNOWN(%d)\r\n",d->vnum);
 		else
-  	      csendf(ch, "%s(%d)\r\n",((CHAR_DATA*)mob_index[real_mobile(d->vnum)].item)->short_desc,d->vnum);
+  	      csendf(ch, "%s(%d)\r\n",((char_data*)mob_index[real_mobile(d->vnum)].item)->short_desc,d->vnum);
 	     a++;
 	    }
 	send_to_char("\r\n",ch);	

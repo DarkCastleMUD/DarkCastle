@@ -1798,7 +1798,7 @@ void begin_hunt(int item, int duration, int amount, char *huntname)
   for (int i = 0; i < amount; i++)
   {
     int mob = -1;
-    CHAR_DATA *vict;
+    char_data *vict;
     while (1)
     {
       mob = number(1, top_of_mobt);
@@ -1954,7 +1954,7 @@ void pulse_hunts()
   }
 }
 
-int do_showhunt(CHAR_DATA *ch, char *arg, int cmd)
+int do_showhunt(char_data *ch, char *arg, int cmd)
 {
   string buf;
   struct hunt_data *h;

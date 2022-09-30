@@ -33,7 +33,7 @@
 #include "const.h"
 #include "move.h"
 
-int check_ethereal_focus(CHAR_DATA *ch, int trigger_type); // class/cl_mage.cpp
+int check_ethereal_focus(char_data *ch, int trigger_type); // class/cl_mage.cpp
 
 int move_player(char_data * ch, int room) {
 	int retval;
@@ -50,7 +50,7 @@ int move_player(char_data * ch, int room) {
 	return retval;
 }
 
-void move_player_home(CHAR_DATA *victim) {
+void move_player_home(char_data *victim) {
 	int was_in = victim->in_room;
 	int found = 0;
 	clan_data * clan = NULL;
@@ -89,7 +89,7 @@ void move_player_home(CHAR_DATA *victim) {
 
 // Rewritten 9/1/96
 // -Sadus
-void record_track_data(CHAR_DATA *ch, int cmd) {
+void record_track_data(char_data *ch, int cmd) {
 	room_track_data * newScent;
 
 	// Rangers outdoors leave no tracks
@@ -131,7 +131,7 @@ void record_track_data(CHAR_DATA *ch, int cmd) {
 }
 
 // Removed this due to it being a funky cold medina. - Nocturnal 09/28/05
-//void do_muddy(CHAR_DATA *ch)
+//void do_muddy(char_data *ch)
 //{
 //   short chance = number(0,30);
 //
@@ -146,7 +146,7 @@ void record_track_data(CHAR_DATA *ch, int cmd) {
 //   }
 //}
 
-int do_unstable(CHAR_DATA *ch) {
+int do_unstable(char_data *ch) {
 	char death_log[MAX_STRING_LENGTH];
 	int retval;
 
@@ -178,7 +178,7 @@ int do_unstable(CHAR_DATA *ch) {
 		return eSUCCESS;
 }
 
-int do_fall(CHAR_DATA *ch, short dir) {
+int do_fall(char_data *ch, short dir) {
 	int target;
 	char damage[MAX_STRING_LENGTH];
 	int retval;
@@ -220,7 +220,7 @@ int do_fall(CHAR_DATA *ch, short dir) {
 
 	if (IS_SET(world[target].room_flags, TUNNEL)) {
 		int ppl = 0;
-		CHAR_DATA *k;
+		char_data *k;
 		for (k = world[target].people; k; k = k->next_in_room)
 			if (!IS_NPC(k))
 				ppl++;
@@ -232,7 +232,7 @@ int do_fall(CHAR_DATA *ch, short dir) {
 
 	if (IS_SET(world[target].room_flags, PRIVATE)) {
 		int ppl = 0;
-		CHAR_DATA *k;
+		char_data *k;
 		for (k = world[target].people; k; k = k->next_in_room)
 			if (!IS_NPC(k))
 				ppl++;
@@ -308,7 +308,7 @@ int do_fall(CHAR_DATA *ch, short dir) {
 // Assumes
 // 1. No master and no followers.
 // 2. That the direction exists.
-int do_simple_move(CHAR_DATA *ch, int cmd, int following)
+int do_simple_move(char_data *ch, int cmd, int following)
 {
 	char tmp[80];
 	int dir;
@@ -538,7 +538,7 @@ int do_simple_move(CHAR_DATA *ch, int cmd, int following)
 	if (IS_SET(rm->room_flags, TUNNEL))
 	{
 		int ppl = 0;
-		CHAR_DATA *k;
+		char_data *k;
 		for (k = rm->people; k; k = k->next_in_room)
 			if (!IS_NPC(k))
 				ppl++;
@@ -574,7 +574,7 @@ int do_simple_move(CHAR_DATA *ch, int cmd, int following)
 	if (IS_SET(rm->room_flags, PRIVATE))
 	{
 		int ppl = 0;
-		CHAR_DATA *k;
+		char_data *k;
 		for (k = rm->people; k; k = k->next_in_room)
 			if (!IS_NPC(k))
 				ppl++;
@@ -802,7 +802,7 @@ int do_simple_move(CHAR_DATA *ch, int cmd, int following)
 	 }
 	 */
 	if ((GET_CLASS(ch) == CLASS_BARD && has_skill(ch, SKILL_SONG_HYPNOTIC_HARMONY)) || GET_CLASS(ch) == CLASS_RANGER)
-		for (CHAR_DATA *tmp_ch = world[ch->in_room].people; tmp_ch; tmp_ch = tmp_ch->next_in_room)
+		for (char_data *tmp_ch = world[ch->in_room].people; tmp_ch; tmp_ch = tmp_ch->next_in_room)
 		{
 			if (!IS_NPC(tmp_ch))
 				continue;
@@ -841,7 +841,7 @@ int do_simple_move(CHAR_DATA *ch, int cmd, int following)
 	return eSUCCESS;
 }
 
-int attempt_move(CHAR_DATA *ch, int cmd, int is_retreat) {
+int attempt_move(char_data *ch, int cmd, int is_retreat) {
 	char tmp[80];
 	int return_val;
 	int was_in = ch->in_room;
@@ -987,7 +987,7 @@ int attempt_move(CHAR_DATA *ch, int cmd, int is_retreat) {
 //   1 : If success.
 //   0 : If fail
 //  -1 : If dead.
-int do_move(CHAR_DATA *ch, char *argument, int cmd) {
+int do_move(char_data *ch, char *argument, int cmd) {
 	return attempt_move(ch, cmd);
 }
 
@@ -1025,11 +1025,11 @@ int do_leave(struct char_data *ch, char *arguement, int cmd)
 	return eFAILURE;
 }
 
-int do_enter(CHAR_DATA *ch, char *argument, int cmd) {
+int do_enter(char_data *ch, char *argument, int cmd) {
 	char buf[MAX_STRING_LENGTH];
 	int retval;
 
-	CHAR_DATA *sesame;
+	char_data *sesame;
 	OBJ_DATA *portal = NULL;
 
 	if ((ch->in_room != NOWHERE) || (ch->in_room)) {
@@ -1163,11 +1163,11 @@ int do_enter(CHAR_DATA *ch, char *argument, int cmd) {
 	return ambush(ch);
 }
 
-int move_char(CHAR_DATA *ch, int dest) {
+int move_char(char_data *ch, int dest) {
 	return move_char(ch, dest, true);
 }
 
-int move_char(CHAR_DATA *ch, int dest, bool stop_all_fighting) {
+int move_char(char_data *ch, int dest, bool stop_all_fighting) {
 	if (!ch) {
 		log("Error in move_char(), NULL character", OVERSEER, LOG_BUG);
 		return eINTERNAL_ERROR;
@@ -1244,9 +1244,9 @@ int do_climb(struct char_data *ch, char *argument, int cmd) {
 
 // The End
 
-int ambush(CHAR_DATA *ch)
+int ambush(char_data *ch)
 {
-  CHAR_DATA *i, *next_i;
+  char_data *i, *next_i;
   int retval;
 
   for(i = world[ch->in_room].people; i; i = next_i) 

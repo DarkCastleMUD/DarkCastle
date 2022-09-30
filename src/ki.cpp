@@ -35,7 +35,7 @@ using namespace std;
 
 extern CWorld world;
  
-extern int hit_gain(CHAR_DATA *, int);
+extern int hit_gain(char_data *, int);
 
 struct ki_info_type ki_info [ ] = {
 { /* 0 */
@@ -115,17 +115,17 @@ const char *ki[] = {
     "transfer",
     "\n"};
 
-int16 use_ki(CHAR_DATA *ch, int kn);
-bool ARE_GROUPED(CHAR_DATA *sub, CHAR_DATA *obj);
+int16 use_ki(char_data *ch, int kn);
+bool ARE_GROUPED(char_data *sub, char_data *obj);
 
-int16 use_ki(CHAR_DATA *ch, int kn)
+int16 use_ki(char_data *ch, int kn)
 {
 	return(ki_info[kn].min_useski);
 }
 
 
-int do_ki(CHAR_DATA *ch, char *argument, int cmd) {
-	CHAR_DATA *tar_char = ch;
+int do_ki(char_data *ch, char *argument, int cmd) {
+	char_data *tar_char = ch;
 	char name[MAX_STRING_LENGTH];
 	int qend, spl = -1;
 	bool target_ok;
@@ -353,7 +353,7 @@ int do_ki(CHAR_DATA *ch, char *argument, int cmd) {
 	return eFAILURE;
 }
 
-void reduce_ki(CHAR_DATA *ch, int type)
+void reduce_ki(char_data *ch, int type)
 {
 	int amount = 0;
 
@@ -366,7 +366,7 @@ void reduce_ki(CHAR_DATA *ch, int type)
 
 }
 
-int ki_gain(CHAR_DATA *ch)
+int ki_gain(char_data *ch)
 {
 	int gain;
 
@@ -392,7 +392,7 @@ int ki_gain(CHAR_DATA *ch)
 	return MAX(gain, 1);
 }
 
-int ki_blast( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
+int ki_blast( ubyte level, char_data *ch, char *arg, char_data *vict)
 {
    int success = 0;
    int exit = number(0, 5); /* Chooses an exit */
@@ -447,7 +447,7 @@ int ki_blast( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
           add_memory(vict, GET_NAME(ch), 'h');
           remove_memory(vict, 'f');
         }
-        CHAR_DATA *tmp;
+        char_data *tmp;
         for(tmp = world[ch->in_room].people;tmp;tmp = tmp->next_in_room)
           if (tmp->fighting == vict)
             stop_fighting(tmp);
@@ -487,7 +487,7 @@ int ki_blast( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
    return eSUCCESS;
 }
 
-int ki_punch(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
+int ki_punch(ubyte level, char_data *ch, char *arg, char_data *vict)
 {
   if (!vict)
   {
@@ -533,7 +533,7 @@ int ki_punch(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
   return eSUCCESS; // shouldn't get here
 }
 
-int ki_sense( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
+int ki_sense( ubyte level, char_data *ch, char *arg, char_data *vict)
 {
 	struct affected_type af;
 	if(IS_AFFECTED(ch, AFF_INFRARED))
@@ -552,11 +552,11 @@ int ki_sense( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
 	return eSUCCESS;
 }
 
-int ki_storm( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
+int ki_storm( ubyte level, char_data *ch, char *arg, char_data *vict)
 {
   int dam;
   int retval;
-  CHAR_DATA *tmp_victim, *temp;
+  char_data *tmp_victim, *temp;
 
   dam = number(135,165);
 //  send_to_char("Your wholeness of spirit purges the souls of those around you!\n\r", ch);
@@ -599,7 +599,7 @@ int ki_storm( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
   return eSUCCESS;
 }
 
-int ki_speed( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
+int ki_speed( ubyte level, char_data *ch, char *arg, char_data *vict)
 {
   struct affected_type af;
 
@@ -632,7 +632,7 @@ int ki_speed( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
   return eSUCCESS;
 }
 
-int ki_purify( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
+int ki_purify( ubyte level, char_data *ch, char *arg, char_data *vict)
 {
   if(!vict) {
     log("Null victim sent to ki purify", ANGEL, LOG_BUG); 
@@ -685,7 +685,7 @@ int ki_purify( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
 }
 
 
-int ki_disrupt( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim)
+int ki_disrupt( ubyte level, char_data *ch, char *arg, char_data *victim)
 {
    if (!victim) {
       log("Serious problem in ki disrupt!", ANGEL, LOG_BUG);
@@ -1028,7 +1028,7 @@ int ki_disrupt( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim)
    return eSUCCESS;
 }
 
-int ki_stance( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
+int ki_stance( ubyte level, char_data *ch, char *arg, char_data *vict)
 {
    struct affected_type af;
 
@@ -1059,7 +1059,7 @@ int ki_stance( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
    return eSUCCESS;
 }
 
-int ki_agility( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
+int ki_agility( ubyte level, char_data *ch, char *arg, char_data *vict)
 {
   int learned, chance, percent;
   struct affected_type af;
@@ -1116,7 +1116,7 @@ int ki_agility( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
   return eSUCCESS;  
 }  
 
-int ki_meditation( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
+int ki_meditation( ubyte level, char_data *ch, char *arg, char_data *vict)
 {
    int gain;
 
@@ -1132,7 +1132,7 @@ int ki_meditation( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict)
    return eSUCCESS;
 }
 
-int ki_transfer( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim)
+int ki_transfer( ubyte level, char_data *ch, char *arg, char_data *victim)
 {
   char amt[MAX_STRING_LENGTH], type[MAX_STRING_LENGTH];
   int amount, temp=0;

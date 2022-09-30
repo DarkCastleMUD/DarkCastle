@@ -10,7 +10,7 @@
 
 #include "const.h"
 
-int get_max(CHAR_DATA *ch, int skill);
+int get_max(char_data *ch, int skill);
 int guild(struct char_data *ch, struct obj_data *obj, int cmd, char *arg, struct char_data *owner);
 bool learn_skill(char_data * ch, int skillnum, int amount, int maximum);
 class_skill_defines * get_skill_list(char_data * ch);

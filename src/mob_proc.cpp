@@ -47,7 +47,7 @@ extern CWorld world;
 extern struct index_data *obj_index;
 extern struct index_data *mob_index;
 
-int check_components(CHAR_DATA *ch, int destroy, int item_one = 0,
+int check_components(char_data *ch, int destroy, int item_one = 0,
 	int item_two = 0, int item_three = 0, int item_four = 0,
 	bool silent = FALSE);
 /* extern procedures */
@@ -198,7 +198,7 @@ void damage_all_players_in_room(struct char_data *ch, int damage)
 {
     char_data * vict = NULL;
     char_data * next_vict = NULL;
-    void inform_victim(CHAR_DATA *ch, CHAR_DATA *vict, int dam);
+    void inform_victim(char_data *ch, char_data *vict, int dam);
 
     for (vict = world[ch->in_room].people; vict; vict = next_vict)
     {    
@@ -354,10 +354,10 @@ int fighter(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg
 }
 
 
-int active_tarrasque(CHAR_DATA *ch, struct obj_data *obj, int cmd, const char *arg,        
+int active_tarrasque(char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
           struct char_data *owner) 
 {
-    CHAR_DATA *vict;
+    char_data *vict;
 
     if((GET_POS(ch) != POSITION_FIGHTING) || (!ch->fighting)) {
         return eFAILURE;
@@ -406,10 +406,10 @@ int active_tarrasque(CHAR_DATA *ch, struct obj_data *obj, int cmd, const char *a
 }
 
 
-int active_grandmaster(CHAR_DATA *ch, struct obj_data *obj, int command, const char *arg,        
+int active_grandmaster(char_data *ch, struct obj_data *obj, int command, const char *arg,        
           struct char_data *owner) 
 {
-    CHAR_DATA *vict;
+    char_data *vict;
     /* Find a dude to do evil things upon ! */
     if((GET_POS(ch) != POSITION_FIGHTING)) {
         return eFAILURE;
@@ -2327,10 +2327,10 @@ int newbie_zone_guard(struct char_data *ch, struct obj_data *obj, int cmd, const
 
 
 // I just like to hellstream every other round.
-int hellstreamer(CHAR_DATA *ch, struct obj_data *obj, int cmd, const char *arg,        
+int hellstreamer(char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
           struct char_data *owner)
 {
-    CHAR_DATA *vict;
+    char_data *vict;
     // int percent; 
     /* Find a dude to do evil things upon ! */
 
@@ -2363,10 +2363,10 @@ int hellstreamer(CHAR_DATA *ch, struct obj_data *obj, int cmd, const char *arg,
 }
 
 // I just firestorm every round...stupid groupies!
-int firestormer(CHAR_DATA *ch, struct obj_data *obj, int cmd, const char *arg,        
+int firestormer(char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
           struct char_data *owner)
 {
-    CHAR_DATA *vict = NULL;
+    char_data *vict = NULL;
     // int percent; 
 
     act("$n utters the words 'Fry bitch!'.", ch, 0, 0, 
@@ -2667,10 +2667,10 @@ int panicprisoner (struct char_data*ch, struct obj_data *obj, int cmd, const cha
 
 
 // let's teleport people around the mud:)
-int bounder(CHAR_DATA *ch, struct obj_data *obj, int cmd, const char *arg,        
+int bounder(char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
           struct char_data *owner)
 {
-    CHAR_DATA *vict;
+    char_data *vict;
     // int percent; 
 
     /* Find a dude to do evil things upon ! */
@@ -2697,10 +2697,10 @@ int bounder(CHAR_DATA *ch, struct obj_data *obj, int cmd, const char *arg,
 }
 
 // I love to dispel stuff!
-int dispelguy(CHAR_DATA *ch, struct obj_data *obj, int cmd, const char *arg,        
+int dispelguy(char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
           struct char_data *owner)
 {
-    CHAR_DATA *vict;
+    char_data *vict;
     // int percent; 
 
     if((GET_POS(ch) != POSITION_FIGHTING)) {

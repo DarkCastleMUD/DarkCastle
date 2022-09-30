@@ -356,7 +356,7 @@ int load_new_help(FILE *fl, int reload, struct char_data *ch)
   return eSUCCESS;
 }
 
-int do_areas(CHAR_DATA *ch, char *arg, int cmd)
+int do_areas(char_data *ch, char *arg, int cmd)
 {
    strcpy(arg, "areas");
    return do_new_help(ch, arg, cmd);

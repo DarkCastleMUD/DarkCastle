@@ -35,9 +35,9 @@
 #include "const.h"
 
 
-void AuctionHandleRenames(CHAR_DATA *ch, string old_name, string new_name);
+void AuctionHandleRenames(char_data *ch, string old_name, string new_name);
 
-int get_max_stat_bonus(CHAR_DATA *ch, int attrs)
+int get_max_stat_bonus(char_data *ch, int attrs)
 {
   int bonus = 0;
 
@@ -750,10 +750,10 @@ extern int64_t mana_plats_spent(char_data * ch);
 
 
 
-int do_metastat(CHAR_DATA *ch, char *argument, int cmd)
+int do_metastat(char_data *ch, char *argument, int cmd)
 {
   char arg[MAX_INPUT_LENGTH];
-  CHAR_DATA *victim;
+  char_data *victim;
   argument = one_argument(argument, arg);
   if (arg[0] == '\0' || !(victim = get_pc_vis(ch, arg)))
   {
@@ -802,7 +802,7 @@ r_new_meta_platinum_cost(0,moves_plats_spent(victim))+GET_RAW_MOVE(victim)-GET_M
 }
 
 
-int do_acfinder(CHAR_DATA *ch, char *argument, int cmdnum)
+int do_acfinder(char_data *ch, char *argument, int cmdnum)
 {
   char arg[MAX_STRING_LENGTH];
   argument = one_argument(argument,arg);

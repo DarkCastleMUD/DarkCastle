@@ -818,8 +818,8 @@ int do_crazedassault(struct char_data *ch, char *argument, int cmd)
 
 void rush_reset(void *arg1, void *arg2, void *arg3)
 {
-  CHAR_DATA *ch = (CHAR_DATA*)arg1;
-  extern bool charExists(CHAR_DATA *ch);
+  char_data *ch = (char_data*)arg1;
+  extern bool charExists(char_data *ch);
   if (!charExists(ch)) return;
   REMBIT(ch->affected_by, AFF_RUSH_CD);
 }
@@ -1180,7 +1180,7 @@ int do_knockback(struct char_data *ch, char *argument, int cmd)
              remove_memory(victim, 'f');
           }
 
-         CHAR_DATA *tmp;
+         char_data *tmp;
          for(tmp = world[ch->in_room].people;tmp;tmp = tmp->next_in_room)
            if (tmp->fighting == victim)
              stop_fighting(tmp);
@@ -1216,7 +1216,7 @@ int do_knockback(struct char_data *ch, char *argument, int cmd)
 }
 
 
-int do_primalfury(CHAR_DATA *ch, char *argument, int cmd)
+int do_primalfury(char_data *ch, char *argument, int cmd)
 {
   struct affected_type af;
 

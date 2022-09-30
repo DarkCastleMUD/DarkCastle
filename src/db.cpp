@@ -196,7 +196,7 @@ void reset_zone(int zone);
 void fix_shopkeepers_inventory();
 int file_to_string(const char *name, char *buf);
 void reset_time(void);
-void clear_char(CHAR_DATA *ch);
+void clear_char(char_data *ch);
 
 // MOBprogram locals
 int mprog_name_to_type(char* name);
@@ -695,7 +695,7 @@ void boot_db(void)
 }
 
 /*
- int do_motdload(CHAR_DATA *ch, char *argument, int cmd)
+ int do_motdload(char_data *ch, char *argument, int cmd)
  {
  file_to_string(MOTD_FILE, motd);
  file_to_string(IMOTD_FILE, imotd);
@@ -778,7 +778,7 @@ void write_wizlist(const char filename[])
 	dc_fclose(fl);
 }
 
-void update_wizlist(CHAR_DATA *ch)
+void update_wizlist(char_data *ch)
 {
 	int x;
 
@@ -817,7 +817,7 @@ void update_wizlist(CHAR_DATA *ch)
 	write_wizlist(ssbuffer.str().c_str());
 }
 
-int do_wizlist(CHAR_DATA *ch, char *argument, int cmd)
+int do_wizlist(char_data *ch, char *argument, int cmd)
 {
   char buf[MAX_STRING_LENGTH], lines[500], space[80];
   int x, current_level, z = 1;
@@ -1048,7 +1048,7 @@ index_data *generate_mob_indices(int *top, struct index_data *index)
 					index[i].mobspec = NULL;
 					index[i].progtypes = 0;
 					curr_virtno = index[i].virt;
-					if (!(index[i].item = (CHAR_DATA *)read_mobile(i, fl))) {
+					if (!(index[i].item = (char_data *)read_mobile(i, fl))) {
 
 						sprintf(log_buf, "Unable to load mobile %d!\n\r",
 								index[i].virt);
@@ -1091,7 +1091,7 @@ void add_mobspec(int i)
 	if (i < 0)
 		return;
 
-	CHAR_DATA *a = (CHAR_DATA *)mob_index[i].item;
+	char_data *a = (char_data *)mob_index[i].item;
 	if (!a)
 		return;
 	if (!a->c_class)
@@ -1240,13 +1240,13 @@ void add_mobspec(int i)
 		mob_index[i].mobspec = mob_index[real_mobile(mob)].mobprogs;
 
 		for (int j = 0; j < ACT_MAX / ASIZE + 1; j++) {
-			SET_BIT(((CHAR_DATA *)mob_index[i].item)->mobdata->actflags[j],
-					((CHAR_DATA *)mob_index[real_mobile(mob)].item)->mobdata->actflags[j]);
+			SET_BIT(((char_data *)mob_index[i].item)->mobdata->actflags[j],
+					((char_data *)mob_index[real_mobile(mob)].item)->mobdata->actflags[j]);
 		}
 
 		for (int j = 0; j < AFF_MAX / ASIZE + 1; j++) {
-			SET_BIT(((CHAR_DATA *)mob_index[i].item)->affected_by[j],
-					((CHAR_DATA *)mob_index[real_mobile(mob)].item)->affected_by[j]);
+			SET_BIT(((char_data *)mob_index[i].item)->affected_by[j],
+					((char_data *)mob_index[real_mobile(mob)].item)->affected_by[j]);
 		}
 	}
 
@@ -2049,7 +2049,7 @@ void setup_dir(FILE *fl, int room, int dir)
 }
 
 // return true for success
-int create_one_room(CHAR_DATA *ch, int vnum)
+int create_one_room(char_data *ch, int vnum)
 {
 	struct room_data *rp;
 	extern int top_of_zone_table;
@@ -2605,12 +2605,12 @@ void boot_zones(void)
  *********************************************************************** */
 
 /* read a mobile from MOB_FILE */
-CHAR_DATA *read_mobile(int nr, FILE *fl)
+char_data *read_mobile(int nr, FILE *fl)
 {
 	char buf[200];
 	int i, j;
 	int32_t tmp, tmp2, tmp3;
-	CHAR_DATA *mob;
+	char_data *mob;
 	char letter;
 
 	i = nr;
@@ -3283,10 +3283,10 @@ void handle_automatic_mob_settings(char_data * mob)
 			+ ((mob_matrix[baselevel].hitpoints / 100) * percent);
 }
 
-CHAR_DATA *clone_mobile(int nr)
+char_data *clone_mobile(int nr)
 {
 	int i;
-	CHAR_DATA *mob, *old;
+	char_data *mob, *old;
 
 	if (nr < 0)
 		return 0;
@@ -3296,7 +3296,7 @@ CHAR_DATA *clone_mobile(int nr)
 	free_list.erase(mob);
 
 	clear_char(mob);
-	old = ((CHAR_DATA *)(mob_index[nr].item)); /* cast void pointer */
+	old = ((char_data *)(mob_index[nr].item)); /* cast void pointer */
 
 	*mob = *old;
 
@@ -3451,7 +3451,7 @@ int create_blank_item(int nr)
 //  Hack of create_blank_item.. Uriz
 int create_blank_mobile(int nr)
 {
-	CHAR_DATA *mob;
+	char_data *mob;
 	int cur_index = 0;
 
 	// check if room available in index
@@ -3627,7 +3627,7 @@ void delete_mob_from_index(int nr)
 
 	// update index of all the mob prototypes
 	for (i = nr; i <= top_of_mobt; i++)
-		((CHAR_DATA *)mob_index[i].item)->mobdata->nr--;
+		((char_data *)mob_index[i].item)->mobdata->nr--;
 
 	// update mob file indices - these store rnums
 	world_file_list_item * wcurr = NULL;
@@ -4455,7 +4455,7 @@ void reset_zone(int zone)
 	extern int top_of_world;
 	int cmd_no, last_cmd, last_mob, last_obj, last_percent;
 	int last_no;
-	CHAR_DATA *mob = NULL;
+	char_data *mob = NULL;
 	struct obj_data *obj, *obj_to;
 	last_cmd = last_mob = last_obj = last_percent = -1;
 
@@ -5341,7 +5341,7 @@ char fread_char(FILE *fl)
 }
 
 /* release memory allocated for a char struct */
-void free_char(CHAR_DATA *ch, Trace trace)
+void free_char(char_data *ch, Trace trace)
 {
 	int iWear;
 //  struct affected_type *af;
@@ -5536,7 +5536,7 @@ int file_to_string(const char *name, char *buf)
 }
 
 /* clear some of the the working variables of a char */
-void reset_char(CHAR_DATA *ch)
+void reset_char(char_data *ch)
 {
 	int i;
 
@@ -5635,7 +5635,7 @@ void reset_char(CHAR_DATA *ch)
 /*
  * Clear but do not de-alloc.
  */
-void clear_char(CHAR_DATA *ch)
+void clear_char(char_data *ch)
 {
 	if (ch == nullptr)
 	{
@@ -5696,7 +5696,7 @@ void apply_initial_saves(char_data *ch)
 			ch->pcdata->saves_mods[i] = 0;
 }
 
-void init_char(CHAR_DATA *ch)
+void init_char(char_data *ch)
 {
 	GET_TITLE(ch) = str_dup("is still a virgin.");
 

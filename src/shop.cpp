@@ -58,7 +58,7 @@ map<string, reroll_t> reroll_sessions = {};
 /*
  * See if a shop keeper wants to trade.
  */
-int is_ok( CHAR_DATA *keeper, CHAR_DATA *ch, int shop_nr )
+int is_ok( char_data *keeper, char_data *ch, int shop_nr )
 {
     char buf[240];
 
@@ -141,7 +141,7 @@ int unlimited_supply (struct obj_data *item, int shop_nr )
     return FALSE;
 }
 
-void restock_keeper (CHAR_DATA *keeper, int shop_nr)
+void restock_keeper (char_data *keeper, int shop_nr)
 {
   struct obj_data *obj, *obj2;
   char buf[50];
@@ -159,8 +159,8 @@ void restock_keeper (CHAR_DATA *keeper, int shop_nr)
 /*
  * Buy an item from a shop.
  */
-void shopping_buy(const char *arg, CHAR_DATA *ch,
-     CHAR_DATA *keeper, int shop_nr )
+void shopping_buy(const char *arg, char_data *ch,
+     char_data *keeper, int shop_nr )
 {
     char buf[MAX_STRING_LENGTH];
     char argm[MAX_INPUT_LENGTH+1];
@@ -273,8 +273,8 @@ void shopping_buy(const char *arg, CHAR_DATA *ch,
 /*
  * Sell an item to a shop keeper.
  */
-void shopping_sell(const char *arg, CHAR_DATA *ch,
-     CHAR_DATA *keeper, int shop_nr )
+void shopping_sell(const char *arg, char_data *ch,
+     char_data *keeper, int shop_nr )
 {
     char buf[MAX_STRING_LENGTH];
     char argm[MAX_INPUT_LENGTH+1];
@@ -386,8 +386,8 @@ void shopping_sell(const char *arg, CHAR_DATA *ch,
 /*
  * Value an item.
  */
-void shopping_value(const char *arg, CHAR_DATA *ch, 
-    CHAR_DATA *keeper, int shop_nr )
+void shopping_value(const char *arg, char_data *ch, 
+    char_data *keeper, int shop_nr )
 {
     char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH];
     char argm[MAX_INPUT_LENGTH+1];
@@ -588,8 +588,8 @@ void shopping_value(const char *arg, CHAR_DATA *ch,
 /*
  * List available items.
  */
-void shopping_list(const char *arg, CHAR_DATA *ch,
-     CHAR_DATA *keeper, int shop_nr )
+void shopping_list(const char *arg, char_data *ch,
+     char_data *keeper, int shop_nr )
 {
     char buf[MAX_STRING_LENGTH];
     struct obj_data *obj,*tobj;
@@ -658,9 +658,9 @@ void shopping_list(const char *arg, CHAR_DATA *ch,
 
 // Spec proc for shop keepers.
 // TODO - Remove goto's from this....I hate goto's.  This is C, not BASIC....
-int shop_keeper( CHAR_DATA *ch, struct obj_data *obj, int cmd, const char *arg, CHAR_DATA * invoker )
+int shop_keeper( char_data *ch, struct obj_data *obj, int cmd, const char *arg, char_data * invoker )
 {
-    CHAR_DATA *keeper;
+    char_data *keeper;
     int shop_nr;
 
     /*
@@ -855,7 +855,7 @@ void fix_shopkeepers_inventory( )
 {
   int shop_nr;
 
-  CHAR_DATA* keeper = 0;
+  char_data* keeper = 0;
   struct obj_data *obj, *last_obj, *cloned;
 
   // set up the unlimited supply items. Those the shop_keeper has on start up.
@@ -1378,9 +1378,9 @@ void player_shopping_list(const char * arg, char_data * ch, char_data * keeper)
      csendf(ch, "\r\nYour shop has %ld cash in the till.\r\n", shop->money_on_hand);
 }
 
-int player_shop_keeper( CHAR_DATA *ch, struct obj_data *obj, int cmd, const char *arg, CHAR_DATA * invoker )
+int player_shop_keeper( char_data *ch, struct obj_data *obj, int cmd, const char *arg, char_data * invoker )
 {
-    CHAR_DATA *keeper;
+    char_data *keeper;
 
     if(!(keeper = invoker)) {
       log( "Shop_keeper: keeper not found.", ANGEL, LOG_BUG );

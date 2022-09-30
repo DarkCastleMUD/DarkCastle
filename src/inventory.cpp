@@ -1509,7 +1509,7 @@ int do_put(struct char_data *ch, char *argument, int cmd)
   return eFAILURE;
 }
 
-void do_givealldot(CHAR_DATA *ch, char *name, char *target, int cmd)
+void do_givealldot(char_data *ch, char *name, char *target, int cmd)
 {
   struct obj_data *tmp_object;
   struct obj_data *next_object;
@@ -2006,7 +2006,7 @@ bool search_container_for_vnum(obj_data *obj, int vnum)
   return false;
 }
 
-int find_door(CHAR_DATA *ch, char *type, char *dir)
+int find_door(char_data *ch, char *type, char *dir)
 {
     int door;
     const char *dirs[] =
@@ -2059,7 +2059,7 @@ int find_door(CHAR_DATA *ch, char *type, char *dir)
 in_room == exit->in_room
 
 */
-bool is_bracing(CHAR_DATA *bracee, struct room_direction_data *exit)
+bool is_bracing(char_data *bracee, struct room_direction_data *exit)
 {
   //this could happen on a repop of the zone
   if(!IS_SET(exit->exit_info, EX_CLOSED))
@@ -2090,17 +2090,17 @@ bool is_bracing(CHAR_DATA *bracee, struct room_direction_data *exit)
   return false;
 }
 
-int do_open(CHAR_DATA *ch, char *argument, int cmd)
+int do_open(char_data *ch, char *argument, int cmd)
 {
   bool found = false;
    int door, other_room, retval;
    char type[MAX_INPUT_LENGTH], dir[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
    struct room_direction_data *back;
    struct obj_data *obj;
-   CHAR_DATA *victim;
-   CHAR_DATA *next_vict;
+   char_data *victim;
+   char_data *next_vict;
             
-   int do_fall(CHAR_DATA *ch, short dir);
+   int do_fall(char_data *ch, short dir);
             
    retval = 0;
          
@@ -2242,14 +2242,14 @@ int do_open(CHAR_DATA *ch, char *argument, int cmd)
    return eSUCCESS;
 }
 
-int do_close(CHAR_DATA *ch, char *argument, int cmd)
+int do_close(char_data *ch, char *argument, int cmd)
 {
   bool found = false;
    int door, other_room;
    char type[MAX_INPUT_LENGTH], dir[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
    struct room_direction_data *back;
    struct obj_data *obj;
-   CHAR_DATA *victim;   
+   char_data *victim;   
     
    argument_interpreter(argument, type, dir);
     
@@ -2316,7 +2316,7 @@ int do_close(CHAR_DATA *ch, char *argument, int cmd)
    return eSUCCESS;
 }
 
-bool has_key(CHAR_DATA *ch, int key)
+bool has_key(char_data *ch, int key)
 {
  //if key vnum is 0, there is no key
   if (key == 0)
@@ -2349,13 +2349,13 @@ bool has_key(CHAR_DATA *ch, int key)
   return false;
 }
 
-int do_lock(CHAR_DATA *ch, char *argument, int cmd)
+int do_lock(char_data *ch, char *argument, int cmd)
 {
     int door, other_room;
     char type[MAX_INPUT_LENGTH], dir[MAX_INPUT_LENGTH];
     struct room_direction_data *back;
     struct obj_data *obj;
-    CHAR_DATA *victim;   
+    char_data *victim;   
     
     argument_interpreter(argument, type, dir);
     
@@ -2421,13 +2421,13 @@ int do_lock(CHAR_DATA *ch, char *argument, int cmd)
 }
  
  
-int do_unlock(CHAR_DATA *ch, char *argument, int cmd)
+int do_unlock(char_data *ch, char *argument, int cmd)
 {
     int door, other_room;
     char type[MAX_INPUT_LENGTH], dir[MAX_INPUT_LENGTH];
     struct room_direction_data *back;
     struct obj_data *obj;
-    CHAR_DATA *victim;   
+    char_data *victim;   
     
     argument_interpreter(argument, type, dir);
     
@@ -2493,7 +2493,7 @@ int do_unlock(CHAR_DATA *ch, char *argument, int cmd)
     return eSUCCESS;
 }
 
-int palm(CHAR_DATA *ch, struct obj_data *obj_object, struct obj_data *sub_object, bool has_consent)
+int palm(char_data *ch, struct obj_data *obj_object, struct obj_data *sub_object, bool has_consent)
 {
   char buffer[MAX_STRING_LENGTH];
 

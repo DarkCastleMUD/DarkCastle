@@ -22,10 +22,10 @@
 
 extern vector<profession> professions;
 
-int get_max(CHAR_DATA *ch, int skill);
+int get_max(char_data *ch, int skill);
 int guild(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg, struct char_data *owner);
 
-int do_practice(CHAR_DATA *ch, char *arg, int cmd)
+int do_practice(char_data *ch, char *arg, int cmd)
 {
   /* Call "guild" with a null string for an argument.
      This displays the character's skills. */
@@ -928,7 +928,7 @@ int skill_master(struct char_data *ch, struct obj_data *obj, int cmd, const char
     do_say(invoker, "Okay, you've got a deal!",9);
     learn_skill(ch, skl, 1, 1);
 
-    extern void prepare_character_for_sixty(CHAR_DATA *ch);
+    extern void prepare_character_for_sixty(char_data *ch);
     prepare_character_for_sixty(ch);
     sprintf(buf, "$BYou have learned the basics of %s.$R\n\r", get_skill_name(skl));
     send_to_char(buf,ch);
@@ -999,7 +999,7 @@ int skill_master(struct char_data *ch, struct obj_data *obj, int cmd, const char
     return eSUCCESS;
 }
 
-int get_stat(CHAR_DATA *ch, int stat)
+int get_stat(char_data *ch, int stat)
 {
       switch (stat)
       {
@@ -1022,7 +1022,7 @@ int get_stat(CHAR_DATA *ch, int stat)
  return 0;
 }
 
-int get_stat_bonus(CHAR_DATA *ch, int stat)
+int get_stat_bonus(char_data *ch, int stat)
 {
   int bonus = 0;
   switch(stat) {
@@ -1237,7 +1237,7 @@ void verify_max_stats(char_data *ch)
   }
 }
 
-int get_max(CHAR_DATA *ch, int skill)
+int get_max(char_data *ch, int skill)
 {
   class_skill_defines *skilllist = get_skill_list(ch);
   if (!skilllist)
@@ -1276,7 +1276,7 @@ int get_max(CHAR_DATA *ch, int skill)
   return (int)percent;
 }
 
-void check_maxes(CHAR_DATA *ch)
+void check_maxes(char_data *ch)
 {
   int maximum;
   class_skill_defines *skilllist = get_skill_list(ch);

@@ -63,7 +63,7 @@ const char *skill_fields[] = { "learned", "recognize", "\n" };
 void string_hash_add(struct descriptor_data *d, char *str) {
 	char *scan;
 	int terminator = 0;
-	CHAR_DATA *ch = d->character;
+	char_data *ch = d->character;
 
 	scan = str;
 	while (*scan) {
@@ -152,11 +152,11 @@ void quad_arg(char *arg, int *type, char *name, int *field, char *string) {
 }
 
 /* modification of malloc'ed strings in chars/objects */
-int do_string(CHAR_DATA *ch, char *arg, int cmd) {
+int do_string(char_data *ch, char *arg, int cmd) {
 	char name[MAX_STRING_LENGTH], string[MAX_STRING_LENGTH];
 	char message[100];
 	int field, type, ctr;
-	CHAR_DATA *mob = NULL;
+	char_data *mob = NULL;
 	struct obj_data *obj;
 	struct extra_descr_data *ed, *tmp;
 

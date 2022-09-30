@@ -78,14 +78,14 @@ extern std::map<int, std::map<uint8_t, std::string> > professions;
 
 // extern funcs
 clan_data * get_clan(char_data *);
-void release_message(CHAR_DATA *ch);
+void release_message(char_data *ch);
 
 // local vars
 char    log_buf[MAX_STRING_LENGTH];
 struct timer_data *timer_list = NULL;
 
 // local funcs
-void update_wizlist(CHAR_DATA *ch);
+void update_wizlist(char_data *ch);
 
 size_t nocolor_strlen(const char *s)
 {
@@ -710,7 +710,7 @@ struct time_info_data mud_time_passed(time_t t2, time_t t1)
     return now;
 }
 
-struct time_info_data age(CHAR_DATA *ch)
+struct time_info_data age(char_data *ch)
 {
     struct time_info_data player_age;
 
@@ -740,7 +740,7 @@ bool file_exists(const char *filename)
   return(r);
 }
 
-void util_archive(const char *char_name, CHAR_DATA *caller)
+void util_archive(const char *char_name, char_data *caller)
 {
   char buf[256];
   char buf2[256];
@@ -789,7 +789,7 @@ void util_archive(const char *char_name, CHAR_DATA *caller)
   log(buf, IMMORTAL, LOG_GOD);
 }
 
-void util_unarchive(char *char_name, CHAR_DATA *caller)
+void util_unarchive(char *char_name, char_data *caller)
 {
   char buf[256];
   char buf2[256];
@@ -1279,11 +1279,11 @@ int do_bug(struct char_data *ch, char *argument, int cmd)
     return eSUCCESS;
 }
 
-int do_recall( CHAR_DATA *ch, char *argument, int cmd )
+int do_recall( char_data *ch, char *argument, int cmd )
 {
   int location, percent, level, cost = 0, x;
-  CHAR_DATA *victim;
-  CHAR_DATA *loop_ch;
+  char_data *victim;
+  char_data *loop_ch;
   float cf;
   char name[256] = "";
   clan_data * clan;
@@ -1594,7 +1594,7 @@ mob_index[fol->follower->mobdata->nr].virt == 8)
    for(obj = object_list; obj; obj = tmp_obj) {
     tmp_obj = obj->next;
     if(obj_index[obj->item_number].virt == CONSECRATE_OBJ_NUMBER)
-      if(ch == (CHAR_DATA *)(obj->obj_flags.origin) )
+      if(ch == (char_data *)(obj->obj_flags.origin) )
        extract_obj(obj);
    }
   }
@@ -2349,7 +2349,7 @@ void remove_familiars(char *name, BACKUP_TYPE backup)
 
 bool check_make_camp(int room)
 {
-  CHAR_DATA *i, *next_i;
+  char_data *i, *next_i;
   bool campok = FALSE;
 
   for(i = world[room].people; i; i = next_i) {
@@ -2366,9 +2366,9 @@ bool check_make_camp(int room)
   return campok;
 }
 
-int get_leadership_bonus(CHAR_DATA *ch)
+int get_leadership_bonus(char_data *ch)
 {
-  CHAR_DATA *leader;
+  char_data *leader;
   struct follow_type *f, *next_f;
   int highlevel = 0, bonus = 0;
 

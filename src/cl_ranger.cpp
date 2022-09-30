@@ -40,8 +40,8 @@ extern struct obj_data *object_list;
 extern int rev_dir[];
 
 
-int saves_spell(CHAR_DATA *ch, CHAR_DATA *vict, int spell_base, int16 save_type);
-void check_eq(CHAR_DATA *ch);
+int saves_spell(char_data *ch, char_data *vict, int spell_base, int16 save_type);
+void check_eq(char_data *ch);
 extern struct index_data *mob_index;
 int get_difficulty(int);
 
@@ -55,7 +55,7 @@ int charm_space(int level)
   return 1;
 }
 
-int charm_levels(CHAR_DATA *ch)
+int charm_levels(char_data *ch)
 {
   int i = GET_LEVEL(ch)/5;
   int z = 3;
@@ -70,11 +70,11 @@ int charm_levels(CHAR_DATA *ch)
   return i;
 }
 
-int do_free_animal(CHAR_DATA *ch, char *arg, int cmd)
+int do_free_animal(char_data *ch, char *arg, int cmd)
 {
-  CHAR_DATA *victim = NULL;
+  char_data *victim = NULL;
   char buf[MAX_INPUT_LENGTH];
-  void stop_follower(CHAR_DATA *ch, int cmd);
+  void stop_follower(char_data *ch, int cmd);
 
   if(!has_skill(ch, SKILL_FREE_ANIMAL)) {
     send_to_char("Try learning HOW to free an animal first.\r\n", ch);
@@ -119,10 +119,10 @@ int do_free_animal(CHAR_DATA *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-int do_tame(CHAR_DATA *ch, char *arg, int cmd)
+int do_tame(char_data *ch, char *arg, int cmd)
 {
   struct affected_type af;
-  CHAR_DATA *victim;
+  char_data *victim;
   char buf[MAX_INPUT_LENGTH];
 
   while(*arg == ' ')
@@ -169,7 +169,7 @@ int do_tame(CHAR_DATA *ch, char *arg, int cmd)
    if(charm_levels(ch) - charm_space(GET_LEVEL(victim)) < 0)  {
      send_to_char("How you plan on controlling so many followers?\n\r", ch);
      return eFAILURE;
-/*   CHAR_DATA * vict = NULL;
+/*   char_data * vict = NULL;
    for(struct follow_type *k = ch->followers; k; k = k->next)
      if(IS_MOB(k->follower) && affected_by_spell(k->follower, SPELL_CHARM_PERSON))
      {
@@ -231,7 +231,7 @@ int do_tame(CHAR_DATA *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-int do_track(CHAR_DATA *ch, char *argument, int cmd)
+int do_track(char_data *ch, char *argument, int cmd)
 {
   int x,y;
   int retval, how_deep, learned;
@@ -241,8 +241,8 @@ int do_track(CHAR_DATA *ch, char *argument, int cmd)
   char condition[60];
   char weight[40];
   char victim[MAX_INPUT_LENGTH];
-  CHAR_DATA *quarry;
-  CHAR_DATA *tmp_ch = NULL;  // For checking room stuff
+  char_data *quarry;
+  char_data *tmp_ch = NULL;  // For checking room stuff
   room_track_data * pScent = 0;
   void swap_hate_memory(char_data * ch);
 
@@ -484,7 +484,7 @@ int do_track(CHAR_DATA *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_ambush(CHAR_DATA *ch, char *arg, int cmd)
+int do_ambush(char_data *ch, char *arg, int cmd)
 {
   char buf[MAX_STRING_LENGTH];
 
@@ -714,7 +714,7 @@ struct forage_lookup forage_lookup_table[SECT_MAX_SECT+1][6] = {
 };
 
 
-int do_forage(CHAR_DATA *ch, char *arg, int cmd)
+int do_forage(char_data *ch, char *arg, int cmd)
 {
   int learned;
   struct obj_data * new_obj = 0;
@@ -1003,7 +1003,7 @@ int do_arrow_damage(struct char_data *ch, struct char_data *victim,
   char buf[200];
   int retval;
 
-  void inform_victim(CHAR_DATA *, CHAR_DATA *, int);
+  void inform_victim(char_data *, char_data *, int);
 
   buf[199] = '\0'; // just cause I'm paranoid
 
@@ -1715,7 +1715,7 @@ int do_mind_delve(struct char_data *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-void check_eq(CHAR_DATA *ch)
+void check_eq(char_data *ch)
 {
    int pos;
 
@@ -1725,7 +1725,7 @@ void check_eq(CHAR_DATA *ch)
    }
 }
 
-int do_natural_selection(CHAR_DATA *ch, char *arg, int cmd)
+int do_natural_selection(char_data *ch, char *arg, int cmd)
 {
    int i;
    char buf[MAX_STRING_LENGTH];

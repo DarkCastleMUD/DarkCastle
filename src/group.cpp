@@ -29,9 +29,9 @@ extern "C"
 extern CWorld world;
 char * calc_color(int hit, int max_hit);
 
-int do_abandon(CHAR_DATA *ch, char *argument, int cmd)
+int do_abandon(char_data *ch, char *argument, int cmd)
 {
-  CHAR_DATA *k;
+  char_data *k;
   char buf[MAX_INPUT_LENGTH+1];
 
 
@@ -77,7 +77,7 @@ int do_abandon(CHAR_DATA *ch, char *argument, int cmd)
 }
 
   
-int do_found(CHAR_DATA *ch, char *argument, int cmd)
+int do_found(char_data *ch, char *argument, int cmd)
 {
   char buf[MAX_INPUT_LENGTH+1];
 
@@ -126,12 +126,12 @@ int do_found(CHAR_DATA *ch, char *argument, int cmd)
   return eSUCCESS;  
 }
 
-int do_split(CHAR_DATA *ch, char *argument, int cmd)
+int do_split(char_data *ch, char *argument, int cmd)
 {
   int32_t amount, share, extra;
   char buf[256], number[MAX_INPUT_LENGTH+1];
   int no_members;
-  CHAR_DATA *k;
+  char_data *k;
   struct follow_type *f;
 
   if (!*argument){
@@ -405,11 +405,11 @@ int do_group(struct char_data *ch, char *argument, int cmd)
   return eFAILURE;
 }
 
-int do_promote(CHAR_DATA *ch, char *argument, int cmd)
+int do_promote(char_data *ch, char *argument, int cmd)
 {
   char name[MAX_INPUT_LENGTH+1];
   char buf[250];
-  CHAR_DATA *new_new_leader, *k;
+  char_data *new_new_leader, *k;
   struct follow_type *f, *next_f;
 
   one_argument(argument, name);
@@ -496,11 +496,11 @@ int do_promote(CHAR_DATA *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_disband(CHAR_DATA *ch, char *argument, int cmd)
+int do_disband(char_data *ch, char *argument, int cmd)
 {
   char name[MAX_INPUT_LENGTH+1];
   char buf[200];
-  CHAR_DATA *adios, *k;
+  char_data *adios, *k;
   struct follow_type *f, *next_f;
 
   if(IS_SET(world[ch->in_room].room_flags, QUIET)) {
@@ -589,14 +589,14 @@ int do_disband(CHAR_DATA *ch, char *argument, int cmd)
 }
 
 
-int do_follow(CHAR_DATA *ch, char *argument, int cmd)
+int do_follow(char_data *ch, char *argument, int cmd)
 {
     char name[MAX_INPUT_LENGTH+1];
-    CHAR_DATA *leader;
+    char_data *leader;
 
 
-    void stop_follower(CHAR_DATA *ch, int cmd);
-    void add_follower(CHAR_DATA *ch, CHAR_DATA *leader, int cmd);
+    void stop_follower(char_data *ch, int cmd);
+    void add_follower(char_data *ch, char_data *leader, int cmd);
 
     if (IS_SET(world[ch->in_room].room_flags, QUIET))
     {
@@ -663,7 +663,7 @@ int do_follow(CHAR_DATA *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_autojoin(CHAR_DATA *ch, char *argument, int cmd)
+int do_autojoin(char_data *ch, char *argument, int cmd)
 {
   if (!ch->pcdata) return eFAILURE;
   char buf[MAX_STRING_LENGTH];

@@ -23,10 +23,10 @@
 using namespace std;
 
 void load_char_obj_error(FILE *fpsave, char strsave[MAX_INPUT_LENGTH]);
-void store_to_char(struct char_file_u4 *st, CHAR_DATA *ch);
-int store_to_char_variable_data(CHAR_DATA *ch, FILE *fpsave);
-struct obj_data *my_obj_store_to_char(CHAR_DATA *ch, FILE *fpsave, struct obj_data *last_cont);
-int read_pc_or_mob_data(CHAR_DATA *ch, FILE *fpsave);
+void store_to_char(struct char_file_u4 *st, char_data *ch);
+int store_to_char_variable_data(char_data *ch, FILE *fpsave);
+struct obj_data *my_obj_store_to_char(char_data *ch, FILE *fpsave, struct obj_data *last_cont);
+int read_pc_or_mob_data(char_data *ch, FILE *fpsave);
 void init_random();
 void load_vaults();
 

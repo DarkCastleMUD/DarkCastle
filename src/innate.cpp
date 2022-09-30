@@ -35,15 +35,15 @@ extern CWorld world;
 // local function declarations
 
 
-int innate_powerwield (CHAR_DATA *ch, char *argument, int cmd);
-int innate_regeneration (CHAR_DATA *ch, char *argument, int cmd);
-int innate_illusion (CHAR_DATA *ch, char *argument, int cmd);
-int innate_repair (CHAR_DATA *ch, char *argument, int cmd);
-int innate_focus (CHAR_DATA *ch, char *argument, int cmd);
-int innate_evasion (CHAR_DATA *ch, char *argument, int cmd);
-int innate_shadowslip (CHAR_DATA *ch, char *argument, int cmd);
-int innate_bloodlust (CHAR_DATA *ch, char *argument, int cmd);
-int innate_fly (CHAR_DATA *ch, char *argument, int cmd);
+int innate_powerwield (char_data *ch, char *argument, int cmd);
+int innate_regeneration (char_data *ch, char *argument, int cmd);
+int innate_illusion (char_data *ch, char *argument, int cmd);
+int innate_repair (char_data *ch, char *argument, int cmd);
+int innate_focus (char_data *ch, char *argument, int cmd);
+int innate_evasion (char_data *ch, char *argument, int cmd);
+int innate_shadowslip (char_data *ch, char *argument, int cmd);
+int innate_bloodlust (char_data *ch, char *argument, int cmd);
+int innate_fly (char_data *ch, char *argument, int cmd);
 
 ////////////////////////////////////////////////////////////////////////////
 // local definitions
@@ -83,7 +83,7 @@ char * innate_skills[] =
 
 ////////////////////////////////////////////////////////////////////////////
 // command functions
-int do_innate(CHAR_DATA *ch, char *arg, int cmd)
+int do_innate(char_data *ch, char *arg, int cmd)
 {
   if(ch && ch->in_room > 0 &&
      IS_SET(world[ch->in_room].room_flags, ARENA) && arena.type == POTATO) {
@@ -150,7 +150,7 @@ int do_innate(CHAR_DATA *ch, char *arg, int cmd)
   }
 }
 
-int innate_regeneration(CHAR_DATA *ch, char *arg, int cmd)
+int innate_regeneration(char_data *ch, char *arg, int cmd)
 {
    struct affected_type af;
    af.type = SKILL_INNATE_REGENERATION;
@@ -163,7 +163,7 @@ int innate_regeneration(CHAR_DATA *ch, char *arg, int cmd)
    return eSUCCESS;
 }
 
-int innate_powerwield(CHAR_DATA *ch, char *arg, int cmd)
+int innate_powerwield(char_data *ch, char *arg, int cmd)
 {
    struct affected_type af;
    af.type = SKILL_INNATE_POWERWIELD;
@@ -177,7 +177,7 @@ int innate_powerwield(CHAR_DATA *ch, char *arg, int cmd)
    return eSUCCESS;
 }
 
-int innate_focus(CHAR_DATA *ch, char *arg, int cmd)
+int innate_focus(char_data *ch, char *arg, int cmd)
 {
    if(IS_AFFECTED(ch, AFF_FOCUS))
    {
@@ -198,7 +198,7 @@ int innate_focus(CHAR_DATA *ch, char *arg, int cmd)
    return eSUCCESS;   
 }
 
-int innate_illusion(CHAR_DATA *ch, char *arg, int cmd)
+int innate_illusion(char_data *ch, char *arg, int cmd)
 {
   if (IS_AFFECTED(ch, AFF_INVISIBLE))
   {
@@ -220,7 +220,7 @@ int innate_illusion(CHAR_DATA *ch, char *arg, int cmd)
    return eSUCCESS;
 }
 
-int innate_bloodlust(CHAR_DATA *ch, char *arg, int cmd)
+int innate_bloodlust(char_data *ch, char *arg, int cmd)
 {
   if (!ch->fighting)
   {
@@ -233,7 +233,7 @@ int innate_bloodlust(CHAR_DATA *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-int innate_repair(CHAR_DATA *ch, char *arg, int cmd)
+int innate_repair(char_data *ch, char *arg, int cmd)
 {
   struct obj_data *obj;
   char buf[MAX_STRING_LENGTH];
@@ -276,7 +276,7 @@ int innate_repair(CHAR_DATA *ch, char *arg, int cmd)
   
 }
 
-int innate_evasion(CHAR_DATA *ch, char *arg, int cmd)
+int innate_evasion(char_data *ch, char *arg, int cmd)
 {
    struct affected_type af;
    af.type = SKILL_INNATE_EVASION;
@@ -289,7 +289,7 @@ int innate_evasion(CHAR_DATA *ch, char *arg, int cmd)
    return eSUCCESS;
 }
 
-int innate_shadowslip(CHAR_DATA *ch, char *arg, int cmd)
+int innate_shadowslip(char_data *ch, char *arg, int cmd)
 {
    struct affected_type af;
    af.type = SKILL_INNATE_SHADOWSLIP;
@@ -302,7 +302,7 @@ int innate_shadowslip(CHAR_DATA *ch, char *arg, int cmd)
    return eSUCCESS;
 }
 
-int innate_fly(CHAR_DATA *ch, char *arg, int cmd)
+int innate_fly(char_data *ch, char *arg, int cmd)
 {
   if (affected_by_spell(ch, SKILL_INNATE_FLY)) {
     affect_from_char(ch, SKILL_INNATE_FLY);

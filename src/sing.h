@@ -12,7 +12,7 @@
 
 #define BARD_MAX_RATING 3
 
-typedef int	SING_FUN		( ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill);
+typedef int	SING_FUN		( ubyte level, char_data *ch, char *arg, char_data *victim, int skill);
 
 struct song_info_type
 {
@@ -41,7 +41,7 @@ struct songInfo
 */
 
 char * skip_spaces(char *string);
-void stop_grouped_bards(CHAR_DATA *ch, int action);
+void stop_grouped_bards(char_data *ch, int action);
 
 SING_FUN song_whistle_sharp;
 SING_FUN song_disrupt;

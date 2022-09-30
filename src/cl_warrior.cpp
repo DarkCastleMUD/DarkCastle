@@ -249,9 +249,9 @@ int do_retreat(struct char_data *ch, char *argument, int cmd)
    char buf[MAX_INPUT_LENGTH];
    // Azrack -- retval should be initialized to something
    int retval = 0;
-   CHAR_DATA *chTemp, *loop_ch;
+   char_data *chTemp, *loop_ch;
 
-   int is_stunned(CHAR_DATA *ch);
+   int is_stunned(char_data *ch);
 
    if (is_stunned(ch))
       return eFAILURE;
@@ -1094,7 +1094,7 @@ int do_tactics(struct char_data *ch, char *argument, int cmd)
 
 int do_make_camp(struct char_data *ch, char *argument, int cmd)
 {
-  CHAR_DATA *i, *next_i;
+  char_data *i, *next_i;
   int learned = has_skill(ch, SKILL_MAKE_CAMP);
   struct affected_type af;
 
@@ -1276,7 +1276,7 @@ int do_battlesense(struct char_data *ch, char *argument, int cmd)
 
 int do_smite(struct char_data *ch, char *argument, int cmd)
 {
-  CHAR_DATA *vict = NULL;
+  char_data *vict = NULL;
   char name[MAX_STRING_LENGTH];
   int learned = has_skill(ch, SKILL_SMITE);
   struct affected_type af;
@@ -1438,7 +1438,7 @@ int do_perseverance(struct char_data *ch, char *argument, int cmd)
 
 int do_defenders_stance(struct char_data *ch, char *argument, int cmd)
 {
-  CHAR_DATA *vict = NULL;
+  char_data *vict = NULL;
   int learned = has_skill(ch, SKILL_DEFENDERS_STANCE);
   struct affected_type af;
 

@@ -40,8 +40,8 @@ char_data *origsing = NULL;
 using namespace std;
 
 extern struct zone_data *zone_table;
-extern int check_social(CHAR_DATA *ch, char *pcomm, int length, char *arg);
-void check_eq(CHAR_DATA *ch);
+extern int check_social(char_data *ch, char *pcomm, int length, char *arg);
+void check_eq(char_data *ch);
 
 //        ubyte beats;     /* Waiting time after ki */
 //        ubyte minimum_position; /* min position for use */
@@ -200,14 +200,14 @@ const char *songs[] = {  "listsongs", "whistle sharp", "stop", /* If you move st
 		"vigilant siren", "astral chanty", "disarming limerick", "shattering resonance", "irresistable ditty", "fanatical fanfare", "dischordant dirge",
 		"crushing crescendo", "hypnotic harmony", "mountain king's charge", "submariner's anthem", "summoning song", "\n" };
 
-int16 use_song(CHAR_DATA *ch, int kn);
-bool ARE_GROUPED(CHAR_DATA *sub, CHAR_DATA *obj);
+int16 use_song(char_data *ch, int kn);
+bool ARE_GROUPED(char_data *sub, char_data *obj);
 
-int16 use_song(CHAR_DATA *ch, int kn) {
+int16 use_song(char_data *ch, int kn) {
 	return (song_info[kn].min_useski);
 }
 
-int getTotalRating(CHAR_DATA *ch) {
+int getTotalRating(char_data *ch) {
 	int rating = 0;
 	vector<songInfo>::iterator i;
 
@@ -218,7 +218,7 @@ int getTotalRating(CHAR_DATA *ch) {
 	return rating;
 }
 
-void stop_grouped_bards(CHAR_DATA *ch, int bardsing) {
+void stop_grouped_bards(char_data *ch, int bardsing) {
 	char_data * master = NULL;
 	follow_type * fvictim = NULL;
 
@@ -272,8 +272,8 @@ void get_instrument_bonus(char_data * ch, int & comb, int & non_comb) {
 	non_comb = ch->equipment[HOLD]->obj_flags.value[0];
 }
 
-int do_sing(CHAR_DATA *ch, char *arg, int cmd) {
-	CHAR_DATA *tar_char = 0;
+int do_sing(char_data *ch, char *arg, int cmd) {
+	char_data *tar_char = 0;
 	obj_data *tar_obj = 0;
 	char name[MAX_STRING_LENGTH];
 	char spellarg[MAX_STRING_LENGTH];
@@ -807,7 +807,7 @@ return false;
 	DC::instance().removeDead();
 }
 
-int song_hypnotic_harmony(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill) {
+int song_hypnotic_harmony(ubyte level, char_data *ch, char *arg, char_data *victim, int skill) {
 	vector<songInfo>::iterator i;
 
 	if (!victim || !ch) {
@@ -829,7 +829,7 @@ int song_hypnotic_harmony(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict
 	return eSUCCESS;
 }
 
-int execute_song_hypnotic_harmony(ubyte level, CHAR_DATA *ch, char *Arg, CHAR_DATA *victim, int skill) {
+int execute_song_hypnotic_harmony(ubyte level, char_data *ch, char *Arg, char_data *victim, int skill) {
 	struct affected_type af;
 	vector<songInfo>::iterator i;
 
@@ -864,7 +864,7 @@ int execute_song_hypnotic_harmony(ubyte level, CHAR_DATA *ch, char *Arg, CHAR_DA
 		return eFAILURE;
 	}
 
-	int charm_levels(CHAR_DATA *ch);
+	int charm_levels(char_data *ch);
 	int charm_space(int level);
 
 	if (charm_levels(ch) - charm_space(GET_LEVEL(victim)) < 0 && victim->master != ch) {
@@ -896,7 +896,7 @@ int execute_song_hypnotic_harmony(ubyte level, CHAR_DATA *ch, char *Arg, CHAR_DA
 
 }
 
-int song_disrupt(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill) {
+int song_disrupt(ubyte level, char_data *ch, char *arg, char_data *victim, int skill) {
 	if (!victim || !ch) {
 		log("Serious problem in song_disrupt!", ANGEL, LOG_BUG);
 		return eFAILURE | eINTERNAL_ERROR;
@@ -938,7 +938,7 @@ int song_disrupt(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int s
 	return spell_dispel_magic(GET_LEVEL(ch) - 1, ch, victim, 0, 0);
 }
 
-int song_whistle_sharp(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill) {
+int song_whistle_sharp(ubyte level, char_data *ch, char *arg, char_data *victim, int skill) {
 	int dam = 0;
 	int retval;
 	vector<songInfo>::iterator i;
@@ -991,7 +991,7 @@ int song_whistle_sharp(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim,
 	return eSUCCESS;
 }
 
-int song_healing_melody(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill) {
+int song_healing_melody(ubyte level, char_data *ch, char *arg, char_data *victim, int skill) {
 	vector<songInfo>::iterator i;
 
 	send_to_char("You begin to sing a song of healing...\n\r", ch);
@@ -1009,7 +1009,7 @@ int song_healing_melody(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim
 	return eSUCCESS;
 }
 
-int execute_song_healing_melody(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill) {
+int execute_song_healing_melody(ubyte level, char_data *ch, char *arg, char_data *victim, int skill) {
 	int heal = 0;
 	int combat, non_combat;
 	vector<songInfo>::iterator i;
@@ -1069,7 +1069,7 @@ int execute_song_healing_melody(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA
 	return eSUCCESS;
 }
 
-int song_revealing_stacato(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill) {
+int song_revealing_stacato(ubyte level, char_data *ch, char *arg, char_data *victim, int skill) {
 	vector<songInfo>::iterator i;
 
 	send_to_char("You begin to sing a song of revealing...\n\r", ch);
@@ -1084,7 +1084,7 @@ int song_revealing_stacato(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vic
 	return eSUCCESS;
 }
 
-int execute_song_revealing_stacato(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill) {
+int execute_song_revealing_stacato(ubyte level, char_data *ch, char *arg, char_data *victim, int skill) {
 	char_data * i;
 	struct room_data *room;
 	char buf[MAX_STRING_LENGTH];
@@ -1149,7 +1149,7 @@ int execute_song_revealing_stacato(ubyte level, CHAR_DATA *ch, char *arg, CHAR_D
 	return eSUCCESS;
 }
 
-int song_note_of_knowledge(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill) {
+int song_note_of_knowledge(ubyte level, char_data *ch, char *arg, char_data *victim, int skill) {
 	vector<songInfo>::iterator i;
 
 	for (i = ch->songs.begin(); i != ch->songs.end(); ++i)
@@ -1167,7 +1167,7 @@ int song_note_of_knowledge(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vic
 	return eSUCCESS;
 }
 
-int execute_song_note_of_knowledge(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill) {
+int execute_song_note_of_knowledge(ubyte level, char_data *ch, char *arg, char_data *victim, int skill) {
 	obj_data * obj = NULL;
 	char_data * vict = NULL;
 	obj_data * corpse = NULL;
@@ -1201,7 +1201,7 @@ int execute_song_note_of_knowledge(ubyte level, CHAR_DATA *ch, char *arg, CHAR_D
 	return eSUCCESS;
 }
 
-int song_terrible_clef(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill) {
+int song_terrible_clef(ubyte level, char_data *ch, char *arg, char_data *victim, int skill) {
 	vector<songInfo>::iterator i;
 
 	send_to_char("You begin a song of battle!\n\r", ch);
@@ -1215,7 +1215,7 @@ int song_terrible_clef(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim,
 	return eSUCCESS;
 }
 
-int execute_song_terrible_clef(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill) {
+int execute_song_terrible_clef(ubyte level, char_data *ch, char *arg, char_data *victim, int skill) {
 	int dam = 0;
 	int retval;
 	vector<songInfo>::iterator i;
@@ -1271,7 +1271,7 @@ int execute_song_terrible_clef(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA 
 	return eSUCCESS;
 }
 
-int song_listsongs(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill) {
+int song_listsongs(ubyte level, char_data *ch, char *arg, char_data *victim, int skill) {
 	char buf[200];
 
 	send_to_char("Available Songs\n\r---------------\r\n", ch);
@@ -1285,7 +1285,7 @@ int song_listsongs(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int
 	return eSUCCESS;
 }
 
-int song_soothing_remembrance(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill) {
+int song_soothing_remembrance(ubyte level, char_data *ch, char *arg, char_data *victim, int skill) {
 	vector<songInfo>::iterator i;
 
 	send_to_char("You begin to sing a song of rememberance...\n\r", ch);
@@ -1299,7 +1299,7 @@ int song_soothing_remembrance(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *
 	return eSUCCESS;
 }
 
-int execute_song_soothing_remembrance(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill) {
+int execute_song_soothing_remembrance(ubyte level, char_data *ch, char *arg, char_data *victim, int skill) {
 	int heal = 0;
 	char buf[MAX_STRING_LENGTH];
 	vector<songInfo>::iterator i;
@@ -1358,7 +1358,7 @@ int execute_song_soothing_remembrance(ubyte level, CHAR_DATA *ch, char *arg, CHA
 	return eSUCCESS;
 }
 
-int song_traveling_march(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill) {
+int song_traveling_march(ubyte level, char_data *ch, char *arg, char_data *victim, int skill) {
 	vector<songInfo>::iterator i;
 
 	send_to_char("You begin to sing a song of travel...\n\r", ch);
@@ -1376,7 +1376,7 @@ int song_traveling_march(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victi
 	return eSUCCESS;
 }
 
-int execute_song_traveling_march(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill) {
+int execute_song_traveling_march(ubyte level, char_data *ch, char *arg, char_data *victim, int skill) {
 	int heal;
 	struct affected_type af;
 	char buf[MAX_STRING_LENGTH];
@@ -1447,7 +1447,7 @@ int execute_song_traveling_march(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DAT
 	return eSUCCESS;
 }
 
-int song_stop(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill) {
+int song_stop(ubyte level, char_data *ch, char *arg, char_data *victim, int skill) {
 	if (origsing)
 		return eFAILURE;
 	if (ch->songs.empty()) {
@@ -1490,7 +1490,7 @@ int song_stop(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skil
 	return eSUCCESS;
 }
 
-int song_astral_chanty(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill) {
+int song_astral_chanty(ubyte level, char_data *ch, char *arg, char_data *victim, int skill) {
 	vector<songInfo>::iterator i;
 
 	send_to_char("You begin to sing an astral chanty...\n\r", ch);
@@ -1507,7 +1507,7 @@ int song_astral_chanty(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim,
 	return eSUCCESS;
 }
 
-void do_astral_chanty_movement(CHAR_DATA *victim, CHAR_DATA *target) {
+void do_astral_chanty_movement(char_data *victim, char_data *target) {
 	int retval;
 
 	if (!victim || !target) {
@@ -1538,7 +1538,7 @@ void do_astral_chanty_movement(CHAR_DATA *victim, CHAR_DATA *target) {
 		return;
 	}
 
-	CHAR_DATA *tmpch;
+	char_data *tmpch;
 	
 	for (tmpch = world[target->in_room].people; tmpch; tmpch = tmpch->next_in_room)
 		if (search_char_for_item(tmpch, real_object(76), false) || search_char_for_item(tmpch, real_object(51), false)) {
@@ -1560,7 +1560,7 @@ void do_astral_chanty_movement(CHAR_DATA *victim, CHAR_DATA *target) {
 	act("$n appears out of nowhere in a chorus of light and song.", victim, 0, 0, TO_ROOM, 0);
 }
 
-int execute_song_astral_chanty(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill) {
+int execute_song_astral_chanty(ubyte level, char_data *ch, char *arg, char_data *victim, int skill) {
 	int status = 0;
 	vector<songInfo>::iterator i;
 
@@ -1584,7 +1584,7 @@ int execute_song_astral_chanty(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA 
 		status = eFAILURE;
 	} else {
 
-		CHAR_DATA *tmpch;
+		char_data *tmpch;
 
 		for (tmpch = world[victim->in_room].people; tmpch; tmpch = tmpch->next_in_room)
 			if (search_char_for_item(tmpch, real_object(51), false)) {
@@ -1637,14 +1637,14 @@ int execute_song_astral_chanty(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA 
 	return status;
 }
 
-int pulse_song_astral_chanty(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill) {
+int pulse_song_astral_chanty(ubyte level, char_data *ch, char *arg, char_data *victim, int skill) {
 	if (number(1, 3) == 3)
 		act("$n sings a rousing chanty!", ch, 0, 0, TO_ROOM, 0);
 
 	return eSUCCESS;
 }
 
-int song_forgetful_rhythm(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill) {
+int song_forgetful_rhythm(ubyte level, char_data *ch, char *arg, char_data *victim, int skill) {
 	vector<songInfo>::iterator i;
 
 	send_to_char("You begin to sing a song of forgetfulness...\n\r", ch);
@@ -1662,7 +1662,7 @@ int song_forgetful_rhythm(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict
 	return eSUCCESS;
 }
 
-int execute_song_forgetful_rhythm(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill) {
+int execute_song_forgetful_rhythm(ubyte level, char_data *ch, char *arg, char_data *victim, int skill) {
 	int retval;
 	vector<songInfo>::iterator i;
 
@@ -1706,7 +1706,7 @@ int execute_song_forgetful_rhythm(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DA
 	return eSUCCESS;
 }
 
-int song_shattering_resonance(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill) {
+int song_shattering_resonance(ubyte level, char_data *ch, char *arg, char_data *victim, int skill) {
 	vector<songInfo>::iterator i;
 
 	send_to_char("You begin to sing a song of shattering...\n\r", ch);
@@ -1727,7 +1727,7 @@ int song_shattering_resonance(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *
 	return eSUCCESS;
 }
 
-int execute_song_shattering_resonance(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill) {
+int execute_song_shattering_resonance(ubyte level, char_data *ch, char *arg, char_data *victim, int skill) {
 	obj_data * obj = NULL;
 	obj_data * tobj = NULL;
 	vector<songInfo>::iterator i;
@@ -1801,7 +1801,7 @@ int execute_song_shattering_resonance(ubyte level, CHAR_DATA *ch, char *arg, CHA
 	return eSUCCESS;
 }
 
-int song_insane_chant(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill) {
+int song_insane_chant(ubyte level, char_data *ch, char *arg, char_data *victim, int skill) {
 	vector<songInfo>::iterator i;
 
 	send_to_char("You begin chanting insanely...\n\r", ch);
@@ -1815,7 +1815,7 @@ int song_insane_chant(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, 
 	return eSUCCESS;
 }
 
-int execute_song_insane_chant(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill) {
+int execute_song_insane_chant(ubyte level, char_data *ch, char *arg, char_data *victim, int skill) {
 	struct affected_type af;
 
 	af.type = SKILL_INSANE_CHANT;
@@ -1849,7 +1849,7 @@ int execute_song_insane_chant(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *
 	return eSUCCESS;
 }
 
-int song_flight_of_bee(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill) {
+int song_flight_of_bee(ubyte level, char_data *ch, char *arg, char_data *victim, int skill) {
 	vector<songInfo>::iterator i;
 
 	send_to_char("You begin to sing a lofty song...\n\r", ch);
@@ -1864,7 +1864,7 @@ int song_flight_of_bee(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim,
 	return eSUCCESS;
 }
 
-int execute_song_flight_of_bee(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill) {
+int execute_song_flight_of_bee(ubyte level, char_data *ch, char *arg, char_data *victim, int skill) {
 	struct affected_type af;
 
 	af.type = SKILL_SONG_FLIGHT_OF_BEE;
@@ -1894,7 +1894,7 @@ int execute_song_flight_of_bee(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA 
 	return eSUCCESS;
 }
 
-int song_searching_song(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill) {
+int song_searching_song(ubyte level, char_data *ch, char *arg, char_data *victim, int skill) {
 	vector<songInfo>::iterator i;
 
 	send_to_char("Your voice raises sending out a song to search the lands...\n\r", ch);
@@ -1913,7 +1913,7 @@ int song_searching_song(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim
 	return eSUCCESS;
 }
 
-int execute_song_searching_song(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill) {
+int execute_song_searching_song(ubyte level, char_data *ch, char *arg, char_data *victim, int skill) {
 	char_data * target = NULL;
 	char buf[200];
 	vector<songInfo>::iterator i;
@@ -1976,7 +1976,7 @@ int execute_song_searching_song(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA
 	return eSUCCESS;
 }
 
-int song_jig_of_alacrity(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill) {
+int song_jig_of_alacrity(ubyte level, char_data *ch, char *arg, char_data *victim, int skill) {
 	vector<songInfo>::iterator i;
 
 	send_to_char("You begin to sing a quick little jig of alacrity...\n\r", ch);
@@ -1991,7 +1991,7 @@ int song_jig_of_alacrity(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victi
 	return eSUCCESS;
 }
 
-int song_fanatical_fanfare(ubyte level, CHAR_DATA *ch, char *Aag, CHAR_DATA *victim, int skill) {
+int song_fanatical_fanfare(ubyte level, char_data *ch, char *Aag, char_data *victim, int skill) {
 	vector<songInfo>::iterator i;
 
 	send_to_char("You begin to sing loudly, and poke everyone in your surroundings with a stick..\r\n", ch);
@@ -2005,7 +2005,7 @@ int song_fanatical_fanfare(ubyte level, CHAR_DATA *ch, char *Aag, CHAR_DATA *vic
 
 	return eSUCCESS;
 }
-int song_summon_song(ubyte level, CHAR_DATA *ch, char *Aag, CHAR_DATA *victim, int skill) {
+int song_summon_song(ubyte level, char_data *ch, char *Aag, char_data *victim, int skill) {
 	vector<songInfo>::iterator i;
 
 	send_to_char("You begin an inappropriately bawdy tune of your intimacy with pets.\r\n", ch);
@@ -2019,7 +2019,7 @@ int song_summon_song(ubyte level, CHAR_DATA *ch, char *Aag, CHAR_DATA *victim, i
 
 	return eSUCCESS;
 }
-int execute_song_summon_song(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill) {
+int execute_song_summon_song(ubyte level, char_data *ch, char *arg, char_data *victim, int skill) {
 	bool summoned = false;
 	follow_type * fvictim = NULL;
 
@@ -2038,7 +2038,7 @@ int execute_song_summon_song(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *v
 	}
 	return eSUCCESS;
 }
-int song_mking_charge(ubyte level, CHAR_DATA *ch, char *Aag, CHAR_DATA *victim, int skill) {
+int song_mking_charge(ubyte level, char_data *ch, char *Aag, char_data *victim, int skill) {
 	vector<songInfo>::iterator i;
 
 	send_to_char("You inspire your allies with your rousing songs about rising against oppression!\r\n", ch);
@@ -2053,7 +2053,7 @@ int song_mking_charge(ubyte level, CHAR_DATA *ch, char *Aag, CHAR_DATA *victim, 
 	return eSUCCESS;
 }
 
-int execute_song_jig_of_alacrity(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill) {
+int execute_song_jig_of_alacrity(ubyte level, char_data *ch, char *arg, char_data *victim, int skill) {
 	// Note, the jig effects everyone in the group BUT the bard.
 	vector<songInfo>::iterator i;
 
@@ -2115,7 +2115,7 @@ int execute_song_jig_of_alacrity(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DAT
 	return eSUCCESS;
 }
 
-int execute_song_fanatical_fanfare(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill) {
+int execute_song_fanatical_fanfare(ubyte level, char_data *ch, char *arg, char_data *victim, int skill) {
 	struct affected_type af1, af2, af3;
 
 	af1.type = SKILL_SONG_FANATICAL_FANFARE;
@@ -2168,7 +2168,7 @@ int execute_song_fanatical_fanfare(ubyte level, CHAR_DATA *ch, char *arg, CHAR_D
 	return eSUCCESS;
 }
 
-int execute_song_mking_charge(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill) {
+int execute_song_mking_charge(ubyte level, char_data *ch, char *arg, char_data *victim, int skill) {
 	vector<songInfo>::iterator i;
 
 	for (i = ch->songs.begin(); i != ch->songs.end(); ++i) {
@@ -2236,24 +2236,24 @@ int execute_song_mking_charge(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *
 	return eSUCCESS;
 }
 
-/*int pulse_song_fanatical_fanfare(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill)
+/*int pulse_song_fanatical_fanfare(ubyte level, char_data *ch, char *arg, char_data *victim, int skill)
  {
  if (number(1,5) == 2)
  act("$n combines singing and poking the people with a stick, getting people worked up.", ch, 0, 0, TO_ROOM,0);
  return eSUCCESS;
  }*/
 
-int pulse_mking_charge(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill) {
+int pulse_mking_charge(ubyte level, char_data *ch, char *arg, char_data *victim, int skill) {
 	return eSUCCESS;
 }
 
-int pulse_jig_of_alacrity(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill) {
+int pulse_jig_of_alacrity(ubyte level, char_data *ch, char *arg, char_data *victim, int skill) {
 	if (number(1, 5) == 3)
 		act("$n prances around like a fairy.", ch, 0, 0, TO_ROOM, 0);
 	return eSUCCESS;
 }
 
-int intrp_jig_of_alacrity(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill) {
+int intrp_jig_of_alacrity(ubyte level, char_data *ch, char *arg, char_data *victim, int skill) {
 	char_data * master = NULL;
 	follow_type * fvictim = NULL;
 
@@ -2279,7 +2279,7 @@ int intrp_jig_of_alacrity(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict
 	return eSUCCESS;
 }
 
-int intrp_song_fanatical_fanfare(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill) {
+int intrp_song_fanatical_fanfare(ubyte level, char_data *ch, char *arg, char_data *victim, int skill) {
 	char_data * master = NULL;
 	follow_type * fvictim = NULL;
 
@@ -2314,7 +2314,7 @@ int intrp_song_fanatical_fanfare(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DAT
 	return eSUCCESS;
 
 }
-int intrp_mking_charge(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill) {
+int intrp_mking_charge(ubyte level, char_data *ch, char *arg, char_data *victim, int skill) {
 	char_data * master = NULL;
 	follow_type * fvictim = NULL;
 
@@ -2342,7 +2342,7 @@ int intrp_mking_charge(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim,
 
 }
 
-int song_glitter_dust(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill) {
+int song_glitter_dust(ubyte level, char_data *ch, char *arg, char_data *victim, int skill) {
 	vector<songInfo>::iterator i;
 
 	send_to_char("You throw dust in the air and sing a wily ditty...\n\r", ch);
@@ -2357,7 +2357,7 @@ int song_glitter_dust(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, 
 	return eSUCCESS;
 }
 
-int execute_song_glitter_dust(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill) {
+int execute_song_glitter_dust(ubyte level, char_data *ch, char *arg, char_data *victim, int skill) {
 	struct affected_type af;
 	struct affected_type af2;
 
@@ -2413,7 +2413,7 @@ int execute_song_glitter_dust(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *
 	return eSUCCESS;
 }
 
-int song_bountiful_sonnet(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill) {
+int song_bountiful_sonnet(ubyte level, char_data *ch, char *arg, char_data *victim, int skill) {
 	vector<songInfo>::iterator i;
 
 	send_to_char("You begin long restoring sonnet...\n\r", ch);
@@ -2428,7 +2428,7 @@ int song_bountiful_sonnet(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vict
 	return eSUCCESS;
 }
 
-int execute_song_bountiful_sonnet(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill) {
+int execute_song_bountiful_sonnet(ubyte level, char_data *ch, char *arg, char_data *victim, int skill) {
 	char_data * master = NULL;
 	follow_type * fvictim = NULL;
 
@@ -2461,7 +2461,7 @@ int execute_song_bountiful_sonnet(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DA
 	return eSUCCESS;
 }
 
-int execute_song_dischordant_dirge(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill) {
+int execute_song_dischordant_dirge(ubyte level, char_data *ch, char *arg, char_data *victim, int skill) {
 	char_data * target = NULL;
 	//char buf[400];
 	vector<songInfo>::iterator i;
@@ -2552,7 +2552,7 @@ int execute_song_dischordant_dirge(ubyte level, CHAR_DATA *ch, char *arg, CHAR_D
 	return eSUCCESS;
 }
 
-int song_dischordant_dirge(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill) {
+int song_dischordant_dirge(ubyte level, char_data *ch, char *arg, char_data *victim, int skill) {
 	vector<songInfo>::iterator i;
 
 	send_to_char("You begin a wailing dirge...\n\r", ch);
@@ -2573,7 +2573,7 @@ int song_dischordant_dirge(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vic
 	return eSUCCESS;
 }
 
-int song_synchronous_chord(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill) {
+int song_synchronous_chord(ubyte level, char_data *ch, char *arg, char_data *victim, int skill) {
 	vector<songInfo>::iterator i;
 
 	send_to_char("You begin a strong chord...\n\r", ch);
@@ -2594,10 +2594,10 @@ int song_synchronous_chord(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vic
 	return eSUCCESS;
 }
 
-int execute_song_synchronous_chord(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill) {
+int execute_song_synchronous_chord(ubyte level, char_data *ch, char *arg, char_data *victim, int skill) {
 	char_data * target = NULL;
 	char buf[400];
-	char * get_random_hate(CHAR_DATA *ch);
+	char * get_random_hate(char_data *ch);
 	vector<songInfo>::iterator i;
 
 	for (i = ch->songs.begin(); i != ch->songs.end(); ++i) {
@@ -2659,7 +2659,7 @@ int execute_song_synchronous_chord(ubyte level, CHAR_DATA *ch, char *arg, CHAR_D
 	return eSUCCESS;
 }
 
-int song_sticky_lullaby(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill) {
+int song_sticky_lullaby(ubyte level, char_data *ch, char *arg, char_data *victim, int skill) {
 	vector<songInfo>::iterator i;
 
 	send_to_char("You begin a slow numbing lullaby...\n\r", ch);
@@ -2680,7 +2680,7 @@ int song_sticky_lullaby(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim
 	return eSUCCESS;
 }
 
-int execute_song_sticky_lullaby(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill) {
+int execute_song_sticky_lullaby(ubyte level, char_data *ch, char *arg, char_data *victim, int skill) {
 	vector<songInfo>::iterator i;
 
 	for (i = ch->songs.begin(); i != ch->songs.end(); ++i) {
@@ -2714,7 +2714,7 @@ int execute_song_sticky_lullaby(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA
 	return eSUCCESS;
 }
 
-int song_vigilant_siren(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill) {
+int song_vigilant_siren(ubyte level, char_data *ch, char *arg, char_data *victim, int skill) {
 	vector<songInfo>::iterator i;
 
 	send_to_char("You begin to sing a fast nervous tune...\n\r", ch);
@@ -2729,7 +2729,7 @@ int song_vigilant_siren(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim
 	return eSUCCESS;
 }
 
-int execute_song_vigilant_siren(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill) {
+int execute_song_vigilant_siren(ubyte level, char_data *ch, char *arg, char_data *victim, int skill) {
 	if (GET_KI(ch) < 2) // we don't have the ki to keep the song going
 			{
 		return intrp_vigilant_siren(level, ch, arg, victim, -1);
@@ -2803,13 +2803,13 @@ int execute_song_vigilant_siren(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA
 	return eSUCCESS;
 }
 
-int pulse_vigilant_siren(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill) {
+int pulse_vigilant_siren(ubyte level, char_data *ch, char *arg, char_data *victim, int skill) {
 	if (number(1, 5) == 3)
 		act("$n chatters a ditty about being alert and ever watchful.", ch, 0, 0, TO_ROOM, 0);
 	return eSUCCESS;
 }
 
-int intrp_vigilant_siren(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill) {
+int intrp_vigilant_siren(ubyte level, char_data *ch, char *arg, char_data *victim, int skill) {
 	char_data * master = NULL;
 	follow_type * fvictim = NULL;
 
@@ -2857,7 +2857,7 @@ void make_person_dance(char_data * ch) {
 	command_interpreter(ch, dothis);
 }
 
-int song_unresistable_ditty(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill) {
+int song_unresistable_ditty(ubyte level, char_data *ch, char *arg, char_data *victim, int skill) {
 	vector<songInfo>::iterator i;
 
 	send_to_char("You begin to sing an irresistable little ditty...\n\r", ch);
@@ -2872,7 +2872,7 @@ int song_unresistable_ditty(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vi
 	return eSUCCESS;
 }
 
-int execute_song_unresistable_ditty(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill) {
+int execute_song_unresistable_ditty(ubyte level, char_data *ch, char *arg, char_data *victim, int skill) {
 	char_data * i;
 
 	act("$n finishs $s song, 'Ahhhhh!  Macarena!'", ch, 0, 0, TO_ROOM, 0);
@@ -2900,7 +2900,7 @@ int execute_song_unresistable_ditty(ubyte level, CHAR_DATA *ch, char *arg, CHAR_
 	return eSUCCESS;
 }
 
-int song_crushing_crescendo(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill) {
+int song_crushing_crescendo(ubyte level, char_data *ch, char *arg, char_data *victim, int skill) {
 	vector<songInfo>::iterator i;
 
 	send_to_char("You begin to sing, approaching crescendo!\n\r", ch);
@@ -2916,7 +2916,7 @@ int song_crushing_crescendo(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vi
 	return eSUCCESS;
 }
 
-int execute_song_crushing_crescendo(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill) {
+int execute_song_crushing_crescendo(ubyte level, char_data *ch, char *arg, char_data *victim, int skill) {
 	int dam = 0;
 	int retval;
 	vector<songInfo>::iterator i;
@@ -3032,7 +3032,7 @@ int execute_song_crushing_crescendo(ubyte level, CHAR_DATA *ch, char *arg, CHAR_
 	return eSUCCESS;
 }
 
-int song_submariners_anthem(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill) {
+int song_submariners_anthem(ubyte level, char_data *ch, char *arg, char_data *victim, int skill) {
 	vector<songInfo>::iterator i;
 
 	send_to_char("You begin to sing about the shining sea and her terrible ways...\n\r", ch);
@@ -3047,7 +3047,7 @@ int song_submariners_anthem(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *vi
 	return eSUCCESS;
 }
 
-int execute_song_submariners_anthem(ubyte level, CHAR_DATA *ch, char *arg, CHAR_DATA *victim, int skill) {
+int execute_song_submariners_anthem(ubyte level, char_data *ch, char *arg, char_data *victim, int skill) {
 	char_data * master = NULL;
 	follow_type * fvictim = NULL;
 	struct affected_type af;

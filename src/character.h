@@ -78,7 +78,7 @@ typedef std::queue<communication> history_t;
 #define MAX_WEAR     23
 
 struct char_data;
-typedef struct char_data CHAR_DATA;
+//typedef struct char_data char_data;
 
 #define SEX_NEUTRAL   0
 #define SEX_MALE      1
@@ -128,7 +128,7 @@ struct  mob_prog_act_list
 {
     MPROG_ACT_LIST * next;
     char *           buf;
-    CHAR_DATA *      ch;
+    char_data *      ch;
     OBJ_DATA *       obj;
     void *           vo;
 };
@@ -203,7 +203,7 @@ struct affected_type
 
 struct follow_type
 {
-    CHAR_DATA *follower;
+    char_data *follower;
     struct follow_type *next;
 };
 
@@ -274,7 +274,7 @@ struct pc_data
     bool unjoinable = {};        // Do NOT autojoin
     struct char_data *golem = {}; // CURRENT golem. 
     bool hide[MAX_HIDE] = {};
-    CHAR_DATA *hiding_from[MAX_HIDE] = {};
+    char_data *hiding_from[MAX_HIDE] = {};
     std::queue<string> *away_msgs = {};
     history_t *tell_history = {};
     history_t *gtell_history = {};
@@ -332,7 +332,7 @@ struct mob_data
     obj_data *object = {};
 };
 
-// CHAR_DATA, char_data
+// char_data, char_data
 // This contains all memory items for a player/mob
 // All non-specific data is held in this structure
 // PC/MOB specific data are held in the appropriate pointed-to structs
@@ -445,13 +445,13 @@ struct char_data
     uint32 combat = {};                     // Bitvector for combat related flags (bash, stun, shock)
     uint32 misc = {};                       // Bitvector for IS_MOB/logs/channels.  So possessed mobs can channel
 
-    CHAR_DATA *fighting = {};                 /* Opponent     */
-    CHAR_DATA *next = {};                     /* Next anywhere in game */
-    CHAR_DATA *next_in_room = {};             /* Next in room */
-    CHAR_DATA *next_fighting = {};            /* Next fighting */
+    char_data *fighting = {};                 /* Opponent     */
+    char_data *next = {};                     /* Next anywhere in game */
+    char_data *next_in_room = {};             /* Next in room */
+    char_data *next_fighting = {};            /* Next fighting */
     OBJ_DATA *altar = {};
     struct follow_type *followers = {};  /* List of followers */
-    CHAR_DATA *master = {};              /* Who is char following? */
+    char_data *master = {};              /* Who is char following? */
     char *group_name = {};                /* Name of group */
     
     int32_t timer = {};                         // Timer for update
@@ -650,8 +650,8 @@ struct profession {
 
 
 void clear_hunt(void *arg1, void *arg2, void *arg3);
-void clear_hunt(char *arg1, CHAR_DATA *arg2, void *arg3);
-void prepare_character_for_sixty(CHAR_DATA *ch);
+void clear_hunt(char *arg1, char_data *arg2, void *arg3);
+void prepare_character_for_sixty(char_data *ch);
 bool isPaused(char_data *mob);
 
 #endif

@@ -2189,7 +2189,7 @@ int do_mclone(struct char_data *ch, char *argument, int cmd)
     send_to_char("Syntax: mclone <source vnum> <destination vnum>\n\r",ch);
     return eFAILURE;
   }
-  CHAR_DATA *mob;
+  char_data *mob;
   int vdst = atoi(arg2), vsrc = atoi(arg1);
   int dst = real_mobile(vdst), src = real_mobile(vsrc);
   if (src < 0)
@@ -2228,7 +2228,7 @@ int do_mclone(struct char_data *ch, char *argument, int cmd)
   mob->mobdata->nr = dst;
 
    // Find old mobile in world and remove
-  char_data *old_mob = (CHAR_DATA*)mob_index[dst].item;
+  char_data *old_mob = (char_data*)mob_index[dst].item;
   if (old_mob && old_mob->mobdata) {
 		auto &character_list = DC::instance().character_list;
 		for (auto& tmpch : character_list) {
@@ -2238,8 +2238,8 @@ int do_mclone(struct char_data *ch, char *argument, int cmd)
   }
 
   csendf(ch, "Ok.\n\rYou copied mob %d (%s) and replaced mob %d (%s).\n\r",
-	 vsrc, ((CHAR_DATA*)mob_index[src].item)->short_desc,
-	 vdst, ((CHAR_DATA*)mob_index[dst].item)->short_desc);
+	 vsrc, ((char_data*)mob_index[src].item)->short_desc,
+	 vdst, ((char_data*)mob_index[dst].item)->short_desc);
 
   // Overwrite old mob with new mob
   mob_index[dst].item = (void*)mob;
