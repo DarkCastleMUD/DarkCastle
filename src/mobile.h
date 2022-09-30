@@ -128,7 +128,7 @@ struct mob_matrix_data
 };
 
 
-void translate_value(char *leftptr, char *rightptr, int16 **vali, uint32 **valui,
+void translate_value(char *leftptr, char *rightptr, int16 **vali, uint32_t **valui,
                 char ***valstr, int64_t **vali64, sbyte **valb, char_data *mob, char_data *actor,
                 OBJ_DATA *obj, void *vo, char_data *rndm);
 

@@ -202,12 +202,12 @@ struct obj_flag_data
 {
     int32_t value[4];       /* Values of the item (see list)    */
     ubyte type_flag;     /* Type of item                     */
-    uint32 wear_flags;     /* Where you can wear it            */
+    uint32_t wear_flags;     /* Where you can wear it            */
     uint16 size;           /* Race restrictions                */
-    uint32 extra_flags;    /* If it hums, glows etc            */
+    uint32_t extra_flags;    /* If it hums, glows etc            */
      int16 weight;         /* Weight what else                 */
      int32_t cost;           /* Value when sold (gp.)            */
-    uint32 more_flags;     /* A second bitvector (extra_flags2)*/
+    uint32_t more_flags;     /* A second bitvector (extra_flags2)*/
      int16 eq_level;	/* Min level to use it for eq       */
      int16 timer;          /* Timer for object                 */
      char_data *origin;    /* Creator of object, previously was stored at value[3] */

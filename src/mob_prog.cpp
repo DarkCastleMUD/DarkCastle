@@ -260,7 +260,7 @@ bool istank(char_data *ch)
 }
 
 void translate_value(char *leftptr, char *rightptr, int16 **vali,
-		uint32 **valui, char ***valstr, int64_t **vali64, sbyte **valb,
+		uint32_t **valui, char ***valstr, int64_t **vali64, sbyte **valb,
 		char_data *mob, char_data *actor, OBJ_DATA *obj, void *vo,
 		char_data *rndm) {
 	/*
@@ -469,7 +469,7 @@ void translate_value(char *leftptr, char *rightptr, int16 **vali,
 	// target acquired. fucking boring code.
 	// more boring code. FUCK.
 	int16 *intval = NULL;
-	uint32 *uintval = NULL;
+	uint32_t *uintval = NULL;
 	char **stringval = NULL;
 	int64_t *llval = NULL;
 	sbyte *sbval = NULL;
@@ -736,11 +736,11 @@ void translate_value(char *leftptr, char *rightptr, int16 **vali,
 			if (!target && !otarget)
 				tError = TRUE;
 			else if (target) {
-				static uint32 tmp;
+				static uint32_t tmp;
 				tmp = (uint32) target->in_room;
 				uintval = &tmp;
 			} else {
-				static uint32 tmp;
+				static uint32_t tmp;
 				tmp = (uint32) otarget->in_room;
 				uintval = &tmp;
 			}
@@ -1366,7 +1366,7 @@ int mprog_do_ifchck( char *ifchck, char_data *mob, char_data *actor,
  }
   
   int16 *lvali = 0;
-  uint32 *lvalui = 0;
+  uint32_t *lvalui = 0;
   char **lvalstr = 0;
   int64_t *lvali64 = 0;
   sbyte *lvalb = 0; 
@@ -1390,7 +1390,7 @@ int mprog_do_ifchck( char *ifchck, char_data *mob, char_data *actor,
     if (lvalstr) return mprog_seval(mob, *lvalstr, opr, val);
   } else {
     int16 *rvali = 0;
-    uint32 *rvalui = 0;
+    uint32_t *rvalui = 0;
     char **rvalstr = 0;
     int64_t *rvali64 = 0;
     sbyte *rvalb = 0; 
@@ -3095,7 +3095,7 @@ int mprog_process_cmnd( char *cmnd, char_data *mob, char_data *actor,
 		*str == '*' || *str == '/') && *(str+1) == '=' && *(str+2) != '\0')
      {
 	  int16 *lvali = 0;
-	  uint32 *lvalui = 0;
+	  uint32_t *lvalui = 0;
 	  char **lvalstr = 0;
 	  int64_t *lvali64 = 0;
 	  sbyte *lvalb = 0; 
@@ -3144,7 +3144,7 @@ int mprog_process_cmnd( char *cmnd, char_data *mob, char_data *actor,
     if (*(str+1) == '.')
     {
 	int16 *lvali = 0;
-	uint32 *lvalui = 0;
+	uint32_t *lvalui = 0;
 	char **lvalstr = 0;
 	int64_t *lvali64 = 0;
 	sbyte *lvalb = 0;

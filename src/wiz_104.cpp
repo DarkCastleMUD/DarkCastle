@@ -1026,8 +1026,8 @@ int do_show(struct char_data *ch, char *argument, int cmd) {
 		}
 	} else if (is_abbrev(type, "msearch") && has_range) {  // Mobile search.
 		char arg1[MAX_STRING_LENGTH];
-		uint32 affect[AFF_MAX / ASIZE + 1] = { };
-		uint32 act[ACT_MAX / ASIZE + 1] = { };
+		uint32_t affect[AFF_MAX / ASIZE + 1] = { };
+		uint32_t act[ACT_MAX / ASIZE + 1] = { };
 		int clas = 0, levlow = -555, levhigh = -555, immune = 0, race = -1,
 				align = 0;
 		//int its;

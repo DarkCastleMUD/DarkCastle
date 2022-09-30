@@ -1930,7 +1930,7 @@ void parse_bitstrings_into_int(const char *bits[], const char *remainder_args, c
   return parse_bitstrings_into_int(bits, string(remainder_args), ch, value);
 }
 
-// calls below uint32 version
+// calls below uint32_t version
 void parse_bitstrings_into_int(const char *bits[], string remainder_args, char_data *ch, uint16 &value)
 {
   int found = false;
@@ -1991,7 +1991,7 @@ void parse_bitstrings_into_int(const char *bits[], const char *remainder_args, c
 // Finds the bits[] strings listed in "strings" and toggles the bit in "value"
 // Informs 'ch' of what has happened
 //
-void parse_bitstrings_into_int(const char *bits[], string remainder_args, char_data *ch, uint32 &value)
+void parse_bitstrings_into_int(const char *bits[], string remainder_args, char_data *ch, uint32_t &value)
 {
   bool found = false;
 
@@ -2041,7 +2041,7 @@ void parse_bitstrings_into_int(const char *bits[], string remainder_args, char_d
     send_to_char("No matching bits found.\n\n", ch);
 }
 
-void parse_bitstrings_into_int(const char *bits[], const char *remainder_args, char_data *ch, uint32 &value)
+void parse_bitstrings_into_int(const char *bits[], const char *remainder_args, char_data *ch, uint32_t &value)
 {
   return parse_bitstrings_into_int(bits, string(remainder_args), ch, value);
 }
@@ -2709,7 +2709,7 @@ const char *find_profession(int c_class, uint8_t profession)
 }
 
 
-string get_isr_string(uint32 isr, int8_t loc)
+string get_isr_string(uint32_t isr, int8_t loc)
 {
    if(!IS_SET(isr,1<<loc)) {
       return string();

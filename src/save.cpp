@@ -65,7 +65,7 @@ char *fread_alias_string(FILE *fpsave);
 // -pir
 int save_char_aliases(char_player_alias * alias, FILE * fpsave)
 {
-  uint32 tmp_size = 0;
+  uint32_t tmp_size = 0;
   char_player_alias * curr;
 
   // count up the number of aliases
@@ -96,7 +96,7 @@ int save_char_aliases(char_player_alias * alias, FILE * fpsave)
 // return pointer to aliases or NULL
 struct char_player_alias * read_char_aliases(FILE * fpsave)
 {
-  uint32 total, x;  
+  uint32_t total, x;  
   struct char_player_alias * top = NULL;  
   struct char_player_alias * curr = NULL;  
 
@@ -131,7 +131,7 @@ struct char_player_alias * read_char_aliases(FILE * fpsave)
 
 char *fread_alias_string(FILE *fpsave)
 {
-    uint32 tmp_size;
+    uint32_t tmp_size;
     char *buf = NULL;
 
     fread (&tmp_size, sizeof tmp_size, 1, fpsave);

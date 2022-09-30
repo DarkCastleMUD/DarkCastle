@@ -2045,7 +2045,7 @@ char *expand_data(char_data *ch, char *orig)
       *(ptr+r) = '~';
     
     int16 *lvali = 0;
-    uint32 *lvalui = 0;
+    uint32_t *lvalui = 0;
     char **lvalstr = 0;
     int64_t *lvali64 = 0;
     sbyte *lvalb = 0;
@@ -2124,7 +2124,7 @@ int do_mpsetmath(char_data *ch, char *arg, int cmd)
   bool allowed = FALSE;
 
   int16 *lvali = 0;
-  uint32 *lvalui = 0;
+  uint32_t *lvalui = 0;
   char **lvalstr = 0;
   int64_t *lvali64 = 0;
   sbyte *lvalb = 0;

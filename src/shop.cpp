@@ -165,7 +165,7 @@ void shopping_buy(const char *arg, char_data *ch,
     char buf[MAX_STRING_LENGTH];
     char argm[MAX_INPUT_LENGTH+1];
     struct obj_data *obj;
-    uint32 cost;
+    uint32_t cost;
 
     if ( !is_ok( keeper, ch, shop_nr ) )
         return;
@@ -279,7 +279,7 @@ void shopping_sell(const char *arg, char_data *ch,
     char buf[MAX_STRING_LENGTH];
     char argm[MAX_INPUT_LENGTH+1];
     struct obj_data *obj;
-    uint32 cost;
+    uint32_t cost;
 
     if ( !is_ok( keeper, ch, shop_nr ) )
         return;

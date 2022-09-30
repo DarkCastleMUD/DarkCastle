@@ -188,7 +188,7 @@ struct class_skill_defines
 /* Used in CHAR_FILE_U *DO*NOT*CHANGE* */
 struct affected_type
 {
-    uint32 type = {};           /* The type of spell that caused ths      */
+    uint32_t type = {};           /* The type of spell that caused ths      */
     int16  duration = {};       /* For how long its effects will last      */
     int32_t  duration_type = {};  
     int32_t  modifier = {};       /* This is added to apropriate ability     */
@@ -216,22 +216,22 @@ struct pc_data
 
     struct char_player_alias * alias = {}; /* Aliases */
 
-    uint32 totalpkills = {};         // total number of pkills THIS LOGIN
-    uint32 totalpkillslv = {};       // sum of levels of pkills THIS LOGIN
-    uint32 pdeathslogin = {};        // pdeaths THIS LOGIN
+    uint32_t totalpkills = {};         // total number of pkills THIS LOGIN
+    uint32_t totalpkillslv = {};       // sum of levels of pkills THIS LOGIN
+    uint32_t pdeathslogin = {};        // pdeaths THIS LOGIN
 
-    uint32 rdeaths = {};             // total number of real deaths
-    uint32 pdeaths = {};             // total number of times pkilled
-    uint32 pkills = {};              // # of pkills ever 
-    uint32 pklvl = {};               // # sum of levels of pk victims ever
-    uint32 group_pkills = {};        // # of pkills for group 
-    uint32 grpplvl = {};              // sum of levels of group pkill victims 
-    uint32 group_kills = {};         // # of kills for group
+    uint32_t rdeaths = {};             // total number of real deaths
+    uint32_t pdeaths = {};             // total number of times pkilled
+    uint32_t pkills = {};              // # of pkills ever 
+    uint32_t pklvl = {};               // # sum of levels of pk victims ever
+    uint32_t group_pkills = {};        // # of pkills for group 
+    uint32_t grpplvl = {};              // sum of levels of group pkill victims 
+    uint32_t group_kills = {};         // # of kills for group
 
     char *last_site = {};                /* Last login from.. */
     struct time_data time = {};          // PC time data.  logon, played, birth
    
-    uint32 bad_pw_tries = {};        // How many times people have entered bad pws
+    uint32_t bad_pw_tries = {};        // How many times people have entered bad pws
 
      int16 statmetas = {};           // How many times I've metad a stat
                                 // This number could go negative from stat loss
@@ -244,11 +244,11 @@ struct pc_data
 
      int16 saves_mods[SAVE_TYPE_MAX+1] = {};  // Character dependant mods to saves (meta'able)
 
-     uint32 bank = {};           /* gold in bank                            */
+     uint32_t bank = {};           /* gold in bank                            */
 
-    uint32 toggles = {};            // Bitvector for toggles.  (Was specials.act)
-    uint32 punish = {};             // flags for punishments
-    uint32 quest_bv1 = {};          // 1st bitvector for quests
+    uint32_t toggles = {};            // Bitvector for toggles.  (Was specials.act)
+    uint32_t punish = {};             // flags for punishments
+    uint32_t quest_bv1 = {};          // 1st bitvector for quests
 
     char *poofin = {};       /* poofin message */
     char *poofout = {};      /* poofout message */    
@@ -279,11 +279,11 @@ struct pc_data
     history_t *tell_history = {};
     history_t *gtell_history = {};
     char *joining = {};
-    uint32 quest_points = {};
+    uint32_t quest_points = {};
     int16  quest_current[QUEST_MAX] = {};
-    uint32 quest_current_ticksleft[QUEST_MAX] = {};
+    uint32_t quest_current_ticksleft[QUEST_MAX] = {};
     int16  quest_cancel[QUEST_CANCEL] = {};
-    uint32 quest_complete[QUEST_TOTAL/ASIZE+1] = {};
+    uint32_t quest_complete[QUEST_TOTAL/ASIZE+1] = {};
     char *last_prompt = {};
     std::multimap<int, std::pair<timeval, timeval> > *lastseen = {};
     uint8_t profession = {};
@@ -306,8 +306,8 @@ struct mob_data
     int32_t nr = {};
     sbyte default_pos = {};    // Default position for NPC
     sbyte last_direction = {}; // Last direction the mobile went in
-    uint32 attack_type = {};    // Bitvector of damage type for bare-handed combat
-    uint32 actflags[ACT_MAX/ASIZE+1] = {}; // flags for NPC behavior
+    uint32_t attack_type = {};    // Bitvector of damage type for bare-handed combat
+    uint32_t actflags[ACT_MAX/ASIZE+1] = {}; // flags for NPC behavior
 
     int16 damnodice = {};         // The number of damage dice's           
     int16 damsizedice = {};       // The size of the damage dice's         
@@ -369,13 +369,13 @@ struct char_data
 
     int16 hometown = {};      /* PC/NPC home town */
     int64_t gold = {};           /* Money carried                           */
-    uint32 plat = {};           /* Platinum                                */
+    uint32_t plat = {};           /* Platinum                                */
      int64_t exp = {};            /* The experience of the player            */
      int32_t in_room = {};
 
-    uint32 immune = {};         // Bitvector of damage types I'm immune to
-    uint32 resist = {};         // Bitvector of damage types I'm resistant to
-    uint32 suscept = {};        // Bitvector of damage types I'm susceptible to
+    uint32_t immune = {};         // Bitvector of damage types I'm immune to
+    uint32_t resist = {};         // Bitvector of damage types I'm resistant to
+    uint32_t suscept = {};        // Bitvector of damage types I'm susceptible to
      int16 saves[SAVE_TYPE_MAX+1] = {};  // Saving throw bonuses
 
      int32_t mana = {};         
@@ -393,10 +393,10 @@ struct char_data
 
      int16 alignment = {};          // +-1000 for alignments                 
 
-    uint32 hpmetas = {};             // total number of times meta'd hps
-    uint32 manametas = {};           // total number of times meta'd mana
-    uint32 movemetas = {};           // total number of times meta'd moves
-    uint32 acmetas = {};             // total number of times meta'd ac
+    uint32_t hpmetas = {};             // total number of times meta'd hps
+    uint32_t manametas = {};           // total number of times meta'd mana
+    uint32_t movemetas = {};           // total number of times meta'd moves
+    uint32_t acmetas = {};             // total number of times meta'd ac
      int32_t agemetas = {};            // number of years age has been meta'd
 
      int16 hit_regen = {};           // modifier to hp regen
@@ -441,9 +441,9 @@ struct char_data
     char_data * guarding = {};              // Pointer to who I am guarding
     follow_type * guarded_by = {};          // List of people guarding me
 
-    uint32 affected_by[AFF_MAX/ASIZE+1] = {}; // Quick reference bitvector for spell affects
-    uint32 combat = {};                     // Bitvector for combat related flags (bash, stun, shock)
-    uint32 misc = {};                       // Bitvector for IS_MOB/logs/channels.  So possessed mobs can channel
+    uint32_t affected_by[AFF_MAX/ASIZE+1] = {}; // Quick reference bitvector for spell affects
+    uint32_t combat = {};                     // Bitvector for combat related flags (bash, stun, shock)
+    uint32_t misc = {};                       // Bitvector for IS_MOB/logs/channels.  So possessed mobs can channel
 
     char_data *fighting = {};                 /* Opponent     */
     char_data *next = {};                     /* Next anywhere in game */
@@ -545,12 +545,12 @@ struct char_file_u4
     ubyte height = {};
     int16 hometown = {};
 
-    uint32 gold = {};
-    uint32 plat = {};
+    uint32_t gold = {};
+    uint32_t plat = {};
     int64_t exp = {};
-    uint32 immune = {};
-    uint32 resist = {};
-    uint32 suscept = {};
+    uint32_t immune = {};
+    uint32_t resist = {};
+    uint32_t suscept = {};
 
     int32_t mana = {};     // current
     int32_t raw_mana = {}; // max without eq/stat bonuses
@@ -564,9 +564,9 @@ struct char_file_u4
     int16 alignment = {};
     int16 unused1 = {};
 
-    uint32 hpmetas = {}; // Used by familiars too... why not.
-    uint32 manametas = {};
-    uint32 movemetas = {};
+    uint32_t hpmetas = {}; // Used by familiars too... why not.
+    uint32_t manametas = {};
+    uint32_t movemetas = {};
 
     int16 armor = {}; // have to save these since mobs have different bases
     int16 hitroll = {};
@@ -576,13 +576,13 @@ struct char_file_u4
 
     int32_t afected_by = {};
     int32_t afected_by2 = {};
-    uint32 misc = {}; // channel flags
+    uint32_t misc = {}; // channel flags
 
     int16 clan = {};
     int16 unused3 = {};
     int32_t load_room = {}; // Which room to place char in
 
-    uint32 acmetas = {};
+    uint32_t acmetas = {};
     int32_t agemetas = {};
     int32_t extra_ints[3] = {}; // available just in case
 } __attribute__((packed));
@@ -605,12 +605,12 @@ struct char_file_u
     ubyte height;
 
     int16 hometown;
-    uint32 gold;
-    uint32 plat;
+    uint32_t gold;
+    uint32_t plat;
     int64_t exp;
-    uint32 immune;
-    uint32 resist;
-    uint32 suscept;
+    uint32_t immune;
+    uint32_t resist;
+    uint32_t suscept;
 
     int32_t mana;        // current
     int32_t raw_mana;    // max without eq/stat bonuses
@@ -622,21 +622,21 @@ struct char_file_u
     int32_t raw_ki;
 
     int16 alignment;
-   uint32 hpmetas; // Used by familiars too... why not.
-   uint32 manametas;
-   uint32 movemetas;
+   uint32_t hpmetas; // Used by familiars too... why not.
+   uint32_t manametas;
+   uint32_t movemetas;
 
     int16 armor;       // have to save these since mobs have different bases
     int16 hitroll;
     int16 damroll;
     int32_t afected_by;
     int32_t afected_by2;
-    uint32 misc;          // channel flags
+    uint32_t misc;          // channel flags
 
     int16 clan; 
     int32_t load_room;                  // Which room to place char in
 
-    uint32 acmetas;
+    uint32_t acmetas;
     int32_t agemetas;
     int32_t extra_ints[3];             // available just in case
 };

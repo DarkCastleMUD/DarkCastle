@@ -545,7 +545,7 @@ char *gl_item(OBJ_DATA *obj, int number, char_data *ch, bool platinum = TRUE)
 	}
 	else
 	{
-		uint32 a = obj->obj_flags.extra_flags;
+		uint32_t a = obj->obj_flags.extra_flags;
 		a &= ALL_CLASSES;
 
 		buf2 = fmt::format("{}]$R, ", sprintbit(a, extra_bits));

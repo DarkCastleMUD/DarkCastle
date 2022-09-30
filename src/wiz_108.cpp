@@ -680,7 +680,7 @@ int do_set(struct char_data *ch, char *argument, int cmd)
             {
               if (GET_LEVEL(ch) == IMP)
               {
-                uint32 before_plat = GET_PLATINUM(vict);
+                uint32_t before_plat = GET_PLATINUM(vict);
                 GET_PLATINUM(vict) = atoi(buf);
                 logf(IMP, LOG_GOD, "%s sets %s's platinum from %u to %u.",
                      GET_NAME(ch), GET_NAME(vict), before_plat, GET_PLATINUM(vict));

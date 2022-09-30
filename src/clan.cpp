@@ -694,7 +694,7 @@ int plr_rights(struct char_data * ch)
 }
 
 // see if ch has rights to 'bit' in his clan
-int has_right(struct char_data * ch, uint32 bit)
+int has_right(struct char_data * ch, uint32_t bit)
 {
   struct clan_member_data * pmember = NULL;
   

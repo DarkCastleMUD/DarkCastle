@@ -363,7 +363,7 @@ int do_golem_score(struct char_data *ch, char *argument, int cmd)
 
    int64_t exp_needed;
 
-   uint32 immune=0,suscept=0,resist=0;
+   uint32_t immune=0,suscept=0,resist=0;
    string isrString;
 
    sprintf(race, "%s", races[(int)GET_RACE(ch)].singular_name);

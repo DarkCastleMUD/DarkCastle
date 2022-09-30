@@ -34,16 +34,16 @@ struct clan_room_data
 struct clan_member_data
 {
   char * member_name;
-  uint32 member_rights;
+  uint32_t member_rights;
    int32_t member_rank;
   
    int32_t unused1;
    int32_t unused2;
-  uint32 unused3;
+  uint32_t unused3;
   char * unused4; // this is saved as a variable length string
   
   //  I'd like to put "time joined" here for CC purposes
-  uint32  time_joined;
+  uint32_t  time_joined;
 
   struct clan_member_data * next;
 };
@@ -86,7 +86,7 @@ void remove_totem_stats(char_data *ch, int stat = 0);
 bool others_clan_room(char_data *ch, room_data *room);
 void clan_login(char_data * ch);
 void clan_logout(char_data * ch);
-int has_right(char_data * ch, uint32 bit);
+int has_right(char_data * ch, uint32_t bit);
 clan_data * get_clan(int nClan);
 clan_data * get_clan(char_data *ch);
 char *get_clan_name(int nClan);

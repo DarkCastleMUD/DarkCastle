@@ -152,12 +152,12 @@ void Database::save(char_data *ch, char_file_u4 *st)
   p.addCol(ubyte height;
 
     int16 hometown;
-    uint32 gold;
-    uint32 plat;
+    uint32_t gold;
+    uint32_t plat;
     int64_t exp;
-    uint32 immune;
-    uint32 resist;
-    uint32 suscept;
+    uint32_t immune;
+    uint32_t resist;
+    uint32_t suscept;
 
     int32_t mana;        // current
     int32_t raw_mana;    // max without eq/stat bonuses
@@ -169,16 +169,16 @@ void Database::save(char_data *ch, char_file_u4 *st)
     int32_t raw_ki;
 
     int16 alignment;
-   uint32 hpmetas; // Used by familiars too... why not.
-   uint32 manametas;
-   uint32 movemetas;
+   uint32_t hpmetas; // Used by familiars too... why not.
+   uint32_t manametas;
+   uint32_t movemetas;
 
     int16 armor;       // have to save these since mobs have different bases
     int16 hitroll;
     int16 damroll;
     int32_t afected_by;
     int32_t afected_by2;
-    uint32 misc;          // channel flags
+    uint32_t misc;          // channel flags
 
     int16 clan; 
     int32_t load_room;                  // Which room to place char in

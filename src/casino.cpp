@@ -2235,7 +2235,7 @@ char *roulette_display[] = {
 struct roulette_player
 {
    char_data *ch;
-   uint32 bet_array[48];
+   uint32_t bet_array[48];
 };
 
 struct wheel_data
@@ -2301,10 +2301,10 @@ void send_wheel_bets(char_data *ch, struct wheel_data *wheel)
    send_to_char(".\n\r", ch);
 }
 
-uint32 check_roulette_wins(struct roulette_player *plr, int num)
+uint32_t check_roulette_wins(struct roulette_player *plr, int num)
 {
-   uint32 tmp;
-   uint32 winnings = 0;
+   uint32_t tmp;
+   uint32_t winnings = 0;
 
    if(plr->bet_array[0] && (num == 2 || num == 4 || num == 6 || num == 8 || num == 10 ||
          num == 11 || num == 13 || num == 15 || num == 17 || num == 20 || num == 22 ||
@@ -2410,7 +2410,7 @@ void send_roulette_message(struct wheel_data *wheel)
 void wheel_stop(struct wheel_data *wheel)
 {
    int num = number(0,36);
-   uint32 payout = 0;
+   uint32_t payout = 0;
    char buf[MAX_STRING_LENGTH];
 
    sprintf(buf, "The ball lands on %s!\n\r", roulette_display[num]);
@@ -2486,7 +2486,7 @@ void pulse_countdown(void *arg1, void *arg2, void *arg3)
 int roulette_table(char_data *ch, struct obj_data *obj, int cmd, const char *arg, char_data *invoker)
 {
    char arg1[MAX_INPUT_LENGTH], arg2[MAX_STRING_LENGTH], buf[MAX_STRING_LENGTH];
-   uint32 bet=0;
+   uint32_t bet=0;
    int i=0;
    bool playing = FALSE;
    arg = one_argument(arg, arg1);

@@ -1787,7 +1787,7 @@ int do_score(struct char_data *ch, char *argument, int cmd)
    struct affected_type *aff;
 
    int64_t exp_needed;
-   uint32 immune=0,suscept=0,resist=0;
+   uint32_t immune=0,suscept=0,resist=0;
    string isrString;
    //int i;
 
