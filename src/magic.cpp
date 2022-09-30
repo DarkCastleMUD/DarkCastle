@@ -9421,8 +9421,7 @@ int elemental_damage_bonus(int spell, char_data *ch)
   fire = ice = earth = energy = FALSE;
   for (f=mst->followers; f; f=f->next)
   {
-    // if (IS_NPC(f->follower) && f->follower->height == 77) 
-    if (IS_NPC(f->follower) && f->follower->mobdata->mob_flags.value[3] == 77)
+    if (IS_NPC(f->follower) && f->follower->height == 77) 
     {
 	switch (mob_index[f->follower->mobdata->nr].virt)
 	{
@@ -9438,8 +9437,7 @@ int elemental_damage_bonus(int spell, char_data *ch)
 	}
     } else {
 	  for (t=f->follower->followers; t; t=t->next)
-    	    // if (IS_NPC(t->follower) && t->follower->height == 77)
-            if (IS_NPC(f->follower) && f->follower->mobdata->mob_flags.value[3] == 77)
+    	    if (IS_NPC(t->follower) && t->follower->height == 77)
     	    {
 		switch (mob_index[t->follower->mobdata->nr].virt)
 		{
@@ -9498,64 +9496,47 @@ int elemental_damage_bonus(int spell, char_data *ch)
 
 bool elemental_score(char_data *ch, int level)
 {
-  char_data *mst = ch->master ? ch->master : ch;
+  char_data *mst = ch->master?ch->master:ch;
   struct follow_type *f, *t;
   bool fire, ice, earth, energy;
   fire = ice = earth = energy = FALSE;
   // reuse of elemental damage function
-  for (f = mst->followers; f; f = f->next)
+  for (f=mst->followers; f; f=f->next)
   {
     if (IS_NPC(f->follower))
     {
-      // if (f->follower->height == 77) // improved
-      if (f->follower->mobdata->mob_flags.value[3] == 77)
-        switch (mob_index[f->follower->mobdata->nr].virt)
-        {
-        case 88:
-          fire = TRUE;
-          break;
-        case 89:
-          ice = TRUE;
-          break;
-        case 90:
-          energy = TRUE;
-          break;
-        case 91:
-          earth = TRUE;
-          break;
-        default:
-          break;
-        }
-    }
-    else
-    {
-      for (t = f->follower->followers; t; t = t->next)
-      {
-        if (IS_NPC(t->follower))
-        {
-          if (f->follower->mobdata->mob_flags.value[3] == 77)
-          {
-            switch (mob_index[t->follower->mobdata->nr].virt)
-            {
-            case 88:
-              fire = TRUE;
-              break;
-            case 89:
-              ice = TRUE;
-              break;
-            case 90:
-              energy = TRUE;
-              break;
-            case 91:
-              earth = TRUE;
-              break;
-            default:
-              break;
-            }
-          }
-        }
-      }
-    }
+	if (f->follower->height == 77) // improved
+	switch (mob_index[f->follower->mobdata->nr].virt)
+	{
+		case 88:
+		  fire = TRUE; break;
+		case 89:
+		  ice = TRUE; break;
+		case 90:
+		  energy = TRUE; break;
+		case 91:
+		  earth = TRUE; break;
+		default: break;
+	}
+    } else {
+	  for (t=f->follower->followers; t; t=t->next)
+   	   if (t->follower->height == 77) // improved
+    	    if (IS_NPC(t->follower))
+    	    {
+		switch (mob_index[t->follower->mobdata->nr].virt)
+		{
+			case 88:
+			  fire = TRUE; break;
+			case 89:
+			  ice = TRUE; break;
+			case 90:
+			  energy = TRUE; break;
+			case 91:
+			  earth = TRUE; break;
+			default: break;
+		}
+	    }
+     }
   }
   char buf[MAX_STRING_LENGTH];
   extern char frills[];
@@ -13422,7 +13403,7 @@ TO_ROOM, 0);
   char_to_room(mob, ch->in_room);
   mob->max_hit += skill*5;
   mob->hit = mob->max_hit;
-  if (skill > 80) mob->mobdata->mob_flags.value[3] = 77;
+  if (skill > 80) mob->height = 77;
   IS_CARRYING_W(mob) = 0;
   IS_CARRYING_N(mob) = 0;
 
