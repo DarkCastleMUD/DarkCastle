@@ -77,7 +77,7 @@ typedef std::queue<communication> history_t;
 */
 #define MAX_WEAR     23
 
-struct char_data;
+//class struct char_data;
 //typedef struct char_data struct char_data;
 
 #define SEX_NEUTRAL   0
@@ -111,8 +111,6 @@ struct char_data;
 
 // * ------- Begin MOBProg stuff ----------- *
 
-typedef struct  mob_prog_data           mob_prog_data;
-typedef struct  mob_prog_act_list       mob_prog_act_list;
 typedef int16_t skill_t;
 typedef map<skill_t, struct char_skill_data> skill_list_t;
 
