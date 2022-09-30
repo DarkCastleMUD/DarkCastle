@@ -9537,8 +9537,8 @@ bool elemental_score(char_data *ch, int level)
     } else {
 	  for (t=f->follower->followers; t; t=t->next)
    	  //  if (t->follower->height == 77) // improved
-       if (f->follower->mobdata->mob_flags.value[3] == 77)
-    	    if (IS_NPC(t->follower))
+       if (IS_NPC(t->follower))
+       	    if (f->follower->mobdata->mob_flags.value[3] == 77)
     	    {
 		switch (mob_index[t->follower->mobdata->nr].virt)
 		{
