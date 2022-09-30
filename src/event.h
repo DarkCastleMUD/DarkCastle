@@ -14,9 +14,6 @@
 #define MAX_NUM_EVT     1024
 
 
-typedef struct  room_data     roomData;
-typedef struct  char_data     charData;
-
 typedef struct  event_params  eventParams;
 typedef struct  event_data    eventData;
 typedef struct  event_brief   eventBrief;
@@ -35,9 +32,9 @@ struct event_brief {          /* Stick ths in a struct char_data                
 };
 
 struct event_params {
-   charData*   ch;
+   struct char_data*   ch;
    obj_data*    obj;
-   charData*   vict;
+   struct char_data*   vict;
    char        str[1024];
    int         num;
    void*       extra;
