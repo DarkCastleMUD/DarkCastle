@@ -34,8 +34,8 @@ struct time_info_data
 /* These data contain information about a players time data */
 struct time_data
 {
-  time_t birth;    /* This represents the characters age                */
-  time_t logon;    /* Time of the last logon (used to calculate played) */
+  int32_t birth;    /* This represents the characters age                */
+  int32_t logon;    /* Time of the last logon (used to calculate played) */
   int32_t played;      /* This is the total accumulated time played in secs */
 };
 
