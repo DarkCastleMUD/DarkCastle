@@ -9439,7 +9439,7 @@ int elemental_damage_bonus(int spell, char_data *ch)
     } else {
 	  for (t=f->follower->followers; t; t=t->next)
     	    // if (IS_NPC(t->follower) && t->follower->height == 77)
-            if (IS_NPC(f->follower) && f->follower->mobdata->mob_flags.value[3] == 77)
+            if (IS_NPC(t->follower) && t->follower->mobdata->mob_flags.value[3] == 77)
     	    {
 		switch (mob_index[t->follower->mobdata->nr].virt)
 		{
@@ -9533,7 +9533,7 @@ bool elemental_score(char_data *ch, int level)
       {
         if (IS_NPC(t->follower))
         {
-          if (f->follower->mobdata->mob_flags.value[3] == 77)
+          if (t->follower->mobdata->mob_flags.value[3] == 77)
           {
             switch (mob_index[t->follower->mobdata->nr].virt)
             {
