@@ -178,7 +178,8 @@ int do_check(struct char_data *ch, char *arg, int cmd) {
     send_to_char(buf, ch);
 
     /* ctime adds a \n to the string it returns! */
-    sprintf(buf, "$3Last connected on$R: %s\r", ctime(const_cast<const time_t *>(&vict->pcdata->time.logon)));
+    const time_t tBuffer = vict->pcdata->time.logon;
++   sprintf(buf, "$3Last connected on$R: %s\r", ctime(&tBuffer));
     send_to_char(buf, ch);
   }
 
