@@ -22,13 +22,13 @@ jobs:
         sudo apt install libpq-dev libpq5 libcurl4-openssl-dev
         sudo apt install unzip zlib1g-dev
         sudo apt install libfmt-dev
-        #git clone https://github.com/fmtlib/fmt.git
-        #cd fmt
+        git clone https://github.com/fmtlib/fmt.git
+        cd fmt
         #export CFLAGS=" -m32"
         #export CXXFLAGS=" -m32"
-        #cmake .
-        #make -j4
-        #sudo make install
+        cmake .
+        make -j4
+        sudo make install
     - name: make
       run: |
         cd src
