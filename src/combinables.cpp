@@ -39,9 +39,9 @@ extern struct index_data *obj_index;
 
 ////////////////////////////////////////////////////////////////////////////
 // local function declarations
-void determine_trade_skill_increase(struct char_data * ch, int skillnum, int learned, int trivial);
+void determine_trade_skill_increase(char_data * ch, int skillnum, int learned, int trivial);
 int determine_trade_skill_chance(int learned, int trivial);
-int valid_trade_skill_combine(struct obj_data * container, struct trade_data_type * data, struct char_data * ch);
+int valid_trade_skill_combine(struct obj_data * container, struct trade_data_type * data, char_data * ch);
 
 ////////////////////////////////////////////////////////////////////////////
 // local definitions
@@ -132,7 +132,7 @@ struct thief_poison_data poison_vial_combat_data[] =
 ////////////////////////////////////////////////////////////////////////////
 // command functions
 
-int do_poisonmaking(struct char_data *ch, char *argument, int cmd)
+int do_poisonmaking(char_data *ch, char *argument, int cmd)
 {
   int learned = has_skill(ch, SKILL_TRADE_POISON);
 
@@ -203,7 +203,7 @@ int do_poisonmaking(struct char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_poisonweapon(struct char_data *ch, char *argument, int cmd)
+int do_poisonweapon(char_data *ch, char *argument, int cmd)
 {
   if(GET_CLASS(ch) != CLASS_THIEF && GET_LEVEL(ch) <= IMMORTAL) {
     send_to_char("Only thieves are trained enough to poison their weapons.\r\n", ch);
@@ -274,7 +274,7 @@ int do_poisonweapon(struct char_data *ch, char *argument, int cmd)
 // Return index of match on successful find
 // Return -1 on failure
 // Return -2 if there's nothing in the container
-int valid_trade_skill_combine(obj_data * container, trade_data_type * data, struct char_data * ch)
+int valid_trade_skill_combine(obj_data * container, trade_data_type * data, char_data * ch)
 {
    if(!(container->contains)) {
      csendf(ch, "Your %s appears to be empty.\r\n", container->short_description);
@@ -326,7 +326,7 @@ int determine_trade_skill_chance(int learned, int trivial)
    return chance;
 }
 
-void determine_trade_skill_increase(struct char_data * ch, int skillnum, int learned, int trivial)
+void determine_trade_skill_increase(char_data * ch, int skillnum, int learned, int trivial)
 {
    // can't learn past item's trivial value
    if(learned >= trivial) {
@@ -340,7 +340,7 @@ void determine_trade_skill_increase(struct char_data * ch, int skillnum, int lea
    learn_skill(ch, skillnum, 1, 500);
 }
 
-int handle_poisoned_weapon_attack(struct char_data * ch, struct char_data * vict, int type)
+int handle_poisoned_weapon_attack(char_data * ch, char_data * vict, int type)
 {
    int retval = eSUCCESS;
    // unused   int dam;
@@ -398,7 +398,7 @@ int handle_poisoned_weapon_attack(struct char_data * ch, struct char_data * vict
    return retval;
 }
 
-int do_brew(struct char_data *ch, char *argument, int cmd)
+int do_brew(char_data *ch, char *argument, int cmd)
 {
   char arg1[MAX_STRING_LENGTH], liquid[MAX_STRING_LENGTH], container[MAX_STRING_LENGTH], buffer[MAX_STRING_LENGTH];
   obj_data *herbobj, *liquidobj, *containerobj;
@@ -719,7 +719,7 @@ void Brew::save(void) {
   }
 }
 
-void Brew::list(struct char_data *ch) {
+void Brew::list(char_data *ch) {
   char buffer[MAX_STRING_LENGTH];
   int i = 0;
 
@@ -738,7 +738,7 @@ void Brew::list(struct char_data *ch) {
 
 }
 
-int Brew::add(struct char_data *ch, char *argument) {
+int Brew::add(char_data *ch, char *argument) {
   int herb_vnum, liquid_type, container_vnum, spell;
   char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH], arg4[MAX_INPUT_LENGTH];
   
@@ -795,7 +795,7 @@ int Brew::add(struct char_data *ch, char *argument) {
   return eSUCCESS;
 }
 
-int Brew::remove(struct char_data *ch, char *argument) {
+int Brew::remove(char_data *ch, char *argument) {
   if (!ch)  {
     return eFAILURE;
   }
@@ -836,7 +836,7 @@ int Brew::find(Brew::recipe r) {
   return spell;
 }
 
-int do_scribe(struct char_data *ch, char *argument, int cmd)
+int do_scribe(char_data *ch, char *argument, int cmd)
 {
   char arg1[MAX_STRING_LENGTH], dust[MAX_STRING_LENGTH], pen[MAX_STRING_LENGTH], paper[MAX_STRING_LENGTH];
   obj_data *inkobj, *dustobj, *penobj, *paperobj;
@@ -1116,7 +1116,7 @@ void Scribe::save(void) {
   }
 }
 
-void Scribe::list(struct char_data *ch) {
+void Scribe::list(char_data *ch) {
   char buffer[MAX_STRING_LENGTH];
   int i = 0;
 
@@ -1134,7 +1134,7 @@ void Scribe::list(struct char_data *ch) {
   }
 }
 
-int Scribe::add(struct char_data *ch, char *argument) {
+int Scribe::add(char_data *ch, char *argument) {
   int ink_vnum, dust_vnum, pen_vnum, paper_vnum, spell;
   char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH], arg4[MAX_INPUT_LENGTH], arg5[MAX_INPUT_LENGTH];
   
@@ -1191,7 +1191,7 @@ int Scribe::add(struct char_data *ch, char *argument) {
   return eSUCCESS;
 }
 
-int Scribe::remove(struct char_data *ch, char *argument) {
+int Scribe::remove(char_data *ch, char *argument) {
   if (!ch)  {
     return eFAILURE;
   }

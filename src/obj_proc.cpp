@@ -46,7 +46,7 @@ extern struct obj_data *object_list;
 extern struct zone_data *zone_table;
 extern struct descriptor_data *descriptor_list;
 
-extern struct char_data *initiate_oproc(struct char_data *ch, obj_data *obj);
+extern char_data *initiate_oproc(char_data *ch, obj_data *obj);
 
 extern void reset_zone(int zone);
 
@@ -199,8 +199,8 @@ void load_emoting_objects()
     return;
 }
 
-int emoting_object(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg,
-                   struct char_data *invoker)
+int emoting_object(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
+                   char_data *invoker)
 {
     obj_emote_index *index_cursor = NULL;
     obj_emote_data  *data_cursor = NULL;
@@ -237,8 +237,8 @@ int emoting_object(struct char_data *ch, struct obj_data *obj, int cmd, const ch
     return eFAILURE;
 }
 
-int barbweap(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg,
-		struct char_data *invoker)
+int barbweap(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
+		char_data *invoker)
 { // Cestus
   if (cmd != CMD_PUSH) return eFAILURE;
   if (str_cmp(arg," cestus")) return eFAILURE;
@@ -256,12 +256,12 @@ int barbweap(struct char_data *ch, struct obj_data *obj, int cmd, const char *ar
   }
  return eFAILURE;
 }
-int souldrainer(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
-                struct char_data *invoker)
+int souldrainer(char_data *ch, struct obj_data *obj, int cmd, char *arg,
+                char_data *invoker)
 {
   // struct obj_data *wielded;
   int percent, chance;
-  struct char_data *vict;
+  char_data *vict;
 
   if (!(vict = ch->fighting))
   {
@@ -315,8 +315,8 @@ int souldrainer(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
   return eFAILURE;
 }
 
-int pushwand(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg,
-		struct char_data *invoker)
+int pushwand(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
+		char_data *invoker)
 {
    if (cmd != CMD_SAY && cmd != CMD_PUSH)
      return eFAILURE;
@@ -360,7 +360,7 @@ int pushwand(struct char_data *ch, struct obj_data *obj, int cmd, const char *ar
 }
 
 
-int dawnsword(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg, struct char_data *invoker)
+int dawnsword(char_data *ch, struct obj_data *obj, int cmd, const char *arg, char_data *invoker)
 {
 	if (cmd != CMD_SAY)
 		return eFAILURE;
@@ -384,7 +384,7 @@ int dawnsword(struct char_data *ch, struct obj_data *obj, int cmd, const char *a
 	addTimer(ch, OBJ_DAWNSWORD, 24);
 
 	send_to_char("You whisper a prayer to Dawn and it responds in a brilliant flash of light!\r\n",ch);
-	struct char_data *v;
+	char_data *v;
 	struct affected_type af;
 	for (v = world[ch->in_room].people; v; v = v->next_in_room)
 	{
@@ -410,7 +410,7 @@ int dawnsword(struct char_data *ch, struct obj_data *obj, int cmd, const char *a
 	return eSUCCESS;
 
 }
-int songstaff(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg, struct char_data *invoker)
+int songstaff(char_data *ch, struct obj_data *obj, int cmd, const char *arg, char_data *invoker)
 {
 	if (cmd) return eFAILURE;
 	if (obj->equipped_by == NULL || !obj->equipped_by->in_room) return eFAILURE;
@@ -423,7 +423,7 @@ int songstaff(struct char_data *ch, struct obj_data *obj, int cmd, const char *a
 	obj->obj_flags.timer = 5;
 
 	int heal;
-        for (struct char_data * tmp_char = world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room) {
+        for (char_data * tmp_char = world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room) {
                 if (!ARE_GROUPED(ch, tmp_char))
                         continue;
 
@@ -449,9 +449,9 @@ int songstaff(struct char_data *ch, struct obj_data *obj, int cmd, const char *a
 	return eSUCCESS;
 }
 
-void check_eq(struct char_data *ch);
+void check_eq(char_data *ch);
 
-int lilithring(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg, struct char_data *invoker)
+int lilithring(char_data *ch, struct obj_data *obj, int cmd, const char *arg, char_data *invoker)
 {
 	if (cmd != CMD_SAY)
 		return eFAILURE;
@@ -461,7 +461,7 @@ int lilithring(struct char_data *ch, struct obj_data *obj, int cmd, const char *
 	arg = one_argument(arg, arg2);
 	if (str_cmp(arg1, "ateni"))
 		return eFAILURE;
-	struct char_data *victim;
+	char_data *victim;
 	if (!(victim = get_char_room_vis(ch, arg2))) {
 		send_to_char("Noone here by that name.\r\n", ch);
 		return eSUCCESS;
@@ -523,7 +523,7 @@ int lilithring(struct char_data *ch, struct obj_data *obj, int cmd, const char *
 }
 
 
-int orrowand(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg, struct char_data *invoker)
+int orrowand(char_data *ch, struct obj_data *obj, int cmd, const char *arg, char_data *invoker)
 {
 	if (cmd != CMD_SAY || str_cmp(arg, " recharge"))
 		return eFAILURE;
@@ -553,12 +553,12 @@ int orrowand(struct char_data *ch, struct obj_data *obj, int cmd, const char *ar
 	return eSUCCESS;
 }
 
-int holyavenger(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg,
-                struct char_data *invoker)
+int holyavenger(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
+                char_data *invoker)
 {
   // struct obj_data *wielded;
   int percent, chance;
-  struct char_data *vict;
+  char_data *vict;
 
   if (!(vict = ch->fighting))
   {
@@ -620,10 +620,10 @@ int holyavenger(struct char_data *ch, struct obj_data *obj, int cmd, const char 
   return eFAILURE;
 }
 
-int hooktippedsteelhalberd(struct char_data *ch, struct obj_data *obj, int cmd,
-                            const char* arg, struct char_data *invoker)
+int hooktippedsteelhalberd(char_data *ch, struct obj_data *obj, int cmd,
+                            const char* arg, char_data *invoker)
 {
-   struct char_data *victim;
+   char_data *victim;
    if (!(victim = ch->fighting))
      return eFAILURE;
    if (number(1,101) > 2) return eFAILURE;
@@ -649,10 +649,10 @@ int hooktippedsteelhalberd(struct char_data *ch, struct obj_data *obj, int cmd,
 }
 
 // TODO - I think we actually used this for a while but it was too powerful
-int drainingstaff(struct char_data *ch, struct obj_data *obj, int cmd, char *arg, 
-                   struct char_data *invoker) 
+int drainingstaff(char_data *ch, struct obj_data *obj, int cmd, char *arg, 
+                   char_data *invoker) 
 {
-    struct char_data *vict;
+    char_data *vict;
     obj_data *staff;
     int dam;
 
@@ -690,8 +690,8 @@ int drainingstaff(struct char_data *ch, struct obj_data *obj, int cmd, char *arg
 
 
 
-int bank(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg, 
-                   struct char_data *invoker)
+int bank(char_data *ch, struct obj_data *obj, int cmd, const char *arg, 
+                   char_data *invoker)
 {
   char buf[MAX_INPUT_LENGTH];
   int32_t x;
@@ -751,8 +751,8 @@ int bank(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg,
   return eSUCCESS;
 }
 
-int casino_atm(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg, 
-                   struct char_data *invoker)
+int casino_atm(char_data *ch, struct obj_data *obj, int cmd, const char *arg, 
+                   char_data *invoker)
 {
   char buf[MAX_INPUT_LENGTH];
   int32_t x;
@@ -797,8 +797,8 @@ int casino_atm(struct char_data *ch, struct obj_data *obj, int cmd, const char *
 // where the exit is supposed to go
 // I should probably just change the exit temporarily to point to the "bad" room
 // and then change it back after the move.
-int returner(struct char_data *ch, struct obj_data *obj, int cmd, char *arg, 
-                   struct char_data *invoker) 
+int returner(char_data *ch, struct obj_data *obj, int cmd, char *arg, 
+                   char_data *invoker) 
 {
 
    if(cmd > CMD_DOWN || cmd < CMD_NORTH)
@@ -916,8 +916,8 @@ struct assemble_item assemble_items[] = {
 
 };
 
-int hellmouth_thing(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg, 
-                   struct char_data *invoker)
+int hellmouth_thing(char_data *ch, struct obj_data *obj, int cmd, const char *arg, 
+                   char_data *invoker)
 {
   if (cmd != CMD_SAY) return eFAILURE;
   char junk[MAX_INPUT_LENGTH];
@@ -977,7 +977,7 @@ int search_assemble_items(int vnum)
 }
 
 
-bool assemble_item_index(struct char_data *ch, int item_index)
+bool assemble_item_index(char_data *ch, int item_index)
 {
 	// This should never happen
 	if (item_index < 0) {
@@ -1060,7 +1060,7 @@ bool assemble_item_index(struct char_data *ch, int item_index)
 	return true;
 }
 
-int do_assemble(struct char_data *ch, char *argument, int cmd)
+int do_assemble(char_data *ch, char *argument, int cmd)
 {
 	bool different_item_components = false;
 	int vnum, item_index = -1, last_item_index = -1;
@@ -1140,8 +1140,8 @@ int do_assemble(struct char_data *ch, char *argument, int cmd)
     return eSUCCESS;
 }
 
-int stupid_button(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg,
-		   struct char_data *invoker)
+int stupid_button(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
+		   char_data *invoker)
 {
   if(cmd != CMD_PUSH) return eFAILURE;
 
@@ -1162,10 +1162,10 @@ int stupid_button(struct char_data *ch, struct obj_data *obj, int cmd, const cha
 }
 
 // Fear gaze.
-int gazeofgaiot(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg,
-		   struct char_data *invoker)
+int gazeofgaiot(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
+		   char_data *invoker)
 {
-   struct char_data *victim;
+   char_data *victim;
    char vict[MAX_INPUT_LENGTH]; // buffer overflow fix
 
    one_argument(arg, vict);
@@ -1213,8 +1213,8 @@ int gazeofgaiot(struct char_data *ch, struct obj_data *obj, int cmd, const char 
    return eSUCCESS;
 }
 
-int pfe_word(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg, 
-                   struct char_data *invoker)
+int pfe_word(char_data *ch, struct obj_data *obj, int cmd, const char *arg, 
+                   char_data *invoker)
 {
    // char buf[MAX_INPUT_LENGTH];
    char junk[MAX_INPUT_LENGTH];
@@ -1222,7 +1222,7 @@ int pfe_word(struct char_data *ch, struct obj_data *obj, int cmd, const char *ar
    struct obj_data *obj_object;
    int j;
 
-   struct obj_data *get_object_in_equip_vis(struct char_data *ch,
+   struct obj_data *get_object_in_equip_vis(char_data *ch,
          char *arg, struct obj_data *equipment[], int *j, bool blindfighting);
 
    if(!cmd && obj) // This is where we recharge
@@ -1311,8 +1311,8 @@ int pfe_word(struct char_data *ch, struct obj_data *obj, int cmd, const char *ar
    return eFAILURE;
 }
 
-int devilsword(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg, 
-                   struct char_data *invoker)
+int devilsword(char_data *ch, struct obj_data *obj, int cmd, const char *arg, 
+                   char_data *invoker)
 {
    // char buf[MAX_INPUT_LENGTH];
    char junk[MAX_INPUT_LENGTH];
@@ -1371,7 +1371,7 @@ int devilsword(struct char_data *ch, struct obj_data *obj, int cmd, const char *
 
 // If you have AFFsanct but not the spell, kill it
 // This works fine as long as they don't have perma-sanct eq
-void remove_eliara(struct char_data *ch)
+void remove_eliara(char_data *ch)
 {
 
    if(!IS_AFFECTED(ch, AFF_SANCTUARY))
@@ -1386,8 +1386,8 @@ void remove_eliara(struct char_data *ch)
 
 }
 
-int dancevest(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg, 
-                   struct char_data *invoker)
+int dancevest(char_data *ch, struct obj_data *obj, int cmd, const char *arg, 
+                   char_data *invoker)
 {
 	if (!cmd || cmd != CMD_SAY || !ch || !ch->in_room || str_cmp(arg, " just dance"))
 	{
@@ -1412,7 +1412,7 @@ int dancevest(struct char_data *ch, struct obj_data *obj, int cmd, const char *a
 		"headbang",
 		"showtune" // 9
 	};
-	struct char_data *v;
+	char_data *v;
 	send_to_char("As you intone the sacred words, phantom music swells around you and everyone within earshot joins in!\r\n",ch);
 	for (v = world[ch->in_room].people; v; v = v->next_in_room)
 	{
@@ -1432,8 +1432,8 @@ int dancevest(struct char_data *ch, struct obj_data *obj, int cmd, const char *a
 
 }
 
-int durendal(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg, 
-                   struct char_data *invoker)
+int durendal(char_data *ch, struct obj_data *obj, int cmd, const char *arg, 
+                   char_data *invoker)
 {
 
 	if (!cmd)
@@ -1478,7 +1478,7 @@ int durendal(struct char_data *ch, struct obj_data *obj, int cmd, const char *ar
 	}
 	send_to_char("Upon hearing your plea, Durendal suddenly bursts into flame with a blinding flash of searing white heat!\r\n",ch);
 	act("$n mutters a quiet prayer and with a blinding flash, their weapon bursts into flame!", ch, 0, 0, TO_ROOM, 0);
-	struct char_data *v, *vn;
+	char_data *v, *vn;
 	for (v = world[ch->in_room].people; v; v = vn)
 	{
 		vn = v->next_in_room;
@@ -1499,11 +1499,11 @@ int durendal(struct char_data *ch, struct obj_data *obj, int cmd, const char *ar
 
 
 // When fighting an evil opponent, sancts PC
-int eliara_combat(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg, 
-                   struct char_data *invoker)
+int eliara_combat(char_data *ch, struct obj_data *obj, int cmd, const char *arg, 
+                   char_data *invoker)
 {
 
-   struct char_data *vict = NULL;
+   char_data *vict = NULL;
 
    if(cmd) return eFAILURE;
 
@@ -1528,8 +1528,8 @@ int eliara_combat(struct char_data *ch, struct obj_data *obj, int cmd, const cha
    return eSUCCESS;
 }
 
-int eliara_non_combat(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg, 
-                   struct char_data *invoker)
+int eliara_non_combat(char_data *ch, struct obj_data *obj, int cmd, const char *arg, 
+                   char_data *invoker)
 {
 
    if(!ch) return eFAILURE;
@@ -1550,8 +1550,8 @@ int eliara_non_combat(struct char_data *ch, struct obj_data *obj, int cmd, const
    return eFAILURE;
 }
 
-int carriage(struct char_data *ch, struct obj_data *obj, int cmd, char *arg, 
-                   struct char_data *invoker) 
+int carriage(char_data *ch, struct obj_data *obj, int cmd, char *arg, 
+                   char_data *invoker) 
 {
   // this ain't done yet...it's natashas half written proc 
 
@@ -1575,8 +1575,8 @@ int carriage(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
    return eSUCCESS;
 }
 
-int arenaporter(struct char_data *ch, struct obj_data *obj, int cmd, char *arg, 
-                   struct char_data *invoker)
+int arenaporter(char_data *ch, struct obj_data *obj, int cmd, char *arg, 
+                   char_data *invoker)
 {
    // only go off when a player types a command
    if(!cmd)
@@ -1610,8 +1610,8 @@ int arenaporter(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
    return eFAILURE;
 }
 
-int movingarenaporter(struct char_data *ch, struct obj_data *obj, int cmd, char *arg, 
-                   struct char_data *invoker)
+int movingarenaporter(char_data *ch, struct obj_data *obj, int cmd, char *arg, 
+                   char_data *invoker)
 {
    int32_t room = 17840;
 
@@ -1651,8 +1651,8 @@ int movingarenaporter(struct char_data *ch, struct obj_data *obj, int cmd, char 
    return eSUCCESS;
 }
 
-int restring_machine(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg, 
-                   struct char_data *invoker)
+int restring_machine(char_data *ch, struct obj_data *obj, int cmd, const char *arg, 
+                   char_data *invoker)
 {
   char name[MAX_INPUT_LENGTH];
   char buf[MAX_INPUT_LENGTH];
@@ -1719,8 +1719,8 @@ int restring_machine(struct char_data *ch, struct obj_data *obj, int cmd, const 
   return eSUCCESS;
 }
 
-int weenie_weedy(struct char_data*ch, struct obj_data *obj, int cmd, const char*arg, 
-                   struct char_data *invoker)
+int weenie_weedy(char_data*ch, struct obj_data *obj, int cmd, const char*arg, 
+                   char_data *invoker)
 {
    if (cmd)
      return eFAILURE;
@@ -1740,8 +1740,8 @@ int weenie_weedy(struct char_data*ch, struct obj_data *obj, int cmd, const char*
 // this should really be a azrack megaphone, but i'm too lazy to figure out how they
 // work right now
 // TODO - figure out how azrack's megaphone's work
-int stupid_message(struct char_data*ch, struct obj_data *obj, int cmd, const char*arg, 
-                   struct char_data *invoker)
+int stupid_message(char_data*ch, struct obj_data *obj, int cmd, const char*arg, 
+                   char_data *invoker)
 {
    if (cmd)
      return eFAILURE;
@@ -1762,13 +1762,13 @@ int stupid_message(struct char_data*ch, struct obj_data *obj, int cmd, const cha
 
 // If there is a player in rooms 8695-8699 (the pillars), then they cause a
 // "balance" and we can remove the imp_only flag from the target room
-int pagoda_balance(struct char_data*ch, struct obj_data *obj, int cmd, const char*arg, 
-                   struct char_data *invoker)
+int pagoda_balance(char_data*ch, struct obj_data *obj, int cmd, const char*arg, 
+                   char_data *invoker)
 {
    if(cmd)
      return eFAILURE;
 
-   struct char_data * vict = NULL;
+   char_data * vict = NULL;
    int found = 0;
 
    for(int i = 8695; i < 8699; i++)
@@ -1798,8 +1798,8 @@ int pagoda_balance(struct char_data*ch, struct obj_data *obj, int cmd, const cha
 }
 
 // If players enter the room, pop a "imp_only" flag back on the room.
-int pagoda_shield_restorer(struct char_data*ch, struct obj_data *obj, int cmd, const char*arg, 
-                   struct char_data *invoker)
+int pagoda_shield_restorer(char_data*ch, struct obj_data *obj, int cmd, const char*arg, 
+                   char_data *invoker)
 {
    if(!cmd) return eFAILURE; // only restore if a player is in the room
 
@@ -1813,10 +1813,10 @@ int pagoda_shield_restorer(struct char_data*ch, struct obj_data *obj, int cmd, c
 }
 
 // stupid little item I made for an ex-gf so she could find me when she logged in
-int phish_locator(struct char_data*ch, struct obj_data *obj, int cmd, const char*arg, 
-                   struct char_data *invoker)
+int phish_locator(char_data*ch, struct obj_data *obj, int cmd, const char*arg, 
+                   char_data *invoker)
 {
-   struct char_data * victim = NULL;
+   char_data * victim = NULL;
 
    if(cmd != CMD_PUSH) // push
       return eFAILURE;
@@ -1840,11 +1840,11 @@ int phish_locator(struct char_data*ch, struct obj_data *obj, int cmd, const char
 }
 
 
-int generic_push_proc(struct char_data*ch, struct obj_data *obj, int cmd, const char*arg, 
-                   struct char_data *invoker)
+int generic_push_proc(char_data*ch, struct obj_data *obj, int cmd, const char*arg, 
+                   char_data *invoker)
 {
-   struct char_data * victim;
-   struct char_data * next_vict;
+   char_data * victim;
+   char_data * next_vict;
 
    if (cmd != CMD_PUSH) // push
       return eFAILURE;
@@ -1874,12 +1874,12 @@ int generic_push_proc(struct char_data*ch, struct obj_data *obj, int cmd, const 
    return eSUCCESS;
 }
 
-int portal_word(struct char_data *ch, struct obj_data *obj, int cmd, char *arg, 
-                   struct char_data *invoker)
+int portal_word(char_data *ch, struct obj_data *obj, int cmd, char *arg, 
+                   char_data *invoker)
 {
    char junk[MAX_INPUT_LENGTH];
    char arg1[MAX_INPUT_LENGTH];
-   struct char_data * victim = NULL;
+   char_data * victim = NULL;
 
    if(!cmd && obj) {  // This is where we recharge
       if(obj->obj_flags.value[3]) {
@@ -1923,12 +1923,12 @@ int portal_word(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
    return eSUCCESS;
 }
 
-int full_heal_word(struct char_data *ch, struct obj_data *obj, int cmd, char *arg, 
-                   struct char_data *invoker)
+int full_heal_word(char_data *ch, struct obj_data *obj, int cmd, char *arg, 
+                   char_data *invoker)
 {
    char junk[MAX_INPUT_LENGTH];
    char arg1[MAX_INPUT_LENGTH];
-   struct char_data * victim = NULL;
+   char_data * victim = NULL;
 
    if(!cmd && obj) { // This is where we recharge
       if(obj->obj_flags.value[3]) {
@@ -1975,8 +1975,8 @@ int full_heal_word(struct char_data *ch, struct obj_data *obj, int cmd, char *ar
    return eSUCCESS;
 }
 
-int mana_box(struct char_data *ch, struct obj_data *obj, int cmd, char *arg, 
-                   struct char_data *invoker)
+int mana_box(char_data *ch, struct obj_data *obj, int cmd, char *arg, 
+                   char_data *invoker)
 {
    if(cmd)                                  return eFAILURE;
    ch = obj->equipped_by;
@@ -1992,8 +1992,8 @@ int mana_box(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
    return eSUCCESS;
 }
 
-int fireshield_word(struct char_data *ch, struct obj_data *obj, int cmd, char *arg, 
-                   struct char_data *invoker)
+int fireshield_word(char_data *ch, struct obj_data *obj, int cmd, char *arg, 
+                   char_data *invoker)
 {
    char junk[MAX_INPUT_LENGTH];
    char arg1[MAX_INPUT_LENGTH];
@@ -2038,12 +2038,12 @@ int fireshield_word(struct char_data *ch, struct obj_data *obj, int cmd, char *a
    return eSUCCESS;
 }
 
-int teleport_word(struct char_data *ch, struct obj_data *obj, int cmd, char *arg, 
-                   struct char_data *invoker)
+int teleport_word(char_data *ch, struct obj_data *obj, int cmd, char *arg, 
+                   char_data *invoker)
 {
    char junk[MAX_INPUT_LENGTH];
    char arg1[MAX_INPUT_LENGTH];
-   struct char_data * victim = NULL;
+   char_data * victim = NULL;
 
    if(!cmd && obj) { // This is where we recharge
       if(obj->obj_flags.value[3]) {
@@ -2094,8 +2094,8 @@ int teleport_word(struct char_data *ch, struct obj_data *obj, int cmd, char *arg
 }
 
 
-int alignment_word(struct char_data *ch, struct obj_data *obj, int cmd, char *arg, 
-                   struct char_data *invoker)
+int alignment_word(char_data *ch, struct obj_data *obj, int cmd, char *arg, 
+                   char_data *invoker)
 {
    char junk[MAX_INPUT_LENGTH];
    char arg1[MAX_INPUT_LENGTH];
@@ -2145,8 +2145,8 @@ int alignment_word(struct char_data *ch, struct obj_data *obj, int cmd, char *ar
    return eSUCCESS;
 }
 
-int protection_word(struct char_data *ch, struct obj_data *obj, int cmd, char *arg, 
-                   struct char_data *invoker)
+int protection_word(char_data *ch, struct obj_data *obj, int cmd, char *arg, 
+                   char_data *invoker)
 {
    char junk[MAX_INPUT_LENGTH];
    char arg1[MAX_INPUT_LENGTH];
@@ -2202,7 +2202,7 @@ int protection_word(struct char_data *ch, struct obj_data *obj, int cmd, char *a
 // Proc for handling any 'pull' actions.  Just put it on the object and put in an entry
 // Lots of things in here will crash if you remove the zone and stuff, but you just have
 // to assume some of these things will work.  If they don't, we got bigger problems anyway
-int pull_proc(struct char_data*ch, struct obj_data *obj, int cmd, const char* arg, struct char_data *invoker)
+int pull_proc(char_data*ch, struct obj_data *obj, int cmd, const char* arg, char_data *invoker)
 {
    if (cmd != CMD_PULL) // pull
       return eFAILURE;
@@ -2236,7 +2236,7 @@ int pull_proc(struct char_data*ch, struct obj_data *obj, int cmd, const char* ar
    return eSUCCESS;
 }
 
-int szrildor_pass(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg, struct char_data *invoker)
+int szrildor_pass(char_data *ch, struct obj_data *obj, int cmd, const char *arg, char_data *invoker)
 {
   struct obj_data *p;
   // 30097
@@ -2317,7 +2317,7 @@ int szrildor_pass(struct char_data *ch, struct obj_data *obj, int cmd, const cha
       n = p->next;
       if (obj_index[p->item_number].virt == 30097)
       {
-        struct char_data *v = nullptr;
+        char_data *v = nullptr;
 
         if (p->carried_by) {
           v = p->carried_by;
@@ -2368,7 +2368,7 @@ int szrildor_pass(struct char_data *ch, struct obj_data *obj, int cmd, const cha
   return eSUCCESS;
 }
 
-int szrildor_pass_checks(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg, struct char_data *invoker)
+int szrildor_pass_checks(char_data *ch, struct obj_data *obj, int cmd, const char *arg, char_data *invoker)
 {
   // 30096
   if (cmd)
@@ -2417,8 +2417,8 @@ int szrildor_pass_checks(struct char_data *ch, struct obj_data *obj, int cmd, co
 
 
 
-int moving_portals(struct char_data*ch, struct obj_data *obj, int cmd, 
-const char*arg, struct char_data *invoker)
+int moving_portals(char_data*ch, struct obj_data *obj, int cmd, 
+const char*arg, char_data *invoker)
 {
    char msg1[MAX_STRING_LENGTH],msg2[MAX_STRING_LENGTH];
    int low, high, room,time,sector = 0;
@@ -2476,7 +2476,7 @@ const char*arg, struct char_data *invoker)
 
 
 // searches for if a certain mob is alive.  If so, you cannot use magic in this room.
-int no_magic_while_alive(struct char_data*ch, struct obj_data *obj, int cmd, const char*arg, struct char_data *invoker)
+int no_magic_while_alive(char_data*ch, struct obj_data *obj, int cmd, const char*arg, char_data *invoker)
 {
    if(cmd)
       return eFAILURE;
@@ -2484,7 +2484,7 @@ int no_magic_while_alive(struct char_data*ch, struct obj_data *obj, int cmd, con
    if(obj->in_room < 0)
       return eFAILURE;
 
-   struct char_data * vict = world[obj->in_room].people;
+   char_data * vict = world[obj->in_room].people;
 
    for(;vict;vict = vict->next_in_room) {
       if(IS_NPC(vict) && (
@@ -2537,7 +2537,7 @@ int dk_boat[] =
 
 // Also, make sure you update "send_to_boat" for the messages
 //
-int boat_proc(struct char_data*ch, struct obj_data *obj, int cmd, const char*arg, struct char_data *invoker)
+int boat_proc(char_data*ch, struct obj_data *obj, int cmd, const char*arg, char_data *invoker)
 {
    if(cmd && cmd != CMD_ENTER)
       return eFAILURE;
@@ -2604,7 +2604,7 @@ int boat_proc(struct char_data*ch, struct obj_data *obj, int cmd, const char*arg
 }
 
 // Depending on which boat we're on, exit the boat if we're not 'at sea'
-int leave_boat_proc(struct char_data*ch, struct obj_data *obj, int cmd, const char*arg, struct char_data *invoker)
+int leave_boat_proc(char_data*ch, struct obj_data *obj, int cmd, const char*arg, char_data *invoker)
 {
    obj_data * obj2;
    int i;
@@ -2669,9 +2669,9 @@ int leave_boat_proc(struct char_data*ch, struct obj_data *obj, int cmd, const ch
 // and loads the mob into the room.  Can work for multiple messages with a 'wait' state
 // obj values:  [current pulse] [unused] [unused] [unused]
 //
-int mob_summoner(struct char_data*ch, struct obj_data *obj, int cmd, const char*arg, struct char_data *invoker)
+int mob_summoner(char_data*ch, struct obj_data *obj, int cmd, const char*arg, char_data *invoker)
 {
-   struct char_data * vict;
+   char_data * vict;
 
    if(cmd)
       return eFAILURE;
@@ -2749,7 +2749,7 @@ int mob_summoner(struct char_data*ch, struct obj_data *obj, int cmd, const char*
 // Takes care of lighting back up a room when globe of darkness wears off
 // values:  [time left] [how dark] [unused] [unused]
 //
-int globe_of_darkness_proc(struct char_data*ch, struct obj_data *obj, int cmd, const char*arg, struct char_data *invoker)
+int globe_of_darkness_proc(char_data*ch, struct obj_data *obj, int cmd, const char*arg, char_data *invoker)
 {
    if(cmd)
       return eFAILURE;
@@ -2770,7 +2770,7 @@ int globe_of_darkness_proc(struct char_data*ch, struct obj_data *obj, int cmd, c
 
 
 
-int hornoplenty(struct char_data*ch, struct obj_data *obj, int cmd, const char*arg, struct char_data *invoker)
+int hornoplenty(char_data*ch, struct obj_data *obj, int cmd, const char*arg, char_data *invoker)
 {
    if(cmd)
       return eFAILURE;
@@ -2795,8 +2795,8 @@ int hornoplenty(struct char_data*ch, struct obj_data *obj, int cmd, const char*a
    return eSUCCESS;
 }
 
-int gl_dragon_fire(struct char_data *ch, struct obj_data *obj, int cmd, char *arg, 
-                   struct char_data *invoker)
+int gl_dragon_fire(char_data *ch, struct obj_data *obj, int cmd, char *arg, 
+                   char_data *invoker)
 {
    if(cmd)                                  return eFAILURE;
    if(!ch || !ch->fighting)                 return eFAILURE;
@@ -2813,8 +2813,8 @@ int gl_dragon_fire(struct char_data *ch, struct obj_data *obj, int cmd, char *ar
    return cast_fire_breath(10, ch, "", SPELL_TYPE_SPELL, ch->fighting, 0, 0);
 }
 
-int dk_rend(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg, 
-                   struct char_data *invoker)
+int dk_rend(char_data *ch, struct obj_data *obj, int cmd, const char *arg, 
+                   char_data *invoker)
 {
    if(cmd)                                  return eFAILURE;
    if(!ch || !ch->fighting)                 return eFAILURE;
@@ -2834,8 +2834,8 @@ int dk_rend(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg
    return eSUCCESS;
 }
 
-int magic_missile_boots(struct char_data *ch, struct obj_data *obj, int cmd, char *arg, 
-                   struct char_data *invoker)
+int magic_missile_boots(char_data *ch, struct obj_data *obj, int cmd, char *arg, 
+                   char_data *invoker)
 {
    if(cmd)                                  return eFAILURE;
    if(!ch || !ch->fighting)                 return eFAILURE;
@@ -2852,8 +2852,8 @@ int magic_missile_boots(struct char_data *ch, struct obj_data *obj, int cmd, cha
 }
 
 
-int shield_combat_procs(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg, 
-                   struct char_data *invoker)
+int shield_combat_procs(char_data *ch, struct obj_data *obj, int cmd, const char *arg, 
+                   char_data *invoker)
 {
    if(cmd)                                  return eFAILURE;
    if(!ch || !ch->fighting)                 return eFAILURE;
@@ -2892,8 +2892,8 @@ int shield_combat_procs(struct char_data *ch, struct obj_data *obj, int cmd, con
    return eFAILURE;
 }
 
-int generic_weapon_combat(struct char_data *ch, struct obj_data *obj, int cmd, char *arg, 
-                   struct char_data *invoker)
+int generic_weapon_combat(char_data *ch, struct obj_data *obj, int cmd, char *arg, 
+                   char_data *invoker)
 {
    extern int top_of_objt;
 
@@ -2933,8 +2933,8 @@ int generic_weapon_combat(struct char_data *ch, struct obj_data *obj, int cmd, c
 }
 
 // item players can buy to find the ToHS
-int TOHS_locator(struct char_data*ch, struct obj_data *obj, int cmd, const char*arg, 
-                   struct char_data *invoker)
+int TOHS_locator(char_data*ch, struct obj_data *obj, int cmd, const char*arg, 
+                   char_data *invoker)
 {
    obj_data * victim = NULL;
 
@@ -2968,18 +2968,18 @@ int TOHS_locator(struct char_data*ch, struct obj_data *obj, int cmd, const char*
    return eSUCCESS;   
 }
 
-/*int no_magic_item(struct char_data *ch, struct obj_data *obj, cmd, char 
-*arg, struct char_data *invoker)
+/*int no_magic_item(char_data *ch, struct obj_data *obj, cmd, char 
+*arg, char_data *invoker)
 { // mobdata last_direction
    if (cmd)  // Not activated through commands..
      return eFAILURE;
 //   if (   
 }
 */
-int gotta_dance_boots(struct char_data*ch, struct obj_data *obj, int cmd, const char*arg, 
-                   struct char_data *invoker)
+int gotta_dance_boots(char_data*ch, struct obj_data *obj, int cmd, const char*arg, 
+                   char_data *invoker)
 {
-   void make_person_dance(struct char_data * ch);
+   void make_person_dance(char_data * ch);
 
    if(cmd)
       return eFAILURE;
@@ -3002,8 +3002,8 @@ int gotta_dance_boots(struct char_data*ch, struct obj_data *obj, int cmd, const 
 }
 
 
-int random_dir_boots(struct char_data*ch, struct obj_data *obj, int cmd, const char*arg, 
-                   struct char_data *invoker)
+int random_dir_boots(char_data*ch, struct obj_data *obj, int cmd, const char*arg, 
+                   char_data *invoker)
 {
    if(cmd)
       return eFAILURE;
@@ -3026,8 +3026,8 @@ int random_dir_boots(struct char_data*ch, struct obj_data *obj, int cmd, const c
 
 // WARNING - uses obj_flags.value[3] to store stuff
 
-int noremove_eq(struct char_data*ch, struct obj_data *obj, int cmd, const char*arg,
-                   struct char_data *invoker)
+int noremove_eq(char_data*ch, struct obj_data *obj, int cmd, const char*arg,
+                   char_data *invoker)
 {
    if(cmd && cmd != CMD_REMOVE)
       return eFAILURE;
@@ -3056,8 +3056,8 @@ int noremove_eq(struct char_data*ch, struct obj_data *obj, int cmd, const char*a
 
 
 
-int glove_combat_procs(struct char_data *ch, struct obj_data *obj, int cmd, char *arg, 
-                   struct char_data *invoker)
+int glove_combat_procs(char_data *ch, struct obj_data *obj, int cmd, char *arg, 
+                   char_data *invoker)
 {
    if(cmd)                                  return eFAILURE;
    if(!ch || !ch->fighting)                 return eFAILURE;
@@ -3223,8 +3223,8 @@ void do_talking_init()
 
 
 
-int chaosblade(struct char_data*ch, struct obj_data *obj, int cmd, const char*arg, 
-                   struct char_data *invoker)
+int chaosblade(char_data*ch, struct obj_data *obj, int cmd, const char*arg, 
+                   char_data *invoker)
 {
 	if (cmd) return eFAILURE;
 	if (!obj->equipped_by) return eFAILURE;
@@ -3253,8 +3253,8 @@ int chaosblade(struct char_data*ch, struct obj_data *obj, int cmd, const char*ar
 	return eSUCCESS;
 }
 
-int rubybrooch(struct char_data*ch, struct obj_data *obj, int cmd, const char*arg, 
-                   struct char_data *invoker)
+int rubybrooch(char_data*ch, struct obj_data *obj, int cmd, const char*arg, 
+                   char_data *invoker)
 {
 	if (cmd) return eFAILURE;
 	if (!obj->equipped_by) return eFAILURE;
@@ -3288,8 +3288,8 @@ int rubybrooch(struct char_data*ch, struct obj_data *obj, int cmd, const char*ar
 	return eSUCCESS;
 }
 
-int eternitystaff(struct char_data*ch, struct obj_data *obj, int cmd, const char*arg, 
-                   struct char_data *invoker)
+int eternitystaff(char_data*ch, struct obj_data *obj, int cmd, const char*arg, 
+                   char_data *invoker)
 {
 	if (cmd) return eFAILURE;
 	if (!obj->equipped_by) return eFAILURE;
@@ -3319,10 +3319,10 @@ int eternitystaff(struct char_data*ch, struct obj_data *obj, int cmd, const char
 	return eSUCCESS;
 }
 
-int talkingsword(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg,
-                 struct char_data *invoker)
+int talkingsword(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
+                 char_data *invoker)
 {
-  struct char_data *vict = NULL;
+  char_data *vict = NULL;
   int unequip = -1;
   static bool init_done = false;
   if (cmd)
@@ -3536,12 +3536,12 @@ int talkingsword(struct char_data *ch, struct obj_data *obj, int cmd, const char
 
 // Fun item to give to mortals...ticks for a while and then when it blows
 // up BOOM!!!
-int hot_potato(struct char_data*ch, struct obj_data *obj, int cmd, const char*arg, 
-                   struct char_data *invoker)
+int hot_potato(char_data*ch, struct obj_data *obj, int cmd, const char*arg, 
+                   char_data *invoker)
 {
    extern int top_of_world;
    int dropped = 0;
-   struct char_data * vict = NULL;
+   char_data * vict = NULL;
 
    if(obj->equipped_by)
       vict = obj->equipped_by;
@@ -3604,7 +3604,7 @@ int hot_potato(struct char_data*ch, struct obj_data *obj, int cmd, const char*ar
       char obj[MAX_INPUT_LENGTH];
       char target[MAX_INPUT_LENGTH];
       half_chop(arg, obj, target);
-      struct char_data * give_vict;
+      char_data * give_vict;
       if (!(give_vict = get_char_room_vis(ch, target)))
          return eFAILURE; // Not giving to char/mob, so ok
       if(IS_MOB(give_vict)) {
@@ -3695,12 +3695,12 @@ int hot_potato(struct char_data*ch, struct obj_data *obj, int cmd, const char*ar
 
 
 // proc for mortar shells - see object.cpp 
-int exploding_mortar_shells(struct char_data*ch, struct obj_data *obj, int cmd, const char*arg, struct char_data *invoker)
+int exploding_mortar_shells(char_data*ch, struct obj_data *obj, int cmd, const char*arg, char_data *invoker)
 {
    int dam = 0;
    char buf[MAX_STRING_LENGTH];
-   struct char_data * victim = NULL;
-   struct char_data * next_v = NULL;
+   char_data * victim = NULL;
+   char_data * next_v = NULL;
 
    if(cmd)
      return eFAILURE;
@@ -3738,10 +3738,10 @@ int exploding_mortar_shells(struct char_data*ch, struct obj_data *obj, int cmd, 
 }
 
 //565
-int godload_banshee(struct char_data *ch, struct obj_data *obj, int cmd, 
-      const char *arg, struct char_data *invoker)
+int godload_banshee(char_data *ch, struct obj_data *obj, int cmd, 
+      const char *arg, char_data *invoker)
 {
-   struct char_data *vict;
+   char_data *vict;
    if (cmd) return eFAILURE;
    if (!(vict = ch->fighting)) return eFAILURE;
    if (number(1,101) > 12) return eFAILURE;
@@ -3750,10 +3750,10 @@ int godload_banshee(struct char_data *ch, struct obj_data *obj, int cmd,
    return song_whistle_sharp(51,ch,"",vict, 50); 
 }
 //511
-int godload_claws(struct char_data *ch, struct obj_data *obj, int cmd,
-   char *arg, struct char_data *invoker)
+int godload_claws(char_data *ch, struct obj_data *obj, int cmd,
+   char *arg, char_data *invoker)
 {
-   struct char_data *vict;
+   char_data *vict;
    if (cmd) return eFAILURE;
    if (!(vict = ch->fighting)) return eFAILURE;
    if (number(1,101) > 5) return eFAILURE;
@@ -3764,9 +3764,9 @@ int godload_claws(struct char_data *ch, struct obj_data *obj, int cmd,
 }
 
 //556
-int godload_defender(struct char_data*ch, struct obj_data *obj, int cmd, 
+int godload_defender(char_data*ch, struct obj_data *obj, int cmd, 
 const char*arg,
-                   struct char_data *invoker)
+                   char_data *invoker)
  {
   char arg1[MAX_INPUT_LENGTH],arg2[MAX_INPUT_LENGTH];
   if (cmd != CMD_SAY|| !is_wearing(ch, obj))
@@ -3784,9 +3784,9 @@ const char*arg,
 }
 
 //500
-int godload_stargazer(struct char_data*ch, struct obj_data *obj, int cmd, 
+int godload_stargazer(char_data*ch, struct obj_data *obj, int cmd, 
 const char*arg,
-                   struct char_data *invoker)
+                   char_data *invoker)
 {
   char arg1[MAX_INPUT_LENGTH];
   if (cmd != CMD_SAY || !is_wearing(ch, obj))
@@ -3806,9 +3806,9 @@ const char*arg,
 }
 
 //534
-int godload_cassock(struct char_data*ch, struct obj_data *obj, int cmd, 
+int godload_cassock(char_data*ch, struct obj_data *obj, int cmd, 
 const char*arg,
-                   struct char_data *invoker)
+                   char_data *invoker)
 {
   char arg1[MAX_INPUT_LENGTH];
   if (cmd != CMD_SAY || !is_wearing(ch, obj))
@@ -3829,8 +3829,8 @@ const char*arg,
 
 
 //526
-int godload_armbands(struct char_data*ch, struct obj_data *obj, int cmd, 
-const char*arg, struct char_data *invoker)
+int godload_armbands(char_data*ch, struct obj_data *obj, int cmd, 
+const char*arg, char_data *invoker)
 {
   char arg1[MAX_INPUT_LENGTH];
   if (cmd != CMD_SAY|| !is_wearing(ch, obj))
@@ -3849,9 +3849,9 @@ const char*arg, struct char_data *invoker)
 }
 
 //548
-int godload_gaze(struct char_data*ch, struct obj_data *obj, int cmd, 
+int godload_gaze(char_data*ch, struct obj_data *obj, int cmd, 
 const char*arg,
-                   struct char_data *invoker)
+                   char_data *invoker)
 {
   char arg1[MAX_INPUT_LENGTH];
   if (cmd != CMD_SAY|| !is_wearing(ch, obj))
@@ -3869,8 +3869,8 @@ const char*arg,
 }
 
 //514
-int godload_wailka(struct char_data*ch, struct obj_data *obj, int cmd, const char*arg,
-                   struct char_data *invoker)
+int godload_wailka(char_data*ch, struct obj_data *obj, int cmd, const char*arg,
+                   char_data *invoker)
 {
   char arg1[MAX_INPUT_LENGTH],arg2[MAX_INPUT_LENGTH];
   if (cmd != CMD_SAY|| !is_wearing(ch, obj))
@@ -3884,7 +3884,7 @@ int godload_wailka(struct char_data*ch, struct obj_data *obj, int cmd, const cha
      send_to_char("The ring hums, but nothing happens.\r\n",ch);
      return eSUCCESS;
   }
-  struct char_data *vict; 
+  char_data *vict; 
   if ((vict = get_char_room_vis(ch, arg2)) == NULL)
   {
      send_to_char("You need to tell the item who.\r\n",ch);
@@ -3896,8 +3896,8 @@ int godload_wailka(struct char_data*ch, struct obj_data *obj, int cmd, const cha
 }
 
 //517
-int godload_choker(struct char_data*ch, struct obj_data *obj, int cmd, const char*arg,
-                   struct char_data *invoker)
+int godload_choker(char_data*ch, struct obj_data *obj, int cmd, const char*arg,
+                   char_data *invoker)
 {
   char arg1[MAX_INPUT_LENGTH];
   if (cmd != CMD_SAY|| !is_wearing(ch, obj))
@@ -3916,8 +3916,8 @@ int godload_choker(struct char_data*ch, struct obj_data *obj, int cmd, const cha
 }
 
 //519
-int godload_lorne(struct char_data*ch, struct obj_data *obj, int cmd, const char*arg,
-                   struct char_data *invoker)
+int godload_lorne(char_data*ch, struct obj_data *obj, int cmd, const char*arg,
+                   char_data *invoker)
 {
   char arg1[MAX_INPUT_LENGTH];
   if (cmd != CMD_SAY|| !is_wearing(ch, obj))
@@ -3936,8 +3936,8 @@ int godload_lorne(struct char_data*ch, struct obj_data *obj, int cmd, const char
 }
 
 //528
-int godload_leprosy(struct char_data *ch, struct obj_data *obj, int cmd, char *arg,
-                   struct char_data *invoker)
+int godload_leprosy(char_data *ch, struct obj_data *obj, int cmd, char *arg,
+                   char_data *invoker)
 {
    if(cmd)                                  return eFAILURE;
    if(!ch || !ch->fighting)                 return eFAILURE;
@@ -3955,8 +3955,8 @@ int godload_leprosy(struct char_data *ch, struct obj_data *obj, int cmd, char *a
 
 
 //540
-int godload_quiver(struct char_data*ch, struct obj_data *obj, int cmd, const char*arg,
-                   struct char_data *invoker)
+int godload_quiver(char_data*ch, struct obj_data *obj, int cmd, const char*arg,
+                   char_data *invoker)
 {
   char arg1[MAX_INPUT_LENGTH];
   if (cmd != CMD_SAY|| !is_wearing(ch, obj))
@@ -3993,8 +3993,8 @@ int godload_quiver(struct char_data*ch, struct obj_data *obj, int cmd, const cha
   return eSUCCESS;
 }
 
-int godload_aligngood(struct char_data*ch, struct obj_data *obj, int cmd, const char*arg,
-                   struct char_data *invoker)
+int godload_aligngood(char_data*ch, struct obj_data *obj, int cmd, const char*arg,
+                   char_data *invoker)
 {
   char arg1[MAX_INPUT_LENGTH];
   if (cmd != CMD_SAY|| !is_wearing(ch, obj))
@@ -4014,8 +4014,8 @@ int godload_aligngood(struct char_data*ch, struct obj_data *obj, int cmd, const 
   return eSUCCESS;  
 }
 
-int godload_alignevil(struct char_data*ch, struct obj_data *obj, int cmd, const char*arg,
-                   struct char_data *invoker)
+int godload_alignevil(char_data*ch, struct obj_data *obj, int cmd, const char*arg,
+                   char_data *invoker)
 {
   char arg1[MAX_INPUT_LENGTH];
   if (cmd != CMD_SAY|| !is_wearing(ch, obj))
@@ -4036,8 +4036,8 @@ int godload_alignevil(struct char_data*ch, struct obj_data *obj, int cmd, const 
 }
 
 
-int godload_tovmier(struct char_data*ch, struct obj_data *obj, int cmd, const char*arg,
-                   struct char_data *invoker)
+int godload_tovmier(char_data*ch, struct obj_data *obj, int cmd, const char*arg,
+                   char_data *invoker)
 {
   char arg1[MAX_INPUT_LENGTH];
   if (cmd != CMD_PULL||!is_wearing(ch,obj))
@@ -4061,8 +4061,8 @@ int godload_tovmier(struct char_data*ch, struct obj_data *obj, int cmd, const ch
   return eSUCCESS;
 }
 
-int godload_hammer(struct char_data*ch, struct obj_data *obj, int cmd, const char*arg,
-                   struct char_data *invoker)
+int godload_hammer(char_data*ch, struct obj_data *obj, int cmd, const char*arg,
+                   char_data *invoker)
 {
   if (cmd != CMD_TREMOR || !ch)
     return eFAILURE;
@@ -4082,7 +4082,7 @@ int godload_hammer(struct char_data*ch, struct obj_data *obj, int cmd, const cha
   return retval;
 }
 
-int angie_proc(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg, struct char_data *invoker)
+int angie_proc(char_data *ch, struct obj_data *obj, int cmd, const char *arg, char_data *invoker)
 {
   if (cmd != CMD_OPEN || ch->in_room != 29263)
     return eFAILURE;
@@ -4097,7 +4097,7 @@ int angie_proc(struct char_data *ch, struct obj_data *obj, int cmd, const char *
   REMOVE_BIT(world[29265].dir_option[2]->exit_info, EX_CLOSED);
   act("$n turns the doorknob, there is a loud click, and a blinding explosion knocks you on your ass.", ch, NULL, NULL, TO_ROOM, 0);
   act("You turn the doorknob, there is a loud click, and a blinding explosion knocks you on your ass.", ch, NULL, NULL, TO_CHAR, 0);
-  struct char_data *a, *b, *c;
+  char_data *a, *b, *c;
   b = initiate_oproc(NULL, obj);
   for (a = world[ch->in_room].people; a; a = c)
   {
@@ -4112,8 +4112,8 @@ int angie_proc(struct char_data *ch, struct obj_data *obj, int cmd, const char *
   return eSUCCESS;
 }
 
-int godload_phyraz(struct char_data*ch, struct obj_data *obj, int cmd, const char*arg,
-                   struct char_data *invoker)
+int godload_phyraz(char_data*ch, struct obj_data *obj, int cmd, const char*arg,
+                   char_data *invoker)
 {
   char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
   if (cmd != CMD_SAY || !is_wearing(ch,obj))
@@ -4128,7 +4128,7 @@ int godload_phyraz(struct char_data*ch, struct obj_data *obj, int cmd, const cha
      return eSUCCESS;
   }
   addTimer(ch, SPELL_WIZARD_EYE, 24);
-  struct char_data *vict = get_char_vis(ch, arg2);
+  char_data *vict = get_char_vis(ch, arg2);
   if (!vict)
   {
     send_to_char("The scrying ball stays murky.\r\n",ch);
@@ -4138,7 +4138,7 @@ int godload_phyraz(struct char_data*ch, struct obj_data *obj, int cmd, const cha
   return spell_wizard_eye(100, ch, vict, 0, 100);
 }
 
-void destroy_spellcraft_glyphs(struct char_data *ch)
+void destroy_spellcraft_glyphs(char_data *ch)
 {
    struct obj_data * tmp_obj, * loop_obj;
 
@@ -4153,7 +4153,7 @@ void destroy_spellcraft_glyphs(struct char_data *ch)
    ch->spellcraftglyph = 0;
 }
 
-int spellcraft_glyphs(struct char_data*ch, struct obj_data *obj, int cmd, const char*argi, struct char_data *invoker)
+int spellcraft_glyphs(char_data*ch, struct obj_data *obj, int cmd, const char*argi, char_data *invoker)
 {
    char target[MAX_STRING_LENGTH],arg[MAX_STRING_LENGTH];
    struct obj_data * sunglyph, *  bookglyph, * heartglyph;
@@ -4256,10 +4256,10 @@ int spellcraft_glyphs(struct char_data*ch, struct obj_data *obj, int cmd, const 
    return eSUCCESS;   
 }
 
-int godload_grathelok(struct char_data *ch, struct obj_data *obj,  int cmd, const char *arg, 
-                   struct char_data *invoker)
+int godload_grathelok(char_data *ch, struct obj_data *obj,  int cmd, const char *arg, 
+                   char_data *invoker)
 {
-   struct char_data *vict; 
+   char_data *vict; 
 
    if(!(vict = ch->fighting))
        return eFAILURE;
@@ -4286,10 +4286,10 @@ int godload_grathelok(struct char_data *ch, struct obj_data *obj,  int cmd, cons
    fight_kill(ch, vict, TYPE_CHOOSE, 0);
    return eSUCCESS|eVICT_DIED; 
 } 
-int goldenbatleth(struct char_data *ch, struct obj_data *obj,  int cmd, const char *arg, 
-                   struct char_data *invoker)
+int goldenbatleth(char_data *ch, struct obj_data *obj,  int cmd, const char *arg, 
+                   char_data *invoker)
 {
-   struct char_data *vict; 
+   char_data *vict; 
 
    if(!(vict = ch->fighting))
        return eFAILURE;
@@ -4317,8 +4317,8 @@ int goldenbatleth(struct char_data *ch, struct obj_data *obj,  int cmd, const ch
    return eSUCCESS|eVICT_DIED; 
 } 
 
-int godload_jaelgreth(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg, 
-                   struct char_data *invoker)
+int godload_jaelgreth(char_data *ch, struct obj_data *obj, int cmd, const char *arg, 
+                   char_data *invoker)
 {
    if(cmd)                                  return eFAILURE;
    if(!ch || !ch->fighting)                 return eFAILURE;
@@ -4331,7 +4331,7 @@ int godload_jaelgreth(struct char_data *ch, struct obj_data *obj, int cmd, const
    send_to_char("You thrust your sacrificial blade into your victim, leeching their lifeforce!\r\n", ch);
    act("$n's dagger sinks into your flesh, and you feel your life force being drained!", 
               ch, obj, ch->fighting, TO_VICT, 0);
-   struct char_data *victim = ch->fighting;
+   char_data *victim = ch->fighting;
 
    int dam = 100;
 
@@ -4372,8 +4372,8 @@ int godload_jaelgreth(struct char_data *ch, struct obj_data *obj, int cmd, const
 }
 
 
-int godload_foecrusher(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg, 
-                   struct char_data *invoker)
+int godload_foecrusher(char_data *ch, struct obj_data *obj, int cmd, const char *arg, 
+                   char_data *invoker)
 {
    if(cmd)                                  return eFAILURE;
    if(!ch || !ch->fighting)                 return eFAILURE;
@@ -4402,7 +4402,7 @@ int godload_foecrusher(struct char_data *ch, struct obj_data *obj, int cmd, cons
               ch, obj, ch->fighting, TO_CHAR, 0);
 	break;
    }
-   struct char_data *victim = ch->fighting;
+   char_data *victim = ch->fighting;
    dam = number(50,dam);
 
    if(affected_by_spell(victim, SPELL_DIVINE_INTER) && dam > affected_by_spell(victim, SPELL_DIVINE_INTER)->modifier)
@@ -4424,8 +4424,8 @@ int godload_foecrusher(struct char_data *ch, struct obj_data *obj, int cmd, cons
 }
 
 
-int godload_hydratail(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg, 
-                   struct char_data *invoker)
+int godload_hydratail(char_data *ch, struct obj_data *obj, int cmd, const char *arg, 
+                   char_data *invoker)
 {
    if(cmd)                                  return eFAILURE;
    if(!ch || !ch->fighting)                 return eFAILURE;
@@ -4460,7 +4460,7 @@ int godload_hydratail(struct char_data *ch, struct obj_data *obj, int cmd, const
        damtype = TYPE_ENERGY;
        break;
    }
-   struct char_data *victim = ch->fighting;
+   char_data *victim = ch->fighting;
 
    stringstream strwithdam;
    stringstream strwithoutdam;

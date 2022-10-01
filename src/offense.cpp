@@ -25,7 +25,7 @@
 #include "interp.h"
 #include "const.h"
 
-int do_suicide(struct char_data *ch, char *argument, int cmd)
+int do_suicide(char_data *ch, char *argument, int cmd)
 {
   if (IS_NPC(ch)) return eFAILURE; // just in case 
   if (IS_SET(world[ch->in_room].room_flags, SAFE))
@@ -73,10 +73,10 @@ int do_suicide(struct char_data *ch, char *argument, int cmd)
 
 // TODO - check differences between hit, murder, and kill....I think we can
 // just pull out alot of the code into a function.
-int do_hit(struct char_data *ch, char *argument, int cmd)
+int do_hit(char_data *ch, char *argument, int cmd)
 {
   char arg[MAX_STRING_LENGTH];
-  struct char_data *victim, *k, *next_char;
+  char_data *victim, *k, *next_char;
   int count = 0;
   
   one_argument(argument, arg);
@@ -129,10 +129,10 @@ int do_hit(struct char_data *ch, char *argument, int cmd)
 }
 
 
-int do_murder(struct char_data *ch, char *argument, int cmd)
+int do_murder(char_data *ch, char *argument, int cmd)
 {
   char arg[MAX_STRING_LENGTH];
-  struct char_data *victim;
+  char_data *victim;
   
   one_argument(argument, arg);
   
@@ -176,11 +176,11 @@ int do_murder(struct char_data *ch, char *argument, int cmd)
 
 
 
-int do_slay(struct char_data *ch, char *argument, int cmd)
+int do_slay(char_data *ch, char *argument, int cmd)
 {
   char buf[256];
   char arg[MAX_STRING_LENGTH];
-  struct char_data *victim;
+  char_data *victim;
   
   one_argument(argument, arg);
   
@@ -232,11 +232,11 @@ int do_slay(struct char_data *ch, char *argument, int cmd)
 
 
 
-int do_kill(struct char_data *ch, char *argument, int cmd)
+int do_kill(char_data *ch, char *argument, int cmd)
 {
   char buf[256];
   char arg[MAX_STRING_LENGTH];
-  struct char_data *victim;
+  char_data *victim;
   
   one_argument(argument, arg);
   
@@ -296,11 +296,11 @@ int do_kill(struct char_data *ch, char *argument, int cmd)
 // if you send do_join a number as the argument, ch will attempt to
 // join a mob of that number.  Only works if ch is mob.
 //
-int do_join(struct char_data *ch, char *argument, int cmd)
+int do_join(char_data *ch, char *argument, int cmd)
 {
-  struct char_data *victim, *tmp_ch, *next_char, *k;
+  char_data *victim, *tmp_ch, *next_char, *k;
   struct follow_type *j;
-  extern struct char_data *combat_list;
+  extern char_data *combat_list;
   int count = 0;
   char victim_name[240];
   bool found = FALSE;

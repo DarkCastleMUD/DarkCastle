@@ -35,9 +35,9 @@
 #include "const.h"
 
 
-void AuctionHandleRenames(struct char_data *ch, string old_name, string new_name);
+void AuctionHandleRenames(char_data *ch, string old_name, string new_name);
 
-int get_max_stat_bonus(struct char_data *ch, int attrs)
+int get_max_stat_bonus(char_data *ch, int attrs)
 {
   int bonus = 0;
 
@@ -69,7 +69,7 @@ int get_max_stat_bonus(struct char_data *ch, int attrs)
 }
 
 // List skill maxes.
-int do_maxes(struct char_data *ch, char *argument, int cmd)
+int do_maxes(char_data *ch, char *argument, int cmd)
 {
   char arg[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
   class_skill_defines *classskill;
@@ -120,9 +120,9 @@ int do_maxes(struct char_data *ch, char *argument, int cmd)
 }
 
 // give a command to a god
-command_return_t do_bestow(struct char_data *ch, string arg, int cmd)
+command_return_t do_bestow(char_data *ch, string arg, int cmd)
 {
-  struct char_data *vict = nullptr;
+  char_data *vict = nullptr;
   string buf;
   string command;
   int i;
@@ -200,9 +200,9 @@ command_return_t do_bestow(struct char_data *ch, string arg, int cmd)
 }
 
 // take away a command from a god
-int do_revoke(struct char_data *ch, char *arg, int cmd)
+int do_revoke(char_data *ch, char *arg, int cmd)
 {
-   struct char_data * vict = NULL;
+   char_data * vict = NULL;
    char buf[MAX_INPUT_LENGTH];
    char command[MAX_INPUT_LENGTH];
    int i;
@@ -268,7 +268,7 @@ int do_revoke(struct char_data *ch, char *arg, int cmd)
 
 /* Thunder is currently in wiz_104.c */
 
-int do_wizlock(struct char_data *ch, char *argument, int cmd)
+int do_wizlock(char_data *ch, char *argument, int cmd)
 {
     wizlock = !wizlock;
 
@@ -291,9 +291,9 @@ int do_wizlock(struct char_data *ch, char *argument, int cmd)
 | Side effects: None
 | Returns: None
 */
-int do_chpwd(struct char_data *ch, char *arg, int cmd)
+int do_chpwd(char_data *ch, char *arg, int cmd)
 {
-  struct char_data *victim;
+  char_data *victim;
   char name[100], buf[50];
 
   /* Verify preconditions */
@@ -326,7 +326,7 @@ int do_chpwd(struct char_data *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-int do_fakelog(struct char_data *ch, char *argument, int cmd)
+int do_fakelog(char_data *ch, char *argument, int cmd)
 {
    char command [MAX_INPUT_LENGTH];
    char lev_str [MAX_INPUT_LENGTH];
@@ -357,9 +357,9 @@ int do_fakelog(struct char_data *ch, char *argument, int cmd)
    return eSUCCESS;
 }
 
-int do_rename_char(struct char_data *ch, char *arg, int cmd)
+int do_rename_char(char_data *ch, char *arg, int cmd)
 {
-  struct char_data *victim;
+  char_data *victim;
   struct obj_data *obj;
   char name[160];
   char strsave[MAX_INPUT_LENGTH];
@@ -552,7 +552,7 @@ int do_rename_char(struct char_data *ch, char *arg, int cmd)
 
   return eSUCCESS;
 }
-int do_install(struct char_data *ch, char *arg, int cmd)
+int do_install(char_data *ch, char *arg, int cmd)
 {
   char buf[256], type[256], arg1[256], err[256], arg2[256];
   int range = 0, type_ok = 0, numrooms = 0;
@@ -640,9 +640,9 @@ int do_install(struct char_data *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-int do_range(struct char_data *ch, char *arg, int cmd)
+int do_range(char_data *ch, char *arg, int cmd)
 {
-  struct char_data *victim;
+  char_data *victim;
   char name[160], buf[160];
   char kind[160];
   char trail[160];
@@ -741,19 +741,19 @@ int do_range(struct char_data *ch, char *arg, int cmd)
 extern int r_new_meta_platinum_cost(int start, int64_t plats);
 extern int r_new_meta_exp_cost(int start, int64_t exp);
 
-extern int64_t moves_exp_spent(struct char_data * ch);
-extern int64_t moves_plats_spent(struct char_data * ch);
-extern int64_t hps_exp_spent(struct char_data * ch);
-extern int64_t hps_plats_spent(struct char_data * ch);
-extern int64_t mana_exp_spent(struct char_data * ch);
-extern int64_t mana_plats_spent(struct char_data * ch);
+extern int64_t moves_exp_spent(char_data * ch);
+extern int64_t moves_plats_spent(char_data * ch);
+extern int64_t hps_exp_spent(char_data * ch);
+extern int64_t hps_plats_spent(char_data * ch);
+extern int64_t mana_exp_spent(char_data * ch);
+extern int64_t mana_plats_spent(char_data * ch);
 
 
 
-int do_metastat(struct char_data *ch, char *argument, int cmd)
+int do_metastat(char_data *ch, char *argument, int cmd)
 {
   char arg[MAX_INPUT_LENGTH];
-  struct char_data *victim;
+  char_data *victim;
   argument = one_argument(argument, arg);
   if (arg[0] == '\0' || !(victim = get_pc_vis(ch, arg)))
   {
@@ -802,7 +802,7 @@ r_new_meta_platinum_cost(0,moves_plats_spent(victim))+GET_RAW_MOVE(victim)-GET_M
 }
 
 
-int do_acfinder(struct char_data *ch, char *argument, int cmdnum)
+int do_acfinder(char_data *ch, char *argument, int cmdnum)
 {
   char arg[MAX_STRING_LENGTH];
   argument = one_argument(argument,arg);
@@ -844,7 +844,7 @@ int do_acfinder(struct char_data *ch, char *argument, int cmdnum)
   return eSUCCESS;
 }
 
-int do_testhit(struct char_data *ch, char *argument, int cmd)
+int do_testhit(char_data *ch, char *argument, int cmd)
 {
  char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH];
  argument = one_argument(argument, arg1);
@@ -892,7 +892,7 @@ void write_array_csv(const char * const *array, ofstream &fout) {
 	}
 }
 
-int do_export(struct char_data *ch, char *args, int cmdnum)
+int do_export(char_data *ch, char *args, int cmdnum)
 {
 	char export_type[MAX_INPUT_LENGTH], filename[MAX_INPUT_LENGTH];
 	world_file_list_item * curr = obj_file_list;
@@ -940,7 +940,7 @@ int do_export(struct char_data *ch, char *args, int cmdnum)
 	return eSUCCESS;
 }
 
-command_return_t do_world(struct char_data* ch, string args, int cmd)
+command_return_t do_world(char_data* ch, string args, int cmd)
 {
   
   if (args == "rename")

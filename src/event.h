@@ -10,6 +10,7 @@
  *
  */
 /* $Id: event.h,v 1.2 2002/06/13 04:41:15 dcastle Exp $ */
+#include "character.h"
 
 #define MAX_NUM_EVT     1024
 
@@ -25,16 +26,16 @@ typedef int                   (*eventKiller)(struct char_data*, eventData*);
 #define EVT_NORMAL       0
 #define EVT_DEAD         1
 
-struct event_brief {          /* Stick ths in a struct char_data                 */
+struct event_brief {          /* Stick ths in a char_data                 */
    eventKiller killfunc;      /* Function to call event dies unexpectedly  */
    eventData*  event;
    eventBrief* next;
 };
 
 struct event_params {
-   struct char_data*   ch;
+   char_data*   ch;
    obj_data*    obj;
-   struct char_data*   vict;
+   char_data*   vict;
    char        str[1024];
    int         num;
    void*       extra;
@@ -65,9 +66,9 @@ eventData* getNewEvent();
 void initHandler();
 void queueEvent(eventData* event, int time);
 void processEvents();
-void killBrief(struct char_data* ch, eventFunc func);
-eventBrief* addBrief(struct char_data* ch, eventData* event);
-eventBrief* foundBrief(struct char_data* ch, eventFunc func);
-void killCharEvents(struct char_data* ch);
+void killBrief(char_data* ch, eventFunc func);
+eventBrief* addBrief(char_data* ch, eventData* event);
+eventBrief* foundBrief(char_data* ch, eventFunc func);
+void killCharEvents(char_data* ch);
 
 #endif

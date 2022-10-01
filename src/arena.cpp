@@ -28,7 +28,7 @@
 extern CWorld world;
 struct _arena arena;
 
-int do_arena(struct char_data *ch, char *argument, int cmd)
+int do_arena(char_data *ch, char *argument, int cmd)
 {
   char arg1[256], arg2[256], arg3[256], arg4[256], arg5[256], buf[256];
   int low, high;
@@ -123,7 +123,7 @@ int do_arena(struct char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
  
-int do_joinarena(struct char_data *ch, char *arg, int cmd)
+int do_joinarena(char_data *ch, char *arg, int cmd)
 {
   char buf[256];
   int send_to = NOWHERE;

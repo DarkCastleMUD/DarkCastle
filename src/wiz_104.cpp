@@ -44,7 +44,7 @@ int count_rooms(int start, int end)
 	return count;
 }
 
-int do_thunder(struct char_data *ch, char *argument, int cmd)
+int do_thunder(char_data *ch, char *argument, int cmd)
 {
   char buf1[MAX_STRING_LENGTH];
   char buf2[MAX_STRING_LENGTH];
@@ -86,7 +86,7 @@ int do_thunder(struct char_data *ch, char *argument, int cmd)
   return eSUCCESS; 
 }
 
-int do_incognito(struct char_data *ch, char *argument, int cmd)
+int do_incognito(char_data *ch, char *argument, int cmd)
 {
   if(IS_MOB(ch))
     return eFAILURE;
@@ -103,7 +103,7 @@ int do_incognito(struct char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_load(struct char_data *ch, char *arg, int cmd)
+int do_load(char_data *ch, char *arg, int cmd)
 {
   char type[MAX_INPUT_LENGTH] = { 0 };
   char name[MAX_INPUT_LENGTH] = { 0 };
@@ -298,9 +298,9 @@ int do_load(struct char_data *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-int do_purge(struct char_data *ch, char *argument, int cmd)
+int do_purge(char_data *ch, char *argument, int cmd)
 {
-  struct char_data *vict, *next_v;
+  char_data *vict, *next_v;
   struct obj_data *obj, *next_o;
 
   char name[100], buf[300];
@@ -383,7 +383,7 @@ char* dirNumToChar(int dir)
   return "ERROR";
 }
 
-int show_zone_commands(struct char_data *ch, int i, int start = 0)
+int show_zone_commands(char_data *ch, int i, int start = 0)
 {
   char buf[MAX_STRING_LENGTH];
   int k = 0;
@@ -648,7 +648,7 @@ int find_file(world_file_list_item *itm, int high)
   return -1;
 }
 
-int do_show(struct char_data *ch, char *argument, int cmd) {
+int do_show(char_data *ch, char *argument, int cmd) {
 	char name[MAX_INPUT_LENGTH], buf[200];
 	char beginrange[MAX_INPUT_LENGTH];
 	char endrange[MAX_INPUT_LENGTH];
@@ -724,8 +724,8 @@ int do_show(struct char_data *ch, char *argument, int cmd) {
 			if (end == -1) {
 				if ((nr = real_mobile(begin)) >= 0) {
 					sprintf(buf, "[  1] [%5d] [%2d] %s\n\r", begin,
-							((struct char_data*) (mob_index[nr].item))->level,
-							((struct char_data *) (mob_index[nr].item))->short_desc);
+							((char_data*) (mob_index[nr].item))->level,
+							((char_data *) (mob_index[nr].item))->short_desc);
 					send_to_char(buf, ch);
 				}
 			} else {
@@ -736,8 +736,8 @@ int do_show(struct char_data *ch, char *argument, int cmd) {
 
 					count++;
 					sprintf(buf, "[%3d] [%5d] [%2d] %s\n\r", count, i,
-							((struct char_data*) (mob_index[nr].item))->level,
-							((struct char_data *) (mob_index[nr].item))->short_desc);
+							((char_data*) (mob_index[nr].item))->level,
+							((char_data *) (mob_index[nr].item))->short_desc);
 					send_to_char(buf, ch);
 
 					if (count > 200) {
@@ -757,11 +757,11 @@ int do_show(struct char_data *ch, char *argument, int cmd) {
 					continue;
 
 				if (isname(name,
-						((struct char_data *) (mob_index[nr].item))->name)) {
+						((char_data *) (mob_index[nr].item))->name)) {
 					count++;
 					sprintf(buf, "[%3d] [%5d] [%2d] %s\n\r", count, i,
-							((struct char_data*) (mob_index[nr].item))->level,
-							((struct char_data *) (mob_index[nr].item))->short_desc);
+							((char_data*) (mob_index[nr].item))->level,
+							((char_data *) (mob_index[nr].item))->short_desc);
 					send_to_char(buf, ch);
 
 					if (count > 200) {
@@ -1159,51 +1159,51 @@ int do_show(struct char_data *ch, char *argument, int cmd) {
 			if ((nr = real_mobile(c)) < 0)
 				continue;
 			if (race > -1)
-				if (((struct char_data *) (mob_index[nr].item))->race != race)
+				if (((char_data *) (mob_index[nr].item))->race != race)
 					continue;
 			if (align) {
 				if (align == 1
-						&& ((struct char_data *) (mob_index[nr].item))->alignment
+						&& ((char_data *) (mob_index[nr].item))->alignment
 								< 350)
 					continue;
 				else if (align == 2
-						&& (((struct char_data*) (mob_index[nr].item))->alignment
+						&& (((char_data*) (mob_index[nr].item))->alignment
 								< -350
-								|| ((struct char_data*) (mob_index[nr].item))->alignment
+								|| ((char_data*) (mob_index[nr].item))->alignment
 										> 350))
 					continue;
 				else if (align == 3
-						&& ((struct char_data *) (mob_index[nr].item))->alignment
+						&& ((char_data *) (mob_index[nr].item))->alignment
 								> -350)
 					continue;
 			}
 			if (immune)
-				if (!IS_SET(((struct char_data * )(mob_index[nr].item))->immune,
+				if (!IS_SET(((char_data * )(mob_index[nr].item))->immune,
 						immune))
 					continue;
 			if (clas)
-				if (((struct char_data *) (mob_index[nr].item))->c_class
+				if (((char_data *) (mob_index[nr].item))->c_class
 						!= clas)
 					continue;
 			if (levlow != -555)
-				if (((struct char_data *) (mob_index[nr].item))->level < levlow)
+				if (((char_data *) (mob_index[nr].item))->level < levlow)
 					continue;
 			if (levhigh != -555)
-				if (((struct char_data *) (mob_index[nr].item))->level
+				if (((char_data *) (mob_index[nr].item))->level
 						> levhigh)
 					continue;
 			if (*act)
 				for (i = 0; i < ACT_MAX; i++)
 					if (ISSET(act, i))
 						if (!ISSET(
-								((struct char_data * )(mob_index[nr].item))->mobdata->actflags,
+								((char_data * )(mob_index[nr].item))->mobdata->actflags,
 								i + 1))
 							goto eheh;
 			if (*affect)
 				for (i = 0; i < AFF_MAX; i++)
 					if (ISSET(affect, i))
 						if (!ISSET(
-								((struct char_data * )(mob_index[nr].item))->affected_by,
+								((char_data * )(mob_index[nr].item))->affected_by,
 								i + 1))
 							goto eheh;
 			count++;
@@ -1212,8 +1212,8 @@ int do_show(struct char_data *ch, char *argument, int cmd) {
 				break;
 			}
 			sprintf(buf, "[%3d] [%5d] [%2d] %s\n\r", count, c,
-					((struct char_data *) (mob_index[nr].item))->level,
-					((struct char_data *) (mob_index[nr].item))->short_desc);
+					((char_data *) (mob_index[nr].item))->level,
+					((char_data *) (mob_index[nr].item))->short_desc);
 			send_to_char(buf, ch);
 			eheh: continue;
 		}
@@ -1605,10 +1605,10 @@ int do_show(struct char_data *ch, char *argument, int cmd) {
 	return eSUCCESS;
 }
 
-int do_trans(struct char_data *ch, char *argument, int cmd)
+int do_trans(char_data *ch, char *argument, int cmd)
 {
     struct descriptor_data *i;
-    struct char_data *victim;
+    char_data *victim;
     char buf[100];
     int target;
 
@@ -1656,9 +1656,9 @@ int do_trans(struct char_data *ch, char *argument, int cmd)
     return eSUCCESS;
 }
 
-int do_teleport(struct char_data *ch, char *argument, int cmd)
+int do_teleport(char_data *ch, char *argument, int cmd)
 {
-   struct char_data *victim, *target_mob, *pers;
+   char_data *victim, *target_mob, *pers;
    char person[MAX_INPUT_LENGTH], room[MAX_INPUT_LENGTH];
    int target;
    int loop;
@@ -1738,10 +1738,10 @@ int do_teleport(struct char_data *ch, char *argument, int cmd)
    return eSUCCESS;
 } /* do_teleport */
 
-int do_gtrans(struct char_data *ch, char *argument, int cmd)
+int do_gtrans(char_data *ch, char *argument, int cmd)
 {
     // struct descriptor_data *i;
-    struct char_data *victim;
+    char_data *victim;
     char buf[100];
     int target;
     struct follow_type *k, *next_dude;
@@ -1814,7 +1814,7 @@ char *oprog_type_to_name(int type)
   }
 }
 
-void opstat(struct char_data *ch, int vnum)
+void opstat(char_data *ch, int vnum)
 {
   int num = real_object(vnum);
   obj_data *obj;
@@ -1852,7 +1852,7 @@ void opstat(struct char_data *ch, int vnum)
     }
 }
 
-int do_opstat(struct char_data *ch, char *argument, int cmd)
+int do_opstat(char_data *ch, char *argument, int cmd)
 {
   char buf[MAX_STRING_LENGTH];
   int vnum = -1;
@@ -1890,7 +1890,7 @@ void update_objprog_bits(int num)
 }
 
 
-int do_opedit(struct char_data *ch, char *argument, int cmd)
+int do_opedit(char_data *ch, char *argument, int cmd)
 {
   int num = -1,vnum = -1,i=-1,a=-1;
   char arg[MAX_INPUT_LENGTH];
@@ -2109,7 +2109,7 @@ int do_opedit(struct char_data *ch, char *argument, int cmd)
 }
 
 
-int do_oclone(struct char_data *ch, char *argument, int cmd)
+int do_oclone(char_data *ch, char *argument, int cmd)
 {
   char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
   argument = one_argument(argument, arg1);
@@ -2179,7 +2179,7 @@ int do_oclone(struct char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_mclone(struct char_data *ch, char *argument, int cmd)
+int do_mclone(char_data *ch, char *argument, int cmd)
 {
   char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
   argument = one_argument(argument, arg1);
@@ -2189,7 +2189,7 @@ int do_mclone(struct char_data *ch, char *argument, int cmd)
     send_to_char("Syntax: mclone <source vnum> <destination vnum>\n\r",ch);
     return eFAILURE;
   }
-  struct char_data *mob;
+  char_data *mob;
   int vdst = atoi(arg2), vsrc = atoi(arg1);
   int dst = real_mobile(vdst), src = real_mobile(vsrc);
   if (src < 0)
@@ -2228,7 +2228,7 @@ int do_mclone(struct char_data *ch, char *argument, int cmd)
   mob->mobdata->nr = dst;
 
    // Find old mobile in world and remove
-  struct char_data *old_mob = (struct char_data*)mob_index[dst].item;
+  char_data *old_mob = (char_data*)mob_index[dst].item;
   if (old_mob && old_mob->mobdata) {
 		auto &character_list = DC::instance().character_list;
 		for (auto& tmpch : character_list) {
@@ -2238,8 +2238,8 @@ int do_mclone(struct char_data *ch, char *argument, int cmd)
   }
 
   csendf(ch, "Ok.\n\rYou copied mob %d (%s) and replaced mob %d (%s).\n\r",
-	 vsrc, ((struct char_data*)mob_index[src].item)->short_desc,
-	 vdst, ((struct char_data*)mob_index[dst].item)->short_desc);
+	 vsrc, ((char_data*)mob_index[src].item)->short_desc,
+	 vdst, ((char_data*)mob_index[dst].item)->short_desc);
 
   // Overwrite old mob with new mob
   mob_index[dst].item = (void*)mob;

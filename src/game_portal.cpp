@@ -255,7 +255,7 @@ int make_arbitrary_portal(int from_room, int to_room, int duplicate, int timer)
   return(1);
 }
 
-void find_and_remove_player_portal(struct char_data * ch)
+void find_and_remove_player_portal(char_data * ch)
 {
   struct obj_data * k;
   struct obj_data * next_k;

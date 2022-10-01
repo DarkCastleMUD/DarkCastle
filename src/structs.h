@@ -17,6 +17,10 @@ extern "C" {
 #include <map>
 #include <cstdint>
 
+const size_t MAX_STRING_LENGTH=8192;
+
+#include "character.h"
+
 using namespace std;
 
 FILE * dc_fopen(const char *filename, const char *type);
@@ -24,14 +28,13 @@ int dc_fclose(FILE * fl);
 
 typedef	struct obj_data		obj_data;
 
-#define MAX_STRING_LENGTH   8192
-#define MAX_INPUT_LENGTH     160
-#define MAX_MESSAGES         150
-#define MAX_OBJ_SDESC_LENGTH 100
+const size_t MAX_INPUT_LENGTH=160;
+const size_t MAX_MESSAGES=150;
+const size_t MAX_OBJ_SDESC_LENGTH=100;
 
-#define MESS_ATTACKER 1
-#define MESS_VICTIM   2
-#define MESS_ROOM     3
+const size_t MESS_ATTACKER=1;
+const size_t MESS_VICTIM=2;
+const size_t MESS_ROOM=3;
 
 /* ======================================================================== */
 struct txt_block
@@ -49,8 +52,8 @@ typedef struct txt_q
 
 struct snoop_data
 {
-    struct char_data *snooping; 
-    struct char_data *snoop_by;
+    char_data *snooping; 
+    char_data *snoop_by;
 };
 
 
@@ -88,17 +91,17 @@ struct SVoteData
 class CVoteData
 {
 public:
-  void SetQuestion(struct char_data *ch, std::string question);
-  void AddAnswer(struct char_data *ch, std::string answer);
-  void RemoveAnswer(struct char_data *ch, unsigned int answer);
-  void StartVote(struct char_data *ch);
-  void EndVote(struct char_data *ch);
-  void Reset(struct char_data *ch);
+  void SetQuestion(char_data *ch, std::string question);
+  void AddAnswer(char_data *ch, std::string answer);
+  void RemoveAnswer(char_data *ch, unsigned int answer);
+  void StartVote(char_data *ch);
+  void EndVote(char_data *ch);
+  void Reset(char_data *ch);
   void OutToFile();
-  bool HasVoted(struct char_data *ch);
-  bool Vote(struct char_data *ch, unsigned int vote);
-  void DisplayVote(struct char_data *ch);
-  void DisplayResults(struct char_data *ch);
+  bool HasVoted(char_data *ch);
+  bool Vote(char_data *ch, unsigned int vote);
+  void DisplayVote(char_data *ch);
+  void DisplayResults(char_data *ch);
   bool IsActive() {return active;}
   CVoteData();
   ~CVoteData();  
@@ -116,11 +119,11 @@ private:
  * TO types for act() output.
  */
 /* OLD
-#define TO_ROOM    0
-#define TO_VICT    1
-#define TO_NOTVICT 2
-#define TO_CHAR    3
-#define TO_GODS    4
+const size_t TO_ROOM    0
+const size_t TO_VICT    1
+const size_t TO_NOTVICT 2
+const size_t TO_CHAR    3
+const size_t TO_GODS    4
 */
 
 extern void debugpoint();

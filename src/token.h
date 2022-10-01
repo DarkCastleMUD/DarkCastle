@@ -46,7 +46,7 @@ public:
 
   TokenList(const char *);
   ~TokenList();
-  string Interpret(struct char_data *from, obj_data *obj, void *vict_obj, struct char_data *send_to, int flags);
+  string Interpret(char_data *from, obj_data *obj, void *vict_obj, char_data *send_to, int flags);
 
 private:
   //--

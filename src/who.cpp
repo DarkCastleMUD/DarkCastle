@@ -23,7 +23,7 @@
 // TODO - Figure out the weird bug for why when I do "who <class>" a random player
 //        from another class will pop up who name is nowhere near matching.
 
-clan_data * get_clan(struct char_data *);
+clan_data * get_clan(char_data *);
 
 //#define GWHOBUFFERSIZE   (MAX_STRING_LENGTH*2)
 //char gWhoBuffer[GWHOBUFFERSIZE];
@@ -68,11 +68,11 @@ void clear_who_buffer()
   gWhoBufferCurSize = 0;  // update the size
 }
 
-int do_whogroup(struct char_data *ch, char *argument, int cmd)
+int do_whogroup(char_data *ch, char *argument, int cmd)
 {
 
    descriptor_data *d;
-   struct char_data *k, *i;
+   char_data *k, *i;
    follow_type *f;
    char target[MAX_INPUT_LENGTH];
    char tempbuffer[800];
@@ -188,10 +188,10 @@ int do_whogroup(struct char_data *ch, char *argument, int cmd)
    return eSUCCESS;
 }
 
-int do_whosolo(struct char_data *ch, char *argument, int cmd)
+int do_whosolo(char_data *ch, char *argument, int cmd)
 {
    descriptor_data *d;
-   struct char_data *i;
+   char_data *i;
    char tempbuffer[800];
    char buf[MAX_INPUT_LENGTH+1];
    bool foundtarget;
@@ -250,10 +250,10 @@ int do_whosolo(struct char_data *ch, char *argument, int cmd)
    return eSUCCESS;
 }
 
-int do_who(struct char_data *ch, char *argument, int cmd)
+int do_who(char_data *ch, char *argument, int cmd)
 {
   struct descriptor_data *d;
-  struct char_data *i;
+  char_data *i;
   clan_data *clan;
   int numPC = 0;
   int numImmort = 0;
@@ -651,7 +651,7 @@ int do_who(struct char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_whoarena(struct char_data *ch, char *argument, int cmd)
+int do_whoarena(char_data *ch, char *argument, int cmd)
 {
    int count = 0;
    clan_data * clan;
@@ -703,7 +703,7 @@ int do_whoarena(struct char_data *ch, char *argument, int cmd)
    return eSUCCESS;
 }
 
-int do_where(struct char_data *ch, char *argument, int cmd)
+int do_where(char_data *ch, char *argument, int cmd)
 {
   struct descriptor_data *d;
   int zonenumber;

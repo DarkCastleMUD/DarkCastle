@@ -130,7 +130,7 @@ int64_t new_meta_exp_cost_one(int start)
 	return new_meta_platinum_cost(start, start + 1) * 51523;
 }
 
-int64_t moves_exp_spent(struct char_data * ch)
+int64_t moves_exp_spent(char_data * ch)
 {
 	int start = GET_MAX_MOVE(ch) - GET_MOVE_METAS(ch);
 	int64_t expcost = 0;
@@ -142,7 +142,7 @@ int64_t moves_exp_spent(struct char_data * ch)
 	return expcost;
 }
 
-int64_t moves_plats_spent(struct char_data * ch)
+int64_t moves_plats_spent(char_data * ch)
 {
 	int64_t expcost = 0;
 	int start = GET_MAX_MOVE(ch) - GET_MOVE_METAS(ch);
@@ -154,7 +154,7 @@ int64_t moves_plats_spent(struct char_data * ch)
 	return expcost;
 }
 
-int64_t hps_exp_spent(struct char_data * ch)
+int64_t hps_exp_spent(char_data * ch)
 {
 	int64_t expcost = 0;
 	int cost;
@@ -206,7 +206,7 @@ int64_t hps_exp_spent(struct char_data * ch)
 	return expcost;
 }
 
-int64_t hps_plats_spent(struct char_data * ch)
+int64_t hps_plats_spent(char_data * ch)
 {
 	int cost;
 	int64_t platcost = 0;
@@ -258,7 +258,7 @@ int64_t hps_plats_spent(struct char_data * ch)
 	return platcost;
 }
 
-int64_t mana_exp_spent(struct char_data * ch)
+int64_t mana_exp_spent(char_data * ch)
 {
 	int cost;
 	int64_t expcost = 0;
@@ -294,7 +294,7 @@ int64_t mana_exp_spent(struct char_data * ch)
 	return expcost;
 }
 
-int64_t mana_plats_spent(struct char_data * ch)
+int64_t mana_plats_spent(char_data * ch)
 {
 	int cost;
 	int64_t platcost = 0;
@@ -330,7 +330,7 @@ int64_t mana_plats_spent(struct char_data * ch)
 	return platcost;
 }
 
-int meta_get_stat_exp_cost(struct char_data * ch, uint8_t stat)
+int meta_get_stat_exp_cost(char_data * ch, uint8_t stat)
 {
 	int xp_price;
 	int curr_stat = 0;
@@ -412,7 +412,7 @@ int meta_get_stat_exp_cost(struct char_data * ch, uint8_t stat)
 	return xp_price;
 }
 
-int meta_get_stat_plat_cost(struct char_data * ch, uint8_t targetstat)
+int meta_get_stat_plat_cost(char_data * ch, uint8_t targetstat)
 {
 	int plat_cost;
 	int stat;
@@ -452,7 +452,7 @@ int meta_get_stat_plat_cost(struct char_data * ch, uint8_t targetstat)
 	return plat_cost;
 }
 
-void meta_list_stats(struct char_data * ch)
+void meta_list_stats(char_data * ch)
 {
 	int xp_price, plat_cost, max_stat;
 
@@ -503,7 +503,7 @@ void meta_list_stats(struct char_data * ch)
 
 }
 
-int64_t meta_get_moves_exp_cost(struct char_data * ch)
+int64_t meta_get_moves_exp_cost(char_data * ch)
 {
 	int meta = GET_MOVE_METAS(ch);
 	if (GET_MAX_MOVE(ch) - GET_RAW_MOVE(ch) < 0)
@@ -511,7 +511,7 @@ int64_t meta_get_moves_exp_cost(struct char_data * ch)
 	return new_meta_exp_cost_one(MAX(0, meta));
 }
 
-int64_t meta_get_moves_plat_cost(struct char_data * ch, int amount)
+int64_t meta_get_moves_plat_cost(char_data * ch, int amount)
 {
 	int meta = GET_MOVE_METAS(ch);
 	if (GET_MAX_MOVE(ch) - GET_RAW_MOVE(ch) < 0)
@@ -519,7 +519,7 @@ int64_t meta_get_moves_plat_cost(struct char_data * ch, int amount)
 	return new_meta_platinum_cost(MAX(0, meta), MAX(0,meta) + amount);
 }
 
-int64_t meta_get_hps_exp_cost(struct char_data * ch)
+int64_t meta_get_hps_exp_cost(char_data * ch)
 {
 	int meta = GET_HP_METAS(ch);
 	int bonus = 0;
@@ -535,7 +535,7 @@ int64_t meta_get_hps_exp_cost(struct char_data * ch)
 	return new_meta_exp_cost_one(MAX(0, meta));
 }
 
-int64_t meta_get_hps_plat_cost(struct char_data * ch, int amount)
+int64_t meta_get_hps_plat_cost(char_data * ch, int amount)
 {
 	int meta = GET_HP_METAS(ch);
 	int bonus = 0;
@@ -551,7 +551,7 @@ int64_t meta_get_hps_plat_cost(struct char_data * ch, int amount)
 	return new_meta_platinum_cost(MAX(0, meta), MAX(0,meta) + amount);
 }
 
-int64_t meta_get_mana_exp_cost(struct char_data * ch)
+int64_t meta_get_mana_exp_cost(char_data * ch)
 {
 	int meta = GET_MANA_METAS(ch);
 	int stat, bonus = 0;
@@ -574,7 +574,7 @@ int64_t meta_get_mana_exp_cost(struct char_data * ch)
 	return new_meta_exp_cost_one(MAX(0, meta));
 }
 
-int64_t meta_get_mana_plat_cost(struct char_data * ch, int amount)
+int64_t meta_get_mana_plat_cost(char_data * ch, int amount)
 {
 	int meta = GET_MANA_METAS(ch);
 	int stat, bonus = 0;
@@ -597,7 +597,7 @@ int64_t meta_get_mana_plat_cost(struct char_data * ch, int amount)
 	return new_meta_platinum_cost(MAX(0, meta), MAX(0,meta) + amount);
 }
 
-int meta_get_ki_exp_cost(struct char_data * ch)
+int meta_get_ki_exp_cost(char_data * ch)
 {
 	int cost, stat;
 	switch (GET_CLASS(ch))
@@ -619,7 +619,7 @@ int meta_get_ki_exp_cost(struct char_data * ch)
 	return (int)(cost * 1.2);
 }
 
-int meta_get_ki_plat_cost(struct char_data * ch)
+int meta_get_ki_plat_cost(char_data * ch)
 {
 	int cost, stat;
 	switch (GET_CLASS(ch))
@@ -641,8 +641,8 @@ int meta_get_ki_plat_cost(struct char_data * ch)
 	return (int)(cost * 0.9);
 }
 
-int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg,
-		struct char_data *owner)
+int meta_dude(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
+		char_data *owner)
 {
 	char argument[MAX_INPUT_LENGTH];
 
@@ -1242,7 +1242,7 @@ int meta_dude(struct char_data *ch, struct obj_data *obj, int cmd, const char *a
 
  */
 
-void undo_race_saves(struct char_data * ch)
+void undo_race_saves(char_data * ch)
 {
 	switch (GET_RACE(ch)) {
 	case RACE_HUMAN:
@@ -1330,7 +1330,7 @@ void undo_race_saves(struct char_data * ch)
 	}
 }
 
-bool is_race_applicable(struct char_data *ch, int race)
+bool is_race_applicable(char_data *ch, int race)
 {
 	if (GET_CLASS(ch) == CLASS_PALADIN && (race != RACE_HUMAN && race != RACE_ELVEN && race != RACE_DWARVEN))
 		return FALSE;
@@ -1380,7 +1380,7 @@ bool is_race_applicable(struct char_data *ch, int race)
 	return TRUE;
 }
 
-bool would_die(struct char_data *ch)
+bool would_die(char_data *ch)
 {
 	if (GET_RAW_STR(ch) < 8 || GET_RAW_CON(ch) < 8 || GET_RAW_WIS(ch) < 8 || GET_RAW_INT(ch) < 8 || GET_RAW_DEX(ch) < 8)
 		return TRUE;
@@ -1388,7 +1388,7 @@ bool would_die(struct char_data *ch)
 	return FALSE;
 }
 
-void set_heightweight(struct char_data *ch)
+void set_heightweight(char_data *ch)
 {
 	switch (GET_RACE(ch))
 	{
@@ -1507,7 +1507,7 @@ int changecost(int oldrace, int newrace)
 	return 100000;
 }
 
-char *race_message(struct char_data *ch, int race)
+char *race_message(char_data *ch, int race)
 {
 	static char buf[MAX_STRING_LENGTH];
 	if (GET_RACE(ch) == race)
@@ -1519,7 +1519,7 @@ char *race_message(struct char_data *ch, int race)
 	return &buf[0];
 }
 
-int cardinal(struct char_data *ch, struct obj_data *obj, int cmd, const char *argument, struct char_data *owner)
+int cardinal(char_data *ch, struct obj_data *obj, int cmd, const char *argument, char_data *owner)
 {
 	if (cmd == 59) // list
 			{
@@ -1623,15 +1623,15 @@ int cardinal(struct char_data *ch, struct obj_data *obj, int cmd, const char *ar
 				redo_mana(ch);
 				redo_ki(ch);
 
-				extern void do_inate_race_abilities(struct char_data * ch);
+				extern void do_inate_race_abilities(char_data * ch);
 				do_inate_race_abilities(ch);
-				extern void verify_max_stats(struct char_data *ch);
+				extern void verify_max_stats(char_data *ch);
 				verify_max_stats(ch);
 				//set_heightweight(ch);
-				extern void check_hw(struct char_data *ch);
+				extern void check_hw(char_data *ch);
 				check_hw(ch);
 
-				extern int recheck_height_wears(struct char_data * ch);
+				extern int recheck_height_wears(char_data * ch);
 				recheck_height_wears(ch);
 
 				send_to_char("The Cardinal prays loudly and summons the magic of the gods...\r\n", ch);

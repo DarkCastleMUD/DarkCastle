@@ -543,7 +543,7 @@ void Leaderboard::check(void) {
 
 void Leaderboard::check_offline(void)
 {
-	struct char_data *ch;
+	char_data *ch;
 	int i, j, k;
 	extern char *curr_type;
 	extern char *curr_name;
@@ -1258,7 +1258,7 @@ void Leaderboard::write_file(const char filename[]) {
 	dc_fclose(fl);
 }
 
-int Leaderboard::pdscore(struct char_data * ch) {
+int Leaderboard::pdscore(char_data * ch) {
 	return ch->pcdata->pdeaths;
 }
 
@@ -1268,7 +1268,7 @@ int Leaderboard::pdscore(struct char_data * ch) {
  things, otherwise renames will crash the server hard.
  */
 
-int do_leaderboard(struct char_data *ch, char *argument, int cmd) {
+int do_leaderboard(char_data *ch, char *argument, int cmd) {
 	struct descriptor_data *d;
 	FILE *fl;
 	char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH];
@@ -1896,7 +1896,7 @@ void Leaderboard::setHP(unsigned int placement, string name, int value)
 	hpactivename[placement] = name.data();
 }
 
-int Leaderboard::scan(struct char_data* ch)
+int Leaderboard::scan(char_data* ch)
 {
 	check_offline();
 

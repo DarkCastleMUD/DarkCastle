@@ -9,9 +9,9 @@ Auction Class
 
 External: (explained more below)
 void auction_expire()
-void check_for_sold_items(struct char_data *ch)
+void check_for_sold_items(char_data *ch)
 void AuctionHandleDelete(string name)
-void AuctionHandleRenames(struct char_data *ch, string old_name, string new_name)
+void AuctionHandleRenames(char_data *ch, string old_name, string new_name)
 void load_auction_tickets()
 
 */
@@ -104,23 +104,23 @@ public:
   AuctionHouse(string in_file);
   AuctionHouse();
   ~AuctionHouse();
-  void CollectTickets(struct char_data *ch, unsigned int ticket = 0);
-  void CancelAll(struct char_data *ch);
-  void AddItem(struct char_data *ch, obj_data *obj, unsigned int price, string buyer);
-  void RemoveTicket(struct char_data *ch, unsigned int ticket);
-  void BuyItem(struct char_data *ch, unsigned int ticket);
-  void ListItems(struct char_data *ch, ListOptions options, string name, unsigned int to, unsigned int from);
+  void CollectTickets(char_data *ch, unsigned int ticket = 0);
+  void CancelAll(char_data *ch);
+  void AddItem(char_data *ch, obj_data *obj, unsigned int price, string buyer);
+  void RemoveTicket(char_data *ch, unsigned int ticket);
+  void BuyItem(char_data *ch, unsigned int ticket);
+  void ListItems(char_data *ch, ListOptions options, string name, unsigned int to, unsigned int from);
   void CheckExpire();
-  void Identify(struct char_data *ch, unsigned int ticket);
-  void AddRoom(struct char_data *ch, int room);
-  void RemoveRoom(struct char_data *ch, int room);
-  void ListRooms(struct char_data *ch);
-  void HandleRename(struct char_data *ch, string old_name, string new_name);
+  void Identify(char_data *ch, unsigned int ticket);
+  void AddRoom(char_data *ch, int room);
+  void RemoveRoom(char_data *ch, int room);
+  void ListRooms(char_data *ch);
+  void HandleRename(char_data *ch, string old_name, string new_name);
   void HandleDelete(string name);
-  void CheckForSoldItems(struct char_data *ch);
+  void CheckForSoldItems(char_data *ch);
   bool IsAuctionHouse(int room);
-  void DoModify(struct char_data *ch, unsigned int ticket, unsigned int new_price);
-  void ShowStats(struct char_data *ch);
+  void DoModify(char_data *ch, unsigned int ticket, unsigned int new_price);
+  void ShowStats(char_data *ch);
   void Save();
   void Load();  
 private:
@@ -132,9 +132,9 @@ private:
   unsigned int  UncollectedGold;
   unsigned int  ItemsActive;
   void ParseStats();
-  bool CanSellMore(struct char_data *ch);
+  bool CanSellMore(char_data *ch);
   bool IsOkToSell(obj_data *obj);
-  bool IsWearable(struct char_data *ch, int vnum);
+  bool IsWearable(char_data *ch, int vnum);
   bool IsNoTrade(int vnum);
   bool IsSeller(string in_name, string seller);
   bool IsExist(string name, int vnum);
@@ -155,7 +155,7 @@ This is the actual auction house creation
 AuctionHouse TheAuctionHouse("auctionhouse");
 
 
-void AuctionHouse::ShowStats(struct char_data *ch)
+void AuctionHouse::ShowStats(char_data *ch)
 {
   send_to_char("Vendor Statistics:\r\n", ch);
   csendf(ch, "Items Posted:     %u\r\n", ItemsPosted);
@@ -303,7 +303,7 @@ bool AuctionHouse::IsSeller(string in_name, string seller)
 DO MODIFY
 modify an existing tickets price
 */
-void AuctionHouse::DoModify(struct char_data *ch, unsigned int ticket, unsigned int new_price)
+void AuctionHouse::DoModify(char_data *ch, unsigned int ticket, unsigned int new_price)
 {
   map<unsigned int, AuctionTicket>::iterator Item_it;
   if(new_price < AUC_MIN_PRICE || new_price > AUC_MAX_PRICE)
@@ -341,7 +341,7 @@ void AuctionHouse::DoModify(struct char_data *ch, unsigned int ticket, unsigned 
   csendf(ch, "The new price of ticket %u (%s) is now %u.\n\r", 
                 ticket, Item_it->second.item_name.c_str(), new_price);
 
-  struct char_data *tmp;
+  char_data *tmp;
   for(tmp = world[ch->in_room].people; tmp; tmp = tmp->next_in_room)
     if(tmp != ch) 
       csendf(tmp, "%s has just modified the price of one of %s items.\n\r", 
@@ -358,7 +358,7 @@ void AuctionHouse::DoModify(struct char_data *ch, unsigned int ticket, unsigned 
 /*
 check for sold items
 */
-void AuctionHouse::CheckForSoldItems(struct char_data *ch)
+void AuctionHouse::CheckForSoldItems(char_data *ch)
 {
   map<unsigned int, AuctionTicket>::iterator Item_it;
   bool has_sold_items = false;
@@ -428,7 +428,7 @@ void AuctionHouse::HandleDelete(string name)
 /*
 Handle Renames
 */
-void AuctionHouse::HandleRename(struct char_data *ch, string old_name, string new_name)
+void AuctionHouse::HandleRename(char_data *ch, string old_name, string new_name)
 {
   map<unsigned int, AuctionTicket>::iterator Item_it;
   unsigned int i = 0;
@@ -451,7 +451,7 @@ void AuctionHouse::HandleRename(struct char_data *ch, string old_name, string ne
 /*
 Is the player selling the max # of items already?
 */
-bool AuctionHouse::CanSellMore(struct char_data *ch)
+bool AuctionHouse::CanSellMore(char_data *ch)
 {
   return true;
 }
@@ -497,9 +497,9 @@ bool AuctionHouse::IsOkToSell(obj_data *obj)
 /*
 Identify an item.
 */
-void AuctionHouse::Identify(struct char_data *ch, unsigned int ticket)
+void AuctionHouse::Identify(char_data *ch, unsigned int ticket)
 {
-  int spell_identify(uint8_t level, struct char_data *ch, struct char_data *victim, struct obj_data *obj, int skill);
+  int spell_identify(uint8_t level, char_data *ch, char_data *victim, struct obj_data *obj, int skill);
   map<unsigned int, AuctionTicket>::iterator Item_it;
 
   if((Item_it = Items_For_Sale.find(ticket)) == Items_For_Sale.end())
@@ -651,10 +651,10 @@ bool AuctionHouse::IsSlot(string slot, int vnum)
 /*
 Is the item wearable by the player?
 */
-bool AuctionHouse::IsWearable(struct char_data *ch, int vnum)
+bool AuctionHouse::IsWearable(char_data *ch, int vnum)
 {
-  int class_restricted(struct char_data *ch, struct obj_data *obj);
-  int size_restricted(struct char_data *ch, struct obj_data *obj);
+  int class_restricted(char_data *ch, struct obj_data *obj);
+  int size_restricted(char_data *ch, struct obj_data *obj);
   int nr = real_object(vnum);
 
   if(nr < 0)
@@ -744,7 +744,7 @@ bool AuctionHouse::IsAuctionHouse(int room)
 /*
 LIST ROOMS
 */
-void AuctionHouse::ListRooms(struct char_data *ch)
+void AuctionHouse::ListRooms(char_data *ch)
 {
   map<int, int>::iterator room_it;
   send_to_char("Auction Rooms:", ch);
@@ -759,7 +759,7 @@ void AuctionHouse::ListRooms(struct char_data *ch)
 /*
 ADD ROOM
 */
-void AuctionHouse::AddRoom(struct char_data *ch, int room)
+void AuctionHouse::AddRoom(char_data *ch, int room)
 {
   if(auction_rooms.end() == auction_rooms.find(room))
   {
@@ -777,7 +777,7 @@ void AuctionHouse::AddRoom(struct char_data *ch, int room)
 /*
 REMOVE ROOM
 */
-void AuctionHouse::RemoveRoom(struct char_data *ch, int room)
+void AuctionHouse::RemoveRoom(char_data *ch, int room)
 {
   if(1 == auction_rooms.erase(room))
   {
@@ -1023,7 +1023,7 @@ AuctionHouse::AuctionHouse(string in_file)
 /*
 CANCEL ALL
 */
-void AuctionHouse::CancelAll(struct char_data *ch)
+void AuctionHouse::CancelAll(char_data *ch)
 {
   map<unsigned int, AuctionTicket>::iterator Item_it;
   queue<unsigned int> tickets_to_cancel;
@@ -1049,7 +1049,7 @@ void AuctionHouse::CancelAll(struct char_data *ch)
 /*
 COLLECT EXPIRED
 */
-void AuctionHouse::CollectTickets(struct char_data *ch, unsigned int ticket)
+void AuctionHouse::CollectTickets(char_data *ch, unsigned int ticket)
 {
   map<unsigned int, AuctionTicket>::iterator Item_it;
   if(ticket > 0)
@@ -1099,7 +1099,7 @@ CHECK EXPIRE
 void AuctionHouse::CheckExpire()
 {
   unsigned int cur_time = time(0);
-  struct char_data *ch;
+  char_data *ch;
   bool something_expired = false;
   map<unsigned int, AuctionTicket>::iterator Item_it;
 
@@ -1124,11 +1124,11 @@ void AuctionHouse::CheckExpire()
 /*
 BUY ITEM
 */
-void AuctionHouse::BuyItem(struct char_data *ch, unsigned int ticket)
+void AuctionHouse::BuyItem(char_data *ch, unsigned int ticket)
 { 
   map<unsigned int, AuctionTicket>::iterator Item_it;
   obj_data *obj;
-  struct char_data *vict;
+  char_data *vict;
   FILE *fl;
   char *buf[10];
   int i = 0;
@@ -1235,7 +1235,7 @@ void AuctionHouse::BuyItem(struct char_data *ch, unsigned int ticket)
 
   csendf(ch, "You have purchased %s for %u coins.\n\r", obj->short_description, Item_it->second.price);
 
-  struct char_data *tmp;
+  char_data *tmp;
   for(tmp = world[ch->in_room].people; tmp; tmp = tmp->next_in_room)
     if(tmp != ch) 
       csendf(tmp, "%s just purchased %s's %s\n\r", GET_NAME(ch), Item_it->second.seller.c_str(), obj->short_description);
@@ -1339,7 +1339,7 @@ obj_data * ticket_object_load(map<unsigned int, AuctionTicket>::iterator Item_it
 /*
 CANCEL ITEM
 */
-void AuctionHouse::RemoveTicket(struct char_data *ch, unsigned int ticket)
+void AuctionHouse::RemoveTicket(char_data *ch, unsigned int ticket)
 {
   map<unsigned int, AuctionTicket>::iterator Item_it;
   obj_data *obj;
@@ -1470,7 +1470,7 @@ void AuctionHouse::RemoveTicket(struct char_data *ch, unsigned int ticket)
 /*
 LIST ITEMS
 */
-void AuctionHouse::ListItems(struct char_data *ch, ListOptions options, string name, unsigned int to, unsigned int from)
+void AuctionHouse::ListItems(char_data *ch, ListOptions options, string name, unsigned int to, unsigned int from)
 {
   map<unsigned int, AuctionTicket>::iterator Item_it;
   queue<string> recent;
@@ -1609,7 +1609,7 @@ void AuctionHouse::ListItems(struct char_data *ch, ListOptions options, string n
 /*
 ADD ITEM
 */
-void AuctionHouse::AddItem(struct char_data *ch, obj_data *obj, unsigned int price, string buyer)
+void AuctionHouse::AddItem(char_data *ch, obj_data *obj, unsigned int price, string buyer)
 {
   char buf[20];
   strncpy(buf, buyer.c_str(), 19);
@@ -1765,9 +1765,9 @@ void AuctionHouse::AddItem(struct char_data *ch, obj_data *obj, unsigned int pri
  
   if(advertise == true && NewTicket.buyer.empty())
   {
-    struct char_data * find_mob_in_room(struct char_data *ch, int iFriendId);
+    char_data * find_mob_in_room(char_data *ch, int iFriendId);
     char auc_buf[MAX_STRING_LENGTH];
-    struct char_data *Broker = find_mob_in_room(ch, 5258);
+    char_data *Broker = find_mob_in_room(ch, 5258);
     if(Broker)
     {
       snprintf(auc_buf, MAX_STRING_LENGTH, "$7$B%s has just posted $R%s $7$Bfor sale for %u gold coins.",
@@ -1818,7 +1818,7 @@ void auction_expire()
 /*
 check if the player has gold items
 */
-void check_for_sold_items(struct char_data *ch)
+void check_for_sold_items(char_data *ch)
 {
   TheAuctionHouse.CheckForSoldItems(ch);
   return;
@@ -1838,7 +1838,7 @@ void AuctionHandleDelete(string name)
 HANDLE RENAMES
 Called externally in wiz_110 (do_rename)
 */
-void AuctionHandleRenames(struct char_data *ch, string old_name, string new_name)
+void AuctionHandleRenames(char_data *ch, string old_name, string new_name)
 {
   TheAuctionHouse.HandleRename(ch, old_name, new_name);
   return;
@@ -1855,7 +1855,7 @@ void load_auction_tickets()
   return;
 }
 
-int do_vend(struct char_data *ch, char *argument, int cmd)
+int do_vend(char_data *ch, char *argument, int cmd)
 {
   char buf[MAX_STRING_LENGTH];
   obj_data *obj;

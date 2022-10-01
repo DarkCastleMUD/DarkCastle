@@ -17,13 +17,13 @@ extern "C"
   #include <string.h>
 }
 #include <assert.h>
+#include "character.h"
 #include "terminal.h"
 #include "connect.h"
 #include "levels.h"
 #include "room.h"
 #include "mobile.h"
 #include "player.h"
-#include "character.h"
 #include "obj.h"
 #include "handler.h"
 #include "interp.h"
@@ -39,9 +39,9 @@ extern "C"
 extern bool MOBtrigger;
 
 /* extern functions */
-int is_busy(struct char_data *ch);
+int is_busy(char_data *ch);
 
-int do_report(struct char_data *ch, char *argument, int cmd)
+int do_report(char_data *ch, char *argument, int cmd)
 {
   char buf[256];
   char report[200];
@@ -225,7 +225,7 @@ int send_to_gods(const char *str, int god_level, int32_t type)
   return(1);
 }
 
-int do_channel(struct char_data *ch, char *arg, int cmd)
+int do_channel(char_data *ch, char *arg, int cmd)
 {
   int x;
   int y = 0;
@@ -367,7 +367,7 @@ int do_channel(struct char_data *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-command_return_t do_ignore(struct char_data *ch, string args, int cmd)
+command_return_t do_ignore(char_data *ch, string args, int cmd)
 {
   if (ch == nullptr)
   {
@@ -431,7 +431,7 @@ command_return_t do_ignore(struct char_data *ch, string args, int cmd)
   return eSUCCESS;
 }
 
-int is_ignoring(const struct char_data *const ch, const struct char_data *const i)
+int is_ignoring(const char_data *const ch, const char_data *const i)
 {
   if (IS_MOB(ch) || (GET_LEVEL(i) >= IMMORTAL && IS_PC(i)) || ch->pcdata->ignoring.empty())
   {
@@ -468,7 +468,7 @@ int is_ignoring(const struct char_data *const ch, const struct char_data *const 
 
 #define MAX_NOTE_LENGTH 1000      /* arbitrary */
 
-int do_write(struct char_data *ch, char *argument, int cmd)
+int do_write(char_data *ch, char *argument, int cmd)
 {
     struct obj_data *paper = 0, *pen = 0;
     char papername[MAX_INPUT_LENGTH], penname[MAX_INPUT_LENGTH],
@@ -571,11 +571,11 @@ int do_write(struct char_data *ch, char *argument, int cmd)
 
 
 // TODO - Add a bunch of insults to this for the hell of it.
-int do_insult(struct char_data *ch, char *argument, int cmd)
+int do_insult(char_data *ch, char *argument, int cmd)
 {
   char buf[100];
   char arg[MAX_STRING_LENGTH];
-  struct char_data *victim;
+  char_data *victim;
                         
   one_argument(argument, arg);
                                 
@@ -615,7 +615,7 @@ int do_insult(struct char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }                   
                 
-int do_emote(struct char_data *ch, char *argument, int cmd)
+int do_emote(char_data *ch, char *argument, int cmd)
 {
   int i;
   char buf[MAX_STRING_LENGTH];

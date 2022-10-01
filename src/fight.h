@@ -15,12 +15,12 @@
 void debug_point();
 
 /* Here are our function prototypes */
-int damage(struct char_data *ch, struct char_data *victim, int dam,
+int damage(char_data *ch, char_data *victim, int dam,
            int weapon_type, int attacktype, int weapon, bool is_death_prog = false);
-int noncombat_damage(struct char_data *ch, int dam, char *char_death_msg,
+int noncombat_damage(char_data *ch, int dam, char *char_death_msg,
                      char *room_death_msg, char *death_log_msg, int type);
-void send_damage(char const *, struct char_data *, obj_data *, struct char_data *, char const *, char const *, int);
-int getRealSpellDamage(struct char_data *ch);
+void send_damage(char const *, char_data *, obj_data *, char_data *, char const *, char const *, int);
+int getRealSpellDamage(char_data *ch);
 
 #define FIRST WIELD
 #define SECOND SECOND_WIELD
@@ -30,69 +30,69 @@ int getRealSpellDamage(struct char_data *ch);
 #define COMBAT_MOD_SUSCEPT 1 << 2
 #define COMBAT_MOD_IGNORE 1 << 3
 #define COMBAT_MOD_REDUCED 1 << 4
-void make_dust(struct char_data *ch);
-bool do_frostshield(struct char_data *ch, struct char_data *vict);
-int speciality_bonus(struct char_data *ch, int attacktype, int level);
-void make_husk(struct char_data *ch);
-void make_heart(struct char_data *ch, struct char_data *vict);
-void make_head(struct char_data *ch);
-void make_arm(struct char_data *ch);
-void make_leg(struct char_data *ch);
-void make_bowels(struct char_data *ch);
-void make_blood(struct char_data *ch);
-void make_scraps(struct char_data *ch, struct obj_data *obj);
-void room_mobs_only_hate(struct char_data *ch);
-void add_memory(struct char_data *ch, char *victim, char type);
-void stop_follower(struct char_data *ch, int cmd);
-int attack(struct char_data *ch, struct char_data *vict, int type, int attack = FIRST);
+void make_dust(char_data *ch);
+bool do_frostshield(char_data *ch, char_data *vict);
+int speciality_bonus(char_data *ch, int attacktype, int level);
+void make_husk(char_data *ch);
+void make_heart(char_data *ch, char_data *vict);
+void make_head(char_data *ch);
+void make_arm(char_data *ch);
+void make_leg(char_data *ch);
+void make_bowels(char_data *ch);
+void make_blood(char_data *ch);
+void make_scraps(char_data *ch, struct obj_data *obj);
+void room_mobs_only_hate(char_data *ch);
+void add_memory(char_data *ch, char *victim, char type);
+void stop_follower(char_data *ch, int cmd);
+int attack(char_data *ch, char_data *vict, int type, int attack = FIRST);
 void perform_violence(void);
-void dam_message(int dam, struct char_data *ch, struct char_data *vict, int w_type, int32_t modifier);
-void group_gain(struct char_data *ch, struct char_data *vict);
-int check_magic_block(struct char_data *ch, struct char_data *victim, int attacktype);
-int check_riposte(struct char_data *ch, struct char_data *vict, int attacktype);
-int check_shieldblock(struct char_data *ch, struct char_data *vict, int attacktype);
-bool check_parry(struct char_data *ch, struct char_data *vict, int attacktype, bool display_results = true);
-bool check_dodge(struct char_data *ch, struct char_data *vict, int attacktype, bool display_results = true);
-void disarm(struct char_data *ch, struct char_data *vict);
-void trip(struct char_data *ch, struct char_data *vict);
-int checkCounterStrike(struct char_data *, struct char_data *);
-int doTumblingCounterStrike(struct char_data *, struct char_data *);
+void dam_message(int dam, char_data *ch, char_data *vict, int w_type, int32_t modifier);
+void group_gain(char_data *ch, char_data *vict);
+int check_magic_block(char_data *ch, char_data *victim, int attacktype);
+int check_riposte(char_data *ch, char_data *vict, int attacktype);
+int check_shieldblock(char_data *ch, char_data *vict, int attacktype);
+bool check_parry(char_data *ch, char_data *vict, int attacktype, bool display_results = true);
+bool check_dodge(char_data *ch, char_data *vict, int attacktype, bool display_results = true);
+void disarm(char_data *ch, char_data *vict);
+void trip(char_data *ch, char_data *vict);
+int checkCounterStrike(char_data *, char_data *);
+int doTumblingCounterStrike(char_data *, char_data *);
 
-int one_hit(struct char_data *ch, struct char_data *vict, int type, int weapon);
-int do_skewer(struct char_data *ch, struct char_data *vict, int dam, int wt, int wt2, int weapon);
-void do_combatmastery(struct char_data *ch, struct char_data *vict, int weapon);
-int do_behead_skill(struct char_data *ch, struct char_data *victim);
-int do_execute_skill(struct char_data *, struct char_data *, int);
-int weapon_spells(struct char_data *ch, struct char_data *vict, int weapon);
-void eq_damage(struct char_data *ch, struct char_data *vict, int dam, int weapon_type, int attacktype);
-void fight_kill(struct char_data *ch, struct char_data *vict, int type, int spec_type);
-int can_attack(struct char_data *ch);
-int can_be_attacked(struct char_data *ch, struct char_data *vict);
-int second_attack(struct char_data *ch);
-int third_attack(struct char_data *ch);
-int fourth_attack(struct char_data *ch);
-int second_wield(struct char_data *ch);
-void set_cantquit(struct char_data *, struct char_data *, bool = FALSE);
-int is_pkill(struct char_data *ch, struct char_data *vict);
-void raw_kill(struct char_data *ch, struct char_data *victim);
-void do_pkill(struct char_data *ch, struct char_data *victim, int type, bool vict_is_attacker = false);
-void arena_kill(struct char_data *ch, struct char_data *victim, int type);
-void do_dead(struct char_data *ch, struct char_data *victim);
+int one_hit(char_data *ch, char_data *vict, int type, int weapon);
+int do_skewer(char_data *ch, char_data *vict, int dam, int wt, int wt2, int weapon);
+void do_combatmastery(char_data *ch, char_data *vict, int weapon);
+int do_behead_skill(char_data *ch, char_data *victim);
+int do_execute_skill(char_data *, char_data *, int);
+int weapon_spells(char_data *ch, char_data *vict, int weapon);
+void eq_damage(char_data *ch, char_data *vict, int dam, int weapon_type, int attacktype);
+void fight_kill(char_data *ch, char_data *vict, int type, int spec_type);
+int can_attack(char_data *ch);
+int can_be_attacked(char_data *ch, char_data *vict);
+int second_attack(char_data *ch);
+int third_attack(char_data *ch);
+int fourth_attack(char_data *ch);
+int second_wield(char_data *ch);
+void set_cantquit(char_data *, char_data *, bool = FALSE);
+int is_pkill(char_data *ch, char_data *vict);
+void raw_kill(char_data *ch, char_data *victim);
+void do_pkill(char_data *ch, char_data *victim, int type, bool vict_is_attacker = false);
+void arena_kill(char_data *ch, char_data *victim, int type);
+void do_dead(char_data *ch, char_data *victim);
 bool ArenaIsOpen();
-void eq_destroyed(struct char_data *ch, obj_data *obj, int pos);
-int is_stunned(struct char_data *ch);
-void update_flags(struct char_data *vict);
-void update_stuns(struct char_data *ch);
-void do_dam_msgs(struct char_data *ch, struct char_data *victim, int dam, int attacktype, int weapon, int filter = 0);
-int act_poisonous(struct char_data *ch);
-int isHit(struct char_data *ch, struct char_data *victim, int attacktype, int &type, int &reduce);
-void inform_victim(struct char_data *ch, struct char_data *victim, int dam);
-struct char_data *loop_followers(struct follow_type **f);
-struct char_data *get_highest_level_killer(struct char_data *leader, struct char_data *killer);
-int32_t count_xp_eligibles(struct char_data *leader, struct char_data *killer, int32_t highest_level, int32_t *total_levels);
-int64_t scale_char_xp(struct char_data *ch, struct char_data *killer, struct char_data *victim, int32_t no_killers, int32_t total_levels, int32_t highest_level, int64_t base_xp, int64_t *bonus_xp);
-void remove_active_potato(struct char_data *vict);
-int check_pursuit(struct char_data *ch, struct char_data *victim, char *dircommand);
+void eq_destroyed(char_data *ch, obj_data *obj, int pos);
+int is_stunned(char_data *ch);
+void update_flags(char_data *vict);
+void update_stuns(char_data *ch);
+void do_dam_msgs(char_data *ch, char_data *victim, int dam, int attacktype, int weapon, int filter = 0);
+int act_poisonous(char_data *ch);
+int isHit(char_data *ch, char_data *victim, int attacktype, int &type, int &reduce);
+void inform_victim(char_data *ch, char_data *victim, int dam);
+char_data *loop_followers(struct follow_type **f);
+char_data *get_highest_level_killer(char_data *leader, char_data *killer);
+int32_t count_xp_eligibles(char_data *leader, char_data *killer, int32_t highest_level, int32_t *total_levels);
+int64_t scale_char_xp(char_data *ch, char_data *killer, char_data *victim, int32_t no_killers, int32_t total_levels, int32_t highest_level, int64_t base_xp, int64_t *bonus_xp);
+void remove_active_potato(char_data *vict);
+int check_pursuit(char_data *ch, char_data *victim, char *dircommand);
 
 // These are so that we only need one copy of one_hit and weapon_spells and
 // skewer and behead

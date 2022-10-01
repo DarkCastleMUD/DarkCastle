@@ -22,9 +22,9 @@
 /************************************************************************
 | OFFENSIVE commands.
 */
-int do_eagle_claw(struct char_data *ch, char *argument, int cmd)
+int do_eagle_claw(char_data *ch, char *argument, int cmd)
 {
-  struct char_data *victim;
+  char_data *victim;
   char name[MAX_INPUT_LENGTH];
   int dam;
   int retval;
@@ -101,11 +101,11 @@ int do_eagle_claw(struct char_data *ch, char *argument, int cmd)
 }
 
 
-int do_quivering_palm(struct char_data *ch, char *argument, int cmd)
+int do_quivering_palm(char_data *ch, char *argument, int cmd)
 {
   extern CWorld world;
   struct affected_type af;
-  struct char_data *victim;
+  char_data *victim;
   char name[256];
   int dam, retval;
   int duration = 100;
@@ -190,9 +190,9 @@ int do_quivering_palm(struct char_data *ch, char *argument, int cmd)
   return retval;
 }
 
-int do_stun(struct char_data *ch, char *argument, int cmd)
+int do_stun(char_data *ch, char *argument, int cmd)
 {
-  struct char_data *victim;
+  char_data *victim;
   char name[256];
   int retval;
 

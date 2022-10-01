@@ -39,10 +39,10 @@ using namespace std;
 
 extern struct obj_data *object_list;
 extern struct index_data *obj_index;
-extern int class_restricted(struct char_data *ch, struct obj_data *obj);
-extern int size_restricted(struct char_data *ch, struct obj_data *obj);
+extern int class_restricted(char_data *ch, struct obj_data *obj);
+extern int size_restricted(char_data *ch, struct obj_data *obj);
 
-void repair_shop_fix_eq(struct char_data * ch, struct char_data * owner, int price, obj_data * obj) {
+void repair_shop_fix_eq(char_data * ch, char_data * owner, int price, obj_data * obj) {
 	char buf[256];
 
 	GET_GOLD(ch) -= price;
@@ -56,7 +56,7 @@ void repair_shop_fix_eq(struct char_data * ch, struct char_data * owner, int pri
 	act("$N gives $n $p.", ch, obj, owner, TO_ROOM, INVIS_NULL);
 }
 
-void repair_shop_complain_no_cash(struct char_data * ch, struct char_data * owner, int price, obj_data * obj) {
+void repair_shop_complain_no_cash(char_data * ch, char_data * owner, int price, obj_data * obj) {
 	char buf[256];
 
 	do_say(owner, "Trying to sucker me for a free repair job?", 9);
@@ -66,7 +66,7 @@ void repair_shop_complain_no_cash(struct char_data * ch, struct char_data * owne
 	act("$N gives $n $p.", ch, obj, owner, TO_ROOM, INVIS_NULL);
 }
 
-void repair_shop_price_check(struct char_data * ch, struct char_data * owner, int price, obj_data * obj) {
+void repair_shop_price_check(char_data * ch, char_data * owner, int price, obj_data * obj) {
 	char buf[256];
 
 	sprintf(buf, "It will only cost you %d coins to repair %s.'", price, obj->short_description);
@@ -75,7 +75,7 @@ void repair_shop_price_check(struct char_data * ch, struct char_data * owner, in
 	act("$N gives $n $p.", ch, obj, owner, TO_ROOM, INVIS_NULL);
 }
 
-int repair_guy(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg, struct char_data *owner) {
+int repair_guy(char_data *ch, struct obj_data *obj, int cmd, const char *arg, char_data *owner) {
 	char item[256];
 	int value0, cost, price;
 	int percent, eqdam;
@@ -145,7 +145,7 @@ int repair_guy(struct char_data *ch, struct obj_data *obj, int cmd, const char *
 	return eSUCCESS;
 }
 
-int super_repair_guy(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg, struct char_data *owner) {
+int super_repair_guy(char_data *ch, struct obj_data *obj, int cmd, const char *arg, char_data *owner) {
 	char item[256];
 	int value0, value2, cost, price;
 	int percent, eqdam;
@@ -233,7 +233,7 @@ int super_repair_guy(struct char_data *ch, struct obj_data *obj, int cmd, const 
 }
 
 // Fingers
-int repair_shop(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg, struct char_data *owner) {
+int repair_shop(char_data *ch, struct obj_data *obj, int cmd, const char *arg, char_data *owner) {
 	char item[256];
 	int value0, value2, cost, price;
 	int percent, eqdam;
@@ -323,7 +323,7 @@ int repair_shop(struct char_data *ch, struct obj_data *obj, int cmd, const char 
 	}
 }
 
-int corpse_cost(struct char_data * ch) {
+int corpse_cost(char_data * ch) {
 	int cost = 0;
 	obj_data * curr_cont;
 
@@ -364,7 +364,7 @@ int corpse_cost(obj_data * obj) {
 	return cost;
 }
 
-int mortician(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg, struct char_data *owner) {
+int mortician(char_data *ch, struct obj_data *obj, int cmd, const char *arg, char_data *owner) {
 	int x = 0, cost = 0, which;
 	int count = 0;
 	char buf[100];
@@ -457,7 +457,7 @@ int mortician(struct char_data *ch, struct obj_data *obj, int cmd, const char *a
 	return eSUCCESS;
 }
 
-char *gl_item(obj_data *obj, int number, struct char_data *ch, bool platinum = TRUE)
+char *gl_item(obj_data *obj, int number, char_data *ch, bool platinum = TRUE)
 {
 	string buf = {}, buf2 = {}, buf3 = {};
 	size_t length = {};
@@ -614,7 +614,7 @@ const struct platsmith platsmith_list[] = { { 10019, { 512, 513, 514, 515, 537, 
 		{ 0, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } } };
 
 //Apoc enjoys the dirty mooselove. Honest.
-int godload_sales(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg, struct char_data *owner) {
+int godload_sales(char_data *ch, struct obj_data *obj, int cmd, const char *arg, char_data *owner) {
 	extern struct index_data *mob_index;
 	int mobvnum = mob_index[owner->mobdata->nr].virt;
 	int o;
@@ -730,7 +730,7 @@ int godload_sales(struct char_data *ch, struct obj_data *obj, int cmd, const cha
 }
 
 //gl_repair_guy
-int gl_repair_shop(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg, struct char_data *owner) {
+int gl_repair_shop(char_data *ch, struct obj_data *obj, int cmd, const char *arg, char_data *owner) {
 	char item[256];
 	int value0, value2, cost, price;
 	int percent, eqdam;

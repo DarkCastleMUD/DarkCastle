@@ -23,10 +23,10 @@
 using namespace std;
 
 void load_char_obj_error(FILE *fpsave, char strsave[MAX_INPUT_LENGTH]);
-void store_to_char(struct char_file_u4 *st, struct char_data *ch);
-int store_to_char_variable_data(struct char_data *ch, FILE *fpsave);
-struct obj_data *my_obj_store_to_char(struct char_data *ch, FILE *fpsave, struct obj_data *last_cont);
-int read_pc_or_mob_data(struct char_data *ch, FILE *fpsave);
+void store_to_char(struct char_file_u4 *st, char_data *ch);
+int store_to_char_variable_data(char_data *ch, FILE *fpsave);
+struct obj_data *my_obj_store_to_char(char_data *ch, FILE *fpsave, struct obj_data *last_cont);
+int read_pc_or_mob_data(char_data *ch, FILE *fpsave);
 void init_random();
 void load_vaults();
 
@@ -40,7 +40,7 @@ bool verbose_mode = FALSE;
 void test_handle_ansi(string test)
 {
   cout << "Testing '" << test << "'" << endl;
-  struct char_data *ch = new struct char_data;
+  char_data *ch = new char_data;
   ch->pcdata = new pc_data;
   SET_BIT(ch->pcdata->toggles, PLR_ANSI);
   GET_LEVEL(ch) = 1;
@@ -165,7 +165,7 @@ void showObjectVault(const char *owner, obj_data *obj)
   cout << " " << obj->short_description << " in " << owner << "'s vault." << endl;
 }
 
-void showObject(struct char_data *ch, obj_data *obj)
+void showObject(char_data *ch, obj_data *obj)
 {
   cout << obj_index[obj->item_number].virt << ":";
   char buf[255];
@@ -278,7 +278,7 @@ int main(int argc, char **argv)
   }
 
   d = new descriptor_data;
-  struct char_data *ch = new struct char_data;
+  char_data *ch = new char_data;
   ch->pcdata = new pc_data;
 
   ch->desc = d;
@@ -322,7 +322,7 @@ int main(int argc, char **argv)
 
             if (argv[1] == string("all"))
             {
-              struct char_data *ch = d->character;
+              char_data *ch = d->character;
               for (int iWear = 0; iWear < MAX_WEAR; iWear++)
               {
                 if (ch->equipment[iWear])
@@ -442,7 +442,7 @@ int main(int argc, char **argv)
         do_save(d->character, "", CMD_DEFAULT);
       }
 
-      struct char_data *ch = d->character;
+      char_data *ch = d->character;
       for (int iWear = 0; iWear < MAX_WEAR; iWear++)
       {
         if (ch->equipment[iWear])

@@ -53,9 +53,9 @@ using namespace std;
 
 #define SKILL_HIDE 337
 
-int check_social( struct char_data *ch, char *pcomm, int length, char *arg );
-int clan_guard(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg, struct char_data *owner);
-int check_ethereal_focus(struct char_data *ch, int trigger_type); // class/cl_mage.cpp
+int check_social( char_data *ch, char *pcomm, int length, char *arg );
+int clan_guard(char_data *ch, struct obj_data *obj, int cmd, const char *arg, char_data *owner);
+int check_ethereal_focus(char_data *ch, int trigger_type); // class/cl_mage.cpp
 
 extern struct index_data *mob_index;
 extern struct index_data *obj_index;
@@ -69,10 +69,10 @@ char last_char_name[MAX_INPUT_LENGTH];
 int  last_char_room;
 unsigned int cmd_size = 0;
 
-void update_wizlist(struct char_data *ch);
+void update_wizlist(char_data *ch);
 // int system(const char *); 
 	
-bool can_use_command(struct char_data *ch, int cmdnum);
+bool can_use_command(char_data *ch, int cmdnum);
 
 void add_command_to_radix(struct command_info *cmd);
 
@@ -690,7 +690,7 @@ struct command_info *find_cmd_in_radix(char *arg)
 } 
 
 
-int do_motd(struct char_data *ch, char *arg, int cmd)
+int do_motd(char_data *ch, char *arg, int cmd)
 {
   extern char motd[];
 
@@ -699,7 +699,7 @@ int do_motd(struct char_data *ch, char *arg, int cmd)
 }
 
 
-int do_imotd(struct char_data *ch, char *arg, int cmd)
+int do_imotd(char_data *ch, char *arg, int cmd)
 {
   extern char imotd[];
 
@@ -707,7 +707,7 @@ int do_imotd(struct char_data *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-int command_interpreter(struct char_data *ch, char *pcomm, bool procced)
+int command_interpreter(char_data *ch, char *pcomm, bool procced)
 {
   CommandStack cstack;
 
@@ -1074,7 +1074,7 @@ int search_blocknolow(char *arg, const char **list, bool exact) {
 }
 
 
-int do_boss(struct char_data *ch, char *arg, int cmd)
+int do_boss(char_data *ch, char *arg, int cmd)
 {
   char buf[200];
   int x;
@@ -1493,10 +1493,10 @@ void chop_half(char *string, char *arg1, char *arg2)
 }
 
 
-int special(struct char_data *ch, int cmd, char *arg)
+int special(char_data *ch, int cmd, char *arg)
 {
   struct obj_data *i;
-  struct char_data *k;
+  char_data *k;
   int j;
   int retval;
   
@@ -1527,7 +1527,7 @@ int special(struct char_data *ch, int cmd, char *arg)
 	/* special in mobile present? */
 	for (k = world[ch->in_room].people; k; k = k->next_in_room) {
 		if (IS_MOB(k)) {
-			if (((struct char_data *)mob_index[k->mobdata->nr].item)->mobdata->mob_flags.type
+			if (((char_data *)mob_index[k->mobdata->nr].item)->mobdata->mob_flags.type
 					== MOB_CLAN_GUARD) {
 				retval = clan_guard(ch, 0, cmd, arg, k);
 				if (IS_SET(retval, eCH_DIED) || IS_SET(retval, eSUCCESS))
@@ -1554,7 +1554,7 @@ int special(struct char_data *ch, int cmd, char *arg)
   return eFAILURE;
 }
 
-void add_command_lag(struct char_data *ch, int cmdnum, int lag)
+void add_command_lag(char_data *ch, int cmdnum, int lag)
 {
   if (!ch) return;
 
@@ -1573,7 +1573,7 @@ void add_command_lag(struct char_data *ch, int cmdnum, int lag)
   cmdl->lag = lag;
 }
 
-bool can_use_command(struct char_data *ch, int cmdnum)
+bool can_use_command(char_data *ch, int cmdnum)
 {
   struct command_lag *cmdl;
   for (cmdl = command_lag_list; cmdl; cmdl = cmdl->next)

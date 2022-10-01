@@ -29,7 +29,7 @@ extern struct index_data *obj_index;
 extern int rev_dir[];
 extern CWorld world;
 
-int do_batter(struct char_data *ch, char *argument, int cmd)
+int do_batter(char_data *ch, char *argument, int cmd)
 {
   bool battervbrace = false;
   bool batterwins = false;
@@ -228,7 +228,7 @@ int do_batter(struct char_data *ch, char *argument, int cmd)
 }
 
 
-int do_brace(struct char_data *ch, char *argument, int cmd)
+int do_brace(char_data *ch, char *argument, int cmd)
 {
   int door, other_room;
   struct room_direction_data *back, *exit;
@@ -340,10 +340,10 @@ int do_brace(struct char_data *ch, char *argument, int cmd)
 }
 
 
-int do_rage(struct char_data *ch, char *argument, int cmd)
+int do_rage(char_data *ch, char *argument, int cmd)
 {
   int retval = 0;
-  struct char_data *victim;
+  char_data *victim;
   char name[256];
 
   if(ch->getHP() == 1) {
@@ -423,7 +423,7 @@ int do_rage(struct char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_battlecry(struct char_data *ch, char *argument, int cmd)
+int do_battlecry(char_data *ch, char *argument, int cmd)
 {
   struct follow_type *f = 0;
   
@@ -485,9 +485,9 @@ int do_battlecry(struct char_data *ch, char *argument, int cmd)
 }
 
 
-int do_berserk(struct char_data *ch, char *argument, int cmd)
+int do_berserk(char_data *ch, char *argument, int cmd)
 {
-  struct char_data *victim;
+  char_data *victim;
   char name[256];
   int bSuccess = 0;
   int retval = 0;
@@ -591,9 +591,9 @@ int do_berserk(struct char_data *ch, char *argument, int cmd)
 }
 
 
-int do_headbutt(struct char_data *ch, char *argument, int cmd)
+int do_headbutt(char_data *ch, char *argument, int cmd)
 {
-  struct char_data *victim;
+  char_data *victim;
 	char name[256];
 	int retval = 0;
 
@@ -725,7 +725,7 @@ int do_headbutt(struct char_data *ch, char *argument, int cmd)
   return retval;
 }
 
-int do_bloodfury(struct char_data *ch, char *argument, int cmd)
+int do_bloodfury(char_data *ch, char *argument, int cmd)
 {
   struct affected_type af;
   float modifier;
@@ -775,7 +775,7 @@ int do_bloodfury(struct char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_crazedassault(struct char_data *ch, char *argument, int cmd)
+int do_crazedassault(char_data *ch, char *argument, int cmd)
 {
   struct affected_type af;
   int duration = 20;
@@ -818,19 +818,19 @@ int do_crazedassault(struct char_data *ch, char *argument, int cmd)
 
 void rush_reset(void *arg1, void *arg2, void *arg3)
 {
-  struct char_data *ch = (struct char_data*)arg1;
-  extern bool charExists(struct char_data *ch);
+  char_data *ch = (char_data*)arg1;
+  extern bool charExists(char_data *ch);
   if (!charExists(ch)) return;
   REMBIT(ch->affected_by, AFF_RUSH_CD);
 }
 
-int do_bullrush(struct char_data *ch, char *argument, int cmd)
+int do_bullrush(char_data *ch, char *argument, int cmd)
 {
   char direction[MAX_INPUT_LENGTH];
   char who[MAX_INPUT_LENGTH];
   int dir = 0;
   int retval;
-  struct char_data *victim;
+  char_data *victim;
 
   if(ch->getHP() == 1) {
     send_to_char("You are feeling too weak right now for rushing to and fro.\r\n", ch);
@@ -924,7 +924,7 @@ int do_bullrush(struct char_data *ch, char *argument, int cmd)
   return attack(ch, victim, TYPE_UNDEFINED);
 }
 
-int do_ferocity(struct char_data *ch, char *argument, int cmd)
+int do_ferocity(char_data *ch, char *argument, int cmd)
 {
   struct affected_type af;
 
@@ -941,7 +941,7 @@ int do_ferocity(struct char_data *ch, char *argument, int cmd)
   }
  
   int grpsize = 0;
-  for(struct char_data * tmp_char = world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
+  for(char_data * tmp_char = world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
   {
     if(tmp_char == ch)
       continue;
@@ -967,7 +967,7 @@ int do_ferocity(struct char_data *ch, char *argument, int cmd)
      af.modifier = 0;
      affect_to_char(ch,&af);
 
-    for(struct char_data * tmp_char = world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
+    for(char_data * tmp_char = world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
     {
       if(tmp_char == ch)
         continue;
@@ -994,7 +994,7 @@ int do_ferocity(struct char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-void barb_magic_resist(struct char_data *ch, int old, int nw)
+void barb_magic_resist(char_data *ch, int old, int nw)
 {
   int bonus=0,i;
   int oldbonus = (old / 10) +1;
@@ -1004,9 +1004,9 @@ void barb_magic_resist(struct char_data *ch, int old, int nw)
       ch->saves[i] += bonus;
 }
 
-int do_knockback(struct char_data *ch, char *argument, int cmd)
+int do_knockback(char_data *ch, char *argument, int cmd)
 {
-  struct char_data *victim;
+  char_data *victim;
   char buf[MAX_STRING_LENGTH], where[MAX_STRING_LENGTH], who[MAX_STRING_LENGTH];
   int dir = 0;
   int retval, dam, dampercent, learned;
@@ -1180,7 +1180,7 @@ int do_knockback(struct char_data *ch, char *argument, int cmd)
              remove_memory(victim, 'f');
           }
 
-         struct char_data *tmp;
+         char_data *tmp;
          for(tmp = world[ch->in_room].people;tmp;tmp = tmp->next_in_room)
            if (tmp->fighting == victim)
              stop_fighting(tmp);
@@ -1216,7 +1216,7 @@ int do_knockback(struct char_data *ch, char *argument, int cmd)
 }
 
 
-int do_primalfury(struct char_data *ch, char *argument, int cmd)
+int do_primalfury(char_data *ch, char *argument, int cmd)
 {
   struct affected_type af;
 
@@ -1282,7 +1282,7 @@ int do_primalfury(struct char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_pursue(struct char_data *ch, char *argument, int cmd)
+int do_pursue(char_data *ch, char *argument, int cmd)
 {
   if (!has_skill(ch, SKILL_PURSUIT)) {
     send_to_char("You don't know how to.\n\r", ch);

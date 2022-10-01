@@ -18,11 +18,11 @@
 #include "const.h"
 #include "Timer.h"
 
-int do_clearaff(struct char_data *ch, char *argument, int cmd)
+int do_clearaff(char_data *ch, char *argument, int cmd)
 {
   bool found = false;
   char buf[MAX_INPUT_LENGTH];
-  struct char_data *victim;
+  char_data *victim;
   struct affected_type *af, *afpk;
   struct obj_data *dummy;
 
@@ -63,7 +63,7 @@ int do_clearaff(struct char_data *ch, char *argument, int cmd)
   return eFAILURE;
 }
 
-int do_reloadhelp(struct char_data *ch, char *argument, int cmd)
+int do_reloadhelp(char_data *ch, char *argument, int cmd)
 {
   extern FILE* help_fl;
   extern struct help_index_element *help_index ;
@@ -81,9 +81,9 @@ int do_reloadhelp(struct char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_log(struct char_data *ch, char *argument, int cmd)
+int do_log(char_data *ch, char *argument, int cmd)
 {
-    struct char_data *vict;
+    char_data *vict;
     struct obj_data *dummy;
     char buf[MAX_INPUT_LENGTH];
     char buf2[MAX_INPUT_LENGTH];
@@ -121,10 +121,10 @@ int do_log(struct char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_showbits(struct char_data *ch, char *argument, int cmd)
+int do_showbits(char_data *ch, char *argument, int cmd)
 {
     char person[MAX_INPUT_LENGTH];
-    struct char_data *victim;
+    char_data *victim;
     one_argument(argument, person);
 
     if (!*person)
@@ -226,7 +226,7 @@ int do_showbits(struct char_data *ch, char *argument, int cmd)
     return eSUCCESS;
 }
 
-int do_debug(struct char_data *ch, char *args, int cmd)
+int do_debug(char_data *ch, char *args, int cmd)
 {
   string arg1, arg2, arg3;
   string remainder;
@@ -303,11 +303,11 @@ int do_debug(struct char_data *ch, char *args, int cmd)
   return eSUCCESS;
 }
 
-int do_pardon(struct char_data *ch, char *argument, int cmd)
+int do_pardon(char_data *ch, char *argument, int cmd)
 {
     char person[MAX_INPUT_LENGTH];
     char flag[MAX_INPUT_LENGTH];
-    struct char_data *victim;
+    char_data *victim;
 
     if (IS_NPC(ch))
         return eFAILURE;
@@ -368,7 +368,7 @@ int do_pardon(struct char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_dmg_eq(struct char_data *ch, char *argument, int cmd)
+int do_dmg_eq(char_data *ch, char *argument, int cmd)
 {
   char buf[MAX_STRING_LENGTH];
   struct obj_data *obj_object;
@@ -439,7 +439,7 @@ struct skill_quest *find_sq(int sq)
 }
 
 
-int do_sqedit(struct char_data *ch, char *argument, int cmd)
+int do_sqedit(char_data *ch, char *argument, int cmd)
 {
   char command[MAX_INPUT_LENGTH];
   argument = one_argument(argument,command);
@@ -672,14 +672,14 @@ int wear_bitv[MAX_WEAR] = {
   262144, 262144
 };
 
-int do_eqmax(struct char_data *ch, char *argument, int cmd)
+int do_eqmax(char_data *ch, char *argument, int cmd)
 {
-  struct char_data *vict;
+  char_data *vict;
   char arg[MAX_INPUT_LENGTH];
   int a = 0,o;
   argument = one_argument(argument, arg);
-extern int class_restricted(struct char_data *ch, struct obj_data *obj);
-extern  int size_restricted(struct char_data *ch, struct obj_data *obj);
+extern int class_restricted(char_data *ch, struct obj_data *obj);
+extern  int size_restricted(char_data *ch, struct obj_data *obj);
 
   if ((vict =  get_pc_vis(ch, arg)) == NULL)
   {
@@ -776,9 +776,9 @@ extern  int size_restricted(struct char_data *ch, struct obj_data *obj);
   return eSUCCESS;
 }
 
-int do_reload(struct char_data *ch, char *argument, int cmd)
+int do_reload(char_data *ch, char *argument, int cmd)
 {
-  int do_reload_help(struct char_data *ch, char *argument, int cmd);
+  int do_reload_help(char_data *ch, char *argument, int cmd);
   void reload_vaults(void);
   extern char motd[MAX_STRING_LENGTH];
   extern char imotd[MAX_STRING_LENGTH];
@@ -845,7 +845,7 @@ int do_reload(struct char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_listproc(struct char_data *ch, char *argument, int a)
+int do_listproc(char_data *ch, char *argument, int a)
 {
   char arg[MAX_INPUT_LENGTH], arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
   int start,i,end, tot;
@@ -872,7 +872,7 @@ int do_listproc(struct char_data *ch, char *argument, int a)
       if (mob)
       {
         sprintf(buf,"%s[%-3d] [%-3d] %s\r\n", buf,tot, 
-i,((struct char_data*)mob_index[real_mobile(i)].item)->name);
+i,((char_data*)mob_index[real_mobile(i)].item)->name);
       } else {
         sprintf(buf,"%s[%-3d] [%-3d] %s\r\n", buf,tot,i,((obj_data*)obj_index[real_object(i)].item)->name);
       }

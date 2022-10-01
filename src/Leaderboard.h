@@ -29,10 +29,10 @@ public:
 	void write_file(std::string &filename);
 	void write_file(std::stringstream &filename);
 	void write_file(const char filename[]);
-	int pdscore(struct char_data * ch);
+	int pdscore(char_data * ch);
 	void rename(char *oldname, char *newname);
 	void setHP(unsigned int placement, string name, int value);	
-	int scan(struct char_data* ch);
+	int scan(char_data* ch);
 private:
 	char *hpactivename[5];
 	char *mnactivename[5];

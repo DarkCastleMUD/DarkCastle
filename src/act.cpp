@@ -3,20 +3,14 @@
 | Description:  This file contains the classes and methods used to make
 |  the act() function work.
 */
-extern "C"
-{
 #include <ctype.h>
-};
-
-extern "C" {
 #include <string.h>
 #include <ctype.h>
-}
 
 #include <string>
 
-#include "comm.h"
 #include "character.h"
+#include "comm.h"
 #include "levels.h"
 #include "db.h"
 #include "room.h"
@@ -39,14 +33,14 @@ extern CWorld world;
 extern struct descriptor_data *descriptor_list;
 extern bool MOBtrigger;
 
-act_return act(const string &str, struct char_data *ch, obj_data *obj, void *vict_obj, int16_t destination, int16_t flags)
+act_return act(const string &str, char_data *ch, obj_data *obj, void *vict_obj, int16_t destination, int16_t flags)
 {
   return act(str.c_str(), ch, obj, vict_obj, destination, flags);
 }
 
 act_return act(
     const char *str,   // Buffer
-    struct char_data *ch,     // Character from
+    char_data *ch,     // Character from
     obj_data *obj,     // Object
     void *vict_obj,    // Victim object
     int16_t destination, // Destination flags
@@ -85,7 +79,7 @@ act_return act(
 
   if (destination == TO_VICT)
   {
-    st_return = send_tokens(tokens, ch, obj, vict_obj, flags, (struct char_data *)vict_obj);
+    st_return = send_tokens(tokens, ch, obj, vict_obj, flags, (char_data *)vict_obj);
     retval |= st_return.retval;
     ar.str = st_return.str;
     ar.retval = retval;
@@ -102,7 +96,7 @@ act_return act(
   }
   else if (destination == TO_ROOM || destination == TO_GROUP || destination == TO_ROOM_NOT_GROUP)
   {
-    struct char_data *tmp_char, *next_tmp_char;
+    char_data *tmp_char, *next_tmp_char;
     if (ch->in_room >= 0)
     {
       for (tmp_char = world[ch->in_room].people; tmp_char; tmp_char = next_tmp_char)
@@ -165,7 +159,7 @@ act_return act(
 | Description:  This function just sends the message to the character,
 |   with no interpretation and no checks.
 */
-void send_message(const char *str, struct char_data *to)
+void send_message(const char *str, char_data *to)
 {
   // This will happen when a token shouldn't be interpreted
   if(str == 0)  return;
@@ -175,12 +169,12 @@ void send_message(const char *str, struct char_data *to)
   SEND_TO_Q((char *)str, to->desc);
 }
 
-void send_message(string str, struct char_data *to)
+void send_message(string str, char_data *to)
 {
   return send_message(str.c_str(), to);
 }
 
-send_tokens_return send_tokens(TokenList * tokens, struct char_data *ch, obj_data * obj, void * vict_obj, int flags, struct char_data *to)
+send_tokens_return send_tokens(TokenList * tokens, char_data *ch, obj_data * obj, void * vict_obj, int flags, char_data *to)
 {
   int retval = 0;
   string buf = tokens->Interpret(ch, obj, vict_obj, to, flags);

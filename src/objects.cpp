@@ -37,8 +37,8 @@ extern CWorld world;
 extern struct spell_info_type spell_info[MAX_SPL_LIST];
 extern struct index_data *obj_index;
 extern struct index_data *mob_index;
-int hands_are_free(struct char_data *ch, int number);
-struct obj_data *get_object_in_equip_vis(struct char_data *ch,
+int hands_are_free(char_data *ch, int number);
+struct obj_data *get_object_in_equip_vis(char_data *ch,
     char *arg, struct obj_data *equipment[], int *j, bool blindfighting);
 
 // add an affect to an item
@@ -211,7 +211,7 @@ void name_from_drinkcon(struct obj_data *obj)
   }
 }
 
-int do_switch(struct char_data *ch, char *arg, int cmd)
+int do_switch(char_data *ch, char *arg, int cmd)
 {
   struct obj_data *between;
 
@@ -250,7 +250,7 @@ int do_switch(struct char_data *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-int do_quaff(struct char_data *ch, char *argument, int cmd)
+int do_quaff(char_data *ch, char *argument, int cmd)
 {
   char buf[MAX_INPUT_LENGTH+1];
   struct obj_data *temp;
@@ -342,11 +342,11 @@ int do_quaff(struct char_data *ch, char *argument, int cmd)
 }
 
 
-int do_recite(struct char_data *ch, char *argument, int cmd)
+int do_recite(char_data *ch, char *argument, int cmd)
 {
     char buf[MAX_INPUT_LENGTH+1];
     struct obj_data *scroll, *obj;
-    struct char_data *victim;
+    char_data *victim;
     int i, bits;
     bool equipped;
     int retval = eSUCCESS;
@@ -460,7 +460,7 @@ int do_recite(struct char_data *ch, char *argument, int cmd)
 
 #define GOD_TRAP_ITEM    193
 
-void set_movement_trap(struct char_data *ch, struct obj_data *obj)
+void set_movement_trap(char_data *ch, struct obj_data *obj)
 {
   char buf[200];
   struct obj_data * trap_obj = NULL;
@@ -481,7 +481,7 @@ void set_movement_trap(struct char_data *ch, struct obj_data *obj)
   obj_to_room(trap_obj, ch->in_room);
 }
 
-void set_exit_trap(struct char_data *ch, struct obj_data *obj, char * arg)
+void set_exit_trap(char_data *ch, struct obj_data *obj, char * arg)
 {
   char buf[200];
   struct obj_data * trap_obj = NULL;
@@ -506,7 +506,7 @@ void set_exit_trap(struct char_data *ch, struct obj_data *obj, char * arg)
 
 // Return FALSE if there was a command problem
 // Return TRUE if it went off
-bool set_utility_mortar(struct char_data *ch, struct obj_data *obj, char *arg)
+bool set_utility_mortar(char_data *ch, struct obj_data *obj, char *arg)
 {
   char direct[MAX_INPUT_LENGTH];
   char buf[MAX_STRING_LENGTH];
@@ -568,7 +568,7 @@ bool set_utility_mortar(struct char_data *ch, struct obj_data *obj, char *arg)
 
 
 // With catstink, the value[1] is the sector type it was designed for
-void set_catstink(struct char_data *ch, struct obj_data *obj)
+void set_catstink(char_data *ch, struct obj_data *obj)
 {
   char buf[200];
   extern const char *sector_types[];
@@ -600,9 +600,9 @@ void set_catstink(struct char_data *ch, struct obj_data *obj)
   world[ch->in_room].FreeTracks();
 }
 
-void set_utility_item(struct char_data *ch, struct obj_data *obj, char *argument)
+void set_utility_item(char_data *ch, struct obj_data *obj, char *argument)
 {
-  int class_restricted(struct char_data *ch, struct obj_data *obj);
+  int class_restricted(char_data *ch, struct obj_data *obj);
 
   if(class_restricted(ch, obj))
   {
@@ -634,7 +634,7 @@ void set_utility_item(struct char_data *ch, struct obj_data *obj, char *argument
   extract_obj(obj);
 }
 
-int do_mortal_set(struct char_data *ch, char *argument, int cmd)
+int do_mortal_set(char_data *ch, char *argument, int cmd)
 {
   struct obj_data *obj = NULL;
   char arg[MAX_INPUT_LENGTH];
@@ -667,12 +667,12 @@ int do_mortal_set(struct char_data *ch, char *argument, int cmd)
    return eSUCCESS;
 }
 
-int do_use(struct char_data *ch, char *argument, int cmd)
+int do_use(char_data *ch, char *argument, int cmd)
 {
   char buf[MAX_INPUT_LENGTH+1];
   char targ[MAX_INPUT_LENGTH+1];
   char xtra_arg[MAX_INPUT_LENGTH+1];
-  struct char_data *tmp_char;
+  char_data *tmp_char;
   struct obj_data *tmp_object, *stick;
   int lvl;
   int bits;
@@ -758,7 +758,7 @@ int do_use(struct char_data *ch, char *argument, int cmd)
 
 
 // Allows a player to change his "name" (short_desc) (Sadus) 
-int do_name(struct char_data *ch, char *arg, int cmd)
+int do_name(char_data *ch, char *arg, int cmd)
 {
   char buf[200];
   char _convert[2];
@@ -836,7 +836,7 @@ int do_name(struct char_data *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-int do_drink(struct char_data *ch, char *argument, int cmd)
+int do_drink(char_data *ch, char *argument, int cmd)
 {
     char buf[MAX_INPUT_LENGTH+1];
     struct obj_data *temp;
@@ -988,7 +988,7 @@ int do_drink(struct char_data *ch, char *argument, int cmd)
 
 
 
-int do_eat(struct char_data *ch, char *argument, int cmd)
+int do_eat(char_data *ch, char *argument, int cmd)
 {
     char buf[MAX_INPUT_LENGTH+1];
     struct obj_data *temp;
@@ -1051,7 +1051,7 @@ int do_eat(struct char_data *ch, char *argument, int cmd)
 }
 
 
-int do_pour(struct char_data *ch, char *argument, int cmd)
+int do_pour(char_data *ch, char *argument, int cmd)
 {
     char arg1[MAX_STRING_LENGTH];
     char arg2[MAX_STRING_LENGTH];
@@ -1169,7 +1169,7 @@ int do_pour(struct char_data *ch, char *argument, int cmd)
     return eSUCCESS;
 }
 
-int do_sip(struct char_data *ch, char *argument, int cmd)
+int do_sip(char_data *ch, char *argument, int cmd)
 {
     char arg[MAX_STRING_LENGTH];
     char buf[MAX_STRING_LENGTH];
@@ -1233,7 +1233,7 @@ int do_sip(struct char_data *ch, char *argument, int cmd)
 }
 
 
-int do_taste(struct char_data *ch, char *argument, int cmd)
+int do_taste(char_data *ch, char *argument, int cmd)
 {
     char arg[MAX_STRING_LENGTH];
     struct obj_data *temp;
@@ -1284,7 +1284,7 @@ int do_taste(struct char_data *ch, char *argument, int cmd)
 
 /* functions related to wear */
 
-void perform_wear(struct char_data *ch, struct obj_data *obj_object,
+void perform_wear(char_data *ch, struct obj_data *obj_object,
         int keyword)
 {
     switch(keyword) {
@@ -1356,7 +1356,7 @@ void perform_wear(struct char_data *ch, struct obj_data *obj_object,
     }
 }
 
-int class_restricted(struct char_data *ch, struct obj_data *obj)
+int class_restricted(char_data *ch, struct obj_data *obj)
 {
 if (IS_NPC(ch)) return FALSE;
 if (IS_OBJ_STAT(obj, ITEM_ANY_CLASS))
@@ -1377,7 +1377,7 @@ if ((IS_OBJ_STAT(obj, ITEM_WARRIOR) && (GET_CLASS(ch) == CLASS_WARRIOR)) ||
 return TRUE;
 }
 
-int charmie_restricted(struct char_data *ch, struct obj_data *obj, int wear_loc)
+int charmie_restricted(char_data *ch, struct obj_data *obj, int wear_loc)
 {
   return FALSE; // sigh, work for nohin'
   if (IS_NPC(ch) && ISSET(ch->affected_by, AFF_CHARM) && ch->master && ch->mobdata)
@@ -1426,7 +1426,7 @@ int charmie_restricted(struct char_data *ch, struct obj_data *obj, int wear_loc)
   return FALSE;
 }
 
-int size_restricted(struct char_data *ch, struct obj_data *obj)
+int size_restricted(char_data *ch, struct obj_data *obj)
 {
   if(IS_SET(obj->obj_flags.size, SIZE_ANY))
     return FALSE;
@@ -1471,7 +1471,7 @@ int size_restricted(struct char_data *ch, struct obj_data *obj)
 // it wearing in terms of sizes vs. height
 // ch = player obj = obj to remove/wear add = 1(wear) or 0(remove)
 // function WILL tell the character if anything is wrong
-int will_screwup_worn_sizes(struct char_data * ch, obj_data * obj, int add)
+int will_screwup_worn_sizes(char_data * ch, obj_data * obj, int add)
 {
   int j;
   int mod = 0;
@@ -1535,7 +1535,7 @@ int will_screwup_worn_sizes(struct char_data * ch, obj_data * obj, int add)
   return FALSE;
 }
 
-void wear(struct char_data *ch, struct obj_data *obj_object, int keyword)
+void wear(char_data *ch, struct obj_data *obj_object, int keyword)
 {
   struct obj_data *obj;
   char buffer[MAX_STRING_LENGTH];
@@ -2048,7 +2048,7 @@ int keywordfind(struct obj_data *obj_object)
     return keyword;
 }
 
-int do_wear(struct char_data *ch, char *argument, int cmd)
+int do_wear(char_data *ch, char *argument, int cmd)
 {
     char arg1[MAX_STRING_LENGTH];
     char arg2[MAX_STRING_LENGTH];
@@ -2139,7 +2139,7 @@ int do_wear(struct char_data *ch, char *argument, int cmd)
 
 
 
-int do_wield(struct char_data *ch, char *argument, int cmd)
+int do_wield(char_data *ch, char *argument, int cmd)
 {
   char arg1[MAX_STRING_LENGTH];
   char arg2[MAX_STRING_LENGTH];
@@ -2185,7 +2185,7 @@ int do_wield(struct char_data *ch, char *argument, int cmd)
 }
 
 
-int do_grab(struct char_data *ch, char *argument, int cmd)
+int do_grab(char_data *ch, char *argument, int cmd)
 {
     char arg1[MAX_STRING_LENGTH];
     char arg2[MAX_STRING_LENGTH];
@@ -2224,7 +2224,7 @@ int do_grab(struct char_data *ch, char *argument, int cmd)
 }
 
 
-int hands_are_free(struct char_data *ch, int number)
+int hands_are_free(char_data *ch, int number)
 {
   struct obj_data *wielded;
   int hands = 0;
@@ -2263,7 +2263,7 @@ int hands_are_free(struct char_data *ch, int number)
   else                              return(0); 
 }
 
-int do_remove(struct char_data *ch, char *argument, int cmd)
+int do_remove(char_data *ch, char *argument, int cmd)
 {
   char arg1[MAX_STRING_LENGTH];
   struct obj_data *obj_object;
@@ -2380,7 +2380,7 @@ int do_remove(struct char_data *ch, char *argument, int cmd)
 // Urizen, hack of will_screwup_worn_sizes
 // Checks for, and removes items that are no longer
 // wear-able, because of disarm, scrap etc.
-int recheck_height_wears(struct char_data * ch)
+int recheck_height_wears(char_data * ch)
 {
   int j;
   struct obj_data *obj = NULL;
@@ -2453,7 +2453,7 @@ bool fullSave(obj_data *obj)
   return 0;
 }
 
-void heightweight(struct char_data *ch, bool add)
+void heightweight(char_data *ch, bool add)
 {
   int i, j;
   for (i=0; i<MAX_WEAR; i++)

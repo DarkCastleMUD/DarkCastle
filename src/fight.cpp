@@ -69,7 +69,7 @@ extern struct index_data *mob_index;
 extern struct index_data *obj_index;
 extern struct zone_data *zone_table;
  
-struct char_data *combat_list = NULL, *combat_next_dude = NULL;
+char_data *combat_list = NULL, *combat_next_dude = NULL;
 
 char *champ_death_messages[] = 
 {
@@ -90,9 +90,9 @@ char *champ_death_messages[] =
 };
 
 
-int debug_retval(struct char_data *ch, struct char_data *victim, int retval);
+int debug_retval(char_data *ch, char_data *victim, int retval);
 
-void do_champ_flag_death(struct char_data *victim)
+void do_champ_flag_death(char_data *victim)
 {
 
   char buf[MAX_STRING_LENGTH];
@@ -111,9 +111,9 @@ void do_champ_flag_death(struct char_data *victim)
 }
 
 
-bool someone_fighting(struct char_data *ch)
+bool someone_fighting(char_data *ch)
 {
- struct char_data *vict;
+ char_data *vict;
  if (ch->fighting && ch->fighting->fighting == ch) return TRUE;
  for (vict = world[ch->in_room].people; vict; vict = vict->next_in_room)
  {
@@ -122,14 +122,14 @@ bool someone_fighting(struct char_data *ch)
  return FALSE;
 }
 
-int check_autojoiners(struct char_data *ch, int skill = 0)
+int check_autojoiners(char_data *ch, int skill = 0)
 {
   if (IS_NPC(ch)) return eFAILURE; // irrelevant
   if (!ch->fighting) return eFAILURE; 
   if (ch->pcdata && ch->pcdata->unjoinable == true) return eFAILURE;
   if (IS_SET(world[ch->in_room].room_flags, SAFE)) return eFAILURE;
 
-  struct char_data *tmp;
+  char_data *tmp;
   for (tmp = world[ch->in_room].people;tmp; tmp = tmp->next_in_room)
   {
      if (tmp == ch || tmp == ch->fighting) continue;
@@ -149,12 +149,12 @@ int check_autojoiners(struct char_data *ch, int skill = 0)
   return eSUCCESS;
 }
 
-int check_joincharmie(struct char_data *ch, int skill = 0)
+int check_joincharmie(char_data *ch, int skill = 0)
 {
   if (!IS_NPC(ch)) return eFAILURE; // irrelevant
   if (!ch->fighting) return eFAILURE; 
   
-  struct char_data *tmp = ch->master;
+  char_data *tmp = ch->master;
   if (!tmp) return eFAILURE;
   if (tmp == ch || tmp == ch->fighting) return eFAILURE;
   if (!tmp->desc) return eFAILURE;
@@ -169,11 +169,11 @@ int check_joincharmie(struct char_data *ch, int skill = 0)
   return retval;
 }
 
-int check_charmiejoin(struct char_data *ch)
+int check_charmiejoin(char_data *ch)
 {
   if (ch->fighting) return eFAILURE; 
   
-  struct char_data *tmp = ch->master;
+  char_data *tmp = ch->master;
   if (!tmp) return eFAILURE;
   if (tmp == ch || tmp == ch->fighting) return eFAILURE;
   if (GET_POS(ch) != POSITION_STANDING) return eFAILURE;
@@ -187,7 +187,7 @@ int check_charmiejoin(struct char_data *ch)
 void perform_violence(void)
 {
   //char debug[256];
-  struct char_data *ch;
+  char_data *ch;
   int is_mob = 0;
   int retval;
   static struct affected_type *af, *next_af_dude;
@@ -315,7 +315,7 @@ void perform_violence(void)
 
     // This takes care of flee and stuff
     if (ch && ch->fighting)
-      if (ch->fighting != (struct char_data *)0x95959595 && ch->in_room != (ch->fighting)->in_room)
+      if (ch->fighting != (char_data *)0x95959595 && ch->in_room != (ch->fighting)->in_room)
         stop_fighting(ch);
   } // for
   //
@@ -415,7 +415,7 @@ void perform_violence(void)
   }
 }
 
-void add_threat(struct char_data *mob, struct char_data *ch, int amt)
+void add_threat(char_data *mob, char_data *ch, int amt)
 {
    struct threat_struct *thr;
    if (!mob || !ch || !amt || !IS_NPC(mob) || !ch->name) return;
@@ -446,7 +446,7 @@ void add_threat(struct char_data *mob, struct char_data *ch, int amt)
 #define AREA_DAM 3
 #define AREA_HEAL 4
 
-void generate_skillthreat(struct char_data *mob, int skill, int damage, struct char_data *actor, struct char_data *target)
+void generate_skillthreat(char_data *mob, int skill, int damage, char_data *actor, char_data *target)
 {
   if (!actor || !mob || !IS_NPC(mob)) return;
   struct threat_struct *thr;
@@ -487,7 +487,7 @@ void generate_skillthreat(struct char_data *mob, int skill, int damage, struct c
 
 }
 
-bool gets_dual_wield_attack(struct char_data * ch)
+bool gets_dual_wield_attack(char_data * ch)
 {
   if(!ch->equipment[SECOND_WIELD]) // only if we have a second wield:)
     return FALSE;
@@ -503,12 +503,12 @@ bool gets_dual_wield_attack(struct char_data * ch)
 
 // int attack(...) FUNCTION SHOULD BE CALLED *INSTEAD* OF HIT IN ALL CASES!
 // standard retvals
-int attack(struct char_data *ch, struct char_data *vict, int type, int weapon)
+int attack(char_data *ch, char_data *vict, int type, int weapon)
 {
   int result = 0;  
   int chance;
   obj_data * wielded = 0;
-  int handle_any_guard(struct char_data * ch);
+  int handle_any_guard(char_data * ch);
 
   if (!ch || !vict) { 
     log("NULL Victim or Ch sent to attack!  This crashes us!", -1, LOG_BUG);
@@ -716,7 +716,7 @@ int attack(struct char_data *ch, struct char_data *vict, int type, int weapon)
   return eSUCCESS;
 } // of attack
 
-void update_flags(struct char_data *vict)
+void update_flags(char_data *vict)
 {
   if (IS_SET(vict->combat, COMBAT_BASH1)) {
     REMOVE_BIT(vict->combat, COMBAT_BASH1);
@@ -799,7 +799,7 @@ void update_flags(struct char_data *vict)
   }
 }
 
-void update_stuns(struct char_data *ch)
+void update_stuns(char_data *ch)
 {
   if (IS_SET(ch->combat, COMBAT_SHOCKED)) {
     REMOVE_BIT(ch->combat, COMBAT_SHOCKED);
@@ -830,7 +830,7 @@ void update_stuns(struct char_data *ch)
   } 
 }
 
-bool do_frostshield(struct char_data *ch, struct char_data *vict) 
+bool do_frostshield(char_data *ch, char_data *vict) 
 {
   if(!ch || !vict) {
     log("Null ch or vict sent to do_frostshield", IMP, LOG_BUG);
@@ -849,7 +849,7 @@ bool do_frostshield(struct char_data *ch, struct char_data *vict)
   }
 }  
 
-int do_lightning_shield(struct char_data *ch, struct char_data *vict, int dam) 
+int do_lightning_shield(char_data *ch, char_data *vict, int dam) 
 {
   struct affected_type * cur_af;
   int learned = 0;
@@ -927,7 +927,7 @@ int do_lightning_shield(struct char_data *ch, struct char_data *vict, int dam)
 
 
 // standard retvals
-int do_vampiric_aura(struct char_data *ch, struct char_data *vict)
+int do_vampiric_aura(char_data *ch, char_data *vict)
 {
   if (!ch || !vict || ch == vict) {
     log("Null ch or vict, or ch==vict sent to do_vampiric_aura!", IMP, LOG_BUG);
@@ -953,7 +953,7 @@ int do_vampiric_aura(struct char_data *ch, struct char_data *vict)
 }
 
 // standard retvals
-int do_fireshield(struct char_data *ch, struct char_data *vict, int dam)
+int do_fireshield(char_data *ch, char_data *vict, int dam)
 {
   // ch is the person who just hit the victim
   // so ch takes the damage from this spell 
@@ -1032,7 +1032,7 @@ int do_fireshield(struct char_data *ch, struct char_data *vict, int dam)
 }
 
 // standard retvals
-int do_acidshield(struct char_data *ch, struct char_data *vict, int dam)
+int do_acidshield(char_data *ch, char_data *vict, int dam)
 {
   // ch is the person who just hit the victim
   // so ch takes the damage from this spell 
@@ -1111,7 +1111,7 @@ int do_acidshield(struct char_data *ch, struct char_data *vict, int dam)
 }
 
 
-int do_boneshield(struct char_data *ch, struct char_data *vict, int dam)
+int do_boneshield(char_data *ch, char_data *vict, int dam)
 {
   // ch is the person who just hit the victim
   // so ch takes the damage from this spell 
@@ -1169,7 +1169,7 @@ int do_boneshield(struct char_data *ch, struct char_data *vict, int dam)
 }
 
 
-void check_weapon_skill_bonus(struct char_data * ch, int type, obj_data *wielded, 
+void check_weapon_skill_bonus(char_data * ch, int type, obj_data *wielded, 
                               int & weapon_skill_hit_bonus, int & weapon_skill_dam_bonus)
 {
    int specialization;
@@ -1267,7 +1267,7 @@ int get_weapon_damage_type(struct obj_data * wielded) {
     return TYPE_HIT; // should never get here
 }
 
-int get_monk_bare_damage(struct char_data * ch) {
+int get_monk_bare_damage(char_data * ch) {
     int dam = 0;
 
     if(GET_LEVEL(ch) < 11)
@@ -1294,7 +1294,7 @@ int get_monk_bare_damage(struct char_data * ch) {
     return dam;
 }
 
-int calculate_paladin_damage_bonus(struct char_data * ch, struct char_data * victim)
+int calculate_paladin_damage_bonus(char_data * ch, char_data * victim)
 {
    if(GET_CLASS(ch) != CLASS_PALADIN)
       return 0;
@@ -1309,7 +1309,7 @@ int calculate_paladin_damage_bonus(struct char_data * ch, struct char_data * vic
 }
 
 // standard "returnvals.h" returns
-int one_hit(struct char_data *ch, struct char_data *vict, int type, int weapon)
+int one_hit(char_data *ch, char_data *vict, int type, int weapon)
 {
   struct obj_data *wielded;	/* convenience */
   int w_type;			/* Holds type info for damage() */
@@ -1531,7 +1531,7 @@ int one_hit(struct char_data *ch, struct char_data *vict, int type, int weapon)
 
 
 // pos of -1 means inventory
-void eq_destroyed(struct char_data * ch, obj_data * obj, int pos)
+void eq_destroyed(char_data * ch, obj_data * obj, int pos)
 {
   if (IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL)) return;
   if (IS_SET(obj->obj_flags.more_flags, ITEM_NO_SCRAP)) return;
@@ -1581,7 +1581,7 @@ void eq_destroyed(struct char_data * ch, obj_data * obj, int pos)
   extract_obj(obj);
 }
 
-void eq_damage(struct char_data * ch, struct char_data * victim,
+void eq_damage(char_data * ch, char_data * victim,
     int dam, int weapon_type, int attacktype) 
 {
   int count, eqdam, chance, value;
@@ -1682,7 +1682,7 @@ void eq_damage(struct char_data * ch, struct char_data * victim,
   save_char_obj(victim);
 }
 
-void pir_stat_loss(struct char_data * victim,int chance,  bool heh, bool zz)
+void pir_stat_loss(char_data * victim,int chance,  bool heh, bool zz)
 {
   if (GET_LEVEL(victim) < 50) return;
   chance /= 2;
@@ -1734,7 +1734,7 @@ void pir_stat_loss(struct char_data * victim,int chance,  bool heh, bool zz)
   } // of pir's extra stat loss
 }
 
-int damage_retval(struct char_data * ch, struct char_data * vict, int value)
+int damage_retval(char_data * ch, char_data * vict, int value)
 {
   // we need to make sure in the case of a reflect or something
   // that we are returning the death of the CH if he died
@@ -1764,7 +1764,7 @@ bool is_bingo(int dam, int weapon_type, int attacktype)
   return false;
 }
 
-int getRealSpellDamage( struct char_data * ch)
+int getRealSpellDamage( char_data * ch)
 {
   int spell_dam;
   switch(GET_CLASS(ch))
@@ -1797,7 +1797,7 @@ int32_t char_data::getHP(void)
   return hit;
 }
 
-void char_data::setHP(int dam, struct char_data* causer)
+void char_data::setHP(int dam, char_data* causer)
 {
   int old_hp = hit;
   hit = dam;
@@ -1810,7 +1810,7 @@ void char_data::setHP(int dam, struct char_data* causer)
   }
 }
 
-void char_data::removeHP(int dam, struct char_data* causer)
+void char_data::removeHP(int dam, char_data* causer)
 {
   hit -= dam;
 
@@ -1832,7 +1832,7 @@ void char_data::fillHPLimit(void)
   setHP(hit_limit(this));
 }
 
-void char_data::addHP(int newhp, struct char_data* causer)
+void char_data::addHP(int newhp, char_data* causer)
 {
   hit += newhp;
   if (hit > max_hit)
@@ -1842,7 +1842,7 @@ void char_data::addHP(int newhp, struct char_data* causer)
 }
 
 // returns standard returnvals.h return codes
-int damage(struct char_data *ch, struct char_data *victim,
+int damage(char_data *ch, char_data *victim,
            int dam, int weapon_type, int attacktype, int weapon, bool is_death_prog)
 {
   int can_miss = 1;
@@ -1851,7 +1851,7 @@ int damage(struct char_data *ch, struct char_data *victim,
   int typeofdamage;
   int damage_type(int weapon_type);
   int32_t get_weapon_bit(int weapon_type);
-  int32_t hit_limit(struct char_data * ch);
+  int32_t hit_limit(char_data * ch);
   int retval = 0;
   int modifier = 0;
   int percent;
@@ -1910,7 +1910,7 @@ int damage(struct char_data *ch, struct char_data *victim,
 
   // here goes le elemental stuff
 
-  extern int elemental_damage_bonus(int spell, struct char_data *ch);
+  extern int elemental_damage_bonus(int spell, char_data *ch);
 
   if (attacktype && attacktype < MAX_SPL_LIST && attacktype != TYPE_UNDEFINED)
     dam += elemental_damage_bonus(attacktype, ch);
@@ -2667,7 +2667,7 @@ int damage(struct char_data *ch, struct char_data *victim,
 
 // this function deals damage in noncombat situations (falls, drowning, etc.)
 // returns standard returnvals.h return codes
-int noncombat_damage(struct char_data * ch, int dam, char *char_death_msg,
+int noncombat_damage(char_data * ch, int dam, char *char_death_msg,
                      char *room_death_msg, char *death_log_msg, int type)
 {
   int kill_type = TYPE_CHOOSE;
@@ -2705,9 +2705,9 @@ int noncombat_damage(struct char_data * ch, int dam, char *char_death_msg,
 }
 
 
-int is_pkill(struct char_data *ch, struct char_data *vict)
+int is_pkill(char_data *ch, char_data *vict)
 {
-  struct char_data *tmp_ch;
+  char_data *tmp_ch;
 
   // TODO - change this so a mob following another mob isn't a pkill
 
@@ -2734,9 +2734,9 @@ int is_pkill(struct char_data *ch, struct char_data *vict)
   return FALSE;
 }
 
-void send_damage(char const *buf, struct char_data *ch, obj_data *obj, struct char_data *victim, char const *dmg, char const *buf2, int to)
+void send_damage(char const *buf, char_data *ch, obj_data *obj, char_data *victim, char const *dmg, char const *buf2, int to)
 {
- struct char_data *tmpch;
+ char_data *tmpch;
  char string1[MAX_INPUT_LENGTH], string2[MAX_INPUT_LENGTH]; 
 
  int i, z = 0, y = 0;
@@ -2788,7 +2788,7 @@ void send_damage(char const *buf, struct char_data *ch, obj_data *obj, struct ch
  delete tokens2;
 }
 
-void do_dam_msgs(struct char_data *ch, struct char_data *victim, int dam, int attacktype, int weapon, int filter)
+void do_dam_msgs(char_data *ch, char_data *victim, int dam, int attacktype, int weapon, int filter)
 {
   extern struct message_list fight_messages[MAX_MESSAGES];
   struct message_type *messages, *messages2;
@@ -2893,11 +2893,11 @@ void do_dam_msgs(struct char_data *ch, struct char_data *victim, int dam, int at
   }
 }
 
-void set_cantquit(struct char_data *ch, struct char_data *vict, bool forced )
+void set_cantquit(char_data *ch, char_data *vict, bool forced )
 {
   struct affected_type af, *paf;
-  struct char_data *realch;
-  struct char_data *realvict;
+  char_data *realch;
+  char_data *realvict;
   int ch_vnum = -1;
   int vict_vnum = -1;
 
@@ -2952,7 +2952,7 @@ void set_cantquit(struct char_data *ch, struct char_data *vict, bool forced )
   }
 }
 
-void fight_kill(struct char_data *ch, struct char_data *vict, int type, int spec_type)
+void fight_kill(char_data *ch, char_data *vict, int type, int spec_type)
 {
   if (!vict) {
     log("Null vict sent to fight_kill()!", -1, LOG_BUG);
@@ -2968,7 +2968,7 @@ void fight_kill(struct char_data *ch, struct char_data *vict, int type, int spec
     stop_fighting(ch);
 
   // loop through world and stop anyone else that was fighting vict from fighting    
-  struct char_data * ich, *next_ich;
+  char_data * ich, *next_ich;
   for(ich = combat_list; ich; ich = next_ich) 
   {
      next_ich = ich->next_fighting;
@@ -2998,7 +2998,7 @@ void fight_kill(struct char_data *ch, struct char_data *vict, int type, int spec
 
 // New toHit code
 
-int isHit(struct char_data *ch, struct char_data *victim, int attacktype, int &type, int &reduce)
+int isHit(char_data *ch, char_data *victim, int attacktype, int &type, int &reduce)
 {
   if((IS_SET(victim->combat, COMBAT_STUNNED)) ||
     (IS_SET(victim->combat, COMBAT_STUNNED2)) ||
@@ -3169,7 +3169,7 @@ int isHit(struct char_data *ch, struct char_data *victim, int attacktype, int &t
 // check counter strike never returns eSUCCESS because that would
 // get returned from damage as a successful damage, which it's
 // not.
-int checkCounterStrike(struct char_data * ch, struct char_data * victim)
+int checkCounterStrike(char_data * ch, char_data * victim)
 {
   int retval, lvl = has_skill(victim, SKILL_COUNTER_STRIKE);
 
@@ -3229,7 +3229,7 @@ int checkCounterStrike(struct char_data * ch, struct char_data * victim)
 // check counter strike never returns eSUCCESS because that would
 // get returned from damage as a successful damage, which it's
 // not.
-int doTumblingCounterStrike(struct char_data * ch, struct char_data * victim)
+int doTumblingCounterStrike(char_data * ch, char_data * victim)
 {
   int retval;
 
@@ -3272,7 +3272,7 @@ int doTumblingCounterStrike(struct char_data * ch, struct char_data * victim)
 // check riposte never returns eSUCCESS because that would
 // get returned from damage as a successful damage, which it's
 // not.
-int check_riposte(struct char_data * ch, struct char_data * victim, int attacktype)
+int check_riposte(char_data * ch, char_data * victim, int attacktype)
 {
   int retval;
   
@@ -3322,7 +3322,7 @@ int check_riposte(struct char_data * ch, struct char_data * victim, int attackty
   return debug_retval(ch, victim, retval);  
 }
 
-int check_magic_block(struct char_data *ch, struct char_data *victim, int attacktype)
+int check_magic_block(char_data *ch, char_data *victim, int attacktype)
 {
   int reduce = 0;
   if (victim->equipment[WEAR_SHIELD] == NULL &&	GET_CLASS(victim) != CLASS_MONK)
@@ -3362,7 +3362,7 @@ int check_magic_block(struct char_data *ch, struct char_data *victim, int attack
   return reduce; 
 }
 
-int check_shieldblock(struct char_data * ch, struct char_data * victim, int attacktype)
+int check_shieldblock(char_data * ch, char_data * victim, int attacktype)
 {
   int modifier = 0;  
   int reduce = 0;
@@ -3430,7 +3430,7 @@ int check_shieldblock(struct char_data * ch, struct char_data * victim, int atta
   return reduce;
 }
 
-bool check_parry(struct char_data * ch, struct char_data * victim, int attacktype, bool display_results)
+bool check_parry(char_data * ch, char_data * victim, int attacktype, bool display_results)
 {
   int modifier = 0;  
   if((IS_SET(victim->combat, COMBAT_STUNNED)) ||
@@ -3489,7 +3489,7 @@ bool check_parry(struct char_data * ch, struct char_data * victim, int attacktyp
   return TRUE;
 }
 
-int speciality_bonus(struct char_data *ch,int attacktype, int level)
+int speciality_bonus(char_data *ch,int attacktype, int level)
 {
   int skill = 0;
 /*  int w_type = TYPE_HIT;
@@ -3536,7 +3536,7 @@ int speciality_bonus(struct char_data *ch,int attacktype, int level)
 /*
 * Check for dodge.
 */
-bool check_dodge(struct char_data * ch, struct char_data * victim, int attacktype, bool display_results)
+bool check_dodge(char_data * ch, char_data * victim, int attacktype, bool display_results)
 {
 //  int chance;
    int modifier = 0;  
@@ -3698,7 +3698,7 @@ void free_messages_from_memory()
 /*
 * Set position of a victim.
 */
-void update_pos(struct char_data * victim)
+void update_pos(char_data * victim)
 {
   if (victim->getHP() > 0)
   {
@@ -3716,9 +3716,9 @@ void update_pos(struct char_data * victim)
 /*
 * Start fights.
 */
-void set_fighting(struct char_data * ch, struct char_data * vict)
+void set_fighting(char_data * ch, char_data * vict)
 {
-  struct char_data *k, *next_char;
+  char_data *k, *next_char;
   int count = 0;
   
   if(ch->fighting) /* If he's already fighting */
@@ -3815,9 +3815,9 @@ timer_data));
 }
 
 // Stop fights.
-void stop_fighting(struct char_data * ch, int clearlag)
+void stop_fighting(char_data * ch, int clearlag)
 {
-  struct char_data *tmp;
+  char_data *tmp;
   
   if (!ch)
   {
@@ -3955,7 +3955,7 @@ void stop_fighting(struct char_data * ch, int clearlag)
 }
 
 
-void make_scraps(struct char_data *ch, struct obj_data *obj)
+void make_scraps(char_data *ch, struct obj_data *obj)
 {
   struct obj_data *corpse /*, *o*/;
   char buf[MAX_STRING_LENGTH];
@@ -3997,7 +3997,7 @@ void make_scraps(struct char_data *ch, struct obj_data *obj)
 #define MAX_NPC_CORPSE_TIME 7
 #define MAX_PC_CORPSE_TIME 7
 
-void make_corpse(struct char_data * ch)
+void make_corpse(char_data * ch)
 {
   struct obj_data *corpse, *o, *o_in_container, *next_o_in_container;
   struct obj_data *money, *next_obj;
@@ -4236,7 +4236,7 @@ void make_corpse(struct char_data * ch)
   return;
 }
 
-void make_dust(struct char_data * ch)
+void make_dust(char_data * ch)
 {
   struct obj_data *o, *tmp_o, *blah;
   struct obj_data *money, *next_obj;
@@ -4283,7 +4283,7 @@ int alignment_value(int val)
 }
 
 // run through eq removing and rewearing is
-void zap_eq_check(struct char_data * ch)
+void zap_eq_check(char_data * ch)
 {
   SETBIT(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT);
   for(int i = 0; i < MAX_WEAR; i++)
@@ -4293,7 +4293,7 @@ void zap_eq_check(struct char_data * ch)
 }
 
 // ch kills victim
-void change_alignment(struct char_data *ch, struct char_data *victim)
+void change_alignment(char_data *ch, char_data *victim)
 {
   int change;
 
@@ -4329,7 +4329,7 @@ void change_alignment(struct char_data *ch, struct char_data *victim)
 
 /* head of a corpse or withered husk  */
 
-void make_husk(struct char_data *ch) {
+void make_husk(char_data *ch) {
   struct obj_data *corpse;
   char buf[MAX_STRING_LENGTH];
   
@@ -4366,7 +4366,7 @@ void make_husk(struct char_data *ch) {
   return;
 }
 
-void make_head(struct char_data * ch)
+void make_head(char_data * ch)
 {
   struct obj_data *corpse;
   char buf[MAX_STRING_LENGTH];
@@ -4413,7 +4413,7 @@ void make_head(struct char_data * ch)
    return;
 }
 
-void make_arm(struct char_data * ch)
+void make_arm(char_data * ch)
 {
   struct obj_data *corpse;
   char buf[MAX_STRING_LENGTH];
@@ -4460,7 +4460,7 @@ void make_arm(struct char_data * ch)
    return;
 }
 
-void make_leg(struct char_data * ch)
+void make_leg(char_data * ch)
 {
   struct obj_data *corpse;
   char buf[MAX_STRING_LENGTH];
@@ -4507,7 +4507,7 @@ void make_leg(struct char_data * ch)
    return;
 }
 
-void make_bowels(struct char_data * ch)
+void make_bowels(char_data * ch)
 {
   struct obj_data *corpse;
   char buf[MAX_STRING_LENGTH];
@@ -4554,7 +4554,7 @@ void make_bowels(struct char_data * ch)
    return;
 }
 
-void make_blood(struct char_data * ch)
+void make_blood(char_data * ch)
 {
   struct obj_data *corpse;
   char buf[MAX_STRING_LENGTH];
@@ -4602,11 +4602,11 @@ void make_blood(struct char_data * ch)
 }
 
 
-void make_heart(struct char_data * ch, struct char_data * vict)
+void make_heart(char_data * ch, char_data * vict)
 {
   struct obj_data *corpse;
   char buf[MAX_STRING_LENGTH];
-  int hands_are_free(struct char_data *ch, int number);
+  int hands_are_free(char_data *ch, int number);
 
   if (!hands_are_free(ch, 1))
     return;
@@ -4657,7 +4657,7 @@ void make_heart(struct char_data * ch, struct char_data * vict)
 }
 
 
-void death_cry(struct char_data * ch)
+void death_cry(char_data * ch)
 {
   int door, was_in;
   char *message;
@@ -4686,7 +4686,7 @@ void death_cry(struct char_data * ch)
 }
 
 // Return TRUE if killed vict.  False otherwise
-int do_skewer(struct char_data *ch, struct char_data *vict, int dam, int wt, int wt2, int weapon)
+int do_skewer(char_data *ch, char_data *vict, int dam, int wt, int wt2, int weapon)
 {
   int damadd = 0;
 
@@ -4751,7 +4751,7 @@ int do_skewer(struct char_data *ch, struct char_data *vict, int dam, int wt, int
   return eSUCCESS;
 }
 
-int do_behead_skill(struct char_data *ch, struct char_data *vict)
+int do_behead_skill(char_data *ch, char_data *vict)
 {
   int chance, percent;
 
@@ -4802,7 +4802,7 @@ int do_behead_skill(struct char_data *ch, struct char_data *vict)
   return eFAILURE;
 }
 
-int do_execute_skill(struct char_data *ch, struct char_data *vict, int w_type)
+int do_execute_skill(char_data *ch, char_data *vict, int w_type)
 {
   int chance, percent;
 
@@ -4867,7 +4867,7 @@ int do_execute_skill(struct char_data *ch, struct char_data *vict, int w_type)
   return eFAILURE;
 }
 
-void do_combatmastery(struct char_data *ch, struct char_data *vict, int weapon)
+void do_combatmastery(char_data *ch, char_data *vict, int weapon)
 {
   if ((GET_CLASS(ch) != CLASS_WARRIOR) && GET_LEVEL(ch) < ARCHANGEL)
       return;
@@ -4957,7 +4957,7 @@ void do_combatmastery(struct char_data *ch, struct char_data *vict, int weapon)
   return;
 }
 
-void raw_kill(struct char_data * ch, struct char_data * victim)
+void raw_kill(char_data * ch, char_data * victim)
 {
   char buf[MAX_STRING_LENGTH];
   char buf2[100];
@@ -5005,7 +5005,7 @@ void raw_kill(struct char_data * ch, struct char_data * victim)
 
   if (ch != nullptr && IS_AFFECTED(ch, AFF_GROUP))
   {
-    struct char_data *master = ch->master ? ch->master : ch;
+    char_data *master = ch->master ? ch->master : ch;
     if (IS_PC(master))
     {
       if (IS_PC(victim))
@@ -5042,8 +5042,8 @@ void raw_kill(struct char_data * ch, struct char_data * victim)
 
   if (victim->pcdata->golem)
   {
-    void release_message(struct char_data *ch);
-    void shatter_message(struct char_data *ch);
+    void release_message(char_data *ch);
+    void shatter_message(char_data *ch);
 
     if (number(0, 99) < (GET_LEVEL(victim) / 10 + victim->pcdata->golem->level / 5))
     { /* rk */
@@ -5362,13 +5362,13 @@ void raw_kill(struct char_data * ch, struct char_data * victim)
 
 
 
-void group_gain(struct char_data * ch, struct char_data * victim)
+void group_gain(char_data * ch, char_data * victim)
 {
   char buf[256];
   int32_t no_members = 0, total_levels = 0;
   int64_t share, total_share = 0;
   int64_t base_xp = 0, bonus_xp = 0;
-  struct char_data *leader, *highest, *tmp_ch;
+  char_data *leader, *highest, *tmp_ch;
   struct follow_type *f;
   
   if(is_pkill(ch, victim))        return;
@@ -5439,10 +5439,10 @@ void group_gain(struct char_data * ch, struct char_data * victim)
 }
 
 /* find the highest level present at the kill */
-struct char_data *get_highest_level_killer(struct char_data *leader, struct char_data *killer)
+char_data *get_highest_level_killer(char_data *leader, char_data *killer)
 {
   struct follow_type *f;
-  struct char_data *highest = killer;
+  char_data *highest = killer;
 
   /* check to see if the group leader was involved and outranks the killer */
   if (leader->in_room == killer->in_room
@@ -5464,7 +5464,7 @@ struct char_data *get_highest_level_killer(struct char_data *leader, struct char
 }
 
 /* count the number of group members eligible for XP from a kill */
-int32_t count_xp_eligibles(struct char_data *leader, struct char_data *killer,
+int32_t count_xp_eligibles(char_data *leader, char_data *killer,
                         int32_t highest_level, int32_t *total_levels)
 {
   struct follow_type *f;
@@ -5495,7 +5495,7 @@ int32_t count_xp_eligibles(struct char_data *leader, struct char_data *killer,
 }
 
 /* scale character XP based on various factors */
-int64_t scale_char_xp(struct char_data *ch, struct char_data *killer, struct char_data *victim,
+int64_t scale_char_xp(char_data *ch, char_data *killer, char_data *victim,
                   int32_t no_killers, int32_t total_levels, int32_t highest_level,
                   int64_t base_xp, int64_t *bonus_xp)
 {
@@ -5512,9 +5512,9 @@ int64_t scale_char_xp(struct char_data *ch, struct char_data *killer, struct cha
 
 
 /* advance to the next follower in the list */
-struct char_data *loop_followers(struct follow_type **f)
+char_data *loop_followers(struct follow_type **f)
 {
-   struct char_data *tmp_ch;
+   char_data *tmp_ch;
 
    // this loops the followers
    if(*f) {
@@ -5535,7 +5535,7 @@ struct char_data *loop_followers(struct follow_type **f)
 	"$B$0stone fist$R"
 	};
 
-void dam_message(int dam, struct char_data * ch, struct char_data * victim,
+void dam_message(int dam, char_data * ch, char_data * victim,
                  int w_type, int32_t modifier)
 {
   static const char *attack_table[] =
@@ -5833,7 +5833,7 @@ PLR_DAMAGE)?dammsg:"", attack, shield, punct);
 * Disarm a creature.
 * Caller must check for successful attack.
 */
-void disarm(struct char_data * ch, struct char_data * victim)
+void disarm(char_data * ch, char_data * victim)
 {
   struct obj_data *obj;
   
@@ -5888,7 +5888,7 @@ void disarm(struct char_data * ch, struct char_data * victim)
 * Trip a creature.
 * Caller must check for successful attack.
 */
-void trip(struct char_data * ch, struct char_data * victim)
+void trip(char_data * ch, char_data * victim)
 {
   if(!can_attack(ch) || !can_be_attacked(ch, victim))
     return;
@@ -5914,14 +5914,14 @@ void trip(struct char_data * ch, struct char_data * victim)
 
 // 'ch' can be null
 // do_pkill should never be called directly, only through "fight_kill"
-void do_pkill(struct char_data *ch, struct char_data *victim, int type, bool vict_is_attacker)
+void do_pkill(char_data *ch, char_data *victim, int type, bool vict_is_attacker)
 {
   int num;
   char killer_message[MAX_STRING_LENGTH];
-//  struct char_data *i = 0;
+//  char_data *i = 0;
   struct affected_type *af, *afpk;
 
-  void move_player_home(struct char_data *victim);
+  void move_player_home(char_data *victim);
   num = number(1,1000);
 
   if(!victim) {
@@ -5932,7 +5932,7 @@ void do_pkill(struct char_data *ch, struct char_data *victim, int type, bool vic
   if(ch) {
     set_cantquit(ch, victim);
   }
-   extern void pk_check(struct char_data *ch, struct char_data *victim);
+   extern void pk_check(char_data *ch, char_data *victim);
   pk_check(ch, victim); 
   // Kill charmed mobs outright
   if(IS_NPC(victim)) {
@@ -6125,7 +6125,7 @@ void do_pkill(struct char_data *ch, struct char_data *victim, int type, bool vic
 
         if (IS_AFFECTED(ch, AFF_GROUP))
         {
-          struct char_data *master = ch->master ? ch->master : ch;
+          char_data *master = ch->master ? ch->master : ch;
           if (IS_PC(master))
           {
             if (IS_PC(victim))
@@ -6167,7 +6167,7 @@ void do_pkill(struct char_data *ch, struct char_data *victim, int type, bool vic
          {
            if (IS_AFFECTED(ch->master->master, AFF_GROUP))
            {
-             struct char_data *master = ch->master->master ? ch->master->master : ch->master;
+             char_data *master = ch->master->master ? ch->master->master : ch->master;
              if (IS_PC(master))
              {
                if (IS_PC(victim))
@@ -6210,7 +6210,7 @@ void do_pkill(struct char_data *ch, struct char_data *victim, int type, bool vic
          {
            if (IS_AFFECTED(ch->master->master, AFF_GROUP))
            {
-             struct char_data *master = ch->master->master ? ch->master->master : ch->master;
+             char_data *master = ch->master->master ? ch->master->master : ch->master;
              if (IS_PC(master))
              {
                if (IS_PC(victim))
@@ -6266,16 +6266,16 @@ void do_pkill(struct char_data *ch, struct char_data *victim, int type, bool vic
 }
 
 // 'ch' can be null
-void arena_kill(struct char_data *ch, struct char_data *victim, int type)
+void arena_kill(char_data *ch, char_data *victim, int type)
 {
-  void remove_nosave(struct char_data *vict);
+  void remove_nosave(char_data *vict);
   
   char killer_message[MAX_STRING_LENGTH];
-//  struct char_data *i;
+//  char_data *i;
   clan_data * ch_clan = NULL;
   clan_data * victim_clan = NULL;
   int eliminated = 1;
-  void move_player_home(struct char_data *victim);
+  void move_player_home(char_data *victim);
   
   if(!victim) {
     log("Null victim sent to do_pkill.", LOG_BUG, IMMORTAL);
@@ -6378,7 +6378,7 @@ void arena_kill(struct char_data *ch, struct char_data *victim, int type)
   save_char_obj(victim);
 }
 
-int is_stunned(struct char_data *ch)
+int is_stunned(char_data *ch)
 {
   if(IS_SET(ch->combat, COMBAT_STUNNED))
     return TRUE;
@@ -6391,7 +6391,7 @@ int is_stunned(struct char_data *ch)
   return FALSE;
 }
 
-int can_attack(struct char_data *ch)
+int can_attack(char_data *ch)
 {
   if((ch->in_room >= 0 && ch->in_room <= top_of_world) &&
     IS_SET(world[ch->in_room].room_flags, ARENA) && ArenaIsOpen()) {
@@ -6413,7 +6413,7 @@ int can_attack(struct char_data *ch)
   return TRUE;
 }
 
-int can_be_attacked(struct char_data *ch, struct char_data *vict)
+int can_be_attacked(char_data *ch, char_data *vict)
 {
   /* this will happen sometimes, no need to log it */
   if(!ch || !vict)
@@ -6556,7 +6556,7 @@ int can_be_attacked(struct char_data *ch, struct char_data *vict)
   return TRUE;
 }
 
-int weapon_spells(struct char_data *ch, struct char_data *vict, int weapon)
+int weapon_spells(char_data *ch, char_data *vict, int weapon)
 {
   int i, current_affect, chance, percent, retval;
   obj_data *weap;
@@ -6733,7 +6733,7 @@ int weapon_spells(struct char_data *ch, struct char_data *vict, int weapon)
   return eSUCCESS;    
 }  /* spell effects */
 
-int act_poisonous(struct char_data *ch)
+int act_poisonous(char_data *ch)
 {
   if(IS_NPC(ch) && ISSET(ch->mobdata->actflags, ACT_POISONOUS))
   if( !number(0, GET_LEVEL(ch)/10) )
@@ -6743,7 +6743,7 @@ int act_poisonous(struct char_data *ch)
   return FALSE;
 }
 
-int second_attack(struct char_data *ch)
+int second_attack(char_data *ch)
 {
   int learned;
 
@@ -6757,7 +6757,7 @@ int second_attack(struct char_data *ch)
   return FALSE;
 }
 
-int third_attack(struct char_data *ch)
+int third_attack(char_data *ch)
 {
   int learned;
 
@@ -6771,7 +6771,7 @@ int third_attack(struct char_data *ch)
   return FALSE;
 }
 
-int fourth_attack(struct char_data *ch)
+int fourth_attack(char_data *ch)
 {
   if((IS_NPC(ch)) && (ISSET(ch->mobdata->actflags, ACT_4TH_ATTACK)))
     return TRUE;
@@ -6780,7 +6780,7 @@ int fourth_attack(struct char_data *ch)
 
 /*  No longer used.  Any class can try to use their second wield if they have
     the skill.
-int second_wield(struct char_data *ch)
+int second_wield(char_data *ch)
 {
   // If the ch is capable of using the SECOND_WIELD 
   if((GET_CLASS(ch) == CLASS_MAGIC_USER) || (GET_CLASS(ch) == CLASS_MONK))
@@ -6790,7 +6790,7 @@ int second_wield(struct char_data *ch)
 */
 
 
-void inform_victim(struct char_data *ch, struct char_data *victim, int dam)
+void inform_victim(char_data *ch, char_data *victim, int dam)
 {
   int max_hit;
    
@@ -6868,9 +6868,9 @@ void inform_victim(struct char_data *ch, struct char_data *victim, int dam)
   | the function returns 0.
   | Morc 8/6/95
 */
-int is_fighting_mob(struct char_data *ch)
+int is_fighting_mob(char_data *ch)
 {
-  struct char_data *fighting = ch->fighting;
+  char_data *fighting = ch->fighting;
   if(!fighting) return 0;
   if(is_pkill(ch, fighting)) return 0;
   if(IS_NPC(fighting) && !IS_NPC(ch)) return 1;
@@ -6881,10 +6881,10 @@ int is_fighting_mob(struct char_data *ch)
 
 
 
-int do_flee(struct char_data *ch, char *argument, int cmd)
+int do_flee(char_data *ch, char *argument, int cmd)
 {
   int i, attempt, retval, escape=0;
-  struct char_data * chTemp, * loop_ch, *vict = NULL;
+  char_data * chTemp, * loop_ch, *vict = NULL;
   
   if (is_stunned(ch))
     return eFAILURE;
@@ -6944,7 +6944,7 @@ int do_flee(struct char_data *ch, char *argument, int cmd)
           act("$n quickly ducks $N's attack and attempts to make good a stealthy escape!", ch, 0, vict, TO_ROOM, INVIS_NULL|NOTVICT);
          }
           // The flee has succeeded
-          struct char_data *last_fighting = ch->fighting;
+          char_data *last_fighting = ch->fighting;
           GET_POS(ch) = POSITION_STANDING;
 
           char tempcommand[32] = { 0 };
@@ -6998,7 +6998,7 @@ int do_flee(struct char_data *ch, char *argument, int cmd)
   return eFAILURE;
 }
 
-int check_pursuit(struct char_data *ch, struct char_data *victim, char *dircommand)
+int check_pursuit(char_data *ch, char_data *victim, char *dircommand)
 {
   // Handle pursuit skill
   if (ch == 0 || victim == 0 || IS_NPC ( ch ) || !affected_by_spell ( ch, SKILL_PURSUIT ) )
@@ -7088,7 +7088,7 @@ int32_t get_weapon_bit(int weapon_type)
   return(0);
 }
 
-void remove_nosave(struct char_data *vict)
+void remove_nosave(char_data *vict)
 {
   struct obj_data *o, *next_obj, *blah, *tmp_o;
   
@@ -7118,7 +7118,7 @@ void remove_nosave(struct char_data *vict)
   } // for
 }  
 
-void remove_active_potato(struct char_data *vict)
+void remove_active_potato(char_data *vict)
 {
   struct obj_data *obj, *next_obj;
   //char buf[256];
@@ -7174,7 +7174,7 @@ int damage_type(int weapon_type)
   return(0);
 }
 
-int debug_retval(struct char_data *ch, struct char_data *victim, int retval)
+int debug_retval(char_data *ch, char_data *victim, int retval)
 {
     static int dumped = 0;
     bool bugged = FALSE;
@@ -7218,7 +7218,7 @@ void char_data::sendRaw(string buffer)
   }
 }
 
-command_return_t char_data::tell(struct char_data* victim, string message)
+command_return_t char_data::tell(char_data* victim, string message)
 {
   string buffer = string(GET_NAME(victim)) + " " + message;
 

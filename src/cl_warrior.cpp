@@ -39,10 +39,10 @@ extern struct index_data *mob_index;
 | OFFENSIVE commands.  These are commands that should require the
 |   victim to retaliate.
 */
-int do_kick(struct char_data *ch, char *argument, int cmd)
+int do_kick(char_data *ch, char *argument, int cmd)
 {
-  struct char_data *victim;
-  struct char_data *next_victim;
+  char_data *victim;
+  char_data *next_victim;
   char name[256];
   int dam;
   int retval;
@@ -143,9 +143,9 @@ int do_kick(struct char_data *ch, char *argument, int cmd)
 }
 
 
-int do_deathstroke(struct char_data *ch, char *argument, int cmd)
+int do_deathstroke(char_data *ch, char *argument, int cmd)
 {
-    struct char_data *victim;
+    char_data *victim;
     char name[256];
     int dam, attacktype;
     int retval;
@@ -243,15 +243,15 @@ int do_deathstroke(struct char_data *ch, char *argument, int cmd)
 }
 
 
-int do_retreat(struct char_data *ch, char *argument, int cmd)
+int do_retreat(char_data *ch, char *argument, int cmd)
 {
    int attempt;
    char buf[MAX_INPUT_LENGTH];
    // Azrack -- retval should be initialized to something
    int retval = 0;
-   struct char_data *chTemp, *loop_ch;
+   char_data *chTemp, *loop_ch;
 
-   int is_stunned(struct char_data *ch);
+   int is_stunned(char_data *ch);
 
    if (is_stunned(ch))
       return eFAILURE;
@@ -338,7 +338,7 @@ int do_retreat(struct char_data *ch, char *argument, int cmd)
 }
 
 
-int do_hitall(struct char_data *ch, char *argument, int cmd) {
+int do_hitall(char_data *ch, char *argument, int cmd) {
 	if (IS_PC(ch) && GET_LEVEL(ch) < ARCHANGEL && !has_skill(ch, SKILL_HITALL)) {
 		send_to_char("You better learn how to first...\r\n", ch);
 		return eFAILURE;
@@ -380,8 +380,8 @@ int do_hitall(struct char_data *ch, char *argument, int cmd) {
 		WAIT_STATE(ch, PULSE_VIOLENCE*3);
 
 		auto &character_list = DC::instance().character_list;
-        for_each(character_list.begin(), character_list.end(), [&ch](struct char_data *vict){
-			if (vict && vict != (struct char_data *) 0x95959595 && ch->in_room == vict->in_room && !ARE_GROUPED(ch, vict) && vict != ch && can_be_attacked(ch, vict)) {
+        for_each(character_list.begin(), character_list.end(), [&ch](char_data *vict){
+			if (vict && vict != (char_data *) 0x95959595 && ch->in_room == vict->in_room && !ARE_GROUPED(ch, vict) && vict != ch && can_be_attacked(ch, vict)) {
 				int retval = one_hit(ch, vict, TYPE_UNDEFINED, FIRST);
 				if (IS_SET(retval, eCH_DIED)) {
 					REMOVE_BIT(ch->combat, COMBAT_HITALL);
@@ -395,9 +395,9 @@ int do_hitall(struct char_data *ch, char *argument, int cmd) {
 	return eSUCCESS;
 }
 
-int do_bash(struct char_data *ch, char *argument, int cmd)
+int do_bash(char_data *ch, char *argument, int cmd)
 {
-    struct char_data *victim;
+    char_data *victim;
     char name[256];
     int retval;
     int hit = 0;
@@ -560,9 +560,9 @@ int do_bash(struct char_data *ch, char *argument, int cmd)
     return retval;
 }
 
-int do_redirect(struct char_data *ch, char *argument, int cmd)
+int do_redirect(char_data *ch, char *argument, int cmd)
 {
-    struct char_data *victim;
+    char_data *victim;
     char name[256];
 
     if (!canPerform(ch, SKILL_REDIRECT, "You aren't skilled enough to change opponents midfight!\r\n"))
@@ -618,16 +618,16 @@ int do_redirect(struct char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_disarm( struct char_data *ch, char *argument, int cmd )
+int do_disarm( char_data *ch, char *argument, int cmd )
 {
-    struct char_data *victim;
+    char_data *victim;
     struct obj_data *wielded;
 
     char name[256];
     struct obj_data *obj;
     int retval = 0;
 
-    int is_fighting_mob(struct char_data *ch);
+    int is_fighting_mob(char_data *ch);
 
     if(!canPerform(ch, SKILL_DISARM)) {
       send_to_char("You dunno how.\r\n", ch);
@@ -738,9 +738,9 @@ int do_disarm( struct char_data *ch, char *argument, int cmd )
 | NON-OFFENSIVE commands.  Below here are commands that should -not-
 |   require the victim to retaliate.
 */
-int do_rescue(struct char_data *ch, char *argument, int cmd)
+int do_rescue(char_data *ch, char *argument, int cmd)
 {
-    struct char_data *victim, *tmp_ch;
+    char_data *victim, *tmp_ch;
     char victim_name[240];
 
     one_argument(argument, victim_name);
@@ -821,7 +821,7 @@ int do_rescue(struct char_data *ch, char *argument, int cmd)
 }
 
 
-int do_bladeshield(struct char_data *ch, char *argument, int cmd)
+int do_bladeshield(char_data *ch, char *argument, int cmd)
 {
   struct affected_type af;
   int duration = 12;
@@ -872,17 +872,17 @@ int do_bladeshield(struct char_data *ch, char *argument, int cmd)
 
 // return TRUE on guard doing anything
 // otherwise FALSE
-int handle_any_guard(struct char_data * ch)
+int handle_any_guard(char_data * ch)
 {
    if(!ch->guarded_by)
       return FALSE;
 
-   struct char_data * guard = NULL;
+   char_data * guard = NULL;
 
    // search the room for my guard
    for(follow_type * curr = ch->guarded_by; curr;) 
    {
-      for(struct char_data * vict = world[ch->in_room].people; vict; vict = vict->next_in_room)
+      for(char_data * vict = world[ch->in_room].people; vict; vict = vict->next_in_room)
          if(vict == curr->follower) 
          {
             curr = NULL;
@@ -905,7 +905,7 @@ int handle_any_guard(struct char_data * ch)
    return FALSE;
 }
 
-struct char_data * is_guarding_me(struct char_data * ch, struct char_data * guard)
+char_data * is_guarding_me(char_data * ch, char_data * guard)
 {
    follow_type * curr = ch->guarded_by;
 
@@ -918,12 +918,12 @@ struct char_data * is_guarding_me(struct char_data * ch, struct char_data * guar
    return NULL;
 }
 
-void stop_guarding(struct char_data * guard)
+void stop_guarding(char_data * guard)
 {
    if(!guard->guarding) // i'm not guarding anyone:)  get out
       return;
 
-   struct char_data   * victim = guard->guarding;
+   char_data   * victim = guard->guarding;
    follow_type * curr = victim->guarded_by;
    follow_type * last = NULL;
 
@@ -943,7 +943,7 @@ void stop_guarding(struct char_data * guard)
    guard->guarding = NULL;
 }
 
-void start_guarding(struct char_data * guard, struct char_data * victim)
+void start_guarding(char_data * guard, char_data * victim)
 {
    follow_type * curr = (struct follow_type *) dc_alloc(1, sizeof(struct follow_type));
 
@@ -954,7 +954,7 @@ void start_guarding(struct char_data * guard, struct char_data * victim)
    guard->guarding = victim;
 }
 
-void stop_guarding_me(struct char_data * victim)
+void stop_guarding_me(char_data * victim)
 {
    char buf[200];
    follow_type * curr = victim->guarded_by;
@@ -974,10 +974,10 @@ void stop_guarding_me(struct char_data * victim)
 
 /* END UTILITY FUNCTIONS FOR "Guard" */
 
-int do_guard(struct char_data *ch, char *argument, int cmd)
+int do_guard(char_data *ch, char *argument, int cmd)
 {
    char name[MAX_INPUT_LENGTH];
-   struct char_data * victim = NULL;
+   char_data * victim = NULL;
 
    if(!IS_MOB(ch) && (!has_skill(ch, SKILL_GUARD) || !has_skill(ch, SKILL_RESCUE))) {
      send_to_char("You have no idea how to be a full time bodyguard.\r\n", ch);
@@ -1019,7 +1019,7 @@ int do_guard(struct char_data *ch, char *argument, int cmd)
    return eSUCCESS;   
 }
 
-int do_tactics(struct char_data *ch, char *argument, int cmd)
+int do_tactics(char_data *ch, char *argument, int cmd)
 {
   struct affected_type af;
   
@@ -1039,7 +1039,7 @@ int do_tactics(struct char_data *ch, char *argument, int cmd)
      
 
   int grpsize = 0;
-  for(struct char_data * tmp_char = world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
+  for(char_data * tmp_char = world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
   {
     if(tmp_char == ch)
       continue;
@@ -1065,7 +1065,7 @@ int do_tactics(struct char_data *ch, char *argument, int cmd)
     af.bitvector = -1;
     affect_to_char(ch, &af);
     
-    for(struct char_data * tmp_char = world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
+    for(char_data * tmp_char = world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
     { 
       if(tmp_char == ch)
         continue;
@@ -1092,9 +1092,9 @@ int do_tactics(struct char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_make_camp(struct char_data *ch, char *argument, int cmd)
+int do_make_camp(char_data *ch, char *argument, int cmd)
 {
-  struct char_data *i, *next_i;
+  char_data *i, *next_i;
   int learned = has_skill(ch, SKILL_MAKE_CAMP);
   struct affected_type af;
 
@@ -1185,7 +1185,7 @@ int do_make_camp(struct char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_triage(struct char_data *ch, char *argument, int cmd)
+int do_triage(char_data *ch, char *argument, int cmd)
 {
   int learned = has_skill(ch, SKILL_TRIAGE);
   struct affected_type af;
@@ -1239,7 +1239,7 @@ int do_triage(struct char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_battlesense(struct char_data *ch, char *argument, int cmd)
+int do_battlesense(char_data *ch, char *argument, int cmd)
 {
   int learned = has_skill(ch, SKILL_BATTLESENSE);
   struct affected_type af;
@@ -1274,9 +1274,9 @@ int do_battlesense(struct char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_smite(struct char_data *ch, char *argument, int cmd)
+int do_smite(char_data *ch, char *argument, int cmd)
 {
-  struct char_data *vict = NULL;
+  char_data *vict = NULL;
   char name[MAX_STRING_LENGTH];
   int learned = has_skill(ch, SKILL_SMITE);
   struct affected_type af;
@@ -1349,7 +1349,7 @@ int do_smite(struct char_data *ch, char *argument, int cmd)
   return ch->fighting?eSUCCESS:attack(ch, vict, TYPE_UNDEFINED);
 }
 
-int do_leadership(struct char_data *ch, char *argument, int cmd)
+int do_leadership(char_data *ch, char *argument, int cmd)
 {
   int learned = has_skill(ch, SKILL_LEADERSHIP);
   struct affected_type af;
@@ -1401,7 +1401,7 @@ int do_leadership(struct char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_perseverance(struct char_data *ch, char *argument, int cmd)
+int do_perseverance(char_data *ch, char *argument, int cmd)
 {
   int learned = has_skill(ch, SKILL_PERSEVERANCE);
   struct affected_type af;
@@ -1436,9 +1436,9 @@ int do_perseverance(struct char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_defenders_stance(struct char_data *ch, char *argument, int cmd)
+int do_defenders_stance(char_data *ch, char *argument, int cmd)
 {
-  struct char_data *vict = NULL;
+  char_data *vict = NULL;
   int learned = has_skill(ch, SKILL_DEFENDERS_STANCE);
   struct affected_type af;
 
@@ -1476,7 +1476,7 @@ int do_defenders_stance(struct char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_onslaught(struct char_data *ch, char *argument, int cmd)
+int do_onslaught(char_data *ch, char *argument, int cmd)
 {
   int learned = has_skill(ch, SKILL_ONSLAUGHT);
   struct affected_type af;

@@ -40,7 +40,7 @@ extern struct obj_data *object_list;
 extern int rev_dir[];
 
 /* procedures related to get */
-void get(struct char_data *ch, struct obj_data *obj_object, struct obj_data *sub_object, bool has_consent, int cmd)
+void get(char_data *ch, struct obj_data *obj_object, struct obj_data *sub_object, bool has_consent, int cmd)
 {
     string buffer;
    
@@ -261,7 +261,7 @@ void get(struct char_data *ch, struct obj_data *obj_object, struct obj_data *sub
 // code at the end that would affect any attempted 'get' it looks really nasty and
 // is never utilized.  Restructure it so it is clear.  Pay proper attention to 'saving'
 // however so as not to introduce a potential dupe-bug.
-int do_get(struct char_data *ch, char *argument, int cmd)
+int do_get(char_data *ch, char *argument, int cmd)
 {
   char arg1[MAX_STRING_LENGTH];
   char arg2[MAX_STRING_LENGTH];
@@ -966,11 +966,11 @@ int do_get(struct char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_consent(struct char_data *ch, char *arg, int cmd)
+int do_consent(char_data *ch, char *arg, int cmd)
 {
   char buf[MAX_INPUT_LENGTH+1], buf2[MAX_STRING_LENGTH+1];
   struct obj_data *obj;
-  struct char_data *vict;
+  char_data *vict;
 
   while(isspace(*arg))
     ++arg;
@@ -1033,7 +1033,7 @@ int do_consent(struct char_data *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-int contents_cause_unique_problem(obj_data * obj, struct char_data * vict)
+int contents_cause_unique_problem(obj_data * obj, char_data * vict)
 {
   int lastnum = -1;
 
@@ -1066,7 +1066,7 @@ int contains_no_trade_item(obj_data * obj)
   return FALSE;
 }
 
-int do_drop(struct char_data *ch, char *argument, int cmd)
+int do_drop(char_data *ch, char *argument, int cmd)
 {
   char arg[MAX_STRING_LENGTH];
   int amount;
@@ -1249,7 +1249,7 @@ int do_drop(struct char_data *ch, char *argument, int cmd)
   return eFAILURE;
 }
 
-void do_putalldot(struct char_data *ch, char *name, char *target, int cmd)
+void do_putalldot(char_data *ch, char *name, char *target, int cmd)
 {
   struct obj_data *tmp_object;
   struct obj_data *next_object;
@@ -1289,14 +1289,14 @@ int weight_in(struct obj_data *obj)
   return w;
 }
 
-int do_put(struct char_data *ch, char *argument, int cmd)
+int do_put(char_data *ch, char *argument, int cmd)
 {
   char buffer[MAX_STRING_LENGTH];
   char arg1[MAX_STRING_LENGTH];
   char arg2[MAX_STRING_LENGTH];
   struct obj_data *obj_object;
   struct obj_data *sub_object;
-  struct char_data *tmp_char;
+  char_data *tmp_char;
   int bits;
   char allbuf[MAX_STRING_LENGTH];
 
@@ -1509,7 +1509,7 @@ int do_put(struct char_data *ch, char *argument, int cmd)
   return eFAILURE;
 }
 
-void do_givealldot(struct char_data *ch, char *name, char *target, int cmd)
+void do_givealldot(char_data *ch, char *name, char *target, int cmd)
 {
   struct obj_data *tmp_object;
   struct obj_data *next_object;
@@ -1536,14 +1536,14 @@ void do_givealldot(struct char_data *ch, char *name, char *target, int cmd)
     send_to_char("You don't have one.\r\n", ch);
 }
 
-int do_give(struct char_data *ch, char *argument, int cmd)
+int do_give(char_data *ch, char *argument, int cmd)
 {
   char obj_name[MAX_INPUT_LENGTH+1], vict_name[MAX_INPUT_LENGTH+1], buf[200];
   char arg[80], allbuf[80];
   int64_t amount;
   int retval;
   extern int top_of_world;
-  struct char_data *vict;
+  char_data *vict;
   struct obj_data *obj;
 
   if(IS_SET(world[ch->in_room].room_flags, QUIET)) {
@@ -1851,7 +1851,7 @@ bool objExists(obj_data *obj);
 
 // Find an item on a character (in inv, or containers in inv (NOT WORN!))
 // and try to put it in his inv.  If sucessful, return pointer to the item.
-struct obj_data * bring_type_to_front(struct char_data * ch, int item_type)
+struct obj_data * bring_type_to_front(char_data * ch, int item_type)
 {
   struct obj_data *item_carried = NULL;
   struct obj_data *container_item = NULL;
@@ -1887,7 +1887,7 @@ struct obj_data * bring_type_to_front(struct char_data * ch, int item_type)
 }
 
 // Find an item on a character
-struct obj_data * search_char_for_item(struct char_data * ch, int16_t item_number, bool wearonly)
+struct obj_data * search_char_for_item(char_data * ch, int16_t item_number, bool wearonly)
 {
   struct obj_data *i = NULL;
   struct obj_data *j = NULL;
@@ -1923,7 +1923,7 @@ struct obj_data * search_char_for_item(struct char_data * ch, int16_t item_numbe
 }
 
 // Find out how many of an item exists on character
-int search_char_for_item_count(struct char_data * ch, int16_t item_number, bool wearonly)
+int search_char_for_item_count(char_data * ch, int16_t item_number, bool wearonly)
 {
   struct obj_data *i = NULL;
   struct obj_data *j = NULL;
@@ -2006,7 +2006,7 @@ bool search_container_for_vnum(obj_data *obj, int vnum)
   return false;
 }
 
-int find_door(struct char_data *ch, char *type, char *dir)
+int find_door(char_data *ch, char *type, char *dir)
 {
     int door;
     const char *dirs[] =
@@ -2059,7 +2059,7 @@ int find_door(struct char_data *ch, char *type, char *dir)
 in_room == exit->in_room
 
 */
-bool is_bracing(struct char_data *bracee, struct room_direction_data *exit)
+bool is_bracing(char_data *bracee, struct room_direction_data *exit)
 {
   //this could happen on a repop of the zone
   if(!IS_SET(exit->exit_info, EX_CLOSED))
@@ -2090,17 +2090,17 @@ bool is_bracing(struct char_data *bracee, struct room_direction_data *exit)
   return false;
 }
 
-int do_open(struct char_data *ch, char *argument, int cmd)
+int do_open(char_data *ch, char *argument, int cmd)
 {
   bool found = false;
    int door, other_room, retval;
    char type[MAX_INPUT_LENGTH], dir[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
    struct room_direction_data *back;
    struct obj_data *obj;
-   struct char_data *victim;
-   struct char_data *next_vict;
+   char_data *victim;
+   char_data *next_vict;
             
-   int do_fall(struct char_data *ch, short dir);
+   int do_fall(char_data *ch, short dir);
             
    retval = 0;
          
@@ -2242,14 +2242,14 @@ int do_open(struct char_data *ch, char *argument, int cmd)
    return eSUCCESS;
 }
 
-int do_close(struct char_data *ch, char *argument, int cmd)
+int do_close(char_data *ch, char *argument, int cmd)
 {
   bool found = false;
    int door, other_room;
    char type[MAX_INPUT_LENGTH], dir[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
    struct room_direction_data *back;
    struct obj_data *obj;
-   struct char_data *victim;   
+   char_data *victim;   
     
    argument_interpreter(argument, type, dir);
     
@@ -2316,7 +2316,7 @@ int do_close(struct char_data *ch, char *argument, int cmd)
    return eSUCCESS;
 }
 
-bool has_key(struct char_data *ch, int key)
+bool has_key(char_data *ch, int key)
 {
  //if key vnum is 0, there is no key
   if (key == 0)
@@ -2349,13 +2349,13 @@ bool has_key(struct char_data *ch, int key)
   return false;
 }
 
-int do_lock(struct char_data *ch, char *argument, int cmd)
+int do_lock(char_data *ch, char *argument, int cmd)
 {
     int door, other_room;
     char type[MAX_INPUT_LENGTH], dir[MAX_INPUT_LENGTH];
     struct room_direction_data *back;
     struct obj_data *obj;
-    struct char_data *victim;   
+    char_data *victim;   
     
     argument_interpreter(argument, type, dir);
     
@@ -2421,13 +2421,13 @@ int do_lock(struct char_data *ch, char *argument, int cmd)
 }
  
  
-int do_unlock(struct char_data *ch, char *argument, int cmd)
+int do_unlock(char_data *ch, char *argument, int cmd)
 {
     int door, other_room;
     char type[MAX_INPUT_LENGTH], dir[MAX_INPUT_LENGTH];
     struct room_direction_data *back;
     struct obj_data *obj;
-    struct char_data *victim;   
+    char_data *victim;   
     
     argument_interpreter(argument, type, dir);
     
@@ -2493,7 +2493,7 @@ int do_unlock(struct char_data *ch, char *argument, int cmd)
     return eSUCCESS;
 }
 
-int palm(struct char_data *ch, struct obj_data *obj_object, struct obj_data *sub_object, bool has_consent)
+int palm(char_data *ch, struct obj_data *obj_object, struct obj_data *sub_object, bool has_consent)
 {
   char buffer[MAX_STRING_LENGTH];
 

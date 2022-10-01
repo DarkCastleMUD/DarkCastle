@@ -23,7 +23,7 @@ protected:
     char buffer[MAX_STRING_LENGTH];
     
     strncpy(buffer, login.c_str(), MAX_STRING_LENGTH);
-    struct char_data * ch = get_all_pc(buffer);
+    char_data * ch = get_all_pc(buffer);
 
     if (ch && IS_PC(ch) && GET_LEVEL(ch) >= IMMORTAL && ch->pcdata->pwd &&
 	!strncmp(crypt(password.c_str(), ch->pcdata->pwd),
@@ -66,7 +66,7 @@ public:
     char buffer[MAX_STRING_LENGTH];
     
     strncpy(buffer, login.c_str(), MAX_STRING_LENGTH);
-    struct char_data *ch = get_all_pc(buffer);
+    char_data *ch = get_all_pc(buffer);
     if (ch == 0) {
       result = "player not found in game";
       return;
@@ -143,7 +143,7 @@ public:
     char buffer[MAX_STRING_LENGTH];
     
     strncpy(buffer, login.c_str(), MAX_STRING_LENGTH);
-    struct char_data *ch = get_all_pc(buffer);
+    char_data *ch = get_all_pc(buffer);
     if (ch == 0) {
       result = "player not found in game";
       return;

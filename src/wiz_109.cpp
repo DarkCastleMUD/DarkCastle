@@ -32,14 +32,14 @@
 
 void AuctionHandleDelete(string name);
 
-int do_linkload(struct char_data *ch, char *arg, int cmd)
+int do_linkload(char_data *ch, char *arg, int cmd)
 {
   struct descriptor_data d;
-  struct char_data *new_new;
+  char_data *new_new;
   char buf[100];
   char *c;
 
-  void add_to_bard_list(struct char_data * ch);
+  void add_to_bard_list(char_data * ch);
 
   while(*arg == ' ')
     arg++;
@@ -91,7 +91,7 @@ int do_linkload(struct char_data *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-int do_processes(struct char_data *ch, char *arg, int cmd)
+int do_processes(char_data *ch, char *arg, int cmd)
 {
   FILE *fl;
   char *tmp;
@@ -127,9 +127,9 @@ int do_processes(struct char_data *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-int do_guide(struct char_data *ch, char *argument, int cmd)
+int do_guide(char_data *ch, char *argument, int cmd)
 {
-    struct char_data *victim;
+    char_data *victim;
     char name[100], buf[256];
 
     one_argument(argument,name);
@@ -161,13 +161,13 @@ int do_guide(struct char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_advance(struct char_data *ch, char *argument, int cmd)
+int do_advance(char_data *ch, char *argument, int cmd)
 {
-    struct char_data *victim;
+    char_data *victim;
     char name[100], level[100], buf[300], passwd[100];
     int new_newlevel;
 
-    void gain_exp(struct char_data *ch, int gain);
+    void gain_exp(char_data *ch, int gain);
 
     if (IS_NPC(ch))
         return eFAILURE;
@@ -264,13 +264,13 @@ int do_advance(struct char_data *ch, char *argument, int cmd)
 }
 
 
-int do_zap(struct char_data *ch, char *argument, int cmd)
+int do_zap(char_data *ch, char *argument, int cmd)
 {
-  struct char_data *victim;
+  char_data *victim;
   int room;
   char name[100], buf[500];
 
-  void remove_clan_member(int clannumber, struct char_data * ch);
+  void remove_clan_member(int clannumber, char_data * ch);
 
   one_argument(argument, name);
 
@@ -341,7 +341,7 @@ int do_zap(struct char_data *ch, char *argument, int cmd)
   return eFAILURE;
 }
 
-int do_global(struct char_data *ch, char *argument, int cmd)
+int do_global(char_data *ch, char *argument, int cmd)
 {
     int i;
     char buf[MAX_STRING_LENGTH];
@@ -364,7 +364,7 @@ int do_global(struct char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_shutdown(struct char_data *ch, char *argument, int cmd)
+int do_shutdown(char_data *ch, char *argument, int cmd)
 {
   char buf[MAX_INPUT_LENGTH];
   extern int _shutdown;
@@ -454,7 +454,7 @@ int do_shutdown(struct char_data *ch, char *argument, int cmd)
     }
     else if(!strcmp(arg1, "crash")) {
         // let's crash the mud!
-        struct char_data * crashus = NULL;
+        char_data * crashus = NULL;
         if (crashus->in_room == NOWHERE) {
         	return eFAILURE; // this should never be reached
         }
@@ -468,7 +468,7 @@ int do_shutdown(struct char_data *ch, char *argument, int cmd)
         try_to_hotboot_on_crash = 0;
 
         // let's crash the mud!
-        struct char_data * crashus = NULL;
+        char_data * crashus = NULL;
         if (crashus->in_room == NOWHERE) {
         	return eFAILURE; // this should never be reached
         }
@@ -478,7 +478,7 @@ int do_shutdown(struct char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_shutdow(struct char_data *ch, char *argument, int cmd)
+int do_shutdow(char_data *ch, char *argument, int cmd)
 {
   if(!has_skill(ch, COMMAND_SHUTDOWN)) {
         send_to_char("Huh?\r\n", ch);
@@ -489,7 +489,7 @@ int do_shutdow(struct char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_testport(struct char_data *ch, char *argument, int cmd)
+int do_testport(char_data *ch, char *argument, int cmd)
 {
   int errnosave = 0;
   static pid_t child = 0;
@@ -542,7 +542,7 @@ int do_testport(struct char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_testuser(struct char_data *ch, char *argument, int cmd)
+int do_testuser(char_data *ch, char *argument, int cmd)
 {
     char arg1[MAX_INPUT_LENGTH];
     char arg2[MAX_INPUT_LENGTH];
@@ -607,7 +607,7 @@ int do_testuser(struct char_data *ch, char *argument, int cmd)
 }
 
 #ifdef BANDWIDTH
-int do_bandwidth(struct char_data *ch, char *argument, int cmd)
+int do_bandwidth(char_data *ch, char *argument, int cmd)
 {
   csendf(ch, "Bytes sent in %ld seconds: %ld\n\r",
 	 get_bandwidth_start(), get_bandwidth_amount());
@@ -615,9 +615,9 @@ int do_bandwidth(struct char_data *ch, char *argument, int cmd)
 }
 #endif
 
-int do_skilledit(struct char_data *ch, char *argument, int cmd)
+int do_skilledit(char_data *ch, char *argument, int cmd)
 {
-  struct char_data *victim;
+  char_data *victim;
   char name[MAX_INPUT_LENGTH];
   char type[MAX_INPUT_LENGTH];
   char value[MAX_INPUT_LENGTH];

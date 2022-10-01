@@ -18,9 +18,9 @@
 #include "race.h"
 #include "const.h"
 
-int do_boot(struct char_data *ch, char *arg, int cmd)
+int do_boot(char_data *ch, char *arg, int cmd)
 {
-  struct char_data *victim;
+  char_data *victim;
   char name[MAX_INPUT_LENGTH], type[MAX_INPUT_LENGTH], buf[500];
 
   half_chop(arg,name,type);
@@ -147,7 +147,7 @@ int do_boot(struct char_data *ch, char *arg, int cmd)
   return eSUCCESS;
 }
     
-int do_disconnect(struct char_data *ch,  char *argument, int cmd)
+int do_disconnect(char_data *ch,  char *argument, int cmd)
 {
     char arg[MAX_STRING_LENGTH];
     char buf[MAX_STRING_LENGTH];
@@ -189,9 +189,9 @@ int do_disconnect(struct char_data *ch,  char *argument, int cmd)
     return eSUCCESS;
 }
 
-int do_fsave(struct char_data *ch, char *argument, int cmd)
+int do_fsave(char_data *ch, char *argument, int cmd)
 {
-  struct char_data *vict;
+  char_data *vict;
   char name[100], buf[400]; 
 
   if(IS_NPC(ch))
@@ -227,10 +227,10 @@ int do_fsave(struct char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_fighting(struct char_data *ch, char *argument, int cmd)
+int do_fighting(char_data *ch, char *argument, int cmd)
 {
   const int CLANTAG_LEN = MAX_CLAN_LEN+3; // "[Foobar]"
-  struct char_data *i;
+  char_data *i;
   bool arenaONLY = false;
   int countFighters = 0;
   char buf[80];
@@ -281,9 +281,9 @@ int do_fighting(struct char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_peace( struct char_data *ch, char *argument, int cmd )
+int do_peace( char_data *ch, char *argument, int cmd )
 {
-    struct char_data *rch;
+    char_data *rch;
 
     for (rch = world[ch->in_room].people; rch!=NULL; rch = rch->next_in_room) {
         if ( IS_MOB(rch) && rch->mobdata->hatred != NULL )
@@ -297,7 +297,7 @@ int do_peace( struct char_data *ch, char *argument, int cmd )
 }
 
 
-int do_matrixinfo(struct char_data *ch, char *argument, int cmd)
+int do_matrixinfo(char_data *ch, char *argument, int cmd)
 {
   char buf[MAX_STRING_LENGTH];
   int i = 0;
@@ -322,7 +322,7 @@ int do_matrixinfo(struct char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int lookupClass(struct char_data *ch, char *str)
+int lookupClass(char_data *ch, char *str)
 {
   int c_class;
 
@@ -346,7 +346,7 @@ int lookupClass(struct char_data *ch, char *str)
   return -1;
 }
 
-int lookupRoom(struct char_data *ch, char *str)
+int lookupRoom(char_data *ch, char *str)
 {
   if (str == 0)
     return -1;
@@ -364,7 +364,7 @@ int lookupRoom(struct char_data *ch, char *str)
   return room;
 }
 
-int do_guild(struct char_data *ch, char *argument, int cmd)
+int do_guild(char_data *ch, char *argument, int cmd)
 {
   int c_class = 0, room = 0, old_room = 0;
   char arg1[MAX_STRING_LENGTH] = { 0 };

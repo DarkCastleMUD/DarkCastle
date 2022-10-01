@@ -1,12 +1,12 @@
+
 #ifndef CHARACTER_H_
 #define CHARACTER_H_
+struct char_data;
 /******************************************************************************
 | $Id: character.h,v 1.85 2014/07/26 23:21:23 jhhudso Exp $
 | Description: This file contains the header information for the character
 |   class implementation.
 */
-#define  COMPILE_WITH_CHANGES 1
-
 #include <sys/time.h>
 #include <stdint.h>
 #include <strings.h>
@@ -30,6 +30,8 @@
 #include "sing.h"
 #include "quest.h"
 #include "interp.h"
+
+struct char_data;
 
 struct strcasecmp_compare
 {
@@ -77,9 +79,6 @@ typedef std::queue<communication> history_t;
 */
 #define MAX_WEAR     23
 
-//class struct char_data;
-//typedef struct char_data struct char_data;
-
 #define SEX_NEUTRAL   0
 #define SEX_MALE      1
 #define SEX_FEMALE    2
@@ -126,7 +125,7 @@ struct  mob_prog_act_list
 {
     mob_prog_act_list * next;
     char *           buf;
-    struct char_data *      ch;
+    char_data *      ch;
     obj_data *       obj;
     void *           vo;
 };
@@ -194,14 +193,14 @@ struct affected_type
     int32_t bitvector = {};      /* Tells which bits to set (AFF_XXX)       */
     std::string caster = {};
     struct affected_type *next = {};
-    struct char_data *origin = {};    
-    struct char_data *victim = {};
+    char_data *origin = {};    
+    char_data *victim = {};
 };
 
 
 struct follow_type
 {
-    struct char_data *follower;
+    char_data *follower;
     struct follow_type *next;
 };
 
@@ -270,9 +269,9 @@ struct pc_data
 
     bool possesing = {}; 	      /*  is the person possessing? */
     bool unjoinable = {};        // Do NOT autojoin
-    struct char_data *golem = {}; // CURRENT golem. 
+    char_data *golem = {}; // CURRENT golem. 
     bool hide[MAX_HIDE] = {};
-    struct char_data *hiding_from[MAX_HIDE] = {};
+    char_data *hiding_from[MAX_HIDE] = {};
     std::queue<string> *away_msgs = {};
     history_t *tell_history = {};
     history_t *gtell_history = {};
@@ -330,7 +329,7 @@ struct mob_data
     obj_data *object = {};
 };
 
-// struct char_data, struct char_data
+// char_data, char_data
 // This contains all memory items for a player/mob
 // All non-specific data is held in this structure
 // PC/MOB specific data are held in the appropriate pointed-to structs
@@ -417,7 +416,7 @@ struct char_data
 
     obj_data * beacon = nullptr;       /* pointer to my beacon */
 
-     std::vector<songInfo> songs = {};          // Song list
+     std::vector<struct songInfo> songs = {};          // Song list
 //     int16_t song_timer = {};       /* status for songs being sung */
 //     int16_t song_number = {};      /* number of song being sung */
 //     char * song_data = {};        /* args for the songs */
@@ -436,20 +435,20 @@ struct char_data
     char *hunting = {};                     // Name of "track" target
     char *ambush = {};                      // Name of "ambush" target
 
-    struct char_data * guarding = {};              // Pointer to who I am guarding
+    char_data * guarding = {};              // Pointer to who I am guarding
     follow_type * guarded_by = {};          // List of people guarding me
 
     uint32_t affected_by[AFF_MAX/ASIZE+1] = {}; // Quick reference bitvector for spell affects
     uint32_t combat = {};                     // Bitvector for combat related flags (bash, stun, shock)
     uint32_t misc = {};                       // Bitvector for IS_MOB/logs/channels.  So possessed mobs can channel
 
-    struct char_data *fighting = {};                 /* Opponent     */
-    struct char_data *next = {};                     /* Next anywhere in game */
-    struct char_data *next_in_room = {};             /* Next in room */
-    struct char_data *next_fighting = {};            /* Next fighting */
+    char_data *fighting = {};                 /* Opponent     */
+    char_data *next = {};                     /* Next anywhere in game */
+    char_data *next_in_room = {};             /* Next in room */
+    char_data *next_fighting = {};            /* Next fighting */
     obj_data *altar = {};
     struct follow_type *followers = {};  /* List of followers */
-    struct char_data *master = {};              /* Who is char following? */
+    char_data *master = {};              /* Who is char following? */
     char *group_name = {};                /* Name of group */
     
     int32_t timer = {};                         // Timer for update
@@ -476,8 +475,8 @@ struct char_data
     int spec = {};
 
     struct room_direction_data *brace_at, *brace_exit; //exits affected by brace
-    void tell_history(struct char_data *sender, string message);
-    void gtell_history(struct char_data *sender, string message);
+    void tell_history(char_data *sender, string message);
+    void gtell_history(char_data *sender, string message);
     time_t first_damage = {};
     uint64_t damage_done = {};
     uint64_t damages = {};
@@ -485,15 +484,15 @@ struct char_data
     uint64_t damage_per_second = {};
     void setPOSFighting();
     int32_t getHP(void);
-    void setHP(int hp, struct char_data* causer = nullptr);
-    void addHP(int hp, struct char_data* causer = nullptr);
-    void removeHP(int dam, struct char_data* causer = nullptr);
+    void setHP(int hp, char_data* causer = nullptr);
+    void addHP(int hp, char_data* causer = nullptr);
+    void removeHP(int dam, char_data* causer = nullptr);
     void fillHP(void);
     void fillHPLimit(void);
     void send(string);
-    command_return_t tell(struct char_data*, string);
+    command_return_t tell(char_data*, string);
     void sendRaw(string);
-    vector<struct char_data *> getFollowers(void);
+    vector<char_data *> getFollowers(void);
     void setPlayerLastMob(u_int64_t mobvnum);
 
     void swapSkill(skill_t oldSkill, skill_t newSkill);
@@ -506,7 +505,7 @@ struct char_data
 class communication
 {
     public:
-    communication(struct char_data *ch, string message);
+    communication(char_data *ch, string message);
     string sender;
     bool sender_ispc;
     string message;
@@ -648,8 +647,8 @@ struct profession {
 
 
 void clear_hunt(void *arg1, void *arg2, void *arg3);
-void clear_hunt(char *arg1, struct char_data *arg2, void *arg3);
-void prepare_character_for_sixty(struct char_data *ch);
-bool isPaused(struct char_data *mob);
+void clear_hunt(char *arg1, char_data *arg2, void *arg3);
+void prepare_character_for_sixty(char_data *ch);
+bool isPaused(char_data *mob);
 
 #endif

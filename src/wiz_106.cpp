@@ -13,9 +13,9 @@
 #include "player.h"
 #include "returnvals.h"
 
-int do_plats (struct char_data *ch, char *argument, int cmd)
+int do_plats (char_data *ch, char *argument, int cmd)
 {
-   struct char_data *i;
+   char_data *i;
    struct descriptor_data *d;
    char arg [100];
    char buf [100];
@@ -50,11 +50,11 @@ int do_plats (struct char_data *ch, char *argument, int cmd)
    return eSUCCESS;
 }
 
-int do_force(struct char_data *ch, char *argument, int cmd)
+int do_force(char_data *ch, char *argument, int cmd)
 {
   struct descriptor_data *i;
   struct descriptor_data *next_i;
-  struct char_data *vict;
+  char_data *vict;
   char name[100], to_force[400],buf[400]; 
 
   if(IS_NPC(ch))

@@ -32,7 +32,7 @@ queue<string> imp_history;
 
 extern struct room_data ** world_array;
 
-int do_wizhelp(struct char_data *ch, char *argument, int cmd_arg)
+int do_wizhelp(char_data *ch, char *argument, int cmd_arg)
 {
   extern struct command_info cmd_info[];
 
@@ -122,12 +122,12 @@ int do_wizhelp(struct char_data *ch, char *argument, int cmd_arg)
   return eSUCCESS;
 }
 
-int do_goto(struct char_data *ch, char *argument, int cmd)
+int do_goto(char_data *ch, char *argument, int cmd)
 {
     char buf[MAX_INPUT_LENGTH];
     int loc_nr, location, i, start_room;
-    struct char_data *target_mob, *pers;
-    struct char_data *tmp_ch;
+    char_data *target_mob, *pers;
+    char_data *tmp_ch;
     struct follow_type *k, *next_dude;
     struct obj_data *target_obj;
     extern int top_of_world;
@@ -273,7 +273,7 @@ int do_goto(struct char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_poof(struct char_data *ch, char *arg, int cmd)
+int do_poof(char_data *ch, char *arg, int cmd)
 {
     char inout[100], buf[100];
     int ctr, nope;
@@ -364,11 +364,11 @@ int do_poof(struct char_data *ch, char *arg, int cmd)
    return eSUCCESS;
 }
 
-int do_at(struct char_data *ch, char *argument, int cmd)
+int do_at(char_data *ch, char *argument, int cmd)
 {
     char command[MAX_INPUT_LENGTH], loc_str[MAX_INPUT_LENGTH];
     int loc_nr, location, original_loc;
-    struct char_data *target_mob;
+    char_data *target_mob;
     struct obj_data *target_obj;
     //extern int top_of_world;
     
@@ -432,9 +432,9 @@ int do_at(struct char_data *ch, char *argument, int cmd)
    return retval;
 }
 
-int do_highfive(struct char_data *ch, char *argument, int cmd)
+int do_highfive(char_data *ch, char *argument, int cmd)
 {
-    struct char_data *victim;
+    char_data *victim;
     char buf[200];
     
      if (IS_NPC(ch))
@@ -467,7 +467,7 @@ int do_highfive(struct char_data *ch, char *argument, int cmd)
     return eSUCCESS;
 }
 
-int do_holylite(struct char_data *ch, char *argument, int cmd)
+int do_holylite(char_data *ch, char *argument, int cmd)
 {
         if (IS_NPC(ch)) 
            return eFAILURE;
@@ -488,7 +488,7 @@ int do_holylite(struct char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_wizinvis(struct char_data *ch, char *argument, int cmd)
+int do_wizinvis(char_data *ch, char *argument, int cmd)
 {
     char buf [200];
 
@@ -520,7 +520,7 @@ int do_wizinvis(struct char_data *ch, char *argument, int cmd)
    return eSUCCESS;
 }
 
-int do_nohassle (struct char_data *ch, char *argument, int cmd)
+int do_nohassle (char_data *ch, char *argument, int cmd)
 {
    if (IS_NPC(ch))
       return eFAILURE;
@@ -537,7 +537,7 @@ int do_nohassle (struct char_data *ch, char *argument, int cmd)
 
 // cmd == 9 - imm
 // cmd == 8 - /
-command_return_t do_wiz(struct char_data *ch, string argument, int cmd)
+command_return_t do_wiz(char_data *ch, string argument, int cmd)
 {
   string buf1 = {};
   descriptor_data *i = nullptr;
@@ -627,7 +627,7 @@ command_return_t do_wiz(struct char_data *ch, string argument, int cmd)
   return eSUCCESS;
 }
 
-int do_findfix(struct char_data *ch, char *argument, int cmd)
+int do_findfix(char_data *ch, char *argument, int cmd)
 {
   int i, j, z;
 
@@ -675,11 +675,11 @@ int do_findfix(struct char_data *ch, char *argument, int cmd)
 }
 
 
-int do_varstat(struct char_data *ch, char *argument, int cmd)
+int do_varstat(char_data *ch, char *argument, int cmd)
 {
     char arg[MAX_INPUT_LENGTH];
     argument = one_argument(argument, arg);
-    struct char_data *vict;
+    char_data *vict;
 
     if ( ( vict = get_char_vis(ch, arg) ) == NULL )
     {

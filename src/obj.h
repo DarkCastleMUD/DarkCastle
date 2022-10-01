@@ -21,6 +21,8 @@
 #include "structs.h" // uint8_t
 #include "character.h"
 
+using namespace std;
+
 /* The following defs are for obj_data  */
 
 /* For 'type_flag' */
@@ -183,6 +185,13 @@
 #define CONT_CLOSED         4
 #define CONT_LOCKED         8
 
+struct tab_data;
+struct table_data;
+struct machine_data;
+struct wheel_data;
+struct obj_data;
+struct char_data;
+
 struct active_object
 {
     struct obj_data *obj;
@@ -219,11 +228,6 @@ struct obj_affected_type
      int32_t modifier;     /* How much it changes by              */
 };
 
-struct tab_data;
-struct table_data;
-struct machine_data;
-struct wheel_data;
-
 /* ======================== Structure for object ========================= */
 struct obj_data {
 	int32_t item_number;                  /* Where in data-base               */
@@ -238,8 +242,8 @@ struct obj_data {
 	char *short_description;            /* when worn/carry/in cont.         */
 	char *action_description;           /* What to write when used          */
 	extra_descr_data *ex_description;   /* extra descriptions     */
-	struct char_data *carried_by;              /* Carried by :NULL in room/conta   */
-	struct char_data *equipped_by;             /* so I can access the player :)    */
+	char_data *carried_by;              /* Carried by :NULL in room/conta   */
+	char_data *equipped_by;             /* so I can access the player :)    */
 
 	obj_data *in_obj;                   /* In what object NULL when none    */
 	obj_data *contains;                 /* Contains objects                 */
@@ -305,10 +309,10 @@ void eq_remove_damage(obj_data * obj);
 void add_obj_affect(obj_data * obj, int loc, int mod);
 void remove_obj_affect_by_index(obj_data * obj, int index);
 void remove_obj_affect_by_type(obj_data * obj, int loc);
-int recheck_height_wears(struct char_data *ch);
+int recheck_height_wears(char_data *ch);
 bool fullSave(obj_data *obj);
-void heightweight(struct char_data *ch, bool add);
-void wear(struct char_data *ch, struct obj_data *obj_object, int keyword);
+void heightweight(char_data *ch, bool add);
+void wear(char_data *ch, struct obj_data *obj_object, int keyword);
 int obj_from(obj_data* obj);
 
 typedef vector<const char *> item_types_t;

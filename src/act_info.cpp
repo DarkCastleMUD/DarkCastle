@@ -41,7 +41,7 @@ int max_who = 0;
 
 void page_string(struct descriptor_data *d, const char *str, int keep_internal);
 
-int do_levels(struct char_data *ch, char *argument, int cmd) {
+int do_levels(char_data *ch, char *argument, int cmd) {
 	int i;
 	char buf[MAX_STRING_LENGTH];
 

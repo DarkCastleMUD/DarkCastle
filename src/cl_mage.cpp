@@ -24,7 +24,7 @@ extern CWorld world;
 extern struct spell_info_type spell_info[MAX_SPL_LIST];
 
 
-int spellcraft(struct char_data *ch, int spell)
+int spellcraft(char_data *ch, int spell)
 {
   int a = has_skill(ch, SKILL_SPELLCRAFT);
   if (!a) return FALSE;
@@ -83,7 +83,7 @@ int spellcraft(struct char_data *ch, int spell)
   return FALSE;
 }
 
-int do_focused_repelance(struct char_data *ch, char *argument, int cmd)
+int do_focused_repelance(char_data *ch, char *argument, int cmd)
 {
   //uint8_t percent;
   struct affected_type af;
@@ -128,7 +128,7 @@ int do_focused_repelance(struct char_data *ch, char *argument, int cmd)
 }
 
 
-int do_imbue(struct char_data *ch, char *argument, int cmd)
+int do_imbue(char_data *ch, char *argument, int cmd)
 {
   char buf[MAX_STRING_LENGTH];
   int lvl = has_skill(ch, SKILL_IMBUE);
@@ -279,9 +279,9 @@ int do_imbue(struct char_data *ch, char *argument, int cmd)
 // Remember that ch is the person triggering the call, meaning they are actually the victim
 // eSUCCESS means the character is unaffected and can keep doing whatever.
 // eFAILURE means the character was interrupted
-int check_ethereal_focus(struct char_data *ch, int trigger_type)
+int check_ethereal_focus(char_data *ch, int trigger_type)
 {
-  struct char_data *i, *next_i, *ally, *next_ally;
+  char_data *i, *next_i, *ally, *next_ally;
   char buf[MAX_STRING_LENGTH];
   int retval;
 

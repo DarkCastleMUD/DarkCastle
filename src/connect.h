@@ -5,9 +5,10 @@
 | connect.h
 | Description: State of connectedness information.
 */
+#include "character.h"
 #include "structs.h"  // MAX_INPUT_LENGTH
 #include "comm.h"
- 
+
 #define STATE(d)  ((d)->connected)
 
 enum conn
@@ -100,7 +101,7 @@ struct descriptor_data {
   string inbuf = {};
   queue<string> input = {}; /* queue of unprocessed input	*/
   struct char_data *character = {}; /* linked to char		*/
-  struct char_data *original = {}; /* for switch / return		*/
+  char_data *original = {}; /* for switch / return		*/
   struct descriptor_data *snooping = {}; /* Who is this char snooping       */
   struct descriptor_data *snoop_by = {}; /* And who is snooping this char   */
   struct descriptor_data *next = {}; /* link to next descriptor	*/

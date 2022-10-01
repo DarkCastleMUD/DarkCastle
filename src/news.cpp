@@ -146,7 +146,7 @@ const char *newsify(char *string)
 //  return str_dup(tmp);
 }
 
-int do_news(struct char_data *ch, char *argument, int cmd)
+int do_news(char_data *ch, char *argument, int cmd)
 {
    bool up;
    if (IS_NPC(ch)) up = TRUE;
@@ -185,7 +185,7 @@ int do_news(struct char_data *ch, char *argument, int cmd)
    return eSUCCESS;
 }
 
-int do_addnews(struct char_data *ch, char *argument, int cmd)
+int do_addnews(char_data *ch, char *argument, int cmd)
 {
 
   if(!has_skill(ch, COMMAND_ADDNEWS)) {

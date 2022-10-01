@@ -31,10 +31,10 @@ extern CWorld world;
 
 // Note that most of the (anti)paladin skills are already in "cl_warrior.C"
 
-int do_harmtouch(struct char_data *ch, char *argument, int cmd)
+int do_harmtouch(char_data *ch, char *argument, int cmd)
 {
-   struct char_data *victim;
-   // struct char_data *tmp_ch;
+   char_data *victim;
+   // char_data *tmp_ch;
    char victim_name[MAX_INPUT_LENGTH];
    struct affected_type af;
    int retval = eSUCCESS, dam;
@@ -119,10 +119,10 @@ int do_harmtouch(struct char_data *ch, char *argument, int cmd)
 
 // Again note that alot of them are in cl_warrior.C
 
-int do_layhands(struct char_data *ch, char *argument, int cmd)
+int do_layhands(char_data *ch, char *argument, int cmd)
 {
-   struct char_data *victim;
-   // struct char_data *tmp_ch;
+   char_data *victim;
+   // char_data *tmp_ch;
    char victim_name[240];
    struct affected_type af;
    int duration = 24;
@@ -189,14 +189,14 @@ victim, dammsg, "A blinding flash fills the area as life force granted from $n's
 }
 
 
-int do_behead(struct char_data *ch, char *argument, int cmd)
+int do_behead(char_data *ch, char *argument, int cmd)
 {
   double modifier = 0.0;
   double enemy_hp = 0.0;
   int chance = 0;
   int retval = eSUCCESS;
   char buf[MAX_STRING_LENGTH];
-  struct char_data *vict;
+  char_data *vict;
   extern struct index_data *obj_index;
   
   one_argument(argument, buf);

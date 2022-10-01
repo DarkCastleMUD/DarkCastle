@@ -47,12 +47,12 @@ extern CWorld world;
 extern struct index_data *obj_index;
 extern struct index_data *mob_index;
 
-int check_components(struct char_data *ch, int destroy, int item_one = 0,
+int check_components(char_data *ch, int destroy, int item_one = 0,
 	int item_two = 0, int item_three = 0, int item_four = 0,
 	bool silent = FALSE);
 /* extern procedures */
 
-bool many_charms(struct char_data *ch);
+bool many_charms(char_data *ch);
 
 
 
@@ -63,9 +63,9 @@ bool many_charms(struct char_data *ch);
 // Returns TRUE if we got help, FALSE if not
 
 //Marauder proc uses this
-int call_for_help_in_room(struct char_data *ch, int iFriendId)
+int call_for_help_in_room(char_data *ch, int iFriendId)
 {
-  struct char_data * ally = NULL;
+  char_data * ally = NULL;
   int friends = 0;
 
   if(!ch)
@@ -107,10 +107,10 @@ int call_for_help_in_room(struct char_data *ch, int iFriendId)
 // standard return values
 
 //Several procs use this
-int protect(struct char_data *ch, int iFriendId)
+int protect(char_data *ch, int iFriendId)
 {
-  struct char_data * ally = NULL;
-  struct char_data * tmp_ch = NULL;
+  char_data * ally = NULL;
+  char_data * tmp_ch = NULL;
   int retval;
 
   if(!ch)
@@ -163,9 +163,9 @@ int protect(struct char_data *ch, int iFriendId)
 // or NULL.
 
 //Pagoda place uses this
-struct char_data * find_random_player_in_room(struct char_data * ch)
+char_data * find_random_player_in_room(char_data * ch)
 {
-    struct char_data * vict = NULL;
+    char_data * vict = NULL;
     int count = 0;
 
     // Count the number of players in room
@@ -194,11 +194,11 @@ struct char_data * find_random_player_in_room(struct char_data * ch)
 // players in the room.  Useful for doing an "earthquake" without
 // hurting the mob standing next to you.  Just do the messages yourself
 // and the call this function to deal the damage you want to do
-void damage_all_players_in_room(struct char_data *ch, int damage)
+void damage_all_players_in_room(char_data *ch, int damage)
 {
-    struct char_data * vict = NULL;
-    struct char_data * next_vict = NULL;
-    void inform_victim(struct char_data *ch, struct char_data *vict, int dam);
+    char_data * vict = NULL;
+    char_data * next_vict = NULL;
+    void inform_victim(char_data *ch, char_data *vict, int dam);
 
     for (vict = world[ch->in_room].people; vict; vict = next_vict)
     {    
@@ -226,7 +226,7 @@ void damage_all_players_in_room(struct char_data *ch, int damage)
 // Call this function with the summoner, and the vnum of the mobs
 // you want summoned into the room with you.  It will pull them from
 // anywhere in the world to you.
-void summon_all_of_mob_to_room(struct char_data * ch, int iFriendId)
+void summon_all_of_mob_to_room(char_data * ch, int iFriendId)
 {
   if(!ch)
     return;
@@ -246,9 +246,9 @@ void summon_all_of_mob_to_room(struct char_data * ch, int iFriendId)
 // want to find, and it will return his pointer if he's in the room.
 // If we find him, return his pointer
 // If it doesn't, return NULL
-struct char_data * find_mob_in_room(struct char_data *ch, int iFriendId)
+char_data * find_mob_in_room(char_data *ch, int iFriendId)
 {
-  struct char_data * ally = NULL;
+  char_data * ally = NULL;
 
   if(!ch)
     return NULL;
@@ -265,8 +265,8 @@ struct char_data * find_mob_in_room(struct char_data *ch, int iFriendId)
 }
 
 //Spellcraft golem stuff.
-int sc_golem(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
-          struct char_data *owner)
+int sc_golem(char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
+          char_data *owner)
 {
    if (cmd) return eFAILURE;
    if (!ch->fighting) return eFAILURE;
@@ -299,12 +299,12 @@ int sc_golem(struct char_data *ch, struct obj_data *obj, int cmd, const char *ar
 
 
 // Couple mobs actually still use this.
-int fighter(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
-          struct char_data *owner)
+int fighter(char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
+          char_data *owner)
 {
     /*struct obj_data *obj;*/
     struct obj_data *wielded;
-    struct char_data *vict;
+    char_data *vict;
 
     if(cmd) return eFAILURE;
     if (GET_POS(ch) < POSITION_FIGHTING) return eFAILURE;
@@ -354,10 +354,10 @@ int fighter(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg
 }
 
 
-int active_tarrasque(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
-          struct char_data *owner) 
+int active_tarrasque(char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
+          char_data *owner) 
 {
-    struct char_data *vict;
+    char_data *vict;
 
     if((GET_POS(ch) != POSITION_FIGHTING) || (!ch->fighting)) {
         return eFAILURE;
@@ -406,10 +406,10 @@ int active_tarrasque(struct char_data *ch, struct obj_data *obj, int cmd, const 
 }
 
 
-int active_grandmaster(struct char_data *ch, struct obj_data *obj, int command, const char *arg,        
-          struct char_data *owner) 
+int active_grandmaster(char_data *ch, struct obj_data *obj, int command, const char *arg,        
+          char_data *owner) 
 {
-    struct char_data *vict;
+    char_data *vict;
     /* Find a dude to do evil things upon ! */
     if((GET_POS(ch) != POSITION_FIGHTING)) {
         return eFAILURE;
@@ -487,8 +487,8 @@ static char *frostyYellText [ ] = {
 
 #define FROSTY_YELL_TEXT_SIZE ( sizeof(frostyYellText) / sizeof(char *) )
 
-int frosty (struct char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
-          struct char_data *owner)
+int frosty (char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
+          char_data *owner)
 {
      int x;
 
@@ -548,8 +548,8 @@ static char *poetEmoteText [] = {
 #define POET_SAY_TEXT_SIZE (sizeof(poetSayText) / sizeof(char *) )
 #define POET_EMOTE_TEXT_SIZE (sizeof(poetEmoteText) / sizeof(char *) )
 
-int poet (struct char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
-          struct char_data *owner)
+int poet (char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
+          char_data *owner)
 {
    int x;
 
@@ -582,8 +582,8 @@ static char *stcrewEmoteText [] = {
 
 #define STCREW_EMOTE_TEXT_SIZE (sizeof(stcrewEmoteText) / sizeof (char *) )
 
-int stcrew (struct char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
-          struct char_data *owner)
+int stcrew (char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
+          char_data *owner)
 {
     int x;
 
@@ -609,8 +609,8 @@ static char *stofficerEmoteText [] = {
 
 #define OFFICER_EMOTE_TEXT_SIZE (sizeof(stofficerEmoteText)/sizeof(char *))
 
-int stofficer(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
-          struct char_data *owner)
+int stofficer(char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
+          char_data *owner)
 {
     int x;
 
@@ -630,9 +630,9 @@ int stofficer(struct char_data *ch, struct obj_data *obj, int cmd, const char *a
 }
 
 
-int backstabber(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg, struct char_data *owner) {
-	struct char_data *tch;
-	/*struct char_data *mob;
+int backstabber(char_data *ch, struct obj_data *obj, int cmd, const char *arg, char_data *owner) {
+	char_data *tch;
+	/*char_data *mob;
 	 char buf[MAX_INPUT_LENGTH];
 
 	 char *strName;*/
@@ -695,10 +695,10 @@ int backstabber(struct char_data *ch, struct obj_data *obj, int cmd, const char 
 
 
 
-int white_dragon(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
-          struct char_data *owner)
+int white_dragon(char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
+          char_data *owner)
 {
-    struct char_data *vict = ch->fighting;
+    char_data *vict = ch->fighting;
 
     if(cmd) 
       return eFAILURE;
@@ -718,10 +718,10 @@ int white_dragon(struct char_data *ch, struct obj_data *obj, int cmd, const char
     return eSUCCESS;
 }
 
-int black_dragon(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
-          struct char_data *owner)
+int black_dragon(char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
+          char_data *owner)
 {
-    struct char_data *vict = ch->fighting;
+    char_data *vict = ch->fighting;
 
 
     if(cmd) 
@@ -742,8 +742,8 @@ int black_dragon(struct char_data *ch, struct obj_data *obj, int cmd, const char
     return cast_acid_breath(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0, GET_LEVEL(ch));
 }
 
-int red_dragon(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
-          struct char_data *owner)
+int red_dragon(char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
+          char_data *owner)
 {
 
     if(cmd) 
@@ -762,8 +762,8 @@ int red_dragon(struct char_data *ch, struct obj_data *obj, int cmd, const char *
     return cast_fire_breath(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0, GET_LEVEL(ch));
 }
 
-int green_dragon(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
-          struct char_data *owner)
+int green_dragon(char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
+          char_data *owner)
 {
 
     if (cmd) 
@@ -782,10 +782,10 @@ int green_dragon(struct char_data *ch, struct obj_data *obj, int cmd, const char
     return cast_gas_breath(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0, GET_LEVEL(ch));
 }
 
-int brass_dragon(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
-          struct char_data *owner)
+int brass_dragon(char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
+          char_data *owner)
 {
-    struct char_data *vict;
+    char_data *vict;
 
     if ( cmd == 4 && ch->in_room == real_room(5065) )
     {
@@ -825,8 +825,8 @@ int brass_dragon(struct char_data *ch, struct obj_data *obj, int cmd, const char
     return cast_lightning_breath(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0, GET_LEVEL(ch));
 }
   
-int francis_guard(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
-          struct char_data *owner)
+int francis_guard(char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
+          char_data *owner)
 {
   if (cmd != 1) return eFAILURE;
   if (world[ch->in_room].number == 7077)
@@ -842,8 +842,8 @@ int francis_guard(struct char_data *ch, struct obj_data *obj, int cmd, const cha
 *  Special procedures for mobiles                                      *
 ******************************************************************** */
 
-int guild_guard(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg,
-                struct char_data *owner)
+int guild_guard(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
+                char_data *owner)
 {
   if (cmd > 6 || cmd < 1)
     return eFAILURE;
@@ -977,8 +977,8 @@ int guild_guard(struct char_data *ch, struct obj_data *obj, int cmd, const char 
   return eFAILURE;
 }
 
-int clan_guard(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg,
-		struct char_data *owner) {
+int clan_guard(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
+		char_data *owner) {
 	int in_room = ch->in_room;
 	int guard_clan = 0;
 	int guard_room = 0;
@@ -1875,7 +1875,7 @@ vector<string> ChainSayText =
 
 // ENDOFCHAIN
 
-int chain_gossips(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg, struct char_data *owner)
+int chain_gossips(char_data *ch, struct obj_data *obj, int cmd, const char *arg, char_data *owner)
 {
   int x;
 
@@ -1908,8 +1908,8 @@ int chain_gossips(struct char_data *ch, struct obj_data *obj, int cmd, const cha
 }
 /*--+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+--*/
 
-int fido(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
-          struct char_data *owner)
+int fido(char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
+          char_data *owner)
 {
     struct obj_data *i, *temp, *next_obj, *deep, *next_deep;
 
@@ -1949,8 +1949,8 @@ int fido(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg,
     return eFAILURE;
 }
 
-int janitor(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
-          struct char_data *owner)
+int janitor(char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
+          char_data *owner)
 {
     struct obj_data *i;
 
@@ -1976,10 +1976,10 @@ int janitor(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg
 }
 
 
-int mother_moat_and_moad(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
-          struct char_data *owner)
+int mother_moat_and_moad(char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
+          char_data *owner)
 {
-  struct char_data *temp, *tmp_victim;
+  char_data *temp, *tmp_victim;
   struct affected_type af;
   int dam;
   int retval;
@@ -2027,10 +2027,10 @@ int mother_moat_and_moad(struct char_data *ch, struct obj_data *obj, int cmd, co
     return eFAILURE;
 }        
        
-int adept(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
-          struct char_data *owner)
+int adept(char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
+          char_data *owner)
 {
-  struct char_data *tch;
+  char_data *tch;
 
   if (cmd || !AWAKE(ch))
     return eFAILURE;
@@ -2069,10 +2069,10 @@ int adept(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg,
 
 /*--+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+--*/
 
-int mud_school_adept(struct char_data *ch,struct obj_data *obj, int cmd, const char *arg,        
-          struct char_data *owner)
+int mud_school_adept(char_data *ch,struct obj_data *obj, int cmd, const char *arg,        
+          char_data *owner)
 {
-  struct char_data *tch;
+  char_data *tch;
 
   if (cmd)
     return eFAILURE;
@@ -2137,8 +2137,8 @@ int mud_school_adept(struct char_data *ch,struct obj_data *obj, int cmd, const c
 }
 
 
-int bee(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
-          struct char_data *owner)
+int bee(char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
+          char_data *owner)
 {
    if(cmd) return eFAILURE;
    if(GET_POS(ch)!=POSITION_FIGHTING) return eFAILURE;
@@ -2177,8 +2177,8 @@ static char *apiary_workerEmoteText [] = {
 
 #define APIARY_WORKER_EMOTE_TEXT_SIZE (sizeof(apiary_workerEmoteText) / sizeof(char *) )
 
-int apiary_worker (struct char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
-          struct char_data *owner)
+int apiary_worker (char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
+          char_data *owner)
 {
    int x;
 
@@ -2203,11 +2203,11 @@ int apiary_worker (struct char_data *ch, struct obj_data *obj, int cmd, const ch
 *  Special procedures for shops                                      *
 *********************************************************************/
 
-int pet_shops(struct char_data *ch, int cmd, char *arg)
+int pet_shops(char_data *ch, int cmd, char *arg)
 {
     char buf[MAX_STRING_LENGTH], pet_name[256];
     int pet_room;
-    struct char_data *pet;
+    char_data *pet;
 
     pet_room = ch->in_room+1;
 
@@ -2277,8 +2277,8 @@ int pet_shops(struct char_data *ch, int cmd, char *arg)
     return eFAILURE;
 }
 
-int newbie_zone_guard(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
-          struct char_data *owner)
+int newbie_zone_guard(char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
+          char_data *owner)
 {
     if (cmd>6 || cmd<1)
 	return eFAILURE;
@@ -2327,10 +2327,10 @@ int newbie_zone_guard(struct char_data *ch, struct obj_data *obj, int cmd, const
 
 
 // I just like to hellstream every other round.
-int hellstreamer(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
-          struct char_data *owner)
+int hellstreamer(char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
+          char_data *owner)
 {
-    struct char_data *vict;
+    char_data *vict;
     // int percent; 
     /* Find a dude to do evil things upon ! */
 
@@ -2363,10 +2363,10 @@ int hellstreamer(struct char_data *ch, struct obj_data *obj, int cmd, const char
 }
 
 // I just firestorm every round...stupid groupies!
-int firestormer(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
-          struct char_data *owner)
+int firestormer(char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
+          char_data *owner)
 {
-    struct char_data *vict = NULL;
+    char_data *vict = NULL;
     // int percent; 
 
     act("$n utters the words 'Fry bitch!'.", ch, 0, 0, 
@@ -2374,10 +2374,10 @@ int firestormer(struct char_data *ch, struct obj_data *obj, int cmd, const char 
     return cast_firestorm(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0, GET_LEVEL(ch));
 }
 
-int humaneater(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
-          struct char_data *owner)
+int humaneater(char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
+          char_data *owner)
 {
-    struct char_data *tch;
+    char_data *tch;
 
     if (cmd || !AWAKE(ch))
 	return eFAILURE;
@@ -2467,8 +2467,8 @@ static char *pir_slutSayText [] = {
 
 #define PIR_SAY_TEXT_SIZE ( sizeof(pir_slutSayText) / sizeof(char*))
 
-int pir_slut (struct char_data*ch, struct obj_data *obj, int cmd, const char*arg,        
-          struct char_data *owner)
+int pir_slut (char_data*ch, struct obj_data *obj, int cmd, const char*arg,        
+          char_data *owner)
 {
    int x;
    if (cmd)
@@ -2484,12 +2484,12 @@ int pir_slut (struct char_data*ch, struct obj_data *obj, int cmd, const char*arg
 }
 
 
-int clutchdrone_combat(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
-          struct char_data *owner)
+int clutchdrone_combat(char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
+          char_data *owner)
 {
     /*struct obj_data *obj;*/
     // struct obj_data *wielded;
-    struct char_data *vict;
+    char_data *vict;
   // int dam;
     int retval;
 
@@ -2530,8 +2530,8 @@ int clutchdrone_combat(struct char_data *ch, struct obj_data *obj, int cmd, cons
 }
 
 
-int generic_guard(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
-          struct char_data *owner)
+int generic_guard(char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
+          char_data *owner)
 {
     if (cmd>6 || cmd<1)
 	return eFAILURE;
@@ -2549,8 +2549,8 @@ int generic_guard(struct char_data *ch, struct obj_data *obj, int cmd, const cha
     return eFAILURE;
 }
 
-int portal_guard(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
-          struct char_data *owner)
+int portal_guard(char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
+          char_data *owner)
 {
     char buf[200];
 
@@ -2574,8 +2574,8 @@ int portal_guard(struct char_data *ch, struct obj_data *obj, int cmd, const char
 }
 
 
-int blindingparrot(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
-          struct char_data *owner)
+int blindingparrot(char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
+          char_data *owner)
 {
    if(cmd) return eFAILURE;
     if(GET_POS(ch)!=POSITION_FIGHTING) return eFAILURE;
@@ -2596,8 +2596,8 @@ int blindingparrot(struct char_data *ch, struct obj_data *obj, int cmd, const ch
     return eFAILURE;
 }
 
-int doorcloser (struct char_data*ch, struct obj_data *obj, int cmd, const char*arg,        
-          struct char_data *owner)
+int doorcloser (char_data*ch, struct obj_data *obj, int cmd, const char*arg,        
+          char_data *owner)
 {
    // int x;
 
@@ -2625,11 +2625,11 @@ int doorcloser (struct char_data*ch, struct obj_data *obj, int cmd, const char*a
 }
 
 
-int panicprisoner (struct char_data*ch, struct obj_data *obj, int cmd, const char*arg,        
-          struct char_data *owner)
+int panicprisoner (char_data*ch, struct obj_data *obj, int cmd, const char*arg,        
+          char_data *owner)
 {
    // int x;
-   struct char_data *vict = NULL;
+   char_data *vict = NULL;
 
    if (cmd)  return eFAILURE;
    if (IS_AFFECTED(ch,AFF_PARALYSIS))  return eFAILURE;
@@ -2667,10 +2667,10 @@ int panicprisoner (struct char_data*ch, struct obj_data *obj, int cmd, const cha
 
 
 // let's teleport people around the mud:)
-int bounder(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
-          struct char_data *owner)
+int bounder(char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
+          char_data *owner)
 {
-    struct char_data *vict;
+    char_data *vict;
     // int percent; 
 
     /* Find a dude to do evil things upon ! */
@@ -2697,10 +2697,10 @@ int bounder(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg
 }
 
 // I love to dispel stuff!
-int dispelguy(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
-          struct char_data *owner)
+int dispelguy(char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
+          char_data *owner)
 {
-    struct char_data *vict;
+    char_data *vict;
     // int percent; 
 
     if((GET_POS(ch) != POSITION_FIGHTING)) {
@@ -2735,12 +2735,12 @@ int dispelguy(struct char_data *ch, struct obj_data *obj, int cmd, const char *a
     return eFAILURE;
 }
 
-int marauder(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
-          struct char_data *owner)
+int marauder(char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
+          char_data *owner)
 {
     /*struct obj_data *obj;*/
     struct obj_data *wielded;
-    struct char_data *vict;
+    char_data *vict;
 
     if(cmd) return eFAILURE;
 
@@ -2781,10 +2781,10 @@ int marauder(struct char_data *ch, struct obj_data *obj, int cmd, const char *ar
 }
 
 
-int foggy_combat(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
-          struct char_data *owner)
+int foggy_combat(char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
+          char_data *owner)
 {
-    struct char_data * mob = NULL;
+    char_data * mob = NULL;
 
     if(cmd)
       return eFAILURE;
@@ -2819,8 +2819,8 @@ int foggy_combat(struct char_data *ch, struct obj_data *obj, int cmd, const char
     return eSUCCESS;
 }
 
-int foggy_non(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
-          struct char_data *owner)
+int foggy_non(char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
+          char_data *owner)
 {
     // n s e s u d are commands 1-6.  For anything but that, ignore
     // the command and return
@@ -2837,10 +2837,10 @@ int foggy_non(struct char_data *ch, struct obj_data *obj, int cmd, const char *a
     return eSUCCESS;
 }
 
-int iasenko_combat(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
-          struct char_data *owner)
+int iasenko_combat(char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
+          char_data *owner)
 {
-    struct char_data * vict = NULL;
+    char_data * vict = NULL;
     int dam = 0;
     int retval;
     //char buf[200];
@@ -2892,8 +2892,8 @@ int iasenko_combat(struct char_data *ch, struct obj_data *obj, int cmd, const ch
 }
 
 
-int iasenko_non_combat(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
-          struct char_data *owner)
+int iasenko_non_combat(char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
+          char_data *owner)
 {
     if(cmd)
       return eFAILURE;
@@ -2901,11 +2901,11 @@ int iasenko_non_combat(struct char_data *ch, struct obj_data *obj, int cmd, cons
     return protect(ch, 8543); // rescue Koban if he's fighting
 }
 
-int koban_combat(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
-          struct char_data *owner)
+int koban_combat(char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
+          char_data *owner)
 {
-    struct char_data * iasenko = NULL;
-    struct char_data * temp_chr = NULL;
+    char_data * iasenko = NULL;
+    char_data * temp_chr = NULL;
 
     if(cmd)
       return eFAILURE;
@@ -2937,10 +2937,10 @@ int koban_combat(struct char_data *ch, struct obj_data *obj, int cmd, const char
     return cast_call_lightning(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0, GET_LEVEL(ch));
 }
 
-int koban_non_combat(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
-          struct char_data *owner)
+int koban_non_combat(char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
+          char_data *owner)
 {
-    struct char_data * iasenko = NULL;
+    char_data * iasenko = NULL;
 
     if(cmd)
       return eFAILURE;
@@ -2985,10 +2985,10 @@ int koban_non_combat(struct char_data *ch, struct obj_data *obj, int cmd, const 
     return eFAILURE;
 }
 
-int kogiro_combat(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
-          struct char_data *owner)
+int kogiro_combat(char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
+          char_data *owner)
 {
-    struct char_data * vict = NULL;
+    char_data * vict = NULL;
     int dam = 0;
     int retval;
 
@@ -3028,8 +3028,8 @@ int kogiro_combat(struct char_data *ch, struct obj_data *obj, int cmd, const cha
     return eSUCCESS;
 }
 
-int takahashi_combat(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
-          struct char_data *owner)
+int takahashi_combat(char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
+          char_data *owner)
 {
     int retval;
 
@@ -3061,8 +3061,8 @@ int takahashi_combat(struct char_data *ch, struct obj_data *obj, int cmd, const 
     return eSUCCESS;
 }
 
-int askari_combat(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
-          struct char_data *owner)
+int askari_combat(char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
+          char_data *owner)
 {
     int dam;
     int retval;
@@ -3099,8 +3099,8 @@ int askari_combat(struct char_data *ch, struct obj_data *obj, int cmd, const cha
     return eSUCCESS;
 }
 
-int surimoto_combat(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
-          struct char_data *owner)
+int surimoto_combat(char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
+          char_data *owner)
 {
     int dam;
 
@@ -3126,10 +3126,10 @@ int surimoto_combat(struct char_data *ch, struct obj_data *obj, int cmd, const c
     return eSUCCESS;
 }     
 
-int hiryushi_combat(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
-          struct char_data *owner)
+int hiryushi_combat(char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
+          char_data *owner)
 {
-    struct char_data * victim = NULL;
+    char_data * victim = NULL;
 
     if(cmd)
       return eFAILURE;
@@ -3162,8 +3162,8 @@ int hiryushi_combat(struct char_data *ch, struct obj_data *obj, int cmd, const c
     return eSUCCESS;
 }     
 
-int izumi_combat(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
-          struct char_data *owner)
+int izumi_combat(char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
+          char_data *owner)
 {
     int retval;
     if(cmd)
@@ -3189,8 +3189,8 @@ int izumi_combat(struct char_data *ch, struct obj_data *obj, int cmd, const char
     return eSUCCESS;
 }     
 
-int shogura_combat(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
-          struct char_data *owner)
+int shogura_combat(char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
+          char_data *owner)
 {
     if(cmd)
       return eFAILURE;
@@ -3229,8 +3229,8 @@ int shogura_combat(struct char_data *ch, struct obj_data *obj, int cmd, const ch
 }     
 
 // Proc for the arena mobs to make DAMN sure they stay in the arena.
-int arena_only(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
-          struct char_data *owner)
+int arena_only(char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
+          char_data *owner)
 {
     if(cmd || ch->fighting)
       return eFAILURE;
@@ -3256,8 +3256,8 @@ int arena_only(struct char_data *ch, struct obj_data *obj, int cmd, const char *
     return eFAILURE;
 }
 
-int druid_elemental(struct char_data *ch, struct obj_data *obj,
- int cmd, const char *arg, struct char_data *owner)
+int druid_elemental(char_data *ch, struct obj_data *obj,
+ int cmd, const char *arg, char_data *owner)
 {
   if (cmd) return eFAILURE;
   if(!ch->master) {
@@ -3280,8 +3280,8 @@ int druid_elemental(struct char_data *ch, struct obj_data *obj,
 }
 
 
-int mage_golem(struct char_data *ch, struct obj_data *obj, int cmd,
-	const char *arg, struct char_data *owner)
+int mage_golem(char_data *ch, struct obj_data *obj, int cmd,
+	const char *arg, char_data *owner)
 {
   if (cmd || !ch->master || ch->fighting || ch->in_room != ch->master->in_room) return eFAILURE;
 
@@ -3292,7 +3292,7 @@ int mage_golem(struct char_data *ch, struct obj_data *obj, int cmd,
 }
 
 
-int gremlinthing(struct char_data *ch)
+int gremlinthing(char_data *ch)
 {
   if( GET_POS(ch) < POSITION_STANDING )
      return eFAILURE;
@@ -3301,7 +3301,7 @@ int gremlinthing(struct char_data *ch)
 ch->master->pcdata->golem->in_room
 	== ch->in_room)
   {
-     struct char_data *gol = ch->master->pcdata->golem;
+     char_data *gol = ch->master->pcdata->golem;
     if (gol->hit < gol->max_hit)
     {
 	  do_emote(ch, "climbs up its master's golem, hammering, tweaking and repairing.\r\n", 9);
@@ -3312,15 +3312,15 @@ ch->master->pcdata->golem->in_room
   return eFAILURE;
 }
 
-int mage_familiar_gremlin(struct char_data *ch, struct obj_data *obj, int
-  cmd, const char *arg, struct char_data *owner)
+int mage_familiar_gremlin(char_data *ch, struct obj_data *obj, int
+  cmd, const char *arg, char_data *owner)
 {
  if (number(0,1)) return eFAILURE;
  return gremlinthing(ch);
 }
 
-int mage_familiar_gremlin_non(struct char_data *ch, struct obj_data *obj,
- int cmd, const char *arg, struct char_data *owner)
+int mage_familiar_gremlin_non(char_data *ch, struct obj_data *obj,
+ int cmd, const char *arg, char_data *owner)
 {
   if (cmd) return eFAILURE;
   if(!ch->master) {
@@ -3357,8 +3357,8 @@ int mage_familiar_gremlin_non(struct char_data *ch, struct obj_data *obj,
 
 
 
-int mage_familiar_imp(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
-          struct char_data *owner)
+int mage_familiar_imp(char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
+          char_data *owner)
 {
   if(number(0, 1))
     return cast_fireball(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0, GET_LEVEL(ch));
@@ -3367,8 +3367,8 @@ int mage_familiar_imp(struct char_data *ch, struct obj_data *obj, int cmd, const
   return eFAILURE;  
 }
 
-int mage_familiar_imp_non(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
-          struct char_data *owner)
+int mage_familiar_imp_non(char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
+          char_data *owner)
 {
   if(cmd)
     return eFAILURE;
@@ -3409,7 +3409,7 @@ int mage_familiar_imp_non(struct char_data *ch, struct obj_data *obj, int cmd, c
   return eFAILURE;
 }
 
-int druid_familiar_owl_non(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg, struct char_data *owner)
+int druid_familiar_owl_non(char_data *ch, struct obj_data *obj, int cmd, const char *arg, char_data *owner)
 {
    if(ch->fighting)
     return eFAILURE;
@@ -3489,8 +3489,8 @@ int druid_familiar_owl_non(struct char_data *ch, struct obj_data *obj, int cmd, 
  return eFAILURE;
 }
 
-int druid_familiar_chipmunk_non(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg,
-          struct char_data *owner)
+int druid_familiar_chipmunk_non(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
+          char_data *owner)
 {
   if(cmd)
     return eFAILURE;
@@ -3542,8 +3542,8 @@ int druid_familiar_chipmunk_non(struct char_data *ch, struct obj_data *obj, int 
 
 // This is here so we don't need 2398429 procs that are just for a bodyguard
 // Just add a case for your mob, and the mob he's supposed to protect
-int bodyguard(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
-          struct char_data *owner)
+int bodyguard(char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
+          char_data *owner)
 {
   if(cmd)
     return eFAILURE;
@@ -3565,8 +3565,8 @@ int bodyguard(struct char_data *ch, struct obj_data *obj, int cmd, const char *a
 }
 
 
-int generic_blocker(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
-          struct char_data *owner)
+int generic_blocker(char_data *ch, struct obj_data *obj, int cmd, const char *arg,        
+          char_data *owner)
 {
     if (cmd>6 || cmd<1)
         return eFAILURE;
@@ -3583,8 +3583,8 @@ int generic_blocker(struct char_data *ch, struct obj_data *obj, int cmd, const c
     return eFAILURE;
 }
 
-int generic_doorpick_blocker(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg,
-          struct char_data *owner)
+int generic_doorpick_blocker(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
+          char_data *owner)
 {
     if(cmd != 35) // pick
        return eFAILURE;
@@ -3603,8 +3603,8 @@ int generic_doorpick_blocker(struct char_data *ch, struct obj_data *obj, int cmd
     return eFAILURE;
 }
 
-int startrek_miles(struct char_data *ch, struct obj_data *obj, int cmd, const char *arg,
-          struct char_data *owner)
+int startrek_miles(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
+          char_data *owner)
 {
   if(cmd != 185)
     return eFAILURE;

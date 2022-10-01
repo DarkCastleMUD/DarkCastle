@@ -9,26 +9,26 @@
 extern struct vault_data *vault_table;
 struct vault_data *has_vault(const char *name);
 
-void vault_stats(struct char_data *ch, char *name);
-void vault_withdraw(struct char_data *ch, unsigned int amount, char *owner);
-void vault_deposit(struct char_data *ch, unsigned int amount, char *owner);
+void vault_stats(char_data *ch, char *name);
+void vault_withdraw(char_data *ch, unsigned int amount, char *owner);
+void vault_deposit(char_data *ch, unsigned int amount, char *owner);
 void save_vault(char *name);
-void vault_access(struct char_data *ch, char *who);
-void my_vault_access(struct char_data *ch);
+void vault_access(char_data *ch, char *who);
+void my_vault_access(char_data *ch);
 void load_vaults(void);
-void add_vault_access(struct char_data *ch, char *name, struct vault_data *vault);
-void remove_vault_access(struct char_data *ch, char *name, struct vault_data *vault);
-void vault_get(struct char_data *ch, char *object, char *owner);
-void vault_put(struct char_data *ch, char *object, char *owner);
-void vault_list(struct char_data *ch, char *owner);
+void add_vault_access(char_data *ch, char *name, struct vault_data *vault);
+void remove_vault_access(char_data *ch, char *name, struct vault_data *vault);
+void vault_get(char_data *ch, char *object, char *owner);
+void vault_put(char_data *ch, char *object, char *owner);
+void vault_list(char_data *ch, char *owner);
 void add_new_vault(char *name, int indexonly);
 void reload_vaults(void);
-void vault_cost(struct char_data *ch, char *object, char *arg);
+void vault_cost(char_data *ch, char *object, char *arg);
 void remove_vault(char *name, BACKUP_TYPE backup = NONE);
 void rename_vault_owner(char *oldname, char *newname);
 void access_remove(char *name, struct vault_data *vault);
 void remove_vault_accesses(char *name);
-void vault_sell(struct char_data *ch, char *object, char *arg);
+void vault_sell(char_data *ch, char *object, char *arg);
 int vault_log_to_string(const char *name, char *buf);
 void vlog(const char *message, const char *name);
 
@@ -42,7 +42,7 @@ struct obj_data *get_obj_in_all_vaults(char *object, int num);
 struct vault_items_data *get_items_in_all_vaults(char *object, int num);
 
 int has_vault_access(char *owner, struct vault_data *vault);
-int vault_search(struct char_data *ch, const char *keyword);
+int vault_search(char_data *ch, const char *keyword);
 
 struct vault_data {
    char *owner;

@@ -81,28 +81,28 @@ private:
 
 void add_totem(obj_data *altar, obj_data *totem);
 void remove_totem(obj_data *altar, obj_data *totem);
-void add_totem_stats(struct char_data *ch, int stat = 0);
-void remove_totem_stats(struct char_data *ch, int stat = 0);
-bool others_clan_room(struct char_data *ch, room_data *room);
-void clan_login(struct char_data * ch);
-void clan_logout(struct char_data * ch);
-int has_right(struct char_data * ch, uint32_t bit);
+void add_totem_stats(char_data *ch, int stat = 0);
+void remove_totem_stats(char_data *ch, int stat = 0);
+bool others_clan_room(char_data *ch, room_data *room);
+void clan_login(char_data * ch);
+void clan_logout(char_data * ch);
+int has_right(char_data * ch, uint32_t bit);
 clan_data * get_clan(int nClan);
-clan_data * get_clan(struct char_data *ch);
+clan_data * get_clan(char_data *ch);
 char *get_clan_name(int nClan);
-char *get_clan_name(struct char_data *ch);
+char *get_clan_name(char_data *ch);
 char *get_clan_name(clan_data *clan);
 void save_clans();
-int plr_rights(struct char_data * ch);
+int plr_rights(char_data * ch);
 void add_clan(clan_data * new_new_clan);
 void add_clan_member(clan_data * theClan, struct clan_member_data * new_new_member);
-void add_clan_member(clan_data * theClan, struct char_data * ch);
-void remove_clan_member(clan_data * theClan, struct char_data * ch);
-void remove_clan_member(int clannumber, struct char_data * ch);
+void add_clan_member(clan_data * theClan, char_data * ch);
+void remove_clan_member(clan_data * theClan, char_data * ch);
+void remove_clan_member(int clannumber, char_data * ch);
 void free_member(struct clan_member_data * member);
 struct clan_member_data * get_member(char * strName, int nClanId);
-void show_clan_log(struct char_data *ch);
-void log_clan(struct char_data *ch, char *buffer);
-void clan_death (struct char_data *ch, struct char_data *killer);
+void show_clan_log(char_data *ch);
+void log_clan(char_data *ch, char *buffer);
+void clan_death (char_data *ch, char_data *killer);
 
 #endif /* CLAN_H_ */
