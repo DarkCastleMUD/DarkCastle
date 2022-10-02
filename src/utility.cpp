@@ -2795,7 +2795,7 @@ void char_data::setPOSFighting(void)
   }
 }
 
-void char_data::setPlayerLastMob(u_int64_t mob_vnum)
+void char_data::setPlayerLastMob(vnum_t mob_vnum)
 {
   string buffer;
   if (this->pcdata == nullptr)
