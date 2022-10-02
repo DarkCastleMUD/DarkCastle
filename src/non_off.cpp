@@ -39,29 +39,29 @@ extern "C"
 extern CWorld world;
 extern struct index_data *obj_index;
 extern CVoteData *DCVote;
-   
+
+// decay variable means it's from a decaying corpse, not a player
 void log_sacrifice(char_data *ch, obj_data *obj, bool decay = FALSE)
-{ //decay variable means it's from a decaying corpse, not a player
-  time_t timep;
-  char *tmstr;
+{
 
-  if(GET_OBJ_RNUM(obj) == NOWHERE) return;
+  if (GET_OBJ_RNUM(obj) == NOWHERE)
+    return;
 
-  timep = time(0);
-  tmstr = asctime(localtime(&timep));
-  *(tmstr + strlen(tmstr) - 1) = '\0';
   if (!decay)
   {
     logf(IMP, LOG_OBJECTS, "%s just sacrificed %s[%d] in room %d\n", GET_NAME(ch), GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj), GET_ROOM_VNUM(ch->in_room));
-  } else {
-    logf(IMP, LOG_OBJECTS, "%s just poofed from decaying corpse %s[%d] in room %d\n", GET_OBJ_SHORT((obj_data*)ch), GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj), GET_ROOM_VNUM(obj->in_room));
+  }
+  else
+  {
+    logf(IMP, LOG_OBJECTS, "%s just poofed from decaying corpse %s[%d] in room %d\n", GET_OBJ_SHORT((obj_data *)ch), GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj), GET_ROOM_VNUM(obj->in_room));
   }
 
-  for(obj_data *loop_obj = obj->contains; loop_obj; loop_obj = loop_obj->next_content) {
+  for (obj_data *loop_obj = obj->contains; loop_obj; loop_obj = loop_obj->next_content)
+  {
     logf(IMP, LOG_OBJECTS, "The %s contained %s[%d]\n",
-	    GET_OBJ_SHORT(obj),
-	    GET_OBJ_SHORT(loop_obj),
-	    GET_OBJ_VNUM(loop_obj));
+         GET_OBJ_SHORT(obj),
+         GET_OBJ_SHORT(loop_obj),
+         GET_OBJ_VNUM(loop_obj));
   }
 }
 
