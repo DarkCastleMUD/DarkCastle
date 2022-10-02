@@ -15,3 +15,5 @@ lib/wizlist.txt
 lib/mobs/*.last
 lib/special.txt
 src/debug
+src/dcastle.stable
+src/dcastle.master
