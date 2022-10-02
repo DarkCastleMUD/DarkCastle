@@ -2014,17 +2014,17 @@ int do_huntstart(char_data *ch, char *argument, int cmd)
   string passWord("");
   string message("");
 
-  userName = "DarkCastleMUD";
-  passWord = "$dc2009";
+  userName = "username";
+  passWord = "password";
 
   twitterObj.setTwitterUsername(userName);
   twitterObj.setTwitterPassword(passWord);
 
-  twitterObj.getOAuth().setConsumerKey(string("phRZBl2IDCFryRITUNtkw"));
-  twitterObj.getOAuth().setConsumerSecret(string("AK5Uxb6jlgROX79d78mPCyuq85E08DbAmJm94RMyY"));
+  twitterObj.getOAuth().setConsumerKey(string("xyz"));
+  twitterObj.getOAuth().setConsumerSecret(string("xyz"));
 
-  twitterObj.getOAuth().setOAuthTokenKey(string("36770859-RMEAZ5jw5hMoVqadRWUS4cMB2VrvK513bck1I61Bz"));
-  twitterObj.getOAuth().setOAuthTokenSecret(string("2TTedhTy6NP1ntHqexsLl4OVWVn5BpZHvZDRp4Fh10"));
+  twitterObj.getOAuth().setOAuthTokenKey(string("xyz-xyz"));
+  twitterObj.getOAuth().setOAuthTokenSecret(string("xyz"));
 
   if (twitterObj.accountVerifyCredGet())
   {
