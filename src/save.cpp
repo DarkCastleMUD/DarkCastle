@@ -1173,12 +1173,12 @@ struct obj_data *  obj_store_to_char(char_data *ch, FILE *fpsave, struct obj_dat
   }
   if(!strcmp("SAV", mod_type))
   {
-    fread(&obj->save_expiration, sizeof(time_t), 1, fpsave);
+    fread(&obj->save_expiration, sizeof(uint32_t), 1, fpsave);
     fread(&mod_type, sizeof(char), 3, fpsave);
   }
   if(!strcmp("SEL", mod_type))
   {
-    fread(&obj->no_sell_expiration, sizeof(time_t), 1, fpsave);
+    fread(&obj->no_sell_expiration, sizeof(uint32_t), 1, fpsave);
     fread(&mod_type, sizeof(char), 3, fpsave);
   }
 
@@ -1474,12 +1474,12 @@ bool put_obj_in_store (struct obj_data *obj, char_data *ch, FILE *fpsave, int we
 
   if (IS_SET(obj->obj_flags.more_flags, ITEM_24H_SAVE)) {
 	  fwrite("SAV", sizeof(char), 3, fpsave);
-	  fwrite(&obj->save_expiration, sizeof(time_t), 1, fpsave);
+	  fwrite(&obj->save_expiration, sizeof(uint32_t), 1, fpsave);
   }
 
   if (IS_SET(obj->obj_flags.more_flags, ITEM_24H_NO_SELL)) {
 	  fwrite("SEL", sizeof(char), 3, fpsave);
-	  fwrite(&obj->no_sell_expiration, sizeof(time_t), 1, fpsave);
+	  fwrite(&obj->no_sell_expiration, sizeof(uint32_t), 1, fpsave);
   }
 
   // extra descs are a little strange...it's a pointer to a list of them
