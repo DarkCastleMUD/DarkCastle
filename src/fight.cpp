@@ -1684,6 +1684,7 @@ void eq_damage(char_data * ch, char_data * victim,
 
 void pir_stat_loss(char_data * victim,int chance,  bool heh, bool zz)
 {
+  char log_buf[MAX_STRING_LENGTH] = {};
   if (GET_LEVEL(victim) < 50) return;
   chance /= 2;
   /* Pir's extra stat loss.  Bwahahah */
@@ -5126,6 +5127,7 @@ void raw_kill(char_data * ch, char_data * victim)
 
     // notify the clan members - clan_death checks for null ch/vict
     clan_death (victim, ch);
+    char log_buf[MAX_STRING_LENGTH] = {};
     sprintf(log_buf, "%s at %d", buf, world[death_room].number);
     log(log_buf, ANGEL, LOG_MORTAL);
 
@@ -6951,7 +6953,7 @@ int do_flee(char_data *ch, char *argument, int cmd)
 
           strncpy(tempcommand, dirs[attempt], 31);
           // we do this so that any spec procs overriding movement can take effect
-	  SET_BIT(ch->combat, COMBAT_FLEEING);
+	        SET_BIT(ch->combat, COMBAT_FLEEING);
           retval = command_interpreter(ch, tempcommand);
 	  // so that a player doesn't keep the flag afte rdying
 	  if (IS_PC(ch))

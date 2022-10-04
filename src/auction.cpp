@@ -347,7 +347,7 @@ void AuctionHouse::DoModify(char_data *ch, unsigned int ticket, unsigned int new
       csendf(tmp, "%s has just modified the price of one of %s items.\n\r", 
                  GET_NAME(ch), (GET_SEX(ch) == SEX_MALE) ? "his" : "her");
 
-  char log_buf[MAX_STRING_LENGTH];
+  char log_buf[MAX_STRING_LENGTH] = {};
   sprintf(log_buf, "VEND: %s modified ticket %u (%s): old price %u, new price %u.\n\r", 
                GET_NAME(ch), Item_it->first, Item_it->second.item_name.c_str(), Item_it->second.price, new_price);
   log(log_buf, IMP, LOG_OBJECTS);
@@ -1244,7 +1244,7 @@ void AuctionHouse::BuyItem(char_data *ch, unsigned int ticket)
   Item_it->second.buyer = GET_NAME(ch);
 
   Save(); 
-  char log_buf[MAX_STRING_LENGTH];
+  char log_buf[MAX_STRING_LENGTH] = {};
   sprintf(log_buf, "VEND: %s bought %s's %s[%d] for %u coins.\n\r",
               GET_NAME(ch), Item_it->second.seller.c_str(), Item_it->second.item_name.c_str(),Item_it->second.vitem, Item_it->second.price);
   log(log_buf, IMP, LOG_OBJECTS);
@@ -1371,7 +1371,7 @@ void AuctionHouse::RemoveTicket(char_data *ch, unsigned int ticket)
       Revenue -= fee;
       UncollectedGold -= Item_it->second.price;
       GET_GOLD(ch) += (Item_it->second.price - fee);
-      char log_buf[MAX_STRING_LENGTH];
+      char log_buf[MAX_STRING_LENGTH] = {};
       sprintf(log_buf, "VEND: %s just collected %u coins from their sale of %s (ticket %u).\n\r", 
                          GET_NAME(ch), Item_it->second.price, Item_it->second.item_name.c_str(), ticket);
       log(log_buf, IMP, LOG_OBJECTS);
@@ -1411,7 +1411,7 @@ void AuctionHouse::RemoveTicket(char_data *ch, unsigned int ticket)
       }
 
       csendf(ch, "The Consignment Broker retrieves %s and returns it to you.\n\r", obj->short_description);
-      char log_buf[MAX_STRING_LENGTH];
+      char log_buf[MAX_STRING_LENGTH] = {};
       sprintf(log_buf, "VEND: %s cancelled or collected ticket # %u (%s) that was for sale for %u coins.\n\r", 
                        GET_NAME(ch), ticket, Item_it->second.item_name.c_str(), Item_it->second.price);
       log(log_buf, IMP, LOG_OBJECTS);
@@ -1780,7 +1780,7 @@ void AuctionHouse::AddItem(char_data *ch, obj_data *obj, unsigned int price, str
     }
   }
  
-  char log_buf[MAX_STRING_LENGTH];
+  char log_buf[MAX_STRING_LENGTH] = {};
   if (NewTicket.buyer.empty())
   {
     sprintf(log_buf, "VEND: %s just listed %s for sale for %u coins.\n\r", GET_NAME(ch), obj->short_description, price);

@@ -273,10 +273,12 @@ int do_wizlock(char_data *ch, char *argument, int cmd)
     wizlock = !wizlock;
 
     if ( wizlock ) {
+        char log_buf[MAX_STRING_LENGTH] = {};
         sprintf(log_buf,"Game has been wizlocked by %s.",GET_NAME(ch));
         log(log_buf, ANGEL, LOG_GOD);
         send_to_char("Game wizlocked.\n\r", ch);
     } else {
+        char log_buf[MAX_STRING_LENGTH] = {};
         sprintf(log_buf,"Game has been un-wizlocked by %s.",GET_NAME(ch));
         log(log_buf, ANGEL, LOG_GOD);
         send_to_char("Game un-wizlocked.\n\r", ch);

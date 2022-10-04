@@ -158,6 +158,7 @@ void process_portals()
          game_portals[i].obj_num,
 	 game_portals[i].max_timer) == 0)
       {
+        char log_buf[MAX_STRING_LENGTH] = {};
 	sprintf(log_buf, "Making portal from %d to %d failed.", from_room,
 	  game_portals[i].to_room);
 	log(log_buf, OVERSEER, LOG_BUG);

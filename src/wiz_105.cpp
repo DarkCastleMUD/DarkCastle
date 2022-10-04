@@ -362,6 +362,7 @@ int do_pardon(char_data *ch, char *argument, int cmd)
      }         
 
     send_to_char("Done.\n\r",ch);
+    char log_buf[MAX_STRING_LENGTH] = {};
     sprintf(log_buf,"%s pardons %s for %s.",
         GET_NAME(ch), GET_NAME(victim), flag);
     log(log_buf, GET_LEVEL(ch), LOG_GOD);

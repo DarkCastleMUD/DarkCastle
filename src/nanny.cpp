@@ -851,6 +851,7 @@ void nanny(struct descriptor_data *d, string arg)
    char badclssmsg[] = "You must choose a class that matches your stats. These are marked by a '*'.\n\rSelect a class-> ";
    unsigned selection = 0;
    auto &character_list = DC::instance().character_list;
+   char log_buf[MAX_STRING_LENGTH] = {};
 
    ch = d->character;
    arg.erase(0, arg.find_first_not_of(' '));
@@ -2028,7 +2029,8 @@ bool check_deny(struct descriptor_data *d, char *name)
    if ((fpdeny = dc_fopen(strdeny, "rb")) == NULL)
       return FALSE;
    dc_fclose(fpdeny);
-
+   
+   char log_buf[MAX_STRING_LENGTH] = {};
    sprintf(log_buf, "Denying access to player %s@%s.", name, d->host);
    log(log_buf, ARCHANGEL, LOG_MORTAL);
    file_to_string(strdeny, bufdeny);
@@ -2070,6 +2072,7 @@ bool check_reconnect(struct descriptor_data *d, char *name, bool fReconnect)
          tmp_ch->desc = d;
          tmp_ch->timer = 0;
          send_to_char("Reconnecting.\n\r", tmp_ch);
+         char log_buf[MAX_STRING_LENGTH] = {};
          sprintf(log_buf, "%s@%s has reconnected.",
                  GET_NAME(tmp_ch), d->host);
          act("$n has reconnected and is ready to kick ass.", tmp_ch, 0,

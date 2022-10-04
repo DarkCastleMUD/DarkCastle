@@ -81,7 +81,7 @@ void get(char_data *ch, struct obj_data *obj_object, struct obj_data *sub_object
         struct affected_type pthiefaf;
         WAIT_STATE(ch, PULSE_VIOLENCE*2);
 
-        char log_buf[MAX_STRING_LENGTH];
+        char log_buf[MAX_STRING_LENGTH] = {};
         sprintf(log_buf, "%s looted %s[%d] from %s", GET_NAME(ch), obj_object->short_description, obj_index[obj_object->item_number].virt, sub_object->name);
         log(log_buf, ANGEL, LOG_MORTAL);
 
@@ -115,7 +115,7 @@ void get(char_data *ch, struct obj_data *obj_object, struct obj_data *sub_object
         WAIT_STATE(ch, PULSE_VIOLENCE);
         send_to_char("You suddenly feel very guilty...shame on you stealing from the dead!\r\n", ch);
 
-        char log_buf[MAX_STRING_LENGTH];
+        char log_buf[MAX_STRING_LENGTH] = {};
         sprintf(log_buf, "%s looted %d coins from %s", GET_NAME(ch), obj_object->obj_flags.value[0], sub_object->name);
         log(log_buf, ANGEL, LOG_MORTAL);
 
@@ -131,6 +131,7 @@ void get(char_data *ch, struct obj_data *obj_object, struct obj_data *sub_object
 
         if (sub_object->in_room && obj_object->obj_flags.type_flag != ITEM_MONEY && sub_object->carried_by != ch)
 	{ // Logging gold gets from corpses would just be too much.
+        char log_buf[MAX_STRING_LENGTH] = {};
   	    sprintf(log_buf, "%s gets %s[%d] from %s[%d]", 
 		    GET_NAME(ch),
 		    obj_object->name,
@@ -160,6 +161,7 @@ void get(char_data *ch, struct obj_data *obj_object, struct obj_data *sub_object
 	act("$n gets $p.", ch, obj_object, 0, TO_ROOM, INVIS_NULL);
         if (obj_object->obj_flags.type_flag != ITEM_MONEY)
         {
+            char log_buf[MAX_STRING_LENGTH] = {};
             sprintf(log_buf, "%s gets %s[%d] from room %d", GET_NAME(ch), obj_object->name, obj_index[obj_object->item_number].virt,
                 ch->in_room);
             log(log_buf, IMP, LOG_OBJECTS);
@@ -870,7 +872,7 @@ int do_get(char_data *ch, char *argument, int cmd)
                 {
                   csendf(ch, "Whoa!  The %s poofed into thin air!\r\n", obj_object->short_description);
 
-                  char log_buf[MAX_STRING_LENGTH];
+                  char log_buf[MAX_STRING_LENGTH] = {};
                   sprintf(log_buf, "%s poofed %s[%d] from %s[%d]",
                           GET_NAME(ch),
                           obj_object->short_description,
@@ -1164,6 +1166,7 @@ int do_drop(char_data *ch, char *argument, int cmd)
 
             if (tmp_object->obj_flags.type_flag != ITEM_MONEY)
             {
+              char log_buf[MAX_STRING_LENGTH] = {};
               sprintf(log_buf, "%s drops %s[%d] in room %d", GET_NAME(ch), tmp_object->name, obj_index[tmp_object->item_number].virt,ch->in_room);
               log(log_buf, IMP, LOG_OBJECTS);
               for(obj_data *loop_obj = tmp_object->contains; loop_obj; loop_obj = loop_obj->next_content)
@@ -1222,6 +1225,7 @@ int do_drop(char_data *ch, char *argument, int cmd)
           act("$n drops $p.", ch, tmp_object, 0, TO_ROOM, INVIS_NULL);
           if (tmp_object->obj_flags.type_flag != ITEM_MONEY)
           {
+            char log_buf[MAX_STRING_LENGTH] = {};
             sprintf(log_buf, "%s drops %s[%d] in room %d", GET_NAME(ch), tmp_object->name, obj_index[tmp_object->item_number].virt,ch->in_room);
             log(log_buf, IMP, LOG_OBJECTS);
             for(obj_data *loop_obj = tmp_object->contains; loop_obj; loop_obj = loop_obj->next_content)
@@ -2583,7 +2587,7 @@ int palm(char_data *ch, struct obj_data *obj_object, struct obj_data *sub_object
     }
   }
   move_obj(obj_object, ch);
-  char log_buf[MAX_STRING_LENGTH];
+  char log_buf[MAX_STRING_LENGTH] = {};
   if (sub_object && sub_object->in_room && obj_object->obj_flags.type_flag != ITEM_MONEY)
   { // Logging gold gets from corpses would just be too much.
     sprintf(log_buf, "%s palms %s[%d] from %s", GET_NAME(ch), obj_object->name, obj_index[obj_object->item_number].virt,

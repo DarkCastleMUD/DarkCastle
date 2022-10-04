@@ -915,6 +915,7 @@ int do_steal(char_data *ch, char *argument, int cmd)
           }
           if(!IS_NPC(victim))
           {
+            char log_buf[MAX_STRING_LENGTH] = {};
             sprintf(log_buf,"%s stole %s[%d] from %s",
                  GET_NAME(ch), obj->short_description,  
                  obj_index[obj->item_number].virt, GET_NAME(victim));

@@ -956,7 +956,7 @@ void reset_time(void)
 		break;
 	}
 	}
-
+	char log_buf[MAX_STRING_LENGTH] = {};
 	sprintf(log_buf, "Current Gametime: %dH %dD %dM %dY.",
 			time_info.hours, time_info.day,
 			time_info.month, time_info.year);
@@ -3828,6 +3828,7 @@ struct obj_data *read_object(int nr, FILE *fl, bool zz)
 	/* *** other flags *** */
 
 	fscanf(fl, "%c\n", &chk);
+	char log_buf[MAX_STRING_LENGTH] = {};
 	while (chk != 'S')
 	{
 		switch (chk) {
@@ -3961,6 +3962,7 @@ ifstream& operator>>(ifstream &in, obj_data *obj)
 
 	in >> chk;
 
+	char log_buf[MAX_STRING_LENGTH] = {};
 	while (chk != 'S')
 	{
 		switch (chk) {
@@ -4460,6 +4462,7 @@ void reset_zone(int zone)
 	last_cmd = last_mob = last_obj = last_percent = -1;
 
 	char buf[MAX_STRING_LENGTH];
+	char log_buf[MAX_STRING_LENGTH] = {};
 
 	if (zone_table[zone].died_this_tick == 0 && zone_is_empty(zone)) {
 		zone_table[zone].repops_without_deaths++;

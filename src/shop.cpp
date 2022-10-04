@@ -818,6 +818,7 @@ void boot_the_shops()
 
 	if(real_room( temp ) == NOWHERE)
 	{
+    char log_buf[MAX_STRING_LENGTH] = {};
 	  sprintf(log_buf, "BAD SHOP IN ROOM %d -- FIX THIS!", temp);
 	  log(log_buf, 0, LOG_MISC);
           /* Free the memory from bad shops */

@@ -283,6 +283,7 @@ int do_donate(char_data *ch, char *argument, int cmd)
  
   if (obj->obj_flags.type_flag != ITEM_MONEY)
   {
+     char log_buf[MAX_STRING_LENGTH] = {};
      sprintf(log_buf, "%s donates %s[%d]", GET_NAME(ch), obj->name, obj_index[obj->item_number].virt);
      log(log_buf, IMP, LOG_OBJECTS);
      for(obj_data *loop_obj = obj->contains; loop_obj; loop_obj = loop_obj->next_content)
