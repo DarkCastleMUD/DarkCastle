@@ -307,7 +307,7 @@ command_return_t do_force(char_data *ch, string argument, int cmd);
 command_return_t do_found(char_data *ch, char *argument, int cmd);
 command_return_t do_free_animal(char_data *ch, char *argument, int cmd);
 command_return_t do_freeze(char_data *ch, char *argument, int cmd);
-command_return_t do_fsave(char_data *ch, char *argument, int cmd);
+command_return_t do_fsave(char_data *ch, string argument, int cmd);
 command_return_t do_get(char_data *ch, char *argument, int cmd);
 command_return_t do_give(char_data *ch, char *argument, int cmd);
 command_return_t do_global(char_data *ch, char *argument, int cmd);
