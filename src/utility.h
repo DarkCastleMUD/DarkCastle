@@ -644,5 +644,6 @@ char * handle_ansi_(char * s, char_data * ch);
 void blackjack_prompt(char_data *ch, string& prompt, bool ascii);
 void show_string(struct descriptor_data *d, const char *input);
 void special_log(char *arg);
+int check_social( char_data *ch, string pcomm, int length);
 
 #endif /* UTILITY_H_ */
