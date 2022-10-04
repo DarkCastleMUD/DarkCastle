@@ -2,8 +2,12 @@
 | Level 103 wizard commands
 | 11/20/95 -- Azrack
 **********************/
-#include "wizard.h"
 
+#include <fmt/format.h>
+
+using namespace fmt;
+
+#include "wizard.h"
 #include "utility.h"
 #include "mobile.h"
 #include "player.h"
@@ -189,47 +193,46 @@ int do_disconnect(char_data *ch,  char *argument, int cmd)
     return eSUCCESS;
 }
 
-int do_fsave(char_data *ch, char *argument, int cmd)
+int do_fsave(char_data *ch, string argument, int cmd)
 {
-  char_data *vict;
-  char name[100], buf[400]; 
+  char_data *vict = {};
+  string name = {}, buf = {};
 
-  if(IS_NPC(ch))
+  if (IS_NPC(ch))
+  {
     return eFAILURE;
-
-  one_argument(argument, name);
-
-  if(!*name)
-    send_to_char("Who do you wish to force to save?\n\r", ch);
-
-  if(!(vict = get_char_vis(ch, name)))
-    send_to_char("No-one by that name here..\n\r", ch);
-
-  else {
-    /*if((GET_LEVEL(ch) <= GET_LEVEL(vict)) && !IS_NPC(vict)) {
-      send_to_char("Hahaha\n\r", ch);
-      sprintf(buf, "$n has failed to force you to save.");
-      act(buf,  ch, 0, vict, TO_VICT, 0);
-    }
-    else */{
-      if (ch->pcdata->stealth == FALSE) {
-        sprintf(buf, "$n has forced you to 'save'.");
-        act(buf,  ch, 0, vict, TO_VICT, 0);
-        strcpy(buf,"");
-        send_to_char("Ok.\n\r", ch);
-      }
-      do_save(vict, "", 9);
-      sprintf(buf,"%s just forced %s to save.", GET_NAME(ch),
-              GET_NAME(vict));
-      log(buf, GET_LEVEL(ch), LOG_GOD);
-    }
   }
-  return eSUCCESS;
+
+  tie(name, argument) = half_chop(argument);
+  if (name.empty())
+  {
+    send_to_char("Who do you wish to force to save?\r\n", ch);
+    return eFAILURE;
+  }
+
+  if (!(vict = get_char_vis(ch, name)))
+  {
+    send_to_char("No-one by that name here..\r\n", ch);
+    return eFAILURE;
+  }
+
+  if (ch->pcdata->stealth == FALSE)
+  {
+    buf = "$n has forced you to 'save'.";
+    act(buf, ch, 0, vict, TO_VICT, 0);
+    buf = {};
+    send_to_char("Ok.\r\n", ch);
+  }
+  do_save(vict, "", 9);
+  buf = format("{} just forced {} to save.", GET_NAME(ch), GET_NAME(vict));
+  log(buf, GET_LEVEL(ch), LOG_GOD);
+
+return eSUCCESS;
 }
 
 int do_fighting(char_data *ch, char *argument, int cmd)
 {
-  const int CLANTAG_LEN = MAX_CLAN_LEN+3; // "[Foobar]"
+  const int CLANTAG_LEN = MAX_CLAN_LEN + 3; // "[Foobar]"
   char_data *i;
   bool arenaONLY = false;
   int countFighters = 0;
@@ -241,38 +244,41 @@ int do_fighting(char_data *ch, char *argument, int cmd)
   clan_data *victim_clan = 0;
   char victim_clan_name[CLANTAG_LEN];
   victim_clan_name[0] = 0;
-  
+
   one_argument(argument, arg);
   if (!strcmp(arg, "arena"))
     arenaONLY = true;
 
-  for(i = combat_list; i; i = i->next_fighting) {
+  for (i = combat_list; i; i = i->next_fighting)
+  {
     // Don't show mobs fighting or people not in the arena when arena
     // keyword was specified.
-    if(IS_NPC(i)
-       || (arenaONLY && !IS_SET(world[i->in_room].room_flags, ARENA))) {
+    if (IS_NPC(i) || (arenaONLY && !IS_SET(world[i->in_room].room_flags, ARENA)))
+    {
       continue;
-    } else {
+    }
+    else
+    {
       countFighters++;
     }
-  
+
     // If they're in a clan
     ch_clan_name[0] = '\0';
     if ((ch_clan = get_clan(i)))
-      snprintf(ch_clan_name, CLANTAG_LEN, "[%s]", ch_clan->name);    
+      snprintf(ch_clan_name, CLANTAG_LEN, "[%s]", ch_clan->name);
 
-    if((victim_clan = get_clan(i->fighting)))
+    if ((victim_clan = get_clan(i->fighting)))
       snprintf(victim_clan_name, CLANTAG_LEN, "[%s]", victim_clan->name);
 
     snprintf(buf, 80, "%s %s fighting %s %s (%d)\n\r",
-	     GET_NAME(i), ch_clan_name,
-	     GET_NAME(i->fighting), victim_clan_name,
-	     world[i->in_room].number);
+             GET_NAME(i), ch_clan_name,
+             GET_NAME(i->fighting), victim_clan_name,
+             world[i->in_room].number);
     send_to_char(buf, ch);
   }
-  
-  
-  if(countFighters == 0) {
+
+  if (countFighters == 0)
+  {
     if (arenaONLY)
       send_to_char("No fighting characters found in the arena.\n\r", ch);
     else
