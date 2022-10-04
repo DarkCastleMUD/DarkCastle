@@ -3803,6 +3803,11 @@ char_data *get_mob_vnum(int vnum) {
 	}
 	return NULL;
 }
+char_data *get_char_vis(char_data *ch, const string& name)
+{
+	return get_char_vis(ch, name.c_str());
+}
+
 
 char_data *get_char_vis(char_data *ch, const char *name) {
 	char_data *i;
