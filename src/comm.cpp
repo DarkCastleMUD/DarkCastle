@@ -97,8 +97,8 @@ extern const char *sector_types[];
 extern char *time_look[];
 extern char *sky_look[];
 extern struct room_data **world_array;
-extern char last_char_name[MAX_INPUT_LENGTH];
-extern char last_processed_cmd[MAX_INPUT_LENGTH];
+extern string last_char_name;
+extern string last_processed_cmd;
 extern struct index_data *obj_index;
 
 void check_champion_and_website_who_list(void);
