@@ -13,6 +13,11 @@
 #include "player.h"
 #include "returnvals.h"
 
+#include <fmt/format.h>
+
+using namespace std;
+using namespace fmt;
+
 int do_plats (char_data *ch, char *argument, int cmd)
 {
    char_data *i;
@@ -50,48 +55,59 @@ int do_plats (char_data *ch, char *argument, int cmd)
    return eSUCCESS;
 }
 
-int do_force(char_data *ch, char *argument, int cmd)
+int do_force(char_data *ch, string argument, int cmd = CMD_FORCE)
 {
-  struct descriptor_data *i;
-  struct descriptor_data *next_i;
-  char_data *vict;
-  char name[100], to_force[400],buf[400]; 
+  struct descriptor_data *i = {};
+  struct descriptor_data *next_i = {};
+  char_data *vict = {};
+  string name = {}, to_force = {}, buf = {};
 
-  if(IS_NPC(ch))
+  if (IS_NPC(ch))
+  {
     return eFAILURE;
-  if(!has_skill(ch, COMMAND_FORCE) && cmd != CMD_FORCE) {
-        send_to_char("Huh?\r\n", ch);
-        return eFAILURE;
   }
 
+  if (!has_skill(ch, COMMAND_FORCE) && cmd != CMD_FORCE)
+  {
+    ch->send("Huh?\r\n");
+    return eFAILURE;
+  }
 
-  half_chop(argument, name, to_force);
+  tie(name, to_force) = half_chop(argument);
 
-  if(!*name || !*to_force)
-    send_to_char("Who do you wish to force to do what?\n\r", ch);
-
-  else if(str_cmp("all", name)) {
-    if(!(vict = get_char_vis(ch, name)))
+  if (name.empty() || to_force.empty())
+  {
+    ch->send("Who do you wish to force to do what?\r\n");
+    return eFAILURE;
+  }
+  else if (name != "all")
+  {
+    if (!(vict = get_char_vis(ch, name)))
       send_to_char("No one by that name here..\n\r", ch);
-    else {
-      if (GET_LEVEL(ch) < GET_LEVEL(vict) && IS_NPC(vict)) {
+    else
+    {
+      if (GET_LEVEL(ch) < GET_LEVEL(vict) && IS_NPC(vict))
+      {
         send_to_char("Now doing that would just tick off the IMPS!\n\r", ch);
-        sprintf(buf, "%s just tried to force %s to, %s", GET_NAME(ch), GET_NAME(vict),to_force);
+        buf = format("{} just tried to force {} to, {}", GET_NAME(ch), GET_NAME(vict), to_force);
         log(buf, OVERSEER, LOG_GOD);
         return eSUCCESS;
       }
-      if((GET_LEVEL(ch) <= GET_LEVEL(vict)) && !IS_NPC(vict)) { 
+      if ((GET_LEVEL(ch) <= GET_LEVEL(vict)) && !IS_NPC(vict))
+      {
         send_to_char("Why be forceful?\n\r", ch);
-        sprintf(buf, "$n has failed to force you to '%s'.", to_force);
-        act(buf,  ch, 0, vict, TO_VICT, 0);
+        buf = format("$n has failed to force you to '{}'.", to_force);
+        act(buf, ch, 0, vict, TO_VICT, 0);
       }
-      else {
-        if(ch->pcdata->stealth == FALSE) {
-          sprintf(buf, "$n has forced you to '%s'.", to_force);
-          act(buf,  ch, 0, vict, TO_VICT, 0);
-          send_to_char("Ok.\n\r", ch);
+      else
+      {
+        if (ch->pcdata->stealth == FALSE)
+        {
+          buf = format("$n has forced you to '{}'.", to_force);
+          act(buf, ch, 0, vict, TO_VICT, 0);
+          send_to_char("Ok.\r\n", ch);
         }
-        sprintf(buf,"%s just forced %s to %s.", GET_NAME(ch), 
+        buf = format("{} just forced %s to %s.", GET_NAME(ch),
                 GET_NAME(vict), to_force);
         command_interpreter(vict, to_force);
         log(buf, GET_LEVEL(ch), LOG_GOD);
@@ -99,31 +115,35 @@ int do_force(char_data *ch, char *argument, int cmd)
     }
   }
 
-  else { /* force all */
-    if(GET_LEVEL(ch) < OVERSEER) {
+  else
+  { /* force all */
+    if (GET_LEVEL(ch) < OVERSEER)
+    {
       send_to_char("Not gonna happen.\n\r", ch);
       return eFAILURE;
     }
-    for(i = descriptor_list; i; i = next_i) {
-       next_i = i->next;
-       if(i->character != ch && !i->connected) {
-         vict = i->character;
-         if(GET_LEVEL(ch) <= GET_LEVEL(vict))
-           continue;
-         else {
-           if(ch->pcdata->stealth == FALSE || GET_LEVEL(ch) < 109) {
-             sprintf(buf, "$n has forced you to '%s'.", to_force);
-             act(buf,  ch, 0, vict, TO_VICT, 0);
-           }
-           command_interpreter(vict, to_force);
-         }
-       }
+    for (i = descriptor_list; i; i = next_i)
+    {
+      next_i = i->next;
+      if (i->character != ch && !i->connected)
+      {
+        vict = i->character;
+        if (GET_LEVEL(ch) <= GET_LEVEL(vict))
+          continue;
+        else
+        {
+          if (ch->pcdata->stealth == FALSE || GET_LEVEL(ch) < 109)
+          {
+            buf = format("$n has forced you to '{}'.", to_force);
+            act(buf, ch, 0, vict, TO_VICT, 0);
+          }
+          command_interpreter(vict, to_force);
+        }
+      }
     }
     send_to_char("Ok.\n\r", ch);
-    sprintf(buf,"%s just forced all to %s.", GET_NAME(ch), to_force);
+    buf = format("{} just forced all to {}.", GET_NAME(ch), to_force);
     log(buf, GET_LEVEL(ch), LOG_GOD);
   }
-   return eSUCCESS;
+  return eSUCCESS;
 }
-
-
