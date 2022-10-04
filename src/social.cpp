@@ -29,92 +29,105 @@ struct social_messg * soc_mess_list;  // head of social array
 int32_t num_socials;                 // number of actual socials (50 = 0-49)
 int32_t social_array_size;           // size of actual array (since we allocate in chunks)
 
-struct social_messg *find_social(char *arg);
+struct social_messg *find_social(string arg);
 
-int check_social( char_data *ch, char *pcomm, int length, char *arg )
+int check_social(char_data *ch, string pcomm, int length)
 {
-    char buf[MAX_INPUT_LENGTH];
-    struct social_messg *action = 0;
-    char_data *vict;
-//    char argz[MAX_INPUT_LENGTH];
-  //  pcomm = one_argument(pcomm, argz);
-    if (*arg) arg++;
-    int i=0;
-     while (*(pcomm+i)!='\0')
-        if (*(pcomm+i)==' ')
-	  { *(pcomm+i) = '\0';   break;}
-	else
-	  i++;
-    if(!(action = find_social(pcomm)))
-      return SOCIAL_FALSE;
+  string arg = {}, buf = {};
+  struct social_messg *action = {};
+  char_data *vict = {};
 
-    if(!IS_NPC(ch) && IS_SET(ch->pcdata->punish, PUNISH_NOEMOTE)) {
-	send_to_char( "You are anti-social!\n\r", ch );
-	return SOCIAL_TRUE;
-    }
+  tie(pcomm, arg) = half_chop(pcomm);
 
-    switch(GET_POS(ch)) {
-    case POSITION_DEAD:
-	send_to_char( "Lie still; you are DEAD.\n\r", ch );
-	return SOCIAL_TRUE;
+  if (!(action = find_social(pcomm)))
+  {
+    return SOCIAL_FALSE;
+  }
 
-    case POSITION_STUNNED:
-	send_to_char( "You are too stunned to do that.\n\r", ch );
-	return SOCIAL_TRUE;
-
-    case POSITION_SLEEPING:
-	send_to_char( "In your dreams, or what?\n\r", ch );
-	return SOCIAL_TRUE;
-    }
-
-   if (IS_SET(world[ch->in_room].room_flags, QUIET))
-   {
-    send_to_char ("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
+  if (!IS_NPC(ch) && IS_SET(ch->pcdata->punish, PUNISH_NOEMOTE))
+  {
+    send_to_char("You are anti-social!\n\r", ch);
     return SOCIAL_TRUE;
-   }
+  }
 
-   if (action->char_found)
-	one_argument(arg, buf);
-    else
-	*buf = '\0';
+  switch (GET_POS(ch))
+  {
+  case POSITION_DEAD:
+    send_to_char("Lie still; you are DEAD.\n\r", ch);
+    return SOCIAL_TRUE;
 
-    if(!*buf)
+  case POSITION_STUNNED:
+    send_to_char("You are too stunned to do that.\n\r", ch);
+    return SOCIAL_TRUE;
+
+  case POSITION_SLEEPING:
+    send_to_char("In your dreams, or what?\n\r", ch);
+    return SOCIAL_TRUE;
+  }
+
+  if (IS_SET(world[ch->in_room].room_flags, QUIET))
+  {
+    send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
+    return SOCIAL_TRUE;
+  }
+
+  if (action->char_found)
+  {
+    tie(buf, arg) = half_chop(arg);
+  }
+  else
+  {
+    buf = {};
+  }
+    
+
+  if (buf.empty() == false)
+  {
+    if (action->char_no_arg)
     {
-	if(action->char_no_arg)
-	  act(action->char_no_arg, ch, 0, 0, TO_CHAR, 0);
-	if(action->others_no_arg)
-	  act(action->others_no_arg, ch, 0, 0, TO_ROOM,
-	    (action->hide)?INVIS_NULL:0);
-	return SOCIAL_TRUE_WITH_NOISE;
+      act(action->char_no_arg, ch, 0, 0, TO_CHAR, 0);
     }
 
-    if(!(vict = get_char_room_vis(ch, buf))) {
-	if(action->not_found)
-	  act(action->not_found, ch, 0, 0, TO_CHAR, 0);
+    if (action->others_no_arg)
+    {
+      act(action->others_no_arg, ch, 0, 0, TO_ROOM, (action->hide) ? INVIS_NULL : 0);
     }
-    else if(vict == ch) {
-	if(action->char_auto)
-	  act(action->char_auto, ch, 0, 0, TO_CHAR, 0);
-	if(action->others_auto)
-	  act(action->others_auto, ch, 0, 0, TO_ROOM,
-	    (action->hide)?INVIS_NULL:0);
-    }
-    else if(GET_POS(vict) < action->min_victim_position) {
-	act("$N is not in a proper position for that.",
-	    ch,0,vict,TO_CHAR, 0);
-    }
-    else {
-	if(action->char_found)
-	  act(action->char_found, ch, 0, vict, TO_CHAR, 0);
-	if(action->others_found)
-	  act(action->others_found, ch, 0, vict, TO_ROOM, 
-	    NOTVICT|((action->hide)?INVIS_NULL:0));
-	if(action->vict_found)
-	  act(action->vict_found, ch, 0, vict, TO_VICT,
-	    (action->hide)?INVIS_NULL:0);
-    }
-
     return SOCIAL_TRUE_WITH_NOISE;
+  }
+
+  if (!(vict = get_char_room_vis(ch, buf)))
+  {
+    if (action->not_found)
+    {
+      act(action->not_found, ch, 0, 0, TO_CHAR, 0);
+    }
+  }
+  else if (vict == ch)
+  {
+    if (action->char_auto)
+      act(action->char_auto, ch, 0, 0, TO_CHAR, 0);
+    if (action->others_auto)
+      act(action->others_auto, ch, 0, 0, TO_ROOM,
+          (action->hide) ? INVIS_NULL : 0);
+  }
+  else if (GET_POS(vict) < action->min_victim_position)
+  {
+    act("$N is not in a proper position for that.",
+        ch, 0, vict, TO_CHAR, 0);
+  }
+  else
+  {
+    if (action->char_found)
+      act(action->char_found, ch, 0, vict, TO_CHAR, 0);
+    if (action->others_found)
+      act(action->others_found, ch, 0, vict, TO_ROOM,
+          NOTVICT | ((action->hide) ? INVIS_NULL : 0));
+    if (action->vict_found)
+      act(action->vict_found, ch, 0, vict, TO_VICT,
+          (action->hide) ? INVIS_NULL : 0);
+  }
+
+  return SOCIAL_TRUE_WITH_NOISE;
 }
 
 char *fread_social_string(FILE *fl)
@@ -254,13 +267,13 @@ void boot_social_messages(void)
   dc_fclose(fl);
 }
 
-struct social_messg * find_social(char *arg)
+struct social_messg * find_social(string arg)
 {
 // now uses a linear search
   int i;
 
   for(i = 1; i < num_socials; i++)
-	if (!compare_social_search((void*)arg,(void*)&soc_mess_list[i]))
+	if (!compare_social_search((void*)arg.c_str(),(void*)&soc_mess_list[i]))
 	  return &soc_mess_list[i];
 
 
