@@ -820,11 +820,11 @@ void DC::game_loop(void)
           // ->snooping before you check snooping->char:P
           if (!comm.empty() && comm[0] == '%' && d->snooping && d->snooping->character)
           {
-            command_interpreter(d->snooping->character, comm.substr(1).data());
+            command_interpreter(d->snooping->character, comm.substr(1));
           }
           else
           {
-            command_interpreter(d->character, comm.data()); /* send it to interpreter */
+            command_interpreter(d->character, comm); /* send it to interpreter */
           }
           PerfTimers["command"].stop();
 
