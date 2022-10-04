@@ -314,6 +314,8 @@ int main(int argc, char **argv)
               cerr << pfile.path().c_str() << endl;
               do_linkload(ch, path.data(), CMD_DEFAULT);
               process_output(d);
+              do_force(ch, string(path.data() + string(" save")).c_str(), CMD_FORCE);
+              process_output(d);
             }
             else
             {
@@ -364,6 +366,9 @@ int main(int argc, char **argv)
         }
       }
     }
+
+    do_force(ch, "all save", CMD_FORCE);
+    process_output(d);
 
     if (argv[1] == string("leaderboard"))
     {
