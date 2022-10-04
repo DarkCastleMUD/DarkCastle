@@ -18,20 +18,16 @@
 /***************************************************************************/
 /* $Id: interp.cpp,v 1.200 2015/06/14 02:38:12 pirahna Exp $ */
 
-extern "C"
-{
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
 #include <stdio.h>
 #include <assert.h>
-/*#include "memory.h"*/
-}
 
 #include <string>
 #include <tuple>
 
-using namespace std;
+#include <fmt/format.h>
 
 #include "structs.h" // MAX_STRING_LENGTH
 #include "character.h" // POSITION_*
@@ -51,9 +47,11 @@ using namespace std;
 #include "CommandStack.h"
 #include "const.h"
 
+using namespace std;
+using namespace fmt;
+
 #define SKILL_HIDE 337
 
-int check_social( char_data *ch, char *pcomm, int length, char *arg );
 int clan_guard(char_data *ch, struct obj_data *obj, int cmd, const char *arg, char_data *owner);
 int check_ethereal_focus(char_data *ch, int trigger_type); // class/cl_mage.cpp
 
@@ -64,9 +62,9 @@ extern CWorld world;
 // globals to store last command that was done.
 // this is used for debugging.  We output it in case of a crash
 // to the log files.  (char name is so long, in case it was a mob)
-char last_processed_cmd[MAX_INPUT_LENGTH];
-char last_char_name[MAX_INPUT_LENGTH];
-int  last_char_room;
+string last_processed_cmd = {};
+string last_char_name = {};
+int  last_char_room = {};
 unsigned int cmd_size = 0;
 
 void update_wizlist(char_data *ch);
@@ -430,7 +428,7 @@ struct command_info cmd_info[] =
         {"unarchive", do_unarchive, nullptr, POSITION_DEAD, 108, CMD_DEFAULT, 0, 1},
         {"stealth", do_stealth, nullptr, POSITION_DEAD, OVERSEER, CMD_DEFAULT, 0, 1},
         {"disconnect", do_disconnect, nullptr, POSITION_DEAD, 106, CMD_DEFAULT, 0, 1},
-        {"force", do_force, nullptr, POSITION_DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1},
+        {"force", nullptr, do_force, POSITION_DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1},
         {"pardon", do_pardon, nullptr, POSITION_DEAD, OVERSEER, CMD_DEFAULT, 0, 1},
         {"goto", do_goto, nullptr, POSITION_DEAD, 102, CMD_DEFAULT, 0, 1},
         {"restore", do_restore, nullptr, POSITION_DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1},
@@ -661,7 +659,7 @@ void add_command_to_radix(struct command_info *cmd)
 }
 
 
-int len_cmp(char *s1, char *s2)
+int len_cmp(const char *s1, const char *s2)
 {
   for( ; *s1 && *s1 != ' '; s1++, s2++) 
     if(*s1 != *s2)
@@ -671,7 +669,7 @@ int len_cmp(char *s1, char *s2)
 }
 
 
-struct command_info *find_cmd_in_radix(char *arg)
+struct command_info *find_cmd_in_radix(const char *arg)
 {
   struct cmd_hash_info *curr;
   struct cmd_hash_info *next;
@@ -707,7 +705,7 @@ int do_imotd(char_data *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-int command_interpreter(char_data *ch, char *pcomm, bool procced)
+int command_interpreter(char_data *ch, string pcomm, bool procced)
 {
   CommandStack cstack;
 
@@ -716,7 +714,7 @@ int command_interpreter(char_data *ch, char *pcomm, bool procced)
     // Prevent errors from showing up multiple times per loop
     if (cstack.getOverflowCount() < 2)
     {
-      if (ch && pcomm && GET_NAME(ch))
+      if (ch != nullptr && pcomm.empty() == false && GET_NAME(ch) != nullptr)
       {
         logf(IMMORTAL, LOG_BUG, "Command stack exceeded. depth: %d, max_depth: %d, name: %s, cmd: %s", cstack.getDepth(), cstack.getMax(), GET_NAME(ch), pcomm);
       }
@@ -731,17 +729,17 @@ int command_interpreter(char_data *ch, char *pcomm, bool procced)
   int look_at;
   int retval;
   struct command_info *found = 0;
-  char buf[100];
+  string buf;
 
   // Handle logged players.
   if (IS_PC(ch) && IS_SET(ch->pcdata->punish, PUNISH_LOG))
   {
-    sprintf(log_buf, "Log %s: %s", GET_NAME(ch), pcomm);
-    log(log_buf, 110, LOG_PLAYER, ch);
+    buf = format("Log {}: {}", GET_NAME(ch), pcomm);
+    log(buf, 110, LOG_PLAYER, ch);
   }
 
   // Implement freeze command.
-  if (!IS_NPC(ch) && IS_SET(ch->pcdata->punish, PUNISH_FREEZE) && str_cmp(pcomm, "quit"))
+  if (IS_PC(ch) && IS_SET(ch->pcdata->punish, PUNISH_FREEZE) && pcomm != "quit")
   {
     send_to_char("You've been frozen by an immortal.\r\n", ch);
     return eSUCCESS;
@@ -768,23 +766,20 @@ int command_interpreter(char_data *ch, char *pcomm, bool procced)
 
   // Strip initial spaces OR tab characters and parse command word.
   // Translate to lower case.  We need to translate tabs for the MOBProgs to work
-  if (ch && ch->desc && ch->desc->connected == conn::EDITING)
+  if (ch == nullptr || ch->desc == nullptr || ch->desc->connected != conn::EDITING)
   {
-    ;
-  }
-  else
-  {
-    while (*pcomm == ' ' || *pcomm == '\t')
-      pcomm++;
+    pcomm = ltrim(pcomm);
   }
 
   // MOBprogram commands weeded out
-  if (*pcomm == 'm' && *(pcomm + 1) == 'p')
+  if (pcomm.size() >= 2 && tolower(pcomm[0]) == 'm' && tolower(pcomm[1]) == 'p')
+  {
     if (ch->desc)
     {
       send_to_char("Huh?\r\n", ch);
       return eSUCCESS;
     }
+  }
 
   for (look_at = 0; pcomm[look_at] > ' '; look_at++)
     pcomm[look_at] = LOWER(pcomm[look_at]);
@@ -794,20 +789,20 @@ int command_interpreter(char_data *ch, char *pcomm, bool procced)
 
   // if we got this far, we're going to play with the command, so put
   // it into the debugging globals
-  strncpy(last_processed_cmd, pcomm, (MAX_INPUT_LENGTH - 1));
-  strncpy(last_char_name, GET_NAME(ch), (MAX_INPUT_LENGTH - 1));
+  last_processed_cmd = pcomm;
+  last_char_name = GET_NAME(ch);
   last_char_room = ch->in_room;
 
-  if (pcomm && *pcomm)
+  if (!pcomm.empty())
   {
-    retval = oprog_command_trigger(pcomm, ch, &pcomm[look_at]);
+    retval = oprog_command_trigger(pcomm.c_str(), ch, &pcomm[look_at]);
     if (SOMEONE_DIED(retval) || IS_SET(retval, eEXTRA_VALUE))
       return retval;
   }
 
   // Look for command in command table.
   // Old method used a linear search. *yuck* (Sadus)
-  if ((found = find_cmd_in_radix(pcomm)))
+  if ((found = find_cmd_in_radix(pcomm.c_str())))
   {
     if (GET_LEVEL(ch) >= found->minimum_level && (found->command_pointer != nullptr || found->command_pointer2 != nullptr))
     {
@@ -952,13 +947,12 @@ int command_interpreter(char_data *ch, char *pcomm, bool procced)
       extern bool selfpurge;
       if (!SOMEONE_DIED(retval) && !selfpurge)
       {
-        sprintf(buf, "%s%s", BOLD, NTEXT);
-        send_to_char(buf, ch);
+        ch->send(format("{}{}", BOLD, NTEXT));
       }
       // This call is here to prevent gcc from tail-chaining the
       // previous call, which screws up the debugger call stack.
       // -- Furey
-      number(0, 0);
+      //number(0, 0);
 
       return retval;
     }
@@ -971,7 +965,7 @@ int command_interpreter(char_data *ch, char *pcomm, bool procced)
     return eSUCCESS;
   }
   // Check social table
-  if ((retval = check_social(ch, pcomm, look_at, &pcomm[look_at])))
+  if ((retval = check_social(ch, pcomm, look_at)))
   {
     if (SOCIAL_TRUE_WITH_NOISE == retval)
       return check_ethereal_focus(ch, ETHEREAL_FOCUS_TRIGGER_SOCIAL);
