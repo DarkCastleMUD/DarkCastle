@@ -500,7 +500,7 @@ struct command_info cmd_info[] =
         {"osave", do_osave, nullptr, POSITION_DEAD, ANGEL, CMD_DEFAULT, 0, 1},
         {"rstat", do_rstat, nullptr, POSITION_DEAD, ANGEL, CMD_DEFAULT, 0, 1},
         {"possess", do_possess, nullptr, POSITION_DEAD, 106, CMD_DEFAULT, 0, 1},
-        {"fsave", do_fsave, nullptr, POSITION_DEAD, 104, CMD_DEFAULT, 0, 1},
+        {"fsave", nullptr, do_fsave, POSITION_DEAD, 104, CMD_DEFAULT, 0, 1},
         {"zedit", do_zedit, nullptr, POSITION_DEAD, ANGEL, CMD_DEFAULT, 0, 1},
         {"colors", do_colors, nullptr, POSITION_DEAD, IMMORTAL, CMD_DEFAULT, 0, 1},
         {"colours", do_colors, nullptr, POSITION_DEAD, IMMORTAL, CMD_DEFAULT, 0, 1},
