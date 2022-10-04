@@ -924,8 +924,7 @@ int command_interpreter(char_data *ch, string pcomm, bool procced)
             (GET_LEVEL(ch) >= 100 || (ch->pcdata->multi == true && dc.cf.allow_multi == false)) &&
             IS_SET(ch->pcdata->punish, PUNISH_LOG) == false)
         {
-          sprintf(log_buf, "Log %s: %s", GET_NAME(ch), pcomm);
-          log(log_buf, 110, LOG_PLAYER, ch);
+          log(format("Log {}: {}", GET_NAME(ch), pcomm), 110, LOG_PLAYER, ch);
         }
       }
     
