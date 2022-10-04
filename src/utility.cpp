@@ -79,9 +79,6 @@ extern std::map<int, std::map<uint8_t, std::string> > professions;
 // extern funcs
 clan_data * get_clan(char_data *);
 void release_message(char_data *ch);
-
-// local vars
-char    log_buf[MAX_STRING_LENGTH];
 struct timer_data *timer_list = NULL;
 
 // local funcs

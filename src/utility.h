@@ -40,7 +40,6 @@
 using namespace std;
 
 extern struct weather_data weather_info;
-extern char log_buf[MAX_STRING_LENGTH];
 
 void check_timer();
 
