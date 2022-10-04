@@ -40,7 +40,7 @@ char_data *origsing = NULL;
 using namespace std;
 
 extern struct zone_data *zone_table;
-extern int check_social(char_data *ch, char *pcomm, int length, char *arg);
+
 void check_eq(char_data *ch);
 
 //        uint8_t beats;     /* Waiting time after ki */
@@ -284,7 +284,7 @@ int do_sing(char_data *ch, char *arg, int cmd) {
 	vector<songInfo>::iterator i;
 
 	if (IS_PC(ch) && GET_CLASS(ch) != CLASS_BARD && GET_LEVEL(ch) < IMMORTAL) {
-		check_social(ch, "sing", 0, arg); // do the social:)
+		check_social(ch, "sing", 0); // do the social:)
 		return eSUCCESS;
 	}
 
