@@ -861,6 +861,7 @@ void save_char_obj (char_data *ch)
 
   if (!(fpsave = dc_fopen(strsave, "wb"))) {
     send_to_char("Warning!  Did not save.  Could not open file.  Contact a god, do not logoff.\n\r", ch);
+    char log_buf[MAX_STRING_LENGTH] = {};
     sprintf(log_buf, "Could not open file in save_char_obj. '%s'", strsave);
     perror(log_buf);
     log(log_buf, ANGEL, LOG_BUG);
@@ -896,6 +897,8 @@ void save_char_obj (char_data *ch)
   {
     if(fpsave != NULL)
       dc_fclose(fpsave);
+      
+    char log_buf[MAX_STRING_LENGTH] = {};
     sprintf(log_buf, "mv -f %s %s", strsave, name); 
     system(log_buf);
   }
@@ -903,6 +906,7 @@ void save_char_obj (char_data *ch)
   {
     if(fpsave != NULL)
       dc_fclose(fpsave);
+    char log_buf[MAX_STRING_LENGTH] = {};
     sprintf(log_buf, "Save_char_obj: %s", strsave);
     send_to_char ("WARNING: file problem. You did not save!", ch);
     perror(log_buf);
@@ -918,6 +922,7 @@ void save_char_obj (char_data *ch)
 // just error crap to avoid using "goto" like we were
 void load_char_obj_error(FILE * fpsave, char strsave[MAX_INPUT_LENGTH])
 {
+  char log_buf[MAX_STRING_LENGTH] = {};
   sprintf(log_buf, "Load_char_obj: %s", strsave);
   perror(log_buf);
   log(log_buf, ANGEL, LOG_BUG);
