@@ -100,6 +100,7 @@ char_data *get_char_room_vis(char_data *ch, const char *name);
 char_data *get_char_room_vis(char_data *ch, string name);
 char_data *get_rand_other_char_room_vis(char_data *ch);
 char_data *get_char_vis(char_data *ch, const char *name);
+char_data *get_char_vis(char_data *ch, const string& name);
 char_data *get_pc_vis(char_data *ch, const char *name);
 char_data *get_pc_vis_exact(char_data *ch, const char *name);
 char_data *get_mob_vis(char_data *ch, char *name);
