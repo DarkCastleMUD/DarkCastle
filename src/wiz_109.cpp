@@ -30,6 +30,8 @@
   #include "bandwidth.h"
 #endif
 
+using namespace fmt;
+
 void AuctionHandleDelete(string name);
 
 int do_linkload(char_data *ch, char *arg, int cmd)
@@ -431,6 +433,25 @@ int do_shutdown(char_data *ch, char *argument, int cmd)
         _shutdown = 1;
     }
     else if(!strcmp(arg1, "hot")) {
+      for(auto& ch : DC::instance().character_list)
+      {
+        if (IS_PC(ch))
+        {
+           vector<char_data*> followers = ch->getFollowers();
+           for(auto& follower : followers)
+           {
+            if (IS_NPC(follower) && IS_AFFECTED(follower, AFF_CHARM))
+            {
+              if (follower->carrying != nullptr)
+              {
+                ch->send(format("Player {} has charmie {} with equipment.\r\n", GET_NAME(ch), GET_NAME(follower)));
+                return eFAILURE;
+              }
+            }
+           }
+        }
+      }
+
         do_not_save_corpses = 1;
         sprintf(buf, "Hot reboot by %s.\n\r", GET_SHORT(ch) );
         send_to_all(buf);
@@ -473,8 +494,29 @@ int do_shutdown(char_data *ch, char *argument, int cmd)
         	return eFAILURE; // this should never be reached
         }
     }
-    else
-        send_to_char("Go shut down someone your own size.\n\r", ch);
+    else if(!strcmp(arg1, "check"))
+    {
+      for(auto& ch : DC::instance().character_list)
+      {
+        if (IS_PC(ch))
+        {
+           vector<char_data*> followers = ch->getFollowers();
+           for(auto& follower : followers)
+           {
+            if (IS_NPC(follower) && IS_AFFECTED(follower, AFF_CHARM))
+            {
+              if (follower->carrying != nullptr)
+              {
+                ch->send(format("Player {} has charmie {} with equipment. Use Force to override.\r\n", GET_NAME(ch), GET_NAME(follower)));
+                return eFAILURE;
+              }
+            }
+           }
+        }
+      }
+      ch->send("Ok.\r\n");
+      return eSUCCESS;
+    }
   return eSUCCESS;
 }
 
