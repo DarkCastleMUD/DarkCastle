@@ -81,7 +81,7 @@ int check_social(char_data *ch, string pcomm, int length)
   }
     
 
-  if (buf.empty() == false)
+  if (buf.empty())
   {
     if (action->char_no_arg)
     {
