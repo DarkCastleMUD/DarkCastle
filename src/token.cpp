@@ -27,7 +27,6 @@ extern "C"
 #include "player.h"    // PLR_ANSI PLR_VT100
 #include "handler.h"   // fname()
 #include "token.h"     // fname()
-#include "machine.h"
 #include "connect.h"
 
 #undef DEBUG_TOKEN

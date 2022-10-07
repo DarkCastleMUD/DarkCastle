@@ -40,7 +40,6 @@
 #include "connect.h" // descriptor_data
 #include "handler.h" // FIND_CHAR_ROOM
 #include "interp.h" // do_return
-#include "machine.h" // index
 #include "act.h"
 #include "isr.h"
 #include "race.h"

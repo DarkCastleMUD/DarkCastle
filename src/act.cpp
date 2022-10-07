@@ -19,7 +19,6 @@
 #include "terminal.h"
 #include "handler.h"
 #include "obj.h"
-#include "machine.h"
 #include "connect.h"
 #include "act.h"
 #include "mobile.h"
