@@ -26,3 +26,5 @@ src/dcastle_autogen/moc_predefs.h
 src/dcastle_autogen/mocs_compilation.cpp
 src/Makefile
 src/*.a
+src/*_autogen/
+
