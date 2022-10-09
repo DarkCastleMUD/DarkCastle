@@ -20,7 +20,6 @@ src/dcastle.master
 src/CMakeFiles
 src/cmake_install.cmake
 src/CMakeCache.txt
-src/CMakeLists.txt
 src/.qt/QtDeploySupport.cmake
 src/dcastle_autogen/moc_predefs.h
 src/dcastle_autogen/mocs_compilation.cpp
