@@ -15,7 +15,6 @@ jobs:
     - uses: actions/checkout@v2
     - name: install ubuntu software
       run: |
-        #sudo dpkg --add-architecture i386
         sudo apt update
         sudo apt install gcc-10-multilib g++-10-multilib gcc-multilib
         sudo apt install g++-multilib scons libcurl4
@@ -30,5 +29,6 @@ jobs:
     - name: make
       run: |
         cd src
-        scons -j4
+        cmake .
+        make -j
 
