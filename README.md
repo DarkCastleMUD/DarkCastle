@@ -18,26 +18,18 @@ cd DarkCastle
 Now we follow most of the steps listed in .github/workflows/ccpp.yml
 
 ```
-  sudo dpkg --add-architecture i386
   sudo apt update
   sudo apt install gcc-10-multilib g++-10-multilib gcc-multilib
   sudo apt install g++-multilib scons libcurl4:i386
-  sudo apt install libpq-dev:i386 libpq5:i386 libcurl4-openssl-dev:i386
-  sudo apt install unzip zlib1g-dev:i386
-  sudo apt install libfmt-dev:i386
+  sudo apt install libpq-dev libpq5 libcurl4-openssl-dev
+  sudo apt install unzip zlib1g-dev
+  sudo apt install libfmt-dev
 ```
 
 Install cmake and gdb
 
 ```
 sudo apt install cmake gdb
-```
-
-Need to set FLAGS to build 32 bit fmt lib
-
-```
-export CFLAGS=" -m32"
-export CXXFLAGS=" -m32"
 ```
 
 Install fmt lib
@@ -54,7 +46,8 @@ Now build the DarkCastle project
 
 ```
 cd ../src
-scons -j4
+cmake .
+make -j
 ```
 
 Run DarkCastle server
