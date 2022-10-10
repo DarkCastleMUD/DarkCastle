@@ -26,4 +26,4 @@ src/dcastle_autogen/mocs_compilation.cpp
 src/Makefile
 src/*.a
 src/*_autogen/
-
+src/version.h
