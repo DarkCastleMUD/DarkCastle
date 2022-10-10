@@ -117,3 +117,17 @@ debug.cpp
 target_link_libraries(dcastle PRIVATE DC Qt6::Core pq fmt crypt)
 target_link_libraries(debug PRIVATE DC Qt6::Core pq fmt crypt)
 
+install(PROGRAMS dcastle RENAME dcastle.${VERSION} DESTINATION /srv/dcastle_test/bin/)
+install(PROGRAMS debug RENAME debug.${VERSION} DESTINATION /srv/dcastle_test/bin/)
+install(CODE "execute_process(COMMAND ln -sf dcastle.${VERSION} /srv/dcastle_test/bin/dcastle)")
+install(CODE "execute_process(COMMAND ln -sf debug.${VERSION} /srv/dcastle_test/bin/debug)")
+
+install(PROGRAMS dcastle RENAME dcastle.${VERSION} DESTINATION /srv/dcastle/bin/)
+install(PROGRAMS debug RENAME debug.${VERSION} DESTINATION /srv/dcastle/bin/)
+install(CODE "execute_process(COMMAND ln -sf dcastle.${VERSION} /srv/dcastle/bin/dcastle)")
+install(CODE "execute_process(COMMAND ln -sf debug.${VERSION} /srv/dcastle/bin/debug)")
+
+install(PROGRAMS dcastle RENAME dcastle.${VERSION} DESTINATION /srv/dcastle2/bin/)
+install(PROGRAMS debug RENAME debug.${VERSION} DESTINATION /srv/dcastle2/bin/)
+install(CODE "execute_process(COMMAND ln -sf dcastle.${VERSION} /srv/dcastle2/bin/dcastle)")
+install(CODE "execute_process(COMMAND ln -sf debug.${VERSION} /srv/dcastle2/bin/debug)")
