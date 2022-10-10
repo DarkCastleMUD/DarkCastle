@@ -25,7 +25,7 @@
                     "ignoreFailures": true
                 }
             ],
-            "preLaunchTask": "scons -C src -j 128"
+            "preLaunchTask": "build src using 128 threads"
         },
         {
             "name": "128 thread Debug Build and Launch in lib/",
@@ -45,7 +45,7 @@
                     "ignoreFailures": true
                 }
             ],
-            "preLaunchTask": "scons debug=1 -C src -j 128"
+            "preLaunchTask": "build debug src using 128 threads"
         },
         {
             "name": "32 thread Build and Launch in lib/",
