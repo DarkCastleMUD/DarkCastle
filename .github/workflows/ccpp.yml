@@ -19,13 +19,8 @@ jobs:
         sudo apt install g++-12-multilib g++-12 libstdc++-12-dev g++
         sudo apt install scons libcurl4
         sudo apt install libpq-dev libpq5 libcurl4-openssl-dev
-        #sudo apt install unzip zlib1g-dev
-        sudo apt install libfmt-dev cmake qt6-base-dev
-        #git clone https://github.com/fmtlib/fmt.git
-        #cd fmt
-        #cmake .
-        #make -j4
-        #sudo make install
+        sudo apt install unzip zlib1g-dev
+        sudo apt install libfmt-dev cmake qt6-base-dev    
     - name: make
       run: |
         cd src
