@@ -1,0 +1,5 @@
+#ifndef VERSION_H
+#define VERSION_H
+#cmakedefine BUILD_TIME "@BUILD_TIME@"
+#cmakedefine VERSION "@VERSION@"
+#endif
