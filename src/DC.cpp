@@ -9,6 +9,7 @@
 #include "DC.h"
 #include "room.h" // NOWHERE
 #include "db.h"
+#include "version.h"
 
 string DC::version = VERSION;
 
