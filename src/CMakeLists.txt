@@ -6,9 +6,11 @@ set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_FLAGS "-O3 -ggdb -Wno-write-strings -fdiagnostics-color=always")
 find_package(Qt6 REQUIRED COMPONENTS Core)
-qt_standard_project_setup()
-add_compile_definitions("VERSION=\"xyz\"")
-add_compile_definitions("BUILD_TIME=\"1\"")
+execute_process(COMMAND git describe --tags --always --abbrev=8 OUTPUT_VARIABLE VERSION OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET)
+execute_process(COMMAND date "+%Y-%m-%d %H:%M:%S" OUTPUT_VARIABLE BUILD_TIME OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET)
+message("${VERSION}")
+message("${BUILD_TIME}")
+configure_file(version.h.in ${CMAKE_CURRENT_BINARY_DIR}/version.h)
 add_library(DC
     act_comm.cpp
     act.cpp
