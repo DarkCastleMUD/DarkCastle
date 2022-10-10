@@ -716,11 +716,11 @@ int command_interpreter(char_data *ch, string pcomm, bool procced)
     {
       if (ch != nullptr && pcomm.empty() == false && GET_NAME(ch) != nullptr)
       {
-        logf(IMMORTAL, LOG_BUG, "Command stack exceeded. depth: %d, max_depth: %d, name: %s, cmd: %s", cstack.getDepth(), cstack.getMax(), GET_NAME(ch), pcomm);
+        log(format("Command stack exceeded. depth: {}, max_depth: {}, name: {}, cmd: {}", cstack.getDepth(), cstack.getMax(), GET_NAME(ch), pcomm), IMMORTAL, LOG_BUG);
       }
       else
       {
-        logf(IMMORTAL, LOG_BUG, "CommandStack::depth %d exceeds CommandStack::max_depth %d", cstack.getDepth(), cstack.getMax());
+        log(format("CommandStack::depth {} exceeds CommandStack::max_depth {}", cstack.getDepth(), cstack.getMax()), IMMORTAL, LOG_BUG);
       }
     }
     return eFAILURE;
