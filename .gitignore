@@ -1,8 +1,6 @@
 src/*.o
 src/*/*.o
 scripts/*.o
-src/dcastle.debug
-src/showplayer
 src/libdcastle.a
 src/.sconsign.dblite
 src/*~
@@ -17,13 +15,6 @@ lib/special.txt
 src/debug
 src/dcastle.stable
 src/dcastle.master
-src/CMakeFiles
-src/cmake_install.cmake
-src/CMakeCache.txt
-src/.qt/QtDeploySupport.cmake
-src/dcastle_autogen/moc_predefs.h
-src/dcastle_autogen/mocs_compilation.cpp
 src/Makefile
-src/*.a
-src/*_autogen/
 src/version.h
+build/
