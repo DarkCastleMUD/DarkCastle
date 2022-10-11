@@ -10,8 +10,7 @@
             "problemMatcher": {
                 "base": "$gcc",
                 "fileLocation": [
-                    "relative",
-                    "${workspaceRoot}/src/"
+                    "absolute"
                 ],
                 "pattern": {
                     "regexp": "^(.*):(\\d+):(\\d+):\\s+(.*)$",
@@ -30,8 +29,7 @@
             "problemMatcher": {
                 "base": "$gcc",
                 "fileLocation": [
-                    "relative",
-                    "${workspaceRoot}/src/"
+                    "absolute"
                 ],
                 "pattern": {
                     "regexp": "^(.*):(\\d+):(\\d+):\\s+(.*)$",
@@ -52,8 +50,7 @@
             "problemMatcher": {
                 "base": "$gcc",
                 "fileLocation": [
-                    "relative",
-                    "${workspaceRoot}/src/"
+                    "absolute"
                 ],
                 "pattern": {
                     "regexp": "^(.*):(\\d+):(\\d+):\\s+(.*)$",
@@ -72,8 +69,7 @@
             "problemMatcher": {
                 "base": "$gcc",
                 "fileLocation": [
-                    "relative",
-                    "${workspaceRoot}/src/"
+                    "absolute"
                 ],
                 "pattern": {
                     "regexp": "^(.*):(\\d+):(\\d+):\\s+(.*)$",
