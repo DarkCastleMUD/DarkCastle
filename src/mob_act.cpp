@@ -224,7 +224,7 @@ void mobile_activity(void)
       {
           // This should get rid of all the "gold coins" in mobs inventories.
           // -Pirahna 12/11/00
-          get(ch, best_obj, 0,0, 9);
+          get(ch, best_obj, 0,0, CMD_DEFAULT);
 //        move_obj( best_obj, ch );
 //        act( "$n gets $p.",  ch, best_obj, 0, TO_ROOM, 0);
       }
@@ -313,7 +313,7 @@ void mobile_activity(void)
       {
 	if (GET_POS(ch) > POSITION_SITTING) {
 	  if(!IS_AFFECTED(ch, AFF_BLIND) && ch->hunting) {
-	    retval = do_track(ch, ch->hunting, 9);
+	    retval = do_track(ch, ch->hunting, CMD_DEFAULT);
 	    if(SOMEONE_DIED(retval))
 	      continue;
 	  }
@@ -573,7 +573,7 @@ void mobile_activity(void)
             {
               sprintf(buf, "$n screams 'Eeeeek, I HATE %s!'", races[tmp_race].plural_name);
               act(buf,  ch, 0, 0, TO_ROOM, 0);
-              do_flee(ch, "", 9);
+              do_flee(ch, "", CMD_DEFAULT);
             }
             break;
           }
@@ -596,20 +596,20 @@ void mob_suprised_sayings(char_data * ch, char_data * aggressor)
 {
    switch(number(0, 6))
    {
-      case 0:  do_say(ch, "What do you think you are doing?!", 9);
+      case 0:  do_say(ch, "What do you think you are doing?!", CMD_DEFAULT);
                break;
-      case 1:  do_say(ch, "Mess with the best?  Die like the rest!", 9);
+      case 1:  do_say(ch, "Mess with the best?  Die like the rest!", CMD_DEFAULT);
                break;
-      case 2:  do_emote(ch, " looks around for a moment, confused.", 9);
-               do_say(ch, "YOU!!", 9);
+      case 2:  do_emote(ch, " looks around for a moment, confused.", CMD_DEFAULT);
+               do_say(ch, "YOU!!", CMD_DEFAULT);
                break;
-      case 3:  do_say(ch, "Foolish.", 9);
+      case 3:  do_say(ch, "Foolish.", CMD_DEFAULT);
                break;
-      case 4:  do_say(ch, "I'm going to treat you like a baby treats a diaper.", 9);
+      case 4:  do_say(ch, "I'm going to treat you like a baby treats a diaper.", CMD_DEFAULT);
                break;
-      case 5:  do_say(ch, "Here comes the pain baby!", 9);
+      case 5:  do_say(ch, "Here comes the pain baby!", CMD_DEFAULT);
                break;
-      case 6:  do_emote(ch, " wiggles its bottom.", 9);
+      case 6:  do_emote(ch, " wiggles its bottom.", CMD_DEFAULT);
                break;
    }
 }

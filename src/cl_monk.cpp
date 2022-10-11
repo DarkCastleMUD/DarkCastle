@@ -85,7 +85,7 @@ int do_eagle_claw(char_data *ch, char *argument, int cmd)
       time ( &time_raw_format );
       ptr_time = localtime ( &time_raw_format );
       if( 11 == ptr_time->tm_mon ) {
-        do_say(victim, "Laaaaaaast Christmas, I gave you my....", 9);
+        do_say(victim, "Laaaaaaast Christmas, I gave you my....", CMD_DEFAULT);
       }
       act("$N blinks and stares glassy-eyed into the distance blissfully no longer aware of $n RIPPING OUT $S $B$4heart$R!", ch, 0, victim, TO_ROOM, NOTVICT);
       act("You feel empty inside and full of heart-ache as if something important to you is missing.  Memories flash of your longing fo....", ch, 0, victim, TO_VICT, 0);

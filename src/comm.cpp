@@ -2661,7 +2661,7 @@ string remove_non_color_codes(string input)
 
         // end any performances
         if (IS_SINGING(d->character))
-          do_sing(d->character, "stop", 9);
+          do_sing(d->character, "stop", CMD_DEFAULT);
 
         act("$n has lost $s link.", d->character, 0, 0, TO_ROOM, 0);
         sprintf(buf, "Closing link to: %s at %d.", GET_NAME(d->character),

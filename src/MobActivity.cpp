@@ -334,11 +334,11 @@ int do_findPath(char_data *ch, char *argument, int cmd)
   int start, end;
   argument = one_argument(argument, arg1);
 
-  if (!arg1[0] || !is_number(arg1)) {do_findPath(ch, "", 9); return eFAILURE; }
+  if (!arg1[0] || !is_number(arg1)) {do_findPath(ch, "", CMD_DEFAULT); return eFAILURE; }
   start = atoi(arg1);
   argument = one_argument(argument, arg1);
 
-  if (!arg1[0] || !is_number(arg1)) {do_findPath(ch, "", 9); return eFAILURE; }
+  if (!arg1[0] || !is_number(arg1)) {do_findPath(ch, "", CMD_DEFAULT); return eFAILURE; }
   end = atoi(arg1);
   char *path = p->determineRoute(ch, start, end);
 

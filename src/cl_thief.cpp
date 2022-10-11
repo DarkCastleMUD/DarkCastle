@@ -641,7 +641,7 @@ int do_stalk(char_data *ch, char *argument, int cmd)
   WAIT_STATE(ch, PULSE_VIOLENCE*1);
 
   if(!skill_success(ch,leader,SKILL_STALK))
-    do_follow(ch, argument, 9);
+    do_follow(ch, argument, CMD_DEFAULT);
 
   else { 
     do_follow(ch, argument, 10);
@@ -792,7 +792,7 @@ int do_steal(char_data *ch, char *argument, int cmd)
   }
 
   if(IS_AFFECTED(ch, AFF_CHARM)) {
-     return do_say(ch, "Nice try, silly thief.", 9);
+     return do_say(ch, "Nice try, silly thief.", CMD_DEFAULT);
   }
 
   if(victim->fighting) {
@@ -896,7 +896,7 @@ int do_steal(char_data *ch, char *argument, int cmd)
               {
                 paf->modifier = 0; // make sleep no longer work
               }
-                do_wake(ch, GET_NAME(victim), 9);
+                do_wake(ch, GET_NAME(victim), CMD_DEFAULT);
 //              }
             }
 
@@ -1054,7 +1054,7 @@ int do_steal(char_data *ch, char *argument, int cmd)
         paf->modifier = 0; // make sleep no longer work
       }
 
-      do_wake(ch, GET_NAME(victim), 9);
+      do_wake(ch, GET_NAME(victim), CMD_DEFAULT);
       act("$n tried to steal something from you, waking you up in the process.!", ch, 0, victim, TO_VICT, 0);
       act("$n fails stealing something from $N, waking $N up in the process.", ch, 0, victim, TO_ROOM, INVIS_NULL|NOTVICT);
     } 
@@ -1071,7 +1071,7 @@ int do_steal(char_data *ch, char *argument, int cmd)
         {
            paf->modifier = 0; // make sleep no longer work
         }
-        do_wake(ch, GET_NAME(victim), 9);
+        do_wake(ch, GET_NAME(victim), CMD_DEFAULT);
     }
     else 
     {
@@ -1106,7 +1106,7 @@ int do_steal(char_data *ch, char *argument, int cmd)
              {
                 paf->modifier = 0; // make sleep no longer work
              }
-             do_wake(ch, GET_NAME(victim), 9);
+             do_wake(ch, GET_NAME(victim), CMD_DEFAULT);
 //            }
 
           }
@@ -1235,7 +1235,7 @@ int do_pocket(char_data *ch, char *argument, int cmd)
   }
 
   if(IS_AFFECTED(ch, AFF_CHARM)) {
-     return do_say(ch, "Nice try.", 9);
+     return do_say(ch, "Nice try.", CMD_DEFAULT);
   }
 
   if(victim->fighting) {
@@ -1535,7 +1535,7 @@ int do_slip(char_data *ch, char *argument, int cmd)
       
          tmp_object = create_money(amount);
          obj_to_room(tmp_object, ch->in_room);
-         do_save(ch, "", 9);
+         do_save(ch, "", CMD_DEFAULT);
          } // failure
     
       // Success
@@ -1569,7 +1569,7 @@ int do_slip(char_data *ch, char *argument, int cmd)
            SETBIT(vict->mobdata->actflags, ACT_NO_GOLD_BONUS);
          }
 
-         do_save(ch, "", 9);
+         do_save(ch, "", CMD_DEFAULT);
          save_char_obj(vict);
          }
     
@@ -1702,7 +1702,7 @@ int do_slip(char_data *ch, char *argument, int cmd)
       act("$n tries to slip $N something, but $e accidentally drops "
           "it.\n\r", ch, 0, vict, TO_ROOM, NOTVICT);
       send_to_char("Whoops!  You dropped it.\n\r", ch);
-      do_save(ch, "", 9);
+      do_save(ch, "", CMD_DEFAULT);
       }
     
    // Success
@@ -1721,7 +1721,7 @@ int do_slip(char_data *ch, char *argument, int cmd)
       act("You slip $p to $N.", ch, obj, vict, TO_CHAR, 0);
       act("$n slips $p to $N.", ch, obj, vict, TO_ROOM, GODS|NOTVICT);
       act("$n slips you $p.", ch, obj, vict, TO_VICT, GODS);
-      do_save(ch, "", 9);
+      do_save(ch, "", CMD_DEFAULT);
       save_char_obj(vict);
       }
   return eSUCCESS;

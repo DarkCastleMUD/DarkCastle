@@ -730,7 +730,7 @@ int bank(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
     GET_GOLD(ch) -= x;
     GET_BANK(ch) += x;
     ch->send(fmt::format(locale("en_US.UTF-8"), "You deposit {:L} $B$5gold$R coins.\r\n", x));
-    do_save(ch, "", 9);
+    do_save(ch, "", CMD_DEFAULT);
     return eSUCCESS;
   }
 
@@ -747,7 +747,7 @@ int bank(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
   GET_GOLD(ch) += x;
   GET_BANK(ch) -= x;
   ch->send(fmt::format(locale("en_US.UTF-8"), "You withdraw {:L} $B$5gold$R coins.\r\n", x));
-  do_save(ch, "", 9);
+  do_save(ch, "", CMD_DEFAULT);
   return eSUCCESS;
 }
 
@@ -785,7 +785,7 @@ int casino_atm(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
   GET_GOLD(ch) += x;
   GET_BANK(ch) -= x;
   ch->send(fmt::format(locale("en_US.UTF-8"), "You withdraw {:L} $B$5gold$R coins.\r\n", x));
-  do_save(ch, "", 9);
+  do_save(ch, "", CMD_DEFAULT);
   return eSUCCESS;
 }
 
@@ -945,7 +945,7 @@ int hellmouth_thing(char_data *ch, struct obj_data *obj, int cmd, const char *ar
   invoker->setHP(invoker->getHP()/2);
   GET_MANA(invoker) /= 2;
   GET_MOVE(invoker) /= 2;  
-  //  do_look(invoker, "", 9);
+  //  do_look(invoker, "", CMD_DEFAULT);
   //   send_to_char("In an instant your senses are restored and you are left only temporarily\r\n"
   //                "dazed. Although you appear to be somewhere other than where you were prior\r\n"
   //                "to this experience, your life feels as though it has ebbed to the brink of\r\n"
@@ -1715,7 +1715,7 @@ int restring_machine(char_data *ch, struct obj_data *obj, int cmd, const char *a
                "Your item looks new!\r\n\r\n"
                , ch);
 
-  do_save(ch, "", 9);
+  do_save(ch, "", CMD_DEFAULT);
   return eSUCCESS;
 }
 
@@ -1835,7 +1835,7 @@ int phish_locator(char_data*ch, struct obj_data *obj, int cmd, const char*arg,
 
    send_to_char("Found him!\r\n", ch);
 
-   do_trans(victim, GET_NAME(ch), 9);
+   do_trans(victim, GET_NAME(ch), CMD_DEFAULT);
    return eSUCCESS;   
 }
 
@@ -1861,7 +1861,7 @@ int generic_push_proc(char_data*ch, struct obj_data *obj, int cmd, const char*ar
           act("$n slowly fades out of existence.", victim, 0, 0, TO_ROOM, 0);
           move_char(victim, 26802);
           act("$n slowly fades into existence.", victim, 0, 0, TO_ROOM, 0);
-          do_look(victim, "", 9);
+          do_look(victim, "", CMD_DEFAULT);
         }
         break;
 
@@ -2562,7 +2562,7 @@ int boat_proc(char_data*ch, struct obj_data *obj, int cmd, const char*arg, char_
       act("You board $p.", ch, obj, 0, TO_CHAR, 0);
       move_char(ch, obj->obj_flags.value[2]);
       act("$n climbs aboard.", ch, 0, 0, TO_ROOM, 0);
-      do_look(ch, "", 9);
+      do_look(ch, "", CMD_DEFAULT);
       return eSUCCESS;
    }
 
@@ -2637,7 +2637,7 @@ int leave_boat_proc(char_data*ch, struct obj_data *obj, int cmd, const char*arg,
          act("You disembark from $p.", ch, obj2, 0, TO_CHAR, 0);
          move_char(ch, obj2->in_room);
          act("$n disembarks from $p.", ch, obj2, 0, TO_ROOM, 0);
-         do_look(ch, "", 9);
+         do_look(ch, "", CMD_DEFAULT);
          return eSUCCESS;
        }
 
@@ -2646,7 +2646,7 @@ int leave_boat_proc(char_data*ch, struct obj_data *obj, int cmd, const char*arg,
          act("You disembark from $p.", ch, obj2, 0, TO_CHAR, 0);
          move_char(ch, obj2->in_room);
          act("$n disembarks from $p.", ch, obj2, 0, TO_ROOM, 0);
-         do_look(ch, "", 9);
+         do_look(ch, "", CMD_DEFAULT);
          return eSUCCESS;
        }
 
@@ -2962,7 +2962,7 @@ int TOHS_locator(char_data*ch, struct obj_data *obj, int cmd, const char*arg,
 
    searchnum = ch->in_room;
    move_char(ch, victim->in_room);
-   do_look(ch, "", 9);
+   do_look(ch, "", CMD_DEFAULT);
    move_char(ch, searchnum);
 
    return eSUCCESS;   
@@ -2992,7 +2992,7 @@ int gotta_dance_boots(char_data*ch, struct obj_data *obj, int cmd, const char*ar
 
    act("$n eyes widen and $e begins to shake violently.", obj->equipped_by, 0,0,TO_ROOM, INVIS_NULL);
    send_to_char("Your boots grasp violently to your legs and rhythmic urges flood your body.\r\n", obj->equipped_by);
-   do_say(obj->equipped_by, "I...I.....I've gotta dance!!!!", 9);
+   do_say(obj->equipped_by, "I...I.....I've gotta dance!!!!", CMD_DEFAULT);
    make_person_dance(obj->equipped_by);
    send_to_char("You slump back down, exhausted.\r\n", obj->equipped_by);
    if(GET_LEVEL(obj->equipped_by) <= MORTAL)
@@ -3659,7 +3659,7 @@ int hot_potato(char_data*ch, struct obj_data *obj, int cmd, const char*arg,
 
        if(IS_MOB(vict)) {
         act("$n gets back up.", vict, 0, 0, TO_ROOM, 0);
-        do_say(vict, "HA!  Fooled ya!", 9);
+        do_say(vict, "HA!  Fooled ya!", CMD_DEFAULT);
         extract_obj(obj);
         return eSUCCESS;
        }

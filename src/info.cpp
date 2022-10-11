@@ -701,7 +701,7 @@ int do_botcheck(char_data *ch, char *argument, int cmd)
 	continue;
       csendf(ch, "\n\r%s\n\r", GET_NAME(i));
       send_to_char("----------\n\r", ch);
-      do_botcheck(ch, GET_NAME(i), 9);
+      do_botcheck(ch, GET_NAME(i), CMD_DEFAULT);
     }
     return eSUCCESS;
   }

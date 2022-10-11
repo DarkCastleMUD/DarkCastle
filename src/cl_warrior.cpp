@@ -897,7 +897,7 @@ int handle_any_guard(char_data * ch)
       return FALSE;
 
    if(ch->fighting && can_be_attacked(guard, ch->fighting) && skill_success(guard,ch,SKILL_GUARD)) {
-      do_rescue(guard, GET_NAME(ch), 9);
+      do_rescue(guard, GET_NAME(ch), CMD_DEFAULT);
       if (ch->fighting)
       return TRUE;
       else return FALSE;

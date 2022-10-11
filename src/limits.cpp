@@ -729,9 +729,9 @@ void food_update(void) {
 				if (IS_DARK(i->in_room) && !IS_MOB(i) && !i->pcdata->holyLite && !affected_by_spell(i, SPELL_INFRAVISION))
 					send_to_char("It's too dark to see what's safe to eat!\n\r", i);
 				else if (FOUNTAINisPresent(i))
-					do_drink(i, "fountain", 9);
+					do_drink(i, "fountain", CMD_DEFAULT);
 				else if ((food = bring_type_to_front(i, ITEM_FOOD)))
-					do_eat(i, food->name, 9);
+					do_eat(i, food->name, CMD_DEFAULT);
 				else
 					send_to_char("You are out of food.\n\r", i);
 			}
@@ -743,9 +743,9 @@ void food_update(void) {
 				if (IS_DARK(i->in_room) && !IS_MOB(i) && !i->pcdata->holyLite && !affected_by_spell(i, SPELL_INFRAVISION))
 					send_to_char("It's too dark to see if there's any potable liquid around!\n\r", i);
 				else if (FOUNTAINisPresent(i))
-					do_drink(i, "fountain", 9);
+					do_drink(i, "fountain", CMD_DEFAULT);
 				else if ((food = bring_type_to_front(i, ITEM_DRINKCON)))
-					do_drink(i, food->name, 9);
+					do_drink(i, food->name, CMD_DEFAULT);
 				else
 					send_to_char("You are out of drink.\n\r", i);
 			}

@@ -516,80 +516,80 @@ int do_toggle(char_data *ch, char *arg, int cmd)
   switch (x)
   {
   case 0:
-    do_brief(ch, "", 9);
+    do_brief(ch, "", CMD_DEFAULT);
     break;
 
   case 1:
-    do_compact(ch, "", 9);
+    do_compact(ch, "", CMD_DEFAULT);
     break;
 
   case 2:
-    do_beep_set(ch, "", 9);
+    do_beep_set(ch, "", CMD_DEFAULT);
     break;
 
   case 3:
-    do_anonymous(ch, "", 9);
+    do_anonymous(ch, "", CMD_DEFAULT);
     break;
 
   case 4:
-    do_ansi(ch, "", 9);
+    do_ansi(ch, "", CMD_DEFAULT);
     break;
 
   case 5:
-    do_vt100(ch, "", 9);
+    do_vt100(ch, "", CMD_DEFAULT);
     break;
 
   case 6:
-    do_wimpy(ch, "", 9);
+    do_wimpy(ch, "", CMD_DEFAULT);
     break;
 
   case 7:
-    do_pager(ch, "", 9);
+    do_pager(ch, "", CMD_DEFAULT);
     break;
 
   case 8:
-    do_bard_song_toggle(ch, "", 9);
+    do_bard_song_toggle(ch, "", CMD_DEFAULT);
     break;
 
   case 9:
-    do_autoeat(ch, "", 9);
+    do_autoeat(ch, "", CMD_DEFAULT);
     break;
 
   case 10:
-    do_summon_toggle(ch, "", 9);
+    do_summon_toggle(ch, "", CMD_DEFAULT);
     break;
 
   case 11:
-    do_lfg_toggle(ch, "", 9);
+    do_lfg_toggle(ch, "", CMD_DEFAULT);
     break;
 
   case 12:
-    do_charmiejoin_toggle(ch, "", 9);
+    do_charmiejoin_toggle(ch, "", CMD_DEFAULT);
     break;
 
   case 13:
-    do_notax_toggle(ch, "", 9);
+    do_notax_toggle(ch, "", CMD_DEFAULT);
     break;
 
   case 14:
     if (IS_SET(ch->pcdata->toggles, PLR_GUIDE))
-      do_guide_toggle(ch, "", 9);
+      do_guide_toggle(ch, "", CMD_DEFAULT);
     else
       send_to_char("You're not a guide!\r\n", ch);
     break;
 
   case 15:
-    do_news_toggle(ch, "", 9);
+    do_news_toggle(ch, "", CMD_DEFAULT);
     break;
 
   case 16:
-    do_ascii_toggle(ch, "", 9);
+    do_ascii_toggle(ch, "", CMD_DEFAULT);
     break;
   case 17:
-    do_damage_toggle(ch, "", 9);
+    do_damage_toggle(ch, "", CMD_DEFAULT);
     break;
   case 18:
-    do_nodupekeys_toggle(ch, "", 9);
+    do_nodupekeys_toggle(ch, "", CMD_DEFAULT);
     break;
   default:
     send_to_char("A bad thing just happened.  Tell the gods.\n\r", ch);

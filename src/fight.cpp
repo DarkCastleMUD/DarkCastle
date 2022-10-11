@@ -143,7 +143,7 @@ int check_autojoiners(char_data *ch, int skill = 0)
      if (skill && !skill_success(tmp, ch, SKILL_FASTJOIN)) continue;
      char buf[MAX_STRING_LENGTH];
      sprintf(buf, "0.%s",GET_NAME(ch));
-     int retval = do_join(tmp, buf, 9);
+     int retval = do_join(tmp, buf, CMD_DEFAULT);
      if (SOMEONE_DIED(retval)) return retval;
   }
   return eSUCCESS;
@@ -165,7 +165,7 @@ int check_joincharmie(char_data *ch, int skill = 0)
   if (!isname("follower", tmp->pcdata->joining) &&
 	!isname("followers", tmp->pcdata->joining)) return eFAILURE;
   if (skill && !skill_success(tmp, ch, SKILL_FASTJOIN)) return eFAILURE;
-   int retval = do_join(tmp, "follower", 9);
+   int retval = do_join(tmp, "follower", CMD_DEFAULT);
   return retval;
 }
 
@@ -179,7 +179,7 @@ int check_charmiejoin(char_data *ch)
   if (GET_POS(ch) != POSITION_STANDING) return eFAILURE;
   char buf[MAX_STRING_LENGTH];
   sprintf(buf, "0.%s", GET_NAME(tmp));
-  int retval = do_join(ch, buf, 9);
+  int retval = do_join(ch, buf, CMD_DEFAULT);
 
   return retval;
 }
@@ -1327,7 +1327,7 @@ int one_hit(char_data *ch, char_data *vict, int type, int weapon)
   }
   
   if(ch == vict) {
-    do_say(ch, "What the hell am I DOING?!?!", 9);
+    do_say(ch, "What the hell am I DOING?!?!", CMD_DEFAULT);
     stop_fighting(ch);
     return eFAILURE;
   }
@@ -6509,7 +6509,7 @@ int can_be_attacked(char_data *ch, char_data *vict)
     if (GET_CLASS(ch->master) != CLASS_ANTI_PAL && GET_CLASS(ch->master) != CLASS_RANGER && GET_CLASS(ch->master) != CLASS_CLERIC) 
         return FALSE;
     if (vict == ch->master) return FALSE;
-    if(GET_LEVEL(vict) < 5) {do_say(ch, "I'm sorry master, I cannot do that.", 9);return eFAILURE;}
+    if(GET_LEVEL(vict) < 5) {do_say(ch, "I'm sorry master, I cannot do that.", CMD_DEFAULT);return eFAILURE;}
   }
 
   if(IS_SET(world[ch->in_room].room_flags, SAFE))
@@ -6920,7 +6920,7 @@ int do_flee(char_data *ch, char *argument, int cmd)
   }
   
   if(GET_CLASS(ch) == CLASS_BARD && IS_SINGING(ch))
-     do_sing(ch, "stop", 9);
+     do_sing(ch, "stop", CMD_DEFAULT);
 
   if(IS_AFFECTED(ch, AFF_NO_FLEE)) {
      if(affected_by_spell(ch, SPELL_IRON_ROOTS))

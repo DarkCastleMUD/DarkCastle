@@ -122,7 +122,7 @@ int do_wizhelp(char_data *ch, char *argument, int cmd_arg)
   return eSUCCESS;
 }
 
-int do_goto(char_data *ch, char *argument, int cmd)
+int do_goto(char_data *ch, string argument, int cmd)
 {
     char buf[MAX_INPUT_LENGTH];
     int loc_nr, location, i, start_room;
@@ -267,7 +267,7 @@ int do_goto(char_data *ch, char *argument, int cmd)
        if(start_room == k->follower->in_room && CAN_SEE(k->follower, ch) &&
           GET_LEVEL(k->follower) >= IMMORTAL) {
          csendf(k->follower, "You follow %s.\n\r\n\r", GET_SHORT(ch));
-         do_goto(k->follower, argument, 9);
+         do_goto(k->follower, argument, CMD_DEFAULT);
        }
     }
   return eSUCCESS;

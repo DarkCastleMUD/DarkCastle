@@ -482,9 +482,9 @@ int do_rename_char(char_data *ch, char *arg, int cmd)
   }
 
   int clan = GET_CLAN(victim), rights = plr_rights(victim);
-  do_outcast(victim, GET_NAME(victim), 9);
+  do_outcast(victim, GET_NAME(victim), CMD_DEFAULT);
 
-  do_fsave(ch, GET_NAME(victim), 9);
+  do_fsave(ch, GET_NAME(victim), CMD_DEFAULT);
 
   // Copy the pfile
   if (DC::instance().cf.bport == false)
@@ -527,14 +527,14 @@ int do_rename_char(char_data *ch, char *arg, int cmd)
   do_zap(ch, GET_NAME(victim), 10);
 
   // load the new guy
-  do_linkload(ch, newname, 9);
+  do_linkload(ch, newname, CMD_DEFAULT);
 
   if(!(victim = get_pc(newname)))
   {
     send_to_char("Major problem...coudn't find target after pfile copied.  Notify Urizen immediatly.\r\n", ch);
     return eFAILURE;
   }
-  do_name(victim, " %", 9);
+  do_name(victim, " %", CMD_DEFAULT);
 
   struct clan_member_data * pmember = NULL;
 

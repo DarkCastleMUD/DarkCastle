@@ -1131,7 +1131,7 @@ void stop_follower(char_data *ch, int cmd)
   }
 /*
   if(ISSET(ch->affected_by, AFF_FAMILIAR)) {
-    do_emote(ch, "screams in pain as its connection with its master is broken.", 9); 
+    do_emote(ch, "screams in pain as its connection with its master is broken.", CMD_DEFAULT); 
     extract_char(ch, TRUE);
     return;
   }

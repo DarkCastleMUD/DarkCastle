@@ -305,7 +305,7 @@ int do_gossip(char_data *ch, char *argument, int cmd)
       }
 
     if(IS_NPC(ch) && ch->master) {
-      do_say(ch, "Why don't you just do that yourself!", 9);
+      do_say(ch, "Why don't you just do that yourself!", CMD_DEFAULT);
       return eSUCCESS;
     }
 
@@ -400,7 +400,7 @@ int do_auction(char_data *ch, char *argument, int cmd)
      }
 
     if(IS_NPC(ch) && ch->master) {
-     do_say(ch, "That's okay, I'll let you do all the auctioning, master.", 9);
+     do_say(ch, "That's okay, I'll let you do all the auctioning, master.", CMD_DEFAULT);
      return eSUCCESS;
     }
 
@@ -482,7 +482,7 @@ int do_shout(char_data *ch, char *argument, int cmd)
       }
 
     if(IS_NPC(ch) && ch->master) {
-      return do_say(ch, "Shouting makes my throat hoarse.", 9);
+      return do_say(ch, "Shouting makes my throat hoarse.", CMD_DEFAULT);
     }
 
     if (!IS_NPC(ch) && IS_SET(ch->pcdata->punish, PUNISH_SILENCED)) {
@@ -546,7 +546,7 @@ int do_trivia(char_data *ch, char *argument, int cmd)
     }
 
   if(IS_NPC(ch) && ch->master) {
-    return do_say(ch, "Why don't you just do that yourself!", 9);
+    return do_say(ch, "Why don't you just do that yourself!", CMD_DEFAULT);
   }
 
   if(!IS_NPC(ch)) {
@@ -631,7 +631,7 @@ int do_dream(char_data *ch, char *argument, int cmd)
     }
 
     if(IS_NPC(ch) && ch->master) {
-      do_say(ch, "Why don't you just do that yourself!", 9);
+      do_say(ch, "Why don't you just do that yourself!", CMD_DEFAULT);
       return eSUCCESS;
     }
     if(!IS_NPC(ch)) 
@@ -716,7 +716,7 @@ command_return_t do_tellhistory(char_data *ch, string argument, int cmd)
       ch->send(fmt::format("tell history timestamp turned off\r\n"));
     }
 
-    do_save(ch, "", 9);
+    do_save(ch, "", CMD_DEFAULT);
   }
 
   return eSUCCESS;
@@ -1183,7 +1183,7 @@ int do_newbie(char_data *ch, char *argument, int cmd)
       }
 
     if(IS_NPC(ch) && ch->master) {
-      return do_say(ch, "Why don't you just do that yourself!", 9);
+      return do_say(ch, "Why don't you just do that yourself!", CMD_DEFAULT);
     }
 
     if(!IS_NPC(ch)) {

@@ -1882,7 +1882,7 @@ struct obj_data * bring_type_to_front(char_data * ch, int item_type)
 	  {
 		if(GET_ITEM_TYPE(container_item) == item_type) 
 		{
-		  get(ch, container_item, item_carried, 0, 9);
+		  get(ch, container_item, item_carried, 0, CMD_DEFAULT);
 		  return container_item;
 		}
 	  }

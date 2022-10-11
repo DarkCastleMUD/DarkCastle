@@ -90,10 +90,10 @@ int call_for_help_in_room(char_data *ch, int iFriendId)
 
       if(!friends)
       {
-        do_say(ch, "This guy is beating the hell out of me!  HELP!!", 9);
+        do_say(ch, "This guy is beating the hell out of me!  HELP!!", CMD_DEFAULT);
         friends = 1;
       }
-      do_say(ally, "I shall come to your aid!", 9);
+      do_say(ally, "I shall come to your aid!", CMD_DEFAULT);
       attack(ally, ch->fighting, TYPE_UNDEFINED);
     }
   }
@@ -131,7 +131,7 @@ int protect(char_data *ch, int iFriendId)
     if(real_mobile(iFriendId) == ally->mobdata->nr)
     {
       // obscure whitney houston joke
-      do_say(ch, "and IiiiIIiiii will always, looove yooooou!", 9);
+      do_say(ch, "and IiiiIIiiii will always, looove yooooou!", CMD_DEFAULT);
       // do join
       retval = attack(ch, ally->fighting, TYPE_UNDEFINED);
       if(SOMEONE_DIED(retval))
@@ -322,7 +322,7 @@ int fighter(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
     if(GET_LEVEL(ch)>39 && GET_POS(vict) < POSITION_FIGHTING)
     {
       MOB_WAIT_STATE(ch) = 2;
-      return do_deathstroke(ch, "", 9);
+      return do_deathstroke(ch, "", CMD_DEFAULT);
     }
 
     if (ch->equipment[WIELD] && vict->equipment[WIELD])
@@ -342,12 +342,12 @@ int fighter(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
     if( vict==ch->fighting && GET_LEVEL(ch)>3 && number(0,2)==0 )
     {
        MOB_WAIT_STATE(ch) = 3;      
-       return do_bash(ch, "", 9);
+       return do_bash(ch, "", CMD_DEFAULT);
     }
     if (vict==ch->fighting && GET_LEVEL(ch)>2 && number(0,1)==0 )
     {
        MOB_WAIT_STATE(ch) = 2;
-       return do_kick(ch, "", 9);
+       return do_kick(ch, "", CMD_DEFAULT);
     }
 
    return eFAILURE;
@@ -501,7 +501,7 @@ int frosty (char_data *ch, struct obj_data *obj, int cmd, const char *arg,
      x = number (0,FROSTY_YELL_TEXT_SIZE * 60);
 
      if((unsigned) x < FROSTY_YELL_TEXT_SIZE) {
-       do_shout(ch, frostyYellText [ x ], 9);
+       do_shout(ch, frostyYellText [ x ], CMD_DEFAULT);
        return eSUCCESS;
      }
      return eFAILURE;
@@ -831,7 +831,7 @@ int francis_guard(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
   if (cmd != 1) return eFAILURE;
   if (world[ch->in_room].number == 7077)
   {
-    do_say(owner, "Oh no you don't!", 9);
+    do_say(owner, "Oh no you don't!", CMD_DEFAULT);
     attack(owner, ch, 0);
     return eSUCCESS;
   }
@@ -2477,7 +2477,7 @@ int pir_slut (char_data*ch, struct obj_data *obj, int cmd, const char*arg,
      return eFAILURE;
    x = number (0,PIR_SAY_TEXT_SIZE * 6);
    if((unsigned) x < PIR_SAY_TEXT_SIZE) {
-     do_say(ch, pir_slutSayText [ x ], 9);
+     do_say(ch, pir_slutSayText [ x ], CMD_DEFAULT);
      return eSUCCESS;
    }
    return eFAILURE;
@@ -2613,11 +2613,11 @@ int doorcloser (char_data*ch, struct obj_data *obj, int cmd, const char*arg,
      )
    {
      if(number(0,1))
-       do_say(ch, "How the hell do these doors keep opening?", 9);
-     else do_say(ch, "I coulda sworn I just closed this....", 9);
+       do_say(ch, "How the hell do these doors keep opening?", CMD_DEFAULT);
+     else do_say(ch, "I coulda sworn I just closed this....", CMD_DEFAULT);
 
-     do_close(ch, "cell e", 9);
-     do_close(ch, "cell w", 9);
+     do_close(ch, "cell e", CMD_DEFAULT);
+     do_close(ch, "cell w", CMD_DEFAULT);
 
      return eSUCCESS;
    }
@@ -2638,8 +2638,8 @@ int panicprisoner (char_data*ch, struct obj_data *obj, int cmd, const char*arg,
    if((vict = get_char_room_vis(ch, "guard")))
    {
      if(number(0, 1))
-       do_say(ch, "Run!  It's the fuzz!", 9);
-     else do_say(ch, "Uh oh, guard.  I'm off like a prom dress!", 9);
+       do_say(ch, "Run!  It's the fuzz!", CMD_DEFAULT);
+     else do_say(ch, "Uh oh, guard.  I'm off like a prom dress!", CMD_DEFAULT);
      do_flee(ch, "", 0);
      return eSUCCESS;
    }   
@@ -2654,11 +2654,11 @@ int panicprisoner (char_data*ch, struct obj_data *obj, int cmd, const char*arg,
      )
    {
      if(number(0,1))
-       do_say(ch, "I must free my fellow prisoners!", 9);
-     else do_say(ch, "Viva la resistance!", 9);
+       do_say(ch, "I must free my fellow prisoners!", CMD_DEFAULT);
+     else do_say(ch, "Viva la resistance!", CMD_DEFAULT);
 
-     do_open(ch, "cell e", 9);
-     do_open(ch, "cell w", 9);
+     do_open(ch, "cell e", CMD_DEFAULT);
+     do_open(ch, "cell w", CMD_DEFAULT);
 
      return eSUCCESS;
    }
@@ -2690,7 +2690,7 @@ int bounder(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
           return eSUCCESS;
       }
 
-   do_say(ch, "I hope you land in enfan hell!", 9);
+   do_say(ch, "I hope you land in enfan hell!", CMD_DEFAULT);
    act("$n recites a bound scroll.", ch, 0, vict, TO_ROOM,
 	  INVIS_NULL);
    return cast_teleport(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, 0, GET_LEVEL(ch));
@@ -2770,11 +2770,11 @@ int marauder(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
 
     if( vict==ch->fighting && GET_LEVEL(ch)>3 && number(0,2)==0 )
     {
-        return do_bash(ch, "", 9);
+        return do_bash(ch, "", CMD_DEFAULT);
     }
     if (vict==ch->fighting && GET_LEVEL(ch)>2 && number(0,1)==0 )
     {
-       return do_kick(ch, "", 9);
+       return do_kick(ch, "", CMD_DEFAULT);
     }
 
    return eFAILURE;
@@ -3007,7 +3007,7 @@ int kogiro_combat(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
       vict = find_random_player_in_room(ch);
       stop_fighting(vict);
       stop_fighting(ch);
-      return do_backstab(ch, GET_NAME(vict), 9);
+      return do_backstab(ch, GET_NAME(vict), CMD_DEFAULT);
       break;
 
       case 2:
@@ -3197,7 +3197,7 @@ int shogura_combat(char_data *ch, struct obj_data *obj, int cmd, const char *arg
 
     if(GET_HIT(ch->fighting) < 5000)
     {
-      do_say(ch, "It's time to finish this, little one.", 9);
+      do_say(ch, "It's time to finish this, little one.", CMD_DEFAULT);
       return ki_punch(GET_LEVEL(ch), ch, "", ch->fighting);
     }
 
@@ -3213,13 +3213,13 @@ int shogura_combat(char_data *ch, struct obj_data *obj, int cmd, const char *arg
       if(!number(0, 10))
       {
         act("$n summons up his iron will!", ch, 0, 0, TO_ROOM, INVIS_NULL);
-        return do_quivering_palm(ch, "", 9); 
+        return do_quivering_palm(ch, "", CMD_DEFAULT); 
       }
       break;
 
       case 2:
       // summon all mobs 8668
-      do_say(ch, "Multi-form technique!", 9);
+      do_say(ch, "Multi-form technique!", CMD_DEFAULT);
       if(! find_mob_in_room(ch, 8668) )
          summon_all_of_mob_to_room(ch, 8668);
       break;
@@ -3269,7 +3269,7 @@ int druid_elemental(char_data *ch, struct obj_data *obj,
   if(!ch->fighting) 
   {
     if(ch->in_room != ch->master->in_room) {
-      do_emote(ch, "creates an elemental gateway and steps through.\r\n", 9);
+      do_emote(ch, "creates an elemental gateway and steps through.\r\n", CMD_DEFAULT);
       move_char(ch, ch->master->in_room);
       act("An elemental gateway shimmers into existance and $n emerges.",ch, 0, 0, TO_ROOM, 0);
       return eSUCCESS;
@@ -3286,7 +3286,7 @@ int mage_golem(char_data *ch, struct obj_data *obj, int cmd,
   if (cmd || !ch->master || ch->fighting || ch->in_room != ch->master->in_room) return eFAILURE;
 
    if(ch->master->fighting && IS_NPC(ch->master->fighting))
-      do_join(ch, GET_NAME(ch->master), 9);
+      do_join(ch, GET_NAME(ch->master), CMD_DEFAULT);
 
    return eFAILURE;
 }
@@ -3304,7 +3304,7 @@ ch->master->pcdata->golem->in_room
      char_data *gol = ch->master->pcdata->golem;
     if (gol->hit < gol->max_hit)
     {
-	  do_emote(ch, "climbs up its master's golem, hammering, tweaking and repairing.\r\n", 9);
+	  do_emote(ch, "climbs up its master's golem, hammering, tweaking and repairing.\r\n", CMD_DEFAULT);
 	  gol->hit += number(40,60);
 	  if (gol->hit > gol->max_hit) gol->hit = gol->max_hit;
     }
@@ -3333,14 +3333,14 @@ int mage_familiar_gremlin_non(char_data *ch, struct obj_data *obj,
   if(!ch->fighting) 
   {
     if(ch->in_room != ch->master->in_room) {
-      do_emote(ch, "looks around, glances at its watch then skitters out of the room.\r\n", 9);
+      do_emote(ch, "looks around, glances at its watch then skitters out of the room.\r\n", CMD_DEFAULT);
       move_char(ch, ch->master->in_room);
-      do_emote(ch, "skitters into the room, anxiously looking for its master.\r\n", 9);
+      do_emote(ch, "skitters into the room, anxiously looking for its master.\r\n", CMD_DEFAULT);
       return eFAILURE;
     }
 
     if(ch->master->fighting) { // help him!
-       do_join(ch, GET_NAME(ch->master), 9);
+       do_join(ch, GET_NAME(ch->master), CMD_DEFAULT);
       return eFAILURE;
     }
 
@@ -3389,19 +3389,19 @@ int mage_familiar_imp_non(char_data *ch, struct obj_data *obj, int cmd, const ch
   if(!ch->fighting) 
   {
     if(ch->in_room != ch->master->in_room) {
-      do_emote(ch, "looks around for its master, then *eep*'s quietly and dissolves into shadow.\r\n", 9);
+      do_emote(ch, "looks around for its master, then *eep*'s quietly and dissolves into shadow.\r\n", CMD_DEFAULT);
       move_char(ch, ch->master->in_room);
-      do_emote(ch, "steps out of a nearby shadow relieved to be back in its master's presence.\r\n", 9);
+      do_emote(ch, "steps out of a nearby shadow relieved to be back in its master's presence.\r\n", CMD_DEFAULT);
       return eFAILURE;
     }
 
     if(ch->master->fighting) { // help him!
-      do_join(ch, GET_NAME(ch->master), 9);
+      do_join(ch, GET_NAME(ch->master), CMD_DEFAULT);
       return eFAILURE;
     }
 
     if(number(1, 500) == 1) {
-      do_emote(ch, "chitters about for a bit then settles down.", 9);
+      do_emote(ch, "chitters about for a bit then settles down.", CMD_DEFAULT);
       return eFAILURE;
     }
   }
@@ -3450,7 +3450,7 @@ int druid_familiar_owl_non(char_data *ch, struct obj_data *obj, int cmd, const c
      char_from_room(ch);
      char_to_room(ch, to_room);
      SETBIT(ch->affected_by, AFF_TRUE_SIGHT);
-     do_look(ch, "", 9);
+     do_look(ch, "", CMD_DEFAULT);
      if (!ts) REMBIT(ch->affected_by, AFF_TRUE_SIGHT);
      char_from_room(ch);
      char_to_room(ch, oldroom);
@@ -3469,19 +3469,19 @@ int druid_familiar_owl_non(char_data *ch, struct obj_data *obj, int cmd, const c
   if(!ch->fighting) 
   {
     if(ch->in_room != ch->master->in_room) {
-      do_emote(ch, "lifts from its perch and flies out of the room.\r\n", 9);
+      do_emote(ch, "lifts from its perch and flies out of the room.\r\n", CMD_DEFAULT);
       move_char(ch, ch->master->in_room);
-      do_emote(ch, "swoops into the room perching itself high up, watching its master.\r\n", 9);
+      do_emote(ch, "swoops into the room perching itself high up, watching its master.\r\n", CMD_DEFAULT);
       return eFAILURE;
     }
 
     if(ch->master->fighting) { // help him!
-      do_join(ch, GET_NAME(ch->master), 9);
+      do_join(ch, GET_NAME(ch->master), CMD_DEFAULT);
       return eFAILURE;
     }
 
     if(number(1, 500) == 1) {
-      do_emote(ch, "circles above, looking for mice.", 9);
+      do_emote(ch, "circles above, looking for mice.", CMD_DEFAULT);
       return eFAILURE;
     }
   }
@@ -3511,19 +3511,19 @@ int druid_familiar_chipmunk_non(char_data *ch, struct obj_data *obj, int cmd, co
   if(!ch->fighting) 
   {
     if(ch->in_room != ch->master->in_room) {
-      do_emote(ch, "looks around for its master than runs off.\r\n", 9);
+      do_emote(ch, "looks around for its master than runs off.\r\n", CMD_DEFAULT);
       move_char(ch, ch->master->in_room);
-      do_emote(ch, "runs in and drops by its masters feet, obviously tired.\r\n", 9);
+      do_emote(ch, "runs in and drops by its masters feet, obviously tired.\r\n", CMD_DEFAULT);
       return eFAILURE;
     }
 
     if(ch->master->fighting) { // help him!
-      do_join(ch, GET_NAME(ch->master), 9);
+      do_join(ch, GET_NAME(ch->master), CMD_DEFAULT);
       return eFAILURE;
     }
 
     if(number(1, 500) == 1) {
-      do_emote(ch, "sqeaks with delight at a found nut.", 9);
+      do_emote(ch, "sqeaks with delight at a found nut.", CMD_DEFAULT);
       return eFAILURE;
     }
 
@@ -3609,6 +3609,6 @@ int startrek_miles(char_data *ch, struct obj_data *obj, int cmd, const char *arg
   if(cmd != 185)
     return eFAILURE;
 
-  do_say(owner, "Don't push anything.  This is highly sophisticated equipment.\r\n", 9);
+  do_say(owner, "Don't push anything.  This is highly sophisticated equipment.\r\n", CMD_DEFAULT);
   return eSUCCESS;
 }

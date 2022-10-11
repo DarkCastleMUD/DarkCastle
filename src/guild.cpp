@@ -605,9 +605,9 @@ int skills_guild ( char_data *ch, const char *arg, char_data *owner )
   }
 
   if(known >= get_max(ch, x)) {
-     do_emote(owner, "eyes you up and down.", 9);
+     do_emote(owner, "eyes you up and down.", CMD_DEFAULT);
      do_say(owner, "Taking into account your current attributes, your",9);
-     do_say(owner, "maximum proficiency in this ability has been reached.", 9);
+     do_say(owner, "maximum proficiency in this ability has been reached.", CMD_DEFAULT);
      return eSUCCESS;
   }
 
@@ -781,13 +781,13 @@ int guild(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
         if (GET_LEVEL(ch) == 60)
 	{
 	     sprintf(buf, "You have truly reached the highest level of %s mastery.", pc_clss_types3[GET_CLASS(ch)]);
-	     do_say(owner, buf, 9);
+	     do_say(owner, buf, CMD_DEFAULT);
  	     do_say(owner,"As such, the guild will imbue into you some of our most powerful magic and grant you freedom from hunger and thirst!",9);
 //	     send_to_char(buf, ch);
 	} else {
 	 sprintf(buf, "Well done master %s, the guild has collected a tithe to reward your continued support of our profession.",pc_clss_types3[GET_CLASS(ch)]);
 
-	 do_say(owner, buf, 9);
+	 do_say(owner, buf, CMD_DEFAULT);
 	sprintf(buf, "Your guildmaster gives you %d platinum coins.\r\n", bonus);
 	 send_to_char(buf,ch);
 	 GET_PLATINUM(ch) += bonus;
@@ -852,7 +852,7 @@ int guild(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
     if(IS_SET(skills_guild(ch, arg, owner), eSUCCESS))
       return eSUCCESS;
     else if (search_skills(arg,g_skills) != -1)
-       do_say(owner,"Seek out the SKILLS MASTER in the forests west of Sorpigal to learn this ability.", 9);
+       do_say(owner,"Seek out the SKILLS MASTER in the forests west of Sorpigal to learn this ability.", CMD_DEFAULT);
     else send_to_char("You do not know of this ability...\n\r", ch);
   }
 
@@ -964,7 +964,7 @@ int skill_master(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
     if (number == -1) {
       if(!skilllist) return eFAILURE;
       if(search_skills(arg, skilllist) != -1)
-         do_say(invoker,"You must speak with your guildmaster to learn such a complicated ability.", 9);
+         do_say(invoker,"You must speak with your guildmaster to learn such a complicated ability.", CMD_DEFAULT);
       else send_to_char("You do not know of this skill...\n\r", ch);
       return eSUCCESS;
     }

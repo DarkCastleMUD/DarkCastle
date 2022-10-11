@@ -620,7 +620,7 @@ int spell_howl(uint8_t level, char_data *ch, char_data *victim, struct obj_data 
 
 	  if (tmp_char->fighting)
 	    {
-	     do_say(tmp_char,"Screw this! I'm going home!", 9);
+	     do_say(tmp_char,"Screw this! I'm going home!", CMD_DEFAULT);
 	     if (tmp_char->fighting->fighting == tmp_char)
 	         stop_fighting(tmp_char->fighting);
 
@@ -1779,7 +1779,7 @@ int spell_paralyze(uint8_t level, char_data *ch, char_data *victim, struct obj_d
 
 	// Finish off any singing performances (bard)
   if(IS_SINGING(victim))
-    do_sing(victim, "stop", 9);
+    do_sing(victim, "stop", CMD_DEFAULT);
 
   act("$n seems to be paralyzed!", victim, 0, 0, TO_ROOM, INVIS_NULL);
   send_to_char("Your entire body rebels against you and you are paralyzed!\n\r", victim);
@@ -11558,7 +11558,7 @@ int spell_beacon(uint8_t level, char_data *ch, char *arg, int type, char_data *v
       send_to_char("Failure in move_char.  Major fuckup.  Contact a god.\r\n", ch);
       return eFAILURE;
    }
-   do_look(ch, "", 9);
+   do_look(ch, "", CMD_DEFAULT);
 
    act("$n steps out from a dimensional rip.", ch, 0, 0, TO_ROOM, 0);
    return eSUCCESS;

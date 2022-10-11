@@ -178,7 +178,7 @@ int do_tame(char_data *ch, char *arg, int cmd)
      }
      if (vict) {
 	if (vict->in_room == ch->in_room && vict->position > POSITION_SLEEPING)
-	  do_say(vict, "Hey... but what about ME!?", 9);
+	  do_say(vict, "Hey... but what about ME!?", CMD_DEFAULT);
          remove_memory(vict, 'h');
 	if (vict->master) { 
          stop_follower(vict, BROKE_CHARM);	
@@ -924,7 +924,7 @@ int mob_arrow_response(char_data *ch, char_data *victim,
   if(ISSET(victim->mobdata->actflags, ACT_STUPID))
   {
     if(!number(0,20))
-       do_shout(victim, "Duh George, someone keeps shooting me!", 9);    
+       do_shout(victim, "Duh George, someone keeps shooting me!", CMD_DEFAULT);    
     return eSUCCESS;
   }
 
@@ -986,9 +986,9 @@ int mob_arrow_response(char_data *ch, char_data *victim,
     }    
     if (number(1, 5) == 1) {
       if (number(0,1)) {
-	do_shout(victim, "Where the fuck are these arrows coming from?!", 9);
+	do_shout(victim, "Where the fuck are these arrows coming from?!", CMD_DEFAULT);
       } else {
-	do_shout(victim, "Quit shooting me dammit!", 9);
+	do_shout(victim, "Quit shooting me dammit!", CMD_DEFAULT);
       }
     }
   }
@@ -1367,7 +1367,7 @@ int do_fire(char_data *ch, char *arg, int cmd) {
             found = find_arrow(ch->equipment[where]);
             if (found)
             {
-              get(ch, found, ch->equipment[where], 0, 9);
+              get(ch, found, ch->equipment[where], 0, CMD_DEFAULT);
             }
             break;
           }

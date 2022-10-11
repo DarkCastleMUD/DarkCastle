@@ -48,10 +48,10 @@ void repair_shop_fix_eq(char_data * ch, char_data * owner, int price, obj_data *
 	GET_GOLD(ch) -= price;
 	eq_remove_damage(obj);
 	sprintf(buf, "It will cost you %d coins to repair %s.", price, obj->short_description);
-	do_say(owner, buf, 9);
+	do_say(owner, buf, CMD_DEFAULT);
 	act("You watch $N fix $p...\n\r\n\r", ch, obj, owner, TO_CHAR, 0);
 	act("You watch $N fix $p...\n\r\n\r", ch, obj, owner, TO_ROOM, 0);
-	do_say(owner, "All fixed!", 9);
+	do_say(owner, "All fixed!", CMD_DEFAULT);
 	act("$N gives you $p.", ch, obj, owner, TO_CHAR, 0);
 	act("$N gives $n $p.", ch, obj, owner, TO_ROOM, INVIS_NULL);
 }
@@ -59,9 +59,9 @@ void repair_shop_fix_eq(char_data * ch, char_data * owner, int price, obj_data *
 void repair_shop_complain_no_cash(char_data * ch, char_data * owner, int price, obj_data * obj) {
 	char buf[256];
 
-	do_say(owner, "Trying to sucker me for a free repair job?", 9);
+	do_say(owner, "Trying to sucker me for a free repair job?", CMD_DEFAULT);
 	sprintf(buf, "It would cost %d coins to repair %s, which you don't have!", price, obj->short_description);
-	do_say(owner, buf, 9);
+	do_say(owner, buf, CMD_DEFAULT);
 	act("$N gives you $p.", ch, obj, owner, TO_CHAR, 0);
 	act("$N gives $n $p.", ch, obj, owner, TO_ROOM, INVIS_NULL);
 }
@@ -70,7 +70,7 @@ void repair_shop_price_check(char_data * ch, char_data * owner, int price, obj_d
 	char buf[256];
 
 	sprintf(buf, "It will only cost you %d coins to repair %s.'", price, obj->short_description);
-	do_say(owner, buf, 9);
+	do_say(owner, buf, CMD_DEFAULT);
 	act("$N gives you $p.", ch, obj, owner, TO_CHAR, 0);
 	act("$N gives $n $p.", ch, obj, owner, TO_ROOM, INVIS_NULL);
 }
@@ -108,7 +108,7 @@ int repair_guy(char_data *ch, struct obj_data *obj, int cmd, const char *arg, ch
 	act("\n\r$N examines $p...", ch, obj, owner, TO_ROOM, INVIS_NULL);
 
 	if (IS_OBJ_STAT(obj, ITEM_NOREPAIR) || obj->obj_flags.type_flag != ITEM_ARMOR || IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL)) {
-		do_say(owner, "I can't repair this.", 9);
+		do_say(owner, "I can't repair this.", CMD_DEFAULT);
 		act("$N gives you $p.", ch, obj, owner, TO_CHAR, 0);
 		act("$N gives $n $p.", ch, obj, owner, TO_ROOM, INVIS_NULL);
 		return eSUCCESS;
@@ -117,7 +117,7 @@ int repair_guy(char_data *ch, struct obj_data *obj, int cmd, const char *arg, ch
 	eqdam = eq_current_damage(obj);
 
 	if (eqdam <= 0) {
-		do_say(owner, "Looks fine to me.", 9);
+		do_say(owner, "Looks fine to me.", CMD_DEFAULT);
 		act("$N gives you $p.", ch, obj, owner, TO_CHAR, 0);
 		act("$N gives $n $p.", ch, obj, owner, TO_ROOM, INVIS_NULL);
 		return eSUCCESS;
@@ -173,7 +173,7 @@ int super_repair_guy(char_data *ch, struct obj_data *obj, int cmd, const char *a
 	}
 
 	if (IS_OBJ_STAT(obj, ITEM_NOREPAIR)) {
-		do_say(owner, "I can't repair this.", 9);
+		do_say(owner, "I can't repair this.", CMD_DEFAULT);
 		return eSUCCESS;
 	}
 
@@ -185,7 +185,7 @@ int super_repair_guy(char_data *ch, struct obj_data *obj, int cmd, const char *a
 	eqdam = eq_current_damage(obj);
 
 	if (eqdam <= 0) {
-		do_say(owner, "Looks fine to me.", 9);
+		do_say(owner, "Looks fine to me.", CMD_DEFAULT);
 		act("$N gives you $p.", ch, obj, owner, TO_CHAR, 0);
 		act("$N gives $n $p.", ch, obj, owner, TO_ROOM, INVIS_NULL);
 		return eSUCCESS;
@@ -207,7 +207,7 @@ int super_repair_guy(char_data *ch, struct obj_data *obj, int cmd, const char *a
 		price = ((cost * percent) / 100); /* now we know what to charge */
 	} else {
 		// Dunno how to repair non-weapons/armor
-		do_say(owner, "I can't repair this.", 9);
+		do_say(owner, "I can't repair this.", CMD_DEFAULT);
 		act("$N gives you $p.", ch, obj, owner, TO_CHAR, 0);
 		act("$N gives $n $p.", ch, obj, owner, TO_ROOM, INVIS_NULL);
 		return eSUCCESS;
@@ -261,7 +261,7 @@ int repair_shop(char_data *ch, struct obj_data *obj, int cmd, const char *arg, c
 	}
 
 	if (IS_OBJ_STAT(obj, ITEM_NOREPAIR)) {
-		do_say(owner, "I can't repair this.", 9);
+		do_say(owner, "I can't repair this.", CMD_DEFAULT);
 		return eSUCCESS;
 	}
 
@@ -273,7 +273,7 @@ int repair_shop(char_data *ch, struct obj_data *obj, int cmd, const char *arg, c
 	eqdam = eq_current_damage(obj);
 
 	if (eqdam <= 0) {
-		do_say(owner, "Looks fine to me.", 9);
+		do_say(owner, "Looks fine to me.", CMD_DEFAULT);
 		act("$N gives you $p.", ch, obj, owner, TO_CHAR, 0);
 		act("$N gives $n $p.", ch, obj, owner, TO_ROOM, INVIS_NULL);
 		return eSUCCESS;
@@ -300,7 +300,7 @@ int repair_shop(char_data *ch, struct obj_data *obj, int cmd, const char *arg, c
 		price *= 3;
 	} else {
 		// Dunno how to repair non-weapons/armor
-		do_say(owner, "I can't repair this.", 9);
+		do_say(owner, "I can't repair this.", CMD_DEFAULT);
 		act("$N gives you $p.", ch, obj, owner, TO_CHAR, 0);
 		act("$N gives $n $p.", ch, obj, owner, TO_ROOM, INVIS_NULL);
 		return eSUCCESS;
@@ -758,7 +758,7 @@ int gl_repair_shop(char_data *ch, struct obj_data *obj, int cmd, const char *arg
 	}
 
 	if (IS_OBJ_STAT(obj, ITEM_NOREPAIR)) {
-		do_say(owner, "I can't repair this.", 9);
+		do_say(owner, "I can't repair this.", CMD_DEFAULT);
 		return eSUCCESS;
 	}
 
@@ -770,7 +770,7 @@ int gl_repair_shop(char_data *ch, struct obj_data *obj, int cmd, const char *arg
 	eqdam = eq_current_damage(obj);
 
 	if (eqdam <= 0) {
-		do_say(owner, "Looks fine to me.", 9);
+		do_say(owner, "Looks fine to me.", CMD_DEFAULT);
 		act("$N gives you $p.", ch, obj, owner, TO_CHAR, 0);
 		act("$N gives $n $p.", ch, obj, owner, TO_ROOM, INVIS_NULL);
 		return eSUCCESS;
@@ -781,7 +781,7 @@ int gl_repair_shop(char_data *ch, struct obj_data *obj, int cmd, const char *arg
 	value2 = obj->obj_flags.value[2];
 
 	if (!IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL)) {
-		do_say(owner, "I don't repair this kind of junk.", 9);
+		do_say(owner, "I don't repair this kind of junk.", CMD_DEFAULT);
 		act("$N gives you $p.", ch, obj, owner, TO_CHAR, 0);
 		act("$N gives $n $p.", ch, obj, owner, TO_ROOM, INVIS_NULL);
 		return eSUCCESS;
@@ -800,7 +800,7 @@ int gl_repair_shop(char_data *ch, struct obj_data *obj, int cmd, const char *arg
 		price *= 5;
 	} else {
 		// Dunno how to repair non-weapons/armor
-		do_say(owner, "I can't repair this.", 9);
+		do_say(owner, "I can't repair this.", CMD_DEFAULT);
 		act("$N gives you $p.", ch, obj, owner, TO_CHAR, 0);
 		act("$N gives $n $p.", ch, obj, owner, TO_ROOM, INVIS_NULL);
 		return eSUCCESS;

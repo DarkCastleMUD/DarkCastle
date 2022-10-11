@@ -322,16 +322,16 @@ int check_ethereal_focus(char_data *ch, int trigger_type)
       )
     {
       sprintf(buf, "I see you %s but I can't do anything about it!", GET_SHORT(ch));
-      do_say(i, buf, 9);
+      do_say(i, buf, CMD_DEFAULT);
       break;
     }
 
     if( i == ch ) { 
-      do_say(i, "Wait, I didn't mean to move .... crap.", 9);
+      do_say(i, "Wait, I didn't mean to move .... crap.", CMD_DEFAULT);
     }
     else {
       sprintf(buf, "I see movement!!!  It's %s!", IS_NPC(ch) ? GET_SHORT(ch) : GET_NAME(ch) );
-      do_say(i, buf, 9);
+      do_say(i, buf, CMD_DEFAULT);
       set_fighting(i, ch);
       set_fighting(ch, i);
       retval = attack(i, ch, TYPE_UNDEFINED);
@@ -370,7 +370,7 @@ int check_ethereal_focus(char_data *ch, int trigger_type)
         if( trigger_type == ETHEREAL_FOCUS_TRIGGER_MOVE || trigger_type == ETHEREAL_FOCUS_TRIGGER_SOCIAL) {
           // Get um!
           sprintf(buf, "I see movement!!!  It's %s!", IS_NPC(ch) ? GET_SHORT(ch) : GET_NAME(ch) );
-          do_say(ally, buf, 9);
+          do_say(ally, buf, CMD_DEFAULT);
           set_fighting(ally, ch);
           set_fighting(ch, ally);
           retval = attack(ally, ch, TYPE_UNDEFINED); 

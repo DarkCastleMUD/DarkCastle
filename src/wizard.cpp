@@ -1512,7 +1512,7 @@ int do_restore(char_data *ch, char *argument, int cmd)
             if (!IS_AFFECTED(ch, AFF_BLIND))
             act("You have been fully healed by $N!",
              victim, 0, ch, TO_CHAR, 0);
-            do_save(victim, "", 9);
+            do_save(victim, "", CMD_DEFAULT);
         } else {    /* Restore all */
 
        if (GET_LEVEL(ch) < OVERSEER) {
@@ -1544,7 +1544,7 @@ int do_restore(char_data *ch, char *argument, int cmd)
      
             act("You have been fully healed by $N!",
              victim, 0, ch, TO_CHAR, 0);
-            do_save(victim, "", 9);
+            do_save(victim, "", CMD_DEFAULT);
         }
            sprintf(buf, "%s did a restore all!", GET_NAME(ch));
             log(buf, GET_LEVEL(ch), LOG_GOD);

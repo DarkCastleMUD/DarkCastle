@@ -425,38 +425,38 @@ void shopping_value(const char *arg, char_data *ch,
        } else {
           act("You hold up $p for the Weaponsmith to examine.", ch, obj, 0, TO_CHAR, 0);
           act("$n holds up $p for the Weaponsmith to examine.", ch, obj, 0, TO_ROOM, 0);
-          do_emote(keeper, "looks carefully at the item.", 9);
+          do_emote(keeper, "looks carefully at the item.", CMD_DEFAULT);
        }
        if(GET_ITEM_TYPE(obj) == ITEM_WEAPON) {
           if(obj->obj_flags.eq_level < 20) {
              sprintf(buf, "Well, %s is able to be used by ", obj->short_description);
              sprintbit(obj->obj_flags.size, size_bits, buf2);
              strcat(buf, buf2);
-             do_say(keeper, buf, 9);
+             do_say(keeper, buf, CMD_DEFAULT);
              sprintf(buf, "and it can be wielded by these classes: ");
              sprintbit(obj->obj_flags.extra_flags, extra_bits, buf2);
              strcat(buf, buf2);
-             do_say(keeper, buf, 9);
+             do_say(keeper, buf, CMD_DEFAULT);
              sprintf(buf, "The minimum level necessary to use it is %d.", obj->obj_flags.eq_level);
-             do_say(keeper, buf, 9);
+             do_say(keeper, buf, CMD_DEFAULT);
              sprintf(buf, "The damage dice are '%dD%d'", obj->obj_flags.value[1], obj->obj_flags.value[2]);
-             do_say(keeper, buf, 9);
+             do_say(keeper, buf, CMD_DEFAULT);
              for(int i=0;i<obj->num_affects;i++) {
                 if(obj->affected[i].location == APPLY_HITROLL && obj->affected[i].modifier != 0) {
                    sprintf(buf, "It increases your hit roll by %d.", obj->affected[i].modifier);
-                   do_say(keeper, buf, 9);
+                   do_say(keeper, buf, CMD_DEFAULT);
                 }
                 if(obj->affected[i].location == APPLY_DAMROLL && obj->affected[i].modifier != 0) {
                    sprintf(buf, "It increases your damage by %d.", obj->affected[i].modifier);
-                   do_say(keeper, buf, 9);
+                   do_say(keeper, buf, CMD_DEFAULT);
                 }
              }
           }
           else
-             do_say(keeper, "This weapon is unknown to me.", 9); 
+             do_say(keeper, "This weapon is unknown to me.", CMD_DEFAULT); 
        }
        else
-          do_say(keeper, "I'm a weapons expert, that is all.", 9);
+          do_say(keeper, "I'm a weapons expert, that is all.", CMD_DEFAULT);
     }
     if(mob_index[keeper->mobdata->nr].virt == 3004) { //if the armourer in town
        if(keeperhas) {
@@ -465,34 +465,34 @@ void shopping_value(const char *arg, char_data *ch,
        } else {
           act("You hold up $p for the Armourer to examine.", ch, obj, 0, TO_CHAR, 0);
           act("$n holds up $p to the Armourer to examine.", ch, obj, 0, TO_ROOM, 0);
-          do_emote(keeper, "looks carefully at the item.", 9);
+          do_emote(keeper, "looks carefully at the item.", CMD_DEFAULT);
        }
        if(GET_ITEM_TYPE(obj) == ITEM_ARMOR) {
           if(obj->obj_flags.eq_level < 20) {
              sprintf(buf, "Ah yes, %s can be worn by ", obj->short_description);
              sprintbit(obj->obj_flags.size, size_bits, buf2);
              strcat(buf, buf2);
-             do_say(keeper, buf, 9);
+             do_say(keeper, buf, CMD_DEFAULT);
              sprintf(buf, "and it can be worn by these classes: ");
              sprintbit(obj->obj_flags.extra_flags, extra_bits, buf2);
              strcat(buf, buf2);
-             do_say(keeper, buf, 9); 
+             do_say(keeper, buf, CMD_DEFAULT); 
              sprintf(buf, "The minimum level necessary to use it is %d.", obj->obj_flags.eq_level);
-             do_say(keeper, buf, 9);
+             do_say(keeper, buf, CMD_DEFAULT);
              for(int i=0;i<obj->num_affects;i++) {
                 if(obj->affected[i].location == APPLY_AC && obj->affected[i].modifier != 0) {
                    sprintf(buf, "Your armor class will change by %d.", obj->affected[i].modifier);
-                   do_say(keeper, buf, 9);
+                   do_say(keeper, buf, CMD_DEFAULT);
                    if(obj->affected[i].modifier < 0)
-                      do_say(keeper, "Don't worry, this is a good thing.", 9);
+                      do_say(keeper, "Don't worry, this is a good thing.", CMD_DEFAULT);
                 }
              }
           }
           else
-             do_say(keeper, "This armor is crafted using too advanced techniques for me.", 9); 
+             do_say(keeper, "This armor is crafted using too advanced techniques for me.", CMD_DEFAULT); 
        }
        else
-          do_say(keeper, "I deal with armor exclusively.", 9);
+          do_say(keeper, "I deal with armor exclusively.", CMD_DEFAULT);
     }
     if(mob_index[keeper->mobdata->nr].virt == 3000) { //if the wizard in town
        if(keeperhas) {
@@ -501,43 +501,43 @@ void shopping_value(const char *arg, char_data *ch,
        } else {
           act("You hold up $p for the Wizard to examine.", ch, obj, 0, TO_CHAR, 0);
           act("$n holds up $p for the Wizard to examine.", ch, obj, 0, TO_ROOM, 0);
-          do_emote(keeper, "looks carefully at the item.", 9);
+          do_emote(keeper, "looks carefully at the item.", CMD_DEFAULT);
        }
        if(GET_ITEM_TYPE(obj) == ITEM_SCROLL || GET_ITEM_TYPE(obj) == ITEM_WAND || GET_ITEM_TYPE(obj) == ITEM_POTION || GET_ITEM_TYPE(obj) == ITEM_STAFF) {
           if(obj->obj_flags.value[0] < 20) {
              sprintf(buf, "Excellent, %s has been imbued with energies of the %dth level.", obj->short_description, obj->obj_flags.value[0]);
-             do_say(keeper, buf, 9);
+             do_say(keeper, buf, CMD_DEFAULT);
              if(GET_ITEM_TYPE(obj) == ITEM_WAND || GET_ITEM_TYPE(obj) == ITEM_STAFF) {
                 if(obj->obj_flags.value[3] >= 1) {
                    sprintf(buf, "It is eminating the aura of ");
                    sprinttype(obj->obj_flags.value[3]-1, spells, buf2);
                    strcat(buf, buf2);
-                   do_say(keeper, buf, 9);
+                   do_say(keeper, buf, CMD_DEFAULT);
                 }
                 if(obj->obj_flags.value[1] == obj->obj_flags.value[2])
-                   do_say(keeper, "It's fully charged as well.", 9);
+                   do_say(keeper, "It's fully charged as well.", CMD_DEFAULT);
                 else if(obj->obj_flags.value[2] == 0)
-                   do_say(keeper, "Though unfortunately, there are no more charges left.", 9);
+                   do_say(keeper, "Though unfortunately, there are no more charges left.", CMD_DEFAULT);
                 else
-                   do_say(keeper, "It looks like it has been used some.", 9);
+                   do_say(keeper, "It looks like it has been used some.", CMD_DEFAULT);
              }
              else {
                 if(obj->obj_flags.value[1] >= 1) {
                    sprintf(buf, "I can easily identify the signatures of ");
                    sprinttype(obj->obj_flags.value[1]-1, spells, buf2);
                    strcat(buf, buf2);
-                   do_say(keeper, buf, 9);
+                   do_say(keeper, buf, CMD_DEFAULT);
                 }
                 if(obj->obj_flags.value[2] >= 1) {
-                   do_say(keeper, "There are more enchantments held within, but I'm rather busy.", 9);
+                   do_say(keeper, "There are more enchantments held within, but I'm rather busy.", CMD_DEFAULT);
                 }
              }
           }
           else
-             do_say(keeper, "This item contains magics too powerful for me to discern.", 9); 
+             do_say(keeper, "This item contains magics too powerful for me to discern.", CMD_DEFAULT); 
        }
        else
-          do_say(keeper, "I only know the properties of scrolls, potions, staves, and wands.", 9);
+          do_say(keeper, "I only know the properties of scrolls, potions, staves, and wands.", CMD_DEFAULT);
     }
 
     if(mob_index[keeper->mobdata->nr].virt == 3010 && keeperhas) { //if the leather worker in town
@@ -548,25 +548,25 @@ void shopping_value(const char *arg, char_data *ch,
              sprintf(buf, "Ah yes, %s can be worn by ", obj->short_description);
              sprintbit(obj->obj_flags.size, size_bits, buf2);
              strcat(buf, buf2);
-             do_say(keeper, buf, 9);
+             do_say(keeper, buf, CMD_DEFAULT);
              sprintf(buf, "and it can be worn by these classes: ");
              sprintbit(obj->obj_flags.extra_flags, extra_bits, buf2);
              strcat(buf, buf2);
-             do_say(keeper, buf, 9);
+             do_say(keeper, buf, CMD_DEFAULT);
              sprintf(buf, "The minimum level necessary to use it is %d.", obj->obj_flags.eq_level);
-             do_say(keeper, buf, 9);
+             do_say(keeper, buf, CMD_DEFAULT);
              for(int i=0;i<obj->num_affects;i++) {
                 if(obj->affected[i].location == APPLY_AC && obj->affected[i].modifier != 0) {
                    sprintf(buf, "Your armor class will change by %d.", obj->affected[i].modifier);
-                   do_say(keeper, buf, 9);
+                   do_say(keeper, buf, CMD_DEFAULT);
                    if(obj->affected[i].modifier < 0)
-                      do_say(keeper, "Don't worry, this is a good thing.", 9);
+                      do_say(keeper, "Don't worry, this is a good thing.", CMD_DEFAULT);
                 }
              }
           }
           else
-             do_say(keeper, "This armor is crafted using too advanced techniques for me.", 9);
-       } else do_say(keeper, "I don't know anything about this item, actually.", 9);
+             do_say(keeper, "This armor is crafted using too advanced techniques for me.", CMD_DEFAULT);
+       } else do_say(keeper, "I don't know anything about this item, actually.", CMD_DEFAULT);
     }
 
     if ( !trade_with( obj, shop_nr ) || obj->obj_flags.cost < 1 )
@@ -1188,7 +1188,7 @@ void player_shopping_buy(const char * arg, char_data * ch, char_data * keeper)
    if(*shop->sell_message)
       sprintf(buf, "%s %s", GET_NAME(ch), shop->sell_message);
    else sprintf(buf, "%s Thank you, come again!", GET_NAME(ch));
-   do_tell(keeper, buf, 9);
+   do_tell(keeper, buf, CMD_DEFAULT);
 
    // update inventory
    for(player_shop_item * curr = shop->sale_list; curr; curr = curr->next) {

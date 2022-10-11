@@ -223,7 +223,7 @@ int do_fsave(char_data *ch, string argument, int cmd)
     buf = {};
     send_to_char("Ok.\r\n", ch);
   }
-  do_save(vict, "", 9);
+  do_save(vict, "", CMD_DEFAULT);
   buf = format("{} just forced {} to save.", GET_NAME(ch), GET_NAME(vict));
   log(buf, GET_LEVEL(ch), LOG_GOD);
 
@@ -478,7 +478,7 @@ int do_guild(char_data *ch, char *argument, int cmd)
   
   old_room = ch->in_room;
   ch->in_room = room;
-  do_rsave(ch, "", 9);
+  do_rsave(ch, "", CMD_DEFAULT);
   ch->in_room = old_room;
   
   return eSUCCESS;

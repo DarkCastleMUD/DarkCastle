@@ -228,7 +228,7 @@ void stop_grouped_bards(char_data *ch, int bardsing) {
 		else {
 			if (bardsing)
 				origsing = master;
-			do_sing(ch, "stop", 9);
+			do_sing(ch, "stop", CMD_DEFAULT);
 			origsing = NULL;
 		}
 		for (fvictim = master->followers; fvictim; fvictim = fvictim->next) {
@@ -236,7 +236,7 @@ void stop_grouped_bards(char_data *ch, int bardsing) {
 				continue;
 			else
 				origsing = fvictim->follower;
-			do_sing(ch, "stop", 9);
+			do_sing(ch, "stop", CMD_DEFAULT);
 			origsing = NULL;
 		}
 	} else { //kill the person's love
@@ -249,11 +249,11 @@ void stop_grouped_bards(char_data *ch, int bardsing) {
 		for (fvictim = master->followers; fvictim; fvictim = fvictim->next) {
 			// end any performances
 			if (IS_SINGING(fvictim->follower))
-				do_sing(fvictim->follower, "stop", 9);
+				do_sing(fvictim->follower, "stop", CMD_DEFAULT);
 		}
 
 		if (IS_SINGING(master)) {
-			do_sing(master, "stop", 9);
+			do_sing(master, "stop", CMD_DEFAULT);
 		}
 		origsing = NULL;
 	}
@@ -1555,7 +1555,7 @@ void do_astral_chanty_movement(char_data *victim, char_data *target) {
 		return;
 	}
 
-	do_look(victim, "", 9);
+	do_look(victim, "", CMD_DEFAULT);
 	WAIT_STATE(victim, PULSE_VIOLENCE);
 	act("$n appears out of nowhere in a chorus of light and song.", victim, 0, 0, TO_ROOM, 0);
 }
@@ -1698,7 +1698,7 @@ int execute_song_forgetful_rhythm(uint8_t level, char_data *ch, char *arg, char_
 	} else {
 		// Die bard!
 		send_to_char("Uh oh.\r\n", ch);
-		do_say(victim, "Die you spoony bard!", 9);
+		do_say(victim, "Die you spoony bard!", CMD_DEFAULT);
 		retval = attack(victim, ch, TYPE_UNDEFINED);
 		retval = SWAP_CH_VICT(retval);
 		return retval;
@@ -2027,7 +2027,7 @@ int execute_song_summon_song(uint8_t level, char_data *ch, char *arg, char_data 
 		for (fvictim = ch->followers; fvictim; fvictim = fvictim->next) {
 			if (IS_AFFECTED(fvictim->follower, AFF_CHARM) && IS_MOB(fvictim->follower) && ch->in_room != fvictim->follower->in_room) {
 				summoned = true;
-				do_emote(fvictim->follower, "disappears in a flash of $B$6m$4u$1l$7t$4i$7-$6c$4o$1l$6o$7r$4e$1d$R (disco?) light.\r\n", 9);
+				do_emote(fvictim->follower, "disappears in a flash of $B$6m$4u$1l$7t$4i$7-$6c$4o$1l$6o$7r$4e$1d$R (disco?) light.\r\n", CMD_DEFAULT);
 				move_char(fvictim->follower, ch->in_room);
 				act("With a $B$6m$4u$1l$7t$4i$7-$6c$4o$1l$6o$7r$4e$1d$R flash of (disco?) light $n appears!", fvictim->follower, 0, 0, TO_ROOM, 0);
 			}
@@ -2544,7 +2544,7 @@ int execute_song_dischordant_dirge(uint8_t level, char_data *ch, char *arg, char
 	act("$N blinks and shakes its head, clearing its thoughts.", ch, 0, target, TO_CHAR, 0);
 	act("$N blinks and shakes its head, clearing its thoughts.", ch, 0, target, TO_ROOM, NOTVICT);
 	if (target->fighting) {
-		do_say(target, "Hey, this sucks. I'm goin' home!", 9);
+		do_say(target, "Hey, this sucks. I'm goin' home!", CMD_DEFAULT);
 		if (target->fighting->fighting == target)
 			stop_fighting(target->fighting);
 		stop_fighting(target);

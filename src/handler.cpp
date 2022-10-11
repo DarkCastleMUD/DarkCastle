@@ -2198,7 +2198,7 @@ int char_to_room(char_data *ch, int room, bool stop_all_fighting)
 	}
 
 	if (stop_all_fighting && (GET_CLASS(ch) == CLASS_BARD) && IS_SET(world[ch->in_room].room_flags, NO_KI) && !(ch->songs.empty())) {
-		do_sing(ch, "stop", 9);
+		do_sing(ch, "stop", CMD_DEFAULT);
 	}
 
 	return (1);

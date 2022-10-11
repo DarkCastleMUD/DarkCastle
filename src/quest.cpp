@@ -762,24 +762,24 @@ int quest_handler(char_data *ch, char_data *qmaster, int cmd, char *name)
 
    switch(cmd) {
       case 1:
-         do_emote(qmaster, "looks at his notes and writes a scroll.", 9);
+         do_emote(qmaster, "looks at his notes and writes a scroll.", CMD_DEFAULT);
          sprintf(buf, "%s Here are some currently available quests.", GET_NAME(ch));
-         do_psay(qmaster, buf, 9);
+         do_psay(qmaster, buf, CMD_DEFAULT);
          show_available_quests(ch);
          break;
       case 2:
          retval = cancel_quest(ch, quest);
          if(IS_SET(retval, eSUCCESS)) {
             sprintf(buf, "%s You may begin this quest again if you speak with me.", GET_NAME(ch));
-            do_psay(qmaster, buf, 9);
+            do_psay(qmaster, buf, CMD_DEFAULT);
          }
          else if(IS_SET(retval, eEXTRA_VALUE)) {
             sprintf(buf, "%s You cannot cancel up any more quests without completing some of them.", GET_NAME(ch));
-            do_psay(qmaster, buf, 9);
+            do_psay(qmaster, buf, CMD_DEFAULT);
          }
          else {
             sprintf(buf, "%s You weren't doing this quest to begin with.", GET_NAME(ch));
-            do_psay(qmaster, buf, 9);
+            do_psay(qmaster, buf, CMD_DEFAULT);
          }
          break;
       case 3:
@@ -787,16 +787,16 @@ int quest_handler(char_data *ch, char_data *qmaster, int cmd, char *name)
          if(IS_SET(retval, eSUCCESS)) {
            if(quest->number) {
             sprintf(buf, "%s Excellent!  Let me write down the quest information for you.", GET_NAME(ch));
-            do_psay(qmaster, buf, 9);
-            do_emote(qmaster, "gives up the scroll.", 9);
+            do_psay(qmaster, buf, CMD_DEFAULT);
+            do_emote(qmaster, "gives up the scroll.", CMD_DEFAULT);
             show_quest_header(ch);
             show_one_quest(ch, quest, 0);
             show_quest_footer(ch);
            } else {
             sprintf(buf, "%s I have placed a token of Phire upon a creature somewhere within the realms.", GET_NAME(ch));
-            do_psay(qmaster, buf, 9);
+            do_psay(qmaster, buf, CMD_DEFAULT);
             sprintf(buf, "%s Retrieve it for me within 12 hours for a reward!", GET_NAME(ch));
-            do_psay(qmaster, buf, 9);
+            do_psay(qmaster, buf, CMD_DEFAULT);
             show_quest_header(ch);
             show_one_quest(ch, quest, 0);
             show_quest_footer(ch);
@@ -804,35 +804,35 @@ int quest_handler(char_data *ch, char_data *qmaster, int cmd, char *name)
          }
          else if(IS_SET(retval, eEXTRA_VALUE)) {
             sprintf(buf, "%s You cannot start any more quests without completing some first.", GET_NAME(ch));
-            do_psay(qmaster, buf, 9);
+            do_psay(qmaster, buf, CMD_DEFAULT);
          }
          else if(IS_SET(retval, eEXTRA_VAL2)) {
             sprintf(buf, "%s You do not have the required funds to get the clue from me, beggar!", GET_NAME(ch));
-            do_psay(qmaster, buf, 9);
+            do_psay(qmaster, buf, CMD_DEFAULT);
          }
          else if(!retval) {
             sprintf(buf, "%s The quest item has left this world.  It will appear again soon.", GET_NAME(ch));
-            do_psay(qmaster, buf, 9);
+            do_psay(qmaster, buf, CMD_DEFAULT);
          }
          else {
             sprintf(buf, "%s Sorry, you cannot start this quest right now.", GET_NAME(ch));
-            do_psay(qmaster, buf, 9);
+            do_psay(qmaster, buf, CMD_DEFAULT);
          }
          break;
       case 4:
          retval = complete_quest(ch, quest);
          if(IS_SET(retval, eSUCCESS)) {
             sprintf(buf, "%s This is it!  Wonderful job, I will add your reward to your current amount of points!", GET_NAME(ch));
-            do_psay(qmaster, buf, 9);
+            do_psay(qmaster, buf, CMD_DEFAULT);
             do_save(ch, "", 666);
          }
          else if(IS_SET(retval, eEXTRA_VALUE)) {
             sprintf(buf, "%s You weren't doing this quest to begin with.", GET_NAME(ch));
-            do_psay(qmaster, buf, 9);
+            do_psay(qmaster, buf, CMD_DEFAULT);
          }
          else {
             sprintf(buf, "%s You have not yet completed this quest.", GET_NAME(ch));
-            do_say(qmaster, buf, 9);
+            do_say(qmaster, buf, CMD_DEFAULT);
          }
          break;
       default:
@@ -866,16 +866,16 @@ int quest_master(char_data *ch, obj_data *obj, int cmd, char *arg, char_data *ow
    if(cmd == 56) {
       if((choice = atoi(arg)) == 0 || choice < 0) {
          sprintf(buf, "%s Try a number from the list.", GET_NAME(ch));
-         do_tell(owner, buf, 9);
+         do_tell(owner, buf, CMD_DEFAULT);
          return eSUCCESS;
       }
       switch (atoi(arg)){
          case 1:
-            do_say(owner, "Sure, bum.", 9);
+            do_say(owner, "Sure, bum.", CMD_DEFAULT);
             break;
          default:
             sprintf(buf, "%s I don't offer that service.", GET_NAME(ch));
-            do_tell(owner, buf, 9);
+            do_tell(owner, buf, CMD_DEFAULT);
             break;
       }
    }

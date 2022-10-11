@@ -733,7 +733,7 @@ int do_simple_move(char_data *ch, int cmd, int following)
 		// This might be a bad idea...cause track calls move, which calls track, which...
 		if (IS_NPC(chaser))
 		{
-			retval = do_track(chaser, chaser->mobdata->hatred, 9);
+			retval = do_track(chaser, chaser->mobdata->hatred, CMD_DEFAULT);
 			if (SOMEONE_DIED(retval))
 				return retval;
 		}
@@ -903,7 +903,7 @@ int attempt_move(char_data *ch, int cmd, int is_retreat) {
 			 add_memory(ch, GET_NAME(ch->master), 'h');
 			 stop_follower(ch, BROKE_CHARM);
 			 //add_memory(ch, GET_NAME(ch->master), 'h');
-			 do_say(ch, "Hey! You tricked me!", 9);
+			 do_say(ch, "Hey! You tricked me!", CMD_DEFAULT);
 			 send_to_char("You lose control.\r\n",ch->master);
 			 }
 			 else
@@ -1012,7 +1012,7 @@ int do_leave(char_data *ch, char *arguement, int cmd)
 					act("$n attempts to leave, but can't!", ch, 0, 0, TO_ROOM, INVIS_NULL | STAYHIDE);
 					return eFAILURE;
 				}
-				do_look(ch, "", 9);
+				do_look(ch, "", CMD_DEFAULT);
 				sprintf(buf, "%s walks out of %s.", GET_NAME(ch), k->short_description);
 				act(buf, ch, 0, 0, TO_ROOM, INVIS_NULL | STAYHIDE);
 				return ambush(ch);
@@ -1076,7 +1076,7 @@ int do_enter(char_data *ch, char *argument, int cmd) {
 			if (others_clan_room(sesame, &world[real_room(portal->obj_flags.value[0])]) == true) {
 				send_to_char("Your master is not from that clan.\r\n", ch);
 				act("$n finds $mself unable to enter!", ch, 0, 0, TO_ROOM, 0);
-				do_say(ch, "I may not enter.", 9);
+				do_say(ch, "I may not enter.", CMD_DEFAULT);
 				return eFAILURE;
 			}
 		}
@@ -1143,7 +1143,7 @@ int do_enter(char_data *ch, char *argument, int cmd) {
 
 	switch (portal->obj_flags.value[1]) {
 	case 0:
-		do_look(ch, "", 9);
+		do_look(ch, "", CMD_DEFAULT);
 		WAIT_STATE(ch, PULSE_VIOLENCE);
 		send_to_char("\n\rYou are momentarily dazed from the dimensional shift.\n\r", ch);
 		act("The portal glows brighter for a second as $n appears beside you.", ch, 0, 0, TO_ROOM, 0);
@@ -1152,7 +1152,7 @@ int do_enter(char_data *ch, char *argument, int cmd) {
 	case 2:
 		sprintf(buf, "%s has entered %s.", GET_NAME(ch), portal->short_description);
 		act(buf, ch, 0, 0, TO_ROOM, STAYHIDE);
-		do_look(ch, "", 9);
+		do_look(ch, "", CMD_DEFAULT);
 		break;
 	case 3:
 		break;
@@ -1237,7 +1237,7 @@ int do_climb(char_data *ch, char *argument, int cmd) {
 		return retval;
 
 	act("$n carefully climbs $p.", ch, obj, 0, TO_ROOM, INVIS_NULL);
-	do_look(ch, "", 9);
+	do_look(ch, "", CMD_DEFAULT);
 
 	return eSUCCESS;
 }

@@ -166,7 +166,7 @@ int do_joinarena(char_data *ch, char *arg, int cmd)
 
   if(GET_POS(ch) == POSITION_SLEEPING) {
     affect_from_char(ch, INTERNAL_SLEEPING);
-    do_wake(ch, "", 9);
+    do_wake(ch, "", CMD_DEFAULT);
   }
 
   arena.cur_num++;

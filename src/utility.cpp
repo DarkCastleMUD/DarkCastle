@@ -1561,7 +1561,7 @@ int do_quit(char_data *ch, char *argument, int cmd)
 
   // Finish off any performances
   if(IS_SINGING(ch))
-    do_sing(ch, "stop", 9);
+    do_sing(ch, "stop", CMD_DEFAULT);
 
   extractFamiliar(ch);
   struct follow_type *fol, *fol_next;

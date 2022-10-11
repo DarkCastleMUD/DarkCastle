@@ -252,13 +252,13 @@ int do_find(char_data *ch, char *arg, int cmd)
       log("Default in do_find...should NOT happen.", ANGEL, LOG_BUG);
       return eFAILURE;
     case 0 :  // mobile 
-      return do_mlocate(ch, name, 9); 
+      return do_mlocate(ch, name, CMD_DEFAULT); 
     case 1 :  // pc 
       break;
     case 2 :  // character
       return do_mlocate(ch, name, 18); 
     case 3 :  // object 
-      return do_olocate(ch, name, 9); 
+      return do_olocate(ch, name, CMD_DEFAULT); 
   }
 
   if(!(vict = get_pc_vis(ch, name))) {
@@ -3891,7 +3891,7 @@ int do_redit(char_data *ch, char *argument, int cmd)
                           a, b, (remainder_args != "" ? remainder_args.c_str() : ""));
         SET_BIT(ch->pcdata->toggles, PLR_ONEWAY);
         char *tmp = strdup(buf.c_str());
-        do_at(ch, tmp, 9);
+        do_at(ch, tmp, CMD_DEFAULT);
         free(tmp);
         REMOVE_BIT(ch->pcdata->toggles, PLR_ONEWAY);
       }

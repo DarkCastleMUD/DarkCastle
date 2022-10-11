@@ -2137,7 +2137,7 @@ int do_oclone(char_data *ch, char *argument, int cmd)
   if (r2 < 0) {
     char buf[30];
     sprintf(buf, "new %d", v2);
-    int retval = do_oedit(ch, buf, 9);
+    int retval = do_oedit(ch, buf, CMD_DEFAULT);
     if (!IS_SET(retval, eSUCCESS)) return eFAILURE;
     r1 = real_object(v1);
     r2 = real_object(v2);
@@ -2207,7 +2207,7 @@ int do_mclone(char_data *ch, char *argument, int cmd)
   if (dst < 0) {
     char buf[30];
     sprintf(buf, "new %d", vdst);
-    int retval = do_medit(ch, buf, 9);
+    int retval = do_medit(ch, buf, CMD_DEFAULT);
     if (!IS_SET(retval, eSUCCESS)) return eFAILURE;
     dst = real_mobile(vdst);
     src = real_mobile(vsrc);

@@ -430,7 +430,7 @@ struct command_info cmd_info[] =
         {"disconnect", do_disconnect, nullptr, POSITION_DEAD, 106, CMD_DEFAULT, 0, 1},
         {"force", nullptr, do_force, POSITION_DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1},
         {"pardon", do_pardon, nullptr, POSITION_DEAD, OVERSEER, CMD_DEFAULT, 0, 1},
-        {"goto", do_goto, nullptr, POSITION_DEAD, 102, CMD_DEFAULT, 0, 1},
+        {"goto", nullptr, do_goto, POSITION_DEAD, 102, CMD_DEFAULT, 0, 1},
         {"restore", do_restore, nullptr, POSITION_DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1},
         {"purloin", do_purloin, nullptr, POSITION_DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1},
         {"set", do_set, nullptr, POSITION_DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1},
@@ -874,7 +874,7 @@ int command_interpreter(char_data *ch, string pcomm, bool procced)
       // charmies can only use charmie "ok" commands
       if (!procced) // Charmed mobs can still use their procs.
         if ((IS_AFFECTED(ch, AFF_FAMILIAR) || IS_AFFECTED(ch, AFF_CHARM)) && !IS_SET(found->flags, COM_CHARMIE_OK))
-          return do_say(ch, "I'm sorry master, I cannot do that.", 9);
+          return do_say(ch, "I'm sorry master, I cannot do that.", CMD_DEFAULT);
       if (IS_NPC(ch) && ch->desc && ch->desc->original &&
           ch->desc->original->level <= MAX_MORTAL && !IS_SET(found->flags, COM_CHARMIE_OK))
       {

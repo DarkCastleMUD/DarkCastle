@@ -546,7 +546,7 @@ bool set_utility_mortar(char_data *ch, struct obj_data *obj, char *arg)
   for(int i = 0;i < 4; i++)
     trap_obj->obj_flags.value[i] = obj->obj_flags.value[i];
 
-  do_say(ch, "Fire in the hole!", 9);
+  do_say(ch, "Fire in the hole!", CMD_DEFAULT);
   act("$n sets off $o with a flash and bang!.", ch, obj, 0, TO_ROOM, 0);
   send_to_char("You set off the device with a loud bang.\r\n", ch);
 

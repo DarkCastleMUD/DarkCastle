@@ -2461,7 +2461,7 @@ void read_one_zone(FILE * fl, int zon)
 			continue;
 		}
 
-		tmp = fread_int(fl, 0, 9);
+		tmp = fread_int(fl, 0, CMD_DEFAULT);
 		reset_tab[reset_top].if_flag = tmp;
 		reset_tab[reset_top].last = time(NULL) - number(0, 12 * 3600);
 		// randomize last repop on boot
