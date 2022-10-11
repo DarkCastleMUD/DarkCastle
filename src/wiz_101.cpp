@@ -125,7 +125,7 @@ int do_wizhelp(char_data *ch, char *argument, int cmd_arg)
 command_return_t do_goto(char_data *ch, string argument, int cmd)
 {
   string buf = {};
-  int loc_nr = {}, location = {}, i = {}, start_room = {};
+  int loc_nr = {}, location = -1, i = {}, start_room = {};
   zone_t zone_nr = {};
   char_data *target_mob = {}, *pers = {};
   char_data *tmp_ch = {};
@@ -133,8 +133,11 @@ command_return_t do_goto(char_data *ch, string argument, int cmd)
   struct obj_data *target_obj = {};
   extern int top_of_world;
 
-  if (IS_NPC(ch))
+  if (ch == nullptr || IS_NPC(ch))
+  {
     return eFAILURE;
+  }
+  start_room = ch->in_room;
 
   tie(buf, argument) = half_chop(argument);
   if (buf.empty())
@@ -152,21 +155,60 @@ command_return_t do_goto(char_data *ch, string argument, int cmd)
       return eFAILURE;
     }
 
-    try 
+    try
     {
-      zone_nr = stoll(buf);
+      zone_nr = stoull(buf);
+      if (zone_nr > top_of_zone_table)
+      {
+        ch->send(format("Invalid zone specified. Valid values are 0-{}\r\n", top_of_zone_table));
+        return eFAILURE;
+      }
+
+      if (zone_nr == 0)
+      {
+        loc_nr = 1;
+      }
+      else
+      {
+        loc_nr = zone_table[zone_nr - 1].top + 1;
+      }
+
+      ch->send(format("Going to room {} in zone #{} [{}]\r\n", loc_nr, zone_nr, ltrim(string(zone_table[zone_nr].name))));
+
+      if (loc_nr > top_of_world || loc_nr < 0)
+      {
+        send_to_char("No room exists with that number.\r\n", ch);
+        return eFAILURE;
+      }
+
+      if (world_array[loc_nr])
+      {
+        location = loc_nr;
+      }
+      else
+      {
+        if (can_modify_this_room(ch, loc_nr))
+        {
+          if (create_one_room(ch, loc_nr))
+          {
+            send_to_char("You form order out of chaos.\r\n", ch);
+            location = loc_nr;
+          }
+        }
+      }
+      if (location == -1)
+      {
+        send_to_char("No room exists with that number.\r\n", ch);
+        return eFAILURE;
+      }
     }
-    catch(...)
+    catch (...)
     {
       ch->send("Invalid zone number specified.\r\n");
       return eFAILURE;
     }
   }
-
-  start_room = ch->in_room;
-  location = -1;
-
-  if (isdigit(buf[0]) && (buf.length() < 2) || (buf.length() >= 2 && buf.find('.') == buf.npos))
+  else if (isdigit(buf[0]) && (buf.length() < 2) || (buf.length() >= 2 && buf.find('.') == buf.npos))
   {
     loc_nr = atoi(buf.c_str());
     if (loc_nr > top_of_world || loc_nr < 0)
@@ -194,19 +236,25 @@ command_return_t do_goto(char_data *ch, string argument, int cmd)
     }
   }
   else if ((target_mob = get_pc_vis(ch, buf)))
+  {
     location = target_mob->in_room;
-
+  }
   else if ((target_mob = get_char_vis(ch, buf)))
+  {
     location = target_mob->in_room;
-
+  }
   else if ((target_obj = get_obj_vis(ch, buf)))
+  {
     if (target_obj->in_room != NOWHERE)
+    {
       location = target_obj->in_room;
+    }
     else
     {
       send_to_char("The object is not available.\n\r", ch);
       return eFAILURE;
     }
+  }
   else
   {
     send_to_char("No such creature or object around.\n\r", ch);
@@ -243,6 +291,8 @@ command_return_t do_goto(char_data *ch, string argument, int cmd)
       return eFAILURE;
     }
   }
+
+  ch->send("\r\n");
 
   if (!IS_MOB(ch))
     for (tmp_ch = world[ch->in_room].people; tmp_ch; tmp_ch = tmp_ch->next_in_room)
