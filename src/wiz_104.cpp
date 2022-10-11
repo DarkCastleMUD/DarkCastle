@@ -61,7 +61,7 @@ int do_thunder(char_data *ch, char *argument, int cmd)
   if(!(*argument))
     send_to_char("It's not gonna look that impressive...\n\r", ch);
   else {
-    if (cmd == 9) 
+    if (cmd == CMD_DEFAULT) 
       sprintf(buf2, "$4$BYou thunder '%s'$R", argument);
     else 
       sprintf(buf2, "$7$BYou bellow '%s'$R", argument);
@@ -74,7 +74,7 @@ int do_thunder(char_data *ch, char *argument, int cmd)
         else
            sprintf(buf3, GET_SHORT(ch));
 
-        if (cmd == 9) {
+        if (cmd == CMD_DEFAULT) {
            sprintf(buf1, "$B$4%s thunders '%s'$R\n\r",buf3, argument);
         } else {
            sprintf(buf1, "$7$B%s bellows '%s'$R\r\n", buf3, argument);
@@ -124,11 +124,11 @@ int do_load(char_data *ch, char *arg, int cmd)
   if(IS_NPC(ch))
     return eFAILURE;
 
-  if(!has_skill(ch, COMMAND_LOAD) && cmd == 9) {
+  if(!has_skill(ch, COMMAND_LOAD) && cmd == CMD_DEFAULT) {
         send_to_char("Huh?\r\n", ch);
         return eFAILURE;
   }
-  if (!has_skill(ch, COMMAND_PRIZE) && cmd == 999)
+  if (!has_skill(ch, COMMAND_PRIZE) && cmd == CMD_PRIZE)
   {
         send_to_char("Huh?\r\n", ch);
         return eFAILURE;
@@ -190,7 +190,7 @@ int do_load(char_data *ch, char *arg, int cmd)
   else
   c = type;
 
-  if (cmd == 9) {
+  if (cmd == CMD_DEFAULT) {
   for(x = 0; x <= 2; x++) {
      if(x == 2) {
        send_to_char("Type must mobile or object.\n\r", ch);
@@ -286,7 +286,7 @@ int do_load(char_data *ch, char *arg, int cmd)
         send_to_char("Why would you want to load that?\n\r", ch);
         return eFAILURE;
       }
-        else if (cmd == 999 && !isname("prize",((struct obj_data*)(obj_index[num].item))->name))
+        else if (cmd == CMD_PRIZE && !isname("prize",((struct obj_data*)(obj_index[num].item))->name))
 	{
 	send_to_char("This command can only load prize items.\r\n",ch);
 	return eFAILURE;
