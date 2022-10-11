@@ -112,7 +112,7 @@ struct obj_data *get_obj_in_list_vis(char_data *ch, const char *name,
 		struct obj_data *list, bool bf = FALSE);
 struct obj_data *get_obj_in_list_vis(char_data *ch, int item_num, 
 		struct obj_data *list, bool bf = FALSE);
-struct obj_data *get_obj_vis(char_data *ch, char *name, bool loc = false);
+struct obj_data *get_obj_vis(char_data *ch, const char *name, bool loc = false);
 struct obj_data *get_obj_vis(char_data *ch, string name, bool loc = false);
 
 void extract_char(char_data *ch, bool pull, Trace t = Trace("unknown"));
