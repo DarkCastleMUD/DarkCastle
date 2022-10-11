@@ -152,7 +152,15 @@ command_return_t do_goto(char_data *ch, string argument, int cmd)
       return eFAILURE;
     }
 
-    zone_nr = stoll(buf);
+    try 
+    {
+      zone_nr = stoll(buf);
+    }
+    catch(...)
+    {
+      ch->send("Invalid zone number specified.\r\n");
+      return eFAILURE;
+    }
   }
 
   start_room = ch->in_room;
