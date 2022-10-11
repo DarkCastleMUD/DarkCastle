@@ -10,7 +10,7 @@ execute_process(COMMAND git describe --tags --always --abbrev=8 OUTPUT_VARIABLE 
 execute_process(COMMAND date "+%Y-%m-%d %H:%M:%S" OUTPUT_VARIABLE BUILD_TIME OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET)
 message("${VERSION}")
 message("${BUILD_TIME}")
-configure_file(version.h.in ${CMAKE_CURRENT_BINARY_DIR}/version.h)
+configure_file(version.h.in ${CMAKE_CURRENT_SOURCE_DIR}/version.h)
 add_library(DC
     act_comm.cpp
     act.cpp
