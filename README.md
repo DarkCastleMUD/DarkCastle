@@ -29,17 +29,18 @@ Install dependencies for compilation.
 
 openSUSE Tumbleweed
 ```
-  sudo zypper -n in git fmt-devel libfmt8 gcc-c++ libpq5 zlib-devel cmake qt6-base-devel postgresql-devel
+sudo zypper ref
+sudo zypper in git fmt-devel libfmt8 gcc-c++ libpq5 zlib-devel cmake qt6-base-devel postgresql-devel
 ```
 
 Ubuntu 22.04
 ```
-  sudo apt update
-  sudo apt install g++-12-multilib g++-12 libstdc++-12-dev g++
-  sudo apt install scons libcurl4
-  sudo apt install libpq-dev libpq5 libcurl4-openssl-dev
-  sudo apt install unzip zlib1g-dev
-  sudo apt install libfmt-dev cmake qt6-base-dev
+sudo apt update
+sudo apt install g++-12-multilib g++-12 libstdc++-12-dev g++
+sudo apt install scons libcurl4
+sudo apt install libpq-dev libpq5 libcurl4-openssl-dev
+sudo apt install unzip zlib1g-dev
+sudo apt install libfmt-dev cmake qt6-base-dev
 ```
 
 Now build the DarkCastle project. Change -j # option below to match the number of threads your CPU(s) can run in parallel.
@@ -58,7 +59,7 @@ cd lib
 ../build/dcastle
 ```
 
-Test server by connecting to it from another terminal
+Test server by connecting to it from another terminal.
 
 ```
 telnet localhost 4000
