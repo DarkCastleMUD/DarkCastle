@@ -4,9 +4,26 @@
 
 The game is available to login via telnet dcastle.org over ports 23, 6969 or 8080 for the standard no-botting/no-multiplaying server or dcastle.org 6666 for the botting/multiplaying server.
 
+## Use existing Docker image
+```
+$ docker create -p 4000 --name darkcastle jhhudso/darkcastle
+567cc580ca65a9fe249ba77312a358a11ab772291a8f4ab01104e1102a7d112d
+$ docker start darkcastle
+darkcastle
+$ docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' darkcastle
+172.17.0.2
+$ telnet 172.17.0.2 4000
+Trying 172.17.0.2...
+Connected to 172.17.0.2.
+Escape character is '^]'.
+
+What name for the roster? 
+```
+
+
 ## Local development
 
-Follow the instructions below to build and run DarkCastle MUD locally. Traditionally, Dark Castle is developed on openSUSE Tumbleweed or Leap. However, the following steps can be followed by anyone with native Ubuntu or Ubuntu within Windows 10 WSL2.
+Follow the instructions below to build and run DarkCastle MUD locally. Traditionally, Dark Castle is developed on openSUSE Tumbleweed or Leap. I've also included instructions for Ubuntu 22.04 which can also be used within Windows 10 WSL2.
 
 Install dependencies for compilation.
 
