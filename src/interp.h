@@ -136,6 +136,8 @@ const auto CMD_IMPCHAN=209;
 const auto CMD_TELL=210;
 const auto CMD_TELLH=211;
 const auto CMD_PRIZE=999;
+const auto CMD_OTHER=999;
+const auto CMD_TELL_REPLY=9999;
 const auto CMD_GAZE=1820;
 
 // Temp removal to perfect system. 1/25/06 Eas
@@ -313,7 +315,7 @@ command_return_t do_give(char_data *ch, char *argument, int cmd);
 command_return_t do_global(char_data *ch, char *argument, int cmd);
 command_return_t do_gossip(char_data *ch, char *argument, int cmd);
 command_return_t do_golem_score(char_data *ch, char *argument, int cmd);
-command_return_t do_goto(char_data *ch, char *argument, int cmd);
+command_return_t do_goto(char_data *ch, string argument, int cmd);
 command_return_t do_guild(char_data *ch, char *argument, int cmd);
 command_return_t do_install(char_data *ch, char *argument, int cmd);
 command_return_t do_reload_help(char_data *ch, char *argument, int cmd);
