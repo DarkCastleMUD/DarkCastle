@@ -12,7 +12,7 @@ WORKDIR /srv/dcastle2/git/DarkCastle
 RUN cmake -S src -B build
 RUN make -C build -j 128
 
-WORKDIR /srv/dcastle.6969/lib
+WORKDIR /srv/dcastle2/git/DarkCastle/lib
 CMD ["/srv/dcastle2/git/DarkCastle/build/dcastle", "-P"]
 
-LABEL Name=darkcastle Version=0.0.1
+LABEL Name=darkcastle Version=0.0.2
