@@ -1203,7 +1203,7 @@ int do_mpsettemp(char_data *ch, char *argument, int cmd)
   char arg2[MAX_INPUT_LENGTH];
   char arg3[MAX_INPUT_LENGTH];
   char_data *victim;
-  if (!IS_NPC(ch) && cmd != 999) {
+  if (!IS_NPC(ch) && cmd != CMD_OTHER) {
     send_to_char("Huh?\r\n",ch);
     return eFAILURE;
   }

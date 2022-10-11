@@ -4409,7 +4409,7 @@ int oprog_command_trigger(const char *txt, char_data *ch, char *arg)
 				if (arg && *arg)
 				{
 					sprintf(buf, "%s lasttyped %s", GET_NAME(ch), arg);
-					do_mpsettemp(ch, &buf[0], 999);
+					do_mpsettemp(ch, &buf[0], CMD_OTHER);
 				}
 
 				vmob = initiate_oproc(ch, item);
@@ -4430,7 +4430,7 @@ int oprog_command_trigger(const char *txt, char_data *ch, char *arg)
 			if (arg && *arg)
 			{
 				sprintf(buf, "%s lasttyped %s", GET_NAME(ch), arg);
-				do_mpsettemp(ch, &buf[0], 999);
+				do_mpsettemp(ch, &buf[0], CMD_OTHER);
 			}
 			vmob = initiate_oproc(ch, item);
 			if (mprog_wordlist_check(txt, vmob, ch, NULL, NULL, COMMAND_PROG, TRUE))
@@ -4451,7 +4451,7 @@ int oprog_command_trigger(const char *txt, char_data *ch, char *arg)
 				if (arg && *arg)
 				{
 					sprintf(buf, "%s lasttyped %s", GET_NAME(ch), arg);
-					do_mpsettemp(ch, &buf[0], 999);
+					do_mpsettemp(ch, &buf[0], CMD_OTHER);
 				}
 
 				vmob = initiate_oproc(ch, ch->equipment[i]);
