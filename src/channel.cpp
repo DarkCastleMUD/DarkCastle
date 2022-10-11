@@ -778,7 +778,7 @@ command_return_t do_tell(char_data *ch, string argument, int cmd)
       send_to_char("They seem to have left!\n\r", ch);
       return eSUCCESS;
     }
-    cmd = 9;
+    cmd = CMD_DEFAULT;
   }
   else if (!(vict = get_active_pc_vis(ch, name.c_str())))
   {
@@ -971,7 +971,7 @@ command_return_t do_reply(char_data *ch, string argument, int cmd)
   }
 
   buf = fmt::format("{} {}", ch->pcdata->last_tell.c_str(), argument);
-  do_tell(ch, buf, 9999);
+  do_tell(ch, buf, CMD_TELL_REPLY);
   return eSUCCESS;
 }
 
