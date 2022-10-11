@@ -6,7 +6,7 @@
         {
             "label": "build src using 32 threads",
             "type": "shell",
-            "command": "cmake src && make -C src clean && make -C src -j 32 && if pidof dcastle; then killall -HUP dcastle; fi",
+            "command": "cmake -S src -B build && make -C build clean && make -C build -j 32 && if pidof dcastle; then killall -HUP dcastle; fi",
             "problemMatcher": {
                 "base": "$gcc",
                 "fileLocation": [
@@ -26,7 +26,7 @@
         {
             "label": "build debug src using 32 threads",
             "type": "shell",
-            "command": "cmake src && make -C src clean && make -C src -j 32 && if pidof dcastle; then killall -HUP dcastle; fi",
+            "command": "cmake -S src -B build && make -C build clean && make -C build -j 32 && if pidof dcastle; then killall -HUP dcastle; fi",
             "problemMatcher": {
                 "base": "$gcc",
                 "fileLocation": [
@@ -48,7 +48,7 @@
         {
             "label": "build src using 128 threads",
             "type": "shell",
-            "command": "cmake src && make -C src clean && make -C src -j 128 && if pidof dcastle; then killall -HUP dcastle; fi",
+            "command": "cmake -S src -B build && make -C build clean && make -C build -j 128 && if pidof dcastle; then killall -HUP dcastle; fi",
             "problemMatcher": {
                 "base": "$gcc",
                 "fileLocation": [
@@ -68,7 +68,7 @@
         {
             "label": "build debug src using 128 threads",
             "type": "shell",
-            "command": "cmake src && make -C src clean && make -C src -j 128 && if pidof dcastle; then killall -HUP dcastle; fi",
+            "command": "cmake -S src -B build && make -C build clean && make -C build -j 128 && if pidof dcastle; then killall -HUP dcastle; fi",
             "problemMatcher": {
                 "base": "$gcc",
                 "fileLocation": [
