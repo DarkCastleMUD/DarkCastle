@@ -11,8 +11,11 @@
             "name": "128 thread Build and Launch in lib/",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/src/dcastle",
-            "args": [ "-P", "-p 6969"],
+            "program": "${workspaceFolder}/build/dcastle",
+            "args": [
+                "-P",
+                "-p 6969"
+            ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}/lib/",
             "environment": [],
@@ -31,8 +34,11 @@
             "name": "128 thread Debug Build and Launch in lib/",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/src/dcastle",
-            "args": [ "-P", "-p 6969"],
+            "program": "${workspaceFolder}/build/dcastle",
+            "args": [
+                "-P",
+                "-p 6969"
+            ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}/lib/",
             "environment": [],
@@ -51,8 +57,11 @@
             "name": "32 thread Build and Launch in lib/",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/src/dcastle",
-            "args": [ "-P", "-p 6969"],
+            "program": "${workspaceFolder}/build/dcastle",
+            "args": [
+                "-P",
+                "-p 6969"
+            ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}/lib/",
             "environment": [],
@@ -71,8 +80,11 @@
             "name": "32 thread Debug Build and Launch in lib/",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/src/dcastle",
-            "args": [ "-P", "-p 6969"],
+            "program": "${workspaceFolder}/build/dcastle",
+            "args": [
+                "-P",
+                "-p 6969"
+            ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}/lib/",
             "environment": [],
@@ -91,8 +103,11 @@
             "name": "Launch dcastle in lib/",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/src/dcastle",
-            "args": [ "-P", "-p 6969"],
+            "program": "${workspaceFolder}/build/dcastle",
+            "args": [
+                "-P",
+                "-p 6969"
+            ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}/lib/",
             "environment": [],
@@ -110,14 +125,20 @@
             "name": "debug ../save/D/Dummy in lib/",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/src/debug",
-            "args": ["${workspaceFolder}/save/D/Dummy"], 
+            "program": "${workspaceFolder}/build/debug",
+            "args": [
+                "${workspaceFolder}/save/D/Dummy"
+            ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}/lib",
             "environment": [],
             "externalConsole": false,
             "MIMode": "gdb",
-            "logging": { "engineLogging": true, "trace": true, "traceResponse": true },
+            "logging": {
+                "engineLogging": true,
+                "trace": true,
+                "traceResponse": true
+            },
             "setupCommands": [
                 {
                     "description": "Enable pretty-printing for gdb",
@@ -130,14 +151,20 @@
             "name": "debug all in lib/",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/src/debug",
-            "args": ["all"], 
+            "program": "${workspaceFolder}/build/debug",
+            "args": [
+                "all"
+            ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}/lib",
             "environment": [],
             "externalConsole": false,
             "MIMode": "gdb",
-            "logging": { "engineLogging": true, "trace": true, "traceResponse": true },
+            "logging": {
+                "engineLogging": true,
+                "trace": true,
+                "traceResponse": true
+            },
             "setupCommands": [
                 {
                     "description": "Enable pretty-printing for gdb",
@@ -150,14 +177,20 @@
             "name": "debug all in dcastle.6969/lib",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/src/debug",
-            "args": ["all"], 
+            "program": "${workspaceFolder}/build/debug",
+            "args": [
+                "all"
+            ],
             "stopAtEntry": false,
-            "cwd":"${workspaceFolder}/../../dcastle.6969/lib",
+            "cwd": "${workspaceFolder}/../../dcastle.6969/lib",
             "environment": [],
             "externalConsole": false,
             "MIMode": "gdb",
-            "logging": { "engineLogging": true, "trace": true, "traceResponse": true },
+            "logging": {
+                "engineLogging": true,
+                "trace": true,
+                "traceResponse": true
+            },
             "setupCommands": [
                 {
                     "description": "Enable pretty-printing for gdb",
@@ -170,14 +203,20 @@
             "name": "debug ../../dcastle/save/J/Julian",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/src/debug",
-            "args": ["${workspaceFolder}/../../dcastle/save/J/Julian"], 
+            "program": "${workspaceFolder}/build/debug",
+            "args": [
+                "${workspaceFolder}/../../dcastle/save/J/Julian"
+            ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}/../../dcastle/lib",
             "environment": [],
             "externalConsole": false,
             "MIMode": "gdb",
-            "logging": { "engineLogging": true, "trace": true, "traceResponse": true },
+            "logging": {
+                "engineLogging": true,
+                "trace": true,
+                "traceResponse": true
+            },
             "setupCommands": [
                 {
                     "description": "Enable pretty-printing for gdb",
@@ -190,14 +229,21 @@
             "name": "dcastle in dcastle.6969/lib",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/src/dcastle",
-            "args": ["-P", "-p 6969"], 
+            "program": "${workspaceFolder}/build/dcastle",
+            "args": [
+                "-P",
+                "-p 6969"
+            ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}/../../dcastle.6969/lib",
             "environment": [],
             "externalConsole": false,
             "MIMode": "gdb",
-            "logging": { "engineLogging": true, "trace": true, "traceResponse": true },
+            "logging": {
+                "engineLogging": true,
+                "trace": true,
+                "traceResponse": true
+            },
             "setupCommands": [
                 {
                     "description": "Enable pretty-printing for gdb",
@@ -209,14 +255,20 @@
             "name": "debug leaderboard in dcastle.6969/lib",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/src/debug",
-            "args": ["leaderboard"], 
+            "program": "${workspaceFolder}/build/debug",
+            "args": [
+                "leaderboard"
+            ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}/../../dcastle.6969/lib",
             "environment": [],
             "externalConsole": false,
             "MIMode": "gdb",
-            "logging": { "engineLogging": true, "trace": true, "traceResponse": true },
+            "logging": {
+                "engineLogging": true,
+                "trace": true,
+                "traceResponse": true
+            },
             "setupCommands": [
                 {
                     "description": "Enable pretty-printing for gdb",
@@ -229,18 +281,18 @@
             "name": "valgrind remote-target",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/src/dcastle",
+            "program": "${workspaceFolder}/build/dcastle",
             "targetArchitecture": "x64",
-            "customLaunchSetupCommands" : [
+            "customLaunchSetupCommands": [
                 {
                     "description": "Enable pretty-printing for gdb",
                     "text": "-enable-pretty-printing",
                     "ignoreFailures": true
                 },
                 {
-                  "description": "Attach to valgrind",
-                  "text": "target remote | /usr/bin/vgdb",
-                  "ignoreFailures": false  
+                    "description": "Attach to valgrind",
+                    "text": "target remote | /usr/bin/vgdb",
+                    "ignoreFailures": false
                 }
             ],
             "stopAtEntry": false,
