@@ -122,153 +122,175 @@ int do_wizhelp(char_data *ch, char *argument, int cmd_arg)
   return eSUCCESS;
 }
 
-int do_goto(char_data *ch, string argument, int cmd)
+command_return_t do_goto(char_data *ch, string argument, int cmd)
 {
-    char buf[MAX_INPUT_LENGTH];
-    int loc_nr, location, i, start_room;
-    char_data *target_mob, *pers;
-    char_data *tmp_ch;
-    struct follow_type *k, *next_dude;
-    struct obj_data *target_obj;
-    extern int top_of_world;
+  string buf = {};
+  int loc_nr = {}, location = {}, i = {}, start_room = {};
+  zone_t zone_nr = {};
+  char_data *target_mob = {}, *pers = {};
+  char_data *tmp_ch = {};
+  struct follow_type *k = {}, *next_dude = {};
+  struct obj_data *target_obj = {};
+  extern int top_of_world;
 
-    if (IS_NPC(ch))
-        return eFAILURE;
+  if (IS_NPC(ch))
+    return eFAILURE;
 
-    
-    one_argument(argument, buf);
-    if (!*buf)
+  tie(buf, argument) = half_chop(argument);
+  if (buf.empty())
+  {
+    ch->send("You must supply a room number, a name or zone <zone number>.\r\n");
+    return eFAILURE;
+  }
+
+  if (buf == "zone" || buf == "z")
+  {
+    tie(buf, argument) = half_chop(argument);
+    if (buf.empty())
     {
-        send_to_char("You must supply a room number or a name.\n\r", ch);
-        return eFAILURE;
-    }
-
-   start_room = ch->in_room;
-   location = -1;
-
-   if(isdigit(*buf) &&
-         ((strlen(buf) < 2) || (strlen(buf) >= 2 && !strchr(buf, '.') ))) 
-   { 
-     loc_nr = atoi(buf);
-     if (loc_nr > top_of_world || loc_nr < 0) 
-     {
-       send_to_char("No room exists with that number.\n\r", ch);
-       return eFAILURE;
-     }
-     if(world_array[loc_nr])
-       location = loc_nr;
-     else
-     {
-       if(can_modify_this_room(ch, loc_nr)) {
-         if(create_one_room(ch, loc_nr)) {
-           send_to_char("You form order out of chaos.\n\r\n\r", ch);
-           location = loc_nr;
-         }
-       }
-     }
-     if(location == -1)
-     {
-       send_to_char("No room exists with that number.\r\n", ch);
-       return eFAILURE;
-     }
-   }
-    else if( ( target_mob=get_pc_vis(ch, buf) ) )
-      location = target_mob->in_room;
-
-    else if((target_mob = get_char_vis(ch, buf)))
-      location = target_mob->in_room;
-
-    else if ( ( target_obj=get_obj_vis(ch, buf) ) )
-      if(target_obj->in_room != NOWHERE)
-        location = target_obj->in_room;
-      else { 
-        send_to_char("The object is not available.\n\r", ch);
-        return eFAILURE;
-      }
-    else { 
-      send_to_char("No such creature or object around.\n\r", ch);
+      ch->send("No zone number specified.\r\n");
       return eFAILURE;
     }
 
-    /* a location has been found. */
-    if (IS_SET(world[location].room_flags, IMP_ONLY) &&
-        GET_LEVEL(ch) < OVERSEER) {
-      send_to_char("No.\n\r", ch);
-      return eFAILURE; 
-    }
+    zone_nr = stoll(buf);
+  }
 
-    /* Let's keep 104-'s out of clan halls....sigh... */
-    if (IS_SET(world[location].room_flags, CLAN_ROOM) &&
-        GET_LEVEL(ch) < DEITY) {
-      send_to_char("For your protection, 104-'s may not be in clanhalls.\r\n", ch);
+  start_room = ch->in_room;
+  location = -1;
+
+  if (isdigit(buf[0]) && (buf.length() < 2) || (buf.length() >= 2 && buf.find('.') == buf.npos))
+  {
+    loc_nr = atoi(buf.c_str());
+    if (loc_nr > top_of_world || loc_nr < 0)
+    {
+      send_to_char("No room exists with that number.\n\r", ch);
       return eFAILURE;
     }
-
-	if ((IS_SET(world[location].room_flags, PRIVATE))
-			&& (GET_LEVEL(ch) < OVERSEER)) {
-
-		for (i = 0, pers = world[location].people; pers;
-				pers = pers->next_in_room, i++)
-			;
-		if (i > 1) {
-			send_to_char("There's a private conversation going on in "
-					"that room.\n\r", ch);
-			return eFAILURE;
-		}
-	}
-
-  if(!IS_MOB(ch))
-   for(tmp_ch=world[ch->in_room].people; tmp_ch;  tmp_ch=tmp_ch->next_in_room) {
-      if ((CAN_SEE(tmp_ch, ch) && (tmp_ch != ch) 
-            && !ch->pcdata->stealth)
-           || (GET_LEVEL(tmp_ch) > GET_LEVEL(ch) && GET_LEVEL(tmp_ch) >  PATRON)) {
-           ansi_color( RED, tmp_ch);
-           ansi_color( BOLD, tmp_ch );
-           send_to_char(ch->pcdata->poofout, tmp_ch);
-           send_to_char ("\n\r", tmp_ch);
-           ansi_color( NTEXT, tmp_ch);
+    if (world_array[loc_nr])
+      location = loc_nr;
+    else
+    {
+      if (can_modify_this_room(ch, loc_nr))
+      {
+        if (create_one_room(ch, loc_nr))
+        {
+          send_to_char("You form order out of chaos.\n\r\n\r", ch);
+          location = loc_nr;
+        }
       }
-      else if (tmp_ch != ch && !ch->pcdata->stealth) {
-             ansi_color( RED, tmp_ch);
-             ansi_color( BOLD, tmp_ch);
-             send_to_char("Someone disappears in a puff of smoke.\n\r",  tmp_ch);
-             ansi_color( NTEXT, tmp_ch);
-           }
+    }
+    if (location == -1)
+    {
+      send_to_char("No room exists with that number.\r\n", ch);
+      return eFAILURE;
+    }
+  }
+  else if ((target_mob = get_pc_vis(ch, buf)))
+    location = target_mob->in_room;
+
+  else if ((target_mob = get_char_vis(ch, buf)))
+    location = target_mob->in_room;
+
+  else if ((target_obj = get_obj_vis(ch, buf)))
+    if (target_obj->in_room != NOWHERE)
+      location = target_obj->in_room;
+    else
+    {
+      send_to_char("The object is not available.\n\r", ch);
+      return eFAILURE;
+    }
+  else
+  {
+    send_to_char("No such creature or object around.\n\r", ch);
+    return eFAILURE;
+  }
+
+  /* a location has been found. */
+  if (IS_SET(world[location].room_flags, IMP_ONLY) &&
+      GET_LEVEL(ch) < OVERSEER)
+  {
+    send_to_char("No.\n\r", ch);
+    return eFAILURE;
+  }
+
+  /* Let's keep 104-'s out of clan halls....sigh... */
+  if (IS_SET(world[location].room_flags, CLAN_ROOM) &&
+      GET_LEVEL(ch) < DEITY)
+  {
+    send_to_char("For your protection, 104-'s may not be in clanhalls.\r\n", ch);
+    return eFAILURE;
+  }
+
+  if ((IS_SET(world[location].room_flags, PRIVATE)) && (GET_LEVEL(ch) < OVERSEER))
+  {
+
+    for (i = 0, pers = world[location].people; pers;
+         pers = pers->next_in_room, i++)
+      ;
+    if (i > 1)
+    {
+      send_to_char("There's a private conversation going on in "
+                   "that room.\n\r",
+                   ch);
+      return eFAILURE;
+    }
+  }
+
+  if (!IS_MOB(ch))
+    for (tmp_ch = world[ch->in_room].people; tmp_ch; tmp_ch = tmp_ch->next_in_room)
+    {
+      if ((CAN_SEE(tmp_ch, ch) && (tmp_ch != ch) && !ch->pcdata->stealth) || (GET_LEVEL(tmp_ch) > GET_LEVEL(ch) && GET_LEVEL(tmp_ch) > PATRON))
+      {
+        ansi_color(RED, tmp_ch);
+        ansi_color(BOLD, tmp_ch);
+        send_to_char(ch->pcdata->poofout, tmp_ch);
+        send_to_char("\n\r", tmp_ch);
+        ansi_color(NTEXT, tmp_ch);
+      }
+      else if (tmp_ch != ch && !ch->pcdata->stealth)
+      {
+        ansi_color(RED, tmp_ch);
+        ansi_color(BOLD, tmp_ch);
+        send_to_char("Someone disappears in a puff of smoke.\n\r", tmp_ch);
+        ansi_color(NTEXT, tmp_ch);
+      }
     }
 
-    move_char(ch, location);
+  move_char(ch, location);
 
-  if(!IS_MOB(ch))
-   for(tmp_ch=world[ch->in_room].people; tmp_ch;  tmp_ch=tmp_ch->next_in_room) {
-      if (( CAN_SEE(tmp_ch, ch) && (tmp_ch != ch)
-            && !ch->pcdata->stealth)
-           || (GET_LEVEL(tmp_ch) > GET_LEVEL(ch) && GET_LEVEL(tmp_ch) >  PATRON)){
+  if (!IS_MOB(ch))
+    for (tmp_ch = world[ch->in_room].people; tmp_ch; tmp_ch = tmp_ch->next_in_room)
+    {
+      if ((CAN_SEE(tmp_ch, ch) && (tmp_ch != ch) && !ch->pcdata->stealth) || (GET_LEVEL(tmp_ch) > GET_LEVEL(ch) && GET_LEVEL(tmp_ch) > PATRON))
+      {
 
-           ansi_color( RED,tmp_ch);
-           ansi_color( BOLD,tmp_ch);
-           send_to_char(ch->pcdata->poofin, tmp_ch);
-           send_to_char("\n\r", tmp_ch);
-           ansi_color( NTEXT, tmp_ch);
+        ansi_color(RED, tmp_ch);
+        ansi_color(BOLD, tmp_ch);
+        send_to_char(ch->pcdata->poofin, tmp_ch);
+        send_to_char("\n\r", tmp_ch);
+        ansi_color(NTEXT, tmp_ch);
       }
-      else if (tmp_ch != ch && !ch->pcdata->stealth) {
-        ansi_color( RED, tmp_ch);
-        ansi_color( BOLD, tmp_ch);
-        send_to_char("Someone appears with an ear-splitting bang!\n\r",  tmp_ch);
-        ansi_color( NTEXT, tmp_ch);
+      else if (tmp_ch != ch && !ch->pcdata->stealth)
+      {
+        ansi_color(RED, tmp_ch);
+        ansi_color(BOLD, tmp_ch);
+        send_to_char("Someone appears with an ear-splitting bang!\n\r", tmp_ch);
+        ansi_color(NTEXT, tmp_ch);
       }
-
-   }
+    }
 
   do_look(ch, "", 15);
- 
-  if(ch->followers)
-    for(k = ch->followers; k; k = next_dude) {
-       next_dude = k->next;
-       if(start_room == k->follower->in_room && CAN_SEE(k->follower, ch) &&
-          GET_LEVEL(k->follower) >= IMMORTAL) {
-         csendf(k->follower, "You follow %s.\n\r\n\r", GET_SHORT(ch));
-         do_goto(k->follower, argument, CMD_DEFAULT);
-       }
+
+  if (ch->followers)
+    for (k = ch->followers; k; k = next_dude)
+    {
+      next_dude = k->next;
+      if (start_room == k->follower->in_room && CAN_SEE(k->follower, ch) &&
+          GET_LEVEL(k->follower) >= IMMORTAL)
+      {
+        csendf(k->follower, "You follow %s.\n\r\n\r", GET_SHORT(ch));
+        do_goto(k->follower, argument, CMD_DEFAULT);
+      }
     }
   return eSUCCESS;
 }
@@ -535,7 +557,7 @@ int do_nohassle (char_data *ch, char *argument, int cmd)
    return eSUCCESS;
 }
 
-// cmd == 9 - imm
+// cmd == CMD_DEFAULT - imm
 // cmd == 8 - /
 command_return_t do_wiz(char_data *ch, string argument, int cmd)
 {
