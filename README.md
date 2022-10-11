@@ -8,57 +8,41 @@ The game is available to login via telnet dcastle.org over ports 23, 6969 or 808
 
 Follow the instructions below to build and run DarkCastle MUD locally. Traditionally, Dark Castle is developed on openSUSE Tumbleweed or Leap. However, the following steps can be followed by anyone with native Ubuntu or Ubuntu within Windows 10 WSL2.
 
-From Ubuntu terminal
+Install dependencies for compilation.
+
+openSUSE Tumbleweed
+```
+  sudo zypper -n in git fmt-devel libfmt8 gcc-c++ libpq5 zlib-devel cmake qt6-base-devel postgresql-devel
+```
+
+Ubuntu 22.04
+```
+  sudo apt update
+  sudo apt install g++-12-multilib g++-12 libstdc++-12-dev g++
+  sudo apt install scons libcurl4
+  sudo apt install libpq-dev libpq5 libcurl4-openssl-dev
+  sudo apt install unzip zlib1g-dev
+  sudo apt install libfmt-dev cmake qt6-base-dev
+```
+
+Now build the DarkCastle project. Change -j # option below to match the number of threads your CPU(s) can run in parallel.
 
 ```
 git clone https://github.com/DarkCastleMUD/DarkCastle.git
 cd DarkCastle
-```
-
-Now we follow most of the steps listed in .github/workflows/ccpp.yml
-
-```
-  sudo apt update
-  sudo apt install gcc-10-multilib g++-10-multilib gcc-multilib
-  sudo apt install g++-multilib scons libcurl4:i386
-  sudo apt install libpq-dev libpq5 libcurl4-openssl-dev
-  sudo apt install unzip zlib1g-dev
-  sudo apt install libfmt-dev
-```
-
-Install cmake and gdb
-
-```
-sudo apt install cmake gdb
-```
-
-Install fmt lib
-
-```
-git clone https://github.com/fmtlib/fmt.git
-cd fmt
-cmake .
-make -j4
-sudo make install
-```
-
-Now build the DarkCastle project
-
-```
-cd ../src
-cmake .
-make -j
+cmake -S src -B build
+make -C build -j 128
 ```
 
 Run DarkCastle server
 
 ```
-cd ../lib
-../src/dcastle -p6969
+cd lib
+../build/dcastle
 ```
 
 Test server by connecting to it from another terminal
 
 ```
-telnet localhost 6969
+telnet localhost 4000
 ```
