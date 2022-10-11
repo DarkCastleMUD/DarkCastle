@@ -3927,6 +3927,11 @@ char_data *get_all_pc(char *name) {
 
 	return 0;
 }
+char_data *get_pc_vis(char_data *ch, string name) 
+{
+	return get_pc_vis(ch, name.c_str());
+}
+
 
 char_data *get_pc_vis(char_data *ch, const char *name) {
 	char_data *partial_match = 0;
@@ -4042,6 +4047,12 @@ struct obj_data *get_obj_in_list_vis(char_data *ch, const char *name, struct obj
 				j++;
 			}
 	return (0);
+}
+
+struct obj_data *get_obj_vis(char_data *ch, string name, bool loc)
+{
+/*search the entire world for an object, and return a pointer  */
+	return get_obj_vis(ch, name.c_str(), loc);
 }
 
 /*search the entire world for an object, and return a pointer  */
