@@ -4056,7 +4056,7 @@ struct obj_data *get_obj_vis(char_data *ch, string name, bool loc)
 }
 
 /*search the entire world for an object, and return a pointer  */
-struct obj_data *get_obj_vis(char_data *ch, char *name, bool loc) {
+struct obj_data *get_obj_vis(char_data *ch, const char *name, bool loc) {
 	struct obj_data *i;
 	int j, number;
 	char tmpname[MAX_INPUT_LENGTH];
