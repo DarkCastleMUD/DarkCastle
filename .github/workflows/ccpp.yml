@@ -23,7 +23,6 @@ jobs:
         sudo apt install libfmt-dev cmake qt6-base-dev    
     - name: make
       run: |
-        cd src
-        cmake .
-        make -j4
+        cmake -S src -B build
+        make -C build -j4
 
