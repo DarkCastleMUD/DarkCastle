@@ -1523,18 +1523,20 @@ int one_hit(char_data *ch, char_data *vict, int type, int weapon)
 
       if (ch->equipment[HOLD])
       {
-
         retval = weapon_spells(ch, vict, HOLD);
         if (SOMEONE_DIED(retval) || !ch->fighting)
         {
           return debug_retval(ch, vict, retval) | eSUCCESS;
         }
 
-        if (obj_index[ch->equipment[HOLD]->item_number].combat_func)
-          retval = ((*obj_index[ch->equipment[HOLD]->item_number].combat_func)(ch, ch->equipment[HOLD], 0, "", ch));
-        if (SOMEONE_DIED(retval) || !ch->fighting)
+        if (ch->equipment[HOLD]->item_number >= 0)
         {
-          return debug_retval(ch, vict, retval) | eSUCCESS;
+          if (obj_index[ch->equipment[HOLD]->item_number].combat_func != nullptr)
+            retval = ((*obj_index[ch->equipment[HOLD]->item_number].combat_func)(ch, ch->equipment[HOLD], 0, "", ch));
+          if (SOMEONE_DIED(retval) || !ch->fighting)
+          {
+            return debug_retval(ch, vict, retval) | eSUCCESS;
+          }
         }
       }
 
@@ -1546,11 +1548,15 @@ int one_hit(char_data *ch, char_data *vict, int type, int weapon)
         {
           return debug_retval(ch, vict, retval) | eSUCCESS;
         }
-        if (obj_index[ch->equipment[HOLD2]->item_number].combat_func)
-          retval = ((*obj_index[ch->equipment[HOLD2]->item_number].combat_func)(ch, ch->equipment[HOLD2], 0, "", ch));
-        if (SOMEONE_DIED(retval) || !ch->fighting)
+
+        if (ch->equipment[HOLD2]->item_number >= 0)
         {
-          return debug_retval(ch, vict, retval) | eSUCCESS;
+          if (obj_index[ch->equipment[HOLD2]->item_number].combat_func != nullptr)
+            retval = ((*obj_index[ch->equipment[HOLD2]->item_number].combat_func)(ch, ch->equipment[HOLD2], 0, "", ch));
+          if (SOMEONE_DIED(retval) || !ch->fighting)
+          {
+            return debug_retval(ch, vict, retval) | eSUCCESS;
+          }
         }
       }
     }
