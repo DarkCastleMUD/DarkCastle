@@ -1165,7 +1165,7 @@ int do_knockback(char_data *ch, char *argument, int cmd)
        sprintf(buf2, "%s smashes into you for | damage, sending you reeling %s.", GET_NAME(ch), dirs[dir]);
        sprintf(buf, "%s smashes into you, sending you reeling %s.", GET_NAME(ch), dirs[dir]);
        send_damage(buf2, ch, 0, victim,dammsg, buf, TO_VICT);
-	extern bool selfpurge;
+
 	if (selfpurge)
 		return eSUCCESS|eVICT_DIED;	
        sprintf(buf2, "%s smashes into %s for | damage and sends $S ass reeling to the %s.", GET_NAME(ch), GET_SHORT(victim), dirs[dir]);

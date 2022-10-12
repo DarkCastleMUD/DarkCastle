@@ -943,7 +943,6 @@ int command_interpreter(char_data *ch, string pcomm, bool procced)
       }
       
       // Next bit for the DUI client, they needed it.
-      extern bool selfpurge;
       if (!SOMEONE_DIED(retval) && !selfpurge)
       {
         ch->send(format("{}{}", BOLD, NTEXT));

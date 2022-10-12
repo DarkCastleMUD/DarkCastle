@@ -100,7 +100,6 @@ void do_mload(char_data *ch, int rnum, int cnt)
   for (i=1; i<=cnt; i++) {
     mob = clone_mobile(rnum);
     char_to_room(mob, ch->in_room);
-    extern bool selfpurge;
     selfpurge = false;
     mprog_load_trigger(mob);
     if (selfpurge) {

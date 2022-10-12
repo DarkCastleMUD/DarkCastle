@@ -686,7 +686,6 @@ void DC::game_loop(void)
     // Set CommandStack to track a command stack with max queue depth of 20
     CommandStack cstack(0, 5);
 
-    extern bool selfpurge;
     selfpurge = false;
     // Set up the input, output, and exception sets for select().
     FD_ZERO(&input_set);
@@ -3063,7 +3062,6 @@ void send_to_char(const char *mesg, char_data *ch)
 
 void send_to_char(string messg, char_data *ch)
 {
-  extern bool selfpurge;
   if (IS_NPC(ch) && !ch->desc && MOBtrigger && !messg.empty())
     mprog_act_trigger(messg, ch, 0, 0, 0);
   if (IS_NPC(ch) && !ch->desc && !selfpurge && MOBtrigger && !messg.empty())

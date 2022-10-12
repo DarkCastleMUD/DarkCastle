@@ -9,6 +9,8 @@
 
 #include <string>
 
+#include <fmt/ostream.h>
+
 #include "character.h"
 
 using namespace std;
@@ -75,6 +77,20 @@ char *getTemp(char_data *ch, char *name);
 #define ACT_NO_GOLD_BONUS   37
 #define ACT_MAX             37
 //#define CHECKTHISACT      64 //Do not chance unless ASIZE changes
+
+class SelfPurge
+{
+public:
+  SelfPurge(void);
+  SelfPurge(bool);
+  explicit operator bool(void) const;
+
+private:
+  bool state = {};
+};
+
+typedef class SelfPurge selfpurge_t;
+extern selfpurge_t selfpurge;
 
 struct race_data
 {

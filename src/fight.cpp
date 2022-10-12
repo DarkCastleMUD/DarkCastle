@@ -62,7 +62,6 @@
 
 #define MAX_CHAMP_DEATH_MESSAGE		14
 
-extern bool selfpurge;
 extern int top_of_world;
 extern CWorld world;
 extern struct index_data *mob_index;

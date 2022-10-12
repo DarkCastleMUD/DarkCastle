@@ -82,7 +82,23 @@ char *activeProgTmpBuf;
 
 bool  MOBtrigger;
 struct mprog_throw_type *g_mprog_throw_list = 0;   // holds all pending mprog throws
-bool selfpurge = false;
+
+SelfPurge::SelfPurge()
+{
+
+}
+
+SelfPurge::SelfPurge(bool s)
+{
+	state = s;
+}
+
+SelfPurge::operator bool() const
+{
+	return state;
+}
+
+selfpurge_t selfpurge = false;
 
 int cIfs[256]; // for MPPAUSE
 int ifpos;
