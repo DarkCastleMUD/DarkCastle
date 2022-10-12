@@ -5080,6 +5080,7 @@ void raw_kill(char_data * ch, char_data * victim)
         logf(0, LOG_BUG, "selfpurge on %s to %s", GET_NAME(ch), GET_NAME(victim));
       }
       selfpurge = true;
+      selfpurge.setOwner(ch, "raw_kill");
     }
     extract_char(victim, TRUE);
     return;

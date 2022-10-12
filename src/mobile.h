@@ -83,10 +83,13 @@ class SelfPurge
 public:
   SelfPurge(void);
   SelfPurge(bool);
+  void setOwner(char_data*, string);
   explicit operator bool(void) const;
 
 private:
   bool state = {};
+  char_data* owner = {};
+  string function = {};
 };
 
 typedef class SelfPurge selfpurge_t;

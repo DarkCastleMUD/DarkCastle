@@ -95,10 +95,16 @@ SelfPurge::SelfPurge(bool s)
 
 SelfPurge::operator bool() const
 {
-	return state;
+	return state;	
 }
 
-selfpurge_t selfpurge = false;
+void SelfPurge::setOwner(char_data* c, string m)
+{
+	owner = c;
+	function = m;
+}
+
+selfpurge_t selfpurge = {};
 
 int cIfs[256]; // for MPPAUSE
 int ifpos;
