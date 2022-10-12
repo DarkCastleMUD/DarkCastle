@@ -1536,7 +1536,7 @@ int read_one_room(FILE *fl, int & room_nr)
 			world[room_nr].zone = zone;
 		} // of top_of_zone_table > 0
 
-		world[room_nr].room_flags = fread_bitvector(fl, -1, LONG_MAX);
+		world[room_nr].room_flags = fread_bitvector(fl, 0, UINT_MAX);
 		if (IS_SET(world[room_nr].room_flags, NO_ASTRAL))
 			REMOVE_BIT(world[room_nr].room_flags, NO_ASTRAL);
 
@@ -2409,7 +2409,7 @@ void read_one_zone(FILE * fl, int zon)
 
 	zone_table[zon].lifespan = fread_int(fl, 0, 64000);
 	zone_table[zon].reset_mode = fread_int(fl, 0, 64000);
-	zone_table[zon].zone_flags = fread_bitvector(fl, 0, LONG_MAX);
+	zone_table[zon].zone_flags = fread_bitvector(fl, 0, INT_MAX);
 
 	// if its old version set the altered flag so that
 	// this zone will be saved with new format soon
@@ -2713,9 +2713,9 @@ char_data *read_mobile(int nr, FILE *fl)
 
 	mob->sex = (char)tmp;
 
-	mob->immune = fread_bitvector(fl, 0, LONG_MAX);
-	mob->suscept = fread_bitvector(fl, 0, LONG_MAX);
-	mob->resist = fread_bitvector(fl, 0, LONG_MAX);
+	mob->immune = fread_bitvector(fl, 0, UINT_MAX);
+	mob->suscept = fread_bitvector(fl, 0, UINT_MAX);
+	mob->resist = fread_bitvector(fl, 0, UINT_MAX);
 
 	// if all three are 0, then chances are someone just didn't set them, so go with
 	// the race defaults.
@@ -3806,9 +3806,9 @@ struct obj_data *read_object(int nr, FILE *fl, bool zz)
 	/* *** numeric data *** */
 
 	obj->obj_flags.type_flag = fread_int(fl, -1000, LONG_MAX);
-	obj->obj_flags.extra_flags = fread_bitvector(fl, 0, LONG_MAX);
-	obj->obj_flags.wear_flags = fread_bitvector(fl, 0, LONG_MAX);
-	obj->obj_flags.size = fread_bitvector(fl, 0, LONG_MAX);
+	obj->obj_flags.extra_flags = fread_bitvector(fl, 0, UINT_MAX);
+	obj->obj_flags.wear_flags = fread_bitvector(fl, 0, UINT_MAX);
+	obj->obj_flags.size = fread_bitvector(fl, 0, UINT16_MAX);
 
 	obj->obj_flags.value[0] = fread_int(fl, -1000, LONG_MAX);
 	obj->obj_flags.value[1] = fread_int(fl, -1000, LONG_MAX);
@@ -3817,7 +3817,7 @@ struct obj_data *read_object(int nr, FILE *fl, bool zz)
 	obj->obj_flags.eq_level = fread_int(fl, -1000, IMP);
 	obj->obj_flags.weight = fread_int(fl, -1000, LONG_MAX);
 	obj->obj_flags.cost = fread_int(fl, -1000, LONG_MAX);
-	obj->obj_flags.more_flags = fread_bitvector(fl, -1000, LONG_MAX);
+	obj->obj_flags.more_flags = fread_bitvector(fl, -1000, UINT_MAX);
 
 	/* currently not stored in object file */
 	obj->obj_flags.timer = 0;
@@ -3939,9 +3939,9 @@ ifstream& operator>>(ifstream &in, obj_data *obj)
 
 	obj->obj_flags.type_flag = fread_int(in, -1000, LONG_MAX);
 
-	obj->obj_flags.extra_flags = fread_bitvector(in, 0, LONG_MAX);
-	obj->obj_flags.wear_flags = fread_bitvector(in, 0, LONG_MAX);
-	obj->obj_flags.size = fread_bitvector(in, 0, LONG_MAX);
+	obj->obj_flags.extra_flags = fread_bitvector(in, 0, UINT_MAX);
+	obj->obj_flags.wear_flags = fread_bitvector(in, 0, UINT_MAX);
+	obj->obj_flags.size = fread_bitvector(in, 0, UINT16_MAX);
 
 	obj->obj_flags.value[0] = fread_int(in, -1000, LONG_MAX);
 	obj->obj_flags.value[1] = fread_int(in, -1000, LONG_MAX);
@@ -3950,7 +3950,7 @@ ifstream& operator>>(ifstream &in, obj_data *obj)
 	obj->obj_flags.eq_level = fread_int(in, -1000, IMP);
 	obj->obj_flags.weight = fread_int(in, -1000, LONG_MAX);
 	obj->obj_flags.cost = fread_int(in, -1000, LONG_MAX);
-	obj->obj_flags.more_flags = fread_bitvector(in, -1000, LONG_MAX);
+	obj->obj_flags.more_flags = fread_bitvector(in, -1000, UINT_MAX);
 
 	// currently not stored in object file
 	obj->obj_flags.timer = 0;
@@ -4519,7 +4519,6 @@ void reset_zone(int zone)
 					zone_table[zone].num_mob_on_repop++;
 					last_cmd = 1;
 					last_mob = 1;
-					extern bool selfpurge;
 					selfpurge = false;
 					mprog_load_trigger(mob);
 					if (selfpurge) {
