@@ -1311,224 +1311,268 @@ int calculate_paladin_damage_bonus(char_data * ch, char_data * victim)
 // standard "returnvals.h" returns
 int one_hit(char_data *ch, char_data *vict, int type, int weapon)
 {
-  struct obj_data *wielded;	/* convenience */
-  int w_type;			/* Holds type info for damage() */
+  struct obj_data *wielded; /* convenience */
+  int w_type;               /* Holds type info for damage() */
   int weapon_type;
-  int dam = 0;			/* Self explan. */
+  int dam = 0; /* Self explan. */
   int retval = 0;
   int weapon_skill_hit_bonus = 0;
-  int weapon_skill_dam_bonus = 0;  
- 
+  int weapon_skill_dam_bonus = 0;
+
   extern uint8_t backstab_mult[];
-  
-  if(!vict || !ch) { 
+
+  if (!vict || !ch)
+  {
     log("Null victim or char in one_hit!  This Crashes us!", -1, LOG_BUG);
     return eINTERNAL_ERROR;
   }
-  
-  if(ch == vict) {
+
+  if (ch == vict)
+  {
     do_say(ch, "What the hell am I DOING?!?!", CMD_DEFAULT);
     stop_fighting(ch);
     return eFAILURE;
   }
 
-  if(GET_POS(vict) == POSITION_DEAD)            return ( eSUCCESS|eVICT_DIED );
+  if (GET_POS(vict) == POSITION_DEAD)
+    return (eSUCCESS | eVICT_DIED);
 
   // TODO - I'd like to remove these 3 cause they are checked in attack()
   /* This happens with multi-attacks */
-  if(ch->in_room != vict->in_room)              return eFAILURE;
-  if(!can_be_attacked(ch, vict))                return eFAILURE;
-  if(!can_attack(ch))                           return eFAILURE;
+  if (ch->in_room != vict->in_room)
+    return eFAILURE;
+  if (!can_be_attacked(ch, vict))
+    return eFAILURE;
+  if (!can_attack(ch))
+    return eFAILURE;
 
-  // Figure out the correct weapon 
+  // Figure out the correct weapon
   wielded = ch->equipment[weapon];
-  
-  // Second got called without a secondary wield 
-  if(weapon == SECOND && wielded == FALSE)      return eFAILURE;
-  
+
+  // Second got called without a secondary wield
+  if (weapon == SECOND && wielded == FALSE)
+    return eFAILURE;
+
   set_cantquit(ch, vict); /* This sets the flag if necessary */
 
   w_type = TYPE_HIT;
-  if(wielded && wielded->obj_flags.type_flag == ITEM_WEAPON) 
-     w_type = get_weapon_damage_type(wielded);
+  if (wielded && wielded->obj_flags.type_flag == ITEM_WEAPON)
+    w_type = get_weapon_damage_type(wielded);
 
   if (wielded && obj_index[wielded->item_number].virt == 30019 && IS_SET(wielded->obj_flags.more_flags, ITEM_TOGGLE))
-  { // Durendal - changes damage type and other stuff
-	w_type = TYPE_FIRE; // no skill bonus
+  {                     // Durendal - changes damage type and other stuff
+    w_type = TYPE_FIRE; // no skill bonus
   }
 
   check_weapon_skill_bonus(ch, w_type, wielded, weapon_skill_hit_bonus, weapon_skill_dam_bonus);
 
   weapon_type = w_type;
-  if(type == SKILL_BACKSTAB)
+  if (type == SKILL_BACKSTAB)
     w_type = SKILL_BACKSTAB;
-  if(type == SKILL_JAB)
+  if (type == SKILL_JAB)
     w_type = SKILL_JAB;
-  
-  if(wielded)  {
-    if(affected_by_spell(ch, SKILL_SMITE) && affected_by_spell(ch, SKILL_SMITE)->victim == vict)
-      for(int i = 0; i < wielded->obj_flags.value[1]; i++)
-        dam += wielded->obj_flags.value[2] - number(0,1);
-    else 
+
+  if (wielded)
+  {
+    if (affected_by_spell(ch, SKILL_SMITE) && affected_by_spell(ch, SKILL_SMITE)->victim == vict)
+      for (int i = 0; i < wielded->obj_flags.value[1]; i++)
+        dam += wielded->obj_flags.value[2] - number(0, 1);
+    else
       dam = dice(wielded->obj_flags.value[1], wielded->obj_flags.value[2]);
-    if(IS_NPC(ch)) {
+    if (IS_NPC(ch))
+    {
       dam = dice(ch->mobdata->damnodice, ch->mobdata->damsizedice);
-      dam += (dice(wielded->obj_flags.value[1], wielded->obj_flags.value[2])/2);
+      dam += (dice(wielded->obj_flags.value[1], wielded->obj_flags.value[2]) / 2);
     }
   }
-  else if(IS_NPC(ch))
+  else if (IS_NPC(ch))
     dam = dice(ch->mobdata->damnodice, ch->mobdata->damsizedice);
-  else if(GET_CLASS(ch) == CLASS_MONK && wielded == FALSE)
+  else if (GET_CLASS(ch) == CLASS_MONK && wielded == FALSE)
     dam = get_monk_bare_damage(ch);
-  else dam = number(0, GET_LEVEL(ch)/2);
+  else
+    dam = number(0, GET_LEVEL(ch) / 2);
 
   /* Damage bonuses */
-//  dam += str_app[STRENGTH_APPLY_INDEX(ch)].todam;
+  //  dam += str_app[STRENGTH_APPLY_INDEX(ch)].todam;
   dam += GET_REAL_DAMROLL(ch);
   dam += weapon_skill_dam_bonus;
   dam += calculate_paladin_damage_bonus(ch, vict);
-  
 
   if (wielded && obj_index[wielded->item_number].virt == 30019 && IS_SET(wielded->obj_flags.more_flags, ITEM_TOGGLE))
   {
-	dam = dam * 85 / 100;
-	dam = dam + (getRealSpellDamage(ch) / 2);
-	w_type = SKILL_FLAMESLASH;
+    dam = dam * 85 / 100;
+    dam = dam + (getRealSpellDamage(ch) / 2);
+    w_type = SKILL_FLAMESLASH;
   }
   // BACKSTAB GOES IN HERE!
-  if( (type == SKILL_BACKSTAB || type == SKILL_CIRCLE ) && dam < 10000) {  // Bingo not affected.
-    if(IS_SET(ch->combat, COMBAT_CIRCLE)) {
-      if(GET_LEVEL(ch) <= MORTAL)
-        if(type == SKILL_CIRCLE) dam = dam * 3 / 2; // non stabbing weapons
-        else dam *= ((backstab_mult[(int)GET_LEVEL(ch)]) / 2);
-      else dam *= 25;
+  if ((type == SKILL_BACKSTAB || type == SKILL_CIRCLE) && dam < 10000)
+  { // Bingo not affected.
+    if (IS_SET(ch->combat, COMBAT_CIRCLE))
+    {
+      if (GET_LEVEL(ch) <= MORTAL)
+        if (type == SKILL_CIRCLE)
+          dam = dam * 3 / 2; // non stabbing weapons
+        else
+          dam *= ((backstab_mult[(int)GET_LEVEL(ch)]) / 2);
+      else
+        dam *= 25;
       REMOVE_BIT(ch->combat, COMBAT_CIRCLE);
     }
-    else if((GET_CLASS(ch) == CLASS_THIEF) ||
-      (GET_CLASS(ch) == CLASS_ANTI_PAL) || IS_NPC(ch)) 
+    else if ((GET_CLASS(ch) == CLASS_THIEF) ||
+             (GET_CLASS(ch) == CLASS_ANTI_PAL) || IS_NPC(ch))
     {
-      if(GET_LEVEL(ch) <= MORTAL)
+      if (GET_LEVEL(ch) <= MORTAL)
       {
-         dam *= backstab_mult[(int)GET_LEVEL(ch)];
+        dam *= backstab_mult[(int)GET_LEVEL(ch)];
       }
-      else dam *= 25;
+      else
+        dam *= 25;
     }
   }
 
-  if(wielded && IS_SET(wielded->obj_flags.extra_flags, ITEM_TWO_HANDED) && has_skill(ch, SKILL_EXECUTE))
-    if(vict->getHP() < 3500 && vict->getHP() * 100 / GET_MAX_HIT(vict) < 15) {
+  if (wielded && IS_SET(wielded->obj_flags.extra_flags, ITEM_TWO_HANDED) && has_skill(ch, SKILL_EXECUTE))
+    if (vict->getHP() < 3500 && vict->getHP() * 100 / GET_MAX_HIT(vict) < 15)
+    {
       retval = do_execute_skill(ch, vict, w_type);
-      if(SOMEONE_DIED(retval)) return debug_retval(ch, vict, retval);
+      if (SOMEONE_DIED(retval))
+        return debug_retval(ch, vict, retval);
     }
 
-  if(dam < 1)
+  if (dam < 1)
     dam = 1;
-  
-  
-  // Now check for special code that occurs each hit
-  retval = do_skewer(ch, vict, dam, weapon_type, w_type,weapon);
-  if (SOMEONE_DIED(retval)) return debug_retval(ch, vict, retval);
 
-  if(has_skill(ch, SKILL_NAT_SELECT) && affected_by_spell(ch, SKILL_NAT_SELECT))
-    if(affected_by_spell(ch, SKILL_NAT_SELECT)->modifier == GET_RACE(vict))
-      dam += 15 + has_skill(ch, SKILL_NAT_SELECT)/10;
-  
+  // Now check for special code that occurs each hit
+  retval = do_skewer(ch, vict, dam, weapon_type, w_type, weapon);
+  if (SOMEONE_DIED(retval))
+    return debug_retval(ch, vict, retval);
+
+  if (has_skill(ch, SKILL_NAT_SELECT) && affected_by_spell(ch, SKILL_NAT_SELECT))
+    if (affected_by_spell(ch, SKILL_NAT_SELECT)->modifier == GET_RACE(vict))
+      dam += 15 + has_skill(ch, SKILL_NAT_SELECT) / 10;
+
   do_combatmastery(ch, vict, weapon);
   if (IS_SET(ch->combat, COMBAT_CRUSH_BLOW2))
-     dam >>= 1; //dam = dam / 2;
+    dam >>= 1; // dam = dam / 2;
 
   if (w_type == TYPE_HIT && IS_NPC(ch))
   {
     int a = mob_index[ch->mobdata->nr].virt;
     switch (a)
     {
-	case 88: w_type = TYPE_FIRE;break;
-	case 89: w_type = TYPE_WATER;break;
-	case 90: w_type = TYPE_ENERGY;break;
-	case 91: w_type = TYPE_CRUSH;break;
-	default: break;
+    case 88:
+      w_type = TYPE_FIRE;
+      break;
+    case 89:
+      w_type = TYPE_WATER;
+      break;
+    case 90:
+      w_type = TYPE_ENERGY;
+      break;
+    case 91:
+      w_type = TYPE_CRUSH;
+      break;
+    default:
+      break;
     }
   }
 
   retval = damage(ch, vict, dam, weapon_type, w_type, weapon);
-  if (SOMEONE_DIED(retval) || !ch->fighting) {
+  if (SOMEONE_DIED(retval) || !ch->fighting)
+  {
     return debug_retval(ch, vict, retval) | eSUCCESS;
-  }  
-  
-  // Was last hit a success?
-  if(IS_SET(retval, eSUCCESS)) {
-    // If they're wielding a weapon check for weapon spells, otherwise check for hand spells
-    if (wielded) {
-      retval = weapon_spells(ch, vict, weapon);     
-      if (SOMEONE_DIED(retval) || !ch->fighting) {
-        return debug_retval(ch, vict, retval) | eSUCCESS;
-      }  
+  }
 
-      if (ch->equipment[weapon] && obj_index[ch->equipment[weapon]->item_number].combat_func) {
+  // Was last hit a success?
+  if (IS_SET(retval, eSUCCESS))
+  {
+    // If they're wielding a weapon check for weapon spells, otherwise check for hand spells
+    if (wielded)
+    {
+      retval = weapon_spells(ch, vict, weapon);
+      if (SOMEONE_DIED(retval) || !ch->fighting)
+      {
+        return debug_retval(ch, vict, retval) | eSUCCESS;
+      }
+
+      if (ch->equipment[weapon] && obj_index[ch->equipment[weapon]->item_number].combat_func)
+      {
         retval = ((*obj_index[ch->equipment[weapon]->item_number].combat_func)(ch, ch->equipment[weapon], 0, "", ch));
-        if (SOMEONE_DIED(retval) || !ch->fighting) {
+        if (SOMEONE_DIED(retval) || !ch->fighting)
+        {
           return debug_retval(ch, vict, retval) | eSUCCESS;
-        }        
+        }
       }
-    } else { //not wielding a weapon    
-      if (ch->equipment[WEAR_HANDS]) { 
-      
-      retval = weapon_spells(ch, vict, WEAR_HANDS);     
-      if (SOMEONE_DIED(retval) || !ch->fighting) {
-        return debug_retval(ch, vict, retval) | eSUCCESS;
-      }  
-        if (obj_index[ch->equipment[WEAR_HANDS]->item_number].combat_func)  
+    }
+    else
+    { // not wielding a weapon
+      if (ch->equipment[WEAR_HANDS])
+      {
+
+        retval = weapon_spells(ch, vict, WEAR_HANDS);
+        if (SOMEONE_DIED(retval) || !ch->fighting)
+        {
+          return debug_retval(ch, vict, retval) | eSUCCESS;
+        }
+        if (obj_index[ch->equipment[WEAR_HANDS]->item_number].combat_func)
           retval = ((*obj_index[ch->equipment[WEAR_HANDS]->item_number].combat_func)(ch, ch->equipment[WEAR_HANDS], 0, "", ch));
-        if (SOMEONE_DIED(retval) || !ch->fighting) {
+        if (SOMEONE_DIED(retval) || !ch->fighting)
+        {
           return debug_retval(ch, vict, retval) | eSUCCESS;
-        }        
+        }
       }
-      
-      if (ch->equipment[HOLD]) {
-        
-      retval = weapon_spells(ch, vict, HOLD);     
-      if (SOMEONE_DIED(retval) || !ch->fighting) {
-        return debug_retval(ch, vict, retval) | eSUCCESS;
-      }  
+
+      if (ch->equipment[HOLD])
+      {
+
+        retval = weapon_spells(ch, vict, HOLD);
+        if (SOMEONE_DIED(retval) || !ch->fighting)
+        {
+          return debug_retval(ch, vict, retval) | eSUCCESS;
+        }
 
         if (obj_index[ch->equipment[HOLD]->item_number].combat_func)
           retval = ((*obj_index[ch->equipment[HOLD]->item_number].combat_func)(ch, ch->equipment[HOLD], 0, "", ch));
-        if (SOMEONE_DIED(retval) || !ch->fighting) {
+        if (SOMEONE_DIED(retval) || !ch->fighting)
+        {
           return debug_retval(ch, vict, retval) | eSUCCESS;
-        }        
+        }
       }
 
-      if (ch->equipment[HOLD2]) {
+      if (ch->equipment[HOLD2])
+      {
 
-      retval = weapon_spells(ch, vict, HOLD2);     
-      if (SOMEONE_DIED(retval) || !ch->fighting) {
-        return debug_retval(ch, vict, retval) | eSUCCESS;
-      }  
+        retval = weapon_spells(ch, vict, HOLD2);
+        if (SOMEONE_DIED(retval) || !ch->fighting)
+        {
+          return debug_retval(ch, vict, retval) | eSUCCESS;
+        }
         if (obj_index[ch->equipment[HOLD2]->item_number].combat_func)
           retval = ((*obj_index[ch->equipment[HOLD2]->item_number].combat_func)(ch, ch->equipment[HOLD2], 0, "", ch));
-        if (SOMEONE_DIED(retval) || !ch->fighting) {
+        if (SOMEONE_DIED(retval) || !ch->fighting)
+        {
           return debug_retval(ch, vict, retval) | eSUCCESS;
-        }        
-      }          
-    }
-  }
-  
-    if(act_poisonous(ch)) 
-    {
-      retval = cast_poison(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, NULL, GET_LEVEL(ch));
-      if(SOMEONE_DIED(retval))       
-        return debug_retval(ch, vict, retval) | eSUCCESS;
-    }
-
-    if (IS_MOB(ch) && ISSET(ch->mobdata->actflags, ACT_DRAINY)) {
-      if (number(1,100) <= 10) {
-        SET_BIT(retval, spell_energy_drain(1, ch, vict, 0, 0));
+        }
       }
     }
+  }
 
-  return debug_retval(ch, vict, retval) | eSUCCESS;  
-} // one_hit 
+  if (act_poisonous(ch))
+  {
+    retval = cast_poison(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, NULL, GET_LEVEL(ch));
+    if (SOMEONE_DIED(retval))
+      return debug_retval(ch, vict, retval) | eSUCCESS;
+  }
 
+  if (IS_MOB(ch) && ISSET(ch->mobdata->actflags, ACT_DRAINY))
+  {
+    if (number(1, 100) <= 10)
+    {
+      SET_BIT(retval, spell_energy_drain(1, ch, vict, 0, 0));
+    }
+  }
+
+  return debug_retval(ch, vict, retval) | eSUCCESS;
+} // one_hit
 
 // pos of -1 means inventory
 void eq_destroyed(char_data * ch, obj_data * obj, int pos)
