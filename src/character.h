@@ -370,9 +370,9 @@ struct char_data
      int64_t exp = {};            /* The experience of the player            */
      int32_t in_room = {};
 
-    uint32_t immune = {};         // Bitvector of damage types I'm immune to
-    uint32_t resist = {};         // Bitvector of damage types I'm resistant to
-    uint32_t suscept = {};        // Bitvector of damage types I'm susceptible to
+    uint64_t immune = {};         // Bitvector of damage types I'm immune to
+    uint64_t resist = {};         // Bitvector of damage types I'm resistant to
+    uint64_t suscept = {};        // Bitvector of damage types I'm susceptible to
      int16_t saves[SAVE_TYPE_MAX+1] = {};  // Saving throw bonuses
 
      int32_t mana = {};         
