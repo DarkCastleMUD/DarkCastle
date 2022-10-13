@@ -145,6 +145,7 @@ int  real_mobile(int virt);
 int64_t fread_int(FILE *fl, int64_t minval, int64_t maxval);
 int64_t fread_int(ifstream &in, int64_t beg_range, int64_t end_range);
 uint64_t fread_uint(FILE *fl, uint64_t minval, uint64_t maxval);
+uint64_t fread_uint(ifstream &in, uint64_t minval, uint64_t maxval);
 char fread_char (FILE *fl);
 void add_mobspec(int i);
 void write_object_csv(obj_data * obj, ofstream &fout);
@@ -218,7 +219,7 @@ struct zone_data
     int top;                /* upper limit for room vnums in this zone */
     int bottom_rnum;
     int top_rnum;
-    int32_t zone_flags;        /* flags for the entire zone eg: !teleport */
+    uint64_t zone_flags;        /* flags for the entire zone eg: !teleport */
 
     int players;            // Number of PCs in the zone
 

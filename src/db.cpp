@@ -183,8 +183,8 @@ world_file_list_item * new_mob_file_item(char * temp, int32_t room_nr);
 world_file_list_item * new_obj_file_item(char * temp, int32_t room_nr);
 
 char * read_next_worldfile_name(FILE * flWorldIndex);
-int fread_bitvector(FILE *fl, int32_t minval, int32_t maxval);
-int fread_bitvector(ifstream &fl, int32_t minval, int32_t maxval);
+uint64_t fread_bitvector(FILE *fl, uint64_t minval, uint64_t maxval);
+uint64_t fread_bitvector(ifstream &fl, uint64_t minval, uint64_t maxval);
 void fread_new_newline(FILE *fl)
 {
 }
@@ -1536,7 +1536,7 @@ int read_one_room(FILE *fl, int & room_nr)
 			world[room_nr].zone = zone;
 		} // of top_of_zone_table > 0
 
-		world[room_nr].room_flags = fread_bitvector(fl, 0, UINT_MAX);
+		world[room_nr].room_flags = fread_bitvector(fl, 0, UINT64_MAX);
 		if (IS_SET(world[room_nr].room_flags, NO_ASTRAL))
 			REMOVE_BIT(world[room_nr].room_flags, NO_ASTRAL);
 
@@ -2006,7 +2006,7 @@ void boot_world(void)
 /* read direction data */
 void setup_dir(FILE *fl, int room, int dir)
 {
-	int tmp;
+	uint64_t tmp;
 
 	if (world[room].dir_option[dir])
 	{
@@ -2033,7 +2033,7 @@ void setup_dir(FILE *fl, int room, int dir)
 
 	world[room].dir_option[dir]->keyword = fread_string(fl, 0);
 
-	tmp = fread_bitvector(fl, -1, 300); /* tjs hack - not the right range */
+	tmp = fread_bitvector(fl, 0, 300); /* tjs hack - not the right range */
 	world[room].dir_option[dir]->exit_info = tmp;
 	world[room].dir_option[dir]->bracee = NULL;
 
@@ -2409,7 +2409,7 @@ void read_one_zone(FILE * fl, int zon)
 
 	zone_table[zon].lifespan = fread_int(fl, 0, 64000);
 	zone_table[zon].reset_mode = fread_int(fl, 0, 64000);
-	zone_table[zon].zone_flags = fread_bitvector(fl, 0, INT_MAX);
+	zone_table[zon].zone_flags = fread_bitvector(fl, 0, UINT64_MAX);
 
 	// if its old version set the altered flag so that
 	// this zone will be saved with new format soon
@@ -2713,9 +2713,9 @@ char_data *read_mobile(int nr, FILE *fl)
 
 	mob->sex = (char)tmp;
 
-	mob->immune = fread_bitvector(fl, 0, UINT_MAX);
-	mob->suscept = fread_bitvector(fl, 0, UINT_MAX);
-	mob->resist = fread_bitvector(fl, 0, UINT_MAX);
+	mob->immune = fread_bitvector(fl, 0, UINT64_MAX);
+	mob->suscept = fread_bitvector(fl, 0, UINT64_MAX);
+	mob->resist = fread_bitvector(fl, 0, UINT64_MAX);
 
 	// if all three are 0, then chances are someone just didn't set them, so go with
 	// the race defaults.
@@ -3806,9 +3806,9 @@ struct obj_data *read_object(int nr, FILE *fl, bool zz)
 	/* *** numeric data *** */
 
 	obj->obj_flags.type_flag = fread_int(fl, -1000, LONG_MAX);
-	obj->obj_flags.extra_flags = fread_bitvector(fl, 0, UINT_MAX);
-	obj->obj_flags.wear_flags = fread_bitvector(fl, 0, UINT_MAX);
-	obj->obj_flags.size = fread_bitvector(fl, 0, UINT16_MAX);
+	obj->obj_flags.extra_flags = fread_bitvector(fl, 0, UINT64_MAX);
+	obj->obj_flags.wear_flags = fread_bitvector(fl, 0, UINT64_MAX);
+	obj->obj_flags.size = fread_bitvector(fl, 0, UINT64_MAX);
 
 	obj->obj_flags.value[0] = fread_int(fl, -1000, LONG_MAX);
 	obj->obj_flags.value[1] = fread_int(fl, -1000, LONG_MAX);
@@ -3817,7 +3817,7 @@ struct obj_data *read_object(int nr, FILE *fl, bool zz)
 	obj->obj_flags.eq_level = fread_int(fl, -1000, IMP);
 	obj->obj_flags.weight = fread_int(fl, -1000, LONG_MAX);
 	obj->obj_flags.cost = fread_int(fl, -1000, LONG_MAX);
-	obj->obj_flags.more_flags = fread_bitvector(fl, -1000, UINT_MAX);
+	obj->obj_flags.more_flags = fread_bitvector(fl, 0, UINT64_MAX);
 
 	/* currently not stored in object file */
 	obj->obj_flags.timer = 0;
@@ -3939,9 +3939,9 @@ ifstream& operator>>(ifstream &in, obj_data *obj)
 
 	obj->obj_flags.type_flag = fread_int(in, -1000, LONG_MAX);
 
-	obj->obj_flags.extra_flags = fread_bitvector(in, 0, UINT_MAX);
-	obj->obj_flags.wear_flags = fread_bitvector(in, 0, UINT_MAX);
-	obj->obj_flags.size = fread_bitvector(in, 0, UINT16_MAX);
+	obj->obj_flags.extra_flags = fread_bitvector(in, 0, UINT64_MAX);
+	obj->obj_flags.wear_flags = fread_bitvector(in, 0, UINT64_MAX);
+	obj->obj_flags.size = fread_bitvector(in, 0, UINT64_MAX);
 
 	obj->obj_flags.value[0] = fread_int(in, -1000, LONG_MAX);
 	obj->obj_flags.value[1] = fread_int(in, -1000, LONG_MAX);
@@ -3950,7 +3950,7 @@ ifstream& operator>>(ifstream &in, obj_data *obj)
 	obj->obj_flags.eq_level = fread_int(in, -1000, IMP);
 	obj->obj_flags.weight = fread_int(in, -1000, LONG_MAX);
 	obj->obj_flags.cost = fread_int(in, -1000, LONG_MAX);
-	obj->obj_flags.more_flags = fread_bitvector(in, -1000, UINT_MAX);
+	obj->obj_flags.more_flags = fread_bitvector(in, 0, UINT64_MAX);
 
 	// currently not stored in object file
 	obj->obj_flags.timer = 0;
@@ -5027,11 +5027,11 @@ char *fread_word(FILE *fl, int hasher)
 // or as a string of characters.  ie, 4, and c are the same.
 // 5 (1+4) would be the same at 'ac'
 
-int fread_bitvector(FILE *fl, int32_t beg_range, int32_t end_range)
+uint64_t fread_bitvector(FILE *fl, uint64_t beg_range, uint64_t end_range)
 {
 	char buf[200];
 	int ch;
-	int32_t i = 0;
+	uint64_t i = 0;
 
 	// eat space till we hit the next one
 	while ((ch = getc(fl))) {
@@ -5050,7 +5050,7 @@ int fread_bitvector(FILE *fl, int32_t beg_range, int32_t end_range)
 			{
 		// It's a digit, so put the char back and let fread_int handle it
 		ungetc(ch, fl);
-		return fread_int(fl, beg_range, end_range);
+		return fread_uint(fl, beg_range, end_range);
 	}
 
 	// we're dealing with letters now
@@ -5093,10 +5093,10 @@ int fread_bitvector(FILE *fl, int32_t beg_range, int32_t end_range)
 	return (0);
 }
 
-int fread_bitvector(ifstream &in, int32_t beg_range, int32_t end_range)
+uint64_t fread_bitvector(ifstream &in, uint64_t beg_range, uint64_t end_range)
 {
 	int ch;
-	int32_t i = 0;
+	uint64_t i = 0;
 
 	// Save original exception mask so we can restore it later
 	ios_base::iostate orig_exceptions = in.exceptions();
@@ -5113,7 +5113,7 @@ int fread_bitvector(ifstream &in, int32_t beg_range, int32_t end_range)
 				{
 			// It's a digit, so put the char back and let fread_int handle it
 			in.unget();
-			int n = fread_int(in, beg_range, end_range);
+			uint64_t n = fread_uint(in, beg_range, end_range);
 			in.exceptions(orig_exceptions);
 			return n;
 		}
@@ -5198,14 +5198,14 @@ uint64_t fread_uint(FILE *fl, uint64_t beg_range, uint64_t end_range)
 				pBufLast++;
 			} else {
 				*pBufLast = 0;
-				i = atoll(buf);
+				i = strtoull(buf, NULL, 10);
 				if (i >= beg_range && i <= end_range) {
 					return i;
 				} else {
 					printf("Buffer: '%s'\n", buf);
 					printf("Reading %s: %s, %d\n", curr_type, curr_name,
 							curr_virtno);
-					printf("fread_int: Bad value for range %lld - %lld: %lld\n",
+					printf("fread_int: Bad value for range %llu - %llu: %llu\n",
 							beg_range, end_range, i);
 					perror("fread_int: Value range error");
 					throw error_range_int();
@@ -5224,6 +5224,25 @@ uint64_t fread_uint(FILE *fl, uint64_t beg_range, uint64_t end_range)
 	abort();
 	return (0);
 }
+
+uint64_t fread_uint(ifstream &in, uint64_t beg_range, uint64_t end_range)
+{
+	uint64_t number;
+	in >> number;
+
+	if (number < beg_range) {
+		cerr << "fread_int: error " << number << " less than " << beg_range << ". "
+				<< "Setting to " << beg_range << endl;
+		number = beg_range;
+	} else if (number > end_range) {
+		cerr << "fread_int: error " << number << " greater than " << beg_range << ". "
+				<< "Setting to " << beg_range << endl;
+		number = end_range;
+	}
+
+	return number;
+}
+
 
 int64_t fread_int(ifstream &in, int64_t beg_range, int64_t end_range)
 {
