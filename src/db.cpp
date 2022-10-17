@@ -4519,7 +4519,6 @@ void reset_zone(int zone)
 					zone_table[zone].num_mob_on_repop++;
 					last_cmd = 1;
 					last_mob = 1;
-					extern bool selfpurge;
 					selfpurge = false;
 					mprog_load_trigger(mob);
 					if (selfpurge) {

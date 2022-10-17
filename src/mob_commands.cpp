@@ -673,6 +673,7 @@ int do_mppurge( char_data *ch, char *argument, int cmd )
     {
       logf(0, LOG_BUG, "selfpurge on %s to %s", GET_NAME(ch), GET_NAME(victim));
       selfpurge = true;
+      selfpurge.setOwner(ch, "do_mppurge");
     }
     extract_char( victim, TRUE );
 
