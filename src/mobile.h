@@ -8,7 +8,9 @@
 */
 
 #include <string>
+#include <ostream>
 
+#include <fmt/format.h>
 #include <fmt/ostream.h>
 
 #include "character.h"
@@ -83,13 +85,32 @@ class SelfPurge
 public:
   SelfPurge(void);
   SelfPurge(bool);
-  void setOwner(char_data*, string);
+  void setOwner(char_data *, string);
   explicit operator bool(void) const;
+  string getFunction(void) const;
+  bool getState(void) const;
+  char_data *getOwner(void) const { return owner; }
 
 private:
   bool state = {};
-  char_data* owner = {};
+  char_data *owner = {};
   string function = {};
+};
+
+template <>
+struct fmt::formatter<SelfPurge>
+{
+  template <typename ParseContext>
+  constexpr auto parse(ParseContext &ctx)
+  {
+    return ctx.begin();
+  }
+
+  template <typename FormatContext>
+  auto format(SelfPurge const &sp, FormatContext &ctx)
+  {
+    return fmt::format_to(ctx.out(), "selfpurge {}:{}", sp.getState(), sp.getFunction());
+  }
 };
 
 typedef class SelfPurge selfpurge_t;
