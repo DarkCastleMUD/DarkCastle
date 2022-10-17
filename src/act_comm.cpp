@@ -655,7 +655,7 @@ void load_hints()
    }
 
    while(fgetc(fl) != '$') {
-      num = fread_int(fl, 0, INT_MAX);
+      num = fread_int(fl, 0, 32768);
       if(num > MAX_HINTS) {
          log("Raise MAX_HINTS or something.", IMMORTAL, LOG_MISC);
          break;

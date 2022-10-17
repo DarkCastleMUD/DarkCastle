@@ -50,12 +50,6 @@ struct error_range_over {};
 #define MAX_ZONE    200
 #define MAX_INDEX   6000
 #define MAX_RESET  16383
-#ifndef LONG_MAX
-#define LONG_MAX    2147483467
-#define LONG_MIN    -2147483467
-#define INT_MAX     32768
-#define INT_MIN     -32768
-#endif
 
 /* Zone Flag Bits */
 

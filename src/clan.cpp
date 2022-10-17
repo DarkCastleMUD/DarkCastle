@@ -113,8 +113,8 @@ void boot_clans(void) {
 		new_new_clan->leader = fread_word(fl, 1);
 		new_new_clan->founder = fread_word(fl, 1);
 		new_new_clan->name = fread_word(fl, 1);
-		new_new_clan->number = fread_int(fl, 0, LONG_MAX);
-		if (new_new_clan->number < 1 || new_new_clan->number >= LONG_MAX) {
+		new_new_clan->number = fread_int(fl, 0, 2147483467);
+		if (new_new_clan->number < 1 || new_new_clan->number >= 2147483467) {
 			logf(LOG_BUG, 0, "Invalid clan number %d found in ../lib/clan.txt.", new_new_clan->number);
 			skip_clan = true;
 		}
@@ -207,12 +207,12 @@ void boot_clans(void) {
 						sizeof(struct clan_member_data));
 #endif
 				new_new_member->member_name = fread_string(fl, 0);
-				new_new_member->member_rights = fread_int(fl, 0, LONG_MAX);
-				new_new_member->member_rank = fread_int(fl, 0, LONG_MAX);
-				new_new_member->unused1 = fread_int(fl, 0, LONG_MAX);
-				new_new_member->unused2 = fread_int(fl, 0, LONG_MAX);
-				new_new_member->unused3 = fread_int(fl, 0, LONG_MAX);
-				new_new_member->time_joined = fread_int(fl, 0, LONG_MAX);
+				new_new_member->member_rights = fread_int(fl, 0, 2147483467);
+				new_new_member->member_rank = fread_int(fl, 0, 2147483467);
+				new_new_member->unused1 = fread_int(fl, 0, 2147483467);
+				new_new_member->unused2 = fread_int(fl, 0, 2147483467);
+				new_new_member->unused3 = fread_int(fl, 0, 2147483467);
+				new_new_member->time_joined = fread_int(fl, 0, 2147483467);
 				new_new_member->unused4 = fread_string(fl, 0);
 
 				// add it to the member linked list

@@ -72,7 +72,7 @@ int load_quests(void)
   quest = (struct quest_info *)dc_alloc(1, sizeof(struct quest_info));
 #endif
 
-      quest->number = fread_int(fl, 0, INT_MAX);
+      quest->number = fread_int(fl, 0, 32768);
       quest->name   = fread_string(fl, 1);
       quest->hint1  = fread_string(fl, 1);
       quest->hint2  = fread_string(fl, 1);
@@ -80,13 +80,13 @@ int load_quests(void)
       quest->objshort = fread_string(fl, 1);
       quest->objlong = fread_string(fl, 1);
       quest->objkey = fread_string(fl, 1);
-      quest->level  = fread_int(fl, 0, INT_MAX);
-      quest->objnum = fread_int(fl, 0, INT_MAX);
-      quest->mobnum = fread_int(fl, 0, INT_MAX);
-      quest->timer  = fread_int(fl, 0, INT_MAX);
-      quest->reward = fread_int(fl, 0, INT_MAX);
-      quest->cost   = fread_int(fl, 0, INT_MAX);
-      quest->brownie= fread_int(fl, 0, INT_MAX);
+      quest->level  = fread_int(fl, 0, 32768);
+      quest->objnum = fread_int(fl, 0, 32768);
+      quest->mobnum = fread_int(fl, 0, 32768);
+      quest->timer  = fread_int(fl, 0, 32768);
+      quest->reward = fread_int(fl, 0, 32768);
+      quest->cost   = fread_int(fl, 0, 32768);
+      quest->brownie= fread_int(fl, 0, 32768);
       quest->active = FALSE;
 
       quest_list.push_back(quest);
