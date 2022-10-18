@@ -216,7 +216,7 @@ struct obj_flag_data
     uint32_t extra_flags;    /* If it hums, glows etc            */
      int16_t weight;         /* Weight what else                 */
      int32_t cost;           /* Value when sold (gp.)            */
-    uint64_t more_flags;     /* A second bitvector (extra_flags2)*/
+    uint32_t more_flags;     /* A second bitvector (extra_flags2)*/
      int16_t eq_level;	/* Min level to use it for eq       */
      int16_t timer;          /* Timer for object                 */
      char_data *origin;    /* Creator of object, previously was stored at value[3] */
