@@ -31,12 +31,9 @@
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
-
 #include <map>
 #include <string>
 #include <algorithm>
-
-#include <fmt/format.h>
 
 #include "fileinfo.h"
 #include "act.h"
@@ -55,11 +52,11 @@
 #include "returnvals.h"
 #include "const.h"
 #include "inventory.h"
+
 #include "DC.h"
 #include "Trace.h"
 
 using namespace std;
-using namespace fmt;
 
 // Extern variables
 
@@ -106,17 +103,6 @@ void SelfPurge::setOwner(char_data* c, string m)
 	owner = c;
 	function = m;
 }
-
-string SelfPurge::getFunction(void) const
-{
-	return function;
-}
-
-bool SelfPurge::getState(void) const
-{
-	return state;
-}
-
 
 selfpurge_t selfpurge = {};
 
@@ -506,7 +492,6 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
 	// more boring code. FUCK.
 	int16_t *intval = NULL;
 	uint32_t *uintval = NULL;
-	uint64_t *uint64val = nullptr;
 	char **stringval = NULL;
 	int64_t *llval = NULL;
 	int8_t *sbval = NULL;
@@ -704,7 +689,7 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
 			if (!rtarget)
 				tError = TRUE;
 			else
-				uint64val = &world[rtarget].room_flags;
+				uintval = &world[rtarget].room_flags;
 		}
 		break;
 	case 'g':
@@ -862,7 +847,7 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
 			if (!otarget)
 				tError = TRUE;
 			else {
-				uint64val = &otarget->obj_flags.more_flags;
+				uintval = &otarget->obj_flags.more_flags;
 			}
 		} else if (!str_cmp(right, "move")) {
 			if (!target)
@@ -966,7 +951,7 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
 			if (!target)
 				tError = TRUE;
 			else
-				uint64val = &target->resist;
+				uintval = &target->resist;
 		}
 		break;
 	case 's':
@@ -1012,7 +997,7 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
 			if (!target)
 				tError = TRUE;
 			else
-				uint64val = &target->suscept;
+				uintval = &target->suscept;
 		}
 		break;
 	case 't':
@@ -4084,7 +4069,7 @@ void end_oproc(char_data *ch, Trace trace)
 	static int core_counter = 0;
 	if (selfpurge)
 	{
-		log(format("Crash averted in end_oproc() {}", selfpurge), IMMORTAL, LOG_BUG);
+		logf(IMMORTAL, LOG_BUG, "Crash averted in end_oproc()");
 
 		if (core_counter++ < 10)
 		{
