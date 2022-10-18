@@ -142,8 +142,8 @@ struct room_data
     char * description;                  // Shown when entered
     extra_descr_data * ex_description;   // for examine/look
     room_direction_data * dir_option[MAX_DIRS]; // Directions
-    uint64_t room_flags;                     // DEATH, DARK ... etc
-    uint64_t temp_room_flags;             // A second bitvector for flags that do NOT get saved.  These are temporary runtime flags.
+    uint32_t room_flags;                     // DEATH, DARK ... etc
+    uint32_t temp_room_flags;             // A second bitvector for flags that do NOT get saved.  These are temporary runtime flags.
     int16_t light;                        // Light factor of room
     
     int (*funct)(char_data*, int, char*);  // special procedure
