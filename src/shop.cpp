@@ -1538,6 +1538,7 @@ struct obj_exchange
   int cost_qty;
   int cost_vnum;
   uint64_t cost_exp;
+  uint64_t cost_plats;
 };
 
 const int OBJ_APOCALYPSE = 27905;
@@ -1546,25 +1547,25 @@ const int OBJ_MEATBALL = 27908;
 const int OBJ_WINGDING = 27909;
 const int OBJ_CLOVERLEAF = 27910;
 
-const int MAX_EDDIE_ITEMS = 15;
+const int MAX_EDDIE_ITEMS = 16;
 
 obj_exchange eddie[MAX_EDDIE_ITEMS] = {
-    {1, OBJ_CLOVERLEAF, 2, OBJ_WINGDING, 0},
-    {1, OBJ_CLOVERLEAF, 2, OBJ_MEATBALL, 0},
-    {1, OBJ_CLOVERLEAF, 2, OBJ_APOCALYPSE, 0},
-    {1, OBJ_CLOVERLEAF, 0, 0, 5000000000},
-    {2, OBJ_CLOVERLEAF, 1, OBJ_BROWNIE, 0},
-    {1, OBJ_WINGDING, 3, OBJ_CLOVERLEAF, 0},
-    {1, OBJ_WINGDING, 2, OBJ_MEATBALL, 0},
-    {1, OBJ_WINGDING, 2, OBJ_APOCALYPSE, 0},
-    {1, OBJ_MEATBALL, 3, OBJ_CLOVERLEAF, 0},
-    {1, OBJ_MEATBALL, 2, OBJ_WINGDING, 0},
-    {1, OBJ_MEATBALL, 2, OBJ_APOCALYPSE, 0},
-    {1, OBJ_APOCALYPSE, 3, OBJ_CLOVERLEAF, 0},
-    {1, OBJ_APOCALYPSE, 2, OBJ_WINGDING, 0},
-    {1, OBJ_APOCALYPSE, 2, OBJ_MEATBALL, 0},
-    {1, OBJ_BROWNIE, 10, OBJ_CLOVERLEAF, 0}
-
+    {1, OBJ_CLOVERLEAF, 2, OBJ_WINGDING, 0, 0},
+    {1, OBJ_CLOVERLEAF, 2, OBJ_MEATBALL, 0, 0},
+    {1, OBJ_CLOVERLEAF, 2, OBJ_APOCALYPSE, 0, 0},
+    {1, OBJ_CLOVERLEAF, 0, 0, 5000000000, 0},
+    {2, OBJ_CLOVERLEAF, 1, OBJ_BROWNIE, 0, 0},
+    {1, OBJ_WINGDING, 3, OBJ_CLOVERLEAF, 0, 0},
+    {1, OBJ_WINGDING, 2, OBJ_MEATBALL, 0, 0},
+    {1, OBJ_WINGDING, 2, OBJ_APOCALYPSE, 0, 0},
+    {1, OBJ_WINGDING, 0, 0, 0, 1000},
+    {1, OBJ_MEATBALL, 3, OBJ_CLOVERLEAF, 0, 0},
+    {1, OBJ_MEATBALL, 2, OBJ_WINGDING, 0, 0},
+    {1, OBJ_MEATBALL, 2, OBJ_APOCALYPSE, 0, 0},
+    {1, OBJ_APOCALYPSE, 3, OBJ_CLOVERLEAF, 0, 0},
+    {1, OBJ_APOCALYPSE, 2, OBJ_WINGDING, 0, 0},
+    {1, OBJ_APOCALYPSE, 2, OBJ_MEATBALL, 0, 0},
+    {1, OBJ_BROWNIE, 10, OBJ_CLOVERLEAF, 0, 0}
 };
 
 int eddie_shopkeeper(char_data *ch, struct obj_data *obj, int cmd, const char *arg, char_data *owner)
@@ -1610,6 +1611,11 @@ int eddie_shopkeeper(char_data *ch, struct obj_data *obj, int cmd, const char *a
         string cost_buf_str = fmt::format(locale("en_US.UTF-8"), "{:L} experience", eddie[i].cost_exp);
         snprintf(cost_buf, 1024, "%s", cost_buf_str.c_str());
       }
+      else if (eddie[i].cost_plats> 0)
+      {
+        string cost_buf_str = fmt::format(locale("en_US.UTF-8"), "{:L} platinum", eddie[i].cost_plats);
+        snprintf(cost_buf, 1024, "%s", cost_buf_str.c_str());
+      }
 
       if (last_vnum != 0 && last_vnum != eddie[i].item_vnum)
       {
@@ -1619,18 +1625,26 @@ int eddie_shopkeeper(char_data *ch, struct obj_data *obj, int cmd, const char *a
       last_vnum = eddie[i].item_vnum;
       int item_qty = eddie[i].item_qty;
       int cost_qty = eddie[i].cost_qty;
+      uint64_t cost_plats = eddie[i].cost_plats;
 
       // setup format specifier based length of item short descriptions
       if (cost_qty > 0)
       {
-        snprintf(buf, 1024, "$B$3%%2d$R|%%2d x %%-%ds|%%2d x %%-%ds|\n\r",
+        snprintf(buf, 1024, "$B$3%%2d$R|%%2d x %%-%ds|%%2d x %%-%ds|\r\n",
                  30 + (strlen(item_buf) - nocolor_strlen(item_buf)),
                  35 + (strlen(cost_buf) - nocolor_strlen(cost_buf)));
         csendf(ch, buf, i + 1, item_qty, item_buf, cost_qty, cost_buf);
       }
+      else if (cost_plats > 0)
+      {
+        snprintf(buf, 1024, "$B$3%%2d$R|%%2d x %%-%ds| $B%%-%ds$R    |\r\n",
+                 30 + (strlen(item_buf) - nocolor_strlen(item_buf)),
+                 35 + (strlen(cost_buf) - nocolor_strlen(cost_buf)));
+        csendf(ch, buf, i + 1, item_qty, item_buf, cost_buf);
+      }
       else
       {
-        snprintf(buf, 1024, "$B$3%%2d$R|%%2d x %%-%ds|     %%-%ds|\n\r",
+        snprintf(buf, 1024, "$B$3%%2d$R|%%2d x %%-%ds| %%-%ds    |\r\n",
                  30 + (strlen(item_buf) - nocolor_strlen(item_buf)),
                  35 + (strlen(cost_buf) - nocolor_strlen(cost_buf)));
         csendf(ch, buf, i + 1, item_qty, item_buf, cost_buf);
@@ -1688,6 +1702,19 @@ int eddie_shopkeeper(char_data *ch, struct obj_data *obj, int cmd, const char *a
       else
       {
         ch->send(fmt::format(locale("en_US.UTF-8"), "You do not have the {:L} experience to pay for that item. You need {:L} more experience.\r\n", eddie[choice - 1].cost_exp, eddie[choice - 1].cost_exp - GET_EXP(ch)));
+        return eSUCCESS;
+      }
+    }
+    else if (eddie[choice - 1].cost_plats > 0)
+    {
+      if (GET_PLATINUM(ch) >= eddie[choice - 1].cost_plats)
+      {
+        GET_PLATINUM(ch) -= eddie[choice - 1].cost_plats;
+        ch->send(fmt::format(locale("en_US.UTF-8"), "Eddie takes {:L} platinum from you, leaving you with {:L} platinum.\r\n", eddie[choice - 1].cost_plats, GET_PLATINUM(ch)));
+      }
+      else
+      {
+        ch->send(fmt::format(locale("en_US.UTF-8"), "You do not have the {:L} platinum to pay for that item. You need {:L} more platinum.\r\n", eddie[choice - 1].cost_plats, eddie[choice - 1].cost_plats - GET_PLATINUM(ch)));
         return eSUCCESS;
       }
     }
