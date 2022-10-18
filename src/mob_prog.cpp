@@ -98,7 +98,7 @@ SelfPurge::SelfPurge(bool s)
 
 SelfPurge::operator bool() const
 {
-	return state;	
+	return state;
 }
 
 void SelfPurge::setOwner(char_data* c, string m)
