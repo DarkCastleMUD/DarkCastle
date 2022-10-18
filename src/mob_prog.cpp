@@ -31,9 +31,12 @@
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
+
 #include <map>
 #include <string>
 #include <algorithm>
+
+#include <fmt/format.h>
 
 #include "fileinfo.h"
 #include "act.h"
@@ -52,11 +55,11 @@
 #include "returnvals.h"
 #include "const.h"
 #include "inventory.h"
-
 #include "DC.h"
 #include "Trace.h"
 
 using namespace std;
+using namespace fmt;
 
 // Extern variables
 
@@ -103,6 +106,17 @@ void SelfPurge::setOwner(char_data* c, string m)
 	owner = c;
 	function = m;
 }
+
+string SelfPurge::getFunction(void) const
+{
+	return function;
+}
+
+bool SelfPurge::getState(void) const
+{
+	return state;
+}
+
 
 selfpurge_t selfpurge = {};
 
@@ -4069,7 +4083,7 @@ void end_oproc(char_data *ch, Trace trace)
 	static int core_counter = 0;
 	if (selfpurge)
 	{
-		logf(IMMORTAL, LOG_BUG, "Crash averted in end_oproc()");
+		log(format("Crash averted in end_oproc() {}", selfpurge), IMMORTAL, LOG_BUG);
 
 		if (core_counter++ < 10)
 		{

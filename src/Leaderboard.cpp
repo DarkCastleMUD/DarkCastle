@@ -1087,7 +1087,7 @@ void Leaderboard::read_file(void) {
 		try {
 			for (i = 0; i < 5; i++) {
 				hpactivename[i] = fread_string(fl, 0);
-				hpactive[i] = fread_int(fl, 0, LONG_MAX);
+				hpactive[i] = fread_int(fl, 0, 2147483467);
 				if (char_file_exists(hpactivename[i]) == false) {
 					hpactivename[i] = str_dup("UNKNOWN");
 					hpactive[i] = 0;
@@ -1095,35 +1095,35 @@ void Leaderboard::read_file(void) {
 			}
 			for (i = 0; i < 5; i++) {
 				mnactivename[i] = fread_string(fl, 0);
-				mnactive[i] = fread_int(fl, 0, LONG_MAX);
+				mnactive[i] = fread_int(fl, 0, 2147483467);
 				if (char_file_exists(mnactivename[i]) == false) {
 					mnactivename[i] = str_dup("UNKNOWN");
 				}
 			}
 			for (i = 0; i < 5; i++) {
 				kiactivename[i] = fread_string(fl, 0);
-				kiactive[i] = fread_int(fl, 0, LONG_MAX);
+				kiactive[i] = fread_int(fl, 0, 2147483467);
 				if (char_file_exists(kiactivename[i]) == false) {
 					kiactivename[i] = str_dup("UNKNOWN");
 				}
 			}
 			for (i = 0; i < 5; i++) {
 				pkactivename[i] = fread_string(fl, 0);
-				pkactive[i] = fread_int(fl, 0, LONG_MAX);
+				pkactive[i] = fread_int(fl, 0, 2147483467);
 				if (char_file_exists(pkactivename[i]) == false) {
 					pkactivename[i] = str_dup("UNKNOWN");
 				}
 			}
 			for (i = 0; i < 5; i++) {
 				pdactivename[i] = fread_string(fl, 0);
-				pdactive[i] = fread_int(fl, 0, LONG_MAX);
+				pdactive[i] = fread_int(fl, 0, 2147483467);
 				if (char_file_exists(pdactivename[i]) == false) {
 					pdactivename[i] = str_dup("UNKNOWN");
 				}
 			}
 			for (i = 0; i < 5; i++) {
 				rdactivename[i] = fread_string(fl, 0);
-				rdactive[i] = fread_int(fl, 0, LONG_MAX);
+				rdactive[i] = fread_int(fl, 0, 2147483467);
 				if (char_file_exists(rdactivename[i]) == false) {
 					rdactivename[i] = str_dup("UNKNOWN");
 				}
@@ -1131,7 +1131,7 @@ void Leaderboard::read_file(void) {
 			}
 			for (i = 0; i < 5; i++) {
 				mvactivename[i] = fread_string(fl, 0);
-				mvactive[i] = fread_int(fl, 0, LONG_MAX);
+				mvactive[i] = fread_int(fl, 0, 2147483467);
 				if (char_file_exists(mvactivename[i]) == false) {
 					mvactivename[i] = str_dup("UNKNOWN");
 				}
@@ -1139,49 +1139,49 @@ void Leaderboard::read_file(void) {
 			for (j = 0; j < CLASS_MAX - 2; j++) {
 				for (i = 0; i < 5; i++) {
 					hpactiveclassname[j][i] = fread_string(fl, 0);
-					hpactiveclass[j][i] = fread_int(fl, 0, LONG_MAX);
+					hpactiveclass[j][i] = fread_int(fl, 0, 2147483467);
 					if (char_file_exists(hpactiveclassname[j][i]) == false) {
 						hpactiveclassname[j][i] = str_dup("UNKNOWN");
 					}
 				}
 				for (i = 0; i < 5; i++) {
 					mnactiveclassname[j][i] = fread_string(fl, 0);
-					mnactiveclass[j][i] = fread_int(fl, 0, LONG_MAX);
+					mnactiveclass[j][i] = fread_int(fl, 0, 2147483467);
 					if (char_file_exists(mnactiveclassname[j][i]) == false) {
 						mnactiveclassname[j][i] = str_dup("UNKNOWN");
 					}
 				}
 				for (i = 0; i < 5; i++) {
 					kiactiveclassname[j][i] = fread_string(fl, 0);
-					kiactiveclass[j][i] = fread_int(fl, 0, LONG_MAX);
+					kiactiveclass[j][i] = fread_int(fl, 0, 2147483467);
 					if (char_file_exists(kiactiveclassname[j][i]) == false) {
 						kiactiveclassname[j][i] = str_dup("UNKNOWN");
 					}
 				}
 				for (i = 0; i < 5; i++) {
 					pkactiveclassname[j][i] = fread_string(fl, 0);
-					pkactiveclass[j][i] = fread_int(fl, 0, LONG_MAX);
+					pkactiveclass[j][i] = fread_int(fl, 0, 2147483467);
 					if (char_file_exists(pkactiveclassname[j][i]) == false) {
 						pkactiveclassname[j][i] = str_dup("UNKNOWN");
 					}
 				}
 				for (i = 0; i < 5; i++) {
 					pdactiveclassname[j][i] = fread_string(fl, 0);
-					pdactiveclass[j][i] = fread_int(fl, 0, LONG_MAX);
+					pdactiveclass[j][i] = fread_int(fl, 0, 2147483467);
 					if (char_file_exists(pdactiveclassname[j][i]) == false) {
 						pdactiveclassname[j][i] = str_dup("UNKNOWN");
 					}
 				}
 				for (i = 0; i < 5; i++) {
 					rdactiveclassname[j][i] = fread_string(fl, 0);
-					rdactiveclass[j][i] = fread_int(fl, 0, LONG_MAX);
+					rdactiveclass[j][i] = fread_int(fl, 0, 2147483467);
 					if (char_file_exists(rdactiveclassname[j][i]) == false) {
 						rdactiveclassname[j][i] = str_dup("UNKNOWN");
 					}
 				}
 				for (i = 0; i < 5; i++) {
 					mvactiveclassname[j][i] = fread_string(fl, 0);
-					mvactiveclass[j][i] = fread_int(fl, 0, LONG_MAX);
+					mvactiveclass[j][i] = fread_int(fl, 0, 2147483467);
 					if (char_file_exists(mvactiveclassname[j][i]) == false) {
 						mvactiveclassname[j][i] = str_dup("UNKNOWN");
 					}
@@ -1361,31 +1361,31 @@ int do_leaderboard(char_data *ch, char *argument, int cmd) {
 	}
 	for (i = 0; i < 5; i++) {
 		hpactivename[i] = fread_string(fl, 0);
-		hpactive[i] = fread_int(fl, 0, LONG_MAX);
+		hpactive[i] = fread_int(fl, 0, 2147483467);
 	}
 	for (i = 0; i < 5; i++) {
 		mnactivename[i] = fread_string(fl, 0);
-		mnactive[i] = fread_int(fl, 0, LONG_MAX);
+		mnactive[i] = fread_int(fl, 0, 2147483467);
 	}
 	for (i = 0; i < 5; i++) {
 		kiactivename[i] = fread_string(fl, 0);
-		kiactive[i] = fread_int(fl, 0, LONG_MAX);
+		kiactive[i] = fread_int(fl, 0, 2147483467);
 	}
 	for (i = 0; i < 5; i++) {
 		pkactivename[i] = fread_string(fl, 0);
-		pkactive[i] = fread_int(fl, 0, LONG_MAX);
+		pkactive[i] = fread_int(fl, 0, 2147483467);
 	}
 	for (i = 0; i < 5; i++) {
 		pdactivename[i] = fread_string(fl, 0);
-		pdactive[i] = fread_int(fl, 0, LONG_MAX);
+		pdactive[i] = fread_int(fl, 0, 2147483467);
 	}
 	for (i = 0; i < 5; i++) {
 		rdactivename[i] = fread_string(fl, 0);
-		rdactive[i] = fread_int(fl, 0, LONG_MAX);
+		rdactive[i] = fread_int(fl, 0, 2147483467);
 	}
 	for (i = 0; i < 5; i++) {
 		mvactivename[i] = fread_string(fl, 0);
-		mvactive[i] = fread_int(fl, 0, LONG_MAX);
+		mvactive[i] = fread_int(fl, 0, 2147483467);
 	}
 	if (validclass) {
 		for (j = 0; j < k + 1; j++) {
@@ -1426,31 +1426,31 @@ int do_leaderboard(char_data *ch, char *argument, int cmd) {
 			}
 			for (i = 0; i < 5; i++) {
 				hpactivename[i] = fread_string(fl, 0);
-				hpactive[i] = fread_int(fl, 0, LONG_MAX);
+				hpactive[i] = fread_int(fl, 0, 2147483467);
 			}
 			for (i = 0; i < 5; i++) {
 				mnactivename[i] = fread_string(fl, 0);
-				mnactive[i] = fread_int(fl, 0, LONG_MAX);
+				mnactive[i] = fread_int(fl, 0, 2147483467);
 			}
 			for (i = 0; i < 5; i++) {
 				kiactivename[i] = fread_string(fl, 0);
-				kiactive[i] = fread_int(fl, 0, LONG_MAX);
+				kiactive[i] = fread_int(fl, 0, 2147483467);
 			}
 			for (i = 0; i < 5; i++) {
 				pkactivename[i] = fread_string(fl, 0);
-				pkactive[i] = fread_int(fl, 0, LONG_MAX);
+				pkactive[i] = fread_int(fl, 0, 2147483467);
 			}
 			for (i = 0; i < 5; i++) {
 				pdactivename[i] = fread_string(fl, 0);
-				pdactive[i] = fread_int(fl, 0, LONG_MAX);
+				pdactive[i] = fread_int(fl, 0, 2147483467);
 			}
 			for (i = 0; i < 5; i++) {
 				rdactivename[i] = fread_string(fl, 0);
-				rdactive[i] = fread_int(fl, 0, LONG_MAX);
+				rdactive[i] = fread_int(fl, 0, 2147483467);
 			}
 			for (i = 0; i < 5; i++) {
 				mvactivename[i] = fread_string(fl, 0);
-				mvactive[i] = fread_int(fl, 0, LONG_MAX);
+				mvactive[i] = fread_int(fl, 0, 2147483467);
 			}
 		}
 	}
@@ -1853,7 +1853,7 @@ void Leaderboard::rename(char *oldname, char *newname) {
 	}
 	for (i = 0; i < lines; i++) {
 		name[i] = fread_string(fl, 0);
-		value[i] = fread_int(fl, 0, LONG_MAX);
+		value[i] = fread_int(fl, 0, 2147483467);
 	}
 	dc_fclose(fl);
 

@@ -479,7 +479,7 @@ void load_skillquests()
 			log(buf, 0, LOG_BUG);
 		}
 		newsq->message = fread_string(fl, 0);
-		newsq->clas = fread_int(fl, 0, INT_MAX);
+		newsq->clas = fread_int(fl, 0, 32768);
 		newsq->level = fread_int(fl, 0, 200);
 		newsq->next = 0;
 
@@ -1536,7 +1536,7 @@ int read_one_room(FILE *fl, int & room_nr)
 			world[room_nr].zone = zone;
 		} // of top_of_zone_table > 0
 
-		world[room_nr].room_flags = fread_bitvector(fl, 0, UINT_MAX);
+		world[room_nr].room_flags = fread_bitvector(fl, -1, 2147483467);
 		if (IS_SET(world[room_nr].room_flags, NO_ASTRAL))
 			REMOVE_BIT(world[room_nr].room_flags, NO_ASTRAL);
 
@@ -1596,7 +1596,7 @@ int read_one_room(FILE *fl, int & room_nr)
 #else
 				deni = (struct deny_data *)dc_alloc(1, sizeof(struct deny_data));
 #endif
-				deni->vnum = fread_int(fl, -1, LONG_MAX);
+				deni->vnum = fread_int(fl, -1, 2147483467);
 				deni->next = world[room_nr].denied;
 				world[room_nr].denied = deni;
 			}
@@ -2409,7 +2409,7 @@ void read_one_zone(FILE * fl, int zon)
 
 	zone_table[zon].lifespan = fread_int(fl, 0, 64000);
 	zone_table[zon].reset_mode = fread_int(fl, 0, 64000);
-	zone_table[zon].zone_flags = fread_bitvector(fl, 0, INT_MAX);
+	zone_table[zon].zone_flags = fread_bitvector(fl, 0, 2147483467);
 
 	// if its old version set the altered flag so that
 	// this zone will be saved with new format soon
@@ -2465,8 +2465,8 @@ void read_one_zone(FILE * fl, int zon)
 		reset_tab[reset_top].if_flag = tmp;
 		reset_tab[reset_top].last = time(NULL) - number(0, 12 * 3600);
 		// randomize last repop on boot
-		reset_tab[reset_top].arg1 = fread_int(fl, -64000, LONG_MAX);
-		reset_tab[reset_top].arg2 = fread_int(fl, -64000, LONG_MAX);
+		reset_tab[reset_top].arg1 = fread_int(fl, -64000, 2147483467);
+		reset_tab[reset_top].arg2 = fread_int(fl, -64000, 2147483467);
 		if (reset_tab[reset_top].arg1 > 64000)
 			reset_tab[reset_top].arg1 = 2;
 
@@ -2484,7 +2484,7 @@ void read_one_zone(FILE * fl, int zon)
 				reset_tab[reset_top].command == 'J'
 						// % only has 2 args
 						)
-			reset_tab[reset_top].arg3 = fread_int(fl, -64000, INT_MAX);
+			reset_tab[reset_top].arg3 = fread_int(fl, -64000, 32768);
 		else
 			reset_tab[reset_top].arg3 = 0;
 
@@ -2641,7 +2641,7 @@ char_data *read_mobile(int nr, FILE *fl)
 	mob->mobdata->reset = NULL;
 	/* *** Numeric data *** */
 	j = 0;
-	while ((tmp = fread_int(fl, LONG_MIN, LONG_MAX)) != -1) {
+	while ((tmp = fread_int(fl, -2147483467, 2147483467)) != -1) {
 		mob->mobdata->actflags[j] = tmp;
 		j++;
 	}
@@ -2652,14 +2652,14 @@ char_data *read_mobile(int nr, FILE *fl)
 	SET_BIT(mob->misc, MISC_IS_MOB);
 
 	j = 0;
-	while ((tmp = fread_int(fl, LONG_MIN, LONG_MAX)) != -1) {
+	while ((tmp = fread_int(fl, -2147483467, 2147483467)) != -1) {
 		mob->affected_by[j] = tmp;
 		j++;
 	}
 	for (; j < AFF_MAX / ASIZE + 1; j++)
 		mob->affected_by[j] = 0;
 
-	mob->alignment = fread_int(fl, LONG_MIN, LONG_MAX);
+	mob->alignment = fread_int(fl, -2147483467, 2147483467);
 
 	tmp = fread_int(fl, 0, MAX_RACE);
 	GET_RACE(mob) = (char)tmp;
@@ -2697,9 +2697,9 @@ char_data *read_mobile(int nr, FILE *fl)
 	mob->ki = mob->max_ki;
 	mob->raw_ki = mob->max_ki;
 
-	mob->gold = fread_int(fl, 0, LONG_MAX);
+	mob->gold = fread_int(fl, 0, 2147483467);
 	mob->plat = 0;
-	GET_EXP(mob) = (int64_t)fread_int(fl, LONG_MIN, LONG_MAX);
+	GET_EXP(mob) = (int64_t)fread_int(fl, -2147483467, 2147483467);
 
 	mob->position = fread_int(fl, 0, 10);
 	mob->mobdata->default_pos = fread_int(fl, 0, 10);
@@ -2713,9 +2713,9 @@ char_data *read_mobile(int nr, FILE *fl)
 
 	mob->sex = (char)tmp;
 
-	mob->immune = fread_bitvector(fl, 0, UINT_MAX);
-	mob->suscept = fread_bitvector(fl, 0, UINT_MAX);
-	mob->resist = fread_bitvector(fl, 0, UINT_MAX);
+	mob->immune = fread_bitvector(fl, 0, 2147483467);
+	mob->suscept = fread_bitvector(fl, 0, 2147483467);
+	mob->resist = fread_bitvector(fl, 0, 2147483467);
 
 	// if all three are 0, then chances are someone just didn't set them, so go with
 	// the race defaults.
@@ -2736,7 +2736,7 @@ char_data *read_mobile(int nr, FILE *fl)
 		letter = fread_char(fl);
 		switch (letter) {
 		case 'C':
-			mob->c_class = fread_int(fl, 0, LONG_MAX);
+			mob->c_class = fread_int(fl, 0, 2147483467);
 			fread_new_newline(fl);
 			break;
 		case 'T': // sTats
@@ -2758,7 +2758,7 @@ char_data *read_mobile(int nr, FILE *fl)
 			break;
 		case 'V': // value
 			i = fread_int(fl, 0, MAX_MOB_VALUES - 1);
-			mob->mobdata->mob_flags.value[i] = fread_int(fl, -1000, LONG_MAX);
+			mob->mobdata->mob_flags.value[i] = fread_int(fl, -1000, 2147483467);
 			fread_new_newline(fl);
 			break;
 		case 'S':
@@ -3805,19 +3805,19 @@ struct obj_data *read_object(int nr, FILE *fl, bool zz)
 
 	/* *** numeric data *** */
 
-	obj->obj_flags.type_flag = fread_int(fl, -1000, LONG_MAX);
-	obj->obj_flags.extra_flags = fread_bitvector(fl, 0, UINT_MAX);
-	obj->obj_flags.wear_flags = fread_bitvector(fl, 0, UINT_MAX);
-	obj->obj_flags.size = fread_bitvector(fl, 0, UINT16_MAX);
+	obj->obj_flags.type_flag = fread_int(fl, -1000, 2147483467);
+	obj->obj_flags.extra_flags = fread_bitvector(fl, 0, 2147483467);
+	obj->obj_flags.wear_flags = fread_bitvector(fl, 0, 2147483467);
+	obj->obj_flags.size = fread_bitvector(fl, 0, 2147483467);
 
-	obj->obj_flags.value[0] = fread_int(fl, -1000, LONG_MAX);
-	obj->obj_flags.value[1] = fread_int(fl, -1000, LONG_MAX);
-	obj->obj_flags.value[2] = fread_int(fl, -1000, LONG_MAX);
-	obj->obj_flags.value[3] = fread_int(fl, -1000, LONG_MAX);
+	obj->obj_flags.value[0] = fread_int(fl, -1000, 2147483467);
+	obj->obj_flags.value[1] = fread_int(fl, -1000, 2147483467);
+	obj->obj_flags.value[2] = fread_int(fl, -1000, 2147483467);
+	obj->obj_flags.value[3] = fread_int(fl, -1000, 2147483467);
 	obj->obj_flags.eq_level = fread_int(fl, -1000, IMP);
-	obj->obj_flags.weight = fread_int(fl, -1000, LONG_MAX);
-	obj->obj_flags.cost = fread_int(fl, -1000, LONG_MAX);
-	obj->obj_flags.more_flags = fread_bitvector(fl, -1000, UINT_MAX);
+	obj->obj_flags.weight = fread_int(fl, -1000, 2147483467);
+	obj->obj_flags.cost = fread_int(fl, -1000, 2147483467);
+	obj->obj_flags.more_flags = fread_bitvector(fl, -1000, 2147483467);
 
 	/* currently not stored in object file */
 	obj->obj_flags.timer = 0;
@@ -3855,7 +3855,7 @@ struct obj_data *read_object(int nr, FILE *fl, bool zz)
 
 		case 'A':
 			// these are only two members of obj_affected_type, so nothing else needs initializing
-			loc = fread_int(fl, -1000, LONG_MAX);
+			loc = fread_int(fl, -1000, 2147483467);
 			try {
 				mod = fread_int(fl, -1000, 1000);
 			} catch (error_range_over) {
@@ -3937,20 +3937,20 @@ ifstream& operator>>(ifstream &in, obj_data *obj)
 
 	// numeric data
 
-	obj->obj_flags.type_flag = fread_int(in, -1000, LONG_MAX);
+	obj->obj_flags.type_flag = fread_int(in, -1000, 2147483467);
 
-	obj->obj_flags.extra_flags = fread_bitvector(in, 0, UINT_MAX);
-	obj->obj_flags.wear_flags = fread_bitvector(in, 0, UINT_MAX);
-	obj->obj_flags.size = fread_bitvector(in, 0, UINT16_MAX);
+	obj->obj_flags.extra_flags = fread_bitvector(in, 0, 2147483467);
+	obj->obj_flags.wear_flags = fread_bitvector(in, 0, 2147483467);
+	obj->obj_flags.size = fread_bitvector(in, 0, 2147483467);
 
-	obj->obj_flags.value[0] = fread_int(in, -1000, LONG_MAX);
-	obj->obj_flags.value[1] = fread_int(in, -1000, LONG_MAX);
-	obj->obj_flags.value[2] = fread_int(in, -1000, LONG_MAX);
-	obj->obj_flags.value[3] = fread_int(in, -1000, LONG_MAX);
+	obj->obj_flags.value[0] = fread_int(in, -1000, 2147483467);
+	obj->obj_flags.value[1] = fread_int(in, -1000, 2147483467);
+	obj->obj_flags.value[2] = fread_int(in, -1000, 2147483467);
+	obj->obj_flags.value[3] = fread_int(in, -1000, 2147483467);
 	obj->obj_flags.eq_level = fread_int(in, -1000, IMP);
-	obj->obj_flags.weight = fread_int(in, -1000, LONG_MAX);
-	obj->obj_flags.cost = fread_int(in, -1000, LONG_MAX);
-	obj->obj_flags.more_flags = fread_bitvector(in, -1000, UINT_MAX);
+	obj->obj_flags.weight = fread_int(in, -1000, 2147483467);
+	obj->obj_flags.cost = fread_int(in, -1000, 2147483467);
+	obj->obj_flags.more_flags = fread_bitvector(in, -1000, 2147483467);
 
 	// currently not stored in object file
 	obj->obj_flags.timer = 0;
@@ -3989,7 +3989,7 @@ ifstream& operator>>(ifstream &in, obj_data *obj)
 
 		case 'A':
 			// these are only two members of obj_affected_type, so nothing else needs initializing
-			loc = fread_int(in, -1000, LONG_MAX);
+			loc = fread_int(in, -1000, 2147483467);
 			mod = fread_int(in, -1000, 1000);
 			add_obj_affect(obj, loc, mod);
 			break;
@@ -6023,7 +6023,7 @@ void load_mobprogs(FILE *fp)
 		case '*':
 			break;
 		case 'm':
-			value = fread_int(fp, 0, LONG_MAX);
+			value = fread_int(fp, 0, 2147483467);
 			if (real_mobile(value) < 0)
 					{
 				logf( IMMORTAL, LOG_WORLD, "Load_mobprogs: vnum %d doesn't exist.", value);

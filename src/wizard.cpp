@@ -1713,7 +1713,7 @@ void init_random_hunt_items(struct hunt_data *h)
   {
     if (!over)
     {
-      i = fread_int(f, 0, INT_MAX);
+      i = fread_int(f, 0, 32768);
       if (i == 0)
         over = TRUE;
       else

@@ -100,7 +100,7 @@ void loadnews()
     return;
   }
   int i;
-  while ((i = fread_int(fl, 0, LONG_MAX))!= 0)
+  while ((i = fread_int(fl, 0, 2147483467))!= 0)
   {
     struct news_data *nnews;
 #ifdef LEAK_CHECK
