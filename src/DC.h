@@ -16,6 +16,8 @@
 #include <netinet/in.h>
 #include <string>
 
+typedef uint64_t vnum_t;
+
 #include "character.h"
 #include "obj.h"
 #include "character.h"
@@ -39,7 +41,6 @@ typedef set<int>::iterator server_descriptor_list_i;
 typedef vector<in_port_t>::iterator port_list_i;
 typedef unordered_map<char_data*, Trace> death_list_t;
 typedef unordered_map<char_data *, Trace> free_list_t;
-typedef uint64_t vnum_t;
 typedef uint64_t zone_t;
 typedef map<vnum_t, special_function> special_function_list_t;
 

@@ -30,6 +30,7 @@ struct char_data;
 #include "sing.h"
 #include "quest.h"
 #include "interp.h"
+#include "utility.h"
 
 struct char_data;
 
@@ -55,7 +56,6 @@ bool ignore_entry::operator=(ignore_entry& a, ignore_entry& b)
 */
 
 typedef std::map<std::string, ignore_entry, strcasecmp_compare> ignoring_t;
-#include "utility.h"
 
 class communication;
 typedef std::queue<communication> history_t;
@@ -257,7 +257,7 @@ struct pc_data
     obj_data *skillchange = {}; /* Skill changing equipment. */
 
      int32_t last_mob_edit = {};       // vnum of last mob edited
-     int32_t last_obj_edit = {};       // vnum of last obj edited
+     vnum_t last_obj_vnum = {};       // vnum of last obj edited
 
     string last_tell = {};          /* last person who told           */
      int16_t last_mess_read = {};     /* for reading messages */

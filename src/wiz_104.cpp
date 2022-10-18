@@ -1872,7 +1872,10 @@ int do_opstat(char_data *ch, char *argument, int cmd)
      vnum = atoi(argument);
 
   } 
-  else vnum = ch->pcdata->last_obj_edit;
+  else
+  {
+	vnum = ch->pcdata->last_obj_vnum;
+  }
 
   opstat(ch,vnum);
   return eSUCCESS;
@@ -1901,7 +1904,7 @@ int do_opedit(char_data *ch, char *argument, int cmd)
     vnum = atoi(arg);
     argument = one_argument(argument, arg);
   } else {
-    vnum = obj_index[ch->pcdata->last_obj_edit].virt;
+    vnum = ch->pcdata->last_obj_vnum;
 
   }
 
@@ -1915,7 +1918,7 @@ int do_opedit(char_data *ch, char *argument, int cmd)
      send_to_char("You are unable to work creation outside your range.\r\n",ch);
      return eFAILURE;
   }
-  ch->pcdata->last_obj_edit = num;
+  ch->pcdata->last_obj_vnum = vnum;
 /*  if (!*arg)
   {
     opstat(ch, vnum);
@@ -2103,7 +2106,7 @@ int do_opedit(char_data *ch, char *argument, int cmd)
 		"The field must be one of the following:\r\n"
 		"\tadd\tremove\ttype\targlist\r\n\tcommand\tlist\r\n\r\n",ch);
  char buf[MAX_STRING_LENGTH];
-  sprintf(buf,"$3Current object set to: %d\r\n",ch->pcdata->last_obj_edit);
+  sprintf(buf,"$3Current object set to: %llu\r\n",ch->pcdata->last_obj_vnum);
   send_to_char(buf,ch);
   return eSUCCESS;
 }
@@ -2173,7 +2176,7 @@ int do_oclone(char_data *ch, char *argument, int cmd)
   obj_index[r2].mobspec = 0;
   //extract_obj(otmp);
 
-  ch->pcdata->last_obj_edit = r2;
+  ch->pcdata->last_obj_vnum = v2;
   set_zone_modified_obj(r2);
 
   return eSUCCESS;

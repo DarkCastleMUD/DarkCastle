@@ -1651,9 +1651,9 @@ string generate_prompt(char_data *ch)
     case 'O':
     if (IS_PC(ch))
     {
-      if (ch->pcdata->last_obj_edit >= 0)
+      if (ch->pcdata->last_obj_vnum > 0)
       {
-        sprintf(pro, "%d", obj_index[ch->pcdata->last_obj_edit ].virt);
+        sprintf(pro, "%llu", ch->pcdata->last_obj_vnum);
       }
     }
     break;
