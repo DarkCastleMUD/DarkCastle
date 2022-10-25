@@ -1880,9 +1880,20 @@ void pick_up_item(char_data *ch, struct obj_data *obj)
           {
             if (search_char_for_item(ch, oitem->item_number, false))
             {
-              send_to_char("The item's uniqueness causes it to poof into thin air!\r\n", ch);
-              extract_obj(oitem);
-              break; // Used to crash it.
+              if (IS_SET(oitem->obj_flags.more_flags, ITEM_24H_SAVE))
+              {
+                send_to_char("You already have this item - Timer has been reset!\r\n", ch);
+                extract_obj(oitem);
+                citem = search_char_for_item(ch, oitem->item_number, false);
+                citem->save_expiration = time(NULL) + (60 * 60 * 24);
+                break; // Used to crash it.
+              }
+              else
+              {
+                send_to_char("The item's uniqueness causes it to poof into thin air!\r\n", ch);
+                extract_obj(oitem);
+                break; // Used to crash it.
+              }
             }
             else
               obj_to_char(oitem, ch);
