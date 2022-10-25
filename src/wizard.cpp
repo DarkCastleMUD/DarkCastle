@@ -2056,7 +2056,7 @@ int do_huntstart(char_data *ch, char *argument, int cmd)
 
   if (arg3[0] == '\0')
   {
-    send_to_char("Syntax: huntstart <vnum> <# of items (1-60)> <time limit> [hunt name]\r\n", ch);
+    send_to_char("Syntax: huntstart <vnum> <# of items (1-50)> <time limit> [hunt name]\r\n", ch);
     return eSUCCESS;
   }
   int vnum = atoi(arg), num = atoi(arg2), time = atoi(arg3);
@@ -2065,9 +2065,9 @@ int do_huntstart(char_data *ch, char *argument, int cmd)
     send_to_char("Non-existent item.\r\n", ch);
     return eSUCCESS;
   }
-  if (num <= 0 || num > 60)
+  if (num <= 0 || num > 50)
   {
-    send_to_char("Invalid number of items. Maximum of 60 allowed.\r\n", ch);
+    send_to_char("Invalid number of items. Maximum of 50 allowed.\r\n", ch);
     return eSUCCESS;
   }
   if (time <= 0)
