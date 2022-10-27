@@ -2951,7 +2951,13 @@ int has_skill(char_data *ch, skill_t skill)
 
 	if (ch->skills.contains(skill))
 	{
-		auto& curr = ch->skills[skill];
+    auto& curr = ch->skills[skill];
+
+    if (skill == SPELL_HEROISM || skill == SPELL_VILLAINY)
+    {
+      return curr.learned;  
+    }
+		
 		for (o = ch->pcdata->skillchange; o; o = o->next_skill)
 		{
 			int a;
