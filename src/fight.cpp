@@ -2687,7 +2687,7 @@ int damage(char_data *ch, char_data *victim,
 
     if (ch->in_room == victim->in_room && attacktype != SKILL_CIRCLE)
     {
-      SET_BIT(retval, check_autojoiners(ch, 0));
+      SET_BIT(retval, check_autojoiners(ch, 1));
       if (!SOMEONE_DIED(retval))
         if (IS_AFFECTED(ch, AFF_CHARM))
           SET_BIT(retval, check_joincharmie(ch));
