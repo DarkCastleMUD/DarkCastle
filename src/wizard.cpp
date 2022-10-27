@@ -1859,7 +1859,7 @@ void pick_up_item(char_data *ch, struct obj_data *obj)
               obj->short_description, i->mobname, ch->name);
       send_info(buf);
       struct hunt_data *h = i->hunt;
-      struct obj_data *oitem = NULL;
+      struct obj_data *oitem = NULL, *citem;
       int r1 = 0;
       switch (vnum)
       {
