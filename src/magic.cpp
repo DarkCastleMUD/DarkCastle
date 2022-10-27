@@ -14156,7 +14156,7 @@ int spell_villainy(uint8_t level, char_data *ch, char_data *victim, struct obj_d
    affect_from_char(victim, SPELL_VILLAINY);
 
   af.type      = SPELL_VILLAINY;
-  af.duration  = 3;
+  af.duration  = 9;
   af.modifier  = skill;
   af.location  = 0;
   af.bitvector = -1;
@@ -14205,7 +14205,7 @@ int spell_heroism(uint8_t level, char_data *ch, char_data *victim, struct obj_da
    affect_from_char(victim, SPELL_HEROISM);
 
   af.type      = SPELL_HEROISM;
-  af.duration  = 3;
+  af.duration  = 9;
   af.modifier  = skill;
   af.location  = 0;
   af.bitvector = -1;
