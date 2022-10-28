@@ -2685,7 +2685,7 @@ int damage(char_data *ch, char_data *victim,
   else
   {
 
-    if (ch->in_room == victim->in_room && attacktype != SKILL_BACKSTAB && attacktype != SKILL_CIRCLE)
+    if (ch->in_room == victim->in_room && attacktype != SKILL_CIRCLE)
     {
       SET_BIT(retval, check_autojoiners(ch, 1));
       if (!SOMEONE_DIED(retval))
