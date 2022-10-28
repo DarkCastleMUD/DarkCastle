@@ -2494,7 +2494,7 @@ int do_cast(char_data *ch, char *argument, int cmd)
 
         if (tar_char && IS_AFFECTED(tar_char, AFF_REFLECT) && number(0, 99) < tar_char->spell_reflect)
         {
-          if (ch == tar_char)
+          if (ch == tar_char || ARE_GROUPED(ch,tar_char))
           { // some idiot was shooting at himself
             //out		  act("The spell harmlessly reflects off you and disperses.", tar_char, 0, 0, TO_CHAR, 0);
             //for		  act("The spell harmlessly reflects off $n and disperses.", tar_char, 0, 0, TO_ROOM, 0);

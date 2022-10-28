@@ -1859,7 +1859,7 @@ void pick_up_item(char_data *ch, struct obj_data *obj)
               obj->short_description, i->mobname, ch->name);
       send_info(buf);
       struct hunt_data *h = i->hunt;
-      struct obj_data *oitem = NULL;
+      struct obj_data *oitem = NULL, *citem;
       int r1 = 0;
       switch (vnum)
       {
@@ -1880,9 +1880,20 @@ void pick_up_item(char_data *ch, struct obj_data *obj)
           {
             if (search_char_for_item(ch, oitem->item_number, false))
             {
-              send_to_char("The item's uniqueness causes it to poof into thin air!\r\n", ch);
-              extract_obj(oitem);
-              break; // Used to crash it.
+              if (IS_SET(oitem->obj_flags.more_flags, ITEM_24H_SAVE))
+              {
+                send_to_char("You already have this item - Timer has been reset!\r\n", ch);
+                extract_obj(oitem);
+                citem = search_char_for_item(ch, oitem->item_number, false);
+                citem->save_expiration = time(NULL) + (60 * 60 * 24);
+                break; // Used to crash it.
+              }
+              else
+              {
+                send_to_char("The item's uniqueness causes it to poof into thin air!\r\n", ch);
+                extract_obj(oitem);
+                break; // Used to crash it.
+              }
             }
             else
               obj_to_char(oitem, ch);
@@ -2045,7 +2056,7 @@ int do_huntstart(char_data *ch, char *argument, int cmd)
 
   if (arg3[0] == '\0')
   {
-    send_to_char("Syntax: huntstart <vnum> <# of items (1-60)> <time limit> [hunt name]\r\n", ch);
+    send_to_char("Syntax: huntstart <vnum> <# of items (1-50)> <time limit> [hunt name]\r\n", ch);
     return eSUCCESS;
   }
   int vnum = atoi(arg), num = atoi(arg2), time = atoi(arg3);
@@ -2054,9 +2065,9 @@ int do_huntstart(char_data *ch, char *argument, int cmd)
     send_to_char("Non-existent item.\r\n", ch);
     return eSUCCESS;
   }
-  if (num <= 0 || num > 60)
+  if (num <= 0 || num > 50)
   {
-    send_to_char("Invalid number of items. Maximum of 60 allowed.\r\n", ch);
+    send_to_char("Invalid number of items. Maximum of 50 allowed.\r\n", ch);
     return eSUCCESS;
   }
   if (time <= 0)
