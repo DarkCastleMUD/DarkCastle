@@ -287,18 +287,18 @@ int do_backstab(char_data *ch, char *argument, int cmd)
 	retval = attack(ch, victim, SKILL_BACKSTAB, SECOND);
       }
       
-      if (!SOMEONE_DIED(retval)) {
-	check_autojoiners(ch, 0);
-      }
+  //     if (!SOMEONE_DIED(retval)) {
+	// check_autojoiners(ch, 0);
+  //     }
     }
   }
 
  if (!SOMEONE_DIED(retval)) {
-    SET_BIT(retval, check_autojoiners(ch,1));
-    if (!SOMEONE_DIED(retval))
+    // SET_BIT(retval, check_autojoiners(ch,1));
+    // if (!SOMEONE_DIED(retval))
 
-    if (IS_AFFECTED(ch, AFF_CHARM)) SET_BIT(retval, check_joincharmie(ch,1));
-    if (SOMEONE_DIED(retval)) return retval;
+    // if (IS_AFFECTED(ch, AFF_CHARM)) SET_BIT(retval, check_joincharmie(ch,1));
+    // if (SOMEONE_DIED(retval)) return retval;
     if (ch->c_class == CLASS_THIEF && IS_PC(victim)) {
       WAIT_STATE(ch, PULSE_VIOLENCE*2);
     }
