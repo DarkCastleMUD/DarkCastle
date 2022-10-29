@@ -1828,6 +1828,11 @@ int reroll_trader(char_data *ch, obj_data *obj, int cmd, const char *arg, char_d
       owner->tell(ch, fmt::format("You need to confirm or cancel rerolling {}.", GET_OBJ_SHORT(r.orig_obj)));
       return eSUCCESS;
     }
+    else if (r.state == reroll_t::reroll_states_t::REROLLED)
+    {
+      owner->tell(ch, fmt::format("You need to choose 1, 2, 3 or type cancel before you can reroll again."));
+      return eSUCCESS;
+    }
 
     if (arg1.empty())
     {
