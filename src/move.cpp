@@ -945,7 +945,7 @@ int attempt_move(char_data *ch, int cmd, int is_retreat) {
 						send_to_char("Your legs are too tired for running away!\r\n", k->follower);
 					continue; //keep going through the groupies
 				}
-				if (is_retreat && k->follower->fighting && GET_LEVEL(k->follower->fighting) > 90 && IS_NPC(k->follower->fighting)) {
+				if (is_retreat && k->follower->fighting && (number(1,100) < 4) && IS_NPC(k->follower->fighting)) {
 
 					act("$n notices your intent and moves quickly to block your retreat!", k->follower->fighting, NULL, k->follower, TO_VICT, 0);
 					act("$n notices $N's intent and moves quickly to block $S retreat!", k->follower->fighting, NULL, k->follower, TO_ROOM, NOTVICT);
