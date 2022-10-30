@@ -875,6 +875,7 @@ int meta_dude(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
 
 			act("The Meta-physician touches $n.", ch, 0, 0, TO_ROOM, 0);
 			act("The Meta-physician touches you.", ch, 0, 0, TO_CHAR, 0);
+			ch->send(fmt::format(locale("en_US.UTF-8"), "The Meta-physician takes {:L} platinum from you, leaving you with {:L} platinum.\r\n", statplatprice, GET_PLATINUM(ch)));
 
 			// affect the stat by 0 to reflect the new raw stat
 			affect_modify(ch, APPLY_STR, 0, -1, TRUE);
@@ -906,6 +907,7 @@ int meta_dude(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
 			GET_HP_METAS(ch) += 5;
 			act("The Meta-physician touches $n.", ch, 0, 0, TO_ROOM, 0);
 			act("The Meta-physician touches you.", ch, 0, 0, TO_CHAR, 0);
+			ch->send(fmt::format(locale("en_US.UTF-8"), "The Meta-physician takes {:L} platinum from you, leaving you with {:L} platinum.\r\n", hit_cost, GET_PLATINUM(ch)));
 			redo_hitpoints(ch);
 			return eSUCCESS;
 		}
@@ -930,6 +932,7 @@ int meta_dude(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
 			GET_HP_METAS(ch) += 1;
 			act("The Meta-physician touches $n.", ch, 0, 0, TO_ROOM, 0);
 			act("The Meta-physician touches you.", ch, 0, 0, TO_CHAR, 0);
+			ch->send(fmt::format(locale("en_US.UTF-8"), "The Meta-physician takes {:L} platinum from you, leaving you with {:L} platinum.\r\n", hit_cost, GET_PLATINUM(ch)));
 			redo_hitpoints(ch);
 			return eSUCCESS;
 		}
@@ -953,6 +956,7 @@ int meta_dude(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
 			GET_MANA_METAS(ch) += 5;
 			act("The Meta-physician touches $n.", ch, 0, 0, TO_ROOM, 0);
 			act("The Meta-physician touches you.", ch, 0, 0, TO_CHAR, 0);
+			ch->send(fmt::format(locale("en_US.UTF-8"), "The Meta-physician takes {:L} platinum from you, leaving you with {:L} platinum.\r\n", mana_cost, GET_PLATINUM(ch)));
 			redo_mana(ch);
 			return eSUCCESS;
 		}
@@ -978,6 +982,7 @@ int meta_dude(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
 			GET_MANA_METAS(ch) += 1;
 			act("The Meta-physician touches $n.", ch, 0, 0, TO_ROOM, 0);
 			act("The Meta-physician touches you.", ch, 0, 0, TO_CHAR, 0);
+			ch->send(fmt::format(locale("en_US.UTF-8"), "The Meta-physician takes {:L} platinum from you, leaving you with {:L} platinum.\r\n", mana_cost, GET_PLATINUM(ch)));
 			redo_mana(ch);
 			return eSUCCESS;
 		}
@@ -1000,6 +1005,7 @@ int meta_dude(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
 			GET_MOVE_METAS(ch) += 5;
 			act("The Meta-physician touches $n.", ch, 0, 0, TO_ROOM, 0);
 			act("The Meta-physician touches you.", ch, 0, 0, TO_CHAR, 0);
+			ch->send(fmt::format(locale("en_US.UTF-8"), "The Meta-physician takes {:L} platinum from you, leaving you with {:L} platinum.\r\n", move_cost, GET_PLATINUM(ch)));
 			redo_hitpoints(ch);
 			redo_mana(ch);
 			return eSUCCESS;
@@ -1026,6 +1032,7 @@ int meta_dude(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
 			GET_MOVE_METAS(ch) += 1;
 			act("The Meta-physician touches $n.", ch, 0, 0, TO_ROOM, 0);
 			act("The Meta-physician touches you.", ch, 0, 0, TO_CHAR, 0);
+			ch->send(fmt::format(locale("en_US.UTF-8"), "The Meta-physician takes {:L} platinum from you, leaving you with {:L} platinum.\r\n", move_cost, GET_PLATINUM(ch)));
 			redo_hitpoints(ch);
 			redo_mana(ch);
 			return eSUCCESS;
@@ -1052,6 +1059,7 @@ int meta_dude(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
 			redo_ki(ch);
 			act("The Meta-physician touches $n.", ch, 0, 0, TO_ROOM, 0);
 			act("The Meta-physician touches you.", ch, 0, 0, TO_CHAR, 0);
+			ch->send(fmt::format(locale("en_US.UTF-8"), "The Meta-physician takes {:L} platinum from you, leaving you with {:L} platinum.\r\n", ki_cost, GET_PLATINUM(ch)));
 			return eSUCCESS;
 		}
 
