@@ -2943,20 +2943,22 @@ int has_skill(char_data *ch, skill_t skill)
 	if (affected_by_spell(ch, SKILL_DEFENDERS_STANCE) && skill == SKILL_DODGE)
 		return affected_by_spell(ch, SKILL_DEFENDERS_STANCE)->modifier;
 
-	if (affected_by_spell(ch, SPELL_VILLAINY))
-		bonus += affected_by_spell(ch, SPELL_VILLAINY)->modifier / 5;
-
-	if (affected_by_spell(ch, SPELL_HEROISM))
+	if (affected_by_spell(ch, SPELL_VILLAINY) && (skill == SPELL_VILLAINY))
+  {
+		bonus = 0;
+  }
+  else if (affected_by_spell(ch, SPELL_VILLAINY))
+    bonus += affected_by_spell(ch, SPELL_VILLAINY)->modifier / 5;
+	if (affected_by_spell(ch, SPELL_HEROISM) && (skill == SPELL_HEROISM))
+  {
+    bonus = 0;
+  }
+  else if (affected_by_spell(ch, SPELL_HEROISM))
 		bonus += affected_by_spell(ch, SPELL_HEROISM)->modifier / 5;
 
 	if (ch->skills.contains(skill))
 	{
     auto& curr = ch->skills[skill];
-
-    if (skill == SPELL_HEROISM || skill == SPELL_VILLAINY)
-    {
-      return curr.learned;  
-    }
 		
 		for (o = ch->pcdata->skillchange; o; o = o->next_skill)
 		{
