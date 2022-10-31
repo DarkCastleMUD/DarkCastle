@@ -424,6 +424,7 @@ int ki_blast( uint8_t level, char_data *ch, char *arg, char_data *vict)
       act("$n finds that you are hard to blast!", ch, 0, vict, TO_VICT, 0);
       if (!vict->fighting && IS_NPC(vict))
          return attack(vict, ch, TYPE_UNDEFINED);
+      return eSUCCESS;
       }
 
    if (CAN_GO(vict, exit) &&
@@ -456,6 +457,7 @@ int ki_blast( uint8_t level, char_data *ch, char *arg, char_data *vict)
 
       move_char(vict, (world[(ch)->in_room].dir_option[exit])->to_room);
       GET_POS(vict) = POSITION_SITTING;
+        SET_BIT(vict->combat, COMBAT_BASH2);
       return eSUCCESS;
    }
    else /* There is no exit there */
@@ -466,19 +468,7 @@ int ki_blast( uint8_t level, char_data *ch, char *arg, char_data *vict)
       strcpy(name, GET_SHORT(vict));
       int retval = damage(ch,vict,100, TYPE_KI,KI_OFFSET+KI_BLAST,0);
       GET_POS(vict) = POSITION_SITTING;
-      if(!SOMEONE_DIED(retval)) {
-        sprintf(buf, "$B%d$R", prev - vict->getHP());
-        send_damage("$N is blasted across the room by $n for | damage!", ch, 0, vict, buf,
-		    "$N is blasted across the room by $n!", TO_ROOM);
-        send_damage("$N is thrown to the ground by your blast and suffers | damage!", ch, 0, vict, buf,
-		    "$N is thrown to the ground by your blast!", TO_CHAR);
-        send_damage("$n blasts you across the room, causing you to fall and take | damage!", ch, 0, vict, buf,
-                    "$n blasts you across the room, causing you to fall!", TO_VICT);
-      } else {
-        csendf(ch, "You blast %s to bits!", name);
-        sprintf(buf, "$N blasts %s to bits!", name);
-        act(buf, ch, 0, 0, TO_ROOM, 0);
-      }
+        SET_BIT(vict->combat, COMBAT_BASH2);
       if(!SOMEONE_DIED(retval) && !vict->fighting && IS_NPC(vict))
          return attack(vict, ch, TYPE_UNDEFINED);
       return retval;
