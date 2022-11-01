@@ -923,6 +923,20 @@ You make an awesome swish sound as your jab misses $N's head.~
 $n misses your head with jis jab.~
 $n looks silly as $e completely misses $N with $s jab.~
 M
+ 250
+You blast the absolute SHIT out of $N!~
+$n blasts the absolute SHIT out of you!~
+$n blasts the absolute SHIT out of $N!~
+$N steps aside as you try to blast them out of the room.$~
+$n attempts to blast you out of the room, but fails miserably.$~
+$N steps aside, avoiding $n's attempt to blast them out of the room.$~
+$N is thrown to the ground by your blast!~
+$n blasts you across the room, causing you to fall!~
+$N is blasted across the room by $n!~
+You step up to blast $N but think twice about it.~
+$n's arms droop by their side at the very thought of blasting you.~
+$n makes a pathetic attempt to blast $N and fails like a bitch.~
+M
  251
 The blood gushes as you put your fist into $N's chest!~
 $n shoves $s hand into your chest, and your lifeblood ebbs away.~
