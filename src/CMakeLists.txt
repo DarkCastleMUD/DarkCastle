@@ -5,7 +5,7 @@ project(dcastle VERSION 1.0.0 LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_FLAGS "-O3 -ggdb -Wno-write-strings -fdiagnostics-color=always")
-find_package(Qt6 REQUIRED COMPONENTS Core)
+find_package(Qt6 REQUIRED COMPONENTS Core Network)
 execute_process(COMMAND git describe --tags --always --abbrev=8 OUTPUT_VARIABLE VERSION OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET)
 execute_process(COMMAND date "+%Y-%m-%d %H:%M:%S" OUTPUT_VARIABLE BUILD_TIME OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET)
 message("${VERSION}")
@@ -114,8 +114,8 @@ add_executable(debug
 debug.cpp
 )
 
-target_link_libraries(dcastle PRIVATE DC Qt6::Core pq fmt crypt)
-target_link_libraries(debug PRIVATE DC Qt6::Core pq fmt crypt)
+target_link_libraries(dcastle PRIVATE DC Qt6::Core Qt6::Network pq fmt crypt)
+target_link_libraries(debug PRIVATE DC Qt6::Core Qt6::Network pq fmt crypt)
 
 
 set(DESTINATIONS /srv/dcastle_test/bin/ /srv/dcastle/bin/ /srv/dcastle2/bin/)
