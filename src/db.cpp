@@ -21,15 +21,12 @@
 
 int load_debug = 0;
 
-extern "C"
-{
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
 #include <time.h>
 #include <stdlib.h>
-}
 
 #include <sstream>
 #include <limits>
@@ -340,7 +337,6 @@ char * funnybootmessages[] =
 				"Synchronizing threads...\r\n",
 				"Initializing mob AI engine...\r\n",
 				"True Randomization(tm) of backstab generator...\r\n",
-				"Re-training slutty blondes...\r\n",
 				"Managing swap file access...\r\n",
 				"Determining best way to break...\r\n",
 				"Corrupting random pfiles...\r\n",
