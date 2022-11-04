@@ -3829,8 +3829,16 @@ char_data *get_char_vis(char_data *ch, const char *name) {
 
 	auto &character_list = DC::instance().character_list;
 	auto result = find_if(character_list.begin(), character_list.end(), [&number, &tmp, &ch, &partial_match, &j](char_data * const &i) {
+		if (i->in_room == 0 || i->in_room == -1)
+		{
+			return false;
+		}
+
 		if (number == 0 && IS_NPC(i))
-		return false;
+		{
+			return false;
+		}
+
 		if (number == 1 || number == 0)
 		{
 			if (isname(tmp, GET_NAME(i)) && CAN_SEE(ch, i))
