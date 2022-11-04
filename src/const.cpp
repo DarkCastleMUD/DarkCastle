@@ -31,6 +31,8 @@ extern "C"
 
 using namespace std;
 
+const room_t IMM_PIRAHNA_ROOM = 25;
+
 map<int,int> fill_skill_cost()
 {
   map<int,int> skill_cost_map;

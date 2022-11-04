@@ -98,3 +98,4 @@ extern const char *songs[];
 extern const char *ki[];
 extern const char *innate_skills[];
 extern const char *reserved[];
+extern const room_t IMM_PIRAHNA_ROOM;
