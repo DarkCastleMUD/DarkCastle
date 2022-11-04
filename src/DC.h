@@ -42,6 +42,7 @@ typedef vector<in_port_t>::iterator port_list_i;
 typedef unordered_map<char_data*, Trace> death_list_t;
 typedef unordered_map<char_data *, Trace> free_list_t;
 typedef uint64_t zone_t;
+typedef uint64_t room_t;
 typedef map<vnum_t, special_function> special_function_list_t;
 
 class DC {
