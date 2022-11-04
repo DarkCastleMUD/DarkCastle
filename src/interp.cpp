@@ -471,7 +471,7 @@ struct command_info cmd_info[] =
         {"plats", do_plats, nullptr, POSITION_DEAD, 106, CMD_DEFAULT, 0, 1},
         {"bellow", do_thunder, nullptr, POSITION_DEAD, DEITY, CMD_BELLOW, 0, 1},
         {"string", do_string, nullptr, POSITION_DEAD, 106, CMD_DEFAULT, 0, 1},
-        {"transfer", do_trans, nullptr, POSITION_DEAD, DEITY, CMD_DEFAULT, 0, 1},
+        {"transfer", nullptr, do_transfer, POSITION_DEAD, DEITY, CMD_DEFAULT, 0, 1},
         {"gtrans", do_gtrans, nullptr, POSITION_DEAD, DEITY, CMD_DEFAULT, 0, 1},
         {"boot", do_boot, nullptr, POSITION_DEAD, DEITY, CMD_DEFAULT, 0, 1},
         {"linkdead", do_linkdead, nullptr, POSITION_DEAD, DEITY, CMD_DEFAULT, 0, 1},

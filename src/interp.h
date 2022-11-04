@@ -563,7 +563,7 @@ command_return_t do_time(char_data *ch, char *argument, int cmd);
 command_return_t do_title(char_data *ch, char *argument, int cmd);
 command_return_t do_toggle(char_data *ch, char *argument, int cmd);
 command_return_t do_track(char_data *ch, char *argument, int cmd);
-command_return_t do_trans(char_data *ch, char *argument, int cmd);
+command_return_t do_transfer(char_data *ch, string argument, int cmd = CMD_DEFAULT);
 command_return_t do_triage(char_data *ch, char *argument, int cmd);
 command_return_t do_trip(char_data *ch, char *argument, int cmd);
 command_return_t do_trivia(char_data *ch, char *argument, int cmd);

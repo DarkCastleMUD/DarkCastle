@@ -1835,7 +1835,7 @@ int phish_locator(char_data*ch, struct obj_data *obj, int cmd, const char*arg,
 
    send_to_char("Found him!\r\n", ch);
 
-   do_trans(victim, GET_NAME(ch), CMD_DEFAULT);
+   do_transfer(victim, GET_NAME(ch));
    return eSUCCESS;   
 }
 

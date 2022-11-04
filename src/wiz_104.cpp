@@ -21,6 +21,9 @@
 #include "const.h"
 #include "corpse.h"
 
+using namespace std;
+using namespace fmt;
+
 int count_rooms(int start, int end)
 {
 	if (start < 0 || end < 0 || start > 1000000 || end > 1000000)
@@ -1605,57 +1608,74 @@ int do_show(char_data *ch, char *argument, int cmd) {
 	return eSUCCESS;
 }
 
-int do_trans(char_data *ch, char *argument, int cmd)
+command_return_t do_transfer(char_data *ch, string arguments, int cmd)
 {
-	struct descriptor_data *i;
-	char_data *victim;
-	char buf[100];
-	int target;
-
-	if (IS_NPC(ch))
-		return eFAILURE;
-
-	one_argument(argument, buf);
-	if (!*buf)
-		send_to_char("Whom do you wish to transfer?\n\r", ch);
-	else if (str_cmp("all", buf))
+	if (IS_NPC(ch) || ch == nullptr)
 	{
-		if (!(victim = get_char_vis(ch, buf)))
-			send_to_char("No-one by that name around.\n\r", ch);
-		else
-		{
-			if (world[ch->in_room].number == 25 && !isname(GET_NAME(ch), "Pirahna"))
-			{
-				send_to_char("Damn! That is rude! This ain't your place. :P\n\r", ch);
-				return eFAILURE;
-			}
-			act("$n disappears in a mushroom cloud.", victim, 0, 0, TO_ROOM, 0);
-			target = ch->in_room;
-			csendf(ch, "Moving %s from %d to %d.\n\r", GET_NAME(victim),
-				   world[victim->in_room].number, world[target].number);
-			move_char(victim, target);
-			act("$n arrives from a puff of smoke.", victim, 0, 0, TO_ROOM, 0);
-			act("$n has transferred you!", ch, 0, victim, TO_VICT, 0);
-			do_look(victim, "", 15);
-			send_to_char("Ok.\n\r", ch);
-		}
+		return eFAILURE;
 	}
-	else
-	{ /* Trans All */
+
+	room_t destination_room = ch->in_room;
+	if (destination_room == 0)
+	{
+		return eFAILURE;
+	}
+
+	string arg1;
+	tie(arg1, arguments) = half_chop(arguments);
+	if (arg1.empty())
+	{
+		ch->send("Usage: transfer <name>\r\n");
+		ch->send("       transfer all\r\n");
+		return eFAILURE;
+	}
+
+	char_data *victim = nullptr;
+	room_t source_room = {};
+	descriptor_data *i = nullptr;
+	if (arg1 == "all")
+	{
 		for (i = descriptor_list; i; i = i->next)
-			if (i->character != ch && !i->connected)
+		{
+			victim = i->character;
+			source_room = victim->in_room;
+			if (victim != ch && i->connected == conn::PLAYING && source_room != 0)
 			{
-				victim = i->character;
 				act("$n disappears in a mushroom cloud.", victim, 0, 0, TO_ROOM, 0);
-				target = ch->in_room;
-				move_char(victim, target);
+				ch->send(format("Moving {} from {} to {}.\r\n", GET_NAME(victim), world[source_room].number, world[destination_room].number));
+				move_char(victim, destination_room);
 				act("$n arrives from a puff of smoke.", victim, 0, 0, TO_ROOM, 0);
 				act("$n has transferred you!", ch, 0, victim, TO_VICT, 0);
 				do_look(victim, "", 15);
 			}
+		}
 
-		send_to_char("Ok.\n\r", ch);
+		send_to_char("Ok.\r\n", ch);
+		return eSUCCESS;
 	}
+
+	victim = get_char_vis(ch, arg1);
+	if (victim == nullptr)
+	{
+		ch->send("No-one by that name around.\r\n");
+		return eFAILURE;
+	}
+	source_room = victim->in_room;
+
+	if (world[destination_room].number == IMM_PIRAHNA_ROOM && !isname(GET_NAME(ch), "Pirahna"))
+	{
+		send_to_char("Damn! That is rude! This ain't your place. :P\r\n", ch);
+		return eFAILURE;
+	}
+
+	act("$n disappears in a mushroom cloud.", victim, 0, 0, TO_ROOM, 0);
+	ch->send(format("Moving {} from {} to {}.\r\n", GET_NAME(victim), world[source_room].number, world[destination_room].number));
+	move_char(victim, destination_room);
+	act("$n arrives from a puff of smoke.", victim, 0, 0, TO_ROOM, 0);
+	act("$n has transferred you!", ch, 0, victim, TO_VICT, 0);
+	do_look(victim, "", 15);
+	send_to_char("Ok.\r\n", ch);
+
 	return eSUCCESS;
 }
 
