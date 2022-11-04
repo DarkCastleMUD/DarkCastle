@@ -2,6 +2,7 @@
 #include "mobile.h"
 #include "db.h"
 #include "character.h"
+#include "DC.h"
 
 extern bestowable_god_commands_type bestowable_god_commands[];
 extern int wear_corr[];
@@ -98,4 +99,4 @@ extern const char *songs[];
 extern const char *ki[];
 extern const char *innate_skills[];
 extern const char *reserved[];
-extern const room_t IMM_PIRAHNA_ROOM;
+extern room_t IMM_PIRAHNA_ROOM;
