@@ -29,6 +29,7 @@
 #include <vector>
 #include <queue>
 
+#include "DC.h"
 #include "structs.h"
 #include "weather.h"
 #include "memory.h"
@@ -439,7 +440,6 @@ void assign_objects(void);
 void assign_mobiles(void);
 void free_obj(struct obj_data *obj);
 
-int char_to_room(char_data *ch, int room);
 int char_from_room(char_data *ch, bool stop_fighting);
 int char_from_room(char_data *ch);
 void do_start(char_data *ch);
