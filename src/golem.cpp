@@ -254,7 +254,7 @@ void set_golem(char_data *golem, int golemtype)
         golem->gold = 0;
         golem->plat = 0;
         golem->move = golem->max_move = golem->mana = golem->max_mana = 100;
-        golem->mobdata->last_room = -1;
+        golem->mobdata->last_room = 0;
         golem->position = POSITION_STANDING;
         golem->immune = golem->suscept = golem->resist = 0;
         golem->c_class = 0;
