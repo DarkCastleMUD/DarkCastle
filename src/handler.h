@@ -89,8 +89,7 @@ char_data *get_pc(char *name);
 
 int char_from_room(char_data *ch, bool stop_all_fighting);
 int char_from_room(char_data *ch);
-int  char_to_room(char_data *ch, int room, bool stop_all_action);
-int  char_to_room(char_data *ch, int room);
+int char_to_room(char_data *ch, room_t room, bool stop_all_fighting=true);
 
 /* find if character can see */
 char_data *get_active_pc_vis(char_data *ch, const char *name);
