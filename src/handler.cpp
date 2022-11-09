@@ -2126,13 +2126,9 @@ bool is_hiding(char_data *ch, char_data *vict) {
 	return skill_success(ch, vict, SKILL_HIDE);
 }
 
-int char_to_room(char_data *ch, int room) {
-    return char_to_room(ch, room, true);
-}
-
 /* place a character in a room */
 /* Returns zero on failure, and one on success */
-int char_to_room(char_data *ch, int room, bool stop_all_fighting)
+int char_to_room(char_data *ch, room_t room, bool stop_all_fighting)
 {
 	char_data *temp;
 	if (room == NOWHERE)
