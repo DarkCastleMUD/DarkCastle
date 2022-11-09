@@ -57,6 +57,7 @@ int load_debug = 0;
 #include "quest.h"
 #include "vault.h"
 #include "const.h"
+#include "wizard.h"
 
 using namespace std;
 
@@ -189,7 +190,7 @@ char fread_char(FILE *fl);
 struct index_data *generate_mob_indices(int *top, struct index_data *index);
 struct index_data *generate_obj_indices(int *top, struct index_data *index);
 int zone_is_empty(int zone_nr);
-void reset_zone(int zone);
+
 void fix_shopkeepers_inventory();
 int file_to_string(const char *name, char *buf);
 void reset_time(void);
@@ -2682,7 +2683,7 @@ char_data *read_mobile(int nr, FILE *fl)
 	mob->mobdata->damnodice = fread_int(fl, 0, 64000);
 	mob->mobdata->damsizedice = fread_int(fl, 0, 64000);
 	mob->damroll = fread_int(fl, 0, 64000);
-	mob->mobdata->last_room = -1;
+	mob->mobdata->last_room = 0;
 	mob->mana = 100 + (mob->level * 10);
 	mob->max_mana = 100 + (mob->level * 10);
 
@@ -3507,7 +3508,7 @@ int create_blank_mobile(int nr)
 	mob->mobdata->damnodice = 1;
 	mob->mobdata->damsizedice = 1;
 	mob->mobdata->default_pos = POSITION_STANDING;
-	mob->mobdata->last_room = -1;
+	mob->mobdata->last_room = 0;
 	mob->mobdata->nr = cur_index;
 	mob->misc = MISC_IS_MOB;
 
