@@ -35,6 +35,7 @@
 #include "const.h"
 #include "inventory.h"
 #include "guild.h"
+#include "wizard.h"
 
 #define EMOTING_FILE "emoting-objects.txt"
 
@@ -47,8 +48,6 @@ extern struct zone_data *zone_table;
 extern struct descriptor_data *descriptor_list;
 
 extern char_data *initiate_oproc(char_data *ch, obj_data *obj);
-
-extern void reset_zone(int zone);
 
 extern struct mprog_throw_type *g_mprog_throw_list;
 
