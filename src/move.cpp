@@ -1163,10 +1163,6 @@ int do_enter(char_data *ch, char *argument, int cmd) {
 	return ambush(ch);
 }
 
-int move_char(char_data *ch, int dest) {
-	return move_char(ch, dest, true);
-}
-
 int move_char(char_data *ch, int dest, bool stop_all_fighting) {
 	if (!ch) {
 		log("Error in move_char(), NULL character", OVERSEER, LOG_BUG);
