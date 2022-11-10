@@ -213,6 +213,26 @@ command_return_t do_goto(char_data *ch, string argument, int cmd)
       return eFAILURE;
     }
   }
+  else if ((target_mob = get_pc_vis(ch, buf)))
+  {
+    location = target_mob->in_room;
+  }
+  else if ((target_mob = get_char_vis(ch, buf)))
+  {
+    location = target_mob->in_room;
+  }
+  else if ((target_obj = get_obj_vis(ch, buf)))
+  {
+    if (target_obj->in_room != NOWHERE)
+    {
+      location = target_obj->in_room;
+    }
+    else
+    {
+      send_to_char("The object is not available.\n\r", ch);
+      return eFAILURE;
+    }
+  }
   else if (isdigit(buf[0]) && (buf.length() < 2) || (buf.length() >= 2 && buf.find('.') == buf.npos))
   {
     loc_nr = atoi(buf.c_str());
@@ -237,26 +257,6 @@ command_return_t do_goto(char_data *ch, string argument, int cmd)
     if (location == -1)
     {
       send_to_char("No room exists with that number.\r\n", ch);
-      return eFAILURE;
-    }
-  }
-  else if ((target_mob = get_pc_vis(ch, buf)))
-  {
-    location = target_mob->in_room;
-  }
-  else if ((target_mob = get_char_vis(ch, buf)))
-  {
-    location = target_mob->in_room;
-  }
-  else if ((target_obj = get_obj_vis(ch, buf)))
-  {
-    if (target_obj->in_room != NOWHERE)
-    {
-      location = target_obj->in_room;
-    }
-    else
-    {
-      send_to_char("The object is not available.\n\r", ch);
       return eFAILURE;
     }
   }
