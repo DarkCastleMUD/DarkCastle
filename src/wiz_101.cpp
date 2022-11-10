@@ -28,9 +28,9 @@ using namespace fmt;
 queue<string> imm_history;
 queue<string> imp_history;
 
-#define MAX_MESSAGE_LENGTH      4096
+#define MAX_MESSAGE_LENGTH 4096
 
-extern struct room_data ** world_array;
+extern struct room_data **world_array;
 
 int do_wizhelp(char_data *ch, char *argument, int cmd_arg)
 {
@@ -44,7 +44,7 @@ int do_wizhelp(char_data *ch, char *argument, int cmd_arg)
   int no2 = 6;
   int no3 = 6;
 
-  if(IS_NPC(ch))
+  if (IS_NPC(ch))
     return eFAILURE;
 
   buf[0] = '\0';
@@ -53,62 +53,67 @@ int do_wizhelp(char_data *ch, char *argument, int cmd_arg)
 
   if (argument && *argument)
   {
-    char arg[MAX_INPUT_LENGTH],arg2[MAX_INPUT_LENGTH];
+    char arg[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
     argument = one_argument(argument, arg);
     one_argument(argument, arg2);
-    sprintf(buf, "Arg1: %s\n",arg);    
-    send_to_char(buf,ch);
-    sprintf(buf, "Arg2: %s\n",arg2);    
-    send_to_char(buf,ch);
+    sprintf(buf, "Arg1: %s\n", arg);
+    send_to_char(buf, ch);
+    sprintf(buf, "Arg2: %s\n", arg2);
+    send_to_char(buf, ch);
     return eSUCCESS;
   }
   send_to_char("Here are your godly powers:\n\r\n\r", ch);
 
   int v;
   for (v = GET_LEVEL(ch); v > 100; v--)
-  for(cmd = 0; cmd_info[cmd].command_name[0] != '\0'; cmd++) {
-     if(cmd_info[cmd].minimum_level == GIFTED_COMMAND &&
-	v == GET_LEVEL(ch))
-     {
-       for(i = 0; *bestowable_god_commands[i].name != '\n'; i++)
-         if(!strcmp(bestowable_god_commands[i].name, cmd_info[cmd].command_name))
-           break;
-       
-       if( *bestowable_god_commands[i].name == '\n') // someone forgot to update it
+    for (cmd = 0; cmd_info[cmd].command_name[0] != '\0'; cmd++)
+    {
+      if (cmd_info[cmd].minimum_level == GIFTED_COMMAND &&
+          v == GET_LEVEL(ch))
+      {
+        for (i = 0; *bestowable_god_commands[i].name != '\n'; i++)
+          if (!strcmp(bestowable_god_commands[i].name, cmd_info[cmd].command_name))
+            break;
+
+        if (*bestowable_god_commands[i].name == '\n') // someone forgot to update it
           continue;
 
-       if(!has_skill(ch, bestowable_god_commands[i].num))
+        if (!has_skill(ch, bestowable_god_commands[i].num))
           continue;
 
-       if (bestowable_god_commands[i].testcmd == false) {
-	 sprintf(buf2 + strlen(buf2), "[GFT]%-11s", cmd_info[cmd].command_name);
-	 if((no2) % 5 == 0)
-	   strcat(buf2, "\n\r");
-	 no2++;
-       } else {
-	 sprintf(buf3 + strlen(buf3), "[TST]%-11s", cmd_info[cmd].command_name);
-	 if((no3) % 5 == 0)
-	   strcat(buf3, "\n\r");
-	 no3++;
-       }
+        if (bestowable_god_commands[i].testcmd == false)
+        {
+          sprintf(buf2 + strlen(buf2), "[GFT]%-11s", cmd_info[cmd].command_name);
+          if ((no2) % 5 == 0)
+            strcat(buf2, "\n\r");
+          no2++;
+        }
+        else
+        {
+          sprintf(buf3 + strlen(buf3), "[TST]%-11s", cmd_info[cmd].command_name);
+          if ((no3) % 5 == 0)
+            strcat(buf3, "\n\r");
+          no3++;
+        }
 
-       continue;
-     }
-     if (cmd_info[cmd].minimum_level != v || cmd_info[cmd].minimum_level == GIFTED_COMMAND) continue;
+        continue;
+      }
+      if (cmd_info[cmd].minimum_level != v || cmd_info[cmd].minimum_level == GIFTED_COMMAND)
+        continue;
 
-     // ignore these 2 duplicates of other commands
-     if( !strcmp(cmd_info[cmd].command_name, "colours") ||
-	 !strcmp(cmd_info[cmd].command_name, ";"))
-       continue;
+      // ignore these 2 duplicates of other commands
+      if (!strcmp(cmd_info[cmd].command_name, "colours") ||
+          !strcmp(cmd_info[cmd].command_name, ";"))
+        continue;
 
-     sprintf(buf + strlen(buf), "[%2d]%-11s",
-             cmd_info[cmd].minimum_level,
-             cmd_info[cmd].command_name);
+      sprintf(buf + strlen(buf), "[%2d]%-11s",
+              cmd_info[cmd].minimum_level,
+              cmd_info[cmd].command_name);
 
-     if((no) % 5 == 0)
-       strcat(buf, "\n\r");
-     no++;
-  }
+      if ((no) % 5 == 0)
+        strcat(buf, "\n\r");
+      no++;
+    }
 
   strcat(buf, "\n\r\n\r"
               "Here are the godly powers that have been gifted to you:\n\r\n\r");
@@ -135,484 +140,521 @@ command_return_t do_goto(char_data *ch, string argument, int cmd)
 
   if (ch == nullptr || IS_NPC(ch))
   {
-  return eFAILURE;
+    return eFAILURE;
   }
   start_room = ch->in_room;
 
   tie(buf, argument) = half_chop(argument);
   if (buf.empty())
   {
-  ch->send("You must supply a room number, a name or zone <zone number>.\r\n");
-  return eFAILURE;
+    ch->send("You must supply a room number, a name or zone <zone number>.\r\n");
+    return eFAILURE;
   }
 
   if (buf == "zone" || buf == "z")
   {
-  tie(buf, argument) = half_chop(argument);
-  if (buf.empty())
-  {
-     ch->send("No zone number specified.\r\n");
-     return eFAILURE;
-  }
+    tie(buf, argument) = half_chop(argument);
+    if (buf.empty())
+    {
+      ch->send("No zone number specified.\r\n");
+      return eFAILURE;
+    }
 
-  try
-  {
-     zone_nr = stoull(buf);
-     if (zone_nr > top_of_zone_table)
-     {
-       ch->send(format("Invalid zone specified. Valid values are 0-{}\r\n", top_of_zone_table));
-       return eFAILURE;
-     }
+    try
+    {
+      zone_nr = stoull(buf);
+      if (zone_nr > top_of_zone_table)
+      {
+        ch->send(format("Invalid zone specified. Valid values are 0-{}\r\n", top_of_zone_table));
+        return eFAILURE;
+      }
 
-     if (zone_nr == 0)
-     {
-       loc_nr = 1;
-     }
-     else
-     {
-       loc_nr = zone_table[zone_nr - 1].top + 1;
-     }
+      if (zone_nr == 0)
+      {
+        loc_nr = 1;
+      }
+      else
+      {
+        loc_nr = zone_table[zone_nr - 1].top + 1;
+      }
 
-     ch->send(format("Going to room {} in zone #{} [{}]\r\n", loc_nr, zone_nr, ltrim(string(zone_table[zone_nr].name))));
+      ch->send(format("Going to room {} in zone #{} [{}]\r\n", loc_nr, zone_nr, ltrim(string(zone_table[zone_nr].name))));
 
-     if (loc_nr > top_of_world || loc_nr < 0)
-     {
-       send_to_char("No room exists with that number.\r\n", ch);
-       return eFAILURE;
-     }
+      if (loc_nr > top_of_world || loc_nr < 0)
+      {
+        send_to_char("No room exists with that number.\r\n", ch);
+        return eFAILURE;
+      }
 
-     if (world_array[loc_nr])
-     {
-       location = loc_nr;
-     }
-     else
-     {
-       if (can_modify_this_room(ch, loc_nr))
-       {
-   if (create_one_room(ch, loc_nr))
-   {
-     send_to_char("You form order out of chaos.\r\n", ch);
-     location = loc_nr;
-   }
-       }
-     }
-     if (location == -1)
-     {
-       send_to_char("No room exists with that number.\r\n", ch);
-       return eFAILURE;
-     }
-  }
-  catch (...)
-  {
-     ch->send("Invalid zone number specified.\r\n");
-     return eFAILURE;
-  }
+      if (world_array[loc_nr])
+      {
+        location = loc_nr;
+      }
+      else
+      {
+        if (can_modify_this_room(ch, loc_nr))
+        {
+          if (create_one_room(ch, loc_nr))
+          {
+            send_to_char("You form order out of chaos.\r\n", ch);
+            location = loc_nr;
+          }
+        }
+      }
+      if (location == -1)
+      {
+        send_to_char("No room exists with that number.\r\n", ch);
+        return eFAILURE;
+      }
+    }
+    catch (...)
+    {
+      ch->send("Invalid zone number specified.\r\n");
+      return eFAILURE;
+    }
   }
   else if (isdigit(buf[0]) && (buf.length() < 2) || (buf.length() >= 2 && buf.find('.') == buf.npos))
   {
-  loc_nr = atoi(buf.c_str());
-  if (loc_nr > top_of_world || loc_nr < 0)
-  {
-     send_to_char("No room exists with that number.\n\r", ch);
-     return eFAILURE;
-  }
-  if (world_array[loc_nr])
-     location = loc_nr;
-  else
-  {
-     if (can_modify_this_room(ch, loc_nr))
-     {
-       if (create_one_room(ch, loc_nr))
-       {
-   send_to_char("You form order out of chaos.\n\r\n\r", ch);
-   location = loc_nr;
-       }
-     }
-  }
-  if (location == -1)
-  {
-     send_to_char("No room exists with that number.\r\n", ch);
-     return eFAILURE;
-  }
+    loc_nr = atoi(buf.c_str());
+    if (loc_nr > top_of_world || loc_nr < 0)
+    {
+      send_to_char("No room exists with that number.\n\r", ch);
+      return eFAILURE;
+    }
+    if (world_array[loc_nr])
+      location = loc_nr;
+    else
+    {
+      if (can_modify_this_room(ch, loc_nr))
+      {
+        if (create_one_room(ch, loc_nr))
+        {
+          send_to_char("You form order out of chaos.\n\r\n\r", ch);
+          location = loc_nr;
+        }
+      }
+    }
+    if (location == -1)
+    {
+      send_to_char("No room exists with that number.\r\n", ch);
+      return eFAILURE;
+    }
   }
   else if ((target_mob = get_pc_vis(ch, buf)))
   {
-  location = target_mob->in_room;
+    location = target_mob->in_room;
   }
   else if ((target_mob = get_char_vis(ch, buf)))
   {
-  location = target_mob->in_room;
+    location = target_mob->in_room;
   }
   else if ((target_obj = get_obj_vis(ch, buf)))
   {
-  if (target_obj->in_room != NOWHERE)
-  {
-     location = target_obj->in_room;
+    if (target_obj->in_room != NOWHERE)
+    {
+      location = target_obj->in_room;
+    }
+    else
+    {
+      send_to_char("The object is not available.\n\r", ch);
+      return eFAILURE;
+    }
   }
   else
   {
-     send_to_char("The object is not available.\n\r", ch);
-     return eFAILURE;
-  }
-  }
-  else
-  {
-  send_to_char("No such creature or object around.\n\r", ch);
-  return eFAILURE;
+    send_to_char("No such creature or object around.\n\r", ch);
+    return eFAILURE;
   }
 
   /* a location has been found. */
   if (IS_SET(world[location].room_flags, IMP_ONLY) &&
       GET_LEVEL(ch) < OVERSEER)
   {
-  send_to_char("No.\n\r", ch);
-  return eFAILURE;
+    send_to_char("No.\n\r", ch);
+    return eFAILURE;
   }
 
   /* Let's keep 104-'s out of clan halls....sigh... */
   if (IS_SET(world[location].room_flags, CLAN_ROOM) &&
       GET_LEVEL(ch) < DEITY)
   {
-  send_to_char("For your protection, 104-'s may not be in clanhalls.\r\n", ch);
-  return eFAILURE;
+    send_to_char("For your protection, 104-'s may not be in clanhalls.\r\n", ch);
+    return eFAILURE;
   }
 
   if ((IS_SET(world[location].room_flags, PRIVATE)) && (GET_LEVEL(ch) < OVERSEER))
   {
 
-  for (i = 0, pers = world[location].people; pers;
-       pers = pers->next_in_room, i++)
-     ;
-  if (i > 1)
-  {
-     send_to_char("There's a private conversation going on in "
-                  "that room.\n\r",
-                  ch);
-     return eFAILURE;
-  }
+    for (i = 0, pers = world[location].people; pers;
+         pers = pers->next_in_room, i++)
+      ;
+    if (i > 1)
+    {
+      send_to_char("There's a private conversation going on in "
+                   "that room.\n\r",
+                   ch);
+      return eFAILURE;
+    }
   }
 
   ch->send("\r\n");
 
   if (!IS_MOB(ch))
-  for (tmp_ch = world[ch->in_room].people; tmp_ch; tmp_ch = tmp_ch->next_in_room)
-  {
-     if ((CAN_SEE(tmp_ch, ch) && (tmp_ch != ch) && !ch->pcdata->stealth) || (GET_LEVEL(tmp_ch) > GET_LEVEL(ch) && GET_LEVEL(tmp_ch) > PATRON))
-     {
-       ansi_color(RED, tmp_ch);
-       ansi_color(BOLD, tmp_ch);
-       send_to_char(ch->pcdata->poofout, tmp_ch);
-       send_to_char("\n\r", tmp_ch);
-       ansi_color(NTEXT, tmp_ch);
-     }
-     else if (tmp_ch != ch && !ch->pcdata->stealth)
-     {
-       ansi_color(RED, tmp_ch);
-       ansi_color(BOLD, tmp_ch);
-       send_to_char("Someone disappears in a puff of smoke.\n\r", tmp_ch);
-       ansi_color(NTEXT, tmp_ch);
-     }
-  }
+    for (tmp_ch = world[ch->in_room].people; tmp_ch; tmp_ch = tmp_ch->next_in_room)
+    {
+      if ((CAN_SEE(tmp_ch, ch) && (tmp_ch != ch) && !ch->pcdata->stealth) || (GET_LEVEL(tmp_ch) > GET_LEVEL(ch) && GET_LEVEL(tmp_ch) > PATRON))
+      {
+        ansi_color(RED, tmp_ch);
+        ansi_color(BOLD, tmp_ch);
+        send_to_char(ch->pcdata->poofout, tmp_ch);
+        send_to_char("\n\r", tmp_ch);
+        ansi_color(NTEXT, tmp_ch);
+      }
+      else if (tmp_ch != ch && !ch->pcdata->stealth)
+      {
+        ansi_color(RED, tmp_ch);
+        ansi_color(BOLD, tmp_ch);
+        send_to_char("Someone disappears in a puff of smoke.\n\r", tmp_ch);
+        ansi_color(NTEXT, tmp_ch);
+      }
+    }
 
   move_char(ch, location);
 
   if (!IS_MOB(ch))
-  for (tmp_ch = world[ch->in_room].people; tmp_ch; tmp_ch = tmp_ch->next_in_room)
-  {
-     if ((CAN_SEE(tmp_ch, ch) && (tmp_ch != ch) && !ch->pcdata->stealth) || (GET_LEVEL(tmp_ch) > GET_LEVEL(ch) && GET_LEVEL(tmp_ch) > PATRON))
-     {
+    for (tmp_ch = world[ch->in_room].people; tmp_ch; tmp_ch = tmp_ch->next_in_room)
+    {
+      if ((CAN_SEE(tmp_ch, ch) && (tmp_ch != ch) && !ch->pcdata->stealth) || (GET_LEVEL(tmp_ch) > GET_LEVEL(ch) && GET_LEVEL(tmp_ch) > PATRON))
+      {
 
-       ansi_color(RED, tmp_ch);
-       ansi_color(BOLD, tmp_ch);
-       send_to_char(ch->pcdata->poofin, tmp_ch);
-       send_to_char("\n\r", tmp_ch);
-       ansi_color(NTEXT, tmp_ch);
-     }
-     else if (tmp_ch != ch && !ch->pcdata->stealth)
-     {
-       ansi_color(RED, tmp_ch);
-       ansi_color(BOLD, tmp_ch);
-       send_to_char("Someone appears with an ear-splitting bang!\n\r", tmp_ch);
-       ansi_color(NTEXT, tmp_ch);
-     }
-  }
+        ansi_color(RED, tmp_ch);
+        ansi_color(BOLD, tmp_ch);
+        send_to_char(ch->pcdata->poofin, tmp_ch);
+        send_to_char("\n\r", tmp_ch);
+        ansi_color(NTEXT, tmp_ch);
+      }
+      else if (tmp_ch != ch && !ch->pcdata->stealth)
+      {
+        ansi_color(RED, tmp_ch);
+        ansi_color(BOLD, tmp_ch);
+        send_to_char("Someone appears with an ear-splitting bang!\n\r", tmp_ch);
+        ansi_color(NTEXT, tmp_ch);
+      }
+    }
 
   do_look(ch, "", 15);
 
   if (ch->followers)
-  for (k = ch->followers; k; k = next_dude)
-  {
-     next_dude = k->next;
-     if (start_room == k->follower->in_room && CAN_SEE(k->follower, ch) &&
-         GET_LEVEL(k->follower) >= IMMORTAL)
-     {
-       csendf(k->follower, "You follow %s.\n\r\n\r", GET_SHORT(ch));
-       do_goto(k->follower, argument, CMD_DEFAULT);
-     }
-  }
+    for (k = ch->followers; k; k = next_dude)
+    {
+      next_dude = k->next;
+      if (start_room == k->follower->in_room && CAN_SEE(k->follower, ch) &&
+          GET_LEVEL(k->follower) >= IMMORTAL)
+      {
+        csendf(k->follower, "You follow %s.\n\r\n\r", GET_SHORT(ch));
+        do_goto(k->follower, argument, CMD_DEFAULT);
+      }
+    }
   return eSUCCESS;
 }
 
 int do_poof(char_data *ch, char *arg, int cmd)
 {
-    char inout[100], buf[100];
-    int ctr, nope;
-    char _convert[2];
+  char inout[100], buf[100];
+  int ctr, nope;
+  char _convert[2];
 
-    if (IS_NPC(ch)) {
-      send_to_char("Mobs can't poof.\r\n", ch);
-      return eFAILURE;
+  if (IS_NPC(ch))
+  {
+    send_to_char("Mobs can't poof.\r\n", ch);
+    return eFAILURE;
+  }
+
+  arg = one_argument(arg, inout);
+
+  if (!*inout)
+  {
+    send_to_char("Usage:\n\rpoof [i|o] <string>\n\r", ch);
+    send_to_char("\n\rCurrent poof in is:\n\r", ch);
+    send_to_char(ch->pcdata->poofin, ch);
+    send_to_char("\n\r", ch);
+    send_to_char("\n\rCurrent poof out is:\n\r", ch);
+    send_to_char(ch->pcdata->poofout, ch);
+    send_to_char("\n\r", ch);
+    return eSUCCESS;
+  }
+
+  if (inout[0] != 'i' && inout[0] != 'o')
+  {
+    send_to_char("Usage:\n\rpoof [i|o] <string>\n\r", ch);
+    return eFAILURE;
+  }
+
+  if (!*arg)
+  {
+    send_to_char("A poof type message was expected.\n\r", ch);
+    return eFAILURE;
+  }
+
+  if (strlen(arg) > 72)
+  {
+    send_to_char("Poof message too long, must be under 72 characters long.\n\r", ch);
+    return eFAILURE;
+  }
+
+  nope = 0;
+
+  for (ctr = 0; (unsigned)ctr <= strlen(arg); ctr++)
+  {
+    if (arg[ctr] == '%')
+    {
+      if (nope == 0)
+        nope = 1;
+      else if (nope == 1)
+      {
+        send_to_char("You can only include one % in your poofin ;)\n\r", ch);
+        return eFAILURE;
+      }
     }
+  }
 
-    arg = one_argument(arg, inout);
+  if (nope == 0)
+  {
+    send_to_char("You MUST include your name. Use % to indicate where "
+                 "you want it.\n\r",
+                 ch);
+    return eFAILURE;
+  }
 
-    if (!*inout)  {
-       send_to_char("Usage:\n\rpoof [i|o] <string>\n\r", ch);
-       send_to_char("\n\rCurrent poof in is:\n\r", ch);
-       send_to_char(ch->pcdata->poofin, ch);
-       send_to_char("\n\r", ch);
-       send_to_char("\n\rCurrent poof out is:\n\r", ch);
-       send_to_char(ch->pcdata->poofout, ch);
-       send_to_char("\n\r", ch);
-       return eSUCCESS;
-    }
+  /* For the first time, use strcpy to avoid that annoying space
+     at the beginning
+  */
+  _convert[0] = arg[0];
+  _convert[1] = '\0';
+  if (arg[ctr] == '%')
+    strcpy(buf, GET_NAME(ch));
+  else
+    strcpy(buf, _convert);
 
-    if (inout[0] != 'i' && inout[0] != 'o') {
-       send_to_char("Usage:\n\rpoof [i|o] <string>\n\r", ch);
-       return eFAILURE;
-    }
+  /* No reason to assign _convert[1] every time through, is there? */
+  for (ctr = 1; (unsigned)ctr < strlen(arg); ctr++)
+  {
+    _convert[0] = arg[ctr];
 
-    if (!*arg) {
-       send_to_char("A poof type message was expected.\n\r", ch);
-       return eFAILURE;
-    }
+    if (arg[ctr] == '%')
+      strcat(buf, GET_NAME(ch));
+    else
+      strcat(buf, _convert);
+  }
 
-    if(strlen(arg) > 72) {
-       send_to_char("Poof message too long, must be under 72 characters long.\n\r", ch);
-       return eFAILURE;
-    }
- 
-    nope = 0;
+  if (inout[0] == 'i')
+  {
+    if (ch->pcdata->poofin)
+      dc_free(ch->pcdata->poofin);
+    ch->pcdata->poofin = str_dup(buf);
+  }
+  else
+  {
+    if (ch->pcdata->poofout)
+      dc_free(ch->pcdata->poofout);
+    ch->pcdata->poofout = str_dup(buf);
+  }
 
-    for(ctr = 0; (unsigned) ctr <= strlen(arg); ctr++) {
-       if(arg[ctr] == '%') {
-          if(nope == 0)
-             nope = 1;
-          else if(nope == 1) { 
-             send_to_char("You can only include one % in your poofin ;)\n\r", ch);
-             return eFAILURE; 
-          } 
-       }
-    }
- 
-   if(nope == 0) {
-      send_to_char("You MUST include your name. Use % to indicate where "
-                 "you want it.\n\r", ch);
-      return eFAILURE; 
-   }
-
-   /* For the first time, use strcpy to avoid that annoying space
-      at the beginning
-   */
-   _convert[0] = arg[0];
-   _convert[1] = '\0';
-   if(arg[ctr] == '%') strcpy(buf, GET_NAME(ch));
-   else strcpy(buf, _convert);
-
-   /* No reason to assign _convert[1] every time through, is there? */
-   for(ctr = 1; (unsigned) ctr < strlen(arg); ctr++) {
-      _convert[0] = arg[ctr];
-
-      if(arg[ctr] == '%') strcat(buf, GET_NAME(ch));
-      else strcat(buf, _convert);
-   }
-
-   if (inout[0] == 'i')
-   {
-      if(ch->pcdata->poofin)
-        dc_free(ch->pcdata->poofin);
-      ch->pcdata->poofin = str_dup(buf);
-   }
-   else 
-   {
-      if(ch->pcdata->poofout)
-        dc_free(ch->pcdata->poofout);
-      ch->pcdata->poofout = str_dup(buf);
-   }
-
-   send_to_char("Ok.\n\r", ch);
-   return eSUCCESS;
+  send_to_char("Ok.\n\r", ch);
+  return eSUCCESS;
 }
 
 int do_at(char_data *ch, char *argument, int cmd)
 {
-    char command[MAX_INPUT_LENGTH], loc_str[MAX_INPUT_LENGTH];
-    int loc_nr, location, original_loc;
-    char_data *target_mob;
-    struct obj_data *target_obj;
-    //extern int top_of_world;
-    
-    if (IS_NPC(ch))
-        return eFAILURE;
+  char command[MAX_INPUT_LENGTH], loc_str[MAX_INPUT_LENGTH];
+  int loc_nr, location, original_loc;
+  char_data *target_mob;
+  struct obj_data *target_obj;
+  // extern int top_of_world;
 
-    half_chop(argument, loc_str, command);
-    if (!*loc_str) {
-        send_to_char("You must supply a room number or a name.\n\r", ch);
-        return eFAILURE;
-    }
+  if (IS_NPC(ch))
+    return eFAILURE;
 
-    
-    if(isdigit(*loc_str) && !strchr(loc_str, '.')) {
-        loc_nr = atoi(loc_str);
-        if((loc_nr == 0 && *loc_str != '0') ||
-           ((location = real_room(loc_nr)) < 0))
-        {
-            send_to_char("No room exists with that number.\n\r", ch);
-            return eFAILURE;
-        }
-    }
-    else if ( ( target_mob = get_char_vis(ch, loc_str) ) != NULL )
-        location = target_mob->in_room;
-    else if ( ( target_obj = get_obj_vis(ch, loc_str) ) != NULL )
-        if (target_obj->in_room != NOWHERE)
-            location = target_obj->in_room;
-        else {
-            send_to_char("The object is not available.\n\r", ch);
-            return eFAILURE;
-        }
-    else {
-        send_to_char("No such creature or object around.\n\r", ch);
-        return eFAILURE;
-    }
+  half_chop(argument, loc_str, command);
+  if (!*loc_str)
+  {
+    send_to_char("You must supply a room number or a name.\n\r", ch);
+    return eFAILURE;
+  }
 
-    /* a location has been found. */
-    if (IS_SET(world[location].room_flags, IMP_ONLY) && GET_LEVEL(ch) < IMP) {
-       send_to_char("No.\n\r", ch);
-       return eFAILURE; 
-    }
-
-    /* Let's keep 104-'s out of clan halls....sigh... */
-    if (IS_SET(world[location].room_flags, CLAN_ROOM) &&
-        GET_LEVEL(ch) < DEITY) {
-      send_to_char("For your protection, 104-'s may not be in clanhalls.\r\n", ch);
+  if (isdigit(*loc_str) && !strchr(loc_str, '.'))
+  {
+    loc_nr = atoi(loc_str);
+    if ((loc_nr == 0 && *loc_str != '0') ||
+        ((location = real_room(loc_nr)) < 0))
+    {
+      send_to_char("No room exists with that number.\n\r", ch);
       return eFAILURE;
     }
+  }
+  else if ((target_mob = get_char_vis(ch, loc_str)) != NULL)
+    location = target_mob->in_room;
+  else if ((target_obj = get_obj_vis(ch, loc_str)) != NULL)
+    if (target_obj->in_room != NOWHERE)
+      location = target_obj->in_room;
+    else
+    {
+      send_to_char("The object is not available.\n\r", ch);
+      return eFAILURE;
+    }
+  else
+  {
+    send_to_char("No such creature or object around.\n\r", ch);
+    return eFAILURE;
+  }
 
-    original_loc = ch->in_room;
-    move_char(ch, location, false);
-    int retval = command_interpreter(ch, command);
+  /* a location has been found. */
+  if (IS_SET(world[location].room_flags, IMP_ONLY) && GET_LEVEL(ch) < IMP)
+  {
+    send_to_char("No.\n\r", ch);
+    return eFAILURE;
+  }
 
-    /* check if the guy's still there */
-    for (target_mob = world[location].people; target_mob; target_mob =
-        target_mob->next_in_room)
-        if (ch == target_mob)
-        {
-	    move_char(ch, original_loc);
-        }
-   return retval;
+  /* Let's keep 104-'s out of clan halls....sigh... */
+  if (IS_SET(world[location].room_flags, CLAN_ROOM) &&
+      GET_LEVEL(ch) < DEITY)
+  {
+    send_to_char("For your protection, 104-'s may not be in clanhalls.\r\n", ch);
+    return eFAILURE;
+  }
+
+  original_loc = ch->in_room;
+  move_char(ch, location, false);
+  int retval = command_interpreter(ch, command);
+
+  /* check if the guy's still there */
+  for (target_mob = world[location].people; target_mob; target_mob =
+                                                            target_mob->next_in_room)
+    if (ch == target_mob)
+    {
+      move_char(ch, original_loc);
+    }
+  return retval;
 }
 
 int do_highfive(char_data *ch, char *argument, int cmd)
 {
-    char_data *victim;
-    char buf[200];
-    
-     if (IS_NPC(ch))
-          return eFAILURE;
+  char_data *victim;
+  char buf[200];
 
-      one_argument(argument,buf);
-     if (!*buf) {
-          send_to_char("Who do you wish to high-five? \n\r", ch);
-              return eFAILURE;
-            }
-       
-       if (!(victim = get_char_vis(ch, buf)))  {
-           send_to_char("No-one by that name in the world.\n\r", ch);
-          return eFAILURE;
-           }
+  if (IS_NPC(ch))
+    return eFAILURE;
 
-      if (GET_LEVEL(victim) < IMMORTAL) {
-        send_to_char ("What you wanna give a mortal a high-five for?! *smirk* \n\r", ch);
-          return eFAILURE;
-      }
+  one_argument(argument, buf);
+  if (!*buf)
+  {
+    send_to_char("Who do you wish to high-five? \n\r", ch);
+    return eFAILURE;
+  }
 
-      if(ch == victim) {
-        sprintf(buf, "%s conjures a clap of thunder to resound the land!\n\r", GET_SHORT(ch) );
-        send_to_all(buf);
-      }
-      else {
+  if (!(victim = get_char_vis(ch, buf)))
+  {
+    send_to_char("No-one by that name in the world.\n\r", ch);
+    return eFAILURE;
+  }
+
+  if (GET_LEVEL(victim) < IMMORTAL)
+  {
+    send_to_char("What you wanna give a mortal a high-five for?! *smirk* \n\r", ch);
+    return eFAILURE;
+  }
+
+  if (ch == victim)
+  {
+    sprintf(buf, "%s conjures a clap of thunder to resound the land!\n\r", GET_SHORT(ch));
+    send_to_all(buf);
+  }
+  else
+  {
     sprintf(buf, "Time stops for a minute as %s and %s high-five!\n\r", GET_SHORT(ch), GET_SHORT(victim));
-      send_to_all(buf);
-    }
-    return eSUCCESS;
+    send_to_all(buf);
+  }
+  return eSUCCESS;
 }
 
 int do_holylite(char_data *ch, char *argument, int cmd)
 {
-        if (IS_NPC(ch)) 
-           return eFAILURE;
+  if (IS_NPC(ch))
+    return eFAILURE;
 
-        if (argument[0] != '\0') {
-           send_to_char(
-           "HOLYLITE doesn't take any arguments; arg ignored.\n\r", ch);
-     } /* if */
+  if (argument[0] != '\0')
+  {
+    send_to_char(
+        "HOLYLITE doesn't take any arguments; arg ignored.\n\r", ch);
+  } /* if */
 
-        if (ch->pcdata->holyLite) {
-           ch->pcdata->holyLite = FALSE;
-           send_to_char("Holy light mode off.\n\r",ch);
-     }
-        else {
-           ch->pcdata->holyLite = TRUE;
-           send_to_char("Holy light mode on.\n\r",ch);
-     } /* if */
+  if (ch->pcdata->holyLite)
+  {
+    ch->pcdata->holyLite = FALSE;
+    send_to_char("Holy light mode off.\n\r", ch);
+  }
+  else
+  {
+    ch->pcdata->holyLite = TRUE;
+    send_to_char("Holy light mode on.\n\r", ch);
+  } /* if */
   return eSUCCESS;
 }
 
 int do_wizinvis(char_data *ch, char *argument, int cmd)
 {
-    char buf [200];
+  char buf[200];
 
-   int arg1;
+  int arg1;
 
-   if(IS_NPC(ch)){
-        return eFAILURE;
-      }
+  if (IS_NPC(ch))
+  {
+    return eFAILURE;
+  }
 
-      arg1 = atoi (argument);
+  arg1 = atoi(argument);
 
-        if (arg1 < 0) 
-          arg1 = 0;
-         
+  if (arg1 < 0)
+    arg1 = 0;
 
-    if (!*argument) {
-      if (ch->pcdata->wizinvis == 0) {
-           ch->pcdata->wizinvis = GET_LEVEL(ch);
-         } else {
-           ch->pcdata->wizinvis = 0;
-             }
-           } else {
-           if (arg1 > GET_LEVEL(ch))
-              arg1 = GET_LEVEL(ch);
-           ch->pcdata->wizinvis = arg1;
-             }
-   sprintf(buf, "WizInvis Set to: %ld \n\r", ch->pcdata->wizinvis);
-     send_to_char(buf,ch);
-   return eSUCCESS;
+  if (!*argument)
+  {
+    if (ch->pcdata->wizinvis == 0)
+    {
+      ch->pcdata->wizinvis = GET_LEVEL(ch);
+    }
+    else
+    {
+      ch->pcdata->wizinvis = 0;
+    }
+  }
+  else
+  {
+    if (arg1 > GET_LEVEL(ch))
+      arg1 = GET_LEVEL(ch);
+    ch->pcdata->wizinvis = arg1;
+  }
+  sprintf(buf, "WizInvis Set to: %ld \n\r", ch->pcdata->wizinvis);
+  send_to_char(buf, ch);
+  return eSUCCESS;
 }
 
-int do_nohassle (char_data *ch, char *argument, int cmd)
+int do_nohassle(char_data *ch, char *argument, int cmd)
 {
-   if (IS_NPC(ch))
-      return eFAILURE;
+  if (IS_NPC(ch))
+    return eFAILURE;
 
-   if (IS_SET(ch->pcdata->toggles, PLR_NOHASSLE))  {
-            REMOVE_BIT(ch->pcdata->toggles, PLR_NOHASSLE);
-                 send_to_char("Mobiles can bother you again.\n\r",ch);
-        } else {
-         SET_BIT(ch->pcdata->toggles, PLR_NOHASSLE);
-        send_to_char("Those pesky mobiles will leave you alone now.\n\r", ch);
-   }
-   return eSUCCESS;
+  if (IS_SET(ch->pcdata->toggles, PLR_NOHASSLE))
+  {
+    REMOVE_BIT(ch->pcdata->toggles, PLR_NOHASSLE);
+    send_to_char("Mobiles can bother you again.\n\r", ch);
+  }
+  else
+  {
+    SET_BIT(ch->pcdata->toggles, PLR_NOHASSLE);
+    send_to_char("Those pesky mobiles will leave you alone now.\n\r", ch);
+  }
+  return eSUCCESS;
 }
 
 // cmd == CMD_DEFAULT - imm
@@ -720,62 +762,75 @@ int do_findfix(char_data *ch, char *argument, int cmd)
     for (j = 0; zone_table[i].cmd[j].command != 'S'; j++)
     {
       bool first = TRUE, found = FALSE;
-      if (zone_table[i].cmd[j].command != 'M') continue;
+      if (zone_table[i].cmd[j].command != 'M')
+        continue;
       int vnum = zone_table[i].cmd[j].arg1, max = zone_table[i].cmd[j].arg2;
       if (zone_table[i].cmd[j].arg2 == 1 ||
-	  zone_table[i].cmd[j].arg2 == -1) continue; // Don't care about those..
-       int amt = 0;
-       for (z = 0; zone_table[i].cmd[z].command != 'S'; z++)
-       {
-         if (zone_table[i].cmd[z].command != 'M') continue;
-	 if (zone_table[i].cmd[z].arg1 != vnum) continue;
-	 if (z == j && found) { first = FALSE; break; }
-	 found = TRUE;
-         if (zone_table[i].cmd[z].arg2 > max) max = zone_table[i].cmd[z].arg2;
-         amt++;
-       }
-       if (!first) continue;
-       if (amt == max) continue;
-       if (strlen(buf) > MAX_STRING_LENGTH -200)
-       {
-	 i = 10000; // Hack to make it end immediatly.
-	 break;
-       }
-       if (amt > max)
-       {
-	 sprintf(buf, "%sReset %d in zone %d has MORE resets than max in world.\r\n",buf, j, i); 
-       } else {
-	 sprintf(buf, "%sReset %d in zone %d has LESS resets than max in world.\r\n",buf, j, i); 
-       }
-
+          zone_table[i].cmd[j].arg2 == -1)
+        continue; // Don't care about those..
+      int amt = 0;
+      for (z = 0; zone_table[i].cmd[z].command != 'S'; z++)
+      {
+        if (zone_table[i].cmd[z].command != 'M')
+          continue;
+        if (zone_table[i].cmd[z].arg1 != vnum)
+          continue;
+        if (z == j && found)
+        {
+          first = FALSE;
+          break;
+        }
+        found = TRUE;
+        if (zone_table[i].cmd[z].arg2 > max)
+          max = zone_table[i].cmd[z].arg2;
+        amt++;
+      }
+      if (!first)
+        continue;
+      if (amt == max)
+        continue;
+      if (strlen(buf) > MAX_STRING_LENGTH - 200)
+      {
+        i = 10000; // Hack to make it end immediatly.
+        break;
+      }
+      if (amt > max)
+      {
+        sprintf(buf, "%sReset %d in zone %d has MORE resets than max in world.\r\n", buf, j, i);
+      }
+      else
+      {
+        sprintf(buf, "%sReset %d in zone %d has LESS resets than max in world.\r\n", buf, j, i);
+      }
     }
   }
   send_to_char(buf, ch);
   return eSUCCESS;
 }
 
-
 int do_varstat(char_data *ch, char *argument, int cmd)
 {
-    char arg[MAX_INPUT_LENGTH];
-    argument = one_argument(argument, arg);
-    char_data *vict;
+  char arg[MAX_INPUT_LENGTH];
+  argument = one_argument(argument, arg);
+  char_data *vict;
 
-    if ( ( vict = get_char_vis(ch, arg) ) == NULL )
-    {
-	send_to_char("Target not found.\r\n",ch);
-	return eFAILURE;
-    }
-    char buf[MAX_STRING_LENGTH];
-    buf[0] = '\0';
-    struct tempvariable *eh;
-    for (eh = vict->tempVariable; eh; eh = eh->next)
-    {
-       sprintf(buf, "$B$3%-30s $R-- $B$5 %s\r\n",
-		eh->name, eh->data);
-       send_to_char(buf,ch);
-    }
-    if (buf[0] == '\0') 
-    { send_to_char("No temporary variables found.\r\n",ch); }
-    return eSUCCESS;
+  if ((vict = get_char_vis(ch, arg)) == NULL)
+  {
+    send_to_char("Target not found.\r\n", ch);
+    return eFAILURE;
+  }
+  char buf[MAX_STRING_LENGTH];
+  buf[0] = '\0';
+  struct tempvariable *eh;
+  for (eh = vict->tempVariable; eh; eh = eh->next)
+  {
+    sprintf(buf, "$B$3%-30s $R-- $B$5 %s\r\n",
+            eh->name, eh->data);
+    send_to_char(buf, ch);
+  }
+  if (buf[0] == '\0')
+  {
+    send_to_char("No temporary variables found.\r\n", ch);
+  }
+  return eSUCCESS;
 }
