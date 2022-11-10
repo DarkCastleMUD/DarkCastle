@@ -374,8 +374,7 @@ string double_dollars(string source);
 
 void    clan_death      (char* b, char_data *ch);
 
-int     move_char       (char_data *ch, int dest);
-int     move_char       (char_data *ch, int dest, bool stop_all_fighting);
+int     move_char       (char_data *ch, int dest, bool stop_all_fighting=true);
 int	number		(int from, int to);
 int 	dice		(int number, int size);
 int	str_cmp		(const char *arg1, const char *arg2);
