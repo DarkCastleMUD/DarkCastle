@@ -2763,114 +2763,114 @@ int spell_invisibility(uint8_t level, char_data *ch, char_data *victim, struct o
 
 /* LOCATE OBJECT */
 
-int spell_locate_object(uint8_t level, char_data *ch, char *arg, char_data *victim, struct obj_data *obj, int skill)
+int spell_locate_object(uint8_t level, char_data* ch, char* arg, char_data* victim, struct obj_data* obj, int skill)
 {
-  struct obj_data *i;
+  struct obj_data* i;
   char name[256];
   char buf[MAX_STRING_LENGTH];
   char tmpname[256];
-  char *tmp;
+  char* tmp;
   int j, n;
   int total;
   int number;
 
   assert(ch);
   if (!arg)
-  return eFAILURE;
+    return eFAILURE;
 
   one_argument(arg, name);
 
   strncpy(tmpname, name, 256);
   tmp = tmpname;
   if ((number = get_number(&tmp)) < 0)
-  number = 0;
+    number = 0;
 
   total = j = (int)(skill / 1.5);
 
   for (i = object_list, n = 0; i && (j > 0) && (number > 0); i = i->next)
   {
-  // TODO
-  // Removed for now because it's keep locate spell from seeing portals or corpses
-  //	  if (i->item_number == -1) {
-  //		  continue;
-  //	  }
-  //
-  if (IS_OBJ_STAT(i, ITEM_NOSEE))
-    continue;
+    // TODO
+    // Removed for now because it's keep locate spell from seeing portals or corpses
+    //	  if (i->item_number == -1) {
+    //		  continue;
+    //	  }
+    //
+    if (IS_OBJ_STAT(i, ITEM_NOSEE))
+      continue;
 
-  if (IS_SET(i->obj_flags.more_flags, ITEM_NOLOCATE))
-    continue;
+    if (IS_SET(i->obj_flags.more_flags, ITEM_NOLOCATE))
+      continue;
 
-  char_data *owner = 0;
-  int room = 0;
-  if (i->equipped_by)
-    owner = i->equipped_by;
+    char_data* owner = 0;
+    int room = 0;
+    if (i->equipped_by)
+      owner = i->equipped_by;
 
-  if (i->carried_by)
-    owner = i->carried_by;
-
-  if (i->in_room)
-    room = i->in_room;
-
-  if (i->in_obj && i->in_obj->equipped_by)
-    owner = i->in_obj->equipped_by;
-
-  if (i->in_obj && i->in_obj->carried_by)
-    owner = i->in_obj->carried_by;
-
-  if (i->in_obj && i->in_obj->in_room)
-    room = i->in_obj->in_room;
-
-  // If owner, PC, with desc and not con_playing or wizinvis,
-  if (owner && owner->pcdata && is_in_game(owner) &&
-      (owner->pcdata->wizinvis > GET_LEVEL(ch)))
-    continue;
-
-  // Skip objs in god rooms
-  if (room >= 0 && room <= 47)
-    continue;
-
-  buf[0] = 0;
-  if (isname(tmp, i->name))
-  {
     if (i->carried_by)
-    {
-   sprintf(buf, "%s carried by %s.\n\r", i->short_description,
-           PERS(i->carried_by, ch));
-    }
-    else if (i->in_obj)
-    {
-   sprintf(buf, "%s is in %s.\n\r", i->short_description,
-           i->in_obj->short_description);
-    }
-    else if (i->in_room != NOWHERE)
-    {
-   sprintf(buf, "%s is in %s.\n\r", i->short_description,
-           world[i->in_room].name);
-    }
-    else if (i->equipped_by != NULL)
-    {
-   sprintf(buf, "%s is in use in an unknown location.\n\r",
-           i->short_description);
-    }
+      owner = i->carried_by;
 
-    if (buf[0] != 0)
+    if (i->in_room)
+      room = i->in_room;
+
+    if (i->in_obj && i->in_obj->equipped_by)
+      owner = i->in_obj->equipped_by;
+
+    if (i->in_obj && i->in_obj->carried_by)
+      owner = i->in_obj->carried_by;
+
+    if (i->in_obj && i->in_obj->in_room)
+      room = i->in_obj->in_room;
+
+    // If owner, PC, with desc and not con_playing or wizinvis,
+    if (owner && owner->pcdata && is_in_game(owner) &&
+      (owner->pcdata->wizinvis > GET_LEVEL(ch)))
+      continue;
+
+    // Skip objs in god rooms
+    if (room >= 0 && room <= 47)
+      continue;
+
+    buf[0] = 0;
+    if (isname(tmp, i->name))
     {
-   n++;
-   if (n >= number)
-   {
-    send_to_char(buf, ch);
-    j--;
-   }
+      if (i->carried_by)
+      {
+        sprintf(buf, "%s carried by %s.\n\r", i->short_description,
+          PERS(i->carried_by, ch));
+      }
+      else if (i->in_obj)
+      {
+        sprintf(buf, "%s is in %s.\n\r", i->short_description,
+          i->in_obj->short_description);
+      }
+      else if (i->in_room != NOWHERE)
+      {
+        sprintf(buf, "%s is in %s.\n\r", i->short_description,
+          world[i->in_room].name);
+      }
+      else if (i->equipped_by != NULL)
+      {
+        sprintf(buf, "%s is in use in an unknown location.\n\r",
+          i->short_description);
+      }
+
+      if (buf[0] != 0)
+      {
+        n++;
+        if (n >= number)
+        {
+          send_to_char(buf, ch);
+          j--;
+        }
+      }
     }
-  }
   }
 
   if (j == total)
-  send_to_char("There appears to be no such object.\n\r", ch);
+    send_to_char("There appears to be no such object.\n\r", ch);
 
   if (j == 0)
-  send_to_char("The tremendous amount of information leaves you very confused.\n\r", ch);
+    send_to_char("The tremendous amount of information leaves you very confused.\n\r", ch);
 
   return eSUCCESS;
 }
