@@ -59,6 +59,7 @@
 #include "obj.h"
 
 using namespace std;
+using namespace fmt;
 
 #define BEACON_OBJ_NUMBER 405
 
@@ -2787,6 +2788,7 @@ int spell_locate_object(uint8_t level, char_data* ch, char* arg, char_data* vict
 
   total = j = (int)(skill / 1.5);
 
+  uint64_t skipped_nosee = 0, skipped_nolocate = 0, skipped_other=0, skipped_god=0, skipped_nowhere=0;
   for (i = object_list, n = 0; i && (j > 0) && (number > 0); i = i->next)
   {
     // TODO
@@ -2796,39 +2798,75 @@ int spell_locate_object(uint8_t level, char_data* ch, char* arg, char_data* vict
     //	  }
     //
     if (IS_OBJ_STAT(i, ITEM_NOSEE))
+    {
+      if (isname(tmp, i->name))
+      {
+        skipped_nosee++;
+      }
       continue;
+    }
 
     if (IS_SET(i->obj_flags.more_flags, ITEM_NOLOCATE))
-      continue;
+    {
+      if (isname(tmp, i->name))
+      {
+        skipped_nolocate++;
+      }
+        continue;
+    }
 
     char_data* owner = 0;
     int room = 0;
     if (i->equipped_by)
+    {
       owner = i->equipped_by;
+      room = owner->in_room;
+    }
 
-    if (i->carried_by)
+    else if (i->carried_by)
       owner = i->carried_by;
 
-    if (i->in_room)
+    else if (i->in_room)
       room = i->in_room;
 
-    if (i->in_obj && i->in_obj->equipped_by)
+    else if (i->in_obj && i->in_obj->equipped_by)
       owner = i->in_obj->equipped_by;
 
-    if (i->in_obj && i->in_obj->carried_by)
+    else if (i->in_obj && i->in_obj->carried_by)
       owner = i->in_obj->carried_by;
 
-    if (i->in_obj && i->in_obj->in_room)
+    else if (i->in_obj && i->in_obj->in_room)
       room = i->in_obj->in_room;
 
     // If owner, PC, with desc and not con_playing or wizinvis,
     if (owner && owner->pcdata && is_in_game(owner) &&
       (owner->pcdata->wizinvis > GET_LEVEL(ch)))
-      continue;
+      {
+        if (isname(tmp, i->name))
+        {
+          skipped_other++;
+        }
+        continue;
+      }
 
     // Skip objs in god rooms
-    if (room >= 0 && room <= 47)
+    if (room >= 1 && room <= 47)
+    {
+      if (isname(tmp, i->name))
+      {
+        skipped_god++;
+      }
       continue;
+    }
+
+    if (room == NOWHERE)
+    {
+      if (isname(tmp, i->name))
+      {
+        skipped_nowhere++;
+      }
+      continue;
+    }
 
     buf[0] = 0;
     if (isname(tmp, i->name))
@@ -2871,6 +2909,12 @@ int spell_locate_object(uint8_t level, char_data* ch, char* arg, char_data* vict
 
   if (j == 0)
     send_to_char("The tremendous amount of information leaves you very confused.\n\r", ch);
+
+  if (GET_LEVEL(ch) >= IMMORTAL)
+  {
+    ch->send(format("Skipped god:{} other:{} nolocate:{} nosee:{} nowhere:{}\r\n", skipped_god, skipped_other, skipped_nolocate, skipped_nosee, skipped_nowhere));
+    
+  }
 
   return eSUCCESS;
 }
