@@ -319,11 +319,6 @@ FILE *clan_log = 0;
 FILE *objects_log = 0;
 FILE *quest_log = 0;
 
-void log(string str, int god_level, int32_t type)
-{
-  log(str, god_level, type, nullptr);
-}
-
 // writes a string to the log
 void log(string str, int god_level, int32_t type, char_data *vict)
 {
