@@ -20,7 +20,7 @@ jobs:
         sudo apt install scons libcurl4
         sudo apt install libpq-dev libpq5 libcurl4-openssl-dev
         sudo apt install unzip zlib1g-dev
-        sudo apt install libfmt-dev cmake qt6-base-dev    
+        sudo apt install libfmt-dev cmake qt6-base-dev libssh-dev   
     - name: make
       run: |
         cmake -S src -B build
