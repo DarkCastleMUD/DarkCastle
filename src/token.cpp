@@ -504,7 +504,7 @@ string TokenList::Interpret(char_data *from, obj_data *obj, void *vict_obj, char
     }    /* if it's a code */
     else // It's unrecognized.  Shouldn't happen.
     {
-      log("TokenList::Interpret() sent bad Token!", OVERSEER, LOG_BUG);
+      log("TokenList::Interpret() sent bad Token!", OVERSEER, LogChannels::LOG_BUG);
     }
 #ifdef DEBUG_TOKEN
     cerr << "Output after this loop: " << interp << endl;

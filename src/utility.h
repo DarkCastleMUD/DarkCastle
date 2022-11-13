@@ -40,6 +40,37 @@
 
 using namespace std;
 
+enum LogChannels
+{
+   LOG_BUG = 1U,
+   LOG_PRAYER = 1U << 1,
+   LOG_GOD = 1U << 2,
+   LOG_MORTAL = 1U << 3,
+   LOG_SOCKET = 1U << 4,
+   LOG_MISC = 1U << 5,
+   LOG_PLAYER = 1U << 6,
+   CHANNEL_GOSSIP = 1U << 7,
+   CHANNEL_AUCTION = 1U << 8,
+   CHANNEL_INFO = 1U << 9,
+   CHANNEL_TRIVIA = 1U << 10,
+   CHANNEL_DREAM = 1U << 11,
+   CHANNEL_CLAN = 1U << 12,
+   CHANNEL_NEWBIE = 1U << 13,
+   CHANNEL_SHOUT = 1U << 14,
+   LOG_WORLD = 1U << 15,
+   LOG_ARENA = 1U << 16,
+   LOG_CLAN = 1U << 17,
+   LOG_WARNINGS = 1U << 18,
+   LOG_HELP = 1U << 19,
+   LOG_DATABASE = 1U << 20,
+   LOG_OBJECTS = 1U << 21,
+   CHANNEL_TELL = 1U << 22,
+   CHANNEL_HINTS = 1U << 23,
+   LOG_VAULT = 1U << 24,
+   LOG_QUEST = 1U << 25,
+   LOG_DEBUG = 1U << 26
+};
+
 extern struct weather_data weather_info;
 
 void check_timer();
@@ -403,9 +434,9 @@ MatchType str_n_nosp_cmp_begin(string arg1, string arg2);
 char *str_nospace(const char *stri);
 char *str_dup(const char *str);
 char *str_dup0(const char *str);
-void log(string str, int god_level, int32_t type, char_data *vict = nullptr);
-void logf(int level, int32_t type, const char *arg, ...);
-int send_to_gods(const char *str, int god_level, int32_t type);
+void log(string str, int god_level, LogChannels type, char_data *vict = nullptr);
+void logf(int level, LogChannels type, const char *arg, ...);
+int send_to_gods(const char *str, int god_level, LogChannels type);
 
 void sprintbit(uint value[], const char *names[], char *result);
 std::string sprintbit(uint value[], const char *names[]);

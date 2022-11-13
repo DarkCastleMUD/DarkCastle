@@ -30,7 +30,7 @@
 #include "player.h"
 #include "obj.h"
 #include "connect.h"
-#include "db.h" // exp_table
+#include "db.h"	   // exp_table
 #include "fight.h" // damage
 #include "ki.h"
 #include "game_portal.h"
@@ -51,25 +51,27 @@
 /* When age in 45..59 calculate the line between p3 & p4 */
 /* When age in 60..79 calculate the line between p4 & p5 */
 /* When age >= 80 return the value p6 */
-int graf(int age, int p0, int p1, int p2, int p3, int p4, int p5, int p6) {
+int graf(int age, int p0, int p1, int p2, int p3, int p4, int p5, int p6)
+{
 
 	if (age < 15)
 		return (p0); /* < 15   */
 	else if (age <= 29)
-		return (int) (p1 + (((age - 15) * (p2 - p1)) / 15)); /* 15..29 */
+		return (int)(p1 + (((age - 15) * (p2 - p1)) / 15)); /* 15..29 */
 	else if (age <= 44)
-		return (int) (p2 + (((age - 30) * (p3 - p2)) / 15)); /* 30..44 */
+		return (int)(p2 + (((age - 30) * (p3 - p2)) / 15)); /* 30..44 */
 	else if (age <= 59)
-		return (int) (p3 + (((age - 45) * (p4 - p3)) / 15)); /* 45..59 */
+		return (int)(p3 + (((age - 45) * (p4 - p3)) / 15)); /* 45..59 */
 	else if (age <= 79)
-		return (int) (p4 + (((age - 60) * (p5 - p4)) / 20)); /* 60..79 */
+		return (int)(p4 + (((age - 60) * (p5 - p4)) / 20)); /* 60..79 */
 	else
 		return (p6); /* >= 80 */
 }
 
 /* The three MAX functions define a characters Effective maximum */
 /* Which is NOT the same as the ch->max_xxxx !!!          */
-int32_t mana_limit(char_data *ch) {
+int32_t mana_limit(char_data *ch)
+{
 	int max;
 
 	if (!IS_NPC(ch))
@@ -81,11 +83,13 @@ int32_t mana_limit(char_data *ch) {
 }
 
 // Previously any NPC got 0 returned.
-int32_t ki_limit(char_data *ch) {
+int32_t ki_limit(char_data *ch)
+{
 	return ch->max_ki;
 }
 
-int32_t hit_limit(char_data *ch) {
+int32_t hit_limit(char_data *ch)
+{
 	int max;
 
 	if (!IS_NPC(ch))
@@ -100,7 +104,8 @@ int32_t hit_limit(char_data *ch) {
 	return (max);
 }
 
-int32_t move_limit(char_data *ch) {
+int32_t move_limit(char_data *ch)
+{
 	int max;
 
 	if (!IS_NPC(ch))
@@ -116,21 +121,24 @@ int32_t move_limit(char_data *ch) {
 	return (max);
 }
 
-const int mana_regens[] = { 0, 13, 13, 1, 1, 10, 9, 1, 1, 9, 1, 13, 0, 0 };
+const int mana_regens[] = {0, 13, 13, 1, 1, 10, 9, 1, 1, 9, 1, 13, 0, 0};
 
 /* manapoint gain pr. game hour */
-int mana_gain(char_data *ch) {
+int mana_gain(char_data *ch)
+{
 	int gain = 0;
 	int divisor = 1;
 	int modifier;
 
 	if (IS_NPC(ch))
 		gain = GET_LEVEL(ch);
-	else {
-//    gain = graf(age(ch).year, 2,3,4,6,7,8,9);
+	else
+	{
+		//    gain = graf(age(ch).year, 2,3,4,6,7,8,9);
 
-		gain = (int) (ch->max_mana * (float) mana_regens[GET_CLASS(ch)] / 100);
-		switch (GET_POS(ch)) {
+		gain = (int)(ch->max_mana * (float)mana_regens[GET_CLASS(ch)] / 100);
+		switch (GET_POS(ch))
+		{
 		case POSITION_SLEEPING:
 			divisor = 1;
 			break;
@@ -146,68 +154,76 @@ int mana_gain(char_data *ch) {
 		}
 
 		if (GET_CLASS(ch) == CLASS_MAGIC_USER ||
-		GET_CLASS(ch) == CLASS_ANTI_PAL || GET_CLASS(ch) == CLASS_RANGER) {
+			GET_CLASS(ch) == CLASS_ANTI_PAL || GET_CLASS(ch) == CLASS_RANGER)
+		{
 			if (GET_INT(ch) < 0)
 				modifier = int_app[0].mana_regen;
 			else
 				modifier = int_app[GET_INT(ch)].mana_regen;
 
 			modifier += GET_INT(ch);
-		} else {
+		}
+		else
+		{
 			modifier = wis_app[GET_WIS(ch)].mana_regen;
 			modifier += GET_WIS(ch);
 		}
 		gain += modifier;
 	}
 
-	if (((GET_COND(ch,FULL) == 0) || (GET_COND(ch,THIRST) == 0)) && GET_LEVEL(ch) < 60)
+	if (((GET_COND(ch, FULL) == 0) || (GET_COND(ch, THIRST) == 0)) && GET_LEVEL(ch) < 60)
 		gain >>= 2;
 	gain /= 4;
 	gain /= divisor;
-	gain += MIN(age(ch).year,100) / 5;
+	gain += MIN(age(ch).year, 100) / 5;
 	if (GET_LEVEL(ch) < 50)
 
-		gain = (int) ((float) gain * (2.0 - (float) GET_LEVEL(ch) / 50.0));
+		gain = (int)((float)gain * (2.0 - (float)GET_LEVEL(ch) / 50.0));
 
 	if (ch->mana_regen > 0)
 		gain += ch->mana_regen;
 	if (ch->in_room >= 0)
 		if (IS_SET(world[ch->in_room].room_flags, SAFE) || check_make_camp(ch->in_room))
-			gain = (int) (gain * 1.25);
+			gain = (int)(gain * 1.25);
 
 	if (ch->mana_regen < 0)
 		gain += ch->mana_regen;
 	return MAX(1, gain);
 }
 
-const int hit_regens[] = { 0, 7, 7, 9, 10, 8, 9, 12, 9, 8, 8, 7, 0, 0 };
+const int hit_regens[] = {0, 7, 7, 9, 10, 8, 9, 12, 9, 8, 8, 7, 0, 0};
 
 /* Hitpoint gain pr. game hour */
-int hit_gain(char_data *ch, int position) {
+int hit_gain(char_data *ch, int position)
+{
 
 	int gain = 1;
-	struct affected_type * af;
+	struct affected_type *af;
 	int divisor = 1;
 	int learned = has_skill(ch, SKILL_ENHANCED_REGEN);
 	bool improve = TRUE;
-	if (position == 777) {
+	if (position == 777)
+	{
 		improve = FALSE;
 		position = GET_POS(ch);
 	}
 	/* Neat and fast */
-	if (IS_NPC(ch)) {
+	if (IS_NPC(ch))
+	{
 		if (ch->fighting)
 			gain = (GET_MAX_HIT(ch) / 24);
 		else
 			gain = (GET_MAX_HIT(ch) / 6);
 	}
 	/* PC's */
-	else {
-		gain = (int) (ch->max_hit * (float) hit_regens[GET_CLASS(ch)] / 100);
+	else
+	{
+		gain = (int)(ch->max_hit * (float)hit_regens[GET_CLASS(ch)] / 100);
 
 		/* Position calculations    */
 
-		switch (position) {
+		switch (position)
+		{
 		case POSITION_SLEEPING:
 			divisor = 1;
 			break;
@@ -252,23 +268,24 @@ int hit_gain(char_data *ch, int position) {
 		gain >>= 2;
 
 	gain /= 4;
-//  gain -= MIN(age(ch).year,100) / 10;
+	//  gain -= MIN(age(ch).year,100) / 10;
 
 	gain /= divisor;
 	if (ch->hit_regen > 0)
 		gain += ch->hit_regen;
 	if (GET_LEVEL(ch) < 50)
-		gain = (int) ((float) gain * (2.0 - (float) GET_LEVEL(ch) / 50.0));
+		gain = (int)((float)gain * (2.0 - (float)GET_LEVEL(ch) / 50.0));
 
 	if (ch->in_room >= 0)
 		if (IS_SET(world[ch->in_room].room_flags, SAFE) || check_make_camp(ch->in_room))
-			gain = (int) (gain * 1.5);
+			gain = (int)(gain * 1.5);
 	if (ch->hit_regen < 0)
 		gain += ch->hit_regen;
 	return MAX(1, gain);
 }
 
-int hit_gain(char_data *ch) {
+int hit_gain(char_data *ch)
+{
 	return hit_gain(ch, GET_POS(ch));
 }
 
@@ -278,19 +295,23 @@ int move_gain(char_data *ch, int extra)
 	int gain;
 	int divisor = 100000;
 	int learned = has_skill(ch, SKILL_ENHANCED_REGEN);
-	struct affected_type * af;
+	struct affected_type *af;
 	bool improve = TRUE;
 	if (extra == 777)
 		improve = FALSE;
 
-	if (IS_NPC(ch)) {
+	if (IS_NPC(ch))
+	{
 		return (GET_LEVEL(ch));
 		/* Neat and fast */
-	} else {
-//	gain = graf(age(ch).year, 4,5,6,7,4,3,2);
-		gain = (int) (ch->max_move * 0.15);
-//	gain /= 2;
-		switch (GET_POS(ch)) {
+	}
+	else
+	{
+		//	gain = graf(age(ch).year, 4,5,6,7,4,3,2);
+		gain = (int)(ch->max_move * 0.15);
+		//	gain /= 2;
+		switch (GET_POS(ch))
+		{
 		case POSITION_SLEEPING:
 			divisor = 1;
 			break;
@@ -309,10 +330,10 @@ int move_gain(char_data *ch, int extra)
 			gain += con_app[GET_CON(ch)].move_regen;
 
 		if ((af = affected_by_spell(ch, SPELL_RAPID_MEND)))
-			gain += (int) (af->modifier * 1.5);
+			gain += (int)(af->modifier * 1.5);
 	}
 
-	if (((GET_COND(ch,FULL) == 0) || (GET_COND(ch,THIRST) == 0)) && GET_LEVEL(ch) < 60)
+	if (((GET_COND(ch, FULL) == 0) || (GET_COND(ch, THIRST) == 0)) && GET_LEVEL(ch) < 60)
 		gain >>= 2;
 	gain /= divisor;
 	gain -= MIN(100, age(ch).year) / 10;
@@ -324,38 +345,42 @@ int move_gain(char_data *ch, int extra)
 		gain += 3 + learned / 10;
 
 	if (GET_LEVEL(ch) < 50)
-		gain = (int) ((float) gain * (2.0 - (float) GET_LEVEL(ch) / 50.0));
+		gain = (int)((float)gain * (2.0 - (float)GET_LEVEL(ch) / 50.0));
 
 	if (ch->in_room >= 0)
 		if (IS_SET(world[ch->in_room].room_flags, SAFE) || check_make_camp(ch->in_room))
-			gain = (int) (gain * 1.5);
+			gain = (int)(gain * 1.5);
 	if (ch->move_regen < 0)
 		gain += ch->move_regen;
 
 	return MAX(1, gain);
 }
 
-void redo_hitpoints(char_data *ch) {
+void redo_hitpoints(char_data *ch)
+{
 	/*struct affected_type *af;*/
 	int i, j, bonus = 0;
 
 	ch->max_hit = ch->raw_hit;
 	for (i = 16; i < GET_CON(ch); i++)
 		bonus += (i * i) / 30;
-//  bonus = (GET_CON(ch) * GET_CON(ch)) / 30; 
+	//  bonus = (GET_CON(ch) * GET_CON(ch)) / 30;
 
 	ch->max_hit += bonus;
-	struct affected_type * af = ch->affected;
+	struct affected_type *af = ch->affected;
 
-	while (af) {
+	while (af)
+	{
 		if (af->location == APPLY_HIT)
 			ch->max_hit += af->modifier;
 		af = af->next;
 	}
 
-	for (i = 0; i < MAX_WEAR; i++) {
+	for (i = 0; i < MAX_WEAR; i++)
+	{
 		if (ch->equipment[i])
-			for (j = 0; j < ch->equipment[i]->num_affects; j++) {
+			for (j = 0; j < ch->equipment[i]->num_affects; j++)
+			{
 				if (ch->equipment[i]->affected[j].location == APPLY_HIT)
 					affect_modify(ch, ch->equipment[i]->affected[j].location, ch->equipment[i]->affected[j].modifier, -1, TRUE);
 			}
@@ -387,14 +412,17 @@ void redo_mana(char_data *ch)
 
 	struct affected_type *af;
 	af = ch->affected;
-	while (af) {
+	while (af)
+	{
 		if (af->location == APPLY_MANA)
 			ch->max_mana += af->modifier;
 		af = af->next;
 	}
-	for (i = 0; i < MAX_WEAR; i++) {
+	for (i = 0; i < MAX_WEAR; i++)
+	{
 		if (ch->equipment[i])
-			for (j = 0; j < ch->equipment[i]->num_affects; j++) {
+			for (j = 0; j < ch->equipment[i]->num_affects; j++)
+			{
 				if (ch->equipment[i]->affected[j].location == APPLY_MANA)
 					affect_modify(ch, ch->equipment[i]->affected[j].location, ch->equipment[i]->affected[j].modifier, -1, TRUE);
 			}
@@ -402,7 +430,8 @@ void redo_mana(char_data *ch)
 	add_totem_stats(ch, APPLY_MANA);
 }
 
-void redo_ki(char_data *ch) {
+void redo_ki(char_data *ch)
+{
 	int i, j;
 	ch->max_ki = ch->raw_ki;
 	if (GET_CLASS(ch) == CLASS_MONK)
@@ -412,15 +441,18 @@ void redo_ki(char_data *ch) {
 
 	struct affected_type *af;
 	af = ch->affected;
-	while (af) {
+	while (af)
+	{
 		if (af->location == APPLY_KI)
 			ch->max_ki += af->modifier;
 		af = af->next;
 	}
 
-	for (i = 0; i < MAX_WEAR; i++) {
+	for (i = 0; i < MAX_WEAR; i++)
+	{
 		if (ch->equipment[i])
-			for (j = 0; j < ch->equipment[i]->num_affects; j++) {
+			for (j = 0; j < ch->equipment[i]->num_affects; j++)
+			{
 				if (ch->equipment[i]->affected[j].location == APPLY_KI)
 					affect_modify(ch, ch->equipment[i]->affected[j].location, ch->equipment[i]->affected[j].modifier, -1, TRUE);
 			}
@@ -429,7 +461,8 @@ void redo_ki(char_data *ch) {
 }
 
 /* Gain maximum in various */
-void advance_level(char_data *ch, int is_conversion) {
+void advance_level(char_data *ch, int is_conversion)
+{
 	int add_hp = 0;
 	int add_mana = 1;
 	int add_moves = 0;
@@ -438,7 +471,8 @@ void advance_level(char_data *ch, int is_conversion) {
 	int i;
 	char buf[MAX_STRING_LENGTH];
 
-	switch (GET_CLASS(ch)) {
+	switch (GET_CLASS(ch))
+	{
 	case CLASS_MAGIC_USER:
 		add_ki += (GET_LEVEL(ch) % 2);
 		add_hp += number(3, 6);
@@ -515,7 +549,7 @@ void advance_level(char_data *ch, int is_conversion) {
 		break;
 
 	default:
-		log("Unknown class in advance level?", OVERSEER, LOG_BUG);
+		log("Unknown class in advance level?", OVERSEER, LogChannels::LOG_BUG);
 		return;
 	}
 
@@ -576,9 +610,11 @@ void advance_level(char_data *ch, int is_conversion) {
 		for (i = 0; i < 3; i++)
 			ch->conditions[i] = -1;
 
-	if (GET_LEVEL(ch) > 10 && !IS_SET(ch->pcdata->toggles, PLR_REMORTED)) {
+	if (GET_LEVEL(ch) > 10 && !IS_SET(ch->pcdata->toggles, PLR_REMORTED))
+	{
 		struct vault_data *vault = has_vault(GET_NAME(ch));
-		if (vault) {
+		if (vault)
+		{
 			send_to_char("10 lbs has been added to your vault!\n\r", ch);
 			vault->size += 10;
 			save_vault(vault->owner);
@@ -587,7 +623,8 @@ void advance_level(char_data *ch, int is_conversion) {
 
 	if (GET_LEVEL(ch) == 6)
 		send_to_char("You are now able to participate in pkilling!\n\rRead HELP PKILL for more information.\n\r", ch);
-	if (GET_LEVEL(ch) == 10) {
+	if (GET_LEVEL(ch) == 10)
+	{
 		send_to_char("You have been given a vault in which to place your valuables!\n\rRead HELP VAULT for more information.\n\r", ch);
 		add_new_vault(GET_NAME(ch), 0);
 	}
@@ -595,15 +632,16 @@ void advance_level(char_data *ch, int is_conversion) {
 		send_to_char("It now costs you gold every time you recall.\r\n", ch);
 	if (GET_LEVEL(ch) == 20)
 		send_to_char(
-				"You will no longer keep your equipment when you suffer a death to a mob.\n\rThere is now a chance you may lose attribute points when you die to a mob.\n\rRead HELP RDEATH and HELP STAT LOSS for more information.\r\n",
-				ch);
+			"You will no longer keep your equipment when you suffer a death to a mob.\n\rThere is now a chance you may lose attribute points when you die to a mob.\n\rRead HELP RDEATH and HELP STAT LOSS for more information.\r\n",
+			ch);
 	if (GET_LEVEL(ch) == 40)
 		send_to_char("You are now able to use the Anonymous command. See \"HELP ANON\" for details.\n\r", ch);
 	if (GET_LEVEL(ch) == 50)
 		send_to_char("The protective covenant of your corpse weakens, upon death players may steal 1 item from you. (See help LOOT for details)\r\n", ch);
 }
 
-void gain_exp(char_data *ch, int64_t gain) {
+void gain_exp(char_data *ch, int64_t gain)
+{
 	int x = 0;
 	int64_t y;
 
@@ -621,10 +659,10 @@ void gain_exp(char_data *ch, int64_t gain) {
 	 return;
 	 }*/
 	GET_EXP(ch) += gain;
-	if ( GET_EXP(ch) < 0)
+	if (GET_EXP(ch) < 0)
 		GET_EXP(ch) = 0;
 
-	void golem_gain_exp(char_data *ch);
+	void golem_gain_exp(char_data * ch);
 
 	if (!IS_NPC(ch) && ch->pcdata->golem && ch->in_room == ch->pcdata->golem->in_room) // Golems get mage's exp, when they're in the same room
 		gain_exp(ch->pcdata->golem, gain);
@@ -635,18 +673,20 @@ void gain_exp(char_data *ch, int64_t gain) {
 	if (IS_NPC(ch))
 		return;
 
-	if (!x && GET_EXP(ch) >= y) {
+	if (!x && GET_EXP(ch) >= y)
+	{
 		send_to_char("You now have enough experience to level!\n\r", ch);
 		if (GET_LEVEL(ch) == 1)
 			csendf(ch, "$B$2An acolyte of Pirahna tells you, 'To find the way to your guild, young %s, please read $7HELP GUILD$2'$R\n\r",
-					pc_clss_types[GET_CLASS(ch)]);
+				   pc_clss_types[GET_CLASS(ch)]);
 	}
 
 	return;
 }
 
-void gain_exp_regardless(char_data *ch, int gain) {
-	GET_EXP(ch) += (int64_t) gain;
+void gain_exp_regardless(char_data *ch, int gain)
+{
+	GET_EXP(ch) += (int64_t)gain;
 
 	if (GET_EXP(ch) < 0)
 		GET_EXP(ch) = 0;
@@ -654,7 +694,8 @@ void gain_exp_regardless(char_data *ch, int gain) {
 	if (IS_NPC(ch))
 		return;
 
-	while (GET_EXP(ch) >= (int32_t) exp_table[GET_LEVEL(ch) + 1]) {
+	while (GET_EXP(ch) >= (int32_t)exp_table[GET_LEVEL(ch) + 1])
+	{
 		send_to_char("You raise a level!!  ", ch);
 		GET_LEVEL(ch) += 1;
 		advance_level(ch, 0);
@@ -663,11 +704,12 @@ void gain_exp_regardless(char_data *ch, int gain) {
 	return;
 }
 
-void gain_condition(char_data *ch, int condition, int value) {
+void gain_condition(char_data *ch, int condition, int value)
+{
 	bool intoxicated;
 
-//    if(GET_COND(ch, condition)==-1) /* No change */
-//	return;
+	//    if(GET_COND(ch, condition)==-1) /* No change */
+	//	return;
 
 	if (condition == FULL && IS_AFFECTED(ch, AFF_BOUNT_SONNET_HUNGER))
 		return;
@@ -678,22 +720,26 @@ void gain_condition(char_data *ch, int condition, int value) {
 
 	GET_COND(ch, condition) += value;
 
-	GET_COND(ch,condition) = MAX(0, (int)GET_COND(ch,condition));
-	GET_COND(ch,condition) = MIN(24, (int)GET_COND(ch,condition));
+	GET_COND(ch, condition) = MAX(0, (int)GET_COND(ch, condition));
+	GET_COND(ch, condition) = MIN(24, (int)GET_COND(ch, condition));
 
-	if (GET_COND(ch,condition) || GET_LEVEL(ch) >= 60)
+	if (GET_COND(ch, condition) || GET_LEVEL(ch) >= 60)
 		return;
 
-	switch (condition) {
-	case FULL: {
+	switch (condition)
+	{
+	case FULL:
+	{
 		send_to_char("You are hungry.\n\r", ch);
 		return;
 	}
-	case THIRST: {
+	case THIRST:
+	{
 		send_to_char("You are thirsty.\n\r", ch);
 		return;
 	}
-	case DRUNK: {
+	case DRUNK:
+	{
 		if (intoxicated)
 			send_to_char("You are now sober.\n\r", ch);
 		return;
@@ -703,29 +749,34 @@ void gain_condition(char_data *ch, int condition, int value) {
 	}
 
 	// just for fun
-	if (1 == number(1, 2000)) {
+	if (1 == number(1, 2000))
+	{
 		send_to_char("You are horny\r\n", ch);
 	}
 }
 
-void food_update(void) {
-	struct obj_data * bring_type_to_front(char_data * ch, int item_type);
-	int do_eat(char_data *ch, char *argument, int cmd);
-	int do_drink(char_data *ch, char *argument, int cmd);
-	int FOUNTAINisPresent(char_data *ch);
+void food_update(void)
+{
+	struct obj_data *bring_type_to_front(char_data * ch, int item_type);
+	int do_eat(char_data * ch, char *argument, int cmd);
+	int do_drink(char_data * ch, char *argument, int cmd);
+	int FOUNTAINisPresent(char_data * ch);
 
-	struct obj_data * food = NULL;
+	struct obj_data *food = NULL;
 
 	auto &character_list = DC::instance().character_list;
-	for (auto& i : character_list) {
+	for (auto &i : character_list)
+	{
 		if (affected_by_spell(i, SPELL_PARALYZE))
 			continue;
 		int amt = -1;
 		if (i->equipment[WEAR_FACE] && obj_index[i->equipment[WEAR_FACE]->item_number].virt == 536)
 			amt = -3;
 		gain_condition(i, FULL, amt);
-		if (!GET_COND(i, FULL) && GET_LEVEL(i) < 60) { // i'm hungry
-			if (!IS_MOB(i) && IS_SET(i->pcdata->toggles, PLR_AUTOEAT) && (GET_POS(i) > POSITION_SLEEPING)) {
+		if (!GET_COND(i, FULL) && GET_LEVEL(i) < 60)
+		{ // i'm hungry
+			if (!IS_MOB(i) && IS_SET(i->pcdata->toggles, PLR_AUTOEAT) && (GET_POS(i) > POSITION_SLEEPING))
+			{
 				if (IS_DARK(i->in_room) && !IS_MOB(i) && !i->pcdata->holyLite && !affected_by_spell(i, SPELL_INFRAVISION))
 					send_to_char("It's too dark to see what's safe to eat!\n\r", i);
 				else if (FOUNTAINisPresent(i))
@@ -738,8 +789,10 @@ void food_update(void) {
 		}
 		gain_condition(i, DRUNK, -1);
 		gain_condition(i, THIRST, amt);
-		if (!GET_COND(i, THIRST) && GET_LEVEL(i) < 60) { // i'm thirsty
-			if (!IS_MOB(i) && IS_SET(i->pcdata->toggles, PLR_AUTOEAT) && (GET_POS(i) > POSITION_SLEEPING)) {
+		if (!GET_COND(i, THIRST) && GET_LEVEL(i) < 60)
+		{ // i'm thirsty
+			if (!IS_MOB(i) && IS_SET(i->pcdata->toggles, PLR_AUTOEAT) && (GET_POS(i) > POSITION_SLEEPING))
+			{
 				if (IS_DARK(i->in_room) && !IS_MOB(i) && !i->pcdata->holyLite && !affected_by_spell(i, SPELL_INFRAVISION))
 					send_to_char("It's too dark to see if there's any potable liquid around!\n\r", i);
 				else if (FOUNTAINisPresent(i))
@@ -756,10 +809,12 @@ void food_update(void) {
 
 // Update the HP of mobs and players
 // Also clears out any linkdead level 1s
-void point_update(void) {
+void point_update(void)
+{
 	/* characters */
 	auto &character_list = DC::instance().character_list;
-	for (auto& i : character_list) {
+	for (auto &i : character_list)
+	{
 		if (i->in_room == NOWHERE)
 			continue;
 		if (affected_by_spell(i, SPELL_POISON))
@@ -767,21 +822,25 @@ void point_update(void) {
 
 		int a;
 		char_data *temp;
-		if (!IS_NPC(i) && ISSET(i->affected_by, AFF_HIDE) && (a = has_skill(i, SKILL_HIDE))) {
+		if (!IS_NPC(i) && ISSET(i->affected_by, AFF_HIDE) && (a = has_skill(i, SKILL_HIDE)))
+		{
 			int o;
 			for (o = 0; o < MAX_HIDE; o++)
 				i->pcdata->hiding_from[o] = NULL;
 			o = 0;
-			for (temp = world[i->in_room].people; temp; temp = temp->next_in_room) {
+			for (temp = world[i->in_room].people; temp; temp = temp->next_in_room)
+			{
 				if (i == temp)
 					continue;
 				if (o >= MAX_HIDE)
 					break;
 				if (number(1, 101) > a) // Failed.
-						{
+				{
 					i->pcdata->hiding_from[o] = temp;
 					i->pcdata->hide[o++] = FALSE;
-				} else {
+				}
+				else
+				{
 					i->pcdata->hiding_from[o] = temp;
 					i->pcdata->hide[o++] = TRUE;
 				}
@@ -789,14 +848,17 @@ void point_update(void) {
 		}
 
 		// only heal linkalive's and mobs
-		if (GET_POS(i) > POSITION_DEAD && (IS_NPC(i) || i->desc)) {
+		if (GET_POS(i) > POSITION_DEAD && (IS_NPC(i) || i->desc))
+		{
 			i->setHP(MIN(i->getHP() + hit_gain(i), hit_limit(i)));
 
 			GET_MANA(i) = MIN(GET_MANA(i) + mana_gain(i), mana_limit(i));
 
-			GET_MOVE(i) = MIN(GET_MOVE(i) + move_gain(i,0), move_limit(i));
+			GET_MOVE(i) = MIN(GET_MOVE(i) + move_gain(i, 0), move_limit(i));
 			GET_KI(i) = MIN(GET_KI(i) + ki_gain(i), ki_limit(i));
-		} else if (!IS_MOB(i) && GET_LEVEL(i) < 1 && !i->desc) {
+		}
+		else if (!IS_MOB(i) && GET_LEVEL(i) < 1 && !i->desc)
+		{
 			act("$n fades away into obscurity; $s life leaving history with nothing of note.", i, 0, 0, TO_ROOM, 0);
 			do_quit(i, "", 666);
 		}
@@ -805,10 +867,10 @@ void point_update(void) {
 
 void update_corpses_and_portals(void)
 {
-	//char buf[256];
+	// char buf[256];
 	struct obj_data *j, *next_thing;
 	struct obj_data *jj, *next_thing2;
-	int proc = 0;							 // Processed items. Debugging.
+	int proc = 0; // Processed items. Debugging.
 	bool corpses_need_saving = false;
 	void extract_obj(struct obj_data * obj); /* handler.c */
 	/* objects */
@@ -922,7 +984,7 @@ void update_corpses_and_portals(void)
 					}
 					else
 					{
-						log("BIIIG problem in limits.c!", OVERSEER, LOG_BUG);
+						log("BIIIG problem in limits.c!", OVERSEER, LogChannels::LOG_BUG);
 						return;
 					}
 				}
@@ -940,16 +1002,19 @@ void update_corpses_and_portals(void)
 	{
 		save_corpses();
 	}
-	//sprintf(buf, "DEBUG: Processed Objects: %d", proc);
-	//log(buf, 108, LOG_BUG);
+	// sprintf(buf, "DEBUG: Processed Objects: %d", proc);
+	// log(buf, 108, LogChannels::LOG_BUG);
 	/* Now process the portals */
 	// process_portals();
 }
 
-void prepare_character_for_sixty(char_data *ch) {
-	if (!IS_NPC(ch) && MAX_MORTAL == 60) {
+void prepare_character_for_sixty(char_data *ch)
+{
+	if (!IS_NPC(ch) && MAX_MORTAL == 60)
+	{
 		int skl = -1;
-		switch (GET_CLASS(ch)) {
+		switch (GET_CLASS(ch))
+		{
 		case CLASS_MAGE:
 			skl = SKILL_SPELLCRAFT;
 			break;
@@ -984,13 +1049,17 @@ void prepare_character_for_sixty(char_data *ch) {
 			skl = SKILL_SONG_HYPNOTIC_HARMONY;
 			break;
 		}
-		if (has_skill(ch, skl) && !IS_SET(ch->pcdata->toggles, PLR_50PLUS)) {
+		if (has_skill(ch, skl) && !IS_SET(ch->pcdata->toggles, PLR_50PLUS))
+		{
 			SET_BIT(ch->pcdata->toggles, PLR_50PLUS);
 			int i = (ch->exp / 100000000) * 500000;
-			if (i > 0) {
+			if (i > 0)
+			{
 				csendf(ch, "$B$3You have been credited %d gold coins for your %lld experience.$R\n\r", i, ch->exp);
 				ch->gold += i;
-			} else if (ch->exp > 0) {
+			}
+			else if (ch->exp > 0)
+			{
 				csendf(ch, "Since you already have your Quest Skill, your experience has been set to 0 to allow advancement to level 60.\n\r");
 			}
 			ch->exp = 0;

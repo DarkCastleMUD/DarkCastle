@@ -9,8 +9,8 @@
 /*****************************************************************************/
 extern "C"
 {
-  #include <ctype.h>
-  #include <string.h>
+#include <ctype.h>
+#include <string.h>
 }
 #include "connect.h"
 #include "character.h"
@@ -49,16 +49,16 @@ void log_sacrifice(char_data *ch, obj_data *obj, bool decay = FALSE)
 
   if (!decay)
   {
-    logf(IMP, LOG_OBJECTS, "%s just sacrificed %s[%d] in room %d\n", GET_NAME(ch), GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj), GET_ROOM_VNUM(ch->in_room));
+    logf(IMP, LogChannels::LOG_OBJECTS, "%s just sacrificed %s[%d] in room %d\n", GET_NAME(ch), GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj), GET_ROOM_VNUM(ch->in_room));
   }
   else
   {
-    logf(IMP, LOG_OBJECTS, "%s just poofed from decaying corpse %s[%d] in room %d\n", GET_OBJ_SHORT((obj_data *)ch), GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj), GET_ROOM_VNUM(obj->in_room));
+    logf(IMP, LogChannels::LOG_OBJECTS, "%s just poofed from decaying corpse %s[%d] in room %d\n", GET_OBJ_SHORT((obj_data *)ch), GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj), GET_ROOM_VNUM(obj->in_room));
   }
 
   for (obj_data *loop_obj = obj->contains; loop_obj; loop_obj = loop_obj->next_content)
   {
-    logf(IMP, LOG_OBJECTS, "The %s contained %s[%d]\n",
+    logf(IMP, LogChannels::LOG_OBJECTS, "The %s contained %s[%d]\n",
          GET_OBJ_SHORT(obj),
          GET_OBJ_SHORT(loop_obj),
          GET_OBJ_VNUM(loop_obj));
@@ -68,79 +68,87 @@ void log_sacrifice(char_data *ch, obj_data *obj, bool decay = FALSE)
 int do_sacrifice(char_data *ch, char *argument, int cmd)
 {
   struct obj_data *obj;
-  char name[MAX_INPUT_LENGTH+1];
+  char name[MAX_INPUT_LENGTH + 1];
 
-
-  if(IS_SET(world[ch->in_room].room_flags, QUIET)) {
-    send_to_char ("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
+  if (IS_SET(world[ch->in_room].room_flags, QUIET))
+  {
+    send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
     return eFAILURE;
   }
 
-  one_argument (argument, name);
+  one_argument(argument, name);
 
-  if(!*name || !str_cmp(name, GET_NAME(ch))) {
+  if (!*name || !str_cmp(name, GET_NAME(ch)))
+  {
     act("$n offers $mself to $s god, who graciously declines.", ch, 0, 0, TO_ROOM, 0);
-    act( "Your god appreciates your offer and may accept it later.", ch, 0, 0, TO_CHAR, 0);
+    act("Your god appreciates your offer and may accept it later.", ch, 0, 0, TO_CHAR, 0);
     return eSUCCESS;
   }
 
   obj = get_obj_in_list_vis(ch, name, ch->carrying);
 
   /* Ok, lets see if it's a corpse on the ground then */
- if(obj == NULL) {
-   obj = get_obj_in_list_vis(ch, name, world[ch->in_room].contents);
-   if(obj == NULL || GET_ITEM_TYPE(obj) != ITEM_CONTAINER || !isname("corpse", obj->name) || isname("pc", obj->name)) {
-     act("You don't seem to be holding that object.", ch, 0, 0, TO_CHAR, 0);
-     return eFAILURE;
-   }
- }
+  if (obj == NULL)
+  {
+    obj = get_obj_in_list_vis(ch, name, world[ch->in_room].contents);
+    if (obj == NULL || GET_ITEM_TYPE(obj) != ITEM_CONTAINER || !isname("corpse", obj->name) || isname("pc", obj->name))
+    {
+      act("You don't seem to be holding that object.", ch, 0, 0, TO_CHAR, 0);
+      return eFAILURE;
+    }
+  }
 
-  if(IS_SET(obj->obj_flags.extra_flags, ITEM_NODROP)) {
-    if(GET_LEVEL(ch) < IMMORTAL) {
+  if (IS_SET(obj->obj_flags.extra_flags, ITEM_NODROP))
+  {
+    if (GET_LEVEL(ch) < IMMORTAL)
+    {
       send_to_char("You are unable to destroy this item, it must be CURSED!\n\r", ch);
       return eFAILURE;
     }
     else
       send_to_char("(This item is cursed, BTW.)\n\r", ch);
   }
-  
-  if(obj->obj_flags.value[3] == 1 && isname("pc", obj->name)) {
+
+  if (obj->obj_flags.value[3] == 1 && isname("pc", obj->name))
+  {
     send_to_char("You probably don't *really* want to do that.\n\r", ch);
     return eFAILURE;
   }
 
-  if(IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL) && GET_LEVEL(ch) < ANGEL) {
+  if (IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL) && GET_LEVEL(ch) < ANGEL)
+  {
     send_to_char("God, what a stupid fucking thing for you to do.\n\r", ch);
     return eFAILURE;
   }
 
-   
-  if(obj_index[obj->item_number].virt == CHAMPION_ITEM)
+  if (obj_index[obj->item_number].virt == CHAMPION_ITEM)
   {
     send_to_char("In soviet russia, champion flag sacrifice YOU!\r\n", ch);
     return eFAILURE;
   }
 
-  if(IS_AFFECTED(ch, AFF_CANTQUIT) && !IS_MOB(ch) && affected_by_spell(ch, FUCK_PTHIEF)) {
+  if (IS_AFFECTED(ch, AFF_CANTQUIT) && !IS_MOB(ch) && affected_by_spell(ch, FUCK_PTHIEF))
+  {
     send_to_char("Your criminal acts prohibit it.\n\r", ch);
     return eFAILURE;
   }
 
   /* don't let people sac stuff in donations */
-  if (ch->in_room == real_room(3099)) {
-     send_to_char("Not in the donation room.\n\r", ch);
-     return(eFAILURE);
+  if (ch->in_room == real_room(3099))
+  {
+    send_to_char("Not in the donation room.\n\r", ch);
+    return (eFAILURE);
   }
 
   if (IS_SET(obj->obj_flags.more_flags, ITEM_LIMIT_SACRIFICE) && obj->contains)
   {
-    act("You attempt to sacrifice $p to the gods but they refuse your foolish gift. Empty it first.", ch, obj, 0, TO_CHAR , 0);
-    act("$n attempts to foolishly sacrifices $p to $s god.", ch, obj, 0, TO_ROOM , 0);
+    act("You attempt to sacrifice $p to the gods but they refuse your foolish gift. Empty it first.", ch, obj, 0, TO_CHAR, 0);
+    act("$n attempts to foolishly sacrifices $p to $s god.", ch, obj, 0, TO_ROOM, 0);
     return eFAILURE;
   }
 
-  act("$n sacrifices $p to $s god.", ch, obj, 0, TO_ROOM , 0);
-  act("You sacrifice $p to the gods and receive one gold coin.", ch, obj, 0, TO_CHAR , 0);
+  act("$n sacrifices $p to $s god.", ch, obj, 0, TO_ROOM, 0);
+  act("You sacrifice $p to the gods and receive one gold coin.", ch, obj, 0, TO_CHAR, 0);
   GET_GOLD(ch) += 1;
   log_sacrifice(ch, obj);
   extract_obj(obj);
@@ -149,17 +157,18 @@ int do_sacrifice(char_data *ch, char *argument, int cmd)
 
 int do_visible(char_data *ch, char *argument, int cmd)
 {
-  if(affected_by_spell(ch, SPELL_INVISIBLE)) {
+  if (affected_by_spell(ch, SPELL_INVISIBLE))
+  {
     affect_from_char(ch, SPELL_INVISIBLE);
     send_to_char("You drop your invisiblity spell.\r\n", ch);
-    if(!IS_AFFECTED(ch, AFF_INVISIBLE))
+    if (!IS_AFFECTED(ch, AFF_INVISIBLE))
       act("$n slowly fades into existence.", ch, 0, 0, TO_ROOM, 0);
-    else 
+    else
       send_to_char("You must remove the equipment making you invis to become visible.\r\n", ch);
     return eSUCCESS;
   }
 
-  if(IS_AFFECTED(ch, AFF_INVISIBLE)) 
+  if (IS_AFFECTED(ch, AFF_INVISIBLE))
     send_to_char("You must remove the equipment making you invis to become visible.\r\n", ch);
   else
     send_to_char("You aren't invisible.\r\n", ch);
@@ -169,130 +178,149 @@ int do_visible(char_data *ch, char *argument, int cmd)
 
 int do_donate(char_data *ch, char *argument, int cmd)
 {
-    struct obj_data *obj;
-    char name[MAX_INPUT_LENGTH+1];
-    char buf[MAX_STRING_LENGTH];
-    int location;
-    int room= 3099;
-    int origin;
+  struct obj_data *obj;
+  char name[MAX_INPUT_LENGTH + 1];
+  char buf[MAX_STRING_LENGTH];
+  int location;
+  int room = 3099;
+  int origin;
 
-  if(IS_SET(world[ch->in_room].room_flags, QUIET)) {
-    send_to_char ("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
+  if (IS_SET(world[ch->in_room].room_flags, QUIET))
+  {
+    send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
     return eFAILURE;
   }
 
-  if(ch->fighting) {
+  if (ch->fighting)
+  {
     send_to_char("Aren't we a little to busy for that right now?\n\r", ch);
     return eFAILURE;
   }
 
-  one_argument (argument, name);
+  one_argument(argument, name);
 
-  if(!*name) {
+  if (!*name)
+  {
     send_to_char("Donate what?\n\r", ch);
     return eFAILURE;
   }
 
-  obj = get_obj_in_list_vis( ch, name, ch->carrying );
-  if( obj == NULL ) {
-        sprintf(buf, "You don't have any '%s' to donate.", name);
-	act(buf, ch, 0, 0, TO_CHAR, 0);
-	return eFAILURE;
+  obj = get_obj_in_list_vis(ch, name, ch->carrying);
+  if (obj == NULL)
+  {
+    sprintf(buf, "You don't have any '%s' to donate.", name);
+    act(buf, ch, 0, 0, TO_CHAR, 0);
+    return eFAILURE;
   }
-  
-  if(IS_AFFECTED(ch, AFF_CANTQUIT) && !IS_MOB(ch) && affected_by_spell(ch, FUCK_PTHIEF)) {
+
+  if (IS_AFFECTED(ch, AFF_CANTQUIT) && !IS_MOB(ch) && affected_by_spell(ch, FUCK_PTHIEF))
+  {
     send_to_char("Your criminal acts prohibit it.\n\r", ch);
     return eFAILURE;
   }
 
   // Handle yielding the champion flag
-  if (GET_OBJ_VNUM(obj) == 45) {
-    if (IS_SET(world[ch->in_room].room_flags, SAFE)) {
-      if(IS_AFFECTED(ch, AFF_CHAMPION)) {
-	REMBIT(ch->affected_by, AFF_CHAMPION);
+  if (GET_OBJ_VNUM(obj) == 45)
+  {
+    if (IS_SET(world[ch->in_room].room_flags, SAFE))
+    {
+      if (IS_AFFECTED(ch, AFF_CHAMPION))
+      {
+        REMBIT(ch->affected_by, AFF_CHAMPION);
 
-	sprintf(buf, "\n\r##%s has just yielded the Champion flag!\n\r",
-		GET_NAME(ch));
-	send_info(buf);
+        sprintf(buf, "\n\r##%s has just yielded the Champion flag!\n\r",
+                GET_NAME(ch));
+        send_info(buf);
 
         struct affected_type af;
-        af.type      = OBJ_CHAMPFLAG_TIMER;
-        af.duration  = 5;
-        af.modifier  = 0;
-        af.location  = APPLY_NONE;
+        af.type = OBJ_CHAMPFLAG_TIMER;
+        af.duration = 5;
+        af.modifier = 0;
+        af.location = APPLY_NONE;
         af.bitvector = -1;
         affect_to_char(ch, &af);
 
-	act("$n yields $p.", ch, obj, 0, TO_ROOM, 0);
-	act("You yield $p.", ch, obj, 0, TO_CHAR, 0);
- 
-	location = real_room(CFLAG_HOME);
-	origin = ch->in_room;
-	move_char(ch, location);
+        act("$n yields $p.", ch, obj, 0, TO_ROOM, 0);
+        act("You yield $p.", ch, obj, 0, TO_CHAR, 0);
 
-	act("$p falls from the heavens...", ch, obj, 0, TO_ROOM, INVIS_NULL);
-      
-	move_char(ch, origin);
-	move_obj(obj, location);
-      
-	do_save(ch, "", 0);
-	return eSUCCESS;
-      } else {
-	sprintf(buf, "%s had the champion flag, but no AFF_CHAMPION.",
-		GET_NAME(ch));
-	log(buf, IMMORTAL, LOG_BUG);
-	return eFAILURE;
+        location = real_room(CFLAG_HOME);
+        origin = ch->in_room;
+        move_char(ch, location);
+
+        act("$p falls from the heavens...", ch, obj, 0, TO_ROOM, INVIS_NULL);
+
+        move_char(ch, origin);
+        move_obj(obj, location);
+
+        do_save(ch, "", 0);
+        return eSUCCESS;
       }
-    } else {
+      else
+      {
+        sprintf(buf, "%s had the champion flag, but no AFF_CHAMPION.",
+                GET_NAME(ch));
+        log(buf, IMMORTAL, LogChannels::LOG_BUG);
+        return eFAILURE;
+      }
+    }
+    else
+    {
       send_to_char("You can only yield the Champion flag from a safe room.\n\r", ch);
       return eFAILURE;
     }
   }
 
-  if(IS_SET(obj->obj_flags.extra_flags, ITEM_NODROP)) {
+  if (IS_SET(obj->obj_flags.extra_flags, ITEM_NODROP))
+  {
     send_to_char("Since you can't let go of it, how are you going to donate it?\n\r", ch);
     return eFAILURE;
   }
 
-  if(IS_SET(obj->obj_flags.more_flags, ITEM_NO_TRADE)) { 
-    if(GET_LEVEL(ch) > IMMORTAL) {
+  if (IS_SET(obj->obj_flags.more_flags, ITEM_NO_TRADE))
+  {
+    if (GET_LEVEL(ch) > IMMORTAL)
+    {
       send_to_char("That was a NO_TRADE item btw....\r\n", ch);
-    } else {
+    }
+    else
+    {
       send_to_char("It seems magically attached to you.\r\n", ch);
       return eFAILURE;
     }
   }
 
-  if(contains_no_trade_item(obj)) {
-    if(GET_LEVEL(ch) > IMMORTAL) {
+  if (contains_no_trade_item(obj))
+  {
+    if (GET_LEVEL(ch) > IMMORTAL)
+    {
       send_to_char("That was a NO_TRADE item btw....\r\n", ch);
-    } else {
-      send_to_char("Something inside it seems magically attached to you.\r\n"
-		   , ch);
+    }
+    else
+    {
+      send_to_char("Something inside it seems magically attached to you.\r\n", ch);
       return eFAILURE;
     }
-  } 
+  }
 
-  if(IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL)) {
+  if (IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL))
+  {
     send_to_char("You can't donate godload equipment.\r\n", ch);
     return eFAILURE;
   }
-  
+
   act("$n donates $p.", ch, obj, 0, TO_ROOM, 0);
   act("You donate $p.", ch, obj, 0, TO_CHAR, 0);
- 
+
   if (obj->obj_flags.type_flag != ITEM_MONEY)
   {
-     char log_buf[MAX_STRING_LENGTH] = {};
-     sprintf(log_buf, "%s donates %s[%d]", GET_NAME(ch), obj->name, obj_index[obj->item_number].virt);
-     log(log_buf, IMP, LOG_OBJECTS);
-     for(obj_data *loop_obj = obj->contains; loop_obj; loop_obj = loop_obj->next_content)
-       logf(IMP, LOG_OBJECTS, "The %s contained %s[%d]", obj->short_description,
-                          loop_obj->short_description,
-                          obj_index[loop_obj->item_number].virt);
+    char log_buf[MAX_STRING_LENGTH] = {};
+    sprintf(log_buf, "%s donates %s[%d]", GET_NAME(ch), obj->name, obj_index[obj->item_number].virt);
+    log(log_buf, IMP, LogChannels::LOG_OBJECTS);
+    for (obj_data *loop_obj = obj->contains; loop_obj; loop_obj = loop_obj->next_content)
+      logf(IMP, LogChannels::LOG_OBJECTS, "The %s contained %s[%d]", obj->short_description,
+           loop_obj->short_description,
+           obj_index[loop_obj->item_number].virt);
   }
-
-
 
   location = real_room(room);
   origin = ch->in_room;
@@ -300,11 +328,11 @@ int do_donate(char_data *ch, char *argument, int cmd)
 
   act("$n has made a donation...", ch, obj, 0, TO_ROOM, 0);
   act("$p falls through a glowing white portal in the top of the ceiling.",
-         ch, obj, 0, TO_ROOM, INVIS_NULL);
-      
+      ch, obj, 0, TO_ROOM, INVIS_NULL);
+
   move_char(ch, origin, false);
   move_obj(obj, location);
-     
+
   do_save(ch, "", 0);
   return eSUCCESS;
 }
@@ -314,68 +342,73 @@ int do_title(char_data *ch, char *argument, int cmd)
   char buf[100];
   int ctr;
 
-  if (!*argument){
+  if (!*argument)
+  {
     send_to_char("Change your title to what?\n\r", ch);
     return eFAILURE;
   }
 
-  if(!IS_MOB(ch) && IS_SET(ch->pcdata->punish, PUNISH_NOTITLE)) {
+  if (!IS_MOB(ch) && IS_SET(ch->pcdata->punish, PUNISH_NOTITLE))
+  {
     send_to_char("You can't do that.  You must have been naughty.\n\r", ch);
     return eFAILURE;
   }
-    
-  for (; isspace(*argument); argument++);
 
-  if (strlen(argument)>40){
+  for (; isspace(*argument); argument++)
+    ;
+
+  if (strlen(argument) > 40)
+  {
     send_to_char("Title field too big.  40 characters max.\n\r", ch);
     return eFAILURE;
   }
- 
-  if(strchr(argument, '[') || strchr(argument, ']')) {
+
+  if (strchr(argument, '[') || strchr(argument, ']'))
+  {
     send_to_char("You cannot have a '[' or a ']' in your title.\n\r", ch);
     return eFAILURE;
   }
-  
+
   // TODO - decide if we still need this anymore since I think the $color code
   // keeps mortals from using $'s anyway  No idea why we don't let them use ?'s offhand
-  for(ctr = 0; (unsigned) ctr <= strlen(argument); ctr++) {
-    if(((argument[ctr] == '$') && (argument[ctr + 1] == '$')) || ((argument[ctr] == '?') && (argument[ctr + 1] == '?'))) {
+  for (ctr = 0; (unsigned)ctr <= strlen(argument); ctr++)
+  {
+    if (((argument[ctr] == '$') && (argument[ctr + 1] == '$')) || ((argument[ctr] == '?') && (argument[ctr + 1] == '?')))
+    {
       send_to_char("Your title is now: Common Dork of Dark Castle.\n\r", ch);
       return eFAILURE;
     }
   }
 
-  if(ch->title) // this should always be true, but why not check anyway?
-    dc_free(ch->title); 
+  if (ch->title) // this should always be true, but why not check anyway?
+    dc_free(ch->title);
   ch->title = str_dup(argument);
-  sprintf(buf,"Your title is now: %s\n\r", argument);
-  send_to_char(buf,ch);
+  sprintf(buf, "Your title is now: %s\n\r", argument);
+  send_to_char(buf, ch);
   return eSUCCESS;
 }
 
-
-char * toggle_txt[] = {
-  "brief",
-  "compact",
-  "beep",
-  "anonymous",
-  "ansi",
-  "vt100",
-  "wimpy",
-  "pager",
-  "bard-songs",
-  "auto-eat",
-  "summonable",
-  "lfg",
-  "charmiejoin",
-  "notax",
-  "guide",
-  "news-up",
-  "ascii",
-  "damage",
-  "nodupekeys",
-  ""
-};
+char *toggle_txt[] = {
+    "brief",
+    "compact",
+    "beep",
+    "anonymous",
+    "ansi",
+    "vt100",
+    "wimpy",
+    "pager",
+    "bard-songs",
+    "auto-eat",
+    "summonable",
+    "lfg",
+    "charmiejoin",
+    "notax",
+    "guide",
+    "news-up",
+    "ascii",
+    "damage",
+    "nodupekeys",
+    ""};
 
 int do_toggle(char_data *ch, char *arg, int cmd)
 {
@@ -442,8 +475,8 @@ int do_toggle(char_data *ch, char *arg, int cmd)
         break;
 
       case 8:
-          sprintf(buf + strlen(buf), "%s\n\r",
-                  IS_SET(ch->pcdata->toggles, PLR_BARD_SONG) ? "$B$2on$R (brief)" : "$B$4off$R (verbose)");
+        sprintf(buf + strlen(buf), "%s\n\r",
+                IS_SET(ch->pcdata->toggles, PLR_BARD_SONG) ? "$B$2on$R (brief)" : "$B$4off$R (verbose)");
         break;
 
       case 9:
@@ -607,7 +640,7 @@ int do_config(char_data *ch, char *argument, int cmd)
 
   if (ch->pcdata->options == nullptr)
   {
-    ch->pcdata->options = new map<string,string>();
+    ch->pcdata->options = new map<string, string>();
   }
 
   if (ch->pcdata->options->empty())
@@ -616,26 +649,26 @@ int do_config(char_data *ch, char *argument, int cmd)
     (*ch->pcdata->options)["color.bad"] = string("red");
   }
 
-  map<string,string> colors;
-  //colors["black"]="$0";
-  colors["blue"]="$1";
-  colors["green"]="$2";
-  colors["cyan"]="$3";
-  colors["red"]="$4";
-  colors["yellow"]="$5";
-  colors["magenta"]="$6";
-  colors["white"]="$7";
-  colors["gray"]="$B$0";
-  colors["bright blue"]="$B$1";
-  colors["bright green"]="$B$2";
-  colors["bright cyan"]="$B$3";
-  colors["bright red"]="$B$4";
-  colors["bright yellow"]="$B$5";
-  colors["bright magenta"]="$B$6";
-  colors["bright white"]="$B$7";
+  map<string, string> colors;
+  // colors["black"]="$0";
+  colors["blue"] = "$1";
+  colors["green"] = "$2";
+  colors["cyan"] = "$3";
+  colors["red"] = "$4";
+  colors["yellow"] = "$5";
+  colors["magenta"] = "$6";
+  colors["white"] = "$7";
+  colors["gray"] = "$B$0";
+  colors["bright blue"] = "$B$1";
+  colors["bright green"] = "$B$2";
+  colors["bright cyan"] = "$B$3";
+  colors["bright red"] = "$B$4";
+  colors["bright yellow"] = "$B$5";
+  colors["bright magenta"] = "$B$6";
+  colors["bright white"] = "$B$7";
 
   string key, value, orig_arguments = string(argument);
-  tie (key, value) = half_chop(argument, '=');
+  tie(key, value) = half_chop(argument, '=');
   size_t equal_position = orig_arguments.find('=');
 
   if (key.empty() == false && key != "color.good" && key != "color.bad" && key != "tell.history.timestamp")
@@ -657,14 +690,14 @@ int do_config(char_data *ch, char *argument, int cmd)
     csendf(ch, "config color.bad=            - Unset color.bad. Will use default \"bad\" color.\r\n\r\n");
     csendf(ch, "Current config:\r\n");
 
-    bool found=false;
+    bool found = false;
     for (auto &option : *ch->pcdata->options)
-    {      
+    {
       if ((key.empty() == false && key == option.first) || key.empty() == true)
       {
-        found=true;
+        found = true;
         csendf(ch, "%s=%s\r\n", option.first.c_str(), option.second.c_str());
-      }     
+      }
     }
 
     if (found == false)
@@ -689,7 +722,7 @@ int do_config(char_data *ch, char *argument, int cmd)
     if (ch->pcdata->options->find(key) != ch->pcdata->options->end())
     {
       csendf(ch, "%s unset.\r\n", key.c_str());
-      (*ch->pcdata->options)[key]=string();
+      (*ch->pcdata->options)[key] = string();
       return eSUCCESS;
     }
     return eFAILURE;
@@ -710,7 +743,7 @@ int do_config(char_data *ch, char *argument, int cmd)
         {
           csendf(ch, "Invalid color specified. Valid colors:\r\n");
         }
-        
+
         for (auto &color : colors)
         {
           if (color.first == "black")
@@ -721,7 +754,6 @@ int do_config(char_data *ch, char *argument, int cmd)
           {
             csendf(ch, "%-15s - %sExample$R\r\n", color.first.c_str(), color.second.c_str());
           }
-          
         }
 
         return eFAILURE;
@@ -735,7 +767,7 @@ int do_config(char_data *ch, char *argument, int cmd)
     {
       csendf(ch, "Invalid config option.\r\n");
       return eFAILURE;
-    }   
+    }
   }
 
   // debug. This point should not be reached.
@@ -746,267 +778,266 @@ int do_config(char_data *ch, char *argument, int cmd)
   return eFAILURE;
 }
 
-
 int do_brief(char_data *ch, char *argument, int cmd)
 {
-    if (IS_NPC(ch))
-	return eFAILURE;
+  if (IS_NPC(ch))
+    return eFAILURE;
 
-    if (IS_SET(ch->pcdata->toggles, PLR_BRIEF))
-    {
-	send_to_char("Brief mode $B$4off$R.\n\r", ch);
-	REMOVE_BIT(ch->pcdata->toggles, PLR_BRIEF);
-    }
-    else
-    {
-	send_to_char("Brief mode $B$2on$R.\n\r", ch);
-	SET_BIT(ch->pcdata->toggles, PLR_BRIEF);
-    }
-    return eSUCCESS;
+  if (IS_SET(ch->pcdata->toggles, PLR_BRIEF))
+  {
+    send_to_char("Brief mode $B$4off$R.\n\r", ch);
+    REMOVE_BIT(ch->pcdata->toggles, PLR_BRIEF);
+  }
+  else
+  {
+    send_to_char("Brief mode $B$2on$R.\n\r", ch);
+    SET_BIT(ch->pcdata->toggles, PLR_BRIEF);
+  }
+  return eSUCCESS;
 }
 
 int do_ansi(char_data *ch, char *argument, int cmd)
 {
-    if (IS_NPC(ch))
-	return eFAILURE;
+  if (IS_NPC(ch))
+    return eFAILURE;
 
-    if (IS_SET(ch->pcdata->toggles, PLR_ANSI))
-    {
-       send_to_char("ANSI COLOR $B$4off$R.\n\r", ch);
-       REMOVE_BIT(ch->pcdata->toggles, PLR_ANSI);
-    }
-    else
-    {
-       send_to_char("ANSI COLOR $B$2on$R.\n\r", ch);
-       SET_BIT(ch->pcdata->toggles, PLR_ANSI);
-    }
-    return eSUCCESS;
+  if (IS_SET(ch->pcdata->toggles, PLR_ANSI))
+  {
+    send_to_char("ANSI COLOR $B$4off$R.\n\r", ch);
+    REMOVE_BIT(ch->pcdata->toggles, PLR_ANSI);
+  }
+  else
+  {
+    send_to_char("ANSI COLOR $B$2on$R.\n\r", ch);
+    SET_BIT(ch->pcdata->toggles, PLR_ANSI);
+  }
+  return eSUCCESS;
 }
 
 int do_vt100(char_data *ch, char *argument, int cmd)
 {
-    if (IS_NPC(ch))
-	return eFAILURE;
+  if (IS_NPC(ch))
+    return eFAILURE;
 
-    if (IS_SET(ch->pcdata->toggles, PLR_VT100))
-    {
-       send_to_char("VT100 $B$4off$R.\n\r", ch);
-       REMOVE_BIT(ch->pcdata->toggles, PLR_VT100);
-    }
-    else
-    {
-       send_to_char("VT100 $B$2on$R.\n\r", ch);
-       SET_BIT(ch->pcdata->toggles, PLR_VT100);
-    }
-    return eSUCCESS;
+  if (IS_SET(ch->pcdata->toggles, PLR_VT100))
+  {
+    send_to_char("VT100 $B$4off$R.\n\r", ch);
+    REMOVE_BIT(ch->pcdata->toggles, PLR_VT100);
+  }
+  else
+  {
+    send_to_char("VT100 $B$2on$R.\n\r", ch);
+    SET_BIT(ch->pcdata->toggles, PLR_VT100);
+  }
+  return eSUCCESS;
 }
-
 
 int do_compact(char_data *ch, char *argument, int cmd)
 {
-    if (IS_NPC(ch))
-	return eFAILURE;
+  if (IS_NPC(ch))
+    return eFAILURE;
 
-    if (IS_SET(ch->pcdata->toggles, PLR_COMPACT))
-    {
-	send_to_char( "Compact mode $B$4off$R.\n\r", ch);
-	REMOVE_BIT(ch->pcdata->toggles, PLR_COMPACT);
-    }
-    else
-    {
-	send_to_char( "Compact mode $B$2on$R.\n\r", ch);
-	SET_BIT(ch->pcdata->toggles, PLR_COMPACT);
-    }
-    return eSUCCESS;
+  if (IS_SET(ch->pcdata->toggles, PLR_COMPACT))
+  {
+    send_to_char("Compact mode $B$4off$R.\n\r", ch);
+    REMOVE_BIT(ch->pcdata->toggles, PLR_COMPACT);
+  }
+  else
+  {
+    send_to_char("Compact mode $B$2on$R.\n\r", ch);
+    SET_BIT(ch->pcdata->toggles, PLR_COMPACT);
+  }
+  return eSUCCESS;
 }
 
 int do_summon_toggle(char_data *ch, char *argument, int cmd)
 {
-    if (IS_NPC(ch))
-	return eFAILURE;
+  if (IS_NPC(ch))
+    return eFAILURE;
 
-    if (IS_SET(ch->pcdata->toggles, PLR_SUMMONABLE))
-    {
-	send_to_char( "You may no longer be summoned by other players.\n\r", ch);
-	REMOVE_BIT(ch->pcdata->toggles, PLR_SUMMONABLE);
-    }
-    else
-    {
-	send_to_char( "You may now be summoned by other players.\n\r"
-                      "Make _sure_ you want this...they could summon you to your death!\r\n", ch);
-	SET_BIT(ch->pcdata->toggles, PLR_SUMMONABLE);
-    }
-    return eSUCCESS;
+  if (IS_SET(ch->pcdata->toggles, PLR_SUMMONABLE))
+  {
+    send_to_char("You may no longer be summoned by other players.\n\r", ch);
+    REMOVE_BIT(ch->pcdata->toggles, PLR_SUMMONABLE);
+  }
+  else
+  {
+    send_to_char("You may now be summoned by other players.\n\r"
+                 "Make _sure_ you want this...they could summon you to your death!\r\n",
+                 ch);
+    SET_BIT(ch->pcdata->toggles, PLR_SUMMONABLE);
+  }
+  return eSUCCESS;
 }
 
 int do_lfg_toggle(char_data *ch, char *argument, int cmd)
 {
-    if (IS_NPC(ch))
-	return eFAILURE;
+  if (IS_NPC(ch))
+    return eFAILURE;
 
-    if (IS_SET(ch->pcdata->toggles, PLR_LFG))
-    {
-	send_to_char( "You are no longer Looking For Group.\n\r", ch);
-	REMOVE_BIT(ch->pcdata->toggles, PLR_LFG);
-    }
-    else
-    {
-	send_to_char( "You are now Looking For Group.\n\r", ch);
-	SET_BIT(ch->pcdata->toggles, PLR_LFG);
-    }
-    return eSUCCESS;
+  if (IS_SET(ch->pcdata->toggles, PLR_LFG))
+  {
+    send_to_char("You are no longer Looking For Group.\n\r", ch);
+    REMOVE_BIT(ch->pcdata->toggles, PLR_LFG);
+  }
+  else
+  {
+    send_to_char("You are now Looking For Group.\n\r", ch);
+    SET_BIT(ch->pcdata->toggles, PLR_LFG);
+  }
+  return eSUCCESS;
 }
 
 int do_guide_toggle(char_data *ch, char *argument, int cmd)
 {
-    if (IS_NPC(ch))
-        return eFAILURE; 
-    
-    if (!IS_SET(ch->pcdata->toggles, PLR_GUIDE)) {
-      send_to_char("You must be assigned as a $BGuide$R by the gods before you can toggle it.\r\n", ch);
-      return eFAILURE; 
-    }
+  if (IS_NPC(ch))
+    return eFAILURE;
 
-    if (IS_SET(ch->pcdata->toggles, PLR_GUIDE_TOG))
-    {
-        send_to_char("You have hidden your $B(Guide)$R tag.\n\r", ch);
-        REMOVE_BIT(ch->pcdata->toggles, PLR_GUIDE_TOG);
-    }
-    else 
-    {
-        send_to_char("You will now show your $B(Guide)$R tag.\n\r", ch);
-        SET_BIT(ch->pcdata->toggles, PLR_GUIDE_TOG);
-    }
-    
-    return eSUCCESS;
-} 
+  if (!IS_SET(ch->pcdata->toggles, PLR_GUIDE))
+  {
+    send_to_char("You must be assigned as a $BGuide$R by the gods before you can toggle it.\r\n", ch);
+    return eFAILURE;
+  }
+
+  if (IS_SET(ch->pcdata->toggles, PLR_GUIDE_TOG))
+  {
+    send_to_char("You have hidden your $B(Guide)$R tag.\n\r", ch);
+    REMOVE_BIT(ch->pcdata->toggles, PLR_GUIDE_TOG);
+  }
+  else
+  {
+    send_to_char("You will now show your $B(Guide)$R tag.\n\r", ch);
+    SET_BIT(ch->pcdata->toggles, PLR_GUIDE_TOG);
+  }
+
+  return eSUCCESS;
+}
 int do_news_toggle(char_data *ch, char *argument, int cmd)
 {
-    if (IS_NPC(ch))
-        return eFAILURE; 
-    
-    if (IS_SET(ch->pcdata->toggles, PLR_NEWS))
-    {
-        send_to_char("You now view news in an up-down fashion.\n\r", ch);
-        REMOVE_BIT(ch->pcdata->toggles, PLR_NEWS);
-    }
-    else 
-    {
-        send_to_char("You now view news in a down-up fashion..\n\r", ch);
-        SET_BIT(ch->pcdata->toggles, PLR_NEWS);
-    }
-    
-    return eSUCCESS;
-} 
+  if (IS_NPC(ch))
+    return eFAILURE;
+
+  if (IS_SET(ch->pcdata->toggles, PLR_NEWS))
+  {
+    send_to_char("You now view news in an up-down fashion.\n\r", ch);
+    REMOVE_BIT(ch->pcdata->toggles, PLR_NEWS);
+  }
+  else
+  {
+    send_to_char("You now view news in a down-up fashion..\n\r", ch);
+    SET_BIT(ch->pcdata->toggles, PLR_NEWS);
+  }
+
+  return eSUCCESS;
+}
 
 int do_ascii_toggle(char_data *ch, char *argument, int cmd)
 {
-    if (IS_NPC(ch))
-        return eFAILURE; 
-    
-    if (IS_SET(ch->pcdata->toggles, PLR_ASCII))
-    {
-        REMOVE_BIT(ch->pcdata->toggles, PLR_ASCII);
-        send_to_char("Cards are now displayed through ASCII.\n\r", ch);
-    }
-    else 
-    {
-        send_to_char("Cards are no longer dislayed through ASCII.\n\r", ch);
-        SET_BIT(ch->pcdata->toggles, PLR_ASCII);
-    }
-    
-    return eSUCCESS;
-} 
+  if (IS_NPC(ch))
+    return eFAILURE;
+
+  if (IS_SET(ch->pcdata->toggles, PLR_ASCII))
+  {
+    REMOVE_BIT(ch->pcdata->toggles, PLR_ASCII);
+    send_to_char("Cards are now displayed through ASCII.\n\r", ch);
+  }
+  else
+  {
+    send_to_char("Cards are no longer dislayed through ASCII.\n\r", ch);
+    SET_BIT(ch->pcdata->toggles, PLR_ASCII);
+  }
+
+  return eSUCCESS;
+}
 
 int do_damage_toggle(char_data *ch, char *argument, int cmd)
 {
-    if (IS_NPC(ch))
-        return eFAILURE; 
-    
-    if (IS_SET(ch->pcdata->toggles, PLR_DAMAGE))
-    {
-        REMOVE_BIT(ch->pcdata->toggles, PLR_DAMAGE);
-        send_to_char("Damage numbers will no longer be displayed in combat.\n\r", ch);
-    }
-    else 
-    {
-        send_to_char("Damage numbers will now be displayed in combat.\n\r", ch);
-        SET_BIT(ch->pcdata->toggles, PLR_DAMAGE);
-    }
-    
-    return eSUCCESS;
-} 
+  if (IS_NPC(ch))
+    return eFAILURE;
 
+  if (IS_SET(ch->pcdata->toggles, PLR_DAMAGE))
+  {
+    REMOVE_BIT(ch->pcdata->toggles, PLR_DAMAGE);
+    send_to_char("Damage numbers will no longer be displayed in combat.\n\r", ch);
+  }
+  else
+  {
+    send_to_char("Damage numbers will now be displayed in combat.\n\r", ch);
+    SET_BIT(ch->pcdata->toggles, PLR_DAMAGE);
+  }
+
+  return eSUCCESS;
+}
 
 int do_notax_toggle(char_data *ch, char *argument, int cmd)
 {
-    if (IS_NPC(ch))
-        return eFAILURE;
+  if (IS_NPC(ch))
+    return eFAILURE;
 
-    if (IS_SET(ch->pcdata->toggles, PLR_NOTAX))
-    {
-        send_to_char( "You will now be taxed on all your loot.\n\r", ch);
-        REMOVE_BIT(ch->pcdata->toggles, PLR_NOTAX);
-    }
-    else
-    {
-        send_to_char( "You will no longer be taxed.\n\r", ch);
-        SET_BIT(ch->pcdata->toggles, PLR_NOTAX);
-    }
+  if (IS_SET(ch->pcdata->toggles, PLR_NOTAX))
+  {
+    send_to_char("You will now be taxed on all your loot.\n\r", ch);
+    REMOVE_BIT(ch->pcdata->toggles, PLR_NOTAX);
+  }
+  else
+  {
+    send_to_char("You will no longer be taxed.\n\r", ch);
+    SET_BIT(ch->pcdata->toggles, PLR_NOTAX);
+  }
 
-    return eSUCCESS;
+  return eSUCCESS;
 }
 
 int do_charmiejoin_toggle(char_data *ch, char *argument, int cmd)
 {
-    if (IS_NPC(ch))
-	return eFAILURE;
+  if (IS_NPC(ch))
+    return eFAILURE;
 
-    if (IS_SET(ch->pcdata->toggles, PLR_CHARMIEJOIN))
-    {
-	send_to_char( "Your followers will no longer automatically join you.\n\r", ch);
-	REMOVE_BIT(ch->pcdata->toggles, PLR_CHARMIEJOIN);
-    }
-    else
-    {
-	send_to_char( "Your followers will automatically aid you in battle.\n\r", ch);
-	SET_BIT(ch->pcdata->toggles, PLR_CHARMIEJOIN);
-    }
+  if (IS_SET(ch->pcdata->toggles, PLR_CHARMIEJOIN))
+  {
+    send_to_char("Your followers will no longer automatically join you.\n\r", ch);
+    REMOVE_BIT(ch->pcdata->toggles, PLR_CHARMIEJOIN);
+  }
+  else
+  {
+    send_to_char("Your followers will automatically aid you in battle.\n\r", ch);
+    SET_BIT(ch->pcdata->toggles, PLR_CHARMIEJOIN);
+  }
 
-    return eSUCCESS;
+  return eSUCCESS;
 }
 
 int do_autoeat(char_data *ch, char *argument, int cmd)
 {
-    if (IS_NPC(ch))
-	return eFAILURE;
+  if (IS_NPC(ch))
+    return eFAILURE;
 
-    if (IS_SET(ch->pcdata->toggles, PLR_AUTOEAT))
-    {
-	send_to_char( "You no longer automatically eat and drink.\n\r", ch);
-	REMOVE_BIT(ch->pcdata->toggles, PLR_AUTOEAT);
-    }
-    else
-    {
-	send_to_char( "You now automatically eat and drink when hungry and thirsty.\n\r", ch);
-	SET_BIT(ch->pcdata->toggles, PLR_AUTOEAT);
-    }
-    return eSUCCESS;
+  if (IS_SET(ch->pcdata->toggles, PLR_AUTOEAT))
+  {
+    send_to_char("You no longer automatically eat and drink.\n\r", ch);
+    REMOVE_BIT(ch->pcdata->toggles, PLR_AUTOEAT);
+  }
+  else
+  {
+    send_to_char("You now automatically eat and drink when hungry and thirsty.\n\r", ch);
+    SET_BIT(ch->pcdata->toggles, PLR_AUTOEAT);
+  }
+  return eSUCCESS;
 }
 
 int do_anonymous(char_data *ch, char *argument, int cmd)
 {
-  if(ch == 0)
+  if (ch == 0)
   {
-    log("Null char in do_anonymous.", OVERSEER, LOG_BUG);
+    log("Null char in do_anonymous.", OVERSEER, LogChannels::LOG_BUG);
     return eFAILURE;
   }
-  if(GET_LEVEL(ch) < 40)
+  if (GET_LEVEL(ch) < 40)
   {
     send_to_char("You are too inexperienced to disguise your profession.\n\r", ch);
     return eSUCCESS;
   }
-  if(IS_SET(ch->pcdata->toggles, PLR_ANONYMOUS))
+  if (IS_SET(ch->pcdata->toggles, PLR_ANONYMOUS))
   {
     send_to_char("Your class and level information is now public.\n\r", ch);
   }
@@ -1021,7 +1052,8 @@ int do_anonymous(char_data *ch, char *argument, int cmd)
 
 int do_wimpy(char_data *ch, char *argument, int cmd)
 {
-  if(IS_SET(ch->pcdata->toggles, PLR_WIMPY)) { 
+  if (IS_SET(ch->pcdata->toggles, PLR_WIMPY))
+  {
     send_to_char("You are no longer a wimp....maybe.\n\r", ch);
     REMOVE_BIT(ch->pcdata->toggles, PLR_WIMPY);
     return eFAILURE;
@@ -1036,7 +1068,8 @@ int do_wimpy(char_data *ch, char *argument, int cmd)
 // If it's not set, we do.
 int do_pager(char_data *ch, char *argument, int cmd)
 {
-  if(IS_SET(ch->pcdata->toggles, PLR_PAGER)) { 
+  if (IS_SET(ch->pcdata->toggles, PLR_PAGER))
+  {
     send_to_char("You now page your strings in 24 line chunks.\n\r", ch);
     REMOVE_BIT(ch->pcdata->toggles, PLR_PAGER);
     return eFAILURE;
@@ -1049,7 +1082,8 @@ int do_pager(char_data *ch, char *argument, int cmd)
 
 int do_bard_song_toggle(char_data *ch, char *argument, int cmd)
 {
-  if(IS_SET(ch->pcdata->toggles, PLR_BARD_SONG)) { 
+  if (IS_SET(ch->pcdata->toggles, PLR_BARD_SONG))
+  {
     send_to_char("Bard singing now in verbose mode.\n\r", ch);
     REMOVE_BIT(ch->pcdata->toggles, PLR_BARD_SONG);
     return eFAILURE;
@@ -1080,297 +1114,370 @@ int do_beep_set(char_data *ch, char *arg, int cmd)
     return eFAILURE;
 
   if (IS_SET(ch->pcdata->toggles, PLR_BEEP))
-    {
-      REMOVE_BIT(ch->pcdata->toggles, PLR_BEEP);
-      send_to_char ("\nTell is now silent.\n", ch);
-      return eFAILURE;
-    }
+  {
+    REMOVE_BIT(ch->pcdata->toggles, PLR_BEEP);
+    send_to_char("\nTell is now silent.\n", ch);
+    return eFAILURE;
+  }
 
   SET_BIT(ch->pcdata->toggles, PLR_BEEP);
-  send_to_char ("\nTell now beeps.\a\n", ch);
+  send_to_char("\nTell now beeps.\a\n", ch);
   return eSUCCESS;
 }
 
 int do_stand(char_data *ch, char *argument, int cmd)
 {
-    switch(GET_POS(ch)) {
-        case POSITION_STANDING : {
-            act("You are already standing.",ch,0,0,TO_CHAR, 0);
-        } break;
-        case POSITION_SITTING   : {
-            act("You stand up.",  ch,0,0,TO_CHAR, 0);
-            act("$n clambers on $s feet.",ch, 0, 0, TO_ROOM, INVIS_NULL);
-            if(ch->fighting)
-              ch->setPOSFighting();
-            else GET_POS(ch) = POSITION_STANDING;
-        } break;
-        case POSITION_RESTING   : {
-            act("You stop resting, and stand up.", ch,0,0,TO_CHAR, 0);
-            act("$n stops resting, and clambers on $s feet.",
-                ch, 0, 0, TO_ROOM, INVIS_NULL);
-            GET_POS(ch) = POSITION_STANDING;
-        } break;
-        case POSITION_SLEEPING : {
-            act("You have to wake up first!", ch, 0,0,TO_CHAR, 0);
-        } break;
-        case POSITION_FIGHTING : {
-            act("Do you not consider fighting as standing?",
-                ch, 0, 0, TO_CHAR, 0);
-        } break;
-        default : {
-            act("You stop floating around, and put your feet on the ground.", ch, 0, 0, TO_CHAR, 0);
-            act("$n stops floating around, and puts $s feet on the ground.", ch, 0, 0, TO_ROOM, INVIS_NULL);
-            GET_POS(ch) = POSITION_STANDING;
-        } break;
-    }
-    return eSUCCESS;
+  switch (GET_POS(ch))
+  {
+  case POSITION_STANDING:
+  {
+    act("You are already standing.", ch, 0, 0, TO_CHAR, 0);
+  }
+  break;
+  case POSITION_SITTING:
+  {
+    act("You stand up.", ch, 0, 0, TO_CHAR, 0);
+    act("$n clambers on $s feet.", ch, 0, 0, TO_ROOM, INVIS_NULL);
+    if (ch->fighting)
+      ch->setPOSFighting();
+    else
+      GET_POS(ch) = POSITION_STANDING;
+  }
+  break;
+  case POSITION_RESTING:
+  {
+    act("You stop resting, and stand up.", ch, 0, 0, TO_CHAR, 0);
+    act("$n stops resting, and clambers on $s feet.",
+        ch, 0, 0, TO_ROOM, INVIS_NULL);
+    GET_POS(ch) = POSITION_STANDING;
+  }
+  break;
+  case POSITION_SLEEPING:
+  {
+    act("You have to wake up first!", ch, 0, 0, TO_CHAR, 0);
+  }
+  break;
+  case POSITION_FIGHTING:
+  {
+    act("Do you not consider fighting as standing?",
+        ch, 0, 0, TO_CHAR, 0);
+  }
+  break;
+  default:
+  {
+    act("You stop floating around, and put your feet on the ground.", ch, 0, 0, TO_CHAR, 0);
+    act("$n stops floating around, and puts $s feet on the ground.", ch, 0, 0, TO_ROOM, INVIS_NULL);
+    GET_POS(ch) = POSITION_STANDING;
+  }
+  break;
+  }
+  return eSUCCESS;
 }
- 
- 
+
 int do_sit(char_data *ch, char *argument, int cmd)
 {
- 
-    if (IS_SET(world[ch->in_room].room_flags, QUIET)) {
-      send_to_char ("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
-      return eFAILURE;
-    }
-       
-   switch(GET_POS(ch)) {
-        case POSITION_STANDING : {
-            act("You sit down.", ch, 0,0, TO_CHAR, 0);
-            act("$n sits down.", ch, 0,0, TO_ROOM, INVIS_NULL);
-            GET_POS(ch) = POSITION_SITTING;
-        } break;
-        case POSITION_SITTING   : {
-            send_to_char("You're sitting already.\n\r", ch);
-        } break;
-        case POSITION_RESTING   : {
-            act("You stop resting, and sit up.", ch,0,0,TO_CHAR, 0);
-            act("$n stops resting.", ch, 0,0,TO_ROOM, INVIS_NULL);
-            GET_POS(ch) = POSITION_SITTING;
-        } break;
-        case POSITION_SLEEPING : {
-            act("You have to wake up first.", ch, 0, 0, TO_CHAR, 0);
-        } break;
-        case POSITION_FIGHTING : {
-            act("Sit down while fighting? are you MAD?",
-                ch,0,0,TO_CHAR, 0);
-        } break;
-        default : {
-            act("You stop floating around, and sit down.",
-                ch,0,0,TO_CHAR, 0);
-            act("$n stops floating around, and sits down.",
-                ch,0,0,TO_ROOM, INVIS_NULL);
-            GET_POS(ch) = POSITION_SITTING;
-        } break;
-    }
-    return eSUCCESS;
+
+  if (IS_SET(world[ch->in_room].room_flags, QUIET))
+  {
+    send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
+    return eFAILURE;
+  }
+
+  switch (GET_POS(ch))
+  {
+  case POSITION_STANDING:
+  {
+    act("You sit down.", ch, 0, 0, TO_CHAR, 0);
+    act("$n sits down.", ch, 0, 0, TO_ROOM, INVIS_NULL);
+    GET_POS(ch) = POSITION_SITTING;
+  }
+  break;
+  case POSITION_SITTING:
+  {
+    send_to_char("You're sitting already.\n\r", ch);
+  }
+  break;
+  case POSITION_RESTING:
+  {
+    act("You stop resting, and sit up.", ch, 0, 0, TO_CHAR, 0);
+    act("$n stops resting.", ch, 0, 0, TO_ROOM, INVIS_NULL);
+    GET_POS(ch) = POSITION_SITTING;
+  }
+  break;
+  case POSITION_SLEEPING:
+  {
+    act("You have to wake up first.", ch, 0, 0, TO_CHAR, 0);
+  }
+  break;
+  case POSITION_FIGHTING:
+  {
+    act("Sit down while fighting? are you MAD?",
+        ch, 0, 0, TO_CHAR, 0);
+  }
+  break;
+  default:
+  {
+    act("You stop floating around, and sit down.",
+        ch, 0, 0, TO_CHAR, 0);
+    act("$n stops floating around, and sits down.",
+        ch, 0, 0, TO_ROOM, INVIS_NULL);
+    GET_POS(ch) = POSITION_SITTING;
+  }
+  break;
+  }
+  return eSUCCESS;
 }
- 
- 
+
 int do_rest(char_data *ch, char *argument, int cmd)
 {
- 
- 
-    if (IS_SET(world[ch->in_room].room_flags, QUIET))
-      {
-      send_to_char ("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
-      return eFAILURE;
-      }
-       
-   switch(GET_POS(ch)) {
-        case POSITION_STANDING : {
-            act("You sit down and rest your tired bones.",
-                ch, 0, 0, TO_CHAR, 0);
-            act("$n sits down and rests.", ch, 0, 0, TO_ROOM, INVIS_NULL);
-            GET_POS(ch) = POSITION_RESTING;
-        } break;
-        case POSITION_SITTING : {
-            act("You rest your tired bones.", ch, 0, 0, TO_CHAR, 0);
-            act("$n rests.", ch, 0, 0, TO_ROOM, INVIS_NULL);
-            GET_POS(ch) = POSITION_RESTING;
-        } break;
-        case POSITION_RESTING : {
-            act("You are already resting.", ch, 0, 0, TO_CHAR, 0);
-        } break;
-        case POSITION_SLEEPING : {
-            act("You have to wake up first.", ch, 0, 0, TO_CHAR, 0);
-            } break;
-        case POSITION_FIGHTING : {
-            act("Rest while fighting? are you MAD?", ch, 0, 0, TO_CHAR, 0);
-        } break;
-        default : {
-            act("You stop floating around, and stop to rest your tired bones.", ch, 0, 0, TO_CHAR, 0);
-            act("$n stops floating around, and rests.", ch, 0,0, TO_ROOM, INVIS_NULL);
-            GET_POS(ch) = POSITION_SITTING;
-        } break;
-    }
-    return eSUCCESS;
+
+  if (IS_SET(world[ch->in_room].room_flags, QUIET))
+  {
+    send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
+    return eFAILURE;
+  }
+
+  switch (GET_POS(ch))
+  {
+  case POSITION_STANDING:
+  {
+    act("You sit down and rest your tired bones.",
+        ch, 0, 0, TO_CHAR, 0);
+    act("$n sits down and rests.", ch, 0, 0, TO_ROOM, INVIS_NULL);
+    GET_POS(ch) = POSITION_RESTING;
+  }
+  break;
+  case POSITION_SITTING:
+  {
+    act("You rest your tired bones.", ch, 0, 0, TO_CHAR, 0);
+    act("$n rests.", ch, 0, 0, TO_ROOM, INVIS_NULL);
+    GET_POS(ch) = POSITION_RESTING;
+  }
+  break;
+  case POSITION_RESTING:
+  {
+    act("You are already resting.", ch, 0, 0, TO_CHAR, 0);
+  }
+  break;
+  case POSITION_SLEEPING:
+  {
+    act("You have to wake up first.", ch, 0, 0, TO_CHAR, 0);
+  }
+  break;
+  case POSITION_FIGHTING:
+  {
+    act("Rest while fighting? are you MAD?", ch, 0, 0, TO_CHAR, 0);
+  }
+  break;
+  default:
+  {
+    act("You stop floating around, and stop to rest your tired bones.", ch, 0, 0, TO_CHAR, 0);
+    act("$n stops floating around, and rests.", ch, 0, 0, TO_ROOM, INVIS_NULL);
+    GET_POS(ch) = POSITION_SITTING;
+  }
+  break;
+  }
+  return eSUCCESS;
 }
- 
- 
+
 int do_sleep(char_data *ch, char *argument, int cmd)
 {
-   struct affected_type *paf;
-    if (IS_SET(world[ch->in_room].room_flags, QUIET)) {
-      send_to_char ("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
-      return eFAILURE;
-    }
-    if(IS_AFFECTED(ch, AFF_INSOMNIA)) {
-       send_to_char("You are far too alert for that.\n\r", ch);
-       return eFAILURE;
-    }
-    if (!IS_SET(world[ch->in_room].room_flags, SAFE))
-      if (! check_make_camp(ch->in_room)) {
-	send_to_char ("Be careful sleeping out here!  This isn't a safe room, so people can steal your equipment while you sleep!\r\n", ch);
-      }
-
-    if ((paf = affected_by_spell(ch, SPELL_SLEEP)) && 
-		paf->modifier == 1 && GET_POS(ch) != POSITION_SLEEPING)
- 	paf->modifier = 0;
-         
-    switch(GET_POS(ch)) {
-        case POSITION_STANDING :
-            send_to_char("You lie down and go to sleep.\n\r", ch);
-            act("$n lies down and falls asleep.", ch, 0, 0, TO_ROOM, INVIS_NULL);
-            GET_POS(ch) = POSITION_SLEEPING;
-            break;
-        case POSITION_SITTING  :
-        case POSITION_RESTING  :
-            send_to_char("You lay back and go to sleep.\n\r", ch);
-            act("$n lies back and falls asleep.", ch, 0, 0, TO_ROOM, INVIS_NULL);
-            GET_POS(ch) = POSITION_SLEEPING;
-            break;
-        case POSITION_SLEEPING : {
-            send_to_char("You are already sound asleep.\n\r", ch);
-            return eFAILURE; // so we don't set INTERNAL_SLEEPING
-        } break;
-        case POSITION_FIGHTING : {
-            send_to_char("Sleep while fighting? Are you MAD?\n\r", ch);
-            return eFAILURE; // so we don't set INTERNAL_SLEEPING
-        } break;
-        default : {
-            act("You stop floating around, and lie down to sleep.", ch, 0, 0, TO_CHAR, 0);
-            act("$n stops floating around, and lie down to sleep.", ch, 0, 0, TO_ROOM, INVIS_NULL);
-            GET_POS(ch) = POSITION_SLEEPING;
-        } break;
+  struct affected_type *paf;
+  if (IS_SET(world[ch->in_room].room_flags, QUIET))
+  {
+    send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
+    return eFAILURE;
+  }
+  if (IS_AFFECTED(ch, AFF_INSOMNIA))
+  {
+    send_to_char("You are far too alert for that.\n\r", ch);
+    return eFAILURE;
+  }
+  if (!IS_SET(world[ch->in_room].room_flags, SAFE))
+    if (!check_make_camp(ch->in_room))
+    {
+      send_to_char("Be careful sleeping out here!  This isn't a safe room, so people can steal your equipment while you sleep!\r\n", ch);
     }
 
-    struct affected_type af;
-    af.type      = INTERNAL_SLEEPING;
-    af.duration  = 0;
-    af.modifier  = 0;
-    af.location  = APPLY_NONE;
-    af.bitvector = -1;
-    affect_to_char(ch, &af);
+  if ((paf = affected_by_spell(ch, SPELL_SLEEP)) &&
+      paf->modifier == 1 && GET_POS(ch) != POSITION_SLEEPING)
+    paf->modifier = 0;
 
-    return eSUCCESS;
+  switch (GET_POS(ch))
+  {
+  case POSITION_STANDING:
+    send_to_char("You lie down and go to sleep.\n\r", ch);
+    act("$n lies down and falls asleep.", ch, 0, 0, TO_ROOM, INVIS_NULL);
+    GET_POS(ch) = POSITION_SLEEPING;
+    break;
+  case POSITION_SITTING:
+  case POSITION_RESTING:
+    send_to_char("You lay back and go to sleep.\n\r", ch);
+    act("$n lies back and falls asleep.", ch, 0, 0, TO_ROOM, INVIS_NULL);
+    GET_POS(ch) = POSITION_SLEEPING;
+    break;
+  case POSITION_SLEEPING:
+  {
+    send_to_char("You are already sound asleep.\n\r", ch);
+    return eFAILURE; // so we don't set INTERNAL_SLEEPING
+  }
+  break;
+  case POSITION_FIGHTING:
+  {
+    send_to_char("Sleep while fighting? Are you MAD?\n\r", ch);
+    return eFAILURE; // so we don't set INTERNAL_SLEEPING
+  }
+  break;
+  default:
+  {
+    act("You stop floating around, and lie down to sleep.", ch, 0, 0, TO_CHAR, 0);
+    act("$n stops floating around, and lie down to sleep.", ch, 0, 0, TO_ROOM, INVIS_NULL);
+    GET_POS(ch) = POSITION_SLEEPING;
+  }
+  break;
+  }
+
+  struct affected_type af;
+  af.type = INTERNAL_SLEEPING;
+  af.duration = 0;
+  af.modifier = 0;
+  af.location = APPLY_NONE;
+  af.bitvector = -1;
+  affect_to_char(ch, &af);
+
+  return eSUCCESS;
 }
- 
- 
+
 int do_wake(char_data *ch, char *argument, int cmd)
 {
-    char_data *tmp_char;
-    char arg[MAX_STRING_LENGTH];
-    struct affected_type * af;
-    
-    one_argument(argument,arg);
-    if (*arg) {
-        if (GET_POS(ch) == POSITION_SLEEPING) {
-            act("You can't wake people up if you are asleep yourself!", ch,0,0,TO_CHAR, 0);
-        } else {
-            tmp_char = get_char_room_vis(ch, arg);
-            if (tmp_char) {
-                if (tmp_char == ch) {
-                    act("If you want to wake yourself up, just type 'wake'", ch,0,0,TO_CHAR, 0);
-                } else {
-                    if (GET_POS(ch) == POSITION_FIGHTING) 
-                    {
-                        if (GET_POS(tmp_char) == POSITION_SLEEPING) {
-                            if(number(1, 100) > GET_DEX(ch)) {
-                                act("You cannot meneuver yourself over to $M!", ch, 0, tmp_char, TO_CHAR, 0);
-                                act("$n tries to move the flow of battle towards $N but is unable.",
-                                      ch, 0, tmp_char, TO_ROOM, 0);
-                                return eSUCCESS;
-                            }
-                            if ((af = affected_by_spell(tmp_char, SPELL_SLEEP)) && af->modifier == 1) {  
-                                act("You can not wake $M up!", ch, 0, tmp_char, TO_CHAR, 0);
-                            } else {
-                                act("You manage to give $M a swift kick in the ribs.", ch, 0, tmp_char, TO_CHAR, 0);
-                                GET_POS(tmp_char) = POSITION_SITTING;
-                                act("$n awakens $N.", ch, 0, tmp_char, TO_ROOM, NOTVICT);
-                                act("$n wakes you up with a sharp kick to the ribs.  The sounds of battle ring in your ears.", ch, 0, tmp_char, TO_VICT, 0);
-                                affect_from_char(tmp_char, INTERNAL_SLEEPING);
-                            }
-                        } else {
-                            act("$N is already awake.", ch,0,tmp_char, TO_CHAR, 0);
-                        }
-                    }
-                    else {
-                        if (GET_POS(tmp_char) == POSITION_SLEEPING) {
-                            if ((af = affected_by_spell(tmp_char, SPELL_SLEEP)) && af->modifier == 1) {  
-                                act("You can not wake $M up!", ch, 0, tmp_char, TO_CHAR, 0);
-                            } else {
-                                act("You wake $M up.", ch, 0, tmp_char, TO_CHAR, 0);
-                                act("$n awakens $N.", ch, 0, tmp_char, TO_ROOM, NOTVICT);
-                                GET_POS(tmp_char) = POSITION_SITTING;
-                                act("You are awakened by $n.", ch, 0, tmp_char, TO_VICT, 0);
-                                affect_from_char(tmp_char, INTERNAL_SLEEPING);
-                            }
-                        } else {
-                            act("$N is already awake.", ch,0,tmp_char, TO_CHAR, 0);
-                        }
-                    }
-                }
-            } else {
-                send_to_char("You do not see that person here.\n\r", ch);
-            }
-        }
-    } else {
-        if (GET_POS(ch) > POSITION_SLEEPING)
-           send_to_char("You are already awake...\n\r", ch);
-        else if ((af = affected_by_spell(ch, SPELL_SLEEP)) && af->modifier == 1) {
-            send_to_char("You can't wake up!\n\r", ch);
-//        } else if ((af = affected_by_spell(ch, INTERNAL_SLEEPING))) {
-//            send_to_char("You just went to sleep!  Your body is still too tired.  Your dreaming continues...\r\n", ch);
-        } else {
-//            else {
-                send_to_char("You wake, and stand up.\n\r", ch);
-                act("$n awakens.", ch, 0, 0, TO_ROOM, 0);
-                GET_POS(ch) = POSITION_STANDING;
-  //          }
-        }
+  char_data *tmp_char;
+  char arg[MAX_STRING_LENGTH];
+  struct affected_type *af;
+
+  one_argument(argument, arg);
+  if (*arg)
+  {
+    if (GET_POS(ch) == POSITION_SLEEPING)
+    {
+      act("You can't wake people up if you are asleep yourself!", ch, 0, 0, TO_CHAR, 0);
     }
-    return eSUCCESS;
+    else
+    {
+      tmp_char = get_char_room_vis(ch, arg);
+      if (tmp_char)
+      {
+        if (tmp_char == ch)
+        {
+          act("If you want to wake yourself up, just type 'wake'", ch, 0, 0, TO_CHAR, 0);
+        }
+        else
+        {
+          if (GET_POS(ch) == POSITION_FIGHTING)
+          {
+            if (GET_POS(tmp_char) == POSITION_SLEEPING)
+            {
+              if (number(1, 100) > GET_DEX(ch))
+              {
+                act("You cannot meneuver yourself over to $M!", ch, 0, tmp_char, TO_CHAR, 0);
+                act("$n tries to move the flow of battle towards $N but is unable.",
+                    ch, 0, tmp_char, TO_ROOM, 0);
+                return eSUCCESS;
+              }
+              if ((af = affected_by_spell(tmp_char, SPELL_SLEEP)) && af->modifier == 1)
+              {
+                act("You can not wake $M up!", ch, 0, tmp_char, TO_CHAR, 0);
+              }
+              else
+              {
+                act("You manage to give $M a swift kick in the ribs.", ch, 0, tmp_char, TO_CHAR, 0);
+                GET_POS(tmp_char) = POSITION_SITTING;
+                act("$n awakens $N.", ch, 0, tmp_char, TO_ROOM, NOTVICT);
+                act("$n wakes you up with a sharp kick to the ribs.  The sounds of battle ring in your ears.", ch, 0, tmp_char, TO_VICT, 0);
+                affect_from_char(tmp_char, INTERNAL_SLEEPING);
+              }
+            }
+            else
+            {
+              act("$N is already awake.", ch, 0, tmp_char, TO_CHAR, 0);
+            }
+          }
+          else
+          {
+            if (GET_POS(tmp_char) == POSITION_SLEEPING)
+            {
+              if ((af = affected_by_spell(tmp_char, SPELL_SLEEP)) && af->modifier == 1)
+              {
+                act("You can not wake $M up!", ch, 0, tmp_char, TO_CHAR, 0);
+              }
+              else
+              {
+                act("You wake $M up.", ch, 0, tmp_char, TO_CHAR, 0);
+                act("$n awakens $N.", ch, 0, tmp_char, TO_ROOM, NOTVICT);
+                GET_POS(tmp_char) = POSITION_SITTING;
+                act("You are awakened by $n.", ch, 0, tmp_char, TO_VICT, 0);
+                affect_from_char(tmp_char, INTERNAL_SLEEPING);
+              }
+            }
+            else
+            {
+              act("$N is already awake.", ch, 0, tmp_char, TO_CHAR, 0);
+            }
+          }
+        }
+      }
+      else
+      {
+        send_to_char("You do not see that person here.\n\r", ch);
+      }
+    }
+  }
+  else
+  {
+    if (GET_POS(ch) > POSITION_SLEEPING)
+      send_to_char("You are already awake...\n\r", ch);
+    else if ((af = affected_by_spell(ch, SPELL_SLEEP)) && af->modifier == 1)
+    {
+      send_to_char("You can't wake up!\n\r", ch);
+      //        } else if ((af = affected_by_spell(ch, INTERNAL_SLEEPING))) {
+      //            send_to_char("You just went to sleep!  Your body is still too tired.  Your dreaming continues...\r\n", ch);
+    }
+    else
+    {
+      //            else {
+      send_to_char("You wake, and stand up.\n\r", ch);
+      act("$n awakens.", ch, 0, 0, TO_ROOM, 0);
+      GET_POS(ch) = POSITION_STANDING;
+      //          }
+    }
+  }
+  return eSUCCESS;
 }
- 
+
 // global tag var
-char_data * tagged_person;
+char_data *tagged_person;
 
 int do_tag(char_data *ch, char *argument, int cmd)
 {
-   char name[MAX_INPUT_LENGTH];
-   char_data * victim;
+  char name[MAX_INPUT_LENGTH];
+  char_data *victim;
 
-   one_argument(name, argument);
+  one_argument(name, argument);
 
-   if(!*name || !(victim = get_char_room_vis(ch, name))) {
-     send_to_char("Tag who?\r\n", ch);
-     return eFAILURE;
-   }
+  if (!*name || !(victim = get_char_room_vis(ch, name)))
+  {
+    send_to_char("Tag who?\r\n", ch);
+    return eFAILURE;
+  }
 
-   return eSUCCESS;   
+  return eSUCCESS;
 }
-
-
-
 
 void CVoteData::DisplayVote(char_data *ch)
 {
   char buf[MAX_STRING_LENGTH];
   std::vector<SVoteData>::iterator answer_it;
   int i = 1;
-  if(vote_question.empty())
+  if (vote_question.empty())
   {
     csendf(ch, "\n\rSorry! There are no active votes right now!\n\r\n\r");
     return;
@@ -1380,46 +1487,46 @@ void CVoteData::DisplayVote(char_data *ch)
   strncpy(buf, vote_question.c_str(), MAX_STRING_LENGTH);
   csendf(ch, buf);
   csendf(ch, "\n\r");
-  for(answer_it = answers.begin(); answer_it != answers.end(); answer_it++)
+  for (answer_it = answers.begin(); answer_it != answers.end(); answer_it++)
     csendf(ch, "%2d: %s\n\r", i++, answer_it->answer.c_str());
   csendf(ch, "\n\r");
 }
 
 void CVoteData::RemoveAnswer(char_data *ch, unsigned int answer)
 {
-  if(active)
+  if (active)
   {
     send_to_char("You have to end the current vote before you can remove answers.\n\r", ch);
     return;
   }
-  if(answers.empty())
+  if (answers.empty())
   {
     send_to_char("That answer doesn't exist!\n\r", ch);
     return;
   }
-  if(answer > answers.size())
+  if (answer > answers.size())
   {
     send_to_char("That answer doesn't exist!\n\r", ch);
     return;
   }
   std::vector<SVoteData>::iterator answer_it = answers.begin();
-  answers.erase(answer_it+answer-1);//need to offset by 1
+  answers.erase(answer_it + answer - 1); // need to offset by 1
   send_to_char("Answer removed!\n\r", ch);
 }
 
 void CVoteData::StartVote(char_data *ch)
 {
-  if(active)
+  if (active)
   {
     send_to_char("There is already an active vote, you can't start another\n\r", ch);
     return;
   }
-  if(vote_question.empty())
+  if (vote_question.empty())
   {
     send_to_char("You can't start a vote without a topic to vote on!\n\r", ch);
     return;
   }
-  if(answers.empty())
+  if (answers.empty())
   {
     send_to_char("You can't start a vote without any answers!\n\r", ch);
     return;
@@ -1435,7 +1542,7 @@ void CVoteData::StartVote(char_data *ch)
 
 void CVoteData::EndVote(char_data *ch)
 {
-  if(!active)
+  if (!active)
   {
     send_to_char("Can't end a vote if there isn't one started.\n\r", ch);
     return;
@@ -1448,7 +1555,7 @@ void CVoteData::EndVote(char_data *ch)
 
 void CVoteData::AddAnswer(char_data *ch, std::string answer)
 {
-  if(active)
+  if (active)
   {
     send_to_char("You can't add answers during an active vote!\n\r", ch);
     return;
@@ -1463,24 +1570,23 @@ void CVoteData::AddAnswer(char_data *ch, std::string answer)
 bool CVoteData::HasVoted(char_data *ch)
 {
   return (ip_voted[ch->desc->host] || char_voted[GET_NAME(ch)]);
-
 }
 
 bool CVoteData::Vote(char_data *ch, unsigned int vote)
 {
-  if(!ch->desc)
+  if (!ch->desc)
   {
     send_to_char("Monsters don't get to vote!\n\r", ch);
     return false;
   }
-  
-  if(this->HasVoted(ch))
+
+  if (this->HasVoted(ch))
   {
     send_to_char("You have already voted!\n\r", ch);
     return false;
   }
 
-  if(vote > answers.size() || vote == 0)
+  if (vote > answers.size() || vote == 0)
   {
     send_to_char("That answer doesn't exist.\n\r", ch);
     return false;
@@ -1489,22 +1595,21 @@ bool CVoteData::Vote(char_data *ch, unsigned int vote)
   ip_voted[ch->desc->host] = true;
   char_voted[GET_NAME(ch)] = true;
   total_votes++;
-  answers.at(vote-1).votes++;
+  answers.at(vote - 1).votes++;
 
   send_to_char("Vote sent!\n\r", ch);
   OutToFile();
   return true;
-  
 }
 
 void CVoteData::DisplayResults(char_data *ch)
 {
-  if(active && GET_LEVEL(ch) > 39 && !ip_voted[ch->desc->host] && GET_LEVEL(ch) < IMMORTAL)
+  if (active && GET_LEVEL(ch) > 39 && !ip_voted[ch->desc->host] && GET_LEVEL(ch) < IMMORTAL)
   {
     send_to_char("Sorry, but you have to cast a vote before you can see the results.\n\r", ch);
     return;
   }
-  if(!total_votes)
+  if (!total_votes)
   {
     send_to_char("There hasn't been any votes to view the results of.\n\r", ch);
     return;
@@ -1512,33 +1617,32 @@ void CVoteData::DisplayResults(char_data *ch)
   char buf[MAX_STRING_LENGTH];
   std::vector<SVoteData>::iterator answer_it;
   csendf(ch, "--Current Vote Results--\n\r");
-  int percent; 
+  int percent;
   strncpy(buf, vote_question.c_str(), MAX_STRING_LENGTH);
   csendf(ch, buf);
   csendf(ch, "\n\r");
-  for(answer_it = answers.begin(); answer_it != answers.end(); answer_it++)
+  for (answer_it = answers.begin(); answer_it != answers.end(); answer_it++)
   {
-    if(GET_LEVEL(ch) < IMMORTAL)
+    if (GET_LEVEL(ch) < IMMORTAL)
     {
-      percent = (answer_it->votes * 100) / total_votes ;
+      percent = (answer_it->votes * 100) / total_votes;
       csendf(ch, "%3d\%: %s\n\r", percent, answer_it->answer.c_str());
     }
     else
       csendf(ch, "%3d: %s\n\r", answer_it->votes, answer_it->answer.c_str());
   }
   csendf(ch, "\n\r");
-  
 }
 
 void CVoteData::Reset(char_data *ch)
 {
-  if(active)
+  if (active)
   {
-    if(ch) //this can be called with null
+    if (ch) // this can be called with null
       send_to_char("Can't reset a vote while one is active.\n\r", ch);
     return;
   }
-  if(ch)
+  if (ch)
     send_to_char("Ok. Vote cleared.\n\r", ch);
 
   total_votes = 0;
@@ -1550,28 +1654,28 @@ void CVoteData::Reset(char_data *ch)
 
 void CVoteData::OutToFile()
 {
-  
-  FILE * the_file;
+
+  FILE *the_file;
 
   the_file = dc_fopen("vote_data", "w");
 
-  if(!the_file) 
+  if (!the_file)
   {
-      log("Unable to open/create save file for vote data", ANGEL,
-          LOG_BUG);
-      return;
+    log("Unable to open/create save file for vote data", ANGEL,
+        LogChannels::LOG_BUG);
+    return;
   }
-  
-  fprintf(the_file,"%d\n", active);
-  fprintf(the_file,"%d\n", total_votes);
 
-  fprintf(the_file,"%s\n", vote_question.c_str());
+  fprintf(the_file, "%d\n", active);
+  fprintf(the_file, "%d\n", total_votes);
 
-  fprintf(the_file,"%d\n", answers.size());
+  fprintf(the_file, "%s\n", vote_question.c_str());
+
+  fprintf(the_file, "%d\n", answers.size());
 
   std::vector<SVoteData>::iterator answer_it;
 
-  for (answer_it = answers.begin(); answer_it != answers.end(); answer_it++) 
+  for (answer_it = answers.begin(); answer_it != answers.end(); answer_it++)
   {
     fprintf(the_file, "%d\n", answer_it->votes);
     fprintf(the_file, "%s\n", answer_it->answer.c_str());
@@ -1579,19 +1683,17 @@ void CVoteData::OutToFile()
 
   std::map<std::string, bool>::iterator ip_it;
 
-  fprintf(the_file,"%d\n", ip_voted.size());
-  for (ip_it = ip_voted.begin(); ip_it != ip_voted.end(); ip_it++) 
+  fprintf(the_file, "%d\n", ip_voted.size());
+  for (ip_it = ip_voted.begin(); ip_it != ip_voted.end(); ip_it++)
   {
     fprintf(the_file, "%s\n", ip_it->first.c_str());
   }
 
-  
-  fprintf(the_file,"%d\n", char_voted.size());
+  fprintf(the_file, "%d\n", char_voted.size());
   for (ip_it = char_voted.begin(); ip_it != char_voted.end(); ip_it++)
   {
     fprintf(the_file, "%s\n", ip_it->first.c_str());
   }
-
 
   dc_fclose(the_file);
   return;
@@ -1599,7 +1701,7 @@ void CVoteData::OutToFile()
 
 void CVoteData::SetQuestion(char_data *ch, std::string question)
 {
-  if(active)
+  if (active)
   {
     send_to_char("Can't change the question while the vote is active.\n\r", ch);
     return;
@@ -1611,24 +1713,25 @@ void CVoteData::SetQuestion(char_data *ch, std::string question)
 CVoteData::CVoteData()
 {
   char buf[MAX_STRING_LENGTH];
-  FILE * the_file = NULL;;
+  FILE *the_file = NULL;
+  ;
   int num = 0;
   int is_active = 0;
   int i = 0;
   SVoteData tmp_vote_data;
   active = false;
- 
+
   the_file = dc_fopen("../lib/vote_data", "r");
-  if (!the_file) 
+  if (!the_file)
   {
     this->Reset(NULL);
     return;
   }
 
-  //save is_active for later
-  fscanf( the_file, "%d\n", &is_active);
+  // save is_active for later
+  fscanf(the_file, "%d\n", &is_active);
 
-  if (feof(the_file)) 
+  if (feof(the_file))
   {
     dc_fclose(the_file);
     this->Reset(NULL);
@@ -1638,126 +1741,125 @@ CVoteData::CVoteData()
   fscanf(the_file, "%d\n", &num);
   total_votes = num;
 
-  if(!fgets(buf, MAX_STRING_LENGTH, the_file))
+  if (!fgets(buf, MAX_STRING_LENGTH, the_file))
   {
     dc_fclose(the_file);
     this->Reset(NULL);
-    log("Error reading question from vote file.", 0, LOG_MISC);
+    log("Error reading question from vote file.", 0, LogChannels::LOG_MISC);
     return;
   }
-  buf[strlen(buf)-1] = 0;
+  buf[strlen(buf) - 1] = 0;
   vote_question = buf;
 
-  //ANSWERS
-  fscanf(the_file, "%d\n", &i); 
-  for(;i > 0; i--)
+  // ANSWERS
+  fscanf(the_file, "%d\n", &i);
+  for (; i > 0; i--)
   {
     fscanf(the_file, "%d\n", &num);
-    if(!fgets(buf, MAX_STRING_LENGTH, the_file))
+    if (!fgets(buf, MAX_STRING_LENGTH, the_file))
     {
       dc_fclose(the_file);
-      log("Error reading answers from vote file.", 0, LOG_MISC);
+      log("Error reading answers from vote file.", 0, LogChannels::LOG_MISC);
       this->Reset(NULL);
       return;
     }
 
-    buf[strlen(buf)-1] = 0;
+    buf[strlen(buf) - 1] = 0;
     tmp_vote_data.votes = num;
     tmp_vote_data.answer = buf;
     answers.push_back(tmp_vote_data);
-  }      
+  }
 
-  //IP ADDRESSES
+  // IP ADDRESSES
   fscanf(the_file, "%d\n", &i);
-  for(;i > 0; i--)
+  for (; i > 0; i--)
   {
-    if(!fgets(buf, MAX_STRING_LENGTH, the_file))
+    if (!fgets(buf, MAX_STRING_LENGTH, the_file))
     {
       dc_fclose(the_file);
-      log("Error reading ip addresses from vote file.", 0, LOG_MISC);
+      log("Error reading ip addresses from vote file.", 0, LogChannels::LOG_MISC);
       this->Reset(NULL);
       return;
     }
-    buf[strlen(buf)-1] = 0;
-    ip_voted[buf] = true;    
-  }      
+    buf[strlen(buf) - 1] = 0;
+    ip_voted[buf] = true;
+  }
 
-  //CHAR NAMES
+  // CHAR NAMES
   fscanf(the_file, "%d\n", &i);
-  for(;i > 0; i--)
+  for (; i > 0; i--)
   {
-    if(!fgets(buf, MAX_STRING_LENGTH, the_file))
+    if (!fgets(buf, MAX_STRING_LENGTH, the_file))
     {
       dc_fclose(the_file);
-      log("Error reading char names from vote file.", 0, LOG_MISC);
+      log("Error reading char names from vote file.", 0, LogChannels::LOG_MISC);
       this->Reset(NULL);
       return;
     }
-    buf[strlen(buf)-1] = 0;
-    char_voted[buf] = true;   
-  }      
+    buf[strlen(buf) - 1] = 0;
+    char_voted[buf] = true;
+  }
 
-  //everything must have been correct, activate it here
-  active = (bool) is_active;
+  // everything must have been correct, activate it here
+  active = (bool)is_active;
 
   dc_fclose(the_file);
 }
 
 CVoteData::~CVoteData()
-{}
- 
+{
+}
+
 int do_vote(char_data *ch, char *arg, int cmd)
 {
   char buf[MAX_STRING_LENGTH];
   int vote;
   arg = one_argument(arg, buf);
- 
-  if(!strcmp(buf, "results"))
+
+  if (!strcmp(buf, "results"))
   {
     DCVote->DisplayResults(ch);
     return eSUCCESS;
   }
 
-  if(!DCVote->IsActive())
+  if (!DCVote->IsActive())
   {
     send_to_char("Sorry, there is nothing to vote on right now.\n\r", ch);
     return eSUCCESS;
   }
-  if(!strlen(buf))
+  if (!strlen(buf))
   {
     DCVote->DisplayVote(ch);
-    return eSUCCESS;  
+    return eSUCCESS;
   }
 
-  if(GET_LEVEL(ch) < 40)
+  if (GET_LEVEL(ch) < 40)
   {
     send_to_char("Sorry, you must be at least level 40 to vote.\n\r", ch);
     return eSUCCESS;
   }
 
   vote = atoi(buf);
-  if(true == DCVote->Vote(ch, vote))
-    logf(IMMORTAL, LOG_PLAYER, "%s just voted %d\n\r", GET_NAME(ch), vote);
+  if (true == DCVote->Vote(ch, vote))
+    logf(IMMORTAL, LogChannels::LOG_PLAYER, "%s just voted %d\n\r", GET_NAME(ch), vote);
 
   return eSUCCESS;
-
-
 }
 
 int do_random(char_data *ch, char *argument, int cmd)
 {
-char buf[MAX_STRING_LENGTH];
- int i = 0;
- 
-    if (IS_SET(world[ch->in_room].room_flags, QUIET))
-      {
-      send_to_char ("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
-      return eFAILURE;
-      }
+  char buf[MAX_STRING_LENGTH];
+  int i = 0;
 
-    i = number(1,100);
-               csendf(ch, "You roll a random number between 1 and 100 resulting in: $B%u$R.\r\n", i);
-               sprintf(buf, "$n rolls a number between 1 and 100 resulting in: $B%u$R.\r\n", i);
-	             act(buf, ch, 0, 0, TO_ROOM, 0);
-    return eSUCCESS;
+  if (IS_SET(world[ch->in_room].room_flags, QUIET))
+  {
+    send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
+    return eFAILURE;
+  }
+
+  i = number(1, 100);
+  csendf(ch, "You roll a random number between 1 and 100 resulting in: $B%u$R.\r\n", i);
+  sprintf(buf, "$n rolls a number between 1 and 100 resulting in: $B%u$R.\r\n", i);
+  act(buf, ch, 0, 0, TO_ROOM, 0);
+  return eSUCCESS;
 }

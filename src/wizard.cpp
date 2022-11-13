@@ -28,63 +28,64 @@
 #include <twitcurl.h>
 #endif
 
-int getRealSpellDamage(char_data * ch);
+int getRealSpellDamage(char_data *ch);
 
 int number_or_name(char **name, int *num)
 {
   int i;
   char *ppos;
   char number[MAX_INPUT_LENGTH];
-  
-  if((ppos = index(*name, '.')) != NULL) {
-    *ppos++ = '\0'; 
+
+  if ((ppos = index(*name, '.')) != NULL)
+  {
+    *ppos++ = '\0';
     strcpy(number, *name);
     strcpy(*name, ppos);
-       
-    for(i = 0; *(number + i); i++)
-       if(!isdigit(*(number + i)))
-         return(0);
 
-    return(atoi(number));
+    for (i = 0; *(number + i); i++)
+      if (!isdigit(*(number + i)))
+        return (0);
+
+    return (atoi(number));
   }
 
   /* no dot */
-  if((*num = atoi(*name)) > 0)
+  if ((*num = atoi(*name)) > 0)
     return -1;
   else
     return 1;
 }
 
-#if(0)
+#if (0)
 int number_or_name(char **name, int *num)
 {
   unsigned i;
   char *ppos = NULL;
   char number[MAX_INPUT_LENGTH];
-  
-  for(i = 0; i < strlen(*name); i++)
+
+  for (i = 0; i < strlen(*name); i++)
   {
-	  if(*name[i] == '.')
-	  {
-		  ppos = *name + i;
-		  break;
-	  }
+    if (*name[i] == '.')
+    {
+      ppos = *name + i;
+      break;
+    }
   }
-  if(ppos)
+  if (ppos)
   {
-    *ppos++ = '\0'; 
+    *ppos++ = '\0';
     strcpy(number, *name);
     strcpy(*name, ppos);
-       
-    for(i = 0; *(number + i); i++)
-       if(!isdigit(*(number + i)))
-         return(0);
 
-    return(atoi(number));
+    for (i = 0; *(number + i); i++)
+      if (!isdigit(*(number + i)))
+        return (0);
+
+    return (atoi(number));
   }
 
   /* no dot */
-  if((*num = atoi(*name)) > 0)
+  if ((*num = atoi(*name)) > 0)
     return -1;
   else
     return 1;
@@ -96,51 +97,60 @@ void do_mload(char_data *ch, int rnum, int cnt)
   char_data *mob = NULL;
   char buf[MAX_STRING_LENGTH];
   int i;
-  if (cnt == 0) cnt = 1;
-  for (i=1; i<=cnt; i++) {
+  if (cnt == 0)
+    cnt = 1;
+  for (i = 1; i <= cnt; i++)
+  {
     mob = clone_mobile(rnum);
     char_to_room(mob, ch->in_room);
     selfpurge = false;
     mprog_load_trigger(mob);
-    if (selfpurge) {
+    if (selfpurge)
+    {
       mob = NULL;
     }
   }
 
-  if (mob) {
+  if (mob)
+  {
     act("$n draws up a swirling column of dust and breathes life into it.",
-      ch, 0, 0, TO_ROOM, 0);
+        ch, 0, 0, TO_ROOM, 0);
     act("$n has created $N!", ch, 0, mob, TO_ROOM, 0);
-    sprintf(buf,"You create %i %s!\n\r",cnt, mob->short_desc);
+    sprintf(buf, "You create %i %s!\n\r", cnt, mob->short_desc);
     send_to_char(buf, ch);
-    if (cnt > 1) {
+    if (cnt > 1)
+    {
       snprintf(buf, MAX_STRING_LENGTH, "%s loads %i copies of mob %d (%s) at room %d (%s).",
-	     GET_NAME(ch),
-	     cnt,
-	     mob_index[rnum].virt,
-	     mob->short_desc,
-	     world[ch->in_room].number,
-	     world[ch->in_room].name);
-    } else {
-    snprintf(buf, MAX_STRING_LENGTH, "%s loads %i copy of mob %d (%s) at room %d (%s).",
-	     GET_NAME(ch),
-	     cnt,
-	     mob_index[rnum].virt,
-	     mob->short_desc,
-	     world[ch->in_room].number,
-	     world[ch->in_room].name);
+               GET_NAME(ch),
+               cnt,
+               mob_index[rnum].virt,
+               mob->short_desc,
+               world[ch->in_room].number,
+               world[ch->in_room].name);
     }
-    log(buf, GET_LEVEL(ch), LOG_GOD);
- } else {
+    else
+    {
+      snprintf(buf, MAX_STRING_LENGTH, "%s loads %i copy of mob %d (%s) at room %d (%s).",
+               GET_NAME(ch),
+               cnt,
+               mob_index[rnum].virt,
+               mob->short_desc,
+               world[ch->in_room].number,
+               world[ch->in_room].name);
+    }
+    log(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
+  }
+  else
+  {
     snprintf(buf, MAX_STRING_LENGTH, "%s loads %i copies of mob %d at room %d (%s).",
-	     GET_NAME(ch),
-	     cnt,
-	     mob_index[rnum].virt,
-	     world[ch->in_room].number,
-	     world[ch->in_room].name);
-  log(buf, GET_LEVEL(ch), LOG_GOD);
-  send_to_char("You load the mob(s) but they immediatly destroy themselves.\r\n",ch);
- }
+             GET_NAME(ch),
+             cnt,
+             mob_index[rnum].virt,
+             world[ch->in_room].number,
+             world[ch->in_room].name);
+    log(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
+    send_to_char("You load the mob(s) but they immediatly destroy themselves.\r\n", ch);
+  }
 }
 
 obj_list_t oload(char_data *ch, int rnum, int cnt, bool random)
@@ -188,65 +198,70 @@ obj_list_t oload(char_data *ch, int rnum, int cnt, bool random)
                     obj->short_description,
                     world[ch->in_room].number,
                     world[ch->in_room].name);
-  log(buf, GET_LEVEL(ch), LOG_GOD);
+  log(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
 
   return obj_list;
 }
 
 void do_oload(char_data *ch, int rnum, int cnt, bool random)
-{    
+{
   struct obj_data *obj = NULL;
   char buf[MAX_STRING_LENGTH];
   int i;
-     
-  if (cnt == 0) cnt = 1;
+
+  if (cnt == 0)
+    cnt = 1;
 
   act("$n makes a strange magical gesture.", ch, 0, 0, TO_ROOM, INVIS_NULL);
-  for (i=1; i<= cnt; i++) {
+  for (i = 1; i <= cnt; i++)
+  {
     obj = clone_object(rnum);
     act("$n has created $p!", ch, obj, 0, TO_ROOM, 0);
-    if (random == true) {
-    	randomize_object(obj);
-    }
-
-    if ( (obj->obj_flags.type_flag == ITEM_MONEY) &&
-         (GET_LEVEL(ch) < IMP)) {
-       extract_obj(obj);
-       send_to_char("Denied.\n\r", ch);
-       return;
-       }
-    else 
+    if (random == true)
     {
-       obj_to_char(obj, ch);       
+      randomize_object(obj);
     }
-  }  
-  
-  
 
-  snprintf(buf, MAX_STRING_LENGTH, "You create %i %s%s.\n\r", cnt, random?"randomized ":"", obj->short_description);
+    if ((obj->obj_flags.type_flag == ITEM_MONEY) &&
+        (GET_LEVEL(ch) < IMP))
+    {
+      extract_obj(obj);
+      send_to_char("Denied.\n\r", ch);
+      return;
+    }
+    else
+    {
+      obj_to_char(obj, ch);
+    }
+  }
+
+  snprintf(buf, MAX_STRING_LENGTH, "You create %i %s%s.\n\r", cnt, random ? "randomized " : "", obj->short_description);
 
   send_to_char(buf, ch);
-  if (cnt > 1) {
+  if (cnt > 1)
+  {
     snprintf(buf, MAX_STRING_LENGTH, "%s loads %i %scopies of obj %d (%s) at room %d (%s).",
-	     GET_NAME(ch),
-	     cnt,
-	     random?"randomized ":"",
-	     GET_OBJ_VNUM(obj),
-	     obj->short_description,
-	     world[ch->in_room].number,
-	     world[ch->in_room].name);
-  } else {
-    snprintf(buf, MAX_STRING_LENGTH, "%s loads %i %scopy of obj %d (%s) at room %d (%s).",
-	     GET_NAME(ch),
-	     cnt,
-	     random?"randomized ":"",
-	     GET_OBJ_VNUM(obj),
-	     obj->short_description,
-	     world[ch->in_room].number,
-	     world[ch->in_room].name);
+             GET_NAME(ch),
+             cnt,
+             random ? "randomized " : "",
+             GET_OBJ_VNUM(obj),
+             obj->short_description,
+             world[ch->in_room].number,
+             world[ch->in_room].name);
   }
-  log(buf, GET_LEVEL(ch), LOG_GOD);
-}    
+  else
+  {
+    snprintf(buf, MAX_STRING_LENGTH, "%s loads %i %scopy of obj %d (%s) at room %d (%s).",
+             GET_NAME(ch),
+             cnt,
+             random ? "randomized " : "",
+             GET_OBJ_VNUM(obj),
+             obj->short_description,
+             world[ch->in_room].number,
+             world[ch->in_room].name);
+  }
+  log(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
+}
 
 //
 // (I let him email it to me *wink* -pir)
@@ -257,462 +272,488 @@ void do_oload(char_data *ch, int rnum, int cnt, bool random)
 
 void boro_mob_stat(char_data *ch, char_data *k)
 {
-	int i, i2;
-	char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH];
-	char buf3[MAX_STRING_LENGTH];
-	struct follow_type *fol;
-	struct obj_data  *j=0;
-	struct affected_type *aff;
+  int i, i2;
+  char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH];
+  char buf3[MAX_STRING_LENGTH];
+  struct follow_type *fol;
+  struct obj_data *j = 0;
+  struct affected_type *aff;
 
-	sprinttype(k->c_class, pc_clss_types, buf2);
-	sprintf(buf,
-	"$R(:)========================================================================(:)\r\n"
-	"|=|$3 (%3s) Key$R: %-35s $3VNUM$R: %-5d $3Room$R: %-5d |=|\r\n"
-	"|=|$3 Short$R: %-50s $3RNUM$R: %-6ld |=|\r\n"
-	"|=|$3 Long$R: %s"
-	"(:)====================(:)=================================================(:)\r\n"
-	"|\\|  $4Fighting$R: %-9s|/|  $1Race$R:   %-10s $1HitPts$R: %5d$1/$R(%5d+%-3d) |~|\r\n"
-	"|~|  $4Master$R:   %-9s|o|  $1Class$R:  %-10s $1Mana$R:   %5d$1/$R(%5d+%-3d) |\\|\r\n",
+  sprinttype(k->c_class, pc_clss_types, buf2);
+  sprintf(buf,
+          "$R(:)========================================================================(:)\r\n"
+          "|=|$3 (%3s) Key$R: %-35s $3VNUM$R: %-5d $3Room$R: %-5d |=|\r\n"
+          "|=|$3 Short$R: %-50s $3RNUM$R: %-6ld |=|\r\n"
+          "|=|$3 Long$R: %s"
+          "(:)====================(:)=================================================(:)\r\n"
+          "|\\|  $4Fighting$R: %-9s|/|  $1Race$R:   %-10s $1HitPts$R: %5d$1/$R(%5d+%-3d) |~|\r\n"
+          "|~|  $4Master$R:   %-9s|o|  $1Class$R:  %-10s $1Mana$R:   %5d$1/$R(%5d+%-3d) |\\|\r\n",
 
-	(!IS_NPC(k) ? "PC" : "MOB"),
-	GET_NAME(k), 
-	(IS_NPC(k) ? mob_index[k->mobdata->nr].virt : 0),
-	(k->in_room == NOWHERE ? -1 : world[k->in_room].number),
-	/* end of first line */
-	
-	(k->short_desc ? k->short_desc : "None"),
-	(int32_t)(IS_NPC(k) ? k->mobdata->nr : 0),
-	/* end of second line */
-	
-	(k->long_desc ? k->long_desc : "None"),
-	/* end of third line */
-	
-	(k->fighting ? GET_NAME(k->fighting) : "Nobody"),
-	(races[(int)(GET_RACE(k))].singular_name),
-	k->getHP(), hit_limit(k), hit_gain(k),
-	/* end of fourth line */
+          (!IS_NPC(k) ? "PC" : "MOB"),
+          GET_NAME(k),
+          (IS_NPC(k) ? mob_index[k->mobdata->nr].virt : 0),
+          (k->in_room == NOWHERE ? -1 : world[k->in_room].number),
+          /* end of first line */
 
-	(k->master ? GET_NAME(k->master) : "Nobody"),
-	buf2, /* this is for the class string, the sprinttype above inits it. */
-	GET_MANA(k),mana_limit(k),mana_gain(k));
-	/* end of the first sprintf */
+          (k->short_desc ? k->short_desc : "None"),
+          (int32_t)(IS_NPC(k) ? k->mobdata->nr : 0),
+          /* end of second line */
 
-	send_to_char(buf,ch); // this sends to char, now we can overwrite buf
+          (k->long_desc ? k->long_desc : "None"),
+          /* end of third line */
 
+          (k->fighting ? GET_NAME(k->fighting) : "Nobody"),
+          (races[(int)(GET_RACE(k))].singular_name),
+          k->getHP(), hit_limit(k), hit_gain(k),
+          /* end of fourth line */
 
-	if(IS_MOB(k)) {
-		sprintf(buf2,"%s",(k->mobdata->hatred ? k->mobdata->hatred : "NOBODY"));
-		sprintf(buf3,"%s",(k->mobdata->fears ? k->mobdata->fears : "NOBODY"));
-	}
-	else
-	{
-		sprintf(buf2,"Nobody");
-		sprintf(buf3,"Nobody");
-	}
+          (k->master ? GET_NAME(k->master) : "Nobody"),
+          buf2, /* this is for the class string, the sprinttype above inits it. */
+          GET_MANA(k), mana_limit(k), mana_gain(k));
+  /* end of the first sprintf */
 
-	sprintf(buf,
-	"|/|  $4Hates$R:    %-9s|\\|  $1Lvl$R:    %-9d  $1Fatigue$R:%5d$1/$R(%5d+%-3d) |o|\r\n"
-	"|o|  $4Fears$R:    %-9s|~|  $1Height$R: %-9d  $1Ki$R:     %5d$1/$R(%5d)     |/|\r\n"
-	"|\\|  $4Tracking$R: %-9s|/|  $1Weight$R: %-9d  $1Alignment$R:   %4d          |~|\r\n",
+  send_to_char(buf, ch); // this sends to char, now we can overwrite buf
 
-	buf2, // who the mob hates
-	k->level,
-	GET_MOVE(k),move_limit(k),move_gain(k,0),
-	/* end of first line */
-	
-	buf3, // who the mob fears, if anyone
-	GET_HEIGHT(k),
-	GET_KI(k), ki_limit(k),
-	/* end of second line */
-	
-	(k->hunting ? k->hunting : "NOBODY"),
-	GET_WEIGHT(k),
-	k->alignment);
-
-	send_to_char(buf,ch);
-		/* end of second sprintf */
-		
-	switch(k->sex) {
-		case SEX_NEUTRAL: sprintf(buf2,"Neutral"); break;
-		case SEX_MALE   : sprintf(buf2,"Male");    break;
-		case SEX_FEMALE : sprintf(buf2,"Female");  break;
-		default : sprintf(buf2,"ILLEGAL-VALUE");   break;
-	}
-	
-	sprintf(buf,
-		"|~|  $2Timer$R: %-11d |o|  $1Town$R:   %-5d     $1Sex$R:         %-14s|\\|\r\n"
-		"(:)====================(:)==========(:)====================================(:)\r\n",
-		k->timer,
-		(!IS_NPC(ch) ? k->hometown : -1),
-		buf2); /* buf is the sex... */
-	send_to_char(buf,ch); /* THIRD sprintf */
-
-	if(IS_MOB(k))
-	{
-		if(mob_index[k->mobdata->nr].non_combat_func)
-			strcpy(buf2,"Exists");
-		else
-			strcpy(buf2,"None");
-		
-		if(mob_index[k->mobdata->nr].combat_func)
-			strcpy(buf3,"Exists");
-		else
-			strcpy(buf3,"None");
-	}
-
-	sprintf(buf,
-	"|/|  $4FIRE$R: %3d  $1COLD$R: %3d $5NRGY$R: %3d |\\| Mob Non-Combat Spec Proc: %-9s|o|\r\n"
-	"|o|  $2$BACID$R: %3d  $3MAGK$R: %3d $2POIS$R: %3d |~| Mob Combat Spec Proc:     %-9s|/|\r\n",
-	
-	k->saves[SAVE_TYPE_FIRE], k->saves[SAVE_TYPE_COLD], k->saves[SAVE_TYPE_ENERGY],
-	buf2, /* whether nor not they have a non_combat spec proc */
-	/* end of first line */
-
-	k->saves[SAVE_TYPE_ACID], k->saves[SAVE_TYPE_MAGIC], k->saves[SAVE_TYPE_POISON],
-	buf3); /* buf2 = whether or not there is a combat spec proc */
-	/* end of fourth sprintf */
-	send_to_char(buf,ch);
-
-
-	sprinttype(GET_POS(k), position_types, buf2);
-	if(IS_NPC(k))
-		sprinttype((k->mobdata->default_pos),position_types,buf3);
-	else
-		strcpy(buf3,"PC");
-
-	for(i = 0, j = k->carrying; j; j = j->next_content, ++i);
-	sprintf(buf,
-	"|\\|  $3Pos$R: %-9s$3DefPos$R: %-9s|/| $1Thirst$R: %-3d $4Hunger$R: %-3d $6Drunk$R: %-3d |~|\r\n"
-	"|/|  $3Dex$R: %2d    $3Con$R: %2d    $3Str$R: %2d  |\\| $3Carried Weight$R: %-4d $3Inv. Items$R: %-3d|o|\r\n",
-
-	buf2, buf3, // pos and default pos respectively
-	k->conditions[THIRST],
-	k->conditions[FULL],
-	k->conditions[DRUNK],
-	// end of first line
-
-	GET_DEX(k), GET_CON(k), GET_STR(k),
-	IS_CARRYING_W(k), i);
-	/* END OF SECOND LINE */
-
-	send_to_char(buf,ch);
-
-	for(i = 0, i2 = 0; i < MAX_WEAR; i++)
-     if(k->equipment[i])
-       i2++;
-
-	sprintf(buf,
-	"|~|  $3Int$R: %2d    $3Wis$R: %2d    $3Ac$R: %-3d |o| $3Carried Items$R: %d $3Equipped Items$R: %d |/|\r\n",
-	GET_INT(k), GET_WIS(k), GET_ARMOR(k), IS_CARRYING_N(k), i2);
-	send_to_char(buf,ch);
-
-	sprintf(buf,
-	"|o| $3 Hitroll$R: %3d     $3Damroll$R: %3d  |~|                                    |/|\r\n"
-	"(:)=================================(:)====================================(:)\r\n",
-	k->hitroll, k->damroll);
-	send_to_char(buf,ch);
-
-
-	sprintbit(k->suscept, isr_bits, buf2);
-	sprintbit(k->immune, isr_bits, buf3);
-	sprintf(buf,
-		"|/| $7Immune$R: %-63s|o|\r\n"
-		"|o| $7Susceptible$R: %-58s|/|\r\n",
-		buf2, buf3); // immune and susceptible bits, first and second.
-	send_to_char(buf,ch);
-	sprintbit(k->affected_by, affected_bits, buf2);
-	sprintf(buf,
-		"|\\| $7Affected By$R: %-58s|~|\r\n", buf2); // affected bits.
-	send_to_char(buf,ch);
-
-	if(IS_MOB(k)) // AND THIS
-		sprintbit(k->mobdata->actflags, action_bits,buf2);
-	else
-		strcpy(buf2,"Not a mob");
-	sprintbit(k->combat, combat_bits, buf3);
-	sprintf(buf,
-		"|~| $7NPC flags$R: %-60s|\\|\r\n"
-		"|/| $7Combat flags$R: %-57s|o|\r\n",
-		buf2,buf3); // npc flags and combat flags respectively
-	send_to_char(buf,ch);
-
-	sprintbit(k->resist, isr_bits, buf2);
-	sprintf(buf,
-		"|o| $7Resistant$R: %-60s|/|\r\n"
-		"(:)========================================================================(:)\r\n",
-		buf2); // the resisted bits
-	send_to_char(buf,ch);
-
-	strcpy(buf,"$3Title$R: ");
-	strcat(buf, (k->title ? k->title : "None"));
-	strcat(buf,"\n\r");
-	send_to_char(buf,ch);
-	
-	// Description
-	send_to_char("$3Detailed description$R:\r\n", ch);
-	if(k->description)
-		send_to_char(k->description, ch);
-	else
-		send_to_char("None", ch);
-
-	// LIST OF FOLLOWERS
-	send_to_char("$3Followers$R:\n\r", ch);
-	for(fol = k->followers; fol; fol = fol->next)
-		act("    $N", ch, 0, fol->follower, TO_CHAR, 0);
-	
-	if(!IS_MOB(k)) {
-		sprintf(buf, "$3Birth$R: [%ld]secs  $3Logon$R:[%ld]secs $3Played$R[%ld]secs\n\r",
-			k->pcdata->time.birth,
-			k->pcdata->time.logon,
-			(int32_t)(k->pcdata->time.played));
-		send_to_char(buf, ch);
-
-		sprintf(buf, "$3Age$R:[%d] Years [%d] Months [%d] Days [%d] Hours\n\r",
-			age(k).year, age(k).month, age(k).day, age(k).hours);
-		send_to_char(buf,ch);
-	}
-
-	if(!IS_MOB(k)) {
-		sprintf(buf, "$3Coins$R:[%lld]  $3Bank$R:[%d]\n\r", GET_GOLD(k),
-		k->pcdata->bank );
-		send_to_char(buf, ch);
-	}
-
-	if(!IS_NPC(k)) {
-		sprintf(buf,"$3SaveMod$R: FIRE[%d] COLD[%d] ENERGY[%d] ACID[%d] MAGIC[%d] POISON[%d]\n\r",
-			k->pcdata->saves_mods[SAVE_TYPE_FIRE],
-			k->pcdata->saves_mods[SAVE_TYPE_COLD],
-			k->pcdata->saves_mods[SAVE_TYPE_ENERGY],
-			k->pcdata->saves_mods[SAVE_TYPE_ACID],
-			k->pcdata->saves_mods[SAVE_TYPE_MAGIC],
-			k->pcdata->saves_mods[SAVE_TYPE_POISON]);
-		send_to_char(buf, ch);
-	}
-
-	if(!IS_MOB(k)) {
-		sprintf(buf, "$3WizInvis$R:  %ld  ", k->pcdata->wizinvis);
-	  send_to_char(buf, ch);
-    sprintf(buf, "$3Holylite$R:  %s  ", ((k->pcdata->holyLite) ? "ON" :
-      "OFF"));
-    send_to_char(buf, ch);
-    sprintf(buf, "$3Stealth$R:  %s\n\r", ((k->pcdata->stealth) ? "ON"  :
-      "OFF"));
-    send_to_char(buf, ch);
-
-    if ( (k->pcdata->buildLowVnum == k->pcdata->buildMLowVnum) == k->pcdata->buildOLowVnum  &&
-	(k->pcdata->buildHighVnum == k->pcdata->buildMHighVnum) == k->pcdata->buildOHighVnum )
-   {
-    sprintf(buf, "$3Creation Range$R:  %d-%d  \r\n", k->pcdata->buildLowVnum, k->pcdata->buildHighVnum);
-    send_to_char(buf,ch);
-   } else {
-    sprintf(buf, "$3R Range$R:  %d-%d  \r\n", k->pcdata->buildLowVnum, k->pcdata->buildHighVnum);
-    send_to_char(buf,ch);
-    sprintf(buf, "$3M Range$R:  %d-%d  \r\n", k->pcdata->buildMLowVnum, k->pcdata->buildMHighVnum);
-    send_to_char(buf,ch);
-    sprintf(buf, "$3O Range$R:  %d-%d  \r\n", k->pcdata->buildOLowVnum, k->pcdata->buildOHighVnum);
-    send_to_char(buf,ch);
-   }
+  if (IS_MOB(k))
+  {
+    sprintf(buf2, "%s", (k->mobdata->hatred ? k->mobdata->hatred : "NOBODY"));
+    sprintf(buf3, "%s", (k->mobdata->fears ? k->mobdata->fears : "NOBODY"));
+  }
+  else
+  {
+    sprintf(buf2, "Nobody");
+    sprintf(buf3, "Nobody");
   }
 
-  if(k->affected) 
+  sprintf(buf,
+          "|/|  $4Hates$R:    %-9s|\\|  $1Lvl$R:    %-9d  $1Fatigue$R:%5d$1/$R(%5d+%-3d) |o|\r\n"
+          "|o|  $4Fears$R:    %-9s|~|  $1Height$R: %-9d  $1Ki$R:     %5d$1/$R(%5d)     |/|\r\n"
+          "|\\|  $4Tracking$R: %-9s|/|  $1Weight$R: %-9d  $1Alignment$R:   %4d          |~|\r\n",
+
+          buf2, // who the mob hates
+          k->level,
+          GET_MOVE(k), move_limit(k), move_gain(k, 0),
+          /* end of first line */
+
+          buf3, // who the mob fears, if anyone
+          GET_HEIGHT(k),
+          GET_KI(k), ki_limit(k),
+          /* end of second line */
+
+          (k->hunting ? k->hunting : "NOBODY"),
+          GET_WEIGHT(k),
+          k->alignment);
+
+  send_to_char(buf, ch);
+  /* end of second sprintf */
+
+  switch (k->sex)
+  {
+  case SEX_NEUTRAL:
+    sprintf(buf2, "Neutral");
+    break;
+  case SEX_MALE:
+    sprintf(buf2, "Male");
+    break;
+  case SEX_FEMALE:
+    sprintf(buf2, "Female");
+    break;
+  default:
+    sprintf(buf2, "ILLEGAL-VALUE");
+    break;
+  }
+
+  sprintf(buf,
+          "|~|  $2Timer$R: %-11d |o|  $1Town$R:   %-5d     $1Sex$R:         %-14s|\\|\r\n"
+          "(:)====================(:)==========(:)====================================(:)\r\n",
+          k->timer,
+          (!IS_NPC(ch) ? k->hometown : -1),
+          buf2);         /* buf is the sex... */
+  send_to_char(buf, ch); /* THIRD sprintf */
+
+  if (IS_MOB(k))
+  {
+    if (mob_index[k->mobdata->nr].non_combat_func)
+      strcpy(buf2, "Exists");
+    else
+      strcpy(buf2, "None");
+
+    if (mob_index[k->mobdata->nr].combat_func)
+      strcpy(buf3, "Exists");
+    else
+      strcpy(buf3, "None");
+  }
+
+  sprintf(buf,
+          "|/|  $4FIRE$R: %3d  $1COLD$R: %3d $5NRGY$R: %3d |\\| Mob Non-Combat Spec Proc: %-9s|o|\r\n"
+          "|o|  $2$BACID$R: %3d  $3MAGK$R: %3d $2POIS$R: %3d |~| Mob Combat Spec Proc:     %-9s|/|\r\n",
+
+          k->saves[SAVE_TYPE_FIRE], k->saves[SAVE_TYPE_COLD], k->saves[SAVE_TYPE_ENERGY],
+          buf2, /* whether nor not they have a non_combat spec proc */
+          /* end of first line */
+
+          k->saves[SAVE_TYPE_ACID], k->saves[SAVE_TYPE_MAGIC], k->saves[SAVE_TYPE_POISON],
+          buf3); /* buf2 = whether or not there is a combat spec proc */
+  /* end of fourth sprintf */
+  send_to_char(buf, ch);
+
+  sprinttype(GET_POS(k), position_types, buf2);
+  if (IS_NPC(k))
+    sprinttype((k->mobdata->default_pos), position_types, buf3);
+  else
+    strcpy(buf3, "PC");
+
+  for (i = 0, j = k->carrying; j; j = j->next_content, ++i)
+    ;
+  sprintf(buf,
+          "|\\|  $3Pos$R: %-9s$3DefPos$R: %-9s|/| $1Thirst$R: %-3d $4Hunger$R: %-3d $6Drunk$R: %-3d |~|\r\n"
+          "|/|  $3Dex$R: %2d    $3Con$R: %2d    $3Str$R: %2d  |\\| $3Carried Weight$R: %-4d $3Inv. Items$R: %-3d|o|\r\n",
+
+          buf2, buf3, // pos and default pos respectively
+          k->conditions[THIRST],
+          k->conditions[FULL],
+          k->conditions[DRUNK],
+          // end of first line
+
+          GET_DEX(k), GET_CON(k), GET_STR(k),
+          IS_CARRYING_W(k), i);
+  /* END OF SECOND LINE */
+
+  send_to_char(buf, ch);
+
+  for (i = 0, i2 = 0; i < MAX_WEAR; i++)
+    if (k->equipment[i])
+      i2++;
+
+  sprintf(buf,
+          "|~|  $3Int$R: %2d    $3Wis$R: %2d    $3Ac$R: %-3d |o| $3Carried Items$R: %d $3Equipped Items$R: %d |/|\r\n",
+          GET_INT(k), GET_WIS(k), GET_ARMOR(k), IS_CARRYING_N(k), i2);
+  send_to_char(buf, ch);
+
+  sprintf(buf,
+          "|o| $3 Hitroll$R: %3d     $3Damroll$R: %3d  |~|                                    |/|\r\n"
+          "(:)=================================(:)====================================(:)\r\n",
+          k->hitroll, k->damroll);
+  send_to_char(buf, ch);
+
+  sprintbit(k->suscept, isr_bits, buf2);
+  sprintbit(k->immune, isr_bits, buf3);
+  sprintf(buf,
+          "|/| $7Immune$R: %-63s|o|\r\n"
+          "|o| $7Susceptible$R: %-58s|/|\r\n",
+          buf2, buf3); // immune and susceptible bits, first and second.
+  send_to_char(buf, ch);
+  sprintbit(k->affected_by, affected_bits, buf2);
+  sprintf(buf,
+          "|\\| $7Affected By$R: %-58s|~|\r\n", buf2); // affected bits.
+  send_to_char(buf, ch);
+
+  if (IS_MOB(k)) // AND THIS
+    sprintbit(k->mobdata->actflags, action_bits, buf2);
+  else
+    strcpy(buf2, "Not a mob");
+  sprintbit(k->combat, combat_bits, buf3);
+  sprintf(buf,
+          "|~| $7NPC flags$R: %-60s|\\|\r\n"
+          "|/| $7Combat flags$R: %-57s|o|\r\n",
+          buf2, buf3); // npc flags and combat flags respectively
+  send_to_char(buf, ch);
+
+  sprintbit(k->resist, isr_bits, buf2);
+  sprintf(buf,
+          "|o| $7Resistant$R: %-60s|/|\r\n"
+          "(:)========================================================================(:)\r\n",
+          buf2); // the resisted bits
+  send_to_char(buf, ch);
+
+  strcpy(buf, "$3Title$R: ");
+  strcat(buf, (k->title ? k->title : "None"));
+  strcat(buf, "\n\r");
+  send_to_char(buf, ch);
+
+  // Description
+  send_to_char("$3Detailed description$R:\r\n", ch);
+  if (k->description)
+    send_to_char(k->description, ch);
+  else
+    send_to_char("None", ch);
+
+  // LIST OF FOLLOWERS
+  send_to_char("$3Followers$R:\n\r", ch);
+  for (fol = k->followers; fol; fol = fol->next)
+    act("    $N", ch, 0, fol->follower, TO_CHAR, 0);
+
+  if (!IS_MOB(k))
+  {
+    sprintf(buf, "$3Birth$R: [%ld]secs  $3Logon$R:[%ld]secs $3Played$R[%ld]secs\n\r",
+            k->pcdata->time.birth,
+            k->pcdata->time.logon,
+            (int32_t)(k->pcdata->time.played));
+    send_to_char(buf, ch);
+
+    sprintf(buf, "$3Age$R:[%d] Years [%d] Months [%d] Days [%d] Hours\n\r",
+            age(k).year, age(k).month, age(k).day, age(k).hours);
+    send_to_char(buf, ch);
+  }
+
+  if (!IS_MOB(k))
+  {
+    sprintf(buf, "$3Coins$R:[%lld]  $3Bank$R:[%d]\n\r", GET_GOLD(k),
+            k->pcdata->bank);
+    send_to_char(buf, ch);
+  }
+
+  if (!IS_NPC(k))
+  {
+    sprintf(buf, "$3SaveMod$R: FIRE[%d] COLD[%d] ENERGY[%d] ACID[%d] MAGIC[%d] POISON[%d]\n\r",
+            k->pcdata->saves_mods[SAVE_TYPE_FIRE],
+            k->pcdata->saves_mods[SAVE_TYPE_COLD],
+            k->pcdata->saves_mods[SAVE_TYPE_ENERGY],
+            k->pcdata->saves_mods[SAVE_TYPE_ACID],
+            k->pcdata->saves_mods[SAVE_TYPE_MAGIC],
+            k->pcdata->saves_mods[SAVE_TYPE_POISON]);
+    send_to_char(buf, ch);
+  }
+
+  if (!IS_MOB(k))
+  {
+    sprintf(buf, "$3WizInvis$R:  %ld  ", k->pcdata->wizinvis);
+    send_to_char(buf, ch);
+    sprintf(buf, "$3Holylite$R:  %s  ", ((k->pcdata->holyLite) ? "ON" : "OFF"));
+    send_to_char(buf, ch);
+    sprintf(buf, "$3Stealth$R:  %s\n\r", ((k->pcdata->stealth) ? "ON" : "OFF"));
+    send_to_char(buf, ch);
+
+    if ((k->pcdata->buildLowVnum == k->pcdata->buildMLowVnum) == k->pcdata->buildOLowVnum &&
+        (k->pcdata->buildHighVnum == k->pcdata->buildMHighVnum) == k->pcdata->buildOHighVnum)
+    {
+      sprintf(buf, "$3Creation Range$R:  %d-%d  \r\n", k->pcdata->buildLowVnum, k->pcdata->buildHighVnum);
+      send_to_char(buf, ch);
+    }
+    else
+    {
+      sprintf(buf, "$3R Range$R:  %d-%d  \r\n", k->pcdata->buildLowVnum, k->pcdata->buildHighVnum);
+      send_to_char(buf, ch);
+      sprintf(buf, "$3M Range$R:  %d-%d  \r\n", k->pcdata->buildMLowVnum, k->pcdata->buildMHighVnum);
+      send_to_char(buf, ch);
+      sprintf(buf, "$3O Range$R:  %d-%d  \r\n", k->pcdata->buildOLowVnum, k->pcdata->buildOHighVnum);
+      send_to_char(buf, ch);
+    }
+  }
+
+  if (k->affected)
   {
     send_to_char("\n\r$3Affecting Spells$R:\n\r--------------\n\r", ch);
-    
-    for(aff = k->affected; aff; aff = aff->next) 
+
+    for (aff = k->affected; aff; aff = aff->next)
     {
       sprintf(buf, "Spell : '%s'\n\r",
-        aff->type < 300 ? spells[(int)aff->type-1] :
-        skills[(int)aff->type-300]);
+              aff->type < 300 ? spells[(int)aff->type - 1] : skills[(int)aff->type - 300]);
       send_to_char(buf, ch);
-      sprintf(buf,"     Modifies %s by %d points\n\r",
-        apply_types[(int) aff->location], aff->modifier);
+      sprintf(buf, "     Modifies %s by %d points\n\r",
+              apply_types[(int)aff->location], aff->modifier);
       send_to_char(buf, ch);
-      sprintf(buf,"     Expires in %3d hours, Bits set ", aff->duration);
+      sprintf(buf, "     Expires in %3d hours, Bits set ", aff->duration);
       send_to_char(buf, ch);
-      sprintbit(aff->bitvector,affected_bits,buf);
-      strcat(buf,"\n\r");
+      sprintbit(aff->bitvector, affected_bits, buf);
+      strcat(buf, "\n\r");
       send_to_char(buf, ch);
     }
     send_to_char("\n\r", ch);
   }
 
-  if(!IS_MOB(k))
+  if (!IS_MOB(k))
     display_punishes(ch, k);
 
-  if(k->desc) {
-    sprinttype(k->desc->connected,connected_types,buf2);
-    strcat(buf,"  $3Connected$R: ");
-    strcat(buf,buf2);
+  if (k->desc)
+  {
+    sprinttype(k->desc->connected, connected_types, buf2);
+    strcat(buf, "  $3Connected$R: ");
+    strcat(buf, buf2);
   }
   send_to_char(buf, ch);
 }
 
 void mob_stat(char_data *ch, char_data *k)
-{   
+{
 
   int i;
   char buf[MAX_STRING_LENGTH];
   struct follow_type *fol;
   int i2;
   char buf2[MAX_STRING_LENGTH];
-  struct obj_data  *j=0;
-  //extern char *skills[];
- // extern char *spells[];
- // extern char *ki[];
- // extern char *songs[];
-  struct affected_type *aff;  
-  
-  if (IS_MOB(k)) {
-		sprintf(buf,
-				"$3%s$R - $3Name$R: [%s]  $3VNum$R: %d  $3RNum$R: %d  $3In room:$R %d $3Mobile type:$R ",
-				(!IS_NPC(k) ? "PC" : "MOB"), GET_NAME(k),
-				(IS_NPC(k) ? mob_index[k->mobdata->nr].virt : 0),
-				(IS_NPC(k) ? k->mobdata->nr : 0),
-				k->in_room == NOWHERE ? -1 : world[k->in_room].number);
+  struct obj_data *j = 0;
+  // extern char *skills[];
+  // extern char *spells[];
+  // extern char *ki[];
+  // extern char *songs[];
+  struct affected_type *aff;
 
-		sprinttype(GET_MOB_TYPE(k), mob_types, buf2);
-		strcat(buf, buf2);
-		strcat(buf, "\n\r");
-	} else {
-		sprintf(buf, "$3%s$R - $3Name$R: [%s]  $3In room:$R %d\n\r",
-				(!IS_NPC(k) ? "PC" : "MOB"), GET_NAME(k),
-				k->in_room == NOWHERE ? -1 : world[k->in_room].number);
-	}
+  if (IS_MOB(k))
+  {
+    sprintf(buf,
+            "$3%s$R - $3Name$R: [%s]  $3VNum$R: %d  $3RNum$R: %d  $3In room:$R %d $3Mobile type:$R ",
+            (!IS_NPC(k) ? "PC" : "MOB"), GET_NAME(k),
+            (IS_NPC(k) ? mob_index[k->mobdata->nr].virt : 0),
+            (IS_NPC(k) ? k->mobdata->nr : 0),
+            k->in_room == NOWHERE ? -1 : world[k->in_room].number);
+
+    sprinttype(GET_MOB_TYPE(k), mob_types, buf2);
+    strcat(buf, buf2);
+    strcat(buf, "\n\r");
+  }
+  else
+  {
+    sprintf(buf, "$3%s$R - $3Name$R: [%s]  $3In room:$R %d\n\r",
+            (!IS_NPC(k) ? "PC" : "MOB"), GET_NAME(k),
+            k->in_room == NOWHERE ? -1 : world[k->in_room].number);
+  }
   send_to_char(buf, ch);
 
-  strcpy(buf,"$3Short description$R: ");
+  strcpy(buf, "$3Short description$R: ");
   strcat(buf, (k->short_desc ? k->short_desc : "None"));
-  strcat(buf,"\n\r");
-  send_to_char(buf,ch);
-     
-  strcpy(buf,"$3Title$R: ");
+  strcat(buf, "\n\r");
+  send_to_char(buf, ch);
+
+  strcpy(buf, "$3Title$R: ");
   strcat(buf, (k->title ? k->title : "None"));
-  strcat(buf,"\n\r");
-  send_to_char(buf,ch);
-     
+  strcat(buf, "\n\r");
+  send_to_char(buf, ch);
+
   send_to_char("$3Long description$R: ", ch);
-  if(k->long_desc)
+  if (k->long_desc)
     send_to_char(k->long_desc, ch);
   else
     send_to_char("None", ch);
   send_to_char("$3Detailed description$R:\r\n", ch);
-  if(k->description)
+  if (k->description)
     send_to_char(k->description, ch);
   else
     send_to_char("None", ch);
 
-  strcpy(buf,"\r\n$3Class$R: ");
+  strcpy(buf, "\r\n$3Class$R: ");
   sprinttype(k->c_class, pc_clss_types, buf2);
 
   strcat(buf, buf2);
-     
+
   sprintf(buf2, "   $3Level$R:[%d] $3Alignment$R:[%d] ", k->level,
           k->alignment);
   strcat(buf, buf2);
   send_to_char(buf, ch);
   sprintf(buf, "$3Spelldamage$R:[%d] ", getRealSpellDamage(k));
-  send_to_char(buf,ch);
-  sprintf(buf,"$3Race$R: %s\r\n", races[(int)(GET_RACE(k))].singular_name);
+  send_to_char(buf, ch);
+  sprintf(buf, "$3Race$R: %s\r\n", races[(int)(GET_RACE(k))].singular_name);
   send_to_char(buf, ch);
 
-  if(!IS_MOB(k)) {     
+  if (!IS_MOB(k))
+  {
     sprintf(buf, "$3Birth$R: [%ld]secs  $3Logon$R:[%ld]secs  $3Played$R[%ld]secs\n\r",
-          k->pcdata->time.birth,
-          k->pcdata->time.logon,
-          (int32_t)(k->pcdata->time.played));
+            k->pcdata->time.birth,
+            k->pcdata->time.logon,
+            (int32_t)(k->pcdata->time.played));
     send_to_char(buf, ch);
 
     sprintf(buf, "$3Age$R:[%d] Years [%d] Months [%d] Days [%d] Hours\n\r",
-          age(k).year, age(k).month, age(k).day, age(k).hours);
-    send_to_char(buf,ch);
+            age(k).year, age(k).month, age(k).day, age(k).hours);
+    send_to_char(buf, ch);
   }
   if (IS_NPC(k))
   {
     sprintf(buf, "$3Mobspec$R: %p  $3Progtypes$R: %p\r\n", (int64_t)(mob_index[k->mobdata->nr].mobspec), mob_index[k->mobdata->nr].progtypes);
-    send_to_char(buf,ch);
+    send_to_char(buf, ch);
   }
- sprintf(buf, "$3Height$R:[%d]  $3Weight$R:[%d]  $3Sex$R:[", GET_HEIGHT(k), GET_WEIGHT(k));
-  send_to_char(buf,ch);
-     
-  switch(k->sex) {
-    case SEX_NEUTRAL :
-      send_to_char("NEUTRAL]  ", ch);
-      break;
-    case SEX_MALE :
-      send_to_char("MALE]  ", ch);
-      break;
-    case SEX_FEMALE :
-      send_to_char("FEMALE]  ", ch);
-      break;
-    default :
-      send_to_char("ILLEGAL-VALUE!]  ", ch);
-      break;
-  }  
+  sprintf(buf, "$3Height$R:[%d]  $3Weight$R:[%d]  $3Sex$R:[", GET_HEIGHT(k), GET_WEIGHT(k));
+  send_to_char(buf, ch);
 
-  if(!IS_NPC(ch)) {
+  switch (k->sex)
+  {
+  case SEX_NEUTRAL:
+    send_to_char("NEUTRAL]  ", ch);
+    break;
+  case SEX_MALE:
+    send_to_char("MALE]  ", ch);
+    break;
+  case SEX_FEMALE:
+    send_to_char("FEMALE]  ", ch);
+    break;
+  default:
+    send_to_char("ILLEGAL-VALUE!]  ", ch);
+    break;
+  }
+
+  if (!IS_NPC(ch))
+  {
     sprintf(buf, "$3Hometown$R:[%d]\n\r", k->hometown);
     send_to_char(buf, ch);
-  } else send_to_char("\n\r", ch);
-   
+  }
+  else
+    send_to_char("\n\r", ch);
+
   sprintf(buf, "$3Str$R:[%2d]+[%2d]=%2d $3Int$R:[%2d]+[%2d]=%2d $3Wis$R:[%2d]+[%2d]=%2d\r\n"
                "$3Dex$R:[%2d]+[%2d]=%2d $3Con$R:[%2d]+[%2d]=%2d\n\r",
           GET_RAW_STR(k), GET_STR_BONUS(k), GET_STR(k),
           GET_RAW_INT(k), GET_INT_BONUS(k), GET_INT(k),
           GET_RAW_WIS(k), GET_WIS_BONUS(k), GET_WIS(k),
           GET_RAW_DEX(k), GET_DEX_BONUS(k), GET_DEX(k),
-          GET_RAW_CON(k), GET_CON_BONUS(k), GET_CON(k) );
-  send_to_char(buf,ch);
-     
-  sprintf(buf, "$3Mana$R:[%5d/%5d+%-4d]  $3Hit$R:[%5d/%5d+%-3d]  $3Move$R:[%5d/%5d+%-3d]  $3Ki$R:[%3d/%3d]\n\r",
-          GET_MANA(k),mana_limit(k),mana_gain(k),
-          k->getHP(),hit_limit(k),hit_gain(k),
-          GET_MOVE(k),move_limit(k),move_gain(k,0),
-          GET_KI(k), ki_limit(k));
-  send_to_char(buf,ch);
-     
-  sprintf(buf, "$3AC$R:[%d]  $3Exp$R:[%lld]  $3Hitroll$R:[%d]  $3Damroll$R:[%d]  $3Gold$R: [$B$5%lld$R]\n\r",
-          GET_ARMOR(k), GET_EXP(k), GET_REAL_HITROLL(k), GET_REAL_DAMROLL(k), GET_GOLD(k) );
+          GET_RAW_CON(k), GET_CON_BONUS(k), GET_CON(k));
   send_to_char(buf, ch);
 
-  if(!IS_MOB(k)) {
-    sprintf(buf, "$3Plats$R:[%d]  $3Bank$R:[%d]  $3Clan$R:[%d]  $3Quest Points$R:[%d]\n\r", 
-          GET_PLATINUM(k), GET_BANK(k), GET_CLAN(k), GET_QPOINTS(k) );
+  sprintf(buf, "$3Mana$R:[%5d/%5d+%-4d]  $3Hit$R:[%5d/%5d+%-3d]  $3Move$R:[%5d/%5d+%-3d]  $3Ki$R:[%3d/%3d]\n\r",
+          GET_MANA(k), mana_limit(k), mana_gain(k),
+          k->getHP(), hit_limit(k), hit_gain(k),
+          GET_MOVE(k), move_limit(k), move_gain(k, 0),
+          GET_KI(k), ki_limit(k));
+  send_to_char(buf, ch);
+
+  sprintf(buf, "$3AC$R:[%d]  $3Exp$R:[%lld]  $3Hitroll$R:[%d]  $3Damroll$R:[%d]  $3Gold$R: [$B$5%lld$R]\n\r",
+          GET_ARMOR(k), GET_EXP(k), GET_REAL_HITROLL(k), GET_REAL_DAMROLL(k), GET_GOLD(k));
+  send_to_char(buf, ch);
+
+  if (!IS_MOB(k))
+  {
+    sprintf(buf, "$3Plats$R:[%d]  $3Bank$R:[%d]  $3Clan$R:[%d]  $3Quest Points$R:[%d]\n\r",
+            GET_PLATINUM(k), GET_BANK(k), GET_CLAN(k), GET_QPOINTS(k));
     send_to_char(buf, ch);
   }
-   
+
   sprinttype(GET_POS(k), position_types, buf2);
-  sprintf(buf,"$3Position$R: %s  $3Fighting$R: %s  ",buf2,
+  sprintf(buf, "$3Position$R: %s  $3Fighting$R: %s  ", buf2,
           ((k->fighting) ? GET_NAME(k->fighting)
-          : "Nobody") );
-  if(k->desc) {
-    sprinttype(k->desc->connected,connected_types,buf2);
-    strcat(buf,"  $3Connected$R: ");
-    strcat(buf,buf2);
-  }  
+                         : "Nobody"));
+  if (k->desc)
+  {
+    sprinttype(k->desc->connected, connected_types, buf2);
+    strcat(buf, "  $3Connected$R: ");
+    strcat(buf, buf2);
+  }
   send_to_char(buf, ch);
-     
-  if(IS_NPC(k)) {
-    strcpy(buf,"$3Default position$R: ");
-    sprinttype((k->mobdata->default_pos),position_types,buf2);
+
+  if (IS_NPC(k))
+  {
+    strcpy(buf, "$3Default position$R: ");
+    sprinttype((k->mobdata->default_pos), position_types, buf2);
     strcat(buf, buf2);
     send_to_char(buf, ch);
   }
 
-  sprintf(buf,"  $3Timer$R:[%d] \n\r", k->timer);
+  sprintf(buf, "  $3Timer$R:[%d] \n\r", k->timer);
   send_to_char(buf, ch);
 
-  if(IS_NPC(k)) {
+  if (IS_NPC(k))
+  {
     sprintf(buf, "$3NPC flags$R: [%d %d]", k->mobdata->actflags[0], k->mobdata->actflags[1]);
-    sprintbit(k->mobdata->actflags, action_bits,buf2);
-  }  
-  else {
+    sprintbit(k->mobdata->actflags, action_bits, buf2);
+  }
+  else
+  {
     sprintf(buf, "$3PC flags$R: [%d]", k->pcdata->toggles);
-    sprintbit(k->pcdata->toggles, player_bits,buf2);
-  }  
+    sprintbit(k->pcdata->toggles, player_bits, buf2);
+  }
   strcat(buf, buf2);
   send_to_char(buf, ch);
-     
-  if(IS_MOB(k)) {
+
+  if (IS_MOB(k))
+  {
     strcpy(buf, "\n\r$3Non-Combat Special Proc$R: ");
     strcat(buf, (mob_index[k->mobdata->nr].non_combat_func ? "Exists  " : "None  "));
     send_to_char(buf, ch);
@@ -722,31 +763,32 @@ void mob_stat(char_data *ch, char_data *k)
     strcpy(buf, "$3Mob Progs$R: ");
     strcat(buf, (mob_index[k->mobdata->nr].mobprogs ? "Exist\r\n" : "None\r\n"));
     send_to_char(buf, ch);
-  } 
-  
-  if(IS_NPC(k)) {
+  }
+
+  if (IS_NPC(k))
+  {
     sprintf(buf, "$3NPC Bare Hand Damage$R: %d$3d$R%d.\n\r",
             k->mobdata->damnodice, k->mobdata->damsizedice);
     send_to_char(buf, ch);
-  }  
-  
-  sprintf(buf,"$3Carried weight$R: %d   $3Carried items$R: %d\n\r",
-          IS_CARRYING_W(k), IS_CARRYING_N(k) );
-  send_to_char(buf,ch);
-     
-  for(i = 0, j = k->carrying; j; j = j->next_content, i++)
+  }
+
+  sprintf(buf, "$3Carried weight$R: %d   $3Carried items$R: %d\n\r",
+          IS_CARRYING_W(k), IS_CARRYING_N(k));
+  send_to_char(buf, ch);
+
+  for (i = 0, j = k->carrying; j; j = j->next_content, i++)
     ;
   sprintf(buf, "$3Items in inventory$R: %d  ", i);
-     
-  for(i = 0, i2 = 0; i < MAX_WEAR; i++)
-     if(k->equipment[i])
-       i2++;
-     
-  sprintf(buf2,"$3Items in equipment$R: %d\n\r", i2);
-  strcat(buf,buf2);
+
+  for (i = 0, i2 = 0; i < MAX_WEAR; i++)
+    if (k->equipment[i])
+      i2++;
+
+  sprintf(buf2, "$3Items in equipment$R: %d\n\r", i2);
+  strcat(buf, buf2);
   send_to_char(buf, ch);
-     
-  sprintf(buf,"$3Save Vs$R: $B$4FIRE[%2d] $7COLD[%2d] $5ENERGY[%2d] $2ACID[%2d] $3MAGIC[%2d] $R$2POISON[%2d]$R\n\r",
+
+  sprintf(buf, "$3Save Vs$R: $B$4FIRE[%2d] $7COLD[%2d] $5ENERGY[%2d] $2ACID[%2d] $3MAGIC[%2d] $R$2POISON[%2d]$R\n\r",
           k->saves[SAVE_TYPE_FIRE],
           k->saves[SAVE_TYPE_COLD],
           k->saves[SAVE_TYPE_ENERGY],
@@ -755,154 +797,163 @@ void mob_stat(char_data *ch, char_data *k)
           k->saves[SAVE_TYPE_POISON]);
   send_to_char(buf, ch);
 
-  if(!IS_NPC(k)) {
-    sprintf(buf,"$3SaveMod$R: $B$4FIRE[%2d] $7COLD[%2d] $5ENERGY[%2d] $2ACID[%2d] $3MAGIC[%2d] $R$2POISON[%2d]$R\n\r",
-          k->pcdata->saves_mods[SAVE_TYPE_FIRE],
-          k->pcdata->saves_mods[SAVE_TYPE_COLD],
-          k->pcdata->saves_mods[SAVE_TYPE_ENERGY],
-          k->pcdata->saves_mods[SAVE_TYPE_ACID],
-          k->pcdata->saves_mods[SAVE_TYPE_MAGIC],
-          k->pcdata->saves_mods[SAVE_TYPE_POISON]);
+  if (!IS_NPC(k))
+  {
+    sprintf(buf, "$3SaveMod$R: $B$4FIRE[%2d] $7COLD[%2d] $5ENERGY[%2d] $2ACID[%2d] $3MAGIC[%2d] $R$2POISON[%2d]$R\n\r",
+            k->pcdata->saves_mods[SAVE_TYPE_FIRE],
+            k->pcdata->saves_mods[SAVE_TYPE_COLD],
+            k->pcdata->saves_mods[SAVE_TYPE_ENERGY],
+            k->pcdata->saves_mods[SAVE_TYPE_ACID],
+            k->pcdata->saves_mods[SAVE_TYPE_MAGIC],
+            k->pcdata->saves_mods[SAVE_TYPE_POISON]);
     send_to_char(buf, ch);
   }
-     
+
   sprintf(buf, "$3Thirst$R: %d  $3Hunger$R: %d  $3Drunk$R: %d\n\r",
           k->conditions[THIRST],
           k->conditions[FULL],
           k->conditions[DRUNK]);
   send_to_char(buf, ch);
-	sprintf(buf, "$3Melee$R: [%d] $3Spell$R: [%d] $3Song$R: [%d] $3Reflect$R: [%d]\r\n", 
-		k->melee_mitigation, k->spell_mitigation, k->song_mitigation, k->spell_reflect);
-	send_to_char(buf,ch);
+  sprintf(buf, "$3Melee$R: [%d] $3Spell$R: [%d] $3Song$R: [%d] $3Reflect$R: [%d]\r\n",
+          k->melee_mitigation, k->spell_mitigation, k->song_mitigation, k->spell_reflect);
+  send_to_char(buf, ch);
 
   sprintf(buf, "$3Tracking$R: '%s'\n\r", ((k->hunting) ? k->hunting : "NOBODY"));
   send_to_char(buf, ch);
 
-  if(IS_MOB(k)) {     
+  if (IS_MOB(k))
+  {
     sprintf(buf, "$3Hates$R: '%s'\n\r",
-          ((k->mobdata->hatred) ? k->mobdata->hatred : "NOBODY"));
+            ((k->mobdata->hatred) ? k->mobdata->hatred : "NOBODY"));
     send_to_char(buf, ch);
-     
+
     sprintf(buf, "$3Fears$R: '%s'\n\r",
-          ((k->mobdata->fears) ? k->mobdata->fears : "NOBODY"));
+            ((k->mobdata->fears) ? k->mobdata->fears : "NOBODY"));
     send_to_char(buf, ch);
   }
- 
+
   sprintf(buf, "$3Master$R: '%s'\n\r",
           ((k->master) ? GET_NAME(k->master) : "NOBODY"));
   send_to_char(buf, ch);
   send_to_char("$3Followers$R:\n\r", ch);
-  for(fol = k->followers; fol; fol = fol->next)
-     act("    $N", ch, 0, fol->follower, TO_CHAR, 0);
-     
+  for (fol = k->followers; fol; fol = fol->next)
+    act("    $N", ch, 0, fol->follower, TO_CHAR, 0);
+
   // Showing the bitvector
   sprintbit(k->combat, combat_bits, buf);
   csendf(ch, "$3Combat flags$R: %s\n\r", buf);
-  
-  if(!IS_MOB(k))
-     display_punishes(ch, k);
-    
+
+  if (!IS_MOB(k))
+    display_punishes(ch, k);
+
   sprintbit(k->affected_by, affected_bits, buf);
   csendf(ch, "$3Affected by$R: [%d %d] %s\r\n", k->affected_by[0], k->affected_by[1], buf);
 
   sprintbit(k->immune, isr_bits, buf);
   csendf(ch, "$3Immune$R: [%d] %s\n\r", k->immune, buf);
-     
+
   sprintbit(k->suscept, isr_bits, buf);
-  csendf(ch, "$3Susceptible$R: [%d] %s\n\r", k->suscept,buf);
-     
+  csendf(ch, "$3Susceptible$R: [%d] %s\n\r", k->suscept, buf);
+
   sprintbit(k->resist, isr_bits, buf);
   csendf(ch, "$3Resistant$R: [%d] %s\n\r", k->resist, buf);
-     
-  if(!IS_MOB(k)) {
+
+  if (!IS_MOB(k))
+  {
     sprintf(buf, "$3WizInvis$R:  %ld  ", k->pcdata->wizinvis);
     send_to_char(buf, ch);
     sprintf(buf, "$3Holylite$R:  %s  ", ((k->pcdata->holyLite) ? "ON" : "OFF"));
     send_to_char(buf, ch);
-    sprintf(buf, "$3Stealth$R:  %s\n\r", ((k->pcdata->stealth) ? "ON"  : "OFF"));
+    sprintf(buf, "$3Stealth$R:  %s\n\r", ((k->pcdata->stealth) ? "ON" : "OFF"));
     send_to_char(buf, ch);
-    if ((k->pcdata->buildLowVnum == k->pcdata->buildMLowVnum) == k->pcdata->buildOLowVnum  &&
+    if ((k->pcdata->buildLowVnum == k->pcdata->buildMLowVnum) == k->pcdata->buildOLowVnum &&
         (k->pcdata->buildHighVnum == k->pcdata->buildMHighVnum) == k->pcdata->buildOHighVnum)
-   {
-    sprintf(buf, "$3Creation Range$R:  %d-%d  \r\n", k->pcdata->buildLowVnum, k->pcdata->buildHighVnum);
-    send_to_char(buf,ch);
-   } else {
-    sprintf(buf, "$3R Range$R:  %d-%d  ", k->pcdata->buildLowVnum, k->pcdata->buildHighVnum);
-    send_to_char(buf,ch);
-    sprintf(buf, "$3M Range$R:  %d-%d  ", k->pcdata->buildMLowVnum, k->pcdata->buildMHighVnum);
-    send_to_char(buf,ch);
-    sprintf(buf, "$3O Range$R:  %d-%d  \r\n", k->pcdata->buildOLowVnum, k->pcdata->buildOHighVnum);
-    send_to_char(buf,ch);
-   }
-  }  
+    {
+      sprintf(buf, "$3Creation Range$R:  %d-%d  \r\n", k->pcdata->buildLowVnum, k->pcdata->buildHighVnum);
+      send_to_char(buf, ch);
+    }
+    else
+    {
+      sprintf(buf, "$3R Range$R:  %d-%d  ", k->pcdata->buildLowVnum, k->pcdata->buildHighVnum);
+      send_to_char(buf, ch);
+      sprintf(buf, "$3M Range$R:  %d-%d  ", k->pcdata->buildMLowVnum, k->pcdata->buildMHighVnum);
+      send_to_char(buf, ch);
+      sprintf(buf, "$3O Range$R:  %d-%d  \r\n", k->pcdata->buildOLowVnum, k->pcdata->buildOHighVnum);
+      send_to_char(buf, ch);
+    }
+  }
 
   csendf(ch, "$3Lag Left$R:  %d\r\n", (GET_WAIT(k) ? GET_WAIT(k) : 0));
 
-
-  if (IS_PC(k)) {
-      csendf(ch, "$3Hp metas$R: %d, $3Mana metas$R: %d, $3Move metas$R: %d, $3Ki metas$R: %d, $3AC metas$R: %d, $3Age metas$R: %d\r\n",GET_HP_METAS(k), GET_MANA_METAS(k), GET_MOVE_METAS(k), GET_KI_METAS(k), GET_AC_METAS(k), GET_AGE_METAS(k));
-      csendf(ch, "$3Profession$R: %s (%d)\n\r", find_profession(k->c_class, k->pcdata->profession), k->pcdata->profession);
+  if (IS_PC(k))
+  {
+    csendf(ch, "$3Hp metas$R: %d, $3Mana metas$R: %d, $3Move metas$R: %d, $3Ki metas$R: %d, $3AC metas$R: %d, $3Age metas$R: %d\r\n", GET_HP_METAS(k), GET_MANA_METAS(k), GET_MOVE_METAS(k), GET_KI_METAS(k), GET_AC_METAS(k), GET_AGE_METAS(k));
+    csendf(ch, "$3Profession$R: %s (%d)\n\r", find_profession(k->c_class, k->pcdata->profession), k->pcdata->profession);
   }
 
-  if(k->affected) {
+  if (k->affected)
+  {
     send_to_char("\n\r$3Affecting Spells$R:\n\r--------------\n\r", ch);
-    for(aff = k->affected; aff; aff = aff->next) {
+    for (aff = k->affected; aff; aff = aff->next)
+    {
 
-      const char * aff_name = get_skill_name(aff->type);
-      
-      if(!aff_name)
+      const char *aff_name = get_skill_name(aff->type);
+
+      if (!aff_name)
       {
-         if(aff->type == INTERNAL_SLEEPING)
-           aff_name = "Internal Sleeping";
-         else if(aff->type == FUCK_CANTQUIT)
-           aff_name = "CANT_QUIT";
-         else
-	     aff_name = "Unknown!!!";
+        if (aff->type == INTERNAL_SLEEPING)
+          aff_name = "Internal Sleeping";
+        else if (aff->type == FUCK_CANTQUIT)
+          aff_name = "CANT_QUIT";
+        else
+          aff_name = "Unknown!!!";
       }
       sprintf(buf, "Spell : '%s' (%d)\n\r", aff_name, aff->type);
       send_to_char(buf, ch);
-      sprintf(buf,"     Modifies %s by %d points\n\r",
-              apply_types[(int) aff->location], aff->modifier);
+      sprintf(buf, "     Modifies %s by %d points\n\r",
+              apply_types[(int)aff->location], aff->modifier);
       send_to_char(buf, ch);
-      sprintf(buf,"     Expires in %3d hours", aff->duration);
-//    strcat(buf,",Bits set ");
-//      send_to_char(buf, ch);
-//      sprintbit(aff->bitvector,affected_bits,buf);
-      strcat(buf,"\n\r");
+      sprintf(buf, "     Expires in %3d hours", aff->duration);
+      //    strcat(buf,",Bits set ");
+      //      send_to_char(buf, ch);
+      //      sprintbit(aff->bitvector,affected_bits,buf);
+      strcat(buf, "\n\r");
       send_to_char(buf, ch);
     }
     send_to_char("\n\r", ch);
   }
 
-  if (IS_MOB(k)) {
-	switch (k->mobdata->mob_flags.type) {
-	case mob_type_t::MOB_NORMAL:
-		break;
-	case mob_type_t::MOB_GUARD:
-		sprintf(buf, "$3Guard room (v1)$R: [%d]\n\r"
-				     " $3Direction (v2)$R: [%d]\n\r"
-				     "    $3Unused (v3)$R: [%d]\n\r"
-				     "    $3Unused (v4)$R: [%d]\n\r",
-				k->mobdata->mob_flags.value[0], k->mobdata->mob_flags.value[1],
-				k->mobdata->mob_flags.value[2], k->mobdata->mob_flags.value[3]);
-		send_to_char(buf, ch);
-		break;
-	case mob_type_t::MOB_CLAN_GUARD:
-		sprintf(buf, "$3Guard room (v1)$R: [%d]\n\r"
-				     " $3Direction (v2)$R: [%d]\n\r"
-				     "  $3Clan num (v3)$R: [%d]\n\r"
-				     "    $3Unused (v4)$R: [%d]\n\r",
-				k->mobdata->mob_flags.value[0], k->mobdata->mob_flags.value[1],
-				k->mobdata->mob_flags.value[2], k->mobdata->mob_flags.value[3]);
-		send_to_char(buf, ch);
-		break;
-	default:
-		sprintf(buf, "$3Values 1-4 : [$R%d$3] [$R%d$3] [$R%d$3] [$R%d$3]$R\n\r",
-				k->mobdata->mob_flags.value[0], k->mobdata->mob_flags.value[1],
-				k->mobdata->mob_flags.value[2], k->mobdata->mob_flags.value[3]);
-		send_to_char(buf, ch);
-		break;
-	}
+  if (IS_MOB(k))
+  {
+    switch (k->mobdata->mob_flags.type)
+    {
+    case mob_type_t::MOB_NORMAL:
+      break;
+    case mob_type_t::MOB_GUARD:
+      sprintf(buf, "$3Guard room (v1)$R: [%d]\n\r"
+                   " $3Direction (v2)$R: [%d]\n\r"
+                   "    $3Unused (v3)$R: [%d]\n\r"
+                   "    $3Unused (v4)$R: [%d]\n\r",
+              k->mobdata->mob_flags.value[0], k->mobdata->mob_flags.value[1],
+              k->mobdata->mob_flags.value[2], k->mobdata->mob_flags.value[3]);
+      send_to_char(buf, ch);
+      break;
+    case mob_type_t::MOB_CLAN_GUARD:
+      sprintf(buf, "$3Guard room (v1)$R: [%d]\n\r"
+                   " $3Direction (v2)$R: [%d]\n\r"
+                   "  $3Clan num (v3)$R: [%d]\n\r"
+                   "    $3Unused (v4)$R: [%d]\n\r",
+              k->mobdata->mob_flags.value[0], k->mobdata->mob_flags.value[1],
+              k->mobdata->mob_flags.value[2], k->mobdata->mob_flags.value[3]);
+      send_to_char(buf, ch);
+      break;
+    default:
+      sprintf(buf, "$3Values 1-4 : [$R%d$3] [$R%d$3] [$R%d$3] [$R%d$3]$R\n\r",
+              k->mobdata->mob_flags.value[0], k->mobdata->mob_flags.value[1],
+              k->mobdata->mob_flags.value[2], k->mobdata->mob_flags.value[3]);
+      send_to_char(buf, ch);
+      break;
+    }
   }
 }
 
@@ -1291,267 +1342,287 @@ void obj_stat(char_data *ch, struct obj_data *j)
 
 void do_start(char_data *ch)
 {
-  char buf [256];
+  char buf[256];
 
   send_to_char("This is now your character in Dark Castle mud.  You lucky "
-               "piece of shit you.\n\r", ch);
+               "piece of shit you.\n\r",
+               ch);
 
-  if(IS_MOB(ch))
+  if (IS_MOB(ch))
     return;
 
   GET_LEVEL(ch) = 1;
   GET_EXP(ch) = 1;
 
-  if(GET_TITLE(ch) == NULL) {
+  if (GET_TITLE(ch) == NULL)
+  {
     GET_TITLE(ch) = str_dup("is a virgin.");
   }
 
   sprintf(buf, "%s appears with an ear-splitting bang!", GET_SHORT(ch));
   ch->pcdata->poofin = str_dup(buf);
 
-  sprintf (buf, "%s disappears in a puff of smoke.", GET_SHORT(ch));
+  sprintf(buf, "%s disappears in a puff of smoke.", GET_SHORT(ch));
   ch->pcdata->poofout = str_dup(buf);
 
-  ch->raw_hit  = 10;
-  ch->max_hit  = 10;
+  ch->raw_hit = 10;
+  ch->max_hit = 10;
 
-  switch(GET_CLASS(ch)) {
+  switch (GET_CLASS(ch))
+  {
 
-    case CLASS_MAGIC_USER:
-        ch->pcdata->practices = 6;
-        break;
+  case CLASS_MAGIC_USER:
+    ch->pcdata->practices = 6;
+    break;
 
-    case CLASS_CLERIC:
-        ch->pcdata->practices = 6;
-        break;
+  case CLASS_CLERIC:
+    ch->pcdata->practices = 6;
+    break;
 
-    case CLASS_THIEF:
-        ch->pcdata->practices = 6;
-        break;
+  case CLASS_THIEF:
+    ch->pcdata->practices = 6;
+    break;
 
-    case CLASS_WARRIOR:
-        ch->pcdata->practices = 6;
-        break;
-    }
+  case CLASS_WARRIOR:
+    ch->pcdata->practices = 6;
+    break;
+  }
 
-    advance_level(ch, 0);
-    redo_hitpoints(ch);
+  advance_level(ch, 0);
+  redo_hitpoints(ch);
 
-    GET_RDEATHS(ch) = 0;
-    GET_PDEATHS(ch) = 0;
-    GET_PKILLS(ch) = 0;
+  GET_RDEATHS(ch) = 0;
+  GET_PDEATHS(ch) = 0;
+  GET_PKILLS(ch) = 0;
 
-    ch->fillHPLimit();
-    GET_MANA(ch) = mana_limit(ch);
-    GET_MOVE(ch) = move_limit(ch);
+  ch->fillHPLimit();
+  GET_MANA(ch) = mana_limit(ch);
+  GET_MOVE(ch) = move_limit(ch);
 
-    GET_COND(ch,THIRST) = 24;
-    GET_COND(ch,FULL)   = 24;
-    GET_COND(ch,DRUNK)  = 0;
+  GET_COND(ch, THIRST) = 24;
+  GET_COND(ch, FULL) = 24;
+  GET_COND(ch, DRUNK) = 0;
 
-    ch->pcdata->time.played = 0;
-    ch->pcdata->time.logon  = time(0);
-
+  ch->pcdata->time.played = 0;
+  ch->pcdata->time.logon = time(0);
 }
-
 
 int do_repop(char_data *ch, char *argument, int cmd)
 {
-        char buf[MAX_STRING_LENGTH];
-    
-        if(GET_LEVEL(ch) < DEITY && !can_modify_room(ch, ch->in_room)) {
-          send_to_char("You may only repop inside of your R range.\r\n", ch);
-          return eFAILURE;
-        }
+  char buf[MAX_STRING_LENGTH];
 
-        send_to_char("Resetting this entire zone!\n\r", ch);
-        sprintf(buf, "%s repopped zone #%d.", GET_NAME(ch), world[ch->in_room].zone);
-        log(buf, GET_LEVEL(ch), LOG_GOD);
-        reset_zone(world[ch->in_room].zone);
-	return eSUCCESS;
+  if (GET_LEVEL(ch) < DEITY && !can_modify_room(ch, ch->in_room))
+  {
+    send_to_char("You may only repop inside of your R range.\r\n", ch);
+    return eFAILURE;
+  }
+
+  send_to_char("Resetting this entire zone!\n\r", ch);
+  sprintf(buf, "%s repopped zone #%d.", GET_NAME(ch), world[ch->in_room].zone);
+  log(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
+  reset_zone(world[ch->in_room].zone);
+  return eSUCCESS;
 }
 
 int do_clear(char_data *ch, char *argument, int cmd)
-{       
-        char buf[MAX_STRING_LENGTH];
-        int zone = world[ch->in_room].zone; 
- 
-        if(GET_LEVEL(ch) < DEITY && !can_modify_room(ch, ch->in_room)) {
-          send_to_char("You may only repop inside of your R range.\r\n", ch);
-          return eFAILURE;
-        }
+{
+  char buf[MAX_STRING_LENGTH];
+  int zone = world[ch->in_room].zone;
 
-	auto &character_list = DC::instance().character_list;
-	for (auto& tmp_victim : character_list) {
-		// This should never happen but it has before so we must investigate without crashing the whole MUD
-		if (tmp_victim == 0) {
-			produce_coredump(tmp_victim);
-			continue;
-		}
-		if (GET_POS(tmp_victim) == POSITION_DEAD || tmp_victim->in_room == NOWHERE) {
-			continue;
-		}
-                if(world[tmp_victim->in_room].zone == zone) {
-                        if(IS_NPC(tmp_victim)) {
-                                for (int l = 0; l < MAX_WEAR; l++ )
-                                {
-                                   if ( tmp_victim->equipment[l] )
-                                      extract_obj(unequip_char(tmp_victim,l));
-                                }
-                                while(tmp_victim->carrying)
-                                   extract_obj(tmp_victim->carrying);
-                                extract_char(tmp_victim, TRUE);
-                        }
-                        else 
-                                send_to_char("You hear unmatched screams of terror as all mobs are summarily executed!\n\r", tmp_victim);
-                }
+  if (GET_LEVEL(ch) < DEITY && !can_modify_room(ch, ch->in_room))
+  {
+    send_to_char("You may only repop inside of your R range.\r\n", ch);
+    return eFAILURE;
+  }
+
+  auto &character_list = DC::instance().character_list;
+  for (auto &tmp_victim : character_list)
+  {
+    // This should never happen but it has before so we must investigate without crashing the whole MUD
+    if (tmp_victim == 0)
+    {
+      produce_coredump(tmp_victim);
+      continue;
+    }
+    if (GET_POS(tmp_victim) == POSITION_DEAD || tmp_victim->in_room == NOWHERE)
+    {
+      continue;
+    }
+    if (world[tmp_victim->in_room].zone == zone)
+    {
+      if (IS_NPC(tmp_victim))
+      {
+        for (int l = 0; l < MAX_WEAR; l++)
+        {
+          if (tmp_victim->equipment[l])
+            extract_obj(unequip_char(tmp_victim, l));
         }
-        send_to_char("You have just caused the destruction of countless creatures in ths area!\n\r",ch);
-        sprintf(buf, "%s just CLEARED zone #%d!", GET_NAME(ch), zone);
-        log(buf, GET_LEVEL(ch), LOG_GOD);
-	return eSUCCESS;
+        while (tmp_victim->carrying)
+          extract_obj(tmp_victim->carrying);
+        extract_char(tmp_victim, TRUE);
+      }
+      else
+        send_to_char("You hear unmatched screams of terror as all mobs are summarily executed!\n\r", tmp_victim);
+    }
+  }
+  send_to_char("You have just caused the destruction of countless creatures in ths area!\n\r", ch);
+  sprintf(buf, "%s just CLEARED zone #%d!", GET_NAME(ch), zone);
+  log(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
+  return eSUCCESS;
 }
 
 int do_linkdead(char_data *ch, char *arg, int cmd)
-{                               
+{
   int x = 0;
   char buf[100];
- 
-  auto &character_list = DC::instance().character_list;
-	for (auto& i : character_list) {
 
-     if(IS_NPC(i) || i->desc || !CAN_SEE(ch, i))
-       continue;
-     x++;
- 
-     if (i->pcdata->possesing)
-        sprintf(buf, "%14s -- [%ld] %s  *possessing*\n\r", GET_NAME(i),
-             (int32_t)(world[i->in_room].number), (world[i->in_room].name));
-     else
-        sprintf(buf, "%14s -- [%ld] %s\n\r", GET_NAME(i),
-             (int32_t)(world[i->in_room].number), (world[i->in_room].name));
-     send_to_char(buf, ch);
-  }  
-  
-  if(!x)
+  auto &character_list = DC::instance().character_list;
+  for (auto &i : character_list)
+  {
+
+    if (IS_NPC(i) || i->desc || !CAN_SEE(ch, i))
+      continue;
+    x++;
+
+    if (i->pcdata->possesing)
+      sprintf(buf, "%14s -- [%ld] %s  *possessing*\n\r", GET_NAME(i),
+              (int32_t)(world[i->in_room].number), (world[i->in_room].name));
+    else
+      sprintf(buf, "%14s -- [%ld] %s\n\r", GET_NAME(i),
+              (int32_t)(world[i->in_room].number), (world[i->in_room].name));
+    send_to_char(buf, ch);
+  }
+
+  if (!x)
     send_to_char("No linkdead players found.\n\r", ch);
   return eSUCCESS;
-}    
+}
 
 int do_echo(char_data *ch, char *argument, int cmd)
-{    
-    int i;
-    char buf[MAX_STRING_LENGTH];
-    char_data *vict;
-     
-    if(IS_NPC(ch))
-      return eFAILURE;
-    
-    for (i = 0; *(argument + i) == ' '; i++);
+{
+  int i;
+  char buf[MAX_STRING_LENGTH];
+  char_data *vict;
 
-    if(!*(argument + i))
-      send_to_char("What message do you want to echo to ths room?\n\r", ch);
-     
-    else {
-        sprintf(buf, "\n\r%s\n\r", argument + i);
-        for(vict = world[ch->in_room].people; vict; vict = vict->next_in_room)
-           send_to_char(buf, vict);
-    }
-    return eSUCCESS;
-}   
+  if (IS_NPC(ch))
+    return eFAILURE;
+
+  for (i = 0; *(argument + i) == ' '; i++)
+    ;
+
+  if (!*(argument + i))
+    send_to_char("What message do you want to echo to ths room?\n\r", ch);
+
+  else
+  {
+    sprintf(buf, "\n\r%s\n\r", argument + i);
+    for (vict = world[ch->in_room].people; vict; vict = vict->next_in_room)
+      send_to_char(buf, vict);
+  }
+  return eSUCCESS;
+}
 
 int do_restore(char_data *ch, char *argument, int cmd)
-{   
-    char_data *victim;
-    char buf[100];
-    struct descriptor_data *i;        
+{
+  char_data *victim;
+  char buf[100];
+  struct descriptor_data *i;
 
-    void update_pos(char_data *victim);
+  void update_pos(char_data * victim);
 
-    if(!has_skill(ch, COMMAND_RESTORE)) {
-        send_to_char("Huh?\r\n", ch);
-        return eFAILURE;
+  if (!has_skill(ch, COMMAND_RESTORE))
+  {
+    send_to_char("Huh?\r\n", ch);
+    return eFAILURE;
+  }
+
+  one_argument(argument, buf);
+  if (!*buf)
+    send_to_char("Whom do you wish to restore?\n\r", ch);
+  else if (strcmp(buf, "all"))
+  {
+
+    if (!(victim = get_char(buf)))
+    {
+      send_to_char("No-one by that name in the world.\n\r", ch);
+      return eFAILURE;
     }
-    
-    one_argument(argument,buf);
-    if (!*buf)
-        send_to_char("Whom do you wish to restore?\n\r",ch);
+
+    GET_MANA(victim) = GET_MAX_MANA(victim);
+    victim->fillHP();
+    GET_MOVE(victim) = GET_MAX_MOVE(victim);
+    GET_KI(victim) = GET_MAX_KI(victim);
+
+    if (GET_LEVEL(victim) >= IMMORTAL)
+    {
+      GET_COND(victim, FULL) = -1;
+      GET_COND(victim, THIRST) = -1;
+    }
     else
-     if (strcmp(buf, "all")) {
-     
-        if(!(victim = get_char(buf))) {
-            send_to_char("No-one by that name in the world.\n\r",ch);
-             return eFAILURE;
-          }
-     
-            GET_MANA(victim) = GET_MAX_MANA(victim);
-            victim->fillHP();
-            GET_MOVE(victim) = GET_MAX_MOVE(victim);
-            GET_KI(victim) = GET_MAX_KI(victim);
+    {
+      if (GET_COND(victim, FULL) != -1)
+      {
+        GET_COND(victim, FULL) = 25;
+        GET_COND(victim, THIRST) = 25;
+      }
+    }
 
-            if(GET_LEVEL(victim) >= IMMORTAL) {
-              GET_COND(victim, FULL)   = -1;
-              GET_COND(victim, THIRST) = -1;
-            }
-            else {
-      if (GET_COND(victim, FULL) != -1) {
-              GET_COND(victim, FULL)   = 25;
-              GET_COND(victim, THIRST) = 25;
-                 }
-            }
-     
-         sprintf(buf, "%s restored %s.", GET_NAME(ch), GET_NAME(victim));
-         log(buf, GET_LEVEL(ch), LOG_GOD);
+    sprintf(buf, "%s restored %s.", GET_NAME(ch), GET_NAME(victim));
+    log(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
 
-            update_pos( victim );
-            redo_hitpoints(victim);
-            redo_mana(victim);
-	    redo_ki(victim);     
-            send_to_char("Done.\n\r", ch);
-            if (!IS_AFFECTED(ch, AFF_BLIND))
-            act("You have been fully healed by $N!",
-             victim, 0, ch, TO_CHAR, 0);
-            do_save(victim, "", CMD_DEFAULT);
-        } else {    /* Restore all */
+    update_pos(victim);
+    redo_hitpoints(victim);
+    redo_mana(victim);
+    redo_ki(victim);
+    send_to_char("Done.\n\r", ch);
+    if (!IS_AFFECTED(ch, AFF_BLIND))
+      act("You have been fully healed by $N!",
+          victim, 0, ch, TO_CHAR, 0);
+    do_save(victim, "", CMD_DEFAULT);
+  }
+  else
+  { /* Restore all */
 
-       if (GET_LEVEL(ch) < OVERSEER) {
-           send_to_char("You don't have the ability to do that!\n\r", ch);
-     sprintf (buf, "%s tried to do a restore all!", GET_NAME(ch));
-            log(buf, GET_LEVEL(ch), LOG_GOD);
-     
-              return eFAILURE;
-         }
-          for (i = descriptor_list; i; i = i->next)
-             if (i->character != ch  && !i->connected) {
-     
-               victim = i->character;
-     
-            GET_MANA(victim) = GET_MAX_MANA(victim);
-            victim->fillHP();
-            GET_MOVE(victim) = GET_MAX_MOVE(victim);
-            GET_KI(victim) = GET_MAX_KI(victim);
+    if (GET_LEVEL(ch) < OVERSEER)
+    {
+      send_to_char("You don't have the ability to do that!\n\r", ch);
+      sprintf(buf, "%s tried to do a restore all!", GET_NAME(ch));
+      log(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
 
-            if(GET_LEVEL(victim) >= IMMORTAL) {
-              GET_COND(victim, FULL)   = -1;
-              GET_COND(victim, THIRST) = -1;
-            }
-     
-            update_pos( victim );
-	    redo_ki(victim);
-            redo_hitpoints(victim);
-            redo_mana(victim);
-     
-            act("You have been fully healed by $N!",
-             victim, 0, ch, TO_CHAR, 0);
-            do_save(victim, "", CMD_DEFAULT);
+      return eFAILURE;
+    }
+    for (i = descriptor_list; i; i = i->next)
+      if (i->character != ch && !i->connected)
+      {
+
+        victim = i->character;
+
+        GET_MANA(victim) = GET_MAX_MANA(victim);
+        victim->fillHP();
+        GET_MOVE(victim) = GET_MAX_MOVE(victim);
+        GET_KI(victim) = GET_MAX_KI(victim);
+
+        if (GET_LEVEL(victim) >= IMMORTAL)
+        {
+          GET_COND(victim, FULL) = -1;
+          GET_COND(victim, THIRST) = -1;
         }
-           sprintf(buf, "%s did a restore all!", GET_NAME(ch));
-            log(buf, GET_LEVEL(ch), LOG_GOD);
-        send_to_char("Trying to be Mister Popularity?\n\r", ch);
-  }  
-    return eSUCCESS;
-} 
 
+        update_pos(victim);
+        redo_ki(victim);
+        redo_hitpoints(victim);
+        redo_mana(victim);
+
+        act("You have been fully healed by $N!",
+            victim, 0, ch, TO_CHAR, 0);
+        do_save(victim, "", CMD_DEFAULT);
+      }
+    sprintf(buf, "%s did a restore all!", GET_NAME(ch));
+    log(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
+    send_to_char("Trying to be Mister Popularity?\n\r", ch);
+  }
+  return eSUCCESS;
+}
 
 // Scavenger hunts..
 
@@ -1566,10 +1637,10 @@ struct hunt_data
 
 struct hunt_items
 { // Bleh, don't wanna make it go through every item in the game everytime someone checks the list
-   struct hunt_items *next;
-   struct hunt_data *hunt;
-   struct obj_data *obj;
-   char *mobname;
+  struct hunt_items *next;
+  struct hunt_data *hunt;
+  struct obj_data *obj;
+  char *mobname;
 };
 
 struct hunt_data *hunt_list = NULL;
@@ -1577,61 +1648,80 @@ struct hunt_items *hunt_items_list = NULL;
 
 void check_end_of_hunt(struct hunt_data *h, bool forced = FALSE)
 {
-  struct hunt_items *i,*p=NULL,*in;
+  struct hunt_items *i, *p = NULL, *in;
   int items = 0;
 
-  for (i = hunt_items_list;  i;i = in)
+  for (i = hunt_items_list; i; i = in)
   {
     in = i->next;
     if (i->hunt == h)
     {
       if (h->time <= 0)
       {
-	//obj_from_char(i->obj);
-	if (p) p->next = in;
-	else hunt_items_list = in;
+        // obj_from_char(i->obj);
+        if (p)
+          p->next = in;
+        else
+          hunt_items_list = in;
 
-	extract_obj(i->obj);
-	dc_free(i->mobname);
+        extract_obj(i->obj);
+        dc_free(i->mobname);
         dc_free(i);
-	continue;
-      } else items++; 
+        continue;
+      }
+      else
+        items++;
     }
     p = i;
   }
   char buf[MAX_STRING_LENGTH];
   if (items == 0)
   {
-    if (!forced) {
-     if (h->huntname) {
-       if (h->time <= 0) sprintf(buf,"\r\n## The time limit on hunt '%s' has expired and all unrecovered prizes have been removed.\r\n",h->huntname);
-       else sprintf(buf,"\r\n## All prizes have been recovered on hunt '%s'\r\n",h->huntname);
-	} else {
-       if (h->time <= 0) sprintf(buf,"\r\n## The time limit on the hunt for '%s' has expired and all unrecovered prizes have been removed.\r\n",((obj_data*)obj_index[real_object(h->itemnum)].item)->short_description);
-       else sprintf(buf,"\r\n## All prizes have been recovered on the hunt for '%s'\r\n",((obj_data*)obj_index[real_object(h->itemnum)].item)->short_description);
-	}
-      } else {
-      if (h->huntname) {
-         sprintf(buf,"\r\n## Hunt '%s' has been ended.\r\n",h->huntname);
-	} else {
-        sprintf(buf,"\r\n## The hunt for '%s' has been ended.\r\n",((obj_data*)obj_index[real_object(h->itemnum)].item)->short_description);
-	}
+    if (!forced)
+    {
+      if (h->huntname)
+      {
+        if (h->time <= 0)
+          sprintf(buf, "\r\n## The time limit on hunt '%s' has expired and all unrecovered prizes have been removed.\r\n", h->huntname);
+        else
+          sprintf(buf, "\r\n## All prizes have been recovered on hunt '%s'\r\n", h->huntname);
       }
-     send_info(buf);
+      else
+      {
+        if (h->time <= 0)
+          sprintf(buf, "\r\n## The time limit on the hunt for '%s' has expired and all unrecovered prizes have been removed.\r\n", ((obj_data *)obj_index[real_object(h->itemnum)].item)->short_description);
+        else
+          sprintf(buf, "\r\n## All prizes have been recovered on the hunt for '%s'\r\n", ((obj_data *)obj_index[real_object(h->itemnum)].item)->short_description);
+      }
+    }
+    else
+    {
+      if (h->huntname)
+      {
+        sprintf(buf, "\r\n## Hunt '%s' has been ended.\r\n", h->huntname);
+      }
+      else
+      {
+        sprintf(buf, "\r\n## The hunt for '%s' has been ended.\r\n", ((obj_data *)obj_index[real_object(h->itemnum)].item)->short_description);
+      }
+    }
+    send_info(buf);
 
-     struct hunt_data *hl,*p=NULL;
-     for (hl = hunt_list;hl;hl = hl->next)
-     {
-	if (hl == h)
-	{
-	  if (p) p->next = hl->next;
-	  else hunt_list = hl->next;
-	  break;
-	}
-	p = hl;
-     }
-     dc_free(h->huntname);
-     dc_free(h);     
+    struct hunt_data *hl, *p = NULL;
+    for (hl = hunt_list; hl; hl = hl->next)
+    {
+      if (hl == h)
+      {
+        if (p)
+          p->next = hl->next;
+        else
+          hunt_list = hl->next;
+        break;
+      }
+      p = hl;
+    }
+    dc_free(h->huntname);
+    dc_free(h);
   }
 }
 
@@ -1945,10 +2035,11 @@ void pulse_hunts()
     check_end_of_hunt(h);
   }
 
-  try {
+  try
+  {
     if (&world[6345] == NULL)
     {
-      logf(IMMORTAL, LOG_BUG, "pulse_hunts: room 6345 does not exist.");
+      logf(IMMORTAL, LogChannels::LOG_BUG, "pulse_hunts: room 6345 does not exist.");
       return;
     }
 
@@ -1958,9 +2049,10 @@ void pulse_hunts()
       onext = obj->next_content;
       extract_obj(obj);
     }
-  } catch(...)
+  }
+  catch (...)
   {
-    logf(IMMORTAL, LOG_BUG, "pulse_hunts: room 6345 does not exist.");
+    logf(IMMORTAL, LogChannels::LOG_BUG, "pulse_hunts: room 6345 does not exist.");
   }
 }
 
@@ -2040,13 +2132,13 @@ int do_huntstart(char_data *ch, char *argument, int cmd)
   {
     //    twitterObj.getLastWebResponse( replyMsg );
     sprintf(buf, "twitterClient:: twitCurl::accountVerifyCredGet web response:\n%s\n", replyMsg.c_str());
-    log(buf, 100, LOG_GOD);
+    log(buf, 100, LogChannels::LOG_GOD);
   }
   else
   {
     twitterObj.getLastCurlError(replyMsg);
     sprintf(buf, "twitterClient:: twitCurl::accountVerifyCredGet error:\n%s\n", replyMsg.c_str());
-    log(buf, 100, LOG_GOD);
+    log(buf, 100, LogChannels::LOG_GOD);
   }
 #endif
 
@@ -2111,13 +2203,13 @@ int do_huntstart(char_data *ch, char *argument, int cmd)
   {
     //    twitterObj.getLastWebResponse( replyMsg );
     sprintf(buf, "\ntwitterClient:: twitCurl::statusUpdate web response:\n%s\n", replyMsg.c_str());
-    log(buf, 100, LOG_GOD);
+    log(buf, 100, LogChannels::LOG_GOD);
   }
   else
   {
     twitterObj.getLastCurlError(replyMsg);
     sprintf(buf, "\ntwitterClient:: twitCurl::statusUpdate error:\n%s\n", replyMsg.c_str());
-    log(buf, 100, LOG_GOD);
+    log(buf, 100, LogChannels::LOG_GOD);
   }
 #endif
 

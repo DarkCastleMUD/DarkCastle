@@ -16,15 +16,14 @@
 #include "db.h"
 #include "handler.h"
 
-extern "C" 
+extern "C"
 {
-  #include <string.h>
+#include <string.h>
 }
-  
+
 int make_arbitrary_portal(int from_room, int to_room, int duplicate, int timer);
 
 struct game_portal game_portals[MAX_GAME_PORTALS];
-
 
 /************************************************************************
 | load_game_portals
@@ -32,11 +31,10 @@ struct game_portal game_portals[MAX_GAME_PORTALS];
 |   hard coded!
 */
 
-const char * portal_bits[] = {
-  "NO_LEAVE",
-  "NO_ENTER",
-  "\n"
-};
+const char *portal_bits[] = {
+    "NO_LEAVE",
+    "NO_ENTER",
+    "\n"};
 
 void load_game_portals()
 {
@@ -45,35 +43,33 @@ void load_game_portals()
   // being hard coded
 
   char *portal_files[MAX_GAME_PORTALS] =
-  {
-    "portal/portal.wagon",
-    "portal/portal.tower",
-    "portal/portal.ship1",
-    "portal/portal.ship2",
-    "portal/portal.ship3",
-    "portal/portal.ship4",
-    "portal/portal.ship5",
-    "portal/portal.ship6",
-    "portal/portal.arcana"
-  };
+      {
+          "portal/portal.wagon",
+          "portal/portal.tower",
+          "portal/portal.ship1",
+          "portal/portal.ship2",
+          "portal/portal.ship3",
+          "portal/portal.ship4",
+          "portal/portal.ship5",
+          "portal/portal.ship6",
+          "portal/portal.arcana"};
 
   extern struct game_portal game_portals[MAX_GAME_PORTALS];
   int i, j;
-  int num_lines = 0;       /* Temporary to count lines */
-  int32_t file_pos;   /* Used to store position before counting length */
+  int num_lines = 0; /* Temporary to count lines */
+  int32_t file_pos;  /* Used to store position before counting length */
   FILE *cur_file;
-  char buf[256];       /* Stores temp file names */
+  char buf[256]; /* Stores temp file names */
   char log_buf[256];
 
-
-  for(i = 0; i < MAX_GAME_PORTALS; i++)
+  for (i = 0; i < MAX_GAME_PORTALS; i++)
   {
     num_lines = 0;
     sprintf(buf, "%s/%s", DFLT_DIR, portal_files[i]);
-    if((cur_file = dc_fopen(buf, "r")) == 0)
+    if ((cur_file = dc_fopen(buf, "r")) == 0)
     {
       sprintf(log_buf, "Could not open portal file: %s", buf);
-      log(log_buf, OVERSEER, LOG_BUG);
+      log(log_buf, OVERSEER, LogChannels::LOG_BUG);
       break;
     }
     /* Now we have a readable file.  Here's the structure:
@@ -86,41 +82,43 @@ void load_game_portals()
     |    WILL CAUSE THE GAME TO CRASH.  I could build a sanity check, but
     |    if people read this it's not necessary.  -Morc 24 Apr 1997
     */
-    if(fscanf(cur_file, "%d\n%d\n%d\n", 
-      &(game_portals[i].to_room),
-      &(game_portals[i].obj_num),
-      &(game_portals[i].max_timer)) != 3)
+    if (fscanf(cur_file, "%d\n%d\n%d\n",
+               &(game_portals[i].to_room),
+               &(game_portals[i].obj_num),
+               &(game_portals[i].max_timer)) != 3)
     {
       sprintf(log_buf, "Error reading portal file: %s!", buf);
-      log(log_buf, OVERSEER, LOG_BUG);
+      log(log_buf, OVERSEER, LogChannels::LOG_BUG);
       break;
     }
     /* Store the current file value and count line feeds */
     file_pos = ftell(cur_file);
-    while(fscanf(cur_file, "%*d\n") != EOF) num_lines++;
+    while (fscanf(cur_file, "%*d\n") != EOF)
+      num_lines++;
     fseek(cur_file, file_pos, 0);
-    game_portals[i].num_rooms  = num_lines;
+    game_portals[i].num_rooms = num_lines;
 #ifdef LEAK_CHECK
-    game_portals[i].from_rooms = (int *) calloc(game_portals[i].num_rooms, sizeof(int)); 
+    game_portals[i].from_rooms = (int *)calloc(game_portals[i].num_rooms, sizeof(int));
 #else
-    game_portals[i].from_rooms = (int *) dc_alloc(game_portals[i].num_rooms, sizeof(int)); 
+    game_portals[i].from_rooms = (int *)dc_alloc(game_portals[i].num_rooms, sizeof(int));
 #endif
-    for(j = 0; j < game_portals[i].num_rooms; j++)
+    for (j = 0; j < game_portals[i].num_rooms; j++)
     {
-      fscanf(cur_file, "%d\n", ((game_portals[i]).from_rooms+j));
+      fscanf(cur_file, "%d\n", ((game_portals[i]).from_rooms + j));
     }
     /* Now set some other values that aren't set */
     game_portals[i].cur_timer = 0; /* So that we get reset */
-    if(game_portals[i].max_timer == (-1)) game_portals[i].max_timer = FOREVER;
+    if (game_portals[i].max_timer == (-1))
+      game_portals[i].max_timer = FOREVER;
     dc_fclose(cur_file);
   }
 }
 
 void free_game_portals_from_memory()
 {
-  for(int i = 0; i < MAX_GAME_PORTALS; i++)
+  for (int i = 0; i < MAX_GAME_PORTALS; i++)
   {
-    if(game_portals[i].from_rooms)
+    if (game_portals[i].from_rooms)
       dc_free(game_portals[i].from_rooms);
   }
 }
@@ -134,11 +132,12 @@ void free_game_portals_from_memory()
 void process_portals()
 {
   int i;
-//  extern struct game_portal game_portals[];
+  //  extern struct game_portal game_portals[];
 
-  for(i = 0; i < MAX_GAME_PORTALS; i++)
+  for (i = 0; i < MAX_GAME_PORTALS; i++)
   {
-    if(game_portals[i].cur_timer == FOREVER) continue;
+    if (game_portals[i].cur_timer == FOREVER)
+      continue;
     game_portals[i].cur_timer--;
     /* This is sort of tricky.  Here's what happens:
     |  We set the timer of the portal to the max_timer of the object
@@ -146,29 +145,28 @@ void process_portals()
     |  then keep track of our own timer for re-creation of the portal
     |  after it's removed by the game.
     */
-    if(game_portals[i].cur_timer <= 0)
+    if (game_portals[i].cur_timer <= 0)
     {
-      int from_room = 
-	game_portals[i].from_rooms[number(0, game_portals[i].num_rooms - 1)];
+      int from_room =
+          game_portals[i].from_rooms[number(0, game_portals[i].num_rooms - 1)];
 
       /* So the portal is already gone, all we do is create a new one */
-      if(make_arbitrary_portal(
-         from_room,
-	 game_portals[i].to_room,
-         game_portals[i].obj_num,
-	 game_portals[i].max_timer) == 0)
+      if (make_arbitrary_portal(
+              from_room,
+              game_portals[i].to_room,
+              game_portals[i].obj_num,
+              game_portals[i].max_timer) == 0)
       {
         char log_buf[MAX_STRING_LENGTH] = {};
-	sprintf(log_buf, "Making portal from %d to %d failed.", from_room,
-	  game_portals[i].to_room);
-	log(log_buf, OVERSEER, LOG_BUG);
+        sprintf(log_buf, "Making portal from %d to %d failed.", from_room,
+                game_portals[i].to_room);
+        log(log_buf, OVERSEER, LogChannels::LOG_BUG);
       }
       game_portals[i].cur_timer = game_portals[i].max_timer;
     }
   }
 }
 
-      
 /************************************************************************
 | make_arbitrary_portal
 | Description: Makes a portal from from_room to to_room, in
@@ -193,44 +191,44 @@ int make_arbitrary_portal(int from_room, int to_room, int duplicate, int timer)
 #endif
   clear_object(from_portal);
 
-  if(real_room(from_room) == (-1))
+  if (real_room(from_room) == (-1))
   {
     sprintf(log_buf, "Cannot create arbitrary portal: room %d doesn't exist.", from_room);
     dc_free(from_portal);
-    log(log_buf, OVERSEER, LOG_BUG);
-    return(0);
+    log(log_buf, OVERSEER, LogChannels::LOG_BUG);
+    return (0);
   }
 
-  if(from_room == to_room)
+  if (from_room == to_room)
   {
     dc_free(from_portal);
-    log("Arbitrary portal made to itself!", OVERSEER, LOG_BUG);
-    return(0);
+    log("Arbitrary portal made to itself!", OVERSEER, LogChannels::LOG_BUG);
+    return (0);
   }
-  
-  if(duplicate < 0) /* Make a generic portal */
+
+  if (duplicate < 0) /* Make a generic portal */
   {
     from_portal->name = str_hsh("portal");
     from_portal->short_description = str_hsh("a path to a hidden world");
     from_portal->description = str_hsh("A mystical path to a hidden world "
-				     "shimmers in the air before you."); 
-    
+                                       "shimmers in the air before you.");
+
     from_portal->obj_flags.type_flag = ITEM_PORTAL;
     from_portal->item_number = (-1);
 
     /* Only need to do this if I didn't clone it */
-    from_portal->next   = object_list;
-    object_list         = from_portal;
+    from_portal->next = object_list;
+    object_list = from_portal;
   }
   else /* Duplicate the object # duplicate */
   {
     from_portal = clone_object(real_object(duplicate));
 
-    if(from_portal->obj_flags.type_flag != ITEM_PORTAL)
+    if (from_portal->obj_flags.type_flag != ITEM_PORTAL)
     {
       sprintf(log_buf, "Non-portal object (%d) sent to make_arbitrary_portal!", duplicate);
       dc_free(from_portal);
-      log(log_buf, OVERSEER, LOG_BUG);
+      log(log_buf, OVERSEER, LogChannels::LOG_BUG);
       return 0;
     }
   }
@@ -238,7 +236,7 @@ int make_arbitrary_portal(int from_room, int to_room, int duplicate, int timer)
 
   from_portal->obj_flags.timer = timer;
 
-  from_portal->in_room     = NOWHERE;
+  from_portal->in_room = NOWHERE;
 
   /* The room that it goes to */
   from_portal->obj_flags.value[0] = to_room;
@@ -250,33 +248,36 @@ int make_arbitrary_portal(int from_room, int to_room, int duplicate, int timer)
   obj_to_room(from_portal, real_room(from_room));
 
   send_to_room("There is a violent flash of light as a portal "
-	       "shimmers into existence.\n\r", real_room(from_room));
+               "shimmers into existence.\n\r",
+               real_room(from_room));
 
   /* Success - presumably */
-  return(1);
+  return (1);
 }
 
-void find_and_remove_player_portal(char_data * ch)
+void find_and_remove_player_portal(char_data *ch)
 {
-  struct obj_data * k;
-  struct obj_data * next_k;
+  struct obj_data *k;
+  struct obj_data *next_k;
   char searchstr[180];
-  extern struct obj_data  *object_list;
+  extern struct obj_data *object_list;
   extern int top_of_world;
-  extern struct room_data ** world_array;
+  extern struct room_data **world_array;
 
-  if(GET_CLASS(ch) == CLASS_CLERIC)
+  if (GET_CLASS(ch) == CLASS_CLERIC)
     sprintf(searchstr, "cleric %s", GET_NAME(ch));
-  else sprintf(searchstr, "only %s", GET_NAME(ch));
+  else
+    sprintf(searchstr, "only %s", GET_NAME(ch));
 
-  for(k = object_list; k; k = next_k) {
+  for (k = object_list; k; k = next_k)
+  {
     next_k = k->next;
-    if(GET_ITEM_TYPE(k) != ITEM_PORTAL ||
-       !strstr(k->name, searchstr))
+    if (GET_ITEM_TYPE(k) != ITEM_PORTAL ||
+        !strstr(k->name, searchstr))
       continue;
 
     // at this point, the portal belongs to the person that quit
-    if(k->in_room < top_of_world && k->in_room > -1 && world_array[k->in_room])
+    if (k->in_room < top_of_world && k->in_room > -1 && world_array[k->in_room])
       send_to_room("Its creator gone, the portal fades away prematurely.\r\n", k->in_room);
     obj_from_room(k);
     extract_obj(k);

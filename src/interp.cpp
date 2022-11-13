@@ -29,7 +29,7 @@
 
 #include <fmt/format.h>
 
-#include "structs.h" // MAX_STRING_LENGTH
+#include "structs.h"   // MAX_STRING_LENGTH
 #include "character.h" // POSITION_*
 #include "interp.h"
 #include "levels.h"
@@ -64,18 +64,17 @@ extern CWorld world;
 // to the log files.  (char name is so long, in case it was a mob)
 string last_processed_cmd = {};
 string last_char_name = {};
-int  last_char_room = {};
+int last_char_room = {};
 unsigned int cmd_size = 0;
 
 void update_wizlist(char_data *ch);
-// int system(const char *); 
-	
+// int system(const char *);
+
 bool can_use_command(char_data *ch, int cmdnum);
 
 void add_command_to_radix(struct command_info *cmd);
 
 struct command_lag *command_lag_list = NULL;
-
 
 // **DEFINE LIST FOUND IN interp.h**
 
@@ -89,7 +88,7 @@ struct command_lag *command_lag_list = NULL;
 // These numbers are overruled by the act() STAYHIDE flag.
 // Eas 1/21/06
 //
-// The command number should be CMD_DEFAULT for any user command that is not used 
+// The command number should be CMD_DEFAULT for any user command that is not used
 // in a spec_proc.  If it is, then it should be a number that is not
 // already in use.
 struct command_info cmd_info[] =
@@ -294,7 +293,7 @@ struct command_info cmd_info[] =
         {"joinarena", do_joinarena, nullptr, POSITION_SLEEPING, 0, CMD_DEFAULT, 0, 0},
         {"backstab", do_backstab, nullptr, POSITION_STANDING, 0, CMD_BACKSTAB, 0, 0},
         {"bs", do_backstab, nullptr, POSITION_STANDING, 0, CMD_BACKSTAB, 0, 0},
-        {"sbs", do_backstab, nullptr, POSITION_STANDING, 0, CMD_SBS, 0, 0}, //single backstab
+        {"sbs", do_backstab, nullptr, POSITION_STANDING, 0, CMD_SBS, 0, 0}, // single backstab
         {"boss", do_boss, nullptr, POSITION_DEAD, 0, CMD_DEFAULT, 0, 1},
         {"jab", do_jab, nullptr, POSITION_FIGHTING, 0, CMD_DEFAULT, 0, 0},
         {"enter", do_enter, nullptr, POSITION_STANDING, 0, CMD_ENTER, COM_CHARMIE_OK, 20},
@@ -351,7 +350,7 @@ struct command_info cmd_info[] =
         {"suicide", do_suicide, nullptr, POSITION_RESTING, 0, CMD_DEFAULT, 0, 0},
         {"vote", do_vote, nullptr, POSITION_RESTING, 0, CMD_VOTE, 0, 0},
         {"huntitems", do_showhunt, nullptr, POSITION_RESTING, 0, CMD_DEFAULT, 0, 0},
-	{"random", do_random, nullptr, POSITION_RESTING, 0, CMD_DEFAULT, 0, 0},
+        {"random", do_random, nullptr, POSITION_RESTING, 0, CMD_DEFAULT, 0, 0},
         // Special procedure commands
 
         {"vend", do_vend, nullptr, POSITION_STANDING, 2, CMD_VEND, 0, 0},
@@ -507,10 +506,10 @@ struct command_info cmd_info[] =
         {"incognito", do_incognito, nullptr, POSITION_DEAD, IMMORTAL, CMD_DEFAULT, 0, 1},
         {"high5", do_highfive, nullptr, POSITION_DEAD, IMMORTAL, CMD_DEFAULT, 0, 1},
         {"holylite", do_holylite, nullptr, POSITION_DEAD, IMMORTAL, CMD_DEFAULT, 0, 1},
-        {"immort",  nullptr, do_wiz, POSITION_DEAD, IMMORTAL, CMD_IMMORT, 0, 1},
-        {";",       nullptr, do_wiz, POSITION_DEAD, IMMORTAL, CMD_IMMORT, 0, 1},
+        {"immort", nullptr, do_wiz, POSITION_DEAD, IMMORTAL, CMD_IMMORT, 0, 1},
+        {";", nullptr, do_wiz, POSITION_DEAD, IMMORTAL, CMD_IMMORT, 0, 1},
         {"impchan", nullptr, do_wiz, POSITION_DEAD, GIFTED_COMMAND, CMD_IMPCHAN, 0, 1},
-        {"/",       nullptr, do_wiz, POSITION_DEAD, GIFTED_COMMAND, CMD_IMPCHAN, 0, 1},
+        {"/", nullptr, do_wiz, POSITION_DEAD, GIFTED_COMMAND, CMD_IMPCHAN, 0, 1},
         {"nohassle", do_nohassle, nullptr, POSITION_DEAD, IMMORTAL, CMD_DEFAULT, 0, 1},
         {"wizinvis", do_wizinvis, nullptr, POSITION_DEAD, IMMORTAL, CMD_DEFAULT, 0, 1},
         {"poof", do_poof, nullptr, POSITION_DEAD, IMMORTAL, CMD_DEFAULT, 0, 1},
@@ -580,21 +579,18 @@ struct command_info cmd_info[] =
         // End of the line
         {"", do_not_here, nullptr, POSITION_DEAD, 0, CMD_DEFAULT, COM_CHARMIE_OK, 0}};
 
-const char *fillwords[]=
-{
-  "in",
-  "from",
-  "with",
-  "the",
-  "on",
-  "at",
-  "to",
-  "\n"
-};
-
+const char *fillwords[] =
+    {
+        "in",
+        "from",
+        "with",
+        "the",
+        "on",
+        "at",
+        "to",
+        "\n"};
 
 struct cmd_hash_info *cmd_radix;
-
 
 void add_commands_to_radix(void)
 {
@@ -606,24 +602,22 @@ void add_commands_to_radix(void)
   cmd_radix = (struct cmd_hash_info *)dc_alloc(1, sizeof(struct cmd_hash_info));
 #endif
   cmd_radix->command = &cmd_info[0];
-  cmd_radix->left    = 0;
-  cmd_radix->right   = 0;
-  cmd_size = (sizeof(cmd_info)/sizeof(cmd_info[0]) - 1 );  
+  cmd_radix->left = 0;
+  cmd_radix->right = 0;
+  cmd_size = (sizeof(cmd_info) / sizeof(cmd_info[0]) - 1);
 
-  for(x = 1; (unsigned) x < cmd_size; x++) 
-    add_command_to_radix(&cmd_info[x]); 
+  for (x = 1; (unsigned)x < cmd_size; x++)
+    add_command_to_radix(&cmd_info[x]);
 }
 
-
-void free_command_radix_nodes(struct cmd_hash_info * curr)
+void free_command_radix_nodes(struct cmd_hash_info *curr)
 {
-  if(curr->left)
+  if (curr->left)
     free_command_radix_nodes(curr->left);
-  if(curr->right)
+  if (curr->right)
     free_command_radix_nodes(curr->right);
   dc_free(curr);
 }
-
 
 void add_command_to_radix(struct command_info *cmd)
 {
@@ -635,13 +629,14 @@ void add_command_to_radix(struct command_info *cmd)
   // At the end of this loop, temp will contain the parent of
   // the new node.  Whether it is the left or right node depends
   // on whether whichway is positive or negative.
-  for(curr = cmd_radix; curr; curr = next) {
-    if((whichway = strcmp(cmd->command_name, curr->command->command_name)) < 0)
+  for (curr = cmd_radix; curr; curr = next)
+  {
+    if ((whichway = strcmp(cmd->command_name, curr->command->command_name)) < 0)
       next = curr->left;
     else
       next = curr->right;
     temp = curr;
-    }
+  }
 
 #ifdef LEAK_CHECK
   curr = (struct cmd_hash_info *)calloc(1, sizeof(struct cmd_hash_info));
@@ -649,25 +644,23 @@ void add_command_to_radix(struct command_info *cmd)
   curr = (struct cmd_hash_info *)dc_alloc(1, sizeof(struct cmd_hash_info));
 #endif
   curr->command = cmd;
-  curr->left  = 0;
+  curr->left = 0;
   curr->right = 0;
-  
-  if(whichway < 0)
+
+  if (whichway < 0)
     temp->left = curr;
   else
     temp->right = curr;
 }
 
-
 int len_cmp(const char *s1, const char *s2)
 {
-  for( ; *s1 && *s1 != ' '; s1++, s2++) 
-    if(*s1 != *s2)
+  for (; *s1 && *s1 != ' '; s1++, s2++)
+    if (*s1 != *s2)
       return *s1 - *s2;
 
-  return 0; 
+  return 0;
 }
-
 
 struct command_info *find_cmd_in_radix(const char *arg)
 {
@@ -675,18 +668,18 @@ struct command_info *find_cmd_in_radix(const char *arg)
   struct cmd_hash_info *next;
   int whichway;
 
-  for(curr = cmd_radix; curr; curr = next) {
-    if((whichway = len_cmp(arg, curr->command->command_name)) == 0)
+  for (curr = cmd_radix; curr; curr = next)
+  {
+    if ((whichway = len_cmp(arg, curr->command->command_name)) == 0)
       return curr->command;
-    if(whichway < 0)
+    if (whichway < 0)
       next = curr->left;
     else
       next = curr->right;
-    }
+  }
 
   return 0;
-} 
-
+}
 
 int do_motd(char_data *ch, char *arg, int cmd)
 {
@@ -695,7 +688,6 @@ int do_motd(char_data *ch, char *arg, int cmd)
   page_string(ch->desc, motd, 1);
   return eSUCCESS;
 }
-
 
 int do_imotd(char_data *ch, char *arg, int cmd)
 {
@@ -716,11 +708,11 @@ int command_interpreter(char_data *ch, string pcomm, bool procced)
     {
       if (ch != nullptr && pcomm.empty() == false && GET_NAME(ch) != nullptr)
       {
-        log(format("Command stack exceeded. depth: {}, max_depth: {}, name: {}, cmd: {}", cstack.getDepth(), cstack.getMax(), GET_NAME(ch), pcomm), IMMORTAL, LOG_BUG);
+        log(format("Command stack exceeded. depth: {}, max_depth: {}, name: {}, cmd: {}", cstack.getDepth(), cstack.getMax(), GET_NAME(ch), pcomm), IMMORTAL, LogChannels::LOG_BUG);
       }
       else
       {
-        log(format("CommandStack::depth {} exceeds CommandStack::max_depth {}", cstack.getDepth(), cstack.getMax()), IMMORTAL, LOG_BUG);
+        log(format("CommandStack::depth {} exceeds CommandStack::max_depth {}", cstack.getDepth(), cstack.getMax()), IMMORTAL, LogChannels::LOG_BUG);
       }
     }
     return eFAILURE;
@@ -735,7 +727,7 @@ int command_interpreter(char_data *ch, string pcomm, bool procced)
   if (IS_PC(ch) && IS_SET(ch->pcdata->punish, PUNISH_LOG))
   {
     buf = format("Log {}: {}", GET_NAME(ch), pcomm);
-    log(buf, 110, LOG_PLAYER, ch);
+    log(buf, 110, LogChannels::LOG_PLAYER, ch);
   }
 
   // Implement freeze command.
@@ -809,7 +801,7 @@ int command_interpreter(char_data *ch, string pcomm, bool procced)
       if (found->minimum_level == GIFTED_COMMAND)
       {
 
-        //search bestowable_god_commands for the command skill number to lookup with has_skill
+        // search bestowable_god_commands for the command skill number to lookup with has_skill
         int command_skill = 0;
         for (int i = 0; *bestowable_god_commands[i].name != '\n'; i++)
         {
@@ -826,7 +818,7 @@ int command_interpreter(char_data *ch, string pcomm, bool procced)
 
           if (command_skill == 0)
           {
-            logf(LOG_BUG, IMMORTAL, "Unable to find command [%s] within bestowable_god_commands", found->command_name);
+            logf(IMMORTAL, LogChannels::LOG_BUG, "Unable to find command [%s] within bestowable_god_commands", found->command_name);
           }
           return eFAILURE;
         }
@@ -897,17 +889,16 @@ int command_interpreter(char_data *ch, string pcomm, bool procced)
       */
       /*
       // Last resort for debugging...if you know it's a mortal.
-      // -Sadus 
+      // -Sadus
       char DEBUGbuf[MAX_STRING_LENGTH];
-      sprintf(DEBUGbuf, "%s: %s", GET_NAME(ch), pcomm); 
-      log (DEBUGbuf, 0, LOG_MISC);
+      sprintf(DEBUGbuf, "%s: %s", GET_NAME(ch), pcomm);
+      log (DEBUGbuf, 0, LogChannels::LOG_MISC);
       */
       if (!can_use_command(ch, found->command_number))
       {
         send_to_char("You are still recovering from your last attempt.\r\n", ch);
         return eSUCCESS;
       }
-
 
       if (IS_PC(ch))
       {
@@ -924,10 +915,10 @@ int command_interpreter(char_data *ch, string pcomm, bool procced)
             (GET_LEVEL(ch) >= 100 || (ch->pcdata->multi == true && dc.cf.allow_multi == false)) &&
             IS_SET(ch->pcdata->punish, PUNISH_LOG) == false)
         {
-          log(format("Log {}: {}", GET_NAME(ch), pcomm), 110, LOG_PLAYER, ch);
+          log(format("Log {}: {}", GET_NAME(ch), pcomm), 110, LogChannels::LOG_PLAYER, ch);
         }
       }
-    
+
       // We're going to execute, check for usable special proc.
       retval = special(ch, found->command_number, &pcomm[look_at]);
       if (IS_SET(retval, eSUCCESS) || IS_SET(retval, eCH_DIED))
@@ -936,12 +927,13 @@ int command_interpreter(char_data *ch, string pcomm, bool procced)
       // Normal dispatch
       if (found->command_pointer)
       {
-      retval = (*(found->command_pointer))(ch, &pcomm[look_at], found->command_number);
-      } else if (found->command_pointer2)
+        retval = (*(found->command_pointer))(ch, &pcomm[look_at], found->command_number);
+      }
+      else if (found->command_pointer2)
       {
         retval = (*(found->command_pointer2))(ch, &pcomm[look_at], found->command_number);
       }
-      
+
       // Next bit for the DUI client, they needed it.
       if (!SOMEONE_DIED(retval) && !selfpurge)
       {
@@ -950,7 +942,7 @@ int command_interpreter(char_data *ch, string pcomm, bool procced)
       // This call is here to prevent gcc from tail-chaining the
       // previous call, which screws up the debugger call stack.
       // -- Furey
-      //number(0, 0);
+      // number(0, 0);
 
       return retval;
     }
@@ -1024,7 +1016,8 @@ int search_block(const char *orig_arg, const char **list, bool exact)
         return (i);
       }
     }
-  } else
+  }
+  else
   {
     for (i = 0; **(list + i) != '\n'; i++)
     {
@@ -1044,264 +1037,285 @@ int search_block(const char *orig_arg, const char **list, bool exact)
   return (-1);
 }
 
+int search_blocknolow(char *arg, const char **list, bool exact)
+{
+  int i;
+  unsigned int l = strlen(arg);
 
-int search_blocknolow(char *arg, const char **list, bool exact) {
-	int i;
-	unsigned int l = strlen(arg);
+  if (exact)
+  {
+    for (i = 0; **(list + i) != '\n'; i++)
+      if (!strcmp(arg, *(list + i)))
+        return (i);
+  }
+  else
+  {
+    if (!l)
+      // Avoid "" to match the first available string
+      l = 1;
+    for (i = 0; **(list + i) != '\n'; i++)
+      if (!strncmp(arg, *(list + i), l))
+        return (i);
+  }
 
-	if (exact) {
-		for (i = 0; **(list + i) != '\n'; i++)
-			if (!strcmp(arg, *(list + i)))
-				return (i);
-	} else {
-		if (!l)
-			// Avoid "" to match the first available string
-			l = 1;
-		for (i = 0; **(list + i) != '\n'; i++)
-			if (!strncmp(arg, *(list + i), l))
-				return (i);
-	}
-
-	return (-1);
+  return (-1);
 }
-
 
 int do_boss(char_data *ch, char *arg, int cmd)
 {
   char buf[200];
   int x;
 
-  for(x = 0; x <= 60; x++) {
+  for (x = 0; x <= 60; x++)
+  {
     sprintf(buf, "NUMBER-CRUNCHER: %d crunched to %d converted to black"
-    "/white tree node %d\n\r", x, 50-x, x+x);
+                 "/white tree node %d\n\r",
+            x, 50 - x, x + x);
     send_to_char(buf, ch);
-    }
+  }
 
   return eSUCCESS;
 }
 
+int old_search_block(const char *argument, int begin, int length, const char **list, int mode)
+{
+  int guess, found, search;
 
-int old_search_block(const char *argument, int begin, int length, const char **list, int mode) {
-	int guess, found, search;
+  // If the word contains 0 letters, a match is already found
+  found = (length < 1);
+  guess = 0;
 
-	// If the word contains 0 letters, a match is already found
-	found = (length < 1);
-	guess = 0;
+  // Search for a match
+  if (mode)
+    while (!found && *(list[guess]) != '\n')
+    {
+      found = ((unsigned)length == strlen(list[guess]));
+      for (search = 0; search < length && found; search++)
+      {
+        found = (*(argument + begin + search) == *(list[guess] + search));
+      }
+      guess++;
+    }
+  else
+  {
+    while (!found && *(list[guess]) != '\n')
+    {
+      found = 1;
+      for (search = 0; (search < length && found); search++)
+      {
+        found = (*(argument + begin + search) == *(list[guess] + search));
+      }
+      guess++;
+    }
+  }
 
-	// Search for a match
-	if (mode)
-		while (!found && *(list[guess]) != '\n') {
-			found = ((unsigned) length == strlen(list[guess]));
-			for (search = 0; search < length && found; search++) {
-				found = (*(argument + begin + search) == *(list[guess] + search));
-			}
-			guess++;
-		}
-	else {
-		while (!found && *(list[guess]) != '\n') {
-			found = 1;
-			for (search = 0; (search < length && found); search++) {
-				found = (*(argument + begin + search) == *(list[guess] + search));
-			}
-			guess++;
-		}
-	}
-
-	return (found ? guess : -1);
+  return (found ? guess : -1);
 }
 
+void argument_interpreter(const char *argument, char *first_arg, char *second_arg)
+{
+  int look_at, begin;
 
-void argument_interpreter(const char *argument, char *first_arg, char *second_arg) {
-	int look_at, begin;
+  begin = 0;
 
-	begin = 0;
+  do
+  {
+    /* Find first non blank */
+    for (; *(argument + begin) == ' '; begin++)
+      ;
+    /* Find length of first word */
+    for (look_at = 0; *(argument + begin + look_at) > ' '; look_at++)
+      /* Make all letters lower case, and copy them to first_arg */
+      *(first_arg + look_at) = LOWER(*(argument + begin + look_at));
+    *(first_arg + look_at) = '\0';
+    begin += look_at;
+  } while (fill_word(first_arg));
 
-	do {
-		/* Find first non blank */
-		for (; *(argument + begin) == ' '; begin++)
-			;
-		/* Find length of first word */
-		for (look_at = 0; *(argument + begin + look_at) > ' '; look_at++)
-			/* Make all letters lower case, and copy them to first_arg */
-			*(first_arg + look_at) = LOWER(*(argument + begin + look_at));
-		*(first_arg + look_at) = '\0';
-		begin += look_at;
-	} while (fill_word(first_arg));
-
-	do {
-		/* Find first non blank */
-		for (; *(argument + begin) == ' '; begin++)
-			;
-		/* Find length of first word */
-		for (look_at = 0; *(argument + begin + look_at) > ' '; look_at++)
-			/* Make all letters lower case, and copy them to second_arg */
-			*(second_arg + look_at) = LOWER(*(argument + begin + look_at));
-		*(second_arg + look_at) = '\0';
-		begin += look_at;
-	} while (fill_word(second_arg));
+  do
+  {
+    /* Find first non blank */
+    for (; *(argument + begin) == ' '; begin++)
+      ;
+    /* Find length of first word */
+    for (look_at = 0; *(argument + begin + look_at) > ' '; look_at++)
+      /* Make all letters lower case, and copy them to second_arg */
+      *(second_arg + look_at) = LOWER(*(argument + begin + look_at));
+    *(second_arg + look_at) = '\0';
+    begin += look_at;
+  } while (fill_word(second_arg));
 }
-
 
 // If the string is ALL numbers, return TRUE
 // If there is a non-numeric in string, return FALSE
 int is_number(const char *str)
 {
   int look_at;
-  
+
   if (*str == '\0')
-    return(0);
+    return (0);
 
-  for(look_at = 0; *(str + look_at) != '\0'; look_at++)
-    if ((*(str + look_at) < '0') || (*(str + look_at) > '9') )
-      return(0);
+  for (look_at = 0; *(str + look_at) != '\0'; look_at++)
+    if ((*(str + look_at) < '0') || (*(str + look_at) > '9'))
+      return (0);
 
-  return(1);
+  return (1);
 }
-
 
 // Multiline arguments, used for mobprogs
-char *one_argument_long(char *argument, char *first_arg) {
-	int begin, look_at;
-	bool end = FALSE;
-	begin = 0;
+char *one_argument_long(char *argument, char *first_arg)
+{
+  int begin, look_at;
+  bool end = FALSE;
+  begin = 0;
 
-	/* Find first non blank */
-	for (; isspace(*(argument + begin)); begin++)
-		;
-	if (*(argument + begin) == '{') {
-		end = TRUE;
-		begin++;
-	}
+  /* Find first non blank */
+  for (; isspace(*(argument + begin)); begin++)
+    ;
+  if (*(argument + begin) == '{')
+  {
+    end = TRUE;
+    begin++;
+  }
 
-	if (*(argument + begin) == '{') {
-		end = TRUE;
-		begin++;
-	}
-	/* Find length of first word */
-	for (look_at = 0;; look_at++)
-		if (!end && *(argument + begin + look_at) <= ' ')
-			break;
-		else if (end && (*(argument + begin + look_at) == '}' || *(argument + begin + look_at) == '\0')) {
-			begin++;
-			break;
-		} else {
-			if (!end)
-				*(first_arg + look_at) = LOWER(*(argument + begin + look_at));
-			else
-				*(first_arg + look_at) = *(argument + begin + look_at);
-		}
+  if (*(argument + begin) == '{')
+  {
+    end = TRUE;
+    begin++;
+  }
+  /* Find length of first word */
+  for (look_at = 0;; look_at++)
+    if (!end && *(argument + begin + look_at) <= ' ')
+      break;
+    else if (end && (*(argument + begin + look_at) == '}' || *(argument + begin + look_at) == '\0'))
+    {
+      begin++;
+      break;
+    }
+    else
+    {
+      if (!end)
+        *(first_arg + look_at) = LOWER(*(argument + begin + look_at));
+      else
+        *(first_arg + look_at) = *(argument + begin + look_at);
+    }
 
-	/* Make all letters lower case, and copy them to first_arg */
-	*(first_arg + look_at) = '\0';
-	begin += look_at;
+  /* Make all letters lower case, and copy them to first_arg */
+  *(first_arg + look_at) = '\0';
+  begin += look_at;
 
-	return argument + begin;
+  return argument + begin;
 }
 
-const char *one_argument_long(const char *argument, char *first_arg) {
-	int begin, look_at;
-	bool end = FALSE;
-	begin = 0;
+const char *one_argument_long(const char *argument, char *first_arg)
+{
+  int begin, look_at;
+  bool end = FALSE;
+  begin = 0;
 
-	/* Find first non blank */
-	for (; isspace(*(argument + begin)); begin++)
-		;
-	if (*(argument + begin) == '{') {
-		end = TRUE;
-		begin++;
-	}
+  /* Find first non blank */
+  for (; isspace(*(argument + begin)); begin++)
+    ;
+  if (*(argument + begin) == '{')
+  {
+    end = TRUE;
+    begin++;
+  }
 
-	if (*(argument + begin) == '{') {
-		end = TRUE;
-		begin++;
-	}
-	/* Find length of first word */
-	for (look_at = 0;; look_at++)
-		if (!end && *(argument + begin + look_at) <= ' ')
-			break;
-		else if (end && (*(argument + begin + look_at) == '}' || *(argument + begin + look_at) == '\0')) {
-			begin++;
-			break;
-		} else {
-			if (!end)
-				*(first_arg + look_at) = LOWER(*(argument + begin + look_at));
-			else
-				*(first_arg + look_at) = *(argument + begin + look_at);
-		}
+  if (*(argument + begin) == '{')
+  {
+    end = TRUE;
+    begin++;
+  }
+  /* Find length of first word */
+  for (look_at = 0;; look_at++)
+    if (!end && *(argument + begin + look_at) <= ' ')
+      break;
+    else if (end && (*(argument + begin + look_at) == '}' || *(argument + begin + look_at) == '\0'))
+    {
+      begin++;
+      break;
+    }
+    else
+    {
+      if (!end)
+        *(first_arg + look_at) = LOWER(*(argument + begin + look_at));
+      else
+        *(first_arg + look_at) = *(argument + begin + look_at);
+    }
 
-	/* Make all letters lower case, and copy them to first_arg */
-	*(first_arg + look_at) = '\0';
-	begin += look_at;
+  /* Make all letters lower case, and copy them to first_arg */
+  *(first_arg + look_at) = '\0';
+  begin += look_at;
 
-	return argument + begin;
+  return argument + begin;
 }
 
 /* find the first sub-argument of a string, return pointer to first char in
    primary argument, following the sub-arg                      */
-char *one_argument(char *argument, char *first_arg) {
-	return one_argument_long(argument, first_arg);
-	int begin, look_at;
+char *one_argument(char *argument, char *first_arg)
+{
+  return one_argument_long(argument, first_arg);
+  int begin, look_at;
 
-	begin = 0;
+  begin = 0;
 
-	do {
-		/* Find first non blank */
-		for (; isspace(*(argument + begin)); begin++)
-			;
-		/* Find length of first word */
-		for (look_at = 0; *(argument + begin + look_at) > ' '; look_at++)
-			/* Make all letters lower case, and copy them to first_arg */
-			*(first_arg + look_at) = LOWER(*(argument + begin + look_at));
-		*(first_arg + look_at) = '\0';
-		begin += look_at;
-	} while (fill_word(first_arg));
+  do
+  {
+    /* Find first non blank */
+    for (; isspace(*(argument + begin)); begin++)
+      ;
+    /* Find length of first word */
+    for (look_at = 0; *(argument + begin + look_at) > ' '; look_at++)
+      /* Make all letters lower case, and copy them to first_arg */
+      *(first_arg + look_at) = LOWER(*(argument + begin + look_at));
+    *(first_arg + look_at) = '\0';
+    begin += look_at;
+  } while (fill_word(first_arg));
 
-	return (argument + begin);
+  return (argument + begin);
 }
 
-const char *one_argument(const char *argument, char *first_arg )
+const char *one_argument(const char *argument, char *first_arg)
 {
   return one_argument_long(argument, first_arg);
 }
 
-
 int fill_wordnolow(char *argument)
 {
-  return (search_blocknolow(argument,fillwords,TRUE) >= 0);
+  return (search_blocknolow(argument, fillwords, TRUE) >= 0);
 }
 
+char *one_argumentnolow(char *argument, char *first_arg)
+{
+  int begin, look_at;
+  begin = 0;
 
-char *one_argumentnolow(char *argument, char *first_arg) {
-	int begin, look_at;
-	begin = 0;
+  do
+  {
+    /* Find first non blank */
+    for (; isspace(*(argument + begin)); begin++)
+      ;
+    /* Find length of first word */
+    for (look_at = 0; *(argument + begin + look_at) > ' '; look_at++)
+      /* copy to first_arg */
+      *(first_arg + look_at) = *(argument + begin + look_at);
+    *(first_arg + look_at) = '\0';
+    begin += look_at;
+  } while (fill_wordnolow(first_arg));
 
-	do {
-		/* Find first non blank */
-		for (; isspace(*(argument + begin)); begin++)
-			;
-		/* Find length of first word */
-		for (look_at = 0; *(argument + begin + look_at) > ' '; look_at++)
-			/* copy to first_arg */
-			*(first_arg + look_at) = *(argument + begin + look_at);
-		*(first_arg + look_at) = '\0';
-		begin += look_at;
-	} while (fill_wordnolow(first_arg));
-
-	return (argument + begin);
+  return (argument + begin);
 }
-
 
 int fill_word(char *argument)
 {
-  return (search_block(argument,fillwords,TRUE) >= 0);
+  return (search_block(argument, fillwords, TRUE) >= 0);
 }
 
-
-void automail(char * name)
+void automail(char *name)
 {
   FILE *blah;
   char buf[100];
- 
+
   blah = dc_fopen("../lib/whassup.txt", "w");
   fprintf(blah, name);
   dc_fclose(blah);
@@ -1309,7 +1323,7 @@ void automail(char * name)
   system(buf);
 }
 
-bool is_abbrev(const string& aabrev, const string& word)
+bool is_abbrev(const string &aabrev, const string &word)
 {
   if (aabrev.empty())
   {
@@ -1317,23 +1331,23 @@ bool is_abbrev(const string& aabrev, const string& word)
   }
 
   return equal(aabrev.begin(), aabrev.end(), word.begin(),
-  [](char a, char w)
-  {
-    return tolower(a) == tolower(w);
-  });
+               [](char a, char w)
+               {
+                 return tolower(a) == tolower(w);
+               });
 }
 
 /* determine if a given string is an abbreviation of another */
-int is_abbrev(char *arg1, char *arg2) /* arg1 is short, arg2 is long */ 
+int is_abbrev(char *arg1, char *arg2) /* arg1 is short, arg2 is long */
 {
   if (!*arg1)
-    return(0);
+    return (0);
 
   for (; *arg1; arg1++, arg2++)
     if (LOWER(*arg1) != LOWER(*arg2))
-      return(0);
+      return (0);
 
-  return(1);
+  return (1);
 }
 
 string ltrim(string str)
@@ -1380,7 +1394,7 @@ string rtrim(string str)
   return str;
 }
 
-tuple<string,string> half_chop(string arguments, const char token)
+tuple<string, string> half_chop(string arguments, const char token)
 {
   arguments = ltrim(arguments);
 
@@ -1392,7 +1406,7 @@ tuple<string,string> half_chop(string arguments, const char token)
 
   arguments = ltrim(arguments);
 
-  return tuple<string,string>(arg1, arguments);
+  return tuple<string, string>(arg1, arguments);
 }
 
 tuple<string, string> last_argument(string arguments)
@@ -1415,12 +1429,12 @@ tuple<string, string> last_argument(string arguments)
     // remove trailing spaces
     last_non_space = arguments.find_last_not_of(' ');
     arguments.erase(last_non_space + 1, arguments.length() + 1);
-    
+
     return tuple<string, string>(last_arg, arguments);
   }
   catch (...)
   {
-    logf(IMMORTAL, LOG_BUG, "Error in last_argument(%s)", arguments.c_str());
+    logf(IMMORTAL, LogChannels::LOG_BUG, "Error in last_argument(%s)", arguments.c_str());
   }
 
   return tuple<string, string>(string(), string());
@@ -1430,53 +1444,57 @@ tuple<string, string> last_argument(string arguments)
 void half_chop(const char *string, char *arg1, char *arg2)
 {
   // strip leading whitespace from original
-  for (; isspace(*string); string++);
-  
+  for (; isspace(*string); string++)
+    ;
+
   // copy everything up to next space
-  for (; !isspace(*arg1 = *string) && *string; string++, arg1++);
-  
+  for (; !isspace(*arg1 = *string) && *string; string++, arg1++)
+    ;
+
   // terminate
   *arg1 = '\0';
-  
+
   // strip leading whitepace
-  for (; isspace(*string); string++);
-  
+  for (; isspace(*string); string++)
+    ;
+
   // copy rest of string to arg2
-  for (; ( *arg2 = *string ) != '\0'; string++, arg2++)
+  for (; (*arg2 = *string) != '\0'; string++, arg2++)
     ;
 }
-
 
 /* return last 'word' plus leading substring of input string */
 void chop_half(char *string, char *arg1, char *arg2)
 {
   int32_t i, j;
-  
+
   // skip over trailing space
-  i = strlen(string)-1;
+  i = strlen(string) - 1;
   j = 0;
   while (isspace(string[i]))
     i--;
 
   // find beginning of last 'word'
-  while (!isspace(string[i])) {
+  while (!isspace(string[i]))
+  {
     i--;
     j++;
-    }
+  }
 
   // copy last word to arg1
-  strncpy(arg1, string+i+1, j);
+  strncpy(arg1, string + i + 1, j);
   arg1[j] = '\0';
 
   // skip over leading space in string
-  while(isspace(*string)) {
+  while (isspace(*string))
+  {
     string++;
     i--;
-    }
+  }
 
   // copy string to arg2
   strncpy(arg2, string, i);
-  
+
   // remove trailing space from arg2
   while (isspace(arg2[i]))
     i--;
@@ -1484,79 +1502,86 @@ void chop_half(char *string, char *arg1, char *arg2)
   arg2[i] = '\0';
 }
 
-
 int special(char_data *ch, int cmd, char *arg)
 {
   struct obj_data *i;
   char_data *k;
   int j;
   int retval;
-  
+
   /* special in room? */
-  if(world[ch->in_room].funct) {
-    if((retval = (*world[ch->in_room].funct)(ch, cmd, arg)) != eFAILURE)
+  if (world[ch->in_room].funct)
+  {
+    if ((retval = (*world[ch->in_room].funct)(ch, cmd, arg)) != eFAILURE)
       return retval;
-    }
+  }
 
   /* special in equipment list? */
   for (j = 0; j <= (MAX_WEAR - 1); j++)
-    if (ch->equipment[j] && ch->equipment[j]->item_number>=0)
-      if (obj_index[ch->equipment[j]->item_number].non_combat_func) {
+    if (ch->equipment[j] && ch->equipment[j]->item_number >= 0)
+      if (obj_index[ch->equipment[j]->item_number].non_combat_func)
+      {
         retval = ((*obj_index[ch->equipment[j]->item_number].non_combat_func)(ch, ch->equipment[j], cmd, arg, ch));
-        if(IS_SET(retval, eCH_DIED) || IS_SET(retval, eSUCCESS))
+        if (IS_SET(retval, eCH_DIED) || IS_SET(retval, eSUCCESS))
           return retval;
-        }
+      }
 
   /* special in inventory? */
   for (i = ch->carrying; i; i = i->next_content)
-    if (i->item_number>=0)
-      if (obj_index[i->item_number].non_combat_func) {
+    if (i->item_number >= 0)
+      if (obj_index[i->item_number].non_combat_func)
+      {
         retval = ((*obj_index[i->item_number].non_combat_func)(ch, i, cmd, arg, ch));
-        if(IS_SET(retval, eCH_DIED) || IS_SET(retval, eSUCCESS))
+        if (IS_SET(retval, eCH_DIED) || IS_SET(retval, eSUCCESS))
           return retval;
-        }
+      }
 
-	/* special in mobile present? */
-	for (k = world[ch->in_room].people; k; k = k->next_in_room) {
-		if (IS_MOB(k)) {
-			if (((char_data *)mob_index[k->mobdata->nr].item)->mobdata->mob_flags.type
-					== MOB_CLAN_GUARD) {
-				retval = clan_guard(ch, 0, cmd, arg, k);
-				if (IS_SET(retval, eCH_DIED) || IS_SET(retval, eSUCCESS))
-					return retval;
-			} else if (mob_index[k->mobdata->nr].non_combat_func) {
-				retval = ((*mob_index[k->mobdata->nr].non_combat_func)(ch, 0,
-						cmd, arg, k));
-				if (IS_SET(retval, eCH_DIED) || IS_SET(retval, eSUCCESS))
-					return retval;
-			}
-
-		}
-	}
+  /* special in mobile present? */
+  for (k = world[ch->in_room].people; k; k = k->next_in_room)
+  {
+    if (IS_MOB(k))
+    {
+      if (((char_data *)mob_index[k->mobdata->nr].item)->mobdata->mob_flags.type == MOB_CLAN_GUARD)
+      {
+        retval = clan_guard(ch, 0, cmd, arg, k);
+        if (IS_SET(retval, eCH_DIED) || IS_SET(retval, eSUCCESS))
+          return retval;
+      }
+      else if (mob_index[k->mobdata->nr].non_combat_func)
+      {
+        retval = ((*mob_index[k->mobdata->nr].non_combat_func)(ch, 0,
+                                                               cmd, arg, k));
+        if (IS_SET(retval, eCH_DIED) || IS_SET(retval, eSUCCESS))
+          return retval;
+      }
+    }
+  }
 
   /* special in object present? */
   for (i = world[ch->in_room].contents; i; i = i->next_content)
-    if (i->item_number>=0)
-      if (obj_index[i->item_number].non_combat_func) {
+    if (i->item_number >= 0)
+      if (obj_index[i->item_number].non_combat_func)
+      {
         retval = ((*obj_index[i->item_number].non_combat_func)(ch, i, cmd, arg, ch));
-        if(IS_SET(retval, eCH_DIED) || IS_SET(retval, eSUCCESS))
+        if (IS_SET(retval, eCH_DIED) || IS_SET(retval, eSUCCESS))
           return retval;
-        }
+      }
 
   return eFAILURE;
 }
 
 void add_command_lag(char_data *ch, int cmdnum, int lag)
 {
-  if (!ch) return;
+  if (!ch)
+    return;
 
   struct command_lag *cmdl;
 #ifdef LEAK_CHECK
-        cmdl = (struct command_lag *)
-                        calloc(1, sizeof(struct command_lag));
+  cmdl = (struct command_lag *)
+      calloc(1, sizeof(struct command_lag));
 #else
-        cmdl = (struct command_lag *)
-                        dc_alloc(1, sizeof(struct command_lag));
+  cmdl = (struct command_lag *)
+      dc_alloc(1, sizeof(struct command_lag));
 #endif
   cmdl->next = command_lag_list;
   command_lag_list = cmdl;
@@ -1570,11 +1595,11 @@ bool can_use_command(char_data *ch, int cmdnum)
   struct command_lag *cmdl;
   for (cmdl = command_lag_list; cmdl; cmdl = cmdl->next)
   {
-    
+
     if (cmdl->ch == ch && cmdl->cmd_number == cmdnum)
-	return FALSE;
+      return FALSE;
   }
- return TRUE;
+  return TRUE;
 }
 
 void pulse_command_lag()
@@ -1583,31 +1608,34 @@ void pulse_command_lag()
 
   for (cmdl = command_lag_list; cmdl; cmdl = cmdlnext)
   {
-     cmdlnext = cmdl->next;
-     if ((cmdl->lag--) <= 0)
-     {
-	if (cmdlp) cmdlp->next = cmdl->next;
-        else command_lag_list = cmdl->next;
+    cmdlnext = cmdl->next;
+    if ((cmdl->lag--) <= 0)
+    {
+      if (cmdlp)
+        cmdlp->next = cmdl->next;
+      else
+        command_lag_list = cmdl->next;
 
-	cmdl->ch = 0;
-        dc_free(cmdl);
-     } else cmdlp = cmdl;
+      cmdl->ch = 0;
+      dc_free(cmdl);
+    }
+    else
+      cmdlp = cmdl;
   }
-  
 }
 
 char *remove_trailing_spaces(char *arg)
 {
   int len = strlen(arg) - 1;
 
-  if(len < 1)
+  if (len < 1)
     return arg;
 
-  for( ;len > 0 ; len--)
+  for (; len > 0; len--)
   {
-    if(arg[len] != ' ')
+    if (arg[len] != ' ')
     {
-      arg[len+1] = '\0';
+      arg[len + 1] = '\0';
       return arg;
     }
   }
@@ -1615,4 +1643,3 @@ char *remove_trailing_spaces(char *arg)
 }
 
 // The End
-

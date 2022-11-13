@@ -235,10 +235,10 @@ int main(int argc, char **argv)
     }
   }
 
-  log("Loading the zones", 0, LOG_MISC);
+  log("Loading the zones", 0, LogChannels::LOG_MISC);
   boot_zones();
 
-  log("Loading the world.", 0, LOG_MISC);
+  log("Loading the world.", 0, LogChannels::LOG_MISC);
   world_array = (room_data **)realloc(world_array, 2000 * sizeof(room_data *));
   extern int top_of_world_alloc;
   top_of_world_alloc = 2000;
@@ -248,16 +248,16 @@ int main(int argc, char **argv)
 
   boot_world();
 
-  log("Renumbering the world.", 0, LOG_MISC);
+  log("Renumbering the world.", 0, LogChannels::LOG_MISC);
   renum_world();
 
-  log("Generating object indices/loading all objects", 0, LOG_MISC);
+  log("Generating object indices/loading all objects", 0, LogChannels::LOG_MISC);
   generate_obj_indices(&top_of_objt, obj_index);
 
-  log("Generating mob indices/loading all mobiles", 0, LOG_MISC);
+  log("Generating mob indices/loading all mobiles", 0, LogChannels::LOG_MISC);
   generate_mob_indices(&top_of_mobt, mob_index);
 
-  log("renumbering zone table", 0, LOG_MISC);
+  log("renumbering zone table", 0, LogChannels::LOG_MISC);
   renum_zone_table();
 
   struct descriptor_data *d = new descriptor_data;

@@ -216,7 +216,7 @@ int str_cmp(const char *arg1, const char *arg2)
 
   if (!arg1 || !arg2)
   {
-    log("NULL args sent to str_cmp in utility.c!", ANGEL, LOG_BUG);
+    log("NULL args sent to str_cmp in utility.c!", ANGEL, LogChannels::LOG_BUG);
     return 0;
   }
 
@@ -320,7 +320,7 @@ FILE *objects_log = 0;
 FILE *quest_log = 0;
 
 // writes a string to the log
-void log(string str, int god_level, int32_t type, char_data *vict)
+void log(string str, int god_level, LogChannels type, char_data *vict)
 {
   FILE **f = 0;
   int stream = 1;
@@ -342,7 +342,7 @@ void log(string str, int god_level, int32_t type, char_data *vict)
   default:
     stream = 0;
     break;
-  case LOG_BUG:
+  case LogChannels::LOG_BUG:
     f = &bug_log;
     logpath << BUG_LOG;
     if (!(*f = dc_fopen(logpath.str().c_str(), "a")))
@@ -359,7 +359,7 @@ void log(string str, int god_level, int32_t type, char_data *vict)
     //  -Sadus
 
     break;
-  case LOG_GOD:
+  case LogChannels::LOG_GOD:
     f = &god_log;
     logpath << GOD_LOG;
     if (!(*f = dc_fopen(logpath.str().c_str(), "a")))
@@ -368,7 +368,7 @@ void log(string str, int god_level, int32_t type, char_data *vict)
       exit(1);
     }
     break;
-  case LOG_MORTAL:
+  case LogChannels::LOG_MORTAL:
     f = &mortal_log;
     logpath << MORTAL_LOG;
     if (!(*f = dc_fopen(logpath.str().c_str(), "a")))
@@ -377,7 +377,7 @@ void log(string str, int god_level, int32_t type, char_data *vict)
       exit(1);
     }
     break;
-  case LOG_SOCKET:
+  case LogChannels::LOG_SOCKET:
     f = &socket_log;
     logpath << SOCKET_LOG;
     if (!(*f = dc_fopen(logpath.str().c_str(), "a")))
@@ -386,7 +386,7 @@ void log(string str, int god_level, int32_t type, char_data *vict)
       exit(1);
     }
     break;
-  case LOG_PLAYER:
+  case LogChannels::LOG_PLAYER:
     f = &player_log;
     if (vict && vict->name)
     {
@@ -405,7 +405,7 @@ void log(string str, int god_level, int32_t type, char_data *vict)
       }
     }
     break;
-  case LOG_WORLD:
+  case LogChannels::LOG_WORLD:
     f = &world_log;
     logpath << WORLD_LOG;
     if (!(*f = dc_fopen(logpath.str().c_str(), "a")))
@@ -414,7 +414,7 @@ void log(string str, int god_level, int32_t type, char_data *vict)
       exit(1);
     }
     break;
-  case LOG_ARENA:
+  case LogChannels::LOG_ARENA:
     f = &arena_log;
     logpath << ARENA_LOG;
     if (!(*f = dc_fopen(logpath.str().c_str(), "a")))
@@ -423,7 +423,7 @@ void log(string str, int god_level, int32_t type, char_data *vict)
       exit(1);
     }
     break;
-  case LOG_CLAN:
+  case LogChannels::LOG_CLAN:
     f = &clan_log;
     logpath << CLAN_LOG;
     if (!(*f = dc_fopen(logpath.str().c_str(), "a")))
@@ -432,7 +432,7 @@ void log(string str, int god_level, int32_t type, char_data *vict)
       exit(1);
     }
     break;
-  case LOG_OBJECTS:
+  case LogChannels::LOG_OBJECTS:
     f = &objects_log;
     logpath << OBJECTS_LOG;
     if (!(*f = dc_fopen(logpath.str().c_str(), "a")))
@@ -441,7 +441,7 @@ void log(string str, int god_level, int32_t type, char_data *vict)
       exit(1);
     }
     break;
-  case LOG_QUEST:
+  case LogChannels::LOG_QUEST:
     f = &quest_log;
     logpath << QUEST_LOG;
     if (!(*f = dc_fopen(logpath.str().c_str(), "a")))
@@ -457,19 +457,19 @@ void log(string str, int god_level, int32_t type, char_data *vict)
   char *tmstr = asctime(lt);
   *(tmstr + strlen(tmstr) - 1) = '\0';
 
-  if (!stream)
+  if (stream == STDIN_FILENO || type == LogChannels::LOG_BUG)
   {
     if (cf.stderr_timestamp == true)
     {
-
-      fprintf(stderr, "%s :: %s\n", tmstr, str.c_str());
+      fprintf(stderr, "%s :%d: %s\n", tmstr, type, str.c_str());
     }
     else
     {
-      fprintf(stderr, "%s\n", str.c_str());
+      fprintf(stderr, "%d:%s\n", type, str.c_str());
     }
   }
-  else
+
+  if (stream != STDIN_FILENO)
   {
     fprintf(*f, "%s :: %s\n", tmstr, str.c_str());
     dc_fclose(*f);
@@ -543,7 +543,7 @@ void sprintbit(uint32_t vektor, const char *names[], char *result)
 
   if (vektor < 0)
   {
-    logf(IMMORTAL, LOG_WORLD, "Negative value sent to sprintbit");
+    logf(IMMORTAL, LogChannels::LOG_WORLD, "Negative value sent to sprintbit");
     return;
   }
 
@@ -577,7 +577,7 @@ std::string sprintbit(uint32_t vektor, const char *names[])
 
   if (vektor < 0)
   {
-    logf(IMMORTAL, LOG_WORLD, "Negative value sent to sprintbit");
+    logf(IMMORTAL, LogChannels::LOG_WORLD, "Negative value sent to sprintbit");
     return result;
   }
 
@@ -755,13 +755,13 @@ void util_archive(const char *char_name, char_data *caller)
       {
         sprintf(buf, "Illegal archive attempt: %s by %s.",
                 char_name, GET_NAME(caller));
-        log(buf, OVERSEER, LOG_GOD);
+        log(buf, OVERSEER, LogChannels::LOG_GOD);
         return;
       }
       else
       {
         sprintf(buf, "Someone got a weird char name in there: %s.", char_name);
-        log(buf, OVERSEER, LOG_GOD);
+        log(buf, OVERSEER, LogChannels::LOG_GOD);
         return;
       }
     }
@@ -774,7 +774,7 @@ void util_archive(const char *char_name, char_data *caller)
     if (caller)
       send_to_char("That character does not exist.\n\r", caller);
     else
-      log("Attempt to archive a non-existent char.", IMMORTAL, LOG_BUG);
+      log("Attempt to archive a non-existent char.", IMMORTAL, LogChannels::LOG_BUG);
     return;
   }
   sprintf(buf, "%s -9 %s/%c/%s", GZIP, SAVE_DIR, UPPER(char_name[0]), char_name);
@@ -784,7 +784,7 @@ void util_archive(const char *char_name, char_data *caller)
     if (caller)
       csendf(caller, "%s\n\r", buf);
     else
-      log(buf, IMMORTAL, LOG_GOD);
+      log(buf, IMMORTAL, LogChannels::LOG_GOD);
     return;
   }
   sprintf(buf, "%s/%c/%s.gz", SAVE_DIR, UPPER(char_name[0]), char_name);
@@ -793,7 +793,7 @@ void util_archive(const char *char_name, char_data *caller)
   sprintf(buf, "Character archived: %s", char_name);
   if (caller)
     csendf(caller, "%s\n\r", buf);
-  log(buf, IMMORTAL, LOG_GOD);
+  log(buf, IMMORTAL, LogChannels::LOG_GOD);
 }
 
 void util_unarchive(char *char_name, char_data *caller)
@@ -810,14 +810,14 @@ void util_unarchive(char *char_name, char_data *caller)
       {
         sprintf(buf, "Illegal unarchive attempt: %s by %s.", char_name,
                 GET_NAME(caller));
-        log(buf, OVERSEER, LOG_GOD);
+        log(buf, OVERSEER, LogChannels::LOG_GOD);
         return;
       }
       else
       {
         sprintf(buf, "Someone got a weird char name in there: %s.",
                 char_name);
-        log(buf, OVERSEER, LOG_GOD);
+        log(buf, OVERSEER, LogChannels::LOG_GOD);
         return;
       }
     }
@@ -838,7 +838,7 @@ void util_unarchive(char *char_name, char_data *caller)
     if (caller)
       csendf(caller, "%s\n\r", buf);
     else
-      log(buf, IMMORTAL, LOG_GOD);
+      log(buf, IMMORTAL, LogChannels::LOG_GOD);
     return;
   }
   sprintf(buf, "%s/%s", ARCHIVE_DIR, char_name);
@@ -847,7 +847,7 @@ void util_unarchive(char *char_name, char_data *caller)
   sprintf(buf, "Character unarchived: %s", char_name);
   if (caller)
     csendf(caller, "%s\n\r", buf);
-  log(buf, IMMORTAL, LOG_GOD);
+  log(buf, IMMORTAL, LogChannels::LOG_GOD);
 }
 
 bool ARE_CLANNED(char_data *sub, char_data *obj)
@@ -969,7 +969,7 @@ bool CAN_SEE(char_data *sub, char_data *obj, bool noprog)
 
   if (!sub || !obj)
   {
-    log("Invalid pointer passed to CAN_SEE!", ANGEL, LOG_BUG);
+    log("Invalid pointer passed to CAN_SEE!", ANGEL, LogChannels::LOG_BUG);
     return FALSE;
   }
 
@@ -1541,7 +1541,7 @@ int do_quit(char_data *ch, char *argument, int cmd)
   */
   if (ch == 0)
   {
-    log("do_quit received null char - problem!", LOG_BUG, OVERSEER);
+    log("do_quit received null char - problem!", OVERSEER, LogChannels::LOG_BUG);
     return eFAILURE | eINTERNAL_ERROR;
   }
 
@@ -2204,19 +2204,19 @@ void init_random()
 
   if ((urandom_fd = open("/dev/urandom", O_RDONLY)) == -1)
   {
-    logf(0, LOG_MISC, "Unable to open /dev/urandom: %s", strerror(errno));
+    logf(0, LogChannels::LOG_MISC, "Unable to open /dev/urandom: %s", strerror(errno));
   }
   else
   {
     if (read(urandom_fd, &seed, sizeof(seed)) == -1)
     {
-      logf(0, LOG_MISC, "Read error: %s", strerror(errno));
+      logf(0, LogChannels::LOG_MISC, "Read error: %s", strerror(errno));
     }
 
     close(urandom_fd);
   }
 
-  logf(0, LOG_MISC, "Seeding random numbers with %u", seed);
+  logf(0, LogChannels::LOG_MISC, "Seeding random numbers with %u", seed);
   char *state = (char *)malloc(256);
   initstate(seed, state, 256);
   return;
@@ -2234,7 +2234,7 @@ int number(int from, int to)
   {
     char buf[MAX_STRING_LENGTH];
     sprintf(buf, "BACKWARDS usage: numbers(%d, %d)!", from, to);
-    log(buf, ANGEL, LOG_BUG);
+    log(buf, ANGEL, LogChannels::LOG_BUG);
     produce_coredump();
     return to;
   }
@@ -2262,7 +2262,7 @@ bool is_in_game(char_data *ch)
   // Bug in code if this happens
   if (ch == 0)
   {
-    log("NULL args sent to is_pc_playing in utility.c!", ANGEL, LOG_BUG);
+    log("NULL args sent to is_pc_playing in utility.c!", ANGEL, LogChannels::LOG_BUG);
     return false;
   }
 
@@ -2294,13 +2294,13 @@ bool is_in_game(char_data *ch)
 
 void produce_coredump(void *ptr)
 {
-  logf(IMMORTAL, LOG_BUG, "produce_coredump called with pointer %p", ptr);
+  logf(IMMORTAL, LogChannels::LOG_BUG, "produce_coredump called with pointer %p", ptr);
 
   static int counter = 0;
 
   if (++counter > COREDUMP_MAX)
   {
-    logf(IMMORTAL, LOG_BUG, "Error detected: Unable to produce coredump. Limit of %d reached.", COREDUMP_MAX);
+    logf(IMMORTAL, LogChannels::LOG_BUG, "Error detected: Unable to produce coredump. Limit of %d reached.", COREDUMP_MAX);
     return;
   }
 
@@ -2313,11 +2313,11 @@ void produce_coredump(void *ptr)
   else if (pid > 0)
   {
     // Parent process
-    logf(IMMORTAL, LOG_BUG, "Error detected: Producing coredump %d of %d.", counter, COREDUMP_MAX);
+    logf(IMMORTAL, LogChannels::LOG_BUG, "Error detected: Producing coredump %d of %d.", counter, COREDUMP_MAX);
   }
   else
   {
-    logf(IMMORTAL, LOG_BUG, "Error detected: Unable to fork process.");
+    logf(IMMORTAL, LogChannels::LOG_BUG, "Error detected: Unable to fork process.");
   }
 
   return;
@@ -2363,7 +2363,7 @@ void remove_character(char *name, BACKUP_TYPE backup)
   case NONE:
     break;
   default:
-    logf(108, LOG_GOD, "remove_character passed invalid BACKUP_TYPE %d for %s.", backup,
+    logf(108, LogChannels::LOG_GOD, "remove_character passed invalid BACKUP_TYPE %d for %s.", backup,
          name);
     break;
   }
@@ -2441,7 +2441,7 @@ void remove_familiars(char *name, BACKUP_TYPE backup)
   case NONE:
     break;
   default:
-    logf(108, LOG_GOD, "remove_familiars passed invalid BACKUP_TYPE %d for %s.",
+    logf(108, LogChannels::LOG_GOD, "remove_familiars passed invalid BACKUP_TYPE %d for %s.",
          backup, name);
     break;
   }
@@ -2685,10 +2685,10 @@ void unique_scan(char_data *victim)
 
   if (!found_items.empty())
   {
-    logf(IMMORTAL, LOG_WARNINGS, "Player %s has duplicate unique items.", GET_NAME(victim));
+    logf(IMMORTAL, LogChannels::LOG_WARNINGS, "Player %s has duplicate unique items.", GET_NAME(victim));
     while (!found_items.empty())
     {
-      logf(IMMORTAL, LOG_WARNINGS, "%s", found_items.front()->short_description);
+      logf(IMMORTAL, LogChannels::LOG_WARNINGS, "%s", found_items.front()->short_description);
       found_items.pop();
     }
   }
@@ -3028,13 +3028,13 @@ bool str_prefix(const char *astr, const char *bstr)
 {
   if (astr == NULL)
   {
-    logf(IMMORTAL, LOG_WORLD, "Str_prefix: null astr.", 0);
+    logf(IMMORTAL, LogChannels::LOG_WORLD, "Str_prefix: null astr.", 0);
     return TRUE;
   }
 
   if (bstr == NULL)
   {
-    logf(IMMORTAL, LOG_WORLD, "Str_prefix: null bstr.", 0);
+    logf(IMMORTAL, LogChannels::LOG_WORLD, "Str_prefix: null bstr.", 0);
     return TRUE;
   }
 
@@ -3081,7 +3081,7 @@ void special_log(char *arg)
 
   if (!(fl = dc_fopen("../lib/special.txt", "a")))
   {
-    log("Unable to open SPECIAL LOG FILE in special_log.", IMP, LOG_GOD);
+    log("Unable to open SPECIAL LOG FILE in special_log.", IMP, LogChannels::LOG_GOD);
     return;
   }
 

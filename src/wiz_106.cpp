@@ -18,41 +18,40 @@
 using namespace std;
 using namespace fmt;
 
-int do_plats (char_data *ch, char *argument, int cmd)
+int do_plats(char_data *ch, char *argument, int cmd)
 {
-   char_data *i;
-   struct descriptor_data *d;
-   char arg [100];
-   char buf [100];
-   int minamt;
+  char_data *i;
+  struct descriptor_data *d;
+  char arg[100];
+  char buf[100];
+  int minamt;
 
-   one_argument (argument, arg);
-   if (*arg)
-      minamt = atoi(arg);
-   else
-      minamt = 1;
+  one_argument(argument, arg);
+  if (*arg)
+    minamt = atoi(arg);
+  else
+    minamt = 1;
 
+  send_to_char("          Plats - Player\n\r", ch);
+  send_to_char("          --------------\n\r", ch);
 
-   send_to_char ("          Plats - Player\n\r", ch);
-   send_to_char ("          --------------\n\r", ch);
+  for (d = descriptor_list; d; d = d->next)
+  {
+    if ((d->connected) || (!CAN_SEE(ch, d->character)))
+      continue;
 
-   for (d = descriptor_list; d; d = d->next)
-      {
-      if ((d->connected) || (!CAN_SEE(ch, d->character)))
-         continue;
+    if (d->original)
+      i = d->original;
+    else
+      i = d->character;
 
-      if (d->original)
-         i = d->original;
-      else
-         i = d->character;
+    if (GET_PLATINUM(i) < (uint32_t)minamt)
+      continue;
 
-      if (GET_PLATINUM(i) < (uint32_t)minamt)
-         continue;
-
-      sprintf(buf, "%15d - %s - %lld - %d\n\r", GET_PLATINUM(i), GET_NAME(i),GET_GOLD(i), GET_BANK(i));
-      send_to_char (buf, ch);
-      }
-   return eSUCCESS;
+    sprintf(buf, "%15d - %s - %lld - %d\n\r", GET_PLATINUM(i), GET_NAME(i), GET_GOLD(i), GET_BANK(i));
+    send_to_char(buf, ch);
+  }
+  return eSUCCESS;
 }
 
 int do_force(char_data *ch, string argument, int cmd = CMD_FORCE)
@@ -90,7 +89,7 @@ int do_force(char_data *ch, string argument, int cmd = CMD_FORCE)
       {
         send_to_char("Now doing that would just tick off the IMPS!\n\r", ch);
         buf = format("{} just tried to force {} to, {}", GET_NAME(ch), GET_NAME(vict), to_force);
-        log(buf, OVERSEER, LOG_GOD);
+        log(buf, OVERSEER, LogChannels::LOG_GOD);
         return eSUCCESS;
       }
       if ((GET_LEVEL(ch) <= GET_LEVEL(vict)) && !IS_NPC(vict))
@@ -108,9 +107,9 @@ int do_force(char_data *ch, string argument, int cmd = CMD_FORCE)
           send_to_char("Ok.\r\n", ch);
         }
         buf = format("{} just forced %s to %s.", GET_NAME(ch),
-                GET_NAME(vict), to_force);
+                     GET_NAME(vict), to_force);
         command_interpreter(vict, to_force);
-        log(buf, GET_LEVEL(ch), LOG_GOD);
+        log(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
       }
     }
   }
@@ -143,7 +142,7 @@ int do_force(char_data *ch, string argument, int cmd = CMD_FORCE)
     }
     send_to_char("Ok.\n\r", ch);
     buf = format("{} just forced all to {}.", GET_NAME(ch), to_force);
-    log(buf, GET_LEVEL(ch), LOG_GOD);
+    log(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
   }
   return eSUCCESS;
 }

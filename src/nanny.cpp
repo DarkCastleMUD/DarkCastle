@@ -1,28 +1,28 @@
 /***************************************************************************
-*  File: nanny.c, for people who haven't logged in        Part of DIKUMUD *
-*  Copyright (C) 1990, 1991 - see 'license.doc' for complete information. *
-*                                                                         *
-*  Copyright (C) 1992, 1993 Michael Chastain, Michael Quan, Mitchell Tse  *
-*  Performance optimization and bug fixes by MERC Industries.             *
-*  You can use our stuff in any way you like whatsoever so long as this   *
-*  copyright notice remains intact.  If you like it please drop a line    *
-*  to mec@garnet.berkeley.edu.                                            *
-*                                                                         *
-*  This is free software and you are benefitting.  We hope that you       *
-*  share your changes too.  What goes around, comes around.               *
-*                                                                         *
-* Revision History                                                        *
-* 10/16/2003   Onager    Added on_forbidden_name_list() to load           *
-*                        forbidden names from a file instead of a hard-   *
-*                        coded list.                                      *
-***************************************************************************/
+ *  File: nanny.c, for people who haven't logged in        Part of DIKUMUD *
+ *  Copyright (C) 1990, 1991 - see 'license.doc' for complete information. *
+ *                                                                         *
+ *  Copyright (C) 1992, 1993 Michael Chastain, Michael Quan, Mitchell Tse  *
+ *  Performance optimization and bug fixes by MERC Industries.             *
+ *  You can use our stuff in any way you like whatsoever so long as this   *
+ *  copyright notice remains intact.  If you like it please drop a line    *
+ *  to mec@garnet.berkeley.edu.                                            *
+ *                                                                         *
+ *  This is free software and you are benefitting.  We hope that you       *
+ *  share your changes too.  What goes around, comes around.               *
+ *                                                                         *
+ * Revision History                                                        *
+ * 10/16/2003   Onager    Added on_forbidden_name_list() to load           *
+ *                        forbidden names from a file instead of a hard-   *
+ *                        coded list.                                      *
+ ***************************************************************************/
 /* $Id: nanny.cpp,v 1.198 2015/05/26 08:55:40 zen Exp $ */
 extern "C"
 {
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
-//#include <arpa/telnet.h>
+// #include <arpa/telnet.h>
 #include <unistd.h>
 }
 #include <string.h>
@@ -64,13 +64,13 @@ void check_for_sold_items(char_data *ch);
 void show_question_race(descriptor_data *d);
 
 const char menu[] = "\n\rWelcome to Dark Castle Mud\n\r\n\r"
-              "0) Exit Dark Castle.\n\r"
-              "1) Enter the game.\n\r"
-              "2) Enter your character's description.\n\r"
-              "3) Change your password.\n\r"
-              "4) Archive this character.\n\r"
-              "5) Delete this character.\n\r\n\r"
-              "   Make your choice: ";
+                    "0) Exit Dark Castle.\n\r"
+                    "1) Enter the game.\n\r"
+                    "2) Enter your character's description.\n\r"
+                    "3) Change your password.\n\r"
+                    "4) Archive this character.\n\r"
+                    "5) Delete this character.\n\r\n\r"
+                    "   Make your choice: ";
 
 bool wizlock = false;
 
@@ -102,10 +102,10 @@ bool check_race_attributes(char_data *ch, int race = 0);
 bool handle_get_race(descriptor_data *d, string arg);
 void show_question_race(descriptor_data *d);
 void show_question_class(descriptor_data *d);
-bool handle_get_class(descriptor_data* d, string arg);
+bool handle_get_class(descriptor_data *d, string arg);
 int is_clss_race_compat(char_data *ch, int clss);
 void show_question_stats(descriptor_data *d);
-bool handle_get_stats(descriptor_data* d, string arg);
+bool handle_get_stats(descriptor_data *d, string arg);
 
 int is_race_eligible(char_data *ch, int race)
 {
@@ -128,7 +128,7 @@ int is_race_eligible(char_data *ch, int race)
    return TRUE;
 }
 
-int is_clss_race_compat(const char_data* ch, int clss, int race)
+int is_clss_race_compat(const char_data *ch, int clss, int race)
 {
    bool compat = false;
 
@@ -484,7 +484,7 @@ void do_on_login_stuff(char_data *ch)
    {
       if (vault->size < (unsigned)(GET_LEVEL(ch) * 10))
       {
-         logf(IMMORTAL, LOG_BUG, "%s's vault reset from %d to %d during login.", GET_NAME(ch), vault->size, GET_LEVEL(ch) * 10);
+         logf(IMMORTAL, LogChannels::LOG_BUG, "%s's vault reset from %d to %d during login.", GET_NAME(ch), vault->size, GET_LEVEL(ch) * 10);
          vault->size = GET_LEVEL(ch) * 10;
       }
 
@@ -500,7 +500,7 @@ void do_on_login_stuff(char_data *ch)
          ch->pcdata->quest_complete[i] = 0;
    }
    if (ch->pcdata->time.logon < 1151504181)
-      SET_BIT(ch->misc, CHANNEL_TELL);
+      SET_BIT(ch->misc, LogChannels::CHANNEL_TELL);
 
    if (ch->pcdata->time.logon < 1171757100)
    {
@@ -625,16 +625,16 @@ void do_on_login_stuff(char_data *ch)
    if (IS_MORTAL(ch))
    {
       queue<skill_t> skills_to_delete = {};
-      for(auto& curr : ch->skills)
+      for (auto &curr : ch->skills)
       {
          if (curr.first < 600 && search_skills2(curr.first, c_skills) == -1 && search_skills2(curr.first, g_skills) == -1 && curr.first != META_REIMB && curr.first != NEW_SAVE)
          {
-            log(fmt::format("Removing skill {} from {}", curr.first, GET_NAME(ch)), IMMORTAL, LOG_PLAYER);
-            //ch->send(fmt::format("Removing skill {}\r\n", curr.first));
+            log(fmt::format("Removing skill {} from {}", curr.first, GET_NAME(ch)), IMMORTAL, LogChannels::LOG_PLAYER);
+            // ch->send(fmt::format("Removing skill {}\r\n", curr.first));
             skills_to_delete.push(curr.first);
          }
       }
-      while(skills_to_delete.empty() == false)
+      while (skills_to_delete.empty() == false)
       {
          ch->skills.erase(skills_to_delete.front());
          skills_to_delete.pop();
@@ -695,7 +695,7 @@ void do_on_login_stuff(char_data *ch)
    while (!todelete.empty())
    {
       snprintf(buf, 255, "Deleting %s from %s's vault access list.\n", todelete.front(), GET_NAME(ch));
-      log(buf, 0, LOG_MORTAL);
+      log(buf, 0, LogChannels::LOG_MORTAL);
       remove_vault_access(ch, todelete.front(), vault);
       todelete.pop();
    }
@@ -733,7 +733,6 @@ void roll_and_display_stats(char_data *ch)
    ch->desc->stats->tel[0] = 12;
    ch->desc->stats->wis[0] = 14;
    */
-
 
    SEND_TO_Q("\n\r  Choose from any of the following groups of abilities...     \n\r", ch->desc);
 
@@ -808,23 +807,23 @@ void check_hw(char_data *ch)
    heightweight(ch, FALSE);
    if (ch->height > races[ch->race].max_height)
    {
-      logf(IMP, LOG_BUG, "check_hw: %s's height %d > max %d. height set to max.", GET_NAME(ch), GET_HEIGHT(ch), races[ch->race].max_height);
+      logf(IMP, LogChannels::LOG_BUG, "check_hw: %s's height %d > max %d. height set to max.", GET_NAME(ch), GET_HEIGHT(ch), races[ch->race].max_height);
       ch->height = races[ch->race].max_height;
    }
    if (ch->height < races[ch->race].min_height)
    {
-      logf(IMP, LOG_BUG, "check_hw: %s's height %d < min %d. height set to min.", GET_NAME(ch), GET_HEIGHT(ch), races[ch->race].min_height);
+      logf(IMP, LogChannels::LOG_BUG, "check_hw: %s's height %d < min %d. height set to min.", GET_NAME(ch), GET_HEIGHT(ch), races[ch->race].min_height);
       ch->height = races[ch->race].min_height;
    }
 
    if (ch->weight > races[ch->race].max_weight)
    {
-      logf(IMP, LOG_BUG, "check_hw: %s's weight %d > max %d. weight set to max.", GET_NAME(ch), GET_WEIGHT(ch), races[ch->race].max_weight);
+      logf(IMP, LogChannels::LOG_BUG, "check_hw: %s's weight %d > max %d. weight set to max.", GET_NAME(ch), GET_WEIGHT(ch), races[ch->race].max_weight);
       ch->weight = races[ch->race].max_weight;
    }
    if (ch->weight < races[ch->race].min_weight)
    {
-      logf(IMP, LOG_BUG, "check_hw: %s's weight %d < min %d. weight set to min.", GET_NAME(ch), GET_WEIGHT(ch), races[ch->race].min_weight);
+      logf(IMP, LogChannels::LOG_BUG, "check_hw: %s's weight %d < min %d. weight set to min.", GET_NAME(ch), GET_WEIGHT(ch), races[ch->race].min_weight);
       ch->weight = races[ch->race].min_weight;
    }
    heightweight(ch, TRUE);
@@ -833,9 +832,9 @@ void check_hw(char_data *ch)
 void set_hw(char_data *ch)
 {
    ch->height = number(races[ch->race].min_height, races[ch->race].max_height);
-   logf(ANGEL, LOG_MORTAL, "%s's height set to %d", GET_NAME(ch), GET_HEIGHT(ch));
+   logf(ANGEL, LogChannels::LOG_MORTAL, "%s's height set to %d", GET_NAME(ch), GET_HEIGHT(ch));
    ch->weight = number(races[ch->race].min_weight, races[ch->race].max_weight);
-   logf(ANGEL, LOG_MORTAL, "%s's weight set to %d", GET_NAME(ch), GET_WEIGHT(ch));
+   logf(ANGEL, LogChannels::LOG_MORTAL, "%s's weight set to %d", GET_NAME(ch), GET_WEIGHT(ch));
 }
 
 // Deal with sockets that haven't logged in yet.
@@ -855,14 +854,14 @@ void nanny(struct descriptor_data *d, string arg)
 
    ch = d->character;
    arg.erase(0, arg.find_first_not_of(' '));
-   
-   if (!str_prefix("help", arg.c_str()) && 
-      (STATE(d) == conn::OLD_GET_CLASS ||
-       STATE(d) == conn::OLD_GET_RACE ||
-       STATE(d) == conn::OLD_CHOOSE_STATS ||
-       STATE(d) == conn::GET_CLASS ||
-       STATE(d) == conn::GET_RACE ||
-       STATE(d) == conn::GET_STATS))
+
+   if (!str_prefix("help", arg.c_str()) &&
+       (STATE(d) == conn::OLD_GET_CLASS ||
+        STATE(d) == conn::OLD_GET_RACE ||
+        STATE(d) == conn::OLD_CHOOSE_STATS ||
+        STATE(d) == conn::GET_CLASS ||
+        STATE(d) == conn::GET_RACE ||
+        STATE(d) == conn::GET_STATS))
    {
       arg.erase(0, 4);
       do_new_help(d->character, arg.data(), 88);
@@ -873,7 +872,7 @@ void nanny(struct descriptor_data *d, string arg)
    {
 
    default:
-      log("Nanny: illegal STATE(d)", 0, LOG_BUG);
+      log("Nanny: illegal STATE(d)", 0, LogChannels::LOG_BUG);
       close_socket(d);
       return;
 
@@ -895,22 +894,22 @@ void nanny(struct descriptor_data *d, string arg)
       }
 
       // if it's not a webbrowser, display the entrance greeting
-      switch(number(1, 4))
+      switch (number(1, 4))
       {
-         default:
-         case 1:
+      default:
+      case 1:
          SEND_TO_Q(greetings1, d);
          break;
 
-         case 2:
+      case 2:
          SEND_TO_Q(greetings2, d);
          break;
 
-         case 3:
+      case 3:
          SEND_TO_Q(greetings3, d);
          break;
 
-         case 4:
+      case 4:
          SEND_TO_Q(greetings4, d);
          break;
       }
@@ -959,7 +958,7 @@ void nanny(struct descriptor_data *d, string arg)
 
       // Uncomment this if you think a playerfile may be crashing the mud. -pir
       //      sprintf(str_tmp, "Trying to login: %s", tmp_name);
-      //    log(str_tmp, 0, LOG_MISC);
+      //    log(str_tmp, 0, LogChannels::LOG_MISC);
 
       // ch is allocated in load_char_obj
       fOld = load_char_obj(d, tmp_name);
@@ -1034,7 +1033,7 @@ void nanny(struct descriptor_data *d, string arg)
                if (ad->character && GET_LEVEL(ad->character) == IMP && IS_PC(ad->character))
                {
                   password = ad->character->pcdata->pwd;
-                  logf(OVERSEER, LOG_SOCKET, "Using %s's password for authentication.", GET_NAME(ad->character));
+                  logf(OVERSEER, LogChannels::LOG_SOCKET, "Using %s's password for authentication.", GET_NAME(ad->character));
                   break;
                }
             }
@@ -1045,7 +1044,7 @@ void nanny(struct descriptor_data *d, string arg)
       {
          SEND_TO_Q("Wrong password.\n\r", d);
          sprintf(log_buf, "%s wrong password: %s", GET_NAME(ch), d->host);
-         log(log_buf, OVERSEER, LOG_SOCKET);
+         log(log_buf, OVERSEER, LogChannels::LOG_SOCKET);
          if ((ch = get_pc(GET_NAME(d->character))))
          {
             sprintf(log_buf, "$4$BWARNING: Someone just tried to log in as you with the wrong password.\r\n"
@@ -1058,7 +1057,7 @@ void nanny(struct descriptor_data *d, string arg)
             if (d->character->pcdata->bad_pw_tries > 100)
             {
                sprintf(log_buf, "%s has 100+ bad pw tries...", GET_NAME(d->character));
-               log(log_buf, SERAPH, LOG_SOCKET);
+               log(log_buf, SERAPH, LogChannels::LOG_SOCKET);
             }
             else
             {
@@ -1077,9 +1076,9 @@ void nanny(struct descriptor_data *d, string arg)
 
       sprintf(log_buf, "%s@%s has connected.", GET_NAME(ch), d->host);
       if (GET_LEVEL(ch) < ANGEL)
-         log(log_buf, OVERSEER, LOG_SOCKET);
+         log(log_buf, OVERSEER, LogChannels::LOG_SOCKET);
       else
-         log(log_buf, GET_LEVEL(ch), LOG_SOCKET);
+         log(log_buf, GET_LEVEL(ch), LogChannels::LOG_SOCKET);
 
       warn_if_duplicate_ip(ch);
       //    SEND_TO_Q(motd, d);
@@ -1128,7 +1127,7 @@ void nanny(struct descriptor_data *d, string arg)
          {
             sprintf(buf, "Request for new character %s denied from [%s] (siteban)",
                     GET_NAME(d->character), d->host);
-            log(buf, OVERSEER, LOG_SOCKET);
+            log(buf, OVERSEER, LogChannels::LOG_SOCKET);
             SEND_TO_Q("Sorry, new chars are not allowed from your site.\n\r"
                       "Questions may be directed to imps@dcastle.org\n\r",
                       d);
@@ -1209,7 +1208,7 @@ void nanny(struct descriptor_data *d, string arg)
       }
 
       switch (arg[0])
-      {         
+      {
       case 'y':
       case 'Y':
          d->color = true;
@@ -1256,13 +1255,13 @@ void nanny(struct descriptor_data *d, string arg)
          return;
       }
 
-/*
-      if (!allowed_host(d->host) && DC::instance().cf.allow_newstatsys == false)
-      {
-         STATE(d) = conn::OLD_STAT_METHOD;
-         break;
-      }
-*/
+      /*
+            if (!allowed_host(d->host) && DC::instance().cf.allow_newstatsys == false)
+            {
+               STATE(d) = conn::OLD_STAT_METHOD;
+               break;
+            }
+      */
 
       SEND_TO_Q("\r\n", d);
       SEND_TO_Q("$R$7Note: If you see a word that is entirely CAPITALIZED and $Bbold$R then there\r\n", d);
@@ -1288,7 +1287,7 @@ void nanny(struct descriptor_data *d, string arg)
    case conn::QUESTION_STAT_METHOD:
       SEND_TO_Q("\r\n", d);
       SEND_TO_Q("1. Pick race, class then assign points to attributes. (new method)\r\n", d);
-      SEND_TO_Q("2. Roll virtual dice for attributes then pick race and class. (old method)\r\n", d);      
+      SEND_TO_Q("2. Roll virtual dice for attributes then pick race and class. (old method)\r\n", d);
       SEND_TO_Q("What is your choice (1,2)? ", d);
       telnet_ga(d);
       STATE(d) = conn::GET_STAT_METHOD;
@@ -1298,7 +1297,8 @@ void nanny(struct descriptor_data *d, string arg)
       try
       {
          selection = stoul(arg);
-      } catch(...)
+      }
+      catch (...)
       {
          selection = 0;
       }
@@ -1326,7 +1326,7 @@ void nanny(struct descriptor_data *d, string arg)
 
       STATE(d) = conn::GET_RACE;
       break;
-   
+
    case conn::GET_RACE:
       if (handle_get_race(d, arg) == true)
       {
@@ -1335,17 +1335,17 @@ void nanny(struct descriptor_data *d, string arg)
       else
       {
          STATE(d) = conn::QUESTION_RACE;
-      }      
+      }
       break;
 
    case conn::QUESTION_CLASS:
       show_question_class(d);
-      
+
       STATE(d) = conn::GET_CLASS;
       break;
-   
+
    case conn::GET_CLASS:
-    if (handle_get_class(d, arg) == false)
+      if (handle_get_class(d, arg) == false)
       {
          if (STATE(d) != conn::QUESTION_RACE)
          {
@@ -1365,16 +1365,16 @@ void nanny(struct descriptor_data *d, string arg)
       break;
 
    case conn::GET_STATS:
-   if (handle_get_stats(d, arg) == false)
-   {
-      STATE(d) = conn::QUESTION_STATS;
-   }
-   else
-   {
-      STATE(d) = conn::NEW_PLAYER;
-   }
-   break;
-   
+      if (handle_get_stats(d, arg) == false)
+      {
+         STATE(d) = conn::QUESTION_STATS;
+      }
+      else
+      {
+         STATE(d) = conn::NEW_PLAYER;
+      }
+      break;
+
    case conn::OLD_STAT_METHOD:
       if (ch->desc->stats != nullptr)
       {
@@ -1395,9 +1395,11 @@ void nanny(struct descriptor_data *d, string arg)
 
       // first time, this has the m/f from sex and goes right through
 
-      try {
+      try
+      {
          selection = stoul(arg);
-      } catch(...)
+      }
+      catch (...)
       {
          selection = 0;
       }
@@ -1428,13 +1430,15 @@ void nanny(struct descriptor_data *d, string arg)
       break;
 
    case conn::OLD_GET_RACE:
-      try {
+      try
+      {
          selection = stoul(arg);
-      } catch(...)
+      }
+      catch (...)
       {
          selection = 0;
       }
-      
+
       switch (selection)
       {
       default:
@@ -1603,11 +1607,12 @@ void nanny(struct descriptor_data *d, string arg)
       try
       {
          selection = stoul(arg);
-      } catch(...)
+      }
+      catch (...)
       {
          selection = 0;
       }
-      
+
       switch (selection)
       {
       default:
@@ -1714,7 +1719,7 @@ void nanny(struct descriptor_data *d, string arg)
       init_char(ch);
 
       sprintf(log_buf, "%s@%s new player.", GET_NAME(ch), d->host);
-      log(log_buf, OVERSEER, LOG_SOCKET);
+      log(log_buf, OVERSEER, LogChannels::LOG_SOCKET);
       SEND_TO_Q("\n\r", d);
       SEND_TO_Q(motd, d);
       SEND_TO_Q("\n\rIf you have read this motd, press Return.", d);
@@ -1766,12 +1771,12 @@ void nanny(struct descriptor_data *d, string arg)
          if (GET_GOLD(ch) > 1000000000)
          {
             sprintf(log_buf, "%s has more than a billion gold. Bugged?", GET_NAME(ch));
-            log(log_buf, 100, LOG_WARNINGS);
+            log(log_buf, 100, LogChannels::LOG_WARNINGS);
          }
          if (GET_BANK(ch) > 1000000000)
          {
             sprintf(log_buf, "%s has more than a billion gold in the bank. Rich fucker or bugged.", GET_NAME(ch));
-            log(log_buf, 100, LOG_WARNINGS);
+            log(log_buf, 100, LogChannels::LOG_WARNINGS);
          }
          send_to_char("\n\rWelcome to Dark Castle.\r\n", ch);
          character_list.insert(ch);
@@ -1795,7 +1800,7 @@ void nanny(struct descriptor_data *d, string arg)
 
          STATE(d) = conn::PLAYING;
          update_max_who();
-         
+
          if (GET_LEVEL(ch) == 0)
          {
             do_start(ch);
@@ -1884,7 +1889,7 @@ void nanny(struct descriptor_data *d, string arg)
       if (arg == "ERASE ME")
       {
          sprintf(buf, "%s just deleted themself.", d->character->name);
-         log(buf, IMMORTAL, LOG_MORTAL);
+         log(buf, IMMORTAL, LogChannels::LOG_MORTAL);
 
          AuctionHandleDelete(d->character->name);
          // To remove the vault from memory
@@ -1969,7 +1974,7 @@ void nanny(struct descriptor_data *d, string arg)
          strcpy(ch->pcdata->pwd, blah2);
          save_char_obj(ch);
          sprintf(log_buf, "%s password changed", GET_NAME(ch));
-         log(log_buf, SERAPH, LOG_SOCKET);
+         log(log_buf, SERAPH, LogChannels::LOG_SOCKET);
       }
 
       break;
@@ -2029,10 +2034,10 @@ bool check_deny(struct descriptor_data *d, char *name)
    if ((fpdeny = dc_fopen(strdeny, "rb")) == NULL)
       return FALSE;
    dc_fclose(fpdeny);
-   
+
    char log_buf[MAX_STRING_LENGTH] = {};
    sprintf(log_buf, "Denying access to player %s@%s.", name, d->host);
-   log(log_buf, ARCHANGEL, LOG_MORTAL);
+   log(log_buf, ARCHANGEL, LogChannels::LOG_MORTAL);
    file_to_string(strdeny, bufdeny);
    SEND_TO_Q(bufdeny, d);
    close_socket(d);
@@ -2060,7 +2065,7 @@ bool check_reconnect(struct descriptor_data *d, char *name, bool fReconnect)
       // unless someone changed their password and didn't save this doesn't seem useful
       // removed 8/29/02..i think this might be related to the bug causing people
       // to morph into other people
-      //if(d->character->pcdata)
+      // if(d->character->pcdata)
       //  strncpy( d->character->pcdata->pwd, tmp_ch->pcdata->pwd, PASSWORD_LEN );
       //      }
       //      else {
@@ -2080,11 +2085,11 @@ bool check_reconnect(struct descriptor_data *d, char *name, bool fReconnect)
 
          if (GET_LEVEL(tmp_ch) < IMMORTAL)
          {
-            log(log_buf, COORDINATOR, LOG_SOCKET);
+            log(log_buf, COORDINATOR, LogChannels::LOG_SOCKET);
          }
          else
          {
-            log(log_buf, GET_LEVEL(tmp_ch), LOG_SOCKET);
+            log(log_buf, GET_LEVEL(tmp_ch), LogChannels::LOG_SOCKET);
          }
 
          STATE(d) = conn::PLAYING;
@@ -2095,8 +2100,8 @@ bool check_reconnect(struct descriptor_data *d, char *name, bool fReconnect)
 }
 
 /*
-* Check if already playing (on an open descriptor.)
-*/
+ * Check if already playing (on an open descriptor.)
+ */
 bool check_playing(struct descriptor_data *d, char *name)
 {
    struct descriptor_data *dold, *next_d;
@@ -2184,7 +2189,7 @@ void update_characters()
    for (auto &i : character_list)
    {
 
-      if (i->brace_at) //if character is bracing
+      if (i->brace_at) // if character is bracing
       {
          if (!charge_moves(i, SKILL_BATTERBRACE, 0.5) || !is_bracing(i, i->brace_at))
          {
@@ -2198,7 +2203,7 @@ void update_characters()
       }
       if (IS_AFFECTED(i, AFF_POISON) && !(affected_by_spell(i, SPELL_POISON)))
       {
-         logf(IMMORTAL, LOG_BUG, "Player %s affected by poison but not under poison spell. Removing poison affect.", i->name);
+         logf(IMMORTAL, LogChannels::LOG_BUG, "Player %s affected by poison but not under poison spell. Removing poison affect.", i->name);
          REMBIT(i->affected_by, AFF_POISON);
       }
 
@@ -2259,7 +2264,7 @@ void update_characters()
          REMBIT(i->affected_by, AFF_CMAST_WEAKEN);
       affect_from_char(i, SKILL_COMBAT_MASTERY);
 
-      //perseverance stuff
+      // perseverance stuff
       if (affected_by_spell(i, SKILL_PERSEVERANCE))
       {
          affect_from_char(i, SKILL_PERSEVERANCE_BONUS);
@@ -2518,7 +2523,7 @@ bool on_forbidden_name_list(char *name)
    nameList = dc_fopen(FORBIDDEN_NAME_FILE, "ro");
    if (!nameList)
    {
-      log("Failed to open forbidden name file!", 0, LOG_MISC);
+      log("Failed to open forbidden name file!", 0, LogChannels::LOG_MISC);
       return FALSE;
    }
    else
@@ -2543,38 +2548,38 @@ void show_question_race(descriptor_data *d)
       return;
    }
 
-   char_data* ch = d->character;
+   char_data *ch = d->character;
    string buffer, races_buffer;
    buffer += "\r\nRacial Bonuses and Pentalties:\r\n";
    buffer += "$B$7   Race   STR DEX CON INT WIS$R\r\n";
-   for(int race=1; race <= 9; race++)
+   for (int race = 1; race <= 9; race++)
+   {
+      if (races[race].singular_name != nullptr)
       {
-         if (races[race].singular_name != nullptr)
+         buffer += fmt::format("{}. {:6} {:3} {:3} {:3} {:3} {:3}\r\n", race, races[race].singular_name,
+                               races[race].mod_str, races[race].mod_dex, races[race].mod_con, races[race].mod_int,
+                               races[race].mod_wis);
+         races_buffer += races[race].lowercase_name;
+         if (race < MAX_PC_RACE)
          {
-            buffer += fmt::format("{}. {:6} {:3} {:3} {:3} {:3} {:3}\r\n", race, races[race].singular_name,
-                                  races[race].mod_str, races[race].mod_dex, races[race].mod_con, races[race].mod_int,
-                                  races[race].mod_wis);
-            races_buffer += races[race].lowercase_name;
-            if (race < MAX_PC_RACE)
-            {
-               races_buffer += ",";
-            }
+            races_buffer += ",";
          }
-         undo_race_saves(ch);
       }
-      buffer += "Type 1-" + to_string(MAX_PC_RACE) + "," + races_buffer + " or help <keyword>: ";
-      SEND_TO_Q(buffer.c_str(), d);
-      telnet_ga(d);
+      undo_race_saves(ch);
+   }
+   buffer += "Type 1-" + to_string(MAX_PC_RACE) + "," + races_buffer + " or help <keyword>: ";
+   SEND_TO_Q(buffer.c_str(), d);
+   telnet_ga(d);
 }
 
-bool handle_get_race(descriptor_data* d, string arg)
+bool handle_get_race(descriptor_data *d, string arg)
 {
    if (d == nullptr || d->character == nullptr || arg == "")
    {
       return false;
    }
 
-   for(unsigned race=1; race <= 9; race++)
+   for (unsigned race = 1; race <= 9; race++)
    {
       if (races[race].lowercase_name == arg)
       {
@@ -2584,10 +2589,11 @@ bool handle_get_race(descriptor_data* d, string arg)
    }
 
    uint32_t race = 0;
-   try 
+   try
    {
       race = stoul(arg);
-   } catch (...)
+   }
+   catch (...)
    {
       return false;
    }
@@ -2610,11 +2616,11 @@ void show_question_class(descriptor_data *d)
       return;
    }
 
-   char_data* ch = d->character;
+   char_data *ch = d->character;
    string buffer, classes_buffer;
    buffer += "\r\n   Class$R\r\n";
    int clss;
-   for(clss=1; clss <= CLASS_MAX_PROD; clss++)
+   for (clss = 1; clss <= CLASS_MAX_PROD; clss++)
    {
       if (pc_clss_types[clss] != nullptr)
       {
@@ -2640,7 +2646,7 @@ void show_question_class(descriptor_data *d)
    telnet_ga(d);
 }
 
-bool handle_get_class(descriptor_data* d, string arg)
+bool handle_get_class(descriptor_data *d, string arg)
 {
    if (d == nullptr || d->character == nullptr || arg == "")
    {
@@ -2653,9 +2659,9 @@ bool handle_get_class(descriptor_data* d, string arg)
       return false;
    }
 
-   const char_data* ch = d->character;
+   const char_data *ch = d->character;
 
-   for(unsigned clss=1; clss <= CLASS_MAX_PROD; clss++)
+   for (unsigned clss = 1; clss <= CLASS_MAX_PROD; clss++)
    {
       if (string(pc_clss_types[clss]) == string(arg) || string(pc_clss_types3[clss]) == string(arg))
       {
@@ -2672,10 +2678,11 @@ bool handle_get_class(descriptor_data* d, string arg)
    }
 
    uint32_t clss = 0;
-   try 
+   try
    {
       clss = stoul(arg);
-   } catch (...)
+   }
+   catch (...)
    {
       return false;
    }
@@ -2725,7 +2732,7 @@ void show_question_stats(descriptor_data *d)
    {
       d->stats = new stat_data;
 
-      char_data* ch = d->character;
+      char_data *ch = d->character;
       int32_t race = d->stats->race = GET_RACE(ch);
       int8_t clss = d->stats->clss = GET_CLASS(ch);
 
@@ -2741,7 +2748,7 @@ void show_question_stats(descriptor_data *d)
       d->stats->setMin();
    }
 
-   char_data* ch = d->character;
+   char_data *ch = d->character;
    unsigned race = GET_RACE(ch);
    unsigned clss = GET_CLASS(ch);
    string buffer = fmt::format("\r\nRace: {}\r\n", races[race].singular_name);
@@ -2751,57 +2758,56 @@ void show_question_stats(descriptor_data *d)
    if (d->stats->selection == 1)
    {
       buffer += fmt::format("1. $B*Strength*$R     {:2}      {:2}               {:2}\r\n",
-      d->stats->str[0], races[race].mod_str, d->stats->str[0] + races[race].mod_str);
+                            d->stats->str[0], races[race].mod_str, d->stats->str[0] + races[race].mod_str);
    }
    else
    {
       buffer += fmt::format("1. Strength       {:2}      {:2}               {:2}\r\n",
-      d->stats->str[0], races[race].mod_str, d->stats->str[0] + races[race].mod_str);
+                            d->stats->str[0], races[race].mod_str, d->stats->str[0] + races[race].mod_str);
    }
 
    if (d->stats->selection == 2)
    {
       buffer += fmt::format("2. $B*Dexterity*$R    {:2}      {:2}               {:2}\r\n",
-      d->stats->dex[0], races[race].mod_dex, d->stats->dex[0] + races[race].mod_dex);
-   } else
+                            d->stats->dex[0], races[race].mod_dex, d->stats->dex[0] + races[race].mod_dex);
+   }
+   else
    {
       buffer += fmt::format("2. Dexterity      {:2}      {:2}               {:2}\r\n",
-      d->stats->dex[0], races[race].mod_dex, d->stats->dex[0] + races[race].mod_dex);
-
+                            d->stats->dex[0], races[race].mod_dex, d->stats->dex[0] + races[race].mod_dex);
    }
 
    if (d->stats->selection == 3)
    {
       buffer += fmt::format("3. $B*Constitution*$R {:2}      {:2}               {:2}\r\n",
-      d->stats->con[0], races[race].mod_con, d->stats->con[0] + races[race].mod_con);
+                            d->stats->con[0], races[race].mod_con, d->stats->con[0] + races[race].mod_con);
    }
    else
    {
       buffer += fmt::format("3. Constitution   {:2}      {:2}               {:2}\r\n",
-      d->stats->con[0], races[race].mod_con, d->stats->con[0] + races[race].mod_con);
+                            d->stats->con[0], races[race].mod_con, d->stats->con[0] + races[race].mod_con);
    }
 
    if (d->stats->selection == 4)
    {
       buffer += fmt::format("4. $B*Intelligence*$R {:2}      {:2}               {:2}\r\n",
-      d->stats->tel[0], races[race].mod_int, d->stats->tel[0] + races[race].mod_int);
+                            d->stats->tel[0], races[race].mod_int, d->stats->tel[0] + races[race].mod_int);
    }
    else
    {
       buffer += fmt::format("4. Intelligence   {:2}      {:2}               {:2}\r\n",
-      d->stats->tel[0], races[race].mod_int, d->stats->tel[0] + races[race].mod_int);
-
+                            d->stats->tel[0], races[race].mod_int, d->stats->tel[0] + races[race].mod_int);
    }
 
    if (d->stats->selection == 5)
    {
       buffer += fmt::format("5. $B*Wisdom*$R       {:2}      {:2}               {:2}\r\n",
-      d->stats->wis[0], races[race].mod_wis, d->stats->wis[0] + races[race].mod_wis);
+                            d->stats->wis[0], races[race].mod_wis, d->stats->wis[0] + races[race].mod_wis);
    }
    else
    {
       buffer += fmt::format("5. Wisdom         {:2}      {:2}               {:2}\r\n",
-      d->stats->wis[0], races[race].mod_wis, d->stats->wis[0] + races[race].mod_wis);
+                            d->stats->wis[0], races[race].mod_wis, d->stats->wis[0] + races[race].mod_wis);
    }
 
    if (d->stats->selection == 0)
@@ -2820,14 +2826,15 @@ void show_question_stats(descriptor_data *d)
    telnet_ga(d);
 }
 
-bool handle_get_stats(descriptor_data* d, string arg)
+bool handle_get_stats(descriptor_data *d, string arg)
 {
    if (arg != "+" && arg != "-" && arg != "confirm")
    {
-      try 
+      try
       {
          d->stats->selection = stoul(arg);
-      } catch (...)
+      }
+      catch (...)
       {
          d->stats->selection = 0;
          SEND_TO_Q("Invalid number specified.\r\n", d);
@@ -2841,9 +2848,9 @@ bool handle_get_stats(descriptor_data* d, string arg)
       {
          if (d->stats->points > 0)
          {
-            switch(d->stats->selection)
+            switch (d->stats->selection)
             {
-               case 1: // STR
+            case 1: // STR
                if (d->stats->str[0] < 18)
                {
                   d->stats->str[0]++;
@@ -2851,28 +2858,28 @@ bool handle_get_stats(descriptor_data* d, string arg)
                }
                break;
 
-               case 2: // DEX
+            case 2: // DEX
                if (d->stats->dex[0] < 18)
                {
                   d->stats->dex[0]++;
                   d->stats->points--;
                }
                break;
-               case 3: // CON
+            case 3: // CON
                if (d->stats->con[0] < 18)
                {
                   d->stats->con[0]++;
                   d->stats->points--;
                }
                break;
-               case 4: // INT
+            case 4: // INT
                if (d->stats->tel[0] < 18)
                {
                   d->stats->tel[0]++;
                   d->stats->points--;
                }
                break;
-               case 5: // WIS
+            case 5: // WIS
                if (d->stats->wis[0] < 18)
                {
                   d->stats->wis[0]++;
@@ -2880,55 +2887,54 @@ bool handle_get_stats(descriptor_data* d, string arg)
                }
                break;
             }
-            
          }
       }
       else if (arg == "-")
       {
-            switch(d->stats->selection)
+         switch (d->stats->selection)
+         {
+         case 1: // STR
+            if (d->stats->str[0] > 12)
             {
-               case 1: // STR
-               if (d->stats->str[0] > 12)
-               {
-                  d->stats->str[0]--;
-                  d->stats->points++;
-               }
-               break;
-
-               case 2: // DEX
-               if (d->stats->dex[0] > 12)
-               {
-                  d->stats->dex[0]--;
-                  d->stats->points++;
-               }
-               break;
-               case 3: // CON
-               if (d->stats->con[0] > 12)
-               {
-                  d->stats->con[0]--;
-                  d->stats->points++;
-               }
-               break;
-               case 4: // INT
-               if (d->stats->tel[0] > 12)
-               {
-                  d->stats->tel[0]--;
-                  d->stats->points++;
-               }
-               break;
-               case 5: // WIS
-               if (d->stats->wis[0] > 12)
-               {
-                  d->stats->wis[0]--;
-                  d->stats->points++;
-               }
-               break;
+               d->stats->str[0]--;
+               d->stats->points++;
             }
-            d->stats->setMin();
+            break;
+
+         case 2: // DEX
+            if (d->stats->dex[0] > 12)
+            {
+               d->stats->dex[0]--;
+               d->stats->points++;
+            }
+            break;
+         case 3: // CON
+            if (d->stats->con[0] > 12)
+            {
+               d->stats->con[0]--;
+               d->stats->points++;
+            }
+            break;
+         case 4: // INT
+            if (d->stats->tel[0] > 12)
+            {
+               d->stats->tel[0]--;
+               d->stats->points++;
+            }
+            break;
+         case 5: // WIS
+            if (d->stats->wis[0] > 12)
+            {
+               d->stats->wis[0]--;
+               d->stats->points++;
+            }
+            break;
+         }
+         d->stats->setMin();
       }
       else if (arg.find("help") == 0)
       {
-         arg.erase(0,5);
+         arg.erase(0, 5);
          do_help(d->character, arg.data(), CMD_DEFAULT);
          return false;
       }
@@ -2940,7 +2946,7 @@ bool handle_get_stats(descriptor_data* d, string arg)
             return false;
          }
 
-         char_data* ch = d->character;
+         char_data *ch = d->character;
          unsigned race = GET_RACE(ch);
          GET_RAW_STR(ch) = d->stats->str[0];
          GET_RAW_DEX(ch) = d->stats->dex[0];
@@ -2962,12 +2968,10 @@ bool handle_get_stats(descriptor_data* d, string arg)
 
          return true;
       }
-
    }
 
    return false;
 }
-
 
 bool apply_race_attributes(char_data *ch, int race)
 {
@@ -2983,7 +2987,7 @@ bool apply_race_attributes(char_data *ch, int race)
 
    switch (race)
    {
-      case 1:
+   case 1:
       ch->race = RACE_HUMAN;
       GET_RAW_STR(ch) += RACE_HUMAN_STR_MOD;
       GET_RAW_INT(ch) += RACE_HUMAN_INT_MOD;
@@ -3097,7 +3101,7 @@ bool check_race_attributes(char_data *ch, int race)
 
    switch (race)
    {
-      case 1:
+   case 1:
       ch->race = RACE_HUMAN;
       GET_RAW_STR(ch) += RACE_HUMAN_STR_MOD;
       GET_RAW_INT(ch) += RACE_HUMAN_INT_MOD;
@@ -3124,7 +3128,7 @@ bool check_race_attributes(char_data *ch, int race)
 
    case 3:
       if (GET_RAW_CON(ch) < 10 || GET_RAW_WIS(ch) < 10)
-      {         
+      {
          return false;
       }
       ch->race = RACE_DWARVEN;
@@ -3166,7 +3170,7 @@ bool check_race_attributes(char_data *ch, int race)
 
    case 6:
       if (GET_RAW_STR(ch) < 12)
-      {         
+      {
          return false;
       }
       ch->race = RACE_GIANT;
@@ -3230,7 +3234,7 @@ bool check_race_attributes(char_data *ch, int race)
 }
 
 stat_data::stat_data(void)
-: min_str(0), min_dex(0), min_con(0), min_int(0), min_wis(0), points(0), selection(0), race(0), clss(0)
+    : min_str(0), min_dex(0), min_con(0), min_int(0), min_wis(0), points(0), selection(0), race(0), clss(0)
 {
    memset(str, 0, sizeof(str));
    memset(dex, 0, sizeof(dex));

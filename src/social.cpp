@@ -1,13 +1,13 @@
 // social.C
-// Description:  Anything to do with socials 
+// Description:  Anything to do with socials
 
 extern "C"
 {
-  #include <string.h>
-  #include <stdlib.h> // qsort()
+#include <string.h>
+#include <stdlib.h> // qsort()
 }
 #include "fileinfo.h" // SOCIAL_FILE
-#include "structs.h" // MAX_INPUT_LENGTH
+#include "structs.h"  // MAX_INPUT_LENGTH
 #include "room.h"
 #include "character.h"
 #include "utility.h"
@@ -23,11 +23,11 @@ extern "C"
 #include "returnvals.h"
 
 extern CWorld world;
- 
+
 // storage of socials
-struct social_messg * soc_mess_list;  // head of social array
-int32_t num_socials;                 // number of actual socials (50 = 0-49)
-int32_t social_array_size;           // size of actual array (since we allocate in chunks)
+struct social_messg *soc_mess_list; // head of social array
+int32_t num_socials;                // number of actual socials (50 = 0-49)
+int32_t social_array_size;          // size of actual array (since we allocate in chunks)
 
 struct social_messg *find_social(string arg);
 
@@ -79,7 +79,6 @@ int check_social(char_data *ch, string pcomm, int length)
   {
     buf = {};
   }
-    
 
   if (buf.empty())
   {
@@ -135,90 +134,91 @@ char *fread_social_string(FILE *fl)
   char buf[MAX_STRING_LENGTH], *rslt;
 
   fgets(buf, MAX_STRING_LENGTH, fl);
-  if(feof(fl)) {
-    log("Fread_social_string - unexpected EOF.", IMMORTAL, LOG_BUG);
+  if (feof(fl))
+  {
+    log("Fread_social_string - unexpected EOF.", IMMORTAL, LogChannels::LOG_BUG);
     exit(0);
   }
 
-  if(*buf == '#')
-    return(0);
+  if (*buf == '#')
+    return (0);
 
   // strip the \n
   *(buf + strlen(buf) - 1) = '\0';
 
   rslt = str_dup(buf);
-  return(rslt);
+  return (rslt);
 }
 
 // read one social
 // return TRUE on success
 // return FALSE on 'EOF'
-int read_social_from_file(int32_t num_social, FILE * fl)
+int read_social_from_file(int32_t num_social, FILE *fl)
 {
   char tmp[MAX_INPUT_LENGTH];
   int hide, min_pos;
 
   fscanf(fl, " %s ", tmp);
-  if(feof(fl))
+  if (feof(fl))
     return FALSE;
   fscanf(fl, " %d %d \n", &hide, &min_pos);
 
   // read strings that will always be there
-  soc_mess_list[num_social].name                = str_dup(tmp);
-  soc_mess_list[num_social].hide                = hide;
+  soc_mess_list[num_social].name = str_dup(tmp);
+  soc_mess_list[num_social].hide = hide;
   soc_mess_list[num_social].min_victim_position = min_pos;
-  soc_mess_list[num_social].char_no_arg         = fread_social_string(fl);
-  soc_mess_list[num_social].others_no_arg       = fread_social_string(fl);
-  soc_mess_list[num_social].char_found          = fread_social_string(fl);
+  soc_mess_list[num_social].char_no_arg = fread_social_string(fl);
+  soc_mess_list[num_social].others_no_arg = fread_social_string(fl);
+  soc_mess_list[num_social].char_found = fread_social_string(fl);
   // if no char_found, then the social is done, and the ones below won't be there
-  if(!soc_mess_list[num_social].char_found)
+  if (!soc_mess_list[num_social].char_found)
     return TRUE;
-  soc_mess_list[num_social].others_found        = fread_social_string(fl);
-  soc_mess_list[num_social].vict_found          = fread_social_string(fl);
-  soc_mess_list[num_social].not_found           = fread_social_string(fl);
-  soc_mess_list[num_social].char_auto           = fread_social_string(fl);
-  soc_mess_list[num_social].others_auto         = fread_social_string(fl);
+  soc_mess_list[num_social].others_found = fread_social_string(fl);
+  soc_mess_list[num_social].vict_found = fread_social_string(fl);
+  soc_mess_list[num_social].not_found = fread_social_string(fl);
+  soc_mess_list[num_social].char_auto = fread_social_string(fl);
+  soc_mess_list[num_social].others_auto = fread_social_string(fl);
   return TRUE;
 }
 
 // this function used by qsort to sort the social array
-int compare_social_sort(const void * A, const void * B)
+int compare_social_sort(const void *A, const void *B)
 {
   int i;
-  for (i = 0;;i++)
-      if (!(*(((social_messg*)A)->name+i) && *(((social_messg*)B)->name+i)))
-	break;
-      else if ( *(((social_messg*)A)->name+i) > *(((social_messg*)B)->name+i))
-         return 1;
-      else if ( *(((social_messg*)A)->name+i) < *(((social_messg*)B)->name+i))
-	return -1;
+  for (i = 0;; i++)
+    if (!(*(((social_messg *)A)->name + i) && *(((social_messg *)B)->name + i)))
+      break;
+    else if (*(((social_messg *)A)->name + i) > *(((social_messg *)B)->name + i))
+      return 1;
+    else if (*(((social_messg *)A)->name + i) < *(((social_messg *)B)->name + i))
+      return -1;
   // Match so far..
-  if (strlen(((social_messg*)A)->name) > strlen(((social_messg*)B)->name))
+  if (strlen(((social_messg *)A)->name) > strlen(((social_messg *)B)->name))
     return 1;
-  if (strlen(((social_messg*)A)->name) < strlen(((social_messg*)B)->name))
+  if (strlen(((social_messg *)A)->name) < strlen(((social_messg *)B)->name))
     return -1;
   return 0;
 }
 
 // this function used by qsort to search the social array
-int compare_social_search(const void * A, const void * B)
+int compare_social_search(const void *A, const void *B)
 {
   int i;
-  for (i = 0;;i++)
-      if (!(*(((char*)A)+i) && *(((social_messg*)B)->name+i)))
-	break;
-      else if ( *(((char*)A)+i) > *(((social_messg*)B)->name+i))
-         return 1;
-      else if ( *(((char*)A)+i) < *(((social_messg*)B)->name+i))
-	return -1;
+  for (i = 0;; i++)
+    if (!(*(((char *)A) + i) && *(((social_messg *)B)->name + i)))
+      break;
+    else if (*(((char *)A) + i) > *(((social_messg *)B)->name + i))
+      return 1;
+    else if (*(((char *)A) + i) < *(((social_messg *)B)->name + i))
+      return -1;
   // Match so far..
-  if (strlen(((char*)A)) > strlen(((social_messg*)B)->name))
+  if (strlen(((char *)A)) > strlen(((social_messg *)B)->name))
     return 1;
-  if (strlen(((char*)A)) < strlen(((social_messg*)B)->name))
+  if (strlen(((char *)A)) < strlen(((social_messg *)B)->name))
     return 0;
   return 0;
-//  return len_cmp( (char *) A, ((social_messg *) B)->name );
-} 
+  //  return len_cmp( (char *) A, ((social_messg *) B)->name );
+}
 
 void boot_social_messages(void)
 {
@@ -230,33 +230,35 @@ void boot_social_messages(void)
                            // going over saves on memory and boot up speed since we won't
                            // have to realloc as often.
 #ifdef LEAK_CHECK
-  soc_mess_list = (struct social_messg *) calloc(social_array_size, sizeof(struct social_messg));
+  soc_mess_list = (struct social_messg *)calloc(social_array_size, sizeof(struct social_messg));
 #else
-  soc_mess_list = (struct social_messg *) dc_alloc(social_array_size, sizeof(struct social_messg));
+  soc_mess_list = (struct social_messg *)dc_alloc(social_array_size, sizeof(struct social_messg));
 #endif
 
-  if(!(fl = dc_fopen(SOCIAL_FILE, "r"))) {
+  if (!(fl = dc_fopen(SOCIAL_FILE, "r")))
+  {
     perror("Can't open social file in boot_social_messages");
     abort();
   }
 
-  for(;;) 
+  for (;;)
   {
     // do we have room?
-    if(num_socials >= social_array_size) {
+    if (num_socials >= social_array_size)
+    {
       social_array_size += 10;
       // realloc the list to have enough memory for the new array size
 #ifdef LEAK_CHECK
-      soc_mess_list = (struct social_messg *) realloc(soc_mess_list, 
-                                  (sizeof(struct social_messg)*social_array_size));
+      soc_mess_list = (struct social_messg *)realloc(soc_mess_list,
+                                                     (sizeof(struct social_messg) * social_array_size));
 #else
-      soc_mess_list = (struct social_messg *) dc_realloc(soc_mess_list, 
-                                  (sizeof(struct social_messg)*social_array_size));
+      soc_mess_list = (struct social_messg *)dc_realloc(soc_mess_list,
+                                                        (sizeof(struct social_messg) * social_array_size));
 #endif
       // clear the memory we just alloc'd
-      memset( (soc_mess_list + num_socials), 0, (sizeof(struct social_messg)*10) );
+      memset((soc_mess_list + num_socials), 0, (sizeof(struct social_messg) * 10));
     }
-    if(!read_social_from_file(num_socials, fl))
+    if (!read_social_from_file(num_socials, fl))
       break;
     num_socials++;
   }
@@ -267,58 +269,55 @@ void boot_social_messages(void)
   dc_fclose(fl);
 }
 
-struct social_messg * find_social(string arg)
+struct social_messg *find_social(string arg)
 {
-// now uses a linear search
+  // now uses a linear search
   int i;
 
-  for(i = 1; i < num_socials; i++)
-	if (!compare_social_search((void*)arg.c_str(),(void*)&soc_mess_list[i]))
-	  return &soc_mess_list[i];
-
+  for (i = 1; i < num_socials; i++)
+    if (!compare_social_search((void *)arg.c_str(), (void *)&soc_mess_list[i]))
+      return &soc_mess_list[i];
 
   return NULL;
-//    sprintf(buf + strlen(buf), "%18s", soc_mess_list[i].name);
+  //    sprintf(buf + strlen(buf), "%18s", soc_mess_list[i].name);
 
-  
-
-//  return (social_messg *) bsearch(arg, soc_mess_list, num_socials, sizeof(struct social_messg), compare_social_search);
+  //  return (social_messg *) bsearch(arg, soc_mess_list, num_socials, sizeof(struct social_messg), compare_social_search);
 }
-    
+
 void clean_socials_from_memory()
 {
-   for(int i = 0; i < num_socials; i++)
-   {
-     if(soc_mess_list[i].name)
-        dc_free(soc_mess_list[i].name);
-     if(soc_mess_list[i].char_no_arg)
-        dc_free(soc_mess_list[i].char_no_arg);
-     if(soc_mess_list[i].others_no_arg)
-        dc_free(soc_mess_list[i].others_no_arg);
-     if(soc_mess_list[i].char_found)
-        dc_free(soc_mess_list[i].char_found);
-     if(soc_mess_list[i].others_found)
-       dc_free(soc_mess_list[i].others_found);
-     if(soc_mess_list[i].vict_found)
-        dc_free(soc_mess_list[i].vict_found);
-     if(soc_mess_list[i].not_found)
-        dc_free(soc_mess_list[i].not_found);
-     if(soc_mess_list[i].char_auto)
-        dc_free(soc_mess_list[i].char_auto);
-     if(soc_mess_list[i].others_auto)
-        dc_free(soc_mess_list[i].others_auto);
-   }
+  for (int i = 0; i < num_socials; i++)
+  {
+    if (soc_mess_list[i].name)
+      dc_free(soc_mess_list[i].name);
+    if (soc_mess_list[i].char_no_arg)
+      dc_free(soc_mess_list[i].char_no_arg);
+    if (soc_mess_list[i].others_no_arg)
+      dc_free(soc_mess_list[i].others_no_arg);
+    if (soc_mess_list[i].char_found)
+      dc_free(soc_mess_list[i].char_found);
+    if (soc_mess_list[i].others_found)
+      dc_free(soc_mess_list[i].others_found);
+    if (soc_mess_list[i].vict_found)
+      dc_free(soc_mess_list[i].vict_found);
+    if (soc_mess_list[i].not_found)
+      dc_free(soc_mess_list[i].not_found);
+    if (soc_mess_list[i].char_auto)
+      dc_free(soc_mess_list[i].char_auto);
+    if (soc_mess_list[i].others_auto)
+      dc_free(soc_mess_list[i].others_auto);
+  }
 
-   dc_free(soc_mess_list);
+  dc_free(soc_mess_list);
 }
 
 int do_social(char_data *ch, char *argument, int cmd)
 {
   int i;
-  char buf[MAX_STRING_LENGTH];  
+  char buf[MAX_STRING_LENGTH];
   *buf = '\0';
- 
-  for(i = 1; i < num_socials; i++)
+
+  for (i = 1; i < num_socials; i++)
   {
     sprintf(buf + strlen(buf), "%18s", soc_mess_list[i].name);
     if (!(i % 4))
@@ -328,8 +327,8 @@ int do_social(char_data *ch, char *argument, int cmd)
       *buf = '\0';
     }
   }
-  if(*buf)
-      send_to_char(buf, ch);
+  if (*buf)
+    send_to_char(buf, ch);
 
   sprintf(buf, "\r\nCurrent Socials:  %d\r\n", i);
   send_to_char(buf, ch);

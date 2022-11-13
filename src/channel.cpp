@@ -30,34 +30,40 @@
 
 using namespace std;
 
-class channel_msg {
+class channel_msg
+{
 public:
-  channel_msg(const char_data *sender, const int32_t type, const char *msg) 
-    : type(type), msg(string(msg))
-  { 
+  channel_msg(const char_data *sender, const int32_t type, const char *msg)
+      : type(type), msg(string(msg))
+  {
     set_wizinvis(sender);
     set_name(sender);
   }
 
-  channel_msg(const char_data *sender, const int32_t type, const string &msg) 
-    : type(type), msg(msg)
-  { 
+  channel_msg(const char_data *sender, const int32_t type, const string &msg)
+      : type(type), msg(msg)
+  {
     set_wizinvis(sender);
     set_name(sender);
   }
 
-  string get_msg(const int receiver_level) {
+  string get_msg(const int receiver_level)
+  {
     stringstream output;
     string sender;
 
-    if (receiver_level < wizinvis) {
+    if (receiver_level < wizinvis)
+    {
       sender = "Someone";
-    } else {
+    }
+    else
+    {
       sender = name;
     }
 
-    switch(type) {
-    case CHANNEL_GOSSIP:
+    switch (type)
+    {
+    case LogChannels::CHANNEL_GOSSIP:
       output << "$5$B" << sender << " gossips '" << msg << "$5$B'$R";
       break;
     }
@@ -65,20 +71,28 @@ public:
     return output.str();
   }
 
-  inline void set_wizinvis(const char_data *sender) {
-    if (sender && IS_PC(sender)) {
+  inline void set_wizinvis(const char_data *sender)
+  {
+    if (sender && IS_PC(sender))
+    {
       wizinvis = sender->pcdata->wizinvis;
-    } else {
+    }
+    else
+    {
       wizinvis = 0;
     }
   }
 
-  inline void set_name(const char_data *sender) {
-    if (sender) {
+  inline void set_name(const char_data *sender)
+  {
+    if (sender)
+    {
       name = string(GET_SHORT(sender));
-    } else {
+    }
+    else
+    {
       name = string("Unknown");
-      logf(IMMORTAL, LOG_BUG, "channel_msg::set_name: sender is NULL. type: %d msg: %s", type, msg.c_str());
+      logf(IMMORTAL, LogChannels::LOG_BUG, "channel_msg::set_name: sender is NULL. type: %d msg: %s", type, msg.c_str());
     }
   }
 
@@ -172,68 +186,73 @@ command_return_t do_say(char_data *ch, string argument, int cmd)
 // TODO - after this gets used alot, maybe switch speech triggers to it
 command_return_t do_psay(char_data *ch, string argument, int cmd)
 {
-   string vict = {}, message = {}, buf = {};
-   char_data* victim = nullptr;
-   extern bool MOBtrigger;
+  string vict = {}, message = {}, buf = {};
+  char_data *victim = nullptr;
+  extern bool MOBtrigger;
 
-   if (IS_PC(ch) && IS_SET(ch->pcdata->punish, PUNISH_STUPID)) {
-      send_to_char ("You try to speak but just look like an idiot!\r\n", ch);
-      return eSUCCESS;
-   }
+  if (IS_PC(ch) && IS_SET(ch->pcdata->punish, PUNISH_STUPID))
+  {
+    send_to_char("You try to speak but just look like an idiot!\r\n", ch);
+    return eSUCCESS;
+  }
 
-   if (IS_SET(world[ch->in_room].room_flags, QUIET)) {
-      send_to_char ("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
-      return eSUCCESS;
-   }
+  if (IS_SET(world[ch->in_room].room_flags, QUIET))
+  {
+    send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
+    return eSUCCESS;
+  }
 
-   obj_data *tmp_obj = nullptr;
-   for(tmp_obj = world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
-    if(tmp_obj && tmp_obj->item_number >= 0 && obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER) {
-       send_to_char("The magical silence prevents you from speaking!\n\r", ch);
-       return eFAILURE;
-     }
+  obj_data *tmp_obj = nullptr;
+  for (tmp_obj = world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
+    if (tmp_obj && tmp_obj->item_number >= 0 && obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER)
+    {
+      send_to_char("The magical silence prevents you from speaking!\n\r", ch);
+      return eFAILURE;
+    }
 
   tie(vict, message) = half_chop(argument);
 
-   if(vict.empty() || message.empty()) {
-      send_to_char("Say what to whom?  psay <target> <message>\r\n", ch);
-      return eSUCCESS;
-   }
+  if (vict.empty() || message.empty())
+  {
+    send_to_char("Say what to whom?  psay <target> <message>\r\n", ch);
+    return eSUCCESS;
+  }
 
-   if (!(victim = get_char_room_vis(ch, vict))) {
-      csendf(ch, "You see noone that goes by '%s' here.\r\n", vict);
-      return eSUCCESS;
-   }
+  if (!(victim = get_char_room_vis(ch, vict)))
+  {
+    csendf(ch, "You see noone that goes by '%s' here.\r\n", vict);
+    return eSUCCESS;
+  }
 
-    string messageStr = message;
-    if (IS_IMMORTAL(ch))
-    {
-      messageStr = remove_all_codes(messageStr);
-    }
+  string messageStr = message;
+  if (IS_IMMORTAL(ch))
+  {
+    messageStr = remove_all_codes(messageStr);
+  }
 
-   if(!IS_NPC(ch))
-     MOBtrigger = false;
-   buf = fmt::format("$B$n says (to $N) '{}'$R", messageStr.c_str());
-   act(buf, ch, 0, victim, TO_ROOM, NOTVICT);
+  if (!IS_NPC(ch))
+    MOBtrigger = false;
+  buf = fmt::format("$B$n says (to $N) '{}'$R", messageStr.c_str());
+  act(buf, ch, 0, victim, TO_ROOM, NOTVICT);
 
-   if(!IS_NPC(ch))
-     MOBtrigger = false;
-   buf = fmt::format("$B$n says (to $3you$7) '{}'$R", messageStr.c_str());
-   act(buf, ch, 0, victim, TO_VICT, 0);
+  if (!IS_NPC(ch))
+    MOBtrigger = false;
+  buf = fmt::format("$B$n says (to $3you$7) '{}'$R", messageStr.c_str());
+  act(buf, ch, 0, victim, TO_VICT, 0);
 
-   if(!IS_NPC(ch))
-     MOBtrigger = false;
-   buf = fmt::format("$BYou say (to $N) '{}'$R", messageStr.c_str());
-   act(buf, ch, 0, victim, TO_CHAR, 0);
-   MOBtrigger = true;
-//   if(!IS_NPC(ch)) {
-//     retval = mprog_speech_trigger( message, ch );
-//     MOBtrigger = true;
-//     if(SOMEONE_DIED(retval))
-//       return SWAP_CH_VICT(retval);
-//   }
+  if (!IS_NPC(ch))
+    MOBtrigger = false;
+  buf = fmt::format("$BYou say (to $N) '{}'$R", messageStr.c_str());
+  act(buf, ch, 0, victim, TO_CHAR, 0);
+  MOBtrigger = true;
+  //   if(!IS_NPC(ch)) {
+  //     retval = mprog_speech_trigger( message, ch );
+  //     MOBtrigger = true;
+  //     if(SOMEONE_DIED(retval))
+  //       return SWAP_CH_VICT(retval);
+  //   }
 
-   return eSUCCESS;
+  return eSUCCESS;
 }
 
 int do_pray(char_data *ch, char *arg, int cmd)
@@ -241,27 +260,29 @@ int do_pray(char_data *ch, char *arg, int cmd)
   char buf1[MAX_STRING_LENGTH];
   struct descriptor_data *i;
 
-  if(IS_NPC(ch))
+  if (IS_NPC(ch))
     return eSUCCESS;
 
-  while(*arg == ' ')
+  while (*arg == ' ')
     arg++;
 
-  if(!*arg) {
+  if (!*arg)
+  {
     send_to_char("You must have something to tell the immortals...\n\r", ch);
     return eSUCCESS;
   }
 
-  if (GET_LEVEL(ch) >= IMMORTAL) {
+  if (GET_LEVEL(ch) >= IMMORTAL)
+  {
     send_to_char("Why pray? You are a god!\n\r", ch);
     return eSUCCESS;
-   }
+  }
 
   if (!IS_MOB(ch) && IS_SET(ch->pcdata->punish, PUNISH_STUPID))
-    {
-    send_to_char ("Duh...I'm too stupid!\n\r", ch);
+  {
+    send_to_char("Duh...I'm too stupid!\n\r", ch);
     return eSUCCESS;
-    }
+  }
 
   if (!IS_MOB(ch) && IS_SET(ch->pcdata->punish, PUNISH_NOPRAY))
   {
@@ -271,259 +292,305 @@ int do_pray(char_data *ch, char *arg, int cmd)
 
   sprintf(buf1, "\a$4$B**$R$5 %s prays: %s $4$B**$R\n\r", GET_NAME(ch), arg);
 
-  for(i = descriptor_list; i; i = i->next) {
-    if((i->character == NULL) || (GET_LEVEL(i->character) <= MORTAL))
+  for (i = descriptor_list; i; i = i->next)
+  {
+    if ((i->character == NULL) || (GET_LEVEL(i->character) <= MORTAL))
       continue;
-    if(!(IS_SET(i->character->misc, LOG_PRAYER)))
+    if (!(IS_SET(i->character->misc, LogChannels::LOG_PRAYER)))
       continue;
-    if(is_busy(i->character) || is_ignoring(i->character, ch))
+    if (is_busy(i->character) || is_ignoring(i->character, ch))
       continue;
-    if(!i->connected)
+    if (!i->connected)
       send_to_char(buf1, i->character);
   }
   send_to_char("\a\aOk.\n\r", ch);
-  WAIT_STATE(ch, PULSE_VIOLENCE*2);
+  WAIT_STATE(ch, PULSE_VIOLENCE * 2);
   return eSUCCESS;
 }
 
 int do_gossip(char_data *ch, char *argument, int cmd)
 {
-    char buf2[MAX_STRING_LENGTH];
-    struct descriptor_data *i;
-    obj_data *tmp_obj;
-    bool silence = false;
+  char buf2[MAX_STRING_LENGTH];
+  struct descriptor_data *i;
+  obj_data *tmp_obj;
+  bool silence = false;
 
-    if (IS_SET(world[ch->in_room].room_flags, QUIET)) {
-      send_to_char ("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
-      return eSUCCESS;
-      }
-
-    for(tmp_obj = world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
-      if(obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER) {
-        send_to_char("The magical silence prevents you from speaking!\n\r", ch);
-        return eFAILURE;
-      }
-
-    if(IS_NPC(ch) && ch->master) {
-      do_say(ch, "Why don't you just do that yourself!", CMD_DEFAULT);
-      return eSUCCESS;
-    }
-
-    if(GET_POS(ch) == POSITION_SLEEPING) {
-      send_to_char("You're asleep.  Dream or something....\r\n", ch);
-      return eSUCCESS;
-    }
-
-    if(!IS_NPC(ch)) {
-      if(!IS_MOB(ch) && IS_SET(ch->pcdata->punish, PUNISH_SILENCED)) {
-	  send_to_char("You must have somehow offended the gods, for "
-                       "you find yourself unable to!\n\r", ch);
-	  return eSUCCESS;
-      }
-      if(!(IS_SET(ch->misc, CHANNEL_GOSSIP))) {
-	  send_to_char("You told yourself not to GOSSIP!!\n\r", ch);
-	  return eSUCCESS;
-      }
-      if(GET_LEVEL(ch) < 3) {
-        send_to_char("You must be at least 3rd level to gossip.\n\r",ch);
-        return eSUCCESS;
-      }
-    }
-
-    for (; *argument == ' '; argument++);
-
-    if (!(*argument))
-    {
-      queue<channel_msg> msgs = gossip_history;
-      send_to_char("Here are the last 10 gossips:\n\r", ch);
-      while(!msgs.empty())
-      {
-	act(msgs.front().get_msg(ch->level), ch, 0, ch, TO_VICT, 0);
-	msgs.pop();
-      }
-    }
-    else 
-    {
-      GET_MOVE(ch) -= 5;
-      if(GET_MOVE(ch) < 0) {
-        send_to_char("You're too out of breath!\n\r", ch);
-        GET_MOVE(ch) += 5;
-        return eSUCCESS;
-      }
-
-      channel_msg msg(ch, CHANNEL_GOSSIP, argument);
-
-      sprintf(buf2, "$5$BYou gossip '%s'$R", argument);
-      act(buf2, ch, 0, 0, TO_CHAR, 0);
-
-      gossip_history.push(msg);
-      if(gossip_history.size() > 10) {
-	gossip_history.pop();
-      }
-
-      for(i = descriptor_list; i; i = i->next) {
-	 if(i->character != ch && !i->connected && (IS_SET(i->character->misc, CHANNEL_GOSSIP)) && !is_ignoring(i->character, ch)) {
-	   for(tmp_obj = world[i->character->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content) {
-	     if(obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER) {
-	       silence = true;
-	       break;
-	     }
-	   }
-
-	   if(!silence) {
-	     act(msg.get_msg(i->character->level), ch, 0, i->character, TO_VICT, 0);
-	   }
-	 }
-      }
-    }
+  if (IS_SET(world[ch->in_room].room_flags, QUIET))
+  {
+    send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
     return eSUCCESS;
+  }
+
+  for (tmp_obj = world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
+    if (obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER)
+    {
+      send_to_char("The magical silence prevents you from speaking!\n\r", ch);
+      return eFAILURE;
+    }
+
+  if (IS_NPC(ch) && ch->master)
+  {
+    do_say(ch, "Why don't you just do that yourself!", CMD_DEFAULT);
+    return eSUCCESS;
+  }
+
+  if (GET_POS(ch) == POSITION_SLEEPING)
+  {
+    send_to_char("You're asleep.  Dream or something....\r\n", ch);
+    return eSUCCESS;
+  }
+
+  if (!IS_NPC(ch))
+  {
+    if (!IS_MOB(ch) && IS_SET(ch->pcdata->punish, PUNISH_SILENCED))
+    {
+      send_to_char("You must have somehow offended the gods, for "
+                   "you find yourself unable to!\n\r",
+                   ch);
+      return eSUCCESS;
+    }
+    if (!(IS_SET(ch->misc, LogChannels::CHANNEL_GOSSIP)))
+    {
+      send_to_char("You told yourself not to GOSSIP!!\n\r", ch);
+      return eSUCCESS;
+    }
+    if (GET_LEVEL(ch) < 3)
+    {
+      send_to_char("You must be at least 3rd level to gossip.\n\r", ch);
+      return eSUCCESS;
+    }
+  }
+
+  for (; *argument == ' '; argument++)
+    ;
+
+  if (!(*argument))
+  {
+    queue<channel_msg> msgs = gossip_history;
+    send_to_char("Here are the last 10 gossips:\n\r", ch);
+    while (!msgs.empty())
+    {
+      act(msgs.front().get_msg(ch->level), ch, 0, ch, TO_VICT, 0);
+      msgs.pop();
+    }
+  }
+  else
+  {
+    GET_MOVE(ch) -= 5;
+    if (GET_MOVE(ch) < 0)
+    {
+      send_to_char("You're too out of breath!\n\r", ch);
+      GET_MOVE(ch) += 5;
+      return eSUCCESS;
+    }
+
+    channel_msg msg(ch, LogChannels::CHANNEL_GOSSIP, argument);
+
+    sprintf(buf2, "$5$BYou gossip '%s'$R", argument);
+    act(buf2, ch, 0, 0, TO_CHAR, 0);
+
+    gossip_history.push(msg);
+    if (gossip_history.size() > 10)
+    {
+      gossip_history.pop();
+    }
+
+    for (i = descriptor_list; i; i = i->next)
+    {
+      if (i->character != ch && !i->connected && (IS_SET(i->character->misc, LogChannels::CHANNEL_GOSSIP)) && !is_ignoring(i->character, ch))
+      {
+        for (tmp_obj = world[i->character->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
+        {
+          if (obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER)
+          {
+            silence = true;
+            break;
+          }
+        }
+
+        if (!silence)
+        {
+          act(msg.get_msg(i->character->level), ch, 0, i->character, TO_VICT, 0);
+        }
+      }
+    }
+  }
+  return eSUCCESS;
 }
 
 int do_auction(char_data *ch, char *argument, int cmd)
 {
-    char buf1[MAX_STRING_LENGTH];
-    char buf2[MAX_STRING_LENGTH];
-    struct descriptor_data *i;
-    obj_data *tmp_obj;
-    bool silence = false;
+  char buf1[MAX_STRING_LENGTH];
+  char buf2[MAX_STRING_LENGTH];
+  struct descriptor_data *i;
+  obj_data *tmp_obj;
+  bool silence = false;
 
-   if(IS_SET(world[ch->in_room].room_flags, QUIET)) {
-     send_to_char ("SHHHHHH!! Can't you see people are trying to read?\r\n",
-                   ch);
-     return eSUCCESS; 
-   }
-
-   for(tmp_obj = world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
-     if(obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER) {
-       send_to_char("The magical silence prevents you from speaking!\n\r", ch);
-       return eFAILURE;
-     }
-
-    if(IS_NPC(ch) && ch->master) {
-     do_say(ch, "That's okay, I'll let you do all the auctioning, master.", CMD_DEFAULT);
-     return eSUCCESS;
-    }
-
-    if(!IS_NPC(ch)) {
-      if(!IS_MOB(ch) && IS_SET(ch->pcdata->punish, PUNISH_SILENCED)) {
-	  send_to_char("You must have somehow offended the gods, for "
-                       "you find yourself unable to!\n\r", ch);
-	  return eSUCCESS;
-      }
-      if(!(IS_SET(ch->misc, CHANNEL_AUCTION))) {
-	  send_to_char("You told yourself not to AUCTION!!\n\r", ch);
-	  return eSUCCESS;
-      }
-      if(GET_LEVEL(ch) < 3) {
-        send_to_char("You must be at least 3rd level to auction.\n\r",ch);
-        return eSUCCESS;
-      }
-    }
-    
-    for (; *argument == ' '; argument++);
-
-    if (!(*argument))
-    {
-      queue<string> tmp = auction_history;
-      send_to_char("Here are the last 10 auctions:\n\r", ch);
-      while(!tmp.empty())
-      {
-	  act((tmp.front()).c_str(), ch, 0, ch, TO_VICT, 0);
-          tmp.pop();
-      }
-    }
-    else {
-      GET_MOVE(ch) -= 5;
-      if(GET_MOVE(ch) < 0) {
-        send_to_char("You're too out of breath!\n\r", ch);
-        GET_MOVE(ch) += 5;
-        return eSUCCESS;
-      }
-      sprintf(buf1, "$6$B%s auctions '%s'$R", GET_NAME(ch), argument);
-      sprintf(buf2, "$6$BYou auction '%s'$R", argument);
-      act(buf2, ch, 0, 0, TO_CHAR, 0);
-
-      auction_history.push(buf1);
-      if(auction_history.size() > 10) auction_history.pop();
-
-      for(i = descriptor_list; i; i = i->next)
-	 if(i->character != ch && !i->connected &&
-	   (IS_SET(i->character->misc, CHANNEL_AUCTION)) &&
-            !is_ignoring(i->character, ch)) {
-          for(tmp_obj = world[i->character->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
-            if(obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER) {
-              silence = true;
-              break;
-            }
-          if(!silence) act(buf1, ch, 0, i->character, TO_VICT, 0);
-         }
-    }
+  if (IS_SET(world[ch->in_room].room_flags, QUIET))
+  {
+    send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n",
+                 ch);
     return eSUCCESS;
+  }
+
+  for (tmp_obj = world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
+    if (obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER)
+    {
+      send_to_char("The magical silence prevents you from speaking!\n\r", ch);
+      return eFAILURE;
+    }
+
+  if (IS_NPC(ch) && ch->master)
+  {
+    do_say(ch, "That's okay, I'll let you do all the auctioning, master.", CMD_DEFAULT);
+    return eSUCCESS;
+  }
+
+  if (!IS_NPC(ch))
+  {
+    if (!IS_MOB(ch) && IS_SET(ch->pcdata->punish, PUNISH_SILENCED))
+    {
+      send_to_char("You must have somehow offended the gods, for "
+                   "you find yourself unable to!\n\r",
+                   ch);
+      return eSUCCESS;
+    }
+    if (!(IS_SET(ch->misc, LogChannels::CHANNEL_AUCTION)))
+    {
+      send_to_char("You told yourself not to AUCTION!!\n\r", ch);
+      return eSUCCESS;
+    }
+    if (GET_LEVEL(ch) < 3)
+    {
+      send_to_char("You must be at least 3rd level to auction.\n\r", ch);
+      return eSUCCESS;
+    }
+  }
+
+  for (; *argument == ' '; argument++)
+    ;
+
+  if (!(*argument))
+  {
+    queue<string> tmp = auction_history;
+    send_to_char("Here are the last 10 auctions:\n\r", ch);
+    while (!tmp.empty())
+    {
+      act((tmp.front()).c_str(), ch, 0, ch, TO_VICT, 0);
+      tmp.pop();
+    }
+  }
+  else
+  {
+    GET_MOVE(ch) -= 5;
+    if (GET_MOVE(ch) < 0)
+    {
+      send_to_char("You're too out of breath!\n\r", ch);
+      GET_MOVE(ch) += 5;
+      return eSUCCESS;
+    }
+    sprintf(buf1, "$6$B%s auctions '%s'$R", GET_NAME(ch), argument);
+    sprintf(buf2, "$6$BYou auction '%s'$R", argument);
+    act(buf2, ch, 0, 0, TO_CHAR, 0);
+
+    auction_history.push(buf1);
+    if (auction_history.size() > 10)
+      auction_history.pop();
+
+    for (i = descriptor_list; i; i = i->next)
+      if (i->character != ch && !i->connected &&
+          (IS_SET(i->character->misc, LogChannels::CHANNEL_AUCTION)) &&
+          !is_ignoring(i->character, ch))
+      {
+        for (tmp_obj = world[i->character->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
+          if (obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER)
+          {
+            silence = true;
+            break;
+          }
+        if (!silence)
+          act(buf1, ch, 0, i->character, TO_VICT, 0);
+      }
+  }
+  return eSUCCESS;
 }
 
 int do_shout(char_data *ch, char *argument, int cmd)
 {
-    char buf1[MAX_STRING_LENGTH];
-    char buf2[MAX_STRING_LENGTH];
-    struct descriptor_data *i;
-    obj_data *tmp_obj;
-    bool silence = false;
+  char buf1[MAX_STRING_LENGTH];
+  char buf2[MAX_STRING_LENGTH];
+  struct descriptor_data *i;
+  obj_data *tmp_obj;
+  bool silence = false;
 
-    if(IS_SET(world[ch->in_room].room_flags, QUIET)) {
-      send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n",
-                   ch);
-      return eSUCCESS;
-    }
-
-    for(tmp_obj = world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
-      if(obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER) {
-        send_to_char("The magical silence prevents you from speaking!\n\r", ch);
-        return eFAILURE;
-      }
-
-    if(IS_NPC(ch) && ch->master) {
-      return do_say(ch, "Shouting makes my throat hoarse.", CMD_DEFAULT);
-    }
-
-    if (!IS_NPC(ch) && IS_SET(ch->pcdata->punish, PUNISH_SILENCED)) {
-	send_to_char("You must have somehow offended the gods, for you "
-	             "find yourself unable to!\n\r", ch);
-	return eSUCCESS;
-    }
-    if(!IS_NPC(ch) && !(IS_SET(ch->misc, CHANNEL_SHOUT))) {
-      send_to_char("You told yourself not to SHOUT!!\n\r", ch);
-      return eSUCCESS;
-    }
-    if (!IS_NPC(ch) && GET_LEVEL(ch) < 3){
-      send_to_char("Due to misuse, you must be of at least 3rd level "
-                   "to shout.\n\r",ch);
-      return eSUCCESS;
-    }
-    
-    for(; *argument == ' '; argument++);
-
-    if(!(*argument))
-      send_to_char("What do you want to shout, dork?\n\r", ch);
-
-    else {
-      sprintf(buf1, "$B$n shouts '%s'$R", argument);
-      sprintf(buf2, "$BYou shout '%s'$R", argument);
-      act(buf2, ch, 0, 0, TO_CHAR, 0);
-
-      for(i = descriptor_list; i; i = i->next)
-	 if(i->character != ch && !i->connected &&
-           (world[i->character->in_room].zone == world[ch->in_room].zone) &&
-	   (IS_NPC(i->character) || IS_SET(i->character->misc, CHANNEL_SHOUT)) &&
-            !is_ignoring(i->character, ch)) {
-          for(tmp_obj = world[i->character->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
-            if(obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER) {
-              silence = true;
-              break;
-            }
-          if(!silence) act(buf1, ch, 0, i->character, TO_VICT, 0);
-         }
-    }
+  if (IS_SET(world[ch->in_room].room_flags, QUIET))
+  {
+    send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n",
+                 ch);
     return eSUCCESS;
+  }
+
+  for (tmp_obj = world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
+    if (obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER)
+    {
+      send_to_char("The magical silence prevents you from speaking!\n\r", ch);
+      return eFAILURE;
+    }
+
+  if (IS_NPC(ch) && ch->master)
+  {
+    return do_say(ch, "Shouting makes my throat hoarse.", CMD_DEFAULT);
+  }
+
+  if (!IS_NPC(ch) && IS_SET(ch->pcdata->punish, PUNISH_SILENCED))
+  {
+    send_to_char("You must have somehow offended the gods, for you "
+                 "find yourself unable to!\n\r",
+                 ch);
+    return eSUCCESS;
+  }
+  if (!IS_NPC(ch) && !(IS_SET(ch->misc, LogChannels::CHANNEL_SHOUT)))
+  {
+    send_to_char("You told yourself not to SHOUT!!\n\r", ch);
+    return eSUCCESS;
+  }
+  if (!IS_NPC(ch) && GET_LEVEL(ch) < 3)
+  {
+    send_to_char("Due to misuse, you must be of at least 3rd level "
+                 "to shout.\n\r",
+                 ch);
+    return eSUCCESS;
+  }
+
+  for (; *argument == ' '; argument++)
+    ;
+
+  if (!(*argument))
+    send_to_char("What do you want to shout, dork?\n\r", ch);
+
+  else
+  {
+    sprintf(buf1, "$B$n shouts '%s'$R", argument);
+    sprintf(buf2, "$BYou shout '%s'$R", argument);
+    act(buf2, ch, 0, 0, TO_CHAR, 0);
+
+    for (i = descriptor_list; i; i = i->next)
+      if (i->character != ch && !i->connected &&
+          (world[i->character->in_room].zone == world[ch->in_room].zone) &&
+          (IS_NPC(i->character) || IS_SET(i->character->misc, LogChannels::CHANNEL_SHOUT)) &&
+          !is_ignoring(i->character, ch))
+      {
+        for (tmp_obj = world[i->character->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
+          if (obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER)
+          {
+            silence = true;
+            break;
+          }
+        if (!silence)
+          act(buf1, ch, 0, i->character, TO_VICT, 0);
+      }
+  }
+  return eSUCCESS;
 }
 
 int do_trivia(char_data *ch, char *argument, int cmd)
@@ -534,34 +601,43 @@ int do_trivia(char_data *ch, char *argument, int cmd)
   obj_data *tmp_obj;
   bool silence = false;
 
-  if (IS_SET(world[ch->in_room].room_flags, QUIET)) {
+  if (IS_SET(world[ch->in_room].room_flags, QUIET))
+  {
     send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
     return eSUCCESS;
   }
- 
-  for(tmp_obj = world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
-    if(obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER) {
+
+  for (tmp_obj = world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
+    if (obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER)
+    {
       send_to_char("The magical silence prevents you from speaking!\n\r", ch);
       return eFAILURE;
     }
 
-  if(IS_NPC(ch) && ch->master) {
+  if (IS_NPC(ch) && ch->master)
+  {
     return do_say(ch, "Why don't you just do that yourself!", CMD_DEFAULT);
   }
 
-  if(!IS_NPC(ch)) {
-    if(IS_SET(ch->pcdata->punish, PUNISH_SILENCED)) {
+  if (!IS_NPC(ch))
+  {
+    if (IS_SET(ch->pcdata->punish, PUNISH_SILENCED))
+    {
       send_to_char("You must have somehow offended the gods, for "
-                   "you find yourself unable to!\n\r", ch);
+                   "you find yourself unable to!\n\r",
+                   ch);
       return eSUCCESS;
     }
-    if(!(IS_SET(ch->misc, CHANNEL_TRIVIA))) {
+    if (!(IS_SET(ch->misc, LogChannels::CHANNEL_TRIVIA)))
+    {
       send_to_char("You told yourself not to listen to Trivia!!\n\r", ch);
       return eSUCCESS;
     }
-    if(GET_LEVEL(ch) < 3) {
+    if (GET_LEVEL(ch) < 3)
+    {
       send_to_char("You must be at least 3rd level to participate in "
-                   "trivia.\n\r",ch);
+                   "trivia.\n\r",
+                   ch);
       return eSUCCESS;
     }
   }
@@ -569,49 +645,57 @@ int do_trivia(char_data *ch, char *argument, int cmd)
   for (; *argument == ' '; argument++)
     ;
 
-  if (!(*argument)) {
+  if (!(*argument))
+  {
     {
       queue<string> tmp = trivia_history;
       send_to_char("Here are the last 10 messages:\n\r", ch);
-      while(!tmp.empty())
+      while (!tmp.empty())
       {
-	  act((tmp.front()).c_str(), ch, 0, ch, TO_VICT, 0);
-          tmp.pop();
+        act((tmp.front()).c_str(), ch, 0, ch, TO_VICT, 0);
+        tmp.pop();
       }
     }
     return eSUCCESS;
   }
 
   GET_MOVE(ch) -= 5;
-  if(GET_MOVE(ch) < 0) {
+  if (GET_MOVE(ch) < 0)
+  {
     send_to_char("You're too out of breath!\n\r", ch);
     GET_MOVE(ch) += 5;
     return eSUCCESS;
   }
 
-  if(GET_LEVEL(ch) >= 102) {
+  if (GET_LEVEL(ch) >= 102)
+  {
     sprintf(buf1, "$3$BQuestion $R$3(%s)$B: '%s'$R", GET_SHORT(ch), argument);
-    sprintf(buf2, "$3$BYou ask, $R$3'%s'$R", argument); 
+    sprintf(buf2, "$3$BYou ask, $R$3'%s'$R", argument);
   }
-  else {
+  else
+  {
     sprintf(buf1, "$3$B%s answers '%s'$R", GET_SHORT(ch), argument);
     sprintf(buf2, "$3$BYou answer '%s'$R", argument);
   }
   act(buf2, ch, 0, 0, TO_CHAR, 0);
 
   trivia_history.push(buf1);
-  if(trivia_history.size() > 10) trivia_history.pop();
-    
-  for(i = descriptor_list; i; i = i->next)
-    if(i->character != ch && !i->connected && 
-       (IS_SET(i->character->misc, CHANNEL_TRIVIA)) &&
-            !is_ignoring(i->character, ch)) {
-          for(tmp_obj = world[i->character->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
-            if(obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER) {
-              silence = true;
-              break;
-            }
-          if(!silence) act(buf1, ch, 0, i->character, TO_VICT, 0);
+  if (trivia_history.size() > 10)
+    trivia_history.pop();
+
+  for (i = descriptor_list; i; i = i->next)
+    if (i->character != ch && !i->connected &&
+        (IS_SET(i->character->misc, LogChannels::CHANNEL_TRIVIA)) &&
+        !is_ignoring(i->character, ch))
+    {
+      for (tmp_obj = world[i->character->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
+        if (obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER)
+        {
+          silence = true;
+          break;
+        }
+      if (!silence)
+        act(buf1, ch, 0, i->character, TO_VICT, 0);
     }
 
   return eSUCCESS;
@@ -619,65 +703,76 @@ int do_trivia(char_data *ch, char *argument, int cmd)
 
 int do_dream(char_data *ch, char *argument, int cmd)
 {
-    char buf1[MAX_STRING_LENGTH] = {0};
-    char buf2[MAX_STRING_LENGTH] = {0};
-    struct descriptor_data *i = nullptr;
-    int ctr = 0;
+  char buf1[MAX_STRING_LENGTH] = {0};
+  char buf2[MAX_STRING_LENGTH] = {0};
+  struct descriptor_data *i = nullptr;
+  int ctr = 0;
 
-    if((GET_POS(ch) != POSITION_SLEEPING) && (GET_LEVEL(ch) < MIN_GOD))
-    {
-      send_to_char("How are you going to dream if you're awake?\n\r", ch);
-      return eSUCCESS;
-    }
-
-    if(IS_NPC(ch) && ch->master) {
-      do_say(ch, "Why don't you just do that yourself!", CMD_DEFAULT);
-      return eSUCCESS;
-    }
-    if(!IS_NPC(ch)) 
-      if(IS_SET(ch->pcdata->punish, PUNISH_SILENCED)) {
-	  send_to_char("You must have somehow offended the gods, for "
-                       "you find yourself unable to!\n\r", ch);
-	  return eSUCCESS;
-      }
-    if(!(IS_SET(ch->misc, CHANNEL_DREAM))) {
-      send_to_char("You told yourself not to dream!!\n\r", ch);
-      return eSUCCESS;
-    }
-
-    if(GET_LEVEL(ch) < 3) {
-      send_to_char("You must be at least 3rd level to dream.\n\r",ch);
-      return eSUCCESS;
-    }
-
-    for(ctr = 0; (unsigned) ctr <= strlen(argument); ctr++) {
-      if(argument[ctr] == '$') {
-        argument[ctr] = ' ';
-      }
-      if((argument[ctr] == '?') && (argument[ctr + 1] == '?')) {
-        argument[ctr] = ' ';
-      }
-    }
-
-    for (; *argument == ' '; argument++);
-
-    if (!(*argument))
-      send_to_char("It must not have been that great!!\n\r", ch);
-    else {
-      sprintf(buf1, "$6%s dreams '$B$1%s$R$6'$R\n\r", GET_SHORT(ch), argument);
-      sprintf(buf2, "$6You dream '$B$1%s$R$6'$R\n\r", argument);
-      send_to_char(buf2, ch);
-      for(i = descriptor_list; i; i = i->next)  {
-	  if((i->character != ch)  &&
-	     (!i->connected) &&
-              !is_ignoring(i->character, ch) &&
-    	      (IS_SET(i->character->misc, CHANNEL_DREAM)) &&
-	        ((GET_POS(i->character) == POSITION_SLEEPING) ||
-	         (GET_LEVEL(i->character) >= MIN_GOD)))
-		   send_to_char(buf1, i->character);
-      }
-    }
+  if ((GET_POS(ch) != POSITION_SLEEPING) && (GET_LEVEL(ch) < MIN_GOD))
+  {
+    send_to_char("How are you going to dream if you're awake?\n\r", ch);
     return eSUCCESS;
+  }
+
+  if (IS_NPC(ch) && ch->master)
+  {
+    do_say(ch, "Why don't you just do that yourself!", CMD_DEFAULT);
+    return eSUCCESS;
+  }
+  if (!IS_NPC(ch))
+    if (IS_SET(ch->pcdata->punish, PUNISH_SILENCED))
+    {
+      send_to_char("You must have somehow offended the gods, for "
+                   "you find yourself unable to!\n\r",
+                   ch);
+      return eSUCCESS;
+    }
+  if (!(IS_SET(ch->misc, LogChannels::CHANNEL_DREAM)))
+  {
+    send_to_char("You told yourself not to dream!!\n\r", ch);
+    return eSUCCESS;
+  }
+
+  if (GET_LEVEL(ch) < 3)
+  {
+    send_to_char("You must be at least 3rd level to dream.\n\r", ch);
+    return eSUCCESS;
+  }
+
+  for (ctr = 0; (unsigned)ctr <= strlen(argument); ctr++)
+  {
+    if (argument[ctr] == '$')
+    {
+      argument[ctr] = ' ';
+    }
+    if ((argument[ctr] == '?') && (argument[ctr + 1] == '?'))
+    {
+      argument[ctr] = ' ';
+    }
+  }
+
+  for (; *argument == ' '; argument++)
+    ;
+
+  if (!(*argument))
+    send_to_char("It must not have been that great!!\n\r", ch);
+  else
+  {
+    sprintf(buf1, "$6%s dreams '$B$1%s$R$6'$R\n\r", GET_SHORT(ch), argument);
+    sprintf(buf2, "$6You dream '$B$1%s$R$6'$R\n\r", argument);
+    send_to_char(buf2, ch);
+    for (i = descriptor_list; i; i = i->next)
+    {
+      if ((i->character != ch) &&
+          (!i->connected) &&
+          !is_ignoring(i->character, ch) &&
+          (IS_SET(i->character->misc, LogChannels::CHANNEL_DREAM)) &&
+          ((GET_POS(i->character) == POSITION_SLEEPING) ||
+           (GET_LEVEL(i->character) >= MIN_GOD)))
+        send_to_char(buf1, i->character);
+    }
+  }
+  return eSUCCESS;
 }
 
 command_return_t do_tellhistory(char_data *ch, string argument, int cmd)
@@ -741,7 +836,7 @@ command_return_t do_tell(char_data *ch, string argument, int cmd)
       return eFAILURE;
     }
 
-  if (!IS_MOB(ch) && !IS_SET(ch->misc, CHANNEL_TELL))
+  if (!IS_MOB(ch) && !IS_SET(ch->misc, LogChannels::CHANNEL_TELL))
   {
     send_to_char("You have tell channeled off!!\n\r", ch);
     return eSUCCESS;
@@ -808,12 +903,12 @@ command_return_t do_tell(char_data *ch, string argument, int cmd)
   // vict guarantted to be a PC
   // Re: Last comment. Switched immortals crash this.
 
-  if (!IS_NPC(vict) && !IS_SET(vict->misc, CHANNEL_TELL) && ch->level <= MAX_MORTAL)
+  if (!IS_NPC(vict) && !IS_SET(vict->misc, LogChannels::CHANNEL_TELL) && ch->level <= MAX_MORTAL)
   {
     send_to_char("The person is ignoring all tells right now.\r\n", ch);
     return eSUCCESS;
   }
-  else if (!IS_NPC(vict) && !IS_SET(vict->misc, CHANNEL_TELL))
+  else if (!IS_NPC(vict) && !IS_SET(vict->misc, LogChannels::CHANNEL_TELL))
   {
     // Immortal sent a tell to a player with NOTELL.  Allow the tell butnotify the imm.
     send_to_char("That player has tell channeled off btw...\r\n", ch);
@@ -887,7 +982,7 @@ command_return_t do_tell(char_data *ch, string argument, int cmd)
       if (!IS_MOB(vict) && IS_SET(vict->pcdata->punish, PUNISH_LOG))
       {
         log_buf = fmt::format("Log {}: {} told them: {}", GET_NAME(vict), GET_NAME(ch), message);
-        log(log_buf, IMP, LOG_PLAYER, vict);
+        log(log_buf, IMP, LogChannels::LOG_PLAYER, vict);
       }
     }
     else if (!is_busy(vict) && GET_POS(vict) == POSITION_SLEEPING &&
@@ -922,7 +1017,7 @@ command_return_t do_tell(char_data *ch, string argument, int cmd)
       if (!IS_MOB(vict) && IS_SET(vict->pcdata->punish, PUNISH_LOG))
       {
         log_buf = fmt::format("Log {}: {} told them: {}", GET_NAME(vict), GET_NAME(ch), message);
-        log(log_buf, IMP, LOG_PLAYER, vict);
+        log(log_buf, IMP, LogChannels::LOG_PLAYER, vict);
       }
     }
     else
@@ -1081,14 +1176,16 @@ int do_grouptell(char_data *ch, char *argument, int cmd)
 
   if (!*argument)
   {
-    if (ch->pcdata->gtell_history == nullptr || ch->pcdata->gtell_history->empty()) {
+    if (ch->pcdata->gtell_history == nullptr || ch->pcdata->gtell_history->empty())
+    {
       send_to_char("No one has said anything.\r\n", ch);
       return eFAILURE;
     }
 
     history_t copy = *(ch->pcdata->gtell_history);
     send_to_char("Here are the last 10 group tells:\r\n", ch);
-    while(!copy.empty()) {
+    while (!copy.empty())
+    {
       csendf(ch, "%s\r\n", copy.front().message.c_str());
       copy.pop();
     }
@@ -1164,79 +1261,93 @@ int do_grouptell(char_data *ch, char *argument, int cmd)
 
 int do_newbie(char_data *ch, char *argument, int cmd)
 {
-    char buf1[MAX_STRING_LENGTH];
-    char buf2[MAX_STRING_LENGTH];
-    struct descriptor_data *i;
-    obj_data *tmp_obj;
-    bool silence = false;
+  char buf1[MAX_STRING_LENGTH];
+  char buf2[MAX_STRING_LENGTH];
+  struct descriptor_data *i;
+  obj_data *tmp_obj;
+  bool silence = false;
 
-    if (IS_SET(world[ch->in_room].room_flags, QUIET)) {
-      send_to_char ("SHHHHHH!! Can't you see people are trying to read?\r\n",
-                    ch);
-      return eSUCCESS;
-      }
-
-    for(tmp_obj = world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
-      if(obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER) {
-        send_to_char("The magical silence prevents you from speaking!\n\r", ch);
-        return eFAILURE;
-      }
-
-    if(IS_NPC(ch) && ch->master) {
-      return do_say(ch, "Why don't you just do that yourself!", CMD_DEFAULT);
-    }
-
-    if(!IS_NPC(ch)) {
-      if(IS_SET(ch->pcdata->punish, PUNISH_SILENCED)) {
-	  send_to_char("You must have somehow offended the gods, for "
-                       "you find yourself unable to!\n\r", ch);
-	  return eSUCCESS;
-      }
-      if(!(IS_SET(ch->misc, CHANNEL_NEWBIE))) {
-	  send_to_char("You told yourself not to use the newbie channel!!\n\r", ch);
-	  return eSUCCESS;
-      }
-    }
-
-    for (; *argument == ' '; argument++);
-
-    if (!(*argument))
-    {
-      queue<string> tmp = newbie_history;
-      send_to_char("Here are the last 10 messages:\n\r", ch);
-      while(!tmp.empty())
-      {
-	  act((tmp.front()).c_str(), ch, 0, ch, TO_VICT, 0);
-          tmp.pop();
-      }
-    }
-    else {
-      GET_MOVE(ch) -= 5;
-      if(GET_MOVE(ch) < 0) {
-        send_to_char("You're too out of breath!\n\r", ch);
-        GET_MOVE(ch) += 5;
-        return eSUCCESS;
-      }
-      sprintf(buf1, "$5%s newbies '$R$B%s$R$5'$R", GET_SHORT(ch), argument);
-      sprintf(buf2, "$5You newbie '$R$B%s$R$5'$R", argument);
-      act(buf2, ch, 0, 0, TO_CHAR, 0);
-
-      newbie_history.push(buf1);
-      if(newbie_history.size() > 10) newbie_history.pop();
-
-      for(i = descriptor_list; i; i = i->next)
-	 if(i->character != ch && !i->connected && 
-           !is_ignoring(i->character, ch) &&
-    	   (IS_SET(i->character->misc, CHANNEL_NEWBIE)) ) {
-          for(tmp_obj = world[i->character->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
-            if(obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER) {
-              silence = true;
-              break;
-            }
-          if(!silence) act(buf1, ch, 0, i->character, TO_VICT, 0);
-         }
-    }
+  if (IS_SET(world[ch->in_room].room_flags, QUIET))
+  {
+    send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n",
+                 ch);
     return eSUCCESS;
+  }
+
+  for (tmp_obj = world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
+    if (obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER)
+    {
+      send_to_char("The magical silence prevents you from speaking!\n\r", ch);
+      return eFAILURE;
+    }
+
+  if (IS_NPC(ch) && ch->master)
+  {
+    return do_say(ch, "Why don't you just do that yourself!", CMD_DEFAULT);
+  }
+
+  if (!IS_NPC(ch))
+  {
+    if (IS_SET(ch->pcdata->punish, PUNISH_SILENCED))
+    {
+      send_to_char("You must have somehow offended the gods, for "
+                   "you find yourself unable to!\n\r",
+                   ch);
+      return eSUCCESS;
+    }
+    if (!(IS_SET(ch->misc, LogChannels::CHANNEL_NEWBIE)))
+    {
+      send_to_char("You told yourself not to use the newbie channel!!\n\r", ch);
+      return eSUCCESS;
+    }
+  }
+
+  for (; *argument == ' '; argument++)
+    ;
+
+  if (!(*argument))
+  {
+    queue<string> tmp = newbie_history;
+    send_to_char("Here are the last 10 messages:\n\r", ch);
+    while (!tmp.empty())
+    {
+      act((tmp.front()).c_str(), ch, 0, ch, TO_VICT, 0);
+      tmp.pop();
+    }
+  }
+  else
+  {
+    GET_MOVE(ch) -= 5;
+    if (GET_MOVE(ch) < 0)
+    {
+      send_to_char("You're too out of breath!\n\r", ch);
+      GET_MOVE(ch) += 5;
+      return eSUCCESS;
+    }
+    sprintf(buf1, "$5%s newbies '$R$B%s$R$5'$R", GET_SHORT(ch), argument);
+    sprintf(buf2, "$5You newbie '$R$B%s$R$5'$R", argument);
+    act(buf2, ch, 0, 0, TO_CHAR, 0);
+
+    newbie_history.push(buf1);
+    if (newbie_history.size() > 10)
+      newbie_history.pop();
+
+    for (i = descriptor_list; i; i = i->next)
+      if (i->character != ch && !i->connected &&
+          !is_ignoring(i->character, ch) &&
+          (IS_SET(i->character->misc, LogChannels::CHANNEL_NEWBIE)))
+      {
+        for (tmp_obj = world[i->character->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
+          if (obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER)
+          {
+            silence = true;
+            break;
+          }
+        if (!silence)
+          act(buf1, ch, 0, i->character, TO_VICT, 0);
+      }
+  }
+  return eSUCCESS;
 }
 
 void char_data::tell_history(char_data *ch, string message)
@@ -1259,7 +1370,6 @@ void char_data::tell_history(char_data *ch, string message)
     this->pcdata->tell_history->pop();
   }
 }
-
 
 void char_data::gtell_history(char_data *ch, string message)
 {

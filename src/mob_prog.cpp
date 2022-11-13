@@ -67,8 +67,8 @@ extern CWorld world;
 extern struct index_data *mob_index;
 extern struct index_data *obj_index;
 char_data *rndm2;
-extern struct obj_data  *object_list;
-extern struct room_data ** world_array;
+extern struct obj_data *object_list;
+extern struct room_data **world_array;
 int activeProgs = 0; // loop protection
 
 char_data *activeActor = NULL;
@@ -77,18 +77,16 @@ char_data *activeTarget = NULL;
 obj_data *activeObj = NULL;
 void *activeVo = NULL;
 
-
 char *activeProg;
 char *activePos;
 char *activeProgTmpBuf;
 // Global defined here
 
-bool  MOBtrigger;
-struct mprog_throw_type *g_mprog_throw_list = 0;   // holds all pending mprog throws
+bool MOBtrigger;
+struct mprog_throw_type *g_mprog_throw_list = 0; // holds all pending mprog throws
 
 SelfPurge::SelfPurge()
 {
-
 }
 
 SelfPurge::SelfPurge(bool s)
@@ -101,7 +99,7 @@ SelfPurge::operator bool() const
 	return state;
 }
 
-void SelfPurge::setOwner(char_data* c, string m)
+void SelfPurge::setOwner(char_data *c, string m)
 {
 	owner = c;
 	function = m;
@@ -117,7 +115,6 @@ bool SelfPurge::getState(void) const
 	return state;
 }
 
-
 selfpurge_t selfpurge = {};
 
 int cIfs[256]; // for MPPAUSE
@@ -132,21 +129,21 @@ int mprog_line_num = 0;
  * Local function prototypes
  */
 
-int	mprog_seval		(char_data *ch, char* lhs, char* opr, char* rhs );
-int	mprog_veval		( int64_t lhs, char* opr, int64_t rhs );
-int	mprog_do_ifchck		( char* ifchck, char_data* mob,
-				       char_data* actor, obj_data* obj,
-				       void* vo, char_data* rndm );
-char *	mprog_process_if	( char* ifchck, char* com_list, 
-				       char_data* mob, char_data* actor,
-				       obj_data* obj, void* vo,
-				       char_data* rndm, struct mprog_throw_type *thrw = NULL );
-void	mprog_translate		( char ch, char* t, char_data* mob,
-				       char_data* actor, obj_data* obj,
-				       void* vo, char_data* rndm );
-int	mprog_process_cmnd	( char* cmnd, char_data* mob, 
-				       char_data* actor, obj_data* obj,
-				       void* vo, char_data* rndm );
+int mprog_seval(char_data *ch, char *lhs, char *opr, char *rhs);
+int mprog_veval(int64_t lhs, char *opr, int64_t rhs);
+int mprog_do_ifchck(char *ifchck, char_data *mob,
+					char_data *actor, obj_data *obj,
+					void *vo, char_data *rndm);
+char *mprog_process_if(char *ifchck, char *com_list,
+					   char_data *mob, char_data *actor,
+					   obj_data *obj, void *vo,
+					   char_data *rndm, struct mprog_throw_type *thrw = NULL);
+void mprog_translate(char ch, char *t, char_data *mob,
+					 char_data *actor, obj_data *obj,
+					 void *vo, char_data *rndm);
+int mprog_process_cmnd(char *cmnd, char_data *mob,
+					   char_data *actor, obj_data *obj,
+					   void *vo, char_data *rndm);
 
 /***************************************************************************
  * Local function code and brief comments.
@@ -156,31 +153,32 @@ int	mprog_process_cmnd	( char* cmnd, char_data* mob,
  * Thus its like one_argument(), but a trifle different. It is destructive
  * to the multi line string argument, and thus clist must not be shared.
  */
-char *mprog_next_command( char *clist )
+char *mprog_next_command(char *clist)
 {
-  bool open = FALSE;
-  char *pointer = clist;
+	bool open = FALSE;
+	char *pointer = clist;
 
-  for ( ; *pointer != '\0'; pointer++)
-  {
-	if (!open && (*pointer == '\n' || *pointer == '\r')) break;
-	if (*pointer == '{') open = TRUE;
-	if (open && *pointer == '}') open = FALSE;
-  }
-//  while ( *pointer != '\n' && *pointer != '\0' )
-//    pointer++;
-  while (*pointer == '\n' || *pointer == '\r')
-     *pointer++ = '\0';
+	for (; *pointer != '\0'; pointer++)
+	{
+		if (!open && (*pointer == '\n' || *pointer == '\r'))
+			break;
+		if (*pointer == '{')
+			open = TRUE;
+		if (open && *pointer == '}')
+			open = FALSE;
+	}
+	//  while ( *pointer != '\n' && *pointer != '\0' )
+	//    pointer++;
+	while (*pointer == '\n' || *pointer == '\r')
+		*pointer++ = '\0';
 
+	/*  if ( *pointer == '\n' )
+		*pointer++ = '\0';
+	  if ( *pointer == '\r' )
+		*pointer++ = '\0';*/
 
-/*  if ( *pointer == '\n' )
-    *pointer++ = '\0';
-  if ( *pointer == '\r' )
-    *pointer++ = '\0';*/
-
-  mprog_line_num++;
-  return ( pointer );
-
+	mprog_line_num++;
+	return (pointer);
 }
 
 /* These two functions do the basic evaluation of ifcheck operators.
@@ -202,84 +200,83 @@ int mprog_seval(char_data *ch, char *lhs, char *opr, char *rhs)
 		return (!str_infix(rhs, lhs));
 	if (!str_cmp(opr, "!/"))
 		return (str_infix(rhs, lhs));
-	
+
 	prog_error(ch, "Improper MOBprog operator");
 
-	logf(IMMORTAL, LOG_WORLD, "Improper MOBprog operator\n\r", 0);
+	logf(IMMORTAL, LogChannels::LOG_WORLD, "Improper MOBprog operator\n\r", 0);
 	return 0;
 }
 
 /*
-int mprog_veval( int lhs, char *opr, int rhs ) 
+int mprog_veval( int lhs, char *opr, int rhs )
 {
 
   if ( !str_cmp( opr, "==" ) )
-    return ( lhs == rhs );
+	return ( lhs == rhs );
   if ( !str_cmp( opr, "!=" ) )
-    return ( lhs != rhs );
+	return ( lhs != rhs );
   if ( !str_cmp( opr, ">" ) )
-    return ( lhs > rhs );
+	return ( lhs > rhs );
   if ( !str_cmp( opr, "<" ) )
-    return ( lhs < rhs );
+	return ( lhs < rhs );
   if ( !str_cmp( opr, "<=" ) )
-    return ( lhs <= rhs );
+	return ( lhs <= rhs );
   if ( !str_cmp( opr, ">=" ) )
-    return ( lhs >= rhs );
+	return ( lhs >= rhs );
   if ( !str_cmp( opr, "&" ) )
-    return ( lhs & rhs );
+	return ( lhs & rhs );
   if ( !str_cmp( opr, "|" ) )
-    return ( lhs | rhs );
+	return ( lhs | rhs );
 
-  logf( IMMORTAL, LOG_WORLD,  "Improper MOBprog operator\n\r", 0 );
+  logf( IMMORTAL, LogChannels::LOG_WORLD,  "Improper MOBprog operator\n\r", 0 );
   return 0;
 
 }
 */
-int mprog_veval( int64_t lhs, char *opr, int64_t rhs ) 
+int mprog_veval(int64_t lhs, char *opr, int64_t rhs)
 {
 
-  if ( !str_cmp( opr, "==" ) )
-    return ( lhs == rhs );
-  if ( !str_cmp( opr, "!=" ) )
-    return ( lhs != rhs );
-  if ( !str_cmp( opr, ">" ) )
-    return ( lhs > rhs );
-  if ( !str_cmp( opr, "<" ) )
-    return ( lhs < rhs );
-  if ( !str_cmp( opr, "<=" ) )
-    return ( lhs <= rhs );
-  if ( !str_cmp( opr, ">=" ) )
-    return ( lhs >= rhs );
-  if ( !str_cmp( opr, "&" ) )
-    return ( lhs & rhs );
-  if ( !str_cmp( opr, "|" ) )
-    return ( lhs | rhs );
+	if (!str_cmp(opr, "=="))
+		return (lhs == rhs);
+	if (!str_cmp(opr, "!="))
+		return (lhs != rhs);
+	if (!str_cmp(opr, ">"))
+		return (lhs > rhs);
+	if (!str_cmp(opr, "<"))
+		return (lhs < rhs);
+	if (!str_cmp(opr, "<="))
+		return (lhs <= rhs);
+	if (!str_cmp(opr, ">="))
+		return (lhs >= rhs);
+	if (!str_cmp(opr, "&"))
+		return (lhs & rhs);
+	if (!str_cmp(opr, "|"))
+		return (lhs | rhs);
 
-  logf( IMMORTAL, LOG_WORLD,  "Improper MOBprog operator\n\r", 0 );
-  return 0;
-
+	logf(IMMORTAL, LogChannels::LOG_WORLD, "Improper MOBprog operator\n\r", 0);
+	return 0;
 }
 /*
-int mprog_veval( uint64_t lhs, char *opr, uint64_t rhs ) 
+int mprog_veval( uint64_t lhs, char *opr, uint64_t rhs )
 {
   if ( !str_cmp( opr, "==" ) )
-    return ( lhs == rhs );
+	return ( lhs == rhs );
   if ( !str_cmp( opr, "!=" ) )
-    return ( lhs != rhs );
+	return ( lhs != rhs );
   if ( !str_cmp( opr, ">" ) )
-    return ( lhs > rhs );
+	return ( lhs > rhs );
   if ( !str_cmp( opr, "<" ) )
-    return ( lhs < rhs );
+	return ( lhs < rhs );
   if ( !str_cmp( opr, "<=" ) )
-    return ( lhs <= rhs );
+	return ( lhs <= rhs );
   if ( !str_cmp( opr, ">=" ) )
-    return ( lhs >= rhs );
+	return ( lhs >= rhs );
   if ( !str_cmp( opr, "&" ) )
-    return ( lhs & rhs );
+	return ( lhs & rhs );
   if ( !str_cmp( opr, "|" ) )
-    return ( lhs | rhs );
+	return ( lhs | rhs );
 
-  logf( IMMORTAL, LOG_WORLD,  "Improper MOBprog operator\n\r", 0 );
+  logf( IMMORTAL, LogChannels::LOG_WORLD,  "Improper MOBprog operator\n\r", 0 );
   return 0;
 
 }
@@ -287,18 +284,20 @@ int mprog_veval( uint64_t lhs, char *opr, uint64_t rhs )
 
 bool istank(char_data *ch)
 {
-  char_data *t;
-  if (!ch->in_room) return FALSE;
-  for (t = world[ch->in_room].people; t; t = t->next_in_room)
-   if (t->fighting == ch && t!=ch)
-	return TRUE;
-  return FALSE;
+	char_data *t;
+	if (!ch->in_room)
+		return FALSE;
+	for (t = world[ch->in_room].people; t; t = t->next_in_room)
+		if (t->fighting == ch && t != ch)
+			return TRUE;
+	return FALSE;
 }
 
 void translate_value(char *leftptr, char *rightptr, int16_t **vali,
-		uint32_t **valui, char ***valstr, int64_t **vali64, int8_t **valb,
-		char_data *mob, char_data *actor, obj_data *obj, void *vo,
-		char_data *rndm) {
+					 uint32_t **valui, char ***valstr, int64_t **vali64, int8_t **valb,
+					 char_data *mob, char_data *actor, obj_data *obj, void *vo,
+					 char_data *rndm)
+{
 	/*
 	 $n.age
 	 '$n' = left
@@ -314,9 +313,10 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
 	obj_data *otarget = NULL;
 	int rtarget = -1, ztarget = -1;
 	bool valset = FALSE; // done like that to determine if value is set, since it can be 0
-	struct tempvariable* mobTempVar = nullptr;
-	if (mob) {
-	 mobTempVar = mob->tempVariable;
+	struct tempvariable *mobTempVar = nullptr;
+	if (mob)
+	{
+		mobTempVar = mob->tempVariable;
 	}
 
 	// Used to store return pointer from getTemp(). Do not use more than
@@ -326,13 +326,14 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
 	activeTarget = NULL;
 	char *tmp, half[MAX_INPUT_LENGTH];
 	half[0] = '\0';
-	if ((tmp = strchr(leftptr, ',')) != NULL) {
+	if ((tmp = strchr(leftptr, ',')) != NULL)
+	{
 		*tmp = '\0';
 		tmp++;
 		one_argument(tmp, half); // strips whatever spaces
 	}
 
-// Less nitpicky about the mobprogs with this stuff below in.
+	// Less nitpicky about the mobprogs with this stuff below in.
 	char larr[MAX_INPUT_LENGTH];
 	one_argument(leftptr, larr);
 	char *left = &larr[0];
@@ -342,82 +343,109 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
 	char *right = &rarr[0];
 	bool silent = FALSE;
 
-	if (!str_prefix("world_", left)) {
+	if (!str_prefix("world_", left))
+	{
 		left += 6;
 
 		auto &character_list = DC::instance().character_list;
 		find_if(character_list.begin(), character_list.end(),
-				[&target, &left](char_data * const &tmp) {
-					if (isname(left, GET_NAME(tmp))) {
+				[&target, &left](char_data *const &tmp)
+				{
+					if (isname(left, GET_NAME(tmp)))
+					{
 						target = tmp;
 						return true;
-					} else {
+					}
+					else
+					{
 						return false;
 					}
 				});
-	} else if (!str_prefix("zone_", left)) {
+	}
+	else if (!str_prefix("zone_", left))
+	{
 		left += 5;
 
 		auto &character_list = DC::instance().character_list;
 		find_if(character_list.begin(), character_list.end(),
-				[&target, &left, &mob](char_data * const &tmp) {
-					if (tmp->in_room != NOWHERE && world[mob->in_room].zone == world[tmp->in_room].zone && isname(left, GET_NAME(tmp))) {
+				[&target, &left, &mob](char_data *const &tmp)
+				{
+					if (tmp->in_room != NOWHERE && world[mob->in_room].zone == world[tmp->in_room].zone && isname(left, GET_NAME(tmp)))
+					{
 						target = tmp;
 						return true;
-					} else {
+					}
+					else
+					{
 						return false;
 					}
 				});
-	} else if (!str_prefix("mroom_", left)) {
+	}
+	else if (!str_prefix("mroom_", left))
+	{
 		left += 6;
 		char_data *tmp;
-		for (tmp = world[mob->in_room].people; tmp; tmp = tmp->next_in_room) {
-			if (isname(left, GET_NAME(tmp))) {
+		for (tmp = world[mob->in_room].people; tmp; tmp = tmp->next_in_room)
+		{
+			if (isname(left, GET_NAME(tmp)))
+			{
 				target = tmp;
 				break;
 			}
 		}
-	} else if (!str_prefix("room_", left)) {
+	}
+	else if (!str_prefix("room_", left))
+	{
 		left += 5;
 		if (is_number(left))
 			rtarget = real_room(atoi(left));
 		else
 			rtarget = mob->in_room;
-	} else if (!str_prefix("oworld_", left)) {
+	}
+	else if (!str_prefix("oworld_", left))
+	{
 		left += 7;
 		otarget = get_obj(left);
-	} else if (!str_prefix("ozone_", left)) {
+	}
+	else if (!str_prefix("ozone_", left))
+	{
 		left += 6;
 		obj_data *otmp;
 		int z = world[mob->in_room].zone;
-		for (otmp = object_list; otmp; otmp = otmp->next) {
+		for (otmp = object_list; otmp; otmp = otmp->next)
+		{
 			obj_data *cmp = otmp->in_obj ? otmp->in_obj : otmp;
-			if ((cmp->in_room != NOWHERE && world[cmp->in_room].zone == z)
-					|| (cmp->carried_by
-							&& world[cmp->carried_by->in_room].zone == z)
-					|| (cmp->equipped_by
-							&& world[cmp->equipped_by->in_room].zone == z))
-				if (isname(left, otmp->name)) {
+			if ((cmp->in_room != NOWHERE && world[cmp->in_room].zone == z) || (cmp->carried_by && world[cmp->carried_by->in_room].zone == z) || (cmp->equipped_by && world[cmp->equipped_by->in_room].zone == z))
+				if (isname(left, otmp->name))
+				{
 					otarget = otmp;
 					break;
 				}
 		}
 		otarget = get_obj(left);
-	} else if (!str_prefix("oroom_", left)) {
+	}
+	else if (!str_prefix("oroom_", left))
+	{
 		left += 6;
 		otarget = get_obj_in_list(left, world[mob->in_room].contents);
-	} else if (!str_prefix("zone_", left)) {
+	}
+	else if (!str_prefix("zone_", left))
+	{
 		ztarget = world[mob->in_room].zone;
 		left += 5;
-	} else if (*left == '$') {
-	  uint8_t number_of_dollar_signs=1;
-	  while (*(left + number_of_dollar_signs) == '$') {
-	    number_of_dollar_signs++;
-	  }
+	}
+	else if (*left == '$')
+	{
+		uint8_t number_of_dollar_signs = 1;
+		while (*(left + number_of_dollar_signs) == '$')
+		{
+			number_of_dollar_signs++;
+		}
 
-		switch (*(left + number_of_dollar_signs)) {
+		switch (*(left + number_of_dollar_signs))
+		{
 		case '$':
-		  break;
+			break;
 		case 'n':
 			target = actor;
 			break;
@@ -430,13 +458,13 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
 			break;
 
 		case 't':
-			target = (char_data*) vo;
+			target = (char_data *)vo;
 			break;
 		case 'o':
 			otarget = obj;
 			break;
 		case 'p':
-			otarget = (obj_data*) vo;
+			otarget = (obj_data *)vo;
 			break;
 		case 'f':
 			if (actor)
@@ -450,15 +478,16 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
 			char buf[MAX_STRING_LENGTH];
 			buf[0] = '\0';
 			int i;
-			for (i = 2; *(left + i); i++) {
+			for (i = 2; *(left + i); i++)
+			{
 				if (*(left + i) == '[')
 					continue;
-				if (*(left + i) == ']') {
+				if (*(left + i) == ']')
+				{
 					buf[i - 3] = '\0';
 					break;
 				}
 				buf[i - 3] = *(left + i);
-
 			}
 			for (; mobTempVar; mobTempVar = mobTempVar->next)
 				if (!str_cmp(buf, mobTempVar->name))
@@ -466,10 +495,12 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
 			if (mobTempVar)
 				strcpy(buf, mobTempVar->data);
 
-			if (buf[0] != '\0') {
+			if (buf[0] != '\0')
+			{
 				if (!is_number(buf))
 					target = get_char_room(buf, mob->in_room);
-				else {
+				else
+				{
 					valset = TRUE;
 				}
 			}
@@ -477,30 +508,40 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
 		default:
 			break;
 		}
-	} else {
+	}
+	else
+	{
 		if (!is_number(left))
 			target = get_char_room(left, mob->in_room);
-		else {
+		else
+		{
 			valset = TRUE;
 		}
 	}
 
-  if (!target && !otarget && ztarget == -1 && rtarget == -1 && !valset && str_cmp(right, "numpcs") && str_cmp(right, "hitpoints") && str_cmp(right, "move") && str_cmp(right, "mana") && str_cmp(right, "isdaytime") && str_cmp(right, "israining"))
-  {
-    if (!silent)
-    {
-      if (mob == nullptr) {
-        logf( IMMORTAL, LOG_WORLD, "translate_value: %s.%s mob == nullptr", left, right);
-      } else if (mob->mobdata == nullptr) {
-        logf( IMMORTAL, LOG_WORLD, "translate_value: %s.%s mob->mobdata == nullptr", left, right);
-      } else if (mob->mobdata->nr < 0) {
-        logf( IMMORTAL, LOG_WORLD, "translate_value: %s.%s mob->mobdata->nr = %d < 0 ", left, right, mob->mobdata->nr);
-      } else {
-        logf( IMMORTAL, LOG_WORLD, "translate_value: Mob: %d invalid target in mobprog", mob_index[mob->mobdata->nr].virt);
-      }
-    }
-    return;
-  }
+	if (!target && !otarget && ztarget == -1 && rtarget == -1 && !valset && str_cmp(right, "numpcs") && str_cmp(right, "hitpoints") && str_cmp(right, "move") && str_cmp(right, "mana") && str_cmp(right, "isdaytime") && str_cmp(right, "israining"))
+	{
+		if (!silent)
+		{
+			if (mob == nullptr)
+			{
+				logf(IMMORTAL, LogChannels::LOG_WORLD, "translate_value: %s.%s mob == nullptr", left, right);
+			}
+			else if (mob->mobdata == nullptr)
+			{
+				logf(IMMORTAL, LogChannels::LOG_WORLD, "translate_value: %s.%s mob->mobdata == nullptr", left, right);
+			}
+			else if (mob->mobdata->nr < 0)
+			{
+				logf(IMMORTAL, LogChannels::LOG_WORLD, "translate_value: %s.%s mob->mobdata->nr = %d < 0 ", left, right, mob->mobdata->nr);
+			}
+			else
+			{
+				logf(IMMORTAL, LogChannels::LOG_WORLD, "translate_value: Mob: %d invalid target in mobprog", mob_index[mob->mobdata->nr].virt);
+			}
+		}
+		return;
+	}
 	activeTarget = target;
 	// target acquired. fucking boring code.
 	// more boring code. FUCK.
@@ -516,190 +557,268 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
 	 not meant to be modify-able through mob-progs, such as character class.
 	 */
 
-	switch (LOWER(*right)) {
+	switch (LOWER(*right))
+	{
 	case 'a':
-		if (!str_cmp(right, "armor")) {
+		if (!str_cmp(right, "armor"))
+		{
 			if (!target)
 				tError = TRUE;
-			else {
+			else
+			{
 				intval = &target->armor;
 				break;
 			}
-		} else if (!str_cmp(right, "actflags1")) {
+		}
+		else if (!str_cmp(right, "actflags1"))
+		{
 			if (!target || !IS_NPC(target))
 				tError = TRUE;
-			else {
+			else
+			{
 				uintval = &target->mobdata->actflags[0];
 				break;
 			}
-		} else if (!str_cmp(right, "actflags2")) {
+		}
+		else if (!str_cmp(right, "actflags2"))
+		{
 			if (!target || !IS_NPC(target))
 				tError = TRUE;
-			else {
+			else
+			{
 				uintval = &target->mobdata->actflags[1];
 				break;
 			}
-		} else if (!str_cmp(right, "affected1")) {
+		}
+		else if (!str_cmp(right, "affected1"))
+		{
 			if (!target)
 				tError = TRUE;
-			else {
+			else
+			{
 				uintval = &target->affected_by[0];
 				break;
 			}
-		} else if (!str_cmp(right, "affected2")) {
+		}
+		else if (!str_cmp(right, "affected2"))
+		{
 			if (!target)
 				tError = TRUE;
-			else {
+			else
+			{
 				uintval = &target->affected_by[1];
 				break;
 			}
-		} else if (!str_cmp(right, "alignment")) {
+		}
+		else if (!str_cmp(right, "alignment"))
+		{
 			if (!target)
 				tError = TRUE;
-			else {
+			else
+			{
 				intval = &target->alignment;
 				break;
 			}
-		} else if (!str_cmp(right, "acidsave")) {
+		}
+		else if (!str_cmp(right, "acidsave"))
+		{
 			if (!target)
 				tError = TRUE;
-			else {
+			else
+			{
 				intval = &target->saves[SAVE_TYPE_ACID];
 				break;
 			}
-		} else if (!str_cmp(right, "age")) {
+		}
+		else if (!str_cmp(right, "age"))
+		{
 			if (!target)
 				tError = TRUE;
-			else {
+			else
+			{
 				int16_t ageint = age(target).year;
 				intval = &ageint;
 			}
 		}
 		break;
 	case 'b':
-		if (!str_cmp(right, "bank")) {
+		if (!str_cmp(right, "bank"))
+		{
 			if (!target || !target->pcdata)
 				tError = TRUE;
-			else {
+			else
+			{
 				uintval = &target->pcdata->bank;
 			}
 		}
 		break;
 	case 'c':
-		if (!str_cmp(right, "carriedby")) {
+		if (!str_cmp(right, "carriedby"))
+		{
 			if (!otarget)
 				tError = TRUE;
-			else if (otarget->carried_by) {
+			else if (otarget->carried_by)
+			{
 				stringval = &otarget->carried_by->name;
-			} else if (otarget->equipped_by) {
+			}
+			else if (otarget->equipped_by)
+			{
 				stringval = &otarget->equipped_by->name;
-			} else if (otarget->in_obj && otarget->in_obj->carried_by) {
+			}
+			else if (otarget->in_obj && otarget->in_obj->carried_by)
+			{
 				stringval = &otarget->in_obj->carried_by->name;
-			} else if (otarget->in_obj && otarget->in_obj->equipped_by) {
+			}
+			else if (otarget->in_obj && otarget->in_obj->equipped_by)
+			{
 				stringval = &otarget->in_obj->equipped_by->name;
-			} else
+			}
+			else
 				stringval = NULL;
-		} else if (!str_cmp(right, "carryingitems")) {
+		}
+		else if (!str_cmp(right, "carryingitems"))
+		{
 			if (!target)
 				tError = TRUE;
-			else {
+			else
+			{
 				int16_t car = target->carry_items;
 				intval = &car;
 			}
-		} else if (!str_cmp(right, "carryingweight")) {
+		}
+		else if (!str_cmp(right, "carryingweight"))
+		{
 			if (!target)
 				tError = TRUE;
-			else {
+			else
+			{
 				int16_t car = target->carry_weight;
 				intval = &car;
 			}
-		} else if (!str_cmp(right, "class")) {
+		}
+		else if (!str_cmp(right, "class"))
+		{
 			if (!target)
 				tError = TRUE;
-			else {
+			else
+			{
 				sbval = &target->c_class;
 			}
-		} else if (!str_cmp(right, "coldsave")) {
+		}
+		else if (!str_cmp(right, "coldsave"))
+		{
 			if (!target)
 				tError = TRUE;
-			else {
+			else
+			{
 				intval = &target->saves[SAVE_TYPE_COLD];
 			}
-		} else if (!str_cmp(right, "constitution")) {
+		}
+		else if (!str_cmp(right, "constitution"))
+		{
 			if (!target)
 				tError = TRUE;
-			else {
+			else
+			{
 				sbval = &target->con;
 			}
-		} else if (!str_cmp(right, "cost")) {
+		}
+		else if (!str_cmp(right, "cost"))
+		{
 			if (!otarget)
 				tError = TRUE;
-			else {
-				uintval = (uint32_t*) &otarget->obj_flags.cost;
+			else
+			{
+				uintval = (uint32_t *)&otarget->obj_flags.cost;
 			}
 		}
 		break;
 	case 'd':
-		if (!str_cmp(right, "damroll")) {
+		if (!str_cmp(right, "damroll"))
+		{
 			if (!target)
 				tError = TRUE;
-			else {
+			else
+			{
 				intval = &target->damroll;
 			}
-		} else if (!str_cmp(right, "description")) {
+		}
+		else if (!str_cmp(right, "description"))
+		{
 			if (!target && !otarget && !rtarget)
 				tError = TRUE;
-			else if (otarget) {
+			else if (otarget)
+			{
 				stringval = &otarget->description;
-			} else if (rtarget >= 0) {
+			}
+			else if (rtarget >= 0)
+			{
 				if (world_array[rtarget])
 					stringval = &world[rtarget].description;
 				else
 					tError = TRUE;
-			} else {
+			}
+			else
+			{
 				stringval = &target->description;
 			}
-		} else if (!str_cmp(right, "dexterity")) {
+		}
+		else if (!str_cmp(right, "dexterity"))
+		{
 			if (!target)
 				tError = TRUE;
-			else {
+			else
+			{
 				sbval = &target->dex;
 			}
-		} else if (!str_cmp(right, "drunk")) {
+		}
+		else if (!str_cmp(right, "drunk"))
+		{
 			if (!target)
 				tError = TRUE;
-			else {
+			else
+			{
 				sbval = &target->conditions[DRUNK];
 			}
 		}
 		break;
 	case 'e':
-		if (!str_cmp(right, "energysaves")) {
+		if (!str_cmp(right, "energysaves"))
+		{
 			if (!target)
 				tError = TRUE;
 			else
 				intval = &target->saves[SAVE_TYPE_ACID];
-		} else if (!str_cmp(right, "experience")) {
+		}
+		else if (!str_cmp(right, "experience"))
+		{
 			if (!target)
 				tError = TRUE;
-			else {
+			else
+			{
 				llval = &target->exp;
 			}
-		} else if (!str_cmp(right, "extra")) {
+		}
+		else if (!str_cmp(right, "extra"))
+		{
 			if (!otarget)
 				tError = TRUE;
-			else {
+			else
+			{
 				uintval = &otarget->obj_flags.extra_flags;
 			}
 		}
 		break;
 	case 'f':
-		if (!str_cmp(right, "firesaves")) {
+		if (!str_cmp(right, "firesaves"))
+		{
 			if (!target)
 				tError = TRUE;
 			else
 				intval = &target->saves[SAVE_TYPE_FIRE];
-		} else if (!str_cmp(right, "flags")) {
+		}
+		else if (!str_cmp(right, "flags"))
+		{
 			if (!rtarget)
 				tError = TRUE;
 			else
@@ -707,12 +826,15 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
 		}
 		break;
 	case 'g':
-		if (!str_cmp(right, "gold")) {
+		if (!str_cmp(right, "gold"))
+		{
 			if (!target)
 				tError = TRUE;
 			else
 				llval = &target->gold;
-		} else if (!str_cmp(right, "glowfactor")) {
+		}
+		else if (!str_cmp(right, "glowfactor"))
+		{
 			if (!target)
 				tError = TRUE;
 			else
@@ -720,248 +842,330 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
 		}
 		break;
 	case 'h':
-		if (!str_cmp(right, "hasskill")) {
+		if (!str_cmp(right, "hasskill"))
+		{
 			if (!target)
 				tError = TRUE;
-			else {
+			else
+			{
 				int skl = 0;
-				if (*half == '\0' || (skl = atoi(half)) < 0) {
-					logf( IMMORTAL, LOG_WORLD,
-							"translate_value: Mob: %d invalid skillnumber in hasskill",
-							mob_index[mob->mobdata->nr].virt);
+				if (*half == '\0' || (skl = atoi(half)) < 0)
+				{
+					logf(IMMORTAL, LogChannels::LOG_WORLD,
+						 "translate_value: Mob: %d invalid skillnumber in hasskill",
+						 mob_index[mob->mobdata->nr].virt);
 					tError = TRUE;
 				}
 				int16_t sklint = has_skill(target, skl);
 				intval = &sklint;
 			}
-		} else if (!str_cmp(right, "height")) {
+		}
+		else if (!str_cmp(right, "height"))
+		{
 			if (!target)
 				tError = TRUE;
 			else
-				sbval = (int8_t*) (&target->height);
-		} else if (!str_cmp(right, "hitpoints")) {
-		  if (!target)
+				sbval = (int8_t *)(&target->height);
+		}
+		else if (!str_cmp(right, "hitpoints"))
+		{
+			if (!target)
 				tError = TRUE;
 			else
-				uintval = (uint32_t*) &target->hit;
-		} else if (!str_cmp(right, "hitroll")) {
+				uintval = (uint32_t *)&target->hit;
+		}
+		else if (!str_cmp(right, "hitroll"))
+		{
 			if (!target)
 				tError = TRUE;
 			else
 				intval = &target->hitroll;
-		} else if (!str_cmp(right, "homeroom")) {
+		}
+		else if (!str_cmp(right, "homeroom"))
+		{
 			if (!target)
 				tError = TRUE;
 			else
 				intval = &target->hometown;
-		} else if (!str_cmp(right, "hunger")) {
+		}
+		else if (!str_cmp(right, "hunger"))
+		{
 			if (!target)
 				tError = TRUE;
-			else {
+			else
+			{
 				sbval = &target->conditions[FULL];
 			}
 		}
 		break;
 	case 'i':
-		if (!str_cmp(right, "immune")) {
+		if (!str_cmp(right, "immune"))
+		{
 			if (!target)
 				tError = TRUE;
 			else
-				uintval = (uint32_t*) &target->immune;
-		} else if (!str_cmp(right, "inroom")) {
+				uintval = (uint32_t *)&target->immune;
+		}
+		else if (!str_cmp(right, "inroom"))
+		{
 			if (!target && !otarget)
 				tError = TRUE;
-			else if (target) {
+			else if (target)
+			{
 				static uint32_t tmp;
-				tmp = (uint32_t) target->in_room;
-				uintval = &tmp;
-			} else {
-				static uint32_t tmp;
-				tmp = (uint32_t) otarget->in_room;
+				tmp = (uint32_t)target->in_room;
 				uintval = &tmp;
 			}
-		} else if (!str_cmp(right, "intelligence")) {
+			else
+			{
+				static uint32_t tmp;
+				tmp = (uint32_t)otarget->in_room;
+				uintval = &tmp;
+			}
+		}
+		else if (!str_cmp(right, "intelligence"))
+		{
 			if (!target)
 				tError = TRUE;
 			else
-				sbval = (int8_t*) &target->intel;
+				sbval = (int8_t *)&target->intel;
 		}
 		break;
 	case 'l':
-		if (!str_cmp(right, "level")) {
+		if (!str_cmp(right, "level"))
+		{
 			if (!target && !otarget)
 				tError = TRUE;
-			else if (otarget) {
+			else if (otarget)
+			{
 				intval = &otarget->obj_flags.eq_level;
-			} else {
+			}
+			else
+			{
 				if (IS_NPC(target))
 					sbval = &target->level;
 				else
 					sbval = &target->level;
 			}
-		} else if (!str_cmp(right, "long")) {
+		}
+		else if (!str_cmp(right, "long"))
+		{
 			if (!target)
 				tError = TRUE;
-			else {
+			else
+			{
 				stringval = &target->long_desc;
 			}
 		}
 		break;
 	case 'k':
-		if (!str_cmp(right, "ki")) {
+		if (!str_cmp(right, "ki"))
+		{
 			if (!target)
 				tError = TRUE;
-			else {
-				uintval = (uint32_t*) &target->ki;
+			else
+			{
+				uintval = (uint32_t *)&target->ki;
 			}
 		}
 		break;
 	case 'm':
-		if (!str_cmp(right, "magicsaves")) {
+		if (!str_cmp(right, "magicsaves"))
+		{
 			if (!target)
 				tError = TRUE;
 			else
 				intval = &target->saves[SAVE_TYPE_MAGIC];
-		} else if (!str_cmp(right, "mana")) {
+		}
+		else if (!str_cmp(right, "mana"))
+		{
 			if (!target)
 				tError = TRUE;
 			else
-				uintval = (uint32_t*) &target->mana;
-		} else if (!str_cmp(right, "maxhitpoints")) {
+				uintval = (uint32_t *)&target->mana;
+		}
+		else if (!str_cmp(right, "maxhitpoints"))
+		{
 			if (!target)
 				tError = TRUE;
 			else
-				uintval = (uint32_t*) &target->max_hit;
-		} else if (!str_cmp(right, "maxmana")) {
+				uintval = (uint32_t *)&target->max_hit;
+		}
+		else if (!str_cmp(right, "maxmana"))
+		{
 			if (!target)
 				tError = TRUE;
 			else
-				uintval = (uint32_t*) &target->max_mana;
-		} else if (!str_cmp(right, "maxmove")) {
+				uintval = (uint32_t *)&target->max_mana;
+		}
+		else if (!str_cmp(right, "maxmove"))
+		{
 			if (!target)
 				tError = TRUE;
 			else
-				uintval = (uint32_t*) &target->max_move;
-		} else if (!str_cmp(right, "maxki")) {
+				uintval = (uint32_t *)&target->max_move;
+		}
+		else if (!str_cmp(right, "maxki"))
+		{
 			if (!target)
 				tError = TRUE;
 			else
-				uintval = (uint32_t*) &target->max_ki;
-		} else if (!str_cmp(right, "meleemit")) {
+				uintval = (uint32_t *)&target->max_ki;
+		}
+		else if (!str_cmp(right, "meleemit"))
+		{
 			if (!target)
 				tError = TRUE;
 			else
 				intval = &target->melee_mitigation;
-		} else if (!str_cmp(right, "misc")) {
+		}
+		else if (!str_cmp(right, "misc"))
+		{
 			if (!target)
 				tError = TRUE;
 			else
 				uintval = &target->misc;
-		} else if (!str_cmp(right, "more")) {
+		}
+		else if (!str_cmp(right, "more"))
+		{
 			if (!otarget)
 				tError = TRUE;
-			else {
+			else
+			{
 				uintval = &otarget->obj_flags.more_flags;
 			}
-		} else if (!str_cmp(right, "move")) {
+		}
+		else if (!str_cmp(right, "move"))
+		{
 			if (!target)
 				tError = TRUE;
 			else
-				uintval = (uint32_t*) &target->move;
+				uintval = (uint32_t *)&target->move;
 		}
 		break;
 	case 'n':
-		if (!str_cmp(right, "name")) {
+		if (!str_cmp(right, "name"))
+		{
 			if (!target && !rtarget)
 				tError = TRUE;
-			else if (rtarget >= 0) {
+			else if (rtarget >= 0)
+			{
 				if (world_array[rtarget])
 					stringval = &world[rtarget].name;
 				else
 					tError = TRUE;
-			} else
+			}
+			else
 				stringval = &target->name;
 		}
 		break;
 	case 'o':
 		break;
 	case 'p':
-		if (!str_cmp(right, "platinum")) {
+		if (!str_cmp(right, "platinum"))
+		{
 			if (!target)
 				tError = TRUE;
 			else
 				uintval = &target->plat;
-		} else if (!str_cmp(right, "poisonsaves")) {
+		}
+		else if (!str_cmp(right, "poisonsaves"))
+		{
 			if (!target)
 				tError = TRUE;
 			else
 				intval = &target->saves[SAVE_TYPE_POISON];
-		} else if (!str_cmp(right, "position")) {
+		}
+		else if (!str_cmp(right, "position"))
+		{
 			if (!target)
 				tError = TRUE;
 			else
-				intval = (int16_t*) &target->position;
-		} else if (!str_cmp(right, "practices")) {
+				intval = (int16_t *)&target->position;
+		}
+		else if (!str_cmp(right, "practices"))
+		{
 			if (!target || !target->pcdata)
 				tError = TRUE;
 			else
-				intval = (int16_t*) &target->pcdata->practices;
+				intval = (int16_t *)&target->pcdata->practices;
 		}
 		break;
 	case 'q':
 		break;
 	case 'r':
-		if (!str_cmp(right, "race")) {
+		if (!str_cmp(right, "race"))
+		{
 			if (!target)
 				tError = TRUE;
 			else
 				sbval = &target->race;
-		} else if (!str_cmp(right, "rawstr")) {
+		}
+		else if (!str_cmp(right, "rawstr"))
+		{
 			if (!target)
 				tError = TRUE;
 			else
 				sbval = &target->raw_str;
-		} else if (!str_cmp(right, "rawcon")) {
+		}
+		else if (!str_cmp(right, "rawcon"))
+		{
 			if (!target)
 				tError = TRUE;
 			else
 				sbval = &target->raw_con;
-		} else if (!str_cmp(right, "rawwis")) {
+		}
+		else if (!str_cmp(right, "rawwis"))
+		{
 			if (!target)
 				tError = TRUE;
 			else
 				sbval = &target->raw_wis;
-		} else if (!str_cmp(right, "rawdex")) {
+		}
+		else if (!str_cmp(right, "rawdex"))
+		{
 			if (!target)
 				tError = TRUE;
 			else
 				sbval = &target->raw_dex;
-		} else if (!str_cmp(right, "rawint")) {
+		}
+		else if (!str_cmp(right, "rawint"))
+		{
 			if (!target)
 				tError = TRUE;
 			else
 				sbval = &target->raw_intel;
-		} else if (!str_cmp(right, "rawhit")) {
+		}
+		else if (!str_cmp(right, "rawhit"))
+		{
 			if (!target)
 				tError = TRUE;
 			else
-				uintval = (uint32_t*) &target->raw_hit;
-		} else if (!str_cmp(right, "rawmana")) {
+				uintval = (uint32_t *)&target->raw_hit;
+		}
+		else if (!str_cmp(right, "rawmana"))
+		{
 			if (!target)
 				tError = TRUE;
 			else
-				uintval = (uint32_t*) &target->raw_mana;
-		} else if (!str_cmp(right, "rawmove")) {
+				uintval = (uint32_t *)&target->raw_mana;
+		}
+		else if (!str_cmp(right, "rawmove"))
+		{
 			if (!target)
 				tError = TRUE;
 			else
-				uintval = (uint32_t*) &target->raw_move;
-		} else if (!str_cmp(right, "rawki")) {
+				uintval = (uint32_t *)&target->raw_move;
+		}
+		else if (!str_cmp(right, "rawki"))
+		{
 			if (!target)
 				tError = TRUE;
 			else
-				uintval = (uint32_t*) &target->raw_ki;
-		} else if (!str_cmp(right, "resist")) {
+				uintval = (uint32_t *)&target->raw_ki;
+		}
+		else if (!str_cmp(right, "resist"))
+		{
 			if (!target)
 				tError = TRUE;
 			else
@@ -969,45 +1173,63 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
 		}
 		break;
 	case 's':
-		if (!str_cmp(right, "sex")) {
+		if (!str_cmp(right, "sex"))
+		{
 			if (!target)
 				tError = TRUE;
 			else
 				sbval = &target->sex;
-		} else if (!str_cmp(right, "size")) {
+		}
+		else if (!str_cmp(right, "size"))
+		{
 			if (!otarget)
 				tError = TRUE;
-			else {
-				intval = (int16_t*) &otarget->obj_flags.size;
+			else
+			{
+				intval = (int16_t *)&otarget->obj_flags.size;
 			}
-		} else if (!str_cmp(right, "short")) {
+		}
+		else if (!str_cmp(right, "short"))
+		{
 			if (!target && !otarget)
 				tError = TRUE;
-			else if (otarget) {
+			else if (otarget)
+			{
 				stringval = &otarget->short_description;
-			} else
+			}
+			else
 				stringval = &target->short_desc;
-		} else if (!str_cmp(right, "songmit")) {
+		}
+		else if (!str_cmp(right, "songmit"))
+		{
 			if (!target)
 				tError = TRUE;
 			else
 				intval = &target->song_mitigation;
-		} else if (!str_cmp(right, "spelleffect")) {
+		}
+		else if (!str_cmp(right, "spelleffect"))
+		{
 			if (!target)
 				tError = TRUE;
 			else
-				uintval = (uint32_t*) &target->spelldamage;
-		} else if (!str_cmp(right, "spellmit")) {
+				uintval = (uint32_t *)&target->spelldamage;
+		}
+		else if (!str_cmp(right, "spellmit"))
+		{
 			if (!target)
 				tError = TRUE;
 			else
 				intval = &target->spell_mitigation;
-		} else if (!str_cmp(right, "strength")) {
+		}
+		else if (!str_cmp(right, "strength"))
+		{
 			if (!target)
 				tError = TRUE;
 			else
 				sbval = &target->str;
-		} else if (!str_cmp(right, "suscept")) {
+		}
+		else if (!str_cmp(right, "suscept"))
+		{
 			if (!target)
 				tError = TRUE;
 			else
@@ -1015,69 +1237,94 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
 		}
 		break;
 	case 't':
-		if (!str_cmp(right, "temp")) {
-			if (!half[0] || !target) {
+		if (!str_cmp(right, "temp"))
+		{
+			if (!half[0] || !target)
+			{
 				tError = TRUE;
-			} else {
+			}
+			else
+			{
 				targetTemp = getTemp(target, half);
 			}
 
 			stringval = &targetTemp;
-		} else if (!str_cmp(right, "title")) {
+		}
+		else if (!str_cmp(right, "title"))
+		{
 			if (!target)
 				tError = TRUE;
 			else
 				stringval = &target->title;
-		} else if (!str_cmp(right, "type")) {
+		}
+		else if (!str_cmp(right, "type"))
+		{
 			if (!otarget)
 				tError = TRUE;
 			else
-				sbval = (int8_t*) &otarget->obj_flags.type_flag;
-		} else if (!str_cmp(right, "thirst")) {
+				sbval = (int8_t *)&otarget->obj_flags.type_flag;
+		}
+		else if (!str_cmp(right, "thirst"))
+		{
 			if (!target)
 				tError = TRUE;
-			else {
+			else
+			{
 				sbval = &target->conditions[THIRST];
 			}
 		}
 		break;
 	case 'v':
-		if (!str_cmp(right, "value0")) {
+		if (!str_cmp(right, "value0"))
+		{
 			if (!otarget)
 				tError = TRUE;
 			else
-				uintval = (uint32_t*) &otarget->obj_flags.value[0];
-		} else if (!str_cmp(right, "value1")) {
+				uintval = (uint32_t *)&otarget->obj_flags.value[0];
+		}
+		else if (!str_cmp(right, "value1"))
+		{
 			if (!otarget)
 				tError = TRUE;
 			else
-				uintval = (uint32_t*) &otarget->obj_flags.value[1];
-		} else if (!str_cmp(right, "value2")) {
+				uintval = (uint32_t *)&otarget->obj_flags.value[1];
+		}
+		else if (!str_cmp(right, "value2"))
+		{
 			if (!otarget)
 				tError = TRUE;
 			else
-				uintval = (uint32_t*) &otarget->obj_flags.value[2];
-		} else if (!str_cmp(right, "value3")) {
+				uintval = (uint32_t *)&otarget->obj_flags.value[2];
+		}
+		else if (!str_cmp(right, "value3"))
+		{
 			if (!otarget)
 				tError = TRUE;
 			else
-				uintval = (uint32_t*) &otarget->obj_flags.value[3];
+				uintval = (uint32_t *)&otarget->obj_flags.value[3];
 		}
 		break;
 	case 'w':
-		if (!str_cmp(right, "wearable")) {
+		if (!str_cmp(right, "wearable"))
+		{
 			if (!otarget)
 				tError = TRUE;
 			else
 				uintval = &otarget->obj_flags.wear_flags;
-		} else if (!str_cmp(right, "weight")) {
+		}
+		else if (!str_cmp(right, "weight"))
+		{
 			if (!target && !otarget)
 				tError = TRUE;
-			else if (otarget) {
+			else if (otarget)
+			{
 				intval = &otarget->obj_flags.weight;
-			} else
-				sbval = (int8_t*) &target->weight;
-		} else if (!str_cmp(right, "wisdom")) {
+			}
+			else
+				sbval = (int8_t *)&target->weight;
+		}
+		else if (!str_cmp(right, "wisdom"))
+		{
 			if (!target)
 				tError = TRUE;
 			else
@@ -1086,27 +1333,28 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
 		break;
 	default:
 		break;
-
 	}
-  if (tError)
-  {
-    logf( IMMORTAL, LOG_WORLD, "translate_value: %s.%s target=%p actor=%p mob=%p", left, right, target, actor, mob);
+	if (tError)
+	{
+		logf(IMMORTAL, LogChannels::LOG_WORLD, "translate_value: %s.%s target=%p actor=%p mob=%p", left, right, target, actor, mob);
 
-    if (mob)
-    {
-      if (mob->mobdata == nullptr)
-      {
-        logf( IMMORTAL, LOG_WORLD, "translate_value: %s.%s mob->mobdata == nullptr", left, right);
-      } else if (mob->mobdata->nr < 0)
-      {
-        logf( IMMORTAL, LOG_WORLD, "translate_value: %s.%s mob->mobdata->nr = %d < 0 ", left, right, mob->mobdata->nr);
-      } else
-      {
-        logf( IMMORTAL, LOG_WORLD, "translate_value: Mob: %d tried to access non-existent field of target", mob_index[mob->mobdata->nr].virt);
-      }
-    }
-    return;
-  }
+		if (mob)
+		{
+			if (mob->mobdata == nullptr)
+			{
+				logf(IMMORTAL, LogChannels::LOG_WORLD, "translate_value: %s.%s mob->mobdata == nullptr", left, right);
+			}
+			else if (mob->mobdata->nr < 0)
+			{
+				logf(IMMORTAL, LogChannels::LOG_WORLD, "translate_value: %s.%s mob->mobdata->nr = %d < 0 ", left, right, mob->mobdata->nr);
+			}
+			else
+			{
+				logf(IMMORTAL, LogChannels::LOG_WORLD, "translate_value: Mob: %d tried to access non-existent field of target", mob_index[mob->mobdata->nr].virt);
+			}
+		}
+		return;
+	}
 	if (intval)
 		*vali = intval;
 	if (uintval)
@@ -1121,7 +1369,6 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
 	return;
 }
 
-
 /* This function performs the evaluation of the if checks.  It is
  * here that you can add any ifchecks which you so desire. Hopefully
  * it is clear from what follows how one would go about adding your
@@ -1134,1347 +1381,1596 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
  */
 
 // Azrack -- this was originally returning a bool, but its returning all sorts of values,
-// switched it to int 
+// switched it to int
 
-enum mprog_ifs 
+enum mprog_ifs
 {
-  eRAND = 1, //start this at 1, map returns 0 if not found
-  eRAND1K,
-  eAMTITEMS,
-  eNUMPCS,
-  eNUMOFMOBSINWORLD,
-  eNUMOFMOBSINROOM,
-  eISPC,
-  eISWIELDING,
-  eISWEAPPRI,
-  eISWEAPSEC,
-  eISNPC,
-  eISGOOD,
-  eISNEUTRAL,
-  eISEVIL,
-  eISWORN,
-  eISFIGHT,
-  eISTANK,
-  eISIMMORT,
-  eISCHARMED,
-  eISFOLLOW,
-  eISSPELLED,
-  eISAFFECTED,
-  eHITPRCNT,
-  eWEARS,
-  eCARRIES,
-  eNUMBER,
-  eTEMPVAR,
-  eISMOBVNUMINROOM,
-  eISOBJVNUMINROOM,
-  eCANSEE,
-  eHASDONEQUEST1,
-  eINSAMEZONE,
-  eCLAN,
-  eISDAYTIME,
-  eISRAINING,
-  eNUMOFOBJSINWORLD
+	eRAND = 1, // start this at 1, map returns 0 if not found
+	eRAND1K,
+	eAMTITEMS,
+	eNUMPCS,
+	eNUMOFMOBSINWORLD,
+	eNUMOFMOBSINROOM,
+	eISPC,
+	eISWIELDING,
+	eISWEAPPRI,
+	eISWEAPSEC,
+	eISNPC,
+	eISGOOD,
+	eISNEUTRAL,
+	eISEVIL,
+	eISWORN,
+	eISFIGHT,
+	eISTANK,
+	eISIMMORT,
+	eISCHARMED,
+	eISFOLLOW,
+	eISSPELLED,
+	eISAFFECTED,
+	eHITPRCNT,
+	eWEARS,
+	eCARRIES,
+	eNUMBER,
+	eTEMPVAR,
+	eISMOBVNUMINROOM,
+	eISOBJVNUMINROOM,
+	eCANSEE,
+	eHASDONEQUEST1,
+	eINSAMEZONE,
+	eCLAN,
+	eISDAYTIME,
+	eISRAINING,
+	eNUMOFOBJSINWORLD
 
 };
 
-
-std::map<std::string,mprog_ifs> load_ifchecks()
+std::map<std::string, mprog_ifs> load_ifchecks()
 {
-  std::map<std::string, mprog_ifs> ifcheck_tmp;
+	std::map<std::string, mprog_ifs> ifcheck_tmp;
 
-  ifcheck_tmp["rand"] = eRAND;
-  ifcheck_tmp["rand1k"] = eRAND1K;
-  ifcheck_tmp["amtitems"] = eAMTITEMS;
-  ifcheck_tmp["numpcs"] = eNUMPCS;
-  ifcheck_tmp["numofmobsinworld"] = eNUMOFMOBSINWORLD;
-  ifcheck_tmp["numofobjsinworld"] = eNUMOFOBJSINWORLD;
-  ifcheck_tmp["numofmobsinroom"] = eNUMOFMOBSINROOM;
-  ifcheck_tmp["ispc"] = eISPC;
-  ifcheck_tmp["iswielding"] = eISWIELDING;
-  ifcheck_tmp["isweappri"] = eISWEAPPRI;
-  ifcheck_tmp["isweapsec"] = eISWEAPSEC;
+	ifcheck_tmp["rand"] = eRAND;
+	ifcheck_tmp["rand1k"] = eRAND1K;
+	ifcheck_tmp["amtitems"] = eAMTITEMS;
+	ifcheck_tmp["numpcs"] = eNUMPCS;
+	ifcheck_tmp["numofmobsinworld"] = eNUMOFMOBSINWORLD;
+	ifcheck_tmp["numofobjsinworld"] = eNUMOFOBJSINWORLD;
+	ifcheck_tmp["numofmobsinroom"] = eNUMOFMOBSINROOM;
+	ifcheck_tmp["ispc"] = eISPC;
+	ifcheck_tmp["iswielding"] = eISWIELDING;
+	ifcheck_tmp["isweappri"] = eISWEAPPRI;
+	ifcheck_tmp["isweapsec"] = eISWEAPSEC;
 
-  ifcheck_tmp["isnpc"] = eISNPC;
-  ifcheck_tmp["isgood"] = eISGOOD;
-  ifcheck_tmp["isneutral"] = eISNEUTRAL;
-  ifcheck_tmp["isevil"] = eISEVIL;
-  ifcheck_tmp["isfight"] = eISFIGHT;
+	ifcheck_tmp["isnpc"] = eISNPC;
+	ifcheck_tmp["isgood"] = eISGOOD;
+	ifcheck_tmp["isneutral"] = eISNEUTRAL;
+	ifcheck_tmp["isevil"] = eISEVIL;
+	ifcheck_tmp["isfight"] = eISFIGHT;
 
-  ifcheck_tmp["istank"] = eISTANK;
-  ifcheck_tmp["isimmort"] = eISIMMORT;
-  ifcheck_tmp["ischarmed"] = eISCHARMED;
-  ifcheck_tmp["isfollow"] = eISFOLLOW;
-  ifcheck_tmp["isspelled"] = eISSPELLED;
-  ifcheck_tmp["isworn"] = eISWORN;
+	ifcheck_tmp["istank"] = eISTANK;
+	ifcheck_tmp["isimmort"] = eISIMMORT;
+	ifcheck_tmp["ischarmed"] = eISCHARMED;
+	ifcheck_tmp["isfollow"] = eISFOLLOW;
+	ifcheck_tmp["isspelled"] = eISSPELLED;
+	ifcheck_tmp["isworn"] = eISWORN;
 
-  ifcheck_tmp["isaffected"] = eISAFFECTED;
-  ifcheck_tmp["hitprcnt"] = eHITPRCNT;
-  ifcheck_tmp["wears"] = eWEARS;
-  ifcheck_tmp["carries"] = eCARRIES;
-  ifcheck_tmp["number"] = eNUMBER;
+	ifcheck_tmp["isaffected"] = eISAFFECTED;
+	ifcheck_tmp["hitprcnt"] = eHITPRCNT;
+	ifcheck_tmp["wears"] = eWEARS;
+	ifcheck_tmp["carries"] = eCARRIES;
+	ifcheck_tmp["number"] = eNUMBER;
 
-  ifcheck_tmp["tempvar"] = eTEMPVAR;
-  ifcheck_tmp["ismobvnuminroom"] = eISMOBVNUMINROOM;
-  ifcheck_tmp["isobjvnuminroom"] = eISOBJVNUMINROOM;
-  ifcheck_tmp["cansee"] = eCANSEE;
+	ifcheck_tmp["tempvar"] = eTEMPVAR;
+	ifcheck_tmp["ismobvnuminroom"] = eISMOBVNUMINROOM;
+	ifcheck_tmp["isobjvnuminroom"] = eISOBJVNUMINROOM;
+	ifcheck_tmp["cansee"] = eCANSEE;
 
-  ifcheck_tmp["insamezone"] = eINSAMEZONE;
-  ifcheck_tmp["clan"] = eCLAN;
+	ifcheck_tmp["insamezone"] = eINSAMEZONE;
+	ifcheck_tmp["clan"] = eCLAN;
 
-  ifcheck_tmp["isdaytime"] = eISDAYTIME;
-  ifcheck_tmp["israining"] = eISRAINING;
+	ifcheck_tmp["isdaytime"] = eISDAYTIME;
+	ifcheck_tmp["israining"] = eISRAINING;
 
-  return ifcheck_tmp;
+	return ifcheck_tmp;
 }
 
+std::map<std::string, mprog_ifs> ifcheck = load_ifchecks();
 
-
-std::map<std::string,mprog_ifs> ifcheck = load_ifchecks();
-
-int mprog_do_ifchck( char *ifchck, char_data *mob, char_data *actor,
-		     obj_data *obj, void *vo, char_data *rndm)
+int mprog_do_ifchck(char *ifchck, char_data *mob, char_data *actor,
+					obj_data *obj, void *vo, char_data *rndm)
 {
 
-  char buf[ MAX_INPUT_LENGTH ];
-  char arg[ MAX_INPUT_LENGTH ];
-  char opr[ MAX_INPUT_LENGTH ];
-  char val[ MAX_INPUT_LENGTH ];
-  char val2 [MAX_INPUT_LENGTH]; // used for non-traditional
-  char_data *vict = (char_data *) vo;
-  obj_data *v_obj = (obj_data  *) vo;
-  char     *bufpt = buf;
-  char     *argpt = arg;
-  char     *oprpt = opr;
-  char     *valpt = val;
-  char     *point = ifchck;
-  val2[0] = '\0';
+	char buf[MAX_INPUT_LENGTH];
+	char arg[MAX_INPUT_LENGTH];
+	char opr[MAX_INPUT_LENGTH];
+	char val[MAX_INPUT_LENGTH];
+	char val2[MAX_INPUT_LENGTH]; // used for non-traditional
+	char_data *vict = (char_data *)vo;
+	obj_data *v_obj = (obj_data *)vo;
+	char *bufpt = buf;
+	char *argpt = arg;
+	char *oprpt = opr;
+	char *valpt = val;
+	char *point = ifchck;
+	val2[0] = '\0';
 
-
-  if ( *point == '\0' ) 
-    {
-      logf( IMMORTAL, LOG_WORLD,  "Mob: v%d r%d: null ifchck: '%s'", mob_index[mob->mobdata->nr].virt, mob->mobdata->nr, ifchck ); 
-      return -1;
-    }   
-  /* skip leading spaces */
-  while ( *point == ' ' )
-    point++;
-  bool traditional = FALSE;
-
-  /* get whatever comes before the left paren.. ignore spaces */
-  while ( *point )
-    if (*point == '(')
-    {
-	traditional =TRUE;
-	break;
-    }
-    else if (*point == ' ')
-    {
-		prog_error(mob, "ifchck syntax error: '%s'", ifchck);
-		return -1;
-    }
-    else if ( *point == '.' )
-    {
-	break;
-    }
-    else if ( *point == '\0' ) 
-      {
-		prog_error(mob, "ifchck syntax error");
-	logf( IMMORTAL, LOG_WORLD,  "Mob: v%d r%d: ifchck syntax error: '%s'", mob_index[mob->mobdata->nr].virt, mob->mobdata->nr, ifchck ); 
-	return -1;
-      }   
-    else
-      if ( *point == ' ' )
-	point++;
-      else 
-	*bufpt++ = *point++; 
-
-  *bufpt = '\0';
-  point++;
-
-  /* get whatever is in between the parens.. ignore spaces */
-  while ( *point ) 
-    if (traditional && *point == ')') break;
-    else if (!traditional && !isalpha(*point)) { point--; break; }
-    else if ( *point == '\0' )
-      {
-		logf( IMMORTAL, LOG_WORLD,  "Mob: v%d r%d: ifchck syntax error: '%s'", mob_index[mob->mobdata->nr].virt, mob->mobdata->nr, ifchck ); 
-	return -1;
-      }   
-    else
-      if ( *point == ' ' )
-	point++;
-      else 
-	*argpt++ = *point++; 
-
-  *argpt = '\0';
-  point++;
-
-  /* check to see if there is an operator */
-
-  // same for both traditional and non-traditional
-  while ( *point == ' ' || *point == '\r')
-    point++;
-  if ( *point == '\0' ) 
-    {
-      *opr = '\0';
-      *val = '\0';
-    }   
-  else /* there should be an operator and value, so get them */
-    {
-      while ( ( *point != ' ' ) && ( !isalnum( *point ) ) ) 
-	if ( *point == '\0' ) 
-	  {
-	  	logf( IMMORTAL, LOG_WORLD,  "Mob: v%d r%d: ifchck operator without value: '%s'", mob_index[mob->mobdata->nr].virt, mob->mobdata->nr, ifchck ); 
-	    return -1;
-	  }   
-	else
-	  *oprpt++ = *point++; 
-
-      *oprpt = '\0';
- 
-      /* finished with operator, skip spaces and then get the value */
-      while ( *point == ' ' )
-	point++;
-      for( ; ; )
+	if (*point == '\0')
 	{
-	  if (*point == '.') { *valpt = '\0'; valpt = val2; point++;}
-	  else if (  *point == '\0' || *point == '\r' || *point == '\n')
-	    break;
-	  else
-	    *valpt++ = *point++; 
+		logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: v%d r%d: null ifchck: '%s'", mob_index[mob->mobdata->nr].virt, mob->mobdata->nr, ifchck);
+		return -1;
+	}
+	/* skip leading spaces */
+	while (*point == ' ')
+		point++;
+	bool traditional = FALSE;
+
+	/* get whatever comes before the left paren.. ignore spaces */
+	while (*point)
+		if (*point == '(')
+		{
+			traditional = TRUE;
+			break;
+		}
+		else if (*point == ' ')
+		{
+			prog_error(mob, "ifchck syntax error: '%s'", ifchck);
+			return -1;
+		}
+		else if (*point == '.')
+		{
+			break;
+		}
+		else if (*point == '\0')
+		{
+			prog_error(mob, "ifchck syntax error");
+			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: v%d r%d: ifchck syntax error: '%s'", mob_index[mob->mobdata->nr].virt, mob->mobdata->nr, ifchck);
+			return -1;
+		}
+		else if (*point == ' ')
+			point++;
+		else
+			*bufpt++ = *point++;
+
+	*bufpt = '\0';
+	point++;
+
+	/* get whatever is in between the parens.. ignore spaces */
+	while (*point)
+		if (traditional && *point == ')')
+			break;
+		else if (!traditional && !isalpha(*point))
+		{
+			point--;
+			break;
+		}
+		else if (*point == '\0')
+		{
+			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: v%d r%d: ifchck syntax error: '%s'", mob_index[mob->mobdata->nr].virt, mob->mobdata->nr, ifchck);
+			return -1;
+		}
+		else if (*point == ' ')
+			point++;
+		else
+			*argpt++ = *point++;
+
+	*argpt = '\0';
+	point++;
+
+	/* check to see if there is an operator */
+
+	// same for both traditional and non-traditional
+	while (*point == ' ' || *point == '\r')
+		point++;
+	if (*point == '\0')
+	{
+		*opr = '\0';
+		*val = '\0';
+	}
+	else /* there should be an operator and value, so get them */
+	{
+		while ((*point != ' ') && (!isalnum(*point)))
+			if (*point == '\0')
+			{
+				logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: v%d r%d: ifchck operator without value: '%s'", mob_index[mob->mobdata->nr].virt, mob->mobdata->nr, ifchck);
+				return -1;
+			}
+			else
+				*oprpt++ = *point++;
+
+		*oprpt = '\0';
+
+		/* finished with operator, skip spaces and then get the value */
+		while (*point == ' ')
+			point++;
+		for (;;)
+		{
+			if (*point == '.')
+			{
+				*valpt = '\0';
+				valpt = val2;
+				point++;
+			}
+			else if (*point == '\0' || *point == '\r' || *point == '\n')
+				break;
+			else
+				*valpt++ = *point++;
+		}
+
+		*valpt = '\0';
+	}
+	bufpt = buf;
+	argpt = arg;
+	oprpt = opr;
+	valpt = val;
+
+	/* Ok... now buf contains the ifchck, arg contains the inside of the
+	 *  parentheses, opr contains an operator if one is present, and val
+	 *  has the value if an operator was present.
+	 *  So.. basically use if statements and run over all known ifchecks
+	 *  Once inside, use the argument and expand the lhs. Then if need be
+	 *  send the lhs,opr,rhs off to be evaluated.
+	 */
+
+	char_data *fvict = NULL;
+	bool ye = FALSE;
+	if (arg[0] == '$' && arg[1] == 'v')
+	{
+		struct tempvariable *eh = mob->tempVariable;
+		char buf1[MAX_STRING_LENGTH];
+		buf1[0] = '\0';
+		int i;
+		for (i = 2; arg[i]; i++)
+		{
+			if (arg[i] == '[')
+				continue;
+			if (arg[i] == ']')
+			{
+				buf1[i - 3] = '\0';
+				break;
+			}
+			buf1[i - 3] = arg[i];
+		}
+		for (; eh; eh = eh->next)
+			if (!str_cmp(buf1, eh->name))
+				break;
+		if (eh)
+			strcpy(arg, eh->data);
 	}
 
-      *valpt = '\0';
-    }
-  bufpt = buf;
-  argpt = arg;
-  oprpt = opr;
-  valpt = val;
+	if (!is_number(arg) && !(arg[0] == '$') && traditional)
+	{
+		fvict = get_char_room(arg, mob->in_room, TRUE);
+		ye = TRUE;
+	}
+	if (!(arg[0] == '$') && is_number(arg) && traditional)
+	{
+		char_data *te;
+		int vnum = atoi(arg);
+		for (te = world[mob->in_room].people; te; te = te->next)
+		{
+			if (!IS_NPC(te))
+				continue;
+			if (mob_index[te->mobdata->nr].virt == vnum)
+			{
+				fvict = te;
+				break;
+			}
+		}
+		ye = TRUE;
+	}
 
-  /* Ok... now buf contains the ifchck, arg contains the inside of the
-   *  parentheses, opr contains an operator if one is present, and val
-   *  has the value if an operator was present.
-   *  So.. basically use if statements and run over all known ifchecks
-   *  Once inside, use the argument and expand the lhs. Then if need be
-   *  send the lhs,opr,rhs off to be evaluated.
-   */
-
-  char_data *fvict = NULL;
-  bool ye = FALSE;
-  if (arg[0] == '$' && arg[1] == 'v')
-  {
-    struct tempvariable *eh = mob->tempVariable;
-    char buf1[MAX_STRING_LENGTH];
-    buf1[0] = '\0';
-    int i;
-    for (i = 2; arg[i]; i++)
-    {
-          if (arg[i] == '[') continue;
-          if (arg[i] == ']')
-          {
-                  buf1[i-3] = '\0';
-                  break;
-          }
-          buf1[i-3] = arg[i];
-    }
-    for (; eh; eh = eh->next)
-     if (!str_cmp(buf1, eh->name))
-       break;
-    if (eh) strcpy(arg, eh->data);
-  }
-
-  if (!is_number(arg) && !(arg[0] == '$') && traditional)
-  {
-    fvict = get_char_room(arg, mob->in_room, TRUE);
-    ye = TRUE;
-  }   
-  if (!(arg[0] == '$') && is_number(arg) && traditional)
- {
-    char_data *te;
-    int vnum = atoi(arg);
-   for (te = world[mob->in_room].people;te;te = te->next)
-   {
-     if (!IS_NPC(te)) continue;
-     if (mob_index[te->mobdata->nr].virt == vnum)
-	{ fvict = te; break; }
-   }
-  ye = TRUE;
- }
-  
-  int16_t *lvali = 0;
-  uint32_t *lvalui = 0;
-  char **lvalstr = 0;
-  int64_t *lvali64 = 0;
-  int8_t *lvalb = 0; 
-  //  int type = 0;
+	int16_t *lvali = 0;
+	uint32_t *lvalui = 0;
+	char **lvalstr = 0;
+	int64_t *lvali64 = 0;
+	int8_t *lvalb = 0;
+	//  int type = 0;
 
 	if (!traditional)
 		translate_value(buf, arg, &lvali, &lvalui, &lvalstr, &lvali64, &lvalb,
-				mob, actor, obj, vo, rndm);
+						mob, actor, obj, vo, rndm);
 	else
 		// switch order of traditional so it'd be $n(ispc), to conform with
 		// new ifchecks
 		translate_value(arg, buf, &lvali, &lvalui, &lvalstr, &lvali64, &lvalb,
-				mob, actor, obj, vo, rndm);
+						mob, actor, obj, vo, rndm);
 
-
-  if (val2[0] == '\0') {
-    if (lvali)   return mprog_veval(*lvali, opr, atoi(val));
-    if (lvalui)  return mprog_veval(*lvalui, opr, (uint)atoi(val));
-    if (lvali64) return mprog_veval((int)*lvali64,opr, atoi(val));
-    if (lvalb)   return mprog_veval((int)*lvalb, opr, atoi(val));  
-    if (lvalstr) return mprog_seval(mob, *lvalstr, opr, val);
-  } else {
-    int16_t *rvali = 0;
-    uint32_t *rvalui = 0;
-    char **rvalstr = 0;
-    int64_t *rvali64 = 0;
-    int8_t *rvalb = 0; 
-    translate_value(val,val2,&rvali,&rvalui, &rvalstr,&rvali64, &rvalb,mob,actor, obj, vo, rndm);
-    int64_t rval = 0;
-    if (rvalstr || rvali || rvalui || rvali64 || rvalb)
-    {
-      if (rvalstr && lvalstr) return mprog_seval(mob, *lvalstr, opr, *rvalstr);
-      // The rest fit in an int64_t, so let's just use that.
-      if (rvalstr) rval = atoi(*rvalstr);
-      if (rvali) rval = *rvali;
-      if (rvalui) rval = *rvalui;
-      if (rvalb) rval = *rvalb;
-      if (rvali64) rval = *rvali64;
-
-      if (lvali)   return mprog_veval(*lvali, opr, rval);
-      if (lvalui)  return mprog_veval(*lvalui, opr, rval);
-      if (lvali64) return mprog_veval(*lvali64,opr, rval);
-      if (lvalb)   return mprog_veval((int)*lvalb, opr, rval);  
-    }
- }
-
-
- switch(ifcheck[buf])
- {
-   case eRAND:
-      return ( number(1, 100) <= atoi(arg) );
-   break;
-
-   case eRAND1K:
-      return ( number(1, 1000) <= atoi(arg) );
-   break;
-
-   case eAMTITEMS:
-     return mprog_veval(obj_index[real_object(atoi(arg))].number,opr,atoi(val));
-   break;
-
-   case eNUMPCS:
-   {
-     char_data *p;
-     int count = 0;
-     for (p = world[mob->in_room].people;p;p=p->next_in_room)
-       if (!IS_NPC(p))
-	count++;
-     return mprog_veval( count, opr, atoi(val) );
-   }
-   break;
- 
-   case eNUMOFMOBSINWORLD:  
-   {
-    int target = atoi(arg);
-    int count = 0;
-
-    auto &character_list = DC::instance().character_list;
-    count = count_if(character_list.begin(), character_list.end(),
-			[&target](char_data *vch) {
-    	if (IS_NPC(vch) && vch->in_room != NOWHERE && mob_index[vch->mobdata->nr].virt == target) {
-    		return true;
-    	} else {
-    		return false;
-    	}
-    });
-
-    return mprog_veval( count, opr, atoi(val) );
-   }
-   break;
-   case eNUMOFOBJSINWORLD:
-   {
-    int target = atoi(arg);
-    int count = 0;
-
-    obj_data *p;
-    for (p = object_list; p; p = p->next)
-    {
-        if (obj_index[p->item_number].virt == target)
-        {
-                count++;
-        }
-    }
-
-    return mprog_veval( count, opr, atoi(val) );
-   }
-   break;
-  
-   case eNUMOFMOBSINROOM:
-   {
-    int target = atoi(arg);
-    char_data *p;
-    int count = 0;
-    for (p = world[mob->in_room].people; p; p = p->next_in_room)
-      if (IS_MOB(p) && mob_index[p->mobdata->nr].virt == target)
-	count++;
-
-    return mprog_veval( count, opr, atoi(val) );
-   }
-   break;
-  
-   case eISPC:
-      if (fvict)
-        return !IS_NPC(fvict);
-      if (ye) return FALSE;
-      switch ( arg[1] )  /* arg should be "$*" so just get the letter */
+	if (val2[0] == '\0')
 	{
-	case 'i': return 0;
-	case 'z': if (mob->beacon)
-             return ( IS_NPC((char_data*)mob->beacon));
-           else return -1;
-	case 'n': if ( actor )
- 	             return ( !IS_NPC( actor ) );
-	          else return 0;
-	case 't': if ( vict )
-                     return ( !IS_NPC( vict ) );
-	          else return 0;
-	case 'r': if ( rndm )
-                     return ( !IS_NPC( rndm ) );
-	          else return 0;
-        case 'f': if (actor && actor->fighting)
-		    return ( !IS_NPC(actor->fighting));
-		  else return 0;
-        case 'g': if (mob && mob->fighting)
-		    return ( !IS_NPC(mob->fighting));
-		  else return 0;
-	default:	
-	  logf( IMMORTAL, LOG_WORLD,  "Mob: %d bad argument to 'ispc'", mob_index[mob->mobdata->nr].virt ); 
-	  return -1;
+		if (lvali)
+			return mprog_veval(*lvali, opr, atoi(val));
+		if (lvalui)
+			return mprog_veval(*lvalui, opr, (uint)atoi(val));
+		if (lvali64)
+			return mprog_veval((int)*lvali64, opr, atoi(val));
+		if (lvalb)
+			return mprog_veval((int)*lvalb, opr, atoi(val));
+		if (lvalstr)
+			return mprog_seval(mob, *lvalstr, opr, val);
 	}
-    break;
-
-    case eISWIELDING:
-      if (fvict)
-        return fvict->equipment[WIELD]?1:0;
-      if (ye) return FALSE;
-      switch ( arg[1] )  /* arg should be "$*" so just get the letter */
-        {
-        case 'i': return (mob->equipment[WIELD] )?1:0;
-	case 'z': if (mob->beacon)
-             return ((char_data*)mob->beacon)->equipment[WIELD]?1:0;
-           else return -1;
-
-        case 'n': if ( actor )
-                     return ( actor->equipment[WIELD] ) ? 1:0;
-                  else return 0;
-        case 't': if ( vict )
-                     return ( vict->equipment[WIELD] ) ?1:0;
-                  else return 0; 
-        case 'r': if ( rndm )
-                     return ( rndm->equipment[WIELD] )?1:0;
-                  else return 0;
-        case 'f': if (actor && actor->fighting) return (actor->fighting->equipment[WIELD])?1:0;
-                   else return 0;
-        case 'g': if (mob && mob->fighting) return (mob->fighting->equipment[WIELD])?1:0;
-                   else return 0;
-        default:
-          logf( IMMORTAL, LOG_WORLD,  "Mob: %d bad argument to 'iswielding'", mob_index[mob->mobdata->nr].virt);
-          return -1;
-      }
-    break;
-    
-    case eISWEAPPRI:
-	if (fvict && fvict->equipment[WIELD])
-	  return mprog_veval(fvict->equipment[WIELD]->obj_flags.value[3],opr, atoi(val));
-	if (ye) return FALSE;
-      switch ( arg[1] )  /* arg should be "$*" so just get the letter */
-      {
-        case 'i': 
-	if (mob->equipment[WIELD])
-	  return mprog_veval(mob->equipment[WIELD]->obj_flags.value[3],opr, atoi(val));
-	else return 0;
-	case 'z': if (mob->beacon && ((char_data*)mob->beacon)->equipment[WIELD])
-	  return mprog_veval(((char_data*)mob->beacon)->equipment[WIELD]->obj_flags.value[3],opr, atoi(val));
-           else return -1;
-        case 'n': if ( actor && actor->equipment[WIELD])
-	  return mprog_veval(actor->equipment[WIELD]->obj_flags.value[3],opr, atoi(val));
-                  else return 0;
-        case 't': if ( vict && vict->equipment[WIELD])
-	  return mprog_veval(vict->equipment[WIELD]->obj_flags.value[3],opr, atoi(val));
-                  else return 0; 
-        case 'r': if ( rndm  && rndm->equipment[WIELD])
-	  return mprog_veval(rndm->equipment[WIELD]->obj_flags.value[3],opr, atoi(val));
-                  else return 0;
-        default:
-          logf( IMMORTAL, LOG_WORLD,  "Mob: %d bad argument to 'isweappri'", mob_index[mob->mobdata->nr].virt);
-          return -1;
-      }
-    break;
-
-    case eISWEAPSEC:
-	if (fvict && fvict->equipment[SECOND_WIELD])
-	  return mprog_veval(fvict->equipment[SECOND_WIELD]->obj_flags.value[3],opr, atoi(val));
-	if (ye) return FALSE;
-      switch ( arg[1] )  /* arg should be "$*" so just get the letter */
-      {
-        case 'i': 
-	if (mob->equipment[SECOND_WIELD])
-	  return mprog_veval(mob->equipment[SECOND_WIELD]->obj_flags.value[3],opr, atoi(val));
-	else return 0;
-	case 'z': if (mob->beacon && ((char_data*)mob->beacon)->equipment[SECOND_WIELD])
-	  return mprog_veval(((char_data*)mob->beacon)->equipment[SECOND_WIELD]->obj_flags.value[3],opr, atoi(val));
-           else return -1;
-        case 'n': if ( actor && actor->equipment[SECOND_WIELD])
-	  return mprog_veval(actor->equipment[SECOND_WIELD]->obj_flags.value[3],opr, atoi(val));
-                  else return 0;
-        case 't': if ( vict && vict->equipment[SECOND_WIELD])
-	  return mprog_veval(vict->equipment[SECOND_WIELD]->obj_flags.value[3],opr, atoi(val));
-                  else return 0; 
-        case 'r': if ( rndm  && rndm->equipment[SECOND_WIELD])
-	  return mprog_veval(rndm->equipment[SECOND_WIELD]->obj_flags.value[3],opr, atoi(val));
-                  else return 0;
-        default:
-          logf( IMMORTAL, LOG_WORLD,  "Mob: %d bad argument to 'isweapsec'", mob_index[mob->mobdata->nr].virt);
-          return -1;
-      }
-    break;
-  
-   case eISNPC:
-	if (fvict)
-	  return IS_NPC(fvict);
-	if (ye) return FALSE;
-      switch ( arg[1] )  /* arg should be "$*" so just get the letter */
+	else
 	{
-	case 'i': return 1;
-	case 'z': if (mob->beacon)
-             return IS_NPC(((char_data*)mob->beacon))/100;
-           else return -1;
+		int16_t *rvali = 0;
+		uint32_t *rvalui = 0;
+		char **rvalstr = 0;
+		int64_t *rvali64 = 0;
+		int8_t *rvalb = 0;
+		translate_value(val, val2, &rvali, &rvalui, &rvalstr, &rvali64, &rvalb, mob, actor, obj, vo, rndm);
+		int64_t rval = 0;
+		if (rvalstr || rvali || rvalui || rvali64 || rvalb)
+		{
+			if (rvalstr && lvalstr)
+				return mprog_seval(mob, *lvalstr, opr, *rvalstr);
+			// The rest fit in an int64_t, so let's just use that.
+			if (rvalstr)
+				rval = atoi(*rvalstr);
+			if (rvali)
+				rval = *rvali;
+			if (rvalui)
+				rval = *rvalui;
+			if (rvalb)
+				rval = *rvalb;
+			if (rvali64)
+				rval = *rvali64;
 
-	case 'n': if ( actor )
-	             return IS_NPC( actor )/100;
-	          else return -1;
-	case 't': if ( vict )
-                     return IS_NPC( vict )/100;
-	          else return -1;
-	case 'r': if ( rndm )
-	             return IS_NPC( rndm )/100;
-	          else return -1;
-	default:
-	  logf( IMMORTAL, LOG_WORLD, "Mob: v%d r%d: bad argument to isnpc(): '%s'", mob_index[mob->mobdata->nr].virt, mob->mobdata->nr, ifchck ); 
-	  return -1;
+			if (lvali)
+				return mprog_veval(*lvali, opr, rval);
+			if (lvalui)
+				return mprog_veval(*lvalui, opr, rval);
+			if (lvali64)
+				return mprog_veval(*lvali64, opr, rval);
+			if (lvalb)
+				return mprog_veval((int)*lvalb, opr, rval);
+		}
 	}
-    break;
 
-    case eISGOOD:
-	if (fvict)
-	  return IS_GOOD(fvict);
-	if (ye) return FALSE;
-
-      switch ( arg[1] )  /* arg should be "$*" so just get the letter */
+	switch (ifcheck[buf])
 	{
-	case 'i': return IS_GOOD( mob );
-	case 'z': if (mob->beacon)
-             return IS_GOOD(((char_data*)mob->beacon));
-           else return -1;
-	case 'n': if ( actor )
-	             return IS_GOOD( actor );
-	          else return -1;
-	case 't': if ( vict )
-	             return IS_GOOD( vict );
-	          else return -1;
-	case 'r': if ( rndm )
-	             return IS_GOOD( rndm );
-	          else return -1;
-	default:
-	  logf( IMMORTAL, LOG_WORLD, "Mob: v%d r%d: bad argument to isgood(): '%s'", mob_index[mob->mobdata->nr].virt, mob->mobdata->nr, ifchck ); 
-	  return -1;
+	case eRAND:
+		return (number(1, 100) <= atoi(arg));
+		break;
+
+	case eRAND1K:
+		return (number(1, 1000) <= atoi(arg));
+		break;
+
+	case eAMTITEMS:
+		return mprog_veval(obj_index[real_object(atoi(arg))].number, opr, atoi(val));
+		break;
+
+	case eNUMPCS:
+	{
+		char_data *p;
+		int count = 0;
+		for (p = world[mob->in_room].people; p; p = p->next_in_room)
+			if (!IS_NPC(p))
+				count++;
+		return mprog_veval(count, opr, atoi(val));
 	}
-    break;
+	break;
 
-    case eISNEUTRAL:
-      if (fvict)
-	  return IS_NEUTRAL(fvict);
-      if (ye)
-	  return FALSE;
+	case eNUMOFMOBSINWORLD:
+	{
+		int target = atoi(arg);
+		int count = 0;
 
-      switch ( arg[1] )  /* arg should be "$*" so just get the letter */
-      {
-	  case 'i':
-	      return IS_NEUTRAL( mob );
-	  case 'z':
-	      if (mob->beacon)
-		  return IS_NEUTRAL(((char_data*)mob->beacon));
-	      else
-		  return -1;
-	  case 'n':
-	      if ( actor )
-		  return IS_NEUTRAL( actor );
-	      else
-		  return -1;
-	  case 't':
-	      if ( vict )
-		  return IS_NEUTRAL( vict );
-	      else
-		  return -1;
-	  case 'r':
-	      if ( rndm )
-		  return IS_NEUTRAL( rndm );
-	      else
-		  return -1;
-	  default:
-	      logf( IMMORTAL, LOG_WORLD, "Mob: v%d r%d: bad argument to isgood(): '%s'", mob_index[mob->mobdata->nr].virt, mob->mobdata->nr, ifchck ); 
-	      return -1;
-      }
-    break;
+		auto &character_list = DC::instance().character_list;
+		count = count_if(character_list.begin(), character_list.end(),
+						 [&target](char_data *vch)
+						 {
+							 if (IS_NPC(vch) && vch->in_room != NOWHERE && mob_index[vch->mobdata->nr].virt == target)
+							 {
+								 return true;
+							 }
+							 else
+							 {
+								 return false;
+							 }
+						 });
 
-    case eISEVIL:
-      if (fvict)
-	  return IS_EVIL(fvict);
-      if (ye)
-	  return FALSE;
-      
-      switch ( arg[1] )  /* arg should be "$*" so just get the letter */
-      {
-	  case 'i':
-	      return IS_EVIL( mob );
-	  case 'z':
-	      if (mob->beacon)
-		  return IS_EVIL(((char_data*)mob->beacon));
-	      else
-		  return -1;
-	  case 'n':
-	      if ( actor )
-		  return IS_EVIL( actor );
-	      else
-		  return -1;
-	  case 't':
-	      if ( vict )
-		  return IS_EVIL( vict );
-	      else
-		  return -1;
-	  case 'r':
-	      if ( rndm )
-		  return IS_EVIL( rndm );
-	      else
-		  return -1;
-	  default:
-		  logf( IMMORTAL, LOG_WORLD, "Mob: v%d r%d: bad argument to isgood(): '%s'", mob_index[mob->mobdata->nr].virt, mob->mobdata->nr, ifchck ); 
-	      return -1;
-      }
-    break;
+		return mprog_veval(count, opr, atoi(val));
+	}
+	break;
+	case eNUMOFOBJSINWORLD:
+	{
+		int target = atoi(arg);
+		int count = 0;
 
-    case eISWORN:
-    {
-        obj_data *o = NULL;
+		obj_data *p;
+		for (p = object_list; p; p = p->next)
+		{
+			if (obj_index[p->item_number].virt == target)
+			{
+				count++;
+			}
+		}
+
+		return mprog_veval(count, opr, atoi(val));
+	}
+	break;
+
+	case eNUMOFMOBSINROOM:
+	{
+		int target = atoi(arg);
+		char_data *p;
+		int count = 0;
+		for (p = world[mob->in_room].people; p; p = p->next_in_room)
+			if (IS_MOB(p) && mob_index[p->mobdata->nr].virt == target)
+				count++;
+
+		return mprog_veval(count, opr, atoi(val));
+	}
+	break;
+
+	case eISPC:
+		if (fvict)
+			return !IS_NPC(fvict);
+		if (ye)
+			return FALSE;
+		switch (arg[1]) /* arg should be "$*" so just get the letter */
+		{
+		case 'i':
+			return 0;
+		case 'z':
+			if (mob->beacon)
+				return (IS_NPC((char_data *)mob->beacon));
+			else
+				return -1;
+		case 'n':
+			if (actor)
+				return (!IS_NPC(actor));
+			else
+				return 0;
+		case 't':
+			if (vict)
+				return (!IS_NPC(vict));
+			else
+				return 0;
+		case 'r':
+			if (rndm)
+				return (!IS_NPC(rndm));
+			else
+				return 0;
+		case 'f':
+			if (actor && actor->fighting)
+				return (!IS_NPC(actor->fighting));
+			else
+				return 0;
+		case 'g':
+			if (mob && mob->fighting)
+				return (!IS_NPC(mob->fighting));
+			else
+				return 0;
+		default:
+			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d bad argument to 'ispc'", mob_index[mob->mobdata->nr].virt);
+			return -1;
+		}
+		break;
+
+	case eISWIELDING:
+		if (fvict)
+			return fvict->equipment[WIELD] ? 1 : 0;
+		if (ye)
+			return FALSE;
+		switch (arg[1]) /* arg should be "$*" so just get the letter */
+		{
+		case 'i':
+			return (mob->equipment[WIELD]) ? 1 : 0;
+		case 'z':
+			if (mob->beacon)
+				return ((char_data *)mob->beacon)->equipment[WIELD] ? 1 : 0;
+			else
+				return -1;
+
+		case 'n':
+			if (actor)
+				return (actor->equipment[WIELD]) ? 1 : 0;
+			else
+				return 0;
+		case 't':
+			if (vict)
+				return (vict->equipment[WIELD]) ? 1 : 0;
+			else
+				return 0;
+		case 'r':
+			if (rndm)
+				return (rndm->equipment[WIELD]) ? 1 : 0;
+			else
+				return 0;
+		case 'f':
+			if (actor && actor->fighting)
+				return (actor->fighting->equipment[WIELD]) ? 1 : 0;
+			else
+				return 0;
+		case 'g':
+			if (mob && mob->fighting)
+				return (mob->fighting->equipment[WIELD]) ? 1 : 0;
+			else
+				return 0;
+		default:
+			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d bad argument to 'iswielding'", mob_index[mob->mobdata->nr].virt);
+			return -1;
+		}
+		break;
+
+	case eISWEAPPRI:
+		if (fvict && fvict->equipment[WIELD])
+			return mprog_veval(fvict->equipment[WIELD]->obj_flags.value[3], opr, atoi(val));
+		if (ye)
+			return FALSE;
+		switch (arg[1]) /* arg should be "$*" so just get the letter */
+		{
+		case 'i':
+			if (mob->equipment[WIELD])
+				return mprog_veval(mob->equipment[WIELD]->obj_flags.value[3], opr, atoi(val));
+			else
+				return 0;
+		case 'z':
+			if (mob->beacon && ((char_data *)mob->beacon)->equipment[WIELD])
+				return mprog_veval(((char_data *)mob->beacon)->equipment[WIELD]->obj_flags.value[3], opr, atoi(val));
+			else
+				return -1;
+		case 'n':
+			if (actor && actor->equipment[WIELD])
+				return mprog_veval(actor->equipment[WIELD]->obj_flags.value[3], opr, atoi(val));
+			else
+				return 0;
+		case 't':
+			if (vict && vict->equipment[WIELD])
+				return mprog_veval(vict->equipment[WIELD]->obj_flags.value[3], opr, atoi(val));
+			else
+				return 0;
+		case 'r':
+			if (rndm && rndm->equipment[WIELD])
+				return mprog_veval(rndm->equipment[WIELD]->obj_flags.value[3], opr, atoi(val));
+			else
+				return 0;
+		default:
+			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d bad argument to 'isweappri'", mob_index[mob->mobdata->nr].virt);
+			return -1;
+		}
+		break;
+
+	case eISWEAPSEC:
+		if (fvict && fvict->equipment[SECOND_WIELD])
+			return mprog_veval(fvict->equipment[SECOND_WIELD]->obj_flags.value[3], opr, atoi(val));
+		if (ye)
+			return FALSE;
+		switch (arg[1]) /* arg should be "$*" so just get the letter */
+		{
+		case 'i':
+			if (mob->equipment[SECOND_WIELD])
+				return mprog_veval(mob->equipment[SECOND_WIELD]->obj_flags.value[3], opr, atoi(val));
+			else
+				return 0;
+		case 'z':
+			if (mob->beacon && ((char_data *)mob->beacon)->equipment[SECOND_WIELD])
+				return mprog_veval(((char_data *)mob->beacon)->equipment[SECOND_WIELD]->obj_flags.value[3], opr, atoi(val));
+			else
+				return -1;
+		case 'n':
+			if (actor && actor->equipment[SECOND_WIELD])
+				return mprog_veval(actor->equipment[SECOND_WIELD]->obj_flags.value[3], opr, atoi(val));
+			else
+				return 0;
+		case 't':
+			if (vict && vict->equipment[SECOND_WIELD])
+				return mprog_veval(vict->equipment[SECOND_WIELD]->obj_flags.value[3], opr, atoi(val));
+			else
+				return 0;
+		case 'r':
+			if (rndm && rndm->equipment[SECOND_WIELD])
+				return mprog_veval(rndm->equipment[SECOND_WIELD]->obj_flags.value[3], opr, atoi(val));
+			else
+				return 0;
+		default:
+			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d bad argument to 'isweapsec'", mob_index[mob->mobdata->nr].virt);
+			return -1;
+		}
+		break;
+
+	case eISNPC:
+		if (fvict)
+			return IS_NPC(fvict);
+		if (ye)
+			return FALSE;
+		switch (arg[1]) /* arg should be "$*" so just get the letter */
+		{
+		case 'i':
+			return 1;
+		case 'z':
+			if (mob->beacon)
+				return IS_NPC(((char_data *)mob->beacon)) / 100;
+			else
+				return -1;
+
+		case 'n':
+			if (actor)
+				return IS_NPC(actor) / 100;
+			else
+				return -1;
+		case 't':
+			if (vict)
+				return IS_NPC(vict) / 100;
+			else
+				return -1;
+		case 'r':
+			if (rndm)
+				return IS_NPC(rndm) / 100;
+			else
+				return -1;
+		default:
+			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: v%d r%d: bad argument to isnpc(): '%s'", mob_index[mob->mobdata->nr].virt, mob->mobdata->nr, ifchck);
+			return -1;
+		}
+		break;
+
+	case eISGOOD:
+		if (fvict)
+			return IS_GOOD(fvict);
+		if (ye)
+			return FALSE;
+
+		switch (arg[1]) /* arg should be "$*" so just get the letter */
+		{
+		case 'i':
+			return IS_GOOD(mob);
+		case 'z':
+			if (mob->beacon)
+				return IS_GOOD(((char_data *)mob->beacon));
+			else
+				return -1;
+		case 'n':
+			if (actor)
+				return IS_GOOD(actor);
+			else
+				return -1;
+		case 't':
+			if (vict)
+				return IS_GOOD(vict);
+			else
+				return -1;
+		case 'r':
+			if (rndm)
+				return IS_GOOD(rndm);
+			else
+				return -1;
+		default:
+			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: v%d r%d: bad argument to isgood(): '%s'", mob_index[mob->mobdata->nr].virt, mob->mobdata->nr, ifchck);
+			return -1;
+		}
+		break;
+
+	case eISNEUTRAL:
+		if (fvict)
+			return IS_NEUTRAL(fvict);
+		if (ye)
+			return FALSE;
+
+		switch (arg[1]) /* arg should be "$*" so just get the letter */
+		{
+		case 'i':
+			return IS_NEUTRAL(mob);
+		case 'z':
+			if (mob->beacon)
+				return IS_NEUTRAL(((char_data *)mob->beacon));
+			else
+				return -1;
+		case 'n':
+			if (actor)
+				return IS_NEUTRAL(actor);
+			else
+				return -1;
+		case 't':
+			if (vict)
+				return IS_NEUTRAL(vict);
+			else
+				return -1;
+		case 'r':
+			if (rndm)
+				return IS_NEUTRAL(rndm);
+			else
+				return -1;
+		default:
+			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: v%d r%d: bad argument to isgood(): '%s'", mob_index[mob->mobdata->nr].virt, mob->mobdata->nr, ifchck);
+			return -1;
+		}
+		break;
+
+	case eISEVIL:
+		if (fvict)
+			return IS_EVIL(fvict);
+		if (ye)
+			return FALSE;
+
+		switch (arg[1]) /* arg should be "$*" so just get the letter */
+		{
+		case 'i':
+			return IS_EVIL(mob);
+		case 'z':
+			if (mob->beacon)
+				return IS_EVIL(((char_data *)mob->beacon));
+			else
+				return -1;
+		case 'n':
+			if (actor)
+				return IS_EVIL(actor);
+			else
+				return -1;
+		case 't':
+			if (vict)
+				return IS_EVIL(vict);
+			else
+				return -1;
+		case 'r':
+			if (rndm)
+				return IS_EVIL(rndm);
+			else
+				return -1;
+		default:
+			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: v%d r%d: bad argument to isgood(): '%s'", mob_index[mob->mobdata->nr].virt, mob->mobdata->nr, ifchck);
+			return -1;
+		}
+		break;
+
+	case eISWORN:
+	{
+		obj_data *o = NULL;
 		if (mob->mobdata->isObject())
 		{
 			o = mob->mobdata->getObject();
 		}
-	if (fvict)
-   	  return is_wearing(fvict, o);
-	if (ye) return FALSE;
-      switch ( arg[1] )  /* arg should be "$*" so just get the letter */
-	{
-	case 'z': if (mob->beacon)
-             return is_wearing(((char_data*)mob->beacon), o);
-           else return -1;
-	case 'i': return -1;
-	case 'n': if ( actor )
-	             return is_wearing(actor,o);
-	          else return -1;
-	case 't': if ( vict )
-	             return is_wearing(actor,o);
-	          else return -1;
-	case 'r': if ( rndm )
-	             return is_wearing(rndm, o);
-	          else return -1;
-	default:
-	  logf( IMMORTAL, LOG_WORLD, "Mob: v%d r%d: bad argument to isword(): '%s'", mob_index[mob->mobdata->nr].virt, mob->mobdata->nr, ifchck ); 
-	  return -1;
-	}
-     }
-     break;
-     
-     case eISFIGHT:
-	if (fvict)
-	  return fvict->fighting ? 1:0;
-	if (ye) return FALSE;
-      switch ( arg[1] )  /* arg should be "$*" so just get the letter */
-	{
-	case 'z': if (mob->beacon)
-             return ((char_data*)mob->beacon)->fighting ? 1:0;
-           else return -1;
-
-	case 'i': return ( mob->fighting ) ? 1 : 0;
-	case 'n': if ( actor )
-	             return ( actor->fighting ) ? 1 : 0;
-	          else return -1;
-	case 't': if ( vict )
-	             return ( vict->fighting ) ? 1 : 0;
-	          else return -1;
-	case 'r': if ( rndm )
-	             return ( rndm->fighting ) ? 1 : 0;
-	          else return -1;
-	default:
-      logf( IMMORTAL, LOG_WORLD, "Mob: v%d r%d: bad argument to isfight(): '%s'", mob_index[mob->mobdata->nr].virt, mob->mobdata->nr, ifchck ); 
-	  return -1;
-	}
-    break;
-
-    case eISTANK:
-	if (fvict)
-	  return istank(fvict);
-	if (ye) return FALSE;
-      switch ( arg[1] )  /* arg should be "$*" so just get the letter */
-	{
-	case 'z': if (mob->beacon)
-             return istank(((char_data*)mob->beacon));
-           else return -1;
-
-	case 'i': return istank( mob );
-	case 'n': if ( actor )
-	             return  istank( actor );
-	          else return -1;
-	case 't': if ( vict )
-	             return istank( vict ) ? 1 : 0;
-	          else return -1;
-	case 'r': if ( rndm )
-	             return istank( rndm ) ? 1 : 0;
-	          else return -1;
-	default:
-	  logf( IMMORTAL, LOG_WORLD, "Mob: v%d r%d: bad argument to istank(): '%s'", mob_index[mob->mobdata->nr].virt, mob->mobdata->nr, ifchck ); 
-	  return -1;
-	}
-    break;
-
-    case eISIMMORT:
-	if (fvict)
-	  return GET_LEVEL(fvict) > IMMORTAL;
-	if (ye) return FALSE;
-      switch ( arg[1] )  /* arg should be "$*" so just get the letter */
-	{
-	case 'i': return ( GET_LEVEL( mob ) > IMMORTAL );
-	case 'z': if (mob->beacon)
-             return ( GET_LEVEL(((char_data*)mob->beacon)) > IMMORTAL);
-           else return -1;
-
-	case 'n': if ( actor )
-	             return ( GET_LEVEL( actor ) > IMMORTAL );
-  	          else return -1;
-	case 't': if ( vict )
-	             return ( GET_LEVEL( vict ) > IMMORTAL );
-                  else return -1;
-	case 'r': if ( rndm )
-	             return ( GET_LEVEL( rndm ) > IMMORTAL );
-                  else return -1;
-	default:
-	  logf( IMMORTAL, LOG_WORLD, "Mob: v%d r%d: bad argument to isimmort(): '%s'", mob_index[mob->mobdata->nr].virt, mob->mobdata->nr, ifchck ); 
-	  return -1;
-	}
-    break;
-
-    case eISCHARMED:
-	if (fvict)
-	  return IS_AFFECTED(fvict, AFF_CHARM);
-	if (ye) return FALSE;
-
-      switch ( arg[1] )  /* arg should be "$*" so just get the letter */
-	{
-	case 'i': return IS_AFFECTED( mob, AFF_CHARM );
-	case 'z': if (mob->beacon)
-             return IS_AFFECTED(((char_data*)mob->beacon), AFF_CHARM);
-           else return -1;
-
-	case 'n': if ( actor )
-	             return IS_AFFECTED( actor, AFF_CHARM );
-	          else return -1;
-	case 't': if ( vict )
-	             return IS_AFFECTED( vict, AFF_CHARM );
-	          else return -1;
-	case 'r': if ( rndm )
-	             return IS_AFFECTED( rndm, AFF_CHARM );
-	          else return -1;
-	default:
-	  logf( IMMORTAL, LOG_WORLD,  "Mob: %d bad argument to 'ischarmed'",
-	       mob_index[mob->mobdata->nr].virt );
-		    
-	  return -1;
-	}
-    break;
-
-    case eISFOLLOW:
-	if (fvict)
-	  return (fvict->master != NULL && fvict->master->in_room == fvict->in_room);
-	if (ye) return FALSE;
-      switch ( arg[1] )  /* arg should be "$*" so just get the letter */
-	{
-	case 'i': return ( mob->master != NULL
-			  && mob->master->in_room == mob->in_room );
-	case 'z': if (mob->beacon)
-             return ((char_data*)mob->beacon)->master && ((char_data*)mob->beacon)->master->in_room
-			== ((char_data*)mob->beacon)->in_room;
-           else return -1;
-	case 'n': if ( actor )
-	             return ( actor->master != NULL
-			     && actor->master->in_room == actor->in_room );
-	          else return -1;
-	case 't': if ( vict )
-	             return ( vict->master != NULL
-			     && vict->master->in_room == vict->in_room );
-	          else return -1;
-	case 'r': if ( rndm )
-	             return ( rndm->master != NULL
-			     && rndm->master->in_room == rndm->in_room );
-	          else return -1;
-	default:
-	  logf( IMMORTAL, LOG_WORLD,  "Mob: %d bad argument to 'isfollow'", mob_index[mob->mobdata->nr].virt ); 
-	  return -1;
-	}
-    break;
-
-    case eISSPELLED:
-    {
-	int find_skill_num(char *name);
-
-	if (!str_cmp(val, "fly")) // needs special check.. sigh..
-	{
-	  if (fvict && IS_AFFECTED(fvict, AFF_FLYING)) return TRUE;
-  	  if (ye) return FALSE;
-          switch (arg[1]) 
-          {
-            case 'i': // mob
-	      if (IS_AFFECTED(mob, AFF_FLYING)) return TRUE;
-	    break;
-	    case 'z': if (mob->beacon)
-	      if (IS_AFFECTED(((char_data*)mob->beacon), AFF_FLYING)) return TRUE;
-	    break;
-	    case 'n': // actor
-	 	if (actor)
-		if (IS_AFFECTED(actor, AFF_FLYING)) return TRUE;
-	    break;
-	    case 't': // vict
-		if (vict)
-		if (IS_AFFECTED(vict, AFF_FLYING)) return TRUE;
-	    break;
-	    case 'r': //rand
-		if (rndm)
-		if (IS_AFFECTED(rndm, AFF_FLYING)) return TRUE;
-	    break;
-            case 'f': if (actor && actor->fighting)
-                    if (IS_AFFECTED(actor->fighting, AFF_FLYING)) return TRUE;
-	    break;
-             case 'g': if (mob && mob->fighting)
-                    if (IS_AFFECTED(mob->fighting, AFF_FLYING)) return TRUE;
-	    break;
-	    default:
-	       logf( IMMORTAL, LOG_WORLD,  "Mob: %d bad argument to 'isspelled'",
-	       mob_index[mob->mobdata->nr].virt ); 
-	       return -1;
-          }
-	}
-
-	if (fvict)
-	  return (int64_t)(affected_by_spell(fvict, find_skill_num(val)));
-	if (ye) return FALSE;
-     switch (arg[1]) 
-     {
-        case 'i': // mob
-		return (int64_t)(affected_by_spell(mob, find_skill_num(val)));
-	case 'z': if (mob->beacon)
-             return (int64_t)(affected_by_spell(((char_data*)mob->beacon), find_skill_num(val)));
-           else return -1;
-
-	case 'n': // actor
-	 	if (actor)
-                return (int64_t)(affected_by_spell(actor, find_skill_num(val)));
-		else return -1;
-	case 't': // vict
-		if (vict)
-                return (int64_t)(affected_by_spell(vict, find_skill_num(val)));
-		else return -1;
-	case 'r': //rand
-		if (rndm)
-                return (int64_t)(affected_by_spell(rndm, find_skill_num(val)));
-		return -1;
-        case 'f': if (actor && actor->fighting)
-                    return (int64_t)(affected_by_spell(actor->fighting, find_skill_num(val)));
-                  else return -1;
-        case 'g': if (mob && mob->fighting)
-                    return (int64_t)(affected_by_spell(mob->fighting, find_skill_num(val)));
-                  else return 0;
-	default:
-	  logf( IMMORTAL, LOG_WORLD,  "Mob: %d bad argument to 'isspelled'",
-	       mob_index[mob->mobdata->nr].virt ); 
-	  return -1;
-
-     }
-  }
-  break;
-
-  case eISAFFECTED:
-	if (fvict)
-	return (ISSET(fvict->affected_by, atoi(val)));
-	if (ye) return FALSE;
-
-      switch ( arg[1] )  /* arg should be "$*" so just get the letter */
-	{
-	case 'i': return ( ISSET(mob->affected_by, atoi( val )) );
-	case 'z': if (mob->beacon)
-             return ( ISSET(((char_data*)mob->beacon)->affected_by, atoi(val)) );
-             else return -1;
-
-	case 'n': if ( actor )
-	             return ( ISSET(actor->affected_by, atoi( val )) );
-	          else return -1;
-	case 't': if ( vict )
-	             return ( ISSET(vict->affected_by, atoi( val )) );
-	          else return -1;
-	case 'r': if ( rndm )
-	             return ( ISSET(rndm->affected_by, atoi( val )) );
-	          else return -1;
-	default:
-	  logf( IMMORTAL, LOG_WORLD,  "Mob: %d bad argument to 'isaffected'",
-	       mob_index[mob->mobdata->nr].virt ); 
-	  return -1;
-	}
-  break;
-
-  case eHITPRCNT:
-  {
-        int lhsvl, rhsvl;
-	if (fvict)
-	{
-	  lhsvl = (fvict->hit*100) / fvict->max_hit;
-	  rhsvl = atoi(val);
-	  return mprog_veval(lhsvl, opr, rhsvl);
-	}
-	if (ye) return FALSE;
-      switch ( arg[1] )  /* arg should be "$*" so just get the letter */
-	{
-	case 'i': lhsvl = (mob->hit*100)  / mob->max_hit;
-	          rhsvl = atoi( val );
-         	  return mprog_veval( lhsvl, opr, rhsvl );
-	case 'z': if (mob->beacon) {
-		lhsvl = (((char_data*)mob->beacon)->hit*100)/((char_data*)mob->beacon)->max_hit;
-		rhsvl = atoi(val);
-             return mprog_veval(lhsvl, opr, rhsvl);
-	  }
-           else return -1;
-
-	case 'n': if ( actor )
-	          {
-		    lhsvl = (actor->hit*100) / actor->max_hit;
-		    rhsvl = atoi( val );
-		    return mprog_veval( lhsvl, opr, rhsvl );
-		  }
-	          else
-		    return -1;
-	case 't': if ( vict )
-	          {
-		    lhsvl = (vict->hit*100) / vict->max_hit;
-		    rhsvl = atoi( val );
-		    return mprog_veval( lhsvl, opr, rhsvl );
-		  }
-	          else
-		    return -1;
-	case 'r': if ( rndm )
-	          {
-		    lhsvl = (rndm->hit*100) / rndm->max_hit;
-		    rhsvl = atoi( val );
-		    return mprog_veval( lhsvl, opr, rhsvl );
-		  }
-	          else
-		    return -1;
-	default:
-	  logf( IMMORTAL, LOG_WORLD,  "Mob: %d bad argument to 'hitprcnt'", mob_index[mob->mobdata->nr].virt ); 
-	  return -1;
-	}
-  }
-  break;
-
-  case eWEARS:
-  {
-    struct obj_data *obj=0;
-    char_data *take;
-    char bufeh[MAX_STRING_LENGTH];
-    char *valu = one_argument(val, bufeh);
-
-
-    if (fvict) {
-	obj = search_char_for_item(fvict, real_object(atoi(valu)), TRUE);
-	take = fvict;
-    }
-   else {
-	if (ye) return FALSE;
-    switch (arg[1] )
-    {
-	case 'z': if (!mob->beacon) return -1;
-		obj = search_char_for_item(((char_data*)mob->beacon), real_object(atoi(valu)), TRUE);
-	      take = ((char_data*)mob->beacon);
-       case 'i': // mob
-          obj = search_char_for_item(mob, real_object(atoi(valu)),TRUE);
-	  take = mob;
-	   break;
-       case 'n': // actor
-	 if (!actor) return -1;
-         obj = search_char_for_item(actor, real_object(atoi(valu)),TRUE);
-	 take = actor;
-	     break;
-	case 't': // vict
-	  if (!vict) return -1;
-          obj = search_char_for_item(vict, real_object(atoi(valu)),TRUE);
-	  take = vict;
-	  break;
-       case 'r': // rndm
-	 if (!rndm) return -1;
-	  obj = search_char_for_item(rndm, real_object(atoi(valu)),TRUE);
-	  take = rndm;
-	  break;
-	default:
-          logf( IMMORTAL, LOG_WORLD,  "Mob: %d bad argument to 'carries'", mob_index[mob->mobdata->nr].virt );
-	  return -1;
-    }
-  }
-    if (!obj) return 0;
-    if (!str_cmp(bufeh, "keep"))
-       return 1;
-    else if (!str_cmp(bufeh, "take"))
-    {
-	int i;
-       if (obj->carried_by)
-	  obj_from_char(obj);
-      for (i=0; i < MAX_WEAR; i++)
-	 if (obj == take->equipment[i])
-	 {
-	   obj_from_char(unequip_char(take, i));
-	 }
-      extract_obj(obj);
-      return 1;
-    }
-    return -1;
-  }
-  break;
-  
-  case eCARRIES:
-  {
-    struct obj_data *obj=0;
-    char_data *take;
-    char bufeh[MAX_STRING_LENGTH];
-    char *valu = one_argument(val, bufeh);
-    if (fvict) {
-      obj = search_char_for_item(fvict, real_object(atoi(valu)), false);
-	take = fvict;
-   } else {
-	if (ye) return FALSE;
-    switch (arg[1] )
-    {
-	case 'z': if (!mob->beacon) return -1;
-		obj = search_char_for_item(((char_data*)mob->beacon), real_object(atoi(valu)), false);
-	      take = ((char_data*)mob->beacon);
-       case 'i': // mob
-          obj = search_char_for_item(mob, real_object(atoi(valu)), false);
-	  take = mob;
-	   break;
-       case 'n': // actor
-	 if (!actor) return -1;
-         obj = search_char_for_item(actor, real_object(atoi(valu)), false);
-	 take = actor;
-	     break;
-	case 't': // vict
-	  if (!vict) return -1;
-          obj = search_char_for_item(vict, real_object(atoi(valu)), false);
-	  take = vict;
-	  break;
-       case 'r': // rndm
-	 if (!rndm) return -1;
-	  obj = search_char_for_item(rndm, real_object(atoi(valu)), false);
-	  take = rndm;
-	  break;
-	default:
-          logf( IMMORTAL, LOG_WORLD,  "Mob: %d bad argument to 'carries'", mob_index[mob->mobdata->nr].virt );
-	  return -1;
-    }
- }
-    if (!obj) return 0;
-    if (!str_cmp(bufeh, "keep"))
-       return 1;
-    else if (!str_cmp(bufeh, "take"))
-    {
-	int i;
-       if (obj->carried_by)
-	  obj_from_char(obj);
-      for (i=0; i < MAX_WEAR; i++)
-	 if (obj == take->equipment[i])
-	 {
-	   obj_from_char(unequip_char(take, i));
-	 }
-      extract_obj(obj);
-      return 1;
-    }
-    return -1;
-  }
-  break;
-
-  case eNUMBER:
-  {
-    int lhsvl, rhsvl;
-      if (fvict) {
-	if (!IS_NPC(fvict)) return 0;
-	     lhsvl = mob_index[fvict->mobdata->nr].virt;
-	     rhsvl = atoi(val);
-             return mprog_veval(lhsvl, opr, rhsvl);
-	}
-	if (ye) return FALSE;
-
-      switch ( arg[1] )  /* arg should be "$*" so just get the letter */
-	{
-	case 'i': lhsvl = mob_index[mob->mobdata->nr].virt;
-	          rhsvl = atoi( val );
-	          return mprog_veval( lhsvl, opr, rhsvl );
-	case 'z': if (mob->beacon)
-	  {
-		if (IS_NPC(((char_data*)mob->beacon)))
+		if (fvict)
+			return is_wearing(fvict, o);
+		if (ye)
+			return FALSE;
+		switch (arg[1]) /* arg should be "$*" so just get the letter */
 		{
-	      lhsvl = mob_index[((char_data*)mob->beacon)->mobdata->nr].virt;
-	     rhsvl = atoi(val);
-             return mprog_veval(lhsvl, opr, rhsvl);
-		} else
-		return 0;
-	  }
-           else return 0;
-
-	case 'n': if ( actor )
-	          {
-		    if IS_NPC( actor )
-		    {
-		      lhsvl = mob_index[actor->mobdata->nr].virt;
-		      rhsvl = atoi( val );
-		      return mprog_veval( lhsvl, opr, rhsvl );
-		    }
-		  }
-	          else
-		    return 0;
-	case 't': if ( vict )
-	          {
-		    if IS_NPC( actor )
-		    {
-		      lhsvl = mob_index[vict->mobdata->nr].virt;
-		      rhsvl = atoi( val );
-		      return mprog_veval( lhsvl, opr, rhsvl );
-		    }
-		  }
-                  else
-		    return 0;
-	case 'r': if ( rndm )
-	          {
-		    if IS_NPC( actor )
-		    {
-		      lhsvl = mob_index[rndm->mobdata->nr].virt;
-		      rhsvl = atoi( val );
-		      return mprog_veval( lhsvl, opr, rhsvl );
-		    }
-		  }
-	         else return 0;
-	case 'o': if ( obj )
-	          {
-		    lhsvl = obj_index[obj->item_number].virt;
-		    rhsvl = atoi( val );
-		    return mprog_veval( lhsvl, opr, rhsvl );
-		  }
-	          else
-		    return -1;
-	case 'p': if ( v_obj )
-	          {
-		    lhsvl = obj_index[v_obj->item_number].virt;
-		    rhsvl = atoi( val );
-		    return mprog_veval( lhsvl, opr, rhsvl );
-		  }
-	          else
-		    return -1;
-	default:
-	  logf( IMMORTAL, LOG_WORLD,  "Mob: %d bad argument to 'number'", mob_index[mob->mobdata->nr].virt ); 
-	  return -1;
-	}
-  }
-  break;
-
-  case eTEMPVAR:
-  {
-      char buf4[MAX_STRING_LENGTH], *buf4pt;
-      if (arg[2] != '[')
-      {
-          logf( IMMORTAL, LOG_WORLD,  "Mob: %d badtarget  to 'tempvar'",mob_index[mob->mobdata->nr].virt );
-	  return -1;
-      }	
-      buf4pt = &arg[3];
-      strcpy(buf4, buf4pt);
-      buf4pt = &buf4[0];
-      while (*buf4pt != ']' && *buf4pt != '\0')
-	buf4pt++;
-      if (*buf4pt == '\0')
-      {
-          logf( IMMORTAL, LOG_WORLD,  "Mob: %d bad target to 'tempvar'",mob_index[mob->mobdata->nr].virt );
-          return -1;
-      }
-      *buf4pt = '\0';
-      if (val[0] == '$' && val[1])
-        mprog_translate(val[1], val, mob, actor, obj, vo, rndm);
-
-      if (fvict)
-       return mprog_seval(mob, getTemp(fvict, buf4), opr, val);
-	if (ye) return FALSE;
-      switch ( arg[1] )  /* arg should be "$*" so just get the letter */
-        {
-	case 'z': if (mob->beacon)
-	  {
-             return mprog_seval(mob, getTemp(((char_data*)mob->beacon), buf4), opr, val);
-	  }
-           else return -1;
-        case 'i': return mprog_seval(mob, getTemp(mob, buf4), opr, val );
-        case 'n': if ( actor )
-                    return mprog_seval(mob, getTemp(actor, buf4), opr, val );
-                  else
-                    return -1;
-        case 't': if ( vict )
-                    return mprog_seval(mob, getTemp(vict, buf4), opr, val );
-                  else
-                    return -1;
-        case 'r': if ( rndm )
-                    return mprog_seval(mob, getTemp(rndm, buf4), opr, val );
-                  else
-                    return -1;
-        case 'o': 
-                    return -1;
-        case 'p': 
-                    return -1;
-        default:
-          logf( IMMORTAL, LOG_WORLD,  "Mob: %d bad argument to 'tempvar'",mob_index[mob->mobdata->nr].virt );
-          return -1;
-        }
-  }
-  break;
-
-  // search a room for a mob with vnum arg
-  case eISMOBVNUMINROOM:
-  {
-      int target = atoi(arg);
-
-      for(char_data * vch = world[mob->in_room].people;
-          vch;
-          vch = vch->next_in_room)
-      {
-        if(IS_NPC(vch) && 
-           vch != mob && 
-           mob_index[vch->mobdata->nr].virt == target)
-          return 1;
-      }
-      return 0;
-  }
-  break;
-
-  // search a room for a obj with vnum arg
-  case eISOBJVNUMINROOM:
-    {
-      int target = atoi(arg);
-
-      for(obj_data * obj = world[mob->in_room].contents;
-          obj;
-          obj = obj->next_content)
-      {
-        if(obj_index[obj->item_number].virt == target)
-          return 1;
-      }
-      return 0;
-    }
-  break;
-
-  case eCANSEE:
-	if (fvict)
-	return CAN_SEE(mob, fvict, TRUE);
-	if (ye) return FALSE;
-	switch ( arg[1] ) /* arg should be "$*" so just get the letter */
-	{
-		case 'z': return 1; // can always see holder
-		case 'i': return 1;
-		case 'n': if ( actor )
-		return CAN_SEE(mob, actor,TRUE );
-		else return -1;
-		case 't': if ( vict )
-		return CAN_SEE(mob, vict,TRUE );
-		else return -1;
-		case 'r': if ( rndm )
-		return CAN_SEE(mob, rndm,TRUE );
-		else return -1;
-		default:
-		logf( IMMORTAL, LOG_WORLD, "Mob: %d bad argument to 'isnpc'", mob_index[mob->mobdata->nr].virt );
-		return -1;
-	}
-  break;
-
-  case eINSAMEZONE:
-      if(fvict)
-        return (GET_ZONE(fvict) == GET_ZONE(mob)); 
-      else if((fvict = get_pc(arg)) != NULL) 
-        return (GET_ZONE(fvict) == GET_ZONE(mob)); 
-
-      switch( arg[1] )
-      {
-        case 'i': return 1; //always in the same zone as itself
-        case 'n': if ( actor )
-            return (GET_ZONE(actor) == GET_ZONE(mob));
-            else return -1;
-        case 'r':
-        case 't': if ( vict )
-            return (GET_ZONE(vict) == GET_ZONE(mob));
-            else return -1;
-	default:
-	  logf( IMMORTAL, LOG_WORLD, "Mob: %d bad argument to 'insamezone'", mob_index[mob->mobdata->nr].virt ); 
-	  return -1;
-      }
-  break;
-
-  case eCLAN:
-	if(fvict)
-	return fvict->clan;
-	switch( arg[1] )
-	{
-		case 'i': return mob->clan; //always in the same zone as itself
-		case 'n': if ( actor )
-		return actor->clan;
-		else return -1;
+		case 'z':
+			if (mob->beacon)
+				return is_wearing(((char_data *)mob->beacon), o);
+			else
+				return -1;
+		case 'i':
+			return -1;
+		case 'n':
+			if (actor)
+				return is_wearing(actor, o);
+			else
+				return -1;
+		case 't':
+			if (vict)
+				return is_wearing(actor, o);
+			else
+				return -1;
 		case 'r':
-		case 't': if ( vict )
-		return vict->clan;
-		else return -1;
+			if (rndm)
+				return is_wearing(rndm, o);
+			else
+				return -1;
 		default:
-		logf( IMMORTAL, LOG_WORLD, "Mob: %d bad argument to 'clan'", mob_index[mob->mobdata->nr].virt );
+			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: v%d r%d: bad argument to isword(): '%s'", mob_index[mob->mobdata->nr].virt, mob->mobdata->nr, ifchck);
+			return -1;
+		}
+	}
+	break;
+
+	case eISFIGHT:
+		if (fvict)
+			return fvict->fighting ? 1 : 0;
+		if (ye)
+			return FALSE;
+		switch (arg[1]) /* arg should be "$*" so just get the letter */
+		{
+		case 'z':
+			if (mob->beacon)
+				return ((char_data *)mob->beacon)->fighting ? 1 : 0;
+			else
+				return -1;
+
+		case 'i':
+			return (mob->fighting) ? 1 : 0;
+		case 'n':
+			if (actor)
+				return (actor->fighting) ? 1 : 0;
+			else
+				return -1;
+		case 't':
+			if (vict)
+				return (vict->fighting) ? 1 : 0;
+			else
+				return -1;
+		case 'r':
+			if (rndm)
+				return (rndm->fighting) ? 1 : 0;
+			else
+				return -1;
+		default:
+			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: v%d r%d: bad argument to isfight(): '%s'", mob_index[mob->mobdata->nr].virt, mob->mobdata->nr, ifchck);
+			return -1;
+		}
+		break;
+
+	case eISTANK:
+		if (fvict)
+			return istank(fvict);
+		if (ye)
+			return FALSE;
+		switch (arg[1]) /* arg should be "$*" so just get the letter */
+		{
+		case 'z':
+			if (mob->beacon)
+				return istank(((char_data *)mob->beacon));
+			else
+				return -1;
+
+		case 'i':
+			return istank(mob);
+		case 'n':
+			if (actor)
+				return istank(actor);
+			else
+				return -1;
+		case 't':
+			if (vict)
+				return istank(vict) ? 1 : 0;
+			else
+				return -1;
+		case 'r':
+			if (rndm)
+				return istank(rndm) ? 1 : 0;
+			else
+				return -1;
+		default:
+			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: v%d r%d: bad argument to istank(): '%s'", mob_index[mob->mobdata->nr].virt, mob->mobdata->nr, ifchck);
+			return -1;
+		}
+		break;
+
+	case eISIMMORT:
+		if (fvict)
+			return GET_LEVEL(fvict) > IMMORTAL;
+		if (ye)
+			return FALSE;
+		switch (arg[1]) /* arg should be "$*" so just get the letter */
+		{
+		case 'i':
+			return (GET_LEVEL(mob) > IMMORTAL);
+		case 'z':
+			if (mob->beacon)
+				return (GET_LEVEL(((char_data *)mob->beacon)) > IMMORTAL);
+			else
+				return -1;
+
+		case 'n':
+			if (actor)
+				return (GET_LEVEL(actor) > IMMORTAL);
+			else
+				return -1;
+		case 't':
+			if (vict)
+				return (GET_LEVEL(vict) > IMMORTAL);
+			else
+				return -1;
+		case 'r':
+			if (rndm)
+				return (GET_LEVEL(rndm) > IMMORTAL);
+			else
+				return -1;
+		default:
+			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: v%d r%d: bad argument to isimmort(): '%s'", mob_index[mob->mobdata->nr].virt, mob->mobdata->nr, ifchck);
+			return -1;
+		}
+		break;
+
+	case eISCHARMED:
+		if (fvict)
+			return IS_AFFECTED(fvict, AFF_CHARM);
+		if (ye)
+			return FALSE;
+
+		switch (arg[1]) /* arg should be "$*" so just get the letter */
+		{
+		case 'i':
+			return IS_AFFECTED(mob, AFF_CHARM);
+		case 'z':
+			if (mob->beacon)
+				return IS_AFFECTED(((char_data *)mob->beacon), AFF_CHARM);
+			else
+				return -1;
+
+		case 'n':
+			if (actor)
+				return IS_AFFECTED(actor, AFF_CHARM);
+			else
+				return -1;
+		case 't':
+			if (vict)
+				return IS_AFFECTED(vict, AFF_CHARM);
+			else
+				return -1;
+		case 'r':
+			if (rndm)
+				return IS_AFFECTED(rndm, AFF_CHARM);
+			else
+				return -1;
+		default:
+			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d bad argument to 'ischarmed'",
+				 mob_index[mob->mobdata->nr].virt);
+
+			return -1;
+		}
+		break;
+
+	case eISFOLLOW:
+		if (fvict)
+			return (fvict->master != NULL && fvict->master->in_room == fvict->in_room);
+		if (ye)
+			return FALSE;
+		switch (arg[1]) /* arg should be "$*" so just get the letter */
+		{
+		case 'i':
+			return (mob->master != NULL && mob->master->in_room == mob->in_room);
+		case 'z':
+			if (mob->beacon)
+				return ((char_data *)mob->beacon)->master && ((char_data *)mob->beacon)->master->in_room == ((char_data *)mob->beacon)->in_room;
+			else
+				return -1;
+		case 'n':
+			if (actor)
+				return (actor->master != NULL && actor->master->in_room == actor->in_room);
+			else
+				return -1;
+		case 't':
+			if (vict)
+				return (vict->master != NULL && vict->master->in_room == vict->in_room);
+			else
+				return -1;
+		case 'r':
+			if (rndm)
+				return (rndm->master != NULL && rndm->master->in_room == rndm->in_room);
+			else
+				return -1;
+		default:
+			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d bad argument to 'isfollow'", mob_index[mob->mobdata->nr].virt);
+			return -1;
+		}
+		break;
+
+	case eISSPELLED:
+	{
+		int find_skill_num(char *name);
+
+		if (!str_cmp(val, "fly")) // needs special check.. sigh..
+		{
+			if (fvict && IS_AFFECTED(fvict, AFF_FLYING))
+				return TRUE;
+			if (ye)
+				return FALSE;
+			switch (arg[1])
+			{
+			case 'i': // mob
+				if (IS_AFFECTED(mob, AFF_FLYING))
+					return TRUE;
+				break;
+			case 'z':
+				if (mob->beacon)
+					if (IS_AFFECTED(((char_data *)mob->beacon), AFF_FLYING))
+						return TRUE;
+				break;
+			case 'n': // actor
+				if (actor)
+					if (IS_AFFECTED(actor, AFF_FLYING))
+						return TRUE;
+				break;
+			case 't': // vict
+				if (vict)
+					if (IS_AFFECTED(vict, AFF_FLYING))
+						return TRUE;
+				break;
+			case 'r': // rand
+				if (rndm)
+					if (IS_AFFECTED(rndm, AFF_FLYING))
+						return TRUE;
+				break;
+			case 'f':
+				if (actor && actor->fighting)
+					if (IS_AFFECTED(actor->fighting, AFF_FLYING))
+						return TRUE;
+				break;
+			case 'g':
+				if (mob && mob->fighting)
+					if (IS_AFFECTED(mob->fighting, AFF_FLYING))
+						return TRUE;
+				break;
+			default:
+				logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d bad argument to 'isspelled'",
+					 mob_index[mob->mobdata->nr].virt);
+				return -1;
+			}
+		}
+
+		if (fvict)
+			return (int64_t)(affected_by_spell(fvict, find_skill_num(val)));
+		if (ye)
+			return FALSE;
+		switch (arg[1])
+		{
+		case 'i': // mob
+			return (int64_t)(affected_by_spell(mob, find_skill_num(val)));
+		case 'z':
+			if (mob->beacon)
+				return (int64_t)(affected_by_spell(((char_data *)mob->beacon), find_skill_num(val)));
+			else
+				return -1;
+
+		case 'n': // actor
+			if (actor)
+				return (int64_t)(affected_by_spell(actor, find_skill_num(val)));
+			else
+				return -1;
+		case 't': // vict
+			if (vict)
+				return (int64_t)(affected_by_spell(vict, find_skill_num(val)));
+			else
+				return -1;
+		case 'r': // rand
+			if (rndm)
+				return (int64_t)(affected_by_spell(rndm, find_skill_num(val)));
+			return -1;
+		case 'f':
+			if (actor && actor->fighting)
+				return (int64_t)(affected_by_spell(actor->fighting, find_skill_num(val)));
+			else
+				return -1;
+		case 'g':
+			if (mob && mob->fighting)
+				return (int64_t)(affected_by_spell(mob->fighting, find_skill_num(val)));
+			else
+				return 0;
+		default:
+			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d bad argument to 'isspelled'",
+				 mob_index[mob->mobdata->nr].virt);
+			return -1;
+		}
+	}
+	break;
+
+	case eISAFFECTED:
+		if (fvict)
+			return (ISSET(fvict->affected_by, atoi(val)));
+		if (ye)
+			return FALSE;
+
+		switch (arg[1]) /* arg should be "$*" so just get the letter */
+		{
+		case 'i':
+			return (ISSET(mob->affected_by, atoi(val)));
+		case 'z':
+			if (mob->beacon)
+				return (ISSET(((char_data *)mob->beacon)->affected_by, atoi(val)));
+			else
+				return -1;
+
+		case 'n':
+			if (actor)
+				return (ISSET(actor->affected_by, atoi(val)));
+			else
+				return -1;
+		case 't':
+			if (vict)
+				return (ISSET(vict->affected_by, atoi(val)));
+			else
+				return -1;
+		case 'r':
+			if (rndm)
+				return (ISSET(rndm->affected_by, atoi(val)));
+			else
+				return -1;
+		default:
+			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d bad argument to 'isaffected'",
+				 mob_index[mob->mobdata->nr].virt);
+			return -1;
+		}
+		break;
+
+	case eHITPRCNT:
+	{
+		int lhsvl, rhsvl;
+		if (fvict)
+		{
+			lhsvl = (fvict->hit * 100) / fvict->max_hit;
+			rhsvl = atoi(val);
+			return mprog_veval(lhsvl, opr, rhsvl);
+		}
+		if (ye)
+			return FALSE;
+		switch (arg[1]) /* arg should be "$*" so just get the letter */
+		{
+		case 'i':
+			lhsvl = (mob->hit * 100) / mob->max_hit;
+			rhsvl = atoi(val);
+			return mprog_veval(lhsvl, opr, rhsvl);
+		case 'z':
+			if (mob->beacon)
+			{
+				lhsvl = (((char_data *)mob->beacon)->hit * 100) / ((char_data *)mob->beacon)->max_hit;
+				rhsvl = atoi(val);
+				return mprog_veval(lhsvl, opr, rhsvl);
+			}
+			else
+				return -1;
+
+		case 'n':
+			if (actor)
+			{
+				lhsvl = (actor->hit * 100) / actor->max_hit;
+				rhsvl = atoi(val);
+				return mprog_veval(lhsvl, opr, rhsvl);
+			}
+			else
+				return -1;
+		case 't':
+			if (vict)
+			{
+				lhsvl = (vict->hit * 100) / vict->max_hit;
+				rhsvl = atoi(val);
+				return mprog_veval(lhsvl, opr, rhsvl);
+			}
+			else
+				return -1;
+		case 'r':
+			if (rndm)
+			{
+				lhsvl = (rndm->hit * 100) / rndm->max_hit;
+				rhsvl = atoi(val);
+				return mprog_veval(lhsvl, opr, rhsvl);
+			}
+			else
+				return -1;
+		default:
+			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d bad argument to 'hitprcnt'", mob_index[mob->mobdata->nr].virt);
+			return -1;
+		}
+	}
+	break;
+
+	case eWEARS:
+	{
+		struct obj_data *obj = 0;
+		char_data *take;
+		char bufeh[MAX_STRING_LENGTH];
+		char *valu = one_argument(val, bufeh);
+
+		if (fvict)
+		{
+			obj = search_char_for_item(fvict, real_object(atoi(valu)), TRUE);
+			take = fvict;
+		}
+		else
+		{
+			if (ye)
+				return FALSE;
+			switch (arg[1])
+			{
+			case 'z':
+				if (!mob->beacon)
+					return -1;
+				obj = search_char_for_item(((char_data *)mob->beacon), real_object(atoi(valu)), TRUE);
+				take = ((char_data *)mob->beacon);
+			case 'i': // mob
+				obj = search_char_for_item(mob, real_object(atoi(valu)), TRUE);
+				take = mob;
+				break;
+			case 'n': // actor
+				if (!actor)
+					return -1;
+				obj = search_char_for_item(actor, real_object(atoi(valu)), TRUE);
+				take = actor;
+				break;
+			case 't': // vict
+				if (!vict)
+					return -1;
+				obj = search_char_for_item(vict, real_object(atoi(valu)), TRUE);
+				take = vict;
+				break;
+			case 'r': // rndm
+				if (!rndm)
+					return -1;
+				obj = search_char_for_item(rndm, real_object(atoi(valu)), TRUE);
+				take = rndm;
+				break;
+			default:
+				logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d bad argument to 'carries'", mob_index[mob->mobdata->nr].virt);
+				return -1;
+			}
+		}
+		if (!obj)
+			return 0;
+		if (!str_cmp(bufeh, "keep"))
+			return 1;
+		else if (!str_cmp(bufeh, "take"))
+		{
+			int i;
+			if (obj->carried_by)
+				obj_from_char(obj);
+			for (i = 0; i < MAX_WEAR; i++)
+				if (obj == take->equipment[i])
+				{
+					obj_from_char(unequip_char(take, i));
+				}
+			extract_obj(obj);
+			return 1;
+		}
 		return -1;
 	}
-  break;
+	break;
 
+	case eCARRIES:
+	{
+		struct obj_data *obj = 0;
+		char_data *take;
+		char bufeh[MAX_STRING_LENGTH];
+		char *valu = one_argument(val, bufeh);
+		if (fvict)
+		{
+			obj = search_char_for_item(fvict, real_object(atoi(valu)), false);
+			take = fvict;
+		}
+		else
+		{
+			if (ye)
+				return FALSE;
+			switch (arg[1])
+			{
+			case 'z':
+				if (!mob->beacon)
+					return -1;
+				obj = search_char_for_item(((char_data *)mob->beacon), real_object(atoi(valu)), false);
+				take = ((char_data *)mob->beacon);
+			case 'i': // mob
+				obj = search_char_for_item(mob, real_object(atoi(valu)), false);
+				take = mob;
+				break;
+			case 'n': // actor
+				if (!actor)
+					return -1;
+				obj = search_char_for_item(actor, real_object(atoi(valu)), false);
+				take = actor;
+				break;
+			case 't': // vict
+				if (!vict)
+					return -1;
+				obj = search_char_for_item(vict, real_object(atoi(valu)), false);
+				take = vict;
+				break;
+			case 'r': // rndm
+				if (!rndm)
+					return -1;
+				obj = search_char_for_item(rndm, real_object(atoi(valu)), false);
+				take = rndm;
+				break;
+			default:
+				logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d bad argument to 'carries'", mob_index[mob->mobdata->nr].virt);
+				return -1;
+			}
+		}
+		if (!obj)
+			return 0;
+		if (!str_cmp(bufeh, "keep"))
+			return 1;
+		else if (!str_cmp(bufeh, "take"))
+		{
+			int i;
+			if (obj->carried_by)
+				obj_from_char(obj);
+			for (i = 0; i < MAX_WEAR; i++)
+				if (obj == take->equipment[i])
+				{
+					obj_from_char(unequip_char(take, i));
+				}
+			extract_obj(obj);
+			return 1;
+		}
+		return -1;
+	}
+	break;
 
-  case eISDAYTIME:
-    if(weather_info.sunlight == SUN_DARK)
-      return false;
-    return true;
-  break;
-		 
-  case eISRAINING:
-    if(weather_info.sky == SKY_LIGHTNING||weather_info.sky == SKY_RAINING||weather_info.sky == SKY_HEAVY_RAIN)
-      return true;
-    return false;
-  break;
+	case eNUMBER:
+	{
+		int lhsvl, rhsvl;
+		if (fvict)
+		{
+			if (!IS_NPC(fvict))
+				return 0;
+			lhsvl = mob_index[fvict->mobdata->nr].virt;
+			rhsvl = atoi(val);
+			return mprog_veval(lhsvl, opr, rhsvl);
+		}
+		if (ye)
+			return FALSE;
 
-  default:
-  /* Ok... all the ifchcks are done, so if we didnt find ours then something
-   * odd happened.  So report the bug and abort the MOBprogram (return error)
-   */
-  logf( IMMORTAL, LOG_WORLD,  "Mob: %d unknown ifchck  \"%s\" value %d", 
-                  mob_index[mob->mobdata->nr].virt, buf, ifcheck[buf] ); 
-  return -1;
- }
+		switch (arg[1]) /* arg should be "$*" so just get the letter */
+		{
+		case 'i':
+			lhsvl = mob_index[mob->mobdata->nr].virt;
+			rhsvl = atoi(val);
+			return mprog_veval(lhsvl, opr, rhsvl);
+		case 'z':
+			if (mob->beacon)
+			{
+				if (IS_NPC(((char_data *)mob->beacon)))
+				{
+					lhsvl = mob_index[((char_data *)mob->beacon)->mobdata->nr].virt;
+					rhsvl = atoi(val);
+					return mprog_veval(lhsvl, opr, rhsvl);
+				}
+				else
+					return 0;
+			}
+			else
+				return 0;
+
+		case 'n':
+			if (actor)
+			{
+				if IS_NPC (actor)
+				{
+					lhsvl = mob_index[actor->mobdata->nr].virt;
+					rhsvl = atoi(val);
+					return mprog_veval(lhsvl, opr, rhsvl);
+				}
+			}
+			else
+				return 0;
+		case 't':
+			if (vict)
+			{
+				if IS_NPC (actor)
+				{
+					lhsvl = mob_index[vict->mobdata->nr].virt;
+					rhsvl = atoi(val);
+					return mprog_veval(lhsvl, opr, rhsvl);
+				}
+			}
+			else
+				return 0;
+		case 'r':
+			if (rndm)
+			{
+				if IS_NPC (actor)
+				{
+					lhsvl = mob_index[rndm->mobdata->nr].virt;
+					rhsvl = atoi(val);
+					return mprog_veval(lhsvl, opr, rhsvl);
+				}
+			}
+			else
+				return 0;
+		case 'o':
+			if (obj)
+			{
+				lhsvl = obj_index[obj->item_number].virt;
+				rhsvl = atoi(val);
+				return mprog_veval(lhsvl, opr, rhsvl);
+			}
+			else
+				return -1;
+		case 'p':
+			if (v_obj)
+			{
+				lhsvl = obj_index[v_obj->item_number].virt;
+				rhsvl = atoi(val);
+				return mprog_veval(lhsvl, opr, rhsvl);
+			}
+			else
+				return -1;
+		default:
+			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d bad argument to 'number'", mob_index[mob->mobdata->nr].virt);
+			return -1;
+		}
+	}
+	break;
+
+	case eTEMPVAR:
+	{
+		char buf4[MAX_STRING_LENGTH], *buf4pt;
+		if (arg[2] != '[')
+		{
+			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d badtarget  to 'tempvar'", mob_index[mob->mobdata->nr].virt);
+			return -1;
+		}
+		buf4pt = &arg[3];
+		strcpy(buf4, buf4pt);
+		buf4pt = &buf4[0];
+		while (*buf4pt != ']' && *buf4pt != '\0')
+			buf4pt++;
+		if (*buf4pt == '\0')
+		{
+			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d bad target to 'tempvar'", mob_index[mob->mobdata->nr].virt);
+			return -1;
+		}
+		*buf4pt = '\0';
+		if (val[0] == '$' && val[1])
+			mprog_translate(val[1], val, mob, actor, obj, vo, rndm);
+
+		if (fvict)
+			return mprog_seval(mob, getTemp(fvict, buf4), opr, val);
+		if (ye)
+			return FALSE;
+		switch (arg[1]) /* arg should be "$*" so just get the letter */
+		{
+		case 'z':
+			if (mob->beacon)
+			{
+				return mprog_seval(mob, getTemp(((char_data *)mob->beacon), buf4), opr, val);
+			}
+			else
+				return -1;
+		case 'i':
+			return mprog_seval(mob, getTemp(mob, buf4), opr, val);
+		case 'n':
+			if (actor)
+				return mprog_seval(mob, getTemp(actor, buf4), opr, val);
+			else
+				return -1;
+		case 't':
+			if (vict)
+				return mprog_seval(mob, getTemp(vict, buf4), opr, val);
+			else
+				return -1;
+		case 'r':
+			if (rndm)
+				return mprog_seval(mob, getTemp(rndm, buf4), opr, val);
+			else
+				return -1;
+		case 'o':
+			return -1;
+		case 'p':
+			return -1;
+		default:
+			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d bad argument to 'tempvar'", mob_index[mob->mobdata->nr].virt);
+			return -1;
+		}
+	}
+	break;
+
+	// search a room for a mob with vnum arg
+	case eISMOBVNUMINROOM:
+	{
+		int target = atoi(arg);
+
+		for (char_data *vch = world[mob->in_room].people;
+			 vch;
+			 vch = vch->next_in_room)
+		{
+			if (IS_NPC(vch) &&
+				vch != mob &&
+				mob_index[vch->mobdata->nr].virt == target)
+				return 1;
+		}
+		return 0;
+	}
+	break;
+
+	// search a room for a obj with vnum arg
+	case eISOBJVNUMINROOM:
+	{
+		int target = atoi(arg);
+
+		for (obj_data *obj = world[mob->in_room].contents;
+			 obj;
+			 obj = obj->next_content)
+		{
+			if (obj_index[obj->item_number].virt == target)
+				return 1;
+		}
+		return 0;
+	}
+	break;
+
+	case eCANSEE:
+		if (fvict)
+			return CAN_SEE(mob, fvict, TRUE);
+		if (ye)
+			return FALSE;
+		switch (arg[1]) /* arg should be "$*" so just get the letter */
+		{
+		case 'z':
+			return 1; // can always see holder
+		case 'i':
+			return 1;
+		case 'n':
+			if (actor)
+				return CAN_SEE(mob, actor, TRUE);
+			else
+				return -1;
+		case 't':
+			if (vict)
+				return CAN_SEE(mob, vict, TRUE);
+			else
+				return -1;
+		case 'r':
+			if (rndm)
+				return CAN_SEE(mob, rndm, TRUE);
+			else
+				return -1;
+		default:
+			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d bad argument to 'isnpc'", mob_index[mob->mobdata->nr].virt);
+			return -1;
+		}
+		break;
+
+	case eINSAMEZONE:
+		if (fvict)
+			return (GET_ZONE(fvict) == GET_ZONE(mob));
+		else if ((fvict = get_pc(arg)) != NULL)
+			return (GET_ZONE(fvict) == GET_ZONE(mob));
+
+		switch (arg[1])
+		{
+		case 'i':
+			return 1; // always in the same zone as itself
+		case 'n':
+			if (actor)
+				return (GET_ZONE(actor) == GET_ZONE(mob));
+			else
+				return -1;
+		case 'r':
+		case 't':
+			if (vict)
+				return (GET_ZONE(vict) == GET_ZONE(mob));
+			else
+				return -1;
+		default:
+			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d bad argument to 'insamezone'", mob_index[mob->mobdata->nr].virt);
+			return -1;
+		}
+		break;
+
+	case eCLAN:
+		if (fvict)
+			return fvict->clan;
+		switch (arg[1])
+		{
+		case 'i':
+			return mob->clan; // always in the same zone as itself
+		case 'n':
+			if (actor)
+				return actor->clan;
+			else
+				return -1;
+		case 'r':
+		case 't':
+			if (vict)
+				return vict->clan;
+			else
+				return -1;
+		default:
+			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d bad argument to 'clan'", mob_index[mob->mobdata->nr].virt);
+			return -1;
+		}
+		break;
+
+	case eISDAYTIME:
+		if (weather_info.sunlight == SUN_DARK)
+			return false;
+		return true;
+		break;
+
+	case eISRAINING:
+		if (weather_info.sky == SKY_LIGHTNING || weather_info.sky == SKY_RAINING || weather_info.sky == SKY_HEAVY_RAIN)
+			return true;
+		return false;
+		break;
+
+	default:
+		/* Ok... all the ifchcks are done, so if we didnt find ours then something
+		 * odd happened.  So report the bug and abort the MOBprogram (return error)
+		 */
+		logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d unknown ifchck  \"%s\" value %d",
+			 mob_index[mob->mobdata->nr].virt, buf, ifcheck[buf]);
+		return -1;
+	}
 }
 /* Quite a long and arduous function, this guy handles the control
  * flow part of MOBprograms.  Basicially once the driver sees an
@@ -2490,276 +2986,302 @@ int mprog_do_ifchck( char *ifchck, char_data *mob, char_data *actor,
  */
 // Null is kept globally so it doesn't go out of scope when we return in
 // -pir 11/18/01
-char null[ 1 ];
+char null[1];
 // Mprog_cur_result holds the current status of the mob that is acting.
-// It will hold eCH_DIED if the mob died doing it's proc.  We need to 
+// It will hold eCH_DIED if the mob died doing it's proc.  We need to
 // make sure this is not true when returning from an if check or the
 // mob's pointer is no longer valid
-int  mprog_cur_result;
-#define DIFF(a,b) ((a-b) > 0?(a-b):(b-a))
+int mprog_cur_result;
+#define DIFF(a, b) ((a - b) > 0 ? (a - b) : (b - a))
 
-char *mprog_process_if( char *ifchck, char *com_list, char_data *mob,
-		       char_data *actor, obj_data *obj, void *vo,
-		       char_data *rndm, struct mprog_throw_type *thrw )
+char *mprog_process_if(char *ifchck, char *com_list, char_data *mob,
+					   char_data *actor, obj_data *obj, void *vo,
+					   char_data *rndm, struct mprog_throw_type *thrw)
 {
 
- char buf[ MAX_INPUT_LENGTH ];
- char *morebuf = 0;
- char    *cmnd = 0;
- bool loopdone = FALSE;
- bool     flag = FALSE;
- int  legal;
+	char buf[MAX_INPUT_LENGTH];
+	char *morebuf = 0;
+	char *cmnd = 0;
+	bool loopdone = FALSE;
+	bool flag = FALSE;
+	int legal;
 
- *null = '\0';
+	*null = '\0';
 
- char_data *ur = NULL;
- if (ur) send_to_char("\r\nProg initiated.\r\n",ur);
+	char_data *ur = NULL;
+	if (ur)
+		send_to_char("\r\nProg initiated.\r\n", ur);
 
- if (!thrw || DIFF(ifchck, activeProgTmpBuf) >= thrw->startPos)
- {
-   /* check for trueness of the ifcheck */
-   if ( ( cIfs[ifpos++] = legal = mprog_do_ifchck( ifchck, mob, actor, obj, vo, rndm ) ) )
-   {
-     if ( legal >= 1 )
-       flag = TRUE;
-     else
-       return null;
-   }
-  if (ur) csendf(ur,"%d>%d\r\n",ifpos-1,legal);
- } else {
-  legal = thrw->ifchecks[thrw->cPos++];
-  cIfs[ifpos++] = legal;
-  if (legal >= 1) flag = TRUE;
-  else if (legal < 0) return NULL;
-  if (ur) csendf(ur,"%d>-%d\r\n",thrw->cPos-1,legal);
-  
- }
-
- while( loopdone == FALSE ) /*scan over any existing or statements */
- {
-     cmnd     = com_list;
-     activePos = com_list = mprog_next_command( com_list );
-     while ( *cmnd == ' ' )
-       cmnd++;
-     if ( *cmnd == '\0' )
-     {
-	 logf( IMMORTAL, LOG_WORLD,  "Mob: %d no commands after IF/OR", mob_index[mob->mobdata->nr].virt ); 
-	 return null;
-     }
-     morebuf = one_argument( cmnd, buf );
-     if ( !str_cmp( buf, "or" ) )
-     {
-
-	 if (!thrw || DIFF(morebuf, activeProgTmpBuf) >= thrw->startPos)
-	 {
-	   if ( ( cIfs[ifpos++] = legal = mprog_do_ifchck( morebuf, mob, actor, obj, vo, rndm ) ) )
-	   {
-	     if ( legal == 1 )
-	       flag = TRUE;
-	     else
-	       return null;
-	   }
-	  if (ur) csendf(ur,"%d<%d\r\n",ifpos-1,legal);
-	 } else {
-	  legal = thrw->ifchecks[thrw->cPos++];
-	  cIfs[ifpos++] = legal;
-	  if (legal == 1) flag = TRUE;
-	  else if (legal < 0) return NULL;
-	  if (ur) csendf(ur,"%d<-%d\r\n",thrw->cPos-1,legal);
-	 }
-     }
-     else
-       loopdone = TRUE;
- }
- 
- if ( flag )
-   for ( ; ; ) /*ifcheck was true, do commands but ignore else to endif*/ 
-   {
-       if ( !str_cmp( buf, "if" ) )
-       {
-	   com_list = mprog_process_if(morebuf,com_list,mob,actor,obj,vo,rndm,thrw);
-           if(IS_SET(mprog_cur_result, eCH_DIED))
-             return null;
-	   while ( *cmnd==' ' )
-	     cmnd++;
-	   if ( *com_list == '\0' )
-	     return null;
-	   cmnd     = com_list;
-	   activePos = com_list = mprog_next_command( com_list );
-	   morebuf  = one_argument( cmnd,buf );
-	   continue;
-       }
-       if ( !str_cmp( buf, "break" ) )
-	 return null;
-       if ( !str_cmp( buf, "endif" ) )
-	 return com_list; 
-       if ( !str_cmp( buf, "else" ) ) 
-       {
-	   int nest = 0;
-	   while ( str_cmp( buf, "endif" ) || nest > 0)
-	   {
-	       if (!str_cmp(buf, "if")) nest++;
-	       if (!str_cmp(buf, "endif")) nest--;
-	       cmnd     = com_list;
-	       activePos = com_list = mprog_next_command( com_list );
-	       while ( *cmnd == ' ' )
-		 cmnd++;
-	       if ( *cmnd == '\0' )
-	       {
-		   logf( IMMORTAL, LOG_WORLD,  "Mob: %d missing endif after else",
-			mob_index[mob->mobdata->nr].virt );
-		   return null;
-	       }
-	       morebuf = one_argument( cmnd,buf );
-	   }
-	   return com_list; 
-       }
-	
-       if (!thrw || DIFF(cmnd, activeProgTmpBuf) >= thrw->startPos) {
-
-#ifdef DEBUG_MPROG
-	 if (mob && mob->mobdata != (mob_data *)0x95959595 && mob_index[mob->mobdata->nr].virt == 4821) {
-	   fprintf(stderr, "debug: ");
-	   if (cmnd)
-	     fprintf(stderr, "cmd: %s ", cmnd);
-	   else
-	     fprintf(stderr, "cmd: (null) ");
-	   
-	   if (mob && mob->name)
-	     fprintf(stderr, "mob: %s ", mob->name);
-	   else
-	     fprintf(stderr, "mob: (null) ");
-	   
-	   if (actor && actor->name)
-	     fprintf(stderr, "actor: %s = ", actor->name);
-	   else
-	     fprintf(stderr, "actor: (null) = ");
-	 }
-#endif
-	 SET_BIT(mprog_cur_result, mprog_process_cmnd( cmnd, mob, actor, obj, vo, rndm ));
-
-#ifdef DEBUG_MPROG
-	 if (mob && mob->mobdata != (mob_data *)0x95959595 && mob_index[mob->mobdata->nr].virt == 4821) {
-	   if (IS_SET(mprog_cur_result, eFAILURE))
-	     fprintf(stderr, "eFAILURE ");
-	   if (IS_SET(mprog_cur_result, eSUCCESS))
-	     fprintf(stderr, "eSUCCESS ");
-	   if (IS_SET(mprog_cur_result, eCH_DIED))
-	     fprintf(stderr, "eCH_DIED ");
-	   if (IS_SET(mprog_cur_result, eVICT_DIED))
-	     fprintf(stderr, "eVICT_DIED ");
-	   if (IS_SET(mprog_cur_result, eINTERNAL_ERROR))
-	     fprintf(stderr, "eINTERNAL_ERROR ");
-	   if (IS_SET(mprog_cur_result, eEXTRA_VALUE))
-	     fprintf(stderr, "eEXTRA_VALUE ");
-	   if (IS_SET(mprog_cur_result, eEXTRA_VAL2))
-	     fprintf(stderr, "eEXTRA_VAL2 ");
-	   if (IS_SET(mprog_cur_result, eDELAYED_EXEC))
-	     fprintf(stderr, "eDELAYED_EXEC ");
-	   
-	   fprintf(stderr, "\n");
-	 }
-#endif
-         if(IS_SET(mprog_cur_result, eCH_DIED) || 
-	    IS_SET(mprog_cur_result, eDELAYED_EXEC) || 
-	    IS_SET(mprog_cur_result, eVICT_DIED))
-           return null;
+	if (!thrw || DIFF(ifchck, activeProgTmpBuf) >= thrw->startPos)
+	{
+		/* check for trueness of the ifcheck */
+		if ((cIfs[ifpos++] = legal = mprog_do_ifchck(ifchck, mob, actor, obj, vo, rndm)))
+		{
+			if (legal >= 1)
+				flag = TRUE;
+			else
+				return null;
+		}
+		if (ur)
+			csendf(ur, "%d>%d\r\n", ifpos - 1, legal);
 	}
-       cmnd     = com_list;
-       activePos = com_list = mprog_next_command( com_list );
-       while ( *cmnd == ' ' )
-	 cmnd++;
-       if ( *cmnd == '\0' )
-       {
-           logf( IMMORTAL, LOG_WORLD,  "Mob: %d missing else or endif", mob_index[mob->mobdata->nr].virt ); 
-           return null;
-       }
-       morebuf = one_argument( cmnd, buf );
-   }
- else /*false ifcheck, find else and do existing commands or quit at endif*/
-   {
-     int nest = 0;
-     while ( true )
-     { // Fix here 13/4 2004. Nested ifs are now taken into account.
-	if ( !str_cmp(buf, "if")) nest++;
-        if (!str_cmp(buf,"endif")) { if (nest == 0) break; else nest--; }
-        if (!nest&&!str_cmp(buf,"else")) break;
+	else
+	{
+		legal = thrw->ifchecks[thrw->cPos++];
+		cIfs[ifpos++] = legal;
+		if (legal >= 1)
+			flag = TRUE;
+		else if (legal < 0)
+			return NULL;
+		if (ur)
+			csendf(ur, "%d>-%d\r\n", thrw->cPos - 1, legal);
+	}
 
-	 cmnd     = com_list;
-	 activePos = com_list = mprog_next_command( com_list );
-	 while ( *cmnd == ' ' )
-	   cmnd++;
-	 if ( *cmnd == '\0' )
-	   {
-	     logf( IMMORTAL, LOG_WORLD,  "Mob: %d missing an else or endif",
-		  mob_index[mob->mobdata->nr].virt ); 
-	     return null;
-	   }
-	 morebuf = one_argument( cmnd, buf );
-       }
+	while (loopdone == FALSE) /*scan over any existing or statements */
+	{
+		cmnd = com_list;
+		activePos = com_list = mprog_next_command(com_list);
+		while (*cmnd == ' ')
+			cmnd++;
+		if (*cmnd == '\0')
+		{
+			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d no commands after IF/OR", mob_index[mob->mobdata->nr].virt);
+			return null;
+		}
+		morebuf = one_argument(cmnd, buf);
+		if (!str_cmp(buf, "or"))
+		{
 
-     /* found either an else or an endif.. act accordingly */
-     if ( !str_cmp( buf, "endif" ) )
-       return com_list;
-     cmnd     = com_list;
-     activePos = com_list = mprog_next_command( com_list );
-     while ( *cmnd == ' ' )
-       cmnd++;
-     if ( *cmnd == '\0' )
-       { 
-	 logf( IMMORTAL, LOG_WORLD,  "Mob: %d missing endif", mob_index[mob->mobdata->nr].virt ); 
-	 return null;
-       }
-     morebuf = one_argument( cmnd, buf );
-     
-     for ( ; ; ) /*process the post-else commands until an endif is found.*/
-       {
-	 if ( !str_cmp( buf, "if" ) )
-	   { 
-	     com_list = mprog_process_if( morebuf, com_list, mob, actor,
-					 obj, vo, rndm, thrw );
-             if(IS_SET(mprog_cur_result, eCH_DIED))
-               return null;
-	     while ( *cmnd == ' ' )
-	       cmnd++;
-	     if ( *com_list == '\0' )
-	       return null;
-	     cmnd     = com_list;
-	     activePos = com_list = mprog_next_command( com_list );
-	     morebuf  = one_argument( cmnd,buf );
-	     continue;
-	   }
-	 if ( !str_cmp( buf, "else" ) ) 
-	   {
-	     logf( IMMORTAL, LOG_WORLD,  "Mob: %d found else in an else section",
-		  mob_index[mob->mobdata->nr].virt ); 
-	     return null;
-	   }
-	 if ( !str_cmp( buf, "break" ) )
-	   return null;
-	 if ( !str_cmp( buf, "endif" ) )
-	   return com_list; 
+			if (!thrw || DIFF(morebuf, activeProgTmpBuf) >= thrw->startPos)
+			{
+				if ((cIfs[ifpos++] = legal = mprog_do_ifchck(morebuf, mob, actor, obj, vo, rndm)))
+				{
+					if (legal == 1)
+						flag = TRUE;
+					else
+						return null;
+				}
+				if (ur)
+					csendf(ur, "%d<%d\r\n", ifpos - 1, legal);
+			}
+			else
+			{
+				legal = thrw->ifchecks[thrw->cPos++];
+				cIfs[ifpos++] = legal;
+				if (legal == 1)
+					flag = TRUE;
+				else if (legal < 0)
+					return NULL;
+				if (ur)
+					csendf(ur, "%d<-%d\r\n", thrw->cPos - 1, legal);
+			}
+		}
+		else
+			loopdone = TRUE;
+	}
 
-	 if (!thrw || DIFF(cmnd, activeProgTmpBuf) >= thrw->startPos) {
-	   SET_BIT(mprog_cur_result, mprog_process_cmnd( cmnd, mob, actor, obj, vo, rndm ));
-           if(IS_SET(mprog_cur_result, eCH_DIED) || IS_SET(mprog_cur_result, eDELAYED_EXEC))
-             return null;
-	 }
-	 cmnd     = com_list;
-	 activePos = com_list = mprog_next_command( com_list );
-	 while ( *cmnd == ' ' )
-	   cmnd++;
-	 if ( *cmnd == '\0' )
-	   {
-	     logf( IMMORTAL, LOG_WORLD,  "Mob: %d missing endif in else section",
-		  mob_index[mob->mobdata->nr].virt ); 
-	     return null;
-	   }
-	 morebuf = one_argument( cmnd, buf );
-       }
-   }
+	if (flag)
+		for (;;) /*ifcheck was true, do commands but ignore else to endif*/
+		{
+			if (!str_cmp(buf, "if"))
+			{
+				com_list = mprog_process_if(morebuf, com_list, mob, actor, obj, vo, rndm, thrw);
+				if (IS_SET(mprog_cur_result, eCH_DIED))
+					return null;
+				while (*cmnd == ' ')
+					cmnd++;
+				if (*com_list == '\0')
+					return null;
+				cmnd = com_list;
+				activePos = com_list = mprog_next_command(com_list);
+				morebuf = one_argument(cmnd, buf);
+				continue;
+			}
+			if (!str_cmp(buf, "break"))
+				return null;
+			if (!str_cmp(buf, "endif"))
+				return com_list;
+			if (!str_cmp(buf, "else"))
+			{
+				int nest = 0;
+				while (str_cmp(buf, "endif") || nest > 0)
+				{
+					if (!str_cmp(buf, "if"))
+						nest++;
+					if (!str_cmp(buf, "endif"))
+						nest--;
+					cmnd = com_list;
+					activePos = com_list = mprog_next_command(com_list);
+					while (*cmnd == ' ')
+						cmnd++;
+					if (*cmnd == '\0')
+					{
+						logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d missing endif after else",
+							 mob_index[mob->mobdata->nr].virt);
+						return null;
+					}
+					morebuf = one_argument(cmnd, buf);
+				}
+				return com_list;
+			}
 
- 	 return NULL;
+			if (!thrw || DIFF(cmnd, activeProgTmpBuf) >= thrw->startPos)
+			{
+
+#ifdef DEBUG_MPROG
+				if (mob && mob->mobdata != (mob_data *)0x95959595 && mob_index[mob->mobdata->nr].virt == 4821)
+				{
+					fprintf(stderr, "debug: ");
+					if (cmnd)
+						fprintf(stderr, "cmd: %s ", cmnd);
+					else
+						fprintf(stderr, "cmd: (null) ");
+
+					if (mob && mob->name)
+						fprintf(stderr, "mob: %s ", mob->name);
+					else
+						fprintf(stderr, "mob: (null) ");
+
+					if (actor && actor->name)
+						fprintf(stderr, "actor: %s = ", actor->name);
+					else
+						fprintf(stderr, "actor: (null) = ");
+				}
+#endif
+				SET_BIT(mprog_cur_result, mprog_process_cmnd(cmnd, mob, actor, obj, vo, rndm));
+
+#ifdef DEBUG_MPROG
+				if (mob && mob->mobdata != (mob_data *)0x95959595 && mob_index[mob->mobdata->nr].virt == 4821)
+				{
+					if (IS_SET(mprog_cur_result, eFAILURE))
+						fprintf(stderr, "eFAILURE ");
+					if (IS_SET(mprog_cur_result, eSUCCESS))
+						fprintf(stderr, "eSUCCESS ");
+					if (IS_SET(mprog_cur_result, eCH_DIED))
+						fprintf(stderr, "eCH_DIED ");
+					if (IS_SET(mprog_cur_result, eVICT_DIED))
+						fprintf(stderr, "eVICT_DIED ");
+					if (IS_SET(mprog_cur_result, eINTERNAL_ERROR))
+						fprintf(stderr, "eINTERNAL_ERROR ");
+					if (IS_SET(mprog_cur_result, eEXTRA_VALUE))
+						fprintf(stderr, "eEXTRA_VALUE ");
+					if (IS_SET(mprog_cur_result, eEXTRA_VAL2))
+						fprintf(stderr, "eEXTRA_VAL2 ");
+					if (IS_SET(mprog_cur_result, eDELAYED_EXEC))
+						fprintf(stderr, "eDELAYED_EXEC ");
+
+					fprintf(stderr, "\n");
+				}
+#endif
+				if (IS_SET(mprog_cur_result, eCH_DIED) ||
+					IS_SET(mprog_cur_result, eDELAYED_EXEC) ||
+					IS_SET(mprog_cur_result, eVICT_DIED))
+					return null;
+			}
+			cmnd = com_list;
+			activePos = com_list = mprog_next_command(com_list);
+			while (*cmnd == ' ')
+				cmnd++;
+			if (*cmnd == '\0')
+			{
+				logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d missing else or endif", mob_index[mob->mobdata->nr].virt);
+				return null;
+			}
+			morebuf = one_argument(cmnd, buf);
+		}
+	else /*false ifcheck, find else and do existing commands or quit at endif*/
+	{
+		int nest = 0;
+		while (true)
+		{ // Fix here 13/4 2004. Nested ifs are now taken into account.
+			if (!str_cmp(buf, "if"))
+				nest++;
+			if (!str_cmp(buf, "endif"))
+			{
+				if (nest == 0)
+					break;
+				else
+					nest--;
+			}
+			if (!nest && !str_cmp(buf, "else"))
+				break;
+
+			cmnd = com_list;
+			activePos = com_list = mprog_next_command(com_list);
+			while (*cmnd == ' ')
+				cmnd++;
+			if (*cmnd == '\0')
+			{
+				logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d missing an else or endif",
+					 mob_index[mob->mobdata->nr].virt);
+				return null;
+			}
+			morebuf = one_argument(cmnd, buf);
+		}
+
+		/* found either an else or an endif.. act accordingly */
+		if (!str_cmp(buf, "endif"))
+			return com_list;
+		cmnd = com_list;
+		activePos = com_list = mprog_next_command(com_list);
+		while (*cmnd == ' ')
+			cmnd++;
+		if (*cmnd == '\0')
+		{
+			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d missing endif", mob_index[mob->mobdata->nr].virt);
+			return null;
+		}
+		morebuf = one_argument(cmnd, buf);
+
+		for (;;) /*process the post-else commands until an endif is found.*/
+		{
+			if (!str_cmp(buf, "if"))
+			{
+				com_list = mprog_process_if(morebuf, com_list, mob, actor,
+											obj, vo, rndm, thrw);
+				if (IS_SET(mprog_cur_result, eCH_DIED))
+					return null;
+				while (*cmnd == ' ')
+					cmnd++;
+				if (*com_list == '\0')
+					return null;
+				cmnd = com_list;
+				activePos = com_list = mprog_next_command(com_list);
+				morebuf = one_argument(cmnd, buf);
+				continue;
+			}
+			if (!str_cmp(buf, "else"))
+			{
+				logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d found else in an else section",
+					 mob_index[mob->mobdata->nr].virt);
+				return null;
+			}
+			if (!str_cmp(buf, "break"))
+				return null;
+			if (!str_cmp(buf, "endif"))
+				return com_list;
+
+			if (!thrw || DIFF(cmnd, activeProgTmpBuf) >= thrw->startPos)
+			{
+				SET_BIT(mprog_cur_result, mprog_process_cmnd(cmnd, mob, actor, obj, vo, rndm));
+				if (IS_SET(mprog_cur_result, eCH_DIED) || IS_SET(mprog_cur_result, eDELAYED_EXEC))
+					return null;
+			}
+			cmnd = com_list;
+			activePos = com_list = mprog_next_command(com_list);
+			while (*cmnd == ' ')
+				cmnd++;
+			if (*cmnd == '\0')
+			{
+				logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d missing endif in else section",
+					 mob_index[mob->mobdata->nr].virt);
+				return null;
+			}
+			morebuf = one_argument(cmnd, buf);
+		}
+	}
+
+	return NULL;
 }
 
 /* This routine handles the variables for command expansion.
@@ -2767,620 +3289,680 @@ char *mprog_process_if( char *ifchck, char *com_list, char_data *mob,
  * clear how it is done and they are quite easy to do, so you
  * can be as creative as you want. The only catch is to check
  * that your variables exist before you use them. At the moment,
- * using $t when the secondary target refers to an object 
+ * using $t when the secondary target refers to an object
  * i.e. >prog_act drops~<nl>if ispc($t)<nl>sigh<nl>endif<nl>~<nl>
  * probably makes the mud crash (vice versa as well) The cure
  * would be to change act() so that vo becomes vict & v_obj.
  * but this would require a lot of small changes all over the code.
  */
-void mprog_translate( char ch, char *t, char_data *mob, char_data *actor,
-                    obj_data *obj, void *vo, char_data *rndm )
+void mprog_translate(char ch, char *t, char_data *mob, char_data *actor,
+					 obj_data *obj, void *vo, char_data *rndm)
 {
- static char *he_she        [] = { "it",  "he",  "she" };
- static char *him_her       [] = { "it",  "him", "her" };
- static char *his_her       [] = { "its", "his", "her" };
- char_data   *vict             = (char_data *) vo;
- obj_data    *v_obj            = (obj_data  *) vo;
+	static char *he_she[] = {"it", "he", "she"};
+	static char *him_her[] = {"it", "him", "her"};
+	static char *his_her[] = {"its", "his", "her"};
+	char_data *vict = (char_data *)vo;
+	obj_data *v_obj = (obj_data *)vo;
 
- *t = '\0';
- switch ( ch ) {
-     case 'i':
-         one_argument( mob->name, t );
-      break;
-     case 'z':
-	   if (mob->beacon){ one_argument(((char_data*)mob->beacon)->name, t);
-	break;}
-	 strcpy(t,"error");
-	break;
-     case 'Z':
-	  if (mob->beacon) strcpy(t, ((char_data*)mob->beacon)->short_desc);
-	  else strcpy(t,"error");
-	break;	   
-     case 'I':
-         strcpy( t, mob->short_desc );
-      break;
-     case 'x':
-          if (mob->beacon && ((char_data*)mob->beacon)->fighting) one_argument(((char_data*)mob->beacon)->fighting->name,t);
-	  else
-	  strcpy(t,"error");
-	*t = UPPER(*t);
-	break;
-     case 'n':
-         if ( actor ) {
-// Mobs can see them no matter what.  Use "cansee()" if you don't want that
-//	   if ( CAN_SEE( mob,actor ) )
-	     one_argument( actor->name, t );
-           if ( !IS_NPC( actor ) )
-             *t = UPPER( *t );
-         }
-         else logf(IMMORTAL, LOG_WORLD, "Mob %d trying illegal $ n in MOBProg.", mob_index[mob->mobdata->nr].virt);
-      break;
+	*t = '\0';
+	switch (ch)
+	{
+	case 'i':
+		one_argument(mob->name, t);
+		break;
+	case 'z':
+		if (mob->beacon)
+		{
+			one_argument(((char_data *)mob->beacon)->name, t);
+			break;
+		}
+		strcpy(t, "error");
+		break;
+	case 'Z':
+		if (mob->beacon)
+			strcpy(t, ((char_data *)mob->beacon)->short_desc);
+		else
+			strcpy(t, "error");
+		break;
+	case 'I':
+		strcpy(t, mob->short_desc);
+		break;
+	case 'x':
+		if (mob->beacon && ((char_data *)mob->beacon)->fighting)
+			one_argument(((char_data *)mob->beacon)->fighting->name, t);
+		else
+			strcpy(t, "error");
+		*t = UPPER(*t);
+		break;
+	case 'n':
+		if (actor)
+		{
+			// Mobs can see them no matter what.  Use "cansee()" if you don't want that
+			//	   if ( CAN_SEE( mob,actor ) )
+			one_argument(actor->name, t);
+			if (!IS_NPC(actor))
+				*t = UPPER(*t);
+		}
+		else
+			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob %d trying illegal $ n in MOBProg.", mob_index[mob->mobdata->nr].virt);
+		break;
 
-     case 'N':
-         if ( actor ) 
-            if ( CAN_SEE( mob, actor ) )
-	       if ( IS_NPC( actor ) )
-		 strcpy( t, actor->short_desc );
-	       else
-	       {
-		   strcpy( t, actor->name );
-		   strcat( t, " " );
-		   strcat( t, actor->title );
-	       }
-	    else
-	      strcpy( t, "someone" );
-         else logf(IMMORTAL, LOG_WORLD, "Mob %d trying illegal $ N in MOBProg.", mob_index[mob->mobdata->nr].virt);
-	 break;
+	case 'N':
+		if (actor)
+			if (CAN_SEE(mob, actor))
+				if (IS_NPC(actor))
+					strcpy(t, actor->short_desc);
+				else
+				{
+					strcpy(t, actor->name);
+					strcat(t, " ");
+					strcat(t, actor->title);
+				}
+			else
+				strcpy(t, "someone");
+		else
+			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob %d trying illegal $ N in MOBProg.", mob_index[mob->mobdata->nr].virt);
+		break;
 
-     case 't':
-         if ( vict ) {
-	   if ( CAN_SEE( mob, vict ) )
-	     one_argument( vict->name, t );
-           if ( !IS_NPC( vict ) )
-             *t = UPPER( *t );
-         }
-         else logf(IMMORTAL, LOG_WORLD, "Mob %d trying illegal $ t in MOBProg.", mob_index[mob->mobdata->nr].virt);
-	 break;
+	case 't':
+		if (vict)
+		{
+			if (CAN_SEE(mob, vict))
+				one_argument(vict->name, t);
+			if (!IS_NPC(vict))
+				*t = UPPER(*t);
+		}
+		else
+			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob %d trying illegal $ t in MOBProg.", mob_index[mob->mobdata->nr].virt);
+		break;
 
-     case 'T':
-         if ( vict ) 
-            if ( CAN_SEE( mob, vict ) )
-	       if ( IS_NPC( vict ) )
-		 strcpy( t, vict->short_desc );
-	       else
-	       {
-		 strcpy( t, vict->name );
-		 strcat( t, " " );
-		 strcat( t, vict->title );
-	       }
-	    else
-	      strcpy( t, "someone" );
-         else logf(IMMORTAL, LOG_WORLD, "Mob %d trying illegal $T in MOBProg.", mob_index[mob->mobdata->nr].virt);
-	 break;
-     
-     case 'f':
-	 if (actor && actor->fighting) {
-		if (CAN_SEE(mob, actor->fighting))
-		  one_argument(actor->fighting->name, t);
-		if (!IS_NPC(actor->fighting))
-		 *t = UPPER(*t);
-	 }
-	 break;
-     case 'F':
-	 if (actor && actor->fighting) {
-		if (CAN_SEE(mob, actor->fighting))
-		 {
-		  if (IS_NPC(actor->fighting))
-			strcpy(t, actor->fighting->short_desc);
-		  else {
- 		   strcpy( t, actor->fighting->name );
-		   strcat( t, " " );
-		   strcat( t, actor->fighting->title );
-		  }
- 	          }
-	 }
-	 break;
-     case 'g':
-	 if (mob && mob->fighting) {
-		if (CAN_SEE(mob, mob->fighting))
-		  one_argument(mob->fighting->name, t);
-		if (!IS_NPC(mob->fighting))
-		 *t = UPPER(*t);
-	 }
-	 break;
-     case 'G':
-	 if (mob && mob->fighting) {
-		if (CAN_SEE(mob, mob->fighting))
-		 {
-		  if (IS_NPC(mob->fighting))
-			strcpy(t, mob->fighting->short_desc);
-		  else {
- 		   strcpy( t, mob->fighting->name );
-		   strcat( t, " " );
-		   strcat( t, mob->fighting->title );
-		  }
- 	          }
-	 }
-	 break;
-     case 'r':
-         if ( rndm ) {
-	   if ( CAN_SEE( mob, rndm ) )
-	     one_argument( rndm->name, t );
-           if ( !IS_NPC( rndm ) )
-             *t = UPPER( *t );
-         }
-      break;
+	case 'T':
+		if (vict)
+			if (CAN_SEE(mob, vict))
+				if (IS_NPC(vict))
+					strcpy(t, vict->short_desc);
+				else
+				{
+					strcpy(t, vict->name);
+					strcat(t, " ");
+					strcat(t, vict->title);
+				}
+			else
+				strcpy(t, "someone");
+		else
+			logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob %d trying illegal $T in MOBProg.", mob_index[mob->mobdata->nr].virt);
+		break;
 
-     case 'R':
-       if ( rndm ) {
-	 if ( CAN_SEE( mob, rndm ) ) {
-	   if ( IS_NPC( rndm ) ) {
-	     strcpy(t,rndm->short_desc);
-	   } else {
-	     strcpy( t, rndm->name );
-	     strcat( t, " " );
-	     strcat( t, rndm->title );
-	   }
-	 } else {
-	   strcpy( t, "someone" );
-	 }
-       }
-       break;
+	case 'f':
+		if (actor && actor->fighting)
+		{
+			if (CAN_SEE(mob, actor->fighting))
+				one_argument(actor->fighting->name, t);
+			if (!IS_NPC(actor->fighting))
+				*t = UPPER(*t);
+		}
+		break;
+	case 'F':
+		if (actor && actor->fighting)
+		{
+			if (CAN_SEE(mob, actor->fighting))
+			{
+				if (IS_NPC(actor->fighting))
+					strcpy(t, actor->fighting->short_desc);
+				else
+				{
+					strcpy(t, actor->fighting->name);
+					strcat(t, " ");
+					strcat(t, actor->fighting->title);
+				}
+			}
+		}
+		break;
+	case 'g':
+		if (mob && mob->fighting)
+		{
+			if (CAN_SEE(mob, mob->fighting))
+				one_argument(mob->fighting->name, t);
+			if (!IS_NPC(mob->fighting))
+				*t = UPPER(*t);
+		}
+		break;
+	case 'G':
+		if (mob && mob->fighting)
+		{
+			if (CAN_SEE(mob, mob->fighting))
+			{
+				if (IS_NPC(mob->fighting))
+					strcpy(t, mob->fighting->short_desc);
+				else
+				{
+					strcpy(t, mob->fighting->name);
+					strcat(t, " ");
+					strcat(t, mob->fighting->title);
+				}
+			}
+		}
+		break;
+	case 'r':
+		if (rndm)
+		{
+			if (CAN_SEE(mob, rndm))
+				one_argument(rndm->name, t);
+			if (!IS_NPC(rndm))
+				*t = UPPER(*t);
+		}
+		break;
 
-     case 'e':
-         if ( actor )
-	   CAN_SEE( mob, actor ) ? strcpy( t, he_she[ actor->sex ] )
-	                         : strcpy( t, "someone" );
-	 break;
-  
-     case 'm':
-         if ( actor )
-	   CAN_SEE( mob, actor ) ? strcpy( t, him_her[ actor->sex ] )
-                                 : strcpy( t, "someone" );
-	 break;
-  
-     case 's':
-         if ( actor )
-	   CAN_SEE( mob, actor ) ? strcpy( t, his_her[ actor->sex ] )
-	                         : strcpy( t, "someone's" );
-	 break;
-     
-     case 'E':
-         if ( vict )
-	   CAN_SEE( mob, vict ) ? strcpy( t, he_she[ vict->sex ] )
-                                : strcpy( t, "someone" );
-	 break;
-  
-     case 'M':
-         if ( vict )
-	   CAN_SEE( mob, vict ) ? strcpy( t, him_her[ vict->sex ] )
-                                : strcpy( t, "someone" );
-	 break;
-  
-     case 'S':
-         if ( vict )
-	   CAN_SEE( mob, vict ) ? strcpy( t, his_her[ vict->sex ] )
-                                : strcpy( t, "someone's" ); 
-	 break;
-     case 'q':
-	char buf[15];
-	sprintf(buf, "%d", mob_index[mob->mobdata->nr].virt);
-	strcpy(t, buf);
-	break;
-     case 'j':
-	 strcpy( t, he_she[ mob->sex ] );
-	 break;
-  
-     case 'k':
-	 strcpy( t, him_her[ mob->sex ] );
-	 break;
-  
-     case 'l':
-	 strcpy( t, his_her[ mob->sex ] );
-	 break;
+	case 'R':
+		if (rndm)
+		{
+			if (CAN_SEE(mob, rndm))
+			{
+				if (IS_NPC(rndm))
+				{
+					strcpy(t, rndm->short_desc);
+				}
+				else
+				{
+					strcpy(t, rndm->name);
+					strcat(t, " ");
+					strcat(t, rndm->title);
+				}
+			}
+			else
+			{
+				strcpy(t, "someone");
+			}
+		}
+		break;
 
-     case 'J':
-         if ( rndm )
-	   CAN_SEE( mob, rndm ) ? strcpy( t, he_she[ rndm->sex ] )
-	                        : strcpy( t, "someone" );
-	 break;
-  
-     case 'K':
-         if ( rndm )
-	   CAN_SEE( mob, rndm ) ? strcpy( t, him_her[ rndm->sex ] )
-                                : strcpy( t, "someone" );
-	 break;
-  
-     case 'L':
-         if ( rndm )
-	   CAN_SEE( mob, rndm ) ? strcpy( t, his_her[ rndm->sex ] )
-	                        : strcpy( t, "someone's" );
-	 break;
+	case 'e':
+		if (actor)
+			CAN_SEE(mob, actor) ? strcpy(t, he_she[actor->sex])
+								: strcpy(t, "someone");
+		break;
 
-     case 'o':
-         if ( obj )
-	   CAN_SEE_OBJ( mob, obj ) ? one_argument( obj->name, t )
-                                   : strcpy( t, "something" );
-	 break;
+	case 'm':
+		if (actor)
+			CAN_SEE(mob, actor) ? strcpy(t, him_her[actor->sex])
+								: strcpy(t, "someone");
+		break;
 
-     case 'O':
-         if ( obj )
-	   CAN_SEE_OBJ( mob, obj ) ? strcpy( t, obj->short_description )
-                                   : strcpy( t, "something" );
-	 break;
+	case 's':
+		if (actor)
+			CAN_SEE(mob, actor) ? strcpy(t, his_her[actor->sex])
+								: strcpy(t, "someone's");
+		break;
 
-     case 'p':
-         if ( v_obj )
-	   CAN_SEE_OBJ( mob, v_obj ) ? one_argument( v_obj->name, t )
-                                     : strcpy( t, "something" );
-	 break;
+	case 'E':
+		if (vict)
+			CAN_SEE(mob, vict) ? strcpy(t, he_she[vict->sex])
+							   : strcpy(t, "someone");
+		break;
 
-     case 'P':
-         if ( v_obj )
-	   CAN_SEE_OBJ( mob, v_obj ) ? strcpy( t, v_obj->short_description )
-                                     : strcpy( t, "something" );
-      break;
+	case 'M':
+		if (vict)
+			CAN_SEE(mob, vict) ? strcpy(t, him_her[vict->sex])
+							   : strcpy(t, "someone");
+		break;
 
-     case 'a':
-         if ( obj ) 
-          switch ( *( obj->name ) )
-	  {
-	    case 'a': case 'e': case 'i':
-            case 'o': case 'u': strcpy( t, "an" );
-	      break;
-            default: strcpy( t, "a" );
-          }
-	 break;
+	case 'S':
+		if (vict)
+			CAN_SEE(mob, vict) ? strcpy(t, his_her[vict->sex])
+							   : strcpy(t, "someone's");
+		break;
+	case 'q':
+		char buf[15];
+		sprintf(buf, "%d", mob_index[mob->mobdata->nr].virt);
+		strcpy(t, buf);
+		break;
+	case 'j':
+		strcpy(t, he_she[mob->sex]);
+		break;
 
-     case 'A':
-         if ( v_obj ) 
-          switch ( *( v_obj->name ) )
-	  {
-            case 'a': case 'e': case 'i':
-	    case 'o': case 'u': strcpy( t, "an" );
-	      break;
-            default: strcpy( t, "a" );
-          }
-	 break;
+	case 'k':
+		strcpy(t, him_her[mob->sex]);
+		break;
 
-     case '$':
-         strcpy( t, "$" );
-	 break;
+	case 'l':
+		strcpy(t, his_her[mob->sex]);
+		break;
 
-     default:
-         logf( IMMORTAL, LOG_WORLD, "Mob: %d bad $$var : %c", mob_index[mob->mobdata->nr].virt, ch );
-	 break;
-       }
+	case 'J':
+		if (rndm)
+			CAN_SEE(mob, rndm) ? strcpy(t, he_she[rndm->sex])
+							   : strcpy(t, "someone");
+		break;
 
- return;
+	case 'K':
+		if (rndm)
+			CAN_SEE(mob, rndm) ? strcpy(t, him_her[rndm->sex])
+							   : strcpy(t, "someone");
+		break;
 
+	case 'L':
+		if (rndm)
+			CAN_SEE(mob, rndm) ? strcpy(t, his_her[rndm->sex])
+							   : strcpy(t, "someone's");
+		break;
+
+	case 'o':
+		if (obj)
+			CAN_SEE_OBJ(mob, obj) ? one_argument(obj->name, t)
+								  : strcpy(t, "something");
+		break;
+
+	case 'O':
+		if (obj)
+			CAN_SEE_OBJ(mob, obj) ? strcpy(t, obj->short_description)
+								  : strcpy(t, "something");
+		break;
+
+	case 'p':
+		if (v_obj)
+			CAN_SEE_OBJ(mob, v_obj) ? one_argument(v_obj->name, t)
+									: strcpy(t, "something");
+		break;
+
+	case 'P':
+		if (v_obj)
+			CAN_SEE_OBJ(mob, v_obj) ? strcpy(t, v_obj->short_description)
+									: strcpy(t, "something");
+		break;
+
+	case 'a':
+		if (obj)
+			switch (*(obj->name))
+			{
+			case 'a':
+			case 'e':
+			case 'i':
+			case 'o':
+			case 'u':
+				strcpy(t, "an");
+				break;
+			default:
+				strcpy(t, "a");
+			}
+		break;
+
+	case 'A':
+		if (v_obj)
+			switch (*(v_obj->name))
+			{
+			case 'a':
+			case 'e':
+			case 'i':
+			case 'o':
+			case 'u':
+				strcpy(t, "an");
+				break;
+			default:
+				strcpy(t, "a");
+			}
+		break;
+
+	case '$':
+		strcpy(t, "$");
+		break;
+
+	default:
+		logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d bad $$var : %c", mob_index[mob->mobdata->nr].virt, ch);
+		break;
+	}
+
+	return;
 }
 
 bool do_bufs(char *bufpt, char *argpt, char *point)
 {
-  bool traditional = FALSE;
+	bool traditional = FALSE;
 
-  /* get whatever comes before the left paren.. ignore spaces */
-  while ( *point )
-    if (*point == '(')
-    {
-	traditional = TRUE;
-	break;
-    }
-    else if (*point == ' ')
-    {
-	return FALSE;
-    }
-    else if ( *point == '.' )
-    {
-	break;
-    }
-    else if ( *point == '\0' ) 
-      {
-	return FALSE;
-      }   
-    else
-      if ( *point == ' ' )
+	/* get whatever comes before the left paren.. ignore spaces */
+	while (*point)
+		if (*point == '(')
+		{
+			traditional = TRUE;
+			break;
+		}
+		else if (*point == ' ')
+		{
+			return FALSE;
+		}
+		else if (*point == '.')
+		{
+			break;
+		}
+		else if (*point == '\0')
+		{
+			return FALSE;
+		}
+		else if (*point == ' ')
+			point++;
+		else
+			*bufpt++ = *point++;
+	*bufpt = '\0';
 	point++;
-      else 
-	*bufpt++ = *point++; 
-  *bufpt = '\0';
-  point++;
 
-  /* get whatever is in between the parens.. ignore spaces */
-  while ( *point ) 
-    if (traditional && *point == ')') break;
-    else if (!traditional && !isalpha(*point)) { point--; break; }
-    else if ( *point == '\0' )
-      {
-	return FALSE;
-      }   
-    else
-      if ( *point == ' ' )
-	point++;
-      else 
-	*argpt++ = *point++; 
+	/* get whatever is in between the parens.. ignore spaces */
+	while (*point)
+		if (traditional && *point == ')')
+			break;
+		else if (!traditional && !isalpha(*point))
+		{
+			point--;
+			break;
+		}
+		else if (*point == '\0')
+		{
+			return FALSE;
+		}
+		else if (*point == ' ')
+			point++;
+		else
+			*argpt++ = *point++;
 
-  *argpt = '\0';
-//  point++;
-  return TRUE;
+	*argpt = '\0';
+	//  point++;
+	return TRUE;
 }
 
-void debugpoint() {};
+void debugpoint(){};
 /* This procedure simply copies the cmnd to a buffer while expanding
  * any variables by calling the translate procedure.  The observant
  * code scrutinizer will notice that this is taken from act()
  */
-int mprog_process_cmnd( char *cmnd, char_data *mob, char_data *actor,
-			obj_data *obj, void *vo, char_data *rndm )
+int mprog_process_cmnd(char *cmnd, char_data *mob, char_data *actor,
+					   obj_data *obj, void *vo, char_data *rndm)
 {
-  char buf[ MAX_INPUT_LENGTH*2 ];
-  char tmp[ MAX_INPUT_LENGTH*2 ];
-  char *str;
-  char *i;
-  char *point;
+	char buf[MAX_INPUT_LENGTH * 2];
+	char tmp[MAX_INPUT_LENGTH * 2];
+	char *str;
+	char *i;
+	char *point;
 
-  point   = buf;
-  str     = cmnd;
-  while ( *str == ' ' )
-    str++;
-/*
-  while (*str != '\0')
-  {
-     if ((*str == '=' || *str == '+' || *str == '-' || *str == '&' || *str == '|' ||
-		*str == '*' || *str == '/') && *(str+1) == '=' && *(str+2) != '\0')
-     {
-	  int16_t *lvali = 0;
-	  uint32_t *lvalui = 0;
-	  char **lvalstr = 0;
-	  int64_t *lvali64 = 0;
-	  int8_t *lvalb = 0; 
-	  *str = '\0';
-	  if (do_bufs(&buf[0], &tmp[0], cmnd)) 
-	    translate_value(buf, tmp, &lvali,&lvalui, &lvalstr,&lvali64, &lvalb,mob,actor, obj, vo, rndm);
-	  else strcpy(left, cmnd);
+	point = buf;
+	str = cmnd;
+	while (*str == ' ')
+		str++;
+	/*
+	  while (*str != '\0')
+	  {
+		 if ((*str == '=' || *str == '+' || *str == '-' || *str == '&' || *str == '|' ||
+			*str == '*' || *str == '/') && *(str+1) == '=' && *(str+2) != '\0')
+		 {
+		  int16_t *lvali = 0;
+		  uint32_t *lvalui = 0;
+		  char **lvalstr = 0;
+		  int64_t *lvali64 = 0;
+		  int8_t *lvalb = 0;
+		  *str = '\0';
+		  if (do_bufs(&buf[0], &tmp[0], cmnd))
+			translate_value(buf, tmp, &lvali,&lvalui, &lvalstr,&lvali64, &lvalb,mob,actor, obj, vo, rndm);
+		  else strcpy(left, cmnd);
 
-	  str += 2;
+		  str += 2;
 
-	  while ( *str == ' ' )
- 	    str++;
-	  if (do_bufs(&buf[0], &tmp[0], str)) 
-	    translate_value(buf,tmp,&lvali,&lvalui, &lvalstr,&lvali64, &lvalb,mob,actor, obj, vo, rndm);
-	  else strcpy(right, str);
-	char buf[MAX_STRING_LENGTH];
-	buf[0] = '\0';
-	if (lvali)
-	  sprintf(buf, "%sLvali: %d\n", buf,*lvali);
-	if (lvalui)
-	  sprintf(buf, "%sLvalui: %d\n", buf,*lvalui);
-	if (lvali64)
-	  sprintf(buf, "%sLvali64: %lld\n", buf,*lvali64);
-	if (lvalb)
-	  sprintf(buf, "%sLvalb: %d\n", buf,*lvalb);
-	if (lvalstr)
-	  sprintf(buf, "%sLvalstr: %s\n", buf,lvalstr);
-	sprintf(buf,"%sLeft: %s\n",buf,left);
-	sprintf(buf,"%sRight: %s\n",buf,right);
-//        if (actor)
-//	  send_to_char(buf, actor);
-	return eSUCCESS;
-     }
-     str++;
-  }*/
-  str = cmnd;
-  while ( *str != '\0' )
-  {
-    if ( *str != '$' )
-    {
-      *point++ = *str++;
-      continue;
-    }
-    str++;
-    if (*str == '\0') break; // panic!
-    if (*(str+1) == '.')
-    {
-	int16_t *lvali = 0;
-	uint32_t *lvalui = 0;
-	char **lvalstr = 0;
-	int64_t *lvali64 = 0;
-	int8_t *lvalb = 0;
-	char left[MAX_INPUT_LENGTH], right[MAX_INPUT_LENGTH];
-        left[0] = '$'; left[1] = *str; left[2] = '\0';
-	str = one_argument(str+2, right);
-        translate_value(left,right,&lvali,&lvalui, &lvalstr,&lvali64, &lvalb,mob,actor, obj, vo, rndm);
-	char buf[MAX_STRING_LENGTH];
-	buf[0] = '\0';
-	if (lvali) sprintf(buf, "%d", *lvali);
-	if (lvalui) sprintf(buf, "%u", *lvalui);
-	if (lvalstr) sprintf(buf, "%s", *lvalstr);
-	if (lvali64) sprintf(buf, "%lld", *lvali64);
-	if (lvalb) sprintf(buf, "%d", *lvalb);
-        for (int i = 0; buf[i];i++)
-	  *point++ = buf[i];
-	continue;
-    }
+		  while ( *str == ' ' )
+			str++;
+		  if (do_bufs(&buf[0], &tmp[0], str))
+			translate_value(buf,tmp,&lvali,&lvalui, &lvalstr,&lvali64, &lvalb,mob,actor, obj, vo, rndm);
+		  else strcpy(right, str);
+		char buf[MAX_STRING_LENGTH];
+		buf[0] = '\0';
+		if (lvali)
+		  sprintf(buf, "%sLvali: %d\n", buf,*lvali);
+		if (lvalui)
+		  sprintf(buf, "%sLvalui: %d\n", buf,*lvalui);
+		if (lvali64)
+		  sprintf(buf, "%sLvali64: %lld\n", buf,*lvali64);
+		if (lvalb)
+		  sprintf(buf, "%sLvalb: %d\n", buf,*lvalb);
+		if (lvalstr)
+		  sprintf(buf, "%sLvalstr: %s\n", buf,lvalstr);
+		sprintf(buf,"%sLeft: %s\n",buf,left);
+		sprintf(buf,"%sRight: %s\n",buf,right);
+	//        if (actor)
+	//	  send_to_char(buf, actor);
+		return eSUCCESS;
+		 }
+		 str++;
+	  }*/
+	str = cmnd;
+	while (*str != '\0')
+	{
+		if (*str != '$')
+		{
+			*point++ = *str++;
+			continue;
+		}
+		str++;
+		if (*str == '\0')
+			break; // panic!
+		if (*(str + 1) == '.')
+		{
+			int16_t *lvali = 0;
+			uint32_t *lvalui = 0;
+			char **lvalstr = 0;
+			int64_t *lvali64 = 0;
+			int8_t *lvalb = 0;
+			char left[MAX_INPUT_LENGTH], right[MAX_INPUT_LENGTH];
+			left[0] = '$';
+			left[1] = *str;
+			left[2] = '\0';
+			str = one_argument(str + 2, right);
+			translate_value(left, right, &lvali, &lvalui, &lvalstr, &lvali64, &lvalb, mob, actor, obj, vo, rndm);
+			char buf[MAX_STRING_LENGTH];
+			buf[0] = '\0';
+			if (lvali)
+				sprintf(buf, "%d", *lvali);
+			if (lvalui)
+				sprintf(buf, "%u", *lvalui);
+			if (lvalstr)
+				sprintf(buf, "%s", *lvalstr);
+			if (lvali64)
+				sprintf(buf, "%lld", *lvali64);
+			if (lvalb)
+				sprintf(buf, "%d", *lvalb);
+			for (int i = 0; buf[i]; i++)
+				*point++ = buf[i];
+			continue;
+		}
 
-
-    if (LOWER(*str) == 'v' || LOWER(*str) == 'w')
-    {
-      char a = *str;
-      str++;
-      if (*str == '[') 
-      {
-	char *tmp1 = &tmp[0];
-	str++;
-	while (*str != ']' && *str!='\0')
-	  *tmp1++ = *str++;
-        *tmp1 = '\0';
-        char_data *who = NULL;
-	if (a == 'v') who = mob;
-	else if (a == 'V') who = actor;
-	else if (a == 'w') who = (char_data*)vo;
-	else if (a == 'W') who = rndm;
-        if (who) {
-	  struct tempvariable *eh = who->tempVariable;
-	  for (; eh; eh = eh->next)
-            if (!str_cmp(tmp, eh->name))
-  	      break;
-	 if (eh) {
-	strcpy(tmp, eh->data);
-	if (eh->data && *eh->data) *eh->data = UPPER(*eh->data);
+		if (LOWER(*str) == 'v' || LOWER(*str) == 'w')
+		{
+			char a = *str;
+			str++;
+			if (*str == '[')
+			{
+				char *tmp1 = &tmp[0];
+				str++;
+				while (*str != ']' && *str != '\0')
+					*tmp1++ = *str++;
+				*tmp1 = '\0';
+				char_data *who = NULL;
+				if (a == 'v')
+					who = mob;
+				else if (a == 'V')
+					who = actor;
+				else if (a == 'w')
+					who = (char_data *)vo;
+				else if (a == 'W')
+					who = rndm;
+				if (who)
+				{
+					struct tempvariable *eh = who->tempVariable;
+					for (; eh; eh = eh->next)
+						if (!str_cmp(tmp, eh->name))
+							break;
+					if (eh)
+					{
+						strcpy(tmp, eh->data);
+						if (eh->data && *eh->data)
+							*eh->data = UPPER(*eh->data);
+					}
+					else
+						continue; // Doesn't have the variable.
+				}
+			}
+		}
+		else
+			mprog_translate(*str, tmp, mob, actor, obj, vo, rndm);
+		i = tmp;
+		++str;
+		while ((*point = *i) != '\0')
+			++point, ++i;
 	}
-	 else continue; // Doesn't have the variable.
-        }
-      }
-    } else
-    mprog_translate( *str, tmp, mob, actor, obj, vo, rndm );
-    i = tmp;
-    ++str;
-    while ( ( *point = *i ) != '\0' )
-      ++point, ++i;
-  }
-  *point = '\0';
+	*point = '\0';
 
-//  if(strlen(buf) > MAX_INPUT_LENGTH-1)
-//    logf(IMMORTAL, LOG_WORLD, "Warning!  Mob '%s' has MobProg command longer than max input.", GET_NAME(mob));
+	//  if(strlen(buf) > MAX_INPUT_LENGTH-1)
+	//    logf(IMMORTAL, LogChannels::LOG_WORLD, "Warning!  Mob '%s' has MobProg command longer than max input.", GET_NAME(mob));
 
-  return command_interpreter( mob, buf, TRUE );
+	return command_interpreter(mob, buf, TRUE);
 }
 
 bool objExists(obj_data *obj)
 {
-  obj_data *tobj;
+	obj_data *tobj;
 
-  for (tobj = object_list;tobj;tobj = tobj->next)
-    if (tobj == obj) break;
-  if (tobj) return TRUE;
-  return FALSE;
+	for (tobj = object_list; tobj; tobj = tobj->next)
+		if (tobj == obj)
+			break;
+	if (tobj)
+		return TRUE;
+	return FALSE;
 }
 
-
-
-/* The main focus of the MOBprograms.  This routine is called 
+/* The main focus of the MOBprograms.  This routine is called
  *  whenever a trigger is successful.  It is responsible for parsing
  *  the command list and figuring out what to do. However, like all
  *  complex procedures, everything is farmed out to the other guys.
  */
-void mprog_driver ( char *com_list, char_data *mob, char_data *actor,
-		   obj_data *obj, void *vo, struct mprog_throw_type *thrw, char_data *rndm )
+void mprog_driver(char *com_list, char_data *mob, char_data *actor,
+				  obj_data *obj, void *vo, struct mprog_throw_type *thrw, char_data *rndm)
 {
 
- char tmpcmndlst[ MAX_STRING_LENGTH ];
- char buf       [ MAX_INPUT_LENGTH ];
- char *morebuf;
- char *command_list;
- char *cmnd;
-// char_data *rndm  = NULL;
- char_data *vch   = NULL;
- int        count = 0;
- if (IS_AFFECTED( mob, AFF_CHARM ))
-   return;
- selfpurge = false;
- mprog_cur_result = eSUCCESS;
- mprog_line_num = 0;
+	char tmpcmndlst[MAX_STRING_LENGTH];
+	char buf[MAX_INPUT_LENGTH];
+	char *morebuf;
+	char *command_list;
+	char *cmnd;
+	// char_data *rndm  = NULL;
+	char_data *vch = NULL;
+	int count = 0;
+	if (IS_AFFECTED(mob, AFF_CHARM))
+		return;
+	selfpurge = false;
+	mprog_cur_result = eSUCCESS;
+	mprog_line_num = 0;
 
- activeProgs++;
- if (activeProgs > 20)
- {
-        logf( IMMORTAL, LOG_WORLD, "Mob: %d : Too many active mobprograms : LOOP", mob_index[mob->mobdata->nr].virt );
+	activeProgs++;
+	if (activeProgs > 20)
+	{
+		logf(IMMORTAL, LogChannels::LOG_WORLD, "Mob: %d : Too many active mobprograms : LOOP", mob_index[mob->mobdata->nr].virt);
+		activeProgs--;
+		return;
+	}
+
+	// int cIfs[256]; // for MPPAUSE
+	// int ifpos;
+	ifpos = 0;
+	memset(&cIfs[0], 0, sizeof(int) * 256);
+
+	if (!charExists(actor))
+		actor = NULL;
+	if (!objExists(obj))
+		obj = NULL;
+
+	activeActor = actor;
+	activeObj = obj;
+	activeVo = vo;
+
+	activeProg = com_list;
+
+	if (!com_list) // this can happen when someone is editing
+	{
+		activeActor = activeRndm = NULL;
+		activeObj = NULL;
+		activeVo = NULL;
+		activeProgs--;
+		return;
+	}
+
+	// count valid random victs in room
+	if (mob->in_room > 0)
+	{
+		for (vch = world[mob->in_room].people; vch; vch = vch->next_in_room)
+			if (CAN_SEE(mob, vch, TRUE) && !IS_NPC(vch))
+				count++;
+
+		if (count)
+			count = number(1, count); // if we have valid victs, choose one
+
+		if (!rndm && count)
+		{
+			for (vch = world[mob->in_room].people; vch && count;)
+			{
+				if (CAN_SEE(mob, vch, TRUE) && !IS_NPC(vch))
+					count--;
+				if (count)
+					vch = vch->next_in_room;
+			}
+			rndm = vch;
+		}
+
+		activeRndm = rndm;
+	}
+
+	strcpy(tmpcmndlst, com_list);
+
+	command_list = tmpcmndlst;
+	cmnd = command_list;
+	activeProgTmpBuf = command_list;
+	activePos = command_list = mprog_next_command(command_list);
+
+	// if (thrw) thrw->orig = &tmpcmndlst[0];
+	while (*cmnd != '\0')
+	{
+		morebuf = one_argument(cmnd, buf);
+
+		if (!str_cmp(buf, "if"))
+		{
+			activePos = command_list = mprog_process_if(morebuf, command_list, mob,
+														actor, obj, vo, rndm, thrw);
+			if (IS_SET(mprog_cur_result, eCH_DIED) || IS_SET(mprog_cur_result, eDELAYED_EXEC))
+			{
+				activeActor = activeRndm = NULL;
+				activeObj = NULL;
+				activeVo = NULL;
+				activeProgs--;
+				return;
+			}
+		}
+		else
+		{
+
+			if (!thrw || DIFF(cmnd, activeProgTmpBuf) >= thrw->startPos)
+			{
+				SET_BIT(mprog_cur_result, mprog_process_cmnd(cmnd, mob, actor, obj, vo, rndm));
+				if (IS_SET(mprog_cur_result, eCH_DIED) || selfpurge || IS_SET(mprog_cur_result, eDELAYED_EXEC))
+				{
+					activeActor = activeRndm = NULL;
+					activeObj = NULL;
+					activeVo = NULL;
+					activeProgs--;
+					return;
+				}
+			}
+		}
+		cmnd = command_list;
+		activePos = command_list = mprog_next_command(command_list);
+	}
+	activeActor = activeRndm = NULL;
+	activeObj = NULL;
+	activeVo = NULL;
 	activeProgs--;
 	return;
- }
-
- //int cIfs[256]; // for MPPAUSE
- //int ifpos;
- ifpos = 0;
- memset(&cIfs[0], 0, sizeof(int) * 256);
-
- if (!charExists(actor)) actor = NULL; 
- if (!objExists(obj)) obj = NULL; 
-
- activeActor = actor;
- activeObj = obj;
- activeVo = vo;
-
- activeProg = com_list;
-
- if(!com_list) // this can happen when someone is editing
- {
-   activeActor = activeRndm = NULL;
-   activeObj = NULL;
-   activeVo = NULL;
-   activeProgs--;
-   return;
- }
-
- // count valid random victs in room
- if (mob->in_room > 0) {
-   for ( vch = world[mob->in_room].people; vch; vch = vch->next_in_room )
-     if ( CAN_SEE( mob, vch, TRUE ) && !IS_NPC(vch) )
-         count++;
-
-   if(count)
-     count = number( 1, count );  // if we have valid victs, choose one
-
-   if(!rndm && count)
-   {
-     for ( vch = world[mob->in_room].people; vch && count; )
-     {
-       if ( CAN_SEE( mob, vch, TRUE ) && !IS_NPC(vch) )
-         count--;
-       if (count) vch = vch->next_in_room;
-    }
-     rndm = vch;
-   }
-
-   activeRndm = rndm;
- }
-
- strcpy( tmpcmndlst, com_list );
-
- command_list = tmpcmndlst;
- cmnd         = command_list;
- activeProgTmpBuf = command_list;
- activePos = command_list = mprog_next_command( command_list );
- 
-// if (thrw) thrw->orig = &tmpcmndlst[0];
- while ( *cmnd != '\0' )
-   {
-     morebuf = one_argument( cmnd, buf );
-
-     if ( !str_cmp( buf, "if" ) ) {
-       activePos = command_list = mprog_process_if( morebuf, command_list, mob,
-				       actor, obj, vo, rndm, thrw );
-       if(IS_SET(mprog_cur_result, eCH_DIED) || IS_SET(mprog_cur_result,eDELAYED_EXEC))
-	{
-	   activeActor = activeRndm = NULL;
-	   activeObj = NULL;
-	   activeVo = NULL;
-	   activeProgs--;
-         return;
-	}
-     }
-     else {
-
-       if (!thrw || DIFF(cmnd, activeProgTmpBuf) >= thrw->startPos)
-       {
-	     SET_BIT(mprog_cur_result, mprog_process_cmnd( cmnd, mob, actor, obj, vo, rndm ));
-       	     if(IS_SET(mprog_cur_result, eCH_DIED) || selfpurge || IS_SET(mprog_cur_result, eDELAYED_EXEC))
-		{
-		   activeActor = activeRndm = NULL;
-		   activeObj = NULL;
-		   activeVo = NULL;
-		   activeProgs--;
-        	  return;
-		}
-	}	
-     }
-     cmnd         = command_list;
-     activePos = command_list = mprog_next_command( command_list );
-   }
-   activeActor = activeRndm = NULL;
-   activeObj = NULL;
-   activeVo = NULL;
-   activeProgs--;
- return;
-
 }
 
 /***************************************************************************
@@ -3393,134 +3975,144 @@ void mprog_driver ( char *com_list, char_data *mob, char_data *actor,
  */
 // Returns TRUE if match
 // FALSE if no match
-int mprog_wordlist_check( const char *arg, char_data *mob, char_data *actor,
-			  obj_data *obj, void *vo, int type, bool reverse )
+int mprog_wordlist_check(const char *arg, char_data *mob, char_data *actor,
+						 obj_data *obj, void *vo, int type, bool reverse)
 // reverse ALSO IMPLIES IT ALSO ONLY CHECKS THE FIRST WORD
 {
-	
-  char        temp1[ MAX_STRING_LENGTH ];
-  char        temp2[ MAX_STRING_LENGTH ];
-  char        word[ MAX_INPUT_LENGTH ];
-  mob_prog_data *mprg;
-  mob_prog_data *next;
-  char       *list;
-  char       *start;
-  char       *dupl;
-  char       *end;
-  int         i;
-  int         retval = 0;
-  bool done = FALSE;
-//  for ( mprg = mob_index[mob->mobdata->nr].mobprogs; mprg != NULL; mprg 
-//= next )
- mprg = mob_index[mob->mobdata->nr].mobprogs;
- if (!mprg) { done = TRUE; mprg = mob_index[mob->mobdata->nr].mobspec; }
 
- mprog_command_num = 0;
- for ( ; mprg != NULL; mprg = next )
-  {
-    mprog_command_num++;
-    next = mprg->next;
-    if ( mprg->type & type )
-      {
-	if (!reverse) strcpy( temp1, mprg->arglist );
-	else strcpy(temp1, arg);
+	char temp1[MAX_STRING_LENGTH];
+	char temp2[MAX_STRING_LENGTH];
+	char word[MAX_INPUT_LENGTH];
+	mob_prog_data *mprg;
+	mob_prog_data *next;
+	char *list;
+	char *start;
+	char *dupl;
+	char *end;
+	int i;
+	int retval = 0;
+	bool done = FALSE;
+	//  for ( mprg = mob_index[mob->mobdata->nr].mobprogs; mprg != NULL; mprg
+	//= next )
+	mprg = mob_index[mob->mobdata->nr].mobprogs;
+	if (!mprg)
+	{
+		done = TRUE;
+		mprg = mob_index[mob->mobdata->nr].mobspec;
+	}
 
-	list = temp1;
-	for ( i = 0; i < (signed) strlen( list ); i++ )
-	  list[i] = LOWER( list[i] );
-
-	if (!reverse) strcpy( temp2, arg );
-	else strcpy(temp2, mprg->arglist);
-
-	dupl = temp2;
-	for ( i = 0; i < (signed) strlen( dupl ); i++ )
-	  dupl[i] = LOWER( dupl[i] );
-	if ( ( list[0] == 'p' ) && ( list[1] == ' ' ) )
-	  {
-	    list += 2;
-	    while ( ( start = strstr( dupl, list ) ) )
-	      if ( (start == dupl || *(start-1) == ' ' )
-		  && ( *(end = start + strlen( list ) ) == ' '
-		      || *end == '\n'
-		      || *end == '\r'
-		      || *end == '\0'
-                      // allow punctuation at the end
-                      || *end == '.'
-                      || *end == '?'
-                      || *end == '!' ) )
+	mprog_command_num = 0;
+	for (; mprg != NULL; mprg = next)
+	{
+		mprog_command_num++;
+		next = mprg->next;
+		if (mprg->type & type)
 		{
-                  retval = 1;
-		  mprog_driver( mprg->comlist, mob, actor, obj, vo, NULL, NULL );
-		  if (selfpurge || IS_SET(mprog_cur_result, eCH_DIED))
-		    return retval;
-		  break;
-		}
-	      else
-		dupl = start+1;
-	  }
-	else
-	  {
-	    list = one_argument( list, word );
-	    for( ; word[0] != '\0'; list = one_argument( list, word ) )
-	    {
+			if (!reverse)
+				strcpy(temp1, mprg->arglist);
+			else
+				strcpy(temp1, arg);
+
+			list = temp1;
+			for (i = 0; i < (signed)strlen(list); i++)
+				list[i] = LOWER(list[i]);
+
+			if (!reverse)
+				strcpy(temp2, arg);
+			else
+				strcpy(temp2, mprg->arglist);
+
+			dupl = temp2;
+			for (i = 0; i < (signed)strlen(dupl); i++)
+				dupl[i] = LOWER(dupl[i]);
+			if ((list[0] == 'p') && (list[1] == ' '))
+			{
+				list += 2;
+				while ((start = strstr(dupl, list)))
+					if ((start == dupl || *(start - 1) == ' ') && (*(end = start + strlen(list)) == ' ' || *end == '\n' || *end == '\r' || *end == '\0'
+																   // allow punctuation at the end
+																   || *end == '.' || *end == '?' || *end == '!'))
+					{
+						retval = 1;
+						mprog_driver(mprg->comlist, mob, actor, obj, vo, NULL, NULL);
+						if (selfpurge || IS_SET(mprog_cur_result, eCH_DIED))
+							return retval;
+						break;
+					}
+					else
+						dupl = start + 1;
+			}
+			else
+			{
+				list = one_argument(list, word);
+				for (; word[0] != '\0'; list = one_argument(list, word))
+				{
 					while ((start = strstr(dupl, word)))
-						if ((start == dupl || *(start - 1) == ' ')
-								&& (*(end = start + strlen(word)) == ' '
-										|| *end == '\n' || *end == '\r'
-										|| *end == '\0'
-										// allow punctuation at the end
-										|| *end == '.' || *end == '?'
-										|| *end == '!')) {
+						if ((start == dupl || *(start - 1) == ' ') && (*(end = start + strlen(word)) == ' ' || *end == '\n' || *end == '\r' || *end == '\0'
+																	   // allow punctuation at the end
+																	   || *end == '.' || *end == '?' || *end == '!'))
+						{
 							retval = 1;
 							mprog_driver(mprg->comlist, mob, actor, obj, vo,
-									NULL, NULL);
+										 NULL, NULL);
 							if (selfpurge || IS_SET(mprog_cur_result, eCH_DIED))
 								return retval;
 							break;
-						} else
+						}
+						else
 							dupl = start + 1;
-		if (reverse) break;
-  	    }
-	  }
-      }
-     if (next == NULL && !done) { done = TRUE;
-       next = mob_index[mob->mobdata->nr].mobspec; }
-    }
-  return retval;
-
+					if (reverse)
+						break;
+				}
+			}
+		}
+		if (next == NULL && !done)
+		{
+			done = TRUE;
+			next = mob_index[mob->mobdata->nr].mobspec;
+		}
+	}
+	return retval;
 }
 
-void mprog_percent_check( char_data *mob, char_data *actor, obj_data *obj,
-			 void *vo, int type)
+void mprog_percent_check(char_data *mob, char_data *actor, obj_data *obj,
+						 void *vo, int type)
 {
- mob_prog_data * mprg;
- mob_prog_data *next;
- bool done = FALSE;
- mprg = mob_index[mob->mobdata->nr].mobprogs;
- if (!mprg) { done = TRUE; mprg = mob_index[mob->mobdata->nr].mobspec; }
+	mob_prog_data *mprg;
+	mob_prog_data *next;
+	bool done = FALSE;
+	mprg = mob_index[mob->mobdata->nr].mobprogs;
+	if (!mprg)
+	{
+		done = TRUE;
+		mprg = mob_index[mob->mobdata->nr].mobspec;
+	}
 
- if (mob_index[mob->mobdata->nr].virt == 30013)
- {
-	debugpoint();
- }
+	if (mob_index[mob->mobdata->nr].virt == 30013)
+	{
+		debugpoint();
+	}
 
- mprog_command_num = 0;
- for ( ; mprg != NULL; mprg = next )
- {
-   mprog_command_num++;
-  next = mprg->next;
-   if ( ( mprg->type & type )
-       && ( number(0, 99) < atoi( mprg->arglist ) ) )
-     {
-       mprog_driver( mprg->comlist, mob, actor, obj, vo, NULL, NULL );
-		if (selfpurge) return;
-       if ( type != GREET_PROG && type != ALL_GREET_PROG )
-	 break;
-     }
-   if (!next && !done){done = TRUE; next = mob_index[mob->mobdata->nr].mobspec; }
- }
- return;
-
+	mprog_command_num = 0;
+	for (; mprg != NULL; mprg = next)
+	{
+		mprog_command_num++;
+		next = mprg->next;
+		if ((mprg->type & type) && (number(0, 99) < atoi(mprg->arglist)))
+		{
+			mprog_driver(mprg->comlist, mob, actor, obj, vo, NULL, NULL);
+			if (selfpurge)
+				return;
+			if (type != GREET_PROG && type != ALL_GREET_PROG)
+				break;
+		}
+		if (!next && !done)
+		{
+			done = TRUE;
+			next = mob_index[mob->mobdata->nr].mobspec;
+		}
+	}
+	return;
 }
 
 /* The triggers.. These are really basic, and since most appear only
@@ -3532,294 +4124,300 @@ void mprog_percent_check( char_data *mob, char_data *actor, obj_data *obj,
  * trigger calls.
  */
 int mprog_act_trigger(string buf, char_data *mob, char_data *ch,
-		       obj_data *obj, void *vo)
+					  obj_data *obj, void *vo)
 {
 
-//  mob_prog_act_list * tmp_act;
-  //mob_prog_act_list * curr;
-//  mob_prog_data *mprg;
-  mprog_cur_result = eSUCCESS;
+	//  mob_prog_act_list * tmp_act;
+	// mob_prog_act_list * curr;
+	//  mob_prog_data *mprg;
+	mprog_cur_result = eSUCCESS;
 
-  if(!MOBtrigger)
-    return mprog_cur_result;
+	if (!MOBtrigger)
+		return mprog_cur_result;
 
-  if ( IS_NPC( mob )
-      && ( mob_index[mob->mobdata->nr].progtypes & ACT_PROG ) && isPaused(mob) == false)
-             mprog_wordlist_check( buf.c_str(), mob, ch,
-                       obj, vo, ACT_PROG );
+	if (IS_NPC(mob) && (mob_index[mob->mobdata->nr].progtypes & ACT_PROG) && isPaused(mob) == false)
+		mprog_wordlist_check(buf.c_str(), mob, ch,
+							 obj, vo, ACT_PROG);
 
-/* Why oh why was it like this? They can add lag themselves if needed.
-  if 
-( IS_NPC( mob )
-      && ( mob_index[mob->mobdata->nr].progtypes & ACT_PROG ) )
-    {
-#ifdef LEAK_CHECK
-      tmp_act = (mob_prog_act_list *) calloc( 1, sizeof( mob_prog_act_list ) );
-#else
-      tmp_act = (mob_prog_act_list *) dc_alloc( 1, sizeof( mob_prog_act_list ) );
-#endif
+	/* Why oh why was it like this? They can add lag themselves if needed.
+	  if
+	( IS_NPC( mob )
+		  && ( mob_index[mob->mobdata->nr].progtypes & ACT_PROG ) )
+		{
+	#ifdef LEAK_CHECK
+		  tmp_act = (mob_prog_act_list *) calloc( 1, sizeof( mob_prog_act_list ) );
+	#else
+		  tmp_act = (mob_prog_act_list *) dc_alloc( 1, sizeof( mob_prog_act_list ) );
+	#endif
 
-      if(!mob->mobdata->mpact)
-        mob->mobdata->mpact = tmp_act;
-      else {
-        curr = mob->mobdata->mpact;
-        while(curr->next)
-          curr = curr->next;
-        curr->next = tmp_act;
-      }
+		  if(!mob->mobdata->mpact)
+			mob->mobdata->mpact = tmp_act;
+		  else {
+			curr = mob->mobdata->mpact;
+			while(curr->next)
+			  curr = curr->next;
+			curr->next = tmp_act;
+		  }
 
-      tmp_act->next = NULL;
-      tmp_act->buf = str_dup( buf );
-      tmp_act->ch  = ch; 
-      tmp_act->obj = obj; 
-      tmp_act->vo  = vo; 
-      mob->mobdata->mpactnum++;
+		  tmp_act->next = NULL;
+		  tmp_act->buf = str_dup( buf );
+		  tmp_act->ch  = ch;
+		  tmp_act->obj = obj;
+		  tmp_act->vo  = vo;
+		  mob->mobdata->mpactnum++;
 
-    }
-*/  return mprog_cur_result;
-
+		}
+	*/
+	return mprog_cur_result;
 }
 
-int mprog_bribe_trigger( char_data *mob, char_data *ch, int amount )
+int mprog_bribe_trigger(char_data *mob, char_data *ch, int amount)
 {
 
-  mob_prog_data *mprg = 0;
-  mob_prog_data *next = 0;
-  obj_data   *obj = 0;
-  bool done = FALSE;
+	mob_prog_data *mprg = 0;
+	mob_prog_data *next = 0;
+	obj_data *obj = 0;
+	bool done = FALSE;
 
-  if ( IS_NPC( mob ) && ( mob_index[mob->mobdata->nr].progtypes & BRIBE_PROG ) && isPaused(mob) == false) {
-	mob->gold -= amount;
-    
-    mprg = mob_index[mob->mobdata->nr].mobprogs;
-    if (!mprg) {
-      done = TRUE;
-      mprg = mob_index[mob->mobdata->nr].mobspec;
-    }
+	if (IS_NPC(mob) && (mob_index[mob->mobdata->nr].progtypes & BRIBE_PROG) && isPaused(mob) == false)
+	{
+		mob->gold -= amount;
 
-    mprog_command_num = 0;
-    for ( ; mprg != NULL; mprg = next )	{
-      mprog_command_num++;
-      next = mprg->next;
+		mprg = mob_index[mob->mobdata->nr].mobprogs;
+		if (!mprg)
+		{
+			done = TRUE;
+			mprg = mob_index[mob->mobdata->nr].mobspec;
+		}
 
-      if ( ( mprg->type & BRIBE_PROG ) && ( amount >= atoi( mprg->arglist ) ) ) {
-	mprog_driver( mprg->comlist, mob, ch, obj, NULL, NULL, NULL );
-	if (selfpurge)
-	  return mprog_cur_result;
-	break;
-      }
+		mprog_command_num = 0;
+		for (; mprg != NULL; mprg = next)
+		{
+			mprog_command_num++;
+			next = mprg->next;
 
-      if (!next && !done) {
-	next = mob_index[mob->mobdata->nr].mobspec;
-	done = TRUE;
-      }
-    }
-  }
-  
-  return mprog_cur_result;
-}
+			if ((mprg->type & BRIBE_PROG) && (amount >= atoi(mprg->arglist)))
+			{
+				mprog_driver(mprg->comlist, mob, ch, obj, NULL, NULL, NULL);
+				if (selfpurge)
+					return mprog_cur_result;
+				break;
+			}
 
-int mprog_damage_trigger( char_data *mob, char_data *ch, int amount )
-{
-
-  mob_prog_data *mprg = 0;
-  mob_prog_data *next = 0;
-  obj_data   *obj = 0;
-  bool done = FALSE;
-  if ( IS_NPC( mob ) && ( mob_index[mob->mobdata->nr].progtypes & DAMAGE_PROG ) && isPaused(mob) == false)
-    {
-	  mprg = mob_index[mob->mobdata->nr].mobprogs;
-
-      if (!mprg) {
-	done = TRUE;
-	mprg = mob_index[mob->mobdata->nr].mobspec;
-      }
-
-      mprog_command_num = 0;
-      for ( ; mprg != NULL; mprg = next ) {
-	mprog_command_num++;
-	next = mprg->next;
-
-	if ( ( mprg->type & DAMAGE_PROG )
-	    && ( amount >= atoi( mprg->arglist ) ) )
-	  {
-	    mprog_driver( mprg->comlist, mob, ch, obj, NULL, NULL, NULL );
-		if (selfpurge) return mprog_cur_result;
-	    break;
-	  }
-	   if (!next && !done) { next = mob_index[mob->mobdata->nr].mobspec; done = TRUE;}
+			if (!next && !done)
+			{
+				next = mob_index[mob->mobdata->nr].mobspec;
+				done = TRUE;
+			}
+		}
 	}
-    }
-  
-  return mprog_cur_result;
 
+	return mprog_cur_result;
 }
 
-int mprog_death_trigger( char_data *mob, char_data *killer )
+int mprog_damage_trigger(char_data *mob, char_data *ch, int amount)
 {
 
- if ( IS_NPC( mob )
-     && ( mob_index[mob->mobdata->nr].progtypes & DEATH_PROG ) && isPaused(mob) == false)
-   {
-	 mprog_percent_check( mob, killer, NULL, NULL, DEATH_PROG );
-   }
- if (!SOMEONE_DIED(mprog_cur_result))
-  death_cry( mob );
- return mprog_cur_result;
+	mob_prog_data *mprg = 0;
+	mob_prog_data *next = 0;
+	obj_data *obj = 0;
+	bool done = FALSE;
+	if (IS_NPC(mob) && (mob_index[mob->mobdata->nr].progtypes & DAMAGE_PROG) && isPaused(mob) == false)
+	{
+		mprg = mob_index[mob->mobdata->nr].mobprogs;
 
-}
+		if (!mprg)
+		{
+			done = TRUE;
+			mprg = mob_index[mob->mobdata->nr].mobspec;
+		}
 
-int mprog_entry_trigger( char_data *mob )
-{
+		mprog_command_num = 0;
+		for (; mprg != NULL; mprg = next)
+		{
+			mprog_command_num++;
+			next = mprg->next;
 
- if ( IS_NPC( mob )
-     && ( mob_index[mob->mobdata->nr].progtypes & ENTRY_PROG ) && isPaused(mob) == false)
-   mprog_percent_check( mob, NULL, NULL, NULL, ENTRY_PROG );
-
- return mprog_cur_result;
-
-}
-
-int mprog_fight_trigger( char_data *mob, char_data *ch )
-{
-
- if ( IS_NPC( mob )
- && MOB_WAIT_STATE(mob) <= 0
-     && ( mob_index[mob->mobdata->nr].progtypes & FIGHT_PROG ) && isPaused(mob) == false)
-   mprog_percent_check( mob, ch, NULL, NULL, FIGHT_PROG );
-
- return mprog_cur_result;
-
-}
-
-int mprog_attack_trigger( char_data *mob, char_data *ch )
-{
-
- if ( IS_NPC( mob )
-     && ( mob_index[mob->mobdata->nr].progtypes & ATTACK_PROG ) && isPaused(mob) == false)
-   mprog_percent_check( mob, ch, NULL, NULL, ATTACK_PROG );
-
- return mprog_cur_result;
-
-}
-
-int mprog_give_trigger( char_data *mob, char_data *ch, obj_data *obj )
-{
-
- char        buf[MAX_INPUT_LENGTH];
- mob_prog_data *mprg;
- mob_prog_data *next;
- bool done = FALSE, okay = FALSE;
- if ( IS_NPC( mob )
-     && ( mob_index[mob->mobdata->nr].progtypes & GIVE_PROG ) && isPaused(mob) == false)
-{
-  mprg = mob_index[mob->mobdata->nr].mobprogs;
-  if (!mprg) { done = TRUE; mprg = mob_index[mob->mobdata->nr].mobspec; }
-
-  mprog_command_num = 0;
-  for ( ; mprg != NULL; mprg = next ) {
-    mprog_command_num++;
-
-    next = mprg->next;
-    one_argument( mprg->arglist, buf );
-    if ( ( mprg->type & GIVE_PROG )
-	 && ( ( !str_cmp( obj->name, mprg->arglist ) )
-	      || ( !str_cmp( "all", buf ) ) ) )
-      {
-	okay = TRUE;
-	mprog_driver( mprg->comlist, mob, ch, obj, NULL, NULL, NULL );
-	if (selfpurge) return mprog_cur_result;
-	break;
-      }
-
-    if (!next && !done) { done = TRUE; next = mob_index[mob->mobdata->nr].mobspec;}
-  }
- }
-
- if (okay && !SOMEONE_DIED(mprog_cur_result)) {
-   obj_data *a;
-   SET_BIT(mprog_cur_result, eEXTRA_VALUE);
-   for (a = mob->carrying; a; a = a->next_content)
-     if (a == obj) {
-       REMOVE_BIT(mprog_cur_result, eEXTRA_VALUE);
-     }  
-   }
-
- return mprog_cur_result;
-}
-
-int mprog_greet_trigger( char_data *ch )
-{
-
- char_data *vmob;
-
- mprog_cur_result = eSUCCESS;
-
- for ( vmob = world[ch->in_room].people; vmob != NULL; vmob = vmob->next_in_room )
-   if ( IS_NPC( vmob )
-       && ( vmob->fighting == NULL )
-       && AWAKE( vmob ) )
-   {
-     if ( ch != vmob
-       && CAN_SEE( vmob, ch )
-       && ( mob_index[vmob->mobdata->nr].progtypes & GREET_PROG) && isPaused(vmob) == false)
-       mprog_percent_check( vmob, ch, NULL, NULL, GREET_PROG );
-     else
-        if( ( mob_index[vmob->mobdata->nr].progtypes & ALL_GREET_PROG ) && isPaused(vmob) == false)
-         mprog_percent_check(vmob,ch,NULL,NULL,ALL_GREET_PROG);
-     
-     if(SOMEONE_DIED(mprog_cur_result)||selfpurge)
-       break;
-   }
- return mprog_cur_result;
-
-}
-
-int mprog_hitprcnt_trigger( char_data *mob, char_data *ch)
-{
-  mob_prog_data *mprg;
-  mob_prog_data *next;
-  bool done = FALSE;
-
-  if ( IS_NPC( mob )
-       && MOB_WAIT_STATE(mob) <= 0
-       && (mob_index[mob->mobdata->nr].progtypes & HITPRCNT_PROG ) && isPaused(mob) == false)
-    {
-      mprg = mob_index[mob->mobdata->nr].mobprogs;
-      if (!mprg) { done = TRUE; mprg = mob_index[mob->mobdata->nr].mobspec; }
-      
-      mprog_command_num = 0;
-      for ( ; mprg != NULL; mprg = next ) {
-	mprog_command_num++;
-	next = mprg->next;
-
-	if ( ( mprg->type & HITPRCNT_PROG )
-	     && ( ( 100*mob->hit / mob->max_hit ) < atoi( mprg->arglist ) ) )
-	  {
-	    mprog_driver( mprg->comlist, mob, ch, NULL, NULL, NULL, NULL );
-	    if (selfpurge) return mprog_cur_result;
-	    break;
-	  }
-
-	if (!next && !done){
-	  done = TRUE;
-	  next = mob_index[mob->mobdata->nr].mobspec;
+			if ((mprg->type & DAMAGE_PROG) && (amount >= atoi(mprg->arglist)))
+			{
+				mprog_driver(mprg->comlist, mob, ch, obj, NULL, NULL, NULL);
+				if (selfpurge)
+					return mprog_cur_result;
+				break;
+			}
+			if (!next && !done)
+			{
+				next = mob_index[mob->mobdata->nr].mobspec;
+				done = TRUE;
+			}
+		}
 	}
-      }
-    }
-  
-  return mprog_cur_result;
+
+	return mprog_cur_result;
 }
 
-int mprog_random_trigger( char_data *mob )
+int mprog_death_trigger(char_data *mob, char_data *killer)
 {
-  mprog_cur_result = eSUCCESS;
 
-  if ( (mob_index[mob->mobdata->nr].progtypes & RAND_PROG) && isPaused(mob) == false)
-    mprog_percent_check(mob,NULL,NULL,NULL,RAND_PROG);
+	if (IS_NPC(mob) && (mob_index[mob->mobdata->nr].progtypes & DEATH_PROG) && isPaused(mob) == false)
+	{
+		mprog_percent_check(mob, killer, NULL, NULL, DEATH_PROG);
+	}
+	if (!SOMEONE_DIED(mprog_cur_result))
+		death_cry(mob);
+	return mprog_cur_result;
+}
 
-  return mprog_cur_result;
+int mprog_entry_trigger(char_data *mob)
+{
 
+	if (IS_NPC(mob) && (mob_index[mob->mobdata->nr].progtypes & ENTRY_PROG) && isPaused(mob) == false)
+		mprog_percent_check(mob, NULL, NULL, NULL, ENTRY_PROG);
+
+	return mprog_cur_result;
+}
+
+int mprog_fight_trigger(char_data *mob, char_data *ch)
+{
+
+	if (IS_NPC(mob) && MOB_WAIT_STATE(mob) <= 0 && (mob_index[mob->mobdata->nr].progtypes & FIGHT_PROG) && isPaused(mob) == false)
+		mprog_percent_check(mob, ch, NULL, NULL, FIGHT_PROG);
+
+	return mprog_cur_result;
+}
+
+int mprog_attack_trigger(char_data *mob, char_data *ch)
+{
+
+	if (IS_NPC(mob) && (mob_index[mob->mobdata->nr].progtypes & ATTACK_PROG) && isPaused(mob) == false)
+		mprog_percent_check(mob, ch, NULL, NULL, ATTACK_PROG);
+
+	return mprog_cur_result;
+}
+
+int mprog_give_trigger(char_data *mob, char_data *ch, obj_data *obj)
+{
+
+	char buf[MAX_INPUT_LENGTH];
+	mob_prog_data *mprg;
+	mob_prog_data *next;
+	bool done = FALSE, okay = FALSE;
+	if (IS_NPC(mob) && (mob_index[mob->mobdata->nr].progtypes & GIVE_PROG) && isPaused(mob) == false)
+	{
+		mprg = mob_index[mob->mobdata->nr].mobprogs;
+		if (!mprg)
+		{
+			done = TRUE;
+			mprg = mob_index[mob->mobdata->nr].mobspec;
+		}
+
+		mprog_command_num = 0;
+		for (; mprg != NULL; mprg = next)
+		{
+			mprog_command_num++;
+
+			next = mprg->next;
+			one_argument(mprg->arglist, buf);
+			if ((mprg->type & GIVE_PROG) && ((!str_cmp(obj->name, mprg->arglist)) || (!str_cmp("all", buf))))
+			{
+				okay = TRUE;
+				mprog_driver(mprg->comlist, mob, ch, obj, NULL, NULL, NULL);
+				if (selfpurge)
+					return mprog_cur_result;
+				break;
+			}
+
+			if (!next && !done)
+			{
+				done = TRUE;
+				next = mob_index[mob->mobdata->nr].mobspec;
+			}
+		}
+	}
+
+	if (okay && !SOMEONE_DIED(mprog_cur_result))
+	{
+		obj_data *a;
+		SET_BIT(mprog_cur_result, eEXTRA_VALUE);
+		for (a = mob->carrying; a; a = a->next_content)
+			if (a == obj)
+			{
+				REMOVE_BIT(mprog_cur_result, eEXTRA_VALUE);
+			}
+	}
+
+	return mprog_cur_result;
+}
+
+int mprog_greet_trigger(char_data *ch)
+{
+
+	char_data *vmob;
+
+	mprog_cur_result = eSUCCESS;
+
+	for (vmob = world[ch->in_room].people; vmob != NULL; vmob = vmob->next_in_room)
+		if (IS_NPC(vmob) && (vmob->fighting == NULL) && AWAKE(vmob))
+		{
+			if (ch != vmob && CAN_SEE(vmob, ch) && (mob_index[vmob->mobdata->nr].progtypes & GREET_PROG) && isPaused(vmob) == false)
+				mprog_percent_check(vmob, ch, NULL, NULL, GREET_PROG);
+			else if ((mob_index[vmob->mobdata->nr].progtypes & ALL_GREET_PROG) && isPaused(vmob) == false)
+				mprog_percent_check(vmob, ch, NULL, NULL, ALL_GREET_PROG);
+
+			if (SOMEONE_DIED(mprog_cur_result) || selfpurge)
+				break;
+		}
+	return mprog_cur_result;
+}
+
+int mprog_hitprcnt_trigger(char_data *mob, char_data *ch)
+{
+	mob_prog_data *mprg;
+	mob_prog_data *next;
+	bool done = FALSE;
+
+	if (IS_NPC(mob) && MOB_WAIT_STATE(mob) <= 0 && (mob_index[mob->mobdata->nr].progtypes & HITPRCNT_PROG) && isPaused(mob) == false)
+	{
+		mprg = mob_index[mob->mobdata->nr].mobprogs;
+		if (!mprg)
+		{
+			done = TRUE;
+			mprg = mob_index[mob->mobdata->nr].mobspec;
+		}
+
+		mprog_command_num = 0;
+		for (; mprg != NULL; mprg = next)
+		{
+			mprog_command_num++;
+			next = mprg->next;
+
+			if ((mprg->type & HITPRCNT_PROG) && ((100 * mob->hit / mob->max_hit) < atoi(mprg->arglist)))
+			{
+				mprog_driver(mprg->comlist, mob, ch, NULL, NULL, NULL, NULL);
+				if (selfpurge)
+					return mprog_cur_result;
+				break;
+			}
+
+			if (!next && !done)
+			{
+				done = TRUE;
+				next = mob_index[mob->mobdata->nr].mobspec;
+			}
+		}
+	}
+
+	return mprog_cur_result;
+}
+
+int mprog_random_trigger(char_data *mob)
+{
+	mprog_cur_result = eSUCCESS;
+
+	if ((mob_index[mob->mobdata->nr].progtypes & RAND_PROG) && isPaused(mob) == false)
+		mprog_percent_check(mob, NULL, NULL, NULL, RAND_PROG);
+
+	return mprog_cur_result;
 }
 
 int mprog_load_trigger(char_data *mob)
@@ -3918,7 +4516,7 @@ int mprog_catch_trigger(char_data *mob, int catch_num, char *var, int opt, char_
 			{
 				if (!check_range_valid_and_convert(curr_catch, mprg->arglist, MPROG_CATCH_MIN, MPROG_CATCH_MAX))
 				{
-					logf(IMMORTAL, LOG_WORLD, "Invalid catch argument: vnum %d",
+					logf(IMMORTAL, LogChannels::LOG_WORLD, "Invalid catch argument: vnum %d",
 						 mob_index[mob->mobdata->nr].virt);
 					return eFAILURE;
 				}
@@ -3970,15 +4568,18 @@ int mprog_catch_trigger(char_data *mob, int catch_num, char *var, int opt, char_
 	return mprog_cur_result;
 }
 
-void update_mprog_throws() {
+void update_mprog_throws()
+{
 	struct mprog_throw_type *curr;
 	struct mprog_throw_type *action;
 	struct mprog_throw_type *last = NULL;
 	char_data *vict;
 	obj_data *vobj;
-	for (curr = g_mprog_throw_list; curr;) {
+	for (curr = g_mprog_throw_list; curr;)
+	{
 		// update
-		if (curr->delay > 0) {
+		if (curr->delay > 0)
+		{
 			curr->delay--;
 			last = curr;
 			curr = curr->next;
@@ -3987,19 +4588,27 @@ void update_mprog_throws() {
 		vobj = NULL;
 		vict = NULL;
 
-//		if (curr->data_num == -999)
-//			debugpoint();
+		//		if (curr->data_num == -999)
+		//			debugpoint();
 
-		if (curr->tMob && charExists(curr->tMob) && curr->tMob->in_room >= 0) {
+		if (curr->tMob && charExists(curr->tMob) && curr->tMob->in_room >= 0)
+		{
 			vict = curr->tMob;
-		} else if (curr->mob) {
+		}
+		else if (curr->mob)
+		{
 			// find target
-			if (*curr->target_mob_name) { // find me by name
+			if (*curr->target_mob_name)
+			{ // find me by name
 				vict = get_mob(curr->target_mob_name);
-			} else {                 // find me by num
+			}
+			else
+			{ // find me by num
 				vict = get_mob_vnum(curr->target_mob_num);
 			}
-		} else {
+		}
+		else
+		{
 			if (*curr->target_mob_name)
 				vobj = get_obj(curr->target_mob_name);
 			else
@@ -4007,12 +4616,15 @@ void update_mprog_throws() {
 		}
 
 		// remove from list
-		if (last) {
+		if (last)
+		{
 			last->next = curr->next;
 			action = curr;
 			curr = last->next;
 			// last doesn't move
-		} else {
+		}
+		else
+		{
 			g_mprog_throw_list = curr->next;
 			action = curr;
 			curr = g_mprog_throw_list;
@@ -4021,16 +4633,19 @@ void update_mprog_throws() {
 		// This is done this way in case the 'catch' does a 'throw' inside of it
 
 		// if !vict, oh well....remove it anyway.  Someone killed him.
-		if (action->data_num == -999 && vict) { // 'tis a pause
+		if (action->data_num == -999 && vict)
+		{ // 'tis a pause
 			// Only resume a MPPAUSE <duration> if we're not in the middle of a MPPAUSE all <duration>
 			if (isPaused(action->tMob) == false)
 			{
 				mprog_driver(action->orig, vict, action->actor, action->obj, action->vo, action, action->rndm);
 			}
-			
+
 			dc_free(action->orig);
 			action->orig = 0;
-		} else if (action->data_num == -1000 && vict) {
+		}
+		else if (action->data_num == -1000 && vict)
+		{
 			if (isPaused(action->tMob))
 			{
 				action->tMob->mobdata->paused = false;
@@ -4038,11 +4653,16 @@ void update_mprog_throws() {
 			mprog_driver(action->orig, vict, action->actor, action->obj, action->vo, action, action->rndm);
 			dc_free(action->orig);
 			action->orig = 0;
-		} else if (vict)  {// activate
-			if (vict->in_room >= 0) {
+		}
+		else if (vict)
+		{ // activate
+			if (vict->in_room >= 0)
+			{
 				mprog_catch_trigger(vict, action->data_num, action->var, action->opt, action->actor, action->obj, action->vo, action->rndm);
 			}
-		} else if (vobj) {
+		}
+		else if (vobj)
+		{
 			oprog_catch_trigger(vobj, action->data_num, action->var, action->opt, action->actor, action->obj, action->vo, action->rndm);
 		}
 
@@ -4052,30 +4672,36 @@ void update_mprog_throws() {
 
 char_data *initiate_oproc(char_data *ch, obj_data *obj)
 { // Sneakiness.
-  char_data *temp;
-  temp = clone_mobile(real_mobile(12));
-  mob_index[real_mobile(12)].mobprogs = obj_index[obj->item_number].mobprogs;
-  mob_index[real_mobile(12)].progtypes = obj_index[obj->item_number].progtypes;
+	char_data *temp;
+	temp = clone_mobile(real_mobile(12));
+	mob_index[real_mobile(12)].mobprogs = obj_index[obj->item_number].mobprogs;
+	mob_index[real_mobile(12)].progtypes = obj_index[obj->item_number].progtypes;
 
-  if (ch)    char_to_room(temp, ch->in_room);
-  else       char_to_room(temp,obj->in_room);
-  if (ch) temp->beacon = (obj_data*) ch;
-  temp->mobdata->setObject(obj);
-//  temp->master = ch;
- // dc_free(temp->short_desc);
-  temp->short_desc = str_hsh(obj->short_description);
-  //dc_free(temp->name);
-  char buf[MAX_STRING_LENGTH];
-  sprintf(buf, "%s", obj->name);
-  for (int i = strlen(buf)-1;i > 0;i--)
-   if (buf[i] == ' ')
-   { buf[i] = '\0'; break; }
-  temp->name = str_hsh(buf);
-  
-  SET_BIT(temp->misc, MISC_IS_OBJ);
-  temp->objdata = obj;
+	if (ch)
+		char_to_room(temp, ch->in_room);
+	else
+		char_to_room(temp, obj->in_room);
+	if (ch)
+		temp->beacon = (obj_data *)ch;
+	temp->mobdata->setObject(obj);
+	//  temp->master = ch;
+	// dc_free(temp->short_desc);
+	temp->short_desc = str_hsh(obj->short_description);
+	// dc_free(temp->name);
+	char buf[MAX_STRING_LENGTH];
+	sprintf(buf, "%s", obj->name);
+	for (int i = strlen(buf) - 1; i > 0; i--)
+		if (buf[i] == ' ')
+		{
+			buf[i] = '\0';
+			break;
+		}
+	temp->name = str_hsh(buf);
 
-  return temp;
+	SET_BIT(temp->misc, MISC_IS_OBJ);
+	temp->objdata = obj;
+
+	return temp;
 }
 
 void end_oproc(char_data *ch, Trace trace)
@@ -4083,12 +4709,12 @@ void end_oproc(char_data *ch, Trace trace)
 	static int core_counter = 0;
 	if (selfpurge)
 	{
-		log(format("Crash averted in end_oproc() {}", selfpurge), IMMORTAL, LOG_BUG);
+		log(format("Crash averted in end_oproc() {}", selfpurge), IMMORTAL, LogChannels::LOG_BUG);
 
 		if (core_counter++ < 10)
 		{
 			produce_coredump();
-			logf(IMMORTAL, LOG_BUG, "Corefile produced.");
+			logf(IMMORTAL, LogChannels::LOG_BUG, "Corefile produced.");
 		}
 	}
 	else
@@ -4188,7 +4814,7 @@ int oprog_catch_trigger(obj_data *obj, int catch_num, char *var, int opt, char_d
 			{
 				if (!check_range_valid_and_convert(curr_catch, mprg->arglist, MPROG_CATCH_MIN, MPROG_CATCH_MAX))
 				{
-					logf(IMMORTAL, LOG_WORLD, "Invalid catch argument: vnum %d",
+					logf(IMMORTAL, LogChannels::LOG_WORLD, "Invalid catch argument: vnum %d",
 						 obj_index[obj->item_number].virt);
 					return eFAILURE;
 				}
@@ -4527,4 +5153,3 @@ bool isPaused(char_data *mob)
 
 	return false;
 }
- 

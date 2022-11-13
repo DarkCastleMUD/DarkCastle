@@ -21,46 +21,40 @@ extern "C"
 #include "structs.h"
 #include "levels.h"
 
-#ifndef LOG_BUG
-#define LOG_BUG           1
-#define LOG_PRAYER        1<<1
-#define LOG_GOD           1<<2
-#define LOG_MORTAL        1<<3
-#define LOG_SOCKET        1<<4
-#define LOG_MISC          1<<5
-#define LOG_PLAYER        1<<6
-#endif
+FILE *NULL_FILE = 0;
 
-FILE * NULL_FILE = 0;
-
-FILE * dc_fopen(const char *f, const char *type)
+FILE *dc_fopen(const char *f, const char *type)
 {
-	char filename[1024];
-	strcpy(filename, f);
+  char filename[1024];
+  strcpy(filename, f);
 
 #ifdef WIN32
 
-  for(unsigned i = 0; i < strlen(filename); i++)
+  for (unsigned i = 0; i < strlen(filename); i++)
   {
-	  if(filename[i] == '/')
-	  {
-		  filename[i] = '\\';
-	  }
+    if (filename[i] == '/')
+    {
+      filename[i] = '\\';
+    }
   }
 #endif
   FILE *x = 0;
 
-  if(NULL_FILE) {
+  if (NULL_FILE)
+  {
     fclose(NULL_FILE);
     NULL_FILE = 0;
   }
-  
-  if((x = fopen(filename, type)) == NULL) {
+
+  if ((x = fopen(filename, type)) == NULL)
+  {
 #ifndef WIN32
-    if(!(NULL_FILE = fopen("../lib/whassup", "w"))) {
+    if (!(NULL_FILE = fopen("../lib/whassup", "w")))
+    {
       perror("dc_fopen: cannot access '../lib/whassup': ");
 #else
-    if(!(NULL_FILE = fopen("..\\..\\lib\\whassup", "w"))) {
+    if (!(NULL_FILE = fopen("..\\..\\lib\\whassup", "w")))
+    {
       perror("dc_fopen: cannot access '..\\..\\lib\\whassup': ");
 #endif
     }
@@ -69,24 +63,26 @@ FILE * dc_fopen(const char *f, const char *type)
   return x;
 }
 
-int dc_fclose(FILE * fl)
+int dc_fclose(FILE *fl)
 {
   int x;
-  
-  if(!fl) return(0);
+
+  if (!fl)
+    return (0);
 
   x = fclose(fl);
-  
+
   if (!(NULL_FILE))
 #ifndef WIN32
-    if(!(NULL_FILE = fopen("../lib/whassup", "w"))) {
+    if (!(NULL_FILE = fopen("../lib/whassup", "w")))
+    {
 #else
-		if(!(NULL_FILE = fopen("..\\lib\\whassup", "w"))) {
+    if (!(NULL_FILE = fopen("..\\lib\\whassup", "w")))
+    {
 #endif
-      //log("Unable to open NULL_FILE in dc_fclose.", ANGEL, LOG_BUG);
+      // log("Unable to open NULL_FILE in dc_fclose.", ANGEL, LogChannels::LOG_BUG);
       perror("Unable to open NULL_FILE in dc_fclose.");
     }
-    
+
   return x;
 }
-

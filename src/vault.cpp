@@ -142,7 +142,7 @@ void save_vault(char *name)
   if (!(fl = dc_fopen(fname, "w")))
   {
     sprintf(buf, "save_vaults: could not open vault file for [%s].", fname);
-    log(buf, IMMORTAL, LOG_BUG);
+    log(buf, IMMORTAL, LogChannels::LOG_BUG);
     return;
   }
 
@@ -624,7 +624,7 @@ void remove_vault(char *name, BACKUP_TYPE backup)
   case NONE:
     break;
   default:
-    logf(108, LOG_GOD, "remove_vault passed invalid BACKUP_TYPE %d for %s.", backup,
+    logf(108, LogChannels::LOG_GOD, "remove_vault passed invalid BACKUP_TYPE %d for %s.", backup,
          name);
     break;
   }
@@ -688,7 +688,7 @@ void remove_vault(char *name, BACKUP_TYPE backup)
   unlink(VAULT_INDEX_FILE);
   rename(VAULT_INDEX_FILE_TMP, VAULT_INDEX_FILE);
   sprintf(buf, "Deleting %s's vault.", name);
-  log(buf, ANGEL, LOG_VAULT);
+  log(buf, ANGEL, LogChannels::LOG_VAULT);
 
   if (!(vault = has_vault(name)))
     return;
@@ -750,7 +750,7 @@ void load_vaults(void)
 
   if (!(index = dc_fopen(VAULT_INDEX_FILE, "r")))
   {
-    log("boot_vaults: could not open vault index file, probably doesn't exist.", IMMORTAL, LOG_BUG);
+    log("boot_vaults: could not open vault index file, probably doesn't exist.", IMMORTAL, LogChannels::LOG_BUG);
     return;
   }
   fscanf(index, "%s\n", line);
@@ -758,19 +758,19 @@ void load_vaults(void)
   {
     total_vaults++;
     sprintf(buf, "%d - %s", total_vaults, line);
-    //    log(buf, IMMORTAL, LOG_BUG);
+    //    log(buf, IMMORTAL, LogChannels::LOG_BUG);
     fscanf(index, "%s\n", line);
   }
   dc_fclose(index);
 
   sprintf(buf, "boot_vaults: found [%d] player vaults to read.", total_vaults);
-  // log(buf, IMMORTAL, LOG_BUG);
+  // log(buf, IMMORTAL, LogChannels::LOG_BUG);
   if (total_vaults)
     CREATE(vault_table, struct vault_data, total_vaults);
 
   if (!(index = dc_fopen(VAULT_INDEX_FILE, "r")))
   {
-    log("boot_vaults: could not open vault index file, probably doesn't exist.", IMMORTAL, LOG_BUG);
+    log("boot_vaults: could not open vault index file, probably doesn't exist.", IMMORTAL, LogChannels::LOG_BUG);
     return;
   }
 
@@ -784,14 +784,14 @@ void load_vaults(void)
     if (!(fl = dc_fopen(fname, "r")))
     {
       sprintf(buf, "boot_vaults: unable to open file [%s].", fname);
-      log(buf, IMMORTAL, LOG_BUG);
+      log(buf, IMMORTAL, LogChannels::LOG_BUG);
       fscanf(index, "%s\n", line);
       continue;
     }
     else
     {
       sprintf(buf, "boot_vaults: sucessfully opened file [%s].", fname);
-      //      log(buf, IMMORTAL, LOG_BUG);
+      //      log(buf, IMMORTAL, LogChannels::LOG_BUG);
     }
 
     CREATE(vault, struct vault_data, 1);
@@ -816,7 +816,7 @@ void load_vaults(void)
 
         /*
         if (vault->size > 2000) {
-            logf(IMMORTAL, LOG_BUG, "boot_vaults: buggy vault size of %d on %s.", vault->size, vault->owner);
+            logf(IMMORTAL, LogChannels::LOG_BUG, "boot_vaults: buggy vault size of %d on %s.", vault->size, vault->owner);
 
             FILE *oldfl;
             char oldfname[MAX_INPUT_LENGTH], oldtype[MAX_INPUT_LENGTH];
@@ -824,14 +824,14 @@ void load_vaults(void)
             sprintf(oldfname, "../vaults.old/%c/%s.vault", UPPER(*line), line);
             if(!(oldfl = dc_fopen(oldfname, "r"))) {
           sprintf(buf, "boot_vaults: unable to open file [%s].", oldfname);
-          log(buf, IMMORTAL, LOG_BUG);
+          log(buf, IMMORTAL, LogChannels::LOG_BUG);
             } else {
           get_line(oldfl, oldtype);
 
           if (*oldtype == 'S') {
               sscanf(oldtype, "%s %d", tmp, &vnum);
               vault->size = vnum;
-              logf(IMMORTAL, LOG_BUG, "boot_vaults: Setting %s's vault size to %d.", vault->owner, vault->size);
+              logf(IMMORTAL, LogChannels::LOG_BUG, "boot_vaults: Setting %s's vault size to %d.", vault->owner, vault->size);
               saveChanges = TRUE;
           }
 
@@ -853,7 +853,7 @@ void load_vaults(void)
         else
         {
           sprintf(buf, "boot_vaults: Bad 'O' option in file [%s]: %s\r\n", fname, type);
-          log(buf, IMMORTAL, LOG_BUG);
+          log(buf, IMMORTAL, LogChannels::LOG_BUG);
           break;
         }
 
@@ -885,7 +885,7 @@ void load_vaults(void)
 
           sprintf(buf, "boot_vaults: bad item vnum (#%d) in vault: %s", vnum,
                   vault->owner);
-          log(buf, IMMORTAL, LOG_BUG);
+          log(buf, IMMORTAL, LogChannels::LOG_BUG);
           saveChanges = TRUE;
         }
         else
@@ -895,10 +895,12 @@ void load_vaults(void)
           items->count = count;
           items->next = vault->items;
           vault->items = items;
+          /*
           sprintf(buf, "boot_vaults: got item [%s(%d)(%d)(%d)] from file [%s].", GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj), count, vnum, fname);
           if (items->obj && ((items->obj->obj_flags.wear_flags != get_obj(vnum)->obj_flags.wear_flags) ||
                              (items->obj->obj_flags.size != get_obj(vnum)->obj_flags.size) || (items->obj->obj_flags.eq_level != get_obj(vnum)->obj_flags.eq_level)))
-            log(buf, IMMORTAL, LOG_BUG);
+            log(buf, IMMORTAL, LogChannels::LOG_BUG);
+          */
         }
         break;
       case 'A':
@@ -914,7 +916,7 @@ void load_vaults(void)
           access->next = vault->access;
           vault->access = access;
           sprintf(buf, "boot_vaults: got access [%s] from file [%s].", access->name, fname);
-          //        log(buf, IMMORTAL, LOG_BUG);
+          //        log(buf, IMMORTAL, LogChannels::LOG_BUG);
         }
         else
         {
@@ -926,7 +928,7 @@ void load_vaults(void)
         break;
       default:
         sprintf(buf, "boot_vaults: unknown type in file [%s].", fname);
-        log(buf, IMMORTAL, LOG_BUG);
+        log(buf, IMMORTAL, LogChannels::LOG_BUG);
         break;
       }
       get_line(fl, type);
@@ -939,7 +941,7 @@ void load_vaults(void)
 
     if (saveChanges)
     {
-      logf(IMMORTAL, LOG_BUG, "boot_vaults: Saving changes to %s's vault.", vault->owner);
+      logf(IMMORTAL, LogChannels::LOG_BUG, "boot_vaults: Saving changes to %s's vault.", vault->owner);
       save_vault(vault->owner);
     }
 
@@ -1975,13 +1977,13 @@ void add_new_vault(char *name, int indexonly)
 
   if (!(vfl = dc_fopen(VAULT_INDEX_FILE, "r")))
   {
-    log("add_new_vault: error opening index file.", IMMORTAL, LOG_BUG);
+    log("add_new_vault: error opening index file.", IMMORTAL, LogChannels::LOG_BUG);
     return;
   }
 
   if (!(tvfl = fopen(VAULT_INDEX_FILE_TMP, "w")))
   {
-    log("add_new_vault: error opening temp index file.", IMMORTAL, LOG_BUG);
+    log("add_new_vault: error opening temp index file.", IMMORTAL, LogChannels::LOG_BUG);
     return;
   }
 
@@ -2010,7 +2012,7 @@ void add_new_vault(char *name, int indexonly)
   if (!(pvfl = dc_fopen(fname, "w")))
   {
     sprintf(buf, "add_new_vault: error opening new vault file [%s].", fname);
-    log(buf, IMMORTAL, LOG_BUG);
+    log(buf, IMMORTAL, LogChannels::LOG_BUG);
     return;
   }
 
@@ -2117,7 +2119,7 @@ void vlog(const char *message, const char *name)
       "Dec",
   };
 
-  log(message, IMMORTAL, LOG_VAULT);
+  log(message, IMMORTAL, LogChannels::LOG_VAULT);
 
   sprintf(fname, "../vaults/%c/%s.vault.log", *name, name);
   sprintf(nfname, "../vaults/%c/%s.vault.log.tmp", *name, name);
@@ -2127,7 +2129,7 @@ void vlog(const char *message, const char *name)
     if (!(ofile = dc_fopen(fname, "w")))
     {
       sprintf(buf, "vault_log: could not open vault log file [%s].", fname);
-      log(buf, IMMORTAL, LOG_BUG);
+      log(buf, IMMORTAL, LogChannels::LOG_BUG);
       return;
     }
     fprintf(ofile, "$\n");
@@ -2135,7 +2137,7 @@ void vlog(const char *message, const char *name)
     if (!(ofile = dc_fopen(fname, "r")))
     {
       sprintf(buf, "vault_log: could not open vault log file [%s].", fname);
-      log(buf, IMMORTAL, LOG_BUG);
+      log(buf, IMMORTAL, LogChannels::LOG_BUG);
       return;
     }
   }
@@ -2143,7 +2145,7 @@ void vlog(const char *message, const char *name)
   if (!(nfile = dc_fopen(nfname, "w")))
   {
     sprintf(buf, "vault_log: could not open vault log file [%s].", nfname);
-    log(buf, IMMORTAL, LOG_BUG);
+    log(buf, IMMORTAL, LogChannels::LOG_BUG);
     return;
   }
 

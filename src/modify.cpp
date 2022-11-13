@@ -14,7 +14,8 @@
  ***************************************************************************/
 /* $Id: modify.cpp,v 1.33 2014/07/04 22:00:04 jhhudso Exp $ */
 
-extern "C" {
+extern "C"
+{
 #include <signal.h>
 #include <stdio.h>
 #include <ctype.h>
@@ -39,43 +40,48 @@ extern "C" {
 using namespace std;
 
 // TODO - what does this do?  Nothing that I can see....let's remove it....
-#define REBOOT_AT    10  /* 0-23, time of optional reboot if -e lib/reboot */
+#define REBOOT_AT 10 /* 0-23, time of optional reboot if -e lib/reboot */
 
-#define TP_MOB    0
-#define TP_OBJ    1
-#define TP_ERROR  2
+#define TP_MOB 0
+#define TP_OBJ 1
+#define TP_ERROR 2
 
 void check_for_awaymsgs(char_data *ch);
 void page_string_dep(struct descriptor_data *d, const char *str, int keep_internal);
 
-const char *string_fields[] = { "name", "short", "long", "description", "title", "delete-description", "\n" };
+const char *string_fields[] = {"name", "short", "long", "description", "title", "delete-description", "\n"};
 
-// maximum length for text field x+1 
-int length[] = { 40, 60, 256, 240, 60 };
+// maximum length for text field x+1
+int length[] = {40, 60, 256, 240, 60};
 
-const char *skill_fields[] = { "learned", "recognize", "\n" };
+const char *skill_fields[] = {"learned", "recognize", "\n"};
 
 // TODO - I'd like to put together some sort of "post office" for sending "mail"
 //  to players that are offline.  (they get notified when they login, and have to
 //  go pick it up)  Note:  There's a "CON_SEND_MAIL" already defined....not sure
 //  why...
 
-void string_hash_add(struct descriptor_data *d, char *str) {
+void string_hash_add(struct descriptor_data *d, char *str)
+{
 	char *scan;
 	int terminator = 0;
 	char_data *ch = d->character;
 
 	scan = str;
-	while (*scan) {
-		if ((terminator = (*scan == '~') != 0)) {
+	while (*scan)
+	{
+		if ((terminator = (*scan == '~') != 0))
+		{
 			*scan = '\0';
 			break;
 		}
 		scan++;
 	}
 
-	if (!(*d->hashstr)) {
-		if (strlen(str) > (unsigned) d->max_str) {
+	if (!(*d->hashstr))
+	{
+		if (strlen(str) > (unsigned)d->max_str)
+		{
 			send_to_char("String too long - Truncated.\n\r", d->character);
 			*(str + d->max_str) = '\0';
 			terminator = 1;
@@ -83,19 +89,23 @@ void string_hash_add(struct descriptor_data *d, char *str) {
 #ifdef LEAK_CHECK
 		(*d->hashstr) = (char *)calloc(strlen(str) + 3, sizeof(char));
 #else
-		(*d->hashstr) = (char *) dc_alloc(strlen(str) + 3, sizeof(char));
+		(*d->hashstr) = (char *)dc_alloc(strlen(str) + 3, sizeof(char));
 #endif
 		strcpy(*d->hashstr, str);
 	}
 
-	else {
-		if (strlen(str) + strlen(*d->hashstr) > (unsigned) d->max_str) {
+	else
+	{
+		if (strlen(str) + strlen(*d->hashstr) > (unsigned)d->max_str)
+		{
 			send_to_char("String too long. Last line skipped.\n\r", d->character);
 			terminator = 1;
 		}
 
-		else {
-			if (!(*d->hashstr = (char *) realloc(*d->hashstr, strlen(*d->hashstr) + strlen(str) + 3))) {
+		else
+		{
+			if (!(*d->hashstr = (char *)realloc(*d->hashstr, strlen(*d->hashstr) + strlen(str) + 3)))
+			{
 				perror("string_hash_add: ");
 				abort();
 			}
@@ -104,7 +114,8 @@ void string_hash_add(struct descriptor_data *d, char *str) {
 		}
 	}
 
-	if (terminator) {
+	if (terminator)
+	{
 		scan = str_hsh(*d->hashstr);
 		dc_free(*d->hashstr);
 		*d->hashstr = scan;
@@ -112,7 +123,8 @@ void string_hash_add(struct descriptor_data *d, char *str) {
 		d->connected = conn::PLAYING;
 		send_to_char("Ok.\n\r", ch);
 		check_for_awaymsgs(ch);
-	} else
+	}
+	else
 		strcat(*d->hashstr, "\n\r");
 }
 
@@ -120,7 +132,8 @@ void string_hash_add(struct descriptor_data *d, char *str) {
 #undef MAX_STR
 
 /* interpret an argument for do_string */
-void quad_arg(char *arg, int *type, char *name, int *field, char *string) {
+void quad_arg(char *arg, int *type, char *name, int *field, char *string)
+{
 	char buf[MAX_STRING_LENGTH];
 
 	/* determine type */
@@ -129,7 +142,8 @@ void quad_arg(char *arg, int *type, char *name, int *field, char *string) {
 		*type = TP_MOB;
 	else if (is_abbrev(buf, "obj"))
 		*type = TP_OBJ;
-	else {
+	else
+	{
 		*type = TP_ERROR;
 		return;
 	}
@@ -152,7 +166,8 @@ void quad_arg(char *arg, int *type, char *name, int *field, char *string) {
 }
 
 /* modification of malloc'ed strings in chars/objects */
-int do_string(char_data *ch, char *arg, int cmd) {
+int do_string(char_data *ch, char *arg, int cmd)
+{
 	char name[MAX_STRING_LENGTH], string[MAX_STRING_LENGTH];
 	char message[100];
 	int field, type, ctr;
@@ -165,33 +180,41 @@ int do_string(char_data *ch, char *arg, int cmd) {
 
 	quad_arg(arg, &type, name, &field, string);
 
-	if (type == TP_ERROR) {
+	if (type == TP_ERROR)
+	{
 		send_to_char("Syntax:\n\rstring ('obj'|'char') <name> <field>"
-				" [<string>].\n\r", ch);
+					 " [<string>].\n\r",
+					 ch);
 		return 1;
 	}
 
-	if (!field) {
+	if (!field)
+	{
 		send_to_char("No field by that name. Try 'help string'.\n\r", ch);
 		return 1;
 	}
 
-	if (type == TP_MOB) {
+	if (type == TP_MOB)
+	{
 		/* locate the beast */
-		if (!(mob = get_char_vis(ch, name))) {
+		if (!(mob = get_char_vis(ch, name)))
+		{
 			send_to_char("I don't know anyone by that name...\n\r", ch);
 			return 1;
 		}
 
-		if ((GET_LEVEL(mob) > GET_LEVEL(ch)) && !IS_NPC(mob)) {
+		if ((GET_LEVEL(mob) > GET_LEVEL(ch)) && !IS_NPC(mob))
+		{
 			sprintf(message, "%s can string himself, thank you.\n\r", GET_SHORT(mob));
 			send_to_char(message, ch);
 			return 1;
 		}
 
-		switch (field) {
+		switch (field)
+		{
 		case 1:
-			if (!IS_NPC(mob) && GET_LEVEL(ch) < IMP) {
+			if (!IS_NPC(mob) && GET_LEVEL(ch) < IMP)
+			{
 				send_to_char("You can't change that field for players.", ch);
 				return 1;
 			}
@@ -203,19 +226,21 @@ int do_string(char_data *ch, char *arg, int cmd) {
 				send_to_char("WARNING: You have changed the name of a player.\n\r", ch);
 			break;
 		case 2:
-			if (GET_LEVEL(ch) < POWER) {
+			if (GET_LEVEL(ch) < POWER)
+			{
 				send_to_char("You must be a God to do that.\n\r", ch);
 				return 1;
 			}
 			sprintf(message, "%s just restrung short on %s", GET_NAME(ch), GET_NAME(mob));
-			log(message, IMP, LOG_GOD);
+			log(message, IMP, LogChannels::LOG_GOD);
 			if (IS_NPC(mob))
 				ch->desc->hashstr = &mob->short_desc;
 			else
 				ch->desc->strnew = &mob->short_desc;
 			break;
 		case 3:
-			if (!IS_NPC(mob)) {
+			if (!IS_NPC(mob))
+			{
 				send_to_char("That field is for monsters only.\n\r", ch);
 				return 1;
 			}
@@ -228,7 +253,8 @@ int do_string(char_data *ch, char *arg, int cmd) {
 				ch->desc->strnew = &mob->description;
 			break;
 		case 5:
-			if (IS_NPC(mob)) {
+			if (IS_NPC(mob))
+			{
 				send_to_char("Monsters have no titles.\n\r", ch);
 				return 1;
 			}
@@ -241,24 +267,31 @@ int do_string(char_data *ch, char *arg, int cmd) {
 	}
 
 	/* type == TP_OBJ */
-	else {
+	else
+	{
 		/* locate the object */
-		if (!(obj = get_obj_vis(ch, name))) {
+		if (!(obj = get_obj_vis(ch, name)))
+		{
 			send_to_char("Can't find such a thing here..\n\r", ch);
 			return 1;
 		}
 
-		if (IS_SET(obj->obj_flags.more_flags, ITEM_NO_RESTRING)) {
-			if (GET_LEVEL(ch) < IMP) {
+		if (IS_SET(obj->obj_flags.more_flags, ITEM_NO_RESTRING))
+		{
+			if (GET_LEVEL(ch) < IMP)
+			{
 				send_to_char("That item is not restringable.\r\n", ch);
 				return 1;
-			} else
+			}
+			else
 				send_to_char("That item is NO_RESTRING btw.\r\n", ch);
 		}
 
-		switch (field) {
+		switch (field)
+		{
 		case 1:
-			if (IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL) && GET_LEVEL(ch) < 110) {
+			if (IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL) && GET_LEVEL(ch) < 110)
+			{
 				send_to_char("The moose will get you if you do that.\r\n", ch);
 				return 1;
 			}
@@ -275,18 +308,20 @@ int do_string(char_data *ch, char *arg, int cmd) {
 			send_to_char("Noone may restring object extra descs at this time. -pir", ch);
 			return 1;
 
-			if (!*string) {
+			if (!*string)
+			{
 				send_to_char("You have to supply a keyword.\n\r", ch);
 				return 1;
 			}
 			/* try to locate extra description */
 			for (ed = obj->ex_description;; ed = ed->next)
-				if (!ed) { /* the field was not found. create a new_new one. */
+				if (!ed)
+				{ /* the field was not found. create a new_new one. */
 #ifdef LEAK_CHECK
 					ed = (struct extra_descr_data *)
-					calloc(1, sizeof(struct extra_descr_data));
+						calloc(1, sizeof(struct extra_descr_data));
 #else
-					ed = (struct extra_descr_data *) dc_alloc(1, sizeof(struct extra_descr_data));
+					ed = (struct extra_descr_data *)dc_alloc(1, sizeof(struct extra_descr_data));
 #endif
 					ed->next = obj->ex_description;
 					obj->ex_description = ed;
@@ -295,7 +330,9 @@ int do_string(char_data *ch, char *arg, int cmd) {
 					ch->desc->hashstr = &ed->description;
 					send_to_char("New field.\n\r", ch);
 					break;
-				} else if (!str_cmp(ed->keyword, string)) {
+				}
+				else if (!str_cmp(ed->keyword, string))
+				{
 					/* the field exists */
 					ed->description = 0;
 					ch->desc->hashstr = &ed->description;
@@ -307,20 +344,25 @@ int do_string(char_data *ch, char *arg, int cmd) {
 			return 1;
 			break;
 		case 6:
-			if (!*string) {
+			if (!*string)
+			{
 				send_to_char("You must supply a field name.\n\r", ch);
 				return 1;
 			}
 			/* try to locate field */
 			for (ed = obj->ex_description;; ed = ed->next)
-				if (!ed) {
+				if (!ed)
+				{
 					send_to_char("No field with that keyword.\n\r", ch);
 					return 1;
-				} else if (!str_cmp(ed->keyword, string)) {
+				}
+				else if (!str_cmp(ed->keyword, string))
+				{
 					/* delete the entry in the desr list */
 					if (ed == obj->ex_description)
 						obj->ex_description = ed->next;
-					else {
+					else
+					{
 						for (tmp = obj->ex_description; tmp->next != ed; tmp = tmp->next)
 							;
 						tmp->next = ed->next;
@@ -337,21 +379,28 @@ int do_string(char_data *ch, char *arg, int cmd) {
 	}
 
 	/* there was a string in the argument array */
-	if (*string) {
-		for (ctr = 0; (unsigned) ctr <= strlen(string); ctr++) {
-			if (string[ctr] == '$') {
+	if (*string)
+	{
+		for (ctr = 0; (unsigned)ctr <= strlen(string); ctr++)
+		{
+			if (string[ctr] == '$')
+			{
 				string[ctr] = ' ';
 			}
 		}
 
-		if (strlen(string) > (unsigned) length[field - 1]) {
+		if (strlen(string) > (unsigned)length[field - 1])
+		{
 			send_to_char("String too long - truncated.\n\r", ch);
 			*(string + length[field - 1]) = '\0';
 		}
-		if (type == TP_MOB && !IS_NPC(mob)) {
+		if (type == TP_MOB && !IS_NPC(mob))
+		{
 			*ch->desc->strnew = str_dup(string);
 			ch->desc->strnew = 0;
-		} else {
+		}
+		else
+		{
 			*ch->desc->hashstr = str_hsh(string);
 			ch->desc->hashstr = 0;
 		}
@@ -359,20 +408,22 @@ int do_string(char_data *ch, char *arg, int cmd) {
 	}
 
 	/* there was no string. enter string mode */
-	else {
+	else
+	{
 		send_to_char("Enter string. Terminate with '~' at the beginning "
-				"of a line.\n\r", ch);
+					 "of a line.\n\r",
+					 ch);
 		if (type == TP_MOB && !IS_NPC(mob))
 #ifdef LEAK_CHECK
 			(*ch->desc->strnew) = (char *)calloc(length[field - 1], sizeof(char));
 #else
-			(*ch->desc->strnew) = (char *) dc_alloc(length[field - 1], sizeof(char));
+			(*ch->desc->strnew) = (char *)dc_alloc(length[field - 1], sizeof(char));
 #endif
 		else
 #ifdef LEAK_CHECK
 			(*ch->desc->hashstr) = (char *)calloc(length[field - 1], sizeof(char));
 #else
-			(*ch->desc->hashstr) = (char *) dc_alloc(length[field - 1], sizeof(char));
+			(*ch->desc->hashstr) = (char *)dc_alloc(length[field - 1], sizeof(char));
 #endif
 		ch->desc->max_str = length[field - 1];
 		ch->desc->connected = conn::EDITING;
@@ -385,16 +436,19 @@ int do_string(char_data *ch, char *arg, int cmd) {
 /* One_Word is like one_argument, execpt that words in quotes "" are */
 /* regarded as ONE word                                              */
 
-char *one_word(char *argument, char *first_arg) {
+char *one_word(char *argument, char *first_arg)
+{
 	int begin, look_at;
 
 	begin = 0;
 
-	do {
+	do
+	{
 		for (; isspace(*(argument + begin)); begin++)
 			;
 
-		if (*(argument + begin) == '\"') { /* is it a quote */
+		if (*(argument + begin) == '\"')
+		{ /* is it a quote */
 
 			begin++;
 
@@ -403,12 +457,12 @@ char *one_word(char *argument, char *first_arg) {
 
 			if (*(argument + begin + look_at) == '\"')
 				begin++;
-
-		} else {
+		}
+		else
+		{
 
 			for (look_at = 0; *(argument + begin + look_at) > ' '; look_at++)
 				*(first_arg + look_at) = LOWER(*(argument + begin + look_at));
-
 		}
 
 		*(first_arg + look_at) = '\0';
@@ -418,9 +472,10 @@ char *one_word(char *argument, char *first_arg) {
 	return (argument + begin);
 }
 
-#define MAX_HELP  1100
+#define MAX_HELP 1100
 
-void free_help_from_memory() {
+void free_help_from_memory()
+{
 	extern struct help_index_element *help_index;
 
 	for (int i = 0; i < MAX_HELP; i++)
@@ -430,7 +485,8 @@ void free_help_from_memory() {
 	dc_free(help_index);
 }
 
-struct help_index_element *build_help_index(FILE *fl, int *num) {
+struct help_index_element *build_help_index(FILE *fl, int *num)
+{
 	int nr = -1, issorted, i;
 	struct help_index_element *list = 0, mem;
 	char buf[81], tmp[81], *scan;
@@ -438,24 +494,27 @@ struct help_index_element *build_help_index(FILE *fl, int *num) {
 
 #ifdef LEAK_CHECK
 	list = (struct help_index_element *)
-	calloc(MAX_HELP, sizeof(struct help_index_element));
+		calloc(MAX_HELP, sizeof(struct help_index_element));
 #else
-	list = (struct help_index_element *) dc_alloc(MAX_HELP, sizeof(struct help_index_element));
+	list = (struct help_index_element *)dc_alloc(MAX_HELP, sizeof(struct help_index_element));
 #endif
 
-	for (;;) {
+	for (;;)
+	{
 		pos = ftell(fl);
 		fgets(buf, 81, fl);
 		*(buf + strlen(buf) - 1) = '\0';
 		scan = buf;
-		for (;;) {
+		for (;;)
+		{
 			/* extract the keywords */
 			scan = one_word(scan, tmp);
 
 			if (!*tmp)
 				break;
 
-			if (++nr >= MAX_HELP) {
+			if (++nr >= MAX_HELP)
+			{
 				perror("Too many help keywords.");
 				abort();
 			}
@@ -473,10 +532,12 @@ struct help_index_element *build_help_index(FILE *fl, int *num) {
 	}
 
 	/* we might as well sort the stuff */
-	do {
+	do
+	{
 		issorted = 1;
 		for (i = 0; i < nr; i++)
-			if (str_cmp(list[i].keyword, list[i + 1].keyword) > 0) {
+			if (str_cmp(list[i].keyword, list[i + 1].keyword) > 0)
+			{
 				mem = list[i];
 				list[i] = list[i + 1];
 				list[i + 1] = mem;
@@ -488,25 +549,29 @@ struct help_index_element *build_help_index(FILE *fl, int *num) {
 	return (list);
 }
 
-#define PAGE_LENGTH     22
-#define PAGE_WIDTH      80
+#define PAGE_LENGTH 22
+#define PAGE_WIDTH 80
 
 /* Traverse down the string until the beginning of the next page has been
  * reached.  Return NULL if this is the last page of the string.
  */
-const char *next_page(const char *str) {
+const char *next_page(const char *str)
+{
 	int col = 1, line = 1, spec_code = FALSE;
 	int chars = 0;
-	for (;; str++) {
+	for (;; str++)
+	{
 		// If end of string, return NULL.
 		if (*str == '\0')
 			return NULL;
 
 		// Check for $ ANSI codes.  They have to be kept together
 		// Might wanna put a && *(str+1) != '$' so that $'s are wrapped...
-		else if (*str == '$') {
-			if (*(str + 1) == '\0') { // this should never happen
-				log("String ended in $ in next_page", ANGEL, LOG_BUG);
+		else if (*str == '$')
+		{
+			if (*(str + 1) == '\0')
+			{ // this should never happen
+				log("String ended in $ in next_page", ANGEL, LogChannels::LOG_BUG);
 				//*str = '\0'; // overwrite the $ so it doesn't mess up anything
 				return NULL;
 			}
@@ -530,7 +595,8 @@ const char *next_page(const char *str) {
 		else if (chars > 2048)
 			return str;
 		// Check for everything else.
-		else if (!spec_code) {
+		else if (!spec_code)
+		{
 			chars += 1;
 
 			// Carriage return puts us in column one.
@@ -542,7 +608,8 @@ const char *next_page(const char *str) {
 
 			// We need to check here and see if we are over the page width,
 			// and if so, compensate by going to the begining of the next line.
-			else if (col++ > PAGE_WIDTH) {
+			else if (col++ > PAGE_WIDTH)
+			{
 				col = 1;
 				line++;
 			}
@@ -551,8 +618,9 @@ const char *next_page(const char *str) {
 	return NULL;
 }
 
-// Function that returns the number of pages in the string. 
-int count_pages(const char *str) {
+// Function that returns the number of pages in the string.
+int count_pages(const char *str)
+{
 	int pages;
 
 	for (pages = 1; (str = next_page(str)); pages++)
@@ -564,7 +632,8 @@ int count_pages(const char *str) {
  * page_string function, after showstr_vector has been allocated and
  * showstr_count set.
  */
-void paginate_string(const char *str, struct descriptor_data *d) {
+void paginate_string(const char *str, struct descriptor_data *d)
+{
 	int i;
 
 	if (d->showstr_count)
@@ -576,16 +645,19 @@ void paginate_string(const char *str, struct descriptor_data *d) {
 	d->showstr_page = 0;
 }
 
-void page_string(struct descriptor_data *d, const char *str, int keep_internal) {
+void page_string(struct descriptor_data *d, const char *str, int keep_internal)
+{
 	if (!d || !(d->character))
 		return;
 
-	if (!str || !*str) {
+	if (!str || !*str)
+	{
 		send_to_char("", d->character);
 		return;
 	}
 
-	if (IS_PC(d->character) && !IS_SET(d->character->pcdata->toggles, PLR_PAGER)) {
+	if (IS_PC(d->character) && !IS_SET(d->character->pcdata->toggles, PLR_PAGER))
+	{
 		page_string_dep(d, str, keep_internal);
 		return;
 	}
@@ -594,13 +666,14 @@ void page_string(struct descriptor_data *d, const char *str, int keep_internal) 
 	string tmp;
 	size_t pagebreak;
 
-	while (!print_me.empty()) {
-		pagebreak = print_me.find_first_of('\n', 3800); //find the first endline after 3800 chars
+	while (!print_me.empty())
+	{
+		pagebreak = print_me.find_first_of('\n', 3800); // find the first endline after 3800 chars
 
 		if (string::npos == pagebreak)
-			pagebreak = print_me.size(); //if one doesn't exist (string < 3800) just set to max string length
+			pagebreak = print_me.size(); // if one doesn't exist (string < 3800) just set to max string length
 		else if (print_me.at(pagebreak) == '\r')
-			pagebreak++; //if its a \r, go 1 greater.
+			pagebreak++; // if its a \r, go 1 greater.
 
 		tmp = print_me.substr(0, pagebreak);
 		print_me = print_me.substr(pagebreak, string::npos);
@@ -612,27 +685,32 @@ void page_string(struct descriptor_data *d, const char *str, int keep_internal) 
 }
 
 /* The depreciated call that gets the paging ball rolling... */
-void page_string_dep(struct descriptor_data *d, const char *str, int keep_internal) {
+void page_string_dep(struct descriptor_data *d, const char *str, int keep_internal)
+{
 	if (!d)
 		return;
-	if (!str || !*str) {
+	if (!str || !*str)
+	{
 		send_to_char("", d->character);
 		return;
 	}
 
 	CREATE(d->showstr_vector, const char *, d->showstr_count = count_pages(str));
 
-	if (keep_internal) {
+	if (keep_internal)
+	{
 		d->showstr_head = str_dup(str);
 		paginate_string(d->showstr_head, d);
-	} else
+	}
+	else
 		paginate_string(str, d);
 
 	show_string(d, "");
 }
 
 /* The call that displays the next page. */
-void show_string(struct descriptor_data *d, const char *input) {
+void show_string(struct descriptor_data *d, const char *input)
+{
 	char buffer[MAX_STRING_LENGTH];
 	char buf[MAX_STRING_LENGTH];
 	int diff;
@@ -654,11 +732,13 @@ void show_string(struct descriptor_data *d, const char *input) {
 	else if (isdigit(*buf))
 		d->showstr_page = MAX(0, MIN(atoi(buf) - 1, d->showstr_count - 1));
 
-	else if (*buf) {
+	else if (*buf)
+	{
 		dc_free(d->showstr_vector);
 		d->showstr_vector = 0;
 		d->showstr_count = 0;
-		if (d->showstr_head) {
+		if (d->showstr_head)
+		{
 			dc_free(d->showstr_head);
 			d->showstr_head = 0;
 		}
@@ -667,19 +747,22 @@ void show_string(struct descriptor_data *d, const char *input) {
 	/* If we're displaying the last page, just send it to the character, and
 	 * then free up the space we used.
 	 */
-	if (d->showstr_page + 1 >= d->showstr_count) {
+	if (d->showstr_page + 1 >= d->showstr_count)
+	{
 		// send them a carriage return first to make sure it looks right
 		send_to_char(d->showstr_vector[d->showstr_page], d->character);
 		dc_free(d->showstr_vector);
 		d->showstr_vector = 0;
 		d->showstr_count = 0;
-		if (d->showstr_head) {
+		if (d->showstr_head)
+		{
 			dc_free(d->showstr_head);
 			d->showstr_head = NULL;
 		}
 	}
 	/* Or if we have more to show.... */
-	else {
+	else
+	{
 		strncpy(buffer, d->showstr_vector[d->showstr_page], diff = (d->showstr_vector[d->showstr_page + 1]) - (d->showstr_vector[d->showstr_page]));
 		buffer[diff] = '\0';
 		send_to_char(buffer, d->character);

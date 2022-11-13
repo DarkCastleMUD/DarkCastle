@@ -5,7 +5,7 @@
  *                                                                          *
  *   Copyright (C) 1992, 1993 Michael Chastain, Michael Quan, Mitchell Tse  *
  *   Performance optimization and bug fixes by MERC Industries.             *
- *   You can use our stuff in any way you like whatsoever so long as ths    * 
+ *   You can use our stuff in any way you like whatsoever so long as ths    *
  *   copyright notice remains intact.  If you like it please drop a line    *
  *   to mec@garnet.berkeley.edu.                                            *
  *                                                                          *
@@ -43,38 +43,41 @@ extern "C"
 struct news_data *thenews = NULL;
 void addnews(struct news_data *newnews)
 {
-  if (!thenews) thenews = newnews;
-  else {
-   struct news_data *tmpnews,*tmpnews2 = NULL;
-   for (tmpnews = thenews;tmpnews; tmpnews = tmpnews->next)
-   {
-     if (tmpnews->time < newnews->time)
-     {
-	if (tmpnews2)
-	{
-		tmpnews2->next = newnews;
-		newnews->next = tmpnews;
-		return;
-	} else {
-	        newnews->next = thenews;
-      		thenews = newnews;
-      		return;
+  if (!thenews)
+    thenews = newnews;
+  else
+  {
+    struct news_data *tmpnews, *tmpnews2 = NULL;
+    for (tmpnews = thenews; tmpnews; tmpnews = tmpnews->next)
+    {
+      if (tmpnews->time < newnews->time)
+      {
+        if (tmpnews2)
+        {
+          tmpnews2->next = newnews;
+          newnews->next = tmpnews;
+          return;
         }
-     }
-     tmpnews2 = tmpnews;
-   }
-   tmpnews2->next = newnews;
-   newnews->next = NULL;
+        else
+        {
+          newnews->next = thenews;
+          thenews = newnews;
+          return;
+        }
+      }
+      tmpnews2 = tmpnews;
+    }
+    tmpnews2->next = newnews;
+    newnews->next = NULL;
   }
 }
 
-
 void savenews()
 {
-  FILE *fl;  
+  FILE *fl;
   if (!(fl = dc_fopen("news.data", "w")))
   {
-    log("Cannot open news file.", 0, LOG_MISC);
+    log("Cannot open news file.", 0, LogChannels::LOG_MISC);
     abort();
   }
   struct news_data *tmpnews;
@@ -84,148 +87,160 @@ void savenews()
     fprintf(fl, "%d %s~\n", (int)tmpnews->time, tmpnews->addedby);
     string_to_file(fl, tmpnews->news);
   }
-   fprintf(fl,"0\n");
+  fprintf(fl, "0\n");
   dc_fclose(fl);
-  if(std::system(0))
-     std::system("cp ../lib/news.data /srv/www/www.dcastle.org/htdocs/news.data");
-  else log("Cannot save news file to web dir.", 0, LOG_MISC);
+  if (std::system(0))
+    std::system("cp ../lib/news.data /srv/www/www.dcastle.org/htdocs/news.data");
+  else
+    log("Cannot save news file to web dir.", 0, LogChannels::LOG_MISC);
 }
 
 void loadnews()
 {
-   FILE *fl;
+  FILE *fl;
   if (!(fl = dc_fopen("news.data", "r")))
   {
-    log("Cannot open news file.", 0, LOG_MISC);
+    log("Cannot open news file.", 0, LogChannels::LOG_MISC);
     return;
   }
   int i;
-  while ((i = fread_int(fl, 0, 2147483467))!= 0)
+  while ((i = fread_int(fl, 0, 2147483467)) != 0)
   {
     struct news_data *nnews;
 #ifdef LEAK_CHECK
     nnews = (struct news_data *)
-                        calloc(1, sizeof(struct news_data));
+        calloc(1, sizeof(struct news_data));
 #else
     nnews = (struct news_data *)
-                        dc_alloc(1, sizeof(struct news_data));
+        dc_alloc(1, sizeof(struct news_data));
 #endif
     nnews->time = i;
-    nnews->addedby = fread_string(fl,0);
-    nnews->news = fread_string(fl,0);
-    int i,v=0;
-	char buf[MAX_STRING_LENGTH];
-	for (i = 0; i < (int)strlen(nnews->news);i++)
-	{
-	 	buf[v++] = *(nnews->news+i);
-	}
-	buf[v] = '\0';
-	nnews->news = str_dup(buf);
+    nnews->addedby = fread_string(fl, 0);
+    nnews->news = fread_string(fl, 0);
+    int i, v = 0;
+    char buf[MAX_STRING_LENGTH];
+    for (i = 0; i < (int)strlen(nnews->news); i++)
+    {
+      buf[v++] = *(nnews->news + i);
+    }
+    buf[v] = '\0';
+    nnews->news = str_dup(buf);
     addnews(nnews);
-    
   }
   dc_fclose(fl);
 }
 
 const char *newsify(char *string)
 {
-  static char tmp[MAX_STRING_LENGTH*2];
-  int i, a=0;
+  static char tmp[MAX_STRING_LENGTH * 2];
+  int i, a = 0;
   tmp[0] = '\0';
-  for (i = 0; *(string+i) != '\0';i++)
+  for (i = 0; *(string + i) != '\0'; i++)
   {
-    if (*(string+i) == '\n' && i < (int)(strlen(string) - 1))
+    if (*(string + i) == '\n' && i < (int)(strlen(string) - 1))
     {
-	tmp[a++] = '\0';
-	strcat(tmp, "\n              ");
-	a += 14;
-    } else tmp[a++] = *(string+i);
+      tmp[a++] = '\0';
+      strcat(tmp, "\n              ");
+      a += 14;
+    }
+    else
+      tmp[a++] = *(string + i);
   }
   tmp[a++] = '\0';
   return &tmp[0];
-//  return str_dup(tmp);
+  //  return str_dup(tmp);
 }
 
 int do_news(char_data *ch, char *argument, int cmd)
 {
-   bool up;
-   if (IS_NPC(ch)) up = TRUE;
-   else up = !IS_SET(ch->pcdata->toggles, PLR_NEWS);
-   struct news_data *tnews;
-   char buf[MAX_STRING_LENGTH*2],old[MAX_STRING_LENGTH*2];
-   char timez[15];
-   buf[0] = '\0';
-   time_t thetime;
-   char arg[MAX_INPUT_LENGTH];
-   one_argument(argument, arg);
-   if (str_cmp(arg, "all"))
-     thetime = time(NULL) - 604800;
-   else
-     thetime = 0;    
+  bool up;
+  if (IS_NPC(ch))
+    up = TRUE;
+  else
+    up = !IS_SET(ch->pcdata->toggles, PLR_NEWS);
+  struct news_data *tnews;
+  char buf[MAX_STRING_LENGTH * 2], old[MAX_STRING_LENGTH * 2];
+  char timez[15];
+  buf[0] = '\0';
+  time_t thetime;
+  char arg[MAX_INPUT_LENGTH];
+  one_argument(argument, arg);
+  if (str_cmp(arg, "all"))
+    thetime = time(NULL) - 604800;
+  else
+    thetime = 0;
 
-   for (tnews = thenews; tnews; tnews = tnews->next) {
-		if (!tnews->news || *tnews->news == '\0')
-			continue;
-		if (tnews->time < thetime)
-			continue;
-     strftime(&timez[0], 10,"%d/%b/%y", gmtime(&tnews->time));
-    
-     strcpy(old,buf);
-     const char *newsstring = tnews->news;
-       if (up)
-			sprintf(buf, "%s$B$4[ $3%-9s $4] \r\n$R%s\r\n", old, timez,
-					newsstring);
-       else 
-			sprintf(buf, "$B$4[ $3%-9s$4 ] \r\n$R%s\r\n%s", timez, newsstring,
-					old);
-		if (strlen(buf) > MAX_STRING_LENGTH - 1000)
-			break;
-   } 
-   page_string(ch->desc,buf, 1);
-   return eSUCCESS;
+  for (tnews = thenews; tnews; tnews = tnews->next)
+  {
+    if (!tnews->news || *tnews->news == '\0')
+      continue;
+    if (tnews->time < thetime)
+      continue;
+    strftime(&timez[0], 10, "%d/%b/%y", gmtime(&tnews->time));
+
+    strcpy(old, buf);
+    const char *newsstring = tnews->news;
+    if (up)
+      sprintf(buf, "%s$B$4[ $3%-9s $4] \r\n$R%s\r\n", old, timez,
+              newsstring);
+    else
+      sprintf(buf, "$B$4[ $3%-9s$4 ] \r\n$R%s\r\n%s", timez, newsstring,
+              old);
+    if (strlen(buf) > MAX_STRING_LENGTH - 1000)
+      break;
+  }
+  page_string(ch->desc, buf, 1);
+  return eSUCCESS;
 }
 
 int do_addnews(char_data *ch, char *argument, int cmd)
 {
 
-  if(!has_skill(ch, COMMAND_ADDNEWS)) {
-        send_to_char("Huh?\r\n", ch);
-        return eFAILURE;
+  if (!has_skill(ch, COMMAND_ADDNEWS))
+  {
+    send_to_char("Huh?\r\n", ch);
+    return eFAILURE;
   }
 
   if (!argument || !*argument || !ch->desc)
   {
     send_to_char("Syntax: addnews <date>\r\n"
-		"Date is either TODAY or in the following format: day/month/year\r\n"
-		"such as 23/02/06 for 23rd february 2006\r\n",ch);
+                 "Date is either TODAY or in the following format: day/month/year\r\n"
+                 "such as 23/02/06 for 23rd february 2006\r\n",
+                 ch);
     return eFAILURE;
   }
   char arg[MAX_INPUT_LENGTH];
   time_t thetime;
   one_argument(argument, arg);
-  if (!str_cmp(arg,"save"))
+  if (!str_cmp(arg, "save"))
   {
     savenews();
-    send_to_char("Saved!\r\n",ch);
+    send_to_char("Saved!\r\n", ch);
     return eSUCCESS;
   }
   if (str_cmp(arg, "today"))
   {
     struct tm tmptime;
-    if (strptime(arg,"%d/%m/%y", &tmptime) == NULL)
-    { do_addnews(ch, "",9); return eFAILURE; }
+    if (strptime(arg, "%d/%m/%y", &tmptime) == NULL)
+    {
+      do_addnews(ch, "", 9);
+      return eFAILURE;
+    }
     tmptime.tm_sec = 0;
     tmptime.tm_hour = 0;
     tmptime.tm_min = 0;
     tmptime.tm_isdst = -1;
     thetime = mktime(&tmptime);
-  } else {
+  }
+  else
+  {
     thetime = time(NULL);
-    struct tm *tmptime= localtime(&thetime);
+    struct tm *tmptime = localtime(&thetime);
     tmptime->tm_sec = 0;
     tmptime->tm_hour = 0;
     tmptime->tm_min = 0;
-    tmptime->tm_isdst = -1;	
+    tmptime->tm_isdst = -1;
     thetime = mktime(tmptime);
   }
   // Time acquired. Whoppin'.
@@ -234,29 +249,29 @@ int do_addnews(char_data *ch, char *argument, int cmd)
   for (nnews = thenews; nnews; nnews = nnews->next)
   {
     if (nnews->time == thetime)
-     break;
+      break;
   }
-  if (!nnews) {
+  if (!nnews)
+  {
 #ifdef LEAK_CHECK
-  nnews = (struct news_data *)
-                        calloc(1, sizeof(struct news_data));
+    nnews = (struct news_data *)
+        calloc(1, sizeof(struct news_data));
 #else
-  nnews = (struct news_data *)
-                        dc_alloc(1, sizeof(struct news_data));
+    nnews = (struct news_data *)
+        dc_alloc(1, sizeof(struct news_data));
 #endif
-  nnews->addedby = str_dup(GET_NAME(ch));
-  nnews->time = thetime;
-  addnews(nnews);
-  nnews->news = NULL;
+    nnews->addedby = str_dup(GET_NAME(ch));
+    nnews->time = thetime;
+    addnews(nnews);
+    nnews->news = NULL;
   }
-  send_to_char("        Enter news item.  (/s saves /h for help)\r\n",ch);
+  send_to_char("        Enter news item.  (/s saves /h for help)\r\n", ch);
   if (nnews->news)
-  send_to_char(nnews->news, ch);
-//  nnews->news = str_dup("Temporary data.\r\n");
+    send_to_char(nnews->news, ch);
+  //  nnews->news = str_dup("Temporary data.\r\n");
   ch->desc->connected = conn::EDITING;
   ch->desc->strnew = &(nnews->news);
   ch->desc->max_str = 2096;
-  
+
   return eSUCCESS;
 }
-

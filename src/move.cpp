@@ -35,26 +35,29 @@
 
 int check_ethereal_focus(char_data *ch, int trigger_type); // class/cl_mage.cpp
 
-int move_player(char_data * ch, int room) {
+int move_player(char_data *ch, int room)
+{
 	int retval;
 
 	retval = move_char(ch, room);
 
-	if (!IS_SET(retval, eSUCCESS)) {
+	if (!IS_SET(retval, eSUCCESS))
+	{
 		retval = move_char(ch, real_room(START_ROOM));
 		if (!IS_SET(retval, eSUCCESS))
 			log("Error in move_player(), Failure moving ch to start room. move_player_home_nofail",
-			IMMORTAL, LOG_BUG);
+				IMMORTAL, LogChannels::LOG_BUG);
 	}
 
 	return retval;
 }
 
-void move_player_home(char_data *victim) {
+void move_player_home(char_data *victim)
+{
 	int was_in = victim->in_room;
 	int found = 0;
-	clan_data * clan = NULL;
-	clan_room_data * room = NULL;
+	clan_data *clan = NULL;
+	clan_room_data *room = NULL;
 
 	// check for homes that don't exist
 	if (real_room(GET_HOME(victim) < 1))
@@ -69,16 +72,21 @@ void move_player_home(char_data *victim) {
 	else if (!IS_SET(world[real_room(GET_HOME(victim))].room_flags, CLAN_ROOM))
 		move_player(victim, real_room(GET_HOME(victim)));
 	// Clanroom else
-	else {
-		if (!victim->clan || !(clan = get_clan(victim))) {
+	else
+	{
+		if (!victim->clan || !(clan = get_clan(victim)))
+		{
 			send_to_char("The gods frown on you, and reset your home.\r\n", victim);
 			GET_HOME(victim) = START_ROOM;
 			move_player(victim, real_room(GET_HOME(victim)));
-		} else {
+		}
+		else
+		{
 			for (room = clan->rooms; room; room = room->next)
 				if (room->room_number == GET_HOME(victim))
 					found = 1;
-			if (!found) {
+			if (!found)
+			{
 				send_to_char("The gods frown on you, and reset your home.\r\n", victim);
 				GET_HOME(victim) = START_ROOM;
 			}
@@ -89,17 +97,19 @@ void move_player_home(char_data *victim) {
 
 // Rewritten 9/1/96
 // -Sadus
-void record_track_data(char_data *ch, int cmd) {
-	room_track_data * newScent;
+void record_track_data(char_data *ch, int cmd)
+{
+	room_track_data *newScent;
 
 	// Rangers outdoors leave no tracks
 	if (world[ch->in_room].sector_type != SECT_INSIDE &&
-	GET_CLASS(ch) == CLASS_RANGER)
+		GET_CLASS(ch) == CLASS_RANGER)
 		return;
 
 	// If we just used a scent killer like catstink, don't leave tracks
 	// on our next move
-	if (ISSET(ch->affected_by, AFF_UTILITY)) {
+	if (ISSET(ch->affected_by, AFF_UTILITY))
+	{
 		REMBIT(ch->affected_by, AFF_UTILITY);
 		return;
 	}
@@ -110,14 +120,14 @@ void record_track_data(char_data *ch, int cmd) {
 #ifdef LEAK_CHECK
 	newScent = (room_track_data *)calloc(1, sizeof(struct room_track_data));
 #else
-	newScent = (room_track_data *) dc_alloc(1, sizeof(struct room_track_data));
+	newScent = (room_track_data *)dc_alloc(1, sizeof(struct room_track_data));
 #endif
 	newScent->direction = cmd;
-	newScent->weight = (int) ch->weight;
-	newScent->race = (int) ch->race;
-	newScent->sex = (int) ch->sex;
+	newScent->weight = (int)ch->weight;
+	newScent->race = (int)ch->race;
+	newScent->sex = (int)ch->sex;
 	newScent->condition = ((ch->getHP() * 100) / (GET_MAX_HIT(ch) == 0 ? 100 : GET_MAX_HIT(ch)));
-	newScent->next = NULL; // just in case
+	newScent->next = NULL;	   // just in case
 	newScent->previous = NULL; // just in case
 
 	if (IS_NPC(ch))
@@ -131,7 +141,7 @@ void record_track_data(char_data *ch, int cmd) {
 }
 
 // Removed this due to it being a funky cold medina. - Nocturnal 09/28/05
-//void do_muddy(char_data *ch)
+// void do_muddy(char_data *ch)
 //{
 //   short chance = number(0,30);
 //
@@ -146,7 +156,8 @@ void record_track_data(char_data *ch, int cmd) {
 //   }
 //}
 
-int do_unstable(char_data *ch) {
+int do_unstable(char_data *ch)
+{
 	char death_log[MAX_STRING_LENGTH];
 	int retval;
 
@@ -156,10 +167,11 @@ int do_unstable(char_data *ch) {
 	short chance = number(0, 30);
 
 	if (IS_AFFECTED(ch, AFF_FLYING) || IS_AFFECTED(ch, AFF_FREEFLOAT) ||
-	GET_LEVEL(ch) >= IMMORTAL)
+		GET_LEVEL(ch) >= IMMORTAL)
 		return eFAILURE;
 
-	if (GET_DEX(ch) > chance) {
+	if (GET_DEX(ch) > chance)
+	{
 		act("You dextrously maintain your footing.", ch, 0, 0, TO_CHAR, 0);
 		return eFAILURE;
 	}
@@ -170,7 +182,7 @@ int do_unstable(char_data *ch) {
 
 	sprintf(death_log, "%s slipped to death in room %d.", GET_NAME(ch), world[ch->in_room].number);
 	retval = noncombat_damage(ch, GET_MAX_HIT(ch) / 12, "You feel your back snap painfully and all goes dark...",
-			"$n's frail body snaps in half as $e is buffeted about the room.", death_log, KILL_FALL);
+							  "$n's frail body snaps in half as $e is buffeted about the room.", death_log, KILL_FALL);
 
 	if (SOMEONE_DIED(retval))
 		return eSUCCESS | eCH_DIED;
@@ -178,7 +190,8 @@ int do_unstable(char_data *ch) {
 		return eSUCCESS;
 }
 
-int do_fall(char_data *ch, short dir) {
+int do_fall(char_data *ch, short dir)
+{
 	int target;
 	char damage[MAX_STRING_LENGTH];
 	int retval;
@@ -195,17 +208,20 @@ int do_fall(char_data *ch, short dir) {
 	else if (GET_MAX_HIT(ch) > 1000)
 		dam = number(200, 400);
 
-	if (GET_LEVEL(ch) >= IMMORTAL) {
+	if (GET_LEVEL(ch) >= IMMORTAL)
+	{
 		return eFAILURE;
 	}
 
-	if (IS_AFFECTED(ch, AFF_FREEFLOAT)) {
+	if (IS_AFFECTED(ch, AFF_FREEFLOAT))
+	{
 		dam = 0;
 		send_to_char("Your freefloating magics reduce your fall to a safer speed.\n\r", ch);
 	}
 
 	// Don't effect mobs
-	if (IS_NPC(ch)) {
+	if (IS_NPC(ch))
+	{
 		act("$n clings to the terrain around $m and avoids falling.", ch, 0, 0, TO_ROOM, 0);
 		return eFAILURE;
 	}
@@ -218,34 +234,39 @@ int do_fall(char_data *ch, short dir) {
 	if (IS_SET(world[target].room_flags, IMP_ONLY) && GET_LEVEL(ch) < IMP)
 		return eFAILURE;
 
-	if (IS_SET(world[target].room_flags, TUNNEL)) {
+	if (IS_SET(world[target].room_flags, TUNNEL))
+	{
 		int ppl = 0;
 		char_data *k;
 		for (k = world[target].people; k; k = k->next_in_room)
 			if (!IS_NPC(k))
 				ppl++;
-		if (ppl > 2) {
+		if (ppl > 2)
+		{
 			send_to_char("There isn't enough space for you to follow.\r\n", ch);
 			return eFAILURE;
 		}
 	}
 
-	if (IS_SET(world[target].room_flags, PRIVATE)) {
+	if (IS_SET(world[target].room_flags, PRIVATE))
+	{
 		int ppl = 0;
 		char_data *k;
 		for (k = world[target].people; k; k = k->next_in_room)
 			if (!IS_NPC(k))
 				ppl++;
-		if (ppl > 4) {
+		if (ppl > 4)
+		{
 			send_to_char("There isn't enough space for you to follow.\r\n", ch);
 			return eFAILURE;
 		}
 	}
 
 	sprintf(damage, "%s falls from %d and sustains %d damage.", GET_NAME(ch), world[ch->in_room].number, dam);
-	log(damage, IMMORTAL, LOG_MORTAL);
+	log(damage, IMMORTAL, LogChannels::LOG_MORTAL);
 
-	switch (dir) {
+	switch (dir)
+	{
 	case 0:
 		act("$n rolls out to the north.", ch, 0, 0, TO_ROOM, 0);
 		send_to_char("You tumble to the north...\n\r", ch);
@@ -271,13 +292,14 @@ int do_fall(char_data *ch, short dir) {
 		send_to_char("You fall...\n\r", ch);
 		break;
 	default:
-		log("Default hit in do_fall", IMMORTAL, LOG_MORTAL);
+		log("Default hit in do_fall", IMMORTAL, LogChannels::LOG_MORTAL);
 		break;
 	}
 
 	retval = move_char(ch, target);
 
-	if (!IS_SET(retval, eSUCCESS)) {
+	if (!IS_SET(retval, eSUCCESS))
+	{
 		send_to_char("You are miraculously upheld by divine powers!\n\r", ch);
 		return retval;
 	}
@@ -286,18 +308,18 @@ int do_fall(char_data *ch, short dir) {
 
 	sprintf(damage, "%s's fall from %d was lethal and it killed them.", GET_NAME(ch), world[ch->in_room].number);
 	retval = noncombat_damage(ch, dam, "Luckily the ground breaks your fall.\n\r", "$n plummets into the room and hits the ground with a wet-sounding splat!",
-			damage, KILL_FALL);
+							  damage, KILL_FALL);
 
 	if (SOMEONE_DIED(retval))
 		return eSUCCESS;
 
-	if (!SOMEONE_DIED(retval)) {
+	if (!SOMEONE_DIED(retval))
+	{
 		act("$n plummets into the room and hits the floor HARD.", ch, 0, 0, TO_ROOM, 0);
 	}
 
-	if ((IS_SET(world[ch->in_room].room_flags, FALL_DOWN) && (dir = 5)) || (IS_SET(world[ch->in_room].room_flags, FALL_UP) && (dir = 4))
-			|| (IS_SET(world[ch->in_room].room_flags, FALL_EAST) && (dir = 1)) || (IS_SET(world[ch->in_room].room_flags, FALL_WEST) && (dir = 3))
-			|| (IS_SET(world[ch->in_room].room_flags, FALL_SOUTH) && (dir = 2)) || (IS_SET(world[ch->in_room].room_flags, FALL_NORTH) && (dir = 0))) {
+	if ((IS_SET(world[ch->in_room].room_flags, FALL_DOWN) && (dir = 5)) || (IS_SET(world[ch->in_room].room_flags, FALL_UP) && (dir = 4)) || (IS_SET(world[ch->in_room].room_flags, FALL_EAST) && (dir = 1)) || (IS_SET(world[ch->in_room].room_flags, FALL_WEST) && (dir = 3)) || (IS_SET(world[ch->in_room].room_flags, FALL_SOUTH) && (dir = 2)) || (IS_SET(world[ch->in_room].room_flags, FALL_NORTH) && (dir = 0)))
+	{
 		return do_fall(ch, dir);
 	}
 
@@ -329,7 +351,7 @@ int do_simple_move(char_data *ch, int cmd, int following)
 
 	if (ch == nullptr || ch->in_room < 1 || cmd < 0 || world[ch->in_room].dir_option[cmd] == nullptr || world[ch->in_room].dir_option[cmd]->to_room < 1)
 	{
-		logf(IMMORTAL, LOG_WORLD, "Error in room %d.", ch->in_room);
+		logf(IMMORTAL, LogChannels::LOG_WORLD, "Error in room %d.", ch->in_room);
 		ch->send("There was an error performing that movement.\r\n");
 		return eFAILURE;
 	}
@@ -841,25 +863,29 @@ int do_simple_move(char_data *ch, int cmd, int following)
 	return eSUCCESS;
 }
 
-int attempt_move(char_data *ch, int cmd, int is_retreat) {
+int attempt_move(char_data *ch, int cmd, int is_retreat)
+{
 	char tmp[80];
 	int return_val;
 	int was_in = ch->in_room;
 	struct follow_type *k, *next_dude;
 
-	if (ch->brace_at) {
+	if (ch->brace_at)
+	{
 		csendf(ch, "You can't move and brace the %s at the same time!\r\n", fname(ch->brace_at->keyword));
 		return eFAILURE;
 	}
 
 	--cmd;
 
-	if (!world[ch->in_room].dir_option[cmd]) {
+	if (!world[ch->in_room].dir_option[cmd])
+	{
 		send_to_char("You can't go that way.\n\r", ch);
 		return eFAILURE;
 	}
 
-	if (IS_SET(EXIT(ch, cmd)->exit_info, EX_CLOSED)) {
+	if (IS_SET(EXIT(ch, cmd)->exit_info, EX_CLOSED))
+	{
 		if (IS_SET(EXIT(ch, cmd)->exit_info, EX_HIDDEN))
 			send_to_char("You can't go that way.\n\r", ch);
 		else if (EXIT(ch, cmd)->keyword)
@@ -869,21 +895,24 @@ int attempt_move(char_data *ch, int cmd, int is_retreat) {
 		return eFAILURE;
 	}
 
-	if (EXIT(ch, cmd)->to_room == NOWHERE) {
+	if (EXIT(ch, cmd)->to_room == NOWHERE)
+	{
 		send_to_char("Alas, you can't go that way.\n\r", ch);
 		return eFAILURE;
 	}
 
-	if (!ch->followers && !ch->master) {
+	if (!ch->followers && !ch->master)
+	{
 		try
 		{
 			return_val = do_simple_move(ch, cmd, FALSE);
-		} catch (...)
+		}
+		catch (...)
 		{
-			logf(IMMORTAL, LOG_WORLD, "Error performing movement in room %d.", ch->in_room);
+			logf(IMMORTAL, LogChannels::LOG_WORLD, "Error performing movement in room %d.", ch->in_room);
 			return_val = eFAILURE;
 		}
-		
+
 		if (SOMEONE_DIED(return_val) || !IS_SET(return_val, eSUCCESS))
 			return return_val;
 		if (!IS_AFFECTED(ch, AFF_SNEAK))
@@ -893,10 +922,12 @@ int attempt_move(char_data *ch, int cmd, int is_retreat) {
 		return check_ethereal_focus(ch, ETHEREAL_FOCUS_TRIGGER_MOVE);
 	}
 
-	if (IS_AFFECTED(ch, AFF_CHARM) && (ch->master) && (ch->in_room == ch->master->in_room)) {
+	if (IS_AFFECTED(ch, AFF_CHARM) && (ch->master) && (ch->in_room == ch->master->in_room))
+	{
 		send_to_char("You are unable to abandon your master.\n\r", ch);
 		act("$n trembles as $s mind attempts to free itself from its magical bondage.", ch, 0, 0, TO_ROOM, 0);
-		if (!IS_NPC(ch->master) && GET_CLASS(ch->master) == CLASS_BARD) {
+		if (!IS_NPC(ch->master) && GET_CLASS(ch->master) == CLASS_BARD)
+		{
 			send_to_char("You struggle to maintain control.\r\n", ch->master);
 			/*
 			 if (GET_KI(ch->master) < 5) {
@@ -919,33 +950,39 @@ int attempt_move(char_data *ch, int cmd, int is_retreat) {
 	}
 	catch (...)
 	{
-		logf(IMMORTAL, LOG_WORLD, "Error performing movement in room %d.", ch->in_room);
+		logf(IMMORTAL, LogChannels::LOG_WORLD, "Error performing movement in room %d.", ch->in_room);
 		return_val = eFAILURE;
 	}
 
 	// this may cause problems with leader being ambushed, dying, and group not moving
 	// but we have to be careful in case leader was a mob (no longer valid memory)
-	if (SOMEONE_DIED(return_val) || !IS_SET(return_val, eSUCCESS)) {
+	if (SOMEONE_DIED(return_val) || !IS_SET(return_val, eSUCCESS))
+	{
 		/*
 		 sprintf(tmp, "%s group failed to follow. (died: %d ret: %d)",
 		 GET_NAME(ch), SOMEONE_DIED(return_val), return_val);
-		 log(tmp, OVERSEER, LOG_BUG);
+		 log(tmp, OVERSEER, LogChannels::LOG_BUG);
 		 */
 		return return_val;
 	}
 
-	if (ch->followers && !IS_SET(ch->combat, COMBAT_FLEEING)) {
-		for (k = ch->followers; k; k = next_dude) { // no following a fleer
+	if (ch->followers && !IS_SET(ch->combat, COMBAT_FLEEING))
+	{
+		for (k = ch->followers; k; k = next_dude)
+		{ // no following a fleer
 			next_dude = k->next;
-			if ((was_in == k->follower->in_room) && ((is_retreat && GET_POS(k->follower) > POSITION_RESTING) || (GET_POS(k->follower) >= POSITION_STANDING))) {
-				if (IS_AFFECTED(k->follower, AFF_NO_FLEE)) {
+			if ((was_in == k->follower->in_room) && ((is_retreat && GET_POS(k->follower) > POSITION_RESTING) || (GET_POS(k->follower) >= POSITION_STANDING)))
+			{
+				if (IS_AFFECTED(k->follower, AFF_NO_FLEE))
+				{
 					if (affected_by_spell(k->follower, SPELL_IRON_ROOTS))
 						send_to_char("The roots bracing your legs make it impossible to run!\r\n", k->follower);
 					else
 						send_to_char("Your legs are too tired for running away!\r\n", k->follower);
-					continue; //keep going through the groupies
+					continue; // keep going through the groupies
 				}
-				if (is_retreat && k->follower->fighting && (number(1,100) < 4) && IS_NPC(k->follower->fighting)) {
+				if (is_retreat && k->follower->fighting && (number(1, 100) < 4) && IS_NPC(k->follower->fighting))
+				{
 
 					act("$n notices your intent and moves quickly to block your retreat!", k->follower->fighting, NULL, k->follower, TO_VICT, 0);
 					act("$n notices $N's intent and moves quickly to block $S retreat!", k->follower->fighting, NULL, k->follower, TO_ROOM, NOTVICT);
@@ -957,18 +994,20 @@ int attempt_move(char_data *ch, int cmd, int is_retreat) {
 				else
 					strcpy(tmp, "You follow someone.\n\r\n\r");
 				send_to_char(tmp, k->follower);
-				//do_move(k->follower, "", cmd + 1);
+				// do_move(k->follower, "", cmd + 1);
 				char tempcommand[32];
 				strcpy(tempcommand, dirs[cmd]);
 				if (k->follower->fighting)
 					stop_fighting(k->follower);
 				command_interpreter(k->follower, tempcommand);
-			} else {
+			}
+			else
+			{
 				/*
 				 sprintf(tmp, "%s attempted to follow %s but failed. (was_in:%d fol->in_room:%d pos: %d ret: %d",
 				 GET_NAME(k->follower), GET_NAME(ch), was_in, k->follower->in_room,
 				 GET_POS(k->follower), is_retreat);
-				 log(tmp, OVERSEER, LOG_BUG);
+				 log(tmp, OVERSEER, LogChannels::LOG_BUG);
 				 */
 			}
 		}
@@ -987,7 +1026,8 @@ int attempt_move(char_data *ch, int cmd, int is_retreat) {
 //   1 : If success.
 //   0 : If fail
 //  -1 : If dead.
-int do_move(char_data *ch, char *argument, int cmd) {
+int do_move(char_data *ch, char *argument, int cmd)
+{
 	return attempt_move(ch, cmd);
 }
 
@@ -1025,92 +1065,107 @@ int do_leave(char_data *ch, char *arguement, int cmd)
 	return eFAILURE;
 }
 
-int do_enter(char_data *ch, char *argument, int cmd) {
+int do_enter(char_data *ch, char *argument, int cmd)
+{
 	char buf[MAX_STRING_LENGTH];
 	int retval;
 
 	char_data *sesame;
 	obj_data *portal = NULL;
 
-	if ((ch->in_room != NOWHERE) || (ch->in_room)) {
+	if ((ch->in_room != NOWHERE) || (ch->in_room))
+	{
 		one_argument(argument, buf);
 	}
 
-	if (!*buf) {
+	if (!*buf)
+	{
 		send_to_char("Enter what?\n\r", ch);
 		return eFAILURE;
 	}
 
-	if ((portal = get_obj_in_list_vis(ch, buf, world[ch->in_room].contents)) == NULL) {
+	if ((portal = get_obj_in_list_vis(ch, buf, world[ch->in_room].contents)) == NULL)
+	{
 		send_to_char("Nothing here by that name.\n\r", ch);
 		return eFAILURE;
 	}
 
-	if (portal->obj_flags.type_flag != ITEM_PORTAL) {
+	if (portal->obj_flags.type_flag != ITEM_PORTAL)
+	{
 		send_to_char("You can't enter that.\r\n", ch);
 		return eFAILURE;
 	}
 
-	if (real_room(portal->obj_flags.value[0]) < 0) {
+	if (real_room(portal->obj_flags.value[0]) < 0)
+	{
 		sprintf(buf, "Error in do_enter(), value 0 on object %d < 0", portal->item_number);
-		log(buf, OVERSEER, LOG_BUG);
+		log(buf, OVERSEER, LogChannels::LOG_BUG);
 		send_to_char("You can't enter that.\r\n", ch);
 		return eFAILURE;
 	}
 
-	if (world[real_room(portal->obj_flags.value[0])].sector_type == SECT_UNDERWATER
-			&& !(affected_by_spell(ch, SPELL_WATER_BREATHING) || IS_AFFECTED(ch, AFF_WATER_BREATHING))) {
+	if (world[real_room(portal->obj_flags.value[0])].sector_type == SECT_UNDERWATER && !(affected_by_spell(ch, SPELL_WATER_BREATHING) || IS_AFFECTED(ch, AFF_WATER_BREATHING)))
+	{
 		send_to_char("You bravely attempt to plunge through the portal - let's hope you have gills!\r\n", ch);
 		return eSUCCESS;
 	}
 
-	if (GET_LEVEL(ch) > IMMORTAL && GET_LEVEL(ch) < DEITY && IS_SET(world[real_room(portal->obj_flags.value[0])].room_flags, CLAN_ROOM)) {
+	if (GET_LEVEL(ch) > IMMORTAL && GET_LEVEL(ch) < DEITY && IS_SET(world[real_room(portal->obj_flags.value[0])].room_flags, CLAN_ROOM))
+	{
 		send_to_char("You may not enter a clanhall at your level.\r\n", ch);
 		return eFAILURE;
 	}
 
-	if (IS_NPC(ch) && ch->master && mob_index[ch->mobdata->nr].virt == 8) {
+	if (IS_NPC(ch) && ch->master && mob_index[ch->mobdata->nr].virt == 8)
+	{
 		sesame = ch->master;
-		if (IS_SET(world[real_room(portal->obj_flags.value[0])].room_flags, CLAN_ROOM)) {
+		if (IS_SET(world[real_room(portal->obj_flags.value[0])].room_flags, CLAN_ROOM))
+		{
 			// Is golem's master not a member of this clan
-			if (others_clan_room(sesame, &world[real_room(portal->obj_flags.value[0])]) == true) {
+			if (others_clan_room(sesame, &world[real_room(portal->obj_flags.value[0])]) == true)
+			{
 				send_to_char("Your master is not from that clan.\r\n", ch);
 				act("$n finds $mself unable to enter!", ch, 0, 0, TO_ROOM, 0);
 				do_say(ch, "I may not enter.", CMD_DEFAULT);
 				return eFAILURE;
 			}
 		}
-	} else {
+	}
+	else
+	{
 		sesame = ch;
 	}
 
 	// should probably just combine this with 'if' below it, but i'm lazy
-	if (IS_SET(portal->obj_flags.value[3], PORTAL_NO_ENTER)) {
+	if (IS_SET(portal->obj_flags.value[3], PORTAL_NO_ENTER))
+	{
 		send_to_char("The portal's destination rebels against you.\r\n", ch);
 		act("$n finds $mself unable to enter!", ch, 0, 0, TO_ROOM, 0);
 		return eFAILURE;
 	}
 
 	// Thieves arent allowed through cleric portals
-	if (affected_by_spell(ch, FUCK_PTHIEF) && portal->obj_flags.value[1] == 0) {
+	if (affected_by_spell(ch, FUCK_PTHIEF) && portal->obj_flags.value[1] == 0)
+	{
 		send_to_char("Your attempt to transport stolen goods through planes of magic fails!\r\n", ch);
 		return eFAILURE;
 	}
 
-	if (!IS_MOB(ch) && (affected_by_spell(ch, FUCK_PTHIEF) || affected_by_spell(ch, FUCK_GTHIEF) || IS_AFFECTED(ch, AFF_CHAMPION))
-			&& (IS_SET(world[real_room(portal->obj_flags.value[0])].room_flags, CLAN_ROOM)
-					|| (portal->obj_flags.value[0] >= 1900 && portal->obj_flags.value[0] <= 1999 && !portal->obj_flags.value[1]))) {
+	if (!IS_MOB(ch) && (affected_by_spell(ch, FUCK_PTHIEF) || affected_by_spell(ch, FUCK_GTHIEF) || IS_AFFECTED(ch, AFF_CHAMPION)) && (IS_SET(world[real_room(portal->obj_flags.value[0])].room_flags, CLAN_ROOM) || (portal->obj_flags.value[0] >= 1900 && portal->obj_flags.value[0] <= 1999 && !portal->obj_flags.value[1])))
+	{
 		send_to_char("The portal's destination rebels against you.\r\n", ch);
 		act("$n finds $mself unable to enter!", ch, 0, 0, TO_ROOM, 0);
 		return eFAILURE;
 	}
 
-	if (isname("only", portal->name) && !isname(GET_NAME(sesame), portal->name)) {
+	if (isname("only", portal->name) && !isname(GET_NAME(sesame), portal->name))
+	{
 		send_to_char("The portal fades when you draw near, then shimmers as you withdraw.\n\r", ch);
 		return eFAILURE;
 	}
 
-	switch (portal->obj_flags.value[1]) {
+	switch (portal->obj_flags.value[1])
+	{
 	case 0:
 		send_to_char("You reach out tentatively and touch the portal...\n\r", ch);
 		act("$n reaches out to the glowing dimensional portal....", ch, 0, 0, TO_ROOM, 0);
@@ -1127,7 +1182,7 @@ int do_enter(char_data *ch, char *argument, int cmd) {
 		return eFAILURE;
 	default:
 		sprintf(buf, "Error in do_enter(), value 1 on object %d returned default case", portal->item_number);
-		log(buf, OVERSEER, LOG_BUG);
+		log(buf, OVERSEER, LogChannels::LOG_BUG);
 		return eFAILURE;
 	}
 
@@ -1136,12 +1191,14 @@ int do_enter(char_data *ch, char *argument, int cmd) {
 	if (SOMEONE_DIED(retval))
 		return retval;
 
-	if (!IS_SET(retval, eSUCCESS)) {
+	if (!IS_SET(retval, eSUCCESS))
+	{
 		send_to_char("You recoil in pain as the portal slams shut!\n\r", ch);
 		act("$n recoils in pain as the portal slams shut!", ch, 0, 0, TO_ROOM, 0);
 	}
 
-	switch (portal->obj_flags.value[1]) {
+	switch (portal->obj_flags.value[1])
+	{
 	case 0:
 		do_look(ch, "", CMD_DEFAULT);
 		WAIT_STATE(ch, PULSE_VIOLENCE);
@@ -1163,31 +1220,37 @@ int do_enter(char_data *ch, char *argument, int cmd) {
 	return ambush(ch);
 }
 
-int move_char(char_data *ch, int dest, bool stop_all_fighting) {
-	if (!ch) {
-		log("Error in move_char(), NULL character", OVERSEER, LOG_BUG);
+int move_char(char_data *ch, int dest, bool stop_all_fighting)
+{
+	if (!ch)
+	{
+		log("Error in move_char(), NULL character", OVERSEER, LogChannels::LOG_BUG);
 		return eINTERNAL_ERROR;
 	}
 
 	int origination = ch->in_room;
 
-	if (ch->in_room != NOWHERE) {
+	if (ch->in_room != NOWHERE)
+	{
 		// Couldn't move char from the room
-		if (char_from_room(ch, stop_all_fighting) == 0) {
+		if (char_from_room(ch, stop_all_fighting) == 0)
+		{
 			log("Error in move_char(), character not NOWHERE, but couldn't be moved.",
-			OVERSEER, LOG_BUG);
+				OVERSEER, LogChannels::LOG_BUG);
 			return eINTERNAL_ERROR;
 		}
 	}
 
 	// Couldn't move char to new room
-	if (char_to_room(ch, dest, stop_all_fighting) == 0) {
+	if (char_to_room(ch, dest, stop_all_fighting) == 0)
+	{
 		// Now we have real problems
-		if (char_to_room(ch, origination) == 0) {
+		if (char_to_room(ch, origination) == 0)
+		{
 			fprintf(stderr, "Error in move_char(), character stuck in NOWHERE: %s.\n", GET_NAME(ch));
 			abort();
 		}
-		logf(OVERSEER, LOG_BUG, "Error in move_char(), could not move %s to %d.", GET_NAME(ch), world[dest].number);
+		logf(OVERSEER, LogChannels::LOG_BUG, "Error in move_char(), could not move %s to %d.", GET_NAME(ch), world[dest].number);
 		return eINTERNAL_ERROR;
 	}
 
@@ -1195,31 +1258,36 @@ int move_char(char_data *ch, int dest, bool stop_all_fighting) {
 	return eSUCCESS;
 }
 
-int do_climb(char_data *ch, char *argument, int cmd) {
+int do_climb(char_data *ch, char *argument, int cmd)
+{
 	char buf[MAX_INPUT_LENGTH];
-	obj_data * obj = NULL;
+	obj_data *obj = NULL;
 
 	one_argument(argument, buf);
 
-	if (!*buf) {
+	if (!*buf)
+	{
 		send_to_char("Climb what?\r\n", ch);
 		return eSUCCESS;
 	}
 
-	if (!(obj = get_obj_in_list_vis(ch, buf, world[ch->in_room].contents))) {
+	if (!(obj = get_obj_in_list_vis(ch, buf, world[ch->in_room].contents)))
+	{
 		send_to_char("Climb what?\r\n", ch);
 		return eSUCCESS;
 	}
 
-	if (obj->obj_flags.type_flag != ITEM_CLIMBABLE) {
+	if (obj->obj_flags.type_flag != ITEM_CLIMBABLE)
+	{
 		send_to_char("You can't climb that.\r\n", ch);
 		return eSUCCESS;
 	}
 
 	int dest = obj->obj_flags.value[0];
 
-	if (real_room(dest) < 0) {
-		logf(IMMORTAL, LOG_WORLD, "Error in do_climb(), illegal destination in object %d.", obj_index[obj->item_number].virt);
+	if (real_room(dest) < 0)
+	{
+		logf(IMMORTAL, LogChannels::LOG_WORLD, "Error in do_climb(), illegal destination in object %d.", obj_index[obj->item_number].virt);
 		send_to_char("You can't climb that.\r\n", ch);
 		return eFAILURE | eINTERNAL_ERROR;
 	}
@@ -1242,57 +1310,59 @@ int do_climb(char_data *ch, char *argument, int cmd) {
 
 int ambush(char_data *ch)
 {
-  char_data *i, *next_i;
-  int retval;
+	char_data *i, *next_i;
+	int retval;
 
-  for(i = world[ch->in_room].people; i; i = next_i) 
-  {
-     next_i = i->next_in_room;
-  
-     if(i == ch || !i->ambush || !CAN_SEE(i, ch) || i->fighting)
-       continue;
+	for (i = world[ch->in_room].people; i; i = next_i)
+	{
+		next_i = i->next_in_room;
 
-     if(  GET_POS(i) <= POSITION_RESTING || 
-          GET_POS(i) == POSITION_FIGHTING ||
-          IS_AFFECTED(i, AFF_PARALYSIS) ||
-          ( IS_SET(world[i->in_room].room_flags, SAFE) &&
-	    !IS_AFFECTED(ch, AFF_CANTQUIT)
-          ))
-       continue;
-     if(!IS_MOB(i) && !i->desc) // don't work if I'm linkdead
-       continue;
-     if(isname(i->ambush, GET_NAME(ch)))
-     {
+		if (i == ch || !i->ambush || !CAN_SEE(i, ch) || i->fighting)
+			continue;
 
-			if (!canPerform(i, SKILL_AMBUSH)) {
-         continue;
-       }
+		if (GET_POS(i) <= POSITION_RESTING ||
+			GET_POS(i) == POSITION_FIGHTING ||
+			IS_AFFECTED(i, AFF_PARALYSIS) ||
+			(IS_SET(world[i->in_room].room_flags, SAFE) &&
+			 !IS_AFFECTED(ch, AFF_CANTQUIT)))
+			continue;
+		if (!IS_MOB(i) && !i->desc) // don't work if I'm linkdead
+			continue;
+		if (isname(i->ambush, GET_NAME(ch)))
+		{
 
-       if(IS_AFFECTED(ch, AFF_ALERT)) {
-          send_to_char("Your target is far too alert to accomplish an ambush!\r\n", i);
-          continue;
-       }
+			if (!canPerform(i, SKILL_AMBUSH))
+			{
+				continue;
+			}
 
+			if (IS_AFFECTED(ch, AFF_ALERT))
+			{
+				send_to_char("Your target is far too alert to accomplish an ambush!\r\n", i);
+				continue;
+			}
 
-       if (!charge_moves(ch, SKILL_AMBUSH)) return eSUCCESS;
+			if (!charge_moves(ch, SKILL_AMBUSH))
+				return eSUCCESS;
 
-       if(skill_success(i,ch, SKILL_AMBUSH)) 
-       { 
-//         act("$n ambushes $N in a brilliant surprise attack!", i, 0, ch, TO_ROOM, NOTVICT);
-//         act("$n ambushes you as you enter the room!", i, 0, ch, TO_VICT, 0);
-//         act("You ambush $N with a brilliant surprise attack!", i, 0, ch, TO_CHAR, 0);
-         retval = damage(i, ch, GET_LEVEL(i) * 10, TYPE_HIT, SKILL_AMBUSH, 0); 
-         if(IS_SET(retval, eVICT_DIED))
-           return (eSUCCESS|eCH_DIED);  // ch = damage vict
-         if(IS_SET(retval, eCH_DIED))
-           return (eSUCCESS); // doesn't matter, but don't lag vict
-         if(!IS_MOB(i) && IS_SET(i->pcdata->toggles, PLR_WIMPY))
-            WAIT_STATE(i, PULSE_VIOLENCE * 3);
-         else WAIT_STATE(i, PULSE_VIOLENCE * 2);
-         WAIT_STATE(ch, PULSE_VIOLENCE * 1);
-       }
-       // we continue instead of breaking in case there are any OTHER rangers in the room
-     }
-  }
-  return eSUCCESS;
+			if (skill_success(i, ch, SKILL_AMBUSH))
+			{
+				//         act("$n ambushes $N in a brilliant surprise attack!", i, 0, ch, TO_ROOM, NOTVICT);
+				//         act("$n ambushes you as you enter the room!", i, 0, ch, TO_VICT, 0);
+				//         act("You ambush $N with a brilliant surprise attack!", i, 0, ch, TO_CHAR, 0);
+				retval = damage(i, ch, GET_LEVEL(i) * 10, TYPE_HIT, SKILL_AMBUSH, 0);
+				if (IS_SET(retval, eVICT_DIED))
+					return (eSUCCESS | eCH_DIED); // ch = damage vict
+				if (IS_SET(retval, eCH_DIED))
+					return (eSUCCESS); // doesn't matter, but don't lag vict
+				if (!IS_MOB(i) && IS_SET(i->pcdata->toggles, PLR_WIMPY))
+					WAIT_STATE(i, PULSE_VIOLENCE * 3);
+				else
+					WAIT_STATE(i, PULSE_VIOLENCE * 2);
+				WAIT_STATE(ch, PULSE_VIOLENCE * 1);
+			}
+			// we continue instead of breaking in case there are any OTHER rangers in the room
+		}
+	}
+	return eSUCCESS;
 }

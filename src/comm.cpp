@@ -146,7 +146,7 @@ void skip_spaces(char **string);
 char *any_one_arg(char *argument, char *first_arg);
 char *calc_color(int hit, int max_hit);
 string generate_prompt(char_data *ch);
-//string generate_prompt(char_data *ch);
+// string generate_prompt(char_data *ch);
 string get_from_q(queue<string> &input_queue);
 void signal_setup(void);
 int new_descriptor(int s);
@@ -165,8 +165,8 @@ void pulse_takeover(void);
 void boot_db(void);
 void zone_update(void);
 void affect_update(int32_t duration_type); /* In spells.c */
-void point_update(void);                 /* In limits.c */
-void food_update(void);                  /* In limits.c */
+void point_update(void);                   /* In limits.c */
+void food_update(void);                    /* In limits.c */
 void mobile_activity(void);
 void object_activity(uint64_t pulse_type);
 void update_corpses_and_portals(void);
@@ -210,7 +210,7 @@ int write_hotboot_file(char **new_argv)
 
   if ((fp = fopen("hotboot", "w")) == NULL)
   {
-    log("Hotboot failed, unable to open hotboot file.", 0, LOG_MISC);
+    log("Hotboot failed, unable to open hotboot file.", 0, LogChannels::LOG_MISC);
     return 0;
   }
 
@@ -269,7 +269,7 @@ int write_hotboot_file(char **new_argv)
     }
   }
   fclose(fp);
-  log("Hotboot descriptor file successfully written.", 0, LOG_MISC);
+  log("Hotboot descriptor file successfully written.", 0, LogChannels::LOG_MISC);
 
   chdir("../bin/");
 
@@ -293,11 +293,11 @@ int write_hotboot_file(char **new_argv)
   }
   char *buffer = new char[100];
   getcwd(buffer, 99);
-  logf(108, LOG_GOD, "Hotbooting %s at [%s]", argv_string.str().c_str(), buffer);
+  logf(108, LogChannels::LOG_GOD, "Hotbooting %s at [%s]", argv_string.str().c_str(), buffer);
 
   if (-1 == execv(argv[0], argv))
   {
-    log("Hotboot execv call failed.", 0, LOG_MISC);
+    log("Hotboot execv call failed.", 0, LogChannels::LOG_MISC);
     perror(argv[0]);
     chdir(DFLT_DIR);
     unlink("hotboot"); // wipe the file since we can't use it anyway
@@ -324,7 +324,7 @@ int load_hotboot_descs()
   {
     ifs.open("hotboot");
     unlink("hotboot");
-    log("Hotboot, reloading characters.", 0, LOG_MISC);
+    log("Hotboot, reloading characters.", 0, LogChannels::LOG_MISC);
 
     for_each(dc.cf.ports.begin(), dc.cf.ports.end(), [&dc, &ifs](in_port_t &port)
              {
@@ -364,7 +364,7 @@ int load_hotboot_descs()
       if (write_to_descriptor(desc, "Recovering...\r\n") == -1)
       {
         sprintf(buf, "Host %s Char %s Desc %d FAILED to recover from hotboot.", host, chr, desc);
-        log(buf, 0, LOG_MISC);
+        log(buf, 0, LogChannels::LOG_MISC);
         CLOSE_SOCKET(desc);
         dc_free(d);
         d = NULL;
@@ -378,7 +378,7 @@ int load_hotboot_descs()
       if (-1 == write_to_descriptor(d->descriptor, "Link recovery successful.\n\rPlease wait while mud finishes rebooting...\n\r"))
       {
         sprintf(buf, "Host %s Char %s Desc %d failed to recover from hotboot.", host, chr, desc);
-        log(buf, 0, LOG_MISC);
+        log(buf, 0, LogChannels::LOG_MISC);
         CLOSE_SOCKET(desc);
         dc_free(d);
         d = NULL;
@@ -392,14 +392,14 @@ int load_hotboot_descs()
   }
   catch (...)
   {
-    log("Hotboot file missing/unopenable.", 0, LOG_MISC);
+    log("Hotboot file missing/unopenable.", 0, LogChannels::LOG_MISC);
     return false;
   }
 
   unlink("hotboot"); // if the above unlink failed somehow(?),
                      // remove the hotboot file so that it dosen't think
                      // next reboot is another hotboot
-  log("Successful hotboot file read.", 0, LOG_MISC);
+  log("Successful hotboot file read.", 0, LogChannels::LOG_MISC);
   return 1;
 }
 
@@ -417,7 +417,7 @@ void finish_hotboot()
     if (!load_char_obj(d, d->output.c_str()))
     {
       sprintf(buf, "Could not load char '%s' in hotboot.", d->output);
-      log(buf, 0, LOG_MISC);
+      log(buf, 0, LogChannels::LOG_MISC);
       write_to_descriptor(d->descriptor, "Link Failed!  Tell an Immortal when you can.\n\r");
       close_socket(d);
       continue;
@@ -477,21 +477,21 @@ void DC::init_game(void)
     fclose(fp);
   }
 
-  log("Attempting to load hotboot file.", 0, LOG_MISC);
+  log("Attempting to load hotboot file.", 0, LogChannels::LOG_MISC);
 
   if (load_hotboot_descs())
   {
-    log("Hotboot Loading complete.", 0, LOG_MISC);
+    log("Hotboot Loading complete.", 0, LogChannels::LOG_MISC);
     was_hotboot = 1;
   }
   else
   {
-    log("Hotboot failed.  Starting regular sockets.", 0, LOG_MISC);
-    log("Opening mother connections.", 0, LOG_MISC);
+    log("Hotboot failed.  Starting regular sockets.", 0, LogChannels::LOG_MISC);
+    log("Opening mother connections.", 0, LogChannels::LOG_MISC);
 
     for_each(cf.ports.begin(), cf.ports.end(), [this](in_port_t &port)
              {
-               logf(0, LOG_MISC, "Opening port %d.", port);
+               logf(0, LogChannels::LOG_MISC, "Opening port %d.", port);
                int listen_fd = init_socket(port);
                if (listen_fd >= 0)
                {
@@ -499,7 +499,7 @@ void DC::init_game(void)
                }
                else
                {
-                 logf(0, LOG_MISC, "Error opening port %d.", port);
+                 logf(0, LogChannels::LOG_MISC, "Error opening port %d.", port);
                } });
   }
 
@@ -508,17 +508,17 @@ void DC::init_game(void)
 
   if (was_hotboot)
   {
-    log("Connecting hotboot characters to their descriptiors", 0, LOG_MISC);
+    log("Connecting hotboot characters to their descriptiors", 0, LogChannels::LOG_MISC);
     finish_hotboot();
   }
 
-  log("Signal trapping.", 0, LOG_MISC);
+  log("Signal trapping.", 0, LogChannels::LOG_MISC);
   signal_setup();
 
   // we got all the way through, let's turn auto-hotboot back on
   try_to_hotboot_on_crash = 1;
 
-  log("Entering game loop.", 0, LOG_MISC);
+  log("Entering game loop.", 0, LogChannels::LOG_MISC);
 
   unlink("died_in_bootup");
 
@@ -529,7 +529,7 @@ void DC::init_game(void)
   game_loop();
   do_not_save_corpses = 1;
 
-  log("Closing all sockets.", 0, LOG_MISC);
+  log("Closing all sockets.", 0, LogChannels::LOG_MISC);
   while (descriptor_list)
   {
     close_socket(descriptor_list);
@@ -537,51 +537,51 @@ void DC::init_game(void)
 
   for_each(server_descriptor_list.begin(), server_descriptor_list.end(), [](const int &fd)
            {
-             logf(0, LOG_MISC, "Closing fd %d.", fd);
+             logf(0, LogChannels::LOG_MISC, "Closing fd %d.", fd);
              CLOSE_SOCKET(fd); });
 #ifdef LEAK_CHECK
 
-  log("Freeing all mobs in world.", 0, LOG_MISC);
+  log("Freeing all mobs in world.", 0, LogChannels::LOG_MISC);
   remove_all_mobs_from_world();
-  log("Freeing all objs in world.", 0, LOG_MISC);
+  log("Freeing all objs in world.", 0, LogChannels::LOG_MISC);
   remove_all_objs_from_world();
-  log("Freeing socials from memory.", 0, LOG_MISC);
+  log("Freeing socials from memory.", 0, LogChannels::LOG_MISC);
   clean_socials_from_memory();
-  log("Freeing zones data.", 0, LOG_MISC);
+  log("Freeing zones data.", 0, LogChannels::LOG_MISC);
   free_zones_from_memory();
-  log("Freeing clan data.", 0, LOG_MISC);
+  log("Freeing clan data.", 0, LogChannels::LOG_MISC);
   free_clans_from_memory();
-  log("Freeing the world.", 0, LOG_MISC);
+  log("Freeing the world.", 0, LogChannels::LOG_MISC);
   free_world_from_memory();
-  log("Freeing mobs from memory.", 0, LOG_MISC);
+  log("Freeing mobs from memory.", 0, LogChannels::LOG_MISC);
   free_mobs_from_memory();
-  log("Freeing objs from memory.", 0, LOG_MISC);
+  log("Freeing objs from memory.", 0, LogChannels::LOG_MISC);
   free_objs_from_memory();
-  log("Freeing messages from memory.", 0, LOG_MISC);
+  log("Freeing messages from memory.", 0, LogChannels::LOG_MISC);
   free_messages_from_memory();
-  log("Freeing hash tree from memory.", 0, LOG_MISC);
+  log("Freeing hash tree from memory.", 0, LogChannels::LOG_MISC);
   free_hsh_tree_from_memory();
-  log("Freeing wizlist from memory.", 0, LOG_MISC);
+  log("Freeing wizlist from memory.", 0, LogChannels::LOG_MISC);
   free_wizlist_from_memory();
-  log("Freeing help index.", 0, LOG_MISC);
+  log("Freeing help index.", 0, LogChannels::LOG_MISC);
   free_help_from_memory();
-  log("Freeing shops from memory.", 0, LOG_MISC);
+  log("Freeing shops from memory.", 0, LogChannels::LOG_MISC);
   free_shops_from_memory();
-  log("Freeing emoting objects from memory.", 0, LOG_MISC);
+  log("Freeing emoting objects from memory.", 0, LogChannels::LOG_MISC);
   free_emoting_objects_from_memory();
-  log("Freeing game portals from memory.", 0, LOG_MISC);
+  log("Freeing game portals from memory.", 0, LogChannels::LOG_MISC);
   free_game_portals_from_memory();
-  log("Freeing command radix from memory.", 0, LOG_MISC);
+  log("Freeing command radix from memory.", 0, LogChannels::LOG_MISC);
   free_command_radix_nodes(cmd_radix);
-  log("Freeing ban list from memory.", 0, LOG_MISC);
+  log("Freeing ban list from memory.", 0, LogChannels::LOG_MISC);
   free_ban_list_from_memory();
-  log("Freeing the bufpool.", 0, LOG_MISC);
+  log("Freeing the bufpool.", 0, LogChannels::LOG_MISC);
   free_buff_pool_from_memory();
   DC::instance().removeDead();
 #endif
 
-  log("Goodbye.", 0, LOG_MISC);
-  log("Normal termination of game.", 0, LOG_MISC);
+  log("Goodbye.", 0, LogChannels::LOG_MISC);
+  log("Normal termination of game.", 0, LogChannels::LOG_MISC);
 }
 
 /*
@@ -756,7 +756,7 @@ void DC::game_loop(void)
           {
             sprintf(buf, "Connection attempt bailed from %s", d->host);
             printf(buf);
-            log(buf, 111, LOG_SOCKET);
+            log(buf, 111, LogChannels::LOG_SOCKET);
           }
           close_socket(d);
         }
@@ -788,7 +788,7 @@ void DC::game_loop(void)
       }
       else if ((d->wait <= 0) && !d->input.empty())
       {
-        
+
         comm = get_from_q(d->input);
 #ifdef DEBUG_INPUT
         cerr << "Got command [" << comm << "] from the d->input queue" << endl;
@@ -881,7 +881,7 @@ void DC::game_loop(void)
       timingDebugStr <<  "Time since last pulse is "
           << (((int) now_time.tv_sec) - ((int) last_time.tv_sec)) << "sec "
           << (((int) now_time.tv_usec) - ((int) last_time.tv_usec)) << "usec.\r\n";
-      //logf(110, LOG_BUG, timingDebugStr.str().c_str());
+      //logf(110, LogChannels::LOG_BUG, timingDebugStr.str().c_str());
     }
     */
 
@@ -896,13 +896,13 @@ void DC::game_loop(void)
       usecDelta -= 1000000;
       secDelta += 1;
     }
-    // logf(110, LOG_BUG, "secD : %d  usecD: %d", secDelta, usecDelta);
+    // logf(110, LogChannels::LOG_BUG, "secD : %d  usecD: %d", secDelta, usecDelta);
 
     if (secDelta > 0 || (secDelta == 0 && usecDelta > 0))
     {
       delay_time.tv_usec = usecDelta;
       delay_time.tv_sec = secDelta;
-      // logf(110, LOG_BUG, "Pausing for  %dsec %dusec.", secDelta, usecDelta);
+      // logf(110, LogChannels::LOG_BUG, "Pausing for  %dsec %dusec.", secDelta, usecDelta);
       int fd_nr = -1;
       errno = 0;
       fd_nr = select(0, NULL, NULL, NULL, &delay_time);
@@ -920,7 +920,7 @@ void DC::game_loop(void)
       }
     }
     // temp removing this since it's spamming the crap out of us
-    // else logf(110, LOG_BUG, "0 delay on pulse");
+    // else logf(110, LogChannels::LOG_BUG, "0 delay on pulse");
     gettimeofday(&last_time, NULL);
     PerfTimers["gameloop"].stop();
   }
@@ -1422,11 +1422,11 @@ string generate_prompt(char_data *ch)
   {
     rm = &world[ch->in_room];
   }
-  catch(...)
+  catch (...)
   {
     rm = nullptr;
   }
-  
+
   if (IS_NPC(ch))
     source = mobprompt;
   else
@@ -1641,8 +1641,8 @@ string generate_prompt(char_data *ch)
       break;
     case 'M':
       sprintf(pro, "%d", GET_MAX_MANA(ch));
-      break;   
-   case 'n':
+      break;
+    case 'n':
       sprintf(pro, "%s%d%s", calc_color(GET_MANA(ch), GET_MAX_MANA(ch)),
               GET_MANA(ch), NTEXT);
       break;
@@ -1652,14 +1652,14 @@ string generate_prompt(char_data *ch)
     // o - unused
     // O - Last object edited
     case 'O':
-    if (IS_PC(ch))
-    {
-      if (ch->pcdata->last_obj_vnum > 0)
+      if (IS_PC(ch))
       {
-        sprintf(pro, "%llu", ch->pcdata->last_obj_vnum);
+        if (ch->pcdata->last_obj_vnum > 0)
+        {
+          sprintf(pro, "%llu", ch->pcdata->last_obj_vnum);
+        }
       }
-    }
-    break;
+      break;
     case 'p':
       if (ch->fighting && ch->fighting->fighting)
       {
@@ -1695,12 +1695,12 @@ string generate_prompt(char_data *ch)
     case 'r':
       sprintf(pro, "%c%c", '\n', '\r');
       break;
-    case 'R':    
-    if (rm != nullptr)
-    {
-      sprintf(pro, "%s%d%s", GREEN, rm->number, NTEXT);
-    }
-    break;
+    case 'R':
+      if (rm != nullptr)
+      {
+        sprintf(pro, "%s%d%s", GREEN, rm->number, NTEXT);
+      }
+      break;
     case 's':
       if (world_array[ch->in_room])
         sprintf(pro, "%s", sector_types[world[ch->in_room].sector_type]);
@@ -1709,11 +1709,11 @@ string generate_prompt(char_data *ch)
       break;
     // S - Last mob edited
     case 'S':
-    if (IS_PC(ch))
-    {
-      sprintf(pro, "%d", ch->pcdata->last_mob_edit);
-    }
-    break;
+      if (IS_PC(ch))
+      {
+        sprintf(pro, "%d", ch->pcdata->last_mob_edit);
+      }
+      break;
     case 't':
       if (ch->fighting && ch->fighting->fighting)
         sprintf(pro, "[%s]",
@@ -1798,18 +1798,18 @@ string generate_prompt(char_data *ch)
       break;
     // z - wizinvis level
     case 'z':
-    if (IS_IMMORTAL(ch))
-    {
-      sprintf(pro, "%s%d%s", YELLOW, ch->pcdata->wizinvis, NTEXT);
-    }
-    break;
+      if (IS_IMMORTAL(ch))
+      {
+        sprintf(pro, "%s%d%s", YELLOW, ch->pcdata->wizinvis, NTEXT);
+      }
+      break;
     // Z - zone number
     case 'Z':
-    if (rm != nullptr)
-    {
-      sprintf(pro, "%s%d%s", RED, rm->zone, NTEXT);
-    }
-    break;
+      if (rm != nullptr)
+      {
+        sprintf(pro, "%s%d%s", RED, rm->zone, NTEXT);
+      }
+      break;
     case '%':
       sprintf(pro, "%%");
       break;
@@ -1852,10 +1852,9 @@ string generate_prompt(char_data *ch)
   *(pro + 1) = '\0';
 
   string buffer = prompt;
-  delete [] prompt;
+  delete[] prompt;
   return buffer;
 }
-
 
 void write_to_q(const string txt, queue<string> &input_queue)
 {
@@ -1936,7 +1935,7 @@ void write_to_output(string txt, struct descriptor_data *t)
     scramble_text(buf);
   }
 
-  t->output += buf; 
+  t->output += buf;
 }
 
 /* ******************************************************************
@@ -1995,7 +1994,7 @@ int new_descriptor(int s)
 
     CLOSE_SOCKET(desc);
     sprintf(buf, "Connection attempt denied from [%s]", newd->host);
-    log(buf, OVERSEER, LOG_SOCKET);
+    log(buf, OVERSEER, LogChannels::LOG_SOCKET);
     // dc_free(newd->host);
     dc_free(newd);
     return 0;
@@ -2085,7 +2084,7 @@ int write_to_descriptor(int desc, string txt)
       if (errno == EAGAIN)
       {
         // log("process_output: socket write would block",
-        //     0, LOG_MISC);
+        //     0, LogChannels::LOG_MISC);
       }
       else
       {
@@ -2146,7 +2145,7 @@ void process_iac(descriptor_data *t)
         case telnet::wont_opt:
         case telnet::do_opt:
         case telnet::dont_opt:
-        continue;
+          continue;
           break;
 
         default:
@@ -2192,7 +2191,7 @@ string removeUnprintable(string input)
     {
       input.erase(found_pos, 1);
     }
-  } while(found_pos != input.npos);
+  } while (found_pos != input.npos);
 
   do
   {
@@ -2201,7 +2200,7 @@ string removeUnprintable(string input)
     {
       input.erase(found_pos, 1);
     }
-  } while(found_pos != input.npos);
+  } while (found_pos != input.npos);
 
   do
   {
@@ -2210,11 +2209,10 @@ string removeUnprintable(string input)
     {
       input.erase(found_pos, 1);
     }
-  } while(found_pos != input.npos);
+  } while (found_pos != input.npos);
 
   return input;
 }
-
 
 string makePrintable(string input)
 {
@@ -2227,7 +2225,7 @@ string makePrintable(string input)
       input.erase(found_pos, 1);
       input.insert(found_pos, "\\n");
     }
-  } while(found_pos != input.npos);
+  } while (found_pos != input.npos);
 
   do
   {
@@ -2237,7 +2235,7 @@ string makePrintable(string input)
       input.erase(found_pos, 1);
       input.insert(found_pos, "\\r");
     }
-  } while(found_pos != input.npos);
+  } while (found_pos != input.npos);
 
   do
   {
@@ -2247,11 +2245,10 @@ string makePrintable(string input)
       input.erase(found_pos, 1);
       input.insert(found_pos, "\\b");
     }
-  } while(found_pos != input.npos);
+  } while (found_pos != input.npos);
 
   return input;
 }
-
 
 string remove_all_codes(string input)
 {
@@ -2266,9 +2263,9 @@ string remove_all_codes(string input)
       {
         input.replace(found_pos, 1, "$$");
         skip = 2;
-      } catch(...)
+      }
+      catch (...)
       {
-
       }
     }
     pos = found_pos + skip;
@@ -2285,12 +2282,12 @@ string remove_non_color_codes(string input)
   try
   {
     while ((found_pos = input.find("$")) != input.npos)
-    {     
-      if (found_pos+1 == input.length())
+    {
+      if (found_pos + 1 == input.length())
       {
-        output += input.substr(0, found_pos+1);
+        output += input.substr(0, found_pos + 1);
         output += "$";
-        input.erase(0, found_pos+1);
+        input.erase(0, found_pos + 1);
         output += input;
         return output;
       }
@@ -2313,15 +2310,15 @@ string remove_non_color_codes(string input)
       case '*':
       case 'R':
       case 'B':
-        output += input.substr(0, found_pos+2);
-        input.erase(0, found_pos+2);
+        output += input.substr(0, found_pos + 2);
+        input.erase(0, found_pos + 2);
         break;
       default:
-        output += input.substr(0, found_pos+1);
+        output += input.substr(0, found_pos + 1);
         output += "$";
-        input.erase(0, found_pos+1);
+        input.erase(0, found_pos + 1);
         break;
-      }      
+      }
     }
     output += input;
   }
@@ -2332,22 +2329,22 @@ string remove_non_color_codes(string input)
   return output;
 }
 
-  /*
-   * ASSUMPTION: There will be no newlines in the raw input buffer when this
-   * function is called.  We must maintain that before returning.
-   */
-  int process_input(struct descriptor_data * t)
-  {
-    size_t eoc_pos = t->inbuf.npos;
-    size_t erase = 0;
-    ssize_t bytes_read = 0;
-    t->idle_time = 0;
+/*
+ * ASSUMPTION: There will be no newlines in the raw input buffer when this
+ * function is called.  We must maintain that before returning.
+ */
+int process_input(struct descriptor_data *t)
+{
+  size_t eoc_pos = t->inbuf.npos;
+  size_t erase = 0;
+  ssize_t bytes_read = 0;
+  t->idle_time = 0;
 
-    do
+  do
+  {
+    char c_buffer[8193] = {};
+    if ((bytes_read = read(t->descriptor, &c_buffer, sizeof(c_buffer) - 1)) < 0)
     {
-      char c_buffer[8193] = {};
-      if ((bytes_read = read(t->descriptor, &c_buffer, sizeof(c_buffer) - 1)) < 0)
-      {
 #ifdef EWOULDBLOCK
       if (errno == EWOULDBLOCK)
         errno = EAGAIN;
@@ -2366,13 +2363,13 @@ string remove_non_color_codes(string input)
     {
       if (t->character != nullptr && GET_NAME(t->character) != nullptr)
       {
-        log(fmt::format("Connection broken by peer {} playing {}.", t->host, GET_NAME(t->character)), IMP+1, LOG_SOCKET);
+        log(fmt::format("Connection broken by peer {} playing {}.", t->host, GET_NAME(t->character)), IMP + 1, LogChannels::LOG_SOCKET);
       }
       else
       {
-        log(fmt::format("Connection broken by peer {} not playing a character.", t->host), IMP+1, LOG_SOCKET);
+        log(fmt::format("Connection broken by peer {} not playing a character.", t->host), IMP + 1, LogChannels::LOG_SOCKET);
       }
-      
+
       return -1;
     }
     string buffer = c_buffer;
@@ -2396,8 +2393,8 @@ string remove_non_color_codes(string input)
         write_to_descriptor(t->descriptor, new_buffer);
       }
     }
-  // Keep looping until client sends us a \n or \r
-  // if read() above has nothing then we return
+    // Keep looping until client sends us a \n or \r
+    // if read() above has nothing then we return
   } while (t->inbuf.find('\n') == t->inbuf.npos && t->inbuf.find('\r') == t->inbuf.npos);
 
   do
@@ -2438,7 +2435,7 @@ string remove_non_color_codes(string input)
     cerr << "buffer [" << makePrintable(buffer) << "]"
          << "(" << buffer.length() << ")" << endl;
 #endif
-    
+
     if (t->character == nullptr || GET_LEVEL(t->character) < IMMORTAL)
     {
       buffer = remove_all_codes(buffer);
@@ -2562,324 +2559,324 @@ string remove_non_color_codes(string input)
   return 1;
 }
 
+/*
+ * perform substitution for the '^..^' csh-esque syntax
+ * orig is the orig string (i.e. the one being modified.
+ * subst contains the substition string, i.e. "^telm^tell"
+ */
+int perform_subst(struct descriptor_data *t, char *orig, char *subst)
+{
+  char new_subst[MAX_INPUT_LENGTH + 5];
+
+  char *first, *second, *strpos;
+
   /*
-   * perform substitution for the '^..^' csh-esque syntax
-   * orig is the orig string (i.e. the one being modified.
-   * subst contains the substition string, i.e. "^telm^tell"
+   * first is the position of the beginning of the first string (the one
+   * to be replaced
    */
-  int perform_subst(struct descriptor_data * t, char *orig, char *subst)
+  first = subst + 1;
+
+  /* now find the second '^' */
+  if (!(second = strchr(first, '^')))
   {
-    char new_subst[MAX_INPUT_LENGTH + 5];
-
-    char *first, *second, *strpos;
-
-    /*
-     * first is the position of the beginning of the first string (the one
-     * to be replaced
-     */
-    first = subst + 1;
-
-    /* now find the second '^' */
-    if (!(second = strchr(first, '^')))
-    {
-      SEND_TO_Q("Invalid substitution.\r\n", t);
-      return 1;
-    }
-    /* terminate "first" at the position of the '^' and make 'second' point
-     * to the beginning of the second string */
-    *(second++) = '\0';
-
-    /* now, see if the contents of the first string appear in the original */
-    if (!(strpos = strstr(orig, first)))
-    {
-      SEND_TO_Q("Invalid substitution.\r\n", t);
-      return 1;
-    }
-    /* now, we construct the new string for output. */
-
-    /* first, everything in the original, up to the string to be replaced */
-    strncpy(new_subst, orig, (strpos - orig));
-    new_subst[(strpos - orig)] = '\0';
-
-    /* now, the replacement string */
-    strncat(new_subst, second, (MAX_INPUT_LENGTH - strlen(new_subst) - 1));
-
-    /* now, if there's anything left in the original after the string to
-     * replaced, copy that too. */
-    if (((strpos - orig) + strlen(first)) < strlen(orig))
-      strncat(new_subst, strpos + strlen(first),
-              (MAX_INPUT_LENGTH - strlen(new_subst) - 1));
-
-    /* terminate the string in case of an overflow from strncat */
-    new_subst[MAX_INPUT_LENGTH - 1] = '\0';
-    strcpy(subst, new_subst);
-
-    return 0;
-  }
-
-  // return 1 on success
-  // return 0 if we quit everyone out at the bottom
-  int close_socket(struct descriptor_data * d)
-  {
-    char buf[128], idiotbuf[128];
-    struct descriptor_data *temp;
-    // int32_t target_idnum = -1;
-    if (!d)
-      return 0;
-    flush_queues(d);
-    CLOSE_SOCKET(d->descriptor);
-
-    /* Forget snooping */
-    if (d->snooping)
-      d->snooping->snoop_by = NULL;
-
-    if (d->snoop_by)
-    {
-      SEND_TO_Q("Your victim is no longer among us.\r\n", d->snoop_by);
-      d->snoop_by->snooping = NULL;
-    }
-    if (d->hashstr)
-    {
-      strcpy(idiotbuf, "\n\r~\n\r");
-      strcat(idiotbuf, "\0");
-      string_hash_add(d, idiotbuf);
-    }
-    if (d->strnew && (IS_MOB(d->character) || !IS_SET(d->character->pcdata->toggles, PLR_EDITOR_WEB)))
-    {
-      strcpy(idiotbuf, "/s\n\r");
-      strcat(idiotbuf, "\0");
-      new_string_add(d, idiotbuf);
-    }
-    if (d->character)
-    {
-      // target_idnum = GET_IDNUM(d->character);
-      if (d->connected == conn::PLAYING || d->connected == conn::WRITE_BOARD ||
-          d->connected == conn::EDITING || d->connected == conn::EDIT_MPROG)
-      {
-        save_char_obj(d->character);
-        // clan area stuff
-        extern void check_quitter(char_data * ch);
-        check_quitter(d->character);
-
-        // end any performances
-        if (IS_SINGING(d->character))
-          do_sing(d->character, "stop", CMD_DEFAULT);
-
-        act("$n has lost $s link.", d->character, 0, 0, TO_ROOM, 0);
-        sprintf(buf, "Closing link to: %s at %d.", GET_NAME(d->character),
-                world[d->character->in_room].number);
-        if (IS_AFFECTED(d->character, AFF_CANTQUIT))
-          sprintf(buf, "%s with CQ.", buf);
-        log(buf, GET_LEVEL(d->character) > SERAPH ? GET_LEVEL(d->character) : SERAPH, LOG_SOCKET);
-        d->character->desc = NULL;
-      }
-      else
-      {
-        sprintf(buf, "Losing player: %s.",
-                GET_NAME(d->character) ? GET_NAME(d->character) : "<null>");
-        log(buf, 111, LOG_SOCKET);
-        if (d->connected == conn::WRITE_BOARD || d->connected == conn::EDITING || d->connected == conn::EDIT_MPROG)
-        {
-          //		sprintf(buf, "Suspicious: %s.",
-          //			GET_NAME(d->character));
-          //		log(buf, 110, LOG_HMM);
-        }
-        free_char(d->character, Trace("close_socket"));
-      }
-    }
-    //   Removed this log caues it's so fricken annoying
-    //   else
-    //    log("Losing descriptor without char.", ANGEL, LOG_SOCKET);
-
-    /* JE 2/22/95 -- part of my unending quest to make switch stable */
-    if (d->original && d->original->desc)
-      d->original->desc = NULL;
-
-    // if we're closing the socket that is next to be processed, we want to
-    // go ahead and move on to the next one
-    if (d == next_d)
-      next_d = d->next;
-
-    REMOVE_FROM_LIST(d, descriptor_list, next);
-
-    if (d->showstr_head)
-      dc_free(d->showstr_head);
-    if (d->showstr_count)
-      dc_free(d->showstr_vector);
-
-    delete d;
-    d = nullptr;
-
-    /*  if(descriptor_list == NULL)
-    {
-      // if there is NOONE on (everyone got disconnected) loop through and
-      // boot all of the linkdeads.  That way if the mud's link is cut, the
-      // first person back on can't RK everyone
-      char_data * next_i;
-      for(char_data * i = character_list; i; i = next_i) {
-         next_i = i->next;
-         if(IS_NPC(i))
-           continue;
-         do_quit(i, "", 666);
-      }
-      return 0;
-    }*/
+    SEND_TO_Q("Invalid substitution.\r\n", t);
     return 1;
   }
+  /* terminate "first" at the position of the '^' and make 'second' point
+   * to the beginning of the second string */
+  *(second++) = '\0';
 
-  void check_idle_passwords(void)
+  /* now, see if the contents of the first string appear in the original */
+  if (!(strpos = strstr(orig, first)))
   {
-    struct descriptor_data *d, *next_d;
-
-    for (d = descriptor_list; d; d = next_d)
-    {
-      next_d = d->next;
-      if (STATE(d) != conn::GET_OLD_PASSWORD && STATE(d) != conn::GET_NAME)
-        continue;
-      if (!d->idle_tics)
-      {
-        d->idle_tics++;
-        continue;
-      }
-      else
-      {
-        echo_on(d);
-        SEND_TO_Q("\r\nTimed out... goodbye.\r\n", d);
-        STATE(d) = conn::CLOSE;
-      }
-    }
+    SEND_TO_Q("Invalid substitution.\r\n", t);
+    return 1;
   }
+  /* now, we construct the new string for output. */
 
-  /* ******************************************************************
-   *  signal-handling functions (formerly signals.c)                   *
-   ****************************************************************** */
+  /* first, everything in the original, up to the string to be replaced */
+  strncpy(new_subst, orig, (strpos - orig));
+  new_subst[(strpos - orig)] = '\0';
 
-  void checkpointing(int sig)
+  /* now, the replacement string */
+  strncat(new_subst, second, (MAX_INPUT_LENGTH - strlen(new_subst) - 1));
+
+  /* now, if there's anything left in the original after the string to
+   * replaced, copy that too. */
+  if (((strpos - orig) + strlen(first)) < strlen(orig))
+    strncat(new_subst, strpos + strlen(first),
+            (MAX_INPUT_LENGTH - strlen(new_subst) - 1));
+
+  /* terminate the string in case of an overflow from strncat */
+  new_subst[MAX_INPUT_LENGTH - 1] = '\0';
+  strcpy(subst, new_subst);
+
+  return 0;
+}
+
+// return 1 on success
+// return 0 if we quit everyone out at the bottom
+int close_socket(struct descriptor_data *d)
+{
+  char buf[128], idiotbuf[128];
+  struct descriptor_data *temp;
+  // int32_t target_idnum = -1;
+  if (!d)
+    return 0;
+  flush_queues(d);
+  CLOSE_SOCKET(d->descriptor);
+
+  /* Forget snooping */
+  if (d->snooping)
+    d->snooping->snoop_by = NULL;
+
+  if (d->snoop_by)
   {
-    if (!tics)
+    SEND_TO_Q("Your victim is no longer among us.\r\n", d->snoop_by);
+    d->snoop_by->snooping = NULL;
+  }
+  if (d->hashstr)
+  {
+    strcpy(idiotbuf, "\n\r~\n\r");
+    strcat(idiotbuf, "\0");
+    string_hash_add(d, idiotbuf);
+  }
+  if (d->strnew && (IS_MOB(d->character) || !IS_SET(d->character->pcdata->toggles, PLR_EDITOR_WEB)))
+  {
+    strcpy(idiotbuf, "/s\n\r");
+    strcat(idiotbuf, "\0");
+    new_string_add(d, idiotbuf);
+  }
+  if (d->character)
+  {
+    // target_idnum = GET_IDNUM(d->character);
+    if (d->connected == conn::PLAYING || d->connected == conn::WRITE_BOARD ||
+        d->connected == conn::EDITING || d->connected == conn::EDIT_MPROG)
     {
-      log("SYSERR: CHECKPOINT shutdown: tics not updated", ANGEL, LOG_BUG);
-      abort();
+      save_char_obj(d->character);
+      // clan area stuff
+      extern void check_quitter(char_data * ch);
+      check_quitter(d->character);
+
+      // end any performances
+      if (IS_SINGING(d->character))
+        do_sing(d->character, "stop", CMD_DEFAULT);
+
+      act("$n has lost $s link.", d->character, 0, 0, TO_ROOM, 0);
+      sprintf(buf, "Closing link to: %s at %d.", GET_NAME(d->character),
+              world[d->character->in_room].number);
+      if (IS_AFFECTED(d->character, AFF_CANTQUIT))
+        sprintf(buf, "%s with CQ.", buf);
+      log(buf, GET_LEVEL(d->character) > SERAPH ? GET_LEVEL(d->character) : SERAPH, LogChannels::LOG_SOCKET);
+      d->character->desc = NULL;
     }
     else
-      tics = 0;
+    {
+      sprintf(buf, "Losing player: %s.",
+              GET_NAME(d->character) ? GET_NAME(d->character) : "<null>");
+      log(buf, 111, LogChannels::LOG_SOCKET);
+      if (d->connected == conn::WRITE_BOARD || d->connected == conn::EDITING || d->connected == conn::EDIT_MPROG)
+      {
+        //		sprintf(buf, "Suspicious: %s.",
+        //			GET_NAME(d->character));
+        //		log(buf, 110, LOG_HMM);
+      }
+      free_char(d->character, Trace("close_socket"));
+    }
+  }
+  //   Removed this log caues it's so fricken annoying
+  //   else
+  //    log("Losing descriptor without char.", ANGEL, LogChannels::LOG_SOCKET);
+
+  /* JE 2/22/95 -- part of my unending quest to make switch stable */
+  if (d->original && d->original->desc)
+    d->original->desc = NULL;
+
+  // if we're closing the socket that is next to be processed, we want to
+  // go ahead and move on to the next one
+  if (d == next_d)
+    next_d = d->next;
+
+  REMOVE_FROM_LIST(d, descriptor_list, next);
+
+  if (d->showstr_head)
+    dc_free(d->showstr_head);
+  if (d->showstr_count)
+    dc_free(d->showstr_vector);
+
+  delete d;
+  d = nullptr;
+
+  /*  if(descriptor_list == NULL)
+  {
+    // if there is NOONE on (everyone got disconnected) loop through and
+    // boot all of the linkdeads.  That way if the mud's link is cut, the
+    // first person back on can't RK everyone
+    char_data * next_i;
+    for(char_data * i = character_list; i; i = next_i) {
+       next_i = i->next;
+       if(IS_NPC(i))
+         continue;
+       do_quit(i, "", 666);
+    }
+    return 0;
+  }*/
+  return 1;
+}
+
+void check_idle_passwords(void)
+{
+  struct descriptor_data *d, *next_d;
+
+  for (d = descriptor_list; d; d = next_d)
+  {
+    next_d = d->next;
+    if (STATE(d) != conn::GET_OLD_PASSWORD && STATE(d) != conn::GET_NAME)
+      continue;
+    if (!d->idle_tics)
+    {
+      d->idle_tics++;
+      continue;
+    }
+    else
+    {
+      echo_on(d);
+      SEND_TO_Q("\r\nTimed out... goodbye.\r\n", d);
+      STATE(d) = conn::CLOSE;
+    }
+  }
+}
+
+/* ******************************************************************
+ *  signal-handling functions (formerly signals.c)                   *
+ ****************************************************************** */
+
+void checkpointing(int sig)
+{
+  if (!tics)
+  {
+    log("SYSERR: CHECKPOINT shutdown: tics not updated", ANGEL, LogChannels::LOG_BUG);
+    abort();
+  }
+  else
+    tics = 0;
+}
+
+void report_debug_logging()
+{
+  extern int last_char_room;
+
+  log("Last cmd:", ANGEL, LogChannels::LOG_BUG);
+  log(last_processed_cmd, ANGEL, LogChannels::LOG_BUG);
+  log("Owner's Name:", ANGEL, LogChannels::LOG_BUG);
+  log(last_char_name, ANGEL, LogChannels::LOG_BUG);
+  logf(ANGEL, LogChannels::LOG_BUG, "Last room: %d", last_char_room);
+}
+
+void crash_hotboot()
+{
+  struct descriptor_data *d = NULL;
+  extern int try_to_hotboot_on_crash;
+  extern int died_from_sigsegv;
+
+  // This can be dangerous, because if we had a SIGSEGV due to a descriptor being
+  // invalid, we're going to do it again.  That's why we put in extern int died_from_sigsegv
+  // sigsegv = # of times we've crashed from SIGSEGV
+
+  for (d = descriptor_list; d && died_from_sigsegv < 2; d = d->next)
+  {
+    write_to_descriptor(d->descriptor, "Mud crash detected.\n\r");
   }
 
-  void report_debug_logging()
+  // attempt to hotboot
+  if (try_to_hotboot_on_crash)
   {
-    extern int last_char_room;
-
-    log("Last cmd:", ANGEL, LOG_BUG);
-    log(last_processed_cmd, ANGEL, LOG_BUG);
-    log("Owner's Name:", ANGEL, LOG_BUG);
-    log(last_char_name, ANGEL, LOG_BUG);
-    logf(ANGEL, LOG_BUG, "Last room: %d", last_char_room);
-  }
-
-  void crash_hotboot()
-  {
-    struct descriptor_data *d = NULL;
-    extern int try_to_hotboot_on_crash;
-    extern int died_from_sigsegv;
-
-    // This can be dangerous, because if we had a SIGSEGV due to a descriptor being
-    // invalid, we're going to do it again.  That's why we put in extern int died_from_sigsegv
-    // sigsegv = # of times we've crashed from SIGSEGV
-
     for (d = descriptor_list; d && died_from_sigsegv < 2; d = d->next)
     {
-      write_to_descriptor(d->descriptor, "Mud crash detected.\n\r");
+      write_to_descriptor(d->descriptor, "Attempting to recover with a hotboot.\n\r");
     }
-
-    // attempt to hotboot
-    if (try_to_hotboot_on_crash)
-    {
-      for (d = descriptor_list; d && died_from_sigsegv < 2; d = d->next)
-      {
-        write_to_descriptor(d->descriptor, "Attempting to recover with a hotboot.\n\r");
-      }
-      log("Attempting to hotboot from the crash.", ANGEL, LOG_BUG);
-      write_hotboot_file(0);
-      // we shouldn't return from there unless we failed
-      log("Hotboot crash recovery failed.  Exiting.", ANGEL, LOG_BUG);
-      for (d = descriptor_list; d && died_from_sigsegv < 2; d = d->next)
-      {
-        write_to_descriptor(d->descriptor, "Hotboot failed giving up.\n\r");
-      }
-    }
-
+    log("Attempting to hotboot from the crash.", ANGEL, LogChannels::LOG_BUG);
+    write_hotboot_file(0);
+    // we shouldn't return from there unless we failed
+    log("Hotboot crash recovery failed.  Exiting.", ANGEL, LogChannels::LOG_BUG);
     for (d = descriptor_list; d && died_from_sigsegv < 2; d = d->next)
     {
-      write_to_descriptor(d->descriptor, "Giving up, goodbye.\n\r");
+      write_to_descriptor(d->descriptor, "Hotboot failed giving up.\n\r");
     }
   }
 
-  void crashill(int sig)
+  for (d = descriptor_list; d && died_from_sigsegv < 2; d = d->next)
   {
-    report_debug_logging();
-    log("Recieved SIGFPE (Illegal Instruction)", ANGEL, LOG_BUG);
-    crash_hotboot();
-    log("Mud exiting from SIGFPE.", ANGEL, LOG_BUG);
+    write_to_descriptor(d->descriptor, "Giving up, goodbye.\n\r");
+  }
+}
+
+void crashill(int sig)
+{
+  report_debug_logging();
+  log("Recieved SIGFPE (Illegal Instruction)", ANGEL, LogChannels::LOG_BUG);
+  crash_hotboot();
+  log("Mud exiting from SIGFPE.", ANGEL, LogChannels::LOG_BUG);
+  exit(0);
+}
+
+void crashfpe(int sig)
+{
+  report_debug_logging();
+  log("Recieved SIGFPE (Arithmetic Error)", ANGEL, LogChannels::LOG_BUG);
+  crash_hotboot();
+  log("Mud exiting from SIGFPE.", ANGEL, LogChannels::LOG_BUG);
+  exit(0);
+}
+
+void crashsig(int sig)
+{
+  extern int died_from_sigsegv;
+  died_from_sigsegv++;
+  if (died_from_sigsegv > 3)
+  { // panic! error is in log...lovely  just give up
     exit(0);
   }
-
-  void crashfpe(int sig)
-  {
-    report_debug_logging();
-    log("Recieved SIGFPE (Arithmetic Error)", ANGEL, LOG_BUG);
-    crash_hotboot();
-    log("Mud exiting from SIGFPE.", ANGEL, LOG_BUG);
+  if (died_from_sigsegv > 2)
+  { // panic! try to log and get out
+    log("Hit 'died_from_sigsegv > 2'", ANGEL, LogChannels::LOG_BUG);
     exit(0);
   }
+  report_debug_logging();
+  log("Recieved SIGSEGV (Segmentation fault)", ANGEL, LogChannels::LOG_BUG);
+  crash_hotboot();
+  log("Mud exiting from SIGSEGV.", ANGEL, LogChannels::LOG_BUG);
+  exit(0);
+}
 
-  void crashsig(int sig)
+void unrestrict_game(int sig)
+{
+  extern struct ban_list_element *ban_list;
+  extern int num_invalid;
+
+  log("Received SIGUSR2 - completely unrestricting game (emergent)",
+      ANGEL, LogChannels::LOG_GOD);
+  ban_list = NULL;
+  restrict = 0;
+  num_invalid = 0;
+}
+
+void hupsig(int sig)
+{
+  log("Received SIGHUP, SIGINT, or SIGTERM.  Shutting down...", 0, LogChannels::LOG_MISC);
+  abort(); /* perhaps something more elegant should
+            * substituted */
+}
+
+void sigusr1(int sig)
+{
+  do_not_save_corpses = 1;
+  log("Writing sockets to file for hotboot recovery.", 0, LogChannels::LOG_MISC);
+  if (!write_hotboot_file(nullptr))
   {
-    extern int died_from_sigsegv;
-    died_from_sigsegv++;
-    if (died_from_sigsegv > 3)
-    { // panic! error is in log...lovely  just give up
-      exit(0);
-    }
-    if (died_from_sigsegv > 2)
-    { // panic! try to log and get out
-      log("Hit 'died_from_sigsegv > 2'", ANGEL, LOG_BUG);
-      exit(0);
-    }
-    report_debug_logging();
-    log("Recieved SIGSEGV (Segmentation fault)", ANGEL, LOG_BUG);
-    crash_hotboot();
-    log("Mud exiting from SIGSEGV.", ANGEL, LOG_BUG);
-    exit(0);
+    log("Hotboot failed.  Closing all sockets.", 0, LogChannels::LOG_MISC);
   }
-
-  void unrestrict_game(int sig)
-  {
-    extern struct ban_list_element *ban_list;
-    extern int num_invalid;
-
-    log("Received SIGUSR2 - completely unrestricting game (emergent)",
-        ANGEL, LOG_GOD);
-    ban_list = NULL;
-    restrict = 0;
-    num_invalid = 0;
-  }
-
-  void hupsig(int sig)
-  {
-    log("Received SIGHUP, SIGINT, or SIGTERM.  Shutting down...", 0, LOG_MISC);
-    abort(); /* perhaps something more elegant should
-              * substituted */
-  }
-
-  void sigusr1(int sig)
-  {
-    do_not_save_corpses = 1;
-    log("Writing sockets to file for hotboot recovery.", 0, LOG_MISC);
-    if (!write_hotboot_file(nullptr))
-    {
-      log("Hotboot failed.  Closing all sockets.", 0, LOG_MISC);
-    }
-  }
+}
 
 #ifndef WIN32
 void sigchld(int sig)
@@ -2906,10 +2903,10 @@ void sigchld(int sig)
 
 void signal_handler(int signal, siginfo_t *si, void *)
 {
-  logf(IMMORTAL, LOG_BUG, "signal_handler: signo=%d errno=%d code=%d "
-                          "pid=%d uid=%d status=%d utime=%lu stime=%lu value=%d "
-                          "int=%d ptr=%p overrun=%d timerid=%d addr=%p band=%ld "
-                          "fd=%d",
+  logf(IMMORTAL, LogChannels::LOG_BUG, "signal_handler: signo=%d errno=%d code=%d "
+                                       "pid=%d uid=%d status=%d utime=%lu stime=%lu value=%d "
+                                       "int=%d ptr=%p overrun=%d timerid=%d addr=%p band=%ld "
+                                       "fd=%d",
        si->si_signo, si->si_errno, si->si_code,
        si->si_pid, si->si_uid, si->si_status, si->si_utime, si->si_stime, si->si_value.sival_int,
        si->si_int, si->si_ptr, si->si_overrun, si->si_timerid, si->si_addr, si->si_band,
@@ -2926,11 +2923,11 @@ void signal_handler(int signal, siginfo_t *si, void *)
     extern int do_not_save_corpses;
     do_not_save_corpses = 1;
     send_to_all(buf.data());
-    log(buf.c_str(), ANGEL, LOG_GOD);
-    log("Writing sockets to file for hotboot recovery.", 0, LOG_MISC);
+    log(buf.c_str(), ANGEL, LogChannels::LOG_GOD);
+    log("Writing sockets to file for hotboot recovery.", 0, LogChannels::LOG_MISC);
     if (!write_hotboot_file(new_argv))
     {
-      log("Hotboot failed.  Closing all sockets.", 0, LOG_MISC);
+      log("Hotboot failed.  Closing all sockets.", 0, LogChannels::LOG_MISC);
     }
   }
 }
@@ -3120,7 +3117,7 @@ void send_info(const char *messg)
     for (i = descriptor_list; i; i = i->next)
     {
       if (!(i->character) ||
-          !IS_SET(i->character->misc, CHANNEL_INFO))
+          !IS_SET(i->character->misc, LogChannels::CHANNEL_INFO))
         continue;
       if ((!i->connected) && !is_busy(i->character))
         SEND_TO_Q(messg, i);
@@ -3188,7 +3185,7 @@ int is_busy(char_data *ch)
 string perform_alias(struct descriptor_data *d, string orig)
 {
   string first_arg, remainder, new_buf;
-  //ptr = any_one_arg(orig, first_arg);
+  // ptr = any_one_arg(orig, first_arg);
   tie(first_arg, remainder) = half_chop(orig);
   struct char_player_alias *x = nullptr;
   int lengthpre;
@@ -3291,7 +3288,7 @@ void warn_if_duplicate_ip(char_data *ch)
 
   for (list<multiplayer>::iterator i = multi_list.begin(); i != multi_list.end(); ++i)
   {
-    logf(108, LOG_WARNINGS, "MultipleIP: %s -> %s / %s ", (*i).host, (*i).name1, (*i).name2);
+    logf(108, LogChannels::LOG_WARNINGS, "MultipleIP: %s -> %s / %s ", (*i).host, (*i).name1, (*i).name2);
   }
 }
 
