@@ -44,35 +44,36 @@ extern struct weather_data weather_info;
 
 void check_timer();
 
-#define TRUE  1
+#define TRUE 1
 #define FALSE 0
 #define COREDUMP_MAX 10
 
 #ifdef WIN32
-inline int random() { return(rand()); }
+inline int random()
+{
+   return (rand());
+}
 char *index(char *buf, char op);
 #endif
 
-#define MOB_WAIT_STATE(ch)  ((ch)->deaths)
+#define MOB_WAIT_STATE(ch) ((ch)->deaths)
 
-#define GET_WAIT(ch)  (IS_MOB((ch)) ? (ch)->deaths : ((ch)->desc ? (ch)->desc->wait : 0))
+#define GET_WAIT(ch) (IS_MOB((ch)) ? (ch)->deaths : ((ch)->desc ? (ch)->desc->wait : 0))
 
-#define WAIT_STATE(czh, cycle)  (((czh)->desc) ? (czh)->desc->wait > (cycle) ? 0 : (czh)->desc->wait = (cycle) :  \
-                                  (IS_MOB((czh)) ? MOB_WAIT_STATE((czh)) = (cycle) : 0))
+#define WAIT_STATE(czh, cycle) (((czh)->desc) ? (czh)->desc->wait > (cycle) ? 0 : (czh)->desc->wait = (cycle) : (IS_MOB((czh)) ? MOB_WAIT_STATE((czh)) = (cycle) : 0))
 
-#define REM_WAIT_STATE(czh, cycle) (((czh)->desc) ? (czh)->desc->wait < (cycle) ? (czh)->desc->wait = 0 : \
-                            (czh)->desc->wait -= (cycle) : IS_MOB((czh)) ? MOB_WAIT_STATE((czh)) < (cycle) ? \
-                            MOB_WAIT_STATE((czh)) = 0 : MOB_WAIT_STATE((czh)) -= (cycle) : 0)
+#define REM_WAIT_STATE(czh, cycle) (((czh)->desc) ? (czh)->desc->wait < (cycle) ? (czh)->desc->wait = 0 : (czh)->desc->wait -= (cycle) : IS_MOB((czh)) ? MOB_WAIT_STATE((czh)) < (cycle) ? MOB_WAIT_STATE((czh)) = 0 : MOB_WAIT_STATE((czh)) -= (cycle) \
+                                                                                                                                                       : 0)
 
 // Defines for gradual skill increase code
 // Usage is defined in guild.cpp
 
-#define SKILL_INCREASE_EASY           100
-#define SKILL_INCREASE_MEDIUM         200
-#define SKILL_INCREASE_HARD           300
+#define SKILL_INCREASE_EASY 100
+#define SKILL_INCREASE_MEDIUM 200
+#define SKILL_INCREASE_HARD 300
 void check_timer();
 
-void skill_increase_check(char_data * ch, int skill, int learned, int difficulty);
+void skill_increase_check(char_data *ch, int skill, int learned, int difficulty);
 bool is_hiding(char_data *ch, char_data *vict);
 
 // End defines for gradual skill increase code
@@ -83,156 +84,179 @@ bool is_hiding(char_data *ch, char_data *vict);
 #define CONSECRATE_COMP_OBJ_NUMBER 3094
 #define DESECRATE_COMP_OBJ_NUMBER 303
 
-#define REMOVE_FROM_LIST(item, head, next)      \
-   if ((item) == (head))                \
-      head = (item)->next;              \
-   else {                               \
-      temp = head;                      \
+#define REMOVE_FROM_LIST(item, head, next)   \
+   if ((item) == (head))                     \
+      head = (item)->next;                   \
+   else                                      \
+   {                                         \
+      temp = head;                           \
       while (temp && (temp->next != (item))) \
-         temp = temp->next;             \
-      if (temp)                         \
-         temp->next = (item)->next;     \
-   }                                    \
+         temp = temp->next;                  \
+      if (temp)                              \
+         temp->next = (item)->next;          \
+   }
 
-#define MIN(a,b)	((a) < (b) ? (a) : (b))
-#define MAX(a,b)	((a) > (b) ? (a) : (b))
+#define MIN(a, b) ((a) < (b) ? (a) : (b))
+#define MAX(a, b) ((a) > (b) ? (a) : (b))
 
-#define LOWER(c) (((c)>='A'  && (c) <= 'Z') ? ((c)+('a'-'A')) : (c))
-#define UPPER(c) (((c)>='a'  && (c) <= 'z') ? ((c)+('A'-'a')) : (c))
+#define LOWER(c) (((c) >= 'A' && (c) <= 'Z') ? ((c) + ('a' - 'A')) : (c))
+#define UPPER(c) (((c) >= 'a' && (c) <= 'z') ? ((c) + ('A' - 'a')) : (c))
 
-//#define ISNEWL(ch) ((ch) == '\n' || (ch) == '\r' || (ch) == '|') 
-#define ISNEWL(ch) ((ch) == '\n' || (ch) == '\r')  // replaced to leave off the pipe and put it eclusively in comm.c
-                                                   // where we could check to see if we were in an editor first.
+// #define ISNEWL(ch) ((ch) == '\n' || (ch) == '\r' || (ch) == '|')
+#define ISNEWL(ch) ((ch) == '\n' || (ch) == '\r') // replaced to leave off the pipe and put it eclusively in comm.c
+                                                  // where we could check to see if we were in an editor first.
 
-#define CAP(st)  (*(st) = UPPER(*(st)), st)
+#define CAP(st) (*(st) = UPPER(*(st)), st)
 
 #ifdef LEAK_CHECK
-#define CREATE(result, type, number)  do {\
-    if (!((result) = (type *) calloc ((number), sizeof(type))))\
-	{ perror("calloc failure in CREATE: "); abort(); } } while(0)
+#define CREATE(result, type, number)                            \
+   do                                                           \
+   {                                                            \
+      if (!((result) = (type *)calloc((number), sizeof(type)))) \
+      {                                                         \
+         perror("calloc failure in CREATE: ");                  \
+         abort();                                               \
+      }                                                         \
+   } while (0)
 #else
-#define CREATE(result, type, number)  do {\
-    if (!((result) = (type *) dc_alloc ((number), sizeof(type))))\
-	{ perror("calloc failure in CREATE: "); abort(); } } while(0)
+#define CREATE(result, type, number)                              \
+   do                                                             \
+   {                                                              \
+      if (!((result) = (type *)dc_alloc((number), sizeof(type)))) \
+      {                                                           \
+         perror("calloc failure in CREATE: ");                    \
+         abort();                                                 \
+      }                                                           \
+   } while (0)
 #endif
 
-#define RECREATE(result,type,number) do {\
-  if (!((result) = (type *) dc_realloc ((result), sizeof(type) * (number))))\
-                { perror("realloc failure in RECREATE"); abort(); } } while(0)
+#define RECREATE(result, type, number)                                         \
+   do                                                                          \
+   {                                                                           \
+      if (!((result) = (type *)dc_realloc((result), sizeof(type) * (number)))) \
+      {                                                                        \
+         perror("realloc failure in RECREATE");                                \
+         abort();                                                              \
+      }                                                                        \
+   } while (0)
 
-#define FREE(p) do { if((p) != NULL) { dc_free((p)); (p) = 0; } } while (0) 
+#define FREE(p)        \
+   do                  \
+   {                   \
+      if ((p) != NULL) \
+      {                \
+         dc_free((p)); \
+         (p) = 0;      \
+      }                \
+   } while (0)
 
-#define ASIZE 32 //don't change unless you want to be screwed
-#define SETBIT(var,bit) ((var)[(bit)/ASIZE] |= (1 << (((bit)-(((bit)/ASIZE)*ASIZE)-1))))
+#define ASIZE 32 // don't change unless you want to be screwed
+#define SETBIT(var, bit) ((var)[(bit) / ASIZE] |= (1 << (((bit) - (((bit) / ASIZE) * ASIZE) - 1))))
 // setting with an OR
-#define REMBIT(var,bit) ((var)[(bit)/ASIZE] &= ~(1 << (((bit)-(((bit)/ASIZE)*ASIZE))-1)))
+#define REMBIT(var, bit) ((var)[(bit) / ASIZE] &= ~(1 << (((bit) - (((bit) / ASIZE) * ASIZE)) - 1)))
 // setting with an AND
-#define TOGBIT(var,bit) ((var)[(bit)/ASIZE] ^= (1 << (((bit)-(((bit)/ASIZE)*ASIZE))-1)))
+#define TOGBIT(var, bit) ((var)[(bit) / ASIZE] ^= (1 << (((bit) - (((bit) / ASIZE) * ASIZE)) - 1)))
 // setting with an XOR
-#define ISSET(var,bit) ((var)[(bit)/ASIZE] & (1 << (((bit)-(((bit)/ASIZE)*ASIZE))-1)))
+#define ISSET(var, bit) ((var)[(bit) / ASIZE] & (1 << (((bit) - (((bit) / ASIZE) * ASIZE)) - 1)))
 // using an AND
 
-#define IS_SET(flag,bit)  ((flag) & (bit))
-#define SET_BIT(var,bit)  ((var) = (var) | (bit))
-#define REMOVE_BIT(var,bit)  ((var) = (var) & ~(bit) )
+#define IS_SET(flag, bit) ((flag) & (bit))
+#define SET_BIT(var, bit) ((var) = (var) | (bit))
+#define REMOVE_BIT(var, bit) ((var) = (var) & ~(bit))
 #define TOGGLE_BIT(var, bit) ((var) = (var) ^ (bit))
 
-#define IS_AFFECTED(ch,skill) ( ISSET((ch)->affected_by, (skill)) )
+#define IS_AFFECTED(ch, skill) (ISSET((ch)->affected_by, (skill)))
 
-int  DARK_AMOUNT( int room );
-bool IS_DARK( int room );
-#define IS_LIGHT(room)  (!IS_DARK(room))
+int DARK_AMOUNT(int room);
+bool IS_DARK(int room);
+#define IS_LIGHT(room) (!IS_DARK(room))
 
 #define IS_ARENA(room) (IS_SET(world[room].room_flags, ARENA))
 
-#define HSHR(ch) ((ch)->sex ?                    \
-    (((ch)->sex == 1) ? "his" : "her") : "its")
-#define HSSH(ch) ((ch)->sex ?                    \
-    (((ch)->sex == 1) ? "he" : "she") : "it")
-#define HMHR(ch) ((ch)->sex ?                    \
-    (((ch)->sex == 1) ? "him" : "her") : "it")   
-//#define ANA(obj) (index("aeiouyAEIOUY", *(obj)->name) ? "An" : "A")
-//#define SANA(obj) (index("aeiouyAEIOUY", *(obj)->name) ? "an" : "a")
+#define HSHR(ch) ((ch)->sex ? (((ch)->sex == 1) ? "his" : "her") : "its")
+#define HSSH(ch) ((ch)->sex ? (((ch)->sex == 1) ? "he" : "she") : "it")
+#define HMHR(ch) ((ch)->sex ? (((ch)->sex == 1) ? "him" : "her") : "it")
+// #define ANA(obj) (index("aeiouyAEIOUY", *(obj)->name) ? "An" : "A")
+// #define SANA(obj) (index("aeiouyAEIOUY", *(obj)->name) ? "an" : "a")
 
-#define IS_PC(ch)   (!IS_NPC(ch))
-#define IS_NPC(ch)  (IS_SET((ch)->misc, MISC_IS_MOB))
-#define IS_MOB(ch)  (IS_NPC(ch))
-#define IS_OBJ(ch)  (IS_SET((ch)->misc, MISC_IS_OBJ))
-#define IS_FAMILIAR(ch)	(IS_AFFECTED(ch, AFF_FAMILIAR))
+#define IS_PC(ch) (!IS_NPC(ch))
+#define IS_NPC(ch) (IS_SET((ch)->misc, MISC_IS_MOB))
+#define IS_MOB(ch) (IS_NPC(ch))
+#define IS_OBJ(ch) (IS_SET((ch)->misc, MISC_IS_OBJ))
+#define IS_FAMILIAR(ch) (IS_AFFECTED(ch, AFF_FAMILIAR))
 
 #define IS_MINLEVEL_PC(ch, level) (GET_LEVEL(ch) >= level && IS_PC(ch))
 #define IS_MAXLEVEL_PC(ch, level) (GET_LEVEL(ch) <= level && IS_PC(ch))
 #define IS_MINLEVEL_NPC(ch, level) (GET_LEVEL(ch) >= level && IS_NPC(ch))
 #define IS_IMMORTAL(ch) (IS_MINLEVEL_PC(ch, IMMORTAL))
-#define IS_MORTAL(ch) (IS_MAXLEVEL_PC(ch, IMMORTAL-1))
+#define IS_MORTAL(ch) (IS_MAXLEVEL_PC(ch, IMMORTAL - 1))
 
-#define GET_RDEATHS(ch)      ((ch)->pcdata->rdeaths)
-#define GET_PDEATHS(ch)      ((ch)->pcdata->pdeaths)
-#define GET_PKILLS(ch)       ((ch)->pcdata->pkills)
+#define GET_RDEATHS(ch) ((ch)->pcdata->rdeaths)
+#define GET_PDEATHS(ch) ((ch)->pcdata->pdeaths)
+#define GET_PKILLS(ch) ((ch)->pcdata->pkills)
 #define GET_PKILLS_TOTAL(ch) ((ch)->pcdata->pklvl)
 
-#define GET_PKILLS_LOGIN(ch)        ((ch)->pcdata->totalpkills)
-#define GET_PKILLS_TOTAL_LOGIN(ch)  ((ch)->pcdata->totalpkillslv)
-#define GET_PDEATHS_LOGIN(ch)       ((ch)->pcdata->pdeathslogin)
+#define GET_PKILLS_LOGIN(ch) ((ch)->pcdata->totalpkills)
+#define GET_PKILLS_TOTAL_LOGIN(ch) ((ch)->pcdata->totalpkillslv)
+#define GET_PDEATHS_LOGIN(ch) ((ch)->pcdata->pdeathslogin)
 
-#define GET_GROUP_KILLS(ch)         ((ch)->pcdata->group_kills)
-#define GET_GROUP_PKILLS(ch)        ((ch)->pcdata->group_pkills)
-#define GET_GROUP_PKILLSTOTAL(ch)   ((ch)->pcdata->grpplvl)
+#define GET_GROUP_KILLS(ch) ((ch)->pcdata->group_kills)
+#define GET_GROUP_PKILLS(ch) ((ch)->pcdata->group_pkills)
+#define GET_GROUP_PKILLSTOTAL(ch) ((ch)->pcdata->grpplvl)
 
-#define GET_HP_METAS(ch)   ((ch)->hpmetas)
+#define GET_HP_METAS(ch) ((ch)->hpmetas)
 #define GET_MANA_METAS(ch) ((ch)->manametas)
 #define GET_MOVE_METAS(ch) ((ch)->movemetas)
-#define GET_AC_METAS(ch)   ((ch)->acmetas)
-#define GET_AGE_METAS(ch)  ((ch)->agemetas)
-#define GET_KI_METAS(ch)   ((ch)->pcdata->kimetas)
+#define GET_AC_METAS(ch) ((ch)->acmetas)
+#define GET_AGE_METAS(ch) ((ch)->agemetas)
+#define GET_KI_METAS(ch) ((ch)->pcdata->kimetas)
 
-#define GET_POS(ch)     ((ch)->position)
+#define GET_POS(ch) ((ch)->position)
 #define GET_COND(ch, i) ((ch)->conditions[(i)])
-#define GET_NAME(ch)    ((ch)->name)
-#define GET_SHORT(ch)   ((ch)->short_desc ? (ch)->short_desc : (ch)->name)
-#define GET_SHORT_ONLY(ch)     ((ch)->short_desc)
-#define GET_TITLE(ch)   ((ch)->title)
-#define GET_LEVEL(ch)   ((ch)->level)
+#define GET_NAME(ch) ((ch)->name)
+#define GET_SHORT(ch) ((ch)->short_desc ? (ch)->short_desc : (ch)->name)
+#define GET_SHORT_ONLY(ch) ((ch)->short_desc)
+#define GET_TITLE(ch) ((ch)->title)
+#define GET_LEVEL(ch) ((ch)->level)
 
 #define GET_ZONE(ch) (world[(ch)->in_room].zone)
 
-#define GET_OBJ_SHORT(obj)      ((obj)->short_description)
-#define GET_OBJ_NAME(obj)       ((obj)->name)
+#define GET_OBJ_SHORT(obj) ((obj)->short_description)
+#define GET_OBJ_NAME(obj) ((obj)->name)
 
-#define GET_OBJ_RNUM(obj)       ((obj)->item_number)
-#define GET_OBJ_VAL(obj, val)   ((obj)->obj_flags.value[(val)])
-#define GET_OBJ_VROOM(obj)      ((obj)->vroom)
-#define GET_OBJ_EXTRA(obj)      ((obj)->obj_flags.extra_flags)
-#define GET_OBJ_TIMER(obj)      ((obj)->obj_flags.timer)
-#define GET_OBJ_TYPE(obj)       ((obj)->obj_flags.type_flag)
-#define GET_OBJ_WEAR(obj)       ((obj)->obj_flags.wear_flags)
-#define GET_OBJ_COST(obj)       ((obj)->obj_flags.cost)
-#define GET_OBJ_RENT(obj)       ((obj)->obj_flags.cost_per_day)
-#define GET_OBJ_VNUM(obj)       (GET_OBJ_RNUM(obj) >= 0 ? \
-                                 obj_index[GET_OBJ_RNUM(obj)].virt : -1)
-#define VALID_ROOM_RNUM(rnum)   ((rnum) != NOWHERE && (rnum) <= top_of_world)
+#define GET_OBJ_RNUM(obj) ((obj)->item_number)
+#define GET_OBJ_VAL(obj, val) ((obj)->obj_flags.value[(val)])
+#define GET_OBJ_VROOM(obj) ((obj)->vroom)
+#define GET_OBJ_EXTRA(obj) ((obj)->obj_flags.extra_flags)
+#define GET_OBJ_TIMER(obj) ((obj)->obj_flags.timer)
+#define GET_OBJ_TYPE(obj) ((obj)->obj_flags.type_flag)
+#define GET_OBJ_WEAR(obj) ((obj)->obj_flags.wear_flags)
+#define GET_OBJ_COST(obj) ((obj)->obj_flags.cost)
+#define GET_OBJ_RENT(obj) ((obj)->obj_flags.cost_per_day)
+#define GET_OBJ_VNUM(obj) (GET_OBJ_RNUM(obj) >= 0 ? obj_index[GET_OBJ_RNUM(obj)].virt : -1)
+#define VALID_ROOM_RNUM(rnum) ((rnum) != NOWHERE && (rnum) <= top_of_world)
 #define GET_ROOM_VNUM(rnum) \
-        ((int32_t)(VALID_ROOM_RNUM(rnum) ? world[(rnum)].number : NOWHERE))
+   ((int32_t)(VALID_ROOM_RNUM(rnum) ? world[(rnum)].number : NOWHERE))
 
-#define GET_PROMPT(ch)  ((ch)->pcdata->prompt)
-#define GET_LAST_PROMPT(ch)  ((ch)->pcdata->last_prompt)
+#define GET_PROMPT(ch) ((ch)->pcdata->prompt)
+#define GET_LAST_PROMPT(ch) ((ch)->pcdata->last_prompt)
 #define GET_TOGGLES(ch) ((ch)->pcdata->toggles)
 
-#define GET_CLASS(ch)   ((ch)->c_class)
-#define GET_HOME(ch)    ((ch)->hometown)
-#define GET_AGE(ch)     (age(ch).year)
+#define GET_CLASS(ch) ((ch)->c_class)
+#define GET_HOME(ch) ((ch)->hometown)
+#define GET_AGE(ch) (age(ch).year)
 
-#define GET_STR(ch)     ((ch)->str)
-#define GET_DEX(ch)     ((ch)->dex)
-#define GET_INT(ch)     ((ch)->intel)
-#define GET_WIS(ch)     ((ch)->wis)
-#define GET_CON(ch)     ((ch)->con)
+#define GET_STR(ch) ((ch)->str)
+#define GET_DEX(ch) ((ch)->dex)
+#define GET_INT(ch) ((ch)->intel)
+#define GET_WIS(ch) ((ch)->wis)
+#define GET_CON(ch) ((ch)->con)
 
-#define GET_STR_BONUS(ch)     ((ch)->str_bonus)
-#define GET_DEX_BONUS(ch)     ((ch)->dex_bonus)
-#define GET_INT_BONUS(ch)     ((ch)->intel_bonus)
-#define GET_WIS_BONUS(ch)     ((ch)->wis_bonus)
-#define GET_CON_BONUS(ch)     ((ch)->con_bonus)
+#define GET_STR_BONUS(ch) ((ch)->str_bonus)
+#define GET_DEX_BONUS(ch) ((ch)->dex_bonus)
+#define GET_INT_BONUS(ch) ((ch)->intel_bonus)
+#define GET_WIS_BONUS(ch) ((ch)->wis_bonus)
+#define GET_CON_BONUS(ch) ((ch)->con_bonus)
 
 #define GET_RAW_STR(ch) ((ch)->raw_str)
 #define GET_RAW_DEX(ch) ((ch)->raw_dex)
@@ -243,45 +267,44 @@ bool IS_DARK( int room );
 #define GET_POISON_AMOUNT(ch) ((ch)->poison_amount)
 
 #define STRENGTH_APPLY_INDEX(ch) \
-			(GET_STR(ch))
+   (GET_STR(ch))
 
-#define GET_AC(ch)       ((ch)->armor)
-#define GET_ARMOR(ch)    ((ch)->armor + dex_app[GET_DEX((ch))].ac_mod)
-#define GET_HIT(ch)      ((ch)->hit)
-#define GET_RAW_HIT(ch)  ((ch)->raw_hit)
-#define GET_MAX_HIT(ch)  (hit_limit(ch))
-#define GET_MOVE(ch)     ((ch)->move)
+#define GET_AC(ch) ((ch)->armor)
+#define GET_ARMOR(ch) ((ch)->armor + dex_app[GET_DEX((ch))].ac_mod)
+#define GET_HIT(ch) ((ch)->hit)
+#define GET_RAW_HIT(ch) ((ch)->raw_hit)
+#define GET_MAX_HIT(ch) (hit_limit(ch))
+#define GET_MOVE(ch) ((ch)->move)
 #define GET_RAW_MOVE(ch) ((ch)->raw_move)
 #define GET_MAX_MOVE(ch) (move_limit(ch))
-#define GET_MANA(ch)     ((ch)->mana)
+#define GET_MANA(ch) ((ch)->mana)
 #define GET_RAW_MANA(ch) ((ch)->raw_mana)
 #define GET_MAX_MANA(ch) (mana_limit(ch))
-#define GET_KI(ch)       ((ch)->ki)
-#define GET_RAW_KI(ch)   ((ch)->raw_ki)
-#define GET_MAX_KI(ch)   ((ch)->max_ki)
-#define GET_GOLD(ch)     ((ch)->gold)
+#define GET_KI(ch) ((ch)->ki)
+#define GET_RAW_KI(ch) ((ch)->raw_ki)
+#define GET_MAX_KI(ch) ((ch)->max_ki)
+#define GET_GOLD(ch) ((ch)->gold)
 #define GET_PLATINUM(ch) ((ch)->plat)
-#define GET_BANK(ch)     ((ch)->pcdata->bank)
-#define GET_CLAN(ch)     ((ch)->clan)
-#define GET_EXP(ch)      ((ch)->exp)
-#define GET_HEIGHT(ch)   ((ch)->height)
-#define GET_WEIGHT(ch)   ((ch)->weight)
-#define GET_SEX(ch)      ((ch)->sex)
-#define GET_HITROLL(ch)  ((ch)->hitroll)
+#define GET_BANK(ch) ((ch)->pcdata->bank)
+#define GET_CLAN(ch) ((ch)->clan)
+#define GET_EXP(ch) ((ch)->exp)
+#define GET_HEIGHT(ch) ((ch)->height)
+#define GET_WEIGHT(ch) ((ch)->weight)
+#define GET_SEX(ch) ((ch)->sex)
+#define GET_HITROLL(ch) ((ch)->hitroll)
 #define GET_REAL_HITROLL(ch) ((ch)->hitroll + dex_app[GET_DEX((ch))].tohit)
-#define GET_DAMROLL(ch)  ((ch)->damroll)
+#define GET_DAMROLL(ch) ((ch)->damroll)
 #define GET_REAL_DAMROLL(ch) ((ch)->damroll + str_app[GET_STR((ch))].todam)
-#define GET_QPOINTS(ch)  ((ch)->pcdata->quest_points)
+#define GET_QPOINTS(ch) ((ch)->pcdata->quest_points)
 #define GET_SPELLDAMAGE(ch) ((ch)->spelldamage)
 
+#define GET_RACE(ch) ((ch)->race)
+#define GET_BITV(ch) ((ch)->race == 1 ? 1 : (1 << (((ch)->race) - 1)))
+#define IS_UNDEAD(ch) ((GET_RACE(ch) == RACE_UNDEAD) || (GET_RACE(ch) == RACE_GHOST))
 
-#define GET_RACE(ch)     ((ch)->race)
-#define GET_BITV(ch)     ((ch)->race==1?1:(1<<(((ch)->race)-1)))
-#define IS_UNDEAD(ch)    ((GET_RACE(ch)==RACE_UNDEAD) || (GET_RACE(ch)==RACE_GHOST))
+#define AWAKE(ch) (GET_POS(ch) != POSITION_SLEEPING)
 
-#define AWAKE(ch) (GET_POS(ch)  != POSITION_SLEEPING)
-
-#define IS_ANONYMOUS(ch) (IS_MOB(ch) ? 1 : ( (GET_LEVEL(ch) >= 101) ? 0 : IS_SET((ch)->pcdata->toggles, PLR_ANONYMOUS)))
+#define IS_ANONYMOUS(ch) (IS_MOB(ch) ? 1 : ((GET_LEVEL(ch) >= 101) ? 0 : IS_SET((ch)->pcdata->toggles, PLR_ANONYMOUS)))
 /*
 inline const short IS_ANONYMOUS(char_data *ch)
 {
@@ -300,21 +323,21 @@ inline const short IS_ANONYMOUS(char_data *ch)
 #define GET_MOB_TYPE(mob) ((mob)->mobdata->mob_flags.type)
 #define GET_OBJ_WEIGHT(obj) ((obj)->obj_flags.weight)
 
-#define CAN_WEAR(obj, part) (IS_SET((obj)->obj_flags.wear_flags,part))
+#define CAN_WEAR(obj, part) (IS_SET((obj)->obj_flags.wear_flags, part))
 
 #define CAN_CARRY_W(ch) (str_app[STRENGTH_APPLY_INDEX(ch)].carry_w + has_skill(ch, SKILL_VIGOR))
-#define CAN_CARRY_N(ch) (5+GET_DEX(ch))
+#define CAN_CARRY_N(ch) (5 + GET_DEX(ch))
 #define IS_CARRYING_W(ch) ((ch)->carry_weight)
 #define IS_CARRYING_N(ch) ((ch)->carry_items)
 
-#define CAN_CARRY_OBJ(ch,obj)  \
-   (((IS_CARRYING_W(ch) + GET_OBJ_WEIGHT(obj)) <= CAN_CARRY_W(ch)) &&   \
+#define CAN_CARRY_OBJ(ch, obj)                                        \
+   (((IS_CARRYING_W(ch) + GET_OBJ_WEIGHT(obj)) <= CAN_CARRY_W(ch)) && \
     ((IS_CARRYING_N(ch) + 1) <= CAN_CARRY_N(ch)))
-#define CAN_GET_OBJ(ch, obj)   \
-   (CAN_WEAR((obj), ITEM_TAKE) && CAN_CARRY_OBJ((ch),(obj)) &&          \
-    CAN_SEE_OBJ((ch),(obj)))
+#define CAN_GET_OBJ(ch, obj)                                    \
+   (CAN_WEAR((obj), ITEM_TAKE) && CAN_CARRY_OBJ((ch), (obj)) && \
+    CAN_SEE_OBJ((ch), (obj)))
 
-#define IS_OBJ_STAT(obj,stat) (IS_SET((obj)->obj_flags.extra_flags,stat))
+#define IS_OBJ_STAT(obj, stat) (IS_SET((obj)->obj_flags.extra_flags, stat))
 #define IS_SPECIAL(obj) (IS_OBJ_STAT(obj, ITEM_SPECIAL))
 #define NOT_SPECIAL(obj) (!IS_SPECIAL(obj))
 
@@ -335,105 +358,100 @@ inline const short IS_ANONYMOUS(char_data *ch)
 
 /* char name/short_desc(for mobs) or someone?  */
 
-#define PERS(ch, vict)   (                                          \
-    GET_LEVEL(ch) > MIN_GOD ?                                       \
-    ( CAN_SEE(vict, ch) ?                                           \
-       GET_SHORT(ch) : "an immortal presence" ) :                   \
-    ( CAN_SEE(vict, ch) ?                                           \
-       GET_SHORT(ch) : "someone" ) )
+#define PERS(ch, vict) ( \
+    GET_LEVEL(ch) > MIN_GOD ? (CAN_SEE(vict, ch) ? GET_SHORT(ch) : "an immortal presence") : (CAN_SEE(vict, ch) ? GET_SHORT(ch) : "someone"))
 
-#define OBJS(obj, vict) (CAN_SEE_OBJ((vict), (obj)) ? \
-    (obj)->short_description  : "something")
+#define OBJS(obj, vict) (CAN_SEE_OBJ((vict), (obj)) ? (obj)->short_description : "something")
 
-#define OBJN(obj, vict) (CAN_SEE_OBJ((vict), (obj)) ? \
-    fname((obj)->name) : "something")
+#define OBJN(obj, vict) (CAN_SEE_OBJ((vict), (obj)) ? fname((obj)->name) : "something")
 
 #define IS_EXIT(room, door) (world[(room)].dir_option[(door)])
 #define EXIT_TO(room, door) (world[(room)].dir_option[(door)]->to_room)
 #define IS_OPEN(room, door) (!IS_SET(world[(room)].dir_option[(door)]->exit_info, EX_CLOSED))
 
-#define OUTSIDE(ch) (!IS_SET(world[(ch)->in_room].room_flags,INDOORS))
-#define EXIT(ch, door)  (world[(ch)->in_room].dir_option[door])
-#define CAN_GO(ch, door) (EXIT(ch,door) \
-			  && (EXIT(ch,door)->to_room != NOWHERE) \
-           && (EXIT(ch,door)->to_room != -1) \
-			  && !IS_SET(EXIT(ch, door)->exit_info, EX_CLOSED))
+#define OUTSIDE(ch) (!IS_SET(world[(ch)->in_room].room_flags, INDOORS))
+#define EXIT(ch, door) (world[(ch)->in_room].dir_option[door])
+#define CAN_GO(ch, door) (EXIT(ch, door) && (EXIT(ch, door)->to_room != NOWHERE) && (EXIT(ch, door)->to_room != -1) && !IS_SET(EXIT(ch, door)->exit_info, EX_CLOSED))
 
 #define GET_ALIGNMENT(ch) ((ch)->alignment)
-#define IS_GOOD(ch)    (GET_ALIGNMENT(ch) >= 350)
-#define IS_EVIL(ch)    (GET_ALIGNMENT(ch) <= -350)
+#define IS_GOOD(ch) (GET_ALIGNMENT(ch) >= 350)
+#define IS_EVIL(ch) (GET_ALIGNMENT(ch) <= -350)
 #define IS_NEUTRAL(ch) (!IS_GOOD(ch) && !IS_EVIL(ch))
 #define IS_SINGING(ch) (!((ch)->songs.empty()))
 
-enum MatchType { Failure, Subset, Exact };
+enum MatchType
+{
+   Failure,
+   Subset,
+   Exact
+};
 
 char *str_hsh(const char *);
 bool ishashed(char *);
-void double_dollars(char * destination, char * source);
+void double_dollars(char *destination, char *source);
 string double_dollars(string source);
 
-void    clan_death      (char* b, char_data *ch);
+void clan_death(char *b, char_data *ch);
 
-int     move_char       (char_data *ch, int dest, bool stop_all_fighting=true);
-int	number		(int from, int to);
-int 	dice		(int number, int size);
-int	str_cmp		(const char *arg1, const char *arg2);
-int	str_nosp_cmp	(const char *arg1, const char *arg2);
-int     str_n_nosp_cmp  (const char *arg1, const char *arg2, int size);
+int move_char(char_data *ch, int dest, bool stop_all_fighting = true);
+int number(int from, int to);
+int dice(int number, int size);
+int str_cmp(const char *arg1, const char *arg2);
+int str_nosp_cmp(const char *arg1, const char *arg2);
+int str_n_nosp_cmp(const char *arg1, const char *arg2, int size);
 MatchType str_n_nosp_cmp_begin(string arg1, string arg2);
-char *  str_nospace     (const char *stri);
-char *	str_dup		(const char *str);
-char *	str_dup0	(const char *str);
-void    log   (string str, int god_level, int32_t type);
-void    log		(string str, int god_level, int32_t type, char_data *vict);
-void    logf            (int level, int32_t type, const char *arg, ...);
-int     send_to_gods    (const char * str, int god_level, int32_t type);
+char *str_nospace(const char *stri);
+char *str_dup(const char *str);
+char *str_dup0(const char *str);
+void log(string str, int god_level, int32_t type, char_data *vict = nullptr);
+void logf(int level, int32_t type, const char *arg, ...);
+int send_to_gods(const char *str, int god_level, int32_t type);
 
-void	sprintbit	(uint value[], const char *names[], char *result);
-std::string	sprintbit	(uint value[], const char *names[]);
+void sprintbit(uint value[], const char *names[], char *result);
+std::string sprintbit(uint value[], const char *names[]);
 
-void    sprintbit	(uint32_t vektor, const char *names[], char *result);
-std::string sprintbit	(uint32_t vektor, const char *names[]);
+void sprintbit(uint32_t vektor, const char *names[], char *result);
+std::string sprintbit(uint32_t vektor, const char *names[]);
 
-void        sprinttype	(int type, const char *names[], char *result);
-std::string sprinttype	(int type, const char *names[]);
+void sprinttype(int type, const char *names[], char *result);
+std::string sprinttype(int type, const char *names[]);
 
-void        sprinttype	(int type, vector<const char *>, char *result);
-std::string sprinttype	(int type, vector<const char *>);
+void sprinttype(int type, vector<const char *>, char *result);
+std::string sprinttype(int type, vector<const char *>);
 
-int     consttype       (char * search_str, const char *names[]);
-const char *  constindex      (int index, const char *names[]);
+int consttype(char *search_str, const char *names[]);
+const char *constindex(int index, const char *names[]);
 struct time_info_data
-	mud_time_passed	(time_t t2, time_t t1);
+mud_time_passed(time_t t2, time_t t1);
 struct time_info_data
-	age		(char_data *ch);
-bool	circle_follow   (char_data *ch, char_data *victim);
-bool ARE_GROUPED( char_data *sub, char_data *obj); 
-bool ARE_CLANNED( char_data *sub, char_data *obj); 
-int	is_number	(const char *str);
-void	gain_condition	(char_data *ch, int condition, int value);
-void	set_fighting	(char_data *ch, char_data *vict);
-void	stop_fighting	(char_data *ch, int clearlag = 1);
-int	do_simple_move	(char_data *ch, int cmd, int following);
+age(char_data *ch);
+bool circle_follow(char_data *ch, char_data *victim);
+bool ARE_GROUPED(char_data *sub, char_data *obj);
+bool ARE_CLANNED(char_data *sub, char_data *obj);
+int is_number(const char *str);
+void gain_condition(char_data *ch, int condition, int value);
+void set_fighting(char_data *ch, char_data *vict);
+void stop_fighting(char_data *ch, int clearlag = 1);
+int do_simple_move(char_data *ch, int cmd, int following);
 // int	attempt_move	(char_data *ch, int cmd, int is_retreat = 0);
-int32_t	move_limit	(char_data *ch);
-int32_t	mana_limit	(char_data *ch);
-int32_t	ki_limit	(char_data *ch);
-int32_t	hit_limit	(char_data *ch);
+int32_t move_limit(char_data *ch);
+int32_t mana_limit(char_data *ch);
+int32_t ki_limit(char_data *ch);
+int32_t hit_limit(char_data *ch);
 typedef int16_t skill_t;
-int	has_skill	(char_data *ch, skill_t skill);
-const char *  get_skill_name  (int skillnum);
-void	gain_exp_regardless	(char_data *ch, int gain);
-void	advance_level	(char_data *ch, int is_conversion);
-int	close_socket	(struct descriptor_data *d);
-int isname    (string arg, const char *arg2);
-int	isname		(const char *arg, const char *arg2);
-void	page_string	(struct descriptor_data *d, const char *str,
-			    int keep_internal);
-void	gain_exp	(char_data *ch, int64_t gain);
-void	redo_hitpoints  (char_data *ch);       /* Rua's put in  */
-void	redo_mana	(char_data *ch);       /* Rua's put in  */
-void    redo_ki		(char_data *ch);	/* And Urizen*/
+int has_skill(char_data *ch, skill_t skill);
+const char *get_skill_name(int skillnum);
+void gain_exp_regardless(char_data *ch, int gain);
+void advance_level(char_data *ch, int is_conversion);
+int close_socket(struct descriptor_data *d);
+int isname(string arg, const char *arg2);
+int isname(const char *arg, const char *arg2);
+void page_string(struct descriptor_data *d, const char *str,
+                 int keep_internal);
+void gain_exp(char_data *ch, int64_t gain);
+void redo_hitpoints(char_data *ch); /* Rua's put in  */
+void redo_mana(char_data *ch);      /* Rua's put in  */
+void redo_ki(char_data *ch);        /* And Urizen*/
 void assign_rooms(void);
 void assign_objects(void);
 void assign_mobiles(void);
@@ -443,180 +461,187 @@ int char_from_room(char_data *ch, bool stop_fighting);
 int char_from_room(char_data *ch);
 void do_start(char_data *ch);
 
-void update_pos( char_data *victim );
+void update_pos(char_data *victim);
 void clear_object(struct obj_data *obj);
-void death_cry( char_data *ch );
+void death_cry(char_data *ch);
 std::vector<std::string> splitstring(std::string splitme, std::string delims, bool ignore_empty = false);
 std::string joinstring(std::vector<std::string> joinme, std::string delims, bool ignore_empty = false);
 
-void add_follower( char_data *ch, char_data *leader, int cmd);
-void send_to_outdoor( char *messg );
+void add_follower(char_data *ch, char_data *leader, int cmd);
+void send_to_outdoor(char *messg);
 void send_to_zone(char *messg, int zone);
 void weather_and_time(int mode);
-void night_watchman( void );
+void night_watchman(void);
 int special(char_data *ch, int cmd, char *arg);
 int process_output(struct descriptor_data *t);
 int file_to_string(const char *name, char *buf);
-bool load_char_obj( struct descriptor_data *d, const char* name);
-void save_char_obj( char_data *ch );
+bool load_char_obj(struct descriptor_data *d, const char *name);
+void save_char_obj(char_data *ch);
 
 #ifdef USE_SQL
 void save_char_obj_db(char_data *ch);
 #endif
 
 void unique_scan(char_data *victim);
-void char_to_store(char_data *ch, struct char_file_u4 *st, struct time_data & tmpage);
-bool obj_to_store( struct obj_data *obj, char_data *ch, FILE *fpsave, int wear_pos );
+void char_to_store(char_data *ch, struct char_file_u4 *st, struct time_data &tmpage);
+bool obj_to_store(struct obj_data *obj, char_data *ch, FILE *fpsave, int wear_pos);
 void check_idling(char_data *ch);
 void stop_follower(char_data *ch, int cmd);
-bool CAN_SEE( char_data *sub, char_data *obj, bool noprog = FALSE );
-int  SWAP_CH_VICT(int value);
+bool CAN_SEE(char_data *sub, char_data *obj, bool noprog = FALSE);
+int SWAP_CH_VICT(int value);
 bool SOMEONE_DIED(int value);
-bool CAN_SEE_OBJ( char_data *sub, struct obj_data *obj, bool bf = FALSE);
-bool check_blind( char_data *ch );
+bool CAN_SEE_OBJ(char_data *sub, struct obj_data *obj, bool bf = FALSE);
+bool check_blind(char_data *ch);
 void raw_kill(char_data *ch, char_data *victim);
-void check_killer( char_data *ch, char_data *victim );
-int map_eq_level( char_data *mob );
-void disarm( char_data *ch, char_data *victim );
-int shop_keeper( char_data *ch, struct obj_data *obj, int cmd, const char *arg, char_data * invoker );
+void check_killer(char_data *ch, char_data *victim);
+int map_eq_level(char_data *mob);
+void disarm(char_data *ch, char_data *victim);
+int shop_keeper(char_data *ch, struct obj_data *obj, int cmd, const char *arg, char_data *invoker);
 void send_to_all(char *messg);
 void ansi_color(char *txt, char_data *ch);
 void send_to_char(string messg, char_data *ch);
 void send_to_char(const char *messg, char_data *ch);
 void send_to_char_nosp(const char *messg, char_data *ch);
 void send_to_room(string messg, int room, bool awakeonly = FALSE, char_data *nta = NULL);
-void record_track_data(char_data *ch, int cmd); 
+void record_track_data(char_data *ch, int cmd);
 int write_to_descriptor(int desc, string txt);
 int write_to_descriptor_fd(int desc, char *txt);
-void write_to_q(const string txt, queue<string>& queue);
-int use_mana( char_data *ch, int sn );
+void write_to_q(const string txt, queue<string> &queue);
+int use_mana(char_data *ch, int sn);
 void automail(char *name);
 bool file_exists(const char *);
 void util_archive(const char *, char_data *);
 void util_unarchive(char *, char_data *);
 int is_busy(char_data *ch);
-int is_ignoring(const char_data * const ch, const char_data * const i);
-void colorCharSend(char* s, char_data* ch);
+int is_ignoring(const char_data *const ch, const char_data *const i);
+void colorCharSend(char *s, char_data *ch);
 void send_to_char_regardless(string messg, char_data *ch);
 int csendf(char_data *ch, const char *arg, ...);
-bool check_range_valid_and_convert(int & value, const char * buf, int begin, int end);
-bool check_valid_and_convert(int & value, char * buf);
-void parse_bitstrings_into_int(const char * bits[], const char * strings, char_data * ch, uint32_t value[]);
-void parse_bitstrings_into_int(const char * bits[], const char * strings, char_data * ch, uint32_t & value);
-void parse_bitstrings_into_int(const char * bits[], const char * strings, char_data * ch, uint16_t & value);
-void parse_bitstrings_into_int(const char * bits[], string strings, char_data * ch, uint32_t value[]);
-void parse_bitstrings_into_int(const char * bits[], string strings, char_data * ch, uint32_t & value);
-void parse_bitstrings_into_int(const char * bits[], string strings, char_data * ch, uint16_t & value);
-void display_string_list(const char * list[], char_data *ch);
-int contains_no_trade_item(obj_data * obj);
-int contents_cause_unique_problem(obj_data * obj, char_data * vict);
+bool check_range_valid_and_convert(int &value, const char *buf, int begin, int end);
+bool check_valid_and_convert(int &value, char *buf);
+void parse_bitstrings_into_int(const char *bits[], const char *strings, char_data *ch, uint32_t value[]);
+void parse_bitstrings_into_int(const char *bits[], const char *strings, char_data *ch, uint32_t &value);
+void parse_bitstrings_into_int(const char *bits[], const char *strings, char_data *ch, uint16_t &value);
+void parse_bitstrings_into_int(const char *bits[], string strings, char_data *ch, uint32_t value[]);
+void parse_bitstrings_into_int(const char *bits[], string strings, char_data *ch, uint32_t &value);
+void parse_bitstrings_into_int(const char *bits[], string strings, char_data *ch, uint16_t &value);
+void display_string_list(const char *list[], char_data *ch);
+int contains_no_trade_item(obj_data *obj);
+int contents_cause_unique_problem(obj_data *obj, char_data *vict);
 bool check_make_camp(int);
 int get_leadership_bonus(char_data *);
 void update_make_camp_and_leadership(void);
 int _parse_name(const char *arg, char *name);
 
-void mob_suprised_sayings(char_data * ch, char_data * aggressor);
+void mob_suprised_sayings(char_data *ch, char_data *aggressor);
 
 // MOBProgs prototypes
-int     mprog_wordlist_check    ( const char * arg, char_data *mob,
-                			char_data* actor, obj_data* object,
-					void* vo, int type, bool reverse = FALSE );
-void    mprog_percent_check     ( char_data *mob, char_data* actor,
-					obj_data* object, void* vo,
-					int type );
-int     mprog_act_trigger       (string buf, char_data* mob,
-		                        char_data* ch, obj_data* obj,
-					void* vo );
-int     mprog_bribe_trigger     ( char_data* mob, char_data* ch,
-		                        int amount );
-int     mprog_entry_trigger     ( char_data* mob );
-int     mprog_give_trigger      ( char_data* mob, char_data* ch,
-                		        obj_data* obj );
-int     mprog_greet_trigger     ( char_data* mob );
-int     mprog_fight_trigger     ( char_data* mob, char_data* ch );
-int     mprog_hitprcnt_trigger  ( char_data* mob, char_data* ch );
-int    mprog_death_trigger     ( char_data* mob, char_data* killer );
-int     mprog_random_trigger    ( char_data* mob );
-int     mprog_arandom_trigger   ( char_data *mob);
-int     mprog_speech_trigger    (const char* txt, char_data* mob );
-int 	mprog_catch_trigger	(char_data * mob, int catch_num, char 
-*var, int opt, char_data *actor,obj_data *obj, void *vo, char_data *rndm);
-int 	mprog_attack_trigger	(char_data * mob, char_data* ch);
-int     mprog_load_trigger      (char_data *mob);
-int mprog_can_see_trigger( char_data *ch, char_data *mob );
-int mprog_damage_trigger( char_data *mob, char_data *ch, int amount );
+int mprog_wordlist_check(const char *arg, char_data *mob,
+                         char_data *actor, obj_data *object,
+                         void *vo, int type, bool reverse = FALSE);
+void mprog_percent_check(char_data *mob, char_data *actor,
+                         obj_data *object, void *vo,
+                         int type);
+int mprog_act_trigger(string buf, char_data *mob,
+                      char_data *ch, obj_data *obj,
+                      void *vo);
+int mprog_bribe_trigger(char_data *mob, char_data *ch,
+                        int amount);
+int mprog_entry_trigger(char_data *mob);
+int mprog_give_trigger(char_data *mob, char_data *ch,
+                       obj_data *obj);
+int mprog_greet_trigger(char_data *mob);
+int mprog_fight_trigger(char_data *mob, char_data *ch);
+int mprog_hitprcnt_trigger(char_data *mob, char_data *ch);
+int mprog_death_trigger(char_data *mob, char_data *killer);
+int mprog_random_trigger(char_data *mob);
+int mprog_arandom_trigger(char_data *mob);
+int mprog_speech_trigger(const char *txt, char_data *mob);
+int mprog_catch_trigger(char_data *mob, int catch_num, char *var, int opt, char_data *actor, obj_data *obj, void *vo, char_data *rndm);
+int mprog_attack_trigger(char_data *mob, char_data *ch);
+int mprog_load_trigger(char_data *mob);
+int mprog_can_see_trigger(char_data *ch, char_data *mob);
+int mprog_damage_trigger(char_data *mob, char_data *ch, int amount);
 
 int oprog_catch_trigger(obj_data *obj, int catch_num, char *var, int opt, char_data *actor, obj_data *obj2, void *vo, char_data *rndm);
-int oprog_act_trigger( const char *txt, char_data *ch );
-int oprog_speech_trigger(const  char *txt, char_data *ch );
-int oprog_command_trigger(const char *txt, char_data *ch, char *arg );
-int oprog_weapon_trigger( char_data *ch, obj_data *item );
-int oprog_armour_trigger( char_data *ch, obj_data *item );
-int oprog_rand_trigger( obj_data *item);
-int oprog_arand_trigger( obj_data *item);
-int oprog_greet_trigger( char_data *ch);
-int oprog_load_trigger( obj_data *item);
-int oprog_can_see_trigger( char_data *ch, obj_data *item );
+int oprog_act_trigger(const char *txt, char_data *ch);
+int oprog_speech_trigger(const char *txt, char_data *ch);
+int oprog_command_trigger(const char *txt, char_data *ch, char *arg);
+int oprog_weapon_trigger(char_data *ch, obj_data *item);
+int oprog_armour_trigger(char_data *ch, obj_data *item);
+int oprog_rand_trigger(obj_data *item);
+int oprog_arand_trigger(obj_data *item);
+int oprog_greet_trigger(char_data *ch);
+int oprog_load_trigger(obj_data *item);
+int oprog_can_see_trigger(char_data *ch, obj_data *item);
 bool is_in_game(char_data *ch);
 int get_stat(char_data *ch, int stat);
 char *pluralize(int qty, char ending[] = "s");
 size_t nocolor_strlen(const char *s);
-void make_prompt(struct descriptor_data *d, string& prompt);
+void make_prompt(struct descriptor_data *d, string &prompt);
 string remove_all_codes(string input);
 void prog_error(char_data *mob, char *format, ...);
-bool str_prefix( const char *astr, const char *bstr );
-bool str_infix( const char *astr, const char *bstr);
+bool str_prefix(const char *astr, const char *bstr);
+bool str_infix(const char *astr, const char *bstr);
 
 extern const char menu[];
 
-#define MAX_THROW_NAME     60
-#define MPROG_CATCH_MIN    1
-#define MPROG_CATCH_MAX    100
+#define MAX_THROW_NAME 60
+#define MPROG_CATCH_MIN 1
+#define MPROG_CATCH_MAX 100
 
-struct mprog_throw_type {
-   int target_mob_num;         // num of mob to recieve
+struct mprog_throw_type
+{
+   int target_mob_num;                   // num of mob to recieve
    char target_mob_name[MAX_THROW_NAME]; // string used to find target name
-   
-   int data_num;               // number of catch call to activate on target
-   int delay;                  // how int32_t until the mob gets it
 
-   int pitcher;                // vnum of mob that threw the call
+   int data_num; // number of catch call to activate on target
+   int delay;    // how int32_t until the mob gets it
+
+   int pitcher; // vnum of mob that threw the call
    int opt;
-   mprog_throw_type * next;
-   bool mob;			// Mob or object.
-   char *var;			// temporary variable
+   mprog_throw_type *next;
+   bool mob;  // Mob or object.
+   char *var; // temporary variable
    char_data *actor;
    obj_data *obj;
    void *vo;
    char_data *rndm; // $r
 
- // new mppause crap below..
-   char_data *tMob; // it should NOT throw it to another similar mob :P
+   // new mppause crap below..
+   char_data *tMob;   // it should NOT throw it to another similar mob :P
    int ifchecks[256]; // Let's hope noone nests more ifs than that.
    int startPos;
    int cPos;
    char *orig;
- // end mppause crap
+   // end mppause crap
 };
 
-struct mprog_variable_data {
-  char *invoker;
-  char *object;
-  char *rndm;
-  char *voi;
-  int nested; // amount of nested ifs, at time of pause
-  char *program;
+struct mprog_variable_data
+{
+   char *invoker;
+   char *object;
+   char *rndm;
+   char *voi;
+   int nested; // amount of nested ifs, at time of pause
+   char *program;
 };
 
-int handle_poisoned_weapon_attack(char_data * ch, char_data * vict, int percent);
+int handle_poisoned_weapon_attack(char_data *ch, char_data *vict, int percent);
 
-enum BACKUP_TYPE { NONE, SELFDELETED, CONDEATH, ZAPPED };
+enum BACKUP_TYPE
+{
+   NONE,
+   SELFDELETED,
+   CONDEATH,
+   ZAPPED
+};
 void remove_character(char *name, BACKUP_TYPE backup = NONE);
 void remove_familiars(char *name, BACKUP_TYPE backup = NONE);
 
 std::string replaceString(std::string message, std::string find, std::string replace);
 
-char * numToStringTH(int);
+char *numToStringTH(int);
 bool champion_can_go(int room);
 bool class_can_go(int ch_class, int room);
 
@@ -630,18 +655,18 @@ bool isDead(char_data *ch);
 bool isNowhere(char_data *ch);
 bool file_exists(string filename);
 bool char_file_exists(string name);
-void show_obj_class_size_mini(obj_data * obj, char_data * ch);
+void show_obj_class_size_mini(obj_data *obj, char_data *ch);
 const char *item_condition(struct obj_data *obj);
 int random_percent_change(uint percentage, int value);
 int random_percent_change(int from, int to, int value);
 bool identify(char_data *ch, obj_data *obj);
 extern void end_oproc(char_data *ch, Trace trace = Trace("unknown"));
-void undo_race_saves(char_data * ch);
-string handle_ansi(string s, char_data * ch);
-char * handle_ansi_(char * s, char_data * ch);
-void blackjack_prompt(char_data *ch, string& prompt, bool ascii);
+void undo_race_saves(char_data *ch);
+string handle_ansi(string s, char_data *ch);
+char *handle_ansi_(char *s, char_data *ch);
+void blackjack_prompt(char_data *ch, string &prompt, bool ascii);
 void show_string(struct descriptor_data *d, const char *input);
 void special_log(char *arg);
-int check_social( char_data *ch, string pcomm, int length);
+int check_social(char_data *ch, string pcomm, int length);
 
 #endif /* UTILITY_H_ */
