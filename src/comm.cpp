@@ -58,6 +58,7 @@
 #include "Timer.h"
 #include "DC.h"
 #include "CommandStack.h"
+#include "SSH.h"
 
 using namespace std;
 
@@ -133,6 +134,8 @@ int pulse_short; // short timer, for archery
 #ifdef USE_SQL
 Database db;
 #endif
+
+SSH ssh;
 
 /* functions in this file */
 void update_mprog_throws(void);
