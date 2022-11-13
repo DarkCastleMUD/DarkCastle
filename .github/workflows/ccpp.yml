@@ -16,11 +16,8 @@ jobs:
     - name: install ubuntu software
       run: |
         sudo apt update
-        sudo apt install g++-12-multilib g++-12 libstdc++-12-dev g++
-        sudo apt install scons libcurl4
-        sudo apt install libpq-dev libpq5 libcurl4-openssl-dev
-        sudo apt install unzip zlib1g-dev
-        sudo apt install libfmt-dev cmake qt6-base-dev libssh-dev   
+        sudo apt install g++-12-multilib g++-12 libstdc++-12-dev g++ scons libcurl4 libpq-dev libpq5 libcurl4-openssl-dev \
+                         unzip zlib1g-dev libfmt-dev cmake qt6-base-dev libssh-dev
     - name: make
       run: |
         cmake -S src -B build
