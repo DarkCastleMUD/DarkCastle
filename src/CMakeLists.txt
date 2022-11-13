@@ -79,6 +79,7 @@ add_library(DC
     offense.cpp
     quest.cpp
     save.cpp
+    SSH.cpp
     shop.cpp
     sing.cpp
     social.cpp
@@ -114,8 +115,8 @@ add_executable(debug
 debug.cpp
 )
 
-target_link_libraries(dcastle PRIVATE DC Qt6::Core Qt6::Network pq fmt crypt)
-target_link_libraries(debug PRIVATE DC Qt6::Core Qt6::Network pq fmt crypt)
+target_link_libraries(dcastle PRIVATE DC Qt6::Core Qt6::Network pq fmt crypt ssh)
+target_link_libraries(debug PRIVATE DC Qt6::Core Qt6::Network pq fmt crypt ssh)
 
 
 set(DESTINATIONS /srv/dcastle_test/bin/ /srv/dcastle/bin/ /srv/dcastle2/bin/)
