@@ -27,13 +27,13 @@ struct hash_info
 };
 
 struct hash_info tree = {"m", 0, 0};
-//struct hash_info nulltree = {"", 0, 0};
+// struct hash_info nulltree = {"", 0, 0};
 
-void kill_hsh_tree_func( struct hash_info * leaf )
+void kill_hsh_tree_func(struct hash_info *leaf)
 {
-  if(leaf->left)
+  if (leaf->left)
     kill_hsh_tree_func(leaf->left);
-  if(leaf->right)
+  if (leaf->right)
     kill_hsh_tree_func(leaf->right);
 
   dc_free(leaf->name);
@@ -41,20 +41,21 @@ void kill_hsh_tree_func( struct hash_info * leaf )
 }
 
 // Since the top of the tree is static, we have to free both sides
-void free_hsh_tree_from_memory( )
+void free_hsh_tree_from_memory()
 {
-   if(tree.left)
-     kill_hsh_tree_func( tree.left );
-   if(tree.right)
-     kill_hsh_tree_func( tree.right );
+  if (tree.left)
+    kill_hsh_tree_func(tree.left);
+  if (tree.right)
+    kill_hsh_tree_func(tree.right);
 }
 
 bool ishashed(char *arg)
 {
   struct hash_info *current = &tree;
-  for(; current; current = current->right) {
-   if (current->name == arg)
-     return TRUE;
+  for (; current; current = current->right)
+  {
+    if (current->name == arg)
+      return TRUE;
   }
   return FALSE;
 }
@@ -67,19 +68,21 @@ char *str_hsh(const char *arg)
   struct hash_info *temp;
 
   // Second spot for "" args so we don't leak them all over the place
-  //if(*arg == '\0')
+  // if(*arg == '\0')
   //  return(nulltree.name);
-  if (!arg) return NULL;
+  if (!arg)
+    return NULL;
 
-  for(; current; current = next) {
-     if((scratch = strcmp(arg, current->name)) == 0)
-       return(current->name);
+  for (; current; current = next)
+  {
+    if ((scratch = strcmp(arg, current->name)) == 0)
+      return (current->name);
 
-     if(scratch < 0)
-       next = current->left;
-     else
-       next = current->right;
-     temp = current;
+    if (scratch < 0)
+      next = current->left;
+    else
+      next = current->right;
+    temp = current;
   }
 
 #ifdef LEAK_CHECK
@@ -89,19 +92,18 @@ char *str_hsh(const char *arg)
 #endif
 
   current->right = current->left = NULL;
-  if(scratch < 0)
-    temp->left  = current;
+  if (scratch < 0)
+    temp->left = current;
   else
     temp->right = current;
-  current->name   = (char *)str_dup(arg);
+  current->name = (char *)str_dup(arg);
 
-  return(current->name);
+  return (current->name);
 }
-
 
 /* logf(GET_LEVEL(ch), LOG_GOD, "%s restored all!", GET_NAME(ch)); */
 void logf(int level, int32_t type, const char *arg, ...)
-{ 
+{
   va_list args;
   char s[MAX_STRING_LENGTH];
 
@@ -113,24 +115,24 @@ void logf(int level, int32_t type, const char *arg, ...)
 }
 
 int csendf(char_data *ch, const char *arg, ...)
-{ 
+{
   va_list args;
   char s[MAX_STRING_LENGTH];
 
   va_start(args, arg);
   /* vsnprintf(s, MAX_STRING_LENGTH, arg, args); */
-  vsprintf(s, arg, args); 
+  vsprintf(s, arg, args);
   va_end(args);
 
   send_to_char(s, ch);
 
-  return(1);
+  return (1);
 }
 
-char * handle_ansi_(char * s, char_data * ch)
+char *handle_ansi_(char *s, char_data *ch)
 {
-  char * t;
-  char* tp, *sp, *i;
+  char *t;
+  char *tp, *sp, *i;
 
   char nullstring[] = "";
   char dollarstring[] = "$";
@@ -142,73 +144,113 @@ char * handle_ansi_(char * s, char_data * ch)
   int numdollars = 0;
 
   t = s;
-  while((t = strstr(t, "$"))) {
+  while ((t = strstr(t, "$")))
+  {
     numdollars++;
     t++;
   }
-  
+
 #ifdef LEAK_CHECK
-  t = (char *)calloc((strlen(s) + numdollars*11 + 1), sizeof(char));
+  t = (char *)calloc((strlen(s) + numdollars * 11 + 1), sizeof(char));
 #else
-  t = (char *)dc_alloc((strlen(s) + numdollars*11 + 1), sizeof(char));
+  t = (char *)dc_alloc((strlen(s) + numdollars * 11 + 1), sizeof(char));
 #endif
   *t = '\0';
 
   i = nullstring;
   tp = t;
   sp = s;
-  while(*sp) {
-    if(*sp != '$') {
+  while (*sp)
+  {
+    if (*sp != '$')
+    {
       *tp++ = *sp++;
-    } else {
-       if(IS_MOB(ch) || IS_SET(ch->pcdata->toggles, PLR_ANSI) || (ch->desc && ch->desc->color)) {
-          switch(*++sp) {
-//             case 'B':  i = BLACK; break;
-//             case 'R':  i = RED; break;
-//             case 'g':  i = GREEN; break;
-//             case 'Y':  i = YELLOW; break;
-//             case 'b':  i = BLUE; break;
-//             case 'P':  i = PURPLE; break;
-//             case 'C':  i = CYAN; break;
-//             case 'G':  i = GREY; break;
-//             case '!':  i = BOLD; break;
-//             case 'N':  i = NTEXT; break;
+    }
+    else
+    {
+      if (IS_MOB(ch) || IS_SET(ch->pcdata->toggles, PLR_ANSI) || (ch->desc && ch->desc->color))
+      {
+        switch (*++sp)
+        {
+          //             case 'B':  i = BLACK; break;
+          //             case 'R':  i = RED; break;
+          //             case 'g':  i = GREEN; break;
+          //             case 'Y':  i = YELLOW; break;
+          //             case 'b':  i = BLUE; break;
+          //             case 'P':  i = PURPLE; break;
+          //             case 'C':  i = CYAN; break;
+          //             case 'G':  i = GREY; break;
+          //             case '!':  i = BOLD; break;
+          //             case 'N':  i = NTEXT; break;
 
-             case '0':  i = BLACK; break;
-             case '1':  i = BLUE; break;
-             case '2':  i = GREEN; break;
-             case '3':  i = CYAN; break;
-             case '4':  i = RED; break;
-             case '5':  i = YELLOW; break;
-             case '6':  i = PURPLE; break;
-             case '7':  i = GREY; break;
-             case 'B':  i = BOLD; break;
-             case 'R':  i = NTEXT; break;
-	     case 'L':  i = FLASH;break;
-	     case 'K':  i = BLINK;break;
-             case 'I':  i = INVERSE; break;
-             case '$':  i = dollarstring; break;
-             case '\0': // this happens if we end a line with $
-                        sp--; // back up to the $ char so we don't go past our \0
-                        // no break here so the default catchs it and uses a nullstring
-             default: i = nullstring; break;
-          }
-       } else {
-         sp++;
-         if(*sp == '$')
-           i = dollarstring;
-         else i = nullstring;
-       }
-       while((*tp++ = *i++));
-       tp--;
-       sp++;
+        case '0':
+          i = BLACK;
+          break;
+        case '1':
+          i = BLUE;
+          break;
+        case '2':
+          i = GREEN;
+          break;
+        case '3':
+          i = CYAN;
+          break;
+        case '4':
+          i = RED;
+          break;
+        case '5':
+          i = YELLOW;
+          break;
+        case '6':
+          i = PURPLE;
+          break;
+        case '7':
+          i = GREY;
+          break;
+        case 'B':
+          i = BOLD;
+          break;
+        case 'R':
+          i = NTEXT;
+          break;
+        case 'L':
+          i = FLASH;
+          break;
+        case 'K':
+          i = BLINK;
+          break;
+        case 'I':
+          i = INVERSE;
+          break;
+        case '$':
+          i = dollarstring;
+          break;
+        case '\0': // this happens if we end a line with $
+          sp--;    // back up to the $ char so we don't go past our \0
+                   // no break here so the default catchs it and uses a nullstring
+        default:
+          i = nullstring;
+          break;
+        }
+      }
+      else
+      {
+        sp++;
+        if (*sp == '$')
+          i = dollarstring;
+        else
+          i = nullstring;
+      }
+      while ((*tp++ = *i++))
+        ;
+      tp--;
+      sp++;
     }
   }
   *tp = '\0';
 
   return t;
 }
-
 
 string handle_ansi(string haystack, char_data *ch)
 {
@@ -232,8 +274,8 @@ string handle_ansi(string haystack, char_data *ch)
   string result;
   try
   {
-    bool code=false;
-    for (auto& c : haystack)
+    bool code = false;
+    for (auto &c : haystack)
     {
       if (code == true)
       {
@@ -241,7 +283,7 @@ string handle_ansi(string haystack, char_data *ch)
         {
           if (rep.find(c) != rep.end())
           {
-            result += rep[c];                   
+            result += rep[c];
           }
           code = false;
           continue;
@@ -254,12 +296,12 @@ string handle_ansi(string haystack, char_data *ch)
       }
       else
       {
-       result += c;
+        result += c;
       }
     }
-  } catch(...)
+  }
+  catch (...)
   {
-
   }
 
   return result;
