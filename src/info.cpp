@@ -1541,21 +1541,6 @@ int do_look(char_data *ch, char *argument, int cmd)
 
             if (tmp_char)
             {
-               if (GET_LEVEL(tmp_char) == IMP && GET_LEVEL(ch) < IMP && !IS_NPC(tmp_char))
-               {
-                  csendf(ch,
-                         "%s has a face like thunder.  A terrible, powerful,"
-                         " apparition.\n\rYou are frightened by the greatness before "
-                         "you!\n\r",
-                         GET_SHORT(tmp_char));
-                  csendf(tmp_char,
-                         "Heh, %s just tried to look at you.\n\r",
-                         GET_NAME(ch));
-                  act("$n starts shaking and SCREAMS in terror!", ch, 0,
-                      0, TO_ROOM, 0);
-                  do_flee(ch, "", 0);
-                  return eSUCCESS;
-               }
                if (*arg3)
                {
                   try_to_peek_into_container(tmp_char, ch, arg3);
