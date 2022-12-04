@@ -3,13 +3,14 @@
         {
             "name": "Linux",
             "includePath": [
-                "${workspaceFolder}/**"
+                "${workspaceFolder}/**",
+                "/usr/include/qt6/**"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/g++-12",
             "cStandard": "c17",
             "cppStandard": "gnu++23",
-            "intelliSenseMode": "gcc-x64",
+            "intelliSenseMode": "gcc-x64"
         }
     ],
     "version": 4
