@@ -6,6 +6,8 @@
  *      Based on http://www.cplusplus.com/forum/beginner/152735/#msg792909
  */
 
+#include <assert.h>
+
 #include "DC.h"
 #include "room.h" // NOWHERE
 #include "db.h"
@@ -13,63 +15,75 @@
 
 string DC::version = VERSION;
 
-DC::DC() {
-
-}
-
-DC& DC::instance()
+DC::DC(int &argc, char **argv)
+	: QCoreApplication(argc, argv), ssh(this)
 {
-	static DC DC_instance { /* ... */};
-	return DC_instance;
+	// ssh = QSharedPointer<SSH::SSH>(new SSH::SSH);
 }
 
-void DC::removeDead(void) {
+void DC::removeDead(void)
+{
 
-	for (auto& node : death_list)
+	for (auto &node : death_list)
 	{
 		character_list.erase(node.first);
 		shooting_list.erase(node.first);
-		Trace& t = node.second;
+		Trace &t = node.second;
 		t.addTrack("DC::removeDeath");
 		free_char(node.first, t);
 	}
 	death_list.clear();
 
-	while (!obj_free_list.empty()) {
-	  obj_data *obj = *(obj_free_list.cbegin());
-	  active_obj_list.erase(obj);
-	  obj_free_list.erase(obj);
-    delete obj;
+	while (!obj_free_list.empty())
+	{
+		obj_data *obj = *(obj_free_list.cbegin());
+		active_obj_list.erase(obj);
+		obj_free_list.erase(obj);
+		delete obj;
 	}
 }
 
-void DC::handleShooting(void) {
+void DC::handleShooting(void)
+{
 	unordered_set<char_data *> remove_list;
 
-	for (auto &ch : shooting_list) {
+	for (auto &ch : shooting_list)
+	{
 		// ignore the dead
-		if (ch->in_room == NOWHERE) {
+		if (ch->in_room == NOWHERE)
+		{
 			continue;
 		}
 
-		if (ch->shotsthisround) {
+		if (ch->shotsthisround)
+		{
 			ch->shotsthisround--;
-		} else {
+		}
+		else
+		{
 			remove_list.insert(ch);
 		}
 	}
 
-	for (auto &ch : remove_list) {
+	for (auto &ch : remove_list)
+	{
 		shooting_list.erase(ch);
 	}
 }
 
 string DC::getVersion(void)
 {
-  return version;
+	return version;
 }
 
 string DC::getBuildTime(void)
 {
-  return string(BUILD_TIME);
+	return string(BUILD_TIME);
+}
+
+DC *DC::getInstance(void)
+{
+	DC *dc = dynamic_cast<DC *>(DC::instance());
+	assert(dc != nullptr);
+	return dc;
 }
