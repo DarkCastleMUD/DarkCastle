@@ -902,18 +902,9 @@ int command_interpreter(char_data *ch, string pcomm, bool procced)
 
       if (IS_PC(ch))
       {
-        DC &dc = DC::instance();
+        DC *dc = dynamic_cast<DC *>(DC::instance());
         // Don't log communication
-        if (found->command_number != CMD_GTELL &&
-            found->command_number != CMD_CTELL &&
-            found->command_number != CMD_SAY &&
-            found->command_number != CMD_IMMORT &&
-            found->command_number != CMD_IMPCHAN &&
-            found->command_number != CMD_TELL &&
-            found->command_number != CMD_WHISPER &&
-            found->command_number != CMD_REPLY &&
-            (GET_LEVEL(ch) >= 100 || (ch->pcdata->multi == true && dc.cf.allow_multi == false)) &&
-            IS_SET(ch->pcdata->punish, PUNISH_LOG) == false)
+        if (found->command_number != CMD_GTELL && found->command_number != CMD_CTELL && found->command_number != CMD_SAY && found->command_number != CMD_IMMORT && found->command_number != CMD_IMPCHAN && found->command_number != CMD_TELL && found->command_number != CMD_WHISPER && found->command_number != CMD_REPLY && (GET_LEVEL(ch) >= 100 || (ch->pcdata->multi == true && dc->cf.allow_multi == false)) && IS_SET(ch->pcdata->punish, PUNISH_LOG) == false)
         {
           log(format("Log {}: {}", GET_NAME(ch), pcomm), 110, LogChannels::LOG_PLAYER, ch);
         }

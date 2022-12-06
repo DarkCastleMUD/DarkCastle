@@ -74,7 +74,7 @@ void mobile_activity(void)
   extern int mprog_cur_result;
 
   /* Examine all mobs. */
-  auto &character_list = DC::instance().character_list;
+  auto &character_list = DC::getInstance()->character_list;
   for (auto &ch : character_list)
   {
     if (isDead(ch) || isNowhere(ch))
@@ -589,7 +589,7 @@ void mobile_activity(void)
     // it just ends here.
 
   } // for() all mobs
-  DC::instance().removeDead();
+  DC::getInstance()->removeDead();
 }
 
 // Just a function to have mobs say random stuff when they are "suprised"
@@ -961,7 +961,7 @@ void clear_hunt(void *arg1, void *arg2, void *arg3)
 
 void clear_hunt(char *arg1, char_data *arg2, void *arg3)
 {
-  auto &character_list = DC::instance().character_list;
+  auto &character_list = DC::getInstance()->character_list;
   for (auto &curr : character_list)
   {
     if (curr == arg2)

@@ -1774,7 +1774,7 @@ int do_fire(char_data *ch, char *arg, int cmd)
 
   extract_obj(found);
 
-  DC::instance().shooting_list.insert(ch);
+  DC::getInstance()->shooting_list.insert(ch);
 
   if (has_skill(ch, SKILL_ARCHERY) < 51 || enchantmentused)
     ch->shotsthisround += PULSE_VIOLENCE;

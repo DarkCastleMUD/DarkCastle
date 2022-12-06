@@ -387,9 +387,9 @@ void save_clans(void)
   dc_fclose(fl);
 
   in_port_t port1 = 0;
-  if (DC::instance().cf.ports.size() > 0)
+  if (DC::getInstance()->cf.ports.size() > 0)
   {
-    port1 = DC::instance().cf.ports[0];
+    port1 = DC::getInstance()->cf.ports[0];
   }
 
   stringstream ssbuffer;
@@ -2976,7 +2976,7 @@ int do_cbalance(char_data *ch, char *arg, int cmd)
 
 void remove_totem(obj_data *altar, obj_data *totem)
 {
-  auto &character_list = DC::instance().character_list;
+  auto &character_list = DC::getInstance()->character_list;
 
   for_each(character_list.begin(), character_list.end(),
            [&altar, totem](char_data *const &t)
@@ -2996,7 +2996,7 @@ void remove_totem(obj_data *altar, obj_data *totem)
 
 void add_totem(obj_data *altar, obj_data *totem)
 {
-  auto &character_list = DC::instance().character_list;
+  auto &character_list = DC::getInstance()->character_list;
 
   for_each(character_list.begin(), character_list.end(),
            [&altar, totem](char_data *const &t)
@@ -3075,7 +3075,7 @@ extern int top_of_zonet;
 
 int count_plrs(int zone, int clan)
 {
-  auto &character_list = DC::instance().character_list;
+  auto &character_list = DC::getInstance()->character_list;
 
   int i = count_if(character_list.begin(), character_list.end(), [&zone, &clan](char_data *const &tmpch)
                    {
@@ -3210,7 +3210,7 @@ void recycle_pulse_data(struct takeover_pulse_data *pl)
 
 int online_clan_members(int clan)
 {
-  auto &character_list = DC::instance().character_list;
+  auto &character_list = DC::getInstance()->character_list;
 
   int i = count_if(character_list.begin(), character_list.end(),
                    [&clan](char_data *const &Tmpch)
@@ -3316,7 +3316,7 @@ void pk_check(char_data *ch, char_data *victim)
 
 bool can_lose(struct takeover_pulse_data *take)
 {
-  auto &character_list = DC::instance().character_list;
+  auto &character_list = DC::getInstance()->character_list;
 
   auto result = find_if(character_list.begin(), character_list.end(), [&take](char_data *const &ch)
                         {

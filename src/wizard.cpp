@@ -1435,7 +1435,7 @@ int do_clear(char_data *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  auto &character_list = DC::instance().character_list;
+  auto &character_list = DC::getInstance()->character_list;
   for (auto &tmp_victim : character_list)
   {
     // This should never happen but it has before so we must investigate without crashing the whole MUD
@@ -1476,7 +1476,7 @@ int do_linkdead(char_data *ch, char *arg, int cmd)
   int x = 0;
   char buf[100];
 
-  auto &character_list = DC::instance().character_list;
+  auto &character_list = DC::getInstance()->character_list;
   for (auto &i : character_list)
   {
 

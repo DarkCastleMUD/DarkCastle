@@ -23,231 +23,240 @@
 // TODO - Figure out the weird bug for why when I do "who <class>" a random player
 //        from another class will pop up who name is nowhere near matching.
 
-clan_data * get_clan(char_data *);
+clan_data *get_clan(char_data *);
 
-//#define GWHOBUFFERSIZE   (MAX_STRING_LENGTH*2)
-//char gWhoBuffer[GWHOBUFFERSIZE];
+// #define GWHOBUFFERSIZE   (MAX_STRING_LENGTH*2)
+// char gWhoBuffer[GWHOBUFFERSIZE];
 
 // We now use a allocated pointer for the who buffer stuff.  It stays allocated, so
 // we're not repeatedly allocing it, and it grows as needed to fit all the data (like a CString)
 // That way we never have to worry about having a bunch of players on, and overflowing it.
 // -pir 2/20/01
-char * gWhoBuffer = NULL;
+char *gWhoBuffer = NULL;
 int32_t gWhoBufferCurSize = 0;
 int32_t gWhoBufferMaxSize = 0;
- 
-void add_to_who(char * strAdd)
+
+void add_to_who(char *strAdd)
 {
-   int32_t strLength = 0;
+  int32_t strLength = 0;
 
-   if(!strAdd)                                    return;
-   if(!(strLength = strlen(strAdd)))              return;
+  if (!strAdd)
+    return;
+  if (!(strLength = strlen(strAdd)))
+    return;
 
-   if((strLength + gWhoBufferCurSize) >= gWhoBufferMaxSize)  { // expand the buffer
-     gWhoBufferMaxSize += (strLength + 500);                   // expand by the size + 500
+  if ((strLength + gWhoBufferCurSize) >= gWhoBufferMaxSize)
+  {                                         // expand the buffer
+    gWhoBufferMaxSize += (strLength + 500); // expand by the size + 500
 #ifdef LEAK_CHECK
-     gWhoBuffer = (char *) realloc(gWhoBuffer, gWhoBufferMaxSize);
-     if(!gWhoBuffer) {
-       fprintf(stderr, "Unable to realloc in who.C add_to_who");
-       abort();
-     }
-#else       
-     gWhoBuffer = (char *) dc_realloc(gWhoBuffer, gWhoBufferMaxSize);
+    gWhoBuffer = (char *)realloc(gWhoBuffer, gWhoBufferMaxSize);
+    if (!gWhoBuffer)
+    {
+      fprintf(stderr, "Unable to realloc in who.C add_to_who");
+      abort();
+    }
+#else
+    gWhoBuffer = (char *)dc_realloc(gWhoBuffer, gWhoBufferMaxSize);
 #endif
-   }
+  }
 
-   // guaranteed to work, since we just allocated enough for it + 500
-   strcat(gWhoBuffer, strAdd);
-   gWhoBufferCurSize += strLength; // update current data size
+  // guaranteed to work, since we just allocated enough for it + 500
+  strcat(gWhoBuffer, strAdd);
+  gWhoBufferCurSize += strLength; // update current data size
 }
 
 void clear_who_buffer()
 {
-  if(gWhoBuffer)
-    *gWhoBuffer = '\0';     // kill the string
-  gWhoBufferCurSize = 0;  // update the size
+  if (gWhoBuffer)
+    *gWhoBuffer = '\0';  // kill the string
+  gWhoBufferCurSize = 0; // update the size
 }
 
 int do_whogroup(char_data *ch, char *argument, int cmd)
 {
 
-   descriptor_data *d;
-   char_data *k, *i;
-   follow_type *f;
-   char target[MAX_INPUT_LENGTH];
-   char tempbuffer[800];
-   int foundtarget = 0;
-   int foundgroup = 0;
-   int hasholylight;
+  descriptor_data *d;
+  char_data *k, *i;
+  follow_type *f;
+  char target[MAX_INPUT_LENGTH];
+  char tempbuffer[800];
+  int foundtarget = 0;
+  int foundgroup = 0;
+  int hasholylight;
 
-   one_argument(argument, target);
-      
-   hasholylight = IS_MOB(ch) ? 0 : ch->pcdata->holyLite;
+  one_argument(argument, target);
 
-   send_to_char(
-     "$B$7($4:$7)=======================================================================($4:$7)\n\r"
-     "$7|$5/$7|                     $5Current Grouped Adventurers                       $7|$5/$7|\n\r"
-     "$7($4:$7)=======================================================================($4:$7)$R\n\r", ch);
+  hasholylight = IS_MOB(ch) ? 0 : ch->pcdata->holyLite;
 
-   if(*target) {
-     sprintf(gWhoBuffer, "Searching for '$B%s$R'...\r\n", target);
-     send_to_char(gWhoBuffer, ch);
-   }
-     
-   clear_who_buffer();
+  send_to_char(
+      "$B$7($4:$7)=======================================================================($4:$7)\n\r"
+      "$7|$5/$7|                     $5Current Grouped Adventurers                       $7|$5/$7|\n\r"
+      "$7($4:$7)=======================================================================($4:$7)$R\n\r",
+      ch);
 
-   for( d = descriptor_list; d; d = d->next ) {
-      foundtarget = 0;
+  if (*target)
+  {
+    sprintf(gWhoBuffer, "Searching for '$B%s$R'...\r\n", target);
+    send_to_char(gWhoBuffer, ch);
+  }
 
-      if ((d->connected) || (!CAN_SEE(ch, d->character)))
-         continue;
+  clear_who_buffer();
 
-//  What the hell is this line supposed to be checking? -pir
-//  If this occurs, we got alot bigger problems than 'who_group'
-//      if (ch->desc->character != ch)
-//         continue;
-          
-      i = d->character;
+  for (d = descriptor_list; d; d = d->next)
+  {
+    foundtarget = 0;
 
-      // If I'm the leader of my group, process it
-      if ((!i->master) && (IS_AFFECTED(i, AFF_GROUP))) 
+    if ((d->connected) || (!CAN_SEE(ch, d->character)))
+      continue;
+
+    //  What the hell is this line supposed to be checking? -pir
+    //  If this occurs, we got alot bigger problems than 'who_group'
+    //      if (ch->desc->character != ch)
+    //         continue;
+
+    i = d->character;
+
+    // If I'm the leader of my group, process it
+    if ((!i->master) && (IS_AFFECTED(i, AFF_GROUP)))
+    {
+      foundgroup = 1; // we found someone!
+      k = i;
+      sprintf(tempbuffer, "\n\r"
+                          "   $B$7[$4: $5%s $4:$7]$R\n\r"
+                          "   Player kills: %-3d  Average level of victim: %d  Total kills: %-3d\n\r",
+              k->group_name,
+              IS_MOB(k) ? 0 : k->pcdata->group_pkills,
+              IS_MOB(k) ? 0 : (k->pcdata->group_pkills ? (k->pcdata->grpplvl / k->pcdata->group_pkills) : 0),
+              IS_MOB(k) ? 0 : k->pcdata->group_kills);
+      add_to_who(tempbuffer);
+
+      // If we're searching, see if this is the target
+      if (is_abbrev(target, GET_NAME(i)))
+        foundtarget = 1;
+
+      // First, if they're not anonymous
+      if ((!IS_MOB(ch) && hasholylight) || (!IS_ANONYMOUS(k) || (k->clan == ch->clan && ch->clan)))
       {
-         foundgroup = 1;  // we found someone!
-         k = i;
-         sprintf(tempbuffer, "\n\r"
-                             "   $B$7[$4: $5%s $4:$7]$R\n\r"
-                             "   Player kills: %-3d  Average level of victim: %d  Total kills: %-3d\n\r",
-                 k->group_name,
-                 IS_MOB(k) ? 0 : k->pcdata->group_pkills,
-                 IS_MOB(k) ? 0 : (k->pcdata->group_pkills ? (k->pcdata->grpplvl / k->pcdata->group_pkills) : 0),
-                 IS_MOB(k) ? 0 : k->pcdata->group_kills);
-         add_to_who(tempbuffer);
-
-         // If we're searching, see if this is the target
-         if(is_abbrev(target, GET_NAME(i)))
-            foundtarget = 1;
-
-         // First, if they're not anonymous
-         if ((!IS_MOB(ch) && hasholylight) || (!IS_ANONYMOUS(k) || (k->clan == ch->clan && ch->clan))) 
-         {
-             sprintf(tempbuffer,
-                 "   $B%-18s %-10s %-14s   Level %2d      $1($7Leader$1)$R \n\r",
-                 GET_NAME(k), races[(int)GET_RACE(k)].singular_name,
-	         pc_clss_types[(int)GET_CLASS(k)], GET_LEVEL(k));
-         }
-         else {
-             sprintf(tempbuffer,
-                 "   $B%-18s %-10s Anonymous                      $1($7Leader$1)$R \n\r", 
-                 GET_NAME(k), races[(int)GET_RACE(k)].singular_name);
-         }
-         add_to_who(tempbuffer);
-
-         // loop through my followers and process them
-         for(f = k->followers; f; f = f->next) {
-            if (!IS_NPC(f->follower))
-               if (IS_AFFECTED(f->follower, AFF_GROUP)) {
-                  // If we're searching, see if this is the target
-                  if(is_abbrev(target, GET_NAME(f->follower)))
-                     foundtarget = 1;
-                  // First if they're not anonymous
-                  if (!IS_ANONYMOUS(f->follower) || (f->follower->clan == ch->clan && ch->clan))
-                     sprintf(tempbuffer, "   %-18s %-10s %-14s   Level %2d\n\r",
-                          GET_NAME(f->follower), races[(int)GET_RACE(f->follower)].singular_name,
-                          pc_clss_types[(int)GET_CLASS(f->follower)], GET_LEVEL(f->follower));
-                  else 
-                     sprintf(tempbuffer,
-                          "   %-18s %-10s Anonymous            \n\r",
-                          GET_NAME(f->follower), races[(int)GET_RACE(f->follower)].singular_name);
-                  add_to_who(tempbuffer);
-               }
-         } // for f = k->followers
-      } //  ((!i->master) && (IS_AFFECTED(i, AFF_GROUP)) )
-
-      // if we're searching (target exists) and we didn't find it, clear out 
-      // the buffer cause we only want the target's group.  
-      // If we found it, send it out, clear the buffer, and keep going in case someone else
-      // matches the same target pattern.   ('whog a' gets Anarchy and Alpha's groups)
-      // -pir
-      if(*target && !foundtarget)
-      {
-         clear_who_buffer();
-         foundgroup = 0; 
+        sprintf(tempbuffer,
+                "   $B%-18s %-10s %-14s   Level %2d      $1($7Leader$1)$R \n\r",
+                GET_NAME(k), races[(int)GET_RACE(k)].singular_name,
+                pc_clss_types[(int)GET_CLASS(k)], GET_LEVEL(k));
       }
-      else if(*target && foundtarget)
+      else
       {
-         send_to_char(gWhoBuffer, ch);
-         clear_who_buffer();
+        sprintf(tempbuffer,
+                "   $B%-18s %-10s Anonymous                      $1($7Leader$1)$R \n\r",
+                GET_NAME(k), races[(int)GET_RACE(k)].singular_name);
       }
-   }    // End for(d).
+      add_to_who(tempbuffer);
 
-   if(0 == foundgroup) 
-     add_to_who("\n\rNo groups found.\n\r");
+      // loop through my followers and process them
+      for (f = k->followers; f; f = f->next)
+      {
+        if (!IS_NPC(f->follower))
+          if (IS_AFFECTED(f->follower, AFF_GROUP))
+          {
+            // If we're searching, see if this is the target
+            if (is_abbrev(target, GET_NAME(f->follower)))
+              foundtarget = 1;
+            // First if they're not anonymous
+            if (!IS_ANONYMOUS(f->follower) || (f->follower->clan == ch->clan && ch->clan))
+              sprintf(tempbuffer, "   %-18s %-10s %-14s   Level %2d\n\r",
+                      GET_NAME(f->follower), races[(int)GET_RACE(f->follower)].singular_name,
+                      pc_clss_types[(int)GET_CLASS(f->follower)], GET_LEVEL(f->follower));
+            else
+              sprintf(tempbuffer,
+                      "   %-18s %-10s Anonymous            \n\r",
+                      GET_NAME(f->follower), races[(int)GET_RACE(f->follower)].singular_name);
+            add_to_who(tempbuffer);
+          }
+      } // for f = k->followers
+    }   //  ((!i->master) && (IS_AFFECTED(i, AFF_GROUP)) )
 
-   // page it to the player.  the 1 tells page_string to make it's own copy of the data
-   page_string(ch->desc, gWhoBuffer, 1);
-   return eSUCCESS;
+    // if we're searching (target exists) and we didn't find it, clear out
+    // the buffer cause we only want the target's group.
+    // If we found it, send it out, clear the buffer, and keep going in case someone else
+    // matches the same target pattern.   ('whog a' gets Anarchy and Alpha's groups)
+    // -pir
+    if (*target && !foundtarget)
+    {
+      clear_who_buffer();
+      foundgroup = 0;
+    }
+    else if (*target && foundtarget)
+    {
+      send_to_char(gWhoBuffer, ch);
+      clear_who_buffer();
+    }
+  } // End for(d).
+
+  if (0 == foundgroup)
+    add_to_who("\n\rNo groups found.\n\r");
+
+  // page it to the player.  the 1 tells page_string to make it's own copy of the data
+  page_string(ch->desc, gWhoBuffer, 1);
+  return eSUCCESS;
 }
 
 int do_whosolo(char_data *ch, char *argument, int cmd)
 {
-   descriptor_data *d;
-   char_data *i;
-   char tempbuffer[800];
-   char buf[MAX_INPUT_LENGTH+1];
-   bool foundtarget;
+  descriptor_data *d;
+  char_data *i;
+  char tempbuffer[800];
+  char buf[MAX_INPUT_LENGTH + 1];
+  bool foundtarget;
 
-   one_argument(argument, buf);
+  one_argument(argument, buf);
 
-   send_to_char(
-    "$B$7($4:$7)=======================================================================($4:$7)\n\r"
-    "$7|$5/$7|                      $5Current SOLO Adventurers                         $7|$5/$7|\n\r"
-    "$7($4:$7)=======================================================================($4:$7)$R\n\r"
-    "   $BName            Race      Class        Level  PKs Deaths Avg-vict-level$R\n\r", ch);
+  send_to_char(
+      "$B$7($4:$7)=======================================================================($4:$7)\n\r"
+      "$7|$5/$7|                      $5Current SOLO Adventurers                         $7|$5/$7|\n\r"
+      "$7($4:$7)=======================================================================($4:$7)$R\n\r"
+      "   $BName            Race      Class        Level  PKs Deaths Avg-vict-level$R\n\r",
+      ch);
 
-   clear_who_buffer();
+  clear_who_buffer();
 
-   for(d = descriptor_list; d; d = d->next) {
-      foundtarget = FALSE;
+  for (d = descriptor_list; d; d = d->next)
+  {
+    foundtarget = FALSE;
 
-      if ((d->connected) || !(i = d->character) || (!CAN_SEE(ch, i)))
-         continue;
+    if ((d->connected) || !(i = d->character) || (!CAN_SEE(ch, i)))
+      continue;
 
-      if (is_abbrev(buf, GET_NAME(i)))
-         foundtarget = TRUE;
+    if (is_abbrev(buf, GET_NAME(i)))
+      foundtarget = TRUE;
 
-      if (*buf && !foundtarget)
-         continue;
+    if (*buf && !foundtarget)
+      continue;
 
-      if (GET_LEVEL(i) <= MORTAL)
-         if (!IS_AFFECTED(i, AFF_GROUP)) {
-            if (!IS_ANONYMOUS(i) || (i->clan && i->clan == ch->clan))
-               sprintf(tempbuffer,
-                 "   %-15s %-9s %-13s %2d     %-4d%-7d%d\n\r",
-                 i->name,
-                 races[(int)GET_RACE(i)].singular_name,
-                 pc_clss_types[(int)GET_CLASS(i)], GET_LEVEL(i),
-                 IS_MOB(i) ? 0 : i->pcdata->totalpkills, 
-                 IS_MOB(i) ? 0 : i->pcdata->pdeathslogin, 
-                 IS_MOB(i) ? 0 : (i->pcdata->totalpkills ? 
-                                  (i->pcdata->totalpkillslv/i->pcdata->totalpkills) : 0)
-                 );
-            else
-               sprintf(tempbuffer,
-                "   %-15s %-9s Anonymous            %-4d%-7d%d\n\r",
-	        i->name, 
-                races[(int)GET_RACE(i)].singular_name,
-                 IS_MOB(i) ? 0 : i->pcdata->totalpkills, 
-                 IS_MOB(i) ? 0 : i->pcdata->pdeathslogin, 
-                 IS_MOB(i) ? 0 : (i->pcdata->totalpkills ? 
-                                  (i->pcdata->totalpkillslv/i->pcdata->totalpkills) : 0)
-	        );
-            add_to_who(tempbuffer);
-         } // if is affected by group
-   } // End For Loop.
+    if (GET_LEVEL(i) <= MORTAL)
+      if (!IS_AFFECTED(i, AFF_GROUP))
+      {
+        if (!IS_ANONYMOUS(i) || (i->clan && i->clan == ch->clan))
+          sprintf(tempbuffer,
+                  "   %-15s %-9s %-13s %2d     %-4d%-7d%d\n\r",
+                  i->name,
+                  races[(int)GET_RACE(i)].singular_name,
+                  pc_clss_types[(int)GET_CLASS(i)], GET_LEVEL(i),
+                  IS_MOB(i) ? 0 : i->pcdata->totalpkills,
+                  IS_MOB(i) ? 0 : i->pcdata->pdeathslogin,
+                  IS_MOB(i) ? 0 : (i->pcdata->totalpkills ? (i->pcdata->totalpkillslv / i->pcdata->totalpkills) : 0));
+        else
+          sprintf(tempbuffer,
+                  "   %-15s %-9s Anonymous            %-4d%-7d%d\n\r",
+                  i->name,
+                  races[(int)GET_RACE(i)].singular_name,
+                  IS_MOB(i) ? 0 : i->pcdata->totalpkills,
+                  IS_MOB(i) ? 0 : i->pcdata->pdeathslogin,
+                  IS_MOB(i) ? 0 : (i->pcdata->totalpkills ? (i->pcdata->totalpkillslv / i->pcdata->totalpkills) : 0));
+        add_to_who(tempbuffer);
+      } // if is affected by group
+  }     // End For Loop.
 
-   // page it to the player.  the 1 tells page_string to make it's own copy of the data
-   page_string(ch->desc, gWhoBuffer, 1);
-   return eSUCCESS;
+  // page it to the player.  the 1 tells page_string to make it's own copy of the data
+  page_string(ch->desc, gWhoBuffer, 1);
+  return eSUCCESS;
 }
 
 int do_who(char_data *ch, char *argument, int cmd)
@@ -653,54 +662,59 @@ int do_who(char_data *ch, char *argument, int cmd)
 
 int do_whoarena(char_data *ch, char *argument, int cmd)
 {
-   int count = 0;
-   clan_data * clan;
+  int count = 0;
+  clan_data *clan;
 
-   send_to_char("\n\rPlayers in the Arena:\n\r--------------------------\n\r", ch);
+  send_to_char("\n\rPlayers in the Arena:\n\r--------------------------\n\r", ch);
 
-   if (GET_LEVEL(ch) <= MORTAL) 
-   {
-		auto &character_list = DC::instance().character_list;
-		for (auto& tmp : character_list) {
-         if (CAN_SEE(ch, tmp))
-         {
-            if (IS_SET(world[tmp->in_room].room_flags, ARENA) 
-                && !IS_SET(world[tmp->in_room].room_flags, NO_WHERE)) 
-            {
-               if((tmp->clan) && (clan = get_clan(tmp)) && GET_LEVEL(tmp) < IMMORTAL)
-                 csendf(ch, "%-20s - [%s$R]\n\r", GET_NAME(tmp), clan->name);
-               else csendf(ch, "%-20s\n\r", GET_NAME(tmp));
-               count++;
-            }
-         }
+  if (GET_LEVEL(ch) <= MORTAL)
+  {
+    auto &character_list = DC::getInstance()->character_list;
+    for (auto &tmp : character_list)
+    {
+      if (CAN_SEE(ch, tmp))
+      {
+        if (IS_SET(world[tmp->in_room].room_flags, ARENA) && !IS_SET(world[tmp->in_room].room_flags, NO_WHERE))
+        {
+          if ((tmp->clan) && (clan = get_clan(tmp)) && GET_LEVEL(tmp) < IMMORTAL)
+            csendf(ch, "%-20s - [%s$R]\n\r", GET_NAME(tmp), clan->name);
+          else
+            csendf(ch, "%-20s\n\r", GET_NAME(tmp));
+          count++;
+        }
       }
-	 
-      if (count == 0)
-	csendf(ch, "\n\rThere are no visible players in the arena.\n\r");
-      
-    return eSUCCESS;
-   }
-      
-   // If they're here that means they're a god
-	auto &character_list = DC::instance().character_list;
-	for (auto& tmp : character_list) {
-      if (CAN_SEE(ch, tmp)) {
-         if (IS_SET(world[tmp->in_room].room_flags, ARENA)) {
-            if((tmp->clan) && (clan = get_clan(tmp)) && GET_LEVEL(tmp) < IMMORTAL)
-               csendf(ch, "%-20s  Level: %-3d  Hit: %-5d  Room: %-5d - [%s$R]\n\r",
-	           GET_NAME(tmp),
-                   GET_LEVEL(tmp), tmp->getHP(), tmp->in_room, clan->name);
-            else csendf(ch, "%-20s  Level: %-3d  Hit: %-5d  Room: %-5d\n\r",
-	           GET_NAME(tmp),
-                   GET_LEVEL(tmp), tmp->getHP(), tmp->in_room);
-            count++;
-            }
-         }
-      }
+    }
 
-   if (count == 0)
+    if (count == 0)
       csendf(ch, "\n\rThere are no visible players in the arena.\n\r");
-   return eSUCCESS;
+
+    return eSUCCESS;
+  }
+
+  // If they're here that means they're a god
+  auto &character_list = DC::getInstance()->character_list;
+  for (auto &tmp : character_list)
+  {
+    if (CAN_SEE(ch, tmp))
+    {
+      if (IS_SET(world[tmp->in_room].room_flags, ARENA))
+      {
+        if ((tmp->clan) && (clan = get_clan(tmp)) && GET_LEVEL(tmp) < IMMORTAL)
+          csendf(ch, "%-20s  Level: %-3d  Hit: %-5d  Room: %-5d - [%s$R]\n\r",
+                 GET_NAME(tmp),
+                 GET_LEVEL(tmp), tmp->getHP(), tmp->in_room, clan->name);
+        else
+          csendf(ch, "%-20s  Level: %-3d  Hit: %-5d  Room: %-5d\n\r",
+                 GET_NAME(tmp),
+                 GET_LEVEL(tmp), tmp->getHP(), tmp->in_room);
+        count++;
+      }
+    }
+  }
+
+  if (count == 0)
+    csendf(ch, "\n\rThere are no visible players in the arena.\n\r");
+  return eSUCCESS;
 }
 
 int do_where(char_data *ch, char *argument, int cmd)
@@ -711,49 +725,68 @@ int do_where(char_data *ch, char *argument, int cmd)
 
   one_argument(argument, buf);
 
-  if (GET_LEVEL(ch) >= IMMORTAL && *buf && !strcmp(buf, "all")) { //  immortal noly, shows all
+  if (GET_LEVEL(ch) >= IMMORTAL && *buf && !strcmp(buf, "all"))
+  { //  immortal noly, shows all
     send_to_char("All Players:\n\r--------\n\r", ch);
-    for (d = descriptor_list; d; d = d->next) {
-      if (d->character && (d->connected == conn::PLAYING) && (CAN_SEE(ch, d->character)) && (d->character->in_room != NOWHERE)) {
-        if (d->original) {  // If switched
+    for (d = descriptor_list; d; d = d->next)
+    {
+      if (d->character && (d->connected == conn::PLAYING) && (CAN_SEE(ch, d->character)) && (d->character->in_room != NOWHERE))
+      {
+        if (d->original)
+        { // If switched
           csendf(ch, "%-20s - %s$R [%d] In body of %s\n\r", d->original->name, world[d->character->in_room].name,
                  world[d->character->in_room].number, fname(d->character->name));
-        } else {
-          csendf(ch, "%-20s - %s$R [%d]\n\r", 
-                      d->character->name, world[d->character->in_room].name, world[d->character->in_room].number);
+        }
+        else
+        {
+          csendf(ch, "%-20s - %s$R [%d]\n\r",
+                 d->character->name, world[d->character->in_room].name, world[d->character->in_room].number);
         }
       }
     } // for
-  } else if (GET_LEVEL(ch) >= IMMORTAL && *buf) { // immortal only, shows ONE person
+  }
+  else if (GET_LEVEL(ch) >= IMMORTAL && *buf)
+  { // immortal only, shows ONE person
     send_to_char("Search of Players:\n\r--------\n\r", ch);
-    for (d = descriptor_list; d; d = d->next) {
-      if (d->character && (d->connected == conn::PLAYING) && (CAN_SEE(ch, d->character)) && (d->character->in_room != NOWHERE)) {
-        if (d->original) {  // If switched
-          if (is_abbrev(buf, d->original->name)) {
+    for (d = descriptor_list; d; d = d->next)
+    {
+      if (d->character && (d->connected == conn::PLAYING) && (CAN_SEE(ch, d->character)) && (d->character->in_room != NOWHERE))
+      {
+        if (d->original)
+        { // If switched
+          if (is_abbrev(buf, d->original->name))
+          {
             csendf(ch, "%-20s - %s$R [%d] In body of %s\n\r", d->original->name, world[d->character->in_room].name,
                    world[d->character->in_room].number, fname(d->character->name));
           }
-        } else {
-          if (is_abbrev(buf, d->character->name)) {
-            csendf(ch, "%-20s - %s$R [%d]\n\r", 
-                        d->character->name, world[d->character->in_room].name, world[d->character->in_room].number);
+        }
+        else
+        {
+          if (is_abbrev(buf, d->character->name))
+          {
+            csendf(ch, "%-20s - %s$R [%d]\n\r",
+                   d->character->name, world[d->character->in_room].name, world[d->character->in_room].number);
           }
         }
       }
     } // for
-  } else {  // normal, mortal where
+  }
+  else
+  { // normal, mortal where
     zonenumber = world[ch->in_room].zone;
     send_to_char("Players in your vicinity:\n\r-------------------------\n\r", ch);
     if (IS_SET(world[ch->in_room].room_flags, NO_WHERE))
-       return eFAILURE;
-    for (d = descriptor_list; d; d = d->next) {
+      return eFAILURE;
+    for (d = descriptor_list; d; d = d->next)
+    {
       if (d->character && (d->connected == conn::PLAYING) && (d->character->in_room != NOWHERE) &&
           !IS_SET(world[d->character->in_room].room_flags, NO_WHERE) &&
- 	  CAN_SEE(ch, d->character) && !IS_MOB(d->character) /*Don't show snooped mobs*/)  {
-          if (world[d->character->in_room].zone == zonenumber)
-            csendf(ch, "%-20s - %s$R\n\r", d->character->name,
-          world[d->character->in_room].name);
-       }
+          CAN_SEE(ch, d->character) && !IS_MOB(d->character) /*Don't show snooped mobs*/)
+      {
+        if (world[d->character->in_room].zone == zonenumber)
+          csendf(ch, "%-20s - %s$R\n\r", d->character->name,
+                 world[d->character->in_room].name);
+      }
     }
   }
 

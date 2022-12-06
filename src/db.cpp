@@ -618,7 +618,7 @@ void boot_db(void)
 	log("Looking for unordered objects...", 0, LogChannels::LOG_MISC);
 	find_unordered_objects();
 
-	if (DC::instance().cf.bport == false)
+	if (DC::getInstance()->cf.bport == false)
 	{
 		log("Loading Corpses.", 0, LogChannels::LOG_MISC);
 		load_corpses();
@@ -648,7 +648,7 @@ void boot_db(void)
 	assign_objects();
 	assign_rooms();
 
-	DC::config &cf = DC::instance().cf;
+	DC::config &cf = DC::getInstance()->cf;
 	if (cf.verbose_mode)
 	{
 		fprintf(stderr, "\n[ Room  Room]\t{Level}\t  Author\tZone\n");
@@ -823,9 +823,9 @@ void update_wizlist(char_data *ch)
 	write_wizlist("../lib/wizlist.txt");
 
 	in_port_t port1 = 0;
-	if (DC::instance().cf.ports.size() > 0)
+	if (DC::getInstance()->cf.ports.size() > 0)
 	{
-		port1 = DC::instance().cf.ports[0];
+		port1 = DC::getInstance()->cf.ports[0];
 	}
 
 	stringstream ssbuffer;
@@ -1016,7 +1016,7 @@ index_data *generate_mob_indices(int *top, struct index_data *index)
 	//  extern short code_testing_mode;
 
 	log("Opening mobile file index.", 0, LogChannels::LOG_MISC);
-	if (DC::instance().cf.test_mobs)
+	if (DC::getInstance()->cf.test_mobs)
 	{
 		if (!(flMobIndex = dc_fopen(MOB_INDEX_FILE_TINY, "r")))
 		{
@@ -1043,7 +1043,7 @@ index_data *generate_mob_indices(int *top, struct index_data *index)
 		strcpy(endfile, "mobs/");
 		strcat(endfile, temp);
 
-		DC::config &cf = DC::instance().cf;
+		DC::config &cf = DC::getInstance()->cf;
 
 		if (cf.verbose_mode)
 		{
@@ -1293,7 +1293,7 @@ void add_mobspec(int i)
 
 void remove_all_mobs_from_world()
 {
-	auto &character_list = DC::instance().character_list;
+	auto &character_list = DC::getInstance()->character_list;
 
 	for_each(character_list.begin(), character_list.end(),
 			 [](char_data *const &curr)
@@ -1303,7 +1303,7 @@ void remove_all_mobs_from_world()
 				 else
 					 do_quit(curr, "", 666);
 			 });
-	DC::instance().removeDead();
+	DC::getInstance()->removeDead();
 }
 
 void remove_all_objs_from_world()
@@ -1352,7 +1352,7 @@ struct index_data *generate_obj_indices(int *top,
 		strcpy(endfile, "objects/");
 		strcat(endfile, temp);
 
-		DC::config &cf = DC::instance().cf;
+		DC::config &cf = DC::getInstance()->cf;
 		if (cf.verbose_mode)
 		{
 			log(temp, 0, LogChannels::LOG_MISC);
@@ -1984,7 +1984,7 @@ void boot_world(void)
 
 	object_list = 0;
 
-	DC::config &cf = DC::instance().cf;
+	DC::config &cf = DC::getInstance()->cf;
 
 	if (cf.test_world)
 	{
@@ -2015,7 +2015,7 @@ void boot_world(void)
 		strcpy(endfile, "world/");
 		strcat(endfile, temp);
 
-		DC::config &cf = DC::instance().cf;
+		DC::config &cf = DC::getInstance()->cf;
 		if (cf.verbose_mode)
 		{
 			log(temp, 0, LogChannels::LOG_MISC);
@@ -2593,7 +2593,7 @@ void boot_zones(void)
 	//  for (zon = 0;zon < MAX_ZONE;zon++)
 	//  zone_table[zon] = NULL; // Null list, top_of_z can't be used now
 
-	DC::config &cf = DC::instance().cf;
+	DC::config &cf = DC::getInstance()->cf;
 
 	if (cf.test_world == false && cf.test_mobs == false && cf.test_objs == false)
 	{
@@ -2663,7 +2663,7 @@ char_data *read_mobile(int nr, FILE *fl)
 	i = nr;
 
 	mob = new char_data;
-	auto &free_list = DC::instance().free_list;
+	auto &free_list = DC::getInstance()->free_list;
 	free_list.erase(mob);
 
 	clear_char(mob);
@@ -3373,7 +3373,7 @@ char_data *clone_mobile(int nr)
 		return 0;
 
 	mob = new char_data;
-	auto &free_list = DC::instance().free_list;
+	auto &free_list = DC::getInstance()->free_list;
 	free_list.erase(mob);
 
 	clear_char(mob);
@@ -3392,7 +3392,7 @@ char_data *clone_mobile(int nr)
 	mob->desc = 0;
 	mob->mobdata->reset = NULL;
 
-	auto &character_list = DC::instance().character_list;
+	auto &character_list = DC::getInstance()->character_list;
 	character_list.insert(mob);
 	mob_index[nr].number++;
 	mob->next_in_room = 0;
@@ -3608,18 +3608,18 @@ int create_blank_mobile(int nr)
 	// insert
 	mob_index[cur_index].virt = nr;
 	mob_index[cur_index].number = 0;
-	if (DC::instance().mob_non_combat_functions.contains(nr))
+	if (DC::getInstance()->mob_non_combat_functions.contains(nr))
 	{
-		mob_index[cur_index].non_combat_func = DC::instance().mob_non_combat_functions[nr];
+		mob_index[cur_index].non_combat_func = DC::getInstance()->mob_non_combat_functions[nr];
 	}
 	else
 	{
 		mob_index[cur_index].non_combat_func = nullptr;
 	}
 
-	if (DC::instance().mob_combat_functions.contains(nr))
+	if (DC::getInstance()->mob_combat_functions.contains(nr))
 	{
-		mob_index[cur_index].combat_func = DC::instance().mob_combat_functions[nr];
+		mob_index[cur_index].combat_func = DC::getInstance()->mob_combat_functions[nr];
 	}
 	else
 	{
@@ -3633,7 +3633,7 @@ int create_blank_mobile(int nr)
 	mob_index[cur_index].progtypes = 0;
 
 	// update index of all mobiles in game
-	auto &character_list = DC::instance().character_list;
+	auto &character_list = DC::getInstance()->character_list;
 	for_each(character_list.begin(), character_list.end(),
 			 [&cur_index](char_data *const &curr)
 			 {
@@ -3701,7 +3701,7 @@ void delete_mob_from_index(int nr)
 	top_of_mobt--;
 
 	// update index of all mobiles in game - these store rnums
-	auto &character_list = DC::instance().character_list;
+	auto &character_list = DC::getInstance()->character_list;
 	for_each(character_list.begin(), character_list.end(),
 			 [&nr](char_data *const &curr)
 			 {
@@ -4387,7 +4387,7 @@ struct obj_data *clone_object(int nr)
 		obj->obj_flags.type_flag == ITEM_MEGAPHONE ||
 		has_random(obj))
 	{
-		DC::instance().active_obj_list.insert(obj);
+		DC::getInstance()->active_obj_list.insert(obj);
 	}
 	return obj;
 }
@@ -4566,7 +4566,7 @@ void zone_update(void)
 		if (zone_table[i].num_mob_first_repop == 0)
 			zone_table[i].num_mob_first_repop = zone_table[i].num_mob_on_repop;
 	}
-	DC::instance().removeDead();
+	DC::getInstance()->removeDead();
 }
 
 /* execute the reset command table of a given zone */
@@ -4681,7 +4681,7 @@ void reset_zone(int zone)
 					}
 					else
 					{
-						DC::config &cf = DC::instance().cf;
+						DC::config &cf = DC::getInstance()->cf;
 
 						if (cf.test_world == false && cf.test_mobs == false && cf.test_objs == false)
 						{
@@ -4990,7 +4990,7 @@ void reset_zone(int zone)
 	{
 		zone_table[zone].repops_with_bonus++;
 
-		auto &character_list = DC::instance().character_list;
+		auto &character_list = DC::getInstance()->character_list;
 		for (auto &tmp_victim : character_list)
 		{
 			if (tmp_victim->in_room == NOWHERE)
@@ -5571,8 +5571,8 @@ void free_char(char_data *ch, Trace trace)
 	struct char_player_alias *x;
 	struct char_player_alias *next;
 	mob_prog_act_list *currmprog;
-	auto &character_list = DC::instance().character_list;
-	auto &free_list = DC::instance().free_list;
+	auto &character_list = DC::getInstance()->character_list;
+	auto &free_list = DC::getInstance()->free_list;
 
 	if (free_list.contains(ch))
 	{
@@ -5586,7 +5586,7 @@ void free_char(char_data *ch, Trace trace)
 			logf(IMMORTAL, LogChannels::LOG_BUG, "free_char: previously freed char_data %p found in character_list", ch);
 		}
 
-		auto &shooting_list = DC::instance().shooting_list;
+		auto &shooting_list = DC::getInstance()->shooting_list;
 		if (shooting_list.contains(ch))
 		{
 			logf(IMMORTAL, LogChannels::LOG_BUG, "free_char: previously freed char_data %p found in shooting_list", ch);

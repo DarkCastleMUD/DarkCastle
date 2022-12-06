@@ -777,7 +777,7 @@ int do_zedit(char_data *ch, char *argument, int cmd)
     // j = i-1 because the user sees arrays starting at 1
     for (j = i - 1; zone_table[zone].cmd[j].command != 'S'; j++)
     {
-      auto &character_list = DC::instance().character_list;
+      auto &character_list = DC::getInstance()->character_list;
       for (auto &tmp_vict : character_list)
       {
         if (IS_MOB(tmp_vict) && tmp_vict->mobdata && tmp_vict->mobdata->reset == &zone_table[zone].cmd[j])
@@ -3872,7 +3872,7 @@ int do_medit(char_data *ch, char *argument, int cmd)
           ch);
       return eFAILURE;
     }
-    auto &character_list = DC::instance().character_list;
+    auto &character_list = DC::getInstance()->character_list;
     for (auto &v : character_list)
     {
       if (IS_NPC(v) && v->mobdata->nr == mob_num)

@@ -133,7 +133,7 @@ int do_showbits(char_data *ch, char *argument, int cmd)
   if (!*person)
   {
     char buf[MAX_STRING_LENGTH];
-    auto &character_list = DC::instance().character_list;
+    auto &character_list = DC::getInstance()->character_list;
     for (auto &victim : character_list)
     {
       if (IS_NPC(victim))

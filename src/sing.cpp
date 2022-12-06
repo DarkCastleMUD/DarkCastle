@@ -719,7 +719,7 @@ void update_bard_singing()
 {
 	vector<songInfo>::iterator j;
 
-	auto &character_list = DC::instance().character_list;
+	auto &character_list = DC::getInstance()->character_list;
 	find_if(character_list.begin(), character_list.end(), [&j](char_data *const &i)
 			{
 		if (IS_PC(i) && GET_CLASS(i) != CLASS_BARD && GET_LEVEL(i) < IMMORTAL)
@@ -884,7 +884,7 @@ void update_bard_singing()
 	}
 }
 return false; });
-	DC::instance().removeDead();
+	DC::getInstance()->removeDead();
 }
 
 int song_hypnotic_harmony(uint8_t level, char_data *ch, char *arg, char_data *victim, int skill)

@@ -12,6 +12,8 @@
 #include <sstream>
 #include <iostream>
 
+#include <QCoreApplication>
+
 // DC headers
 #include "fileinfo.h"
 #include "utility.h"
@@ -32,38 +34,41 @@ DC::config parse_arguments(int argc, char *const argv[]);
  *  main game loop and related stuff                                  *
  **********************************************************************/
 
-int main(int argc, char *const argv[])
+int main(int argc, char **argv)
 {
+  DC dcastle(argc, argv);
+  QThread::currentThread()->setObjectName("Main Thread");
+
   struct stat stat_buffer;
   char char_buffer[512] = {'\0'};
 
-  DC &dc = DC::instance();
-  dc.cf = parse_arguments(argc, argv);
+  DC *dc = dynamic_cast<DC *>(DC::instance());
+  dc->cf = parse_arguments(argc, argv);
 
   logf(0, LogChannels::LOG_MISC, "Executable: %s Version: %s Build date: %s\n", argv[0], DC::getVersion().c_str(), DC::getBuildTime().c_str());
   backup_executable(argv);
 
   // If no ports specified then set default ports
-  if (dc.cf.ports.size() == 0)
+  if (dc->cf.ports.size() == 0)
   {
-    dc.cf.ports.push_back(DFLT_PORT);
-    dc.cf.ports.push_back(DFLT_PORT2);
-    dc.cf.allow_multi = true;
-    dc.cf.ports.push_back(DFLT_PORT3);
-    dc.cf.ports.push_back(DFLT_PORT4);
+    dc->cf.ports.push_back(DFLT_PORT);
+    dc->cf.ports.push_back(DFLT_PORT2);
+    dc->cf.allow_multi = true;
+    dc->cf.ports.push_back(DFLT_PORT3);
+    dc->cf.ports.push_back(DFLT_PORT4);
   }
 
   orig_argv = argv;
 
   init_random();
 
-  logf(0, LogChannels::LOG_MISC, "Using %s as data directory.", dc.cf.dir.c_str());
+  logf(0, LogChannels::LOG_MISC, "Using %s as data directory.", dc->cf.dir.c_str());
 
-  if (stat(dc.cf.dir.c_str(), &stat_buffer) == -1)
+  if (stat(dc->cf.dir.c_str(), &stat_buffer) == -1)
   {
     if (errno == ENOENT)
     {
-      logf(0, LogChannels::LOG_MISC, "Data directory %s is missing.", dc.cf.dir.c_str());
+      logf(0, LogChannels::LOG_MISC, "Data directory %s is missing.", dc->cf.dir.c_str());
     }
     else
     {
@@ -72,16 +77,16 @@ int main(int argc, char *const argv[])
     exit(EXIT_FAILURE);
   }
 
-  if (chdir(dc.cf.dir.c_str()) < 0)
+  if (chdir(dc->cf.dir.c_str()) < 0)
   {
     const char *strerror_result = strerror_r(errno, char_buffer, sizeof(char_buffer));
-    logf(0, LogChannels::LOG_MISC, "Error changing current directory to %s: %s", dc.cf.dir, strerror_result);
+    logf(0, LogChannels::LOG_MISC, "Error changing current directory to %s: %s", dc->cf.dir, strerror_result);
     exit(EXIT_FAILURE);
   }
 
   DCVote = new CVoteData();
 
-  if (dc.cf.check_syntax)
+  if (dc->cf.check_syntax)
   {
     boot_zones();
     boot_world();
@@ -90,7 +95,7 @@ int main(int argc, char *const argv[])
   }
   else
   {
-    dc.init_game();
+    dc->init_game();
   }
 
   delete DCVote;

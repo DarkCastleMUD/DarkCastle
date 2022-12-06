@@ -964,7 +964,7 @@ void affect_update(int32_t duration_type)
   if (duration_type != PULSE_REGEN && duration_type != PULSE_TIMER && duration_type != PULSE_VIOLENCE && duration_type != PULSE_TIME) // Default
     return;
 
-  auto &character_list = DC::instance().character_list;
+  auto &character_list = DC::getInstance()->character_list;
   for (auto &i : character_list)
   {
     // This doesn't really belong here, but it beats creating an "update" just for it.
@@ -1040,7 +1040,7 @@ void affect_update(int32_t duration_type)
     }
     continue;
   }
-  DC::instance().removeDead();
+  DC::getInstance()->removeDead();
 }
 
 // Sets any ISR's that go with a spell..  (ISR's arent saved)

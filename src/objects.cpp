@@ -168,7 +168,7 @@ int damage_eq_once(obj_data *obj)
 
 void object_activity(uint64_t pulse_type)
 {
-  for (auto &obj : DC::instance().active_obj_list)
+  for (auto &obj : DC::getInstance()->active_obj_list)
   {
     int32_t item_number = obj->item_number;
 
@@ -198,7 +198,7 @@ void object_activity(uint64_t pulse_type)
     }
   }
 
-  DC::instance().removeDead();
+  DC::getInstance()->removeDead();
   return;
 }
 

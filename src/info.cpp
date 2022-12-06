@@ -2685,7 +2685,7 @@ int do_mlocate(char_data *ch, char *name, int cmd)
    *buf2 = '\0';
    send_to_char(" #   Short description          Room Number\n\n\r", ch);
 
-   auto &character_list = DC::instance().character_list;
+   auto &character_list = DC::getInstance()->character_list;
    for (auto &i : character_list)
    {
 
@@ -3322,7 +3322,7 @@ void check_champion_and_website_who_list()
    int addminute = 0;
    string name;
 
-   auto &character_list = DC::instance().character_list;
+   auto &character_list = DC::getInstance()->character_list;
    for (auto &ch : character_list)
    {
 

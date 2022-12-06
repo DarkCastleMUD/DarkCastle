@@ -325,10 +325,10 @@ void log(string str, int god_level, LogChannels type, char_data *vict)
   FILE **f = 0;
   int stream = 1;
   stringstream logpath;
-  DC &dc = DC::instance();
-  DC::config &cf = dc.cf;
+  DC *dc = dynamic_cast<DC *>(DC::instance());
+  DC::config &cf = dc->cf;
 
-  if (DC::instance().cf.bport)
+  if (DC::getInstance()->cf.bport)
   {
     logpath << "../blog/";
   }
@@ -2172,7 +2172,7 @@ void check_timer()
     }
     las = curr;
   }
-  DC::instance().removeDead();
+  DC::getInstance()->removeDead();
 }
 
 int get_line(FILE *fl, char *buf)
@@ -2368,7 +2368,7 @@ void remove_character(char *name, BACKUP_TYPE backup)
     break;
   }
 
-  if (DC::instance().cf.bport)
+  if (DC::getInstance()->cf.bport)
   {
     snprintf(src_filename, 256, "%s/%c/%s", BSAVE_DIR, name[0], name);
   }
@@ -2390,7 +2390,7 @@ void remove_character(char *name, BACKUP_TYPE backup)
     }
   }
 
-  if (DC::instance().cf.bport)
+  if (DC::getInstance()->cf.bport)
   {
     snprintf(src_filename, 256, "%s/%c/%s.backup", BSAVE_DIR, name[0], name);
   }
@@ -2535,7 +2535,7 @@ void update_make_camp_and_leadership(void)
 {
   struct affected_type af;
   int bonus = 0;
-  auto &character_list = DC::instance().character_list;
+  auto &character_list = DC::getInstance()->character_list;
 
   for_each(character_list.begin(), character_list.end(),
            [&af, &bonus](char_data *i)
@@ -2979,7 +2979,7 @@ bool char_file_exists(string name)
 
   string filename;
 
-  if (DC::instance().cf.bport)
+  if (DC::getInstance()->cf.bport)
   {
     filename = fmt::format("{}/{}/{}", BSAVE_DIR, name[0], name);
   }

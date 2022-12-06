@@ -2452,7 +2452,7 @@ int do_oclone(char_data *ch, char *argument, int cmd)
 	  if(obj_index[obj->item_number].non_combat_func ||
 			obj->obj_flags.type_flag == ITEM_MEGAPHONE ||
 			has_random(obj)) {
-		DC::instance().obj_free_list.insert(obj);
+		DC::getInstance()->obj_free_list.insert(obj);
 	  }
 	*/
 
@@ -2530,7 +2530,7 @@ int do_mclone(char_data *ch, char *argument, int cmd)
 	// This undos the change
 	mob_index[src].number--;
 
-	auto &character_list = DC::instance().character_list;
+	auto &character_list = DC::getInstance()->character_list;
 	character_list.erase(mob);
 	mob->mobdata->nr = dst;
 
@@ -2538,7 +2538,7 @@ int do_mclone(char_data *ch, char *argument, int cmd)
 	char_data *old_mob = (char_data *)mob_index[dst].item;
 	if (old_mob && old_mob->mobdata)
 	{
-		auto &character_list = DC::instance().character_list;
+		auto &character_list = DC::getInstance()->character_list;
 		for (auto &tmpch : character_list)
 		{
 			if (!tmpch->mobdata)

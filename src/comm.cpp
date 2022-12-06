@@ -33,6 +33,7 @@
 #include <cstdint>
 
 #include <fmt/format.h>
+#include <QTimer>
 
 #include "terminal.h"
 #include "fileinfo.h"
@@ -135,8 +136,6 @@ int pulse_short; // short timer, for archery
 Database db;
 #endif
 
-SSH ssh;
-
 /* functions in this file */
 void update_mprog_throws(void);
 void update_bard_singing(void);
@@ -214,9 +213,9 @@ int write_hotboot_file(char **new_argv)
     return 0;
   }
 
-  DC &dc = DC::instance();
+  DC *dc = dynamic_cast<DC *>(DC::instance());
   // for_each(dc.server_descriptor_list.begin(), dc.server_descriptor_list.end(), [fp](server_descriptor_list_i i)
-  for_each(dc.server_descriptor_list.begin(), dc.server_descriptor_list.end(), [&fp](const int &fd)
+  for_each(dc->server_descriptor_list.begin(), dc->server_descriptor_list.end(), [&fp](const int &fd)
            { fprintf(fp, "%d\n", fd); });
 
   for (d = descriptor_list; d; d = sd)
@@ -293,6 +292,9 @@ int write_hotboot_file(char **new_argv)
   }
   char *buffer = new char[100];
   getcwd(buffer, 99);
+
+  DC::getInstance()->ssh.close();
+
   logf(108, LogChannels::LOG_GOD, "Hotbooting %s at [%s]", argv_string.str().c_str(), buffer);
 
   if (-1 == execv(argv[0], argv))
@@ -315,7 +317,7 @@ int load_hotboot_descs()
   char host[MAX_INPUT_LENGTH] = {}, buf[MAX_STRING_LENGTH] = {};
   int desc = {};
   struct descriptor_data *d = nullptr;
-  DC &dc = DC::instance();
+  DC *dc = dynamic_cast<DC *>(DC::instance());
   ifstream ifs;
 
   ifs.exceptions(ifstream::eofbit | ifstream::failbit | ifstream::badbit);
@@ -326,11 +328,11 @@ int load_hotboot_descs()
     unlink("hotboot");
     log("Hotboot, reloading characters.", 0, LogChannels::LOG_MISC);
 
-    for_each(dc.cf.ports.begin(), dc.cf.ports.end(), [&dc, &ifs](in_port_t &port)
+    for_each(dc->cf.ports.begin(), dc->cf.ports.end(), [&dc, &ifs](in_port_t &port)
              {
              int fd;
             ifs >> fd;
-            dc.server_descriptor_list.insert(fd); });
+            dc->server_descriptor_list.insert(fd); });
 
     while (ifs.good())
     {
@@ -427,7 +429,7 @@ void finish_hotboot()
 
     d->output.clear();
 
-    auto &character_list = DC::instance().character_list;
+    auto &character_list = DC::getInstance()->character_list;
     character_list.insert(d->character);
 
     do_on_login_stuff(d->character);
@@ -522,11 +524,11 @@ void DC::init_game(void)
 
   unlink("died_in_bootup");
 
-  if (DC::instance().cf.bport == false)
+  if (DC::getInstance()->cf.bport == false)
   {
     do_not_save_corpses = 0;
   }
-  game_loop();
+  game_loop_init();
   do_not_save_corpses = 1;
 
   log("Closing all sockets.", 0, LogChannels::LOG_MISC);
@@ -577,7 +579,7 @@ void DC::init_game(void)
   free_ban_list_from_memory();
   log("Freeing the bufpool.", 0, LogChannels::LOG_MISC);
   free_buff_pool_from_memory();
-  DC::instance().removeDead();
+  DC::getInstance()->removeDead();
 #endif
 
   log("Goodbye.", 0, LogChannels::LOG_MISC);
@@ -660,13 +662,9 @@ uint64_t pulseavg = 0;
  * new connections, polling existing connections for input, dequeueing
  * output and sending it out to players, and calling "heartbeat" function
  */
+
 void DC::game_loop(void)
 {
-
-  fd_set input_set = {}, output_set = {}, exc_set = {}, null_set = {};
-  struct timeval last_time = {}, delay_time = {}, now_time = {};
-  int32_t secDelta = {}, usecDelta = {};
-
   // comm must be much longer than MAX_INPUT_LENGTH since we allow aliases in-game
   // otherwise an alias'd command could easily overrun the buffer
   string comm = {};
@@ -675,255 +673,270 @@ void DC::game_loop(void)
   int maxdesc = {};
   int aliased = false;
 
-  null_time.tv_sec = 0;
-  null_time.tv_usec = 0;
-  FD_ZERO(&null_set);
-  init_heartbeat();
-
-  gettimeofday(&last_time, NULL);
-
   /* The Main Loop.  The Big Cheese.  The Top Dog.  The Head Honcho.  The.. */
-  while (!_shutdown)
-  {
-    PerfTimers["gameloop"].start();
-    // Set CommandStack to track a command stack with max queue depth of 20
-    CommandStack cstack(0, 5);
+  PerfTimers["gameloop"].start();
+  // Set CommandStack to track a command stack with max queue depth of 20
+  CommandStack cstack(0, 5);
 
-    selfpurge = false;
-    // Set up the input, output, and exception sets for select().
-    FD_ZERO(&input_set);
-    FD_ZERO(&output_set);
-    FD_ZERO(&exc_set);
+  selfpurge = false;
+  // Set up the input, output, and exception sets for select().
+  FD_ZERO(&input_set);
+  FD_ZERO(&output_set);
+  FD_ZERO(&exc_set);
 
-    maxdesc = 0;
-    for_each(server_descriptor_list.begin(), server_descriptor_list.end(), [&input_set, &maxdesc](const int &fd)
-             {
+  maxdesc = 0;
+  fd_set &input_set = this->input_set;
+  for_each(server_descriptor_list.begin(), server_descriptor_list.end(), [&input_set, &maxdesc](const int &fd)
+           {
                FD_SET(fd, &input_set);
                if (fd > maxdesc)
                {
                  maxdesc = fd;
                } });
 
-    for (d = descriptor_list; d; d = d->next)
-    {
-      if (d->descriptor > maxdesc)
-        maxdesc = d->descriptor;
-      FD_SET(d->descriptor, &input_set);
-      FD_SET(d->descriptor, &output_set);
-      FD_SET(d->descriptor, &exc_set);
-    }
+  for (d = descriptor_list; d; d = d->next)
+  {
+    if (d->descriptor > maxdesc)
+      maxdesc = d->descriptor;
+    FD_SET(d->descriptor, &input_set);
+    FD_SET(d->descriptor, &output_set);
+    FD_SET(d->descriptor, &exc_set);
+  }
 
-    // poll (without blocking) for new input, output, and exceptions
-    if (select(maxdesc + 1, &input_set, &output_set, &exc_set, &null_time) < 0)
+  // poll (without blocking) for new input, output, and exceptions
+  if (select(maxdesc + 1, &input_set, &output_set, &exc_set, &null_time) < 0)
+  {
+    int save_errno = errno;
+    perror("game_loop : select : poll");
+    if (save_errno != EINTR)
     {
-      int save_errno = errno;
-      perror("game_loop : select : poll");
-      if (save_errno != EINTR)
-      {
-        return;
-      }
+      return;
     }
+  }
 
-    // If new connection waiting, accept it
-    for_each(server_descriptor_list.begin(), server_descriptor_list.end(), [&input_set](const int &fd)
-             {
+  // If new connection waiting, accept it
+  for_each(server_descriptor_list.begin(), server_descriptor_list.end(), [this, &input_set](const int &fd)
+           {
                if (FD_ISSET(fd, &input_set))
                {
                  new_descriptor(fd);
                } });
 
-    // close the weird descriptors in the exception set
-    for (d = descriptor_list; d; d = next_d)
+  // close the weird descriptors in the exception set
+  for (d = descriptor_list; d; d = next_d)
+  {
+    next_d = d->next;
+    if (FD_ISSET(d->descriptor, &exc_set))
     {
-      next_d = d->next;
-      if (FD_ISSET(d->descriptor, &exc_set))
+      FD_CLR(d->descriptor, &input_set);
+      FD_CLR(d->descriptor, &output_set);
+      close_socket(d);
+    }
+  }
+
+  /* process descriptors with input pending */
+  for (d = descriptor_list; d; d = next_d)
+  {
+    next_d = d->next;
+    if (FD_ISSET(d->descriptor, &input_set))
+    {
+      if (process_input(d) < 0)
       {
-        FD_CLR(d->descriptor, &input_set);
-        FD_CLR(d->descriptor, &output_set);
+        if (strcmp(d->host, "127.0.0.1"))
+        {
+          sprintf(buf, "Connection attempt bailed from %s", d->host);
+          printf(buf);
+          log(buf, 111, LogChannels::LOG_SOCKET);
+        }
         close_socket(d);
       }
     }
+  }
 
-    /* process descriptors with input pending */
-    for (d = descriptor_list; d; d = next_d)
+  /* process commands we just read from process_input */
+  for (d = descriptor_list; d; d = next_d)
+  {
+    next_d = d->next;
+    d->wait = MAX(d->wait, 1);
+    if (d->connected == conn::CLOSE)
     {
-      next_d = d->next;
-      if (FD_ISSET(d->descriptor, &input_set))
-      {
-        if (process_input(d) < 0)
-        {
-          if (strcmp(d->host, "127.0.0.1"))
-          {
-            sprintf(buf, "Connection attempt bailed from %s", d->host);
-            printf(buf);
-            log(buf, 111, LogChannels::LOG_SOCKET);
-          }
-          close_socket(d);
-        }
-      }
+      close_socket(d); // So they don't have to type a command.
+      continue;
     }
-
-    /* process commands we just read from process_input */
-    for (d = descriptor_list; d; d = next_d)
+    --(d->wait);
+    if (STATE(d) == conn::QUESTION_ANSI ||
+        STATE(d) == conn::QUESTION_SEX ||
+        STATE(d) == conn::QUESTION_STAT_METHOD ||
+        STATE(d) == conn::NEW_STAT_METHOD ||
+        STATE(d) == conn::OLD_STAT_METHOD ||
+        STATE(d) == conn::QUESTION_RACE ||
+        STATE(d) == conn::QUESTION_CLASS ||
+        STATE(d) == conn::QUESTION_STATS ||
+        STATE(d) == conn::NEW_PLAYER)
     {
-      next_d = d->next;
-      d->wait = MAX(d->wait, 1);
-      if (d->connected == conn::CLOSE)
-      {
-        close_socket(d); // So they don't have to type a command.
-        continue;
-      }
-      --(d->wait);
-      if (STATE(d) == conn::QUESTION_ANSI ||
-          STATE(d) == conn::QUESTION_SEX ||
-          STATE(d) == conn::QUESTION_STAT_METHOD ||
-          STATE(d) == conn::NEW_STAT_METHOD ||
-          STATE(d) == conn::OLD_STAT_METHOD ||
-          STATE(d) == conn::QUESTION_RACE ||
-          STATE(d) == conn::QUESTION_CLASS ||
-          STATE(d) == conn::QUESTION_STATS ||
-          STATE(d) == conn::NEW_PLAYER)
-      {
-        nanny(d);
-      }
-      else if ((d->wait <= 0) && !d->input.empty())
-      {
+      nanny(d);
+    }
+    else if ((d->wait <= 0) && !d->input.empty())
+    {
 
-        comm = get_from_q(d->input);
+      comm = get_from_q(d->input);
 #ifdef DEBUG_INPUT
-        cerr << "Got command [" << comm << "] from the d->input queue" << endl;
+      cerr << "Got command [" << comm << "] from the d->input queue" << endl;
 #endif
-        /* reset the idle timer & pull char back from void if necessary */
-        d->wait = 1;
-        d->prompt_mode = 1;
+      /* reset the idle timer & pull char back from void if necessary */
+      d->wait = 1;
+      d->prompt_mode = 1;
 
-        if (d->showstr_count) /* reading something w/ pager     */
-          show_string(d, comm.data());
-        //	else if (d->str)		/* writing boards, mail, etc.     */
-        //	  string_add(d, comm);
-        else if (d->strnew && STATE(d) == conn::EXDSCR)
-          new_string_add(d, comm.data());
-        else if (d->hashstr)
-          string_hash_add(d, comm.data());
-        else if (d->strnew && (IS_MOB(d->character) || !IS_SET(d->character->pcdata->toggles, PLR_EDITOR_WEB)))
-          new_string_add(d, comm.data());
-        else if (d->connected != conn::PLAYING) /* in menus, etc. */
-          nanny(d, comm);
-        else
-        {              /* else: we're playing normally */
-          if (aliased) /* to prevent recursive aliases */
-            d->prompt_mode = 0;
-          else
-          {
-            comm = perform_alias(d, comm);
-          }
-          PerfTimers["command"].start();
-          // Azrack's a chode.  Don't forget to check
-          // ->snooping before you check snooping->char:P
-          if (!comm.empty() && comm[0] == '%' && d->snooping && d->snooping->character)
-          {
-            command_interpreter(d->snooping->character, comm.substr(1));
-          }
-          else
-          {
-            command_interpreter(d->character, comm); /* send it to interpreter */
-          }
-          PerfTimers["command"].stop();
-
-        } // else if input
-      }   // if input
-      // the below two if-statements are used to allow the mud to detect and respond
-      // to web-browsers attempting to connect to the game on port 80
-      // this line processes a "get" or "post" if available.  Otherwise it prints the
-      // entrance screen.  If a player has already entered their name, it processes
-      // that too.
-      else if (d->connected == conn::DISPLAY_ENTRANCE)
-        nanny(d, "");
-      // this line allows the mud to skip this descriptor until next pulse
-      else if (d->connected == conn::PRE_DISPLAY_ENTRANCE)
-        d->connected = conn::DISPLAY_ENTRANCE;
+      if (d->showstr_count) /* reading something w/ pager     */
+        show_string(d, comm.data());
+      //	else if (d->str)		/* writing boards, mail, etc.     */
+      //	  string_add(d, comm);
+      else if (d->strnew && STATE(d) == conn::EXDSCR)
+        new_string_add(d, comm.data());
+      else if (d->hashstr)
+        string_hash_add(d, comm.data());
+      else if (d->strnew && (IS_MOB(d->character) || !IS_SET(d->character->pcdata->toggles, PLR_EDITOR_WEB)))
+        new_string_add(d, comm.data());
+      else if (d->connected != conn::PLAYING) /* in menus, etc. */
+        nanny(d, comm);
       else
-        d->idle_time++;
-    } // for
+      {              /* else: we're playing normally */
+        if (aliased) /* to prevent recursive aliases */
+          d->prompt_mode = 0;
+        else
+        {
+          comm = perform_alias(d, comm);
+        }
+        PerfTimers["command"].start();
+        // Azrack's a chode.  Don't forget to check
+        // ->snooping before you check snooping->char:P
+        if (!comm.empty() && comm[0] == '%' && d->snooping && d->snooping->character)
+        {
+          command_interpreter(d->snooping->character, comm.substr(1));
+        }
+        else
+        {
+          command_interpreter(d->character, comm); /* send it to interpreter */
+        }
+        PerfTimers["command"].stop();
 
-    // do what needs to be done.  violence, repoping, regen, etc.
-    PerfTimers["heartbeat"].start();
-    heartbeat();
-    PerfTimers["heartbeat"].stop();
+      } // else if input
+    }   // if input
+    // the below two if-statements are used to allow the mud to detect and respond
+    // to web-browsers attempting to connect to the game on port 80
+    // this line processes a "get" or "post" if available.  Otherwise it prints the
+    // entrance screen.  If a player has already entered their name, it processes
+    // that too.
+    else if (d->connected == conn::DISPLAY_ENTRANCE)
+      nanny(d, "");
+    // this line allows the mud to skip this descriptor until next pulse
+    else if (d->connected == conn::PRE_DISPLAY_ENTRANCE)
+      d->connected = conn::DISPLAY_ENTRANCE;
+    else
+      d->idle_time++;
+  } // for
+
+  // do what needs to be done.  violence, repoping, regen, etc.
+  PerfTimers["heartbeat"].start();
+  heartbeat();
+  PerfTimers["heartbeat"].stop();
 
 #ifdef USE_SQL
-    PerfTimers["db"].start();
-    db.processqueue();
-    PerfTimers["db"].stop();
+  PerfTimers["db"].start();
+  db.processqueue();
+  PerfTimers["db"].stop();
 #endif
-    PerfTimers["output"].start();
+  PerfTimers["output"].start();
 
-    /* send queued output out to the operating system (ultimately to user) */
-    for (d = descriptor_list; d; d = next_d)
+  /* send queued output out to the operating system (ultimately to user) */
+  for (d = descriptor_list; d; d = next_d)
+  {
+    next_d = d->next;
+    if ((FD_ISSET(d->descriptor, &output_set) && !d->output.empty()) || d->prompt_mode)
+      if (process_output(d) < 0)
+        close_socket(d);
+    // else
+    // d->prompt_mode = 1;
+  }
+  PerfTimers["output"].stop();
+  // we're done with this pulse.  Now calculate the time until the next pulse and sleep until then
+  // we want to pulse PASSES_PER_SEC times a second (duh).  This is currently 4.
+
+  gettimeofday(&now_time, NULL);
+  usecDelta = ((int)last_time.tv_usec) - ((int)now_time.tv_usec);
+  secDelta = ((int)last_time.tv_sec) - ((int)now_time.tv_sec);
+
+  /*
+  if (now_time.tv_sec-last_time.tv_sec > 0 || now_time.tv_usec-last_time.tv_usec > 20000) {
+    timingDebugStr <<  "Time since last pulse is "
+        << (((int) now_time.tv_sec) - ((int) last_time.tv_sec)) << "sec "
+        << (((int) now_time.tv_usec) - ((int) last_time.tv_usec)) << "usec.\r\n";
+    //logf(110, LogChannels::LOG_BUG, timingDebugStr.str().c_str());
+  }
+  */
+
+  usecDelta += (1000000 / PASSES_PER_SEC);
+  while (usecDelta < 0)
+  {
+    usecDelta += 1000000;
+    secDelta -= 1;
+  }
+  while (usecDelta >= 1000000)
+  {
+    usecDelta -= 1000000;
+    secDelta += 1;
+  }
+  // logf(110, LogChannels::LOG_BUG, "secD : %d  usecD: %d", secDelta, usecDelta);
+
+  if (secDelta > 0 || (secDelta == 0 && usecDelta > 0))
+  {
+    delay_time.tv_usec = usecDelta;
+    delay_time.tv_sec = secDelta;
+    // logf(110, LogChannels::LOG_BUG, "Pausing for  %dsec %dusec.", secDelta, usecDelta);
+    int fd_nr = -1;
+    errno = 0;
+    fd_nr = select(0, NULL, NULL, NULL, &delay_time);
+    if (fd_nr == -1)
     {
-      next_d = d->next;
-      if ((FD_ISSET(d->descriptor, &output_set) && !d->output.empty()) || d->prompt_mode)
-        if (process_output(d) < 0)
-          close_socket(d);
-      // else
-      // d->prompt_mode = 1;
-    }
-    PerfTimers["output"].stop();
-    // we're done with this pulse.  Now calculate the time until the next pulse and sleep until then
-    // we want to pulse PASSES_PER_SEC times a second (duh).  This is currently 4.
-
-    gettimeofday(&now_time, NULL);
-    usecDelta = ((int)last_time.tv_usec) - ((int)now_time.tv_usec);
-    secDelta = ((int)last_time.tv_sec) - ((int)now_time.tv_sec);
-
-    /*
-    if (now_time.tv_sec-last_time.tv_sec > 0 || now_time.tv_usec-last_time.tv_usec > 20000) {
-      timingDebugStr <<  "Time since last pulse is "
-          << (((int) now_time.tv_sec) - ((int) last_time.tv_sec)) << "sec "
-          << (((int) now_time.tv_usec) - ((int) last_time.tv_usec)) << "usec.\r\n";
-      //logf(110, LogChannels::LOG_BUG, timingDebugStr.str().c_str());
-    }
-    */
-
-    usecDelta += (1000000 / PASSES_PER_SEC);
-    while (usecDelta < 0)
-    {
-      usecDelta += 1000000;
-      secDelta -= 1;
-    }
-    while (usecDelta >= 1000000)
-    {
-      usecDelta -= 1000000;
-      secDelta += 1;
-    }
-    // logf(110, LogChannels::LOG_BUG, "secD : %d  usecD: %d", secDelta, usecDelta);
-
-    if (secDelta > 0 || (secDelta == 0 && usecDelta > 0))
-    {
-      delay_time.tv_usec = usecDelta;
-      delay_time.tv_sec = secDelta;
-      // logf(110, LogChannels::LOG_BUG, "Pausing for  %dsec %dusec.", secDelta, usecDelta);
-      int fd_nr = -1;
-      errno = 0;
-      fd_nr = select(0, NULL, NULL, NULL, &delay_time);
-      if (fd_nr == -1)
+      if (errno == EINTR)
       {
-        if (errno == EINTR)
-        {
-          cerr << "select() interupted." << endl;
-        }
-        else
-        {
-          perror("game_loop: select: delay");
-          exit(1);
-        }
+        cerr << "select() interupted." << endl;
+      }
+      else
+      {
+        perror("game_loop: select: delay");
+        exit(1);
       }
     }
-    // temp removing this since it's spamming the crap out of us
-    // else logf(110, LogChannels::LOG_BUG, "0 delay on pulse");
-    gettimeofday(&last_time, NULL);
-    PerfTimers["gameloop"].stop();
   }
+  // temp removing this since it's spamming the crap out of us
+  // else logf(110, LogChannels::LOG_BUG, "0 delay on pulse");
+  gettimeofday(&last_time, NULL);
+  PerfTimers["gameloop"].stop();
+}
+
+void DC::game_loop_init(void)
+{
+  null_time.tv_sec = 0;
+  null_time.tv_usec = 0;
+  FD_ZERO(&null_set);
+  init_heartbeat();
+
+  ssh.setup();
+
+  gettimeofday(&last_time, NULL);
+
+  QTimer *gameLoopTimer = new QTimer(this);
+  connect(gameLoopTimer, &QTimer::timeout, this, &DC::game_loop);
+  gameLoopTimer->start();
+
+  // QTimer *sshLoopTimer = new QTimer(this);
+  // connect(sshLoopTimer, &QTimer::timeout, &ssh, &SSH::SSH::poll);
+  // sshLoopTimer->start();
+
+  exec();
+
+  ssh.close();
 }
 
 extern void pulse_hunts();
@@ -1075,7 +1088,7 @@ void heartbeat()
     leaderboard.check(); // good place to put this
     PerfTimers["leaderboard"].stop();
 
-    if (DC::instance().cf.bport == false)
+    if (DC::getInstance()->cf.bport == false)
     {
       PerfTimers["check_champ"].start();
       check_champion_and_website_who_list();

@@ -448,7 +448,7 @@ int do_rename_char(char_data *ch, char *arg, int cmd)
   }
 
   // extern short bport;
-  if (DC::instance().cf.bport == false)
+  if (DC::getInstance()->cf.bport == false)
   {
     sprintf(strsave, "%s/%c/%s", SAVE_DIR, newname[0], newname);
   }
@@ -526,7 +526,7 @@ int do_rename_char(char_data *ch, char *arg, int cmd)
   do_fsave(ch, GET_NAME(victim), CMD_DEFAULT);
 
   // Copy the pfile
-  if (DC::instance().cf.bport == false)
+  if (DC::getInstance()->cf.bport == false)
   {
     sprintf(name, "cp %s/%c/%s %s/%c/%s", SAVE_DIR, victim->name[0], GET_NAME(victim), SAVE_DIR, newname[0], newname);
   }
@@ -674,7 +674,7 @@ int do_install(char_data *ch, char *arg, int cmd)
     return eFAILURE;
   }
 
-  sprintf(buf, "./new_zone %d %d %c true %s", range, numrooms, *type, DC::instance().cf.bport == true ? "b" : "n");
+  sprintf(buf, "./new_zone %d %d %c true %s", range, numrooms, *type, DC::getInstance()->cf.bport == true ? "b" : "n");
   ret = system(buf);
   // ret = bits, but I didn't use bits because I'm lazy and it only returns 2 values I gives a flyging fuck about!
   // if you change the script, you gotta change this too. - Rahz

@@ -849,7 +849,7 @@ void nanny(struct descriptor_data *d, string arg)
    int y;
    char badclssmsg[] = "You must choose a class that matches your stats. These are marked by a '*'.\n\rSelect a class-> ";
    unsigned selection = 0;
-   auto &character_list = DC::instance().character_list;
+   auto &character_list = DC::getInstance()->character_list;
    char log_buf[MAX_STRING_LENGTH] = {};
 
    ch = d->character;
@@ -1003,7 +1003,7 @@ void nanny(struct descriptor_data *d, string arg)
       }
       else
       {
-         if (DC::instance().cf.bport)
+         if (DC::getInstance()->cf.bport)
          {
             SEND_TO_Q("New chars not allowed on this port.\r\nEnter a new name: ", d);
             return;
@@ -1024,7 +1024,7 @@ void nanny(struct descriptor_data *d, string arg)
       password = ch->pcdata->pwd;
 
       // If -P option passed and one of your other characters is an imp, allow this char with that imp's password
-      if (DC::instance().cf.allow_imp_password && allowed_host(d->host))
+      if (DC::getInstance()->cf.allow_imp_password && allowed_host(d->host))
       {
          for (descriptor_data *ad = descriptor_list; ad && ad != (descriptor_data *)0x95959595; ad = ad->next)
          {
@@ -1256,7 +1256,7 @@ void nanny(struct descriptor_data *d, string arg)
       }
 
       /*
-            if (!allowed_host(d->host) && DC::instance().cf.allow_newstatsys == false)
+            if (!allowed_host(d->host) && DC::getInstance()->cf.allow_newstatsys == false)
             {
                STATE(d) = conn::OLD_STAT_METHOD;
                break;
@@ -2047,7 +2047,7 @@ bool check_deny(struct descriptor_data *d, char *name)
 // Look for link-dead player to reconnect.
 bool check_reconnect(struct descriptor_data *d, char *name, bool fReconnect)
 {
-   auto &character_list = DC::instance().character_list;
+   auto &character_list = DC::getInstance()->character_list;
    for (auto &tmp_ch : character_list)
    {
       if (IS_NPC(tmp_ch) || tmp_ch->desc != NULL)
@@ -2158,7 +2158,7 @@ char *str_str(char *first, char *second)
 
 void short_activity()
 { // handles short activity. at the moment, only archery.
-   DC::instance().handleShooting();
+   DC::getInstance()->handleShooting();
 }
 
 // these are for my special lag that only keeps you from doing certain
@@ -2185,7 +2185,7 @@ void update_characters()
    char log_msg[MAX_STRING_LENGTH], dammsg[MAX_STRING_LENGTH];
    struct affected_type af;
 
-   auto &character_list = DC::instance().character_list;
+   auto &character_list = DC::getInstance()->character_list;
    for (auto &i : character_list)
    {
 
@@ -2508,7 +2508,7 @@ void checkConsecrate(int pulseType)
          }
       }
    }
-   DC::instance().removeDead();
+   DC::getInstance()->removeDead();
    return;
 }
 

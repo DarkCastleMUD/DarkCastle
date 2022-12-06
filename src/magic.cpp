@@ -954,7 +954,7 @@ int spell_earthquake(uint8_t level, char_data *ch, char_data *victim, struct obj
     break;
   }
 
-  auto &character_list = DC::instance().character_list;
+  auto &character_list = DC::getInstance()->character_list;
   for (auto &tmp_victim : character_list)
   {
     if (IS_SET(retval, eCH_DIED))
@@ -1286,7 +1286,7 @@ int spell_group_recall(uint8_t level, char_data *ch, char_data *victim, struct o
     chance = 1;
   }
 
-  auto &character_list = DC::instance().character_list;
+  auto &character_list = DC::getInstance()->character_list;
   for (auto &tmp_victim : character_list)
   {
     if (GET_POS(tmp_victim) == POSITION_DEAD || tmp_victim->in_room == NOWHERE)
@@ -1319,7 +1319,7 @@ int spell_group_recall(uint8_t level, char_data *ch, char_data *victim, struct o
 
 int spell_group_fly(uint8_t level, char_data *ch, char_data *victim, struct obj_data *obj, int skill)
 {
-  auto &character_list = DC::instance().character_list;
+  auto &character_list = DC::getInstance()->character_list;
   for (auto &tmp_victim : character_list)
   {
 
@@ -1354,7 +1354,7 @@ int spell_heroes_feast(uint8_t level, char_data *ch, char_data *victim, struct o
     GET_COND(ch, THIRST) = result;
   }
   send_to_char("You partake in a magnificent feast!\n\r", ch);
-  auto &character_list = DC::instance().character_list;
+  auto &character_list = DC::getInstance()->character_list;
   for (auto &tmp_victim : character_list)
   {
     if (GET_POS(tmp_victim) == POSITION_DEAD || tmp_victim->in_room == NOWHERE)
@@ -1381,7 +1381,7 @@ int spell_heroes_feast(uint8_t level, char_data *ch, char_data *victim, struct o
 int spell_group_sanc(uint8_t level, char_data *ch, char_data *victim, struct obj_data *obj, int skill)
 {
 
-  auto &character_list = DC::instance().character_list;
+  auto &character_list = DC::getInstance()->character_list;
   for (auto &tmp_victim : character_list)
   {
     if (GET_POS(tmp_victim) == POSITION_DEAD || tmp_victim->in_room == NOWHERE)
@@ -1407,7 +1407,7 @@ int spell_group_sanc(uint8_t level, char_data *ch, char_data *victim, struct obj
 int spell_heal_spray(uint8_t level, char_data *ch, char_data *victim, struct obj_data *obj, int skill)
 {
 
-  auto &character_list = DC::instance().character_list;
+  auto &character_list = DC::getInstance()->character_list;
   for (auto &tmp_victim : character_list)
   {
     if (GET_POS(tmp_victim) == POSITION_DEAD || tmp_victim->in_room == NOWHERE)
@@ -1471,7 +1471,7 @@ int spell_firestorm(uint8_t level, char_data *ch, char_data *victim, struct obj_
     }
   }
 
-  auto &character_list = DC::instance().character_list;
+  auto &character_list = DC::getInstance()->character_list;
   for (auto &tmp_victim : character_list)
   {
     if (GET_POS(tmp_victim) == POSITION_DEAD || tmp_victim->in_room == NOWHERE)
@@ -4944,7 +4944,7 @@ int spell_fire_breath(uint8_t level, char_data *ch, char_data *victim, struct ob
 
   act("$B$4You are $IENVELOPED$I$B$4 in scorching $B$4flames$R!$R", ch, 0, 0, TO_ROOM, 0);
 
-  auto &character_list = DC::instance().character_list;
+  auto &character_list = DC::getInstance()->character_list;
   for (auto &tmp_victim : character_list)
   {
     if (GET_POS(tmp_victim) == POSITION_DEAD || tmp_victim->in_room == NOWHERE)
@@ -4985,7 +4985,7 @@ int spell_gas_breath(uint8_t level, char_data *ch, char_data *victim, struct obj
   act("You CHOKE on the gas fumes!",
       ch, 0, 0, TO_ROOM, 0);
 
-  auto &character_list = DC::instance().character_list;
+  auto &character_list = DC::getInstance()->character_list;
   for (auto &tmp_victim : character_list)
   {
     if (GET_POS(tmp_victim) == POSITION_DEAD || tmp_victim->in_room == NOWHERE)
@@ -11267,7 +11267,7 @@ int spell_bee_swarm(uint8_t level, char_data *ch, char_data *victim, struct obj_
 
   act("$n calls upon the insect world!\n\r", ch, 0, 0, TO_ROOM, INVIS_NULL);
 
-  auto &character_list = DC::instance().character_list;
+  auto &character_list = DC::getInstance()->character_list;
   for (auto &tmp_victim : character_list)
   {
     try
@@ -13426,7 +13426,7 @@ int spell_icestorm(uint8_t level, char_data *ch, char_data *victim, struct obj_d
   send_to_char("$B$3Ice$R erupts from the earth!\r\n", ch);
   act("$n makes $B$3ice$R fall erupt from the earth!", ch, 0, 0, TO_ROOM, 0);
 
-  auto &character_list = DC::instance().character_list;
+  auto &character_list = DC::getInstance()->character_list;
   for (auto &tmp_victim : character_list)
   {
     if (GET_POS(tmp_victim) == POSITION_DEAD || tmp_victim->in_room == NOWHERE)

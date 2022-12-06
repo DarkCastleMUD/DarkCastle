@@ -519,9 +519,9 @@ void Leaderboard::check(void)
 	write_file(LEADERBOARD_FILE);
 
 	in_port_t port1 = 0;
-	if (DC::instance().cf.ports.size() > 0)
+	if (DC::getInstance()->cf.ports.size() > 0)
 	{
-		port1 = DC::instance().cf.ports[0];
+		port1 = DC::getInstance()->cf.ports[0];
 	}
 
 	stringstream ssbuffer;
@@ -615,7 +615,7 @@ void Leaderboard::check_offline(void)
 	curr_name = "NA";
 	curr_virtno = 0;
 
-	for (auto &ch : DC::instance().character_list)
+	for (auto &ch : DC::getInstance()->character_list)
 	{
 		if (GET_LEVEL(ch) >= IMMORTAL || IS_NPC(ch))
 			continue;
@@ -1055,9 +1055,9 @@ void Leaderboard::check_offline(void)
 	write_file(LEADERBOARD_FILE);
 
 	in_port_t port1 = 0;
-	if (DC::instance().cf.ports.size() > 0)
+	if (DC::getInstance()->cf.ports.size() > 0)
 	{
-		port1 = DC::instance().cf.ports[0];
+		port1 = DC::getInstance()->cf.ports[0];
 	}
 
 	stringstream ssbuffer;
@@ -1308,7 +1308,7 @@ void Leaderboard::write_file(std::string &filename)
 
 void Leaderboard::write_file(const char filename[])
 {
-	if (DC::instance().cf.leaderboard_check == "suspend" || DC::instance().cf.bport == true)
+	if (DC::getInstance()->cf.leaderboard_check == "suspend" || DC::getInstance()->cf.bport == true)
 	{
 		return;
 	}
@@ -1400,13 +1400,13 @@ int do_leaderboard(char_data *ch, char *argument, int cmd)
 		tie(arg1, remainder) = half_chop(argument);
 		if (arg1 == "suspend")
 		{
-			if (DC::instance().cf.leaderboard_check == "suspend")
+			if (DC::getInstance()->cf.leaderboard_check == "suspend")
 			{
 				csendf(ch, "Leaderboard writes already suspended.\n\r");
 			}
 			else
 			{
-				DC::instance().cf.leaderboard_check = "suspend";
+				DC::getInstance()->cf.leaderboard_check = "suspend";
 				csendf(ch, "Leaderboard writes suspended.\n\r");
 				logf(IMP, LogChannels::LOG_GOD, "Leaderboard writes suspended by %s.", GET_NAME(ch));
 			}
@@ -1415,13 +1415,13 @@ int do_leaderboard(char_data *ch, char *argument, int cmd)
 		}
 		else if (arg1 == "resume")
 		{
-			if (DC::instance().cf.leaderboard_check == "")
+			if (DC::getInstance()->cf.leaderboard_check == "")
 			{
 				csendf(ch, "Leaderboard writes already resumed.\n\r");
 			}
 			else
 			{
-				DC::instance().cf.leaderboard_check = "";
+				DC::getInstance()->cf.leaderboard_check = "";
 				csendf(ch, "Leaderboard writes resumed.\n\r");
 				logf(IMP, LogChannels::LOG_GOD, "Leaderboard writes resumed by %s.", GET_NAME(ch));
 			}
@@ -2023,7 +2023,7 @@ void Leaderboard::rename(char *oldname, char *newname)
 	int value[lines], i;
 	char *name[lines];
 
-	if (DC::instance().cf.bport)
+	if (DC::getInstance()->cf.bport)
 	{
 		return;
 	}
@@ -2049,7 +2049,7 @@ void Leaderboard::rename(char *oldname, char *newname)
 		}
 	}
 
-	if (DC::instance().cf.leaderboard_check == "suspend")
+	if (DC::getInstance()->cf.leaderboard_check == "suspend")
 	{
 		logf(IMMORTAL, LogChannels::LOG_GOD, "Leaderboard rename of %s to %s failed because writes are suspended.", oldname, newname);
 	}

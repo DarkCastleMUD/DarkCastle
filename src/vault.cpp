@@ -2047,7 +2047,7 @@ void add_new_vault(char *name, int indexonly)
 
 char_data *find_owner(const char *name)
 {
-  const auto &character_list = DC::instance().character_list;
+  const auto &character_list = DC::getInstance()->character_list;
   const auto &result = find_if(character_list.begin(), character_list.end(), [&name](const auto &ch)
                                {
 	  if (ch->name == NULL)

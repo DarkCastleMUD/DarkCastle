@@ -77,7 +77,7 @@ int do_linkload(char_data *ch, char *arg, int cmd)
 
   new_new = d.character;
   new_new->desc = 0;
-  auto &character_list = DC::instance().character_list;
+  auto &character_list = DC::getInstance()->character_list;
   character_list.insert(new_new);
   add_to_bard_list(new_new);
 
@@ -467,7 +467,7 @@ int do_shutdown(char_data *ch, char *argument, int cmd)
   }
   else if (!strcmp(arg1, "hot"))
   {
-    for (auto &ch : DC::instance().character_list)
+    for (auto &ch : DC::getInstance()->character_list)
     {
       if (IS_PC(ch))
       {
@@ -539,7 +539,7 @@ int do_shutdown(char_data *ch, char *argument, int cmd)
   }
   else if (!strcmp(arg1, "check"))
   {
-    for (auto &ch : DC::instance().character_list)
+    for (auto &ch : DC::getInstance()->character_list)
     {
       if (IS_PC(ch))
       {

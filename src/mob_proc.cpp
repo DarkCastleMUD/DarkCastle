@@ -230,7 +230,7 @@ void summon_all_of_mob_to_room(char_data *ch, int iFriendId)
   if (!ch)
     return;
 
-  auto &character_list = DC::instance().character_list;
+  auto &character_list = DC::getInstance()->character_list;
   for (auto &victim : character_list)
   {
     if (!IS_MOB(victim))

@@ -757,7 +757,7 @@ void quest_update()
    obj_data *obj;
    struct quest_info *quest;
 
-   auto &character_list = DC::instance().character_list;
+   auto &character_list = DC::getInstance()->character_list;
    for (auto &i : character_list)
    {
       if (!i->desc || IS_NPC(i))
@@ -803,7 +803,7 @@ void quest_update()
          }
       }
    }
-   DC::instance().removeDead();
+   DC::getInstance()->removeDead();
 }
 
 int quest_handler(char_data *ch, char_data *qmaster, int cmd, char *name)

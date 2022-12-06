@@ -377,7 +377,7 @@ int main(int argc, char **argv)
     }
     /*
         multimap<int32_t, string> hp_leaders;
-        for (auto& ch : DC::instance().character_list)
+        for (auto& ch : DC::getInstance()->character_list)
         {
           if (IS_PC(ch))
           {
@@ -406,7 +406,7 @@ int main(int argc, char **argv)
     */
 
     // leaderboard.check_offline();
-    // cout << DC::instance().character_list.size() << endl;
+    // cout << DC::getInstance()->character_list.size() << endl;
     // do_leaderboard(ch, "", CMD_DEFAULT);
     // process_output(d);
 

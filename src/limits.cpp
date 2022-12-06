@@ -764,7 +764,7 @@ void food_update(void)
 
 	struct obj_data *food = NULL;
 
-	auto &character_list = DC::instance().character_list;
+	auto &character_list = (dynamic_cast<DC *>(DC::instance()))->character_list;
 	for (auto &i : character_list)
 	{
 		if (affected_by_spell(i, SPELL_PARALYZE))
@@ -804,7 +804,7 @@ void food_update(void)
 			}
 		}
 	}
-	DC::instance().removeDead();
+	DC::getInstance()->removeDead();
 }
 
 // Update the HP of mobs and players
@@ -812,7 +812,7 @@ void food_update(void)
 void point_update(void)
 {
 	/* characters */
-	auto &character_list = DC::instance().character_list;
+	auto &character_list = DC::getInstance()->character_list;
 	for (auto &i : character_list)
 	{
 		if (i->in_room == NOWHERE)
@@ -997,7 +997,7 @@ void update_corpses_and_portals(void)
 			}
 		}
 	}
-	DC::instance().removeDead();
+	DC::getInstance()->removeDead();
 	if (corpses_need_saving == true)
 	{
 		save_corpses();

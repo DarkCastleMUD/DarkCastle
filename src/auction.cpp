@@ -899,7 +899,7 @@ void AuctionHouse::Save()
   map<unsigned int, AuctionTicket>::iterator Item_it;
   map<int, int>::iterator room_it;
 
-  if (DC::instance().cf.bport)
+  if (DC::getInstance()->cf.bport)
   {
     log("Unable to save auction files because this is the testport!", ANGEL, LogChannels::LOG_MISC);
     return;
@@ -1252,7 +1252,7 @@ void AuctionHouse::BuyItem(char_data *ch, unsigned int ticket)
   obj_to_char(obj, ch);
   do_save(ch, "", CMD_DEFAULT);
 
-  if (DC::instance().cf.bport == false)
+  if (DC::getInstance()->cf.bport == false)
   {
     errno = 0;
     if (!(fl = dc_fopen(WEB_AUCTION_FILE, "r")))

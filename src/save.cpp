@@ -872,7 +872,7 @@ void save_char_obj(char_data *ch)
   }
 
   // TODO - figure out a way for mob's to save...maybe <mastername>.pet ?
-  if (DC::instance().cf.bport)
+  if (DC::getInstance()->cf.bport)
   {
     sprintf(name, "%s/%c/%s", BSAVE_DIR, ch->name[0], ch->name);
   }
@@ -967,7 +967,7 @@ bool load_char_obj(struct descriptor_data *d, const char *name)
     return FALSE;
 
   ch = new char_data;
-  auto &free_list = DC::instance().free_list;
+  auto &free_list = DC::getInstance()->free_list;
   free_list.erase(ch);
 
   if (d->character)
@@ -979,7 +979,7 @@ bool load_char_obj(struct descriptor_data *d, const char *name)
   clear_char(ch);
   ch->desc = d;
 
-  if (DC::instance().cf.bport)
+  if (DC::getInstance()->cf.bport)
   {
     sprintf(strsave, "%s/%c/%s", BSAVE_DIR, UPPER(name[0]), name);
   }
