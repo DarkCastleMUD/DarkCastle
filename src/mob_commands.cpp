@@ -687,7 +687,7 @@ int do_mppurge(char_data *ch, char *argument, int cmd)
   //    issame = (ch == victim);
   if (ch == victim)
   {
-    logf(0, LogChannels::LOG_BUG, "selfpurge on %s to %s", GET_NAME(ch), GET_NAME(victim));
+    // logf(0, LogChannels::LOG_BUG, "selfpurge on %s to %s", GET_NAME(ch), GET_NAME(victim));
     selfpurge = true;
     selfpurge.setOwner(ch, "do_mppurge");
   }

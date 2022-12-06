@@ -5425,7 +5425,7 @@ void raw_kill(char_data *ch, char_data *victim)
       }
       else
       {
-        logf(0, LogChannels::LOG_BUG, "selfpurge on %s to %s", GET_NAME(ch), GET_NAME(victim));
+        // logf(0, LogChannels::LOG_BUG, "selfpurge on %s to %s", GET_NAME(ch), GET_NAME(victim));
       }
       selfpurge = true;
       selfpurge.setOwner(ch, "raw_kill");
