@@ -499,7 +499,7 @@ int do_golem_score(char_data *ch, char *argument, int cmd)
       switch (aff->type)
       {
       case FUCK_CANTQUIT:
-        aff_name = "CANT_QUIT";
+        aff_name = "Can't Quit";
         break;
       case FUCK_PTHIEF:
         aff_name = "DIRTY_DIRTY_THIEF";
