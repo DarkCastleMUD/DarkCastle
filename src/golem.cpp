@@ -529,10 +529,20 @@ int do_golem_score(char_data *ch, char *argument, int cmd)
       if (!aff_name) // not one we want displayed
         continue;
 
-      sprintf(buf, "|%c| Affected by %-25s %s Modifier %-13s   |%c|\n\r",
-              scratch, aff_name,
-              ((IS_AFFECTED(ch, AFF_DETECT_MAGIC) && aff->duration < 3) ? "$2(fading)$7" : "        "),
-              apply_types[(int)aff->location], scratch);
+      if (aff->type == FUCK_CANTQUIT)
+      {
+        sprintf(buf, "|%c| Affected by %-25s (%s) |%c|\n\r",
+                scratch, aff_name,
+                ((IS_AFFECTED(ch, AFF_DETECT_MAGIC) && aff->duration < 3) ? "$2(fading)$7" : "        "),
+                apply_types[(int)aff->location], aff->caster.c_str());
+      }
+      else
+      {
+        sprintf(buf, "|%c| Affected by %-25s %s Modifier %-13s   |%c|\n\r",
+                scratch, aff_name,
+                ((IS_AFFECTED(ch, AFF_DETECT_MAGIC) && aff->duration < 3) ? "$2(fading)$7" : "        "),
+                apply_types[(int)aff->location], scratch);
+      }
       send_to_char(buf, master);
       if (++level == 4)
         level = 0;

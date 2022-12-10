@@ -2106,7 +2106,7 @@ int do_score(char_data *ch, char *argument, int cmd)
                aff_name = "infravision";
             break;
          case FUCK_CANTQUIT:
-            aff_name = "CANT_QUIT";
+            aff_name = "CANTQUIT";
             break;
          case FUCK_PTHIEF:
             aff_name = "DIRTY_THIEF/CANT_QUIT";
@@ -2168,16 +2168,48 @@ int do_score(char_data *ch, char *argument, int cmd)
          if (!aff_name) // not one we want displayed
             continue;
 
-         sprintf(buf, "|%c| Affected by %-25s %s Modifier %-13s   |%c|\n\r",
-                 scratch,
-                 aff_name,
-                 ((IS_AFFECTED(ch, AFF_DETECT_MAGIC) && aff->duration < 3) ? "$2(fading)$7" : "        "),
-                 modifyOutput ? affected_by_spell(ch, SKILL_NAT_SELECT) ? races[aff->modifier].singular_name : affected_by_spell(ch, SPELL_IMMUNITY) ? spells[aff->modifier]
-                                                                                                                                                     : apply_types[(int)aff->location]
-                              : apply_types[(int)aff->location],
-                 scratch);
+         string fading;
+         if (IS_AFFECTED(ch, AFF_DETECT_MAGIC))
+         {
+            if (aff->duration < 3)
+            {
+               fading = "$2(fading)$7";
+            }
+         }
 
-         send_to_char(buf, ch);
+         string modified = apply_types[(int)aff->location];
+         if (modifyOutput)
+         {
+            if (affected_by_spell(ch, SKILL_NAT_SELECT))
+            {
+               modified = races[aff->modifier].singular_name;
+            }
+            else if (affected_by_spell(ch, SPELL_IMMUNITY))
+            {
+               modified = spells[aff->modifier];
+            }
+         }
+
+         QString format;
+         if (aff->type == FUCK_CANTQUIT)
+         {
+            format = "|%1| Affected by %2 from %3%4 Modifier %5 |%1|\r\n";
+            format = format.arg(scratch);
+            format = format.arg(QString::fromStdString("CANTQUIT"), 8);
+            format = format.arg(QString::fromStdString(aff->caster), -12);
+            format = format.arg(QString::fromStdString(fading), 8);
+            format = format.arg(QString::fromStdString(modified), -15);
+         }
+         else
+         {
+            format = "|%1| Affected by %2 %3 Modifier %4 |%1|\r\n";
+            format = format.arg(scratch);
+            format = format.arg(QString::fromStdString(aff_name), -25);
+            format = format.arg(QString::fromStdString(fading), 8);
+            format = format.arg(QString::fromStdString(modified), -15);
+         }
+         ch->send(format.toStdString());
+
          found = TRUE;
          if (++level == 4)
             level = 0;

@@ -3168,6 +3168,10 @@ void set_cantquit(char_data *ch, char_data *vict, bool forced)
     af.modifier = 0;
     af.location = APPLY_NONE;
     af.bitvector = AFF_CANTQUIT;
+    if (realvict && GET_NAME(realvict))
+    {
+      af.caster = GET_NAME(realvict);
+    }
 
     if (!ISSET(realch->affected_by, AFF_CANTQUIT))
       affect_to_char(realch, &af);

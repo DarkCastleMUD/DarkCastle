@@ -904,7 +904,7 @@ void mob_stat(char_data *ch, char_data *k)
         if (aff->type == INTERNAL_SLEEPING)
           aff_name = "Internal Sleeping";
         else if (aff->type == FUCK_CANTQUIT)
-          aff_name = "CANT_QUIT";
+          aff_name = "CANTQUIT";
         else
           aff_name = "Unknown!!!";
       }
