@@ -1418,7 +1418,7 @@ command_return_t do_repop(char_data *ch, string arguments, int cmd)
   string arg1;
   tie(arg1, arguments) = half_chop(arguments);
 
-  if (arg1 == "full")re
+  if (arg1 == "full")
   {
     send_to_char("Performing full zone reset!\n\r", ch);
     string buf = fmt::format("{} full repopped zone #{}.", GET_NAME(ch), world[ch->in_room].zone);
