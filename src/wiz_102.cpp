@@ -703,12 +703,11 @@ int do_zedit(char_data *ch, char *argument, int cmd)
   int i = 0, j = 0;
   int zone, last_cmd;
   int robj, rmob;
-  int show_zone_commands(char_data * ch, int i, int start = 0);
 
   const char *zedit_values[] = {
       "remove", "add", "edit", "list", "name",
       "lifetime", "mode", "flags", "help", "search",
-      "swap", "copy", "continent",
+      "swap", "copy", "continent", "info",
       "\n"};
 
   argument = one_argumentnolow(argument, select);
@@ -1207,6 +1206,10 @@ int do_zedit(char_data *ch, char *argument, int cmd)
     }
     csendf(ch, "Success. Continent changed to %s\n\r", continent_names.at(cont).c_str());
     zone_table[zone].continent = cont;
+    break;
+
+  case 13:
+    show_zone_info(ch, zone);
     break;
 
   default:

@@ -166,8 +166,6 @@ int total_rooms = 0;	  /* total amount of rooms in memory */
 struct time_info_data time_info;  /* the infomation about the time   */
 struct weather_data weather_info; /* the infomation about the weather */
 
-int mud_is_booting;
-
 struct vault_data *vault_table = 0;
 
 /* local procedures */
@@ -508,13 +506,11 @@ void boot_db(void)
 
 	void add_commands_to_radix(void);
 
-	mud_is_booting = TRUE;
-
 	reset_time();
 
-	log("************** REBOOTING THE MUD ***********", 0, LogChannels::LOG_SOCKET);
-	log("************** REBOOTING THE MUD ***********", 0, LogChannels::LOG_MISC);
-	log("************** REBOOTING THE MUD ***********", 0, LogChannels::LOG_WORLD);
+	log("************** BOOTING THE MUD ***********", 0, LogChannels::LOG_SOCKET);
+	log("************** BOOTING THE MUD ***********", 0, LogChannels::LOG_MISC);
+	log("************** BOOTING THE MUD ***********", 0, LogChannels::LOG_WORLD);
 	log("Reading aux files.", 0, LogChannels::LOG_MISC);
 	file_to_string(WEBPAGE_FILE, webpage);
 	file_to_string(GREETINGS1_FILE, greetings1);
@@ -664,7 +660,7 @@ void boot_db(void)
 					zone_table[i].name);
 		}
 
-		reset_zone(i);
+		reset_zone(i, ResetType::full);
 	}
 
 	if (cf.verbose_mode)
@@ -695,8 +691,6 @@ void boot_db(void)
 
 	log("Loading auction tickets.", 0, LogChannels::LOG_MISC);
 	load_auction_tickets();
-
-	mud_is_booting = FALSE;
 }
 
 /*
@@ -4548,30 +4542,51 @@ void randomize_object(obj_data *obj)
 
 void zone_update(void)
 {
-	int i;
-
-	for (i = 0; i <= top_of_zone_table; i++)
+	for (auto zone = 0; zone <= top_of_zone_table; zone++)
 	{
-		if (zone_table[i].reset_mode == 0)
-			continue;
-		if (zone_table[i].age < zone_table[i].lifespan && !(zone_table[i].reset_mode == 1 && !zone_is_empty(i)))
+		if (zone_table[zone].reset_mode == 0)
 		{
-			zone_table[i].age++;
 			continue;
 		}
-		if (zone_table[i].reset_mode == 1 && !zone_is_empty(i))
+
+		if (zone_table[zone].age < zone_table[zone].lifespan && !(zone_table[zone].reset_mode == 1 && !zone_is_empty(zone)))
+		{
+			zone_table[zone].age++;
 			continue;
-		reset_zone(i);
+		}
+
+		if (zone_table[zone].reset_mode == 1 && !zone_is_empty(zone))
+		{
+			continue;
+		}
+
+		if (QDateTime::currentDateTimeUtc() > zone_table[zone].last_full_reset.addDays(1))
+		{
+			reset_zone(zone, ResetType::full);
+		}
+		else
+		{
+			reset_zone(zone);
+		}
+
 		// update first repop numbers
-		if (zone_table[i].num_mob_first_repop == 0)
-			zone_table[i].num_mob_first_repop = zone_table[i].num_mob_on_repop;
+		if (zone_table[zone].num_mob_first_repop == 0)
+		{
+			zone_table[zone].num_mob_first_repop = zone_table[zone].num_mob_on_repop;
+		}
 	}
+
 	DC::getInstance()->removeDead();
 }
 
 /* execute the reset command table of a given zone */
-void reset_zone(int zone)
+void reset_zone(int zone, ResetType reset_type)
 {
+	if (reset_type == ResetType::full)
+	{
+		zone_table[zone].last_full_reset = QDateTime::currentDateTimeUtc();
+	}
+
 	extern int top_of_world;
 	int cmd_no, last_cmd, last_mob, last_obj, last_percent;
 	int last_no;
@@ -4616,16 +4631,16 @@ void reset_zone(int zone)
 
 		ZCMD.last = time(nullptr);
 		ZCMD.attempts++;
-		if (ZCMD.if_flag == 0 ||						// always
-			(last_cmd == 1 && ZCMD.if_flag == 1) ||		// if last command true
-			(last_cmd == 0 && ZCMD.if_flag == 2) ||		// if last command false
-			(mud_is_booting && ZCMD.if_flag == 3) ||	// on reboot
-			(last_mob == 1 && ZCMD.if_flag == 4) ||		// if-last-mob-true
-			(last_mob == 0 && ZCMD.if_flag == 5) ||		// if-last-mob-false
-			(last_obj == 1 && ZCMD.if_flag == 6) ||		// if-last-obj-true
-			(last_obj == 0 && ZCMD.if_flag == 7) ||		// if-last-obj-false
-			(last_percent == 1 && ZCMD.if_flag == 8) || // if-last-percent-true
-			(last_percent == 0 && ZCMD.if_flag == 9)	// if-last-percent-false
+		if (ZCMD.if_flag == 0 ||									// always
+			(last_cmd == 1 && ZCMD.if_flag == 1) ||					// if last command true
+			(last_cmd == 0 && ZCMD.if_flag == 2) ||					// if last command false
+			(reset_type == ResetType::full && ZCMD.if_flag == 3) || // full reset (onboot)
+			(last_mob == 1 && ZCMD.if_flag == 4) ||					// if-last-mob-true
+			(last_mob == 0 && ZCMD.if_flag == 5) ||					// if-last-mob-false
+			(last_obj == 1 && ZCMD.if_flag == 6) ||					// if-last-obj-true
+			(last_obj == 0 && ZCMD.if_flag == 7) ||					// if-last-obj-false
+			(last_percent == 1 && ZCMD.if_flag == 8) ||				// if-last-percent-true
+			(last_percent == 0 && ZCMD.if_flag == 9)				// if-last-percent-false
 		)
 		{
 			ZCMD.lastSuccess = ZCMD.last;

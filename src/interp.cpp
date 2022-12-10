@@ -488,7 +488,7 @@ struct command_info cmd_info[] =
         {"guild", do_guild, nullptr, POSITION_DEAD, ANGEL, CMD_DEFAULT, 0, 1},
         {"oedit", do_oedit, nullptr, POSITION_DEAD, ANGEL, CMD_DEFAULT, 0, 1},
         {"clear", do_clear, nullptr, POSITION_DEAD, ANGEL, CMD_DEFAULT, 0, 1},
-        {"repop", do_repop, nullptr, POSITION_DEAD, ANGEL, CMD_DEFAULT, 0, 1},
+        {"repop", nullptr, do_repop, POSITION_DEAD, ANGEL, CMD_DEFAULT, 0, 1},
         {"medit", do_medit, nullptr, POSITION_DEAD, ANGEL, CMD_DEFAULT, 0, 1},
         {"rdelete", do_rdelete, nullptr, POSITION_DEAD, ANGEL, CMD_DEFAULT, 0, 1},
         {"oneway", do_oneway, nullptr, POSITION_DEAD, ANGEL, 1, 0, 1},

@@ -4,6 +4,8 @@
 #include <string>
 #include <utility>
 
+#include <QTimeZone>
+
 #include "wizard.h"
 #include "utility.h"
 #include "connect.h"
@@ -435,28 +437,25 @@ char *dirNumToChar(int dir)
 	return "ERROR";
 }
 
-int show_zone_commands(char_data *ch, int i, int start = 0)
+int show_zone_info(char_data *ch, int i)
 {
-	char buf[MAX_STRING_LENGTH];
-	int k = 0;
-	int num_to_show;
-
-	if (start < 0)
-		start = 0;
-
 	if (i > top_of_zonet)
 	{
 		send_to_char("There is no such zone.\r\n", ch);
 		return eFAILURE;
 	}
+
+	char buf[MAX_STRING_LENGTH];
+
 	string continent_name;
 	if (zone_table[i].continent && (unsigned)zone_table[i].continent < continent_names.size())
 		continent_name = continent_names.at(zone_table[i].continent);
 
-	sprintf(buf, "$3Name$R: %s\r\n"
-				 "$3Starts$R:    %6d $3Ends$R:  %13d     $3Continent:$R %s\n\r"
-				 "$3Lifetime$R:  %6d $3Age$R:   %13d     $3Left$R:   %6d\r\n"
-				 "$3PC'sInZone$R:  %4d $3Mode$R: %-18s $3Flags$R: ",
+	sprintf(buf, "$3Name:$R %s\r\n"
+				 "$3Starts:$R    %6d $3Ends:$R  %13d     $3Continent:$R %s\n\r"
+				 "$3Lifetime:$R  %6d $3Age:$R   %13d     $3Left:$R   %6d\r\n"
+				 "$3PC'sInZone:$R  %4d $3Mode:$R %-18s $3Last full reset:$R %s %s\r\n"
+				 "$3Flags:$R ",
 			zone_table[i].name,
 			(i ? (zone_table[i - 1].top + 1) : 0),
 			zone_table[i].top,
@@ -465,7 +464,10 @@ int show_zone_commands(char_data *ch, int i, int start = 0)
 			zone_table[i].age,
 			zone_table[i].lifespan - zone_table[i].age,
 			zone_table[i].players,
-			zone_modes[zone_table[i].reset_mode]);
+			zone_modes[zone_table[i].reset_mode],
+			zone_table[i].last_full_reset.toLocalTime().toString().toStdString().c_str(),
+			zone_table[i].last_full_reset.toLocalTime().timeZoneAbbreviation().toStdString().c_str());
+
 	send_to_char(buf, ch);
 	sprintbit(zone_table[i].zone_flags, zone_bits, buf);
 	send_to_char(buf, ch);
@@ -481,6 +483,23 @@ int show_zone_commands(char_data *ch, int i, int start = 0)
 	send_to_char(buf, ch);
 	send_to_char("\r\n", ch);
 
+	return eSUCCESS;
+}
+
+int show_zone_commands(char_data *ch, int i, int start)
+{
+	char buf[MAX_STRING_LENGTH];
+	int k = 0;
+	int num_to_show;
+
+	if (start < 0)
+		start = 0;
+
+	if (i > top_of_zonet)
+	{
+		send_to_char("There is no such zone.\r\n", ch);
+		return eFAILURE;
+	}
 	if (zone_table[i].cmd[0].command == 'S')
 	{
 		send_to_char("This zone has no zone commands.\r\n", ch);

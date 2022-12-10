@@ -1407,20 +1407,32 @@ void do_start(char_data *ch)
   ch->pcdata->time.logon = time(0);
 }
 
-int do_repop(char_data *ch, char *argument, int cmd)
+command_return_t do_repop(char_data *ch, string arguments, int cmd)
 {
-  char buf[MAX_STRING_LENGTH];
-
   if (GET_LEVEL(ch) < DEITY && !can_modify_room(ch, ch->in_room))
   {
-    send_to_char("You may only repop inside of your R range.\r\n", ch);
+    send_to_char("You may only repop inside of your room range.\r\n", ch);
     return eFAILURE;
   }
 
-  send_to_char("Resetting this entire zone!\n\r", ch);
-  sprintf(buf, "%s repopped zone #%d.", GET_NAME(ch), world[ch->in_room].zone);
-  log(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
-  reset_zone(world[ch->in_room].zone);
+  string arg1;
+  tie(arg1, arguments) = half_chop(arguments);
+
+  if (arg1 == "full")re
+  {
+    send_to_char("Performing full zone reset!\n\r", ch);
+    string buf = fmt::format("{} full repopped zone #{}.", GET_NAME(ch), world[ch->in_room].zone);
+    log(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
+    reset_zone(world[ch->in_room].zone, ResetType::full);
+  }
+  else
+  {
+    send_to_char("Resetting this entire zone!\n\r", ch);
+    string buf = fmt::format("{} repopped zone #{}.", GET_NAME(ch), world[ch->in_room].zone);
+    log(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
+    reset_zone(world[ch->in_room].zone);
+  }
+
   return eSUCCESS;
 }
 
