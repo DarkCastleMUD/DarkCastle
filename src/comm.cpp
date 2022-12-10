@@ -161,7 +161,6 @@ void report_debug_logging();
 
 /* extern fcnts */
 void pulse_takeover(void);
-void boot_db(void);
 void zone_update(void);
 void affect_update(int32_t duration_type); /* In spells.c */
 void point_update(void);                   /* In limits.c */
