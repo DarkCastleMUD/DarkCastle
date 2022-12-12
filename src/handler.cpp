@@ -150,9 +150,32 @@ int isname2(const char *str, const char *namel)
 	return 0;
 }
 
-int isname(string str, const char *namelist)
+int isname(string arg, string namelist)
 {
-	return isname(str.c_str(), namelist);
+	return isname(arg.c_str(), namelist.c_str());
+}
+
+int isname(string arg, const char *namelist)
+{
+	return isname(arg.c_str(), namelist);
+}
+
+int isname(const char *arg, string namelist)
+{
+	return isname(arg, namelist.c_str());
+}
+
+int isname(const char *arg, joining_t &namelist)
+{
+	for (joining_t::const_iterator i = namelist.begin(); i != namelist.end(); ++i)
+	{
+		if (i.value() && QString(arg).compare(i.key(), Qt::CaseInsensitive) == 0)
+		{
+			return true;
+		}
+	}
+
+	return false;
 }
 
 /************************************************************************

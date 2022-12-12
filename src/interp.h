@@ -201,7 +201,7 @@ command_return_t do_guide(char_data *ch, char *argument, int cmd);
 command_return_t do_alias(char_data *ch, char *argument, int cmd);
 command_return_t do_archive(char_data *ch, char *argument, int cmd);
 command_return_t do_autoeat(char_data *ch, char *argument, int cmd);
-command_return_t do_autojoin(char_data *ch, char *argument, int cmd);
+command_return_t do_autojoin(char_data *ch, string argument, int cmd);
 command_return_t do_unban(char_data *ch, char *argument, int cmd);
 command_return_t do_ambush(char_data *ch, char *argument, int cmd);
 command_return_t do_anonymous(char_data *ch, char *argument, int cmd);

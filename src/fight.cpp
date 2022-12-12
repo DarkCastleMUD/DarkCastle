@@ -147,7 +147,7 @@ int check_autojoiners(char_data *ch, int skill = 0)
       continue;
     if (GET_POS(tmp) != POSITION_STANDING)
       continue;
-    if (!tmp->pcdata || !tmp->pcdata->joining)
+    if (tmp->pcdata == nullptr || tmp->pcdata->joining.empty())
       continue;
     if (!isname(GET_NAME(ch), tmp->pcdata->joining))
       continue;
@@ -184,7 +184,7 @@ int check_joincharmie(char_data *ch, int skill = 0)
     return eFAILURE;
   if (GET_POS(tmp) != POSITION_STANDING)
     return eFAILURE;
-  if (!tmp->pcdata || !tmp->pcdata->joining)
+  if (!tmp->pcdata || tmp->pcdata->joining.empty())
     return eFAILURE;
   if (!isname("follower", tmp->pcdata->joining) &&
       !isname("followers", tmp->pcdata->joining))
@@ -7772,9 +7772,19 @@ int debug_retval(char_data *ch, char_data *victim, int retval)
   return retval;
 }
 
+void char_data::send(const char *buffer)
+{
+  send_to_char(string(buffer), this);
+}
+
 void char_data::send(string buffer)
 {
   send_to_char(buffer, this);
+}
+
+void char_data::send(QString buffer)
+{
+  send_to_char(buffer.toStdString(), this);
 }
 
 void char_data::sendRaw(string buffer)

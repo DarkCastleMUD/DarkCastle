@@ -19,6 +19,8 @@ struct char_data;
 #include <algorithm>
 #include <set>
 
+#include <QString>
+
 #include "DC.h"
 #include "affect.h"   /* MAX_AFFECTS, etc.. */
 #include "alias.h"    /* struct char_player_alias, MAX_ALIASES, etc.. */
@@ -206,6 +208,7 @@ struct follow_type
 // first, or you will probably end up corrupting all the pfiles
 struct pc_data
 {
+
     char pwd[PASSWORD_LEN + 1] = {};
     ignoring_t ignoring = {}; /* List of ignored names */
 
@@ -273,7 +276,7 @@ struct pc_data
     std::queue<string> *away_msgs = {};
     history_t *tell_history = {};
     history_t *gtell_history = {};
-    char *joining = {};
+    joining_t joining = {};
     uint32_t quest_points = {};
     int16_t quest_current[QUEST_MAX] = {};
     uint32_t quest_current_ticksleft[QUEST_MAX] = {};
@@ -284,6 +287,10 @@ struct pc_data
     uint8_t profession = {};
     bool multi = {};
     std::map<string, string> *options = {};
+
+    QString getJoining(void);
+    void setJoining(QString list);
+    void toggleJoining(QString key);
 };
 
 enum mob_type_t
@@ -504,7 +511,9 @@ struct char_data
     void removeHP(int dam, char_data *causer = nullptr);
     void fillHP(void);
     void fillHPLimit(void);
-    void send(string);
+    void send(const char *buffer);
+    void send(string buffer);
+    void send(QString buffer);
     command_return_t tell(char_data *, string);
     void sendRaw(string);
     vector<char_data *> getFollowers(void);

@@ -18,8 +18,11 @@
 
 #include <QSharedPointer>
 #include <QCoreApplication>
+#include <QMap>
+#include <QString>
 
 typedef uint64_t vnum_t;
+typedef QMap<QString, bool> joining_t;
 
 #include "character.h"
 #include "obj.h"

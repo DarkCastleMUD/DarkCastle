@@ -177,6 +177,11 @@ void fwrite_var_string(const char *string, FILE *fpsave)
   }
 }
 
+void fwrite_var_string(QString string, FILE *fpsave)
+{
+  fwrite_var_string(string.toStdString().c_str(), fpsave);
+}
+
 char *fread_var_string(FILE *fpsave)
 {
   uint16_t tmp_size = 0;
@@ -301,10 +306,10 @@ void save_pc_data(struct pc_data *i, FILE *fpsave, struct time_data tmpage)
     fwrite(&(i->kimetas), sizeof(i->kimetas), 1, fpsave);
   }
   // autojoinin'
-  if (i->joining)
+  if (!i->joining.empty())
   {
     fwrite("JIN", sizeof(char), 3, fpsave);
-    fwrite_var_string(i->joining, fpsave);
+    fwrite_var_string(i->getJoining(), fpsave);
   }
 
   fwrite("QST", sizeof(char), 3, fpsave);
@@ -467,10 +472,12 @@ void read_pc_data(char_data *ch, FILE *fpsave)
     fread(&i->kimetas, sizeof(i->kimetas), 1, fpsave);
     fread(&typeflag, sizeof(char), 3, fpsave);
   }
-  i->joining = 0;
+  i->joining = {};
+
   if (!strcmp("JIN", typeflag))
   {
-    i->joining = fread_var_string(fpsave);
+    QString buffer = fread_var_string(fpsave);
+    i->setJoining(buffer);
     fread(&typeflag, sizeof(char), 3, fpsave);
   }
   if (!strcmp("QST", typeflag))

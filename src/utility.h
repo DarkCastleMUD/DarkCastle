@@ -475,8 +475,11 @@ const char *get_skill_name(int skillnum);
 void gain_exp_regardless(char_data *ch, int gain);
 void advance_level(char_data *ch, int is_conversion);
 int close_socket(struct descriptor_data *d);
-int isname(string arg, const char *arg2);
-int isname(const char *arg, const char *arg2);
+int isname(string arg, string namelist);
+int isname(string arg, const char *namelist);
+int isname(const char *arg, const char *namelist);
+int isname(const char *arg, string namelist);
+int isname(const char *arg, joining_t &namelist);
 void page_string(struct descriptor_data *d, const char *str,
                  int keep_internal);
 void gain_exp(char_data *ch, int64_t gain);

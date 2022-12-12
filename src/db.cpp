@@ -5666,8 +5666,6 @@ void free_char(char_data *ch, Trace trace)
 				dc_free(ch->pcdata->last_prompt);
 			if (ch->pcdata->golem)
 				log("Error, golem not released properly", ANGEL, LogChannels::LOG_BUG);
-			if (ch->pcdata->joining)
-				dc_free(ch->pcdata->joining);
 			/* Free aliases... (I was to lazy to do before. ;) */
 			for (x = ch->pcdata->alias; x; x = next)
 			{
@@ -6009,7 +6007,7 @@ void init_char(char_data *ch)
 	GET_PROMPT(ch) = 0;
 	GET_LAST_PROMPT(ch) = 0;
 	ch->pcdata->skillchange = 0;
-	ch->pcdata->joining = 0;
+	ch->pcdata->joining = {};
 	ch->pcdata->practices = 0;
 	ch->pcdata->time.birth = time(0);
 	ch->pcdata->time.played = 0;

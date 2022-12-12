@@ -278,7 +278,7 @@ struct command_info cmd_info[] =
 
         // Miscellaneous commands
         {"editor", do_editor, nullptr, POSITION_SLEEPING, CMD_EDITOR, CMD_DEFAULT, 0, 1},
-        {"autojoin", do_autojoin, nullptr, POSITION_SLEEPING, 0, CMD_DEFAULT, 0, 1},
+        {"autojoin", nullptr, do_autojoin, POSITION_SLEEPING, 0, CMD_DEFAULT, 0, 1},
         {"visible", do_visible, nullptr, POSITION_SLEEPING, 0, CMD_DEFAULT, 0, 1},
         {"ctell", do_ctell, nullptr, POSITION_SLEEPING, 0, CMD_CTELL, 0, 1},
         {"outcast", do_outcast, nullptr, POSITION_RESTING, 0, CMD_DEFAULT, 0, 1},
