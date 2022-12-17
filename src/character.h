@@ -20,6 +20,7 @@ struct char_data;
 #include <set>
 
 #include <QString>
+#include <QMap>
 
 #include "DC.h"
 #include "affect.h"   /* MAX_AFFECTS, etc.. */
@@ -50,17 +51,32 @@ struct ignore_entry
     uint64_t ignored_count;
 };
 
-/*
-bool ignore_entry::operator=(ignore_entry& a, ignore_entry& b)
-{
-    return ((a.ignore == b.ignore) && (a.ignored_count == b.ignored_count));
-}
-*/
-
 typedef std::map<std::string, ignore_entry, strcasecmp_compare> ignoring_t;
 
 class communication;
 typedef std::queue<communication> history_t;
+
+typedef QString player_config_key_t;
+typedef QString player_config_value_t;
+typedef QMap<player_config_key_t, player_config_value_t> player_config_t;
+class PlayerConfig : public QObject
+{
+    Q_OBJECT
+public:
+    PlayerConfig();
+    player_config_t::iterator begin();
+    player_config_t::iterator end();
+    player_config_t::const_iterator constBegin() const;
+    player_config_t::const_iterator constEnd() const;
+    player_config_value_t value(const player_config_key_t &key, const player_config_value_t &defaultValue = player_config_value_t()) const;
+    player_config_key_t key(const player_config_value_t &value, const player_config_key_t &defaultKey = player_config_key_t()) const;
+    player_config_t::iterator find(const player_config_key_t &k);
+    player_config_t::iterator insert(const player_config_key_t &key, const player_config_value_t &value);
+    player_config_t &getQMap(void);
+
+private:
+    player_config_t config;
+};
 
 #define ASIZE 32
 #define MAX_GOLEMS 2 // amount of golems above +1
@@ -286,7 +302,7 @@ struct pc_data
     std::multimap<int, std::pair<timeval, timeval>> *lastseen = {};
     uint8_t profession = {};
     bool multi = {};
-    std::map<string, string> *options = {};
+    PlayerConfig *config = {};
 
     QString getJoining(void);
     void setJoining(QString list);

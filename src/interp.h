@@ -151,16 +151,27 @@ const auto CMD_GAZE = 1820;
 typedef int DO_FUN(char_data *ch, char *argument, int cmd);
 typedef int command_return_t;
 
+enum class CommandType
+{
+    all,
+    players_only,
+    non_players_only,
+    immortals_only,
+    implementors_only
+};
+
 struct command_info
 {
-    char *command_name;                                                            /* Name of ths command             */
-    int (*command_pointer)(char_data *ch, char *argument, int cmd);                /* Function that does it            */
-    command_return_t (*command_pointer2)(char_data *ch, string argument, int cmd); /* Function that does it            */
-    uint8_t minimum_position;                                                      /* Position commander must be in    */
-    uint8_t minimum_level;                                                         /* Minimum level needed             */
-    int command_number;                                                            /* Passed to function as argument   */
-    int flags;                                                                     // what flags the skills has
+    char *command_name;                                                                   /* Name of ths command             */
+    int (*command_pointer)(char_data *ch, char *argument, int cmd);                       /* Function that does it            */
+    command_return_t (*command_pointer2)(char_data *ch, string argument, int cmd);        /* Function that does it            */
+    command_return_t (*command_pointer3)(char_data *ch, QStringList &arguments, int cmd); /* Function that does it            */
+    uint8_t minimum_position;                                                             /* Position commander must be in    */
+    uint8_t minimum_level;                                                                /* Minimum level needed             */
+    int command_number;                                                                   /* Passed to function as argument   */
+    int flags;                                                                            // what flags the skills has
     uint8_t toggle_hide;
+    CommandType type;
 };
 
 struct command_lag
@@ -260,7 +271,7 @@ command_return_t do_cwithdraw(char_data *ch, char *argument, int cmd);
 command_return_t do_cbalance(char_data *ch, char *argument, int cmd);
 command_return_t do_colors(char_data *ch, char *argument, int cmd);
 command_return_t do_compact(char_data *ch, char *argument, int cmd);
-command_return_t do_config(char_data *ch, char *argument, int cmd);
+command_return_t do_config(char_data *ch, QStringList &arguments, int cmd);
 command_return_t do_consent(char_data *ch, char *argument, int cmd);
 command_return_t do_consider(char_data *ch, char *argument, int cmd);
 command_return_t do_count(char_data *ch, char *argument, int cmd);

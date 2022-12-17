@@ -64,3 +64,55 @@ void pc_data::toggleJoining(QString key)
         joining.insert(key, !i.value());
     }
 }
+
+PlayerConfig::PlayerConfig()
+{
+    config["color.good"] = "green";
+    config["color.bad"] = "red";
+    config["tell.history.timestamp"] = "1";
+}
+
+player_config_value_t PlayerConfig::value(const player_config_key_t &key, const player_config_value_t &defaultValue) const
+{
+    return config.value(key, defaultValue);
+}
+
+player_config_key_t PlayerConfig::key(const player_config_value_t &value, const player_config_key_t &defaultKey) const
+{
+    return config.key(value, defaultKey);
+}
+
+QMap<QString, QString> &PlayerConfig::getQMap(void)
+{
+    return config;
+}
+
+player_config_t::iterator PlayerConfig::insert(const player_config_key_t &key, const player_config_value_t &value)
+{
+    return config.insert(key, value);
+}
+
+player_config_t::iterator PlayerConfig::find(const player_config_key_t &key)
+{
+    return config.find(key);
+}
+
+player_config_t::iterator PlayerConfig::begin()
+{
+    return config.begin();
+}
+
+player_config_t::iterator PlayerConfig::end()
+{
+    return config.end();
+}
+
+player_config_t::const_iterator PlayerConfig::constBegin() const
+{
+    return config.constBegin();
+}
+
+player_config_t::const_iterator PlayerConfig::constEnd() const
+{
+    return config.constEnd();
+}

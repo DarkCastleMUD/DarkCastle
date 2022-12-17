@@ -959,15 +959,15 @@ void try_to_peek_into_container(char_data *vict, char_data *ch,
 
 void showStatDiff(char_data *ch, int base, int random, bool swapcolors = false)
 {
-   char buf[MAX_STRING_LENGTH] = {0}, buf2[256] = {0};
-   string color_good = "$2";
-   string color_bad = "$4";
+   QString buf, buf2;
+   QString color_good = "$2";
+   QString color_bad = "$4";
 
    if (ch && ch->pcdata)
    {
-      if (ch->pcdata->options)
+      if (ch->pcdata->config)
       {
-         map<string, string> colors;
+         QMap<QString, QString> colors;
          // colors["black"]="$0";
          colors["blue"] = "$1";
          colors["green"] = "$2";
@@ -984,22 +984,15 @@ void showStatDiff(char_data *ch, int base, int random, bool swapcolors = false)
          colors["bright yellow"] = "$B$5";
          colors["bright magenta"] = "$B$6";
          colors["bright white"] = "$B$7";
-         map<string, string>::iterator value;
 
-         if (ch->pcdata->options->find("color.good")->second.empty() == false)
+         if (ch->pcdata->config->value("color.good").isEmpty() == false)
          {
-            if (colors.find(ch->pcdata->options->find("color.good")->second)->second.empty() == false)
-            {
-               color_good = colors.find(ch->pcdata->options->find("color.good")->second)->second;
-            }
+            color_good = colors.value(ch->pcdata->config->value("color.good"));
          }
 
-         if (ch->pcdata->options->find("color.bad")->second.empty() == false)
+         if (ch->pcdata->config->value("color.bad").isEmpty() == false)
          {
-            if (colors.find(ch->pcdata->options->find("color.bad")->second)->second.empty() == false)
-            {
-               color_bad = colors.find(ch->pcdata->options->find("color.bad")->second)->second;
-            }
+            color_bad = colors.value(ch->pcdata->config->value("color.bad"));
          }
       }
    }
@@ -1009,38 +1002,38 @@ void showStatDiff(char_data *ch, int base, int random, bool swapcolors = false)
    }
 
    // original value
-   sprintf(buf2, "%d", base);
-   strcat(buf, buf2);
+   buf2 = QString("%1").arg(base);
+   buf += buf2;
 
    if (random - base > 0)
    {
       // if postive show "+ difference"
       if (swapcolors)
       {
-         sprintf(buf2, "%s+%d$R", color_bad.c_str(), random - base);
+         buf2 = QString("%1+%2$R").arg(color_bad).arg(random - base);
       }
       else
       {
-         sprintf(buf2, "%s+%d$R", color_good.c_str(), random - base);
+         buf2 = QString("%1+%2$R").arg(color_good).arg(random - base);
       }
-      strcat(buf, buf2);
+      buf += buf2;
    }
    else if (random - base < 0)
    {
       // if negative show "- difference"
       if (swapcolors)
       {
-         sprintf(buf2, "%s%d$R", color_good.c_str(), random - base);
+         buf2 = QString("%s%d$R").arg(color_good).arg(random - base);
       }
       else
       {
-         sprintf(buf2, "%s%d$R", color_bad.c_str(), random - base);
+         buf2 = QString("%1%2$R").arg(color_bad).arg(random - base);
       }
-      strcat(buf, buf2);
+      buf += buf2;
    }
-   strcat(buf, "$R");
+   buf += "$R";
 
-   csendf(ch, "%s", buf);
+   ch->send(buf);
    return;
 }
 

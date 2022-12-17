@@ -5683,9 +5683,9 @@ void free_char(char_data *ch, Trace trace)
 			if (ch->pcdata->lastseen)
 				delete ch->pcdata->lastseen;
 
-			if (ch->pcdata->options)
+			if (ch->pcdata->config)
 			{
-				delete ch->pcdata->options;
+				delete ch->pcdata->config;
 			}
 
 			delete ch->pcdata;

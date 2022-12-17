@@ -358,17 +358,17 @@ void save_pc_data(struct pc_data *i, FILE *fpsave, struct time_data tmpage)
     fwrite("WIZ", sizeof(char), 3, fpsave);
     fwrite(&(i->wizinvis), sizeof(i->wizinvis), 1, fpsave);
   }
-  if (i->options && i->options->empty() == false)
+  if (i->config != nullptr)
   {
-    for (auto &opt : *i->options)
+    for (auto setting = i->config->constBegin(); setting != i->config->constEnd(); ++setting)
     {
-      if (opt.first == "color.good" ||
-          opt.first == "color.bad" ||
-          opt.first == "tell.history.timestamp")
+      if (setting.key() == "color.good" ||
+          setting.key() == "color.bad" ||
+          setting.key() == "tell.history.timestamp")
       {
         fwrite("OPT", sizeof(char), 3, fpsave);
-        fwrite_var_string(opt.first.c_str(), fpsave);
-        fwrite_var_string(opt.second.c_str(), fpsave);
+        fwrite_var_string(setting.key(), fpsave);
+        fwrite_var_string(setting.value(), fpsave);
       }
     }
   }
@@ -531,16 +531,16 @@ void read_pc_data(char_data *ch, FILE *fpsave)
   }
   while (!strcmp("OPT", typeflag))
   {
-    if (i->options == nullptr)
+    if (i->config == nullptr)
     {
-      i->options = new map<string, string>();
+      i->config = new PlayerConfig();
     }
 
-    string key = fread_var_string(fpsave);
-    string value = fread_var_string(fpsave);
-    if (key.empty() == false && (key == "color.good" || key == "color.bad" || key == "tell.history.timestamp"))
+    QString key = fread_var_string(fpsave);
+    QString value = fread_var_string(fpsave);
+    if (key == "color.good" || key == "color.bad" || key == "tell.history.timestamp")
     {
-      (*i->options)[key] = value;
+      i->config->insert(key, value);
     }
 
     fread(&typeflag, sizeof(char), 3, fpsave);

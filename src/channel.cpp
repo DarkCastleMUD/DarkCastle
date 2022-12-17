@@ -792,22 +792,16 @@ command_return_t do_tellhistory(char_data *ch, string argument, int cmd)
 
   if (arg1 == "timestamp")
   {
-    auto result = ch->pcdata->options->find("tell.history.timestamp");
+    QString tell_history_timestamp = ch->pcdata->config->value("tell.history.timestamp");
 
-    string tell_history_timestamp;
-    if (result != ch->pcdata->options->end())
+    if (tell_history_timestamp == "0" || tell_history_timestamp.isEmpty())
     {
-      tell_history_timestamp = result->second;
-    }
-
-    if (tell_history_timestamp == "0" || tell_history_timestamp.empty())
-    {
-      (*ch->pcdata->options)["tell.history.timestamp"] = "1";
+      ch->pcdata->config->insert("tell.history.timestamp", "1");
       ch->send(fmt::format("tell history timestamp turned on\r\n"));
     }
     else if (tell_history_timestamp == "1")
     {
-      (*ch->pcdata->options)["tell.history.timestamp"] = "0";
+      ch->pcdata->config->insert("tell.history.timestamp", "0");
       ch->send(fmt::format("tell history timestamp turned off\r\n"));
     }
 

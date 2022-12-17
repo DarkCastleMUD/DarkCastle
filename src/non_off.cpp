@@ -631,25 +631,23 @@ int do_toggle(char_data *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-int do_config(char_data *ch, char *argument, int cmd)
+int do_config(char_data *ch, QStringList &arguments, int cmd)
 {
-  if (ch == nullptr || ch->pcdata == nullptr || IS_MOB(ch))
+  if (ch->pcdata->config == nullptr)
   {
-    return eFAILURE;
+    ch->pcdata->config = new PlayerConfig();
   }
 
-  if (ch->pcdata->options == nullptr)
+  if (arguments.isEmpty())
   {
-    ch->pcdata->options = new map<string, string>();
+    for (auto setting = ch->pcdata->config->constBegin(); setting != ch->pcdata->config->constEnd(); ++setting)
+    {
+      ch->send(QString("%1=%2\r\n").arg(setting.key()).arg(setting.value()));
+    }
+    return eSUCCESS;
   }
 
-  if (ch->pcdata->options->empty())
-  {
-    (*ch->pcdata->options)["color.good"] = string("green");
-    (*ch->pcdata->options)["color.bad"] = string("red");
-  }
-
-  map<string, string> colors;
+  QMap<QString, QString> colors;
   // colors["black"]="$0";
   colors["blue"] = "$1";
   colors["green"] = "$2";
@@ -667,19 +665,7 @@ int do_config(char_data *ch, char *argument, int cmd)
   colors["bright magenta"] = "$B$6";
   colors["bright white"] = "$B$7";
 
-  string key, value, orig_arguments = string(argument);
-  tie(key, value) = half_chop(argument, '=');
-  size_t equal_position = orig_arguments.find('=');
-
-  if (key.empty() == false && key != "color.good" && key != "color.bad" && key != "tell.history.timestamp")
-  {
-    csendf(ch, "Invalid configuration key specified.\r\n");
-    return eFAILURE;
-  }
-
-  // config
-  // config key
-  if (equal_position == string::npos && value.empty() == true)
+  if (arguments.size() > 0 && arguments.at(0) == "help")
   {
     csendf(ch, "Usage:\r\n");
     csendf(ch, "config                       - Show all currently set configuration options.\r\n");
@@ -688,23 +674,40 @@ int do_config(char_data *ch, char *argument, int cmd)
     csendf(ch, "                               Use ? as color name to see valid colors.\r\n");
     csendf(ch, "config color.good=           - Unset color.good. Will use default \"good\" color.\r\n");
     csendf(ch, "config color.bad=            - Unset color.bad. Will use default \"bad\" color.\r\n\r\n");
-    csendf(ch, "Current config:\r\n");
+    return eSUCCESS;
+  }
 
+  QString argument1 = arguments.at(0);
+  QStringList setting = argument1.split('=');
+  QString key, value;
+  if (setting.size() >= 1)
+  {
+    key = setting.at(0);
+  }
+  if (setting.size() == 2)
+  {
+    value = setting.at(1);
+  }
+
+  // config
+  // config key
+  if (setting.size() < 2)
+  {
     bool found = false;
-    for (auto &option : *ch->pcdata->options)
+    for (auto i = ch->pcdata->config->begin(); i != ch->pcdata->config->end(); ++i)
     {
-      if ((key.empty() == false && key == option.first) || key.empty() == true)
+      if (key == i.key() || key.isEmpty() || i.key().startsWith(key))
       {
         found = true;
-        csendf(ch, "%s=%s\r\n", option.first.c_str(), option.second.c_str());
+        ch->send(QString("%1=%2\r\n").arg(i.key()).arg(i.value()));
       }
     }
 
     if (found == false)
     {
-      if (key.empty() == false)
+      if (key.isEmpty() == false)
       {
-        csendf(ch, "%s not found.\r\n", key.c_str());
+        ch->send(QString("%1 not found.\r\n").arg(key));
       }
       else
       {
@@ -717,21 +720,22 @@ int do_config(char_data *ch, char *argument, int cmd)
   }
 
   // config key=
-  if (equal_position == (orig_arguments.length() - 1) && key.empty() == false && value.empty() == true)
+  if (value.isEmpty() && key.isEmpty() == false && value.isEmpty() == true)
   {
-    if (ch->pcdata->options->find(key) != ch->pcdata->options->end())
+    if (ch->pcdata->config->find(key) != ch->pcdata->config->end())
     {
-      csendf(ch, "%s unset.\r\n", key.c_str());
-      (*ch->pcdata->options)[key] = string();
+      ch->send(QString("%1 unset.\r\n").arg(key));
+      ch->pcdata->config->insert(key, QString());
       return eSUCCESS;
     }
+    ch->send(QString("%1 not found.\r\n").arg(key));
     return eFAILURE;
   }
 
   // config key=value
-  if (key.empty() == false && value.empty() == false)
+  if (key.isEmpty() == false && value.isEmpty() == false)
   {
-    if (key == "color.good" || key == "color.bad")
+    if (key == "color.good" || key == "color.bad" || key == "tell.history.timestamp")
     {
       if (colors.find(value) == colors.end())
       {
@@ -744,36 +748,32 @@ int do_config(char_data *ch, char *argument, int cmd)
           csendf(ch, "Invalid color specified. Valid colors:\r\n");
         }
 
-        for (auto &color : colors)
+        for (auto color = colors.constBegin(); color != colors.constEnd(); ++color)
         {
-          if (color.first == "black")
+          if (color.key() == "black")
           {
-            csendf(ch, "%s\r\n", color.first.c_str());
+            ch->send(QString("%1\r\n").arg(color.key()));
           }
           else
           {
-            csendf(ch, "%-15s - %sExample$R\r\n", color.first.c_str(), color.second.c_str());
+            ch->send(QString("%1 - %2Example$R\r\n").arg(color.key(), -15).arg(color.value()));
           }
         }
 
         return eFAILURE;
       }
 
-      (*ch->pcdata->options)[key] = value;
-      csendf(ch, "Setting %s=%s\r\n", key.c_str(), value.c_str());
+      ch->pcdata->config->insert(key, value);
+
+      ch->send(QString("Setting %1=%2\r\n").arg(key).arg(value));
       return eSUCCESS;
     }
     else
     {
-      csendf(ch, "Invalid config option.\r\n");
+      ch->send("Invalid config option.\r\n");
       return eFAILURE;
     }
   }
-
-  // debug. This point should not be reached.
-  csendf(ch, "Invalid scenario.\r\n");
-  csendf(ch, "=:%u orig length:%u [%s]\r\n", equal_position, orig_arguments.length(), orig_arguments.c_str());
-  csendf(ch, "key:[%s] value:[%s]\r\n", key.c_str(), value.c_str());
 
   return eFAILURE;
 }
