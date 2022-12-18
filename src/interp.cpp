@@ -157,7 +157,7 @@ struct command_info cmd_info[] =
         {"index", do_index, nullptr, nullptr, POSITION_DEAD, 0, CMD_DEFAULT, 0, 1, CommandType::all},
         {"areas", do_areas, nullptr, nullptr, POSITION_DEAD, 0, CMD_DEFAULT, 0, 1, CommandType::all},
         {"commands", do_new_help, nullptr, nullptr, POSITION_DEAD, 0, CMD_DEFAULT, 0, 1, CommandType::all},
-        {"experience", do_show_exp, nullptr, nullptr, POSITION_DEAD, 0, CMD_DEFAULT, 0, 1, CommandType::all},
+        {"experience", nullptr, nullptr, do_experience, POSITION_DEAD, 0, CMD_DEFAULT, 0, 1, CommandType::players_only},
         {"version", do_version, nullptr, nullptr, POSITION_DEAD, 0, CMD_DEFAULT, 0, 0, CommandType::all},
         {"identify", do_identify, nullptr, nullptr, POSITION_DEAD, 0, CMD_DEFAULT, COM_CHARMIE_OK, 0, CommandType::all},
 

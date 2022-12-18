@@ -3326,16 +3326,34 @@ int do_tick(char_data *ch, char *argument, int cmd)
    return eSUCCESS;
 }
 
-int do_show_exp(char_data *ch, char *arg, int cmd)
+command_return_t do_experience(char_data *ch, QStringList &arguments, int cmd)
 {
-   if (GET_LEVEL(ch) < MAX_MORTAL)
+   if (GET_LEVEL(ch) >= IMMORTAL)
    {
-      csendf(ch, "You require %ld experience to advance to level",
-             exp_table[(int)GET_LEVEL(ch) + 1] - GET_EXP(ch));
-      csendf(ch, " %d.\r\n", GET_LEVEL(ch) + 1); // weirdest. bug. ever.
+      ch->send("Immortals cannot gain levels by gaining experience.\r\n");
+      return eSUCCESS;
    }
-   else
-      send_to_char("You require 7399928377275452622483 experience to advance to the next level.\r\n", ch);
+
+   quint64 next_level = GET_LEVEL(ch);
+   qint64 experience_remaining = 0;
+   QLocale::setDefault(QLocale::English);
+
+   do
+   {
+      next_level += 1;
+      quint64 experience_next_level = exp_table[next_level];
+      quint64 current_experience = GET_EXP(ch);
+      experience_remaining = experience_next_level - current_experience;
+
+      if (experience_remaining < 0)
+      {
+         ch->send(QString("You have enough experience to advance to level %L1.\r\n").arg(next_level));
+      }
+      else
+      {
+         ch->send(QString("You require %L1 experience to advance to level %L2.\r\n").arg(experience_remaining).arg(next_level));
+      }
+   } while (experience_remaining < 0);
 
    return eSUCCESS;
 }
