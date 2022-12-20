@@ -4629,15 +4629,15 @@ int generic_find(const char *arg, int bitvector, char_data *ch, char_data **tar_
 			{
 				if ((*tar_ch)->short_desc)
 				{
-					csendf(ch, "You find %s in this room.\r\n\r\n", (*tar_ch)->short_desc);
+					csendf(ch, "You find %s in this room.\r\n", (*tar_ch)->short_desc);
 				}
 				else if ((*tar_ch)->name)
 				{
-					csendf(ch, "You find %s in this room.\r\n\r\n", (*tar_ch)->name);
+					csendf(ch, "You find %s in this room.\r\n", (*tar_ch)->name);
 				}
 				else
 				{
-					csendf(ch, "You find them in this room.\r\n\r\n");
+					csendf(ch, "You find them in this room.\r\n");
 				}
 			}
 			return (FIND_CHAR_ROOM);
@@ -4653,15 +4653,15 @@ int generic_find(const char *arg, int bitvector, char_data *ch, char_data **tar_
 			{
 				if ((*tar_ch)->short_desc)
 				{
-					csendf(ch, "You find %s somewhere in the world.\r\n\r\n", (*tar_ch)->short_desc);
+					csendf(ch, "You find %s somewhere in the world.\r\n", (*tar_ch)->short_desc);
 				}
 				else if ((*tar_ch)->name)
 				{
-					csendf(ch, "You find %s somewhere in the world.\r\n\r\n", (*tar_ch)->name);
+					csendf(ch, "You find %s somewhere in the world.\r\n", (*tar_ch)->name);
 				}
 				else
 				{
-					csendf(ch, "You find them somewhere in the world.\r\n\r\n");
+					csendf(ch, "You find them somewhere in the world.\r\n");
 				}
 			}
 			return (FIND_CHAR_WORLD);
@@ -4677,15 +4677,15 @@ int generic_find(const char *arg, int bitvector, char_data *ch, char_data **tar_
 			{
 				if ((*tar_obj)->short_description)
 				{
-					csendf(ch, "You find %s in your inventory.\r\n\r\n", (*tar_obj)->short_description);
+					csendf(ch, "You find %s in your inventory.\r\n", (*tar_obj)->short_description);
 				}
 				else if ((*tar_obj)->name)
 				{
-					csendf(ch, "You find %s in your inventory.\r\n\r\n", (*tar_obj)->name);
+					csendf(ch, "You find %s in your inventory.\r\n", (*tar_obj)->name);
 				}
 				else
 				{
-					csendf(ch, "You find it in your inventory.\r\n\r\n");
+					csendf(ch, "You find it in your inventory.\r\n");
 				}
 			}
 			return (FIND_OBJ_INV);
@@ -4708,15 +4708,15 @@ int generic_find(const char *arg, int bitvector, char_data *ch, char_data **tar_
 			{
 				if ((*tar_obj)->short_description)
 				{
-					csendf(ch, "You find %s among your equipment.\r\n\r\n", (*tar_obj)->short_description);
+					csendf(ch, "You find %s among your equipment.\r\n", (*tar_obj)->short_description);
 				}
 				else if ((*tar_obj)->name)
 				{
-					csendf(ch, "You find %s among your equipment.\r\n\r\n", (*tar_obj)->name);
+					csendf(ch, "You find %s among your equipment.\r\n", (*tar_obj)->name);
 				}
 				else
 				{
-					csendf(ch, "You find it among your equipment.\r\n\r\n");
+					csendf(ch, "You find it among your equipment.\r\n");
 				}
 			}
 			return (FIND_OBJ_EQUIP);
@@ -4732,15 +4732,15 @@ int generic_find(const char *arg, int bitvector, char_data *ch, char_data **tar_
 			{
 				if ((*tar_obj)->short_description)
 				{
-					csendf(ch, "You find %s in this room.\r\n\r\n", (*tar_obj)->short_description);
+					csendf(ch, "You find %s in this room.\r\n", (*tar_obj)->short_description);
 				}
 				else if ((*tar_obj)->name)
 				{
-					csendf(ch, "You find %s in this room.\r\n\r\n", (*tar_obj)->name);
+					csendf(ch, "You find %s in this room.\r\n", (*tar_obj)->name);
 				}
 				else
 				{
-					csendf(ch, "You find it in this room.\r\n\r\n");
+					csendf(ch, "You find it in this room.\r\n");
 				}
 			}
 			return (FIND_OBJ_ROOM);
@@ -4756,15 +4756,15 @@ int generic_find(const char *arg, int bitvector, char_data *ch, char_data **tar_
 			{
 				if ((*tar_obj)->short_description)
 				{
-					csendf(ch, "You find %s somewhere in the world.\r\n\r\n", (*tar_obj)->short_description);
+					csendf(ch, "You find %s somewhere in the world.\r\n", (*tar_obj)->short_description);
 				}
 				else if ((*tar_obj)->name)
 				{
-					csendf(ch, "You find %s somewhere in the world\r\n\r\n", (*tar_obj)->name);
+					csendf(ch, "You find %s somewhere in the world\r\n", (*tar_obj)->name);
 				}
 				else
 				{
-					csendf(ch, "You find it somewhere in the world\r\n\r\n");
+					csendf(ch, "You find it somewhere in the world\r\n");
 				}
 			}
 			return (FIND_OBJ_WORLD);
