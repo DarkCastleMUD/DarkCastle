@@ -2071,8 +2071,6 @@ int do_score(char_data *ch, char *argument, int cmd)
 
          if (aff->bitvector)
             affect_found[aff->bitvector] = true;
-         if (aff->type == SKILL_SNEAK)
-            continue;
          scratch = frills[level];
          modifyOutput = FALSE;
 
