@@ -622,7 +622,7 @@ int do_sneak(char_data *ch, char *argument, int cmd)
   if ((ch->in_room >= 0 && ch->in_room <= top_of_world) &&
       IS_SET(world[ch->in_room].room_flags, ARENA) && arena.type == POTATO)
   {
-    send_to_char("You can't do that in a potato arena ya sneaky bastard!\n\r", ch);
+    send_to_char("You can't do that in a potato arena ya sneaky bastard!\r\n", ch);
     return eFAILURE;
   }
 
