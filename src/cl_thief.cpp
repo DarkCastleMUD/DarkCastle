@@ -727,7 +727,7 @@ int do_hide(char_data *ch, char *argument, int cmd)
   if (!canPerform(ch, SKILL_HIDE))
   {
     if (cmd != 12)
-      send_to_char("I bet you think you're a thief. ;)\n\r", ch);
+      send_to_char("You don't know how to hide. What do you think you are, a thief?\r\n", ch);
     return eFAILURE;
   }
 
