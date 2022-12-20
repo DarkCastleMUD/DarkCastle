@@ -546,7 +546,7 @@ command_return_t do_sneak(char_data *ch, char *argument, int cmd);
 command_return_t do_snoop(char_data *ch, char *argument, int cmd);
 command_return_t do_sockets(char_data *ch, char *argument, int cmd);
 command_return_t do_spells(char_data *ch, char *argument, int cmd);
-command_return_t do_split(char_data *ch, char *argument, int cmd);
+command_return_t do_split(char_data *ch, QStringList &arguments, int cmd);
 command_return_t do_sqedit(char_data *ch, char *argument, int cmd);
 command_return_t do_stalk(char_data *ch, char *argument, int cmd);
 command_return_t do_stand(char_data *ch, char *argument, int cmd);

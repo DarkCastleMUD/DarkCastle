@@ -364,7 +364,8 @@ void save_pc_data(struct pc_data *i, FILE *fpsave, struct time_data tmpage)
     {
       if (setting.key() == "color.good" ||
           setting.key() == "color.bad" ||
-          setting.key() == "tell.history.timestamp")
+          setting.key() == "tell.history.timestamp" ||
+          setting.key() == "locale")
       {
         fwrite("OPT", sizeof(char), 3, fpsave);
         fwrite_var_string(setting.key(), fpsave);
@@ -538,7 +539,7 @@ void read_pc_data(char_data *ch, FILE *fpsave)
 
     QString key = fread_var_string(fpsave);
     QString value = fread_var_string(fpsave);
-    if (key == "color.good" || key == "color.bad" || key == "tell.history.timestamp")
+    if (key == "color.good" || key == "color.bad" || key == "tell.history.timestamp" || key == "locale")
     {
       i->config->insert(key, value);
     }

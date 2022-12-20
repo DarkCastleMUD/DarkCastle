@@ -755,6 +755,12 @@ void DC::game_loop(void)
   /* process commands we just read from process_input */
   for (d = descriptor_list; d; d = next_d)
   {
+    if (d->character != nullptr)
+    {
+      QString locale = d->character->getSetting("locale", "en_US");
+      QLocale::setDefault(QLocale(locale));
+    }
+
     next_d = d->next;
     d->wait = MAX(d->wait, 1);
     if (d->connected == conn::CLOSE)

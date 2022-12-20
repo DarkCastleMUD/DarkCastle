@@ -135,45 +135,39 @@ int do_found(char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_split(char_data *ch, char *argument, int cmd)
+command_return_t do_split(char_data *ch, QStringList &arguments, int cmd)
 {
-  int32_t amount, share, extra;
-  char buf[256], number[MAX_INPUT_LENGTH + 1];
-  int no_members;
-  char_data *k;
-  struct follow_type *f;
+  quint64 share = 0, extra = 0;
+  quint64 no_members = 0;
+  char_data *k = nullptr;
+  struct follow_type *f = nullptr;
 
-  if (!*argument)
+  if (arguments.isEmpty())
   {
-    send_to_char("Split what?\n\r", ch);
+    ch->send("Split what?\r\n");
     return eFAILURE;
   }
 
   if (affected_by_spell(ch, FUCK_GTHIEF))
   {
-    send_to_char("Nobody wants any part of your stolen booty!\n\r", ch);
+    ch->send("Nobody wants any part of your stolen booty!\r\n");
     return eFAILURE;
   }
 
-  one_argument(argument, number);
+  QString number = arguments.at(0);
 
-  if (strlen(number) > 7)
+  bool ok = false;
+  quint64 amount = number.toULongLong(&ok);
+  if (ok == false)
   {
-    send_to_char("Number field too big.\n\r", ch);
-    return eFAILURE;
-  }
-
-  amount = atol(number);
-
-  if (amount < 0)
-  {
-    send_to_char("Your group wouldn't like that!\n\r", ch);
+    ch->send("Invalid value.\r\n");
+    ch->send(QString("Valid values are %1 to %2.\r\n").arg(1).arg(static_cast<quint64>(-1)));
     return eFAILURE;
   }
 
   if (amount == 0)
   {
-    send_to_char("You hand out zero coins to everyone, but no one notices.\n\r", ch);
+    send_to_char("You hand out zero coins to everyone, but no one notices.\r\n", ch);
     return eSUCCESS;
   }
 
@@ -190,7 +184,7 @@ int do_split(char_data *ch, char *argument, int cmd)
 
   if ((!IS_AFFECTED(k, AFF_GROUP)) || (!IS_AFFECTED(ch, AFF_GROUP)))
   {
-    send_to_char("You must be grouped to split your money!\n\r", ch);
+    send_to_char("You are not grouped. You must be grouped to split your money!\r\n", ch);
     return eFAILURE;
   }
 
@@ -218,29 +212,20 @@ int do_split(char_data *ch, char *argument, int cmd)
   GET_GOLD(ch) -= amount;
   do_save(ch, "", 666);
 
-  sprintf(buf, "You split %d gold coins.  "
-               "Your share is %d gold coins.\n\r",
-          amount, share + extra);
-  send_to_char(buf, ch);
+  ch->send(QString("You split %L1 gold coins. Your share is %L2 gold coins.\r\n").arg(amount).arg(share + extra));
   GET_GOLD(ch) += share + extra;
 
-  sprintf(buf, "%s splits %d gold coins.  "
-               "Your share is %d gold coins.\n\r",
-          GET_SHORT(ch), amount, share);
-
-  char buf2[MAX_STRING_LENGTH];
   if (k != ch && k->in_room == ch->in_room)
   {
-    send_to_char(buf, k);
+    k->send(QString("%1 splits %L2 gold coins. Your share is %L3 gold coins.\r\n").arg(GET_SHORT(ch)).arg(amount).arg(share));
     int lost = 0;
     if (k->clan && get_clan(k)->tax && !IS_SET(GET_TOGGLES(k), PLR_NOTAX) &&
         (k->clan != ch->clan || (k->clan == ch->clan && IS_SET(GET_TOGGLES(ch), PLR_NOTAX))))
     {
       lost = (int)((float)share * (float)((float)get_clan(k)->tax / 100));
-      sprintf(buf2, "Your clan taxes %d gold of your share.\r\n", lost);
+      k->send(QString("Your clan taxes %1 gold of your share.\r\n").arg(lost));
       get_clan(k)->cdeposit(lost);
       save_clans();
-      send_to_char(buf2, k);
     }
     GET_GOLD(k) += (share - lost);
   }
@@ -251,16 +236,15 @@ int do_split(char_data *ch, char *argument, int cmd)
         f->follower != ch &&
         !IS_MOB(f->follower))
     {
-      send_to_char(buf, f->follower);
+      f->follower->send(QString("%1 splits %L2 gold coins. Your share is %L3 gold coins.\r\n").arg(GET_SHORT(ch)).arg(amount).arg(share));
       int lost = 0;
       if (f->follower->clan && get_clan(f->follower)->tax && !IS_SET(GET_TOGGLES(f->follower), PLR_NOTAX) &&
           (f->follower->clan != ch->clan || (f->follower->clan == ch->clan && IS_SET(GET_TOGGLES(ch), PLR_NOTAX))))
       {
         lost = (int)((float)share * (float)((float)get_clan(f->follower)->tax / 100));
-        sprintf(buf2, "Your clan taxes %d gold of your share.\r\n", lost);
+        f->follower->send(QString("Your clan taxes %L1 gold of your share.\r\n").arg(lost));
         get_clan(f->follower)->cdeposit(lost);
         save_clans();
-        send_to_char(buf2, f->follower);
       }
       GET_GOLD(f->follower) += (share - lost);
     }

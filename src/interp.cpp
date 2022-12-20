@@ -327,7 +327,7 @@ struct command_info cmd_info[] =
         {"save", do_save, nullptr, nullptr, POSITION_DEAD, 0, CMD_DEFAULT, 0, 1, CommandType::all},
         {"sneak", do_sneak, nullptr, nullptr, POSITION_STANDING, 1, CMD_DEFAULT, 0, 0, CommandType::all},
         {"home", do_home, nullptr, nullptr, POSITION_DEAD, 0, CMD_DEFAULT, 0, 1, CommandType::all},
-        {"split", do_split, nullptr, nullptr, POSITION_RESTING, 0, CMD_SPLIT, 0, 0, CommandType::all},
+        {"split", nullptr, nullptr, do_split, POSITION_RESTING, 0, CMD_SPLIT, 0, 0, CommandType::all},
         {"spells", do_spells, nullptr, nullptr, POSITION_SLEEPING, 0, CMD_DEFAULT, 0, 1, CommandType::all},
         {"skills", do_skills, nullptr, nullptr, POSITION_SLEEPING, 0, CMD_DEFAULT, 0, 1, CommandType::all},
         {"songs", do_songs, nullptr, nullptr, POSITION_SLEEPING, 0, CMD_DEFAULT, 0, 1, CommandType::all},
@@ -973,7 +973,7 @@ int command_interpreter(char_data *ch, string pcomm, bool procced)
       }
       else if (found->command_pointer3)
       {
-        QString command = QString(&pcomm[look_at]).trimmed().toLower();
+        QString command = QString(&pcomm[look_at]).trimmed();
         QStringList arguments = command.split(' ', Qt::SkipEmptyParts);
         retval = (*(found->command_pointer3))(ch, arguments, found->command_number);
       }

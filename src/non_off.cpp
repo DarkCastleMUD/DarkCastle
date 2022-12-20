@@ -735,7 +735,7 @@ int do_config(char_data *ch, QStringList &arguments, int cmd)
   // config key=value
   if (key.isEmpty() == false && value.isEmpty() == false)
   {
-    if (key == "color.good" || key == "color.bad" || key == "tell.history.timestamp")
+    if (key == "color.good" || key == "color.bad")
     {
       if (colors.find(value) == colors.end())
       {
@@ -762,17 +762,17 @@ int do_config(char_data *ch, QStringList &arguments, int cmd)
 
         return eFAILURE;
       }
-
-      ch->pcdata->config->insert(key, value);
-
-      ch->send(QString("Setting %1=%2\r\n").arg(key).arg(value));
-      return eSUCCESS;
     }
-    else
+    else if (key != "tell.history.timestamp" && key != "locale")
     {
       ch->send("Invalid config option.\r\n");
       return eFAILURE;
     }
+
+    ch->pcdata->config->insert(key, value);
+
+    ch->send(QString("Setting %1=%2\r\n").arg(key).arg(value));
+    return eSUCCESS;
   }
 
   return eFAILURE;
