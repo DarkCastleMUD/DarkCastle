@@ -6,6 +6,19 @@ char_file_u4::char_file_u4()
 {
 }
 
+QString char_data::getSetting(QString key, QString defaultValue)
+{
+    if (pcdata != nullptr)
+    {
+        if (pcdata->config == nullptr)
+        {
+            pcdata->config = new PlayerConfig;
+        }
+        return pcdata->config->value(key, defaultValue);
+    }
+    return defaultValue;
+}
+
 void mob_data::setObject(obj_data *o)
 {
     object = o;
@@ -70,6 +83,7 @@ PlayerConfig::PlayerConfig()
     config["color.good"] = "green";
     config["color.bad"] = "red";
     config["tell.history.timestamp"] = "1";
+    config["locale"] = "en_US";
 }
 
 player_config_value_t PlayerConfig::value(const player_config_key_t &key, const player_config_value_t &defaultValue) const

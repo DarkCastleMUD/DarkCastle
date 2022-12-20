@@ -540,6 +540,7 @@ struct char_data
     char_skill_data &getSkill(skill_t skill);
     void setSkill(skill_t, int value = 0);
     void upSkill(skill_t skillnum, int learned = 1);
+    QString getSetting(QString key, QString defaultValue = QString());
 };
 
 class communication
