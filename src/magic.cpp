@@ -640,7 +640,7 @@ int spell_howl(uint8_t level, char_data *ch, char_data *victim, struct obj_data 
     if (affected_by_spell(tmp_char, SPELL_CHARM_PERSON))
     {
       affect_from_char(tmp_char, SPELL_CHARM_PERSON);
-      send_to_char("You feel less enthused about your master.\n\r",
+      send_to_char("You feel less enthused about your master.\r\n",
                    tmp_char);
       act("$N blinks and shakes its head, clearing its thoughts.",
           ch, 0, tmp_char, TO_CHAR, 0);
@@ -682,7 +682,7 @@ int spell_aegis(uint8_t level, char_data *ch, char_data *victim, struct obj_data
 
   affect_to_char(ch, &af);
   if (GET_CLASS(ch) == CLASS_PALADIN)
-    send_to_char("You invoke your protective aegis.\n\r", ch);
+    send_to_char("You invoke your protective aegis.\r\n", ch);
   else
     send_to_char("You invoke your unholy aegis.\r\n", ch);
   return eSUCCESS;
@@ -708,7 +708,7 @@ int spell_armor(uint8_t level, char_data *ch, char_data *victim, struct obj_data
   af.bitvector = -1;
 
   affect_to_char(victim, &af);
-  send_to_char("You feel a magical armour surround you.\n\r", victim);
+  send_to_char("You feel a magical armour surround you.\r\n", victim);
   return eSUCCESS;
 }
 
@@ -739,7 +739,7 @@ int spell_stone_shield(uint8_t level, char_data *ch, char_data *victim, struct o
   af.bitvector = -1;
 
   affect_to_char(victim, &af);
-  send_to_char("A shield of ethereal stones begins to swirl around you.\n\r", victim);
+  send_to_char("A shield of ethereal stones begins to swirl around you.\r\n", victim);
   act("Ethereal stones form out of nothing and begin to swirl around $n.",
       victim, 0, 0, TO_ROOM, INVIS_NULL);
   return eSUCCESS;
@@ -878,7 +878,7 @@ int spell_greater_stone_shield(uint8_t level, char_data *ch, char_data *victim, 
   af.bitvector = -1;
 
   affect_to_char(victim, &af);
-  send_to_char("A shield of ethereal stones begins to swirl around you.\n\r", victim);
+  send_to_char("A shield of ethereal stones begins to swirl around you.\r\n", victim);
   act("Ethereal stones form out of nothing and begin to swirl around $n.",
       victim, 0, 0, TO_ROOM, INVIS_NULL);
   return eSUCCESS;
@@ -931,26 +931,26 @@ int spell_earthquake(uint8_t level, char_data *ch, char_data *victim, struct obj
   switch (world[ch->in_room].sector_type)
   {
   case SECT_AIR:
-    send_to_char("You attempt to cause an earthquake in the air, but nothing happens.\n\r", ch);
+    send_to_char("You attempt to cause an earthquake in the air, but nothing happens.\r\n", ch);
     act("$n attempted to cause an earthquake in the air, what an idiot.", ch, 0, 0, TO_ROOM, 0);
     return retval;
     break;
 
   case SECT_WATER_NOSWIM:
-    send_to_char("The water turns violent as the earth beneath it trembles.\n\r", ch);
+    send_to_char("The water turns violent as the earth beneath it trembles.\r\n", ch);
     act("$n's earthquake creates a tsunami that capsizes any ships in the area.", ch, 0, 0, TO_ROOM, 0);
     capsize = true;
     break;
 
   case SECT_UNDERWATER:
     underwater = true;
-    send_to_char("The earth trembles below you, the water pressure nearly makes you lose consciousness.\n\r", ch);
+    send_to_char("The earth trembles below you, the water pressure nearly makes you lose consciousness.\r\n", ch);
     act("$n's earthquake nearly makes you implode from the water pressure.", ch, 0, 0, TO_ROOM, 0);
     break;
 
   default:
     send_to_char("The earth trembles beneath your feet!\n\r", ch);
-    act("$n makes the earth tremble and shiver.\n\r", ch, 0, 0, TO_ROOM, 0);
+    act("$n makes the earth tremble and shiver.\r\n", ch, 0, 0, TO_ROOM, 0);
     break;
   }
 
@@ -988,7 +988,7 @@ int spell_earthquake(uint8_t level, char_data *ch, char_data *victim, struct obj
 
       if (!underwater && (IS_AFFECTED(tmp_victim, AFF_FREEFLOAT) || IS_AFFECTED(tmp_victim, AFF_FLYING)))
       {
-        send_to_char("Debris from the earthquake flies in every direction and strikes you.\n\r", tmp_victim);
+        send_to_char("Debris from the earthquake flies in every direction and strikes you.\r\n", tmp_victim);
         dam = 1;
       }
       else
@@ -1034,7 +1034,7 @@ int spell_earthquake(uint8_t level, char_data *ch, char_data *victim, struct obj
     }
     else if (ch_zone == tmp_vict_zone)
     {
-      send_to_char("The earth trembles and shivers.\n\r", tmp_victim);
+      send_to_char("The earth trembles and shivers.\r\n", tmp_victim);
     }
   } // main for loop of all characters
 
@@ -1152,8 +1152,8 @@ int spell_solar_gate(uint8_t level, char_data *ch, char_data *victim, struct obj
       5};
 
   // do room caster is in
-  send_to_char("A Bright light comes down from the heavens.\n\r", ch);
-  act("$n opens a Solar Gate.\n\r", ch, 0, 0, TO_ROOM, 0);
+  send_to_char("A Bright light comes down from the heavens.\r\n", ch);
+  act("$n opens a Solar Gate.\r\n", ch, 0, 0, TO_ROOM, 0);
 
   // we use "orig_room" for this now, instead of ch->in_room.  The reason for
   // this, is so if we die from a reflect, we don't keep looping through and
@@ -1491,7 +1491,7 @@ int spell_firestorm(uint8_t level, char_data *ch, char_data *victim, struct obj_
     {
       if (world[ch->in_room].zone == world[tmp_victim->in_room].zone)
       {
-        send_to_char("You feel a HOT blast of air.\n\r", tmp_victim);
+        send_to_char("You feel a HOT blast of air.\r\n", tmp_victim);
       }
     }
     catch (...)
@@ -1694,10 +1694,10 @@ int spell_teleport(uint8_t level, char_data *ch, char_data *victim, struct obj_d
   if (IS_SET(world[victim->in_room].room_flags, TELEPORT_BLOCK) ||
       IS_AFFECTED(victim, AFF_SOLIDITY))
   {
-    send_to_char("You find yourself unable to.\n\r", ch);
+    send_to_char("You find yourself unable to.\r\n", ch);
     if (ch != victim)
     {
-      sprintf(buf, "%s just tried to teleport you.\n\r", GET_SHORT(ch));
+      sprintf(buf, "%s just tried to teleport you.\r\n", GET_SHORT(ch));
       send_to_char(buf, victim);
     }
     return eFAILURE;
@@ -1779,7 +1779,7 @@ int spell_bless(uint8_t level, char_data *ch, char_data *victim, struct obj_data
   {
     if (affected_by_spell(victim, SPELL_BLESS))
       affect_from_char(victim, SPELL_BLESS);
-    send_to_char("You feel blessed.\n\r", victim);
+    send_to_char("You feel blessed.\r\n", victim);
 
     if (victim != ch)
       act("$N receives the blessing from your god.", ch, NULL, victim, TO_CHAR, 0);
@@ -2101,7 +2101,7 @@ int spell_remove_blind(uint8_t level, char_data *ch, char_data *victim, struct o
     if (!affected_by_spell(victim, SPELL_BLINDNESS) && !IS_AFFECTED(victim, AFF_BLIND))
     {
       if (victim == ch)
-        send_to_char("Seems you weren't blind after all.\n\r", ch);
+        send_to_char("Seems you weren't blind after all.\r\n", ch);
       else
         act("Seems $N wasn't blind after all.", ch, 0, victim, TO_CHAR, 0);
     }
@@ -2150,7 +2150,7 @@ int spell_cure_critic(uint8_t level, char_data *ch, char_data *victim, struct ob
 
   if (GET_RACE(victim) == RACE_UNDEAD)
   {
-    send_to_char("Healing spells are useless on the undead.\n\r", ch);
+    send_to_char("Healing spells are useless on the undead.\r\n", ch);
     return eFAILURE;
   }
 
@@ -2214,7 +2214,7 @@ int spell_cure_light(uint8_t level, char_data *ch, char_data *victim, struct obj
 
   if (GET_RACE(victim) == RACE_UNDEAD)
   {
-    send_to_char("Healing spells are useless on the undead.\n\r", ch);
+    send_to_char("Healing spells are useless on the undead.\r\n", ch);
     return eFAILURE;
   }
 
@@ -2278,7 +2278,7 @@ int spell_curse(uint8_t level, char_data *ch, char_data *victim, struct obj_data
         obj->obj_flags.value[2]--;
       }
       //		 else {
-      //		  send_to_char("Your curse has failed.\n\r", ch);
+      //		  send_to_char("Your curse has failed.\r\n", ch);
       //		 }
     }
   }
@@ -2401,7 +2401,7 @@ int spell_detect_evil(uint8_t level, char_data *ch, char_data *victim, struct ob
 
   if (ch != victim && skill < 70)
   {
-    send_to_char("You aren't practiced enough to be able to cast on others.\n\r", ch);
+    send_to_char("You aren't practiced enough to be able to cast on others.\r\n", ch);
     return eFAILURE;
   }
 
@@ -2415,7 +2415,7 @@ int spell_detect_evil(uint8_t level, char_data *ch, char_data *victim, struct ob
   af.bitvector = AFF_DETECT_EVIL;
 
   affect_to_char(victim, &af);
-  send_to_char("You become more conscious of the evil around you.\n\r", victim);
+  send_to_char("You become more conscious of the evil around you.\r\n", victim);
   act("$n looks to be more conscious of the evil around $m.", victim, 0, 0, TO_ROOM, INVIS_NULL);
   return eSUCCESS;
 }
@@ -2434,7 +2434,7 @@ int spell_detect_good(uint8_t level, char_data *ch, char_data *victim, struct ob
 
   if (ch != victim && skill < 70)
   {
-    send_to_char("You aren't practiced enough to be able to cast on others.\n\r", ch);
+    send_to_char("You aren't practiced enough to be able to cast on others.\r\n", ch);
     return eFAILURE;
   }
 
@@ -2448,7 +2448,7 @@ int spell_detect_good(uint8_t level, char_data *ch, char_data *victim, struct ob
   af.bitvector = AFF_DETECT_GOOD;
 
   affect_to_char(victim, &af);
-  send_to_char("You are now able to truly recognize the good in others.\n\r", victim);
+  send_to_char("You are now able to truly recognize the good in others.\r\n", victim);
   act("$n looks to be more conscious of the evil around $m.", victim, 0, 0, TO_ROOM, INVIS_NULL);
   return eSUCCESS;
 }
@@ -2478,7 +2478,7 @@ int spell_true_sight(uint8_t level, char_data *ch, char_data *victim, struct obj
   af.bitvector = AFF_TRUE_SIGHT;
 
   affect_to_char(victim, &af);
-  send_to_char("You feel your vision enhanced with an incredibly keen perception.\n\r", victim);
+  send_to_char("You feel your vision enhanced with an incredibly keen perception.\r\n", victim);
   return eSUCCESS;
 }
 
@@ -2507,9 +2507,9 @@ int spell_detect_invisibility(uint8_t level, char_data *ch, char_data *victim, s
   af.bitvector = AFF_DETECT_INVISIBLE;
 
   affect_to_char(victim, &af);
-  send_to_char("Your eyes tingle, allowing you to see the invisible.\n\r", victim);
+  send_to_char("Your eyes tingle, allowing you to see the invisible.\r\n", victim);
   if (ch != victim)
-    csendf(ch, "%s's eyes tingle briefly.\n\r", GET_SHORT(victim));
+    csendf(ch, "%s's eyes tingle briefly.\r\n", GET_SHORT(victim));
   return eSUCCESS;
 }
 
@@ -2538,9 +2538,9 @@ int spell_infravision(uint8_t level, char_data *ch, char_data *victim, struct ob
   af.bitvector = AFF_INFRARED;
 
   affect_to_char(victim, &af);
-  send_to_char("Your eyes glow $B$4red$R.\n\r", victim);
+  send_to_char("Your eyes glow $B$4red$R.\r\n", victim);
   if (ch != victim)
-    csendf(ch, "%s's eyes glow $B$4red$R.\n\r", GET_SHORT(victim));
+    csendf(ch, "%s's eyes glow $B$4red$R.\r\n", GET_SHORT(victim));
 
   return eSUCCESS;
 }
@@ -2567,9 +2567,9 @@ int spell_detect_magic(uint8_t level, char_data *ch, char_data *victim, struct o
   af.bitvector = AFF_DETECT_MAGIC;
 
   affect_to_char(victim, &af);
-  send_to_char("Your vision temporarily blurs, your focus shifting to the metaphysical realm.\n\r", victim);
+  send_to_char("Your vision temporarily blurs, your focus shifting to the metaphysical realm.\r\n", victim);
   if (ch != victim)
-    csendf(ch, "%s's eyes appear to blur momentarily.\n\r", GET_SHORT(victim));
+    csendf(ch, "%s's eyes appear to blur momentarily.\r\n", GET_SHORT(victim));
   return eSUCCESS;
 }
 
@@ -2617,9 +2617,9 @@ int spell_detect_poison(uint8_t level, char_data *ch, char_data *victim, struct 
   {
     if (victim == ch)
       if (IS_AFFECTED(victim, AFF_POISON))
-        send_to_char("You can sense poison in your blood.\n\r", ch);
+        send_to_char("You can sense poison in your blood.\r\n", ch);
       else
-        send_to_char("You feel healthy.\n\r", ch);
+        send_to_char("You feel healthy.\r\n", ch);
     else if (IS_AFFECTED(victim, AFF_POISON))
     {
       act("You sense that $E is poisoned.", ch, 0, victim, TO_CHAR, 0);
@@ -2637,11 +2637,11 @@ int spell_detect_poison(uint8_t level, char_data *ch, char_data *victim, struct 
       if (obj->obj_flags.value[3])
         act("Poisonous fumes are revealed.", ch, 0, 0, TO_CHAR, 0);
       else
-        send_to_char("It looks very delicious.\n\r", ch);
+        send_to_char("It looks very delicious.\r\n", ch);
     }
     else
     {
-      send_to_char("There is nothing much that poison would do on this.\n\r", ch);
+      send_to_char("There is nothing much that poison would do on this.\r\n", ch);
     }
   }
   return eSUCCESS;
@@ -2653,7 +2653,7 @@ int spell_enchant_armor(uint8_t level, char_data *ch, char_data *victim, struct 
 {
   /*int i;*/
 
-  send_to_char("This spell being revamped.  Sorry.\n\r", ch);
+  send_to_char("This spell being revamped.  Sorry.\r\n", ch);
   return eFAILURE;
 
   if ((GET_ITEM_TYPE(obj) == ITEM_ARMOR) &&
@@ -2692,7 +2692,7 @@ int spell_enchant_weapon(uint8_t level, char_data *ch, char_data *victim, struct
     return eFAILURE;
   }
 
-  send_to_char("This spell being revamped, sorry.\n\r", ch);
+  send_to_char("This spell being revamped, sorry.\r\n", ch);
   return eFAILURE;
 
   if ((GET_ITEM_TYPE(obj) == ITEM_WEAPON) &&
@@ -2788,7 +2788,7 @@ int spell_heal(uint8_t level, char_data *ch, char_data *victim, struct obj_data 
 
   if (GET_RACE(victim) == RACE_UNDEAD)
   {
-    send_to_char("Healing spells are useless on the undead.\n\r", ch);
+    send_to_char("Healing spells are useless on the undead.\r\n", ch);
     return eFAILURE;
   }
   if (GET_RACE(victim) == RACE_GOLEM)
@@ -2847,7 +2847,7 @@ int spell_power_heal(uint8_t level, char_data *ch, char_data *victim, struct obj
 
   if (GET_RACE(victim) == RACE_UNDEAD)
   {
-    send_to_char("Healing spells are useless on the undead.\n\r", ch);
+    send_to_char("Healing spells are useless on the undead.\r\n", ch);
     return eFAILURE;
   }
   if (GET_RACE(victim) == RACE_GOLEM)
@@ -2902,7 +2902,7 @@ int spell_full_heal(uint8_t level, char_data *ch, char_data *victim, struct obj_
 
   if (GET_RACE(victim) == RACE_UNDEAD)
   {
-    send_to_char("Healing spells are useless on the undead.\n\r", ch);
+    send_to_char("Healing spells are useless on the undead.\r\n", ch);
     return eFAILURE;
   }
   if (GET_RACE(victim) == RACE_GOLEM)
@@ -2986,7 +2986,7 @@ int spell_invisibility(uint8_t level, char_data *ch, char_data *victim, struct o
       return eFAILURE;
 
     act("$n slowly fades out of existence.", victim, 0, 0, TO_ROOM, INVIS_NULL);
-    send_to_char("You slowly fade out of existence.\n\r", victim);
+    send_to_char("You slowly fade out of existence.\r\n", victim);
 
     af.type = SPELL_INVISIBLE;
     af.duration = (int)(skill / 3.75);
@@ -3109,22 +3109,22 @@ int spell_locate_object(uint8_t level, char_data *ch, char *arg, char_data *vict
     {
       if (i->carried_by)
       {
-        sprintf(buf, "%s carried by %s.\n\r", i->short_description,
+        sprintf(buf, "%s carried by %s.\r\n", i->short_description,
                 PERS(i->carried_by, ch));
       }
       else if (i->in_obj)
       {
-        sprintf(buf, "%s is in %s.\n\r", i->short_description,
+        sprintf(buf, "%s is in %s.\r\n", i->short_description,
                 i->in_obj->short_description);
       }
       else if (i->in_room != NOWHERE)
       {
-        sprintf(buf, "%s is in %s.\n\r", i->short_description,
+        sprintf(buf, "%s is in %s.\r\n", i->short_description,
                 world[i->in_room].name);
       }
       else if (i->equipped_by != NULL)
       {
-        sprintf(buf, "%s is in use in an unknown location.\n\r",
+        sprintf(buf, "%s is in use in an unknown location.\r\n",
                 i->short_description);
       }
 
@@ -3141,10 +3141,10 @@ int spell_locate_object(uint8_t level, char_data *ch, char *arg, char_data *vict
   }
 
   if (j == total)
-    send_to_char("There appears to be no such object.\n\r", ch);
+    send_to_char("There appears to be no such object.\r\n", ch);
 
   if (j == 0)
-    send_to_char("The tremendous amount of information leaves you very confused.\n\r", ch);
+    send_to_char("The tremendous amount of information leaves you very confused.\r\n", ch);
 
   if (GET_LEVEL(ch) >= IMMORTAL)
   {
@@ -3196,7 +3196,7 @@ int spell_poison(uint8_t level, char_data *ch, char_data *victim, struct obj_dat
       af.location = APPLY_NONE;
       af.bitvector = AFF_POISON;
       affect_join(victim, &af, FALSE, FALSE);
-      send_to_char("You feel very sick.\n\r", victim);
+      send_to_char("You feel very sick.\r\n", victim);
       act("$N looks very sick.", ch, 0, victim, TO_CHAR, 0);
     }
     if (IS_NPC(victim) && (!victim->fighting) && GET_POS(ch) > POSITION_SLEEPING)
@@ -3216,7 +3216,7 @@ int spell_poison(uint8_t level, char_data *ch, char_data *victim, struct obj_dat
     }
     else
     {
-      send_to_char("Nothing special seems to happen.\n\r", ch);
+      send_to_char("Nothing special seems to happen.\r\n", ch);
     }
   }
   return retval;
@@ -3289,7 +3289,7 @@ int spell_protection_from_good(uint8_t level, char_data *ch, char_data *victim, 
   af.location = APPLY_NONE;
   af.bitvector = AFF_PROTECT_GOOD;
   affect_to_char(victim, &af);
-  send_to_char("You feel yourself wrapped in a protective mantle of evil.\n\r", victim);
+  send_to_char("You feel yourself wrapped in a protective mantle of evil.\r\n", victim);
   act("A light, $B$6pulsing$R aura surrounds $n.", victim, 0, 0, TO_ROOM, INVIS_NULL);
 
   return eSUCCESS;
@@ -3442,7 +3442,7 @@ bool find_spell_shield(char_data *ch, char_data *victim)
   if (IS_AFFECTED(victim, AFF_FIRESHIELD))
   {
     if (ch == victim)
-      send_to_char("You are already protected by a shield of fire.\n\r", ch);
+      send_to_char("You are already protected by a shield of fire.\r\n", ch);
     else
       act("$N is already protected by a shield of fire.", ch, 0, victim, TO_CHAR, INVIS_NULL);
 
@@ -3452,7 +3452,7 @@ bool find_spell_shield(char_data *ch, char_data *victim)
   if (IS_AFFECTED(victim, AFF_LIGHTNINGSHIELD))
   {
     if (ch == victim)
-      send_to_char("You are already protected by a shield of lightning.\n\r", ch);
+      send_to_char("You are already protected by a shield of lightning.\r\n", ch);
     else
       act("$N is already protected by a shield of lightning.", ch, 0, victim, TO_CHAR, INVIS_NULL);
 
@@ -3472,7 +3472,7 @@ bool find_spell_shield(char_data *ch, char_data *victim)
   if (IS_AFFECTED(victim, AFF_ACID_SHIELD))
   {
     if (ch == victim)
-      send_to_char("You are already protected by a shield of acid.\n\r", ch);
+      send_to_char("You are already protected by a shield of acid.\r\n", ch);
     else
       act("$N is already protected by a shield of acid.", ch, 0, victim, TO_CHAR, INVIS_NULL);
 
@@ -4033,9 +4033,9 @@ int spell_sleep(uint8_t level, char_data *ch, char_data *victim, struct obj_data
 
   if (level < GET_LEVEL(victim))
   {
-    snprintf(buf, 100, "%s laughs in your face at your feeble attempt.\n\r", GET_SHORT(victim));
+    snprintf(buf, 100, "%s laughs in your face at your feeble attempt.\r\n", GET_SHORT(victim));
     send_to_char(buf, ch);
-    snprintf(buf, 100, "%s tries to make you sleep, but fails miserably.\n\r", GET_SHORT(ch));
+    snprintf(buf, 100, "%s tries to make you sleep, but fails miserably.\r\n", GET_SHORT(ch));
     send_to_char(buf, victim);
     retval = one_hit(victim, ch, TYPE_UNDEFINED, FIRST);
     retval = SWAP_CH_VICT(retval);
@@ -4152,10 +4152,10 @@ int spell_word_of_recall(uint8_t level, char_data *ch, char_data *victim, struct
 
   if (IS_AFFECTED(victim, AFF_SOLIDITY))
   {
-    send_to_char("You find yourself unable to.\n\r", ch);
+    send_to_char("You find yourself unable to.\r\n", ch);
     if (ch != victim)
     {
-      sprintf(buf, "%s just tried to recall you.\n\r", GET_SHORT(ch));
+      sprintf(buf, "%s just tried to recall you.\r\n", GET_SHORT(ch));
       send_to_char(buf, victim);
     }
     return eFAILURE;
@@ -4234,7 +4234,7 @@ int spell_word_of_recall(uint8_t level, char_data *ch, char_data *victim, struct
 
   if (location == -1)
   {
-    send_to_char("You are completely lost.\n\r", victim);
+    send_to_char("You are completely lost.\r\n", victim);
     return eFAILURE;
   }
 
@@ -4253,13 +4253,13 @@ int spell_word_of_recall(uint8_t level, char_data *ch, char_data *victim, struct
   {
     if (GET_MANA(victim) < use_mana(victim, skill))
     {
-      send_to_char("You don't posses the energy to travel that far.\n\r", victim);
+      send_to_char("You don't posses the energy to travel that far.\r\n", victim);
       GET_MANA(victim) += use_mana(victim, skill);
       return eFAILURE;
     }
     else
     {
-      send_to_char("The long distance drains additional mana from you.\n\r", ch);
+      send_to_char("The long distance drains additional mana from you.\r\n", ch);
       GET_MANA(victim) -= use_mana(victim, skill);
     }
   }
@@ -4304,7 +4304,7 @@ int spell_wizard_eye(uint8_t level, char_data *ch, char_data *victim, struct obj
   if (IS_SET(world[victim->in_room].room_flags, NO_MAGIC) ||
       (GET_LEVEL(victim) >= IMMORTAL && GET_LEVEL(ch) < IMMORTAL))
   {
-    send_to_char("Your vision is too clouded to make out anything.\n\r", ch);
+    send_to_char("Your vision is too clouded to make out anything.\r\n", ch);
     return eFAILURE;
   }
 
@@ -4357,7 +4357,7 @@ int spell_eagle_eye(uint8_t level, char_data *ch, char_data *victim, struct obj_
   if (!OUTSIDE(victim) ||
       (GET_LEVEL(victim) >= IMMORTAL && GET_LEVEL(ch) < IMMORTAL))
   {
-    send_to_char("Your eagle cannot scan the area.\n\r", ch);
+    send_to_char("Your eagle cannot scan the area.\r\n", ch);
     return eFAILURE;
   }
 
@@ -4383,7 +4383,7 @@ int spell_eagle_eye(uint8_t level, char_data *ch, char_data *victim, struct obj_
   target = victim->in_room;
 
   move_char(ch, target, false);
-  send_to_char("You summon a large eagle to scan the area.\n\rThrough the eagle's eyes you see...\n\r", ch);
+  send_to_char("You summon a large eagle to scan the area.\n\rThrough the eagle's eyes you see...\r\n", ch);
   do_look(ch, "", 15);
   move_char(ch, original_loc);
   return eSUCCESS;
@@ -4405,7 +4405,7 @@ int spell_summon(uint8_t level, char_data *ch, char_data *victim, struct obj_dat
 
   if ((GET_LEVEL(victim) > MIN(MORTAL, level + 3)) && GET_LEVEL(ch) < IMP)
   {
-    send_to_char("You failed.\n\r", ch);
+    send_to_char("You failed.\r\n", ch);
     return eFAILURE;
   }
 
@@ -4413,7 +4413,7 @@ int spell_summon(uint8_t level, char_data *ch, char_data *victim, struct obj_dat
     if (IS_NPC(victim) || !IS_SET(victim->pcdata->toggles, PLR_SUMMONABLE))
     {
       send_to_char("Someone has tried to summon you!\n\r", victim);
-      send_to_char("Something strange about that person prevents your summoning.\n\r", ch);
+      send_to_char("Something strange about that person prevents your summoning.\r\n", ch);
       return eFAILURE;
     }
   if (IS_NPC(ch) && IS_NPC(victim))
@@ -4449,7 +4449,7 @@ int spell_summon(uint8_t level, char_data *ch, char_data *victim, struct obj_dat
 
   if (IS_AFFECTED(victim, AFF_CHAMPION) && (IS_SET(world[ch->in_room].room_flags, CLAN_ROOM) || (ch->in_room >= 1900 && ch->in_room <= 1999)))
   {
-    send_to_char("You cannot summon a Champion here.\n\r", ch);
+    send_to_char("You cannot summon a Champion here.\r\n", ch);
     return eFAILURE;
   }
 
@@ -4457,13 +4457,13 @@ int spell_summon(uint8_t level, char_data *ch, char_data *victim, struct obj_dat
   {
     if (GET_MANA(ch) < use_mana(ch, skill))
     {
-      send_to_char("You don't posses the energy to travel that far.\n\r", ch);
+      send_to_char("You don't posses the energy to travel that far.\r\n", ch);
       GET_MANA(ch) += use_mana(ch, skill);
       return eFAILURE;
     }
     else
     {
-      send_to_char("The long distance drains additional mana from you.\n\r", ch);
+      send_to_char("The long distance drains additional mana from you.\r\n", ch);
       GET_MANA(ch) -= use_mana(ch, skill);
     }
   }
@@ -4513,7 +4513,7 @@ int spell_charm_person(uint8_t level, char_data *ch, char_data *victim, struct o
 
   if (!IS_NPC(victim))
   {
-    send_to_char("You find yourself unable to charm this player.\n\r", ch);
+    send_to_char("You find yourself unable to charm this player.\r\n", ch);
     return eFAILURE;
   }
 
@@ -4522,7 +4522,7 @@ int spell_charm_person(uint8_t level, char_data *ch, char_data *victim, struct o
 
   if (circle_follow(victim, ch))
   {
-    send_to_char("Sorry, following in circles can not be allowed.\n\r", ch);
+    send_to_char("Sorry, following in circles can not be allowed.\r\n", ch);
     return eFAILURE;
   }
 
@@ -4588,7 +4588,7 @@ int spell_sense_life(uint8_t level, char_data *ch, char_data *victim, struct obj
   if (affected_by_spell(victim, SPELL_SENSE_LIFE))
     affect_from_char(victim, SPELL_SENSE_LIFE);
 
-  send_to_char("You feel your awareness improve.\n\r", victim);
+  send_to_char("You feel your awareness improve.\r\n", victim);
 
   af.type = SPELL_SENSE_LIFE;
   af.duration = 18 + skill / 2;
@@ -4706,7 +4706,7 @@ int spell_identify(uint8_t level, char_data *ch, char_data *victim, struct obj_d
 
     case ITEM_WAND:
     case ITEM_STAFF:
-      sprintf(buf, "Has %d charges, with %d charges left.\n\r",
+      sprintf(buf, "Has %d charges, with %d charges left.\r\n",
               obj->obj_flags.value[1],
               obj->obj_flags.value[2]);
       send_to_char(buf, ch);
@@ -4798,7 +4798,7 @@ int spell_identify(uint8_t level, char_data *ch, char_data *victim, struct obj_d
 
     if (!IS_NPC(victim))
     {
-      sprintf(buf, "%d Years,  %d Months,  %d Days,  %d Hours old.\n\r",
+      sprintf(buf, "%d Years,  %d Months,  %d Days,  %d Hours old.\r\n",
               age(victim).year, age(victim).month,
               age(victim).day, age(victim).hours);
       send_to_char(buf, ch);
@@ -4826,7 +4826,7 @@ int spell_identify(uint8_t level, char_data *ch, char_data *victim, struct obj_d
     }
     else
     {
-      send_to_char("You learn nothing new.\n\r", ch);
+      send_to_char("You learn nothing new.\r\n", ch);
     }
   }
   return eSUCCESS;
@@ -4972,7 +4972,7 @@ int spell_fire_breath(uint8_t level, char_data *ch, char_data *victim, struct ob
         return retval;
     }
     else if (world[ch->in_room].zone == world[tmp_victim->in_room].zone)
-      send_to_char("You feel a HOT blast of air.\n\r", tmp_victim);
+      send_to_char("You feel a HOT blast of air.\r\n", tmp_victim);
   }
   return eSUCCESS;
 }
@@ -5007,7 +5007,7 @@ int spell_gas_breath(uint8_t level, char_data *ch, char_data *victim, struct obj
         return retval;
     }
     else if (world[ch->in_room].zone == world[tmp_victim->in_room].zone)
-      send_to_char("You wanna choke on the smell in the air.\n\r", tmp_victim);
+      send_to_char("You wanna choke on the smell in the air.\r\n", tmp_victim);
   }
   return eSUCCESS;
 }
@@ -5044,7 +5044,7 @@ int spell_fear(uint8_t level, char_data *ch, char_data *victim,
 
   if (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_STUPID))
   {
-    csendf(ch, "%s doesn't understand your psychological tactics.\n\r",
+    csendf(ch, "%s doesn't understand your psychological tactics.\r\n",
            GET_SHORT(victim));
     return eFAILURE;
   }
@@ -5115,7 +5115,7 @@ int spell_fear(uint8_t level, char_data *ch, char_data *victim,
   if (saves_spell(ch, victim, 0, SAVE_TYPE_COLD) >= 0)
   {
     send_to_char(
-        "For a moment you feel compelled to run away, but you fight back the urge.\n\r",
+        "For a moment you feel compelled to run away, but you fight back the urge.\r\n",
         victim);
     act("$N doesnt seem to be the yellow-bellied slug you thought!", ch,
         NULL, victim, TO_CHAR, 0);
@@ -5260,7 +5260,7 @@ int spell_animate_dead(uint8_t level, char_data *ch, char_data *victim, struct o
 
   if (!IS_EVIL(ch) && GET_LEVEL(ch) < ARCHANGEL && GET_CLASS(ch) == CLASS_ANTI_PAL)
   {
-    send_to_char("You aren't evil enough to cast such a repugnant spell.\n\r",
+    send_to_char("You aren't evil enough to cast such a repugnant spell.\r\n",
                  ch);
     return eFAILURE;
   }
@@ -5311,7 +5311,7 @@ int spell_animate_dead(uint8_t level, char_data *ch, char_data *victim, struct o
 
   if ((r_num = real_mobile(number)) < 0)
   {
-    send_to_char("Mobile: Zombie not found.\n\r", ch);
+    send_to_char("Mobile: Zombie not found.\r\n", ch);
     return eFAILURE;
   }
 
@@ -5338,7 +5338,7 @@ int spell_animate_dead(uint8_t level, char_data *ch, char_data *victim, struct o
 
   //  if (GET_ALIGNMENT(ch) < 0)
   //{
-  // sprintf(buf, "%s slowly staggers around.\n\r", corpse->short_description);
+  // sprintf(buf, "%s slowly staggers around.\r\n", corpse->short_description);
   //    mob->long_desc = str_hsh(buf);
   //}
   //  else
@@ -5408,7 +5408,7 @@ int spell_know_alignment(uint8_t level, char_data *ch, char_data *victim, struct
 
   if (skill == 150)
     duration = 2;
-  send_to_char("Your eyes tingle, allowing you to see the auras of other creatures.\n\r", ch);
+  send_to_char("Your eyes tingle, allowing you to see the auras of other creatures.\r\n", ch);
   act("$n's eyes flash with knowledge and insight!", ch, 0, 0, TO_ROOM, INVIS_NULL);
 
   af.type = SPELL_KNOW_ALIGNMENT;
@@ -5460,7 +5460,7 @@ int spell_dispel_minor(uint8_t level, char_data *ch, char_data *victim, struct o
     if (!obj->equipped_by)
     {
       // Someone load it or something?
-      send_to_char("The magic fades away back to the ether.\n\r", ch);
+      send_to_char("The magic fades away back to the ether.\r\n", ch);
       act("$p fades away gently.", ch, obj, 0, TO_ROOM, INVIS_NULL);
     }
     else
@@ -5541,14 +5541,14 @@ int spell_dispel_minor(uint8_t level, char_data *ch, char_data *victim, struct o
       if (affected_by_spell(victim, SPELL_INVISIBLE))
       {
         affect_from_char(victim, SPELL_INVISIBLE);
-        send_to_char("You feel your invisibility dissipate.\n\r", victim);
+        send_to_char("You feel your invisibility dissipate.\r\n", victim);
         act("$n fades into existence.", victim, 0, 0, TO_ROOM, 0);
         done = TRUE;
       }
       if (IS_AFFECTED(victim, AFF_INVISIBLE))
       {
         REMBIT(victim->affected_by, AFF_INVISIBLE);
-        send_to_char("You feel your invisibility dissipate.\n\r", victim);
+        send_to_char("You feel your invisibility dissipate.\r\n", victim);
         act("$n fades into existence.", victim, 0, 0, TO_ROOM, 0);
         done = TRUE;
       }
@@ -5568,7 +5568,7 @@ int spell_dispel_minor(uint8_t level, char_data *ch, char_data *victim, struct o
       if (affected_by_spell(victim, SPELL_CAMOUFLAGE))
       {
         affect_from_char(victim, SPELL_CAMOUFLAGE);
-        send_to_char("Your camouflage has been dispelled!.\n\r", victim);
+        send_to_char("Your camouflage has been dispelled!.\r\n", victim);
         act("$N's form is less obscured as you dispel $S camouflage.", ch, 0, victim, TO_CHAR, 0);
         done = TRUE;
       }
@@ -5628,7 +5628,7 @@ int spell_dispel_minor(uint8_t level, char_data *ch, char_data *victim, struct o
       if (affected_by_spell(victim, SPELL_STONE_SKIN))
       {
         affect_from_char(victim, SPELL_STONE_SKIN);
-        send_to_char("Your skin loses stone-like consistency.\n\r", victim);
+        send_to_char("Your skin loses stone-like consistency.\r\n", victim);
         act("$N's looks like less of a stoner as $S skin returns to normal.", ch, 0, victim, TO_CHAR, 0);
         done = TRUE;
       }
@@ -5638,14 +5638,14 @@ int spell_dispel_minor(uint8_t level, char_data *ch, char_data *victim, struct o
       if (affected_by_spell(victim, SPELL_FLY))
       {
         affect_from_char(victim, SPELL_FLY);
-        send_to_char("You do not feel lighter than air anymore.\n\r", victim);
+        send_to_char("You do not feel lighter than air anymore.\r\n", victim);
         act("$N is no longer lighter than air.", ch, 0, victim, TO_CHAR, 0);
         done = TRUE;
       }
       if (IS_AFFECTED(victim, AFF_FLYING))
       {
         REMBIT(victim->affected_by, AFF_FLYING);
-        send_to_char("You do not feel lighter than air anymore.\n\r", victim);
+        send_to_char("You do not feel lighter than air anymore.\r\n", victim);
         act("$n drops to the ground, no longer lighter than air.", victim, 0, 0, TO_ROOM, 0);
         done = TRUE;
       }
@@ -5655,7 +5655,7 @@ int spell_dispel_minor(uint8_t level, char_data *ch, char_data *victim, struct o
       if (affected_by_spell(victim, SPELL_TRUE_SIGHT))
       {
         affect_from_char(victim, SPELL_TRUE_SIGHT);
-        send_to_char("You no longer see what is hidden.\n\r", victim);
+        send_to_char("You no longer see what is hidden.\r\n", victim);
         act("$N no longer sees what is hidden.", ch, 0, victim, TO_CHAR, 0);
         done = TRUE;
       }
@@ -5970,7 +5970,7 @@ int spell_cure_serious(uint8_t level, char_data *ch, char_data *victim, struct o
 
   if (GET_RACE(victim) == RACE_UNDEAD)
   {
-    send_to_char("Healing spells are useless on the undead.\n\r", ch);
+    send_to_char("Healing spells are useless on the undead.\r\n", ch);
     return eFAILURE;
   }
   if (GET_RACE(victim) == RACE_GOLEM)
@@ -6498,7 +6498,7 @@ int spell_mass_invis(uint8_t level, char_data *ch, char_data *victim, struct obj
 
         act("$n slowly fades out of existence.", tmp_victim, 0, 0,
             TO_ROOM, INVIS_NULL);
-        send_to_char("You vanish.\n\r", tmp_victim);
+        send_to_char("You vanish.\r\n", tmp_victim);
 
         af.type = SPELL_INVISIBLE;
         af.duration = 24;
@@ -6621,14 +6621,14 @@ void make_portal(char_data *ch, char_data *vict)
   obj_to_room(vict_portal, destination);
 
   send_to_room("There is a violent flash of light as a portal shimmers "
-               "into existence.\n\r",
+               "into existence.\r\n",
                ch->in_room);
 
-  sprintf(buf, "The space in front of you warps itself to %s's iron will.\n\r",
+  sprintf(buf, "The space in front of you warps itself to %s's iron will.\r\n",
           GET_SHORT(ch));
   send_to_room(buf, vict->in_room);
   send_to_room("There is a violent flash of light as a portal shimmers "
-               "into existence.\n\r",
+               "into existence.\r\n",
                vict->in_room);
 
   return;
@@ -6645,7 +6645,7 @@ int spell_portal(uint8_t level, char_data *ch, char_data *victim, struct obj_dat
       IS_SET(world[victim->in_room].room_flags, IMP_ONLY) ||
       IS_SET(world[victim->in_room].room_flags, NO_PORTAL))
   {
-    send_to_char("You can't seem to find a path.\n\r", ch);
+    send_to_char("You can't seem to find a path.\r\n", ch);
     return eFAILURE;
   }
 
@@ -6656,12 +6656,12 @@ int spell_portal(uint8_t level, char_data *ch, char_data *victim, struct obj_dat
   }
   if (IS_AFFECTED(victim, AFF_SHADOWSLIP))
   {
-    send_to_char("You can't seem to find a definite path.\n\r", ch);
+    send_to_char("You can't seem to find a definite path.\r\n", ch);
     return eFAILURE;
   }
   if (IS_SET(zone_table[world[victim->in_room].zone].zone_flags, ZONE_NO_TELEPORT))
   {
-    send_to_char("A portal shimmers into view but is unstable and immediately fades to nothing.\n\r", ch);
+    send_to_char("A portal shimmers into view but is unstable and immediately fades to nothing.\r\n", ch);
     act("A portal shimmers into view but is unstable and immediately fades to nothing.", ch, 0, 0, TO_ROOM, 0);
     return eFAILURE;
   }
@@ -6676,13 +6676,13 @@ int spell_portal(uint8_t level, char_data *ch, char_data *victim, struct obj_dat
 
     if (GET_MANA(ch) < use_mana(ch, skill))
     {
-      send_to_char("You don't posses the energy to portal that far.\n\r", ch);
+      send_to_char("You don't posses the energy to portal that far.\r\n", ch);
       GET_MANA(ch) += use_mana(ch, skill);
       return eFAILURE;
     }
     else
     {
-      send_to_char("The long distance drains additional mana from you.\n\r", ch);
+      send_to_char("The long distance drains additional mana from you.\r\n", ch);
       GET_MANA(ch) -= use_mana(ch, skill);
     }
   }
@@ -6706,7 +6706,7 @@ int spell_portal(uint8_t level, char_data *ch, char_data *victim, struct obj_dat
 
   if (portal || IS_ARENA(victim->in_room) || IS_ARENA(ch->in_room))
   {
-    send_to_char("A portal shimmers into view, then fades away again.\n\r", ch);
+    send_to_char("A portal shimmers into view, then fades away again.\r\n", ch);
     act("A portal shimmers into view, then fades away again.",
         ch, 0, 0, TO_ROOM, 0);
     return eFAILURE;
@@ -7691,7 +7691,7 @@ int cast_bless(uint8_t level, char_data *ch, char *arg, int type,
     { /* It's an object */
       if (IS_SET(tar_obj->obj_flags.extra_flags, ITEM_BLESS))
       {
-        send_to_char("Nothing seems to happen.\n\r", ch);
+        send_to_char("Nothing seems to happen.\r\n", ch);
         return eFAILURE;
       }
       return spell_bless(level, ch, 0, tar_obj, skill);
@@ -7721,7 +7721,7 @@ int cast_bless(uint8_t level, char_data *ch, char *arg, int type,
               act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_ROOM, NOTVICT);
             }
             else if (GET_POS(tar_ch) == POSITION_FIGHTING)
-              send_to_char("Nothing seems to happen.\n\r", ch);
+              send_to_char("Nothing seems to happen.\r\n", ch);
             else
               retval &= spell_bless(level, ch, tar_ch, 0, skill);
           }
@@ -7735,7 +7735,7 @@ int cast_bless(uint8_t level, char_data *ch, char *arg, int type,
             act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, TO_ROOM, NOTVICT);
           }
           else if (GET_POS(leader) == POSITION_FIGHTING)
-            send_to_char("Nothing seems to happen.\n\r", ch);
+            send_to_char("Nothing seems to happen.\r\n", ch);
           else
             retval &= spell_bless(level, ch, leader, 0, skill);
         }
@@ -7744,7 +7744,7 @@ int cast_bless(uint8_t level, char_data *ch, char *arg, int type,
       }
       if (GET_POS(tar_ch) == POSITION_FIGHTING)
       {
-        send_to_char("Nothing seems to happen.\n\r", ch);
+        send_to_char("Nothing seems to happen.\r\n", ch);
         return eFAILURE;
       }
       return spell_bless(level, ch, tar_ch, 0, skill);
@@ -7753,7 +7753,7 @@ int cast_bless(uint8_t level, char_data *ch, char *arg, int type,
   case SPELL_TYPE_POTION:
     if (GET_POS(ch) == POSITION_FIGHTING)
     {
-      send_to_char("Nothing seems to happen.\n\r", ch);
+      send_to_char("Nothing seems to happen.\r\n", ch);
       return eFAILURE;
     }
     return spell_bless(level, ch, ch, 0, skill);
@@ -7763,7 +7763,7 @@ int cast_bless(uint8_t level, char_data *ch, char *arg, int type,
     { /* It's an object */
       if (IS_SET(tar_obj->obj_flags.extra_flags, ITEM_BLESS))
       {
-        send_to_char("Nothing seems to happen.\n\r", ch);
+        send_to_char("Nothing seems to happen.\r\n", ch);
         return eFAILURE;
       }
       return spell_bless(level, ch, 0, tar_obj, skill);
@@ -7776,7 +7776,7 @@ int cast_bless(uint8_t level, char_data *ch, char *arg, int type,
 
       if (GET_POS(tar_ch) == POSITION_FIGHTING)
       {
-        send_to_char("Nothing seems to happen.\n\r", ch);
+        send_to_char("Nothing seems to happen.\r\n", ch);
         return eFAILURE;
       }
       return spell_bless(level, ch, tar_ch, 0, skill);
@@ -7787,7 +7787,7 @@ int cast_bless(uint8_t level, char_data *ch, char *arg, int type,
     { /* It's an object */
       if (IS_SET(tar_obj->obj_flags.extra_flags, ITEM_BLESS))
       {
-        send_to_char("Nothing seems to happen.\n\r", ch);
+        send_to_char("Nothing seems to happen.\r\n", ch);
         return eFAILURE;
       }
       return spell_bless(level, ch, 0, tar_obj, skill);
@@ -7797,7 +7797,7 @@ int cast_bless(uint8_t level, char_data *ch, char *arg, int type,
 
       if (GET_POS(tar_ch) == POSITION_FIGHTING)
       {
-        send_to_char("Nothing seems to happen.\n\r", ch);
+        send_to_char("Nothing seems to happen.\r\n", ch);
         return eFAILURE;
       }
       return spell_bless(level, ch, tar_ch, 0, skill);
@@ -7827,7 +7827,7 @@ int cast_paralyze(uint8_t level, char_data *ch, char *arg, int type,
   case SPELL_TYPE_SPELL:
     if (IS_AFFECTED(tar_ch, AFF_PARALYSIS))
     {
-      send_to_char("Nothing seems to happen.\n\r", ch);
+      send_to_char("Nothing seems to happen.\r\n", ch);
       return eFAILURE;
     }
     return spell_paralyze(level, ch, tar_ch, 0, skill);
@@ -7893,7 +7893,7 @@ int cast_blindness(uint8_t level, char_data *ch, char *arg, int type,
   case SPELL_TYPE_SPELL:
     if (IS_AFFECTED(tar_ch, AFF_BLIND))
     {
-      send_to_char("Nothing seems to happen.\n\r", ch);
+      send_to_char("Nothing seems to happen.\r\n", ch);
       return eFAILURE;
     }
     return spell_blindness(level, ch, tar_ch, 0, skill);
@@ -7965,13 +7965,13 @@ int cast_control_weather(uint8_t level, char_data *ch, char *arg, int type,
     if (!str_cmp("better", buffer))
     {
       weather_info.change += (dice(((level) / 3), 9));
-      send_to_char("The skies around you grow a bit clearer.\n\r", ch);
+      send_to_char("The skies around you grow a bit clearer.\r\n", ch);
       act("$n's magic causes the skies around you to grow a bit clearer.", ch, 0, 0, TO_ROOM, 0);
     }
     else
     {
       weather_info.change -= (dice(((level) / 3), 9));
-      send_to_char("The skies around you grow a bit darker.\n\r", ch);
+      send_to_char("The skies around you grow a bit darker.\r\n", ch);
       act("$n's magic causes the skies around you to grow a bit darker.", ch, 0, 0, TO_ROOM, 0);
     }
     break;
@@ -8023,7 +8023,7 @@ int cast_create_water(uint8_t level, char_data *ch, char *arg, int type,
   case SPELL_TYPE_SPELL:
     if (tar_obj->obj_flags.type_flag != ITEM_DRINKCON)
     {
-      send_to_char("It is unable to hold water.\n\r", ch);
+      send_to_char("It is unable to hold water.\r\n", ch);
       return eFAILURE;
     }
     return spell_create_water(level, ch, 0, tar_obj, skill);
@@ -8965,7 +8965,7 @@ int cast_invisibility(uint8_t level, char_data *ch, char *arg, int type,
     if (tar_obj)
     {
       if (IS_SET(tar_obj->obj_flags.extra_flags, ITEM_INVISIBLE))
-        send_to_char("Nothing new seems to happen.\n\r", ch);
+        send_to_char("Nothing new seems to happen.\r\n", ch);
       else
         return spell_invisibility(level, ch, 0, tar_obj, skill);
     }
@@ -9087,13 +9087,13 @@ int cast_protection_from_evil(uint8_t level, char_data *ch, char *arg, int type,
   case SPELL_TYPE_SPELL:
     if (IS_EVIL(ch) && GET_LEVEL(ch) < ARCHANGEL)
     {
-      send_to_char("You are too evil to invoke the protection of your god.\n\r", ch);
+      send_to_char("You are too evil to invoke the protection of your god.\r\n", ch);
       return eFAILURE;
     }
     else if (ch != tar_ch && GET_CLASS(ch) != CLASS_CLERIC)
     {
       /* only let clerics cast on others */
-      send_to_char("You can only cast this spell on yourself.\n\r", ch);
+      send_to_char("You can only cast this spell on yourself.\r\n", ch);
       return eFAILURE;
     }
     else
@@ -9176,13 +9176,13 @@ int cast_protection_from_good(uint8_t level, char_data *ch, char *arg, int type,
   case SPELL_TYPE_SPELL:
     if (IS_GOOD(ch) && GET_LEVEL(ch) < ARCHANGEL)
     {
-      send_to_char("Your goodness finds disfavor amongst the forces of darkness.\n\r", ch);
+      send_to_char("Your goodness finds disfavor amongst the forces of darkness.\r\n", ch);
       return eFAILURE;
     }
     else if (ch != tar_ch && GET_CLASS(ch) != CLASS_CLERIC)
     {
       /* only let clerics cast on others */
-      send_to_char("You can only cast this spell on yourself.\n\r", ch);
+      send_to_char("You can only cast this spell on yourself.\r\n", ch);
       return eFAILURE;
     }
     else
@@ -9492,7 +9492,7 @@ int cast_ventriloquate(uint8_t level, char_data *ch, char *arg, int type,
   if (tar_obj)
   {
     sprintf(buf1, "The %s says '%s'\n\r", fname(tar_obj->name), arg);
-    sprintf(buf2, "Someone makes it sound like the %s says '%s'.\n\r",
+    sprintf(buf2, "Someone makes it sound like the %s says '%s'.\r\n",
             fname(tar_obj->name), arg);
   }
   else
@@ -11289,7 +11289,7 @@ int spell_bee_swarm(uint8_t level, char_data *ch, char_data *victim, struct obj_
       }
       else if (world[ch->in_room].zone == world[tmp_victim->in_room].zone)
       {
-        send_to_char("You hear the buzzing of hundreds of bees.\n\r",
+        send_to_char("You hear the buzzing of hundreds of bees.\r\n",
                      tmp_victim);
       }
     }
@@ -11471,7 +11471,7 @@ int spell_barkskin(uint8_t level, char_data *ch, char_data *victim, struct obj_d
 
   SET_BIT(victim->resist, ISR_SLASH);
 
-  send_to_char("Your skin turns stiff and bark-like.\n\r", victim);
+  send_to_char("Your skin turns stiff and bark-like.\r\n", victim);
   act("$N begins to look rather woody.", ch, 0, victim, TO_ROOM, INVIS_NULL | NOTVICT);
   return eSUCCESS;
 }
@@ -11485,7 +11485,7 @@ int cast_herb_lore(uint8_t level, char_data *ch, char *arg, int type, char_data 
 
   if (GET_RACE(victim) == RACE_UNDEAD)
   {
-    send_to_char("Healing spells are useless on the undead.\n\r", ch);
+    send_to_char("Healing spells are useless on the undead.\r\n", ch);
     return eFAILURE;
   }
   if (GET_RACE(victim) == RACE_GOLEM)
@@ -11718,7 +11718,7 @@ int cast_call_follower(uint8_t level, char_data *ch, char *arg, int type, char_d
 {
   if (IS_SET(world[ch->in_room].room_flags, CLAN_ROOM))
   {
-    send_to_char("I don't think your fellow clan members would appreciate the wildlife.\n\r", ch);
+    send_to_char("I don't think your fellow clan members would appreciate the wildlife.\r\n", ch);
     GET_MANA(ch) += 75;
     REM_WAIT_STATE(ch, skill / 10);
     return eFAILURE;
@@ -11869,7 +11869,7 @@ int spell_eyes_of_the_owl(uint8_t level, char_data *ch, char_data *victim, struc
   af.bitvector = AFF_INFRARED;
   affect_join(victim, &af, FALSE, FALSE);
   redo_mana(victim);
-  send_to_char("You feel your vision become much more acute.\n\r", victim);
+  send_to_char("You feel your vision become much more acute.\r\n", victim);
   return eSUCCESS;
 }
 
@@ -12041,7 +12041,7 @@ int cast_forest_meld(uint8_t level, char_data *ch, char *arg, int type, char_dat
   }
   act("$n melts into the forest and is gone.", ch, 0, 0,
       TO_ROOM, INVIS_NULL);
-  send_to_char("You feel yourself slowly become a temporary part of the living forest.\n\r", ch);
+  send_to_char("You feel yourself slowly become a temporary part of the living forest.\r\n", ch);
   struct affected_type af;
   int skil = has_skill(ch, SPELL_FOREST_MELD);
   af.type = SPELL_FOREST_MELD;
@@ -12505,7 +12505,7 @@ int spell_beacon(uint8_t level, char_data *ch, char *arg, int type, char_data *v
   {
     if (ch->beacon->in_room >= 1900 && ch->beacon->in_room <= 1999)
     {
-      send_to_char("You cannot beacon into a guild whilst Champion.\n\r", ch);
+      send_to_char("You cannot beacon into a guild whilst Champion.\r\n", ch);
       return eFAILURE;
     }
 
@@ -12520,20 +12520,20 @@ int spell_beacon(uint8_t level, char_data *ch, char *arg, int type, char_data *v
   {
     if (GET_MANA(ch) < use_mana(ch, skill))
     {
-      send_to_char("You don't posses the energy to travel that far.\n\r", ch);
+      send_to_char("You don't posses the energy to travel that far.\r\n", ch);
       GET_MANA(ch) += use_mana(ch, skill);
       return eFAILURE;
     }
     else
     {
-      send_to_char("The long distance drains additional mana from you.\n\r", ch);
+      send_to_char("The long distance drains additional mana from you.\r\n", ch);
       GET_MANA(ch) -= use_mana(ch, skill);
     }
   }
 
   if (others_clan_room(ch, &world[ch->beacon->in_room]) == true)
   {
-    send_to_char("You cannot beacon into another clan's hall.\n\r", ch);
+    send_to_char("You cannot beacon into another clan's hall.\r\n", ch);
     ch->beacon->equipped_by = NULL;
     extract_obj(ch->beacon);
     ch->beacon = NULL;
@@ -12577,7 +12577,7 @@ int do_beacon(char_data *ch, char *argument, int cmd)
 
   if (IS_AFFECTED(ch, AFF_CHAMPION) && ch->in_room >= 1900 && ch->in_room <= 1999)
   {
-    send_to_char("You cannot set a beacon in a guild whilst Champion.\n\r", ch);
+    send_to_char("You cannot set a beacon in a guild whilst Champion.\r\n", ch);
     return eFAILURE;
   }
 
@@ -12595,7 +12595,7 @@ int do_beacon(char_data *ch, char *argument, int cmd)
 
   if (others_clan_room(ch, &world[ch->in_room]) == true)
   {
-    send_to_char("You cannot set a beacon in another clan's hall.\n\r", ch);
+    send_to_char("You cannot set a beacon in another clan's hall.\r\n", ch);
     return eFAILURE;
   }
 
@@ -12604,7 +12604,7 @@ int do_beacon(char_data *ch, char *argument, int cmd)
   {
     if (!(new_obj = clone_object(real_object(BEACON_OBJ_NUMBER))))
     {
-      send_to_char("Error setting beacon.  Contact a god.\n\r", ch);
+      send_to_char("Error setting beacon.  Contact a god.\r\n", ch);
       return eFAILURE;
     }
   }
@@ -12758,7 +12758,7 @@ int spell_summon_familiar(uint8_t level, char_data *ch, char *arg, int type, cha
 
   if ((r_num = real_mobile(fam_type)) < 0)
   {
-    send_to_char("Summon familiar mob not found.  Tell a god.\n\r", ch);
+    send_to_char("Summon familiar mob not found.  Tell a god.\r\n", ch);
     return eFAILURE;
   }
 
@@ -13032,7 +13032,7 @@ int spell_rapid_mend(uint8_t level, char_data *ch, char_data *victim, struct obj
   if (!affected_by_spell(victim, SPELL_RAPID_MEND))
   {
     act("$n starts to heal more quickly.", victim, 0, 0, TO_ROOM, INVIS_NULL);
-    send_to_char("You feel your body begin to heal more quickly.\n\r", victim);
+    send_to_char("You feel your body begin to heal more quickly.\r\n", victim);
 
     if (skill < 40)
     {
@@ -13326,7 +13326,7 @@ int spell_globe_of_darkness(uint8_t level, char_data *ch, char_data *victim, str
 
   if (!globe)
   {
-    send_to_char("Major screwup in globe of darkness.  Missing util obj.  Tell coder.\n\r", ch);
+    send_to_char("Major screwup in globe of darkness.  Missing util obj.  Tell coder.\r\n", ch);
     return eFAILURE;
   }
 
@@ -13335,7 +13335,7 @@ int spell_globe_of_darkness(uint8_t level, char_data *ch, char_data *victim, str
 
   act("$n's hand blurs, causing $B$0darkness$R to quickly expand and expunge light from the entire area.",
       ch, 0, 0, TO_ROOM, 0);
-  send_to_char("Your summoned $B$0darkness$R turns the area pitch black.\n\r", ch);
+  send_to_char("Your summoned $B$0darkness$R turns the area pitch black.\r\n", ch);
 
   obj_to_room(globe, ch->in_room);
   world[ch->in_room].light -= globe->obj_flags.value[1];
@@ -13464,7 +13464,7 @@ int spell_icestorm(uint8_t level, char_data *ch, char_data *victim, struct obj_d
     else
     {
       if (world[ch->in_room].zone == world[tmp_victim->in_room].zone)
-        send_to_char("You feel a BLAST of $B$3cold$R air.\n\r", tmp_victim);
+        send_to_char("You feel a BLAST of $B$3cold$R air.\r\n", tmp_victim);
     }
   }
 
@@ -13923,7 +13923,7 @@ int spell_vampiric_aura(uint8_t level, char_data *ch, char_data *victim, struct 
   /*
   if (affected_by_spell(victim, SPELL_ACID_SHIELD)) {
      act("A film of $B$0shadow$R begins to rise around $n but fades around $s ankles.", victim, 0, 0, TO_ROOM, INVIS_NULL);
-     send_to_char("A film of $B$0shadow$R tries to rise around you but dissolves in your acid shield.\n\r", ch);
+     send_to_char("A film of $B$0shadow$R tries to rise around you but dissolves in your acid shield.\r\n", ch);
      return eFAILURE;
   }
 */
@@ -14560,7 +14560,7 @@ int spell_conjure_elemental(uint8_t level, char_data *ch, char *arg, char_data *
   }
   if ((r_num = real_mobile(virt)) < 0)
   {
-    send_to_char("Mobile: Elemental not found.\n\r", ch);
+    send_to_char("Mobile: Elemental not found.\r\n", ch);
     return eFAILURE;
   }
 
@@ -14659,7 +14659,7 @@ int spell_wrath_of_god(uint8_t level, char_data *ch, char_data *victim, obj_data
 
   if (IS_SET(world[ch->in_room].room_flags, SAFE))
   {
-    send_to_char("You cannot cast this here.\n\r", ch);
+    send_to_char("You cannot cast this here.\r\n", ch);
     return eFAILURE;
   }
 
@@ -14670,7 +14670,7 @@ int spell_wrath_of_god(uint8_t level, char_data *ch, char_data *victim, obj_data
 
   if (GET_MANA(ch) < castcost)
   {
-    send_to_char("You do not have enough mana to cast this spell.\n\r", ch);
+    send_to_char("You do not have enough mana to cast this spell.\r\n", ch);
     return eFAILURE;
   }
   else
@@ -14729,12 +14729,12 @@ int spell_atonement(uint8_t level, char_data *ch, char_data *victim, obj_data *o
 
   if (heal < 0)
   {
-    send_to_char("Yeah, right.\n\r", ch);
+    send_to_char("Yeah, right.\r\n", ch);
     return eFAILURE;
   }
   if (GET_MAX_MANA(ch) - heal < 1)
   {
-    send_to_char("You do not have enough mana to sacrifice.\n\r", ch);
+    send_to_char("You do not have enough mana to sacrifice.\r\n", ch);
     return eFAILURE;
   }
   if (ch->fighting)
@@ -14743,7 +14743,7 @@ int spell_atonement(uint8_t level, char_data *ch, char_data *victim, obj_data *o
     ch->max_mana -= heal;
   GET_MANA(ch) = GET_MAX_MANA(ch);
 
-  send_to_char("You pray fervently for the support of the gods and are rewarded restoration...at a price.\n\r", ch);
+  send_to_char("You pray fervently for the support of the gods and are rewarded restoration...at a price.\r\n", ch);
   act("$n prays fervently for the support of the gods and is rewarded restoration...at a price.", ch, 0, 0, TO_ROOM, 0);
 
   return eSUCCESS;
@@ -14774,16 +14774,16 @@ int spell_silence(uint8_t level, char_data *ch, char_data *victim, obj_data *obj
 
   if (IS_SET(world[ch->in_room].room_flags, SAFE))
   {
-    send_to_char("You cannot silence this room.\n\r", ch);
+    send_to_char("You cannot silence this room.\r\n", ch);
     return eFAILURE;
   }
 
-  send_to_char("Your chants fade softy to an eerie quiet as the silence takes hold...\n\r", ch);
+  send_to_char("Your chants fade softy to an eerie quiet as the silence takes hold...\r\n", ch);
   act("$n's chants fade to an eerie quiet as the silence takes hold...", ch, 0, 0, TO_ROOM, 0);
 
   if (!(silence_obj = clone_object(real_object(SILENCE_OBJ_NUMBER))))
   {
-    send_to_char("Error setting silence object.  Tell an immortal.\n\r", ch);
+    send_to_char("Error setting silence object.  Tell an immortal.\r\n", ch);
     return eFAILURE;
   }
 
@@ -14819,19 +14819,19 @@ int spell_immunity(uint8_t level, char_data *ch, char_data *victim, obj_data *ob
 
   if ((spell_info[spl].targets & TAR_IGNORE))
   {
-    send_to_char("You find it impossible to immunize yourself against this type of spell.\n\r", ch);
+    send_to_char("You find it impossible to immunize yourself against this type of spell.\r\n", ch);
     return eSUCCESS;
   }
 
   if (ch->fighting)
   {
-    send_to_char("You cannot concentrate enough to immunize yourself.\n\r", ch);
+    send_to_char("You cannot concentrate enough to immunize yourself.\r\n", ch);
     return eSUCCESS;
   }
 
   if (affected_by_spell(ch, SPELL_IMMUNITY))
   {
-    csendf(ch, "You are already immune to %s.\n\r", spells[affected_by_spell(ch, SPELL_IMMUNITY)->modifier]);
+    csendf(ch, "You are already immune to %s.\r\n", spells[affected_by_spell(ch, SPELL_IMMUNITY)->modifier]);
     return eSUCCESS;
   }
 
@@ -14874,7 +14874,7 @@ int spell_boneshield(uint8_t level, char_data *ch, char_data *victim, obj_data *
 
   if (!IS_NPC(victim) || victim->master != ch)
   {
-    send_to_char("You cannot cast this spell on that.\n\r", ch);
+    send_to_char("You cannot cast this spell on that.\r\n", ch);
     return eFAILURE;
   }
 
@@ -15376,7 +15376,7 @@ int cast_wild_magic(uint8_t level, char_data *ch, char *arg,
     spell_to_cast = get_wild_magic_defensive(level, ch, tar_ch, 0, skill);
   else
   {
-    send_to_char("You need to specify offensive or defensive.\n\r", ch);
+    send_to_char("You need to specify offensive or defensive.\r\n", ch);
     return eFAILURE;
   }
 
@@ -15395,13 +15395,13 @@ int spell_spirit_shield(uint8_t level, char_data *ch, char_data *victim, struct 
 
   if (ch->equipment[WEAR_SHIELD])
   {
-    send_to_char("Your prayers are ignored by the gods as your hands are not free to receive thief gifts.\n\r", ch);
+    send_to_char("Your prayers are ignored by the gods as your hands are not free to receive thief gifts.\r\n", ch);
     return eFAILURE;
   }
 
   if (!(ssobj = clone_object(real_object(SPIRIT_SHIELD_OBJ_NUMBER))))
   {
-    send_to_char("Error setting spirit shield object.  Tell an immortal.\n\r", ch);
+    send_to_char("Error setting spirit shield object.  Tell an immortal.\r\n", ch);
     return eFAILURE;
   }
 
@@ -15927,7 +15927,7 @@ int spell_ethereal_focus(uint8_t level, char_data *ch, char_data *victim, struct
 
   affect_to_char(ch, &af);
 
-  send_to_char("You focus the minds of your allies to react to the slightest movement...\n\r", ch);
+  send_to_char("You focus the minds of your allies to react to the slightest movement...\r\n", ch);
   act("$n's magic attempts to focus $s allies minds into a unified supernatural focus...", ch, 0, 0, TO_ROOM, INVIS_NULL);
   // loop through group members in room
   for (ally = world[ch->in_room].people; ally; ally = next_ally)

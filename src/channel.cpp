@@ -268,7 +268,7 @@ int do_pray(char_data *ch, char *arg, int cmd)
 
   if (!*arg)
   {
-    send_to_char("You must have something to tell the immortals...\n\r", ch);
+    send_to_char("You must have something to tell the immortals...\r\n", ch);
     return eSUCCESS;
   }
 
@@ -286,7 +286,7 @@ int do_pray(char_data *ch, char *arg, int cmd)
 
   if (!IS_MOB(ch) && IS_SET(ch->pcdata->punish, PUNISH_NOPRAY))
   {
-    send_to_char("The gods are deaf to your prayers.\n\r", ch);
+    send_to_char("The gods are deaf to your prayers.\r\n", ch);
     return eSUCCESS;
   }
 
@@ -303,7 +303,7 @@ int do_pray(char_data *ch, char *arg, int cmd)
     if (!i->connected)
       send_to_char(buf1, i->character);
   }
-  send_to_char("\a\aOk.\n\r", ch);
+  send_to_char("\a\aOk.\r\n", ch);
   WAIT_STATE(ch, PULSE_VIOLENCE * 2);
   return eSUCCESS;
 }
@@ -356,7 +356,7 @@ int do_gossip(char_data *ch, char *argument, int cmd)
     }
     if (GET_LEVEL(ch) < 3)
     {
-      send_to_char("You must be at least 3rd level to gossip.\n\r", ch);
+      send_to_char("You must be at least 3rd level to gossip.\r\n", ch);
       return eSUCCESS;
     }
   }
@@ -462,7 +462,7 @@ int do_auction(char_data *ch, char *argument, int cmd)
     }
     if (GET_LEVEL(ch) < 3)
     {
-      send_to_char("You must be at least 3rd level to auction.\n\r", ch);
+      send_to_char("You must be at least 3rd level to auction.\r\n", ch);
       return eSUCCESS;
     }
   }
@@ -557,7 +557,7 @@ int do_shout(char_data *ch, char *argument, int cmd)
   if (!IS_NPC(ch) && GET_LEVEL(ch) < 3)
   {
     send_to_char("Due to misuse, you must be of at least 3rd level "
-                 "to shout.\n\r",
+                 "to shout.\r\n",
                  ch);
     return eSUCCESS;
   }
@@ -636,7 +636,7 @@ int do_trivia(char_data *ch, char *argument, int cmd)
     if (GET_LEVEL(ch) < 3)
     {
       send_to_char("You must be at least 3rd level to participate in "
-                   "trivia.\n\r",
+                   "trivia.\r\n",
                    ch);
       return eSUCCESS;
     }
@@ -735,7 +735,7 @@ int do_dream(char_data *ch, char *argument, int cmd)
 
   if (GET_LEVEL(ch) < 3)
   {
-    send_to_char("You must be at least 3rd level to dream.\n\r", ch);
+    send_to_char("You must be at least 3rd level to dream.\r\n", ch);
     return eSUCCESS;
   }
 
@@ -888,7 +888,7 @@ command_return_t do_tell(char_data *ch, string argument, int cmd)
     }
     else
     {
-      send_to_char("No-one by that name here.\n\r", ch);
+      send_to_char("No-one by that name here.\r\n", ch);
     }
 
     return eSUCCESS;
@@ -908,7 +908,7 @@ command_return_t do_tell(char_data *ch, string argument, int cmd)
     send_to_char("That player has tell channeled off btw...\r\n", ch);
   }
   if (ch == vict)
-    send_to_char("You try to tell yourself something.\n\r", ch);
+    send_to_char("You try to tell yourself something.\r\n", ch);
   else if ((GET_POS(vict) == POSITION_SLEEPING || IS_SET(world[vict->in_room].room_flags, QUIET)) && GET_LEVEL(ch) < IMMORTAL)
     act("Sorry, $E cannot hear you.", ch, 0, vict, TO_CHAR, STAYHIDE);
   else
@@ -921,7 +921,7 @@ command_return_t do_tell(char_data *ch, string argument, int cmd)
       }
     if (is_ignoring(vict, ch))
     {
-      csendf(ch, "%s is ignoring you right now.\n\r", GET_SHORT(vict));
+      csendf(ch, "%s is ignoring you right now.\r\n", GET_SHORT(vict));
       return eSUCCESS;
     }
     if (is_busy(vict) && GET_LEVEL(ch) >= OVERSEER)
@@ -1030,7 +1030,7 @@ command_return_t do_reply(char_data *ch, string argument, int cmd)
 
   if (IS_MOB(ch) || ch->pcdata->last_tell.empty())
   {
-    send_to_char("You have noone to reply to.\n\r", ch);
+    send_to_char("You have noone to reply to.\r\n", ch);
     return eSUCCESS;
   }
 
@@ -1083,12 +1083,12 @@ int do_whisper(char_data *ch, char *argument, int cmd)
   if (!*name || !*message)
     send_to_char("Who do you want to whisper to.. and what??\n\r", ch);
   else if (!(vict = get_char_room_vis(ch, name)))
-    send_to_char("No-one by that name here..\n\r", ch);
+    send_to_char("No-one by that name here..\r\n", ch);
   else if (vict == ch)
   {
     act("$n whispers quietly to $mself.", ch, 0, 0, TO_ROOM, STAYHIDE);
     send_to_char(
-        "You can't seem to get your mouth close enough to your ear...\n\r", ch);
+        "You can't seem to get your mouth close enough to your ear...\r\n", ch);
   }
   else if (is_ignoring(vict, ch))
   {
@@ -1130,11 +1130,11 @@ int do_ask(char_data *ch, char *argument, int cmd)
   if (!*name || !*message)
     send_to_char("Who do you want to ask something, and what??\n\r", ch);
   else if (!(vict = get_char_room_vis(ch, name)))
-    send_to_char("No-one by that name here.\n\r", ch);
+    send_to_char("No-one by that name here.\r\n", ch);
   else if (vict == ch)
   {
     act("$n quietly asks $mself a question.", ch, 0, 0, TO_ROOM, 0);
-    send_to_char("You think about it for a while...\n\r", ch);
+    send_to_char("You think about it for a while...\r\n", ch);
   }
   else if (is_ignoring(vict, ch))
   {

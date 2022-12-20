@@ -443,7 +443,7 @@ int do_write_skillquest(char_data *ch, char *argument, int cmd)
 	}
 	fprintf(fl, "0\n");
 	dc_fclose(fl);
-	send_to_char("Skill quests saved.\n\r", ch);
+	send_to_char("Skill quests saved.\r\n", ch);
 	return eSUCCESS;
 }
 
@@ -1390,7 +1390,7 @@ struct index_data *generate_obj_indices(int *top,
 			}
 			else
 			{
-				fprintf(stderr, "Error in \'%s\'.\n\r", endfile);
+				fprintf(stderr, "Error in \'%s\'.\r\n", endfile);
 				perror("generate obj indices");
 				abort();
 			}
@@ -2160,7 +2160,7 @@ int create_one_room(char_data *ch, int vnum)
 	rp->last_track = 0;
 	sprintf(buf, "Room %d", vnum);
 	rp->name = (char *)str_dup(buf);
-	rp->description = (char *)str_dup("Empty description.\n\r");
+	rp->description = (char *)str_dup("Empty description.\r\n");
 	return 1;
 }
 

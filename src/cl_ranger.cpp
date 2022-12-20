@@ -160,20 +160,20 @@ int do_tame(char_data *ch, char *arg, int cmd)
 
   if (!IS_NPC(victim))
   {
-    send_to_char("You find yourself unable to tame this player.\n\r", ch);
+    send_to_char("You find yourself unable to tame this player.\r\n", ch);
     return eFAILURE;
   }
 
   if (IS_AFFECTED(victim, AFF_CHARM) || IS_AFFECTED(ch, AFF_CHARM) ||
       (GET_LEVEL(ch) < GET_LEVEL(victim)))
   {
-    send_to_char("You find yourself unable to tame this creature.\n\r", ch);
+    send_to_char("You find yourself unable to tame this creature.\r\n", ch);
     return eFAILURE;
   }
 
   if (circle_follow(victim, ch))
   {
-    send_to_char("Sorry, following in circles can not be allowed.\n\r", ch);
+    send_to_char("Sorry, following in circles can not be allowed.\r\n", ch);
     return eFAILURE;
   }
 
@@ -293,7 +293,7 @@ int do_track(char_data *ch, char *argument, int cmd)
 
   if (*victim && !IS_NPC(ch) && GET_CLASS(ch) != CLASS_RANGER && GET_CLASS(ch) != CLASS_DRUID && GET_LEVEL(ch) < ANGEL)
   {
-    send_to_char("Only a ranger could track someone by name.\n\r", ch);
+    send_to_char("Only a ranger could track someone by name.\r\n", ch);
     return eFAILURE;
   }
 
@@ -321,12 +321,12 @@ int do_track(char_data *ch, char *argument, int cmd)
     {
       ansi_color(RED, ch);
       ansi_color(BOLD, ch);
-      send_to_char("You have lost the trail.\n\r", ch);
+      send_to_char("You have lost the trail.\r\n", ch);
       ansi_color(NTEXT, ch);
       // remove_memory(ch, 't');
     }
     else
-      send_to_char("There are no distinct scents here.\n\r", ch);
+      send_to_char("There are no distinct scents here.\r\n", ch);
     return eFAILURE;
   }
 
@@ -345,11 +345,11 @@ int do_track(char_data *ch, char *argument, int cmd)
         {
           ansi_color(RED, ch);
           ansi_color(BOLD, ch);
-          send_to_char("You have lost the trail.\n\r", ch);
+          send_to_char("You have lost the trail.\r\n", ch);
           ansi_color(NTEXT, ch);
         }
         else
-          send_to_char("You can't find any traces of such a scent.\n\r", ch);
+          send_to_char("You can't find any traces of such a scent.\r\n", ch);
         //         remove_memory(ch, 't');
         if (IS_NPC(ch))
           swap_hate_memory(ch);
@@ -362,7 +362,7 @@ int do_track(char_data *ch, char *argument, int cmd)
         add_memory(ch, pScent->trackee, 't');
         ansi_color(RED, ch);
         ansi_color(BOLD, ch);
-        csendf(ch, "You sense traces of your quarry to the %s.\n\r",
+        csendf(ch, "You sense traces of your quarry to the %s.\r\n",
                dirs[y]);
         ansi_color(NTEXT, ch);
 
@@ -430,11 +430,11 @@ int do_track(char_data *ch, char *argument, int cmd)
     {
       ansi_color(RED, ch);
       ansi_color(BOLD, ch);
-      send_to_char("You have lost the trail.\n\r", ch);
+      send_to_char("You have lost the trail.\r\n", ch);
       ansi_color(NTEXT, ch);
     }
     else
-      send_to_char("You can't find any traces of such a scent.\n\r", ch);
+      send_to_char("You can't find any traces of such a scent.\r\n", ch);
 
     //    remove_memory(ch, 't');
     return eFAILURE;
@@ -445,7 +445,7 @@ int do_track(char_data *ch, char *argument, int cmd)
     if ((x > world[ch->in_room].nTracks) || !(pScent = world[ch->in_room].TrackItem(x)))
     {
       if (x == 1)
-        send_to_char("There are no distinct smells here.\n\r", ch);
+        send_to_char("There are no distinct smells here.\r\n", ch);
       break;
     }
 
@@ -501,9 +501,9 @@ int do_track(char_data *ch, char *argument, int cmd)
       strcpy(sex, "");
 
     if (x == 1)
-      send_to_char("Freshest scents first...\n\r", ch);
+      send_to_char("Freshest scents first...\r\n", ch);
 
-    sprintf(buf, "The scent of a%s%s%s%s leads %s.\n\r",
+    sprintf(buf, "The scent of a%s%s%s%s leads %s.\r\n",
             weight,
             condition,
             sex,
@@ -528,14 +528,14 @@ int do_ambush(char_data *ch, char *arg, int cmd)
 
   if (!*arg)
   {
-    sprintf(buf, "You will ambush %s on sight.\n\r", ch->ambush ? ch->ambush : "no one");
+    sprintf(buf, "You will ambush %s on sight.\r\n", ch->ambush ? ch->ambush : "no one");
     send_to_char(buf, ch);
     return eSUCCESS;
   }
 
   if (!(ch->ambush))
   {
-    sprintf(buf, "You will now ambush %s on sight.\n\r", arg);
+    sprintf(buf, "You will now ambush %s on sight.\r\n", arg);
     send_to_char(buf, ch);
     ch->ambush = str_dup(arg);
     return eSUCCESS;
@@ -543,14 +543,14 @@ int do_ambush(char_data *ch, char *arg, int cmd)
 
   if (!str_cmp(arg, ch->ambush))
   {
-    sprintf(buf, "You will no longer ambush %s on sight.\n\r", arg);
+    sprintf(buf, "You will no longer ambush %s on sight.\r\n", arg);
     send_to_char(buf, ch);
     dc_free(ch->ambush);
     ch->ambush = NULL;
     return eSUCCESS;
   }
 
-  sprintf(buf, "You will now ambush %s on sight.\n\r", arg);
+  sprintf(buf, "You will now ambush %s on sight.\r\n", arg);
 
   // TODO - remove this later after I've watched for Bushmaster to do it a few times
   if (strlen(buf) > MAX_INPUT_LENGTH)
@@ -758,7 +758,7 @@ int do_forage(char_data *ch, char *arg, int cmd)
     if (number(0, 1) == 0)
       send_to_char("You already foraged recently.  Give mother nature a break!\n\r", ch);
     else
-      send_to_char("There's a limit to how often you can play with your nuts.  Give it some time.\n\r", ch);
+      send_to_char("There's a limit to how often you can play with your nuts.  Give it some time.\r\n", ch);
     return eFAILURE;
   }
 
@@ -926,7 +926,7 @@ void do_arrow_miss(char_data *ch, char_data *victim, int dir, struct obj_data *f
   case 1:
     if (dir < 0)
     {
-      sprintf(buf, "%s wizzes by.\n\r", found->short_description);
+      sprintf(buf, "%s wizzes by.\r\n", found->short_description);
       send_to_char(buf, victim);
       sprintf(buf, "%s wizzes by.", found->short_description);
       act(buf, victim, NULL, ch, TO_ROOM, NOTVICT);
@@ -1408,7 +1408,7 @@ int do_fire(char_data *ch, char *arg, int cmd)
     else if (dir < 0)
     {
       send_to_char(
-          "You aren't skilled enough to fire at a target this close.\n\r",
+          "You aren't skilled enough to fire at a target this close.\r\n",
           ch);
       return eFAILURE;
     }
@@ -1416,7 +1416,7 @@ int do_fire(char_data *ch, char *arg, int cmd)
     {
       if (dir >= 0)
         send_to_char(
-            "You cannot concentrate enough to fire into an adjacent room while fighting.\n\r",
+            "You cannot concentrate enough to fire into an adjacent room while fighting.\r\n",
             ch);
       else
         send_to_char("You cannot seem to locate your target.\r\n", ch);
@@ -1642,7 +1642,7 @@ int do_fire(char_data *ch, char *arg, int cmd)
       if (!char_to_room(ch, victim->in_room))
       {
         char_to_room(ch, cur_room);
-        send_to_char("Error moving you to room in do_fire.\n\r", ch);
+        send_to_char("Error moving you to room in do_fire.\r\n", ch);
         return eFAILURE;
       }
       retval = weapon_spells(ch, victim, ITEM_MISSILE);
@@ -1865,13 +1865,13 @@ int do_natural_selection(char_data *ch, char *arg, int cmd)
   int learned = has_skill(ch, SKILL_NAT_SELECT);
   if (IS_NPC(ch) || !learned)
   {
-    send_to_char("You don't know how to use this to your advantage.\n\r", ch);
+    send_to_char("You don't know how to use this to your advantage.\r\n", ch);
     return eFAILURE;
   }
 
   if (affected_by_spell(ch, SPELL_NAT_SELECT_TIMER))
   {
-    send_to_char("You cannot yet select a new enemy of choice.\n\r", ch);
+    send_to_char("You cannot yet select a new enemy of choice.\r\n", ch);
     return eFAILURE;
   }
 
@@ -1883,14 +1883,14 @@ int do_natural_selection(char_data *ch, char *arg, int cmd)
     {
       if (cur && cur->modifier == i)
       {
-        send_to_char("You are already studying this race.\n\r", ch);
+        send_to_char("You are already studying this race.\r\n", ch);
         return eFAILURE;
       }
       break;
     }
     if (i == 32)
     {
-      send_to_char("Please select a valid race.\n\r", ch);
+      send_to_char("Please select a valid race.\r\n", ch);
       return eFAILURE;
     }
   }
@@ -1912,7 +1912,7 @@ int do_natural_selection(char_data *ch, char *arg, int cmd)
   af.bitvector = -1;
   affect_to_char(ch, &af);
 
-  csendf(ch, "You study the habits of the %s race and select them as your enemy of choice.\n\r", races[i].singular_name);
+  csendf(ch, "You study the habits of the %s race and select them as your enemy of choice.\r\n", races[i].singular_name);
 
   return eSUCCESS;
 }

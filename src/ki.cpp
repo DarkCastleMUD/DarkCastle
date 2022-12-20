@@ -128,7 +128,7 @@ int do_ki(char_data *ch, char *argument, int cmd)
   /*
    if ((IS_SET(world[ch->in_room].room_flags, SAFE)) && (GET_LEVEL(ch) < IMP)) {
    send_to_char("You feel at peace, calm, relaxed, one with yourself and "
-   "the universe.\n\r", ch);
+   "the universe.\r\n", ch);
    return eFAILURE;
    }*/
 
@@ -155,7 +155,7 @@ int do_ki(char_data *ch, char *argument, int cmd)
   if (IS_SET(world[ch->in_room].room_flags, SAFE) && (GET_LEVEL(ch) < IMP) && spl != KI_SENSE && spl != KI_SPEED && spl != KI_PURIFY && spl != KI_STANCE && spl != KI_AGILITY && spl != KI_MEDITATION)
   {
     send_to_char("You feel at peace, calm, relaxed, one with yourself and "
-                 "the universe.\n\r",
+                 "the universe.\r\n",
                  ch);
     return eFAILURE;
   }
@@ -174,7 +174,7 @@ int do_ki(char_data *ch, char *argument, int cmd)
       switch (GET_POS(ch))
       {
       case POSITION_SLEEPING:
-        send_to_char("You dream of wonderful ki powers.\n\r", ch);
+        send_to_char("You dream of wonderful ki powers.\r\n", ch);
         break;
       case POSITION_RESTING:
         send_to_char("You cannot harness that much energy while "
@@ -185,7 +185,7 @@ int do_ki(char_data *ch, char *argument, int cmd)
         send_to_char("You can't do this sitting!\n\r", ch);
         break;
       case POSITION_FIGHTING:
-        send_to_char("This is a peaceful ki power.\n\r", ch);
+        send_to_char("This is a peaceful ki power.\r\n", ch);
         break;
       default:
         send_to_char("It seems like you're in a pretty bad shape!\n\r",
@@ -245,7 +245,7 @@ int do_ki(char_data *ch, char *argument, int cmd)
     if (target_ok != TRUE)
     {
       if (*name)
-        send_to_char("Nobody here by that name.\n\r", ch);
+        send_to_char("Nobody here by that name.\r\n", ch);
       else
         /* No arguments were given */
         send_to_char("Whom should the power be used upon?\n\r", ch);
@@ -256,19 +256,19 @@ int do_ki(char_data *ch, char *argument, int cmd)
     {
       if ((tar_char == ch) && IS_SET(ki_info[spl].targets, TAR_SELF_NONO))
       {
-        send_to_char("You cannot use this power on yourself.\n\r", ch);
+        send_to_char("You cannot use this power on yourself.\r\n", ch);
         return eFAILURE;
       }
       else if ((tar_char != ch) && IS_SET(ki_info[spl].targets, TAR_SELF_ONLY))
       {
-        send_to_char("You can only use this power upon yourself.\n\r",
+        send_to_char("You can only use this power upon yourself.\r\n",
                      ch);
         return eFAILURE;
       }
       else if (IS_AFFECTED(ch, AFF_CHARM) && (ch->master == tar_char))
       {
         send_to_char(
-            "You are afraid that it might harm your master.\n\r",
+            "You are afraid that it might harm your master.\r\n",
             ch);
         return eFAILURE;
       }
@@ -285,7 +285,7 @@ int do_ki(char_data *ch, char *argument, int cmd)
             LogChannels::LOG_BUG);
         send_to_char(
             "If you triggered this message, you almost crashed the\n\r"
-            "game.  Tell a god what you did immediately.\n\r",
+            "game.  Tell a god what you did immediately.\r\n",
             ch);
         return eFAILURE;
       }
@@ -294,7 +294,7 @@ int do_ki(char_data *ch, char *argument, int cmd)
     if (IS_SET(world[ch->in_room].room_flags, NO_KI))
     {
       send_to_char(
-          "You find yourself unable to focus your energy here.\n\r",
+          "You find yourself unable to focus your energy here.\r\n",
           ch);
       return eFAILURE;
     }
@@ -312,7 +312,7 @@ int do_ki(char_data *ch, char *argument, int cmd)
     WAIT_STATE(ch, ki_info[spl].beats);
 
     if ((ki_info[spl].ki_pointer == NULL) && spl > 0)
-      send_to_char("Sorry, this power has not yet been implemented.\n\r",
+      send_to_char("Sorry, this power has not yet been implemented.\r\n",
                    ch);
     else
     {
@@ -351,7 +351,7 @@ int do_ki(char_data *ch, char *argument, int cmd)
               tar_char);
         }
 
-      send_to_char("Ok.\n\r", ch);
+      send_to_char("Ok.\r\n", ch);
       GET_KI(ch) -= use_ki(ch, spl);
 
       return ((*ki_info[spl].ki_pointer)(GET_LEVEL(ch), ch, argument,
@@ -548,7 +548,7 @@ int ki_sense(uint8_t level, char_data *ch, char *arg, char_data *vict)
   af.duration = level;
   af.bitvector = AFF_INFRARED;
   affect_to_char(vict, &af);
-  send_to_char("You feel your sense become more acute.\n\r", vict);
+  send_to_char("You feel your sense become more acute.\r\n", vict);
 
   return eSUCCESS;
 }
@@ -576,7 +576,7 @@ int ki_storm(uint8_t level, char_data *ch, char *arg, char_data *vict)
       act("A burst of energy slams into you!", ch, 0, 0, TO_ROOM, 0);
     } // else
     //		if (world[ch->in_room].zone == world[tmp_victim->in_room].zone)
-    //	send_to_char("A crackle of energy echos past you.\n\r", tmp_victim);
+    //	send_to_char("A crackle of energy echos past you.\r\n", tmp_victim);
   }
   int dir = number(0, 5), distance = number(1, 3), i;
   if (room > 0)
@@ -1115,7 +1115,7 @@ int ki_stance(uint8_t level, char_data *ch, char *arg, char_data *vict)
   // chance of failure - can be meta'd past that point though
   if (number(1, 100) > (GET_DEX(ch) * 4))
   {
-    send_to_char("You accidently stub your toe and fall out of the defenseive stance.\n\r", ch);
+    send_to_char("You accidently stub your toe and fall out of the defenseive stance.\r\n", ch);
     return eSUCCESS;
   }
 

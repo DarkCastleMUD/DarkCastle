@@ -107,7 +107,7 @@ public:
 	  ch->desc->web_connected = conn::PLAYING;
 	  result = *(ch->desc->strnew);
 	  ch->desc->strnew = 0;
-	  send_to_char("Entry submitted.\n\r", ch);
+	  send_to_char("Entry submitted.\r\n", ch);
 	} else {
 	  string str_result = *(ch->desc->strnew);
 

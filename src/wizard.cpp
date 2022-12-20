@@ -187,7 +187,7 @@ obj_list_t oload(char_data *ch, int rnum, int cnt, bool random)
     }
   }
 
-  ch->send(fmt::format("You create {} {}{}.\n\r", cnt, random ? "randomized " : "", obj->short_description));
+  ch->send(fmt::format("You create {} {}{}.\r\n", cnt, random ? "randomized " : "", obj->short_description));
 
   buf = fmt::format("{} loads {} {}{} of obj {} ({}) at room {} ({}).",
                     GET_NAME(ch),
@@ -226,7 +226,7 @@ void do_oload(char_data *ch, int rnum, int cnt, bool random)
         (GET_LEVEL(ch) < IMP))
     {
       extract_obj(obj);
-      send_to_char("Denied.\n\r", ch);
+      send_to_char("Denied.\r\n", ch);
       return;
     }
     else
@@ -235,7 +235,7 @@ void do_oload(char_data *ch, int rnum, int cnt, bool random)
     }
   }
 
-  snprintf(buf, MAX_STRING_LENGTH, "You create %i %s%s.\n\r", cnt, random ? "randomized " : "", obj->short_description);
+  snprintf(buf, MAX_STRING_LENGTH, "You create %i %s%s.\r\n", cnt, random ? "randomized " : "", obj->short_description);
 
   send_to_char(buf, ch);
   if (cnt > 1)
@@ -767,7 +767,7 @@ void mob_stat(char_data *ch, char_data *k)
 
   if (IS_NPC(k))
   {
-    sprintf(buf, "$3NPC Bare Hand Damage$R: %d$3d$R%d.\n\r",
+    sprintf(buf, "$3NPC Bare Hand Damage$R: %d$3d$R%d.\r\n",
             k->mobdata->damnodice, k->mobdata->damsizedice);
     send_to_char(buf, ch);
   }
@@ -1345,7 +1345,7 @@ void do_start(char_data *ch)
   char buf[256];
 
   send_to_char("This is now your character in Dark Castle mud.  You lucky "
-               "piece of shit you.\n\r",
+               "piece of shit you.\r\n",
                ch);
 
   if (IS_MOB(ch))
@@ -1506,7 +1506,7 @@ int do_linkdead(char_data *ch, char *arg, int cmd)
   }
 
   if (!x)
-    send_to_char("No linkdead players found.\n\r", ch);
+    send_to_char("No linkdead players found.\r\n", ch);
   return eSUCCESS;
 }
 
@@ -1556,7 +1556,7 @@ int do_restore(char_data *ch, char *argument, int cmd)
 
     if (!(victim = get_char(buf)))
     {
-      send_to_char("No-one by that name in the world.\n\r", ch);
+      send_to_char("No-one by that name in the world.\r\n", ch);
       return eFAILURE;
     }
 
@@ -1586,7 +1586,7 @@ int do_restore(char_data *ch, char *argument, int cmd)
     redo_hitpoints(victim);
     redo_mana(victim);
     redo_ki(victim);
-    send_to_char("Done.\n\r", ch);
+    send_to_char("Done.\r\n", ch);
     if (!IS_AFFECTED(ch, AFF_BLIND))
       act("You have been fully healed by $N!",
           victim, 0, ch, TO_CHAR, 0);

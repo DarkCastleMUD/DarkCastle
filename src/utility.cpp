@@ -772,7 +772,7 @@ void util_archive(const char *char_name, char_data *caller)
   if (!file_exists(buf) || file_exists(buf2))
   {
     if (caller)
-      send_to_char("That character does not exist.\n\r", caller);
+      send_to_char("That character does not exist.\r\n", caller);
     else
       log("Attempt to archive a non-existent char.", IMMORTAL, LogChannels::LOG_BUG);
     return;
@@ -1163,14 +1163,14 @@ int do_order(char_data *ch, char *argument, int cmd)
     send_to_char("Order who to do what?\n\r", ch);
   else if (!(victim = get_char_room_vis(ch, name)) &&
            str_cmp("follower", name) && str_cmp("followers", name))
-    send_to_char("That person isn't here.\n\r", ch);
+    send_to_char("That person isn't here.\r\n", ch);
   else if (ch == victim)
-    send_to_char("You obviously suffer from schitzophrenia.\n\r", ch);
+    send_to_char("You obviously suffer from schitzophrenia.\r\n", ch);
   else
   {
     if (IS_AFFECTED(ch, AFF_CHARM))
     {
-      send_to_char("Your superior would not aprove of you giving orders.\n\r", ch);
+      send_to_char("Your superior would not aprove of you giving orders.\r\n", ch);
       return eFAILURE;
     }
 
@@ -1185,7 +1185,7 @@ int do_order(char_data *ch, char *argument, int cmd)
         act("$n has an indifferent look.", victim, 0, 0, TO_ROOM, 0);
       else
       {
-        send_to_char("Ok.\n\r", ch);
+        send_to_char("Ok.\r\n", ch);
         command_interpreter(victim, message);
       }
     }
@@ -1211,7 +1211,7 @@ int do_order(char_data *ch, char *argument, int cmd)
         }
 
       if (found)
-        send_to_char("Ok.\n\r", ch);
+        send_to_char("Ok.\r\n", ch);
       else
         send_to_char("Nobody here are loyal subjects of yours!\n\r",
                      ch);
@@ -1227,7 +1227,7 @@ int do_idea(char_data *ch, char *argument, int cmd)
 
   if (IS_NPC(ch))
   {
-    send_to_char("Monsters can't have ideas - Go away.\n\r", ch);
+    send_to_char("Monsters can't have ideas - Go away.\r\n", ch);
     return eFAILURE;
   }
 
@@ -1237,21 +1237,21 @@ int do_idea(char_data *ch, char *argument, int cmd)
 
   if (!*argument)
   {
-    send_to_char("That doesn't sound like a good idea to me.  Sorry.\n\r", ch);
+    send_to_char("That doesn't sound like a good idea to me.  Sorry.\r\n", ch);
     return eFAILURE;
   }
 
   if (!(fl = dc_fopen(IDEA_LOG, "a")))
   {
     perror("do_idea");
-    send_to_char("Could not open the idea log.\n\r", ch);
+    send_to_char("Could not open the idea log.\r\n", ch);
     return eFAILURE;
   }
 
   sprintf(str, "**%s[%d]: %s\n", GET_NAME(ch), world[ch->in_room].number, argument);
   fputs(str, fl);
   dc_fclose(fl);
-  send_to_char("Ok.  Thanks.\n\r", ch);
+  send_to_char("Ok.  Thanks.\r\n", ch);
   return eSUCCESS;
 }
 
@@ -1262,7 +1262,7 @@ int do_typo(char_data *ch, char *argument, int cmd)
 
   if (IS_NPC(ch))
   {
-    send_to_char("Monsters can't spell - leave me alone.\n\r", ch);
+    send_to_char("Monsters can't spell - leave me alone.\r\n", ch);
     return eFAILURE;
   }
 
@@ -1279,7 +1279,7 @@ int do_typo(char_data *ch, char *argument, int cmd)
   if (!(fl = dc_fopen(TYPO_LOG, "a")))
   {
     perror("do_typo");
-    send_to_char("Could not open the typo log.\n\r", ch);
+    send_to_char("Could not open the typo log.\r\n", ch);
     return eFAILURE;
   }
 
@@ -1287,7 +1287,7 @@ int do_typo(char_data *ch, char *argument, int cmd)
           GET_NAME(ch), world[ch->in_room].number, argument);
   fputs(str, fl);
   dc_fclose(fl);
-  send_to_char("Ok.  Thanks.\n\r", ch);
+  send_to_char("Ok.  Thanks.\r\n", ch);
   return eSUCCESS;
 }
 
@@ -1315,14 +1315,14 @@ int do_bug(char_data *ch, char *argument, int cmd)
   if (!(fl = dc_fopen(BUG_LOG, "a")))
   {
     perror("do_bug");
-    send_to_char("Could not open the bug log.\n\r", ch);
+    send_to_char("Could not open the bug log.\r\n", ch);
     return eFAILURE;
   }
 
   sprintf(str, "**%s[%d]: %s\n", GET_NAME(ch), world[ch->in_room].number, argument);
   fputs(str, fl);
   dc_fclose(fl);
-  send_to_char("Ok.\n\r", ch);
+  send_to_char("Ok.\r\n", ch);
   return eSUCCESS;
 }
 
@@ -1346,13 +1346,13 @@ int do_recall(char_data *ch, char *argument, int cmd)
 
   if (IS_SET(world[ch->in_room].room_flags, ARENA))
   {
-    send_to_char("To the DEATH, you wimp.\n\r", ch);
+    send_to_char("To the DEATH, you wimp.\r\n", ch);
     return eFAILURE;
   }
 
   if (IS_SET(world[ch->in_room].room_flags, NO_MAGIC))
   {
-    send_to_char("Your magic fizzles and dies.\n\r", ch);
+    send_to_char("Your magic fizzles and dies.\r\n", ch);
     return eFAILURE;
   }
 
@@ -1405,7 +1405,7 @@ int do_recall(char_data *ch, char *argument, int cmd)
 
   if (affected_by_spell(victim, FUCK_PTHIEF) || affected_by_spell(victim, FUCK_GTHIEF))
   {
-    send_to_char("The gods frown upon your thieving ways and refuse to aid your escape.\n\r", victim);
+    send_to_char("The gods frown upon your thieving ways and refuse to aid your escape.\r\n", victim);
     return eFAILURE;
   }
 
@@ -1459,18 +1459,18 @@ int do_recall(char_data *ch, char *argument, int cmd)
 
   if (location == -1)
   {
-    send_to_char("You are completely lost.\n\r", victim);
+    send_to_char("You are completely lost.\r\n", victim);
     return eFAILURE | eINTERNAL_ERROR;
   }
 
   if ((IS_SET(world[location].room_flags, CLAN_ROOM) || location == real_room(2354) || location == real_room(2355)) && IS_AFFECTED(victim, AFF_CHAMPION))
   {
-    send_to_char("No recalling into a clan hall whilst Champion, go to the Tavern!.\n\r", victim);
+    send_to_char("No recalling into a clan hall whilst Champion, go to the Tavern!.\r\n", victim);
     location = real_room(START_ROOM);
   }
   if (location >= 1900 && location <= 1999 && IS_AFFECTED(victim, AFF_CHAMPION))
   {
-    send_to_char("No recalling into a guild hall whilst Champion, go to the Tavern!.\n\r", victim);
+    send_to_char("No recalling into a guild hall whilst Champion, go to the Tavern!.\r\n", victim);
     location = real_room(START_ROOM);
   }
 
@@ -1550,7 +1550,7 @@ int do_quit(char_data *ch, char *argument, int cmd)
 
   if (!IS_SET(world[ch->in_room].room_flags, SAFE) && cmd != 666 && GET_LEVEL(ch) < IMMORTAL)
   {
-    send_to_char("This room doesn't feel...SAFE enough to do that.\n\r", ch);
+    send_to_char("This room doesn't feel...SAFE enough to do that.\r\n", ch);
     return eFAILURE;
   }
 
@@ -1579,13 +1579,13 @@ int do_quit(char_data *ch, char *argument, int cmd)
 
     if (GET_POS(ch) == POSITION_FIGHTING && cmd != 666)
     {
-      send_to_char("No way! You are fighting.\n\r", ch);
+      send_to_char("No way! You are fighting.\r\n", ch);
       return eFAILURE;
     }
 
     if (GET_POS(ch) < POSITION_STUNNED)
     {
-      send_to_char("You're not DEAD yet.\n\r", ch);
+      send_to_char("You're not DEAD yet.\r\n", ch);
       return eFAILURE;
     }
 
@@ -1744,7 +1744,7 @@ int do_save(char_data *ch, char *argument, int cmd)
 
   if (cmd != 666)
   {
-    csendf(ch, "Saving %s.\n\r", GET_NAME(ch));
+    csendf(ch, "Saving %s.\r\n", GET_NAME(ch));
   }
 
   if (IS_PC(ch))
@@ -1778,19 +1778,19 @@ int do_home(char_data *ch, char *argument, int cmd)
       IS_SET(world[ch->in_room].room_flags, ARENA))
   {
     send_to_char("This place doesn't sit right with you...not enough "
-                 "security.\n\r",
+                 "security.\r\n",
                  ch);
     return eFAILURE;
   }
   if (IS_SET(world[ch->in_room].room_flags, NOHOME))
   {
-    send_to_char("Something prevents it.\n\r", ch);
+    send_to_char("Something prevents it.\r\n", ch);
     return eFAILURE;
   }
 
   if (GET_LEVEL(ch) < 11)
   {
-    send_to_char("You must grow a bit before you can leave the nursery.\n\r", ch);
+    send_to_char("You must grow a bit before you can leave the nursery.\r\n", ch);
     GET_HOME(ch) = START_ROOM;
     return eFAILURE;
   }
@@ -1814,7 +1814,7 @@ int do_home(char_data *ch, char *argument, int cmd)
     }
   }
 
-  send_to_char("You now consider this place to be your home.\n\r", ch);
+  send_to_char("You now consider this place to be your home.\r\n", ch);
   GET_HOME(ch) = world[ch->in_room].number;
   return eSUCCESS;
 }
@@ -2562,7 +2562,7 @@ void update_make_camp_and_leadership(void)
                  if (affected_by_spell(i, SKILL_MAKE_CAMP))
                  {
                    affect_from_char(i, SKILL_MAKE_CAMP);
-                   send_to_room("The camp has been disturbed.\n\r", i->in_room);
+                   send_to_room("The camp has been disturbed.\r\n", i->in_room);
                  }
                  if (affected_by_spell(i, SPELL_FARSIGHT) && affected_by_spell(i, SPELL_FARSIGHT)->modifier == 111)
                    affect_from_char(i, SPELL_FARSIGHT);

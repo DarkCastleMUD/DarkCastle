@@ -505,7 +505,7 @@ void show_char_to_char(char_data *i, char_data *ch, int mode)
       {
          if (IS_AFFECTED(ch, AFF_SENSE_LIFE))
          {
-            send_to_char("$R$7You sense a hidden life form in the room.\n\r", ch);
+            send_to_char("$R$7You sense a hidden life form in the room.\r\n", ch);
          }
 
          return;
@@ -691,21 +691,21 @@ void show_char_to_char(char_data *i, char_data *ch, int mode)
       buffer.append(buf);
 
       if (percent >= 100)
-         buffer.append(" is in excellent condition.\n\r");
+         buffer.append(" is in excellent condition.\r\n");
       else if (percent >= 90)
-         buffer.append(" has a few scratches.\n\r");
+         buffer.append(" has a few scratches.\r\n");
       else if (percent >= 75)
-         buffer.append(" is slightly hurt.\n\r");
+         buffer.append(" is slightly hurt.\r\n");
       else if (percent >= 50)
-         buffer.append(" is fairly fucked up.\n\r");
+         buffer.append(" is fairly fucked up.\r\n");
       else if (percent >= 30)
-         buffer.append(" is bleeding freely.\n\r");
+         buffer.append(" is bleeding freely.\r\n");
       else if (percent >= 15)
-         buffer.append(" is covered in blood.\n\r");
+         buffer.append(" is covered in blood.\r\n");
       else if (percent >= 0)
-         buffer.append(" is near death.\n\r");
+         buffer.append(" is near death.\r\n");
       else
-         buffer.append(" is suffering from a slow death.\n\r");
+         buffer.append(" is suffering from a slow death.\r\n");
 
       send_to_char(buffer.c_str(), ch);
 
@@ -762,7 +762,7 @@ void show_char_to_char(char_data *i, char_data *ch, int mode)
             }
          }
          if (!found)
-            send_to_char("You can't see anything.\n\r", ch);
+            send_to_char("You can't see anything.\r\n", ch);
       }
    }
    else if (mode == 2)
@@ -809,21 +809,21 @@ int do_botcheck(char_data *ch, char *argument, int cmd)
 
    if (victim == NULL)
    {
-      csendf(ch, "Unable to find %s.\n\r", name);
+      csendf(ch, "Unable to find %s.\r\n", name);
       return eFAILURE;
    }
 
    if (GET_LEVEL(victim) > GET_LEVEL(ch))
    {
-      send_to_char("Unable to show information.\n\r", ch);
-      csendf(ch, "%s is a higher level than you.\n\r", GET_NAME(victim));
+      send_to_char("Unable to show information.\r\n", ch);
+      csendf(ch, "%s is a higher level than you.\r\n", GET_NAME(victim));
       return eFAILURE;
    }
 
    if (IS_NPC(victim))
    {
-      send_to_char("Unable to show information.\n\r", ch);
-      csendf(ch, "%s is a mob.\n\r", GET_NAME(victim));
+      send_to_char("Unable to show information.\r\n", ch);
+      csendf(ch, "%s is a mob.\r\n", GET_NAME(victim));
       return eFAILURE;
    }
 
@@ -832,7 +832,7 @@ int do_botcheck(char_data *ch, char *argument, int cmd)
 
    if (victim->pcdata->lastseen->size() == 0)
    {
-      csendf(ch, "%s has not seen any mobs recently.\n\r", GET_NAME(victim));
+      csendf(ch, "%s has not seen any mobs recently.\r\n", GET_NAME(victim));
       return eFAILURE;
    }
 
@@ -903,7 +903,7 @@ void list_char_to_char(char_data *list, char_data *ch, int mode)
       else if (IS_DARK(ch->in_room))
       {
          if (known && skill_success(ch, NULL, SKILL_BLINDFIGHTING))
-            send_to_char("Your blindfighting awareness alerts you to a presense in the area.\n\r", ch);
+            send_to_char("Your blindfighting awareness alerts you to a presense in the area.\r\n", ch);
          else if (number(1, 10) == 1)
             send_to_char("$B$4You see a pair of glowing red eyes looking your way.$R$7\n\r", ch);
       }
@@ -1294,7 +1294,7 @@ int do_identify(char_data *ch, char *argument, int cmd)
    }
    else
    {
-      csendf(ch, "You could not find %s in your inventory, among your equipment or in this room.\n\r", arg1.c_str());
+      csendf(ch, "You could not find %s in your inventory, among your equipment or in this room.\r\n", arg1.c_str());
    }
 
    return eFAILURE;
@@ -1332,7 +1332,7 @@ int do_look(char_data *ch, char *argument, int cmd)
    }
    else if (IS_DARK(ch->in_room) && (!IS_MOB(ch) && !ch->pcdata->holyLite))
    {
-      send_to_char("It is pitch black...\n\r", ch);
+      send_to_char("It is pitch black...\r\n", ch);
       list_char_to_char(world[ch->in_room].people, ch, 0);
       send_to_char("$R", ch);
       // TODO - if have blindfighting, list some of the room exits sometimes
@@ -1381,12 +1381,12 @@ int do_look(char_data *ch, char *argument, int cmd)
             }
             else
             {
-               send_to_char("You see nothing special.\n\r", ch);
+               send_to_char("You see nothing special.\r\n", ch);
             }
 
             if (IS_SET(EXIT(ch, keyword_no)->exit_info, EX_CLOSED) && !IS_SET(EXIT(ch, keyword_no)->exit_info, EX_HIDDEN) && (EXIT(ch, keyword_no)->keyword))
             {
-               sprintf(buffer, "The %s is closed.\n\r",
+               sprintf(buffer, "The %s is closed.\r\n",
                        fname(EXIT(ch, keyword_no)->keyword));
                send_to_char(buffer, ch);
             }
@@ -1395,7 +1395,7 @@ int do_look(char_data *ch, char *argument, int cmd)
                if (IS_SET(EXIT(ch, keyword_no)->exit_info, EX_ISDOOR) && !IS_SET(EXIT(ch, keyword_no)->exit_info, EX_HIDDEN) &&
                    EXIT(ch, keyword_no)->keyword)
                {
-                  sprintf(buffer, "The %s is open.\n\r",
+                  sprintf(buffer, "The %s is open.\r\n",
                           fname(EXIT(ch, keyword_no)->keyword));
                   send_to_char(buffer, ch);
                }
@@ -1403,7 +1403,7 @@ int do_look(char_data *ch, char *argument, int cmd)
          }
          else
          {
-            send_to_char("You see nothing special.\n\r", ch);
+            send_to_char("You see nothing special.\r\n", ch);
          }
       }
       break;
@@ -1440,7 +1440,7 @@ int do_look(char_data *ch, char *argument, int cmd)
                         temp = 3;
                      }
 
-                     sprintf(buffer, "It's %sfull of a %s liquid.\n\r",
+                     sprintf(buffer, "It's %sfull of a %s liquid.\r\n",
                              fullness[temp],
                              color_liquid[tmp_object->obj_flags.value[2]]);
                      send_to_char(buffer, ch);
@@ -1505,16 +1505,16 @@ int do_look(char_data *ch, char *argument, int cmd)
                      list_obj_to_char(tmp_object->contains, ch, 2, TRUE);
                   }
                   else
-                     send_to_char("It is closed.\n\r", ch);
+                     send_to_char("It is closed.\r\n", ch);
                }
                else
                {
-                  send_to_char("That is not a container.\n\r", ch);
+                  send_to_char("That is not a container.\r\n", ch);
                }
             }
             else
             { /* wrong argument */
-               send_to_char("You do not see that item here.\n\r", ch);
+               send_to_char("You do not see that item here.\r\n", ch);
             }
          }
          else
@@ -1662,7 +1662,7 @@ int do_look(char_data *ch, char *argument, int cmd)
             }
             else if (!found)
             {
-               send_to_char("You do not see that here.\n\r", ch);
+               send_to_char("You do not see that here.\r\n", ch);
             }
          }
          else
@@ -1686,7 +1686,7 @@ int do_look(char_data *ch, char *argument, int cmd)
          }
          if (found != TRUE)
          {
-            send_to_char("Nothing much to see there.\n\r", ch);
+            send_to_char("Nothing much to see there.\r\n", ch);
             return eFAILURE;
          }
       }
@@ -1704,7 +1704,7 @@ int do_look(char_data *ch, char *argument, int cmd)
                      if (tmp_object->obj_flags.value[1] == 0 || tmp_object->obj_flags.value[1] == 4)
                      {
                         sprintf(tmpbuf,
-                                "You look through %s but it seems to be opaque.\n\r",
+                                "You look through %s but it seems to be opaque.\r\n",
                                 tmp_object->short_description);
                         send_to_char(tmpbuf, ch);
                         return eFAILURE;
@@ -1726,7 +1726,7 @@ int do_look(char_data *ch, char *argument, int cmd)
 
          if (found != TRUE)
          {
-            send_to_char("You can't seem to look through that.\n\r", ch);
+            send_to_char("You can't seem to look through that.\r\n", ch);
             return eFAILURE;
          }
          /* no break */
@@ -1912,16 +1912,16 @@ int do_exits(char_data *ch, char *argument, int cmd)
       else if (IS_DARK(EXIT(ch, door)->to_room))
          sprintf(buf + strlen(buf), "%s - Too dark to tell\n\r", exits[door]);
       else
-         sprintf(buf + strlen(buf), "%s leads to %s.\n\r", exits[door],
+         sprintf(buf + strlen(buf), "%s leads to %s.\r\n", exits[door],
                  world[EXIT(ch, door)->to_room].name);
    }
 
-   send_to_char("You scan around the exits to see where they lead.\n\r", ch);
+   send_to_char("You scan around the exits to see where they lead.\r\n", ch);
 
    if (buf[0])
       send_to_char(buf, ch);
    else
-      send_to_char("None.\n\r", ch);
+      send_to_char("None.\r\n", ch);
 
    return eSUCCESS;
 }
@@ -2291,7 +2291,7 @@ int do_time(char_data *ch, char *argument, int cmd)
    /* 35 days in a month */
    weekday = ((35 * time_info.month) + time_info.day + 1) % 7;
 
-   sprintf(buf, "It is %d o'clock %s, on %s.\n\r",
+   sprintf(buf, "It is %d o'clock %s, on %s.\r\n",
            ((time_info.hours % 12 == 0) ? 12 : ((time_info.hours) % 12)),
            ((time_info.hours >= 12) ? "pm" : "am"),
            weekdays[weekday]);
@@ -2330,7 +2330,7 @@ int do_time(char_data *ch, char *argument, int cmd)
    timep = time(0);
    if (GET_LEVEL(ch) > IMMORTAL)
    {
-      sprintf(buf, "The system time is %ld.\n\r", timep);
+      sprintf(buf, "The system time is %ld.\r\n", timep);
 
       send_to_char(buf, ch);
    }
@@ -2375,19 +2375,19 @@ int do_weather(char_data *ch, char *argument, int cmd)
 
    if (GET_POS(ch) <= POSITION_SLEEPING)
    {
-      send_to_char("You dream of being on a tropical island surrounded by beautiful members of the attractive sex.\n\r", ch);
+      send_to_char("You dream of being on a tropical island surrounded by beautiful members of the attractive sex.\r\n", ch);
       return eSUCCESS;
    }
    if (OUTSIDE(ch))
    {
       sprintf(buf,
-              "The sky is %s and %s.\n\r",
+              "The sky is %s and %s.\r\n",
               sky_look[weather_info.sky],
               (weather_info.change >= 0 ? "you feel a warm wind from south" : "your foot tells you bad weather is due"));
       act(buf, ch, 0, 0, TO_CHAR, 0);
    }
    else
-      send_to_char("You have no feeling about the weather at all.\n\r", ch);
+      send_to_char("You have no feeling about the weather at all.\r\n", ch);
 
    if (GET_LEVEL(ch) >= IMMORTAL)
    {
@@ -2419,7 +2419,7 @@ int do_help(char_data *ch, char *argument, int cmd)
    {
       if (!help_index)
       {
-         send_to_char("No help available.\n\r", ch);
+         send_to_char("No help available.\r\n", ch);
          return eSUCCESS;
       }
       bot = 0;
@@ -2449,7 +2449,7 @@ int do_help(char_data *ch, char *argument, int cmd)
          }
          else if (bot >= top)
          {
-            send_to_char("There is no help on that word.\n\r", ch);
+            send_to_char("There is no help on that word.\r\n", ch);
             return 1;
          }
          else if (chk > 0)
@@ -2491,14 +2491,14 @@ int do_count(char_data *ch, char *arg, int cmd)
       total++;
    }
 
-   csendf(ch, "There are %d visible players connected, %d of which are immortals.\n\r", total, immortal);
+   csendf(ch, "There are %d visible players connected, %d of which are immortals.\r\n", total, immortal);
    csendf(ch, "%d warriors, %d clerics, %d mages, %d thieves, %d barbarians, %d monks,\n\r", clss[CLASS_WARRIOR], clss[CLASS_CLERIC], clss[CLASS_MAGIC_USER], clss[CLASS_THIEF], clss[CLASS_BARBARIAN], clss[CLASS_MONK]);
-   csendf(ch, "%d paladins, %d antipaladins, %d bards, %d druids, and %d rangers.\n\r",
+   csendf(ch, "%d paladins, %d antipaladins, %d bards, %d druids, and %d rangers.\r\n",
           clss[CLASS_PALADIN], clss[CLASS_ANTI_PAL], clss[CLASS_BARD], clss[CLASS_DRUID], clss[CLASS_RANGER]);
    csendf(ch, "%d humans, %d elves, %d dwarves, %d hobbits, %d pixies,\n\r", race[RACE_HUMAN], race[RACE_ELVEN], race[RACE_DWARVEN], race[RACE_HOBBIT], race[RACE_PIXIE]);
-   csendf(ch, "%d ogres, %d gnomes, %d orcs, %d trolls.\n\r", race[RACE_GIANT], race[RACE_GNOME], race[RACE_ORC], race[RACE_TROLL]);
+   csendf(ch, "%d ogres, %d gnomes, %d orcs, %d trolls.\r\n", race[RACE_GIANT], race[RACE_GNOME], race[RACE_ORC], race[RACE_TROLL]);
    csendf(ch, "The maximum number of players since "
-              "last reboot was %d.\n\r",
+              "last reboot was %d.\r\n",
           max_who);
    return eSUCCESS;
 }
@@ -2541,7 +2541,7 @@ int do_equipment(char_data *ch, char *argument, int cmd)
    }
    if (!found)
    {
-      send_to_char("Nothing.\n\r", ch);
+      send_to_char("Nothing.\r\n", ch);
    }
    return eSUCCESS;
 }
@@ -2683,7 +2683,7 @@ int do_olocate(char_data *ch, char *name, int cmd)
    }
 
    if (!*buf2)
-      send_to_char("Couldn't find any such OBJECT.\n\r", ch);
+      send_to_char("Couldn't find any such OBJECT.\r\n", ch);
    else
       page_string(ch->desc, buf2, 1);
    return eSUCCESS;
@@ -2748,7 +2748,7 @@ int do_mlocate(char_data *ch, char *name, int cmd)
    }
 
    if (!*buf2)
-      send_to_char("Couldn't find any MOBS by that NAME.\n\r", ch);
+      send_to_char("Couldn't find any MOBS by that NAME.\r\n", ch);
    else
       page_string(ch->desc, buf2, 1);
    return eSUCCESS;
@@ -2764,15 +2764,15 @@ int do_consider(char_data *ch, char *argument, int cmd)
    int Learned;
 
    char *level_messages[] = {
-       "You can kill %s naked and weaponless.\n\r",
-       "%s is no match for you.\n\r",
-       "%s looks like an easy kill.\n\r",
-       "%s wouldn't be all that hard.\n\r",
+       "You can kill %s naked and weaponless.\r\n",
+       "%s is no match for you.\r\n",
+       "%s looks like an easy kill.\r\n",
+       "%s wouldn't be all that hard.\r\n",
        "%s is perfect for you!\n\r",
-       "You would need some luck and good equipment to kill %s.\n\r",
-       "%s says 'Do you feel lucky, punk?'.\n\r",
-       "%s laughs at you mercilessly.\n\r",
-       "%s will tear your head off and piss on your dead skull.\n\r"};
+       "You would need some luck and good equipment to kill %s.\r\n",
+       "%s says 'Do you feel lucky, punk?'.\r\n",
+       "%s laughs at you mercilessly.\r\n",
+       "%s will tear your head off and piss on your dead skull.\r\n"};
 
    char *ac_messages[] = {
        "looks impenetrable.",
@@ -2857,7 +2857,7 @@ int do_consider(char_data *ch, char *argument, int cmd)
 
    if (GET_MOVE(ch) < 5)
    {
-      send_to_char("You are too tired to consider much of anything at the moment.\n\r", ch);
+      send_to_char("You are too tired to consider much of anything at the moment.\r\n", ch);
       return eFAILURE;
    }
 
@@ -2908,7 +2908,7 @@ int do_consider(char_data *ch, char *argument, int cmd)
 
       if (!IS_NPC(victim) && GET_LEVEL(victim) > IMMORTAL)
       {
-         csendf(ch, "Compared to your hps, %s can definitely take anything you can dish out.\n\r",
+         csendf(ch, "Compared to your hps, %s can definitely take anything you can dish out.\r\n",
                 GET_SHORT(victim));
       }
       else
@@ -2939,7 +2939,7 @@ int do_consider(char_data *ch, char *argument, int cmd)
                }
             }
 
-            csendf(ch, "Compared to your hps, %s %s.\n\r", GET_SHORT(victim), hplow_messages[x]);
+            csendf(ch, "Compared to your hps, %s %s.\r\n", GET_SHORT(victim), hplow_messages[x]);
          }
          else
          {
@@ -2966,7 +2966,7 @@ int do_consider(char_data *ch, char *argument, int cmd)
                }
             }
 
-            csendf(ch, "Compared to your hps, %s %s.\n\r", GET_SHORT(victim), hphigh_messages[x]);
+            csendf(ch, "Compared to your hps, %s %s.\r\n", GET_SHORT(victim), hphigh_messages[x]);
          }
       }
 
@@ -3035,7 +3035,7 @@ int do_consider(char_data *ch, char *argument, int cmd)
             }
          }
 
-         csendf(ch, "Average damage: %s %s.\n\r", GET_SHORT(victim),
+         csendf(ch, "Average damage: %s %s.\r\n", GET_SHORT(victim),
                 dam_messages[x]);
       }
    }
@@ -3296,7 +3296,7 @@ int do_tick(char_data *ch, char *argument, int cmd)
 
    if (IS_NPC(ch))
    {
-      send_to_char("Monsters don't wait for anything.\n\r", ch);
+      send_to_char("Monsters don't wait for anything.\r\n", ch);
       return eFAILURE;
    }
 
@@ -3439,7 +3439,7 @@ int do_sector(char_data *ch, char *arg, int cmd)
          break;
       }
 
-      csendf(ch, "You are currently in %s %s area.\n\r", art.c_str(), sector_types[sector]);
+      csendf(ch, "You are currently in %s %s area.\r\n", art.c_str(), sector_types[sector]);
    }
 
    return eSUCCESS;

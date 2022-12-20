@@ -138,7 +138,7 @@ int do_layhands(char_data *ch, char *argument, int cmd)
    }
 
    if (victim == ch) {
-     send_to_char("Oh yeah...that's really holy....pervert...\n\r", ch);
+     send_to_char("Oh yeah...that's really holy....pervert...\r\n", ch);
      return eFAILURE;
    }
 

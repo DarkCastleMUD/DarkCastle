@@ -229,7 +229,7 @@ command_return_t do_goto(char_data *ch, string argument, int cmd)
     }
     else
     {
-      send_to_char("The object is not available.\n\r", ch);
+      send_to_char("The object is not available.\r\n", ch);
       return eFAILURE;
     }
   }
@@ -238,7 +238,7 @@ command_return_t do_goto(char_data *ch, string argument, int cmd)
     loc_nr = atoi(buf.c_str());
     if (loc_nr > top_of_world || loc_nr < 0)
     {
-      send_to_char("No room exists with that number.\n\r", ch);
+      send_to_char("No room exists with that number.\r\n", ch);
       return eFAILURE;
     }
     if (world_array[loc_nr])
@@ -262,7 +262,7 @@ command_return_t do_goto(char_data *ch, string argument, int cmd)
   }
   else
   {
-    send_to_char("No such creature or object around.\n\r", ch);
+    send_to_char("No such creature or object around.\r\n", ch);
     return eFAILURE;
   }
 
@@ -270,7 +270,7 @@ command_return_t do_goto(char_data *ch, string argument, int cmd)
   if (IS_SET(world[location].room_flags, IMP_ONLY) &&
       GET_LEVEL(ch) < OVERSEER)
   {
-    send_to_char("No.\n\r", ch);
+    send_to_char("No.\r\n", ch);
     return eFAILURE;
   }
 
@@ -291,7 +291,7 @@ command_return_t do_goto(char_data *ch, string argument, int cmd)
     if (i > 1)
     {
       send_to_char("There's a private conversation going on in "
-                   "that room.\n\r",
+                   "that room.\r\n",
                    ch);
       return eFAILURE;
     }
@@ -314,7 +314,7 @@ command_return_t do_goto(char_data *ch, string argument, int cmd)
       {
         ansi_color(RED, tmp_ch);
         ansi_color(BOLD, tmp_ch);
-        send_to_char("Someone disappears in a puff of smoke.\n\r", tmp_ch);
+        send_to_char("Someone disappears in a puff of smoke.\r\n", tmp_ch);
         ansi_color(NTEXT, tmp_ch);
       }
     }
@@ -392,13 +392,13 @@ int do_poof(char_data *ch, char *arg, int cmd)
 
   if (!*arg)
   {
-    send_to_char("A poof type message was expected.\n\r", ch);
+    send_to_char("A poof type message was expected.\r\n", ch);
     return eFAILURE;
   }
 
   if (strlen(arg) > 72)
   {
-    send_to_char("Poof message too long, must be under 72 characters long.\n\r", ch);
+    send_to_char("Poof message too long, must be under 72 characters long.\r\n", ch);
     return eFAILURE;
   }
 
@@ -421,7 +421,7 @@ int do_poof(char_data *ch, char *arg, int cmd)
   if (nope == 0)
   {
     send_to_char("You MUST include your name. Use % to indicate where "
-                 "you want it.\n\r",
+                 "you want it.\r\n",
                  ch);
     return eFAILURE;
   }
@@ -460,7 +460,7 @@ int do_poof(char_data *ch, char *arg, int cmd)
     ch->pcdata->poofout = str_dup(buf);
   }
 
-  send_to_char("Ok.\n\r", ch);
+  send_to_char("Ok.\r\n", ch);
   return eSUCCESS;
 }
 
@@ -478,7 +478,7 @@ int do_at(char_data *ch, char *argument, int cmd)
   half_chop(argument, loc_str, command);
   if (!*loc_str)
   {
-    send_to_char("You must supply a room number or a name.\n\r", ch);
+    send_to_char("You must supply a room number or a name.\r\n", ch);
     return eFAILURE;
   }
 
@@ -488,7 +488,7 @@ int do_at(char_data *ch, char *argument, int cmd)
     if ((loc_nr == 0 && *loc_str != '0') ||
         ((location = real_room(loc_nr)) < 0))
     {
-      send_to_char("No room exists with that number.\n\r", ch);
+      send_to_char("No room exists with that number.\r\n", ch);
       return eFAILURE;
     }
   }
@@ -499,19 +499,19 @@ int do_at(char_data *ch, char *argument, int cmd)
       location = target_obj->in_room;
     else
     {
-      send_to_char("The object is not available.\n\r", ch);
+      send_to_char("The object is not available.\r\n", ch);
       return eFAILURE;
     }
   else
   {
-    send_to_char("No such creature or object around.\n\r", ch);
+    send_to_char("No such creature or object around.\r\n", ch);
     return eFAILURE;
   }
 
   /* a location has been found. */
   if (IS_SET(world[location].room_flags, IMP_ONLY) && GET_LEVEL(ch) < IMP)
   {
-    send_to_char("No.\n\r", ch);
+    send_to_char("No.\r\n", ch);
     return eFAILURE;
   }
 
@@ -554,7 +554,7 @@ int do_highfive(char_data *ch, char *argument, int cmd)
 
   if (!(victim = get_char_vis(ch, buf)))
   {
-    send_to_char("No-one by that name in the world.\n\r", ch);
+    send_to_char("No-one by that name in the world.\r\n", ch);
     return eFAILURE;
   }
 
@@ -585,18 +585,18 @@ int do_holylite(char_data *ch, char *argument, int cmd)
   if (argument[0] != '\0')
   {
     send_to_char(
-        "HOLYLITE doesn't take any arguments; arg ignored.\n\r", ch);
+        "HOLYLITE doesn't take any arguments; arg ignored.\r\n", ch);
   } /* if */
 
   if (ch->pcdata->holyLite)
   {
     ch->pcdata->holyLite = FALSE;
-    send_to_char("Holy light mode off.\n\r", ch);
+    send_to_char("Holy light mode off.\r\n", ch);
   }
   else
   {
     ch->pcdata->holyLite = TRUE;
-    send_to_char("Holy light mode on.\n\r", ch);
+    send_to_char("Holy light mode on.\r\n", ch);
   } /* if */
   return eSUCCESS;
 }
@@ -647,12 +647,12 @@ int do_nohassle(char_data *ch, char *argument, int cmd)
   if (IS_SET(ch->pcdata->toggles, PLR_NOHASSLE))
   {
     REMOVE_BIT(ch->pcdata->toggles, PLR_NOHASSLE);
-    send_to_char("Mobiles can bother you again.\n\r", ch);
+    send_to_char("Mobiles can bother you again.\r\n", ch);
   }
   else
   {
     SET_BIT(ch->pcdata->toggles, PLR_NOHASSLE);
-    send_to_char("Those pesky mobiles will leave you alone now.\n\r", ch);
+    send_to_char("Those pesky mobiles will leave you alone now.\r\n", ch);
   }
   return eSUCCESS;
 }

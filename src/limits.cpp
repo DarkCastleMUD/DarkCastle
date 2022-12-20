@@ -591,7 +591,7 @@ void advance_level(char_data *ch, int is_conversion)
 	if (!IS_MOB(ch) && !is_conversion)
 		ch->pcdata->practices += add_practices;
 
-	sprintf(buf, "Your gain is: %d/%d hp, %d/%d m, %d/%d mv, %d/%d prac, %d/%d ki.\n\r", add_hp, GET_MAX_HIT(ch), add_mana, GET_MAX_MANA(ch), add_moves,
+	sprintf(buf, "Your gain is: %d/%d hp, %d/%d m, %d/%d mv, %d/%d prac, %d/%d ki.\r\n", add_hp, GET_MAX_HIT(ch), add_mana, GET_MAX_MANA(ch), add_moves,
 			GET_MAX_MOVE(ch),
 			IS_MOB(ch) ? 0 : add_practices, IS_MOB(ch) ? 0 : ch->pcdata->practices, add_ki, GET_MAX_KI(ch));
 	if (!is_conversion)
@@ -622,10 +622,10 @@ void advance_level(char_data *ch, int is_conversion)
 	}
 
 	if (GET_LEVEL(ch) == 6)
-		send_to_char("You are now able to participate in pkilling!\n\rRead HELP PKILL for more information.\n\r", ch);
+		send_to_char("You are now able to participate in pkilling!\n\rRead HELP PKILL for more information.\r\n", ch);
 	if (GET_LEVEL(ch) == 10)
 	{
-		send_to_char("You have been given a vault in which to place your valuables!\n\rRead HELP VAULT for more information.\n\r", ch);
+		send_to_char("You have been given a vault in which to place your valuables!\n\rRead HELP VAULT for more information.\r\n", ch);
 		add_new_vault(GET_NAME(ch), 0);
 	}
 	if (GET_LEVEL(ch) == 11)
@@ -635,7 +635,7 @@ void advance_level(char_data *ch, int is_conversion)
 			"You will no longer keep your equipment when you suffer a death to a mob.\n\rThere is now a chance you may lose attribute points when you die to a mob.\n\rRead HELP RDEATH and HELP STAT LOSS for more information.\r\n",
 			ch);
 	if (GET_LEVEL(ch) == 40)
-		send_to_char("You are now able to use the Anonymous command. See \"HELP ANON\" for details.\n\r", ch);
+		send_to_char("You are now able to use the Anonymous command. See \"HELP ANON\" for details.\r\n", ch);
 	if (GET_LEVEL(ch) == 50)
 		send_to_char("The protective covenant of your corpse weakens, upon death players may steal 1 item from you. (See help LOOT for details)\r\n", ch);
 }
@@ -730,18 +730,18 @@ void gain_condition(char_data *ch, int condition, int value)
 	{
 	case FULL:
 	{
-		send_to_char("You are hungry.\n\r", ch);
+		send_to_char("You are hungry.\r\n", ch);
 		return;
 	}
 	case THIRST:
 	{
-		send_to_char("You are thirsty.\n\r", ch);
+		send_to_char("You are thirsty.\r\n", ch);
 		return;
 	}
 	case DRUNK:
 	{
 		if (intoxicated)
-			send_to_char("You are now sober.\n\r", ch);
+			send_to_char("You are now sober.\r\n", ch);
 		return;
 	}
 	default:
@@ -784,7 +784,7 @@ void food_update(void)
 				else if ((food = bring_type_to_front(i, ITEM_FOOD)))
 					do_eat(i, food->name, CMD_DEFAULT);
 				else
-					send_to_char("You are out of food.\n\r", i);
+					send_to_char("You are out of food.\r\n", i);
 			}
 		}
 		gain_condition(i, DRUNK, -1);
@@ -800,7 +800,7 @@ void food_update(void)
 				else if ((food = bring_type_to_front(i, ITEM_DRINKCON)))
 					do_drink(i, food->name, CMD_DEFAULT);
 				else
-					send_to_char("You are out of drink.\n\r", i);
+					send_to_char("You are out of drink.\r\n", i);
 			}
 		}
 	}
@@ -1060,7 +1060,7 @@ void prepare_character_for_sixty(char_data *ch)
 			}
 			else if (ch->exp > 0)
 			{
-				csendf(ch, "Since you already have your Quest Skill, your experience has been set to 0 to allow advancement to level 60.\n\r");
+				csendf(ch, "Since you already have your Quest Skill, your experience has been set to 0 to allow advancement to level 60.\r\n");
 			}
 			ch->exp = 0;
 		}

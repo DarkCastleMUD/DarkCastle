@@ -170,7 +170,7 @@ int do_ban(char_data *ch, char *argument, int cmd)
   struct sockaddr_in sa;
   if (inet_pton(AF_INET, site, &(sa.sin_addr)) == 0)
   {
-    csendf(ch, "Invalid IP address.\n\r");
+    csendf(ch, "Invalid IP address.\r\n");
     return eFAILURE;
   }
 

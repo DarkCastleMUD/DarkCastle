@@ -376,7 +376,7 @@ int load_hotboot_descs()
       d->descriptor = desc;
 
       // we need a second to be sure
-      if (-1 == write_to_descriptor(d->descriptor, "Link recovery successful.\n\rPlease wait while mud finishes rebooting...\n\r"))
+      if (-1 == write_to_descriptor(d->descriptor, "Link recovery successful.\n\rPlease wait while mud finishes rebooting...\r\n"))
       {
         sprintf(buf, "Host %s Char %s Desc %d failed to recover from hotboot.", host, chr, desc);
         log(buf, 0, LogChannels::LOG_MISC);
@@ -419,12 +419,12 @@ void finish_hotboot()
     {
       sprintf(buf, "Could not load char '%s' in hotboot.", d->output);
       log(buf, 0, LogChannels::LOG_MISC);
-      write_to_descriptor(d->descriptor, "Link Failed!  Tell an Immortal when you can.\n\r");
+      write_to_descriptor(d->descriptor, "Link Failed!  Tell an Immortal when you can.\r\n");
       close_socket(d);
       continue;
     }
 
-    write_to_descriptor(d->descriptor, "Success...May your visit continue to suck...\n\r");
+    write_to_descriptor(d->descriptor, "Success...May your visit continue to suck...\r\n");
 
     d->output.clear();
 
@@ -1186,7 +1186,7 @@ int do_prompt(char_data *ch, char *arg, int cmd)
 
   if (!*arg)
   {
-    send_to_char("Set your prompt to what? Try 'help prompt'.\n\r", ch);
+    send_to_char("Set your prompt to what? Try 'help prompt'.\r\n", ch);
     if (GET_PROMPT(ch))
     {
       send_to_char("Current prompt:  ", ch);
@@ -1216,7 +1216,7 @@ int do_prompt(char_data *ch, char *arg, int cmd)
   }
 
   GET_PROMPT(ch) = str_dup(arg);
-  send_to_char("Ok.\n\r", ch);
+  send_to_char("Ok.\r\n", ch);
   return eSUCCESS;
 }
 
@@ -2803,7 +2803,7 @@ void crash_hotboot()
 
   for (d = descriptor_list; d && died_from_sigsegv < 2; d = d->next)
   {
-    write_to_descriptor(d->descriptor, "Mud crash detected.\n\r");
+    write_to_descriptor(d->descriptor, "Mud crash detected.\r\n");
   }
 
   // attempt to hotboot
@@ -2811,7 +2811,7 @@ void crash_hotboot()
   {
     for (d = descriptor_list; d && died_from_sigsegv < 2; d = d->next)
     {
-      write_to_descriptor(d->descriptor, "Attempting to recover with a hotboot.\n\r");
+      write_to_descriptor(d->descriptor, "Attempting to recover with a hotboot.\r\n");
     }
     log("Attempting to hotboot from the crash.", ANGEL, LogChannels::LOG_BUG);
     write_hotboot_file(0);
@@ -2819,13 +2819,13 @@ void crash_hotboot()
     log("Hotboot crash recovery failed.  Exiting.", ANGEL, LogChannels::LOG_BUG);
     for (d = descriptor_list; d && died_from_sigsegv < 2; d = d->next)
     {
-      write_to_descriptor(d->descriptor, "Hotboot failed giving up.\n\r");
+      write_to_descriptor(d->descriptor, "Hotboot failed giving up.\r\n");
     }
   }
 
   for (d = descriptor_list; d && died_from_sigsegv < 2; d = d->next)
   {
-    write_to_descriptor(d->descriptor, "Giving up, goodbye.\n\r");
+    write_to_descriptor(d->descriptor, "Giving up, goodbye.\r\n");
   }
 }
 
@@ -2937,7 +2937,7 @@ void signal_handler(int signal, siginfo_t *si, void *)
   if (signal == SIGHUP)
   {
     char **new_argv = nullptr;
-    string buf = "Hot reboot by SIGHUP.\n\r";
+    string buf = "Hot reboot by SIGHUP.\r\n";
     extern int do_not_save_corpses;
     do_not_save_corpses = 1;
     send_to_all(buf.data());
@@ -3034,7 +3034,7 @@ int do_awaymsgs(char_data *ch, char *argument, int cmd)
 
   if ((ch->pcdata->away_msgs == 0) || ch->pcdata->away_msgs->empty())
   {
-    SEND_TO_Q("No messages have been recorded.\n\r", ch->desc);
+    SEND_TO_Q("No messages have been recorded.\r\n", ch->desc);
     return eSUCCESS;
   }
 
@@ -3070,7 +3070,7 @@ void check_for_awaymsgs(char_data *ch)
   }
 
   send_to_char("You have unviewed away messages. ", ch);
-  send_to_char("Type awaymsgs to view them.\n\r", ch);
+  send_to_char("Type awaymsgs to view them.\r\n", ch);
 }
 
 void send_to_char(const char *mesg, char_data *ch)
@@ -3328,15 +3328,15 @@ int do_editor(char_data *ch, char *argument, int cmd)
     if (!strcmp(arg1, "web"))
     {
       SET_BIT(ch->pcdata->toggles, PLR_EDITOR_WEB);
-      send_to_char("Changing to web editor.\n\r", ch);
-      send_to_char("Ok.\n\r", ch);
+      send_to_char("Changing to web editor.\r\n", ch);
+      send_to_char("Ok.\r\n", ch);
       return eSUCCESS;
     }
     else if (!strcmp(arg1, "game"))
     {
       REMOVE_BIT(ch->pcdata->toggles, PLR_EDITOR_WEB);
-      send_to_char("Changing to in game line editor.\n\r", ch);
-      send_to_char("Ok.\n\r", ch);
+      send_to_char("Changing to in game line editor.\r\n", ch);
+      send_to_char("Ok.\r\n", ch);
       return eSUCCESS;
     }
   }

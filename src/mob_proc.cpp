@@ -134,7 +134,7 @@ int protect(char_data *ch, int iFriendId)
       if (SOMEONE_DIED(retval))
         return retval;
       // pertant rescue code (easier than calling it)
-      send_to_char("Banzai! To the rescue...\n\r", ch);
+      send_to_char("Banzai! To the rescue...\r\n", ch);
       act("You are rescued by $N, you are confused!",
           ally, 0, ch, TO_CHAR, 0);
       act("$n heroically rescues $N.", ch, 0, ally, TO_ROOM, NOTVICT);
@@ -683,7 +683,7 @@ int backstabber(char_data *ch, struct obj_data *obj, int cmd, const char *arg, c
           if (tch->fighting)
           {
 
-            act("$n circles around $s target....\n\r", ch, 0, 0, TO_ROOM,
+            act("$n circles around $s target....\r\n", ch, 0, 0, TO_ROOM,
                 INVIS_NULL);
             SET_BIT(ch->combat, COMBAT_CIRCLE);
           }
@@ -950,31 +950,31 @@ int guild_guard(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
         if (affected_by_spell(ch, FUCK_PTHIEF) || affected_by_spell(ch, FUCK_GTHIEF))
         {
           act("The guard humiliates $n, and blocks $s way because of their crimes.", ch, 0, 0, TO_ROOM, 0);
-          send_to_char("The guard humiliates you, and blocks your way because of your crimes.\n\r", ch);
+          send_to_char("The guard humiliates you, and blocks your way because of your crimes.\r\n", ch);
           return eSUCCESS;
         }
         else if (IS_AFFECTED(ch, AFF_CHAMPION))
         {
           act("The guard humiliates $n, and blocks $s way because they have the Champion flag.", ch, 0, 0, TO_ROOM, 0);
-          send_to_char("The guard humiliates you, and blocks your way because you have the Champion flag.\n\r", ch);
+          send_to_char("The guard humiliates you, and blocks your way because you have the Champion flag.\r\n", ch);
           return eSUCCESS;
         }
         else if (GET_CLASS(ch) != clas)
         {
           act("The guard humiliates $n, and blocks $s way because they are the wrong class.", ch, 0, 0, TO_ROOM, 0);
-          send_to_char("The guard humiliates you, and blocks your way because you are the wrong class.\n\r", ch);
+          send_to_char("The guard humiliates you, and blocks your way because you are the wrong class.\r\n", ch);
           return eSUCCESS;
         }
         else if (align == 1 && !IS_EVIL(ch))
         {
           act("The guard humiliates $n, and blocks $s way because they are not evil.", ch, 0, 0, TO_ROOM, 0);
-          send_to_char("The guard humiliates you, and blocks your way because you are not evil.\n\r", ch);
+          send_to_char("The guard humiliates you, and blocks your way because you are not evil.\r\n", ch);
           return eSUCCESS;
         }
         else if (align == 3 && !IS_GOOD(ch))
         {
           act("The guard humiliates $n, and blocks $s way because they are not good.", ch, 0, 0, TO_ROOM, 0);
-          send_to_char("The guard humiliates you, and blocks your way because you are not good.\n\r", ch);
+          send_to_char("The guard humiliates you, and blocks your way because you are not good.\r\n", ch);
           return eSUCCESS;
         }
       }
@@ -1068,7 +1068,7 @@ int clan_guard(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
     if (clan_num != guard_clan && in_room == real_room(guard_room))
     {
       act("$n is turned away from the clan hall.", ch, 0, 0, TO_ROOM, 0);
-      send_to_char("The clan guard throws you out on your ass.\n\r", ch);
+      send_to_char("The clan guard throws you out on your ass.\r\n", ch);
       return eSUCCESS;
     }
   }
@@ -1097,7 +1097,7 @@ int clan_guard(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
     )
     {
       act("$n is turned away from the clan hall.", ch, 0, 0, TO_ROOM, 0);
-      send_to_char("The clan guard throws you out on your ass.\n\r", ch);
+      send_to_char("The clan guard throws you out on your ass.\r\n", ch);
       return eSUCCESS;
     }
   }
@@ -2020,7 +2020,7 @@ int mother_moat_and_moad(char_data *ch, struct obj_data *obj, int cmd, const cha
     temp = tmp_victim->next_in_room;
     if ((IS_NPC(tmp_victim) || IS_NPC(ch)) && (tmp_victim != ch))
     {
-      send_to_char("You choke and gag as noxious gases fill the air.\n\r",
+      send_to_char("You choke and gag as noxious gases fill the air.\r\n",
                    tmp_victim);
       dam = dice(GET_LEVEL(ch), 8);
       act("$n floods the surroundings with poisonous gas.", ch, 0, 0,
@@ -2038,7 +2038,7 @@ int mother_moat_and_moad(char_data *ch, struct obj_data *obj, int cmd, const cha
           af.bitvector = AFF_POISON;
 
           affect_join(tmp_victim, &af, FALSE, FALSE);
-          send_to_char("You feel very sick.\n\r", tmp_victim);
+          send_to_char("You feel very sick.\r\n", tmp_victim);
           return eSUCCESS;
         }
     }
@@ -2292,7 +2292,7 @@ int pet_shops(char_data *ch, int cmd, char *arg)
     IS_CARRYING_W(pet) = 1000;
     IS_CARRYING_N(pet) = 100;
 
-    send_to_char("May you enjoy your pet.\n\r", ch);
+    send_to_char("May you enjoy your pet.\r\n", ch);
     act("$n bought $N as a pet.", ch, 0, pet, TO_ROOM, 0);
 
     return eSUCCESS;
@@ -2324,7 +2324,7 @@ int newbie_zone_guard(char_data *ch, struct obj_data *obj, int cmd, const char *
       act("The guard refuses $n entrance to this sacred school.",
           ch, 0, 0, TO_ROOM, 0);
       send_to_char(
-          "The guard refuses you entrance to the school.\n\r", ch);
+          "The guard refuses you entrance to the school.\r\n", ch);
       return eSUCCESS;
     }
     else if (ch->in_room == real_room(6400)) /* newbie caves */
@@ -2332,7 +2332,7 @@ int newbie_zone_guard(char_data *ch, struct obj_data *obj, int cmd, const char *
       act("The guard stops $n from entering the caves.",
           ch, 0, 0, TO_ROOM, 0);
       send_to_char(
-          "The guard refuses you entrance to the caves.\n\r", ch);
+          "The guard refuses you entrance to the caves.\r\n", ch);
       return eSUCCESS;
     }
     else /* default */
@@ -2340,7 +2340,7 @@ int newbie_zone_guard(char_data *ch, struct obj_data *obj, int cmd, const char *
       act("The guard humiliates $n, and blocks $s way.",
           ch, 0, 0, TO_ROOM, 0);
       send_to_char(
-          "The guard humiliates you, and blocks your way.\n\r", ch);
+          "The guard humiliates you, and blocks your way.\r\n", ch);
       return eSUCCESS;
     }
   }
@@ -2569,7 +2569,7 @@ int generic_guard(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
     act("A statue magically holds $n back.",
         ch, 0, 0, TO_ROOM, 0);
     send_to_char(
-        "A statue magically holds you from going east.\n\r", ch);
+        "A statue magically holds you from going east.\r\n", ch);
     return eSUCCESS;
   }
 
@@ -2592,7 +2592,7 @@ int portal_guard(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
     act("Dense vegetation blocks $n's path through the door.",
         ch, 0, 0, TO_ROOM, 0);
     send_to_char(
-        "There is too much vegetation in the way to get through.\n\r", ch);
+        "There is too much vegetation in the way to get through.\r\n", ch);
     return eSUCCESS;
   }
 
@@ -2868,7 +2868,7 @@ int foggy_non(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
   // message the player
   act("The foggy guardian flows in front of $n, and blocks $s way.",
       ch, 0, 0, TO_ROOM, 0);
-  send_to_char("The foggy guardian flows in front of you, and blocks your way.\n\r", ch);
+  send_to_char("The foggy guardian flows in front of you, and blocks your way.\r\n", ch);
 
   // return true.  This lets the mud know that you already took care of
   // the command, and to ignore whatever it was.  (ie, don't move)

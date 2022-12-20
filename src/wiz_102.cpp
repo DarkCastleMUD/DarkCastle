@@ -254,7 +254,7 @@ int do_find(char_data *ch, char *arg, int cmd)
   {
     if (x == 4)
     {
-      send_to_char("Type must be one of these: mob, pc, char, obj.\n\r",
+      send_to_char("Type must be one of these: mob, pc, char, obj.\r\n",
                    ch);
       return eFAILURE;
     }
@@ -265,7 +265,7 @@ int do_find(char_data *ch, char *arg, int cmd)
   switch (x)
   {
   default:
-    send_to_char("Problem...fuck up in do_find.\n\r", ch);
+    send_to_char("Problem...fuck up in do_find.\r\n", ch);
     log("Default in do_find...should NOT happen.", ANGEL, LogChannels::LOG_BUG);
     return eFAILURE;
   case 0: // mobile
@@ -280,7 +280,7 @@ int do_find(char_data *ch, char *arg, int cmd)
 
   if (!(vict = get_pc_vis(ch, name)))
   {
-    send_to_char("Unable to find that character.\n\r", ch);
+    send_to_char("Unable to find that character.\r\n", ch);
     return eFAILURE;
   }
 
@@ -326,7 +326,7 @@ int do_stat(char_data *ch, char *arg, int cmd)
     if (x == 3)
     {
       send_to_char("Type must be one of these: mobile, object, "
-                   "character.\n\r",
+                   "character.\r\n",
                    ch);
       return eFAILURE;
     }
@@ -337,7 +337,7 @@ int do_stat(char_data *ch, char *arg, int cmd)
   switch (x)
   {
   default:
-    send_to_char("Problem...fuck up in do_stat.\n\r", ch);
+    send_to_char("Problem...fuck up in do_stat.\r\n", ch);
     log("Default in do_stat...should NOT happen.", ANGEL, LogChannels::LOG_BUG);
     return eFAILURE;
   case 0: // mobile
@@ -346,12 +346,12 @@ int do_stat(char_data *ch, char *arg, int cmd)
       mob_stat(ch, vict);
       return eFAILURE;
     }
-    send_to_char("No such mobile.\n\r", ch);
+    send_to_char("No such mobile.\r\n", ch);
     return eFAILURE;
   case 1: // object
     if (!(obj = get_obj_vis(ch, name)))
     {
-      send_to_char("No such object.\n\r", ch);
+      send_to_char("No such object.\r\n", ch);
       return eFAILURE;
     }
     obj_stat(ch, obj);
@@ -447,7 +447,7 @@ int do_mpstat(char_data *ch, char *arg, int cmd)
   {
     if (!(vict = get_mob_vis(ch, name)))
     {
-      send_to_char("No such mobile.\n\r", ch);
+      send_to_char("No such mobile.\r\n", ch);
       return eFAILURE;
     }
     x = vict->mobdata->nr;
@@ -456,7 +456,7 @@ int do_mpstat(char_data *ch, char *arg, int cmd)
     if(!has_range)
     {
       if(!can_modify_mobile(ch, mob_index[x].virt)) {
-        send_to_char("You are unable to work creation outside of your range.\n\r", ch);
+        send_to_char("You are unable to work creation outside of your range.\r\n", ch);
         return eFAILURE;
       }
     }
@@ -726,7 +726,7 @@ int do_zedit(char_data *ch, char *argument, int cmd)
   {
     if (zedit_values[skill][0] == '\n')
     {
-      send_to_char("Invalid field.\n\r", ch);
+      send_to_char("Invalid field.\r\n", ch);
       return eFAILURE;
     }
     if (is_abbrev(select, zedit_values[skill]))
@@ -735,7 +735,7 @@ int do_zedit(char_data *ch, char *argument, int cmd)
 
   if (!can_modify_room(ch, ch->in_room))
   {
-    send_to_char("You are unable to modify a zone other than the one your room-range is in.\n\r", ch);
+    send_to_char("You are unable to modify a zone other than the one your room-range is in.\r\n", ch);
     return eFAILURE;
   }
   int from, to;
@@ -794,7 +794,7 @@ int do_zedit(char_data *ch, char *argument, int cmd)
       zone_table[zone].cmd[j] = zone_table[zone].cmd[j + 1];
     }
 
-    sprintf(buf, "Command %d removed.  Table reformatted.\n\r", i);
+    sprintf(buf, "Command %d removed.  Table reformatted.\r\n", i);
     send_to_char(buf, ch);
     break;
   }
@@ -817,8 +817,8 @@ int do_zedit(char_data *ch, char *argument, int cmd)
             !(i = atoi(text)) || i > last_cmd) &&
         !isname(text, "new"))
     {
-      sprintf(buf, "You must state either 'new' or the insertion point which must be between 0 and %d.\n\r"
-                   "'%s' is not valid.\n\r",
+      sprintf(buf, "You must state either 'new' or the insertion point which must be between 0 and %d.\r\n"
+                   "'%s' is not valid.\r\n",
               zone_table[zone].reset_total, text);
       send_to_char(buf, ch);
       return eFAILURE;
@@ -1034,7 +1034,7 @@ int do_zedit(char_data *ch, char *argument, int cmd)
                    "This searches your current zonefile for any commands\r\n"
                    "containing that number.  It then lists them to you.  If you're\r\n"
                    "a deity or higher it will also warn you if that number appears\r\n"
-                   "in any other zonefiles.\n\r",
+                   "in any other zonefiles.\r\n",
                    ch);
       return eFAILURE;
     }
@@ -1143,8 +1143,8 @@ int do_zedit(char_data *ch, char *argument, int cmd)
 
     if (from > last_cmd || from < 0)
     {
-      sprintf(buf, "Source line must be between 0 and %d.\n\r"
-                   "'%s' is not valid.\n\r",
+      sprintf(buf, "Source line must be between 0 and %d.\r\n"
+                   "'%s' is not valid.\r\n",
               zone_table[zone].reset_total, text);
       send_to_char(buf, ch);
       return eFAILURE;
@@ -1476,7 +1476,7 @@ int oedit_exdesc(char_data *ch, int item_num, char *buf)
   {
     if (fields[x][0] == '\n')
     {
-      send_to_char("Invalid field.\n\r", ch);
+      send_to_char("Invalid field.\r\n", ch);
       return eFAILURE;
     }
     if (is_abbrev(type, fields[x]))
@@ -1497,7 +1497,7 @@ int oedit_exdesc(char_data *ch, int item_num, char *buf)
     }
     curr = (extra_descr_data *)calloc(1, sizeof(extra_descr_data));
     curr->keyword = str_hsh(select);
-    curr->description = str_hsh("Empty desc.\n\r");
+    curr->description = str_hsh("Empty desc.\r\n");
     curr->next = obj->ex_description;
     obj->ex_description = curr;
     send_to_char("New desc created.\r\n", ch);
@@ -1529,7 +1529,7 @@ int oedit_exdesc(char_data *ch, int item_num, char *buf)
 
     if (!curr)
     {
-      send_to_char("There is no desc for that number.\n\r", ch);
+      send_to_char("There is no desc for that number.\r\n", ch);
       return eFAILURE;
     }
 
@@ -1543,7 +1543,7 @@ int oedit_exdesc(char_data *ch, int item_num, char *buf)
       curr2->next = curr->next;
       dc_free(curr);
     }
-    send_to_char("Deleted.\n\r", ch);
+    send_to_char("Deleted.\r\n", ch);
     break;
   }
 
@@ -1567,11 +1567,11 @@ int oedit_exdesc(char_data *ch, int item_num, char *buf)
 
     if (!curr)
     {
-      send_to_char("There is no desc for that number.\n\r", ch);
+      send_to_char("There is no desc for that number.\r\n", ch);
       return eFAILURE;
     }
     curr->keyword = str_hsh(value);
-    send_to_char("New keyword set.\n\r", ch);
+    send_to_char("New keyword set.\r\n", ch);
     break;
   }
 
@@ -1595,7 +1595,7 @@ int oedit_exdesc(char_data *ch, int item_num, char *buf)
 
     if (!curr)
     {
-      send_to_char("There is no desc for that number.\n\r", ch);
+      send_to_char("There is no desc for that number.\r\n", ch);
       return eFAILURE;
     }
     send_to_char("        Write your obj's description.  (/s saves /h for help)\r\n", ch);
@@ -1661,7 +1661,7 @@ int oedit_affects(char_data *ch, int item_num, char *buf)
   {
     if (fields[x][0] == '\n')
     {
-      send_to_char("Invalid field.\n\r", ch);
+      send_to_char("Invalid field.\r\n", ch);
       return eFAILURE;
     }
     if (is_abbrev(type, fields[x]))
@@ -1991,7 +1991,7 @@ int do_oedit(char_data *ch, char *argument, int cmd)
   {
     if (fields[x][0] == '\n')
     {
-      send_to_char("Invalid field.\n\r", ch);
+      send_to_char("Invalid field.\r\n", ch);
       return eFAILURE;
     }
     if (is_abbrev(buf3, fields[x]))
@@ -2376,7 +2376,7 @@ int do_oedit(char_data *ch, char *argument, int cmd)
     }
     /*
             if(!can_modify_object(ch, intval)) {
-              send_to_char("You are unable to work creation outside of your range.\n\r", ch);
+              send_to_char("You are unable to work creation outside of your range.\r\n", ch);
               return eFAILURE;
             }
     */
@@ -2591,7 +2591,7 @@ int do_procedit(char_data *ch, char *argument, int cmd)
 
   if (!can_modify_mobile(ch, mobvnum))
   {
-    send_to_char("You are unable to work creation outside of your range.\n\r", ch);
+    send_to_char("You are unable to work creation outside of your range.\r\n", ch);
     return eFAILURE;
   }
 
@@ -2608,7 +2608,7 @@ int do_procedit(char_data *ch, char *argument, int cmd)
   {
     if (fields[x][0] == '\n')
     {
-      send_to_char("Invalid field.\n\r", ch);
+      send_to_char("Invalid field.\r\n", ch);
       return eFAILURE;
     }
     if (is_abbrev(buf3, fields[x]))
@@ -3023,7 +3023,7 @@ int do_medit(char_data *ch, char *argument, int cmd)
   {
     if (fields[x][0] == '\n')
     {
-      send_to_char("Invalid field.\n\r", ch);
+      send_to_char("Invalid field.\r\n", ch);
       return eFAILURE;
     }
     if (is_abbrev(buf3, fields[x]))
@@ -3036,7 +3036,7 @@ int do_medit(char_data *ch, char *argument, int cmd)
     if (!can_modify_mobile(ch, mobvnum))
     {
       send_to_char(
-          "You are unable to work creation outside of your range.\n\r",
+          "You are unable to work creation outside of your range.\r\n",
           ch);
       return eFAILURE;
     }
@@ -4046,7 +4046,7 @@ int do_redit(char_data *ch, char *argument, int cmd)
 
   if (!can_modify_room(ch, ch->in_room))
   {
-    send_to_char("You are unable to work creation outside of your range.\n\r", ch);
+    send_to_char("You are unable to work creation outside of your range.\r\n", ch);
     return eFAILURE;
   }
 
@@ -4079,7 +4079,7 @@ int do_redit(char_data *ch, char *argument, int cmd)
     }
     dc_free(world[ch->in_room].name);
     world[ch->in_room].name = str_dup(remainder_args.c_str());
-    send_to_char("Ok.\n\r", ch);
+    send_to_char("Ok.\r\n", ch);
   }
   break;
 
@@ -4091,7 +4091,7 @@ int do_redit(char_data *ch, char *argument, int cmd)
       string description = remainder_args + "\n\r";
       dc_free(world[ch->in_room].description);
       world[ch->in_room].description = str_dup(description.c_str());
-      send_to_char("Ok.\n\r", ch);
+      send_to_char("Ok.\r\n", ch);
       return eFAILURE;
     }
     send_to_char("        Write your room's description.  (/s saves /h for help)\r\n", ch);
@@ -4189,7 +4189,7 @@ int do_redit(char_data *ch, char *argument, int cmd)
     {
       if (x == 6)
       {
-        send_to_char("No such direction.\n\r", ch);
+        send_to_char("No such direction.\r\n", ch);
         return eFAILURE;
       }
       if (is_abbrev(arg2, dirs[x]))
@@ -4259,7 +4259,7 @@ int do_redit(char_data *ch, char *argument, int cmd)
       if (create_one_room(ch, d))
       {
         c = real_room(d);
-        csendf(ch, "Creating room %d.\n\r", d);
+        csendf(ch, "Creating room %d.\r\n", d);
       }
     }
 
@@ -4270,10 +4270,10 @@ int do_redit(char_data *ch, char *argument, int cmd)
     }
 
     if (world[ch->in_room].dir_option[x])
-      send_to_char("Modifying exit.\n\r", ch);
+      send_to_char("Modifying exit.\r\n", ch);
     else
     {
-      send_to_char("Creating new exit.\n\r", ch);
+      send_to_char("Creating new exit.\r\n", ch);
       CREATE(world[ch->in_room].dir_option[x], struct room_direction_data, 1);
       world[ch->in_room].dir_option[x]->general_description = 0;
       world[ch->in_room].dir_option[x]->keyword = 0;
@@ -4289,16 +4289,16 @@ int do_redit(char_data *ch, char *argument, int cmd)
       world[ch->in_room].dir_option[x]->keyword = str_dup(remainder_args.c_str());
     }
 
-    send_to_char("Ok.\n\r", ch);
+    send_to_char("Ok.\r\n", ch);
 
     if (!IS_MOB(ch) && !IS_SET(ch->pcdata->toggles, PLR_ONEWAY))
     {
       send_to_char("Attempting to create a return exit from "
-                   "that room...\n\r",
+                   "that room...\r\n",
                    ch);
       if (world[c].dir_option[reverse_number[x]])
       {
-        send_to_char("COULD NOT CREATE EXIT...One already exists.\n\r", ch);
+        send_to_char("COULD NOT CREATE EXIT...One already exists.\r\n", ch);
       }
       else
       {
@@ -4449,7 +4449,7 @@ int do_redit(char_data *ch, char *argument, int cmd)
     {
       if (x == 6)
       {
-        send_to_char("No such direction.\n\r", ch);
+        send_to_char("No such direction.\r\n", ch);
         return eFAILURE;
       }
       if (is_abbrev(arg3, dirs[x]))
@@ -4458,7 +4458,7 @@ int do_redit(char_data *ch, char *argument, int cmd)
 
     if (!(world[ch->in_room].dir_option[x]))
     {
-      send_to_char("That exit does not exist...create it first.\n\r", ch);
+      send_to_char("That exit does not exist...create it first.\r\n", ch);
       return eFAILURE;
     }
 
@@ -4533,13 +4533,13 @@ int do_redit(char_data *ch, char *argument, int cmd)
     {
       if (!strcmp(sector_types[x], "\n"))
       {
-        send_to_char("No such sector type.\n\r", ch);
+        send_to_char("No such sector type.\r\n", ch);
         return eFAILURE;
       }
       else if (is_abbrev(remainder_args, sector_types[x]))
       {
         world[ch->in_room].sector_type = x;
-        csendf(ch, "Sector type set to %s.\n\r", sector_types[x]);
+        csendf(ch, "Sector type set to %s.\r\n", sector_types[x]);
         break;
       }
     }
@@ -4620,7 +4620,7 @@ int do_rdelete(char_data *ch, char *arg, int cmd)
 
   if (!can_modify_room(ch, ch->in_room))
   {
-    send_to_char("You cannot destroy things here, it is not your domain.\n\r", ch);
+    send_to_char("You cannot destroy things here, it is not your domain.\r\n", ch);
     return eFAILURE;
   }
 
@@ -4630,7 +4630,7 @@ int do_rdelete(char_data *ch, char *arg, int cmd)
     {
       if (x == 6)
       {
-        send_to_char("No such direction.\n\r", ch);
+        send_to_char("No such direction.\r\n", ch);
         return eFAILURE;
       }
       if (is_abbrev(buf2, dirs[x]))
@@ -4639,13 +4639,13 @@ int do_rdelete(char_data *ch, char *arg, int cmd)
 
     if (!(world[ch->in_room].dir_option[x]))
     {
-      send_to_char("There is nothing there to remove.\n\r", ch);
+      send_to_char("There is nothing there to remove.\r\n", ch);
       return eFAILURE;
     }
     dc_free(world[ch->in_room].dir_option[x]);
     world[ch->in_room].dir_option[x] = 0;
     csendf(ch, "You stretch forth your hands and remove "
-               "the %s exit.\n\r",
+               "the %s exit.\r\n",
            dirs[x]);
   }
 
@@ -4655,7 +4655,7 @@ int do_rdelete(char_data *ch, char *arg, int cmd)
     {
       if (i == NULL)
       {
-        send_to_char("There is nothing there to remove.\n\r", ch);
+        send_to_char("There is nothing there to remove.\r\n", ch);
         return eFAILURE;
       }
       if (isname(buf2, i->keyword))
@@ -4666,7 +4666,7 @@ int do_rdelete(char_data *ch, char *arg, int cmd)
     {
       world[ch->in_room].ex_description = i->next;
       dc_free(i);
-      send_to_char("You remove the extra description.\n\r", ch);
+      send_to_char("You remove the extra description.\r\n", ch);
     }
     else
     {
@@ -4675,7 +4675,7 @@ int do_rdelete(char_data *ch, char *arg, int cmd)
         {
           extra->next = i->next;
           dc_free(i);
-          send_to_char("You remove the extra description.\n\r", ch);
+          send_to_char("You remove the extra description.\r\n", ch);
           break;
         }
     }
@@ -4693,7 +4693,7 @@ int do_rdelete(char_data *ch, char *arg, int cmd)
     {
       if (x == 6)
       {
-        send_to_char("No such direction.\n\r", ch);
+        send_to_char("No such direction.\r\n", ch);
         return eFAILURE;
       }
       if (is_abbrev(buf, dirs[x]))
@@ -4702,13 +4702,13 @@ int do_rdelete(char_data *ch, char *arg, int cmd)
 
     if (!(world[ch->in_room].dir_option[x]))
     {
-      send_to_char("That exit does not exist...create it first.\n\r", ch);
+      send_to_char("That exit does not exist...create it first.\r\n", ch);
       return eFAILURE;
     }
 
     if (!(world[ch->in_room].dir_option[x]->general_description))
     {
-      send_to_char("There's no description there to delete.\n\r", ch);
+      send_to_char("There's no description there to delete.\r\n", ch);
       return eFAILURE;
     }
 
@@ -4716,7 +4716,7 @@ int do_rdelete(char_data *ch, char *arg, int cmd)
     {
       dc_free(world[ch->in_room].dir_option[x]->general_description);
       world[ch->in_room].dir_option[x]->general_description = 0;
-      send_to_char("Ok.\n\r", ch);
+      send_to_char("Ok.\r\n", ch);
     }
   }
 
@@ -4738,13 +4738,13 @@ int do_oneway(char_data *ch, char *arg, int cmd)
   {
     if (!IS_SET(ch->pcdata->toggles, PLR_ONEWAY))
       SET_BIT(ch->pcdata->toggles, PLR_ONEWAY);
-    send_to_char("You generate one-way exits.\n\r", ch);
+    send_to_char("You generate one-way exits.\r\n", ch);
   }
   else
   {
     if (IS_SET(ch->pcdata->toggles, PLR_ONEWAY))
       REMOVE_BIT(ch->pcdata->toggles, PLR_ONEWAY);
-    send_to_char("You generate two-way exits.\n\r", ch);
+    send_to_char("You generate two-way exits.\r\n", ch);
   }
   return eSUCCESS;
 }
@@ -4757,7 +4757,7 @@ int do_zsave(char_data *ch, char *arg, int cmd)
 
   if (!can_modify_room(ch, ch->in_room))
   {
-    send_to_char("You may only zsave inside of the room range you are assigned to.\n\r", ch);
+    send_to_char("You may only zsave inside of the room range you are assigned to.\r\n", ch);
     return eFAILURE;
   }
 
@@ -4781,7 +4781,7 @@ int do_zsave(char_data *ch, char *arg, int cmd)
 
   if ((f = dc_fopen(buf, "w")) == NULL)
   {
-    fprintf(stderr, "Couldn't open room save file %s for %s.\n\r",
+    fprintf(stderr, "Couldn't open room save file %s for %s.\r\n",
             zone_table[zone].filename, GET_NAME(ch));
     return eFAILURE;
   }
@@ -4789,7 +4789,7 @@ int do_zsave(char_data *ch, char *arg, int cmd)
   write_one_zone(f, zone);
 
   dc_fclose(f);
-  send_to_char("Saved.\n\r", ch);
+  send_to_char("Saved.\r\n", ch);
   set_zone_saved_zone(ch->in_room);
   return eSUCCESS;
 }
@@ -4801,7 +4801,7 @@ int do_rsave(char_data *ch, char *arg, int cmd)
 
   if (!can_modify_room(ch, ch->in_room))
   {
-    send_to_char("You may only rsave inside of the room range you are assigned to.\n\r", ch);
+    send_to_char("You may only rsave inside of the room range you are assigned to.\r\n", ch);
     return eFAILURE;
   }
 
@@ -4830,7 +4830,7 @@ int do_rsave(char_data *ch, char *arg, int cmd)
 
   if ((f = dc_fopen(file.c_str(), "w")) == NULL)
   {
-    fprintf(stderr, "Couldn't open room save file %s for %s.\n\r",
+    fprintf(stderr, "Couldn't open room save file %s for %s.\r\n",
             curr->filename, GET_NAME(ch));
     return eFAILURE;
   }
@@ -4842,7 +4842,7 @@ int do_rsave(char_data *ch, char *arg, int cmd)
   fprintf(f, "$~\n");
 
   dc_fclose(f);
-  send_to_char("Saved.\n\r", ch);
+  send_to_char("Saved.\r\n", ch);
   set_zone_saved_world(ch->in_room);
   return eSUCCESS;
 }
@@ -4863,7 +4863,7 @@ int do_msave(char_data *ch, char *arg, int cmd)
   int v = ch->pcdata->last_mob_edit;
   if (!can_modify_mobile(ch, v))
   {
-    send_to_char("You may only msave inside of the room range you are assigned to.\n\r", ch);
+    send_to_char("You may only msave inside of the room range you are assigned to.\r\n", ch);
     return eFAILURE;
   }
 
@@ -4894,7 +4894,7 @@ int do_msave(char_data *ch, char *arg, int cmd)
 
   if ((f = dc_fopen(buf, "w")) == NULL)
   {
-    fprintf(stderr, "Couldn't open mob save file %s for %s.\n\r",
+    fprintf(stderr, "Couldn't open mob save file %s for %s.\r\n",
             curr->filename, GET_NAME(ch));
     return eFAILURE;
   }
@@ -4906,7 +4906,7 @@ int do_msave(char_data *ch, char *arg, int cmd)
   fprintf(f, "$~\n");
 
   dc_fclose(f);
-  send_to_char("Saved.\n\r", ch);
+  send_to_char("Saved.\r\n", ch);
   set_zone_saved_mob(curr->firstnum);
   return eSUCCESS;
 }
@@ -4926,7 +4926,7 @@ int do_osave(char_data *ch, char *arg, int cmd)
   vnum_t v = ch->pcdata->last_obj_vnum;
   if (!can_modify_object(ch, v))
   {
-    send_to_char("You may only msave inside of the room range you are assigned to.\n\r", ch);
+    send_to_char("You may only msave inside of the room range you are assigned to.\r\n", ch);
     return eFAILURE;
   }
   int r = real_object(v);
@@ -4955,7 +4955,7 @@ int do_osave(char_data *ch, char *arg, int cmd)
 
   if ((f = dc_fopen(buf, "w")) == NULL)
   {
-    fprintf(stderr, "Couldn't open obj save file %s for %s.\n\r",
+    fprintf(stderr, "Couldn't open obj save file %s for %s.\r\n",
             curr->filename, GET_NAME(ch));
     return eFAILURE;
   }
@@ -4967,7 +4967,7 @@ int do_osave(char_data *ch, char *arg, int cmd)
   fprintf(f, "$~\n");
 
   dc_fclose(f);
-  send_to_char("Saved.\n\r", ch);
+  send_to_char("Saved.\r\n", ch);
   set_zone_saved_obj(curr->firstnum);
   return eSUCCESS;
 }
@@ -5303,7 +5303,7 @@ int do_rstat(char_data *ch, char *argument, int cmd)
     x = atoi(arg1);
     if (x < 0 || (loc = real_room(x)) == (-1))
     {
-      send_to_char("No such room exists.\n\r", ch);
+      send_to_char("No such room exists.\r\n", ch);
       return eFAILURE;
     }
     rm = &world[loc];
@@ -5434,7 +5434,7 @@ int do_possess(char_data *ch, char *argument, int cmd)
   else
   {
     if (!(victim = get_char_vis(ch, arg)))
-      send_to_char("They aren't here.\n\r", ch);
+      send_to_char("They aren't here.\r\n", ch);
     else
     {
       if (ch == victim)
@@ -5445,7 +5445,7 @@ int do_possess(char_data *ch, char *argument, int cmd)
       else if ((GET_LEVEL(victim) > GET_LEVEL(ch)) &&
                (GET_LEVEL(ch) < IMP))
       {
-        send_to_char("That mob is a bit too tough for you to handle.\n\r", ch);
+        send_to_char("That mob is a bit too tough for you to handle.\r\n", ch);
         return eFAILURE;
       }
       else if (!ch->desc || ch->desc->snoop_by || ch->desc->snooping)
@@ -5460,7 +5460,7 @@ int do_possess(char_data *ch, char *argument, int cmd)
         }
         else
         {
-          send_to_char("Mixing snoop & possess is bad for your health.\n\r", ch);
+          send_to_char("Mixing snoop & possess is bad for your health.\r\n", ch);
           return eFAILURE;
         }
       }
@@ -5473,7 +5473,7 @@ int do_possess(char_data *ch, char *argument, int cmd)
       }
       else
       {
-        send_to_char("Ok.\n\r", ch);
+        send_to_char("Ok.\r\n", ch);
         sprintf(buf, "%s possessed %s", GET_NAME(ch), GET_NAME(victim));
         log(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
         ch->pcdata->possesing = 1;
@@ -5504,7 +5504,7 @@ int do_return(char_data *ch, char *argument, int cmd)
   }
   else
   {
-    send_to_char("You return to your original body.\n\r", ch);
+    send_to_char("You return to your original body.\r\n", ch);
 
     ch->desc->original->pcdata->possesing = 0;
     ch->desc->character = ch->desc->original;
@@ -5536,7 +5536,7 @@ int do_sockets(char_data *ch, char *argument, int cmd)
 
   if (IS_NPC(ch))
   {
-    send_to_char("Monsters don't care who's logged in.\n\r", ch);
+    send_to_char("Monsters don't care who's logged in.\r\n", ch);
     return eFAILURE;
   }
 
@@ -5589,7 +5589,7 @@ int do_sockets(char_data *ch, char *argument, int cmd)
 
   } // for
 
-  sprintf(buf + strlen(buf), "\n\r\n\rThere are %d connections.\n\r", num_can_see);
+  sprintf(buf + strlen(buf), "\n\r\n\rThere are %d connections.\r\n", num_can_see);
   page_string(ch->desc, buf, 1);
   return eSUCCESS;
 }
@@ -5677,7 +5677,7 @@ int do_punish(char_data *ch, char *arg, int cmd)
 
   if (!(vict = get_pc_vis(ch, name)))
   {
-    snprintf(buf, sizeof(buf), "%s not found.\n\r", name);
+    snprintf(buf, sizeof(buf), "%s not found.\r\n", name);
     send_to_char(buf, ch);
     return eFAILURE;
   }
@@ -5705,7 +5705,7 @@ int do_punish(char_data *ch, char *arg, int cmd)
     if (IS_SET(vict->pcdata->punish, PUNISH_STUPID))
     {
       send_to_char("You feel a sudden onslaught of wisdom!\n\r", vict);
-      send_to_char("STUPID removed.\n\r", ch);
+      send_to_char("STUPID removed.\r\n", ch);
       sprintf(buf, "%s removes %s's stupid", GET_NAME(ch), GET_NAME(vict));
       log(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
       REMOVE_BIT(vict->pcdata->punish, PUNISH_STUPID);
@@ -5720,7 +5720,7 @@ int do_punish(char_data *ch, char *arg, int cmd)
       send_to_char("You can't remember how to do basic things!\n\r", vict);
       sprintf(buf, "You have been lobotomized by %s!\n\r", GET_NAME(ch));
       send_to_char(buf, vict);
-      send_to_char("STUPID set.\n\r", ch);
+      send_to_char("STUPID set.\r\n", ch);
       sprintf(buf, "%s lobotimized %s", GET_NAME(ch), GET_NAME(vict));
       log(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
       SET_BIT(vict->pcdata->punish, PUNISH_STUPID);
@@ -5734,9 +5734,9 @@ int do_punish(char_data *ch, char *arg, int cmd)
   {
     if (IS_SET(vict->pcdata->punish, PUNISH_SILENCED))
     {
-      send_to_char("The gods take pity on you and lift your silence.\n\r",
+      send_to_char("The gods take pity on you and lift your silence.\r\n",
                    vict);
-      send_to_char("SILENCE removed.\n\r", ch);
+      send_to_char("SILENCE removed.\r\n", ch);
       sprintf(buf, "%s removes %s's silence", GET_NAME(ch), GET_NAME(vict));
       log(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
     }
@@ -5744,7 +5744,7 @@ int do_punish(char_data *ch, char *arg, int cmd)
     {
       sprintf(buf, "You have been silenced by %s!\n\r", GET_NAME(ch));
       send_to_char(buf, vict);
-      send_to_char("SILENCE set.\n\r", ch);
+      send_to_char("SILENCE set.\r\n", ch);
       sprintf(buf, "%s silenced %s", GET_NAME(ch), GET_NAME(vict));
       log(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
     }
@@ -5754,16 +5754,16 @@ int do_punish(char_data *ch, char *arg, int cmd)
   {
     if (IS_SET(vict->pcdata->punish, PUNISH_FREEZE))
     {
-      send_to_char("You now can do things again.\n\r", vict);
-      send_to_char("FREEZE removed.\n\r", ch);
+      send_to_char("You now can do things again.\r\n", vict);
+      send_to_char("FREEZE removed.\r\n", ch);
       sprintf(buf, "%s unfrozen by %s", GET_NAME(vict), GET_NAME(ch));
       log(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
     }
     else
     {
-      sprintf(buf, "%s takes away your ability to....\n\r", GET_NAME(ch));
+      sprintf(buf, "%s takes away your ability to....\r\n", GET_NAME(ch));
       send_to_char(buf, vict);
-      send_to_char("FREEZE set.\n\r", ch);
+      send_to_char("FREEZE set.\r\n", ch);
       sprintf(buf, "%s frozen by %s", GET_NAME(vict), GET_NAME(ch));
       log(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
     }
@@ -5773,13 +5773,13 @@ int do_punish(char_data *ch, char *arg, int cmd)
   {
     if (IS_SET(vict->pcdata->punish, PUNISH_NOARENA))
     {
-      send_to_char("Some kind god has let you join arenas again.\n\r", vict);
-      send_to_char("NOARENA removed.\n\r", ch);
+      send_to_char("Some kind god has let you join arenas again.\r\n", vict);
+      send_to_char("NOARENA removed.\r\n", ch);
     }
     else
     {
       sprintf(buf, "%s takes away your ability to join arenas!\n\r", GET_NAME(ch));
-      send_to_char("NOARENA set.\n\r", ch);
+      send_to_char("NOARENA set.\r\n", ch);
       send_to_char(buf, vict);
     }
     TOGGLE_BIT(vict->pcdata->punish, PUNISH_NOARENA);
@@ -5788,14 +5788,14 @@ int do_punish(char_data *ch, char *arg, int cmd)
   {
     if (IS_SET(vict->pcdata->punish, PUNISH_NOEMOTE))
     {
-      send_to_char("You can emote again.\n\r", vict);
-      send_to_char("NOEMOTE removed.\n\r", ch);
+      send_to_char("You can emote again.\r\n", vict);
+      send_to_char("NOEMOTE removed.\r\n", ch);
     }
     else
     {
       sprintf(buf, "%s takes away your ability to emote!\n\r", GET_NAME(ch));
       send_to_char(buf, vict);
-      send_to_char("NOEMOTE set.\n\r", ch);
+      send_to_char("NOEMOTE set.\r\n", ch);
     }
     TOGGLE_BIT(vict->pcdata->punish, PUNISH_NOEMOTE);
   }
@@ -5803,14 +5803,14 @@ int do_punish(char_data *ch, char *arg, int cmd)
   {
     if (IS_SET(vict->pcdata->punish, PUNISH_NOTELL))
     {
-      send_to_char("You can use telepatic communication again.\n\r", vict);
-      send_to_char("NOTELL removed.\n\r", ch);
+      send_to_char("You can use telepatic communication again.\r\n", vict);
+      send_to_char("NOTELL removed.\r\n", ch);
     }
     else
     {
       sprintf(buf, "%s takes away your ability to use telepathic communication!\n\r", GET_NAME(ch));
       send_to_char(buf, vict);
-      send_to_char("NOTELL set.\n\r", ch);
+      send_to_char("NOTELL set.\r\n", ch);
     }
     TOGGLE_BIT(vict->pcdata->punish, PUNISH_NOTELL);
   }
@@ -5818,13 +5818,13 @@ int do_punish(char_data *ch, char *arg, int cmd)
   {
     if (IS_SET(vict->pcdata->punish, PUNISH_NONAME))
     {
-      send_to_char("The gods grant you control over your name.\n\r", vict);
-      send_to_char("NONAME removed.\n\r", ch);
+      send_to_char("The gods grant you control over your name.\r\n", vict);
+      send_to_char("NONAME removed.\r\n", ch);
     }
     else
     {
       sprintf(buf, "%s removes your ability to set your name!\n\r", GET_NAME(ch));
-      send_to_char("NONAME set.\n\r", ch);
+      send_to_char("NONAME set.\r\n", ch);
       send_to_char(buf, vict);
     }
     TOGGLE_BIT(vict->pcdata->punish, PUNISH_NONAME);
@@ -5834,13 +5834,13 @@ int do_punish(char_data *ch, char *arg, int cmd)
   {
     if (IS_SET(vict->pcdata->punish, PUNISH_NOTITLE))
     {
-      send_to_char("The gods grant you control over your title.\n\r", vict);
-      send_to_char("NOTITLE removed.\n\r", ch);
+      send_to_char("The gods grant you control over your title.\r\n", vict);
+      send_to_char("NOTITLE removed.\r\n", ch);
     }
     else
     {
       sprintf(buf, "%s removes your ability to set your title!\n\r", GET_NAME(ch));
-      send_to_char("NOTITLE set.\n\r", ch);
+      send_to_char("NOTITLE set.\r\n", ch);
       send_to_char(buf, vict);
     }
     TOGGLE_BIT(vict->pcdata->punish, PUNISH_NOTITLE);
@@ -5851,8 +5851,8 @@ int do_punish(char_data *ch, char *arg, int cmd)
     if (IS_SET(vict->pcdata->punish, PUNISH_UNLUCKY))
     {
       if (!ch->pcdata->stealth)
-        send_to_char("The gods remove your poor luck.\n\r", vict);
-      send_to_char("UNLUCKY removed.\n\r", ch);
+        send_to_char("The gods remove your poor luck.\r\n", vict);
+      send_to_char("UNLUCKY removed.\r\n", ch);
       sprintf(buf, "%s removes %s's unlucky.", GET_NAME(ch), GET_NAME(vict));
       log(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
     }
@@ -5861,7 +5861,7 @@ int do_punish(char_data *ch, char *arg, int cmd)
       if (!ch->pcdata->stealth)
       {
         sprintf(buf, "%s curses you with god-given bad luck!\n\r", GET_NAME(ch));
-        send_to_char("UNLUCKY set.\n\r", ch);
+        send_to_char("UNLUCKY set.\r\n", ch);
       }
       send_to_char(buf, vict);
       sprintf(buf, "%s makes %s unlucky.", GET_NAME(ch), GET_NAME(vict));
@@ -5874,14 +5874,14 @@ int do_punish(char_data *ch, char *arg, int cmd)
   {
     if (IS_SET(vict->pcdata->punish, PUNISH_NOPRAY))
     {
-      send_to_char("The gods will once again hear your prayers.\n\r", vict);
-      send_to_char("But not necessarily answer them...\n\r", vict);
-      send_to_char("NOPRAY (nemke) removed.\n\r", ch);
+      send_to_char("The gods will once again hear your prayers.\r\n", vict);
+      send_to_char("But not necessarily answer them...\r\n", vict);
+      send_to_char("NOPRAY (nemke) removed.\r\n", ch);
     }
     else
     {
       csendf(vict, "%s has removed your ability to pray!\n\r", GET_NAME(ch));
-      send_to_char("NOPRAY (nemke) set.\n\r", ch);
+      send_to_char("NOPRAY (nemke) set.\r\n", ch);
     }
     TOGGLE_BIT(vict->pcdata->punish, PUNISH_NOPRAY);
   }

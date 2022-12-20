@@ -248,7 +248,7 @@ int make_arbitrary_portal(int from_room, int to_room, int duplicate, int timer)
   obj_to_room(from_portal, real_room(from_room));
 
   send_to_room("There is a violent flash of light as a portal "
-               "shimmers into existence.\n\r",
+               "shimmers into existence.\r\n",
                real_room(from_room));
 
   /* Success - presumably */

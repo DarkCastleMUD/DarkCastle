@@ -31,7 +31,7 @@ int do_clearaff(char_data *ch, char *argument, int cmd)
   if (!*buf)
     victim = ch;
   else if (!generic_find(argument, FIND_CHAR_ROOM | FIND_CHAR_WORLD, ch, &victim, &dummy, true))
-    csendf(ch, "Couldn't find '%s' anywhere.\n\r", argument);
+    csendf(ch, "Couldn't find '%s' anywhere.\r\n", argument);
   if (victim)
   {
     for (af = victim->affected; af; af = afpk)
@@ -102,21 +102,21 @@ int do_log(char_data *ch, char *argument, int cmd)
     send_to_char("Log who?\n\r", ch);
   }
   else if (!(vict = get_pc_vis(ch, buf)))
-    send_to_char("Couldn't find any such creature.\n\r", ch);
+    send_to_char("Couldn't find any such creature.\r\n", ch);
   else if (IS_NPC(vict))
-    send_to_char("Can't do that to a beast.\n\r", ch);
+    send_to_char("Can't do that to a beast.\r\n", ch);
   else if (GET_LEVEL(vict) > GET_LEVEL(ch))
     act("$E might object to that.. better not.", ch, 0, vict, TO_CHAR, 0);
   else if (IS_SET(vict->pcdata->punish, PUNISH_LOG))
   {
-    send_to_char("LOG removed.\n\r", ch);
+    send_to_char("LOG removed.\r\n", ch);
     REMOVE_BIT(vict->pcdata->punish, PUNISH_LOG);
     sprintf(buf2, "%s removed log on %s.", GET_NAME(ch), GET_NAME(vict));
     log(buf2, GET_LEVEL(ch), LogChannels::LOG_GOD);
   }
   else
   {
-    send_to_char("LOG set.\n\r", ch);
+    send_to_char("LOG set.\r\n", ch);
     SET_BIT(vict->pcdata->punish, PUNISH_LOG);
     sprintf(buf2, "%s just logged %s.", GET_NAME(ch), GET_NAME(vict));
     log(buf2, GET_LEVEL(ch), LogChannels::LOG_GOD);
@@ -145,7 +145,7 @@ int do_showbits(char_data *ch, char *argument, int cmd)
   }
   if (!(victim = get_char(person)))
   {
-    send_to_char("They aren't here.\n\r", ch);
+    send_to_char("They aren't here.\r\n", ch);
     return eFAILURE;
   }
 
@@ -327,7 +327,7 @@ int do_pardon(char_data *ch, char *argument, int cmd)
 
   if (!(victim = get_pc_vis(ch, person)))
   {
-    send_to_char("They aren't here.\n\r", ch);
+    send_to_char("They aren't here.\r\n", ch);
     return eFAILURE;
   }
 
@@ -335,9 +335,9 @@ int do_pardon(char_data *ch, char *argument, int cmd)
   {
     if (affected_by_spell(victim, FUCK_PTHIEF))
     {
-      send_to_char("Thief flag removed.\n\r", ch);
+      send_to_char("Thief flag removed.\r\n", ch);
       affect_from_char(victim, FUCK_PTHIEF);
-      send_to_char("A nice god has pardoned you of your thievery.\n\r", victim);
+      send_to_char("A nice god has pardoned you of your thievery.\r\n", victim);
     }
     else
     {
@@ -349,10 +349,10 @@ int do_pardon(char_data *ch, char *argument, int cmd)
   {
     if (ISSET(victim->affected_by, AFF_CANTQUIT))
     {
-      send_to_char("Killer flag removed.\n\r", ch);
+      send_to_char("Killer flag removed.\r\n", ch);
       affect_from_char(victim, FUCK_CANTQUIT);
       send_to_char(
-          "A nice god has pardoned you of your murdering.\n\r", victim);
+          "A nice god has pardoned you of your murdering.\r\n", victim);
     }
     else
     {
@@ -366,7 +366,7 @@ int do_pardon(char_data *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  send_to_char("Done.\n\r", ch);
+  send_to_char("Done.\r\n", ch);
   char log_buf[MAX_STRING_LENGTH] = {};
   sprintf(log_buf, "%s pardons %s for %s.",
           GET_NAME(ch), GET_NAME(victim), flag);

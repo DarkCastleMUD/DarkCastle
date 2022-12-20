@@ -89,7 +89,7 @@ int repair_guy(char_data *ch, struct obj_data *obj, int cmd, const char *arg, ch
 
 	if (!IS_MOB(ch) && affected_by_spell(ch, FUCK_GTHIEF))
 	{
-		send_to_char("Your criminal acts prohibit it.\n\r", ch);
+		send_to_char("Your criminal acts prohibit it.\r\n", ch);
 		return eSUCCESS;
 	}
 
@@ -105,7 +105,7 @@ int repair_guy(char_data *ch, struct obj_data *obj, int cmd, const char *arg, ch
 
 	if (obj == NULL)
 	{
-		send_to_char("You don't have that item.\n\r", ch);
+		send_to_char("You don't have that item.\r\n", ch);
 		return eSUCCESS;
 	}
 
@@ -167,7 +167,7 @@ int super_repair_guy(char_data *ch, struct obj_data *obj, int cmd, const char *a
 
 	if (!IS_MOB(ch) && affected_by_spell(ch, FUCK_GTHIEF))
 	{
-		send_to_char("Your criminal acts prohibit it.\n\r", ch);
+		send_to_char("Your criminal acts prohibit it.\r\n", ch);
 		return eSUCCESS;
 	}
 
@@ -183,7 +183,7 @@ int super_repair_guy(char_data *ch, struct obj_data *obj, int cmd, const char *a
 
 	if (obj == NULL)
 	{
-		send_to_char("You don't have that item.\n\r", ch);
+		send_to_char("You don't have that item.\r\n", ch);
 		return eSUCCESS;
 	}
 
@@ -268,7 +268,7 @@ int repair_shop(char_data *ch, struct obj_data *obj, int cmd, const char *arg, c
 
 	if (!IS_MOB(ch) && affected_by_spell(ch, FUCK_GTHIEF))
 	{
-		send_to_char("Your criminal acts prohibit it.\n\r", ch);
+		send_to_char("Your criminal acts prohibit it.\r\n", ch);
 		return eSUCCESS;
 	}
 
@@ -284,7 +284,7 @@ int repair_shop(char_data *ch, struct obj_data *obj, int cmd, const char *arg, c
 
 	if (obj == NULL)
 	{
-		send_to_char("You don't have that item.\n\r", ch);
+		send_to_char("You don't have that item.\r\n", ch);
 		return eSUCCESS;
 	}
 
@@ -440,14 +440,14 @@ int mortician(char_data *ch, struct obj_data *obj, int cmd, const char *arg, cha
 			cost = corpse_cost(obj);
 			cost /= 20000;
 			cost = MAX(cost, 30);
-			sprintf(buf, "%d) %-21s %d Platinum coins.\n\r", ++count, obj->short_description, cost);
+			sprintf(buf, "%d) %-21s %d Platinum coins.\r\n", ++count, obj->short_description, cost);
 			send_to_char(buf, ch);
 		}
 		send_to_char("$RIf any corpses were listed, they are still where you left them.  This\n\r"
 					 "list is therefore always changing.  If you purchase one, it will be\n\r"
-					 "placed at your feet. Use \"buy <number>\" to purchase a corpse.\n\r"
+					 "placed at your feet. Use \"buy <number>\" to purchase a corpse.\r\n"
 					 "Use 'value' to find how much your eq would cost with what you\n\r"
-					 "have on you now.\n\r",
+					 "have on you now.\r\n",
 					 ch);
 		return eSUCCESS;
 	}
@@ -457,7 +457,7 @@ int mortician(char_data *ch, struct obj_data *obj, int cmd, const char *arg, cha
 		cost = corpse_cost(ch);
 		cost /= 20000;
 		cost = MAX(cost, 30);
-		csendf(ch, "The Undertaker takes a look at you and estimates your corpse would cost around %d platinum coins.\n\r", cost);
+		csendf(ch, "The Undertaker takes a look at you and estimates your corpse would cost around %d platinum coins.\r\n", cost);
 		return eSUCCESS;
 	}
 
@@ -465,7 +465,7 @@ int mortician(char_data *ch, struct obj_data *obj, int cmd, const char *arg, cha
 	if ((which = atoi(arg)) == 0)
 	{
 		send_to_char("Try \"buy <number>\", or \"list\" for a list of "
-					 "available corpses.\n\r",
+					 "available corpses.\r\n",
 					 ch);
 		return eSUCCESS;
 	}
@@ -497,7 +497,7 @@ int mortician(char_data *ch, struct obj_data *obj, int cmd, const char *arg, cha
 		move_obj(obj, ch->in_room);
 		REMOVE_BIT(obj->obj_flags.extra_flags, ITEM_INVISIBLE);
 		send_to_char("The mortician goes into his freezer and returns with a corpse, which he\n\r"
-					 "places at your feet.\n\r",
+					 "places at your feet.\r\n",
 					 ch);
 		GET_PLATINUM(ch) -= cost;
 		do_save(ch, "", 10);
@@ -505,7 +505,7 @@ int mortician(char_data *ch, struct obj_data *obj, int cmd, const char *arg, cha
 		return eSUCCESS;
 	}
 
-	send_to_char("No such corpse was found.  Try \"list\".\n\r", ch);
+	send_to_char("No such corpse was found.  Try \"list\".\r\n", ch);
 	return eSUCCESS;
 }
 
@@ -810,7 +810,7 @@ int gl_repair_shop(char_data *ch, struct obj_data *obj, int cmd, const char *arg
 
 	if (!IS_MOB(ch) && affected_by_spell(ch, FUCK_GTHIEF))
 	{
-		send_to_char("Your criminal acts prohibit it.\n\r", ch);
+		send_to_char("Your criminal acts prohibit it.\r\n", ch);
 		return eSUCCESS;
 	}
 
@@ -826,7 +826,7 @@ int gl_repair_shop(char_data *ch, struct obj_data *obj, int cmd, const char *arg
 
 	if (obj == NULL)
 	{
-		send_to_char("You don't have that item.\n\r", ch);
+		send_to_char("You don't have that item.\r\n", ch);
 		return eSUCCESS;
 	}
 

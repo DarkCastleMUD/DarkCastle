@@ -2732,7 +2732,7 @@ int palm(char_data *ch, struct obj_data *obj_object, struct obj_data *sub_object
       (obj_object->obj_flags.value[0] >= 1))
   {
     obj_from_char(obj_object);
-    sprintf(buffer, "There was %d coins.\n\r",
+    sprintf(buffer, "There was %d coins.\r\n",
             obj_object->obj_flags.value[0]);
     send_to_char(buffer, ch);
     if (zone_table[world[ch->in_room].zone].clanowner > 0 && ch->clan !=

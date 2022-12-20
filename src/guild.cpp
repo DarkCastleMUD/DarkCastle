@@ -32,7 +32,7 @@ int do_practice(char_data *ch, char *arg, int cmd)
 
   if (arg[0] != '\0')
   {
-    send_to_char("You can only practice in a guild.\n\r", ch);
+    send_to_char("You can only practice in a guild.\r\n", ch);
   }
   else
   {
@@ -54,7 +54,7 @@ int do_profession(char_data *ch, char *args, int cmdnum)
   char_data *victim = get_mob_room_vis(ch, "guildmaster");
   if (victim == NULL)
   {
-    csendf(ch, "You can't pick a profession here. You need to find a Guild Master.\n\r");
+    csendf(ch, "You can't pick a profession here. You need to find a Guild Master.\r\n");
     return eFAILURE;
   }
 
@@ -79,7 +79,7 @@ int do_profession(char_data *ch, char *args, int cmdnum)
                "Syntax: profession [profession name]\n\r"
                "        profession reset\n\r"
                "\n\r"
-               "Resetting your profession costs 10000 platinum.\n\r");
+               "Resetting your profession costs 10000 platinum.\r\n");
 
     return eSUCCESS;
   }
@@ -96,7 +96,7 @@ int do_profession(char_data *ch, char *args, int cmdnum)
       }
       else
       {
-        csendf(ch, "That profession is not available to your class.\n\r");
+        csendf(ch, "That profession is not available to your class.\r\n");
         return eFAILURE;
       }
     }
@@ -104,7 +104,7 @@ int do_profession(char_data *ch, char *args, int cmdnum)
 
   if (found == false)
   {
-    csendf(ch, "%s not a valid profession.\n\r", arg1);
+    csendf(ch, "%s not a valid profession.\r\n", arg1);
     return eFAILURE;
   }
 
@@ -630,7 +630,7 @@ int skills_guild(char_data *ch, const char *arg, char_data *owner)
 
   if (!*arg) // display skills that can be learned
   {
-    sprintf(buf, "You have %d practice sessions left.\n\r", ch->pcdata->practices);
+    sprintf(buf, "You have %d practice sessions left.\r\n", ch->pcdata->practices);
     send_to_char(buf, ch);
     send_to_char("You can practice any of these skills:\n\r\r\n", ch);
 
@@ -654,7 +654,7 @@ int skills_guild(char_data *ch, const char *arg, char_data *owner)
     send_to_char("\r\n", ch);
 
     if (GET_CLASS(ch) == CLASS_BARD)
-      send_to_char("$B#$R denotes a song which requires an instrument.\n\r", ch);
+      send_to_char("$B#$R denotes a song which requires an instrument.\r\n", ch);
 
     return eSUCCESS;
   }
@@ -720,13 +720,13 @@ int skills_guild(char_data *ch, const char *arg, char_data *owner)
     // If this is a profession-specific skill and we are a mortal without that profession, disallow
     if (skilllist[skillnumber].group && IS_PC(ch) && skilllist[skillnumber].group != ch->pcdata->profession)
     {
-      csendf(ch, "You must join the %s profession in order to learn that.\n\r", find_profession(ch->c_class, skilllist[skillnumber].group));
+      csendf(ch, "You must join the %s profession in order to learn that.\r\n", find_profession(ch->c_class, skilllist[skillnumber].group));
       return eSUCCESS;
     }
   }
   if (ch->pcdata->practices <= 0)
   {
-    send_to_char("You do not seem to be able to practice now.\n\r", ch);
+    send_to_char("You do not seem to be able to practice now.\r\n", ch);
     return eSUCCESS;
   }
 
@@ -740,7 +740,7 @@ int skills_guild(char_data *ch, const char *arg, char_data *owner)
 
   if (known >= skilllist[skillnumber].maximum)
   {
-    send_to_char("You are already learned in this area.\n\r", ch);
+    send_to_char("You are already learned in this area.\r\n", ch);
     return eSUCCESS;
   }
   float maxlearn = (float)skilllist[skillnumber].maximum;
@@ -748,7 +748,7 @@ int skills_guild(char_data *ch, const char *arg, char_data *owner)
 
   if (known >= (GET_LEVEL(ch) * 2))
   {
-    send_to_char("You are not experienced enough to practice that any further right now.\n\r", ch);
+    send_to_char("You are not experienced enough to practice that any further right now.\r\n", ch);
     return eSUCCESS;
   }
   if (known >= maxlearn)
@@ -814,7 +814,7 @@ int skills_guild(char_data *ch, const char *arg, char_data *owner)
       break;
     }
 
-  send_to_char("You practice for a while...\n\r", ch);
+  send_to_char("You practice for a while...\r\n", ch);
   ch->pcdata->practices--;
 
   percent = 1 + (int)int_app[GET_INT(ch)].learn_bonus;
@@ -823,7 +823,7 @@ int skills_guild(char_data *ch, const char *arg, char_data *owner)
 
   if (known >= skilllist[skillnumber].maximum)
   {
-    send_to_char("You are now learned in this area.\n\r", ch);
+    send_to_char("You are now learned in this area.\r\n", ch);
     return eSUCCESS;
   }
 
@@ -898,7 +898,7 @@ int guild(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
     {
       x = (int)(exp_needed - GET_EXP(ch));
 
-      csendf(ch, "You need %d experience to level.\n\r", x);
+      csendf(ch, "You need %d experience to level.\r\n", x);
       return eSUCCESS;
     }
 
@@ -957,7 +957,7 @@ int guild(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
       return eSUCCESS;
     }
 
-    send_to_char("Your profession skills have been reset.\n\r", ch);
+    send_to_char("Your profession skills have been reset.\r\n", ch);
     struct class_skill_defines *class_skills = get_skill_list(ch);
     struct char_skill_data *skill;
 
@@ -970,7 +970,7 @@ int guild(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
         }
       }
 
-    send_to_char("You have remorted back to level 50.\n\r", ch);
+    send_to_char("You have remorted back to level 50.\r\n", ch);
     if (GET_LEVEL(ch) <= MAX_MORTAL)
       GET_LEVEL(ch) = 50;
     SET_BIT(ch->pcdata->toggles, PLR_REMORTED);
@@ -1002,7 +1002,7 @@ int guild(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
     else if (search_skills(arg, g_skills) != -1)
       do_say(owner, "Seek out the SKILLS MASTER in the forests west of Sorpigal to learn this ability.", CMD_DEFAULT);
     else
-      send_to_char("You do not know of this ability...\n\r", ch);
+      send_to_char("You do not know of this ability...\r\n", ch);
   }
 
   return eSUCCESS;
@@ -1119,7 +1119,7 @@ int skill_master(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
 
   if (!*arg)
   {
-    sprintf(buf, "You have %d practice sessions left.\n\r", ch->pcdata->practices);
+    sprintf(buf, "You have %d practice sessions left.\r\n", ch->pcdata->practices);
     send_to_char(buf, ch);
     send_to_char("You can practice any of these skills:\n\r", ch);
     for (i = 0; *g_skills[i].skillname != '\n'; i++)
@@ -1142,29 +1142,29 @@ int skill_master(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
     if (search_skills(arg, skilllist) != -1)
       do_say(invoker, "You must speak with your guildmaster to learn such a complicated ability.", CMD_DEFAULT);
     else
-      send_to_char("You do not know of this skill...\n\r", ch);
+      send_to_char("You do not know of this skill...\r\n", ch);
     return eSUCCESS;
   }
 
   if (ch->pcdata->practices <= 0)
   {
-    send_to_char("You do not seem to be able to practice now.\n\r", ch);
+    send_to_char("You do not seem to be able to practice now.\r\n", ch);
     return eSUCCESS;
   }
   learned = has_skill(ch, g_skills[number].skillnum);
 
   if (learned >= g_skills[number].maximum)
   {
-    send_to_char("You are already learned in this area.\n\r", ch);
+    send_to_char("You are already learned in this area.\r\n", ch);
     return eSUCCESS;
   }
   if (learned >= (GET_LEVEL(ch) * 3))
   {
-    send_to_char("You aren't experienced enough to practice that any further right now.\n\r", ch);
+    send_to_char("You aren't experienced enough to practice that any further right now.\r\n", ch);
     return eSUCCESS;
   }
 
-  send_to_char("You practice for a while...\n\r", ch);
+  send_to_char("You practice for a while...\r\n", ch);
   ch->pcdata->practices--;
 
   percent = 1 + (int)int_app[GET_INT(ch)].learn_bonus;
@@ -1174,7 +1174,7 @@ int skill_master(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
 
   if (learned >= g_skills[number].maximum)
   {
-    send_to_char("You are now learned in this area.\n\r", ch);
+    send_to_char("You are now learned in this area.\r\n", ch);
     return eSUCCESS;
   }
   return eSUCCESS;

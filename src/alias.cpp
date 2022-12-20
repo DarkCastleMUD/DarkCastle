@@ -62,7 +62,7 @@ int do_alias(char_data *ch, char *arg, int cmd)
     }
 	
     if (nokey == 0) {        /* No keyword to grab.. exit now...  */
-      send_to_char ("You need more than just a space for a keyword.\n\r", ch);
+      send_to_char ("You need more than just a space for a keyword.\r\n", ch);
       return eSUCCESS;
     }
 	
@@ -120,7 +120,7 @@ int do_alias(char_data *ch, char *arg, int cmd)
       for (x = 1, curr = ch->pcdata->alias; curr; curr = curr->next, x++)  
       {
           if (!str_cmp(curr->keyword, buf)) {
-            sprintf(outbuf, "Alias %d: %s == %s    REPLACED with '%s'.\n\r", x,
+            sprintf(outbuf, "Alias %d: %s == %s    REPLACED with '%s'.\r\n", x,
                buf, curr->command, buf1);
             send_to_char(outbuf, ch);
             dc_free (curr->command);
@@ -152,7 +152,7 @@ int do_alias(char_data *ch, char *arg, int cmd)
 #endif
       curr->keyword = str_dup(buf);
       curr->command = str_dup(buf1);
-      send_to_char ("New Alias Defined.\n\r", ch);
+      send_to_char ("New Alias Defined.\r\n", ch);
       curr->next = ch->pcdata->alias;
       ch->pcdata->alias = curr;
       dc_free(buf);
@@ -191,7 +191,7 @@ int do_alias(char_data *ch, char *arg, int cmd)
       {
 	  
           if (!str_cmp(buf, curr->keyword)) {
-            sprintf(outbuf,"Alias %2d: %s == %s DELETED.\n\r",o, 
+            sprintf(outbuf,"Alias %2d: %s == %s DELETED.\r\n",o, 
                    curr->keyword, curr->command);
             send_to_char(outbuf, ch);
             // if we're first, reassign the chain

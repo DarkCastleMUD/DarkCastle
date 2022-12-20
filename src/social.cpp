@@ -53,11 +53,11 @@ int check_social(char_data *ch, string pcomm, int length)
   switch (GET_POS(ch))
   {
   case POSITION_DEAD:
-    send_to_char("Lie still; you are DEAD.\n\r", ch);
+    send_to_char("Lie still; you are DEAD.\r\n", ch);
     return SOCIAL_TRUE;
 
   case POSITION_STUNNED:
-    send_to_char("You are too stunned to do that.\n\r", ch);
+    send_to_char("You are too stunned to do that.\r\n", ch);
     return SOCIAL_TRUE;
 
   case POSITION_SLEEPING:

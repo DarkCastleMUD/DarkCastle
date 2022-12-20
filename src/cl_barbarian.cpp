@@ -378,13 +378,13 @@ int do_rage(char_data *ch, char *argument, int cmd)
 
   if (ch->in_room != victim->in_room)
   {
-    send_to_char("That person seems to have left.\n\r", ch);
+    send_to_char("That person seems to have left.\r\n", ch);
     return eFAILURE;
   }
 
   if (victim == ch)
   {
-    send_to_char("Aren't we funny today...\n\r", ch);
+    send_to_char("Aren't we funny today...\r\n", ch);
     return eFAILURE;
   }
 
@@ -449,13 +449,13 @@ int do_battlecry(char_data *ch, char *argument, int cmd)
 
   if (!ch->fighting)
   {
-    send_to_char("You must be fighting already in order to battlecry.\n\r", ch);
+    send_to_char("You must be fighting already in order to battlecry.\r\n", ch);
     return eFAILURE;
   }
 
   if (ch->master || !ch->followers)
   {
-    send_to_char("You must be leading a group in order to battlecry.\n\r", ch);
+    send_to_char("You must be leading a group in order to battlecry.\r\n", ch);
     return eFAILURE;
   }
 
@@ -550,13 +550,13 @@ int do_berserk(char_data *ch, char *argument, int cmd)
 
   if (ch->in_room != victim->in_room)
   {
-    send_to_char("That person seems to have left.\n\r", ch);
+    send_to_char("That person seems to have left.\r\n", ch);
     return eFAILURE;
   }
 
   if (victim == ch)
   {
-    send_to_char("Aren't we funny today...\n\r", ch);
+    send_to_char("Aren't we funny today...\r\n", ch);
     return eFAILURE;
   }
 
@@ -659,7 +659,7 @@ int do_headbutt(char_data *ch, char *argument, int cmd)
 
   if (victim == ch)
   {
-    send_to_char("Aren't we funny today...\n\r", ch);
+    send_to_char("Aren't we funny today...\r\n", ch);
     return eFAILURE;
   }
 
@@ -1087,7 +1087,7 @@ int do_knockback(char_data *ch, char *argument, int cmd)
 
   if (ch->getHP() == 1)
   {
-    send_to_char("You are feeling too weak right now to smash into anybody.\n\r", ch);
+    send_to_char("You are feeling too weak right now to smash into anybody.\r\n", ch);
     return eFAILURE;
   }
 
@@ -1394,18 +1394,18 @@ int do_pursue(char_data *ch, char *argument, int cmd)
 {
   if (!has_skill(ch, SKILL_PURSUIT))
   {
-    send_to_char("You don't know how to.\n\r", ch);
+    send_to_char("You don't know how to.\r\n", ch);
     return eFAILURE;
   }
 
   if (affected_by_spell(ch, SKILL_PURSUIT))
   {
-    send_to_char("You will no longer pursue your victims.\n\r", ch);
+    send_to_char("You will no longer pursue your victims.\r\n", ch);
     affect_from_char(ch, SKILL_PURSUIT);
   }
   else
   {
-    send_to_char("You will pursue your victims.\n\r", ch);
+    send_to_char("You will pursue your victims.\r\n", ch);
     affected_type af;
     af.type = SKILL_PURSUIT;
     af.duration = -1;

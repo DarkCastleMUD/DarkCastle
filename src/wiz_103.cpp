@@ -32,7 +32,7 @@ int do_boot(char_data *ch, char *arg, int cmd)
   if (!(*name))
   {
     send_to_char("Syntax: boot <victim> [boot]\n\r", ch);
-    send_to_char("The boot option causes the victim to see a large ASCII boot.\n\r", ch);
+    send_to_char("The boot option causes the victim to see a large ASCII boot.\r\n", ch);
     return eFAILURE;
   }
 
@@ -65,12 +65,12 @@ int do_boot(char_data *ch, char *arg, int cmd)
 
     /* Still here? Ok, the boot continues */
     send_to_char("You have been disconnected.\r\n", victim);
-    send_to_char("Ok.\n\r", ch);
+    send_to_char("Ok.\r\n", ch);
     if (!IS_NPC(victim))
     {
       sprintf(buf, "A stream of fire arcs down from the heavens, striking "
                    "you between the eyes.\n\rYou have been removed from the "
-                   "world by %s.\n\r",
+                   "world by %s.\r\n",
               GET_SHORT(ch));
       send_to_char(buf, victim);
     }
@@ -139,7 +139,7 @@ int do_boot(char_data *ch, char *arg, int cmd)
                    "##\"\"F~5#F        ###L                                 __          #M#M###M##\n\r"
                    "      J#K        ###L                                g##g             ##\n\r"
                    "     _y##ga       ~           _amog                  ####            ##F\n\r"
-                   " a###~'\"#1                   d#   \"#                 \"##          #wy##L.\n\r"
+                   " a###~'\"#1                   d#   \"#                 \"##          #wy##L.\r\n"
                    "        3#,                   #g__g\"                                ##\"\"5##g\n\r"
                    "         ##g#                    ''                                a##    '~\n\r"
                    "    __y#\"FH#_                                                  y_ g##\n\r"
@@ -174,7 +174,7 @@ int do_disconnect(char_data *ch, char *argument, int cmd)
   sdesc = atoi(arg);
   if (arg == 0)
   {
-    send_to_char("Illegal descriptor number.\n\r", ch);
+    send_to_char("Illegal descriptor number.\r\n", ch);
     send_to_char("Usage: release <#>\n\r", ch);
     return eFAILURE;
   }
@@ -184,7 +184,7 @@ int do_disconnect(char_data *ch, char *argument, int cmd)
     {
       if (d->character && (GET_LEVEL(d->character) > GET_LEVEL(ch)))
       {
-        sprintf(buf, "Heh, %s tried to disconnect you. He has paid.\n\r", GET_NAME(ch));
+        sprintf(buf, "Heh, %s tried to disconnect you. He has paid.\r\n", GET_NAME(ch));
         send_to_char(buf, d->character);
         send_to_char("You dummy, can't do that to your elders!\n\r", ch);
         close_socket(ch->desc);
@@ -290,9 +290,9 @@ int do_fighting(char_data *ch, char *argument, int cmd)
   if (countFighters == 0)
   {
     if (arenaONLY)
-      send_to_char("No fighting characters found in the arena.\n\r", ch);
+      send_to_char("No fighting characters found in the arena.\r\n", ch);
     else
-      send_to_char("No fighting characters found.\n\r", ch);
+      send_to_char("No fighting characters found.\r\n", ch);
   }
   return eSUCCESS;
 }
@@ -309,7 +309,7 @@ int do_peace(char_data *ch, char *argument, int cmd)
       stop_fighting(rch);
   }
   act("$n makes a gesture and all fighting stops.", ch, 0, 0, TO_ROOM, 0);
-  send_to_char("You stop all fighting in this room.\n\r", ch);
+  send_to_char("You stop all fighting in this room.\r\n", ch);
   return eSUCCESS;
 }
 
@@ -378,7 +378,7 @@ int lookupRoom(char_data *ch, char *str)
   {
     if (ch)
     {
-      send_to_char("No such room exists.\n\r", ch);
+      send_to_char("No such room exists.\r\n", ch);
     }
 
     return -1;
@@ -474,7 +474,7 @@ int do_guild(char_data *ch, char *argument, int cmd)
 
       if (count == 0)
       {
-        send_to_char("None found.\n\r", ch);
+        send_to_char("None found.\r\n", ch);
       }
       else
       {
@@ -500,18 +500,18 @@ int do_guild(char_data *ch, char *argument, int cmd)
 
   if (!can_modify_room(ch, room))
   {
-    send_to_char("You are unable to work creation outside of your range.\n\r", ch);
+    send_to_char("You are unable to work creation outside of your range.\r\n", ch);
     return eFAILURE;
   }
 
   if (world_array[room]->allow_class[c_class] == TRUE)
   {
-    csendf(ch, "Removed %s class from room #%d's allow list.\n\r", pc_clss_types[c_class], room);
+    csendf(ch, "Removed %s class from room #%d's allow list.\r\n", pc_clss_types[c_class], room);
     world_array[room]->allow_class[c_class] = FALSE;
   }
   else
   {
-    csendf(ch, "Added %s class to room #%d's allow list.\n\r", pc_clss_types[c_class], room);
+    csendf(ch, "Added %s class to room #%d's allow list.\r\n", pc_clss_types[c_class], room);
     world_array[room]->allow_class[c_class] = TRUE;
   }
 

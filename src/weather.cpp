@@ -65,44 +65,44 @@ void another_hour(int mode)
       {
          case 5 :
             weather_info.sunlight = SUN_RISE;
-            send_to_outdoor("The morning sky lightens to pale blue.\n\r");
+            send_to_outdoor("The morning sky lightens to pale blue.\r\n");
             break;  
          case 6 :
             weather_info.sunlight = SUN_LIGHT;
             if(weather_info.sky == SKY_CLOUDLESS)
-              send_to_outdoor("The sun crests the horizon sending down rays of warmth from the cloudless blue skies.\n\r");
-            else send_to_outdoor("Orange flares join the sun touching the morning sky.\n\r");
+              send_to_outdoor("The sun crests the horizon sending down rays of warmth from the cloudless blue skies.\r\n");
+            else send_to_outdoor("Orange flares join the sun touching the morning sky.\r\n");
             break;
          /* aderrick added code 5/3/12, case 8 */
          case 8 :
             if(weather_info.sky == SKY_CLOUDLESS)
-              send_to_outdoor("The sun rises higher into the sky casting brighter light across the land.\n\r");
-            else send_to_outdoor("The sun continues to rise giving more heat and light.\n\r");
+              send_to_outdoor("The sun rises higher into the sky casting brighter light across the land.\r\n");
+            else send_to_outdoor("The sun continues to rise giving more heat and light.\r\n");
             break;
          case 11 :
-            send_to_outdoor("The shadows shift imperceptibly as another hour passes.\n\r");
+            send_to_outdoor("The shadows shift imperceptibly as another hour passes.\r\n");
             break;
          case 13 :
             if(weather_info.sky == SKY_CLOUDLESS)
-              send_to_outdoor("Finishing its daily climb, the sun burns brightly overhead and begins its descent.\n\r");
+              send_to_outdoor("Finishing its daily climb, the sun burns brightly overhead and begins its descent.\r\n");
             break;
          case 15 :
-            send_to_outdoor("The shadows shift imperceptibly as another hour passes.\n\r");
+            send_to_outdoor("The shadows shift imperceptibly as another hour passes.\r\n");
             break;
          /* aderrick added code 5/3/12 case 19 & 20 */
          case 19 :
-            send_to_outdoor("The day begins to cool as evening arrives.\n\r");
+            send_to_outdoor("The day begins to cool as evening arrives.\r\n");
             break;
          case 20 :
-            send_to_outdoor("The shadows get longer as the evening grows later.\n\r");
+            send_to_outdoor("The shadows get longer as the evening grows later.\r\n");
             break;
          case 21 :
             weather_info.sunlight = SUN_SET;
-            send_to_outdoor("The sun falls below the horizon as a biting cold sets in.\n\r");
+            send_to_outdoor("The sun falls below the horizon as a biting cold sets in.\r\n");
             break;
          case 22 :
             weather_info.sunlight = SUN_DARK;
-            send_to_outdoor("The twin northern moons surface into the night sky.\n\r");
+            send_to_outdoor("The twin northern moons surface into the night sky.\r\n");
             break;
          default : break;
       }
@@ -222,67 +222,67 @@ void weather_change(void)
          break;
       case 1 :
          switch(number(1, 3)) {
-         case 1:  send_to_outdoor("A bitter chill sets in as billowing clouds form on the horizon.\n\r"); break;
-         case 2:  send_to_outdoor("Dark and heavy clouds begin to crowd the sky, blocking off the light of the heavens.\n\r"); break;
-         case 3:  if(weather_info.sunlight != SUN_DARK) send_to_outdoor("The sun's light diffuses as clouds roll in to create a pale and dreary scape.\n\r");break;
+         case 1:  send_to_outdoor("A bitter chill sets in as billowing clouds form on the horizon.\r\n"); break;
+         case 2:  send_to_outdoor("Dark and heavy clouds begin to crowd the sky, blocking off the light of the heavens.\r\n"); break;
+         case 3:  if(weather_info.sunlight != SUN_DARK) send_to_outdoor("The sun's light diffuses as clouds roll in to create a pale and dreary scape.\r\n");break;
          }
          weather_info.sky=SKY_CLOUDY;
          break;
       case 2 :
          switch(number(1, 2)) {
-         case 1:  send_to_outdoor("Small circlets dot the ground as a light rain begins.\n\r"); break;
-         case 2:  send_to_outdoor("A light mist hangs in the air and slowly turns to rain.\n\r"); break;
+         case 1:  send_to_outdoor("Small circlets dot the ground as a light rain begins.\r\n"); break;
+         case 2:  send_to_outdoor("A light mist hangs in the air and slowly turns to rain.\r\n"); break;
          }
          weather_info.sky=SKY_RAINING;
          break;
       case 3 :
          switch(number(1, 2)) {
-         case 1:  send_to_outdoor("The southern sky slips into view as the clouds fade.\n\r"); break;
-         case 2:  send_to_outdoor("The clouds overhead slowly move off to the horizon clearing the sky above.\n\r"); break;
+         case 1:  send_to_outdoor("The southern sky slips into view as the clouds fade.\r\n"); break;
+         case 2:  send_to_outdoor("The clouds overhead slowly move off to the horizon clearing the sky above.\r\n"); break;
          }
          weather_info.sky=SKY_CLOUDLESS;
          break;
       case 4 :
          switch(number(1, 3)) {
-         case 1:  send_to_outdoor("An eerie flash of lightning crackles across the sky.\n\r"); break;
-         case 2:  send_to_outdoor("The rain begins to fall harder and lightning streaks across the sky.\n\r"); break;
-         case 3:  send_to_outdoor("The storm worsens, bringing the crashing of thunder and flashes of lightning.\n\r"); break;
+         case 1:  send_to_outdoor("An eerie flash of lightning crackles across the sky.\r\n"); break;
+         case 2:  send_to_outdoor("The rain begins to fall harder and lightning streaks across the sky.\r\n"); break;
+         case 3:  send_to_outdoor("The storm worsens, bringing the crashing of thunder and flashes of lightning.\r\n"); break;
          }
          weather_info.sky=SKY_LIGHTNING;
          break;
       case 5 :
          switch(number(1, 2)) {
-         case 1:  send_to_outdoor("Like a hushed whisper, the pattering rain has lifted.\n\r"); break;
-         case 2:  send_to_outdoor("The rain begins to slow as the clouds end their assault.\n\r"); break;
+         case 1:  send_to_outdoor("Like a hushed whisper, the pattering rain has lifted.\r\n"); break;
+         case 2:  send_to_outdoor("The rain begins to slow as the clouds end their assault.\r\n"); break;
          }
          weather_info.sky=SKY_CLOUDY;
          break;
       case 6 :
          switch(number(1, 2)) {
-         case 1:  send_to_outdoor("A last ominous rumble and the sky's energy is dispelled.\n\r"); break;
-         case 2:  send_to_outdoor("The rain begins to lessen and the rumble of thunder moves off to the distance.\n\r"); break;
+         case 1:  send_to_outdoor("A last ominous rumble and the sky's energy is dispelled.\r\n"); break;
+         case 2:  send_to_outdoor("The rain begins to lessen and the rumble of thunder moves off to the distance.\r\n"); break;
          }
          weather_info.sky=SKY_RAINING;
          break;
       case 7:
          switch(number(1,2)) {
-         case 1: send_to_outdoor("The clouds open up and send a torrent of rain to the planet.\n\r"); break;
-         case 2: send_to_outdoor("The rain drops begin slamming down heavily.\n\r"); break;
+         case 1: send_to_outdoor("The clouds open up and send a torrent of rain to the planet.\r\n"); break;
+         case 2: send_to_outdoor("The rain drops begin slamming down heavily.\r\n"); break;
          }
          weather_info.sky=SKY_HEAVY_RAIN;
          break;
       case 8:
          switch(number(1,2)) {
-         case 1: send_to_outdoor("The rain eases slightly, assailing the ground with less force.\n\r"); break;
-         case 2: send_to_outdoor("The clouds overhead become a few shades lighter, lessening the downpour.\n\r"); break;
+         case 1: send_to_outdoor("The rain eases slightly, assailing the ground with less force.\r\n"); break;
+         case 2: send_to_outdoor("The clouds overhead become a few shades lighter, lessening the downpour.\r\n"); break;
          }
          weather_info.sky=SKY_RAINING;
          break;
       case 9:
          switch(number(1,3)) {
-         case 1: send_to_outdoor("The energy of the clouds increases as lightning bolts rain down.\n\r"); break;
-         case 2: send_to_outdoor("Occasional sounds of thunder are heard over the deluge.\n\r"); break;
-         case 3: send_to_outdoor("The electrical activity within the clouds rises noticeably.\n\r"); break;
+         case 1: send_to_outdoor("The energy of the clouds increases as lightning bolts rain down.\r\n"); break;
+         case 2: send_to_outdoor("Occasional sounds of thunder are heard over the deluge.\r\n"); break;
+         case 3: send_to_outdoor("The electrical activity within the clouds rises noticeably.\r\n"); break;
          }
          weather_info.sky=SKY_LIGHTNING;
          break;

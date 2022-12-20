@@ -72,20 +72,20 @@ char_data *combat_list = NULL, *combat_next_dude = NULL;
 
 char *champ_death_messages[] =
     {
-        /*1*/ "\n\r##Somewhere a village has been deprived of their idiot.\n\r",
+        /*1*/ "\n\r##Somewhere a village has been deprived of their idiot.\r\n",
         "\n\r##Don't feel bad %s. A lot of people have no talent!\n\r",
-        "\n\r##If at first you don't succeed, failure may be your style.\n\r",
-        "\n\r##%s just found the cure for stupidity. Death.\n\r",
-        /*5*/ "\n\r##%s just succumbed to a fatal case of stupidity.\n\r",
-        "\n\r##%s: About as useful as a windshield wiper on a goat's ass.\n\r",
-        "\n\r##Proof of reincarnation. Nobody could be as stupid as %s in one lifetime.\n\r",
-        "\n\r##%s: The poster child for birth control.\n\r",
-        "\n\r##Someone... we're not saying who... but someone is an unmitigated moron.\n\r",
-        /*10*/ "\n\r##%s wasn't ready.\n\r",
+        "\n\r##If at first you don't succeed, failure may be your style.\r\n",
+        "\n\r##%s just found the cure for stupidity. Death.\r\n",
+        /*5*/ "\n\r##%s just succumbed to a fatal case of stupidity.\r\n",
+        "\n\r##%s: About as useful as a windshield wiper on a goat's ass.\r\n",
+        "\n\r##Proof of reincarnation. Nobody could be as stupid as %s in one lifetime.\r\n",
+        "\n\r##%s: The poster child for birth control.\r\n",
+        "\n\r##Someone... we're not saying who... but someone is an unmitigated moron.\r\n",
+        /*10*/ "\n\r##%s wasn't ready.\r\n",
         "\n\r##EPIC FAIL\n\r",
-        "\n\r##%s wants a do-over.\n\r",
+        "\n\r##%s wants a do-over.\r\n",
         "\n\r##%s prays, 'THIS GAME SUCKS'\n\r",
-        "\n\r##DarkCastle: Helping people like %s to die since 1991.\n\r"};
+        "\n\r##DarkCastle: Helping people like %s to die since 1991.\r\n"};
 
 int debug_retval(char_data *ch, char_data *victim, int retval);
 
@@ -376,7 +376,7 @@ void perform_violence(void)
         if (get_saves(ch, SAVE_TYPE_POISON) > number(1, 100))
         {
           dam = dam * get_saves(ch, SAVE_TYPE_POISON) / 100;
-          send_to_char("You feel very sick, but resist the $2poison's$R damage.\n\r", ch);
+          send_to_char("You feel very sick, but resist the $2poison's$R damage.\r\n", ch);
         }
         if (dam)
         {
@@ -2560,7 +2560,7 @@ int damage(char_data *ch, char_data *victim,
     {
       dam -= pspell->modifier;
       pspell->duration -= pspell->modifier;
-      csendf(victim, "Your stones absorb %d damage allowing %d through.\n\r", pspell->modifier, dam);
+      csendf(victim, "Your stones absorb %d damage allowing %d through.\r\n", pspell->modifier, dam);
       string1 << "Your attack hits $N's stones for " << pspell->modifier << " damage allowing " << dam << " through.";
       act(string1.str().c_str(), ch, 0, victim, TO_CHAR, 0);
       string1.clear();
@@ -2571,7 +2571,7 @@ int damage(char_data *ch, char_data *victim,
     else
     {
       pspell->duration -= dam;
-      csendf(victim, "Your stones absorb %d damage from the attack and change its direction slightly.\n\r", dam);
+      csendf(victim, "Your stones absorb %d damage from the attack and change its direction slightly.\r\n", dam);
       string1 << "$N's stones absorb " << dam << " damage of your attack and cause your blow to change direction slightly.";
       act(string1.str().c_str(), ch, 0, victim, TO_CHAR, 0);
       string1.clear();
@@ -5866,7 +5866,7 @@ void group_gain(char_data *ch, char_data *victim)
 
     if (IS_AFFECTED(tmp_ch, AFF_CHAMPION))
       share = (int)((double)share * 1.10);
-    sprintf(buf, "You receive %lld exps of %lld total.\n\r", share, base_xp + bonus_xp);
+    sprintf(buf, "You receive %lld exps of %lld total.\r\n", share, base_xp + bonus_xp);
     send_to_char(buf, tmp_ch);
     gain_exp(tmp_ch, share);
     total_share += share;
@@ -6881,7 +6881,7 @@ void arena_kill(char_data *ch, char_data *victim, int type)
     }
   }
 
-  send_to_char("You have been completely healed.\n\r", victim);
+  send_to_char("You have been completely healed.\r\n", victim);
   GET_POS(victim) = POSITION_RESTING;
   victim->fillHP();
   GET_MANA(victim) = GET_MAX_MANA(victim);
@@ -6959,14 +6959,14 @@ int can_be_attacked(char_data *ch, char_data *vict)
 
     if (ch->fighting && ch->fighting != vict)
     {
-      send_to_char("You are already fighting someone.\n\r", ch);
+      send_to_char("You are already fighting someone.\r\n", ch);
       logf(IMMORTAL, LogChannels::LOG_ARENA, "%s, whom was fighting %s was prevented from attacking %s.",
            GET_NAME(ch), GET_NAME(ch->fighting), GET_NAME(vict));
       return FALSE;
     }
     else if (vict->fighting && vict->fighting != ch)
     {
-      send_to_char("They are already fighting someone.\n\r", ch);
+      send_to_char("They are already fighting someone.\r\n", ch);
       logf(IMMORTAL, LogChannels::LOG_ARENA, "%s was prevented from attacking %s who was fighting %s.",
            GET_NAME(ch), GET_NAME(vict), GET_NAME(vict->fighting));
       return FALSE;
@@ -6978,14 +6978,14 @@ int can_be_attacked(char_data *ch, char_data *vict)
   {
     if (ch->fighting && ch->fighting != vict && !ARE_CLANNED(ch->fighting, vict))
     {
-      send_to_char("You are already fighting someone from another clan.\n\r", ch);
+      send_to_char("You are already fighting someone from another clan.\r\n", ch);
       logf(IMMORTAL, LogChannels::LOG_ARENA, "%s [%s], whom was fighting %s [%s] was prevented from attacking %s [%s].",
            GET_NAME(ch), get_clan_name(ch), GET_NAME(ch->fighting), get_clan_name(ch->fighting), GET_NAME(vict), get_clan_name(vict));
       return FALSE;
     }
     else if (vict->fighting && vict->fighting != ch && !ARE_CLANNED(vict->fighting, ch))
     {
-      send_to_char("They are already fighting someone.\n\r", ch);
+      send_to_char("They are already fighting someone.\r\n", ch);
       logf(IMMORTAL, LogChannels::LOG_ARENA, "%s [%s] was prevented from attacking %s [%s] who was fighting %s [%s].",
            GET_NAME(ch), get_clan_name(ch), GET_NAME(vict), get_clan_name(vict), GET_NAME(vict->fighting), get_clan_name(vict->fighting));
       return FALSE;
@@ -7004,7 +7004,7 @@ int can_be_attacked(char_data *ch, char_data *vict)
         !(IS_AFFECTED(vict->master, AFF_CANTQUIT) || IS_AFFECTED(vict->master, AFF_CHAMPION)) &&
         IS_SET(world[vict->in_room].room_flags, SAFE))
     {
-      send_to_char("No fighting permitted in a safe room.\n\r", ch);
+      send_to_char("No fighting permitted in a safe room.\r\n", ch);
       return FALSE;
     }
     // Any other mob can be attacked at any time
@@ -7072,7 +7072,7 @@ int can_be_attacked(char_data *ch, char_data *vict)
       return TRUE;
     }
 
-    send_to_char("No fighting permitted in a safe room.\n\r", ch);
+    send_to_char("No fighting permitted in a safe room.\r\n", ch);
 
     if (ch->fighting == vict)
     {
@@ -7344,7 +7344,7 @@ void inform_victim(char_data *ch, char_data *victim, int dam)
     // once on the players first attack.
     //        act("$n is stunned, but will probably recover.",
     //        victim, 0, 0, TO_ROOM, INVIS_NULL);
-    send_to_char("You are stunned, but will probably recover.\n\r",
+    send_to_char("You are stunned, but will probably recover.\r\n",
                  victim);
     break;
   case POSITION_DEAD:

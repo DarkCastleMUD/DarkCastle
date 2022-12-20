@@ -864,7 +864,7 @@ void new_string_add(struct descriptor_data *d, char *str)
             }
             else
             {
-               send_to_char("Ok.\n\r", ch);
+               send_to_char("Ok.\r\n", ch);
 
                if (d->connected != conn::EXDSCR)
                {

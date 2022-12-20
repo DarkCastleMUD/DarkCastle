@@ -35,7 +35,7 @@ int do_zoneexits(char_data *ch, char *argument, int cmd)
 
   if (!can_modify_room(ch, ch->in_room))
   {
-    send_to_char("You are unable to do this outside of your range.\n\r", ch);
+    send_to_char("You are unable to do this outside of your range.\r\n", ch);
     return eFAILURE;
   }
 
@@ -184,8 +184,8 @@ int do_purloin(char_data *ch, char *argument, int cmd)
   // if the string is NULL, return.  Else assign pBuf to point to it.
   if (*(pBuf = bufName) == '\0')
   {
-    send_to_char("Retrieves any item in the game and puts it in your inventory.\n\r"
-                 "Works well in combination with the 'find obj' command.\n\r"
+    send_to_char("Retrieves any item in the game and puts it in your inventory.\r\n"
+                 "Works well in combination with the 'find obj' command.\r\n"
                  "Usage: purloin [number.]name\n\r",
                  ch);
     return eFAILURE;
@@ -260,14 +260,14 @@ int do_purloin(char_data *ch, char *argument, int cmd)
       }
       if (vict != NULL)
       {
-        csendf(ch, "You purloin %s from %s.\n\r",
+        csendf(ch, "You purloin %s from %s.\r\n",
                k->short_description, GET_NAME(vict));
         logf(GET_LEVEL(ch), LogChannels::LOG_GOD, "%s purloins %s from %s",
              GET_NAME(ch), k->short_description, GET_NAME(vict));
       }
       else
       {
-        csendf(ch, "You purloin %s.\n\r", k->short_description);
+        csendf(ch, "You purloin %s.\r\n", k->short_description);
       }
       move_obj(k, ch);
       return eSUCCESS;
@@ -275,7 +275,7 @@ int do_purloin(char_data *ch, char *argument, int cmd)
     j++;
   }
 
-  send_to_char("Sorry, couldn't find it or something.\n\r", ch);
+  send_to_char("Sorry, couldn't find it or something.\r\n", ch);
   return eSUCCESS;
 }
 
@@ -337,13 +337,13 @@ int do_set(char_data *ch, char *argument, int cmd)
   }
   if (!(vict = get_char_vis(ch, name)))
   {
-    send_to_char("No living thing by that name.\n\r", ch);
+    send_to_char("No living thing by that name.\r\n", ch);
     return eFAILURE;
   }
 
   if (GET_LEVEL(ch) < GET_LEVEL(vict))
   {
-    send_to_char("Get real! You ain't that big.\n\r", ch);
+    send_to_char("Get real! You ain't that big.\r\n", ch);
     if (!IS_NPC(vict))
     {
       sprintf(buf2, "%s just tried to set: %s\n\r", GET_NAME(ch), buf);
@@ -354,21 +354,21 @@ int do_set(char_data *ch, char *argument, int cmd)
 
   if (!IS_NPC(vict) && (GET_LEVEL(vict) == IMP) && (GET_NAME(vict) != GET_NAME(ch)))
   {
-    send_to_char("Forget it dweeb.\n\r", ch);
+    send_to_char("Forget it dweeb.\r\n", ch);
     return eFAILURE;
   }
 
   argument = one_argument(argument, buf);
   if (!*buf)
   {
-    send_to_char("A field was expected.\n\r", ch);
+    send_to_char("A field was expected.\r\n", ch);
     return eFAILURE;
   }
 
   skill = old_search_block(buf, 0, strlen(buf), values, 1);
   if (skill < 0)
   {
-    send_to_char("That value not recognized.\n\r", ch);
+    send_to_char("That value not recognized.\r\n", ch);
     return eFAILURE;
   }
   argument = one_argument(argument, buf); /* update argument */
@@ -396,7 +396,7 @@ int do_set(char_data *ch, char *argument, int cmd)
   {
     if (str_cmp(buf, "m") && str_cmp(buf, "f") && str_cmp(buf, "n"))
     {
-      send_to_char("Sex must be 'm','f' or 'n'.\n\r", ch);
+      send_to_char("Sex must be 'm','f' or 'n'.\r\n", ch);
       return eFAILURE;
     }
     log(buf2, IMP, LogChannels::LOG_GOD);
@@ -482,7 +482,7 @@ int do_set(char_data *ch, char *argument, int cmd)
     if (((value < 0) || (value > MAX_MORTAL)) && GET_LEVEL(ch) < OVERSEER)
     {
       send_to_char(
-          "Level must be between 0 and 101.\n\r", ch);
+          "Level must be between 0 and 101.\r\n", ch);
       return eFAILURE;
     }
     /* why the fuck was ths missing? -Sadus */
@@ -519,7 +519,7 @@ int do_set(char_data *ch, char *argument, int cmd)
     if ((value <= 0) || (value > 30))
     {
       send_to_char("Strength must be more than 0\n\r", ch);
-      send_to_char("and less than 26.\n\r", ch);
+      send_to_char("and less than 26.\r\n", ch);
       return eFAILURE;
     }
     log(buf2, IMP, LogChannels::LOG_GOD);
@@ -529,7 +529,7 @@ int do_set(char_data *ch, char *argument, int cmd)
   break;
   case 7: /* stradd */
   {
-    send_to_char("Strength addition not supported.\n\r", ch);
+    send_to_char("Strength addition not supported.\r\n", ch);
   }
   break;
   case 8: /* int */
@@ -538,7 +538,7 @@ int do_set(char_data *ch, char *argument, int cmd)
     if ((value <= 0) || (value > 30))
     {
       send_to_char("Intelligence must be more than 0\n\r", ch);
-      send_to_char("and less than 26.\n\r", ch);
+      send_to_char("and less than 26.\r\n", ch);
       return eFAILURE;
     }
     log(buf2, IMP, LogChannels::LOG_GOD);
@@ -554,7 +554,7 @@ int do_set(char_data *ch, char *argument, int cmd)
     if ((value <= 0) || (value > 30))
     {
       send_to_char("Wisdom must be more than 0\n\r", ch);
-      send_to_char("and less than 26.\n\r", ch);
+      send_to_char("and less than 26.\r\n", ch);
       return eFAILURE;
     }
     log(buf2, IMP, LogChannels::LOG_GOD);
@@ -568,7 +568,7 @@ int do_set(char_data *ch, char *argument, int cmd)
     if ((value <= 0) || (value > 30))
     {
       send_to_char("Dexterity must be more than 0\n\r", ch);
-      send_to_char("and less than 26.\n\r", ch);
+      send_to_char("and less than 26.\r\n", ch);
       return eFAILURE;
     }
     log(buf2, IMP, LogChannels::LOG_GOD);
@@ -582,7 +582,7 @@ int do_set(char_data *ch, char *argument, int cmd)
     if ((value <= 0) || (value > 30))
     {
       send_to_char("Constitution must be more than 0\n\r", ch);
-      send_to_char("and less than 26.\n\r", ch);
+      send_to_char("and less than 26.\r\n", ch);
       return eFAILURE;
     }
     log(buf2, IMP, LogChannels::LOG_GOD);
@@ -654,7 +654,7 @@ int do_set(char_data *ch, char *argument, int cmd)
     if ((value < -1000) || (value > 1000))
     {
       send_to_char("Alignment must be more than -1000\n\r", ch);
-      send_to_char("and less than 1000.\n\r", ch);
+      send_to_char("and less than 1000.\r\n", ch);
       return eFAILURE;
     }
     log(buf2, IMP, LogChannels::LOG_GOD);
@@ -668,7 +668,7 @@ int do_set(char_data *ch, char *argument, int cmd)
     if ((value < -1) || (value > 100))
     {
       send_to_char("Thirst must be more than -2\n\r", ch);
-      send_to_char("and less than 101.\n\r", ch);
+      send_to_char("and less than 101.\r\n", ch);
       return eFAILURE;
     }
     log(buf2, IMP, LogChannels::LOG_GOD);
@@ -682,7 +682,7 @@ int do_set(char_data *ch, char *argument, int cmd)
     if ((value < -1) || (value > 100))
     {
       send_to_char("Drunk must be more than -2\n\r", ch);
-      send_to_char("and less than 101.\n\r", ch);
+      send_to_char("and less than 101.\r\n", ch);
       return eFAILURE;
     }
     log(buf2, IMP, LogChannels::LOG_GOD);
@@ -696,7 +696,7 @@ int do_set(char_data *ch, char *argument, int cmd)
     if ((value < -1) || (value > 100))
     {
       send_to_char("Full must be more than -2\n\r", ch);
-      send_to_char("and less than 101.\n\r", ch);
+      send_to_char("and less than 101.\r\n", ch);
       return eFAILURE;
     }
     log(buf2, IMP, LogChannels::LOG_GOD);
@@ -710,7 +710,7 @@ int do_set(char_data *ch, char *argument, int cmd)
     {
       if (x == 31)
       {
-        send_to_char("No such race.\n\r", ch);
+        send_to_char("No such race.\r\n", ch);
         return eFAILURE;
       }
       if (isname(races[x].singular_name, buf))
@@ -833,7 +833,7 @@ int do_set(char_data *ch, char *argument, int cmd)
   break;
   }
 
-  send_to_char("Ok.\n\r", ch);
+  send_to_char("Ok.\r\n", ch);
   affect_total(vict);
   return eSUCCESS;
 }

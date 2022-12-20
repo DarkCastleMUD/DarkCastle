@@ -52,7 +52,7 @@ int do_eyegouge(char_data *ch, char *argument, int cmd)
 
   if (!(victim = get_char_room_vis(ch, name)) && !(victim = ch->fighting))
   {
-    send_to_char("There is no one like that here to gouge.\n\r", ch);
+    send_to_char("There is no one like that here to gouge.\r\n", ch);
     return eFAILURE;
   }
   if (IS_AFFECTED(victim, AFF_BLIND))
@@ -62,7 +62,7 @@ int do_eyegouge(char_data *ch, char *argument, int cmd)
   }
   if (victim == ch)
   {
-    send_to_char("That sounds...stupid.\n\r", ch);
+    send_to_char("That sounds...stupid.\r\n", ch);
     return eFAILURE;
   }
 
@@ -185,13 +185,13 @@ int do_backstab(char_data *ch, char *argument, int cmd)
 
   if (!ch->equipment[WIELD])
   {
-    send_to_char("You need to wield a weapon to make it a success.\n\r", ch);
+    send_to_char("You need to wield a weapon to make it a success.\r\n", ch);
     return eFAILURE;
   }
 
   if (ch->equipment[WIELD]->obj_flags.value[3] != 11 && ch->equipment[WIELD]->obj_flags.value[3] != 9)
   {
-    send_to_char("You can't stab without a stabbing weapon...\n\r", ch);
+    send_to_char("You can't stab without a stabbing weapon...\r\n", ch);
     return eFAILURE;
   }
 
@@ -404,7 +404,7 @@ int do_circle(char_data *ch, char *argument, int cmd)
 
   if (!ch->equipment[WIELD])
   {
-    send_to_char("You need to wield a weapon to make it a success.\n\r", ch);
+    send_to_char("You need to wield a weapon to make it a success.\r\n", ch);
     return eFAILURE;
   }
 
@@ -427,7 +427,7 @@ int do_circle(char_data *ch, char *argument, int cmd)
     stabbingCircle = TRUE;
     break;
   default:
-    //     send_to_char("Only certain weapons can be used for backstabbing, this is not one of them.\n\r", ch);
+    //     send_to_char("Only certain weapons can be used for backstabbing, this is not one of them.\r\n", ch);
     //     return eFAILURE;
     break;
   }
@@ -545,7 +545,7 @@ int do_trip(char_data *ch, char *argument, int cmd)
 
   if (ch->in_room != victim->in_room)
   {
-    send_to_char("That person seems to have left.\n\r", ch);
+    send_to_char("That person seems to have left.\r\n", ch);
     return eFAILURE;
   }
 
@@ -637,7 +637,7 @@ int do_sneak(char_data *ch, char *argument, int cmd)
     affect_from_char(ch, SKILL_SNEAK);
     if (cmd != 10)
     {
-      send_to_char("You won't be so sneaky anymore.\n\r", ch);
+      send_to_char("You won't be so sneaky anymore.\r\n", ch);
       return eFAILURE;
     }
   }
@@ -647,7 +647,7 @@ int do_sneak(char_data *ch, char *argument, int cmd)
 
   do_hide(ch, "", 12);
 
-  send_to_char("You try to move silently for a while.\n\r", ch);
+  send_to_char("You try to move silently for a while.\r\n", ch);
 
   //   skill_increase_check(ch, SKILL_SNEAK, has_skill(ch,SKILL_SNEAK),
   // SKILL_INCREASE_HARD);
@@ -675,9 +675,9 @@ int do_stalk(char_data *ch, char *argument, int cmd)
   if (!(*argument))
   {
     if (ch->master)
-      csendf(ch, "You are currently stalking %s.\n\r", GET_SHORT(ch->master));
+      csendf(ch, "You are currently stalking %s.\r\n", GET_SHORT(ch->master));
     else
-      send_to_char("Pick a name, any name.\n\r", ch);
+      send_to_char("Pick a name, any name.\r\n", ch);
     return eFAILURE;
   }
 
@@ -692,9 +692,9 @@ int do_stalk(char_data *ch, char *argument, int cmd)
   if (leader == ch)
   {
     if (!ch->master)
-      send_to_char("You are already following yourself.\n\r", ch);
+      send_to_char("You are already following yourself.\r\n", ch);
     else if (IS_AFFECTED(ch, AFF_GROUP))
-      send_to_char("You must first abandon your group.\n\r", ch);
+      send_to_char("You must first abandon your group.\r\n", ch);
     else
       stop_follower(ch, 1);
     return eFAILURE;
@@ -753,7 +753,7 @@ int do_hide(char_data *ch, char *argument, int cmd)
     if (!charge_moves(ch, SKILL_HIDE))
       return eSUCCESS;
 
-  send_to_char("You attempt to hide yourself.\n\r", ch);
+  send_to_char("You attempt to hide yourself.\r\n", ch);
 
   if (!IS_AFFECTED(ch, AFF_HIDE))
     SETBIT(ch->affected_by, AFF_HIDE);
@@ -839,7 +839,7 @@ int do_steal(char_data *ch, char *argument, int cmd)
   }
   else if (victim == ch)
   {
-    send_to_char("Got it!\n\rYou receive 30000000000 experience.\n\r", ch);
+    send_to_char("Got it!\n\rYou receive 30000000000 experience.\r\n", ch);
     return eFAILURE;
   }
 
@@ -883,13 +883,13 @@ int do_steal(char_data *ch, char *argument, int cmd)
 
   if (victim->fighting)
   {
-    send_to_char("You can't get close enough because of the fight.\n\r", ch);
+    send_to_char("You can't get close enough because of the fight.\r\n", ch);
     return eFAILURE;
   }
 
   /*  if(!IS_NPC(victim) &&
       !(victim->desc) && !affected_by_spell(victim, FUCK_PTHIEF) ) {
-      send_to_char("That person is not really there.\n\r", ch);
+      send_to_char("That person is not really there.\r\n", ch);
       return eFAILURE;
     }*/
 
@@ -907,7 +907,7 @@ int do_steal(char_data *ch, char *argument, int cmd)
     chance -= GET_OBJ_WEIGHT(obj);
     if (IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL))
     {
-      send_to_char("That item is protected by the gods.\n\r", ch);
+      send_to_char("That item is protected by the gods.\r\n", ch);
       return eFAILURE;
     }
     if (IS_SET(obj->obj_flags.extra_flags, ITEM_NEWBIE))
@@ -935,7 +935,7 @@ int do_steal(char_data *ch, char *argument, int cmd)
     if (!skill_success(ch, victim, SKILL_STEAL, 0 - mod))
     {
       set_cantquit(ch, victim);
-      send_to_char("Oops, that was clumsy...\n\r", ch);
+      send_to_char("Oops, that was clumsy...\r\n", ch);
       ohoh = TRUE;
       if (!number(0, 4))
       {
@@ -969,7 +969,7 @@ int do_steal(char_data *ch, char *argument, int cmd)
           if (_exp)
           {
             GET_EXP(ch) += _exp; /* exp for stealing :) */
-            sprintf(buf, "You receive %d experience.\n\r", _exp);
+            sprintf(buf, "You receive %d experience.\r\n", _exp);
             send_to_char(buf, ch);
           }
 
@@ -1050,10 +1050,10 @@ int do_steal(char_data *ch, char *argument, int cmd)
             }
         }
         else
-          send_to_char("You cannot carry that much weight.\n\r", ch);
+          send_to_char("You cannot carry that much weight.\r\n", ch);
       }
       else
-        send_to_char("You cannot carry that many items.\n\r", ch);
+        send_to_char("You cannot carry that many items.\r\n", ch);
     }
   }
   else // not in inventory
@@ -1123,7 +1123,7 @@ int do_steal(char_data *ch, char *argument, int cmd)
       wakey -= GET_DEX(ch) / 2;
       if (IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL))
       {
-        send_to_char("That item is protected by the gods.\n\r", ch);
+        send_to_char("That item is protected by the gods.\r\n", ch);
         return eFAILURE;
       }
       if (!has_skill(ch, SKILL_STEAL))
@@ -1180,7 +1180,7 @@ int do_steal(char_data *ch, char *argument, int cmd)
         if (GET_POS(victim) <= POSITION_SLEEPING)
           _exp = 1;
         GET_EXP(ch) += _exp; /* exp for stealing :) */
-        sprintf(buf, "You receive %d exps.\n\r", _exp);
+        sprintf(buf, "You receive %d exps.\r\n", _exp);
         send_to_char(buf, ch);
         sprintf(buf, "%s stole %s from %s while victim was asleep",
                 GET_NAME(ch), obj->short_description, GET_NAME(victim));
@@ -1296,7 +1296,7 @@ int do_pocket(char_data *ch, char *argument, int cmd)
   }
   else if (victim == ch)
   {
-    send_to_char("Got it!\n\rYou receive 30000000000 experience.\n\r", ch);
+    send_to_char("Got it!\n\rYou receive 30000000000 experience.\r\n", ch);
     return eFAILURE;
   }
 
@@ -1343,13 +1343,13 @@ int do_pocket(char_data *ch, char *argument, int cmd)
 
   if (victim->fighting)
   {
-    send_to_char("You can't get close enough because of the fight.\n\r", ch);
+    send_to_char("You can't get close enough because of the fight.\r\n", ch);
     return eFAILURE;
   }
 
   /*if(!IS_NPC(victim) &&
     !(victim->desc) && !affected_by_spell(victim, FUCK_PTHIEF) ) {
-    send_to_char("That person is not really there.\n\r", ch);
+    send_to_char("That person is not really there.\r\n", ch);
     return eFAILURE;
   }
 */
@@ -1403,12 +1403,12 @@ int do_pocket(char_data *ch, char *argument, int cmd)
       if (GET_POS(victim) <= POSITION_SLEEPING || IS_AFFECTED(victim, AFF_PARALYSIS))
         _exp = 0;
 
-      sprintf(buf, "Nice work! You pilfered %d gold coins.\n\r", gold);
+      sprintf(buf, "Nice work! You pilfered %d gold coins.\r\n", gold);
       send_to_char(buf, ch);
       if (_exp && _exp > 1)
       {
         GET_EXP(ch) += _exp; /* exp for stealing :) */
-        sprintf(buf, "You receive %d experience.\n\r", _exp);
+        sprintf(buf, "You receive %d experience.\r\n", _exp);
         send_to_char(buf, ch);
       }
 
@@ -1432,7 +1432,7 @@ int do_pocket(char_data *ch, char *argument, int cmd)
     }
     else
     {
-      send_to_char("You couldn't get any gold...\n\r", ch);
+      send_to_char("You couldn't get any gold...\r\n", ch);
     }
   }
 
@@ -1493,15 +1493,15 @@ int do_pick(char_data *ch, char *argument, int cmd)
     // this is an object
 
     if (obj->obj_flags.type_flag != ITEM_CONTAINER)
-      send_to_char("That's not a container.\n\r", ch);
+      send_to_char("That's not a container.\r\n", ch);
     else if (!IS_SET(obj->obj_flags.value[1], CONT_CLOSED))
       send_to_char("Silly, it's not even closed!\n\r", ch);
     else if (obj->obj_flags.value[2] < 0)
-      send_to_char("Odd, you can't seem to find a keyhole.\n\r", ch);
+      send_to_char("Odd, you can't seem to find a keyhole.\r\n", ch);
     else if (!IS_SET(obj->obj_flags.value[1], CONT_LOCKED))
       send_to_char("Oh-ho! This thing is not even locked!\n\r", ch);
     else if (IS_SET(obj->obj_flags.value[1], CONT_PICKPROOF))
-      send_to_char("The lock resists even your best attempts to pick it.\n\r", ch);
+      send_to_char("The lock resists even your best attempts to pick it.\r\n", ch);
     else
     {
       if (!charge_moves(ch, SKILL_PICK_LOCK))
@@ -1509,7 +1509,7 @@ int do_pick(char_data *ch, char *argument, int cmd)
 
       if (!skill_success(ch, NULL, SKILL_PICK_LOCK))
       {
-        send_to_char("You failed to pick the lock.\n\r", ch);
+        send_to_char("You failed to pick the lock.\r\n", ch);
         WAIT_STATE(ch, PULSE_VIOLENCE);
         return eFAILURE;
       }
@@ -1525,7 +1525,7 @@ int do_pick(char_data *ch, char *argument, int cmd)
 
     if (!IS_SET(EXIT(ch, door)->exit_info, EX_ISDOOR))
     {
-      send_to_char("That's absurd.\n\r", ch);
+      send_to_char("That's absurd.\r\n", ch);
     }
     else if (!IS_SET(EXIT(ch, door)->exit_info, EX_CLOSED))
     {
@@ -1533,15 +1533,15 @@ int do_pick(char_data *ch, char *argument, int cmd)
     }
     else if (EXIT(ch, door)->key < 0)
     {
-      send_to_char("You can't seem to spot any lock to pick.\n\r", ch);
+      send_to_char("You can't seem to spot any lock to pick.\r\n", ch);
     }
     else if (!IS_SET(EXIT(ch, door)->exit_info, EX_LOCKED))
     {
-      send_to_char("Oh...it wasn't locked at all.\n\r", ch);
+      send_to_char("Oh...it wasn't locked at all.\r\n", ch);
     }
     else if (IS_SET(EXIT(ch, door)->exit_info, EX_PICKPROOF))
     {
-      send_to_char("You seem to be unable to pick this lock.\n\r", ch);
+      send_to_char("You seem to be unable to pick this lock.\r\n", ch);
     }
     else
     {
@@ -1553,7 +1553,7 @@ int do_pick(char_data *ch, char *argument, int cmd)
       // skill_increase_check(ch, SKILL_PICK_LOCK, has_skill(ch,SKILL_PICK_LOCK), SKILL_INCREASE_MEDIUM);
       if (!skill_success(ch, NULL, SKILL_PICK_LOCK))
       {
-        send_to_char("You failed to pick the lock.\n\r", ch);
+        send_to_char("You failed to pick the lock.\r\n", ch);
         WAIT_STATE(ch, PULSE_VIOLENCE);
 
         return eFAILURE;
@@ -1571,7 +1571,7 @@ int do_pick(char_data *ch, char *argument, int cmd)
             INVIS_NULL);
       }
 
-      send_to_char("The lock quickly yields to your skills.\n\r", ch);
+      send_to_char("The lock quickly yields to your skills.\r\n", ch);
 
       /* now for unlocking the other side, too */
       if ((other_room = EXIT(ch, door)->to_room) != NOWHERE)
@@ -1606,7 +1606,7 @@ int do_slip(char_data *ch, char *argument, int cmd)
 
   if (!IS_MOB(ch) && affected_by_spell(ch, FUCK_PTHIEF))
   {
-    send_to_char("Your criminal acts prohibit this action.\n\r", ch);
+    send_to_char("Your criminal acts prohibit this action.\r\n", ch);
     return eFAILURE;
   }
   if (!has_skill(ch, SKILL_SLIP))
@@ -1620,12 +1620,12 @@ int do_slip(char_data *ch, char *argument, int cmd)
   {
     if (!IS_MOB(ch) && affected_by_spell(ch, FUCK_GTHIEF))
     {
-      send_to_char("Your criminal acts prohibit this action.\n\r", ch);
+      send_to_char("Your criminal acts prohibit this action.\r\n", ch);
       return eFAILURE;
     }
     if (strlen(obj_name) > 7)
     {
-      send_to_char("Number field too large.  Try something smaller.\n\r", ch);
+      send_to_char("Number field too large.  Try something smaller.\r\n", ch);
       return eFAILURE;
     }
 
@@ -1634,7 +1634,7 @@ int do_slip(char_data *ch, char *argument, int cmd)
 
     if (str_cmp("coins", arg) && str_cmp("coin", arg))
     {
-      send_to_char("Sorry, you can't do that (yet)...\n\r", ch);
+      send_to_char("Sorry, you can't do that (yet)...\r\n", ch);
       return eFAILURE;
     }
     if (amount <= 0)
@@ -1662,7 +1662,7 @@ int do_slip(char_data *ch, char *argument, int cmd)
     }
     if (ch == vict)
     {
-      send_to_char("To yourself?!  Very cute...\n\r", ch);
+      send_to_char("To yourself?!  Very cute...\r\n", ch);
       return eFAILURE;
     }
 
@@ -1680,10 +1680,10 @@ int do_slip(char_data *ch, char *argument, int cmd)
       }
 
       act("$n tries to slip you some coins, but $e accidentally drops "
-          "them.\n\r",
+          "them.\r\n",
           ch, 0, vict, TO_VICT, 0);
       act("$n tries to slip $N some coins, but $e accidentally drops "
-          "them.\n\r",
+          "them.\r\n",
           ch, 0, vict, TO_ROOM, NOTVICT);
 
       if (IS_NPC(ch) || (GET_LEVEL(ch) < DEITY))
@@ -1697,7 +1697,7 @@ int do_slip(char_data *ch, char *argument, int cmd)
     // Success
     else
     {
-      csendf(ch, "You slip %d coins to %s.\n\r", amount, GET_NAME(vict));
+      csendf(ch, "You slip %d coins to %s.\r\n", amount, GET_NAME(vict));
 
       if (GET_LEVEL(ch) >= IMMORTAL)
       {
@@ -1706,7 +1706,7 @@ int do_slip(char_data *ch, char *argument, int cmd)
         special_log(buf);
       }
 
-      sprintf(buf, "%s slips you %d gold coins.\n\r", PERS(ch, vict),
+      sprintf(buf, "%s slips you %d gold coins.\r\n", PERS(ch, vict),
               amount);
       act(buf, ch, 0, vict, TO_VICT, GODS);
       act("$n slips some gold to $N.", ch, 0, vict, TO_ROOM, GODS | NOTVICT);
@@ -1744,19 +1744,19 @@ int do_slip(char_data *ch, char *argument, int cmd)
 
   if (!(obj = get_obj_in_list_vis(ch, obj_name, ch->carrying)))
   {
-    send_to_char("You do not seem to have anything like that.\n\r", ch);
+    send_to_char("You do not seem to have anything like that.\r\n", ch);
     return eFAILURE;
   }
 
   if (IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL))
   {
-    send_to_char("That sure would be a stupid thing to do.\n\r", ch);
+    send_to_char("That sure would be a stupid thing to do.\r\n", ch);
     return eFAILURE;
   }
 
   if (IS_SET(obj->obj_flags.more_flags, ITEM_NO_TRADE))
   {
-    send_to_char("You can't seem to get the item to leave you.\n\r", ch);
+    send_to_char("You can't seem to get the item to leave you.\r\n", ch);
     return eFAILURE;
   }
 
@@ -1769,7 +1769,7 @@ int do_slip(char_data *ch, char *argument, int cmd)
     }
     else
     {
-      send_to_char("This item is NODROP btw.\n\r", ch);
+      send_to_char("This item is NODROP btw.\r\n", ch);
     }
   }
 
@@ -1817,7 +1817,7 @@ int do_slip(char_data *ch, char *argument, int cmd)
   }
   if (!(vict = get_char_room_vis(ch, vict_name)))
   {
-    send_to_char("No one by that name around here.\n\r", ch);
+    send_to_char("No one by that name around here.\r\n", ch);
     return eFAILURE;
   }
 
@@ -1829,7 +1829,7 @@ int do_slip(char_data *ch, char *argument, int cmd)
 
   if (ch == vict)
   {
-    send_to_char("To yourself?!  Very cute...\n\r", ch);
+    send_to_char("To yourself?!  Very cute...\r\n", ch);
     return eFAILURE;
   }
 
@@ -1882,12 +1882,12 @@ int do_slip(char_data *ch, char *argument, int cmd)
     move_obj(obj, ch->in_room);
 
     act("$n tries to slip you something, but $e accidentally drops "
-        "it.\n\r",
+        "it.\r\n",
         ch, 0, vict, TO_VICT, 0);
     act("$n tries to slip $N something, but $e accidentally drops "
-        "it.\n\r",
+        "it.\r\n",
         ch, 0, vict, TO_ROOM, NOTVICT);
-    send_to_char("Whoops!  You dropped it.\n\r", ch);
+    send_to_char("Whoops!  You dropped it.\r\n", ch);
     do_save(ch, "", CMD_DEFAULT);
   }
 
@@ -2092,7 +2092,7 @@ int do_jab(char_data *ch, char *argument, int cmd)
 
   if (ch->in_room != victim->in_room)
   {
-    send_to_char("That person seems to have left.\n\r", ch);
+    send_to_char("That person seems to have left.\r\n", ch);
     return eFAILURE;
   }
 
@@ -2217,7 +2217,7 @@ int do_appraise(char_data *ch, char *argument, int cmd)
 
   if (!(learned = has_skill(ch, SKILL_APPRAISE)))
   {
-    send_to_char("Your estimate would be baseless.\n\r", ch);
+    send_to_char("Your estimate would be baseless.\r\n", ch);
     return eFAILURE;
   }
 
@@ -2249,7 +2249,7 @@ int do_appraise(char_data *ch, char *argument, int cmd)
   {
     if (victim == ch && !*item)
     {
-      send_to_char("You're worth a million bucks, baby.\n\r", ch);
+      send_to_char("You're worth a million bucks, baby.\r\n", ch);
       return eFAILURE;
     }
 
@@ -2265,7 +2265,7 @@ int do_appraise(char_data *ch, char *argument, int cmd)
           weight = TRUE;
         }
         else
-          send_to_char("You don't seem to be carrying anything like that.\n\r", ch);
+          send_to_char("You don't seem to be carrying anything like that.\r\n", ch);
       }
       else
       {
@@ -2326,11 +2326,11 @@ int do_appraise(char_data *ch, char *argument, int cmd)
   else
   {
     if (weight)
-      sprintf(buf, "After some consideration, you estimate the weight of %s to be %d.\n\r", GET_OBJ_SHORT(obj), appraised);
+      sprintf(buf, "After some consideration, you estimate the weight of %s to be %d.\r\n", GET_OBJ_SHORT(obj), appraised);
     else if (found)
-      sprintf(buf, "After some consideration, you estimate the value of %s to be %d.\n\r", GET_OBJ_SHORT(obj), appraised);
+      sprintf(buf, "After some consideration, you estimate the value of %s to be %d.\r\n", GET_OBJ_SHORT(obj), appraised);
     else
-      sprintf(buf, "After some consideration, you estimate the amount of gold %s is carrying to be %d.\n\r", GET_NAME(victim), appraised);
+      sprintf(buf, "After some consideration, you estimate the amount of gold %s is carrying to be %d.\r\n", GET_NAME(victim), appraised);
     send_to_char(buf, ch);
     WAIT_STATE(ch, (int)(PULSE_VIOLENCE * 1.5));
   }
@@ -2348,7 +2348,7 @@ int do_cripple(char_data *ch, char *argument, int cmd)
 
   if (!(skill = has_skill(ch, SKILL_CRIPPLE)))
   {
-    send_to_char("You don't know how to cripple anybody.\n\r", ch);
+    send_to_char("You don't know how to cripple anybody.\r\n", ch);
     return eFAILURE;
   }
 
@@ -2360,7 +2360,7 @@ int do_cripple(char_data *ch, char *argument, int cmd)
 
   if (vict == ch)
   {
-    send_to_char("You turn your head and grimace as you break your ankles with a sledgehammer.\n\r", ch);
+    send_to_char("You turn your head and grimace as you break your ankles with a sledgehammer.\r\n", ch);
     return eFAILURE;
   }
 

@@ -87,7 +87,7 @@ int do_innate(char_data *ch, char *arg, int cmd)
 {
   if(ch && ch->in_room > 0 &&
      IS_SET(world[ch->in_room].room_flags, ARENA) && arena.type == POTATO) {
-    send_to_char("Cannot use innate skills within a potato arena.\n\r", ch);
+    send_to_char("Cannot use innate skills within a potato arena.\r\n", ch);
     return eFAILURE;
   }
 
@@ -306,11 +306,11 @@ int innate_fly(char_data *ch, char *arg, int cmd)
 {
   if (affected_by_spell(ch, SKILL_INNATE_FLY)) {
     affect_from_char(ch, SKILL_INNATE_FLY);
-    send_to_char("You fold your wings smoothly behind you and settle gently to the ground.\n\r", ch);
+    send_to_char("You fold your wings smoothly behind you and settle gently to the ground.\r\n", ch);
    act("$n folds $s wings smoothly behind $m and settles gently to the ground.", ch, NULL, NULL, TO_ROOM, 0);
   } else {
     if (ISSET(ch->affected_by, AFF_FLYING)) {
-      send_to_char("You are already flying.\n\r", ch);
+      send_to_char("You are already flying.\r\n", ch);
       return eFAILURE;
     }
 
@@ -321,7 +321,7 @@ int innate_fly(char_data *ch, char *arg, int cmd)
    af.location = 0;
    af.bitvector = AFF_FLYING;
    affect_to_char(ch, &af);
-   send_to_char("You spread your delicate wings and lift lightly into the air.\n\r", ch);
+   send_to_char("You spread your delicate wings and lift lightly into the air.\r\n", ch);
    act("$n spreads $s delicate wings and lifts lightly into the air.", ch, NULL, NULL, TO_ROOM, 0);
   }
 

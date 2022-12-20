@@ -65,7 +65,7 @@ int do_thunder(char_data *ch, char *argument, int cmd)
 		;
 
 	if (!(*argument))
-		send_to_char("It's not gonna look that impressive...\n\r", ch);
+		send_to_char("It's not gonna look that impressive...\r\n", ch);
 	else
 	{
 		if (cmd == CMD_DEFAULT)
@@ -104,13 +104,13 @@ int do_incognito(char_data *ch, char *argument, int cmd)
 
 	if (ch->pcdata->incognito == TRUE)
 	{
-		send_to_char("Incognito off.\n\r", ch);
+		send_to_char("Incognito off.\r\n", ch);
 		ch->pcdata->incognito = FALSE;
 	}
 	else
 	{
 		send_to_char("Incognito on.  Even while invis, anyone in your room can "
-					 "see you.\n\r",
+					 "see you.\r\n",
 					 ch);
 		ch->pcdata->incognito = TRUE;
 	}
@@ -214,7 +214,7 @@ int do_load(char_data *ch, char *arg, int cmd)
 		{
 			if (x == 2)
 			{
-				send_to_char("Type must mobile or object.\n\r", ch);
+				send_to_char("Type must mobile or object.\r\n", ch);
 				return eFAILURE;
 			}
 			if (is_abbrev(type, types[x]))
@@ -227,7 +227,7 @@ int do_load(char_data *ch, char *arg, int cmd)
 	switch (x)
 	{
 	default:
-		send_to_char("Problem...fuck up in do_load.\n\r", ch);
+		send_to_char("Problem...fuck up in do_load.\r\n", ch);
 		log("Default in do_load...should NOT happen.", ANGEL, LogChannels::LOG_BUG);
 		return eFAILURE;
 	case 0: /* mobile */
@@ -237,12 +237,12 @@ int do_load(char_data *ch, char *arg, int cmd)
 		{
 			if ((number = real_mobile(num)) < 0)
 			{
-				send_to_char("No such mobile.\n\r", ch);
+				send_to_char("No such mobile.\r\n", ch);
 				return eFAILURE;
 			}
 			if (GET_LEVEL(ch) < DEITY && !can_modify_mobile(ch, num))
 			{
-				send_to_char("You may only load mobs inside of your range.\n\r", ch);
+				send_to_char("You may only load mobs inside of your range.\r\n", ch);
 				return eFAILURE;
 			}
 			do_mload(ch, number, cnt);
@@ -250,7 +250,7 @@ int do_load(char_data *ch, char *arg, int cmd)
 		}
 		if ((num = mob_in_index(c, number)) == -1)
 		{
-			send_to_char("No such mobile.\n\r", ch);
+			send_to_char("No such mobile.\r\n", ch);
 			return eFAILURE;
 		}
 		do_mload(ch, num, cnt);
@@ -262,7 +262,7 @@ int do_load(char_data *ch, char *arg, int cmd)
 		{
 			if ((number = real_object(num)) < 0)
 			{
-				send_to_char("No such object.\n\r", ch);
+				send_to_char("No such object.\r\n", ch);
 				return eFAILURE;
 			}
 			if ((GET_LEVEL(ch) < 108) &&
@@ -278,7 +278,7 @@ int do_load(char_data *ch, char *arg, int cmd)
 			}
 			else if (cmd != CMD_PRIZE && GET_LEVEL(ch) < DEITY && !can_modify_object(ch, num))
 			{
-				send_to_char("You may only load objects inside of your range.\n\r", ch);
+				send_to_char("You may only load objects inside of your range.\r\n", ch);
 				return eFAILURE;
 			}
 
@@ -307,7 +307,7 @@ int do_load(char_data *ch, char *arg, int cmd)
 		}
 		if ((num = obj_in_index(c, number)) == -1)
 		{
-			send_to_char("No such object.\n\r", ch);
+			send_to_char("No such object.\r\n", ch);
 			return eFAILURE;
 		}
 		if ((GET_LEVEL(ch) < IMP) &&
@@ -348,7 +348,7 @@ int do_purge(char_data *ch, char *argument, int cmd)
 			if (!IS_NPC(vict) && (GET_LEVEL(ch) <= GET_LEVEL(vict)))
 			{
 				sprintf(buf, "%s is surrounded with scorching flames but is"
-							 " unharmed.\n\r",
+							 " unharmed.\r\n",
 						GET_SHORT(vict));
 				send_to_char(buf, ch);
 				act("$n tried to purge you.", ch, 0, vict, TO_VICT, 0);
@@ -383,7 +383,7 @@ int do_purge(char_data *ch, char *argument, int cmd)
 	{ /* no argument. clean out the room */
 		if (IS_NPC(ch))
 		{
-			send_to_char("Don't... You would kill yourself too.\n\r", ch);
+			send_to_char("Don't... You would kill yourself too.\r\n", ch);
 			return eFAILURE;
 		}
 
@@ -778,7 +778,7 @@ int do_show(char_data *ch, char *argument, int cmd)
 
 	if (!*type)
 	{
-		send_to_char("Format: show <type> <name>.\n\r"
+		send_to_char("Format: show <type> <name>.\r\n"
 					 "Types:\r\n"
 					 "  keydoorcombo\r\n"
 					 "  mob\r\n"
@@ -902,7 +902,7 @@ int do_show(char_data *ch, char *argument, int cmd)
 			}
 		}
 		if (!*buf)
-			send_to_char("Couldn't find any MOBS by that NAME.\n\r", ch);
+			send_to_char("Couldn't find any MOBS by that NAME.\r\n", ch);
 	} /* "mobile" */
 	else if (is_abbrev(type, "counts") && has_range)
 	{
@@ -1013,7 +1013,7 @@ int do_show(char_data *ch, char *argument, int cmd)
 			}
 		}
 		if (!*buf)
-			send_to_char("Couldn't find any OBJECTS by that NAME.\n\r", ch);
+			send_to_char("Couldn't find any OBJECTS by that NAME.\r\n", ch);
 	} /* "object" */
 	else if (is_abbrev(type, "room"))
 	{
@@ -1081,7 +1081,7 @@ int do_show(char_data *ch, char *argument, int cmd)
 			}
 		}
 		if (!*buf)
-			send_to_char("Couldn't find any ROOMS in that range.\n\r", ch);
+			send_to_char("Couldn't find any ROOMS in that range.\r\n", ch);
 	} /* "object" */
 	else if (is_abbrev(type, "zone"))
 	{
@@ -1916,7 +1916,7 @@ int do_teleport(char_data *ch, char *argument, int cmd)
 
 	if (!(victim = get_char_vis(ch, person)))
 	{
-		send_to_char("No-one by that name around.\n\r", ch);
+		send_to_char("No-one by that name around.\r\n", ch);
 		return eFAILURE;
 	} /* if */
 
@@ -1925,7 +1925,7 @@ int do_teleport(char_data *ch, char *argument, int cmd)
 		target = atoi(&room[0]);
 		if ((*room != '0' && target == 0) || !world_array[target])
 		{
-			send_to_char("No room exists with that number.\n\r", ch);
+			send_to_char("No room exists with that number.\r\n", ch);
 			return eFAILURE;
 		}
 		//      for (loop = 0; loop <= top_of_world; loop++) {
@@ -1933,7 +1933,7 @@ int do_teleport(char_data *ch, char *argument, int cmd)
 		//            target = (int16_t)loop;
 		//            break;
 		//      } else if (loop == top_of_world) {
-		//            send_to_char("No room exists with that number.\n\r", ch);
+		//            send_to_char("No room exists with that number.\r\n", ch);
 		//            return eFAILURE;
 		//      } /* if */
 		//       } /* for */
@@ -1944,7 +1944,7 @@ int do_teleport(char_data *ch, char *argument, int cmd)
 	}
 	else
 	{
-		send_to_char("No such target (person) can be found.\n\r", ch);
+		send_to_char("No such target (person) can be found.\r\n", ch);
 		return eFAILURE;
 	} /* if */
 
@@ -1964,25 +1964,25 @@ int do_teleport(char_data *ch, char *argument, int cmd)
 
 	if (IS_SET(world[target].room_flags, IMP_ONLY) && GET_LEVEL(ch) < IMP)
 	{
-		send_to_char("No.\n\r", ch);
+		send_to_char("No.\r\n", ch);
 		return eFAILURE;
 	}
 
 	if (IS_SET(world[target].room_flags, CLAN_ROOM) &&
 		GET_LEVEL(ch) < DEITY)
 	{
-		send_to_char("No.\n\r", ch);
+		send_to_char("No.\r\n", ch);
 		return eFAILURE;
 	}
 
 	act("$n disappears in a puff of smoke.", victim, 0, 0, TO_ROOM, 0);
-	csendf(ch, "Moving %s from %d to %d.\n\r", GET_NAME(victim),
+	csendf(ch, "Moving %s from %d to %d.\r\n", GET_NAME(victim),
 		   world[victim->in_room].number, world[target].number);
 	move_char(victim, target);
 	act("$n arrives from a puff of smoke.", victim, 0, 0, TO_ROOM, 0);
 	act("$n has teleported you!", ch, 0, (char *)victim, TO_VICT, 0);
 	do_look(victim, "", 15);
-	send_to_char("Teleport completed.\n\r", ch);
+	send_to_char("Teleport completed.\r\n", ch);
 
 	return eSUCCESS;
 } /* do_teleport */
@@ -2007,7 +2007,7 @@ int do_gtrans(char_data *ch, char *argument, int cmd)
 
 	if (!(victim = get_char_vis(ch, buf)))
 	{
-		send_to_char("No-one by that name around.\n\r", ch);
+		send_to_char("No-one by that name around.\r\n", ch);
 		return eFAILURE;
 	}
 	else
@@ -2015,7 +2015,7 @@ int do_gtrans(char_data *ch, char *argument, int cmd)
 		act("$n disappears in a mushroom cloud.",
 			victim, 0, 0, TO_ROOM, 0);
 		target = ch->in_room;
-		csendf(ch, "Moving %s from %d to %d.\n\r", GET_NAME(victim),
+		csendf(ch, "Moving %s from %d to %d.\r\n", GET_NAME(victim),
 			   world[victim->in_room].number, world[target].number);
 		move_char(victim, target);
 		act("$n arrives from a puff of smoke.",
@@ -2032,7 +2032,7 @@ int do_gtrans(char_data *ch, char *argument, int cmd)
 					act("$n disappears in a mushroom cloud.",
 						victim, 0, 0, TO_ROOM, 0);
 					target = ch->in_room;
-					csendf(ch, "Moving %s from %d to %d.\n\r", GET_NAME(k->follower),
+					csendf(ch, "Moving %s from %d to %d.\r\n", GET_NAME(k->follower),
 						   world[k->follower->in_room].number, world[target].number);
 					move_char(k->follower, target);
 					act("$n arrives from a puff of smoke.",
@@ -2041,7 +2041,7 @@ int do_gtrans(char_data *ch, char *argument, int cmd)
 					do_look(k->follower, "", 15);
 				}
 			} /* for */
-		send_to_char("Ok.\n\r", ch);
+		send_to_char("Ok.\r\n", ch);
 	} /* else */
 	return eSUCCESS;
 }
@@ -2440,7 +2440,7 @@ int do_oclone(char_data *ch, char *argument, int cmd)
 
 	if (!can_modify_object(ch, v2))
 	{
-		send_to_char("You are unable to work creation outside of your range.\n\r",
+		send_to_char("You are unable to work creation outside of your range.\r\n",
 					 ch);
 		return eFAILURE;
 	}
@@ -2456,7 +2456,7 @@ int do_oclone(char_data *ch, char *argument, int cmd)
 		r2 = real_object(v2);
 		if (r2 == -1)
 		{
-			send_to_char("Something failed. Possibly your destination vnum was too high.\n\r", ch);
+			send_to_char("Something failed. Possibly your destination vnum was too high.\r\n", ch);
 			return eFAILURE;
 		}
 	}
@@ -2475,7 +2475,7 @@ int do_oclone(char_data *ch, char *argument, int cmd)
 	  }
 	*/
 
-	csendf(ch, "Ok.\n\rYou copied item %d (%s) and replaced item %d (%s).\n\r",
+	csendf(ch, "Ok.\n\rYou copied item %d (%s) and replaced item %d (%s).\r\n",
 		   v1, ((obj_data *)obj_index[real_object(v1)].item)->short_description,
 		   v2, ((obj_data *)obj_index[real_object(v2)].item)->short_description);
 
@@ -2518,7 +2518,7 @@ int do_mclone(char_data *ch, char *argument, int cmd)
 
 	if (!can_modify_mobile(ch, vdst))
 	{
-		send_to_char("You are unable to work creation outside of your range.\n\r",
+		send_to_char("You are unable to work creation outside of your range.\r\n",
 					 ch);
 		return eFAILURE;
 	}
@@ -2534,7 +2534,7 @@ int do_mclone(char_data *ch, char *argument, int cmd)
 		src = real_mobile(vsrc);
 		if (dst == -1)
 		{
-			send_to_char("Something failed. Possibly your destination vnum was too high.\n\r", ch);
+			send_to_char("Something failed. Possibly your destination vnum was too high.\r\n", ch);
 			return eFAILURE;
 		}
 	}
@@ -2567,7 +2567,7 @@ int do_mclone(char_data *ch, char *argument, int cmd)
 		}
 	}
 
-	csendf(ch, "Ok.\n\rYou copied mob %d (%s) and replaced mob %d (%s).\n\r",
+	csendf(ch, "Ok.\n\rYou copied mob %d (%s) and replaced mob %d (%s).\r\n",
 		   vsrc, ((char_data *)mob_index[src].item)->short_desc,
 		   vdst, ((char_data *)mob_index[dst].item)->short_desc);
 
@@ -2585,15 +2585,15 @@ int do_mclone(char_data *ch, char *argument, int cmd)
 
 	if (mob_index[src].non_combat_func)
 	{
-		send_to_char("Warning: hardcoded non_combat function found. Notify coder.\n\r", ch);
+		send_to_char("Warning: hardcoded non_combat function found. Notify coder.\r\n", ch);
 	}
 	if (mob_index[src].combat_func)
 	{
-		send_to_char("Warning: hardcoded combat function found. Notify coder.\n\r", ch);
+		send_to_char("Warning: hardcoded combat function found. Notify coder.\r\n", ch);
 	}
 	if (mob_index[src].mobprogs)
 	{
-		send_to_char("Warning: mob program found. This will need to be copied manually.\n\r", ch);
+		send_to_char("Warning: mob program found. This will need to be copied manually.\r\n", ch);
 	}
 
 	ch->pcdata->last_mob_edit = dst;

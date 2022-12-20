@@ -274,7 +274,7 @@ void show_quest_info(char_data *ch, int num)
          return;
       }
    }
-   send_to_char("That quest doesn't exist.\n\r", ch);
+   send_to_char("That quest doesn't exist.\r\n", ch);
 }
 
 bool check_available_quest(char_data *ch, struct quest_info *quest)
@@ -318,7 +318,7 @@ int get_quest_price(struct quest_info *quest)
 
 void show_quest_header(char_data *ch)
 {
-   csendf(ch, "  .-------------------------------------------------------------------------.\n\r"
+   csendf(ch, "  .-------------------------------------------------------------------------.\r\n"
               " /.-.                                                                     .-.\\\n\r"
               "[/   \\                                                                   /   \\]\n\r"
               "[\\__. !                    $B$2Dark Castle Quest System$R                     ! ._/]\n\r"
@@ -538,7 +538,7 @@ int start_quest(char_data *ch, struct quest_info *quest)
 
    if (!check_available_quest(ch, quest))
    {
-      send_to_char("That quest is not available to you.\n\r", ch);
+      send_to_char("That quest is not available to you.\r\n", ch);
       return eFAILURE;
    }
 
@@ -549,7 +549,7 @@ int start_quest(char_data *ch, struct quest_info *quest)
       count++;
       if (count == QUEST_MAX)
       {
-         send_to_char("You've got too many quests started already.\n\r", ch);
+         send_to_char("You've got too many quests started already.\r\n", ch);
          return eEXTRA_VALUE;
       }
    }
@@ -588,7 +588,7 @@ int start_quest(char_data *ch, struct quest_info *quest)
 
    if (!mob)
    {
-      send_to_char("This quest is temporarily unavailable.\n\r", ch);
+      send_to_char("This quest is temporarily unavailable.\r\n", ch);
       return eFAILURE;
    }
 
@@ -624,11 +624,11 @@ int start_quest(char_data *ch, struct quest_info *quest)
 
    if (quest->brownie)
    {
-      csendf(ch, "%s takes a brownie point from you.\n\r", GET_SHORT(qmaster));
+      csendf(ch, "%s takes a brownie point from you.\r\n", GET_SHORT(qmaster));
       obj_from_char(brownie);
    }
 
-   csendf(ch, "%s takes %d platinum from you.\n\r", GET_SHORT(qmaster), price);
+   csendf(ch, "%s takes %d platinum from you.\r\n", GET_SHORT(qmaster), price);
    GET_PLATINUM(ch) -= price;
 
    return eSUCCESS;
@@ -683,7 +683,7 @@ int complete_quest(char_data *ch, struct quest_info *quest)
 
    if (!obj)
    {
-      send_to_char("You do not appear to have the quest object yet.\n\r", ch);
+      send_to_char("You do not appear to have the quest object yet.\r\n", ch);
       return eFAILURE;
    }
 
@@ -777,7 +777,7 @@ void quest_update()
 
                      logf(IMMORTAL, LogChannels::LOG_QUEST, "%s ran out of time on quest %d (%s).", GET_NAME(i), quest->number, quest->name);
 
-                     csendf(i, "Time has expired for %s.  This quest has ended.\n\r", quest->name);
+                     csendf(i, "Time has expired for %s.  This quest has ended.\r\n", quest->name);
                   }
                   i->pcdata->quest_current_ticksleft[j]--;
                   break;
@@ -817,7 +817,7 @@ int quest_handler(char_data *ch, char_data *qmaster, int cmd, char *name)
       quest = get_quest_struct(name);
       if (quest == 0)
       {
-         csendf(ch, "That is not a valid quest name or number.\n\r");
+         csendf(ch, "That is not a valid quest name or number.\r\n");
          return eFAILURE;
       }
    }
@@ -982,7 +982,7 @@ int do_quest(char_data *ch, char *arg, int cmd)
       if (!qmaster)
          return eFAILURE;
       if (ch->in_room != qmaster->in_room)
-         send_to_char("You must ask the Quest Master for available quests.\n\r", ch);
+         send_to_char("You must ask the Quest Master for available quests.\r\n", ch);
       else
          retval = quest_handler(ch, qmaster, 1, 0);
    }
@@ -991,7 +991,7 @@ int do_quest(char_data *ch, char *arg, int cmd)
       if (!qmaster)
          return eFAILURE;
       if (ch->in_room != qmaster->in_room)
-         send_to_char("You must let the Quest Master know of your intentions.\n\r", ch);
+         send_to_char("You must let the Quest Master know of your intentions.\r\n", ch);
       else
          retval = quest_handler(ch, qmaster, 2, name);
       return retval;
@@ -1001,7 +1001,7 @@ int do_quest(char_data *ch, char *arg, int cmd)
       if (!qmaster)
          return eFAILURE;
       if (ch->in_room != qmaster->in_room)
-         send_to_char("You may only begin quests given from the Quest Master.\n\r", ch);
+         send_to_char("You may only begin quests given from the Quest Master.\r\n", ch);
       else
          retval = quest_handler(ch, qmaster, 3, name);
       return retval;
@@ -1011,7 +1011,7 @@ int do_quest(char_data *ch, char *arg, int cmd)
       if (!qmaster)
          return eFAILURE;
       if (ch->in_room != qmaster->in_room)
-         send_to_char("You may only finish quests in the presence of the Quest Master.\n\r", ch);
+         send_to_char("You may only finish quests in the presence of the Quest Master.\r\n", ch);
       else
          retval = quest_handler(ch, qmaster, 4, name);
       return retval;
@@ -1025,7 +1025,7 @@ int do_quest(char_data *ch, char *arg, int cmd)
 
       if (ch->in_room != qmaster->in_room)
       {
-         send_to_char("You may only reset all quests in the presence of the Quest Master.\n\r", ch);
+         send_to_char("You may only reset all quests in the presence of the Quest Master.\r\n", ch);
          return eFAILURE;
       }
 
@@ -1061,7 +1061,7 @@ int do_quest(char_data *ch, char *arg, int cmd)
 
       if (completed < 100)
       {
-         csendf(ch, "You will need to complete at least 100 quests before you can reset.\n\r");
+         csendf(ch, "You will need to complete at least 100 quests before you can reset.\r\n");
          return eFAILURE;
       }
 
@@ -1078,9 +1078,9 @@ int do_quest(char_data *ch, char *arg, int cmd)
          return eFAILURE;
       }
 
-      csendf(ch, "%s takes 2000 platinum from you.\n\r", GET_SHORT(qmaster));
+      csendf(ch, "%s takes 2000 platinum from you.\r\n", GET_SHORT(qmaster));
       GET_PLATINUM(ch) -= 2000;
-      csendf(ch, "%s takes a brownie point from you.\n\r", GET_SHORT(qmaster));
+      csendf(ch, "%s takes a brownie point from you.\r\n", GET_SHORT(qmaster));
       obj_from_char(brownie);
 
       stop_all_quests(ch);
@@ -1091,7 +1091,7 @@ int do_quest(char_data *ch, char *arg, int cmd)
       }
       memset(ch->pcdata->quest_cancel, 0, sizeof(ch->pcdata->quest_cancel));
       memset(ch->pcdata->quest_complete, 0, sizeof(ch->pcdata->quest_complete));
-      send_to_char("All quests have been reset.\n\r", ch);
+      send_to_char("All quests have been reset.\r\n", ch);
       return retval;
    }
    else
@@ -1099,7 +1099,7 @@ int do_quest(char_data *ch, char *arg, int cmd)
       csendf(ch, "Usage: quest current            (lists current quests)\n\r"
                  "       quest completed          (lists completed quests)\n\r"
                  "       quest canceled           (lists canceled quests)\n\r\n\r"
-                 "The following commands may only be used at the Quest Master.\n\r"
+                 "The following commands may only be used at the Quest Master.\r\n"
                  "       quest list               (lists available quests)\n\r"
                  "       quest cancel <name or #> (cancel the current quest)\n\r"
                  "       quest start <name or #>  (starts a new quest)\n\r"
@@ -1159,7 +1159,7 @@ int do_qedit(char_data *ch, char *argument, int cmd)
 
    if (is_abbrev(arg, "save"))
    {
-      send_to_char("Quests saved.\n\r", ch);
+      send_to_char("Quests saved.\r\n", ch);
       return save_quests();
    }
 
@@ -1175,7 +1175,7 @@ int do_qedit(char_data *ch, char *argument, int cmd)
          quest = get_quest_struct(argument);
          if (quest)
          {
-            send_to_char("A quest by this name already exists.\n\r", ch);
+            send_to_char("A quest by this name already exists.\r\n", ch);
             return eFAILURE;
          }
          else
@@ -1207,7 +1207,7 @@ int do_qedit(char_data *ch, char *argument, int cmd)
       {
          if (!(vict = get_char_vis(ch, field)) || IS_MOB(vict))
          {
-            send_to_char("No living thing by that name.\n\r", ch);
+            send_to_char("No living thing by that name.\r\n", ch);
             return eFAILURE;
          }
 
@@ -1231,13 +1231,13 @@ int do_qedit(char_data *ch, char *argument, int cmd)
       {
          if (!(vict = get_char_vis(ch, field)) || IS_MOB(vict))
          {
-            send_to_char("No living thing by that name.\n\r", ch);
+            send_to_char("No living thing by that name.\r\n", ch);
             return eFAILURE;
          }
 
          logf(IMMORTAL, LogChannels::LOG_QUEST, "%s set %s's quest points from %d to %d.", GET_NAME(ch), GET_NAME(vict),
               vict->pcdata->quest_points, atoi(value));
-         csendf(ch, "Setting %s's quest points from %d to %d.\n\r", GET_NAME(vict),
+         csendf(ch, "Setting %s's quest points from %d to %d.\r\n", GET_NAME(vict),
                 vict->pcdata->quest_points, atoi(value));
 
          vict->pcdata->quest_points = atoi(value);
@@ -1292,25 +1292,25 @@ int do_qedit(char_data *ch, char *argument, int cmd)
 
    if (holdernum <= 0 || holdernum > QUEST_TOTAL)
    {
-      send_to_char("Invalid quest number.\n\r", ch);
+      send_to_char("Invalid quest number.\r\n", ch);
       return eFAILURE;
    }
 
    if (!(quest = get_quest_struct(holdernum)))
    {
-      send_to_char("That quest doesn't exist.\n\r", ch);
+      send_to_char("That quest doesn't exist.\r\n", ch);
       return eFAILURE;
    }
 
    if (!*field)
    {
-      send_to_char("Valid fields: name, level, cost, brownie, objnum, objshort, objlong, objkey, mobnum, timer, reward or hints.\n\r", ch);
+      send_to_char("Valid fields: name, level, cost, brownie, objnum, objshort, objlong, objkey, mobnum, timer, reward or hints.\r\n", ch);
       return eFAILURE;
    }
 
    if (!(*value))
    {
-      send_to_char("You must enter a value.\n\r", ch);
+      send_to_char("You must enter a value.\r\n", ch);
       return eFAILURE;
    }
 
@@ -1325,7 +1325,7 @@ int do_qedit(char_data *ch, char *argument, int cmd)
 
    if (valid_fields[i] == NULL)
    {
-      send_to_char("Valid fields: name, level, cost, brownie, objnum, objshort, objlong, objkey, mobnum, timer, reward, hint1, hint2, or hint3.\n\r", ch);
+      send_to_char("Valid fields: name, level, cost, brownie, objnum, objshort, objlong, objkey, mobnum, timer, reward, hint1, hint2, or hint3.\r\n", ch);
       return eFAILURE;
    }
 
@@ -1338,91 +1338,91 @@ int do_qedit(char_data *ch, char *argument, int cmd)
       oldquest = get_quest_struct(field);
       if (oldquest)
       {
-         send_to_char("A quest by this name already exists.\n\r", ch);
+         send_to_char("A quest by this name already exists.\r\n", ch);
          return eFAILURE;
       }
       else
       {
          csendf(ch, "Name changed from %s ", quest->name);
          quest->name = str_hsh(field);
-         csendf(ch, "to %s.\n\r", quest->name);
+         csendf(ch, "to %s.\r\n", quest->name);
       }
       break;
    case 1: // level
       csendf(ch, "Level changed from %d ", quest->level);
       quest->level = atoi(value);
-      csendf(ch, "to %d.\n\r", quest->level);
+      csendf(ch, "to %d.\r\n", quest->level);
       break;
    case 2: // objnum
       csendf(ch, "Objnum changed from %d ", quest->objnum);
       quest->objnum = atoi(value);
-      csendf(ch, "to %d.\n\r", quest->objnum);
+      csendf(ch, "to %d.\r\n", quest->objnum);
       break;
    case 3: // objshort
       csendf(ch, "Objshort changed from %s ", quest->objshort);
       sprintf(field, "%s %s", value, argument);
       quest->objshort = str_hsh(field);
-      csendf(ch, "to %s.\n\r", quest->objshort);
+      csendf(ch, "to %s.\r\n", quest->objshort);
       break;
    case 4: // objlong
       csendf(ch, "Objlong changed from %s ", quest->objlong);
       sprintf(field, "%s %s", value, argument);
       quest->objlong = str_hsh(field);
-      csendf(ch, "to %s.\n\r", quest->objlong);
+      csendf(ch, "to %s.\r\n", quest->objlong);
       break;
    case 5: // objkey
       csendf(ch, "Objkey changed from %s ", quest->objkey);
       sprintf(field, "%s %s", value, argument);
       quest->objkey = str_hsh(field);
-      csendf(ch, "to %s.\n\r", quest->objkey);
+      csendf(ch, "to %s.\r\n", quest->objkey);
       break;
    case 6: // mobnum
       csendf(ch, "Mobnum changed from %d ", quest->mobnum);
       quest->mobnum = atoi(value);
-      csendf(ch, "to %d.\n\r", quest->mobnum);
+      csendf(ch, "to %d.\r\n", quest->mobnum);
       break;
    case 7: // timer
       csendf(ch, "Timer changed from %d ", quest->timer);
       quest->timer = atoi(value);
-      csendf(ch, "to %d.\n\r", quest->timer);
+      csendf(ch, "to %d.\r\n", quest->timer);
       break;
    case 8: // reward
       csendf(ch, "Reward changed from %d ", quest->reward);
       quest->reward = atoi(value);
-      csendf(ch, "to %d.\n\r", quest->reward);
+      csendf(ch, "to %d.\r\n", quest->reward);
       break;
    case 9: // hint1
       sprintf(field, "%s %s", value, argument);
       csendf(ch, "Hint #1 changed from %s ", quest->hint1);
       quest->hint1 = str_hsh(field);
-      csendf(ch, "to %s.\n\r", quest->hint1);
+      csendf(ch, "to %s.\r\n", quest->hint1);
       break;
    case 10: // hint2
       sprintf(field, "%s %s", value, argument);
       csendf(ch, "Hint #2 changed from %s ", quest->hint2);
       quest->hint2 = str_hsh(field);
-      csendf(ch, "to %s.\n\r", quest->hint2);
+      csendf(ch, "to %s.\r\n", quest->hint2);
       break;
    case 11: // hint3
       sprintf(field, "%s %s", value, argument);
       csendf(ch, "Hint #3 changed from %s ", quest->hint3);
       quest->hint3 = str_hsh(field);
-      csendf(ch, "to %s.\n\r", quest->hint3);
+      csendf(ch, "to %s.\r\n", quest->hint3);
       break;
    case 12: // cost
       csendf(ch, "Cost changed from %d ", quest->cost);
       quest->cost = atoi(value);
-      csendf(ch, "to %d.\n\r", quest->cost);
+      csendf(ch, "to %d.\r\n", quest->cost);
       break;
    case 13: // brownie
       if (quest->brownie)
       {
-         csendf(ch, "Brownie toggled to NOT required.\n\r");
+         csendf(ch, "Brownie toggled to NOT required.\r\n");
          quest->brownie = 0;
       }
       else
       {
-         csendf(ch, "Brownie toggled to required.\n\r");
+         csendf(ch, "Brownie toggled to required.\r\n");
          quest->brownie = 1;
       }
       break;

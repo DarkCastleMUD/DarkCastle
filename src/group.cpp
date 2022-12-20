@@ -42,8 +42,8 @@ int do_abandon(char_data *ch, char *argument, int cmd)
 
   if ((!ch->master) && (IS_AFFECTED(ch, AFF_GROUP)))
   {
-    send_to_char("You can't abandon a group you're leading.\n\r", ch);
-    send_to_char("You must disband the group.\n\r", ch);
+    send_to_char("You can't abandon a group you're leading.\r\n", ch);
+    send_to_char("You must disband the group.\r\n", ch);
     return eFAILURE;
   }
 
@@ -113,7 +113,7 @@ int do_found(char_data *ch, char *argument, int cmd)
 
   if (strlen(argument) > 50)
   {
-    send_to_char("You gonna name your party? Or write a book?!  50 characters max.\n\r", ch);
+    send_to_char("You gonna name your party? Or write a book?!  50 characters max.\r\n", ch);
     return eFAILURE;
   }
 
@@ -364,7 +364,7 @@ int do_group(char_data *ch, char *argument, int cmd)
   }
 
   if (!(victim = get_char_room_vis(ch, name)))
-    send_to_char("No one here by that name.\n\r", ch);
+    send_to_char("No one here by that name.\r\n", ch);
 
   else
   {
@@ -400,7 +400,7 @@ int do_group(char_data *ch, char *argument, int cmd)
     {
       if (ch == victim)
       {
-        send_to_char("You must found a group, or Disband a group.\n\r", ch);
+        send_to_char("You must found a group, or Disband a group.\r\n", ch);
         return eFAILURE;
       }
       //      if((abs(GET_LEVEL(ch) - GET_LEVEL(victim)) ) <= 99) {
@@ -441,13 +441,13 @@ int do_promote(char_data *ch, char *argument, int cmd)
 
   if (ch->master)
   {
-    send_to_char("You aren't running the show here, pal.\n\r", ch);
+    send_to_char("You aren't running the show here, pal.\r\n", ch);
     return eFAILURE;
   }
 
   if ((!ch->master) && !IS_AFFECTED(ch, AFF_GROUP))
   {
-    send_to_char("You don't even have a group to promote anyone.\n\r", ch);
+    send_to_char("You don't even have a group to promote anyone.\r\n", ch);
     return eFAILURE;
   }
 
@@ -485,7 +485,7 @@ int do_promote(char_data *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  sprintf(buf, "You step down, appointing %s as the new leader.\n\r",
+  sprintf(buf, "You step down, appointing %s as the new leader.\r\n",
           GET_SHORT(new_new_leader));
   send_to_char(buf, ch);
   sprintf(buf, "%s steps down as leader of: %s\n\r%s appoints YOU as "
@@ -560,14 +560,14 @@ int do_disband(char_data *ch, char *argument, int cmd)
 
   if ((!ch->master) && (!IS_AFFECTED(ch, AFF_GROUP)))
   {
-    send_to_char("You don't even have a group to disband.\n\r", ch);
+    send_to_char("You don't even have a group to disband.\r\n", ch);
     return eFAILURE;
   }
 
   if (!*name)
   {
     send_to_char("Who do you wish to disband? \n\r", ch);
-    send_to_char("Disband 'all' will disband the group.\n\r", ch);
+    send_to_char("Disband 'all' will disband the group.\r\n", ch);
     return eFAILURE;
   }
 
@@ -614,7 +614,7 @@ int do_disband(char_data *ch, char *argument, int cmd)
   if (adios == ch)
   {
     send_to_char("You can't disband yourself from a group you're leading!\n\r", ch);
-    send_to_char("Either Promote someone to Group Leader, or Disband All.\n\r", ch);
+    send_to_char("Either Promote someone to Group Leader, or Disband All.\r\n", ch);
     return eFAILURE;
   }
 
@@ -626,7 +626,7 @@ int do_disband(char_data *ch, char *argument, int cmd)
 
   if ((IS_NPC(adios)) && (IS_AFFECTED(adios, AFF_CHARM)))
   {
-    send_to_char("Can't kick out a charmee.\n\r", ch);
+    send_to_char("Can't kick out a charmee.\r\n", ch);
     return eFAILURE;
   }
 
@@ -678,7 +678,7 @@ int do_follow(char_data *ch, char *argument, int cmd)
 
   if (IS_AFFECTED(ch, AFF_GROUP))
   {
-    send_to_char("You must first abandon your group.\n\r", ch);
+    send_to_char("You must first abandon your group.\r\n", ch);
     return eFAILURE;
   }
 
@@ -693,7 +693,7 @@ int do_follow(char_data *ch, char *argument, int cmd)
     {
       if (!ch->master)
       {
-        send_to_char("You are already following yourself.\n\r", ch);
+        send_to_char("You are already following yourself.\r\n", ch);
         return eFAILURE;
       }
       stop_follower(ch, STOP_FOLLOW);

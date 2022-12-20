@@ -39,9 +39,9 @@ int do_archive(char_data *ch, char *argument, int cmd)
   }
 
   send_to_char("Suddenly someone reaches down and packs you into a "
-               "little ball.\n\r",
+               "little ball.\r\n",
                victim);
-  csendf(victim, "You have been archived by %s.  Goodbye.\n\r", GET_NAME(ch));
+  csendf(victim, "You have been archived by %s.  Goodbye.\r\n", GET_NAME(ch));
   act("$N is grabbed up and packed into a small ball by $n.", ch, 0,
       victim, TO_ROOM, 0);
   do_quit(victim, "", 666);
@@ -119,7 +119,7 @@ int do_snoop(char_data *ch, char *argument, int cmd)
   if (!(victim = get_active_pc_vis(ch, arg)))
   {
     send_to_char("Your victim is either not available or "
-                 "linkdead.\n\r",
+                 "linkdead.\r\n",
                  ch);
     send_to_char("(You can only snoop a link-active pc.)\n\r", ch);
     return eFAILURE;
@@ -134,7 +134,7 @@ int do_snoop(char_data *ch, char *argument, int cmd)
 
   if (victim == ch)
   {
-    send_to_char("Ok, you just snoop yourself.\n\r", ch);
+    send_to_char("Ok, you just snoop yourself.\r\n", ch);
     if (ch->desc->snooping)
     {
       ch->desc->snooping->snoop_by = 0;
@@ -152,7 +152,7 @@ int do_snoop(char_data *ch, char *argument, int cmd)
 
     if (GET_LEVEL(victim) == IMP)
     {
-      send_to_char("What are you!? Crazy! You can't snoop an Imp.\n\r", ch);
+      send_to_char("What are you!? Crazy! You can't snoop an Imp.\r\n", ch);
     }
     sprintf(buf, "%s failed snooping you. \n\r", GET_NAME(ch));
     send_to_char(buf, victim);
@@ -181,18 +181,18 @@ int do_stealth(char_data *ch, char *argument, int cmd)
   if (argument[0] != '\0')
   {
     send_to_char(
-        "STEALTH doesn't take any arguments; arg ignored.\n\r", ch);
+        "STEALTH doesn't take any arguments; arg ignored.\r\n", ch);
   } /* if */
 
   if (ch->pcdata->stealth)
   {
     ch->pcdata->stealth = FALSE;
-    send_to_char("Stealth mode off.\n\r", ch);
+    send_to_char("Stealth mode off.\r\n", ch);
   }
   else
   {
     ch->pcdata->stealth = TRUE;
-    send_to_char("Stealth mode on.\n\r", ch);
+    send_to_char("Stealth mode on.\r\n", ch);
   } /* if */
   return eSUCCESS;
 }

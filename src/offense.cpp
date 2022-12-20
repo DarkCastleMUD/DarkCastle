@@ -85,7 +85,7 @@ int do_hit(char_data *ch, char *argument, int cmd)
     victim = get_char_room_vis(ch, arg);
     if (victim) {
       if (victim == ch) {
-	send_to_char("You hit yourself..OUCH!.\n\r", ch);
+	send_to_char("You hit yourself..OUCH!.\r\n", ch);
 	act("$n hits $mself, and says OUCH!",
 	    ch, 0, victim, TO_ROOM, 0);
       }
@@ -121,7 +121,7 @@ int do_hit(char_data *ch, char *argument, int cmd)
       }
     }
     else
-      send_to_char("They aren't here.\n\r", ch);
+      send_to_char("They aren't here.\r\n", ch);
   }
   else
     send_to_char("Hit whom?\n\r", ch);
@@ -140,7 +140,7 @@ int do_murder(char_data *ch, char *argument, int cmd)
     victim = get_char_room_vis(ch, arg);
     if (victim) {
       if (victim == ch) {
-        send_to_char("You hit yourself..OUCH!.\n\r", ch);
+        send_to_char("You hit yourself..OUCH!.\r\n", ch);
         act("$n hits $mself, and says OUCH!", ch, 0, victim, TO_ROOM, 0);
       }
       else {
@@ -167,7 +167,7 @@ int do_murder(char_data *ch, char *argument, int cmd)
       }
     }
     else
-      send_to_char("They aren't here.\n\r", ch);
+      send_to_char("They aren't here.\r\n", ch);
   }
   else
       send_to_char("Hit whom?\n\r", ch);
@@ -190,7 +190,7 @@ int do_slay(char_data *ch, char *argument, int cmd)
   }
   
   if(!(victim = get_char_room_vis(ch, arg))) {
-    send_to_char("They aren't here.\n\r", ch);
+    send_to_char("They aren't here.\r\n", ch);
     return eFAILURE;
   }
   
@@ -246,7 +246,7 @@ int do_kill(char_data *ch, char *argument, int cmd)
   }
   
   if(!(victim = get_char_room_vis(ch, arg))) {
-    send_to_char("They aren't here.\n\r", ch);
+    send_to_char("They aren't here.\r\n", ch);
     return eFAILURE;
   }
   
@@ -352,7 +352,7 @@ int do_join(char_data *ch, char *argument, int cmd)
   }
 
   if(victim == ch) { 
-    send_to_char("Don't be a dork.\n\r", ch);
+    send_to_char("Don't be a dork.\r\n", ch);
     return eFAILURE;
   }
   if(victim->fighting == ch) {
@@ -391,7 +391,7 @@ int do_join(char_data *ch, char *argument, int cmd)
     return eFAILURE;
   }
 */
-  send_to_char("ARGGGGG!!!! *** K I L L ***!!!!.\n\r", ch);
+  send_to_char("ARGGGGG!!!! *** K I L L ***!!!!.\r\n", ch);
   act("$N joins you in the fight!", victim, 0, ch, TO_CHAR, 0);
   act("$n has joined $N in the battle.", ch, 0, victim, TO_ROOM, NOTVICT);
 

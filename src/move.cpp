@@ -216,7 +216,7 @@ int do_fall(char_data *ch, short dir)
 	if (IS_AFFECTED(ch, AFF_FREEFLOAT))
 	{
 		dam = 0;
-		send_to_char("Your freefloating magics reduce your fall to a safer speed.\n\r", ch);
+		send_to_char("Your freefloating magics reduce your fall to a safer speed.\r\n", ch);
 	}
 
 	// Don't effect mobs
@@ -269,27 +269,27 @@ int do_fall(char_data *ch, short dir)
 	{
 	case 0:
 		act("$n rolls out to the north.", ch, 0, 0, TO_ROOM, 0);
-		send_to_char("You tumble to the north...\n\r", ch);
+		send_to_char("You tumble to the north...\r\n", ch);
 		break;
 	case 1:
 		act("$n rolls out to the east.", ch, 0, 0, TO_ROOM, 0);
-		send_to_char("You tumble to the east...\n\r", ch);
+		send_to_char("You tumble to the east...\r\n", ch);
 		break;
 	case 2:
 		act("$n rolls out to the south.", ch, 0, 0, TO_ROOM, 0);
-		send_to_char("You tumble to the south...\n\r", ch);
+		send_to_char("You tumble to the south...\r\n", ch);
 		break;
 	case 3:
 		act("$n rolls out to the west.", ch, 0, 0, TO_ROOM, 0);
-		send_to_char("You tumble to the west...\n\r", ch);
+		send_to_char("You tumble to the west...\r\n", ch);
 		break;
 	case 4:
 		act("$n is launched upwards.", ch, 0, 0, TO_ROOM, 0);
-		send_to_char("You are launched into the air...\n\r", ch);
+		send_to_char("You are launched into the air...\r\n", ch);
 		break;
 	case 5:
 		act("$n falls through the room.", ch, 0, 0, TO_ROOM, 0);
-		send_to_char("You fall...\n\r", ch);
+		send_to_char("You fall...\r\n", ch);
 		break;
 	default:
 		log("Default hit in do_fall", IMMORTAL, LogChannels::LOG_MORTAL);
@@ -307,7 +307,7 @@ int do_fall(char_data *ch, short dir)
 	do_look(ch, "\0", 15);
 
 	sprintf(damage, "%s's fall from %d was lethal and it killed them.", GET_NAME(ch), world[ch->in_room].number);
-	retval = noncombat_damage(ch, dam, "Luckily the ground breaks your fall.\n\r", "$n plummets into the room and hits the ground with a wet-sounding splat!",
+	retval = noncombat_damage(ch, dam, "Luckily the ground breaks your fall.\r\n", "$n plummets into the room and hits the ground with a wet-sounding splat!",
 							  damage, KILL_FALL);
 
 	if (SOMEONE_DIED(retval))
@@ -519,7 +519,7 @@ int do_simple_move(char_data *ch, int cmd, int following)
 			if (!has_boat && !IS_AFFECTED(ch, AFF_FLYING) && GET_LEVEL(ch) < IMMORTAL &&
 				GET_RACE(ch) != RACE_FISH && GET_RACE(ch) != RACE_SLIME && !IS_AFFECTED(ch, AFF_FREEFLOAT))
 			{
-				send_to_char("You need a boat to go there.\n\r", ch);
+				send_to_char("You need a boat to go there.\r\n", ch);
 				return eFAILURE;
 			}
 		}
@@ -627,9 +627,9 @@ int do_simple_move(char_data *ch, int cmd, int following)
 	if (GET_MOVE(ch) < need_movement && !IS_NPC(ch))
 	{
 		if (!following)
-			send_to_char("You are too exhausted.\n\r", ch);
+			send_to_char("You are too exhausted.\r\n", ch);
 		else
-			send_to_char("You are too exhausted to follow.\n\r", ch);
+			send_to_char("You are too exhausted to follow.\r\n", ch);
 		return eFAILURE;
 	}
 
@@ -702,14 +702,14 @@ int do_simple_move(char_data *ch, int cmd, int following)
 
 	if (IS_SET(retval, eSUCCESS) && IS_AFFECTED(ch, AFF_CRIPPLE))
 	{
-		send_to_char("Your crippled body responds slowly.\n\r", ch);
+		send_to_char("Your crippled body responds slowly.\r\n", ch);
 		WAIT_STATE(ch, PULSE_VIOLENCE);
 	}
 
 	obj_data *tmp_obj;
 	for (tmp_obj = world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
 		if (obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER)
-			send_to_char("The sounds around you fade to nothing as the silence takes hold...\n\r", ch);
+			send_to_char("The sounds around you fade to nothing as the silence takes hold...\r\n", ch);
 
 	for (tmp_obj = world[was_in].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
 		if (obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER)
@@ -717,7 +717,7 @@ int do_simple_move(char_data *ch, int cmd, int following)
 
 	if (!IS_SET(retval, eSUCCESS))
 	{
-		send_to_char("You fail to move.\n\r", ch);
+		send_to_char("You fail to move.\r\n", ch);
 		return retval;
 	}
 
@@ -880,24 +880,24 @@ int attempt_move(char_data *ch, int cmd, int is_retreat)
 
 	if (!world[ch->in_room].dir_option[cmd])
 	{
-		send_to_char("You can't go that way.\n\r", ch);
+		send_to_char("You can't go that way.\r\n", ch);
 		return eFAILURE;
 	}
 
 	if (IS_SET(EXIT(ch, cmd)->exit_info, EX_CLOSED))
 	{
 		if (IS_SET(EXIT(ch, cmd)->exit_info, EX_HIDDEN))
-			send_to_char("You can't go that way.\n\r", ch);
+			send_to_char("You can't go that way.\r\n", ch);
 		else if (EXIT(ch, cmd)->keyword)
-			csendf(ch, "The %s seems to be closed.\n\r", fname(EXIT(ch, cmd)->keyword));
+			csendf(ch, "The %s seems to be closed.\r\n", fname(EXIT(ch, cmd)->keyword));
 		else
-			send_to_char("It seems to be closed.\n\r", ch);
+			send_to_char("It seems to be closed.\r\n", ch);
 		return eFAILURE;
 	}
 
 	if (EXIT(ch, cmd)->to_room == NOWHERE)
 	{
-		send_to_char("Alas, you can't go that way.\n\r", ch);
+		send_to_char("Alas, you can't go that way.\r\n", ch);
 		return eFAILURE;
 	}
 
@@ -924,7 +924,7 @@ int attempt_move(char_data *ch, int cmd, int is_retreat)
 
 	if (IS_AFFECTED(ch, AFF_CHARM) && (ch->master) && (ch->in_room == ch->master->in_room))
 	{
-		send_to_char("You are unable to abandon your master.\n\r", ch);
+		send_to_char("You are unable to abandon your master.\r\n", ch);
 		act("$n trembles as $s mind attempts to free itself from its magical bondage.", ch, 0, 0, TO_ROOM, 0);
 		if (!IS_NPC(ch->master) && GET_CLASS(ch->master) == CLASS_BARD)
 		{
@@ -1086,7 +1086,7 @@ int do_enter(char_data *ch, char *argument, int cmd)
 
 	if ((portal = get_obj_in_list_vis(ch, buf, world[ch->in_room].contents)) == NULL)
 	{
-		send_to_char("Nothing here by that name.\n\r", ch);
+		send_to_char("Nothing here by that name.\r\n", ch);
 		return eFAILURE;
 	}
 
@@ -1160,19 +1160,19 @@ int do_enter(char_data *ch, char *argument, int cmd)
 
 	if (isname("only", portal->name) && !isname(GET_NAME(sesame), portal->name))
 	{
-		send_to_char("The portal fades when you draw near, then shimmers as you withdraw.\n\r", ch);
+		send_to_char("The portal fades when you draw near, then shimmers as you withdraw.\r\n", ch);
 		return eFAILURE;
 	}
 
 	switch (portal->obj_flags.value[1])
 	{
 	case 0:
-		send_to_char("You reach out tentatively and touch the portal...\n\r", ch);
+		send_to_char("You reach out tentatively and touch the portal...\r\n", ch);
 		act("$n reaches out to the glowing dimensional portal....", ch, 0, 0, TO_ROOM, 0);
 		break;
 	case 1:
 	case 2:
-		sprintf(buf, "You take a bold step towards %s.\n\r", portal->short_description);
+		sprintf(buf, "You take a bold step towards %s.\r\n", portal->short_description);
 		send_to_char(buf, ch);
 		sprintf(buf, "%s boldly walks toward %s and disappears.", GET_NAME(ch), portal->short_description);
 		act(buf, ch, 0, 0, TO_ROOM, INVIS_NULL | STAYHIDE);
@@ -1202,7 +1202,7 @@ int do_enter(char_data *ch, char *argument, int cmd)
 	case 0:
 		do_look(ch, "", CMD_DEFAULT);
 		WAIT_STATE(ch, PULSE_VIOLENCE);
-		send_to_char("\n\rYou are momentarily dazed from the dimensional shift.\n\r", ch);
+		send_to_char("\n\rYou are momentarily dazed from the dimensional shift.\r\n", ch);
 		act("The portal glows brighter for a second as $n appears beside you.", ch, 0, 0, TO_ROOM, 0);
 		break;
 	case 1:

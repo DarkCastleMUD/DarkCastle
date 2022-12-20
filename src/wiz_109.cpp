@@ -116,7 +116,7 @@ int do_processes(char_data *ch, char *arg, int cmd)
   if (fprintf(fl, "~\n") < 0)
   {
     dc_fclose(fl);
-    send_to_char("Failure writing to transition file.\n\r", ch);
+    send_to_char("Failure writing to transition file.\r\n", ch);
     return eFAILURE;
   }
 
@@ -147,7 +147,7 @@ int do_guide(char_data *ch, char *argument, int cmd)
   {
     if (!(victim = get_pc_vis(ch, name)))
     {
-      send_to_char("That player is not here.\n\r", ch);
+      send_to_char("That player is not here.\r\n", ch);
       return eFAILURE;
     }
   }
@@ -195,7 +195,7 @@ int do_advance(char_data *ch, char *argument, int cmd)
   {
     if (!(victim = get_char_vis(ch, name)))
     {
-      send_to_char("That player is not here.\n\r", ch);
+      send_to_char("That player is not here.\r\n", ch);
       return eFAILURE;
     }
   }
@@ -207,14 +207,14 @@ int do_advance(char_data *ch, char *argument, int cmd)
 
   if (IS_NPC(victim))
   {
-    send_to_char("NO! Not on NPC's.\n\r", ch);
+    send_to_char("NO! Not on NPC's.\r\n", ch);
     return eFAILURE;
   }
 
   if (!*level ||
       (new_newlevel = atoi(level)) <= 0 || new_newlevel > IMP)
   {
-    send_to_char("Level must be 1 to 110.\n\r", ch);
+    send_to_char("Level must be 1 to 110.\r\n", ch);
     return eFAILURE;
   }
 
@@ -226,14 +226,14 @@ int do_advance(char_data *ch, char *argument, int cmd)
 
   if (GET_LEVEL(ch) < OVERSEER && new_newlevel >= IMMORTAL)
   {
-    send_to_char("Limited to levels lower than Titan.\n\r", ch);
+    send_to_char("Limited to levels lower than Titan.\r\n", ch);
     return eFAILURE;
   }
 
   /* Who the fuck took ths out in the first place? -Sadus */
   if (new_newlevel > GET_LEVEL(ch))
   {
-    send_to_char("Yeah right.\n\r", ch);
+    send_to_char("Yeah right.\r\n", ch);
     return eFAILURE;
   }
 
@@ -261,7 +261,7 @@ int do_advance(char_data *ch, char *argument, int cmd)
     redo_hitpoints(victim);
   }
 
-  send_to_char("You feel generous.\n\r", ch);
+  send_to_char("You feel generous.\r\n", ch);
   act("$n makes some strange gestures.\n\rA strange feeling comes upon you,"
       "like a giant hand. Light comes\n\rdown from above, grabbing your "
       "body, which begins to pulse\n\rwith coloured lights from inside.\n\rYo"
@@ -301,7 +301,7 @@ int do_zap(char_data *ch, char *argument, int cmd)
   if (!(*name))
   {
     send_to_char("Zap who??\n\rOh, BTW this deletes anyone "
-                 "lower than you.\n\r",
+                 "lower than you.\r\n",
                  ch);
     return eFAILURE;
   }
@@ -321,7 +321,7 @@ int do_zap(char_data *ch, char *argument, int cmd)
 
     if (GET_LEVEL(victim) == IMP)
     { // Hehe..
-      send_to_char("Get stuffed.\n\r", ch);
+      send_to_char("Get stuffed.\r\n", ch);
       return eFAILURE;
     }
 
@@ -329,7 +329,7 @@ int do_zap(char_data *ch, char *argument, int cmd)
     {
       sprintf(buf, "A massive bolt of lightning arcs down from the "
                    "heavens, striking you\n\rbetween the eyes. You have "
-                   "been utterly destroyed by %s.\n\r",
+                   "been utterly destroyed by %s.\r\n",
               GET_SHORT(ch));
       send_to_char(buf, victim);
     }
@@ -338,7 +338,7 @@ int do_zap(char_data *ch, char *argument, int cmd)
 
     sprintf(buf, "A massive bolt of lightning arcs down from the heavens,"
                  " striking\n\r%s between the eyes.\n\r  %s has been utterly"
-                 " destroyed by %s.\n\r",
+                 " destroyed by %s.\r\n",
             GET_NAME(victim), GET_SHORT(victim),
             GET_SHORT(ch));
 
@@ -353,19 +353,19 @@ int do_zap(char_data *ch, char *argument, int cmd)
       remove_clan_member(ch->clan, ch);
 
     AuctionHandleDelete(GET_NAME(victim));
-    snprintf(buf, 500, "%s has deleted %s.\n\r", ch->name, victim->name);
+    snprintf(buf, 500, "%s has deleted %s.\r\n", ch->name, victim->name);
 
     do_quit(victim, "", 666);
     remove_character(victim->name, ZAPPED);
 
     send_to_room(buf, room);
-    send_to_all("You hear an ominous clap of thunder in the distance.\n\r");
+    send_to_all("You hear an ominous clap of thunder in the distance.\r\n");
     log(buf, ANGEL, LogChannels::LOG_GOD);
   }
 
   else
     send_to_char("Zap who??\n\rOh, BTW this deletes anyone "
-                 "lower than you.\n\r",
+                 "lower than you.\r\n",
                  ch);
 
   return eFAILURE;
@@ -447,12 +447,12 @@ int do_shutdown(char_data *ch, char *argument, int cmd)
     send_to_char("Syntax:  shutdown [sub command] [options ...]\n\r"
                  " Sub Commands:\n\r"
                  "--------------\n\r"
-                 "   hot - Rerun current DC filename and keep players' links active.\n\r"
+                 "   hot - Rerun current DC filename and keep players' links active.\r\n"
                  "         Options: [path/dc executable] [dc options ...]\n\r"
-                 "  cold - Go ahead and kill the links.\n\r"
-                 " crash - Crash the mud by referencing an invalid pointer.\n\r"
-                 "  core - Produce a core file.\n\r"
-                 "  auto - Toggle auto-hotboot on crash setting.\n\r"
+                 "  cold - Go ahead and kill the links.\r\n"
+                 " crash - Crash the mud by referencing an invalid pointer.\r\n"
+                 "  core - Produce a core file.\r\n"
+                 "  auto - Toggle auto-hotboot on crash setting.\r\n"
                  "   die - Kill boot script and crash mud so it won't reboot.\r\n",
                  ch);
     return eFAILURE;
@@ -460,7 +460,7 @@ int do_shutdown(char_data *ch, char *argument, int cmd)
 
   if (!strcmp(arg1, "cold"))
   {
-    sprintf(buf, "Shutdown by %s.\n\r", GET_SHORT(ch));
+    sprintf(buf, "Shutdown by %s.\r\n", GET_SHORT(ch));
     send_to_all(buf);
     log(buf, ANGEL, LogChannels::LOG_GOD);
     _shutdown = 1;
@@ -487,7 +487,7 @@ int do_shutdown(char_data *ch, char *argument, int cmd)
     }
 
     do_not_save_corpses = 1;
-    sprintf(buf, "Hot reboot by %s.\n\r", GET_SHORT(ch));
+    sprintf(buf, "Hot reboot by %s.\r\n", GET_SHORT(ch));
     send_to_all(buf);
     log(buf, ANGEL, LogChannels::LOG_GOD);
     log("Writing sockets to file for hotboot recovery.", 0, LogChannels::LOG_MISC);
@@ -495,19 +495,19 @@ int do_shutdown(char_data *ch, char *argument, int cmd)
     if (!write_hotboot_file(new_argv))
     {
       log("Hotboot failed.  Closing all sockets.", 0, LogChannels::LOG_MISC);
-      send_to_char("Hot reboot failed.\n\r", ch);
+      send_to_char("Hot reboot failed.\r\n", ch);
     }
   }
   else if (!strcmp(arg1, "auto"))
   {
     if (try_to_hotboot_on_crash)
     {
-      send_to_char("Mud will not try to hotboot when it crashes next.\n\r", ch);
+      send_to_char("Mud will not try to hotboot when it crashes next.\r\n", ch);
       try_to_hotboot_on_crash = 0;
     }
     else
     {
-      send_to_char("Mud will now TRY to hotboot when it crashes next.\n\r", ch);
+      send_to_char("Mud will now TRY to hotboot when it crashes next.\r\n", ch);
       try_to_hotboot_on_crash = 1;
     }
   }
@@ -610,7 +610,7 @@ int do_testport(char_data *ch, char *argument, int cmd)
     }
 
     logf(105, LogChannels::LOG_MISC, "Starting testport.");
-    send_to_char("Testport successfully started.\n\r", ch);
+    send_to_char("Testport successfully started.\r\n", ch);
   }
   else if (!str_cmp(arg1, "stop"))
   {
@@ -622,7 +622,7 @@ int do_testport(char_data *ch, char *argument, int cmd)
     }
 
     logf(105, LogChannels::LOG_MISC, "Shutdown testport under pid %d", child);
-    send_to_char("Testport successfully shutdown.\n\r", ch);
+    send_to_char("Testport successfully shutdown.\r\n", ch);
   }
 
   return eSUCCESS;
@@ -659,7 +659,7 @@ int do_testuser(char_data *ch, char *argument, int cmd)
 
   if (strlen(arg1) > 19 || _parse_name(arg1, username))
   {
-    send_to_char("Invalid username passed.\n\r", ch);
+    send_to_char("Invalid username passed.\r\n", ch);
     return eFAILURE;
   }
 
@@ -674,7 +674,7 @@ int do_testuser(char_data *ch, char *argument, int cmd)
 
   if (!file_exists(savefile))
   {
-    send_to_char("Player file not found.\n\r", ch);
+    send_to_char("Player file not found.\r\n", ch);
     return eFAILURE;
   }
 
@@ -688,7 +688,7 @@ int do_testuser(char_data *ch, char *argument, int cmd)
   }
   else
   {
-    send_to_char("Only on or off are valid second arguments to this command.\n\r", ch);
+    send_to_char("Only on or off are valid second arguments to this command.\r\n", ch);
     return eFAILURE;
   }
 
@@ -696,11 +696,11 @@ int do_testuser(char_data *ch, char *argument, int cmd)
 
   if (system(command))
   {
-    send_to_char("Error occurred.\n\r", ch);
+    send_to_char("Error occurred.\r\n", ch);
   }
   else
   {
-    send_to_char("Ok.\n\r", ch);
+    send_to_char("Ok.\r\n", ch);
   }
 
   return eSUCCESS;

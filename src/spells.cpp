@@ -997,7 +997,7 @@ void affect_update(int32_t duration_type)
           char_data *bard = get_pc_room_vis_exact(i, (af->caster).c_str());
           if (!bard || !ARE_GROUPED(i, bard))
           {
-            send_to_char("Away from the music, the effect weakens...\n\r", i);
+            send_to_char("Away from the music, the effect weakens...\r\n", i);
             af->duration = 1;
             (af->caster).clear();
           }
@@ -1830,13 +1830,13 @@ int do_cast(char_data *ch, char *argument, int cmd)
 
   if (IS_NPC(ch) && ch->desc && ch->desc->original && ch->desc->original != ch->desc->character && GET_LEVEL(ch->desc->original) < IMMORTAL)
   {
-    send_to_char("You cannot cast in this form.\n\r", ch);
+    send_to_char("You cannot cast in this form.\r\n", ch);
     return eFAILURE;
   }
 
   if (affected_by_spell(ch, SPELL_NO_CAST_TIMER))
   {
-    send_to_char("You seem unable to concentrate enough to cast any spells.\n\r", ch);
+    send_to_char("You seem unable to concentrate enough to cast any spells.\r\n", ch);
     return eFAILURE;
   }
 
@@ -1858,22 +1858,22 @@ int do_cast(char_data *ch, char *argument, int cmd)
   {
     if (GET_CLASS(ch) == CLASS_WARRIOR)
     {
-      send_to_char("Think you had better stick to fighting...\n\r", ch);
+      send_to_char("Think you had better stick to fighting...\r\n", ch);
       return eFAILURE;
     }
     else if (GET_CLASS(ch) == CLASS_THIEF)
     {
-      send_to_char("Think you should stick to robbing and killing...\n\r", ch);
+      send_to_char("Think you should stick to robbing and killing...\r\n", ch);
       return eFAILURE;
     }
     else if (GET_CLASS(ch) == CLASS_BARBARIAN)
     {
-      send_to_char("Think you should stick to berserking...\n\r", ch);
+      send_to_char("Think you should stick to berserking...\r\n", ch);
       return eFAILURE;
     }
     else if (GET_CLASS(ch) == CLASS_MONK)
     {
-      send_to_char("Think you should stick with meditating...\n\r", ch);
+      send_to_char("Think you should stick with meditating...\r\n", ch);
       return eFAILURE;
     }
     else if ((GET_CLASS(ch) == CLASS_ANTI_PAL) && (!IS_EVIL(ch)))
@@ -1893,7 +1893,7 @@ int do_cast(char_data *ch, char *argument, int cmd)
     }
     if (IS_SET(world[ch->in_room].room_flags, NO_MAGIC))
     {
-      send_to_char("You find yourself unable to weave magic here.\n\r", ch);
+      send_to_char("You find yourself unable to weave magic here.\r\n", ch);
       return eFAILURE;
     }
   }
@@ -1927,12 +1927,12 @@ int do_cast(char_data *ch, char *argument, int cmd)
   spl = old_search_block(argument, 1, qend - 1, spells, 0);
   if (spl <= 0)
   {
-    send_to_char("Your lips do not move, no magic appears.\n\r", ch);
+    send_to_char("Your lips do not move, no magic appears.\r\n", ch);
     return eFAILURE;
   }
   if (spl == SPELL_DIVINE_INTER && affected_by_spell(ch, SPELL_DIV_INT_TIMER))
   {
-    send_to_char("The gods are unwilling to intervene on your behalf again so soon.\n\r", ch);
+    send_to_char("The gods are unwilling to intervene on your behalf again so soon.\r\n", ch);
     return eFAILURE;
   }
 
@@ -1943,10 +1943,10 @@ int do_cast(char_data *ch, char *argument, int cmd)
       switch (GET_POS(ch))
       {
       case POSITION_SLEEPING:
-        send_to_char("You dream about great magical powers.\n\r", ch);
+        send_to_char("You dream about great magical powers.\r\n", ch);
         break;
       case POSITION_RESTING:
-        send_to_char("You can't concentrate enough while resting.\n\r", ch);
+        send_to_char("You can't concentrate enough while resting.\r\n", ch);
         break;
       case POSITION_SITTING:
         send_to_char("You can't do this sitting!\n\r", ch);
@@ -2107,7 +2107,7 @@ int do_cast(char_data *ch, char *argument, int cmd)
         }
         if (!target_ok)
         {
-          send_to_char("There is no such known spell in the realms to protect yourself against.\n\r", ch);
+          send_to_char("There is no such known spell in the realms to protect yourself against.\r\n", ch);
           return eFAILURE;
         }
       } // end spell immunity
@@ -2215,7 +2215,7 @@ int do_cast(char_data *ch, char *argument, int cmd)
               }
               else
               {
-                send_to_char("You cannot cast this spell on your entire group at once.\n\r", ch);
+                send_to_char("You cannot cast this spell on your entire group at once.\r\n", ch);
                 return eFAILURE;
               }
             }
@@ -2305,19 +2305,19 @@ int do_cast(char_data *ch, char *argument, int cmd)
         if (*name)
         {
           if (IS_SET(spell_info[spl].targets, TAR_CHAR_ROOM))
-            send_to_char("Nobody here by that name.\n\r", ch);
+            send_to_char("Nobody here by that name.\r\n", ch);
           else if (IS_SET(spell_info[spl].targets, TAR_CHAR_WORLD))
-            send_to_char("Nobody playing by that name.\n\r", ch);
+            send_to_char("Nobody playing by that name.\r\n", ch);
           else if (IS_SET(spell_info[spl].targets, TAR_OBJ_INV))
-            send_to_char("You are not carrying anything like that.\n\r", ch);
+            send_to_char("You are not carrying anything like that.\r\n", ch);
           else if (IS_SET(spell_info[spl].targets, TAR_OBJ_ROOM))
-            send_to_char("Nothing here by that name.\n\r", ch);
+            send_to_char("Nothing here by that name.\r\n", ch);
           else if (IS_SET(spell_info[spl].targets, TAR_OBJ_WORLD))
-            send_to_char("Nothing at all by that name.\n\r", ch);
+            send_to_char("Nothing at all by that name.\r\n", ch);
           else if (IS_SET(spell_info[spl].targets, TAR_OBJ_EQUIP))
-            send_to_char("You are not wearing anything like that.\n\r", ch);
+            send_to_char("You are not wearing anything like that.\r\n", ch);
           else if (IS_SET(spell_info[spl].targets, TAR_OBJ_WORLD))
-            send_to_char("Nothing at all by that name.\n\r", ch);
+            send_to_char("Nothing at all by that name.\r\n", ch);
         }
         else
         { /* Nothing was given as argument */
@@ -2337,17 +2337,17 @@ int do_cast(char_data *ch, char *argument, int cmd)
             char_from_room(ch);
             char_to_room(ch, oldroom);
           }
-          send_to_char("You can not cast this spell upon yourself.\n\r", ch);
+          send_to_char("You can not cast this spell upon yourself.\r\n", ch);
           return eFAILURE;
         }
         else if ((tar_char != ch) && IS_SET(spell_info[spl].targets, TAR_SELF_ONLY))
         {
-          send_to_char("You can only cast this spell upon yourself.\n\r", ch);
+          send_to_char("You can only cast this spell upon yourself.\r\n", ch);
           return eFAILURE;
         }
         else if (IS_AFFECTED(ch, AFF_CHARM) && (ch->master == tar_char))
         {
-          send_to_char("You are afraid that it could harm your master.\n\r", ch);
+          send_to_char("You are afraid that it could harm your master.\r\n", ch);
           return eFAILURE;
         }
       }
@@ -2361,7 +2361,7 @@ int do_cast(char_data *ch, char *argument, int cmd)
             char_from_room(ch);
             char_to_room(ch, oldroom);
           }
-          send_to_char("You can't summon enough energy to cast the spell.\n\r", ch);
+          send_to_char("You can't summon enough energy to cast the spell.\r\n", ch);
           return eFAILURE;
         }
       }
@@ -2459,7 +2459,7 @@ int do_cast(char_data *ch, char *argument, int cmd)
           REMBIT(ch->affected_by, AFF_INVISIBLE);
         }
 
-        send_to_char("Ok.\n\r", ch);
+        send_to_char("Ok.\r\n", ch);
 
         if (group_spell)
         {
@@ -2486,7 +2486,7 @@ int do_cast(char_data *ch, char *argument, int cmd)
           counter *= use_mana(ch, spl);
           if (GET_MANA(ch) < counter)
           {
-            send_to_char("You do not have enough mana to cast this group spell.\n\r", ch);
+            send_to_char("You do not have enough mana to cast this group spell.\r\n", ch);
             return eFAILURE;
           }
           GET_MANA(ch) -= counter;
@@ -2513,7 +2513,7 @@ int do_cast(char_data *ch, char *argument, int cmd)
           {
             if (tar_char && tar_char != ch && !IS_SET(spell_info[spl].targets, TAR_FIGHT_VICT))
             {
-              send_to_char("You can't cast that spell on someone in a prize arena.\n\r", ch);
+              send_to_char("You can't cast that spell on someone in a prize arena.\r\n", ch);
               logf(IMMORTAL, LogChannels::LOG_ARENA, "%s was prevented from casting '%s' on %s.",
                    GET_NAME(ch), get_skill_name(spl), GET_NAME(tar_char));
               return eFAILURE;
@@ -2521,14 +2521,14 @@ int do_cast(char_data *ch, char *argument, int cmd)
 
             if (ch->fighting && ch->fighting != tar_char)
             {
-              send_to_char("You can't cast that because you're in a fight with someone else.\n\r", ch);
+              send_to_char("You can't cast that because you're in a fight with someone else.\r\n", ch);
               logf(IMMORTAL, LogChannels::LOG_ARENA, "%s, whom was fighting %s, was prevented from casting '%s' on %s.", GET_NAME(ch),
                    GET_NAME(ch->fighting), get_skill_name(spl), GET_NAME(tar_char));
               return eFAILURE;
             }
             else if (tar_char->fighting && tar_char->fighting != ch)
             {
-              send_to_char("You can't cast that because they are fighting someone else.\n\r", ch);
+              send_to_char("You can't cast that because they are fighting someone else.\r\n", ch);
               logf(IMMORTAL, LogChannels::LOG_ARENA, "%s was prevented from casting '%s' on %s who was fighting %s.", GET_NAME(ch),
                    get_skill_name(spl), GET_NAME(tar_char), GET_NAME(tar_char->fighting));
               return eFAILURE;
@@ -2541,7 +2541,7 @@ int do_cast(char_data *ch, char *argument, int cmd)
           {
             if (tar_char && tar_char != ch && !IS_SET(spell_info[spl].targets, TAR_FIGHT_VICT) && !ARE_CLANNED(ch, tar_char))
             {
-              send_to_char("You can't cast that spell on someone from another clan in a prize arena.\n\r", ch);
+              send_to_char("You can't cast that spell on someone from another clan in a prize arena.\r\n", ch);
               logf(IMMORTAL, LogChannels::LOG_ARENA, "%s [%s] was prevented from casting '%s' on %s [%s].",
                    GET_NAME(ch), get_clan_name(ch), get_skill_name(spl), GET_NAME(tar_char), get_clan_name(tar_char));
               return eFAILURE;
@@ -2549,7 +2549,7 @@ int do_cast(char_data *ch, char *argument, int cmd)
 
             if (ch->fighting && ch->fighting != tar_char && !ARE_CLANNED(ch->fighting, tar_char) && IS_SET(spell_info[spl].targets, TAR_FIGHT_VICT))
             {
-              send_to_char("You can't cast that because you're in a fight with someone else.\n\r", ch);
+              send_to_char("You can't cast that because you're in a fight with someone else.\r\n", ch);
               logf(IMMORTAL, LogChannels::LOG_ARENA, "%s [%s], whom was fighting %s [%s], was prevented from casting '%s' on %s [%s].",
                    GET_NAME(ch), get_clan_name(ch),
                    GET_NAME(ch->fighting), get_clan_name(ch->fighting),
@@ -2559,7 +2559,7 @@ int do_cast(char_data *ch, char *argument, int cmd)
             }
             else if (tar_char->fighting && tar_char->fighting != ch && !ARE_CLANNED(tar_char->fighting, ch) && IS_SET(spell_info[spl].targets, TAR_FIGHT_VICT))
             {
-              send_to_char("You can't cast that because they are fighting someone else.\n\r", ch);
+              send_to_char("You can't cast that because they are fighting someone else.\r\n", ch);
               logf(IMMORTAL, LogChannels::LOG_ARENA, "%s [%s] was prevented from casting '%s' on %s [%s] who was fighting %s [%s].",
                    GET_NAME(ch), get_clan_name(ch),
                    get_skill_name(spl),
@@ -2605,7 +2605,7 @@ int do_cast(char_data *ch, char *argument, int cmd)
 
         if (group_spell)
         {
-          send_to_char("You utter a swift prayer to the gods to amplify your powers.\n\r", ch);
+          send_to_char("You utter a swift prayer to the gods to amplify your powers.\r\n", ch);
           act("$n utters a swift prayer to the gods to amplify $s powers.", ch, 0, 0, TO_ROOM, 0);
           argument = strdup("communegroupspell");
           argument_ptr = argument;
@@ -2705,7 +2705,7 @@ int do_cast(char_data *ch, char *argument, int cmd)
   }
   else
   {
-    send_to_char("Your lips do not move, no magic appears.\n\r", ch);
+    send_to_char("Your lips do not move, no magic appears.\r\n", ch);
   }
   return eFAILURE;
 }

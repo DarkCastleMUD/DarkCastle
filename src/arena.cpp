@@ -51,11 +51,11 @@ int do_arena(char_data *ch, char *argument, int cmd)
     send_to_char(buf, ch);
     send_to_char("Syntax: arena <lowest level> <highest level> [num mortals] [type] [hp limit if applicable]\n\r"
                  "Valid types: chaos, potato, prize, hp\n\r"
-                 "Use -1 for no limit on number of mortals.\n\r"
-                 "Use arena 0 0 to close the arena.\n\r"
+                 "Use -1 for no limit on number of mortals.\r\n"
+                 "Use arena 0 0 to close the arena.\r\n"
                  "Do *NOT* leave the arena open, people will be stuck there forever!\n\r"
                  "Also the arena can be opened without specifying the number"
-                 " of mortals allowed to join.\n\r",
+                 " of mortals allowed to join.\r\n",
                  ch);
     return eSUCCESS;
   }
@@ -65,7 +65,7 @@ int do_arena(char_data *ch, char *argument, int cmd)
     arena.low = 0;
     arena.high = 0;
     arena.status = CLOSED;
-    send_to_char("Closing the arena.\n\r", ch);
+    send_to_char("Closing the arena.\r\n", ch);
     send_info("## The Arena has been CLOSED!\n\r");
     return eSUCCESS;
   }
@@ -73,7 +73,7 @@ int do_arena(char_data *ch, char *argument, int cmd)
   arena.low = low;
   arena.high = high;
   arena.status = OPENED;
-  sprintf(buf, "## The Arena has been OPENED for levels %d - %d.\n\r"
+  sprintf(buf, "## The Arena has been OPENED for levels %d - %d.\r\n"
                "## Type JOINARENA to enter the Bloodbath!\n\r",
           low, high);
   send_info(buf);
@@ -139,7 +139,7 @@ int do_arena(char_data *ch, char *argument, int cmd)
     arena.type = NORMAL;
   }
 
-  send_to_char("The Arena has been opened for the specified levels.\n\r", ch);
+  send_to_char("The Arena has been opened for the specified levels.\r\n", ch);
   return eSUCCESS;
 }
 
@@ -153,12 +153,12 @@ int do_joinarena(char_data *ch, char *arg, int cmd)
 
   if (arena.low > GET_LEVEL(ch) || arena.high < GET_LEVEL(ch))
   {
-    send_to_char("The arena is not open for anyone your level.\n\r", ch);
+    send_to_char("The arena is not open for anyone your level.\r\n", ch);
     return eFAILURE;
   }
   if (!IS_MOB(ch) && IS_SET(ch->pcdata->punish, PUNISH_NOARENA))
   {
-    send_to_char("You have been banned from arenas.\n\r", ch);
+    send_to_char("You have been banned from arenas.\r\n", ch);
     return eFAILURE;
   }
   if (affected_by_spell(ch, FUCK_PTHIEF) || affected_by_spell(ch, FUCK_GTHIEF))

@@ -191,7 +191,7 @@ int do_whogroup(char_data *ch, char *argument, int cmd)
   } // End for(d).
 
   if (0 == foundgroup)
-    add_to_who("\n\rNo groups found.\n\r");
+    add_to_who("\n\rNo groups found.\r\n");
 
   // page it to the player.  the 1 tells page_string to make it's own copy of the data
   page_string(ch->desc, gWhoBuffer, 1);
@@ -686,7 +686,7 @@ int do_whoarena(char_data *ch, char *argument, int cmd)
     }
 
     if (count == 0)
-      csendf(ch, "\n\rThere are no visible players in the arena.\n\r");
+      csendf(ch, "\n\rThere are no visible players in the arena.\r\n");
 
     return eSUCCESS;
   }
@@ -713,7 +713,7 @@ int do_whoarena(char_data *ch, char *argument, int cmd)
   }
 
   if (count == 0)
-    csendf(ch, "\n\rThere are no visible players in the arena.\n\r");
+    csendf(ch, "\n\rThere are no visible players in the arena.\r\n");
   return eSUCCESS;
 }
 

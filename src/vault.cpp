@@ -323,7 +323,7 @@ int do_vault(char_data *ch, char *argument, int cmd)
         clan_data *clan = get_clan(ch);
         if (clan == nullptr)
         {
-          send_to_char("You are not a member of any clan.\n\r", ch);
+          send_to_char("You are not a member of any clan.\r\n", ch);
           return eFAILURE;
         }
 
@@ -339,7 +339,7 @@ int do_vault(char_data *ch, char *argument, int cmd)
         }
         else
         {
-          send_to_char("You don't have access to view the clan's vault log.\n\r", ch);
+          send_to_char("You don't have access to view the clan's vault log.\r\n", ch);
           return eFAILURE;
         }
       }
@@ -970,7 +970,7 @@ void add_vault_access(char_data *ch, char *name, struct vault_data *vault)
   if (!get_pc(name))
     if (!(load_char_obj(&d, name)))
     {
-      send_to_char("You can't give access to someone who doesn't exist.\n\r", ch);
+      send_to_char("You can't give access to someone who doesn't exist.\r\n", ch);
       return;
     }
 
@@ -1006,7 +1006,7 @@ void remove_vault_access(char_data *ch, char *name, struct vault_data *vault)
 
   if (!has_vault_access(name, vault))
   {
-    send_to_char("That person doesn't have access to your vault.\n\r", ch);
+    send_to_char("That person doesn't have access to your vault.\r\n", ch);
     return;
   }
 
@@ -1257,7 +1257,7 @@ void vault_get(char_data *ch, char *object, char *owner)
         strncpy(obj_list[i], fname(obj->name), sizeof(obj_list[i]));
         if (i > 49)
         {
-          send_to_char("You can only take out 50 items at a time.\n\r", ch);
+          send_to_char("You can only take out 50 items at a time.\r\n", ch);
           ioverload = TRUE;
           break;
         }
@@ -1292,7 +1292,7 @@ void vault_get(char_data *ch, char *object, char *owner)
 
     if (!num)
     {
-      send_to_char("There is nothing like that in the vault.\n\r", ch);
+      send_to_char("There is nothing like that in the vault.\r\n", ch);
       return;
     }
 
@@ -1308,7 +1308,7 @@ void vault_get(char_data *ch, char *object, char *owner)
 
     if (!(obj = get_obj_in_vault(vault, object, num)))
     {
-      send_to_char("There is nothing like that in the vault.\n\r", ch);
+      send_to_char("There is nothing like that in the vault.\r\n", ch);
       return;
     }
 
@@ -1330,12 +1330,12 @@ void vault_get(char_data *ch, char *object, char *owner)
       if (GET_LEVEL(ch) < IMMORTAL)
         return;
       else
-        send_to_char("But since you're an immortal, you get it anyway.\n\r", ch);
+        send_to_char("But since you're an immortal, you get it anyway.\r\n", ch);
     }
 
     if (IS_CARRYING_N(ch) + 1 > CAN_CARRY_N(ch))
     {
-      send_to_char("You cannot carry any more items.\n\r", ch);
+      send_to_char("You cannot carry any more items.\r\n", ch);
       return;
     }
 
@@ -1794,7 +1794,7 @@ void vault_put(char_data *ch, char *object, char *owner)
   {
     if (!(obj = get_obj_in_list_vis(ch, object, ch->carrying)))
     {
-      send_to_char("You don't have anything like that.\n\r", ch);
+      send_to_char("You don't have anything like that.\r\n", ch);
       return;
     }
 
@@ -2536,7 +2536,7 @@ int vault_search(char_data *ch, const char *args)
     }   // if we have access to vault
   }     // for loop of vaults
 
-  csendf(ch, "\n\rSearched %d vaults and found %d objects.\n\r",
+  csendf(ch, "\n\rSearched %d vaults and found %d objects.\r\n",
          vaults_searched, objects_found);
 
   return eSUCCESS;

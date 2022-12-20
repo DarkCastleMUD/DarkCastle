@@ -64,11 +64,11 @@ void check_for_sold_items(char_data *ch);
 void show_question_race(descriptor_data *d);
 
 const char menu[] = "\n\rWelcome to Dark Castle Mud\n\r\n\r"
-                    "0) Exit Dark Castle.\n\r"
-                    "1) Enter the game.\n\r"
-                    "2) Enter your character's description.\n\r"
-                    "3) Change your password.\n\r"
-                    "4) Archive this character.\n\r"
+                    "0) Exit Dark Castle.\r\n"
+                    "1) Enter the game.\r\n"
+                    "2) Enter your character's description.\r\n"
+                    "3) Change your password.\r\n"
+                    "4) Archive this character.\r\n"
                     "5) Delete this character.\n\r\n\r"
                     "   Make your choice: ";
 
@@ -968,7 +968,7 @@ void nanny(struct descriptor_data *d, string arg)
          if (file_exists(str_tmp.str().c_str()))
          {
             SEND_TO_Q("That character is archived.\n\rPlease mail "
-                      "imps@dcastle.org to request it be restored.\n\r",
+                      "imps@dcastle.org to request it be restored.\r\n",
                       d);
             close_socket(d);
             return;
@@ -988,7 +988,7 @@ void nanny(struct descriptor_data *d, string arg)
          fOld = TRUE;
       else if ((wizlock) && !allowed_host(d->host))
       {
-         SEND_TO_Q("The game is wizlocked.\n\r", d);
+         SEND_TO_Q("The game is wizlocked.\r\n", d);
          close_socket(d);
          return;
       }
@@ -1042,7 +1042,7 @@ void nanny(struct descriptor_data *d, string arg)
 
       if (string(crypt(arg.c_str(), password)) != password)
       {
-         SEND_TO_Q("Wrong password.\n\r", d);
+         SEND_TO_Q("Wrong password.\r\n", d);
          sprintf(log_buf, "%s wrong password: %s", GET_NAME(ch), d->host);
          log(log_buf, OVERSEER, LogChannels::LOG_SOCKET);
          if ((ch = get_pc(GET_NAME(d->character))))
@@ -1128,7 +1128,7 @@ void nanny(struct descriptor_data *d, string arg)
             sprintf(buf, "Request for new character %s denied from [%s] (siteban)",
                     GET_NAME(d->character), d->host);
             log(buf, OVERSEER, LogChannels::LOG_SOCKET);
-            SEND_TO_Q("Sorry, new chars are not allowed from your site.\n\r"
+            SEND_TO_Q("Sorry, new chars are not allowed from your site.\r\n"
                       "Questions may be directed to imps@dcastle.org\n\r",
                       d);
             STATE(d) = conn::CLOSE;
@@ -1413,7 +1413,7 @@ void nanny(struct descriptor_data *d, string arg)
          GET_RAW_CON(ch) = ch->desc->stats->con[selection - 1];
          delete ch->desc->stats;
          ch->desc->stats = nullptr;
-         SEND_TO_Q("\n\rChoose a race(races you can select are marked with a *).\n\r", d);
+         SEND_TO_Q("\n\rChoose a race(races you can select are marked with a *).\r\n", d);
          sprintf(buf, "  %c1: Human\n\r  %c2: Elf\n\r  %c3: Dwarf\n\r"
                       "  %c4: Hobbit\n\r  %c5: Pixie\n\r  %c6: Ogre\n\r"
                       "  %c7: Gnome\r\n  %c8: Orc\r\n  %c9: Troll\r\n"
@@ -1572,7 +1572,7 @@ void nanny(struct descriptor_data *d, string arg)
       }
 
       set_hw(ch);
-      SEND_TO_Q("\n\rA '*' denotes a class that fits your chosen stats.\n\r", d);
+      SEND_TO_Q("\n\rA '*' denotes a class that fits your chosen stats.\r\n", d);
       sprintf(buf, " %c 1: Warrior\n\r"
                    " %c 2: Cleric\n\r"
                    " %c 3: Mage\n\r"
@@ -1810,7 +1810,7 @@ void nanny(struct descriptor_data *d, string arg)
          {
             if (GET_LEVEL(ch) >= 40 && DCVote->IsActive() && !DCVote->HasVoted(ch))
             {
-               send_to_char("\n\rThere is an active vote in which you have not yet voted.\n\r"
+               send_to_char("\n\rThere is an active vote in which you have not yet voted.\r\n"
                             "Enter \"vote\" to see details\n\r\n\r",
                             ch);
             }
@@ -1820,8 +1820,8 @@ void nanny(struct descriptor_data *d, string arg)
          break;
 
       case '2':
-         SEND_TO_Q("Enter a text you'd like others to see when they look at you.\n\r"
-                   "Terminate with '/s' on a new line.\n\r",
+         SEND_TO_Q("Enter a text you'd like others to see when they look at you.\r\n"
+                   "Terminate with '/s' on a new line.\r\n",
                    d);
          if (ch->description)
          {
@@ -1873,7 +1873,7 @@ void nanny(struct descriptor_data *d, string arg)
       if (arg == "ARCHIVE ME")
       {
          str_tmp << GET_NAME(d->character);
-         SEND_TO_Q("\n\rCharacter Archived.\n\r", d);
+         SEND_TO_Q("\n\rCharacter Archived.\r\n", d);
          update_wizlist(d->character);
          close_socket(d);
          util_archive(str_tmp.str().c_str(), 0);
@@ -1958,7 +1958,7 @@ void nanny(struct descriptor_data *d, string arg)
          return;
       }
 
-      SEND_TO_Q("\n\rDone.\n\r", d);
+      SEND_TO_Q("\n\rDone.\r\n", d);
       SEND_TO_Q(menu, d);
       STATE(d) = conn::SELECT_MENU;
       if (GET_LEVEL(ch) > 1)
@@ -2076,7 +2076,7 @@ bool check_reconnect(struct descriptor_data *d, char *name, bool fReconnect)
          d->character = tmp_ch;
          tmp_ch->desc = d;
          tmp_ch->timer = 0;
-         send_to_char("Reconnecting.\n\r", tmp_ch);
+         send_to_char("Reconnecting.\r\n", tmp_ch);
          char log_buf[MAX_STRING_LENGTH] = {};
          sprintf(log_buf, "%s@%s has reconnected.",
                  GET_NAME(tmp_ch), d->host);
@@ -2214,7 +2214,7 @@ void update_characters()
          if (get_saves(i, SAVE_TYPE_POISON) > number(1, 101))
          {
             tmp *= get_saves(i, SAVE_TYPE_POISON) / 100;
-            send_to_char("You feel very sick, but resist the $2poison's$R damage.\n\r", i);
+            send_to_char("You feel very sick, but resist the $2poison's$R damage.\r\n", i);
          }
          if (tmp)
          {
@@ -2355,7 +2355,7 @@ void checkConsecrate(int pulseType)
                   if (spl == SPELL_CONSECRATE)
                   {
                      if (affected_by_spell(tmp_ch, SPELL_DETECT_GOOD) && affected_by_spell(tmp_ch, SPELL_DETECT_GOOD)->modifier >= 80)
-                        send_to_char("Runes upon the ground glow brightly, then fade to nothing.\r\nThe holy consecration here has ended.\n\r", tmp_ch);
+                        send_to_char("Runes upon the ground glow brightly, then fade to nothing.\r\nThe holy consecration here has ended.\r\n", tmp_ch);
                   }
                   else
                   {
@@ -2364,7 +2364,7 @@ void checkConsecrate(int pulseType)
                         {
                            send_damage("Runes upon the ground glow softly as your holy consecration heals $N of | damage.", ch, 0, tmp_ch, buf, "Runes upon the ground glow softly as your holy consecration heals $N.", TO_CHAR);
                         }
-                     send_to_char("The runes upon the ground shatter with a burst of magic!\r\nThe unholy desecration has ended.\n\r", tmp_ch);
+                     send_to_char("The runes upon the ground shatter with a burst of magic!\r\nThe unholy desecration has ended.\r\n", tmp_ch);
                   }
                }
                extract_obj(obj);

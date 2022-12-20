@@ -893,7 +893,7 @@ void save_char_obj(char_data *ch)
 
   if (!(fpsave = dc_fopen(strsave, "wb")))
   {
-    send_to_char("Warning!  Did not save.  Could not open file.  Contact a god, do not logoff.\n\r", ch);
+    send_to_char("Warning!  Did not save.  Could not open file.  Contact a god, do not logoff.\r\n", ch);
     char log_buf[MAX_STRING_LENGTH] = {};
     sprintf(log_buf, "Could not open file in save_char_obj. '%s'", strsave);
     perror(log_buf);

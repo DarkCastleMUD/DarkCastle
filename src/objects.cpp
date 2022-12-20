@@ -145,7 +145,7 @@ int damage_eq_once(obj_data *obj)
 {
   if (obj_index[obj->item_number].virt == SPIRIT_SHIELD_OBJ_NUMBER && obj->carried_by && obj->carried_by->in_room)
   {
-    send_to_room("The spirit shield shimmers brightly then fades away.\n\r", obj->carried_by->in_room);
+    send_to_room("The spirit shield shimmers brightly then fades away.\r\n", obj->carried_by->in_room);
     extract_obj(obj);
     return 0;
   }
@@ -230,7 +230,7 @@ int do_switch(char_data *ch, char *arg, int cmd)
   if (!ch->equipment[WIELD] || !ch->equipment[SECOND_WIELD])
   {
     send_to_char("You must be wielding two weapons to switch their "
-                 "positions.\n\r",
+                 "positions.\r\n",
                  ch);
     return eFAILURE;
   }
@@ -256,7 +256,7 @@ int do_switch(char_data *ch, char *arg, int cmd)
   between = ch->equipment[WIELD];
   ch->equipment[WIELD] = ch->equipment[SECOND_WIELD];
   ch->equipment[SECOND_WIELD] = between;
-  send_to_char("You switch your weapon positions.\n\r", ch);
+  send_to_char("You switch your weapon positions.\r\n", ch);
   return eSUCCESS;
 }
 
@@ -369,7 +369,7 @@ int do_recite(char_data *ch, char *argument, int cmd)
 
   if (IS_SET(world[ch->in_room].room_flags, NO_MAGIC))
   {
-    send_to_char("Your magic is muffled by greater beings.\n\r", ch);
+    send_to_char("Your magic is muffled by greater beings.\r\n", ch);
     return eFAILURE;
   }
   equipped = FALSE;
@@ -410,7 +410,7 @@ int do_recite(char_data *ch, char *argument, int cmd)
     bits = generic_find(argument, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP | FIND_CHAR_ROOM, ch, &victim, &obj, true);
     if (bits == 0)
     {
-      send_to_char("No such thing around to recite the scroll on.\n\r", ch);
+      send_to_char("No such thing around to recite the scroll on.\r\n", ch);
       return eFAILURE;
     }
   }
@@ -721,7 +721,7 @@ int do_use(char_data *ch, char *argument, int cmd)
 
   if (IS_SET(world[ch->in_room].room_flags, NO_MAGIC))
   {
-    send_to_char("Your magic is muffled by greater beings.\n\r", ch);
+    send_to_char("Your magic is muffled by greater beings.\r\n", ch);
     return eFAILURE;
   }
 
@@ -758,7 +758,7 @@ int do_use(char_data *ch, char *argument, int cmd)
     }
     else
     {
-      send_to_char("The staff seems powerless.\n\r", ch);
+      send_to_char("The staff seems powerless.\r\n", ch);
     }
   }
   else if (stick->obj_flags.type_flag == ITEM_WAND)
@@ -793,7 +793,7 @@ int do_use(char_data *ch, char *argument, int cmd)
       }
       else
       {
-        send_to_char("The wand seems powerless.\n\r", ch);
+        send_to_char("The wand seems powerless.\r\n", ch);
       }
     }
     else
@@ -803,7 +803,7 @@ int do_use(char_data *ch, char *argument, int cmd)
   }
   else
   {
-    send_to_char("Use is normally only for wands and staves.\n\r", ch);
+    send_to_char("Use is normally only for wands and staves.\r\n", ch);
   }
   return eFAILURE;
 }
@@ -818,7 +818,7 @@ int do_name(char_data *ch, char *arg, int cmd)
 
   if (!IS_MOB(ch) && IS_SET(ch->pcdata->punish, PUNISH_NONAME))
   {
-    send_to_char("You can't do that.  You must have been naughty.\n\r", ch);
+    send_to_char("You can't do that.  You must have been naughty.\r\n", ch);
     return eFAILURE;
   }
   if (GET_LEVEL(ch) < 5)
@@ -837,7 +837,7 @@ int do_name(char_data *ch, char *arg, int cmd)
 
   if (strlen(arg) > 30)
   {
-    send_to_char("Name too long, must be under 30 characters long.\n\r", ch);
+    send_to_char("Name too long, must be under 30 characters long.\r\n", ch);
     return eFAILURE;
   }
 
@@ -866,7 +866,7 @@ int do_name(char_data *ch, char *arg, int cmd)
   }
   if (nope == 0)
   {
-    send_to_char("You MUST include your real name. Use % to indicate where you want it.\n\r", ch);
+    send_to_char("You MUST include your real name. Use % to indicate where you want it.\r\n", ch);
     return eFAILURE;
   }
 
@@ -897,7 +897,7 @@ int do_name(char_data *ch, char *arg, int cmd)
     GET_SHORT_ONLY(ch) = str_hsh(buf);
   else
     GET_SHORT_ONLY(ch) = str_dup(buf);
-  send_to_char("Ok.\n\r", ch);
+  send_to_char("Ok.\r\n", ch);
   return eSUCCESS;
 }
 
@@ -971,7 +971,7 @@ int do_drink(char_data *ch, char *argument, int cmd)
     {
       sprintf(buf, "$n drinks %s from $p.", drinks[temp->obj_flags.value[2]]);
       act(buf, ch, temp, 0, TO_ROOM, INVIS_NULL);
-      sprintf(buf, "You drink the %s.\n\r", drinks[temp->obj_flags.value[2]]);
+      sprintf(buf, "You drink the %s.\r\n", drinks[temp->obj_flags.value[2]]);
       send_to_char(buf, ch);
 
       if (GET_LEVEL(ch) >= IMMORTAL)
@@ -1018,7 +1018,7 @@ int do_drink(char_data *ch, char *argument, int cmd)
             ch, 0, 0, TO_ROOM, 0);
         if (number(1, 100) < get_saves(ch, SAVE_TYPE_POISON) - 15)
         {
-          send_to_char("Luckily, your body rejects the poison almost immediately.\n\r", ch);
+          send_to_char("Luckily, your body rejects the poison almost immediately.\r\n", ch);
         }
         else
         {
@@ -1101,7 +1101,7 @@ int do_eat(char_data *ch, char *argument, int cmd)
 
     if (number(1, 100) < get_saves(ch, SAVE_TYPE_POISON) - 15)
     {
-      send_to_char("Luckily, your body rejects the poison almost immediately.\n\r", ch);
+      send_to_char("Luckily, your body rejects the poison almost immediately.\r\n", ch);
     }
     else
     {
@@ -1207,7 +1207,7 @@ int do_pour(char_data *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  sprintf(buf, "You pour the %s into the %s.\n\r",
+  sprintf(buf, "You pour the %s into the %s.\r\n",
           drinks[from_obj->obj_flags.value[2]], arg2);
   send_to_char(buf, ch);
 
@@ -1276,7 +1276,7 @@ int do_sip(char_data *ch, char *argument, int cmd)
   }
 
   act("$n sips from the $o", ch, temp, 0, TO_ROOM, INVIS_NULL);
-  sprintf(buf, "It tastes like %s.\n\r", drinks[temp->obj_flags.value[2]]);
+  sprintf(buf, "It tastes like %s.\r\n", drinks[temp->obj_flags.value[2]]);
   send_to_char(buf, ch);
 
   gain_condition(ch, DRUNK,
@@ -1702,7 +1702,7 @@ void wear(char_data *ch, struct obj_data *obj_object, int keyword)
         perform_wear(ch, obj_object, keyword);
         if (ch->equipment[WEAR_FINGER_L])
         {
-          sprintf(buffer, "You put the %s on your right ring-finger.\n\r",
+          sprintf(buffer, "You put the %s on your right ring-finger.\r\n",
                   fname(obj_object->name));
           send_to_char(buffer, ch);
           obj_from_char(obj_object);
@@ -1710,7 +1710,7 @@ void wear(char_data *ch, struct obj_data *obj_object, int keyword)
         }
         else
         {
-          sprintf(buffer, "You put the %s on your left ring-finger.\n\r",
+          sprintf(buffer, "You put the %s on your left ring-finger.\r\n",
                   fname(obj_object->name));
           send_to_char(buffer, ch);
           obj_from_char(obj_object);
@@ -1719,7 +1719,7 @@ void wear(char_data *ch, struct obj_data *obj_object, int keyword)
       }
     }
     else
-      send_to_char("You can't wear that on your finger.\n\r", ch);
+      send_to_char("You can't wear that on your finger.\r\n", ch);
   }
   break;
   case 1:
@@ -1749,7 +1749,7 @@ void wear(char_data *ch, struct obj_data *obj_object, int keyword)
       }
     }
     else
-      send_to_char("You can't wear that around your neck.\n\r", ch);
+      send_to_char("You can't wear that around your neck.\r\n", ch);
   }
   break;
   case 2:
@@ -1770,7 +1770,7 @@ void wear(char_data *ch, struct obj_data *obj_object, int keyword)
       }
     }
     else
-      send_to_char("You can't wear that on your body.\n\r", ch);
+      send_to_char("You can't wear that on your body.\r\n", ch);
   }
   break;
   case 3:
@@ -1791,7 +1791,7 @@ void wear(char_data *ch, struct obj_data *obj_object, int keyword)
       }
     }
     else
-      send_to_char("You can't wear that on your head.\n\r", ch);
+      send_to_char("You can't wear that on your head.\r\n", ch);
   }
   break;
   case 4:
@@ -1812,7 +1812,7 @@ void wear(char_data *ch, struct obj_data *obj_object, int keyword)
       }
     }
     else
-      send_to_char("You can't wear that on your legs.\n\r", ch);
+      send_to_char("You can't wear that on your legs.\r\n", ch);
   }
   break;
   case 5:
@@ -1833,7 +1833,7 @@ void wear(char_data *ch, struct obj_data *obj_object, int keyword)
       }
     }
     else
-      send_to_char("You can't wear that on your feet.\n\r", ch);
+      send_to_char("You can't wear that on your feet.\r\n", ch);
   }
   break;
   case 6:
@@ -1854,7 +1854,7 @@ void wear(char_data *ch, struct obj_data *obj_object, int keyword)
       }
     }
     else
-      send_to_char("You can't wear that on your hands.\n\r", ch);
+      send_to_char("You can't wear that on your hands.\r\n", ch);
   }
   break;
   case 7:
@@ -1875,7 +1875,7 @@ void wear(char_data *ch, struct obj_data *obj_object, int keyword)
       }
     }
     else
-      send_to_char("You can't wear that on your arms.\n\r", ch);
+      send_to_char("You can't wear that on your arms.\r\n", ch);
   }
   break;
   case 8:
@@ -1896,7 +1896,7 @@ void wear(char_data *ch, struct obj_data *obj_object, int keyword)
       }
     }
     else
-      send_to_char("You can't wear that about your body.\n\r", ch);
+      send_to_char("You can't wear that about your body.\r\n", ch);
   }
   break;
   case 9:
@@ -1917,7 +1917,7 @@ void wear(char_data *ch, struct obj_data *obj_object, int keyword)
       }
     }
     else
-      send_to_char("You can't wear that about your waist.\n\r", ch);
+      send_to_char("You can't wear that about your waist.\r\n", ch);
   }
   break;
   case 10:
@@ -1937,14 +1937,14 @@ void wear(char_data *ch, struct obj_data *obj_object, int keyword)
         perform_wear(ch, obj_object, keyword);
         if (ch->equipment[WEAR_WRIST_L])
         {
-          sprintf(buffer, "You wear the %s around your right wrist.\n\r",
+          sprintf(buffer, "You wear the %s around your right wrist.\r\n",
                   fname(obj_object->name));
           send_to_char(buffer, ch);
           equip_char(ch, obj_object, WEAR_WRIST_R);
         }
         else
         {
-          sprintf(buffer, "You wear the %s around your left wrist.\n\r",
+          sprintf(buffer, "You wear the %s around your left wrist.\r\n",
                   fname(obj_object->name));
           send_to_char(buffer, ch);
           equip_char(ch, obj_object, WEAR_WRIST_L);
@@ -1952,7 +1952,7 @@ void wear(char_data *ch, struct obj_data *obj_object, int keyword)
       }
     }
     else
-      send_to_char("You can't wear that around your wrist.\n\r", ch);
+      send_to_char("You can't wear that around your wrist.\r\n", ch);
   }
   break;
 
@@ -1964,7 +1964,7 @@ void wear(char_data *ch, struct obj_data *obj_object, int keyword)
         send_to_char("You cannot wear this.\r\n", ch);
       else if ((ch->equipment[WEAR_FACE]))
       {
-        send_to_char("You only have one face.\n\r", ch);
+        send_to_char("You only have one face.\r\n", ch);
       }
       else
       {
@@ -1983,7 +1983,7 @@ void wear(char_data *ch, struct obj_data *obj_object, int keyword)
     {
       if (!ch->equipment[WIELD] && GET_OBJ_WEIGHT(obj_object) > MIN(GET_STR(ch), get_max_stat(ch, STR)) &&
           !ISSET(ch->affected_by, AFF_POWERWIELD))
-        send_to_char("It is too heavy for you to use.\n\r", ch);
+        send_to_char("It is too heavy for you to use.\r\n", ch);
       else if (ch->equipment[WIELD] && GET_OBJ_WEIGHT(obj_object) > MIN(GET_STR(ch) / 2, get_max_stat(ch, STR) / 2) &&
                !ISSET(ch->affected_by, AFF_POWERWIELD))
 
@@ -1991,9 +1991,9 @@ void wear(char_data *ch, struct obj_data *obj_object, int keyword)
 
       else if ((!hands_are_free(ch, 2)) &&
                (IS_SET(obj_object->obj_flags.extra_flags, ITEM_TWO_HANDED) && !ISSET(ch->affected_by, AFF_POWERWIELD)))
-        send_to_char("You need both hands for this weapon.\n\r", ch);
+        send_to_char("You need both hands for this weapon.\r\n", ch);
       else if (!hands_are_free(ch, 1))
-        send_to_char("Your hands are already full.\n\r", ch);
+        send_to_char("Your hands are already full.\r\n", ch);
 
       else if (IS_AFFECTED(ch, AFF_CHARM))
       {
@@ -2011,7 +2011,7 @@ void wear(char_data *ch, struct obj_data *obj_object, int keyword)
       }
     }
     else
-      send_to_char("You can't wield that.\n\r", ch);
+      send_to_char("You can't wield that.\r\n", ch);
     break;
 
   case 13:
@@ -2030,7 +2030,7 @@ void wear(char_data *ch, struct obj_data *obj_object, int keyword)
         send_to_char("You need both hands for this shield.\r\n", ch);
       }
       else if (!hands_are_free(ch, 1))
-        send_to_char("Your hands are already full.\n\r", ch);
+        send_to_char("Your hands are already full.\r\n", ch);
 
       else
       {
@@ -2041,7 +2041,7 @@ void wear(char_data *ch, struct obj_data *obj_object, int keyword)
     }
 
     else
-      send_to_char("You can't use that as a shield.\n\r", ch);
+      send_to_char("You can't use that as a shield.\r\n", ch);
   }
   break;
 
@@ -2052,7 +2052,7 @@ void wear(char_data *ch, struct obj_data *obj_object, int keyword)
       if (charmie_restricted(ch, obj_object, HOLD))
         send_to_char("You cannot wear this.\r\n", ch);
       else if (!hands_are_free(ch, 1))
-        send_to_char("Your hands are already full.\n\r", ch);
+        send_to_char("Your hands are already full.\r\n", ch);
       else if ((!hands_are_free(ch, 2)) &&
                (IS_SET(obj_object->obj_flags.extra_flags, ITEM_TWO_HANDED) && !ISSET(ch->affected_by, AFF_POWERWIELD)))
       {
@@ -2073,7 +2073,7 @@ void wear(char_data *ch, struct obj_data *obj_object, int keyword)
       }
     }
     else
-      send_to_char("You can't hold this.\n\r", ch);
+      send_to_char("You can't hold this.\r\n", ch);
     break;
 
   case 15:
@@ -2105,7 +2105,7 @@ void wear(char_data *ch, struct obj_data *obj_object, int keyword)
       }
     }
     else
-      send_to_char("You can't wear that in your ear.\n\r", ch);
+      send_to_char("You can't wear that in your ear.\r\n", ch);
   }
   break;
 
@@ -2123,7 +2123,7 @@ void wear(char_data *ch, struct obj_data *obj_object, int keyword)
       send_to_char("You need both hands for this light.\r\n", ch);
     }
     else if (!hands_are_free(ch, 1))
-      send_to_char("Your hands are already full.\n\r", ch);
+      send_to_char("Your hands are already full.\r\n", ch);
     else if (obj_object->obj_flags.type_flag != ITEM_LIGHT)
       send_to_char("That isn't a light you cheating fuck!\n\r", ch);
     else
@@ -2147,7 +2147,7 @@ void wear(char_data *ch, struct obj_data *obj_object, int keyword)
 
       if (!hands_are_free(ch, 1))
       {
-        send_to_char("Your hands are already full.\n\r", ch);
+        send_to_char("Your hands are already full.\r\n", ch);
         break;
       }
 
@@ -2172,18 +2172,18 @@ void wear(char_data *ch, struct obj_data *obj_object, int keyword)
       return;
     }
     else
-      send_to_char("You can't wield that.\n\r", ch);
+      send_to_char("You can't wield that.\r\n", ch);
     break;
 
   case -1:
   {
-    sprintf(buffer, "Wear %s where?.\n\r", fname(obj_object->name));
+    sprintf(buffer, "Wear %s where?.\r\n", fname(obj_object->name));
     send_to_char(buffer, ch);
   }
   break;
   case -2:
   {
-    sprintf(buffer, "You can't wear the %s.\n\r",
+    sprintf(buffer, "You can't wear the %s.\r\n",
             fname(obj_object->name));
     send_to_char(buffer, ch);
   }
@@ -2313,7 +2313,7 @@ int do_wear(char_data *ch, char *argument, int cmd)
       if (keyword == -1)
       {
         sprintf(buf,
-                "%s is an unknown body location.\n\r", arg2);
+                "%s is an unknown body location.\r\n", arg2);
         send_to_char(buf, ch);
       }
       else
@@ -2330,7 +2330,7 @@ int do_wear(char_data *ch, char *argument, int cmd)
   }
   else
   {
-    sprintf(buffer, "You do not seem to have the '%s'.\n\r", arg1);
+    sprintf(buffer, "You do not seem to have the '%s'.\r\n", arg1);
     send_to_char(buffer, ch);
   }
   return eSUCCESS;
@@ -2375,7 +2375,7 @@ int do_wield(char_data *ch, char *argument, int cmd)
     }
     else
     {
-      sprintf(buffer, "You do not seem to have the '%s'.\n\r", arg1);
+      sprintf(buffer, "You do not seem to have the '%s'.\r\n", arg1);
       send_to_char(buffer, ch);
     }
   }
@@ -2421,7 +2421,7 @@ int do_grab(char_data *ch, char *argument, int cmd)
     }
     else
     {
-      sprintf(buffer, "You do not seem to have the '%s'.\n\r", arg1);
+      sprintf(buffer, "You do not seem to have the '%s'.\r\n", arg1);
       send_to_char(buffer, ch);
     }
   }
@@ -2520,7 +2520,7 @@ int do_remove(char_data *ch, char *argument, int cmd)
 
             if (obj_index[obj_object->item_number].virt == SPIRIT_SHIELD_OBJ_NUMBER)
             {
-              send_to_room("The spirit shield shimmers brightly then fades away.\n\r", ch->in_room);
+              send_to_room("The spirit shield shimmers brightly then fades away.\r\n", ch->in_room);
               extract_obj(obj_object);
               continue;
             }
@@ -2532,7 +2532,7 @@ int do_remove(char_data *ch, char *argument, int cmd)
         }
         else
         {
-          send_to_char("You can't carry that many items.\n\r", ch);
+          send_to_char("You can't carry that many items.\r\n", ch);
           j = MAX_WEAR;
         }
       }
@@ -2574,7 +2574,7 @@ int do_remove(char_data *ch, char *argument, int cmd)
           }
           else if (obj_index[obj_object->item_number].virt == SPIRIT_SHIELD_OBJ_NUMBER)
           {
-            send_to_room("The spirit shield shimmers brightly then fades away.\n\r", ch->in_room);
+            send_to_room("The spirit shield shimmers brightly then fades away.\r\n", ch->in_room);
             extract_obj(obj_object);
             return eSUCCESS;
           }
@@ -2588,13 +2588,13 @@ int do_remove(char_data *ch, char *argument, int cmd)
         }
         else
         {
-          send_to_char("You can't carry that many items.\n\r", ch);
+          send_to_char("You can't carry that many items.\r\n", ch);
           j = MAX_WEAR;
         }
       }
       else
       {
-        send_to_char("You are not using it.\n\r", ch);
+        send_to_char("You are not using it.\r\n", ch);
       }
     }
   }

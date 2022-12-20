@@ -142,7 +142,7 @@ int do_quivering_palm(char_data *ch, char *argument, int cmd)
   }
 
   if(victim == ch) {
-    send_to_char("Masturbate on your own time.\n\r", ch);
+    send_to_char("Masturbate on your own time.\r\n", ch);
     return eFAILURE;
   }
 
@@ -152,7 +152,7 @@ int do_quivering_palm(char_data *ch, char *argument, int cmd)
   }
 
   if (IS_SET(world[ch->in_room].room_flags, NO_KI)) {
-    send_to_char("You find yourself unable to focus your energy here.\n\r", ch);
+    send_to_char("You find yourself unable to focus your energy here.\r\n", ch);
     return eFAILURE;
   }
 
@@ -217,7 +217,7 @@ int do_stun(char_data *ch, char *argument, int cmd)
   }
 
   if(victim == ch) {
-    send_to_char("Aren't we funny today...\n\r", ch);
+    send_to_char("Aren't we funny today...\r\n", ch);
     return eFAILURE;
   }
 

@@ -184,7 +184,7 @@ void shopping_buy(const char *arg, char_data *ch,
 
   if (!IS_MOB(ch) && affected_by_spell(ch, FUCK_GTHIEF))
   {
-    send_to_char("Your criminal acts prohibit it.\n\r", ch);
+    send_to_char("Your criminal acts prohibit it.\r\n", ch);
     return;
   }
 
@@ -223,13 +223,13 @@ void shopping_buy(const char *arg, char_data *ch,
 
   if (IS_CARRYING_N(ch) + 1 > CAN_CARRY_N(ch))
   {
-    send_to_char("You can't carry that many items.\n\r", ch);
+    send_to_char("You can't carry that many items.\r\n", ch);
     return;
   }
 
   if (IS_CARRYING_W(ch) + obj->obj_flags.weight > CAN_CARRY_W(ch))
   {
-    send_to_char("You can't carry that much weight.\n\r", ch);
+    send_to_char("You can't carry that much weight.\r\n", ch);
     return;
   }
 
@@ -245,7 +245,7 @@ void shopping_buy(const char *arg, char_data *ch,
   act("$n buys $p.", ch, obj, 0, TO_ROOM, 0);
   sprintf(buf, shop_index[shop_nr].message_buy, GET_NAME(ch), cost);
   do_tell(keeper, buf, 0);
-  sprintf(buf, "You now have %s.\n\r", obj->short_description);
+  sprintf(buf, "You now have %s.\r\n", obj->short_description);
   send_to_char(buf, ch);
   GET_GOLD(ch) -= cost;
   GET_GOLD(keeper) += cost;
@@ -297,7 +297,7 @@ void shopping_sell(const char *arg, char_data *ch,
 
   if (!IS_MOB(ch) && affected_by_spell(ch, FUCK_PTHIEF))
   {
-    send_to_char("Your criminal acts prohibit it.\n\r", ch);
+    send_to_char("Your criminal acts prohibit it.\r\n", ch);
     return;
   }
 
@@ -366,7 +366,7 @@ void shopping_sell(const char *arg, char_data *ch,
   act("$n sells $p.", ch, obj, 0, TO_ROOM, 0);
   sprintf(buf, shop_index[shop_nr].message_sell, GET_NAME(ch), cost);
   do_tell(keeper, buf, 0);
-  sprintf(buf, "The shopkeeper now has %s.\n\r", obj->short_description);
+  sprintf(buf, "The shopkeeper now has %s.\r\n", obj->short_description);
   send_to_char(buf, ch);
   GET_GOLD(ch) += cost;
   GET_GOLD(keeper) -= cost;
@@ -675,13 +675,13 @@ void shopping_list(const char *arg, char_data *ch,
         a++;
     /*        if ( GET_ITEM_TYPE(obj) == ITEM_DRINKCON && obj->obj_flags.value[1] )
             {
-                sprintf( buf, "[%3d] [%7d] %s of %s.\n\r",
+                sprintf( buf, "[%3d] [%7d] %s of %s.\r\n",
                     a, cost, obj->short_description,
                     drinks[obj->obj_flags.value[2]] );
             }
             else
             {*/
-    sprintf(buf, "[%3d] [%7d] %s.\n\r",
+    sprintf(buf, "[%3d] [%7d] %s.\r\n",
             a, cost, obj->short_description);
     //        }
     send_to_char(buf, ch);
@@ -1055,7 +1055,7 @@ void save_player_shop_world_range()
   sprintf(buf, "world/%s", curr->filename);
   if ((f = dc_fopen(buf, "w")) == NULL)
   {
-    fprintf(stderr, "Couldn't open room save file %s for player shops.\n\r",
+    fprintf(stderr, "Couldn't open room save file %s for player shops.\r\n",
             curr->filename);
     return;
   }
@@ -1354,7 +1354,7 @@ void player_shopping_design(const char *arg, char_data *ch, char_data *keeper)
   {
     if (pdesign_values[skill][0] == '\n')
     {
-      send_to_char("Invalid field.\n\r", ch);
+      send_to_char("Invalid field.\r\n", ch);
       return;
     }
     if (is_abbrev(select, pdesign_values[skill]))
@@ -1536,7 +1536,7 @@ int do_pshopedit(char_data * ch, char * arg, int cmd)
   {
     if(pshopedit_values[skill][0] == '\n')
     {
-      send_to_char("Invalid field.\n\r", ch);
+      send_to_char("Invalid field.\r\n", ch);
       return eFAILURE;
     }
     if(is_abbrev(select, pshopedit_values[skill]))
@@ -1748,22 +1748,22 @@ int eddie_shopkeeper(char_data *ch, struct obj_data *obj, int cmd, const char *a
     csendf(ch, "--------------------------------------------------------------------------------\n\r");
 
     /*
-    send_to_char(" $B$31)$R Cloverleaf Token      Cost: 2 Wingding tokens.\n\r", ch);
-    send_to_char(" $B$32)$R Cloverleaf Token      Cost: 2 Meatball tokens.\n\r", ch);
-    send_to_char(" $B$33)$R Cloverleaf Token      Cost: 2 Apocalypse tokens.\n\r", ch);
+    send_to_char(" $B$31)$R Cloverleaf Token      Cost: 2 Wingding tokens.\r\n", ch);
+    send_to_char(" $B$32)$R Cloverleaf Token      Cost: 2 Meatball tokens.\r\n", ch);
+    send_to_char(" $B$33)$R Cloverleaf Token      Cost: 2 Apocalypse tokens.\r\n", ch);
 
-    send_to_char(" $B$34)$R Wingding Token        Cost: 3 Cloverleaf tokens.\n\r", ch);
-    send_to_char(" $B$35)$R Wingding Token        Cost: 2 Meatball tokens.\n\r", ch);
-    send_to_char(" $B$36)$R Wingding Token        Cost: 2 Apocalypse tokens.\n\r", ch);
+    send_to_char(" $B$34)$R Wingding Token        Cost: 3 Cloverleaf tokens.\r\n", ch);
+    send_to_char(" $B$35)$R Wingding Token        Cost: 2 Meatball tokens.\r\n", ch);
+    send_to_char(" $B$36)$R Wingding Token        Cost: 2 Apocalypse tokens.\r\n", ch);
 
-    send_to_char(" $B$37)$R Meatball Token        Cost: 3 Cloverleaf tokens.\n\r", ch);
-    send_to_char(" $B$38)$R Meatball Token        Cost: 2 Wingding tokens.\n\r", ch);
-    send_to_char(" $B$39)$R Meatball Token        Cost: 2 Apocalypse tokens.\n\r", ch);
+    send_to_char(" $B$37)$R Meatball Token        Cost: 3 Cloverleaf tokens.\r\n", ch);
+    send_to_char(" $B$38)$R Meatball Token        Cost: 2 Wingding tokens.\r\n", ch);
+    send_to_char(" $B$39)$R Meatball Token        Cost: 2 Apocalypse tokens.\r\n", ch);
 
-    send_to_char("$B$310)$R Apocalypse Token      Cost: 2 Wingding tokens.\n\r", ch);
-    send_to_char("$B$311)$R Apocalypse Token      Cost: 2 Meatball tokens.\n\r", ch);
+    send_to_char("$B$310)$R Apocalypse Token      Cost: 2 Wingding tokens.\r\n", ch);
+    send_to_char("$B$311)$R Apocalypse Token      Cost: 2 Meatball tokens.\r\n", ch);
 
-    send_to_char("$B$312)$R Brownie Point         Cost: 10 Cloverleaf tokens.\n\r", ch);
+    send_to_char("$B$312)$R Brownie Point         Cost: 10 Cloverleaf tokens.\r\n", ch);
     */
     return eSUCCESS;
   }
@@ -1783,7 +1783,7 @@ int eddie_shopkeeper(char_data *ch, struct obj_data *obj, int cmd, const char *a
     int choice = atoi(arg1);
     if (choice < 1 || choice > MAX_EDDIE_ITEMS)
     {
-      csendf(ch, "Invalid number. Choose between 1 and %d.\n\r", MAX_EDDIE_ITEMS);
+      csendf(ch, "Invalid number. Choose between 1 and %d.\r\n", MAX_EDDIE_ITEMS);
       return eSUCCESS;
     }
 
@@ -1820,7 +1820,7 @@ int eddie_shopkeeper(char_data *ch, struct obj_data *obj, int cmd, const char *a
 
       if (count < eddie[choice - 1].cost_qty)
       {
-        send_to_char("You don't have enough to trade.\n\r", ch);
+        send_to_char("You don't have enough to trade.\r\n", ch);
         return eSUCCESS;
       }
 
@@ -1848,7 +1848,7 @@ int eddie_shopkeeper(char_data *ch, struct obj_data *obj, int cmd, const char *a
         }
         else
         {
-          csendf(ch, "An error occured.\n\r");
+          csendf(ch, "An error occured.\r\n");
           do_save(ch, "", 666);
           return eSUCCESS;
         }
@@ -1872,7 +1872,7 @@ int eddie_shopkeeper(char_data *ch, struct obj_data *obj, int cmd, const char *a
       }
       else
       {
-        csendf(ch, "An error occured.\n\r");
+        csendf(ch, "An error occured.\r\n");
         do_save(ch, "", 666);
         return eSUCCESS;
       }

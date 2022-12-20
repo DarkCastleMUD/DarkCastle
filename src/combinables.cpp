@@ -467,7 +467,7 @@ int do_brew(char_data *ch, char *argument, int cmd)
 
   if (affected_by_spell(ch, SKILL_BREW_TIMER))
   {
-    send_to_char("You aren't ready to brew anything again.\n\r", ch);
+    send_to_char("You aren't ready to brew anything again.\r\n", ch);
     return eFAILURE;
   }
 
@@ -476,7 +476,7 @@ int do_brew(char_data *ch, char *argument, int cmd)
 
   if (!*liquid)
   {
-    send_to_char("You'll need to choose a liquid type and container.\n\r"
+    send_to_char("You'll need to choose a liquid type and container.\r\n"
                  "$3Syntax:$R brew <herb> <liquid> <container>\n\r",
                  ch);
     return eFAILURE;
@@ -484,7 +484,7 @@ int do_brew(char_data *ch, char *argument, int cmd)
 
   if (!*container)
   {
-    send_to_char("You'll need to select a container.\n\r"
+    send_to_char("You'll need to select a container.\r\n"
                  "$3Syntax:$R brew <herb> <liquid> <container>\n\r",
                  ch);
     return eFAILURE;
@@ -496,41 +496,41 @@ int do_brew(char_data *ch, char *argument, int cmd)
 
   if (!herbobj)
   {
-    send_to_char("You do not have that type of herb.\n\r", ch);
+    send_to_char("You do not have that type of herb.\r\n", ch);
     return eFAILURE;
   }
   if (herbobj->obj_flags.type_flag != ITEM_OTHER)
   {
-    send_to_char("That is not an herb.\n\r", ch);
+    send_to_char("That is not an herb.\r\n", ch);
     return eFAILURE;
   }
 
   if (!liquidobj)
   {
-    send_to_char("You do not have that type of liquid.\n\r", ch);
+    send_to_char("You do not have that type of liquid.\r\n", ch);
     return eFAILURE;
   }
   if (liquidobj->obj_flags.type_flag != ITEM_DRINKCON)
   {
-    send_to_char("That is not a liquid container.\n\r", ch);
+    send_to_char("That is not a liquid container.\r\n", ch);
     return eFAILURE;
   }
 
   if (!containerobj)
   {
-    send_to_char("You do not have that type of container.\n\r", ch);
+    send_to_char("You do not have that type of container.\r\n", ch);
     return eFAILURE;
   }
 
   if (containerobj->obj_flags.type_flag != ITEM_POTION && containerobj->obj_flags.type_flag != ITEM_DRINKCON)
   {
-    send_to_char("That is not a target container.\n\r", ch);
+    send_to_char("That is not a target container.\r\n", ch);
     return eFAILURE;
   }
 
   if (IS_SET(containerobj->obj_flags.more_flags, ITEM_CUSTOM))
   {
-    send_to_char("That container is already a brewed potion.\n\r", ch);
+    send_to_char("That container is already a brewed potion.\r\n", ch);
     return eFAILURE;
   }
 
@@ -542,7 +542,7 @@ int do_brew(char_data *ch, char *argument, int cmd)
 
   if (liquidobj->obj_flags.value[1] < 1)
   {
-    send_to_char("There is no liquid left in that container.\n\r", ch);
+    send_to_char("There is no liquid left in that container.\r\n", ch);
     return eFAILURE;
   }
 
@@ -823,7 +823,7 @@ int Brew::add(char_data *ch, char *argument)
 
   if (herb_vnum < 6301 || herb_vnum > 6312)
   {
-    send_to_char("Only vnums 6301-6312 are valid herbs.\n\r", ch);
+    send_to_char("Only vnums 6301-6312 are valid herbs.\r\n", ch);
     return eFAILURE;
   }
 
@@ -834,7 +834,7 @@ int Brew::add(char_data *ch, char *argument)
   case LIQ_SALTWATER:
     break;
   default:
-    csendf(ch, "Invalid liquid type. Only Milk (%d), Wine (%d), Salt Water (%d) allowed.\n\r",
+    csendf(ch, "Invalid liquid type. Only Milk (%d), Wine (%d), Salt Water (%d) allowed.\r\n",
            LIQ_MILK, LIQ_WINE, LIQ_SALTWATER);
     return eFAILURE;
     break;
@@ -842,7 +842,7 @@ int Brew::add(char_data *ch, char *argument)
 
   if (container_vnum < 6320 || container_vnum > 6324)
   {
-    send_to_char("Only vnums 6320-6324 are valid containers.\n\r", ch);
+    send_to_char("Only vnums 6320-6324 are valid containers.\r\n", ch);
     return eFAILURE;
   }
 
@@ -855,7 +855,7 @@ int Brew::add(char_data *ch, char *argument)
   recipe r = {herb_vnum, liquid_type, container_vnum};
   recipes.insert(make_pair(r, spell));
 
-  send_to_char("New brew recipe added.\n\r", ch);
+  send_to_char("New brew recipe added.\r\n", ch);
 
   return eSUCCESS;
 }
@@ -881,13 +881,13 @@ int Brew::remove(char_data *ch, char *argument)
     if (++i == target)
     {
       recipes.erase((*iter).first);
-      csendf(ch, "Recipe # %d has been removed.\n\r", target);
+      csendf(ch, "Recipe # %d has been removed.\r\n", target);
 
       return eSUCCESS;
     }
   }
 
-  csendf(ch, "Recipe # %d not found.\n\r", target);
+  csendf(ch, "Recipe # %d not found.\r\n", target);
   return eFAILURE;
 }
 
@@ -974,7 +974,7 @@ int do_scribe(char_data *ch, char *argument, int cmd)
 
   if (affected_by_spell(ch, SKILL_SCRIBE_TIMER))
   {
-    send_to_char("You aren't ready to scribe anything again.\n\r", ch);
+    send_to_char("You aren't ready to scribe anything again.\r\n", ch);
     return eFAILURE;
   }
 
@@ -984,7 +984,7 @@ int do_scribe(char_data *ch, char *argument, int cmd)
 
   if (!*dust)
   {
-    send_to_char("You'll need to choose a dust, pen and paper.\n\r"
+    send_to_char("You'll need to choose a dust, pen and paper.\r\n"
                  "$3Syntax:$R scribe <ink> <dust> <pen> <paper>\n\r",
                  ch);
     return eFAILURE;
@@ -992,7 +992,7 @@ int do_scribe(char_data *ch, char *argument, int cmd)
 
   if (!*pen)
   {
-    send_to_char("You'll need to choose a pen and paper.\n\r"
+    send_to_char("You'll need to choose a pen and paper.\r\n"
                  "$3Syntax:$R scribe <ink> <dust> <pen> <paper>\n\r",
                  ch);
     return eFAILURE;
@@ -1000,7 +1000,7 @@ int do_scribe(char_data *ch, char *argument, int cmd)
 
   if (!*paper)
   {
-    send_to_char("You'll need to select a paper.\n\r"
+    send_to_char("You'll need to select a paper.\r\n"
                  "$3Syntax:$R scribe <ink> <dust> <pen> <paper>\n\r",
                  ch);
     return eFAILURE;
@@ -1013,51 +1013,51 @@ int do_scribe(char_data *ch, char *argument, int cmd)
 
   if (!inkobj)
   {
-    send_to_char("You do not have that type of ink.\n\r", ch);
+    send_to_char("You do not have that type of ink.\r\n", ch);
     return eFAILURE;
   }
   if (inkobj->obj_flags.type_flag != ITEM_DRINKCON || inkobj->obj_flags.value[2] != LIQ_INK)
   {
-    send_to_char("That is not ink.\n\r", ch);
+    send_to_char("That is not ink.\r\n", ch);
     return eFAILURE;
   }
 
   if (!dustobj)
   {
-    send_to_char("You do not have that type of dust.\n\r", ch);
+    send_to_char("You do not have that type of dust.\r\n", ch);
     return eFAILURE;
   }
   if (dustobj->obj_flags.type_flag != ITEM_OTHER)
   {
-    send_to_char("That is not dust.\n\r", ch);
+    send_to_char("That is not dust.\r\n", ch);
     return eFAILURE;
   }
 
   if (!penobj)
   {
-    send_to_char("You do not have that type of pen.\n\r", ch);
+    send_to_char("You do not have that type of pen.\r\n", ch);
     return eFAILURE;
   }
   if (penobj->obj_flags.type_flag != ITEM_PEN)
   {
-    send_to_char("That is not a pen.\n\r", ch);
+    send_to_char("That is not a pen.\r\n", ch);
     return eFAILURE;
   }
 
   if (!paperobj)
   {
-    send_to_char("You do not have that type of paper.\n\r", ch);
+    send_to_char("You do not have that type of paper.\r\n", ch);
     return eFAILURE;
   }
   if (paperobj->obj_flags.type_flag != ITEM_SCROLL)
   {
-    send_to_char("That is not paper.\n\r", ch);
+    send_to_char("That is not paper.\r\n", ch);
     return eFAILURE;
   }
 
   if (inkobj->obj_flags.value[1] < 1)
   {
-    send_to_char("There is no liquid left in that ink container.\n\r", ch);
+    send_to_char("There is no liquid left in that ink container.\r\n", ch);
     return eFAILURE;
   }
 
@@ -1291,25 +1291,25 @@ int Scribe::add(char_data *ch, char *argument)
 
   if (ink_vnum < 6326 || ink_vnum > 6328)
   {
-    send_to_char("Only vnums 6326-6328 are valid inks.\n\r", ch);
+    send_to_char("Only vnums 6326-6328 are valid inks.\r\n", ch);
     return eFAILURE;
   }
 
   if (dust_vnum < 6335 || dust_vnum > 6337)
   {
-    send_to_char("Only vnums 6335-6337 are valid dusts.\n\r", ch);
+    send_to_char("Only vnums 6335-6337 are valid dusts.\r\n", ch);
     return eFAILURE;
   }
 
   if (pen_vnum < 6329 || pen_vnum > 6334)
   {
-    send_to_char("Only vnums 6329-6334 are valid pens.\n\r", ch);
+    send_to_char("Only vnums 6329-6334 are valid pens.\r\n", ch);
     return eFAILURE;
   }
 
   if (paper_vnum < 6338 || paper_vnum > 6342)
   {
-    send_to_char("Only vnums 6338-6342 are valid papers.\n\r", ch);
+    send_to_char("Only vnums 6338-6342 are valid papers.\r\n", ch);
     return eFAILURE;
   }
 
@@ -1322,7 +1322,7 @@ int Scribe::add(char_data *ch, char *argument)
   recipe r = {ink_vnum, dust_vnum, pen_vnum, paper_vnum};
   recipes.insert(make_pair(r, spell));
 
-  send_to_char("New scribe recipe added.\n\r", ch);
+  send_to_char("New scribe recipe added.\r\n", ch);
 
   return eSUCCESS;
 }
@@ -1348,13 +1348,13 @@ int Scribe::remove(char_data *ch, char *argument)
     if (++i == target)
     {
       recipes.erase((*iter).first);
-      csendf(ch, "Recipe # %d has been removed.\n\r", target);
+      csendf(ch, "Recipe # %d has been removed.\r\n", target);
 
       return eSUCCESS;
     }
   }
 
-  csendf(ch, "Recipe # %d not found.\n\r", target);
+  csendf(ch, "Recipe # %d not found.\r\n", target);
   return eFAILURE;
 }
 

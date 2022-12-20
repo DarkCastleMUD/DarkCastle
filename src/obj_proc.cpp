@@ -520,7 +520,7 @@ int lilithring(char_data *ch, struct obj_data *obj, int cmd, const char *arg, ch
 
   if (circle_follow(victim, ch))
   {
-    send_to_char("Sorry, following in circles can not be allowed.\n\r", ch);
+    send_to_char("Sorry, following in circles can not be allowed.\r\n", ch);
     return eSUCCESS;
   }
 
@@ -773,7 +773,7 @@ int bank(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
   {
     if (!IS_MOB(ch) && affected_by_spell(ch, FUCK_GTHIEF))
     {
-      send_to_char("Your criminal acts prohibit it.\n\r", ch);
+      send_to_char("Your criminal acts prohibit it.\r\n", ch);
       return eFAILURE;
     }
 
@@ -958,16 +958,16 @@ struct assemble_item assemble_items[] = {
      17348},
 
     // Item 6, the Shield of the Beholder
-    {"You place the two gems into the holes on the shield and it seems to hum with power.\n\r",
-     "$n places two precious gemstones into a beholder's carapace to create a shield.\n\r",
-     "You seem to be missing a piece.\n\r",
+    {"You place the two gems into the holes on the shield and it seems to hum with power.\r\n",
+     "$n places two precious gemstones into a beholder's carapace to create a shield.\r\n",
+     "You seem to be missing a piece.\r\n",
      {5260, 5261, 5262, -1, -1, -1, -1, -1, -1, -1},
      5263},
 
     // Item 7, a curiously notched medallion
-    {"With a blinding flash, the gem makes the medallion whole.\n\r",
+    {"With a blinding flash, the gem makes the medallion whole.\r\n",
      "As $n fiddles with the medallion pieces, you are dazed by a bright flash!\n\r",
-     "You attempt to assemble the family medallion but something is missing.\n\r",
+     "You attempt to assemble the family medallion but something is missing.\r\n",
      {30084, 30085, 30086, 30087, 30088, -1, -1, -1, -1, -1},
      30083},
 
@@ -1071,7 +1071,7 @@ bool assemble_item_index(char_data *ch, int item_index)
       logf(ANGEL, LogChannels::LOG_BUG, "assemble_items[%d], component_index %d refers to invalid rnum %d for vnum %d.",
            item_index, component_index, component_real, component_virt);
 
-      send_to_char("There was an internal malfunction assembling your item. Contact an Immortal.\n\r", ch);
+      send_to_char("There was an internal malfunction assembling your item. Contact an Immortal.\r\n", ch);
       produce_coredump();
       return true;
     }
@@ -1116,7 +1116,7 @@ bool assemble_item_index(char_data *ch, int item_index)
       logf(ANGEL, LogChannels::LOG_BUG, "assemble_items index %d, component_index %d refers to invalid rnum %d for vnum %d.",
            item_index, component_index, component_real, component_virt);
 
-      send_to_char("There was an internal malfunction assembling your item. Contact an Immortal.\n\r", ch);
+      send_to_char("There was an internal malfunction assembling your item. Contact an Immortal.\r\n", ch);
       return true;
     }
 
@@ -1130,7 +1130,7 @@ bool assemble_item_index(char_data *ch, int item_index)
   if (reward_item == 0)
   {
     logf(ANGEL, LogChannels::LOG_BUG, "Unable to clone vnum %d, rnum %d.", item_vnum, item_real);
-    send_to_char("There was an internal malfunction cloning the new item. Contact an Immortal.\n\r", ch);
+    send_to_char("There was an internal malfunction cloning the new item. Contact an Immortal.\r\n", ch);
     return true;
   }
 
@@ -1191,7 +1191,7 @@ int do_assemble(char_data *ch, char *argument, int cmd)
     }
     else if (last_item_index == -1)
     {
-      csendf(ch, "You don't have anything that can be assembled.\n\r");
+      csendf(ch, "You don't have anything that can be assembled.\r\n");
       return eFAILURE;
     }
     else
@@ -1221,7 +1221,7 @@ int do_assemble(char_data *ch, char *argument, int cmd)
   // Object specified is not part of an item that can be assembled
   if (item_index == -1)
   {
-    csendf(ch, "That item can't be assembled into anything.\n\r");
+    csendf(ch, "That item can't be assembled into anything.\r\n");
     return eFAILURE;
   }
 
@@ -1251,7 +1251,7 @@ int stupid_button(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
   }
 
   send_to_char("You couldn't help but push the $4$Bbutton$R, could you?\n\r", ch);
-  send_to_char("The floor drops out beneath you and you find yourself.. er.. somewhere.\n\r", ch);
+  send_to_char("The floor drops out beneath you and you find yourself.. er.. somewhere.\r\n", ch);
   move_char(ch, real_room(49));
   do_look(ch, "\0", 15);
   return eSUCCESS;
@@ -1954,7 +1954,7 @@ int generic_push_proc(char_data *ch, struct obj_data *obj, int cmd, const char *
   switch (obj_vnum)
   {
   case 26723: // transporter in star-trek
-    send_to_room("You hear a chiming electrical noise as the transporter hums to life.\n\r", obj->in_room);
+    send_to_room("You hear a chiming electrical noise as the transporter hums to life.\r\n", obj->in_room);
     for (victim = world[obj->in_room].people; victim; victim = next_vict)
     {
       next_vict = victim->next_in_room;
@@ -1990,13 +1990,13 @@ int portal_word(char_data *ch, struct obj_data *obj, int cmd, char *arg,
       if (0 == obj->obj_flags.value[3])
       {
         if (obj->carried_by)
-          send_to_char("Your enchanted box seems to be recharged.\n\r", obj->carried_by);
+          send_to_char("Your enchanted box seems to be recharged.\r\n", obj->carried_by);
         else if (obj->equipped_by)
-          send_to_char("Your enchanted box seems to be recharged.\n\r", obj->equipped_by);
+          send_to_char("Your enchanted box seems to be recharged.\r\n", obj->equipped_by);
         else if (obj->in_obj && obj->in_obj->carried_by)
-          send_to_char("Your enchanted box seems to be recharged.\n\r", obj->in_obj->carried_by);
+          send_to_char("Your enchanted box seems to be recharged.\r\n", obj->in_obj->carried_by);
         else if (obj->in_obj && obj->in_obj->equipped_by)
-          send_to_char("Your enchanted box seems to be recharged.\n\r", obj->in_obj->equipped_by);
+          send_to_char("Your enchanted box seems to be recharged.\r\n", obj->in_obj->equipped_by);
       }
     }
   }
@@ -2050,13 +2050,13 @@ int full_heal_word(char_data *ch, struct obj_data *obj, int cmd, char *arg,
       if (0 == obj->obj_flags.value[3])
       {
         if (obj->carried_by)
-          send_to_char("Your enchanted box seems to be recharged.\n\r", obj->carried_by);
+          send_to_char("Your enchanted box seems to be recharged.\r\n", obj->carried_by);
         else if (obj->equipped_by)
-          send_to_char("Your enchanted box seems to be recharged.\n\r", obj->equipped_by);
+          send_to_char("Your enchanted box seems to be recharged.\r\n", obj->equipped_by);
         else if (obj->in_obj && obj->in_obj->carried_by)
-          send_to_char("Your enchanted box seems to be recharged.\n\r", obj->in_obj->carried_by);
+          send_to_char("Your enchanted box seems to be recharged.\r\n", obj->in_obj->carried_by);
         else if (obj->in_obj && obj->in_obj->equipped_by)
-          send_to_char("Your enchanted box seems to be recharged.\n\r", obj->in_obj->equipped_by);
+          send_to_char("Your enchanted box seems to be recharged.\r\n", obj->in_obj->equipped_by);
       }
     }
   }
@@ -2132,13 +2132,13 @@ int fireshield_word(char_data *ch, struct obj_data *obj, int cmd, char *arg,
       if (0 == obj->obj_flags.value[3])
       {
         if (obj->carried_by)
-          send_to_char("Your enchanted box seems to be recharged.\n\r", obj->carried_by);
+          send_to_char("Your enchanted box seems to be recharged.\r\n", obj->carried_by);
         else if (obj->equipped_by)
-          send_to_char("Your enchanted box seems to be recharged.\n\r", obj->equipped_by);
+          send_to_char("Your enchanted box seems to be recharged.\r\n", obj->equipped_by);
         else if (obj->in_obj && obj->in_obj->carried_by)
-          send_to_char("Your enchanted box seems to be recharged.\n\r", obj->in_obj->carried_by);
+          send_to_char("Your enchanted box seems to be recharged.\r\n", obj->in_obj->carried_by);
         else if (obj->in_obj && obj->in_obj->equipped_by)
-          send_to_char("Your enchanted box seems to be recharged.\n\r", obj->in_obj->equipped_by);
+          send_to_char("Your enchanted box seems to be recharged.\r\n", obj->in_obj->equipped_by);
       }
     }
   }
@@ -2187,13 +2187,13 @@ int teleport_word(char_data *ch, struct obj_data *obj, int cmd, char *arg,
       if (0 == obj->obj_flags.value[3])
       {
         if (obj->carried_by)
-          send_to_char("Your enchanted box seems to be recharged.\n\r", obj->carried_by);
+          send_to_char("Your enchanted box seems to be recharged.\r\n", obj->carried_by);
         else if (obj->equipped_by)
-          send_to_char("Your enchanted box seems to be recharged.\n\r", obj->equipped_by);
+          send_to_char("Your enchanted box seems to be recharged.\r\n", obj->equipped_by);
         else if (obj->in_obj && obj->in_obj->carried_by)
-          send_to_char("Your enchanted box seems to be recharged.\n\r", obj->in_obj->carried_by);
+          send_to_char("Your enchanted box seems to be recharged.\r\n", obj->in_obj->carried_by);
         else if (obj->in_obj && obj->in_obj->equipped_by)
-          send_to_char("Your enchanted box seems to be recharged.\n\r", obj->in_obj->equipped_by);
+          send_to_char("Your enchanted box seems to be recharged.\r\n", obj->in_obj->equipped_by);
       }
     }
   }
@@ -2253,13 +2253,13 @@ int alignment_word(char_data *ch, struct obj_data *obj, int cmd, char *arg,
       if (0 == obj->obj_flags.value[3])
       {
         if (obj->carried_by)
-          send_to_char("Your enchanted box seems to be recharged.\n\r", obj->carried_by);
+          send_to_char("Your enchanted box seems to be recharged.\r\n", obj->carried_by);
         else if (obj->equipped_by)
-          send_to_char("Your enchanted box seems to be recharged.\n\r", obj->equipped_by);
+          send_to_char("Your enchanted box seems to be recharged.\r\n", obj->equipped_by);
         else if (obj->in_obj && obj->in_obj->carried_by)
-          send_to_char("Your enchanted box seems to be recharged.\n\r", obj->in_obj->carried_by);
+          send_to_char("Your enchanted box seems to be recharged.\r\n", obj->in_obj->carried_by);
         else if (obj->in_obj && obj->in_obj->equipped_by)
-          send_to_char("Your enchanted box seems to be recharged.\n\r", obj->in_obj->equipped_by);
+          send_to_char("Your enchanted box seems to be recharged.\r\n", obj->in_obj->equipped_by);
       }
     }
   }
@@ -2315,13 +2315,13 @@ int protection_word(char_data *ch, struct obj_data *obj, int cmd, char *arg,
       if (0 == obj->obj_flags.value[3])
       {
         if (obj->carried_by)
-          send_to_char("Your enchanted box seems to be recharged.\n\r", obj->carried_by);
+          send_to_char("Your enchanted box seems to be recharged.\r\n", obj->carried_by);
         else if (obj->equipped_by)
-          send_to_char("Your enchanted box seems to be recharged.\n\r", obj->equipped_by);
+          send_to_char("Your enchanted box seems to be recharged.\r\n", obj->equipped_by);
         else if (obj->in_obj && obj->in_obj->carried_by)
-          send_to_char("Your enchanted box seems to be recharged.\n\r", obj->in_obj->carried_by);
+          send_to_char("Your enchanted box seems to be recharged.\r\n", obj->in_obj->carried_by);
         else if (obj->in_obj && obj->in_obj->equipped_by)
-          send_to_char("Your enchanted box seems to be recharged.\n\r", obj->in_obj->equipped_by);
+          send_to_char("Your enchanted box seems to be recharged.\r\n", obj->in_obj->equipped_by);
       }
     }
   }
@@ -2379,9 +2379,9 @@ int pull_proc(char_data *ch, struct obj_data *obj, int cmd, const char *arg, cha
     // unlock the gate
     REMOVE_BIT(world[9531].dir_option[1]->exit_info, EX_LOCKED);
     REMOVE_BIT(world[9532].dir_option[3]->exit_info, EX_LOCKED);
-    send_to_room("You hear a large clicking noise.\n\r", 9531, TRUE);
-    send_to_room("You hear a large clicking noise.\n\r", 9532, TRUE);
-    send_to_room("You hear a large clicking noise.\n\r", ch->in_room, TRUE);
+    send_to_room("You hear a large clicking noise.\r\n", 9531, TRUE);
+    send_to_room("You hear a large clicking noise.\r\n", 9532, TRUE);
+    send_to_room("You hear a large clicking noise.\r\n", ch->in_room, TRUE);
     break;
   case 29203:
     if (obj_index[real_object(29202)].number > 0)
@@ -2664,13 +2664,13 @@ int no_magic_while_alive(char_data *ch, struct obj_data *obj, int cmd, const cha
   if (vict)
   {
     if (!IS_SET(world[obj->in_room].room_flags, NO_MAGIC))
-      send_to_room("With an audible whoosh, the flow of magic is sucked from the room.\n\r", obj->in_room);
+      send_to_room("With an audible whoosh, the flow of magic is sucked from the room.\r\n", obj->in_room);
     SET_BIT(world[obj->in_room].room_flags, NO_MAGIC);
   }
   else
   {
     if (IS_SET(world[obj->in_room].room_flags, NO_MAGIC))
-      send_to_room("With a large popping noise, the flow of magic returns to the room.\n\r", obj->in_room);
+      send_to_room("With a large popping noise, the flow of magic returns to the room.\r\n", obj->in_room);
     REMOVE_BIT(world[obj->in_room].room_flags, NO_MAGIC);
   }
   return eSUCCESS;
@@ -2752,7 +2752,7 @@ int boat_proc(char_data *ch, struct obj_data *obj, int cmd, const char *arg, cha
       if (obj->obj_flags.value[0] == -1) // at beginning
       {
         obj->obj_flags.value[0] = 1;
-        send_to_boat(obj_index[obj->item_number].virt, "The ship docks at its destination.\n\r");
+        send_to_boat(obj_index[obj->item_number].virt, "The ship docks at its destination.\r\n");
       }
     }
     else
@@ -2762,14 +2762,14 @@ int boat_proc(char_data *ch, struct obj_data *obj, int cmd, const char *arg, cha
       if (obj->obj_flags.value[0] == boat_list[0]) // at beginning
       {
         obj->obj_flags.value[0] *= -1;
-        send_to_boat(obj_index[obj->item_number].virt, "The ship docks at its destination.\n\r");
+        send_to_boat(obj_index[obj->item_number].virt, "The ship docks at its destination.\r\n");
       }
     }
-    send_to_room("The ship sails away.\n\r", obj->in_room, TRUE);
-    send_to_boat(obj_index[obj->item_number].virt, "The ship sails onwards.\n\r");
+    send_to_room("The ship sails away.\r\n", obj->in_room, TRUE);
+    send_to_boat(obj_index[obj->item_number].virt, "The ship sails onwards.\r\n");
     obj_from_room(obj);
     obj_to_room(obj, move_to);
-    send_to_room("A ship sails in.\n\r", obj->in_room, TRUE);
+    send_to_room("A ship sails in.\r\n", obj->in_room, TRUE);
   }
   return eSUCCESS;
 }
@@ -2800,7 +2800,7 @@ int leave_boat_proc(char_data *ch, struct obj_data *obj, int cmd, const char *ar
 
     if (obj2 == NULL)
     {
-      send_to_char("Cannot find your boat obj.  BUG.  Tell a god.\n\r", ch);
+      send_to_char("Cannot find your boat obj.  BUG.  Tell a god.\r\n", ch);
       return eSUCCESS;
     }
 
@@ -2875,10 +2875,10 @@ int mob_summoner(char_data *ch, struct obj_data *obj, int cmd, const char *arg, 
     switch (obj->obj_flags.value[0])
     {
     case 0:
-      send_to_room("The shadows in the room begin to shift and slide in tricks of the light.\n\r", BONEWRACK_ROOM, TRUE);
+      send_to_room("The shadows in the room begin to shift and slide in tricks of the light.\r\n", BONEWRACK_ROOM, TRUE);
       break;
     case 1:
-      send_to_zone("A loud roar echos audibly through the entire kingdom.\n\r", world[obj->in_room].zone);
+      send_to_zone("A loud roar echos audibly through the entire kingdom.\r\n", world[obj->in_room].zone);
       break;
     case 2:
       send_to_room("The dragon $B$2Bonewrack$R flies in from above!\n\r", BONEWRACK_ROOM, TRUE);
@@ -2899,10 +2899,10 @@ int mob_summoner(char_data *ch, struct obj_data *obj, int cmd, const char *arg, 
     switch (obj->obj_flags.value[0])
     {
     case 0:
-      send_to_room("In the distance a winged creature can be seen flying towards you.\n\r", GAIOT_AVATAR, TRUE);
+      send_to_room("In the distance a winged creature can be seen flying towards you.\r\n", GAIOT_AVATAR, TRUE);
       break;
     case 1:
-      send_to_room("The winged creature flies closer and closer.\n\r", GAIOT_AVATAR, TRUE);
+      send_to_room("The winged creature flies closer and closer.\r\n", GAIOT_AVATAR, TRUE);
       break;
     case 2:
       send_to_room("The creature shatters in illusion!\n\r", GAIOT_AVATAR, TRUE);
@@ -2938,7 +2938,7 @@ int globe_of_darkness_proc(char_data *ch, struct obj_data *obj, int cmd, const c
   {
     // time to kill myself
     world[obj->in_room].light += obj->obj_flags.value[1]; // light back up
-    send_to_room("The globe of darkness fades brightening the room some.\n\r", obj->in_room, TRUE);
+    send_to_room("The globe of darkness fades brightening the room some.\r\n", obj->in_room, TRUE);
     extract_obj(obj);
   }
   else
@@ -3837,7 +3837,7 @@ int hot_potato(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
   {
     obj->obj_flags.value[3]--;
     if (obj->obj_flags.value[3] % 3 == 0)
-      send_to_room("You smell a delicious baked potato and hear a faint *beep*.\n\r", vict->in_room, true);
+      send_to_room("You smell a delicious baked potato and hear a faint *beep*.\r\n", vict->in_room, true);
   }
   else
   {
@@ -3850,9 +3850,9 @@ int hot_potato(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
     if (!IS_NPC(vict))
       for (descriptor_data *i = descriptor_list; i; i = i->next)
         if (i->character && i->character->in_room != vict->in_room && !i->connected)
-          send_to_char("You hear a large BOOM from somewhere in the distance.\n\r", i->character);
+          send_to_char("You hear a large BOOM from somewhere in the distance.\r\n", i->character);
 
-    act("The hot potato $n is carrying beeps one final time.\n\r"
+    act("The hot potato $n is carrying beeps one final time.\r\n"
         "\n\r$B"
         "BBBB     OOO     OOO    M   M   !!   !!\n\r"
         "B   B   O   O   O   O   MM MM   !!   !!\n\r"
@@ -4060,7 +4060,7 @@ int godload_armbands(char_data *ch, struct obj_data *obj, int cmd,
     return eSUCCESS;
   }
   addTimer(ch, SPELL_TELEPORT, 24);
-  send_to_char("Your armbands crackle, and you phase out of existence.\n\r", ch);
+  send_to_char("Your armbands crackle, and you phase out of existence.\r\n", ch);
   act("$n phases out of existence.", ch, 0, 0, TO_ROOM, 0);
   return spell_teleport(50, ch, ch, 0, 100);
 }
@@ -4407,7 +4407,7 @@ int spellcraft_glyphs(char_data *ch, struct obj_data *obj, int cmd, const char *
   {
     if (ch->in_room != 14060)
     {
-      send_to_char("There's no place around to put this special item.\n\r", ch);
+      send_to_char("There's no place around to put this special item.\r\n", ch);
       return eFAILURE;
     }
 
@@ -4418,7 +4418,7 @@ int spellcraft_glyphs(char_data *ch, struct obj_data *obj, int cmd, const char *
     }
     if (!str_cmp(target, "sun"))
     {
-      send_to_room("The sun glows brightly as it releases the energy inside the glyph.\n\r", ch->in_room);
+      send_to_room("The sun glows brightly as it releases the energy inside the glyph.\r\n", ch->in_room);
       obj_from_char(sunglyph);
       SET_BIT(ch->spellcraftglyph, 1);
     }
@@ -4442,7 +4442,7 @@ int spellcraft_glyphs(char_data *ch, struct obj_data *obj, int cmd, const char *
   {
     if (ch->in_room != 14060)
     {
-      send_to_char("There's no place around to put this special item.\n\r", ch);
+      send_to_char("There's no place around to put this special item.\r\n", ch);
       return eFAILURE;
     }
     if (bookglyph == NULL)
@@ -4457,7 +4457,7 @@ int spellcraft_glyphs(char_data *ch, struct obj_data *obj, int cmd, const char *
     }
     else if (!str_cmp(target, "book"))
     {
-      send_to_room("The book closes over the glyph, becoming slightly warm.\n\r", ch->in_room);
+      send_to_room("The book closes over the glyph, becoming slightly warm.\r\n", ch->in_room);
       obj_from_char(bookglyph);
       SET_BIT(ch->spellcraftglyph, 2);
     }
@@ -4476,7 +4476,7 @@ int spellcraft_glyphs(char_data *ch, struct obj_data *obj, int cmd, const char *
   {
     if (ch->in_room != 14060)
     {
-      send_to_char("There's no place around to put this special item.\n\r", ch);
+      send_to_char("There's no place around to put this special item.\r\n", ch);
       return eFAILURE;
     }
 
@@ -4497,7 +4497,7 @@ int spellcraft_glyphs(char_data *ch, struct obj_data *obj, int cmd, const char *
     }
     else if (!str_cmp(target, "heart"))
     {
-      send_to_room("You place the glyph next to the heart, and it slowly begins to pulse.\n\r", ch->in_room);
+      send_to_room("You place the glyph next to the heart, and it slowly begins to pulse.\r\n", ch->in_room);
       obj_from_char(heartglyph);
       SET_BIT(ch->spellcraftglyph, 4);
     }
@@ -4514,7 +4514,7 @@ int spellcraft_glyphs(char_data *ch, struct obj_data *obj, int cmd, const char *
   {
     if (GET_CLASS(ch) == CLASS_MAGIC_USER && GET_LEVEL(ch) >= 50 && !has_skill(ch, SKILL_SPELLCRAFT))
     {
-      send_to_room("The glyph receptacles glow an eerie pale white.\n\rThe book shoots out a beams of light from the pages.\n\r", ch->in_room);
+      send_to_room("The glyph receptacles glow an eerie pale white.\n\rThe book shoots out a beams of light from the pages.\r\n", ch->in_room);
       send_to_char("A beam of light hits you in the head!\n\rYou have learned spellcraft!\n\r", ch);
       learn_skill(ch, SKILL_SPELLCRAFT, 1, 1);
     }

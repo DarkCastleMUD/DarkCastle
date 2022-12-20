@@ -46,7 +46,7 @@ int do_levels(char_data *ch, char *argument, int cmd) {
 	char buf[MAX_STRING_LENGTH];
 
 	if (IS_NPC(ch)) {
-		send_to_char("You ain't nothin' but a hound-dog.\n\r", ch);
+		send_to_char("You ain't nothin' but a hound-dog.\r\n", ch);
 		return eSUCCESS;
 	}
 

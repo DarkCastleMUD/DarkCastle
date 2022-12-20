@@ -153,7 +153,7 @@ void mpstat(char_data *ch, char_data *victim)
   mob_prog_data *mprg;
   int i;
 
-  sprintf(buf, "$3Name$R: %s  $3Vnum$R: %d.\n\r",
+  sprintf(buf, "$3Name$R: %s  $3Vnum$R: %d.\r\n",
           victim->name, mob_index[victim->mobdata->nr].virt);
   send_to_char(buf, ch);
 
@@ -164,7 +164,7 @@ void mpstat(char_data *ch, char_data *victim)
 
   if (!(mob_index[victim->mobdata->nr].progtypes))
   {
-    send_to_char("That mob has no programs set.\n\r", ch);
+    send_to_char("That mob has no programs set.\r\n", ch);
     return;
   }
 
@@ -1883,7 +1883,7 @@ int do_mpteleport(char_data *ch, char *argument, int cmd)
     }
     else
     {
-      send_to_char("No-one by that name around.\n\r", ch);
+      send_to_char("No-one by that name around.\r\n", ch);
       return eFAILURE;
     }
   }
@@ -1891,10 +1891,10 @@ int do_mpteleport(char_data *ch, char *argument, int cmd)
   if (IS_SET(world[victim->in_room].room_flags, TELEPORT_BLOCK) ||
       IS_AFFECTED(victim, AFF_SOLIDITY))
   {
-    send_to_char("You find yourself unable to.\n\r", ch);
+    send_to_char("You find yourself unable to.\r\n", ch);
     if (ch != victim)
     {
-      snprintf(buf, MAX_INPUT_LENGTH, "%s just tried to teleport you.\n\r", GET_SHORT(ch));
+      snprintf(buf, MAX_INPUT_LENGTH, "%s just tried to teleport you.\r\n", GET_SHORT(ch));
       send_to_char(buf, victim);
     }
     return eFAILURE;

@@ -917,7 +917,7 @@ void clan_login(char_data *ch)
 
   if (!is_in_clan(clan, ch))
   {
-    send_to_char("You were kicked out of your clan.\n\r", ch);
+    send_to_char("You were kicked out of your clan.\r\n", ch);
     ch->clan = 0;
     return;
   }
@@ -1012,21 +1012,21 @@ int do_accept(char_data *ch, char *arg, int cmd)
 
   if (IS_NPC(victim) || GET_LEVEL(victim) >= IMMORTAL)
   {
-    send_to_char("Yeah right.\n\r", ch);
+    send_to_char("Yeah right.\r\n", ch);
     return eFAILURE;
   }
 
   if (victim->clan)
   {
-    send_to_char("This person already belongs to a clan.\n\r", ch);
+    send_to_char("This person already belongs to a clan.\r\n", ch);
     return eFAILURE;
   }
 
   victim->clan = ch->clan;
   add_clan_member(clan, victim);
   save_clans();
-  sprintf(buf, "You are now a member of %s.\n\r", clan->name);
-  send_to_char("Your clan now has a new member.\n\r", ch);
+  sprintf(buf, "You are now a member of %s.\r\n", clan->name);
+  send_to_char("Your clan now has a new member.\r\n", ch);
   send_to_char(buf, victim);
 
   sprintf(buf, "%s just joined clan [%s].", GET_NAME(victim), clan->name);
@@ -1076,7 +1076,7 @@ int do_outcast(char_data *ch, char *arg, int cmd)
       if (file_exists(tmp_buf))
         send_to_char("Character is archived.\r\n", ch);
       else
-        send_to_char("Unable to outcast, type the entire name.\n\r", ch);
+        send_to_char("Unable to outcast, type the entire name.\r\n", ch);
       return eFAILURE;
     }
 
@@ -1090,7 +1090,7 @@ int do_outcast(char_data *ch, char *arg, int cmd)
 
   if (!victim->clan)
   {
-    send_to_char("This person isn't in a clan in the first place...\n\r", ch);
+    send_to_char("This person isn't in a clan in the first place...\r\n", ch);
     return eFAILURE;
   }
 
@@ -1112,7 +1112,7 @@ int do_outcast(char_data *ch, char *arg, int cmd)
   {
     sprintf(buf, "%s just quit clan [%s].", GET_NAME(victim), clan->name);
     log(buf, IMP, LogChannels::LOG_CLAN);
-    send_to_char("You quit your clan.\n\r", ch);
+    send_to_char("You quit your clan.\r\n", ch);
     remove_totem_stats(victim);
     victim->clan = 0;
     remove_clan_member(clan, ch);
@@ -1130,9 +1130,9 @@ int do_outcast(char_data *ch, char *arg, int cmd)
   victim->clan = 0;
   remove_clan_member(clan, victim);
   save_clans();
-  sprintf(buf, "You cast %s out of your clan.\n\r", GET_NAME(victim));
+  sprintf(buf, "You cast %s out of your clan.\r\n", GET_NAME(victim));
   send_to_char(buf, ch);
-  sprintf(buf, "You are cast out of %s.\n\r", clan->name);
+  sprintf(buf, "You are cast out of %s.\r\n", clan->name);
   send_to_char(buf, victim);
 
   sprintf(buf, "%s was outcasted from clan [%s].", GET_NAME(victim), clan->name);
@@ -1183,14 +1183,14 @@ int do_cpromote(char_data *ch, char *arg, int cmd)
 
   if (IS_NPC(victim))
   {
-    send_to_char("Yeah right.\n\r", ch);
+    send_to_char("Yeah right.\r\n", ch);
     return eFAILURE;
   }
 
   if (victim->clan != ch->clan)
   {
     send_to_char("You can not cpromote someone who doesn't belong to the "
-                 "clan.\n\r",
+                 "clan.\r\n",
                  ch);
     return eFAILURE;
   }
@@ -1200,8 +1200,8 @@ int do_cpromote(char_data *ch, char *arg, int cmd)
 
   save_clans();
 
-  sprintf(buf, "You are now the leader of %s.\n\r", clan->name);
-  send_to_char("Your clan now has a new leader.\n\r", ch);
+  sprintf(buf, "You are now the leader of %s.\r\n", clan->name);
+  send_to_char("Your clan now has a new leader.\r\n", ch);
   send_to_char(buf, victim);
 
   sprintf(buf, "%s just cpromoted by %s as leader of clan [%s].", GET_NAME(victim), GET_NAME(ch), clan->name);
@@ -1673,7 +1673,7 @@ void do_clan_member_list(char_data *ch)
 
   if (!(pclan = get_clan(ch->clan)))
   {
-    send_to_char("Error:  Not in clan.  Contact a god.\n\r", ch);
+    send_to_char("Error:  Not in clan.  Contact a god.\r\n", ch);
     return;
   }
 
@@ -1737,7 +1737,7 @@ void do_clan_rights(char_data *ch, char *arg)
 
   if (!(pmember = get_member(name, ch->clan)))
   {
-    sprintf(buf, "Could not find '%s' in your clan.\n\r", name);
+    sprintf(buf, "Could not find '%s' in your clan.\r\n", name);
     send_to_char(buf, ch);
     return;
   }
@@ -1765,7 +1765,7 @@ void do_clan_rights(char_data *ch, char *arg)
 
   if (!is_clan_leader(ch) && !has_right(ch, 1 << bit))
   {
-    send_to_char("You can't give out rights that you don't have.\n\r", ch);
+    send_to_char("You can't give out rights that you don't have.\r\n", ch);
     return;
   }
 
@@ -1773,13 +1773,13 @@ void do_clan_rights(char_data *ch, char *arg)
 
   if (IS_SET(pmember->member_rights, 1 << bit))
   {
-    sprintf(buf, "%s toggled on.\n\r", clan_rights[bit]);
-    sprintf(buf2, "%s has given you '%s' rights within your clan.\n\r", GET_SHORT(ch), clan_rights[bit]);
+    sprintf(buf, "%s toggled on.\r\n", clan_rights[bit]);
+    sprintf(buf2, "%s has given you '%s' rights within your clan.\r\n", GET_SHORT(ch), clan_rights[bit]);
   }
   else
   {
-    sprintf(buf, "%s toggled off.\n\r", clan_rights[bit]);
-    sprintf(buf2, "%s has taken away '%s' rights within your clan.\n\r", GET_SHORT(ch), clan_rights[bit]);
+    sprintf(buf, "%s toggled off.\r\n", clan_rights[bit]);
+    sprintf(buf2, "%s has taken away '%s' rights within your clan.\r\n", GET_SHORT(ch), clan_rights[bit]);
   }
   send_to_char(buf, ch);
 
@@ -3402,13 +3402,13 @@ int do_clanarea(char_data *ch, char *argument, int cmd)
   {
     if (can_collect(world[ch->in_room].zone))
     {
-      send_to_char("There is no challenge to withdraw from.\n\r", ch);
+      send_to_char("There is no challenge to withdraw from.\r\n", ch);
       return eFAILURE;
     }
 
     if (!affected_by_spell(ch, SKILL_CLANAREA_CHALLENGE))
     {
-      send_to_char("You did not issue the challenge, or you have waited too long to withdraw.\n\r", ch);
+      send_to_char("You did not issue the challenge, or you have waited too long to withdraw.\r\n", ch);
       return eFAILURE;
     }
 
@@ -3422,20 +3422,20 @@ int do_clanarea(char_data *ch, char *argument, int cmd)
         send_to_char("You withdraw your challenge.\r\n", ch);
         return eSUCCESS;
       }
-    send_to_char("Your did not issue this challenge.\n\r", ch);
+    send_to_char("Your did not issue this challenge.\r\n", ch);
     return eFAILURE;
   }
   else if (!str_cmp(arg, "claim"))
   {
     if (affected_by_spell(ch, SKILL_CLANAREA_CLAIM))
     {
-      send_to_char("You need to wait before you can attempt to claim an area.\n\r", ch);
+      send_to_char("You need to wait before you can attempt to claim an area.\r\n", ch);
       return eFAILURE;
     }
 
     if (zone_table[world[ch->in_room].zone].clanowner == 0 && !can_challenge(ch->clan, world[ch->in_room].zone))
     {
-      send_to_char("You cannot claim this area right now.\n\r", ch);
+      send_to_char("You cannot claim this area right now.\r\n", ch);
       return eFAILURE;
     }
 
@@ -3559,12 +3559,12 @@ int do_clanarea(char_data *ch, char *argument, int cmd)
   {
     if (affected_by_spell(ch, SKILL_CLANAREA_CHALLENGE))
     {
-      send_to_char("You need to wait before you can attempt to challenge an area.\n\r", ch);
+      send_to_char("You need to wait before you can attempt to challenge an area.\r\n", ch);
       return eFAILURE;
     }
     if (GET_LEVEL(ch) < 40)
     {
-      send_to_char("You must be level 40 to issue a challenge.\n\r", ch);
+      send_to_char("You must be level 40 to issue a challenge.\r\n", ch);
       return eFAILURE;
     }
 

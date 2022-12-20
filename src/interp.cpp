@@ -846,7 +846,7 @@ int command_interpreter(char_data *ch, string pcomm, bool procced)
           send_to_char("Lie still; you are DEAD.\r\n", ch);
           break;
         case POSITION_STUNNED:
-          send_to_char("You are too stunned to do that.\n\r", ch);
+          send_to_char("You are too stunned to do that.\r\n", ch);
           break;
         case POSITION_SLEEPING:
           send_to_char("In your dreams, or what?\r\n", ch);

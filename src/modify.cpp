@@ -82,7 +82,7 @@ void string_hash_add(struct descriptor_data *d, char *str)
 	{
 		if (strlen(str) > (unsigned)d->max_str)
 		{
-			send_to_char("String too long - Truncated.\n\r", d->character);
+			send_to_char("String too long - Truncated.\r\n", d->character);
 			*(str + d->max_str) = '\0';
 			terminator = 1;
 		}
@@ -98,7 +98,7 @@ void string_hash_add(struct descriptor_data *d, char *str)
 	{
 		if (strlen(str) + strlen(*d->hashstr) > (unsigned)d->max_str)
 		{
-			send_to_char("String too long. Last line skipped.\n\r", d->character);
+			send_to_char("String too long. Last line skipped.\r\n", d->character);
 			terminator = 1;
 		}
 
@@ -121,7 +121,7 @@ void string_hash_add(struct descriptor_data *d, char *str)
 		*d->hashstr = scan;
 		d->hashstr = 0;
 		d->connected = conn::PLAYING;
-		send_to_char("Ok.\n\r", ch);
+		send_to_char("Ok.\r\n", ch);
 		check_for_awaymsgs(ch);
 	}
 	else
@@ -183,14 +183,14 @@ int do_string(char_data *ch, char *arg, int cmd)
 	if (type == TP_ERROR)
 	{
 		send_to_char("Syntax:\n\rstring ('obj'|'char') <name> <field>"
-					 " [<string>].\n\r",
+					 " [<string>].\r\n",
 					 ch);
 		return 1;
 	}
 
 	if (!field)
 	{
-		send_to_char("No field by that name. Try 'help string'.\n\r", ch);
+		send_to_char("No field by that name. Try 'help string'.\r\n", ch);
 		return 1;
 	}
 
@@ -199,13 +199,13 @@ int do_string(char_data *ch, char *arg, int cmd)
 		/* locate the beast */
 		if (!(mob = get_char_vis(ch, name)))
 		{
-			send_to_char("I don't know anyone by that name...\n\r", ch);
+			send_to_char("I don't know anyone by that name...\r\n", ch);
 			return 1;
 		}
 
 		if ((GET_LEVEL(mob) > GET_LEVEL(ch)) && !IS_NPC(mob))
 		{
-			sprintf(message, "%s can string himself, thank you.\n\r", GET_SHORT(mob));
+			sprintf(message, "%s can string himself, thank you.\r\n", GET_SHORT(mob));
 			send_to_char(message, ch);
 			return 1;
 		}
@@ -223,12 +223,12 @@ int do_string(char_data *ch, char *arg, int cmd)
 			else
 				ch->desc->strnew = &GET_NAME(mob);
 			if (!IS_NPC(mob))
-				send_to_char("WARNING: You have changed the name of a player.\n\r", ch);
+				send_to_char("WARNING: You have changed the name of a player.\r\n", ch);
 			break;
 		case 2:
 			if (GET_LEVEL(ch) < POWER)
 			{
-				send_to_char("You must be a God to do that.\n\r", ch);
+				send_to_char("You must be a God to do that.\r\n", ch);
 				return 1;
 			}
 			sprintf(message, "%s just restrung short on %s", GET_NAME(ch), GET_NAME(mob));
@@ -241,7 +241,7 @@ int do_string(char_data *ch, char *arg, int cmd)
 		case 3:
 			if (!IS_NPC(mob))
 			{
-				send_to_char("That field is for monsters only.\n\r", ch);
+				send_to_char("That field is for monsters only.\r\n", ch);
 				return 1;
 			}
 			ch->desc->hashstr = &mob->long_desc;
@@ -255,13 +255,13 @@ int do_string(char_data *ch, char *arg, int cmd)
 		case 5:
 			if (IS_NPC(mob))
 			{
-				send_to_char("Monsters have no titles.\n\r", ch);
+				send_to_char("Monsters have no titles.\r\n", ch);
 				return 1;
 			}
 			ch->desc->strnew = &mob->title;
 			break;
 		default:
-			send_to_char("That field is undefined for monsters.\n\r", ch);
+			send_to_char("That field is undefined for monsters.\r\n", ch);
 			return 1;
 		}
 	}
@@ -272,7 +272,7 @@ int do_string(char_data *ch, char *arg, int cmd)
 		/* locate the object */
 		if (!(obj = get_obj_vis(ch, name)))
 		{
-			send_to_char("Can't find such a thing here..\n\r", ch);
+			send_to_char("Can't find such a thing here..\r\n", ch);
 			return 1;
 		}
 
@@ -310,7 +310,7 @@ int do_string(char_data *ch, char *arg, int cmd)
 
 			if (!*string)
 			{
-				send_to_char("You have to supply a keyword.\n\r", ch);
+				send_to_char("You have to supply a keyword.\r\n", ch);
 				return 1;
 			}
 			/* try to locate extra description */
@@ -328,7 +328,7 @@ int do_string(char_data *ch, char *arg, int cmd)
 					ed->keyword = str_hsh(string);
 					ed->description = 0;
 					ch->desc->hashstr = &ed->description;
-					send_to_char("New field.\n\r", ch);
+					send_to_char("New field.\r\n", ch);
 					break;
 				}
 				else if (!str_cmp(ed->keyword, string))
@@ -336,7 +336,7 @@ int do_string(char_data *ch, char *arg, int cmd)
 					/* the field exists */
 					ed->description = 0;
 					ch->desc->hashstr = &ed->description;
-					send_to_char("Modifying description.\n\r", ch);
+					send_to_char("Modifying description.\r\n", ch);
 					break;
 				}
 			ch->desc->max_str = MAX_STRING_LENGTH;
@@ -346,14 +346,14 @@ int do_string(char_data *ch, char *arg, int cmd)
 		case 6:
 			if (!*string)
 			{
-				send_to_char("You must supply a field name.\n\r", ch);
+				send_to_char("You must supply a field name.\r\n", ch);
 				return 1;
 			}
 			/* try to locate field */
 			for (ed = obj->ex_description;; ed = ed->next)
 				if (!ed)
 				{
-					send_to_char("No field with that keyword.\n\r", ch);
+					send_to_char("No field with that keyword.\r\n", ch);
 					return 1;
 				}
 				else if (!str_cmp(ed->keyword, string))
@@ -368,12 +368,12 @@ int do_string(char_data *ch, char *arg, int cmd)
 						tmp->next = ed->next;
 					}
 					dc_free(ed);
-					send_to_char("Field deleted.\n\r", ch);
+					send_to_char("Field deleted.\r\n", ch);
 					return 1;
 				}
 			break;
 		default:
-			send_to_char("That field is undefined for objects.\n\r", ch);
+			send_to_char("That field is undefined for objects.\r\n", ch);
 			return 1;
 		}
 	}
@@ -391,7 +391,7 @@ int do_string(char_data *ch, char *arg, int cmd)
 
 		if (strlen(string) > (unsigned)length[field - 1])
 		{
-			send_to_char("String too long - truncated.\n\r", ch);
+			send_to_char("String too long - truncated.\r\n", ch);
 			*(string + length[field - 1]) = '\0';
 		}
 		if (type == TP_MOB && !IS_NPC(mob))
@@ -404,14 +404,14 @@ int do_string(char_data *ch, char *arg, int cmd)
 			*ch->desc->hashstr = str_hsh(string);
 			ch->desc->hashstr = 0;
 		}
-		send_to_char("Ok.\n\r", ch);
+		send_to_char("Ok.\r\n", ch);
 	}
 
 	/* there was no string. enter string mode */
 	else
 	{
 		send_to_char("Enter string. Terminate with '~' at the beginning "
-					 "of a line.\n\r",
+					 "of a line.\r\n",
 					 ch);
 		if (type == TP_MOB && !IS_NPC(mob))
 #ifdef LEAK_CHECK

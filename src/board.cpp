@@ -723,12 +723,12 @@ void board_write_msg(char_data *ch, const char *arg, std::map<string, BOARD_INFO
   {
     if (ch->clan != board->second.owner)
     {
-      send_to_char("You aren't in the right clan bucko.\n\r", ch);
+      send_to_char("You aren't in the right clan bucko.\r\n", ch);
       return;
     }
     if (!has_right(ch, CLAN_RIGHTS_B_WRITE))
     {
-      send_to_char("You don't have the right!  Talk to your clan leader.\n\r", ch);
+      send_to_char("You don't have the right!  Talk to your clan leader.\r\n", ch);
       return;
     }
   }
@@ -742,7 +742,7 @@ void board_write_msg(char_data *ch, const char *arg, std::map<string, BOARD_INFO
   {
     send_to_char("You pick up a quill to write, but realize "
                  "you're not powerful enough\n\rto submit "
-                 "intelligent material to this board.\n\r",
+                 "intelligent material to this board.\r\n",
                  ch);
     return;
   }
@@ -754,7 +754,7 @@ void board_write_msg(char_data *ch, const char *arg, std::map<string, BOARD_INFO
 
   if (!*arg)
   {
-    send_to_char("Need a header, fool.\n\r", ch);
+    send_to_char("Need a header, fool.\r\n", ch);
     return;
   }
 
@@ -813,7 +813,7 @@ int board_remove_msg(char_data *ch, const char *arg, std::map<std::string, BOARD
 
   if (tmessage == 0 || tmessage >= board->second.msgs.size())
   {
-    send_to_char("That message exists only in your imagination..\n\r",
+    send_to_char("That message exists only in your imagination..\r\n",
                  ch);
     return eSUCCESS;
   }
@@ -825,12 +825,12 @@ int board_remove_msg(char_data *ch, const char *arg, std::map<std::string, BOARD
   {
     if (ch->clan != board->second.owner)
     {
-      send_to_char("You aren't in the right clan bucko.\n\r", ch);
+      send_to_char("You aren't in the right clan bucko.\r\n", ch);
       return eSUCCESS;
     }
     if (!has_right(ch, CLAN_RIGHTS_B_REMOVE) && board->second.msgs[ind].author.compare(GET_NAME(ch)))
     {
-      send_to_char("You don't have the right!  Talk to your clan leader.\n\r", ch);
+      send_to_char("You don't have the right!  Talk to your clan leader.\r\n", ch);
       return eSUCCESS;
     }
   }
@@ -843,14 +843,14 @@ int board_remove_msg(char_data *ch, const char *arg, std::map<std::string, BOARD
   {
     send_to_char("You try and grab one of the notes of the board but "
                  "get a nasty\n\rshock. Maybe you'd better leave it "
-                 "alone.\n\r",
+                 "alone.\r\n",
                  ch);
     return eSUCCESS;
   }
 
   board->second.msgs.erase(board->second.msgs.begin() + ind);
 
-  send_to_char("Message erased.\n\r", ch);
+  send_to_char("Message erased.\r\n", ch);
   sprintf(buf, "$n just erased message %d.", tmessage);
 
   // Removal message also repaired
@@ -1010,12 +1010,12 @@ int board_display_msg(char_data *ch, const char *arg, std::map<std::string, BOAR
   {
     if (ch->clan != board->second.owner)
     {
-      send_to_char("You aren't in the right clan bucko.\n\r", ch);
+      send_to_char("You aren't in the right clan bucko.\r\n", ch);
       return eSUCCESS;
     }
     if (!has_right(ch, CLAN_RIGHTS_B_READ))
     {
-      send_to_char("You don't have the right!  Talk to your clan leader.\n\r", ch);
+      send_to_char("You don't have the right!  Talk to your clan leader.\r\n", ch);
       return eSUCCESS;
     }
   }
@@ -1043,7 +1043,7 @@ int board_display_msg(char_data *ch, const char *arg, std::map<std::string, BOAR
 
   if (tmessage == 0 || tmessage >= board->second.msgs.size())
   {
-    send_to_char("That message doesn't exist, moron.\n\r", ch);
+    send_to_char("That message doesn't exist, moron.\r\n", ch);
     return eSUCCESS;
   }
 
@@ -1083,12 +1083,12 @@ int board_show_board(char_data *ch, const char *arg, std::map<std::string, BOARD
   {
     if (ch->clan != board->second.owner)
     {
-      send_to_char("You aren't in the right clan bucko.\n\r", ch);
+      send_to_char("You aren't in the right clan bucko.\r\n", ch);
       return eSUCCESS;
     }
     if (!has_right(ch, CLAN_RIGHTS_B_READ))
     {
-      send_to_char("You don't have the right!  Talk to your clan leader.\n\r", ch);
+      send_to_char("You don't have the right!  Talk to your clan leader.\r\n", ch);
       return eSUCCESS;
     }
   }
@@ -1101,7 +1101,7 @@ int board_show_board(char_data *ch, const char *arg, std::map<std::string, BOARD
   if ((GET_LEVEL(ch) < board->second.min_read_level))
   {
     send_to_char("You try and look at the messages on the board "
-                 "but you\n\rcannot comprehend their meaning.\n\r",
+                 "but you\n\rcannot comprehend their meaning.\r\n",
                  ch);
     act("$n tries to read the board, but looks bewildered.", ch, 0, 0,
         TO_ROOM, INVIS_NULL);
@@ -1112,10 +1112,10 @@ int board_show_board(char_data *ch, const char *arg, std::map<std::string, BOARD
 
   csendf(ch, "This is a bulletin board. Usage: READ/ERASE <mesg #>, WRITE <header>\n\r");
   if (board->second.msgs.empty())
-    csendf(ch, "The board is empty.\n\r");
+    csendf(ch, "The board is empty.\r\n");
   else
   {
-    csendf(ch, "There are %d messages on the board.\n\r", board->second.msgs.size());
+    csendf(ch, "There are %d messages on the board.\r\n", board->second.msgs.size());
     ;
 
     csendf(ch, "Board Topic:\n\r%s------------\n\r", board->second.msgs[0].text.c_str());

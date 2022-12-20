@@ -308,18 +308,18 @@ void AuctionHouse::DoModify(char_data *ch, unsigned int ticket, unsigned int new
   map<unsigned int, AuctionTicket>::iterator Item_it;
   if (new_price < AUC_MIN_PRICE || new_price > AUC_MAX_PRICE)
   {
-    csendf(ch, "Price must be between %u and %u.\n\r", AUC_MIN_PRICE, AUC_MAX_PRICE);
+    csendf(ch, "Price must be between %u and %u.\r\n", AUC_MIN_PRICE, AUC_MAX_PRICE);
     return;
   }
   if ((Item_it = Items_For_Sale.find(ticket)) == Items_For_Sale.end())
   {
-    csendf(ch, "Ticket number %u doesn't seem to exist.\n\r", ticket);
+    csendf(ch, "Ticket number %u doesn't seem to exist.\r\n", ticket);
     return;
   }
 
   if (Item_it->second.seller.compare(GET_NAME(ch)))
   {
-    csendf(ch, "Ticket number %u doesn't belong to you.\n\r", ticket);
+    csendf(ch, "Ticket number %u doesn't belong to you.\r\n", ticket);
     return;
   }
 
@@ -329,25 +329,25 @@ void AuctionHouse::DoModify(char_data *ch, unsigned int ticket, unsigned int new
     unsigned int fee = (unsigned int)((double)difference * 0.025);
     if (GET_GOLD(ch) < fee)
     {
-      csendf(ch, "Increasing the items price by %u costs %u, you don't have enough.\n\r", difference, fee);
+      csendf(ch, "Increasing the items price by %u costs %u, you don't have enough.\r\n", difference, fee);
       return;
     }
     GET_GOLD(ch) -= fee;
-    csendf(ch, "The broker collects %u coins for increasing the price by %u.\n\r", fee, difference);
+    csendf(ch, "The broker collects %u coins for increasing the price by %u.\r\n", fee, difference);
     do_save(ch, "", CMD_DEFAULT);
   }
 
-  csendf(ch, "The new price of ticket %u (%s) is now %u.\n\r",
+  csendf(ch, "The new price of ticket %u (%s) is now %u.\r\n",
          ticket, Item_it->second.item_name.c_str(), new_price);
 
   char_data *tmp;
   for (tmp = world[ch->in_room].people; tmp; tmp = tmp->next_in_room)
     if (tmp != ch)
-      csendf(tmp, "%s has just modified the price of one of %s items.\n\r",
+      csendf(tmp, "%s has just modified the price of one of %s items.\r\n",
              GET_NAME(ch), (GET_SEX(ch) == SEX_MALE) ? "his" : "her");
 
   char log_buf[MAX_STRING_LENGTH] = {};
-  sprintf(log_buf, "VEND: %s modified ticket %u (%s): old price %u, new price %u.\n\r",
+  sprintf(log_buf, "VEND: %s modified ticket %u (%s): old price %u, new price %u.\r\n",
           GET_NAME(ch), Item_it->first, Item_it->second.item_name.c_str(), Item_it->second.price, new_price);
   log(log_buf, IMP, LogChannels::LOG_OBJECTS);
   Item_it->second.price = new_price;
@@ -368,19 +368,19 @@ void AuctionHouse::CheckForSoldItems(char_data *ch)
       if (Item_it->second.state == AUC_SOLD)
       {
         has_sold_items = true;
-        csendf(ch, "Your auction of %s has $2SOLD$R to %s for %u coins.\n\r",
+        csendf(ch, "Your auction of %s has $2SOLD$R to %s for %u coins.\r\n",
                Item_it->second.item_name.c_str(), Item_it->second.buyer.c_str(), Item_it->second.price);
       }
       if (Item_it->second.state == AUC_EXPIRED)
       {
         has_sold_items = true;
-        csendf(ch, "Your auction of %s has $4EXPIRED$R.\n\r",
+        csendf(ch, "Your auction of %s has $4EXPIRED$R.\r\n",
                Item_it->second.item_name.c_str());
       }
     }
   }
   if (has_sold_items)
-    send_to_char("Please stop by your local Consignment House.\n\r", ch);
+    send_to_char("Please stop by your local Consignment House.\r\n", ch);
   return;
 }
 
@@ -505,26 +505,26 @@ void AuctionHouse::Identify(char_data *ch, unsigned int ticket)
 
   if ((Item_it = Items_For_Sale.find(ticket)) == Items_For_Sale.end())
   {
-    csendf(ch, "Ticket number %d doesn't seem to exist.\n\r", ticket);
+    csendf(ch, "Ticket number %d doesn't seem to exist.\r\n", ticket);
     return;
   }
 
   if (!Item_it->second.buyer.empty() && Item_it->second.buyer.compare(GET_NAME(ch)))
   {
-    csendf(ch, "Ticket number %d is private.\n\r", ticket);
+    csendf(ch, "Ticket number %d is private.\r\n", ticket);
     return;
   }
 
   if (GET_GOLD(ch) < 6000)
   {
-    send_to_char("The broker charges 6000 gold to identify items.\n\r", ch);
+    send_to_char("The broker charges 6000 gold to identify items.\r\n", ch);
     return;
   }
 
   int nr = real_object(Item_it->second.vitem);
   if (nr < 0)
   {
-    csendf(ch, "There is a problem with ticket %d. Please tell an imm.\n\r", ticket);
+    csendf(ch, "There is a problem with ticket %d. Please tell an imm.\r\n", ticket);
     return;
   }
 
@@ -578,7 +578,7 @@ bool AuctionHouse::IsSlot(string slot, int vnum)
     return false;
 
   //   char out_buf[MAX_STRING_LENGTH];
-  //  sprintf(out_buf, "%s is an unknown body location.\n\r", buf);
+  //  sprintf(out_buf, "%s is an unknown body location.\r\n", buf);
   // send_to_char(out_buf, ch);
 
   int nr = real_object(vnum);
@@ -758,13 +758,13 @@ void AuctionHouse::AddRoom(char_data *ch, int room)
   if (auction_rooms.end() == auction_rooms.find(room))
   {
     auction_rooms[room] = 1;
-    csendf(ch, "Done. Room %d added to auction houses.\n\r", room);
+    csendf(ch, "Done. Room %d added to auction houses.\r\n", room);
     logf(GET_LEVEL(ch), LogChannels::LOG_GOD, "%s just added room %d to auction houses.", GET_NAME(ch), room);
     Save();
     return;
   }
   else
-    csendf(ch, "Room %d is already an auction house.\n\r", room);
+    csendf(ch, "Room %d is already an auction house.\r\n", room);
   return;
 }
 
@@ -775,13 +775,13 @@ void AuctionHouse::RemoveRoom(char_data *ch, int room)
 {
   if (1 == auction_rooms.erase(room))
   {
-    csendf(ch, "Done. Room %d has been removed from auction houses.\n\r", room);
+    csendf(ch, "Done. Room %d has been removed from auction houses.\r\n", room);
     logf(GET_LEVEL(ch), LogChannels::LOG_GOD, "%s just removed room %d from auction houses.", GET_NAME(ch), room);
     Save();
     return;
   }
   else
-    csendf(ch, "Room %d doesn't appear to be an auction house.\n\r", room);
+    csendf(ch, "Room %d doesn't appear to be an auction house.\r\n", room);
   return;
 }
 
@@ -1061,12 +1061,12 @@ void AuctionHouse::CollectTickets(char_data *ch, unsigned int ticket)
     {
       if (Item_it->second.seller.compare(GET_NAME(ch)))
       {
-        csendf(ch, "Ticket %d doesn't seem to belong to you.\n\r", ticket);
+        csendf(ch, "Ticket %d doesn't seem to belong to you.\r\n", ticket);
         return;
       }
       if (Item_it->second.state != AUC_EXPIRED && Item_it->second.state != AUC_SOLD)
       {
-        csendf(ch, "Ticket %d isn't collectible!.\n\r", ticket);
+        csendf(ch, "Ticket %d isn't collectible!.\r\n", ticket);
         return;
       }
     }
@@ -1110,7 +1110,7 @@ void AuctionHouse::CheckExpire()
       ItemsActive -= 1;
       ItemsExpired += 1;
       if ((ch = get_active_pc(Item_it->second.seller.c_str())))
-        csendf(ch, "Your auction of %s has expired.\n\r", Item_it->second.item_name.c_str());
+        csendf(ch, "Your auction of %s has expired.\r\n", Item_it->second.item_name.c_str());
       Item_it->second.state = AUC_EXPIRED;
       something_expired = true;
     }
@@ -1135,13 +1135,13 @@ void AuctionHouse::BuyItem(char_data *ch, unsigned int ticket)
   Item_it = Items_For_Sale.find(ticket);
   if (Item_it == Items_For_Sale.end())
   {
-    csendf(ch, "Ticket number %u doesn't seem to exist.\n\r", ticket);
+    csendf(ch, "Ticket number %u doesn't seem to exist.\r\n", ticket);
     return;
   }
 
   if (!Item_it->second.buyer.empty() && Item_it->second.buyer.compare(GET_NAME(ch)))
   {
-    csendf(ch, "Ticket number %u is private.\n\r", ticket);
+    csendf(ch, "Ticket number %u is private.\r\n", ticket);
     return;
   }
 
@@ -1207,7 +1207,7 @@ void AuctionHouse::BuyItem(char_data *ch, unsigned int ticket)
     }
     else
     {
-      csendf(ch, "You give your %s to the broker.\n\r", no_trade_obj->short_description);
+      csendf(ch, "You give your %s to the broker.\r\n", no_trade_obj->short_description);
       extract_obj(no_trade_obj);
     }
   }
@@ -1232,9 +1232,9 @@ void AuctionHouse::BuyItem(char_data *ch, unsigned int ticket)
   GET_GOLD(ch) -= Item_it->second.price;
 
   if ((vict = get_active_pc(Item_it->second.seller.c_str())))
-    csendf(vict, "%s just purchased your ticket of %s for %u coins.\n\r", GET_NAME(ch), Item_it->second.item_name.c_str(), Item_it->second.price);
+    csendf(vict, "%s just purchased your ticket of %s for %u coins.\r\n", GET_NAME(ch), Item_it->second.item_name.c_str(), Item_it->second.price);
 
-  csendf(ch, "You have purchased %s for %u coins.\n\r", obj->short_description, Item_it->second.price);
+  csendf(ch, "You have purchased %s for %u coins.\r\n", obj->short_description, Item_it->second.price);
 
   char_data *tmp;
   for (tmp = world[ch->in_room].people; tmp; tmp = tmp->next_in_room)
@@ -1246,7 +1246,7 @@ void AuctionHouse::BuyItem(char_data *ch, unsigned int ticket)
 
   Save();
   char log_buf[MAX_STRING_LENGTH] = {};
-  sprintf(log_buf, "VEND: %s bought %s's %s[%d] for %u coins.\n\r",
+  sprintf(log_buf, "VEND: %s bought %s's %s[%d] for %u coins.\r\n",
           GET_NAME(ch), Item_it->second.seller.c_str(), Item_it->second.item_name.c_str(), Item_it->second.vitem, Item_it->second.price);
   log(log_buf, IMP, LogChannels::LOG_OBJECTS);
   obj_to_char(obj, ch);
@@ -1372,12 +1372,12 @@ void AuctionHouse::RemoveTicket(char_data *ch, unsigned int ticket)
   Item_it = Items_For_Sale.find(ticket);
   if (Item_it == Items_For_Sale.end())
   {
-    csendf(ch, "Ticket number %d doesn't seem to exist.\n\r", ticket);
+    csendf(ch, "Ticket number %d doesn't seem to exist.\r\n", ticket);
     return;
   }
   if (Item_it->second.seller.compare(GET_NAME(ch)))
   {
-    csendf(ch, "Ticket number %d doesn't belong to you.\n\r", ticket);
+    csendf(ch, "Ticket number %d doesn't belong to you.\r\n", ticket);
     return;
   }
 
@@ -1388,15 +1388,15 @@ void AuctionHouse::RemoveTicket(char_data *ch, unsigned int ticket)
     unsigned int fee = (unsigned int)((double)Item_it->second.price * 0.025);
     if (fee > 500000)
       fee = 500000;
-    csendf(ch, "The Broker hands you %u gold coins from your sale of %s.\n\r"
-               "He pockets %u gold as a broker's fee.\n\r",
+    csendf(ch, "The Broker hands you %u gold coins from your sale of %s.\r\n"
+               "He pockets %u gold as a broker's fee.\r\n",
            (Item_it->second.price - fee), Item_it->second.item_name.c_str(), fee);
     TaxCollected += fee;
     Revenue -= fee;
     UncollectedGold -= Item_it->second.price;
     GET_GOLD(ch) += (Item_it->second.price - fee);
     char log_buf[MAX_STRING_LENGTH] = {};
-    sprintf(log_buf, "VEND: %s just collected %u coins from their sale of %s (ticket %u).\n\r",
+    sprintf(log_buf, "VEND: %s just collected %u coins from their sale of %s (ticket %u).\r\n",
             GET_NAME(ch), Item_it->second.price, Item_it->second.item_name.c_str(), ticket);
     log(log_buf, IMP, LogChannels::LOG_OBJECTS);
   }
@@ -1434,9 +1434,9 @@ void AuctionHouse::RemoveTicket(char_data *ch, unsigned int ticket)
       return;
     }
 
-    csendf(ch, "The Consignment Broker retrieves %s and returns it to you.\n\r", obj->short_description);
+    csendf(ch, "The Consignment Broker retrieves %s and returns it to you.\r\n", obj->short_description);
     char log_buf[MAX_STRING_LENGTH] = {};
-    sprintf(log_buf, "VEND: %s cancelled or collected ticket # %u (%s) that was for sale for %u coins.\n\r",
+    sprintf(log_buf, "VEND: %s cancelled or collected ticket # %u (%s) that was for sale for %u coins.\r\n",
             GET_NAME(ch), ticket, Item_it->second.item_name.c_str(), Item_it->second.price);
     log(log_buf, IMP, LogChannels::LOG_OBJECTS);
     obj_to_char(obj, ch);
@@ -1587,17 +1587,17 @@ void AuctionHouse::ListItems(char_data *ch, ListOptions options, string name, un
   if (i == 0)
   {
     if (options == LIST_BY_SLOT)
-      csendf(ch, "\n\rThere are no %s items currently posted.\n\r", name.c_str());
+      csendf(ch, "\n\rThere are no %s items currently posted.\r\n", name.c_str());
     else if (options == LIST_BY_SELLER)
-      csendf(ch, "\n\r\"%s\" doesn't seem to be selling any public items.\n\r"
-                 "\n\rTo view private items, use \"vend list private\".\n\r",
+      csendf(ch, "\n\r\"%s\" doesn't seem to be selling any public items.\r\n"
+                 "\n\rTo view private items, use \"vend list private\".\r\n",
              name.c_str());
     else if (options == LIST_BY_CLASS)
-      csendf(ch, "\n\rThere are no \"%s\" wearable public items for sale.\n\r", name.c_str());
+      csendf(ch, "\n\rThere are no \"%s\" wearable public items for sale.\r\n", name.c_str());
     else if (options == LIST_MINE)
-      send_to_char("\n\rYou do not have any tickets.\n\r", ch);
+      send_to_char("\n\rYou do not have any tickets.\r\n", ch);
     else if (options == LIST_BY_RACE)
-      csendf(ch, "\n\rThere is nothing for sale that would fit a \"%s\".\n\r", name.c_str());
+      csendf(ch, "\n\rThere is nothing for sale that would fit a \"%s\".\r\n", name.c_str());
     else
       send_to_char("\n\rThere is nothing for sale!\n\r", ch);
   }
@@ -1608,7 +1608,7 @@ void AuctionHouse::ListItems(char_data *ch, ListOptions options, string name, un
     if ((vault = has_vault(GET_NAME(ch))))
     {
       int max_items = vault->size / 100;
-      csendf(ch, "\n\rYou are using %d of your %d available tickets.\n\r", i, max_items);
+      csendf(ch, "\n\rYou are using %d of your %d available tickets.\r\n", i, max_items);
     }
   }
 
@@ -1617,11 +1617,11 @@ void AuctionHouse::ListItems(char_data *ch, ListOptions options, string name, un
     int nr = real_object(27909);
     if (nr >= 0)
     {
-      sprintf(buf, "\n\r'$4N$R' indicates an item is NO_TRADE and requires %s to purchase.\n\r",
+      sprintf(buf, "\n\r'$4N$R' indicates an item is NO_TRADE and requires %s to purchase.\r\n",
               ((struct obj_data *)(obj_index[nr].item))->short_description);
       output_buf += buf;
     }
-    output_buf += "'$4*$R' indicates you are unable to use this item.\n\r";
+    output_buf += "'$4*$R' indicates you are unable to use this item.\r\n";
   }
 
   page_string(ch->desc, output_buf.c_str(), 1);
@@ -1652,7 +1652,7 @@ void AuctionHouse::AddItem(char_data *ch, obj_data *obj, unsigned int price, str
 
   if (!obj)
   {
-    send_to_char("You don't seem to have that item.\n\r", ch);
+    send_to_char("You don't seem to have that item.\r\n", ch);
     return;
   }
 
@@ -1682,7 +1682,7 @@ void AuctionHouse::AddItem(char_data *ch, obj_data *obj, unsigned int price, str
 
   if (price > AUC_MAX_PRICE)
   {
-    csendf(ch, "Price must be between %u and %u.\n\r", AUC_MIN_PRICE, AUC_MAX_PRICE);
+    csendf(ch, "Price must be between %u and %u.\r\n", AUC_MIN_PRICE, AUC_MAX_PRICE);
     return;
   }
 
@@ -1723,19 +1723,19 @@ void AuctionHouse::AddItem(char_data *ch, obj_data *obj, unsigned int price, str
 
   if (strcmp(obj->short_description, ((struct obj_data *)(obj_index[obj->item_number].item))->short_description))
   {
-    send_to_char("The Consignment broker informs you that he does not handle items that have been restrung.\n\r", ch);
+    send_to_char("The Consignment broker informs you that he does not handle items that have been restrung.\r\n", ch);
     return;
   }
 
   if (eq_current_damage(obj) > 0)
   {
-    send_to_char("The Consignment Broker curtly informs you that all items sold must be in $B$2Excellent Condition$R.\n\r", ch);
+    send_to_char("The Consignment Broker curtly informs you that all items sold must be in $B$2Excellent Condition$R.\r\n", ch);
     return;
   }
 
   if ((obj->obj_flags.type_flag == ITEM_WAND || obj->obj_flags.type_flag == ITEM_STAFF) && obj->obj_flags.value[1] != obj->obj_flags.value[2])
   {
-    send_to_char("The Consignment Broker curtly informs you that it needs to have full charges.\n\r", ch);
+    send_to_char("The Consignment Broker curtly informs you that it needs to have full charges.\r\n", ch);
     return;
   }
 
@@ -1781,11 +1781,11 @@ void AuctionHouse::AddItem(char_data *ch, obj_data *obj, unsigned int price, str
   Save();
 
   if (buyer.empty())
-    csendf(ch, "You are now selling %s for %u coins.\n\r",
+    csendf(ch, "You are now selling %s for %u coins.\r\n",
            obj->short_description, price);
   else
   {
-    csendf(ch, "You are now selling %s to %s for %u coins.\n\r",
+    csendf(ch, "You are now selling %s to %s for %u coins.\r\n",
            obj->short_description, buyer.c_str(), price);
   }
 
@@ -1802,18 +1802,18 @@ void AuctionHouse::AddItem(char_data *ch, obj_data *obj, unsigned int price, str
     }
     else
     {
-      send_to_char("The Consignment Broker couldn't auction. Contact an imm.\n\r", ch);
+      send_to_char("The Consignment Broker couldn't auction. Contact an imm.\r\n", ch);
     }
   }
 
   char log_buf[MAX_STRING_LENGTH] = {};
   if (NewTicket.buyer.empty())
   {
-    sprintf(log_buf, "VEND: %s just listed %s for sale for %u coins.\n\r", GET_NAME(ch), obj->short_description, price);
+    sprintf(log_buf, "VEND: %s just listed %s for sale for %u coins.\r\n", GET_NAME(ch), obj->short_description, price);
   }
   else
   {
-    sprintf(log_buf, "VEND: %s just listed %s for sale for %u coins for %s.\n\r", GET_NAME(ch), obj->short_description, price, NewTicket.buyer.c_str());
+    sprintf(log_buf, "VEND: %s just listed %s for sale for %u coins for %s.\r\n", GET_NAME(ch), obj->short_description, price, NewTicket.buyer.c_str());
   }
   log(log_buf, IMP, LogChannels::LOG_OBJECTS);
 

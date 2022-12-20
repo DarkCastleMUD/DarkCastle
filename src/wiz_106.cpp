@@ -82,7 +82,7 @@ int do_force(char_data *ch, string argument, int cmd = CMD_FORCE)
   else if (name != "all")
   {
     if (!(vict = get_char_vis(ch, name)))
-      send_to_char("No one by that name here..\n\r", ch);
+      send_to_char("No one by that name here..\r\n", ch);
     else
     {
       if (GET_LEVEL(ch) < GET_LEVEL(vict) && IS_NPC(vict))
@@ -118,7 +118,7 @@ int do_force(char_data *ch, string argument, int cmd = CMD_FORCE)
   { /* force all */
     if (GET_LEVEL(ch) < OVERSEER)
     {
-      send_to_char("Not gonna happen.\n\r", ch);
+      send_to_char("Not gonna happen.\r\n", ch);
       return eFAILURE;
     }
     for (i = descriptor_list; i; i = next_i)
@@ -140,7 +140,7 @@ int do_force(char_data *ch, string argument, int cmd = CMD_FORCE)
         }
       }
     }
-    send_to_char("Ok.\n\r", ch);
+    send_to_char("Ok.\r\n", ch);
     buf = format("{} just forced all to {}.", GET_NAME(ch), to_force);
     log(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
   }

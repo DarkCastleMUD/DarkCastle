@@ -66,8 +66,8 @@ int do_report(char_data *ch, char *argument, int cmd)
     if (arg1 == "help")
     {
       csendf(ch, "report       - Reports hps, mana, moves and ki. (default)\n\r");
-      csendf(ch, "report xp    - Reports current xp, xp till next level and levels to be gained.\n\r");
-      csendf(ch, "report help  - Shows different ways report can be used.\n\r");
+      csendf(ch, "report xp    - Reports current xp, xp till next level and levels to be gained.\r\n");
+      csendf(ch, "report help  - Shows different ways report can be used.\r\n");
       return eFAILURE;
     }
 
@@ -340,7 +340,7 @@ int do_channel(char_data *ch, char *arg, int cmd)
   {
     if (x == 27)
     {
-      send_to_char("That type was not found.\n\r", ch);
+      send_to_char("That type was not found.\r\n", ch);
       return eSUCCESS;
     }
     if (is_abbrev(buf, types[x]))
@@ -350,23 +350,23 @@ int do_channel(char_data *ch, char *arg, int cmd)
   if (GET_LEVEL(ch) < IMMORTAL &&
       (x < 7 || (x > 14 && x < 22)))
   {
-    send_to_char("That type was not found.\n\r", ch);
+    send_to_char("That type was not found.\r\n", ch);
     return eSUCCESS;
   }
   if (x > 19 && GET_LEVEL(ch) != 110 && x < 22)
   {
-    send_to_char("That type was not found.\n\r", ch);
+    send_to_char("That type was not found.\r\n", ch);
     return eSUCCESS;
   }
   if (IS_SET(ch->misc, (1 << x)))
   {
-    sprintf(buf, "%s channel turned $B$4OFF$R.\n\r", types[x]);
+    sprintf(buf, "%s channel turned $B$4OFF$R.\r\n", types[x]);
     send_to_char(buf, ch);
     REMOVE_BIT(ch->misc, (1 << x));
   }
   else
   {
-    sprintf(buf, "%s channel turned $B$2ON$R.\n\r", types[x]);
+    sprintf(buf, "%s channel turned $B$2ON$R.\r\n", types[x]);
     send_to_char(buf, ch);
     SET_BIT(ch->misc, (1 << x));
   }
@@ -501,13 +501,13 @@ int do_write(char_data *ch, char *argument, int cmd)
   {
     if (!(paper = get_obj_in_list_vis(ch, papername, ch->carrying)))
     {
-      sprintf(buf, "You have no %s.\n\r", papername);
+      sprintf(buf, "You have no %s.\r\n", papername);
       send_to_char(buf, ch);
       return eSUCCESS;
     }
     if (!(pen = get_obj_in_list_vis(ch, penname, ch->carrying)))
     {
-      sprintf(buf, "You have no %s.\n\r", papername);
+      sprintf(buf, "You have no %s.\r\n", papername);
       send_to_char(buf, ch);
       return eSUCCESS;
     }
@@ -516,7 +516,7 @@ int do_write(char_data *ch, char *argument, int cmd)
   {
     if (!(paper = get_obj_in_list_vis(ch, papername, ch->carrying)))
     {
-      sprintf(buf, "There is no %s in your inventory.\n\r", papername);
+      sprintf(buf, "There is no %s in your inventory.\r\n", papername);
       send_to_char(buf, ch);
       return eSUCCESS;
     }
@@ -527,14 +527,14 @@ int do_write(char_data *ch, char *argument, int cmd)
     }
     else if (paper->obj_flags.type_flag != ITEM_NOTE)
     {
-      send_to_char("That thing has nothing to do with writing.\n\r", ch);
+      send_to_char("That thing has nothing to do with writing.\r\n", ch);
       return eSUCCESS;
     }
 
     /* one object was found. Now for the other one. */
     if (!ch->equipment[HOLD])
     {
-      sprintf(buf, "You can't write with a %s alone.\n\r", papername);
+      sprintf(buf, "You can't write with a %s alone.\r\n", papername);
       send_to_char(buf, ch);
       return eSUCCESS;
     }
@@ -561,12 +561,12 @@ int do_write(char_data *ch, char *argument, int cmd)
   }
   else if (paper->action_description)
     /*    else if (paper->item_number != real_object(1205) )  */
-    send_to_char("There's something written on it already.\n\r", ch);
+    send_to_char("There's something written on it already.\r\n", ch);
   else
   {
     /* we can write - hooray! */
 
-    send_to_char("Ok.. go ahead and write.. end the note with a \\@.\n\r",
+    send_to_char("Ok.. go ahead and write.. end the note with a \\@.\r\n",
                  ch);
     act("$n begins to jot down a note.", ch, 0, 0, TO_ROOM, INVIS_NULL);
     ch->desc->strnew = &paper->action_description;
@@ -594,7 +594,7 @@ int do_insult(char_data *ch, char *argument, int cmd)
     {
       if (victim != ch)
       {
-        sprintf(buf, "You insult %s.\n\r", GET_SHORT(victim));
+        sprintf(buf, "You insult %s.\r\n", GET_SHORT(victim));
         send_to_char(buf, ch);
 
         switch (number(0, 3))
@@ -623,7 +623,7 @@ int do_insult(char_data *ch, char *argument, int cmd)
       }
       else
       { /* ch == victim */
-        send_to_char("You feel insulted.\n\r", ch);
+        send_to_char("You feel insulted.\r\n", ch);
       }
     }
   }

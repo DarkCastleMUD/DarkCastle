@@ -590,7 +590,7 @@ int do_index(char_data *ch, char *argument, int cmd)
     }
 
     if (new_help_table[atoi(argument)].min_level > 1)
-      send_to_char("You are not high enough level to view this helpfile.\n\r", ch);
+      send_to_char("You are not high enough level to view this helpfile.\r\n", ch);
     else
     {
       show_help_header(ch);
@@ -917,8 +917,8 @@ void save_help(char_data *ch)
 
   if ((f = dc_fopen(file, "w")) == NULL)
   {
-    send_to_char("Couldn't open help file for saving.\n\r", ch);
-    perror("Couldn't open help file for saving.\n\r");
+    send_to_char("Couldn't open help file for saving.\r\n", ch);
+    perror("Couldn't open help file for saving.\r\n");
     return;
   }
 
@@ -943,7 +943,7 @@ void save_help(char_data *ch)
   fprintf(f, "$~\n");
 
   dc_fclose(f);
-  send_to_char("Saved.\n\r", ch);
+  send_to_char("Saved.\r\n", ch);
   sprintf(buf, "%s just saved the help files.", GET_NAME(ch));
   log(buf, OVERSEER, LogChannels::LOG_HELP);
 
@@ -951,8 +951,8 @@ void save_help(char_data *ch)
 
   if ((f = dc_fopen(file, "w")) == NULL)
   {
-    send_to_char("Couldn't open web help file for saving.\n\r", ch);
-    perror("Couldn't open web help file for saving.\n\r");
+    send_to_char("Couldn't open web help file for saving.\r\n", ch);
+    perror("Couldn't open web help file for saving.\r\n");
     return;
   }
 

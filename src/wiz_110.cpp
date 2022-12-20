@@ -295,14 +295,14 @@ int do_wizlock(char_data *ch, char *argument, int cmd)
     char log_buf[MAX_STRING_LENGTH] = {};
     sprintf(log_buf, "Game has been wizlocked by %s.", GET_NAME(ch));
     log(log_buf, ANGEL, LogChannels::LOG_GOD);
-    send_to_char("Game wizlocked.\n\r", ch);
+    send_to_char("Game wizlocked.\r\n", ch);
   }
   else
   {
     char log_buf[MAX_STRING_LENGTH] = {};
     sprintf(log_buf, "Game has been un-wizlocked by %s.", GET_NAME(ch));
     log(log_buf, ANGEL, LogChannels::LOG_GOD);
-    send_to_char("Game un-wizlocked.\n\r", ch);
+    send_to_char("Game un-wizlocked.\r\n", ch);
   }
   return eSUCCESS;
 }
@@ -334,7 +334,7 @@ int do_chpwd(char_data *ch, char *arg, int cmd)
 
   if (!(victim = get_pc_vis(ch, name)))
   {
-    send_to_char("That player was not found.\n\r", ch);
+    send_to_char("That player was not found.\r\n", ch);
     return eFAILURE;
   }
 
@@ -342,14 +342,14 @@ int do_chpwd(char_data *ch, char *arg, int cmd)
 
   if (!*name || strlen(name) > 10)
   {
-    send_to_char("Password must be 10 characters or less.\n\r", ch);
+    send_to_char("Password must be 10 characters or less.\r\n", ch);
     return eFAILURE;
   }
 
   strncpy(victim->pcdata->pwd, (char *)crypt((char *)name, (char *)GET_NAME(victim)), PASSWORD_LEN);
   victim->pcdata->pwd[PASSWORD_LEN] = '\0';
 
-  send_to_char("Ok.\n\r", ch);
+  send_to_char("Ok.\r\n", ch);
   return eSUCCESS;
 }
 
@@ -366,7 +366,7 @@ int do_fakelog(char_data *ch, char *argument, int cmd)
 
   if (!*lev_str)
   {
-    send_to_char("Also, you must supply a level.\n\r", ch);
+    send_to_char("Also, you must supply a level.\r\n", ch);
     return eFAILURE;
   }
 
@@ -375,7 +375,7 @@ int do_fakelog(char_data *ch, char *argument, int cmd)
     lev_nr = atoi(lev_str);
     if (lev_nr < IMMORTAL || lev_nr > IMP)
     {
-      send_to_char("You must use a valid level from 100-110.\n\r", ch);
+      send_to_char("You must use a valid level from 100-110.\r\n", ch);
       return eFAILURE;
     }
   }
@@ -434,14 +434,14 @@ int do_rename_char(char_data *ch, char *arg, int cmd)
   {
     if (GET_PLATINUM(victim) < 500)
     {
-      send_to_char("They don't have enough plats.\n\r", ch);
+      send_to_char("They don't have enough plats.\r\n", ch);
       return eFAILURE;
     }
     else
     {
       GET_PLATINUM(victim) -= 500;
-      csendf(ch, "You reach into %s's soul and remove 500 platinum.\n\r", GET_SHORT(victim));
-      send_to_char("You feel the hand of god slip into your soul and remove 500 platinum.\n\r", victim);
+      csendf(ch, "You reach into %s's soul and remove 500 platinum.\r\n", GET_SHORT(victim));
+      send_to_char("You feel the hand of god slip into your soul and remove 500 platinum.\r\n", victim);
       sprintf(name, "500 platinum removed from %s for rename.", GET_NAME(victim));
       log(name, GET_LEVEL(ch), LogChannels::LOG_GOD);
     }
@@ -614,7 +614,7 @@ int do_install(char_data *ch, char *arg, int cmd)
   if (!*arg1 || !*type || !*arg2)
   {
     sprintf(err, "Usage: install <range #> <# of rooms> <world|obj|mob|zone|all>\n\r"
-                 "  ie.. install 29100 100 m = installs mob range 29100-29199.\n\r");
+                 "  ie.. install 29100 100 m = installs mob range 29100-29199.\r\n");
     send_to_char(err, ch);
     return eFAILURE;
   }
@@ -622,7 +622,7 @@ int do_install(char_data *ch, char *arg, int cmd)
   if (!(range = atoi(arg1)))
   {
     sprintf(err, "Usage: install <range #> <# of rooms> <world|obj|mob|zone|all>\n\r"
-                 "  ie.. install 29100 100 m = installs mob range 29100-29199.\n\r");
+                 "  ie.. install 29100 100 m = installs mob range 29100-29199.\r\n");
     send_to_char(err, ch);
     return eFAILURE;
   }
@@ -636,7 +636,7 @@ int do_install(char_data *ch, char *arg, int cmd)
   if (!(numrooms = atoi(arg2)))
   {
     sprintf(err, "Usage: install <range #> <# of rooms> <world|obj|mob|zone|all>\n\r"
-                 "  ie.. install 29100 100 m = installs mob range 29100-29199.\n\r");
+                 "  ie.. install 29100 100 m = installs mob range 29100-29199.\r\n");
     send_to_char(err, ch);
     return eFAILURE;
   }
@@ -669,7 +669,7 @@ int do_install(char_data *ch, char *arg, int cmd)
   if (type_ok != 1)
   {
     sprintf(err, "Usage: install <range #> <# of rooms> <world|obj|mob|zone|all>\n\r"
-                 "  ie.. install 29100 100 m = installs mob range 29100-29199.\n\r");
+                 "  ie.. install 29100 100 m = installs mob range 29100-29199.\r\n");
     send_to_char(err, ch);
     return eFAILURE;
   }
@@ -691,7 +691,7 @@ int do_install(char_data *ch, char *arg, int cmd)
   {
     sprintf(err, "Error Code: %d\r\n"
                  "Usage: install <range #> <# of rooms> <world|obj|mob|zone|all>\n\r"
-                 "  ie.. install 29100 100 m = installs mob range 29100-29199.\n\r",
+                 "  ie.. install 29100 100 m = installs mob range 29100-29199.\r\n",
             ret);
   }
   send_to_char(err, ch);

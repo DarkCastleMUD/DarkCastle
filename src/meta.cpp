@@ -462,7 +462,7 @@ void meta_list_stats(char_data *ch)
 	plat_cost = meta_get_stat_plat_cost(ch, STRENGTH);
 	max_stat = get_max_stat(ch, STRENGTH);
 	if (ch->raw_str >= max_stat)
-		csendf(ch, "$B$31)$R Str:       Your strength is already %d.\n\r", max_stat);
+		csendf(ch, "$B$31)$R Str:       Your strength is already %d.\r\n", max_stat);
 	else
 		csendf(ch, "$B$31)$R Str: %d        Cost: %d exp + %d Platinum coins. \n\r",
 			   (ch->raw_str + 1), xp_price, plat_cost);
@@ -471,36 +471,36 @@ void meta_list_stats(char_data *ch)
 	plat_cost = meta_get_stat_plat_cost(ch, DEXTERITY);
 	max_stat = get_max_stat(ch, DEXTERITY);
 	if (ch->raw_dex >= max_stat)
-		csendf(ch, "$B$32)$R Dex:       Your dexterity is already %d.\n\r", max_stat);
+		csendf(ch, "$B$32)$R Dex:       Your dexterity is already %d.\r\n", max_stat);
 	else
-		csendf(ch, "$B$32)$R Dex: %d        Cost: %d exp + %d Platinum coins.\n\r",
+		csendf(ch, "$B$32)$R Dex: %d        Cost: %d exp + %d Platinum coins.\r\n",
 			   (ch->raw_dex + 1), xp_price, plat_cost);
 
 	xp_price = meta_get_stat_exp_cost(ch, CONSTITUTION);
 	plat_cost = meta_get_stat_plat_cost(ch, CONSTITUTION);
 	max_stat = get_max_stat(ch, CONSTITUTION);
 	if (ch->raw_con >= max_stat)
-		csendf(ch, "$B$33)$R Con:       Your constitution is already %d.\n\r", max_stat);
+		csendf(ch, "$B$33)$R Con:       Your constitution is already %d.\r\n", max_stat);
 	else
-		csendf(ch, "$B$33)$R Con: %d        Cost: %d exp + %d Platinum coins.\n\r",
+		csendf(ch, "$B$33)$R Con: %d        Cost: %d exp + %d Platinum coins.\r\n",
 			   (ch->raw_con + 1), xp_price, plat_cost);
 
 	xp_price = meta_get_stat_exp_cost(ch, INTELLIGENCE);
 	plat_cost = meta_get_stat_plat_cost(ch, INTELLIGENCE);
 	max_stat = get_max_stat(ch, INTELLIGENCE);
 	if (ch->raw_intel >= max_stat)
-		csendf(ch, "$B$34)$R Int:       Your intelligence is already %d.\n\r", max_stat);
+		csendf(ch, "$B$34)$R Int:       Your intelligence is already %d.\r\n", max_stat);
 	else
-		csendf(ch, "$B$34)$R Int: %d        Cost: %d exp + %d Platinum coins.\n\r",
+		csendf(ch, "$B$34)$R Int: %d        Cost: %d exp + %d Platinum coins.\r\n",
 			   (ch->raw_intel + 1), xp_price, plat_cost);
 
 	xp_price = meta_get_stat_exp_cost(ch, WISDOM);
 	plat_cost = meta_get_stat_plat_cost(ch, WISDOM);
 	max_stat = get_max_stat(ch, WISDOM);
 	if (ch->raw_wis >= max_stat)
-		csendf(ch, "$B$35)$R Wis:       Your wisdom is already %d.\n\r", max_stat);
+		csendf(ch, "$B$35)$R Wis:       Your wisdom is already %d.\r\n", max_stat);
 	else
-		csendf(ch, "$B$35)$R Wis: %d        Cost: %d exp + %d Platinum coins.\n\r",
+		csendf(ch, "$B$35)$R Wis: %d        Cost: %d exp + %d Platinum coins.\r\n",
 			   (ch->raw_wis + 1), xp_price, plat_cost);
 }
 
@@ -746,42 +746,42 @@ int meta_dude(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
 		send_to_char("$BStatistic Meta:$R\r\n", ch);
 		if (hit_exp && hit_cost)
 			csendf(ch, "$B$36)$R Add 5 points to your hit points:   %lld experience points and %lld"
-					   " Platinum coins.\n\r",
+					   " Platinum coins.\r\n",
 				   hit_exp, hit_cost);
 		else
 			csendf(ch, "$B$36)$R Add to your hit points:   You cannot do this.\r\n");
 
 		if (hit_exp && hit_cost)
 			csendf(ch, "$B$37)$R Add 1 point to your hit points:   %lld experience points and %lld"
-					   " Platinum coins.\n\r",
+					   " Platinum coins.\r\n",
 				   (int64_t)(hit_exp / 5 * 1.1), (int64_t)(hit_cost / 5 * 1.1));
 		else
 			csendf(ch, "$B$37)$R Add to your hit points:   You cannot do this.\r\n");
 
 		if (mana_exp && mana_cost)
 			csendf(ch, "$B$38)$R Add 5 points to your mana points:  %lld experience points and %lld"
-					   " Platinum coins.\n\r",
+					   " Platinum coins.\r\n",
 				   mana_exp, mana_cost);
 		else
 			csendf(ch, "$B$38)$R Add to your mana points:  You cannot do this.\r\n");
 
 		if (mana_exp && mana_cost)
 			csendf(ch, "$B$39)$R Add 1 point to your mana points:   %lld experience points and %lld"
-					   " Platinum coins.\n\r",
+					   " Platinum coins.\r\n",
 				   (int64_t)(mana_exp / 5 * 1.1), (int64_t)(mana_cost / 5 * 1.1));
 		else
 			csendf(ch, "$B$39)$R Add to your mana points:   You cannot do this.\r\n");
 
 		if (move_exp && move_cost)
 			csendf(ch, "$B$310)$R Add 5 points to your movement points: %lld experience points and %lld"
-					   " Platinum coins.\n\r",
+					   " Platinum coins.\r\n",
 				   move_exp, move_cost);
 		else
 			csendf(ch, "$B$310)$R Add to your movement points:  You cannot do this.\r\n");
 
 		if (move_exp && move_cost)
 			csendf(ch, "$B$311)$R Add 1 points to your movement points:   %lld experience points and %lld"
-					   " Platinum coins.\n\r",
+					   " Platinum coins.\r\n",
 				   (int64_t)(move_exp / 5 * 1.1), (int64_t)(move_cost / 5 * 1.1));
 		else
 			csendf(ch, "$B$311)$R Add to your movement points:   You cannot do this.\r\n");
@@ -790,15 +790,15 @@ int meta_dude(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
 
 		if (!IS_MOB(ch) && ki_cost && ki_exp)
 		{ // mobs can't meta ki
-			csendf(ch, "$B$312)$R Add a point of ki:        %lld experience points and %lld Platinum.\n\r", ki_exp, ki_cost);
+			csendf(ch, "$B$312)$R Add a point of ki:        %lld experience points and %lld Platinum.\r\n", ki_exp, ki_cost);
 		}
 		else if (!IS_MOB(ch))
 			csendf(ch, "$B$312)$R Add a point of ki:        You cannot do this.\r\n");
 
 		send_to_char("$BMonetary Exchange:$R\r\n", ch);
 		send_to_char(
-			"$B$313)$R One (1) Platinum coin     Cost: 20,000 Gold Coins.\n\r"
-			"$B$314)$R Five (5) Platinum coins   Cost: 100,000 Gold Coins.\n\r"
+			"$B$313)$R One (1) Platinum coin     Cost: 20,000 Gold Coins.\r\n"
+			"$B$314)$R Five (5) Platinum coins   Cost: 100,000 Gold Coins.\r\n"
 			"$B$315)$R 250 Platinum coins        Cost: 5,000,000 Gold Coins.\r\n"
 			"$B$316)$R 100,000 Gold Coins        Cost: Five (5) Platinum coins.\r\n"
 			"$B$317)$R 5,000,000 Gold Coins      Cost: 250 Platinum coins.\r\n"
@@ -1114,7 +1114,7 @@ int meta_dude(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
 			}
 			GET_GOLD(ch) -= 20000;
 			GET_PLATINUM(ch) += 1;
-			send_to_char("Ok.\n\r", ch);
+			send_to_char("Ok.\r\n", ch);
 			return eSUCCESS;
 		}
 		if (choice == 14)
@@ -1132,14 +1132,14 @@ int meta_dude(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
 
 			GET_GOLD(ch) -= 100000;
 			GET_PLATINUM(ch) += 5;
-			send_to_char("Ok.\n\r", ch);
+			send_to_char("Ok.\r\n", ch);
 			return eSUCCESS;
 		}
 		if (choice == 15)
 		{
 			if (!IS_MOB(ch) && affected_by_spell(ch, FUCK_GTHIEF))
 			{
-				send_to_char("Your criminal acts prohibit it.\n\r", ch);
+				send_to_char("Your criminal acts prohibit it.\r\n", ch);
 				return eSUCCESS;
 			}
 
@@ -1150,7 +1150,7 @@ int meta_dude(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
 			}
 			GET_PLATINUM(ch) += 250;
 			GET_GOLD(ch) -= 5000000;
-			send_to_char("Ok.\n\r", ch);
+			send_to_char("Ok.\r\n", ch);
 			return eSUCCESS;
 		}
 		if (choice == 16)
@@ -1162,7 +1162,7 @@ int meta_dude(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
 			}
 			GET_PLATINUM(ch) -= 5;
 			GET_GOLD(ch) += 100000;
-			send_to_char("Ok.\n\r", ch);
+			send_to_char("Ok.\r\n", ch);
 			return eSUCCESS;
 		}
 
@@ -1175,7 +1175,7 @@ int meta_dude(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
 			}
 			GET_PLATINUM(ch) -= 250;
 			GET_GOLD(ch) += 5000000;
-			send_to_char("Ok.\n\r", ch);
+			send_to_char("Ok.\r\n", ch);
 			return eSUCCESS;
 		}
 		if (choice == 18)
@@ -1208,14 +1208,14 @@ int meta_dude(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
 			struct obj_data *obj = clone_object(real_object(10003));
 			if (IS_CARRYING_N(ch) + 1 > CAN_CARRY_N(ch))
 			{
-				send_to_char("You can't carry that many items.\n\r", ch);
+				send_to_char("You can't carry that many items.\r\n", ch);
 				extract_obj(obj);
 				return eSUCCESS;
 			}
 
 			if (IS_CARRYING_W(ch) + obj->obj_flags.weight > CAN_CARRY_W(ch))
 			{
-				send_to_char("You can't carry that much weight.\n\r", ch);
+				send_to_char("You can't carry that much weight.\r\n", ch);
 				extract_obj(obj);
 				return eSUCCESS;
 			}
@@ -1228,7 +1228,7 @@ int meta_dude(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
 		{
 			if (GET_PLATINUM(ch) < 25)
 			{
-				send_to_char("Costs 25 plats...which you don't have.\n\r", ch);
+				send_to_char("Costs 25 plats...which you don't have.\r\n", ch);
 				return eSUCCESS;
 			}
 			if (IS_MOB(ch))
@@ -1236,7 +1236,7 @@ int meta_dude(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
 				send_to_char("You can't buy practices chode...\r\n", ch);
 				return eSUCCESS;
 			}
-			send_to_char("The Meta-Physician gives you a practice session.\n\r", ch);
+			send_to_char("The Meta-Physician gives you a practice session.\r\n", ch);
 
 			GET_PLATINUM(ch) -= 25;
 			ch->pcdata->practices += 1;
@@ -1246,7 +1246,7 @@ int meta_dude(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
 		{ // -2 AC
 			if (GET_QPOINTS(ch) < 10)
 			{
-				send_to_char("Costs 10 qpoints...which you don't have.\n\r", ch);
+				send_to_char("Costs 10 qpoints...which you don't have.\r\n", ch);
 				return eSUCCESS;
 			}
 			if (IS_MOB(ch))
@@ -1274,7 +1274,7 @@ int meta_dude(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
 		{ // 2,000,000 experience
 			if (GET_QPOINTS(ch) < 1)
 			{
-				send_to_char("Costs 1 qpoint...which you don't have.\n\r", ch);
+				send_to_char("Costs 1 qpoint...which you don't have.\r\n", ch);
 				return eSUCCESS;
 			}
 			if (IS_MOB(ch))
@@ -1752,14 +1752,14 @@ int cardinal(char_data *ch, struct obj_data *obj, int cmd, const char *argument,
 			struct obj_data *obj = clone_object(real_object(10004));
 			if (IS_CARRYING_N(ch) + 1 > CAN_CARRY_N(ch))
 			{
-				send_to_char("You can't carry that many items.\n\r", ch);
+				send_to_char("You can't carry that many items.\r\n", ch);
 				extract_obj(obj);
 				return eSUCCESS;
 			}
 
 			if (IS_CARRYING_W(ch) + obj->obj_flags.weight > CAN_CARRY_W(ch))
 			{
-				send_to_char("You can't carry that much weight.\n\r", ch);
+				send_to_char("You can't carry that much weight.\r\n", ch);
 				extract_obj(obj);
 				return eSUCCESS;
 			}
@@ -1832,7 +1832,7 @@ int cardinal(char_data *ch, struct obj_data *obj, int cmd, const char *argument,
 		{
 			if (GET_QPOINTS(ch) < 5)
 			{
-				send_to_char("Costs 5 qpoints...which you don't have.\n\r", ch);
+				send_to_char("Costs 5 qpoints...which you don't have.\r\n", ch);
 				return eSUCCESS;
 			}
 			if (IS_MOB(ch))
@@ -1859,7 +1859,7 @@ int cardinal(char_data *ch, struct obj_data *obj, int cmd, const char *argument,
 		{
 			if (GET_QPOINTS(ch) < 5)
 			{
-				send_to_char("Costs 5 qpoints...which you don't have.\n\r", ch);
+				send_to_char("Costs 5 qpoints...which you don't have.\r\n", ch);
 				return eSUCCESS;
 			}
 			if (IS_MOB(ch))

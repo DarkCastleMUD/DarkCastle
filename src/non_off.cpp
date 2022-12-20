@@ -111,13 +111,13 @@ int do_sacrifice(char_data *ch, char *argument, int cmd)
 
   if (obj->obj_flags.value[3] == 1 && isname("pc", obj->name))
   {
-    send_to_char("You probably don't *really* want to do that.\n\r", ch);
+    send_to_char("You probably don't *really* want to do that.\r\n", ch);
     return eFAILURE;
   }
 
   if (IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL) && GET_LEVEL(ch) < ANGEL)
   {
-    send_to_char("God, what a stupid fucking thing for you to do.\n\r", ch);
+    send_to_char("God, what a stupid fucking thing for you to do.\r\n", ch);
     return eFAILURE;
   }
 
@@ -129,14 +129,14 @@ int do_sacrifice(char_data *ch, char *argument, int cmd)
 
   if (IS_AFFECTED(ch, AFF_CANTQUIT) && !IS_MOB(ch) && affected_by_spell(ch, FUCK_PTHIEF))
   {
-    send_to_char("Your criminal acts prohibit it.\n\r", ch);
+    send_to_char("Your criminal acts prohibit it.\r\n", ch);
     return eFAILURE;
   }
 
   /* don't let people sac stuff in donations */
   if (ch->in_room == real_room(3099))
   {
-    send_to_char("Not in the donation room.\n\r", ch);
+    send_to_char("Not in the donation room.\r\n", ch);
     return (eFAILURE);
   }
 
@@ -215,7 +215,7 @@ int do_donate(char_data *ch, char *argument, int cmd)
 
   if (IS_AFFECTED(ch, AFF_CANTQUIT) && !IS_MOB(ch) && affected_by_spell(ch, FUCK_PTHIEF))
   {
-    send_to_char("Your criminal acts prohibit it.\n\r", ch);
+    send_to_char("Your criminal acts prohibit it.\r\n", ch);
     return eFAILURE;
   }
 
@@ -265,7 +265,7 @@ int do_donate(char_data *ch, char *argument, int cmd)
     }
     else
     {
-      send_to_char("You can only yield the Champion flag from a safe room.\n\r", ch);
+      send_to_char("You can only yield the Champion flag from a safe room.\r\n", ch);
       return eFAILURE;
     }
   }
@@ -350,7 +350,7 @@ int do_title(char_data *ch, char *argument, int cmd)
 
   if (!IS_MOB(ch) && IS_SET(ch->pcdata->punish, PUNISH_NOTITLE))
   {
-    send_to_char("You can't do that.  You must have been naughty.\n\r", ch);
+    send_to_char("You can't do that.  You must have been naughty.\r\n", ch);
     return eFAILURE;
   }
 
@@ -359,13 +359,13 @@ int do_title(char_data *ch, char *argument, int cmd)
 
   if (strlen(argument) > 40)
   {
-    send_to_char("Title field too big.  40 characters max.\n\r", ch);
+    send_to_char("Title field too big.  40 characters max.\r\n", ch);
     return eFAILURE;
   }
 
   if (strchr(argument, '[') || strchr(argument, ']'))
   {
-    send_to_char("You cannot have a '[' or a ']' in your title.\n\r", ch);
+    send_to_char("You cannot have a '[' or a ']' in your title.\r\n", ch);
     return eFAILURE;
   }
 
@@ -375,7 +375,7 @@ int do_title(char_data *ch, char *argument, int cmd)
   {
     if (((argument[ctr] == '$') && (argument[ctr + 1] == '$')) || ((argument[ctr] == '?') && (argument[ctr + 1] == '?')))
     {
-      send_to_char("Your title is now: Common Dork of Dark Castle.\n\r", ch);
+      send_to_char("Your title is now: Common Dork of Dark Castle.\r\n", ch);
       return eFAILURE;
     }
   }
@@ -541,7 +541,7 @@ int do_toggle(char_data *ch, char *arg, int cmd)
   if (toggle_txt[x][0] == '\0')
   {
     send_to_char("Bad option.  Type toggle with no arguments for a list of "
-                 "good ones.\n\r",
+                 "good ones.\r\n",
                  ch);
     return eFAILURE;
   }
@@ -625,7 +625,7 @@ int do_toggle(char_data *ch, char *arg, int cmd)
     do_nodupekeys_toggle(ch, "", CMD_DEFAULT);
     break;
   default:
-    send_to_char("A bad thing just happened.  Tell the gods.\n\r", ch);
+    send_to_char("A bad thing just happened.  Tell the gods.\r\n", ch);
     break;
   }
   return eSUCCESS;
@@ -785,12 +785,12 @@ int do_brief(char_data *ch, char *argument, int cmd)
 
   if (IS_SET(ch->pcdata->toggles, PLR_BRIEF))
   {
-    send_to_char("Brief mode $B$4off$R.\n\r", ch);
+    send_to_char("Brief mode $B$4off$R.\r\n", ch);
     REMOVE_BIT(ch->pcdata->toggles, PLR_BRIEF);
   }
   else
   {
-    send_to_char("Brief mode $B$2on$R.\n\r", ch);
+    send_to_char("Brief mode $B$2on$R.\r\n", ch);
     SET_BIT(ch->pcdata->toggles, PLR_BRIEF);
   }
   return eSUCCESS;
@@ -803,12 +803,12 @@ int do_ansi(char_data *ch, char *argument, int cmd)
 
   if (IS_SET(ch->pcdata->toggles, PLR_ANSI))
   {
-    send_to_char("ANSI COLOR $B$4off$R.\n\r", ch);
+    send_to_char("ANSI COLOR $B$4off$R.\r\n", ch);
     REMOVE_BIT(ch->pcdata->toggles, PLR_ANSI);
   }
   else
   {
-    send_to_char("ANSI COLOR $B$2on$R.\n\r", ch);
+    send_to_char("ANSI COLOR $B$2on$R.\r\n", ch);
     SET_BIT(ch->pcdata->toggles, PLR_ANSI);
   }
   return eSUCCESS;
@@ -821,12 +821,12 @@ int do_vt100(char_data *ch, char *argument, int cmd)
 
   if (IS_SET(ch->pcdata->toggles, PLR_VT100))
   {
-    send_to_char("VT100 $B$4off$R.\n\r", ch);
+    send_to_char("VT100 $B$4off$R.\r\n", ch);
     REMOVE_BIT(ch->pcdata->toggles, PLR_VT100);
   }
   else
   {
-    send_to_char("VT100 $B$2on$R.\n\r", ch);
+    send_to_char("VT100 $B$2on$R.\r\n", ch);
     SET_BIT(ch->pcdata->toggles, PLR_VT100);
   }
   return eSUCCESS;
@@ -839,12 +839,12 @@ int do_compact(char_data *ch, char *argument, int cmd)
 
   if (IS_SET(ch->pcdata->toggles, PLR_COMPACT))
   {
-    send_to_char("Compact mode $B$4off$R.\n\r", ch);
+    send_to_char("Compact mode $B$4off$R.\r\n", ch);
     REMOVE_BIT(ch->pcdata->toggles, PLR_COMPACT);
   }
   else
   {
-    send_to_char("Compact mode $B$2on$R.\n\r", ch);
+    send_to_char("Compact mode $B$2on$R.\r\n", ch);
     SET_BIT(ch->pcdata->toggles, PLR_COMPACT);
   }
   return eSUCCESS;
@@ -857,12 +857,12 @@ int do_summon_toggle(char_data *ch, char *argument, int cmd)
 
   if (IS_SET(ch->pcdata->toggles, PLR_SUMMONABLE))
   {
-    send_to_char("You may no longer be summoned by other players.\n\r", ch);
+    send_to_char("You may no longer be summoned by other players.\r\n", ch);
     REMOVE_BIT(ch->pcdata->toggles, PLR_SUMMONABLE);
   }
   else
   {
-    send_to_char("You may now be summoned by other players.\n\r"
+    send_to_char("You may now be summoned by other players.\r\n"
                  "Make _sure_ you want this...they could summon you to your death!\r\n",
                  ch);
     SET_BIT(ch->pcdata->toggles, PLR_SUMMONABLE);
@@ -877,12 +877,12 @@ int do_lfg_toggle(char_data *ch, char *argument, int cmd)
 
   if (IS_SET(ch->pcdata->toggles, PLR_LFG))
   {
-    send_to_char("You are no longer Looking For Group.\n\r", ch);
+    send_to_char("You are no longer Looking For Group.\r\n", ch);
     REMOVE_BIT(ch->pcdata->toggles, PLR_LFG);
   }
   else
   {
-    send_to_char("You are now Looking For Group.\n\r", ch);
+    send_to_char("You are now Looking For Group.\r\n", ch);
     SET_BIT(ch->pcdata->toggles, PLR_LFG);
   }
   return eSUCCESS;
@@ -901,12 +901,12 @@ int do_guide_toggle(char_data *ch, char *argument, int cmd)
 
   if (IS_SET(ch->pcdata->toggles, PLR_GUIDE_TOG))
   {
-    send_to_char("You have hidden your $B(Guide)$R tag.\n\r", ch);
+    send_to_char("You have hidden your $B(Guide)$R tag.\r\n", ch);
     REMOVE_BIT(ch->pcdata->toggles, PLR_GUIDE_TOG);
   }
   else
   {
-    send_to_char("You will now show your $B(Guide)$R tag.\n\r", ch);
+    send_to_char("You will now show your $B(Guide)$R tag.\r\n", ch);
     SET_BIT(ch->pcdata->toggles, PLR_GUIDE_TOG);
   }
 
@@ -919,12 +919,12 @@ int do_news_toggle(char_data *ch, char *argument, int cmd)
 
   if (IS_SET(ch->pcdata->toggles, PLR_NEWS))
   {
-    send_to_char("You now view news in an up-down fashion.\n\r", ch);
+    send_to_char("You now view news in an up-down fashion.\r\n", ch);
     REMOVE_BIT(ch->pcdata->toggles, PLR_NEWS);
   }
   else
   {
-    send_to_char("You now view news in a down-up fashion..\n\r", ch);
+    send_to_char("You now view news in a down-up fashion..\r\n", ch);
     SET_BIT(ch->pcdata->toggles, PLR_NEWS);
   }
 
@@ -939,11 +939,11 @@ int do_ascii_toggle(char_data *ch, char *argument, int cmd)
   if (IS_SET(ch->pcdata->toggles, PLR_ASCII))
   {
     REMOVE_BIT(ch->pcdata->toggles, PLR_ASCII);
-    send_to_char("Cards are now displayed through ASCII.\n\r", ch);
+    send_to_char("Cards are now displayed through ASCII.\r\n", ch);
   }
   else
   {
-    send_to_char("Cards are no longer dislayed through ASCII.\n\r", ch);
+    send_to_char("Cards are no longer dislayed through ASCII.\r\n", ch);
     SET_BIT(ch->pcdata->toggles, PLR_ASCII);
   }
 
@@ -958,11 +958,11 @@ int do_damage_toggle(char_data *ch, char *argument, int cmd)
   if (IS_SET(ch->pcdata->toggles, PLR_DAMAGE))
   {
     REMOVE_BIT(ch->pcdata->toggles, PLR_DAMAGE);
-    send_to_char("Damage numbers will no longer be displayed in combat.\n\r", ch);
+    send_to_char("Damage numbers will no longer be displayed in combat.\r\n", ch);
   }
   else
   {
-    send_to_char("Damage numbers will now be displayed in combat.\n\r", ch);
+    send_to_char("Damage numbers will now be displayed in combat.\r\n", ch);
     SET_BIT(ch->pcdata->toggles, PLR_DAMAGE);
   }
 
@@ -976,12 +976,12 @@ int do_notax_toggle(char_data *ch, char *argument, int cmd)
 
   if (IS_SET(ch->pcdata->toggles, PLR_NOTAX))
   {
-    send_to_char("You will now be taxed on all your loot.\n\r", ch);
+    send_to_char("You will now be taxed on all your loot.\r\n", ch);
     REMOVE_BIT(ch->pcdata->toggles, PLR_NOTAX);
   }
   else
   {
-    send_to_char("You will no longer be taxed.\n\r", ch);
+    send_to_char("You will no longer be taxed.\r\n", ch);
     SET_BIT(ch->pcdata->toggles, PLR_NOTAX);
   }
 
@@ -995,12 +995,12 @@ int do_charmiejoin_toggle(char_data *ch, char *argument, int cmd)
 
   if (IS_SET(ch->pcdata->toggles, PLR_CHARMIEJOIN))
   {
-    send_to_char("Your followers will no longer automatically join you.\n\r", ch);
+    send_to_char("Your followers will no longer automatically join you.\r\n", ch);
     REMOVE_BIT(ch->pcdata->toggles, PLR_CHARMIEJOIN);
   }
   else
   {
-    send_to_char("Your followers will automatically aid you in battle.\n\r", ch);
+    send_to_char("Your followers will automatically aid you in battle.\r\n", ch);
     SET_BIT(ch->pcdata->toggles, PLR_CHARMIEJOIN);
   }
 
@@ -1014,12 +1014,12 @@ int do_autoeat(char_data *ch, char *argument, int cmd)
 
   if (IS_SET(ch->pcdata->toggles, PLR_AUTOEAT))
   {
-    send_to_char("You no longer automatically eat and drink.\n\r", ch);
+    send_to_char("You no longer automatically eat and drink.\r\n", ch);
     REMOVE_BIT(ch->pcdata->toggles, PLR_AUTOEAT);
   }
   else
   {
-    send_to_char("You now automatically eat and drink when hungry and thirsty.\n\r", ch);
+    send_to_char("You now automatically eat and drink when hungry and thirsty.\r\n", ch);
     SET_BIT(ch->pcdata->toggles, PLR_AUTOEAT);
   }
   return eSUCCESS;
@@ -1034,16 +1034,16 @@ int do_anonymous(char_data *ch, char *argument, int cmd)
   }
   if (GET_LEVEL(ch) < 40)
   {
-    send_to_char("You are too inexperienced to disguise your profession.\n\r", ch);
+    send_to_char("You are too inexperienced to disguise your profession.\r\n", ch);
     return eSUCCESS;
   }
   if (IS_SET(ch->pcdata->toggles, PLR_ANONYMOUS))
   {
-    send_to_char("Your class and level information is now public.\n\r", ch);
+    send_to_char("Your class and level information is now public.\r\n", ch);
   }
   else
   {
-    send_to_char("Your class and level information is now private.\n\r", ch);
+    send_to_char("Your class and level information is now private.\r\n", ch);
   }
 
   TOGGLE_BIT(ch->pcdata->toggles, PLR_ANONYMOUS);
@@ -1054,12 +1054,12 @@ int do_wimpy(char_data *ch, char *argument, int cmd)
 {
   if (IS_SET(ch->pcdata->toggles, PLR_WIMPY))
   {
-    send_to_char("You are no longer a wimp....maybe.\n\r", ch);
+    send_to_char("You are no longer a wimp....maybe.\r\n", ch);
     REMOVE_BIT(ch->pcdata->toggles, PLR_WIMPY);
     return eFAILURE;
   }
 
-  send_to_char("You are now an official wimp.\n\r", ch);
+  send_to_char("You are now an official wimp.\r\n", ch);
   SET_BIT(ch->pcdata->toggles, PLR_WIMPY);
   return eSUCCESS;
 }
@@ -1070,12 +1070,12 @@ int do_pager(char_data *ch, char *argument, int cmd)
 {
   if (IS_SET(ch->pcdata->toggles, PLR_PAGER))
   {
-    send_to_char("You now page your strings in 24 line chunks.\n\r", ch);
+    send_to_char("You now page your strings in 24 line chunks.\r\n", ch);
     REMOVE_BIT(ch->pcdata->toggles, PLR_PAGER);
     return eFAILURE;
   }
 
-  send_to_char("You no longer page strings in 24 line chunks.\n\r", ch);
+  send_to_char("You no longer page strings in 24 line chunks.\r\n", ch);
   SET_BIT(ch->pcdata->toggles, PLR_PAGER);
   return eSUCCESS;
 }
@@ -1084,12 +1084,12 @@ int do_bard_song_toggle(char_data *ch, char *argument, int cmd)
 {
   if (IS_SET(ch->pcdata->toggles, PLR_BARD_SONG))
   {
-    send_to_char("Bard singing now in verbose mode.\n\r", ch);
+    send_to_char("Bard singing now in verbose mode.\r\n", ch);
     REMOVE_BIT(ch->pcdata->toggles, PLR_BARD_SONG);
     return eFAILURE;
   }
 
-  send_to_char("Bard singing now in brief mode.\n\r", ch);
+  send_to_char("Bard singing now in brief mode.\r\n", ch);
   SET_BIT(ch->pcdata->toggles, PLR_BARD_SONG);
   return eSUCCESS;
 }
@@ -1194,7 +1194,7 @@ int do_sit(char_data *ch, char *argument, int cmd)
   break;
   case POSITION_SITTING:
   {
-    send_to_char("You're sitting already.\n\r", ch);
+    send_to_char("You're sitting already.\r\n", ch);
   }
   break;
   case POSITION_RESTING:
@@ -1290,7 +1290,7 @@ int do_sleep(char_data *ch, char *argument, int cmd)
   }
   if (IS_AFFECTED(ch, AFF_INSOMNIA))
   {
-    send_to_char("You are far too alert for that.\n\r", ch);
+    send_to_char("You are far too alert for that.\r\n", ch);
     return eFAILURE;
   }
   if (!IS_SET(world[ch->in_room].room_flags, SAFE))
@@ -1306,19 +1306,19 @@ int do_sleep(char_data *ch, char *argument, int cmd)
   switch (GET_POS(ch))
   {
   case POSITION_STANDING:
-    send_to_char("You lie down and go to sleep.\n\r", ch);
+    send_to_char("You lie down and go to sleep.\r\n", ch);
     act("$n lies down and falls asleep.", ch, 0, 0, TO_ROOM, INVIS_NULL);
     GET_POS(ch) = POSITION_SLEEPING;
     break;
   case POSITION_SITTING:
   case POSITION_RESTING:
-    send_to_char("You lay back and go to sleep.\n\r", ch);
+    send_to_char("You lay back and go to sleep.\r\n", ch);
     act("$n lies back and falls asleep.", ch, 0, 0, TO_ROOM, INVIS_NULL);
     GET_POS(ch) = POSITION_SLEEPING;
     break;
   case POSITION_SLEEPING:
   {
-    send_to_char("You are already sound asleep.\n\r", ch);
+    send_to_char("You are already sound asleep.\r\n", ch);
     return eFAILURE; // so we don't set INTERNAL_SLEEPING
   }
   break;
@@ -1427,14 +1427,14 @@ int do_wake(char_data *ch, char *argument, int cmd)
       }
       else
       {
-        send_to_char("You do not see that person here.\n\r", ch);
+        send_to_char("You do not see that person here.\r\n", ch);
       }
     }
   }
   else
   {
     if (GET_POS(ch) > POSITION_SLEEPING)
-      send_to_char("You are already awake...\n\r", ch);
+      send_to_char("You are already awake...\r\n", ch);
     else if ((af = affected_by_spell(ch, SPELL_SLEEP)) && af->modifier == 1)
     {
       send_to_char("You can't wake up!\n\r", ch);
@@ -1444,7 +1444,7 @@ int do_wake(char_data *ch, char *argument, int cmd)
     else
     {
       //            else {
-      send_to_char("You wake, and stand up.\n\r", ch);
+      send_to_char("You wake, and stand up.\r\n", ch);
       act("$n awakens.", ch, 0, 0, TO_ROOM, 0);
       GET_POS(ch) = POSITION_STANDING;
       //          }
@@ -1482,7 +1482,7 @@ void CVoteData::DisplayVote(char_data *ch)
     csendf(ch, "\n\rSorry! There are no active votes right now!\n\r\n\r");
     return;
   }
-  csendf(ch, "\n\r--Current Vote Infortmation--\n\rTo vote, type \"vote #\".\n\r"
+  csendf(ch, "\n\r--Current Vote Infortmation--\n\rTo vote, type \"vote #\".\r\n"
              "Enter \"vote results\" to see the current voting demographics.\n\r\n\r");
   strncpy(buf, vote_question.c_str(), MAX_STRING_LENGTH);
   csendf(ch, buf);
@@ -1496,7 +1496,7 @@ void CVoteData::RemoveAnswer(char_data *ch, unsigned int answer)
 {
   if (active)
   {
-    send_to_char("You have to end the current vote before you can remove answers.\n\r", ch);
+    send_to_char("You have to end the current vote before you can remove answers.\r\n", ch);
     return;
   }
   if (answers.empty())
@@ -1544,7 +1544,7 @@ void CVoteData::EndVote(char_data *ch)
 {
   if (!active)
   {
-    send_to_char("Can't end a vote if there isn't one started.\n\r", ch);
+    send_to_char("Can't end a vote if there isn't one started.\r\n", ch);
     return;
   }
 
@@ -1560,7 +1560,7 @@ void CVoteData::AddAnswer(char_data *ch, std::string answer)
     send_to_char("You can't add answers during an active vote!\n\r", ch);
     return;
   }
-  send_to_char("Answer added.\n\r", ch);
+  send_to_char("Answer added.\r\n", ch);
   SVoteData tmp;
   tmp.votes = 0;
   tmp.answer = answer;
@@ -1588,7 +1588,7 @@ bool CVoteData::Vote(char_data *ch, unsigned int vote)
 
   if (vote > answers.size() || vote == 0)
   {
-    send_to_char("That answer doesn't exist.\n\r", ch);
+    send_to_char("That answer doesn't exist.\r\n", ch);
     return false;
   }
 
@@ -1606,12 +1606,12 @@ void CVoteData::DisplayResults(char_data *ch)
 {
   if (active && GET_LEVEL(ch) > 39 && !ip_voted[ch->desc->host] && GET_LEVEL(ch) < IMMORTAL)
   {
-    send_to_char("Sorry, but you have to cast a vote before you can see the results.\n\r", ch);
+    send_to_char("Sorry, but you have to cast a vote before you can see the results.\r\n", ch);
     return;
   }
   if (!total_votes)
   {
-    send_to_char("There hasn't been any votes to view the results of.\n\r", ch);
+    send_to_char("There hasn't been any votes to view the results of.\r\n", ch);
     return;
   }
   char buf[MAX_STRING_LENGTH];
@@ -1639,11 +1639,11 @@ void CVoteData::Reset(char_data *ch)
   if (active)
   {
     if (ch) // this can be called with null
-      send_to_char("Can't reset a vote while one is active.\n\r", ch);
+      send_to_char("Can't reset a vote while one is active.\r\n", ch);
     return;
   }
   if (ch)
-    send_to_char("Ok. Vote cleared.\n\r", ch);
+    send_to_char("Ok. Vote cleared.\r\n", ch);
 
   total_votes = 0;
   vote_question.clear();
@@ -1703,10 +1703,10 @@ void CVoteData::SetQuestion(char_data *ch, std::string question)
 {
   if (active)
   {
-    send_to_char("Can't change the question while the vote is active.\n\r", ch);
+    send_to_char("Can't change the question while the vote is active.\r\n", ch);
     return;
   }
-  send_to_char("Ok. Question changed.\n\r", ch);
+  send_to_char("Ok. Question changed.\r\n", ch);
   vote_question = question;
 }
 
@@ -1824,7 +1824,7 @@ int do_vote(char_data *ch, char *arg, int cmd)
 
   if (!DCVote->IsActive())
   {
-    send_to_char("Sorry, there is nothing to vote on right now.\n\r", ch);
+    send_to_char("Sorry, there is nothing to vote on right now.\r\n", ch);
     return eSUCCESS;
   }
   if (!strlen(buf))
@@ -1835,7 +1835,7 @@ int do_vote(char_data *ch, char *arg, int cmd)
 
   if (GET_LEVEL(ch) < 40)
   {
-    send_to_char("Sorry, you must be at least level 40 to vote.\n\r", ch);
+    send_to_char("Sorry, you must be at least level 40 to vote.\r\n", ch);
     return eSUCCESS;
   }
 
