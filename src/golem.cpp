@@ -491,8 +491,6 @@ int do_golem_score(char_data *ch, char *argument, int cmd)
   {
     for (; aff; aff = aff->next)
     {
-      if (aff->type == SKILL_SNEAK)
-        continue;
       scratch = frills[level];
       // figure out the name of the affect (if any)
       const char *aff_name = get_skill_name(aff->type);
