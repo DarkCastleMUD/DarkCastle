@@ -58,7 +58,6 @@ extern struct obj_data *object_list;
 extern struct index_data *mob_index;
 extern struct index_data *obj_index;
 extern struct descriptor_data *descriptor_list;
-extern struct zone_data *zone_table;
 
 void huntclear_item(struct obj_data *obj);
 
@@ -2260,7 +2259,7 @@ int char_from_room(char_data *ch, bool stop_all_fighting)
 			kimore = TRUE;
 	}
 	if (!IS_NPC(ch)) // player
-		zone_table[world[ch->in_room].zone].players--;
+		DC::getInstance()->zones[world[ch->in_room].zone].players--;
 	if (IS_NPC(ch))
 		ch->mobdata->last_room = ch->in_room;
 	if (IS_NPC(ch))
@@ -2367,7 +2366,7 @@ int char_to_room(char_data *ch, room_t room, bool stop_all_fighting)
 			}
 	}
 	if (!IS_NPC(ch)) // player
-		zone_table[world[room].zone].players++;
+		DC::getInstance()->zones[world[room].zone].players++;
 	if (IS_NPC(ch))
 	{
 		if (ISSET(ch->mobdata->actflags, ACT_NOMAGIC) && !IS_SET(world[room].room_flags, NO_MAGIC))
@@ -3728,9 +3727,9 @@ void extract_char(char_data *ch, bool pull, Trace t)
 	{
 		if (world[was_in].number == START_ROOM)
 			char_to_room(ch, real_room(SECOND_START_ROOM));
-		else if (zone_table[world[GET_HOME(ch)].zone].continent == FAR_REACH || zone_table[world[GET_HOME(ch)].zone].continent == UNDERDARK)
+		else if (DC::getInstance()->zones[world[GET_HOME(ch)].zone].continent == FAR_REACH || DC::getInstance()->zones[world[GET_HOME(ch)].zone].continent == UNDERDARK)
 			char_to_room(ch, real_room(FARREACH_START_ROOM));
-		else if (zone_table[world[GET_HOME(ch)].zone].continent == DIAMOND_ISLE || zone_table[world[GET_HOME(ch)].zone].continent == FORBIDDEN_ISLAND)
+		else if (DC::getInstance()->zones[world[GET_HOME(ch)].zone].continent == DIAMOND_ISLE || DC::getInstance()->zones[world[GET_HOME(ch)].zone].continent == FORBIDDEN_ISLAND)
 			char_to_room(ch, real_room(THALOS_START_ROOM));
 		else
 			char_to_room(ch, real_room(START_ROOM));

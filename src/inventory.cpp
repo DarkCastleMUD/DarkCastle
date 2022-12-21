@@ -206,23 +206,22 @@ void get(char_data *ch, struct obj_data *obj_object, struct obj_data *sub_object
       send_to_char(buffer, ch);
       send_to_char("\r\n", ch);
     }
-    extern zone_data *zone_table;
     bool tax = FALSE;
 
-    if (zone_table[world[ch->in_room].zone].clanowner > 0 && ch->clan !=
-                                                                 zone_table[world[ch->in_room].zone].clanowner)
+    if (DC::getInstance()->zones[world[ch->in_room].zone].clanowner > 0 && ch->clan !=
+                                                                 DC::getInstance()->zones[world[ch->in_room].zone].clanowner)
     {
       int cgold = (int)((float)(obj_object->obj_flags.value[0]) * 0.1);
       obj_object->obj_flags.value[0] -= cgold;
-      zone_table[world[ch->in_room].zone].gold += cgold;
+      DC::getInstance()->zones[world[ch->in_room].zone].gold += cgold;
       if (!IS_MOB(ch) && IS_SET(ch->pcdata->toggles, PLR_BRIEF))
       {
         tax = TRUE;
         buffer = fmt::format("{} Bounty: {}", buffer, cgold);
-        zone_table[world[ch->in_room].zone].gold += cgold;
+        DC::getInstance()->zones[world[ch->in_room].zone].gold += cgold;
       }
       else
-        csendf(ch, "Clan %s collects %d bounty, leaving %d for you.\r\n", get_clan(zone_table[world[ch->in_room].zone].clanowner)->name, cgold,
+        csendf(ch, "Clan %s collects %d bounty, leaving %d for you.\r\n", get_clan(DC::getInstance()->zones[world[ch->in_room].zone].clanowner)->name, cgold,
                obj_object->obj_flags.value[0]);
     }
     //	if (sub_object && sub_object->obj_flags.value[3] == 1 &&
@@ -2735,14 +2734,14 @@ int palm(char_data *ch, struct obj_data *obj_object, struct obj_data *sub_object
     sprintf(buffer, "There was %d coins.\r\n",
             obj_object->obj_flags.value[0]);
     send_to_char(buffer, ch);
-    if (zone_table[world[ch->in_room].zone].clanowner > 0 && ch->clan !=
-                                                                 zone_table[world[ch->in_room].zone].clanowner)
+    if (DC::getInstance()->zones[world[ch->in_room].zone].clanowner > 0 && ch->clan !=
+                                                                 DC::getInstance()->zones[world[ch->in_room].zone].clanowner)
     {
       int cgold = (int)((float)(obj_object->obj_flags.value[0]) * 0.1);
       obj_object->obj_flags.value[0] -= cgold;
-      csendf(ch, "Clan %s collects %d bounty, leaving %d for you.\r\n", get_clan(zone_table[world[ch->in_room].zone].clanowner)->name, cgold,
+      csendf(ch, "Clan %s collects %d bounty, leaving %d for you.\r\n", get_clan(DC::getInstance()->zones[world[ch->in_room].zone].clanowner)->name, cgold,
              obj_object->obj_flags.value[0]);
-      zone_table[world[ch->in_room].zone].gold += cgold;
+      DC::getInstance()->zones[world[ch->in_room].zone].gold += cgold;
     }
 
     GET_GOLD(ch) += obj_object->obj_flags.value[0];

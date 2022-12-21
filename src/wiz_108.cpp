@@ -39,7 +39,7 @@ int do_zoneexits(char_data *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  csendf(ch, "Searching Zone: %d - %s\r\n", curZone, zone_table[world[curRoom].zone].name);
+  csendf(ch, "Searching Zone: %d - %s\r\n", curZone, DC::getInstance()->zones[world[curRoom].zone].name);
   for (low = curRoom; low > 0; low--)
   {
     if (!world_array[low - 1])
@@ -72,7 +72,7 @@ int do_zoneexits(char_data *ch, char *argument, int cmd)
         {
           sprintf(buf, "Room %5d - %5s to Room %5d, zone %3d (%s)\r\n",
                   i, dirs[dir], curExits->to_room, world[curExits->to_room].zone,
-                  zone_table[world[curExits->to_room].zone].name);
+                  DC::getInstance()->zones[world[curExits->to_room].zone].name);
 
           output += buf;
         }
@@ -101,7 +101,7 @@ int do_zoneexits(char_data *ch, char *argument, int cmd)
           sprintf(buf, "Room %5d - climb to Room %5d, zone %3d (%s)\r\n",
                   i, real_room(portal->obj_flags.value[0]),
                   world[real_room(portal->obj_flags.value[0])].zone,
-                  zone_table[world[real_room(portal->obj_flags.value[0])].zone].name);
+                  DC::getInstance()->zones[world[real_room(portal->obj_flags.value[0])].zone].name);
 
           output += buf;
         }
@@ -128,7 +128,7 @@ int do_zoneexits(char_data *ch, char *argument, int cmd)
           sprintf(buf, "Room %5d - enter to Room %5d, zone %3d (%s)\r\n",
                   i, real_room(portal->obj_flags.value[0]),
                   world[real_room(portal->obj_flags.value[0])].zone,
-                  zone_table[world[real_room(portal->obj_flags.value[0])].zone].name);
+                  DC::getInstance()->zones[world[real_room(portal->obj_flags.value[0])].zone].name);
 
           output += buf;
         }
@@ -146,7 +146,7 @@ int do_zoneexits(char_data *ch, char *argument, int cmd)
             sprintf(buf, "Room %5d - leave to Room %5d, zone %3d (%s)\r\n",
                     i, real_room(portal->in_room),
                     world[real_room(portal->in_room)].zone,
-                    zone_table[world[real_room(portal->in_room)].zone].name);
+                    DC::getInstance()->zones[world[real_room(portal->in_room)].zone].name);
 
             output += buf;
           }

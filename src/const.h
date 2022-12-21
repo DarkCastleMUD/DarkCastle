@@ -43,7 +43,6 @@ extern const char *pc_clss_abbrev[];
 extern CWorld world;
 extern int max_who;
 extern int top_of_zone_table;
-extern struct zone_data *zone_table;
 extern int top_of_world;
 extern struct descriptor_data *descriptor_list;
 extern char globalBuf[MAX_STRING_LENGTH];
@@ -88,7 +87,6 @@ extern int mob_race_mod[][5];
 
 extern struct index_data *mob_index;
 extern struct index_data *obj_index;
-extern struct zone_data *zone_table;
 extern struct descriptor_data *descriptor_list;
 extern const char *race_abbrev[];
 

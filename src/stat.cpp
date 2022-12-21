@@ -25,7 +25,6 @@
 using namespace std;
 
 extern int top_of_zone_table;
-extern zone_data *zone_table;
 
 
 /******************* Area start **************************************/
@@ -101,10 +100,10 @@ void AreaData::SortAreaData(char_data *ch, SortState state)
 		for(list<AreaStats>::iterator lit = lAreaStats.begin(); lit!=lAreaStats.end();lit++)
 		{
 			i++;
-			snprintf(buf,35+(strlen(zone_table[lit->area].name)-nocolor_strlen(zone_table[lit->area].name)),"%s",
-			zone_table[lit->area].name);
+			snprintf(buf,35+(strlen(DC::getInstance()->zones[lit->area].name)-nocolor_strlen(DC::getInstance()->zones[lit->area].name)),"%s",
+			DC::getInstance()->zones[lit->area].name);
 			snprintf(buf2,MAX_STRING_LENGTH,"%%3d)%%-%ds $5%%15lld$R xps\r\n", 
-			35+(strlen(zone_table[lit->area].name)-nocolor_strlen(zone_table[lit->area].name)));
+			35+(strlen(DC::getInstance()->zones[lit->area].name)-nocolor_strlen(DC::getInstance()->zones[lit->area].name)));
 			csendf(ch, buf2,i,buf,lit->xps);
 		}
 	}
@@ -114,10 +113,10 @@ void AreaData::SortAreaData(char_data *ch, SortState state)
 		for(list<AreaStats>::iterator lit = lAreaStats.begin(); lit!=lAreaStats.end();lit++)
 		{
 			i++;
-			snprintf(buf,35+(strlen(zone_table[lit->area].name)-nocolor_strlen(zone_table[lit->area].name)),"%s",
-			zone_table[lit->area].name);
+			snprintf(buf,35+(strlen(DC::getInstance()->zones[lit->area].name)-nocolor_strlen(DC::getInstance()->zones[lit->area].name)),"%s",
+			DC::getInstance()->zones[lit->area].name);
 			snprintf(buf2,MAX_STRING_LENGTH,"%%3d)%%-%ds $5%%15lld$R gold\r\n", 
-			35+(strlen(zone_table[lit->area].name)-nocolor_strlen(zone_table[lit->area].name)));
+			35+(strlen(DC::getInstance()->zones[lit->area].name)-nocolor_strlen(DC::getInstance()->zones[lit->area].name)));
 			csendf(ch, buf2,i,buf,lit->gold);
 		}
 	}
@@ -139,7 +138,7 @@ void AreaData::DisplaySingleArea(char_data *ch, int area)
 		return;
 	}
 	snprintf(buf,MAX_STRING_LENGTH, "%d)%30s -- $5%12lld$R xps -- $5%12lld$R gold\n\r", area, 
-	zone_table[area].name, areaStats[area].xps, areaStats[area].gold);
+	DC::getInstance()->zones[area].name, areaStats[area].xps, areaStats[area].gold);
 	csendf(ch, buf);
 	snprintf(buf,MAX_STRING_LENGTH, "%-30s %-5s\r\n","Mob Name","Killed");
 	csendf(ch,buf);
@@ -168,10 +167,10 @@ void AreaData::DisplayAreaData(char_data *ch)
 	for(i=0;i<=top_of_zone_table;i++)
 	{
 		if(areaStats[i].xps ==0) continue;
-		snprintf(buf,35+(strlen(zone_table[i].name)-nocolor_strlen(zone_table[i].name)),
-		"%s",zone_table[i].name);
+		snprintf(buf,35+(strlen(DC::getInstance()->zones[i].name)-nocolor_strlen(DC::getInstance()->zones[i].name)),
+		"%s",DC::getInstance()->zones[i].name);
 		snprintf(buf2,MAX_STRING_LENGTH, "%%3d)%%-%ds|$5%%12lld$R xps|$5%%12lld$R gold|\n\r",
-		35+(strlen(zone_table[i].name)-nocolor_strlen(zone_table[i].name)));
+		35+(strlen(DC::getInstance()->zones[i].name)-nocolor_strlen(DC::getInstance()->zones[i].name)));
 		csendf(ch, buf2,i,buf, areaStats[i].xps, areaStats[i].gold);
 	}
 	return;

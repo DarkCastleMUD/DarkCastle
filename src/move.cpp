@@ -617,7 +617,7 @@ int do_simple_move(char_data *ch, int cmd, int following)
 	// if I'm STAY_NO_TOWN, don't enter a ZONE_IS_TOWN zone no matter what
 	if (IS_NPC(ch) &&
 		ISSET(ch->mobdata->actflags, ACT_STAY_NO_TOWN) &&
-		IS_SET(zone_table[world[world[ch->in_room].dir_option[cmd]->to_room].zone].zone_flags, ZONE_IS_TOWN))
+		IS_SET(DC::getInstance()->zones[world[world[ch->in_room].dir_option[cmd]->to_room].zone].zone_flags, ZONE_IS_TOWN))
 		return eFAILURE;
 
 	int a = 0;

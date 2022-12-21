@@ -112,11 +112,6 @@ CWorld world;
 #ifndef SEEK_CUR
 #define SEEK_CUR 1
 #endif
-
-struct zone_data zone_table_array[MAX_ZONE + 50];
-struct zone_data *zone_table = zone_table_array;
-#define zone_table zone_table_array
-/* table of reset data             */
 int top_of_zone_table = 0;
 struct message_list fight_messages[MAX_MESSAGES]; /* fighting messages   */
 
@@ -655,9 +650,9 @@ void boot_db(void)
 		if (cf.verbose_mode)
 		{
 			fprintf(stderr, "[%5d %5d]\t%s.\n",
-					(i ? (zone_table[i - 1].top + 1) : 0),
-					zone_table[i].top,
-					zone_table[i].name);
+					(i ? (DC::getInstance()->zones[i - 1].top + 1) : 0),
+					DC::getInstance()->zones[i].top,
+					DC::getInstance()->zones[i].name);
 		}
 
 		reset_zone(i, ResetType::full);
@@ -1541,7 +1536,7 @@ int read_one_room(FILE *fl, int &room_nr)
 
 			// OBS: Assumes ordering of input rooms
 
-			if (world[room_nr].number <= (zone ? zone_table[zone - 1].top : -1))
+			if (world[room_nr].number <= (zone ? DC::getInstance()->zones[zone - 1].top : -1))
 			{
 				fprintf(stderr, "Room nr %d is below zone %d.\n", room_nr, zone);
 				log("Room below minimum for it's zone table.  ERROR", IMMORTAL, LogChannels::LOG_BUG);
@@ -1553,7 +1548,7 @@ int read_one_room(FILE *fl, int &room_nr)
 			// Go through the zone table until world[room_nr].number is
 			// in the current zone.
 
-			while (world[room_nr].number > zone_table[zone].top)
+			while (world[room_nr].number > DC::getInstance()->zones[zone].top)
 			{
 				if (++zone > top_of_zone_table)
 				{
@@ -1564,10 +1559,10 @@ int read_one_room(FILE *fl, int &room_nr)
 				}
 			}
 
-			if (room_nr > zone_table[zone].top_rnum)
-				zone_table[zone].top_rnum = room_nr;
-			if (room_nr < zone_table[zone].bottom_rnum)
-				zone_table[zone].bottom_rnum = room_nr;
+			if (room_nr > DC::getInstance()->zones[zone].top_rnum)
+				DC::getInstance()->zones[zone].top_rnum = room_nr;
+			if (room_nr < DC::getInstance()->zones[zone].bottom_rnum)
+				DC::getInstance()->zones[zone].bottom_rnum = room_nr;
 
 			world[room_nr].zone = zone;
 		} // of top_of_zone_table > 0
@@ -1747,13 +1742,13 @@ bool can_modify_object(char_data *ch, int32_t obj)
 void set_zone_saved_zone(int32_t room)
 {
 	int zone = world[room].zone;
-	REMOVE_BIT(zone_table[zone].zone_flags, ZONE_MODIFIED);
+	REMOVE_BIT(DC::getInstance()->zones[zone].zone_flags, ZONE_MODIFIED);
 }
 
 void set_zone_modified_zone(int32_t room)
 {
 	int zone = world[room].zone;
-	SET_BIT(zone_table[zone].zone_flags, ZONE_MODIFIED);
+	SET_BIT(DC::getInstance()->zones[zone].zone_flags, ZONE_MODIFIED);
 }
 
 void set_zone_modified(int32_t modnum, world_file_list_item *list)
@@ -2135,7 +2130,7 @@ int create_one_room(char_data *ch, int vnum)
 		int zone;
 
 		for (zone = 0;
-			 rp->number > zone_table[zone].top && zone <= top_of_zone_table;
+			 rp->number > DC::getInstance()->zones[zone].top && zone <= top_of_zone_table;
 			 zone++)
 			;
 		if (zone > top_of_zone_table)
@@ -2182,79 +2177,79 @@ void renum_zone_table(void)
 	int zone, comm;
 
 	for (zone = 0; zone <= top_of_zone_table; zone++)
-		for (comm = 0; zone_table[zone].cmd[comm].command != 'S'; comm++)
+		for (comm = 0; DC::getInstance()->zones[zone].cmd[comm].command != 'S'; comm++)
 		{
-			zone_table[zone].cmd[comm].active = 1;
-			switch (zone_table[zone].cmd[comm].command)
+			DC::getInstance()->zones[zone].cmd[comm].active = 1;
+			switch (DC::getInstance()->zones[zone].cmd[comm].command)
 			{
 			case 'M':
-				/*if(real_room(zone_table[zone].cmd[comm].arg3) < 0) {
+				/*if(real_room(DC::getInstance()->zones[zone].cmd[comm].arg3) < 0) {
 
 				 fprintf(stderr, "Problem in zonefile: no room number %d for mob "
-				 "%d - setting to J command\n", zone_table[zone].cmd[comm].arg3,
-				 zone_table[zone].cmd[comm].arg1);
-				 zone_table[zone].cmd[comm].command = 'J';
+				 "%d - setting to J command\n", DC::getInstance()->zones[zone].cmd[comm].arg3,
+				 DC::getInstance()->zones[zone].cmd[comm].arg1);
+				 DC::getInstance()->zones[zone].cmd[comm].command = 'J';
 				 }*/
-				if (real_mobile(zone_table[zone].cmd[comm].arg1) >= 0 && real_room(zone_table[zone].cmd[comm].arg3) >= 0)
-					zone_table[zone].cmd[comm].arg1 =
-						real_mobile(zone_table[zone].cmd[comm].arg1);
+				if (real_mobile(DC::getInstance()->zones[zone].cmd[comm].arg1) >= 0 && real_room(DC::getInstance()->zones[zone].cmd[comm].arg3) >= 0)
+					DC::getInstance()->zones[zone].cmd[comm].arg1 =
+						real_mobile(DC::getInstance()->zones[zone].cmd[comm].arg1);
 				else
 				{
-					zone_table[zone].cmd[comm].active = 0;
+					DC::getInstance()->zones[zone].cmd[comm].active = 0;
 				}
-				//          zone_table[zone].cmd[comm].arg3;// =
-				//                real_room(zone_table[zone].cmd[comm].arg3);
+				//          DC::getInstance()->zones[zone].cmd[comm].arg3;// =
+				//                real_room(DC::getInstance()->zones[zone].cmd[comm].arg3);
 
 				break;
 			case 'O':
-				if (real_object(zone_table[zone].cmd[comm].arg1) >= 0 && real_room(zone_table[zone].cmd[comm].arg3) >= 0)
-					zone_table[zone].cmd[comm].arg1 = real_object(zone_table[zone].cmd[comm].arg1);
+				if (real_object(DC::getInstance()->zones[zone].cmd[comm].arg1) >= 0 && real_room(DC::getInstance()->zones[zone].cmd[comm].arg3) >= 0)
+					DC::getInstance()->zones[zone].cmd[comm].arg1 = real_object(DC::getInstance()->zones[zone].cmd[comm].arg1);
 				else
-					zone_table[zone].cmd[comm].active = 0;
+					DC::getInstance()->zones[zone].cmd[comm].active = 0;
 
-				//            if (zone_table[zone].cmd[comm].arg3 != NOWHERE)
-				//          zone_table[zone].cmd[comm].arg3 =
-				//        real_room(zone_table[zone].cmd[comm].arg3);
+				//            if (DC::getInstance()->zones[zone].cmd[comm].arg3 != NOWHERE)
+				//          DC::getInstance()->zones[zone].cmd[comm].arg3 =
+				//        real_room(DC::getInstance()->zones[zone].cmd[comm].arg3);
 				break;
 			case 'G':
-				if (real_object(zone_table[zone].cmd[comm].arg1) >= 0)
-					zone_table[zone].cmd[comm].arg1 =
-						real_object(zone_table[zone].cmd[comm].arg1);
+				if (real_object(DC::getInstance()->zones[zone].cmd[comm].arg1) >= 0)
+					DC::getInstance()->zones[zone].cmd[comm].arg1 =
+						real_object(DC::getInstance()->zones[zone].cmd[comm].arg1);
 				else
-					zone_table[zone].cmd[comm].active = 0;
+					DC::getInstance()->zones[zone].cmd[comm].active = 0;
 
 				break;
 			case 'E':
-				if (real_object(zone_table[zone].cmd[comm].arg1) >= 0)
-					zone_table[zone].cmd[comm].arg1 =
-						real_object(zone_table[zone].cmd[comm].arg1);
+				if (real_object(DC::getInstance()->zones[zone].cmd[comm].arg1) >= 0)
+					DC::getInstance()->zones[zone].cmd[comm].arg1 =
+						real_object(DC::getInstance()->zones[zone].cmd[comm].arg1);
 				else
-					zone_table[zone].cmd[comm].active = 0;
+					DC::getInstance()->zones[zone].cmd[comm].active = 0;
 
 				break;
 			case 'P':
-				if (real_object(zone_table[zone].cmd[comm].arg1) >= 0 && real_object(zone_table[zone].cmd[comm].arg3) >= 0)
+				if (real_object(DC::getInstance()->zones[zone].cmd[comm].arg1) >= 0 && real_object(DC::getInstance()->zones[zone].cmd[comm].arg3) >= 0)
 				{
-					zone_table[zone].cmd[comm].arg1 =
-						real_object(zone_table[zone].cmd[comm].arg1);
-					zone_table[zone].cmd[comm].arg3 =
-						real_object(zone_table[zone].cmd[comm].arg3);
+					DC::getInstance()->zones[zone].cmd[comm].arg1 =
+						real_object(DC::getInstance()->zones[zone].cmd[comm].arg1);
+					DC::getInstance()->zones[zone].cmd[comm].arg3 =
+						real_object(DC::getInstance()->zones[zone].cmd[comm].arg3);
 				}
 				else
-					zone_table[zone].cmd[comm].active = 0;
+					DC::getInstance()->zones[zone].cmd[comm].active = 0;
 				break;
 			case 'D':
-				if (real_room(zone_table[zone].cmd[comm].arg1) < 0)
-					zone_table[zone].cmd[comm].active = 0;
+				if (real_room(DC::getInstance()->zones[zone].cmd[comm].arg1) < 0)
+					DC::getInstance()->zones[zone].cmd[comm].active = 0;
 				else
 				{
-					zone_table[zone].cmd[comm].arg1 =
-						real_room(zone_table[zone].cmd[comm].arg1);
-					if (zone_table[zone].cmd[comm].arg1 == -1)
+					DC::getInstance()->zones[zone].cmd[comm].arg1 =
+						real_room(DC::getInstance()->zones[zone].cmd[comm].arg1);
+					if (DC::getInstance()->zones[zone].cmd[comm].arg1 == -1)
 					{
 						fprintf(stderr, "Problem in zonefile: no room number for door"
 										" - setting to J command\n");
-						zone_table[zone].cmd[comm].command = 'J';
+						DC::getInstance()->zones[zone].cmd[comm].command = 'J';
 					}
 				}
 				break;
@@ -2280,108 +2275,108 @@ void free_zones_from_memory()
 {
 	for (int i = 0; i < MAX_ZONE; i++)
 	{
-		if (zone_table[i].name)
-			dc_free(zone_table[i].name);
-		if (zone_table[i].cmd)
+		if (DC::getInstance()->zones[i].name)
+			dc_free(DC::getInstance()->zones[i].name);
+		if (DC::getInstance()->zones[i].cmd)
 		{
 			//      We're str_hsh'ing this now, so we don't need to worry about it
-			//      for(int j = 0; zone_table[i].cmd[j].command != 'S'; j++)
-			//        if(zone_table[i].cmd[j].comment)
-			//          dc_free(zone_table[i].cmd[j].comment);
-			dc_free(zone_table[i].cmd);
-			// don't have to free zone_table[i].cmd.comment cause it's str_hsh'd
+			//      for(int j = 0; DC::getInstance()->zones[i].cmd[j].command != 'S'; j++)
+			//        if(DC::getInstance()->zones[i].cmd[j].comment)
+			//          dc_free(DC::getInstance()->zones[i].cmd[j].comment);
+			dc_free(DC::getInstance()->zones[i].cmd);
+			// don't have to free DC::getInstance()->zones[i].cmd.comment cause it's str_hsh'd
 		}
 	}
 }
-#define ZCMD zone_table[zone].cmd[cmd_no]
-#define ZWCMD zone_table[zon].cmd[i]
+#define ZCMD DC::getInstance()->zones[zone].cmd[cmd_no]
+#define ZWCMD DC::getInstance()->zones[zon].cmd[i]
 
 void write_one_zone(FILE *fl, int zon)
 {
 	fprintf(fl, "V2\n");
-	fprintf(fl, "#%d\n", (zon ? ((zone_table[zon - 1].top + 1) / 100) : 0));
-	fprintf(fl, "%s~\n", zone_table[zon].name);
-	fprintf(fl, "%d %d %d %ld %d\n", zone_table[zon].top,
-			zone_table[zon].lifespan,
-			zone_table[zon].reset_mode,
-			zone_table[zon].zone_flags,
-			zone_table[zon].continent);
+	fprintf(fl, "#%d\n", (zon ? ((DC::getInstance()->zones[zon - 1].top + 1) / 100) : 0));
+	fprintf(fl, "%s~\n", DC::getInstance()->zones[zon].name);
+	fprintf(fl, "%d %d %d %ld %d\n", DC::getInstance()->zones[zon].top,
+			DC::getInstance()->zones[zon].lifespan,
+			DC::getInstance()->zones[zon].reset_mode,
+			DC::getInstance()->zones[zon].zone_flags,
+			DC::getInstance()->zones[zon].continent);
 
-	for (int i = 0; zone_table[zon].cmd[i].command != 'S'; i++)
+	for (int i = 0; DC::getInstance()->zones[zon].cmd[i].command != 'S'; i++)
 	{
-		if (zone_table[zon].cmd[i].command == '*')
-			fprintf(fl, "* %s\n", zone_table[zon].cmd[i].comment ? zone_table[zon].cmd[i].comment : "");
-		else if (zone_table[zon].cmd[i].command == '%')
-			fprintf(fl, "%% %2d %3d %3d %s\n", zone_table[zon].cmd[i].if_flag,
-					zone_table[zon].cmd[i].arg1,
-					zone_table[zon].cmd[i].arg2,
-					zone_table[zon].cmd[i].comment ? zone_table[zon].cmd[i].comment : "");
-		else if (zone_table[zon].cmd[i].command == 'X')
-			fprintf(fl, "X %2d %5d %3d %5d%s\n", zone_table[zon].cmd[i].if_flag,
-					zone_table[zon].cmd[i].arg1,
-					zone_table[zon].cmd[i].arg2,
-					zone_table[zon].cmd[i].arg3,
-					zone_table[zon].cmd[i].comment ? zone_table[zon].cmd[i].comment : "");
-		else if (zone_table[zon].cmd[i].command == 'K')
-			fprintf(fl, "K %2d %5d %3d %5d%s\n", zone_table[zon].cmd[i].if_flag,
-					zone_table[zon].cmd[i].arg1,
-					zone_table[zon].cmd[i].arg2,
-					zone_table[zon].cmd[i].arg3,
-					zone_table[zon].cmd[i].comment ? zone_table[zon].cmd[i].comment : "");
-		else if (zone_table[zon].cmd[i].command == 'M')
+		if (DC::getInstance()->zones[zon].cmd[i].command == '*')
+			fprintf(fl, "* %s\n", DC::getInstance()->zones[zon].cmd[i].comment ? DC::getInstance()->zones[zon].cmd[i].comment : "");
+		else if (DC::getInstance()->zones[zon].cmd[i].command == '%')
+			fprintf(fl, "%% %2d %3d %3d %s\n", DC::getInstance()->zones[zon].cmd[i].if_flag,
+					DC::getInstance()->zones[zon].cmd[i].arg1,
+					DC::getInstance()->zones[zon].cmd[i].arg2,
+					DC::getInstance()->zones[zon].cmd[i].comment ? DC::getInstance()->zones[zon].cmd[i].comment : "");
+		else if (DC::getInstance()->zones[zon].cmd[i].command == 'X')
+			fprintf(fl, "X %2d %5d %3d %5d%s\n", DC::getInstance()->zones[zon].cmd[i].if_flag,
+					DC::getInstance()->zones[zon].cmd[i].arg1,
+					DC::getInstance()->zones[zon].cmd[i].arg2,
+					DC::getInstance()->zones[zon].cmd[i].arg3,
+					DC::getInstance()->zones[zon].cmd[i].comment ? DC::getInstance()->zones[zon].cmd[i].comment : "");
+		else if (DC::getInstance()->zones[zon].cmd[i].command == 'K')
+			fprintf(fl, "K %2d %5d %3d %5d%s\n", DC::getInstance()->zones[zon].cmd[i].if_flag,
+					DC::getInstance()->zones[zon].cmd[i].arg1,
+					DC::getInstance()->zones[zon].cmd[i].arg2,
+					DC::getInstance()->zones[zon].cmd[i].arg3,
+					DC::getInstance()->zones[zon].cmd[i].comment ? DC::getInstance()->zones[zon].cmd[i].comment : "");
+		else if (DC::getInstance()->zones[zon].cmd[i].command == 'M')
 		{
 			int virt = ZWCMD.active ? mob_index[ZWCMD.arg1].virt : ZWCMD.arg1;
-			fprintf(fl, "M %2d %5d %3d %5d %s\n", zone_table[zon].cmd[i].if_flag,
+			fprintf(fl, "M %2d %5d %3d %5d %s\n", DC::getInstance()->zones[zon].cmd[i].if_flag,
 					virt,
-					zone_table[zon].cmd[i].arg2,
-					zone_table[zon].cmd[i].arg3,
-					zone_table[zon].cmd[i].comment ? zone_table[zon].cmd[i].comment : "");
+					DC::getInstance()->zones[zon].cmd[i].arg2,
+					DC::getInstance()->zones[zon].cmd[i].arg3,
+					DC::getInstance()->zones[zon].cmd[i].comment ? DC::getInstance()->zones[zon].cmd[i].comment : "");
 		}
-		else if (zone_table[zon].cmd[i].command == 'P')
+		else if (DC::getInstance()->zones[zon].cmd[i].command == 'P')
 		{
 			int virt = ZWCMD.active ? obj_index[ZWCMD.arg1].virt : ZWCMD.arg1;
 			int virt2 = ZWCMD.active ? obj_index[ZWCMD.arg3].virt : ZWCMD.arg3;
-			fprintf(fl, "P %2d %5d %3d %5d %s\n", zone_table[zon].cmd[i].if_flag,
+			fprintf(fl, "P %2d %5d %3d %5d %s\n", DC::getInstance()->zones[zon].cmd[i].if_flag,
 					virt,
-					zone_table[zon].cmd[i].arg2,
+					DC::getInstance()->zones[zon].cmd[i].arg2,
 					virt2,
-					zone_table[zon].cmd[i].comment ? zone_table[zon].cmd[i].comment : "");
+					DC::getInstance()->zones[zon].cmd[i].comment ? DC::getInstance()->zones[zon].cmd[i].comment : "");
 		}
-		else if (zone_table[zon].cmd[i].command == 'G')
+		else if (DC::getInstance()->zones[zon].cmd[i].command == 'G')
 		{
 			int virt = ZWCMD.active ? obj_index[ZWCMD.arg1].virt : ZWCMD.arg1;
 
-			fprintf(fl, "G %2d %5d %3d %5d %s\n", zone_table[zon].cmd[i].if_flag,
+			fprintf(fl, "G %2d %5d %3d %5d %s\n", DC::getInstance()->zones[zon].cmd[i].if_flag,
 					virt,
-					zone_table[zon].cmd[i].arg2,
-					zone_table[zon].cmd[i].arg3,
-					zone_table[zon].cmd[i].comment ? zone_table[zon].cmd[i].comment : "");
+					DC::getInstance()->zones[zon].cmd[i].arg2,
+					DC::getInstance()->zones[zon].cmd[i].arg3,
+					DC::getInstance()->zones[zon].cmd[i].comment ? DC::getInstance()->zones[zon].cmd[i].comment : "");
 		}
-		else if (zone_table[zon].cmd[i].command == 'O')
+		else if (DC::getInstance()->zones[zon].cmd[i].command == 'O')
 		{
 			int virt = ZWCMD.active ? obj_index[ZWCMD.arg1].virt : ZWCMD.arg1;
-			fprintf(fl, "O %2d %5d %3d %5d %s\n", zone_table[zon].cmd[i].if_flag,
+			fprintf(fl, "O %2d %5d %3d %5d %s\n", DC::getInstance()->zones[zon].cmd[i].if_flag,
 					virt,
-					zone_table[zon].cmd[i].arg2,
-					zone_table[zon].cmd[i].arg3,
-					zone_table[zon].cmd[i].comment ? zone_table[zon].cmd[i].comment : "");
+					DC::getInstance()->zones[zon].cmd[i].arg2,
+					DC::getInstance()->zones[zon].cmd[i].arg3,
+					DC::getInstance()->zones[zon].cmd[i].comment ? DC::getInstance()->zones[zon].cmd[i].comment : "");
 		}
-		else if (zone_table[zon].cmd[i].command == 'E')
+		else if (DC::getInstance()->zones[zon].cmd[i].command == 'E')
 		{
 			int virt = ZWCMD.active ? obj_index[ZWCMD.arg1].virt : ZWCMD.arg1;
-			fprintf(fl, "E %2d %5d %3d %5d %s\n", zone_table[zon].cmd[i].if_flag,
+			fprintf(fl, "E %2d %5d %3d %5d %s\n", DC::getInstance()->zones[zon].cmd[i].if_flag,
 					virt,
-					zone_table[zon].cmd[i].arg2,
-					zone_table[zon].cmd[i].arg3,
-					zone_table[zon].cmd[i].comment ? zone_table[zon].cmd[i].comment : "");
+					DC::getInstance()->zones[zon].cmd[i].arg2,
+					DC::getInstance()->zones[zon].cmd[i].arg3,
+					DC::getInstance()->zones[zon].cmd[i].comment ? DC::getInstance()->zones[zon].cmd[i].comment : "");
 		}
 		else
-			fprintf(fl, "%c %2d %5d %3d %5d %s\n", zone_table[zon].cmd[i].command,
-					zone_table[zon].cmd[i].if_flag,
-					zone_table[zon].cmd[i].arg1,
-					zone_table[zon].cmd[i].arg2,
-					zone_table[zon].cmd[i].arg3,
-					zone_table[zon].cmd[i].comment ? zone_table[zon].cmd[i].comment : "");
+			fprintf(fl, "%c %2d %5d %3d %5d %s\n", DC::getInstance()->zones[zon].cmd[i].command,
+					DC::getInstance()->zones[zon].cmd[i].if_flag,
+					DC::getInstance()->zones[zon].cmd[i].arg1,
+					DC::getInstance()->zones[zon].cmd[i].arg2,
+					DC::getInstance()->zones[zon].cmd[i].arg3,
+					DC::getInstance()->zones[zon].cmd[i].comment ? DC::getInstance()->zones[zon].cmd[i].comment : "");
 	}
 
 	fprintf(fl, "S\n$~\n");
@@ -2424,12 +2419,12 @@ void read_one_zone(FILE *fl, int zon)
 	curr_type = "Zone";
 	curr_name = check;
 
-	zone_table[zon].name = check;
-	zone_table[zon].top = fread_int(fl, 0, 64000);
-	zone_table[zon].clanowner = 0;
-	zone_table[zon].gold = 0;
-	zone_table[zon].repops_without_deaths = -1;
-	zone_table[zon].repops_with_bonus = 0;
+	DC::getInstance()->zones[zon].name = check;
+	DC::getInstance()->zones[zon].top = fread_int(fl, 0, 64000);
+	DC::getInstance()->zones[zon].clanowner = 0;
+	DC::getInstance()->zones[zon].gold = 0;
+	DC::getInstance()->zones[zon].repops_without_deaths = -1;
+	DC::getInstance()->zones[zon].repops_with_bonus = 0;
 	///  extern void debug_point();
 
 	//  if (tmp == 23)
@@ -2441,21 +2436,21 @@ void read_one_zone(FILE *fl, int zon)
 	 * grep this file to see why.
 	 * -Sadus
 	 */
-	zone_table[zon].bottom_rnum = WORLD_MAX_ROOM;
-	zone_table[zon].top_rnum = 0;
+	DC::getInstance()->zones[zon].bottom_rnum = WORLD_MAX_ROOM;
+	DC::getInstance()->zones[zon].top_rnum = 0;
 
-	zone_table[zon].lifespan = fread_int(fl, 0, 64000);
-	zone_table[zon].reset_mode = fread_int(fl, 0, 64000);
-	zone_table[zon].zone_flags = fread_bitvector(fl, 0, 2147483467);
+	DC::getInstance()->zones[zon].lifespan = fread_int(fl, 0, 64000);
+	DC::getInstance()->zones[zon].reset_mode = fread_int(fl, 0, 64000);
+	DC::getInstance()->zones[zon].zone_flags = fread_bitvector(fl, 0, 2147483467);
 
 	// if its old version set the altered flag so that
 	// this zone will be saved with new format soon
 	if (modified == true)
-		SET_BIT(zone_table[zon].zone_flags, ZONE_MODIFIED);
+		SET_BIT(DC::getInstance()->zones[zon].zone_flags, ZONE_MODIFIED);
 
 	if (version > 1)
 	{
-		zone_table[zon].continent = fread_int(fl, 0, 64000);
+		DC::getInstance()->zones[zon].continent = fread_int(fl, 0, 64000);
 	}
 
 	/* read the command table */
@@ -2555,23 +2550,23 @@ void read_one_zone(FILE *fl, int zon)
 	} // for( ;; ) til end of zone commands
 
 #ifdef LEAK_CHECK
-	zone_table[zon].cmd = ((struct reset_com *)calloc(reset_top, sizeof(struct reset_com)));
+	DC::getInstance()->zones[zon].cmd = ((struct reset_com *)calloc(reset_top, sizeof(struct reset_com)));
 #else
-	zone_table[zon].cmd = ((struct reset_com *)dc_alloc(reset_top, sizeof(struct reset_com)));
+	DC::getInstance()->zones[zon].cmd = ((struct reset_com *)dc_alloc(reset_top, sizeof(struct reset_com)));
 #endif
 
-	zone_table[zon].reset_total = reset_top;
+	DC::getInstance()->zones[zon].reset_total = reset_top;
 
 	// copy the temp into the memory
 	for (i = 0; i < reset_top; i++)
 	{
-		zone_table[zon].cmd[i].command = reset_tab[i].command;
-		zone_table[zon].cmd[i].if_flag = reset_tab[i].if_flag;
-		zone_table[zon].cmd[i].arg1 = reset_tab[i].arg1;
-		zone_table[zon].cmd[i].arg2 = reset_tab[i].arg2;
-		zone_table[zon].cmd[i].arg3 = reset_tab[i].arg3;
+		DC::getInstance()->zones[zon].cmd[i].command = reset_tab[i].command;
+		DC::getInstance()->zones[zon].cmd[i].if_flag = reset_tab[i].if_flag;
+		DC::getInstance()->zones[zon].cmd[i].arg1 = reset_tab[i].arg1;
+		DC::getInstance()->zones[zon].cmd[i].arg2 = reset_tab[i].arg2;
+		DC::getInstance()->zones[zon].cmd[i].arg3 = reset_tab[i].arg3;
 		if (reset_tab[i].comment)
-			zone_table[zon].cmd[i].comment = reset_tab[i].comment;
+			DC::getInstance()->zones[zon].cmd[i].comment = reset_tab[i].comment;
 	}
 }
 
@@ -2585,7 +2580,7 @@ void boot_zones(void)
 	char endfile[200]; // hopefully noone is stupid and makes a 180 char filename
 
 	//  for (zon = 0;zon < MAX_ZONE;zon++)
-	//  zone_table[zon] = NULL; // Null list, top_of_z can't be used now
+	//  DC::getInstance()->zones[zon] = NULL; // Null list, top_of_z can't be used now
 
 	DC::config &cf = DC::getInstance()->cf;
 
@@ -2625,7 +2620,7 @@ void boot_zones(void)
 			abort();
 		}
 		// int num = 0;
-		zone_table[zon].filename = strdup(temp);
+		DC::getInstance()->zones[zon].filename = strdup(temp);
 		read_one_zone(fl, zon);
 		zon++;
 		//    if (num > zon) zon = num;
@@ -3726,13 +3721,13 @@ void delete_mob_from_index(int nr)
 	// update zonefile commands - these store rnums
 	for (i = 0; i <= top_of_zonet; i++)
 	{
-		for (j = 0; zone_table[i].cmd[j].command != 'S'; j++)
+		for (j = 0; DC::getInstance()->zones[i].cmd[j].command != 'S'; j++)
 		{
-			switch (zone_table[i].cmd[j].command)
+			switch (DC::getInstance()->zones[i].cmd[j].command)
 			{
 			case 'M': // just #1
-				if (zone_table[i].cmd[j].arg1 >= nr)
-					zone_table[i].cmd[j].arg1--;
+				if (DC::getInstance()->zones[i].cmd[j].arg1 >= nr)
+					DC::getInstance()->zones[i].cmd[j].arg1--;
 				break;
 			default:
 				break;
@@ -3806,19 +3801,19 @@ void delete_item_from_index(int nr)
 	// update zonefile commands - these store rnums
 	for (i = 0; i <= top_of_zonet; i++)
 	{
-		for (j = 0; zone_table[i].cmd[j].command != 'S'; j++)
+		for (j = 0; DC::getInstance()->zones[i].cmd[j].command != 'S'; j++)
 		{
-			switch (zone_table[i].cmd[j].command)
+			switch (DC::getInstance()->zones[i].cmd[j].command)
 			{
 			case 'P': // 1 and 3
-				if (zone_table[i].cmd[j].arg3 >= nr)
-					zone_table[i].cmd[j].arg3--;
+				if (DC::getInstance()->zones[i].cmd[j].arg3 >= nr)
+					DC::getInstance()->zones[i].cmd[j].arg3--;
 				// no break here on purpose so it falls through and does the '1'
 			case 'O':
 			case 'G':
 			case 'E': // 1 only
-				if (zone_table[i].cmd[j].arg1 >= nr)
-					zone_table[i].cmd[j].arg1--;
+				if (DC::getInstance()->zones[i].cmd[j].arg1 >= nr)
+					DC::getInstance()->zones[i].cmd[j].arg1--;
 				break;
 			default:
 				break;
@@ -4544,23 +4539,23 @@ void zone_update(void)
 {
 	for (auto zone = 0; zone <= top_of_zone_table; zone++)
 	{
-		if (zone_table[zone].reset_mode == 0)
+		if (DC::getInstance()->zones[zone].reset_mode == 0)
 		{
 			continue;
 		}
 
-		if (zone_table[zone].age < zone_table[zone].lifespan && !(zone_table[zone].reset_mode == 1 && !zone_is_empty(zone)))
+		if (DC::getInstance()->zones[zone].age < DC::getInstance()->zones[zone].lifespan && !(DC::getInstance()->zones[zone].reset_mode == 1 && !zone_is_empty(zone)))
 		{
-			zone_table[zone].age++;
+			DC::getInstance()->zones[zone].age++;
 			continue;
 		}
 
-		if (zone_table[zone].reset_mode == 1 && !zone_is_empty(zone))
+		if (DC::getInstance()->zones[zone].reset_mode == 1 && !zone_is_empty(zone))
 		{
 			continue;
 		}
 
-		if (QDateTime::currentDateTimeUtc() > zone_table[zone].last_full_reset.addDays(1))
+		if (QDateTime::currentDateTimeUtc() > DC::getInstance()->zones[zone].last_full_reset.addDays(1))
 		{
 			reset_zone(zone, ResetType::full);
 		}
@@ -4570,9 +4565,9 @@ void zone_update(void)
 		}
 
 		// update first repop numbers
-		if (zone_table[zone].num_mob_first_repop == 0)
+		if (DC::getInstance()->zones[zone].num_mob_first_repop == 0)
 		{
-			zone_table[zone].num_mob_first_repop = zone_table[zone].num_mob_on_repop;
+			DC::getInstance()->zones[zone].num_mob_first_repop = DC::getInstance()->zones[zone].num_mob_on_repop;
 		}
 	}
 
@@ -4584,7 +4579,7 @@ void reset_zone(int zone, ResetType reset_type)
 {
 	if (reset_type == ResetType::full)
 	{
-		zone_table[zone].last_full_reset = QDateTime::currentDateTimeUtc();
+		DC::getInstance()->zones[zone].last_full_reset = QDateTime::currentDateTimeUtc();
 	}
 
 	extern int top_of_world;
@@ -4597,26 +4592,26 @@ void reset_zone(int zone, ResetType reset_type)
 	char buf[MAX_STRING_LENGTH];
 	char log_buf[MAX_STRING_LENGTH] = {};
 
-	if (zone_table[zone].died_this_tick == 0 && zone_is_empty(zone))
+	if (DC::getInstance()->zones[zone].died_this_tick == 0 && zone_is_empty(zone))
 	{
-		zone_table[zone].repops_without_deaths++;
+		DC::getInstance()->zones[zone].repops_without_deaths++;
 	}
 	else
 	{
-		zone_table[zone].repops_without_deaths = 0;
+		DC::getInstance()->zones[zone].repops_without_deaths = 0;
 	}
 
 	// reset number of mobs that have died this tick to 0
-	zone_table[zone].died_this_tick = 0;
-	zone_table[zone].num_mob_on_repop = 0;
+	DC::getInstance()->zones[zone].died_this_tick = 0;
+	DC::getInstance()->zones[zone].num_mob_on_repop = 0;
 	// find last command in zone
 	last_no = 0;
-	while (zone_table[zone].cmd[last_no].command != 'S')
+	while (DC::getInstance()->zones[zone].cmd[last_no].command != 'S')
 		last_no++;
 
 	for (cmd_no = 0; cmd_no <= last_no; cmd_no++)
 	{
-		if ((zone_table[zone].cmd + cmd_no) == 0)
+		if ((DC::getInstance()->zones[zone].cmd + cmd_no) == 0)
 		{
 			sprintf(buf,
 					"Trapped zone error, Command is null, zone: %d cmd_no: %d",
@@ -4652,10 +4647,10 @@ void reset_zone(int zone, ResetType reset_type)
 				if ((ZCMD.arg2 == -1 || ZCMD.lastPop == 0) && mob_index[ZCMD.arg1].number < ZCMD.arg2 && (mob = clone_mobile(ZCMD.arg1)))
 				{
 					char_to_room(mob, ZCMD.arg3);
-					mob->mobdata->reset = &zone_table[zone].cmd[cmd_no];
+					mob->mobdata->reset = &DC::getInstance()->zones[zone].cmd[cmd_no];
 					ZCMD.lastPop = mob;
 					GET_HOME(mob) = world_array[ZCMD.arg3]->number;
-					zone_table[zone].num_mob_on_repop++;
+					DC::getInstance()->zones[zone].num_mob_on_repop++;
 					last_cmd = 1;
 					last_mob = 1;
 					selfpurge = false;
@@ -4960,7 +4955,7 @@ void reset_zone(int zone, ResetType reset_type)
 					"UNKNOWN COMMAND!!! ZONE %d cmd %d: '%c' Skipping zone..",
 					zone, cmd_no, ZCMD.command);
 				log(log_buf, IMMORTAL, LogChannels::LOG_WORLD);
-				zone_table[zone].age = 0;
+				DC::getInstance()->zones[zone].age = 0;
 				return;
 				break;
 			}
@@ -4999,11 +4994,11 @@ void reset_zone(int zone, ResetType reset_type)
 		}
 	}
 
-	zone_table[zone].age = 0;
+	DC::getInstance()->zones[zone].age = 0;
 
-	if (zone_table[zone].repops_without_deaths > 2 && zone_table[zone].repops_without_deaths < 7 && zone_table[zone].repops_with_bonus < 4)
+	if (DC::getInstance()->zones[zone].repops_without_deaths > 2 && DC::getInstance()->zones[zone].repops_without_deaths < 7 && DC::getInstance()->zones[zone].repops_with_bonus < 4)
 	{
-		zone_table[zone].repops_with_bonus++;
+		DC::getInstance()->zones[zone].repops_with_bonus++;
 
 		auto &character_list = DC::getInstance()->character_list;
 		for (auto &tmp_victim : character_list)

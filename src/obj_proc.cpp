@@ -44,7 +44,6 @@ extern struct index_data *obj_index;
 extern struct index_data *mob_index;
 extern struct obj_data *object_list;
 
-extern struct zone_data *zone_table;
 extern struct descriptor_data *descriptor_list;
 
 extern char_data *initiate_oproc(char_data *ch, obj_data *obj);
@@ -1845,7 +1844,7 @@ int stupid_message(char_data *ch, struct obj_data *obj, int cmd, const char *arg
   if (!obj || obj->in_room < 0)
     return eFAILURE;
 
-  if (!zone_table[world[obj->in_room].zone].players)
+  if (!DC::getInstance()->zones[world[obj->in_room].zone].players)
     return eFAILURE;
 
   if (number(1, 10) == 1)

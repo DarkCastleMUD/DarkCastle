@@ -15,6 +15,7 @@
 #include <unordered_map>
 #include <netinet/in.h>
 #include <string>
+#include <map>
 
 #include <QSharedPointer>
 #include <QCoreApplication>
@@ -32,6 +33,7 @@ typedef QMap<QString, bool> joining_t;
 #include "Trace.h"
 #include "connect.h"
 #include "SSH.h"
+#include "Zone.h"
 
 using namespace std;
 
@@ -105,6 +107,7 @@ public:
   fd_set null_set = {};
 
   void init_game(void);
+  map<zone_t, Zone> zones = {};
 
 private:
   DC(const DC &) = delete; // non-copyable
@@ -128,7 +131,6 @@ extern vector<string> continent_names;
 extern class CVoteData *DCVote;
 extern struct room_data **world_array;
 extern struct obj_data *object_list;
-extern struct zone_data *zone_table;
 extern struct spell_info_type spell_info[];
 void boot_zones(void);
 void boot_world(void);

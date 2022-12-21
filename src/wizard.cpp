@@ -1918,7 +1918,7 @@ void begin_hunt(int item, int duration, int amount, char *huntname)
         continue;
       if (!(vict = get_random_mob_vnum(vnum)))
         continue;
-      if (IS_SET(zone_table[world[vict->in_room].zone].zone_flags, ZONE_NOHUNT))
+      if (IS_SET(DC::getInstance()->zones[world[vict->in_room].zone].zone_flags, ZONE_NOHUNT))
         continue;
 
       if (strlen(vict->short_desc) > 34)

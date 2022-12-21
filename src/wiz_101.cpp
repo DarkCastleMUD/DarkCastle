@@ -175,10 +175,10 @@ command_return_t do_goto(char_data *ch, string argument, int cmd)
       }
       else
       {
-        loc_nr = zone_table[zone_nr - 1].top + 1;
+        loc_nr = DC::getInstance()->zones[zone_nr - 1].top + 1;
       }
 
-      ch->send(format("Going to room {} in zone #{} [{}]\r\n", loc_nr, zone_nr, ltrim(string(zone_table[zone_nr].name))));
+      ch->send(format("Going to room {} in zone #{} [{}]\r\n", loc_nr, zone_nr, ltrim(string(DC::getInstance()->zones[zone_nr].name))));
 
       if (loc_nr > top_of_world || loc_nr < 0)
       {
@@ -759,21 +759,21 @@ int do_findfix(char_data *ch, char *argument, int cmd)
   extern int top_of_zonet;
   for (i = 0; i < top_of_zonet; i++)
   {
-    for (j = 0; zone_table[i].cmd[j].command != 'S'; j++)
+    for (j = 0; DC::getInstance()->zones[i].cmd[j].command != 'S'; j++)
     {
       bool first = TRUE, found = FALSE;
-      if (zone_table[i].cmd[j].command != 'M')
+      if (DC::getInstance()->zones[i].cmd[j].command != 'M')
         continue;
-      int vnum = zone_table[i].cmd[j].arg1, max = zone_table[i].cmd[j].arg2;
-      if (zone_table[i].cmd[j].arg2 == 1 ||
-          zone_table[i].cmd[j].arg2 == -1)
+      int vnum = DC::getInstance()->zones[i].cmd[j].arg1, max = DC::getInstance()->zones[i].cmd[j].arg2;
+      if (DC::getInstance()->zones[i].cmd[j].arg2 == 1 ||
+          DC::getInstance()->zones[i].cmd[j].arg2 == -1)
         continue; // Don't care about those..
       int amt = 0;
-      for (z = 0; zone_table[i].cmd[z].command != 'S'; z++)
+      for (z = 0; DC::getInstance()->zones[i].cmd[z].command != 'S'; z++)
       {
-        if (zone_table[i].cmd[z].command != 'M')
+        if (DC::getInstance()->zones[i].cmd[z].command != 'M')
           continue;
-        if (zone_table[i].cmd[z].arg1 != vnum)
+        if (DC::getInstance()->zones[i].cmd[z].arg1 != vnum)
           continue;
         if (z == j && found)
         {
@@ -781,8 +781,8 @@ int do_findfix(char_data *ch, char *argument, int cmd)
           break;
         }
         found = TRUE;
-        if (zone_table[i].cmd[z].arg2 > max)
-          max = zone_table[i].cmd[z].arg2;
+        if (DC::getInstance()->zones[i].cmd[z].arg2 > max)
+          max = DC::getInstance()->zones[i].cmd[z].arg2;
         amt++;
       }
       if (!first)

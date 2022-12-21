@@ -1385,7 +1385,7 @@ int do_recall(char_data *ch, char *argument, int cmd)
 
     // Additional 5% chance of failure when recalling across continents
     location = GET_HOME(victim);
-    if (location > 0 && zone_table[world[victim->in_room].zone].continent != zone_table[world[location].zone].continent)
+    if (location > 0 && DC::getInstance()->zones[world[victim->in_room].zone].continent != DC::getInstance()->zones[world[location].zone].continent)
     {
       percent += 5;
     }
@@ -1481,7 +1481,7 @@ int do_recall(char_data *ch, char *argument, int cmd)
     cf = 1 + ((level - 11) * .347f);
     cost = (int)(3440 * cf);
 
-    if (zone_table[world[victim->in_room].zone].continent != zone_table[world[location].zone].continent)
+    if (DC::getInstance()->zones[world[victim->in_room].zone].continent != DC::getInstance()->zones[world[location].zone].continent)
     {
       // Cross-continent recalling costs twice as much
       cost *= 2;

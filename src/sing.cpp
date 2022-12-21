@@ -40,8 +40,6 @@ char_data *origsing = NULL;
 
 using namespace std;
 
-extern struct zone_data *zone_table;
-
 void check_eq(char_data *ch);
 
 //        uint8_t beats;     /* Waiting time after ki */
@@ -1777,7 +1775,7 @@ int execute_song_astral_chanty(uint8_t level, char_data *ch, char *arg, char_dat
 		status = eFAILURE;
 	}
 	else if (IS_SET(world[victim->in_room].room_flags, NO_PORTAL) ||
-			 IS_SET(zone_table[world[victim->in_room].zone].zone_flags, ZONE_NO_TELEPORT) ||
+			 IS_SET(DC::getInstance()->zones[world[victim->in_room].zone].zone_flags, ZONE_NO_TELEPORT) ||
 			 IS_SET(world[victim->in_room].room_flags, ARENA))
 	{
 		send_to_char("A mystical force seems to be keeping you out.\r\n", ch);
@@ -1799,7 +1797,7 @@ int execute_song_astral_chanty(uint8_t level, char_data *ch, char *arg, char_dat
 		if (status != eFAILURE)
 		{
 			// Additional costs for astral chanty across continents
-			if (zone_table[world[ch->in_room].zone].continent != zone_table[world[victim->in_room].zone].continent)
+			if (DC::getInstance()->zones[world[ch->in_room].zone].continent != DC::getInstance()->zones[world[victim->in_room].zone].continent)
 			{
 				if (GET_KI(ch) < use_song(ch, SKILL_SONG_ASTRAL_CHANTY - SKILL_SONG_BASE))
 				{

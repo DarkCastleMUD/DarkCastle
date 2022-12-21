@@ -74,7 +74,6 @@ extern char_data *activeTarget;
 extern obj_data *activeObj;
 extern void *activeVo;
 
-extern struct zone_data *zone_table;
 extern int top_of_world;
 extern room_data **world_array;
 extern struct index_data *obj_index;
@@ -1901,8 +1900,8 @@ int do_mpteleport(char_data *ch, char *argument, int cmd)
   }
 
   int i = world[ch->in_room].zone,
-      low = zone_table[i].bottom_rnum,
-      high = zone_table[i].top_rnum,
+      low = DC::getInstance()->zones[i].bottom_rnum,
+      high = DC::getInstance()->zones[i].top_rnum,
       attempts = 0;
 
   do
@@ -1928,8 +1927,8 @@ int do_mpteleport(char_data *ch, char *argument, int cmd)
            IS_SET(world[to_room].room_flags, NO_TELEPORT) ||
            IS_SET(world[to_room].room_flags, ARENA) ||
            (world[to_room].sector_type == SECT_UNDERWATER && GET_RACE(victim) != RACE_FISH) ||
-           IS_SET(zone_table[world[to_room].zone].zone_flags, ZONE_NO_TELEPORT) ||
-           ((IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_STAY_NO_TOWN)) ? (IS_SET(zone_table[world[to_room].zone].zone_flags, ZONE_IS_TOWN)) : FALSE) ||
+           IS_SET(DC::getInstance()->zones[world[to_room].zone].zone_flags, ZONE_NO_TELEPORT) ||
+           ((IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_STAY_NO_TOWN)) ? (IS_SET(DC::getInstance()->zones[world[to_room].zone].zone_flags, ZONE_IS_TOWN)) : FALSE) ||
            (IS_AFFECTED(victim, AFF_CHAMPION) && (IS_SET(world[to_room].room_flags, CLAN_ROOM) ||
                                                   (to_room >= 1900 && to_room <= 1999))));
 

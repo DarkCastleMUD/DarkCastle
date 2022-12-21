@@ -108,6 +108,7 @@ add_library(DC STATIC
     wiz_109.cpp
     wiz_110.cpp
     wizard.cpp
+    Zone.cpp
 )
 target_link_libraries(DC PRIVATE Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Network pq fmt crypt ssh)
 target_include_directories(DC INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})

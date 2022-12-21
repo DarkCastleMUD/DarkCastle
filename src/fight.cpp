@@ -66,7 +66,6 @@ extern int top_of_world;
 extern CWorld world;
 extern struct index_data *mob_index;
 extern struct index_data *obj_index;
-extern struct zone_data *zone_table;
 
 char_data *combat_list = NULL, *combat_next_dude = NULL;
 
@@ -5387,7 +5386,7 @@ void raw_kill(char_data *ch, char_data *victim)
   }
 
   // register my death with this zone's counter
-  zone_table[world[victim->in_room].zone].died_this_tick++;
+  DC::getInstance()->zones[world[victim->in_room].zone].died_this_tick++;
 
   GET_POS(victim) = POSITION_STANDING;
   int retval = mprog_death_trigger(victim, ch);

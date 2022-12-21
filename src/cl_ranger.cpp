@@ -35,7 +35,6 @@
 #include "corpse.h"
 
 extern CWorld world;
-extern struct zone_data *zone_table;
 extern struct obj_data *object_list;
 extern int rev_dir[];
 
@@ -370,7 +369,7 @@ int do_track(char_data *ch, char *argument, int cmd)
         {
           // temp disable tracking mobs into town
           if ((/*!ISSET(ch->mobdata->actflags, ACT_STAY_NO_TOWN) ||*/
-               !IS_SET(zone_table[world[EXIT(ch, y)->to_room].zone].zone_flags, ZONE_IS_TOWN)) &&
+               !IS_SET(DC::getInstance()->zones[world[EXIT(ch, y)->to_room].zone].zone_flags, ZONE_IS_TOWN)) &&
               !IS_SET(world[EXIT(ch, y)->to_room].room_flags, NO_TRACK))
           {
             ch->mobdata->last_direction = y;
@@ -1012,7 +1011,7 @@ int mob_arrow_response(char_data *ch, char_data *victim,
         if (EXIT(victim, dir2))
         {
           if (!(ISSET(victim->mobdata->actflags, ACT_STAY_NO_TOWN) &&
-                IS_SET(zone_table[world[EXIT(victim, dir2)->to_room].zone].zone_flags, ZONE_IS_TOWN)) &&
+                IS_SET(DC::getInstance()->zones[world[EXIT(victim, dir2)->to_room].zone].zone_flags, ZONE_IS_TOWN)) &&
               !IS_SET(world[EXIT(victim, dir2)->to_room].room_flags, NO_TRACK))
             /* send 1-6 since attempt move --cmd's it */
             return attempt_move(victim, dir2 + 1, 0);
@@ -1034,7 +1033,7 @@ int mob_arrow_response(char_data *ch, char_data *victim,
     {
       if (CAN_GO(ch, dir2))
         if (!(ISSET(victim->mobdata->actflags, ACT_STAY_NO_TOWN) &&
-              IS_SET(zone_table[world[EXIT(victim, dir2)->to_room].zone].zone_flags, ZONE_IS_TOWN)))
+              IS_SET(DC::getInstance()->zones[world[EXIT(victim, dir2)->to_room].zone].zone_flags, ZONE_IS_TOWN)))
           if (!IS_SET(world[EXIT(victim, dir2)->to_room].room_flags, NO_TRACK))
           {
             /* dir+1 it since attempt_move will --cmd it */

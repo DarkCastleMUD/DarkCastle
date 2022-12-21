@@ -1714,8 +1714,8 @@ int spell_teleport(uint8_t level, char_data *ch, char_data *victim, struct obj_d
     {
       // Find a valid room in whatever arena area the ch is in
       int cur_zone = world[ch->in_room].zone;
-      int cur_zone_bottom = zone_table[cur_zone].bottom_rnum;
-      int cur_zone_top = zone_table[cur_zone].top_rnum;
+      int cur_zone_bottom = DC::getInstance()->zones[cur_zone].bottom_rnum;
+      int cur_zone_top = DC::getInstance()->zones[cur_zone].top_rnum;
 
       do
       {
@@ -1734,13 +1734,13 @@ int spell_teleport(uint8_t level, char_data *ch, char_data *victim, struct obj_d
              IS_SET(world[to_room].room_flags, NO_TELEPORT) ||
              IS_SET(world[to_room].room_flags, ARENA) ||
              world[to_room].sector_type == SECT_UNDERWATER ||
-             IS_SET(zone_table[world[to_room].zone].zone_flags, ZONE_NO_TELEPORT) ||
-             ((IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_STAY_NO_TOWN)) ? (IS_SET(zone_table[world[to_room].zone].zone_flags, ZONE_IS_TOWN)) : FALSE) ||
+             IS_SET(DC::getInstance()->zones[world[to_room].zone].zone_flags, ZONE_NO_TELEPORT) ||
+             ((IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_STAY_NO_TOWN)) ? (IS_SET(DC::getInstance()->zones[world[to_room].zone].zone_flags, ZONE_IS_TOWN)) : FALSE) ||
              (IS_AFFECTED(victim, AFF_CHAMPION) && (IS_SET(world[to_room].room_flags, CLAN_ROOM) ||
                                                     (to_room >= 1900 && to_room <= 1999))) ||
              // NPCs can only teleport within the same continent
              (IS_NPC(victim) &&
-              zone_table[world[victim->in_room].zone].continent != zone_table[world[to_room].zone].continent));
+              DC::getInstance()->zones[world[victim->in_room].zone].continent != DC::getInstance()->zones[world[to_room].zone].continent));
   }
 
   if ((IS_MOB(victim)) && (!IS_MOB(ch)))
@@ -4249,7 +4249,7 @@ int spell_word_of_recall(uint8_t level, char_data *ch, char_data *victim, struct
     location = real_room(START_ROOM);
   }
 
-  if (zone_table[world[victim->in_room].zone].continent != zone_table[world[location].zone].continent)
+  if (DC::getInstance()->zones[world[victim->in_room].zone].continent != DC::getInstance()->zones[world[location].zone].continent)
   {
     if (GET_MANA(victim) < use_mana(victim, skill))
     {
@@ -4453,7 +4453,7 @@ int spell_summon(uint8_t level, char_data *ch, char_data *victim, struct obj_dat
     return eFAILURE;
   }
 
-  if (zone_table[world[ch->in_room].zone].continent != zone_table[world[victim->in_room].zone].continent)
+  if (DC::getInstance()->zones[world[ch->in_room].zone].continent != DC::getInstance()->zones[world[victim->in_room].zone].continent)
   {
     if (GET_MANA(ch) < use_mana(ch, skill))
     {
@@ -6594,7 +6594,7 @@ void make_portal(char_data *ch, char_data *vict)
           IS_SET(world[destination].room_flags, CLAN_ROOM) ||
           IS_SET(world[destination].room_flags, NO_PORTAL) ||
           IS_SET(world[destination].room_flags, NO_TELEPORT) ||
-          IS_SET(zone_table[world[destination].zone].zone_flags, ZONE_NO_TELEPORT))
+          IS_SET(DC::getInstance()->zones[world[destination].zone].zone_flags, ZONE_NO_TELEPORT))
       {
         good_destination = false;
       }
@@ -6659,14 +6659,14 @@ int spell_portal(uint8_t level, char_data *ch, char_data *victim, struct obj_dat
     send_to_char("You can't seem to find a definite path.\r\n", ch);
     return eFAILURE;
   }
-  if (IS_SET(zone_table[world[victim->in_room].zone].zone_flags, ZONE_NO_TELEPORT))
+  if (IS_SET(DC::getInstance()->zones[world[victim->in_room].zone].zone_flags, ZONE_NO_TELEPORT))
   {
     send_to_char("A portal shimmers into view but is unstable and immediately fades to nothing.\r\n", ch);
     act("A portal shimmers into view but is unstable and immediately fades to nothing.", ch, 0, 0, TO_ROOM, 0);
     return eFAILURE;
   }
 
-  if (zone_table[world[ch->in_room].zone].continent != zone_table[world[victim->in_room].zone].continent)
+  if (DC::getInstance()->zones[world[ch->in_room].zone].continent != DC::getInstance()->zones[world[victim->in_room].zone].continent)
   {
     if (number(1, 100) < 6)
     {
@@ -12516,7 +12516,7 @@ int spell_beacon(uint8_t level, char_data *ch, char *arg, int type, char_data *v
     }
   }
 
-  if (zone_table[world[ch->in_room].zone].continent != zone_table[world[ch->beacon->in_room].zone].continent)
+  if (DC::getInstance()->zones[world[ch->in_room].zone].continent != DC::getInstance()->zones[world[ch->beacon->in_room].zone].continent)
   {
     if (GET_MANA(ch) < use_mana(ch, skill))
     {

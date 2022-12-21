@@ -28,7 +28,6 @@ typedef vector<quest_info *> quest_list_t;
 quest_list_t quest_list;
 
 extern CWorld world;
-extern zone_data *zone_table;
 
 char *valid_fields[] = {
     "name",
@@ -578,7 +577,7 @@ int start_quest(char_data *ch, struct quest_info *quest)
       while (++dontwannabeinthisforever < 100)
       {
          mob = get_mob_vnum(number(1, 34000));
-         if (mob && (GET_LEVEL(mob) < 90) && !IS_SET(zone_table[world[mob->in_room].zone].zone_flags, ZONE_NOHUNT) && (strlen(mob->description) > 80))
+         if (mob && (GET_LEVEL(mob) < 90) && !IS_SET(DC::getInstance()->zones[world[mob->in_room].zone].zone_flags, ZONE_NOHUNT) && (strlen(mob->description) > 80))
             break;
       }
       quest->hint1 = str_hsh(mob->description);

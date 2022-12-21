@@ -32,7 +32,6 @@ extern CWorld world;
 extern struct index_data *mob_index;
 extern struct index_data *obj_index;
 extern int top_of_world;
-extern struct zone_data *zone_table;
 
 int find_door(char_data *ch, char *type, char *dir);
 int get_weapon_damage_type(struct obj_data *wielded);
