@@ -4,7 +4,8 @@
             "name": "Linux",
             "includePath": [
                 "${workspaceFolder}/**",
-                "/usr/include/qt6/**"
+                "/usr/include/qt6/**",
+                "/usr/include/qt6/QtCore"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/g++-12",
