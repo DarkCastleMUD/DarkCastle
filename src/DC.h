@@ -33,6 +33,7 @@ typedef QMap<QString, bool> joining_t;
 #include "Trace.h"
 #include "connect.h"
 #include "SSH.h"
+#include "weather.h"
 #include "Zone.h"
 
 using namespace std;
@@ -52,7 +53,10 @@ typedef unordered_map<char_data *, Trace> death_list_t;
 typedef unordered_map<char_data *, Trace> free_list_t;
 typedef uint64_t zone_t;
 typedef uint64_t room_t;
+typedef uint64_t gold_t;
 typedef map<vnum_t, special_function> special_function_list_t;
+// class Zone;
+typedef QMap<zone_t, Zone> zones_t;
 
 class DC : public QCoreApplication
 {
@@ -107,12 +111,28 @@ public:
   fd_set null_set = {};
 
   void init_game(void);
-  map<zone_t, Zone> zones = {};
+  static zone_t getRoomZone(room_t room_nr);
+  static QString getZoneName(zone_t zone_key);
+  static void setZoneClanOwner(zone_t zone_key, int clan_key);
+  static void setZoneClanGold(zone_t zone_key, gold_t gold);
+  static void setZoneTopRoom(zone_t zone_key, room_t room_key);
+  static void setZoneBottomRoom(zone_t zone_key, room_t room_key);
+  static void setZoneModified(zone_t zone_key);
+  static void setZoneNotModified(zone_t zone_key);
+  static void incrementZoneDiedTick(zone_t zone_key);
+  static void resetZone(zone_t zone_key, Zone::ResetType reset_type = Zone::ResetType::normal);
+  zones_t zones = {};
+
+  void boot_db(void);
+  void boot_zones(void);
+  void boot_world(void);
+  void write_one_zone(FILE *fl, zone_t zone_key);
+  zone_t read_one_zone(FILE *fl);
+  int read_one_room(FILE *fl, int &room_nr);
 
 private:
   DC(const DC &) = delete; // non-copyable
   DC(DC &&) = delete;      // and non-movable
-
   static string version;
   struct timeval last_time = {}, delay_time = {}, now_time = {};
   int32_t secDelta = {}, usecDelta = {};
@@ -129,11 +149,9 @@ private:
 extern struct descriptor_data *descriptor_list;
 extern vector<string> continent_names;
 extern class CVoteData *DCVote;
-extern struct room_data **world_array;
+extern class room_data **world_array;
 extern struct obj_data *object_list;
 extern struct spell_info_type spell_info[];
-void boot_zones(void);
-void boot_world(void);
 void renum_world(void);
 void renum_zone_table(void);
 
