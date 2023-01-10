@@ -9,50 +9,62 @@
 using namespace std;
 typedef int socket_t;
 
-#define SEND_TO_Q(messg, desc)  write_to_output((messg), desc)
+#define SEND_TO_Q(messg, desc) write_to_output((messg), desc)
 #ifndef WIN32
 #define CLOSE_SOCKET(sock) close(sock)
 #else
 #define CLOSE_SOCKET(sock) closesocket(sock)
 #endif
 
-#define SMALL_BUFSIZE           1024
-#define LARGE_BUFSIZE           (24 * 2048)
-#define GARBAGE_SPACE           32
-#define NUM_RESERVED_DESCS      8
-//#define OPT_USEC                250000  
-//#define PASSES_PER_SEC         (1000000 / OPT_USEC)
-#define PASSES_PER_SEC          100
-#define HOST_LENGTH             30
+#define SMALL_BUFSIZE 1024
+#define LARGE_BUFSIZE (24 * 2048)
+#define GARBAGE_SPACE 32
+#define NUM_RESERVED_DESCS 8
+// #define OPT_USEC                250000
+// #define PASSES_PER_SEC         (1000000 / OPT_USEC)
+#define PASSES_PER_SEC 100
+#define HOST_LENGTH 30
 
-enum pulse_type { TIMER, MOBILE, OBJECT, VIOLENCE, BARD, TENSEC, WEATHER, TIME, REGEN, SHORT };
+enum pulse_type
+{
+	TIMER,
+	MOBILE,
+	OBJECT,
+	VIOLENCE,
+	BARD,
+	TENSEC,
+	WEATHER,
+	TIME,
+	REGEN,
+	SHORT
+};
 
-struct pulse_info {
+struct pulse_info
+{
 	pulse_type pulse;
 	uint64_t duration;
 	char name[];
 };
 
-#define PULSE_TIMER	(1 * PASSES_PER_SEC)
-#define PULSE_MOBILE    (4 * PASSES_PER_SEC)
-#define PULSE_OBJECT    (4 * PASSES_PER_SEC)
-#define PULSE_VIOLENCE  (2 * PASSES_PER_SEC)
-#define PULSE_BARD      (1 * PASSES_PER_SEC)
-#define PULSE_TENSEC	(10 * PASSES_PER_SEC)
-#define PULSE_WEATHER   (45 * PASSES_PER_SEC)
-#define PULSE_TIME      (60 * PASSES_PER_SEC)
-#define PULSE_REGEN     (15 * PASSES_PER_SEC)
-#define PULSE_SHORT     1 // Pulses all the time. 
+#define PULSE_TIMER (1 * PASSES_PER_SEC)
+#define PULSE_MOBILE (4 * PASSES_PER_SEC)
+#define PULSE_OBJECT (4 * PASSES_PER_SEC)
+#define PULSE_VIOLENCE (2 * PASSES_PER_SEC)
+#define PULSE_BARD (1 * PASSES_PER_SEC)
+#define PULSE_TENSEC (10 * PASSES_PER_SEC)
+#define PULSE_WEATHER (45 * PASSES_PER_SEC)
+#define PULSE_TIME (60 * PASSES_PER_SEC)
+#define PULSE_REGEN (15 * PASSES_PER_SEC)
+#define PULSE_SHORT 1 // Pulses all the time.
 
-#define BAN_NOT         0
-#define BAN_NEW         1
-#define BAN_SELECT      2
-#define BAN_ALL         3
-
+#define BAN_NOT 0
+#define BAN_NEW 1
+#define BAN_SELECT 2
+#define BAN_ALL 3
 
 #include "character.h"
 
-//void     write_to_output(const char *txt, struct descriptor_data *d);
+// void     write_to_output(const char *txt, struct descriptor_data *d);
 void write_to_output(string txt, struct descriptor_data *d);
 void scramble_text(char *txt);
 void warn_if_duplicate_ip(struct char_data *ch);
@@ -63,6 +75,9 @@ void send_info(const char *messg);
 bool is_multi(char_data *ch);
 void new_string_add(struct descriptor_data *d, char *str);
 void telnet_ga(descriptor_data *d);
+void telnet_sga(descriptor_data *d);
+void telnet_echo_off(struct descriptor_data *d);
+void telnet_echo_on(struct descriptor_data *d);
 string remove_non_color_codes(string input);
 
 #endif
