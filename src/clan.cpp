@@ -84,12 +84,12 @@ void boot_clans(void)
   int tempint;
   bool skip_clan = false, changes_made = false;
 
-  if (!(fl = dc_fopen("../lib/clan.txt", "r")))
+  if (!(fl = fopen("../lib/clan.txt", "r")))
   {
     fprintf(stderr, "Unable to open clan file...\n");
-    fl = dc_fopen("../lib/clan.txt", "w");
+    fl = fopen("../lib/clan.txt", "w");
     fprintf(fl, "~\n");
-    dc_fclose(fl);
+    fclose(fl);
     abort();
   }
 
@@ -238,8 +238,8 @@ void boot_clans(void)
         break;
       }
       default:
-        log("Illegal switch hit in boot_clans.", 0, LogChannels::LOG_MISC);
-        log(buf, 0, LogChannels::LOG_MISC);
+        logentry("Illegal switch hit in boot_clans.", 0, LogChannels::LOG_MISC);
+        logentry(buf, 0, LogChannels::LOG_MISC);
         break;
       }
     }
@@ -256,7 +256,7 @@ void boot_clans(void)
     }
   }
 
-  dc_fclose(fl);
+  fclose(fl);
 
   if (changes_made)
   {
@@ -275,7 +275,7 @@ void save_clans(void)
   char *x;
   char *targ;
 
-  if (!(fl = dc_fopen("../lib/clan.txt", "w")))
+  if (!(fl = fopen("../lib/clan.txt", "w")))
   {
     fprintf(stderr, "Unable to open clan.txt for writing.\n");
     abort();
@@ -383,7 +383,7 @@ void save_clans(void)
     fprintf(fl, "~\n");
   }
   fprintf(fl, "~\n");
-  dc_fclose(fl);
+  fclose(fl);
 
   in_port_t port1 = 0;
   if (DC::getInstance()->cf.ports.size() > 0)
@@ -393,7 +393,7 @@ void save_clans(void)
 
   stringstream ssbuffer;
   ssbuffer << HTDOCS_DIR << port1 << "/" << WEBCLANSLIST_FILE;
-  if (!(fl = dc_fopen(ssbuffer.str().c_str(), "w")))
+  if (!(fl = fopen(ssbuffer.str().c_str(), "w")))
   {
     logf(0, LogChannels::LOG_MISC, "Unable to open web clan file \'%s\' for writing.\n", ssbuffer.str().c_str());
     return;
@@ -412,7 +412,7 @@ void save_clans(void)
     fprintf(fl, "%s\n",
             pclan->description ? pclan->description : "(No Description)\r\n");
   }
-  dc_fclose(fl);
+  fclose(fl);
 }
 
 void delete_clan(const clan_data *currclan)
@@ -541,7 +541,7 @@ void add_clan_member(clan_data *theClan, char_data *ch)
 
   if (!ch || !theClan)
   {
-    log("add_clan_member(clan, ch) called with a null.", ANGEL, LogChannels::LOG_BUG);
+    logentry("add_clan_member(clan, ch) called with a null.", ANGEL, LogChannels::LOG_BUG);
     return;
   }
 
@@ -574,13 +574,13 @@ void add_clan_member(clan_data *theClan, struct clan_member_data *new_new_member
 
   if (!new_new_member || !theClan)
   {
-    log("add_clan_member(clan, member) called with a null.", ANGEL, LogChannels::LOG_BUG);
+    logentry("add_clan_member(clan, member) called with a null.", ANGEL, LogChannels::LOG_BUG);
     return;
   }
 
   if (!*new_new_member->member_name)
   {
-    log("Attempt to add a blank member name to a clan.", ANGEL, LogChannels::LOG_BUG);
+    logentry("Attempt to add a blank member name to a clan.", ANGEL, LogChannels::LOG_BUG);
     return;
   }
 
@@ -601,7 +601,7 @@ void add_clan_member(clan_data *theClan, struct clan_member_data *new_new_member
 
   if (result == 0)
   { // found um, get out
-    log("Tried to add already existing clan member.  Possible memory leak.", ANGEL, LogChannels::LOG_BUG);
+    logentry("Tried to add already existing clan member.  Possible memory leak.", ANGEL, LogChannels::LOG_BUG);
     return;
   }
 
@@ -698,7 +698,7 @@ void delete_clan(clan_data *dead_clan)
       {
         room = dead_clan->rooms;
         nextroom = room->next;
-        if (real_room(room->room_number) != -1)
+        if (real_room(room->room_number) != NOWHERE)
           if (IS_SET(world[real_room(room->room_number)].room_flags, CLAN_ROOM))
             REMOVE_BIT(world[real_room(room->room_number)].room_flags, CLAN_ROOM);
 
@@ -1029,7 +1029,7 @@ int do_accept(char_data *ch, char *arg, int cmd)
   send_to_char(buf, victim);
 
   sprintf(buf, "%s just joined clan [%s].", GET_NAME(victim), clan->name);
-  log(buf, IMP, LogChannels::LOG_CLAN);
+  logentry(buf, IMP, LogChannels::LOG_CLAN);
 
   add_totem_stats(victim);
 
@@ -1110,7 +1110,7 @@ int do_outcast(char_data *ch, char *arg, int cmd)
   if (victim == ch)
   {
     sprintf(buf, "%s just quit clan [%s].", GET_NAME(victim), clan->name);
-    log(buf, IMP, LogChannels::LOG_CLAN);
+    logentry(buf, IMP, LogChannels::LOG_CLAN);
     send_to_char("You quit your clan.\r\n", ch);
     remove_totem_stats(victim);
     victim->clan = 0;
@@ -1135,7 +1135,7 @@ int do_outcast(char_data *ch, char *arg, int cmd)
   send_to_char(buf, victim);
 
   sprintf(buf, "%s was outcasted from clan [%s].", GET_NAME(victim), clan->name);
-  log(buf, IMP, LogChannels::LOG_CLAN);
+  logentry(buf, IMP, LogChannels::LOG_CLAN);
 
   do_save(victim, "", 666);
   if (!connected)
@@ -1204,7 +1204,7 @@ int do_cpromote(char_data *ch, char *arg, int cmd)
   send_to_char(buf, victim);
 
   sprintf(buf, "%s just cpromoted by %s as leader of clan [%s].", GET_NAME(victim), GET_NAME(ch), clan->name);
-  log(buf, IMP, LogChannels::LOG_CLAN);
+  logentry(buf, IMP, LogChannels::LOG_CLAN);
   return eSUCCESS;
 }
 
@@ -2568,7 +2568,7 @@ void log_clan(char_data *ch, char *buf)
   {
     stringstream errormsg;
     errormsg << "Exception while writing to " << fname.str() << ".";
-    log(errormsg.str().c_str(), 108, LogChannels::LOG_MISC);
+    logentry(errormsg.str().c_str(), 108, LogChannels::LOG_MISC);
   }
 }
 
@@ -3070,7 +3070,6 @@ void add_totem_stats(char_data *ch, int stat)
 */
 
 struct takeover_pulse_data *pulse_list = NULL;
-extern int top_of_zonet;
 
 int count_plrs(int zone, int clan)
 {
@@ -3143,13 +3142,13 @@ void claimArea(int clan, bool defend, bool challenge, int clan2, int zone)
   {
     if (!defend)
     {
-      //      DC::getInstance()->zones[zone].gold = 0;
+      //      DC::getInstance()->zones.value(zone).gold = 0;
       if (clan)
         sprintf(buf, "\r\n##Clan %s has broken clan %s's control of%s!\r\n",
-                get_clan(clan)->name, get_clan(clan2)->name, DC::getInstance()->zones[zone].name);
+                get_clan(clan)->name, get_clan(clan2)->name, DC::getInstance()->zones.value(zone).name);
       else
         sprintf(buf, "\r\n##Clan %s's control of%s has been broken!\r\n",
-                get_clan(clan2)->name, DC::getInstance()->zones[zone].name);
+                get_clan(clan2)->name, DC::getInstance()->zones.value(zone).name);
 
       takeover_pause(clan2, zone);
     }
@@ -3158,35 +3157,45 @@ void claimArea(int clan, bool defend, bool challenge, int clan2, int zone)
       takeover_pause(clan2, zone);
       if (clan2)
         sprintf(buf, "\r\n##Clan %s has defended against clan %s's challenge for control of%s!\r\n",
-                get_clan(clan)->name, get_clan(clan2)->name, DC::getInstance()->zones[zone].name);
+                get_clan(clan)->name, get_clan(clan2)->name, DC::getInstance()->zones.value(zone).name);
       else
         sprintf(buf, "\r\n##Clan %s has defended their control of%s!\r\n",
-                get_clan(clan)->name, DC::getInstance()->zones[zone].name);
+                get_clan(clan)->name, DC::getInstance()->zones.value(zone).name);
     }
   }
   else
   {
     if (clan)
       sprintf(buf, "\r\n##%s has been claimed by clan %s!\r\n",
-              DC::getInstance()->zones[zone].name, get_clan(clan)->name);
+              DC::getInstance()->zones.value(zone).name, get_clan(clan)->name);
 
-    //     DC::getInstance()->zones[zone].gold = 0;
+    //     DC::getInstance()->zones.value(zone).gold = 0;
   }
-  DC::getInstance()->zones[zone].clanowner = clan;
+  DC::setZoneClanOwner(zone, clan);
+
   send_info(buf);
 }
 
 int count_controlled_areas(int clan)
 {
-  int i, z = 0;
-  for (i = 0; i <= top_of_zonet; i++)
-    if (DC::getInstance()->zones[i].clanowner == clan && can_collect(i))
-      z++;
-  struct takeover_pulse_data *plc;
-  for (plc = pulse_list; plc; plc = plc->next)
+  quint64 zones = 0;
+  for (auto [zone_key, zone] : DC::getInstance()->zones.asKeyValueRange())
+  {
+    if (zone.clanowner == clan && can_collect(zone_key))
+    {
+      zones++;
+    }
+  }
+
+  for (struct takeover_pulse_data *plc = pulse_list; plc; plc = plc->next)
+  {
     if ((plc->clan1 == clan || plc->clan2 == clan) && plc->clan2 != -2)
-      z++;
-  return z;
+    {
+      zones++;
+    }
+  }
+
+  return zones;
 }
 
 void recycle_pulse_data(struct takeover_pulse_data *pl)
@@ -3247,17 +3256,20 @@ void check_quitter(void *arg1, void *arg2, void *arg3)
   { // One needs to go.
     int i = number(1, count_controlled_areas(clan));
     int a, z = 0;
-    for (a = 0; a <= top_of_zonet; a++)
-      if (DC::getInstance()->zones[a].clanowner == clan && can_collect(a))
+    for (auto [zone_key, zone] : DC::getInstance()->zones.asKeyValueRange())
+    {
+      if (zone.clanowner == clan && can_collect(zone_key))
         if (++z == i)
         {
-          //			DC::getInstance()->zones[a].gold = 0;
-          DC::getInstance()->zones[a].clanowner = 0;
+          //			DC::getInstance()->zones.value(a].gold = 0;
+          zone.clanowner = 0;
           sprintf(buf, "\r\n##Clan %s has lost control of%s!\r\n",
-                  get_clan(clan)->name, DC::getInstance()->zones[a].name);
+                  get_clan(clan)->name, zone.name);
           send_info(buf);
           return;
         }
+    }
+
     struct takeover_pulse_data *pl;
     for (pl = pulse_list; pl; pl = pl->next)
     {
@@ -3354,11 +3366,10 @@ void pulse_takeover()
     if (take->pulse > 60 && take->clan2 != -2 && can_lose(take))
     {
       char buf[MAX_STRING_LENGTH];
-      sprintf(buf, "\r\n##Control of%s has been lost!\r\n",
-              DC::getInstance()->zones[take->zone].name);
+      std::sprintf(buf, "\r\n##Control of%s has been lost!\r\n",
+                   DC::getInstance()->zones.value(take->zone).name);
       send_info(buf);
-      DC::getInstance()->zones[take->zone].clanowner = 0;
-      //	DC::getInstance()->zones[take->zone].gold = 0;
+      DC::setZoneClanOwner(take->zone, 0);
       recycle_pulse_data(take);
       continue;
     }
@@ -3374,85 +3385,92 @@ void pulse_takeover()
   }
 }
 
-int do_clanarea(char_data *ch, char *argument, int cmd)
+command_return_t char_data::do_clanarea(QStringList &arguments, int cmd)
 {
-  char arg[MAX_INPUT_LENGTH];
-  argument = one_argument(argument, arg);
   bool clanless_challenge = false;
 
-  if (!ch->clan)
+  if (arguments.isEmpty())
   {
-    if (!str_cmp(arg, "challenge"))
-      clanless_challenge = true;
-    else
-    {
-      send_to_char("You're not in a clan!\r\n", ch);
-      return eFAILURE;
-    }
-  }
-
-  if (!has_right(ch, CLAN_RIGHTS_AREA) && !clanless_challenge)
-  {
-    send_to_char("You have not been granted that right.\r\n", ch);
     return eFAILURE;
   }
 
-  if (!str_cmp(arg, "withdraw"))
+  QString arg = arguments.at(0);
+
+  if (!clan)
   {
-    if (can_collect(world[ch->in_room].zone))
+    if (arg == "challenge")
     {
-      send_to_char("There is no challenge to withdraw from.\r\n", ch);
+      clanless_challenge = true;
+    }
+    else
+    {
+      send("You're not in a clan!\r\n");
+      return eFAILURE;
+    }
+  }
+
+  if (!has_right(this, CLAN_RIGHTS_AREA) && !clanless_challenge)
+  {
+    send_to_char("You have not been granted that right.\r\n", this);
+    return eFAILURE;
+  }
+
+  if (arg == "withdraw")
+  {
+    if (can_collect(world[in_room].zone))
+    {
+      send_to_char("There is no challenge to withdraw from.\r\n", this);
       return eFAILURE;
     }
 
-    if (!affected_by_spell(ch, SKILL_CLANAREA_CHALLENGE))
+    if (!affected_by_spell(this, SKILL_CLANAREA_CHALLENGE))
     {
-      send_to_char("You did not issue the challenge, or you have waited too long to withdraw.\r\n", ch);
+      send_to_char("You did not issue the challenge, or you have waited too long to withdraw.\r\n", this);
       return eFAILURE;
     }
 
     struct takeover_pulse_data *take;
     for (take = pulse_list; take; take = take->next)
-      if (take->zone == world[ch->in_room].zone &&
-          take->clan2 == ch->clan)
+      if (take->zone == world[in_room].zone &&
+          take->clan2 == clan)
       {
         take->clan1points += 20;
         check_victory(take);
-        send_to_char("You withdraw your challenge.\r\n", ch);
+        send_to_char("You withdraw your challenge.\r\n", this);
         return eSUCCESS;
       }
-    send_to_char("Your did not issue this challenge.\r\n", ch);
+    send_to_char("Your did not issue this challenge.\r\n", this);
     return eFAILURE;
   }
-  else if (!str_cmp(arg, "claim"))
+  else if (arg == "claim")
   {
-    if (affected_by_spell(ch, SKILL_CLANAREA_CLAIM))
+    if (affected_by_spell(this, SKILL_CLANAREA_CLAIM))
     {
-      send_to_char("You need to wait before you can attempt to claim an area.\r\n", ch);
+      send_to_char("You need to wait before you can attempt to claim an area.\r\n", this);
       return eFAILURE;
     }
 
-    if (DC::getInstance()->zones[world[ch->in_room].zone].clanowner == 0 && !can_challenge(ch->clan, world[ch->in_room].zone))
+    if (DC::getInstance()->zones.value(world[in_room].zone).clanowner == 0 && !can_challenge(clan, world[in_room].zone))
     {
-      send_to_char("You cannot claim this area right now.\r\n", ch);
+      send_to_char("You cannot claim this area right now.\r\n", this);
       return eFAILURE;
     }
 
-    if (DC::getInstance()->zones[world[ch->in_room].zone].clanowner > 0)
+    if (DC::getInstance()->zones.value(world[in_room].zone).clanowner > 0)
     {
-      csendf(ch, "This area is claimed by %s, you need to challenge to obtain ownership.\r\n",
-             get_clan(DC::getInstance()->zones[world[ch->in_room].zone].clanowner)->name);
+      csendf(this, "This area is claimed by %s, you need to challenge to obtain ownership.\r\n",
+             get_clan(DC::getInstance()->zones.value(world[in_room].zone).clanowner)->name);
 
       return eFAILURE;
     }
-    if (IS_SET(DC::getInstance()->zones[world[ch->in_room].zone].zone_flags, ZONE_NOCLAIM))
+    if (DC::getInstance()->zones.value(world[in_room].zone).isNoClaim())
     {
-      send_to_char("This area cannot be claimed.\r\n", ch);
+      send_to_char("This area cannot be claimed.\r\n", this);
       return eFAILURE;
     }
-    if (count_controlled_areas(ch->clan) >= online_clan_members(ch->clan))
+    if (count_controlled_areas(clan) >= online_clan_members(clan))
     {
-      send_to_char("You cannot claim any more areas.\r\n", ch);
+      send_to_char("You cannot claim any more areas.\r\n", this);
       return eFAILURE;
     }
 
@@ -3462,131 +3480,132 @@ int do_clanarea(char_data *ch, char *argument, int cmd)
     af.modifier = 0;
     af.location = APPLY_NONE;
     af.bitvector = -1;
-    affect_to_char(ch, &af, PULSE_TIMER);
+    affect_to_char(this, &af, PULSE_TIMER);
 
-    send_to_char("You claim the area on behalf of your clan.\r\n", ch);
-    char buf[MAX_STRING_LENGTH];
-    sprintf(buf, "\r\n##%s has been claimed by %s!\r\n",
-            DC::getInstance()->zones[world[ch->in_room].zone].name, get_clan(ch->clan)->name);
-    send_info(buf);
-    DC::getInstance()->zones[world[ch->in_room].zone].clanowner = ch->clan;
-    //    DC::getInstance()->zones[world[ch->in_room].zone].gold = 0;
+    auto zone_key = world[in_room].zone;
+    DC::setZoneClanOwner(zone_key, clan);
+
+    send("You claim the area on behalf of your clan.\r\n");
+    send(QString("\r\n##%1 has been claimed by %2!\r\n").arg(DC::getZoneName(zone_key)).arg(get_clan(clan)->name));
+
     return eSUCCESS;
   }
-  else if (!str_cmp(arg, "yield"))
+  else if (arg == "yield")
   {
-    if (DC::getInstance()->zones[world[ch->in_room].zone].clanowner == 0)
+    if (DC::getInstance()->zones.value(world[in_room].zone).clanowner == 0)
     {
-      send_to_char("This zone is not under anyone's control.\r\n", ch);
+      send_to_char("This zone is not under anyone's control.\r\n", this);
       return eFAILURE;
     }
-    if (DC::getInstance()->zones[world[ch->in_room].zone].clanowner != ch->clan)
+    if (DC::getInstance()->zones.value(world[in_room].zone).clanowner != clan)
     {
-      send_to_char("This zone is not under your clan's control.\r\n", ch);
+      send_to_char("This zone is not under your clan's control.\r\n", this);
       return eFAILURE;
     }
 
     struct takeover_pulse_data *take;
     for (take = pulse_list; take; take = take->next)
-      if (take->zone == world[ch->in_room].zone &&
-          take->clan1 == ch->clan && take->clan2 != -2)
+      if (take->zone == world[in_room].zone &&
+          take->clan1 == clan && take->clan2 != -2)
       {
         take->clan2points += 20;
         check_victory(take);
         return eSUCCESS;
       }
-    send_to_char("You yield the area on behalf of your clan.\r\n", ch);
+    send_to_char("You yield the area on behalf of your clan.\r\n", this);
     char buf[MAX_STRING_LENGTH];
     sprintf(buf, "\r\n##Clan %s has yielded control of%s!\r\n",
-            get_clan(ch->clan)->name, DC::getInstance()->zones[world[ch->in_room].zone].name);
+            get_clan(clan)->name, DC::getInstance()->zones.value(world[in_room].zone).name);
     send_info(buf);
-    DC::getInstance()->zones[world[ch->in_room].zone].clanowner = 0;
-    //    DC::getInstance()->zones[world[ch->in_room].zone].gold = 0;
+    DC::setZoneClanOwner(world[in_room].zone, 0);
+
     return eSUCCESS;
   }
-  else if (!str_cmp(arg, "collect"))
+  else if (arg == "collect")
   {
-    if (DC::getInstance()->zones[world[ch->in_room].zone].clanowner == 0)
+    if (DC::getInstance()->zones.value(world[in_room].zone).clanowner == 0)
     {
-      send_to_char("This area is not under anyone's control.\r\n", ch);
+      send_to_char("This area is not under anyone's control.\r\n", this);
       return eFAILURE;
     }
 
-    if (DC::getInstance()->zones[world[ch->in_room].zone].clanowner != ch->clan)
+    if (DC::getInstance()->zones.value(world[in_room].zone).clanowner != clan)
     {
-      send_to_char("This area is not under your clan's control.\r\n", ch);
+      send_to_char("This area is not under your clan's control.\r\n", this);
       return eFAILURE;
     }
 
-    if (DC::getInstance()->zones[world[ch->in_room].zone].gold == 0)
+    if (DC::getInstance()->zones.value(world[in_room].zone).gold == 0)
     {
-      send_to_char("There is no gold to collect.\r\n", ch);
+      send_to_char("There is no gold to collect.\r\n", this);
       return eFAILURE;
     }
-    if (!can_collect(world[ch->in_room].zone))
+    if (!can_collect(world[in_room].zone))
     {
-      send_to_char("There is currently an active challenge for this area, and collecting is not possible.\r\n", ch);
+      send_to_char("There is currently an active challenge for this area, and collecting is not possible.\r\n", this);
       return eFAILURE;
     }
-    get_clan(ch)->cdeposit(DC::getInstance()->zones[world[ch->in_room].zone].gold);
-    csendf(ch, "You collect %d gold for your clan's treasury.\r\n",
-           DC::getInstance()->zones[world[ch->in_room].zone].gold);
-    DC::getInstance()->zones[world[ch->in_room].zone].gold = 0;
+    get_clan(this)->cdeposit(DC::getInstance()->zones.value(world[in_room].zone).gold);
+    csendf(this, "You collect %d gold for your clan's treasury.\r\n",
+           DC::getInstance()->zones.value(world[in_room].zone).gold);
+
+    DC::setZoneClanGold(world[in_room].zone, 0);
     save_clans();
     return eSUCCESS;
   }
-  else if (!str_cmp(arg, "list"))
+  else if (arg == "list")
   {
-    int i, z = 0;
-    for (i = 0; i <= top_of_zonet; i++)
-      if (DC::getInstance()->zones[i].clanowner == ch->clan)
+    int z = 0;
+    for (auto [zone_key, zone] : DC::getInstance()->zones.asKeyValueRange())
+      if (DC::getInstance()->zones.value(i).clanowner == clan)
       {
         if (++z == 1)
-          csendf(ch, "$BAreas Claimed by %s:$R\r\n",
-                 get_clan(ch)->name);
-        csendf(ch, "%d)%s\r\n",
-               z, DC::getInstance()->zones[i].name);
+          csendf(this, "$BAreas Claimed by %s:$R\r\n",
+                 get_clan(this)->name);
+        csendf(this, "%d)%s\r\n",
+               z, DC::getInstance()->zones.value(i).name);
       }
+
     if (z == 0)
     {
-      send_to_char("Your clan has not claimed any areas.\r\n", ch);
+      send_to_char("Your clan has not claimed any areas.\r\n", this);
       return eFAILURE;
     }
     return eSUCCESS;
   }
-  else if (!str_cmp(arg, "challenge"))
+  else if (arg == "challenge")
   {
-    if (affected_by_spell(ch, SKILL_CLANAREA_CHALLENGE))
+    if (affected_by_spell(this, SKILL_CLANAREA_CHALLENGE))
     {
-      send_to_char("You need to wait before you can attempt to challenge an area.\r\n", ch);
+      send_to_char("You need to wait before you can attempt to challenge an area.\r\n", this);
       return eFAILURE;
     }
-    if (GET_LEVEL(ch) < 40)
+    if (GET_LEVEL(this) < 40)
     {
-      send_to_char("You must be level 40 to issue a challenge.\r\n", ch);
+      send_to_char("You must be level 40 to issue a challenge.\r\n", this);
       return eFAILURE;
     }
 
     // most annoying one for last.
-    if (DC::getInstance()->zones[world[ch->in_room].zone].clanowner == 0)
+    if (DC::getInstance()->zones.value(world[in_room].zone).clanowner == 0)
     {
-      send_to_char("This area is not under anyone's control, you could simply claim it.\r\n", ch);
+      send_to_char("This area is not under anyone's control, you could simply claim it.\r\n", this);
       return eFAILURE;
     }
-    if (!can_challenge(ch->clan, world[ch->in_room].zone))
+    if (!can_challenge(clan, world[in_room].zone))
     {
-      send_to_char("You cannot issue a challenge for this area at the moment.\r\n", ch);
+      send_to_char("You cannot issue a challenge for this area at the moment.\r\n", this);
       return eFAILURE;
     }
-    if (DC::getInstance()->zones[world[ch->in_room].zone].clanowner == ch->clan && !clanless_challenge)
+    if (DC::getInstance()->zones.value(world[in_room].zone).clanowner == clan && !clanless_challenge)
     {
-      send_to_char("Your clan already controls this area!\r\n", ch);
+      send_to_char("Your clan already controls this area!\r\n", this);
       return eFAILURE;
     }
 
-    if (count_controlled_areas(ch->clan) >= online_clan_members(ch->clan) && !clanless_challenge)
+    if (count_controlled_areas(clan) >= online_clan_members(clan) && !clanless_challenge)
     {
-      send_to_char("You cannot own any more areas.\r\n", ch);
+      send_to_char("You cannot own any more areas.\r\n", this);
       return eFAILURE;
     }
 
@@ -3596,7 +3615,7 @@ int do_clanarea(char_data *ch, char *argument, int cmd)
     af.modifier = 0;
     af.location = APPLY_NONE;
     af.bitvector = -1;
-    affect_to_char(ch, &af, PULSE_TIMER);
+    affect_to_char(this, &af, PULSE_TIMER);
 
     // no point checking for noclaim flag, at this point it already IS under someone's control
     struct takeover_pulse_data *pl;
@@ -3606,21 +3625,21 @@ int do_clanarea(char_data *ch, char *argument, int cmd)
     pl = (struct takeover_pulse_data *)dc_alloc(1, sizeof(struct takeover_pulse_data));
 #endif
     pl->next = pulse_list;
-    pl->clan1 = DC::getInstance()->zones[world[ch->in_room].zone].clanowner;
-    pl->clan2 = ch->clan;
+    pl->clan1 = DC::getInstance()->zones.value(world[in_room].zone).clanowner;
+    pl->clan2 = clan;
     pl->clan1points = pl->clan2points = 0;
     pl->pulse = 0;
-    pl->zone = world[ch->in_room].zone;
+    pl->zone = world[in_room].zone;
     pulse_list = pl;
     char buf[MAX_STRING_LENGTH];
     if (!clanless_challenge)
       sprintf(buf, "\r\n##Clan %s has challenged clan %s for control of%s!\r\n",
-              get_clan(ch)->name, get_clan(pl->clan1)->name,
-              DC::getInstance()->zones[world[ch->in_room].zone].name);
+              get_clan(this)->name, get_clan(pl->clan1)->name,
+              DC::getInstance()->zones.value(world[in_room].zone).name);
     else
       sprintf(buf, "\r\n##Clan %s's control of%s is being challenged!\r\n",
               get_clan(pl->clan1)->name,
-              DC::getInstance()->zones[world[ch->in_room].zone].name);
+              DC::getInstance()->zones.value(world[in_room].zone).name);
     send_info(buf);
     return eSUCCESS;
   }
@@ -3632,7 +3651,7 @@ int do_clanarea(char_data *ch, char *argument, int cmd)
                "clanarea withdraw     (withdraw a recently issued challenge)\r\n"
                "clanarea yield        (yield an area your clan controls that you are currently in)\r\n"
                "clanarea collect      (collect bounty from an area you are currently in that your clan controls)\r\n",
-               ch);
+               this);
   return eSUCCESS;
 }
 
