@@ -975,8 +975,7 @@ command_return_t do_tell(char_data *ch, string argument, int cmd)
       // Log what I told a logged player under their name
       if (!IS_MOB(vict) && IS_SET(vict->pcdata->punish, PUNISH_LOG))
       {
-        log_buf = fmt::format("Log {}: {} told them: {}", GET_NAME(vict), GET_NAME(ch), message);
-        log(log_buf, IMP, LogChannels::LOG_PLAYER, vict);
+        logentry(QString("Log %1: %2 told them: %3").arg(GET_NAME(vict)).arg(GET_NAME(ch)).arg(message.c_str()), IMP, LogChannels::LOG_PLAYER, vict);
       }
     }
     else if (!is_busy(vict) && GET_POS(vict) == POSITION_SLEEPING &&
@@ -1010,8 +1009,7 @@ command_return_t do_tell(char_data *ch, string argument, int cmd)
       // Log what I told a logged player under their name
       if (!IS_MOB(vict) && IS_SET(vict->pcdata->punish, PUNISH_LOG))
       {
-        log_buf = fmt::format("Log {}: {} told them: {}", GET_NAME(vict), GET_NAME(ch), message);
-        log(log_buf, IMP, LogChannels::LOG_PLAYER, vict);
+        logentry(QString("Log %1: %2 told them: %3").arg(GET_NAME(vict)).arg(GET_NAME(ch)).arg(message.c_str()), IMP, LogChannels::LOG_PLAYER, vict);
       }
     }
     else

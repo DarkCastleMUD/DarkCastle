@@ -1012,7 +1012,7 @@ int do_steal(char_data *ch, char *argument, int cmd)
             sprintf(log_buf, "%s stole %s[%d] from %s",
                     GET_NAME(ch), obj->short_description,
                     obj_index[obj->item_number].virt, GET_NAME(victim));
-            log(log_buf, ANGEL, LogChannels::LOG_MORTAL);
+            logentry(log_buf, ANGEL, LogChannels::LOG_MORTAL);
             for (loop_obj = obj->contains; loop_obj; loop_obj = loop_obj->next_content)
               logf(ANGEL, LogChannels::LOG_MORTAL, "The %s contained %s[%d]",
                    obj->short_description,
@@ -1183,7 +1183,7 @@ int do_steal(char_data *ch, char *argument, int cmd)
         send_to_char(buf, ch);
         sprintf(buf, "%s stole %s from %s while victim was asleep",
                 GET_NAME(ch), obj->short_description, GET_NAME(victim));
-        log(buf, ANGEL, LogChannels::LOG_MORTAL);
+        logentry(buf, ANGEL, LogChannels::LOG_MORTAL);
         if (!IS_MOB(victim))
         {
           do_save(victim, "", 666);
@@ -1712,7 +1712,7 @@ int do_slip(char_data *ch, char *argument, int cmd)
 
       sprintf(buf, "%s slips %d coins to %s", GET_NAME(ch), amount,
               GET_NAME(vict));
-      log(buf, IMP, LogChannels::LOG_OBJECTS);
+      logentry(buf, IMP, LogChannels::LOG_OBJECTS);
 
       if (IS_NPC(ch) || (GET_LEVEL(ch) < DEITY))
         GET_GOLD(ch) -= amount;
@@ -1901,7 +1901,7 @@ int do_slip(char_data *ch, char *argument, int cmd)
       */
     sprintf(buf, "%s slips %s to %s", GET_NAME(ch), obj->name,
             GET_NAME(vict));
-    log(buf, IMP, LogChannels::LOG_OBJECTS);
+    logentry(buf, IMP, LogChannels::LOG_OBJECTS);
 
     move_obj(obj, vict);
     act("You slip $p to $N.", ch, obj, vict, TO_CHAR, 0);

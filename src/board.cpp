@@ -576,12 +576,12 @@ int save_boards()
 
   FILE *the_file;
 
-  the_file = dc_fopen("board/index", "w");
+  the_file = fopen("board/index", "w");
 
   if (!the_file)
   {
-    log("Unable to open/create save file for bulletin board index", ANGEL,
-        LogChannels::LOG_BUG);
+    logentry("Unable to open/create save file for bulletin board index", ANGEL,
+             LogChannels::LOG_BUG);
     return eFAILURE;
   }
 
@@ -596,7 +596,7 @@ int save_boards()
     fwrite_string((char *)board_it->second.save_file.c_str(), the_file);
     fwrite_string((char *)board_it->first.c_str(), the_file);
   }
-  dc_fclose(the_file);
+  fclose(the_file);
   return eSUCCESS;
 }
 
@@ -884,12 +884,12 @@ void board_save_board(std::map<string, BOARD_INFO>::iterator board)
   string write_me;
   unsigned int ind;
 
-  the_file = dc_fopen(board->second.save_file.c_str(), "w");
+  the_file = fopen(board->second.save_file.c_str(), "w");
 
   if (!the_file)
   {
-    log("Unable to open/create save file for bulletin board", ANGEL,
-        LogChannels::LOG_BUG);
+    logentry("Unable to open/create save file for bulletin board", ANGEL,
+             LogChannels::LOG_BUG);
     return;
   }
 
@@ -908,7 +908,7 @@ void board_save_board(std::map<string, BOARD_INFO>::iterator board)
     write_me = remove_slashr(board->second.msgs[ind].text);
     fwrite_string((char *)write_me.c_str(), the_file);
   }
-  dc_fclose(the_file);
+  fclose(the_file);
   return;
 }
 
@@ -941,14 +941,14 @@ void board_load_board()
     map_it->second.lock = 0;
     map_it->second.locked_for = NULL;
 
-    the_file = dc_fopen((*map_it).second.save_file.c_str(), "r");
+    the_file = fopen((*map_it).second.save_file.c_str(), "r");
     if (!the_file)
       continue;
 
     fscanf(the_file, " %d ", &number);
     if (number < 0 || feof(the_file))
     {
-      dc_fclose(the_file);
+      fclose(the_file);
       continue;
     }
 
@@ -970,7 +970,7 @@ void board_load_board()
       map_it->second.msgs.push_back(curr_msg);
     }
 
-    dc_fclose(the_file);
+    fclose(the_file);
   }
 }
 
