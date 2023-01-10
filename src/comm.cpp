@@ -98,7 +98,7 @@ extern CWorld world; /* In db.c */
 extern const char *sector_types[];
 extern char *time_look[];
 extern char *sky_look[];
-extern struct room_data **world_array;
+extern class room_data **world_array;
 extern string last_char_name;
 extern string last_processed_cmd;
 extern struct index_data *obj_index;
@@ -208,7 +208,7 @@ int write_hotboot_file(char **new_argv)
 
   if ((fp = fopen("hotboot", "w")) == NULL)
   {
-    log("Hotboot failed, unable to open hotboot file.", 0, LogChannels::LOG_MISC);
+    logentry("Hotboot failed, unable to open hotboot file.", 0, LogChannels::LOG_MISC);
     return 0;
   }
 
@@ -267,7 +267,7 @@ int write_hotboot_file(char **new_argv)
     }
   }
   fclose(fp);
-  log("Hotboot descriptor file successfully written.", 0, LogChannels::LOG_MISC);
+  logentry("Hotboot descriptor file successfully written.", 0, LogChannels::LOG_MISC);
 
   chdir("../bin/");
 
@@ -298,7 +298,7 @@ int write_hotboot_file(char **new_argv)
 
   if (-1 == execv(argv[0], argv))
   {
-    log("Hotboot execv call failed.", 0, LogChannels::LOG_MISC);
+    logentry("Hotboot execv call failed.", 0, LogChannels::LOG_MISC);
     perror(argv[0]);
     chdir(DFLT_DIR);
     unlink("hotboot"); // wipe the file since we can't use it anyway
@@ -325,7 +325,7 @@ int load_hotboot_descs()
   {
     ifs.open("hotboot");
     unlink("hotboot");
-    log("Hotboot, reloading characters.", 0, LogChannels::LOG_MISC);
+    logentry("Hotboot, reloading characters.", 0, LogChannels::LOG_MISC);
 
     for_each(dc->cf.ports.begin(), dc->cf.ports.end(), [&dc, &ifs](in_port_t &port)
              {
@@ -365,7 +365,7 @@ int load_hotboot_descs()
       if (write_to_descriptor(desc, "Recovering...\r\n") == -1)
       {
         sprintf(buf, "Host %s Char %s Desc %d FAILED to recover from hotboot.", host, chr, desc);
-        log(buf, 0, LogChannels::LOG_MISC);
+        logentry(buf, 0, LogChannels::LOG_MISC);
         CLOSE_SOCKET(desc);
         dc_free(d);
         d = NULL;
@@ -379,7 +379,7 @@ int load_hotboot_descs()
       if (-1 == write_to_descriptor(d->descriptor, "Link recovery successful.\n\rPlease wait while mud finishes rebooting...\r\n"))
       {
         sprintf(buf, "Host %s Char %s Desc %d failed to recover from hotboot.", host, chr, desc);
-        log(buf, 0, LogChannels::LOG_MISC);
+        logentry(buf, 0, LogChannels::LOG_MISC);
         CLOSE_SOCKET(desc);
         dc_free(d);
         d = NULL;
@@ -393,14 +393,14 @@ int load_hotboot_descs()
   }
   catch (...)
   {
-    log("Hotboot file missing/unopenable.", 0, LogChannels::LOG_MISC);
+    logentry("Hotboot file missing/unopenable.", 0, LogChannels::LOG_MISC);
     return false;
   }
 
   unlink("hotboot"); // if the above unlink failed somehow(?),
                      // remove the hotboot file so that it dosen't think
                      // next reboot is another hotboot
-  log("Successful hotboot file read.", 0, LogChannels::LOG_MISC);
+  logentry("Successful hotboot file read.", 0, LogChannels::LOG_MISC);
   return 1;
 }
 
@@ -418,7 +418,7 @@ void finish_hotboot()
     if (!load_char_obj(d, d->output.c_str()))
     {
       sprintf(buf, "Could not load char '%s' in hotboot.", d->output);
-      log(buf, 0, LogChannels::LOG_MISC);
+      logentry(buf, 0, LogChannels::LOG_MISC);
       write_to_descriptor(d->descriptor, "Link Failed!  Tell an Immortal when you can.\r\n");
       close_socket(d);
       continue;
@@ -478,17 +478,17 @@ void DC::init_game(void)
     fclose(fp);
   }
 
-  log("Attempting to load hotboot file.", 0, LogChannels::LOG_MISC);
+  logentry("Attempting to load hotboot file.", 0, LogChannels::LOG_MISC);
 
   if (load_hotboot_descs())
   {
-    log("Hotboot Loading complete.", 0, LogChannels::LOG_MISC);
+    logentry("Hotboot Loading complete.", 0, LogChannels::LOG_MISC);
     was_hotboot = 1;
   }
   else
   {
-    log("Hotboot failed.  Starting regular sockets.", 0, LogChannels::LOG_MISC);
-    log("Opening mother connections.", 0, LogChannels::LOG_MISC);
+    logentry("Hotboot failed.  Starting regular sockets.", 0, LogChannels::LOG_MISC);
+    logentry("Opening mother connections.", 0, LogChannels::LOG_MISC);
 
     for_each(cf.ports.begin(), cf.ports.end(), [this](in_port_t &port)
              {
@@ -509,17 +509,17 @@ void DC::init_game(void)
 
   if (was_hotboot)
   {
-    log("Connecting hotboot characters to their descriptiors", 0, LogChannels::LOG_MISC);
+    logentry("Connecting hotboot characters to their descriptiors", 0, LogChannels::LOG_MISC);
     finish_hotboot();
   }
 
-  log("Signal trapping.", 0, LogChannels::LOG_MISC);
+  logentry("Signal trapping.", 0, LogChannels::LOG_MISC);
   signal_setup();
 
   // we got all the way through, let's turn auto-hotboot back on
   try_to_hotboot_on_crash = 1;
 
-  log("Entering game loop.", 0, LogChannels::LOG_MISC);
+  logentry("Entering game loop.", 0, LogChannels::LOG_MISC);
 
   unlink("died_in_bootup");
 
@@ -530,7 +530,7 @@ void DC::init_game(void)
   game_loop_init();
   do_not_save_corpses = 1;
 
-  log("Closing all sockets.", 0, LogChannels::LOG_MISC);
+  logentry("Closing all sockets.", 0, LogChannels::LOG_MISC);
   while (descriptor_list)
   {
     close_socket(descriptor_list);
@@ -542,47 +542,47 @@ void DC::init_game(void)
              CLOSE_SOCKET(fd); });
 #ifdef LEAK_CHECK
 
-  log("Freeing all mobs in world.", 0, LogChannels::LOG_MISC);
+  logentry("Freeing all mobs in world.", 0, LogChannels::LOG_MISC);
   remove_all_mobs_from_world();
-  log("Freeing all objs in world.", 0, LogChannels::LOG_MISC);
+  logentry("Freeing all objs in world.", 0, LogChannels::LOG_MISC);
   remove_all_objs_from_world();
-  log("Freeing socials from memory.", 0, LogChannels::LOG_MISC);
+  logentry("Freeing socials from memory.", 0, LogChannels::LOG_MISC);
   clean_socials_from_memory();
-  log("Freeing zones data.", 0, LogChannels::LOG_MISC);
+  logentry("Freeing zones data.", 0, LogChannels::LOG_MISC);
   free_zones_from_memory();
-  log("Freeing clan data.", 0, LogChannels::LOG_MISC);
+  logentry("Freeing clan data.", 0, LogChannels::LOG_MISC);
   free_clans_from_memory();
-  log("Freeing the world.", 0, LogChannels::LOG_MISC);
+  logentry("Freeing the world.", 0, LogChannels::LOG_MISC);
   free_world_from_memory();
-  log("Freeing mobs from memory.", 0, LogChannels::LOG_MISC);
+  logentry("Freeing mobs from memory.", 0, LogChannels::LOG_MISC);
   free_mobs_from_memory();
-  log("Freeing objs from memory.", 0, LogChannels::LOG_MISC);
+  logentry("Freeing objs from memory.", 0, LogChannels::LOG_MISC);
   free_objs_from_memory();
-  log("Freeing messages from memory.", 0, LogChannels::LOG_MISC);
+  logentry("Freeing messages from memory.", 0, LogChannels::LOG_MISC);
   free_messages_from_memory();
-  log("Freeing hash tree from memory.", 0, LogChannels::LOG_MISC);
+  logentry("Freeing hash tree from memory.", 0, LogChannels::LOG_MISC);
   free_hsh_tree_from_memory();
-  log("Freeing wizlist from memory.", 0, LogChannels::LOG_MISC);
+  logentry("Freeing wizlist from memory.", 0, LogChannels::LOG_MISC);
   free_wizlist_from_memory();
-  log("Freeing help index.", 0, LogChannels::LOG_MISC);
+  logentry("Freeing help index.", 0, LogChannels::LOG_MISC);
   free_help_from_memory();
-  log("Freeing shops from memory.", 0, LogChannels::LOG_MISC);
+  logentry("Freeing shops from memory.", 0, LogChannels::LOG_MISC);
   free_shops_from_memory();
-  log("Freeing emoting objects from memory.", 0, LogChannels::LOG_MISC);
+  logentry("Freeing emoting objects from memory.", 0, LogChannels::LOG_MISC);
   free_emoting_objects_from_memory();
-  log("Freeing game portals from memory.", 0, LogChannels::LOG_MISC);
+  logentry("Freeing game portals from memory.", 0, LogChannels::LOG_MISC);
   free_game_portals_from_memory();
-  log("Freeing command radix from memory.", 0, LogChannels::LOG_MISC);
+  logentry("Freeing command radix from memory.", 0, LogChannels::LOG_MISC);
   free_command_radix_nodes(cmd_radix);
-  log("Freeing ban list from memory.", 0, LogChannels::LOG_MISC);
+  logentry("Freeing ban list from memory.", 0, LogChannels::LOG_MISC);
   free_ban_list_from_memory();
-  log("Freeing the bufpool.", 0, LogChannels::LOG_MISC);
+  logentry("Freeing the bufpool.", 0, LogChannels::LOG_MISC);
   free_buff_pool_from_memory();
   DC::getInstance()->removeDead();
 #endif
 
-  log("Goodbye.", 0, LogChannels::LOG_MISC);
-  log("Normal termination of game.", 0, LogChannels::LOG_MISC);
+  logentry("Goodbye.", 0, LogChannels::LOG_MISC);
+  logentry("Normal termination of game.", 0, LogChannels::LOG_MISC);
 }
 
 /*
@@ -745,7 +745,7 @@ void DC::game_loop(void)
         {
           sprintf(buf, "Connection attempt bailed from %s", d->host);
           printf(buf);
-          log(buf, 111, LogChannels::LOG_SOCKET);
+          logentry(buf, 111, LogChannels::LOG_SOCKET);
         }
         close_socket(d);
       }
@@ -897,7 +897,7 @@ void DC::game_loop(void)
   {
     delay_time.tv_usec = usecDelta;
     delay_time.tv_sec = secDelta;
-    // logf(110, LogChannels::LOG_BUG, "Pausing for  %dsec %dusec.", secDelta, usecDelta);
+    // cerr << QString("Pausing for  %1sec %2usec.").arg(secDelta).arg(usecDelta).toStdString() << endl;
     int fd_nr = -1;
     errno = 0;
     fd_nr = select(0, NULL, NULL, NULL, &delay_time);
@@ -905,7 +905,7 @@ void DC::game_loop(void)
     {
       if (errno == EINTR)
       {
-        cerr << "select() interupted." << endl;
+        qWarning() << "select() interupted.";
       }
       else
       {
@@ -914,6 +914,7 @@ void DC::game_loop(void)
       }
     }
   }
+
   // temp removing this since it's spamming the crap out of us
   // else logf(110, LogChannels::LOG_BUG, "0 delay on pulse");
   gettimeofday(&last_time, NULL);
@@ -1126,7 +1127,7 @@ void heartbeat()
 /*
  * Turn off echoing (specific to telnet client)
  */
-void echo_off(struct descriptor_data *d)
+void telnet_echo_off(struct descriptor_data *d)
 {
   char off_string[] =
       {
@@ -1142,7 +1143,7 @@ void echo_off(struct descriptor_data *d)
 /*
  * Turn on echoing (specific to telnet client)
  */
-void echo_on(struct descriptor_data *d)
+void telnet_echo_on(struct descriptor_data *d)
 {
   char on_string[] =
       {
@@ -1155,6 +1156,12 @@ void echo_on(struct descriptor_data *d)
       };
 
   SEND_TO_Q(on_string, d);
+}
+
+void telnet_sga(descriptor_data *d)
+{
+  char suppress_go_ahead[] = {(char)IAC, (char)WILL, (char)TELOPT_SGA, (char)0};
+  SEND_TO_Q(suppress_go_ahead, d);
 }
 
 void telnet_ga(descriptor_data *d)
@@ -1408,8 +1415,13 @@ void make_prompt(struct descriptor_data *d, string &prompt)
     else
       prompt += generate_prompt(d->character);
   }
-  char go_ahead[] = {(char)IAC, (char)GA, (char)0};
-  prompt += go_ahead;
+
+  // As long as we're not in telnet character mode then send IAC GA
+  if (d->character->getSetting("mode").startsWith("char") == false)
+  {
+    char go_ahead[] = {(char)IAC, (char)GA, (char)0};
+    prompt += go_ahead;
+  }
 }
 
 char_data *get_charmie(char_data *ch)
@@ -2012,7 +2024,7 @@ int new_descriptor(int s)
 
     CLOSE_SOCKET(desc);
     sprintf(buf, "Connection attempt denied from [%s]", newd->host);
-    log(buf, OVERSEER, LogChannels::LOG_SOCKET);
+    logentry(buf, OVERSEER, LogChannels::LOG_SOCKET);
     // dc_free(newd->host);
     dc_free(newd);
     return 0;
@@ -2101,7 +2113,7 @@ int write_to_descriptor(int desc, string txt)
 #endif /* EWOULDBLOCK */
       if (errno == EAGAIN)
       {
-        // log("process_output: socket write would block",
+        // logentry("process_output: socket write would block",
         //     0, LogChannels::LOG_MISC);
       }
       else
@@ -2381,11 +2393,11 @@ int process_input(struct descriptor_data *t)
     {
       if (t->character != nullptr && GET_NAME(t->character) != nullptr)
       {
-        log(fmt::format("Connection broken by peer {} playing {}.", t->host, GET_NAME(t->character)), IMP + 1, LogChannels::LOG_SOCKET);
+        logentry(QString("Connection broken by peer %1 playing %2.").arg(t->host).arg(GET_NAME(t->character)), IMP + 1, LogChannels::LOG_SOCKET);
       }
       else
       {
-        log(fmt::format("Connection broken by peer {} not playing a character.", t->host), IMP + 1, LogChannels::LOG_SOCKET);
+        logentry(QString("Connection broken by peer %1 not playing a character.").arg(t->host), IMP + 1, LogChannels::LOG_SOCKET);
       }
 
       return -1;
@@ -2400,9 +2412,25 @@ int process_input(struct descriptor_data *t)
       string new_buffer;
       for (auto &c : buffer)
       {
-        if ((c >= ' ' && c <= '~') || c == '\b')
+        if ((c >= ' ' && c <= '~'))
         {
           new_buffer += c;
+        }
+        else if (c == '\b' || c == '\x7F') // erase last character for backspace or delete
+        {
+          if (t->inbuf.size() == 1)
+          {
+            cerr << "Before: [" << t->inbuf << "]" << t->inbuf.size() << endl;
+            t->inbuf.erase(t->inbuf.end() - 1, t->inbuf.end());
+            cerr << "After: [" << t->inbuf << "]" << t->inbuf.size() << endl;
+          }
+          if (t->inbuf.size() >= 2)
+          {
+            cerr << "Before: [" << t->inbuf << "]" << t->inbuf.size() << endl;
+            t->inbuf.erase(t->inbuf.end() - 2, t->inbuf.end());
+            cerr << "After: [" << t->inbuf << "]" << t->inbuf.size() << endl;
+            new_buffer += "\b \b";
+          }
         }
         else if (c == '\r')
         {
@@ -2685,26 +2713,26 @@ int close_socket(struct descriptor_data *d)
               world[d->character->in_room].number);
       if (IS_AFFECTED(d->character, AFF_CANTQUIT))
         sprintf(buf, "%s with CQ.", buf);
-      log(buf, GET_LEVEL(d->character) > SERAPH ? GET_LEVEL(d->character) : SERAPH, LogChannels::LOG_SOCKET);
+      logentry(buf, GET_LEVEL(d->character) > SERAPH ? GET_LEVEL(d->character) : SERAPH, LogChannels::LOG_SOCKET);
       d->character->desc = NULL;
     }
     else
     {
       sprintf(buf, "Losing player: %s.",
               GET_NAME(d->character) ? GET_NAME(d->character) : "<null>");
-      log(buf, 111, LogChannels::LOG_SOCKET);
+      logentry(buf, 111, LogChannels::LOG_SOCKET);
       if (d->connected == conn::WRITE_BOARD || d->connected == conn::EDITING || d->connected == conn::EDIT_MPROG)
       {
         //		sprintf(buf, "Suspicious: %s.",
         //			GET_NAME(d->character));
-        //		log(buf, 110, LOG_HMM);
+        //		logentry(buf, 110, LOG_HMM);
       }
       free_char(d->character, Trace("close_socket"));
     }
   }
   //   Removed this log caues it's so fricken annoying
   //   else
-  //    log("Losing descriptor without char.", ANGEL, LogChannels::LOG_SOCKET);
+  //    logentry("Losing descriptor without char.", ANGEL, LogChannels::LOG_SOCKET);
 
   /* JE 2/22/95 -- part of my unending quest to make switch stable */
   if (d->original && d->original->desc)
@@ -2756,9 +2784,9 @@ void check_idle_passwords(void)
       d->idle_tics++;
       continue;
     }
-    else
+    else if (d->idle_tics > 5)
     {
-      echo_on(d);
+      telnet_echo_on(d);
       SEND_TO_Q("\r\nTimed out... goodbye.\r\n", d);
       STATE(d) = conn::CLOSE;
     }
@@ -2773,7 +2801,7 @@ void checkpointing(int sig)
 {
   if (!tics)
   {
-    log("SYSERR: CHECKPOINT shutdown: tics not updated", ANGEL, LogChannels::LOG_BUG);
+    logentry("SYSERR: CHECKPOINT shutdown: tics not updated", ANGEL, LogChannels::LOG_BUG);
     abort();
   }
   else
@@ -2784,10 +2812,10 @@ void report_debug_logging()
 {
   extern int last_char_room;
 
-  log("Last cmd:", ANGEL, LogChannels::LOG_BUG);
-  log(last_processed_cmd, ANGEL, LogChannels::LOG_BUG);
-  log("Owner's Name:", ANGEL, LogChannels::LOG_BUG);
-  log(last_char_name, ANGEL, LogChannels::LOG_BUG);
+  logentry("Last cmd:", ANGEL, LogChannels::LOG_BUG);
+  logentry(QString::fromStdString(last_processed_cmd), ANGEL, LogChannels::LOG_BUG);
+  logentry("Owner's Name:", ANGEL, LogChannels::LOG_BUG);
+  logentry(QString::fromStdString(last_char_name), ANGEL, LogChannels::LOG_BUG);
   logf(ANGEL, LogChannels::LOG_BUG, "Last room: %d", last_char_room);
 }
 
@@ -2813,10 +2841,10 @@ void crash_hotboot()
     {
       write_to_descriptor(d->descriptor, "Attempting to recover with a hotboot.\r\n");
     }
-    log("Attempting to hotboot from the crash.", ANGEL, LogChannels::LOG_BUG);
+    logentry("Attempting to hotboot from the crash.", ANGEL, LogChannels::LOG_BUG);
     write_hotboot_file(0);
     // we shouldn't return from there unless we failed
-    log("Hotboot crash recovery failed.  Exiting.", ANGEL, LogChannels::LOG_BUG);
+    logentry("Hotboot crash recovery failed.  Exiting.", ANGEL, LogChannels::LOG_BUG);
     for (d = descriptor_list; d && died_from_sigsegv < 2; d = d->next)
     {
       write_to_descriptor(d->descriptor, "Hotboot failed giving up.\r\n");
@@ -2832,18 +2860,18 @@ void crash_hotboot()
 void crashill(int sig)
 {
   report_debug_logging();
-  log("Recieved SIGFPE (Illegal Instruction)", ANGEL, LogChannels::LOG_BUG);
+  logentry("Recieved SIGFPE (Illegal Instruction)", ANGEL, LogChannels::LOG_BUG);
   crash_hotboot();
-  log("Mud exiting from SIGFPE.", ANGEL, LogChannels::LOG_BUG);
+  logentry("Mud exiting from SIGFPE.", ANGEL, LogChannels::LOG_BUG);
   exit(0);
 }
 
 void crashfpe(int sig)
 {
   report_debug_logging();
-  log("Recieved SIGFPE (Arithmetic Error)", ANGEL, LogChannels::LOG_BUG);
+  logentry("Recieved SIGFPE (Arithmetic Error)", ANGEL, LogChannels::LOG_BUG);
   crash_hotboot();
-  log("Mud exiting from SIGFPE.", ANGEL, LogChannels::LOG_BUG);
+  logentry("Mud exiting from SIGFPE.", ANGEL, LogChannels::LOG_BUG);
   exit(0);
 }
 
@@ -2857,13 +2885,13 @@ void crashsig(int sig)
   }
   if (died_from_sigsegv > 2)
   { // panic! try to log and get out
-    log("Hit 'died_from_sigsegv > 2'", ANGEL, LogChannels::LOG_BUG);
+    logentry("Hit 'died_from_sigsegv > 2'", ANGEL, LogChannels::LOG_BUG);
     exit(0);
   }
   report_debug_logging();
-  log("Recieved SIGSEGV (Segmentation fault)", ANGEL, LogChannels::LOG_BUG);
+  logentry("Recieved SIGSEGV (Segmentation fault)", ANGEL, LogChannels::LOG_BUG);
   crash_hotboot();
-  log("Mud exiting from SIGSEGV.", ANGEL, LogChannels::LOG_BUG);
+  logentry("Mud exiting from SIGSEGV.", ANGEL, LogChannels::LOG_BUG);
   exit(0);
 }
 
@@ -2872,8 +2900,8 @@ void unrestrict_game(int sig)
   extern struct ban_list_element *ban_list;
   extern int num_invalid;
 
-  log("Received SIGUSR2 - completely unrestricting game (emergent)",
-      ANGEL, LogChannels::LOG_GOD);
+  logentry("Received SIGUSR2 - completely unrestricting game (emergent)",
+           ANGEL, LogChannels::LOG_GOD);
   ban_list = NULL;
   restrict = 0;
   num_invalid = 0;
@@ -2881,7 +2909,7 @@ void unrestrict_game(int sig)
 
 void hupsig(int sig)
 {
-  log("Received SIGHUP, SIGINT, or SIGTERM.  Shutting down...", 0, LogChannels::LOG_MISC);
+  logentry("Received SIGHUP, SIGINT, or SIGTERM.  Shutting down...", 0, LogChannels::LOG_MISC);
   abort(); /* perhaps something more elegant should
             * substituted */
 }
@@ -2889,10 +2917,10 @@ void hupsig(int sig)
 void sigusr1(int sig)
 {
   do_not_save_corpses = 1;
-  log("Writing sockets to file for hotboot recovery.", 0, LogChannels::LOG_MISC);
+  logentry("Writing sockets to file for hotboot recovery.", 0, LogChannels::LOG_MISC);
   if (!write_hotboot_file(nullptr))
   {
-    log("Hotboot failed.  Closing all sockets.", 0, LogChannels::LOG_MISC);
+    logentry("Hotboot failed.  Closing all sockets.", 0, LogChannels::LOG_MISC);
   }
 }
 
@@ -2941,11 +2969,11 @@ void signal_handler(int signal, siginfo_t *si, void *)
     extern int do_not_save_corpses;
     do_not_save_corpses = 1;
     send_to_all(buf.data());
-    log(buf.c_str(), ANGEL, LogChannels::LOG_GOD);
-    log("Writing sockets to file for hotboot recovery.", 0, LogChannels::LOG_MISC);
+    logentry(buf.c_str(), ANGEL, LogChannels::LOG_GOD);
+    logentry("Writing sockets to file for hotboot recovery.", 0, LogChannels::LOG_MISC);
     if (!write_hotboot_file(new_argv))
     {
-      log("Hotboot failed.  Closing all sockets.", 0, LogChannels::LOG_MISC);
+      logentry("Hotboot failed.  Closing all sockets.", 0, LogChannels::LOG_MISC);
     }
   }
 }
@@ -3076,6 +3104,11 @@ void check_for_awaymsgs(char_data *ch)
 void send_to_char(const char *mesg, char_data *ch)
 {
   send_to_char(string(mesg), ch);
+}
+
+void send_to_char(QString messg, char_data *ch)
+{
+  send_to_char(messg.toStdString(), ch);
 }
 
 void send_to_char(string messg, char_data *ch)
