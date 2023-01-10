@@ -63,7 +63,7 @@ act_return act(
   // This shouldn't happen
   if (ch == 0)
   {
-    log("Error in act(), character equal to 0", OVERSEER, LogChannels::LOG_BUG);
+    logentry("Error in act(), character equal to 0", OVERSEER, LogChannels::LOG_BUG);
     delete tokens;
     ar.retval = eFAILURE;
     return ar;
@@ -128,7 +128,7 @@ act_return act(
   {
     if (destination != TO_ZONE && destination != TO_WORLD)
     {
-      log("Error in act(), invalid value sent as 'destination'", OVERSEER, LogChannels::LOG_BUG);
+      logentry("Error in act(), invalid value sent as 'destination'", OVERSEER, LogChannels::LOG_BUG);
       delete tokens;
       ar.retval = eFAILURE;
       return ar;
