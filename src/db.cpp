@@ -87,11 +87,9 @@ world_file_list_item *world_file_list = 0; // List of the world files
 world_file_list_item *mob_file_list = 0;   // List of the mob files
 world_file_list_item *obj_file_list = 0;   // List of the obj files
 
-struct room_data **world_array = 0; // array of rooms
-int top_of_world = 0;				// index of last room in world
-int top_of_world_alloc = 0;			// index of last alloc'd memory in world
-
-int top_of_zonet = 0; // index of last valid zonefile
+class room_data **world_array = 0; // array of rooms
+int top_of_world = 0;			   // index of last room in world
+int top_of_world_alloc = 0;		   // index of last alloc'd memory in world
 
 struct obj_data *object_list = 0; /* the global linked list of obj's */
 
@@ -99,10 +97,13 @@ pulse_data *bard_list = 0; /* global l-list of bards          */
 
 room_data &CWorld::operator[](int rnum)
 {
-	if (rnum > top_of_world)
-		throw overrun();
-	else if (rnum < 0)
-		throw underrun();
+	static room_data generic_room = {};
+
+	if (rnum > top_of_world || rnum < 0 || world_array[rnum] == nullptr)
+	{
+		generic_room = {};
+		return generic_room;
+	}
 
 	return *world_array[rnum];
 }
@@ -112,7 +113,6 @@ CWorld world;
 #ifndef SEEK_CUR
 #define SEEK_CUR 1
 #endif
-int top_of_zone_table = 0;
 struct message_list fight_messages[MAX_MESSAGES]; /* fighting messages   */
 
 struct wizlist_info
@@ -164,25 +164,20 @@ struct weather_data weather_info; /* the infomation about the weather */
 struct vault_data *vault_table = 0;
 
 /* local procedures */
-void boot_zones(void);
 void setup_dir(FILE *fl, int room, int dir);
 void load_banned();
 void boot_world(void);
 void do_godlist();
 void half_chop(const char *string, char *arg1, char *arg2);
-world_file_list_item *new_mob_file_item(char *temp, int32_t room_nr);
-world_file_list_item *new_obj_file_item(char *temp, int32_t room_nr);
+world_file_list_item *new_mob_file_item(QString filename, int32_t room_nr);
+world_file_list_item *new_obj_file_item(QString filename, int32_t room_nr);
 
-char *read_next_worldfile_name(FILE *flWorldIndex);
+QString read_next_worldfile_name(FILE *flWorldIndex);
 int fread_bitvector(FILE *fl, int32_t minval, int32_t maxval);
 int fread_bitvector(ifstream &fl, int32_t minval, int32_t maxval);
-void fread_new_newline(FILE *fl)
-{
-}
 char fread_char(FILE *fl);
 struct index_data *generate_mob_indices(int *top, struct index_data *index);
 struct index_data *generate_obj_indices(int *top, struct index_data *index);
-int zone_is_empty(int zone_nr);
 
 void fix_shopkeepers_inventory();
 int file_to_string(const char *name, char *buf);
@@ -425,7 +420,7 @@ int do_write_skillquest(char_data *ch, char *argument, int cmd)
 	struct skill_quest *curr;
 	FILE *fl;
 
-	if (!(fl = dc_fopen(SKILL_QUEST_FILE, "w")))
+	if (!(fl = fopen(SKILL_QUEST_FILE, "w")))
 	{
 		if (ch)
 			send_to_char("Can't open the skill quest file.\r\n", ch);
@@ -437,7 +432,7 @@ int do_write_skillquest(char_data *ch, char *argument, int cmd)
 		fprintf(fl, "%d %d\n", curr->clas, curr->level);
 	}
 	fprintf(fl, "0\n");
-	dc_fclose(fl);
+	fclose(fl);
 	send_to_char("Skill quests saved.\r\n", ch);
 	return eSUCCESS;
 }
@@ -449,9 +444,9 @@ void load_skillquests()
 	int i;
 	FILE *fl;
 
-	if (!(fl = dc_fopen(SKILL_QUEST_FILE, "r")))
+	if (!(fl = fopen(SKILL_QUEST_FILE, "r")))
 	{
-		log("Cannot open skill quest file.", 0, LogChannels::LOG_MISC);
+		logentry("Cannot open skill quest file.", 0, LogChannels::LOG_MISC);
 		abort();
 	}
 
@@ -468,7 +463,7 @@ void load_skillquests()
 		{
 			char buf[512];
 			sprintf(buf, "%d duplicate.", i);
-			log(buf, 0, LogChannels::LOG_BUG);
+			logentry(buf, 0, LogChannels::LOG_BUG);
 		}
 		newsq->message = fread_string(fl, 0);
 		newsq->clas = fread_int(fl, 0, 32768);
@@ -482,7 +477,7 @@ void load_skillquests()
 
 		last = newsq;
 	}
-	dc_fclose(fl);
+	fclose(fl);
 }
 
 /*************************************************************************
@@ -490,7 +485,7 @@ void load_skillquests()
  *********************************************************************** */
 
 /* body of the booting system */
-void boot_db(void)
+void DC::boot_db(void)
 {
 	int i;
 	int help_rec_count = 0;
@@ -503,10 +498,10 @@ void boot_db(void)
 
 	reset_time();
 
-	log("************** BOOTING THE MUD ***********", 0, LogChannels::LOG_SOCKET);
-	log("************** BOOTING THE MUD ***********", 0, LogChannels::LOG_MISC);
-	log("************** BOOTING THE MUD ***********", 0, LogChannels::LOG_WORLD);
-	log("Reading aux files.", 0, LogChannels::LOG_MISC);
+	logentry("************** BOOTING THE MUD ***********", 0, LogChannels::LOG_SOCKET);
+	logentry("************** BOOTING THE MUD ***********", 0, LogChannels::LOG_MISC);
+	logentry("************** BOOTING THE MUD ***********", 0, LogChannels::LOG_WORLD);
+	logentry("Reading aux files.", 0, LogChannels::LOG_MISC);
 	file_to_string(WEBPAGE_FILE, webpage);
 	file_to_string(GREETINGS1_FILE, greetings1);
 	file_to_string(GREETINGS2_FILE, greetings2);
@@ -528,8 +523,8 @@ void boot_db(void)
 #endif
 
 	do_godlist();
-	log("Godlist done!", 0, LogChannels::LOG_MISC);
-	log("Booting clans...", 0, LogChannels::LOG_MISC);
+	logentry("Godlist done!", 0, LogChannels::LOG_MISC);
+	logentry("Booting clans...", 0, LogChannels::LOG_MISC);
 
 #ifdef LEAK_CHECK
 	cause_leak();
@@ -537,34 +532,34 @@ void boot_db(void)
 
 	boot_clans();
 
-	log("Loading new news file.", 0, LogChannels::LOG_MISC);
+	logentry("Loading new news file.", 0, LogChannels::LOG_MISC);
 	extern void loadnews();
 	loadnews();
 
-	log("Loading new help file.", 0, LogChannels::LOG_MISC);
+	logentry("Loading new help file.", 0, LogChannels::LOG_MISC);
 
 	// new help file stuff
-	if (!(new_help_fl = dc_fopen(NEW_HELP_FILE, "r")))
+	if (!(new_help_fl = fopen(NEW_HELP_FILE, "r")))
 	{
 		perror(NEW_HELP_FILE);
 		abort();
 	}
 	help_rec_count = count_hash_records(new_help_fl);
-	dc_fclose(new_help_fl);
+	fclose(new_help_fl);
 
-	if (!(new_help_fl = dc_fopen(NEW_HELP_FILE, "r")))
+	if (!(new_help_fl = fopen(NEW_HELP_FILE, "r")))
 	{
 		perror(NEW_HELP_FILE);
 		abort();
 	}
 	CREATE(new_help_table, struct help_index_element_new, help_rec_count);
 	load_new_help(new_help_fl, 0, 0);
-	dc_fclose(new_help_fl);
+	fclose(new_help_fl);
 	// end new help files
 
-	log("Opening help file.", 0, LogChannels::LOG_MISC);
+	logentry("Opening help file.", 0, LogChannels::LOG_MISC);
 
-	if (!(help_fl = dc_fopen(HELP_KWRD_FILE, "r")))
+	if (!(help_fl = fopen(HELP_KWRD_FILE, "r")))
 	{
 		perror(HELP_KWRD_FILE);
 		abort();
@@ -572,10 +567,10 @@ void boot_db(void)
 
 	help_index = build_help_index(help_fl, &top_of_helpt);
 
-	log("Loading the zones", 0, LogChannels::LOG_MISC);
+	logentry("Loading the zones", 0, LogChannels::LOG_MISC);
 	boot_zones();
 
-	log("Loading the world.", 0, LogChannels::LOG_MISC);
+	logentry("Loading the world.", 0, LogChannels::LOG_MISC);
 	// start world off with 2000 rooms of alloc'd space
 	world_array = (room_data **)realloc(world_array, 2000 * sizeof(room_data *));
 	top_of_world_alloc = 2000;
@@ -587,75 +582,73 @@ void boot_db(void)
 
 	boot_world();
 
-	log("Renumbering the world.", 0, LogChannels::LOG_MISC);
+	logentry("Renumbering the world.", 0, LogChannels::LOG_MISC);
 	renum_world();
 
 	funny_boot_message();
 
-	log("Generating mob indices/loading all mobiles", 0, LogChannels::LOG_MISC);
+	logentry("Generating mob indices/loading all mobiles", 0, LogChannels::LOG_MISC);
 	generate_mob_indices(&top_of_mobt, mob_index);
 
-	log("Generating object indices/loading all objects", 0, LogChannels::LOG_MISC);
+	logentry("Generating object indices/loading all objects", 0, LogChannels::LOG_MISC);
 	generate_obj_indices(&top_of_objt, obj_index);
 
 	funny_boot_message();
 
-	log("renumbering zone table", 0, LogChannels::LOG_MISC);
+	logentry("renumbering zone table", 0, LogChannels::LOG_MISC);
 	renum_zone_table();
 
-	log("Looking for unordered mobiles...", 0, LogChannels::LOG_MISC);
+	logentry("Looking for unordered mobiles...", 0, LogChannels::LOG_MISC);
 	find_unordered_mobiles();
 
-	log("Looking for unordered objects...", 0, LogChannels::LOG_MISC);
+	logentry("Looking for unordered objects...", 0, LogChannels::LOG_MISC);
 	find_unordered_objects();
 
-	if (DC::getInstance()->cf.bport == false)
+	if (cf.bport == false)
 	{
-		log("Loading Corpses.", 0, LogChannels::LOG_MISC);
+		logentry("Loading Corpses.", 0, LogChannels::LOG_MISC);
 		load_corpses();
 	}
 
-	log("Loading messages.", 0, LogChannels::LOG_MISC);
+	logentry("Loading messages.", 0, LogChannels::LOG_MISC);
 	load_messages(MESS_FILE);
 	load_messages(MESS2_FILE, 2000);
 
-	log("Loading socials.", 0, LogChannels::LOG_MISC);
+	logentry("Loading socials.", 0, LogChannels::LOG_MISC);
 	boot_social_messages();
 
-	log("Adding commands to radix", 0, LogChannels::LOG_MISC);
+	logentry("Adding commands to radix", 0, LogChannels::LOG_MISC);
 	add_commands_to_radix();
 
-	log("Processing game portals...", 0, LogChannels::LOG_MISC);
+	logentry("Processing game portals...", 0, LogChannels::LOG_MISC);
 	load_game_portals();
 
-	log("Loading emoting objects...", 0, LogChannels::LOG_MISC);
+	logentry("Loading emoting objects...", 0, LogChannels::LOG_MISC);
 	load_emoting_objects();
 
-	log("Adding clan room flags to rooms...", 0, LogChannels::LOG_MISC);
+	logentry("Adding clan room flags to rooms...", 0, LogChannels::LOG_MISC);
 	assign_clan_rooms();
 
-	log("Assigning function pointers.", 0, LogChannels::LOG_MISC);
+	logentry("Assigning function pointers.", 0, LogChannels::LOG_MISC);
 	assign_mobiles();
 	assign_objects();
 	assign_rooms();
 
-	DC::config &cf = DC::getInstance()->cf;
+	// DC::config &cf = DC::getInstance()->cf;
 	if (cf.verbose_mode)
 	{
 		fprintf(stderr, "\n[ Room  Room]\t{Level}\t  Author\tZone\n");
 	}
 
-	for (i = 0; i <= top_of_zone_table; i++)
+	// auto &zones = DC::getInstance()->zones;
+	for (auto [zone_key, zone] : zones.asKeyValueRange())
 	{
 		if (cf.verbose_mode)
 		{
-			fprintf(stderr, "[%5d %5d]\t%s.\n",
-					(i ? (DC::getInstance()->zones[i - 1].top + 1) : 0),
-					DC::getInstance()->zones[i].top,
-					DC::getInstance()->zones[i].name);
+			cerr << QString("[%1 %2]\t%3.\n").arg(zone.getBottom(), 5).arg(zone.getTop(), 5).arg(zone.name).toStdString() << endl;
 		}
 
-		reset_zone(i, ResetType::full);
+		zone.reset(Zone::ResetType::full);
 	}
 
 	if (cf.verbose_mode)
@@ -663,28 +656,28 @@ void boot_db(void)
 		fprintf(stderr, "\n");
 	}
 
-	log("Loading banned list", 0, LogChannels::LOG_MISC);
+	logentry("Loading banned list", 0, LogChannels::LOG_MISC);
 	load_banned();
 
-	log("Loading skill quests.", 0, LogChannels::LOG_MISC);
+	logentry("Loading skill quests.", 0, LogChannels::LOG_MISC);
 	load_skillquests();
 
-	log("Assigning inventory to shopkeepers", 0, LogChannels::LOG_MISC);
+	logentry("Assigning inventory to shopkeepers", 0, LogChannels::LOG_MISC);
 	fix_shopkeepers_inventory();
 
-	log("Turning on MOB Progs", 0, LogChannels::LOG_MISC);
+	logentry("Turning on MOB Progs", 0, LogChannels::LOG_MISC);
 	MOBtrigger = TRUE;
 
-	log("Loading quest one liners.", 0, LogChannels::LOG_MISC);
+	logentry("Loading quest one liners.", 0, LogChannels::LOG_MISC);
 	load_quests();
 
-	log("Loading vaults.", 0, LogChannels::LOG_MISC);
+	logentry("Loading vaults.", 0, LogChannels::LOG_MISC);
 	load_vaults();
 
-	log("Loading player hints.", 0, LogChannels::LOG_MISC);
+	logentry("Loading player hints.", 0, LogChannels::LOG_MISC);
 	load_hints();
 
-	log("Loading auction tickets.", 0, LogChannels::LOG_MISC);
+	logentry("Loading auction tickets.", 0, LogChannels::LOG_MISC);
 	load_auction_tickets();
 }
 
@@ -703,13 +696,13 @@ void do_godlist()
 	int x;
 	FILE *fl;
 
-	log("Doing wizlist...db.c\n\r", 0, LogChannels::LOG_MISC);
+	logentry("Doing wizlist...db.c\n\r", 0, LogChannels::LOG_MISC);
 
-	if (!(fl = dc_fopen("../lib/wizlist.txt", "r")))
+	if (!(fl = fopen("../lib/wizlist.txt", "r")))
 	{
-		log("db.c: error reading wizlist.txt", ANGEL, LogChannels::LOG_BUG);
+		logentry("db.c: error reading wizlist.txt", ANGEL, LogChannels::LOG_BUG);
 		perror("db.c...error reading wizlist.txt: ");
-		dc_fclose(fl);
+		fclose(fl);
 		return;
 	}
 
@@ -727,8 +720,8 @@ void do_godlist()
 		wizlist[x].level = atoi(buf3);
 	}
 
-	log("Done!\n\r", 0, LogChannels::LOG_MISC);
-	dc_fclose(fl);
+	logentry("Done!\n\r", 0, LogChannels::LOG_MISC);
+	fclose(fl);
 }
 
 void free_wizlist_from_memory()
@@ -759,7 +752,7 @@ void write_wizlist(const char filename[])
 	int x;
 	FILE *fl;
 
-	if (!(fl = dc_fopen(filename, "w")))
+	if (!(fl = fopen(filename, "w")))
 	{
 		logf(IMMORTAL, LogChannels::LOG_BUG, "Unable to open wizlist file: %s", filename);
 		return;
@@ -775,7 +768,7 @@ void write_wizlist(const char filename[])
 		if (wizlist[x].level >= IMMORTAL)
 			fprintf(fl, "%s %d\n", wizlist[x].name, wizlist[x].level);
 	}
-	dc_fclose(fl);
+	fclose(fl);
 }
 
 void update_wizlist(char_data *ch)
@@ -971,7 +964,7 @@ void reset_time(void)
 	sprintf(log_buf, "Current Gametime: %dH %dD %dM %dY.",
 			time_info.hours, time_info.day,
 			time_info.month, time_info.year);
-	log(log_buf, 0, LogChannels::LOG_MISC);
+	logentry(log_buf, 0, LogChannels::LOG_MISC);
 
 	weather_info.pressure = 960;
 	if ((time_info.month >= 7) && (time_info.month <= 12))
@@ -999,47 +992,47 @@ index_data *generate_mob_indices(int *top, struct index_data *index)
 	char log_buf[256];
 	FILE *flMobIndex;
 	FILE *fl;
-	char *temp;
+	QString temp;
 	char endfile[180];
 	struct world_file_list_item *pItem = NULL;
 	//  extern short code_testing_mode;
 
-	log("Opening mobile file index.", 0, LogChannels::LOG_MISC);
+	logentry("Opening mobile file index.", 0, LogChannels::LOG_MISC);
 	if (DC::getInstance()->cf.test_mobs)
 	{
-		if (!(flMobIndex = dc_fopen(MOB_INDEX_FILE_TINY, "r")))
+		if (!(flMobIndex = fopen(MOB_INDEX_FILE_TINY, "r")))
 		{
-			log("Could not open index file.", 0, LogChannels::LOG_MISC);
+			logentry("Could not open index file.", 0, LogChannels::LOG_MISC);
 			abort();
 		}
 	}
 	else
 	{
-		if (!(flMobIndex = dc_fopen(MOB_INDEX_FILE, "r")))
+		if (!(flMobIndex = fopen(MOB_INDEX_FILE, "r")))
 		{
-			log("Could not open index file.", 0, LogChannels::LOG_MISC);
+			logentry("Could not open index file.", 0, LogChannels::LOG_MISC);
 			abort();
 		}
 	}
 
-	log("Opening object files.", 0, LogChannels::LOG_MISC);
+	logentry("Opening object files.", 0, LogChannels::LOG_MISC);
 
 	// note, we don't worry about free'ing temp, cause it's held in the "mob_file_list"
 	for (temp = read_next_worldfile_name(flMobIndex);
-		 temp;
+		 temp.isEmpty() == false;
 		 temp = read_next_worldfile_name(flMobIndex))
 	{
 		strcpy(endfile, "mobs/");
-		strcat(endfile, temp);
+		strcat(endfile, temp.toStdString().c_str());
 
 		DC::config &cf = DC::getInstance()->cf;
 
 		if (cf.verbose_mode)
 		{
-			log(temp, 0, LogChannels::LOG_MISC);
+			logentry(temp, 0, LogChannels::LOG_MISC);
 		}
 
-		if (!(fl = dc_fopen(endfile, "r")))
+		if (!(fl = fopen(endfile, "r")))
 		{
 			perror(endfile);
 			logf(IMMORTAL, LogChannels::LOG_BUG, "generate_mob_indices: could not open mob file: %s", endfile);
@@ -1073,7 +1066,7 @@ index_data *generate_mob_indices(int *top, struct index_data *index)
 
 						sprintf(log_buf, "Unable to load mobile %d!\n\r",
 								index[i].virt);
-						log(log_buf, ANGEL, LogChannels::LOG_BUG);
+						logentry(log_buf, ANGEL, LogChannels::LOG_BUG);
 					}
 					i++;
 				}
@@ -1083,17 +1076,17 @@ index_data *generate_mob_indices(int *top, struct index_data *index)
 			else
 			{
 				sprintf(endfile, "Bad char (%s)", buf);
-				log(endfile, 0, LogChannels::LOG_MISC);
+				logentry(endfile, 0, LogChannels::LOG_MISC);
 				abort();
 			}
 		}
 
 		pItem->lastnum = (i - 1);
 
-		dc_fclose(fl);
+		fclose(fl);
 	}
 	*top = i - 1;
-	dc_fclose(flMobIndex);
+	fclose(flMobIndex);
 	/*
 	 Here the index gets processed, and mob classes gets
 	 assigned. (Not done in read_mobile 'cause of
@@ -1312,45 +1305,45 @@ struct index_data *generate_obj_indices(int *top,
 	char log_buf[256];
 	FILE *fl;
 	FILE *flObjIndex;
-	char *temp = NULL;
+	QString temp;
 	char endfile[180];
 	struct world_file_list_item *pItem = NULL;
 
 	//  if (!bport) {
 
-	if (!(flObjIndex = dc_fopen(OBJECT_INDEX_FILE, "r")))
+	if (!(flObjIndex = fopen(OBJECT_INDEX_FILE, "r")))
 	{
-		log("Cannot open object file index.", 0, LogChannels::LOG_MISC);
+		logentry("Cannot open object file index.", 0, LogChannels::LOG_MISC);
 		abort();
 	}
 	/*
 	 } else {
-	 if (!(flObjIndex = dc_fopen(OBJECT_INDEX_FILE_TINY,"r"))) {
-	 log("Cannot open object file index.(tiny).",0,LogChannels::LOG_MISC);
+	 if (!(flObjIndex = fopen(OBJECT_INDEX_FILE_TINY,"r"))) {
+	 logentry("Cannot open object file index.(tiny).",0,LogChannels::LOG_MISC);
 	 abort();
 	 }
 	 }
 	 */
-	log("Opening object files.", 0, LogChannels::LOG_MISC);
+	logentry("Opening object files.", 0, LogChannels::LOG_MISC);
 
 	// note, we don't worry about free'ing temp, cause it's held in the "obj_file_list"
 	for (temp = read_next_worldfile_name(flObjIndex);
-		 temp;
+		 temp.isEmpty() == false;
 		 temp = read_next_worldfile_name(flObjIndex))
 	{
 		strcpy(endfile, "objects/");
-		strcat(endfile, temp);
+		strcat(endfile, temp.toStdString().c_str());
 
 		DC::config &cf = DC::getInstance()->cf;
 		if (cf.verbose_mode)
 		{
-			log(temp, 0, LogChannels::LOG_MISC);
+			logentry(temp, 0, LogChannels::LOG_MISC);
 		}
 
-		if (!(fl = dc_fopen(endfile, "r")))
+		if (!(fl = fopen(endfile, "r")))
 		{
-			log("generate_obj_indices: could not open obj file.", 0, LogChannels::LOG_BUG);
-			log(temp, 0, LogChannels::LOG_BUG);
+			logentry("generate_obj_indices: could not open obj file.", 0, LogChannels::LOG_BUG);
+			logentry(temp, 0, LogChannels::LOG_BUG);
 			abort();
 		}
 
@@ -1376,7 +1369,7 @@ struct index_data *generate_obj_indices(int *top,
 					{
 						sprintf(log_buf, "Unable to load object %d!\n\r",
 								index[i].virt);
-						log(log_buf, ANGEL, LogChannels::LOG_BUG);
+						logentry(log_buf, ANGEL, LogChannels::LOG_BUG);
 					}
 					i++;
 				}
@@ -1393,11 +1386,11 @@ struct index_data *generate_obj_indices(int *top,
 
 		pItem->lastnum = (i - 1);
 
-		dc_fclose(fl);
+		fclose(fl);
 	} // for next_in_file
 
 	*top = i - 1;
-	dc_fclose(flObjIndex);
+	fclose(flObjIndex);
 	return (index);
 }
 
@@ -1473,13 +1466,13 @@ void write_one_room(FILE *f, int a)
 	fprintf(f, "S\n");
 }
 
-int read_one_room(FILE *fl, int &room_nr)
+int DC::read_one_room(FILE *fl, int &room_nr)
 {
-	int zone = 0, tmp = 0;
 	char *temp = nullptr;
 	char ch = 0;
 	int dir = 0;
 	struct extra_descr_data *new_new_descr;
+	zone_t zone_nr = {};
 
 	ch = fread_char(fl);
 
@@ -1510,8 +1503,8 @@ int read_one_room(FILE *fl, int &room_nr)
 
 			if (!world_array)
 			{
-				log("Unable to realloc more rooms in read_one_room.  Aborting.", IMMORTAL, LogChannels::LOG_WORLD);
-				log("Unable to realloc more rooms in read_one_room.  Aborting.", IMMORTAL, LogChannels::LOG_BUG);
+				logentry("Unable to realloc more rooms in read_one_room.  Aborting.", IMMORTAL, LogChannels::LOG_WORLD);
+				logentry("Unable to realloc more rooms in read_one_room.  Aborting.", IMMORTAL, LogChannels::LOG_BUG);
 				abort();
 			}
 		}
@@ -1530,42 +1523,46 @@ int read_one_room(FILE *fl, int &room_nr)
 		world[room_nr].last_track = 0;
 		world[room_nr].denied = 0;
 		total_rooms++;
-		if (top_of_zone_table >= 0)
+
+		// Ignore recorded zone number since it may not longer be valid
+		fread_int(fl, -1, 64000); // zone nr
+
+		// Go through the zone table until world[room_nr].number is
+		// in the current zone.
+
+		bool found = false;
+		zone_t zone_nr = {};
+		for (auto [zone_key, zone] : DC::getInstance()->zones.asKeyValueRange())
 		{
-			tmp = fread_int(fl, -1, 64000); // zone nr
-
-			// OBS: Assumes ordering of input rooms
-
-			if (world[room_nr].number <= (zone ? DC::getInstance()->zones[zone - 1].top : -1))
+			if (zone.getBottom() <= world[room_nr].number && zone.getTop() >= world[room_nr].number)
 			{
-				fprintf(stderr, "Room nr %d is below zone %d.\n", room_nr, zone);
-				log("Room below minimum for it's zone table.  ERROR", IMMORTAL, LogChannels::LOG_BUG);
-				log("Room below minimum for it's zone table.  ERROR", IMMORTAL, LogChannels::LOG_MISC);
-				//        abort();
-				return FALSE;
+				found = true;
+				zone_nr = zone_key;
+				break;
 			}
-
-			// Go through the zone table until world[room_nr].number is
-			// in the current zone.
-
-			while (world[room_nr].number > DC::getInstance()->zones[zone].top)
+		}
+		if (!found)
+		{
+			QString error = QString("Room %1 is outside of any zone.").arg(room_nr);
+			logentry(error);
+			logentry("Room outside of ANY zone.  ERROR", IMMORTAL, LogChannels::LOG_BUG);
+		}
+		else
+		{
+			auto &zone = DC::getInstance()->zones[zone_nr];
+			if (room_nr >= zone.getBottom() && room_nr <= zone.getTop())
 			{
-				if (++zone > top_of_zone_table)
+				if (room_nr < zone.getRealBottom() || zone.getRealBottom() == 0)
 				{
-					fprintf(stderr, "Room %d is outside of any zone.\n", room_nr);
-					log("Room outside of ANY zone.  ERROR", IMMORTAL, LogChannels::LOG_BUG);
-					log("Room outside of ANY zone.  ERROR", IMMORTAL, LogChannels::LOG_MISC);
-					return FALSE;
+					zone.setRealBottom(room_nr);
+				}
+				if (room_nr > zone.getRealTop() || zone.getRealTop() == 0)
+				{
+					zone.setRealTop(room_nr);
 				}
 			}
-
-			if (room_nr > DC::getInstance()->zones[zone].top_rnum)
-				DC::getInstance()->zones[zone].top_rnum = room_nr;
-			if (room_nr < DC::getInstance()->zones[zone].bottom_rnum)
-				DC::getInstance()->zones[zone].bottom_rnum = room_nr;
-
-			world[room_nr].zone = zone;
-		} // of top_of_zone_table > 0
+			world[room_nr].zone = zone_nr;
+		}
 
 		world[room_nr].room_flags = fread_bitvector(fl, -1, 2147483467);
 		if (IS_SET(world[room_nr].room_flags, NO_ASTRAL))
@@ -1578,7 +1575,7 @@ int read_one_room(FILE *fl, int &room_nr)
 
 		if (load_debug)
 		{
-			printf("Flags are %d %d %d\n", tmp, world[room_nr].room_flags,
+			printf("Flags are %d %d\n", zone_nr, world[room_nr].room_flags,
 				   world[room_nr].sector_type);
 			fflush(stdout);
 		}
@@ -1588,7 +1585,7 @@ int read_one_room(FILE *fl, int &room_nr)
 		world[room_nr].people = 0;
 		world[room_nr].light = 0; /* Zero light sources */
 
-		for (tmp = 0; tmp <= 5; tmp++)
+		for (size_t tmp = 0; tmp <= 5; tmp++)
 			world[room_nr].dir_option[tmp] = 0;
 
 		world[room_nr].ex_description = 0;
@@ -1649,28 +1646,23 @@ int read_one_room(FILE *fl, int &room_nr)
 	return FALSE;
 }
 
-char *read_next_worldfile_name(FILE *flWorldIndex)
+QString read_next_worldfile_name(FILE *flWorldIndex)
 {
-	char *temp;
-
-	temp = fread_string(flWorldIndex, 0);
+	QString filename = fread_string(flWorldIndex, 0);
 
 	// Check for end of file marker
-	if (!strcmp(temp, "$"))
+	if (filename == "$")
 	{
-		dc_free(temp);
-		return NULL;
+		return "";
 	}
 
 	// Check for comments
-	if (!strncmp(temp, "*", 1))
+	if (filename.startsWith("*"))
 	{
-		dc_free(temp);
-		// Whee!  recursive loops!
-		temp = read_next_worldfile_name(flWorldIndex);
+		filename = read_next_worldfile_name(flWorldIndex);
 	}
 
-	return temp;
+	return filename;
 }
 
 bool can_modify_this_room(char_data *ch, int32_t vnum)
@@ -1741,14 +1733,12 @@ bool can_modify_object(char_data *ch, int32_t obj)
 
 void set_zone_saved_zone(int32_t room)
 {
-	int zone = world[room].zone;
-	REMOVE_BIT(DC::getInstance()->zones[zone].zone_flags, ZONE_MODIFIED);
+	DC::setZoneNotModified(world[room].zone);
 }
 
 void set_zone_modified_zone(int32_t room)
 {
-	int zone = world[room].zone;
-	SET_BIT(DC::getInstance()->zones[zone].zone_flags, ZONE_MODIFIED);
+	DC::setZoneModified(world[room].zone);
 }
 
 void set_zone_modified(int32_t modnum, world_file_list_item *list)
@@ -1763,7 +1753,7 @@ void set_zone_modified(int32_t modnum, world_file_list_item *list)
 
 	if (!curr)
 	{
-		log("ERROR in set_zone_modified: Cannot find room!!!", IMMORTAL, LogChannels::LOG_BUG);
+		logentry("ERROR in set_zone_modified: Cannot find room!!!", IMMORTAL, LogChannels::LOG_BUG);
 		return;
 	}
 
@@ -1805,7 +1795,7 @@ void set_zone_saved(int32_t modnum, world_file_list_item *list)
 
 	if (!curr)
 	{
-		log("ERROR in set_zone_modified: Cannot find room!!!", IMMORTAL, LogChannels::LOG_BUG);
+		logentry("ERROR in set_zone_modified: Cannot find room!!!", IMMORTAL, LogChannels::LOG_BUG);
 		return;
 	}
 
@@ -1877,7 +1867,7 @@ void free_world_from_memory()
 
 	while (curr_wfli)
 	{
-		dc_free(curr_wfli->filename);
+
 		world_file_list = curr_wfli->next;
 		dc_free(curr_wfli);
 		curr_wfli = world_file_list;
@@ -1911,7 +1901,7 @@ void free_objs_from_memory()
 		}
 }
 
-world_file_list_item *one_new_world_file_item(char *temp, int32_t room_nr)
+world_file_list_item *one_new_world_file_item(QString filename, int32_t room_nr)
 {
 	world_file_list_item *curr = NULL;
 
@@ -1921,7 +1911,7 @@ world_file_list_item *one_new_world_file_item(char *temp, int32_t room_nr)
 	curr = (world_file_list_item *)dc_alloc(1, sizeof(world_file_list_item));
 #endif
 
-	curr->filename = temp;
+	curr->filename = filename;
 	curr->firstnum = room_nr;
 	curr->lastnum = -1;
 	curr->flags = 0;
@@ -1929,45 +1919,45 @@ world_file_list_item *one_new_world_file_item(char *temp, int32_t room_nr)
 	return curr;
 }
 
-world_file_list_item *new_w_file_item(char *temp, int32_t room_nr, world_file_list_item *&list)
+world_file_list_item *new_w_file_item(QString filename, int32_t room_nr, world_file_list_item *&list)
 {
 	world_file_list_item *curr = list;
 
 	if (!list)
 	{
-		list = one_new_world_file_item(temp, room_nr);
+		list = one_new_world_file_item(filename, room_nr);
 		return list;
 	}
 
 	while (curr->next)
 		curr = curr->next;
 
-	curr->next = one_new_world_file_item(temp, room_nr);
+	curr->next = one_new_world_file_item(filename, room_nr);
 	return curr->next;
 }
 
-world_file_list_item *new_world_file_item(char *temp, int32_t room_nr)
+world_file_list_item *new_world_file_item(QString filename, int32_t room_nr)
 {
-	return new_w_file_item(temp, room_nr, world_file_list);
+	return new_w_file_item(filename, room_nr, world_file_list);
 }
 
-world_file_list_item *new_mob_file_item(char *temp, int32_t room_nr)
+world_file_list_item *new_mob_file_item(QString filename, int32_t room_nr)
 {
-	return new_w_file_item(temp, room_nr, mob_file_list);
+	return new_w_file_item(filename, room_nr, mob_file_list);
 }
 
-world_file_list_item *new_obj_file_item(char *temp, int32_t room_nr)
+world_file_list_item *new_obj_file_item(QString filename, int32_t room_nr)
 {
-	return new_w_file_item(temp, room_nr, obj_file_list);
+	return new_w_file_item(filename, room_nr, obj_file_list);
 }
 
 /* load the rooms */
-void boot_world(void)
+void DC::boot_world(void)
 {
 	FILE *fl;
 	FILE *flWorldIndex;
 	int room_nr = 0;
-	char *temp;
+	QString temp;
 	char endfile[200]; // hopefully noone is stupid and makes a 180 char filename
 	struct world_file_list_item *pItem = NULL;
 
@@ -1977,44 +1967,44 @@ void boot_world(void)
 
 	if (cf.test_world)
 	{
-		if (!(flWorldIndex = dc_fopen(WORLD_INDEX_FILE_TINY, "r")))
+		if (!(flWorldIndex = fopen(WORLD_INDEX_FILE_TINY, "r")))
 		{
-			perror("dc_fopen");
-			log("boot_world: could not open world index file tiny.", 0, LogChannels::LOG_BUG);
+			perror("fopen");
+			logentry("boot_world: could not open world index file tiny.", 0, LogChannels::LOG_BUG);
 			abort();
 		}
 	}
 	else
 	{
-		if (!(flWorldIndex = dc_fopen(WORLD_INDEX_FILE, "r")))
+		if (!(flWorldIndex = fopen(WORLD_INDEX_FILE, "r")))
 		{
-			perror("dc_fopen");
-			log("boot_world: could not open world index file.", 0, LogChannels::LOG_BUG);
+			perror("fopen");
+			logentry("boot_world: could not open world index file.", 0, LogChannels::LOG_BUG);
 			abort();
 		}
 	}
 
-	log("Booting individual world files", 0, LogChannels::LOG_MISC);
+	logentry("Booting individual world files", 0, LogChannels::LOG_MISC);
 
 	// note, we don't worry about free'ing temp, cause it's held in the "world_file_list"
 	for (temp = read_next_worldfile_name(flWorldIndex);
-		 temp;
+		 temp.isEmpty() == false;
 		 temp = read_next_worldfile_name(flWorldIndex))
 	{
 		strcpy(endfile, "world/");
-		strcat(endfile, temp);
+		strcat(endfile, temp.toStdString().c_str());
 
 		DC::config &cf = DC::getInstance()->cf;
 		if (cf.verbose_mode)
 		{
-			log(temp, 0, LogChannels::LOG_MISC);
+			logentry(temp, 0, LogChannels::LOG_MISC);
 		}
 
-		if (!(fl = dc_fopen(endfile, "r")))
+		if (!(fl = fopen(endfile, "r")))
 		{
-			perror("dc_fopen");
-			log("boot_world: could not open world file.", 0, LogChannels::LOG_BUG);
-			log(temp, 0, LogChannels::LOG_BUG);
+			perror("fopen");
+			logentry("boot_world: could not open world file.", 0, LogChannels::LOG_BUG);
+			logentry(temp, 0, LogChannels::LOG_BUG);
 			abort();
 		}
 
@@ -2033,10 +2023,10 @@ void boot_world(void)
 
 		room_nr++;
 
-		dc_fclose(fl);
+		fclose(fl);
 	}
-	log("World Boot done.", 0, LogChannels::LOG_MISC);
-	dc_fclose(flWorldIndex);
+	logentry("World Boot done.", 0, LogChannels::LOG_MISC);
+	fclose(flWorldIndex);
 
 	top_of_world = --room_nr;
 }
@@ -2050,7 +2040,7 @@ void setup_dir(FILE *fl, int room, int dir)
 	{
 		char buf[200];
 		sprintf(buf, "Room %d attemped to created two exits in the same direction.", world[room].number);
-		log(buf, 0, LogChannels::LOG_WORLD);
+		logentry(buf, 0, LogChannels::LOG_WORLD);
 		if (world[room].dir_option[dir]->general_description)
 			dc_free(world[room].dir_option[dir]->general_description);
 		if (world[room].dir_option[dir]->keyword)
@@ -2089,8 +2079,7 @@ void setup_dir(FILE *fl, int room, int dir)
 // return true for success
 int create_one_room(char_data *ch, int vnum)
 {
-	struct room_data *rp;
-	extern int top_of_zone_table;
+	class room_data *rp;
 	int x;
 
 	char buf[256];
@@ -2114,7 +2103,7 @@ int create_one_room(char_data *ch, int vnum)
 
 		if (!world_array)
 		{
-			log("Out of memory in create_one_room.", IMMORTAL, LogChannels::LOG_BUG);
+			logentry("Out of memory in create_one_room.", IMMORTAL, LogChannels::LOG_BUG);
 			abort();
 		}
 	}
@@ -2125,21 +2114,7 @@ int create_one_room(char_data *ch, int vnum)
 
 	rp->number = vnum;
 
-	if (top_of_zone_table >= 0)
-	{
-		int zone;
-
-		for (zone = 0;
-			 rp->number > DC::getInstance()->zones[zone].top && zone <= top_of_zone_table;
-			 zone++)
-			;
-		if (zone > top_of_zone_table)
-		{
-			fprintf(stderr, "Room %d is outside of any zone.\n", rp->number);
-			zone--;
-		}
-		rp->zone = zone;
-	}
+	rp->zone = DC::getRoomZone(rp->number);
 
 	rp->sector_type = 0;
 	rp->room_flags = 0;
@@ -2176,80 +2151,83 @@ void renum_zone_table(void)
 {
 	int zone, comm;
 
-	for (zone = 0; zone <= top_of_zone_table; zone++)
-		for (comm = 0; DC::getInstance()->zones[zone].cmd[comm].command != 'S'; comm++)
+	auto &zones = DC::getInstance()->zones;
+	for (auto [zone_key, zone] : zones.asKeyValueRange())
+	{
+		assert(zone_key != 0);
+		for (comm = 0; zone.cmd[comm].command != 'S'; comm++)
 		{
-			DC::getInstance()->zones[zone].cmd[comm].active = 1;
-			switch (DC::getInstance()->zones[zone].cmd[comm].command)
+			zone.cmd[comm].active = 1;
+			switch (zone.cmd[comm].command)
 			{
 			case 'M':
-				/*if(real_room(DC::getInstance()->zones[zone].cmd[comm].arg3) < 0) {
+				/*if(real_room(zone.cmd[comm].arg3) < 0) {
 
 				 fprintf(stderr, "Problem in zonefile: no room number %d for mob "
-				 "%d - setting to J command\n", DC::getInstance()->zones[zone].cmd[comm].arg3,
-				 DC::getInstance()->zones[zone].cmd[comm].arg1);
-				 DC::getInstance()->zones[zone].cmd[comm].command = 'J';
+				 "%d - setting to J command\n", zone.cmd[comm].arg3,
+				 zone.cmd[comm].arg1);
+				 zone.cmd[comm].command = 'J';
 				 }*/
-				if (real_mobile(DC::getInstance()->zones[zone].cmd[comm].arg1) >= 0 && real_room(DC::getInstance()->zones[zone].cmd[comm].arg3) >= 0)
-					DC::getInstance()->zones[zone].cmd[comm].arg1 =
-						real_mobile(DC::getInstance()->zones[zone].cmd[comm].arg1);
+				if (real_mobile(zone.cmd[comm].arg1) >= 0 && real_room(zone.cmd[comm].arg3) >= 0)
+					zone.cmd[comm].arg1 =
+						real_mobile(zone.cmd[comm].arg1);
 				else
 				{
-					DC::getInstance()->zones[zone].cmd[comm].active = 0;
+					zone.cmd[comm].active = 0;
 				}
-				//          DC::getInstance()->zones[zone].cmd[comm].arg3;// =
-				//                real_room(DC::getInstance()->zones[zone].cmd[comm].arg3);
+				//          zone.cmd[comm].arg3;// =
+				//                real_room(zone.cmd[comm].arg3);
 
 				break;
 			case 'O':
-				if (real_object(DC::getInstance()->zones[zone].cmd[comm].arg1) >= 0 && real_room(DC::getInstance()->zones[zone].cmd[comm].arg3) >= 0)
-					DC::getInstance()->zones[zone].cmd[comm].arg1 = real_object(DC::getInstance()->zones[zone].cmd[comm].arg1);
+				if (real_object(zone.cmd[comm].arg1) >= 0 && real_room(zone.cmd[comm].arg3) >= 0)
+					zone.cmd[comm].arg1 = real_object(zone.cmd[comm].arg1);
 				else
-					DC::getInstance()->zones[zone].cmd[comm].active = 0;
+					zone.cmd[comm].active = 0;
 
-				//            if (DC::getInstance()->zones[zone].cmd[comm].arg3 != NOWHERE)
-				//          DC::getInstance()->zones[zone].cmd[comm].arg3 =
-				//        real_room(DC::getInstance()->zones[zone].cmd[comm].arg3);
+				//            if (zone.cmd[comm].arg3 != NOWHERE)
+				//          zone.cmd[comm].arg3 =
+				//        real_room(zone.cmd[comm].arg3);
 				break;
 			case 'G':
-				if (real_object(DC::getInstance()->zones[zone].cmd[comm].arg1) >= 0)
-					DC::getInstance()->zones[zone].cmd[comm].arg1 =
-						real_object(DC::getInstance()->zones[zone].cmd[comm].arg1);
+				if (real_object(zone.cmd[comm].arg1) >= 0)
+					zone.cmd[comm].arg1 =
+						real_object(zone.cmd[comm].arg1);
 				else
-					DC::getInstance()->zones[zone].cmd[comm].active = 0;
+					zone.cmd[comm].active = 0;
 
 				break;
 			case 'E':
-				if (real_object(DC::getInstance()->zones[zone].cmd[comm].arg1) >= 0)
-					DC::getInstance()->zones[zone].cmd[comm].arg1 =
-						real_object(DC::getInstance()->zones[zone].cmd[comm].arg1);
+				if (real_object(zone.cmd[comm].arg1) >= 0)
+					zone.cmd[comm].arg1 =
+						real_object(zone.cmd[comm].arg1);
 				else
-					DC::getInstance()->zones[zone].cmd[comm].active = 0;
+					zone.cmd[comm].active = 0;
 
 				break;
 			case 'P':
-				if (real_object(DC::getInstance()->zones[zone].cmd[comm].arg1) >= 0 && real_object(DC::getInstance()->zones[zone].cmd[comm].arg3) >= 0)
+				if (real_object(zone.cmd[comm].arg1) >= 0 && real_object(zone.cmd[comm].arg3) >= 0)
 				{
-					DC::getInstance()->zones[zone].cmd[comm].arg1 =
-						real_object(DC::getInstance()->zones[zone].cmd[comm].arg1);
-					DC::getInstance()->zones[zone].cmd[comm].arg3 =
-						real_object(DC::getInstance()->zones[zone].cmd[comm].arg3);
+					zone.cmd[comm].arg1 =
+						real_object(zone.cmd[comm].arg1);
+					zone.cmd[comm].arg3 =
+						real_object(zone.cmd[comm].arg3);
 				}
 				else
-					DC::getInstance()->zones[zone].cmd[comm].active = 0;
+					zone.cmd[comm].active = 0;
 				break;
 			case 'D':
-				if (real_room(DC::getInstance()->zones[zone].cmd[comm].arg1) < 0)
-					DC::getInstance()->zones[zone].cmd[comm].active = 0;
+				if (real_room(zone.cmd[comm].arg1) < 0)
+					zone.cmd[comm].active = 0;
 				else
 				{
-					DC::getInstance()->zones[zone].cmd[comm].arg1 =
-						real_room(DC::getInstance()->zones[zone].cmd[comm].arg1);
-					if (DC::getInstance()->zones[zone].cmd[comm].arg1 == -1)
+					zone.cmd[comm].arg1 =
+						real_room(zone.cmd[comm].arg1);
+					if (zone.cmd[comm].arg1 == -1)
 					{
 						fprintf(stderr, "Problem in zonefile: no room number for door"
 										" - setting to J command\n");
-						DC::getInstance()->zones[zone].cmd[comm].command = 'J';
+						zone.cmd[comm].command = 'J';
 					}
 				}
 				break;
@@ -2265,125 +2243,125 @@ void renum_zone_table(void)
 				// J = junk.  Just a temp holder for an empty command, ignore it
 				break;
 			default:
-				log("Illegal char hit in renum_zone_table", 0, LogChannels::LOG_WORLD);
+				logentry("Illegal char hit in renum_zone_table", 0, LogChannels::LOG_WORLD);
 				break;
 			}
 		}
+	}
 }
 
 void free_zones_from_memory()
 {
-	for (int i = 0; i < MAX_ZONE; i++)
+	for (auto [zone_key, zone] : DC::getInstance()->zones.asKeyValueRange())
 	{
-		if (DC::getInstance()->zones[i].name)
-			dc_free(DC::getInstance()->zones[i].name);
-		if (DC::getInstance()->zones[i].cmd)
+		if (zone.name)
+			dc_free(zone.name);
+		if (zone.cmd)
 		{
 			//      We're str_hsh'ing this now, so we don't need to worry about it
-			//      for(int j = 0; DC::getInstance()->zones[i].cmd[j].command != 'S'; j++)
-			//        if(DC::getInstance()->zones[i].cmd[j].comment)
-			//          dc_free(DC::getInstance()->zones[i].cmd[j].comment);
-			dc_free(DC::getInstance()->zones[i].cmd);
-			// don't have to free DC::getInstance()->zones[i].cmd.comment cause it's str_hsh'd
+			//      for(int j = 0; zone.cmd[j].command != 'S'; j++)
+			//        if(zone.cmd[j].comment)
+			//          dc_free(zone.cmd[j].comment);
+			dc_free(zone.cmd);
+			// don't have to free DC::getInstance()->zones.value(i).cmd.comment cause it's str_hsh'd
 		}
 	}
 }
-#define ZCMD DC::getInstance()->zones[zone].cmd[cmd_no]
-#define ZWCMD DC::getInstance()->zones[zon].cmd[i]
 
-void write_one_zone(FILE *fl, int zon)
+void Zone::write(FILE *fl)
 {
 	fprintf(fl, "V2\n");
-	fprintf(fl, "#%d\n", (zon ? ((DC::getInstance()->zones[zon - 1].top + 1) / 100) : 0));
-	fprintf(fl, "%s~\n", DC::getInstance()->zones[zon].name);
-	fprintf(fl, "%d %d %d %ld %d\n", DC::getInstance()->zones[zon].top,
-			DC::getInstance()->zones[zon].lifespan,
-			DC::getInstance()->zones[zon].reset_mode,
-			DC::getInstance()->zones[zon].zone_flags,
-			DC::getInstance()->zones[zon].continent);
+	fprintf(fl, "#%d\n", (id ? (bottom / 100) : 0));
+	fprintf(fl, "%s~\n", name);
+	fprintf(fl, "%d %d %d %ld %d\n", top,
+			lifespan,
+			reset_mode,
+			zone_flags,
+			continent);
 
-	for (int i = 0; DC::getInstance()->zones[zon].cmd[i].command != 'S'; i++)
+	for (int i = 0; cmd[i].command != 'S'; i++)
 	{
-		if (DC::getInstance()->zones[zon].cmd[i].command == '*')
-			fprintf(fl, "* %s\n", DC::getInstance()->zones[zon].cmd[i].comment ? DC::getInstance()->zones[zon].cmd[i].comment : "");
-		else if (DC::getInstance()->zones[zon].cmd[i].command == '%')
-			fprintf(fl, "%% %2d %3d %3d %s\n", DC::getInstance()->zones[zon].cmd[i].if_flag,
-					DC::getInstance()->zones[zon].cmd[i].arg1,
-					DC::getInstance()->zones[zon].cmd[i].arg2,
-					DC::getInstance()->zones[zon].cmd[i].comment ? DC::getInstance()->zones[zon].cmd[i].comment : "");
-		else if (DC::getInstance()->zones[zon].cmd[i].command == 'X')
-			fprintf(fl, "X %2d %5d %3d %5d%s\n", DC::getInstance()->zones[zon].cmd[i].if_flag,
-					DC::getInstance()->zones[zon].cmd[i].arg1,
-					DC::getInstance()->zones[zon].cmd[i].arg2,
-					DC::getInstance()->zones[zon].cmd[i].arg3,
-					DC::getInstance()->zones[zon].cmd[i].comment ? DC::getInstance()->zones[zon].cmd[i].comment : "");
-		else if (DC::getInstance()->zones[zon].cmd[i].command == 'K')
-			fprintf(fl, "K %2d %5d %3d %5d%s\n", DC::getInstance()->zones[zon].cmd[i].if_flag,
-					DC::getInstance()->zones[zon].cmd[i].arg1,
-					DC::getInstance()->zones[zon].cmd[i].arg2,
-					DC::getInstance()->zones[zon].cmd[i].arg3,
-					DC::getInstance()->zones[zon].cmd[i].comment ? DC::getInstance()->zones[zon].cmd[i].comment : "");
-		else if (DC::getInstance()->zones[zon].cmd[i].command == 'M')
+		if (cmd[i].command == '*')
+			fprintf(fl, "* %s\n", cmd[i].comment ? cmd[i].comment : "");
+		else if (cmd[i].command == '%')
+			fprintf(fl, "%% %2d %3d %3d %s\n", cmd[i].if_flag,
+					cmd[i].arg1,
+					cmd[i].arg2,
+					cmd[i].comment ? cmd[i].comment : "");
+		else if (cmd[i].command == 'X')
+			fprintf(fl, "X %2d %5d %3d %5d%s\n", cmd[i].if_flag,
+					cmd[i].arg1,
+					cmd[i].arg2,
+					cmd[i].arg3,
+					cmd[i].comment ? cmd[i].comment : "");
+		else if (cmd[i].command == 'K')
+			fprintf(fl, "K %2d %5d %3d %5d%s\n", cmd[i].if_flag,
+					cmd[i].arg1,
+					cmd[i].arg2,
+					cmd[i].arg3,
+					cmd[i].comment ? cmd[i].comment : "");
+		else if (cmd[i].command == 'M')
 		{
-			int virt = ZWCMD.active ? mob_index[ZWCMD.arg1].virt : ZWCMD.arg1;
-			fprintf(fl, "M %2d %5d %3d %5d %s\n", DC::getInstance()->zones[zon].cmd[i].if_flag,
+			int virt = cmd[i].active ? mob_index[cmd[i].arg1].virt : cmd[i].arg1;
+			fprintf(fl, "M %2d %5d %3d %5d %s\n", cmd[i].if_flag,
 					virt,
-					DC::getInstance()->zones[zon].cmd[i].arg2,
-					DC::getInstance()->zones[zon].cmd[i].arg3,
-					DC::getInstance()->zones[zon].cmd[i].comment ? DC::getInstance()->zones[zon].cmd[i].comment : "");
+					cmd[i].arg2,
+					cmd[i].arg3,
+					cmd[i].comment ? cmd[i].comment : "");
 		}
-		else if (DC::getInstance()->zones[zon].cmd[i].command == 'P')
+		else if (cmd[i].command == 'P')
 		{
-			int virt = ZWCMD.active ? obj_index[ZWCMD.arg1].virt : ZWCMD.arg1;
-			int virt2 = ZWCMD.active ? obj_index[ZWCMD.arg3].virt : ZWCMD.arg3;
-			fprintf(fl, "P %2d %5d %3d %5d %s\n", DC::getInstance()->zones[zon].cmd[i].if_flag,
+			int virt = cmd[i].active ? obj_index[cmd[i].arg1].virt : cmd[i].arg1;
+			int virt2 = cmd[i].active ? obj_index[cmd[i].arg3].virt : cmd[i].arg3;
+			fprintf(fl, "P %2d %5d %3d %5d %s\n", cmd[i].if_flag,
 					virt,
-					DC::getInstance()->zones[zon].cmd[i].arg2,
+					cmd[i].arg2,
 					virt2,
-					DC::getInstance()->zones[zon].cmd[i].comment ? DC::getInstance()->zones[zon].cmd[i].comment : "");
+					cmd[i].comment ? cmd[i].comment : "");
 		}
-		else if (DC::getInstance()->zones[zon].cmd[i].command == 'G')
+		else if (cmd[i].command == 'G')
 		{
-			int virt = ZWCMD.active ? obj_index[ZWCMD.arg1].virt : ZWCMD.arg1;
+			int virt = cmd[i].active ? obj_index[cmd[i].arg1].virt : cmd[i].arg1;
 
-			fprintf(fl, "G %2d %5d %3d %5d %s\n", DC::getInstance()->zones[zon].cmd[i].if_flag,
+			fprintf(fl, "G %2d %5d %3d %5d %s\n", cmd[i].if_flag,
 					virt,
-					DC::getInstance()->zones[zon].cmd[i].arg2,
-					DC::getInstance()->zones[zon].cmd[i].arg3,
-					DC::getInstance()->zones[zon].cmd[i].comment ? DC::getInstance()->zones[zon].cmd[i].comment : "");
+					cmd[i].arg2,
+					cmd[i].arg3,
+					cmd[i].comment ? cmd[i].comment : "");
 		}
-		else if (DC::getInstance()->zones[zon].cmd[i].command == 'O')
+		else if (cmd[i].command == 'O')
 		{
-			int virt = ZWCMD.active ? obj_index[ZWCMD.arg1].virt : ZWCMD.arg1;
-			fprintf(fl, "O %2d %5d %3d %5d %s\n", DC::getInstance()->zones[zon].cmd[i].if_flag,
+			int virt = cmd[i].active ? obj_index[cmd[i].arg1].virt : cmd[i].arg1;
+			fprintf(fl, "O %2d %5d %3d %5d %s\n", cmd[i].if_flag,
 					virt,
-					DC::getInstance()->zones[zon].cmd[i].arg2,
-					DC::getInstance()->zones[zon].cmd[i].arg3,
-					DC::getInstance()->zones[zon].cmd[i].comment ? DC::getInstance()->zones[zon].cmd[i].comment : "");
+					cmd[i].arg2,
+					cmd[i].arg3,
+					cmd[i].comment ? cmd[i].comment : "");
 		}
-		else if (DC::getInstance()->zones[zon].cmd[i].command == 'E')
+		else if (cmd[i].command == 'E')
 		{
-			int virt = ZWCMD.active ? obj_index[ZWCMD.arg1].virt : ZWCMD.arg1;
-			fprintf(fl, "E %2d %5d %3d %5d %s\n", DC::getInstance()->zones[zon].cmd[i].if_flag,
+			int virt = cmd[i].active ? obj_index[cmd[i].arg1].virt : cmd[i].arg1;
+			fprintf(fl, "E %2d %5d %3d %5d %s\n", cmd[i].if_flag,
 					virt,
-					DC::getInstance()->zones[zon].cmd[i].arg2,
-					DC::getInstance()->zones[zon].cmd[i].arg3,
-					DC::getInstance()->zones[zon].cmd[i].comment ? DC::getInstance()->zones[zon].cmd[i].comment : "");
+					cmd[i].arg2,
+					cmd[i].arg3,
+					cmd[i].comment ? cmd[i].comment : "");
 		}
 		else
-			fprintf(fl, "%c %2d %5d %3d %5d %s\n", DC::getInstance()->zones[zon].cmd[i].command,
-					DC::getInstance()->zones[zon].cmd[i].if_flag,
-					DC::getInstance()->zones[zon].cmd[i].arg1,
-					DC::getInstance()->zones[zon].cmd[i].arg2,
-					DC::getInstance()->zones[zon].cmd[i].arg3,
-					DC::getInstance()->zones[zon].cmd[i].comment ? DC::getInstance()->zones[zon].cmd[i].comment : "");
+			fprintf(fl, "%c %2d %5d %3d %5d %s\n", cmd[i].command,
+					cmd[i].if_flag,
+					cmd[i].arg1,
+					cmd[i].arg2,
+					cmd[i].arg3,
+					cmd[i].comment ? cmd[i].comment : "");
 	}
 
 	fprintf(fl, "S\n$~\n");
 }
 
-void read_one_zone(FILE *fl, int zon)
+zone_t DC::read_one_zone(FILE *fl)
 {
+	static room_t last_top_vnum = 0;
 	struct reset_com reset_tab[MAX_RESET];
 	char *check, buf[161], ch;
 	int reset_top, i, tmp;
@@ -2404,53 +2382,39 @@ void read_one_zone(FILE *fl, int zon)
 	// a = fread_int(fl, 0, 64000);
 	/* alloc a new_new zone */
 	//*num = zon = a / 100;
-	top_of_zonet = zon;
-	if (zon >= MAX_ZONE)
-	{
-		log("Max zone hit!", 0, LogChannels::LOG_MISC);
-		abort();
-	}
+	Zone zone;
 
-	//  top_of_zonet = zon;
-
-	// log("Reading zone", 0, LogChannels::LOG_BUG);
+	// logentry("Reading zone", 0, LogChannels::LOG_BUG);
 
 	curr_virtno = tmp;
 	curr_type = "Zone";
 	curr_name = check;
 
-	DC::getInstance()->zones[zon].name = check;
-	DC::getInstance()->zones[zon].top = fread_int(fl, 0, 64000);
-	DC::getInstance()->zones[zon].clanowner = 0;
-	DC::getInstance()->zones[zon].gold = 0;
-	DC::getInstance()->zones[zon].repops_without_deaths = -1;
-	DC::getInstance()->zones[zon].repops_with_bonus = 0;
-	///  extern void debug_point();
+	zone.name = check;
+	zone.setBottom(last_top_vnum + 1);
+	zone.setTop(fread_int(fl, 0, WORLD_MAX_ROOM));
+	last_top_vnum = zone.getTop();
+	zone.setRealBottom(0);
+	zone.setRealTop(0);
+	zone.clanowner = 0;
+	zone.gold = 0;
+	zone.repops_without_deaths = -1;
+	zone.repops_with_bonus = 0;
 
-	//  if (tmp == 23)
-	//   debug_point();
-
-	/*
-	 * this initialization is important for obtaining the
-	 * actual values to be stored in the following 2 variables.
-	 * grep this file to see why.
-	 * -Sadus
-	 */
-	DC::getInstance()->zones[zon].bottom_rnum = WORLD_MAX_ROOM;
-	DC::getInstance()->zones[zon].top_rnum = 0;
-
-	DC::getInstance()->zones[zon].lifespan = fread_int(fl, 0, 64000);
-	DC::getInstance()->zones[zon].reset_mode = fread_int(fl, 0, 64000);
-	DC::getInstance()->zones[zon].zone_flags = fread_bitvector(fl, 0, 2147483467);
+	zone.lifespan = fread_int(fl, 0, 64000);
+	zone.reset_mode = fread_int(fl, 0, 64000);
+	zone.setZoneFlags(fread_bitvector(fl, 0, 2147483467));
 
 	// if its old version set the altered flag so that
 	// this zone will be saved with new format soon
 	if (modified == true)
-		SET_BIT(DC::getInstance()->zones[zon].zone_flags, ZONE_MODIFIED);
+	{
+		zone.setModified();
+	}
 
 	if (version > 1)
 	{
-		DC::getInstance()->zones[zon].continent = fread_int(fl, 0, 64000);
+		zone.continent = fread_int(fl, 0, 64000);
 	}
 
 	/* read the command table */
@@ -2550,90 +2514,99 @@ void read_one_zone(FILE *fl, int zon)
 	} // for( ;; ) til end of zone commands
 
 #ifdef LEAK_CHECK
-	DC::getInstance()->zones[zon].cmd = ((struct reset_com *)calloc(reset_top, sizeof(struct reset_com)));
+	zone.cmd = ((struct reset_com *)calloc(reset_top, sizeof(struct reset_com)));
 #else
-	DC::getInstance()->zones[zon].cmd = ((struct reset_com *)dc_alloc(reset_top, sizeof(struct reset_com)));
+	zone.cmd = ((struct reset_com *)dc_alloc(reset_top, sizeof(struct reset_com)));
 #endif
 
-	DC::getInstance()->zones[zon].reset_total = reset_top;
+	zone.reset_total = reset_top;
 
 	// copy the temp into the memory
 	for (i = 0; i < reset_top; i++)
 	{
-		DC::getInstance()->zones[zon].cmd[i].command = reset_tab[i].command;
-		DC::getInstance()->zones[zon].cmd[i].if_flag = reset_tab[i].if_flag;
-		DC::getInstance()->zones[zon].cmd[i].arg1 = reset_tab[i].arg1;
-		DC::getInstance()->zones[zon].cmd[i].arg2 = reset_tab[i].arg2;
-		DC::getInstance()->zones[zon].cmd[i].arg3 = reset_tab[i].arg3;
+		zone.cmd[i].command = reset_tab[i].command;
+		zone.cmd[i].if_flag = reset_tab[i].if_flag;
+		zone.cmd[i].arg1 = reset_tab[i].arg1;
+		zone.cmd[i].arg2 = reset_tab[i].arg2;
+		zone.cmd[i].arg3 = reset_tab[i].arg3;
 		if (reset_tab[i].comment)
-			DC::getInstance()->zones[zon].cmd[i].comment = reset_tab[i].comment;
+			zone.cmd[i].comment = reset_tab[i].comment;
 	}
+
+	auto &zones = DC::getInstance()->zones;
+	zone_t zone_key = 1;
+	if (zones.isEmpty() == false)
+	{
+		zone_key = zones.lastKey() + 1;
+	}
+	zone.key = zone_key;
+	// cerr << QString("Insert %1 into QMap with size %2").arg(zone_nr).arg(zones.size()).toStdString() << endl;
+	zones.insert(zone_key, zone);
+	return zone_key;
 }
 
 /* load the zone table and command tables */
-void boot_zones(void)
+void DC::boot_zones(void)
 {
 	FILE *fl;
 	FILE *flZoneIndex;
-	int zon = 0;
-	char *temp;
+	QString temp;
 	char endfile[200]; // hopefully noone is stupid and makes a 180 char filename
 
 	//  for (zon = 0;zon < MAX_ZONE;zon++)
-	//  DC::getInstance()->zones[zon] = NULL; // Null list, top_of_z can't be used now
+	//  DC::getInstance()->zones.value(zon) = NULL; // Null list, top_of_z can't be used now
 
 	DC::config &cf = DC::getInstance()->cf;
 
 	if (cf.test_world == false && cf.test_mobs == false && cf.test_objs == false)
 	{
-		if (!(flZoneIndex = dc_fopen(ZONE_INDEX_FILE, "r")))
+		if (!(flZoneIndex = fopen(ZONE_INDEX_FILE, "r")))
 		{
-			perror("dc_fopen");
-			log("boot_world: could not open world index file.", 0, LogChannels::LOG_BUG);
+			perror("fopen");
+			logentry("boot_world: could not open world index file.", 0, LogChannels::LOG_BUG);
 			abort();
 		}
 	}
-	else if (!(flZoneIndex = dc_fopen(ZONE_INDEX_FILE_TINY, "r")))
+	else if (!(flZoneIndex = fopen(ZONE_INDEX_FILE_TINY, "r")))
 	{
-		perror("dc_fopen");
-		log("boot_world: could not open world index file tiny.", 0, LogChannels::LOG_BUG);
+		perror("fopen");
+		logentry("boot_world: could not open world index file tiny.", 0, LogChannels::LOG_BUG);
 		abort();
 	}
-	log("Booting individual zone files", 0, LogChannels::LOG_MISC);
+	logentry("Booting individual zone files", 0, LogChannels::LOG_MISC);
 
 	for (temp = read_next_worldfile_name(flZoneIndex);
-		 temp;
+		 temp.isEmpty() == false;
 		 temp = read_next_worldfile_name(flZoneIndex))
 	{
 		strcpy(endfile, "zonefiles/");
-		strcat(endfile, temp);
+		strcat(endfile, temp.toStdString().c_str());
 
 		if (cf.verbose_mode)
 		{
-			log(temp, 0, LogChannels::LOG_MISC);
+			logentry(temp, 0, LogChannels::LOG_MISC);
 		}
 
-		if (!(fl = dc_fopen(endfile, "r")))
+		if (!(fl = fopen(endfile, "r")))
 		{
 			perror(endfile);
 			logf(IMMORTAL, LogChannels::LOG_BUG, "boot_zone: could not open zone file: %s", endfile);
 			abort();
 		}
-		// int num = 0;
-		DC::getInstance()->zones[zon].filename = strdup(temp);
-		read_one_zone(fl, zon);
-		zon++;
-		//    if (num > zon) zon = num;
-		dc_fclose(fl);
-		dc_free(temp);
+
+		auto zone_key = read_one_zone(fl);
+		auto &zone = zones[zone_key];
+		zone.setFilename(temp);
+		// cerr << QString("%1 %2").arg(zone).arg(temp).toStdString() << endl;
+
+		fclose(fl);
 	}
 
-	log("Zone Boot done.", 0, LogChannels::LOG_MISC);
+	logentry("Zone Boot done.", 0, LogChannels::LOG_MISC);
 
-	dc_fclose(flZoneIndex);
+	fclose(flZoneIndex);
 
-	top_of_zone_table = --zon;
-	//  dc_fclose(fl);
+	//  fclose(fl);
 }
 
 /*************************************************************************
@@ -2777,7 +2750,7 @@ char_data *read_mobile(int nr, FILE *fl)
 		{
 		case 'C':
 			mob->c_class = fread_int(fl, 0, 2147483467);
-			fread_new_newline(fl);
+			// fread_new_newline(fl);
 			break;
 		case 'T': // sTats
 			mob->raw_str = mob->str = fread_int(fl, 0, 100);
@@ -2786,7 +2759,7 @@ char_data *read_mobile(int nr, FILE *fl)
 			mob->raw_dex = mob->dex = fread_int(fl, 0, 100);
 			mob->raw_con = mob->con = fread_int(fl, 0, 100);
 			fread_int(fl, 0, 100); // junk var in case we add another stat
-			fread_new_newline(fl);
+			// fread_new_newline(fl);
 			break;
 		case '>':
 			ungetc(letter, fl);
@@ -2794,23 +2767,23 @@ char_data *read_mobile(int nr, FILE *fl)
 			break;
 		case 'Y': // type
 			mob->mobdata->mob_flags.type = (mob_type_t)fread_int(fl, mob_type_t::MOB_TYPE_FIRST, mob_type_t::MOB_TYPE_LAST);
-			fread_new_newline(fl);
+			// fread_new_newline(fl);
 			break;
 		case 'V': // value
 			i = fread_int(fl, 0, MAX_MOB_VALUES - 1);
 			mob->mobdata->mob_flags.value[i] = fread_int(fl, -1000, 2147483467);
-			fread_new_newline(fl);
+			// fread_new_newline(fl);
 			break;
 		case 'S':
 			break;
 		default:
 			sprintf(buf, "Mob %s: Invalid additional flag.  (Class, S, etc)", mob->short_desc);
-			log(buf, 0, LogChannels::LOG_BUG);
+			logentry(buf, 0, LogChannels::LOG_BUG);
 			break;
 		}
 	} while (letter != 'S');
 
-	fread_new_newline(fl);
+	// fread_new_newline(fl);
 
 	mob->weight = 200;
 	mob->height = 198;
@@ -3719,15 +3692,16 @@ void delete_mob_from_index(int nr)
 	}
 
 	// update zonefile commands - these store rnums
-	for (i = 0; i <= top_of_zonet; i++)
+	for (auto [zone_key, zone] : DC::getInstance()->zones.asKeyValueRange())
 	{
-		for (j = 0; DC::getInstance()->zones[i].cmd[j].command != 'S'; j++)
+		for (j = 0; zone.cmd[j].command != 'S'; j++)
 		{
-			switch (DC::getInstance()->zones[i].cmd[j].command)
+			switch (zone.cmd[j].command)
 			{
 			case 'M': // just #1
-				if (DC::getInstance()->zones[i].cmd[j].arg1 >= nr)
-					DC::getInstance()->zones[i].cmd[j].arg1--;
+				if (zone.cmd[j].arg1 >= nr)
+					zone.cmd[j]
+						.arg1--;
 				break;
 			default:
 				break;
@@ -3799,21 +3773,21 @@ void delete_item_from_index(int nr)
 	}
 
 	// update zonefile commands - these store rnums
-	for (i = 0; i <= top_of_zonet; i++)
+	for (auto [zone_key, zone] : DC::getInstance()->zones.asKeyValueRange())
 	{
-		for (j = 0; DC::getInstance()->zones[i].cmd[j].command != 'S'; j++)
+		for (j = 0; zone.cmd[j].command != 'S'; j++)
 		{
-			switch (DC::getInstance()->zones[i].cmd[j].command)
+			switch (zone.cmd[j].command)
 			{
 			case 'P': // 1 and 3
-				if (DC::getInstance()->zones[i].cmd[j].arg3 >= nr)
-					DC::getInstance()->zones[i].cmd[j].arg3--;
+				if (zone.cmd[j].arg3 >= nr)
+					zone.cmd[j].arg3--;
 				// no break here on purpose so it falls through and does the '1'
 			case 'O':
 			case 'G':
 			case 'E': // 1 only
-				if (DC::getInstance()->zones[i].cmd[j].arg1 >= nr)
-					DC::getInstance()->zones[i].cmd[j].arg1--;
+				if (zone.cmd[j].arg1 >= nr)
+					zone.cmd[j].arg1--;
 				break;
 			default:
 				break;
@@ -3949,7 +3923,7 @@ struct obj_data *read_object(int nr, FILE *fl, bool zz)
 
 		default:
 			sprintf(log_buf, "Illegal obj addon flag %c in obj %s.", chk, obj->name);
-			log(log_buf, IMP, LogChannels::LOG_BUG);
+			logentry(log_buf, IMP, LogChannels::LOG_BUG);
 			break;
 		} // switch
 		  // read in next flag
@@ -4083,7 +4057,7 @@ ifstream &operator>>(ifstream &in, obj_data *obj)
 
 		default:
 			sprintf(log_buf, "Illegal obj addon flag %c in obj %s.", chk, obj->name);
-			log(log_buf, IMP, LogChannels::LOG_BUG);
+			logentry(log_buf, IMP, LogChannels::LOG_BUG);
 			break;
 		} // switch
 		  // read in next flag
@@ -4304,7 +4278,7 @@ void write_object_csv(obj_data *obj, ofstream &fout)
 	{
 		stringstream errormsg;
 		errormsg << "Exception while writing in write_obj_csv.";
-		log(errormsg.str().c_str(), 108, LogChannels::LOG_MISC);
+		logentry(errormsg.str().c_str(), 108, LogChannels::LOG_MISC);
 	}
 
 	fout << endl;
@@ -4537,37 +4511,38 @@ void randomize_object(obj_data *obj)
 
 void zone_update(void)
 {
-	for (auto zone = 0; zone <= top_of_zone_table; zone++)
+	auto &zones = DC::getInstance()->zones;
+	for (auto [zone_key, zone] : zones.asKeyValueRange())
 	{
-		if (DC::getInstance()->zones[zone].reset_mode == 0)
+		if (zone.reset_mode == 0)
 		{
 			continue;
 		}
 
-		if (DC::getInstance()->zones[zone].age < DC::getInstance()->zones[zone].lifespan && !(DC::getInstance()->zones[zone].reset_mode == 1 && !zone_is_empty(zone)))
+		if (zone.age < zone.lifespan && !(zone.reset_mode == 1 && !zone.isEmpty()))
 		{
-			DC::getInstance()->zones[zone].age++;
+			zone.age++;
 			continue;
 		}
 
-		if (DC::getInstance()->zones[zone].reset_mode == 1 && !zone_is_empty(zone))
+		if (zone.reset_mode == 1 && !zone.isEmpty())
 		{
 			continue;
 		}
 
-		if (QDateTime::currentDateTimeUtc() > DC::getInstance()->zones[zone].last_full_reset.addDays(1))
+		if (QDateTime::currentDateTimeUtc() > zone.last_full_reset.addDays(1))
 		{
-			reset_zone(zone, ResetType::full);
+			zone.reset(Zone::ResetType::full);
 		}
 		else
 		{
-			reset_zone(zone);
+			zone.reset();
 		}
 
 		// update first repop numbers
-		if (DC::getInstance()->zones[zone].num_mob_first_repop == 0)
+		if (zone.num_mob_first_repop == 0)
 		{
-			DC::getInstance()->zones[zone].num_mob_first_repop = DC::getInstance()->zones[zone].num_mob_on_repop;
+			zone.num_mob_first_repop = zone.num_mob_on_repop;
 		}
 	}
 
@@ -4575,14 +4550,13 @@ void zone_update(void)
 }
 
 /* execute the reset command table of a given zone */
-void reset_zone(int zone, ResetType reset_type)
+void Zone::reset(ResetType reset_type)
 {
 	if (reset_type == ResetType::full)
 	{
-		DC::getInstance()->zones[zone].last_full_reset = QDateTime::currentDateTimeUtc();
+		last_full_reset = QDateTime::currentDateTimeUtc();
 	}
 
-	extern int top_of_world;
 	int cmd_no, last_cmd, last_mob, last_obj, last_percent;
 	int last_no;
 	char_data *mob = NULL;
@@ -4592,65 +4566,65 @@ void reset_zone(int zone, ResetType reset_type)
 	char buf[MAX_STRING_LENGTH];
 	char log_buf[MAX_STRING_LENGTH] = {};
 
-	if (DC::getInstance()->zones[zone].died_this_tick == 0 && zone_is_empty(zone))
+	if (died_this_tick == 0 && isEmpty())
 	{
-		DC::getInstance()->zones[zone].repops_without_deaths++;
+		repops_without_deaths++;
 	}
 	else
 	{
-		DC::getInstance()->zones[zone].repops_without_deaths = 0;
+		repops_without_deaths = 0;
 	}
 
 	// reset number of mobs that have died this tick to 0
-	DC::getInstance()->zones[zone].died_this_tick = 0;
-	DC::getInstance()->zones[zone].num_mob_on_repop = 0;
+	died_this_tick = 0;
+	num_mob_on_repop = 0;
 	// find last command in zone
 	last_no = 0;
-	while (DC::getInstance()->zones[zone].cmd[last_no].command != 'S')
+	while (cmd[last_no].command != 'S')
 		last_no++;
 
 	for (cmd_no = 0; cmd_no <= last_no; cmd_no++)
 	{
-		if ((DC::getInstance()->zones[zone].cmd + cmd_no) == 0)
+		if ((cmd + cmd_no) == 0)
 		{
 			sprintf(buf,
 					"Trapped zone error, Command is null, zone: %d cmd_no: %d",
-					zone, cmd_no);
-			log(buf, IMMORTAL, LogChannels::LOG_WORLD);
+					id, cmd_no);
+			logentry(buf, IMMORTAL, LogChannels::LOG_WORLD);
 			break;
 		}
-		if (ZCMD.command == 'S')
+		if (cmd[cmd_no].command == 'S')
 			break;
-		if (ZCMD.active == 0)
+		if (cmd[cmd_no].active == 0)
 			continue;
 
-		ZCMD.last = time(nullptr);
-		ZCMD.attempts++;
-		if (ZCMD.if_flag == 0 ||									// always
-			(last_cmd == 1 && ZCMD.if_flag == 1) ||					// if last command true
-			(last_cmd == 0 && ZCMD.if_flag == 2) ||					// if last command false
-			(reset_type == ResetType::full && ZCMD.if_flag == 3) || // full reset (onboot)
-			(last_mob == 1 && ZCMD.if_flag == 4) ||					// if-last-mob-true
-			(last_mob == 0 && ZCMD.if_flag == 5) ||					// if-last-mob-false
-			(last_obj == 1 && ZCMD.if_flag == 6) ||					// if-last-obj-true
-			(last_obj == 0 && ZCMD.if_flag == 7) ||					// if-last-obj-false
-			(last_percent == 1 && ZCMD.if_flag == 8) ||				// if-last-percent-true
-			(last_percent == 0 && ZCMD.if_flag == 9)				// if-last-percent-false
+		cmd[cmd_no].last = time(nullptr);
+		cmd[cmd_no].attempts++;
+		if (cmd[cmd_no].if_flag == 0 ||									   // always
+			(last_cmd == 1 && cmd[cmd_no].if_flag == 1) ||				   // if last command true
+			(last_cmd == 0 && cmd[cmd_no].if_flag == 2) ||				   // if last command false
+			(reset_type == ResetType::full && cmd[cmd_no].if_flag == 3) || // full reset (onboot)
+			(last_mob == 1 && cmd[cmd_no].if_flag == 4) ||				   // if-last-mob-true
+			(last_mob == 0 && cmd[cmd_no].if_flag == 5) ||				   // if-last-mob-false
+			(last_obj == 1 && cmd[cmd_no].if_flag == 6) ||				   // if-last-obj-true
+			(last_obj == 0 && cmd[cmd_no].if_flag == 7) ||				   // if-last-obj-false
+			(last_percent == 1 && cmd[cmd_no].if_flag == 8) ||			   // if-last-percent-true
+			(last_percent == 0 && cmd[cmd_no].if_flag == 9)				   // if-last-percent-false
 		)
 		{
-			ZCMD.lastSuccess = ZCMD.last;
-			ZCMD.successes++;
-			switch (ZCMD.command)
+			cmd[cmd_no].lastSuccess = cmd[cmd_no].last;
+			cmd[cmd_no].successes++;
+			switch (cmd[cmd_no].command)
 			{
 
 			case 'M': /* read a mobile */
-				if ((ZCMD.arg2 == -1 || ZCMD.lastPop == 0) && mob_index[ZCMD.arg1].number < ZCMD.arg2 && (mob = clone_mobile(ZCMD.arg1)))
+				if ((cmd[cmd_no].arg2 == -1 || cmd[cmd_no].lastPop == 0) && mob_index[cmd[cmd_no].arg1].number < cmd[cmd_no].arg2 && (mob = clone_mobile(cmd[cmd_no].arg1)))
 				{
-					char_to_room(mob, ZCMD.arg3);
-					mob->mobdata->reset = &DC::getInstance()->zones[zone].cmd[cmd_no];
-					ZCMD.lastPop = mob;
-					GET_HOME(mob) = world_array[ZCMD.arg3]->number;
-					DC::getInstance()->zones[zone].num_mob_on_repop++;
+					char_to_room(mob, cmd[cmd_no].arg3);
+					mob->mobdata->reset = &cmd[cmd_no];
+					cmd[cmd_no].lastPop = mob;
+					GET_HOME(mob) = world[cmd[cmd_no].arg3].number;
+					num_mob_on_repop++;
 					last_cmd = 1;
 					last_mob = 1;
 					selfpurge = false;
@@ -4670,16 +4644,16 @@ void reset_zone(int zone, ResetType reset_type)
 				break;
 
 			case 'O': /* read an object */
-				if (ZCMD.arg2 == -1 || obj_index[ZCMD.arg1].number < ZCMD.arg2)
+				if (cmd[cmd_no].arg2 == -1 || obj_index[cmd[cmd_no].arg1].number < cmd[cmd_no].arg2)
 				{
-					if (ZCMD.arg3 >= 0)
+					if (cmd[cmd_no].arg3 >= 0)
 					{
-						if (!get_obj_in_list_num(ZCMD.arg1,
-												 world[ZCMD.arg3].contents) &&
+						if (!get_obj_in_list_num(cmd[cmd_no].arg1,
+												 world[cmd[cmd_no].arg3].contents) &&
 							(obj =
-								 clone_object(ZCMD.arg1)))
+								 clone_object(cmd[cmd_no].arg1)))
 						{
-							obj_to_room(obj, ZCMD.arg3);
+							obj_to_room(obj, cmd[cmd_no].arg3);
 							last_cmd = 1;
 							last_obj = 1;
 						}
@@ -4697,8 +4671,8 @@ void reset_zone(int zone, ResetType reset_type)
 						{
 							sprintf(buf,
 									"Obj %d loaded to NOWHERE. Zone %d Cmd %d",
-									obj_index[ZCMD.arg1].virt, zone, cmd_no);
-							log(buf, IMMORTAL, LogChannels::LOG_WORLD);
+									obj_index[cmd[cmd_no].arg1].virt, id, cmd_no);
+							logentry(buf, IMMORTAL, LogChannels::LOG_WORLD);
 						}
 						last_cmd = 0;
 						last_obj = 0;
@@ -4713,19 +4687,19 @@ void reset_zone(int zone, ResetType reset_type)
 
 			case 'P': /* object to object */
 
-				if (ZCMD.arg2 == -1 || obj_index[ZCMD.arg1].number < ZCMD.arg2)
+				if (cmd[cmd_no].arg2 == -1 || obj_index[cmd[cmd_no].arg1].number < cmd[cmd_no].arg2)
 				{
 					obj_to = 0;
 					obj = 0;
-					if ((obj_to = get_obj_num(ZCMD.arg3)) && (obj =
-																  clone_object(ZCMD.arg1)))
+					if ((obj_to = get_obj_num(cmd[cmd_no].arg3)) && (obj =
+																		 clone_object(cmd[cmd_no].arg1)))
 						obj_to_obj(obj, obj_to);
 					else
 						logf(
 							IMMORTAL,
 							LogChannels::LOG_WORLD,
 							"Null container obj in P command Zone: %d, Cmd: %d",
-							zone, cmd_no);
+							id, cmd_no);
 
 					last_cmd = 1;
 					last_obj = 1;
@@ -4740,14 +4714,14 @@ void reset_zone(int zone, ResetType reset_type)
 			case 'G': /* obj_to_char */
 				if (mob == NULL)
 				{
-					sprintf(buf, "Null mob in G, reseting zone %d cmd %d", zone,
+					sprintf(buf, "Null mob in G, reseting zone %d cmd %d", id,
 							cmd_no + 1);
-					log(buf, IMMORTAL, LogChannels::LOG_WORLD);
+					logentry(buf, IMMORTAL, LogChannels::LOG_WORLD);
 					last_cmd = 0;
 					last_obj = 0;
 					break;
 				}
-				if ((ZCMD.arg2 == -1 || obj_index[ZCMD.arg1].number < ZCMD.arg2 || number(0, 1)) && (obj = clone_object(ZCMD.arg1)))
+				if ((cmd[cmd_no].arg2 == -1 || obj_index[cmd[cmd_no].arg1].number < cmd[cmd_no].arg2 || number(0, 1)) && (obj = clone_object(cmd[cmd_no].arg1)))
 				{
 					obj_to_char(obj, mob);
 					last_cmd = 1;
@@ -4762,17 +4736,17 @@ void reset_zone(int zone, ResetType reset_type)
 
 			case '%': /* percent chance of next command happening */
 				// We can't send a number less than one to number() otherwise a debug coredump occurs
-				if (ZCMD.arg2 < 1)
+				if (cmd[cmd_no].arg2 < 1)
 				{
-					logf(IMMORTAL, LogChannels::LOG_BUG, "Zone %d, line %d: % arg1: %d arg2: %d - Error: arg2 < 1", zone, cmd_no, ZCMD.arg1, ZCMD.arg2);
+					logf(IMMORTAL, LogChannels::LOG_BUG, "Zone %d, line %d: % arg1: %d arg2: %d - Error: arg2 < 1", id, cmd_no, cmd[cmd_no].arg1, cmd[cmd_no].arg2);
 					last_cmd = 0;
 					last_percent = 0;
 				}
 				else
 				{
-					if (number(1, ZCMD.arg2) <= ZCMD.arg1)
+					if (number(1, cmd[cmd_no].arg2) <= cmd[cmd_no].arg1)
 					{
-						ZCMD.last = time(NULL);
+						cmd[cmd_no].last = time(NULL);
 						last_percent = 1;
 						last_cmd = 1;
 					}
@@ -4787,14 +4761,14 @@ void reset_zone(int zone, ResetType reset_type)
 			case 'E': /* object to equipment list */
 				if (mob == NULL)
 				{
-					sprintf(buf, "Null mob in E reseting zone %d cmd %d", zone,
+					sprintf(buf, "Null mob in E reseting zone %d cmd %d", id,
 							cmd_no);
-					log(buf, IMMORTAL, LogChannels::LOG_WORLD);
+					logentry(buf, IMMORTAL, LogChannels::LOG_WORLD);
 					last_cmd = 0;
 					last_obj = 0;
 					break;
 				}
-				if ((obj = clone_object(ZCMD.arg1)))
+				if ((obj = clone_object(cmd[cmd_no].arg1)))
 				{
 					randomize_object(obj);
 
@@ -4804,20 +4778,19 @@ void reset_zone(int zone, ResetType reset_type)
 					// so we don't see unnecessary errors when a zone reset tries to reequip a mob
 					if (mob == NULL)
 					{
-						log("NULL mob in reset_zone()!", ANGEL, LogChannels::LOG_BUG);
+						logentry("NULL mob in reset_zone()!", ANGEL, LogChannels::LOG_BUG);
 					}
-					else if (ZCMD.arg3 < 0 || ZCMD.arg3 >= MAX_WEAR)
+					else if (cmd[cmd_no].arg3 < 0 || cmd[cmd_no].arg3 >= MAX_WEAR)
 					{
-						log("Invalid eq position in reset_zone()!", ANGEL,
-							LogChannels::LOG_BUG);
+						logentry("Invalid eq position in Zone::reset()!", ANGEL, LogChannels::LOG_BUG);
 					}
-					else if (mob->equipment[ZCMD.arg3] == 0)
+					else if (mob->equipment[cmd[cmd_no].arg3] == 0)
 					{
-						if (!equip_char(mob, obj, ZCMD.arg3))
+						if (!equip_char(mob, obj, cmd[cmd_no].arg3))
 						{
-							sprintf(buf, "Bad equip_char zone %d cmd %d", zone,
+							sprintf(buf, "Bad equip_char zone %d cmd %d", id,
 									cmd_no);
-							log(buf, IMMORTAL, LogChannels::LOG_WORLD);
+							logentry(buf, IMMORTAL, LogChannels::LOG_WORLD);
 						}
 					}
 
@@ -4842,68 +4815,68 @@ void reset_zone(int zone, ResetType reset_type)
 				break;
 
 			case 'D': /* set state of door */
-				if (ZCMD.arg1 < 0 || ZCMD.arg1 > top_of_world)
+				if (cmd[cmd_no].arg1 < 0 || cmd[cmd_no].arg1 > top_of_world)
 				{
-					sprintf(log_buf, "Illegal room number Z: %d cmd %d", zone,
+					sprintf(log_buf, "Illegal room number Z: %d cmd %d", id,
 							cmd_no);
-					log(log_buf, IMMORTAL, LogChannels::LOG_WORLD);
+					logentry(log_buf, IMMORTAL, LogChannels::LOG_WORLD);
 					break;
 				}
-				if (ZCMD.arg2 < 0 || ZCMD.arg2 >= 6)
+				if (cmd[cmd_no].arg2 < 0 || cmd[cmd_no].arg2 >= 6)
 				{
 					sprintf(log_buf,
 							"Illegal direction %d doesn't exist Z: %d cmd %d",
-							ZCMD.arg2, zone, cmd_no);
-					log(log_buf, IMMORTAL, LogChannels::LOG_WORLD);
+							cmd[cmd_no].arg2, id, cmd_no);
+					logentry(log_buf, IMMORTAL, LogChannels::LOG_WORLD);
 					break;
 				}
-				if (!world_array[ZCMD.arg1])
+				if (!world_array[cmd[cmd_no].arg1])
 				{
 					sprintf(log_buf, "Room %d doesn't exist Z: %d cmd %d",
-							ZCMD.arg1, zone, cmd_no);
-					log(log_buf, IMMORTAL, LogChannels::LOG_WORLD);
+							cmd[cmd_no].arg1, id, cmd_no);
+					logentry(log_buf, IMMORTAL, LogChannels::LOG_WORLD);
 					break;
 				}
 
-				if (world[ZCMD.arg1].dir_option[ZCMD.arg2] == 0)
+				if (world[cmd[cmd_no].arg1].dir_option[cmd[cmd_no].arg2] == 0)
 				{
 					sprintf(
 						log_buf,
 						"Attempt to reset direction %d on room %d that doesn't exist Z: %d cmd %d",
-						ZCMD.arg2, world[ZCMD.arg1].number, zone, cmd_no);
-					log(log_buf, IMMORTAL, LogChannels::LOG_WORLD);
+						cmd[cmd_no].arg2, world[cmd[cmd_no].arg1].number, id, cmd_no);
+					logentry(log_buf, IMMORTAL, LogChannels::LOG_WORLD);
 					break;
 				}
-				switch (ZCMD.arg3)
+				switch (cmd[cmd_no].arg3)
 				{
 				case 0:
 					REMOVE_BIT(
-						world[ZCMD.arg1].dir_option[ZCMD.arg2]->exit_info,
+						world[cmd[cmd_no].arg1].dir_option[cmd[cmd_no].arg2]->exit_info,
 						EX_BROKEN);
 					REMOVE_BIT(
-						world[ZCMD.arg1].dir_option[ZCMD.arg2]->exit_info,
+						world[cmd[cmd_no].arg1].dir_option[cmd[cmd_no].arg2]->exit_info,
 						EX_LOCKED);
 					REMOVE_BIT(
-						world[ZCMD.arg1].dir_option[ZCMD.arg2]->exit_info,
+						world[cmd[cmd_no].arg1].dir_option[cmd[cmd_no].arg2]->exit_info,
 						EX_CLOSED);
 					break;
 				case 1:
 					REMOVE_BIT(
-						world[ZCMD.arg1].dir_option[ZCMD.arg2]->exit_info,
+						world[cmd[cmd_no].arg1].dir_option[cmd[cmd_no].arg2]->exit_info,
 						EX_BROKEN);
-					SET_BIT(world[ZCMD.arg1].dir_option[ZCMD.arg2]->exit_info,
+					SET_BIT(world[cmd[cmd_no].arg1].dir_option[cmd[cmd_no].arg2]->exit_info,
 							EX_CLOSED);
 					REMOVE_BIT(
-						world[ZCMD.arg1].dir_option[ZCMD.arg2]->exit_info,
+						world[cmd[cmd_no].arg1].dir_option[cmd[cmd_no].arg2]->exit_info,
 						EX_LOCKED);
 					break;
 				case 2:
 					REMOVE_BIT(
-						world[ZCMD.arg1].dir_option[ZCMD.arg2]->exit_info,
+						world[cmd[cmd_no].arg1].dir_option[cmd[cmd_no].arg2]->exit_info,
 						EX_BROKEN);
-					SET_BIT(world[ZCMD.arg1].dir_option[ZCMD.arg2]->exit_info,
+					SET_BIT(world[cmd[cmd_no].arg1].dir_option[cmd[cmd_no].arg2]->exit_info,
 							EX_LOCKED);
-					SET_BIT(world[ZCMD.arg1].dir_option[ZCMD.arg2]->exit_info,
+					SET_BIT(world[cmd[cmd_no].arg1].dir_option[cmd[cmd_no].arg2]->exit_info,
 							EX_CLOSED);
 					break;
 				}
@@ -4911,7 +4884,7 @@ void reset_zone(int zone, ResetType reset_type)
 				break;
 
 			case 'X':
-				switch (ZCMD.arg1)
+				switch (cmd[cmd_no].arg1)
 				{
 				case 0:
 					last_cmd = -1;
@@ -4942,7 +4915,7 @@ void reset_zone(int zone, ResetType reset_type)
 				break;
 
 			case 'K': // skip
-				cmd_no += ZCMD.arg1;
+				cmd_no += cmd[cmd_no].arg1;
 				break;
 
 			case '*': // ignore *
@@ -4952,17 +4925,17 @@ void reset_zone(int zone, ResetType reset_type)
 			default:
 				sprintf(
 					log_buf,
-					"UNKNOWN COMMAND!!! ZONE %d cmd %d: '%c' Skipping zone..",
-					zone, cmd_no, ZCMD.command);
-				log(log_buf, IMMORTAL, LogChannels::LOG_WORLD);
-				DC::getInstance()->zones[zone].age = 0;
+					"UNKNOWN COMMAND!!! ZONE %d cmd %d: '%c' Skipping .",
+					id, cmd_no, cmd[cmd_no].command);
+				logentry(log_buf, IMMORTAL, LogChannels::LOG_WORLD);
+				age = 0;
 				return;
 				break;
 			}
 		}
 		else
 		{
-			switch (ZCMD.command)
+			switch (cmd[cmd_no].command)
 			{
 
 			case 'M':
@@ -4994,11 +4967,11 @@ void reset_zone(int zone, ResetType reset_type)
 		}
 	}
 
-	DC::getInstance()->zones[zone].age = 0;
+	age = 0;
 
-	if (DC::getInstance()->zones[zone].repops_without_deaths > 2 && DC::getInstance()->zones[zone].repops_without_deaths < 7 && DC::getInstance()->zones[zone].repops_with_bonus < 4)
+	if (repops_without_deaths > 2 && repops_without_deaths < 7 && repops_with_bonus < 4)
 	{
-		DC::getInstance()->zones[zone].repops_with_bonus++;
+		repops_with_bonus++;
 
 		auto &character_list = DC::getInstance()->character_list;
 		for (auto &tmp_victim : character_list)
@@ -5007,7 +4980,7 @@ void reset_zone(int zone, ResetType reset_type)
 			{
 				continue;
 			}
-			if (IS_NPC(tmp_victim) && !ISSET(tmp_victim->mobdata->actflags, ACT_NO_GOLD_BONUS) && world[tmp_victim->in_room].zone == zone)
+			if (IS_NPC(tmp_victim) && !ISSET(tmp_victim->mobdata->actflags, ACT_NO_GOLD_BONUS) && world[tmp_victim->in_room].zone == id)
 			{
 				tmp_victim->gold *= 1.10;
 				tmp_victim->exp *= 1.10;
@@ -5016,18 +4989,15 @@ void reset_zone(int zone, ResetType reset_type)
 	}
 }
 
-#undef ZCMD
-
-/* for use in reset_zone; return TRUE if zone 'nr' is free of PC's  */
-int zone_is_empty(int zone_nr)
+bool Zone::isEmpty(void)
 {
 	struct descriptor_data *i;
 
 	for (i = descriptor_list; i; i = i->next)
-		if (STATE(i) == conn::PLAYING && i->character && world[i->character->in_room].zone == zone_nr)
-			return (0);
+		if (STATE(i) == conn::PLAYING && i->character && world[i->character->in_room].zone == id)
+			return false;
 
-	return (1);
+	return true;
 }
 
 /************************************************************************
@@ -5250,7 +5220,7 @@ int fread_bitvector(FILE *fl, int32_t beg_range, int32_t end_range)
 		if (ch == EOF)
 		{
 			sprintf(buf, "Reading %s: %s, %d\n", curr_type, curr_name, curr_virtno);
-			log(buf, 0, LogChannels::LOG_MISC);
+			logentry(buf, 0, LogChannels::LOG_MISC);
 			perror("fread_bitvector: premature EOF");
 			abort();
 		}
@@ -5270,7 +5240,7 @@ int fread_bitvector(FILE *fl, int32_t beg_range, int32_t end_range)
 		else
 		{
 			sprintf(buf, "Reading %s: %s, %d (%c)\n", curr_type, curr_name, curr_virtno, ch);
-			log(buf, 0, LogChannels::LOG_MISC);
+			logentry(buf, 0, LogChannels::LOG_MISC);
 			perror("fread_bitvector: illegal character");
 			abort();
 		}
@@ -5660,7 +5630,7 @@ void free_char(char_data *ch, Trace trace)
 			if (ch->pcdata->last_prompt)
 				dc_free(ch->pcdata->last_prompt);
 			if (ch->pcdata->golem)
-				log("Error, golem not released properly", ANGEL, LogChannels::LOG_BUG);
+				logentry("Error, golem not released properly", ANGEL, LogChannels::LOG_BUG);
 			/* Free aliases... (I was to lazy to do before. ;) */
 			for (x = ch->pcdata->alias; x; x = next)
 			{
@@ -5738,7 +5708,7 @@ int file_to_string(const char *name, char *buf)
 
 	*buf = '\0';
 
-	if (!(fl = dc_fopen(name, "r")))
+	if (!(fl = fopen(name, "r")))
 	{
 		perror(name);
 		*buf = '\0';
@@ -5753,8 +5723,8 @@ int file_to_string(const char *name, char *buf)
 		{
 			if (strlen(buf) + strlen(tmp) + 2 > MAX_STRING_LENGTH)
 			{
-				log("fl->strng: string too big (db.c, file_to_string)",
-					0, LogChannels::LOG_BUG);
+				logentry("fl->strng: string too big (db.c, file_to_string)",
+						 0, LogChannels::LOG_BUG);
 				*buf = '\0';
 				return (-1);
 			}
@@ -5765,7 +5735,7 @@ int file_to_string(const char *name, char *buf)
 		}
 	} while (!feof(fl));
 
-	dc_fclose(fl);
+	fclose(fl);
 
 	return (0);
 }
@@ -6030,13 +6000,19 @@ void init_char(char_data *ch)
 }
 
 /* returns the real number of the room with given virt number */
-int real_room(int virt)
+room_t real_room(room_t virt)
 {
 	if (virt < 0 || virt > top_of_world)
-		return -1;
+	{
+		return NOWHERE;
+	}
+
 	if (world_array[virt])
+	{
 		return virt;
-	return -1;
+	}
+
+	return NOWHERE;
 }
 
 /* returns the real number of the monster with given virt number */
@@ -6623,4 +6599,21 @@ bool verify_item(struct obj_data **obj)
 
 	*obj = clone_object(newitem); // Fixed!
 	return TRUE;
+}
+
+FILE *legacyFileOpen(QString directory, QString filename, QString error_message)
+{
+	FILE *file_handle = NULL;
+
+	QString file = directory.arg(filename);
+	QString syscmd = QString("cp -f %1 %1.last").arg(file);
+	system(syscmd.toStdString().c_str());
+
+	if ((file_handle = fopen(file.toStdString().c_str(), "w")) == NULL)
+	{
+		qCritical() << error_message.arg(file);
+		return nullptr;
+	}
+
+	return file_handle;
 }

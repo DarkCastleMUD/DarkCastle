@@ -30,7 +30,7 @@
 #include "character.h"
 #include "weather.h"
 #include "handler.h"
-#include "Zone.h"
+#include "DC.h"
 
 using namespace std;
 
@@ -54,27 +54,12 @@ struct error_range_over
 {
 };
 
-#define WORLD_MAX_ROOM 50000 // should never get this high...
-                             // it's just to keep builders/imps from
-                             // doing a 'goto 1831919131928' and
-                             // creating it
+const uint64_t WORLD_MAX_ROOM = 50000; // should never get this high...
+                                       // it's just to keep builders/imps from
+                                       // doing a 'goto 1831919131928' and
+                                       // creating it
 
-#define MAX_ZONE 200
-#define MAX_INDEX 6000
-#define MAX_RESET 16383
-
-/* Zone Flag Bits */
-
-#define ZONE_NO_TELEPORT 1
-#define ZONE_IS_TOWN 1 << 1 // Keep out the really bad baddies that are STAY_NO_TOWN
-#define ZONE_MODIFIED 1 << 2
-#define ZONE_UNUSED 1 << 3
-#define ZONE_BPORT 1 << 4
-#define ZONE_NOCLAIM 1 << 5 // cannot claim this area
-#define ZONE_NOHUNT 1 << 6
-// Remember to update const.C  zone_bits[] if you change this
-
-#define VERSION_NUMBER 2 /* used for changing pfile format */
+const int VERSION_NUMBER = 2; /* used for changing pfile format */
 
 /* ban system stuff */
 
@@ -125,12 +110,11 @@ bool can_modify_this_room(char_data *ch, int32_t room);
 bool can_modify_room(char_data *ch, int32_t room);
 bool can_modify_mobile(char_data *ch, int32_t room);
 bool can_modify_object(char_data *ch, int32_t room);
-void write_one_zone(FILE *fl, int zon);
+
 void write_one_room(FILE *fl, int nr);
 void write_mobile(char_data *mob, FILE *fl);
 void write_object(obj_data *obj, FILE *fl);
 void load_emoting_objects(void);
-void boot_db(void);
 int create_entry(char *name);
 void zone_update(void);
 void init_char(char_data *ch);
@@ -138,7 +122,7 @@ void clear_char(char_data *ch);
 void clear_object(struct obj_data *obj);
 void reset_char(char_data *ch);
 void free_char(char_data *ch, Trace trace = Trace("Unknown"));
-int real_room(int virt);
+room_t real_room(room_t virt);
 char *fread_string(FILE *fl, int hasher);
 char *fread_string(ifstream &in, int hasher);
 char *fread_word(FILE *, int);
@@ -176,6 +160,7 @@ void copySaveData(obj_data *new_obj, obj_data *obj);
 bool verify_item(struct obj_data **obj);
 bool fullItemMatch(obj_data *obj, obj_data *obj2);
 bool has_random(obj_data *obj);
+FILE *legacyFileOpen(QString directory, QString filename, QString error_message);
 
 extern int top_of_objt;
 extern time_t start_time; /* mud start time */
@@ -243,7 +228,7 @@ extern int exp_table[61 + 1];
 
 struct world_file_list_item
 {
-  char *filename;
+  QString filename;
   int32_t firstnum;
   int32_t lastnum;
   int32_t flags;
