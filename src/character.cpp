@@ -84,6 +84,7 @@ PlayerConfig::PlayerConfig()
     config["color.bad"] = "red";
     config["tell.history.timestamp"] = "1";
     config["locale"] = "en_US";
+    config["mode"] = "line";
 }
 
 player_config_value_t PlayerConfig::value(const player_config_key_t &key, const player_config_value_t &defaultValue) const

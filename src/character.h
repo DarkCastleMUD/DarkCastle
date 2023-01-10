@@ -541,6 +541,15 @@ struct char_data
     void setSkill(skill_t, int value = 0);
     void upSkill(skill_t skillnum, int learned = 1);
     QString getSetting(QString key, QString defaultValue = QString());
+    command_return_t do_clanarea(QStringList &arguments, int cmd);
+    command_return_t do_config(QStringList &arguments, int cmd);
+    command_return_t do_experience(QStringList &arguments, int cmd);
+    command_return_t do_split(QStringList &arguments, int cmd);
+    command_return_t do_zsave(QStringList &arguments, int cmd);
+    command_return_t do_goto(QStringList &arguments, int cmd);
+    char_data *getVisiblePlayer(QString name);
+    char_data *getVisibleCharacter(QString name);
+    obj_data *getVisibleObject(QString name);
 };
 
 class communication
