@@ -218,7 +218,7 @@ void save_corpses(void)
 		return;
 
 	/* Open corpse file */
-	if (!(fp = dc_fopen(CORPSE_FILE, "w")))
+	if (!(fp = fopen(CORPSE_FILE, "w")))
 	{
 		if (errno != ENOENT) /* if it fails, NOT because of no file */
 			sprintf(buf1, "SYSERR: checking for corpse file %s : %s", CORPSE_FILE, strerror(errno));
@@ -238,13 +238,13 @@ void save_corpses(void)
 			if (!corpse_save(i, fp, location, FALSE))
 			{
 				perror("SYSERR: A corpse didnt save for some reason");
-				dc_fclose(fp);
+				fclose(fp);
 				return;
 			}
 		}
 	}
 	/* Close the corpse file */
-	dc_fclose(fp);
+	fclose(fp);
 }
 
 void load_corpses(void)
@@ -270,10 +270,10 @@ void load_corpses(void)
 	struct obj_data *money;
 	int debug = 0;
 
-	if (!(fp = dc_fopen(CORPSE_FILE, "r")))
+	if (!(fp = fopen(CORPSE_FILE, "r")))
 	{
 		sprintf(buf1, "SYSERR: READING CORPSE FILE %s in load_corpses", CORPSE_FILE);
-		log(buf1, 0, LogChannels::LOG_MISC);
+		logentry(buf1, 0, LogChannels::LOG_MISC);
 		return;
 	}
 
@@ -282,7 +282,7 @@ void load_corpses(void)
 		get_line_new(fp, line);
 	}
 	else
-		log("No corpses in file to load", 0, LogChannels::LOG_MISC);
+		logentry("No corpses in file to load", 0, LogChannels::LOG_MISC);
 
 	while (!feof(fp) && !end)
 	{
@@ -299,7 +299,7 @@ void load_corpses(void)
 			if (debug == 1)
 			{
 				sprintf(buf3, " -Loading Object: %d", nr);
-				log(buf3, 0, LogChannels::LOG_MISC);
+				logentry(buf3, 0, LogChannels::LOG_MISC);
 			}
 			/* we have the number, check it, load obj. */
 			if (nr == -1)
@@ -330,7 +330,7 @@ void load_corpses(void)
 			if (debug == 1)
 			{
 				sprintf(buf3, " -LINE: %s", line);
-				log(buf3, 0, LogChannels::LOG_MISC);
+				logentry(buf3, 0, LogChannels::LOG_MISC);
 			}
 			sscanf(line, "%d %d %d %d %d %d %d %d", t, t + 1, t + 2, t + 3, t + 4, t + 5, t + 6, t + 7);
 			GET_OBJ_VAL(temp, 0) = t[1];
@@ -345,13 +345,13 @@ void load_corpses(void)
 			if (debug == 1)
 			{
 				sprintf(buf3, " -LINE: %s", line);
-				log(buf3, 0, LogChannels::LOG_MISC);
+				logentry(buf3, 0, LogChannels::LOG_MISC);
 			}
 			/* read line check for xap. */
 			if (!strcmp("XAP\n", line))
 			{ /* then this is a Xap Obj, requires special care */
 				if (debug == 1)
-					log("XAP Found", 0, LogChannels::LOG_MISC);
+					logentry("XAP Found", 0, LogChannels::LOG_MISC);
 				if ((temp->name = fread_string_new(fp, buf2)) == NULL)
 				{
 					temp->name = "undefined";
@@ -361,7 +361,7 @@ void load_corpses(void)
 					if (debug == 1)
 					{
 						sprintf(buf3, "   -NAME: %s\n", temp->name);
-						log(buf3, 0, LogChannels::LOG_MISC);
+						logentry(buf3, 0, LogChannels::LOG_MISC);
 					}
 				}
 
@@ -374,7 +374,7 @@ void load_corpses(void)
 					if (debug == 1)
 					{
 						sprintf(buf3, "   -SHORT: %s\n", temp->short_description);
-						log(buf3, 0, LogChannels::LOG_MISC);
+						logentry(buf3, 0, LogChannels::LOG_MISC);
 					}
 				}
 
@@ -387,7 +387,7 @@ void load_corpses(void)
 					if (debug == 1)
 					{
 						sprintf(buf3, "   -DESC: %s\n", temp->description);
-						log(buf3, 0, LogChannels::LOG_MISC);
+						logentry(buf3, 0, LogChannels::LOG_MISC);
 					}
 				}
 
@@ -400,20 +400,20 @@ void load_corpses(void)
 					if (debug == 1)
 					{
 						sprintf(buf3, "   -ACT_DESC: %s\n", temp->action_description);
-						log(buf3, 0, LogChannels::LOG_MISC);
+						logentry(buf3, 0, LogChannels::LOG_MISC);
 					}
 				}
 				if (!get_line_new(fp, line) ||
 					(sscanf(line, "%d %d %d %d %d", t, t + 1, t + 2, t + 3, t + 4) != 5))
 				{
-					log("load_corpses: Format error in first numeric line (expecting 5 args)", 0, LogChannels::LOG_MISC);
+					logentry("load_corpses: Format error in first numeric line (expecting 5 args)", 0, LogChannels::LOG_MISC);
 				}
 				else
 				{
 					if (debug == 1)
 					{
 						sprintf(buf3, "   -FLAGS: %s", line);
-						log(buf3, 0, LogChannels::LOG_MISC);
+						logentry(buf3, 0, LogChannels::LOG_MISC);
 					}
 				}
 				temp->obj_flags.type_flag = t[0];
@@ -493,7 +493,7 @@ void load_corpses(void)
 					continue;
 				}
 				if (debug == 1)
-					log("XAP NOT Found", 0, LogChannels::LOG_MISC);
+					logentry("XAP NOT Found", 0, LogChannels::LOG_MISC);
 			}
 			if (temp != NULL)
 			{
@@ -510,7 +510,7 @@ void load_corpses(void)
 							if (debug == 1)
 							{
 								sprintf(buf3, "  -Moving [%s] to [%s]", obj->name, temp->name);
-								log(buf3, 0, LogChannels::LOG_MISC);
+								logentry(buf3, 0, LogChannels::LOG_MISC);
 							}
 							obj_from_room(obj);	   /* get those objs from that room */
 							obj_to_obj(obj, temp); /* and put them in the corpse */
@@ -522,7 +522,7 @@ void load_corpses(void)
 						if (debug == 1)
 						{
 							sprintf(buf3, "  -Moving corpse [%s] to [%d]", temp->name, GET_OBJ_VROOM(temp));
-							log(buf3, 0, LogChannels::LOG_MISC);
+							logentry(buf3, 0, LogChannels::LOG_MISC);
 						}
 						obj_to_room(temp, real_room(GET_OBJ_VROOM(temp)));
 					}
@@ -533,14 +533,14 @@ void load_corpses(void)
 					if (debug == 1)
 					{
 						sprintf(buf3, "  -Moving corpse [%s] to holding room.", temp->name);
-						log(buf3, 0, LogChannels::LOG_MISC);
+						logentry(buf3, 0, LogChannels::LOG_MISC);
 					}
 					obj_to_room(temp, real_room(frozen_start_room));
 				}
 			}
 		}
 	}
-	dc_fclose(fp);
+	fclose(fp);
 }
 
 int get_line_new(FILE *fl, char *buf)
