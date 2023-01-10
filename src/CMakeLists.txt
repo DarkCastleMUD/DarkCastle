@@ -6,7 +6,7 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_FLAGS "-O3 -ggdb -Wno-write-strings -fdiagnostics-color=always")
-
+#set(CMAKE_CXX_FLAGS "-O3 -Wfatal-errors -ggdb -Wno-write-strings -fdiagnostics-color=always")
 find_package(QT NAMES Qt6 REQUIRED COMPONENTS Core Network)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Network)
 
@@ -77,7 +77,6 @@ add_library(DC STATIC
     news.cpp
     nlog.cpp
     non_off.cpp
-    nullfile.cpp
     objects.cpp
     obj_proc.cpp
     offense.cpp
