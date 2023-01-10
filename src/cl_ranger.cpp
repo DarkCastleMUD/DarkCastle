@@ -368,9 +368,7 @@ int do_track(char_data *ch, char *argument, int cmd)
         if (IS_NPC(ch))
         {
           // temp disable tracking mobs into town
-          if ((/*!ISSET(ch->mobdata->actflags, ACT_STAY_NO_TOWN) ||*/
-               !IS_SET(DC::getInstance()->zones[world[EXIT(ch, y)->to_room].zone].zone_flags, ZONE_IS_TOWN)) &&
-              !IS_SET(world[EXIT(ch, y)->to_room].room_flags, NO_TRACK))
+          if (DC::getInstance()->zones.value(world[EXIT(ch, y)->to_room].zone).isTown() == false && !IS_SET(world[EXIT(ch, y)->to_room].room_flags, NO_TRACK))
           {
             ch->mobdata->last_direction = y;
             retval = do_move(ch, "", (y + 1));
@@ -1011,7 +1009,7 @@ int mob_arrow_response(char_data *ch, char_data *victim,
         if (EXIT(victim, dir2))
         {
           if (!(ISSET(victim->mobdata->actflags, ACT_STAY_NO_TOWN) &&
-                IS_SET(DC::getInstance()->zones[world[EXIT(victim, dir2)->to_room].zone].zone_flags, ZONE_IS_TOWN)) &&
+                DC::getInstance()->zones.value(world[EXIT(victim, dir2)->to_room].zone).isTown()) &&
               !IS_SET(world[EXIT(victim, dir2)->to_room].room_flags, NO_TRACK))
             /* send 1-6 since attempt move --cmd's it */
             return attempt_move(victim, dir2 + 1, 0);
@@ -1033,7 +1031,7 @@ int mob_arrow_response(char_data *ch, char_data *victim,
     {
       if (CAN_GO(ch, dir2))
         if (!(ISSET(victim->mobdata->actflags, ACT_STAY_NO_TOWN) &&
-              IS_SET(DC::getInstance()->zones[world[EXIT(victim, dir2)->to_room].zone].zone_flags, ZONE_IS_TOWN)))
+              DC::getInstance()->zones.value(world[EXIT(victim, dir2)->to_room].zone).isTown()))
           if (!IS_SET(world[EXIT(victim, dir2)->to_room].room_flags, NO_TRACK))
           {
             /* dir+1 it since attempt_move will --cmd it */
