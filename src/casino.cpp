@@ -1874,7 +1874,7 @@ int handcompare(int hand1[5], int hand2[5])
       if (a == b)
          return 3; //
    }
-   log("Error in handcompare.", 110, LogChannels::LOG_MORTAL);
+   logentry("Error in handcompare.", 110, LogChannels::LOG_MORTAL);
 
    return -1;
 }
@@ -2088,23 +2088,17 @@ void save_slot_machines()
    extern world_file_list_item *obj_file_list;
 
    curr = obj_file_list;
-   while (curr && strcmp(curr->filename, "21900-21999.obj"))
+   while (curr && curr->filename != "21900-21999.obj")
       curr = curr->next;
 
    if (!curr)
    {
-      log("Mess up in save_slot_machines, no object file.", IMMORTAL, LogChannels::LOG_BUG);
+      logentry("Mess up in save_slot_machines, no object file.", IMMORTAL, LogChannels::LOG_BUG);
       return;
    }
 
-   sprintf(buf, "objects/%s", curr->filename);
-   sprintf(buf2, "cp %s %s.last", buf, buf);
-   system(buf2);
-
-   if ((f = dc_fopen(buf, "w")) == NULL)
+   if ((f = legacyFileOpen("objects/%1", curr->filename, "Couldn't open obj save file %1 for save_slot_machines.")) == nullptr)
    {
-      fprintf(stderr, "Couldn't open obj save file %s for save_slot_machines.\r\n",
-              curr->filename);
       return;
    }
 
@@ -2114,7 +2108,7 @@ void save_slot_machines()
    // end file
    fprintf(f, "$~\n");
 
-   dc_fclose(f);
+   fclose(f);
 }
 
 void create_slot(obj_data *obj)
