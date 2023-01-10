@@ -49,7 +49,7 @@ int do_report(char_data *ch, char *argument, int cmd)
   assert(ch != 0);
   if (ch->in_room == NOWHERE)
   {
-    log("NOWHERE sent to do_report!", OVERSEER, LogChannels::LOG_BUG);
+    logentry("NOWHERE sent to do_report!", OVERSEER, LogChannels::LOG_BUG);
     return eSUCCESS;
   }
 
@@ -133,18 +133,19 @@ int do_report(char_data *ch, char *argument, int cmd)
 | Returns: 0 on failure, non-zero on success
 | Notes:
 */
-int send_to_gods(const char *str, int god_level, LogChannels type)
+int send_to_gods(QString message, int god_level, LogChannels type)
 {
-  char buf1[MAX_STRING_LENGTH];
-  char buf[MAX_STRING_LENGTH];
-  char typestr[30];
-  struct descriptor_data *i;
+  QString buf1;
+  QString buf;
+  QString typestr;
+  descriptor_data *i = nullptr;
 
-  if (str == 0)
+  if (message.isEmpty())
   {
-    log("NULL STRING sent to send_to_gods!", OVERSEER, LogChannels::LOG_BUG);
+    logentry("NULL STRING sent to send_to_gods!", OVERSEER, LogChannels::LOG_BUG);
     return (0);
   }
+
   if ((god_level > IMP) || (god_level < 0))
   { // Outside valid god levels
     return (0);
@@ -153,64 +154,63 @@ int send_to_gods(const char *str, int god_level, LogChannels type)
   switch (type)
   {
   case LogChannels::LOG_BUG:
-    sprintf(typestr, "bug");
+    typestr = "bug";
     break;
   case LogChannels::LOG_PRAYER:
-    sprintf(typestr, "pray");
+    typestr = "pray";
     break;
   case LogChannels::LOG_GOD:
-    sprintf(typestr, "god");
+    typestr = "god";
     break;
   case LogChannels::LOG_MORTAL:
-    sprintf(typestr, "mortal");
+    typestr = "mortal";
     break;
   case LogChannels::LOG_SOCKET:
-    sprintf(typestr, "socket");
+    typestr = "socket";
     break;
   case LogChannels::LOG_MISC:
-    sprintf(typestr, "misc");
+    typestr = "misc";
     break;
   case LogChannels::LOG_PLAYER:
-    sprintf(typestr, "player");
+    typestr = "player";
     break;
   case LogChannels::LOG_WORLD:
-    sprintf(typestr, "world");
+    typestr = "world";
     break;
   case LogChannels::LOG_ARENA:
-    sprintf(typestr, "arena");
+    typestr = "arena";
     break;
   case LogChannels::LOG_CLAN:
-    sprintf(typestr, "logclan");
+    typestr = "logclan";
     break;
   case LogChannels::LOG_WARNINGS:
-    sprintf(typestr, "warnings");
+    typestr = "warnings";
     break;
   case LogChannels::LOG_DATABASE:
-    sprintf(typestr, "database");
+    typestr = "database";
     break;
   case LogChannels::LOG_VAULT:
-    sprintf(typestr, "vault");
+    typestr = "vault";
     break;
   case LogChannels::LOG_HELP:
-    sprintf(typestr, "help");
+    typestr = "help";
     break;
   case LogChannels::LOG_OBJECTS:
-    sprintf(typestr, "objects");
+    typestr = "objects";
     break;
   case LogChannels::LOG_QUEST:
-    sprintf(typestr, "quest");
+    typestr = "quest";
     break;
   case LogChannels::LOG_DEBUG:
-    sprintf(typestr, "debug");
+    typestr = "debug";
     break;
   default:
-    sprintf(typestr, "unknown");
+    typestr = "unknown";
     break;
   }
 
-  sprintf(buf, "//(%s) %s\n\r", typestr, str);
-  sprintf(buf1, "%s%s//%s(%s)%s %s%s %s%s%s\n\r",
-          BOLD, RED, NTEXT, typestr, BOLD, YELLOW, str, RED, NTEXT, GREY);
+  buf = QString("//(%1) %2\n\r").arg(typestr).arg(message);
+  buf1 = QString("%1%2//%3(%4)%5 %6%7 %8%9%10\n\r").arg(BOLD).arg(RED).arg(NTEXT).arg(typestr).arg(BOLD).arg(YELLOW).arg(message).arg(RED).arg(NTEXT).arg(GREY);
 
   for (i = descriptor_list; i; i = i->next)
   {
@@ -669,9 +669,9 @@ void load_hints()
   int num;
   char *buf = NULL;
 
-  if (!(fl = dc_fopen(HINTS_FILE, "r")))
+  if (!(fl = fopen(HINTS_FILE, "r")))
   {
-    log("Error opening the hint file", IMMORTAL, LogChannels::LOG_MISC);
+    logentry("Error opening the hint file", IMMORTAL, LogChannels::LOG_MISC);
     return;
   }
 
@@ -680,7 +680,7 @@ void load_hints()
     num = fread_int(fl, 0, 32768);
     if (num > MAX_HINTS)
     {
-      log("Raise MAX_HINTS or something.", IMMORTAL, LogChannels::LOG_MISC);
+      logentry("Raise MAX_HINTS or something.", IMMORTAL, LogChannels::LOG_MISC);
       break;
     }
     buf = fread_string(fl, 0);
@@ -689,7 +689,7 @@ void load_hints()
 
   dc_free(buf);
 
-  dc_fclose(fl);
+  fclose(fl);
 
   return;
 }
