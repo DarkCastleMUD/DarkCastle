@@ -71,8 +71,8 @@ int do_reloadhelp(char_data *ch, char *argument, int cmd)
   extern struct help_index_element *build_help_index(FILE * fl, int *num);
   extern void free_help_from_memory();
   free_help_from_memory();
-  dc_fclose(help_fl);
-  if (!(help_fl = dc_fopen(HELP_KWRD_FILE, "r")))
+  fclose(help_fl);
+  if (!(help_fl = fopen(HELP_KWRD_FILE, "r")))
   {
     perror(HELP_KWRD_FILE);
     abort();
@@ -112,14 +112,14 @@ int do_log(char_data *ch, char *argument, int cmd)
     send_to_char("LOG removed.\r\n", ch);
     REMOVE_BIT(vict->pcdata->punish, PUNISH_LOG);
     sprintf(buf2, "%s removed log on %s.", GET_NAME(ch), GET_NAME(vict));
-    log(buf2, GET_LEVEL(ch), LogChannels::LOG_GOD);
+    logentry(buf2, GET_LEVEL(ch), LogChannels::LOG_GOD);
   }
   else
   {
     send_to_char("LOG set.\r\n", ch);
     SET_BIT(vict->pcdata->punish, PUNISH_LOG);
     sprintf(buf2, "%s just logged %s.", GET_NAME(ch), GET_NAME(vict));
-    log(buf2, GET_LEVEL(ch), LogChannels::LOG_GOD);
+    logentry(buf2, GET_LEVEL(ch), LogChannels::LOG_GOD);
   }
   return eSUCCESS;
 }
@@ -370,7 +370,7 @@ int do_pardon(char_data *ch, char *argument, int cmd)
   char log_buf[MAX_STRING_LENGTH] = {};
   sprintf(log_buf, "%s pardons %s for %s.",
           GET_NAME(ch), GET_NAME(victim), flag);
-  log(log_buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
+  logentry(log_buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
   return eSUCCESS;
 }
 
@@ -650,7 +650,7 @@ int do_sqedit(char_data *ch, char *argument, int cmd)
     do_write_skillquest(ch, argument, cmd);
     break;
   default:
-    log("Incorrect -i- in do_sqedit", 0, LogChannels::LOG_WORLD);
+    logentry("Incorrect -i- in do_sqedit", 0, LogChannels::LOG_WORLD);
     return eFAILURE;
   }
   return eSUCCESS;

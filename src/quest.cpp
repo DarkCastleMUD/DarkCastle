@@ -57,9 +57,9 @@ int load_quests(void)
    FILE *fl;
    quest_info *quest;
 
-   if (!(fl = dc_fopen(QUEST_FILE, "r")))
+   if (!(fl = fopen(QUEST_FILE, "r")))
    {
-      log("Failed to open quest file for reading!", 0, LogChannels::LOG_MISC);
+      logentry("Failed to open quest file for reading!", 0, LogChannels::LOG_MISC);
       return eFAILURE;
    }
 
@@ -92,7 +92,7 @@ int load_quests(void)
       quest_list.push_back(quest);
    }
 
-   dc_fclose(fl);
+   fclose(fl);
 
    return eSUCCESS;
 }
@@ -102,9 +102,9 @@ int save_quests(void)
    FILE *fl;
    quest_info *quest;
 
-   if (!(fl = dc_fopen(QUEST_FILE, "w")))
+   if (!(fl = fopen(QUEST_FILE, "w")))
    {
-      log("Failed to open quest file for writing!", 0, LogChannels::LOG_MISC);
+      logentry("Failed to open quest file for writing!", 0, LogChannels::LOG_MISC);
       return eFAILURE;
    }
 
@@ -124,7 +124,7 @@ int save_quests(void)
 
    fprintf(fl, "$");
 
-   dc_fclose(fl);
+   fclose(fl);
 
    return eSUCCESS;
 }
@@ -399,7 +399,7 @@ int show_one_quest(char_data *ch, struct quest_info *quest, int count)
 
          if (!amount)
          {
-            log("Somebody passed a quest into here that they don't really have.", IMMORTAL, LogChannels::LOG_BUG);
+            logentry("Somebody passed a quest into here that they don't really have.", IMMORTAL, LogChannels::LOG_BUG);
          }
 
          csendf(ch, " $B$2Level:$7 %d  $2Time remaining:$7 %-7ld  $2Reward:$7 %-5d$R\n\r\n\r",
@@ -577,7 +577,7 @@ int start_quest(char_data *ch, struct quest_info *quest)
       while (++dontwannabeinthisforever < 100)
       {
          mob = get_mob_vnum(number(1, 34000));
-         if (mob && (GET_LEVEL(mob) < 90) && !IS_SET(DC::getInstance()->zones[world[mob->in_room].zone].zone_flags, ZONE_NOHUNT) && (strlen(mob->description) > 80))
+         if (mob && (GET_LEVEL(mob) < 90) && DC::getInstance()->zones.value(world[mob->in_room].zone).isNoHunt() == false && (strlen(mob->description) > 80))
             break;
       }
       quest->hint1 = str_hsh(mob->description);
@@ -912,7 +912,7 @@ int quest_handler(char_data *ch, char_data *qmaster, int cmd, char *name)
       }
       break;
    default:
-      log("Bug in quest_handler, how'd they get here?", IMMORTAL, LogChannels::LOG_BUG);
+      logentry("Bug in quest_handler, how'd they get here?", IMMORTAL, LogChannels::LOG_BUG);
       return eFAILURE;
    }
    return retval;
@@ -1426,7 +1426,7 @@ int do_qedit(char_data *ch, char *argument, int cmd)
       }
       break;
    default:
-      log("Screw up in do_edit_quest, whatsamaddahyou?", IMMORTAL, LogChannels::LOG_BUG);
+      logentry("Screw up in do_edit_quest, whatsamaddahyou?", IMMORTAL, LogChannels::LOG_BUG);
       return eFAILURE;
    }
    return eSUCCESS;

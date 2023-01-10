@@ -1144,7 +1144,7 @@ void Leaderboard::read_file(void)
 	FILE *fl;
 	int i, j;
 
-	if (!(fl = dc_fopen(LEADERBOARD_FILE, "r")))
+	if (!(fl = fopen(LEADERBOARD_FILE, "r")))
 	{
 		logf(0, LogChannels::LOG_BUG, "Cannot open leaderboard file '%s'", LEADERBOARD_FILE);
 	}
@@ -1292,7 +1292,7 @@ void Leaderboard::read_file(void)
 			logf(0, LogChannels::LOG_BUG, "Corrupt leaderboard file '%s': negative int found where positive expected", LEADERBOARD_FILE);
 		}
 
-		dc_fclose(fl);
+		fclose(fl);
 	}
 }
 
@@ -1316,7 +1316,7 @@ void Leaderboard::write_file(const char filename[])
 	FILE *fl;
 	int i, j;
 
-	if (!(fl = dc_fopen(filename, "w")))
+	if (!(fl = fopen(filename, "w")))
 	{
 		logf(0, LogChannels::LOG_BUG, "Cannot open leaderboard file '%s'", filename);
 		return;
@@ -1359,7 +1359,7 @@ void Leaderboard::write_file(const char filename[])
 			fprintf(fl, "%s~ %d\n", mvactiveclassname[j][i],
 					mvactiveclass[j][i]);
 	}
-	dc_fclose(fl);
+	fclose(fl);
 }
 
 int Leaderboard::pdscore(char_data *ch)
@@ -1463,7 +1463,7 @@ int do_leaderboard(char_data *ch, char *argument, int cmd)
 		}
 	}
 
-	if (!(fl = dc_fopen(LEADERBOARD_FILE, "r")))
+	if (!(fl = fopen(LEADERBOARD_FILE, "r")))
 	{
 		logf(0, LogChannels::LOG_BUG, "Cannot open leaderboard file '%s'", LEADERBOARD_FILE);
 		return eFAILURE;
@@ -1579,7 +1579,7 @@ int do_leaderboard(char_data *ch, char *argument, int cmd)
 			}
 		}
 	}
-	dc_fclose(fl);
+	fclose(fl);
 
 	// top 5 online
 	for (d = descriptor_list; d; d = d->next)
@@ -2028,7 +2028,7 @@ void Leaderboard::rename(char *oldname, char *newname)
 		return;
 	}
 
-	if (!(fl = dc_fopen(LEADERBOARD_FILE, "r")))
+	if (!(fl = fopen(LEADERBOARD_FILE, "r")))
 	{
 		logf(0, LogChannels::LOG_BUG, "Cannot open leaderboard file: %s", LEADERBOARD_FILE);
 		abort();
@@ -2038,7 +2038,7 @@ void Leaderboard::rename(char *oldname, char *newname)
 		name[i] = fread_string(fl, 0);
 		value[i] = fread_int(fl, 0, 2147483467);
 	}
-	dc_fclose(fl);
+	fclose(fl);
 
 	for (i = 0; i < lines; i++)
 	{
@@ -2055,7 +2055,7 @@ void Leaderboard::rename(char *oldname, char *newname)
 	}
 	else
 	{
-		if (!(fl = dc_fopen(LEADERBOARD_FILE, "w")))
+		if (!(fl = fopen(LEADERBOARD_FILE, "w")))
 		{
 			logf(0, LogChannels::LOG_BUG, "Cannot open leaderboard file: %s", LEADERBOARD_FILE);
 			abort();
@@ -2066,7 +2066,7 @@ void Leaderboard::rename(char *oldname, char *newname)
 			fprintf(fl, "%s~ %d\n", name[i], value[i]);
 		}
 
-		dc_fclose(fl);
+		fclose(fl);
 	}
 
 	for (i = 0; i < lines; i++)

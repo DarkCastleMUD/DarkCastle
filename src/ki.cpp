@@ -281,7 +281,7 @@ int do_ki(char_data *ch, char *argument, int cmd)
     if (!IS_SET(ki_info[spl].targets, TAR_IGNORE))
       if (!tar_char)
       {
-        log("Dammit Morc, fix that null tar_char thing in ki", IMP,
+        logentry("Dammit Morc, fix that null tar_char thing in ki", IMP,
             LogChannels::LOG_BUG);
         send_to_char(
             "If you triggered this message, you almost crashed the\n\r"
@@ -414,7 +414,7 @@ int ki_blast(uint8_t level, char_data *ch, char *arg, char_data *vict)
 
   if (!vict)
   {
-    log("Serious problem in ki blast!", ANGEL, LogChannels::LOG_BUG);
+    logentry("Serious problem in ki blast!", ANGEL, LogChannels::LOG_BUG);
     return eINTERNAL_ERROR;
   }
 
@@ -609,7 +609,7 @@ int ki_speed(uint8_t level, char_data *ch, char *arg, char_data *vict)
 
   if (!vict)
   {
-    log("Null victim sent to ki speed", ANGEL, LogChannels::LOG_BUG);
+    logentry("Null victim sent to ki speed", ANGEL, LogChannels::LOG_BUG);
     return eINTERNAL_ERROR;
   }
 
@@ -640,7 +640,7 @@ int ki_purify(uint8_t level, char_data *ch, char *arg, char_data *vict)
 {
   if (!vict)
   {
-    log("Null victim sent to ki purify", ANGEL, LogChannels::LOG_BUG);
+    logentry("Null victim sent to ki purify", ANGEL, LogChannels::LOG_BUG);
     return eINTERNAL_ERROR;
   }
   if (!arg)
@@ -703,7 +703,7 @@ int ki_disrupt(uint8_t level, char_data *ch, char *arg, char_data *victim)
 {
   if (!victim)
   {
-    log("Serious problem in ki disrupt!", ANGEL, LogChannels::LOG_BUG);
+    logentry("Serious problem in ki disrupt!", ANGEL, LogChannels::LOG_BUG);
     return eINTERNAL_ERROR;
   }
 

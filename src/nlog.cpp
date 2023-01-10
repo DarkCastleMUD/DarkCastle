@@ -111,7 +111,7 @@ void logf(int level, LogChannels type, const char *arg, ...)
   vsnprintf(s, MAX_STRING_LENGTH, arg, args);
   va_end(args);
 
-  log(s, level, type);
+  logentry(s, level, type);
 }
 
 int csendf(char_data *ch, const char *arg, ...)

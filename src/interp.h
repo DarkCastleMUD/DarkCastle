@@ -162,14 +162,14 @@ enum class CommandType
 
 struct command_info
 {
-    char *command_name;                                                                   /* Name of ths command             */
-    int (*command_pointer)(char_data *ch, char *argument, int cmd);                       /* Function that does it            */
-    command_return_t (*command_pointer2)(char_data *ch, string argument, int cmd);        /* Function that does it            */
-    command_return_t (*command_pointer3)(char_data *ch, QStringList &arguments, int cmd); /* Function that does it            */
-    uint8_t minimum_position;                                                             /* Position commander must be in    */
-    uint8_t minimum_level;                                                                /* Minimum level needed             */
-    int command_number;                                                                   /* Passed to function as argument   */
-    int flags;                                                                            // what flags the skills has
+    char *command_name;                                                               /* Name of ths command             */
+    int (*command_pointer)(char_data *ch, char *argument, int cmd);                   /* Function that does it            */
+    command_return_t (*command_pointer2)(char_data *ch, string argument, int cmd);    /* Function that does it            */
+    command_return_t (char_data::*command_pointer3)(QStringList &arguments, int cmd); /* Function that does it            */
+    uint8_t minimum_position;                                                         /* Position commander must be in    */
+    uint8_t minimum_level;                                                            /* Minimum level needed             */
+    int command_number;                                                               /* Passed to function as argument   */
+    int flags;                                                                        // what flags the skills has
     uint8_t toggle_hide;
     CommandType type;
 };
@@ -192,7 +192,6 @@ struct cmd_hash_info
 #define COM_CHARMIE_OK 1
 
 command_return_t do_mscore(char_data *ch, char *argument, int cmd);
-command_return_t do_clanarea(char_data *ch, char *argument, int cmd);
 command_return_t do_huntstart(char_data *ch, char *argument, int cmd);
 command_return_t do_huntclear(char_data *ch, char *argument, int cmd);
 
@@ -327,7 +326,6 @@ command_return_t do_give(char_data *ch, char *argument, int cmd);
 command_return_t do_global(char_data *ch, char *argument, int cmd);
 command_return_t do_gossip(char_data *ch, char *argument, int cmd);
 command_return_t do_golem_score(char_data *ch, char *argument, int cmd);
-command_return_t do_goto(char_data *ch, string argument, int cmd);
 command_return_t do_guild(char_data *ch, char *argument, int cmd);
 command_return_t do_install(char_data *ch, char *argument, int cmd);
 command_return_t do_reload_help(char_data *ch, char *argument, int cmd);
@@ -546,7 +544,6 @@ command_return_t do_sneak(char_data *ch, char *argument, int cmd);
 command_return_t do_snoop(char_data *ch, char *argument, int cmd);
 command_return_t do_sockets(char_data *ch, char *argument, int cmd);
 command_return_t do_spells(char_data *ch, char *argument, int cmd);
-command_return_t do_split(char_data *ch, QStringList &arguments, int cmd);
 command_return_t do_sqedit(char_data *ch, char *argument, int cmd);
 command_return_t do_stalk(char_data *ch, char *argument, int cmd);
 command_return_t do_stand(char_data *ch, char *argument, int cmd);
@@ -613,7 +610,6 @@ command_return_t do_write(char_data *ch, char *argument, int cmd);
 command_return_t do_zap(char_data *ch, char *argument, int cmd);
 command_return_t do_zedit(char_data *ch, char *argument, int cmd);
 command_return_t do_zoneexits(char_data *ch, char *argument, int cmd);
-command_return_t do_zsave(char_data *ch, char *argument, int cmd);
 command_return_t do_editor(char_data *ch, char *argument, int cmd);
 command_return_t do_pursue(char_data *ch, char *argument, int cmd);
 

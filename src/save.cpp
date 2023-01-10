@@ -365,7 +365,8 @@ void save_pc_data(struct pc_data *i, FILE *fpsave, struct time_data tmpage)
       if (setting.key() == "color.good" ||
           setting.key() == "color.bad" ||
           setting.key() == "tell.history.timestamp" ||
-          setting.key() == "locale")
+          setting.key() == "locale" ||
+          setting.key() == "mode")
       {
         fwrite("OPT", sizeof(char), 3, fpsave);
         fwrite_var_string(setting.key(), fpsave);
@@ -539,7 +540,7 @@ void read_pc_data(char_data *ch, FILE *fpsave)
 
     QString key = fread_var_string(fpsave);
     QString value = fread_var_string(fpsave);
-    if (key == "color.good" || key == "color.bad" || key == "tell.history.timestamp" || key == "locale")
+    if (key == "color.good" || key == "color.bad" || key == "tell.history.timestamp" || key == "locale" || key == "mode")
     {
       i->config->insert(key, value);
     }
@@ -690,19 +691,19 @@ void read_skill(char_data *ch, FILE *fpsave)
 
   if (fread(&(curr.skillnum), sizeof(curr.skillnum), 1, fpsave) != 1)
   {
-    log(fmt::format("Unable to read a skill from player file for {}.", GET_NAME(ch)), IMMORTAL, LogChannels::LOG_BUG);
+    logentry(QString("Unable to read a skill from player file for {}.").arg(GET_NAME(ch)), IMMORTAL, LogChannels::LOG_BUG);
     return;
   }
 
   if (fread(&(curr.learned), sizeof(curr.learned), 1, fpsave) != 1)
   {
-    log(fmt::format("Unable to read a skill from player file for {}.", GET_NAME(ch)), IMMORTAL, LogChannels::LOG_BUG);
+    logentry(QString("Unable to read a skill from player file for {}.").arg(GET_NAME(ch)), IMMORTAL, LogChannels::LOG_BUG);
     return;
   }
 
   if (fread(&(curr.unused), sizeof(curr.unused[0]), 5, fpsave) != 5)
   {
-    log(fmt::format("Unable to read a skill from player file for {}.", GET_NAME(ch)), IMMORTAL, LogChannels::LOG_BUG);
+    logentry(QString("Unable to read a skill from player file for {}.").arg(GET_NAME(ch)), IMMORTAL, LogChannels::LOG_BUG);
     return;
   }
 
@@ -835,18 +836,18 @@ void save_char_obj_db(char_data *ch)
     )
   {
     if(fpsave != NULL)
-      dc_fclose(fpsave);
+      fclose(fpsave);
     sprintf(log_buf, "mv -f %s %s", strsave, name);
     system(log_buf);
   }
   else
   {
     if(fpsave != NULL)
-      dc_fclose(fpsave);
+      fclose(fpsave);
     sprintf(log_buf, "Save_char_obj: %s", strsave);
     send_to_char ("WARNING: file problem. You did not save!", ch);
     perror(log_buf);
-    log(log_buf, ANGEL, LogChannels::LOG_BUG);
+    logentry(log_buf, ANGEL, LogChannels::LOG_BUG);
   }
 
   REMBIT(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT);
@@ -891,13 +892,13 @@ void save_char_obj(char_data *ch)
 
   sprintf(strsave, "%s.back", name);
 
-  if (!(fpsave = dc_fopen(strsave, "wb")))
+  if (!(fpsave = fopen(strsave, "wb")))
   {
     send_to_char("Warning!  Did not save.  Could not open file.  Contact a god, do not logoff.\r\n", ch);
     char log_buf[MAX_STRING_LENGTH] = {};
     sprintf(log_buf, "Could not open file in save_char_obj. '%s'", strsave);
     perror(log_buf);
-    log(log_buf, ANGEL, LogChannels::LOG_BUG);
+    logentry(log_buf, ANGEL, LogChannels::LOG_BUG);
     return;
   }
 
@@ -928,7 +929,7 @@ void save_char_obj(char_data *ch)
       (store_worn_eq(ch, fpsave)))
   {
     if (fpsave != NULL)
-      dc_fclose(fpsave);
+      fclose(fpsave);
 
     char log_buf[MAX_STRING_LENGTH] = {};
     sprintf(log_buf, "mv -f %s %s", strsave, name);
@@ -937,12 +938,12 @@ void save_char_obj(char_data *ch)
   else
   {
     if (fpsave != NULL)
-      dc_fclose(fpsave);
+      fclose(fpsave);
     char log_buf[MAX_STRING_LENGTH] = {};
     sprintf(log_buf, "Save_char_obj: %s", strsave);
     send_to_char("WARNING: file problem. You did not save!", ch);
     perror(log_buf);
-    log(log_buf, ANGEL, LogChannels::LOG_BUG);
+    logentry(log_buf, ANGEL, LogChannels::LOG_BUG);
   }
 
   REMBIT(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT);
@@ -957,9 +958,9 @@ void load_char_obj_error(FILE *fpsave, char strsave[MAX_INPUT_LENGTH])
   char log_buf[MAX_STRING_LENGTH] = {};
   sprintf(log_buf, "Load_char_obj: %s", strsave);
   perror(log_buf);
-  log(log_buf, ANGEL, LogChannels::LOG_BUG);
+  logentry(log_buf, ANGEL, LogChannels::LOG_BUG);
   if (fpsave != NULL)
-    dc_fclose(fpsave);
+    fclose(fpsave);
 }
 
 // Load a char and inventory into a new_new ch structure.
@@ -1002,7 +1003,7 @@ bool load_char_obj(struct descriptor_data *d, const char *name)
   //  then parse the memory instead of reading each item from file seperately
   //  Should be much faster and save our HD from turning itself to mush -pir
 
-  if ((fpsave = dc_fopen(strsave, "rb")) == NULL)
+  if ((fpsave = fopen(strsave, "rb")) == NULL)
     return FALSE;
 
   if (fread(&uchar, sizeof(uchar), 1, fpsave) == 0)
@@ -1016,6 +1017,7 @@ bool load_char_obj(struct descriptor_data *d, const char *name)
   store_to_char(&uchar, ch);
   store_to_char_variable_data(ch, fpsave);
   read_pc_or_mob_data(ch, fpsave);
+
   if (!IS_NPC(ch) && ch->pcdata->time.logon < 1117527906)
   {
     extern int do_clearaff(char_data * ch, char *argument, int cmd);
@@ -1036,7 +1038,7 @@ bool load_char_obj(struct descriptor_data *d, const char *name)
   }
 
   if (fpsave != NULL)
-    dc_fclose(fpsave);
+    fclose(fpsave);
   return TRUE;
 }
 
@@ -1634,7 +1636,7 @@ void store_to_char(struct char_file_u4 *st, char_data *ch)
   // make the actual call to "char_to_room" using this data later
   ch->in_room = real_room(st->load_room);
 
-  if (ch->in_room == (-1))
+  if (ch->in_room == NOWHERE)
   {
     if (GET_LEVEL(ch) >= IMMORTAL)
       ch->in_room = real_room(17);

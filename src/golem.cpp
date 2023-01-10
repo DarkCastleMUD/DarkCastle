@@ -165,9 +165,9 @@ void save_golem_data(char_data *ch)
     return;
   golemtype = !IS_AFFECTED(ch->pcdata->golem, AFF_GOLEM); // 0 or 1
   sprintf(file, "%s/%c/%s.%d", FAMILIAR_DIR, ch->name[0], ch->name, golemtype);
-  if (!(fpfile = dc_fopen(file, "w")))
+  if (!(fpfile = fopen(file, "w")))
   {
-    log("Error while opening file in save_golem_data[golem.cpp].", ANGEL, LogChannels::LOG_BUG);
+    logentry("Error while opening file in save_golem_data[golem.cpp].", ANGEL, LogChannels::LOG_BUG);
     return;
   }
   char_data *golem = ch->pcdata->golem; // Just to make the code below cleaner.
@@ -176,7 +176,7 @@ void save_golem_data(char_data *ch)
   // Use previously defined functions after this.
   obj_to_store(golem->carrying, golem, fpfile, -1);
   store_worn_eq(golem, fpfile);
-  dc_fclose(fpfile);
+  fclose(fpfile);
 }
 
 void save_charmie_data(char_data *ch)
@@ -200,14 +200,14 @@ void save_charmie_data(char_data *ch)
 
     // logf(IMMORTAL, LogChannels::LOG_MISC, "Saving charmie %s for %s", follower->name, ch->name);
     sprintf(file, "%s/%c/%s.%d", FOLLOWER_DIR, ch->name[0], ch->name, 0);
-    if (!(fpfile = dc_fopen(file, "w")))
+    if (!(fpfile = fopen(file, "w")))
     {
       logf(ANGEL, LogChannels::LOG_BUG, "Error while opening file in save_charmie_data[golem.cpp].");
       return;
     }
     obj_to_store(follower->carrying, follower, fpfile, -1);
     store_worn_eq(follower, fpfile);
-    dc_fclose(fpfile);
+    fclose(fpfile);
   }
 }
 
@@ -269,7 +269,7 @@ void load_golem_data(char_data *ch, int golemtype)
   if (golemtype < 0 || golemtype > 1)
     return; // Say what?
   sprintf(file, "%s/%c/%s.%d", FAMILIAR_DIR, ch->name[0], ch->name, golemtype);
-  if (!(fpfile = dc_fopen(file, "r")))
+  if (!(fpfile = fopen(file, "r")))
   { // No golem. Create a new one.
     golem = clone_mobile(real_mobile(8));
     set_golem(golem, golemtype);
@@ -290,7 +290,7 @@ void load_golem_data(char_data *ch, int golemtype)
   {
     last_cont = obj_store_to_char(golem, fpfile, last_cont);
   }
-  dc_fclose(fpfile);
+  fclose(fpfile);
 }
 
 int cast_create_golem(uint8_t level, char_data *ch, char *arg, int type, char_data *tar_ch, struct obj_data *tar_obj, int skill)

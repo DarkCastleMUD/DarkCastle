@@ -37,6 +37,7 @@
 #include <algorithm>
 
 #include <fmt/format.h>
+#include <QString>
 
 #include "fileinfo.h"
 #include "act.h"
@@ -68,7 +69,7 @@ extern struct index_data *mob_index;
 extern struct index_data *obj_index;
 char_data *rndm2;
 extern struct obj_data *object_list;
-extern struct room_data **world_array;
+extern class room_data **world_array;
 int activeProgs = 0; // loop protection
 
 char_data *activeActor = NULL;
@@ -4709,7 +4710,7 @@ void end_oproc(char_data *ch, Trace trace)
 	static int core_counter = 0;
 	if (selfpurge)
 	{
-		log(format("Crash averted in end_oproc() {}", selfpurge), IMMORTAL, LogChannels::LOG_BUG);
+		logentry(QString("Crash averted in end_oproc() %1 %2").arg(selfpurge.getFunction().c_str()).arg(selfpurge.getState()), IMMORTAL, LogChannels::LOG_BUG);
 
 		if (core_counter++ < 10)
 		{

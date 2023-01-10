@@ -270,7 +270,15 @@ int do_newPath(char_data *ch, char *argument, int cmd)
 
 int do_listPathsByZone(char_data *ch, char *argument, int cmd)
 {
-  int i = world[ch->in_room].zone, low = DC::getInstance()->zones[i].bottom_rnum, high = DC::getInstance()->zones[i].top_rnum;
+  auto &zones = DC::getInstance()->zones;
+  int i = world[ch->in_room].zone;
+  if (zones.contains(i) == false)
+  {
+    return eFAILURE;
+  }
+
+  auto &zone = DC::getInstance()->zones[i];
+  int low = zone.getRealBottom(), high = zone.getRealTop();
 
   class Path *p;
   bool found = FALSE;

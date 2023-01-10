@@ -1395,7 +1395,7 @@ void skill_increase_check(char_data *ch, int skill, int learned, int difficulty)
     oi -= int_app[GET_INT(ch)].hard_bonus;
     break;
   default:
-    log("Illegal difficulty value sent to skill_increase_check", IMMORTAL, LogChannels::LOG_BUG);
+    logentry("Illegal difficulty value sent to skill_increase_check", IMMORTAL, LogChannels::LOG_BUG);
     break;
   }
 

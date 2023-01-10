@@ -128,7 +128,7 @@ int do_snoop(char_data *ch, char *argument, int cmd)
   {
     send_to_char("Can't do that. That mob is higher than you!\n\r", ch);
     sprintf(buf, "%s tried to snoop a higher mob\n\r", GET_NAME(ch));
-    log(buf, OVERSEER, LogChannels::LOG_GOD);
+    logentry(buf, OVERSEER, LogChannels::LOG_GOD);
     return eFAILURE;
   }
 
@@ -141,7 +141,7 @@ int do_snoop(char_data *ch, char *argument, int cmd)
       ch->desc->snooping = 0;
     }
     sprintf(buf, "%s snoops themself.", GET_NAME(ch));
-    log(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
+    logentry(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
     return eSUCCESS;
   }
 
@@ -169,7 +169,7 @@ int do_snoop(char_data *ch, char *argument, int cmd)
   ch->desc->snooping = victim->desc;
   victim->desc->snoop_by = ch->desc;
   sprintf(buf, "%s snoops %s.", GET_NAME(ch), GET_NAME(victim));
-  log(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
+  logentry(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
   return eSUCCESS;
 }
 

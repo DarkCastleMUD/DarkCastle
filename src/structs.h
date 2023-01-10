@@ -7,9 +7,9 @@
 #ifndef STRUCTS_H_
 #define STRUCTS_H_
 
-extern "C" {
+extern "C"
+{
 #include <sys/types.h>
-
 }
 #include <stdio.h> // FILE
 #include <string>
@@ -17,69 +17,68 @@ extern "C" {
 #include <map>
 #include <cstdint>
 
-const size_t MAX_STRING_LENGTH=8192;
+const size_t MAX_STRING_LENGTH = 8192;
 
 #include "character.h"
 
 using namespace std;
 
-FILE * dc_fopen(const char *filename, const char *type);
-int dc_fclose(FILE * fl);
+// FILE * fopen(const char *filename, const char *type);
+// int fclose(FILE * fl);
 
-typedef	struct obj_data		obj_data;
+typedef struct obj_data obj_data;
 
-const size_t MAX_INPUT_LENGTH=160;
-const size_t MAX_MESSAGES=150;
-const size_t MAX_OBJ_SDESC_LENGTH=100;
+const size_t MAX_INPUT_LENGTH = 160;
+const size_t MAX_MESSAGES = 150;
+const size_t MAX_OBJ_SDESC_LENGTH = 100;
 
-const size_t MESS_ATTACKER=1;
-const size_t MESS_VICTIM=2;
-const size_t MESS_ROOM=3;
+const size_t MESS_ATTACKER = 1;
+const size_t MESS_VICTIM = 2;
+const size_t MESS_ROOM = 3;
 
 /* ======================================================================== */
 struct txt_block
 {
-    string text = {};
-    struct txt_block *next = {};
-    int aliased = {};
+  string text = {};
+  struct txt_block *next = {};
+  int aliased = {};
 };
 
 typedef struct txt_q
 {
-    struct txt_block *head;
-    struct txt_block *tail;
+  struct txt_block *head;
+  struct txt_block *tail;
 } TXT_Q;
 
 struct snoop_data
 {
-    char_data *snooping; 
-    char_data *snoop_by;
+  char_data *snooping;
+  char_data *snoop_by;
 };
 
-
-struct msg_type 
+struct msg_type
 {
-    char *attacker_msg;  /* message to attacker */
-    char *victim_msg;    /* message to victim   */
-    char *room_msg;      /* message to room     */
+  char *attacker_msg; /* message to attacker */
+  char *victim_msg;   /* message to victim   */
+  char *room_msg;     /* message to room     */
 };
 
 struct message_type
 {
-    struct msg_type die_msg;      /* messages when death            */
-    struct msg_type miss_msg;     /* messages when miss             */
-    struct msg_type hit_msg;      /* messages when hit              */
-    struct msg_type sanctuary_msg;/* messages when hit on sanctuary */
-    struct msg_type god_msg;      /* messages when hit on god       */
-    struct message_type *next;/* to next messages of ths kind.*/
+  struct msg_type die_msg;       /* messages when death            */
+  struct msg_type miss_msg;      /* messages when miss             */
+  struct msg_type hit_msg;       /* messages when hit              */
+  struct msg_type sanctuary_msg; /* messages when hit on sanctuary */
+  struct msg_type god_msg;       /* messages when hit on god       */
+  struct message_type *next;     /* to next messages of ths kind.*/
 };
 
 struct message_list
 {
-    int a_type;               /* Attack type				*/
-    int number_of_attacks;    /* # messages to chose from		*/
-    struct message_type *msg; /* List of messages			*/
-    struct message_type *msg2; /* List of messages with toggle damage ON */
+  int a_type;                /* Attack type				*/
+  int number_of_attacks;     /* # messages to chose from		*/
+  struct message_type *msg;  /* List of messages			*/
+  struct message_type *msg2; /* List of messages with toggle damage ON */
 };
 
 struct SVoteData
@@ -102,9 +101,9 @@ public:
   bool Vote(char_data *ch, unsigned int vote);
   void DisplayVote(char_data *ch);
   void DisplayResults(char_data *ch);
-  bool IsActive() {return active;}
+  bool IsActive() { return active; }
   CVoteData();
-  ~CVoteData();  
+  ~CVoteData();
 
 private:
   bool active;
@@ -127,6 +126,5 @@ const size_t TO_GODS    4
 */
 
 extern void debugpoint();
-
 
 #endif

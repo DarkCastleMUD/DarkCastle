@@ -57,33 +57,33 @@ void rebuild_rnum_references(int startAt, int type)
 {
   int zone, comm;
 
-  for (zone = 0; zone <= top_of_zone_table; zone++)
+  for (auto [zone_key, zone] : DC::getInstance()->zones.asKeyValueRange())
   {
-    for (comm = 0; DC::getInstance()->zones[zone].cmd && DC::getInstance()->zones[zone].cmd[comm].command != 'S'; comm++)
+    for (comm = 0; zone.cmd && zone.cmd[comm].command != 'S'; comm++)
     {
-      switch (DC::getInstance()->zones[zone].cmd[comm].command)
+      switch (zone.cmd[comm].command)
       {
       case 'M':
-        if (type == 1 && DC::getInstance()->zones[zone].cmd[comm].arg1 >= startAt)
-          DC::getInstance()->zones[zone].cmd[comm].arg1++;
+        if (type == 1 && zone.cmd[comm].arg1 >= startAt)
+          zone.cmd[comm].arg1++;
         break;
       case 'O':
-        if (type == 2 && DC::getInstance()->zones[zone].cmd[comm].arg1 >= startAt)
-          DC::getInstance()->zones[zone].cmd[comm].arg1++;
+        if (type == 2 && zone.cmd[comm].arg1 >= startAt)
+          zone.cmd[comm].arg1++;
         break;
       case 'G':
-        if (type == 2 && DC::getInstance()->zones[zone].cmd[comm].arg1 >= startAt)
-          DC::getInstance()->zones[zone].cmd[comm].arg1++;
+        if (type == 2 && zone.cmd[comm].arg1 >= startAt)
+          zone.cmd[comm].arg1++;
         break;
       case 'E':
-        if (type == 2 && DC::getInstance()->zones[zone].cmd[comm].arg1 >= startAt)
-          DC::getInstance()->zones[zone].cmd[comm].arg1++;
+        if (type == 2 && zone.cmd[comm].arg1 >= startAt)
+          zone.cmd[comm].arg1++;
         break;
       case 'P':
-        if (type == 2 && DC::getInstance()->zones[zone].cmd[comm].arg1 >= startAt)
-          DC::getInstance()->zones[zone].cmd[comm].arg1++;
-        if (type == 2 && DC::getInstance()->zones[zone].cmd[comm].arg3 >= startAt)
-          DC::getInstance()->zones[zone].cmd[comm].arg3++;
+        if (type == 2 && zone.cmd[comm].arg1 >= startAt)
+          zone.cmd[comm].arg1++;
+        if (type == 2 && zone.cmd[comm].arg3 >= startAt)
+          zone.cmd[comm].arg3++;
         break;
       case '%':
       case 'K':
@@ -93,7 +93,7 @@ void rebuild_rnum_references(int startAt, int type)
       case 'J':
         break;
       default:
-        log("Illegal char hit in rebuild_rnum_references", 0, LogChannels::LOG_WORLD);
+        logentry("Illegal char hit in rebuild_rnum_references", 0, LogChannels::LOG_WORLD);
         break;
       }
     }
@@ -266,7 +266,7 @@ int do_find(char_data *ch, char *arg, int cmd)
   {
   default:
     send_to_char("Problem...fuck up in do_find.\r\n", ch);
-    log("Default in do_find...should NOT happen.", ANGEL, LogChannels::LOG_BUG);
+    logentry("Default in do_find...should NOT happen.", ANGEL, LogChannels::LOG_BUG);
     return eFAILURE;
   case 0: // mobile
     return do_mlocate(ch, name, CMD_DEFAULT);
@@ -338,7 +338,7 @@ int do_stat(char_data *ch, char *arg, int cmd)
   {
   default:
     send_to_char("Problem...fuck up in do_stat.\r\n", ch);
-    log("Default in do_stat...should NOT happen.", ANGEL, LogChannels::LOG_BUG);
+    logentry("Default in do_stat...should NOT happen.", ANGEL, LogChannels::LOG_BUG);
     return eFAILURE;
   case 0: // mobile
     if ((vict = get_mob_vis(ch, name)))
@@ -500,13 +500,13 @@ int do_zone_single_edit(char_data *ch, char *argument, int zone)
       case 'K':
       case 'X':
       case '*':
-        DC::getInstance()->zones[zone].cmd[cmd].arg1 = 0;
-        DC::getInstance()->zones[zone].cmd[cmd].arg2 = 0;
-        DC::getInstance()->zones[zone].cmd[cmd].arg3 = 0;
+        DC::getInstance()->zones.value(zone).cmd[cmd].arg1 = 0;
+        DC::getInstance()->zones.value(zone).cmd[cmd].arg2 = 0;
+        DC::getInstance()->zones.value(zone).cmd[cmd].arg3 = 0;
         /* no break */
       case '%':
-        DC::getInstance()->zones[zone].cmd[cmd].arg2 = 100;
-        DC::getInstance()->zones[zone].cmd[cmd].command = result;
+        DC::getInstance()->zones.value(zone).cmd[cmd].arg2 = 100;
+        DC::getInstance()->zones.value(zone).cmd[cmd].command = result;
         sprintf(select, "Type for command %d changed to %c.\r\nArg1-3 reset.\r\n", cmd + 1, result);
         send_to_char(select, ch);
         break;
@@ -520,43 +520,43 @@ int do_zone_single_edit(char_data *ch, char *argument, int zone)
       switch (*last)
       {
       case '0':
-        DC::getInstance()->zones[zone].cmd[cmd].if_flag = 0;
+        DC::getInstance()->zones.value(zone).cmd[cmd].if_flag = 0;
         sprintf(select, "If flag for command %d changed to 0 (always).\r\n", cmd + 1);
         break;
       case '1':
-        DC::getInstance()->zones[zone].cmd[cmd].if_flag = 1;
+        DC::getInstance()->zones.value(zone).cmd[cmd].if_flag = 1;
         sprintf(select, "If flag for command %d changed to 1 ($B$2ontrue$R).\r\n", cmd + 1);
         break;
       case '2':
-        DC::getInstance()->zones[zone].cmd[cmd].if_flag = 2;
+        DC::getInstance()->zones.value(zone).cmd[cmd].if_flag = 2;
         sprintf(select, "If flag for command %d changed to 2 ($B$4onfalse$R).\r\n", cmd + 1);
         break;
       case '3':
-        DC::getInstance()->zones[zone].cmd[cmd].if_flag = 3;
+        DC::getInstance()->zones.value(zone).cmd[cmd].if_flag = 3;
         sprintf(select, "If flag for command %d changed to 3 ($B$5onboot$R).\r\n", cmd + 1);
         break;
       case '4':
-        DC::getInstance()->zones[zone].cmd[cmd].if_flag = 4;
+        DC::getInstance()->zones.value(zone).cmd[cmd].if_flag = 4;
         sprintf(select, "If flag for command %d changed to 4 if-last-mob-true ($B$2Ls$1Mb$2Tr$R).\r\n", cmd + 1);
         break;
       case '5':
-        DC::getInstance()->zones[zone].cmd[cmd].if_flag = 5;
+        DC::getInstance()->zones.value(zone).cmd[cmd].if_flag = 5;
         sprintf(select, "If flag for command %d changed to 5 if-last-mob-false ($B$4Ls$1Mb$4Fl$R).\r\n", cmd + 1);
         break;
       case '6':
-        DC::getInstance()->zones[zone].cmd[cmd].if_flag = 6;
+        DC::getInstance()->zones.value(zone).cmd[cmd].if_flag = 6;
         sprintf(select, "If flag for command %d changed to 6 if-last-obj-true ($B$2Ls$7Ob$2Tr$R).\r\n", cmd + 1);
         break;
       case '7':
-        DC::getInstance()->zones[zone].cmd[cmd].if_flag = 7;
+        DC::getInstance()->zones.value(zone).cmd[cmd].if_flag = 7;
         sprintf(select, "If flag for command %d changed to 7 if-last-obj-false ($B$4Ls$7Ob$4Fl$R).\r\n", cmd + 1);
         break;
       case '8':
-        DC::getInstance()->zones[zone].cmd[cmd].if_flag = 8;
+        DC::getInstance()->zones.value(zone).cmd[cmd].if_flag = 8;
         sprintf(select, "If flag for command %d changed to 8 if-last-%%-true ($B$2Ls$R%%%%$B$2Tr$R).\r\n", cmd + 1);
         break;
       case '9':
-        DC::getInstance()->zones[zone].cmd[cmd].if_flag = 9;
+        DC::getInstance()->zones.value(zone).cmd[cmd].if_flag = 9;
         sprintf(select, "If flag for command %d changed to 9 if-last-%%-false ($B$4Ls$R%%%%$B$4Fl$R).\r\n", cmd + 1);
         break;
       default:
@@ -572,19 +572,19 @@ int do_zone_single_edit(char_data *ch, char *argument, int zone)
     else if (isname(select, "comment"))
     {
       //      This is str_hsh'd, don't delete it
-      //      if(DC::getInstance()->zones[zone].cmd[cmd].comment)
-      //        dc_free(DC::getInstance()->zones[zone].cmd[cmd].comment);
+      //      if(DC::getInstance()->zones.value(zone).cmd[cmd].comment)
+      //        dc_free(DC::getInstance()->zones.value(zone).cmd[cmd].comment);
       if (!strcmp(last, "none"))
       {
-        DC::getInstance()->zones[zone].cmd[cmd].comment = NULL;
+        DC::getInstance()->zones.value(zone).cmd[cmd].comment = NULL;
         sprintf(select, "Comment for command %d removed.\r\n", cmd + 1);
         send_to_char(select, ch);
       }
       else
       {
-        DC::getInstance()->zones[zone].cmd[cmd].comment = str_hsh(last);
+        DC::getInstance()->zones.value(zone).cmd[cmd].comment = str_hsh(last);
         sprintf(select, "Comment for command %d change to '%s'.\r\n", cmd + 1,
-                DC::getInstance()->zones[zone].cmd[cmd].comment);
+                DC::getInstance()->zones.value(zone).cmd[cmd].comment);
         send_to_char(select, ch);
       }
     }
@@ -601,7 +601,7 @@ int do_zone_single_edit(char_data *ch, char *argument, int zone)
       int vnum = 0;
       if (isname(select, "1"))
       {
-        switch (DC::getInstance()->zones[zone].cmd[cmd].command)
+        switch (DC::getInstance()->zones.value(zone).cmd[cmd].command)
         {
         case 'M':
           j = real_mobile(i);
@@ -622,13 +622,13 @@ int do_zone_single_edit(char_data *ch, char *argument, int zone)
           j = i;
           break;
         }
-        DC::getInstance()->zones[zone].cmd[cmd].arg1 = j;
+        DC::getInstance()->zones.value(zone).cmd[cmd].arg1 = j;
         sprintf(select, "Arg 1 set to %ld.\r\n", i);
         send_to_char(select, ch);
       }
       else if (isname(select, "2"))
       {
-        switch (DC::getInstance()->zones[zone].cmd[cmd].command)
+        switch (DC::getInstance()->zones.value(zone).cmd[cmd].command)
         {
         case 'K':
         case 'X':
@@ -637,13 +637,13 @@ int do_zone_single_edit(char_data *ch, char *argument, int zone)
         default:
           break;
         }
-        DC::getInstance()->zones[zone].cmd[cmd].arg2 = i;
+        DC::getInstance()->zones.value(zone).cmd[cmd].arg2 = i;
         sprintf(select, "Arg 2 set to %ld.\r\n", i);
         send_to_char(select, ch);
       }
       else if (isname(select, "3"))
       {
-        switch (DC::getInstance()->zones[zone].cmd[cmd].command)
+        switch (DC::getInstance()->zones.value(zone).cmd[cmd].command)
         {
         case 'M':
         case 'O':
@@ -668,7 +668,7 @@ int do_zone_single_edit(char_data *ch, char *argument, int zone)
         default:
           break;
         }
-        DC::getInstance()->zones[zone].cmd[cmd].arg3 = i;
+        DC::getInstance()->zones.value(zone).cmd[cmd].arg3 = i;
         sprintf(select, "Arg 3 set to %ld.\r\n", i);
         send_to_char(select, ch);
       }
@@ -688,7 +688,7 @@ int max_res(int zone)
 {
   int i;
   for (i = 0;
-       DC::getInstance()->zones[zone].cmd[i].command != 'S' && i < (DC::getInstance()->zones[zone].reset_total - 1);
+       DC::getInstance()->zones.value(zone).cmd[i].command != 'S' && i < (DC::getInstance()->zones.value(zone).reset_total - 1);
        i++)
     ;
   return i;
@@ -701,7 +701,7 @@ int do_zedit(char_data *ch, char *argument, int cmd)
   char text[MAX_INPUT_LENGTH];
   int16_t skill;
   int i = 0, j = 0;
-  int zone, last_cmd;
+  int last_cmd;
   int robj, rmob;
 
   const char *zedit_values[] = {
@@ -740,13 +740,20 @@ int do_zedit(char_data *ch, char *argument, int cmd)
   }
   int from, to;
   // set the zone we're in
-  zone = world[ch->in_room].zone;
+  auto zone_key = world[ch->in_room].zone;
+  if (DC::getInstance()->zones.contains(zone_key) == false)
+  {
+    ch->send(QString("Zone %1 not found.\r\n").arg(zone_key));
+    return eFAILURE;
+  }
+
+  Zone &zone = DC::getInstance()->zones[zone_key];
 
   // set the index of the S command in that zone
   // have to go from bottom instead of top-counting down since we could have more than
   // one 'S' at the end from deletes
   for (i = 0;
-       DC::getInstance()->zones[zone].cmd[i].command != 'S' && i < (DC::getInstance()->zones[zone].reset_total - 1);
+       zone.cmd[i].command != 'S' && i < (zone.reset_total - 1);
        i++)
     ;
   last_cmd = i;
@@ -774,16 +781,16 @@ int do_zedit(char_data *ch, char *argument, int cmd)
     }
 
     // j = i-1 because the user sees arrays starting at 1
-    for (j = i - 1; DC::getInstance()->zones[zone].cmd[j].command != 'S'; j++)
+    for (j = i - 1; zone.cmd[j].command != 'S'; j++)
     {
       auto &character_list = DC::getInstance()->character_list;
       for (auto &tmp_vict : character_list)
       {
-        if (IS_MOB(tmp_vict) && tmp_vict->mobdata && tmp_vict->mobdata->reset == &DC::getInstance()->zones[zone].cmd[j])
+        if (IS_MOB(tmp_vict) && tmp_vict->mobdata && tmp_vict->mobdata->reset == &zone.cmd[j])
         {
-          if (DC::getInstance()->zones[zone].cmd[j + 1].command != 'S')
+          if (zone.cmd[j + 1].command != 'S')
           {
-            tmp_vict->mobdata->reset = &DC::getInstance()->zones[zone].cmd[j + 1];
+            tmp_vict->mobdata->reset = &zone.cmd[j + 1];
           }
           else
           {
@@ -791,7 +798,7 @@ int do_zedit(char_data *ch, char *argument, int cmd)
           }
         }
       }
-      DC::getInstance()->zones[zone].cmd[j] = DC::getInstance()->zones[zone].cmd[j + 1];
+      zone.cmd[j] = zone.cmd[j + 1];
     }
 
     sprintf(buf, "Command %d removed.  Table reformatted.\r\n", i);
@@ -819,46 +826,46 @@ int do_zedit(char_data *ch, char *argument, int cmd)
     {
       sprintf(buf, "You must state either 'new' or the insertion point which must be between 0 and %d.\r\n"
                    "'%s' is not valid.\r\n",
-              DC::getInstance()->zones[zone].reset_total, text);
+              zone.reset_total, text);
       send_to_char(buf, ch);
       return eFAILURE;
     }
 
     // if the zone memory is full, allocate another 10 commands worth
-    if (last_cmd >= (DC::getInstance()->zones[zone].reset_total - 2))
+    if (last_cmd >= (zone.reset_total - 2))
     {
-      DC::getInstance()->zones[zone].cmd = (struct reset_com *)
-          realloc(DC::getInstance()->zones[zone].cmd, (DC::getInstance()->zones[zone].reset_total + 10) * sizeof(struct reset_com));
-      DC::getInstance()->zones[zone].reset_total += 10;
+      zone.cmd = (struct reset_com *)
+          realloc(zone.cmd, (zone.reset_total + 10) * sizeof(struct reset_com));
+      zone.reset_total += 10;
     }
 
     if (i)
     {
       // bump everything up a slot
       for (j = last_cmd; j != (i - 2); j--)
-        DC::getInstance()->zones[zone].cmd[j + 1] = DC::getInstance()->zones[zone].cmd[j];
+        zone.cmd[j + 1] = zone.cmd[j];
       // set up the 'J'
-      DC::getInstance()->zones[zone].cmd[i - 1].active = 1;
-      DC::getInstance()->zones[zone].cmd[i - 1].command = 'J';
-      DC::getInstance()->zones[zone].cmd[i - 1].if_flag = 0;
-      DC::getInstance()->zones[zone].cmd[i - 1].arg1 = 0;
-      DC::getInstance()->zones[zone].cmd[i - 1].arg2 = 0;
-      DC::getInstance()->zones[zone].cmd[i - 1].arg3 = 0;
-      DC::getInstance()->zones[zone].cmd[i - 1].comment = NULL;
+      zone.cmd[i - 1].active = 1;
+      zone.cmd[i - 1].command = 'J';
+      zone.cmd[i - 1].if_flag = 0;
+      zone.cmd[i - 1].arg1 = 0;
+      zone.cmd[i - 1].arg2 = 0;
+      zone.cmd[i - 1].arg3 = 0;
+      zone.cmd[i - 1].comment = NULL;
       sprintf(buf, "New command 'J' added at %d.\r\n", i);
     }
     else // tack it on the end
     {
       // bump the 'S' up
-      DC::getInstance()->zones[zone].cmd[last_cmd + 1] = DC::getInstance()->zones[zone].cmd[last_cmd];
+      zone.cmd[last_cmd + 1] = zone.cmd[last_cmd];
       // set up the 'J'
-      DC::getInstance()->zones[zone].cmd[last_cmd].active = 1;
-      DC::getInstance()->zones[zone].cmd[last_cmd].command = 'J';
-      DC::getInstance()->zones[zone].cmd[last_cmd].if_flag = 0;
-      DC::getInstance()->zones[zone].cmd[last_cmd].arg1 = 0;
-      DC::getInstance()->zones[zone].cmd[last_cmd].arg2 = 0;
-      DC::getInstance()->zones[zone].cmd[last_cmd].arg3 = 0;
-      DC::getInstance()->zones[zone].cmd[last_cmd].comment = NULL;
+      zone.cmd[last_cmd].active = 1;
+      zone.cmd[last_cmd].command = 'J';
+      zone.cmd[last_cmd].if_flag = 0;
+      zone.cmd[last_cmd].arg1 = 0;
+      zone.cmd[last_cmd].arg2 = 0;
+      zone.cmd[last_cmd].arg3 = 0;
+      zone.cmd[last_cmd].comment = NULL;
       sprintf(buf, "New command 'J' added at %d.\r\n", last_cmd + 1);
     }
     send_to_char(buf, ch);
@@ -866,7 +873,7 @@ int do_zedit(char_data *ch, char *argument, int cmd)
   }
   case 2: /* edit */
   {
-    do_zone_single_edit(ch, argument, zone);
+    do_zone_single_edit(ch, argument, zone_key);
     break;
   }
   case 3: /* list */
@@ -874,7 +881,7 @@ int do_zedit(char_data *ch, char *argument, int cmd)
     argument = one_argumentnolow(argument, text);
     if (!*text)
     {
-      show_zone_commands(ch, zone);
+      show_zone_commands(ch, zone_key);
     }
     else
     {
@@ -883,7 +890,7 @@ int do_zedit(char_data *ch, char *argument, int cmd)
         send_to_char("Use zedit list <number>.\r\n", ch);
         return eFAILURE;
       }
-      show_zone_commands(ch, zone, i - 1);
+      show_zone_commands(ch, zone_key, i - 1);
     }
     send_to_char("To see commands higher than 20, use zedit list <cmdnumber>.\r\n", ch);
 
@@ -899,8 +906,8 @@ int do_zedit(char_data *ch, char *argument, int cmd)
       return eFAILURE;
     }
 
-    dc_free(DC::getInstance()->zones[zone].name);
-    DC::getInstance()->zones[zone].name = str_dup(argument);
+    dc_free(zone.name);
+    zone.name = str_dup(argument);
 
     sprintf(buf, "Zone %d's name changed to '%s'.\r\n", zone, argument);
     send_to_char(buf, ch);
@@ -924,7 +931,7 @@ int do_zedit(char_data *ch, char *argument, int cmd)
       return eFAILURE;
     }
 
-    DC::getInstance()->zones[zone].lifespan = i;
+    zone.lifespan = i;
 
     sprintf(buf, "Zone %d's lifetime changed to %d.\r\n", zone, i);
     send_to_char(buf, ch);
@@ -951,11 +958,11 @@ int do_zedit(char_data *ch, char *argument, int cmd)
 
     if (!(i = atoi(text)) || i > 3)
     {
-      send_to_char("You much choose between 1 and 3.\r\n", ch);
+      send_to_char("You must choose between 1 and 3.\r\n", ch);
       return eFAILURE;
     }
 
-    DC::getInstance()->zones[zone].reset_mode = i - 1;
+    zone.reset_mode = i - 1;
 
     sprintf(buf, "Zone %d's reset mode changed to %s(%d).\r\n", zone, zone_modes[i - 1], i);
     send_to_char(buf, ch);
@@ -972,28 +979,40 @@ int do_zedit(char_data *ch, char *argument, int cmd)
 
     if (!str_cmp(text, "noclaim"))
     {
-      TOGGLE_BIT(DC::getInstance()->zones[zone].zone_flags, ZONE_NOCLAIM);
-      if (IS_SET(DC::getInstance()->zones[zone].zone_flags, ZONE_NOCLAIM))
+      zone.setNoClaim();
+      if (zone.isNoClaim())
+      {
         send_to_char("Noclaim turned on.\r\n", ch);
+      }
       else
+      {
         send_to_char("Noclaim turned off.\r\n", ch);
+      }
     }
 
     else if (!strcmp(text, "noteleport"))
     {
-      TOGGLE_BIT(DC::getInstance()->zones[zone].zone_flags, ZONE_NO_TELEPORT);
-      if (IS_SET(DC::getInstance()->zones[zone].zone_flags, ZONE_NO_TELEPORT))
+      zone.setNoTeleport();
+      if (zone.isNoTeleport())
+      {
         send_to_char("Noteleport turned on.\r\n", ch);
+      }
       else
+      {
         send_to_char("Noteleport turned off.\r\n", ch);
+      }
     }
     else if (!strcmp(text, "nohunt"))
     {
-      TOGGLE_BIT(DC::getInstance()->zones[zone].zone_flags, ZONE_NOHUNT);
-      if (IS_SET(DC::getInstance()->zones[zone].zone_flags, ZONE_NOHUNT))
+      zone.setNoHunt();
+      if (zone.isNoHunt())
+      {
         send_to_char("Nohunt turned on.\r\n", ch);
+      }
       else
+      {
         send_to_char("Nohunt turned off.\r\n", ch);
+      }
     }
     else
     {
@@ -1002,9 +1021,8 @@ int do_zedit(char_data *ch, char *argument, int cmd)
       return eFAILURE;
     }
 
-    sprintf(buf, "Zone %d's lifetime changed to %s.\r\n", zone,
-            DC::getInstance()->zones[zone].zone_flags & 1 ? "true" : "false");
-    send_to_char(buf, ch);
+    // sprintf(buf, "Zone %d's lifetime changed to %s.\r\n", zone, zone.isNoTeleport() ? "true" : "false");
+    // send_to_char(buf, ch);
     break;
   }
   case 8: /* help */
@@ -1056,37 +1074,37 @@ int do_zedit(char_data *ch, char *argument, int cmd)
     if (rmob == -1)
       rmob = -93294;
 
-    for (int k = 0; k <= top_of_zonet; k++)
+    for (auto [z_key, zone] : DC::getInstance()->zones.asKeyValueRange())
     {
-      if (!has_skill(ch, COMMAND_RANGE) && zone != k)
+      if (!has_skill(ch, COMMAND_RANGE) && z_key != zone_key)
         continue;
 
-      for (i = 0; i < DC::getInstance()->zones[k].reset_total; i++)
-        switch (DC::getInstance()->zones[k].cmd[i].command)
+      for (i = 0; i < zone.reset_total; i++)
+        switch (zone.cmd[i].command)
         {
         case 'M':
-          if (rmob == DC::getInstance()->zones[k].cmd[i].arg1)
-            csendf(ch, " Zone %d  Command %d (%c)\r\n", k, i + 1, DC::getInstance()->zones[k].cmd[i].command);
+          if (rmob == zone.cmd[i].arg1)
+            csendf(ch, " Zone %d  Command %d (%c)\r\n", zone_key, i + 1, zone.cmd[i].command);
           break;
         case 'G': // G, E, and O have obj # in arg1
         case 'E':
         case 'O':
-          if (robj == DC::getInstance()->zones[k].cmd[i].arg1)
-            csendf(ch, " Zone %d  Command %d (%c)\r\n", k, i + 1, DC::getInstance()->zones[k].cmd[i].command);
+          if (robj == zone.cmd[i].arg1)
+            csendf(ch, " Zone %d  Command %d (%c)\r\n", zone_key, i + 1, zone.cmd[i].command);
           break;
         case 'P': // P has obj # in arg1 and arg3
-          if (robj == DC::getInstance()->zones[k].cmd[i].arg1 ||
-              robj == DC::getInstance()->zones[k].cmd[i].arg3)
-            csendf(ch, " Zone %d  Command %d (%c)\r\n", k, i + 1, DC::getInstance()->zones[k].cmd[i].command);
+          if (robj == zone.cmd[i].arg1 ||
+              robj == zone.cmd[i].arg3)
+            csendf(ch, " Zone %d  Command %d (%c)\r\n", zone_key, i + 1, zone.cmd[i].command);
           break;
         case 'J': // J could be any
-          if (robj == DC::getInstance()->zones[k].cmd[i].arg1 ||
-              rmob == DC::getInstance()->zones[k].cmd[i].arg1 ||
-              robj == DC::getInstance()->zones[k].cmd[i].arg2 ||
-              rmob == DC::getInstance()->zones[k].cmd[i].arg2 ||
-              robj == DC::getInstance()->zones[k].cmd[i].arg3 ||
-              rmob == DC::getInstance()->zones[k].cmd[i].arg3)
-            csendf(ch, " Zone %d  Command %d (%c)\r\n", k, i + 1, DC::getInstance()->zones[k].cmd[i].command);
+          if (robj == zone.cmd[i].arg1 ||
+              rmob == zone.cmd[i].arg1 ||
+              robj == zone.cmd[i].arg2 ||
+              rmob == zone.cmd[i].arg2 ||
+              robj == zone.cmd[i].arg3 ||
+              rmob == zone.cmd[i].arg3)
+            csendf(ch, " Zone %d  Command %d (%c)\r\n", zone_key, i + 1, zone.cmd[i].command);
         default:
           break;
         }
@@ -1119,9 +1137,9 @@ int do_zedit(char_data *ch, char *argument, int cmd)
     // swap i and j
     struct reset_com temp_com;
 
-    temp_com = DC::getInstance()->zones[zone].cmd[i - 1];
-    DC::getInstance()->zones[zone].cmd[i - 1] = DC::getInstance()->zones[zone].cmd[j - 1];
-    DC::getInstance()->zones[zone].cmd[j - 1] = temp_com;
+    temp_com = zone.cmd[i - 1];
+    zone.cmd[i - 1] = zone.cmd[j - 1];
+    zone.cmd[j - 1] = temp_com;
 
     csendf(ch, "Commands %d and %d swapped.\r\n", i, j);
     break;
@@ -1145,42 +1163,42 @@ int do_zedit(char_data *ch, char *argument, int cmd)
     {
       sprintf(buf, "Source line must be between 0 and %d.\r\n"
                    "'%s' is not valid.\r\n",
-              DC::getInstance()->zones[zone].reset_total, text);
+              zone.reset_total, text);
       send_to_char(buf, ch);
       return eFAILURE;
     }
 
     // if the zone memory is full, allocate another 10 commands worth
-    if (last_cmd >= (DC::getInstance()->zones[zone].reset_total - 2))
+    if (last_cmd >= (zone.reset_total - 2))
     {
-      DC::getInstance()->zones[zone].cmd = (struct reset_com *)
-          realloc(DC::getInstance()->zones[zone].cmd, (DC::getInstance()->zones[zone].reset_total + 10) * sizeof(struct reset_com));
-      DC::getInstance()->zones[zone].reset_total += 10;
+      zone.cmd = (struct reset_com *)
+          realloc(zone.cmd, (zone.reset_total + 10) * sizeof(struct reset_com));
+      zone.reset_total += 10;
     }
 
-    struct reset_com tmp = DC::getInstance()->zones[zone].cmd[from];
+    struct reset_com tmp = zone.cmd[from];
     if (to)
     {
       // bump everything up a slot
       for (j = last_cmd; j != (to - 2); j--)
-        DC::getInstance()->zones[zone].cmd[j + 1] = DC::getInstance()->zones[zone].cmd[j];
+        zone.cmd[j + 1] = zone.cmd[j];
       sprintf(buf, "Command copied to %d.\r\n", to);
       to--;
     }
     else // tack it on the end
     {
       // bump the 'S' up
-      DC::getInstance()->zones[zone].cmd[last_cmd + 1] = DC::getInstance()->zones[zone].cmd[last_cmd];
+      zone.cmd[last_cmd + 1] = zone.cmd[last_cmd];
       to = last_cmd;
       sprintf(buf, "Command copied.\r\n");
     }
-    DC::getInstance()->zones[zone].cmd[to].active = tmp.active;
-    DC::getInstance()->zones[zone].cmd[to].command = tmp.command;
-    DC::getInstance()->zones[zone].cmd[to].if_flag = tmp.if_flag;
-    DC::getInstance()->zones[zone].cmd[to].arg1 = tmp.arg1;
-    DC::getInstance()->zones[zone].cmd[to].arg2 = tmp.arg2;
-    DC::getInstance()->zones[zone].cmd[to].arg3 = tmp.arg3;
-    DC::getInstance()->zones[zone].cmd[to].comment = tmp.comment;
+    zone.cmd[to].active = tmp.active;
+    zone.cmd[to].command = tmp.command;
+    zone.cmd[to].if_flag = tmp.if_flag;
+    zone.cmd[to].arg1 = tmp.arg1;
+    zone.cmd[to].arg2 = tmp.arg2;
+    zone.cmd[to].arg3 = tmp.arg3;
+    zone.cmd[to].comment = tmp.comment;
     send_to_char(buf, ch);
     break;
   }
@@ -1205,11 +1223,11 @@ int do_zedit(char_data *ch, char *argument, int cmd)
       return eFAILURE;
     }
     csendf(ch, "Success. Continent changed to %s\n\r", continent_names.at(cont).c_str());
-    DC::getInstance()->zones[zone].continent = cont;
+    zone.continent = cont;
     break;
 
   case 13:
-    show_zone_info(ch, zone);
+    zone.show_info(ch);
     break;
 
   default:
@@ -1335,7 +1353,7 @@ int do_sedit(char_data *ch, char *argument, int cmd)
     learn_skill(vict, skillnum, 1, 1);
 
     buf = fmt::format("'{}' has been given skill '{}' ({}) by {}.", GET_NAME(vict), text, skillnum, GET_NAME(ch));
-    log(buf.c_str(), GET_LEVEL(ch), LogChannels::LOG_GOD);
+    logentry(buf.c_str(), GET_LEVEL(ch), LogChannels::LOG_GOD);
     ch->send(fmt::format("'{}' has been given skill '{}' ({}) by {}.\r\n", GET_NAME(vict), text, skillnum, GET_NAME(ch)));
     break;
   }
@@ -1353,7 +1371,7 @@ int do_sedit(char_data *ch, char *argument, int cmd)
       ch->skills.erase(skillnum);
 
       buf = fmt::format("Skill '{}' ({}) removed from {} by {}.", text, skillnum, GET_NAME(vict), GET_NAME(ch));
-      log(buf.c_str(), GET_LEVEL(ch), LogChannels::LOG_GOD);
+      logentry(buf.c_str(), GET_LEVEL(ch), LogChannels::LOG_GOD);
       ch->send(fmt::format("Skill '{}' ({}) removed from {}.\r\n", text, skillnum, GET_NAME(vict)));
     }
     else
@@ -1385,7 +1403,7 @@ int do_sedit(char_data *ch, char *argument, int cmd)
     learn_skill(vict, skillnum, i, i);
 
     buf = fmt::format("'{}'s skill '{}' set to {} from {} by {}.", GET_NAME(vict), text, i, learned, GET_NAME(ch));
-    log(buf.c_str(), GET_LEVEL(ch), LogChannels::LOG_GOD);
+    logentry(buf.c_str(), GET_LEVEL(ch), LogChannels::LOG_GOD);
     ch->send(fmt::format("'{}' skill '{}' set to {} from {}.\r\n", GET_NAME(vict), text, i, learned));
     break;
   }
@@ -4749,48 +4767,51 @@ int do_oneway(char_data *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-int do_zsave(char_data *ch, char *arg, int cmd)
+command_return_t char_data::do_zsave(QStringList &arguments, int cmd)
 {
-  FILE *f = (FILE *)NULL;
-  char buf[180];
-  char buf2[180];
+  FILE *f = nullptr;
 
-  if (!can_modify_room(ch, ch->in_room))
+  if (!can_modify_room(this, in_room))
   {
-    send_to_char("You may only zsave inside of the room range you are assigned to.\r\n", ch);
+    send("You may only zsave inside of the room range you are assigned to.\r\n");
     return eFAILURE;
   }
 
-  int zone = world[ch->in_room].zone;
-
-  if (!DC::getInstance()->zones[zone].filename)
+  auto zone_key = world[in_room].zone;
+  auto &zones = DC::getInstance()->zones;
+  if (zones.contains(zone_key) == false)
   {
-    send_to_char("That zone file doesn't seem to exist...tell an imp.\r\n", ch);
+    send(QString("Current room is in zone %1 but that zone is not found out of %2 zones loaded.\r\n").arg(zone_key).arg(zones.size()));
+    return eFAILURE;
+  }
+  auto &zone = zones[zone_key];
+
+  if (zone.getFilename().isEmpty())
+  {
+    send(QString("Zone %1 has an empty filename.\r\n").arg(zone_key));
     return eFAILURE;
   }
 
-  if (!IS_SET(DC::getInstance()->zones[zone].zone_flags, ZONE_MODIFIED))
+  if (zone.isModified() == false)
   {
-    send_to_char("This zonefile has not been modified.\r\n", ch);
+    send(QString("Zone %1 has not been modified. Saving anyway.\r\n").arg(zone_key));
+  }
+
+  QString filename = QString("zonefiles/%1").arg(zone.getFilename());
+  QString command = QString("cp %1 %1.last").arg(filename);
+  system(command.toStdString().c_str());
+
+  if ((f = fopen(filename.toStdString().c_str(), "w")) == NULL)
+  {
+    cerr << QString("Couldn't open room save file %1 for %2.").arg(zone.getFilename()).arg(GET_NAME(this)).toStdString() << endl;
     return eFAILURE;
   }
 
-  sprintf(buf, "zonefiles/%s", DC::getInstance()->zones[zone].filename);
-  sprintf(buf2, "cp %s %s.last", buf, buf);
-  system(buf2);
+  zone.write(f);
 
-  if ((f = dc_fopen(buf, "w")) == NULL)
-  {
-    fprintf(stderr, "Couldn't open room save file %s for %s.\r\n",
-            DC::getInstance()->zones[zone].filename, GET_NAME(ch));
-    return eFAILURE;
-  }
-
-  write_one_zone(f, zone);
-
-  dc_fclose(f);
-  send_to_char("Saved.\r\n", ch);
-  set_zone_saved_zone(ch->in_room);
+  fclose(f);
+  send("Saved.\r\n");
+  set_zone_saved_zone(in_room);
   return eSUCCESS;
 }
 
@@ -4824,14 +4845,8 @@ int do_rsave(char_data *ch, char *arg, int cmd)
     return eFAILURE;
   }
 
-  string file = string("world/") + string(curr->filename);
-  string syscmd = string("cp ") + file + string(" ") + file + string(".last");
-  system(syscmd.c_str());
-
-  if ((f = dc_fopen(file.c_str(), "w")) == NULL)
+  if ((f = legacyFileOpen("world/%1", curr->filename, "Couldn't open room save file %1.")) == nullptr)
   {
-    fprintf(stderr, "Couldn't open room save file %s for %s.\r\n",
-            curr->filename, GET_NAME(ch));
     return eFAILURE;
   }
 
@@ -4841,7 +4856,7 @@ int do_rsave(char_data *ch, char *arg, int cmd)
   // end file
   fprintf(f, "$~\n");
 
-  dc_fclose(f);
+  fclose(f);
   send_to_char("Saved.\r\n", ch);
   set_zone_saved_world(ch->in_room);
   return eSUCCESS;
@@ -4888,14 +4903,8 @@ int do_msave(char_data *ch, char *arg, int cmd)
     return eFAILURE;
   }
 
-  sprintf(buf, "mobs/%s", curr->filename);
-  sprintf(buf2, "cp %s %s.last", buf, buf);
-  system(buf2);
-
-  if ((f = dc_fopen(buf, "w")) == NULL)
+  if ((f = legacyFileOpen("mobs/%1", curr->filename, "Couldn't open legacy mob save file %1.")) == nullptr)
   {
-    fprintf(stderr, "Couldn't open mob save file %s for %s.\r\n",
-            curr->filename, GET_NAME(ch));
     return eFAILURE;
   }
 
@@ -4905,7 +4914,7 @@ int do_msave(char_data *ch, char *arg, int cmd)
   // end file
   fprintf(f, "$~\n");
 
-  dc_fclose(f);
+  fclose(f);
   send_to_char("Saved.\r\n", ch);
   set_zone_saved_mob(curr->firstnum);
   return eSUCCESS;
@@ -4949,14 +4958,8 @@ int do_osave(char_data *ch, char *arg, int cmd)
     return eFAILURE;
   }
 
-  sprintf(buf, "objects/%s", curr->filename);
-  sprintf(buf2, "cp %s %s.last", buf, buf);
-  system(buf2);
-
-  if ((f = dc_fopen(buf, "w")) == NULL)
+  if ((f = legacyFileOpen("objects/%1", curr->filename, "Couldn't open legacy obj save file %1.")) == nullptr)
   {
-    fprintf(stderr, "Couldn't open obj save file %s for %s.\r\n",
-            curr->filename, GET_NAME(ch));
     return eFAILURE;
   }
 
@@ -4966,7 +4969,7 @@ int do_osave(char_data *ch, char *arg, int cmd)
   // end file
   fprintf(f, "$~\n");
 
-  dc_fclose(f);
+  fclose(f);
   send_to_char("Saved.\r\n", ch);
   set_zone_saved_obj(curr->firstnum);
   return eSUCCESS;
@@ -5006,7 +5009,7 @@ int do_instazone(char_data *ch, char *arg, int cmd)
   for (x = low; x <= high; x++)
   {
     room = real_room(x);
-    if (room == (-1))
+    if (room == NOWHERE)
       continue;
     found_room = TRUE;
     break;
@@ -5020,17 +5023,17 @@ int do_instazone(char_data *ch, char *arg, int cmd)
 
   sprintf(buf, "../lib/builder/%s.zon", GET_NAME(ch));
 
-  if ((fl = dc_fopen(buf, "w")) == NULL)
+  if ((fl = fopen(buf, "w")) == NULL)
   {
     send_to_char("Couldn't open up zone file. Tell Godflesh!", ch);
-    dc_fclose(fl);
+    fclose(fl);
     return eFAILURE;
   }
 
   for (x = low; x <= high; x++)
   {
     room = real_room(x);
-    if (room == (-1))
+    if (room == NOWHERE)
       continue;
     break;
   }
@@ -5046,7 +5049,7 @@ int do_instazone(char_data *ch, char *arg, int cmd)
   for (x = low; x <= high; x++)
   {
     room = real_room(x);
-    if (room == (-1))
+    if (room == NOWHERE)
       continue;
 
     for (door = 0; door <= 5; door++)
@@ -5077,7 +5080,7 @@ int do_instazone(char_data *ch, char *arg, int cmd)
   for (x = low; x <= high; x++)
   {
     room = real_room(x);
-    if (room == (-1))
+    if (room == NOWHERE)
       continue;
 
     if (world[room].contents)
@@ -5140,7 +5143,7 @@ int do_instazone(char_data *ch, char *arg, int cmd)
   for (x = low; x <= high; x++)
   {
     room = real_room(x);
-    if (room == (-1))
+    if (room == NOWHERE)
       continue;
 
     if (world[room].people)
@@ -5271,7 +5274,7 @@ int do_instazone(char_data *ch, char *arg, int cmd)
   }           /* end of for loop going through the zone looking for mobs...  */
 
   fprintf(fl, "S\n");
-  dc_fclose(fl);
+  fclose(fl);
   send_to_char("Zone File Created! Tell someone who can put it in!\n\r", ch);
   return eSUCCESS;
 }
@@ -5281,7 +5284,7 @@ int do_rstat(char_data *ch, char *argument, int cmd)
   char arg1[MAX_STRING_LENGTH];
   char buf[MAX_STRING_LENGTH * 2];
   char buf2[MAX_STRING_LENGTH];
-  struct room_data *rm = 0;
+  class room_data *rm = 0;
   char_data *k = 0;
   struct obj_data *j = 0;
   struct extra_descr_data *desc;
@@ -5301,7 +5304,7 @@ int do_rstat(char_data *ch, char *argument, int cmd)
   else
   {
     x = atoi(arg1);
-    if (x < 0 || (loc = real_room(x)) == (-1))
+    if (x < 0 || (loc = real_room(x)) == NOWHERE)
     {
       send_to_char("No such room exists.\r\n", ch);
       return eFAILURE;
@@ -5312,7 +5315,7 @@ int do_rstat(char_data *ch, char *argument, int cmd)
   {
     send_to_char("And you are rstating a clan room because?\r\n", ch);
     sprintf(buf, "%s just rstat'd clan room %d.", GET_NAME(ch), rm->number);
-    log(buf, PATRON, LogChannels::LOG_GOD);
+    logentry(buf, PATRON, LogChannels::LOG_GOD);
     return eFAILURE;
   }
   sprintf(buf,
@@ -5475,7 +5478,7 @@ int do_possess(char_data *ch, char *argument, int cmd)
       {
         send_to_char("Ok.\r\n", ch);
         sprintf(buf, "%s possessed %s", GET_NAME(ch), GET_NAME(victim));
-        log(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
+        logentry(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
         ch->pcdata->possesing = 1;
         ch->desc->character = victim;
         ch->desc->original = ch;
@@ -5707,7 +5710,7 @@ int do_punish(char_data *ch, char *arg, int cmd)
       send_to_char("You feel a sudden onslaught of wisdom!\n\r", vict);
       send_to_char("STUPID removed.\r\n", ch);
       sprintf(buf, "%s removes %s's stupid", GET_NAME(ch), GET_NAME(vict));
-      log(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
+      logentry(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
       REMOVE_BIT(vict->pcdata->punish, PUNISH_STUPID);
       REMOVE_BIT(vict->pcdata->punish, PUNISH_SILENCED);
       REMOVE_BIT(vict->pcdata->punish, PUNISH_NOEMOTE);
@@ -5722,7 +5725,7 @@ int do_punish(char_data *ch, char *arg, int cmd)
       send_to_char(buf, vict);
       send_to_char("STUPID set.\r\n", ch);
       sprintf(buf, "%s lobotimized %s", GET_NAME(ch), GET_NAME(vict));
-      log(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
+      logentry(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
       SET_BIT(vict->pcdata->punish, PUNISH_STUPID);
       SET_BIT(vict->pcdata->punish, PUNISH_SILENCED);
       SET_BIT(vict->pcdata->punish, PUNISH_NOEMOTE);
@@ -5738,7 +5741,7 @@ int do_punish(char_data *ch, char *arg, int cmd)
                    vict);
       send_to_char("SILENCE removed.\r\n", ch);
       sprintf(buf, "%s removes %s's silence", GET_NAME(ch), GET_NAME(vict));
-      log(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
+      logentry(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
     }
     else
     {
@@ -5746,7 +5749,7 @@ int do_punish(char_data *ch, char *arg, int cmd)
       send_to_char(buf, vict);
       send_to_char("SILENCE set.\r\n", ch);
       sprintf(buf, "%s silenced %s", GET_NAME(ch), GET_NAME(vict));
-      log(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
+      logentry(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
     }
     TOGGLE_BIT(vict->pcdata->punish, PUNISH_SILENCED);
   }
@@ -5757,7 +5760,7 @@ int do_punish(char_data *ch, char *arg, int cmd)
       send_to_char("You now can do things again.\r\n", vict);
       send_to_char("FREEZE removed.\r\n", ch);
       sprintf(buf, "%s unfrozen by %s", GET_NAME(vict), GET_NAME(ch));
-      log(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
+      logentry(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
     }
     else
     {
@@ -5765,7 +5768,7 @@ int do_punish(char_data *ch, char *arg, int cmd)
       send_to_char(buf, vict);
       send_to_char("FREEZE set.\r\n", ch);
       sprintf(buf, "%s frozen by %s", GET_NAME(vict), GET_NAME(ch));
-      log(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
+      logentry(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
     }
     TOGGLE_BIT(vict->pcdata->punish, PUNISH_FREEZE);
   }
@@ -5854,7 +5857,7 @@ int do_punish(char_data *ch, char *arg, int cmd)
         send_to_char("The gods remove your poor luck.\r\n", vict);
       send_to_char("UNLUCKY removed.\r\n", ch);
       sprintf(buf, "%s removes %s's unlucky.", GET_NAME(ch), GET_NAME(vict));
-      log(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
+      logentry(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
     }
     else
     {
@@ -5865,7 +5868,7 @@ int do_punish(char_data *ch, char *arg, int cmd)
       }
       send_to_char(buf, vict);
       sprintf(buf, "%s makes %s unlucky.", GET_NAME(ch), GET_NAME(vict));
-      log(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
+      logentry(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
     }
     TOGGLE_BIT(vict->pcdata->punish, PUNISH_UNLUCKY);
   }

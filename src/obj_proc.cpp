@@ -113,7 +113,7 @@ void load_emoting_objects()
        done2 = false;
   short offset;
 
-  fl = dc_fopen(EMOTING_FILE, "r");
+  fl = fopen(EMOTING_FILE, "r");
 #ifdef LEAK_CHECK
   obj_emote_head.next = (struct obj_emote_index *)
       calloc(1, sizeof(struct obj_emote_index));
@@ -124,7 +124,7 @@ void load_emoting_objects()
   index_cursor = obj_emote_head.next;
   index_cursor->next = NULL;
   index_cursor->data = NULL;
-  index_cursor->room_number = -1;
+  index_cursor->room_number = NOWHERE;
   index_cursor->emote_index_length = -1;
   index_cursor->frequency = 0;
 #ifdef LEAK_CHECK
@@ -192,14 +192,14 @@ void load_emoting_objects()
       index_cursor->data = (struct obj_emote_data *)
           dc_alloc(1, sizeof(struct obj_emote_data));
 #endif
-      index_cursor->room_number = -1;
+      index_cursor->room_number = NOWHERE;
       index_cursor->emote_index_length = -1;
       index_cursor->frequency = -1;
       data_cursor = index_cursor->data;
       data_cursor->next = NULL;
     }
   }
-  dc_fclose(fl);
+  fclose(fl);
   return;
 }
 
@@ -1844,7 +1844,7 @@ int stupid_message(char_data *ch, struct obj_data *obj, int cmd, const char *arg
   if (!obj || obj->in_room < 0)
     return eFAILURE;
 
-  if (!DC::getInstance()->zones[world[obj->in_room].zone].players)
+  if (!DC::getInstance()->zones.value(world[obj->in_room].zone).players)
     return eFAILURE;
 
   if (number(1, 10) == 1)
@@ -2431,7 +2431,7 @@ int szrildor_pass(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
         break;
       }
     }
-    if (first && real_room(30000) != -1)
+    if (first && real_room(30000) != NOWHERE)
     {
       int zone = world[real_room(30000)].zone;
       auto &character_list = DC::getInstance()->character_list;
@@ -2466,7 +2466,8 @@ int szrildor_pass(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
           }
         }
       }
-      reset_zone(world[real_room(30000)].zone);
+
+      DC::resetZone(world[real_room(30000)].zone);
     }
   }
 
@@ -2617,10 +2618,16 @@ int moving_portals(char_data *ch, struct obj_data *obj, int cmd,
   if (obj->obj_flags.timer <= 0)
   {
     obj->obj_flags.timer = time;
+    uint64_t tries = 0;
     while ((room = number(low, high)))
     {
+      // Give up after 100 tries
+      if (tries++ > 100)
+      {
+        break;
+      }
       bool portal = FALSE;
-      if (real_room(room) < 0)
+      if (real_room(room) == NOWHERE)
         continue;
       if (sector)
         if (world[real_room(room)].sector_type != sector)
@@ -2632,6 +2639,13 @@ int moving_portals(char_data *ch, struct obj_data *obj, int cmd,
       if (!portal)
         break;
     } // Find a room
+
+    // Give up after 100 tries
+    if (tries > 100)
+    {
+      return eFAILURE;
+    }
+
     send_to_room(msg1, obj->in_room, TRUE);
     obj_from_room(obj);
     obj_to_room(obj, room);
@@ -3913,7 +3927,7 @@ int exploding_mortar_shells(char_data *ch, struct obj_data *obj, int cmd, const 
 
   if (obj->in_room <= 0)
   {
-    log("Mortar round without a room?", IMMORTAL, LogChannels::LOG_BUG);
+    logentry("Mortar round without a room?", IMMORTAL, LogChannels::LOG_BUG);
     extract_obj(obj);
     return eFAILURE;
   }

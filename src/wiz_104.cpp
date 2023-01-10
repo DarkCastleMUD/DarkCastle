@@ -228,7 +228,7 @@ int do_load(char_data *ch, char *arg, int cmd)
 	{
 	default:
 		send_to_char("Problem...fuck up in do_load.\r\n", ch);
-		log("Default in do_load...should NOT happen.", ANGEL, LogChannels::LOG_BUG);
+		logentry("Default in do_load...should NOT happen.", ANGEL, LogChannels::LOG_BUG);
 		return eFAILURE;
 	case 0: /* mobile */
 		if ((number = number_or_name(&c, &num)) == 0)
@@ -437,56 +437,54 @@ char *dirNumToChar(int dir)
 	return "ERROR";
 }
 
-int show_zone_info(char_data *ch, int i)
+int Zone::show_info(char_data *ch)
 {
-	if (i > top_of_zonet)
-	{
-		send_to_char("There is no such zone.\r\n", ch);
-		return eFAILURE;
-	}
-
 	char buf[MAX_STRING_LENGTH];
 
 	string continent_name;
-	if (DC::getInstance()->zones[i].continent && (unsigned)DC::getInstance()->zones[i].continent < continent_names.size())
-		continent_name = continent_names.at(DC::getInstance()->zones[i].continent);
+	if (continent && (unsigned)continent < continent_names.size())
+		continent_name = continent_names.at(continent);
 
-	sprintf(buf, "$3Name:$R %s\r\n"
-				 "$3Starts:$R    %6d $3Ends:$R  %13d     $3Continent:$R %s\n\r"
-				 "$3Lifetime:$R  %6d $3Age:$R   %13d     $3Left:$R   %6d\r\n"
-				 "$3PC'sInZone:$R  %4d $3Mode:$R %-18s $3Last full reset:$R %s %s\r\n"
-				 "$3Flags:$R ",
-			DC::getInstance()->zones[i].name,
-			(i ? (DC::getInstance()->zones[i - 1].top + 1) : 0),
-			DC::getInstance()->zones[i].top,
-			continent_name.c_str(),
-			DC::getInstance()->zones[i].lifespan,
-			DC::getInstance()->zones[i].age,
-			DC::getInstance()->zones[i].lifespan - DC::getInstance()->zones[i].age,
-			DC::getInstance()->zones[i].players,
-			zone_modes[DC::getInstance()->zones[i].reset_mode],
-			DC::getInstance()->zones[i].last_full_reset.toLocalTime().toString().toStdString().c_str(),
-			DC::getInstance()->zones[i].last_full_reset.toLocalTime().timeZoneAbbreviation().toStdString().c_str());
+	ch->send(QString("$3Name:$R %1\r\n"
+					 "$3Filename:$R %2\r\n"
+					 "$3Starts:$R    %3 $3Ends:$R  %4     $3Continent:$R %5\n\r"
+					 "$3Starts:$R    %6 $3Ends:$R  %7\n\r"
+					 "$3Lifetime:$R  %8 $3Age:$R   %9     $3Left:$R   %10\r\n"
+					 "$3PC'sInZone:$R  %11 $3Mode:$R %12 $3Last full reset:$R %13 %14\r\n"
+					 "$3Flags:$R ")
+				 .arg(name)
+				 .arg(filename)
+				 .arg(bottom, 6)
+				 .arg(top, 13)
+				 .arg(continent_name.c_str())
+				 .arg(bottom_rnum, 6)
+				 .arg(top_rnum, 13)
+				 .arg(lifespan, 6)
+				 .arg(age, 13)
+				 .arg(lifespan - age, 6)
+				 .arg(players, 4)
+				 .arg(zone_modes[reset_mode], -18)
+				 .arg(last_full_reset.toLocalTime().toString().toStdString().c_str())
+				 .arg(last_full_reset.toLocalTime().timeZoneAbbreviation().toStdString().c_str()));
 
-	send_to_char(buf, ch);
-	sprintbit(DC::getInstance()->zones[i].zone_flags, zone_bits, buf);
+	sprintbit(zone_flags, zone_bits, buf);
 	send_to_char(buf, ch);
 	sprintf(buf, "\r\n"
 				 "$3MobsLastPop$R:  %3d $3DeathCounter$R: %6d     $3ReduceCounter$R: %d\r\n"
 				 "$3DiedThisTick$R: %3d $3Repops without Deaths$R: %d $3Repops with bonus$R: %d\r\n",
-			DC::getInstance()->zones[i].num_mob_on_repop,
-			DC::getInstance()->zones[i].death_counter,
-			DC::getInstance()->zones[i].counter_mod,
-			DC::getInstance()->zones[i].died_this_tick,
-			DC::getInstance()->zones[i].repops_without_deaths,
-			DC::getInstance()->zones[i].repops_with_bonus);
+			num_mob_on_repop,
+			death_counter,
+			counter_mod,
+			died_this_tick,
+			repops_without_deaths,
+			repops_with_bonus);
 	send_to_char(buf, ch);
 	send_to_char("\r\n", ch);
 
 	return eSUCCESS;
 }
 
-int show_zone_commands(char_data *ch, int i, int start)
+int show_zone_commands(char_data *ch, int zone_key, int start)
 {
 	char buf[MAX_STRING_LENGTH];
 	int k = 0;
@@ -495,18 +493,21 @@ int show_zone_commands(char_data *ch, int i, int start)
 	if (start < 0)
 		start = 0;
 
-	if (i > top_of_zonet)
+	if (DC::getInstance()->zones.contains(zone_key) == false)
 	{
-		send_to_char("There is no such zone.\r\n", ch);
+		ch->send(QString("Zone %1 not found.\r\n").arg(zone_key));
 		return eFAILURE;
 	}
-	if (DC::getInstance()->zones[i].cmd[0].command == 'S')
+
+	auto &zone = DC::getInstance()->zones[zone_key];
+
+	if (zone.cmd[0].command == 'S')
 	{
 		send_to_char("This zone has no zone commands.\r\n", ch);
 		return eFAILURE;
 	}
 
-	for (k = 0; DC::getInstance()->zones[i].cmd[k].command != 'S'; k++)
+	for (k = 0; zone.cmd[k].command != 'S'; k++)
 		;
 
 	if (k < start)
@@ -522,24 +523,24 @@ int show_zone_commands(char_data *ch, int i, int start)
 		num_to_show = 20;
 
 	// show zone cmds
-	for (int j = start; (j < start + num_to_show) && (DC::getInstance()->zones[i].cmd[j].command != 'S'); j++)
+	for (int j = start; (j < start + num_to_show) && (zone.cmd[j].command != 'S'); j++)
 	{
-		time_t last = DC::getInstance()->zones[i].cmd[j].last;
+		time_t last = zone.cmd[j].last;
 		string lastStr = "never";
 		if (last)
 		{
 			lastStr = fmt::format("{:%Y-%m-%d %H:%M:%S}", fmt::localtime(last));
 		}
 
-		time_t lastSuccess = DC::getInstance()->zones[i].cmd[j].lastSuccess;
+		time_t lastSuccess = zone.cmd[j].lastSuccess;
 		string lastSuccessStr = "never";
 		if (lastSuccess)
 		{
 			lastSuccessStr = fmt::format("{:%Y-%m-%d %H:%M:%S}", fmt::localtime(lastSuccess));
 		}
 
-		uint64_t attempts = DC::getInstance()->zones[i].cmd[j].attempts;
-		uint64_t successes = DC::getInstance()->zones[i].cmd[j].successes;
+		uint64_t attempts = zone.cmd[j].attempts;
+		uint64_t successes = zone.cmd[j].successes;
 		double successRate = 0.0;
 		if (attempts > 0)
 		{
@@ -549,12 +550,12 @@ int show_zone_commands(char_data *ch, int i, int start)
 		// show command # and if_flag
 		// note that we show the command as cmd+1.  This is so we don't have a
 		// command 0 from the user's perspective.
-		if (DC::getInstance()->zones[i].cmd[j].command == '*')
+		if (zone.cmd[j].command == '*')
 		{
 			sprintf(buf, "[%3d] Comment: ", j + 1);
 		}
 		else
-			switch (DC::getInstance()->zones[i].cmd[j].if_flag)
+			switch (zone.cmd[j].if_flag)
 			{
 			case 0:
 				sprintf(buf, "[%3d] Always ", j + 1);
@@ -587,78 +588,78 @@ int show_zone_commands(char_data *ch, int i, int start)
 				sprintf(buf, "[%3d] $B$4Ls$R%%%%$B$4Fl$R ", j + 1);
 				break;
 			default:
-				sprintf(buf, "[%3d] $B$4ERROR(%d)$R", j + 1, DC::getInstance()->zones[i].cmd[j].if_flag);
+				sprintf(buf, "[%3d] $B$4ERROR(%d)$R", j + 1, zone.cmd[j].if_flag);
 				break;
 			}
 		int virt;
-#define ZCMD DC::getInstance()->zones[i].cmd[j]
-		switch (DC::getInstance()->zones[i].cmd[j].command)
+#define ZCMD zone.cmd[j]
+		switch (zone.cmd[j].command)
 		{
 		case 'M':
 			virt = ZCMD.active ? mob_index[ZCMD.arg1].virt : ZCMD.arg1;
 			sprintf(buf, "%s $B$1Load mob  [%5d] ", buf, virt);
-			if (DC::getInstance()->zones[i].cmd[j].arg2 == -1)
+			if (zone.cmd[j].arg2 == -1)
 				strcat(buf, "(  always ) in room ");
 			else
-				sprintf(buf, "%s(if< [%3d]) in room ", buf, DC::getInstance()->zones[i].cmd[j].arg2);
-			sprintf(buf, "%s[%5d].$R", buf, DC::getInstance()->zones[i].cmd[j].arg3);
+				sprintf(buf, "%s(if< [%3d]) in room ", buf, zone.cmd[j].arg2);
+			sprintf(buf, "%s[%5d].$R", buf, zone.cmd[j].arg3);
 			if (ch && !str_cmp(ch->name, "Urizen"))
 			{
 				sprintf(buf, "%s [%d] [%d] %s", buf,
-						DC::getInstance()->zones[i].cmd[j].lastPop ? 1 : 0, charExists(DC::getInstance()->zones[i].cmd[j].lastPop),
-						charExists(DC::getInstance()->zones[i].cmd[j].lastPop) ? GET_SHORT(DC::getInstance()->zones[i].cmd[j].lastPop) : "Unknown");
+						zone.cmd[j].lastPop ? 1 : 0, charExists(zone.cmd[j].lastPop),
+						charExists(zone.cmd[j].lastPop) ? GET_SHORT(zone.cmd[j].lastPop) : "Unknown");
 			}
 			sprintf(buf, "%s\r\n", buf);
 			break;
 		case 'O':
 			virt = ZCMD.active ? obj_index[ZCMD.arg1].virt : ZCMD.arg1;
 			sprintf(buf, "%s $BLoad obj  [%5d] ", buf, virt);
-			if (DC::getInstance()->zones[i].cmd[j].arg2 == -1)
+			if (zone.cmd[j].arg2 == -1)
 				strcat(buf, "(  always ) in room ");
 			else
-				sprintf(buf, "%s(if< [%3d]) in room ", buf, DC::getInstance()->zones[i].cmd[j].arg2);
+				sprintf(buf, "%s(if< [%3d]) in room ", buf, zone.cmd[j].arg2);
 			//      sprintf(buf, "%s[%5d].$R\r\n", buf,
-			// world[DC::getInstance()->zones[i].cmd[j].arg3].number);
-			sprintf(buf, "%s[%5d].$R\r\n", buf, DC::getInstance()->zones[i].cmd[j].arg3);
+			// world[zone.cmd[j].arg3].number);
+			sprintf(buf, "%s[%5d].$R\r\n", buf, zone.cmd[j].arg3);
 			break;
 		case 'P':
 			virt = ZCMD.active ? obj_index[ZCMD.arg1].virt : ZCMD.arg1;
 			sprintf(buf, "%s $5Place obj [%5d] ", buf, virt);
-			if (DC::getInstance()->zones[i].cmd[j].arg2 == -1)
+			if (zone.cmd[j].arg2 == -1)
 				strcat(buf, "(  always ) in objt ");
 			else
-				sprintf(buf, "%s(if< [%3d]) in objt ", buf, DC::getInstance()->zones[i].cmd[j].arg2);
+				sprintf(buf, "%s(if< [%3d]) in objt ", buf, zone.cmd[j].arg2);
 			virt = ZCMD.active ? obj_index[ZCMD.arg3].virt : ZCMD.arg3;
 			sprintf(buf, "%s[%5d] (in last created).$R\r\n", buf, virt);
 			break;
 		case 'G':
 			virt = ZCMD.active ? obj_index[ZCMD.arg1].virt : ZCMD.arg1;
 			sprintf(buf, "%s $6Place obj [%5d] ", buf, virt);
-			if (DC::getInstance()->zones[i].cmd[j].arg2 == -1)
+			if (zone.cmd[j].arg2 == -1)
 				strcat(buf, "(  always ) on last mob loaded.$R\r\n");
 			else
-				sprintf(buf, "%s(if< [%3d]) on last mob loaded.$R\r\n", buf, DC::getInstance()->zones[i].cmd[j].arg2);
+				sprintf(buf, "%s(if< [%3d]) on last mob loaded.$R\r\n", buf, zone.cmd[j].arg2);
 			break;
 		case 'E':
 			virt = ZCMD.active ? obj_index[ZCMD.arg1].virt : ZCMD.arg1;
 			sprintf(buf, "%s $2Equip obj [%5d] ", buf, virt);
-			if (DC::getInstance()->zones[i].cmd[j].arg2 == -1)
+			if (zone.cmd[j].arg2 == -1)
 				strcat(buf, "(  always ) on last mob on ");
 			else
-				sprintf(buf, "%s(if< [%3d]) on last mob on ", buf, DC::getInstance()->zones[i].cmd[j].arg2);
-			if (DC::getInstance()->zones[i].cmd[j].arg3 > MAX_WEAR - 1 ||
-				DC::getInstance()->zones[i].cmd[j].arg3 < 0)
-				sprintf(buf, "%s[%d](InvalidArg3).$R\r\n", buf, DC::getInstance()->zones[i].cmd[j].arg3);
+				sprintf(buf, "%s(if< [%3d]) on last mob on ", buf, zone.cmd[j].arg2);
+			if (zone.cmd[j].arg3 > MAX_WEAR - 1 ||
+				zone.cmd[j].arg3 < 0)
+				sprintf(buf, "%s[%d](InvalidArg3).$R\r\n", buf, zone.cmd[j].arg3);
 			else
-				sprintf(buf, "%s[%d](%s).$R\r\n", buf, DC::getInstance()->zones[i].cmd[j].arg3,
-						equipment_types[DC::getInstance()->zones[i].cmd[j].arg3]);
+				sprintf(buf, "%s[%d](%s).$R\r\n", buf, zone.cmd[j].arg3,
+						equipment_types[zone.cmd[j].arg3]);
 			break;
 		case 'D':
 			sprintf(buf, "%s $3Room [%5d] Dir: [%s]", buf,
-					DC::getInstance()->zones[i].cmd[j].arg1,
-					dirNumToChar(DC::getInstance()->zones[i].cmd[j].arg2));
+					zone.cmd[j].arg1,
+					dirNumToChar(zone.cmd[j].arg2));
 
-			switch (DC::getInstance()->zones[i].cmd[j].arg3)
+			switch (zone.cmd[j].arg3)
 			{
 			case 0:
 				strcat(buf, "Unlock/Open$R\r\n");
@@ -676,23 +677,23 @@ int show_zone_commands(char_data *ch, int i, int start)
 			break;
 		case '%':
 			sprintf(buf, "%s Consider myself true on %d times out of %d.\r\n", buf,
-					DC::getInstance()->zones[i].cmd[j].arg1,
-					DC::getInstance()->zones[i].cmd[j].arg2);
+					zone.cmd[j].arg1,
+					zone.cmd[j].arg2);
 
 			break;
 		case 'J':
 			sprintf(buf, "%s Temp Command. [%d] [%d] [%d]\r\n", buf,
-					DC::getInstance()->zones[i].cmd[j].arg1,
-					DC::getInstance()->zones[i].cmd[j].arg2,
-					DC::getInstance()->zones[i].cmd[j].arg3);
+					zone.cmd[j].arg1,
+					zone.cmd[j].arg2,
+					zone.cmd[j].arg3);
 			break;
 		case '*':
 			sprintf(buf, "%s %s\r\n", buf,
-					DC::getInstance()->zones[i].cmd[j].comment ? DC::getInstance()->zones[i].cmd[j].comment : "Empty Comment");
+					zone.cmd[j].comment ? zone.cmd[j].comment : "Empty Comment");
 			break;
 		case 'K':
 			sprintf(buf, "%s Skip next [%d] commands.\r\n", buf,
-					DC::getInstance()->zones[i].cmd[j].arg1);
+					zone.cmd[j].arg1);
 			break;
 		case 'X':
 		{
@@ -703,7 +704,7 @@ int show_zone_commands(char_data *ch, int i, int start)
 			char xstrerror[] = "Illegal value in arg1.";
 			char *xresultstr;
 
-			switch (DC::getInstance()->zones[i].cmd[j].arg1)
+			switch (zone.cmd[j].arg1)
 			{
 			case 0:
 				xresultstr = xstrone;
@@ -723,21 +724,21 @@ int show_zone_commands(char_data *ch, int i, int start)
 			}
 
 			sprintf(buf, "%s [%d] %s\r\n", buf,
-					DC::getInstance()->zones[i].cmd[j].arg1, xresultstr);
+					zone.cmd[j].arg1, xresultstr);
 		}
 		break;
 		default:
 			sprintf(buf, "Illegal Command: %c %d %d %d %d\r\n",
-					DC::getInstance()->zones[i].cmd[j].command,
-					DC::getInstance()->zones[i].cmd[j].if_flag,
-					DC::getInstance()->zones[i].cmd[j].arg1,
-					DC::getInstance()->zones[i].cmd[j].arg2,
-					DC::getInstance()->zones[i].cmd[j].arg3);
+					zone.cmd[j].command,
+					zone.cmd[j].if_flag,
+					zone.cmd[j].arg1,
+					zone.cmd[j].arg2,
+					zone.cmd[j].arg3);
 			break;
 		} // switch
 
-		if (DC::getInstance()->zones[i].cmd[j].comment && DC::getInstance()->zones[i].cmd[j].command != '*')
-			sprintf(buf, "%s       %s\r\n", buf, DC::getInstance()->zones[i].cmd[j].comment);
+		if (zone.cmd[j].comment && zone.cmd[j].command != '*')
+			sprintf(buf, "%s       %s\r\n", buf, zone.cmd[j].comment);
 
 		send_to_char(buf, ch);
 		csendf(ch, "[%3d] Last attempt: $B%s$R Last success: $B%s$R Average: $B%.2f$R\r\n", j + 1, lastStr.c_str(), lastSuccessStr.c_str(), successRate * 100.0);
@@ -755,6 +756,42 @@ int find_file(world_file_list_item *itm, int high)
 		if (tmp->lastnum / 100 == high / 100)
 			return i;
 	return -1;
+}
+
+void show_legacy_files(char_data *ch, world_file_list_item *head)
+{
+	world_file_list_item *curr = head;
+	uint64_t i = 0;
+
+	ch->send("ID ) Filename                       Begin  End\r\n"
+			 "----------------------------------------------------------\r\n");
+
+	while (curr != nullptr)
+	{
+		QString file_in_progress, file_ready, file_approved, file_modified;
+		if (IS_SET(curr->flags, WORLD_FILE_IN_PROGRESS))
+		{
+			file_in_progress = "$B$1*$R";
+		}
+
+		if (IS_SET(curr->flags, WORLD_FILE_READY))
+		{
+			file_ready = "$B$5*$R";
+		}
+
+		if (IS_SET(curr->flags, WORLD_FILE_APPROVED))
+		{
+			file_approved = "$B$2*$R";
+		}
+
+		if (IS_SET(curr->flags, WORLD_FILE_MODIFIED))
+		{
+			file_modified = "MODIFIED";
+		}
+
+		ch->send(QString("%1) %2 %3 %4 %5%6%7 %8\r\n").arg(i++, 3).arg(curr->filename, -30).arg(curr->firstnum, -6).arg(curr->lastnum, -6).arg(file_in_progress, 1).arg(file_ready, 1).arg(file_approved, 1).arg(file_modified));
+		curr = curr->next;
+	}
 }
 
 int do_show(char_data *ch, char *argument, int cmd)
@@ -1095,33 +1132,29 @@ int do_show(char_data *ch, char *argument, int cmd)
 		if (!isdigit(*name)) /* show them all */
 		{
 			send_to_char(
-				"Num  Range Start-End (Usage Start-End) Rooms  Name\r\n"
-				"---  ------------------------- -----  ----------------------\r\n",
+				"     Range        Usage\r\n"
+				"Num  Start-End    Start-End    Rooms   Name\r\n"
+				//	 174  31900-32100  32001-32079   78   the Battle of Troy
+				"---  -----------  -----------  -----  ----------------------\r\n",
 				ch);
-			for (i = 0; i <= top_of_zone_table; i++)
+			for (auto [zone_key, zone] : DC::getInstance()->zones.asKeyValueRange())
 			{
-				int range_start = (i ? (DC::getInstance()->zones[i - 1].top + 1) : 0);
-				int range_end = DC::getInstance()->zones[i].top;
+				room_t range_start = zone.getBottom();
+				room_t range_end = zone.getTop();
 				int num = count_rooms(range_start, range_end);
 
-				sprintf(buf, "%3d  %5d-%-5d $0$B(%5d-%-5d) %5d$R  %s$R\r\n", i,
-						(i ? (DC::getInstance()->zones[i - 1].top + 1) : 0),
-						DC::getInstance()->zones[i].top,
-						DC::getInstance()->zones[i].bottom_rnum, DC::getInstance()->zones[i].top_rnum,
-						num,
-						DC::getInstance()->zones[i].name);
-				send_to_char(buf, ch);
+				ch->send(QString("%1  %2-%3  $0$B%4-%5  %6$R  %7$R\r\n").arg(zone_key, 3).arg(zone.getBottom(), 5).arg(zone.getTop(), -5).arg(zone.getRealBottom(), 5).arg(zone.getRealTop(), -5).arg(num, 5).arg(zone.name));
 			}
 		}
 		else /* was a digit */
 		{
 			i = atoi(name);
-			if ((!i && *name != '0') || i < 0)
+			if ((!i && *name != '0') || i < 0 || DC::getInstance()->zones.contains(i) == false)
 			{
 				send_to_char("Which zone was that?\r\n", ch);
 				return eFAILURE;
 			}
-			show_zone_commands(ch, i);
+			DC::getInstance()->zones.value(i).show_info(ch);
 
 		} // else was a digit
 	}	  // zone
@@ -1173,13 +1206,15 @@ int do_show(char_data *ch, char *argument, int cmd)
 				ch);
 			return eSUCCESS;
 		}
-		if (zon > top_of_zone_table)
+		room_t last_room = DC::getInstance()->zones.lastKey();
+		if (zon > last_room)
 		{
-			send_to_char("Unknown zone.\r\n", ch);
+
+			ch->send(QString("Unknown zone. Zone %1 is greater than last valid zone %2.\r\n").arg(zon).arg(last_room));
 			return eFAILURE;
 		}
 		char buf[MAX_INPUT_LENGTH];
-		for (i = DC::getInstance()->zones[zon].bottom_rnum; i < DC::getInstance()->zones[zon].top_rnum;
+		for (i = DC::getInstance()->zones.value(zon).getRealBottom(); i < DC::getInstance()->zones.value(zon).getRealTop();
 			 i++)
 		{
 			if (!world_array[i])
@@ -1724,63 +1759,15 @@ int do_show(char_data *ch, char *argument, int cmd)
 	}
 	else if (is_abbrev(type, "rfiles") && has_range)
 	{
-		curr = world_file_list;
-		i = 0;
-		send_to_char(
-			"ID ) Filename                       Begin  End\r\n"
-			"----------------------------------------------------------\r\n",
-			ch);
-		while (curr)
-		{
-			sprintf(buf, "%3d) %-30s %-6ld %-6ld %1s%1s%1s %s\r\n", i++,
-					curr->filename, curr->firstnum, curr->lastnum,
-					IS_SET(curr->flags, WORLD_FILE_IN_PROGRESS) ? "$B$1*$R" : " ",
-					IS_SET(curr->flags, WORLD_FILE_READY) ? "$B$5*$R" : " ",
-					IS_SET(curr->flags, WORLD_FILE_APPROVED) ? "$B$2*$R" : " ",
-					IS_SET(curr->flags, WORLD_FILE_MODIFIED) ? "MODIFIED" : "");
-			send_to_char(buf, ch);
-			curr = curr->next;
-		}
+		show_legacy_files(ch, world_file_list);
 	}
 	else if (is_abbrev(type, "mfiles") && has_range)
 	{
-		curr = mob_file_list;
-		i = 0;
-		send_to_char(
-			"ID ) Filename                       Begin  End\r\n"
-			"----------------------------------------------------------\r\n",
-			ch);
-		while (curr)
-		{
-			sprintf(buf, "%3d) %-30s %-6ld %-6ld %1s%1s%1s %s\r\n", i++,
-					curr->filename, curr->firstnum, curr->lastnum,
-					IS_SET(curr->flags, WORLD_FILE_IN_PROGRESS) ? "$B$1*$R" : " ",
-					IS_SET(curr->flags, WORLD_FILE_READY) ? "$B$5*$R" : " ",
-					IS_SET(curr->flags, WORLD_FILE_APPROVED) ? "$B$2*$R" : " ",
-					IS_SET(curr->flags, WORLD_FILE_MODIFIED) ? "MODIFIED" : "");
-			send_to_char(buf, ch);
-			curr = curr->next;
-		}
+		show_legacy_files(ch, mob_file_list);
 	}
 	else if (is_abbrev(type, "ofiles") && has_range)
 	{
-		curr = obj_file_list;
-		i = 0;
-		send_to_char(
-			"ID ) Filename                       Begin  End\r\n"
-			"----------------------------------------------------------\r\n",
-			ch);
-		while (curr)
-		{
-			sprintf(buf, "%3d) %-30s %-6ld %-6ld %1s%1s%1s %s\r\n", i++,
-					curr->filename, curr->firstnum, curr->lastnum,
-					IS_SET(curr->flags, WORLD_FILE_IN_PROGRESS) ? "$B$1*$R" : " ",
-					IS_SET(curr->flags, WORLD_FILE_READY) ? "$B$5*$R" : " ",
-					IS_SET(curr->flags, WORLD_FILE_APPROVED) ? "$B$2*$R" : " ",
-					IS_SET(curr->flags, WORLD_FILE_MODIFIED) ? "MODIFIED" : "");
-			send_to_char(buf, ch);
-			curr = curr->next;
-		}
+		show_legacy_files(ch, obj_file_list);
 	}
 	else if (is_abbrev(type, "keydoorcombo"))
 	{

@@ -105,7 +105,7 @@ void do_champ_flag_death(char_data *victim)
   }
   else
   {
-    log("Champion without the flag, no bueno amigo!", IMMORTAL, LogChannels::LOG_BUG);
+    logentry("Champion without the flag, no bueno amigo!", IMMORTAL, LogChannels::LOG_BUG);
   }
 }
 
@@ -234,7 +234,7 @@ void perform_violence(void)
 
     if (!ch->fighting)
     {
-      log("Error in perform_violence()!  Null ch->fighting!", IMMORTAL, LogChannels::LOG_BUG);
+      logentry("Error in perform_violence()!  Null ch->fighting!", IMMORTAL, LogChannels::LOG_BUG);
       return;
     }
 
@@ -301,7 +301,7 @@ void perform_violence(void)
           {
             // sprintf(debug, "DEBUG: Mob: %s (Lag: %d)", GET_SHORT(ch), MOB_WAIT_STATE(ch));
             // MOB_WAIT_STATE(ch) -= PULSE_VIOLENCE; // MIKE
-            // log(debug, OVERSEER, LogChannels::LOG_BUG);
+            // logentry(debug, OVERSEER, LogChannels::LOG_BUG);
           }
           else
           {
@@ -357,7 +357,7 @@ void perform_violence(void)
 
     if (!ch->fighting)
     {
-      log("Error in perform_violence(), part2!  Null ch->fighting!", IMMORTAL, LogChannels::LOG_BUG);
+      logentry("Error in perform_violence(), part2!  Null ch->fighting!", IMMORTAL, LogChannels::LOG_BUG);
       return;
     }
     bool over = FALSE;
@@ -544,7 +544,7 @@ int attack(char_data *ch, char_data *vict, int type, int weapon)
 
   if (!ch || !vict)
   {
-    log("NULL Victim or Ch sent to attack!  This crashes us!", -1, LogChannels::LOG_BUG);
+    logentry("NULL Victim or Ch sent to attack!  This crashes us!", -1, LogChannels::LOG_BUG);
     produce_coredump();
 
     return eINTERNAL_ERROR;
@@ -552,7 +552,7 @@ int attack(char_data *ch, char_data *vict, int type, int weapon)
 
   if (GET_POS(ch) == POSITION_DEAD)
   {
-    log("Dead ch sent to attack. Wtf ;)", -1, LogChannels::LOG_BUG);
+    logentry("Dead ch sent to attack. Wtf ;)", -1, LogChannels::LOG_BUG);
     produce_coredump();
     stop_fighting(ch);
 
@@ -922,7 +922,7 @@ bool do_frostshield(char_data *ch, char_data *vict)
 {
   if (!ch || !vict)
   {
-    log("Null ch or vict sent to do_frostshield", IMP, LogChannels::LOG_BUG);
+    logentry("Null ch or vict sent to do_frostshield", IMP, LogChannels::LOG_BUG);
     return (false);
   }
   if (!IS_AFFECTED(vict, AFF_FROSTSHIELD))
@@ -949,7 +949,7 @@ int do_lightning_shield(char_data *ch, char_data *vict, int dam)
 
   if (!ch || !vict)
   {
-    log("Null ch or vict sent to do_lightning_shield", IMP, LogChannels::LOG_BUG);
+    logentry("Null ch or vict sent to do_lightning_shield", IMP, LogChannels::LOG_BUG);
     return eFAILURE | eINTERNAL_ERROR;
   }
 
@@ -1031,7 +1031,7 @@ int do_vampiric_aura(char_data *ch, char_data *vict)
 {
   if (!ch || !vict || ch == vict)
   {
-    log("Null ch or vict, or ch==vict sent to do_vampiric_aura!", IMP, LogChannels::LOG_BUG);
+    logentry("Null ch or vict, or ch==vict sent to do_vampiric_aura!", IMP, LogChannels::LOG_BUG);
     abort();
   }
 
@@ -1064,7 +1064,7 @@ int do_fireshield(char_data *ch, char_data *vict, int dam)
 
   if (!ch || !vict || ch == vict)
   {
-    log("Null ch or vict, or ch==vict sent to do_fireshield!", IMP, LogChannels::LOG_BUG);
+    logentry("Null ch or vict, or ch==vict sent to do_fireshield!", IMP, LogChannels::LOG_BUG);
     abort();
   }
 
@@ -1153,7 +1153,7 @@ int do_acidshield(char_data *ch, char_data *vict, int dam)
 
   if (!ch || !vict || ch == vict)
   {
-    log("Null ch or vict, or ch==vict sent to do_acidshield!", IMP, LogChannels::LOG_BUG);
+    logentry("Null ch or vict, or ch==vict sent to do_acidshield!", IMP, LogChannels::LOG_BUG);
     abort();
   }
 
@@ -1238,7 +1238,7 @@ int do_boneshield(char_data *ch, char_data *vict, int dam)
 
   if (!ch || !vict || ch == vict)
   {
-    log("Null ch or vict, or ch==vict sent to do_boneshield!", IMP, LogChannels::LOG_BUG);
+    logentry("Null ch or vict, or ch==vict sent to do_boneshield!", IMP, LogChannels::LOG_BUG);
     abort();
   }
 
@@ -1395,7 +1395,7 @@ int get_weapon_damage_type(struct obj_data *wielded)
   default:
     sprintf(log_buf, "WORLD: Unknown w_type for object #%d name: %s, fourth value flag is: %d.",
             wielded->item_number, wielded->name, wielded->obj_flags.value[3]);
-    log(log_buf, OVERSEER, LogChannels::LOG_BUG);
+    logentry(log_buf, OVERSEER, LogChannels::LOG_BUG);
     break;
   }
   return TYPE_HIT; // should never get here
@@ -1458,7 +1458,7 @@ int one_hit(char_data *ch, char_data *vict, int type, int weapon)
 
   if (!vict || !ch)
   {
-    log("Null victim or char in one_hit!  This Crashes us!", -1, LogChannels::LOG_BUG);
+    logentry("Null victim or char in one_hit!  This Crashes us!", -1, LogChannels::LOG_BUG);
     return eINTERNAL_ERROR;
   }
 
@@ -1930,7 +1930,7 @@ void pir_stat_loss(char_data *victim, int chance, bool heh, bool zz)
       }
       break;
     } // of switch
-    log(log_buf, SERAPH, LogChannels::LOG_MORTAL);
+    logentry(log_buf, SERAPH, LogChannels::LOG_MORTAL);
     victim->pcdata->statmetas -= 1; // we lost a stat, so don't charge extra meta
   }                                 // of pir's extra stat loss
 }
@@ -2900,7 +2900,7 @@ int noncombat_damage(char_data *ch, int dam, char *char_death_msg,
     if (room_death_msg)
       act(room_death_msg, ch, 0, 0, TO_ROOM, 0);
     if (death_log_msg)
-      log(death_log_msg, IMMORTAL, LogChannels::LOG_MORTAL);
+      logentry(death_log_msg, IMMORTAL, LogChannels::LOG_MORTAL);
     if (type == KILL_BATTER)
       kill_type = TYPE_PKILL;
     fight_kill(NULL, ch, kill_type, type);
@@ -3189,7 +3189,7 @@ void fight_kill(char_data *ch, char_data *vict, int type, int spec_type)
 {
   if (!vict)
   {
-    log("Null vict sent to fight_kill()!", -1, LogChannels::LOG_BUG);
+    logentry("Null vict sent to fight_kill()!", -1, LogChannels::LOG_BUG);
     return;
   }
   bool vict_is_attacker = false;
@@ -3475,7 +3475,7 @@ int checkCounterStrike(char_data *ch, char_data *victim)
     act("Upon blocking $N's blow, $n spins and lands a solid strike with $s knee!", victim, NULL, ch, TO_ROOM, NOTVICT);
     break;
   default:
-    log("Serious screw-up in counter strike!", ANGEL, LogChannels::LOG_BUG);
+    logentry("Serious screw-up in counter strike!", ANGEL, LogChannels::LOG_BUG);
     break;
   }
 
@@ -3519,7 +3519,7 @@ int doTumblingCounterStrike(char_data *ch, char_data *victim)
     act("$n finds an opening in $N's defenses as $E swings, and lands a quick counterattack!", victim, NULL, ch, TO_ROOM, NOTVICT);
     break;
   default:
-    log("Serious screw-up in counter strike!", ANGEL, LogChannels::LOG_BUG);
+    logentry("Serious screw-up in counter strike!", ANGEL, LogChannels::LOG_BUG);
     break;
   }
 
@@ -3945,7 +3945,7 @@ void load_messages(char *file, int base)
   struct message_type *messages;
   char chk[100];
 
-  if (!(fl = dc_fopen(file, "r")))
+  if (!(fl = fopen(file, "r")))
   {
     perror("read messages");
     exit(0);
@@ -3973,7 +3973,7 @@ void load_messages(char *file, int base)
     //	 produce_coredump();
     if (i >= MAX_MESSAGES)
     {
-      log("Too many combat messages.", ANGEL, LogChannels::LOG_BUG);
+      logentry("Too many combat messages.", ANGEL, LogChannels::LOG_BUG);
       exit(0);
     }
 
@@ -4012,7 +4012,7 @@ void load_messages(char *file, int base)
     fscanf(fl, " %s \n", chk);
   }
 
-  dc_fclose(fl);
+  fclose(fl);
 }
 
 void free_messages_from_memory()
@@ -4164,7 +4164,7 @@ void stop_fighting(char_data *ch, int clearlag)
 
   if (!ch)
   {
-    log("Null ch in stop_fighting.  This would have crashed us.", IMP, LogChannels::LOG_BUG);
+    logentry("Null ch in stop_fighting.  This would have crashed us.", IMP, LogChannels::LOG_BUG);
     return;
   }
 
@@ -4270,7 +4270,7 @@ void stop_fighting(char_data *ch, int clearlag)
       ;
     if (!tmp)
     {
-      log("Stop_fighting: char not found", ANGEL, LogChannels::LOG_BUG);
+      logentry("Stop_fighting: char not found", ANGEL, LogChannels::LOG_BUG);
       // abort();
       return;
     }
@@ -4553,7 +4553,7 @@ void make_corpse(char_data *ch)
       {
         char bugmsg[MAX_STRING_LENGTH];
         sprintf(bugmsg, "%s was supposed to drop a paper/bottle but was unable to create the item", GET_NAME(ch));
-        log(bugmsg, IMMORTAL, LogChannels::LOG_BUG);
+        logentry(bugmsg, IMMORTAL, LogChannels::LOG_BUG);
       }
     }
 
@@ -5364,7 +5364,7 @@ void raw_kill(char_data *ch, char_data *victim)
 
   if (!victim)
   {
-    log("Error in raw_kill()!  Null victim!", IMMORTAL, LogChannels::LOG_BUG);
+    logentry("Error in raw_kill()!  Null victim!", IMMORTAL, LogChannels::LOG_BUG);
     return;
   }
 
@@ -5386,7 +5386,7 @@ void raw_kill(char_data *ch, char_data *victim)
   }
 
   // register my death with this zone's counter
-  DC::getInstance()->zones[world[victim->in_room].zone].died_this_tick++;
+  DC::incrementZoneDiedTick(world[victim->in_room].zone);
 
   GET_POS(victim) = POSITION_STANDING;
   int retval = mprog_death_trigger(victim, ch);
@@ -5451,7 +5451,7 @@ void raw_kill(char_data *ch, char_data *victim)
     { /* rk */
       char buf[MAX_STRING_LENGTH];
       sprintf(buf, "%s's golem lost a level!", GET_NAME(victim));
-      log(buf, ANGEL, LogChannels::LOG_MORTAL);
+      logentry(buf, ANGEL, LogChannels::LOG_MORTAL);
       shatter_message(victim->pcdata->golem);
       extract_char(victim->pcdata->golem, TRUE);
     }
@@ -5543,7 +5543,7 @@ void raw_kill(char_data *ch, char_data *victim)
     clan_death(victim, ch);
     char log_buf[MAX_STRING_LENGTH] = {};
     sprintf(log_buf, "%s at %d", buf, world[death_room].number);
-    log(log_buf, ANGEL, LogChannels::LOG_MORTAL);
+    logentry(log_buf, ANGEL, LogChannels::LOG_MORTAL);
 
     // update stats
     GET_RDEATHS(victim) += 1;
@@ -5578,7 +5578,7 @@ void raw_kill(char_data *ch, char_data *victim)
             if (!IS_NPC(victim))
             {
               sprintf(log_buf, "%s lost a con. ouch.", GET_NAME(victim));
-              log(log_buf, SERAPH, LogChannels::LOG_MORTAL);
+              logentry(log_buf, SERAPH, LogChannels::LOG_MORTAL);
               victim->pcdata->statmetas--;
             }
           }
@@ -5590,7 +5590,7 @@ void raw_kill(char_data *ch, char_data *victim)
             if (!IS_NPC(victim))
             {
               sprintf(log_buf, "%s lost a dex. ouch.", GET_NAME(victim));
-              log(log_buf, SERAPH, LogChannels::LOG_MORTAL);
+              logentry(log_buf, SERAPH, LogChannels::LOG_MORTAL);
               victim->pcdata->statmetas--;
             }
           }
@@ -5626,7 +5626,7 @@ void raw_kill(char_data *ch, char_data *victim)
         remove_character(name, CONDEATH);
 
         sprintf(buf2, "%s permanently dies.", name);
-        log(buf2, ANGEL, LogChannels::LOG_MORTAL);
+        logentry(buf2, ANGEL, LogChannels::LOG_MORTAL);
         return;
       }
       else if (GET_INT(victim) <= 4)
@@ -5673,7 +5673,7 @@ void raw_kill(char_data *ch, char_data *victim)
         remove_character(name, CONDEATH);
 
         sprintf(buf2, "%s sees tits.", name);
-        log(buf2, ANGEL, LogChannels::LOG_MORTAL);
+        logentry(buf2, ANGEL, LogChannels::LOG_MORTAL);
         return;
       }
       else if (GET_WIS(victim) <= 4)
@@ -5700,7 +5700,7 @@ void raw_kill(char_data *ch, char_data *victim)
         remove_character(name, CONDEATH);
 
         sprintf(buf2, "%s gets batted to death.", name);
-        log(buf2, ANGEL, LogChannels::LOG_MORTAL);
+        logentry(buf2, ANGEL, LogChannels::LOG_MORTAL);
         return;
       }
       else if (GET_STR(victim) <= 4)
@@ -5733,7 +5733,7 @@ void raw_kill(char_data *ch, char_data *victim)
         remove_character(name, CONDEATH);
 
         sprintf(buf2, "%s goes to moose heaven.", name);
-        log(buf2, ANGEL, LogChannels::LOG_MORTAL);
+        logentry(buf2, ANGEL, LogChannels::LOG_MORTAL);
         return;
       }
       else if (GET_DEX(victim) <= 4 && GET_RACE(victim) == RACE_TROLL)
@@ -5777,7 +5777,7 @@ void raw_kill(char_data *ch, char_data *victim)
         remove_character(name, CONDEATH);
 
         sprintf(buf2, "%s permanently dies the horrible dex-death.", name);
-        log(buf2, ANGEL, LogChannels::LOG_MORTAL);
+        logentry(buf2, ANGEL, LogChannels::LOG_MORTAL);
         return;
       }
     }
@@ -6124,7 +6124,7 @@ void dam_message(int dam, char_data *ch, char_data *victim,
     w_type -= TYPE_HIT;
     if (((unsigned)w_type) >= sizeof(attack_table))
     {
-      log("Dam_message: bad w_type", ANGEL, LogChannels::LOG_BUG);
+      logentry("Dam_message: bad w_type", ANGEL, LogChannels::LOG_BUG);
       w_type = 0;
     }
   }
@@ -6413,7 +6413,7 @@ void do_pkill(char_data *ch, char_data *victim, int type, bool vict_is_attacker)
 
   if (!victim)
   {
-    log("Null victim sent to do_pkill.", IMMORTAL, LogChannels::LOG_BUG);
+    logentry("Null victim sent to do_pkill.", IMMORTAL, LogChannels::LOG_BUG);
     return;
   }
 
@@ -6737,7 +6737,7 @@ void do_pkill(char_data *ch, char_data *victim, int type, bool vict_is_attacker)
     obj_data *obj = NULL;
     if (!(obj = get_obj_in_list_num(real_object(CHAMPION_ITEM), victim->carrying)))
     {
-      log("Champion without the flag, no bueno amigo!", IMMORTAL, LogChannels::LOG_BUG);
+      logentry("Champion without the flag, no bueno amigo!", IMMORTAL, LogChannels::LOG_BUG);
       return;
     }
     if (IS_NPC(ch) && ch->master)
@@ -6778,7 +6778,7 @@ void arena_kill(char_data *ch, char_data *victim, int type)
 
   if (!victim)
   {
-    log("Null victim sent to do_pkill.", IMMORTAL, LogChannels::LOG_BUG);
+    logentry("Null victim sent to do_pkill.", IMMORTAL, LogChannels::LOG_BUG);
     return;
   }
 
@@ -7096,7 +7096,7 @@ int weapon_spells(char_data *ch, char_data *vict, int weapon)
 
   if (!ch || !vict)
   {
-    log("Null ch or vict sent to weapon spells!", -1, LogChannels::LOG_BUG);
+    logentry("Null ch or vict sent to weapon spells!", -1, LogChannels::LOG_BUG);
     return eFAILURE | eINTERNAL_ERROR;
   }
   if (!weapon)
@@ -7657,7 +7657,7 @@ void remove_nosave(char_data *vict)
 
   if (!vict)
   {
-    log("Null victim sent to remove_nosave!", OVERSEER, LogChannels::LOG_BUG);
+    logentry("Null victim sent to remove_nosave!", OVERSEER, LogChannels::LOG_BUG);
     return;
   }
 
@@ -7692,7 +7692,7 @@ void remove_active_potato(char_data *vict)
 
   if (!vict)
   {
-    log("Null victim sent to remove_active_potato!", OVERSEER, LogChannels::LOG_BUG);
+    logentry("Null victim sent to remove_active_potato!", OVERSEER, LogChannels::LOG_BUG);
     return;
   }
 
@@ -7751,13 +7751,13 @@ int debug_retval(char_data *ch, char_data *victim, int retval)
 
   if (!IS_SET(retval, eCH_DIED) && ch && ch->name == (char *)0x95959595)
   {
-    log("ch->name == 0x95959595 && !eCH_DIED", IMMORTAL, LogChannels::LOG_BUG);
+    logentry("ch->name == 0x95959595 && !eCH_DIED", IMMORTAL, LogChannels::LOG_BUG);
     bugged = TRUE;
   }
 
   if (!IS_SET(retval, eVICT_DIED) && victim && victim->name == (char *)0x95959595)
   {
-    log("victim->name == 0x95959595 && !eVICT_DIED", IMMORTAL, LogChannels::LOG_BUG);
+    logentry("victim->name == 0x95959595 && !eVICT_DIED", IMMORTAL, LogChannels::LOG_BUG);
     bugged = TRUE;
   }
 

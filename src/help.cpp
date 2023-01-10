@@ -221,7 +221,7 @@ int do_new_help(char_data *ch, char *argument, int cmd)
 
     sprintf(buf, "'%s' has no help entry.  %s just tried to call it.",
             upper_argument, GET_NAME(ch));
-    log(buf, IMMORTAL, LogChannels::LOG_HELP);
+    logentry(buf, IMMORTAL, LogChannels::LOG_HELP);
 
     dc_free(upper_argument);
     return eFAILURE;
@@ -305,7 +305,7 @@ int load_new_help(FILE *fl, int reload, char_data *ch)
   {
     if (reload == 1)
     {
-      log("Error in verion number in help file.\r\n", OVERSEER, LogChannels::LOG_HELP);
+      logentry("Error in verion number in help file.\r\n", OVERSEER, LogChannels::LOG_HELP);
       return eFAILURE;
     }
     else
@@ -385,7 +385,7 @@ int load_new_help(FILE *fl, int reload, char_data *ch)
   if (reload == 1)
   {
     sprintf(buf, "%s just reloaded the help files.", GET_NAME(ch));
-    log(buf, OVERSEER, LogChannels::LOG_HELP);
+    logentry(buf, OVERSEER, LogChannels::LOG_HELP);
   }
   return eSUCCESS;
 }
@@ -685,18 +685,18 @@ int do_reload_help(char_data *ch, char *argument, int cmd)
   // send_to_char("Command disabled!\r\n", ch);
   // return eFAILURE;
 
-  if (!(new_help_fl = dc_fopen(NEW_HELP_FILE, "r")))
+  if (!(new_help_fl = fopen(NEW_HELP_FILE, "r")))
   {
-    log("Error opening help file for reload.", OVERSEER, LogChannels::LOG_HELP);
+    logentry("Error opening help file for reload.", OVERSEER, LogChannels::LOG_HELP);
     return eFAILURE;
   }
 
   help_rec_count = count_hash_records(new_help_fl);
-  dc_fclose(new_help_fl);
+  fclose(new_help_fl);
 
-  if (!(new_help_fl = dc_fopen(NEW_HELP_FILE, "r")))
+  if (!(new_help_fl = fopen(NEW_HELP_FILE, "r")))
   {
-    log("Error opening help file for reload.", OVERSEER, LogChannels::LOG_HELP);
+    logentry("Error opening help file for reload.", OVERSEER, LogChannels::LOG_HELP);
     return eFAILURE;
   }
 
@@ -704,7 +704,7 @@ int do_reload_help(char_data *ch, char *argument, int cmd)
   new_top_of_helpt = 0;
   CREATE(new_help_table, struct help_index_element_new, help_rec_count);
   ret = load_new_help(new_help_fl, 1, ch);
-  dc_fclose(new_help_fl);
+  fclose(new_help_fl);
 
   if (ret == eFAILURE)
   {
@@ -770,7 +770,7 @@ int do_hedit(char_data *ch, char *argument, int cmd)
     send_to_char(buf, ch);
     new_top_of_helpt++;
     sprintf(buf, "%s just created a help file for '%s'.", GET_NAME(ch), buf2);
-    log(buf, OVERSEER, LogChannels::LOG_HELP);
+    logentry(buf, OVERSEER, LogChannels::LOG_HELP);
   }
   else if ((help_id = atoi(buf)) || *buf == '0')
   { // Edit a specific help entry
@@ -915,7 +915,7 @@ void save_help(char_data *ch)
 
   sprintf(file, "%s", NEW_HELP_FILE);
 
-  if ((f = dc_fopen(file, "w")) == NULL)
+  if ((f = fopen(file, "w")) == NULL)
   {
     send_to_char("Couldn't open help file for saving.\r\n", ch);
     perror("Couldn't open help file for saving.\r\n");
@@ -942,14 +942,14 @@ void save_help(char_data *ch)
   // end file
   fprintf(f, "$~\n");
 
-  dc_fclose(f);
+  fclose(f);
   send_to_char("Saved.\r\n", ch);
   sprintf(buf, "%s just saved the help files.", GET_NAME(ch));
-  log(buf, OVERSEER, LogChannels::LOG_HELP);
+  logentry(buf, OVERSEER, LogChannels::LOG_HELP);
 
   sprintf(file, "%s", WEB_HELP_FILE);
 
-  if ((f = dc_fopen(file, "w")) == NULL)
+  if ((f = fopen(file, "w")) == NULL)
   {
     send_to_char("Couldn't open web help file for saving.\r\n", ch);
     perror("Couldn't open web help file for saving.\r\n");
@@ -977,7 +977,7 @@ void save_help(char_data *ch)
   // end file
   fprintf(f, "$~\n");
 
-  dc_fclose(f);
+  fclose(f);
 }
 
 void help_string_to_file(FILE *f, char *string)

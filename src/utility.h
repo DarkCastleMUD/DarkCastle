@@ -402,7 +402,7 @@ inline const short IS_ANONYMOUS(char_data *ch)
 
 #define OUTSIDE(ch) (!IS_SET(world[(ch)->in_room].room_flags, INDOORS))
 #define EXIT(ch, door) (world[(ch)->in_room].dir_option[door])
-#define CAN_GO(ch, door) (EXIT(ch, door) && (EXIT(ch, door)->to_room != NOWHERE) && (EXIT(ch, door)->to_room != -1) && !IS_SET(EXIT(ch, door)->exit_info, EX_CLOSED))
+#define CAN_GO(ch, door) (EXIT(ch, door) && (EXIT(ch, door)->to_room != NOWHERE) && (EXIT(ch, door)->to_room != NOWHERE) && !IS_SET(EXIT(ch, door)->exit_info, EX_CLOSED))
 
 #define GET_ALIGNMENT(ch) ((ch)->alignment)
 #define IS_GOOD(ch) (GET_ALIGNMENT(ch) >= 350)
@@ -434,9 +434,9 @@ MatchType str_n_nosp_cmp_begin(string arg1, string arg2);
 char *str_nospace(const char *stri);
 char *str_dup(const char *str);
 char *str_dup0(const char *str);
-void log(string str, int god_level, LogChannels type, char_data *vict = nullptr);
+void logentry(QString str, int god_level = 0, LogChannels type = LogChannels::LOG_MISC, char_data *vict = nullptr);
 void logf(int level, LogChannels type, const char *arg, ...);
-int send_to_gods(const char *str, int god_level, LogChannels type);
+int send_to_gods(QString message, int god_level, LogChannels type);
 
 void sprintbit(uint value[], const char *names[], char *result);
 std::string sprintbit(uint value[], const char *names[]);
@@ -533,6 +533,7 @@ void disarm(char_data *ch, char_data *victim);
 int shop_keeper(char_data *ch, struct obj_data *obj, int cmd, const char *arg, char_data *invoker);
 void send_to_all(char *messg);
 void ansi_color(char *txt, char_data *ch);
+void send_to_char(QString messg, char_data *ch);
 void send_to_char(string messg, char_data *ch);
 void send_to_char(const char *messg, char_data *ch);
 void send_to_char_nosp(const char *messg, char_data *ch);

@@ -81,7 +81,7 @@ int do_boot(char_data *ch, char *arg, int cmd)
         victim, 0, ch, TO_ROOM, INVIS_NULL);
 
     sprintf(name, "%s has booted %s.", GET_NAME(ch), GET_NAME(victim));
-    log(name, GET_LEVEL(ch), LogChannels::LOG_GOD);
+    logentry(name, GET_LEVEL(ch), LogChannels::LOG_GOD);
 
     if (!strcmp(type, "boot"))
     {
@@ -234,8 +234,8 @@ int do_fsave(char_data *ch, string argument, int cmd)
     send_to_char("Ok.\r\n", ch);
   }
   do_save(vict, "", CMD_DEFAULT);
-  buf = format("{} just forced {} to save.", GET_NAME(ch), GET_NAME(vict));
-  log(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
+
+  logentry(QString("%1 just forced %2 to save.").arg(GET_NAME(ch)).arg(GET_NAME(vict)), GET_LEVEL(ch), LogChannels::LOG_GOD);
 
   return eSUCCESS;
 }
@@ -416,7 +416,7 @@ int do_guild(char_data *ch, char *argument, int cmd)
     {
       // guild <room #>
       room = lookupRoom(ch, arg1);
-      if (room == -1)
+      if (room == NOWHERE)
       {
         return eFAILURE;
       }
@@ -493,7 +493,7 @@ int do_guild(char_data *ch, char *argument, int cmd)
   }
 
   room = lookupRoom(ch, arg2);
-  if (room == -1)
+  if (room == NOWHERE)
   {
     return eFAILURE;
   }

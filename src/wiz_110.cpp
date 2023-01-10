@@ -204,7 +204,7 @@ command_return_t do_bestow(char_data *ch, string arg, int cmd)
   // give it
   learn_skill(vict, bestowable_god_commands[i].num, 1, 1);
   buf = fmt::format("{} has been bestowed {} by {}.", GET_NAME(vict), bestowable_god_commands[i].name, GET_NAME(ch));
-  log(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
+  logentry(buf.c_str(), GET_LEVEL(ch), LogChannels::LOG_GOD);
 
   ch->send(fmt::format("{} has been bestowed {}.\r\n", GET_NAME(vict), bestowable_god_commands[i].name));
   ch->send(fmt::format("{} has bestowed {} upon you.\r\n", GET_NAME(ch), bestowable_god_commands[i].name));
@@ -247,7 +247,7 @@ int do_revoke(char_data *ch, char *arg, int cmd)
     send_to_char(buf, ch);
     sprintf(buf, "%s has had all commands revoked by %s.\r\n", GET_NAME(vict),
             GET_NAME(ch));
-    log(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
+    logentry(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
     sprintf(buf, "%s has revoked all commands from you.\r\n", GET_NAME(ch));
     send_to_char(buf, vict);
     return eSUCCESS;
@@ -277,7 +277,7 @@ int do_revoke(char_data *ch, char *arg, int cmd)
   send_to_char(buf, ch);
   sprintf(buf, "%s has had %s revoked by %s.", GET_NAME(vict),
           bestowable_god_commands[i].name, GET_NAME(ch));
-  log(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
+  logentry(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
   sprintf(buf, "%s has revoked %s from you.\r\n", GET_NAME(ch),
           bestowable_god_commands[i].name);
   send_to_char(buf, vict);
@@ -294,14 +294,14 @@ int do_wizlock(char_data *ch, char *argument, int cmd)
   {
     char log_buf[MAX_STRING_LENGTH] = {};
     sprintf(log_buf, "Game has been wizlocked by %s.", GET_NAME(ch));
-    log(log_buf, ANGEL, LogChannels::LOG_GOD);
+    logentry(log_buf, ANGEL, LogChannels::LOG_GOD);
     send_to_char("Game wizlocked.\r\n", ch);
   }
   else
   {
     char log_buf[MAX_STRING_LENGTH] = {};
     sprintf(log_buf, "Game has been un-wizlocked by %s.", GET_NAME(ch));
-    log(log_buf, ANGEL, LogChannels::LOG_GOD);
+    logentry(log_buf, ANGEL, LogChannels::LOG_GOD);
     send_to_char("Game un-wizlocked.\r\n", ch);
   }
   return eSUCCESS;
@@ -443,7 +443,7 @@ int do_rename_char(char_data *ch, char *arg, int cmd)
       csendf(ch, "You reach into %s's soul and remove 500 platinum.\r\n", GET_SHORT(victim));
       send_to_char("You feel the hand of god slip into your soul and remove 500 platinum.\r\n", victim);
       sprintf(name, "500 platinum removed from %s for rename.", GET_NAME(victim));
-      log(name, GET_LEVEL(ch), LogChannels::LOG_GOD);
+      logentry(name, GET_LEVEL(ch), LogChannels::LOG_GOD);
     }
   }
 
@@ -560,7 +560,7 @@ int do_rename_char(char_data *ch, char *arg, int cmd)
   }
 
   sprintf(name, "%s renamed to %s.", GET_NAME(victim), newname);
-  log(name, GET_LEVEL(ch), LogChannels::LOG_GOD);
+  logentry(name, GET_LEVEL(ch), LogChannels::LOG_GOD);
 
   // handle the renames
   AuctionHandleRenames(ch, GET_NAME(victim), newname);
@@ -1009,7 +1009,7 @@ int do_export(char_data *ch, char *args, int cmdnum)
   {
     stringstream errormsg;
     errormsg << "Exception while writing to " << filename << ".";
-    log(errormsg.str().c_str(), 108, LogChannels::LOG_MISC);
+    logentry(errormsg.str().c_str(), 108, LogChannels::LOG_MISC);
   }
 
   logf(110, LogChannels::LOG_GOD, "Exported objects as %s.", filename);
@@ -1025,20 +1025,19 @@ command_return_t do_world(char_data *ch, string args, int cmd)
     auto world = world_file_list;
     while (world != nullptr)
     {
-      stringstream potential_filename = {};
-      potential_filename << world->firstnum << "-" << world->lastnum << ".txt";
-      if (strcmp(world->filename, potential_filename.str().c_str()))
+      QString potential_filename = QString("%1-%2.txt").arg(world->firstnum).arg(world->lastnum);
+      if (world->filename != potential_filename)
       {
-        ch->send(fmt::format("filename: {} firstnum: {} lastnum: {} flag: {}\r\n", world->filename, world->firstnum, world->lastnum, world->flags));
-        ch->send(fmt::format("Renaming {} to {}\r\n", world->filename, potential_filename.str()));
+        ch->send(QString("filename: %1 firstnum: %2 lastnum: %3 flag: %4\r\n").arg(world->filename).arg(world->firstnum).arg(world->lastnum).arg(world->flags));
+        ch->send(QString("Renaming %1 to %2\r\n").arg(world->filename).arg(potential_filename));
 
-        if (rename(world->filename, potential_filename.str().c_str()) == -1)
+        if (rename(world->filename.toStdString().c_str(), potential_filename.toStdString().c_str()) == -1)
         {
           auto rename_errno = errno;
           char *errStr = strerror(rename_errno);
           if (errStr != nullptr)
           {
-            ch->send(fmt::format("Error renaming {} to {} was {} {}", world->filename, potential_filename.str().c_str(), rename_errno, errStr));
+            ch->send(QString("Error renaming %1 to %2 was %3 %4\r\n").arg(world->filename).arg(potential_filename).arg(rename_errno).arg(errStr));
           }
         }
       }

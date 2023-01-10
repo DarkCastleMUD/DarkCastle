@@ -66,10 +66,10 @@ void load_game_portals()
   {
     num_lines = 0;
     sprintf(buf, "%s/%s", DFLT_DIR, portal_files[i]);
-    if ((cur_file = dc_fopen(buf, "r")) == 0)
+    if ((cur_file = fopen(buf, "r")) == 0)
     {
       sprintf(log_buf, "Could not open portal file: %s", buf);
-      log(log_buf, OVERSEER, LogChannels::LOG_BUG);
+      logentry(log_buf, OVERSEER, LogChannels::LOG_BUG);
       break;
     }
     /* Now we have a readable file.  Here's the structure:
@@ -88,7 +88,7 @@ void load_game_portals()
                &(game_portals[i].max_timer)) != 3)
     {
       sprintf(log_buf, "Error reading portal file: %s!", buf);
-      log(log_buf, OVERSEER, LogChannels::LOG_BUG);
+      logentry(log_buf, OVERSEER, LogChannels::LOG_BUG);
       break;
     }
     /* Store the current file value and count line feeds */
@@ -110,7 +110,7 @@ void load_game_portals()
     game_portals[i].cur_timer = 0; /* So that we get reset */
     if (game_portals[i].max_timer == (-1))
       game_portals[i].max_timer = FOREVER;
-    dc_fclose(cur_file);
+    fclose(cur_file);
   }
 }
 
@@ -160,7 +160,7 @@ void process_portals()
         char log_buf[MAX_STRING_LENGTH] = {};
         sprintf(log_buf, "Making portal from %d to %d failed.", from_room,
                 game_portals[i].to_room);
-        log(log_buf, OVERSEER, LogChannels::LOG_BUG);
+        logentry(log_buf, OVERSEER, LogChannels::LOG_BUG);
       }
       game_portals[i].cur_timer = game_portals[i].max_timer;
     }
@@ -191,18 +191,18 @@ int make_arbitrary_portal(int from_room, int to_room, int duplicate, int timer)
 #endif
   clear_object(from_portal);
 
-  if (real_room(from_room) == (-1))
+  if (real_room(from_room) == NOWHERE)
   {
     sprintf(log_buf, "Cannot create arbitrary portal: room %d doesn't exist.", from_room);
     dc_free(from_portal);
-    log(log_buf, OVERSEER, LogChannels::LOG_BUG);
+    logentry(log_buf, OVERSEER, LogChannels::LOG_BUG);
     return (0);
   }
 
   if (from_room == to_room)
   {
     dc_free(from_portal);
-    log("Arbitrary portal made to itself!", OVERSEER, LogChannels::LOG_BUG);
+    logentry("Arbitrary portal made to itself!", OVERSEER, LogChannels::LOG_BUG);
     return (0);
   }
 
@@ -228,7 +228,7 @@ int make_arbitrary_portal(int from_room, int to_room, int duplicate, int timer)
     {
       sprintf(log_buf, "Non-portal object (%d) sent to make_arbitrary_portal!", duplicate);
       dc_free(from_portal);
-      log(log_buf, OVERSEER, LogChannels::LOG_BUG);
+      logentry(log_buf, OVERSEER, LogChannels::LOG_BUG);
       return 0;
     }
   }
@@ -262,7 +262,7 @@ void find_and_remove_player_portal(char_data *ch)
   char searchstr[180];
   extern struct obj_data *object_list;
   extern int top_of_world;
-  extern struct room_data **world_array;
+  extern class room_data **world_array;
 
   if (GET_CLASS(ch) == CLASS_CLERIC)
     sprintf(searchstr, "cleric %s", GET_NAME(ch));

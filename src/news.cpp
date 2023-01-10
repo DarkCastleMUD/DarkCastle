@@ -75,9 +75,9 @@ void addnews(struct news_data *newnews)
 void savenews()
 {
   FILE *fl;
-  if (!(fl = dc_fopen("news.data", "w")))
+  if (!(fl = fopen("news.data", "w")))
   {
-    log("Cannot open news file.", 0, LogChannels::LOG_MISC);
+    logentry("Cannot open news file.", 0, LogChannels::LOG_MISC);
     abort();
   }
   struct news_data *tmpnews;
@@ -88,19 +88,19 @@ void savenews()
     string_to_file(fl, tmpnews->news);
   }
   fprintf(fl, "0\n");
-  dc_fclose(fl);
+  fclose(fl);
   if (std::system(0))
     std::system("cp ../lib/news.data /srv/www/www.dcastle.org/htdocs/news.data");
   else
-    log("Cannot save news file to web dir.", 0, LogChannels::LOG_MISC);
+    logentry("Cannot save news file to web dir.", 0, LogChannels::LOG_MISC);
 }
 
 void loadnews()
 {
   FILE *fl;
-  if (!(fl = dc_fopen("news.data", "r")))
+  if (!(fl = fopen("news.data", "r")))
   {
-    log("Cannot open news file.", 0, LogChannels::LOG_MISC);
+    logentry("Cannot open news file.", 0, LogChannels::LOG_MISC);
     return;
   }
   int i;
@@ -127,7 +127,7 @@ void loadnews()
     nnews->news = str_dup(buf);
     addnews(nnews);
   }
-  dc_fclose(fl);
+  fclose(fl);
 }
 
 const char *newsify(char *string)

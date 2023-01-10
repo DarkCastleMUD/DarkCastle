@@ -2844,7 +2844,7 @@ int foggy_combat(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
   mob = clone_mobile(real_mobile(22026));
   if (!mob)
   {
-    log("Foggy combat mobile missing", ANGEL, LogChannels::LOG_BUG);
+    logentry("Foggy combat mobile missing", ANGEL, LogChannels::LOG_BUG);
     return eFAILURE;
   }
   // put it in the room ch is in
@@ -3373,7 +3373,7 @@ int mage_familiar_gremlin_non(char_data *ch, struct obj_data *obj,
     return eFAILURE;
   if (!ch->master)
   {
-    log("Familiar without a master.", IMMORTAL, LogChannels::LOG_BUG);
+    logentry("Familiar without a master.", IMMORTAL, LogChannels::LOG_BUG);
     extract_char(ch, TRUE);
     return (eCH_DIED | eSUCCESS);
   }
@@ -3428,7 +3428,7 @@ int mage_familiar_imp_non(char_data *ch, struct obj_data *obj, int cmd, const ch
 
   if (!ch->master)
   {
-    log("Familiar without a master.", IMMORTAL, LogChannels::LOG_BUG);
+    logentry("Familiar without a master.", IMMORTAL, LogChannels::LOG_BUG);
     extract_char(ch, TRUE);
     return (eCH_DIED | eSUCCESS);
   }
@@ -3516,7 +3516,7 @@ int druid_familiar_owl_non(char_data *ch, struct obj_data *obj, int cmd, const c
   {
     if (!ch->master)
     {
-      log("Familiar without a master.", IMMORTAL, LogChannels::LOG_BUG);
+      logentry("Familiar without a master.", IMMORTAL, LogChannels::LOG_BUG);
       extract_char(ch, TRUE);
       return (eCH_DIED | eSUCCESS);
     }
@@ -3562,7 +3562,7 @@ int druid_familiar_chipmunk_non(char_data *ch, struct obj_data *obj, int cmd, co
 
   if (!ch->master)
   {
-    log("Familiar without a master.", IMMORTAL, LogChannels::LOG_BUG);
+    logentry("Familiar without a master.", IMMORTAL, LogChannels::LOG_BUG);
     extract_char(ch, TRUE);
     return (eCH_DIED | eSUCCESS);
   }

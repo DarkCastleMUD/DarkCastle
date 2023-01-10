@@ -107,29 +107,29 @@ int do_processes(char_data *ch, char *arg, int cmd)
 
   system(buf);
 
-  if (!(fl = dc_fopen("../lib/whassup.txt", "a")))
+  if (!(fl = fopen("../lib/whassup.txt", "a")))
   {
-    log("Unable to open whassup.txt for adding in do_processes!", IMP,
+    logentry("Unable to open whassup.txt for adding in do_processes!", IMP,
         LogChannels::LOG_BUG);
     return eFAILURE;
   }
   if (fprintf(fl, "~\n") < 0)
   {
-    dc_fclose(fl);
+    fclose(fl);
     send_to_char("Failure writing to transition file.\r\n", ch);
     return eFAILURE;
   }
 
-  dc_fclose(fl);
+  fclose(fl);
 
-  if (!(fl = dc_fopen("../lib/whassup.txt", "r")))
+  if (!(fl = fopen("../lib/whassup.txt", "r")))
   {
-    log("Unable to open whassup.txt for reading in do_processes!", IMP,
+    logentry("Unable to open whassup.txt for reading in do_processes!", IMP,
         LogChannels::LOG_BUG);
     return eFAILURE;
   }
   tmp = fread_string(fl, 0);
-  dc_fclose(fl);
+  fclose(fl);
 
   send_to_char(tmp, ch);
   FREE(tmp);
@@ -273,7 +273,7 @@ int do_advance(char_data *ch, char *argument, int cmd)
 
   sprintf(buf, "%s advances %s to level %d.", GET_NAME(ch),
           GET_NAME(victim), new_newlevel);
-  log(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
+  logentry(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
 
   if (GET_LEVEL(victim) == 0)
     do_start(victim);
@@ -360,7 +360,7 @@ int do_zap(char_data *ch, char *argument, int cmd)
 
     send_to_room(buf, room);
     send_to_all("You hear an ominous clap of thunder in the distance.\r\n");
-    log(buf, ANGEL, LogChannels::LOG_GOD);
+    logentry(buf, ANGEL, LogChannels::LOG_GOD);
   }
 
   else
@@ -462,7 +462,7 @@ int do_shutdown(char_data *ch, char *argument, int cmd)
   {
     sprintf(buf, "Shutdown by %s.\r\n", GET_SHORT(ch));
     send_to_all(buf);
-    log(buf, ANGEL, LogChannels::LOG_GOD);
+    logentry(buf, ANGEL, LogChannels::LOG_GOD);
     _shutdown = 1;
   }
   else if (!strcmp(arg1, "hot"))
@@ -489,12 +489,12 @@ int do_shutdown(char_data *ch, char *argument, int cmd)
     do_not_save_corpses = 1;
     sprintf(buf, "Hot reboot by %s.\r\n", GET_SHORT(ch));
     send_to_all(buf);
-    log(buf, ANGEL, LogChannels::LOG_GOD);
-    log("Writing sockets to file for hotboot recovery.", 0, LogChannels::LOG_MISC);
+    logentry(buf, ANGEL, LogChannels::LOG_GOD);
+    logentry("Writing sockets to file for hotboot recovery.", 0, LogChannels::LOG_MISC);
     do_force(ch, "all save", CMD_FORCE);
     if (!write_hotboot_file(new_argv))
     {
-      log("Hotboot failed.  Closing all sockets.", 0, LogChannels::LOG_MISC);
+      logentry("Hotboot failed.  Closing all sockets.", 0, LogChannels::LOG_MISC);
       send_to_char("Hot reboot failed.\r\n", ch);
     }
   }
@@ -523,7 +523,7 @@ int do_shutdown(char_data *ch, char *argument, int cmd)
   else if (!strcmp(arg1, "core"))
   {
     produce_coredump(ch);
-    log("Corefile produced.", IMMORTAL, LogChannels::LOG_BUG);
+    logentry("Corefile produced.", IMMORTAL, LogChannels::LOG_BUG);
   }
   else if (!strcmp(arg1, "die"))
   {

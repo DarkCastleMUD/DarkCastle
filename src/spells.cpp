@@ -1051,13 +1051,13 @@ void isr_set(char_data *ch)
 
   if (!ch)
   {
-    log("NULL ch in isr_set!", 0, LogChannels::LOG_BUG);
+    logentry("NULL ch in isr_set!", 0, LogChannels::LOG_BUG);
     return;
   }
 
   /*  why do we need this spamming the logs?
      sprintf(buf, "isr_set ch %s", GET_NAME(ch));
-     log(buf, 0, LogChannels::LOG_BUG);
+     logentry(buf, 0, LogChannels::LOG_BUG);
   */
   for (afisr = ch->affected; afisr; afisr = afisr->next)
   {
@@ -1139,7 +1139,7 @@ void stop_follower(char_data *ch, int cmd)
 
   if (ch->master == NULL)
   {
-    log("Stop_follower: null ch_master!", ARCHANGEL, LogChannels::LOG_BUG);
+    logentry("Stop_follower: null ch_master!", ARCHANGEL, LogChannels::LOG_BUG);
     return;
   }
   /*
@@ -2504,7 +2504,7 @@ int do_cast(char_data *ch, char *argument, int cmd)
           {
             sprintf(log_buf, "Multi: %s casted '%s' on %s", GET_NAME(ch),
                     get_skill_name(spl), GET_NAME(tar_char));
-            log(log_buf, 110, LogChannels::LOG_PLAYER, ch);
+            logentry(log_buf, 110, LogChannels::LOG_PLAYER, ch);
           }*/
 
           // Wizard's eye (88) is ok to cast

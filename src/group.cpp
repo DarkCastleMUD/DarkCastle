@@ -135,7 +135,7 @@ int do_found(char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-command_return_t do_split(char_data *ch, QStringList &arguments, int cmd)
+command_return_t char_data::do_split(QStringList &arguments, int cmd)
 {
   quint64 share = 0, extra = 0;
   quint64 no_members = 0;
@@ -144,13 +144,13 @@ command_return_t do_split(char_data *ch, QStringList &arguments, int cmd)
 
   if (arguments.isEmpty())
   {
-    ch->send("Split what?\r\n");
+    send("Split what?\r\n");
     return eFAILURE;
   }
 
-  if (affected_by_spell(ch, FUCK_GTHIEF))
+  if (affected_by_spell(this, FUCK_GTHIEF))
   {
-    ch->send("Nobody wants any part of your stolen booty!\r\n");
+    send("Nobody wants any part of your stolen booty!\r\n");
     return eFAILURE;
   }
 
@@ -160,35 +160,35 @@ command_return_t do_split(char_data *ch, QStringList &arguments, int cmd)
   quint64 amount = number.toULongLong(&ok);
   if (ok == false)
   {
-    ch->send("Invalid value.\r\n");
-    ch->send(QString("Valid values are %1 to %2.\r\n").arg(1).arg(static_cast<quint64>(-1)));
+    send("Invalid value.\r\n");
+    send(QString("Valid values are %1 to %2.\r\n").arg(1).arg(static_cast<quint64>(-1)));
     return eFAILURE;
   }
 
   if (amount == 0)
   {
-    send_to_char("You hand out zero coins to everyone, but no one notices.\r\n", ch);
+    send("You hand out zero coins to everyone, but no one notices.\r\n");
     return eSUCCESS;
   }
 
-  if (GET_GOLD(ch) < (uint32_t)amount)
+  if (gold < (uint32_t)amount)
   {
-    send_to_char("You don't have that much gold!\n\r", ch);
+    send("You don't have that much gold!\r\n");
     return eFAILURE;
   }
 
-  if (ch->master)
-    k = ch->master;
+  if (master)
+    k = master;
   else
-    k = ch;
+    k = this;
 
-  if ((!IS_AFFECTED(k, AFF_GROUP)) || (!IS_AFFECTED(ch, AFF_GROUP)))
+  if ((!IS_AFFECTED(k, AFF_GROUP)) || (!IS_AFFECTED(this, AFF_GROUP)))
   {
-    send_to_char("You are not grouped. You must be grouped to split your money!\r\n", ch);
+    send("You are not grouped. You must be grouped to split your money!\r\n");
     return eFAILURE;
   }
 
-  if (k->in_room == ch->in_room)
+  if (k->in_room == in_room)
     no_members = 1;
   else
     no_members = 0;
@@ -196,31 +196,31 @@ command_return_t do_split(char_data *ch, QStringList &arguments, int cmd)
   for (f = k->followers; f; f = f->next)
   {
     if (IS_AFFECTED(f->follower, AFF_GROUP) &&
-        (f->follower->in_room == ch->in_room) &&
+        (f->follower->in_room == in_room) &&
         !IS_MOB(f->follower))
       no_members++;
   }
 
   if (no_members == 0) // should be impossible
   {
-    send_to_char("You got a divide by 0.  Tell a god how.\r\n", ch);
+    send("You got a divide by 0.  Tell a god how.\r\n");
     return eFAILURE;
   }
 
   share = amount / no_members;
   extra = amount % no_members;
-  GET_GOLD(ch) -= amount;
-  do_save(ch, "", 666);
+  gold -= amount;
+  do_save(this, "", 666);
 
-  ch->send(QString("You split %L1 gold coins. Your share is %L2 gold coins.\r\n").arg(amount).arg(share + extra));
-  GET_GOLD(ch) += share + extra;
+  send(QString("You split %L1 gold coins. Your share is %L2 gold coins.\r\n").arg(amount).arg(share + extra));
+  gold += share + extra;
 
-  if (k != ch && k->in_room == ch->in_room)
+  if (k != this && k->in_room == in_room)
   {
-    k->send(QString("%1 splits %L2 gold coins. Your share is %L3 gold coins.\r\n").arg(GET_SHORT(ch)).arg(amount).arg(share));
+    k->send(QString("%1 splits %L2 gold coins. Your share is %L3 gold coins.\r\n").arg(GET_SHORT(this)).arg(amount).arg(share));
     int lost = 0;
     if (k->clan && get_clan(k)->tax && !IS_SET(GET_TOGGLES(k), PLR_NOTAX) &&
-        (k->clan != ch->clan || (k->clan == ch->clan && IS_SET(GET_TOGGLES(ch), PLR_NOTAX))))
+        (k->clan != clan || (k->clan == clan && IS_SET(GET_TOGGLES(this), PLR_NOTAX))))
     {
       lost = (int)((float)share * (float)((float)get_clan(k)->tax / 100));
       k->send(QString("Your clan taxes %1 gold of your share.\r\n").arg(lost));
@@ -232,14 +232,14 @@ command_return_t do_split(char_data *ch, QStringList &arguments, int cmd)
   for (f = k->followers; f; f = f->next)
   {
     if (IS_AFFECTED(f->follower, AFF_GROUP) &&
-        f->follower->in_room == ch->in_room &&
-        f->follower != ch &&
+        f->follower->in_room == in_room &&
+        f->follower != this &&
         !IS_MOB(f->follower))
     {
-      f->follower->send(QString("%1 splits %L2 gold coins. Your share is %L3 gold coins.\r\n").arg(GET_SHORT(ch)).arg(amount).arg(share));
+      f->follower->send(QString("%1 splits %L2 gold coins. Your share is %L3 gold coins.\r\n").arg(GET_SHORT(this)).arg(amount).arg(share));
       int lost = 0;
       if (f->follower->clan && get_clan(f->follower)->tax && !IS_SET(GET_TOGGLES(f->follower), PLR_NOTAX) &&
-          (f->follower->clan != ch->clan || (f->follower->clan == ch->clan && IS_SET(GET_TOGGLES(ch), PLR_NOTAX))))
+          (f->follower->clan != clan || (f->follower->clan == clan && IS_SET(GET_TOGGLES(this), PLR_NOTAX))))
       {
         lost = (int)((float)share * (float)((float)get_clan(f->follower)->tax / 100));
         f->follower->send(QString("Your clan taxes %L1 gold of your share.\r\n").arg(lost));

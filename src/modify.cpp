@@ -232,7 +232,7 @@ int do_string(char_data *ch, char *arg, int cmd)
 				return 1;
 			}
 			sprintf(message, "%s just restrung short on %s", GET_NAME(ch), GET_NAME(mob));
-			log(message, IMP, LogChannels::LOG_GOD);
+			logentry(message, IMP, LogChannels::LOG_GOD);
 			if (IS_NPC(mob))
 				ch->desc->hashstr = &mob->short_desc;
 			else
@@ -571,7 +571,7 @@ const char *next_page(const char *str)
 		{
 			if (*(str + 1) == '\0')
 			{ // this should never happen
-				log("String ended in $ in next_page", ANGEL, LogChannels::LOG_BUG);
+				logentry("String ended in $ in next_page", ANGEL, LogChannels::LOG_BUG);
 				//*str = '\0'; // overwrite the $ so it doesn't mess up anything
 				return NULL;
 			}

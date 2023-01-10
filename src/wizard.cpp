@@ -138,7 +138,7 @@ void do_mload(char_data *ch, int rnum, int cnt)
                world[ch->in_room].number,
                world[ch->in_room].name);
     }
-    log(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
+    logentry(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
   }
   else
   {
@@ -148,7 +148,7 @@ void do_mload(char_data *ch, int rnum, int cnt)
              mob_index[rnum].virt,
              world[ch->in_room].number,
              world[ch->in_room].name);
-    log(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
+    logentry(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
     send_to_char("You load the mob(s) but they immediatly destroy themselves.\r\n", ch);
   }
 }
@@ -198,7 +198,7 @@ obj_list_t oload(char_data *ch, int rnum, int cnt, bool random)
                     obj->short_description,
                     world[ch->in_room].number,
                     world[ch->in_room].name);
-  log(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
+  logentry(buf.c_str(), GET_LEVEL(ch), LogChannels::LOG_GOD);
 
   return obj_list;
 }
@@ -260,7 +260,7 @@ void do_oload(char_data *ch, int rnum, int cnt, bool random)
              world[ch->in_room].number,
              world[ch->in_room].name);
   }
-  log(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
+  logentry(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
 }
 
 //
@@ -1422,15 +1422,15 @@ command_return_t do_repop(char_data *ch, string arguments, int cmd)
   {
     send_to_char("Performing full zone reset!\n\r", ch);
     string buf = fmt::format("{} full repopped zone #{}.", GET_NAME(ch), world[ch->in_room].zone);
-    log(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
-    reset_zone(world[ch->in_room].zone, ResetType::full);
+    logentry(buf.c_str(), GET_LEVEL(ch), LogChannels::LOG_GOD);
+    DC::resetZone(world[ch->in_room].zone, Zone::ResetType::full);
   }
   else
   {
     send_to_char("Resetting this entire zone!\n\r", ch);
     string buf = fmt::format("{} repopped zone #{}.", GET_NAME(ch), world[ch->in_room].zone);
-    log(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
-    reset_zone(world[ch->in_room].zone);
+    logentry(buf.c_str(), GET_LEVEL(ch), LogChannels::LOG_GOD);
+    DC::resetZone(world[ch->in_room].zone);
   }
 
   return eSUCCESS;
@@ -1479,7 +1479,7 @@ int do_clear(char_data *ch, char *argument, int cmd)
   }
   send_to_char("You have just caused the destruction of countless creatures in ths area!\n\r", ch);
   sprintf(buf, "%s just CLEARED zone #%d!", GET_NAME(ch), zone);
-  log(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
+  logentry(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
   return eSUCCESS;
 }
 
@@ -1580,7 +1580,7 @@ int do_restore(char_data *ch, char *argument, int cmd)
     }
 
     sprintf(buf, "%s restored %s.", GET_NAME(ch), GET_NAME(victim));
-    log(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
+    logentry(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
 
     update_pos(victim);
     redo_hitpoints(victim);
@@ -1599,7 +1599,7 @@ int do_restore(char_data *ch, char *argument, int cmd)
     {
       send_to_char("You don't have the ability to do that!\n\r", ch);
       sprintf(buf, "%s tried to do a restore all!", GET_NAME(ch));
-      log(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
+      logentry(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
 
       return eFAILURE;
     }
@@ -1630,7 +1630,7 @@ int do_restore(char_data *ch, char *argument, int cmd)
         do_save(victim, "", CMD_DEFAULT);
       }
     sprintf(buf, "%s did a restore all!", GET_NAME(ch));
-    log(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
+    logentry(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
     send_to_char("Trying to be Mister Popularity?\n\r", ch);
   }
   return eSUCCESS;
@@ -1803,7 +1803,7 @@ int get_rand_obj(struct hunt_data *h)
 void init_random_hunt_items(struct hunt_data *h)
 {
   FILE *f;
-  if ((f = dc_fopen("huntitems.txt", "r")) == NULL)
+  if ((f = fopen("huntitems.txt", "r")) == NULL)
   {
     for (int i = 0; i < 50; i++)
       h->itemsAvail[i] = -1;
@@ -1826,7 +1826,7 @@ void init_random_hunt_items(struct hunt_data *h)
     }
     h->itemsAvail[a] = -1;
   }
-  dc_fclose(f);
+  fclose(f);
 }
 
 char *last_hunt_time(char *last_hunt)
@@ -1918,7 +1918,7 @@ void begin_hunt(int item, int duration, int amount, char *huntname)
         continue;
       if (!(vict = get_random_mob_vnum(vnum)))
         continue;
-      if (IS_SET(DC::getInstance()->zones[world[vict->in_room].zone].zone_flags, ZONE_NOHUNT))
+      if (DC::getInstance()->zones.value(world[vict->in_room].zone).isNoHunt())
         continue;
 
       if (strlen(vict->short_desc) > 34)
@@ -2144,13 +2144,13 @@ int do_huntstart(char_data *ch, char *argument, int cmd)
   {
     //    twitterObj.getLastWebResponse( replyMsg );
     sprintf(buf, "twitterClient:: twitCurl::accountVerifyCredGet web response:\n%s\n", replyMsg.c_str());
-    log(buf, 100, LogChannels::LOG_GOD);
+    logentry(buf, 100, LogChannels::LOG_GOD);
   }
   else
   {
     twitterObj.getLastCurlError(replyMsg);
     sprintf(buf, "twitterClient:: twitCurl::accountVerifyCredGet error:\n%s\n", replyMsg.c_str());
-    log(buf, 100, LogChannels::LOG_GOD);
+    logentry(buf, 100, LogChannels::LOG_GOD);
   }
 #endif
 
@@ -2215,13 +2215,13 @@ int do_huntstart(char_data *ch, char *argument, int cmd)
   {
     //    twitterObj.getLastWebResponse( replyMsg );
     sprintf(buf, "\ntwitterClient:: twitCurl::statusUpdate web response:\n%s\n", replyMsg.c_str());
-    log(buf, 100, LogChannels::LOG_GOD);
+    logentry(buf, 100, LogChannels::LOG_GOD);
   }
   else
   {
     twitterObj.getLastCurlError(replyMsg);
     sprintf(buf, "\ntwitterClient:: twitCurl::statusUpdate error:\n%s\n", replyMsg.c_str());
-    log(buf, 100, LogChannels::LOG_GOD);
+    logentry(buf, 100, LogChannels::LOG_GOD);
   }
 #endif
 

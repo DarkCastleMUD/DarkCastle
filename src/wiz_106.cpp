@@ -88,8 +88,7 @@ int do_force(char_data *ch, string argument, int cmd = CMD_FORCE)
       if (GET_LEVEL(ch) < GET_LEVEL(vict) && IS_NPC(vict))
       {
         send_to_char("Now doing that would just tick off the IMPS!\n\r", ch);
-        buf = format("{} just tried to force {} to, {}", GET_NAME(ch), GET_NAME(vict), to_force);
-        log(buf, OVERSEER, LogChannels::LOG_GOD);
+        logentry(QString("%1 just tried to force %2 to %3").arg(GET_NAME(ch)).arg(GET_NAME(vict)).arg(to_force.c_str()), OVERSEER, LogChannels::LOG_GOD);
         return eSUCCESS;
       }
       if ((GET_LEVEL(ch) <= GET_LEVEL(vict)) && !IS_NPC(vict))
@@ -109,7 +108,7 @@ int do_force(char_data *ch, string argument, int cmd = CMD_FORCE)
         buf = format("{} just forced %s to %s.", GET_NAME(ch),
                      GET_NAME(vict), to_force);
         command_interpreter(vict, to_force);
-        log(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
+        logentry(buf.c_str(), GET_LEVEL(ch), LogChannels::LOG_GOD);
       }
     }
   }
@@ -142,7 +141,7 @@ int do_force(char_data *ch, string argument, int cmd = CMD_FORCE)
     }
     send_to_char("Ok.\r\n", ch);
     buf = format("{} just forced all to {}.", GET_NAME(ch), to_force);
-    log(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);
+    logentry(buf.c_str(), GET_LEVEL(ch), LogChannels::LOG_GOD);
   }
   return eSUCCESS;
 }

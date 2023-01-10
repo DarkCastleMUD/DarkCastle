@@ -45,7 +45,7 @@ int move_player(char_data *ch, int room)
 	{
 		retval = move_char(ch, real_room(START_ROOM));
 		if (!IS_SET(retval, eSUCCESS))
-			log("Error in move_player(), Failure moving ch to start room. move_player_home_nofail",
+			logentry("Error in move_player(), Failure moving ch to start room. move_player_home_nofail",
 				IMMORTAL, LogChannels::LOG_BUG);
 	}
 
@@ -263,7 +263,7 @@ int do_fall(char_data *ch, short dir)
 	}
 
 	sprintf(damage, "%s falls from %d and sustains %d damage.", GET_NAME(ch), world[ch->in_room].number, dam);
-	log(damage, IMMORTAL, LogChannels::LOG_MORTAL);
+	logentry(damage, IMMORTAL, LogChannels::LOG_MORTAL);
 
 	switch (dir)
 	{
@@ -292,7 +292,7 @@ int do_fall(char_data *ch, short dir)
 		send_to_char("You fall...\r\n", ch);
 		break;
 	default:
-		log("Default hit in do_fall", IMMORTAL, LogChannels::LOG_MORTAL);
+		logentry("Default hit in do_fall", IMMORTAL, LogChannels::LOG_MORTAL);
 		break;
 	}
 
@@ -543,7 +543,7 @@ int do_simple_move(char_data *ch, int cmd, int following)
 		return eFAILURE;
 	}
 
-	struct room_data *rm = &(world[world[ch->in_room].dir_option[cmd]->to_room]);
+	class room_data *rm = &(world[world[ch->in_room].dir_option[cmd]->to_room]);
 
 	if (rm->sector_type != world[ch->in_room].sector_type && ch->desc && ch->desc->original && ch->desc->original->level <= MAX_MORTAL)
 	{
@@ -614,10 +614,8 @@ int do_simple_move(char_data *ch, int cmd, int following)
 		// return eFAILURE;
 	}
 
-	// if I'm STAY_NO_TOWN, don't enter a ZONE_IS_TOWN zone no matter what
-	if (IS_NPC(ch) &&
-		ISSET(ch->mobdata->actflags, ACT_STAY_NO_TOWN) &&
-		IS_SET(DC::getInstance()->zones[world[world[ch->in_room].dir_option[cmd]->to_room].zone].zone_flags, ZONE_IS_TOWN))
+	// if I'm STAY_NO_TOWN, don't enter a Zone::Flag::IS_TOWN zone no matter what
+	if (IS_NPC(ch) &&	ISSET(ch->mobdata->actflags, ACT_STAY_NO_TOWN) && DC::getInstance()->zones.value(world[world[ch->in_room].dir_option[cmd]->to_room].zone).isTown())
 		return eFAILURE;
 
 	int a = 0;
@@ -961,7 +959,7 @@ int attempt_move(char_data *ch, int cmd, int is_retreat)
 		/*
 		 sprintf(tmp, "%s group failed to follow. (died: %d ret: %d)",
 		 GET_NAME(ch), SOMEONE_DIED(return_val), return_val);
-		 log(tmp, OVERSEER, LogChannels::LOG_BUG);
+		 logentry(tmp, OVERSEER, LogChannels::LOG_BUG);
 		 */
 		return return_val;
 	}
@@ -1007,7 +1005,7 @@ int attempt_move(char_data *ch, int cmd, int is_retreat)
 				 sprintf(tmp, "%s attempted to follow %s but failed. (was_in:%d fol->in_room:%d pos: %d ret: %d",
 				 GET_NAME(k->follower), GET_NAME(ch), was_in, k->follower->in_room,
 				 GET_POS(k->follower), is_retreat);
-				 log(tmp, OVERSEER, LogChannels::LOG_BUG);
+				 logentry(tmp, OVERSEER, LogChannels::LOG_BUG);
 				 */
 			}
 		}
@@ -1099,7 +1097,7 @@ int do_enter(char_data *ch, char *argument, int cmd)
 	if (real_room(portal->obj_flags.value[0]) < 0)
 	{
 		sprintf(buf, "Error in do_enter(), value 0 on object %d < 0", portal->item_number);
-		log(buf, OVERSEER, LogChannels::LOG_BUG);
+		logentry(buf, OVERSEER, LogChannels::LOG_BUG);
 		send_to_char("You can't enter that.\r\n", ch);
 		return eFAILURE;
 	}
@@ -1182,7 +1180,7 @@ int do_enter(char_data *ch, char *argument, int cmd)
 		return eFAILURE;
 	default:
 		sprintf(buf, "Error in do_enter(), value 1 on object %d returned default case", portal->item_number);
-		log(buf, OVERSEER, LogChannels::LOG_BUG);
+		logentry(buf, OVERSEER, LogChannels::LOG_BUG);
 		return eFAILURE;
 	}
 
@@ -1224,7 +1222,7 @@ int move_char(char_data *ch, int dest, bool stop_all_fighting)
 {
 	if (!ch)
 	{
-		log("Error in move_char(), NULL character", OVERSEER, LogChannels::LOG_BUG);
+		logentry("Error in move_char(), NULL character", OVERSEER, LogChannels::LOG_BUG);
 		return eINTERNAL_ERROR;
 	}
 
@@ -1235,7 +1233,7 @@ int move_char(char_data *ch, int dest, bool stop_all_fighting)
 		// Couldn't move char from the room
 		if (char_from_room(ch, stop_all_fighting) == 0)
 		{
-			log("Error in move_char(), character not NOWHERE, but couldn't be moved.",
+			logentry("Error in move_char(), character not NOWHERE, but couldn't be moved.",
 				OVERSEER, LogChannels::LOG_BUG);
 			return eINTERNAL_ERROR;
 		}

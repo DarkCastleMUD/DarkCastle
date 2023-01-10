@@ -39,7 +39,7 @@ int do_zoneexits(char_data *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  csendf(ch, "Searching Zone: %d - %s\r\n", curZone, DC::getInstance()->zones[world[curRoom].zone].name);
+  ch->send(QString("Searching Zone: %1 - %2\r\n").arg(curZone).arg(DC::getInstance()->zones.value(world[curRoom].zone).name));
   for (low = curRoom; low > 0; low--)
   {
     if (!world_array[low - 1])
@@ -72,7 +72,7 @@ int do_zoneexits(char_data *ch, char *argument, int cmd)
         {
           sprintf(buf, "Room %5d - %5s to Room %5d, zone %3d (%s)\r\n",
                   i, dirs[dir], curExits->to_room, world[curExits->to_room].zone,
-                  DC::getInstance()->zones[world[curExits->to_room].zone].name);
+                  DC::getInstance()->zones.value(world[curExits->to_room].zone).name);
 
           output += buf;
         }
@@ -101,7 +101,7 @@ int do_zoneexits(char_data *ch, char *argument, int cmd)
           sprintf(buf, "Room %5d - climb to Room %5d, zone %3d (%s)\r\n",
                   i, real_room(portal->obj_flags.value[0]),
                   world[real_room(portal->obj_flags.value[0])].zone,
-                  DC::getInstance()->zones[world[real_room(portal->obj_flags.value[0])].zone].name);
+                  DC::getInstance()->zones.value(world[real_room(portal->obj_flags.value[0])].zone).name);
 
           output += buf;
         }
@@ -128,7 +128,7 @@ int do_zoneexits(char_data *ch, char *argument, int cmd)
           sprintf(buf, "Room %5d - enter to Room %5d, zone %3d (%s)\r\n",
                   i, real_room(portal->obj_flags.value[0]),
                   world[real_room(portal->obj_flags.value[0])].zone,
-                  DC::getInstance()->zones[world[real_room(portal->obj_flags.value[0])].zone].name);
+                  DC::getInstance()->zones.value(world[real_room(portal->obj_flags.value[0])].zone).name);
 
           output += buf;
         }
@@ -146,7 +146,7 @@ int do_zoneexits(char_data *ch, char *argument, int cmd)
             sprintf(buf, "Room %5d - leave to Room %5d, zone %3d (%s)\r\n",
                     i, real_room(portal->in_room),
                     world[real_room(portal->in_room)].zone,
-                    DC::getInstance()->zones[world[real_room(portal->in_room)].zone].name);
+                    DC::getInstance()->zones.value(world[real_room(portal->in_room)].zone).name);
 
             output += buf;
           }
@@ -386,7 +386,7 @@ int do_set(char_data *ch, char *argument, int cmd)
       return eFAILURE;
     }
     value = atoi(buf);
-    log(buf2, IMP, LogChannels::LOG_GOD);
+    logentry(buf2, IMP, LogChannels::LOG_GOD);
     /* set age of victim */
     vict->pcdata->time.birth =
         time(0) - (int32_t)value * (int32_t)SECS_PER_MUD_YEAR;
@@ -399,7 +399,7 @@ int do_set(char_data *ch, char *argument, int cmd)
       send_to_char("Sex must be 'm','f' or 'n'.\r\n", ch);
       return eFAILURE;
     }
-    log(buf2, IMP, LogChannels::LOG_GOD);
+    logentry(buf2, IMP, LogChannels::LOG_GOD);
     /* set sex of victim */
     switch (*buf)
     {
@@ -430,7 +430,7 @@ int do_set(char_data *ch, char *argument, int cmd)
                    ch);
       return eFAILURE;
     }
-    log(buf2, IMP, LogChannels::LOG_GOD);
+    logentry(buf2, IMP, LogChannels::LOG_GOD);
     /* set class of victim */
     switch (*buf)
     {
@@ -491,7 +491,7 @@ int do_set(char_data *ch, char *argument, int cmd)
       send_to_char("That level is higher than you!\n\r", ch);
       return eFAILURE;
     }
-    log(buf2, IMP, LogChannels::LOG_GOD);
+    logentry(buf2, IMP, LogChannels::LOG_GOD);
     /* set level of victim */
     vict->level = value;
     update_wizlist(vict);
@@ -500,7 +500,7 @@ int do_set(char_data *ch, char *argument, int cmd)
   case 4: /* height */
   {
     value = atoi(buf);
-    log(buf2, IMP, LogChannels::LOG_GOD);
+    logentry(buf2, IMP, LogChannels::LOG_GOD);
     /* set height of victim */
     vict->height = value;
   }
@@ -508,7 +508,7 @@ int do_set(char_data *ch, char *argument, int cmd)
   case 5: /* weight */
   {
     value = atoi(buf);
-    log(buf2, IMP, LogChannels::LOG_GOD);
+    logentry(buf2, IMP, LogChannels::LOG_GOD);
     /* set weight of victim */
     vict->weight = value;
   }
@@ -522,7 +522,7 @@ int do_set(char_data *ch, char *argument, int cmd)
       send_to_char("and less than 26.\r\n", ch);
       return eFAILURE;
     }
-    log(buf2, IMP, LogChannels::LOG_GOD);
+    logentry(buf2, IMP, LogChannels::LOG_GOD);
     /* set original strength of victim */
     vict->raw_str = value;
   }
@@ -541,7 +541,7 @@ int do_set(char_data *ch, char *argument, int cmd)
       send_to_char("and less than 26.\r\n", ch);
       return eFAILURE;
     }
-    log(buf2, IMP, LogChannels::LOG_GOD);
+    logentry(buf2, IMP, LogChannels::LOG_GOD);
     /* set original INT of victim */
     vict->raw_intel = value;
     redo_mana(vict);
@@ -557,7 +557,7 @@ int do_set(char_data *ch, char *argument, int cmd)
       send_to_char("and less than 26.\r\n", ch);
       return eFAILURE;
     }
-    log(buf2, IMP, LogChannels::LOG_GOD);
+    logentry(buf2, IMP, LogChannels::LOG_GOD);
     /* set original WIS of victim */
     vict->raw_wis = value;
   }
@@ -571,7 +571,7 @@ int do_set(char_data *ch, char *argument, int cmd)
       send_to_char("and less than 26.\r\n", ch);
       return eFAILURE;
     }
-    log(buf2, IMP, LogChannels::LOG_GOD);
+    logentry(buf2, IMP, LogChannels::LOG_GOD);
     /* set original DEX of victim */
     vict->raw_dex = value;
   }
@@ -585,7 +585,7 @@ int do_set(char_data *ch, char *argument, int cmd)
       send_to_char("and less than 26.\r\n", ch);
       return eFAILURE;
     }
-    log(buf2, IMP, LogChannels::LOG_GOD);
+    logentry(buf2, IMP, LogChannels::LOG_GOD);
     /* set original CON of victim */
     vict->raw_con = value;
     redo_hitpoints(vict);
@@ -594,7 +594,7 @@ int do_set(char_data *ch, char *argument, int cmd)
   case 12: /* gold */
   {
     value = atoi(buf);
-    log(buf2, IMP, LogChannels::LOG_GOD);
+    logentry(buf2, IMP, LogChannels::LOG_GOD);
     /* set original gold of victim */
     vict->gold = value;
   }
@@ -612,7 +612,7 @@ int do_set(char_data *ch, char *argument, int cmd)
   case 14: /* mana */
   {
     value = atoi(buf);
-    log(buf2, IMP, LogChannels::LOG_GOD);
+    logentry(buf2, IMP, LogChannels::LOG_GOD);
     /* set original mana of victim */
     vict->raw_mana = value;
     redo_mana(vict);
@@ -621,7 +621,7 @@ int do_set(char_data *ch, char *argument, int cmd)
   case 15: /* hit */
   {
     value = atoi(buf);
-    log(buf2, IMP, LogChannels::LOG_GOD);
+    logentry(buf2, IMP, LogChannels::LOG_GOD);
     /* set original hit of victim */
     vict->raw_hit = value;
     redo_hitpoints(vict);
@@ -630,7 +630,7 @@ int do_set(char_data *ch, char *argument, int cmd)
   case 16: /* move */
   {
     value = atoi(buf);
-    log(buf2, IMP, LogChannels::LOG_GOD);
+    logentry(buf2, IMP, LogChannels::LOG_GOD);
     /* set original move of victim */
     vict->raw_move = value;
   }
@@ -643,7 +643,7 @@ int do_set(char_data *ch, char *argument, int cmd)
       return eFAILURE;
     }
     value = atoi(buf);
-    log(buf2, IMP, LogChannels::LOG_GOD);
+    logentry(buf2, IMP, LogChannels::LOG_GOD);
     /* set original sessions of victim */
     vict->pcdata->practices = value;
   }
@@ -657,7 +657,7 @@ int do_set(char_data *ch, char *argument, int cmd)
       send_to_char("and less than 1000.\r\n", ch);
       return eFAILURE;
     }
-    log(buf2, IMP, LogChannels::LOG_GOD);
+    logentry(buf2, IMP, LogChannels::LOG_GOD);
     /* set original alignment of victim */
     vict->alignment = value;
   }
@@ -671,7 +671,7 @@ int do_set(char_data *ch, char *argument, int cmd)
       send_to_char("and less than 101.\r\n", ch);
       return eFAILURE;
     }
-    log(buf2, IMP, LogChannels::LOG_GOD);
+    logentry(buf2, IMP, LogChannels::LOG_GOD);
     /* set original thirst of victim */
     vict->conditions[THIRST] = value;
   }
@@ -685,7 +685,7 @@ int do_set(char_data *ch, char *argument, int cmd)
       send_to_char("and less than 101.\r\n", ch);
       return eFAILURE;
     }
-    log(buf2, IMP, LogChannels::LOG_GOD);
+    logentry(buf2, IMP, LogChannels::LOG_GOD);
     /* set original drunk of victim */
     vict->conditions[DRUNK] = value;
   }
@@ -699,7 +699,7 @@ int do_set(char_data *ch, char *argument, int cmd)
       send_to_char("and less than 101.\r\n", ch);
       return eFAILURE;
     }
-    log(buf2, IMP, LogChannels::LOG_GOD);
+    logentry(buf2, IMP, LogChannels::LOG_GOD);
     /* set original full of victim */
     vict->conditions[FULL] = value;
   }
@@ -722,13 +722,13 @@ int do_set(char_data *ch, char *argument, int cmd)
         break;
       }
     }
-    log(buf2, IMP, LogChannels::LOG_GOD);
+    logentry(buf2, IMP, LogChannels::LOG_GOD);
   }
   break;
   case 23: /* bank */
   {
     GET_BANK(vict) = atoi(buf);
-    log(buf2, GET_LEVEL(ch), LogChannels::LOG_GOD);
+    logentry(buf2, GET_LEVEL(ch), LogChannels::LOG_GOD);
   }
   break;
   case 24: /* platinum */
@@ -745,13 +745,13 @@ int do_set(char_data *ch, char *argument, int cmd)
   case 25: /* ki */
   {
     vict->raw_ki = atoi(buf);
-    log(buf2, GET_LEVEL(ch), LogChannels::LOG_GOD);
+    logentry(buf2, GET_LEVEL(ch), LogChannels::LOG_GOD);
   }
   break;
   case 26: /* clan number */
   {
     vict->clan = atoi(buf);
-    log(buf2, GET_LEVEL(ch), LogChannels::LOG_BUG);
+    logentry(buf2, GET_LEVEL(ch), LogChannels::LOG_BUG);
   }
   break;
   case 27: // saves
@@ -786,25 +786,25 @@ int do_set(char_data *ch, char *argument, int cmd)
   case 28:
   {
     GET_HP_METAS(vict) = atoi(buf);
-    log(buf2, GET_LEVEL(ch), LogChannels::LOG_GOD);
+    logentry(buf2, GET_LEVEL(ch), LogChannels::LOG_GOD);
   }
   break;
   case 29:
   {
     GET_MANA_METAS(vict) = atoi(buf);
-    log(buf2, GET_LEVEL(ch), LogChannels::LOG_GOD);
+    logentry(buf2, GET_LEVEL(ch), LogChannels::LOG_GOD);
   }
   break;
   case 30:
   {
     GET_MOVE_METAS(vict) = atoi(buf);
-    log(buf2, GET_LEVEL(ch), LogChannels::LOG_GOD);
+    logentry(buf2, GET_LEVEL(ch), LogChannels::LOG_GOD);
   }
   break;
   case 31:
   {
     vict->armor = atoi(buf);
-    log(buf2, GET_LEVEL(ch), LogChannels::LOG_GOD);
+    logentry(buf2, GET_LEVEL(ch), LogChannels::LOG_GOD);
   }
   break;
   case 32:
@@ -828,7 +828,7 @@ int do_set(char_data *ch, char *argument, int cmd)
     }
 
     vict->pcdata->profession = value;
-    log(buf2, GET_LEVEL(ch), LogChannels::LOG_GOD);
+    logentry(buf2, GET_LEVEL(ch), LogChannels::LOG_GOD);
   }
   break;
   }

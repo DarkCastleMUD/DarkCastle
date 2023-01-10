@@ -135,7 +135,7 @@ struct command_info cmd_info[] =
         {"alias", do_alias, nullptr, nullptr, POSITION_DEAD, 0, CMD_DEFAULT, 0, 1, CommandType::all},
         {"toggle", do_toggle, nullptr, nullptr, POSITION_DEAD, 0, CMD_DEFAULT, 0, 1, CommandType::all},
         {"consider", do_consider, nullptr, nullptr, POSITION_RESTING, 0, CMD_DEFAULT, 0, 1, CommandType::all},
-        {"configure", nullptr, nullptr, do_config, POSITION_DEAD, 0, CMD_DEFAULT, 0, 1, CommandType::players_only},
+        {"configure", nullptr, nullptr, &char_data::do_config, POSITION_DEAD, 0, CMD_DEFAULT, 0, 1, CommandType::players_only},
         {"credits", do_credits, nullptr, nullptr, POSITION_DEAD, 0, CMD_DEFAULT, 0, 1, CommandType::all},
         {"equipment", do_equipment, nullptr, nullptr, POSITION_DEAD, 0, CMD_DEFAULT, 0, 1, CommandType::all},
         {"ohelp", do_help, nullptr, nullptr, POSITION_DEAD, 0, CMD_DEFAULT, 0, 1, CommandType::all},
@@ -157,7 +157,7 @@ struct command_info cmd_info[] =
         {"index", do_index, nullptr, nullptr, POSITION_DEAD, 0, CMD_DEFAULT, 0, 1, CommandType::all},
         {"areas", do_areas, nullptr, nullptr, POSITION_DEAD, 0, CMD_DEFAULT, 0, 1, CommandType::all},
         {"commands", do_new_help, nullptr, nullptr, POSITION_DEAD, 0, CMD_DEFAULT, 0, 1, CommandType::all},
-        {"experience", nullptr, nullptr, do_experience, POSITION_DEAD, 0, CMD_DEFAULT, 0, 1, CommandType::players_only},
+        {"experience", nullptr, nullptr, &char_data::do_experience, POSITION_DEAD, 0, CMD_DEFAULT, 0, 1, CommandType::players_only},
         {"version", do_version, nullptr, nullptr, POSITION_DEAD, 0, CMD_DEFAULT, 0, 0, CommandType::all},
         {"identify", do_identify, nullptr, nullptr, POSITION_DEAD, 0, CMD_DEFAULT, COM_CHARMIE_OK, 0, CommandType::all},
 
@@ -287,7 +287,7 @@ struct command_info cmd_info[] =
         {"whoclan", do_whoclan, nullptr, nullptr, POSITION_DEAD, 0, CMD_DEFAULT, 0, 1, CommandType::all},
         {"cpromote", do_cpromote, nullptr, nullptr, POSITION_RESTING, 0, CMD_DEFAULT, 0, 1, CommandType::all},
         {"clans", do_clans, nullptr, nullptr, POSITION_SLEEPING, 0, CMD_DEFAULT, 0, 1, CommandType::all},
-        {"clanarea", do_clanarea, nullptr, nullptr, POSITION_RESTING, 11, CMD_DEFAULT, 0, 1, CommandType::all},
+        {"clanarea", nullptr, nullptr, &char_data::do_clanarea, POSITION_RESTING, 11, CMD_DEFAULT, 0, 1, CommandType::all},
         {"cinfo", do_cinfo, nullptr, nullptr, POSITION_SLEEPING, 0, CMD_DEFAULT, 0, 1, CommandType::all},
         {"ambush", do_ambush, nullptr, nullptr, POSITION_RESTING, 0, CMD_DEFAULT, 0, 1, CommandType::all},
         {"whoarena", do_whoarena, nullptr, nullptr, POSITION_SLEEPING, 0, CMD_DEFAULT, 0, 1, CommandType::all},
@@ -327,7 +327,7 @@ struct command_info cmd_info[] =
         {"save", do_save, nullptr, nullptr, POSITION_DEAD, 0, CMD_DEFAULT, 0, 1, CommandType::all},
         {"sneak", do_sneak, nullptr, nullptr, POSITION_STANDING, 1, CMD_DEFAULT, 0, 0, CommandType::all},
         {"home", do_home, nullptr, nullptr, POSITION_DEAD, 0, CMD_DEFAULT, 0, 1, CommandType::all},
-        {"split", nullptr, nullptr, do_split, POSITION_RESTING, 0, CMD_SPLIT, 0, 0, CommandType::all},
+        {"split", nullptr, nullptr, &char_data::do_split, POSITION_RESTING, 0, CMD_SPLIT, 0, 0, CommandType::all},
         {"spells", do_spells, nullptr, nullptr, POSITION_SLEEPING, 0, CMD_DEFAULT, 0, 1, CommandType::all},
         {"skills", do_skills, nullptr, nullptr, POSITION_SLEEPING, 0, CMD_DEFAULT, 0, 1, CommandType::all},
         {"songs", do_songs, nullptr, nullptr, POSITION_SLEEPING, 0, CMD_DEFAULT, 0, 1, CommandType::all},
@@ -430,7 +430,7 @@ struct command_info cmd_info[] =
         {"disconnect", do_disconnect, nullptr, nullptr, POSITION_DEAD, 106, CMD_DEFAULT, 0, 1, CommandType::all},
         {"force", nullptr, do_force, nullptr, POSITION_DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1, CommandType::all},
         {"pardon", do_pardon, nullptr, nullptr, POSITION_DEAD, OVERSEER, CMD_DEFAULT, 0, 1, CommandType::all},
-        {"goto", nullptr, do_goto, nullptr, POSITION_DEAD, 102, CMD_DEFAULT, 0, 1, CommandType::all},
+        {"goto", nullptr, nullptr, &char_data::do_goto, POSITION_DEAD, 102, CMD_DEFAULT, 0, 1, CommandType::immortals_only},
         {"restore", do_restore, nullptr, nullptr, POSITION_DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1, CommandType::all},
         {"purloin", do_purloin, nullptr, nullptr, POSITION_DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1, CommandType::all},
         {"set", do_set, nullptr, nullptr, POSITION_DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1, CommandType::all},
@@ -494,7 +494,7 @@ struct command_info cmd_info[] =
         {"rdelete", do_rdelete, nullptr, nullptr, POSITION_DEAD, ANGEL, CMD_DEFAULT, 0, 1, CommandType::all},
         {"oneway", do_oneway, nullptr, nullptr, POSITION_DEAD, ANGEL, 1, 0, 1, CommandType::all},
         {"twoway", do_oneway, nullptr, nullptr, POSITION_DEAD, ANGEL, 2, 0, 1, CommandType::all},
-        {"zsave", do_zsave, nullptr, nullptr, POSITION_DEAD, ANGEL, CMD_DEFAULT, 0, 1, CommandType::all},
+        {"zsave", nullptr, nullptr, &char_data::do_zsave, POSITION_DEAD, ANGEL, CMD_DEFAULT, 0, 1, CommandType::all},
         {"rsave", do_rsave, nullptr, nullptr, POSITION_DEAD, ANGEL, CMD_DEFAULT, 0, 1, CommandType::all},
         {"msave", do_msave, nullptr, nullptr, POSITION_DEAD, ANGEL, CMD_DEFAULT, 0, 1, CommandType::all},
         {"osave", do_osave, nullptr, nullptr, POSITION_DEAD, ANGEL, CMD_DEFAULT, 0, 1, CommandType::all},
@@ -709,11 +709,11 @@ int command_interpreter(char_data *ch, string pcomm, bool procced)
     {
       if (ch != nullptr && pcomm.empty() == false && GET_NAME(ch) != nullptr)
       {
-        log(format("Command stack exceeded. depth: {}, max_depth: {}, name: {}, cmd: {}", cstack.getDepth(), cstack.getMax(), GET_NAME(ch), pcomm), IMMORTAL, LogChannels::LOG_BUG);
+        logentry(QString("Command stack exceeded. depth: %1, max_depth: %2, name: %3, cmd: %4").arg(cstack.getDepth()).arg(cstack.getMax()).arg(GET_NAME(ch)).arg(pcomm.c_str()), IMMORTAL, LogChannels::LOG_BUG);
       }
       else
       {
-        log(format("CommandStack::depth {} exceeds CommandStack::max_depth {}", cstack.getDepth(), cstack.getMax()), IMMORTAL, LogChannels::LOG_BUG);
+        logentry(QString("CommandStack::depth %1 exceeds CommandStack::max_depth %2").arg(cstack.getDepth()).arg(cstack.getMax()), IMMORTAL, LogChannels::LOG_BUG);
       }
     }
     return eFAILURE;
@@ -722,13 +722,13 @@ int command_interpreter(char_data *ch, string pcomm, bool procced)
   int look_at;
   int retval;
   struct command_info *found = 0;
-  string buf;
+  QString buf;
 
   // Handle logged players.
   if (IS_PC(ch) && IS_SET(ch->pcdata->punish, PUNISH_LOG))
   {
-    buf = format("Log {}: {}", GET_NAME(ch), pcomm);
-    log(buf, 110, LogChannels::LOG_PLAYER, ch);
+    buf = QString("Log %1: %2").arg(GET_NAME(ch)).arg(pcomm.c_str());
+    logentry(buf, 110, LogChannels::LOG_PLAYER, ch);
   }
 
   // Implement freeze command.
@@ -907,7 +907,7 @@ int command_interpreter(char_data *ch, string pcomm, bool procced)
         // Don't log communication
         if (found->command_number != CMD_GTELL && found->command_number != CMD_CTELL && found->command_number != CMD_SAY && found->command_number != CMD_IMMORT && found->command_number != CMD_IMPCHAN && found->command_number != CMD_TELL && found->command_number != CMD_WHISPER && found->command_number != CMD_REPLY && (GET_LEVEL(ch) >= 100 || (ch->pcdata->multi == true && dc->cf.allow_multi == false)) && IS_SET(ch->pcdata->punish, PUNISH_LOG) == false)
         {
-          log(format("Log {}: {}", GET_NAME(ch), pcomm), 110, LogChannels::LOG_PLAYER, ch);
+          logentry(QString("Log %1: %2").arg(GET_NAME(ch)).arg(pcomm.c_str()), 110, LogChannels::LOG_PLAYER, ch);
         }
       }
 
@@ -975,7 +975,7 @@ int command_interpreter(char_data *ch, string pcomm, bool procced)
       {
         QString command = QString(&pcomm[look_at]).trimmed();
         QStringList arguments = command.split(' ', Qt::SkipEmptyParts);
-        retval = (*(found->command_pointer3))(ch, arguments, found->command_number);
+        retval = (*ch.*(found->command_pointer3))(arguments, found->command_number);
       }
 
       // Next bit for the DUI client, they needed it.
@@ -1360,9 +1360,9 @@ void automail(char *name)
   FILE *blah;
   char buf[100];
 
-  blah = dc_fopen("../lib/whassup.txt", "w");
+  blah = fopen("../lib/whassup.txt", "w");
   fprintf(blah, name);
-  dc_fclose(blah);
+  fclose(blah);
   sprintf(buf, "mail void@dcastle.org < ../lib/whassup.txt");
   system(buf);
 }

@@ -187,7 +187,7 @@ void object_activity(uint64_t pulse_type)
 
       if (obj->in_room != NOWHERE)
       {
-        if (DC::getInstance()->zones[world[obj->in_room].zone].players)
+        if (DC::getInstance()->zones.value(world[obj->in_room].zone).players > 0)
           retval = oprog_rand_trigger(obj);
       }
       else
@@ -2189,7 +2189,7 @@ void wear(char_data *ch, struct obj_data *obj_object, int keyword)
   break;
   default:
   {
-    log("Unknown type called in wear.", ANGEL, LogChannels::LOG_BUG);
+    logentry("Unknown type called in wear.", ANGEL, LogChannels::LOG_BUG);
   }
   break;
   }
@@ -2643,7 +2643,7 @@ bool fullSave(obj_data *obj)
   {
     char buf[MAX_STRING_LENGTH];
     sprintf(buf, "crash bug! objects.cpp, tmp_obj was null! %s is obj", obj->name);
-    log(buf, IMMORTAL, LogChannels::LOG_BUG);
+    logentry(buf, IMMORTAL, LogChannels::LOG_BUG);
     return 0;
   }
 

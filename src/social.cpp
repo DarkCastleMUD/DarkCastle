@@ -136,7 +136,7 @@ char *fread_social_string(FILE *fl)
   fgets(buf, MAX_STRING_LENGTH, fl);
   if (feof(fl))
   {
-    log("Fread_social_string - unexpected EOF.", IMMORTAL, LogChannels::LOG_BUG);
+    logentry("Fread_social_string - unexpected EOF.", IMMORTAL, LogChannels::LOG_BUG);
     exit(0);
   }
 
@@ -235,7 +235,7 @@ void boot_social_messages(void)
   soc_mess_list = (struct social_messg *)dc_alloc(social_array_size, sizeof(struct social_messg));
 #endif
 
-  if (!(fl = dc_fopen(SOCIAL_FILE, "r")))
+  if (!(fl = fopen(SOCIAL_FILE, "r")))
   {
     perror("Can't open social file in boot_social_messages");
     abort();
@@ -266,7 +266,7 @@ void boot_social_messages(void)
   // sort it!
   qsort(soc_mess_list, num_socials, sizeof(social_messg), compare_social_sort);
 
-  dc_fclose(fl);
+  fclose(fl);
 }
 
 struct social_messg *find_social(string arg)

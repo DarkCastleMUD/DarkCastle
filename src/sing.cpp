@@ -557,7 +557,7 @@ int do_sing(char_data *ch, char *arg, int cmd)
 		if (!IS_SET(song_info[spl].targets, TAR_IGNORE))
 			if (!tar_char && !tar_obj)
 			{
-				log("Dammit, fix that null tar_char thing in do_song", IMP, LogChannels::LOG_BUG);
+				logentry("Dammit, fix that null tar_char thing in do_song", IMP, LogChannels::LOG_BUG);
 				send_to_char("If you triggered this message, you almost crashed the\n\r"
 							 "game.  Tell a god what you did immediately.\r\n",
 							 ch);
@@ -891,7 +891,7 @@ int song_hypnotic_harmony(uint8_t level, char_data *ch, char *arg, char_data *vi
 
 	if (!victim || !ch)
 	{
-		log("Serious problem in song_hypnotic_harmony!", ANGEL, LogChannels::LOG_BUG);
+		logentry("Serious problem in song_hypnotic_harmony!", ANGEL, LogChannels::LOG_BUG);
 		return eFAILURE | eINTERNAL_ERROR;
 	}
 	act("$n sings an incredibly beautiful hymn, making you want to just give up your dayjob and follow $m around!", ch, 0, victim, TO_VICT, 0);
@@ -917,7 +917,7 @@ int execute_song_hypnotic_harmony(uint8_t level, char_data *ch, char *Arg, char_
 
 	if (!ch || ch->songs.empty())
 	{
-		log("Serious problem in execute_song_hypnotic_harmony!", ANGEL, LogChannels::LOG_BUG);
+		logentry("Serious problem in execute_song_hypnotic_harmony!", ANGEL, LogChannels::LOG_BUG);
 		return eFAILURE | eINTERNAL_ERROR;
 	}
 
@@ -987,7 +987,7 @@ int song_disrupt(uint8_t level, char_data *ch, char *arg, char_data *victim, int
 {
 	if (!victim || !ch)
 	{
-		log("Serious problem in song_disrupt!", ANGEL, LogChannels::LOG_BUG);
+		logentry("Serious problem in song_disrupt!", ANGEL, LogChannels::LOG_BUG);
 		return eFAILURE | eINTERNAL_ERROR;
 	}
 
@@ -1040,7 +1040,7 @@ int song_whistle_sharp(uint8_t level, char_data *ch, char *arg, char_data *victi
 
 	if (!victim)
 	{
-		log("No vict send to song whistle sharp!", ANGEL, LogChannels::LOG_BUG);
+		logentry("No vict send to song whistle sharp!", ANGEL, LogChannels::LOG_BUG);
 		return eFAILURE | eINTERNAL_ERROR;
 	}
 
@@ -1201,7 +1201,7 @@ int song_revealing_stacato(uint8_t level, char_data *ch, char *arg, char_data *v
 int execute_song_revealing_stacato(uint8_t level, char_data *ch, char *arg, char_data *victim, int skill)
 {
 	char_data *i;
-	struct room_data *room;
+	class room_data *room;
 	char buf[MAX_STRING_LENGTH];
 	char *direction[] = {
 		"to the North",
@@ -1775,7 +1775,7 @@ int execute_song_astral_chanty(uint8_t level, char_data *ch, char *arg, char_dat
 		status = eFAILURE;
 	}
 	else if (IS_SET(world[victim->in_room].room_flags, NO_PORTAL) ||
-			 IS_SET(DC::getInstance()->zones[world[victim->in_room].zone].zone_flags, ZONE_NO_TELEPORT) ||
+			 DC::getInstance()->zones.value(world[victim->in_room].zone).isNoTeleport() ||
 			 IS_SET(world[victim->in_room].room_flags, ARENA))
 	{
 		send_to_char("A mystical force seems to be keeping you out.\r\n", ch);
@@ -1797,7 +1797,7 @@ int execute_song_astral_chanty(uint8_t level, char_data *ch, char *arg, char_dat
 		if (status != eFAILURE)
 		{
 			// Additional costs for astral chanty across continents
-			if (DC::getInstance()->zones[world[ch->in_room].zone].continent != DC::getInstance()->zones[world[victim->in_room].zone].continent)
+			if (DC::getInstance()->zones.value(world[ch->in_room].zone).continent != DC::getInstance()->zones.value(world[victim->in_room].zone).continent)
 			{
 				if (GET_KI(ch) < use_song(ch, SKILL_SONG_ASTRAL_CHANTY - SKILL_SONG_BASE))
 				{

@@ -259,7 +259,7 @@ int do_donate(char_data *ch, char *argument, int cmd)
       {
         sprintf(buf, "%s had the champion flag, but no AFF_CHAMPION.",
                 GET_NAME(ch));
-        log(buf, IMMORTAL, LogChannels::LOG_BUG);
+        logentry(buf, IMMORTAL, LogChannels::LOG_BUG);
         return eFAILURE;
       }
     }
@@ -315,7 +315,7 @@ int do_donate(char_data *ch, char *argument, int cmd)
   {
     char log_buf[MAX_STRING_LENGTH] = {};
     sprintf(log_buf, "%s donates %s[%d]", GET_NAME(ch), obj->name, obj_index[obj->item_number].virt);
-    log(log_buf, IMP, LogChannels::LOG_OBJECTS);
+    logentry(log_buf, IMP, LogChannels::LOG_OBJECTS);
     for (obj_data *loop_obj = obj->contains; loop_obj; loop_obj = loop_obj->next_content)
       logf(IMP, LogChannels::LOG_OBJECTS, "The %s contained %s[%d]", obj->short_description,
            loop_obj->short_description,
@@ -631,18 +631,18 @@ int do_toggle(char_data *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-int do_config(char_data *ch, QStringList &arguments, int cmd)
+int char_data::do_config(QStringList &arguments, int cmd)
 {
-  if (ch->pcdata->config == nullptr)
+  if (pcdata->config == nullptr)
   {
-    ch->pcdata->config = new PlayerConfig();
+    pcdata->config = new PlayerConfig();
   }
 
   if (arguments.isEmpty())
   {
-    for (auto setting = ch->pcdata->config->constBegin(); setting != ch->pcdata->config->constEnd(); ++setting)
+    for (auto setting = pcdata->config->constBegin(); setting != pcdata->config->constEnd(); ++setting)
     {
-      ch->send(QString("%1=%2\r\n").arg(setting.key()).arg(setting.value()));
+      send(QString("%1=%2\r\n").arg(setting.key()).arg(setting.value()));
     }
     return eSUCCESS;
   }
@@ -667,13 +667,13 @@ int do_config(char_data *ch, QStringList &arguments, int cmd)
 
   if (arguments.size() > 0 && arguments.at(0) == "help")
   {
-    csendf(ch, "Usage:\r\n");
-    csendf(ch, "config                       - Show all currently set configuration options.\r\n");
-    csendf(ch, "config color.good=color name - Set color to use for \"good\" values in game.\r\n");
-    csendf(ch, "config color.bad=color name  - Set color to use for \"bad\" values in game.\r\n");
-    csendf(ch, "                               Use ? as color name to see valid colors.\r\n");
-    csendf(ch, "config color.good=           - Unset color.good. Will use default \"good\" color.\r\n");
-    csendf(ch, "config color.bad=            - Unset color.bad. Will use default \"bad\" color.\r\n\r\n");
+    send("Usage:\r\n");
+    send("config                       - Show all currently set configuration options.\r\n");
+    send("config color.good=color name - Set color to use for \"good\" values in game.\r\n");
+    send("config color.bad=color name  - Set color to use for \"bad\" values in game.\r\n");
+    send("                               Use ? as color name to see valid colors.\r\n");
+    send("config color.good=           - Unset color.good. Will use default \"good\" color.\r\n");
+    send("config color.bad=            - Unset color.bad. Will use default \"bad\" color.\r\n\r\n");
     return eSUCCESS;
   }
 
@@ -694,12 +694,12 @@ int do_config(char_data *ch, QStringList &arguments, int cmd)
   if (setting.size() < 2)
   {
     bool found = false;
-    for (auto i = ch->pcdata->config->begin(); i != ch->pcdata->config->end(); ++i)
+    for (auto i = pcdata->config->begin(); i != pcdata->config->end(); ++i)
     {
       if (key == i.key() || key.isEmpty() || i.key().startsWith(key))
       {
         found = true;
-        ch->send(QString("%1=%2\r\n").arg(i.key()).arg(i.value()));
+        send(QString("%1=%2\r\n").arg(i.key()).arg(i.value()));
       }
     }
 
@@ -707,11 +707,11 @@ int do_config(char_data *ch, QStringList &arguments, int cmd)
     {
       if (key.isEmpty() == false)
       {
-        ch->send(QString("%1 not found.\r\n").arg(key));
+        send(QString("%1 not found.\r\n").arg(key));
       }
       else
       {
-        csendf(ch, "No config options set.\r\n");
+        send("No config options set.\r\n");
       }
       return eFAILURE;
     }
@@ -722,13 +722,13 @@ int do_config(char_data *ch, QStringList &arguments, int cmd)
   // config key=
   if (value.isEmpty() && key.isEmpty() == false && value.isEmpty() == true)
   {
-    if (ch->pcdata->config->find(key) != ch->pcdata->config->end())
+    if (pcdata->config->find(key) != pcdata->config->end())
     {
-      ch->send(QString("%1 unset.\r\n").arg(key));
-      ch->pcdata->config->insert(key, QString());
+      send(QString("%1 unset.\r\n").arg(key));
+      pcdata->config->insert(key, QString());
       return eSUCCESS;
     }
-    ch->send(QString("%1 not found.\r\n").arg(key));
+    send(QString("%1 not found.\r\n").arg(key));
     return eFAILURE;
   }
 
@@ -741,37 +741,50 @@ int do_config(char_data *ch, QStringList &arguments, int cmd)
       {
         if (value == "?")
         {
-          csendf(ch, "Valid colors:\r\n");
+          send("Valid colors:\r\n");
         }
         else
         {
-          csendf(ch, "Invalid color specified. Valid colors:\r\n");
+          send("Invalid color specified. Valid colors:\r\n");
         }
 
         for (auto color = colors.constBegin(); color != colors.constEnd(); ++color)
         {
           if (color.key() == "black")
           {
-            ch->send(QString("%1\r\n").arg(color.key()));
+            send(QString("%1\r\n").arg(color.key()));
           }
           else
           {
-            ch->send(QString("%1 - %2Example$R\r\n").arg(color.key(), -15).arg(color.value()));
+            send(QString("%1 - %2Example$R\r\n").arg(color.key(), -15).arg(color.value()));
           }
         }
 
         return eFAILURE;
       }
     }
+    else if (key == "mode")
+    {
+      if (value.startsWith("char"))
+      {
+        telnet_sga(desc);
+        telnet_echo_off(desc);
+      }
+      else if (value.startsWith("line") == false)
+      {
+        send("Valid telnet modes are line for linemode or char for character mode.\r\n");
+        return eFAILURE;
+      }
+    }
     else if (key != "tell.history.timestamp" && key != "locale")
     {
-      ch->send("Invalid config option.\r\n");
+      send("Invalid config option.\r\n");
       return eFAILURE;
     }
 
-    ch->pcdata->config->insert(key, value);
+    pcdata->config->insert(key, value);
 
-    ch->send(QString("Setting %1=%2\r\n").arg(key).arg(value));
+    send(QString("Setting %1=%2\r\n").arg(key).arg(value));
     return eSUCCESS;
   }
 
@@ -1029,7 +1042,7 @@ int do_anonymous(char_data *ch, char *argument, int cmd)
 {
   if (ch == 0)
   {
-    log("Null char in do_anonymous.", OVERSEER, LogChannels::LOG_BUG);
+    logentry("Null char in do_anonymous.", OVERSEER, LogChannels::LOG_BUG);
     return eFAILURE;
   }
   if (GET_LEVEL(ch) < 40)
@@ -1479,17 +1492,17 @@ void CVoteData::DisplayVote(char_data *ch)
   int i = 1;
   if (vote_question.empty())
   {
-    csendf(ch, "\n\rSorry! There are no active votes right now!\n\r\n\r");
+    ch->send("\n\rSorry! There are no active votes right now!\n\r\n\r");
     return;
   }
-  csendf(ch, "\n\r--Current Vote Infortmation--\n\rTo vote, type \"vote #\".\r\n"
-             "Enter \"vote results\" to see the current voting demographics.\n\r\n\r");
+  ch->send("\n\r--Current Vote Infortmation--\n\rTo vote, type \"vote #\".\r\n"
+           "Enter \"vote results\" to see the current voting demographics.\n\r\n\r");
   strncpy(buf, vote_question.c_str(), MAX_STRING_LENGTH);
-  csendf(ch, buf);
-  csendf(ch, "\n\r");
+  ch->send(buf);
+  ch->send("\n\r");
   for (answer_it = answers.begin(); answer_it != answers.end(); answer_it++)
-    csendf(ch, "%2d: %s\n\r", i++, answer_it->answer.c_str());
-  csendf(ch, "\n\r");
+    ch->send(QString("%1: %2\r\n").arg(i++, 2).arg(answer_it->answer.c_str()));
+  ch->send("\n\r");
 }
 
 void CVoteData::RemoveAnswer(char_data *ch, unsigned int answer)
@@ -1657,11 +1670,11 @@ void CVoteData::OutToFile()
 
   FILE *the_file;
 
-  the_file = dc_fopen("vote_data", "w");
+  the_file = fopen("vote_data", "w");
 
   if (!the_file)
   {
-    log("Unable to open/create save file for vote data", ANGEL,
+    logentry("Unable to open/create save file for vote data", ANGEL,
         LogChannels::LOG_BUG);
     return;
   }
@@ -1695,7 +1708,7 @@ void CVoteData::OutToFile()
     fprintf(the_file, "%s\n", ip_it->first.c_str());
   }
 
-  dc_fclose(the_file);
+  fclose(the_file);
   return;
 }
 
@@ -1721,7 +1734,7 @@ CVoteData::CVoteData()
   SVoteData tmp_vote_data;
   active = false;
 
-  the_file = dc_fopen("../lib/vote_data", "r");
+  the_file = fopen("../lib/vote_data", "r");
   if (!the_file)
   {
     this->Reset(NULL);
@@ -1733,7 +1746,7 @@ CVoteData::CVoteData()
 
   if (feof(the_file))
   {
-    dc_fclose(the_file);
+    fclose(the_file);
     this->Reset(NULL);
     return;
   }
@@ -1743,9 +1756,9 @@ CVoteData::CVoteData()
 
   if (!fgets(buf, MAX_STRING_LENGTH, the_file))
   {
-    dc_fclose(the_file);
+    fclose(the_file);
     this->Reset(NULL);
-    log("Error reading question from vote file.", 0, LogChannels::LOG_MISC);
+    logentry("Error reading question from vote file.", 0, LogChannels::LOG_MISC);
     return;
   }
   buf[strlen(buf) - 1] = 0;
@@ -1758,8 +1771,8 @@ CVoteData::CVoteData()
     fscanf(the_file, "%d\n", &num);
     if (!fgets(buf, MAX_STRING_LENGTH, the_file))
     {
-      dc_fclose(the_file);
-      log("Error reading answers from vote file.", 0, LogChannels::LOG_MISC);
+      fclose(the_file);
+      logentry("Error reading answers from vote file.", 0, LogChannels::LOG_MISC);
       this->Reset(NULL);
       return;
     }
@@ -1776,8 +1789,8 @@ CVoteData::CVoteData()
   {
     if (!fgets(buf, MAX_STRING_LENGTH, the_file))
     {
-      dc_fclose(the_file);
-      log("Error reading ip addresses from vote file.", 0, LogChannels::LOG_MISC);
+      fclose(the_file);
+      logentry("Error reading ip addresses from vote file.", 0, LogChannels::LOG_MISC);
       this->Reset(NULL);
       return;
     }
@@ -1791,8 +1804,8 @@ CVoteData::CVoteData()
   {
     if (!fgets(buf, MAX_STRING_LENGTH, the_file))
     {
-      dc_fclose(the_file);
-      log("Error reading char names from vote file.", 0, LogChannels::LOG_MISC);
+      fclose(the_file);
+      logentry("Error reading char names from vote file.", 0, LogChannels::LOG_MISC);
       this->Reset(NULL);
       return;
     }
@@ -1803,7 +1816,7 @@ CVoteData::CVoteData()
   // everything must have been correct, activate it here
   active = (bool)is_active;
 
-  dc_fclose(the_file);
+  fclose(the_file);
 }
 
 CVoteData::~CVoteData()

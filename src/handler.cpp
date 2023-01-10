@@ -26,6 +26,8 @@
 #include <sstream>
 #include <map>
 
+#include <QString>
+
 #include "magic.h"
 #include "spells.h"
 #include "room.h"
@@ -118,7 +120,7 @@ char *fname(char *namelist)
 	// we seem to use this alot, and 30 chars isn't a whole lot.....
 	// let's just put this here for the heck of it -pir 2/28/01
 	if (point > (holder + 29))
-		log("point overran holder in fname (handler.c)", ANGEL, LogChannels::LOG_BUG);
+		logentry("point overran holder in fname (handler.c)", ANGEL, LogChannels::LOG_BUG);
 
 	*point = '\0';
 
@@ -1565,7 +1567,7 @@ void affect_modify(char_data *ch, int32_t loc, int32_t mod, int32_t bitv, bool a
 		sprintf(log_buf, "Unknown apply adjust attempt: %d. (handler.c, "
 						 "affect_modify.)",
 				loc);
-		log(log_buf, 0, LogChannels::LOG_BUG);
+		logentry(log_buf, 0, LogChannels::LOG_BUG);
 		break;
 
 	} /* switch */
@@ -1678,9 +1680,9 @@ void affect_remove(char_data *ch, struct affected_type *af, int flags)
 
 		if (hjp->next != af)
 		{
-			log("FATAL : Could not locate affected_type in ch->affected. (handler.c, affect_remove)", ANGEL, LogChannels::LOG_BUG);
+			logentry("FATAL : Could not locate affected_type in ch->affected. (handler.c, affect_remove)", ANGEL, LogChannels::LOG_BUG);
 			sprintf(buf, "Problem With: %s    Affect type: %d", ch->name, af->type);
-			log(buf, ANGEL, LogChannels::LOG_BUG);
+			logentry(buf, ANGEL, LogChannels::LOG_BUG);
 			return;
 		}
 		hjp->next = af->next; /* skip the af element */
@@ -2259,7 +2261,7 @@ int char_from_room(char_data *ch, bool stop_all_fighting)
 			kimore = TRUE;
 	}
 	if (!IS_NPC(ch)) // player
-		DC::getInstance()->zones[world[ch->in_room].zone].players--;
+		DC::getInstance()->zones.value(world[ch->in_room].zone).decrementPlayers();
 	if (IS_NPC(ch))
 		ch->mobdata->last_room = ch->in_room;
 	if (IS_NPC(ch))
@@ -2314,7 +2316,7 @@ int char_to_room(char_data *ch, room_t room, bool stop_all_fighting)
 
 	if (world[room].people == ch)
 	{
-		log("Error: world[room].people == ch in char_to_room().", ANGEL, LogChannels::LOG_BUG);
+		logentry("Error: world[room].people == ch in char_to_room().", ANGEL, LogChannels::LOG_BUG);
 		return 0;
 	}
 
@@ -2366,7 +2368,7 @@ int char_to_room(char_data *ch, room_t room, bool stop_all_fighting)
 			}
 	}
 	if (!IS_NPC(ch)) // player
-		DC::getInstance()->zones[world[room].zone].players++;
+		DC::getInstance()->zones.value(world[room].zone).incrementPlayers();
 	if (IS_NPC(ch))
 	{
 		if (ISSET(ch->mobdata->actflags, ACT_NOMAGIC) && !IS_SET(world[room].room_flags, NO_MAGIC))
@@ -2423,12 +2425,12 @@ int equip_char(char_data *ch, struct obj_data *obj, int pos, int flag)
 
 	if (!ch || !obj)
 	{
-		log("Null ch or obj in equip_char()!", ANGEL, LogChannels::LOG_BUG);
+		logentry("Null ch or obj in equip_char()!", ANGEL, LogChannels::LOG_BUG);
 		return 0;
 	}
 	if (pos < 0 || pos >= MAX_WEAR)
 	{
-		log("Invalid eq position in equip_char!", ANGEL, LogChannels::LOG_BUG);
+		logentry("Invalid eq position in equip_char!", ANGEL, LogChannels::LOG_BUG);
 		return 0;
 	}
 	if (ch->equipment[pos])
@@ -2446,13 +2448,13 @@ int equip_char(char_data *ch, struct obj_data *obj, int pos, int flag)
 
 	if (obj->carried_by)
 	{
-		log("EQUIP: Obj is carried_by when equip.", ANGEL, LogChannels::LOG_BUG);
+		logentry("EQUIP: Obj is carried_by when equip.", ANGEL, LogChannels::LOG_BUG);
 		return 0;
 	}
 
 	if (obj->in_room != NOWHERE)
 	{
-		log("EQUIP: Obj is in_room when equip.", ANGEL, LogChannels::LOG_BUG);
+		logentry("EQUIP: Obj is in_room when equip.", ANGEL, LogChannels::LOG_BUG);
 		return 0;
 	}
 
@@ -2483,7 +2485,7 @@ int equip_char(char_data *ch, struct obj_data *obj, int pos, int flag)
 		}
 		else
 		{
-			log("ch->in_room = NOWHERE when equipping char.", 0, LogChannels::LOG_BUG);
+			logentry("ch->in_room = NOWHERE when equipping char.", 0, LogChannels::LOG_BUG);
 		}
 	}
 
@@ -2934,7 +2936,7 @@ int move_obj(obj_data *obj, int dest)
 
 	if (!obj)
 	{
-		log("NULL object sent to move_obj!", OVERSEER, LogChannels::LOG_BUG);
+		logentry("NULL object sent to move_obj!", OVERSEER, LogChannels::LOG_BUG);
 		return 0;
 	}
 
@@ -3019,7 +3021,7 @@ int move_obj(obj_data *obj, obj_data *dest_obj)
 
 	if (!obj)
 	{
-		log("NULL object sent to move_obj!", OVERSEER, LogChannels::LOG_BUG);
+		logentry("NULL object sent to move_obj!", OVERSEER, LogChannels::LOG_BUG);
 		return 0;
 	}
 
@@ -3106,7 +3108,7 @@ int move_obj(obj_data *obj, char_data *ch)
 
 	if (!obj)
 	{
-		log("NULL object sent to move_obj!", OVERSEER, LogChannels::LOG_BUG);
+		logentry("NULL object sent to move_obj!", OVERSEER, LogChannels::LOG_BUG);
 		return 0;
 	}
 
@@ -3246,7 +3248,7 @@ int obj_from_char(struct obj_data *object)
 
 	if (!object->carried_by)
 	{
-		log("Obj_from_char called on an object no one is carrying!", OVERSEER,
+		logentry("Obj_from_char called on an object no one is carrying!", OVERSEER,
 			LogChannels::LOG_BUG);
 		return 0;
 	}
@@ -3369,7 +3371,7 @@ int obj_from_room(struct obj_data *object)
 
 	if (object->in_room < 0)
 	{
-		log("obj_from_room called on an object that isn't in a room!", OVERSEER,
+		logentry("obj_from_room called on an object that isn't in a room!", OVERSEER,
 			LogChannels::LOG_BUG);
 		return 0;
 	}
@@ -3387,7 +3389,10 @@ int obj_from_room(struct obj_data *object)
 		for (i = world[object->in_room].contents; i && (i->next_content != object); i = i->next_content)
 			;
 
-		i->next_content = object->next_content;
+		if (i != nullptr)
+		{
+			i->next_content = object->next_content;
+		}
 	}
 
 	object->in_room = NOWHERE;
@@ -3441,7 +3446,7 @@ int obj_from_obj(struct obj_data *obj)
 
 	if (!obj->in_obj)
 	{
-		log("obj_from_obj called on an item that isn't inside another item.",
+		logentry("obj_from_obj called on an item that isn't inside another item.",
 			OVERSEER, LogChannels::LOG_BUG);
 		return 0;
 	}
@@ -3665,7 +3670,7 @@ void extract_char(char_data *ch, bool pull, Trace t)
 	}
 	if (ch->in_room == NOWHERE)
 	{
-		log("Extract_char: NOWHERE", ANGEL, LogChannels::LOG_BUG);
+		logentry("Extract_char: NOWHERE", ANGEL, LogChannels::LOG_BUG);
 		return;
 	}
 
@@ -3727,9 +3732,9 @@ void extract_char(char_data *ch, bool pull, Trace t)
 	{
 		if (world[was_in].number == START_ROOM)
 			char_to_room(ch, real_room(SECOND_START_ROOM));
-		else if (DC::getInstance()->zones[world[GET_HOME(ch)].zone].continent == FAR_REACH || DC::getInstance()->zones[world[GET_HOME(ch)].zone].continent == UNDERDARK)
+		else if (DC::getInstance()->zones.value(world[GET_HOME(ch)].zone).continent == FAR_REACH || DC::getInstance()->zones.value(world[GET_HOME(ch)].zone).continent == UNDERDARK)
 			char_to_room(ch, real_room(FARREACH_START_ROOM));
-		else if (DC::getInstance()->zones[world[GET_HOME(ch)].zone].continent == DIAMOND_ISLE || DC::getInstance()->zones[world[GET_HOME(ch)].zone].continent == FORBIDDEN_ISLAND)
+		else if (DC::getInstance()->zones.value(world[GET_HOME(ch)].zone).continent == DIAMOND_ISLE || DC::getInstance()->zones.value(world[GET_HOME(ch)].zone).continent == FORBIDDEN_ISLAND)
 			char_to_room(ch, real_room(THALOS_START_ROOM));
 		else
 			char_to_room(ch, real_room(START_ROOM));
@@ -4227,7 +4232,7 @@ char_data *get_char_vis(char_data *ch, const char *name)
 	auto &character_list = DC::getInstance()->character_list;
 	auto result = find_if(character_list.begin(), character_list.end(), [&number, &tmp, &ch, &partial_match, &j](char_data *const &i)
 						  {
-		if (i->in_room == 0 || i->in_room == -1)
+		if (i->in_room == NOWHERE)
 		{
 			return false;
 		}
@@ -4343,6 +4348,22 @@ char_data *get_all_pc(char *name)
 
 	return 0;
 }
+
+char_data *char_data::getVisiblePlayer(QString name)
+{
+	return get_pc_vis(this, name.toStdString().c_str());
+}
+
+char_data *char_data::getVisibleCharacter(QString name)
+{
+	return get_char_vis(this, name.toStdString());
+}
+
+obj_data *char_data::getVisibleObject(QString name)
+{
+	return get_obj_vis(this, name.toStdString());
+}
+
 char_data *get_pc_vis(char_data *ch, string name)
 {
 	return get_pc_vis(ch, name.c_str());
@@ -4531,7 +4552,7 @@ struct obj_data *create_money(int amount)
 
 	if (amount <= 0)
 	{
-		log("ERROR: Try to create negative money.", ANGEL, LogChannels::LOG_BUG);
+		logentry("ERROR: Try to create negative money.", ANGEL, LogChannels::LOG_BUG);
 		return (0);
 	}
 

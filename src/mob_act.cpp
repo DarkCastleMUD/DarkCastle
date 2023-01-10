@@ -143,7 +143,7 @@ void mobile_activity(void)
     // Only activate mprog random triggers if someone is in the zone
     try
     {
-      if (DC::getInstance()->zones[world[ch->in_room].zone].players)
+      if (DC::getInstance()->zones.value(world[ch->in_room].zone).players)
       {
         retval = mprog_random_trigger(ch);
         if (IS_SET(retval, eCH_DIED) || isDead(ch) || isNowhere(ch))
@@ -160,7 +160,7 @@ void mobile_activity(void)
     }
     catch (...)
     {
-      log("error in mobile_activity. dumping core.", IMMORTAL, LogChannels::LOG_BUG);
+      logentry("error in mobile_activity. dumping core.", IMMORTAL, LogChannels::LOG_BUG);
       produce_coredump(ch);
     }
 
@@ -254,7 +254,7 @@ void mobile_activity(void)
           if (!is_r_denied(ch, EXIT(ch, door)->to_room) && ch->mobdata->last_direction == door)
             ch->mobdata->last_direction = -1;
           else if (!is_r_denied(ch, EXIT(ch, door)->to_room) && (!ISSET(ch->mobdata->actflags, ACT_STAY_NO_TOWN) ||
-                                                                 !IS_SET(DC::getInstance()->zones[world[EXIT(ch, door)->to_room].zone].zone_flags, ZONE_IS_TOWN)))
+                                                                 !DC::getInstance()->zones.value(world[EXIT(ch, door)->to_room].zone).isTown()))
           {
             ch->mobdata->last_direction = door;
             retval = attempt_move(ch, ++door);
@@ -352,7 +352,7 @@ void mobile_activity(void)
           {
             if (!tmp_ch || !ch)
             {
-              log("Null ch or tmp_ch in mobile_action()", IMMORTAL, LogChannels::LOG_BUG);
+              logentry("Null ch or tmp_ch in mobile_action()", IMMORTAL, LogChannels::LOG_BUG);
               break;
             }
             next_aggro = tmp_ch->next_in_room;
@@ -939,7 +939,7 @@ void scavenge(char_data *ch)
             break;
 
           default:
-            log("Bad switch in mob_act.C", 0, LogChannels::LOG_BUG);
+            logentry("Bad switch in mob_act.C", 0, LogChannels::LOG_BUG);
             break;
 
           } /* end switch */

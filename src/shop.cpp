@@ -151,7 +151,7 @@ void restock_keeper(char_data *keeper, int shop_nr)
   char buf[50];
 
   sprintf(buf, "Restocking shop keeper: %d", shop_nr);
-  log(buf, OVERSEER, LogChannels::LOG_MISC);
+  logentry(buf, OVERSEER, LogChannels::LOG_MISC);
 
   for (obj = shop_index[shop_nr].inventory; obj; obj = obj->next_content)
   {
@@ -715,7 +715,7 @@ int shop_keeper(char_data *ch, struct obj_data *obj, int cmd, const char *arg, c
   // instead of looping through.  Should allow for multiple keepers too:)
   if (!(keeper = invoker))
   {
-    log("Shop_keeper: keeper not found.", ANGEL, LogChannels::LOG_BUG);
+    logentry("Shop_keeper: keeper not found.", ANGEL, LogChannels::LOG_BUG);
     return eFAILURE;
   }
 
@@ -725,7 +725,7 @@ int shop_keeper(char_data *ch, struct obj_data *obj, int cmd, const char *arg, c
     if (shop_index[shop_nr].keeper == keeper->mobdata->nr)
       goto LFound2;
   }
-  log("Shop_keeper: shop_nr not found.", ANGEL, LogChannels::LOG_BUG);
+  logentry("Shop_keeper: shop_nr not found.", ANGEL, LogChannels::LOG_BUG);
   return eFAILURE;
 
 LFound2:
@@ -781,7 +781,7 @@ void boot_the_shops()
   int count;
   FILE *fp;
 
-  if ((fp = dc_fopen(SHOP_FILE, "r")) == NULL)
+  if ((fp = fopen(SHOP_FILE, "r")) == NULL)
   {
     perror(SHOP_FILE);
     exit(1);
@@ -865,7 +865,7 @@ void boot_the_shops()
     {
       char log_buf[MAX_STRING_LENGTH] = {};
       sprintf(log_buf, "BAD SHOP IN ROOM %d -- FIX THIS!", temp);
-      log(log_buf, 0, LogChannels::LOG_MISC);
+      logentry(log_buf, 0, LogChannels::LOG_MISC);
       /* Free the memory from bad shops */
       dc_free(shop_index[max_shop].no_such_item1);
       dc_free(shop_index[max_shop].no_such_item2);
@@ -881,7 +881,7 @@ void boot_the_shops()
     max_shop++;
   }
 
-  dc_fclose(fp);
+  fclose(fp);
 }
 
 void assign_the_shopkeepers()
@@ -985,7 +985,7 @@ void write_one_player_shop(player_shop *shop)
 
   sprintf(buf, "%s/%s", PLAYER_SHOP_DIR, shop->owner);
 
-  if ((fp = dc_fopen(buf, "w")) == NULL)
+  if ((fp = fopen(buf, "w")) == NULL)
   {
     logf(IMMORTAL, LogChannels::LOG_WORLD, "Could not open %s for writing.", buf);
     return;
@@ -1012,7 +1012,7 @@ void write_one_player_shop(player_shop *shop)
     fwrite("END", sizeof(char), 3, fp);
   }
 
-  dc_fclose(fp);
+  fclose(fp);
 }
 
 // save the list of shopfiles (not an individual shop)
@@ -1021,7 +1021,7 @@ void save_shop_list()
 {
   FILE *fp;
 
-  if ((fp = dc_fopen(PLAYER_SHOP_INDEX, "w")) == NULL)
+  if ((fp = fopen(PLAYER_SHOP_INDEX, "w")) == NULL)
   {
     perror(PLAYER_SHOP_INDEX);
     exit(1);
@@ -1031,7 +1031,7 @@ void save_shop_list()
     fwrite_string(shop->owner, fp);
 
   fwrite_string("$", fp);
-  dc_fclose(fp);
+  fclose(fp);
 }
 
 void save_player_shop_world_range()
@@ -1052,18 +1052,16 @@ void save_player_shop_world_range()
     logf(IMMORTAL, LogChannels::LOG_BUG, "Could not find player shop range to save files.");
     exit(1);
   }
-  sprintf(buf, "world/%s", curr->filename);
-  if ((f = dc_fopen(buf, "w")) == NULL)
+
+  if ((f = legacyFileOpen("world/%1", curr->filename, "Couldn't open room save file %1 for player shops.")) == nullptr)
   {
-    fprintf(stderr, "Couldn't open room save file %s for player shops.\r\n",
-            curr->filename);
     return;
   }
 
   for (int x = curr->firstnum; x <= curr->lastnum; x++)
     write_one_room(f, x);
   fprintf(f, "$~\n");
-  dc_fclose(f);
+  fclose(f);
 }
 
 void boot_player_shops()
@@ -1076,7 +1074,7 @@ void boot_player_shops()
 
   g_playershops = NULL;
 
-  if ((fp = dc_fopen(PLAYER_SHOP_INDEX, "r")) == NULL)
+  if ((fp = fopen(PLAYER_SHOP_INDEX, "r")) == NULL)
   {
     perror(PLAYER_SHOP_INDEX);
     exit(1);
@@ -1088,7 +1086,7 @@ void boot_player_shops()
   while (strcmp(filename, "$"))
   {
     sprintf(buf, "%s/%s", PLAYER_SHOP_DIR, filename);
-    if ((shopfp = dc_fopen(buf, "r")) == NULL)
+    if ((shopfp = fopen(buf, "r")) == NULL)
     {
       perror(buf);
       exit(1);
@@ -1102,10 +1100,10 @@ void boot_player_shops()
     shop->next = g_playershops;
     g_playershops = shop;
 
-    dc_fclose(shopfp);
+    fclose(shopfp);
     filename = fread_string(fp, 0);
   }
-  dc_fclose(fp);
+  fclose(fp);
 }
 
 player_shop *find_player_shop(char_data *keeper)
@@ -1462,7 +1460,7 @@ int player_shop_keeper(char_data *ch, struct obj_data *obj, int cmd, const char 
 
   if (!(keeper = invoker))
   {
-    log("Shop_keeper: keeper not found.", ANGEL, LogChannels::LOG_BUG);
+    logentry("Shop_keeper: keeper not found.", ANGEL, LogChannels::LOG_BUG);
     return eFAILURE;
   }
 
@@ -1844,7 +1842,7 @@ int eddie_shopkeeper(char_data *ch, struct obj_data *obj, int cmd, const char *a
 
           sprintf(buf, "%s gives %s to %s (removed)", GET_NAME(ch), obj->name,
                   GET_NAME(owner));
-          log(buf, IMP, LogChannels::LOG_OBJECTS);
+          logentry(buf, IMP, LogChannels::LOG_OBJECTS);
         }
         else
         {
@@ -1868,7 +1866,7 @@ int eddie_shopkeeper(char_data *ch, struct obj_data *obj, int cmd, const char *a
 
         sprintf(buf, "%s gives %s to %s (created)", GET_NAME(owner), item->name,
                 GET_NAME(ch));
-        log(buf, IMP, LogChannels::LOG_OBJECTS);
+        logentry(buf, IMP, LogChannels::LOG_OBJECTS);
       }
       else
       {
@@ -1998,7 +1996,7 @@ int reroll_trader(char_data *ch, obj_data *obj, int cmd, const char *arg, char_d
         act("$n gives $p to $N.", ch, obj, owner, TO_ROOM, INVIS_NULL | NOTVICT);
         act("$n gives you $p.", ch, obj, owner, TO_VICT, 0);
         act("You give $p to $N.", ch, obj, owner, TO_CHAR, 0);
-        log(fmt::format("{} gives {} to {}", GET_NAME(ch), obj->name, GET_NAME(owner)), IMP, LogChannels::LOG_OBJECTS);
+        logentry(QString("%1 gives %2 to %3").arg(GET_NAME(ch)).arg(obj->name).arg(GET_NAME(owner)), IMP, LogChannels::LOG_OBJECTS);
       }
 
       if (r.orig_obj != nullptr)
@@ -2007,7 +2005,7 @@ int reroll_trader(char_data *ch, obj_data *obj, int cmd, const char *arg, char_d
         act("$n gives $p to $N.", ch, r.orig_obj, owner, TO_ROOM, INVIS_NULL | NOTVICT);
         act("$n gives you $p.", ch, r.orig_obj, owner, TO_VICT, 0);
         act("You give $p to $N.", ch, r.orig_obj, owner, TO_CHAR, 0);
-        log(fmt::format("{} gives {} to {}", GET_NAME(ch), r.orig_obj->name, GET_NAME(owner)), IMP, LogChannels::LOG_OBJECTS);
+        logentry(QString("%1 gives %2 to %3").arg(GET_NAME(ch)).arg(r.orig_obj->name).arg(GET_NAME(owner)), IMP, LogChannels::LOG_OBJECTS);
       }
       else
       {
@@ -2057,7 +2055,7 @@ int reroll_trader(char_data *ch, obj_data *obj, int cmd, const char *arg, char_d
       if (r.choice1_obj != nullptr)
       {
         move_obj(r.choice1_obj, ch);
-        log(fmt::format("{} gives {} to {}", GET_NAME(owner), r.choice1_obj->name, GET_NAME(ch)), IMP, LogChannels::LOG_OBJECTS);
+        logentry(QString("%1 gives %2 to %3").arg(GET_NAME(owner)).arg(r.choice1_obj->name).arg(GET_NAME(ch)), IMP, LogChannels::LOG_OBJECTS);
         act("$n gives $p to $N.", owner, r.choice1_obj, ch, TO_ROOM, INVIS_NULL | NOTVICT);
         act("$n gives you $p.", owner, r.choice1_obj, ch, TO_VICT, 0);
         act("You give $p to $N.", owner, r.choice1_obj, ch, TO_CHAR, 0);
@@ -2074,7 +2072,7 @@ int reroll_trader(char_data *ch, obj_data *obj, int cmd, const char *arg, char_d
       if (r.choice2_obj != nullptr)
       {
         move_obj(r.choice2_obj, ch);
-        log(fmt::format("{} gives {} to {}", GET_NAME(owner), r.choice2_obj->name, GET_NAME(ch)), IMP, LogChannels::LOG_OBJECTS);
+        logentry(QString("%1 gives %2 to %3").arg(GET_NAME(owner)).arg(r.choice2_obj->name).arg(GET_NAME(ch)), IMP, LogChannels::LOG_OBJECTS);
         act("$n gives $p to $N.", owner, r.choice2_obj, ch, TO_ROOM, INVIS_NULL | NOTVICT);
         act("$n gives you $p.", owner, r.choice2_obj, ch, TO_VICT, 0);
         act("You give $p to $N.", owner, r.choice2_obj, ch, TO_CHAR, 0);
@@ -2092,7 +2090,7 @@ int reroll_trader(char_data *ch, obj_data *obj, int cmd, const char *arg, char_d
       if (r.orig_obj != nullptr)
       {
         move_obj(r.orig_obj, ch);
-        log(fmt::format("{} gives {} to {}", GET_NAME(owner), r.orig_obj->name, GET_NAME(ch)), IMP, LogChannels::LOG_OBJECTS);
+        logentry(QString("%1 gives %2 to %3").arg(GET_NAME(owner)).arg(r.orig_obj->name).arg(GET_NAME(ch)), IMP, LogChannels::LOG_OBJECTS);
         act("$n gives $p to $N.", owner, r.orig_obj, ch, TO_ROOM, INVIS_NULL | NOTVICT);
         act("$n gives you $p.", owner, r.orig_obj, ch, TO_VICT, 0);
         act("You give $p to $N.", owner, r.orig_obj, ch, TO_CHAR, 0);
@@ -2120,7 +2118,7 @@ int reroll_trader(char_data *ch, obj_data *obj, int cmd, const char *arg, char_d
     if (r.orig_obj != nullptr)
     {
       move_obj(r.orig_obj, ch);
-      log(fmt::format("{} gives {} to {}", GET_NAME(owner), r.orig_obj->name, GET_NAME(ch)), IMP, LogChannels::LOG_OBJECTS);
+      logentry(QString("%1 gives %2 to %3").arg(GET_NAME(owner)).arg(r.orig_obj->name).arg(GET_NAME(ch)), IMP, LogChannels::LOG_OBJECTS);
       act("$n gives $p to $N.", owner, r.orig_obj, ch, TO_ROOM, INVIS_NULL | NOTVICT);
       act("$n gives you $p.", owner, r.orig_obj, ch, TO_VICT, 0);
       act("You give $p to $N.", owner, r.orig_obj, ch, TO_CHAR, 0);

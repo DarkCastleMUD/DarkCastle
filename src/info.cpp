@@ -3147,7 +3147,7 @@ int do_scan(char_data *ch, char *argument, int cmd)
 {
    int i;
    char_data *vict;
-   struct room_data *room;
+   class room_data *room;
    int32_t was_in;
 
    char *possibilities[] =
@@ -3324,15 +3324,15 @@ int do_tick(char_data *ch, char *argument, int cmd)
    return eSUCCESS;
 }
 
-command_return_t do_experience(char_data *ch, QStringList &arguments, int cmd)
+command_return_t char_data::do_experience(QStringList &arguments, int cmd)
 {
-   if (GET_LEVEL(ch) >= IMMORTAL)
+   if (level >= IMMORTAL)
    {
-      ch->send("Immortals cannot gain levels by gaining experience.\r\n");
+      send("Immortals cannot gain levels by gaining experience.\r\n");
       return eSUCCESS;
    }
 
-   quint64 next_level = GET_LEVEL(ch);
+   quint64 next_level = level;
    qint64 experience_remaining = 0;
    QLocale::setDefault(QLocale::English);
 
@@ -3340,16 +3340,16 @@ command_return_t do_experience(char_data *ch, QStringList &arguments, int cmd)
    {
       next_level += 1;
       quint64 experience_next_level = exp_table[next_level];
-      quint64 current_experience = GET_EXP(ch);
+      quint64 current_experience = exp;
       experience_remaining = experience_next_level - current_experience;
 
       if (experience_remaining < 0)
       {
-         ch->send(QString("You have enough experience to advance to level %L1.\r\n").arg(next_level));
+         send(QString("You have enough experience to advance to level %L1.\r\n").arg(next_level));
       }
       else
       {
-         ch->send(QString("You require %L1 experience to advance to level %L2.\r\n").arg(experience_remaining).arg(next_level));
+         send(QString("You require %L1 experience to advance to level %L2.\r\n").arg(experience_remaining).arg(next_level));
       }
    } while (experience_remaining < 0);
 
@@ -3395,7 +3395,7 @@ void check_champion_and_website_who_list()
       }
       else
       {
-         log("CHAMPION_ITEM obj not found. Please create one.", 0, LogChannels::LOG_MISC);
+         logentry("CHAMPION_ITEM obj not found. Please create one.", 0, LogChannels::LOG_MISC);
       }
    }
 

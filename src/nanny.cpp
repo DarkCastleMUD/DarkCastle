@@ -345,7 +345,7 @@ obj_data *clan_altar(char_data *ch)
          {
             for (room = clan->rooms; room; room = room->next)
             {
-               if (real_room(room->room_number) == -1)
+               if (real_room(room->room_number) == NOWHERE)
                   continue;
                obj_data *t = world[real_room(room->room_number)].contents;
                for (; t; t = t->next_content)
@@ -629,7 +629,7 @@ void do_on_login_stuff(char_data *ch)
       {
          if (curr.first < 600 && search_skills2(curr.first, c_skills) == -1 && search_skills2(curr.first, g_skills) == -1 && curr.first != META_REIMB && curr.first != NEW_SAVE)
          {
-            log(fmt::format("Removing skill {} from {}", curr.first, GET_NAME(ch)), IMMORTAL, LogChannels::LOG_PLAYER);
+            logentry(QString("Removing skill %1 from %2").arg(curr.first).arg(GET_NAME(ch)), IMMORTAL, LogChannels::LOG_PLAYER);
             // ch->send(fmt::format("Removing skill {}\r\n", curr.first));
             skills_to_delete.push(curr.first);
          }
@@ -695,9 +695,15 @@ void do_on_login_stuff(char_data *ch)
    while (!todelete.empty())
    {
       snprintf(buf, 255, "Deleting %s from %s's vault access list.\n", todelete.front(), GET_NAME(ch));
-      log(buf, 0, LogChannels::LOG_MORTAL);
+      logentry(buf, 0, LogChannels::LOG_MORTAL);
       remove_vault_access(ch, todelete.front(), vault);
       todelete.pop();
+   }
+
+   if (ch->getSetting("mode").startsWith("char"))
+   {
+      telnet_echo_off(ch->desc);
+      telnet_sga(ch->desc);
    }
 }
 
@@ -872,7 +878,7 @@ void nanny(struct descriptor_data *d, string arg)
    {
 
    default:
-      log("Nanny: illegal STATE(d)", 0, LogChannels::LOG_BUG);
+      logentry("Nanny: illegal STATE(d)", 0, LogChannels::LOG_BUG);
       close_socket(d);
       return;
 
@@ -958,7 +964,7 @@ void nanny(struct descriptor_data *d, string arg)
 
       // Uncomment this if you think a playerfile may be crashing the mud. -pir
       //      sprintf(str_tmp, "Trying to login: %s", tmp_name);
-      //    log(str_tmp, 0, LogChannels::LOG_MISC);
+      //    logentry(str_tmp, 0, LogChannels::LOG_MISC);
 
       // ch is allocated in load_char_obj
       fOld = load_char_obj(d, tmp_name);
@@ -1044,7 +1050,7 @@ void nanny(struct descriptor_data *d, string arg)
       {
          SEND_TO_Q("Wrong password.\r\n", d);
          sprintf(log_buf, "%s wrong password: %s", GET_NAME(ch), d->host);
-         log(log_buf, OVERSEER, LogChannels::LOG_SOCKET);
+         logentry(log_buf, OVERSEER, LogChannels::LOG_SOCKET);
          if ((ch = get_pc(GET_NAME(d->character))))
          {
             sprintf(log_buf, "$4$BWARNING: Someone just tried to log in as you with the wrong password.\r\n"
@@ -1057,7 +1063,7 @@ void nanny(struct descriptor_data *d, string arg)
             if (d->character->pcdata->bad_pw_tries > 100)
             {
                sprintf(log_buf, "%s has 100+ bad pw tries...", GET_NAME(d->character));
-               log(log_buf, SERAPH, LogChannels::LOG_SOCKET);
+               logentry(log_buf, SERAPH, LogChannels::LOG_SOCKET);
             }
             else
             {
@@ -1076,9 +1082,9 @@ void nanny(struct descriptor_data *d, string arg)
 
       sprintf(log_buf, "%s@%s has connected.", GET_NAME(ch), d->host);
       if (GET_LEVEL(ch) < ANGEL)
-         log(log_buf, OVERSEER, LogChannels::LOG_SOCKET);
+         logentry(log_buf, OVERSEER, LogChannels::LOG_SOCKET);
       else
-         log(log_buf, GET_LEVEL(ch), LogChannels::LOG_SOCKET);
+         logentry(log_buf, GET_LEVEL(ch), LogChannels::LOG_SOCKET);
 
       warn_if_duplicate_ip(ch);
       //    SEND_TO_Q(motd, d);
@@ -1127,7 +1133,7 @@ void nanny(struct descriptor_data *d, string arg)
          {
             sprintf(buf, "Request for new character %s denied from [%s] (siteban)",
                     GET_NAME(d->character), d->host);
-            log(buf, OVERSEER, LogChannels::LOG_SOCKET);
+            logentry(buf, OVERSEER, LogChannels::LOG_SOCKET);
             SEND_TO_Q("Sorry, new chars are not allowed from your site.\r\n"
                       "Questions may be directed to imps@dcastle.org\n\r",
                       d);
@@ -1719,7 +1725,7 @@ void nanny(struct descriptor_data *d, string arg)
       init_char(ch);
 
       sprintf(log_buf, "%s@%s new player.", GET_NAME(ch), d->host);
-      log(log_buf, OVERSEER, LogChannels::LOG_SOCKET);
+      logentry(log_buf, OVERSEER, LogChannels::LOG_SOCKET);
       SEND_TO_Q("\n\r", d);
       SEND_TO_Q(motd, d);
       SEND_TO_Q("\n\rIf you have read this motd, press Return.", d);
@@ -1771,12 +1777,12 @@ void nanny(struct descriptor_data *d, string arg)
          if (GET_GOLD(ch) > 1000000000)
          {
             sprintf(log_buf, "%s has more than a billion gold. Bugged?", GET_NAME(ch));
-            log(log_buf, 100, LogChannels::LOG_WARNINGS);
+            logentry(log_buf, 100, LogChannels::LOG_WARNINGS);
          }
          if (GET_BANK(ch) > 1000000000)
          {
             sprintf(log_buf, "%s has more than a billion gold in the bank. Rich fucker or bugged.", GET_NAME(ch));
-            log(log_buf, 100, LogChannels::LOG_WARNINGS);
+            logentry(log_buf, 100, LogChannels::LOG_WARNINGS);
          }
          send_to_char("\n\rWelcome to Dark Castle.\r\n", ch);
          character_list.insert(ch);
@@ -1889,7 +1895,7 @@ void nanny(struct descriptor_data *d, string arg)
       if (arg == "ERASE ME")
       {
          sprintf(buf, "%s just deleted themself.", d->character->name);
-         log(buf, IMMORTAL, LogChannels::LOG_MORTAL);
+         logentry(buf, IMMORTAL, LogChannels::LOG_MORTAL);
 
          AuctionHandleDelete(d->character->name);
          // To remove the vault from memory
@@ -1974,7 +1980,7 @@ void nanny(struct descriptor_data *d, string arg)
          strcpy(ch->pcdata->pwd, blah2);
          save_char_obj(ch);
          sprintf(log_buf, "%s password changed", GET_NAME(ch));
-         log(log_buf, SERAPH, LogChannels::LOG_SOCKET);
+         logentry(log_buf, SERAPH, LogChannels::LOG_SOCKET);
       }
 
       break;
@@ -2031,13 +2037,13 @@ bool check_deny(struct descriptor_data *d, char *name)
    char bufdeny[MAX_STRING_LENGTH];
 
    sprintf(strdeny, "%s/%c/%s.deny", SAVE_DIR, UPPER(name[0]), name);
-   if ((fpdeny = dc_fopen(strdeny, "rb")) == NULL)
+   if ((fpdeny = fopen(strdeny, "rb")) == NULL)
       return FALSE;
-   dc_fclose(fpdeny);
+   fclose(fpdeny);
 
    char log_buf[MAX_STRING_LENGTH] = {};
    sprintf(log_buf, "Denying access to player %s@%s.", name, d->host);
-   log(log_buf, ARCHANGEL, LogChannels::LOG_MORTAL);
+   logentry(log_buf, ARCHANGEL, LogChannels::LOG_MORTAL);
    file_to_string(strdeny, bufdeny);
    SEND_TO_Q(bufdeny, d);
    close_socket(d);
@@ -2054,9 +2060,6 @@ bool check_reconnect(struct descriptor_data *d, char *name, bool fReconnect)
          continue;
 
       if (str_cmp(GET_NAME(d->character), GET_NAME(tmp_ch)))
-         continue;
-
-      if (GET_LEVEL(d->character) < 2)
          continue;
 
       //      if(fReconnect == FALSE)
@@ -2085,14 +2088,20 @@ bool check_reconnect(struct descriptor_data *d, char *name, bool fReconnect)
 
          if (GET_LEVEL(tmp_ch) < IMMORTAL)
          {
-            log(log_buf, COORDINATOR, LogChannels::LOG_SOCKET);
+            logentry(log_buf, COORDINATOR, LogChannels::LOG_SOCKET);
          }
          else
          {
-            log(log_buf, GET_LEVEL(tmp_ch), LogChannels::LOG_SOCKET);
+            logentry(log_buf, GET_LEVEL(tmp_ch), LogChannels::LOG_SOCKET);
          }
 
          STATE(d) = conn::PLAYING;
+
+         if (tmp_ch->getSetting("mode").startsWith("char"))
+         {
+            telnet_echo_off(d);
+            telnet_sga(d);
+         }
       }
       return TRUE;
    }
@@ -2520,10 +2529,10 @@ bool on_forbidden_name_list(char *name)
    bool found = FALSE;
    int i;
 
-   nameList = dc_fopen(FORBIDDEN_NAME_FILE, "ro");
+   nameList = fopen(FORBIDDEN_NAME_FILE, "ro");
    if (!nameList)
    {
-      log("Failed to open forbidden name file!", 0, LogChannels::LOG_MISC);
+      logentry("Failed to open forbidden name file!", 0, LogChannels::LOG_MISC);
       return FALSE;
    }
    else
@@ -2536,7 +2545,7 @@ bool on_forbidden_name_list(char *name)
          if (!str_cmp(name, buf))
             found = TRUE;
       }
-      dc_fclose(nameList);
+      fclose(nameList);
    }
    return found;
 }

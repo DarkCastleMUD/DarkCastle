@@ -2,8 +2,12 @@
 | Level 101 wizard commands
 | 11/20/95 -- Azrack
 **********************/
-#include "wizard.h"
+#include <queue>
+#include <string>
 
+#include <fmt/format.h>
+
+#include "wizard.h"
 #include "utility.h"
 #include "mobile.h"
 #include "levels.h"
@@ -18,9 +22,6 @@
 #include "returnvals.h"
 #include "spells.h"
 #include "const.h"
-#include <queue>
-#include <string>
-#include <fmt/format.h>
 
 using namespace std;
 using namespace fmt;
@@ -30,7 +31,7 @@ queue<string> imp_history;
 
 #define MAX_MESSAGE_LENGTH 4096
 
-extern struct room_data **world_array;
+extern class room_data **world_array;
 
 int do_wizhelp(char_data *ch, char *argument, int cmd_arg)
 {
@@ -127,9 +128,8 @@ int do_wizhelp(char_data *ch, char *argument, int cmd_arg)
   return eSUCCESS;
 }
 
-command_return_t do_goto(char_data *ch, string argument, int cmd)
+command_return_t char_data::do_goto(QStringList &arguments, int cmd)
 {
-  string buf = {};
   int loc_nr = {}, location = -1, i = {}, start_room = {};
   zone_t zone_nr = {};
   char_data *target_mob = {}, *pers = {};
@@ -138,51 +138,62 @@ command_return_t do_goto(char_data *ch, string argument, int cmd)
   struct obj_data *target_obj = {};
   extern int top_of_world;
 
-  if (ch == nullptr || IS_NPC(ch))
+  if (IS_NPC(this))
   {
     return eFAILURE;
   }
-  start_room = ch->in_room;
+  start_room = in_room;
 
-  tie(buf, argument) = half_chop(argument);
-  if (buf.empty())
+  if (arguments.isEmpty())
   {
-    ch->send("You must supply a room number, a name or zone <zone number>.\r\n");
+    send("You must supply a room number, a name or zone <zone number>.\r\n");
     return eFAILURE;
   }
 
-  if (buf == "zone" || buf == "z")
+  QString arg1 = arguments.at(0);
+  bool ok = false;
+  if (arg1 == "zone" || arg1 == "z")
   {
-    tie(buf, argument) = half_chop(argument);
-    if (buf.empty())
+
+    if (arguments.size() < 2)
     {
-      ch->send("No zone number specified.\r\n");
+      send("No zone number specified.\r\n");
       return eFAILURE;
     }
+    QString arg2 = arguments.at(1);
 
     try
     {
-      zone_nr = stoull(buf);
-      if (zone_nr > top_of_zone_table)
+      zone_t zone_key = arg2.toULongLong(&ok);
+      auto &zones = DC::getInstance()->zones;
+      if (ok == false || zones.contains(zone_key) == false)
       {
-        ch->send(format("Invalid zone specified. Valid values are 0-{}\r\n", top_of_zone_table));
+        if (zones.isEmpty())
+        {
+          send(QString("Invalid zone %1 specified. No zones loaded.\r\n").arg(zone_key));
+          return eFAILURE;
+        }
+
+        auto last_zone_nr = zones.lastKey();
+        send(QString("Invalid zone %1 specified. Valid values are 1-%2\r\n").arg(zone_key).arg(last_zone_nr));
         return eFAILURE;
       }
+      auto &zone = zones[zone_key];
 
-      if (zone_nr == 0)
+      if (zone_key == 0)
       {
         loc_nr = 1;
       }
       else
       {
-        loc_nr = DC::getInstance()->zones[zone_nr - 1].top + 1;
+        loc_nr = zone.getRealBottom();
       }
 
-      ch->send(format("Going to room {} in zone #{} [{}]\r\n", loc_nr, zone_nr, ltrim(string(DC::getInstance()->zones[zone_nr].name))));
+      send(format("Going to room {} in zone #{} [{}]\r\n", loc_nr, zone_key, ltrim(string(DC::getInstance()->zones.value(zone_key).name))));
 
       if (loc_nr > top_of_world || loc_nr < 0)
       {
-        send_to_char("No room exists with that number.\r\n", ch);
+        send("No room exists with that number.\r\n");
         return eFAILURE;
       }
 
@@ -192,97 +203,102 @@ command_return_t do_goto(char_data *ch, string argument, int cmd)
       }
       else
       {
-        if (can_modify_this_room(ch, loc_nr))
+        if (can_modify_this_room(this, loc_nr))
         {
-          if (create_one_room(ch, loc_nr))
+          if (create_one_room(this, loc_nr))
           {
-            send_to_char("You form order out of chaos.\r\n", ch);
+            send("You form order out of chaos.\r\n");
             location = loc_nr;
           }
         }
       }
       if (location == -1)
       {
-        send_to_char("No room exists with that number.\r\n", ch);
+        send("No room exists with that number.\r\n");
         return eFAILURE;
       }
     }
     catch (...)
     {
-      ch->send("Invalid zone number specified.\r\n");
+      send("Invalid zone number specified.\r\n");
       return eFAILURE;
     }
   }
-  else if ((target_mob = get_pc_vis(ch, buf)))
+  else if (arg1.isEmpty() == false)
   {
-    location = target_mob->in_room;
-  }
-  else if ((target_mob = get_char_vis(ch, buf)))
-  {
-    location = target_mob->in_room;
-  }
-  else if ((target_obj = get_obj_vis(ch, buf)))
-  {
-    if (target_obj->in_room != NOWHERE)
+    loc_nr = arg1.toULongLong(&ok);
+    if (ok == false)
     {
-      location = target_obj->in_room;
+      if ((target_mob = getVisiblePlayer(arg1)))
+      {
+        location = target_mob->in_room;
+      }
+      else if ((target_mob = getVisibleCharacter(arg1)))
+      {
+        location = target_mob->in_room;
+      }
+      else if ((target_obj = getVisibleObject(arg1)))
+      {
+        if (target_obj->in_room != NOWHERE)
+        {
+          location = target_obj->in_room;
+        }
+        else
+        {
+          send("The object is not available.\r\n");
+          return eFAILURE;
+        }
+      }
     }
-    else
-    {
-      send_to_char("The object is not available.\r\n", ch);
-      return eFAILURE;
-    }
-  }
-  else if (isdigit(buf[0]) && (buf.length() < 2) || (buf.length() >= 2 && buf.find('.') == buf.npos))
-  {
-    loc_nr = atoi(buf.c_str());
+
     if (loc_nr > top_of_world || loc_nr < 0)
     {
-      send_to_char("No room exists with that number.\r\n", ch);
+      send("No room exists with that number.\r\n");
       return eFAILURE;
     }
+
     if (world_array[loc_nr])
       location = loc_nr;
     else
     {
-      if (can_modify_this_room(ch, loc_nr))
+      if (can_modify_this_room(this, loc_nr))
       {
-        if (create_one_room(ch, loc_nr))
+        if (create_one_room(this, loc_nr))
         {
-          send_to_char("You form order out of chaos.\n\r\n\r", ch);
+          send("You form order out of chaos.\n\r\n\r");
           location = loc_nr;
         }
       }
     }
     if (location == -1)
     {
-      send_to_char("No room exists with that number.\r\n", ch);
+      send("No room exists with that number.\r\n");
       return eFAILURE;
     }
   }
   else
   {
-    send_to_char("No such creature or object around.\r\n", ch);
+    send("No such creature or object around.\r\n");
     return eFAILURE;
   }
 
   /* a location has been found. */
   if (IS_SET(world[location].room_flags, IMP_ONLY) &&
-      GET_LEVEL(ch) < OVERSEER)
+      GET_LEVEL(this) < OVERSEER)
   {
-    send_to_char("No.\r\n", ch);
+    send("No.\r\n");
     return eFAILURE;
   }
 
   /* Let's keep 104-'s out of clan halls....sigh... */
   if (IS_SET(world[location].room_flags, CLAN_ROOM) &&
-      GET_LEVEL(ch) < DEITY)
+      GET_LEVEL(this) < DEITY)
   {
-    send_to_char("For your protection, 104-'s may not be in clanhalls.\r\n", ch);
+    send("For your protection, 104-'s may not be in clanhalls.\r\n");
     return eFAILURE;
   }
 
-  if ((IS_SET(world[location].room_flags, PRIVATE)) && (GET_LEVEL(ch) < OVERSEER))
+  if ((IS_SET(world[location].room_flags, PRIVATE)) && (GET_LEVEL(this) < OVERSEER))
   {
 
     for (i = 0, pers = world[location].people; pers;
@@ -290,27 +306,25 @@ command_return_t do_goto(char_data *ch, string argument, int cmd)
       ;
     if (i > 1)
     {
-      send_to_char("There's a private conversation going on in "
-                   "that room.\r\n",
-                   ch);
+      send("There's a private conversation going on in that room.\r\n");
       return eFAILURE;
     }
   }
 
-  ch->send("\r\n");
+  send("\r\n");
 
-  if (!IS_MOB(ch))
-    for (tmp_ch = world[ch->in_room].people; tmp_ch; tmp_ch = tmp_ch->next_in_room)
+  if (!IS_MOB(this))
+    for (tmp_ch = world[in_room].people; tmp_ch; tmp_ch = tmp_ch->next_in_room)
     {
-      if ((CAN_SEE(tmp_ch, ch) && (tmp_ch != ch) && !ch->pcdata->stealth) || (GET_LEVEL(tmp_ch) > GET_LEVEL(ch) && GET_LEVEL(tmp_ch) > PATRON))
+      if ((CAN_SEE(tmp_ch, this) && (tmp_ch != this) && !pcdata->stealth) || (GET_LEVEL(tmp_ch) > GET_LEVEL(this) && GET_LEVEL(tmp_ch) > PATRON))
       {
         ansi_color(RED, tmp_ch);
         ansi_color(BOLD, tmp_ch);
-        send_to_char(ch->pcdata->poofout, tmp_ch);
+        send_to_char(pcdata->poofout, tmp_ch);
         send_to_char("\n\r", tmp_ch);
         ansi_color(NTEXT, tmp_ch);
       }
-      else if (tmp_ch != ch && !ch->pcdata->stealth)
+      else if (tmp_ch != this && !pcdata->stealth)
       {
         ansi_color(RED, tmp_ch);
         ansi_color(BOLD, tmp_ch);
@@ -319,21 +333,21 @@ command_return_t do_goto(char_data *ch, string argument, int cmd)
       }
     }
 
-  move_char(ch, location);
+  move_char(this, location);
 
-  if (!IS_MOB(ch))
-    for (tmp_ch = world[ch->in_room].people; tmp_ch; tmp_ch = tmp_ch->next_in_room)
+  if (!IS_MOB(this))
+    for (tmp_ch = world[in_room].people; tmp_ch; tmp_ch = tmp_ch->next_in_room)
     {
-      if ((CAN_SEE(tmp_ch, ch) && (tmp_ch != ch) && !ch->pcdata->stealth) || (GET_LEVEL(tmp_ch) > GET_LEVEL(ch) && GET_LEVEL(tmp_ch) > PATRON))
+      if ((CAN_SEE(tmp_ch, this) && (tmp_ch != this) && !pcdata->stealth) || (GET_LEVEL(tmp_ch) > GET_LEVEL(this) && GET_LEVEL(tmp_ch) > PATRON))
       {
 
         ansi_color(RED, tmp_ch);
         ansi_color(BOLD, tmp_ch);
-        send_to_char(ch->pcdata->poofin, tmp_ch);
+        send_to_char(pcdata->poofin, tmp_ch);
         send_to_char("\n\r", tmp_ch);
         ansi_color(NTEXT, tmp_ch);
       }
-      else if (tmp_ch != ch && !ch->pcdata->stealth)
+      else if (tmp_ch != this && !pcdata->stealth)
       {
         ansi_color(RED, tmp_ch);
         ansi_color(BOLD, tmp_ch);
@@ -342,17 +356,17 @@ command_return_t do_goto(char_data *ch, string argument, int cmd)
       }
     }
 
-  do_look(ch, "", 15);
+  do_look(this, "", 15);
 
-  if (ch->followers)
-    for (k = ch->followers; k; k = next_dude)
+  if (followers)
+    for (k = followers; k; k = next_dude)
     {
       next_dude = k->next;
-      if (start_room == k->follower->in_room && CAN_SEE(k->follower, ch) &&
+      if (start_room == k->follower->in_room && CAN_SEE(k->follower, this) &&
           GET_LEVEL(k->follower) >= IMMORTAL)
       {
-        csendf(k->follower, "You follow %s.\n\r\n\r", GET_SHORT(ch));
-        do_goto(k->follower, argument, CMD_DEFAULT);
+        csendf(k->follower, "You follow %s.\n\r\n\r", GET_SHORT(this));
+        k->follower->do_goto(arguments, CMD_DEFAULT);
       }
     }
   return eSUCCESS;
@@ -756,24 +770,23 @@ int do_findfix(char_data *ch, char *argument, int cmd)
   // Lazy code. Nested fors > thinking.
   char buf[MAX_STRING_LENGTH];
   buf[0] = '\0';
-  extern int top_of_zonet;
-  for (i = 0; i < top_of_zonet; i++)
+  for (auto [zone_key, zone] : DC::getInstance()->zones.asKeyValueRange())
   {
-    for (j = 0; DC::getInstance()->zones[i].cmd[j].command != 'S'; j++)
+    for (j = 0; zone.cmd[j].command != 'S'; j++)
     {
       bool first = TRUE, found = FALSE;
-      if (DC::getInstance()->zones[i].cmd[j].command != 'M')
+      if (zone.cmd[j].command != 'M')
         continue;
-      int vnum = DC::getInstance()->zones[i].cmd[j].arg1, max = DC::getInstance()->zones[i].cmd[j].arg2;
-      if (DC::getInstance()->zones[i].cmd[j].arg2 == 1 ||
-          DC::getInstance()->zones[i].cmd[j].arg2 == -1)
+      int vnum = zone.cmd[j].arg1, max = zone.cmd[j].arg2;
+      if (zone.cmd[j].arg2 == 1 ||
+          zone.cmd[j].arg2 == -1)
         continue; // Don't care about those..
       int amt = 0;
-      for (z = 0; DC::getInstance()->zones[i].cmd[z].command != 'S'; z++)
+      for (z = 0; zone.cmd[z].command != 'S'; z++)
       {
-        if (DC::getInstance()->zones[i].cmd[z].command != 'M')
+        if (zone.cmd[z].command != 'M')
           continue;
-        if (DC::getInstance()->zones[i].cmd[z].arg1 != vnum)
+        if (zone.cmd[z].arg1 != vnum)
           continue;
         if (z == j && found)
         {
@@ -781,8 +794,8 @@ int do_findfix(char_data *ch, char *argument, int cmd)
           break;
         }
         found = TRUE;
-        if (DC::getInstance()->zones[i].cmd[z].arg2 > max)
-          max = DC::getInstance()->zones[i].cmd[z].arg2;
+        if (zone.cmd[z].arg2 > max)
+          max = zone.cmd[z].arg2;
         amt++;
       }
       if (!first)
