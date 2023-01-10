@@ -730,12 +730,14 @@ struct time_info_data age(char_data *ch)
 bool file_exists(const char *filename)
 {
   FILE *fp;
-  bool r;
 
-  fp = fopen(filename, "r");
-  r = (fp ? 1 : 0);
+  if ((fp = fopen(filename, "r")) == NULL)
+  {
+    return false;
+  }
+
   fclose(fp);
-  return (r);
+  return true;
 }
 
 void util_archive(const char *char_name, char_data *caller)
