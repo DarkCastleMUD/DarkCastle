@@ -46,7 +46,7 @@ int move_player(char_data *ch, int room)
 		retval = move_char(ch, real_room(START_ROOM));
 		if (!IS_SET(retval, eSUCCESS))
 			logentry("Error in move_player(), Failure moving ch to start room. move_player_home_nofail",
-				IMMORTAL, LogChannels::LOG_BUG);
+					 IMMORTAL, LogChannels::LOG_BUG);
 	}
 
 	return retval;
@@ -615,7 +615,7 @@ int do_simple_move(char_data *ch, int cmd, int following)
 	}
 
 	// if I'm STAY_NO_TOWN, don't enter a Zone::Flag::IS_TOWN zone no matter what
-	if (IS_NPC(ch) &&	ISSET(ch->mobdata->actflags, ACT_STAY_NO_TOWN) && DC::getInstance()->zones.value(world[world[ch->in_room].dir_option[cmd]->to_room].zone).isTown())
+	if (IS_NPC(ch) && ISSET(ch->mobdata->actflags, ACT_STAY_NO_TOWN) && DC::getInstance()->zones.value(world[world[ch->in_room].dir_option[cmd]->to_room].zone).isTown())
 		return eFAILURE;
 
 	int a = 0;
@@ -1037,23 +1037,29 @@ int do_leave(char_data *ch, char *arguement, int cmd)
 
 	for (k = object_list; k; k = k->next)
 	{
-		if ((k->obj_flags.type_flag == ITEM_PORTAL) && (k->obj_flags.value[1] == 1 || (k->obj_flags.value[1] == 2)) && (k->in_room > -1) && !IS_SET(k->obj_flags.value[3], PORTAL_NO_LEAVE))
+		if (k->obj_flags.type_flag == ITEM_PORTAL)
 		{
-			if ((k->obj_flags.value[0] == world[ch->in_room].number) || (k->obj_flags.value[2] == world[ch->in_room].zone))
+			if (k->obj_flags.value[1] == 1 || k->obj_flags.value[1] == 2)
 			{
-				send_to_char("You exit the area.\r\n", ch);
-				act("$n has left the area.", ch, 0, 0, TO_ROOM, INVIS_NULL | STAYHIDE);
-				retval = move_char(ch, real_room(world[k->in_room].number));
-				if (!IS_SET(retval, eSUCCESS))
+				if (k->in_room > 0 && !IS_SET(k->obj_flags.value[3], PORTAL_NO_LEAVE))
 				{
-					send_to_char("You attempt to leave, but the door slams in your face!\r\n", ch);
-					act("$n attempts to leave, but can't!", ch, 0, 0, TO_ROOM, INVIS_NULL | STAYHIDE);
-					return eFAILURE;
+					if (k->obj_flags.value[0] == world[ch->in_room].number || k->obj_flags.value[2] == world[ch->in_room].zone)
+					{
+						send_to_char("You exit the area.\r\n", ch);
+						act("$n has left the area.", ch, 0, 0, TO_ROOM, INVIS_NULL | STAYHIDE);
+						retval = move_char(ch, real_room(world[k->in_room].number));
+						if (!IS_SET(retval, eSUCCESS))
+						{
+							send_to_char("You attempt to leave, but the door slams in your face!\r\n", ch);
+							act("$n attempts to leave, but can't!", ch, 0, 0, TO_ROOM, INVIS_NULL | STAYHIDE);
+							return eFAILURE;
+						}
+						do_look(ch, "", CMD_DEFAULT);
+						sprintf(buf, "%s walks out of %s.", GET_NAME(ch), k->short_description);
+						act(buf, ch, 0, 0, TO_ROOM, INVIS_NULL | STAYHIDE);
+						return ambush(ch);
+					}
 				}
-				do_look(ch, "", CMD_DEFAULT);
-				sprintf(buf, "%s walks out of %s.", GET_NAME(ch), k->short_description);
-				act(buf, ch, 0, 0, TO_ROOM, INVIS_NULL | STAYHIDE);
-				return ambush(ch);
 			}
 		}
 	}
@@ -1234,7 +1240,7 @@ int move_char(char_data *ch, int dest, bool stop_all_fighting)
 		if (char_from_room(ch, stop_all_fighting) == 0)
 		{
 			logentry("Error in move_char(), character not NOWHERE, but couldn't be moved.",
-				OVERSEER, LogChannels::LOG_BUG);
+					 OVERSEER, LogChannels::LOG_BUG);
 			return eINTERNAL_ERROR;
 		}
 	}
