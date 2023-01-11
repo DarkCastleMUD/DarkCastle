@@ -324,7 +324,7 @@ struct command_info cmd_info[] =
         {"free animal", do_free_animal, nullptr, nullptr, POSITION_RESTING, 0, CMD_DEFAULT, 0, 0, CommandType::all},
         {"prompt", do_prompt, nullptr, nullptr, POSITION_DEAD, 0, CMD_DEFAULT, 0, 1, CommandType::all},
         {"lastprompt", do_lastprompt, nullptr, nullptr, POSITION_DEAD, 0, CMD_DEFAULT, 0, 1, CommandType::all},
-        {"save", do_save, nullptr, nullptr, POSITION_DEAD, 0, CMD_DEFAULT, 0, 1, CommandType::all},
+        {"save", nullptr, nullptr, &char_data::do_save, POSITION_DEAD, 0, CMD_DEFAULT, 0, 1, CommandType::all},
         {"sneak", do_sneak, nullptr, nullptr, POSITION_STANDING, 1, CMD_DEFAULT, 0, 0, CommandType::all},
         {"home", do_home, nullptr, nullptr, POSITION_DEAD, 0, CMD_DEFAULT, 0, 1, CommandType::all},
         {"split", nullptr, nullptr, &char_data::do_split, POSITION_RESTING, 0, CMD_SPLIT, 0, 0, CommandType::all},

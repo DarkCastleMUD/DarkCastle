@@ -210,7 +210,7 @@ command_return_t char_data::do_split(QStringList &arguments, int cmd)
   share = amount / no_members;
   extra = amount % no_members;
   gold -= amount;
-  do_save(this, "", 666);
+  save(666);
 
   send(QString("You split %L1 gold coins. Your share is %L2 gold coins.\r\n").arg(amount).arg(share + extra));
   gold += share + extra;

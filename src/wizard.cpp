@@ -1590,7 +1590,7 @@ int do_restore(char_data *ch, char *argument, int cmd)
     if (!IS_AFFECTED(ch, AFF_BLIND))
       act("You have been fully healed by $N!",
           victim, 0, ch, TO_CHAR, 0);
-    do_save(victim, "", CMD_DEFAULT);
+    victim->save();
   }
   else
   { /* Restore all */
@@ -1627,7 +1627,7 @@ int do_restore(char_data *ch, char *argument, int cmd)
 
         act("You have been fully healed by $N!",
             victim, 0, ch, TO_CHAR, 0);
-        do_save(victim, "", CMD_DEFAULT);
+        victim->save();
       }
     sprintf(buf, "%s did a restore all!", GET_NAME(ch));
     logentry(buf, GET_LEVEL(ch), LogChannels::LOG_GOD);

@@ -441,7 +441,7 @@ void finish_hotboot()
   for (d = descriptor_list; d; d = d->next)
   {
     do_look(d->character, "", 8);
-    do_save(d->character, "", 666);
+    d->character->save(666);
   }
 }
 
@@ -962,6 +962,7 @@ void init_heartbeat()
 
 void heartbeat()
 {
+  DC *dc = DC::getInstance();
   if (--pulse_mobile < 1)
   {
     pulse_mobile = PULSE_MOBILE;
@@ -1052,7 +1053,7 @@ void heartbeat()
     checkConsecrate(PULSE_REGEN);
     if (!number(0, 2))
     {
-      send_hint();
+      dc->send_hint();
     }
     PerfTimers["pulse_regen"].stop();
   }

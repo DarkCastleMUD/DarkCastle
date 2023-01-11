@@ -1137,7 +1137,7 @@ int do_outcast(char_data *ch, char *arg, int cmd)
   sprintf(buf, "%s was outcasted from clan [%s].", GET_NAME(victim), clan->name);
   logentry(buf, IMP, LogChannels::LOG_CLAN);
 
-  do_save(victim, "", 666);
+  victim->save(666);
   if (!connected)
     free_char(victim, Trace("do_outcast"));
 
@@ -2874,7 +2874,7 @@ int do_cdeposit(char_data *ch, char *arg, int cmd)
     ch->send(fmt::format(locale("en_US.UTF-8"), "You deposit {:L} $B$5gold$R coins into your clan's account.\r\n", dep));
   }
   save_clans();
-  do_save(ch, "", 0);
+  ch->save(0);
 
   char buf[MAX_INPUT_LENGTH];
   if (dep == 1)
@@ -2932,7 +2932,7 @@ int do_cwithdraw(char_data *ch, char *arg, int cmd)
     csendf(ch, "You withdraw %d gold coins.\r\n", wdraw);
   }
   save_clans();
-  do_save(ch, "", 0);
+  ch->save(0);
 
   char buf[MAX_INPUT_LENGTH];
   if (wdraw == 1)

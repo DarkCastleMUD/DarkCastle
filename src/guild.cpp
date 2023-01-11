@@ -975,7 +975,7 @@ int guild(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
       GET_LEVEL(ch) = 50;
     SET_BIT(ch->pcdata->toggles, PLR_REMORTED);
 
-    do_save(ch, "", 666);
+    ch->save(666);
     return eSUCCESS;
   }
 

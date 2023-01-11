@@ -1266,7 +1266,7 @@ int meta_dude(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
 			act("The Meta-physician touches $n.", ch, 0, 0, TO_ROOM, 0);
 			act("The Meta-physician touches you.", ch, 0, 0, TO_CHAR, 0);
 			logf(110, LogChannels::LOG_MORTAL, "%s metas -2 AC for 10 qpoints.", GET_NAME(ch));
-			do_save(ch, "", 10);
+			ch->save(10);
 
 			return eSUCCESS;
 		}
@@ -1288,7 +1288,7 @@ int meta_dude(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
 			act("The Meta-physician touches $n.", ch, 0, 0, TO_ROOM, 0);
 			act("The Meta-physician touches you.", ch, 0, 0, TO_CHAR, 0);
 			logf(110, LogChannels::LOG_MORTAL, "%s metas 2000000 XP for 1 qpoint.", GET_NAME(ch));
-			do_save(ch, "", 10);
+			ch->save(10);
 
 			return eSUCCESS;
 		}
@@ -1851,7 +1851,7 @@ int cardinal(char_data *ch, struct obj_data *obj, int cmd, const char *argument,
 			act("The Meta-physician touches $n.", ch, 0, 0, TO_ROOM, 0);
 			act("The Meta-physician touches you.", ch, 0, 0, TO_CHAR, 0);
 			logf(110, LogChannels::LOG_MORTAL, "%s metas 1 age for 5 qpoints.", GET_NAME(ch));
-			do_save(ch, "", 10);
+			ch->save(10);
 
 			return eSUCCESS;
 		}
@@ -1878,7 +1878,7 @@ int cardinal(char_data *ch, struct obj_data *obj, int cmd, const char *argument,
 			act("The Meta-physician touches $n.", ch, 0, 0, TO_ROOM, 0);
 			act("The Meta-physician touches you.", ch, 0, 0, TO_CHAR, 0);
 			logf(110, LogChannels::LOG_MORTAL, "%s metas -1 age for 5 qpoints.", GET_NAME(ch));
-			do_save(ch, "", 10);
+			ch->save(10);
 
 			return eSUCCESS;
 		}

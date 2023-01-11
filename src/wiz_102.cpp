@@ -1443,7 +1443,7 @@ int do_sedit(char_data *ch, char *argument, int cmd)
   }
 
   // make sure the changes stick
-  do_save(vict, "", 666);
+  vict->save(666);
 
   return eSUCCESS;
 }

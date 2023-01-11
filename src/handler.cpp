@@ -3249,7 +3249,7 @@ int obj_from_char(struct obj_data *object)
 	if (!object->carried_by)
 	{
 		logentry("Obj_from_char called on an object no one is carrying!", OVERSEER,
-			LogChannels::LOG_BUG);
+				 LogChannels::LOG_BUG);
 		return 0;
 	}
 
@@ -3372,7 +3372,7 @@ int obj_from_room(struct obj_data *object)
 	if (object->in_room < 0)
 	{
 		logentry("obj_from_room called on an object that isn't in a room!", OVERSEER,
-			LogChannels::LOG_BUG);
+				 LogChannels::LOG_BUG);
 		return 0;
 	}
 
@@ -3447,7 +3447,7 @@ int obj_from_obj(struct obj_data *obj)
 	if (!obj->in_obj)
 	{
 		logentry("obj_from_obj called on an item that isn't inside another item.",
-			OVERSEER, LogChannels::LOG_BUG);
+				 OVERSEER, LogChannels::LOG_BUG);
 		return 0;
 	}
 
@@ -3778,7 +3778,7 @@ void extract_char(char_data *ch, bool pull, Trace t)
 	}
 	if (isGolem && omast)
 	{
-		do_save(omast, "", 666);
+		omast->save(666);
 		omast->pcdata->golem = 0; // Reset the golem flag.
 	}
 	/*

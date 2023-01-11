@@ -252,7 +252,7 @@ int do_donate(char_data *ch, char *argument, int cmd)
         move_char(ch, origin);
         move_obj(obj, location);
 
-        do_save(ch, "", 0);
+        ch->save(0);
         return eSUCCESS;
       }
       else
@@ -333,7 +333,7 @@ int do_donate(char_data *ch, char *argument, int cmd)
   move_char(ch, origin, false);
   move_obj(obj, location);
 
-  do_save(ch, "", 0);
+  ch->save(0);
   return eSUCCESS;
 }
 

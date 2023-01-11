@@ -805,7 +805,7 @@ command_return_t do_tellhistory(char_data *ch, string argument, int cmd)
       ch->send(fmt::format("tell history timestamp turned off\r\n"));
     }
 
-    do_save(ch, "", CMD_DEFAULT);
+    ch->save();
   }
 
   return eSUCCESS;

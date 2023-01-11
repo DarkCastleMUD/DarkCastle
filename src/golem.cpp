@@ -86,7 +86,7 @@ void golem_gain_exp(char_data *ch)
     ch->exp = 0;
     ch->level++;
     advance_golem_level(ch);
-    do_save(ch->master, "", 666);
+    ch->master->save(666);
     do_say(ch, "Errrrrhhgg...", 0);
   }
 }

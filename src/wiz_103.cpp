@@ -233,7 +233,7 @@ int do_fsave(char_data *ch, string argument, int cmd)
     buf = {};
     send_to_char("Ok.\r\n", ch);
   }
-  do_save(vict, "", CMD_DEFAULT);
+  vict->save();
 
   logentry(QString("%1 just forced %2 to save.").arg(GET_NAME(ch)).arg(GET_NAME(vict)), GET_LEVEL(ch), LogChannels::LOG_GOD);
 

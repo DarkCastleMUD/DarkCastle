@@ -795,7 +795,7 @@ int bank(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
     GET_GOLD(ch) -= x;
     GET_BANK(ch) += x;
     ch->send(fmt::format(locale("en_US.UTF-8"), "You deposit {:L} $B$5gold$R coins.\r\n", x));
-    do_save(ch, "", CMD_DEFAULT);
+    ch->save();
     return eSUCCESS;
   }
 
@@ -814,7 +814,7 @@ int bank(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
   GET_GOLD(ch) += x;
   GET_BANK(ch) -= x;
   ch->send(fmt::format(locale("en_US.UTF-8"), "You withdraw {:L} $B$5gold$R coins.\r\n", x));
-  do_save(ch, "", CMD_DEFAULT);
+  ch->save();
   return eSUCCESS;
 }
 
@@ -856,7 +856,7 @@ int casino_atm(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
   GET_GOLD(ch) += x;
   GET_BANK(ch) -= x;
   ch->send(fmt::format(locale("en_US.UTF-8"), "You withdraw {:L} $B$5gold$R coins.\r\n", x));
-  do_save(ch, "", CMD_DEFAULT);
+  ch->save();
   return eSUCCESS;
 }
 
@@ -1809,7 +1809,7 @@ int restring_machine(char_data *ch, struct obj_data *obj, int cmd, const char *a
                "Your item looks new!\r\n\r\n",
                ch);
 
-  do_save(ch, "", CMD_DEFAULT);
+  ch->save();
   return eSUCCESS;
 }
 

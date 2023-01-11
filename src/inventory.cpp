@@ -192,7 +192,7 @@ void get(char_data *ch, struct obj_data *obj_object, struct obj_data *sub_object
   }
   if (sub_object && sub_object->obj_flags.value[3] == 1 &&
       isname("pc", sub_object->name))
-    do_save(ch, "", 666);
+    ch->save(666);
 
   if ((obj_object->obj_flags.type_flag == ITEM_MONEY) &&
       (obj_object->obj_flags.value[0] >= 1))
@@ -514,7 +514,7 @@ int do_get(char_data *ch, char *argument, int cmd)
     if (found)
     {
       //		send_to_char("OK.\r\n", ch);
-      do_save(ch, "", 666);
+      ch->save(666);
     }
     else
     {
@@ -588,7 +588,7 @@ int do_get(char_data *ch, char *argument, int cmd)
         {
           csendf(ch, "The aura of the donation room allows you to pick up %s.\r\n", obj_object->short_description);
           get(ch, obj_object, sub_object, 0, cmd);
-          do_save(ch, "", 666);
+          ch->save(666);
           found = TRUE;
         }
       }
@@ -599,7 +599,7 @@ int do_get(char_data *ch, char *argument, int cmd)
         else
           get(ch, obj_object, sub_object, 0, cmd);
 
-        do_save(ch, "", 666);
+        ch->save(666);
         found = TRUE;
       }
       else
@@ -981,7 +981,7 @@ int do_get(char_data *ch, char *argument, int cmd)
   }
   if (fail)
     return eFAILURE;
-  do_save(ch, "", 666);
+  ch->save(666);
   return eSUCCESS;
 }
 
@@ -1156,7 +1156,7 @@ int do_drop(char_data *ch, char *argument, int cmd)
       special_log(buffer);
     }
 
-    do_save(ch, "", 666);
+    ch->save(666);
     return eSUCCESS;
   }
 
@@ -1292,7 +1292,7 @@ int do_drop(char_data *ch, char *argument, int cmd)
       else
         send_to_char("You do not have that item.\r\n", ch);
     }
-    do_save(ch, "", 666);
+    ch->save(666);
   }
   else
     send_to_char("Drop what?\r\n", ch);
@@ -1710,8 +1710,8 @@ int do_give(char_data *ch, char *argument, int cmd)
       SETBIT(vict->mobdata->actflags, ACT_NO_GOLD_BONUS);
     }
 
-    do_save(ch, "", 10);
-    do_save(vict, "", 10);
+    ch->save(10);
+    vict->save(10);
     // bribe trigger automatically removes any gold given to mob
     mprog_bribe_trigger(vict, ch, amount);
 
@@ -1910,8 +1910,8 @@ int do_give(char_data *ch, char *argument, int cmd)
   }
 
   //    send_to_char("Ok.\r\n", ch);
-  do_save(ch, "", 10);
-  do_save(vict, "", 10);
+  ch->save(10);
+  vict->save(10);
   // if I gave a no_trade item to a mob, the mob needs to destroy it
   // otherwise it defeats the purpose of no_trade:)
 

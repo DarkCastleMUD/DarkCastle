@@ -440,7 +440,7 @@ int main(int argc, char **argv)
       }
       else
       {
-        do_save(d->character, "", CMD_DEFAULT);
+        d->character->save();
       }
 
       char_data *ch = d->character;

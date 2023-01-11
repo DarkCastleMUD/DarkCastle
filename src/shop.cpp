@@ -267,7 +267,7 @@ void shopping_buy(const char *arg, char_data *ch,
     obj_from_char(obj);
 
   obj_to_char(obj, ch);
-  do_save(ch, "", 666);
+  ch->save(666);
 
   return;
 }
@@ -380,7 +380,7 @@ void shopping_sell(const char *arg, char_data *ch,
   else
     move_obj(obj, keeper);
 
-  do_save(ch, "", 666);
+  ch->save(666);
 
   return;
 }
@@ -1847,7 +1847,7 @@ int eddie_shopkeeper(char_data *ch, struct obj_data *obj, int cmd, const char *a
         else
         {
           csendf(ch, "An error occured.\r\n");
-          do_save(ch, "", 666);
+          ch->save(666);
           return eSUCCESS;
         }
       }
@@ -1871,11 +1871,11 @@ int eddie_shopkeeper(char_data *ch, struct obj_data *obj, int cmd, const char *a
       else
       {
         csendf(ch, "An error occured.\r\n");
-        do_save(ch, "", 666);
+        ch->save(666);
         return eSUCCESS;
       }
     }
-    do_save(ch, "", 0);
+    ch->save(0);
   }
 
   return eSUCCESS;

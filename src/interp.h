@@ -509,7 +509,6 @@ command_return_t do_revoke(char_data *ch, char *argument, int cmd);
 command_return_t do_rsave(char_data *ch, char *argument, int cmd);
 command_return_t do_rstat(char_data *ch, char *argument, int cmd);
 command_return_t do_sacrifice(char_data *ch, char *argument, int cmd);
-command_return_t do_save(char_data *ch, char *argument, int cmd);
 command_return_t do_say(char_data *ch, string argument, int cmd = CMD_SAY);
 command_return_t do_scan(char_data *ch, char *argument, int cmd);
 command_return_t do_score(char_data *ch, char *argument, int cmd);

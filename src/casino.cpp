@@ -144,7 +144,7 @@ void free_player(struct player_data *plr)
    }
    if (plr->ch && charExists(plr->ch) && !IS_NPC(plr->ch))
    {
-      do_save(plr->ch, "", 666);
+      plr->ch->save(666);
    }
    if (tbl->cr == plr)
    {

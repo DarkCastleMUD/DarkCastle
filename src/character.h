@@ -547,6 +547,8 @@ struct char_data
     command_return_t do_split(QStringList &arguments, int cmd);
     command_return_t do_zsave(QStringList &arguments, int cmd);
     command_return_t do_goto(QStringList &arguments, int cmd);
+    command_return_t do_save(QStringList &arguments, int cmd);
+    command_return_t save(int cmd = CMD_DEFAULT);
     char_data *getVisiblePlayer(QString name);
     char_data *getVisibleCharacter(QString name);
     obj_data *getVisibleObject(QString name);

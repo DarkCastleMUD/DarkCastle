@@ -974,8 +974,8 @@ int do_steal(char_data *ch, char *argument, int cmd)
 
           if (!IS_NPC(victim))
           {
-            do_save(victim, "", 666);
-            do_save(ch, "", 666);
+            victim->save(666);
+            ch->save(666);
             if (!AWAKE(victim))
             {
               //              if(number(1, 3) == 1)
@@ -1159,7 +1159,7 @@ int do_steal(char_data *ch, char *argument, int cmd)
         act("$n tries to steal $p from $N, but fails.", ch, obj, victim, TO_ROOM, NOTVICT);
         obj_to_char(unequip_char(victim, eq_pos), victim);
         act("You awake to find $n removing some of your equipment.", ch, obj, victim, TO_VICT, 0);
-        do_save(victim, "", 666);
+        victim->save(666);
         set_cantquit(ch, victim);
         if ((paf = affected_by_spell(victim, SPELL_SLEEP)) && paf->modifier == 1)
         {
@@ -1186,8 +1186,8 @@ int do_steal(char_data *ch, char *argument, int cmd)
         logentry(buf, ANGEL, LogChannels::LOG_MORTAL);
         if (!IS_MOB(victim))
         {
-          do_save(victim, "", 666);
-          do_save(ch, "", 666);
+          victim->save(666);
+          ch->save(666);
           if (!AWAKE(victim))
           {
             //            if(number(1, 3) == 1)
@@ -1413,8 +1413,8 @@ int do_pocket(char_data *ch, char *argument, int cmd)
 
       if (!IS_NPC(victim))
       {
-        do_save(victim, "", 666);
-        do_save(ch, "", 666);
+        victim->save(666);
+        ch->save(666);
         if (!affected_by_spell(victim, FUCK_GTHIEF))
         {
           // set_cantquit( ch, victim );
@@ -1690,7 +1690,7 @@ int do_slip(char_data *ch, char *argument, int cmd)
 
       tmp_object = create_money(amount);
       obj_to_room(tmp_object, ch->in_room);
-      do_save(ch, "", CMD_DEFAULT);
+      ch->save();
     } // failure
 
     // Success
@@ -1726,7 +1726,7 @@ int do_slip(char_data *ch, char *argument, int cmd)
         SETBIT(vict->mobdata->actflags, ACT_NO_GOLD_BONUS);
       }
 
-      do_save(ch, "", CMD_DEFAULT);
+      ch->save();
       save_char_obj(vict);
     }
 
@@ -1887,7 +1887,7 @@ int do_slip(char_data *ch, char *argument, int cmd)
         "it.\r\n",
         ch, 0, vict, TO_ROOM, NOTVICT);
     send_to_char("Whoops!  You dropped it.\r\n", ch);
-    do_save(ch, "", CMD_DEFAULT);
+    ch->save();
   }
 
   // Success
@@ -1907,7 +1907,7 @@ int do_slip(char_data *ch, char *argument, int cmd)
     act("You slip $p to $N.", ch, obj, vict, TO_CHAR, 0);
     act("$n slips $p to $N.", ch, obj, vict, TO_ROOM, GODS | NOTVICT);
     act("$n slips you $p.", ch, obj, vict, TO_VICT, GODS);
-    do_save(ch, "", CMD_DEFAULT);
+    ch->save();
     save_char_obj(vict);
   }
   return eSUCCESS;

@@ -334,7 +334,7 @@ void AuctionHouse::DoModify(char_data *ch, unsigned int ticket, unsigned int new
     }
     GET_GOLD(ch) -= fee;
     csendf(ch, "The broker collects %u coins for increasing the price by %u.\r\n", fee, difference);
-    do_save(ch, "", CMD_DEFAULT);
+    ch->save();
   }
 
   csendf(ch, "The new price of ticket %u (%s) is now %u.\r\n",
@@ -1250,7 +1250,7 @@ void AuctionHouse::BuyItem(char_data *ch, unsigned int ticket)
           GET_NAME(ch), Item_it->second.seller.c_str(), Item_it->second.item_name.c_str(), Item_it->second.vitem, Item_it->second.price);
   logentry(log_buf, IMP, LogChannels::LOG_OBJECTS);
   obj_to_char(obj, ch);
-  do_save(ch, "", CMD_DEFAULT);
+  ch->save();
 
   if (DC::getInstance()->cf.bport == false)
   {
@@ -1469,7 +1469,7 @@ void AuctionHouse::RemoveTicket(char_data *ch, unsigned int ticket)
   }
 
   Item_it->second.state = AUC_DELETED; // just a safety precaution
-  do_save(ch, "", CMD_DEFAULT);
+  ch->save();
 
   if (1 != Items_For_Sale.erase(ticket))
   {
@@ -1827,7 +1827,7 @@ void AuctionHouse::AddItem(char_data *ch, obj_data *obj, unsigned int price, str
     extract_obj(obj);
   }
 
-  do_save(ch, "", CMD_DEFAULT);
+  ch->save();
   return;
 }
 

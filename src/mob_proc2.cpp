@@ -500,7 +500,7 @@ int mortician(char_data *ch, struct obj_data *obj, int cmd, const char *arg, cha
 					 "places at your feet.\r\n",
 					 ch);
 		GET_PLATINUM(ch) -= cost;
-		do_save(ch, "", 10);
+		ch->save(10);
 		save_corpses();
 		return eSUCCESS;
 	}

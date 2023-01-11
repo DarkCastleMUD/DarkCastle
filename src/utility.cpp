@@ -1729,11 +1729,7 @@ int do_quit(char_data *ch, char *argument, int cmd)
   return eSUCCESS | eCH_DIED;
 }
 
-// TODO - make some sort of auto-save, or "save" flag, so player's
-//        that save after every other kill don't actually do it, but it
-//        pretends that it does.  That way we can start reducing the amount
-//        of writing we're doing.
-int do_save(char_data *ch, char *argument, int cmd)
+command_return_t char_data::save(int cmd)
 {
   // With the cmd numbers
   // 666 = save quietly
@@ -1741,33 +1737,55 @@ int do_save(char_data *ch, char *argument, int cmd)
   // 9 = save with a round of lag
   // -pir 3/15/1999
 
-  if (IS_NPC(ch) || GET_LEVEL(ch) > IMP)
+  if (IS_NPC(this) || GET_LEVEL(this) > IMP)
     return eFAILURE;
 
   if (cmd != 666)
   {
-    csendf(ch, "Saving %s.\r\n", GET_NAME(ch));
+    send(QString("Saving %1.\r\n").arg(GET_NAME(this)));
   }
 
-  if (IS_PC(ch))
+  if (IS_PC(this))
   {
-    save_char_obj(ch);
+    save_char_obj(this);
 #ifdef USE_SQL
-    save_char_obj_db(ch);
+    save_char_obj_db(this);
 #endif
 
-    if (ch->followers)
+    if (followers)
     {
-      save_charmie_data(ch);
+      save_charmie_data(this);
     }
 
-    if (ch->pcdata->golem)
+    if (pcdata->golem)
     {
-      save_golem_data(ch); // Golem data, eh!
+      save_golem_data(this); // Golem data, eh!
     }
   }
 
   return eSUCCESS;
+}
+
+// TODO - make some sort of auto-save, or "save" flag, so player's
+//        that save after every other kill don't actually do it, but it
+//        pretends that it does.  That way we can start reducing the amount
+//        of writing we're doing.
+command_return_t char_data::do_save(QStringList &arguments, int cmd)
+{
+  if (IS_IMMORTAL(this))
+  {
+    if (arguments.size() > 0)
+    {
+      if (arguments.at(0) == "hints")
+      {
+        send("Saving hints.\r\n");
+        DC::getInstance()->save_hints();
+        return eSUCCESS;
+      }
+    }
+  }
+
+  return save(cmd);
 }
 
 int do_home(char_data *ch, char *argument, int cmd)

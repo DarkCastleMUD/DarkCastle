@@ -25,6 +25,7 @@
 typedef uint64_t vnum_t;
 typedef QMap<QString, bool> joining_t;
 
+typedef QList<QString> hints_t;
 #include "character.h"
 #include "obj.h"
 #include "character.h"
@@ -129,6 +130,9 @@ public:
   void write_one_zone(FILE *fl, zone_t zone_key);
   zone_t read_one_zone(FILE *fl);
   int read_one_room(FILE *fl, int &room_nr);
+  void load_hints(void);
+  void save_hints(void);
+  void send_hint(void);
 
 private:
   DC(const DC &) = delete; // non-copyable
@@ -136,6 +140,7 @@ private:
   static string version;
   struct timeval last_time = {}, delay_time = {}, now_time = {};
   int32_t secDelta = {}, usecDelta = {};
+  hints_t hints;
 
   // as there is only one object, assignment would always be assign to self
   DC &operator=(const DC &) = delete;

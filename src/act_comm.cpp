@@ -12,11 +12,14 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-extern "C"
-{
 #include <string.h>
-}
 #include <assert.h>
+#include <cstdint>
+
+#include <fmt/format.h>
+#include <QFile>
+
+#include "DC.h"
 #include "character.h"
 #include "terminal.h"
 #include "connect.h"
@@ -33,8 +36,6 @@ extern "C"
 #include "returnvals.h"
 #include "fileinfo.h"
 #include "const.h"
-#include <fmt/format.h>
-#include <cstdint>
 
 extern bool MOBtrigger;
 
@@ -660,16 +661,11 @@ int do_emote(char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-#define MAX_HINTS 100
-char hints[MAX_HINTS][MAX_STRING_LENGTH];
-
-void load_hints()
+void DC::load_hints(void)
 {
-  FILE *fl;
-  int num;
-  char *buf = NULL;
+  FILE *fl = {};
 
-  if (!(fl = fopen(HINTS_FILE, "r")))
+  if (!(fl = fopen(HINTS_FILE_NAME.toStdString().c_str(), "r")))
   {
     logentry("Error opening the hint file", IMMORTAL, LogChannels::LOG_MISC);
     return;
@@ -677,40 +673,63 @@ void load_hints()
 
   while (fgetc(fl) != '$')
   {
-    num = fread_int(fl, 0, 32768);
-    if (num > MAX_HINTS)
+    fread_uint(fl, 0, 32768); // ignored
+
+    char *buffer = fread_string(fl, 0);
+    if (buffer != nullptr)
     {
-      logentry("Raise MAX_HINTS or something.", IMMORTAL, LogChannels::LOG_MISC);
-      break;
+      hints.push_back(buffer);
+      free(buffer);
     }
-    buf = fread_string(fl, 0);
-    strcpy(hints[num - 1], buf);
   }
 
-  dc_free(buf);
-
   fclose(fl);
-
-  return;
 }
 
-void send_hint()
+void DC::save_hints(void)
 {
-  char hint[MAX_STRING_LENGTH];
-  struct descriptor_data *i;
-  int num = number(0, MAX_HINTS - 1);
+  QFile file(HINTS_FILE_NAME);
+  if (!file.open(QIODeviceBase::WriteOnly | QIODeviceBase::Text))
+  {
+    qCritical() << "Unable to open" << HINTS_FILE_NAME;
+    return;
+  }
 
-  while (hints[num][0] == '\0')
-    num = number(0, MAX_HINTS - 1);
+  QTextStream out(&file);
 
-  sprintf(hint, "$B$5HINT:$7 %s$R\n\r", hints[num]);
+  uint64_t hint_key = 0;
+  for (hints_t::iterator i = hints.begin(); i != hints.end(); ++i)
+  {
+    out << "#" << ++hint_key << "\n";
+    out << (*i).remove('\r') << "~"
+        << "\n";
+  }
+  out << "$\n";
+}
 
-  for (i = descriptor_list; i; i = i->next)
+void DC::send_hint(void)
+{
+  uint64_t num = number(0, hints.size() - 1);
+
+  uint64_t attempts = 0;
+  while (hints.value(num).isEmpty() && attempts++ < 100)
+  {
+    num = number(0, hints.size() - 1);
+  }
+
+  QString hint = QString("$B$5HINT:$7 %1$R\r\n").arg(hints.value(num));
+
+  for (descriptor_data *i = descriptor_list; i; i = i->next)
   {
     if (i->connected || !i->character || !i->character->desc || is_busy(i->character) || IS_NPC(i->character))
+    {
       continue;
+    }
+
     if (IS_SET(i->character->misc, LogChannels::CHANNEL_HINTS))
-      send_to_char(hint, i->character);
+    {
+      i->character->send(hint);
+    }
   }
 
   return;

@@ -898,7 +898,7 @@ int quest_handler(char_data *ch, char_data *qmaster, int cmd, char *name)
       {
          sprintf(buf, "%s This is it!  Wonderful job, I will add your reward to your current amount of points!", GET_NAME(ch));
          do_psay(qmaster, buf, CMD_DEFAULT);
-         do_save(ch, "", 666);
+         ch->save(666);
       }
       else if (IS_SET(retval, eEXTRA_VALUE))
       {
