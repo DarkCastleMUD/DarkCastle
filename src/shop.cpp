@@ -1942,9 +1942,14 @@ int reroll_trader(char_data *ch, obj_data *obj, int cmd, const char *arg, char_d
       }
       else
       {
-        if (GET_OBJ_TYPE(obj) != ITEM_WEAPON && GET_OBJ_TYPE(obj) != ITEM_ARMOR)
+        if (GET_OBJ_TYPE(obj) != ITEM_WEAPON &&
+            GET_OBJ_TYPE(obj) != ITEM_ARMOR &&
+            GET_OBJ_TYPE(obj) != ITEM_INSTRUMENT &&
+            GET_OBJ_TYPE(obj) != ITEM_WAND &&
+            GET_OBJ_TYPE(obj) != ITEM_STAFF &&
+            GET_OBJ_TYPE(obj) != ITEM_CONTAINER)
         {
-          owner->tell(ch, "I can only reroll weapons or armor.");
+          owner->tell(ch, "I can only reroll weapons, armor, instruments, wands, staffs and containers.");
           return eSUCCESS;
         }
 
