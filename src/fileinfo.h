@@ -87,6 +87,4 @@
 
 #define VAULT_INDEX_FILE "../vaults/vaultindex"
 #define VAULT_INDEX_FILE_TMP "../vaults/vaultindex.tmp"
-
-const QString HINTS_FILE_NAME = "playerhints.txt";
 #endif // FILEINFO_H_

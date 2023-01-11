@@ -141,6 +141,7 @@ private:
   struct timeval last_time = {}, delay_time = {}, now_time = {};
   int32_t secDelta = {}, usecDelta = {};
   hints_t hints;
+  const QString HINTS_FILE_NAME = "playerhints.txt";
 
   // as there is only one object, assignment would always be assign to self
   DC &operator=(const DC &) = delete;
