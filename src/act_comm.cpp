@@ -663,27 +663,57 @@ int do_emote(char_data *ch, char *argument, int cmd)
 
 void DC::load_hints(void)
 {
-  FILE *fl = {};
+  QFile file(HINTS_FILE_NAME);
 
-  if (!(fl = fopen(HINTS_FILE_NAME.toStdString().c_str(), "r")))
+  if (!file.open(QIODeviceBase::ReadOnly | QIODeviceBase::Text))
   {
-    logentry("Error opening the hint file", IMMORTAL, LogChannels::LOG_MISC);
+    qCritical() << "Unable to open" << HINTS_FILE_NAME;
     return;
   }
 
-  while (fgetc(fl) != '$')
+  QString line, buffer;
+  QTextStream in(&file);
+  while (!in.atEnd())
   {
-    fread_uint(fl, 0, 32768); // ignored
+    // Read the #1 and discard it. It's only in the file for legacy reasons
+    in.readLine();
 
-    char *buffer = fread_string(fl, 0);
-    if (buffer != nullptr)
+    buffer = {};
+    while (!in.atEnd())
     {
-      hints.push_back(buffer);
-      free(buffer);
+      line = in.readLine();
+      buffer += line;
+
+      // If line ends with ~ then we're done and erase the ~
+      if (line.endsWith('~'))
+      {
+        buffer.erase(buffer.cend() - 1, buffer.cend());
+        hints.push_back(buffer);
+        break;
+      }
+      else
+      {
+        buffer += '\n';
+      }
     }
+    // qDebug() << buffer;
   }
 
-  fclose(fl);
+  /*
+    while (fgetc(fl) != '$')
+    {
+      fread_uint(fl, 0, 32768); // ignored
+
+      char *buffer = fread_string(fl, 0);
+      if (buffer != nullptr)
+      {
+        hints.push_back(buffer);
+        free(buffer);
+      }
+    }
+
+    fclose(fl);
+    */
 }
 
 void DC::save_hints(void)
@@ -709,6 +739,11 @@ void DC::save_hints(void)
 
 void DC::send_hint(void)
 {
+  if (hints.isEmpty())
+  {
+    return;
+  }
+
   uint64_t num = number(0, hints.size() - 1);
 
   uint64_t attempts = 0;
