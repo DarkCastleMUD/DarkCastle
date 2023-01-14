@@ -555,7 +555,7 @@ struct char_data
     obj_data *getVisibleObject(QString name);
     bool isMortal(void);
     bool isImmortal(void);
-    bool isImplementor(void);
+    bool isImplementer(void);
 };
 
 class communication

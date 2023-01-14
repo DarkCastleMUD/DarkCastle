@@ -832,7 +832,7 @@ int do_wizlist(char_data *ch, char *argument, int cmd)
 			"(:) == Honorary Immortals == (:)",
 			"(:) == Coordinators == (:)",
 			"(:) == Senior Coordinators == (:)",
-			"(:) == Implementors == (:)"};
+			"(:) == Implementers == (:)"};
 
 	for (sp = 0; sp < 80; sp++)
 		space[sp] = ' ';

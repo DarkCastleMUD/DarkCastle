@@ -1758,7 +1758,7 @@ vector<string> ChainSayText =
         "Ahh yes, the good old days of the Internet...when men were men, women were men, and children were FBI agents.",
         "I think Bush's foreign policy is quite reasonable.",
         "Remember, arguing on the internet is like entering the Special Olympics...even if you win, you're still a retard.",
-        "Sorry guys, I have to step down as Implementor so I can pass my PhD.",
+        "Sorry guys, I have to step down as Implementer so I can pass my PhD.",
         "Chuck Norris doesn't teabag the ladies, he potato sacks them!",
         "Chuck Norris' tears could cure cancer except he's never cried.",
         "Sheep are great and all, but goats have handlebars and rabbits are handheld.",

@@ -143,7 +143,7 @@ bool char_data::isImmortal(void)
     return GET_LEVEL(this) >= IMMORTAL;
 }
 
-bool char_data::isImplementor(void)
+bool char_data::isImplementer(void)
 {
     return GET_LEVEL(this) == IMPLEMENTER;
 }

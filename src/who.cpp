@@ -302,7 +302,7 @@ int do_who(char_data *ch, char *argument, int cmd)
       "   --------  ",
       " Coordinator ",
       "   --------  ",
-      " Implementor "};
+      " Implementer "};
   char *clss_types[] = {
       "mage",
       "cleric",
