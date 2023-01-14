@@ -478,7 +478,7 @@ struct command_info cmd_info[] =
         {"teleport", do_teleport, nullptr, nullptr, POSITION_DEAD, DEITY, CMD_DEFAULT, 0, 1, CommandType::all},
         {"purge", do_purge, nullptr, nullptr, POSITION_DEAD, 103, CMD_DEFAULT, 0, 1, CommandType::all},
         {"show", do_show, nullptr, nullptr, POSITION_DEAD, ANGEL, CMD_DEFAULT, 0, 1, CommandType::all},
-        {"search", nullptr, nullptr, &char_data::do_search, POSITION_DEAD, ANGEL, CMD_DEFAULT, 0, 1, CommandType::all},
+        {"search", nullptr, nullptr, &char_data::do_search, POSITION_DEAD, 0, CMD_DEFAULT, 0, 1, CommandType::all},
         {"fighting", do_fighting, nullptr, nullptr, POSITION_DEAD, 104, CMD_DEFAULT, 0, 1, CommandType::all},
         {"peace", do_peace, nullptr, nullptr, POSITION_DEAD, ANGEL, CMD_DEFAULT, 0, 1, CommandType::all},
         {"check", do_check, nullptr, nullptr, POSITION_DEAD, 105, CMD_DEFAULT, 0, 1, CommandType::all},
