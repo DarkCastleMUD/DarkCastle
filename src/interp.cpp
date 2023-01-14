@@ -159,7 +159,7 @@ struct command_info cmd_info[] =
         {"commands", do_new_help, nullptr, nullptr, POSITION_DEAD, 0, CMD_DEFAULT, 0, 1, CommandType::all},
         {"experience", nullptr, nullptr, &char_data::do_experience, POSITION_DEAD, 0, CMD_DEFAULT, 0, 1, CommandType::players_only},
         {"version", do_version, nullptr, nullptr, POSITION_DEAD, 0, CMD_DEFAULT, 0, 0, CommandType::all},
-        {"identify", do_identify, nullptr, nullptr, POSITION_DEAD, 0, CMD_DEFAULT, COM_CHARMIE_OK, 0, CommandType::all},
+        {"identify", nullptr, nullptr, &char_data::do_identify, POSITION_DEAD, 0, CMD_DEFAULT, COM_CHARMIE_OK, 0, CommandType::all},
 
         // Communication commands
         {"ask", do_ask, nullptr, nullptr, POSITION_RESTING, 0, CMD_DEFAULT, COM_CHARMIE_OK, 0, CommandType::all},

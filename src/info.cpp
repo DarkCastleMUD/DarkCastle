@@ -22,6 +22,8 @@
 #include <fstream>
 #include <fmt/format.h>
 
+#include <QRegularExpression>
+
 #include "structs.h"
 #include "room.h"
 #include "character.h"
@@ -1271,30 +1273,53 @@ bool identify(char_data *ch, obj_data *obj)
    return true;
 }
 
-int do_identify(char_data *ch, char *argument, int cmd)
+command_return_t char_data::do_identify(QStringList &arguments, int cmd)
 {
-   string arg1, remainder_args;
-   tie(arg1, remainder_args) = half_chop(argument);
-
-   if (arg1.empty())
+   if (arguments.isEmpty())
    {
-      csendf(ch, "What object do you want to identify?\n\r");
+      send("What object do you want to identify?\r\n");
       return eFAILURE;
    }
+   QString arg1 = arguments.at(0);
 
-   char_data *tmp_char;
-   obj_data *obj;
-   int bits = generic_find(arg1.c_str(), FIND_OBJ_INV | FIND_OBJ_EQUIP | FIND_OBJ_ROOM, ch, &tmp_char, &obj, true);
-   if (bits && obj)
+   QRegularExpression re("^v(?<vnum>\\d+)$");
+   QRegularExpressionMatch match = re.match(arg1);
+   obj_data *obj = nullptr;
+   if (match.hasMatch())
    {
-      if (identify(ch, obj))
+      QString buffer = match.captured("vnum");
+
+      vnum_t vnum = buffer.toULongLong();
+      vnum_t rnum = real_object(vnum);
+      if (rnum == -1)
       {
-         return eSUCCESS;
+         send("Invalid VNUM.\r\n");
+         return eFAILURE;
       }
+      obj = (obj_data *)obj_index[rnum].item;
+
+      if (isMortal() && obj->isDark())
+      {
+         send("This object cannot be identified by mortals.\r\n");
+         return eFAILURE;
+      }
+      return identify(this, obj);
    }
    else
    {
-      csendf(ch, "You could not find %s in your inventory, among your equipment or in this room.\r\n", arg1.c_str());
+      char_data *tmp_char;
+      int bits = generic_find(arg1.toStdString().c_str(), FIND_OBJ_INV | FIND_OBJ_EQUIP | FIND_OBJ_ROOM, this, &tmp_char, &obj, true);
+      if (bits && obj)
+      {
+         if (identify(this, obj))
+         {
+            return eSUCCESS;
+         }
+      }
+      else
+      {
+         send(QString("You could not find %1 in your inventory, among your equipment or in this room.\r\n").arg(arg1));
+      }
    }
 
    return eFAILURE;
