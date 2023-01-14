@@ -1394,7 +1394,7 @@ int do_leaderboard(char_data *ch, char *argument, int cmd)
 	char *clss_types[] = {"mage", "cleric", "thief", "warrior", "antipaladin",
 						  "paladin", "barbarian", "monk", "ranger", "bard", "druid", "\n"};
 
-	if (IS_PC(ch) && GET_LEVEL(ch) >= IMP)
+	if (IS_PC(ch) && GET_LEVEL(ch) >= IMPLEMENTER)
 	{
 		string arg1, remainder;
 		tie(arg1, remainder) = half_chop(argument);
@@ -1408,7 +1408,7 @@ int do_leaderboard(char_data *ch, char *argument, int cmd)
 			{
 				DC::getInstance()->cf.leaderboard_check = "suspend";
 				csendf(ch, "Leaderboard writes suspended.\r\n");
-				logf(IMP, LogChannels::LOG_GOD, "Leaderboard writes suspended by %s.", GET_NAME(ch));
+				logf(IMPLEMENTER, LogChannels::LOG_GOD, "Leaderboard writes suspended by %s.", GET_NAME(ch));
 			}
 
 			return eSUCCESS;
@@ -1423,7 +1423,7 @@ int do_leaderboard(char_data *ch, char *argument, int cmd)
 			{
 				DC::getInstance()->cf.leaderboard_check = "";
 				csendf(ch, "Leaderboard writes resumed.\r\n");
-				logf(IMP, LogChannels::LOG_GOD, "Leaderboard writes resumed by %s.", GET_NAME(ch));
+				logf(IMPLEMENTER, LogChannels::LOG_GOD, "Leaderboard writes resumed by %s.", GET_NAME(ch));
 			}
 
 			return eSUCCESS;

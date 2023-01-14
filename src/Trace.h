@@ -7,17 +7,16 @@
 
 class Trace
 {
-    public:
+public:
     Trace(std::string source = "unknown");
     ~Trace();
-    std::vector<std::string>& getTracks();
+    std::vector<std::string> &getTracks();
     void addTrack(std::string source);
 
-    private:
+private:
     std::vector<std::string> tracks;
-
 };
 
-std::ostream& operator<<(std::ostream &out, Trace& t);
+std::ostream &operator<<(std::ostream &out, Trace &t);
 
 #endif

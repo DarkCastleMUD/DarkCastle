@@ -1672,7 +1672,7 @@ void wear(char_data *ch, struct obj_data *obj_object, int keyword)
     }*/
 
   if (IS_SET(obj->obj_flags.extra_flags, ITEM_SPECIAL) &&
-      !isname(GET_NAME(ch), obj->name) && GET_LEVEL(ch) < IMP)
+      !isname(GET_NAME(ch), obj->name) && GET_LEVEL(ch) < IMPLEMENTER)
   {
     act("$p can only be worn by its rightful owner.", ch, obj_object, 0, TO_CHAR, 0);
     return;
@@ -2729,4 +2729,9 @@ int obj_from(obj_data *obj)
   }
 
   return false;
+}
+
+bool obj_data::isDark(void)
+{
+  return IS_SET(obj_flags.extra_flags, ITEM_DARK);
 }

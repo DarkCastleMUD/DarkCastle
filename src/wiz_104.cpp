@@ -310,7 +310,7 @@ int do_load(char_data *ch, char *arg, int cmd)
 			send_to_char("No such object.\r\n", ch);
 			return eFAILURE;
 		}
-		if ((GET_LEVEL(ch) < IMP) &&
+		if ((GET_LEVEL(ch) < IMPLEMENTER) &&
 			IS_SET(((struct obj_data *)(obj_index[num].item))->obj_flags.extra_flags,
 				   ITEM_SPECIAL))
 		{
@@ -1477,7 +1477,7 @@ int do_show(char_data *ch, char *argument, int cmd)
 					SET_BIT(wear, 1 << i);
 					goto endy;
 				}
-			for (i = 0; *item_types[i] != '\n'; i++)
+			for (i = 0; i < item_types.size(); i++)
 			{
 				if (!str_nosp_cmp(item_types[i], arg1))
 				{
@@ -1611,7 +1611,7 @@ int do_show(char_data *ch, char *argument, int cmd)
 				else
 					send_to_char(" ", ch);
 			}
-			for (z = 0; *item_types[z] != '\n'; z++)
+			for (z = 0; z < item_types.size(); z++)
 			{
 				o++;
 				send_to_char_nosp(item_types[z], ch);
@@ -1949,7 +1949,7 @@ int do_teleport(char_data *ch, char *argument, int cmd)
 		} /* if */
 	}	  /* if */
 
-	if (IS_SET(world[target].room_flags, IMP_ONLY) && GET_LEVEL(ch) < IMP)
+	if (IS_SET(world[target].room_flags, IMP_ONLY) && GET_LEVEL(ch) < IMPLEMENTER)
 	{
 		send_to_char("No.\r\n", ch);
 		return eFAILURE;

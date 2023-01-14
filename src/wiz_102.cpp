@@ -2094,10 +2094,10 @@ int do_oedit(char_data *ch, char *argument, int cmd)
       sprintf(buf, "%s\n", item_types[((obj_data *)obj_index[rnum].item)->obj_flags.type_flag]);
       send_to_char(buf, ch);
       send_to_char("\r\n$3Valid types$R:\r\n", ch);
-      for (i = 1; *item_types[i] != '\n'; i++)
+
+      for (i = 1; i < item_types.size(); i++)
       {
-        sprintf(buf, "  %d) %s\n\r", i, item_types[i]);
-        send_to_char(buf, ch);
+        ch->send(QString("%1) %2\r\n").arg(i, 3).arg(item_types[i]));
       }
       return eFAILURE;
     }
@@ -5446,7 +5446,7 @@ int do_possess(char_data *ch, char *argument, int cmd)
         return eFAILURE;
       }
       else if ((GET_LEVEL(victim) > GET_LEVEL(ch)) &&
-               (GET_LEVEL(ch) < IMP))
+               (GET_LEVEL(ch) < IMPLEMENTER))
       {
         send_to_char("That mob is a bit too tough for you to handle.\r\n", ch);
         return eFAILURE;

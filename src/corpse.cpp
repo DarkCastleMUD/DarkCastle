@@ -2,7 +2,7 @@
  *  File: corpse.c Version 1.1                                          *
  *  Usage: Corpse Saving over reboots/crashes/copyovers                 *
  *                                                                      *
- *  By: Michael Cunningham (Romulus) IMP of Legends of The Phoenix MUD  *
+ *  By: Michael Cunningham (Romulus) IMPLEMENTER of Legends of The Phoenix MUD  *
  *  Permission is granted to use and modify this software as long as    *
  *  credits are given in the credits command in the game.               *
  *  Built for circle30bpl15                                             *

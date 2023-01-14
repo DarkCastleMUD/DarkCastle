@@ -315,7 +315,7 @@ void perform_violence(void)
       {
         // if this happened, most likely the mob died somehow during the proc and didn't return eCH_DIED and is
         // now invalid memory.  report what class we were and return
-        logf(IMP, LogChannels::LOG_BUG, "Crash bug!!!!  fight.cpp last_class changed (%d) Mob=%d", last_class, last_virt);
+        logf(IMPLEMENTER, LogChannels::LOG_BUG, "Crash bug!!!!  fight.cpp last_class changed (%d) Mob=%d", last_class, last_virt);
         break;
       }
       // DEBUG CODE
@@ -922,7 +922,7 @@ bool do_frostshield(char_data *ch, char_data *vict)
 {
   if (!ch || !vict)
   {
-    logentry("Null ch or vict sent to do_frostshield", IMP, LogChannels::LOG_BUG);
+    logentry("Null ch or vict sent to do_frostshield", IMPLEMENTER, LogChannels::LOG_BUG);
     return (false);
   }
   if (!IS_AFFECTED(vict, AFF_FROSTSHIELD))
@@ -949,7 +949,7 @@ int do_lightning_shield(char_data *ch, char_data *vict, int dam)
 
   if (!ch || !vict)
   {
-    logentry("Null ch or vict sent to do_lightning_shield", IMP, LogChannels::LOG_BUG);
+    logentry("Null ch or vict sent to do_lightning_shield", IMPLEMENTER, LogChannels::LOG_BUG);
     return eFAILURE | eINTERNAL_ERROR;
   }
 
@@ -1031,7 +1031,7 @@ int do_vampiric_aura(char_data *ch, char_data *vict)
 {
   if (!ch || !vict || ch == vict)
   {
-    logentry("Null ch or vict, or ch==vict sent to do_vampiric_aura!", IMP, LogChannels::LOG_BUG);
+    logentry("Null ch or vict, or ch==vict sent to do_vampiric_aura!", IMPLEMENTER, LogChannels::LOG_BUG);
     abort();
   }
 
@@ -1064,7 +1064,7 @@ int do_fireshield(char_data *ch, char_data *vict, int dam)
 
   if (!ch || !vict || ch == vict)
   {
-    logentry("Null ch or vict, or ch==vict sent to do_fireshield!", IMP, LogChannels::LOG_BUG);
+    logentry("Null ch or vict, or ch==vict sent to do_fireshield!", IMPLEMENTER, LogChannels::LOG_BUG);
     abort();
   }
 
@@ -1153,7 +1153,7 @@ int do_acidshield(char_data *ch, char_data *vict, int dam)
 
   if (!ch || !vict || ch == vict)
   {
-    logentry("Null ch or vict, or ch==vict sent to do_acidshield!", IMP, LogChannels::LOG_BUG);
+    logentry("Null ch or vict, or ch==vict sent to do_acidshield!", IMPLEMENTER, LogChannels::LOG_BUG);
     abort();
   }
 
@@ -1238,7 +1238,7 @@ int do_boneshield(char_data *ch, char_data *vict, int dam)
 
   if (!ch || !vict || ch == vict)
   {
-    logentry("Null ch or vict, or ch==vict sent to do_boneshield!", IMP, LogChannels::LOG_BUG);
+    logentry("Null ch or vict, or ch==vict sent to do_boneshield!", IMPLEMENTER, LogChannels::LOG_BUG);
     abort();
   }
 
@@ -1421,7 +1421,7 @@ int get_monk_bare_damage(char_data *ch)
     dam = dice(6, 5);
   else if (GET_LEVEL(ch) < IMMORTAL)
     dam = dice(10, 6);
-  else if (GET_LEVEL(ch) < IMP)
+  else if (GET_LEVEL(ch) < IMPLEMENTER)
     dam = dice(10, 10);
   else
     dam = dice(50, 5);
@@ -4164,7 +4164,7 @@ void stop_fighting(char_data *ch, int clearlag)
 
   if (!ch)
   {
-    logentry("Null ch in stop_fighting.  This would have crashed us.", IMP, LogChannels::LOG_BUG);
+    logentry("Null ch in stop_fighting.  This would have crashed us.", IMPLEMENTER, LogChannels::LOG_BUG);
     return;
   }
 
@@ -7056,9 +7056,9 @@ int can_be_attacked(char_data *ch, char_data *vict)
         return TRUE;
     }
     /* Imps ignore safe flags  */
-    if (!IS_NPC(ch) && (GET_LEVEL(ch) == IMP))
+    if (!IS_NPC(ch) && (GET_LEVEL(ch) == IMPLEMENTER))
     {
-      send_to_char("There is no safe haven from an angry IMP!\n\r", vict);
+      send_to_char("There is no safe haven from an angry IMPLEMENTER!\n\r", vict);
       return TRUE;
     }
 

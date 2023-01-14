@@ -1712,7 +1712,7 @@ int do_slip(char_data *ch, char *argument, int cmd)
 
       sprintf(buf, "%s slips %d coins to %s", GET_NAME(ch), amount,
               GET_NAME(vict));
-      logentry(buf, IMP, LogChannels::LOG_OBJECTS);
+      logentry(buf, IMPLEMENTER, LogChannels::LOG_OBJECTS);
 
       if (IS_NPC(ch) || (GET_LEVEL(ch) < DEITY))
         GET_GOLD(ch) -= amount;
@@ -1901,7 +1901,7 @@ int do_slip(char_data *ch, char *argument, int cmd)
       */
     sprintf(buf, "%s slips %s to %s", GET_NAME(ch), obj->name,
             GET_NAME(vict));
-    logentry(buf, IMP, LogChannels::LOG_OBJECTS);
+    logentry(buf, IMPLEMENTER, LogChannels::LOG_OBJECTS);
 
     move_obj(obj, vict);
     act("You slip $p to $N.", ch, obj, vict, TO_CHAR, 0);

@@ -2394,11 +2394,11 @@ int process_input(struct descriptor_data *t)
     {
       if (t->character != nullptr && GET_NAME(t->character) != nullptr)
       {
-        logentry(QString("Connection broken by peer %1 playing %2.").arg(t->host).arg(GET_NAME(t->character)), IMP + 1, LogChannels::LOG_SOCKET);
+        logentry(QString("Connection broken by peer %1 playing %2.").arg(t->host).arg(GET_NAME(t->character)), IMPLEMENTER + 1, LogChannels::LOG_SOCKET);
       }
       else
       {
-        logentry(QString("Connection broken by peer %1 not playing a character.").arg(t->host), IMP + 1, LogChannels::LOG_SOCKET);
+        logentry(QString("Connection broken by peer %1 not playing a character.").arg(t->host), IMPLEMENTER + 1, LogChannels::LOG_SOCKET);
       }
 
       return -1;
@@ -3035,6 +3035,11 @@ void send_to_char_nosp(const char *messg, char_data *ch)
   char *tmp = str_nospace(messg);
   send_to_char(tmp, ch);
   dc_free(tmp);
+}
+
+void send_to_char_nosp(QString messg, char_data *ch)
+{
+  send_to_char_nosp(messg.toStdString().c_str(), ch);
 }
 
 void record_msg(string messg, char_data *ch)

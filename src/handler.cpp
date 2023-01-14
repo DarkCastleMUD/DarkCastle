@@ -151,6 +151,29 @@ int isname2(const char *str, const char *namel)
 	return 0;
 }
 
+int isname(QString arg, QStringList namelist)
+{
+	for (auto &name : namelist)
+	{
+		if (arg.compare(name, Qt::CaseInsensitive) == 0)
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
+int isname(QString arg, QString namelist)
+{
+	return isname(arg.toStdString().c_str(), namelist.toStdString().c_str());
+}
+
+int isname(QString arg, const char *namelist)
+{
+	return isname(arg.toStdString().c_str(), namelist);
+}
+
 int isname(string arg, string namelist)
 {
 	return isname(arg.c_str(), namelist.c_str());

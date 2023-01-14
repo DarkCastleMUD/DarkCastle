@@ -213,7 +213,7 @@ int do_string(char_data *ch, char *arg, int cmd)
 		switch (field)
 		{
 		case 1:
-			if (!IS_NPC(mob) && GET_LEVEL(ch) < IMP)
+			if (!IS_NPC(mob) && GET_LEVEL(ch) < IMPLEMENTER)
 			{
 				send_to_char("You can't change that field for players.", ch);
 				return 1;
@@ -232,7 +232,7 @@ int do_string(char_data *ch, char *arg, int cmd)
 				return 1;
 			}
 			sprintf(message, "%s just restrung short on %s", GET_NAME(ch), GET_NAME(mob));
-			logentry(message, IMP, LogChannels::LOG_GOD);
+			logentry(message, IMPLEMENTER, LogChannels::LOG_GOD);
 			if (IS_NPC(mob))
 				ch->desc->hashstr = &mob->short_desc;
 			else
@@ -278,7 +278,7 @@ int do_string(char_data *ch, char *arg, int cmd)
 
 		if (IS_SET(obj->obj_flags.more_flags, ITEM_NO_RESTRING))
 		{
-			if (GET_LEVEL(ch) < IMP)
+			if (GET_LEVEL(ch) < IMPLEMENTER)
 			{
 				send_to_char("That item is not restringable.\r\n", ch);
 				return 1;

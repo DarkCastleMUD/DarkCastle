@@ -259,6 +259,8 @@ struct obj_data
     wheel_data *wheel;
     time_t save_expiration = {};
     time_t no_sell_expiration = {};
+
+    bool isDark(void);
 };
 
 /* For 'equipment' */
@@ -318,6 +320,6 @@ void heightweight(char_data *ch, bool add);
 void wear(char_data *ch, struct obj_data *obj_object, int keyword);
 int obj_from(obj_data *obj);
 
-typedef vector<const char *> item_types_t;
+typedef QStringList item_types_t;
 
 #endif

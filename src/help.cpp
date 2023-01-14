@@ -415,7 +415,7 @@ int do_hindex(char_data *ch, char *argument, int cmd)
                "              d = defunct, < level 0 OR > level %d\r\n"
                "              u = unfinished, level 75\r\n"
                "\r\n",
-           IMP);
+           IMPLEMENTER);
     return eFAILURE;
   }
   int start = 0;
@@ -466,7 +466,7 @@ int do_hindex(char_data *ch, char *argument, int cmd)
       show_help_header(ch);
       for (i = 0; i < new_top_of_helpt; i++)
       {
-        if (new_help_table[i].min_level <= 0 || new_help_table[i].min_level > IMP)
+        if (new_help_table[i].min_level <= 0 || new_help_table[i].min_level > IMPLEMENTER)
           count = show_one_help_entry(i, ch, count);
       }
       show_help_bar(ch);
@@ -476,7 +476,7 @@ int do_hindex(char_data *ch, char *argument, int cmd)
       show_help_header(ch);
       for (i = 0; i < new_top_of_helpt; i++)
       {
-        if (new_help_table[i].min_level >= IMMORTAL && new_help_table[i].min_level <= IMP)
+        if (new_help_table[i].min_level >= IMMORTAL && new_help_table[i].min_level <= IMPLEMENTER)
           count = show_one_help_entry(i, ch, count);
       }
       show_help_bar(ch);

@@ -813,23 +813,23 @@ void check_hw(char_data *ch)
    heightweight(ch, FALSE);
    if (ch->height > races[ch->race].max_height)
    {
-      logf(IMP, LogChannels::LOG_BUG, "check_hw: %s's height %d > max %d. height set to max.", GET_NAME(ch), GET_HEIGHT(ch), races[ch->race].max_height);
+      logf(IMPLEMENTER, LogChannels::LOG_BUG, "check_hw: %s's height %d > max %d. height set to max.", GET_NAME(ch), GET_HEIGHT(ch), races[ch->race].max_height);
       ch->height = races[ch->race].max_height;
    }
    if (ch->height < races[ch->race].min_height)
    {
-      logf(IMP, LogChannels::LOG_BUG, "check_hw: %s's height %d < min %d. height set to min.", GET_NAME(ch), GET_HEIGHT(ch), races[ch->race].min_height);
+      logf(IMPLEMENTER, LogChannels::LOG_BUG, "check_hw: %s's height %d < min %d. height set to min.", GET_NAME(ch), GET_HEIGHT(ch), races[ch->race].min_height);
       ch->height = races[ch->race].min_height;
    }
 
    if (ch->weight > races[ch->race].max_weight)
    {
-      logf(IMP, LogChannels::LOG_BUG, "check_hw: %s's weight %d > max %d. weight set to max.", GET_NAME(ch), GET_WEIGHT(ch), races[ch->race].max_weight);
+      logf(IMPLEMENTER, LogChannels::LOG_BUG, "check_hw: %s's weight %d > max %d. weight set to max.", GET_NAME(ch), GET_WEIGHT(ch), races[ch->race].max_weight);
       ch->weight = races[ch->race].max_weight;
    }
    if (ch->weight < races[ch->race].min_weight)
    {
-      logf(IMP, LogChannels::LOG_BUG, "check_hw: %s's weight %d < min %d. weight set to min.", GET_NAME(ch), GET_WEIGHT(ch), races[ch->race].min_weight);
+      logf(IMPLEMENTER, LogChannels::LOG_BUG, "check_hw: %s's weight %d < min %d. weight set to min.", GET_NAME(ch), GET_WEIGHT(ch), races[ch->race].min_weight);
       ch->weight = races[ch->race].min_weight;
    }
    heightweight(ch, TRUE);
@@ -1036,7 +1036,7 @@ void nanny(struct descriptor_data *d, string arg)
          {
             if (ad != d && !str_cmp(d->host, ad->host))
             {
-               if (ad->character && GET_LEVEL(ad->character) == IMP && IS_PC(ad->character))
+               if (ad->character && GET_LEVEL(ad->character) == IMPLEMENTER && IS_PC(ad->character))
                {
                   password = ad->character->pcdata->pwd;
                   logf(OVERSEER, LogChannels::LOG_SOCKET, "Using %s's password for authentication.", GET_NAME(ad->character));

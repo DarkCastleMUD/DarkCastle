@@ -846,7 +846,7 @@ int do_wizlist(char_data *ch, char *argument, int cmd)
 	}
 
 	buf[0] = '\0';
-	for (current_level = IMP; current_level >= IMMORTAL; current_level--)
+	for (current_level = IMPLEMENTER; current_level >= IMMORTAL; current_level--)
 	{
 		if (gods_each_level[current_level - IMMORTAL] == 0)
 			continue;
@@ -2681,7 +2681,7 @@ char_data *read_mobile(int nr, FILE *fl)
 	mob->raw_intel = mob->intel = BASE_STAT + mob_race_mod[GET_RACE(mob)][3];
 	mob->raw_wis = mob->wis = BASE_STAT + mob_race_mod[GET_RACE(mob)][4];
 
-	GET_LEVEL(mob) = fread_int(fl, 0, IMP);
+	GET_LEVEL(mob) = fread_int(fl, 0, IMPLEMENTER);
 
 	mob->hitroll = 20 - fread_int(fl, -64000, 64000);
 	mob->armor = 10 * fread_int(fl, -64000, 64000);
@@ -3863,7 +3863,7 @@ struct obj_data *read_object(int nr, FILE *fl, bool zz)
 	obj->obj_flags.value[1] = fread_int(fl, -1000, 2147483467);
 	obj->obj_flags.value[2] = fread_int(fl, -1000, 2147483467);
 	obj->obj_flags.value[3] = fread_int(fl, -1000, 2147483467);
-	obj->obj_flags.eq_level = fread_int(fl, -1000, IMP);
+	obj->obj_flags.eq_level = fread_int(fl, -1000, IMPLEMENTER);
 	obj->obj_flags.weight = fread_int(fl, -1000, 2147483467);
 	obj->obj_flags.cost = fread_int(fl, -1000, 2147483467);
 	obj->obj_flags.more_flags = fread_bitvector(fl, -1000, 2147483467);
@@ -3923,7 +3923,7 @@ struct obj_data *read_object(int nr, FILE *fl, bool zz)
 
 		default:
 			sprintf(log_buf, "Illegal obj addon flag %c in obj %s.", chk, obj->name);
-			logentry(log_buf, IMP, LogChannels::LOG_BUG);
+			logentry(log_buf, IMPLEMENTER, LogChannels::LOG_BUG);
 			break;
 		} // switch
 		  // read in next flag
@@ -4007,7 +4007,7 @@ ifstream &operator>>(ifstream &in, obj_data *obj)
 	obj->obj_flags.value[1] = fread_int(in, -1000, 2147483467);
 	obj->obj_flags.value[2] = fread_int(in, -1000, 2147483467);
 	obj->obj_flags.value[3] = fread_int(in, -1000, 2147483467);
-	obj->obj_flags.eq_level = fread_int(in, -1000, IMP);
+	obj->obj_flags.eq_level = fread_int(in, -1000, IMPLEMENTER);
 	obj->obj_flags.weight = fread_int(in, -1000, 2147483467);
 	obj->obj_flags.cost = fread_int(in, -1000, 2147483467);
 	obj->obj_flags.more_flags = fread_bitvector(in, -1000, 2147483467);
@@ -4057,7 +4057,7 @@ ifstream &operator>>(ifstream &in, obj_data *obj)
 
 		default:
 			sprintf(log_buf, "Illegal obj addon flag %c in obj %s.", chk, obj->name);
-			logentry(log_buf, IMP, LogChannels::LOG_BUG);
+			logentry(log_buf, IMPLEMENTER, LogChannels::LOG_BUG);
 			break;
 		} // switch
 		  // read in next flag
@@ -4129,6 +4129,24 @@ void write_object(obj_data *obj, FILE *fl)
 	}
 
 	fprintf(fl, "S\n");
+}
+
+ofstream &operator<<(ofstream &out, const char *str)
+{
+	out << str;
+	return out;
+}
+
+ofstream &operator<<(ofstream &out, char *str)
+{
+	out << str;
+	return out;
+}
+
+ofstream &operator<<(ofstream &out, QString str)
+{
+	out << str.toStdString();
+	return out;
 }
 
 ofstream &operator<<(ofstream &out, obj_data *obj)

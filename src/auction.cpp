@@ -349,7 +349,7 @@ void AuctionHouse::DoModify(char_data *ch, unsigned int ticket, unsigned int new
   char log_buf[MAX_STRING_LENGTH] = {};
   sprintf(log_buf, "VEND: %s modified ticket %u (%s): old price %u, new price %u.\r\n",
           GET_NAME(ch), Item_it->first, Item_it->second.item_name.c_str(), Item_it->second.price, new_price);
-  logentry(log_buf, IMP, LogChannels::LOG_OBJECTS);
+  logentry(log_buf, IMPLEMENTER, LogChannels::LOG_OBJECTS);
   Item_it->second.price = new_price;
   Save();
   return;
@@ -1248,7 +1248,7 @@ void AuctionHouse::BuyItem(char_data *ch, unsigned int ticket)
   char log_buf[MAX_STRING_LENGTH] = {};
   sprintf(log_buf, "VEND: %s bought %s's %s[%d] for %u coins.\r\n",
           GET_NAME(ch), Item_it->second.seller.c_str(), Item_it->second.item_name.c_str(), Item_it->second.vitem, Item_it->second.price);
-  logentry(log_buf, IMP, LogChannels::LOG_OBJECTS);
+  logentry(log_buf, IMPLEMENTER, LogChannels::LOG_OBJECTS);
   obj_to_char(obj, ch);
   ch->save();
 
@@ -1398,7 +1398,7 @@ void AuctionHouse::RemoveTicket(char_data *ch, unsigned int ticket)
     char log_buf[MAX_STRING_LENGTH] = {};
     sprintf(log_buf, "VEND: %s just collected %u coins from their sale of %s (ticket %u).\r\n",
             GET_NAME(ch), Item_it->second.price, Item_it->second.item_name.c_str(), ticket);
-    logentry(log_buf, IMP, LogChannels::LOG_OBJECTS);
+    logentry(log_buf, IMPLEMENTER, LogChannels::LOG_OBJECTS);
   }
   break;
   case AUC_EXPIRED: // intentional fallthrough
@@ -1438,7 +1438,7 @@ void AuctionHouse::RemoveTicket(char_data *ch, unsigned int ticket)
     char log_buf[MAX_STRING_LENGTH] = {};
     sprintf(log_buf, "VEND: %s cancelled or collected ticket # %u (%s) that was for sale for %u coins.\r\n",
             GET_NAME(ch), ticket, Item_it->second.item_name.c_str(), Item_it->second.price);
-    logentry(log_buf, IMP, LogChannels::LOG_OBJECTS);
+    logentry(log_buf, IMPLEMENTER, LogChannels::LOG_OBJECTS);
     obj_to_char(obj, ch);
   }
   break;
@@ -1815,7 +1815,7 @@ void AuctionHouse::AddItem(char_data *ch, obj_data *obj, unsigned int price, str
   {
     sprintf(log_buf, "VEND: %s just listed %s for sale for %u coins for %s.\r\n", GET_NAME(ch), obj->short_description, price, NewTicket.buyer.c_str());
   }
-  logentry(log_buf, IMP, LogChannels::LOG_OBJECTS);
+  logentry(log_buf, IMPLEMENTER, LogChannels::LOG_OBJECTS);
 
   // If this is a custom item we need it to continue existing otherwise we remove the clone
   if (fullSave(obj))

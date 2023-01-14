@@ -150,7 +150,7 @@ int do_snoop(char_data *ch, char *argument, int cmd)
     send_to_char("Busy already. \n\r", ch);
     return eFAILURE;
 
-    if (GET_LEVEL(victim) == IMP)
+    if (GET_LEVEL(victim) == IMPLEMENTER)
     {
       send_to_char("What are you!? Crazy! You can't snoop an Imp.\r\n", ch);
     }

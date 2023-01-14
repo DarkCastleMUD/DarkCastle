@@ -4403,7 +4403,7 @@ int spell_summon(uint8_t level, char_data *ch, char_data *victim, struct obj_dat
     return eFAILURE;
   }
 
-  if ((GET_LEVEL(victim) > MIN(MORTAL, level + 3)) && GET_LEVEL(ch) < IMP)
+  if ((GET_LEVEL(victim) > MIN(MORTAL, level + 3)) && GET_LEVEL(ch) < IMPLEMENTER)
   {
     send_to_char("You failed.\r\n", ch);
     return eFAILURE;
@@ -4419,7 +4419,7 @@ int spell_summon(uint8_t level, char_data *ch, char_data *victim, struct obj_dat
   if (IS_NPC(ch) && IS_NPC(victim))
     return eFAILURE;
 
-  if ((IS_NPC(victim) && GET_LEVEL(ch) < IMP) ||
+  if ((IS_NPC(victim) && GET_LEVEL(ch) < IMPLEMENTER) ||
       IS_SET(world[victim->in_room].room_flags, PRIVATE) ||
       IS_SET(world[victim->in_room].room_flags, NO_SUMMON))
   {
@@ -9600,7 +9600,7 @@ int cast_eagle_eye(uint8_t level, char_data *ch, char *arg, int type,
     break;
   default:
     logentry("Serious screw-up in eagle eye!",
-        ANGEL, LogChannels::LOG_BUG);
+             ANGEL, LogChannels::LOG_BUG);
     break;
   }
   return eFAILURE;

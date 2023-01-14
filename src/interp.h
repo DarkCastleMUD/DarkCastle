@@ -517,7 +517,6 @@ command_return_t do_sector(char_data *ch, char *argument, int cmd);
 command_return_t do_sedit(char_data *ch, char *argument, int cmd);
 command_return_t do_send(char_data *ch, char *argument, int cmd);
 command_return_t do_set(char_data *ch, char *argument, int cmd);
-command_return_t do_search(char_data *ch, char *argument, int cmd);
 command_return_t do_shout(char_data *ch, char *argument, int cmd);
 command_return_t do_showhunt(char_data *ch, char *argument, int cmd);
 command_return_t do_skills(char_data *ch, char *argument, int cmd);

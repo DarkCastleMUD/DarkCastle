@@ -260,7 +260,7 @@ int do_stun(char_data *ch, char *argument, int cmd)
      victim = ch;
   }
 
-  if(GET_LEVEL(victim) == IMP) {
+  if(GET_LEVEL(victim) == IMPLEMENTER) {
     send_to_char("You gotta be kidding!\n\r",ch);
     return eFAILURE;
   }

@@ -146,7 +146,7 @@ void get(char_data *ch, struct obj_data *obj_object, struct obj_data *sub_object
               obj_index[sub_object->item_number].virt);
       logentry(log_buf, 110, LogChannels::LOG_OBJECTS);
       for (obj_data *loop_obj = obj_object->contains; loop_obj; loop_obj = loop_obj->next_content)
-        logf(IMP, LogChannels::LOG_OBJECTS, "The %s[%d] contained %s[%d]",
+        logf(IMPLEMENTER, LogChannels::LOG_OBJECTS, "The %s[%d] contained %s[%d]",
              obj_object->short_description,
              obj_index[obj_object->item_number].virt,
              loop_obj->short_description,
@@ -175,9 +175,9 @@ void get(char_data *ch, struct obj_data *obj_object, struct obj_data *sub_object
       char log_buf[MAX_STRING_LENGTH] = {};
       sprintf(log_buf, "%s gets %s[%d] from room %d", GET_NAME(ch), obj_object->name, obj_index[obj_object->item_number].virt,
               ch->in_room);
-      logentry(log_buf, IMP, LogChannels::LOG_OBJECTS);
+      logentry(log_buf, IMPLEMENTER, LogChannels::LOG_OBJECTS);
       for (obj_data *loop_obj = obj_object->contains; loop_obj; loop_obj = loop_obj->next_content)
-        logf(IMP, LogChannels::LOG_OBJECTS, "The %s contained %s[%d]",
+        logf(IMPLEMENTER, LogChannels::LOG_OBJECTS, "The %s contained %s[%d]",
              obj_object->short_description,
              loop_obj->short_description,
              obj_index[loop_obj->item_number].virt);
@@ -441,7 +441,7 @@ int do_get(char_data *ch, char *argument, int cmd)
       }
 
       if (IS_SET(obj_object->obj_flags.extra_flags, ITEM_SPECIAL) &&
-          !isname(GET_NAME(ch), obj_object->name) && GET_LEVEL(ch) < IMP)
+          !isname(GET_NAME(ch), obj_object->name) && GET_LEVEL(ch) < IMPLEMENTER)
       {
         csendf(ch, "The %s appears to be SPECIAL. Only its rightful owner can take it.\r\n", obj_object->short_description);
         continue;
@@ -551,7 +551,7 @@ int do_get(char_data *ch, char *argument, int cmd)
       }
 
       if (IS_SET(obj_object->obj_flags.extra_flags, ITEM_SPECIAL) &&
-          !isname(GET_NAME(ch), obj_object->name) && GET_LEVEL(ch) < IMP)
+          !isname(GET_NAME(ch), obj_object->name) && GET_LEVEL(ch) < IMPLEMENTER)
       {
         csendf(ch, "The %s appears to be SPECIAL. Only its rightful owner can take it.\r\n", obj_object->short_description);
       }
@@ -695,7 +695,7 @@ int do_get(char_data *ch, char *argument, int cmd)
           }
 
           if (IS_SET(obj_object->obj_flags.extra_flags, ITEM_SPECIAL) &&
-              !isname(GET_NAME(ch), obj_object->name) && GET_LEVEL(ch) < IMP)
+              !isname(GET_NAME(ch), obj_object->name) && GET_LEVEL(ch) < IMPLEMENTER)
           {
             csendf(ch, "The %s appears to be SPECIAL. Only its rightful owner can take it.\r\n", obj_object->short_description);
             continue;
@@ -1206,9 +1206,9 @@ int do_drop(char_data *ch, char *argument, int cmd)
           {
             char log_buf[MAX_STRING_LENGTH] = {};
             sprintf(log_buf, "%s drops %s[%d] in room %d", GET_NAME(ch), tmp_object->name, obj_index[tmp_object->item_number].virt, ch->in_room);
-            logentry(log_buf, IMP, LogChannels::LOG_OBJECTS);
+            logentry(log_buf, IMPLEMENTER, LogChannels::LOG_OBJECTS);
             for (obj_data *loop_obj = tmp_object->contains; loop_obj; loop_obj = loop_obj->next_content)
-              logf(IMP, LogChannels::LOG_OBJECTS, "The %s contained %s[%d]",
+              logf(IMPLEMENTER, LogChannels::LOG_OBJECTS, "The %s contained %s[%d]",
                    tmp_object->short_description,
                    loop_obj->short_description,
                    obj_index[loop_obj->item_number].virt);
@@ -1275,9 +1275,9 @@ int do_drop(char_data *ch, char *argument, int cmd)
           {
             char log_buf[MAX_STRING_LENGTH] = {};
             sprintf(log_buf, "%s drops %s[%d] in room %d", GET_NAME(ch), tmp_object->name, obj_index[tmp_object->item_number].virt, ch->in_room);
-            logentry(log_buf, IMP, LogChannels::LOG_OBJECTS);
+            logentry(log_buf, IMPLEMENTER, LogChannels::LOG_OBJECTS);
             for (obj_data *loop_obj = tmp_object->contains; loop_obj; loop_obj = loop_obj->next_content)
-              logf(IMP, LogChannels::LOG_OBJECTS, "The %s contained %s[%d]",
+              logf(IMPLEMENTER, LogChannels::LOG_OBJECTS, "The %s contained %s[%d]",
                    tmp_object->short_description,
                    loop_obj->short_description,
                    obj_index[loop_obj->item_number].virt);
@@ -1502,7 +1502,7 @@ int do_put(char_data *ch, char *argument, int cmd)
                 {
                   act("$n attaches $p to $P.", ch, obj_object, sub_object, TO_ROOM, INVIS_NULL);
                   act("You attach $p to $P.", ch, obj_object, sub_object, TO_CHAR, 0);
-                  logf(IMP, LogChannels::LOG_OBJECTS, "%s attaches %s[%d] to %s[%d]",
+                  logf(IMPLEMENTER, LogChannels::LOG_OBJECTS, "%s attaches %s[%d] to %s[%d]",
                        ch->name,
                        obj_object->short_description,
                        obj_index[obj_object->item_number].virt,
@@ -1513,7 +1513,7 @@ int do_put(char_data *ch, char *argument, int cmd)
                 {
                   act("$n puts $p in $P.", ch, obj_object, sub_object, TO_ROOM, INVIS_NULL);
                   act("You put $p in $P.", ch, obj_object, sub_object, TO_CHAR, 0);
-                  logf(IMP, LogChannels::LOG_OBJECTS, "%s puts %s[%d] in %s[%d]",
+                  logf(IMPLEMENTER, LogChannels::LOG_OBJECTS, "%s puts %s[%d] in %s[%d]",
                        ch->name,
                        obj_object->short_description,
                        obj_index[obj_object->item_number].virt,
@@ -1674,7 +1674,7 @@ int do_give(char_data *ch, char *argument, int cmd)
 
     sprintf(buf, "%s gives %lld coin%s to %s", GET_NAME(ch), amount,
             pluralize(amount), GET_NAME(vict));
-    logentry(buf, IMP, LogChannels::LOG_OBJECTS);
+    logentry(buf, IMPLEMENTER, LogChannels::LOG_OBJECTS);
 
     sprintf(buf, "%s gives you %lld gold coin%s.", PERS(ch, vict), amount,
             amount == 1 ? "" : "s");
@@ -1694,7 +1694,7 @@ int do_give(char_data *ch, char *argument, int cmd)
     {
       GET_GOLD(ch) = 0;
       send_to_char("Warning:  You are giving out more gold than you had.\r\n", ch);
-      if (GET_LEVEL(ch) < IMP)
+      if (GET_LEVEL(ch) < IMPLEMENTER)
       {
         sprintf(buf, "%s gives %lld coins to %s (negative!)", GET_NAME(ch),
                 amount, GET_NAME(vict));
@@ -1894,9 +1894,9 @@ int do_give(char_data *ch, char *argument, int cmd)
 
   sprintf(buf, "%s gives %s to %s", GET_NAME(ch), obj->name,
           GET_NAME(vict));
-  logentry(buf, IMP, LogChannels::LOG_OBJECTS);
+  logentry(buf, IMPLEMENTER, LogChannels::LOG_OBJECTS);
   for (obj_data *loop_obj = obj->contains; loop_obj; loop_obj = loop_obj->next_content)
-    logf(IMP, LogChannels::LOG_OBJECTS, "The %s[%d] contained %s[%d]",
+    logf(IMPLEMENTER, LogChannels::LOG_OBJECTS, "The %s[%d] contained %s[%d]",
          obj->short_description,
          obj_index[obj->item_number].virt,
          loop_obj->short_description,
@@ -2696,18 +2696,18 @@ int palm(char_data *ch, struct obj_data *obj_object, struct obj_data *sub_object
   { // Logging gold gets from corpses would just be too much.
     sprintf(log_buf, "%s palms %s[%d] from %s", GET_NAME(ch), obj_object->name, obj_index[obj_object->item_number].virt,
             sub_object->name);
-    logentry(log_buf, IMP, LogChannels::LOG_OBJECTS);
+    logentry(log_buf, IMPLEMENTER, LogChannels::LOG_OBJECTS);
     for (obj_data *loop_obj = obj_object->contains; loop_obj; loop_obj = loop_obj->next_content)
-      logf(IMP, LogChannels::LOG_OBJECTS, "The %s contained %s[%d]", obj_object->short_description, loop_obj->short_description,
+      logf(IMPLEMENTER, LogChannels::LOG_OBJECTS, "The %s contained %s[%d]", obj_object->short_description, loop_obj->short_description,
            obj_index[loop_obj->item_number].virt);
   }
   else if (!sub_object && obj_object->obj_flags.type_flag != ITEM_MONEY)
   {
     sprintf(log_buf, "%s palms %s[%d] from room %d", GET_NAME(ch), obj_object->name, obj_index[obj_object->item_number].virt,
             ch->in_room);
-    logentry(log_buf, IMP, LogChannels::LOG_OBJECTS);
+    logentry(log_buf, IMPLEMENTER, LogChannels::LOG_OBJECTS);
     for (obj_data *loop_obj = obj_object->contains; loop_obj; loop_obj = loop_obj->next_content)
-      logf(IMP, LogChannels::LOG_OBJECTS, "The %s contained %s[%d]", obj_object->short_description, loop_obj->short_description,
+      logf(IMPLEMENTER, LogChannels::LOG_OBJECTS, "The %s contained %s[%d]", obj_object->short_description, loop_obj->short_description,
            obj_index[loop_obj->item_number].virt);
   }
 

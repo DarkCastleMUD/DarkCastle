@@ -231,7 +231,7 @@ int do_fall(char_data *ch, short dir)
 
 	target = world[ch->in_room].dir_option[dir]->to_room;
 
-	if (IS_SET(world[target].room_flags, IMP_ONLY) && GET_LEVEL(ch) < IMP)
+	if (IS_SET(world[target].room_flags, IMP_ONLY) && GET_LEVEL(ch) < IMPLEMENTER)
 		return eFAILURE;
 
 	if (IS_SET(world[target].room_flags, TUNNEL))
@@ -537,7 +537,7 @@ int do_simple_move(char_data *ch, int cmd, int following)
 	} // else if !FLYING
 
 	if (IS_SET(world[world[ch->in_room].dir_option[cmd]->to_room].room_flags, IMP_ONLY) &&
-		GET_LEVEL(ch) < IMP)
+		GET_LEVEL(ch) < IMPLEMENTER)
 	{
 		send_to_char("No.\r\n", ch);
 		return eFAILURE;

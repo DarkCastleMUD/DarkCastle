@@ -49,16 +49,16 @@ void log_sacrifice(char_data *ch, obj_data *obj, bool decay = FALSE)
 
   if (!decay)
   {
-    logf(IMP, LogChannels::LOG_OBJECTS, "%s just sacrificed %s[%d] in room %d\n", GET_NAME(ch), GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj), GET_ROOM_VNUM(ch->in_room));
+    logf(IMPLEMENTER, LogChannels::LOG_OBJECTS, "%s just sacrificed %s[%d] in room %d\n", GET_NAME(ch), GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj), GET_ROOM_VNUM(ch->in_room));
   }
   else
   {
-    logf(IMP, LogChannels::LOG_OBJECTS, "%s just poofed from decaying corpse %s[%d] in room %d\n", GET_OBJ_SHORT((obj_data *)ch), GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj), GET_ROOM_VNUM(obj->in_room));
+    logf(IMPLEMENTER, LogChannels::LOG_OBJECTS, "%s just poofed from decaying corpse %s[%d] in room %d\n", GET_OBJ_SHORT((obj_data *)ch), GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj), GET_ROOM_VNUM(obj->in_room));
   }
 
   for (obj_data *loop_obj = obj->contains; loop_obj; loop_obj = loop_obj->next_content)
   {
-    logf(IMP, LogChannels::LOG_OBJECTS, "The %s contained %s[%d]\n",
+    logf(IMPLEMENTER, LogChannels::LOG_OBJECTS, "The %s contained %s[%d]\n",
          GET_OBJ_SHORT(obj),
          GET_OBJ_SHORT(loop_obj),
          GET_OBJ_VNUM(loop_obj));
@@ -315,9 +315,9 @@ int do_donate(char_data *ch, char *argument, int cmd)
   {
     char log_buf[MAX_STRING_LENGTH] = {};
     sprintf(log_buf, "%s donates %s[%d]", GET_NAME(ch), obj->name, obj_index[obj->item_number].virt);
-    logentry(log_buf, IMP, LogChannels::LOG_OBJECTS);
+    logentry(log_buf, IMPLEMENTER, LogChannels::LOG_OBJECTS);
     for (obj_data *loop_obj = obj->contains; loop_obj; loop_obj = loop_obj->next_content)
-      logf(IMP, LogChannels::LOG_OBJECTS, "The %s contained %s[%d]", obj->short_description,
+      logf(IMPLEMENTER, LogChannels::LOG_OBJECTS, "The %s contained %s[%d]", obj->short_description,
            loop_obj->short_description,
            obj_index[loop_obj->item_number].virt);
   }

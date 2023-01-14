@@ -147,7 +147,7 @@ int send_to_gods(QString message, int god_level, LogChannels type)
     return (0);
   }
 
-  if ((god_level > IMP) || (god_level < 0))
+  if ((god_level > IMPLEMENTER) || (god_level < 0))
   { // Outside valid god levels
     return (0);
   }

@@ -1,6 +1,7 @@
 #include <QStringTokenizer>
 
 #include "character.h"
+#include "levels.h"
 
 char_file_u4::char_file_u4()
 {
@@ -130,4 +131,19 @@ player_config_t::const_iterator PlayerConfig::constBegin() const
 player_config_t::const_iterator PlayerConfig::constEnd() const
 {
     return config.constEnd();
+}
+
+bool char_data::isMortal(void)
+{
+    return GET_LEVEL(this) < IMMORTAL;
+}
+
+bool char_data::isImmortal(void)
+{
+    return GET_LEVEL(this) >= IMMORTAL;
+}
+
+bool char_data::isImplementor(void)
+{
+    return GET_LEVEL(this) == IMPLEMENTER;
 }

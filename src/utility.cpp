@@ -273,6 +273,11 @@ int str_nosp_cmp(const char *arg1, const char *arg2)
   return retval;
 }
 
+int str_nosp_cmp(QString arg1, QString arg2)
+{
+  return str_nosp_cmp(arg1.toStdString().c_str(), arg2.toStdString().c_str());
+}
+
 int str_n_nosp_cmp(const char *arg1, const char *arg2, int size)
 {
   char *tmp_arg1 = str_nospace(arg1);
@@ -614,6 +619,14 @@ std::string sprintbit(uint32_t vektor, const char *names[])
 
   return result;
 }
+void sprinttype(int type, QStringList names, char *result)
+{
+  if (result == nullptr)
+  {
+    return;
+  }
+  strcpy(result, names.value(type, "Undefined").toStdString().c_str());
+}
 
 void sprinttype(int type, const char *names[], char *result)
 {
@@ -639,28 +652,14 @@ string sprinttype(int type, const char *names[])
     return "Undefined";
 }
 
-void sprinttype(int type, item_types_t names, char *result)
+void sprinttype(uint64_t type, item_types_t names, char *result)
 {
-  int nr;
-
-  for (nr = 0; *names[nr] != '\n'; nr++)
-    ;
-  if (type > -1 && type < nr)
-    strcpy(result, names[type]);
-  else
-    strcpy(result, "Undefined");
+  strcpy(result, names.value(type, "Undefined").toStdString().c_str());
 }
 
 string sprinttype(int type, item_types_t names)
 {
-  int nr;
-
-  for (nr = 0; *names[nr] != '\n'; nr++)
-    ;
-  if (type > -1 && type < nr)
-    return names[type];
-  else
-    return "Undefined";
+  return names.value(type, "Undefined").toStdString();
 }
 
 int consttype(char *search_str, const char *names[])
@@ -1737,7 +1736,7 @@ command_return_t char_data::save(int cmd)
   // 9 = save with a round of lag
   // -pir 3/15/1999
 
-  if (IS_NPC(this) || GET_LEVEL(this) > IMP)
+  if (IS_NPC(this) || GET_LEVEL(this) > IMPLEMENTER)
     return eFAILURE;
 
   if (cmd != 666)
@@ -3101,7 +3100,7 @@ void special_log(char *arg)
 
   if (!(fl = fopen("../lib/special.txt", "a")))
   {
-    logentry("Unable to open SPECIAL LOG FILE in special_log.", IMP, LogChannels::LOG_GOD);
+    logentry("Unable to open SPECIAL LOG FILE in special_log.", IMPLEMENTER, LogChannels::LOG_GOD);
     return;
   }
 

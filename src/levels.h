@@ -18,7 +18,7 @@
 // #define POWER 107
 // #define G_POWER 108
 // #define OVERSEER 109
-// #define IMP 110
+// #define IMPLEMENTER 110
 // #define MAX_MORTAL 50
 // #define MIN_GOD IMMORTAL
 
@@ -28,7 +28,7 @@ const uint64_t IMMORTAL = 102;
 #define DEITY 104
 #define OVERSEER 105
 #define COORDINATOR 108
-#define IMP 110
+const uint64_t IMPLEMENTER = 110;
 
 #define ARCHITECT ANGEL
 #define ARCHANGEL ANGEL

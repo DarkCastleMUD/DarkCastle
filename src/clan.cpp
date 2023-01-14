@@ -1029,7 +1029,7 @@ int do_accept(char_data *ch, char *arg, int cmd)
   send_to_char(buf, victim);
 
   sprintf(buf, "%s just joined clan [%s].", GET_NAME(victim), clan->name);
-  logentry(buf, IMP, LogChannels::LOG_CLAN);
+  logentry(buf, IMPLEMENTER, LogChannels::LOG_CLAN);
 
   add_totem_stats(victim);
 
@@ -1110,7 +1110,7 @@ int do_outcast(char_data *ch, char *arg, int cmd)
   if (victim == ch)
   {
     sprintf(buf, "%s just quit clan [%s].", GET_NAME(victim), clan->name);
-    logentry(buf, IMP, LogChannels::LOG_CLAN);
+    logentry(buf, IMPLEMENTER, LogChannels::LOG_CLAN);
     send_to_char("You quit your clan.\r\n", ch);
     remove_totem_stats(victim);
     victim->clan = 0;
@@ -1135,7 +1135,7 @@ int do_outcast(char_data *ch, char *arg, int cmd)
   send_to_char(buf, victim);
 
   sprintf(buf, "%s was outcasted from clan [%s].", GET_NAME(victim), clan->name);
-  logentry(buf, IMP, LogChannels::LOG_CLAN);
+  logentry(buf, IMPLEMENTER, LogChannels::LOG_CLAN);
 
   victim->save(666);
   if (!connected)
@@ -1204,7 +1204,7 @@ int do_cpromote(char_data *ch, char *arg, int cmd)
   send_to_char(buf, victim);
 
   sprintf(buf, "%s just cpromoted by %s as leader of clan [%s].", GET_NAME(victim), GET_NAME(ch), clan->name);
-  logentry(buf, IMP, LogChannels::LOG_CLAN);
+  logentry(buf, IMPLEMENTER, LogChannels::LOG_CLAN);
   return eSUCCESS;
 }
 

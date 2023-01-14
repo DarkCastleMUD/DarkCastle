@@ -175,7 +175,7 @@ obj_list_t oload(char_data *ch, int rnum, int cnt, bool random)
     }
 
     if ((obj->obj_flags.type_flag == ITEM_MONEY) &&
-        (GET_LEVEL(ch) < IMP || !IS_IMMORTAL(ch)))
+        (GET_LEVEL(ch) < IMPLEMENTER || !IS_IMMORTAL(ch)))
     {
       extract_obj(obj);
       ch->send("Denied.\r\n");
@@ -223,7 +223,7 @@ void do_oload(char_data *ch, int rnum, int cnt, bool random)
     }
 
     if ((obj->obj_flags.type_flag == ITEM_MONEY) &&
-        (GET_LEVEL(ch) < IMP))
+        (GET_LEVEL(ch) < IMPLEMENTER))
     {
       extract_obj(obj);
       send_to_char("Denied.\r\n", ch);

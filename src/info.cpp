@@ -1997,7 +1997,7 @@ int do_score(char_data *ch, char *argument, int cmd)
               GET_ARMOR(ch), GET_PKILLS(ch), IS_CARRYING_N(ch), CAN_CARRY_N(ch),
               to_hit, GET_PDEATHS(ch), IS_CARRYING_W(ch), CAN_CARRY_W(ch),
               to_dam, spell_dam, GET_EXP(ch),
-              get_saves(ch, SAVE_TYPE_FIRE), get_saves(ch, SAVE_TYPE_COLD), get_saves(ch, SAVE_TYPE_ENERGY), GET_LEVEL(ch) == IMP ? 0 : exp_needed,
+              get_saves(ch, SAVE_TYPE_FIRE), get_saves(ch, SAVE_TYPE_COLD), get_saves(ch, SAVE_TYPE_ENERGY), GET_LEVEL(ch) == IMPLEMENTER ? 0 : exp_needed,
               get_saves(ch, SAVE_TYPE_ACID), get_saves(ch, SAVE_TYPE_MAGIC), get_saves(ch, SAVE_TYPE_POISON), GET_GOLD(ch), (int)GET_PLATINUM(ch),
               ch->melee_mitigation, ch->spell_mitigation, ch->song_mitigation, (int)GET_BANK(ch), GET_QPOINTS(ch));
 
@@ -3482,25 +3482,25 @@ struct search
 {
    search_types type;
 
-   uint8_t o_min_level;
-   uint8_t o_max_level;
+   uint64_t o_min_level;
+   uint64_t o_max_level;
 
-   int32_t o_item_number;          /* Where in data-base               */
-   int32_t o_in_room;              /* In what room -1 when conta/carr  */
-   int o_vroom;                    /* for corpse saving */
+   uint64_t o_item_number;         /* Where in data-base               */
+   uint64_t o_in_room;             /* In what room -1 when conta/carr  */
+   uint64_t o_vroom;               /* for corpse saving */
    struct obj_flag_data obj_flags; /* Object information               */
    int16_t o_num_affects;
    obj_affected_type o_affected; /* Which abilities in PC to change  */
 
-   string o_name;               /* Title of object :get etc.        */
-   string o_description;        /* When in room                     */
-   string o_short_description;  /* when worn/carry/in cont.         */
-   string o_action_description; /* What to write when used          */
+   QString o_name;               /* Title of object :get etc.        */
+   QString o_description;        /* When in room                     */
+   QString o_short_description;  /* when worn/carry/in cont.         */
+   QString o_action_description; /* What to write when used          */
 
-   string o_edd_keyword;     /* Keyword in look/examine          */
-   string o_edd_description; /* What to see                      */
-   string o_carried_by;
-   string o_equipped_by;
+   QString o_edd_keyword;     /* Keyword in look/examine          */
+   QString o_edd_description; /* What to see                      */
+   QString o_carried_by;
+   QString o_equipped_by;
    bool operator==(const obj_data *obj);
 };
 
@@ -3514,7 +3514,7 @@ bool search::operator==(const obj_data *obj)
    switch (this->type)
    {
    case O_NAME:
-      if (this->o_name == string(obj->name) || isname(this->o_name, obj->name))
+      if (this->o_name == obj->name || isname(this->o_name, obj->name))
       {
          return true;
       }
@@ -3590,71 +3590,38 @@ bool search::operator==(const obj_data *obj)
    return false;
 }
 
-int do_search(char_data *ch, char *argument_buffer, int cmd)
+command_return_t char_data::do_search(QStringList &arguments, int cmd)
 {
-   if (ch == nullptr || GET_LEVEL(ch) < IMMORTAL)
+
+   if (arguments.empty())
    {
-      return false;
-   }
-
-   vector<string> parsables;
-   string arg1, arg2, args(argument_buffer);
-
-   do
-   {
-      // Separate arguments by spaces first, half_chop will remove leading spaces
-      tie(arg1, arg2) = half_chop(args);
-      if (arg1.empty())
-      {
-         break;
-      }
-
-      // Look to see if doublequotes were used because then we have to include spaces
-      // found within the doublequotes
-      auto quotes1 = arg1.find('"');
-      auto quotes2 = arg2.find('"');
-      if (quotes1 != string::npos && quotes2 != string::npos)
-      {
-         arg1 = arg1 + " " + arg2.substr(0, quotes2 + 1);
-         arg2.erase(0, quotes2 + 1);
-      }
-      args = arg2;
-      parsables.push_back(arg1);
-   } while (args.length() > 0);
-
-   if (parsables.empty())
-   {
-      ch->send("Usage: search <objects> <search terms>\r\n");
-      return eFAILURE;
-   }
-
-   if (string("objects").find(parsables[0]) == string::npos)
-   {
-      ch->send(fmt::format("{} not a valid search target.\r\n", parsables[0]));
+      send("Usage: search <search terms>\r\n");
       return eFAILURE;
    }
 
    // Create search object based on parameters
    struct search so;
-   vector<struct search> sl;
-   for (auto i = 1; i < parsables.size(); ++i)
+   QList<struct search> sl;
+   QString arg1, arg2;
+   for (auto i = 0; i < arguments.size(); ++i)
    {
       // ch->send(fmt::format("{} [{}]\r\n", i, parsables[i]));
-      string arg1, arg2;
-      if (parsables[i].find('=') != string::npos)
+      if (arguments[i].contains('='))
       {
-         tie(arg1, arg2) = half_chop(parsables[i], '=');
+         QStringList equal_buffer = arguments[i].split('=');
+         arg1 = equal_buffer.at(0);
+         arg2 = equal_buffer.at(1);
       }
       else
       {
-         arg1 = parsables[i];
+         arg1 = arguments[i];
       }
 
       if (arg1 == "level")
       {
-         if (arg2.empty())
+         if (arg2.isEmpty())
          {
-            ch->send("What level?\r\n");
+            send("What level?\r\n");
             return eFAILURE;
          }
          else
@@ -3663,15 +3630,17 @@ int do_search(char_data *ch, char *argument_buffer, int cmd)
             {
                // #-#
                // #-
-               if (arg2.find('-') != string::npos)
+               if (arg2.contains('-'))
                {
-                  tie(arg1, arg2) = half_chop(arg2, '-');
-                  if (!arg1.empty())
+                  QStringList equal_buffer = arg2.split('-');
+                  arg1 = equal_buffer.at(0);
+                  arg2 = equal_buffer.at(1);
+                  if (!arg1.isEmpty())
                   {
-                     so.o_min_level = stoul(arg1.c_str());
-                     if (!arg2.empty())
+                     so.o_min_level = arg1.toULongLong();
+                     if (!arg2.isEmpty())
                      {
-                        so.o_max_level = stoul(arg2.c_str());
+                        so.o_max_level = arg2.toULongLong();
                      }
                      else
                      {
@@ -3684,10 +3653,10 @@ int do_search(char_data *ch, char *argument_buffer, int cmd)
                }
                else // #
                {
-                  if (!arg2.empty())
+                  if (!arg2.isEmpty())
                   {
-                     so.o_min_level = stoul(arg2.c_str());
-                     so.o_max_level = stoul(arg2.c_str());
+                     so.o_min_level = arg2.toULongLong();
+                     so.o_max_level = arg2.toULongLong();
                      so.type = O_EQ_LEVEL;
                      sl.push_back(so);
                   }
@@ -3700,17 +3669,17 @@ int do_search(char_data *ch, char *argument_buffer, int cmd)
       }
       else if (arg1 == "name")
       {
-         if (arg2.empty())
+         if (arg2.isEmpty())
          {
-            ch->send("What name are you searching for? You can use name=value multiple times.\r\n");
+            send("What name are you searching for? You can use name=value multiple times.\r\n");
             return eFAILURE;
          }
          else
          {
-            size_t quote;
-            while ((quote = arg2.find('"')) != string::npos)
+            qsizetype quote;
+            while ((quote = arg2.indexOf('"')) != -1)
             {
-               arg2.erase(quote, 1);
+               arg2 = arg2.remove(quote, 1);
             }
 
             // Ex. name=woodbey
@@ -3722,17 +3691,13 @@ int do_search(char_data *ch, char *argument_buffer, int cmd)
       else if (arg1 == "type")
       {
          bool found = false;
-         if (!arg2.empty())
+         if (!arg2.isEmpty())
          {
-            // UPPERCASE arg2 to match item_types list
-            for (auto i = 0; i < arg2.size(); ++i)
-            {
-               arg2[i] = toupper(arg2[i]);
-            }
+            arg2 = arg2.toUpper();
 
             for (auto i = 0; i < item_types.size(); ++i)
             {
-               if (string(item_types[i]).find(arg2) == 0)
+               if (item_types[i].indexOf(arg2) == 0)
                {
                   found = true;
                   so.obj_flags.type_flag = i;
@@ -3745,18 +3710,24 @@ int do_search(char_data *ch, char *argument_buffer, int cmd)
 
          if (!found)
          {
-            ch->send("What type are you searching for?\r\n");
-            ch->send("Here are some valid types:\r\n");
+            send("What type are you searching for?\r\n");
+            send("Here are some valid types:\r\n");
             for (auto &i : item_types)
             {
-               ch->send(string(i) + "\r\n");
+               send(i + "\r\n");
             }
             return eFAILURE;
          }
       }
+      else
+      {
+         so.o_name = arg1;
+         so.type = O_NAME;
+         sl.push_back(so);
+      }
    }
 
-   ch->send(fmt::format("Searching {} objects...", top_of_objt));
+   send(QString("Searching %1 objects...").arg(top_of_objt));
 
    bool header_shown = false;
    size_t objects_found = 0;
@@ -3772,6 +3743,11 @@ int do_search(char_data *ch, char *argument_buffer, int cmd)
       }
       obj_data *obj = static_cast<obj_data *>(obj_index[rnum].item);
       if (obj == nullptr)
+      {
+         continue;
+      }
+
+      if (isMortal() && obj->isDark())
       {
          continue;
       }
@@ -3798,16 +3774,16 @@ int do_search(char_data *ch, char *argument_buffer, int cmd)
 
    if (obj_results.empty())
    {
-      ch->send("No results found.\r\n");
+      send("No results found.\r\n");
       return eFAILURE;
    }
 
-   ch->send(fmt::format("{} matches found.\r\n\r\n", obj_results.size()));
+   send(fmt::format("{} matches found.\r\n\r\n", obj_results.size()));
 
-   ch->send("[ VNUM] [ LV] Short Description\r\n");
+   send("[ VNUM] [ LV] Short Description\r\n");
    for (auto obj : obj_results)
    {
-      ch->send(fmt::format("[{:5}] [{:3}] {}\r\n", GET_OBJ_VNUM(obj), obj->obj_flags.eq_level, GET_OBJ_SHORT(obj)));
+      send(fmt::format("[{:5}] [{:3}] {}\r\n", GET_OBJ_VNUM(obj), obj->obj_flags.eq_level, GET_OBJ_SHORT(obj)));
    }
 
    return eSUCCESS;

@@ -373,7 +373,7 @@ int do_fakelog(char_data *ch, char *argument, int cmd)
   if (isdigit(*lev_str))
   {
     lev_nr = atoi(lev_str);
-    if (lev_nr < IMMORTAL || lev_nr > IMP)
+    if (lev_nr < IMMORTAL || lev_nr > IMPLEMENTER)
     {
       send_to_char("You must use a valid level from 100-110.\r\n", ch);
       return eFAILURE;

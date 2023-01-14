@@ -109,7 +109,7 @@ int do_processes(char_data *ch, char *arg, int cmd)
 
   if (!(fl = fopen("../lib/whassup.txt", "a")))
   {
-    logentry("Unable to open whassup.txt for adding in do_processes!", IMP,
+    logentry("Unable to open whassup.txt for adding in do_processes!", IMPLEMENTER,
         LogChannels::LOG_BUG);
     return eFAILURE;
   }
@@ -124,7 +124,7 @@ int do_processes(char_data *ch, char *arg, int cmd)
 
   if (!(fl = fopen("../lib/whassup.txt", "r")))
   {
-    logentry("Unable to open whassup.txt for reading in do_processes!", IMP,
+    logentry("Unable to open whassup.txt for reading in do_processes!", IMPLEMENTER,
         LogChannels::LOG_BUG);
     return eFAILURE;
   }
@@ -212,7 +212,7 @@ int do_advance(char_data *ch, char *argument, int cmd)
   }
 
   if (!*level ||
-      (new_newlevel = atoi(level)) <= 0 || new_newlevel > IMP)
+      (new_newlevel = atoi(level)) <= 0 || new_newlevel > IMPLEMENTER)
   {
     send_to_char("Level must be 1 to 110.\r\n", ch);
     return eFAILURE;
@@ -319,7 +319,7 @@ int do_zap(char_data *ch, char *argument, int cmd)
       return eFAILURE;
     }
 
-    if (GET_LEVEL(victim) == IMP)
+    if (GET_LEVEL(victim) == IMPLEMENTER)
     { // Hehe..
       send_to_char("Get stuffed.\r\n", ch);
       return eFAILURE;

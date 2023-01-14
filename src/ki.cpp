@@ -126,7 +126,7 @@ int do_ki(char_data *ch, char *argument, int cmd)
     return eFAILURE;
   }
   /*
-   if ((IS_SET(world[ch->in_room].room_flags, SAFE)) && (GET_LEVEL(ch) < IMP)) {
+   if ((IS_SET(world[ch->in_room].room_flags, SAFE)) && (GET_LEVEL(ch) < IMPLEMENTER)) {
    send_to_char("You feel at peace, calm, relaxed, one with yourself and "
    "the universe.\r\n", ch);
    return eFAILURE;
@@ -152,7 +152,7 @@ int do_ki(char_data *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (IS_SET(world[ch->in_room].room_flags, SAFE) && (GET_LEVEL(ch) < IMP) && spl != KI_SENSE && spl != KI_SPEED && spl != KI_PURIFY && spl != KI_STANCE && spl != KI_AGILITY && spl != KI_MEDITATION)
+  if (IS_SET(world[ch->in_room].room_flags, SAFE) && (GET_LEVEL(ch) < IMPLEMENTER) && spl != KI_SENSE && spl != KI_SPEED && spl != KI_PURIFY && spl != KI_STANCE && spl != KI_AGILITY && spl != KI_MEDITATION)
   {
     send_to_char("You feel at peace, calm, relaxed, one with yourself and "
                  "the universe.\r\n",
@@ -281,7 +281,7 @@ int do_ki(char_data *ch, char *argument, int cmd)
     if (!IS_SET(ki_info[spl].targets, TAR_IGNORE))
       if (!tar_char)
       {
-        logentry("Dammit Morc, fix that null tar_char thing in ki", IMP,
+        logentry("Dammit Morc, fix that null tar_char thing in ki", IMPLEMENTER,
             LogChannels::LOG_BUG);
         send_to_char(
             "If you triggered this message, you almost crashed the\n\r"
@@ -344,10 +344,10 @@ int do_ki(char_data *ch, char *argument, int cmd)
 
       /* Imps ignore safe flags  */
       if (!IS_SET(ki_info[spl].targets, TAR_IGNORE))
-        if (IS_SET(world[ch->in_room].room_flags, SAFE) && !IS_NPC(ch) && (GET_LEVEL(ch) == IMP))
+        if (IS_SET(world[ch->in_room].room_flags, SAFE) && !IS_NPC(ch) && (GET_LEVEL(ch) == IMPLEMENTER))
         {
           send_to_char(
-              "There is no safe haven from an angry IMP!\n\r",
+              "There is no safe haven from an angry IMPLEMENTER!\n\r",
               tar_char);
         }
 

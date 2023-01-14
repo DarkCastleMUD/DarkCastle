@@ -402,18 +402,18 @@ struct command_info cmd_info[] =
 
         // Immortal commands
         {"voteset", do_setvote, nullptr, nullptr, POSITION_DEAD, 108, CMD_SETVOTE, 0, 1, CommandType::all},
-        {"thunder", do_thunder, nullptr, nullptr, POSITION_DEAD, IMP, CMD_DEFAULT, 0, 1, CommandType::all},
-        {"wizlock", do_wizlock, nullptr, nullptr, POSITION_DEAD, IMP, CMD_DEFAULT, 0, 1, CommandType::all},
+        {"thunder", do_thunder, nullptr, nullptr, POSITION_DEAD, IMPLEMENTER, CMD_DEFAULT, 0, 1, CommandType::all},
+        {"wizlock", do_wizlock, nullptr, nullptr, POSITION_DEAD, IMPLEMENTER, CMD_DEFAULT, 0, 1, CommandType::all},
         {"processes", do_processes, nullptr, nullptr, POSITION_DEAD, 108, CMD_DEFAULT, 0, 1, CommandType::all},
-        {"bestow", nullptr, do_bestow, nullptr, POSITION_DEAD, IMP, CMD_DEFAULT, 0, 1, CommandType::all},
+        {"bestow", nullptr, do_bestow, nullptr, POSITION_DEAD, IMPLEMENTER, CMD_DEFAULT, 0, 1, CommandType::all},
         {"oclone", do_oclone, nullptr, nullptr, POSITION_DEAD, 103, CMD_DEFAULT, 0, 1, CommandType::all},
         {"mclone", do_mclone, nullptr, nullptr, POSITION_DEAD, 103, CMD_DEFAULT, 0, 1, CommandType::all},
         {"huntclear", do_huntclear, nullptr, nullptr, POSITION_DEAD, 105, CMD_DEFAULT, 0, 1, CommandType::all},
         {"areastats", do_areastats, nullptr, nullptr, POSITION_DEAD, 105, CMD_DEFAULT, 0, 1, CommandType::all},
         {"huntstart", do_huntstart, nullptr, nullptr, POSITION_DEAD, 105, CMD_DEFAULT, 0, 1, CommandType::all},
-        {"revoke", do_revoke, nullptr, nullptr, POSITION_DEAD, IMP, CMD_DEFAULT, 0, 1, CommandType::all},
-        {"chpwd", do_chpwd, nullptr, nullptr, POSITION_DEAD, IMP, CMD_DEFAULT, 0, 1, CommandType::all},
-        {"advance", do_advance, nullptr, nullptr, POSITION_DEAD, IMP, CMD_DEFAULT, 0, 1, CommandType::all},
+        {"revoke", do_revoke, nullptr, nullptr, POSITION_DEAD, IMPLEMENTER, CMD_DEFAULT, 0, 1, CommandType::all},
+        {"chpwd", do_chpwd, nullptr, nullptr, POSITION_DEAD, IMPLEMENTER, CMD_DEFAULT, 0, 1, CommandType::all},
+        {"advance", do_advance, nullptr, nullptr, POSITION_DEAD, IMPLEMENTER, CMD_DEFAULT, 0, 1, CommandType::all},
         {"skillmax", do_maxes, nullptr, nullptr, POSITION_DEAD, 105, CMD_DEFAULT, 0, 1, CommandType::all},
         {"damage", do_dmg_eq, nullptr, nullptr, POSITION_DEAD, 103, CMD_DEFAULT, 0, 1, CommandType::all},
         {"affclear", do_clearaff, nullptr, nullptr, POSITION_DEAD, 104, CMD_DEFAULT, 0, 1, CommandType::all},
@@ -440,7 +440,7 @@ struct command_info cmd_info[] =
         {"eqmax", do_eqmax, nullptr, nullptr, POSITION_DEAD, 105, CMD_DEFAULT, 0, 1, CommandType::all},
         {"send", do_send, nullptr, nullptr, POSITION_DEAD, 106, CMD_DEFAULT, 0, 1, CommandType::all},
         {"at", do_at, nullptr, nullptr, POSITION_DEAD, IMMORTAL, CMD_DEFAULT, 0, 1, CommandType::all},
-        {"fakelog", do_fakelog, nullptr, nullptr, POSITION_DEAD, IMP, CMD_DEFAULT, 0, 1, CommandType::all},
+        {"fakelog", do_fakelog, nullptr, nullptr, POSITION_DEAD, IMPLEMENTER, CMD_DEFAULT, 0, 1, CommandType::all},
         {"global", do_global, nullptr, nullptr, POSITION_DEAD, 108, CMD_DEFAULT, 0, 1, CommandType::all},
         {"log", do_log, nullptr, nullptr, POSITION_DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1, CommandType::all},
         {"snoop", do_snoop, nullptr, nullptr, POSITION_DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1, CommandType::all},
@@ -463,8 +463,8 @@ struct command_info cmd_info[] =
         {"punish", do_punish, nullptr, nullptr, POSITION_DEAD, 106, CMD_DEFAULT, 0, 1, CommandType::all},
         {"sqedit", do_sqedit, nullptr, nullptr, POSITION_DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1, CommandType::all},
         {"qedit", do_qedit, nullptr, nullptr, POSITION_DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1, CommandType::all},
-        {"install", do_install, nullptr, nullptr, POSITION_DEAD, IMP, CMD_DEFAULT, 0, 1, CommandType::all},
-        //  { "motdload",       do_motdload,    POSITION_DEAD, IMP, CMD_DEFAULT, 0, 1  ,CommandType::all},
+        {"install", do_install, nullptr, nullptr, POSITION_DEAD, IMPLEMENTER, CMD_DEFAULT, 0, 1, CommandType::all},
+        //  { "motdload",       do_motdload,    POSITION_DEAD, IMPLEMENTER, CMD_DEFAULT, 0, 1  ,CommandType::all},
         {"hedit", do_hedit, nullptr, nullptr, POSITION_DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1, CommandType::all},
         {"hindex", do_hindex, nullptr, nullptr, POSITION_DEAD, IMMORTAL, CMD_DEFAULT, 0, 1, CommandType::all},
         {"reload", do_reload, nullptr, nullptr, POSITION_DEAD, OVERSEER, CMD_DEFAULT, 0, 1, CommandType::all},
@@ -478,7 +478,7 @@ struct command_info cmd_info[] =
         {"teleport", do_teleport, nullptr, nullptr, POSITION_DEAD, DEITY, CMD_DEFAULT, 0, 1, CommandType::all},
         {"purge", do_purge, nullptr, nullptr, POSITION_DEAD, 103, CMD_DEFAULT, 0, 1, CommandType::all},
         {"show", do_show, nullptr, nullptr, POSITION_DEAD, ANGEL, CMD_DEFAULT, 0, 1, CommandType::all},
-        {"search", do_search, nullptr, nullptr, POSITION_DEAD, ANGEL, CMD_DEFAULT, 0, 1, CommandType::all},
+        {"search", nullptr, nullptr, &char_data::do_search, POSITION_DEAD, ANGEL, CMD_DEFAULT, 0, 1, CommandType::all},
         {"fighting", do_fighting, nullptr, nullptr, POSITION_DEAD, 104, CMD_DEFAULT, 0, 1, CommandType::all},
         {"peace", do_peace, nullptr, nullptr, POSITION_DEAD, ANGEL, CMD_DEFAULT, 0, 1, CommandType::all},
         {"check", do_check, nullptr, nullptr, POSITION_DEAD, 105, CMD_DEFAULT, 0, 1, CommandType::all},
@@ -521,13 +521,13 @@ struct command_info cmd_info[] =
         {"varstat", do_varstat, nullptr, nullptr, POSITION_DEAD, 104, CMD_DEFAULT, 0, 1, CommandType::all},
         {"matrixinfo", do_matrixinfo, nullptr, nullptr, POSITION_DEAD, 103, CMD_DEFAULT, 0, 1, CommandType::all},
         {"maxcheck", do_findfix, nullptr, nullptr, POSITION_DEAD, 103, CMD_DEFAULT, 0, 1, CommandType::all},
-        {"export", do_export, nullptr, nullptr, POSITION_DEAD, IMP, CMD_DEFAULT, 0, 1, CommandType::all},
+        {"export", do_export, nullptr, nullptr, POSITION_DEAD, IMPLEMENTER, CMD_DEFAULT, 0, 1, CommandType::all},
         {"mscore", do_mscore, nullptr, nullptr, POSITION_DEAD, 103, CMD_DEFAULT, 0, 1, CommandType::all},
-        {"world", nullptr, do_world, nullptr, POSITION_DEAD, IMP, CMD_DEFAULT, 0, 1, CommandType::all},
+        {"world", nullptr, do_world, nullptr, POSITION_DEAD, IMPLEMENTER, CMD_DEFAULT, 0, 1, CommandType::all},
 
         // Special procedure commands placed to not disrupt god commands
         {"setup", do_mortal_set, nullptr, nullptr, POSITION_STANDING, 0, CMD_DEFAULT, 0, 1, CommandType::all},
-        {"metastat", do_metastat, nullptr, nullptr, POSITION_DEAD, IMP, CMD_DEFAULT, 0, 1, CommandType::all},
+        {"metastat", do_metastat, nullptr, nullptr, POSITION_DEAD, IMPLEMENTER, CMD_DEFAULT, 0, 1, CommandType::all},
         {"testhit", do_testhit, nullptr, nullptr, POSITION_DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1, CommandType::all},
         {"acfinder", do_acfinder, nullptr, nullptr, POSITION_DEAD, 106, CMD_DEFAULT, 0, 1, CommandType::all},
         {"findpath", do_findPath, nullptr, nullptr, POSITION_DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1, CommandType::all},
@@ -539,7 +539,7 @@ struct command_info cmd_info[] =
         {"dopathpath", do_pathpath, nullptr, nullptr, POSITION_DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1, CommandType::all},
         {"botcheck", do_botcheck, nullptr, nullptr, POSITION_DEAD, 106, CMD_DEFAULT, 0, 1, CommandType::all},
         {"showbits", do_showbits, nullptr, nullptr, POSITION_DEAD, OVERSEER, CMD_DEFAULT, 0, 1, CommandType::all},
-        {"debug", do_debug, nullptr, nullptr, POSITION_DEAD, IMP, CMD_DEFAULT, 0, 1, CommandType::all},
+        {"debug", do_debug, nullptr, nullptr, POSITION_DEAD, IMPLEMENTER, CMD_DEFAULT, 0, 1, CommandType::all},
 
         // Bug way down here after 'buy'
         {"bug", do_bug, nullptr, nullptr, POSITION_DEAD, 0, CMD_DEFAULT, 0, 1, CommandType::all},
@@ -905,7 +905,7 @@ int command_interpreter(char_data *ch, string pcomm, bool procced)
       {
         DC *dc = dynamic_cast<DC *>(DC::instance());
         // Don't log communication
-        if (found->command_number != CMD_GTELL && found->command_number != CMD_CTELL && found->command_number != CMD_SAY && found->command_number != CMD_IMMORT && found->command_number != CMD_IMPCHAN && found->command_number != CMD_TELL && found->command_number != CMD_WHISPER && found->command_number != CMD_REPLY && (GET_LEVEL(ch) >= 100 || (ch->pcdata->multi == true && dc->cf.allow_multi == false)) && IS_SET(ch->pcdata->punish, PUNISH_LOG) == false)
+        if (found->command_number != CMD_GTELL && found->command_number != CMD_CTELL && found->command_number != CMD_SAY && found->command_number != CMD_TELL && found->command_number != CMD_WHISPER && found->command_number != CMD_REPLY && (GET_LEVEL(ch) >= 100 || (ch->pcdata->multi == true && dc->cf.allow_multi == false)) && IS_SET(ch->pcdata->punish, PUNISH_LOG) == false)
         {
           logentry(QString("Log %1: %2").arg(GET_NAME(ch)).arg(pcomm.c_str()), 110, LogChannels::LOG_PLAYER, ch);
         }
@@ -974,7 +974,31 @@ int command_interpreter(char_data *ch, string pcomm, bool procced)
       else if (found->command_pointer3)
       {
         QString command = QString(&pcomm[look_at]).trimmed();
-        QStringList arguments = command.split(' ', Qt::SkipEmptyParts);
+        QStringList arguments;
+
+        // This code splits command by spaces and doublequotes
+        while (command.count('"') > 1)
+        {
+          qsizetype section_start, first_quote;
+          first_quote = command.indexOf('"');
+
+          // Find section start is the location of the character after a space next to first double quote
+          section_start = command.sliced(0, first_quote + 1).lastIndexOf(' ') + 1;
+          if (section_start == -1)
+          {
+            section_start = first_quote;
+          }
+          QString before_quotes = command.sliced(0, section_start);
+
+          auto second_quote = command.indexOf('"', first_quote + 1);
+          QString quoted = command.sliced(section_start, second_quote - section_start + 1);
+          arguments.append(before_quotes.split(' ', Qt::SkipEmptyParts));
+          arguments.append(quoted);
+          command = command.remove(0, second_quote + 1);
+        }
+
+        arguments.append(command.split(' ', Qt::SkipEmptyParts));
+
         retval = (*ch.*(found->command_pointer3))(arguments, found->command_number);
       }
 
@@ -1478,7 +1502,8 @@ tuple<string, string> last_argument(string arguments)
   }
   catch (...)
   {
-    logf(IMMORTAL, LogChannels::LOG_BUG, "Error in last_argument(%s)", arguments.c_str());
+    logf(IMMORTAL, LogChannels::LOG_BUG, "Error in last_argument(%s)",
+         arguments.c_str());
   }
 
   return tuple<string, string>(string(), string());

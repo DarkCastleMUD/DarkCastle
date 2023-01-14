@@ -523,7 +523,7 @@ int do_at(char_data *ch, char *argument, int cmd)
   }
 
   /* a location has been found. */
-  if (IS_SET(world[location].room_flags, IMP_ONLY) && GET_LEVEL(ch) < IMP)
+  if (IS_SET(world[location].room_flags, IMP_ONLY) && GET_LEVEL(ch) < IMPLEMENTER)
   {
     send_to_char("No.\r\n", ch);
     return eFAILURE;

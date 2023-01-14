@@ -379,7 +379,7 @@ int do_sing(char_data *ch, char *arg, int cmd)
 			return eFAILURE;
 		}
 
-	if ((IS_SET(world[ch->in_room].room_flags, SAFE)) && (GET_LEVEL(ch) < IMP) && (spl == SKILL_SONG_WHISTLE_SHARP - SKILL_SONG_BASE || spl == SKILL_SONG_UNRESIST_DITTY - SKILL_SONG_BASE || spl == SKILL_SONG_GLITTER_DUST - SKILL_SONG_BASE || spl == SKILL_SONG_STICKY_LULL - SKILL_SONG_BASE || spl == SKILL_SONG_REVEAL_STACATO - SKILL_SONG_BASE || spl == SKILL_SONG_TERRIBLE_CLEF - SKILL_SONG_BASE || spl == SKILL_SONG_DISCHORDANT_DIRGE - SKILL_SONG_BASE || spl == SKILL_SONG_INSANE_CHANT - SKILL_SONG_BASE || spl == SKILL_SONG_JIG_OF_ALACRITY - SKILL_SONG_BASE || spl == SKILL_SONG_DISARMING_LIMERICK - SKILL_SONG_BASE || spl == SKILL_SONG_CRUSHING_CRESCENDO - SKILL_SONG_BASE || spl == SKILL_SONG_SHATTERING_RESO - SKILL_SONG_BASE || spl == SKILL_SONG_MKING_CHARGE - SKILL_SONG_BASE || spl == SKILL_SONG_HYPNOTIC_HARMONY - SKILL_SONG_BASE))
+	if ((IS_SET(world[ch->in_room].room_flags, SAFE)) && (GET_LEVEL(ch) < IMPLEMENTER) && (spl == SKILL_SONG_WHISTLE_SHARP - SKILL_SONG_BASE || spl == SKILL_SONG_UNRESIST_DITTY - SKILL_SONG_BASE || spl == SKILL_SONG_GLITTER_DUST - SKILL_SONG_BASE || spl == SKILL_SONG_STICKY_LULL - SKILL_SONG_BASE || spl == SKILL_SONG_REVEAL_STACATO - SKILL_SONG_BASE || spl == SKILL_SONG_TERRIBLE_CLEF - SKILL_SONG_BASE || spl == SKILL_SONG_DISCHORDANT_DIRGE - SKILL_SONG_BASE || spl == SKILL_SONG_INSANE_CHANT - SKILL_SONG_BASE || spl == SKILL_SONG_JIG_OF_ALACRITY - SKILL_SONG_BASE || spl == SKILL_SONG_DISARMING_LIMERICK - SKILL_SONG_BASE || spl == SKILL_SONG_CRUSHING_CRESCENDO - SKILL_SONG_BASE || spl == SKILL_SONG_SHATTERING_RESO - SKILL_SONG_BASE || spl == SKILL_SONG_MKING_CHARGE - SKILL_SONG_BASE || spl == SKILL_SONG_HYPNOTIC_HARMONY - SKILL_SONG_BASE))
 	{
 		send_to_char("This room feels too safe to sing an offensive song such as this.\r\n", ch);
 		return eFAILURE;
@@ -557,7 +557,7 @@ int do_sing(char_data *ch, char *arg, int cmd)
 		if (!IS_SET(song_info[spl].targets, TAR_IGNORE))
 			if (!tar_char && !tar_obj)
 			{
-				logentry("Dammit, fix that null tar_char thing in do_song", IMP, LogChannels::LOG_BUG);
+				logentry("Dammit, fix that null tar_char thing in do_song", IMPLEMENTER, LogChannels::LOG_BUG);
 				send_to_char("If you triggered this message, you almost crashed the\n\r"
 							 "game.  Tell a god what you did immediately.\r\n",
 							 ch);
@@ -620,9 +620,9 @@ int do_sing(char_data *ch, char *arg, int cmd)
 
 			/* Imps ignore safe flags  */
 			if (!IS_SET(song_info[spl].targets, TAR_IGNORE) && !tar_obj)
-				if (IS_SET(world[ch->in_room].room_flags, SAFE) && !IS_NPC(ch) && (GET_LEVEL(ch) == IMP))
+				if (IS_SET(world[ch->in_room].room_flags, SAFE) && !IS_NPC(ch) && (GET_LEVEL(ch) == IMPLEMENTER))
 				{
-					send_to_char("There is no safe haven from an angry IMP!\n\r", tar_char);
+					send_to_char("There is no safe haven from an angry IMPLEMENTER!\n\r", tar_char);
 				}
 
 			if (cmd != CMD_ORCHESTRATE && IS_SINGING(ch)) // I'm singing
@@ -754,7 +754,7 @@ void update_bard_singing()
 			REMBIT(i->affected_by, AFF_HIDE);
 			send_to_char("Your singing ruins your hiding place.\r\n", i);
 		}
-		if (GET_LEVEL(i) < IMP
+		if (GET_LEVEL(i) < IMPLEMENTER
 				&& ((IS_SET(world[i->in_room].room_flags, NO_KI) || IS_SET(world[i->in_room].room_flags, SAFE))
 						&& ((*j).song_number == SKILL_SONG_WHISTLE_SHARP - SKILL_SONG_BASE
 								|| (*j).song_number == SKILL_SONG_UNRESIST_DITTY - SKILL_SONG_BASE
