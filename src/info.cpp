@@ -3617,11 +3617,9 @@ bool search::operator==(const obj_data *obj)
 
 command_return_t char_data::do_search(QStringList &arguments, int cmd)
 {
-
    if (arguments.empty())
    {
-      send("Usage: search <search terms>\r\n");
-      return eFAILURE;
+      arguments.append("help");
    }
 
    // Create search object based on parameters
@@ -3642,7 +3640,20 @@ command_return_t char_data::do_search(QStringList &arguments, int cmd)
          arg1 = arguments[i];
       }
 
-      if (arg1 == "level")
+      if (arg1 == "help")
+      {
+         send("Search terms:\r\n");
+         send("level=50      show objects that are level 50.\r\n");
+         send("level=50-60   show objects with level including and between 50 to 60.\r\n");
+         send("type=WEAPON   show objects of type WEAPON.\r\n");
+         send("type=         show available object types.\r\n");
+         send("name=moss     show objects matching keyword moss.\r\n");
+         send("xyz           show objects matching keyword xyz.\r\n");
+         send("Terms can be combined.\r\n");
+         send("search level=1-10 type=ARMOR golden\r\n");
+         return eSUCCESS;
+      }
+      else if (arg1 == "level")
       {
          if (arg2.isEmpty())
          {
