@@ -1863,7 +1863,7 @@ The immortal changing your name will not provide either a
 gender or sex change as these can ONLY be purchased at the
 temple in Sorpigal.
  
-Politely contact an Implementor for a name change and have
+Politely contact an Implementer for a name change and have
 your 500 plats ready.
  
 Immortal note: The admin helpfile for this command is listed as "IMM RENAME".
@@ -2152,16 +2152,12 @@ E:
 $B$0The Dark Castle Development Team...$R
  
   $B$4Management Team:$R
-$B$7Apocalypse$R  apocalypse@dcastle.org       $B$7Lead Implementor/$RMicromanager
-$B$7Julian$R      julian@dcastle.org           $B$7Lead Implementor/$RSite Host
-$B$7Sergio$R      sergio@dcastle.org           $B$7World Implementor$R
-$B$7Elder$R       elder@dcastle.org            $B$7Player Coordination/$ROldest Imp (ever?)
-$B$7Zen$R         nodecentnamesleft@gmail.com  $B$7Lead Dingo/$Rall-round awesome guy
+$B$7Julian$R      julian@dcastle.org           $B$7Lead Implementer/$R
+
  
   $B$2Game Development:$R
  
   $B$5World Development:$R
-$B$7Wendy$R       wendy@dcastle.org            $B$7Building Coordinator/$RToken Female
  
   $B$3Player Relations:$R
 $B$7Petra$R       Troub11@yahoo.com            $B$7Quest Coordinator/$RPlayer Support
@@ -2170,7 +2166,7 @@ $B$7Petra$R       Troub11@yahoo.com            $B$7Quest Coordinator/$RPlayer Su
 $B$7Urizen$R      -unlisted-                   $B$7Legendary Immortal$R
 $B$7Wynn$R        -unlisted-                   $B$7Legendary Immortal$R
 $B$7Pirahna$R     dcpirahna@hotmail.com        $B$7Legendary Immortal$R
-$B$7Scyld$R       scyld@dcastle.com            $B$7Web Implementor/$RCode Support
+$B$7Scyld$R       scyld@dcastle.com            $B$7Web Implementer/$RCode Support
 #
 ~
 CLAN HALL
@@ -7214,7 +7210,7 @@ supply vague information, your plea is likely to be disregarded.
 POLICY: You will receive what you can wear at your level and 3 items
         in your inventory.  Items that you cannot otherwise get your-
         self will not be reimbed until you talk to a Greater God, Overseer
-        or Implementor.  Items which no longer load in the game will *not*
+        or Implementer.  Items which no longer load in the game will *not*
         be reimbursed (i.e. pre-revised equipment) for the simple reason
         that they no longer exist in that format.
 
@@ -7349,7 +7345,7 @@ the damage they receive.
 Syntax:   cast 'dispel good' <target>
 #
 ~
-IMPLEMENTOR
+IMPLEMENTER
 IMPLEMENTER
 IMMORTAL
 IMMORT
@@ -7357,7 +7353,7 @@ IMMORTALS
 WIZLIST, PRAY, EMAIL, IMPERSONATE, PASSWORD, CONTRIBUTE
 L: 1
 E:
-The Implementors are listed on the top of the wizlist (type wizlist).
+The Implementers are listed on the top of the wizlist (type wizlist).
 This mud is based on MERC Diku code, modified extensively by the
 implementors.
 
@@ -8472,7 +8468,7 @@ E:
 Chain is a mobile (computer generated character) who's primary purpose
 is to spout off amusing, anecdotal, or down right idiotic comments over
 the gossip channel.  It is also the name of one of the very first
-Implementors on Dark Castle.  Many of his comments are associated with
+Implementers on Dark Castle.  Many of his comments are associated with
 the rich and intricate history of Dark Castle...like Apocalypse puking
 his guts out for example!
 
@@ -12098,7 +12094,7 @@ to a new player. Here is a brief list which you might want to familarize
 yourself with.
 
 imm     - Immortal
-imp     - Implementor, the highest level immortal
+imp     - Implementer, the highest level immortal
 imp'ed  - Not to be confused with the past tense of an implementor,
           which makes no sense.
           It actually refers to some procedure or bit of code, or a new
@@ -12657,7 +12653,7 @@ Syntax:   rflag <flag names>
  
 Note: In addition to the above flags, there are also available "class specific"
 guild flags for use in safe rooms that are a specific class' guild.
-No safe rooms or guild flagging should used without permission from an Implementor.
+No safe rooms or guild flagging should used without permission from an Implementer.
 #
 ~
 SECTOR
@@ -15199,7 +15195,7 @@ NONE
 BELLOW, CHANNELS, GOSSIP
 L: 1
 E:
-A communication channel available only to Implementors.
+A communication channel available only to Implementers.
 If you see one of these, you better listen.
 
 syntax: thunder <message>
@@ -15515,30 +15511,30 @@ ADVANCE COMMAND
 NONE
 NONE
 NONE
-IMPLEMENTOR, WIZHELP
+IMPLEMENTER, WIZHELP
 L: 108
 E:
 To advance a player to a level higher or lower than his or her present.
 
 syntax: advance <player> <level>
 
-$BImplementor Command Only$R
+$BImplementer Command Only$R
 #
 ~
 IMPCHAN
 IMP CHAN
-IMPLEMENTOR CHANNEL
+IMPLEMENTER CHANNEL
 IMPLEMENTER CHANNEL
 NONE
 CHANNEL, IMMCHAN, TELL, GOSSIP, SAY, BESTOW
 L: 110
 E:
-Impchan is the channel reserved for the Implementors.
-It can only be accessed or seen if it has been turned on for you by an Implementor.
+Impchan is the channel reserved for the Implementers.
+It can only be accessed or seen if it has been turned on for you by an Implementer.
  
 You speak on the impchan by preceeding your comments with a /.
 
-Syntax: / Hi Implementors! Thanks for letting me use your special channel!
+Syntax: / Hi Implementers! Thanks for letting me use your special channel!
 #
 ~
 PRIZE ARENA
@@ -16219,7 +16215,7 @@ $B$7Genuine Wendy $B$3W$5i$6n$3g$7d$4i$3n$5g$R
 4. Two of THESE tokens may be redeemed for any ONE other token.
  
 $BElder's $5Old Man$R$B Cane$R
-1. ONE question, answered by an Implementor, about the DC World.
+1. ONE question, answered by an Implementer, about the DC World.
 $R   (Remember, the Imp will use their discretion when answering.)
 2. ONE attribute point added to the skill/spell of your choice.
 3. ONE restring
@@ -16250,7 +16246,7 @@ at any time choose not to honor the request of the bearer in
 instances where such redemption attempts are evaluated to be
 suspicious. In the event such a redemption attempt is denied, the
 token will still be valid for redemption.  Further clarifications
-should be directed to an Implementor or Coordinator.
+should be directed to an Implementer or Coordinator.
 #
 ~
 HAIKU
@@ -18751,7 +18747,7 @@ WIZ LOCK
 WIZLOCK COMMAND
 NONE
 NONE
-IMPLEMENTOR, WIZHELP
+IMPLEMENTER, WIZHELP
 L: 108
 E:
 The wizlock command locks the game to all but Immortals.
@@ -18759,7 +18755,7 @@ Once the game is wizlocked only level 101+ can log in.
 
 Simply type "wizlock" to lock the game, and repeat to unlock it.
 
-$BImplementor Command Only$R
+$BImplementer Command Only$R
 #
 ~
 BESTOW
@@ -18767,10 +18763,10 @@ REVOKE
 NONE
 NONE
 NONE
-IMPLEMENTOR, WIZHELP
+IMPLEMENTER, WIZHELP
 L: 108
 E:
-There are many immortal commands that can only be granted by an Implementor.
+There are many immortal commands that can only be granted by an Implementer.
 
 The BESTOW and REVOKE commands grant and remove these abilities at the
 discretion of the Imps.  The granted commants appear as "GFT" listings on
@@ -18781,7 +18777,7 @@ Note: 'bestow <god>' will list all available commands for that god.
 
 Syntax:  revoke <god> <command|all>
 
-$BImplementor Command Only$R
+$BImplementer Command Only$R
 #
 ~
 CHPWD
@@ -18789,10 +18785,10 @@ CHANGE PASSWORD
 CHPWD COMMAND
 NONE
 NONE
-IMPLEMENTOR, WIZHELP
+IMPLEMENTER, WIZHELP
 L: 108
 E:
-This command is used by Implementors to change a target player's password.
+This command is used by Implementers to change a target player's password.
 Note that the target player must be IN the game, either connected or linkdead,
 in order for the command to work.
 
@@ -18803,7 +18799,7 @@ This command should NEVER be used without good cause or thorough investigation.
 
 Syntax: chpwd <character> <new password>
 
-$BImplementor Command Only$R
+$BImplementer Command Only$R
 #
 ~
 FAKELOG
@@ -18811,7 +18807,7 @@ FAKE LOG
 FAKELOG COMMAND
 NONE
 NONE
-IMPLEMENTOR, WIZHELP
+IMPLEMENTER, WIZHELP
 L: 110
 E:
 The FAKELOG command is used to cause a "bug log" message to appear to all
@@ -18820,7 +18816,7 @@ fun with an immortal, or to trick an immortal when cheating is suspected.
 
 Syntax: fakelog <level> <message>
 
-$BImplementor Command Only$R
+$BImplementer Command Only$R
 #
 ~
 DO_THE_THING
@@ -18828,7 +18824,7 @@ DO THE THING
 META STAT
 METASTAT
 CHECKMETA
-WIZHELP, IMPLEMENTOR, META, STAT, CHECK, PLATINUM
+WIZHELP, IMPLEMENTER, META, STAT, CHECK, PLATINUM
 L: 108
 E:
 This command, with a really useless name, is made to stat a player's metaed
@@ -18838,7 +18834,7 @@ so much now.
 
 Syntax: do_the_thing <player>
 
-$BImplementor Command Only$R
+$BImplementer Command Only$R
 #
 ~
 RENAME COMMAND
@@ -19938,7 +19934,7 @@ SKILLS, SPELLS, SET, RULES, PRAC
 L: 108
 E:
 This immortal command is used for adding, removing, and setting skills on players.
-It should NOT BE EVER USED without prior approval from an Implementor.  It should
+It should NOT BE EVER USED without prior approval from an Implementer.  It should
 also not ever be used without a specific reason in mind (ie testing on a test char).
 It is NOT for buffing up your morts.
 
@@ -19946,7 +19942,7 @@ The syntax for this command can be found by entering "sedit" with no arguments.
 If you need further clarification this either means:
 a) you shouldn't be using this command
 or
-b) you need to talk to an Implementor.
+b) you need to talk to an Implementer.
 
 Note that changes that are not part of a class' actual stats or over a char's max
 will NOT save on relog and will reset.
@@ -23314,7 +23310,7 @@ GUILD, REDIT, RFLAG, RDELETE, SECTOR
 L: 103
 E:
 The "Guild Flags" or "Class Flags" are available for builders to use
-with permission from an Implementor or their supervising Immortal.
+with permission from an Implementer or their supervising Immortal.
 
 These flags will prevent all but the specificed classes from entering the
 designated rooms.  Turning off all classes from entering a room will make

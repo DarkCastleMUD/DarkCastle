@@ -1612,8 +1612,7 @@ EMAIL MAIL
 
 Immortal    Email                             Title
 
-Apocalypse  DC_Apoc@hotmail.com               Lead Implementor
-Urizen      nick.bj@gmail.com                 Lead Coder
+Julian      julian@dcastle.org               Lead Implementer, Coder
 
 More immortals and their contact information is listed once you enter
 the game.
@@ -3489,7 +3488,7 @@ make sure you don't hassle them with trivial requests.
 
 Syntax:   wizlist
 
-See Also: IMPLEMENTOR, IMMORTAL.
+See Also: IMPLEMENTER, IMMORTAL.
 
 #
 CHANNEL CHANNELS 
@@ -5306,7 +5305,7 @@ supply vague information, your plea is likely to be disregarded.
 POLICY: You will receive what you can wear at your level and 3 items
         in your inventory.  Items that you cannot otherwise get your-
         self will not be reimbed until you talk to a Greater God, Overseer
-        or Implementor.  Items which no longer load in the game will *not*
+        or Implementer.  Items which no longer load in the game will *not*
         be reimbursed (i.e. pre-revised equipment) for the simple reason
         that they no longer exist in that format.
 
@@ -5404,9 +5403,9 @@ Syntax:   cast 'dispel good' <target>
 See Also: SPELLS, DISPEL EVIL
 
 #
-IMPLEMENTOR IMPLEMENTER IMMORTAL IMMORT 
+IMPLEMENTER IMPLEMENTOR IMMORTAL IMMORT 
 
-The Implementors are listed on the top of the wizlist (type wizlist).
+The Implementers are listed on the top of the wizlist (type wizlist).
 This mud is based on MERC Diku code, modified extensively by the
 implementers.
 
@@ -6199,7 +6198,7 @@ Chain is a mobile (computer generated character) who's primary purpose
 
 is to spout off amusing, anecdotal, or down right idiotic comments over
 the gossip channel.  It is also the name of one of the very first
-Implementors on Dark Castle.  Many of his comments are associated with
+Implementers on Dark Castle.  Many of his comments are associated with
 the rich and intricate history of Dark Castle...like Apocalypse puking
 his guts out for example!
 
@@ -8956,7 +8955,7 @@ to a new player. Here is a brief list which you might want to familarize
 yourself with.
 
 imm     - Immortal
-imp     - Implementor, the highest level immortal
+imp     - Implementer, the highest level immortal
 imp'ed  - Not to be confused with the past tense of an implementor,
           which makes no sense.
           It actually refers to some procedure or bit of code, or a new
@@ -9260,7 +9259,7 @@ DROP  ORDER  LIST  BUY  SELL  RENT  WEATHER  READ  REMOVE  "NEWBIE SHOP"
 PLAYERSHOPS  IWANTAPLAYERSHOP  MAP  PRACTISE  EXITS  LEAVE  ENTER
 TIME  BUG  IDEAHELP  GET  PUT  BOARD  NEWS  SLEEPING  POUR  GRAB  FOLLOW
 FLEE  REIMB  SPAM  THIRST  REGEN  "CONTROL WEATHER"  INFRAVISION
-HASTE  "DISPEL GOOD"  IMPLEMENTOR  GUILD  INFO  WHERE  GAIN  LEVELS
+HASTE  "DISPEL GOOD"  IMPLEMENTER  GUILD  INFO  WHERE  GAIN  LEVELS
 BRIEF  !    CONSIDER  EXPERIENCE  GROUP  SOLO  QUAFF  RECITE  USE  ARMOR
 TELEPORT  BLESS  BLINDNESS  "FULL HEAL"  "POWER HARM"  "CREATE FOOD"
 "METEOR SWARM"  "WIZARD'S EYE"  "SOLAR GATE"  "HEROES FEAST"
