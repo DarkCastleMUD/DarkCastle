@@ -64,6 +64,7 @@ class DC : public QCoreApplication
   Q_OBJECT
   // Favor reference semantics over pointer semantics
 public:
+  static const room_t SORPIGAL_BANK_ROOM = 3005;
   void main_loop2(void);
   explicit DC(int &argc, char **argv);
 

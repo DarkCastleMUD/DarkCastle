@@ -336,7 +336,7 @@ struct command_info cmd_info[] =
         {"motd", do_motd, nullptr, nullptr, POSITION_DEAD, 0, CMD_DEFAULT, 0, 1, CommandType::all},
         {"cmotd", do_cmotd, nullptr, nullptr, POSITION_DEAD, 0, CMD_DEFAULT, 0, 1, CommandType::all},
         {"cbalance", do_cbalance, nullptr, nullptr, POSITION_STANDING, 0, CMD_DEFAULT, 0, 0, CommandType::all},
-        {"cdeposit", do_cdeposit, nullptr, nullptr, POSITION_STANDING, 0, CMD_DEFAULT, 0, 0, CommandType::all},
+        {"cdeposit", nullptr, nullptr, &char_data::do_cdeposit, POSITION_STANDING, 0, CMD_DEFAULT, 0, 0, CommandType::all},
         {"cwithdraw", do_cwithdraw, nullptr, nullptr, POSITION_STANDING, 0, CMD_DEFAULT, 0, 0, CommandType::all},
         {"ctax", do_ctax, nullptr, nullptr, POSITION_STANDING, 0, CMD_DEFAULT, 0, 1, CommandType::all},
         {"where", do_where, nullptr, nullptr, POSITION_RESTING, 0, CMD_DEFAULT, 0, 1, CommandType::all},
@@ -1215,18 +1215,36 @@ void argument_interpreter(const char *argument, char *first_arg, char *second_ar
 
 // If the string is ALL numbers, return TRUE
 // If there is a non-numeric in string, return FALSE
-int is_number(const char *str)
+bool is_number(const char *str)
 {
   int look_at;
 
   if (*str == '\0')
-    return (0);
+    return false;
 
   for (look_at = 0; *(str + look_at) != '\0'; look_at++)
     if ((*(str + look_at) < '0') || (*(str + look_at) > '9'))
-      return (0);
+      return false;
 
-  return (1);
+  return false;
+}
+
+bool is_number(QString str)
+{
+  bool ok = false;
+  str.toLongLong(&ok);
+  if (ok)
+  {
+    return true;
+  }
+
+  str.toULongLong(&ok);
+  if (ok)
+  {
+    return true;
+  }
+
+  return false;
 }
 
 // Multiline arguments, used for mobprogs

@@ -265,7 +265,7 @@ command_return_t do_climb(char_data *ch, char *argument, int cmd);
 command_return_t do_close(char_data *ch, char *argument, int cmd);
 command_return_t do_cmotd(char_data *ch, char *argument, int cmd);
 command_return_t do_ctax(char_data *ch, char *argument, int cmd);
-command_return_t do_cdeposit(char_data *ch, char *argument, int cmd);
+
 command_return_t do_cwithdraw(char_data *ch, char *argument, int cmd);
 command_return_t do_cbalance(char_data *ch, char *argument, int cmd);
 command_return_t do_colors(char_data *ch, char *argument, int cmd);
