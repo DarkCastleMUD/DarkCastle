@@ -84,6 +84,11 @@ struct timer_data *timer_list = NULL;
 // local funcs
 void update_wizlist(char_data *ch);
 
+size_t nocolor_strlen(QString str)
+{
+  return nocolor_strlen(str.toStdString().c_str());
+}
+
 size_t nocolor_strlen(const char *s)
 {
   if (!s)

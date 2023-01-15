@@ -619,6 +619,7 @@ bool is_in_game(char_data *ch);
 int get_stat(char_data *ch, int stat);
 char *pluralize(int qty, char ending[] = "s");
 size_t nocolor_strlen(const char *s);
+size_t nocolor_strlen(QString str);
 void make_prompt(struct descriptor_data *d, string &prompt);
 string remove_all_codes(string input);
 void prog_error(char_data *mob, char *format, ...);

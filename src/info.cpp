@@ -22,6 +22,7 @@
 #include <fstream>
 #include <fmt/format.h>
 
+#include <algorithm>
 #include <QRegularExpression>
 
 #include "structs.h"
@@ -3479,53 +3480,57 @@ int do_version(char_data *ch, char *arg, int cmd)
    return eSUCCESS;
 }
 
-enum search_types
-{
-   O_NAME,
-   O_DESCRIPTION,
-   O_SHORT_DESCRIPTION,
-   O_ACTION_DESCRIPTION,
-   O_TYPE_FLAG,
-   O_WEAR_FLAGS,
-   O_SIZE,
-   O_EXTRA_FLAGS,
-   O_WEIGHT,
-   O_COST,
-   O_MORE_FLAGS,
-   O_EQ_LEVEL,
-   O_V1,
-   O_V2,
-   O_V3,
-   O_V4,
-   O_AFFECTED,
-   O_EDD_KEYWORD,
-   O_EDD_DESCRIPTION,
-   O_CARRIED_BY,
-   O_EQUIPPED_BY
-};
 struct search
 {
-   search_types type;
+   enum types
+   {
+      O_NAME,
+      O_DESCRIPTION,
+      O_SHORT_DESCRIPTION,
+      O_ACTION_DESCRIPTION,
+      O_TYPE_FLAG,
+      O_WEAR_FLAGS,
+      O_SIZE,
+      O_EXTRA_FLAGS,
+      O_WEIGHT,
+      O_COST,
+      O_MORE_FLAGS,
+      O_EQ_LEVEL,
+      O_V1,
+      O_V2,
+      O_V3,
+      O_V4,
+      O_AFFECTED,
+      O_EDD_KEYWORD,
+      O_EDD_DESCRIPTION,
+      O_CARRIED_BY,
+      O_EQUIPPED_BY,
+      LIMIT
+   };
 
-   uint64_t o_min_level;
-   uint64_t o_max_level;
+   types type = {};
 
-   uint64_t o_item_number;         /* Where in data-base               */
-   uint64_t o_in_room;             /* In what room -1 when conta/carr  */
-   uint64_t o_vroom;               /* for corpse saving */
-   struct obj_flag_data obj_flags; /* Object information               */
-   int16_t o_num_affects;
-   obj_affected_type o_affected; /* Which abilities in PC to change  */
+   uint64_t o_min_level = {};
+   uint64_t o_max_level = {};
 
-   QString o_name;               /* Title of object :get etc.        */
-   QString o_description;        /* When in room                     */
-   QString o_short_description;  /* when worn/carry/in cont.         */
-   QString o_action_description; /* What to write when used          */
+   uint64_t o_item_number = {};         /* Where in data-base               */
+   uint64_t o_in_room = {};             /* In what room -1 when conta/carr  */
+   uint64_t o_vroom = {};               /* for corpse saving */
+   struct obj_flag_data obj_flags = {}; /* Object information               */
+   int16_t o_num_affects = {};
+   obj_affected_type o_affected = {}; /* Which abilities in PC to change  */
 
-   QString o_edd_keyword;     /* Keyword in look/examine          */
-   QString o_edd_description; /* What to see                      */
-   QString o_carried_by;
-   QString o_equipped_by;
+   QString o_name = {};               /* Title of object :get etc.        */
+   QString o_description = {};        /* When in room                     */
+   QString o_short_description = {};  /* when worn/carry/in cont.         */
+   QString o_action_description = {}; /* What to write when used          */
+
+   QString o_edd_keyword = {};     /* Keyword in look/examine          */
+   QString o_edd_description = {}; /* What to see                      */
+   QString o_carried_by = {};
+   QString o_equipped_by = {};
+   uint64_t limit_output = {};
+   bool show_range = false;
    bool operator==(const obj_data *obj);
 };
 
@@ -3534,6 +3539,11 @@ bool search::operator==(const obj_data *obj)
    if (obj == nullptr)
    {
       return false;
+   }
+
+   if (show_range)
+   {
+      return true;
    }
 
    switch (this->type)
@@ -3623,42 +3633,82 @@ command_return_t char_data::do_search(QStringList &arguments, int cmd)
    }
 
    // Create search object based on parameters
-   struct search so;
+
    QList<struct search> sl;
    QString arg1, arg2;
+   bool equals = false, greater = false, greater_equals = false, lesser = false, lesser_equals = false;
    for (auto i = 0; i < arguments.size(); ++i)
    {
+      struct search so;
       // ch->send(fmt::format("{} [{}]\r\n", i, parsables[i]));
-      if (arguments[i].contains('='))
+      if (arguments[i].contains('=') && !arguments[i].contains(">=") && !arguments[i].contains("<="))
       {
          QStringList equal_buffer = arguments[i].split('=');
          arg1 = equal_buffer.at(0);
          arg2 = equal_buffer.at(1);
+         equals = true;
+      }
+      else if (arguments[i].contains('>') && !arguments[i].contains(">="))
+      {
+         QStringList equal_buffer = arguments[i].split('>');
+         qDebug() << equal_buffer;
+         arg1 = equal_buffer.at(0);
+         arg2 = equal_buffer.at(1);
+         greater = true;
+      }
+      else if (arguments[i].contains(">="))
+      {
+         QStringList equal_buffer = arguments[i].split(">=");
+         arg1 = equal_buffer.at(0);
+         arg2 = equal_buffer.at(1);
+         greater_equals = true;
+      }
+      else if (arguments[i].contains('<') && !arguments[i].contains("<="))
+      {
+         QStringList equal_buffer = arguments[i].split('<');
+         arg1 = equal_buffer.at(0);
+         arg2 = equal_buffer.at(1);
+         lesser = true;
+      }
+      else if (arguments[i].contains("<="))
+      {
+         QStringList equal_buffer = arguments[i].split("<=");
+         arg1 = equal_buffer.at(0);
+         arg2 = equal_buffer.at(1);
+         lesser_equals = true;
       }
       else
       {
          arg1 = arguments[i];
       }
 
-      if (arg1 == "help")
+      if (arg1 == "help" || arg1 == "?")
       {
+         send("Usage: search <search terms> <other options>\r\n");
+         send("\r\n");
          send("Search terms:\r\n");
          send("level=50      show objects that are level 50.\r\n");
          send("level=50-60   show objects with level including and between 50 to 60.\r\n");
+         send("level=?       show objects with level including and between 50 to 60.\r\n");
          send("type=WEAPON   show objects of type WEAPON.\r\n");
-         send("type=         show available object types.\r\n");
+         send("type=?        show available object types.\r\n");
          send("name=moss     show objects matching keyword moss.\r\n");
          send("xyz           show objects matching keyword xyz.\r\n");
-         send("Terms can be combined.\r\n");
+         send("Search terms can be combined.\r\n");
          send("search level=1-10 type=ARMOR golden\r\n");
+         send("\r\n");
+         send("Other options:\r\n");
+         send("limit=10       limit output to only 10 results.\r\n");
          return eSUCCESS;
       }
       else if (arg1 == "level")
       {
-         if (arg2.isEmpty())
+         so.type = search::types::O_EQ_LEVEL;
+
+         if (arg2.isEmpty() || arg2 == "?")
          {
-            send("What level?\r\n");
-            return eFAILURE;
+            so.show_range = true;
+            sl.push_back(so);
          }
          else
          {
@@ -3683,7 +3733,6 @@ command_return_t char_data::do_search(QStringList &arguments, int cmd)
                         so.o_max_level = -1;
                      }
 
-                     so.type = O_EQ_LEVEL;
                      sl.push_back(so);
                   }
                }
@@ -3691,9 +3740,32 @@ command_return_t char_data::do_search(QStringList &arguments, int cmd)
                {
                   if (!arg2.isEmpty())
                   {
-                     so.o_min_level = arg2.toULongLong();
-                     so.o_max_level = arg2.toULongLong();
-                     so.type = O_EQ_LEVEL;
+                     if (greater)
+                     {
+                        so.o_min_level = arg2.toULongLong() + 1;
+                        so.o_max_level = -1;
+                     }
+                     else if (greater_equals)
+                     {
+                        so.o_min_level = arg2.toULongLong();
+                        so.o_max_level = -1;
+                     }
+                     else if (lesser)
+                     {
+                        so.o_min_level = 0;
+                        so.o_max_level = arg2.toULongLong() - 1;
+                     }
+                     else if (lesser_equals)
+                     {
+                        so.o_min_level = 0;
+                        so.o_max_level = arg2.toULongLong();
+                     }
+                     else
+                     {
+                        so.o_min_level = arg2.toULongLong();
+                        so.o_max_level = arg2.toULongLong();
+                     }
+
                      sl.push_back(so);
                   }
                }
@@ -3720,7 +3792,7 @@ command_return_t char_data::do_search(QStringList &arguments, int cmd)
 
             // Ex. name=woodbey
             so.o_name = arg2;
-            so.type = O_NAME;
+            so.type = search::types::O_NAME;
             sl.push_back(so);
          }
       }
@@ -3737,7 +3809,7 @@ command_return_t char_data::do_search(QStringList &arguments, int cmd)
                {
                   found = true;
                   so.obj_flags.type_flag = i;
-                  so.type = O_TYPE_FLAG;
+                  so.type = search::types::O_TYPE_FLAG;
                   sl.push_back(so);
                   break;
                }
@@ -3755,19 +3827,26 @@ command_return_t char_data::do_search(QStringList &arguments, int cmd)
             return eFAILURE;
          }
       }
+      else if (arg1 == "limit")
+      {
+         if (!arg2.isEmpty())
+         {
+            so.type = search::types::LIMIT;
+            so.limit_output = arg2.toULongLong();
+         }
+      }
       else
       {
          so.o_name = arg1;
-         so.type = O_NAME;
+         so.type = search::types::O_NAME;
          sl.push_back(so);
       }
    }
 
-   send(QString("Searching %1 objects...").arg(top_of_objt));
-
    bool header_shown = false;
    size_t objects_found = 0;
    vector<struct obj_data *> obj_results;
+   uint64_t limit_output = 0;
 
    for (int vnum = 0; vnum < obj_index[top_of_objt].virt; ++vnum)
    {
@@ -3795,6 +3874,10 @@ command_return_t char_data::do_search(QStringList &arguments, int cmd)
          {
             matches = true;
          }
+         else if (sl[i].type == search::types::LIMIT)
+         {
+            limit_output = sl[i].limit_output;
+         }
          else
          {
             matches = false;
@@ -3810,16 +3893,99 @@ command_return_t char_data::do_search(QStringList &arguments, int cmd)
 
    if (obj_results.empty())
    {
-      send("No results found.\r\n");
+      send(QString("Searching $B%1$R objects...No results found.\r\n").arg(top_of_objt));
       return eFAILURE;
    }
 
-   send(fmt::format("{} matches found.\r\n\r\n", obj_results.size()));
+   bool showed_ranges = false;
+   for (auto &s : sl)
+   {
+      if (s.show_range)
+      {
+         if (s.type == search::types::O_EQ_LEVEL)
+         {
+            uint64_t min_level = 100, max_level = 0;
+            for (auto &obj : obj_results)
+            {
+               if (obj->getLevel() > max_level)
+               {
+                  max_level = obj->getLevel();
+               }
+               else if (obj->getLevel() < min_level)
+               {
+                  min_level = obj->getLevel();
+               }
+            }
 
-   send("[ VNUM] [ LV] Short Description\r\n");
+            send(QString("Within %1 results the levels were %2-%3\r\n").arg(obj_results.size()).arg(min_level).arg(max_level));
+
+            showed_ranges = true;
+         }
+      }
+   }
+
+   if (showed_ranges)
+   {
+      return eSUCCESS;
+   }
+
+   if (limit_output)
+   {
+      send(QString("Searching %1 objects...%2 matches found. Limiting output to %3 matches.\r\n").arg(top_of_objt).arg(obj_results.size()));
+   }
+   else
+   {
+      send(QString("Searching %1 objects...%2 matches found.\r\n").arg(top_of_objt).arg(obj_results.size()));
+   }
+
+   QString header;
+   qsizetype max_keyword_size = 0, max_short_description_size = 0;
+
    for (auto obj : obj_results)
    {
-      send(fmt::format("[{:5}] [{:3}] {}\r\n", GET_OBJ_VNUM(obj), obj->obj_flags.eq_level, GET_OBJ_SHORT(obj)));
+      if (QString(obj->name).size() > max_keyword_size)
+      {
+         max_keyword_size = QString(obj->name).size();
+      }
+
+      if (nocolor_strlen(obj->short_description) > max_short_description_size)
+      {
+         max_short_description_size = nocolor_strlen(obj->short_description);
+      }
+   }
+   qDebug() << max_short_description_size;
+
+   if (count_if(sl.begin(), sl.end(), [](struct search search_item)
+                { return (search_item.type == search::types::O_NAME); }))
+   {
+      header += QString(" [%1]").arg("Keywords", -max_keyword_size);
+   }
+
+   if (true || count_if(sl.begin(), sl.end(), [](struct search search_item)
+                        { return (search_item.type == search::types::O_SHORT_DESCRIPTION); }))
+   {
+      header += QString(" [%1]").arg(QString("Short Description"), -max_short_description_size);
+   }
+
+   send(QString("$7$B[ VNUM] [ LV]%1$R\r\n").arg(header));
+
+   for (auto obj : obj_results)
+   {
+      QString custom_columns;
+      if (count_if(sl.begin(), sl.end(), [](struct search search_item)
+                   { return (search_item.type == search::types::O_NAME); }))
+      {
+         custom_columns += QString(" [%1]").arg(obj->name, -max_keyword_size);
+      }
+      if (true ||
+          count_if(sl.begin(), sl.end(), [](struct search search_item)
+                   { return (search_item.type == search::types::O_SHORT_DESCRIPTION); }))
+      {
+         // Because the color codes make the string longer then it visually appears, we calculate that color code difference and add it to our max_short_description_size to get alignment right
+         custom_columns += QString(" [%1]").arg(obj->short_description, -(strlen(obj->short_description) - nocolor_strlen(obj->short_description) + max_short_description_size));
+      }
+
+      send(QString("[%1] [%2]%3\r\n").arg(GET_OBJ_VNUM(obj), 5).arg(obj->obj_flags.eq_level, 3).arg(custom_columns));
    }
 
    return eSUCCESS;

@@ -2735,3 +2735,8 @@ bool obj_data::isDark(void)
 {
   return IS_SET(obj_flags.extra_flags, ITEM_DARK);
 }
+
+uint64_t obj_data::getLevel(void)
+{
+  return obj_flags.eq_level;
+}

@@ -261,6 +261,7 @@ struct obj_data
     time_t no_sell_expiration = {};
 
     bool isDark(void);
+    uint64_t getLevel(void);
 };
 
 /* For 'equipment' */
