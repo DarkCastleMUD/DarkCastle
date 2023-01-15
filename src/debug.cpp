@@ -55,7 +55,7 @@ void test_handle_ansi(string test)
   cout << "Result1: [" << result1 << "]" << endl;
   cout << "Result2: [" << result2 << "]" << endl;
   assert(handle_ansi(str1, ch) == string(handle_ansi_(str2, ch)));
-  delete str2;
+  delete[] str2;
 }
 
 bool test_rolls(uint8_t total)
@@ -223,6 +223,8 @@ int main(int argc, char **argv)
 
     exit(0);
   }
+
+  DC debug(argc, argv);
 
   string orig_cwd, dclib;
   if (getenv("DCLIB"))
