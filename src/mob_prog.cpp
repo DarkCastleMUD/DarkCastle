@@ -295,7 +295,7 @@ bool istank(char_data *ch)
 }
 
 void translate_value(char *leftptr, char *rightptr, int16_t **vali,
-					 uint32_t **valui, char ***valstr, int64_t **vali64, int8_t **valb,
+					 uint32_t **valui, char ***valstr, int64_t **vali64, uint64_t **valui64, int8_t **valb,
 					 char_data *mob, char_data *actor, obj_data *obj, void *vo,
 					 char_data *rndm)
 {
@@ -546,11 +546,12 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
 	activeTarget = target;
 	// target acquired. fucking boring code.
 	// more boring code. FUCK.
-	int16_t *intval = NULL;
-	uint32_t *uintval = NULL;
-	char **stringval = NULL;
-	int64_t *llval = NULL;
-	int8_t *sbval = NULL;
+	int16_t *intval = nullptr;
+	uint32_t *uintval = nullptr;
+	char **stringval = nullptr;
+	int64_t *llval = nullptr;
+	uint64_t *ullval = nullptr;
+	int8_t *sbval = nullptr;
 	bool tError = FALSE;
 
 	/*
@@ -832,7 +833,7 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
 			if (!target)
 				tError = TRUE;
 			else
-				llval = &target->gold;
+				ullval = &target->gold;
 		}
 		else if (!str_cmp(right, "glowfactor"))
 		{
@@ -1364,6 +1365,8 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
 		*valstr = stringval;
 	if (llval)
 		*vali64 = llval;
+	if (ullval)
+		*valui64 = ullval;
 	if (sbval)
 		*valb = sbval;
 
@@ -1659,20 +1662,21 @@ int mprog_do_ifchck(char *ifchck, char_data *mob, char_data *actor,
 		ye = TRUE;
 	}
 
-	int16_t *lvali = 0;
-	uint32_t *lvalui = 0;
-	char **lvalstr = 0;
-	int64_t *lvali64 = 0;
-	int8_t *lvalb = 0;
+	int16_t *lvali = nullptr;
+	uint32_t *lvalui = nullptr;
+	char **lvalstr = nullptr;
+	int64_t *lvali64 = nullptr;
+	uint64_t *lvalui64 = nullptr;
+	int8_t *lvalb = nullptr;
 	//  int type = 0;
 
 	if (!traditional)
-		translate_value(buf, arg, &lvali, &lvalui, &lvalstr, &lvali64, &lvalb,
+		translate_value(buf, arg, &lvali, &lvalui, &lvalstr, &lvali64, &lvalui64, &lvalb,
 						mob, actor, obj, vo, rndm);
 	else
 		// switch order of traditional so it'd be $n(ispc), to conform with
 		// new ifchecks
-		translate_value(arg, buf, &lvali, &lvalui, &lvalstr, &lvali64, &lvalb,
+		translate_value(arg, buf, &lvali, &lvalui, &lvalstr, &lvali64, &lvalui64, &lvalb,
 						mob, actor, obj, vo, rndm);
 
 	if (val2[0] == '\0')
@@ -1683,6 +1687,8 @@ int mprog_do_ifchck(char *ifchck, char_data *mob, char_data *actor,
 			return mprog_veval(*lvalui, opr, (uint)atoi(val));
 		if (lvali64)
 			return mprog_veval((int)*lvali64, opr, atoi(val));
+		if (lvalui64)
+			return mprog_veval((int)*lvalui64, opr, atoi(val));
 		if (lvalb)
 			return mprog_veval((int)*lvalb, opr, atoi(val));
 		if (lvalstr)
@@ -1690,14 +1696,15 @@ int mprog_do_ifchck(char *ifchck, char_data *mob, char_data *actor,
 	}
 	else
 	{
-		int16_t *rvali = 0;
-		uint32_t *rvalui = 0;
-		char **rvalstr = 0;
-		int64_t *rvali64 = 0;
-		int8_t *rvalb = 0;
-		translate_value(val, val2, &rvali, &rvalui, &rvalstr, &rvali64, &rvalb, mob, actor, obj, vo, rndm);
+		int16_t *rvali = nullptr;
+		uint32_t *rvalui = nullptr;
+		char **rvalstr = nullptr;
+		int64_t *rvali64 = nullptr;
+		uint64_t *rvalui64 = nullptr;
+		int8_t *rvalb = nullptr;
+		translate_value(val, val2, &rvali, &rvalui, &rvalstr, &rvali64, &rvalui64, &rvalb, mob, actor, obj, vo, rndm);
 		int64_t rval = 0;
-		if (rvalstr || rvali || rvalui || rvali64 || rvalb)
+		if (rvalstr || rvali || rvalui || rvali64 || rvalui64 || rvalb)
 		{
 			if (rvalstr && lvalstr)
 				return mprog_seval(mob, *lvalstr, opr, *rvalstr);
@@ -1712,6 +1719,8 @@ int mprog_do_ifchck(char *ifchck, char_data *mob, char_data *actor,
 				rval = *rvalb;
 			if (rvali64)
 				rval = *rvali64;
+			if (rvalui64)
+				rval = *rvalui64;
 
 			if (lvali)
 				return mprog_veval(*lvali, opr, rval);
@@ -3746,13 +3755,14 @@ int mprog_process_cmnd(char *cmnd, char_data *mob, char_data *actor,
 			uint32_t *lvalui = 0;
 			char **lvalstr = 0;
 			int64_t *lvali64 = 0;
+			uint64_t *lvalui64 = 0;
 			int8_t *lvalb = 0;
 			char left[MAX_INPUT_LENGTH], right[MAX_INPUT_LENGTH];
 			left[0] = '$';
 			left[1] = *str;
 			left[2] = '\0';
 			str = one_argument(str + 2, right);
-			translate_value(left, right, &lvali, &lvalui, &lvalstr, &lvali64, &lvalb, mob, actor, obj, vo, rndm);
+			translate_value(left, right, &lvali, &lvalui, &lvalstr, &lvali64, &lvalui64, &lvalb, mob, actor, obj, vo, rndm);
 			char buf[MAX_STRING_LENGTH];
 			buf[0] = '\0';
 			if (lvali)
@@ -3763,6 +3773,8 @@ int mprog_process_cmnd(char *cmnd, char_data *mob, char_data *actor,
 				sprintf(buf, "%s", *lvalstr);
 			if (lvali64)
 				sprintf(buf, "%lld", *lvali64);
+			if (lvalui64)
+				sprintf(buf, "%llu", *lvalui64);
 			if (lvalb)
 				sprintf(buf, "%d", *lvalb);
 			for (int i = 0; buf[i]; i++)

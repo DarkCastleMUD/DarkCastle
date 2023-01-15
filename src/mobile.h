@@ -167,7 +167,7 @@ struct mob_matrix_data
 };
 
 void translate_value(char *leftptr, char *rightptr, int16_t **vali, uint32_t **valui,
-                     char ***valstr, int64_t **vali64, int8_t **valb, char_data *mob, char_data *actor,
+                     char ***valstr, int64_t **vali64, uint64_t **valui64, int8_t **valb, char_data *mob, char_data *actor,
                      obj_data *obj, void *vo, char_data *rndm);
 
 void save_golem_data(char_data *ch);

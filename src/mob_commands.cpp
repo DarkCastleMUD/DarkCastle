@@ -2123,12 +2123,13 @@ char *expand_data(char_data *ch, char *orig)
     if (!c == '\0')
       *(ptr + r) = '~';
 
-    int16_t *lvali = 0;
-    uint32_t *lvalui = 0;
-    char **lvalstr = 0;
-    int64_t *lvali64 = 0;
-    int8_t *lvalb = 0;
-    translate_value(left, right, &lvali, &lvalui, &lvalstr, &lvali64, &lvalb, ch, activeActor, activeObj, activeVo, activeRndm);
+    int16_t *lvali = nullptr;
+    uint32_t *lvalui = nullptr;
+    char **lvalstr = nullptr;
+    int64_t *lvali64 = nullptr;
+    uint64_t *lvalui64 = nullptr;
+    int8_t *lvalb = nullptr;
+    translate_value(left, right, &lvali, &lvalui, &lvalstr, &lvali64, &lvalui64, &lvalb, ch, activeActor, activeObj, activeVo, activeRndm);
 
     if (!lvali && !lvalui && !lvalb)
     {
@@ -2199,12 +2200,13 @@ int do_mpsetmath(char_data *ch, char *arg, int cmd)
   }
   bool allowed = FALSE;
 
-  int16_t *lvali = 0;
-  uint32_t *lvalui = 0;
-  char **lvalstr = 0;
-  int64_t *lvali64 = 0;
-  int8_t *lvalb = 0;
-  translate_value(arg1, r, &lvali, &lvalui, &lvalstr, &lvali64, &lvalb, ch, activeActor, activeObj, activeVo, activeRndm);
+  int16_t *lvali = nullptr;
+  uint32_t *lvalui = nullptr;
+  char **lvalstr = nullptr;
+  int64_t *lvali64 = nullptr;
+  uint64_t *lvalui64 = nullptr;
+  int8_t *lvalb = nullptr;
+  translate_value(arg1, r, &lvali, &lvalui, &lvalstr, &lvali64, &lvalui64, &lvalb, ch, activeActor, activeObj, activeVo, activeRndm);
 
   vict = activeTarget;
   if (!vict)

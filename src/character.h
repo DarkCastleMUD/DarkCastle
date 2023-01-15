@@ -403,7 +403,7 @@ struct char_data
     uint8_t height = {}; /* PC/NPC's height */
 
     int16_t hometown = {}; /* PC/NPC home town */
-    int64_t gold = {};     /* Money carried                           */
+    uint64_t gold = {};    /* Money carried                           */
     uint32_t plat = {};    /* Platinum                                */
     int64_t exp = {};      /* The experience of the player            */
     int32_t in_room = {};
@@ -550,6 +550,7 @@ struct char_data
     command_return_t do_save(QStringList &arguments, int cmd);
     command_return_t do_search(QStringList &arguments, int cmd);
     command_return_t do_identify(QStringList &arguments, int cmd);
+    command_return_t do_cdeposit(QStringList &arguments, int cmd);
     command_return_t save(int cmd = CMD_DEFAULT);
     char_data *getVisiblePlayer(QString name);
     char_data *getVisibleCharacter(QString name);
