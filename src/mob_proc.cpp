@@ -48,7 +48,7 @@ extern struct index_data *mob_index;
 
 int check_components(char_data *ch, int destroy, int item_one = 0,
                      int item_two = 0, int item_three = 0, int item_four = 0,
-                     bool silent = FALSE);
+                     bool silent = false);
 /* extern procedures */
 
 bool many_charms(char_data *ch);
@@ -57,7 +57,7 @@ bool many_charms(char_data *ch);
 // You send it the mob (ch) and the Vnum of the people you want to join it
 // (iFriendId) and it will search for them, call for help, and they will
 // join in combat.  (If they are in the room)
-// Returns TRUE if we got help, FALSE if not
+// Returns true if we got help, false if not
 
 // Marauder proc uses this
 int call_for_help_in_room(char_data *ch, int iFriendId)
@@ -66,7 +66,7 @@ int call_for_help_in_room(char_data *ch, int iFriendId)
   int friends = 0;
 
   if (!ch)
-    return FALSE;
+    return false;
 
   // Any friends in the room?  Call for help!   int friends = 0;
   for (ally = world[ch->in_room].people; ally; ally = ally->next_in_room)
@@ -272,9 +272,9 @@ int sc_golem(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
     return eFAILURE;
   if (!ch->fighting)
     return eFAILURE;
-  bool iron = FALSE;
+  bool iron = false;
   if (IS_AFFECTED(ch, AFF_GOLEM))
-    iron = TRUE;
+    iron = true;
   SPELL_FUN *iron_list[] = {
       cast_shocking_grasp,
       cast_lightning_bolt,
@@ -2037,7 +2037,7 @@ int mother_moat_and_moad(char_data *ch, struct obj_data *obj, int cmd, const cha
           af.location = APPLY_STR;
           af.bitvector = AFF_POISON;
 
-          affect_join(tmp_victim, &af, FALSE, FALSE);
+          affect_join(tmp_victim, &af, false, false);
           send_to_char("You feel very sick.\r\n", tmp_victim);
           return eSUCCESS;
         }
@@ -3294,7 +3294,7 @@ int arena_only(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
 
     // get rid of me
     stop_fighting(ch);
-    extract_char(ch, TRUE);
+    extract_char(ch, true);
     // It's important we return true
     return eSUCCESS | eCH_DIED;
   }
@@ -3308,7 +3308,7 @@ int druid_elemental(char_data *ch, struct obj_data *obj,
     return eFAILURE;
   if (!ch->master)
   {
-    extract_char(ch, TRUE);
+    extract_char(ch, true);
     return (eCH_DIED | eSUCCESS);
   }
   if (GET_POS(ch) < POSITION_STANDING)
@@ -3374,7 +3374,7 @@ int mage_familiar_gremlin_non(char_data *ch, struct obj_data *obj,
   if (!ch->master)
   {
     logentry("Familiar without a master.", IMMORTAL, LogChannels::LOG_BUG);
-    extract_char(ch, TRUE);
+    extract_char(ch, true);
     return (eCH_DIED | eSUCCESS);
   }
   if (GET_POS(ch) < POSITION_STANDING)
@@ -3429,7 +3429,7 @@ int mage_familiar_imp_non(char_data *ch, struct obj_data *obj, int cmd, const ch
   if (!ch->master)
   {
     logentry("Familiar without a master.", IMMORTAL, LogChannels::LOG_BUG);
-    extract_char(ch, TRUE);
+    extract_char(ch, true);
     return (eCH_DIED | eSUCCESS);
   }
 
@@ -3489,12 +3489,12 @@ int druid_familiar_owl_non(char_data *ch, struct obj_data *obj, int cmd, const c
       return eSUCCESS;
     }
     int to_room = 0;
-    bool ts = IS_AFFECTED(ch, AFF_TRUE_SIGHT);
+    bool ts = IS_AFFECTED(ch, AFF_true_SIGHT);
     if (!str_cmp(arg1, "far") && world[world[ch->in_room].dir_option[dir]->to_room].dir_option[dir])
       to_room = world[world[ch->in_room].dir_option[dir]->to_room].dir_option[dir]->to_room;
     if (!to_room)
       to_room = world[ch->in_room].dir_option[dir]->to_room;
-    if (!check_components(ch, 1, 44, 0, 0, 0, TRUE))
+    if (!check_components(ch, 1, 44, 0, 0, 0, true))
     {
       send_to_char("The owl requires a feeding to do this for you.\r\n", ch);
       return eSUCCESS;
@@ -3504,10 +3504,10 @@ int druid_familiar_owl_non(char_data *ch, struct obj_data *obj, int cmd, const c
     int oldroom = ch->in_room;
     char_from_room(ch);
     char_to_room(ch, to_room);
-    SETBIT(ch->affected_by, AFF_TRUE_SIGHT);
+    SETBIT(ch->affected_by, AFF_true_SIGHT);
     do_look(ch, "", CMD_DEFAULT);
     if (!ts)
-      REMBIT(ch->affected_by, AFF_TRUE_SIGHT);
+      REMBIT(ch->affected_by, AFF_true_SIGHT);
     char_from_room(ch);
     char_to_room(ch, oldroom);
     return eSUCCESS;
@@ -3517,7 +3517,7 @@ int druid_familiar_owl_non(char_data *ch, struct obj_data *obj, int cmd, const c
     if (!ch->master)
     {
       logentry("Familiar without a master.", IMMORTAL, LogChannels::LOG_BUG);
-      extract_char(ch, TRUE);
+      extract_char(ch, true);
       return (eCH_DIED | eSUCCESS);
     }
 
@@ -3563,7 +3563,7 @@ int druid_familiar_chipmunk_non(char_data *ch, struct obj_data *obj, int cmd, co
   if (!ch->master)
   {
     logentry("Familiar without a master.", IMMORTAL, LogChannels::LOG_BUG);
-    extract_char(ch, TRUE);
+    extract_char(ch, true);
     return (eCH_DIED | eSUCCESS);
   }
 

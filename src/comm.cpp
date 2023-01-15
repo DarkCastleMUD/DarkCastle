@@ -1300,7 +1300,7 @@ char *cond_colorcodes[] = {
     BOLD GREY,
 };
 
-string calc_name(char_data *ch, bool colour = FALSE)
+string calc_name(char_data *ch, bool colour = false)
 {
   int percent;
   string name;
@@ -1310,7 +1310,7 @@ string calc_name(char_data *ch, bool colour = FALSE)
   else
     percent = ch->getHP() * 100 / GET_MAX_HIT(ch);
 
-  if (colour == TRUE)
+  if (colour == true)
   {
     if (percent >= 100)
       name = cond_colorcodes[0];
@@ -1338,7 +1338,7 @@ string calc_name(char_data *ch, bool colour = FALSE)
   return name;
 }
 
-char *calc_condition(char_data *ch, bool colour = FALSE)
+char *calc_condition(char_data *ch, bool colour = false)
 {
   int percent;
   char *cond_txt[8]; // = cond_txtz;
@@ -1533,7 +1533,7 @@ string generate_prompt(char_data *ch)
       break;
     case 'C':
       if (ch->fighting)
-        sprintf(pro, "<%s>", calc_condition(ch, TRUE));
+        sprintf(pro, "<%s>", calc_condition(ch, true));
       /* added by pir to stop "prompt %c" crash bug */
       else
         sprintf(pro, " ");
@@ -1592,7 +1592,7 @@ string generate_prompt(char_data *ch)
       break;
     case 'F':
       if (ch->fighting)
-        sprintf(pro, "(%s)", calc_condition(ch->fighting, TRUE));
+        sprintf(pro, "(%s)", calc_condition(ch->fighting, true));
       /* added by pir to stop "prompt %c" crash bug */
       else
         sprintf(pro, " ");
@@ -1702,7 +1702,7 @@ string generate_prompt(char_data *ch)
     case 'P':
       if (ch->fighting && ch->fighting->fighting)
       {
-        sprintf(pro, "%s", calc_name(ch->fighting->fighting, TRUE).c_str());
+        sprintf(pro, "%s", calc_name(ch->fighting->fighting, true).c_str());
       }
       else
         sprintf(pro, " ");
@@ -1718,7 +1718,7 @@ string generate_prompt(char_data *ch)
     case 'Q':
       if (ch->fighting)
       {
-        sprintf(pro, "%s", calc_name(ch->fighting, TRUE).c_str());
+        sprintf(pro, "%s", calc_name(ch->fighting, true).c_str());
       }
       else
         sprintf(pro, " ");
@@ -1755,7 +1755,7 @@ string generate_prompt(char_data *ch)
       break;
     case 'T':
       if (ch->fighting && ch->fighting->fighting)
-        sprintf(pro, "[%s]", calc_condition(ch->fighting->fighting, TRUE));
+        sprintf(pro, "[%s]", calc_condition(ch->fighting->fighting, true));
       /* added by pir to stop "prompt %c" crash bug */
       else
         sprintf(pro, " ");

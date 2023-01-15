@@ -9,7 +9,7 @@
 #include "structs.h" // uint8_t, uint8_t, etc..
 #include "obj.h"     // WIELD, SECOND_WIELD
 #include "character.h"
-#include "utility.h" // FALSE
+#include "utility.h" // false
 
 /* External prototype */
 void debug_point();
@@ -72,7 +72,7 @@ int second_attack(char_data *ch);
 int third_attack(char_data *ch);
 int fourth_attack(char_data *ch);
 int second_wield(char_data *ch);
-void set_cantquit(char_data *, char_data *, bool = FALSE);
+void set_cantquit(char_data *, char_data *, bool = false);
 int is_pkill(char_data *ch, char_data *vict);
 void raw_kill(char_data *ch, char_data *victim);
 void do_pkill(char_data *ch, char_data *victim, int type, bool vict_is_attacker = false);

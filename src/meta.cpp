@@ -895,11 +895,11 @@ int meta_dude(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
 			ch->send(fmt::format(locale("en_US.UTF-8"), "The Meta-physician takes {:L} platinum from you, leaving you with {:L} platinum.\r\n", statplatprice, GET_PLATINUM(ch)));
 
 			// affect the stat by 0 to reflect the new raw stat
-			affect_modify(ch, APPLY_STR, 0, -1, TRUE);
-			affect_modify(ch, APPLY_DEX, 0, -1, TRUE);
-			affect_modify(ch, APPLY_INT, 0, -1, TRUE);
-			affect_modify(ch, APPLY_WIS, 0, -1, TRUE);
-			affect_modify(ch, APPLY_CON, 0, -1, TRUE);
+			affect_modify(ch, APPLY_STR, 0, -1, true);
+			affect_modify(ch, APPLY_DEX, 0, -1, true);
+			affect_modify(ch, APPLY_INT, 0, -1, true);
+			affect_modify(ch, APPLY_WIS, 0, -1, true);
+			affect_modify(ch, APPLY_CON, 0, -1, true);
 
 			redo_hitpoints(ch);
 			redo_mana(ch);
@@ -1401,59 +1401,59 @@ void undo_race_saves(char_data *ch)
 bool is_race_applicable(char_data *ch, int race)
 {
 	if (GET_CLASS(ch) == CLASS_PALADIN && (race != RACE_HUMAN && race != RACE_ELVEN && race != RACE_DWARVEN))
-		return FALSE;
+		return false;
 	if (GET_CLASS(ch) == CLASS_ANTI_PAL && (race != RACE_HUMAN && race != RACE_ORC && race != RACE_DWARVEN))
-		return FALSE;
+		return false;
 	if (GET_CLASS(ch) == CLASS_BARBARIAN && race == RACE_PIXIE)
-		return FALSE;
+		return false;
 	if (GET_CLASS(ch) == CLASS_THIEF && race == RACE_GIANT)
-		return FALSE;
+		return false;
 	switch (race)
 	{
 	case RACE_ELVEN:
 		if (GET_RAW_DEX(ch) - 2 < 10 || GET_RAW_INT(ch) - 2 < 10)
-			return FALSE;
+			return false;
 		break;
 	case RACE_DWARVEN:
 		if (GET_RAW_CON(ch) - 2 < 10 || GET_RAW_WIS(ch) - 2 < 10)
-			return FALSE;
+			return false;
 		break;
 	case RACE_HOBBIT:
 		if (GET_RAW_DEX(ch) - 2 < 10)
-			return FALSE;
+			return false;
 		break;
 	case RACE_PIXIE:
 		if (GET_RAW_INT(ch) - 2 < 10)
-			return FALSE;
+			return false;
 		break;
 	case RACE_GIANT:
 		if (GET_RAW_STR(ch) - 2 < 12)
-			return FALSE;
+			return false;
 		break;
 	case RACE_GNOME:
 		if (GET_RAW_WIS(ch) - 2 < 12)
-			return FALSE;
+			return false;
 		break;
 	case RACE_ORC:
 		if (GET_RAW_CON(ch) - 2 < 10 || GET_RAW_STR(ch) - 2 < 10)
-			return FALSE;
+			return false;
 		break;
 	case RACE_TROLL:
 		if (GET_RAW_CON(ch) - 2 < 12)
-			return FALSE;
+			return false;
 		break;
 	default:
 		break;
 	}
-	return TRUE;
+	return true;
 }
 
 bool would_die(char_data *ch)
 {
 	if (GET_RAW_STR(ch) < 8 || GET_RAW_CON(ch) < 8 || GET_RAW_WIS(ch) < 8 || GET_RAW_INT(ch) < 8 || GET_RAW_DEX(ch) < 8)
-		return TRUE;
+		return true;
 
-	return FALSE;
+	return false;
 }
 
 void set_heightweight(char_data *ch)
@@ -1605,7 +1605,7 @@ int cardinal(char_data *ch, struct obj_data *obj, int cmd, const char *argument,
 		csendf(ch, "$B$3%d)$R %-32s - 50 platinum coins.\r\n", MAX_PC_RACE + 2, "A deep red vial of mana");
 
 		send_to_char("$BHeight/Weight Change:$R\r\n", ch);
-		heightweight(ch, FALSE);
+		heightweight(ch, false);
 		if (ch->height < races[ch->race].max_height)
 			csendf(ch, "$B$3%d)$R %-32s - 250 platinum coins.\r\n", MAX_PC_RACE + 3, "Increase your height by 1");
 		else
@@ -1625,7 +1625,7 @@ int cardinal(char_data *ch, struct obj_data *obj, int cmd, const char *argument,
 			csendf(ch, "$B$3%d)$R %-32s - 250 platinum coins.\r\n", MAX_PC_RACE + 6, "Decrease your weight by 1");
 		else
 			csendf(ch, "$B$3%d)$R %-32s.\r\n", MAX_PC_RACE + 6, "You cannot decrease your weight further");
-		heightweight(ch, TRUE);
+		heightweight(ch, true);
 		csendf(ch, "$B$3%d)$R %-32s - 5 quest points.\r\n", MAX_PC_RACE + 7, "Increase your age by 1 (500 max)");
 		csendf(ch, "$B$3%d)$R %-32s - 5 quest points.\r\n", MAX_PC_RACE + 8, "Decrease your age by 1  (18 min)");
 
@@ -1772,32 +1772,32 @@ int cardinal(char_data *ch, struct obj_data *obj, int cmd, const char *argument,
 		{
 			choice -= MAX_PC_RACE;
 
-			heightweight(ch, FALSE);
+			heightweight(ch, false);
 			if (choice == 3 && ch->height >= races[ch->race].max_height)
 			{
 				send_to_char("You cannot increase your height any more.\r\n", ch);
-				heightweight(ch, TRUE);
+				heightweight(ch, true);
 				return eSUCCESS;
 			}
 			else if (choice == 4 && ch->height <= races[ch->race].min_height)
 			{
 				send_to_char("You cannot decrease your height any more.\r\n", ch);
-				heightweight(ch, TRUE);
+				heightweight(ch, true);
 				return eSUCCESS;
 			}
 			else if (choice == 5 && ch->weight >= races[ch->race].max_weight)
 			{
 				send_to_char("You cannot increase your weight any more.\r\n", ch);
-				heightweight(ch, TRUE);
+				heightweight(ch, true);
 				return eSUCCESS;
 			}
 			else if (choice == 6 && ch->weight <= races[ch->race].min_weight)
 			{
 				send_to_char("You cannot decrease your weight any more.\r\n", ch);
-				heightweight(ch, TRUE);
+				heightweight(ch, true);
 				return eSUCCESS;
 			}
-			heightweight(ch, TRUE);
+			heightweight(ch, true);
 
 			if (GET_PLATINUM(ch) < 250)
 			{

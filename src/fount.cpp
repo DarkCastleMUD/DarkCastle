@@ -35,16 +35,16 @@ extern CWorld world;
 int FOUNTAINisPresent (char_data *ch)
 {
   struct obj_data *tmp;
-  bool found = FALSE;
+  bool found = false;
 
   for (tmp = world[ch->in_room].contents;
        tmp != NULL && !found;
        tmp = tmp->next_content) {
     if((tmp->obj_flags.type_flag == ITEM_FOUNTAIN)  && CAN_SEE_OBJ(ch, tmp)) {
-       return(TRUE);
+       return(true);
     }
   }
-  return(FALSE);
+  return(false);
 
 }
 

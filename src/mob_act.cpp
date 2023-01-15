@@ -56,11 +56,11 @@ bool is_r_denied(char_data *ch, int room)
 {
   struct deny_data *d;
   if (!IS_NPC(ch))
-    return FALSE;
+    return false;
   for (d = world[room].denied; d; d = d->next)
     if (mob_index[ch->mobdata->nr].virt == d->vnum)
-      return TRUE;
-  return FALSE;
+      return true;
+  return false;
 }
 void mobile_activity(void)
 {
@@ -172,7 +172,7 @@ void mobile_activity(void)
       {
         PerfTimers["mprog_wordlist"].start();
         mprog_wordlist_check(tmp_act->buf, ch, tmp_act->ch,
-                             tmp_act->obj, tmp_act->vo, ACT_PROG, FALSE);
+                             tmp_act->obj, tmp_act->vo, ACT_PROG, false);
         PerfTimers["mprog_wordlist"].stop();
 
         retval = mprog_cur_result;
@@ -638,7 +638,7 @@ bool is_protected(char_data *vict, char_data *ch)
     return (true);
 
   if (IS_EVIL(ch) && GET_LEVEL(ch) <= GET_LEVEL(vict) && IS_AFFECTED(vict, AFF_PROTECT_EVIL))
-    return TRUE;
+    return true;
 
   aff = affected_by_spell(vict, SPELL_PROTECT_FROM_GOOD);
   level_protected = aff ? aff->modifier : 0;
@@ -649,7 +649,7 @@ bool is_protected(char_data *vict, char_data *ch)
     return (true);
 
   if (IS_GOOD(ch) && GET_LEVEL(ch) <= GET_LEVEL(vict) && IS_AFFECTED(vict, AFF_PROTECT_GOOD))
-    return TRUE;
+    return true;
 
   /* old version
      if(IS_EVIL(ch) && GET_LEVEL(ch) <= (GET_LEVEL(vict))) {

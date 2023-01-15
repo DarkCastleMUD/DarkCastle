@@ -505,17 +505,17 @@ int do_simple_move(char_data *ch, int cmd, int following)
 		// fly doesn't work over water
 		if ((world[ch->in_room].sector_type == SECT_WATER_NOSWIM) || (world[world[ch->in_room].dir_option[cmd]->to_room].sector_type == SECT_WATER_NOSWIM))
 		{
-			has_boat = FALSE;
+			has_boat = false;
 			// See if char is carrying a boat
 			for (obj = ch->carrying; obj; obj = obj->next_content)
 				if (obj->obj_flags.type_flag == ITEM_BOAT)
-					has_boat = TRUE;
+					has_boat = true;
 			// See if char is wearing a boat (boat ring, etc)
 			if (!has_boat)
 				for (int x = 0; x < MAX_WEAR; x++)
 					if (ch->equipment[x])
 						if (ch->equipment[x]->obj_flags.type_flag == ITEM_BOAT)
-							has_boat = TRUE;
+							has_boat = true;
 			if (!has_boat && !IS_AFFECTED(ch, AFF_FLYING) && GET_LEVEL(ch) < IMMORTAL &&
 				GET_RACE(ch) != RACE_FISH && GET_RACE(ch) != RACE_SLIME && !IS_AFFECTED(ch, AFF_FREEFLOAT))
 			{
@@ -552,7 +552,7 @@ int do_simple_move(char_data *ch, int cmd, int following)
 		{
 			send_to_char("The ghost evaporates as you leave its habitat.\r\n", ch);
 			do_return(ch, "", 0);
-			// extract_char(ch,TRUE);
+			// extract_char(ch,true);
 			return eSUCCESS | eCH_DIED;
 		}
 	}
@@ -573,19 +573,19 @@ int do_simple_move(char_data *ch, int cmd, int following)
 
 	if (GET_LEVEL(ch) < IMMORTAL)
 	{
-		bool classRestrictions = FALSE;
+		bool classRestrictions = false;
 		// Determine if any class restrictions are in place
 		for (int c_class = 1; c_class < CLASS_MAX; c_class++)
 		{
-			if (rm->allow_class[c_class] == TRUE)
+			if (rm->allow_class[c_class] == true)
 			{
-				classRestrictions = TRUE;
+				classRestrictions = true;
 			}
 		}
 
 		if (classRestrictions)
 		{
-			if (rm->allow_class[GET_CLASS(ch)] != TRUE)
+			if (rm->allow_class[GET_CLASS(ch)] != true)
 			{
 				send_to_char("Your class is not allowed there.\r\n", ch);
 				return eFAILURE;
@@ -777,25 +777,25 @@ int do_simple_move(char_data *ch, int cmd, int following)
 		if (a == 88 && world[ch->in_room].sector_type == SECT_UNDERWATER)
 		{
 			act("Unable to survive underwater, $n returns to the elemental plane of fire.", ch, 0, 0, TO_ROOM, 0);
-			extract_char(ch, TRUE);
+			extract_char(ch, true);
 			return eSUCCESS | eCH_DIED;
 		}
 		if (a == 89 && world[ch->in_room].sector_type == SECT_DESERT)
 		{
 			act("Unable to survive in the desert, $n returns to the elemental plane of water.", ch, 0, 0, TO_ROOM, 0);
-			extract_char(ch, TRUE);
+			extract_char(ch, true);
 			return eSUCCESS | eCH_DIED;
 		}
 		if (a == 90 && world[ch->in_room].sector_type == SECT_SWAMP)
 		{
 			act("Unable to survive in the swamp, $n returns to the elemental plane of air.", ch, 0, 0, TO_ROOM, 0);
-			extract_char(ch, TRUE);
+			extract_char(ch, true);
 			return eSUCCESS | eCH_DIED;
 		}
 		if (a == 91 && world[ch->in_room].sector_type == SECT_AIR)
 		{
 			act("Unable to survive in the air, $n returns to the elemental plane of earth.", ch, 0, 0, TO_ROOM, 0);
-			extract_char(ch, TRUE);
+			extract_char(ch, true);
 			return eSUCCESS | eCH_DIED;
 		}
 	}
@@ -903,7 +903,7 @@ int attempt_move(char_data *ch, int cmd, int is_retreat)
 	{
 		try
 		{
-			return_val = do_simple_move(ch, cmd, FALSE);
+			return_val = do_simple_move(ch, cmd, false);
 		}
 		catch (...)
 		{
@@ -944,7 +944,7 @@ int attempt_move(char_data *ch, int cmd, int is_retreat)
 
 	try
 	{
-		return_val = do_simple_move(ch, cmd, TRUE);
+		return_val = do_simple_move(ch, cmd, true);
 	}
 	catch (...)
 	{

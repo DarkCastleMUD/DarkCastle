@@ -75,9 +75,7 @@ extern struct weather_data weather_info;
 
 void check_timer();
 
-#define TRUE 1
-#define FALSE 0
-#define COREDUMP_MAX 10
+static const int COREDUMP_MAX = 10;
 
 #ifdef WIN32
 inline int random()
@@ -527,10 +525,10 @@ void char_to_store(char_data *ch, struct char_file_u4 *st, struct time_data &tmp
 bool obj_to_store(struct obj_data *obj, char_data *ch, FILE *fpsave, int wear_pos);
 void check_idling(char_data *ch);
 void stop_follower(char_data *ch, int cmd);
-bool CAN_SEE(char_data *sub, char_data *obj, bool noprog = FALSE);
+bool CAN_SEE(char_data *sub, char_data *obj, bool noprog = false);
 int SWAP_CH_VICT(int value);
 bool SOMEONE_DIED(int value);
-bool CAN_SEE_OBJ(char_data *sub, struct obj_data *obj, bool bf = FALSE);
+bool CAN_SEE_OBJ(char_data *sub, struct obj_data *obj, bool bf = false);
 bool check_blind(char_data *ch);
 void raw_kill(char_data *ch, char_data *victim);
 void check_killer(char_data *ch, char_data *victim);
@@ -544,7 +542,7 @@ void send_to_char(string messg, char_data *ch);
 void send_to_char(const char *messg, char_data *ch);
 void send_to_char_nosp(const char *messg, char_data *ch);
 void send_to_char_nosp(QString messg, char_data *ch);
-void send_to_room(string messg, int room, bool awakeonly = FALSE, char_data *nta = NULL);
+void send_to_room(string messg, int room, bool awakeonly = false, char_data *nta = NULL);
 void record_track_data(char_data *ch, int cmd);
 int write_to_descriptor(int desc, string txt);
 int write_to_descriptor_fd(int desc, char *txt);
@@ -580,7 +578,7 @@ void mob_suprised_sayings(char_data *ch, char_data *aggressor);
 // MOBProgs prototypes
 int mprog_wordlist_check(const char *arg, char_data *mob,
                          char_data *actor, obj_data *object,
-                         void *vo, int type, bool reverse = FALSE);
+                         void *vo, int type, bool reverse = false);
 void mprog_percent_check(char_data *mob, char_data *actor,
                          obj_data *object, void *vo,
                          int type);

@@ -70,7 +70,7 @@ int is_ok(char_data *keeper, char_data *ch, int shop_nr)
     do_say(keeper, "Go away before I call the guards!!", 0);
     sprintf(buf, "%s the KILLER is over here!\n\r", GET_SHORT(ch));
     do_shout(keeper, buf, 0);
-    return FALSE;
+    return false;
   }
 
   /*
@@ -79,7 +79,7 @@ int is_ok(char_data *keeper, char_data *ch, int shop_nr)
   if (!CAN_SEE(keeper, ch))
   {
     do_say(keeper, "I don't trade with someone I can't see!", 0);
-    return FALSE;
+    return false;
   }
 
   /*
@@ -88,29 +88,29 @@ int is_ok(char_data *keeper, char_data *ch, int shop_nr)
   if (time_info.hours < shop_index[shop_nr].open1)
   {
     do_say(keeper, "Come back later!", 0);
-    return FALSE;
+    return false;
   }
 
   else if (time_info.hours <= shop_index[shop_nr].close1)
   {
-    return TRUE;
+    return true;
   }
   else if (time_info.hours < shop_index[shop_nr].open2)
   {
     do_say(keeper, "Come back later!", 0);
-    return FALSE;
+    return false;
   }
   else if (time_info.hours <= shop_index[shop_nr].close2)
   {
-    return TRUE;
+    return true;
   }
   else
   {
     do_say(keeper, "Sorry, come back tomorrow.", 0);
-    return FALSE;
+    return false;
   }
 
-  return TRUE;
+  return true;
 }
 
 /*
@@ -121,15 +121,15 @@ int trade_with(struct obj_data *item, int shop_nr)
   int counter;
 
   if (item->obj_flags.cost < 1)
-    return FALSE;
+    return false;
 
   for (counter = 0; counter < MAX_TRADE; counter++)
   {
     if (GET_ITEM_TYPE(item) == shop_index[shop_nr].type[counter])
-      return TRUE;
+      return true;
   }
 
-  return FALSE;
+  return false;
 }
 
 int unlimited_supply(struct obj_data *item, int shop_nr)
@@ -139,10 +139,10 @@ int unlimited_supply(struct obj_data *item, int shop_nr)
   for (obj = shop_index[shop_nr].inventory; obj; obj = obj->next_content)
   {
     if (item->item_number == obj->item_number)
-      return TRUE;
+      return true;
   }
 
-  return FALSE;
+  return false;
 }
 
 void restock_keeper(char_data *keeper, int shop_nr)
@@ -395,7 +395,7 @@ void shopping_value(const char *arg, char_data *ch,
   char argm[MAX_INPUT_LENGTH + 1];
   struct obj_data *obj;
   int cost;
-  bool keeperhas = FALSE;
+  bool keeperhas = false;
 
   if (!is_ok(keeper, ch, shop_nr))
     return;
@@ -412,7 +412,7 @@ void shopping_value(const char *arg, char_data *ch,
   if ((obj = get_obj_in_list_vis(ch, argm, ch->carrying)) == NULL)
   {
     if ((obj = get_obj_in_list_vis(keeper, argm, keeper->carrying)) != NULL)
-      keeperhas = TRUE;
+      keeperhas = true;
     else
     {
       sprintf(buf, shop_index[shop_nr].no_such_item2, GET_NAME(ch));
@@ -648,21 +648,21 @@ void shopping_list(const char *arg, char_data *ch,
   }
   i = 0;
   send_to_char("[Amt] [ Price ] Item\n\r", ch);
-  found = FALSE;
+  found = false;
   for (obj = keeper->carrying; obj; obj = obj->next_content)
   {
     if (!CAN_SEE_OBJ(ch, obj) || obj->obj_flags.cost <= 0)
       continue;
 
-    found = TRUE;
+    found = true;
 
     cost = (int)(obj->obj_flags.cost * shop_index[shop_nr].profit_buy);
 
     int vnum = obj_index[obj->item_number].virt;
-    bool loop = FALSE;
+    bool loop = false;
     for (a = 0; a < i; a++)
       if (done[a] == vnum)
-        loop = TRUE;
+        loop = true;
     if (loop)
       continue;
     if (i < 100)

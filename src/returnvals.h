@@ -22,8 +22,8 @@ enum ReturnValue {
 };
 
 
-#define SOCIAL_FALSE            0
-#define SOCIAL_TRUE             1
-#define SOCIAL_TRUE_WITH_NOISE  2
+#define SOCIAL_false            0
+#define SOCIAL_true             1
+#define SOCIAL_true_WITH_NOISE  2
 
 #endif // _RETURNVALS_H_

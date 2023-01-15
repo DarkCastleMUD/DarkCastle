@@ -186,12 +186,12 @@ int do_stealth(char_data *ch, char *argument, int cmd)
 
   if (ch->pcdata->stealth)
   {
-    ch->pcdata->stealth = FALSE;
+    ch->pcdata->stealth = false;
     send_to_char("Stealth mode off.\r\n", ch);
   }
   else
   {
-    ch->pcdata->stealth = TRUE;
+    ch->pcdata->stealth = true;
     send_to_char("Stealth mode on.\r\n", ch);
   } /* if */
   return eSUCCESS;

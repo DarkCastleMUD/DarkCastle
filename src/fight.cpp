@@ -113,13 +113,13 @@ bool someone_fighting(char_data *ch)
 {
   char_data *vict;
   if (ch->fighting && ch->fighting->fighting == ch)
-    return TRUE;
+    return true;
   for (vict = world[ch->in_room].people; vict; vict = vict->next_in_room)
   {
     if (vict->fighting == ch)
-      return TRUE;
+      return true;
   }
-  return FALSE;
+  return false;
 }
 
 int check_autojoiners(char_data *ch, int skill = 0)
@@ -360,12 +360,12 @@ void perform_violence(void)
       logentry("Error in perform_violence(), part2!  Null ch->fighting!", IMMORTAL, LogChannels::LOG_BUG);
       return;
     }
-    bool over = FALSE;
+    bool over = false;
     for (af = ch->affected; af; af = next_af_dude)
     {
       if (af == (affected_type *)0x95959595)
       {
-        over = TRUE;
+        over = true;
         break;
       }
       next_af_dude = af->next;
@@ -391,7 +391,7 @@ void perform_violence(void)
                                     0, KILL_POISON);
           if (SOMEONE_DIED(retval))
           {
-            over = TRUE;
+            over = true;
             break;
           }
         }
@@ -522,15 +522,15 @@ void generate_skillthreat(char_data *mob, int skill, int damage, char_data *acto
 bool gets_dual_wield_attack(char_data *ch)
 {
   if (!ch->equipment[SECOND_WIELD]) // only if we have a second wield:)
-    return FALSE;
+    return false;
 
   if (!has_skill(ch, SKILL_DUAL_WIELD))
-    return FALSE;
+    return false;
 
   if (!skill_success(ch, NULL, SKILL_DUAL_WIELD, 15))
-    return FALSE;
+    return false;
 
-  return TRUE;
+  return true;
 }
 
 // int attack(...) FUNCTION SHOULD BE CALLED *INSTEAD* OF HIT IN ALL CASES!
@@ -628,7 +628,7 @@ int attack(char_data *ch, char_data *vict, int type, int weapon)
   {
     return one_hit(ch, vict, SKILL_JAB, weapon);
   }
-  else if (GET_CLASS(ch) == CLASS_MONK && wielded == FALSE)
+  else if (GET_CLASS(ch) == CLASS_MONK && wielded == nullptr)
   {
     if (GET_LEVEL(ch) >= MORTAL)
     {
@@ -1485,7 +1485,7 @@ int one_hit(char_data *ch, char_data *vict, int type, int weapon)
   wielded = ch->equipment[weapon];
 
   // Second got called without a secondary wield
-  if (weapon == SECOND && wielded == FALSE)
+  if (weapon == SECOND && wielded == nullptr)
     return eFAILURE;
 
   set_cantquit(ch, vict); /* This sets the flag if necessary */
@@ -1522,7 +1522,7 @@ int one_hit(char_data *ch, char_data *vict, int type, int weapon)
   }
   else if (IS_NPC(ch))
     dam = dice(ch->mobdata->damnodice, ch->mobdata->damsizedice);
-  else if (GET_CLASS(ch) == CLASS_MONK && wielded == FALSE)
+  else if (GET_CLASS(ch) == CLASS_MONK && wielded == nullptr)
     dam = get_monk_bare_damage(ch);
   else
     dam = number(0, GET_LEVEL(ch) / 2);
@@ -2059,7 +2059,7 @@ int damage(char_data *ch, char_data *victim,
   int percent;
   int learned;
   int ethereal = 0;
-  bool reflected = FALSE;
+  bool reflected = false;
   char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH], buf3[MAX_STRING_LENGTH];
 
   bool bingo;
@@ -2144,9 +2144,9 @@ int damage(char_data *ch, char_data *victim,
     REMOVE_BIT(victim->combat, COMBAT_REPELANCE);
     //  }
   }
-  bool imm = FALSE;
+  bool imm = false;
   if (IS_SET(victim->immune, weapon_bit))
-    imm = TRUE;
+    imm = true;
 
   if (attacktype < MAX_SPL_LIST && ch && dam > 1)
   {
@@ -2919,7 +2919,7 @@ int is_pkill(char_data *ch, char_data *vict)
   // TODO - change this so a mob following another mob isn't a pkill
 
   if (!ch)
-    return TRUE;
+    return true;
 
   for (tmp_ch = ch; tmp_ch; tmp_ch = tmp_ch->master)
   {
@@ -2933,21 +2933,21 @@ int is_pkill(char_data *ch, char_data *vict)
           {
             if (vict->master != ch)
             { /* Can't pkill your own charmie */
-              return TRUE;
+              return true;
             }
-            return FALSE; /* Standard mob kill */
+            return false; /* Standard mob kill */
           }
         }
       }
       else
       { /* vict is a pc */
-        return TRUE;
+        return true;
       }
     }
   }
 
   /* Still here?  The killer is an uncharmed mob, definitely not a pkill! */
-  return FALSE;
+  return false;
 }
 
 void send_damage(char const *buf, char_data *ch, obj_data *obj, char_data *victim, char const *dmg, char const *buf2, int to)
@@ -3726,7 +3726,7 @@ bool check_parry(char_data *ch, char_data *victim, int attacktype, bool display_
       (IS_SET(victim->combat, COMBAT_SHOCKED)) ||
       (IS_SET(victim->combat, COMBAT_SHOCKED2)) ||
       (IS_AFFECTED(victim, AFF_PARALYSIS)))
-    return FALSE;
+    return false;
 
   if (IS_NPC(victim))
   {
@@ -3771,11 +3771,11 @@ bool check_parry(char_data *ch, char_data *victim, int attacktype, bool display_
     }
   }
   else if (!has_skill(victim, SKILL_PARRY))
-    return FALSE;
+    return false;
   if (!modifier && IS_NPC(victim) && (ISSET(victim->mobdata->actflags, ACT_PARRY)))
     modifier = 10;
   else if (IS_NPC(victim) && !ISSET(victim->mobdata->actflags, ACT_PARRY))
-    return FALSE; // damned mobs
+    return false; // damned mobs
 
   modifier += speciality_bonus(ch, attacktype, GET_LEVEL(victim));
   //  if (IS_NPC(victim)) modifier -= 50;
@@ -3786,7 +3786,7 @@ bool check_parry(char_data *ch, char_data *victim, int attacktype, bool display_
   if (!skill_success(victim, ch, SKILL_PARRY, modifier) &&
       !IS_SET(victim->combat, COMBAT_BLADESHIELD1) &&
       !IS_SET(victim->combat, COMBAT_BLADESHIELD2))
-    return FALSE;
+    return false;
 
   if (display_results == true)
   {
@@ -3794,7 +3794,7 @@ bool check_parry(char_data *ch, char_data *victim, int attacktype, bool display_
     act("$n parries your attack.", victim, NULL, ch, TO_VICT, 0);
     act("You parry $N's attack.", victim, NULL, ch, TO_CHAR, 0);
   }
-  return TRUE;
+  return true;
 }
 
 int speciality_bonus(char_data *ch, int attacktype, int level)
@@ -3862,7 +3862,7 @@ bool check_dodge(char_data *ch, char_data *victim, int attacktype, bool display_
       (IS_SET(victim->combat, COMBAT_SHOCKED)) ||
       (IS_SET(victim->combat, COMBAT_SHOCKED2)) ||
       (IS_AFFECTED(victim, AFF_PARALYSIS)))
-    return FALSE;
+    return false;
 
   if (IS_NPC(victim))
   {
@@ -3912,17 +3912,17 @@ bool check_dodge(char_data *ch, char_data *victim, int attacktype, bool display_
       modifier = 5;
   }
   else if (!has_skill(victim, SKILL_DODGE))
-    return FALSE;
+    return false;
 
   if (modifier == 0 && IS_NPC(victim))
-    return FALSE;
+    return false;
 
   modifier += speciality_bonus(ch, attacktype, GET_LEVEL(victim));
   //  if (IS_NPC(victim)) modifier = 50; // 75 is base, and it's calculated
   // around here
   modifier -= GET_DEX(ch) / 2;
   if (!skill_success(victim, ch, SKILL_DODGE, modifier))
-    return FALSE;
+    return false;
 
   if (display_results == true)
   {
@@ -3931,7 +3931,7 @@ bool check_dodge(char_data *ch, char_data *victim, int attacktype, bool display_
     act("You dodge $N's attack.", victim, NULL, ch, TO_CHAR, 0);
   }
 
-  return TRUE;
+  return true;
 }
 
 /*
@@ -4176,10 +4176,10 @@ void stop_fighting(char_data *ch, int clearlag)
   // -Sadus
   if (IS_SET(ch->combat, COMBAT_BERSERK))
   {
-    bool keepZerk = FALSE;
+    bool keepZerk = false;
     for (tmp = world[ch->in_room].people; tmp; tmp = tmp->next_in_room)
       if (tmp->fighting == ch)
-        keepZerk = TRUE;
+        keepZerk = true;
     if (!keepZerk)
     {
       REMOVE_BIT(ch->combat, COMBAT_BERSERK);
@@ -5041,7 +5041,7 @@ void death_cry(char_data *ch)
   ch->in_room = was_in;
 }
 
-// Return TRUE if killed vict.  False otherwise
+// Return true if killed vict.  False otherwise
 int do_skewer(char_data *ch, char_data *vict, int dam, int wt, int wt2, int weapon)
 {
   int damadd = 0;
@@ -5433,7 +5433,7 @@ void raw_kill(char_data *ch, char_data *victim)
       selfpurge = true;
       selfpurge.setOwner(ch, "raw_kill");
     }
-    extract_char(victim, TRUE);
+    extract_char(victim, true);
     return;
   }
 
@@ -5453,12 +5453,12 @@ void raw_kill(char_data *ch, char_data *victim)
       sprintf(buf, "%s's golem lost a level!", GET_NAME(victim));
       logentry(buf, ANGEL, LogChannels::LOG_MORTAL);
       shatter_message(victim->pcdata->golem);
-      extract_char(victim->pcdata->golem, TRUE);
+      extract_char(victim->pcdata->golem, true);
     }
     else
     { /* release */
       release_message(victim->pcdata->golem);
-      extract_char(victim->pcdata->golem, FALSE);
+      extract_char(victim->pcdata->golem, false);
     }
   }
   victim->pcdata->group_pkills = 0;
@@ -5484,7 +5484,7 @@ void raw_kill(char_data *ch, char_data *victim)
 
   GET_POS(victim) = POSITION_RESTING;
   death_room = victim->in_room;
-  extract_char(victim, FALSE);
+  extract_char(victim, false);
 
   victim->setHP(1);
   if (GET_MOVE(victim) <= 0)
@@ -5556,7 +5556,7 @@ void raw_kill(char_data *ch, char_data *victim)
       // or got a bad roll
 
       if (is_thief)
-        pir_stat_loss(victim, 100, TRUE, is_thief);
+        pir_stat_loss(victim, 100, true, is_thief);
       else if (GET_LEVEL(victim) > 20)
       {
         int chance = ch ? GET_LEVEL(ch) / 10 : 50 / 10;
@@ -5594,7 +5594,7 @@ void raw_kill(char_data *ch, char_data *victim)
               victim->pcdata->statmetas--;
             }
           }
-          pir_stat_loss(victim, chance, FALSE, is_thief);
+          pir_stat_loss(victim, chance, false, is_thief);
         }
       }
       check_maxes(victim); // Check if any skills got lowered because of
@@ -6787,7 +6787,7 @@ void arena_kill(char_data *ch, char_data *victim, int type)
   {
     mprog_death_trigger(victim, ch);
     remove_nosave(victim);
-    extract_char(victim, TRUE);
+    extract_char(victim, true);
     return;
   }
 
@@ -6897,14 +6897,14 @@ void arena_kill(char_data *ch, char_data *victim, int type)
 int is_stunned(char_data *ch)
 {
   if (IS_SET(ch->combat, COMBAT_STUNNED))
-    return TRUE;
+    return true;
   if (IS_SET(ch->combat, COMBAT_STUNNED2))
-    return TRUE;
+    return true;
   if (IS_SET(ch->combat, COMBAT_SHOCKED))
-    return TRUE;
+    return true;
   if (IS_SET(ch->combat, COMBAT_SHOCKED2))
-    return TRUE;
-  return FALSE;
+    return true;
+  return false;
 }
 
 int can_attack(char_data *ch)
@@ -6913,43 +6913,43 @@ int can_attack(char_data *ch)
       IS_SET(world[ch->in_room].room_flags, ARENA) && ArenaIsOpen())
   {
     send_to_char("Wait until it closes!\n\r", ch);
-    return FALSE;
+    return false;
   }
 
   if ((ch->in_room >= 0 && ch->in_room <= top_of_world) &&
       IS_SET(world[ch->in_room].room_flags, ARENA) && arena.type == POTATO)
   {
     send_to_char("You can't attack in a potato arena, go find a potato would ya?!\n\r", ch);
-    return FALSE;
+    return false;
   }
 
   if (IS_AFFECTED(ch, AFF_PARALYSIS))
-    return FALSE;
+    return false;
   if (is_stunned(ch))
-    return FALSE;
+    return false;
 
-  return TRUE;
+  return true;
 }
 
 int can_be_attacked(char_data *ch, char_data *vict)
 {
   /* this will happen sometimes, no need to log it */
   if (!ch || !vict)
-    return FALSE;
+    return false;
 
   if (vict->in_room < 0 || vict->in_room >= top_of_world ||
       ch->in_room < 0 || ch->in_room >= top_of_world)
-    return FALSE;
+    return false;
 
   // Ch should not be able to attack a wizinvis immortal player
   if (!IS_NPC(vict) && GET_LEVEL(ch) < vict->pcdata->wizinvis)
-    return FALSE;
+    return false;
 
   if (IS_NPC(vict))
     if (ISSET(vict->mobdata->actflags, ACT_NOATTACK))
     {
       send_to_char("Due to heavy magics, they cannot be attacked.\r\n", ch);
-      return FALSE;
+      return false;
     }
 
   // Prize Arena
@@ -6961,14 +6961,14 @@ int can_be_attacked(char_data *ch, char_data *vict)
       send_to_char("You are already fighting someone.\r\n", ch);
       logf(IMMORTAL, LogChannels::LOG_ARENA, "%s, whom was fighting %s was prevented from attacking %s.",
            GET_NAME(ch), GET_NAME(ch->fighting), GET_NAME(vict));
-      return FALSE;
+      return false;
     }
     else if (vict->fighting && vict->fighting != ch)
     {
       send_to_char("They are already fighting someone.\r\n", ch);
       logf(IMMORTAL, LogChannels::LOG_ARENA, "%s was prevented from attacking %s who was fighting %s.",
            GET_NAME(ch), GET_NAME(vict), GET_NAME(vict->fighting));
-      return FALSE;
+      return false;
     }
   }
 
@@ -6980,20 +6980,20 @@ int can_be_attacked(char_data *ch, char_data *vict)
       send_to_char("You are already fighting someone from another clan.\r\n", ch);
       logf(IMMORTAL, LogChannels::LOG_ARENA, "%s [%s], whom was fighting %s [%s] was prevented from attacking %s [%s].",
            GET_NAME(ch), get_clan_name(ch), GET_NAME(ch->fighting), get_clan_name(ch->fighting), GET_NAME(vict), get_clan_name(vict));
-      return FALSE;
+      return false;
     }
     else if (vict->fighting && vict->fighting != ch && !ARE_CLANNED(vict->fighting, ch))
     {
       send_to_char("They are already fighting someone.\r\n", ch);
       logf(IMMORTAL, LogChannels::LOG_ARENA, "%s [%s] was prevented from attacking %s [%s] who was fighting %s [%s].",
            GET_NAME(ch), get_clan_name(ch), GET_NAME(vict), get_clan_name(vict), GET_NAME(vict->fighting), get_clan_name(vict->fighting));
-      return FALSE;
+      return false;
     }
   }
 
   // Golem cannot attack players
   if (IS_NPC(ch) && mob_index[ch->mobdata->nr].virt == 8 && IS_PC(vict))
-    return FALSE;
+    return false;
 
   if (IS_NPC(vict))
   {
@@ -7004,36 +7004,36 @@ int can_be_attacked(char_data *ch, char_data *vict)
         IS_SET(world[vict->in_room].room_flags, SAFE))
     {
       send_to_char("No fighting permitted in a safe room.\r\n", ch);
-      return FALSE;
+      return false;
     }
     // Any other mob can be attacked at any time
-    return TRUE;
+    return true;
   }
 
   if (!IS_NPC(ch) && !IS_NPC(vict) && GET_LEVEL(ch) < 5)
   {
     send_to_char("You are too new in this realm to make enemies!\n\r", ch);
-    return FALSE;
+    return false;
   }
 
   if (IS_AFFECTED(vict, AFF_CANTQUIT) || affected_by_spell(vict, FUCK_PTHIEF) || affected_by_spell(vict, FUCK_GTHIEF) || IS_AFFECTED(vict, AFF_CHAMPION))
-    return TRUE;
+    return true;
 
   if (!IS_NPC(ch) && GET_LEVEL(vict) < 5)
   {
     act("The magic of the MUD school is protecting $M from harm.", ch, 0, vict, TO_CHAR, 0);
-    return FALSE;
+    return false;
   }
 
   if (IS_NPC(ch) && !IS_NPC(vict) && IS_AFFECTED(ch, AFF_CHARM))
   { // New charmie stuff. No attacking pcs unless yer master's a ranger/cleric.
     // Those guys are soo convincing.
     if (!ch->master)
-      return FALSE; // What the hell?
+      return false; // What the hell?
     if (GET_CLASS(ch->master) != CLASS_ANTI_PAL && GET_CLASS(ch->master) != CLASS_RANGER && GET_CLASS(ch->master) != CLASS_CLERIC)
-      return FALSE;
+      return false;
     if (vict == ch->master)
-      return FALSE;
+      return false;
     if (GET_LEVEL(vict) < 5)
     {
       do_say(ch, "I'm sorry master, I cannot do that.", CMD_DEFAULT);
@@ -7047,19 +7047,19 @@ int can_be_attacked(char_data *ch, char_data *vict)
     if (IS_NPC(ch))
     {
       if (ch->fighting == vict)
-        return TRUE;
+        return true;
     }
     /* Allow players to continue fighting if they have a cantquit */
     if (IS_AFFECTED(ch, AFF_CANTQUIT) || IS_AFFECTED(ch, AFF_CHAMPION))
     {
       if (ch->fighting == vict)
-        return TRUE;
+        return true;
     }
     /* Imps ignore safe flags  */
     if (!IS_NPC(ch) && (GET_LEVEL(ch) == IMPLEMENTER))
     {
       send_to_char("There is no safe haven from an angry IMPLEMENTER!\n\r", vict);
-      return TRUE;
+      return true;
     }
 
     if (vict->fighting == ch)
@@ -7068,7 +7068,7 @@ int can_be_attacked(char_data *ch, char_data *vict)
       This happens when someone with CQ is defending himself from people without CQ,
       if they are already in combat, a riposte or similar will cause this.
       */
-      return TRUE;
+      return true;
     }
 
     send_to_char("No fighting permitted in a safe room.\r\n", ch);
@@ -7084,9 +7084,9 @@ int can_be_attacked(char_data *ch, char_data *vict)
       stop_fighting(ch);
     }
 
-    return FALSE;
+    return false;
   }
-  return TRUE;
+  return true;
 }
 
 int weapon_spells(char_data *ch, char_data *vict, int weapon)
@@ -7277,9 +7277,9 @@ int act_poisonous(char_data *ch)
 {
   if (IS_NPC(ch) && ISSET(ch->mobdata->actflags, ACT_POISONOUS))
     if (!number(0, GET_LEVEL(ch) / 10))
-      return TRUE; // poisoned
+      return true; // poisoned
 
-  return FALSE;
+  return false;
 }
 
 int second_attack(char_data *ch)
@@ -7287,15 +7287,15 @@ int second_attack(char_data *ch)
   int learned;
 
   if ((IS_NPC(ch)) && (ISSET(ch->mobdata->actflags, ACT_2ND_ATTACK)))
-    return TRUE;
+    return true;
   if (affected_by_spell(ch, SKILL_DEFENDERS_STANCE))
-    return FALSE;
+    return false;
   learned = has_skill(ch, SKILL_SECOND_ATTACK);
   if (learned && skill_success(ch, NULL, SKILL_SECOND_ATTACK, 15))
   {
-    return TRUE;
+    return true;
   }
-  return FALSE;
+  return false;
 }
 
 int third_attack(char_data *ch)
@@ -7303,22 +7303,22 @@ int third_attack(char_data *ch)
   int learned;
 
   if ((IS_NPC(ch)) && (ISSET(ch->mobdata->actflags, ACT_3RD_ATTACK)))
-    return TRUE;
+    return true;
   if (affected_by_spell(ch, SKILL_DEFENDERS_STANCE))
-    return FALSE;
+    return false;
   learned = has_skill(ch, SKILL_THIRD_ATTACK);
   if (learned && skill_success(ch, NULL, SKILL_THIRD_ATTACK, 15))
   {
-    return TRUE;
+    return true;
   }
-  return FALSE;
+  return false;
 }
 
 int fourth_attack(char_data *ch)
 {
   if ((IS_NPC(ch)) && (ISSET(ch->mobdata->actflags, ACT_4TH_ATTACK)))
-    return TRUE;
-  return FALSE;
+    return true;
+  return false;
 }
 
 /*  No longer used.  Any class can try to use their second wield if they have
@@ -7327,8 +7327,8 @@ int second_wield(char_data *ch)
 {
   // If the ch is capable of using the SECOND_WIELD
   if((GET_CLASS(ch) == CLASS_MAGIC_USER) || (GET_CLASS(ch) == CLASS_MONK))
-    return FALSE;
-  return TRUE;
+    return false;
+  return true;
 }
 */
 
@@ -7747,18 +7747,18 @@ int damage_type(int weapon_type)
 int debug_retval(char_data *ch, char_data *victim, int retval)
 {
   static int dumped = 0;
-  bool bugged = FALSE;
+  bool bugged = false;
 
   if (!IS_SET(retval, eCH_DIED) && ch && ch->name == (char *)0x95959595)
   {
     logentry("ch->name == 0x95959595 && !eCH_DIED", IMMORTAL, LogChannels::LOG_BUG);
-    bugged = TRUE;
+    bugged = true;
   }
 
   if (!IS_SET(retval, eVICT_DIED) && victim && victim->name == (char *)0x95959595)
   {
     logentry("victim->name == 0x95959595 && !eVICT_DIED", IMMORTAL, LogChannels::LOG_BUG);
-    bugged = TRUE;
+    bugged = true;
   }
 
   // Only coredump up to 10 times

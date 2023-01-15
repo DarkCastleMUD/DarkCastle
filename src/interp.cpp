@@ -1025,7 +1025,7 @@ int command_interpreter(char_data *ch, string pcomm, bool procced)
   // Check social table
   if ((retval = check_social(ch, pcomm, look_at)))
   {
-    if (SOCIAL_TRUE_WITH_NOISE == retval)
+    if (SOCIAL_true_WITH_NOISE == retval)
       return check_ethereal_focus(ch, ETHEREAL_FOCUS_TRIGGER_SOCIAL);
     else
       return eSUCCESS;
@@ -1213,8 +1213,8 @@ void argument_interpreter(const char *argument, char *first_arg, char *second_ar
   } while (fill_word(second_arg));
 }
 
-// If the string is ALL numbers, return TRUE
-// If there is a non-numeric in string, return FALSE
+// If the string is ALL numbers, return true
+// If there is a non-numeric in string, return false
 bool is_number(const char *str)
 {
   int look_at;
@@ -1251,7 +1251,7 @@ bool is_number(QString str)
 char *one_argument_long(char *argument, char *first_arg)
 {
   int begin, look_at;
-  bool end = FALSE;
+  bool end = false;
   begin = 0;
 
   /* Find first non blank */
@@ -1259,13 +1259,13 @@ char *one_argument_long(char *argument, char *first_arg)
     ;
   if (*(argument + begin) == '{')
   {
-    end = TRUE;
+    end = true;
     begin++;
   }
 
   if (*(argument + begin) == '{')
   {
-    end = TRUE;
+    end = true;
     begin++;
   }
   /* Find length of first word */
@@ -1295,7 +1295,7 @@ char *one_argument_long(char *argument, char *first_arg)
 const char *one_argument_long(const char *argument, char *first_arg)
 {
   int begin, look_at;
-  bool end = FALSE;
+  bool end = false;
   begin = 0;
 
   /* Find first non blank */
@@ -1303,13 +1303,13 @@ const char *one_argument_long(const char *argument, char *first_arg)
     ;
   if (*(argument + begin) == '{')
   {
-    end = TRUE;
+    end = true;
     begin++;
   }
 
   if (*(argument + begin) == '{')
   {
-    end = TRUE;
+    end = true;
     begin++;
   }
   /* Find length of first word */
@@ -1368,7 +1368,7 @@ const char *one_argument(const char *argument, char *first_arg)
 
 int fill_wordnolow(char *argument)
 {
-  return (search_blocknolow(argument, fillwords, TRUE) >= 0);
+  return (search_blocknolow(argument, fillwords, true) >= 0);
 }
 
 char *one_argumentnolow(char *argument, char *first_arg)
@@ -1394,7 +1394,7 @@ char *one_argumentnolow(char *argument, char *first_arg)
 
 int fill_word(char *argument)
 {
-  return (search_block(argument, fillwords, TRUE) >= 0);
+  return (search_block(argument, fillwords, true) >= 0);
 }
 
 void automail(char *name)
@@ -1684,9 +1684,9 @@ bool can_use_command(char_data *ch, int cmdnum)
   {
 
     if (cmdl->ch == ch && cmdl->cmd_number == cmdnum)
-      return FALSE;
+      return false;
   }
-  return TRUE;
+  return true;
 }
 
 void pulse_command_lag()

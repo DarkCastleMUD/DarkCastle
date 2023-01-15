@@ -492,7 +492,7 @@ int do_sqedit(char_data *ch, char *argument, int cmd)
     return eFAILURE;
   }
   char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH * 2];
-  bool done = FALSE;
+  bool done = false;
   argument = one_argument(argument, arg1);
   struct skill_quest *skill = NULL;
 
@@ -641,7 +641,7 @@ int do_sqedit(char_data *ch, char *argument, int cmd)
       if (!IS_SET(curren->clas, 1 << (l - 1)))
         continue;
       csendf(ch, "$3%d$R. %s\r\n", curren->num, get_skill_name(curren->num));
-      done = TRUE;
+      done = true;
     }
     if (!done)
       send_to_char("    No skill quests.\r\n", ch);
@@ -729,9 +729,9 @@ int do_eqmax(char_data *ch, char *argument, int cmd)
     return eFAILURE;
   }
   argument = one_argument(argument, arg);
-  bool nodouble = FALSE;
+  bool nodouble = false;
   if (!str_cmp(arg, "nodouble"))
-    nodouble = TRUE;
+    nodouble = true;
   int i = 1;
   struct obj_data *obj;
   for (i = 1; i < 32000; i++)

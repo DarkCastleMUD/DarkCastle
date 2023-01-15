@@ -219,13 +219,13 @@ int do_whosolo(char_data *ch, char *argument, int cmd)
 
   for (d = descriptor_list; d; d = d->next)
   {
-    foundtarget = FALSE;
+    foundtarget = false;
 
     if ((d->connected) || !(i = d->character) || (!CAN_SEE(ch, i)))
       continue;
 
     if (is_abbrev(buf, GET_NAME(i)))
-      foundtarget = TRUE;
+      foundtarget = true;
 
     if (*buf && !foundtarget)
       continue;
@@ -522,7 +522,7 @@ int do_who(char_data *ch, char *argument, int cmd)
     infoField = infoBuf;
     extraBuf[0] = '\0';
     buf[0] = '\0';
-    addimmbuf = FALSE;
+    addimmbuf = false;
     if (GET_LEVEL(i) > MORTAL)
     {
       /* Immortals can't be anonymous */
@@ -558,7 +558,7 @@ int do_who(char_data *ch, char *argument, int cmd)
 
       if (GET_LEVEL(ch) >= IMMORTAL && !IS_MOB(i) && i->pcdata->wizinvis > 0)
       {
-        if (!IS_MOB(i) && i->pcdata->incognito == TRUE)
+        if (!IS_MOB(i) && i->pcdata->incognito == true)
         {
           sprintf(extraBuf, " (Incognito / WizInvis %ld)", i->pcdata->wizinvis);
         }
@@ -568,7 +568,7 @@ int do_who(char_data *ch, char *argument, int cmd)
         }
       }
       numImmort++;
-      addimmbuf = TRUE;
+      addimmbuf = true;
     }
     else
     {

@@ -1157,7 +1157,7 @@ int do_fire(char_data *ch, char *arg, int cmd)
       target[MAX_STRING_LENGTH], buf[MAX_STRING_LENGTH],
       buf2[MAX_STRING_LENGTH], victname[MAX_STRING_LENGTH],
       victhshr[MAX_STRING_LENGTH];
-  bool enchantmentused = FALSE;
+  bool enchantmentused = false;
 
   victim = NULL;
   *direct = '\0';
@@ -1689,7 +1689,7 @@ int do_fire(char_data *ch, char *arg, int cmd)
         skill_increase_check(ch, SKILL_FIRE_ARROW,
                              has_skill(ch, SKILL_FIRE_ARROW),
                              get_difficulty(SKILL_FIRE_ARROW));
-        enchantmentused = TRUE;
+        enchantmentused = true;
         break;
       case 2:
         dam = 50;
@@ -1712,7 +1712,7 @@ int do_fire(char_data *ch, char *arg, int cmd)
         skill_increase_check(ch, SKILL_ICE_ARROW,
                              has_skill(ch, SKILL_ICE_ARROW),
                              get_difficulty(SKILL_ICE_ARROW));
-        enchantmentused = TRUE;
+        enchantmentused = true;
         break;
       case 3:
         dam = 30;
@@ -1732,7 +1732,7 @@ int do_fire(char_data *ch, char *arg, int cmd)
         skill_increase_check(ch, SKILL_TEMPEST_ARROW,
                              has_skill(ch, SKILL_TEMPEST_ARROW),
                              get_difficulty(SKILL_TEMPEST_ARROW));
-        enchantmentused = TRUE;
+        enchantmentused = true;
         break;
       case 4:
         dam = 70;
@@ -1761,7 +1761,7 @@ int do_fire(char_data *ch, char *arg, int cmd)
         skill_increase_check(ch, SKILL_GRANITE_ARROW,
                              has_skill(ch, SKILL_GRANITE_ARROW),
                              get_difficulty(SKILL_GRANITE_ARROW));
-        enchantmentused = TRUE;
+        enchantmentused = true;
         break;
       default:
         break;

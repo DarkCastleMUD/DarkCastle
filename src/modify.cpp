@@ -557,7 +557,7 @@ struct help_index_element *build_help_index(FILE *fl, int *num)
  */
 const char *next_page(const char *str)
 {
-	int col = 1, line = 1, spec_code = FALSE;
+	int col = 1, line = 1, spec_code = false;
 	int chars = 0;
 	for (;; str++)
 	{
@@ -581,11 +581,11 @@ const char *next_page(const char *str)
 		}
 		// Check for the begining of an ANSI color code block.
 		else if (*str == '\x1B' && !spec_code)
-			spec_code = TRUE;
+			spec_code = true;
 
 		// Check for the end of an ANSI color code block.
 		else if (*str == 'm' && spec_code)
-			spec_code = FALSE;
+			spec_code = false;
 
 		// If we're at the start of the next page, return this fact.
 		// Note, this is done AFTER we check for ansi codes, so that we don't

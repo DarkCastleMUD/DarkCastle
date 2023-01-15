@@ -666,7 +666,7 @@ void DC::boot_db(void)
 	fix_shopkeepers_inventory();
 
 	logentry("Turning on MOB Progs", 0, LogChannels::LOG_MISC);
-	MOBtrigger = TRUE;
+	MOBtrigger = true;
 
 	logentry("Loading quest one liners.", 0, LogChannels::LOG_MISC);
 	load_quests();
@@ -1281,7 +1281,7 @@ void remove_all_mobs_from_world()
 			 [](char_data *const &curr)
 			 {
 				 if (IS_NPC(curr))
-					 extract_char(curr, TRUE);
+					 extract_char(curr, true);
 				 else
 					 do_quit(curr, "", 666);
 			 });
@@ -1365,7 +1365,7 @@ struct index_data *generate_obj_indices(int *top,
 					index[i].non_combat_func = 0;
 					index[i].combat_func = 0;
 					index[i].progtypes = 0;
-					if (!(index[i].item = (struct obj_data *)read_object(i, fl, FALSE)))
+					if (!(index[i].item = (struct obj_data *)read_object(i, fl, false)))
 					{
 						sprintf(log_buf, "Unable to load object %d!\n\r",
 								index[i].virt);
@@ -1457,7 +1457,7 @@ void write_one_room(FILE *f, int a)
 	// Write out allowed classes if any
 	for (int i = 0; i < CLASS_MAX; i++)
 	{
-		if (world[a].allow_class[i] == TRUE)
+		if (world[a].allow_class[i] == true)
 		{
 			fprintf(f, "C%d\n", i);
 		}
@@ -1635,15 +1635,15 @@ int DC::read_one_room(FILE *fl, int &room_nr)
 			else if (ch == 'C')
 			{
 				int c_class = fread_int(fl, 0, CLASS_MAX);
-				world[room_nr].allow_class[c_class] = TRUE;
+				world[room_nr].allow_class[c_class] = true;
 			}
 		} // of for (;;) (get directions and extra descs)
 
-		return TRUE;
+		return true;
 	} // if == $
 	  //  dc_free(temp); /* cleanup the area containing the terminal $  */
 	  // we no longer free temp, cause it's no longer used as a terminating char
-	return FALSE;
+	return false;
 }
 
 QString read_next_worldfile_name(FILE *flWorldIndex)
@@ -1668,43 +1668,43 @@ QString read_next_worldfile_name(FILE *flWorldIndex)
 bool can_modify_this_room(char_data *ch, int32_t vnum)
 {
 	if (has_skill(ch, COMMAND_RANGE))
-		return TRUE;
+		return true;
 
 	if (ch->pcdata->buildLowVnum <= 0 || ch->pcdata->buildHighVnum <= 0)
-		return FALSE;
+		return false;
 	if (ch->pcdata->buildLowVnum > vnum)
-		return FALSE;
+		return false;
 	if (ch->pcdata->buildHighVnum < vnum)
-		return FALSE;
-	return TRUE;
+		return false;
+	return true;
 }
 
 bool can_modify_room(char_data *ch, int32_t vnum)
 {
 	if (has_skill(ch, COMMAND_RANGE))
-		return TRUE;
+		return true;
 
 	if (ch->pcdata->buildLowVnum <= 0 || ch->pcdata->buildHighVnum <= 0)
-		return FALSE;
+		return false;
 	if (ch->pcdata->buildLowVnum > vnum)
-		return FALSE;
+		return false;
 	if (ch->pcdata->buildHighVnum < vnum)
-		return FALSE;
-	return TRUE;
+		return false;
+	return true;
 }
 
 bool can_modify_this_mobile(char_data *ch, int32_t vnum)
 {
 	if (has_skill(ch, COMMAND_RANGE))
-		return TRUE;
+		return true;
 
 	if (ch->pcdata->buildMLowVnum <= 0 || ch->pcdata->buildMHighVnum <= 0)
-		return FALSE;
+		return false;
 	if (ch->pcdata->buildMLowVnum > vnum)
-		return FALSE;
+		return false;
 	if (ch->pcdata->buildMHighVnum < vnum)
-		return FALSE;
-	return TRUE;
+		return false;
+	return true;
 }
 
 bool can_modify_mobile(char_data *ch, int32_t mob)
@@ -1715,15 +1715,15 @@ bool can_modify_mobile(char_data *ch, int32_t mob)
 bool can_modify_this_object(char_data *ch, int32_t vnum)
 {
 	if (has_skill(ch, COMMAND_RANGE))
-		return TRUE;
+		return true;
 
 	if (ch->pcdata->buildOLowVnum <= 0 || ch->pcdata->buildOHighVnum <= 0)
-		return FALSE;
+		return false;
 	if (ch->pcdata->buildOLowVnum > vnum)
-		return FALSE;
+		return false;
 	if (ch->pcdata->buildOHighVnum < vnum)
-		return FALSE;
-	return TRUE;
+		return false;
+	return true;
 }
 
 bool can_modify_object(char_data *ch, int32_t obj)
@@ -2763,7 +2763,7 @@ char_data *read_mobile(int nr, FILE *fl)
 			break;
 		case '>':
 			ungetc(letter, fl);
-			mprog_read_programs(fl, nr, FALSE);
+			mprog_read_programs(fl, nr, false);
 			break;
 		case 'Y': // type
 			mob->mobdata->mob_flags.type = (mob_type_t)fread_int(fl, mob_type_t::MOB_TYPE_FIRST, mob_type_t::MOB_TYPE_LAST);
@@ -2955,7 +2955,7 @@ void write_mobile(char_data *mob, FILE *fl)
 
 	if (mob_index[mob->mobdata->nr].mobprogs)
 	{
-		write_mprog_recur(fl, mob_index[mob->mobdata->nr].mobprogs, TRUE);
+		write_mprog_recur(fl, mob_index[mob->mobdata->nr].mobprogs, true);
 		fprintf(fl, "|\n");
 	}
 
@@ -3254,7 +3254,7 @@ void handle_automatic_mob_settings(char_data *mob)
 		alevel -= 0.5;
 	if (!c && IS_AFFECTED(mob, AFF_INFRARED))
 		alevel -= 0.5;
-	if (!c && IS_AFFECTED(mob, AFF_TRUE_SIGHT))
+	if (!c && IS_AFFECTED(mob, AFF_true_SIGHT))
 		alevel -= 1.0;
 	if (IS_AFFECTED(mob, AFF_BLIND))
 		alevel += 3.0;
@@ -4124,7 +4124,7 @@ void write_object(obj_data *obj, FILE *fl)
 
 	if (obj_index[obj->item_number].mobprogs)
 	{
-		write_mprog_recur(fl, obj_index[obj->item_number].mobprogs, FALSE);
+		write_mprog_recur(fl, obj_index[obj->item_number].mobprogs, false);
 		fprintf(fl, "|\n");
 	}
 
@@ -4190,7 +4190,7 @@ ofstream &operator<<(ofstream &out, obj_data *obj)
 
 	if (obj_index[obj->item_number].mobprogs)
 	{
-		write_mprog_recur(out, obj_index[obj->item_number].mobprogs, FALSE);
+		write_mprog_recur(out, obj_index[obj->item_number].mobprogs, false);
 		out << "|\n";
 	}
 
@@ -6589,7 +6589,7 @@ bool verify_item(struct obj_data **obj)
 	extern int top_of_objt;
 
 	if (!str_cmp((*obj)->short_description, ((struct obj_data *)obj_index[(*obj)->item_number].item)->short_description))
-		return FALSE;
+		return false;
 
 	int newitem = -1;
 	for (int i = 1;; i++)
@@ -6613,10 +6613,10 @@ bool verify_item(struct obj_data **obj)
 			}
 	}
 	if (newitem == -1)
-		return FALSE;
+		return false;
 
 	*obj = clone_object(newitem); // Fixed!
-	return TRUE;
+	return true;
 }
 
 FILE *legacyFileOpen(QString directory, QString filename, QString error_message)

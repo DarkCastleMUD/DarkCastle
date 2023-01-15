@@ -1142,7 +1142,7 @@ const char *affected_bits[] =
     "DETECT-GOOD",
     "FIRESHIELD",
     "SLEEP",
-    "TRUE-SIGHT",
+    "true-SIGHT",
     "SNEAK",
     "HIDE",
     "UNUSED",
@@ -1888,7 +1888,7 @@ struct class_skill_defines c_skills[] = { // cleric skills
 {    "protection from evil", SPELL_PROTECT_FROM_EVIL, 36,     90,  0,   CONWIS },
 {    "protection from good", SPELL_PROTECT_FROM_GOOD, 37,     90,  0,   CONWIS },
 {    "portal",               SPELL_PORTAL,            38,     90,  0,   DEXWIS },
-{    "true sight",           SPELL_TRUE_SIGHT,        39,     90,  0,   DEXINT },
+{    "true sight",           SPELL_true_SIGHT,        39,     90,  0,   DEXINT },
 {    "full heal",            SPELL_FULL_HEAL,         40,    100,  0,   INTWIS },
 {    "power harm",           SPELL_POWER_HARM,        41,    100,  0,   STRINT },
 {    "resist magic",         SPELL_RESIST_MAGIC,      43,     85,  0,   CONWIS },
@@ -1948,7 +1948,7 @@ struct class_skill_defines m_skills[] = { // mage skills
 {    "bludgeoning",         SKILL_BLUDGEON_WEAPONS,  30,     50,  0,   DEXINT },
 {    "resist magic",        SPELL_RESIST_MAGIC,      31,     90,  0,   CONWIS },
 {    "haste",               SPELL_HASTE,             33,    100,  0,   DEXINT },
-{    "true sight",          SPELL_TRUE_SIGHT,        34,     90,  0,   INTWIS },
+{    "true sight",          SPELL_true_SIGHT,        34,     90,  0,   INTWIS },
 {    "dispel magic",        SPELL_DISPEL_MAGIC,      35,     90,  0,   CONWIS },
 {    "resist fire",         SPELL_RESIST_FIRE,       36,     70,  0,   CONWIS },
 {    "wizard eye",          SPELL_WIZARD_EYE,        37,    100,  0,   INTWIS },
@@ -2079,7 +2079,7 @@ struct race_data races[] =
 
 { "Goblin",    "goblin",    "Goblins",    false, 63,    0,       0,       0,     1<<6|1<<11,    0,    100,   100,    60,    60,    0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0,AFF_IGNORE_WEAPON_WEIGHT|AFF_INFRARED, "jab" }, 
 { "Reptile",   "reptile",   "Reptiles",   false, 59,    0,       0,     520,              0,            0,    0,     0,     0,     0,    0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0,AFF_IGNORE_WEAPON_WEIGHT, "strike" },
-{ "Dragon",    "dragon",    "Dragons",    false, 91,    0,     268,       0,      1<<6|1<<9,     0,   500,  2000,   144,   240,    0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0,AFF_IGNORE_WEAPON_WEIGHT|AFF_INFRARED|AFF_SENSE_LIFE|AFF_DETECT_INVISIBLE|AFF_FLYING|AFF_TRUE_SIGHT|AFF_SOLIDITY, "maul" },
+{ "Dragon",    "dragon",    "Dragons",    false, 91,    0,     268,       0,      1<<6|1<<9,     0,   500,  2000,   144,   240,    0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0,AFF_IGNORE_WEAPON_WEIGHT|AFF_INFRARED|AFF_SENSE_LIFE|AFF_DETECT_INVISIBLE|AFF_FLYING|AFF_true_SIGHT|AFF_SOLIDITY, "maul" },
 { "Snake",     "snake",     "Snakes",     false, 3,    0,       1, 2097160,           32768,      4096,    5,    50,     2,     8,    0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0,AFF_IGNORE_WEAPON_WEIGHT, "bite" },
 { "Horse",     "horse",     "Horses",     false, 19,    0,       0,       0,           2048,         3,  400,   600,    72,    84,    0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0,AFF_IGNORE_WEAPON_WEIGHT, "hoof" },
 { "Bird",      "bird",      "Birds",      false, 63,    0, 2097152,       0,          65536,         0,    0,     0,     0,     0,    0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0,AFF_IGNORE_WEAPON_WEIGHT|AFF_FLYING, "peck" },
@@ -2100,7 +2100,7 @@ struct race_data races[] =
 { "Demon",     "demon",     "Demons",     false, 127,   16,       8, 1048576,          1023,         0,    0,     0,     0,    0,    0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0,AFF_IGNORE_WEAPON_WEIGHT|AFF_INFRARED|AFF_SENSE_LIFE, "maul" },
 
 { "Yrnali",    "yrnali",    "Yrnali",     false, 63,   16,       8, 1048576,       1, 536870912,  150,   300,    72,    96,    0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0,AFF_IGNORE_WEAPON_WEIGHT|AFF_INFRARED|AFF_SENSE_LIFE|AFF_DETECT_INVISIBLE, "maul" },
-{ "Immortal",  "immortal",  "Immortals",  false, 127, 1288, 1048576,       0,       0,         0,    0,     0,     0,     0,    0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0,AFF_IGNORE_WEAPON_WEIGHT|AFF_INFRARED|AFF_SENSE_LIFE|AFF_DETECT_INVISIBLE|AFF_FLYING|AFF_TRUE_SIGHT|AFF_SOLIDITY|AFF_SANCTUARY, "ethereal strike" },
+{ "Immortal",  "immortal",  "Immortals",  false, 127, 1288, 1048576,       0,       0,         0,    0,     0,     0,     0,    0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0,AFF_IGNORE_WEAPON_WEIGHT|AFF_INFRARED|AFF_SENSE_LIFE|AFF_DETECT_INVISIBLE|AFF_FLYING|AFF_true_SIGHT|AFF_SOLIDITY|AFF_SANCTUARY, "ethereal strike" },
 { "Feline",    "feline",    "Felines",    false, 27,    0,       0,     128, 8388608,         0,    0,     0,     0,     0,    0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0,AFF_IGNORE_WEAPON_WEIGHT|AFF_INFRARED|AFF_SENSE_LIFE|AFF_SNEAK, "claw" }
 }; 
 

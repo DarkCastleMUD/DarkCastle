@@ -128,7 +128,7 @@ void boot_clans(void)
     }
 
     char b;
-    while (TRUE) /* I see clan rooms! */
+    while (true) /* I see clan rooms! */
     {
       b = fread_char(fl);
       if (b == 'S')
@@ -738,7 +738,7 @@ int plr_rights(char_data *ch)
   struct clan_member_data *pmember = NULL;
 
   if (!ch || !(pmember = get_member(GET_NAME(ch), ch->clan)))
-    return FALSE;
+    return false;
 
   return pmember->member_rights;
 }
@@ -749,7 +749,7 @@ int has_right(char_data *ch, uint32_t bit)
   struct clan_member_data *pmember = NULL;
 
   if (!ch || !(pmember = get_member(GET_NAME(ch), ch->clan)))
-    return FALSE;
+    return false;
 
   return IS_SET(pmember->member_rights, bit);
 }
@@ -1043,7 +1043,7 @@ int do_outcast(char_data *ch, char *arg, int cmd)
   clan_data *clan;
   struct descriptor_data d;
   char buf[MAX_STRING_LENGTH], tmp_buf[MAX_STRING_LENGTH];
-  bool connected = TRUE;
+  bool connected = true;
 
   while (isspace(*arg))
     arg++;
@@ -1085,7 +1085,7 @@ int do_outcast(char_data *ch, char *arg, int cmd)
 
     victim->hometown = START_ROOM;
     victim->in_room = START_ROOM;
-    connected = FALSE;
+    connected = false;
   }
 
   if (!victim->clan)
@@ -1601,7 +1601,7 @@ int do_ctell(char_data *ch, char *arg, int cmd)
   bool yes;
   for (desc = descriptor_list; desc; desc = desc->next)
   {
-    yes = FALSE;
+    yes = false;
     if (desc->connected || !(pch = desc->character))
       continue;
     if (pch == ch || pch->clan != ch->clan ||
@@ -1613,7 +1613,7 @@ int do_ctell(char_data *ch, char *arg, int cmd)
     for (tmp_obj = world[pch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
       if (obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER)
       {
-        yes = TRUE;
+        yes = true;
         break;
       }
 
@@ -2881,7 +2881,7 @@ command_return_t char_data::do_cdeposit(QStringList &arguments, int cmd)
   }
 
   send(QString("You deposit %L1 $B$5gold$R %2 into your clan's account.\r\n").arg(dep).arg(coin));
-  QString log_entry = QString("%1 deposited %L2 $B$5gold$R %3 in the clan bank account.\r\n").arg(name).arg(dep).arg(coin);
+  QString log_entry = QString("%1 deposited %2 gold %3 in the clan bank account.\r\n").arg(name).arg(dep).arg(coin);
   clan_data *clan = get_clan(this->clan);
   if (clan != nullptr)
   {
@@ -2990,7 +2990,7 @@ void remove_totem(obj_data *altar, obj_data *totem)
                int j;
                for (j = 0; j < totem->num_affects; j++)
                  affect_modify(t, totem->affected[j].location,
-                               totem->affected[j].modifier, -1, FALSE);
+                               totem->affected[j].modifier, -1, false);
                redo_hitpoints(t);
                redo_mana(t);
                redo_ki(t);
@@ -3010,7 +3010,7 @@ void add_totem(obj_data *altar, obj_data *totem)
                int j;
                for (j = 0; j < totem->num_affects; j++)
                  affect_modify(t, totem->affected[j].location,
-                               totem->affected[j].modifier, -1, TRUE);
+                               totem->affected[j].modifier, -1, true);
              }
            });
 }
@@ -3028,10 +3028,10 @@ void remove_totem_stats(char_data *ch, int stat)
     for (j = 0; j < a->num_affects; j++)
       if (stat && stat == a->affected[j].location)
         affect_modify(ch, a->affected[j].location,
-                      a->affected[j].modifier, -1, FALSE);
+                      a->affected[j].modifier, -1, false);
       else if (!stat)
         affect_modify(ch, a->affected[j].location,
-                      a->affected[j].modifier, -1, FALSE);
+                      a->affected[j].modifier, -1, false);
   }
   if (!stat)
   {
@@ -3054,10 +3054,10 @@ void add_totem_stats(char_data *ch, int stat)
     for (j = 0; j < a->num_affects; j++)
       if (stat && stat == a->affected[j].location)
         affect_modify(ch, a->affected[j].location,
-                      a->affected[j].modifier, -1, TRUE);
+                      a->affected[j].modifier, -1, true);
       else if (!stat)
         affect_modify(ch, a->affected[j].location,
-                      a->affected[j].modifier, -1, TRUE);
+                      a->affected[j].modifier, -1, true);
   }
   if (!stat)
   {
@@ -3107,8 +3107,8 @@ bool can_collect(int zone)
   struct takeover_pulse_data *take;
   for (take = pulse_list; take; take = take->next)
     if (zone == take->zone && take->clan2 != -2)
-      return FALSE;
-  return TRUE;
+      return false;
+  return true;
 }
 
 bool can_challenge(int clan, int zone)
@@ -3117,10 +3117,10 @@ bool can_challenge(int clan, int zone)
   for (take = pulse_list; take; take = take->next)
     if (take->clan2 == -2 &&
         take->clan1 == clan && zone == take->zone)
-      return FALSE;
+      return false;
     else if (zone == take->zone && take->clan2 >= 0 && take->clan1 >= 0)
-      return FALSE;
-  return TRUE;
+      return false;
+  return true;
 }
 
 void takeover_pause(int clan, int zone)
@@ -3243,12 +3243,12 @@ void check_victory(struct takeover_pulse_data *take)
     return;
   if (take->clan1points >= 20)
   {
-    claimArea(take->clan1, TRUE, TRUE, take->clan2, take->zone);
+    claimArea(take->clan1, true, true, take->clan2, take->zone);
     recycle_pulse_data(take);
   }
   else if (take->clan2points >= 20)
   {
-    claimArea(take->clan2, FALSE, TRUE, take->clan1, take->zone);
+    claimArea(take->clan2, false, true, take->clan1, take->zone);
     recycle_pulse_data(take);
   }
 }

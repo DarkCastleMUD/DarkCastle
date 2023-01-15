@@ -1284,14 +1284,14 @@ void obj_stat(char_data *ch, struct obj_data *j)
     strcat(buf, "NONE");
   else
   {
-    found = FALSE;
+    found = false;
     for (i = 0; i < MAX_WEAR; i++)
     {
       if (j->carried_by->equipment[i] == j)
       {
         sprinttype(i, equipment_types, buf2);
         strcat(buf, buf2);
-        found = TRUE;
+        found = true;
       }
     }
     if (!found)
@@ -1312,12 +1312,12 @@ void obj_stat(char_data *ch, struct obj_data *j)
     strcat(buf, "No\n\r");
   send_to_char(buf, ch);
   strcpy(buf, "$3Contains$R :\n\r");
-  found = FALSE;
+  found = false;
   for (j2 = j->contains; j2; j2 = j2->next_content)
   {
     strcat(buf, fname(j2->name));
     strcat(buf, "\n\r");
-    found = TRUE;
+    found = true;
   }
   if (!found)
     strcpy(buf, "$3Contains$R : Nothing\n\r");
@@ -1471,7 +1471,7 @@ int do_clear(char_data *ch, char *argument, int cmd)
         }
         while (tmp_victim->carrying)
           extract_obj(tmp_victim->carrying);
-        extract_char(tmp_victim, TRUE);
+        extract_char(tmp_victim, true);
       }
       else
         send_to_char("You hear unmatched screams of terror as all mobs are summarily executed!\n\r", tmp_victim);
@@ -1658,7 +1658,7 @@ struct hunt_items
 struct hunt_data *hunt_list = NULL;
 struct hunt_items *hunt_items_list = NULL;
 
-void check_end_of_hunt(struct hunt_data *h, bool forced = FALSE)
+void check_end_of_hunt(struct hunt_data *h, bool forced = false)
 {
   struct hunt_items *i, *p = NULL, *in;
   int items = 0;
@@ -1754,7 +1754,7 @@ int do_huntclear(char_data *ch, char *arg, int cmd)
     {
       hn = h->next;
       h->time = -1;
-      check_end_of_hunt(h, TRUE);
+      check_end_of_hunt(h, true);
     }
     send_to_char("Done!\r\n", ch);
     return eSUCCESS;
@@ -1810,14 +1810,14 @@ void init_random_hunt_items(struct hunt_data *h)
     return;
   }
   int a, i;
-  bool over = FALSE;
+  bool over = false;
   for (a = 0; a < 50; a++)
   {
     if (!over)
     {
       i = fread_int(f, 0, 32768);
       if (i == 0)
-        over = TRUE;
+        over = true;
       else
       {
         h->itemsAvail[a] = i;

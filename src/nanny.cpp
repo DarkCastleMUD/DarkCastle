@@ -34,7 +34,7 @@ extern "C"
 #include "connect.h"
 #include "race.h"
 #include "player.h"
-#include "structs.h" // TRUE
+#include "structs.h" // true
 #include "utility.h"
 #include "levels.h"
 #include "ki.h"
@@ -110,22 +110,22 @@ bool handle_get_stats(descriptor_data *d, string arg);
 int is_race_eligible(char_data *ch, int race)
 {
    if (race == 2 && (GET_RAW_DEX(ch) < 10 || GET_RAW_INT(ch) < 10))
-      return FALSE;
+      return false;
    if (race == 3 && (GET_RAW_CON(ch) < 10 || GET_RAW_WIS(ch) < 10))
-      return FALSE;
+      return false;
    if (race == 4 && (GET_RAW_DEX(ch) < 10))
-      return FALSE;
+      return false;
    if (race == 5 && (GET_RAW_DEX(ch) < 12))
-      return FALSE;
+      return false;
    if (race == 6 && (GET_RAW_STR(ch) < 12))
-      return FALSE;
+      return false;
    if (race == 7 && (GET_RAW_WIS(ch) < 12))
-      return FALSE;
+      return false;
    if (race == 8 && (GET_RAW_CON(ch) < 10 || GET_RAW_STR(ch) < 10))
-      return FALSE;
+      return false;
    if (race == 9 && (GET_RAW_CON(ch) < 12))
-      return FALSE;
-   return TRUE;
+      return false;
+   return true;
 }
 
 int is_clss_race_compat(const char_data *ch, int clss, int race)
@@ -442,7 +442,7 @@ void do_on_login_stuff(char_data *ch)
 
    if (!IS_MOB(ch) && GET_LEVEL(ch) >= IMMORTAL)
    {
-      ch->pcdata->holyLite = TRUE;
+      ch->pcdata->holyLite = true;
       GET_COND(ch, THIRST) = -1;
       GET_COND(ch, FULL) = -1;
    }
@@ -457,7 +457,7 @@ void do_on_login_stuff(char_data *ch)
       char_to_room(ch, real_room(START_ROOM));
 
    ch->curLeadBonus = 0;
-   ch->changeLeadBonus = FALSE;
+   ch->changeLeadBonus = false;
    ch->cRooms = 0;
    REMBIT(ch->affected_by, AFF_BLACKJACK_ALERT);
    for (int i = 0; i < QUEST_MAX; i++)
@@ -804,13 +804,13 @@ bool allowed_host(char *host)
    int i;
    for (i = 0; i < (int)((sizeof(host_list) / sizeof(char *))); i++)
       if (!str_prefix(host_list[i], host))
-         return TRUE;
-   return FALSE;
+         return true;
+   return false;
 }
 
 void check_hw(char_data *ch)
 {
-   heightweight(ch, FALSE);
+   heightweight(ch, false);
    if (ch->height > races[ch->race].max_height)
    {
       logf(IMPLEMENTER, LogChannels::LOG_BUG, "check_hw: %s's height %d > max %d. height set to max.", GET_NAME(ch), GET_HEIGHT(ch), races[ch->race].max_height);
@@ -832,7 +832,7 @@ void check_hw(char_data *ch)
       logf(IMPLEMENTER, LogChannels::LOG_BUG, "check_hw: %s's weight %d < min %d. weight set to min.", GET_NAME(ch), GET_WEIGHT(ch), races[ch->race].min_weight);
       ch->weight = races[ch->race].min_weight;
    }
-   heightweight(ch, TRUE);
+   heightweight(ch, true);
 }
 
 void set_hw(char_data *ch)
@@ -990,8 +990,8 @@ void nanny(struct descriptor_data *d, string arg)
       // if (allowed_host(d->host))
       // SEND_TO_Q("You are logging in from an ALLOWED host.\r\n", d);
 
-      if (check_reconnect(d, tmp_name, FALSE))
-         fOld = TRUE;
+      if (check_reconnect(d, tmp_name, false))
+         fOld = true;
       else if ((wizlock) && !allowed_host(d->host))
       {
          SEND_TO_Q("The game is wizlocked.\r\n", d);
@@ -1077,7 +1077,7 @@ void nanny(struct descriptor_data *d, string arg)
 
       check_playing(d, GET_NAME(ch));
 
-      if (check_reconnect(d, GET_NAME(ch), TRUE))
+      if (check_reconnect(d, GET_NAME(ch), true))
          return;
 
       sprintf(log_buf, "%s@%s has connected.", GET_NAME(ch), d->host);
@@ -2038,7 +2038,7 @@ bool check_deny(struct descriptor_data *d, char *name)
 
    sprintf(strdeny, "%s/%c/%s.deny", SAVE_DIR, UPPER(name[0]), name);
    if ((fpdeny = fopen(strdeny, "rb")) == NULL)
-      return FALSE;
+      return false;
    fclose(fpdeny);
 
    char log_buf[MAX_STRING_LENGTH] = {};
@@ -2047,7 +2047,7 @@ bool check_deny(struct descriptor_data *d, char *name)
    file_to_string(strdeny, bufdeny);
    SEND_TO_Q(bufdeny, d);
    close_socket(d);
-   return TRUE;
+   return true;
 }
 
 // Look for link-dead player to reconnect.
@@ -2062,7 +2062,7 @@ bool check_reconnect(struct descriptor_data *d, char *name, bool fReconnect)
       if (str_cmp(GET_NAME(d->character), GET_NAME(tmp_ch)))
          continue;
 
-      //      if(fReconnect == FALSE)
+      //      if(fReconnect == false)
       //      {
       // TODO - why are we doing this?  we load the password doing load_char_obj
       // unless someone changed their password and didn't save this doesn't seem useful
@@ -2073,7 +2073,7 @@ bool check_reconnect(struct descriptor_data *d, char *name, bool fReconnect)
       //      }
       //      else {
 
-      if (fReconnect == TRUE)
+      if (fReconnect == true)
       {
          free_char(d->character, Trace("check_reconnect"));
          d->character = tmp_ch;
@@ -2103,9 +2103,9 @@ bool check_reconnect(struct descriptor_data *d, char *name, bool fReconnect)
             telnet_sga(d);
          }
       }
-      return TRUE;
+      return true;
    }
-   return FALSE;
+   return false;
 }
 
 /*
@@ -2526,14 +2526,14 @@ bool on_forbidden_name_list(char *name)
 {
    FILE *nameList;
    char buf[MAX_STRING_LENGTH + 1];
-   bool found = FALSE;
+   bool found = false;
    int i;
 
    nameList = fopen(FORBIDDEN_NAME_FILE, "ro");
    if (!nameList)
    {
       logentry("Failed to open forbidden name file!", 0, LogChannels::LOG_MISC);
-      return FALSE;
+      return false;
    }
    else
    {
@@ -2543,7 +2543,7 @@ bool on_forbidden_name_list(char *name)
          if ((i = strlen(buf)) > 0)
             buf[i - 1] = '\0';
          if (!str_cmp(name, buf))
-            found = TRUE;
+            found = true;
       }
       fclose(nameList);
    }

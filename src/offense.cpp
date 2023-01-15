@@ -303,7 +303,7 @@ int do_join(char_data *ch, char *argument, int cmd)
   extern char_data *combat_list;
   int count = 0;
   char victim_name[240];
-  bool found = FALSE;
+  bool found = false;
 
   one_argument(argument, victim_name);
 
@@ -333,7 +333,7 @@ int do_join(char_data *ch, char *argument, int cmd)
         for (j = ch->followers; j; j = j->next) {
            if (ch->in_room == j->follower->in_room && j->follower->fighting)
               if (IS_AFFECTED(j->follower, AFF_CHARM)) {
-                 found = TRUE;
+                 found = true;
                  victim = j->follower;
               }
 	}

@@ -102,12 +102,12 @@ int corpse_save(struct obj_data *obj, FILE *fp, int location, bool recurse_this_
 		 corpse.save file.
 		 */
 
-		if (recurse_this_tree != FALSE)
+		if (recurse_this_tree != false)
 		{
 			corpse_save(obj->next_content, fp, location, recurse_this_tree);
 		}
 
-		recurse_this_tree = TRUE;
+		recurse_this_tree = true;
 		corpse_save(obj->contains, fp, MIN(0, location) - 1, recurse_this_tree);
 		result = write_corpse_to_disk(fp, obj, location);
 
@@ -117,7 +117,7 @@ int corpse_save(struct obj_data *obj, FILE *fp, int location, bool recurse_this_
 		if (!result)
 			return (0);
 	}
-	return (TRUE);
+	return (true);
 }
 
 int write_corpse_to_disk(FILE *fp, struct obj_data *obj, int locate)
@@ -235,7 +235,7 @@ void save_corpses(void)
 		if (IS_OBJ_STAT(i, ITEM_PC_CORPSE))
 		{
 			/* It is, so save it to a file */
-			if (!corpse_save(i, fp, location, FALSE))
+			if (!corpse_save(i, fp, location, false))
 			{
 				perror("SYSERR: A corpse didnt save for some reason");
 				fclose(fp);
@@ -265,7 +265,7 @@ void load_corpses(void)
 	struct obj_data *temp = NULL, *obj = NULL, *next_obj = NULL;
 	struct extra_descr_data *new_descr;
 	char buf1[256] = {0}, buf2[256] = {0}, buf3[256] = {0};
-	bool end = FALSE;
+	bool end = false;
 	int number = -1;
 	struct obj_data *money;
 	int debug = 0;
@@ -465,7 +465,7 @@ void load_corpses(void)
 
 					case '|':
 						zwei = 1;
-						end = TRUE;
+						end = true;
 						break;
 					case '$':
 					case '#':

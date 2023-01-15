@@ -55,7 +55,7 @@ extern "C"
 #include "levels.h"   // levels..
 #include "clan.h"
 #include "character.h"
-#include "utility.h" // FALSE
+#include "utility.h" // false
 #include "memory.h"
 #include "act.h"
 #include "db.h"

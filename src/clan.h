@@ -7,6 +7,8 @@
 | Description:  Header information for clans.
 */
 
+#include <stddef.h>
+
 constexpr size_t MAX_CLAN_LEN = 15;
 #define CLAN_RIGHTS_ACCEPT 1
 #define CLAN_RIGHTS_OUTCAST 1 << 1

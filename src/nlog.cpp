@@ -55,9 +55,9 @@ bool ishashed(char *arg)
   for (; current; current = current->right)
   {
     if (current->name == arg)
-      return TRUE;
+      return true;
   }
-  return FALSE;
+  return false;
 }
 
 char *str_hsh(const char *arg)

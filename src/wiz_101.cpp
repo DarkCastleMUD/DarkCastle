@@ -604,12 +604,12 @@ int do_holylite(char_data *ch, char *argument, int cmd)
 
   if (ch->pcdata->holyLite)
   {
-    ch->pcdata->holyLite = FALSE;
+    ch->pcdata->holyLite = false;
     send_to_char("Holy light mode off.\r\n", ch);
   }
   else
   {
-    ch->pcdata->holyLite = TRUE;
+    ch->pcdata->holyLite = true;
     send_to_char("Holy light mode on.\r\n", ch);
   } /* if */
   return eSUCCESS;
@@ -774,7 +774,7 @@ int do_findfix(char_data *ch, char *argument, int cmd)
   {
     for (j = 0; zone.cmd[j].command != 'S'; j++)
     {
-      bool first = TRUE, found = FALSE;
+      bool first = true, found = false;
       if (zone.cmd[j].command != 'M')
         continue;
       int vnum = zone.cmd[j].arg1, max = zone.cmd[j].arg2;
@@ -790,10 +790,10 @@ int do_findfix(char_data *ch, char *argument, int cmd)
           continue;
         if (z == j && found)
         {
-          first = FALSE;
+          first = false;
           break;
         }
-        found = TRUE;
+        found = true;
         if (zone.cmd[z].arg2 > max)
           max = zone.cmd[z].arg2;
         amt++;

@@ -573,7 +573,7 @@ bool AuctionHouse::IsSlot(string slot, int vnum)
           "light",  // 16
           "\n"};
 
-  keyword = search_block(buf.c_str(), keywords, FALSE);
+  keyword = search_block(buf.c_str(), keywords, false);
   if (keyword == -1)
     return false;
 

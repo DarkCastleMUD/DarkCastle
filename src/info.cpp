@@ -394,7 +394,7 @@ void list_obj_to_char(struct obj_data *list, char_data *ch, int mode,
                       bool show)
 {
    struct obj_data *i;
-   bool found = FALSE;
+   bool found = false;
    int number = 1;
    int can_see;
    char buf[50];
@@ -415,7 +415,7 @@ void list_obj_to_char(struct obj_data *list, char_data *ch, int mode,
             send_to_char(buf, ch);
          }
          show_obj_to_char(i, ch, mode);
-         found = TRUE;
+         found = true;
          number = 1;
       }
    }
@@ -617,7 +617,7 @@ void show_char_to_char(char_data *i, char_data *ch, int mode)
 
          if (IS_AFFECTED(i, AFF_INVISIBLE))
             buffer.append(" $1(invisible)");
-         if (IS_AFFECTED(i, AFF_HIDE) && ((IS_AFFECTED(ch, AFF_TRUE_SIGHT) && has_skill(ch, SPELL_TRUE_SIGHT) > 80) || GET_LEVEL(ch) > IMMORTAL || ARE_GROUPED(i, ch)))
+         if (IS_AFFECTED(i, AFF_HIDE) && ((IS_AFFECTED(ch, AFF_true_SIGHT) && has_skill(ch, SPELL_true_SIGHT) > 80) || GET_LEVEL(ch) > IMMORTAL || ARE_GROUPED(i, ch)))
             buffer.append("$4 (hidden)");
          if ((IS_AFFECTED(ch, AFF_DETECT_EVIL) || IS_AFFECTED(ch, AFF_KNOW_ALIGN)) && IS_EVIL(i))
             buffer.append("$B$4(Red Halo) ");
@@ -644,7 +644,7 @@ void show_char_to_char(char_data *i, char_data *ch, int mode)
             buffer = "";
          }
 
-         if (IS_AFFECTED(i, AFF_HIDE) && IS_AFFECTED(ch, AFF_TRUE_SIGHT) && has_skill(ch, SPELL_TRUE_SIGHT) > 80)
+         if (IS_AFFECTED(i, AFF_HIDE) && IS_AFFECTED(ch, AFF_true_SIGHT) && has_skill(ch, SPELL_true_SIGHT) > 80)
             buffer.append("$4(hidden) $3");
          if ((IS_AFFECTED(ch, AFF_DETECT_EVIL) || IS_AFFECTED(ch, AFF_KNOW_ALIGN)) && IS_EVIL(i))
             buffer.append("$B$4(Red Halo)$3 ");
@@ -718,14 +718,14 @@ void show_char_to_char(char_data *i, char_data *ch, int mode)
          return;
       }
 
-      found = FALSE;
+      found = false;
       for (j = 0; j < MAX_WEAR; j++)
       {
          if (i->equipment[j])
          {
             if (CAN_SEE_OBJ(ch, i->equipment[j]))
             {
-               found = TRUE;
+               found = true;
             }
          }
       }
@@ -750,18 +750,18 @@ void show_char_to_char(char_data *i, char_data *ch, int mode)
 
       if ((GET_CLASS(ch) == CLASS_THIEF && ch != i) || GET_LEVEL(ch) > IMMORTAL)
       {
-         found = FALSE;
+         found = false;
          send_to_char("\n\rYou attempt to peek at the inventory:\n\r", ch);
          for (tmp_obj = i->carrying; tmp_obj;
               tmp_obj = tmp_obj->next_content)
          {
-            if ((IS_SET(tmp_obj->obj_flags.extra_flags, ITEM_QUEST) == FALSE ||
+            if ((IS_SET(tmp_obj->obj_flags.extra_flags, ITEM_QUEST) == false ||
                  GET_LEVEL(ch) > IMMORTAL) &&
                 CAN_SEE_OBJ(ch, tmp_obj) &&
                 number(0, MORTAL) < GET_LEVEL(ch))
             {
                show_obj_to_char(tmp_obj, ch, 1);
-               found = TRUE;
+               found = true;
             }
          }
          if (!found)
@@ -772,7 +772,7 @@ void show_char_to_char(char_data *i, char_data *ch, int mode)
    {
       /* Lists inventory */
       act("$n is carrying:", i, 0, ch, TO_VICT, 0);
-      list_obj_to_char(i->carrying, ch, 1, TRUE);
+      list_obj_to_char(i->carrying, ch, 1, true);
    }
 }
 
@@ -918,7 +918,7 @@ void try_to_peek_into_container(char_data *vict, char_data *ch,
 {
    struct obj_data *obj = NULL;
    struct obj_data *cont = NULL;
-   int found = FALSE;
+   int found = false;
 
    if (GET_CLASS(ch) != CLASS_THIEF && GET_LEVEL(ch) < DEITY)
    {
@@ -953,7 +953,7 @@ void try_to_peek_into_container(char_data *vict, char_data *ch,
       if (CAN_SEE_OBJ(ch, obj) && number(0, MORTAL + 30) < GET_LEVEL(ch))
       {
          show_obj_to_char(obj, ch, 1);
-         found = TRUE;
+         found = true;
       }
 
    if (!found)
@@ -1223,7 +1223,7 @@ bool identify(char_data *ch, obj_data *obj)
       break;
    }
 
-   found = FALSE;
+   found = false;
 
    for (i = 0; i < obj->num_affects; i++)
    {
@@ -1237,7 +1237,7 @@ bool identify(char_data *ch, obj_data *obj)
          if (!found)
          {
             send_to_char("$3Can affect you as:$R\n\r", ch);
-            found = TRUE;
+            found = true;
          }
 
          if (obj->affected[i].location < 1000)
@@ -1366,7 +1366,7 @@ int do_look(char_data *ch, char *argument, int cmd)
    else
    {
       argument_split_3(argument, arg1, arg2, arg3);
-      keyword_no = search_block(arg1, keywords, FALSE); /* Partial Match */
+      keyword_no = search_block(arg1, keywords, false); /* Partial Match */
 
       if ((keyword_no == -1) && *arg1)
       {
@@ -1374,7 +1374,7 @@ int do_look(char_data *ch, char *argument, int cmd)
          strcpy(arg2, arg1); /* Let arg2 become the target object (arg1) */
       }
 
-      found = FALSE;
+      found = false;
       tmp_object = 0;
       tmp_char = 0;
       tmp_desc = 0;
@@ -1528,7 +1528,7 @@ int do_look(char_data *ch, char *argument, int cmd)
                         csendf(ch, ": \r\n");
                      }
 
-                     list_obj_to_char(tmp_object->contains, ch, 2, TRUE);
+                     list_obj_to_char(tmp_object->contains, ch, 2, true);
                   }
                   else
                      send_to_char("It is closed.\r\n", ch);
@@ -1604,7 +1604,7 @@ int do_look(char_data *ch, char *argument, int cmd)
                {
                   page_string(ch->desc, tmp_desc, 0);
                   return eSUCCESS; /* RETURN SINCE IT WAS ROOM DESCRIPTION */
-                                   /* Old system was: found = TRUE; */
+                                   /* Old system was: found = true; */
                }
             }
 
@@ -1626,7 +1626,7 @@ int do_look(char_data *ch, char *argument, int cmd)
                         {
                            page_string(ch->desc, tmp_desc, 1);
                            return eSUCCESS;
-                           //                              found = TRUE;
+                           //                              found = true;
                         }
                      }
                   }
@@ -1648,7 +1648,7 @@ int do_look(char_data *ch, char *argument, int cmd)
                      {
                         page_string(ch->desc, tmp_desc, 1);
                         return eSUCCESS;
-                        //                           found = TRUE;
+                        //                           found = true;
                      }
                   }
                }
@@ -1670,7 +1670,7 @@ int do_look(char_data *ch, char *argument, int cmd)
                      {
                         page_string(ch->desc, tmp_desc, 1);
                         return eSUCCESS;
-                        //                           found = TRUE;
+                        //                           found = true;
                      }
                   }
                }
@@ -1706,11 +1706,11 @@ int do_look(char_data *ch, char *argument, int cmd)
             if (((tmp_object->obj_flags.type_flag == ITEM_PORTAL) && (tmp_object->obj_flags.value[2] == world[ch->in_room].zone) && (tmp_object->in_room) && (tmp_object->obj_flags.value[1] == 1)) || ((tmp_object->obj_flags.type_flag == ITEM_PORTAL) && (tmp_object->obj_flags.value[0] == world[ch->in_room].number) && (tmp_object->in_room > -1) && (tmp_object->obj_flags.value[1] == 1)))
             {
                ch->in_room = tmp_object->in_room;
-               found = TRUE;
+               found = true;
                break;
             }
          }
-         if (found != TRUE)
+         if (found != true)
          {
             send_to_char("Nothing much to see there.\r\n", ch);
             return eFAILURE;
@@ -1718,7 +1718,7 @@ int do_look(char_data *ch, char *argument, int cmd)
       }
          /* no break */
       case 9: // look through
-         if (found != TRUE)
+         if (found != true)
          {
             if (*arg2)
             {
@@ -1739,7 +1739,7 @@ int do_look(char_data *ch, char *argument, int cmd)
                                     tmp_object->obj_flags.value[0])))
                         ch->in_room = original_loc;
                      else
-                        found = TRUE;
+                        found = true;
                   }
                }
                else
@@ -1750,7 +1750,7 @@ int do_look(char_data *ch, char *argument, int cmd)
             }
          }
 
-         if (found != TRUE)
+         if (found != true)
          {
             send_to_char("You can't seem to look through that.\r\n", ch);
             return eFAILURE;
@@ -1794,7 +1794,7 @@ int do_look(char_data *ch, char *argument, int cmd)
 
          ansi_color(BLUE, ch);
          ansi_color(BOLD, ch);
-         list_obj_to_char(world[ch->in_room].contents, ch, 0, FALSE);
+         list_obj_to_char(world[ch->in_room].contents, ch, 0, false);
 
          list_char_to_char(world[ch->in_room].people, ch, 0);
 
@@ -2032,7 +2032,7 @@ int do_score(char_data *ch, char *argument, int cmd)
    else
       send_to_char(
           "($5:$7)===================================($5:$7)==================================($5:$7)\n\r", ch);
-   int found = FALSE;
+   int found = false;
 
    if ((immune = ch->immune))
    {
@@ -2045,7 +2045,7 @@ int do_score(char_data *ch, char *argument, int cmd)
             sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\n\r",
                     scratch, "Immunity", isrString.c_str(), scratch);
             send_to_char(buf, ch);
-            found = TRUE;
+            found = true;
             isrString = string();
             if (++level == 4)
                level = 0;
@@ -2063,7 +2063,7 @@ int do_score(char_data *ch, char *argument, int cmd)
             sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\n\r",
                     scratch, "Susceptibility", isrString.c_str(), scratch);
             send_to_char(buf, ch);
-            found = TRUE;
+            found = true;
             isrString = string();
             if (++level == 4)
                level = 0;
@@ -2081,7 +2081,7 @@ int do_score(char_data *ch, char *argument, int cmd)
             sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\n\r",
                     scratch, "Resistibility", isrString.c_str(), scratch);
             send_to_char(buf, ch);
-            found = TRUE;
+            found = true;
             isrString = string();
             if (++level == 4)
                level = 0;
@@ -2098,7 +2098,7 @@ int do_score(char_data *ch, char *argument, int cmd)
          if (aff->bitvector)
             affect_found[aff->bitvector] = true;
          scratch = frills[level];
-         modifyOutput = FALSE;
+         modifyOutput = false;
 
          // figure out the name of the affect (if any)
          const char *aff_name = get_skill_name(aff->type);
@@ -2164,11 +2164,11 @@ int do_score(char_data *ch, char *argument, int cmd)
             break;
          case SPELL_IMMUNITY:
             aff_name = "immunity";
-            modifyOutput = TRUE;
+            modifyOutput = true;
             break;
          case SKILL_NAT_SELECT:
             aff_name = "natural selection";
-            modifyOutput = TRUE;
+            modifyOutput = true;
             break;
          case SKILL_BREW_TIMER:
             aff_name = "brew timer";
@@ -2227,7 +2227,7 @@ int do_score(char_data *ch, char *argument, int cmd)
          }
          ch->send(format.toStdString());
 
-         found = TRUE;
+         found = true;
          if (++level == 4)
             level = 0;
       }
@@ -2237,7 +2237,7 @@ int do_score(char_data *ch, char *argument, int cmd)
        sprintf(buf, "|%c| Affected by fly                                Modifier NONE            |%c|\n\r",
                scratch, scratch);
        send_to_char(buf, ch);
-       found = TRUE;
+       found = true;
        if(++level == 4)
          level = 0;
      }*/
@@ -2250,7 +2250,7 @@ int do_score(char_data *ch, char *argument, int cmd)
    if (found)
       send_to_char("($5:$7)=========================================================================($5:$7)\n\r", ch);
 
-   found = FALSE;
+   found = false;
 
    for (int aff_idx = 1; aff_idx < (AFF_MAX + 1); aff_idx++)
    {
@@ -2259,7 +2259,7 @@ int do_score(char_data *ch, char *argument, int cmd)
          if (aff_idx == AFF_HIDE || aff_idx == AFF_GROUP)
             continue;
 
-         found = TRUE;
+         found = true;
          if (++level == 4)
             level = 0;
          scratch = frills[level];
@@ -2532,7 +2532,7 @@ int do_count(char_data *ch, char *arg, int cmd)
 int do_inventory(char_data *ch, char *argument, int cmd)
 {
    send_to_char("You are carrying:\n\r", ch);
-   list_obj_to_char(ch->carrying, ch, 1, TRUE);
+   list_obj_to_char(ch->carrying, ch, 1, true);
    return eSUCCESS;
 }
 
@@ -2542,7 +2542,7 @@ int do_equipment(char_data *ch, char *argument, int cmd)
    bool found;
 
    send_to_char("You are using:\n\r", ch);
-   found = FALSE;
+   found = false;
    for (j = 0; j < MAX_WEAR; j++)
    {
       if (ch->equipment[j])
@@ -2552,7 +2552,7 @@ int do_equipment(char_data *ch, char *argument, int cmd)
             if (!found)
             {
                act("<    worn     > Item Description     (Flags) [Item Condition]\r\n", ch, 0, 0, TO_CHAR, 0);
-               found = TRUE;
+               found = true;
             }
             send_to_char(where[j], ch);
             show_obj_to_char(ch->equipment[j], ch, 1);
@@ -2561,7 +2561,7 @@ int do_equipment(char_data *ch, char *argument, int cmd)
          {
             send_to_char(where[j], ch);
             send_to_char("something\n\r", ch);
-            found = TRUE;
+            found = true;
          }
       }
    }

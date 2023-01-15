@@ -283,7 +283,7 @@ void parse_action(int command, char *str, struct descriptor_data *d)
       sprintf(buf, "%s\r\n%d line%sshown.\r\n", buf, total_len,
             ((total_len != 1)?"s ":" "));
        */
-      // page_string(d, buf, TRUE);
+      // page_string(d, buf, true);
       SEND_TO_Q(buf, d);
       break;
    case PARSE_LIST_NUM:
@@ -362,7 +362,7 @@ void parse_action(int command, char *str, struct descriptor_data *d)
       sprintf(buf, "%s\r\n%d numbered line%slisted.\r\n", buf, total_len,
             ((total_len != 1)?"s ":" "));
        */
-      // page_string(d, buf, TRUE);
+      // page_string(d, buf, true);
       SEND_TO_Q(buf, d);
       break;
 
@@ -567,7 +567,7 @@ int replace_str(char **string, char *pattern, char *replacement, int rep_all,
 /* (for strings edited with d->strnew) (mostly olc and mail)     */
 void format_text(char **ptr_string, int mode, struct descriptor_data *d, int maxlen)
 {
-   int total_chars, cap_next = TRUE, cap_next_next = FALSE;
+   int total_chars, cap_next = true, cap_next_next = false;
    char *flow, *start = NULL, temp;
    /* warning: do not edit messages with max_str's of over this value */
    char formated[MAX_STRING_LENGTH];
@@ -615,14 +615,14 @@ void format_text(char **ptr_string, int mode, struct descriptor_data *d, int max
 
          if (cap_next_next)
          {
-            cap_next_next = FALSE;
-            cap_next = TRUE;
+            cap_next_next = false;
+            cap_next = true;
          }
 
          /* this is so that if we stopped on a sentance .. we move off the sentance delim. */
          while ((*flow == '.') || (*flow == '!') || (*flow == '?'))
          {
-            cap_next_next = TRUE;
+            cap_next_next = true;
             flow++;
          }
 
@@ -645,7 +645,7 @@ void format_text(char **ptr_string, int mode, struct descriptor_data *d, int max
          }
          else
          {
-            cap_next = FALSE;
+            cap_next = false;
             *start = UPPER(*start);
          }
 

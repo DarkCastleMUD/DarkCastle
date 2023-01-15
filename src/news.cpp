@@ -155,7 +155,7 @@ int do_news(char_data *ch, char *argument, int cmd)
 {
   bool up;
   if (IS_NPC(ch))
-    up = TRUE;
+    up = true;
   else
     up = !IS_SET(ch->pcdata->toggles, PLR_NEWS);
   struct news_data *tnews;

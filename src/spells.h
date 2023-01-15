@@ -153,7 +153,7 @@ void check_maxes(char_data *ch);
 #define SPELL_FIRESHIELD             86
 #define SPELL_METEOR_SWARM           87
 #define SPELL_WIZARD_EYE             88
-#define SPELL_TRUE_SIGHT             89
+#define SPELL_true_SIGHT             89
 #define SPELL_MANA                   90
 #define SPELL_SOLAR_GATE             91
 #define SPELL_HEROES_FEAST           92
@@ -738,7 +738,7 @@ struct attack_hit_type
   #define LIGHTNING_SHIELD_VNUM 6310
   #define INSOMNIA_VNUM 6311
   #define HASTE_VNUM 6312
-  #define TRUE_VNUM 6305
+  #define true_VNUM 6305
 
 int has_skill(char_data *ch, skill_t skill);
 

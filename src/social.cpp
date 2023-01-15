@@ -41,34 +41,34 @@ int check_social(char_data *ch, string pcomm, int length)
 
   if (!(action = find_social(pcomm)))
   {
-    return SOCIAL_FALSE;
+    return SOCIAL_false;
   }
 
   if (!IS_NPC(ch) && IS_SET(ch->pcdata->punish, PUNISH_NOEMOTE))
   {
     send_to_char("You are anti-social!\n\r", ch);
-    return SOCIAL_TRUE;
+    return SOCIAL_true;
   }
 
   switch (GET_POS(ch))
   {
   case POSITION_DEAD:
     send_to_char("Lie still; you are DEAD.\r\n", ch);
-    return SOCIAL_TRUE;
+    return SOCIAL_true;
 
   case POSITION_STUNNED:
     send_to_char("You are too stunned to do that.\r\n", ch);
-    return SOCIAL_TRUE;
+    return SOCIAL_true;
 
   case POSITION_SLEEPING:
     send_to_char("In your dreams, or what?\n\r", ch);
-    return SOCIAL_TRUE;
+    return SOCIAL_true;
   }
 
   if (IS_SET(world[ch->in_room].room_flags, QUIET))
   {
     send_to_char("SHHHHHH!! Can't you see people are trying to read?\r\n", ch);
-    return SOCIAL_TRUE;
+    return SOCIAL_true;
   }
 
   if (action->char_found)
@@ -91,7 +91,7 @@ int check_social(char_data *ch, string pcomm, int length)
     {
       act(action->others_no_arg, ch, 0, 0, TO_ROOM, (action->hide) ? INVIS_NULL : 0);
     }
-    return SOCIAL_TRUE_WITH_NOISE;
+    return SOCIAL_true_WITH_NOISE;
   }
 
   if (!(vict = get_char_room_vis(ch, buf)))
@@ -126,7 +126,7 @@ int check_social(char_data *ch, string pcomm, int length)
           (action->hide) ? INVIS_NULL : 0);
   }
 
-  return SOCIAL_TRUE_WITH_NOISE;
+  return SOCIAL_true_WITH_NOISE;
 }
 
 char *fread_social_string(FILE *fl)
@@ -151,8 +151,8 @@ char *fread_social_string(FILE *fl)
 }
 
 // read one social
-// return TRUE on success
-// return FALSE on 'EOF'
+// return true on success
+// return false on 'EOF'
 int read_social_from_file(int32_t num_social, FILE *fl)
 {
   char tmp[MAX_INPUT_LENGTH];
@@ -160,7 +160,7 @@ int read_social_from_file(int32_t num_social, FILE *fl)
 
   fscanf(fl, " %s ", tmp);
   if (feof(fl))
-    return FALSE;
+    return false;
   fscanf(fl, " %d %d \n", &hide, &min_pos);
 
   // read strings that will always be there
@@ -172,13 +172,13 @@ int read_social_from_file(int32_t num_social, FILE *fl)
   soc_mess_list[num_social].char_found = fread_social_string(fl);
   // if no char_found, then the social is done, and the ones below won't be there
   if (!soc_mess_list[num_social].char_found)
-    return TRUE;
+    return true;
   soc_mess_list[num_social].others_found = fread_social_string(fl);
   soc_mess_list[num_social].vict_found = fread_social_string(fl);
   soc_mess_list[num_social].not_found = fread_social_string(fl);
   soc_mess_list[num_social].char_auto = fread_social_string(fl);
   soc_mess_list[num_social].others_auto = fread_social_string(fl);
-  return TRUE;
+  return true;
 }
 
 // this function used by qsort to sort the social array

@@ -188,7 +188,7 @@ void send_to_table(const string msg, struct table_data *tbl, struct player_data 
         send_to_char(msg,plr->ch);
      */
    if (tbl->obj->in_room)
-      send_to_room(msg, tbl->obj->in_room, TRUE, plrSilent ? plrSilent->ch : 0);
+      send_to_room(msg, tbl->obj->in_room, true, plrSilent ? plrSilent->ch : 0);
 }
 
 bool charExists(char_data *ch)
@@ -331,16 +331,16 @@ bool canInsurance(struct player_data *plr)
        plr->hand_data[2] == 0 &&
        plr->table->state == 1 &&
        !plr->insurance)
-      return TRUE;
-   return FALSE;
+      return true;
+   return false;
 }
 
 bool canSplit(struct player_data *plr)
 {
    if (plr->hand_data[0] && val(plr->hand_data[0]) == val(plr->hand_data[1]) && !plr->hand_data[2] && plr->table->cr == plr)
-      return TRUE;
+      return true;
 
-   return FALSE;
+   return false;
 }
 
 struct player_data *createPlayer(char_data *ch, struct table_data *tbl, int noadd = 0)
@@ -356,7 +356,7 @@ struct player_data *createPlayer(char_data *ch, struct table_data *tbl, int noad
    for (int i = 0; i < 21; i++)
       plr->hand_data[i] = 0;
    plr->bet = 0;
-   plr->insurance = plr->doubled = FALSE;
+   plr->insurance = plr->doubled = false;
    plr->state = 0;
    if (!noadd)
    {
@@ -594,7 +594,7 @@ void add_timer_bj_dealer2(struct table_data *tbl, int time = 10)
 void bj_finish(void *arg1, void *arg2, void *arg3)
 {
    struct table_data *tbl = (table_data *)arg1;
-   send_to_room("$B$7The dealer says 'Place your bets!'$R\r\n", tbl->obj->in_room, TRUE);
+   send_to_room("$B$7The dealer says 'Place your bets!'$R\r\n", tbl->obj->in_room, true);
    tbl->state = 0;
 }
 
@@ -704,7 +704,7 @@ void bj_dealer_ai(void *arg1, void *arg2, void *arg3)
    char buf[MAX_STRING_LENGTH];
    if (a && tbl->handnr != a)
       return; // handled earlier
-   bool cont = FALSE;
+   bool cont = false;
 
    switch (tbl->state)
    {
@@ -720,7 +720,7 @@ void bj_dealer_ai(void *arg1, void *arg2, void *arg3)
       { // check if all players have busted
          pnext = plr->next;
          if (hand_strength(plr) < 22)
-            cont = TRUE;
+            cont = true;
       }
       if (!cont)
       {
@@ -755,7 +755,7 @@ void bj_dealer_ai(void *arg1, void *arg2, void *arg3)
    case 1:
       // TODO CHECK THIS
       //	if (!tbl->plr) { add_timer_bj_dealer2(tbl); return; }
-      send_to_room("$B$7The dealer says 'No more bets!'$R\r\n\r\n", tbl->obj->in_room, TRUE);
+      send_to_room("$B$7The dealer says 'No more bets!'$R\r\n\r\n", tbl->obj->in_room, true);
       tbl->state = 0;
       pulse_table_bj(tbl);
       break;
@@ -928,9 +928,9 @@ void create_table(struct obj_data *obj)
 #endif
    table->obj = obj;
    if (obj->obj_flags.value[2])
-      table->gold = FALSE;
+      table->gold = false;
    else
-      table->gold = TRUE;
+      table->gold = true;
    table->deck = create_deck(6);
    shuffle_deck(table->deck);
    table->plr = table->cr = NULL;
@@ -955,9 +955,9 @@ bool playing(char_data *ch, struct table_data *tbl)
    struct player_data *plr;
    for (plr = tbl->plr; plr; plr = plr->next)
       if (plr->ch == ch)
-         return TRUE;
+         return true;
 
-   return FALSE;
+   return false;
 }
 
 struct player_data *getPlayer(char_data *ch, struct table_data *tbl)
@@ -1350,7 +1350,7 @@ int blackjack_table(char_data *ch, struct obj_data *obj, int cmd, const char *ar
          return eSUCCESS;
       }
       plr->table->handnr++;
-      plr->insurance = TRUE;
+      plr->insurance = true;
       char buf[MAX_STRING_LENGTH];
       if (plr->table->gold)
          GET_GOLD(ch) -= plr->bet / 2;
@@ -1388,7 +1388,7 @@ int blackjack_table(char_data *ch, struct obj_data *obj, int cmd, const char *ar
       else
          GET_PLATINUM(plr->ch) -= plr->bet;
       plr->bet *= 2;
-      plr->doubled = TRUE;
+      plr->doubled = true;
       plr->table->handnr++;
       char buf[MAX_STRING_LENGTH];
       sprintf(buf, "%s doubles %s bet.\r\n", GET_NAME(ch), HSHR(ch));
@@ -1583,9 +1583,9 @@ bool findcard(int hand[5], int valu, char su, int num = 1)
       if (!valu || val(hand[i]) == valu)
          if (!su || suit(hand[i]) == su)
             if (--num <= 0)
-               return TRUE;
+               return true;
 
-   return FALSE;
+   return false;
 }
 
 int highcard(int hand[5])
@@ -1610,7 +1610,7 @@ int has_flush(int hand[5])
 {
    if (findcard(hand, 0, suit(hand[0]), 5))
       return highcard(hand);
-   return FALSE;
+   return false;
 }
 
 int has_straight(int hand[5])
@@ -1629,27 +1629,27 @@ int has_straight(int hand[5])
           findcard(hand, 13, 0, 1))
          return 14;
    }
-   return FALSE;
+   return false;
 }
 
 int has_rsf(int hand[5])
 {
    if (hand[0] == 0)
-      return FALSE; // shockingly, nope
+      return false; // shockingly, nope
    if (has_flush(hand) && has_straight(hand) == 14)
-      return TRUE; // yegods
+      return true; // yegods
 
-   return FALSE;
+   return false;
 }
 
 int has_sf(int hand[5])
 {
    if (hand[0] == 0)
-      return FALSE;
+      return false;
    if (has_flush(hand))
       return has_straight(hand);
 
-   return FALSE;
+   return false;
 }
 
 int has_4kind(int hand[5])
@@ -1659,7 +1659,7 @@ int has_4kind(int hand[5])
    if (findcard(hand, val(hand[1]), 0, 4))
       return val(hand[1]);
    // one of the first two cards has to be part of the 4kind
-   return FALSE;
+   return false;
 }
 
 int has_fhouse(int hand[5])
@@ -1675,7 +1675,7 @@ int has_fhouse(int hand[5])
        (findcard(hand, card1, 0, 2) &&
         findcard(hand, val(hand[i]), 0, 3)))
       return highcard(hand) * 1000 + lowcard(hand); // works
-   return FALSE;
+   return false;
 }
 
 int has_3kind(int hand[5])
@@ -1686,7 +1686,7 @@ int has_3kind(int hand[5])
       return val(hand[1]);
    if (findcard(hand, val(hand[2]), 0, 3))
       return val(hand[2]);
-   return FALSE;
+   return false;
 }
 
 int has_2pair(int hand[5])
@@ -1700,7 +1700,7 @@ int has_2pair(int hand[5])
          else
             first = hand[i];
       }
-   return FALSE;
+   return false;
 }
 
 int has_pair(int hand[5])
@@ -1713,7 +1713,7 @@ int has_pair(int hand[5])
       return val(hand[0]);
    if (findcard(hand, val(hand[3]), 0, 2))
       return val(hand[0]);
-   return FALSE;
+   return false;
 }
 
 char *cardname(int card)
@@ -1919,13 +1919,13 @@ struct tplayer *createTplayer(struct ttable *ttbl)
    tplr = (struct tplayer *)dc_alloc(1, sizeof(struct tplayer));
 #endif
    ttbl->player[seat] = tplr;
-   tplr->nw = TRUE;
+   tplr->nw = true;
    tplr->table = ttbl;
    for (int i = 0; i < 2; i++)
       tplr->hand[i] = 0;
    tplr->chips = 0;
    tplr->pos = -1;
-   tplr->dealer = FALSE;
+   tplr->dealer = false;
    tplr->options = 0;
    return tplr;
 }
@@ -2129,20 +2129,20 @@ void create_slot(obj_data *obj)
    slot->lastwin = 0;
    slot->bet = 1;
    if (obj->obj_flags.value[2])
-      slot->gold = FALSE;
+      slot->gold = false;
    else
-      slot->gold = TRUE;
-   slot->busy = FALSE;
-   slot->button = FALSE;
+      slot->gold = true;
+   slot->busy = false;
+   slot->button = false;
    obj->slot = slot;
 }
 
 bool verify_slot(struct machine_data *machine)
 {
    if (machine->ch->in_room == machine->obj->in_room)
-      return TRUE;
+      return true;
 
-   return FALSE;
+   return false;
 }
 
 void update_linked_slots(struct machine_data *machine)
@@ -2313,14 +2313,14 @@ void reel_spin(void *arg1, void *arg2, void *arg3)
             GET_PLATINUM(machine->ch) += machine->lastwin;
          send_to_char(buf, machine->ch);
          send_to_char("A tiny panel flips open on the slot machine, revealing red and black buttons.\r\n", machine->ch);
-         machine->button = TRUE;
+         machine->button = true;
          machine->prch = machine->ch;
       }
-      machine->busy = FALSE;
+      machine->busy = false;
    }
    else
    { // something bad happened
-      machine->busy = FALSE;
+      machine->busy = false;
    }
 
    save_slot_machines();
@@ -2367,7 +2367,7 @@ int slot_machine(char_data *ch, obj_data *obj, int cmd, const char *arg, char_da
          if (obj->slot->button)
          {
             send_to_char("The panel closes quietly.\r\n", ch);
-            obj->slot->button = FALSE;
+            obj->slot->button = false;
          }
          if (obj->slot->bet == 1)
             send_to_char("You place only the minimum bet into the slot machine now.\r\n", ch);
@@ -2398,7 +2398,7 @@ int slot_machine(char_data *ch, obj_data *obj, int cmd, const char *arg, char_da
                      GET_GOLD(ch) += obj->slot->lastwin;
                   else
                      GET_PLATINUM(ch) += obj->slot->lastwin;
-                  obj->slot->button = FALSE;
+                  obj->slot->button = false;
                }
                else
                {
@@ -2407,7 +2407,7 @@ int slot_machine(char_data *ch, obj_data *obj, int cmd, const char *arg, char_da
                      GET_GOLD(ch) -= obj->slot->lastwin;
                   else
                      GET_PLATINUM(ch) -= obj->slot->lastwin;
-                  obj->slot->button = FALSE;
+                  obj->slot->button = false;
                }
             }
             else
@@ -2431,13 +2431,13 @@ int slot_machine(char_data *ch, obj_data *obj, int cmd, const char *arg, char_da
       obj->slot->bet = 1;
    if (obj->slot->button)
       send_to_char("The panel closes quietly.\r\n", ch);
-   obj->slot->button = FALSE;
+   obj->slot->button = false;
 
    if (obj->slot->gold)
       GET_GOLD(ch) -= obj->slot->cost * obj->slot->bet;
    else
       GET_PLATINUM(ch) -= obj->slot->cost * obj->slot->bet;
-   obj->slot->busy = TRUE;
+   obj->slot->busy = true;
    sprintf(buf, "You place %d %s into the slot and set the reels spinning!\n\r", obj->slot->cost * obj->slot->bet, obj->slot->gold ? "coins" : "plats");
    send_to_char(buf, ch);
    act("$n reaches for the handle and pulls down.", ch, 0, 0, TO_ROOM, 0);
@@ -2495,14 +2495,14 @@ void create_wheel(obj_data *obj)
          wheel->plr[i]->bet_array[j] = 0;
    }
    wheel->countdown = 11;
-   wheel->spinning = FALSE;
+   wheel->spinning = false;
    obj->wheel = wheel;
 }
 
 void send_wheel_bets(char_data *ch, struct wheel_data *wheel)
 {
    int i, j;
-   bool found = FALSE;
+   bool found = false;
    char *bet_name[] = {
        "$B$0BLACK$R", "$4$BRED$R", "$BEVEN$R", "$BODD$R", "$B1-12$R", "$B13-24$R", "$B25-36$R", "$B1-9$R", "$B10-18$R",
        "$B19-27$R", "$B28-36$R"};
@@ -2518,7 +2518,7 @@ void send_wheel_bets(char_data *ch, struct wheel_data *wheel)
                if (!found)
                {
                   send_to_char("You have", ch);
-                  found = TRUE;
+                  found = true;
                }
                else
                   send_to_char(" and", ch);
@@ -2532,7 +2532,7 @@ void send_wheel_bets(char_data *ch, struct wheel_data *wheel)
                if (!found)
                {
                   send_to_char("You have", ch);
-                  found = TRUE;
+                  found = true;
                }
                else
                   send_to_char(" and", ch);
@@ -2699,7 +2699,7 @@ void wheel_stop(struct wheel_data *wheel)
          wheel->plr[i]->bet_array[j] = 0;
       wheel->plr[i]->ch = NULL;
    }
-   wheel->spinning = FALSE;
+   wheel->spinning = false;
    wheel->countdown = 11;
 }
 
@@ -2729,7 +2729,7 @@ void pulse_countdown(void *arg1, void *arg2, void *arg3)
 
    if (wheel->countdown <= 0 && !spin)
    {
-      wheel->spinning = TRUE;
+      wheel->spinning = true;
       send_to_room("The croupier places the ball on the wheel and spins both objects....\r\n", wheel->obj->in_room);
       wheel->countdown = 2;
       roulette_timer(wheel, 1);
@@ -2761,7 +2761,7 @@ int roulette_table(char_data *ch, struct obj_data *obj, int cmd, const char *arg
    char arg1[MAX_INPUT_LENGTH], arg2[MAX_STRING_LENGTH], buf[MAX_STRING_LENGTH];
    uint32_t bet = 0;
    int i = 0;
-   bool playing = FALSE;
+   bool playing = false;
    arg = one_argument(arg, arg1);
    arg = one_argument(arg, arg2);
    if (cmd != 189)
@@ -2790,7 +2790,7 @@ int roulette_table(char_data *ch, struct obj_data *obj, int cmd, const char *arg
    {
       if (obj->wheel->plr[i]->ch == ch)
       {
-         playing = TRUE;
+         playing = true;
          break;
       }
    }

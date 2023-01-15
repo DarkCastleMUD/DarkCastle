@@ -99,7 +99,7 @@ int do_force(char_data *ch, string argument, int cmd = CMD_FORCE)
       }
       else
       {
-        if (ch->pcdata->stealth == FALSE)
+        if (ch->pcdata->stealth == false)
         {
           buf = format("$n has forced you to '{}'.", to_force);
           act(buf, ch, 0, vict, TO_VICT, 0);
@@ -130,7 +130,7 @@ int do_force(char_data *ch, string argument, int cmd = CMD_FORCE)
           continue;
         else
         {
-          if (ch->pcdata->stealth == FALSE || GET_LEVEL(ch) < 109)
+          if (ch->pcdata->stealth == false || GET_LEVEL(ch) < 109)
           {
             buf = format("$n has forced you to '{}'.", to_force);
             act(buf, ch, 0, vict, TO_VICT, 0);

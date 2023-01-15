@@ -745,7 +745,7 @@ void load_vaults(void)
   int vnum = 0, full = 0, count = 0;
   uint64_t gold = 0;
   char value[128] = {}, line[128] = {}, buf[MAX_STRING_LENGTH] = {}, fname[MAX_INPUT_LENGTH] = {}, type[128] = {}, tmp[10] = {};
-  bool saveChanges = FALSE;
+  bool saveChanges = false;
   char src_filename[256] = {};
 
   if (!(index = fopen(VAULT_INDEX_FILE, "r")))
@@ -777,7 +777,7 @@ void load_vaults(void)
   fscanf(index, "%s\n", line);
   while (*line != '$')
   {
-    saveChanges = FALSE;
+    saveChanges = false;
 
     *line = UPPER(*line);
     sprintf(fname, "../vaults/%c/%s.vault", UPPER(*line), line);
@@ -832,7 +832,7 @@ void load_vaults(void)
               sscanf(oldtype, "%s %d", tmp, &vnum);
               vault->size = vnum;
               logf(IMMORTAL, LogChannels::LOG_BUG, "boot_vaults: Setting %s's vault size to %d.", vault->owner, vault->size);
-              saveChanges = TRUE;
+              saveChanges = true;
           }
 
           fclose(oldfl);
@@ -868,7 +868,7 @@ void load_vaults(void)
         {
           char tmp[MAX_INPUT_LENGTH];
           get_line(fl, tmp);
-          obj = read_object(real_object(vnum), fl, TRUE);
+          obj = read_object(real_object(vnum), fl, true);
           items->obj = obj;
         }
 
@@ -886,7 +886,7 @@ void load_vaults(void)
           sprintf(buf, "boot_vaults: bad item vnum (#%d) in vault: %s", vnum,
                   vault->owner);
           logentry(buf, IMMORTAL, LogChannels::LOG_BUG);
-          saveChanges = TRUE;
+          saveChanges = true;
         }
         else
         {
@@ -1245,7 +1245,7 @@ void vault_get(char_data *ch, char *object, char *owner)
 
   if (!strcmp(object, "all"))
   {
-    bool ioverload = FALSE;
+    bool ioverload = false;
     for (items = vault->items, i = 0; items; items = items->next)
     {
       obj = items->obj ? items->obj : get_obj(items->item_vnum);
@@ -1258,12 +1258,12 @@ void vault_get(char_data *ch, char *object, char *owner)
         if (i > 49)
         {
           send_to_char("You can only take out 50 items at a time.\r\n", ch);
-          ioverload = TRUE;
+          ioverload = true;
           break;
         }
         if (IS_CARRYING_N(ch) + i > CAN_CARRY_N(ch))
         {
-          ioverload = TRUE;
+          ioverload = true;
           break;
         }
       }

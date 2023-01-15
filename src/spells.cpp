@@ -1074,10 +1074,10 @@ bool many_charms(char_data *ch)
   for (k = ch->followers; k; k = k->next)
   {
     if (IS_AFFECTED(k->follower, AFF_CHARM))
-      return TRUE;
+      return true;
   }
 
-  return FALSE;
+  return false;
 }
 /* Stop the familiar without a master floods*/
 void extractFamiliar(char_data *ch)
@@ -1094,7 +1094,7 @@ void extractFamiliar(char_data *ch)
     return;
 
   act("$n disappears in a flash of flame and shadow.", victim, 0, 0, TO_ROOM, 0);
-  extract_char(victim, TRUE);
+  extract_char(victim, true);
 }
 
 bool any_charms(char_data *ch)
@@ -1110,9 +1110,9 @@ bool any_charms(char_data *ch)
     }
 
     if(counter > 1)
-      return TRUE;
+      return true;
     else
-      return FALSE;
+      return false;
   */
 }
 
@@ -1125,10 +1125,10 @@ bool circle_follow(char_data *ch, char_data *victim)
   for (k = victim; k; k = k->master)
   {
     if (k == ch)
-      return (TRUE);
+      return (true);
   }
 
-  return (FALSE);
+  return (false);
 }
 
 // Called when stop following persons, or stopping charm
@@ -1145,7 +1145,7 @@ void stop_follower(char_data *ch, int cmd)
   /*
     if(ISSET(ch->affected_by, AFF_FAMILIAR)) {
       do_emote(ch, "screams in pain as its connection with its master is broken.", CMD_DEFAULT);
-      extract_char(ch, TRUE);
+      extract_char(ch, true);
       return;
     }
   */
@@ -1259,7 +1259,7 @@ void die_follower(char_data *ch)
           TO_ROOM, 0);
 
       make_dust(zombie);
-      extract_char(zombie, TRUE);
+      extract_char(zombie, true);
     }
   }
 }
@@ -1462,7 +1462,7 @@ int saves_spell(char_data *ch, char_data *vict, int spell_base, int16_t save_typ
     // ISR Magic has to affect saving throws as well as damage so they don't get
     // para'd or slept or something
     if (IS_SET(vict->immune, ISR_MAGIC))
-      return (TRUE);
+      return (true);
     if (IS_SET(vict->suscept, ISR_MAGIC))
       save *= 0.7;
     if (IS_SET(vict->resist, ISR_MAGIC))
@@ -1494,9 +1494,9 @@ char *skip_spaces(char *string)
 int do_release(char_data *ch, char *argument, int cmd)
 {
   struct affected_type *aff, *aff_next;
-  bool printed = FALSE;
+  bool printed = false;
   argument = skip_spaces(argument);
-  bool done = FALSE;
+  bool done = false;
   int learned = has_skill(ch, SKILL_RELEASE);
 
   if (!learned)
@@ -1518,7 +1518,7 @@ int do_release(char_data *ch, char *argument, int cmd)
       if (!printed)
       {
         send_to_char("You can release the following spells:\r\n", ch);
-        printed = TRUE;
+        printed = true;
       }
       if (((spell_info[aff->type].targets & TAR_SELF_DEFAULT) ||
            aff->type == SPELL_HOLY_AURA) &&
@@ -1586,7 +1586,7 @@ int do_release(char_data *ch, char *argument, int cmd)
       snprintf(buffer, 255, "$n concentrates for a moment and releases their %s.", get_skill_name(aftype));
       act(buffer, ch, 0, 0, TO_ROOM, INVIS_NULL);
 
-      done = TRUE;
+      done = true;
     }
   }
   if (!done)
@@ -1728,7 +1728,7 @@ bool skill_success(char_data *ch, char_data *victim, int skillnum, int mod)
       send_to_char("got here", ch);
     }
     else if (!learned)
-      return FALSE;
+      return false;
   }
   else
   {
@@ -1775,14 +1775,14 @@ bool skill_success(char_data *ch, char_data *victim, int skillnum, int mod)
   {
     if (skillnum != SKILL_ENHANCED_REGEN || (skillnum == SKILL_ENHANCED_REGEN && ch->getHP() + 50 < GET_MAX_HIT(ch) && (GET_POS(ch) == POSITION_RESTING || GET_POS(ch) == POSITION_SLEEPING)))
       skill_increase_check(ch, skillnum, learned, a + 500);
-    return TRUE; // Success
+    return true; // Success
   }
   else
   {
     /* Check for skill improvement anyway */
     if (skillnum != SKILL_ENHANCED_REGEN || (skillnum == SKILL_ENHANCED_REGEN && ch->getHP() + 50 < GET_MAX_HIT(ch) && (GET_POS(ch) == POSITION_RESTING || GET_POS(ch) == POSITION_SLEEPING)))
       skill_increase_check(ch, skillnum, learned, a);
-    return FALSE; // Failure
+    return false; // Failure
   }
 }
 
@@ -1985,13 +1985,13 @@ int do_cast(char_data *ch, char *argument, int cmd)
 
       /* **************** Locate targets **************** */
 
-      target_ok = FALSE;
+      target_ok = false;
       tar_char = 0;
       tar_obj = 0;
-      bool ok_self = FALSE;
+      bool ok_self = false;
       int oldroom = 0;
       int dir = -1;
-      bool group_spell = FALSE;
+      bool group_spell = false;
       if (spl == SPELL_LIGHTNING_BOLT && has_skill(ch, SKILL_SPELLCRAFT) && cmd != CMD_FILTER)
       { // Oh the special cases of spellcraft.
 
@@ -2072,9 +2072,9 @@ int do_cast(char_data *ch, char *argument, int cmd)
             char_to_room(ch, oldroom);
             tar_char = ch;
             send_to_char("Your spell bounces off the fortress' enchantments, and the lightning bolt comes flying back towards you!\r\n", ch);
-            ok_self = TRUE;
+            ok_self = true;
           }
-          target_ok = TRUE;
+          target_ok = true;
 
           // Reduce timer on paralyze even the victim is hit by a lightning bolt
           affected_type *af;
@@ -2098,9 +2098,9 @@ int do_cast(char_data *ch, char *argument, int cmd)
         {
           if (!strcmp(spells[i], argument))
           {
-            ok_self = TRUE;
+            ok_self = true;
             tar_char = ch;
-            target_ok = TRUE;
+            target_ok = true;
             argument = (char *)i;
             break;
           }
@@ -2203,14 +2203,14 @@ int do_cast(char_data *ch, char *argument, int cmd)
           if (IS_SET(spell_info[spl].targets, TAR_CHAR_ROOM))
           {
             if ((tar_char = get_char_room_vis(ch, name)) != NULL)
-              target_ok = TRUE;
+              target_ok = true;
             if (!str_cmp(name, "group") && has_skill(ch, SKILL_COMMUNE))
             {
               if ((has_skill(ch, SKILL_COMMUNE) >= 90 && (spl == SPELL_PROTECT_FROM_EVIL || spl == SPELL_RESIST_MAGIC || spl == SPELL_PROTECT_FROM_GOOD)) || (has_skill(ch, SKILL_COMMUNE) >= 70 && (spl == SPELL_CURE_CRITIC || spl == SPELL_SANCTUARY || spl == SPELL_REMOVE_POISON || spl == SPELL_REMOVE_BLIND || spl == SPELL_IRIDESCENT_AURA)) || (has_skill(ch, SKILL_COMMUNE) >= 40 && (spl == SPELL_ARMOR || spl == SPELL_REFRESH || spl == SPELL_REMOVE_PARALYSIS || spl == SPELL_CURE_SERIOUS || spl == SPELL_BLESS || spl == SPELL_FLY)) || (spl == SPELL_DETECT_INVISIBLE || spl == SPELL_DETECT_MAGIC || spl == SPELL_DETECT_POISON || spl == SPELL_SENSE_LIFE || spl == SPELL_CURE_LIGHT))
               {
                 skill_increase_check(ch, SKILL_COMMUNE, has_skill(ch, SKILL_COMMUNE), SKILL_INCREASE_HARD);
-                target_ok = TRUE;
-                group_spell = TRUE;
+                target_ok = true;
+                group_spell = true;
                 tar_char = ch;
               }
               else
@@ -2223,29 +2223,29 @@ int do_cast(char_data *ch, char *argument, int cmd)
 
           if (!target_ok && IS_SET(spell_info[spl].targets, TAR_CHAR_WORLD))
           {
-            bool orig = ISSET(ch->affected_by, AFF_TRUE_SIGHT);
+            bool orig = ISSET(ch->affected_by, AFF_true_SIGHT);
             if (spl == SPELL_EAGLE_EYE)
-              SETBIT(ch->affected_by, AFF_TRUE_SIGHT);
+              SETBIT(ch->affected_by, AFF_true_SIGHT);
             if ((tar_char = get_char_vis(ch, name)) != NULL)
-              target_ok = TRUE;
+              target_ok = true;
             if (!orig)
-              REMBIT(ch->affected_by, AFF_TRUE_SIGHT);
+              REMBIT(ch->affected_by, AFF_true_SIGHT);
           }
           if (!target_ok && IS_SET(spell_info[spl].targets, TAR_OBJ_INV))
             if ((tar_obj = get_obj_in_list_vis(ch, name, ch->carrying)) != NULL)
-              target_ok = TRUE;
+              target_ok = true;
 
           if (!target_ok && IS_SET(spell_info[spl].targets, TAR_OBJ_ROOM))
           {
             tar_obj = get_obj_in_list_vis(ch, name, world[ch->in_room].contents);
             if (tar_obj != NULL)
-              target_ok = TRUE;
+              target_ok = true;
           }
 
           if (!target_ok && IS_SET(spell_info[spl].targets, TAR_OBJ_WORLD))
-            if ((tar_obj = get_obj_vis(ch, name, TRUE)) != NULL)
+            if ((tar_obj = get_obj_vis(ch, name, true)) != NULL)
               /* && !(IS_SET(tar_obj->obj_flags.more_flags, ITEM_NOLOCATE)))*/
-              target_ok = TRUE;
+              target_ok = true;
 
           if (!target_ok && IS_SET(spell_info[spl].targets, TAR_OBJ_EQUIP))
           {
@@ -2253,7 +2253,7 @@ int do_cast(char_data *ch, char *argument, int cmd)
               if (ch->equipment[i] && str_cmp(name, ch->equipment[i]->name) == 0)
               {
                 tar_obj = ch->equipment[i];
-                target_ok = TRUE;
+                target_ok = true;
               }
           }
 
@@ -2261,7 +2261,7 @@ int do_cast(char_data *ch, char *argument, int cmd)
             if (str_cmp(GET_NAME(ch), name) == 0)
             {
               tar_char = ch;
-              target_ok = TRUE;
+              target_ok = true;
             }
         }
         else
@@ -2271,7 +2271,7 @@ int do_cast(char_data *ch, char *argument, int cmd)
             if ((ch->fighting) && ((ch->fighting)->in_room == ch->in_room))
             {
               tar_char = ch;
-              target_ok = TRUE;
+              target_ok = true;
             }
 
           if (!target_ok && IS_SET(spell_info[spl].targets, TAR_FIGHT_VICT))
@@ -2279,25 +2279,25 @@ int do_cast(char_data *ch, char *argument, int cmd)
             // added the in_room checks -pir2/23/01
             {
               tar_char = ch->fighting;
-              target_ok = TRUE;
+              target_ok = true;
             }
 
           if (!target_ok && (IS_SET(spell_info[spl].targets, TAR_SELF_ONLY) ||
                              IS_SET(spell_info[spl].targets, TAR_SELF_DEFAULT)))
           {
             tar_char = ch;
-            target_ok = TRUE;
+            target_ok = true;
           }
 
           if (!target_ok && IS_SET(spell_info[spl].targets, TAR_NONE_OK))
           {
-            target_ok = TRUE;
+            target_ok = true;
           }
         }
       }
       else
       {                   // tar_ignore is true
-        target_ok = TRUE; /* No target, is a good target */
+        target_ok = true; /* No target, is a good target */
       }
 
       if (!target_ok)

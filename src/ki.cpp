@@ -199,7 +199,7 @@ int do_ki(char_data *ch, char *argument, int cmd)
       ; /* skip spaces */
 
     /* Locate targets */
-    target_ok = FALSE;
+    target_ok = false;
 
     if (!IS_SET(ki_info[spl].targets, TAR_IGNORE))
     {
@@ -208,13 +208,13 @@ int do_ki(char_data *ch, char *argument, int cmd)
       {
         if (IS_SET(ki_info[spl].targets, TAR_CHAR_ROOM))
           if ((tar_char = get_char_room_vis(ch, name)) != NULL)
-            target_ok = TRUE;
+            target_ok = true;
 
         if (!target_ok && IS_SET(ki_info[spl].targets, TAR_SELF_ONLY))
           if (str_cmp(GET_NAME(ch), name) == 0)
           {
             tar_char = ch;
-            target_ok = TRUE;
+            target_ok = true;
           } // of !target_ok
       }     // of *name
 
@@ -226,23 +226,23 @@ int do_ki(char_data *ch, char *argument, int cmd)
             if ((ch->fighting)->in_room == ch->in_room)
             {
               tar_char = ch->fighting;
-              target_ok = TRUE;
+              target_ok = true;
             }
         if (!target_ok && IS_SET(ki_info[spl].targets, TAR_SELF_ONLY))
         {
           tar_char = ch;
-          target_ok = TRUE;
+          target_ok = true;
         }
       } // of !*name
 
       else
-        target_ok = FALSE;
+        target_ok = false;
     }
 
     if (IS_SET(ki_info[spl].targets, TAR_IGNORE))
-      target_ok = TRUE;
+      target_ok = true;
 
-    if (target_ok != TRUE)
+    if (target_ok != true)
     {
       if (*name)
         send_to_char("Nobody here by that name.\r\n", ch);

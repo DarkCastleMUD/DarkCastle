@@ -27,8 +27,8 @@ extern struct spell_info_type spell_info[MAX_SPL_LIST];
 int spellcraft(char_data *ch, int spell)
 {
   int a = has_skill(ch, SKILL_SPELLCRAFT);
-  if (!a) return FALSE;
-  if (has_skill(ch, spell) < 71) return FALSE;
+  if (!a) return false;
+  if (has_skill(ch, spell) < 71) return false;
   if (spell == SPELL_MAGIC_MISSILE)
   {
     if (a < 11) skill_increase_check(ch, SKILL_SPELLCRAFT, a, SKILL_INCREASE_HARD);
@@ -80,7 +80,7 @@ int spellcraft(char_data *ch, int spell)
     return eSUCCESS;
   }
 
-  return FALSE;
+  return false;
 }
 
 int do_focused_repelance(char_data *ch, char *argument, int cmd)

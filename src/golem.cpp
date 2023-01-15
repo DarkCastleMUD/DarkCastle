@@ -112,14 +112,14 @@ int verify_existing_components(char_data *ch, int golemtype)
   {
     if (golem_list[golemtype].components[i] == 0)
       continue;
-    bool found = FALSE;
+    bool found = false;
     for (curr = ch->carrying; curr; curr = next_content)
     {
       next_content = curr->next_content;
       int vnum = obj_index[curr->item_number].virt;
       if (vnum == golem_list[golemtype].components[i])
       {
-        found = TRUE;
+        found = true;
         if (i == 4)
           SET_BIT(retval, eEXTRA_VALUE); // Special effect.
       }
@@ -560,7 +560,7 @@ int spell_release_golem(uint8_t level, char_data *ch, char *arg, int type, char_
     if (IS_NPC(fol->follower) && mob_index[fol->follower->mobdata->nr].virt == 8)
     {
       release_message(fol->follower);
-      extract_char(fol->follower, FALSE);
+      extract_char(fol->follower, false);
       return eSUCCESS;
     }
   send_to_char("You don't have a golem.\r\n", ch);

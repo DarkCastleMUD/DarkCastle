@@ -102,17 +102,17 @@ int do_incognito(char_data *ch, char *argument, int cmd)
 	if (IS_MOB(ch))
 		return eFAILURE;
 
-	if (ch->pcdata->incognito == TRUE)
+	if (ch->pcdata->incognito == true)
 	{
 		send_to_char("Incognito off.\r\n", ch);
-		ch->pcdata->incognito = FALSE;
+		ch->pcdata->incognito = false;
 	}
 	else
 	{
 		send_to_char("Incognito on.  Even while invis, anyone in your room can "
 					 "see you.\r\n",
 					 ch);
-		ch->pcdata->incognito = TRUE;
+		ch->pcdata->incognito = true;
 	}
 	return eSUCCESS;
 }
@@ -364,7 +364,7 @@ int do_purge(char_data *ch, char *argument, int cmd)
 				vict->desc = NULL;
 			}
 
-			extract_char(vict, TRUE);
+			extract_char(vict, true);
 		}
 		else if ((obj = get_obj_in_list_vis(ch, name,
 											world[ch->in_room].contents)) != NULL)
@@ -397,7 +397,7 @@ int do_purge(char_data *ch, char *argument, int cmd)
 		{
 			next_v = vict->next_in_room;
 			if (IS_NPC(vict))
-				extract_char(vict, TRUE);
+				extract_char(vict, true);
 		}
 
 		for (obj = world[ch->in_room].contents; obj; obj = next_o)
@@ -1180,19 +1180,19 @@ int do_show(char_data *ch, char *argument, int cmd)
 			if (arg1[0] == '\0')
 				break;
 			int i;
-			bool found = FALSE;
+			bool found = false;
 			for (i = 0; room_bits[i][0] != '\n'; i++)
 				if (!str_cmp(arg1, room_bits[i]))
 				{
 					SET_BIT(bits, 1 << i);
-					found = TRUE;
+					found = true;
 					break;
 				}
 			for (i = 0; sector_types[i][0] != '\n'; i++)
 				if (!str_cmp(arg1, sector_types[i]))
 				{
 					sector = i - 1;
-					found = TRUE;
+					found = true;
 					break;
 				}
 
@@ -1238,13 +1238,13 @@ int do_show(char_data *ch, char *argument, int cmd)
 			align = 0;
 		// int its;
 		//    if (
-		bool fo = FALSE;
+		bool fo = false;
 		while ((argument = one_argument(argument, arg1)))
 		{
 			int i;
 			if (strlen(arg1) < 2)
 				break;
-			fo = TRUE;
+			fo = true;
 			for (i = 0; *pc_clss_types2[i] != '\n'; i++)
 				if (!str_cmp(pc_clss_types2[i], arg1))
 				{
@@ -1439,7 +1439,7 @@ int do_show(char_data *ch, char *argument, int cmd)
 		int affect = 0, size = 0, extra = 0, more = 0, wear = 0, type = 0;
 		int levlow = -555, levhigh = -555, dam = 0, lweight = -555, hweight = -555;
 		int any = 0;
-		bool fo = FALSE;
+		bool fo = false;
 		int item_type = 0;
 		int its = 0;
 		int spellnum = -1;
@@ -1448,7 +1448,7 @@ int do_show(char_data *ch, char *argument, int cmd)
 			int i;
 			if (strlen(arg1) < 2)
 				break;
-			fo = TRUE;
+			fo = true;
 
 			if (!str_nosp_cmp("wand", arg1))
 			{
@@ -1570,7 +1570,7 @@ int do_show(char_data *ch, char *argument, int cmd)
 		}
 		int c, nr, aff;
 		//     csendf(ch,"%d %d %d %d %d", more, extra, wear, size, affect);
-		bool found = FALSE;
+		bool found = false;
 		int o = 0, z;
 		if (!fo)
 		{
@@ -1655,7 +1655,7 @@ int do_show(char_data *ch, char *argument, int cmd)
 
 		for (c = 0; c < obj_index[top_of_objt].virt; c++)
 		{
-			found = FALSE;
+			found = false;
 			if ((nr = real_object(c)) < 0)
 				continue;
 			if (wear)
@@ -1715,29 +1715,29 @@ int do_show(char_data *ch, char *argument, int cmd)
 								1 << i))
 							goto endLoop;
 			//      int aff,total = 0;
-			//    bool found = FALSE;
+			//    bool found = false;
 			if (!item_type)
 				for (aff = 0;
 					 aff < ((struct obj_data *)(obj_index[nr].item))->num_affects;
 					 aff++)
 					if (affect == ((struct obj_data *)(obj_index[nr].item))->affected[aff].location)
-						found = TRUE;
+						found = true;
 			if (affect && !item_type)
 				if (!found)
 					continue;
 
 			if (item_type)
 			{
-				bool spell_found = FALSE;
+				bool spell_found = false;
 				if (((struct obj_data *)(obj_index[nr].item))->obj_flags.type_flag != item_type)
 					continue;
 				if (item_type == ITEM_POTION || item_type == ITEM_SCROLL)
 					for (i = 1; i < 4; i++)
 						if (((struct obj_data *)(obj_index[nr].item))->obj_flags.value[i] == spellnum)
-							spell_found = TRUE;
+							spell_found = true;
 				if (item_type == ITEM_STAFF || item_type == ITEM_WAND)
 					if (((struct obj_data *)(obj_index[nr].item))->obj_flags.value[3] == spellnum)
-						spell_found = TRUE;
+						spell_found = true;
 
 				if (!spell_found)
 					continue;
@@ -2550,7 +2550,7 @@ int do_mclone(char_data *ch, char *argument, int cmd)
 			if (!tmpch->mobdata)
 				continue;
 			if (old_mob->mobdata->nr == tmpch->mobdata->nr)
-				extract_char(tmpch, TRUE);
+				extract_char(tmpch, true);
 		}
 	}
 

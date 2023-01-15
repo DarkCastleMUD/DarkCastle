@@ -80,7 +80,7 @@ void extract_obj(struct obj_data *obj);
 
 /* ******* characters ********* */
 
-char_data *get_char_room(char *name, int room, bool careful = FALSE);
+char_data *get_char_room(char *name, int room, bool careful = false);
 char_data *get_char_num(int nr);
 char_data *get_char(string name);
 char_data *get_mob(char *name);
@@ -108,9 +108,9 @@ char_data *get_mob_room_vis(char_data *ch, char *name);
 char_data *get_mob_vnum(int vnum);
 obj_data *get_obj_vnum(int vnum);
 struct obj_data *get_obj_in_list_vis(char_data *ch, const char *name, 
-		struct obj_data *list, bool bf = FALSE);
+		struct obj_data *list, bool bf = false);
 struct obj_data *get_obj_in_list_vis(char_data *ch, int item_num, 
-		struct obj_data *list, bool bf = FALSE);
+		struct obj_data *list, bool bf = false);
 struct obj_data *get_obj_vis(char_data *ch, const char *name, bool loc = false);
 struct obj_data *get_obj_vis(char_data *ch, string name, bool loc = false);
 

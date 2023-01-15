@@ -35,7 +35,7 @@ extern struct vault_data *vault_table;
 extern Leaderboard leaderboard;
 
 CVoteData *DCVote;
-bool verbose_mode = FALSE;
+bool verbose_mode = false;
 
 void test_handle_ansi(string test)
 {

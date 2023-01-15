@@ -41,7 +41,7 @@ extern struct index_data *obj_index;
 extern CVoteData *DCVote;
 
 // decay variable means it's from a decaying corpse, not a player
-void log_sacrifice(char_data *ch, obj_data *obj, bool decay = FALSE)
+void log_sacrifice(char_data *ch, obj_data *obj, bool decay = false)
 {
 
   if (GET_OBJ_RNUM(obj) == NOWHERE)

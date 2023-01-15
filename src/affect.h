@@ -27,7 +27,7 @@
 #define AFF_DETECT_GOOD         16
 #define AFF_FIRESHIELD          17
 #define AFF_SLEEP               18
-#define AFF_TRUE_SIGHT          19
+#define AFF_true_SIGHT          19
 #define AFF_SNEAK               20
 #define AFF_HIDE                21
 #define AFF_IGNORE_WEAPON_WEIGHT 22
