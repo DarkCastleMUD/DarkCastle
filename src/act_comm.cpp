@@ -143,7 +143,7 @@ int send_to_gods(QString message, int god_level, LogChannels type)
 
   if (message.isEmpty())
   {
-    logentry("NULL STRING sent to send_to_gods!", OVERSEER, LogChannels::LOG_BUG);
+    logentry("nullptr STRING sent to send_to_gods!", OVERSEER, LogChannels::LOG_BUG);
     return (0);
   }
 
@@ -215,7 +215,7 @@ int send_to_gods(QString message, int god_level, LogChannels type)
 
   for (i = descriptor_list; i; i = i->next)
   {
-    if ((i->character == NULL) || (GET_LEVEL(i->character) <= MORTAL))
+    if ((i->character == nullptr) || (GET_LEVEL(i->character) <= MORTAL))
       continue;
     if (!(IS_SET(i->character->misc, type)))
       continue;

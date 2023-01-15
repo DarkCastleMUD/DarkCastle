@@ -230,7 +230,7 @@ int main(int argc, char **argv)
     dclib = string(getenv("DCLIB"));
     if (!dclib.empty())
     {
-      orig_cwd = getcwd(NULL, 0);
+      orig_cwd = getcwd(nullptr, 0);
       chdir(dclib.c_str());
     }
   }

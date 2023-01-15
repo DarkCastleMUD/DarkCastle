@@ -276,7 +276,7 @@ struct help_index_element_new *find_help(char *keyword)
   int i;
 
   if (!strcmp(keyword, "NONE"))
-    return NULL;
+    return nullptr;
 
   for (i = 0; i < (int)strlen(keyword); i++)
     keyword[i] = UPPER(keyword[i]);
@@ -289,7 +289,7 @@ struct help_index_element_new *find_help(char *keyword)
         !strcmp(keyword, new_help_table[i].keyword5))
       return (new_help_table + i);
 
-  return NULL;
+  return nullptr;
 }
 
 #define ENTRY_MAX 32384
@@ -866,7 +866,7 @@ int do_hedit(char_data *ch, char *argument, int cmd)
     }
     else if (is_abbrev(field, "entry"))
     { // changing the actual help entry
-      ch->desc->backstr = NULL;
+      ch->desc->backstr = nullptr;
       send_to_char("        Write your help entry and stay within the line.  (/s saves /h for help)\r\n"
                    "   |--------------------------------------------------------------------------------|\r\n",
                    ch);
@@ -915,7 +915,7 @@ void save_help(char_data *ch)
 
   sprintf(file, "%s", NEW_HELP_FILE);
 
-  if ((f = fopen(file, "w")) == NULL)
+  if ((f = fopen(file, "w")) == nullptr)
   {
     send_to_char("Couldn't open help file for saving.\r\n", ch);
     perror("Couldn't open help file for saving.\r\n");
@@ -949,7 +949,7 @@ void save_help(char_data *ch)
 
   sprintf(file, "%s", WEB_HELP_FILE);
 
-  if ((f = fopen(file, "w")) == NULL)
+  if ((f = fopen(file, "w")) == nullptr)
   {
     send_to_char("Couldn't open web help file for saving.\r\n", ch);
     perror("Couldn't open web help file for saving.\r\n");

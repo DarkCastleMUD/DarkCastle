@@ -188,7 +188,7 @@ void shopping_buy(const char *arg, char_data *ch,
     return;
   }
 
-  if ((obj = get_obj_in_list_vis(ch, argm, keeper->carrying)) == NULL)
+  if ((obj = get_obj_in_list_vis(ch, argm, keeper->carrying)) == nullptr)
   {
     sprintf(buf, shop_index[shop_nr].no_such_item1, GET_NAME(ch));
     do_tell(keeper, buf, 0);
@@ -301,7 +301,7 @@ void shopping_sell(const char *arg, char_data *ch,
     return;
   }
 
-  if ((obj = get_obj_in_list_vis(ch, argm, ch->carrying)) == NULL)
+  if ((obj = get_obj_in_list_vis(ch, argm, ch->carrying)) == nullptr)
   {
     sprintf(buf, shop_index[shop_nr].no_such_item2, GET_NAME(ch));
     do_tell(keeper, buf, 0);
@@ -409,9 +409,9 @@ void shopping_value(const char *arg, char_data *ch,
     return;
   }
 
-  if ((obj = get_obj_in_list_vis(ch, argm, ch->carrying)) == NULL)
+  if ((obj = get_obj_in_list_vis(ch, argm, ch->carrying)) == nullptr)
   {
-    if ((obj = get_obj_in_list_vis(keeper, argm, keeper->carrying)) != NULL)
+    if ((obj = get_obj_in_list_vis(keeper, argm, keeper->carrying)) != nullptr)
       keeperhas = true;
     else
     {
@@ -704,7 +704,7 @@ int shop_keeper(char_data *ch, struct obj_data *obj, int cmd, const char *arg, c
    * Find a shop keeper in the room.
    */
   //    for ( keeper = world[ch->in_room].people;
-  //        keeper != NULL;
+  //        keeper != nullptr;
   //        keeper = keeper->next_in_room )
   //    {
   //        if ( IS_MOB(keeper) && mob_index[keeper->mobdata->nr].non_combat_func == shop_keeper )
@@ -781,7 +781,7 @@ void boot_the_shops()
   int count;
   FILE *fp;
 
-  if ((fp = fopen(SHOP_FILE, "r")) == NULL)
+  if ((fp = fopen(SHOP_FILE, "r")) == nullptr)
   {
     perror(SHOP_FILE);
     exit(1);
@@ -904,7 +904,7 @@ void fix_shopkeepers_inventory()
   // set up the unlimited supply items. Those the shop_keeper has on start up.
 
   for (shop_nr = 0; shop_nr < max_shop; shop_nr++)
-    for (keeper = world[shop_index[shop_nr].in_room].people; keeper != NULL;
+    for (keeper = world[shop_index[shop_nr].in_room].people; keeper != nullptr;
          keeper = keeper->next_in_room)
     {
       if (IS_MOB(keeper) && mob_index[keeper->mobdata->nr].non_combat_func == shop_keeper)
@@ -929,14 +929,14 @@ void fix_shopkeepers_inventory()
   return;
 }
 
-// return NULL for failure
+// return nullptr for failure
 // return pointer to new shop on success
 player_shop *read_one_player_shop(FILE *fp)
 {
   int32_t count;
   char code[4];
 
-  player_shop_item *item = NULL;
+  player_shop_item *item = nullptr;
   player_shop *shop = (player_shop *)dc_alloc(1, sizeof(player_shop));
 
   fread(&shop->owner, sizeof(char), PC_SHOP_OWNER_SIZE, fp);
@@ -958,7 +958,7 @@ player_shop *read_one_player_shop(FILE *fp)
 
   fread(&count, sizeof(int32_t), 1, fp);
 
-  shop->sale_list = NULL;
+  shop->sale_list = nullptr;
   for (int i = 0; i < count; i++)
   {
     item = (player_shop_item *)dc_alloc(1, sizeof(player_shop_item));
@@ -985,7 +985,7 @@ void write_one_player_shop(player_shop *shop)
 
   sprintf(buf, "%s/%s", PLAYER_SHOP_DIR, shop->owner);
 
-  if ((fp = fopen(buf, "w")) == NULL)
+  if ((fp = fopen(buf, "w")) == nullptr)
   {
     logf(IMMORTAL, LogChannels::LOG_WORLD, "Could not open %s for writing.", buf);
     return;
@@ -1021,7 +1021,7 @@ void save_shop_list()
 {
   FILE *fp;
 
-  if ((fp = fopen(PLAYER_SHOP_INDEX, "w")) == NULL)
+  if ((fp = fopen(PLAYER_SHOP_INDEX, "w")) == nullptr)
   {
     perror(PLAYER_SHOP_INDEX);
     exit(1);
@@ -1036,7 +1036,7 @@ void save_shop_list()
 
 void save_player_shop_world_range()
 {
-  FILE *f = (FILE *)NULL;
+  FILE *f = (FILE *)nullptr;
   world_file_list_item *curr;
   char buf[180];
 
@@ -1072,9 +1072,9 @@ void boot_player_shops()
   char *filename;
   char buf[80];
 
-  g_playershops = NULL;
+  g_playershops = nullptr;
 
-  if ((fp = fopen(PLAYER_SHOP_INDEX, "r")) == NULL)
+  if ((fp = fopen(PLAYER_SHOP_INDEX, "r")) == nullptr)
   {
     perror(PLAYER_SHOP_INDEX);
     exit(1);
@@ -1086,7 +1086,7 @@ void boot_player_shops()
   while (strcmp(filename, "$"))
   {
     sprintf(buf, "%s/%s", PLAYER_SHOP_DIR, filename);
-    if ((shopfp = fopen(buf, "r")) == NULL)
+    if ((shopfp = fopen(buf, "r")) == nullptr)
     {
       perror(buf);
       exit(1);
@@ -1155,7 +1155,7 @@ void player_shopping_stock(const char *arg, char_data *ch, char_data *keeper)
   // find item
   obj_data *obj;
 
-  if ((obj = get_obj_in_list_vis(ch, item, ch->carrying)) == NULL)
+  if ((obj = get_obj_in_list_vis(ch, item, ch->carrying)) == nullptr)
   {
     send_to_char("Stock what item?\r\n", ch);
     return;
@@ -1560,7 +1560,7 @@ int do_pshopedit(char_data * ch, char * arg, int cmd)
       *shop->sell_message = '\0';
       shop->room_num = i;
       shop->money_on_hand = 0;
-      shop->sale_list = NULL;
+      shop->sale_list = nullptr;
       shop->next = g_playershops;
       g_playershops = shop;
       save_shop_list();

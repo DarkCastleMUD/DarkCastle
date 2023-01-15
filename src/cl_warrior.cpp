@@ -328,7 +328,7 @@ int do_retreat(char_data *ch, char *argument, int cmd)
     return eSUCCESS;
 
   // failure
-  if (!skill_success(ch, NULL, SKILL_RETREAT))
+  if (!skill_success(ch, nullptr, SKILL_RETREAT))
   {
     act("$n tries to retreat, but pays a heavy price for $s hesitancy.\r\n"
         "$n falls to the ground!",
@@ -406,7 +406,7 @@ int do_hitall(char_data *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (!skill_success(ch, NULL, SKILL_HITALL))
+  if (!skill_success(ch, nullptr, SKILL_HITALL))
   {
 
     act("You start swinging like a madman, but trip over your own feet!",
@@ -637,7 +637,7 @@ int do_redirect(char_data *ch, char *argument, int cmd)
 
   victim = get_char_room_vis(ch, name);
 
-  if (victim == NULL)
+  if (victim == nullptr)
   {
     send_to_char("Redirect your attacks to whom?\n\r", ch);
     return eFAILURE;
@@ -673,16 +673,16 @@ int do_redirect(char_data *ch, char *argument, int cmd)
 
   if (!skill_success(ch, victim, SKILL_REDIRECT))
   {
-    act("$n tries to redirect his attacks but $N won't allow it.", ch, NULL, ch->fighting, TO_VICT, 0);
-    act("You try to redirect your attacks to $N but are blocked.", ch, NULL, victim, TO_CHAR, 0);
-    act("$n tries to redirect his attacks elsewhere, but $N wont allow it.", ch, NULL, victim, TO_ROOM, NOTVICT);
+    act("$n tries to redirect his attacks but $N won't allow it.", ch, nullptr, ch->fighting, TO_VICT, 0);
+    act("You try to redirect your attacks to $N but are blocked.", ch, nullptr, victim, TO_CHAR, 0);
+    act("$n tries to redirect his attacks elsewhere, but $N wont allow it.", ch, nullptr, victim, TO_ROOM, NOTVICT);
     WAIT_STATE(ch, PULSE_VIOLENCE);
   }
   else
   {
-    act("$n redirects his attacks at YOU!", ch, NULL, victim, TO_VICT, 0);
-    act("You redirect your at attacks at $N!", ch, NULL, victim, TO_CHAR, 0);
-    act("$n redirects his attacks at $N!", ch, NULL, victim, TO_ROOM, NOTVICT);
+    act("$n redirects his attacks at YOU!", ch, nullptr, victim, TO_VICT, 0);
+    act("You redirect your at attacks at $N!", ch, nullptr, victim, TO_CHAR, 0);
+    act("$n redirects his attacks at $N!", ch, nullptr, victim, TO_ROOM, NOTVICT);
     stop_fighting(ch);
     set_fighting(ch, victim);
     WAIT_STATE(ch, PULSE_VIOLENCE);
@@ -707,7 +707,7 @@ int do_disarm(char_data *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (ch->equipment[WIELD] == NULL)
+  if (ch->equipment[WIELD] == nullptr)
   {
     send_to_char("You must wield a weapon to disarm.\r\n", ch);
     return eFAILURE;
@@ -715,16 +715,16 @@ int do_disarm(char_data *ch, char *argument, int cmd)
 
   one_argument(argument, name);
   victim = get_char_room_vis(ch, name);
-  if (victim == NULL)
+  if (victim == nullptr)
     victim = ch->fighting;
 
-  if (victim == NULL)
+  if (victim == nullptr)
   {
     send_to_char("Disarm whom?\n\r", ch);
     return eFAILURE;
   }
 
-  if (victim->equipment[WIELD] == NULL)
+  if (victim->equipment[WIELD] == nullptr)
   {
     send_to_char("Your opponent is not wielding a weapon!\n\r", ch);
     return eFAILURE;
@@ -756,7 +756,7 @@ int do_disarm(char_data *ch, char *argument, int cmd)
       send_to_room("$B$7Ghaerad, Sword of Legends says, 'Sneaky! Sneaky! But you can't catch me!'$R\n\r", ch->in_room);
       return eSUCCESS;
     }
-    act("$n disarms $mself!", ch, NULL, victim, TO_ROOM, NOTVICT);
+    act("$n disarms $mself!", ch, nullptr, victim, TO_ROOM, NOTVICT);
     send_to_char("You disarm yourself!  Congratulations!  Try using 'remove' next-time.\r\n", ch);
     obj = unequip_char(ch, WIELD);
     obj_to_char(obj, ch);
@@ -799,9 +799,9 @@ int do_disarm(char_data *ch, char *argument, int cmd)
   }
   else
   {
-    act("$B$n attempts to disarm you!$R", ch, NULL, victim, TO_VICT, 0);
-    act("You try to disarm $N and fail!", ch, NULL, victim, TO_CHAR, 0);
-    act("$n attempts to disarm $N, but fails!", ch, NULL, victim, TO_ROOM, NOTVICT);
+    act("$B$n attempts to disarm you!$R", ch, nullptr, victim, TO_VICT, 0);
+    act("You try to disarm $N and fail!", ch, nullptr, victim, TO_CHAR, 0);
+    act("$n attempts to disarm $N, but fails!", ch, nullptr, victim, TO_ROOM, NOTVICT);
     WAIT_STATE(ch, PULSE_VIOLENCE * 2);
     if (IS_NPC(victim) && !victim->fighting)
     {
@@ -933,7 +933,7 @@ int do_bladeshield(char_data *ch, char *argument, int cmd)
   if (!charge_moves(ch, SKILL_BLADESHIELD))
     return eSUCCESS;
 
-  if (!skill_success(ch, NULL, SKILL_BLADESHIELD))
+  if (!skill_success(ch, nullptr, SKILL_BLADESHIELD))
   {
     act("$n starts swinging $s weapons around but stops before narrowly avoiding dismembering $mself.", ch, 0, 0, TO_ROOM, NOTVICT);
     send_to_char("You try to begin the bladeshield technique and almost chop off your own arm!\r\n", ch);
@@ -969,7 +969,7 @@ int handle_any_guard(char_data *ch)
   if (!ch->guarded_by)
     return false;
 
-  char_data *guard = NULL;
+  char_data *guard = nullptr;
 
   // search the room for my guard
   for (follow_type *curr = ch->guarded_by; curr;)
@@ -977,7 +977,7 @@ int handle_any_guard(char_data *ch)
     for (char_data *vict = world[ch->in_room].people; vict; vict = vict->next_in_room)
       if (vict == curr->follower)
       {
-        curr = NULL;
+        curr = nullptr;
         guard = vict;
         break;
       }
@@ -1010,7 +1010,7 @@ char_data *is_guarding_me(char_data *ch, char_data *guard)
     curr = curr->next;
   }
 
-  return NULL;
+  return nullptr;
 }
 
 void stop_guarding(char_data *guard)
@@ -1020,7 +1020,7 @@ void stop_guarding(char_data *guard)
 
   char_data *victim = guard->guarding;
   follow_type *curr = victim->guarded_by;
-  follow_type *last = NULL;
+  follow_type *last = nullptr;
 
   while (curr)
   {
@@ -1038,7 +1038,7 @@ void stop_guarding(char_data *guard)
       victim->guarded_by = curr->next;
   }
   // if we didn't find guard, return, since we wanted to remove um anyway:)
-  guard->guarding = NULL;
+  guard->guarding = nullptr;
 }
 
 void start_guarding(char_data *guard, char_data *victim)
@@ -1062,13 +1062,13 @@ void stop_guarding_me(char_data *victim)
   {
     sprintf(buf, "You stop trying to guard %s.\r\n", GET_SHORT(victim));
     send_to_char(buf, curr->follower);
-    curr->follower->guarding = NULL;
+    curr->follower->guarding = nullptr;
     last = curr;
     curr = curr->next;
     dc_free(last);
   }
 
-  victim->guarded_by = NULL;
+  victim->guarded_by = nullptr;
 }
 
 /* END UTILITY FUNCTIONS FOR "Guard" */
@@ -1076,7 +1076,7 @@ void stop_guarding_me(char_data *victim)
 int do_guard(char_data *ch, char *argument, int cmd)
 {
   char name[MAX_INPUT_LENGTH];
-  char_data *victim = NULL;
+  char_data *victim = nullptr;
 
   if (!IS_MOB(ch) && (!has_skill(ch, SKILL_GUARD) || !has_skill(ch, SKILL_RESCUE)))
   {
@@ -1157,7 +1157,7 @@ int do_tactics(char_data *ch, char *argument, int cmd)
   if (!charge_moves(ch, SKILL_TACTICS, grpsize))
     return eSUCCESS;
 
-  if (!skill_success(ch, NULL, SKILL_TACTICS))
+  if (!skill_success(ch, nullptr, SKILL_TACTICS))
   {
     send_to_char("Guess you just weren't the Patton you thought you were.\r\n", ch);
     act("$n goes on about team not being spelled with an 'I' or something.", ch, 0, 0, TO_ROOM, 0);
@@ -1406,7 +1406,7 @@ int do_battlesense(char_data *ch, char *argument, int cmd)
 
 int do_smite(char_data *ch, char *argument, int cmd)
 {
-  char_data *vict = NULL;
+  char_data *vict = nullptr;
   char name[MAX_STRING_LENGTH];
   int learned = has_skill(ch, SKILL_SMITE);
   struct affected_type af;
@@ -1591,7 +1591,7 @@ int do_perseverance(char_data *ch, char *argument, int cmd)
 
 int do_defenders_stance(char_data *ch, char *argument, int cmd)
 {
-  char_data *vict = NULL;
+  char_data *vict = nullptr;
   int learned = has_skill(ch, SKILL_DEFENDERS_STANCE);
   struct affected_type af;
 

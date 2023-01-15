@@ -24,8 +24,8 @@ int do_alias(char_data *ch, char *arg, int cmd)
   int found;
   int nokey;
   int count = 0;
-  struct char_player_alias * curr = NULL;
-  struct char_player_alias * next = NULL;
+  struct char_player_alias * curr = nullptr;
+  struct char_player_alias * next = nullptr;
 
   if(IS_MOB(ch))
     return eFAILURE;
@@ -181,7 +181,7 @@ int do_alias(char_data *ch, char *arg, int cmd)
             dc_free (curr->command);
             dc_free (curr);
          }
-         ch->pcdata->alias = NULL;
+         ch->pcdata->alias = nullptr;
          send_to_char("All aliases deleted.\r\n", ch);
          dc_free(buf);
          return eSUCCESS;

@@ -76,7 +76,7 @@ int charm_levels(char_data *ch)
 
 int do_free_animal(char_data *ch, char *arg, int cmd)
 {
-  char_data *victim = NULL;
+  char_data *victim = nullptr;
   char buf[MAX_INPUT_LENGTH];
   void stop_follower(char_data * ch, int cmd);
 
@@ -107,16 +107,16 @@ int do_free_animal(char_data *ch, char *arg, int cmd)
   if (!skill_success(ch, victim, SKILL_FREE_ANIMAL))
   {
     act("You give $N a gentle pat to the head, but $E seems unwilling to leave your side.",
-        ch, NULL, victim, TO_CHAR, 0);
+        ch, nullptr, victim, TO_CHAR, 0);
     act("$n gives $N a gentle pat to the head, but $E seems unwilling to leave $s side.",
-        ch, NULL, victim, TO_ROOM, INVIS_NULL);
+        ch, nullptr, victim, TO_ROOM, INVIS_NULL);
     return eSUCCESS;
   }
 
   act("With a gentle pat to the head, you set $N free to roam the wilds again.",
-      ch, NULL, victim, TO_CHAR, 0);
+      ch, nullptr, victim, TO_CHAR, 0);
   act("With a gentle pat to the head, $n sets $N free to roam the wilds again.",
-      ch, NULL, victim, TO_ROOM, INVIS_NULL);
+      ch, nullptr, victim, TO_ROOM, INVIS_NULL);
 
   stop_follower(victim, 0);
 
@@ -180,7 +180,7 @@ int do_tame(char_data *ch, char *arg, int cmd)
   {
     send_to_char("How you plan on controlling so many followers?\n\r", ch);
     return eFAILURE;
-    /*   char_data * vict = NULL;
+    /*   char_data * vict = nullptr;
        for(struct follow_type *k = ch->followers; k; k = k->next)
          if(IS_MOB(k->follower) && affected_by_spell(k->follower, SPELL_CHARM_PERSON))
          {
@@ -201,20 +201,20 @@ int do_tame(char_data *ch, char *arg, int cmd)
   if (!charge_moves(ch, SKILL_TAME))
     return eSUCCESS;
 
-  act("$n holds out $s hand to $N and beckons softly.", ch, NULL, victim, TO_ROOM, INVIS_NULL);
+  act("$n holds out $s hand to $N and beckons softly.", ch, nullptr, victim, TO_ROOM, INVIS_NULL);
 
   WAIT_STATE(ch, PULSE_VIOLENCE * 1);
 
   if ((IS_SET(victim->immune, ISR_CHARM)) ||
       !ISSET(victim->mobdata->actflags, ACT_CHARM))
   {
-    act("$N is wilder than you thought.", ch, NULL, victim, TO_CHAR, 0);
+    act("$N is wilder than you thought.", ch, nullptr, victim, TO_CHAR, 0);
     return eFAILURE;
   }
 
   if (!skill_success(ch, victim, SKILL_TAME) || saves_spell(ch, victim, 0, SAVE_TYPE_MAGIC) >= 0)
   {
-    act("$N is unreceptive to your attempts to tame $M.", ch, NULL, victim, TO_CHAR, 0);
+    act("$N is unreceptive to your attempts to tame $M.", ch, nullptr, victim, TO_CHAR, 0);
     return eFAILURE;
   }
 
@@ -256,7 +256,7 @@ int do_track(char_data *ch, char *argument, int cmd)
   char weight[40];
   char victim[MAX_INPUT_LENGTH];
   char_data *quarry;
-  char_data *tmp_ch = NULL; // For checking room stuff
+  char_data *tmp_ch = nullptr; // For checking room stuff
   room_track_data *pScent = 0;
   void swap_hate_memory(char_data * ch);
 
@@ -543,7 +543,7 @@ int do_ambush(char_data *ch, char *arg, int cmd)
     sprintf(buf, "You will no longer ambush %s on sight.\r\n", arg);
     send_to_char(buf, ch);
     dc_free(ch->ambush);
-    ch->ambush = NULL;
+    ch->ambush = nullptr;
     return eSUCCESS;
   }
 
@@ -873,7 +873,7 @@ int parse_arrow(char_data *ch, char *arrow)
 }
 
 /* go through and find an arrow */
-/* return NULL if failure
+/* return nullptr if failure
  *  return pointer if success */
 struct obj_data *find_arrow(struct obj_data *quiver)
 {
@@ -884,10 +884,10 @@ struct obj_data *find_arrow(struct obj_data *quiver)
   target = get_obj_in_list("arrow", quiver->contains);
 
   if (!target)
-    return NULL;
+    return nullptr;
 
   if (!(target->obj_flags.type_flag == ITEM_MISSILE))
-    target = NULL;
+    target = nullptr;
 
   return target;
 }
@@ -926,7 +926,7 @@ void do_arrow_miss(char_data *ch, char_data *victim, int dir, struct obj_data *f
       sprintf(buf, "%s wizzes by.\r\n", found->short_description);
       send_to_char(buf, victim);
       sprintf(buf, "%s wizzes by.", found->short_description);
-      act(buf, victim, NULL, ch, TO_ROOM, NOTVICT);
+      act(buf, victim, nullptr, ch, TO_ROOM, NOTVICT);
     }
     else
     {
@@ -934,7 +934,7 @@ void do_arrow_miss(char_data *ch, char_data *victim, int dir, struct obj_data *f
       send_to_char(buf, victim);
       sprintf(buf, "%s wizzes by from the %s.",
               found->short_description, dirs[rev_dir[dir]]);
-      act(buf, victim, NULL, 0, TO_ROOM, 0);
+      act(buf, victim, nullptr, 0, TO_ROOM, 0);
     }
     break;
   case 2:
@@ -951,7 +951,7 @@ void do_arrow_miss(char_data *ch, char_data *victim, int dir, struct obj_data *f
       sprintf(buf, "%s narrowly misses your head.\r\n", found->short_description);
       send_to_char(buf, victim);
       sprintf(buf, "%s narrowly misses $n.", found->short_description);
-      act(buf, victim, NULL, ch, TO_ROOM, NOTVICT);
+      act(buf, victim, nullptr, ch, TO_ROOM, NOTVICT);
     }
     else
     {
@@ -960,7 +960,7 @@ void do_arrow_miss(char_data *ch, char_data *victim, int dir, struct obj_data *f
       send_to_char(buf, victim);
       sprintf(buf, "%s from the %s narrowly misses $n.",
               found->short_description, dirs[rev_dir[dir]]);
-      act(buf, victim, NULL, 0, TO_ROOM, 0);
+      act(buf, victim, nullptr, 0, TO_ROOM, 0);
     }
     break;
   }
@@ -1084,7 +1084,7 @@ int do_arrow_damage(char_data *ch, char_data *victim,
     send_to_char(buf, victim);
     sprintf(buf, "%s from the %s impales $n through the chest!",
        found->short_description, dirs[rev_dir[dir]]);
-    act(buf, victim, NULL, 0, TO_ROOM, 0);
+    act(buf, victim, nullptr, 0, TO_ROOM, 0);
     break;
 
     case 2:
@@ -1096,7 +1096,7 @@ int do_arrow_damage(char_data *ch, char_data *victim,
     send_to_char(buf, victim);
     sprintf(buf, "%s from the %s lands with a solid 'thunk.'\r\n$n falls to the ground, an arrow sticking from $s left eye.",
        found->short_description, dirs[rev_dir[dir]]);
-    act(buf, victim, NULL, 0, TO_ROOM, 0);
+    act(buf, victim, nullptr, 0, TO_ROOM, 0);
     break;
    } // of switch
   }
@@ -1159,7 +1159,7 @@ int do_fire(char_data *ch, char *arg, int cmd)
       victhshr[MAX_STRING_LENGTH];
   bool enchantmentused = false;
 
-  victim = NULL;
+  victim = nullptr;
   *direct = '\0';
   *arrow = '\0';
 
@@ -1448,7 +1448,7 @@ int do_fire(char_data *ch, char *arg, int cmd)
 
   /* check for arrows here */
 
-  found = NULL;
+  found = nullptr;
   int where = 0;
   for (; where < MAX_WEAR; where++)
   {
@@ -1786,7 +1786,7 @@ int do_fire(char_data *ch, char *arg, int cmd)
 int do_mind_delve(char_data *ch, char *arg, int cmd)
 {
   char buf[1000];
-  char_data *target = NULL;
+  char_data *target = nullptr;
   //  int learned, specialization;
 
   if (!*arg)

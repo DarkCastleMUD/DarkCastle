@@ -5,7 +5,7 @@
  *                                                                        *
  **************************************************************************
  * Revision History                                                       *
- * 10/23/2003 Onager Added checks for ch == NULL in raw_kill() to prevent *
+ * 10/23/2003 Onager Added checks for ch == nullptr in raw_kill() to prevent *
  * crashes from non-(N)PC deaths                                          *
  * Changed raw_kill() to make imms immune to stat loss                    *
  * 11/09/2003 Onager Added noncombat_damage() to do noncombat-related     *
@@ -67,7 +67,7 @@ extern CWorld world;
 extern struct index_data *mob_index;
 extern struct index_data *obj_index;
 
-char_data *combat_list = NULL, *combat_next_dude = NULL;
+char_data *combat_list = nullptr, *combat_next_dude = nullptr;
 
 char *champ_death_messages[] =
     {
@@ -288,7 +288,7 @@ void perform_violence(void)
       {
         if ((mob_index[ch->mobdata->nr].combat_func) && MOB_WAIT_STATE(ch) <= 0)
         {
-          retval = ((*mob_index[ch->mobdata->nr].combat_func)(ch, NULL, 0, "", ch));
+          retval = ((*mob_index[ch->mobdata->nr].combat_func)(ch, nullptr, 0, "", ch));
           if (SOMEONE_DIED(retval))
             continue;
           // Check if we're still fighting someone
@@ -527,7 +527,7 @@ bool gets_dual_wield_attack(char_data *ch)
   if (!has_skill(ch, SKILL_DUAL_WIELD))
     return false;
 
-  if (!skill_success(ch, NULL, SKILL_DUAL_WIELD, 15))
+  if (!skill_success(ch, nullptr, SKILL_DUAL_WIELD, 15))
     return false;
 
   return true;
@@ -544,7 +544,7 @@ int attack(char_data *ch, char_data *vict, int type, int weapon)
 
   if (!ch || !vict)
   {
-    logentry("NULL Victim or Ch sent to attack!  This crashes us!", -1, LogChannels::LOG_BUG);
+    logentry("nullptr Victim or Ch sent to attack!  This crashes us!", -1, LogChannels::LOG_BUG);
     produce_coredump();
 
     return eINTERNAL_ERROR;
@@ -606,7 +606,7 @@ int attack(char_data *ch, char_data *vict, int type, int weapon)
   if (type != SKILL_BACKSTAB)
     if (handle_any_guard(vict))
     {
-      if ((vict = ch->fighting) == NULL)
+      if ((vict = ch->fighting) == nullptr)
         return eFAILURE;
     }
   assert(vict);
@@ -851,7 +851,7 @@ void update_flags(char_data *vict)
   {
     REMOVE_BIT(vict->combat, COMBAT_THI_EYEGOUGE2);
     REMBIT(vict->affected_by, AFF_BLIND);
-    act("$n clears the blood from $s eyes.\r\n", vict, NULL, NULL, TO_ROOM, 0);
+    act("$n clears the blood from $s eyes.\r\n", vict, nullptr, nullptr, TO_ROOM, 0);
     send_to_char("You clear the blood out of your eyes.\r\n", vict);
   }
 
@@ -1040,7 +1040,7 @@ int do_vampiric_aura(char_data *ch, char_data *vict)
 
   struct affected_type *af;
 
-  if (NULL == (af = affected_by_spell(vict, SPELL_VAMPIRIC_AURA)))
+  if (nullptr == (af = affected_by_spell(vict, SPELL_VAMPIRIC_AURA)))
     return eFAILURE;
 
   // ch just hit vict...vict has Vampiric aura up
@@ -1324,7 +1324,7 @@ void check_weapon_skill_bonus(char_data *ch, int type, obj_data *wielded,
     return;
   }
   learned = has_skill(ch, skill);
-  if (skill_success(ch, NULL, skill))
+  if (skill_success(ch, nullptr, skill))
   {
     // rare skill increases
     specialization = learned / 100;
@@ -1699,7 +1699,7 @@ int one_hit(char_data *ch, char_data *vict, int type, int weapon)
 
   if (act_poisonous(ch))
   {
-    retval = cast_poison(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, NULL, GET_LEVEL(ch));
+    retval = cast_poison(GET_LEVEL(ch), ch, "", SPELL_TYPE_SPELL, vict, nullptr, GET_LEVEL(ch));
     if (SOMEONE_DIED(retval))
       return debug_retval(ch, vict, retval) | eSUCCESS;
   }
@@ -2549,7 +2549,7 @@ int damage(char_data *ch, char_data *victim,
 
   int pre_stoneshield_dam = 0;
   stringstream string1;
-  struct affected_type *pspell = NULL;
+  struct affected_type *pspell = nullptr;
   if (GET_LEVEL(victim) < IMMORTAL && dam > 0 && typeofdamage == DAMAGE_TYPE_PHYSICAL &&
       ((pspell = affected_by_spell(victim, SPELL_STONE_SHIELD)) ||
        (pspell = affected_by_spell(victim, SPELL_GREATER_STONE_SHIELD))))
@@ -2718,7 +2718,7 @@ int damage(char_data *ch, char_data *victim,
   // Check for parry, mob disarm, and trip. Print a suitable damage message.
   if ((attacktype >= TYPE_HIT && attacktype < TYPE_SUFFERING) || (IS_NPC(ch) && mob_index[ch->mobdata->nr].virt > 87 && mob_index[ch->mobdata->nr].virt < 92) || attacktype == SKILL_FLAMESLASH)
   {
-    if (ch->equipment[weapon] == NULL)
+    if (ch->equipment[weapon] == nullptr)
     {
       dam_message(dam, ch, victim, TYPE_HIT, modifier);
     }
@@ -2903,7 +2903,7 @@ int noncombat_damage(char_data *ch, int dam, char *char_death_msg,
       logentry(death_log_msg, IMMORTAL, LogChannels::LOG_MORTAL);
     if (type == KILL_BATTER)
       kill_type = TYPE_PKILL;
-    fight_kill(NULL, ch, kill_type, type);
+    fight_kill(nullptr, ch, kill_type, type);
     return eSUCCESS | eCH_DIED;
   }
   else
@@ -3324,7 +3324,7 @@ int isHit(char_data *ch, char_data *victim, int attacktype, int &type, int &redu
   int martial = has_skill(victim, SKILL_DEFENSE);
   int tumbling = has_skill(victim, SKILL_TUMBLING);
 
-  if (victim->equipment[WIELD] == NULL)
+  if (victim->equipment[WIELD] == nullptr)
     parry = 0;
 
   if (!victim->equipment[WEAR_SHIELD])
@@ -3363,9 +3363,9 @@ int isHit(char_data *ch, char_data *victim, int attacktype, int &type, int &redu
 
   if (what < parry || IS_SET(victim->combat, COMBAT_BLADESHIELD1) || IS_SET(victim->combat, COMBAT_BLADESHIELD2))
   { // Parry. Riposte-check goes here.
-    act("$n parries $N's attack.", victim, NULL, ch, TO_ROOM, NOTVICT);
-    act("$n parries your attack.", victim, NULL, ch, TO_VICT, 0);
-    act("You parry $N's attack.", victim, NULL, ch, TO_CHAR, 0);
+    act("$n parries $N's attack.", victim, nullptr, ch, TO_ROOM, NOTVICT);
+    act("$n parries your attack.", victim, nullptr, ch, TO_VICT, 0);
+    act("You parry $N's attack.", victim, nullptr, ch, TO_CHAR, 0);
     retval = check_riposte(ch, victim, attacktype);
     if (SOMEONE_DIED(retval))
       return debug_retval(ch, victim, retval);
@@ -3404,9 +3404,9 @@ int isHit(char_data *ch, char_data *victim, int attacktype, int &type, int &redu
   }
   else if (what < (parry + tumbling + dodge))
   { // Dodge
-    act("$n dodges $N's attack.", victim, NULL, ch, TO_ROOM, NOTVICT);
-    act("$n dodges your attack.", victim, NULL, ch, TO_VICT, 0);
-    act("You dodge $N's attack.", victim, NULL, ch, TO_CHAR, 0);
+    act("$n dodges $N's attack.", victim, nullptr, ch, TO_ROOM, NOTVICT);
+    act("$n dodges your attack.", victim, nullptr, ch, TO_VICT, 0);
+    act("You dodge $N's attack.", victim, nullptr, ch, TO_CHAR, 0);
   }
   else if (what < (parry + tumbling + dodge + block))
   { // Shieldblock
@@ -3434,7 +3434,7 @@ int checkCounterStrike(char_data *ch, char_data *victim)
   int retval, lvl = has_skill(victim, SKILL_COUNTER_STRIKE);
 
   if ((IS_SET(victim->combat, COMBAT_STUNNED)) ||
-      (victim->equipment[WIELD] != NULL) ||
+      (victim->equipment[WIELD] != nullptr) ||
       (IS_SET(victim->combat, COMBAT_STUNNED2)) ||
       (IS_SET(victim->combat, COMBAT_BASH1)) ||
       (IS_SET(victim->combat, COMBAT_BASH2)) ||
@@ -3455,24 +3455,24 @@ int checkCounterStrike(char_data *ch, char_data *victim)
   switch (number(1, 4))
   {
   case 1:
-    act("Upon blocking $N's blow, you counter with a hard strike of your palm!", victim, NULL, ch, TO_CHAR, 0);
-    act("Upon blocking your blow, $n counters with a hard strike of $s palm!", victim, NULL, ch, TO_VICT, 0);
-    act("Upon blocking $N's blow, $n counters with a hard strike of $s palm!", victim, NULL, ch, TO_ROOM, NOTVICT);
+    act("Upon blocking $N's blow, you counter with a hard strike of your palm!", victim, nullptr, ch, TO_CHAR, 0);
+    act("Upon blocking your blow, $n counters with a hard strike of $s palm!", victim, nullptr, ch, TO_VICT, 0);
+    act("Upon blocking $N's blow, $n counters with a hard strike of $s palm!", victim, nullptr, ch, TO_ROOM, NOTVICT);
     break;
   case 2:
-    act("Upon blocking $N's blow, you counter with a sharp kick of your heel!", victim, NULL, ch, TO_CHAR, 0);
-    act("Upon blocking your blow, $n counters with a sharp kick of $s heel!", victim, NULL, ch, TO_VICT, 0);
-    act("Upon blocking $N's blow, $n counters with a sharp kick of $s heel!", victim, NULL, ch, TO_ROOM, NOTVICT);
+    act("Upon blocking $N's blow, you counter with a sharp kick of your heel!", victim, nullptr, ch, TO_CHAR, 0);
+    act("Upon blocking your blow, $n counters with a sharp kick of $s heel!", victim, nullptr, ch, TO_VICT, 0);
+    act("Upon blocking $N's blow, $n counters with a sharp kick of $s heel!", victim, nullptr, ch, TO_ROOM, NOTVICT);
     break;
   case 3:
-    act("Upon blocking $N's blow, you spin and land a short, hard strike with your elbow!", victim, NULL, ch, TO_CHAR, 0);
-    act("Upon blocking your blow, $n spins and lands a short, hard strike with $s elbow!", victim, NULL, ch, TO_VICT, 0);
-    act("Upon blocking $N's blow, $n spins and lands a short, hard strike with $s elbow!", victim, NULL, ch, TO_ROOM, NOTVICT);
+    act("Upon blocking $N's blow, you spin and land a short, hard strike with your elbow!", victim, nullptr, ch, TO_CHAR, 0);
+    act("Upon blocking your blow, $n spins and lands a short, hard strike with $s elbow!", victim, nullptr, ch, TO_VICT, 0);
+    act("Upon blocking $N's blow, $n spins and lands a short, hard strike with $s elbow!", victim, nullptr, ch, TO_ROOM, NOTVICT);
     break;
   case 4:
-    act("Upon blocking $N's blow, you spin and land a solid strike with your knee!", victim, NULL, ch, TO_CHAR, 0);
-    act("Upon blocking your blow, $n spins and lands a solid strike with $s knee!", victim, NULL, ch, TO_VICT, 0);
-    act("Upon blocking $N's blow, $n spins and lands a solid strike with $s knee!", victim, NULL, ch, TO_ROOM, NOTVICT);
+    act("Upon blocking $N's blow, you spin and land a solid strike with your knee!", victim, nullptr, ch, TO_CHAR, 0);
+    act("Upon blocking your blow, $n spins and lands a solid strike with $s knee!", victim, nullptr, ch, TO_VICT, 0);
+    act("Upon blocking $N's blow, $n spins and lands a solid strike with $s knee!", victim, nullptr, ch, TO_ROOM, NOTVICT);
     break;
   default:
     logentry("Serious screw-up in counter strike!", ANGEL, LogChannels::LOG_BUG);
@@ -3509,14 +3509,14 @@ int doTumblingCounterStrike(char_data *ch, char_data *victim)
   switch (number(1, 2))
   {
   case 1:
-    act("$N overextends $Mself as $E strikes you, leaving $M open to your counterattack!", victim, NULL, ch, TO_CHAR, 0);
-    act("You overextend yourself as you strike $n, leaving yourself open to $s counterattack!", victim, NULL, ch, TO_VICT, 0);
-    act("$N overextends $Mself as $E strikes $n, leaving $M open to a counterattack!", victim, NULL, ch, TO_ROOM, NOTVICT);
+    act("$N overextends $Mself as $E strikes you, leaving $M open to your counterattack!", victim, nullptr, ch, TO_CHAR, 0);
+    act("You overextend yourself as you strike $n, leaving yourself open to $s counterattack!", victim, nullptr, ch, TO_VICT, 0);
+    act("$N overextends $Mself as $E strikes $n, leaving $M open to a counterattack!", victim, nullptr, ch, TO_ROOM, NOTVICT);
     break;
   case 2:
-    act("You find an opening in $N's defenses as $E swings, and land a quick counterattack!", victim, NULL, ch, TO_CHAR, 0);
-    act("$n finds an opening in your defenses as you swing, and lands a quick counterattack!", victim, NULL, ch, TO_VICT, 0);
-    act("$n finds an opening in $N's defenses as $E swings, and lands a quick counterattack!", victim, NULL, ch, TO_ROOM, NOTVICT);
+    act("You find an opening in $N's defenses as $E swings, and land a quick counterattack!", victim, nullptr, ch, TO_CHAR, 0);
+    act("$n finds an opening in your defenses as you swing, and lands a quick counterattack!", victim, nullptr, ch, TO_VICT, 0);
+    act("$n finds an opening in $N's defenses as $E swings, and lands a quick counterattack!", victim, nullptr, ch, TO_ROOM, NOTVICT);
     break;
   default:
     logentry("Serious screw-up in counter strike!", ANGEL, LogChannels::LOG_BUG);
@@ -3540,7 +3540,7 @@ int check_riposte(char_data *ch, char_data *victim, int attacktype)
   int retval;
 
   if ((IS_SET(victim->combat, COMBAT_STUNNED)) ||
-      (ch->equipment[WIELD] == NULL && number(1, 101) >= 50) ||
+      (ch->equipment[WIELD] == nullptr && number(1, 101) >= 50) ||
       (IS_SET(victim->combat, COMBAT_STUNNED2)) ||
       (IS_SET(victim->combat, COMBAT_BASH1)) ||
       (IS_SET(victim->combat, COMBAT_BASH2)) ||
@@ -3580,9 +3580,9 @@ int check_riposte(char_data *ch, char_data *victim, int attacktype)
     }
   }
 
-  act("$n turns $N's attack into one of $s own!", victim, NULL, ch, TO_ROOM, NOTVICT);
-  act("$n turns your attack against you!", victim, NULL, ch, TO_VICT, 0);
-  act("You turn $N's attack against $M.", victim, NULL, ch, TO_CHAR, 0);
+  act("$n turns $N's attack into one of $s own!", victim, nullptr, ch, TO_ROOM, NOTVICT);
+  act("$n turns your attack against you!", victim, nullptr, ch, TO_VICT, 0);
+  act("You turn $N's attack against $M.", victim, nullptr, ch, TO_CHAR, 0);
 
   retval = one_hit(victim, ch, TYPE_UNDEFINED, FIRST);
   retval = SWAP_CH_VICT(retval);
@@ -3596,10 +3596,10 @@ int check_riposte(char_data *ch, char_data *victim, int attacktype)
 int check_magic_block(char_data *ch, char_data *victim, int attacktype)
 {
   int reduce = 0;
-  if (victim->equipment[WEAR_SHIELD] == NULL && GET_CLASS(victim) != CLASS_MONK)
+  if (victim->equipment[WEAR_SHIELD] == nullptr && GET_CLASS(victim) != CLASS_MONK)
     return 0;
   if ((IS_SET(victim->combat, COMBAT_STUNNED)) ||
-      //    (victim->equipment[WEAR_SHIELD] == NULL) ||
+      //    (victim->equipment[WEAR_SHIELD] == nullptr) ||
       (IS_NPC(victim) && (!ISSET(victim->mobdata->actflags, ACT_PARRY))) ||
       (IS_SET(victim->combat, COMBAT_STUNNED2)) ||
       (IS_SET(victim->combat, COMBAT_BASH1)) ||
@@ -3628,9 +3628,9 @@ int check_magic_block(char_data *ch, char_data *victim, int attacktype)
   }
   else
   {
-    act("$n manages to avoid taking a direct hit from $N's spell!", victim, NULL, ch, TO_ROOM, NOTVICT);
-    act("$n avoids part of your spell!", victim, NULL, ch, TO_VICT, 0);
-    act("Your martial defense allows you to avoid a direct hit from $N's spell!", victim, NULL, ch, TO_CHAR, 0);
+    act("$n manages to avoid taking a direct hit from $N's spell!", victim, nullptr, ch, TO_ROOM, NOTVICT);
+    act("$n avoids part of your spell!", victim, nullptr, ch, TO_VICT, 0);
+    act("Your martial defense allows you to avoid a direct hit from $N's spell!", victim, nullptr, ch, TO_CHAR, 0);
     reduce = (int)((float)reduce / 1.25);
   }
   return reduce;
@@ -3640,10 +3640,10 @@ int check_shieldblock(char_data *ch, char_data *victim, int attacktype)
 {
   int modifier = 0;
   int reduce = 0;
-  if (victim->equipment[WEAR_SHIELD] == NULL && GET_CLASS(victim) != CLASS_MONK)
+  if (victim->equipment[WEAR_SHIELD] == nullptr && GET_CLASS(victim) != CLASS_MONK)
     return 0;
   if ((IS_SET(victim->combat, COMBAT_STUNNED)) ||
-      //    (victim->equipment[WEAR_SHIELD] == NULL) ||
+      //    (victim->equipment[WEAR_SHIELD] == nullptr) ||
       (IS_NPC(victim) && (!ISSET(victim->mobdata->actflags, ACT_PARRY))) ||
       (IS_SET(victim->combat, COMBAT_STUNNED2)) ||
       (IS_SET(victim->combat, COMBAT_BASH1)) ||
@@ -3694,17 +3694,17 @@ int check_shieldblock(char_data *ch, char_data *victim, int attacktype)
   else if (!skill_success(victim, ch, SKILL_SHIELDBLOCK, modifier))
     return 0;
 
-  // act("$n blocks $N's attack with $s shield.", victim, NULL, ch, TO_ROOM, NOTVICT);
-  // act("$n blocks your attack with $s shield.", victim, NULL, ch, TO_VICT, 0);
-  // act("You block $N's attack with your shield.", victim, NULL, ch, TO_CHAR, 0);
+  // act("$n blocks $N's attack with $s shield.", victim, nullptr, ch, TO_ROOM, NOTVICT);
+  // act("$n blocks your attack with $s shield.", victim, nullptr, ch, TO_VICT, 0);
+  // act("You block $N's attack with your shield.", victim, nullptr, ch, TO_CHAR, 0);
   /*  if (!GET_CLASS(victim) == CLASS_MONK) {
       act("$n blocks $N's attack with $p.", victim, victim->equipment[WEAR_SHIELD], ch, TO_ROOM, NOTVICT);
       act("$n blocks your attack with $p.", victim, victim->equipment[WEAR_SHIELD], ch, TO_VICT, 0);
       act("You block $N's attack with $p.", victim, victim->equipment[WEAR_SHIELD], ch, TO_CHAR, 0);
     } else {
-      act("$n swiftly deflects $N's attack.", victim, NULL, ch, TO_ROOM, NOTVICT);
-      act("$n swiftly deflects your attack.",victim, NULL, ch, TO_VICT,0);
-      act("You swiftly deflect $N's attack.",victim, NULL, ch, TO_CHAR, 0);
+      act("$n swiftly deflects $N's attack.", victim, nullptr, ch, TO_ROOM, NOTVICT);
+      act("$n swiftly deflects your attack.",victim, nullptr, ch, TO_VICT,0);
+      act("You swiftly deflect $N's attack.",victim, nullptr, ch, TO_CHAR, 0);
     }*/
   if (GET_CLASS(victim) == CLASS_MONK)
     reduce = (int)((float)reduce / 1.25);
@@ -3716,7 +3716,7 @@ bool check_parry(char_data *ch, char_data *victim, int attacktype, bool display_
 {
   int modifier = 0;
   if ((IS_SET(victim->combat, COMBAT_STUNNED)) ||
-      (victim->equipment[WIELD] == NULL) ||
+      (victim->equipment[WIELD] == nullptr) ||
       (IS_NPC(victim) && (!ISSET(victim->mobdata->actflags, ACT_PARRY))) ||
       (IS_SET(victim->combat, COMBAT_STUNNED2)) ||
       ((IS_SET(victim->combat, COMBAT_BASH1) ||
@@ -3790,9 +3790,9 @@ bool check_parry(char_data *ch, char_data *victim, int attacktype, bool display_
 
   if (display_results == true)
   {
-    act("$n parries $N's attack.", victim, NULL, ch, TO_ROOM, NOTVICT);
-    act("$n parries your attack.", victim, NULL, ch, TO_VICT, 0);
-    act("You parry $N's attack.", victim, NULL, ch, TO_CHAR, 0);
+    act("$n parries $N's attack.", victim, nullptr, ch, TO_ROOM, NOTVICT);
+    act("$n parries your attack.", victim, nullptr, ch, TO_VICT, 0);
+    act("You parry $N's attack.", victim, nullptr, ch, TO_CHAR, 0);
   }
   return true;
 }
@@ -3926,9 +3926,9 @@ bool check_dodge(char_data *ch, char_data *victim, int attacktype, bool display_
 
   if (display_results == true)
   {
-    act("$n dodges $N's attack.", victim, NULL, ch, TO_ROOM, NOTVICT);
-    act("$n dodges your attack.", victim, NULL, ch, TO_VICT, 0);
-    act("You dodge $N's attack.", victim, NULL, ch, TO_CHAR, 0);
+    act("$n dodges $N's attack.", victim, nullptr, ch, TO_ROOM, NOTVICT);
+    act("$n dodges your attack.", victim, nullptr, ch, TO_VICT, 0);
+    act("You dodge $N's attack.", victim, nullptr, ch, TO_CHAR, 0);
   }
 
   return true;
@@ -4018,7 +4018,7 @@ void load_messages(char *file, int base)
 void free_messages_from_memory()
 {
   extern struct message_list fight_messages[MAX_MESSAGES];
-  struct message_type *next_message = NULL;
+  struct message_type *next_message = nullptr;
   int i;
 
   for (i = 0; (i < MAX_MESSAGES) && (fight_messages[i].a_type); i++)
@@ -4482,7 +4482,7 @@ void make_corpse(char_data *ch)
 
     if (IS_MOB(ch) && GET_LEVEL(ch) > 60 && number(1, 100) > 90) // 10%
     {
-      struct obj_data *recipeitem = NULL;
+      struct obj_data *recipeitem = nullptr;
       int rarity = number(1, 100);
       bool itemtype = number(0, 1);
       if (rarity > 95) // 96-100 5%
@@ -5071,16 +5071,16 @@ int do_skewer(char_data *ch, char_data *vict, int dam, int wt, int wt2, int weap
   {
     if (check_dodge(ch, vict, type, false))
     {
-      act("$n dodges $N's skewer!!", vict, NULL, ch, TO_ROOM, NOTVICT);
-      act("$n dodges your skewer!!", vict, NULL, ch, TO_VICT, 0);
-      act("You dodge $N's skewer!!", vict, NULL, ch, TO_CHAR, 0);
+      act("$n dodges $N's skewer!!", vict, nullptr, ch, TO_ROOM, NOTVICT);
+      act("$n dodges your skewer!!", vict, nullptr, ch, TO_VICT, 0);
+      act("You dodge $N's skewer!!", vict, nullptr, ch, TO_CHAR, 0);
       return 0;
     }
     if (check_parry(ch, vict, type, false))
     {
-      act("$n parries $N's skewer!!", vict, NULL, ch, TO_ROOM, NOTVICT);
-      act("$n parries your skewer!!", vict, NULL, ch, TO_VICT, 0);
-      act("You parry $N's skewer!!", vict, NULL, ch, TO_CHAR, 0);
+      act("$n parries $N's skewer!!", vict, nullptr, ch, TO_ROOM, NOTVICT);
+      act("$n parries your skewer!!", vict, nullptr, ch, TO_VICT, 0);
+      act("You parry $N's skewer!!", vict, nullptr, ch, TO_CHAR, 0);
       return 0;
     }
     if (check_shieldblock(ch, vict, type))
@@ -5424,7 +5424,7 @@ void raw_kill(char_data *ch, char_data *victim)
     {
       if (ch == nullptr)
       {
-        logf(0, LogChannels::LOG_BUG, "selfpurge on NULL to NULL");
+        logf(0, LogChannels::LOG_BUG, "selfpurge on nullptr to nullptr");
       }
       else
       {
@@ -5960,7 +5960,7 @@ char_data *loop_followers(struct follow_type **f)
     *f = (*f)->next;
   }
   else
-    tmp_ch = NULL;
+    tmp_ch = nullptr;
 
   return (tmp_ch);
 }
@@ -5992,9 +5992,9 @@ void dam_message(int dam, char_data *ch, char_data *victim,
     sprintf(buf1, "$n's pitiful attack is ignored by $N!");
     sprintf(buf2, "Your pitiful attack is completely ignored by $N!");
     sprintf(buf3, "You ignore $n's pitiful attack.");
-    act(buf1, ch, NULL, victim, TO_ROOM, NOTVICT);
-    act(buf2, ch, NULL, victim, TO_CHAR, 0);
-    act(buf3, ch, NULL, victim, TO_VICT, 0);
+    act(buf1, ch, nullptr, victim, TO_ROOM, NOTVICT);
+    act(buf2, ch, nullptr, victim, TO_CHAR, 0);
+    act(buf3, ch, nullptr, victim, TO_VICT, 0);
     return;
   }
 
@@ -6309,10 +6309,10 @@ void dam_message(int dam, char_data *ch, char_data *victim,
       sprintf(buf3, "$n's %s%s %s you%s%s%c", modstring, attack, vp, vx, !IS_NPC(victim) && IS_SET(victim->pcdata->toggles, PLR_DAMAGE) ? dammsg : "", punct);
     }
   }
-  //   act(buf1, ch, NULL, victim, TO_ROOM, NOTVICT);
+  //   act(buf1, ch, nullptr, victim, TO_ROOM, NOTVICT);
   send_damage(buf1, ch, 0, victim, dammsg, 0, TO_ROOM);
-  act(buf2, ch, NULL, victim, TO_CHAR, 0);
-  act(buf3, ch, NULL, victim, TO_VICT, 0);
+  act(buf2, ch, nullptr, victim, TO_CHAR, 0);
+  act(buf3, ch, nullptr, victim, TO_VICT, 0);
 }
 
 /*
@@ -6323,9 +6323,9 @@ void disarm(char_data *ch, char_data *victim)
 {
   struct obj_data *obj;
 
-  if (victim->equipment[WIELD] == NULL)
+  if (victim->equipment[WIELD] == nullptr)
     return;
-  if (ch->equipment[WIELD] == NULL)
+  if (ch->equipment[WIELD] == nullptr)
     return;
 
   if (affected_by_spell(victim, SPELL_PARALYZE))
@@ -6338,9 +6338,9 @@ void disarm(char_data *ch, char_data *victim)
     send_to_char("In their enraged state, there's no chance they'd let go of their weapon!\r\n", ch);
     return;
   }
-  act("$B$n disarms you and sends your weapon flying!$R", ch, NULL, victim, TO_VICT, 0);
-  act("You disarm $N and send $S weapon flying!", ch, NULL, victim, TO_CHAR, 0);
-  act("$n disarms $N and sends $S weapon flying!", ch, NULL, victim, TO_ROOM, NOTVICT);
+  act("$B$n disarms you and sends your weapon flying!$R", ch, nullptr, victim, TO_VICT, 0);
+  act("You disarm $N and send $S weapon flying!", ch, nullptr, victim, TO_CHAR, 0);
+  act("$n disarms $N and sends $S weapon flying!", ch, nullptr, victim, TO_ROOM, NOTVICT);
 
   // all disarms go to inventory right now -pir
   //  if (!IS_NPC(ch)) {
@@ -6381,11 +6381,11 @@ void trip(char_data *ch, char_data *victim)
     return;
 
   act("$n trips you and you go down!",
-      ch, NULL, victim, TO_VICT, 0);
+      ch, nullptr, victim, TO_VICT, 0);
   act("You trip $N and $N goes down!",
-      ch, NULL, victim, TO_CHAR, 0);
+      ch, nullptr, victim, TO_CHAR, 0);
   act("$n trips $N and $N goes down!",
-      ch, NULL, victim, TO_ROOM, NOTVICT);
+      ch, nullptr, victim, TO_ROOM, NOTVICT);
 
   WAIT_STATE(ch, PULSE_VIOLENCE * 3);
   if (damage(ch, victim, 1, TYPE_HIT, SKILL_TRIP, 0) == (-1))
@@ -6500,7 +6500,7 @@ void do_pkill(char_data *ch, char_data *victim, int type, bool vict_is_attacker)
   save_char_obj(victim);
 
   // have to be level 20 and linkalive to count as a pkill and not yourself
-  if (ch != NULL)
+  if (ch != nullptr)
   {
     if (type == KILL_POTATO)
       sprintf(killer_message, "\n\r##%s just got POTATOED!!\n\r", GET_NAME(victim));
@@ -6714,7 +6714,7 @@ void do_pkill(char_data *ch, char_data *victim, int type, bool vict_is_attacker)
   }
   else
   {
-    // ch == NULL
+    // ch == nullptr
     if (type == KILL_DROWN)
       sprintf(killer_message, "\n\r##%s just DROWNED!\n\r", GET_NAME(victim));
     else if (type == KILL_POTATO)
@@ -6734,7 +6734,7 @@ void do_pkill(char_data *ch, char_data *victim, int type, bool vict_is_attacker)
   if (IS_AFFECTED(victim, AFF_CHAMPION) && ch && ch != victim)
   {
     REMBIT(victim->affected_by, AFF_CHAMPION);
-    obj_data *obj = NULL;
+    obj_data *obj = nullptr;
     if (!(obj = get_obj_in_list_num(real_object(CHAMPION_ITEM), victim->carrying)))
     {
       logentry("Champion without the flag, no bueno amigo!", IMMORTAL, LogChannels::LOG_BUG);
@@ -6771,8 +6771,8 @@ void arena_kill(char_data *ch, char_data *victim, int type)
 
   char killer_message[MAX_STRING_LENGTH];
   //  char_data *i;
-  clan_data *ch_clan = NULL;
-  clan_data *victim_clan = NULL;
+  clan_data *ch_clan = nullptr;
+  clan_data *victim_clan = nullptr;
   int eliminated = 1;
   void move_player_home(char_data * victim);
 
@@ -7291,7 +7291,7 @@ int second_attack(char_data *ch)
   if (affected_by_spell(ch, SKILL_DEFENDERS_STANCE))
     return false;
   learned = has_skill(ch, SKILL_SECOND_ATTACK);
-  if (learned && skill_success(ch, NULL, SKILL_SECOND_ATTACK, 15))
+  if (learned && skill_success(ch, nullptr, SKILL_SECOND_ATTACK, 15))
   {
     return true;
   }
@@ -7307,7 +7307,7 @@ int third_attack(char_data *ch)
   if (affected_by_spell(ch, SKILL_DEFENDERS_STANCE))
     return false;
   learned = has_skill(ch, SKILL_THIRD_ATTACK);
-  if (learned && skill_success(ch, NULL, SKILL_THIRD_ATTACK, 15))
+  if (learned && skill_success(ch, nullptr, SKILL_THIRD_ATTACK, 15))
   {
     return true;
   }
@@ -7431,7 +7431,7 @@ int is_fighting_mob(char_data *ch)
 int do_flee(char_data *ch, char *argument, int cmd)
 {
   int i, attempt, retval, escape = 0;
-  char_data *chTemp, *loop_ch, *vict = NULL;
+  char_data *chTemp, *loop_ch, *vict = nullptr;
 
   if (is_stunned(ch))
     return eFAILURE;

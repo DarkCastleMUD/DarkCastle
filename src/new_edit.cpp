@@ -96,25 +96,25 @@ void parse_action(int command, char *str, struct descriptor_data *d)
          j++;
       }
       s = strtok(str, "'");
-      if (s == NULL)
+      if (s == nullptr)
       {
          SEND_TO_Q("Invalid format.\r\n", d);
          return;
       }
-      s = strtok(NULL, "'");
-      if (s == NULL)
+      s = strtok(nullptr, "'");
+      if (s == nullptr)
       {
          SEND_TO_Q("Target string must be enclosed in single quotes.\r\n", d);
          return;
       }
-      t = strtok(NULL, "'");
-      if (t == NULL)
+      t = strtok(nullptr, "'");
+      if (t == nullptr)
       {
          SEND_TO_Q("No replacement string.\r\n", d);
          return;
       }
-      t = strtok(NULL, "'");
-      if (t == NULL)
+      t = strtok(nullptr, "'");
+      if (t == nullptr)
       {
          SEND_TO_Q("Replacement string must be enclosed in single quotes.\r\n", d);
          return;
@@ -164,7 +164,7 @@ void parse_action(int command, char *str, struct descriptor_data *d)
 
       i = 1;
       total_len = 1;
-      if ((s = *d->strnew) == NULL)
+      if ((s = *d->strnew) == nullptr)
       {
          SEND_TO_Q("Buffer is empty.\r\n", d);
          return;
@@ -172,12 +172,12 @@ void parse_action(int command, char *str, struct descriptor_data *d)
       if (line_low > 0)
       {
          while (s && (i < line_low))
-            if ((s = strchr(s, '\n')) != NULL)
+            if ((s = strchr(s, '\n')) != nullptr)
             {
                i++;
                s++;
             }
-         if ((i < line_low) || (s == NULL))
+         if ((i < line_low) || (s == nullptr))
          {
             SEND_TO_Q("Line(s) out of range; not deleting.\r\n", d);
             return;
@@ -185,13 +185,13 @@ void parse_action(int command, char *str, struct descriptor_data *d)
 
          t = s;
          while (s && (i < line_high))
-            if ((s = strchr(s, '\n')) != NULL)
+            if ((s = strchr(s, '\n')) != nullptr)
             {
                i++;
                total_len++;
                s++;
             }
-         if ((s) && ((s = strchr(s, '\n')) != NULL))
+         if ((s) && ((s = strchr(s, '\n')) != nullptr))
          {
             s++;
             while (*s != '\0')
@@ -251,12 +251,12 @@ void parse_action(int command, char *str, struct descriptor_data *d)
       total_len = 0;
       s = *d->strnew;
       while (s && (i < line_low))
-         if ((s = strchr(s, '\n')) != NULL)
+         if ((s = strchr(s, '\n')) != nullptr)
          {
             i++;
             s++;
          }
-      if ((i < line_low) || (s == NULL))
+      if ((i < line_low) || (s == nullptr))
       {
          SEND_TO_Q("Line(s) out of range; no buffer listing.\r\n", d);
          return;
@@ -264,7 +264,7 @@ void parse_action(int command, char *str, struct descriptor_data *d)
 
       t = s;
       while (s && (i <= line_high))
-         if ((s = strchr(s, '\n')) != NULL)
+         if ((s = strchr(s, '\n')) != nullptr)
          {
             i++;
             total_len++;
@@ -322,12 +322,12 @@ void parse_action(int command, char *str, struct descriptor_data *d)
       total_len = 0;
       s = *d->strnew;
       while (s && (i < line_low))
-         if ((s = strchr(s, '\n')) != NULL)
+         if ((s = strchr(s, '\n')) != nullptr)
          {
             i++;
             s++;
          }
-      if ((i < line_low) || (s == NULL))
+      if ((i < line_low) || (s == nullptr))
       {
          SEND_TO_Q("Line(s) out of range; no buffer listing.\r\n", d);
          return;
@@ -335,7 +335,7 @@ void parse_action(int command, char *str, struct descriptor_data *d)
 
       t = s;
       while (s && (i <= line_high))
-         if ((s = strchr(s, '\n')) != NULL)
+         if ((s = strchr(s, '\n')) != nullptr)
          {
             i++;
             total_len++;
@@ -378,7 +378,7 @@ void parse_action(int command, char *str, struct descriptor_data *d)
 
       i = 1;
       *buf = '\0';
-      if ((s = *d->strnew) == NULL)
+      if ((s = *d->strnew) == nullptr)
       {
          SEND_TO_Q("Buffer is empty, nowhere to insert.\r\n", d);
          return;
@@ -386,12 +386,12 @@ void parse_action(int command, char *str, struct descriptor_data *d)
       if (line_low > 0)
       {
          while (s && (i < line_low))
-            if ((s = strchr(s, '\n')) != NULL)
+            if ((s = strchr(s, '\n')) != nullptr)
             {
                i++;
                s++;
             }
-         if ((i < line_low) || (s == NULL))
+         if ((i < line_low) || (s == nullptr))
          {
             SEND_TO_Q("Line number out of range; insert aborted.\r\n", d);
             return;
@@ -433,7 +433,7 @@ void parse_action(int command, char *str, struct descriptor_data *d)
 
       i = 1;
       *buf = '\0';
-      if ((s = *d->strnew) == NULL)
+      if ((s = *d->strnew) == nullptr)
       {
          SEND_TO_Q("Buffer is empty, nothing to change.\r\n", d);
          return;
@@ -442,13 +442,13 @@ void parse_action(int command, char *str, struct descriptor_data *d)
       {
          /* loop through the text counting /n chars till we get to the line */
          while (s && (i < line_low))
-            if ((s = strchr(s, '\n')) != NULL)
+            if ((s = strchr(s, '\n')) != nullptr)
             {
                i++;
                s++;
             }
          /* make sure that there was a THAT line in the text */
-         if ((i < line_low) || (s == NULL))
+         if ((i < line_low) || (s == nullptr))
          {
             SEND_TO_Q("Line number out of range; change aborted.\r\n", d);
             return;
@@ -466,7 +466,7 @@ void parse_action(int command, char *str, struct descriptor_data *d)
          }
          /* put the new 'good' line into place. */
          strncat(buf, buf2, 32768 - strlen(buf) - 1);
-         if ((s = strchr(s, '\n')) != NULL)
+         if ((s = strchr(s, '\n')) != nullptr)
          {
             /* this means that we are at the END of the line we want outta there. */
             /* BUT we want s to point to the beginning of the line AFTER
@@ -507,7 +507,7 @@ void parse_action(int command, char *str, struct descriptor_data *d)
 int replace_str(char **string, char *pattern, char *replacement, int rep_all,
                 int max_size)
 {
-   char *replace_buffer = NULL;
+   char *replace_buffer = nullptr;
    char *flow, *jetsam, temp;
    int len, i;
 
@@ -521,7 +521,7 @@ int replace_str(char **string, char *pattern, char *replacement, int rep_all,
    *replace_buffer = '\0';
    if (rep_all)
    {
-      while ((flow = (char *)strstr(flow, pattern)) != NULL)
+      while ((flow = (char *)strstr(flow, pattern)) != nullptr)
       {
          i++;
          temp = *flow;
@@ -541,7 +541,7 @@ int replace_str(char **string, char *pattern, char *replacement, int rep_all,
    }
    else
    {
-      if ((flow = (char *)strstr(*string, pattern)) != NULL)
+      if ((flow = (char *)strstr(*string, pattern)) != nullptr)
       {
          i++;
          flow += strlen(pattern);
@@ -568,7 +568,7 @@ int replace_str(char **string, char *pattern, char *replacement, int rep_all,
 void format_text(char **ptr_string, int mode, struct descriptor_data *d, int maxlen)
 {
    int total_chars, cap_next = true, cap_next_next = false;
-   char *flow, *start = NULL, temp;
+   char *flow, *start = nullptr, temp;
    /* warning: do not edit messages with max_str's of over this value */
    char formated[MAX_STRING_LENGTH];
 
@@ -720,7 +720,7 @@ void new_string_add(struct descriptor_data *d, char *str)
       case 'c':
          if (*(d->strnew))
          {
-            *(d->strnew) = NULL;
+            *(d->strnew) = nullptr;
             SEND_TO_Q("Current buffer cleared.\r\n", d);
          }
          else
@@ -803,7 +803,7 @@ void new_string_add(struct descriptor_data *d, char *str)
    bool ishashed(char *arg);
    if (terminator)
    {
-      if (terminator == 2 || *(d->strnew) == NULL)
+      if (terminator == 2 || *(d->strnew) == nullptr)
       {
          if ((d->strnew) && (*d->strnew) && (**d->strnew == '\0') && !ishashed(*d->strnew))
             dc_free(*d->strnew);
@@ -813,11 +813,11 @@ void new_string_add(struct descriptor_data *d, char *str)
          }
          else
          {
-            //         *d->strnew = NULL;
+            //         *d->strnew = nullptr;
             *d->strnew = strdup("");
          }
-         d->backstr = NULL;
-         d->strnew = NULL;
+         d->backstr = nullptr;
+         d->strnew = nullptr;
          if (d->connected == conn::WRITE_BOARD)
          {
             if (d->character)
@@ -852,8 +852,8 @@ void new_string_add(struct descriptor_data *d, char *str)
                save_char_obj(d->character);
             if ((d->strnew) && (*d->strnew) && (**d->strnew == '\0') && !ishashed(*d->strnew) && STATE(d))
                dc_free(*d->strnew);
-            d->backstr = NULL;
-            d->strnew = NULL;
+            d->backstr = nullptr;
+            d->strnew = nullptr;
             if (d->connected == conn::WRITE_BOARD)
             {
                if (d->character)

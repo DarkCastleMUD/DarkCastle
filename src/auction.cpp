@@ -869,7 +869,7 @@ void AuctionHouse::Load()
     InTicket.state = (AuctionStates)state;
     fscanf(the_file, "%u\n", &InTicket.end_time);
     fscanf(the_file, "%u\n", &InTicket.price);
-    InTicket.obj = NULL;
+    InTicket.obj = nullptr;
 
     Items_For_Sale[ticket] = InTicket;
   } // LOOP
@@ -1224,7 +1224,7 @@ void AuctionHouse::BuyItem(char_data *ch, unsigned int ticket)
     }
   }
 
-  Item_it->second.obj = NULL;
+  Item_it->second.obj = nullptr;
   ItemsSold += 1;
   ItemsActive -= 1;
   Revenue += Item_it->second.price;
@@ -1291,8 +1291,8 @@ void AuctionHouse::BuyItem(char_data *ch, unsigned int ticket)
 
 obj_data *ticket_object_load(map<unsigned int, AuctionTicket>::iterator Item_it, int ticket)
 {
-  // If obj is NULL then either we haven't loaded this object yet or it's not custom
-  if (Item_it->second.obj == NULL)
+  // If obj is nullptr then either we haven't loaded this object yet or it's not custom
+  if (Item_it->second.obj == nullptr)
   {
     stringstream obj_filename;
     obj_filename << "../lib/auctions/" << ticket << ".auction_obj";
@@ -1327,12 +1327,12 @@ obj_data *ticket_object_load(map<unsigned int, AuctionTicket>::iterator Item_it,
         {
           logf(IMMORTAL, LogChannels::LOG_BUG, "ticket_object_load(): could not load obj file for ticket %d due to reasons unknown", ticket);
         }
-        Item_it->second.obj = NULL;
+        Item_it->second.obj = nullptr;
       }
       catch (...)
       {
         logf(IMMORTAL, LogChannels::LOG_BUG, "ticket_object_load(): unknown error");
-        Item_it->second.obj = NULL;
+        Item_it->second.obj = nullptr;
       }
     }
   }
@@ -1774,7 +1774,7 @@ void AuctionHouse::AddItem(char_data *ch, obj_data *obj, unsigned int price, str
   }
   else
   {
-    NewTicket.obj = NULL;
+    NewTicket.obj = nullptr;
   }
 
   Items_For_Sale[cur_index] = NewTicket;

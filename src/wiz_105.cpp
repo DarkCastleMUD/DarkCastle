@@ -431,7 +431,7 @@ struct skill_quest *find_sq(char *testa)
   for (curr = skill_list; curr; curr = curr->next)
     if (!str_nosp_cmp(get_skill_name(curr->num), testa))
       return curr;
-  return NULL;
+  return nullptr;
 }
 
 struct skill_quest *find_sq(int sq)
@@ -440,7 +440,7 @@ struct skill_quest *find_sq(int sq)
   for (curr = skill_list; curr; curr = curr->next)
     if (sq == curr->num)
       return curr;
-  return NULL;
+  return nullptr;
 }
 
 int do_sqedit(char_data *ch, char *argument, int cmd)
@@ -494,7 +494,7 @@ int do_sqedit(char_data *ch, char *argument, int cmd)
   char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH * 2];
   bool done = false;
   argument = one_argument(argument, arg1);
-  struct skill_quest *skill = NULL;
+  struct skill_quest *skill = nullptr;
 
   if (argument && *argument)
   {
@@ -505,12 +505,12 @@ int do_sqedit(char_data *ch, char *argument, int cmd)
     skill = find_sq(arg3);
   }
 
-  if (skill == NULL && (skill = find_sq(arg1)) == NULL && i != 0 && i != 6 && i != 7)
+  if (skill == nullptr && (skill = find_sq(arg1)) == nullptr && i != 0 && i != 6 && i != 7)
   {
     send_to_char("Unknown skill.\r\n", ch);
     return eFAILURE;
   }
-  struct skill_quest *curren, *last = NULL;
+  struct skill_quest *curren, *last = nullptr;
   switch (i)
   {
   case 0:
@@ -694,7 +694,7 @@ int do_eqmax(char_data *ch, char *argument, int cmd)
   extern int class_restricted(char_data * ch, struct obj_data * obj);
   extern int size_restricted(char_data * ch, struct obj_data * obj);
 
-  if ((vict = get_pc_vis(ch, arg)) == NULL)
+  if ((vict = get_pc_vis(ch, arg)) == nullptr)
   {
     send_to_char("Who?\r\n", ch);
     return eFAILURE;

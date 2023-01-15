@@ -15,7 +15,7 @@
 #include "returnvals.h"
 #include "spells.h"
 
-struct ban_list_element *ban_list = NULL;
+struct ban_list_element *ban_list = nullptr;
 
 char *ban_types[] = {
     "no",
@@ -61,7 +61,7 @@ void load_banned(void)
 
 void free_ban_list_from_memory()
 {
-  ban_list_element *next = NULL;
+  ban_list_element *next = nullptr;
 
   for (; ban_list; ban_list = next)
   {

@@ -93,17 +93,17 @@ int save_char_aliases(char_player_alias *alias, FILE *fpsave)
   return 1;
 }
 
-// return pointer to aliases or NULL
+// return pointer to aliases or nullptr
 struct char_player_alias *read_char_aliases(FILE *fpsave)
 {
   uint32_t total, x;
-  struct char_player_alias *top = NULL;
-  struct char_player_alias *curr = NULL;
+  struct char_player_alias *top = nullptr;
+  struct char_player_alias *curr = nullptr;
 
   fread(&total, sizeof(total), 1, fpsave);
 
   if (total < 1)
-    return NULL;
+    return nullptr;
 
   for (x = 0; x < total; x++)
   {
@@ -115,11 +115,11 @@ struct char_player_alias *read_char_aliases(FILE *fpsave)
 
     curr->keyword = fread_alias_string(fpsave);
     curr->command = fread_alias_string(fpsave);
-    if (curr->keyword == NULL || curr->command == NULL)
+    if (curr->keyword == nullptr || curr->command == nullptr)
     {
-      if (curr->keyword == NULL && curr->command)
+      if (curr->keyword == nullptr && curr->command)
         dc_free(curr->command);
-      if (curr->command == NULL && curr->keyword)
+      if (curr->command == nullptr && curr->keyword)
         dc_free(curr->keyword);
       dc_free(curr);
     }
@@ -135,7 +135,7 @@ struct char_player_alias *read_char_aliases(FILE *fpsave)
 char *fread_alias_string(FILE *fpsave)
 {
   uint32_t tmp_size;
-  char *buf = NULL;
+  char *buf = nullptr;
 
   fread(&tmp_size, sizeof tmp_size, 1, fpsave);
   if (tmp_size > 0)
@@ -588,7 +588,7 @@ int read_pc_or_mob_data(char_data *ch, FILE *fpsave)
 {
   if (IS_MOB(ch))
   {
-    ch->pcdata = NULL;
+    ch->pcdata = nullptr;
 #ifdef LEAK_CHECK
     ch->mobdata = (mob_data *)calloc(1, sizeof(mob_data));
 #else
@@ -598,7 +598,7 @@ int read_pc_or_mob_data(char_data *ch, FILE *fpsave)
   }
   else
   {
-    ch->mobdata = NULL;
+    ch->mobdata = nullptr;
     ch->pcdata = new pc_data;
     read_pc_data(ch, fpsave);
   }
@@ -740,7 +740,7 @@ int store_to_char_variable_data(char_data *ch, FILE *fpsave)
   {
     int16_t aff_count; // do not change form int16_t
     fread(&aff_count, sizeof(aff_count), 1, fpsave);
-    ch->affected = NULL;
+    ch->affected = nullptr;
     for (int16_t i = 0; i < aff_count; i++)
     {
       affected_type *af = new (nothrow) affected_type;
@@ -819,9 +819,9 @@ void save_char_obj_db(char_data *ch)
 
   timeval start, finish;
 
-  gettimeofday(&start, NULL);
+  gettimeofday(&start, nullptr);
   db.save(ch, &uchar);
-  gettimeofday(&finish, NULL);
+  gettimeofday(&finish, nullptr);
 
   int msec = finish.tv_sec * 1000 + finish.tv_usec / 1000;
   msec -= start.tv_sec * 1000 + start.tv_usec / 1000;
@@ -835,14 +835,14 @@ void save_char_obj_db(char_data *ch)
      (store_worn_eq(ch, fpsave))
     )
   {
-    if(fpsave != NULL)
+    if(fpsave != nullptr)
       fclose(fpsave);
     sprintf(log_buf, "mv -f %s %s", strsave, name);
     system(log_buf);
   }
   else
   {
-    if(fpsave != NULL)
+    if(fpsave != nullptr)
       fclose(fpsave);
     sprintf(log_buf, "Save_char_obj: %s", strsave);
     send_to_char ("WARNING: file problem. You did not save!", ch);
@@ -928,7 +928,7 @@ void save_char_obj(char_data *ch)
       (obj_to_store(ch->carrying, ch, fpsave, -1)) &&
       (store_worn_eq(ch, fpsave)))
   {
-    if (fpsave != NULL)
+    if (fpsave != nullptr)
       fclose(fpsave);
 
     char log_buf[MAX_STRING_LENGTH] = {};
@@ -937,7 +937,7 @@ void save_char_obj(char_data *ch)
   }
   else
   {
-    if (fpsave != NULL)
+    if (fpsave != nullptr)
       fclose(fpsave);
     char log_buf[MAX_STRING_LENGTH] = {};
     sprintf(log_buf, "Save_char_obj: %s", strsave);
@@ -959,17 +959,17 @@ void load_char_obj_error(FILE *fpsave, char strsave[MAX_INPUT_LENGTH])
   sprintf(log_buf, "Load_char_obj: %s", strsave);
   perror(log_buf);
   logentry(log_buf, ANGEL, LogChannels::LOG_BUG);
-  if (fpsave != NULL)
+  if (fpsave != nullptr)
     fclose(fpsave);
 }
 
 // Load a char and inventory into a new_new ch structure.
 bool load_char_obj(struct descriptor_data *d, const char *name)
 {
-  FILE *fpsave = NULL;
+  FILE *fpsave = nullptr;
   char strsave[MAX_INPUT_LENGTH];
   struct char_file_u4 uchar;
-  struct obj_data *last_cont = NULL;
+  struct obj_data *last_cont = nullptr;
   struct char_data *ch;
 
   if (!name || !strcmp(name, ""))
@@ -1003,7 +1003,7 @@ bool load_char_obj(struct descriptor_data *d, const char *name)
   //  then parse the memory instead of reading each item from file seperately
   //  Should be much faster and save our HD from turning itself to mush -pir
 
-  if ((fpsave = fopen(strsave, "rb")) == NULL)
+  if ((fpsave = fopen(strsave, "rb")) == nullptr)
     return false;
 
   if (fread(&uchar, sizeof(uchar), 1, fpsave) == 0)
@@ -1037,7 +1037,7 @@ bool load_char_obj(struct descriptor_data *d, const char *name)
     last_cont = obj_store_to_char(ch, fpsave, last_cont);
   }
 
-  if (fpsave != NULL)
+  if (fpsave != nullptr)
     fclose(fpsave);
   return true;
 }
@@ -1061,7 +1061,7 @@ struct obj_data *obj_store_to_char(char_data *ch, FILE *fpsave, struct obj_data 
   fread(&object, sizeof(object), 1, fpsave);
 
   if (feof(fpsave))
-    return NULL;
+    return nullptr;
 
   // if it's a current object, clone it and continue
   // if it's not, then we need to remove it from the pfile so clone obj 1
@@ -1283,7 +1283,7 @@ bool obj_to_store(struct obj_data *obj, char_data *ch, FILE *fpsave, int wear_po
 {
   // struct obj_data *tmp;
 
-  if (obj == NULL)
+  if (obj == nullptr)
     return true;
 
   // recurse down next item in list
@@ -1324,9 +1324,9 @@ bool put_obj_in_store(struct obj_data *obj, char_data *ch, FILE *fpsave, int wea
     // expiration to 24 hours from this point
     if (obj->save_expiration == 0)
     {
-      obj->save_expiration = time(NULL) + (60 * 60 * 24);
+      obj->save_expiration = time(nullptr) + (60 * 60 * 24);
     }
-    else if (time(NULL) > obj->save_expiration)
+    else if (time(nullptr) > obj->save_expiration)
     {
       // If the object's window for saving has expired then
       // we don't save it as-if it had ITEM_NOSAVE
@@ -1552,7 +1552,7 @@ void restore_weight(struct obj_data *obj)
 {
   struct obj_data *tmp;
 
-  if (obj == NULL)
+  if (obj == nullptr)
     return;
   if (obj_index[obj->item_number].virt == 536)
     return;

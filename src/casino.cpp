@@ -129,7 +129,7 @@ void switch_cards(struct cDeck *tDeck, int pos1, int pos2)
 
 void free_player(struct player_data *plr)
 {
-   struct player_data *tmp, *prev = NULL;
+   struct player_data *tmp, *prev = nullptr;
    struct table_data *tbl = plr->table;
    for (tmp = tbl->plr; tmp; tmp = tmp->next)
    {
@@ -175,7 +175,7 @@ void nextturn(struct table_data *tbl)
    }
    else
    {
-      tbl->cr = NULL;
+      tbl->cr = nullptr;
       add_timer_bj_dealer(tbl);
    }
 }
@@ -362,14 +362,14 @@ struct player_data *createPlayer(char_data *ch, struct table_data *tbl, int noad
    {
       struct player_data *tmp;
       for (tmp = tbl->plr; tmp; tmp = tmp->next)
-         if (tmp->next == NULL)
+         if (tmp->next == nullptr)
             break;
 
       if (tmp)
          tmp->next = plr;
       else
          tbl->plr = plr;
-      plr->next = NULL;
+      plr->next = nullptr;
    }
    return plr;
 }
@@ -469,7 +469,7 @@ void check_active(void *arg1, void *arg2, void *arg3)
 {
    struct player_data *plr = (struct player_data *)arg1;
    struct table_data *tbl = (struct table_data *)arg3;
-   struct player_data *ptmp = NULL;
+   struct player_data *ptmp = nullptr;
    for (ptmp = tbl->plr; ptmp; ptmp = ptmp->next)
       if (ptmp == plr)
          break;
@@ -523,7 +523,7 @@ void addtimer(struct timer_data *add)
    struct timer_data *timer;
    for (timer = timer_list; timer; timer = timer->next)
    {
-      if (timer->next == NULL)
+      if (timer->next == nullptr)
       {
          timer->next = add;
          return;
@@ -616,7 +616,7 @@ void reset_table(struct table_data *tbl)
 { // called both on error and regular reset
    while (tbl->plr)
       free_player(tbl->plr);
-   tbl->cr = NULL;
+   tbl->cr = nullptr;
    tbl->state = 0;
    for (int i = 0; i < 21; i++)
       tbl->hand_data[i] = 0;
@@ -933,7 +933,7 @@ void create_table(struct obj_data *obj)
       table->gold = true;
    table->deck = create_deck(6);
    shuffle_deck(table->deck);
-   table->plr = table->cr = NULL;
+   table->plr = table->cr = nullptr;
    table->deck->table = table;
    for (int i = 0; i < 21; i++)
       table->hand_data[i] = 0;
@@ -945,7 +945,7 @@ void create_table(struct obj_data *obj)
 
 void destroy_table(struct table_data *tbl)
 {
-   tbl->obj->table = NULL;
+   tbl->obj->table = nullptr;
    reset_table(tbl);
    dc_free(tbl);
 }
@@ -968,7 +968,7 @@ struct player_data *getPlayer(char_data *ch, struct table_data *tbl)
    for (plr = tbl->plr; plr; plr = plr->next)
       if (plr->ch == ch)
          return plr;
-   return NULL;
+   return nullptr;
 }
 
 int players(struct table_data *tbl)
@@ -1413,7 +1413,7 @@ int blackjack_table(char_data *ch, struct obj_data *obj, int cmd, const char *ar
                       ch);
          nextturn(plr->table);
 
-         if (plr->table->plr != plr || plr->next != NULL) // make dealer show cards..
+         if (plr->table->plr != plr || plr->next != nullptr) // make dealer show cards..
             free_player(plr);
       }
       else
@@ -1513,7 +1513,7 @@ int blackjack_table(char_data *ch, struct obj_data *obj, int cmd, const char *ar
          send_to_char("$BYou BUSTED!$R\r\nThe dealer takes your bet.\r\n",
                       ch);
          nextturn(plr->table);
-         if (plr->table->plr != plr || plr->next != NULL) // make dealer show cards..
+         if (plr->table->plr != plr || plr->next != nullptr) // make dealer show cards..
             free_player(plr);
       }
       else
@@ -1571,7 +1571,7 @@ struct ttable
 int has_seat(struct ttable *ttbl)
 {
    for (int i = 0; i < 6; i++)
-      if (ttbl->player[i] == NULL)
+      if (ttbl->player[i] == nullptr)
          return i;
    return -1;
 }
@@ -1910,7 +1910,7 @@ struct tplayer *createTplayer(struct ttable *ttbl)
 {
    int seat = has_seat(ttbl);
    if (seat < 0)
-      return NULL;
+      return nullptr;
    struct tplayer *tplr;
 
 #ifdef LEAK_CHECK
@@ -2080,7 +2080,7 @@ void save_slot_machines()
       return;
    }
 
-   FILE *f = (FILE *)NULL;
+   FILE *f = (FILE *)nullptr;
    world_file_list_item *curr;
    char buf[180];
    char buf2[180];
@@ -2121,8 +2121,8 @@ void create_slot(obj_data *obj)
 #endif
 
    slot->obj = obj;
-   slot->ch = NULL;
-   slot->prch = NULL;
+   slot->ch = nullptr;
+   slot->prch = nullptr;
    slot->cost = obj->obj_flags.value[0];
    slot->jackpot = obj->obj_flags.value[1];
    slot->linkedto = obj->obj_flags.value[3];
@@ -2490,7 +2490,7 @@ void create_wheel(obj_data *obj)
 #else
       wheel->plr[i] = (struct roulette_player *)dc_alloc(1, sizeof(struct roulette_player));
 #endif
-      wheel->plr[i]->ch = NULL;
+      wheel->plr[i]->ch = nullptr;
       for (int j = 0; j < 48; j++)
          wheel->plr[i]->bet_array[j] = 0;
    }
@@ -2697,7 +2697,7 @@ void wheel_stop(struct wheel_data *wheel)
       }
       for (int j = 0; j < 48; j++)
          wheel->plr[i]->bet_array[j] = 0;
-      wheel->plr[i]->ch = NULL;
+      wheel->plr[i]->ch = nullptr;
    }
    wheel->spinning = false;
    wheel->countdown = 11;
@@ -2805,9 +2805,9 @@ int roulette_table(char_data *ch, struct obj_data *obj, int cmd, const char *arg
             return eSUCCESS;
          }
          if (obj->wheel->plr[i]->ch && charExists(obj->wheel->plr[i]->ch) && obj->wheel->plr[i]->ch->in_room != obj->in_room)
-            obj->wheel->plr[i]->ch = NULL;
+            obj->wheel->plr[i]->ch = nullptr;
          else if (obj->wheel->plr[i]->ch && !charExists(obj->wheel->plr[i]->ch))
-            obj->wheel->plr[i]->ch = NULL;
+            obj->wheel->plr[i]->ch = nullptr;
          if (!obj->wheel->plr[i]->ch)
          {
             obj->wheel->plr[i]->ch = ch;

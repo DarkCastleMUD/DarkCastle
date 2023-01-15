@@ -168,7 +168,7 @@ void mobile_activity(void)
     if (ch->mobdata->mpactnum > 0) // we check to make sure ch is mob in very beginning, so safe
     {
       mob_prog_act_list *tmp_act, *tmp2_act;
-      for (tmp_act = ch->mobdata->mpact; tmp_act != NULL; tmp_act = tmp_act->next)
+      for (tmp_act = ch->mobdata->mpact; tmp_act != nullptr; tmp_act = tmp_act->next)
       {
         PerfTimers["mprog_wordlist"].start();
         mprog_wordlist_check(tmp_act->buf, ch, tmp_act->ch,
@@ -182,14 +182,14 @@ void mobile_activity(void)
       if (IS_SET(retval, eCH_DIED) || selfpurge || isDead(ch) || isNowhere(ch))
         continue; // move on to next mob, this one is dead
 
-      for (tmp_act = ch->mobdata->mpact; tmp_act != NULL; tmp_act = tmp2_act)
+      for (tmp_act = ch->mobdata->mpact; tmp_act != nullptr; tmp_act = tmp2_act)
       {
         tmp2_act = tmp_act->next;
         dc_free(tmp_act->buf);
         dc_free(tmp_act);
       }
       ch->mobdata->mpactnum = 0;
-      ch->mobdata->mpact = NULL;
+      ch->mobdata->mpact = nullptr;
     }
 
     PerfTimers["scavenge"].start();
@@ -266,7 +266,7 @@ void mobile_activity(void)
     }
 
     // check hatred
-    if ((ch->mobdata->hatred != NULL)) //  && (!ch->fighting)) (we check fighting earlier)
+    if ((ch->mobdata->hatred != nullptr)) //  && (!ch->fighting)) (we check fighting earlier)
     {
       send_to_char("You're hating.\r\n", ch);
       char_data *next_blah;
@@ -399,7 +399,7 @@ void mobile_activity(void)
       if (ch->mobdata->fears)
         if (get_char_room_vis(ch, ch->mobdata->fears))
         {
-          if (ch->mobdata->hatred != NULL)
+          if (ch->mobdata->hatred != nullptr)
             remove_memory(ch, 'h');
           act("$n screams 'Oh SHIT!'", ch, 0, 0, TO_ROOM, 0);
           do_flee(ch, "", 0);
@@ -956,7 +956,7 @@ void scavenge(char_data *ch)
 
 void clear_hunt(void *arg1, void *arg2, void *arg3)
 {
-  clear_hunt((char *)arg1, (char_data *)arg2, NULL);
+  clear_hunt((char *)arg1, (char_data *)arg2, nullptr);
 }
 
 void clear_hunt(char *arg1, char_data *arg2, void *arg3)
@@ -967,7 +967,7 @@ void clear_hunt(char *arg1, char_data *arg2, void *arg3)
     if (curr == arg2)
     {
       dc_free(arg1);
-      arg2->hunting = NULL;
+      arg2->hunting = nullptr;
     }
   }
 }

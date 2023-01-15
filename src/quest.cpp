@@ -44,7 +44,7 @@ char *valid_fields[] = {
     "hint3",
     "cost",
     "brownie",
-    NULL};
+    nullptr};
 
 extern int keywordfind(obj_data *);
 extern void wear(char_data *, obj_data *, int);
@@ -1118,8 +1118,8 @@ int do_qedit(char_data *ch, char *argument, int cmd)
    char value[MAX_STRING_LENGTH];
    int holdernum;
    int i, lownum, highnum;
-   struct quest_info *quest = NULL;
-   char_data *vict = NULL;
+   struct quest_info *quest = nullptr;
+   char_data *vict = nullptr;
 
    half_chop(argument, arg, argument);
    for (; *argument == ' '; argument++)
@@ -1142,7 +1142,7 @@ int do_qedit(char_data *ch, char *argument, int cmd)
       //
       char **tmp = valid_fields;
       int i = 0;
-      while (*tmp != NULL)
+      while (*tmp != nullptr)
       {
          csendf(ch, "%s\t", *tmp);
          if (++i % 4 == 0)
@@ -1314,7 +1314,7 @@ int do_qedit(char_data *ch, char *argument, int cmd)
    }
 
    i = 0;
-   while (valid_fields[i] != NULL)
+   while (valid_fields[i] != nullptr)
    {
       if (is_abbrev(field, valid_fields[i]))
          break;
@@ -1322,7 +1322,7 @@ int do_qedit(char_data *ch, char *argument, int cmd)
          i++;
    }
 
-   if (valid_fields[i] == NULL)
+   if (valid_fields[i] == nullptr)
    {
       send_to_char("Valid fields: name, level, cost, brownie, objnum, objshort, objlong, objkey, mobnum, timer, reward, hint1, hint2, or hint3.\r\n", ch);
       return eFAILURE;
@@ -1587,7 +1587,7 @@ int quest_vendor(char_data *ch, obj_data *obj, int cmd, const char *arg, char_da
 
       SET_BIT(obj->obj_flags.more_flags, ITEM_24H_NO_SELL);
       SET_BIT(obj->obj_flags.more_flags, ITEM_CUSTOM);
-      obj->no_sell_expiration = time(NULL) + (60 * 60 * 24);
+      obj->no_sell_expiration = time(nullptr) + (60 * 60 * 24);
 
       obj_to_char(obj, ch);
       sprintf(buf, "%s Here's your %s$B$2. Have a nice time with it.", GET_NAME(ch), obj->short_description);
@@ -1620,7 +1620,7 @@ int quest_vendor(char_data *ch, obj_data *obj, int cmd, const char *arg, char_da
 
       if (IS_SET(obj->obj_flags.more_flags, ITEM_24H_NO_SELL))
       {
-         time_t now = time(NULL);
+         time_t now = time(nullptr);
          time_t expires = obj->no_sell_expiration;
          if (now < expires)
          {

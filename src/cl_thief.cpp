@@ -583,9 +583,9 @@ int do_trip(char_data *ch, char *argument, int cmd)
 
   if (!skill_success(ch, victim, SKILL_TRIP, modifier))
   {
-    act("$n fumbles clumsily as $e attempts to trip you!", ch, NULL, victim, TO_VICT, 0);
-    act("You fumble the trip!", ch, NULL, victim, TO_CHAR, 0);
-    act("$n fumbles as $e tries to trip $N!", ch, NULL, victim, TO_ROOM, NOTVICT);
+    act("$n fumbles clumsily as $e attempts to trip you!", ch, nullptr, victim, TO_VICT, 0);
+    act("You fumble the trip!", ch, nullptr, victim, TO_CHAR, 0);
+    act("$n fumbles as $e tries to trip $N!", ch, nullptr, victim, TO_ROOM, NOTVICT);
     WAIT_STATE(ch, PULSE_VIOLENCE * 2);
     retval = damage(ch, victim, 0, TYPE_UNDEFINED, SKILL_TRIP, 0);
   }
@@ -600,9 +600,9 @@ int do_trip(char_data *ch, char *argument, int cmd)
     }
     else
     {
-      act("$n trips you and you go down!", ch, NULL, victim, TO_VICT, 0);
-      act("You trip $N and $N goes down!", ch, NULL, victim, TO_CHAR, 0);
-      act("$n trips $N and $N goes down!", ch, NULL, victim, TO_ROOM, NOTVICT);
+      act("$n trips you and you go down!", ch, nullptr, victim, TO_VICT, 0);
+      act("You trip $N and $N goes down!", ch, nullptr, victim, TO_CHAR, 0);
+      act("$n trips $N and $N goes down!", ch, nullptr, victim, TO_ROOM, NOTVICT);
       if (GET_POS(victim) > POSITION_SITTING)
         GET_POS(victim) = POSITION_SITTING;
       SET_BIT(victim->combat, COMBAT_BASH2);
@@ -762,7 +762,7 @@ int do_hide(char_data *ch, char *argument, int cmd)
   if (!IS_NPC(ch) && (a = has_skill(ch, SKILL_HIDE)))
   {
     for (i = 0; i < MAX_HIDE; i++)
-      ch->pcdata->hiding_from[i] = NULL;
+      ch->pcdata->hiding_from[i] = nullptr;
     i = 0;
     for (temp = world[ch->in_room].people; temp; temp = temp->next_in_room)
     {
@@ -809,7 +809,7 @@ int do_steal(char_data *ch, char *argument, int cmd)
   int eq_pos;
   int _exp;
   int retval;
-  obj_data *has_item = NULL;
+  obj_data *has_item = nullptr;
   bool ohoh = false;
   int chance = GET_HITROLL(ch) + has_skill(ch, SKILL_STEAL) / 4;
   extern struct index_data *obj_index;
@@ -1506,7 +1506,7 @@ int do_pick(char_data *ch, char *argument, int cmd)
       if (!charge_moves(ch, SKILL_PICK_LOCK))
         return eSUCCESS;
 
-      if (!skill_success(ch, NULL, SKILL_PICK_LOCK))
+      if (!skill_success(ch, nullptr, SKILL_PICK_LOCK))
       {
         send_to_char("You failed to pick the lock.\r\n", ch);
         WAIT_STATE(ch, PULSE_VIOLENCE);
@@ -1550,7 +1550,7 @@ int do_pick(char_data *ch, char *argument, int cmd)
       }
 
       // skill_increase_check(ch, SKILL_PICK_LOCK, has_skill(ch,SKILL_PICK_LOCK), SKILL_INCREASE_MEDIUM);
-      if (!skill_success(ch, NULL, SKILL_PICK_LOCK))
+      if (!skill_success(ch, nullptr, SKILL_PICK_LOCK))
       {
         send_to_char("You failed to pick the lock.\r\n", ch);
         WAIT_STATE(ch, PULSE_VIOLENCE);
@@ -1799,7 +1799,7 @@ int do_slip(char_data *ch, char *argument, int cmd)
       send_to_char("It won't fit...cheater.\r\n", ch);
       return eFAILURE;
     }
-    if (!skill_success(ch, NULL, SKILL_SLIP))
+    if (!skill_success(ch, nullptr, SKILL_SLIP))
     { // fail
       act("$n tries to stealthily slip $p in $P, but you notice $s motions.", ch, obj,
           container, TO_ROOM, 0);
@@ -1939,7 +1939,7 @@ int do_vitalstrike(char_data *ch, char *argument, int cmd)
   if (!charge_moves(ch, SKILL_VITAL_STRIKE))
     return eSUCCESS;
 
-  if (!skill_success(ch, NULL, SKILL_VITAL_STRIKE))
+  if (!skill_success(ch, nullptr, SKILL_VITAL_STRIKE))
   {
     act("$n starts jabbing $s weapons around $mself and almost chops off $s pinkie finger.", ch, 0, 0, TO_ROOM, NOTVICT);
     send_to_char("You try to begin the vital strike technique and nearly slice off your own pinkie finger!\r\n", ch);
@@ -2006,7 +2006,7 @@ int do_deceit(char_data *ch, char *argument, int cmd)
   if (!charge_moves(ch, SKILL_DECEIT, grpsize))
     return eSUCCESS;
 
-  if (!skill_success(ch, NULL, SKILL_DECEIT))
+  if (!skill_success(ch, nullptr, SKILL_DECEIT))
   {
     send_to_char("Your class just isn't up to the task.\r\n", ch);
     act("$n tries to explain to you the weaknesses of others, but you do not understand.", ch, 0, 0, TO_ROOM, 0);

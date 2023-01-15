@@ -355,7 +355,7 @@ obj_data *clan_altar(char_data *ch)
                }
             }
          }
-   return NULL;
+   return nullptr;
 }
 
 void update_max_who(void)
@@ -396,7 +396,7 @@ void do_on_login_stuff(char_data *ch)
    do_inate_race_abilities(ch);
    check_hw(ch);
    /* Add a character's skill item's to the list. */
-   ch->pcdata->skillchange = NULL;
+   ch->pcdata->skillchange = nullptr;
    ch->spellcraftglyph = 0;
    for (int i = 0; i < MAX_WEAR; i++)
    {
@@ -408,7 +408,7 @@ void do_on_login_stuff(char_data *ch)
          {
             ch->equipment[i]->next_skill = ch->pcdata->skillchange;
             ch->pcdata->skillchange = ch->equipment[i];
-            ch->equipment[i]->next_skill = NULL;
+            ch->equipment[i]->next_skill = nullptr;
          }
       }
    }
@@ -419,7 +419,7 @@ void do_on_login_stuff(char_data *ch)
       ch->saves[i] += ch->pcdata->saves_mods[i];
    }
 
-   if (GET_TITLE(ch) == NULL)
+   if (GET_TITLE(ch) == nullptr)
    {
       GET_TITLE(ch) = str_dup("is a virgin.");
    }
@@ -1159,9 +1159,9 @@ void nanny(struct descriptor_data *d, string arg)
          telnet_ga(d);
          // TODO - double check this to make sure we're free'ing properly
          delete GET_NAME(ch);
-         GET_NAME(ch) = NULL;
+         GET_NAME(ch) = nullptr;
          delete d->character;
-         d->character = NULL;
+         d->character = nullptr;
          STATE(d) = conn::GET_NAME;
          break;
 
@@ -1752,7 +1752,7 @@ void nanny(struct descriptor_data *d, string arg)
       {
       case '0':
          close_socket(d);
-         d = NULL;
+         d = nullptr;
          break;
 
       case '1':
@@ -1769,7 +1769,7 @@ void nanny(struct descriptor_data *d, string arg)
             {
                write_to_descriptor(d->descriptor, "It seems your character has been deleted during logon, or you just experienced some obscure bug.");
                close_socket(d);
-               d = NULL;
+               d = nullptr;
                break;
             }
          }
@@ -1910,7 +1910,7 @@ void nanny(struct descriptor_data *d, string arg)
          GET_LEVEL(d->character) = 1;
          update_wizlist(d->character);
          close_socket(d);
-         d = NULL;
+         d = nullptr;
       }
       else
       {
@@ -2032,12 +2032,12 @@ int _parse_name(const char *arg, char *name)
 // Check for denial of service.
 bool check_deny(struct descriptor_data *d, char *name)
 {
-   FILE *fpdeny = NULL;
+   FILE *fpdeny = nullptr;
    char strdeny[MAX_INPUT_LENGTH];
    char bufdeny[MAX_STRING_LENGTH];
 
    sprintf(strdeny, "%s/%c/%s.deny", SAVE_DIR, UPPER(name[0]), name);
-   if ((fpdeny = fopen(strdeny, "rb")) == NULL)
+   if ((fpdeny = fopen(strdeny, "rb")) == nullptr)
       return false;
    fclose(fpdeny);
 
@@ -2056,7 +2056,7 @@ bool check_reconnect(struct descriptor_data *d, char *name, bool fReconnect)
    auto &character_list = DC::getInstance()->character_list;
    for (auto &tmp_ch : character_list)
    {
-      if (IS_NPC(tmp_ch) || tmp_ch->desc != NULL)
+      if (IS_NPC(tmp_ch) || tmp_ch->desc != nullptr)
          continue;
 
       if (str_cmp(GET_NAME(d->character), GET_NAME(tmp_ch)))
@@ -2312,7 +2312,7 @@ void check_silence_beacons(void)
 void checkConsecrate(int pulseType)
 {
    obj_data *obj, *tmp_obj;
-   char_data *ch = NULL, *tmp_ch, *next_ch;
+   char_data *ch = nullptr, *tmp_ch, *next_ch;
    int align, amount, spl = 0;
    char buf[MAX_STRING_LENGTH];
 

@@ -506,9 +506,9 @@ int do_at(char_data *ch, char *argument, int cmd)
       return eFAILURE;
     }
   }
-  else if ((target_mob = get_char_vis(ch, loc_str)) != NULL)
+  else if ((target_mob = get_char_vis(ch, loc_str)) != nullptr)
     location = target_mob->in_room;
-  else if ((target_obj = get_obj_vis(ch, loc_str)) != NULL)
+  else if ((target_obj = get_obj_vis(ch, loc_str)) != nullptr)
     if (target_obj->in_room != NOWHERE)
       location = target_obj->in_room;
     else
@@ -827,7 +827,7 @@ int do_varstat(char_data *ch, char *argument, int cmd)
   argument = one_argument(argument, arg);
   char_data *vict;
 
-  if ((vict = get_char_vis(ch, arg)) == NULL)
+  if ((vict = get_char_vis(ch, arg)) == nullptr)
   {
     send_to_char("Target not found.\r\n", ch);
     return eFAILURE;

@@ -361,13 +361,13 @@ int do_purge(char_data *ch, char *argument, int cmd)
 			if (vict->desc)
 			{
 				close_socket(vict->desc);
-				vict->desc = NULL;
+				vict->desc = nullptr;
 			}
 
 			extract_char(vict, true);
 		}
 		else if ((obj = get_obj_in_list_vis(ch, name,
-											world[ch->in_room].contents)) != NULL)
+											world[ch->in_room].contents)) != nullptr)
 		{
 			act("$n purges $p.", ch, obj, 0, TO_ROOM, 0);
 			act("You purge $p.", ch, obj, 0, TO_CHAR, 0);
@@ -800,7 +800,7 @@ int do_show(char_data *ch, char *argument, int cmd)
 	char beginrange[MAX_INPUT_LENGTH];
 	char endrange[MAX_INPUT_LENGTH];
 	char type[MAX_INPUT_LENGTH];
-	world_file_list_item *curr = NULL;
+	world_file_list_item *curr = nullptr;
 	int i;
 	int nr;
 	int count = 0;
@@ -1175,7 +1175,7 @@ int do_show(char_data *ch, char *argument, int cmd)
 		//   zone
 		//   sector_type
 		// room_flags
-		while ((argument = one_argument(argument, arg1)) != NULL)
+		while ((argument = one_argument(argument, arg1)) != nullptr)
 		{
 			if (arg1[0] == '\0')
 				break;
@@ -1925,7 +1925,7 @@ int do_teleport(char_data *ch, char *argument, int cmd)
 		//      } /* if */
 		//       } /* for */
 	}
-	else if ((target_mob = get_char_vis(ch, room)) != NULL)
+	else if ((target_mob = get_char_vis(ch, room)) != nullptr)
 	{
 		target = target_mob->in_room;
 	}
@@ -2087,7 +2087,7 @@ void opstat(char_data *ch, int vnum)
 	mob_prog_data *mprg;
 	int i;
 	char buf2[MAX_STRING_LENGTH];
-	for (mprg = obj_index[num].mobprogs, i = 1; mprg != NULL;
+	for (mprg = obj_index[num].mobprogs, i = 1; mprg != nullptr;
 		 i++, mprg = mprg->next)
 	{
 		sprintf(buf, "$3%d$R>$3$B", i);
@@ -2196,7 +2196,7 @@ int do_opedit(char_data *ch, char *argument, int cmd)
 		prog->type = ALL_GREET_PROG;
 		prog->arglist = strdup("80");
 		prog->comlist = strdup("say This is my new obj prog!\n\r");
-		prog->next = NULL;
+		prog->next = nullptr;
 
 		if ((currprog = obj_index[num].mobprogs))
 		{
@@ -2222,7 +2222,7 @@ int do_opedit(char_data *ch, char *argument, int cmd)
 			return eFAILURE;
 		}
 		a = atoi(arg);
-		prog = NULL;
+		prog = nullptr;
 		for (i = 1, currprog = obj_index[num].mobprogs;
 			 currprog && i != a;
 			 i++, prog = currprog, currprog = currprog->next)
@@ -2365,7 +2365,7 @@ int do_opedit(char_data *ch, char *argument, int cmd)
 			return eFAILURE;
 		}
 
-		ch->desc->backstr = NULL;
+		ch->desc->backstr = nullptr;
 		ch->desc->strnew = &(currprog->comlist);
 		ch->desc->max_str = MAX_MESSAGE_LENGTH;
 
@@ -2473,7 +2473,7 @@ int do_oclone(char_data *ch, char *argument, int cmd)
 	obj_index[r2].non_combat_func = 0;
 	obj_index[r2].number = 0;
 	obj_index[r2].virt = v2;
-	obj_index[r2].mobprogs = NULL;
+	obj_index[r2].mobprogs = nullptr;
 	obj_index[r2].combat_func = 0;
 	obj_index[r2].mobspec = 0;
 	// extract_obj(otmp);
@@ -2563,7 +2563,7 @@ int do_mclone(char_data *ch, char *argument, int cmd)
 	mob_index[dst].number = 0;
 	mob_index[dst].non_combat_func = 0;
 	mob_index[dst].combat_func = 0;
-	mob_index[dst].mobprogs = NULL;
+	mob_index[dst].mobprogs = nullptr;
 	mob_index[dst].mobspec = 0;
 	mob_index[dst].progtypes = 0;
 	mob_index[dst].virt = vdst;

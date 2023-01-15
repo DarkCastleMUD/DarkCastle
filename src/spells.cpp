@@ -351,7 +351,7 @@ struct spell_info_type spell_info[] =
 
         {/* 130 */ /* 3*PULSE_TIMER, POSITION_STANDING, 50, TAR_CHAR_ROOM|TAR_SELF_ONLY|TAR_SELF_DEFAULT, cast_eyes_of_the_eagle */ 0, 0, 0, 0, 0, 0},
 
-        {/* 131 */ /* 3*PULSE_TIMER, POSITION_STANDING,  0, TAR_CHAR_ROOM, NULL */ 0, 0, 0, 0, 0, 0},
+        {/* 131 */ /* 3*PULSE_TIMER, POSITION_STANDING,  0, TAR_CHAR_ROOM, nullptr */ 0, 0, 0, 0, 0, 0},
 
         {/* 132 */ 3 * PULSE_TIMER, POSITION_FIGHTING, 90, TAR_IGNORE, cast_icestorm, SKILL_INCREASE_HARD},
 
@@ -383,17 +383,17 @@ struct spell_info_type spell_info[] =
 
         {/* 146 */ 3 * PULSE_TIMER, POSITION_STANDING, 24, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, cast_stability, SKILL_INCREASE_MEDIUM},
 
-        {/* 147 */ 3 * PULSE_TIMER, POSITION_STANDING, 24, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, NULL, SKILL_INCREASE_MEDIUM},
+        {/* 147 */ 3 * PULSE_TIMER, POSITION_STANDING, 24, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, nullptr, SKILL_INCREASE_MEDIUM},
 
-        {/* 148*/ 3 * PULSE_TIMER, POSITION_STANDING, 24, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, NULL, SKILL_INCREASE_MEDIUM},
+        {/* 148*/ 3 * PULSE_TIMER, POSITION_STANDING, 24, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, nullptr, SKILL_INCREASE_MEDIUM},
 
         {/* 149*/ 3 * PULSE_TIMER, POSITION_STANDING, 24, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, cast_solidity, SKILL_INCREASE_MEDIUM},
 
-        {/* 150*/ 3 * PULSE_TIMER, POSITION_STANDING, 24, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, NULL, SKILL_INCREASE_MEDIUM},
+        {/* 150*/ 3 * PULSE_TIMER, POSITION_STANDING, 24, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, nullptr, SKILL_INCREASE_MEDIUM},
 
-        {/* 151*/ 3 * PULSE_TIMER, POSITION_STANDING, 24, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, NULL, SKILL_INCREASE_MEDIUM},
+        {/* 151*/ 3 * PULSE_TIMER, POSITION_STANDING, 24, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, nullptr, SKILL_INCREASE_MEDIUM},
 
-        {/* 152*/ 3 * PULSE_TIMER, POSITION_STANDING, 24, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, NULL, SKILL_INCREASE_MEDIUM},
+        {/* 152*/ 3 * PULSE_TIMER, POSITION_STANDING, 24, TAR_CHAR_ROOM | TAR_SELF_DEFAULT, nullptr, SKILL_INCREASE_MEDIUM},
 
         {/* 153*/ 3 * PULSE_TIMER, POSITION_STANDING, 50, TAR_CHAR_ROOM | TAR_SELF_ONLY | TAR_SELF_DEFAULT, cast_aegis, SKILL_INCREASE_HARD},
 
@@ -1033,7 +1033,7 @@ void affect_update(int32_t duration_type)
         {
           // NOTICE:  this is a TEMP room flag
           REMOVE_BIT(world[i->in_room].temp_room_flags, ROOM_ETHEREAL_FOCUS);
-          act("$n shakes his $s head suddenly in confusion losing $s magical focus.", i, NULL, NULL, TO_ROOM, NOTVICT);
+          act("$n shakes his $s head suddenly in confusion losing $s magical focus.", i, nullptr, nullptr, TO_ROOM, NOTVICT);
         }
         affect_remove(i, af, 0);
       }
@@ -1051,7 +1051,7 @@ void isr_set(char_data *ch)
 
   if (!ch)
   {
-    logentry("NULL ch in isr_set!", 0, LogChannels::LOG_BUG);
+    logentry("nullptr ch in isr_set!", 0, LogChannels::LOG_BUG);
     return;
   }
 
@@ -1082,7 +1082,7 @@ bool many_charms(char_data *ch)
 /* Stop the familiar without a master floods*/
 void extractFamiliar(char_data *ch)
 {
-  char_data *victim = NULL;
+  char_data *victim = nullptr;
   for (struct follow_type *k = ch->followers; k; k = k->next)
     if (IS_MOB(k->follower) && IS_AFFECTED(k->follower, AFF_FAMILIAR))
     {
@@ -1090,7 +1090,7 @@ void extractFamiliar(char_data *ch)
       break;
     }
 
-  if (NULL == victim)
+  if (nullptr == victim)
     return;
 
   act("$n disappears in a flash of flame and shadow.", victim, 0, 0, TO_ROOM, 0);
@@ -1137,7 +1137,7 @@ void stop_follower(char_data *ch, int cmd)
 {
   struct follow_type *j, *k;
 
-  if (ch->master == NULL)
+  if (ch->master == nullptr)
   {
     logentry("Stop_follower: null ch_master!", ARCHANGEL, LogChannels::LOG_BUG);
     return;
@@ -1220,7 +1220,7 @@ void stop_follower(char_data *ch, int cmd)
 
   ch->master = 0;
 
-  /* do this after setting master to NULL, to prevent endless loop */
+  /* do this after setting master to nullptr, to prevent endless loop */
   /* between affect_remove() and stop_follower()                   */
   if (cmd != CHANGE_LEADER)
   {
@@ -1557,7 +1557,7 @@ int do_release(char_data *ch, char *argument, int cmd)
           aff->type != SPELL_HOLY_AURA)
         continue;
       if ((aff->type > 0) && (aff->type <= MAX_SPL_LIST))
-        if (!done && !skill_success(ch, NULL, SKILL_RELEASE))
+        if (!done && !skill_success(ch, nullptr, SKILL_RELEASE))
         {
           send_to_char(
               "You failed to release the spell, and are left momentarily dazed.\r\n",
@@ -2078,7 +2078,7 @@ int do_cast(char_data *ch, char *argument, int cmd)
 
           // Reduce timer on paralyze even the victim is hit by a lightning bolt
           affected_type *af;
-          if ((af = affected_by_spell(tar_char, SPELL_PARALYZE)) != NULL)
+          if ((af = affected_by_spell(tar_char, SPELL_PARALYZE)) != nullptr)
           {
             af->duration--;
             if (af->duration <= 0)
@@ -2202,7 +2202,7 @@ int do_cast(char_data *ch, char *argument, int cmd)
         {
           if (IS_SET(spell_info[spl].targets, TAR_CHAR_ROOM))
           {
-            if ((tar_char = get_char_room_vis(ch, name)) != NULL)
+            if ((tar_char = get_char_room_vis(ch, name)) != nullptr)
               target_ok = true;
             if (!str_cmp(name, "group") && has_skill(ch, SKILL_COMMUNE))
             {
@@ -2226,24 +2226,24 @@ int do_cast(char_data *ch, char *argument, int cmd)
             bool orig = ISSET(ch->affected_by, AFF_true_SIGHT);
             if (spl == SPELL_EAGLE_EYE)
               SETBIT(ch->affected_by, AFF_true_SIGHT);
-            if ((tar_char = get_char_vis(ch, name)) != NULL)
+            if ((tar_char = get_char_vis(ch, name)) != nullptr)
               target_ok = true;
             if (!orig)
               REMBIT(ch->affected_by, AFF_true_SIGHT);
           }
           if (!target_ok && IS_SET(spell_info[spl].targets, TAR_OBJ_INV))
-            if ((tar_obj = get_obj_in_list_vis(ch, name, ch->carrying)) != NULL)
+            if ((tar_obj = get_obj_in_list_vis(ch, name, ch->carrying)) != nullptr)
               target_ok = true;
 
           if (!target_ok && IS_SET(spell_info[spl].targets, TAR_OBJ_ROOM))
           {
             tar_obj = get_obj_in_list_vis(ch, name, world[ch->in_room].contents);
-            if (tar_obj != NULL)
+            if (tar_obj != nullptr)
               target_ok = true;
           }
 
           if (!target_ok && IS_SET(spell_info[spl].targets, TAR_OBJ_WORLD))
-            if ((tar_obj = get_obj_vis(ch, name, true)) != NULL)
+            if ((tar_obj = get_obj_vis(ch, name, true)) != nullptr)
               /* && !(IS_SET(tar_obj->obj_flags.more_flags, ITEM_NOLOCATE)))*/
               target_ok = true;
 

@@ -367,7 +367,7 @@ struct char_data
     struct pc_data *pcdata = nullptr;
     struct obj_data *objdata = nullptr;
 
-    struct descriptor_data *desc = nullptr; // NULL normally for mobs
+    struct descriptor_data *desc = nullptr; // nullptr normally for mobs
 
     char *name = nullptr;        // Keyword 'kill X'
     char *short_desc = nullptr;  // Action 'X hits you.'

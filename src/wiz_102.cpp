@@ -576,7 +576,7 @@ int do_zone_single_edit(char_data *ch, char *argument, int zone)
       //        dc_free(DC::getInstance()->zones.value(zone).cmd[cmd].comment);
       if (!strcmp(last, "none"))
       {
-        DC::getInstance()->zones.value(zone).cmd[cmd].comment = NULL;
+        DC::getInstance()->zones.value(zone).cmd[cmd].comment = nullptr;
         sprintf(select, "Comment for command %d removed.\r\n", cmd + 1);
         send_to_char(select, ch);
       }
@@ -794,7 +794,7 @@ int do_zedit(char_data *ch, char *argument, int cmd)
           }
           else
           {
-            tmp_vict->mobdata->reset = NULL;
+            tmp_vict->mobdata->reset = nullptr;
           }
         }
       }
@@ -851,7 +851,7 @@ int do_zedit(char_data *ch, char *argument, int cmd)
       zone.cmd[i - 1].arg1 = 0;
       zone.cmd[i - 1].arg2 = 0;
       zone.cmd[i - 1].arg3 = 0;
-      zone.cmd[i - 1].comment = NULL;
+      zone.cmd[i - 1].comment = nullptr;
       sprintf(buf, "New command 'J' added at %d.\r\n", i);
     }
     else // tack it on the end
@@ -865,7 +865,7 @@ int do_zedit(char_data *ch, char *argument, int cmd)
       zone.cmd[last_cmd].arg1 = 0;
       zone.cmd[last_cmd].arg2 = 0;
       zone.cmd[last_cmd].arg3 = 0;
-      zone.cmd[last_cmd].comment = NULL;
+      zone.cmd[last_cmd].comment = nullptr;
       sprintf(buf, "New command 'J' added at %d.\r\n", last_cmd + 1);
     }
     send_to_char(buf, ch);
@@ -1455,11 +1455,11 @@ int oedit_exdesc(char_data *ch, int item_num, char *buf)
   char select[MAX_INPUT_LENGTH];
   char value[MAX_INPUT_LENGTH];
   int x;
-  obj_data *obj = NULL;
+  obj_data *obj = nullptr;
   int num;
 
-  extra_descr_data *curr = NULL;
-  extra_descr_data *curr2 = NULL;
+  extra_descr_data *curr = nullptr;
+  extra_descr_data *curr2 = nullptr;
 
   const char *fields[] =
       {
@@ -1538,7 +1538,7 @@ int oedit_exdesc(char_data *ch, int item_num, char *buf)
       return eFAILURE;
     }
     x = 1;
-    curr2 = NULL;
+    curr2 = nullptr;
     for (curr = obj->ex_description; x < num && curr; curr = curr->next)
     {
       curr2 = curr;
@@ -1645,7 +1645,7 @@ int oedit_affects(char_data *ch, int item_num, char *buf)
   char select[MAX_INPUT_LENGTH];
   char value[MAX_INPUT_LENGTH];
   int x;
-  obj_data *obj = NULL;
+  obj_data *obj = nullptr;
   int num;
   int modifier;
 
@@ -2439,7 +2439,7 @@ int do_oedit(char_data *ch, char *argument, int cmd)
 
           real_num = real_object(items->item_vnum);
           obj = items->obj ? items->obj : ((struct obj_data *)obj_index[real_num].item);
-          if (obj == NULL)
+          if (obj == nullptr)
             continue;
 
           if (obj->item_number == rnum)
@@ -2654,7 +2654,7 @@ int do_procedit(char_data *ch, char *argument, int cmd)
     prog->type = GREET_PROG;
     prog->arglist = strdup("80");
     prog->comlist = strdup("say This is my new mob prog!\n\r");
-    prog->next = NULL;
+    prog->next = nullptr;
 
     int prog_num = 1;
     if ((currprog = mob_index[mob_num].mobprogs))
@@ -2692,7 +2692,7 @@ int do_procedit(char_data *ch, char *argument, int cmd)
       return eFAILURE;
     }
     // find program number "intval"
-    prog = NULL;
+    prog = nullptr;
     for (i = 1, currprog = mob_index[mob_num].mobprogs; currprog && i != intval; i++, prog = currprog, currprog = currprog->next)
       ;
 
@@ -2888,7 +2888,7 @@ int do_procedit(char_data *ch, char *argument, int cmd)
       return eFAILURE;
     }
 
-    ch->desc->backstr = NULL;
+    ch->desc->backstr = nullptr;
     ch->desc->strnew = &(currprog->comlist);
     ch->desc->max_str = MAX_MESSAGE_LENGTH;
 
@@ -3124,7 +3124,7 @@ int do_medit(char_data *ch, char *argument, int cmd)
                  " Terminate with '/s' on a new line.\n\r\n\r",
                  ch);
     // TODO - this causes a memory leak if you edit the desc twice (first one is hsh'd)
-    //        ((char_data *)mob_index[mob_num].item)->description = NULL;
+    //        ((char_data *)mob_index[mob_num].item)->description = nullptr;
     ch->desc->connected = conn::EDITING;
     ((char_data *)mob_index[mob_num].item)->description = str_dup("");
     ch->desc->strnew =
@@ -4579,7 +4579,7 @@ int do_redit(char_data *ch, char *argument, int cmd)
     {
       mob = 0;
     }
-    struct deny_data *nd, *pd = NULL;
+    struct deny_data *nd, *pd = nullptr;
     for (nd = world[ch->in_room].denied; nd; nd = nd->next)
     {
       if (nd->vnum == mob)
@@ -4671,7 +4671,7 @@ int do_rdelete(char_data *ch, char *arg, int cmd)
   {
     for (i = world[ch->in_room].ex_description;; i = i->next)
     {
-      if (i == NULL)
+      if (i == nullptr)
       {
         send_to_char("There is nothing there to remove.\r\n", ch);
         return eFAILURE;
@@ -4801,7 +4801,7 @@ command_return_t char_data::do_zsave(QStringList &arguments, int cmd)
   QString command = QString("cp %1 %1.last").arg(filename);
   system(command.toStdString().c_str());
 
-  if ((f = fopen(filename.toStdString().c_str(), "w")) == NULL)
+  if ((f = fopen(filename.toStdString().c_str(), "w")) == nullptr)
   {
     cerr << QString("Couldn't open room save file %1 for %2.").arg(zone.getFilename()).arg(GET_NAME(this)).toStdString() << endl;
     return eFAILURE;
@@ -4817,7 +4817,7 @@ command_return_t char_data::do_zsave(QStringList &arguments, int cmd)
 
 int do_rsave(char_data *ch, char *arg, int cmd)
 {
-  FILE *f = (FILE *)NULL;
+  FILE *f = (FILE *)nullptr;
   world_file_list_item *curr;
 
   if (!can_modify_room(ch, ch->in_room))
@@ -4864,7 +4864,7 @@ int do_rsave(char_data *ch, char *arg, int cmd)
 
 int do_msave(char_data *ch, char *arg, int cmd)
 {
-  FILE *f = (FILE *)NULL;
+  FILE *f = (FILE *)nullptr;
   world_file_list_item *curr;
   char buf[180];
   char buf2[180];
@@ -4922,7 +4922,7 @@ int do_msave(char_data *ch, char *arg, int cmd)
 
 int do_osave(char_data *ch, char *arg, int cmd)
 {
-  FILE *f = (FILE *)NULL;
+  FILE *f = (FILE *)nullptr;
   world_file_list_item *curr;
   char buf[180];
   char buf2[180];
@@ -5023,7 +5023,7 @@ int do_instazone(char_data *ch, char *arg, int cmd)
 
   sprintf(buf, "../lib/builder/%s.zon", GET_NAME(ch));
 
-  if ((fl = fopen(buf, "w")) == NULL)
+  if ((fl = fopen(buf, "w")) == nullptr)
   {
     send_to_char("Couldn't open up zone file. Tell Godflesh!", ch);
     fclose(fl);
@@ -5552,9 +5552,9 @@ int do_sockets(char_data *ch, char *argument, int cmd)
   {
     if (GET_LEVEL(ch) < OVERSEER)
     {
-      if (d->character == NULL)
+      if (d->character == nullptr)
         continue;
-      if (d->character->name == NULL)
+      if (d->character->name == nullptr)
         continue;
     }
     if (d->character)

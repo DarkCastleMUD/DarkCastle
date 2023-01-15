@@ -939,7 +939,7 @@ void board_load_board()
   for (map_it = board_db.begin(); map_it != board_db.end(); map_it++)
   {
     map_it->second.lock = 0;
-    map_it->second.locked_for = NULL;
+    map_it->second.locked_for = nullptr;
 
     the_file = fopen((*map_it).second.save_file.c_str(), "r");
     if (!the_file)

@@ -460,9 +460,9 @@ int spell_souldrain(uint8_t level, char_data *ch, char_data *victim, struct obj_
   if (number(1, 100) < get_saves(victim, SAVE_TYPE_MAGIC) + 40)
 
   {
-    act("$N resists your attempt to souldrain $M!", ch, NULL, victim, TO_CHAR, 0);
-    act("$N resists $n's attempt to souldrain $M!", ch, NULL, victim, TO_ROOM, NOTVICT);
-    act("You resist $n's attempt to souldrain you!", ch, NULL, victim, TO_VICT, 0);
+    act("$N resists your attempt to souldrain $M!", ch, nullptr, victim, TO_CHAR, 0);
+    act("$N resists $n's attempt to souldrain $M!", ch, nullptr, victim, TO_ROOM, NOTVICT);
+    act("You resist $n's attempt to souldrain you!", ch, nullptr, victim, TO_VICT, 0);
     int retval;
     if (IS_MOB(victim) && !victim->fighting)
     {
@@ -1510,7 +1510,7 @@ int spell_dispel_evil(uint8_t level, char_data *ch, char_data *victim, struct ob
 {
   if (obj && obj->in_room && obj->obj_flags.value[0] == SPELL_DESECRATE)
   { // desecrate object
-    char_data *pal = NULL;
+    char_data *pal = nullptr;
     if ((pal = obj->obj_flags.origin) && charExists(pal))
     {
       pal->cRooms--;
@@ -1559,7 +1559,7 @@ int spell_dispel_good(uint8_t level, char_data *ch, char_data *victim, struct ob
 {
   if (obj && obj->in_room && obj->obj_flags.value[0] == SPELL_CONSECRATE)
   { // consecrate object
-    char_data *pal = NULL;
+    char_data *pal = nullptr;
     if ((pal = obj->obj_flags.origin) && charExists(pal))
     {
       pal->cRooms--;
@@ -1782,7 +1782,7 @@ int spell_bless(uint8_t level, char_data *ch, char_data *victim, struct obj_data
     send_to_char("You feel blessed.\r\n", victim);
 
     if (victim != ch)
-      act("$N receives the blessing from your god.", ch, NULL, victim, TO_CHAR, 0);
+      act("$N receives the blessing from your god.", ch, nullptr, victim, TO_CHAR, 0);
 
     af.type = SPELL_BLESS;
     af.duration = 6 + skill / 3;
@@ -1827,7 +1827,7 @@ int spell_paralyze(uint8_t level, char_data *ch, char_data *victim, struct obj_d
         if (GET_POS(victim) == POSITION_SLEEPING)
         {
           send_to_char("You are awakened by a burst of $6energy$R!\r\n", victim);
-          act("$n is awakened in a burst of $6energy$R!", victim, NULL, NULL, TO_ROOM, 0);
+          act("$n is awakened in a burst of $6energy$R!", victim, nullptr, nullptr, TO_ROOM, 0);
           GET_POS(victim) = POSITION_SITTING;
         }
       }
@@ -1842,10 +1842,10 @@ int spell_paralyze(uint8_t level, char_data *ch, char_data *victim, struct obj_d
 
   if (IS_SET(victim->immune, ISR_PARA) || IS_AFFECTED(victim, AFF_NO_PARA))
   {
-    act("$N absorbs your puny spell and seems no different!", ch, NULL, victim, TO_CHAR, 0);
-    act("$N absorbs $n's puny spell and seems no different!", ch, NULL, victim, TO_ROOM, NOTVICT);
+    act("$N absorbs your puny spell and seems no different!", ch, nullptr, victim, TO_CHAR, 0);
+    act("$N absorbs $n's puny spell and seems no different!", ch, nullptr, victim, TO_ROOM, NOTVICT);
     if (!IS_NPC(victim))
-      act("You absorb $n's puny spell and are no different!", ch, NULL, victim, TO_VICT, 0);
+      act("You absorb $n's puny spell and are no different!", ch, nullptr, victim, TO_VICT, 0);
     return eSUCCESS;
   }
 
@@ -1858,9 +1858,9 @@ int spell_paralyze(uint8_t level, char_data *ch, char_data *victim, struct obj_d
 
   if (malediction_res(ch, victim, SPELL_PARALYZE))
   {
-    act("$N resists your attempt to paralyze $M!", ch, NULL, victim, TO_CHAR, 0);
-    act("$N resists $n's attempt to paralyze $M!", ch, NULL, victim, TO_ROOM, NOTVICT);
-    act("You resist $n's attempt to paralyze you!", ch, NULL, victim, TO_VICT, 0);
+    act("$N resists your attempt to paralyze $M!", ch, nullptr, victim, TO_CHAR, 0);
+    act("$N resists $n's attempt to paralyze $M!", ch, nullptr, victim, TO_ROOM, NOTVICT);
+    act("You resist $n's attempt to paralyze you!", ch, nullptr, victim, TO_VICT, 0);
     if ((!victim->fighting) && GET_POS(victim) > POSITION_SLEEPING && victim != ch)
     {
       retval = attack(victim, ch, TYPE_UNDEFINED);
@@ -1885,10 +1885,10 @@ int spell_paralyze(uint8_t level, char_data *ch, char_data *victim, struct obj_d
   /* ideally, we would do a dice roll to see if spell hits or not */
   if (spellret >= 0 && (victim != ch))
   {
-    act("$N seems to be unaffected!", ch, NULL, victim, TO_CHAR, 0);
+    act("$N seems to be unaffected!", ch, nullptr, victim, TO_CHAR, 0);
     if (!IS_NPC(victim))
     {
-      act("$n tried to paralyze you!", ch, NULL, victim, TO_VICT, 0);
+      act("$n tried to paralyze you!", ch, nullptr, victim, TO_VICT, 0);
     }
     if (IS_NPC(victim) && (!victim->fighting) && GET_POS(victim) > POSITION_SLEEPING)
     {
@@ -1903,14 +1903,14 @@ int spell_paralyze(uint8_t level, char_data *ch, char_data *victim, struct obj_d
   if (!IS_NPC(ch) && !IS_NPC(victim) && ((level - GET_LEVEL(victim)) > 10) &&
       (!IS_MINLEVEL_PC(ch, DEITY) || GET_LEVEL(victim) >= GET_LEVEL(ch)))
   {
-    act("$N seems to be unaffected!", ch, NULL, victim, TO_CHAR, 0);
+    act("$N seems to be unaffected!", ch, nullptr, victim, TO_CHAR, 0);
     victim = ch;
     if (saves_spell(ch, ch, -100, SAVE_TYPE_MAGIC) >= 0)
     {
-      act("Your magic misfires but you are saved!", ch, NULL, victim, TO_CHAR, 0);
+      act("Your magic misfires but you are saved!", ch, nullptr, victim, TO_CHAR, 0);
       return eSUCCESS;
     }
-    act("Your cruel heart causes your magic to misfire!", ch, NULL, victim, TO_CHAR, 0);
+    act("Your cruel heart causes your magic to misfire!", ch, nullptr, victim, TO_CHAR, 0);
   }
 
   // Finish off any singing performances (bard)
@@ -1959,9 +1959,9 @@ int spell_blindness(uint8_t level, char_data *ch, char_data *victim, struct obj_
 
   if (malediction_res(ch, victim, SPELL_BLINDNESS))
   {
-    act("$N resists your attempt to blind $M!", ch, NULL, victim, TO_CHAR, 0);
-    act("$N resists $n's attempt to blind $M!", ch, NULL, victim, TO_ROOM, NOTVICT);
-    act("You resist $n's attempt to blind you!", ch, NULL, victim, TO_VICT, 0);
+    act("$N resists your attempt to blind $M!", ch, nullptr, victim, TO_CHAR, 0);
+    act("$N resists $n's attempt to blind $M!", ch, nullptr, victim, TO_ROOM, NOTVICT);
+    act("You resist $n's attempt to blind you!", ch, nullptr, victim, TO_VICT, 0);
     if (IS_NPC(victim) && (!victim->fighting) && GET_POS(ch) > POSITION_SLEEPING)
     {
       retval = attack(victim, ch, TYPE_UNDEFINED);
@@ -1978,10 +1978,10 @@ int spell_blindness(uint8_t level, char_data *ch, char_data *victim, struct obj_
 
   if (spellret >= 0 && (victim != ch))
   {
-    act("$N seems to be unaffected!", ch, NULL, victim, TO_CHAR, 0);
+    act("$N seems to be unaffected!", ch, nullptr, victim, TO_CHAR, 0);
     if (!IS_NPC(victim))
     {
-      act("$n tried to blind you!", ch, NULL, victim, TO_VICT, 0);
+      act("$n tried to blind you!", ch, nullptr, victim, TO_VICT, 0);
     }
     if (IS_NPC(victim) && (!victim->fighting) && GET_POS(victim) > POSITION_SLEEPING)
     {
@@ -2343,9 +2343,9 @@ int spell_curse(uint8_t level, char_data *ch, char_data *victim, struct obj_data
 
     if (malediction_res(ch, victim, SPELL_CURSE) || (!IS_NPC(victim) && GET_LEVEL(victim) >= IMMORTAL))
     {
-      act("$N resists your attempt to curse $M!", ch, NULL, victim, TO_CHAR, 0);
-      act("$N resists $n's attempt to curse $M!", ch, NULL, victim, TO_ROOM, NOTVICT);
-      act("You resist $n's attempt to curse you!", ch, NULL, victim, TO_VICT, 0);
+      act("$N resists your attempt to curse $M!", ch, nullptr, victim, TO_CHAR, 0);
+      act("$N resists $n's attempt to curse $M!", ch, nullptr, victim, TO_ROOM, NOTVICT);
+      act("You resist $n's attempt to curse you!", ch, nullptr, victim, TO_VICT, 0);
     }
     else
     {
@@ -3122,7 +3122,7 @@ int spell_locate_object(uint8_t level, char_data *ch, char *arg, char_data *vict
         sprintf(buf, "%s is in %s.\r\n", i->short_description,
                 world[i->in_room].name);
       }
-      else if (i->equipped_by != NULL)
+      else if (i->equipped_by != nullptr)
       {
         sprintf(buf, "%s is in use in an unknown location.\r\n",
                 i->short_description);
@@ -3166,16 +3166,16 @@ int spell_poison(uint8_t level, char_data *ch, char_data *victim, struct obj_dat
   {
     if (IS_AFFECTED(victim, AFF_POISON))
     {
-      act("$N's insides are already being eaten away by poison!", ch, NULL, victim, TO_CHAR, 0);
+      act("$N's insides are already being eaten away by poison!", ch, nullptr, victim, TO_CHAR, 0);
       endy = true;
     }
     else if (IS_SET(victim->immune, ISR_POISON) ||
              malediction_res(ch, victim, SPELL_POISON) ||
              (!IS_NPC(victim) && GET_LEVEL(victim) >= IMMORTAL))
     {
-      act("$N resists your attempt to poison $M!", ch, NULL, victim, TO_CHAR, 0);
-      act("$N resists $n's attempt to poison $M!", ch, NULL, victim, TO_ROOM, NOTVICT);
-      act("You resist $n's attempt to poison you!", ch, NULL, victim, TO_VICT, 0);
+      act("$N resists your attempt to poison $M!", ch, nullptr, victim, TO_CHAR, 0);
+      act("$N resists $n's attempt to poison $M!", ch, nullptr, victim, TO_ROOM, NOTVICT);
+      act("You resist $n's attempt to poison you!", ch, nullptr, victim, TO_VICT, 0);
       endy = true;
     }
     set_cantquit(ch, victim);
@@ -3981,7 +3981,7 @@ int spell_sleep(uint8_t level, char_data *ch, char_data *victim, struct obj_data
   /* You can't sleep someone higher level than you*/
   if (affected_by_spell(victim, SPELL_INSOMNIA) || IS_AFFECTED(victim, AFF_INSOMNIA))
   {
-    act("$N does not look sleepy!", ch, NULL, victim, TO_CHAR, 0);
+    act("$N does not look sleepy!", ch, nullptr, victim, TO_CHAR, 0);
     retval = one_hit(victim, ch, TYPE_UNDEFINED, FIRST);
     retval = SWAP_CH_VICT(retval);
     return retval;
@@ -3989,7 +3989,7 @@ int spell_sleep(uint8_t level, char_data *ch, char_data *victim, struct obj_data
   if (affected_by_spell(victim, SPELL_SLEEP))
   {
     act("$N's mind still has the lingering effects of a past sleep spell active.",
-        ch, NULL, victim, TO_CHAR, 0);
+        ch, nullptr, victim, TO_CHAR, 0);
     return eFAILURE;
   }
 
@@ -4000,13 +4000,13 @@ int spell_sleep(uint8_t level, char_data *ch, char_data *victim, struct obj_data
       switch (number(1, 3))
       {
       case 1:
-        act("$N does not look sleepy!", ch, NULL, victim, TO_CHAR, 0);
+        act("$N does not look sleepy!", ch, nullptr, victim, TO_CHAR, 0);
         break;
       case 2:
       case 3:
         send_to_char("The combined magics fizzle, and cause an explosion!\r\n", ch);
         {
-          act("$n wakes up in a burst of magical energies!", victim, NULL, NULL, TO_ROOM, 0);
+          act("$n wakes up in a burst of magical energies!", victim, nullptr, nullptr, TO_ROOM, 0);
           affect_from_char(victim, SPELL_PARALYZE);
         }
         break;
@@ -4018,9 +4018,9 @@ int spell_sleep(uint8_t level, char_data *ch, char_data *victim, struct obj_data
 
   if (number(1, 100) <= MIN(MAX((get_saves(ch, SAVE_TYPE_MAGIC) - get_saves(victim, SAVE_TYPE_MAGIC)) / 2, 1), 7))
   {
-    act("$N resists your attempt to sleep $M!", ch, NULL, victim, TO_CHAR, 0);
-    act("$N resists $n's attempt to sleep $M!", ch, NULL, victim, TO_ROOM, NOTVICT);
-    act("You resist $n's attempt to sleep you!", ch, NULL, victim, TO_VICT, 0);
+    act("$N resists your attempt to sleep $M!", ch, nullptr, victim, TO_CHAR, 0);
+    act("$N resists $n's attempt to sleep $M!", ch, nullptr, victim, TO_ROOM, NOTVICT);
+    act("You resist $n's attempt to sleep you!", ch, nullptr, victim, TO_VICT, 0);
     if (IS_NPC(victim) && (!victim->fighting) && GET_POS(ch) > POSITION_SLEEPING)
     {
       retval = attack(victim, ch, TYPE_UNDEFINED);
@@ -4064,10 +4064,10 @@ int spell_sleep(uint8_t level, char_data *ch, char_data *victim, struct obj_data
       return eSUCCESS;
     }
     else
-      act("$N does not look sleepy!", ch, NULL, victim, TO_CHAR, 0);
+      act("$N does not look sleepy!", ch, nullptr, victim, TO_CHAR, 0);
   }
   else
-    act("$N does not look sleepy!", ch, NULL, victim, TO_CHAR, 0);
+    act("$N does not look sleepy!", ch, nullptr, victim, TO_CHAR, 0);
 
   retval = one_hit(victim, ch, TYPE_UNDEFINED, FIRST);
   retval = SWAP_CH_VICT(retval);
@@ -4535,14 +4535,14 @@ int spell_charm_person(uint8_t level, char_data *ch, char_data *victim, struct o
   if (IS_SET(victim->immune, ISR_CHARM) ||
       (IS_MOB(victim) && !ISSET(victim->mobdata->actflags, ACT_CHARM)))
   {
-    act("$N laughs at your feeble charm attempt.", ch, NULL, victim,
+    act("$N laughs at your feeble charm attempt.", ch, nullptr, victim,
         TO_CHAR, 0);
     return eFAILURE;
   }
 
   if (saves_spell(ch, victim, 0, SAVE_TYPE_MAGIC) >= 0)
   {
-    act("$N doesnt seem to be affected.", ch, NULL, victim, TO_CHAR, 0);
+    act("$N doesnt seem to be affected.", ch, nullptr, victim, TO_CHAR, 0);
     return eFAILURE;
   }
 
@@ -5071,12 +5071,12 @@ int spell_fear(uint8_t level, char_data *ch, char_data *victim,
   {
     act(
         "$N looks at you with glazed over eyes, drools, and continues to fight!",
-        ch, NULL, victim, TO_CHAR, 0);
+        ch, nullptr, victim, TO_CHAR, 0);
     act(
         "$N smiles madly, drool running down his chin as he ignores $n's magic!",
-        ch, NULL, victim, TO_ROOM, 0);
+        ch, nullptr, victim, TO_ROOM, 0);
     act("You grin as $n realizes you have no target for his mental attack!",
-        ch, NULL, victim, TO_VICT, 0);
+        ch, nullptr, victim, TO_VICT, 0);
     return eFAILURE;
   }
 
@@ -5094,11 +5094,11 @@ int spell_fear(uint8_t level, char_data *ch, char_data *victim,
 
   if (malediction_res(ch, victim, SPELL_FEAR))
   {
-    act("$N resists your attempt to scare $M!", ch, NULL, victim, TO_CHAR,
+    act("$N resists your attempt to scare $M!", ch, nullptr, victim, TO_CHAR,
         0);
-    act("$N resists $n's attempt to scare $M!", ch, NULL, victim, TO_ROOM,
+    act("$N resists $n's attempt to scare $M!", ch, nullptr, victim, TO_ROOM,
         NOTVICT);
-    act("You resist $n's attempt to scare you!", ch, NULL, victim, TO_VICT,
+    act("You resist $n's attempt to scare you!", ch, nullptr, victim, TO_VICT,
         0);
     if (IS_NPC(
             victim) &&
@@ -5118,7 +5118,7 @@ int spell_fear(uint8_t level, char_data *ch, char_data *victim,
         "For a moment you feel compelled to run away, but you fight back the urge.\r\n",
         victim);
     act("$N doesnt seem to be the yellow-bellied slug you thought!", ch,
-        NULL, victim, TO_CHAR, 0);
+        nullptr, victim, TO_CHAR, 0);
 
     if (IS_NPC(victim) && !victim->fighting)
     {
@@ -5147,7 +5147,7 @@ int spell_refresh(uint8_t level, char_data *ch, char_data *victim, struct obj_da
   int dam;
   if (!ch || !victim)
   {
-    logentry("NULL ch or victim sent to spell_refresh!", ANGEL, LogChannels::LOG_BUG);
+    logentry("nullptr ch or victim sent to spell_refresh!", ANGEL, LogChannels::LOG_BUG);
     return eFAILURE;
   }
 
@@ -5179,7 +5179,7 @@ int spell_fly(uint8_t level, char_data *ch, char_data *victim, struct obj_data *
 
   if (!ch || !victim)
   {
-    logentry("NULL ch or victim sent to spell_fly!", ANGEL, LogChannels::LOG_BUG);
+    logentry("nullptr ch or victim sent to spell_fly!", ANGEL, LogChannels::LOG_BUG);
     return eFAILURE;
   }
 
@@ -5191,7 +5191,7 @@ int spell_fly(uint8_t level, char_data *ch, char_data *victim, struct obj_data *
 
   send_to_char("You start flapping and rise off the ground!\n\r", victim);
   if (ch != victim)
-    act("$N starts flapping and rises off the ground!", ch, NULL, victim, TO_CHAR, 0);
+    act("$N starts flapping and rises off the ground!", ch, nullptr, victim, TO_CHAR, 0);
   act("$N's feet rise off the ground.", ch, 0, victim, TO_ROOM, INVIS_NULL | NOTVICT);
 
   af.type = SPELL_FLY;
@@ -5212,7 +5212,7 @@ int spell_cont_light(uint8_t level, char_data *ch, char_data *victim, struct obj
 
   if (!ch)
   {
-    logentry("NULL ch sent to cont_light!", ANGEL, LogChannels::LOG_BUG);
+    logentry("nullptr ch sent to cont_light!", ANGEL, LogChannels::LOG_BUG);
     return eFAILURE;
   }
 
@@ -5390,7 +5390,7 @@ int spell_know_alignment(uint8_t level, char_data *ch, char_data *victim, struct
 
   if (!ch)
   {
-    logentry("NULL ch sent to know_alignment!", ANGEL, LogChannels::LOG_BUG);
+    logentry("nullptr ch sent to know_alignment!", ANGEL, LogChannels::LOG_BUG);
     return eFAILURE;
   }
 
@@ -5468,8 +5468,8 @@ int spell_dispel_minor(uint8_t level, char_data *ch, char_data *victim, struct o
       send_to_char("The magic is shattered by your will!\n\r", ch);
       act("$p blinks out of existence with a bang!", ch, obj, 0, TO_ROOM, INVIS_NULL);
       send_to_char("Your magic beacon is shattered!\n\r", obj->equipped_by);
-      obj->equipped_by->beacon = NULL;
-      obj->equipped_by = NULL;
+      obj->equipped_by->beacon = nullptr;
+      obj->equipped_by = nullptr;
     }
     extract_obj(obj);
     return eSUCCESS;
@@ -5518,9 +5518,9 @@ int spell_dispel_minor(uint8_t level, char_data *ch, char_data *victim, struct o
   // If victim higher level, they get a save vs magic for no effect
   if (number(1, 100) < get_saves(victim, SAVE_TYPE_MAGIC) + savebonus)
   {
-    act("$N resists your attempt to dispel minor!", ch, NULL, victim, TO_CHAR, 0);
-    act("$N resists $n's attempt to dispel minor!", ch, NULL, victim, TO_ROOM, NOTVICT);
-    act("You resist $n's attempt to dispel minor!", ch, NULL, victim, TO_VICT, 0);
+    act("$N resists your attempt to dispel minor!", ch, nullptr, victim, TO_CHAR, 0);
+    act("$N resists $n's attempt to dispel minor!", ch, nullptr, victim, TO_ROOM, NOTVICT);
+    act("You resist $n's attempt to dispel minor!", ch, nullptr, victim, TO_VICT, 0);
     if (IS_NPC(victim) && (!victim->fighting) && GET_POS(ch) > POSITION_SLEEPING)
     {
       retval = attack(victim, ch, TYPE_UNDEFINED);
@@ -5789,9 +5789,9 @@ int spell_dispel_magic(uint8_t level, char_data *ch, char_data *victim, struct o
   //          return eFAILURE;
   if (number(1, 100) < get_saves(victim, SAVE_TYPE_MAGIC) + savebonus && level != GET_LEVEL(ch) - 1)
   {
-    act("$N resists your attempt to dispel magic!", ch, NULL, victim, TO_CHAR, 0);
-    act("$N resists $n's attempt to dispel magic!", ch, NULL, victim, TO_ROOM, NOTVICT);
-    act("You resist $n's attempt to dispel magic!", ch, NULL, victim, TO_VICT, 0);
+    act("$N resists your attempt to dispel magic!", ch, nullptr, victim, TO_CHAR, 0);
+    act("$N resists $n's attempt to dispel magic!", ch, nullptr, victim, TO_ROOM, NOTVICT);
+    act("You resist $n's attempt to dispel magic!", ch, nullptr, victim, TO_VICT, 0);
     if (IS_NPC(victim) && (!victim->fighting) && GET_POS(ch) > POSITION_SLEEPING)
     {
       retval = attack(victim, ch, TYPE_UNDEFINED);
@@ -6045,7 +6045,7 @@ int spell_cause_critical(uint8_t level, char_data *ch, char_data *victim, struct
 
   if (!ch || !victim)
   {
-    logentry("NULL ch or victim sent to cause_critical!", ANGEL, LogChannels::LOG_BUG);
+    logentry("nullptr ch or victim sent to cause_critical!", ANGEL, LogChannels::LOG_BUG);
     return eFAILURE;
   }
 
@@ -6063,7 +6063,7 @@ int spell_cause_serious(uint8_t level, char_data *ch, char_data *victim, struct 
   int dam;
   if (!ch || !victim)
   {
-    logentry("NULL ch or victim sent to cause_serious!", ANGEL, LogChannels::LOG_BUG);
+    logentry("nullptr ch or victim sent to cause_serious!", ANGEL, LogChannels::LOG_BUG);
     return eFAILURE;
   }
 
@@ -6083,7 +6083,7 @@ int spell_flamestrike(uint8_t level, char_data *ch, char_data *victim, struct ob
 
   if (!ch || !victim)
   {
-    logentry("NULL ch or victim sent to flamestrike!", ANGEL, LogChannels::LOG_BUG);
+    logentry("nullptr ch or victim sent to flamestrike!", ANGEL, LogChannels::LOG_BUG);
     return eFAILURE;
   }
 
@@ -6291,7 +6291,7 @@ int spell_stone_skin(uint8_t level, char_data *ch, char_data *victim, struct obj
 
   if (!ch)
   {
-    logentry("NULL ch sent to cause_serious!", ANGEL, LogChannels::LOG_BUG);
+    logentry("nullptr ch sent to cause_serious!", ANGEL, LogChannels::LOG_BUG);
     return eFAILURE;
   }
 
@@ -6323,7 +6323,7 @@ int spell_shield(uint8_t level, char_data *ch, char_data *victim, struct obj_dat
 
   if (!ch || !victim)
   {
-    logentry("NULL ch or victim sent to shield!", ANGEL, LogChannels::LOG_BUG);
+    logentry("nullptr ch or victim sent to shield!", ANGEL, LogChannels::LOG_BUG);
     return eFAILURE;
   }
 
@@ -6363,7 +6363,7 @@ int spell_weaken(uint8_t level, char_data *ch, char_data *victim, struct obj_dat
 
   if (!ch || !victim)
   {
-    logentry("NULL ch or victim sent to weaken!", ANGEL, LogChannels::LOG_BUG);
+    logentry("nullptr ch or victim sent to weaken!", ANGEL, LogChannels::LOG_BUG);
     return eFAILURE;
   }
 
@@ -6410,9 +6410,9 @@ int spell_weaken(uint8_t level, char_data *ch, char_data *victim, struct obj_dat
 
   if (malediction_res(ch, victim, SPELL_WEAKEN))
   {
-    act("$N resists your attempt to weaken $M!", ch, NULL, victim, TO_CHAR, 0);
-    act("$N resists $n's attempt to weaken $M!", ch, NULL, victim, TO_ROOM, NOTVICT);
-    act("You resist $n's attempt to weaken you!", ch, NULL, victim, TO_VICT, 0);
+    act("$N resists your attempt to weaken $M!", ch, nullptr, victim, TO_CHAR, 0);
+    act("$N resists $n's attempt to weaken $M!", ch, nullptr, victim, TO_ROOM, NOTVICT);
+    act("You resist $n's attempt to weaken you!", ch, nullptr, victim, TO_VICT, 0);
   }
   else
   {
@@ -6485,7 +6485,7 @@ int spell_mass_invis(uint8_t level, char_data *ch, char_data *victim, struct obj
 
   if (!ch)
   {
-    logentry("NULL ch sent to mass_invis!", ANGEL, LogChannels::LOG_BUG);
+    logentry("nullptr ch sent to mass_invis!", ANGEL, LogChannels::LOG_BUG);
     return eFAILURE;
   }
 
@@ -6734,7 +6734,7 @@ int cast_burning_hands(uint8_t level, char_data *ch, char *arg, int type,
     if (arg1[0] && spellcraft(ch, SPELL_BURNING_HANDS))
       vict = get_char_room_vis(ch, arg1);
     else
-      vict = NULL;
+      vict = nullptr;
     if (!vict || vict == victim)
       return retval;
     return spell_burning_hands(level, ch, vict, 0, skill);
@@ -7629,9 +7629,9 @@ int targetted_teleport(uint8_t level, char_data *ch, char_data *victim, struct o
 {
   if (player_resist_reallocation(victim, skill))
   {
-    act("$N resists your attempt to teleport $M!", ch, NULL, victim, TO_CHAR, 0);
-    act("$N resists $n's attempt to teleport $M!", ch, NULL, victim, TO_ROOM, NOTVICT);
-    act("You resist $n's attempt to teleport you!", ch, NULL, victim, TO_VICT, 0);
+    act("$N resists your attempt to teleport $M!", ch, nullptr, victim, TO_CHAR, 0);
+    act("$N resists $n's attempt to teleport $M!", ch, nullptr, victim, TO_ROOM, NOTVICT);
+    act("You resist $n's attempt to teleport you!", ch, nullptr, victim, TO_VICT, 0);
     return eFAILURE;
   }
   else
@@ -9529,9 +9529,9 @@ int targetted_word_of_recall(uint8_t level, char_data *ch, char_data *victim, st
 {
   if (player_resist_reallocation(victim, skill))
   {
-    act("$N resists your attempt to recall $M!", ch, NULL, victim, TO_CHAR, 0);
-    act("$N resists $n's attempt to recall $M!", ch, NULL, victim, TO_ROOM, NOTVICT);
-    act("You resist $n's attempt to recall you!", ch, NULL, victim, TO_VICT, 0);
+    act("$N resists your attempt to recall $M!", ch, nullptr, victim, TO_CHAR, 0);
+    act("$N resists $n's attempt to recall $M!", ch, nullptr, victim, TO_ROOM, NOTVICT);
+    act("You resist $n's attempt to recall you!", ch, nullptr, victim, TO_VICT, 0);
     return eFAILURE;
   }
   else
@@ -11724,7 +11724,7 @@ int cast_call_follower(uint8_t level, char_data *ch, char *arg, int type, char_d
     return eFAILURE;
   }
 
-  victim = NULL;
+  victim = nullptr;
 
   for (struct follow_type *k = ch->followers; k; k = k->next)
     if (IS_MOB(k->follower) && affected_by_spell(k->follower, SPELL_CHARM_PERSON) &&
@@ -11734,7 +11734,7 @@ int cast_call_follower(uint8_t level, char_data *ch, char *arg, int type, char_d
       break;
     }
 
-  if (NULL == victim)
+  if (nullptr == victim)
   {
     send_to_char("You don't have any tamed friends in need of a summon!\n\r", ch);
     REM_WAIT_STATE(ch, skill / 10);
@@ -12165,7 +12165,7 @@ int check_components(char_data *ch, int destroy, int item_one = 0,
   int all_ok = 0;
   obj_data *ptr_one, *ptr_two, *ptr_three, *ptr_four;
 
-  ptr_one = ptr_two = ptr_three = ptr_four = NULL;
+  ptr_one = ptr_two = ptr_three = ptr_four = nullptr;
 
   if (!ch)
   {
@@ -12534,9 +12534,9 @@ int spell_beacon(uint8_t level, char_data *ch, char *arg, int type, char_data *v
   if (others_clan_room(ch, &world[ch->beacon->in_room]) == true)
   {
     send_to_char("You cannot beacon into another clan's hall.\r\n", ch);
-    ch->beacon->equipped_by = NULL;
+    ch->beacon->equipped_by = nullptr;
     extract_obj(ch->beacon);
-    ch->beacon = NULL;
+    ch->beacon = nullptr;
     return eFAILURE;
   }
 
@@ -12544,9 +12544,9 @@ int spell_beacon(uint8_t level, char_data *ch, char *arg, int type, char_data *v
   {
     send_to_char("In the heat of combat, you forget your beacon's location!\n\r", ch);
     act("$n's eyes widen for a moment, $s concentration broken.", ch, 0, 0, TO_ROOM, 0);
-    ch->beacon->equipped_by = NULL;
+    ch->beacon->equipped_by = nullptr;
     extract_obj(ch->beacon);
-    ch->beacon = NULL;
+    ch->beacon = nullptr;
     return eFAILURE;
   }
 
@@ -12566,7 +12566,7 @@ int spell_beacon(uint8_t level, char_data *ch, char *arg, int type, char_data *v
 
 int do_beacon(char_data *ch, char *argument, int cmd)
 {
-  struct obj_data *new_obj = NULL;
+  struct obj_data *new_obj = nullptr;
   if (IS_NPC(ch))
     return eFAILURE;
   if (GET_CLASS(ch) != CLASS_ANTI_PAL && GET_LEVEL(ch) < ARCHANGEL)
@@ -12746,10 +12746,10 @@ void familiar_creation_message(char_data *ch, int fam_type)
 
 int spell_summon_familiar(uint8_t level, char_data *ch, char *arg, int type, char_data *victim, struct obj_data *tar_obj, int skill)
 {
-  char_data *mob = NULL;
+  char_data *mob = nullptr;
   int r_num;
   struct affected_type af;
-  follow_type *k = NULL;
+  follow_type *k = nullptr;
   int fam_type;
 
   fam_type = choose_familiar(ch, arg);
@@ -13714,9 +13714,9 @@ int spell_debility(uint8_t level, char_data *ch, char_data *victim, struct obj_d
 
   if (malediction_res(ch, victim, SPELL_DEBILITY))
   {
-    act("$N resists your attempt to $6debilitize$R $M!", ch, NULL, victim, TO_CHAR, 0);
-    act("$N resists $n's attempt to $6debilitize$R $M!", ch, NULL, victim, TO_ROOM, NOTVICT);
-    act("You resist $n's attempt to $6debilitize$R you!", ch, NULL, victim, TO_VICT, 0);
+    act("$N resists your attempt to $6debilitize$R $M!", ch, nullptr, victim, TO_CHAR, 0);
+    act("$N resists $n's attempt to $6debilitize$R $M!", ch, nullptr, victim, TO_ROOM, NOTVICT);
+    act("You resist $n's attempt to $6debilitize$R you!", ch, nullptr, victim, TO_VICT, 0);
   }
   else
   {
@@ -13837,9 +13837,9 @@ int spell_attrition(uint8_t level, char_data *ch, char_data *victim, struct obj_
 
   if (malediction_res(ch, victim, SPELL_ATTRITION))
   {
-    act("$N resists your attempt to cast attrition on $M!", ch, NULL, victim, TO_CHAR, 0);
-    act("$N resists $n's attempt to cast attrition on $M!", ch, NULL, victim, TO_ROOM, NOTVICT);
-    act("You resist $n's attempt to cast attrition on you!", ch, NULL, victim, TO_VICT, 0);
+    act("$N resists your attempt to cast attrition on $M!", ch, nullptr, victim, TO_CHAR, 0);
+    act("$N resists $n's attempt to cast attrition on $M!", ch, nullptr, victim, TO_ROOM, NOTVICT);
+    act("You resist $n's attempt to cast attrition on you!", ch, nullptr, victim, TO_VICT, 0);
   }
   else
   {
@@ -14078,7 +14078,7 @@ int cast_holy_aura(uint8_t level, char_data *ch, char *arg, int type, char_data 
 
 int spell_dismiss_familiar(uint8_t level, char_data *ch, char_data *victim, struct obj_data *obj, int skill)
 {
-  victim = NULL;
+  victim = nullptr;
 
   for (struct follow_type *k = ch->followers; k; k = k->next)
     if (IS_MOB(k->follower) && IS_AFFECTED(k->follower, AFF_FAMILIAR))
@@ -14087,7 +14087,7 @@ int spell_dismiss_familiar(uint8_t level, char_data *ch, char_data *victim, stru
       break;
     }
 
-  if (NULL == victim)
+  if (nullptr == victim)
   {
     send_to_char("You don't have a familiar!\n\r", ch);
     return eFAILURE;
@@ -14137,7 +14137,7 @@ int cast_dismiss_familiar(uint8_t level, char_data *ch, char *arg, int type, cha
 
 int spell_dismiss_corpse(uint8_t level, char_data *ch, char_data *victim, struct obj_data *obj, int skill)
 {
-  victim = NULL;
+  victim = nullptr;
   // send_to_char("Disabled.\r\n",ch);
   // return eFAILURE;
 
@@ -14148,7 +14148,7 @@ int spell_dismiss_corpse(uint8_t level, char_data *ch, char_data *victim, struct
       break;
     }
 
-  if (NULL == victim)
+  if (nullptr == victim)
   {
     send_to_char("You don't have a corpse!\n\r", ch);
     return eFAILURE;
@@ -14194,7 +14194,7 @@ int cast_dismiss_corpse(uint8_t level, char_data *ch, char *arg, int type, char_
 
 int spell_release_elemental(uint8_t level, char_data *ch, char_data *victim, struct obj_data *obj, int skill)
 {
-  victim = NULL;
+  victim = nullptr;
   // send_to_char("Disabled.\r\n",ch);
   // return eFAILURE;
 
@@ -14205,7 +14205,7 @@ int spell_release_elemental(uint8_t level, char_data *ch, char_data *victim, str
       break;
     }
 
-  if (NULL == victim)
+  if (nullptr == victim)
   {
     send_to_char("You don't have an elemental!\n\r", ch);
     return eFAILURE;
@@ -14481,7 +14481,7 @@ int spell_conjure_elemental(uint8_t level, char_data *ch, char *arg, char_data *
     send_to_char("How do you plan on controlling so many followers?\n\r", ch);
     return eFAILURE;
   }
-  //  obj_data *container  = NULL;
+  //  obj_data *container  = nullptr;
   if (!str_cmp(arg, "fire"))
   {
     virt = FIRE_ELEMENTAL;
@@ -14536,23 +14536,23 @@ int spell_conjure_elemental(uint8_t level, char_data *ch, char *arg, char_data *
   switch (virt)
   {
   case FIRE_ELEMENTAL:
-    act("Your container of blood burns hotly as a denizen of the elemental plane of fire arrives in a blast of flame!", ch, NULL, NULL, TO_CHAR, 0);
-    act("$n's container of blood burns hotly as a denizen of the elemental plane of fire arrives in a blast of flame!", ch, NULL, NULL, TO_ROOM,
+    act("Your container of blood burns hotly as a denizen of the elemental plane of fire arrives in a blast of flame!", ch, nullptr, nullptr, TO_CHAR, 0);
+    act("$n's container of blood burns hotly as a denizen of the elemental plane of fire arrives in a blast of flame!", ch, nullptr, nullptr, TO_ROOM,
         0);
     break;
   case WATER_ELEMENTAL:
-    act("Your holy water bubbles briefly as an icy denizen of the elemental plane of water crystalizes into existence.", ch, NULL, NULL,
+    act("Your holy water bubbles briefly as an icy denizen of the elemental plane of water crystalizes into existence.", ch, nullptr, nullptr,
         TO_CHAR, 0);
-    act("$n's holy water bubbles briefly as an icy denizen of the elemental plane of water crystalizes intoto existence.", ch, NULL, NULL,
+    act("$n's holy water bubbles briefly as an icy denizen of the elemental plane of water crystalizes intoto existence.", ch, nullptr, nullptr,
         TO_ROOM, 0);
     break;
   case EARTH_ELEMENTAL:
-    act("Your dirty water churns violently as a denizen of the elemental plane of earth rises from the ground.", ch, NULL, NULL, TO_CHAR, 0);
-    act("$n's dirty water churns violently as a denizen of the elemental plane of earth rises from the ground.", ch, NULL, NULL, TO_ROOM, 0);
+    act("Your dirty water churns violently as a denizen of the elemental plane of earth rises from the ground.", ch, nullptr, nullptr, TO_CHAR, 0);
+    act("$n's dirty water churns violently as a denizen of the elemental plane of earth rises from the ground.", ch, nullptr, nullptr, TO_ROOM, 0);
     break;
   case AIR_ELEMENTAL:
-    act("Your wine boils with energy as a denizen of the elemental plane of air crackles into existance.", ch, NULL, NULL, TO_CHAR, 0);
-    act("$n's wine boils with energy as a denizen of the elemental plane of air crackles into existance.", ch, NULL, NULL, TO_ROOM, 0);
+    act("Your wine boils with energy as a denizen of the elemental plane of air crackles into existance.", ch, nullptr, nullptr, TO_CHAR, 0);
+    act("$n's wine boils with energy as a denizen of the elemental plane of air crackles into existance.", ch, nullptr, nullptr, TO_ROOM, 0);
     break;
   default:
     send_to_char("That item is not used for elemental summoning.\r\n", ch);
@@ -14770,7 +14770,7 @@ int cast_atonement(uint8_t level, char_data *ch, char *arg, int type, char_data 
 
 int spell_silence(uint8_t level, char_data *ch, char_data *victim, obj_data *obj, int skill)
 {
-  obj_data *silence_obj = NULL;
+  obj_data *silence_obj = nullptr;
 
   if (IS_SET(world[ch->in_room].room_flags, SAFE))
   {
@@ -14952,7 +14952,7 @@ int cast_channel(uint8_t level, char_data *ch, char *arg, int type, char_data *t
 SPELL_POINTER get_wild_magic_offensive(uint8_t level, char_data *ch, char_data *victim, obj_data *obj, int skill)
 {
   const int MAX_OFFENSIVE = 25;
-  SPELL_POINTER spell_to_cast = NULL;
+  SPELL_POINTER spell_to_cast = nullptr;
   switch (number(1, MAX_OFFENSIVE + 1)) //+1 causes a chance of defensive
   {
   case 1:
@@ -15197,7 +15197,7 @@ int spell_frostshield(uint8_t level, char_data *ch, char_data *victim, obj_data 
 SPELL_POINTER get_wild_magic_defensive(uint8_t level, char_data *ch, char_data *victim, obj_data *obj, int skill)
 {
   const int MAX_DEFENSIVE = 50;
-  SPELL_POINTER spell_to_cast = NULL;
+  SPELL_POINTER spell_to_cast = nullptr;
 
   switch (number(1, MAX_DEFENSIVE + 1)) //+1 to allow for a random chance
   {
@@ -15366,7 +15366,7 @@ int cast_wild_magic(uint8_t level, char_data *ch, char *arg,
                     struct obj_data *tar_obj, int skill)
 {
   char off_def[MAX_INPUT_LENGTH + 1];
-  SPELL_POINTER spell_to_cast = NULL;
+  SPELL_POINTER spell_to_cast = nullptr;
 
   arg = one_argument(arg, off_def);
 
@@ -15391,7 +15391,7 @@ int cast_wild_magic(uint8_t level, char_data *ch, char *arg,
 
 int spell_spirit_shield(uint8_t level, char_data *ch, char_data *victim, struct obj_data *obj, int skill)
 {
-  obj_data *ssobj = NULL;
+  obj_data *ssobj = nullptr;
 
   if (ch->equipment[WEAR_SHIELD])
   {
@@ -15555,7 +15555,7 @@ int spell_consecrate(uint8_t level, char_data *ch, char_data *victim,
 {
   int spl = SPELL_CONSECRATE;
   int compNum = CONSECRATE_COMP_OBJ_NUMBER;
-  obj_data *component = NULL;
+  obj_data *component = nullptr;
 
   if (IS_MORTAL(ch))
   {
@@ -15615,7 +15615,7 @@ int spell_consecrate(uint8_t level, char_data *ch, char_data *victim,
     }
   }
 
-  obj_data *cItem = NULL;
+  obj_data *cItem = nullptr;
 
   if ((cItem = get_obj_in_list("consecrateitem", world[ch->in_room].contents)))
   {
@@ -15721,7 +15721,7 @@ int spell_desecrate(uint8_t level, char_data *ch, char_data *victim,
   int spl = SPELL_DESECRATE;
   int compNum = DESECRATE_COMP_OBJ_NUMBER;
   char buf[MAX_STRING_LENGTH];
-  obj_data *component = NULL;
+  obj_data *component = nullptr;
 
   if (IS_MORTAL(ch))
   {
@@ -15789,7 +15789,7 @@ int spell_desecrate(uint8_t level, char_data *ch, char_data *victim,
     return eSUCCESS;
   }
 
-  obj_data *cItem = NULL;
+  obj_data *cItem = nullptr;
   if ((cItem = get_obj_in_list("consecrateitem", world[ch->in_room].contents)))
   {
     if (ch == ((char_data *)(cItem->obj_flags.origin)))

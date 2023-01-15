@@ -52,7 +52,7 @@ int do_profession(char_data *ch, char *args, int cmdnum)
 
   // You can only use the command in the same room of a mob named guildmaster
   char_data *victim = get_mob_room_vis(ch, "guildmaster");
-  if (victim == NULL)
+  if (victim == nullptr)
   {
     csendf(ch, "You can't pick a profession here. You need to find a Guild Master.\r\n");
     return eFAILURE;
@@ -232,7 +232,7 @@ int search_skills(const char *arg, class_skill_defines *list_skills)
 
 class_skill_defines *get_skill_list(char_data *ch)
 {
-  class_skill_defines *skilllist = NULL;
+  class_skill_defines *skilllist = nullptr;
 
   switch (GET_CLASS(ch))
   {
@@ -691,9 +691,9 @@ int skills_guild(char_data *ch, const char *arg, char_data *owner)
     else
     {
       struct skill_quest *sq;
-      if ((sq = find_sq(skilllist[skillnumber].skillname)) != NULL && sq->message && IS_SET(sq->clas, 1 << (GET_CLASS(ch) - 1)))
+      if ((sq = find_sq(skilllist[skillnumber].skillname)) != nullptr && sq->message && IS_SET(sq->clas, 1 << (GET_CLASS(ch) - 1)))
       {
-        mprog_driver(sq->message, owner, ch, NULL, NULL, NULL, NULL);
+        mprog_driver(sq->message, owner, ch, nullptr, nullptr, nullptr, nullptr);
         switch (skillnumber)
         {
         case SPELL_VAMPIRIC_AURA:

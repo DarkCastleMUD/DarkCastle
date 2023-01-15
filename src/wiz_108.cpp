@@ -181,7 +181,7 @@ int do_purloin(char_data *ch, char *argument, int cmd)
 
   one_argument(argument, bufName);
 
-  // if the string is NULL, return.  Else assign pBuf to point to it.
+  // if the string is nullptr, return.  Else assign pBuf to point to it.
   if (*(pBuf = bufName) == '\0')
   {
     send_to_char("Retrieves any item in the game and puts it in your inventory.\r\n"
@@ -229,7 +229,7 @@ int do_purloin(char_data *ch, char *argument, int cmd)
 
     if (j == nIndex)
     {
-      char_data *vict = NULL;
+      char_data *vict = nullptr;
       if (k->carried_by)
       {
         vict = k->carried_by;
@@ -258,7 +258,7 @@ int do_purloin(char_data *ch, char *argument, int cmd)
           vict = k->in_obj->equipped_by;
         }
       }
-      if (vict != NULL)
+      if (vict != nullptr)
       {
         csendf(ch, "You purloin %s from %s.\r\n",
                k->short_description, GET_NAME(vict));

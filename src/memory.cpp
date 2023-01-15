@@ -30,7 +30,7 @@ void * dc_alloc(size_t nmemb, size_t size)
 // void * dc_realloc(void * oldptr, size_t size)
 void * dc_realloc(void * oldptr, size_t size)
 {
-  void * new_mem = NULL;
+  void * new_mem = nullptr;
 
   // if no old pointer, use dc_alloc to calloc new memory instead of
   // realloc's default, which is to use malloc() (that way memory is 0'd)
@@ -41,12 +41,12 @@ void * dc_realloc(void * oldptr, size_t size)
   if(0 == size)
   {
     dc_free(oldptr);
-    return NULL;
+    return nullptr;
   }
 
   if(size < 0)  {
     fprintf(stderr, "Attempt to realloc with negative size?");
-    return NULL;
+    return nullptr;
   }
 
   new_mem = realloc(oldptr, size);
@@ -64,5 +64,5 @@ void *dc_free(void * ptr)
 	{
 		free(ptr);
 	}
-	return NULL;
+	return nullptr;
 }

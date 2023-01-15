@@ -63,7 +63,7 @@ const struct in_skills innates[] = {
   { "evasion", RACE_PIXIE, innate_evasion},
   { "shadowslip", RACE_HOBBIT, innate_shadowslip},
   { "fly", RACE_PIXIE, innate_fly},
-  { "\n", 0, NULL}
+  { "\n", 0, nullptr}
 };
 
 char * innate_skills[] = 
@@ -173,7 +173,7 @@ int innate_powerwield(char_data *ch, char *arg, int cmd)
    af.bitvector = AFF_POWERWIELD;
    affect_to_char(ch, &af);
    send_to_char("You gather your energy in an effort to wield two mighty weapons.\r\n",ch);
-   act("$n gathers his strength in order to wield two mighty weapons.",ch, NULL,NULL,TO_ROOM,0);
+   act("$n gathers his strength in order to wield two mighty weapons.",ch, nullptr,nullptr,TO_ROOM,0);
    return eSUCCESS;
 }
 
@@ -216,7 +216,7 @@ int innate_illusion(char_data *ch, char *arg, int cmd)
    af.bitvector = AFF_INVISIBLE;
    affect_to_char(ch, &af);
    send_to_char("You use your race's innate illusion powers, and fade out of existence.\r\n",ch);
-   act("$n chants something incoherent and fades out of existence.", ch, NULL, NULL, TO_ROOM, 0);
+   act("$n chants something incoherent and fades out of existence.", ch, nullptr, nullptr, TO_ROOM, 0);
    return eSUCCESS;
 }
 
@@ -229,7 +229,7 @@ int innate_bloodlust(char_data *ch, char *arg, int cmd)
   }
   SET_BIT(ch->combat, COMBAT_ORC_BLOODLUST1);
   send_to_char("Your blood boils as you drive yourself into a war-like state.\r\n",ch);
-  act("$n's blood boils has $e drives $mself into warlike rage.",ch,NULL,NULL, TO_ROOM, 0);
+  act("$n's blood boils has $e drives $mself into warlike rage.",ch,nullptr,nullptr, TO_ROOM, 0);
   return eSUCCESS;
 }
 
@@ -240,7 +240,7 @@ int innate_repair(char_data *ch, char *arg, int cmd)
   int i, chance = 60-GET_LEVEL(ch);
   bool found = false;
   arg = one_argument(arg,buf);
-  if ( ( obj = get_obj_in_list_vis( ch, buf, ch->carrying ) ) == NULL )
+  if ( ( obj = get_obj_in_list_vis( ch, buf, ch->carrying ) ) == nullptr )
   {
     send_to_char("You are not carrying anything like that.\r\n",ch);
     return eFAILURE;
@@ -307,7 +307,7 @@ int innate_fly(char_data *ch, char *arg, int cmd)
   if (affected_by_spell(ch, SKILL_INNATE_FLY)) {
     affect_from_char(ch, SKILL_INNATE_FLY);
     send_to_char("You fold your wings smoothly behind you and settle gently to the ground.\r\n", ch);
-   act("$n folds $s wings smoothly behind $m and settles gently to the ground.", ch, NULL, NULL, TO_ROOM, 0);
+   act("$n folds $s wings smoothly behind $m and settles gently to the ground.", ch, nullptr, nullptr, TO_ROOM, 0);
   } else {
     if (ISSET(ch->affected_by, AFF_FLYING)) {
       send_to_char("You are already flying.\r\n", ch);
@@ -322,7 +322,7 @@ int innate_fly(char_data *ch, char *arg, int cmd)
    af.bitvector = AFF_FLYING;
    affect_to_char(ch, &af);
    send_to_char("You spread your delicate wings and lift lightly into the air.\r\n", ch);
-   act("$n spreads $s delicate wings and lifts lightly into the air.", ch, NULL, NULL, TO_ROOM, 0);
+   act("$n spreads $s delicate wings and lifts lightly into the air.", ch, nullptr, nullptr, TO_ROOM, 0);
   }
 
   return eSUCCESS;

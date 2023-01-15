@@ -75,7 +75,7 @@ bool can_use_command(char_data *ch, int cmdnum);
 
 void add_command_to_radix(struct command_info *cmd);
 
-struct command_lag *command_lag_list = NULL;
+struct command_lag *command_lag_list = nullptr;
 
 // **DEFINE LIST FOUND IN interp.h**
 
@@ -622,9 +622,9 @@ void free_command_radix_nodes(struct cmd_hash_info *curr)
 
 void add_command_to_radix(struct command_info *cmd)
 {
-  struct cmd_hash_info *curr = NULL;
-  struct cmd_hash_info *temp = NULL;
-  struct cmd_hash_info *next = NULL;
+  struct cmd_hash_info *curr = nullptr;
+  struct cmd_hash_info *temp = nullptr;
+  struct cmd_hash_info *next = nullptr;
   int whichway = 0;
 
   // At the end of this loop, temp will contain the parent of
@@ -1691,7 +1691,7 @@ bool can_use_command(char_data *ch, int cmdnum)
 
 void pulse_command_lag()
 {
-  struct command_lag *cmdl, *cmdlp = NULL, *cmdlnext = NULL;
+  struct command_lag *cmdl, *cmdlp = nullptr, *cmdlnext = nullptr;
 
   for (cmdl = command_lag_list; cmdl; cmdl = cmdlnext)
   {

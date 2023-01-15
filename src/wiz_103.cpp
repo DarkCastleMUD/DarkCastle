@@ -301,11 +301,11 @@ int do_peace(char_data *ch, char *argument, int cmd)
 {
   char_data *rch;
 
-  for (rch = world[ch->in_room].people; rch != NULL; rch = rch->next_in_room)
+  for (rch = world[ch->in_room].people; rch != nullptr; rch = rch->next_in_room)
   {
-    if (IS_MOB(rch) && rch->mobdata->hatred != NULL)
+    if (IS_MOB(rch) && rch->mobdata->hatred != nullptr)
       remove_memory(rch, 'h');
-    if (rch->fighting != NULL)
+    if (rch->fighting != nullptr)
       stop_fighting(rch);
   }
   act("$n makes a gesture and all fighting stops.", ch, 0, 0, TO_ROOM, 0);

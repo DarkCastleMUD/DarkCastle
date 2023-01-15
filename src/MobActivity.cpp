@@ -30,7 +30,7 @@ extern "C"
 extern CWorld world;
 
 // Locals
-class Path *mPathList = NULL;
+class Path *mPathList = nullptr;
 
 /* PATHFINDING */
 
@@ -78,7 +78,7 @@ char *Path::determineRoute(char_data *ch, int from, int to)
   {
     if (ch)
       send_to_char("Error::determineBestRoute:: Room 'to' or 'from' is not connected to the path.\r\n", ch);
-    return NULL;
+    return nullptr;
   }
   i = 1000;
   resetPath();
@@ -175,7 +175,7 @@ bool Path::isPathConnected(class Path *pa)
 void Path::addRoom(char_data *ch, int room, bool IgnoreConnectingIssues)
 {
 
-  // Used at times with ch == NULL
+  // Used at times with ch == nullptr
 
   if (!IgnoreConnectingIssues)
   {
@@ -437,7 +437,7 @@ int do_pathpath(char_data *ch, char *argument, int cmd)
   char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
   argument = one_argument(argument, arg1);
   argument = one_argument(argument, arg2);
-  class Path *pt = NULL, *pt2 = NULL;
+  class Path *pt = nullptr, *pt2 = nullptr;
   for (pt = mPathList; pt; pt = pt->next)
     if (!str_cmp(pt->name, arg1))
       break;
@@ -524,7 +524,7 @@ int Path::connectRoom(class Path *z)
   return 0;
 }
 
-char *findPath(int from, int to, char_data *ch = NULL)
+char *findPath(int from, int to, char_data *ch = nullptr)
 {
   char buf[MAX_STRING_LENGTH];
   static char endbuf[MAX_STRING_LENGTH];

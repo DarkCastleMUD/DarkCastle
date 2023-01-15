@@ -36,7 +36,7 @@ int number_or_name(char **name, int *num)
   char *ppos;
   char number[MAX_INPUT_LENGTH];
 
-  if ((ppos = index(*name, '.')) != NULL)
+  if ((ppos = index(*name, '.')) != nullptr)
   {
     *ppos++ = '\0';
     strcpy(number, *name);
@@ -60,7 +60,7 @@ int number_or_name(char **name, int *num)
 int number_or_name(char **name, int *num)
 {
   unsigned i;
-  char *ppos = NULL;
+  char *ppos = nullptr;
   char number[MAX_INPUT_LENGTH];
 
   for (i = 0; i < strlen(*name); i++)
@@ -94,7 +94,7 @@ int number_or_name(char **name, int *num)
 
 void do_mload(char_data *ch, int rnum, int cnt)
 {
-  char_data *mob = NULL;
+  char_data *mob = nullptr;
   char buf[MAX_STRING_LENGTH];
   int i;
   if (cnt == 0)
@@ -107,7 +107,7 @@ void do_mload(char_data *ch, int rnum, int cnt)
     mprog_load_trigger(mob);
     if (selfpurge)
     {
-      mob = NULL;
+      mob = nullptr;
     }
   }
 
@@ -205,7 +205,7 @@ obj_list_t oload(char_data *ch, int rnum, int cnt, bool random)
 
 void do_oload(char_data *ch, int rnum, int cnt, bool random)
 {
-  struct obj_data *obj = NULL;
+  struct obj_data *obj = nullptr;
   char buf[MAX_STRING_LENGTH];
   int i;
 
@@ -1354,7 +1354,7 @@ void do_start(char_data *ch)
   GET_LEVEL(ch) = 1;
   GET_EXP(ch) = 1;
 
-  if (GET_TITLE(ch) == NULL)
+  if (GET_TITLE(ch) == nullptr)
   {
     GET_TITLE(ch) = str_dup("is a virgin.");
   }
@@ -1655,12 +1655,12 @@ struct hunt_items
   char *mobname;
 };
 
-struct hunt_data *hunt_list = NULL;
-struct hunt_items *hunt_items_list = NULL;
+struct hunt_data *hunt_list = nullptr;
+struct hunt_items *hunt_items_list = nullptr;
 
 void check_end_of_hunt(struct hunt_data *h, bool forced = false)
 {
-  struct hunt_items *i, *p = NULL, *in;
+  struct hunt_items *i, *p = nullptr, *in;
   int items = 0;
 
   for (i = hunt_items_list; i; i = in)
@@ -1719,7 +1719,7 @@ void check_end_of_hunt(struct hunt_data *h, bool forced = false)
     }
     send_info(buf);
 
-    struct hunt_data *hl, *p = NULL;
+    struct hunt_data *hl, *p = nullptr;
     for (hl = hunt_list; hl; hl = hl->next)
     {
       if (hl == h)
@@ -1763,7 +1763,7 @@ int do_huntclear(char_data *ch, char *arg, int cmd)
 
 void huntclear_item(struct obj_data *obj)
 {
-  struct hunt_items *hi, *hin, *hip = NULL;
+  struct hunt_items *hi, *hin, *hip = nullptr;
   for (hi = hunt_items_list; hi; hi = hin)
   {
     hin = hi->next;
@@ -1803,7 +1803,7 @@ int get_rand_obj(struct hunt_data *h)
 void init_random_hunt_items(struct hunt_data *h)
 {
   FILE *f;
-  if ((f = fopen("huntitems.txt", "r")) == NULL)
+  if ((f = fopen("huntitems.txt", "r")) == nullptr)
   {
     for (int i = 0; i < 50; i++)
       h->itemsAvail[i] = -1;
@@ -1831,7 +1831,7 @@ void init_random_hunt_items(struct hunt_data *h)
 
 char *last_hunt_time(char *last_hunt)
 {
-  static char *time_of_last_hunt = NULL;
+  static char *time_of_last_hunt = nullptr;
   char buf[MAX_STRING_LENGTH];
 
   if (!time_of_last_hunt)
@@ -1850,7 +1850,7 @@ void begin_hunt(int item, int duration, int amount, char *huntname)
 { // time, itme, item
   struct hunt_data *n;
   char *tmp;
-  struct tm *pTime = NULL;
+  struct tm *pTime = nullptr;
   time_t ct;
 
 #ifdef LEAK_CHECK
@@ -1867,9 +1867,9 @@ void begin_hunt(int item, int duration, int amount, char *huntname)
 
   ct = time(0);
   pTime = localtime(&ct);
-  tmp = last_hunt_time(NULL);
+  tmp = last_hunt_time(nullptr);
 
-  if (NULL != pTime)
+  if (nullptr != pTime)
   {
 #ifdef __CYGWIN__
     snprintf(tmp, strlen(tmp) + 1, "%d/%d/%d (%d:%02d)\n\r",
@@ -1944,7 +1944,7 @@ void begin_hunt(int item, int duration, int amount, char *huntname)
 
 void pick_up_item(char_data *ch, struct obj_data *obj)
 {
-  struct hunt_items *i, *p = NULL, *in;
+  struct hunt_items *i, *p = nullptr, *in;
   char buf[MAX_STRING_LENGTH];
   int gold = 0;
   for (i = hunt_items_list; i; i = in)
@@ -1961,7 +1961,7 @@ void pick_up_item(char_data *ch, struct obj_data *obj)
               obj->short_description, i->mobname, ch->name);
       send_info(buf);
       struct hunt_data *h = i->hunt;
-      struct obj_data *oitem = NULL, *citem;
+      struct obj_data *oitem = nullptr, *citem;
       int r1 = 0;
       switch (vnum)
       {
@@ -1987,7 +1987,7 @@ void pick_up_item(char_data *ch, struct obj_data *obj)
                 send_to_char("You already have this item - Timer has been reset!\r\n", ch);
                 extract_obj(oitem);
                 citem = search_char_for_item(ch, oitem->item_number, false);
-                citem->save_expiration = time(NULL) + (60 * 60 * 24);
+                citem->save_expiration = time(nullptr) + (60 * 60 * 24);
                 break; // Used to crash it.
               }
               else
@@ -2049,7 +2049,7 @@ void pulse_hunts()
 
   try
   {
-    if (&world[6345] == NULL)
+    if (&world[6345] == nullptr)
     {
       logf(IMMORTAL, LogChannels::LOG_BUG, "pulse_hunts: room 6345 does not exist.");
       return;
@@ -2078,7 +2078,7 @@ int do_showhunt(char_data *ch, char *arg, int cmd)
   {
     send_to_char("There are no active hunts at the moment.\r\n", ch);
 
-    ch->send(fmt::format("Last hunt was run: {}\n\r", last_hunt_time(NULL)));
+    ch->send(fmt::format("Last hunt was run: {}\n\r", last_hunt_time(nullptr)));
 
     send_to_char(buf, ch);
   }

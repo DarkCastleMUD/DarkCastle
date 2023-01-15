@@ -207,7 +207,7 @@ int do_ki(char_data *ch, char *argument, int cmd)
       if (*name)
       {
         if (IS_SET(ki_info[spl].targets, TAR_CHAR_ROOM))
-          if ((tar_char = get_char_room_vis(ch, name)) != NULL)
+          if ((tar_char = get_char_room_vis(ch, name)) != nullptr)
             target_ok = true;
 
         if (!target_ok && IS_SET(ki_info[spl].targets, TAR_SELF_ONLY))
@@ -311,7 +311,7 @@ int do_ki(char_data *ch, char *argument, int cmd)
 
     WAIT_STATE(ch, ki_info[spl].beats);
 
-    if ((ki_info[spl].ki_pointer == NULL) && spl > 0)
+    if ((ki_info[spl].ki_pointer == nullptr) && spl > 0)
       send_to_char("Sorry, this power has not yet been implemented.\r\n",
                    ch);
     else
@@ -832,11 +832,11 @@ int ki_disrupt(uint8_t level, char_data *ch, char *arg, char_data *victim)
       affect_to_char(victim, &newaf);
     }
 
-    act("$N resists your attempt to disrupt magic!", ch, NULL, victim,
+    act("$N resists your attempt to disrupt magic!", ch, nullptr, victim,
         TO_CHAR, 0);
-    act("$N resists $n's attempt to disrupt magic!", ch, NULL, victim, TO_ROOM,
+    act("$N resists $n's attempt to disrupt magic!", ch, nullptr, victim, TO_ROOM,
         NOTVICT);
-    act("You resist $n's attempt to disrupt magic!", ch, NULL, victim, TO_VICT,
+    act("You resist $n's attempt to disrupt magic!", ch, nullptr, victim, TO_VICT,
         0);
 
     if (IS_NPC(victim) && (!victim->fighting) &&

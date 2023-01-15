@@ -108,7 +108,7 @@ void save_slot_machines(void);
 void check_silence_beacons(void);
 
 /* local globals */
-struct descriptor_data *descriptor_list = NULL; /* master desc list */
+struct descriptor_data *descriptor_list = nullptr; /* master desc list */
 struct txt_block *bufpool = 0;                  /* pool of large output buffers */
 int buf_largecount = 0;                         /* # of large buffers which exist */
 int buf_overflows = 0;                          /* # of overflows of output */
@@ -206,7 +206,7 @@ int write_hotboot_file(char **new_argv)
   */
   //  extern char ** ext_argv;
 
-  if ((fp = fopen("hotboot", "w")) == NULL)
+  if ((fp = fopen("hotboot", "w")) == nullptr)
   {
     logentry("Hotboot failed, unable to open hotboot file.", 0, LogChannels::LOG_MISC);
     return 0;
@@ -368,7 +368,7 @@ int load_hotboot_descs()
         logentry(buf, 0, LogChannels::LOG_MISC);
         CLOSE_SOCKET(desc);
         dc_free(d);
-        d = NULL;
+        d = nullptr;
         continue;
       }
 
@@ -382,7 +382,7 @@ int load_hotboot_descs()
         logentry(buf, 0, LogChannels::LOG_MISC);
         CLOSE_SOCKET(desc);
         dc_free(d);
-        d = NULL;
+        d = nullptr;
         continue;
       }
 
@@ -867,7 +867,7 @@ void DC::game_loop(void)
   // we're done with this pulse.  Now calculate the time until the next pulse and sleep until then
   // we want to pulse PASSES_PER_SEC times a second (duh).  This is currently 4.
 
-  gettimeofday(&now_time, NULL);
+  gettimeofday(&now_time, nullptr);
   usecDelta = ((int)last_time.tv_usec) - ((int)now_time.tv_usec);
   secDelta = ((int)last_time.tv_sec) - ((int)now_time.tv_sec);
 
@@ -900,7 +900,7 @@ void DC::game_loop(void)
     // cerr << QString("Pausing for  %1sec %2usec.").arg(secDelta).arg(usecDelta).toStdString() << endl;
     int fd_nr = -1;
     errno = 0;
-    fd_nr = select(0, NULL, NULL, NULL, &delay_time);
+    fd_nr = select(0, nullptr, nullptr, nullptr, &delay_time);
     if (fd_nr == -1)
     {
       if (errno == EINTR)
@@ -917,7 +917,7 @@ void DC::game_loop(void)
 
   // temp removing this since it's spamming the crap out of us
   // else logf(110, LogChannels::LOG_BUG, "0 delay on pulse");
-  gettimeofday(&last_time, NULL);
+  gettimeofday(&last_time, nullptr);
   PerfTimers["gameloop"].stop();
 }
 
@@ -930,7 +930,7 @@ void DC::game_loop_init(void)
 
   ssh.setup();
 
-  gettimeofday(&last_time, NULL);
+  gettimeofday(&last_time, nullptr);
 
   QTimer *gameLoopTimer = new QTimer(this);
   connect(gameLoopTimer, &QTimer::timeout, this, &DC::game_loop);
@@ -1436,7 +1436,7 @@ char_data *get_charmie(char_data *ch)
       if (IS_AFFECTED(k->follower, AFF_CHARM))
         return k->follower;
 
-  return NULL;
+  return nullptr;
 }
 
 string generate_prompt(char_data *ch)
@@ -1814,14 +1814,14 @@ string generate_prompt(char_data *ch)
       break;
     case 'y':
       charmie = get_charmie(ch);
-      if (charmie != NULL)
+      if (charmie != nullptr)
         sprintf(pro, "%d", (charmie->getHP() * 100) / GET_MAX_HIT(charmie));
       else
         sprintf(pro, " ");
       break;
     case 'Y':
       charmie = get_charmie(ch);
-      if (charmie != NULL)
+      if (charmie != nullptr)
         sprintf(pro, "%s%d%s", calc_color(charmie->getHP(), GET_MAX_HIT(charmie)),
                 (charmie->getHP() * 100) / GET_MAX_HIT(charmie), NTEXT);
       else
@@ -1924,7 +1924,7 @@ void flush_queues(struct descriptor_data *d)
 
 void free_buff_pool_from_memory()
 {
-  struct txt_block *curr = NULL;
+  struct txt_block *curr = nullptr;
 
   while (bufpool)
   {
@@ -2589,7 +2589,7 @@ int process_input(struct descriptor_data *t)
   /* see if there's another newline in the input buffer */
   /*
     read_point = ptr = nl_pos;
-    for (nl_pos = NULL; *ptr && !nl_pos; ptr++)
+    for (nl_pos = nullptr; *ptr && !nl_pos; ptr++)
       if (ISNEWL(*ptr) || (t->connected != conn::WRITE_BOARD && t->connected != conn::EDITING && t->connected != conn::EDIT_MPROG && *ptr == '|'))
         nl_pos = ptr;
 
@@ -2675,12 +2675,12 @@ int close_socket(struct descriptor_data *d)
 
   /* Forget snooping */
   if (d->snooping)
-    d->snooping->snoop_by = NULL;
+    d->snooping->snoop_by = nullptr;
 
   if (d->snoop_by)
   {
     SEND_TO_Q("Your victim is no longer among us.\r\n", d->snoop_by);
-    d->snoop_by->snooping = NULL;
+    d->snoop_by->snooping = nullptr;
   }
   if (d->hashstr)
   {
@@ -2715,7 +2715,7 @@ int close_socket(struct descriptor_data *d)
       if (IS_AFFECTED(d->character, AFF_CANTQUIT))
         sprintf(buf, "%s with CQ.", buf);
       logentry(buf, GET_LEVEL(d->character) > SERAPH ? GET_LEVEL(d->character) : SERAPH, LogChannels::LOG_SOCKET);
-      d->character->desc = NULL;
+      d->character->desc = nullptr;
     }
     else
     {
@@ -2737,7 +2737,7 @@ int close_socket(struct descriptor_data *d)
 
   /* JE 2/22/95 -- part of my unending quest to make switch stable */
   if (d->original && d->original->desc)
-    d->original->desc = NULL;
+    d->original->desc = nullptr;
 
   // if we're closing the socket that is next to be processed, we want to
   // go ahead and move on to the next one
@@ -2754,7 +2754,7 @@ int close_socket(struct descriptor_data *d)
   delete d;
   d = nullptr;
 
-  /*  if(descriptor_list == NULL)
+  /*  if(descriptor_list == nullptr)
   {
     // if there is NOONE on (everyone got disconnected) loop through and
     // boot all of the linkdeads.  That way if the mud's link is cut, the
@@ -2822,7 +2822,7 @@ void report_debug_logging()
 
 void crash_hotboot()
 {
-  struct descriptor_data *d = NULL;
+  struct descriptor_data *d = nullptr;
   extern int try_to_hotboot_on_crash;
   extern int died_from_sigsegv;
 
@@ -2903,7 +2903,7 @@ void unrestrict_game(int sig)
 
   logentry("Received SIGUSR2 - completely unrestricting game (emergent)",
            ANGEL, LogChannels::LOG_GOD);
-  ban_list = NULL;
+  ban_list = nullptr;
   restrict = 0;
   num_invalid = 0;
 }
@@ -2929,7 +2929,7 @@ void sigusr1(int sig)
 void sigchld(int sig)
 {
   struct rusage ru;
-  wait3(NULL, WNOHANG, &ru);
+  wait3(nullptr, WNOHANG, &ru);
 }
 #endif
 /*
@@ -3005,8 +3005,8 @@ void signal_setup(void)
   sahup.sa_sigaction = signal_handler;
   sigemptyset(&sahup.sa_mask);
   sahup.sa_flags = SA_SIGINFO;
-  sahup.sa_restorer = NULL;
-  sigaction(SIGHUP, &sahup, NULL);
+  sahup.sa_restorer = nullptr;
+  sigaction(SIGHUP, &sahup, nullptr);
 
   my_signal(SIGTERM, hupsig);
   my_signal(SIGPIPE, SIG_IGN);
@@ -3143,7 +3143,7 @@ void send_to_all(char *messg)
 void ansi_color(char *txt, char_data *ch)
 {
   // mobs don't have toggles, so they automatically get ansi on
-  if (txt != NULL && ch->desc != NULL)
+  if (txt != nullptr && ch->desc != nullptr)
   {
     if (!IS_MOB(ch) &&
         !IS_SET(GET_TOGGLES(ch), PLR_ANSI) &&
@@ -3194,7 +3194,7 @@ void send_to_outdoor(char *messg)
 
 void send_to_zone(char *messg, int zone)
 {
-  struct descriptor_data *i = NULL;
+  struct descriptor_data *i = nullptr;
   if (messg)
   {
     for (i = descriptor_list; i; i = i->next)
@@ -3209,7 +3209,7 @@ void send_to_zone(char *messg, int zone)
 
 void send_to_room(string messg, int room, bool awakeonly, char_data *nta)
 {
-  char_data *i = NULL;
+  char_data *i = nullptr;
 
   // If a megaphone goes off when in someone's inventory this happens
   if (room == NOWHERE)

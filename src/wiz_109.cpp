@@ -514,7 +514,7 @@ int do_shutdown(char_data *ch, char *argument, int cmd)
   else if (!strcmp(arg1, "crash"))
   {
     // let's crash the mud!
-    char_data *crashus = NULL;
+    char_data *crashus = nullptr;
     if (crashus->in_room == NOWHERE)
     {
       return eFAILURE; // this should never be reached
@@ -531,7 +531,7 @@ int do_shutdown(char_data *ch, char *argument, int cmd)
     try_to_hotboot_on_crash = 0;
 
     // let's crash the mud!
-    char_data *crashus = NULL;
+    char_data *crashus = nullptr;
     if (crashus->in_room == NOWHERE)
     {
       return eFAILURE; // this should never be reached
@@ -581,7 +581,7 @@ int do_testport(char_data *ch, char *argument, int cmd)
   static pid_t child = 0;
   char arg1[MAX_INPUT_LENGTH];
 
-  if (ch == NULL)
+  if (ch == nullptr)
   {
     return eFAILURE;
   }
@@ -637,7 +637,7 @@ int do_testuser(char_data *ch, char *argument, int cmd)
   char command[512];
   char username[20];
 
-  if (ch == NULL)
+  if (ch == nullptr)
   {
     return eFAILURE;
   }

@@ -278,7 +278,7 @@ struct social_messg *find_social(string arg)
     if (!compare_social_search((void *)arg.c_str(), (void *)&soc_mess_list[i]))
       return &soc_mess_list[i];
 
-  return NULL;
+  return nullptr;
   //    sprintf(buf + strlen(buf), "%18s", soc_mess_list[i].name);
 
   //  return (social_messg *) bsearch(arg, soc_mess_list, num_socials, sizeof(struct social_messg), compare_social_search);

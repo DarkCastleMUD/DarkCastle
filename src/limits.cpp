@@ -261,7 +261,7 @@ int hit_gain(char_data *ch, int position)
 	if (ISSET(ch->affected_by, AFF_REGENERATION))
 		gain += (gain / 2);
 
-	if (learned && (!improve || skill_success(ch, NULL, SKILL_ENHANCED_REGEN)))
+	if (learned && (!improve || skill_success(ch, nullptr, SKILL_ENHANCED_REGEN)))
 		gain += 3 + learned / 5;
 
 	if (((GET_COND(ch, FULL) == 0) || (GET_COND(ch, THIRST) == 0)) && GET_LEVEL(ch) < 60)
@@ -341,7 +341,7 @@ int move_gain(char_data *ch, int extra)
 	if (ch->move_regen > 0)
 		gain += ch->move_regen;
 
-	if (learned && (!improve || skill_success(ch, NULL, SKILL_ENHANCED_REGEN)))
+	if (learned && (!improve || skill_success(ch, nullptr, SKILL_ENHANCED_REGEN)))
 		gain += 3 + learned / 10;
 
 	if (GET_LEVEL(ch) < 50)
@@ -762,7 +762,7 @@ void food_update(void)
 	int do_drink(char_data * ch, char *argument, int cmd);
 	int FOUNTAINisPresent(char_data * ch);
 
-	struct obj_data *food = NULL;
+	struct obj_data *food = nullptr;
 
 	auto &character_list = (dynamic_cast<DC *>(DC::instance()))->character_list;
 	for (auto &i : character_list)
@@ -826,7 +826,7 @@ void point_update(void)
 		{
 			int o;
 			for (o = 0; o < MAX_HIDE; o++)
-				i->pcdata->hiding_from[o] = NULL;
+				i->pcdata->hiding_from[o] = nullptr;
 			o = 0;
 			for (temp = world[i->in_room].people; temp; temp = temp->next_in_room)
 			{

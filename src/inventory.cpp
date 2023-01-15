@@ -1934,8 +1934,8 @@ int do_give(char_data *ch, char *argument, int cmd)
 // and try to put it in his inv.  If sucessful, return pointer to the item.
 struct obj_data *bring_type_to_front(char_data *ch, int item_type)
 {
-  struct obj_data *item_carried = NULL;
-  struct obj_data *container_item = NULL;
+  struct obj_data *item_carried = nullptr;
+  struct obj_data *container_item = nullptr;
 
   queue<obj_data *> container_queue;
 
@@ -1963,14 +1963,14 @@ struct obj_data *bring_type_to_front(char_data *ch, int item_type)
       }
     }
   }
-  return NULL;
+  return nullptr;
 }
 
 // Find an item on a character
 struct obj_data *search_char_for_item(char_data *ch, int16_t item_number, bool wearonly)
 {
-  struct obj_data *i = NULL;
-  struct obj_data *j = NULL;
+  struct obj_data *i = nullptr;
+  struct obj_data *j = nullptr;
   int k;
 
   for (k = 0; k < MAX_WEAR; k++)
@@ -2005,14 +2005,14 @@ struct obj_data *search_char_for_item(char_data *ch, int16_t item_number, bool w
         }
       }
     }
-  return NULL;
+  return nullptr;
 }
 
 // Find out how many of an item exists on character
 int search_char_for_item_count(char_data *ch, int16_t item_number, bool wearonly)
 {
-  struct obj_data *i = NULL;
-  struct obj_data *j = NULL;
+  struct obj_data *i = nullptr;
+  struct obj_data *j = nullptr;
   int k;
   int count = 0;
 
@@ -2214,7 +2214,7 @@ int do_open(char_data *ch, char *argument, int cmd)
       send_to_char("It seems to be locked.\r\n", ch);
     else if (IS_SET(EXIT(ch, door)->exit_info, EX_BROKEN))
       send_to_char("It's already been broken open!\r\n", ch);
-    else if (EXIT(ch, door)->bracee != NULL)
+    else if (EXIT(ch, door)->bracee != nullptr)
     {
       if (is_bracing(EXIT(ch, door)->bracee, EXIT(ch, door)))
       {
@@ -2711,7 +2711,7 @@ int palm(char_data *ch, struct obj_data *obj_object, struct obj_data *sub_object
            obj_index[loop_obj->item_number].virt);
   }
 
-  if (skill_success(ch, NULL, SKILL_PALM))
+  if (skill_success(ch, nullptr, SKILL_PALM))
   {
     act("You successfully snag $p, no one saw you do it!", ch,
         obj_object, 0, TO_CHAR, 0);

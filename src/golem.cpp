@@ -159,7 +159,7 @@ int verify_existing_components(char_data *ch, int golemtype)
 void save_golem_data(char_data *ch)
 {
   char file[200];
-  FILE *fpfile = NULL;
+  FILE *fpfile = nullptr;
   int golemtype = 0;
   if (IS_NPC(ch) || GET_CLASS(ch) != CLASS_MAGIC_USER || !ch->pcdata->golem)
     return;
@@ -262,7 +262,7 @@ void set_golem(char_data *golem, int golemtype)
 void load_golem_data(char_data *ch, int golemtype)
 {
   char file[200];
-  FILE *fpfile = NULL;
+  FILE *fpfile = nullptr;
   char_data *golem;
   if (IS_NPC(ch) || (GET_CLASS(ch) != CLASS_MAGIC_USER && GET_LEVEL(ch) < OVERSEER) || ch->pcdata->golem)
     return;
@@ -285,7 +285,7 @@ void load_golem_data(char_data *ch, int golemtype)
   for (; level > 1; level--)
     advance_golem_level(golem); // Level it up again.
   fread(&(golem->exp), sizeof(golem->exp), 1, fpfile);
-  struct obj_data *last_cont = NULL; // Last container.
+  struct obj_data *last_cont = nullptr; // Last container.
   while (!feof(fpfile))
   {
     last_cont = obj_store_to_char(golem, fpfile, last_cont);

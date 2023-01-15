@@ -340,7 +340,7 @@ void show_obj_to_char(struct obj_data *object, char_data *ch, int mode)
       }
       if (IS_SET(object->obj_flags.more_flags, ITEM_24H_SAVE) && !IS_SET(object->obj_flags.extra_flags, ITEM_NOSAVE))
       {
-         time_t now = time(NULL);
+         time_t now = time(nullptr);
          time_t expires = object->save_expiration;
          if (expires == 0)
          {
@@ -364,7 +364,7 @@ void show_obj_to_char(struct obj_data *object, char_data *ch, int mode)
 
       if (IS_SET(object->obj_flags.more_flags, ITEM_24H_NO_SELL))
       {
-         time_t now = time(NULL);
+         time_t now = time(nullptr);
          time_t expires = object->no_sell_expiration;
          if (now >= expires || expires == 0)
          {
@@ -790,7 +790,7 @@ int do_botcheck(char_data *ch, char *argument, int cmd)
    string name2 = "0." + string(name);
    victim = get_char(name2.c_str());
 
-   if (victim == NULL && name != NULL && !strcmp(name, "all"))
+   if (victim == nullptr && name != nullptr && !strcmp(name, "all"))
    {
       descriptor_data *d;
       char_data *i;
@@ -810,7 +810,7 @@ int do_botcheck(char_data *ch, char *argument, int cmd)
       return eSUCCESS;
    }
 
-   if (victim == NULL)
+   if (victim == nullptr)
    {
       csendf(ch, "Unable to find %s.\r\n", name);
       return eFAILURE;
@@ -899,13 +899,13 @@ void list_char_to_char(char_data *list, char_data *ch, int mode)
                clear_lastseen = true;
             }
 
-            gettimeofday(&tv, NULL);
+            gettimeofday(&tv, nullptr);
             ch->pcdata->lastseen->insert(pair<int, pair<timeval, timeval>>(i->mobdata->nr, pair<timeval, timeval>(tv, tv_zero)));
          }
       }
       else if (IS_DARK(ch->in_room))
       {
-         if (known && skill_success(ch, NULL, SKILL_BLINDFIGHTING))
+         if (known && skill_success(ch, nullptr, SKILL_BLINDFIGHTING))
             send_to_char("Your blindfighting awareness alerts you to a presense in the area.\r\n", ch);
          else if (number(1, 10) == 1)
             send_to_char("$B$4You see a pair of glowing red eyes looking your way.$R$7\n\r", ch);
@@ -916,8 +916,8 @@ void list_char_to_char(char_data *list, char_data *ch, int mode)
 void try_to_peek_into_container(char_data *vict, char_data *ch,
                                 char *container)
 {
-   struct obj_data *obj = NULL;
-   struct obj_data *cont = NULL;
+   struct obj_data *obj = nullptr;
+   struct obj_data *cont = nullptr;
    int found = false;
 
    if (GET_CLASS(ch) != CLASS_THIEF && GET_LEVEL(ch) < DEITY)
@@ -2312,7 +2312,7 @@ int do_time(char_data *ch, char *argument, int cmd)
    extern struct time_info_data time_info;
    extern char *weekdays[];
    extern char *month_name[];
-   struct tm *pTime = NULL;
+   struct tm *pTime = nullptr;
 
    /* 35 days in a month */
    weekday = ((35 * time_info.month) + time_info.day + 1) % 7;
@@ -2889,7 +2889,7 @@ int do_consider(char_data *ch, char *argument, int cmd)
 
    GET_MOVE(ch) -= 5;
 
-   if (!skill_success(ch, NULL, SKILL_CONSIDER))
+   if (!skill_success(ch, nullptr, SKILL_CONSIDER))
    {
       send_to_char("You try really hard, but you really have no idea about their capabilties!\n\r", ch);
       return eFAILURE;
@@ -3228,7 +3228,7 @@ int do_scan(char_data *ch, char *argument, int cmd)
                       world[vict->in_room].sector_type != SECT_AIR)
                      continue;
 
-                  if (skill_success(ch, NULL, SKILL_SCAN))
+                  if (skill_success(ch, nullptr, SKILL_SCAN))
                   {
                      csendf(ch, "%35s -- a little bit %s\n\r", GET_SHORT(vict),
                             possibilities[i]);
@@ -3260,7 +3260,7 @@ int do_scan(char_data *ch, char *argument, int cmd)
                          world[vict->in_room].sector_type != SECT_AIR)
                         continue;
 
-                     if (skill_success(ch, NULL, SKILL_SCAN, -10))
+                     if (skill_success(ch, nullptr, SKILL_SCAN, -10))
                      {
                         csendf(ch, "%35s -- a ways off %s\n\r",
                                GET_SHORT(vict),
@@ -3291,7 +3291,7 @@ int do_scan(char_data *ch, char *argument, int cmd)
                                world[vict->in_room].sector_type != SECT_AIR)
                               continue;
 
-                           if (skill_success(ch, NULL, SKILL_SCAN, -20))
+                           if (skill_success(ch, nullptr, SKILL_SCAN, -20))
                            {
                               csendf(ch, "%35s -- extremely far off %s\n\r",
                                      GET_SHORT(vict),
@@ -3326,7 +3326,7 @@ int do_tick(char_data *ch, char *argument, int cmd)
       return eFAILURE;
    }
 
-   if (ch->desc == NULL)
+   if (ch->desc == nullptr)
       return eFAILURE;
 
    while (*argument == ' ')

@@ -78,7 +78,7 @@ bool TimeVal::operator>=(TimeVal t1) {
 
 void TimeVal::gettime() {
 	timeval tv;
-	gettimeofday(&tv, NULL);
+	gettimeofday(&tv, nullptr);
 	tv_sec = tv.tv_sec;
 	tv_usec = tv.tv_usec;
 }

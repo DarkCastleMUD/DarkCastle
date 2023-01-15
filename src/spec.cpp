@@ -41,7 +41,7 @@ struct spec_data
 const struct spec_data spec_list[] =
     {
         {"Blah", "Blehe", 1, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}},
-        {NULL, NULL, 0, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}}};
+        {nullptr, nullptr, 0, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}}};
 
 int do_spec(char_data *ch, char *argument, int cmd)
 {
@@ -53,7 +53,7 @@ int do_spec(char_data *ch, char *argument, int cmd)
   if (!str_cmp(arg, "list"))
   {
     /*
-       for (int i = 0; spec_list[i].name != NULL; i++)
+       for (int i = 0; spec_list[i].name != nullptr; i++)
         {
            if (spec_list[i].pcclass != GET_CLASS(ch)) continue;
            sprintf(buf, "%d. %s : %s\r\n",i+1, spec_list[i].name,

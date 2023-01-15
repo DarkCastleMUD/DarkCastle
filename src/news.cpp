@@ -40,14 +40,14 @@ extern "C"
 #include "returnvals.h"
 #include "news.h"
 
-struct news_data *thenews = NULL;
+struct news_data *thenews = nullptr;
 void addnews(struct news_data *newnews)
 {
   if (!thenews)
     thenews = newnews;
   else
   {
-    struct news_data *tmpnews, *tmpnews2 = NULL;
+    struct news_data *tmpnews, *tmpnews2 = nullptr;
     for (tmpnews = thenews; tmpnews; tmpnews = tmpnews->next)
     {
       if (tmpnews->time < newnews->time)
@@ -68,7 +68,7 @@ void addnews(struct news_data *newnews)
       tmpnews2 = tmpnews;
     }
     tmpnews2->next = newnews;
-    newnews->next = NULL;
+    newnews->next = nullptr;
   }
 }
 
@@ -166,7 +166,7 @@ int do_news(char_data *ch, char *argument, int cmd)
   char arg[MAX_INPUT_LENGTH];
   one_argument(argument, arg);
   if (str_cmp(arg, "all"))
-    thetime = time(NULL) - 604800;
+    thetime = time(nullptr) - 604800;
   else
     thetime = 0;
 
@@ -222,7 +222,7 @@ int do_addnews(char_data *ch, char *argument, int cmd)
   if (str_cmp(arg, "today"))
   {
     struct tm tmptime;
-    if (strptime(arg, "%d/%m/%y", &tmptime) == NULL)
+    if (strptime(arg, "%d/%m/%y", &tmptime) == nullptr)
     {
       do_addnews(ch, "", 9);
       return eFAILURE;
@@ -235,7 +235,7 @@ int do_addnews(char_data *ch, char *argument, int cmd)
   }
   else
   {
-    thetime = time(NULL);
+    thetime = time(nullptr);
     struct tm *tmptime = localtime(&thetime);
     tmptime->tm_sec = 0;
     tmptime->tm_hour = 0;
@@ -263,7 +263,7 @@ int do_addnews(char_data *ch, char *argument, int cmd)
     nnews->addedby = str_dup(GET_NAME(ch));
     nnews->time = thetime;
     addnews(nnews);
-    nnews->news = NULL;
+    nnews->news = nullptr;
   }
   send_to_char("        Enter news item.  (/s saves /h for help)\r\n", ch);
   if (nnews->news)

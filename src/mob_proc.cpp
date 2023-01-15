@@ -62,7 +62,7 @@ bool many_charms(char_data *ch);
 // Marauder proc uses this
 int call_for_help_in_room(char_data *ch, int iFriendId)
 {
-  char_data *ally = NULL;
+  char_data *ally = nullptr;
   int friends = 0;
 
   if (!ch)
@@ -106,8 +106,8 @@ int call_for_help_in_room(char_data *ch, int iFriendId)
 // Several procs use this
 int protect(char_data *ch, int iFriendId)
 {
-  char_data *ally = NULL;
-  char_data *tmp_ch = NULL;
+  char_data *ally = nullptr;
+  char_data *tmp_ch = nullptr;
   int retval;
 
   if (!ch)
@@ -157,12 +157,12 @@ int protect(char_data *ch, int iFriendId)
 // find_random_player_in_room is another purely utilitarian function to
 // include inside a proc.  You call it with the mob that you are using,
 // and it returns either the pointer to a random player in the room,
-// or NULL.
+// or nullptr.
 
 // Pagoda place uses this
 char_data *find_random_player_in_room(char_data *ch)
 {
-  char_data *vict = NULL;
+  char_data *vict = nullptr;
   int count = 0;
 
   // Count the number of players in room
@@ -171,7 +171,7 @@ char_data *find_random_player_in_room(char_data *ch)
       count++;
 
   if (!count) // no players
-    return NULL;
+    return nullptr;
 
   // Pick a random one
   count = number(1, count);
@@ -186,7 +186,7 @@ char_data *find_random_player_in_room(char_data *ch)
         return vict;
     }
   // we should never get here
-  return NULL;
+  return nullptr;
 }
 
 // Call this for any "area effect" damage you want to do to all the
@@ -195,8 +195,8 @@ char_data *find_random_player_in_room(char_data *ch)
 // and the call this function to deal the damage you want to do
 void damage_all_players_in_room(char_data *ch, int damage)
 {
-  char_data *vict = NULL;
-  char_data *next_vict = NULL;
+  char_data *vict = nullptr;
+  char_data *next_vict = nullptr;
   void inform_victim(char_data * ch, char_data * vict, int dam);
 
   for (vict = world[ch->in_room].people; vict; vict = next_vict)
@@ -245,13 +245,13 @@ void summon_all_of_mob_to_room(char_data *ch, int iFriendId)
 // Call this function with the finder, and the vnum of the mob you
 // want to find, and it will return his pointer if he's in the room.
 // If we find him, return his pointer
-// If it doesn't, return NULL
+// If it doesn't, return nullptr
 char_data *find_mob_in_room(char_data *ch, int iFriendId)
 {
-  char_data *ally = NULL;
+  char_data *ally = nullptr;
 
   if (!ch)
-    return NULL;
+    return nullptr;
 
   // Is my friend in the room?
   for (ally = world[ch->in_room].people; ally; ally = ally->next_in_room)
@@ -261,7 +261,7 @@ char_data *find_mob_in_room(char_data *ch, int iFriendId)
     if (real_mobile(iFriendId) == ally->mobdata->nr)
       return ally;
   }
-  return NULL;
+  return nullptr;
 }
 
 // Spellcraft golem stuff.
@@ -820,7 +820,7 @@ int brass_dragon(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
     if (number(0, 2) == 0)
     {
       vict = ch->fighting;
-      if (vict == NULL)
+      if (vict == nullptr)
         return eFAILURE;
     }
     else
@@ -2389,7 +2389,7 @@ int hellstreamer(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
 int firestormer(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
                 char_data *owner)
 {
-  char_data *vict = NULL;
+  char_data *vict = nullptr;
   // int percent;
 
   act("$n utters the words 'Fry bitch!'.", ch, 0, 0,
@@ -2539,9 +2539,9 @@ int clutchdrone_combat(char_data *ch, struct obj_data *obj, int cmd, const char 
     if (IS_SET(retval, eCH_DIED))
       return retval;
 
-    act("Your bash at $N sends $M sprawling.", ch, NULL, vict, TO_CHAR, 0);
-    act("$n sends you sprawling.", ch, NULL, vict, TO_VICT, 0);
-    act("$n sends $N sprawling with a powerful bash.", ch, NULL, vict, TO_ROOM, NOTVICT);
+    act("Your bash at $N sends $M sprawling.", ch, nullptr, vict, TO_CHAR, 0);
+    act("$n sends you sprawling.", ch, nullptr, vict, TO_VICT, 0);
+    act("$n sends $N sprawling with a powerful bash.", ch, nullptr, vict, TO_ROOM, NOTVICT);
 
     GET_POS(vict) = POSITION_SITTING;
     SET_BIT(vict->combat, COMBAT_BASH1);
@@ -2657,7 +2657,7 @@ int panicprisoner(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
                   char_data *owner)
 {
   // int x;
-  char_data *vict = NULL;
+  char_data *vict = nullptr;
 
   if (cmd)
     return eFAILURE;
@@ -2822,7 +2822,7 @@ int marauder(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
 int foggy_combat(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
                  char_data *owner)
 {
-  char_data *mob = NULL;
+  char_data *mob = nullptr;
 
   if (cmd)
     return eFAILURE;
@@ -2878,7 +2878,7 @@ int foggy_non(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
 int iasenko_combat(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
                    char_data *owner)
 {
-  char_data *vict = NULL;
+  char_data *vict = nullptr;
   int dam = 0;
   int retval;
   // char buf[200];
@@ -2942,8 +2942,8 @@ int iasenko_non_combat(char_data *ch, struct obj_data *obj, int cmd, const char 
 int koban_combat(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
                  char_data *owner)
 {
-  char_data *iasenko = NULL;
-  char_data *temp_chr = NULL;
+  char_data *iasenko = nullptr;
+  char_data *temp_chr = nullptr;
 
   if (cmd)
     return eFAILURE;
@@ -2978,7 +2978,7 @@ int koban_combat(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
 int koban_non_combat(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
                      char_data *owner)
 {
-  char_data *iasenko = NULL;
+  char_data *iasenko = nullptr;
 
   if (cmd)
     return eFAILURE;
@@ -3026,7 +3026,7 @@ int koban_non_combat(char_data *ch, struct obj_data *obj, int cmd, const char *a
 int kogiro_combat(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
                   char_data *owner)
 {
-  char_data *vict = NULL;
+  char_data *vict = nullptr;
   int dam = 0;
   int retval;
 
@@ -3171,7 +3171,7 @@ int surimoto_combat(char_data *ch, struct obj_data *obj, int cmd, const char *ar
 int hiryushi_combat(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
                     char_data *owner)
 {
-  char_data *victim = NULL;
+  char_data *victim = nullptr;
 
   if (cmd)
     return eFAILURE;

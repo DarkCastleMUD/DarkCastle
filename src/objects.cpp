@@ -73,7 +73,7 @@ void remove_obj_affect_by_index(obj_data *obj, int index)
   else
   {
     dc_free(obj->affected);
-    obj->affected = NULL;
+    obj->affected = nullptr;
   }
 }
 
@@ -174,7 +174,7 @@ void object_activity(uint64_t pulse_type)
 
     if (obj_index[item_number].non_combat_func)
     {
-      obj_index[item_number].non_combat_func(NULL, obj, 0, "", NULL);
+      obj_index[item_number].non_combat_func(nullptr, obj, 0, "", nullptr);
     }
     else if (obj->obj_flags.type_flag == ITEM_MEGAPHONE && obj->ex_description && obj->obj_flags.value[0]-- == 0)
     {
@@ -241,7 +241,7 @@ int do_switch(char_data *ch, char *arg, int cmd)
   }
   GET_MOVE(ch) -= 4;
 
-  if (!has_skill(ch, SKILL_SWITCH) || !skill_success(ch, NULL, SKILL_SWITCH))
+  if (!has_skill(ch, SKILL_SWITCH) || !skill_success(ch, nullptr, SKILL_SWITCH))
   {
     act("$n fails to switch $s weapons.", ch, 0, 0, TO_ROOM, 0);
     act("You fail to switch your weapons.", ch, 0, 0, TO_CHAR, 0);
@@ -482,7 +482,7 @@ int do_recite(char_data *ch, char *argument, int cmd)
 void set_movement_trap(char_data *ch, struct obj_data *obj)
 {
   char buf[200];
-  struct obj_data *trap_obj = NULL;
+  struct obj_data *trap_obj = nullptr;
 
   sprintf(buf, "You set up the %s to catch people moving around in the area.\r\n", obj->short_description);
   send_to_char(buf, ch);
@@ -503,7 +503,7 @@ void set_movement_trap(char_data *ch, struct obj_data *obj)
 void set_exit_trap(char_data *ch, struct obj_data *obj, char *arg)
 {
   char buf[200];
-  struct obj_data *trap_obj = NULL;
+  struct obj_data *trap_obj = nullptr;
 
   sprintf(buf, "You set up the %s to catch people trying to leave the area.\r\n", obj->short_description);
   send_to_char(buf, ch);
@@ -529,7 +529,7 @@ bool set_utility_mortar(char_data *ch, struct obj_data *obj, char *arg)
 {
   char direct[MAX_INPUT_LENGTH];
   char buf[MAX_STRING_LENGTH];
-  struct obj_data *trap_obj = NULL;
+  struct obj_data *trap_obj = nullptr;
   int dir;
 
   one_argument(arg, direct);
@@ -668,7 +668,7 @@ void set_utility_item(char_data *ch, struct obj_data *obj, char *argument)
 
 int do_mortal_set(char_data *ch, char *argument, int cmd)
 {
-  struct obj_data *obj = NULL;
+  struct obj_data *obj = nullptr;
   char arg[MAX_INPUT_LENGTH];
   char buf[MAX_STRING_LENGTH];
 
@@ -2157,7 +2157,7 @@ void wear(char_data *ch, struct obj_data *obj_object, int keyword)
       }
       GET_MOVE(ch) -= 4;
 
-      if (!has_skill(ch, SKILL_SWITCH) || !skill_success(ch, NULL, SKILL_SWITCH))
+      if (!has_skill(ch, SKILL_SWITCH) || !skill_success(ch, nullptr, SKILL_SWITCH))
       {
         act("$n fails to switch $s weapons.", ch, 0, 0, TO_ROOM, 0);
         act("You fail to switch your weapons.", ch, 0, 0, TO_CHAR, 0);
@@ -2610,7 +2610,7 @@ int do_remove(char_data *ch, char *argument, int cmd)
 int recheck_height_wears(char_data *ch)
 {
   int j;
-  struct obj_data *obj = NULL;
+  struct obj_data *obj = nullptr;
   if (!ch || IS_NPC(ch))
     return eFAILURE; // NPCs get to wear the stuff.
 
@@ -2623,8 +2623,8 @@ int recheck_height_wears(char_data *ch)
     {
       obj = unequip_char(ch, j);
       obj_to_char(obj, ch);
-      act("$n looks uncomfortable, and shifts $p into $s inventory.", ch, obj, NULL, TO_ROOM, 0);
-      act("$p feels uncomfortable and you shift it into your inventory.", ch, obj, NULL, TO_CHAR, 0);
+      act("$n looks uncomfortable, and shifts $p into $s inventory.", ch, obj, nullptr, TO_ROOM, 0);
+      act("$p feels uncomfortable and you shift it into your inventory.", ch, obj, nullptr, TO_CHAR, 0);
     }
   }
   return eSUCCESS;

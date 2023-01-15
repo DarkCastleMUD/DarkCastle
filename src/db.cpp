@@ -213,8 +213,8 @@ void room_data::FreeTracks()
 		// trackee is a str_hsh, don't free it
 		dc_free(curr);
 	}
-	tracks = NULL;
-	last_track = NULL;
+	tracks = nullptr;
+	last_track = nullptr;
 	nTracks = 0;
 }
 
@@ -261,7 +261,7 @@ room_track_data *room_data::TrackItem(int nIndex)
 
 void add_to_bard_list(char_data *ch)
 {
-	pulse_data *curr = NULL;
+	pulse_data *curr = nullptr;
 
 	if (GET_CLASS(ch) != CLASS_BARD)
 		return;
@@ -281,8 +281,8 @@ void add_to_bard_list(char_data *ch)
 
 void remove_from_bard_list(char_data *ch)
 {
-	pulse_data *curr = NULL;
-	pulse_data *last = NULL;
+	pulse_data *curr = nullptr;
+	pulse_data *last = nullptr;
 
 	if (!bard_list)
 		return;
@@ -440,7 +440,7 @@ int do_write_skillquest(char_data *ch, char *argument, int cmd)
 void load_skillquests()
 {
 	struct skill_quest *newsq, *last = 0;
-	skill_list = NULL;
+	skill_list = nullptr;
 	int i;
 	FILE *fl;
 
@@ -994,7 +994,7 @@ index_data *generate_mob_indices(int *top, struct index_data *index)
 	FILE *fl;
 	QString temp;
 	char endfile[180];
-	struct world_file_list_item *pItem = NULL;
+	struct world_file_list_item *pItem = nullptr;
 	//  extern short code_testing_mode;
 
 	logentry("Opening mobile file index.", 0, LogChannels::LOG_MISC);
@@ -1057,8 +1057,8 @@ index_data *generate_mob_indices(int *top, struct index_data *index)
 					index[i].number = 0;
 					index[i].non_combat_func = 0;
 					index[i].combat_func = 0;
-					index[i].mobprogs = NULL;
-					index[i].mobspec = NULL;
+					index[i].mobprogs = nullptr;
+					index[i].mobspec = nullptr;
 					index[i].progtypes = 0;
 					curr_virtno = index[i].virt;
 					if (!(index[i].item = (char_data *)read_mobile(i, fl)))
@@ -1290,7 +1290,7 @@ void remove_all_mobs_from_world()
 
 void remove_all_objs_from_world()
 {
-	obj_data *curr = NULL;
+	obj_data *curr = nullptr;
 
 	while ((curr = object_list))
 		extract_obj(curr);
@@ -1307,7 +1307,7 @@ struct index_data *generate_obj_indices(int *top,
 	FILE *flObjIndex;
 	QString temp;
 	char endfile[180];
-	struct world_file_list_item *pItem = NULL;
+	struct world_file_list_item *pItem = nullptr;
 
 	//  if (!bport) {
 
@@ -1826,8 +1826,8 @@ void set_zone_saved_obj(int32_t obj)
 /* destruct the world */
 void free_world_from_memory()
 {
-	struct extra_descr_data *curr_extra = NULL;
-	struct world_file_list_item *curr_wfli = NULL;
+	struct extra_descr_data *curr_extra = nullptr;
+	struct world_file_list_item *curr_wfli = nullptr;
 
 	for (int i = 0; i <= top_of_world; i++)
 	{
@@ -1876,34 +1876,34 @@ void free_world_from_memory()
 
 void free_mobs_from_memory()
 {
-	char_data *curr = NULL;
+	char_data *curr = nullptr;
 
 	for (int i = 0; i <= top_of_mobt; i++)
 	{
 		if ((curr = (char_data *)mob_index[i].item))
 		{
 			free_char(curr, Trace("free_mobs_from_memory"));
-			mob_index[i].item = NULL;
+			mob_index[i].item = nullptr;
 		}
 	}
 }
 
 void free_objs_from_memory()
 {
-	struct obj_data *curr = NULL;
-	// struct extra_descr_data * curr_extra = NULL;
+	struct obj_data *curr = nullptr;
+	// struct extra_descr_data * curr_extra = nullptr;
 
 	for (int i = 0; i <= top_of_objt; i++)
 		if ((curr = (struct obj_data *)obj_index[i].item))
 		{
 			free_obj(curr);
-			obj_index[i].item = NULL;
+			obj_index[i].item = nullptr;
 		}
 }
 
 world_file_list_item *one_new_world_file_item(QString filename, int32_t room_nr)
 {
-	world_file_list_item *curr = NULL;
+	world_file_list_item *curr = nullptr;
 
 #ifdef LEAK_CHECK
 	curr = (world_file_list_item *)calloc(1, sizeof(world_file_list_item));
@@ -1915,7 +1915,7 @@ world_file_list_item *one_new_world_file_item(QString filename, int32_t room_nr)
 	curr->firstnum = room_nr;
 	curr->lastnum = -1;
 	curr->flags = 0;
-	curr->next = NULL;
+	curr->next = nullptr;
 	return curr;
 }
 
@@ -1959,7 +1959,7 @@ void DC::boot_world(void)
 	int room_nr = 0;
 	QString temp;
 	char endfile[200]; // hopefully noone is stupid and makes a 180 char filename
-	struct world_file_list_item *pItem = NULL;
+	struct world_file_list_item *pItem = nullptr;
 
 	object_list = 0;
 
@@ -2063,7 +2063,7 @@ void setup_dir(FILE *fl, int room, int dir)
 
 	tmp = fread_bitvector(fl, -1, 300); /* tjs hack - not the right range */
 	world[room].dir_option[dir]->exit_info = tmp;
-	world[room].dir_option[dir]->bracee = NULL;
+	world[room].dir_option[dir]->bracee = nullptr;
 
 	world[room].dir_option[dir]->key = fread_int(fl, -62000, 62000);
 	try
@@ -2365,7 +2365,7 @@ zone_t DC::read_one_zone(FILE *fl)
 	struct reset_com reset_tab[MAX_RESET];
 	char *check, buf[161], ch;
 	int reset_top, i, tmp;
-	char *skipper = NULL;
+	char *skipper = nullptr;
 	int version = 1;
 	bool modified = false;
 
@@ -2427,7 +2427,7 @@ zone_t DC::read_one_zone(FILE *fl)
 			perror("Too many zone resets");
 			abort();
 		}
-		reset_tab[reset_top].comment = NULL; // needs to be initialized
+		reset_tab[reset_top].comment = nullptr; // needs to be initialized
 		reset_tab[reset_top].command = fread_char(fl);
 		reset_tab[reset_top].if_flag = 0;
 		reset_tab[reset_top].last = 0;
@@ -2461,7 +2461,7 @@ zone_t DC::read_one_zone(FILE *fl)
 
 		tmp = fread_int(fl, 0, CMD_DEFAULT);
 		reset_tab[reset_top].if_flag = tmp;
-		reset_tab[reset_top].last = time(NULL) - number(0, 12 * 3600);
+		reset_tab[reset_top].last = time(nullptr) - number(0, 12 * 3600);
 		// randomize last repop on boot
 		reset_tab[reset_top].arg1 = fread_int(fl, -64000, 2147483467);
 		reset_tab[reset_top].arg2 = fread_int(fl, -64000, 2147483467);
@@ -2554,7 +2554,7 @@ void DC::boot_zones(void)
 	char endfile[200]; // hopefully noone is stupid and makes a 180 char filename
 
 	//  for (zon = 0;zon < MAX_ZONE;zon++)
-	//  DC::getInstance()->zones.value(zon) = NULL; // Null list, top_of_z can't be used now
+	//  DC::getInstance()->zones.value(zon) = nullptr; // Null list, top_of_z can't be used now
 
 	DC::config &cf = DC::getInstance()->cf;
 
@@ -2647,7 +2647,7 @@ char_data *read_mobile(int nr, FILE *fl)
 #else
 	mob->mobdata = (mob_data *)dc_alloc(1, sizeof(mob_data));
 #endif
-	mob->mobdata->reset = NULL;
+	mob->mobdata->reset = nullptr;
 	/* *** Numeric data *** */
 	j = 0;
 	while ((tmp = fread_int(fl, -2147483467, 2147483467)) != -1)
@@ -3352,7 +3352,7 @@ char_data *clone_mobile(int nr)
 
 	mob->mobdata->nr = nr;
 	mob->desc = 0;
-	mob->mobdata->reset = NULL;
+	mob->mobdata->reset = nullptr;
 
 	auto &character_list = DC::getInstance()->character_list;
 	character_list.insert(mob);
@@ -3468,7 +3468,7 @@ int create_blank_item(int nr)
 		((obj_data *)obj_index[i].item)->item_number++;
 
 	// update obj file indices
-	world_file_list_item *wcurr = NULL;
+	world_file_list_item *wcurr = nullptr;
 
 	extern world_file_list_item *obj_file_list;
 
@@ -3554,7 +3554,7 @@ int create_blank_mobile(int nr)
 		mob->mobdata->actflags[i] = 0;
 	for (i = 0; i < AFF_MAX / ASIZE + 1; i++)
 		mob->affected_by[i] = 0;
-	mob->mobdata->reset = NULL;
+	mob->mobdata->reset = nullptr;
 	mob->mobdata->damnodice = 1;
 	mob->mobdata->damsizedice = 1;
 	mob->mobdata->default_pos = POSITION_STANDING;
@@ -3609,7 +3609,7 @@ int create_blank_mobile(int nr)
 		((char_data *)mob_index[i].item)->mobdata->nr++;
 
 	// update obj file indices
-	world_file_list_item *wcurr = NULL;
+	world_file_list_item *wcurr = nullptr;
 
 	extern world_file_list_item *mob_file_list;
 
@@ -3676,7 +3676,7 @@ void delete_mob_from_index(int nr)
 		((char_data *)mob_index[i].item)->mobdata->nr--;
 
 	// update mob file indices - these store rnums
-	world_file_list_item *wcurr = NULL;
+	world_file_list_item *wcurr = nullptr;
 
 	extern world_file_list_item *mob_file_list;
 
@@ -3756,7 +3756,7 @@ void delete_item_from_index(int nr)
 		((obj_data *)obj_index[i].item)->item_number--;
 
 	// update obj file indices - these store rnums
-	world_file_list_item *wcurr = NULL;
+	world_file_list_item *wcurr = nullptr;
 
 	extern world_file_list_item *obj_file_list;
 
@@ -3871,8 +3871,8 @@ struct obj_data *read_object(int nr, FILE *fl, bool zz)
 	/* currently not stored in object file */
 	obj->obj_flags.timer = 0;
 
-	obj->ex_description = NULL;
-	obj->affected = NULL;
+	obj->ex_description = nullptr;
+	obj->affected = nullptr;
 	obj->num_affects = 0;
 	/* *** other flags *** */
 
@@ -3957,7 +3957,7 @@ ifstream &operator>>(ifstream &in, obj_data *obj)
 	char chk, c;
 	struct extra_descr_data *new_new_descr;
 
-	if (obj == NULL)
+	if (obj == nullptr)
 	{
 		return in;
 	}
@@ -4015,8 +4015,8 @@ ifstream &operator>>(ifstream &in, obj_data *obj)
 	// currently not stored in object file
 	obj->obj_flags.timer = 0;
 
-	obj->ex_description = NULL;
-	obj->affected = NULL;
+	obj->ex_description = nullptr;
+	obj->affected = nullptr;
 	obj->num_affects = 0;
 	// other flags
 
@@ -4329,7 +4329,7 @@ struct obj_data *clone_object(int nr)
 	{
 		fprintf(stderr, "clone_object(%d): Obj not found in obj_index.\n", nr);
 		dc_free(obj);
-		return NULL;
+		return nullptr;
 	}
 
 	/* *** extra descriptions *** */
@@ -4375,7 +4375,7 @@ struct obj_data *clone_object(int nr)
 
 void randomize_object_affects(obj_data *obj)
 {
-	if (obj == NULL)
+	if (obj == nullptr)
 	{
 		return;
 	}
@@ -4472,7 +4472,7 @@ void randomize_object_affects(obj_data *obj)
 
 void randomize_object(obj_data *obj)
 {
-	if (obj == NULL)
+	if (obj == nullptr)
 	{
 		return;
 	}
@@ -4577,7 +4577,7 @@ void Zone::reset(ResetType reset_type)
 
 	int cmd_no, last_cmd, last_mob, last_obj, last_percent;
 	int last_no;
-	char_data *mob = NULL;
+	char_data *mob = nullptr;
 	struct obj_data *obj, *obj_to;
 	last_cmd = last_mob = last_obj = last_percent = -1;
 
@@ -4649,7 +4649,7 @@ void Zone::reset(ResetType reset_type)
 					mprog_load_trigger(mob);
 					if (selfpurge)
 					{
-						mob = NULL;
+						mob = nullptr;
 						last_mob = 0;
 						last_cmd = 0;
 					}
@@ -4730,7 +4730,7 @@ void Zone::reset(ResetType reset_type)
 				break;
 
 			case 'G': /* obj_to_char */
-				if (mob == NULL)
+				if (mob == nullptr)
 				{
 					sprintf(buf, "Null mob in G, reseting zone %d cmd %d", id,
 							cmd_no + 1);
@@ -4764,7 +4764,7 @@ void Zone::reset(ResetType reset_type)
 				{
 					if (number(1, cmd[cmd_no].arg2) <= cmd[cmd_no].arg1)
 					{
-						cmd[cmd_no].last = time(NULL);
+						cmd[cmd_no].last = time(nullptr);
 						last_percent = 1;
 						last_cmd = 1;
 					}
@@ -4777,7 +4777,7 @@ void Zone::reset(ResetType reset_type)
 				break;
 
 			case 'E': /* object to equipment list */
-				if (mob == NULL)
+				if (mob == nullptr)
 				{
 					sprintf(buf, "Null mob in E reseting zone %d cmd %d", id,
 							cmd_no);
@@ -4794,9 +4794,9 @@ void Zone::reset(ResetType reset_type)
 					// Some of these checks are redundant compared to equip_char() but
 					// we want to know if the position is filled already before running equip_char()
 					// so we don't see unnecessary errors when a zone reset tries to reequip a mob
-					if (mob == NULL)
+					if (mob == nullptr)
 					{
-						logentry("NULL mob in reset_zone()!", ANGEL, LogChannels::LOG_BUG);
+						logentry("nullptr mob in reset_zone()!", ANGEL, LogChannels::LOG_BUG);
 					}
 					else if (cmd[cmd_no].arg3 < 0 || cmd[cmd_no].arg3 >= MAX_WEAR)
 					{
@@ -5128,7 +5128,7 @@ char *fread_string(FILE *fl, int hasher)
 
 	perror("fread_string: string too long");
 	abort();
-	return (NULL);
+	return (nullptr);
 }
 
 /* read and allocate space for a whitespace-terminated string from a given file */
@@ -5197,7 +5197,7 @@ char *fread_word(FILE *fl, int hasher)
 
 	perror("fread_word: string too long");
 	abort();
-	return (NULL);
+	return (nullptr);
 }
 
 // This is here to allow us to read a bitvector in as either a number
@@ -5691,7 +5691,7 @@ void free_char(char_data *ch, Trace trace)
 
 	if (ch->title)
 		dc_free(ch->title);
-	ch->title = NULL;
+	ch->title = nullptr;
 
 	remove_memory(ch, 't');
 
@@ -5985,7 +5985,7 @@ void init_char(char_data *ch)
 		break;
 	}
 
-	ch->altar = NULL;
+	ch->altar = nullptr;
 	ch->spec = 0;
 	GET_PROMPT(ch) = 0;
 	GET_LAST_PROMPT(ch) = 0;
@@ -6480,7 +6480,7 @@ void copySaveData(obj_data *target, obj_data *source)
 				errno = 0;
 				target->affected = (obj_affected_type *)realloc(target->affected,
 																(sizeof(obj_affected_type) * source->num_affects));
-				if (target->affected == NULL)
+				if (target->affected == nullptr)
 				{
 					perror("realloc");
 					abort();
@@ -6621,13 +6621,13 @@ bool verify_item(struct obj_data **obj)
 
 FILE *legacyFileOpen(QString directory, QString filename, QString error_message)
 {
-	FILE *file_handle = NULL;
+	FILE *file_handle = nullptr;
 
 	QString file = directory.arg(filename);
 	QString syscmd = QString("cp -f %1 %1.last").arg(file);
 	system(syscmd.toStdString().c_str());
 
-	if ((file_handle = fopen(file.toStdString().c_str(), "w")) == NULL)
+	if ((file_handle = fopen(file.toStdString().c_str(), "w")) == nullptr)
 	{
 		qCritical() << error_message.arg(file);
 		return nullptr;

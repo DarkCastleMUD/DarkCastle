@@ -72,11 +72,11 @@ extern struct obj_data *object_list;
 extern class room_data **world_array;
 int activeProgs = 0; // loop protection
 
-char_data *activeActor = NULL;
-char_data *activeRndm = NULL;
-char_data *activeTarget = NULL;
-obj_data *activeObj = NULL;
-void *activeVo = NULL;
+char_data *activeActor = nullptr;
+char_data *activeRndm = nullptr;
+char_data *activeTarget = nullptr;
+obj_data *activeObj = nullptr;
+void *activeVo = nullptr;
 
 char *activeProg;
 char *activePos;
@@ -138,7 +138,7 @@ int mprog_do_ifchck(char *ifchck, char_data *mob,
 char *mprog_process_if(char *ifchck, char *com_list,
 					   char_data *mob, char_data *actor,
 					   obj_data *obj, void *vo,
-					   char_data *rndm, struct mprog_throw_type *thrw = NULL);
+					   char_data *rndm, struct mprog_throw_type *thrw = nullptr);
 void mprog_translate(char ch, char *t, char_data *mob,
 					 char_data *actor, obj_data *obj,
 					 void *vo, char_data *rndm);
@@ -310,8 +310,8 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
 	 'hasskill' = right
 	 */
 
-	char_data *target = NULL;
-	obj_data *otarget = NULL;
+	char_data *target = nullptr;
+	obj_data *otarget = nullptr;
 	int rtarget = -1, ztarget = -1;
 	bool valset = false; // done like that to determine if value is set, since it can be 0
 	struct tempvariable *mobTempVar = nullptr;
@@ -324,10 +324,10 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
 	// once in this function.
 	char *targetTemp = 0;
 
-	activeTarget = NULL;
+	activeTarget = nullptr;
 	char *tmp, half[MAX_INPUT_LENGTH];
 	half[0] = '\0';
-	if ((tmp = strchr(leftptr, ',')) != NULL)
+	if ((tmp = strchr(leftptr, ',')) != nullptr)
 	{
 		*tmp = '\0';
 		tmp++;
@@ -676,7 +676,7 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
 				stringval = &otarget->in_obj->equipped_by->name;
 			}
 			else
-				stringval = NULL;
+				stringval = nullptr;
 		}
 		else if (!str_cmp(right, "carryingitems"))
 		{
@@ -1614,7 +1614,7 @@ int mprog_do_ifchck(char *ifchck, char_data *mob, char_data *actor,
 	 *  send the lhs,opr,rhs off to be evaluated.
 	 */
 
-	char_data *fvict = NULL;
+	char_data *fvict = nullptr;
 	bool ye = false;
 	if (arg[0] == '$' && arg[1] == 'v')
 	{
@@ -2124,7 +2124,7 @@ int mprog_do_ifchck(char *ifchck, char_data *mob, char_data *actor,
 
 	case eISWORN:
 	{
-		obj_data *o = NULL;
+		obj_data *o = nullptr;
 		if (mob->mobdata->isObject())
 		{
 			o = mob->mobdata->getObject();
@@ -2313,13 +2313,13 @@ int mprog_do_ifchck(char *ifchck, char_data *mob, char_data *actor,
 
 	case eISFOLLOW:
 		if (fvict)
-			return (fvict->master != NULL && fvict->master->in_room == fvict->in_room);
+			return (fvict->master != nullptr && fvict->master->in_room == fvict->in_room);
 		if (ye)
 			return false;
 		switch (arg[1]) /* arg should be "$*" so just get the letter */
 		{
 		case 'i':
-			return (mob->master != NULL && mob->master->in_room == mob->in_room);
+			return (mob->master != nullptr && mob->master->in_room == mob->in_room);
 		case 'z':
 			if (mob->beacon)
 				return ((char_data *)mob->beacon)->master && ((char_data *)mob->beacon)->master->in_room == ((char_data *)mob->beacon)->in_room;
@@ -2327,17 +2327,17 @@ int mprog_do_ifchck(char *ifchck, char_data *mob, char_data *actor,
 				return -1;
 		case 'n':
 			if (actor)
-				return (actor->master != NULL && actor->master->in_room == actor->in_room);
+				return (actor->master != nullptr && actor->master->in_room == actor->in_room);
 			else
 				return -1;
 		case 't':
 			if (vict)
-				return (vict->master != NULL && vict->master->in_room == vict->in_room);
+				return (vict->master != nullptr && vict->master->in_room == vict->in_room);
 			else
 				return -1;
 		case 'r':
 			if (rndm)
-				return (rndm->master != NULL && rndm->master->in_room == rndm->in_room);
+				return (rndm->master != nullptr && rndm->master->in_room == rndm->in_room);
 			else
 				return -1;
 		default:
@@ -2913,7 +2913,7 @@ int mprog_do_ifchck(char *ifchck, char_data *mob, char_data *actor,
 	case eINSAMEZONE:
 		if (fvict)
 			return (GET_ZONE(fvict) == GET_ZONE(mob));
-		else if ((fvict = get_pc(arg)) != NULL)
+		else if ((fvict = get_pc(arg)) != nullptr)
 			return (GET_ZONE(fvict) == GET_ZONE(mob));
 
 		switch (arg[1])
@@ -3018,7 +3018,7 @@ char *mprog_process_if(char *ifchck, char *com_list, char_data *mob,
 
 	*null = '\0';
 
-	char_data *ur = NULL;
+	char_data *ur = nullptr;
 	if (ur)
 		send_to_char("\r\nProg initiated.\r\n", ur);
 
@@ -3042,7 +3042,7 @@ char *mprog_process_if(char *ifchck, char *com_list, char_data *mob,
 		if (legal >= 1)
 			flag = true;
 		else if (legal < 0)
-			return NULL;
+			return nullptr;
 		if (ur)
 			csendf(ur, "%d>-%d\r\n", thrw->cPos - 1, legal);
 	}
@@ -3081,7 +3081,7 @@ char *mprog_process_if(char *ifchck, char *com_list, char_data *mob,
 				if (legal == 1)
 					flag = true;
 				else if (legal < 0)
-					return NULL;
+					return nullptr;
 				if (ur)
 					csendf(ur, "%d<-%d\r\n", thrw->cPos - 1, legal);
 			}
@@ -3291,7 +3291,7 @@ char *mprog_process_if(char *ifchck, char *com_list, char_data *mob,
 		}
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 /* This routine handles the variables for command expansion.
@@ -3793,7 +3793,7 @@ int mprog_process_cmnd(char *cmnd, char_data *mob, char_data *actor,
 				while (*str != ']' && *str != '\0')
 					*tmp1++ = *str++;
 				*tmp1 = '\0';
-				char_data *who = NULL;
+				char_data *who = nullptr;
 				if (a == 'v')
 					who = mob;
 				else if (a == 'V')
@@ -3860,8 +3860,8 @@ void mprog_driver(char *com_list, char_data *mob, char_data *actor,
 	char *morebuf;
 	char *command_list;
 	char *cmnd;
-	// char_data *rndm  = NULL;
-	char_data *vch = NULL;
+	// char_data *rndm  = nullptr;
+	char_data *vch = nullptr;
 	int count = 0;
 	if (IS_AFFECTED(mob, AFF_CHARM))
 		return;
@@ -3883,9 +3883,9 @@ void mprog_driver(char *com_list, char_data *mob, char_data *actor,
 	memset(&cIfs[0], 0, sizeof(int) * 256);
 
 	if (!charExists(actor))
-		actor = NULL;
+		actor = nullptr;
 	if (!objExists(obj))
-		obj = NULL;
+		obj = nullptr;
 
 	activeActor = actor;
 	activeObj = obj;
@@ -3895,9 +3895,9 @@ void mprog_driver(char *com_list, char_data *mob, char_data *actor,
 
 	if (!com_list) // this can happen when someone is editing
 	{
-		activeActor = activeRndm = NULL;
-		activeObj = NULL;
-		activeVo = NULL;
+		activeActor = activeRndm = nullptr;
+		activeObj = nullptr;
+		activeVo = nullptr;
 		activeProgs--;
 		return;
 	}
@@ -3945,9 +3945,9 @@ void mprog_driver(char *com_list, char_data *mob, char_data *actor,
 														actor, obj, vo, rndm, thrw);
 			if (IS_SET(mprog_cur_result, eCH_DIED) || IS_SET(mprog_cur_result, eDELAYED_EXEC))
 			{
-				activeActor = activeRndm = NULL;
-				activeObj = NULL;
-				activeVo = NULL;
+				activeActor = activeRndm = nullptr;
+				activeObj = nullptr;
+				activeVo = nullptr;
 				activeProgs--;
 				return;
 			}
@@ -3960,9 +3960,9 @@ void mprog_driver(char *com_list, char_data *mob, char_data *actor,
 				SET_BIT(mprog_cur_result, mprog_process_cmnd(cmnd, mob, actor, obj, vo, rndm));
 				if (IS_SET(mprog_cur_result, eCH_DIED) || selfpurge || IS_SET(mprog_cur_result, eDELAYED_EXEC))
 				{
-					activeActor = activeRndm = NULL;
-					activeObj = NULL;
-					activeVo = NULL;
+					activeActor = activeRndm = nullptr;
+					activeObj = nullptr;
+					activeVo = nullptr;
 					activeProgs--;
 					return;
 				}
@@ -3971,9 +3971,9 @@ void mprog_driver(char *com_list, char_data *mob, char_data *actor,
 		cmnd = command_list;
 		activePos = command_list = mprog_next_command(command_list);
 	}
-	activeActor = activeRndm = NULL;
-	activeObj = NULL;
-	activeVo = NULL;
+	activeActor = activeRndm = nullptr;
+	activeObj = nullptr;
+	activeVo = nullptr;
 	activeProgs--;
 	return;
 }
@@ -4005,7 +4005,7 @@ int mprog_wordlist_check(const char *arg, char_data *mob, char_data *actor,
 	int i;
 	int retval = 0;
 	bool done = false;
-	//  for ( mprg = mob_index[mob->mobdata->nr].mobprogs; mprg != NULL; mprg
+	//  for ( mprg = mob_index[mob->mobdata->nr].mobprogs; mprg != nullptr; mprg
 	//= next )
 	mprg = mob_index[mob->mobdata->nr].mobprogs;
 	if (!mprg)
@@ -4015,7 +4015,7 @@ int mprog_wordlist_check(const char *arg, char_data *mob, char_data *actor,
 	}
 
 	mprog_command_num = 0;
-	for (; mprg != NULL; mprg = next)
+	for (; mprg != nullptr; mprg = next)
 	{
 		mprog_command_num++;
 		next = mprg->next;
@@ -4047,7 +4047,7 @@ int mprog_wordlist_check(const char *arg, char_data *mob, char_data *actor,
 																   || *end == '.' || *end == '?' || *end == '!'))
 					{
 						retval = 1;
-						mprog_driver(mprg->comlist, mob, actor, obj, vo, NULL, NULL);
+						mprog_driver(mprg->comlist, mob, actor, obj, vo, nullptr, nullptr);
 						if (selfpurge || IS_SET(mprog_cur_result, eCH_DIED))
 							return retval;
 						break;
@@ -4067,7 +4067,7 @@ int mprog_wordlist_check(const char *arg, char_data *mob, char_data *actor,
 						{
 							retval = 1;
 							mprog_driver(mprg->comlist, mob, actor, obj, vo,
-										 NULL, NULL);
+										 nullptr, nullptr);
 							if (selfpurge || IS_SET(mprog_cur_result, eCH_DIED))
 								return retval;
 							break;
@@ -4079,7 +4079,7 @@ int mprog_wordlist_check(const char *arg, char_data *mob, char_data *actor,
 				}
 			}
 		}
-		if (next == NULL && !done)
+		if (next == nullptr && !done)
 		{
 			done = true;
 			next = mob_index[mob->mobdata->nr].mobspec;
@@ -4107,13 +4107,13 @@ void mprog_percent_check(char_data *mob, char_data *actor, obj_data *obj,
 	}
 
 	mprog_command_num = 0;
-	for (; mprg != NULL; mprg = next)
+	for (; mprg != nullptr; mprg = next)
 	{
 		mprog_command_num++;
 		next = mprg->next;
 		if ((mprg->type & type) && (number(0, 99) < atoi(mprg->arglist)))
 		{
-			mprog_driver(mprg->comlist, mob, actor, obj, vo, NULL, NULL);
+			mprog_driver(mprg->comlist, mob, actor, obj, vo, nullptr, nullptr);
 			if (selfpurge)
 				return;
 			if (type != GREET_PROG && type != ALL_GREET_PROG)
@@ -4172,7 +4172,7 @@ int mprog_act_trigger(string buf, char_data *mob, char_data *ch,
 			curr->next = tmp_act;
 		  }
 
-		  tmp_act->next = NULL;
+		  tmp_act->next = nullptr;
 		  tmp_act->buf = str_dup( buf );
 		  tmp_act->ch  = ch;
 		  tmp_act->obj = obj;
@@ -4204,14 +4204,14 @@ int mprog_bribe_trigger(char_data *mob, char_data *ch, int amount)
 		}
 
 		mprog_command_num = 0;
-		for (; mprg != NULL; mprg = next)
+		for (; mprg != nullptr; mprg = next)
 		{
 			mprog_command_num++;
 			next = mprg->next;
 
 			if ((mprg->type & BRIBE_PROG) && (amount >= atoi(mprg->arglist)))
 			{
-				mprog_driver(mprg->comlist, mob, ch, obj, NULL, NULL, NULL);
+				mprog_driver(mprg->comlist, mob, ch, obj, nullptr, nullptr, nullptr);
 				if (selfpurge)
 					return mprog_cur_result;
 				break;
@@ -4246,14 +4246,14 @@ int mprog_damage_trigger(char_data *mob, char_data *ch, int amount)
 		}
 
 		mprog_command_num = 0;
-		for (; mprg != NULL; mprg = next)
+		for (; mprg != nullptr; mprg = next)
 		{
 			mprog_command_num++;
 			next = mprg->next;
 
 			if ((mprg->type & DAMAGE_PROG) && (amount >= atoi(mprg->arglist)))
 			{
-				mprog_driver(mprg->comlist, mob, ch, obj, NULL, NULL, NULL);
+				mprog_driver(mprg->comlist, mob, ch, obj, nullptr, nullptr, nullptr);
 				if (selfpurge)
 					return mprog_cur_result;
 				break;
@@ -4274,7 +4274,7 @@ int mprog_death_trigger(char_data *mob, char_data *killer)
 
 	if (IS_NPC(mob) && (mob_index[mob->mobdata->nr].progtypes & DEATH_PROG) && isPaused(mob) == false)
 	{
-		mprog_percent_check(mob, killer, NULL, NULL, DEATH_PROG);
+		mprog_percent_check(mob, killer, nullptr, nullptr, DEATH_PROG);
 	}
 	if (!SOMEONE_DIED(mprog_cur_result))
 		death_cry(mob);
@@ -4285,7 +4285,7 @@ int mprog_entry_trigger(char_data *mob)
 {
 
 	if (IS_NPC(mob) && (mob_index[mob->mobdata->nr].progtypes & ENTRY_PROG) && isPaused(mob) == false)
-		mprog_percent_check(mob, NULL, NULL, NULL, ENTRY_PROG);
+		mprog_percent_check(mob, nullptr, nullptr, nullptr, ENTRY_PROG);
 
 	return mprog_cur_result;
 }
@@ -4294,7 +4294,7 @@ int mprog_fight_trigger(char_data *mob, char_data *ch)
 {
 
 	if (IS_NPC(mob) && MOB_WAIT_STATE(mob) <= 0 && (mob_index[mob->mobdata->nr].progtypes & FIGHT_PROG) && isPaused(mob) == false)
-		mprog_percent_check(mob, ch, NULL, NULL, FIGHT_PROG);
+		mprog_percent_check(mob, ch, nullptr, nullptr, FIGHT_PROG);
 
 	return mprog_cur_result;
 }
@@ -4303,7 +4303,7 @@ int mprog_attack_trigger(char_data *mob, char_data *ch)
 {
 
 	if (IS_NPC(mob) && (mob_index[mob->mobdata->nr].progtypes & ATTACK_PROG) && isPaused(mob) == false)
-		mprog_percent_check(mob, ch, NULL, NULL, ATTACK_PROG);
+		mprog_percent_check(mob, ch, nullptr, nullptr, ATTACK_PROG);
 
 	return mprog_cur_result;
 }
@@ -4325,7 +4325,7 @@ int mprog_give_trigger(char_data *mob, char_data *ch, obj_data *obj)
 		}
 
 		mprog_command_num = 0;
-		for (; mprg != NULL; mprg = next)
+		for (; mprg != nullptr; mprg = next)
 		{
 			mprog_command_num++;
 
@@ -4334,7 +4334,7 @@ int mprog_give_trigger(char_data *mob, char_data *ch, obj_data *obj)
 			if ((mprg->type & GIVE_PROG) && ((!str_cmp(obj->name, mprg->arglist)) || (!str_cmp("all", buf))))
 			{
 				okay = true;
-				mprog_driver(mprg->comlist, mob, ch, obj, NULL, NULL, NULL);
+				mprog_driver(mprg->comlist, mob, ch, obj, nullptr, nullptr, nullptr);
 				if (selfpurge)
 					return mprog_cur_result;
 				break;
@@ -4369,13 +4369,13 @@ int mprog_greet_trigger(char_data *ch)
 
 	mprog_cur_result = eSUCCESS;
 
-	for (vmob = world[ch->in_room].people; vmob != NULL; vmob = vmob->next_in_room)
-		if (IS_NPC(vmob) && (vmob->fighting == NULL) && AWAKE(vmob))
+	for (vmob = world[ch->in_room].people; vmob != nullptr; vmob = vmob->next_in_room)
+		if (IS_NPC(vmob) && (vmob->fighting == nullptr) && AWAKE(vmob))
 		{
 			if (ch != vmob && CAN_SEE(vmob, ch) && (mob_index[vmob->mobdata->nr].progtypes & GREET_PROG) && isPaused(vmob) == false)
-				mprog_percent_check(vmob, ch, NULL, NULL, GREET_PROG);
+				mprog_percent_check(vmob, ch, nullptr, nullptr, GREET_PROG);
 			else if ((mob_index[vmob->mobdata->nr].progtypes & ALL_GREET_PROG) && isPaused(vmob) == false)
-				mprog_percent_check(vmob, ch, NULL, NULL, ALL_GREET_PROG);
+				mprog_percent_check(vmob, ch, nullptr, nullptr, ALL_GREET_PROG);
 
 			if (SOMEONE_DIED(mprog_cur_result) || selfpurge)
 				break;
@@ -4399,14 +4399,14 @@ int mprog_hitprcnt_trigger(char_data *mob, char_data *ch)
 		}
 
 		mprog_command_num = 0;
-		for (; mprg != NULL; mprg = next)
+		for (; mprg != nullptr; mprg = next)
 		{
 			mprog_command_num++;
 			next = mprg->next;
 
 			if ((mprg->type & HITPRCNT_PROG) && ((100 * mob->hit / mob->max_hit) < atoi(mprg->arglist)))
 			{
-				mprog_driver(mprg->comlist, mob, ch, NULL, NULL, NULL, NULL);
+				mprog_driver(mprg->comlist, mob, ch, nullptr, nullptr, nullptr, nullptr);
 				if (selfpurge)
 					return mprog_cur_result;
 				break;
@@ -4428,7 +4428,7 @@ int mprog_random_trigger(char_data *mob)
 	mprog_cur_result = eSUCCESS;
 
 	if ((mob_index[mob->mobdata->nr].progtypes & RAND_PROG) && isPaused(mob) == false)
-		mprog_percent_check(mob, NULL, NULL, NULL, RAND_PROG);
+		mprog_percent_check(mob, nullptr, nullptr, nullptr, RAND_PROG);
 
 	return mprog_cur_result;
 }
@@ -4442,7 +4442,7 @@ int mprog_load_trigger(char_data *mob)
 
 	mprog_cur_result = eSUCCESS;
 	if ((mob_index[mob->mobdata->nr].progtypes & LOAD_PROG) && isPaused(mob) == false)
-		mprog_percent_check(mob, NULL, NULL, NULL, LOAD_PROG);
+		mprog_percent_check(mob, nullptr, nullptr, nullptr, LOAD_PROG);
 	return mprog_cur_result;
 }
 
@@ -4454,7 +4454,7 @@ int mprog_arandom_trigger(char_data *mob)
 	}
 	mprog_cur_result = eSUCCESS;
 	if ((mob_index[mob->mobdata->nr].progtypes & ARAND_PROG) && isPaused(mob) == false)
-		mprog_percent_check(mob, NULL, NULL, NULL, ARAND_PROG);
+		mprog_percent_check(mob, nullptr, nullptr, nullptr, ARAND_PROG);
 	return mprog_cur_result;
 }
 
@@ -4472,7 +4472,7 @@ int mprog_can_see_trigger(char_data *ch, char_data *mob)
 
 	mprog_cur_result = eSUCCESS;
 	if ((mob_index[mob->mobdata->nr].progtypes & CAN_SEE_PROG) && isPaused(mob) == false)
-		mprog_percent_check(mob, ch, NULL, NULL, CAN_SEE_PROG);
+		mprog_percent_check(mob, ch, nullptr, nullptr, CAN_SEE_PROG);
 
 	return mprog_cur_result;
 }
@@ -4488,10 +4488,10 @@ int mprog_speech_trigger(const char *txt, char_data *mob)
 
 	mprog_cur_result = eSUCCESS;
 
-	for (vmob = world[mob->in_room].people; vmob != NULL; vmob = vmob->next_in_room)
+	for (vmob = world[mob->in_room].people; vmob != nullptr; vmob = vmob->next_in_room)
 		if (IS_NPC(vmob) && (mob_index[vmob->mobdata->nr].progtypes & SPEECH_PROG) && isPaused(vmob) == false)
 		{
-			if (mprog_wordlist_check(txt, vmob, mob, NULL, NULL, SPEECH_PROG))
+			if (mprog_wordlist_check(txt, vmob, mob, nullptr, nullptr, SPEECH_PROG))
 				break;
 		}
 
@@ -4521,7 +4521,7 @@ int mprog_catch_trigger(char_data *mob, int catch_num, char *var, int opt, char_
 		}
 
 		mprog_command_num = 0;
-		for (; mprg != NULL; mprg = next)
+		for (; mprg != nullptr; mprg = next)
 		{
 			mprog_command_num++;
 			next = mprg->next;
@@ -4564,7 +4564,7 @@ int mprog_catch_trigger(char_data *mob, int catch_num, char *var, int opt, char_
 							mob->tempVariable = eh;
 						}
 					}
-					mprog_driver(mprg->comlist, mob, actor, obj, vo, NULL, rndm);
+					mprog_driver(mprg->comlist, mob, actor, obj, vo, nullptr, rndm);
 					if (selfpurge)
 						return mprog_cur_result;
 
@@ -4585,7 +4585,7 @@ void update_mprog_throws()
 {
 	struct mprog_throw_type *curr;
 	struct mprog_throw_type *action;
-	struct mprog_throw_type *last = NULL;
+	struct mprog_throw_type *last = nullptr;
 	char_data *vict;
 	obj_data *vobj;
 	for (curr = g_mprog_throw_list; curr;)
@@ -4598,8 +4598,8 @@ void update_mprog_throws()
 			curr = curr->next;
 			continue;
 		}
-		vobj = NULL;
-		vict = NULL;
+		vobj = nullptr;
+		vict = nullptr;
 
 		//		if (curr->data_num == -999)
 		//			debugpoint();
@@ -4752,7 +4752,7 @@ int oprog_can_see_trigger(char_data *ch, obj_data *item)
 	if (obj_index[item->item_number].progtypes & CAN_SEE_PROG)
 	{
 		vmob = initiate_oproc(ch, item);
-		mprog_percent_check(vmob, ch, item, NULL, CAN_SEE_PROG);
+		mprog_percent_check(vmob, ch, item, nullptr, CAN_SEE_PROG);
 		end_oproc(vmob, Trace("oprog_can_see_trigger"));
 		return mprog_cur_result;
 	}
@@ -4766,7 +4766,7 @@ int oprog_speech_trigger(const char *txt, char_data *ch)
 		return eFAILURE;
 	}
 
-	char_data *vmob = NULL;
+	char_data *vmob = nullptr;
 	obj_data *item;
 
 	mprog_cur_result = eSUCCESS;
@@ -4775,7 +4775,7 @@ int oprog_speech_trigger(const char *txt, char_data *ch)
 		if (obj_index[item->item_number].progtypes & SPEECH_PROG)
 		{
 			vmob = initiate_oproc(ch, item);
-			if (mprog_wordlist_check(txt, vmob, ch, NULL, NULL, SPEECH_PROG))
+			if (mprog_wordlist_check(txt, vmob, ch, nullptr, nullptr, SPEECH_PROG))
 			{
 				end_oproc(vmob, Trace("oprog_speech_trigger1"));
 				return mprog_cur_result;
@@ -4786,7 +4786,7 @@ int oprog_speech_trigger(const char *txt, char_data *ch)
 		if (obj_index[item->item_number].progtypes & SPEECH_PROG)
 		{
 			vmob = initiate_oproc(ch, item);
-			if (mprog_wordlist_check(txt, vmob, ch, NULL, NULL, SPEECH_PROG))
+			if (mprog_wordlist_check(txt, vmob, ch, nullptr, nullptr, SPEECH_PROG))
 			{
 				end_oproc(vmob, Trace("oprog_speech_trigger3"));
 				return mprog_cur_result;
@@ -4799,7 +4799,7 @@ int oprog_speech_trigger(const char *txt, char_data *ch)
 			if (obj_index[ch->equipment[i]->item_number].progtypes & SPEECH_PROG)
 			{
 				vmob = initiate_oproc(ch, ch->equipment[i]);
-				if (mprog_wordlist_check(txt, vmob, ch, NULL, NULL, SPEECH_PROG))
+				if (mprog_wordlist_check(txt, vmob, ch, nullptr, nullptr, SPEECH_PROG))
 				{
 					end_oproc(vmob, Trace("oprog_speech_trigger5"));
 				}
@@ -4819,7 +4819,7 @@ int oprog_catch_trigger(obj_data *obj, int catch_num, char *var, int opt, char_d
 	{
 		mprg = obj_index[obj->item_number].mobprogs;
 		mprog_command_num = 0;
-		for (; mprg != NULL; mprg = mprg->next)
+		for (; mprg != nullptr; mprg = mprg->next)
 		{
 			mprog_command_num++;
 
@@ -4833,7 +4833,7 @@ int oprog_catch_trigger(obj_data *obj, int catch_num, char *var, int opt, char_d
 				}
 				if (curr_catch == catch_num)
 				{
-					vmob = initiate_oproc(NULL, obj);
+					vmob = initiate_oproc(nullptr, obj);
 					if (var)
 					{
 						struct tempvariable *eh;
@@ -4852,7 +4852,7 @@ int oprog_catch_trigger(obj_data *obj, int catch_num, char *var, int opt, char_d
 						vmob->tempVariable = eh;
 					}
 
-					mprog_driver(mprg->comlist, vmob, actor, obj2, vo, NULL, rndm);
+					mprog_driver(mprg->comlist, vmob, actor, obj2, vo, nullptr, rndm);
 					if (selfpurge)
 						return mprog_cur_result;
 					end_oproc(vmob, Trace("oprog_catch_trigger"));
@@ -4884,7 +4884,7 @@ int oprog_act_trigger(const char *txt, char_data *ch)
 		if (obj_index[item->item_number].progtypes & ACT_PROG)
 		{
 			vmob = initiate_oproc(ch, item);
-			if (mprog_wordlist_check(txt, vmob, ch, NULL, NULL, ACT_PROG))
+			if (mprog_wordlist_check(txt, vmob, ch, nullptr, nullptr, ACT_PROG))
 			{
 				end_oproc(vmob, Trace("oprog_act_trigger1"));
 				return mprog_cur_result;
@@ -4895,7 +4895,7 @@ int oprog_act_trigger(const char *txt, char_data *ch)
 		if (obj_index[item->item_number].progtypes & ACT_PROG)
 		{
 			vmob = initiate_oproc(ch, item);
-			if (mprog_wordlist_check(txt, vmob, ch, NULL, NULL, ACT_PROG))
+			if (mprog_wordlist_check(txt, vmob, ch, nullptr, nullptr, ACT_PROG))
 			{
 				end_oproc(vmob, Trace("oprog_act_trigger3"));
 				return mprog_cur_result;
@@ -4908,7 +4908,7 @@ int oprog_act_trigger(const char *txt, char_data *ch)
 			if (obj_index[ch->equipment[i]->item_number].progtypes & ACT_PROG)
 			{
 				vmob = initiate_oproc(ch, ch->equipment[i]);
-				if (mprog_wordlist_check(txt, vmob, ch, NULL, NULL, ACT_PROG))
+				if (mprog_wordlist_check(txt, vmob, ch, nullptr, nullptr, ACT_PROG))
 				{
 					end_oproc(vmob, Trace("oprog_act_trigger5"));
 					return mprog_cur_result;
@@ -4935,7 +4935,7 @@ int oprog_greet_trigger(char_data *ch)
 		if (obj_index[item->item_number].progtypes & ALL_GREET_PROG)
 		{
 			vmob = initiate_oproc(ch, item);
-			mprog_percent_check(vmob, ch, item, NULL, ALL_GREET_PROG);
+			mprog_percent_check(vmob, ch, item, nullptr, ALL_GREET_PROG);
 			end_oproc(vmob, Trace("oprog_greet_trigger"));
 			return mprog_cur_result;
 		}
@@ -4951,11 +4951,11 @@ int oprog_rand_trigger(obj_data *item)
 	if (item->carried_by)
 		ch = item->carried_by;
 	else
-		ch = NULL;
+		ch = nullptr;
 	if (obj_index[item->item_number].progtypes & RAND_PROG)
 	{
 		vmob = initiate_oproc(ch, item);
-		mprog_percent_check(vmob, ch, item, NULL, RAND_PROG);
+		mprog_percent_check(vmob, ch, item, nullptr, RAND_PROG);
 		end_oproc(vmob);
 		return mprog_cur_result;
 	}
@@ -4971,11 +4971,11 @@ int oprog_arand_trigger(obj_data *item)
 	if (item->carried_by)
 		ch = item->carried_by;
 	else
-		ch = NULL;
+		ch = nullptr;
 	if (obj_index[item->item_number].progtypes & ARAND_PROG)
 	{
 		vmob = initiate_oproc(ch, item);
-		mprog_percent_check(vmob, ch, item, NULL, ARAND_PROG);
+		mprog_percent_check(vmob, ch, item, nullptr, ARAND_PROG);
 		end_oproc(vmob);
 		return mprog_cur_result;
 	}
@@ -4995,7 +4995,7 @@ int oprog_load_trigger(char_data *ch)
 		if (obj_index[item->item_number].progtypes & LOAD_PROG)
 		{
 			vmob = initiate_oproc(ch, item);
-			mprog_percent_check(vmob, ch, item, NULL, LOAD_PROG);
+			mprog_percent_check(vmob, ch, item, nullptr, LOAD_PROG);
 			end_oproc(vmob);
 			return mprog_cur_result;
 		}
@@ -5003,7 +5003,7 @@ int oprog_load_trigger(char_data *ch)
 		if (obj_index[item->item_number].progtypes & LOAD_PROG)
 		{
 			vmob = initiate_oproc(ch, item);
-			mprog_percent_check(vmob, ch, item, NULL, LOAD_PROG);
+			mprog_percent_check(vmob, ch, item, nullptr, LOAD_PROG);
 			end_oproc(vmob);
 			return mprog_cur_result;
 		}
@@ -5013,7 +5013,7 @@ int oprog_load_trigger(char_data *ch)
 			if (obj_index[ch->equipment[i]->item_number].progtypes & LOAD_PROG)
 			{
 				vmob = initiate_oproc(ch, item);
-				mprog_percent_check(vmob, ch, item, NULL, LOAD_PROG);
+				mprog_percent_check(vmob, ch, item, nullptr, LOAD_PROG);
 				end_oproc(vmob);
 				return mprog_cur_result;
 			}
@@ -5034,7 +5034,7 @@ int oprog_weapon_trigger(char_data *ch, obj_data *item)
 	if (obj_index[item->item_number].progtypes & WEAPON_PROG)
 	{
 		vmob = initiate_oproc(ch, item);
-		mprog_percent_check(vmob, ch, item, NULL, WEAPON_PROG);
+		mprog_percent_check(vmob, ch, item, nullptr, WEAPON_PROG);
 		end_oproc(vmob);
 		return mprog_cur_result;
 	}
@@ -5056,7 +5056,7 @@ int oprog_armour_trigger(char_data *ch, obj_data *item)
 	if (obj_index[item->item_number].progtypes & ARMOUR_PROG)
 	{
 		vmob = initiate_oproc(ch, item);
-		mprog_percent_check(vmob, ch, item, NULL, ARMOUR_PROG);
+		mprog_percent_check(vmob, ch, item, nullptr, ARMOUR_PROG);
 		end_oproc(vmob);
 		return mprog_cur_result;
 	}
@@ -5088,7 +5088,7 @@ int oprog_command_trigger(const char *txt, char_data *ch, char *arg)
 				}
 
 				vmob = initiate_oproc(ch, item);
-				if (mprog_wordlist_check(txt, vmob, ch, NULL, NULL, COMMAND_PROG, true))
+				if (mprog_wordlist_check(txt, vmob, ch, nullptr, nullptr, COMMAND_PROG, true))
 				{
 					end_oproc(vmob);
 					return mprog_cur_result;
@@ -5108,7 +5108,7 @@ int oprog_command_trigger(const char *txt, char_data *ch, char *arg)
 				do_mpsettemp(ch, &buf[0], CMD_OTHER);
 			}
 			vmob = initiate_oproc(ch, item);
-			if (mprog_wordlist_check(txt, vmob, ch, NULL, NULL, COMMAND_PROG, true))
+			if (mprog_wordlist_check(txt, vmob, ch, nullptr, nullptr, COMMAND_PROG, true))
 			{
 				end_oproc(vmob);
 				return mprog_cur_result;
@@ -5130,7 +5130,7 @@ int oprog_command_trigger(const char *txt, char_data *ch, char *arg)
 				}
 
 				vmob = initiate_oproc(ch, ch->equipment[i]);
-				if (mprog_wordlist_check(txt, vmob, ch, NULL, NULL, COMMAND_PROG, true))
+				if (mprog_wordlist_check(txt, vmob, ch, nullptr, nullptr, COMMAND_PROG, true))
 				{
 					end_oproc(vmob);
 					return mprog_cur_result;

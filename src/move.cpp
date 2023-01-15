@@ -56,8 +56,8 @@ void move_player_home(char_data *victim)
 {
 	int was_in = victim->in_room;
 	int found = 0;
-	clan_data *clan = NULL;
-	clan_room_data *room = NULL;
+	clan_data *clan = nullptr;
+	clan_room_data *room = nullptr;
 
 	// check for homes that don't exist
 	if (real_room(GET_HOME(victim) < 1))
@@ -127,8 +127,8 @@ void record_track_data(char_data *ch, int cmd)
 	newScent->race = (int)ch->race;
 	newScent->sex = (int)ch->sex;
 	newScent->condition = ((ch->getHP() * 100) / (GET_MAX_HIT(ch) == 0 ? 100 : GET_MAX_HIT(ch)));
-	newScent->next = NULL;	   // just in case
-	newScent->previous = NULL; // just in case
+	newScent->next = nullptr;	   // just in case
+	newScent->previous = nullptr; // just in case
 
 	if (IS_NPC(ch))
 		newScent->trackee = GET_NAME(ch);
@@ -659,7 +659,7 @@ int do_simple_move(char_data *ch, int cmd, int following)
 	else if (IS_AFFECTED(ch, AFF_SNEAK))
 	{
 		char tmp[100];
-		if (!skill_success(ch, NULL, SKILL_SNEAK))
+		if (!skill_success(ch, nullptr, SKILL_SNEAK))
 		{
 			sprintf(tmp, "$n leaves %s.", dirs[cmd]);
 			act(tmp, ch, 0, 0, TO_ROOM, INVIS_NULL | STAYHIDE);
@@ -837,13 +837,13 @@ int do_simple_move(char_data *ch, int cmd, int following)
 
 			if (GET_CLASS(ch) == CLASS_BARD && ISSET(tmp_ch->mobdata->actflags, ACT_BARDCHARM))
 			{
-				act("$N looks at you expectantly, perhaps hoping for a song?", ch, NULL, tmp_ch, TO_CHAR, 0);
-				act("$N looks at $n expectantly, perhaps hoping for a song?", ch, NULL, tmp_ch, TO_ROOM, INVIS_NULL);
+				act("$N looks at you expectantly, perhaps hoping for a song?", ch, nullptr, tmp_ch, TO_CHAR, 0);
+				act("$N looks at $n expectantly, perhaps hoping for a song?", ch, nullptr, tmp_ch, TO_ROOM, INVIS_NULL);
 			}
 			else if (GET_CLASS(ch) == CLASS_RANGER && ISSET(tmp_ch->mobdata->actflags, ACT_CHARM) && GET_LEVEL(ch) >= GET_LEVEL(tmp_ch) && CAN_SEE(tmp_ch, ch))
 			{
-				act("$N moves submissively out of your way.", ch, NULL, tmp_ch, TO_CHAR, 0);
-				act("$N moves submissively out of $n's way.", ch, NULL, tmp_ch, TO_ROOM, INVIS_NULL);
+				act("$N moves submissively out of your way.", ch, nullptr, tmp_ch, TO_CHAR, 0);
+				act("$N moves submissively out of $n's way.", ch, nullptr, tmp_ch, TO_ROOM, INVIS_NULL);
 			}
 		}
 
@@ -982,8 +982,8 @@ int attempt_move(char_data *ch, int cmd, int is_retreat)
 				if (is_retreat && k->follower->fighting && (number(1, 100) < 4) && IS_NPC(k->follower->fighting))
 				{
 
-					act("$n notices your intent and moves quickly to block your retreat!", k->follower->fighting, NULL, k->follower, TO_VICT, 0);
-					act("$n notices $N's intent and moves quickly to block $S retreat!", k->follower->fighting, NULL, k->follower, TO_ROOM, NOTVICT);
+					act("$n notices your intent and moves quickly to block your retreat!", k->follower->fighting, nullptr, k->follower, TO_VICT, 0);
+					act("$n notices $N's intent and moves quickly to block $S retreat!", k->follower->fighting, nullptr, k->follower, TO_ROOM, NOTVICT);
 					WAIT_STATE(k->follower, 8);
 					continue;
 				}
@@ -1075,7 +1075,7 @@ int do_enter(char_data *ch, char *argument, int cmd)
 	int retval;
 
 	char_data *sesame;
-	obj_data *portal = NULL;
+	obj_data *portal = nullptr;
 
 	if ((ch->in_room != NOWHERE) || (ch->in_room))
 	{
@@ -1088,7 +1088,7 @@ int do_enter(char_data *ch, char *argument, int cmd)
 		return eFAILURE;
 	}
 
-	if ((portal = get_obj_in_list_vis(ch, buf, world[ch->in_room].contents)) == NULL)
+	if ((portal = get_obj_in_list_vis(ch, buf, world[ch->in_room].contents)) == nullptr)
 	{
 		send_to_char("Nothing here by that name.\r\n", ch);
 		return eFAILURE;
@@ -1228,7 +1228,7 @@ int move_char(char_data *ch, int dest, bool stop_all_fighting)
 {
 	if (!ch)
 	{
-		logentry("Error in move_char(), NULL character", OVERSEER, LogChannels::LOG_BUG);
+		logentry("Error in move_char(), nullptr character", OVERSEER, LogChannels::LOG_BUG);
 		return eINTERNAL_ERROR;
 	}
 
@@ -1265,7 +1265,7 @@ int move_char(char_data *ch, int dest, bool stop_all_fighting)
 int do_climb(char_data *ch, char *argument, int cmd)
 {
 	char buf[MAX_INPUT_LENGTH];
-	obj_data *obj = NULL;
+	obj_data *obj = nullptr;
 
 	one_argument(argument, buf);
 

@@ -98,10 +98,10 @@ int do_focused_repelance(char_data *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  if (!skill_success(ch,NULL,SKILL_FOCUSED_REPELANCE)) 
+  if (!skill_success(ch,nullptr,SKILL_FOCUSED_REPELANCE)) 
   {
     act("$n closes $s eyes and chants quietly, $s head shakes suddenly in confusion.",
-         ch, NULL, NULL, TO_ROOM, NOTVICT);
+         ch, nullptr, nullptr, TO_ROOM, NOTVICT);
     send_to_char("Your mind cannot handle the strain!\r\n", ch);
     WAIT_STATE(ch, PULSE_VIOLENCE*2);
     duration = 20 - (has_skill(ch, SKILL_FOCUSED_REPELANCE) / 10);
@@ -109,7 +109,7 @@ int do_focused_repelance(char_data *ch, char *argument, int cmd)
   else 
   {
     act( "$n closes $s eyes and chants quietly, $s eyes flick open with a devilish smile.",
-	  ch, NULL, NULL, TO_ROOM, NOTVICT );
+	  ch, nullptr, nullptr, TO_ROOM, NOTVICT );
     send_to_char("Your mystical vision is clear, your senses of the arcane sharpened.  " 
                  "No mortal can break through _your_ magical barrier.\r\n", ch);
     SET_BIT(ch->combat, COMBAT_REPELANCE);

@@ -103,7 +103,7 @@ int repair_guy(char_data *ch, struct obj_data *obj, int cmd, const char *arg, ch
 
 	obj = get_obj_in_list_vis(ch, item, ch->carrying);
 
-	if (obj == NULL)
+	if (obj == nullptr)
 	{
 		send_to_char("You don't have that item.\r\n", ch);
 		return eSUCCESS;
@@ -181,7 +181,7 @@ int super_repair_guy(char_data *ch, struct obj_data *obj, int cmd, const char *a
 
 	obj = get_obj_in_list_vis(ch, item, ch->carrying);
 
-	if (obj == NULL)
+	if (obj == nullptr)
 	{
 		send_to_char("You don't have that item.\r\n", ch);
 		return eSUCCESS;
@@ -282,7 +282,7 @@ int repair_shop(char_data *ch, struct obj_data *obj, int cmd, const char *arg, c
 
 	obj = get_obj_in_list_vis(ch, item, ch->carrying);
 
-	if (obj == NULL)
+	if (obj == nullptr)
 	{
 		send_to_char("You don't have that item.\r\n", ch);
 		return eSUCCESS;
@@ -824,7 +824,7 @@ int gl_repair_shop(char_data *ch, struct obj_data *obj, int cmd, const char *arg
 
 	obj = get_obj_in_list_vis(ch, item, ch->carrying);
 
-	if (obj == NULL)
+	if (obj == nullptr)
 	{
 		send_to_char("You don't have that item.\r\n", ch);
 		return eSUCCESS;

@@ -61,7 +61,7 @@ vault_search_parameter::vault_search_parameter()
 
 vault_search_parameter::~vault_search_parameter()
 {
-  if (type == KEYWORD && str_argument != NULL)
+  if (type == KEYWORD && str_argument != nullptr)
   {
     free(str_argument);
   }
@@ -105,7 +105,7 @@ struct vault_data *has_vault(const char *name)
 
 void remove_from_object_list(obj_data *obj)
 {
-  obj_data *tObj, *pObj = NULL;
+  obj_data *tObj, *pObj = nullptr;
   for (tObj = object_list; tObj; tObj = tObj->next)
   {
     if (tObj == obj)
@@ -114,7 +114,7 @@ void remove_from_object_list(obj_data *obj)
         pObj->next = tObj->next;
       else
         object_list = tObj->next;
-      tObj->next = NULL;
+      tObj->next = nullptr;
       break;
     }
     pObj = tObj;
@@ -170,7 +170,7 @@ void save_vault(char *name)
 void vault_access(char_data *ch, char *who)
 {
   struct vault_access_data *access;
-  struct vault_data *vault = NULL;
+  struct vault_data *vault = nullptr;
 
   if (!vault && !(vault = has_vault(GET_NAME(ch))))
   {
@@ -449,7 +449,7 @@ int do_vault(char_data *ch, char *argument, int cmd)
 
 void vault_stats(char_data *ch, char *name)
 {
-  struct vault_data *vault = NULL;
+  struct vault_data *vault = nullptr;
   struct vault_items_data *item;
   struct vault_access_data *access;
   struct obj_data *obj;
@@ -531,7 +531,7 @@ void reload_vaults(void)
       free(vault);
   }
 
-  vault_table = NULL;
+  vault_table = nullptr;
 
   load_vaults();
 }
@@ -603,7 +603,7 @@ void remove_vault(char *name, BACKUP_TYPE backup)
   char syscmd[512];
   struct stat statbuf;
 
-  if (name == NULL)
+  if (name == nullptr)
   {
     return;
   }
@@ -676,7 +676,7 @@ void remove_vault(char *name, BACKUP_TYPE backup)
 
   remove_vault_accesses(name);
 
-  struct vault_data *vault, *next_vault, *prev_vault = NULL;
+  struct vault_data *vault, *next_vault, *prev_vault = nullptr;
   struct vault_items_data *items, *titems;
   struct vault_access_data *access, *taccess;
 
@@ -726,7 +726,7 @@ void remove_vault(char *name, BACKUP_TYPE backup)
       else
         prev_vault->next = vault->next;
       free(vault);
-      vault = NULL;
+      vault = nullptr;
       total_vaults--;
       return;
     }
@@ -800,9 +800,9 @@ void load_vaults(void)
     vault->size = VAULT_BASE_SIZE;
     vault->gold = 0;
     vault->weight = 0;
-    vault->access = NULL;
-    vault->items = NULL;
-    vault->next = NULL;
+    vault->access = nullptr;
+    vault->items = nullptr;
+    vault->next = nullptr;
 
     get_line(fl, type);
     while (*type != '$')
@@ -862,7 +862,7 @@ void load_vaults(void)
         if (!full)
         {
           obj = get_obj(vnum);
-          items->obj = NULL;
+          items->obj = nullptr;
         }
         else
         {
@@ -1043,7 +1043,7 @@ void remove_vault_accesses(char *name)
 
 void access_remove(char *name, struct vault_data *vault)
 {
-  struct vault_access_data *access, *next_access, *prev_access = NULL;
+  struct vault_access_data *access, *next_access, *prev_access = nullptr;
 
   for (access = vault->access; access; access = next_access)
   {
@@ -1053,13 +1053,13 @@ void access_remove(char *name, struct vault_data *vault)
     {
       if (access == vault->access)
         vault->access = access->next;
-      else if (prev_access != NULL)
+      else if (prev_access != nullptr)
       {
         prev_access->next = access->next;
       }
 
       free(access);
-      access = NULL;
+      access = nullptr;
       break;
     }
     prev_access = access;
@@ -1460,7 +1460,7 @@ void item_add(obj_data *obj, struct vault_data *vault)
 
 void item_remove(obj_data *obj, struct vault_data *vault)
 {
-  struct vault_items_data *item, *next_item, *prev_item = NULL;
+  struct vault_items_data *item, *next_item, *prev_item = nullptr;
   int vnum = GET_OBJ_VNUM(obj);
 
   for (item = vault->items; item; item = next_item)
@@ -1477,13 +1477,13 @@ void item_remove(obj_data *obj, struct vault_data *vault)
       }
       else if (item == vault->items)
         vault->items = item->next;
-      else if (prev_item != NULL)
+      else if (prev_item != nullptr)
       {
         prev_item->next = item->next;
       }
 
       free(item);
-      item = NULL;
+      item = nullptr;
       vault->weight -= GET_OBJ_WEIGHT(get_obj(vnum));
       return;
     }
@@ -2037,8 +2037,8 @@ void add_new_vault(char *name, int indexonly)
   else
     vault->size = VAULT_BASE_SIZE;
   vault->weight = 0;
-  vault->access = NULL;
-  vault->items = NULL;
+  vault->access = nullptr;
+  vault->items = nullptr;
   vault->next = vault_table;
   vault_table = vault;
 
@@ -2050,9 +2050,9 @@ char_data *find_owner(const char *name)
   const auto &character_list = DC::getInstance()->character_list;
   const auto &result = find_if(character_list.begin(), character_list.end(), [&name](const auto &ch)
                                {
-	  if (ch->name == NULL)
+	  if (ch->name == nullptr)
     {
-		  produce_coredump(); //Trying to track down bug that causes mob->name to be NULL
+		  produce_coredump(); //Trying to track down bug that causes mob->name to be nullptr
 	  }
     else if (!strcmp(name, GET_NAME(ch)) && IS_PC(ch))
     {
@@ -2096,7 +2096,7 @@ void vault_log(char_data *ch, char *owner)
 
 void vlog(const char *message, const char *name)
 {
-  struct tm *tm = NULL;
+  struct tm *tm = nullptr;
   time_t ct;
   FILE *ofile, *nfile;
   char buf[MAX_INPUT_LENGTH], line[MAX_INPUT_LENGTH];

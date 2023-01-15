@@ -171,7 +171,7 @@ int do_string(char_data *ch, char *arg, int cmd)
 	char name[MAX_STRING_LENGTH], string[MAX_STRING_LENGTH];
 	char message[100];
 	int field, type, ctr;
-	char_data *mob = NULL;
+	char_data *mob = nullptr;
 	struct obj_data *obj;
 	struct extra_descr_data *ed, *tmp;
 
@@ -553,7 +553,7 @@ struct help_index_element *build_help_index(FILE *fl, int *num)
 #define PAGE_WIDTH 80
 
 /* Traverse down the string until the beginning of the next page has been
- * reached.  Return NULL if this is the last page of the string.
+ * reached.  Return nullptr if this is the last page of the string.
  */
 const char *next_page(const char *str)
 {
@@ -561,9 +561,9 @@ const char *next_page(const char *str)
 	int chars = 0;
 	for (;; str++)
 	{
-		// If end of string, return NULL.
+		// If end of string, return nullptr.
 		if (*str == '\0')
-			return NULL;
+			return nullptr;
 
 		// Check for $ ANSI codes.  They have to be kept together
 		// Might wanna put a && *(str+1) != '$' so that $'s are wrapped...
@@ -573,7 +573,7 @@ const char *next_page(const char *str)
 			{ // this should never happen
 				logentry("String ended in $ in next_page", ANGEL, LogChannels::LOG_BUG);
 				//*str = '\0'; // overwrite the $ so it doesn't mess up anything
-				return NULL;
+				return nullptr;
 			}
 			str++; // skip the $
 				   // This causes the next char to get skipped in the loop iteration
@@ -615,7 +615,7 @@ const char *next_page(const char *str)
 			}
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 // Function that returns the number of pages in the string.
@@ -757,7 +757,7 @@ void show_string(struct descriptor_data *d, const char *input)
 		if (d->showstr_head)
 		{
 			dc_free(d->showstr_head);
-			d->showstr_head = NULL;
+			d->showstr_head = nullptr;
 		}
 	}
 	/* Or if we have more to show.... */

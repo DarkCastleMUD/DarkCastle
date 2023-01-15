@@ -24,7 +24,7 @@ namespace SSH
 
     ssh_init();
     sshbind = ssh_bind_new();
-    if (int rc = ssh_bind_options_parse_config(sshbind, NULL) < 0)
+    if (int rc = ssh_bind_options_parse_config(sshbind, nullptr) < 0)
     {
       logf(0, LogChannels::LOG_BUG, "ssh_bind_options_parse_config returned %d", rc);
     }

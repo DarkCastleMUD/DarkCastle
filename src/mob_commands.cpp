@@ -158,7 +158,7 @@ void mpstat(char_data *ch, char_data *victim)
 
   sprintf(buf, "$3Short description$R: %s\n\r$3Long  description$R: %s\r\n",
           victim->short_desc,
-          victim->long_desc ? victim->long_desc : "(NULL)");
+          victim->long_desc ? victim->long_desc : "(nullptr)");
   send_to_char(buf, ch);
 
   if (!(mob_index[victim->mobdata->nr].progtypes))
@@ -167,7 +167,7 @@ void mpstat(char_data *ch, char_data *victim)
     return;
   }
 
-  for (mprg = mob_index[victim->mobdata->nr].mobprogs, i = 1; mprg != NULL;
+  for (mprg = mob_index[victim->mobdata->nr].mobprogs, i = 1; mprg != nullptr;
        i++, mprg = mprg->next)
   {
     sprintf(buf, "$3%d$R>$3$B", i);
@@ -210,7 +210,7 @@ int do_mpasound(char_data *ch, char *argument, int cmd)
         continue;
       MOBtrigger = false;
       // argument +1 so we skip the leading ' '
-      act(argument + 1, ch, NULL, NULL, TO_ROOM, 0);
+      act(argument + 1, ch, nullptr, nullptr, TO_ROOM, 0);
       ch->in_room = was_in_room;
     }
   }
@@ -240,7 +240,7 @@ int do_mpkill(char_data *ch, char *argument, int cmd)
     return eFAILURE | eINTERNAL_ERROR;
   }
 
-  if ((victim = get_char_room_vis(ch, arg)) == NULL)
+  if ((victim = get_char_room_vis(ch, arg)) == nullptr)
   {
     prog_error(ch, "MpKill - Victim not in room.");
     return eFAILURE | eINTERNAL_ERROR;
@@ -286,7 +286,7 @@ int do_mphit(char_data *ch, char *argument, int cmd)
     return eFAILURE | eINTERNAL_ERROR;
   }
 
-  if ((victim = get_char_room_vis(ch, arg)) == NULL)
+  if ((victim = get_char_room_vis(ch, arg)) == nullptr)
   {
     prog_error(ch, "MpHit - Victim not in room.");
     return eFAILURE | eINTERNAL_ERROR;
@@ -334,7 +334,7 @@ int do_mpaddlag(char_data *ch, char *argument, int cmd)
     return eFAILURE | eINTERNAL_ERROR;
   }
 
-  if ((victim = get_char_room_vis(ch, arg)) == NULL)
+  if ((victim = get_char_room_vis(ch, arg)) == nullptr)
   {
     prog_error(ch, "MpAddlag - Victim not in room.");
     return eFAILURE | eINTERNAL_ERROR;
@@ -435,7 +435,7 @@ int do_mpechoaround(char_data *ch, char *argument, int cmd)
     return eFAILURE | eINTERNAL_ERROR;
   }
   if (CAN_SEE(ch, victim))
-    act(argument + 1, ch, NULL, victim, TO_ROOM, NOTVICT);
+    act(argument + 1, ch, nullptr, victim, TO_ROOM, NOTVICT);
   return eSUCCESS;
 }
 
@@ -470,7 +470,7 @@ int do_mpechoaroundnotbad(char_data *ch, char *argument, int cmd)
   }
 
   //     if (CAN_SEE(ch,victim))
-  act(argument + 1, victim, NULL, victim2, TO_ROOM, NOTVICT);
+  act(argument + 1, victim, nullptr, victim2, TO_ROOM, NOTVICT);
   return eSUCCESS;
 }
 
@@ -501,7 +501,7 @@ int do_mpechoat(char_data *ch, char *argument, int cmd)
     return eFAILURE | eINTERNAL_ERROR;
   }
 
-  act(argument + 1, ch, NULL, victim, TO_VICT, 0);
+  act(argument + 1, ch, nullptr, victim, TO_VICT, 0);
   return eSUCCESS;
 }
 
@@ -521,7 +521,7 @@ int do_mpecho(char_data *ch, char *argument, int cmd)
     return eFAILURE | eINTERNAL_ERROR;
   }
 
-  act(argument + 1, ch, NULL, NULL, TO_ROOM, 0);
+  act(argument + 1, ch, nullptr, nullptr, TO_ROOM, 0);
   return eSUCCESS;
 }
 
@@ -640,7 +640,7 @@ int do_mppurge(char_data *ch, char *argument, int cmd)
     char_data *vnext;
     obj_data *obj_next;
 
-    for (victim = world[ch->in_room].people; victim != NULL; victim = vnext)
+    for (victim = world[ch->in_room].people; victim != nullptr; victim = vnext)
     {
       vnext = victim->next_in_room;
       if (IS_NPC(victim) && victim != ch)
@@ -649,7 +649,7 @@ int do_mppurge(char_data *ch, char *argument, int cmd)
       }
     }
 
-    for (obj = world[ch->in_room].contents; obj != NULL; obj = obj_next)
+    for (obj = world[ch->in_room].contents; obj != nullptr; obj = obj_next)
     {
       obj_next = obj->next_content;
       extract_obj(obj);
@@ -782,7 +782,7 @@ int do_mpgoto(char_data *ch, char *argument, int cmd)
   if (location > top_of_world || !world_array[location])
     location = 0;
 
-  if (ch->fighting != NULL)
+  if (ch->fighting != nullptr)
     stop_fighting(ch);
 
   char_from_room(ch);
@@ -919,7 +919,7 @@ int do_mptransfer(char_data *ch, char *argument, int cmd)
 
   if (!str_cmp(arg1, "all"))
   {
-    for (d = descriptor_list; d != NULL; d = d->next)
+    for (d = descriptor_list; d != nullptr; d = d->next)
     {
       if (d->connected == conn::PLAYING && d->character != ch && d->character->in_room == ch->in_room && CAN_SEE(ch, d->character))
       {
@@ -956,7 +956,7 @@ int do_mptransfer(char_data *ch, char *argument, int cmd)
     }
   }
 
-  if ((victim = get_char_vis(ch, arg1)) == NULL)
+  if ((victim = get_char_vis(ch, arg1)) == nullptr)
   {
     prog_error(ch, "Mptransfer - No such person.");
     return eFAILURE | eINTERNAL_ERROR;
@@ -968,7 +968,7 @@ int do_mptransfer(char_data *ch, char *argument, int cmd)
     return eFAILURE | eINTERNAL_ERROR;
   }
 
-  if (victim->fighting != NULL)
+  if (victim->fighting != nullptr)
     stop_fighting(victim);
 
   char_from_room(victim);
@@ -1006,7 +1006,7 @@ int do_mpforce(char_data *ch, char *argument, int cmd)
     char_data *vch;
     char_data *vch_next;
 
-    for (vch = world[ch->in_room].people; vch != NULL; vch = vch_next)
+    for (vch = world[ch->in_room].people; vch != nullptr; vch = vch_next)
     {
       vch_next = vch->next_in_room;
 
@@ -1020,7 +1020,7 @@ int do_mpforce(char_data *ch, char *argument, int cmd)
   {
     char_data *victim;
 
-    if ((victim = get_char_room_vis(ch, arg)) == NULL)
+    if ((victim = get_char_room_vis(ch, arg)) == nullptr)
     {
       prog_error(ch, "Mpforce - No such victim.");
       return eFAILURE | eINTERNAL_ERROR;
@@ -1052,7 +1052,7 @@ int do_mpforce(char_data *ch, char *argument, int cmd)
 // argument should be <mob> <catchnum> <delay>
 int do_mpthrow(char_data *ch, char *argument, int cmd)
 {
-  struct mprog_throw_type *throwitem = NULL;
+  struct mprog_throw_type *throwitem = nullptr;
   int mob_num;
   int catch_num;
   int delay;
@@ -1113,12 +1113,12 @@ int do_mpthrow(char_data *ch, char *argument, int cmd)
   throwitem->actor = activeActor;
   throwitem->obj = activeObj;
   throwitem->vo = activeVo;
-  throwitem->rndm = NULL;
+  throwitem->rndm = nullptr;
 
   if (fourth[0] != '\0')
     throwitem->var = str_dup(fourth);
   else
-    throwitem->var = NULL;
+    throwitem->var = nullptr;
   throwitem->opt = opt;
   // add to delay list
   throwitem->next = g_mprog_throw_list;
@@ -1148,7 +1148,7 @@ int do_mpteachskill(char_data *ch, char *argument, int cmd)
 
   char_data *victim;
 
-  if ((victim = get_char_room(arg, ch->in_room)) == NULL)
+  if ((victim = get_char_room(arg, ch->in_room)) == nullptr)
   {
     prog_error(ch, "Mpteachskill - No such victim.");
     return eFAILURE | eINTERNAL_ERROR;
@@ -1224,7 +1224,7 @@ char *getTemp(char_data *ch, char *name)
   for (eh = ch->tempVariable; eh; eh = eh->next)
     if (!str_cmp(eh->name, name))
       return eh->data;
-  return NULL;
+  return nullptr;
 }
 
 int do_mpsettemp(char_data *ch, char *argument, int cmd)
@@ -1343,7 +1343,7 @@ struct damage_list
   int damage; // Damage #
 };
 
-struct damage_list *dmg_list = NULL;
+struct damage_list *dmg_list = nullptr;
 
 void free_dmg_list()
 {
@@ -1353,7 +1353,7 @@ void free_dmg_list()
     n = c->next;
     dc_free(c);
   }
-  dmg_list = NULL;
+  dmg_list = nullptr;
 }
 
 void add_dmg(char_data *ch, int dmg)
@@ -1407,14 +1407,14 @@ int do_mpdamage(char_data *ch, char *argument, int cmd)
     return eFAILURE | eINTERNAL_ERROR;
   }
 
-  char_data *victim = NULL;
+  char_data *victim = nullptr;
 
-  // if it's 'all' leave victim NULL and skip
+  // if it's 'all' leave victim nullptr and skip
   if (strcmp(arg, "all") && strcmp(arg, "allpc"))
   {
     victim = get_char_room(arg, ch->in_room);
     if (victim && (GET_LEVEL(victim) > MORTAL || IS_MOB(victim))) // don't target immortals
-      victim = NULL;
+      victim = nullptr;
 
     if (!victim)
       return eFAILURE; // not an error, just couldn't get valid vict
@@ -1471,7 +1471,7 @@ int do_mpdamage(char_data *ch, char *argument, int cmd)
 
     if (victim)
     {
-      int *data = NULL;
+      int *data = nullptr;
       if (!temp[0] || !str_cmp(temp, "hitpoints"))
       {
         hitpoints = ch->getHP();
@@ -1546,7 +1546,7 @@ int do_mpdamage(char_data *ch, char *argument, int cmd)
       {
         continue;
       }
-      int *data = NULL;
+      int *data = nullptr;
       if (!temp[0] || !str_cmp(temp, "hitpoints"))
       {
         hitpoints = ch->getHP();
@@ -1598,7 +1598,7 @@ int do_mpdamage(char_data *ch, char *argument, int cmd)
 
 int do_mpothrow(char_data *ch, char *argument, int cmd)
 {
-  struct mprog_throw_type *throwitem = NULL;
+  struct mprog_throw_type *throwitem = nullptr;
   int mob_num;
   int catch_num;
   int delay;
@@ -1656,7 +1656,7 @@ int do_mpothrow(char_data *ch, char *argument, int cmd)
   if (fourth[0] != '\0')
     throwitem->var = str_dup(fourth);
   else
-    throwitem->var = NULL;
+    throwitem->var = nullptr;
 
   // add to delay list
   throwitem->next = g_mprog_throw_list;
@@ -1685,7 +1685,7 @@ int do_mpbestow(char_data *ch, char *argument, int cmd)
 {
   char arg[MAX_INPUT_LENGTH], arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH],
       arg3[MAX_INPUT_LENGTH];
-  char_data *victim, *owner = NULL;
+  char_data *victim, *owner = nullptr;
   if (!IS_NPC(ch))
   {
     send_to_char("Huh?\r\n", ch);
@@ -1698,7 +1698,7 @@ int do_mpbestow(char_data *ch, char *argument, int cmd)
 
   if (arg[0] == '\0' || arg1[0] == '\0' || arg2[0] == '\0')
     return eFAILURE;
-  if ((victim = get_char_room(arg, ch->in_room, true)) == NULL && str_cmp(arg, "all") && str_cmp(arg, "allpc"))
+  if ((victim = get_char_room(arg, ch->in_room, true)) == nullptr && str_cmp(arg, "all") && str_cmp(arg, "allpc"))
   {
     prog_error(ch, "Mpbestow - No such person.");
     return eFAILURE | eINTERNAL_ERROR;
@@ -1780,7 +1780,7 @@ int do_mppause(char_data *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  struct mprog_throw_type *throwitem = NULL;
+  struct mprog_throw_type *throwitem = nullptr;
   int delay;
 
   char first[MAX_INPUT_LENGTH];
@@ -1850,7 +1850,7 @@ int do_mppause(char_data *ch, char *argument, int cmd)
 
   throwitem->startPos = activePos - activeProgTmpBuf;
 
-  throwitem->var = NULL;
+  throwitem->var = nullptr;
   throwitem->opt = 0;
   // add to delay list
   throwitem->next = g_mprog_throw_list;
@@ -1950,7 +1950,7 @@ int do_mppeace(char_data *ch, char *argument, int cmd)
   char arg[MAX_INPUT_LENGTH];
   argument = one_argument(argument, arg);
 
-  char_data *rch, *vict = NULL;
+  char_data *rch, *vict = nullptr;
 
   if (arg[0])
   {
@@ -1960,17 +1960,17 @@ int do_mppeace(char_data *ch, char *argument, int cmd)
       prog_error(ch, "Mppeace - Vict not found.");
       return eFAILURE;
     }
-    if (IS_MOB(vict) && vict->mobdata->hatred != NULL)
+    if (IS_MOB(vict) && vict->mobdata->hatred != nullptr)
       remove_memory(vict, 'h');
-    if (vict->fighting != NULL)
+    if (vict->fighting != nullptr)
       stop_fighting(vict);
     return eSUCCESS;
   }
-  for (rch = world[ch->in_room].people; rch != NULL; rch = rch->next_in_room)
+  for (rch = world[ch->in_room].people; rch != nullptr; rch = rch->next_in_room)
   {
-    if (IS_MOB(rch) && rch->mobdata->hatred != NULL)
+    if (IS_MOB(rch) && rch->mobdata->hatred != nullptr)
       remove_memory(rch, 'h');
-    if (rch->fighting != NULL)
+    if (rch->fighting != nullptr)
       stop_fighting(rch);
   }
   return eSUCCESS;
@@ -2134,7 +2134,7 @@ char *expand_data(char_data *ch, char *orig)
     if (!lvali && !lvalui && !lvalb)
     {
       prog_error(ch, "Mpsetmath - Expand_data - Accessing unknown data.");
-      return NULL;
+      return nullptr;
     }
 
     for (o = z;; o++)
@@ -2167,7 +2167,7 @@ char *expand_data(char_data *ch, char *orig)
 }
 
 char *allowedData[] = {
-    "hitpoints", "mana", "move", NULL};
+    "hitpoints", "mana", "move", nullptr};
 
 int do_mpsetmath(char_data *ch, char *arg, int cmd)
 {
@@ -2185,9 +2185,9 @@ int do_mpsetmath(char_data *ch, char *arg, int cmd)
   char arg1[MAX_INPUT_LENGTH];
   char arg2[MAX_INPUT_LENGTH];
   arg = one_argument(arg, arg1);
-  char *r = NULL;
+  char *r = nullptr;
 
-  if ((r = strchr(arg1, '.')) != NULL)
+  if ((r = strchr(arg1, '.')) != nullptr)
   {
     *r = '\0';
     r++;

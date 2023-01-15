@@ -67,14 +67,14 @@ struct obj_emote_index
   short frequency;
 };
 struct obj_emote_index obj_emote_head = {
-    NULL,
-    NULL,
+    nullptr,
+    nullptr,
     -1,
     -1 - 1};
 
 void free_emoting_obj_data(obj_emote_index *myobj)
 {
-  obj_emote_data *curr_data = NULL;
+  obj_emote_data *curr_data = nullptr;
 
   while (myobj->data)
   {
@@ -88,7 +88,7 @@ void free_emoting_obj_data(obj_emote_index *myobj)
 
 void free_emoting_objects_from_memory()
 {
-  obj_emote_index *curr_index = NULL;
+  obj_emote_index *curr_index = nullptr;
 
   while (obj_emote_head.next)
   {
@@ -104,8 +104,8 @@ void free_emoting_objects_from_memory()
 
 void load_emoting_objects()
 {
-  obj_emote_index *index_cursor = NULL;
-  obj_emote_data *data_cursor = NULL;
+  obj_emote_index *index_cursor = nullptr;
+  obj_emote_data *data_cursor = nullptr;
   FILE *fl;
   // short i;
   char fromfile;
@@ -122,8 +122,8 @@ void load_emoting_objects()
       dc_alloc(1, sizeof(struct obj_emote_index));
 #endif
   index_cursor = obj_emote_head.next;
-  index_cursor->next = NULL;
-  index_cursor->data = NULL;
+  index_cursor->next = nullptr;
+  index_cursor->data = nullptr;
   index_cursor->room_number = NOWHERE;
   index_cursor->emote_index_length = -1;
   index_cursor->frequency = 0;
@@ -135,7 +135,7 @@ void load_emoting_objects()
       dc_alloc(1, sizeof(struct obj_emote_index));
 #endif
   index_cursor->data = data_cursor;
-  data_cursor->next = NULL;
+  data_cursor->next = nullptr;
   while (!done2)
   {
     index_cursor->room_number = fread_int(fl, 0, 1000000);
@@ -163,7 +163,7 @@ void load_emoting_objects()
             dc_alloc(1, sizeof(struct obj_emote_data));
 #endif
         data_cursor = data_cursor->next;
-        data_cursor->next = NULL;
+        data_cursor->next = nullptr;
         // Azrack -- fseek had a -1 * offset * sizeof(char) which is going to send us to EOF immmediately
         // because fseek takes an unsigned int.
         fseek(fl, (-1 * offset * sizeof(char)), SEEK_CUR);
@@ -184,7 +184,7 @@ void load_emoting_objects()
           dc_alloc(1, sizeof(struct obj_emote_index));
 #endif
       index_cursor = index_cursor->next;
-      index_cursor->next = NULL;
+      index_cursor->next = nullptr;
 #ifdef LEAK_CHECK
       index_cursor->data = (struct obj_emote_data *)
           calloc(1, sizeof(struct obj_emote_data));
@@ -196,7 +196,7 @@ void load_emoting_objects()
       index_cursor->emote_index_length = -1;
       index_cursor->frequency = -1;
       data_cursor = index_cursor->data;
-      data_cursor->next = NULL;
+      data_cursor->next = nullptr;
     }
   }
   fclose(fl);
@@ -206,8 +206,8 @@ void load_emoting_objects()
 int emoting_object(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
                    char_data *invoker)
 {
-  obj_emote_index *index_cursor = NULL;
-  obj_emote_data *data_cursor = NULL;
+  obj_emote_index *index_cursor = nullptr;
+  obj_emote_data *data_cursor = nullptr;
   short i = 0;
   if (cmd)
   {
@@ -444,7 +444,7 @@ int songstaff(char_data *ch, struct obj_data *obj, int cmd, const char *arg, cha
 {
   if (cmd)
     return eFAILURE;
-  if (obj->equipped_by == NULL || !obj->equipped_by->in_room)
+  if (obj->equipped_by == nullptr || !obj->equipped_by->in_room)
     return eFAILURE;
   ch = obj->equipped_by;
   char buf[MAX_STRING_LENGTH];
@@ -570,13 +570,13 @@ int orrowand(char_data *ch, struct obj_data *obj, int cmd, const char *arg, char
     return eFAILURE;
 
   struct obj_data *curr;
-  struct obj_data *firstP = NULL, *secondP = NULL, *vial = NULL, *diamond = NULL;
+  struct obj_data *firstP = nullptr, *secondP = nullptr, *vial = nullptr, *diamond = nullptr;
 
   for (curr = ch->carrying; curr; curr = curr->next_content)
   {
     if (obj_index[curr->item_number].virt == 17399)
       diamond = curr;
-    else if (obj_index[curr->item_number].virt == 27903 && firstP != NULL)
+    else if (obj_index[curr->item_number].virt == 27903 && firstP != nullptr)
       secondP = curr;
     else if (obj_index[curr->item_number].virt == 27903)
       firstP = curr;
@@ -1208,7 +1208,7 @@ int do_assemble(char_data *ch, char *argument, int cmd)
 
   // if arguments are given, find object and see if it can be assembled.
   obj = get_obj_in_list_vis(ch, arg1, ch->carrying);
-  if (obj == NULL)
+  if (obj == nullptr)
   {
     act("You can't find it!", ch, 0, 0, TO_CHAR, 0);
     return eFAILURE;
@@ -1593,7 +1593,7 @@ int eliara_combat(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
                   char_data *invoker)
 {
 
-  char_data *vict = NULL;
+  char_data *vict = nullptr;
 
   if (cmd)
     return eFAILURE;
@@ -1749,7 +1749,7 @@ int restring_machine(char_data *ch, struct obj_data *obj, int cmd, const char *a
 {
   char name[MAX_INPUT_LENGTH];
   char buf[MAX_INPUT_LENGTH];
-  struct obj_data *target_obj = NULL;
+  struct obj_data *target_obj = nullptr;
 
   if (cmd != CMD_RESTRING)
     return eFAILURE;
@@ -1864,7 +1864,7 @@ int pagoda_balance(char_data *ch, struct obj_data *obj, int cmd, const char *arg
   if (cmd)
     return eFAILURE;
 
-  char_data *vict = NULL;
+  char_data *vict = nullptr;
   int found = 0;
 
   for (int i = 8695; i < 8699; i++)
@@ -1917,7 +1917,7 @@ int pagoda_shield_restorer(char_data *ch, struct obj_data *obj, int cmd, const c
 int phish_locator(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
                   char_data *invoker)
 {
-  char_data *victim = NULL;
+  char_data *victim = nullptr;
 
   if (cmd != CMD_PUSH) // push
     return eFAILURE;
@@ -1979,7 +1979,7 @@ int portal_word(char_data *ch, struct obj_data *obj, int cmd, char *arg,
 {
   char junk[MAX_INPUT_LENGTH];
   char arg1[MAX_INPUT_LENGTH];
-  char_data *victim = NULL;
+  char_data *victim = nullptr;
 
   if (!cmd && obj)
   { // This is where we recharge
@@ -2039,7 +2039,7 @@ int full_heal_word(char_data *ch, struct obj_data *obj, int cmd, char *arg,
 {
   char junk[MAX_INPUT_LENGTH];
   char arg1[MAX_INPUT_LENGTH];
-  char_data *victim = NULL;
+  char_data *victim = nullptr;
 
   if (!cmd && obj)
   { // This is where we recharge
@@ -2176,7 +2176,7 @@ int teleport_word(char_data *ch, struct obj_data *obj, int cmd, char *arg,
 {
   char junk[MAX_INPUT_LENGTH];
   char arg1[MAX_INPUT_LENGTH];
-  char_data *victim = NULL;
+  char_data *victim = nullptr;
 
   if (!cmd && obj)
   { // This is where we recharge
@@ -2511,7 +2511,7 @@ int szrildor_pass(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
               move_char(v, real_room(30000));
               do_look(v, "", CMD_LOOK);
 
-              struct mprog_throw_type *throwitem = NULL;
+              struct mprog_throw_type *throwitem = nullptr;
               throwitem = (struct mprog_throw_type *)dc_alloc(1, sizeof(struct mprog_throw_type));
               throwitem->target_mob_num = 30033;
               strcpy(throwitem->target_mob_name, "");
@@ -2519,11 +2519,11 @@ int szrildor_pass(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
               throwitem->delay = 0;
               throwitem->mob = true; // This is, surprisingly, a mob
               throwitem->actor = v;
-              throwitem->obj = NULL;
-              throwitem->vo = NULL;
-              throwitem->rndm = NULL;
+              throwitem->obj = nullptr;
+              throwitem->vo = nullptr;
+              throwitem->rndm = nullptr;
               throwitem->opt = 0;
-              throwitem->var = NULL;
+              throwitem->var = nullptr;
               throwitem->next = g_mprog_throw_list;
               g_mprog_throw_list = throwitem;
             }
@@ -2727,7 +2727,7 @@ int boat_proc(char_data *ch, struct obj_data *obj, int cmd, const char *arg, cha
     return eFAILURE; // someone loaded me
 
   // figure out which boat I am
-  int *boat_list = NULL;
+  int *boat_list = nullptr;
   switch (obj_index[obj->item_number].virt)
   {
   case 9531:
@@ -2811,7 +2811,7 @@ int leave_boat_proc(char_data *ch, struct obj_data *obj, int cmd, const char *ar
         break;
     }
 
-    if (obj2 == NULL)
+    if (obj2 == nullptr)
     {
       send_to_char("Cannot find your boat obj.  BUG.  Tell a god.\r\n", ch);
       return eSUCCESS;
@@ -2971,7 +2971,7 @@ int hornoplenty(char_data *ch, struct obj_data *obj, int cmd, const char *arg, c
   if (number(0, 100))
     return eFAILURE;
 
-  struct obj_data *newobj = NULL;
+  struct obj_data *newobj = nullptr;
   int objnum = real_object(3170); // chewy tuber
   if (objnum < 0)
   {
@@ -3142,7 +3142,7 @@ int generic_weapon_combat(char_data *ch, struct obj_data *obj, int cmd, char *ar
 int TOHS_locator(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
                  char_data *invoker)
 {
-  obj_data *victim = NULL;
+  obj_data *victim = nullptr;
 
   if (cmd != CMD_PUSH) // push
     return eFAILURE;
@@ -3290,17 +3290,17 @@ int glove_combat_procs(char_data *ch, struct obj_data *obj, int cmd, char *arg,
   case 4818:
     if (number(0, 19))
       return eFAILURE;
-    return spell_burning_hands(ch->level, ch, ch->fighting, NULL, 50);
+    return spell_burning_hands(ch->level, ch, ch->fighting, nullptr, 50);
   case 4819:
     if (number(0, 19))
       return eFAILURE;
-    return spell_chill_touch(ch->level, ch, ch->fighting, NULL, 50);
+    return spell_chill_touch(ch->level, ch, ch->fighting, nullptr, 50);
   case 21718:
     if (affected_by_spell(ch, BASE_SETS + SET_SAIYAN))
     {
       if (number(0, 19))
         return eFAILURE;
-      return spell_sparks(ch->level, ch, ch->fighting, NULL, 0);
+      return spell_sparks(ch->level, ch, ch->fighting, nullptr, 0);
     }
     break;
   case 19503: // Gloves of the Dreamer
@@ -3528,7 +3528,7 @@ int eternitystaff(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
 int talkingsword(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
                  char_data *invoker)
 {
-  char_data *vict = NULL;
+  char_data *vict = nullptr;
   int unequip = -1;
   static bool init_done = false;
   if (cmd)
@@ -3747,7 +3747,7 @@ int hot_potato(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
 {
   extern int top_of_world;
   int dropped = 0;
-  char_data *vict = NULL;
+  char_data *vict = nullptr;
 
   if (obj->equipped_by)
     vict = obj->equipped_by;
@@ -3919,8 +3919,8 @@ int exploding_mortar_shells(char_data *ch, struct obj_data *obj, int cmd, const 
 {
   int dam = 0;
   char buf[MAX_STRING_LENGTH];
-  char_data *victim = NULL;
-  char_data *next_v = NULL;
+  char_data *victim = nullptr;
+  char_data *next_v = nullptr;
 
   if (cmd)
     return eFAILURE;
@@ -4117,7 +4117,7 @@ int godload_wailka(char_data *ch, struct obj_data *obj, int cmd, const char *arg
     return eSUCCESS;
   }
   char_data *vict;
-  if ((vict = get_char_room_vis(ch, arg2)) == NULL)
+  if ((vict = get_char_room_vis(ch, arg2)) == nullptr)
   {
     send_to_char("You need to tell the item who.\r\n", ch);
     return eSUCCESS;
@@ -4341,10 +4341,10 @@ int angie_proc(char_data *ch, struct obj_data *obj, int cmd, const char *arg, ch
     return eFAILURE;
   REMOVE_BIT(world[ch->in_room].dir_option[0]->exit_info, EX_CLOSED);
   REMOVE_BIT(world[29265].dir_option[2]->exit_info, EX_CLOSED);
-  act("$n turns the doorknob, there is a loud click, and a blinding explosion knocks you on your ass.", ch, NULL, NULL, TO_ROOM, 0);
-  act("You turn the doorknob, there is a loud click, and a blinding explosion knocks you on your ass.", ch, NULL, NULL, TO_CHAR, 0);
+  act("$n turns the doorknob, there is a loud click, and a blinding explosion knocks you on your ass.", ch, nullptr, nullptr, TO_ROOM, 0);
+  act("You turn the doorknob, there is a loud click, and a blinding explosion knocks you on your ass.", ch, nullptr, nullptr, TO_CHAR, 0);
   char_data *a, *b, *c;
-  b = initiate_oproc(NULL, obj);
+  b = initiate_oproc(nullptr, obj);
   for (a = world[ch->in_room].people; a; a = c)
   {
     c = a->next_in_room; // 'cause mobs get freed
@@ -4424,7 +4424,7 @@ int spellcraft_glyphs(char_data *ch, struct obj_data *obj, int cmd, const char *
       return eFAILURE;
     }
 
-    if (sunglyph == NULL)
+    if (sunglyph == nullptr)
     {
       send_to_char("Put what where?\n\r", ch);
       return eFAILURE;
@@ -4458,7 +4458,7 @@ int spellcraft_glyphs(char_data *ch, struct obj_data *obj, int cmd, const char *
       send_to_char("There's no place around to put this special item.\r\n", ch);
       return eFAILURE;
     }
-    if (bookglyph == NULL)
+    if (bookglyph == nullptr)
     {
       send_to_char("Put what where?\n\r", ch);
       return eFAILURE;
@@ -4493,7 +4493,7 @@ int spellcraft_glyphs(char_data *ch, struct obj_data *obj, int cmd, const char *
       return eFAILURE;
     }
 
-    if (heartglyph == NULL)
+    if (heartglyph == nullptr)
     {
       send_to_char("Put what where?\n\r", ch);
       return eFAILURE;

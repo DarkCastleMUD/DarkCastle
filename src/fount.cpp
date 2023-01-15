@@ -38,7 +38,7 @@ int FOUNTAINisPresent (char_data *ch)
   bool found = false;
 
   for (tmp = world[ch->in_room].contents;
-       tmp != NULL && !found;
+       tmp != nullptr && !found;
        tmp = tmp->next_content) {
     if((tmp->obj_flags.type_flag == ITEM_FOUNTAIN)  && CAN_SEE_OBJ(ch, tmp)) {
        return(true);

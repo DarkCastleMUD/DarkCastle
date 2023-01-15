@@ -88,10 +88,10 @@ int do_sacrifice(char_data *ch, char *argument, int cmd)
   obj = get_obj_in_list_vis(ch, name, ch->carrying);
 
   /* Ok, lets see if it's a corpse on the ground then */
-  if (obj == NULL)
+  if (obj == nullptr)
   {
     obj = get_obj_in_list_vis(ch, name, world[ch->in_room].contents);
-    if (obj == NULL || GET_ITEM_TYPE(obj) != ITEM_CONTAINER || !isname("corpse", obj->name) || isname("pc", obj->name))
+    if (obj == nullptr || GET_ITEM_TYPE(obj) != ITEM_CONTAINER || !isname("corpse", obj->name) || isname("pc", obj->name))
     {
       act("You don't seem to be holding that object.", ch, 0, 0, TO_CHAR, 0);
       return eFAILURE;
@@ -206,7 +206,7 @@ int do_donate(char_data *ch, char *argument, int cmd)
   }
 
   obj = get_obj_in_list_vis(ch, name, ch->carrying);
-  if (obj == NULL)
+  if (obj == nullptr)
   {
     sprintf(buf, "You don't have any '%s' to donate.", name);
     act(buf, ch, 0, 0, TO_CHAR, 0);
@@ -1726,7 +1726,7 @@ void CVoteData::SetQuestion(char_data *ch, std::string question)
 CVoteData::CVoteData()
 {
   char buf[MAX_STRING_LENGTH];
-  FILE *the_file = NULL;
+  FILE *the_file = nullptr;
   ;
   int num = 0;
   int is_active = 0;
@@ -1737,7 +1737,7 @@ CVoteData::CVoteData()
   the_file = fopen("../lib/vote_data", "r");
   if (!the_file)
   {
-    this->Reset(NULL);
+    this->Reset(nullptr);
     return;
   }
 
@@ -1747,7 +1747,7 @@ CVoteData::CVoteData()
   if (feof(the_file))
   {
     fclose(the_file);
-    this->Reset(NULL);
+    this->Reset(nullptr);
     return;
   }
 
@@ -1757,7 +1757,7 @@ CVoteData::CVoteData()
   if (!fgets(buf, MAX_STRING_LENGTH, the_file))
   {
     fclose(the_file);
-    this->Reset(NULL);
+    this->Reset(nullptr);
     logentry("Error reading question from vote file.", 0, LogChannels::LOG_MISC);
     return;
   }
@@ -1773,7 +1773,7 @@ CVoteData::CVoteData()
     {
       fclose(the_file);
       logentry("Error reading answers from vote file.", 0, LogChannels::LOG_MISC);
-      this->Reset(NULL);
+      this->Reset(nullptr);
       return;
     }
 
@@ -1791,7 +1791,7 @@ CVoteData::CVoteData()
     {
       fclose(the_file);
       logentry("Error reading ip addresses from vote file.", 0, LogChannels::LOG_MISC);
-      this->Reset(NULL);
+      this->Reset(nullptr);
       return;
     }
     buf[strlen(buf) - 1] = 0;
@@ -1806,7 +1806,7 @@ CVoteData::CVoteData()
     {
       fclose(the_file);
       logentry("Error reading char names from vote file.", 0, LogChannels::LOG_MISC);
-      this->Reset(NULL);
+      this->Reset(nullptr);
       return;
     }
     buf[strlen(buf) - 1] = 0;

@@ -47,7 +47,7 @@ const char *players_cols[] = {"sex", "c_class", "race", "level",
           "raw_ki", "alignment", "hpmetas",
           "manametas", "movemetas", "armor", "hitroll",
           "damroll", "afected_by", "afected_by2",
-          "misc", "clan", "load_room", NULL};
+          "misc", "clan", "load_room", nullptr};
 generic_prepares("players", "player_id", players_cols);
 */
 
@@ -59,7 +59,7 @@ int Database::lookupPlayerID(const char *name)
   const char *paramValues[1];
   paramValues[0] = name;
 
-  PGresult *res = PQexecParams(conn, "SELECT player_id FROM player_lookup WHERE name=$1", 1, NULL, paramValues, NULL, NULL, 0);
+  PGresult *res = PQexecParams(conn, "SELECT player_id FROM player_lookup WHERE name=$1", 1, nullptr, paramValues, nullptr, nullptr, 0);
   if (PQresultStatus(res) != PGRES_TUPLES_OK)
   {
     cerr << "Error occured: " << PQresultErrorMessage(res) << endl;
@@ -240,7 +240,7 @@ void Database::processqueue(void)
   if (PQisBusy(conn) == false)
   {
     PGresult *res = PQgetResult(conn);
-    if (res == NULL)
+    if (res == nullptr)
     {
       // We're ready to process a new SQL statement
 
@@ -364,7 +364,7 @@ void Prepare::exec(void)
       query = generateInsertQuery();
     }
 
-    res = PQprepare(conn, prepareID.c_str(), query.c_str(), nParams, NULL);
+    res = PQprepare(conn, prepareID.c_str(), query.c_str(), nParams, nullptr);
     if (PQresultStatus(res) != PGRES_COMMAND_OK)
     {
       cerr << "Error occured trying to prepare SQL: " << PQresultErrorMessage(res) << endl;
@@ -391,8 +391,8 @@ void Prepare::exec(void)
   if (lastResult)
     PQclear(lastResult);
 
-  // lastResult = res = PQexecPrepared(this->conn, prepareID.c_str(), nParams, paramValues, NULL, NULL, 0);
-  int status = PQsendQueryPrepared(this->conn, prepareID.c_str(), nParams, paramValues, NULL, NULL, 0);
+  // lastResult = res = PQexecPrepared(this->conn, prepareID.c_str(), nParams, paramValues, nullptr, nullptr, 0);
+  int status = PQsendQueryPrepared(this->conn, prepareID.c_str(), nParams, paramValues, nullptr, nullptr, 0);
   if (status == 0)
   {
     cerr << "Error occured trying to prepare SQL: " << PQresultErrorMessage(res) << endl;

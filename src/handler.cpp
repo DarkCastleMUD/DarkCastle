@@ -79,7 +79,7 @@ bool isTimer(char_data *ch, int spell)
 int timerLeft(char_data *ch, int spell)
 {
 	struct affected_type *af = affected_by_spell(ch, BASE_TIMERS + spell);
-	if (af == NULL)
+	if (af == nullptr)
 		return 0;
 	else
 		return af->duration;
@@ -505,8 +505,8 @@ const struct set_data set_list[] = {
 	{"Berkthgar's Rage",
 	 1,
 	 {27977, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-	 NULL,
-	 NULL},
+	 nullptr,
+	 nullptr},
 	{"The Naturalists Trappings",
 	 17,
 	 {331, 332, 333, 334, 335, 336, 337, 338, 339, 340, 341, 342, 343, 343, 344, 345, 346, 347, 347},
@@ -571,7 +571,7 @@ void add_set_stats(char_data *ch, obj_data *obj, int flag, int pos)
 				// By gawd, they just completed the set.
 				if (affected_by_spell(ch, BASE_SETS + z))
 					return;
-				if (!flag && set_list[z].Set_Wear_Message != NULL)
+				if (!flag && set_list[z].Set_Wear_Message != nullptr)
 					send_to_char(set_list[z].Set_Wear_Message, ch);
 				switch (z)
 				{
@@ -831,7 +831,7 @@ void remove_set_stats(char_data *ch, obj_data *obj, int flag)
 				}
 				// Remove it
 				affect_from_char(ch, BASE_SETS + z);
-				if (!flag && set_list[z].Set_Remove_Message != NULL)
+				if (!flag && set_list[z].Set_Remove_Message != nullptr)
 					send_to_char(set_list[z].Set_Remove_Message, ch);
 				break;
 			}
@@ -1821,31 +1821,31 @@ void affect_remove(char_data *ch, struct affected_type *af, int flags)
 				{
 					obj_to_char(unequip_char(ch, SECOND_WIELD, (flags & SUPPRESS_MESSAGES)), ch);
 					if (!(flags & SUPPRESS_MESSAGES))
-						act("You shift $p into your inventory.", ch, obj, NULL, TO_CHAR, 0);
+						act("You shift $p into your inventory.", ch, obj, nullptr, TO_CHAR, 0);
 				}
 				else if ((obj = ch->equipment[HOLD]))
 				{
 					obj_to_char(unequip_char(ch, HOLD, (flags & SUPPRESS_MESSAGES)), ch);
 					if (!(flags & SUPPRESS_MESSAGES))
-						act("You shift $p into your inventory.", ch, obj, NULL, TO_CHAR, 0);
+						act("You shift $p into your inventory.", ch, obj, nullptr, TO_CHAR, 0);
 				}
 				else if ((obj = ch->equipment[HOLD2]))
 				{
 					obj_to_char(unequip_char(ch, HOLD2, (flags & SUPPRESS_MESSAGES)), ch);
 					if (!(flags & SUPPRESS_MESSAGES))
-						act("You shift $p into your inventory.", ch, obj, NULL, TO_CHAR, 0);
+						act("You shift $p into your inventory.", ch, obj, nullptr, TO_CHAR, 0);
 				}
 				else if ((obj = ch->equipment[WEAR_SHIELD]))
 				{
 					obj_to_char(unequip_char(ch, WEAR_SHIELD, (flags & SUPPRESS_MESSAGES)), ch);
 					if (!(flags & SUPPRESS_MESSAGES))
-						act("You shift $p into your inventory.", ch, obj, NULL, TO_CHAR, 0);
+						act("You shift $p into your inventory.", ch, obj, nullptr, TO_CHAR, 0);
 				}
 				else if ((obj = ch->equipment[WEAR_LIGHT]))
 				{
 					obj_to_char(unequip_char(ch, WEAR_LIGHT, (flags & SUPPRESS_MESSAGES)), ch);
 					if (!(flags & SUPPRESS_MESSAGES))
-						act("You shift $p into your inventory.", ch, obj, NULL, TO_CHAR, 0);
+						act("You shift $p into your inventory.", ch, obj, nullptr, TO_CHAR, 0);
 				}
 			}
 		obj = ch->equipment[SECOND_WIELD];
@@ -1857,7 +1857,7 @@ void affect_remove(char_data *ch, struct affected_type *af, int flags)
 				{
 					obj_to_char(unequip_char(ch, SECOND_WIELD, (flags & SUPPRESS_MESSAGES)), ch);
 					if (!(flags & SUPPRESS_MESSAGES))
-						act("You shift $p into your inventory.", ch, obj, NULL, TO_CHAR, 0);
+						act("You shift $p into your inventory.", ch, obj, nullptr, TO_CHAR, 0);
 				}
 			}
 		if (!(flags & SUPPRESS_MESSAGES))
@@ -1929,7 +1929,7 @@ void affect_remove(char_data *ch, struct affected_type *af, int flags)
 					"$n is DEAD!!", ch, 0, 0, TO_ROOM, 0);
 			send_to_char("The water rushes into your lungs and the light fades with your oxygen.\r\n"
 					"You have been KILLED!!!\n\r", ch);
-			fight_kill(NULL, ch, TYPE_RAW_KILL, 0);
+			fight_kill(nullptr, ch, TYPE_RAW_KILL, 0);
 			char_died = true;
 #else
 			act("$n begins to choke on the water, a look of panic filling $s eyes as it fills $s lungs.\r\n", ch, 0, 0, TO_ROOM, 0);
@@ -2161,7 +2161,7 @@ void affect_from_char(char_data *ch, int skill, int flags)
 }
 
 /*
- * Return if a char is affected by a spell (SPELL_XXX), NULL indicates
+ * Return if a char is affected by a spell (SPELL_XXX), nullptr indicates
  * not affected.
  */
 affected_type *affected_by_spell(char_data *ch, int skill)
@@ -2352,7 +2352,7 @@ int char_to_room(char_data *ch, room_t room, bool stop_all_fighting)
 	if (!IS_NPC(ch) && ISSET(ch->affected_by, AFF_HIDE) && (a = has_skill(ch, SKILL_HIDE)))
 	{
 		for (i = 0; i < MAX_HIDE; i++)
-			ch->pcdata->hiding_from[i] = NULL;
+			ch->pcdata->hiding_from[i] = nullptr;
 		i = 0;
 		for (temp = ch->next_in_room; temp; temp = temp->next_in_room)
 		{
@@ -2375,7 +2375,7 @@ int char_to_room(char_data *ch, room_t room, bool stop_all_fighting)
 		if (ISSET(temp->affected_by, AFF_HIDE) && !IS_NPC(temp))
 			for (i = 0; i < MAX_HIDE; i++)
 			{
-				if (temp->pcdata->hiding_from[i] == NULL || temp->pcdata->hiding_from[i] == ch)
+				if (temp->pcdata->hiding_from[i] == nullptr || temp->pcdata->hiding_from[i] == ch)
 				{
 					if (number(1, 101) > has_skill(temp, SKILL_HIDE))
 					{
@@ -2612,7 +2612,7 @@ struct obj_data *unequip_char(char_data *ch, int pos, int flag)
 		GET_AC(ch) += apply_ac(ch, pos);
 
 	remove_set_stats(ch, obj, flag);
-	struct obj_data *a, *b = NULL;
+	struct obj_data *a, *b = nullptr;
 b: // ew
 	if (!IS_NPC(ch))
 		for (a = ch->pcdata->skillchange; a; a = a->next_skill)
@@ -2620,7 +2620,7 @@ b: // ew
 			if (a == (obj_data *)0x95959595)
 			{
 				int i;
-				ch->pcdata->skillchange = NULL;
+				ch->pcdata->skillchange = nullptr;
 				for (i = 0; i < MAX_WEAR; i++)
 				{
 					int j;
@@ -2703,11 +2703,11 @@ int get_number(string &name)
 int get_number(char **name)
 {
 	unsigned i;
-	char *ppos = NULL;
+	char *ppos = nullptr;
 	char number[MAX_INPUT_LENGTH];
 	char buffer[MAX_INPUT_LENGTH];
 
-	if ((ppos = index(*name, '.')) != NULL)
+	if ((ppos = index(*name, '.')) != nullptr)
 	{
 		*ppos++ = '\0';
 		// at this point, ppos points to the name only, and there is a
@@ -2959,7 +2959,7 @@ int move_obj(obj_data *obj, int dest)
 
 	if (!obj)
 	{
-		logentry("NULL object sent to move_obj!", OVERSEER, LogChannels::LOG_BUG);
+		logentry("nullptr object sent to move_obj!", OVERSEER, LogChannels::LOG_BUG);
 		return 0;
 	}
 
@@ -3044,7 +3044,7 @@ int move_obj(obj_data *obj, obj_data *dest_obj)
 
 	if (!obj)
 	{
-		logentry("NULL object sent to move_obj!", OVERSEER, LogChannels::LOG_BUG);
+		logentry("nullptr object sent to move_obj!", OVERSEER, LogChannels::LOG_BUG);
 		return 0;
 	}
 
@@ -3131,7 +3131,7 @@ int move_obj(obj_data *obj, char_data *ch)
 
 	if (!obj)
 	{
-		logentry("NULL object sent to move_obj!", OVERSEER, LogChannels::LOG_BUG);
+		logentry("nullptr object sent to move_obj!", OVERSEER, LogChannels::LOG_BUG);
 		return 0;
 	}
 
@@ -3312,9 +3312,9 @@ int obj_to_room(struct obj_data *object, int room)
 	if (!object)
 		return 0;
 
-	if (&world[room] == NULL)
+	if (&world[room] == nullptr)
 	{
-		logf(IMMORTAL, LogChannels::LOG_BUG, "obj_to_room: world[%d] == NULL", room);
+		logf(IMMORTAL, LogChannels::LOG_BUG, "obj_to_room: world[%d] == nullptr", room);
 		produce_coredump();
 		return 0;
 	}
@@ -3345,7 +3345,7 @@ int obj_to_room(struct obj_data *object, int room)
 	// put it in the list
 	if (!obj)
 	{
-		object->next_content = NULL;
+		object->next_content = nullptr;
 		world[room].contents = object;
 	}
 	else
@@ -3442,7 +3442,7 @@ int obj_to_obj(struct obj_data *obj, struct obj_data *obj_to)
 	// put it in the list
 	if (!tobj)
 	{
-		obj->next_content = NULL;
+		obj->next_content = nullptr;
 		obj_to->contains = obj;
 	}
 	else
@@ -3681,7 +3681,7 @@ void extract_char(char_data *ch, bool pull, Trace t)
 	bool isGolem = false;
 
 	struct obj_data *i;
-	char_data *omast = NULL;
+	char_data *omast = nullptr;
 	int ret = eSUCCESS;
 	if (!IS_NPC(ch) && !ch->desc)
 		for (t_desc = descriptor_list; t_desc; t_desc = t_desc->next)
@@ -3698,7 +3698,7 @@ void extract_char(char_data *ch, bool pull, Trace t)
 	}
 
 	if (IS_NPC(ch) && ch->mobdata && ch->mobdata->reset && ch->mobdata->reset->lastPop)
-		ch->mobdata->reset->lastPop = NULL;
+		ch->mobdata->reset->lastPop = nullptr;
 
 	remove_totem_stats(ch);
 	if (!IS_NPC(ch))
@@ -3731,7 +3731,7 @@ void extract_char(char_data *ch, bool pull, Trace t)
 	if (ch->group_name)
 	{
 		dc_free(ch->group_name);
-		ch->group_name = NULL;
+		ch->group_name = nullptr;
 		REMBIT(ch->affected_by, AFF_GROUP); // shrug
 	}
 
@@ -3767,7 +3767,7 @@ void extract_char(char_data *ch, bool pull, Trace t)
 	if (ch->ambush)
 	{
 		dc_free(ch->ambush);
-		ch->ambush = NULL;
+		ch->ambush = nullptr;
 	}
 
 	// I'm guarding someone.  Remove myself from their guarding list
@@ -3898,11 +3898,11 @@ void extract_char(char_data *ch, bool pull, Trace t)
  * Get a random character from the player's current room that is visible to
  * him and not him.
  *
- * Remember that this function can return NULL!
+ * Remember that this function can return nullptr!
  */
 char_data *get_rand_other_char_room_vis(char_data *ch)
 {
-	char_data *vict = NULL;
+	char_data *vict = nullptr;
 	int count = 0;
 
 	// Count the number of players in room
@@ -3911,7 +3911,7 @@ char_data *get_rand_other_char_room_vis(char_data *ch)
 			count++;
 
 	if (!count) // no players
-		return NULL;
+		return nullptr;
 
 	// Pick a random one
 	count = number(1, count);
@@ -3933,7 +3933,7 @@ char_data *get_rand_other_char_room_vis(char_data *ch)
 	}
 
 	// we should never get here
-	return NULL;
+	return nullptr;
 }
 
 void lastseen_targeted(char_data *ch, char_data *victim)
@@ -3968,7 +3968,7 @@ void lastseen_targeted(char_data *ch, char_data *victim)
 	{
 		if ((*i).second.second.tv_sec == 0)
 		{
-			gettimeofday(&tv, NULL);
+			gettimeofday(&tv, nullptr);
 			(*i).second.second = tv;
 			return;
 		}
@@ -4002,7 +4002,7 @@ char_data *get_char_room_vis(char_data *ch, const char *name)
 				rnd = get_rand_other_char_room_vis(ch);
 				if (rnd)
 				{
-					// Added get_rand.. check above 'cause ch->fighting would get set to NULL.
+					// Added get_rand.. check above 'cause ch->fighting would get set to nullptr.
 					send_to_char("You're so dizzy you don't know who you're hitting.\r\n", ch);
 					ch->fighting = rnd;
 					return ch->fighting;
@@ -4114,7 +4114,7 @@ char_data *get_pc_room_vis_exact(char_data *ch, const char *name)
 		if (isname(name, GET_NAME(i)) && CAN_SEE(ch, i) && !IS_NPC(i))
 			return (i);
 	}
-	return NULL;
+	return nullptr;
 }
 
 char_data *get_mob_vis(char_data *ch, char *name)
@@ -4179,7 +4179,7 @@ obj_data *get_obj_vnum(int vnum)
 	for (i = object_list; i; i = i->next)
 		if (i->item_number == num)
 			return i;
-	return NULL;
+	return nullptr;
 }
 
 char_data *get_random_mob_vnum(int vnum)
@@ -4207,7 +4207,7 @@ char_data *get_random_mob_vnum(int vnum)
 		return *result;
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 char_data *get_mob_vnum(int vnum)
@@ -4225,7 +4225,7 @@ char_data *get_mob_vnum(int vnum)
 	{
 		return *result;
 	}
-	return NULL;
+	return nullptr;
 }
 char_data *get_char_vis(char_data *ch, const string &name)
 {
@@ -4488,13 +4488,13 @@ struct obj_data *get_obj_in_list_vis(char_data *ch, int item_num, struct obj_dat
 
 	// never match invalid items
 	if (number == -1)
-		return NULL;
+		return nullptr;
 
 	for (i = list; i; i = i->next_content)
 		if (i->item_number == number && CAN_SEE_OBJ(ch, i, blindfighting))
 			return i;
 
-	return NULL;
+	return nullptr;
 }
 
 struct obj_data *get_obj_in_list_vis(char_data *ch, const char *name, struct obj_data *list, bool blindfighting)
@@ -4535,11 +4535,11 @@ struct obj_data *get_obj_vis(char_data *ch, const char *name, bool loc)
 	char *tmp;
 
 	/* scan items carried */
-	if ((i = get_obj_in_list_vis(ch, name, ch->carrying)) != NULL)
+	if ((i = get_obj_in_list_vis(ch, name, ch->carrying)) != nullptr)
 		return (i);
 
 	/* scan room */
-	if ((i = get_obj_in_list_vis(ch, name, world[ch->in_room].contents)) != NULL)
+	if ((i = get_obj_in_list_vis(ch, name, world[ch->in_room].contents)) != nullptr)
 		return (i);
 
 	strcpy(tmpname, name);
@@ -4626,8 +4626,8 @@ struct obj_data *create_money(int amount)
 /*  bitv..   All those bits that you want to "search through".            */
 /*           Bit found will be result of the function                     */
 /*  *ch      This is the person that is trying to "find"                  */
-/*  **tar_ch Will be NULL if no character was found, otherwise points     */
-/* **tar_obj Will be NULL if no object was found, otherwise points        */
+/*  **tar_ch Will be nullptr if no character was found, otherwise points     */
+/* **tar_obj Will be nullptr if no object was found, otherwise points        */
 /*                                                                        */
 /* The routine returns a pointer to the next word in *arg (just like the  */
 /* one_argument routine).                                                 */
@@ -4823,13 +4823,13 @@ int generic_find(const char *arg, int bitvector, char_data *ch, char_data **tar_
 char *get_random_hate(char_data *ch)
 {
 	char buf[128];
-	char *name = NULL;
+	char *name = nullptr;
 
 	if (!IS_MOB(ch))
-		return NULL;
+		return nullptr;
 
 	if (!ch->mobdata->hatred)
-		return NULL;
+		return nullptr;
 
 	if (!strstr(ch->mobdata->hatred, " "))
 		return (ch->mobdata->hatred);
@@ -4865,7 +4865,7 @@ int hates_someone(char_data *ch)
 	if (!IS_MOB(ch))
 		return 0;
 
-	return (ch->mobdata->hatred != NULL);
+	return (ch->mobdata->hatred != nullptr);
 }
 
 int fears_someone(char_data *ch)
@@ -4873,13 +4873,13 @@ int fears_someone(char_data *ch)
 	if (!IS_MOB(ch))
 		return 0;
 
-	return (ch->mobdata->fears != NULL);
+	return (ch->mobdata->fears != nullptr);
 }
 
 void remove_memory(char_data *ch, char type, char_data *vict)
 {
-	char *temp = NULL;
-	char *curr = NULL;
+	char *temp = nullptr;
+	char *curr = nullptr;
 
 	if (type == 't')
 		ch->hunting = 0;
@@ -4923,7 +4923,7 @@ void remove_memory(char_data *ch, char type, char_data *vict)
 		else
 		{
 			dc_free(ch->mobdata->hatred);
-			ch->mobdata->hatred = NULL;
+			ch->mobdata->hatred = nullptr;
 		}
 	}
 
@@ -4959,7 +4959,7 @@ void remove_memory(char_data *ch, char type)
 	if (type == 'h' && ch->mobdata->hatred)
 	{
 		dc_free(ch->mobdata->hatred);
-		ch->mobdata->hatred = NULL;
+		ch->mobdata->hatred = nullptr;
 	}
 
 	if (type == 'f')
@@ -4968,7 +4968,7 @@ void remove_memory(char_data *ch, char type)
 
 void add_memory(char_data *ch, char *victim, char type)
 {
-	char *buf = NULL;
+	char *buf = nullptr;
 
 	if (!IS_MOB(ch))
 		return;
@@ -5011,7 +5011,7 @@ bool charge_moves(char_data *ch, int skill, double modifier)
 	int amt = skill_cost.find(skill)->second * modifier;
 	int reduce = 0;
 
-	if ((i = has_skill(ch, SKILL_VIGOR)) && skill_success(ch, NULL, SKILL_VIGOR))
+	if ((i = has_skill(ch, SKILL_VIGOR)) && skill_success(ch, nullptr, SKILL_VIGOR))
 	{
 		reduce = number(i / 8, i / 4); // 12-25 @ max skill
 		amt = (amt * reduce) / 100;

@@ -100,7 +100,7 @@ int do_maxes(char_data *ch, char *argument, int cmd)
     return eFAILURE;
   }
   GET_CLASS(ch) = i;
-  if ((classskill = get_skill_list(ch)) == NULL)
+  if ((classskill = get_skill_list(ch)) == nullptr)
     return eFAILURE;
   GET_CLASS(ch) = oclass;
   // Same problem with races... get_max_stat(ch, STRENGTH
@@ -214,7 +214,7 @@ command_return_t do_bestow(char_data *ch, string arg, int cmd)
 // take away a command from a god
 int do_revoke(char_data *ch, char *arg, int cmd)
 {
-  char_data *vict = NULL;
+  char_data *vict = nullptr;
   char buf[MAX_INPUT_LENGTH];
   char command[MAX_INPUT_LENGTH];
   int i;
@@ -237,7 +237,7 @@ int do_revoke(char_data *ch, char *arg, int cmd)
     return eSUCCESS;
   }
 
-  struct char_skill_data *last = NULL;
+  struct char_skill_data *last = nullptr;
 
   if (!strcmp(command, "all"))
   {
@@ -578,7 +578,7 @@ int do_rename_char(char_data *ch, char *arg, int cmd)
   }
   do_name(victim, " %", CMD_DEFAULT);
 
-  struct clan_member_data *pmember = NULL;
+  struct clan_member_data *pmember = nullptr;
 
   if (clan)
   {

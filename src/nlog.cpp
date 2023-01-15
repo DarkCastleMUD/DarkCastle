@@ -71,7 +71,7 @@ char *str_hsh(const char *arg)
   // if(*arg == '\0')
   //  return(nulltree.name);
   if (!arg)
-    return NULL;
+    return nullptr;
 
   for (; current; current = next)
   {
@@ -91,7 +91,7 @@ char *str_hsh(const char *arg)
   current = (struct hash_info *)dc_alloc(1, sizeof(struct hash_info));
 #endif
 
-  current->right = current->left = NULL;
+  current->right = current->left = nullptr;
   if (scratch < 0)
     temp->left = current;
   else

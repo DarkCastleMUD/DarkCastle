@@ -92,7 +92,7 @@ public:
     else
     {
       name = string("Unknown");
-      logf(IMMORTAL, LogChannels::LOG_BUG, "channel_msg::set_name: sender is NULL. type: %d msg: %s", type, msg.c_str());
+      logf(IMMORTAL, LogChannels::LOG_BUG, "channel_msg::set_name: sender is nullptr. type: %d msg: %s", type, msg.c_str());
     }
   }
 
@@ -294,7 +294,7 @@ int do_pray(char_data *ch, char *arg, int cmd)
 
   for (i = descriptor_list; i; i = i->next)
   {
-    if ((i->character == NULL) || (GET_LEVEL(i->character) <= MORTAL))
+    if ((i->character == nullptr) || (GET_LEVEL(i->character) <= MORTAL))
       continue;
     if (!(IS_SET(i->character->misc, LogChannels::LOG_PRAYER)))
       continue;
@@ -872,7 +872,7 @@ command_return_t do_tell(char_data *ch, string argument, int cmd)
   else if (!(vict = get_active_pc_vis(ch, name.c_str())))
   {
     vict = get_pc_vis(ch, name.c_str());
-    if ((vict != NULL) && GET_LEVEL(vict) >= IMMORTAL)
+    if ((vict != nullptr) && GET_LEVEL(vict) >= IMMORTAL)
     {
       send_to_char("That person is busy right now.\r\n", ch);
       send_to_char("Your message has been saved.\r\n", ch);

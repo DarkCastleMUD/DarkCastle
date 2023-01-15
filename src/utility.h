@@ -169,14 +169,14 @@ bool is_hiding(char_data *ch, char_data *vict);
       }                                                                        \
    } while (0)
 
-#define FREE(p)        \
-   do                  \
-   {                   \
-      if ((p) != NULL) \
-      {                \
-         dc_free((p)); \
-         (p) = 0;      \
-      }                \
+#define FREE(p)           \
+   do                     \
+   {                      \
+      if ((p) != nullptr) \
+      {                   \
+         dc_free((p));    \
+         (p) = 0;         \
+      }                   \
    } while (0)
 
 #define ASIZE 32 // don't change unless you want to be screwed
@@ -542,7 +542,7 @@ void send_to_char(string messg, char_data *ch);
 void send_to_char(const char *messg, char_data *ch);
 void send_to_char_nosp(const char *messg, char_data *ch);
 void send_to_char_nosp(QString messg, char_data *ch);
-void send_to_room(string messg, int room, bool awakeonly = false, char_data *nta = NULL);
+void send_to_room(string messg, int room, bool awakeonly = false, char_data *nta = nullptr);
 void record_track_data(char_data *ch, int cmd);
 int write_to_descriptor(int desc, string txt);
 int write_to_descriptor_fd(int desc, char *txt);

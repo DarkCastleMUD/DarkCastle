@@ -79,9 +79,9 @@ void boot_clans(void)
 {
   FILE *fl;
   char buf[1024];
-  clan_data *new_new_clan = NULL;
-  clan_room_data *new_new_room = NULL;
-  clan_member_data *new_new_member = NULL;
+  clan_data *new_new_clan = nullptr;
+  clan_room_data *new_new_room = nullptr;
+  clan_member_data *new_new_member = nullptr;
   int tempint;
   bool skip_clan = false, changes_made = false;
 
@@ -102,13 +102,13 @@ void boot_clans(void)
     new_new_clan = new clan_data;
     new_new_clan->next = 0;
     new_new_clan->tax = 0;
-    new_new_clan->email = NULL;
-    new_new_clan->description = NULL;
-    new_new_clan->login_message = NULL;
-    new_new_clan->death_message = NULL;
-    new_new_clan->logout_message = NULL;
-    new_new_clan->rooms = NULL;
-    new_new_clan->members = NULL;
+    new_new_clan->email = nullptr;
+    new_new_clan->description = nullptr;
+    new_new_clan->login_message = nullptr;
+    new_new_clan->death_message = nullptr;
+    new_new_clan->logout_message = nullptr;
+    new_new_clan->rooms = nullptr;
+    new_new_clan->members = nullptr;
     new_new_clan->acc = 0;
     new_new_clan->amt = 0;
     new_new_clan->leader = fread_word(fl, 1);
@@ -121,7 +121,7 @@ void boot_clans(void)
       skip_clan = true;
     }
 
-    if (get_clan(new_new_clan->number) != NULL)
+    if (get_clan(new_new_clan->number) != nullptr)
     {
       logf(0, LogChannels::LOG_BUG, "Duplicate clan number %d found in ../lib/clan.txt.", new_new_clan->number);
       skip_clan = true;
@@ -269,9 +269,9 @@ void boot_clans(void)
 void save_clans(void)
 {
   FILE *fl;
-  clan_data *pclan = NULL;
-  struct clan_room_data *proom = NULL;
-  struct clan_member_data *pmember = NULL;
+  clan_data *pclan = nullptr;
+  struct clan_room_data *proom = nullptr;
+  struct clan_member_data *pmember = nullptr;
   char buf[MAX_STRING_LENGTH];
   char *x;
   char *targ;
@@ -418,10 +418,10 @@ void save_clans(void)
 
 void delete_clan(const clan_data *currclan)
 {
-  struct clan_room_data *curr_room = NULL;
-  struct clan_room_data *next_room = NULL;
-  struct clan_member_data *curr_member = NULL;
-  struct clan_member_data *next_member = NULL;
+  struct clan_room_data *curr_room = nullptr;
+  struct clan_room_data *next_room = nullptr;
+  struct clan_member_data *curr_member = nullptr;
+  struct clan_member_data *next_member = nullptr;
 
   for (curr_room = currclan->rooms; curr_room; curr_room = next_room)
   {
@@ -450,8 +450,8 @@ void delete_clan(const clan_data *currclan)
 
 void free_clans_from_memory(void)
 {
-  clan_data *currclan = NULL;
-  clan_data *nextclan = NULL;
+  clan_data *currclan = nullptr;
+  clan_data *nextclan = nullptr;
 
   for (currclan = clan_list; currclan; currclan = nextclan)
   {
@@ -474,10 +474,10 @@ void assign_clan_rooms()
 
 struct clan_member_data *get_member(char *strName, int nClanId)
 {
-  clan_data *theClan = NULL;
+  clan_data *theClan = nullptr;
 
   if (!(theClan = get_clan(nClanId)) || !strName)
-    return NULL;
+    return nullptr;
 
   struct clan_member_data *pcurr = theClan->members;
 
@@ -503,7 +503,7 @@ int is_in_clan(clan_data *theClan, char_data *ch)
 
 void remove_clan_member(int clannumber, char_data *ch)
 {
-  clan_data *pclan = NULL;
+  clan_data *pclan = nullptr;
 
   if (!(pclan = get_clan(clannumber)))
     return;
@@ -513,8 +513,8 @@ void remove_clan_member(int clannumber, char_data *ch)
 
 void remove_clan_member(clan_data *theClan, char_data *ch)
 {
-  struct clan_member_data *pcurr = NULL;
-  struct clan_member_data *plast = NULL;
+  struct clan_member_data *pcurr = nullptr;
+  struct clan_member_data *plast = nullptr;
 
   pcurr = theClan->members;
 
@@ -538,7 +538,7 @@ void remove_clan_member(clan_data *theClan, char_data *ch)
 // Add someone.  Just makes the struct, fills it, then calls the other add_clan_member
 void add_clan_member(clan_data *theClan, char_data *ch)
 {
-  struct clan_member_data *pmember = NULL;
+  struct clan_member_data *pmember = nullptr;
 
   if (!ch || !theClan)
   {
@@ -560,7 +560,7 @@ void add_clan_member(clan_data *theClan, char_data *ch)
   pmember->unused3 = 0;
   pmember->time_joined = 0;
   pmember->unused4 = str_dup("");
-  pmember->next = NULL;
+  pmember->next = nullptr;
 
   add_clan_member(theClan, pmember);
 }
@@ -569,8 +569,8 @@ void add_clan_member(clan_data *theClan, char_data *ch)
 // very often, so it's just a linked list sorted by member name
 void add_clan_member(clan_data *theClan, struct clan_member_data *new_new_member)
 {
-  struct clan_member_data *pcurr = NULL;
-  struct clan_member_data *plast = NULL;
+  struct clan_member_data *pcurr = nullptr;
+  struct clan_member_data *plast = nullptr;
   int result = 0;
 
   if (!new_new_member || !theClan)
@@ -588,7 +588,7 @@ void add_clan_member(clan_data *theClan, struct clan_member_data *new_new_member
   if (!theClan->members)
   {
     theClan->members = new_new_member;
-    new_new_member->next = NULL;
+    new_new_member->next = nullptr;
     return;
   }
 
@@ -616,7 +616,7 @@ void add_clan_member(clan_data *theClan, struct clan_member_data *new_new_member
   if (!pcurr)
   { // we hit the end of the list
     plast->next = new_new_member;
-    new_new_member->next = NULL;
+    new_new_member->next = nullptr;
     return;
   }
 
@@ -627,8 +627,8 @@ void add_clan_member(clan_data *theClan, struct clan_member_data *new_new_member
 
 void add_clan(clan_data *new_new_clan)
 {
-  clan_data *pcurr = NULL;
-  clan_data *plast = NULL;
+  clan_data *pcurr = nullptr;
+  clan_data *plast = nullptr;
 
   if (!clan_list)
   {
@@ -735,7 +735,7 @@ void delete_clan(clan_data *dead_clan)
 
 int plr_rights(char_data *ch)
 {
-  struct clan_member_data *pmember = NULL;
+  struct clan_member_data *pmember = nullptr;
 
   if (!ch || !(pmember = get_member(GET_NAME(ch), ch->clan)))
     return false;
@@ -746,7 +746,7 @@ int plr_rights(char_data *ch)
 // see if ch has rights to 'bit' in his clan
 int has_right(char_data *ch, uint32_t bit)
 {
-  struct clan_member_data *pmember = NULL;
+  struct clan_member_data *pmember = nullptr;
 
   if (!ch || !(pmember = get_member(GET_NAME(ch), ch->clan)))
     return false;
@@ -767,10 +767,10 @@ int num_clan_members(clan_data *clan)
 
 clan_data *get_clan(int nClan)
 {
-  clan_data *clan = NULL;
+  clan_data *clan = nullptr;
 
   if (nClan == 0)
-    return NULL;
+    return nullptr;
 
   for (clan = clan_list; clan; clan = clan->next)
     if (nClan == clan->number)
@@ -783,7 +783,7 @@ clan_data *get_clan(char_data *ch)
 {
   if (ch == 0)
   {
-    return NULL;
+    return nullptr;
   }
 
   clan_data *clan;
@@ -793,7 +793,7 @@ clan_data *get_clan(char_data *ch)
       return clan;
 
   ch->clan = 0;
-  return NULL;
+  return nullptr;
 }
 
 char *get_clan_name(int nClan)
@@ -856,7 +856,7 @@ void clan_death(char_data *ch, char_data *killer)
   char buf[400];
   char secondbuf[400];
   clan_data *clan;
-  char *curr = NULL;
+  char *curr = nullptr;
 
   if (!(clan = get_clan(ch->clan)))
   {
@@ -900,7 +900,7 @@ void clan_login(char_data *ch)
 
   char buf[400];
   clan_data *clan;
-  char *curr = NULL;
+  char *curr = nullptr;
 
   if (!(clan = get_clan(ch->clan)))
   {
@@ -945,7 +945,7 @@ void clan_logout(char_data *ch)
 
   char buf[400];
   clan_data *clan;
-  char *curr = NULL;
+  char *curr = nullptr;
 
   if (!(clan = get_clan(ch->clan)))
   {
@@ -1223,7 +1223,7 @@ int clan_desc(char_data *ch, char *arg)
   {
     if (clan->description)
       dc_free(clan->description);
-    clan->description = NULL;
+    clan->description = nullptr;
     send_to_char("Clan description removed.\r\n", ch);
     return 1;
   }
@@ -1239,14 +1239,14 @@ int clan_desc(char_data *ch, char *arg)
 
   /*  if(clan->description)
       dc_free(clan->description);
-    clan->description = NULL;
+    clan->description = nullptr;
   */
   // send_to_char("Write new description.  ~ to end.\r\n", ch);
 
   //  ch->desc->connected = conn::EDITING;
   //  ch->desc->str = &clan->description;
   //  ch->desc->max_str = MAX_CLAN_DESC_LENGTH;
-  ch->desc->backstr = NULL;
+  ch->desc->backstr = nullptr;
   send_to_char("        Write your description and stay within the line.  (/s saves /h for help)\r\n"
                "   |--------------------------------------------------------------------------------|\r\n",
                ch);
@@ -1276,7 +1276,7 @@ int clan_motd(char_data *ch, char *arg)
   {
     if (clan->clanmotd)
       dc_free(clan->clanmotd);
-    clan->clanmotd = NULL;
+    clan->clanmotd = nullptr;
     send_to_char("Clan motd removed.\r\n", ch);
     return 1;
   }
@@ -1292,7 +1292,7 @@ int clan_motd(char_data *ch, char *arg)
 
   /*  if(clan->clanmotd)
       dc_free(clan->clanmotd);
-    clan->clanmotd = NULL;
+    clan->clanmotd = nullptr;
   */
   // send_to_char("Write new motd.  ~ to end.\r\n", ch);
 
@@ -1300,7 +1300,7 @@ int clan_motd(char_data *ch, char *arg)
   // ch->desc->str = &clan->clanmotd;
   // ch->desc->max_str = MAX_CLAN_DESC_LENGTH;
 
-  ch->desc->backstr = NULL;
+  ch->desc->backstr = nullptr;
   send_to_char("        Write your motd and stay within the line.  (/s saves /h for help)\r\n"
                "   |--------------------------------------------------------------------------------|\r\n",
                ch);
@@ -1338,7 +1338,7 @@ int clan_death_message(char_data *ch, char *arg)
     send_to_char("Clan death message removed.\r\n", ch);
     if (clan->death_message)
       dc_free(clan->death_message);
-    clan->death_message = NULL;
+    clan->death_message = nullptr;
     return 1;
   }
 
@@ -1406,7 +1406,7 @@ int clan_logout_message(char_data *ch, char *arg)
     send_to_char("Clan logout message removed.\r\n", ch);
     if (clan->logout_message)
       dc_free(clan->logout_message);
-    clan->logout_message = NULL;
+    clan->logout_message = nullptr;
     return 1;
   }
 
@@ -1462,7 +1462,7 @@ int clan_login_message(char_data *ch, char *arg)
     send_to_char("Clan login message removed.\r\n", ch);
     if (clan->login_message)
       dc_free(clan->login_message);
-    clan->login_message = NULL;
+    clan->login_message = nullptr;
     return 1;
   }
 
@@ -1517,7 +1517,7 @@ int clan_email(char_data *ch, char *arg)
   {
     if (clan->email)
       dc_free(clan->email);
-    clan->email = NULL;
+    clan->email = nullptr;
     send_to_char("Clan email address removed.\r\n", ch);
     return 1;
   }
@@ -1705,7 +1705,7 @@ void do_clan_member_list(char_data *ch)
 
 int is_clan_leader(char_data *ch)
 {
-  clan_data *pclan = NULL;
+  clan_data *pclan = nullptr;
 
   if (!ch || !(pclan = get_clan(ch->clan)))
     return 0;
@@ -1715,8 +1715,8 @@ int is_clan_leader(char_data *ch)
 
 void do_clan_rights(char_data *ch, char *arg)
 {
-  struct clan_member_data *pmember = NULL;
-  char_data *victim = NULL;
+  struct clan_member_data *pmember = nullptr;
+  char_data *victim = nullptr;
   // extern char * clan_rights[]~;
 
   char buf[MAX_STRING_LENGTH];
@@ -1870,7 +1870,7 @@ void do_god_clans(char_data *ch, char *arg, int cmd)
       return;
     }
 
-    if (get_clan(x) != NULL)
+    if (get_clan(x) != nullptr)
     {
       csendf(ch, "%d is an invalid clan number because it already exists.\r\n", x);
       return;
@@ -1885,8 +1885,8 @@ void do_god_clans(char_data *ch, char *arg, int cmd)
     clan->acc = 0;
     clan->rooms = 0;
     clan->next = 0;
-    clan->email = NULL;
-    clan->description = NULL;
+    clan->email = nullptr;
+    clan->description = nullptr;
     add_clan(clan);
     send_to_char("New clan created.\r\n", ch);
     break;
@@ -2632,7 +2632,7 @@ int do_clans(char_data *ch, char *arg, int cmd)
     if (!*buf) // only do this if they want clan rights on themselves
     {
       int bit = -1;
-      struct clan_member_data *pmember = NULL;
+      struct clan_member_data *pmember = nullptr;
 
       if (!(pmember = get_member(ch->name, ch->clan)))
       {
@@ -3074,7 +3074,7 @@ void add_totem_stats(char_data *ch, int stat)
 
 */
 
-struct takeover_pulse_data *pulse_list = NULL;
+struct takeover_pulse_data *pulse_list = nullptr;
 
 int count_plrs(int zone, int clan)
 {
@@ -3205,7 +3205,7 @@ int count_controlled_areas(int clan)
 
 void recycle_pulse_data(struct takeover_pulse_data *pl)
 {
-  struct takeover_pulse_data *plc, *plp = NULL;
+  struct takeover_pulse_data *plc, *plp = nullptr;
   for (plc = pulse_list; plc; plc = plc->next)
   {
     if (plc == pl)
@@ -3697,19 +3697,19 @@ bool others_clan_room(char_data *ch, room_data *room)
 clan_data::clan_data(void)
 {
   balance = 0;
-  leader = NULL;
-  founder = NULL;
-  name = NULL;
-  email = NULL;
-  description = NULL;
-  login_message = NULL;
-  death_message = NULL;
-  logout_message = NULL;
-  clanmotd = NULL;
-  rooms = NULL;
-  members = NULL;
-  next = NULL;
-  acc = NULL;
+  leader = nullptr;
+  founder = nullptr;
+  name = nullptr;
+  email = nullptr;
+  description = nullptr;
+  login_message = nullptr;
+  death_message = nullptr;
+  logout_message = nullptr;
+  clanmotd = nullptr;
+  rooms = nullptr;
+  members = nullptr;
+  next = nullptr;
+  acc = nullptr;
   amt = 0;
   number = 0;
   tax = 0;

@@ -262,7 +262,7 @@ void load_corpses(void)
 	char line[256] = {0};
 	int t[15], zwei = 0;
 	int nr, num_objs = 0;
-	struct obj_data *temp = NULL, *obj = NULL, *next_obj = NULL;
+	struct obj_data *temp = nullptr, *obj = nullptr, *next_obj = nullptr;
 	struct extra_descr_data *new_descr;
 	char buf1[256] = {0}, buf2[256] = {0}, buf3[256] = {0};
 	bool end = false;
@@ -286,7 +286,7 @@ void load_corpses(void)
 
 	while (!feof(fp) && !end)
 	{
-		temp = NULL;
+		temp = nullptr;
 		/* first, we get the number. Not too hard. */
 		if (*line == '|')
 			break;
@@ -352,7 +352,7 @@ void load_corpses(void)
 			{ /* then this is a Xap Obj, requires special care */
 				if (debug == 1)
 					logentry("XAP Found", 0, LogChannels::LOG_MISC);
-				if ((temp->name = fread_string_new(fp, buf2)) == NULL)
+				if ((temp->name = fread_string_new(fp, buf2)) == nullptr)
 				{
 					temp->name = "undefined";
 				}
@@ -365,7 +365,7 @@ void load_corpses(void)
 					}
 				}
 
-				if ((temp->short_description = fread_string_new(fp, buf2)) == NULL)
+				if ((temp->short_description = fread_string_new(fp, buf2)) == nullptr)
 				{
 					temp->short_description = "undefined";
 				}
@@ -378,7 +378,7 @@ void load_corpses(void)
 					}
 				}
 
-				if ((temp->description = fread_string_new(fp, buf2)) == NULL)
+				if ((temp->description = fread_string_new(fp, buf2)) == nullptr)
 				{
 					temp->description = "undefined";
 				}
@@ -391,7 +391,7 @@ void load_corpses(void)
 					}
 				}
 
-				if ((temp->action_description = fread_string_new(fp, buf2)) == NULL)
+				if ((temp->action_description = fread_string_new(fp, buf2)) == nullptr)
 				{
 					temp->action_description = "undefined";
 				}
@@ -437,7 +437,7 @@ void load_corpses(void)
 
 				if (temp->ex_description)
 				{
-					temp->ex_description = NULL;
+					temp->ex_description = nullptr;
 				}
 
 				get_line_new(fp, line);
@@ -495,7 +495,7 @@ void load_corpses(void)
 				if (debug == 1)
 					logentry("XAP NOT Found", 0, LogChannels::LOG_MISC);
 			}
-			if (temp != NULL)
+			if (temp != nullptr)
 			{
 				num_objs++;
 				/* Check if our object is a corpse */
@@ -613,14 +613,14 @@ struct obj_data *read_object_new(int nr, int type)
 	if (nr < 0)
 	{
 		perror("SYSERR: trying to create obj with negative num!");
-		return NULL;
+		return nullptr;
 	}
 	if (type == VIRTUAL)
 	{
 		if ((i = real_object(nr)) < 0)
 		{
 			sprintf(buf, "Object (V) %d does not exist in database.", nr);
-			return NULL;
+			return nullptr;
 		}
 	}
 	else
@@ -654,7 +654,7 @@ char *fread_string_new(FILE *fl, char *error)
 			exit(1);
 		}
 		/* If there is a '~', end the string; else put an "\r\n" over the '\n'. */
-		if ((point = strchr(tmp, '~')) != NULL)
+		if ((point = strchr(tmp, '~')) != nullptr)
 		{
 			*point = '\0';
 			done = 1;
@@ -689,7 +689,7 @@ char *fread_string_new(FILE *fl, char *error)
 		strcpy(rslt, buf);
 	}
 	else
-		rslt = NULL;
+		rslt = nullptr;
 
 	return rslt;
 }

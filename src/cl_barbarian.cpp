@@ -99,7 +99,7 @@ int do_batter(char_data *ch, char *argument, int cmd)
     act("$n takes a deep breath, lets loose a mighty bellow, and charges blindly at the $F in $s path...",
         ch, 0, exit->keyword, TO_ROOM, 0);
 
-    if (!skill_success(ch, NULL, SKILL_BATTERBRACE))
+    if (!skill_success(ch, nullptr, SKILL_BATTERBRACE))
     {
 
       sprintf(dammsg, "$B%d$R", dam);
@@ -125,7 +125,7 @@ int do_batter(char_data *ch, char *argument, int cmd)
     else
     {
       // check for brace
-      if (exit->bracee != NULL)
+      if (exit->bracee != nullptr)
       {
         battervbrace = true;
         int batterer = GET_STR(ch) + GET_CON(ch) + GET_DEX(ch) + number(1, 10);
@@ -243,7 +243,7 @@ int do_brace(char_data *ch, char *argument, int cmd)
 
   if (!*type)
   {
-    if (ch->brace_at != NULL)
+    if (ch->brace_at != nullptr)
     {
       if (cmd == 0)
       {
@@ -254,11 +254,11 @@ int do_brace(char_data *ch, char *argument, int cmd)
         csendf(ch, "You stop holding the %s shut.\r\n", fname(ch->brace_at->keyword));
         act("$n stops holding the $F shut.", ch, 0, ch->brace_at->keyword, TO_ROOM, 0);
       }
-      ch->brace_at->bracee = NULL;
-      ch->brace_at = NULL;
-      if (ch->brace_exit != NULL) // incase it's a weird exit area
-        ch->brace_exit->bracee = NULL;
-      ch->brace_exit = NULL;
+      ch->brace_at->bracee = nullptr;
+      ch->brace_at = nullptr;
+      if (ch->brace_exit != nullptr) // incase it's a weird exit area
+        ch->brace_exit->bracee = nullptr;
+      ch->brace_exit = nullptr;
       return eSUCCESS;
     }
     send_to_char("Brace what??\r\n", ch);
@@ -288,7 +288,7 @@ int do_brace(char_data *ch, char *argument, int cmd)
       send_to_char("You have to close it first!\r\n", ch);
       return eFAILURE;
     }
-    if (exit->bracee != NULL)
+    if (exit->bracee != nullptr)
     {
       if (exit->bracee->in_room == ch->in_room)
       {
@@ -316,7 +316,7 @@ int do_brace(char_data *ch, char *argument, int cmd)
     act("$n leans heavily on the $F, bracing $s shoulder solidly against it...",
         ch, 0, exit->keyword, TO_ROOM, 0);
 
-    if (!skill_success(ch, NULL, SKILL_BATTERBRACE))
+    if (!skill_success(ch, nullptr, SKILL_BATTERBRACE))
     {
       send_to_char("Your attempt to block the passage fails.\r\n", ch);
       act("$s attempt to block the passage fails!", ch, 0, exit->keyword, TO_ROOM, 0);
@@ -462,7 +462,7 @@ int do_battlecry(char_data *ch, char *argument, int cmd)
   if (!charge_moves(ch, SKILL_BATTLECRY))
     return eSUCCESS;
 
-  if (!skill_success(ch, NULL, SKILL_BATTLECRY))
+  if (!skill_success(ch, nullptr, SKILL_BATTLECRY))
   {
     act("You give a cry of defiance, but trip over your own feet!", ch, 0, 0, TO_CHAR, 0);
     act("$n gives a cry of defiance, but trips over $s own feet!", ch, 0, 0, TO_ROOM, 0);
@@ -648,10 +648,10 @@ int do_headbutt(char_data *ch, char *argument, int cmd)
   one_argument(argument, name);
 
   victim = get_char_room_vis(ch, name);
-  if (victim == NULL)
+  if (victim == nullptr)
     victim = ch->fighting;
 
-  if (victim == NULL)
+  if (victim == nullptr)
   {
     send_to_char("Headbutt whom?\n\r", ch);
     return eFAILURE;
@@ -701,9 +701,9 @@ int do_headbutt(char_data *ch, char *argument, int cmd)
 
   if (IS_SET(victim->combat, COMBAT_BERSERK) && (IS_NPC(victim) || has_skill(victim, SKILL_BERSERK) > 80))
   {
-    act("$N shakes off $n's attempt to immobilize them.", ch, NULL, victim, TO_ROOM, NOTVICT);
-    act("$N shakes off your attempt to immobilize them.", ch, NULL, victim, TO_CHAR, NOTVICT);
-    act("In your enraged state, you shake off $n's attempt to immobilize you.", ch, NULL, victim, TO_VICT, 0);
+    act("$N shakes off $n's attempt to immobilize them.", ch, nullptr, victim, TO_ROOM, NOTVICT);
+    act("$N shakes off your attempt to immobilize them.", ch, nullptr, victim, TO_CHAR, NOTVICT);
+    act("In your enraged state, you shake off $n's attempt to immobilize you.", ch, nullptr, victim, TO_VICT, 0);
 
     WAIT_STATE(ch, PULSE_VIOLENCE * 3);
     return eSUCCESS;
@@ -766,9 +766,9 @@ int do_headbutt(char_data *ch, char *argument, int cmd)
       if (!SOMEONE_DIED(retval) && !number(0, 9) &&
           ch->equipment[WEAR_HEAD] && obj_index[ch->equipment[WEAR_HEAD]->item_number].virt == 508)
       {
-        act("$n's spiked helmet crackles as it strikes $N's face!", ch, NULL, victim, TO_ROOM, NOTVICT);
-        act("$n's spiked helmet crackles as it strikes your face!", ch, NULL, victim, TO_VICT, 0);
-        act("Your spiked helmet crackles as it strikes $N's face!", ch, NULL, victim, TO_CHAR, 0);
+        act("$n's spiked helmet crackles as it strikes $N's face!", ch, nullptr, victim, TO_ROOM, NOTVICT);
+        act("$n's spiked helmet crackles as it strikes your face!", ch, nullptr, victim, TO_VICT, 0);
+        act("Your spiked helmet crackles as it strikes $N's face!", ch, nullptr, victim, TO_CHAR, 0);
         //	retval = damage(ch, victim, 50, TYPE_PIERCE, TYPE_UNDEFINED, 0);
         retval = spell_shocking_grasp(50, ch, victim, 0, 60);
         // TWEAKME
@@ -800,16 +800,16 @@ int do_bloodfury(char_data *ch, char *argument, int cmd)
   if (!charge_moves(ch, SKILL_BLOOD_FURY))
     return eSUCCESS;
 
-  if (!skill_success(ch, NULL, SKILL_BLOOD_FURY))
+  if (!skill_success(ch, nullptr, SKILL_BLOOD_FURY))
   {
-    act("$n starts breathing heavily, then chokes and tries to clear $s head.", ch, NULL, NULL, TO_ROOM, NOTVICT);
+    act("$n starts breathing heavily, then chokes and tries to clear $s head.", ch, nullptr, nullptr, TO_ROOM, NOTVICT);
     send_to_char("You try to pysch yourself up and choke on the taste of blood.\r\n", ch);
     duration = 1;
   }
   else
   {
     act("Panting heavily $n's eyes glaze red $e begins to move with renewed fury!",
-        ch, NULL, NULL, TO_ROOM, NOTVICT);
+        ch, nullptr, nullptr, TO_ROOM, NOTVICT);
     send_to_char("Your sight tinges red with the blood of battle and your "
                  "limbs feel strong with death and destruction deep within "
                  "your bones.\r\n",
@@ -849,7 +849,7 @@ int do_crazedassault(char_data *ch, char *argument, int cmd)
   if (!charge_moves(ch, SKILL_CRAZED_ASSAULT))
     return eSUCCESS;
 
-  if (!skill_success(ch, NULL, SKILL_CRAZED_ASSAULT))
+  if (!skill_success(ch, nullptr, SKILL_CRAZED_ASSAULT))
   {
     send_to_char("You try to psyche yourself up for it but just can't muster the concentration.\r\n", ch);
     duration = 1;
@@ -977,7 +977,7 @@ int do_bullrush(char_data *ch, char *argument, int cmd)
   {
     send_to_char("You rush in madly and fail to find your target!\r\n", ch);
     act("$n rushes into the room with nostrils flaring then looks around sheepishly.",
-        ch, NULL, NULL, TO_ROOM, NOTVICT);
+        ch, nullptr, nullptr, TO_ROOM, NOTVICT);
     return eFAILURE;
   }
 
@@ -988,7 +988,7 @@ int do_bullrush(char_data *ch, char *argument, int cmd)
   }
 
   act("$n rushes into the room with an amazingly violent speed!",
-      ch, NULL, NULL, TO_ROOM, NOTVICT);
+      ch, nullptr, nullptr, TO_ROOM, NOTVICT);
   return attack(ch, victim, TYPE_UNDEFINED);
 }
 
@@ -1024,7 +1024,7 @@ int do_ferocity(char_data *ch, char *argument, int cmd)
   if (!charge_moves(ch, SKILL_FEROCITY, grpsize))
     return eSUCCESS;
 
-  if (!skill_success(ch, NULL, SKILL_FEROCITY))
+  if (!skill_success(ch, nullptr, SKILL_FEROCITY))
   {
     send_to_char("Guess you just weren't that angry.\r\n", ch);
     act("$n tries to rile you up but just seems to be pouty.", ch, 0, 0, TO_ROOM, 0);
@@ -1107,10 +1107,10 @@ int do_knockback(char_data *ch, char *argument, int cmd)
 
   victim = get_char_room_vis(ch, who);
 
-  if (victim == NULL)
+  if (victim == nullptr)
     victim = ch->fighting;
 
-  if (victim == NULL)
+  if (victim == nullptr)
   {
     send_to_char("Knockback whom?\n\r", ch);
     return eFAILURE;
@@ -1359,11 +1359,11 @@ int do_primalfury(char_data *ch, char *argument, int cmd)
   af.bitvector = -1;
   affect_to_char(ch, &af);
 
-  if (!skill_success(ch, NULL, SKILL_PRIMAL_FURY))
+  if (!skill_success(ch, nullptr, SKILL_PRIMAL_FURY))
   {
     affect_to_char(ch, &af);
     send_to_char("You attempt to let forth a primal scream, but manage only a squeak...how embarassing!\r\n", ch);
-    act("$n attempts to let forth a primal scream, but manages only a squeak...how embarassing!", ch, NULL, NULL, TO_ROOM, 0);
+    act("$n attempts to let forth a primal scream, but manages only a squeak...how embarassing!", ch, nullptr, nullptr, TO_ROOM, 0);
     GET_MOVE(ch) /= 2;
     return eSUCCESS;
   }
@@ -1384,7 +1384,7 @@ int do_primalfury(char_data *ch, char *argument, int cmd)
   af.bitvector = AFF_PRIMAL_FURY;
   affect_to_char(ch, &af);
 
-  act("$n lets forth a primal scream of anger and begins to fight with terrible fury!", ch, NULL, NULL, TO_ROOM, 0);
+  act("$n lets forth a primal scream of anger and begins to fight with terrible fury!", ch, nullptr, nullptr, TO_ROOM, 0);
   send_to_char("You let forth a primal scream of anger and fall upon your enemies with a terrible fury!\r\n", ch);
 
   return eSUCCESS;

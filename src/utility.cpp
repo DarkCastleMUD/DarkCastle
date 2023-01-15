@@ -79,7 +79,7 @@ extern std::map<int, std::map<uint8_t, std::string>> professions;
 // extern funcs
 clan_data *get_clan(char_data *);
 void release_message(char_data *ch);
-struct timer_data *timer_list = NULL;
+struct timer_data *timer_list = nullptr;
 
 // local funcs
 void update_wizlist(char_data *ch);
@@ -181,7 +181,7 @@ char *index(char *buf, char op)
     }
     i++;
   }
-  return (NULL);
+  return (nullptr);
 }
 #endif
 
@@ -221,7 +221,7 @@ int str_cmp(const char *arg1, const char *arg2)
 
   if (!arg1 || !arg2)
   {
-    logentry("NULL args sent to str_cmp in utility.c!", ANGEL, LogChannels::LOG_BUG);
+    logentry("nullptr args sent to str_cmp in utility.c!", ANGEL, LogChannels::LOG_BUG);
     return 0;
   }
 
@@ -735,7 +735,7 @@ bool file_exists(const char *filename)
 {
   FILE *fp;
 
-  if ((fp = fopen(filename, "r")) == NULL)
+  if ((fp = fopen(filename, "r")) == nullptr)
   {
     return false;
   }
@@ -917,7 +917,7 @@ bool ARE_GROUPED(char_data *sub, char_data *obj)
   if (obj == sub)
     return true;
 
-  if (obj == NULL || sub == NULL)
+  if (obj == nullptr || sub == nullptr)
     return false;
 
   if (IS_PC(sub) &&
@@ -1094,7 +1094,7 @@ bool CAN_SEE_OBJ(char_data *sub, struct obj_data *obj, bool blindfighting)
 
   if (IS_AFFECTED(sub, AFF_BLIND))
   {
-    if (blindfighting && skill_success(sub, NULL, SKILL_BLINDFIGHTING))
+    if (blindfighting && skill_success(sub, nullptr, SKILL_BLINDFIGHTING))
       return true;
     else
       return false;
@@ -1895,7 +1895,7 @@ int do_beep(char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-// if a skill has a valid name, return it, else NULL
+// if a skill has a valid name, return it, else nullptr
 const char *get_skill_name(int skillnum)
 {
 
@@ -1913,7 +1913,7 @@ const char *get_skill_name(int skillnum)
     return set_list[skillnum - BASE_SETS].SetName;
   else if (skillnum >= RESERVED_BASE && skillnum <= RESERVED_MAX)
     return reserved[skillnum - RESERVED_BASE];
-  return NULL;
+  return nullptr;
 }
 
 string double_dollars(string source)
@@ -2177,7 +2177,7 @@ void display_string_list(const char *list[], char_data *ch)
 void check_timer()
 { // Called once/sec
   struct timer_data *curr, *nex, *las;
-  las = NULL;
+  las = nullptr;
   for (curr = timer_list; curr; curr = nex)
   {
     nex = curr->next;
@@ -2286,7 +2286,7 @@ bool is_in_game(char_data *ch)
   // Bug in code if this happens
   if (ch == 0)
   {
-    logentry("NULL args sent to is_pc_playing in utility.c!", ANGEL, LogChannels::LOG_BUG);
+    logentry("nullptr args sent to is_pc_playing in utility.c!", ANGEL, LogChannels::LOG_BUG);
     return false;
   }
 
@@ -2366,7 +2366,7 @@ void remove_character(char *name, BACKUP_TYPE backup)
   char syscmd[512];
   struct stat statbuf;
 
-  if (name == NULL)
+  if (name == nullptr)
   {
     return;
   }
@@ -2444,7 +2444,7 @@ void remove_familiars(char *name, BACKUP_TYPE backup)
   char syscmd[512];
   struct stat statbuf;
 
-  if (name == NULL)
+  if (name == nullptr)
   {
     return;
   }
@@ -2648,8 +2648,8 @@ void unique_scan(char_data *victim)
   if (!victim)
     return;
 
-  struct obj_data *i = NULL;
-  struct obj_data *j = NULL;
+  struct obj_data *i = nullptr;
+  struct obj_data *j = nullptr;
   int k;
   map<int, int> virtnums;
   queue<obj_data *> found_items;
@@ -3050,13 +3050,13 @@ void char_data::setPlayerLastMob(vnum_t mob_vnum)
  */
 bool str_prefix(const char *astr, const char *bstr)
 {
-  if (astr == NULL)
+  if (astr == nullptr)
   {
     logf(IMMORTAL, LogChannels::LOG_WORLD, "Str_prefix: null astr.", 0);
     return true;
   }
 
-  if (bstr == NULL)
+  if (bstr == nullptr)
   {
     logf(IMMORTAL, LogChannels::LOG_WORLD, "Str_prefix: null bstr.", 0);
     return true;

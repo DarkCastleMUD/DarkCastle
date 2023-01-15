@@ -512,7 +512,7 @@ int do_promote(char_data *ch, char *argument, int cmd)
   if (ch->group_name)
   {
     new_new_leader->group_name = ch->group_name;
-    ch->group_name = NULL;
+    ch->group_name = nullptr;
   }
   else
     new_new_leader->group_name = str_dup("I am a dork");
