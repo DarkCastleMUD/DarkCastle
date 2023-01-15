@@ -1148,7 +1148,7 @@ void player_shopping_stock(const char *arg, char_data *ch, char_data *keeper)
   value = atol(price);
   if (value < 1 || value > 20000000)
   {
-    send_to_char("Invalid price.  The price must be between 1 gold and 20 million gold.\r\n", ch);
+    send_to_char("Invalid price.  The price must be between 1 $B$5gold$R and 20 million $B$5gold$R.\r\n", ch);
     return;
   }
 
@@ -1305,7 +1305,7 @@ void player_shopping_withdraw(const char *arg, char_data *ch, char_data *keeper)
 
   shop->money_on_hand -= value;
   GET_GOLD(ch) += value;
-  csendf(ch, "You take %ld gold out of the till.\r\n", value);
+  csendf(ch, "You take %ld $B$5gold$R out of the till.\r\n", value);
   write_one_player_shop(shop);
 }
 

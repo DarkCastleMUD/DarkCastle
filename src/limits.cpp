@@ -629,7 +629,7 @@ void advance_level(char_data *ch, int is_conversion)
 		add_new_vault(GET_NAME(ch), 0);
 	}
 	if (GET_LEVEL(ch) == 11)
-		send_to_char("It now costs you gold every time you recall.\r\n", ch);
+		send_to_char("It now costs you $B$5gold$R every time you recall.\r\n", ch);
 	if (GET_LEVEL(ch) == 20)
 		send_to_char(
 			"You will no longer keep your equipment when you suffer a death to a mob.\n\rThere is now a chance you may lose attribute points when you die to a mob.\n\rRead HELP RDEATH and HELP STAT LOSS for more information.\r\n",
@@ -1055,7 +1055,7 @@ void prepare_character_for_sixty(char_data *ch)
 			int i = (ch->exp / 100000000) * 500000;
 			if (i > 0)
 			{
-				csendf(ch, "$B$3You have been credited %d gold coins for your %lld experience.$R\n\r", i, ch->exp);
+				csendf(ch, "$B$3You have been credited %d $B$5gold$R coins for your %lld experience.$R\n\r", i, ch->exp);
 				ch->gold += i;
 			}
 			else if (ch->exp > 0)

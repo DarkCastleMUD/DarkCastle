@@ -808,7 +808,7 @@ int bank(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
   }
   if ((uint32_t)x > GET_BANK(ch))
   {
-    send_to_char("You don't have that much gold in the bank!\n\r", ch);
+    send_to_char("You don't have that much $B$5gold$R in the bank!\n\r", ch);
     return eSUCCESS;
   }
   GET_GOLD(ch) += x;
@@ -850,7 +850,7 @@ int casino_atm(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
   }
   if ((uint32_t)x > GET_BANK(ch))
   {
-    send_to_char("You don't have that much gold in the bank!\n\r", ch);
+    send_to_char("You don't have that much $B$5gold$R in the bank!\n\r", ch);
     return eSUCCESS;
   }
   GET_GOLD(ch) += x;
@@ -3358,7 +3358,7 @@ void do_talking_init()
   sword_non_combat.push_back(buf);
   buf = "Would you just stab him in the back and put me out of this misery?";
   sword_non_combat.push_back(buf);
-  buf = "10,000 gold if you pinch his ass right now.";
+  buf = "10,000 $B$5gold$R if you pinch his ass right now.";
   sword_non_combat.push_back(buf);
   buf = "Seriously. How can you stand grouping with this moron?";
   sword_non_combat.push_back(buf);

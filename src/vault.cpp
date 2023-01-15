@@ -244,9 +244,9 @@ void vault_balance(char_data *ch, char *owner)
   }
 
   if (self)
-    csendf(ch, "You have %llu gold coins in your vault.\r\n", vault->gold);
+    csendf(ch, "You have %llu $B$5gold$R coins in your vault.\r\n", vault->gold);
   else
-    csendf(ch, "There are %llu gold coins in %s's vault.\r\n", vault->gold, owner);
+    csendf(ch, "There are %llu $B$5gold$R coins in %s's vault.\r\n", vault->gold, owner);
 }
 
 char *vault_usage = "Syntax: vault <list | balance> [vault owner]\r\n"
@@ -384,7 +384,7 @@ int do_vault(char_data *ch, char *argument, int cmd)
       strcpy(arg2, clanVName(ch->clan));
     if (!*argument)
     {
-      send_to_char("How much gold would you like get from the vault?\r\n", ch);
+      send_to_char("How much $B$5gold$R would you like get from the vault?\r\n", ch);
       return eSUCCESS;
     }
     else if (!*arg2)
@@ -398,7 +398,7 @@ int do_vault(char_data *ch, char *argument, int cmd)
       strcpy(arg2, clanVName(ch->clan));
     if (!*argument)
     {
-      send_to_char("How much gold would you like to place in the vault?\r\n", ch);
+      send_to_char("How much $B$5gold$R would you like to place in the vault?\r\n", ch);
       return eSUCCESS;
     }
     else if (!*arg2)
@@ -1523,7 +1523,7 @@ void vault_deposit(char_data *ch, unsigned int amount, char *owner)
 
   if (!has_vault_access(GET_NAME(ch), vault))
   {
-    csendf(ch, "You don't have permission to put gold in %s's vault.\r\n", owner);
+    csendf(ch, "You don't have permission to put $B$5gold$R in %s's vault.\r\n", owner);
     return;
   }
 
@@ -1547,11 +1547,11 @@ void vault_deposit(char_data *ch, unsigned int amount, char *owner)
     save_vault(owner);
     sprintf(buf, "%s added %d gold to %s's vault.", GET_NAME(ch), amount, owner);
     vlog(buf, owner);
-    csendf(ch, "Done!  The current balance is now %llu gold.\r\n", vault->gold);
+    csendf(ch, "Done!  The current balance is now %llu $B$5gold$R.\r\n", vault->gold);
   }
   else
   {
-    csendf(ch, "But you only have %lld gold coins!\r\n", GET_GOLD(ch));
+    csendf(ch, "But you only have %lld $B$5gold$R coins!\r\n", GET_GOLD(ch));
   }
 }
 
@@ -1582,7 +1582,7 @@ void vault_withdraw(char_data *ch, unsigned int amount, char *owner)
 
   if (!amount)
   {
-    send_to_char("How much gold would you like get from the vault?\r\n", ch);
+    send_to_char("How much $B$5gold$R would you like get from the vault?\r\n", ch);
     return;
   }
 
@@ -1608,7 +1608,7 @@ void vault_withdraw(char_data *ch, unsigned int amount, char *owner)
   }
   else
   {
-    csendf(ch, "The vault only has %llu gold coins in it!\r\n", vault->gold);
+    csendf(ch, "The vault only has %llu $B$5gold$R coins in it!\r\n", vault->gold);
   }
 }
 

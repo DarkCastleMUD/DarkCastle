@@ -1187,7 +1187,7 @@ int meta_dude(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
 			}
 			if (IS_MOB(ch))
 			{
-				send_to_char("What would you have to spend gold on chode?\r\n", ch);
+				send_to_char("What would you have to spend $B$5gold$R on chode?\r\n", ch);
 				return eSUCCESS;
 			}
 

@@ -148,7 +148,7 @@ int do_sacrifice(char_data *ch, char *argument, int cmd)
   }
 
   act("$n sacrifices $p to $s god.", ch, obj, 0, TO_ROOM, 0);
-  act("You sacrifice $p to the gods and receive one gold coin.", ch, obj, 0, TO_CHAR, 0);
+  act("You sacrifice $p to the gods and receive one $B$5gold$R coin.", ch, obj, 0, TO_CHAR, 0);
   GET_GOLD(ch) += 1;
   log_sacrifice(ch, obj);
   extract_obj(obj);

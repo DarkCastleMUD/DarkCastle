@@ -243,7 +243,7 @@ void get(char_data *ch, struct obj_data *obj_object, struct obj_data *sub_object
       }
       else
       {
-        csendf(ch, "Your clan taxes you %d gold, leaving %d gold for you.\r\n", cgold, obj_object->obj_flags.value[0]);
+        csendf(ch, "Your clan taxes you %d $B$5gold$R, leaving %d $B$5gold$R for you.\r\n", cgold, obj_object->obj_flags.value[0]);
       }
       save_clans();
     }
@@ -259,7 +259,7 @@ void get(char_data *ch, struct obj_data *obj_object, struct obj_data *sub_object
 
     if (tax)
     {
-      buffer = fmt::format("{}. {} gold remaining.\r\n", buffer, obj_object->obj_flags.value[0]);
+      buffer = fmt::format("{}. {} $B$5gold$R remaining.\r\n", buffer, obj_object->obj_flags.value[0]);
     }
     else
     {
@@ -1676,7 +1676,7 @@ int do_give(char_data *ch, char *argument, int cmd)
             pluralize(amount), GET_NAME(vict));
     logentry(buf, IMPLEMENTER, LogChannels::LOG_OBJECTS);
 
-    sprintf(buf, "%s gives you %lld gold coin%s.", PERS(ch, vict), amount,
+    sprintf(buf, "%s gives you %lld $B$5gold$R coin%s.", PERS(ch, vict), amount,
             amount == 1 ? "" : "s");
     act(buf, ch, 0, vict, TO_VICT, INVIS_NULL);
     act("$n gives some gold to $N.", ch, 0, vict, TO_ROOM, INVIS_NULL | NOTVICT);
@@ -1693,7 +1693,7 @@ int do_give(char_data *ch, char *argument, int cmd)
     if (GET_GOLD(ch) < 0)
     {
       GET_GOLD(ch) = 0;
-      send_to_char("Warning:  You are giving out more gold than you had.\r\n", ch);
+      send_to_char("Warning:  You are giving out more $B$5gold$R than you had.\r\n", ch);
       if (GET_LEVEL(ch) < IMPLEMENTER)
       {
         sprintf(buf, "%s gives %lld coins to %s (negative!)", GET_NAME(ch),

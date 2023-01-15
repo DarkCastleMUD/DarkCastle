@@ -1325,7 +1325,7 @@ int do_pocket(char_data *ch, char *argument, int cmd)
 
   if (check_make_camp(ch->in_room))
   {
-    send_to_char("You can't pocket gold while inside of a camp!\n\r", ch);
+    send_to_char("You can't pocket $B$5gold$R while inside of a camp!\n\r", ch);
     return eFAILURE;
   }
 
@@ -1373,7 +1373,7 @@ int do_pocket(char_data *ch, char *argument, int cmd)
     if (number(0, 6))
     {
       act("You discover that $n has $s hands in your wallet.", ch, 0, victim, TO_VICT, 0);
-      act("$n tries to steal gold from $N.", ch, 0, victim, TO_ROOM, NOTVICT | INVIS_NULL);
+      act("$n tries to steal $B$5gold$R from $N.", ch, 0, victim, TO_ROOM, NOTVICT | INVIS_NULL);
       REMBIT(ch->affected_by, AFF_HIDE);
     }
     else
@@ -1402,7 +1402,7 @@ int do_pocket(char_data *ch, char *argument, int cmd)
       if (GET_POS(victim) <= POSITION_SLEEPING || IS_AFFECTED(victim, AFF_PARALYSIS))
         _exp = 0;
 
-      sprintf(buf, "Nice work! You pilfered %d gold coins.\r\n", gold);
+      sprintf(buf, "Nice work! You pilfered %d $B$5gold$R coins.\r\n", gold);
       send_to_char(buf, ch);
       if (_exp && _exp > 1)
       {
@@ -1705,10 +1705,10 @@ int do_slip(char_data *ch, char *argument, int cmd)
         special_log(buf);
       }
 
-      sprintf(buf, "%s slips you %d gold coins.\r\n", PERS(ch, vict),
+      sprintf(buf, "%s slips you %d $B$5gold$R coins.\r\n", PERS(ch, vict),
               amount);
       act(buf, ch, 0, vict, TO_VICT, GODS);
-      act("$n slips some gold to $N.", ch, 0, vict, TO_ROOM, GODS | NOTVICT);
+      act("$n slips some $B$5gold$R to $N.", ch, 0, vict, TO_ROOM, GODS | NOTVICT);
 
       sprintf(buf, "%s slips %d coins to %s", GET_NAME(ch), amount,
               GET_NAME(vict));
@@ -2329,7 +2329,7 @@ int do_appraise(char_data *ch, char *argument, int cmd)
     else if (found)
       sprintf(buf, "After some consideration, you estimate the value of %s to be %d.\r\n", GET_OBJ_SHORT(obj), appraised);
     else
-      sprintf(buf, "After some consideration, you estimate the amount of gold %s is carrying to be %d.\r\n", GET_NAME(victim), appraised);
+      sprintf(buf, "After some consideration, you estimate the amount of $B$5gold$R %s is carrying to be %d.\r\n", GET_NAME(victim), appraised);
     send_to_char(buf, ch);
     WAIT_STATE(ch, (int)(PULSE_VIOLENCE * 1.5));
   }

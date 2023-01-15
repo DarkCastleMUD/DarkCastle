@@ -212,18 +212,18 @@ command_return_t char_data::do_split(QStringList &arguments, int cmd)
   gold -= amount;
   save(666);
 
-  send(QString("You split %L1 gold coins. Your share is %L2 gold coins.\r\n").arg(amount).arg(share + extra));
+  send(QString("You split %L1 $B$5gold$R coins. Your share is %L2 gold coins.\r\n").arg(amount).arg(share + extra));
   gold += share + extra;
 
   if (k != this && k->in_room == in_room)
   {
-    k->send(QString("%1 splits %L2 gold coins. Your share is %L3 gold coins.\r\n").arg(GET_SHORT(this)).arg(amount).arg(share));
+    k->send(QString("%1 splits %L2 $B$5gold$R coins. Your share is %L3 $B$5gold$R coins.\r\n").arg(GET_SHORT(this)).arg(amount).arg(share));
     int lost = 0;
     if (k->clan && get_clan(k)->tax && !IS_SET(GET_TOGGLES(k), PLR_NOTAX) &&
         (k->clan != clan || (k->clan == clan && IS_SET(GET_TOGGLES(this), PLR_NOTAX))))
     {
       lost = (int)((float)share * (float)((float)get_clan(k)->tax / 100));
-      k->send(QString("Your clan taxes %1 gold of your share.\r\n").arg(lost));
+      k->send(QString("Your clan taxes %L1 $B$5gold$R of your share.\r\n").arg(lost));
       get_clan(k)->cdeposit(lost);
       save_clans();
     }
@@ -236,7 +236,7 @@ command_return_t char_data::do_split(QStringList &arguments, int cmd)
         f->follower != this &&
         !IS_MOB(f->follower))
     {
-      f->follower->send(QString("%1 splits %L2 gold coins. Your share is %L3 gold coins.\r\n").arg(GET_SHORT(this)).arg(amount).arg(share));
+      f->follower->send(QString("%1 splits %L2 $B$5gold$R coins. Your share is %L3 $B$5gold$R coins.\r\n").arg(GET_SHORT(this)).arg(amount).arg(share));
       int lost = 0;
       if (f->follower->clan && get_clan(f->follower)->tax && !IS_SET(GET_TOGGLES(f->follower), PLR_NOTAX) &&
           (f->follower->clan != clan || (f->follower->clan == clan && IS_SET(GET_TOGGLES(this), PLR_NOTAX))))

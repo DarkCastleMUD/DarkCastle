@@ -517,7 +517,7 @@ void AuctionHouse::Identify(char_data *ch, unsigned int ticket)
 
   if (GET_GOLD(ch) < 6000)
   {
-    send_to_char("The broker charges 6000 gold to identify items.\r\n", ch);
+    send_to_char("The broker charges 6000 $B$5gold$R to identify items.\r\n", ch);
     return;
   }
 
@@ -1388,8 +1388,8 @@ void AuctionHouse::RemoveTicket(char_data *ch, unsigned int ticket)
     unsigned int fee = (unsigned int)((double)Item_it->second.price * 0.025);
     if (fee > 500000)
       fee = 500000;
-    csendf(ch, "The Broker hands you %u gold coins from your sale of %s.\r\n"
-               "He pockets %u gold as a broker's fee.\r\n",
+    csendf(ch, "The Broker hands you %u $B$5gold$R coins from your sale of %s.\r\n"
+               "He pockets %u $B$5gold$R as a broker's fee.\r\n",
            (Item_it->second.price - fee), Item_it->second.item_name.c_str(), fee);
     TaxCollected += fee;
     Revenue -= fee;
@@ -1744,12 +1744,12 @@ void AuctionHouse::AddItem(char_data *ch, obj_data *obj, unsigned int price, str
   {
     if (GET_GOLD(ch) < 500000)
     {
-      send_to_char("You do not have the 500,000 gold required to sell an item privately.\r\n", ch);
+      send_to_char("You do not have the 500,000 $B$5gold$R required to sell an item privately.\r\n", ch);
       return;
     }
 
     GET_GOLD(ch) -= 500000;
-    send_to_char("The Consignment Broker takes 500,000 gold from you as a cost for selling something privately.\r\n", ch);
+    send_to_char("The Consignment Broker takes 500,000 $B$5gold$R from you as a cost for selling something privately.\r\n", ch);
   }
 
   ItemsPosted += 1;
@@ -1796,7 +1796,7 @@ void AuctionHouse::AddItem(char_data *ch, obj_data *obj, unsigned int price, str
     char_data *Broker = find_mob_in_room(ch, 5258);
     if (Broker)
     {
-      snprintf(auc_buf, MAX_STRING_LENGTH, "$7$B%s has just posted $R%s $7$Bfor sale for %u gold coins.",
+      snprintf(auc_buf, MAX_STRING_LENGTH, "$7$B%s has just posted $R%s $7$Bfor sale for %u $B$5gold$R coins.",
                GET_SHORT(ch), obj->short_description, price);
       do_auction(Broker, auc_buf, CMD_DEFAULT);
     }
