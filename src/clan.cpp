@@ -21,6 +21,7 @@ uint64_t i = UINT64_MAX;
 #include <locale>
 
 #include <fmt/format.h>
+#include <QFile>
 
 #include "fileinfo.h"
 #include "db.h" // real_room
@@ -2551,25 +2552,20 @@ void do_leader_clans(char_data *ch, char *arg, int cmd)
   }
 }
 
-void log_clan(char_data *ch, char *buf)
+void clan_data::log(QString log_entry)
 {
-  stringstream fname;
-  ofstream fout;
-  fout.exceptions(ofstream::failbit | ofstream::badbit);
+  QString clan_filename = QString("../lib/clans/clan%1.log").arg(number);
+  QFile file(clan_filename);
 
-  try
+  if (!file.open(QIODeviceBase::Append | QIODeviceBase::Text))
   {
-    fname << "../lib/clans/clan" << ch->clan << ".log";
-    fout.open(fname.str().c_str(), ios_base::app);
-    fout << buf;
-    fout.close();
+    qCritical() << "Unable to open" << clan_filename;
+    return;
   }
-  catch (ofstream::failure &e)
-  {
-    stringstream errormsg;
-    errormsg << "Exception while writing to " << fname.str() << ".";
-    logentry(errormsg.str().c_str(), 108, LogChannels::LOG_MISC);
-  }
+
+  QTextStream out(&file);
+  out << log_entry;
+  file.close();
 }
 
 void show_clan_log(char_data *ch)
@@ -2828,64 +2824,69 @@ int do_ctax(char_data *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-int do_cdeposit(char_data *ch, char *arg, int cmd)
+// This command deposits gold into a clan bank account
+command_return_t char_data::do_cdeposit(QStringList &arguments, int cmd)
 {
-  char arg1[MAX_INPUT_LENGTH];
-  if (!ch->clan)
-  {
-    send_to_char("You not a member of a clan.\r\n", ch);
-    return eFAILURE;
-  }
-  /*  if (!has_right(ch, CLAN_RIGHTS_DEPOSIT))
-    {
-       send_to_char("You don't have the right to .\r\n",ch);
-       return eFAILURE;
-    }*/
-  if (affected_by_spell(ch, FUCK_GTHIEF))
-  {
-    send_to_char("Launder your money elsewhere, thief!\r\n", ch);
-    return eFAILURE;
-  }
-  if (world[ch->in_room].number != 3005)
-  {
-    send_to_char("This can only be done at the Sorpigal bank.\r\n", ch);
-    return eFAILURE;
-  }
-  arg = one_argument(arg, arg1);
-  if (!is_number(arg1))
-  {
-    send_to_char("How much do you want to deposit?\r\n", ch);
-    return eFAILURE;
-  }
-  unsigned int dep = atoi(arg1);
-  if (GET_GOLD(ch) < dep || dep < 0)
-  {
-    send_to_char("You don't have that much gold.\r\n", ch);
-    return eFAILURE;
-  }
-  GET_GOLD(ch) -= dep;
-  get_clan(ch)->cdeposit(dep);
-  if (dep == 1)
-  {
-    csendf(ch, "You deposit 1 $B$5gold$R coin into your clan's account.\r\n");
-  }
-  else
-  {
-    ch->send(fmt::format(locale("en_US.UTF-8"), "You deposit {:L} $B$5gold$R coins into your clan's account.\r\n", dep));
-  }
-  save_clans();
-  ch->save(0);
+  QString arg1;
 
-  char buf[MAX_INPUT_LENGTH];
-  if (dep == 1)
+  if (clan == 0)
   {
-    snprintf(buf, MAX_INPUT_LENGTH, "%s deposited 1 gold coin in the clan bank account.\r\n", ch->name);
+    send("You are not a member of a clan.\r\n");
+    return eFAILURE;
   }
-  else
+
+  if (affected_by_spell(this, FUCK_GTHIEF))
   {
-    snprintf(buf, MAX_INPUT_LENGTH, "%s deposited %d gold coins in the clan bank account.\r\n", ch->name, dep);
+    send("Launder your money elsewhere, thief!\r\n");
+    return eFAILURE;
   }
-  log_clan(ch, buf);
+
+  if (world[in_room].number != DC::SORPIGAL_BANK_ROOM)
+  {
+    send("This can only be done at the Sorpigal bank.\r\n");
+    return eFAILURE;
+  }
+
+  if (arguments.isEmpty())
+  {
+    send("Usage: cdeposit <number>\r\n");
+    return eFAILURE;
+  }
+
+  arg1 = arguments.at(0);
+  bool ok = false;
+  gold_t dep = arg1.toULongLong(&ok);
+  if (ok == false)
+  {
+    send("How much do you want to deposit?\r\n");
+    return eFAILURE;
+  }
+
+  if (GET_GOLD(this) < dep)
+  {
+    send(QString("You don't have %L1 $B$5gold$R coins to deposit into your clan account.\r\n").arg(dep));
+    send(QString("You only have %L1 $B$5gold$R coins on you.\r\n").arg(GET_GOLD(this)));
+    return eFAILURE;
+  }
+
+  GET_GOLD(this) -= dep;
+  save(666);
+  get_clan(this)->cdeposit(dep);
+  save_clans();
+
+  QString coin = "coin";
+  if (dep > 1)
+  {
+    coin = "coins";
+  }
+
+  send(QString("You deposit %L1 $B$5gold$R %2 into your clan's account.\r\n").arg(dep).arg(coin));
+  QString log_entry = QString("%1 deposited %L2 $B$5gold$R %3 in the clan bank account.\r\n").arg(name).arg(dep).arg(coin);
+  clan_data *clan = get_clan(this->clan);
+  if (clan != nullptr)
+  {
+    clan->log(log_entry);
+  }
 
   return eSUCCESS;
 }
@@ -2900,10 +2901,10 @@ int do_cwithdraw(char_data *ch, char *arg, int cmd)
   }
   if (!has_right(ch, CLAN_RIGHTS_WITHDRAW) && GET_LEVEL(ch) < 108)
   {
-    send_to_char("You don't have the right to withdraw gold from your clan's account.\r\n", ch);
+    send_to_char("You don't have the right to withdraw $B$5gold$R from your clan's account.\r\n", ch);
     return eFAILURE;
   }
-  if (world[ch->in_room].number != 3005)
+  if (world[ch->in_room].number != DC::SORPIGAL_BANK_ROOM)
   {
     send_to_char("This can only be done at the Sorpigal bank.\r\n", ch);
     return eFAILURE;
@@ -2925,11 +2926,11 @@ int do_cwithdraw(char_data *ch, char *arg, int cmd)
   get_clan(ch)->cwithdraw(wdraw);
   if (wdraw == 1)
   {
-    csendf(ch, "You withdraw 1 gold coin.\r\n", wdraw);
+    csendf(ch, "You withdraw 1 $B$5gold$R coin.\r\n", wdraw);
   }
   else
   {
-    csendf(ch, "You withdraw %d gold coins.\r\n", wdraw);
+    csendf(ch, "You withdraw %d $B$5gold$R coins.\r\n", wdraw);
   }
   save_clans();
   ch->save(0);
@@ -2937,13 +2938,17 @@ int do_cwithdraw(char_data *ch, char *arg, int cmd)
   char buf[MAX_INPUT_LENGTH];
   if (wdraw == 1)
   {
-    snprintf(buf, MAX_INPUT_LENGTH, "%s withdrew 1 gold coin from the clan bank account.\r\n", ch->name);
+    snprintf(buf, MAX_INPUT_LENGTH, "%s withdrew 1 $B$5gold$R coin from the clan bank account.\r\n", ch->name);
   }
   else
   {
-    snprintf(buf, MAX_INPUT_LENGTH, "%s withdrew %llu gold coins from the clan bank account.\r\n", ch->name, wdraw);
+    snprintf(buf, MAX_INPUT_LENGTH, "%s withdrew %llu $B$5gold$R coins from the clan bank account.\r\n", ch->name, wdraw);
   }
-  log_clan(ch, buf);
+  clan_data *clan = get_clan(ch);
+  if (clan != nullptr)
+  {
+    clan->log(buf);
+  }
 
   return eSUCCESS;
 }
@@ -2955,7 +2960,7 @@ int do_cbalance(char_data *ch, char *arg, int cmd)
     send_to_char("You not a member of a clan.\r\n", ch);
     return eFAILURE;
   }
-  if (world[ch->in_room].number != 3005)
+  if (world[ch->in_room].number != DC::SORPIGAL_BANK_ROOM)
   {
     send_to_char("This can only be done at the Sorpigal bank.\r\n", ch);
     return eFAILURE;
@@ -2969,7 +2974,7 @@ int do_cbalance(char_data *ch, char *arg, int cmd)
   stringstream ss;
   ss.imbue(locale("en_US"));
   ss << get_clan(ch)->getBalance();
-  csendf(ch, "Your clan has %s gold coins in the bank.\r\n", ss.str().c_str());
+  csendf(ch, "Your clan has %s $B$5gold$R coins in the bank.\r\n", ss.str().c_str());
   return eSUCCESS;
 }
 
@@ -3537,7 +3542,7 @@ command_return_t char_data::do_clanarea(QStringList &arguments, int cmd)
 
     if (DC::getInstance()->zones.value(world[in_room].zone).gold == 0)
     {
-      send_to_char("There is no gold to collect.\r\n", this);
+      send_to_char("There is no $B$5gold$R to collect.\r\n", this);
       return eFAILURE;
     }
     if (!can_collect(world[in_room].zone))
@@ -3546,7 +3551,7 @@ command_return_t char_data::do_clanarea(QStringList &arguments, int cmd)
       return eFAILURE;
     }
     get_clan(this)->cdeposit(DC::getInstance()->zones.value(world[in_room].zone).gold);
-    csendf(this, "You collect %d gold for your clan's treasury.\r\n",
+    csendf(this, "You collect %d $B$5gold$R for your clan's treasury.\r\n",
            DC::getInstance()->zones.value(world[in_room].zone).gold);
 
     DC::setZoneClanGold(world[in_room].zone, 0);

@@ -73,6 +73,7 @@ public:
   uint64_t getBalance(void);
   void setBalance(const uint64_t &value);
   std::queue<std::string> ctell_history;
+  void log(QString log_entry);
 
 private:
   uint64_t balance;
@@ -102,7 +103,6 @@ void remove_clan_member(int clannumber, char_data *ch);
 void free_member(struct clan_member_data *member);
 struct clan_member_data *get_member(char *strName, int nClanId);
 void show_clan_log(char_data *ch);
-void log_clan(char_data *ch, char *buffer);
 void clan_death(char_data *ch, char_data *killer);
 
 #endif /* CLAN_H_ */
