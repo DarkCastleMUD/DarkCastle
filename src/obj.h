@@ -196,67 +196,67 @@ typedef uint64_t room_t;
 
 struct active_object
 {
-    struct obj_data *obj;
-    struct active_object *next;
+    struct obj_data *obj = {};
+    struct active_object *next = {};
 };
 
 struct extra_descr_data
 {
-    char *keyword;                 /* Keyword in look/examine          */
-    char *description;             /* What to see                      */
-    struct extra_descr_data *next; /* Next in list                     */
+    char *keyword = {};                 /* Keyword in look/examine          */
+    char *description = {};             /* What to see                      */
+    struct extra_descr_data *next = {}; /* Next in list                     */
 };
 
 #define OBJ_NOTIMER -7000000
 
 struct obj_flag_data
 {
-    int32_t value[4];     /* Values of the item (see list)    */
-    uint8_t type_flag;    /* Type of item                     */
-    uint32_t wear_flags;  /* Where you can wear it            */
-    uint16_t size;        /* Race restrictions                */
-    uint32_t extra_flags; /* If it hums, glows etc            */
-    int16_t weight;       /* Weight what else                 */
-    int32_t cost;         /* Value when sold (gp.)            */
-    uint32_t more_flags;  /* A second bitvector (extra_flags2)*/
-    int16_t eq_level;     /* Min level to use it for eq       */
-    int16_t timer;        /* Timer for object                 */
-    char_data *origin;    /* Creator of object, previously was stored at value[3] */
+    int32_t value[4] = {};     /* Values of the item (see list)    */
+    uint8_t type_flag = {};    /* Type of item                     */
+    uint32_t wear_flags = {};  /* Where you can wear it            */
+    uint16_t size = {};        /* Race restrictions                */
+    uint32_t extra_flags = {}; /* If it hums, glows etc            */
+    int16_t weight = {};       /* Weight what else                 */
+    int32_t cost = {};         /* Value when sold (gp.)            */
+    uint32_t more_flags = {};  /* A second bitvector (extra_flags2)*/
+    int16_t eq_level = {};     /* Min level to use it for eq       */
+    int16_t timer = {};        /* Timer for object                 */
+    char_data *origin = {};    /* Creator of object, previously was stored at value[3] */
 };
 
 struct obj_affected_type
 {
-    int32_t location; /* Which ability to change (APPLY_XXX) */
-    int32_t modifier; /* How much it changes by              */
+    int32_t location = {}; /* Which ability to change (APPLY_XXX) */
+    int32_t modifier = {}; /* How much it changes by              */
 };
 
 /* ======================== Structure for object ========================= */
 struct obj_data
 {
-    int32_t item_number;     /* Where in data-base               */
-    room_t in_room;          /* In what room -1 when conta/carr  */
-    int vroom;               /* for corpse saving */
-    obj_flag_data obj_flags; /* Object information               */
-    int16_t num_affects;
-    obj_affected_type *affected; /* Which abilities in PC to change  */
+    int32_t item_number = {};     /* Where in data-base               */
+    room_t in_room = {};          /* In what room -1 when conta/carr  */
+    int vroom = {};               /* for corpse saving */
+    obj_flag_data obj_flags = {}; /* Object information               */
+    int16_t num_affects = {};
+    obj_affected_type *affected = {}; /* Which abilities in PC to change  */
 
-    char *name;                       /* Title of object :get etc.        */
-    char *description;                /* When in room                     */
-    char *short_description;          /* when worn/carry/in cont.         */
-    char *action_description;         /* What to write when used          */
-    extra_descr_data *ex_description; /* extra descriptions     */
-    char_data *carried_by;            /* Carried by :NULL in room/conta   */
-    char_data *equipped_by;           /* so I can access the player :)    */
+    char *name = {};                       /* Title of object :get etc.        */
+    char *description = {};                /* When in room                     */
+    char *short_description = {};          /* when worn/carry/in cont.         */
+    char *action_description = {};         /* What to write when used          */
+    extra_descr_data *ex_description = {}; /* extra descriptions     */
+    char_data *carried_by = {};            /* Carried by :NULL in room/conta   */
+    char_data *equipped_by = {};           /* so I can access the player :)    */
 
-    obj_data *in_obj;   /* In what object NULL when none    */
-    obj_data *contains; /* Contains objects                 */
+    obj_data *in_obj = {};   /* In what object NULL when none    */
+    obj_data *contains = {}; /* Contains objects                 */
 
-    obj_data *next_content; /* For 'contains' lists             */
-    obj_data *next;         /* For the object list              */
-    obj_data *next_skill;
-    table_data *table;
-    machine_data *slot;
-    wheel_data *wheel;
+    obj_data *next_content = {}; /* For 'contains' lists             */
+    obj_data *next = {};         /* For the object list              */
+    obj_data *next_skill = {};
+    table_data *table = {};
+    machine_data *slot = {};
+    wheel_data *wheel = {};
     time_t save_expiration = {};
     time_t no_sell_expiration = {};
 
@@ -299,12 +299,12 @@ struct obj_data
 
 struct obj_file_elem
 {
-    int16_t version;
-    int32_t item_number;
-    int16_t timer;
-    int16_t wear_pos;
-    int16_t container_depth;
-    int32_t other[5]; // unused
+    int16_t version = {};
+    int32_t item_number = {};
+    int16_t timer = {};
+    int16_t wear_pos = {};
+    int16_t container_depth = {};
+    int32_t other[5] = {}; // unused
 };
 
 // functions from objects.cpp
