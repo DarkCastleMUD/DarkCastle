@@ -1,7 +1,7 @@
 
 #ifndef CHARACTER_H_
 #define CHARACTER_H_
-struct Character;
+class Character;
 /******************************************************************************
 | $Id: character.h,v 1.85 2014/07/26 23:21:23 jhhudso Exp $
 | Description: This file contains the header information for the character
@@ -35,7 +35,7 @@ struct Character;
 #include "interp.h"
 #include "utility.h"
 
-struct Character;
+class Character;
 
 struct strcasecmp_compare
 {
@@ -361,8 +361,9 @@ private:
 // This contains all memory items for a player/mob
 // All non-specific data is held in this structure
 // PC/MOB specific data are held in the appropriate pointed-to structs
-struct Character
+class Character
 {
+public:
     struct mob_data *mobdata = nullptr;
     struct pc_data *pcdata = nullptr;
     struct obj_data *objdata = nullptr;

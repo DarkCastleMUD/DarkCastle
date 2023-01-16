@@ -67,7 +67,7 @@ struct pulse_info
 // void     write_to_output(const char *txt, struct descriptor_data *d);
 void write_to_output(string txt, struct descriptor_data *d);
 void scramble_text(char *txt);
-void warn_if_duplicate_ip(struct Character *ch);
+void warn_if_duplicate_ip(Character *ch);
 void record_msg(string messg, Character *ch);
 int write_hotboot_file(char **argv);
 void send_info(string messg);

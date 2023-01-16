@@ -20,7 +20,7 @@
 #include "character.h"
 #include "returnvals.h"
 
-struct Character;
+class Character;
 
 char *remove_trailing_spaces(char *arg);
 int command_interpreter(Character *ch, string argument, bool procced = 0);

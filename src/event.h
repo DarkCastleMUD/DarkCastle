@@ -21,7 +21,7 @@ typedef struct  event_brief   eventBrief;
 typedef struct  event_bucket  eventBucket;
 typedef struct  event_handler eventHandler;
 typedef void                  (*eventFunc)(eventParams*);
-typedef int                   (*eventKiller)(struct Character*, eventData*);
+typedef int                   (*eventKiller)(Character*, eventData*);
 
 #define EVT_NORMAL       0
 #define EVT_DEAD         1

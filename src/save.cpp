@@ -970,7 +970,7 @@ bool load_char_obj(struct descriptor_data *d, const char *name)
   char strsave[MAX_INPUT_LENGTH];
   struct char_file_u4 uchar;
   struct obj_data *last_cont = nullptr;
-  struct Character *ch;
+  Character *ch;
 
   if (!name || !strcmp(name, ""))
     return false;

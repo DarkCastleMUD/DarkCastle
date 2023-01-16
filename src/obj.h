@@ -190,7 +190,7 @@ struct table_data;
 struct machine_data;
 struct wheel_data;
 struct obj_data;
-struct Character;
+class Character;
 typedef uint64_t vnum_t;
 typedef uint64_t room_t;
 
