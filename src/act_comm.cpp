@@ -696,7 +696,6 @@ void DC::load_hints(void)
         buffer += '\n';
       }
     }
-    // qDebug() << buffer;
   }
 
   /*
