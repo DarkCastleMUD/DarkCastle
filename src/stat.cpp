@@ -53,9 +53,9 @@ public:
 	AreaData();
 	~AreaData() {}
 	void GetAreaData(zone_t zone_nr, int mob, int64_t xps, int64_t gold);
-	void DisplaySingleArea(char_data *ch, zone_t area);
-	void DisplayAreaData(char_data *ch);
-	void SortAreaData(char_data *ch, SortState state);
+	void DisplaySingleArea(Character *ch, zone_t area);
+	void DisplayAreaData(Character *ch);
+	void SortAreaData(Character *ch, SortState state);
 	void Load() {}
 	void Save() {}
 
@@ -76,7 +76,7 @@ bool CompareAreaGoldStats(AreaStats first, AreaStats second)
 	return first.gold > second.gold;
 }
 
-void AreaData::SortAreaData(char_data *ch, SortState state)
+void AreaData::SortAreaData(Character *ch, SortState state)
 {
 	list<AreaStats> lAreaStats;
 	area_stats_t::iterator it;
@@ -123,14 +123,14 @@ void AreaData::SortAreaData(char_data *ch, SortState state)
 	return;
 }
 
-void AreaData::DisplaySingleArea(char_data *ch, zone_t area)
+void AreaData::DisplaySingleArea(Character *ch, zone_t area)
 {
 
 	char buf[MAX_STRING_LENGTH];
 	string output_buf;
 	vector<MobKills>::iterator mobs;
-	char_data *get_mob_vnum(int vnum);
-	char_data *tmpchar;
+	Character *get_mob_vnum(int vnum);
+	Character *tmpchar;
 
 	if (DC::getInstance()->zones.contains(area) == false)
 	{
@@ -157,7 +157,7 @@ void AreaData::DisplaySingleArea(char_data *ch, zone_t area)
 	page_string(ch->desc, output_buf.c_str(), 1);
 	return;
 }
-void AreaData::DisplayAreaData(char_data *ch)
+void AreaData::DisplayAreaData(Character *ch)
 {
 	QString buf, buf2;
 	for (auto [zone_key, zone] : DC::getInstance()->zones.asKeyValueRange())
@@ -202,7 +202,7 @@ void AreaData::GetAreaData(zone_t zone, int mob, int64_t xps, int64_t gold)
 
 AreaData areaData;
 
-int do_areastats(char_data *ch, char *argument, int cmd)
+int do_areastats(Character *ch, char *argument, int cmd)
 {
 	char buf[MAX_STRING_LENGTH];
 

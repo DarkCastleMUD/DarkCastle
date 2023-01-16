@@ -18,9 +18,9 @@
 using namespace std;
 using namespace fmt;
 
-int do_plats(char_data *ch, char *argument, int cmd)
+int do_plats(Character *ch, char *argument, int cmd)
 {
-  char_data *i;
+  Character *i;
   struct descriptor_data *d;
   char arg[100];
   char buf[100];
@@ -54,11 +54,11 @@ int do_plats(char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_force(char_data *ch, string argument, int cmd = CMD_FORCE)
+int do_force(Character *ch, string argument, int cmd = CMD_FORCE)
 {
   struct descriptor_data *i = {};
   struct descriptor_data *next_i = {};
-  char_data *vict = {};
+  Character *vict = {};
   string name = {}, to_force = {}, buf = {};
 
   if (IS_NPC(ch))

@@ -33,14 +33,14 @@ using namespace std;
 class channel_msg
 {
 public:
-  channel_msg(const char_data *sender, const int32_t type, const char *msg)
+  channel_msg(const Character *sender, const int32_t type, const char *msg)
       : type(type), msg(string(msg))
   {
     set_wizinvis(sender);
     set_name(sender);
   }
 
-  channel_msg(const char_data *sender, const int32_t type, const string &msg)
+  channel_msg(const Character *sender, const int32_t type, const string &msg)
       : type(type), msg(msg)
   {
     set_wizinvis(sender);
@@ -71,7 +71,7 @@ public:
     return output.str();
   }
 
-  inline void set_wizinvis(const char_data *sender)
+  inline void set_wizinvis(const Character *sender)
   {
     if (sender && IS_PC(sender))
     {
@@ -83,7 +83,7 @@ public:
     }
   }
 
-  inline void set_name(const char_data *sender)
+  inline void set_name(const Character *sender)
   {
     if (sender)
     {
@@ -112,7 +112,7 @@ extern CWorld world;
 extern struct descriptor_data *descriptor_list;
 extern struct index_data *obj_index;
 
-command_return_t do_say(char_data *ch, string argument, int cmd)
+command_return_t do_say(Character *ch, string argument, int cmd)
 {
   int i;
   string buf;
@@ -184,10 +184,10 @@ command_return_t do_say(char_data *ch, string argument, int cmd)
 
 // Psay works like 'say', just it's directed at a person
 // TODO - after this gets used alot, maybe switch speech triggers to it
-command_return_t do_psay(char_data *ch, string argument, int cmd)
+command_return_t do_psay(Character *ch, string argument, int cmd)
 {
   string vict = {}, message = {}, buf = {};
-  char_data *victim = nullptr;
+  Character *victim = nullptr;
   extern bool MOBtrigger;
 
   if (IS_PC(ch) && IS_SET(ch->pcdata->punish, PUNISH_STUPID))
@@ -255,7 +255,7 @@ command_return_t do_psay(char_data *ch, string argument, int cmd)
   return eSUCCESS;
 }
 
-int do_pray(char_data *ch, char *arg, int cmd)
+int do_pray(Character *ch, char *arg, int cmd)
 {
   char buf1[MAX_STRING_LENGTH];
   struct descriptor_data *i;
@@ -308,7 +308,7 @@ int do_pray(char_data *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-int do_gossip(char_data *ch, char *argument, int cmd)
+int do_gossip(Character *ch, char *argument, int cmd)
 {
   char buf2[MAX_STRING_LENGTH];
   struct descriptor_data *i;
@@ -418,7 +418,7 @@ int do_gossip(char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_auction(char_data *ch, char *argument, int cmd)
+int do_auction(Character *ch, char *argument, int cmd)
 {
   char buf1[MAX_STRING_LENGTH];
   char buf2[MAX_STRING_LENGTH];
@@ -515,7 +515,7 @@ int do_auction(char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_shout(char_data *ch, char *argument, int cmd)
+int do_shout(Character *ch, char *argument, int cmd)
 {
   char buf1[MAX_STRING_LENGTH];
   char buf2[MAX_STRING_LENGTH];
@@ -593,7 +593,7 @@ int do_shout(char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_trivia(char_data *ch, char *argument, int cmd)
+int do_trivia(Character *ch, char *argument, int cmd)
 {
   char buf1[MAX_STRING_LENGTH];
   char buf2[MAX_STRING_LENGTH];
@@ -701,7 +701,7 @@ int do_trivia(char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_dream(char_data *ch, char *argument, int cmd)
+int do_dream(Character *ch, char *argument, int cmd)
 {
   char buf1[MAX_STRING_LENGTH] = {0};
   char buf2[MAX_STRING_LENGTH] = {0};
@@ -775,7 +775,7 @@ int do_dream(char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-command_return_t do_tellhistory(char_data *ch, string argument, int cmd)
+command_return_t do_tellhistory(Character *ch, string argument, int cmd)
 {
   if (ch == nullptr)
   {
@@ -811,9 +811,9 @@ command_return_t do_tellhistory(char_data *ch, string argument, int cmd)
   return eSUCCESS;
 }
 
-command_return_t do_tell(char_data *ch, string argument, int cmd)
+command_return_t do_tell(Character *ch, string argument, int cmd)
 {
-  char_data *vict = nullptr;
+  Character *vict = nullptr;
   string name = {}, message = {}, buf = {}, log_buf = {};
   obj_data *tmp_obj = nullptr;
 
@@ -1021,10 +1021,10 @@ command_return_t do_tell(char_data *ch, string argument, int cmd)
   return eSUCCESS;
 }
 
-command_return_t do_reply(char_data *ch, string argument, int cmd)
+command_return_t do_reply(Character *ch, string argument, int cmd)
 {
   string buf = {};
-  char_data *vict = nullptr;
+  Character *vict = nullptr;
 
   if (IS_MOB(ch) || ch->pcdata->last_tell.empty())
   {
@@ -1062,9 +1062,9 @@ command_return_t do_reply(char_data *ch, string argument, int cmd)
   return eSUCCESS;
 }
 
-int do_whisper(char_data *ch, char *argument, int cmd)
+int do_whisper(Character *ch, char *argument, int cmd)
 {
-  char_data *vict;
+  Character *vict;
   char name[MAX_INPUT_LENGTH + 1], message[MAX_STRING_LENGTH],
       buf[MAX_STRING_LENGTH];
 
@@ -1108,9 +1108,9 @@ int do_whisper(char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_ask(char_data *ch, char *argument, int cmd)
+int do_ask(Character *ch, char *argument, int cmd)
 {
-  char_data *vict;
+  Character *vict;
   char name[MAX_INPUT_LENGTH + 1], message[MAX_INPUT_LENGTH + 1], buf[MAX_STRING_LENGTH];
 
   obj_data *tmp_obj;
@@ -1153,10 +1153,10 @@ int do_ask(char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_grouptell(char_data *ch, char *argument, int cmd)
+int do_grouptell(Character *ch, char *argument, int cmd)
 {
   char buf[MAX_STRING_LENGTH];
-  char_data *k;
+  Character *k;
   struct follow_type *f;
   obj_data *tmp_obj;
   bool silence = false;
@@ -1251,7 +1251,7 @@ int do_grouptell(char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_newbie(char_data *ch, char *argument, int cmd)
+int do_newbie(Character *ch, char *argument, int cmd)
 {
   char buf1[MAX_STRING_LENGTH];
   char buf2[MAX_STRING_LENGTH];
@@ -1342,7 +1342,7 @@ int do_newbie(char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-void char_data::tell_history(char_data *ch, string message)
+void Character::tell_history(Character *ch, string message)
 {
   if (this->pcdata == nullptr)
   {
@@ -1363,7 +1363,7 @@ void char_data::tell_history(char_data *ch, string message)
   }
 }
 
-void char_data::gtell_history(char_data *ch, string message)
+void Character::gtell_history(Character *ch, string message)
 {
   if (this->pcdata == nullptr)
   {
@@ -1384,7 +1384,7 @@ void char_data::gtell_history(char_data *ch, string message)
   }
 }
 
-communication::communication(char_data *ch, string message)
+communication::communication(Character *ch, string message)
 {
   this->sender = GET_NAME(ch);
   this->sender_ispc = IS_PC(ch);

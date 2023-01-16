@@ -31,11 +31,11 @@ int32_t social_array_size;          // size of actual array (since we allocate i
 
 struct social_messg *find_social(string arg);
 
-int check_social(char_data *ch, string pcomm, int length)
+int check_social(Character *ch, string pcomm, int length)
 {
   string arg = {}, buf = {};
   struct social_messg *action = {};
-  char_data *vict = {};
+  Character *vict = {};
 
   tie(pcomm, arg) = half_chop(pcomm);
 
@@ -311,7 +311,7 @@ void clean_socials_from_memory()
   dc_free(soc_mess_list);
 }
 
-int do_social(char_data *ch, char *argument, int cmd)
+int do_social(Character *ch, char *argument, int cmd)
 {
   int i;
   char buf[MAX_STRING_LENGTH];

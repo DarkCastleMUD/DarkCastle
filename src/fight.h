@@ -15,12 +15,12 @@
 void debug_point();
 
 /* Here are our function prototypes */
-int damage(char_data *ch, char_data *victim, int dam,
+int damage(Character *ch, Character *victim, int dam,
            int weapon_type, int attacktype, int weapon, bool is_death_prog = false);
-int noncombat_damage(char_data *ch, int dam, char *char_death_msg,
+int noncombat_damage(Character *ch, int dam, char *char_death_msg,
                      char *room_death_msg, char *death_log_msg, int type);
-void send_damage(char const *, char_data *, obj_data *, char_data *, char const *, char const *, int);
-int getRealSpellDamage(char_data *ch);
+void send_damage(char const *, Character *, obj_data *, Character *, char const *, char const *, int);
+int getRealSpellDamage(Character *ch);
 
 #define FIRST WIELD
 #define SECOND SECOND_WIELD
@@ -30,69 +30,69 @@ int getRealSpellDamage(char_data *ch);
 #define COMBAT_MOD_SUSCEPT 1 << 2
 #define COMBAT_MOD_IGNORE 1 << 3
 #define COMBAT_MOD_REDUCED 1 << 4
-void make_dust(char_data *ch);
-bool do_frostshield(char_data *ch, char_data *vict);
-int speciality_bonus(char_data *ch, int attacktype, int level);
-void make_husk(char_data *ch);
-void make_heart(char_data *ch, char_data *vict);
-void make_head(char_data *ch);
-void make_arm(char_data *ch);
-void make_leg(char_data *ch);
-void make_bowels(char_data *ch);
-void make_blood(char_data *ch);
-void make_scraps(char_data *ch, struct obj_data *obj);
-void room_mobs_only_hate(char_data *ch);
-void add_memory(char_data *ch, char *victim, char type);
-void stop_follower(char_data *ch, int cmd);
-int attack(char_data *ch, char_data *vict, int type, int attack = FIRST);
+void make_dust(Character *ch);
+bool do_frostshield(Character *ch, Character *vict);
+int speciality_bonus(Character *ch, int attacktype, int level);
+void make_husk(Character *ch);
+void make_heart(Character *ch, Character *vict);
+void make_head(Character *ch);
+void make_arm(Character *ch);
+void make_leg(Character *ch);
+void make_bowels(Character *ch);
+void make_blood(Character *ch);
+void make_scraps(Character *ch, struct obj_data *obj);
+void room_mobs_only_hate(Character *ch);
+void add_memory(Character *ch, char *victim, char type);
+void stop_follower(Character *ch, int cmd);
+int attack(Character *ch, Character *vict, int type, int attack = FIRST);
 void perform_violence(void);
-void dam_message(int dam, char_data *ch, char_data *vict, int w_type, int32_t modifier);
-void group_gain(char_data *ch, char_data *vict);
-int check_magic_block(char_data *ch, char_data *victim, int attacktype);
-int check_riposte(char_data *ch, char_data *vict, int attacktype);
-int check_shieldblock(char_data *ch, char_data *vict, int attacktype);
-bool check_parry(char_data *ch, char_data *vict, int attacktype, bool display_results = true);
-bool check_dodge(char_data *ch, char_data *vict, int attacktype, bool display_results = true);
-void disarm(char_data *ch, char_data *vict);
-void trip(char_data *ch, char_data *vict);
-int checkCounterStrike(char_data *, char_data *);
-int doTumblingCounterStrike(char_data *, char_data *);
+void dam_message(int dam, Character *ch, Character *vict, int w_type, int32_t modifier);
+void group_gain(Character *ch, Character *vict);
+int check_magic_block(Character *ch, Character *victim, int attacktype);
+int check_riposte(Character *ch, Character *vict, int attacktype);
+int check_shieldblock(Character *ch, Character *vict, int attacktype);
+bool check_parry(Character *ch, Character *vict, int attacktype, bool display_results = true);
+bool check_dodge(Character *ch, Character *vict, int attacktype, bool display_results = true);
+void disarm(Character *ch, Character *vict);
+void trip(Character *ch, Character *vict);
+int checkCounterStrike(Character *, Character *);
+int doTumblingCounterStrike(Character *, Character *);
 
-int one_hit(char_data *ch, char_data *vict, int type, int weapon);
-int do_skewer(char_data *ch, char_data *vict, int dam, int wt, int wt2, int weapon);
-void do_combatmastery(char_data *ch, char_data *vict, int weapon);
-int do_behead_skill(char_data *ch, char_data *victim);
-int do_execute_skill(char_data *, char_data *, int);
-int weapon_spells(char_data *ch, char_data *vict, int weapon);
-void eq_damage(char_data *ch, char_data *vict, int dam, int weapon_type, int attacktype);
-void fight_kill(char_data *ch, char_data *vict, int type, int spec_type);
-int can_attack(char_data *ch);
-int can_be_attacked(char_data *ch, char_data *vict);
-int second_attack(char_data *ch);
-int third_attack(char_data *ch);
-int fourth_attack(char_data *ch);
-int second_wield(char_data *ch);
-void set_cantquit(char_data *, char_data *, bool = false);
-int is_pkill(char_data *ch, char_data *vict);
-void raw_kill(char_data *ch, char_data *victim);
-void do_pkill(char_data *ch, char_data *victim, int type, bool vict_is_attacker = false);
-void arena_kill(char_data *ch, char_data *victim, int type);
-void do_dead(char_data *ch, char_data *victim);
+int one_hit(Character *ch, Character *vict, int type, int weapon);
+int do_skewer(Character *ch, Character *vict, int dam, int wt, int wt2, int weapon);
+void do_combatmastery(Character *ch, Character *vict, int weapon);
+int do_behead_skill(Character *ch, Character *victim);
+int do_execute_skill(Character *, Character *, int);
+int weapon_spells(Character *ch, Character *vict, int weapon);
+void eq_damage(Character *ch, Character *vict, int dam, int weapon_type, int attacktype);
+void fight_kill(Character *ch, Character *vict, int type, int spec_type);
+int can_attack(Character *ch);
+int can_be_attacked(Character *ch, Character *vict);
+int second_attack(Character *ch);
+int third_attack(Character *ch);
+int fourth_attack(Character *ch);
+int second_wield(Character *ch);
+void set_cantquit(Character *, Character *, bool = false);
+int is_pkill(Character *ch, Character *vict);
+void raw_kill(Character *ch, Character *victim);
+void do_pkill(Character *ch, Character *victim, int type, bool vict_is_attacker = false);
+void arena_kill(Character *ch, Character *victim, int type);
+void do_dead(Character *ch, Character *victim);
 bool ArenaIsOpen();
-void eq_destroyed(char_data *ch, obj_data *obj, int pos);
-int is_stunned(char_data *ch);
-void update_flags(char_data *vict);
-void update_stuns(char_data *ch);
-void do_dam_msgs(char_data *ch, char_data *victim, int dam, int attacktype, int weapon, int filter = 0);
-int act_poisonous(char_data *ch);
-int isHit(char_data *ch, char_data *victim, int attacktype, int &type, int &reduce);
-void inform_victim(char_data *ch, char_data *victim, int dam);
-char_data *loop_followers(struct follow_type **f);
-char_data *get_highest_level_killer(char_data *leader, char_data *killer);
-int32_t count_xp_eligibles(char_data *leader, char_data *killer, int32_t highest_level, int32_t *total_levels);
-int64_t scale_char_xp(char_data *ch, char_data *killer, char_data *victim, int32_t no_killers, int32_t total_levels, int32_t highest_level, int64_t base_xp, int64_t *bonus_xp);
-void remove_active_potato(char_data *vict);
-int check_pursuit(char_data *ch, char_data *victim, char *dircommand);
+void eq_destroyed(Character *ch, obj_data *obj, int pos);
+int is_stunned(Character *ch);
+void update_flags(Character *vict);
+void update_stuns(Character *ch);
+void do_dam_msgs(Character *ch, Character *victim, int dam, int attacktype, int weapon, int filter = 0);
+int act_poisonous(Character *ch);
+int isHit(Character *ch, Character *victim, int attacktype, int &type, int &reduce);
+void inform_victim(Character *ch, Character *victim, int dam);
+Character *loop_followers(struct follow_type **f);
+Character *get_highest_level_killer(Character *leader, Character *killer);
+int32_t count_xp_eligibles(Character *leader, Character *killer, int32_t highest_level, int32_t *total_levels);
+int64_t scale_char_xp(Character *ch, Character *killer, Character *victim, int32_t no_killers, int32_t total_levels, int32_t highest_level, int64_t base_xp, int64_t *bonus_xp);
+void remove_active_potato(Character *vict);
+int check_pursuit(Character *ch, Character *victim, char *dircommand);
 
 // These are so that we only need one copy of one_hit and weapon_spells and
 // skewer and behead

@@ -190,7 +190,7 @@ struct table_data;
 struct machine_data;
 struct wheel_data;
 struct obj_data;
-struct char_data;
+struct Character;
 typedef uint64_t vnum_t;
 typedef uint64_t room_t;
 
@@ -221,7 +221,7 @@ struct obj_flag_data
     uint32_t more_flags = {};  /* A second bitvector (extra_flags2)*/
     int16_t eq_level = {};     /* Min level to use it for eq       */
     int16_t timer = {};        /* Timer for object                 */
-    char_data *origin = {};    /* Creator of object, previously was stored at value[3] */
+    Character *origin = {};    /* Creator of object, previously was stored at value[3] */
 };
 
 struct obj_affected_type
@@ -245,8 +245,8 @@ struct obj_data
     char *short_description = {};          /* when worn/carry/in cont.         */
     char *action_description = {};         /* What to write when used          */
     extra_descr_data *ex_description = {}; /* extra descriptions     */
-    char_data *carried_by = {};            /* Carried by :NULL in room/conta   */
-    char_data *equipped_by = {};           /* so I can access the player :)    */
+    Character *carried_by = {};            /* Carried by :NULL in room/conta   */
+    Character *equipped_by = {};           /* so I can access the player :)    */
 
     obj_data *in_obj = {};   /* In what object NULL when none    */
     obj_data *contains = {}; /* Contains objects                 */
@@ -315,10 +315,10 @@ void eq_remove_damage(obj_data *obj);
 void add_obj_affect(obj_data *obj, int loc, int mod);
 void remove_obj_affect_by_index(obj_data *obj, int index);
 void remove_obj_affect_by_type(obj_data *obj, int loc);
-int recheck_height_wears(char_data *ch);
+int recheck_height_wears(Character *ch);
 bool fullSave(obj_data *obj);
-void heightweight(char_data *ch, bool add);
-void wear(char_data *ch, struct obj_data *obj_object, int keyword);
+void heightweight(Character *ch, bool add);
+void wear(Character *ch, struct obj_data *obj_object, int keyword);
 int obj_from(obj_data *obj);
 
 typedef QStringList item_types_t;

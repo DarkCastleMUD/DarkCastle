@@ -34,14 +34,14 @@ using namespace fmt;
 
 void AuctionHandleDelete(string name);
 
-int do_linkload(char_data *ch, char *arg, int cmd)
+int do_linkload(Character *ch, char *arg, int cmd)
 {
   struct descriptor_data d;
-  char_data *new_new;
+  Character *new_new;
   char buf[100];
   char *c;
 
-  void add_to_bard_list(char_data * ch);
+  void add_to_bard_list(Character * ch);
 
   while (*arg == ' ')
     arg++;
@@ -97,7 +97,7 @@ int do_linkload(char_data *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-int do_processes(char_data *ch, char *arg, int cmd)
+int do_processes(Character *ch, char *arg, int cmd)
 {
   FILE *fl;
   char *tmp;
@@ -136,9 +136,9 @@ int do_processes(char_data *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-int do_guide(char_data *ch, char *argument, int cmd)
+int do_guide(Character *ch, char *argument, int cmd)
 {
-  char_data *victim;
+  Character *victim;
   char name[100], buf[256];
 
   one_argument(argument, name);
@@ -177,13 +177,13 @@ int do_guide(char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_advance(char_data *ch, char *argument, int cmd)
+int do_advance(Character *ch, char *argument, int cmd)
 {
-  char_data *victim;
+  Character *victim;
   char name[100], level[100], buf[300], passwd[100];
   int new_newlevel;
 
-  void gain_exp(char_data * ch, int gain);
+  void gain_exp(Character * ch, int gain);
 
   if (IS_NPC(ch))
     return eFAILURE;
@@ -288,13 +288,13 @@ int do_advance(char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_zap(char_data *ch, char *argument, int cmd)
+int do_zap(Character *ch, char *argument, int cmd)
 {
-  char_data *victim;
+  Character *victim;
   int room;
   char name[100], buf[500];
 
-  void remove_clan_member(int clannumber, char_data *ch);
+  void remove_clan_member(int clannumber, Character *ch);
 
   one_argument(argument, name);
 
@@ -371,7 +371,7 @@ int do_zap(char_data *ch, char *argument, int cmd)
   return eFAILURE;
 }
 
-int do_global(char_data *ch, char *argument, int cmd)
+int do_global(Character *ch, char *argument, int cmd)
 {
   int i;
   char buf[MAX_STRING_LENGTH];
@@ -395,7 +395,7 @@ int do_global(char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_shutdown(char_data *ch, char *argument, int cmd)
+int do_shutdown(Character *ch, char *argument, int cmd)
 {
   char buf[MAX_INPUT_LENGTH];
   extern int _shutdown;
@@ -471,7 +471,7 @@ int do_shutdown(char_data *ch, char *argument, int cmd)
     {
       if (IS_PC(ch))
       {
-        vector<char_data *> followers = ch->getFollowers();
+        vector<Character *> followers = ch->getFollowers();
         for (auto &follower : followers)
         {
           if (IS_NPC(follower) && IS_AFFECTED(follower, AFF_CHARM))
@@ -514,7 +514,7 @@ int do_shutdown(char_data *ch, char *argument, int cmd)
   else if (!strcmp(arg1, "crash"))
   {
     // let's crash the mud!
-    char_data *crashus = nullptr;
+    Character *crashus = nullptr;
     if (crashus->in_room == NOWHERE)
     {
       return eFAILURE; // this should never be reached
@@ -531,7 +531,7 @@ int do_shutdown(char_data *ch, char *argument, int cmd)
     try_to_hotboot_on_crash = 0;
 
     // let's crash the mud!
-    char_data *crashus = nullptr;
+    Character *crashus = nullptr;
     if (crashus->in_room == NOWHERE)
     {
       return eFAILURE; // this should never be reached
@@ -543,7 +543,7 @@ int do_shutdown(char_data *ch, char *argument, int cmd)
     {
       if (IS_PC(ch))
       {
-        vector<char_data *> followers = ch->getFollowers();
+        vector<Character *> followers = ch->getFollowers();
         for (auto &follower : followers)
         {
           if (IS_NPC(follower) && IS_AFFECTED(follower, AFF_CHARM))
@@ -563,7 +563,7 @@ int do_shutdown(char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_shutdow(char_data *ch, char *argument, int cmd)
+int do_shutdow(Character *ch, char *argument, int cmd)
 {
   if (!has_skill(ch, COMMAND_SHUTDOWN))
   {
@@ -575,7 +575,7 @@ int do_shutdow(char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_testport(char_data *ch, char *argument, int cmd)
+int do_testport(Character *ch, char *argument, int cmd)
 {
   int errnosave = 0;
   static pid_t child = 0;
@@ -628,7 +628,7 @@ int do_testport(char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_testuser(char_data *ch, char *argument, int cmd)
+int do_testuser(Character *ch, char *argument, int cmd)
 {
   char arg1[MAX_INPUT_LENGTH];
   char arg2[MAX_INPUT_LENGTH];
@@ -707,7 +707,7 @@ int do_testuser(char_data *ch, char *argument, int cmd)
 }
 
 #ifdef BANDWIDTH
-int do_bandwidth(char_data *ch, char *argument, int cmd)
+int do_bandwidth(Character *ch, char *argument, int cmd)
 {
   csendf(ch, "Bytes sent in %ld seconds: %ld\n\r",
          get_bandwidth_start(), get_bandwidth_amount());
@@ -715,9 +715,9 @@ int do_bandwidth(char_data *ch, char *argument, int cmd)
 }
 #endif
 
-int do_skilledit(char_data *ch, char *argument, int cmd)
+int do_skilledit(Character *ch, char *argument, int cmd)
 {
-  char_data *victim;
+  Character *victim;
   char name[MAX_INPUT_LENGTH];
   char type[MAX_INPUT_LENGTH];
   char value[MAX_INPUT_LENGTH];

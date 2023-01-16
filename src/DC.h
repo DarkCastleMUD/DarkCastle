@@ -39,19 +39,19 @@ typedef QList<QString> hints_t;
 
 using namespace std;
 
-using special_function = int (*)(char_data *, struct obj_data *, int, const char *, char_data *);
+using special_function = int (*)(Character *, struct obj_data *, int, const char *, Character *);
 
-typedef set<char_data *> character_list_t;
+typedef set<Character *> character_list_t;
 typedef set<struct obj_data *> obj_list_t;
 typedef set<int> client_descriptor_list_t;
 typedef set<int> server_descriptor_list_t;
 typedef vector<in_port_t> port_list_t;
-typedef set<char_data *>::iterator character_list_i;
+typedef set<Character *>::iterator character_list_i;
 typedef set<int>::iterator client_descriptor_list_i;
 typedef set<int>::iterator server_descriptor_list_i;
 typedef vector<in_port_t>::iterator port_list_i;
-typedef unordered_map<char_data *, Trace> death_list_t;
-typedef unordered_map<char_data *, Trace> free_list_t;
+typedef unordered_map<Character *, Trace> death_list_t;
+typedef unordered_map<Character *, Trace> free_list_t;
 typedef uint64_t zone_t;
 typedef uint64_t room_t;
 typedef uint64_t gold_t;
@@ -82,7 +82,7 @@ public:
   death_list_t death_list;
   obj_list_t active_obj_list;
   obj_list_t obj_free_list;
-  unordered_set<char_data *> shooting_list;
+  unordered_set<Character *> shooting_list;
   special_function_list_t mob_non_combat_functions;
   special_function_list_t mob_combat_functions;
   special_function_list_t obj_non_combat_functions;

@@ -9,9 +9,9 @@ class Backend {
 
  public:
   Backend();
-  virtual void save(char_data *ch, char_file_u4 *st) = 0;
+  virtual void save(Character *ch, char_file_u4 *st) = 0;
   
-  virtual char_data *load(void) = 0;
+  virtual Character *load(void) = 0;
   virtual ~Backend();
 };
 

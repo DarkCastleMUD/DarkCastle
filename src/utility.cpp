@@ -77,12 +77,12 @@ using namespace std;
 extern std::map<int, std::map<uint8_t, std::string>> professions;
 
 // extern funcs
-clan_data *get_clan(char_data *);
-void release_message(char_data *ch);
+clan_data *get_clan(Character *);
+void release_message(Character *ch);
 struct timer_data *timer_list = nullptr;
 
 // local funcs
-void update_wizlist(char_data *ch);
+void update_wizlist(Character *ch);
 
 size_t nocolor_strlen(QString str)
 {
@@ -330,7 +330,7 @@ FILE *objects_log = 0;
 FILE *quest_log = 0;
 
 // writes a string to the log
-void logentry(QString str, int god_level, LogChannels type, char_data *vict)
+void logentry(QString str, int god_level, LogChannels type, Character *vict)
 {
   FILE **f = 0;
   int stream = 1;
@@ -711,7 +711,7 @@ struct time_info_data mud_time_passed(time_t t2, time_t t1)
   return now;
 }
 
-struct time_info_data age(char_data *ch)
+struct time_info_data age(Character *ch)
 {
   struct time_info_data player_age;
 
@@ -744,7 +744,7 @@ bool file_exists(const char *filename)
   return true;
 }
 
-void util_archive(const char *char_name, char_data *caller)
+void util_archive(const char *char_name, Character *caller)
 {
   char buf[256];
   char buf2[256];
@@ -802,7 +802,7 @@ void util_archive(const char *char_name, char_data *caller)
   logentry(buf, IMMORTAL, LogChannels::LOG_GOD);
 }
 
-void util_unarchive(char *char_name, char_data *caller)
+void util_unarchive(char *char_name, Character *caller)
 {
   char buf[256];
   char buf2[256];
@@ -856,7 +856,7 @@ void util_unarchive(char *char_name, char_data *caller)
   logentry(buf, IMMORTAL, LogChannels::LOG_GOD);
 }
 
-bool ARE_CLANNED(char_data *sub, char_data *obj)
+bool ARE_CLANNED(Character *sub, Character *obj)
 {
   if (IS_PC(sub) &&
       IS_MOB(obj) &&
@@ -909,10 +909,10 @@ bool IS_DARK(int room)
   return false;
 }
 
-bool ARE_GROUPED(char_data *sub, char_data *obj)
+bool ARE_GROUPED(Character *sub, Character *obj)
 {
   struct follow_type *f;
-  char_data *k;
+  Character *k;
 
   if (obj == sub)
     return true;
@@ -968,7 +968,7 @@ bool SOMEONE_DIED(int value)
   return false;
 }
 
-bool CAN_SEE(char_data *sub, char_data *obj, bool noprog)
+bool CAN_SEE(Character *sub, Character *obj, bool noprog)
 {
   if (obj == sub)
     return true;
@@ -1063,7 +1063,7 @@ bool CAN_SEE(char_data *sub, char_data *obj, bool noprog)
   return false;
 }
 
-bool CAN_SEE_OBJ(char_data *sub, struct obj_data *obj, bool blindfighting)
+bool CAN_SEE_OBJ(Character *sub, struct obj_data *obj, bool blindfighting)
 {
   int skill = 0;
   struct affected_type *cur_af;
@@ -1129,7 +1129,7 @@ bool CAN_SEE_OBJ(char_data *sub, struct obj_data *obj, bool blindfighting)
   return true;
 }
 
-bool check_blind(char_data *ch)
+bool check_blind(Character *ch)
 {
 
   //   if (IS_AFFECTED(ch, AFF_true_SIGHT))
@@ -1147,14 +1147,14 @@ bool check_blind(char_data *ch)
   return false;
 }
 
-int do_order(char_data *ch, char *argument, int cmd)
+int do_order(Character *ch, char *argument, int cmd)
 {
   char name[MAX_INPUT_LENGTH], message[MAX_INPUT_LENGTH];
   char buf[256];
   bool found = false;
   int org_room;
   int retval;
-  char_data *victim;
+  Character *victim;
   struct follow_type *k;
 
   half_chop(argument, name, message);
@@ -1226,7 +1226,7 @@ int do_order(char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_idea(char_data *ch, char *argument, int cmd)
+int do_idea(Character *ch, char *argument, int cmd)
 {
   FILE *fl;
   char str[MAX_STRING_LENGTH];
@@ -1261,7 +1261,7 @@ int do_idea(char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_typo(char_data *ch, char *argument, int cmd)
+int do_typo(Character *ch, char *argument, int cmd)
 {
   FILE *fl;
   char str[MAX_STRING_LENGTH];
@@ -1297,7 +1297,7 @@ int do_typo(char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_bug(char_data *ch, char *argument, int cmd)
+int do_bug(Character *ch, char *argument, int cmd)
 {
   FILE *fl;
   char str[MAX_STRING_LENGTH];
@@ -1332,11 +1332,11 @@ int do_bug(char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_recall(char_data *ch, char *argument, int cmd)
+int do_recall(Character *ch, char *argument, int cmd)
 {
   int location, percent, level, cost = 0, x;
-  char_data *victim;
-  char_data *loop_ch;
+  Character *victim;
+  Character *loop_ch;
   float cf;
   char name[256] = "";
   clan_data *clan;
@@ -1524,13 +1524,13 @@ int do_recall(char_data *ch, char *argument, int cmd)
   return retval;
 }
 
-int do_qui(char_data *ch, char *argument, int cmd)
+int do_qui(Character *ch, char *argument, int cmd)
 {
   send_to_char("You have to write quit - no less, to quit!\n\r", ch);
   return eSUCCESS;
 }
 
-int do_quit(char_data *ch, char *argument, int cmd)
+int do_quit(Character *ch, char *argument, int cmd)
 {
   int iWear;
   struct follow_type *k;
@@ -1540,7 +1540,7 @@ int do_quit(char_data *ch, char *argument, int cmd)
   char buf[MAX_STRING_LENGTH];
   obj_data *obj, *tmp_obj;
 
-  void find_and_remove_player_portal(char_data * ch);
+  void find_and_remove_player_portal(Character * ch);
 
   /*
   | Code inserted by Morc 9 Apr 1997 to fix crasher
@@ -1670,7 +1670,7 @@ int do_quit(char_data *ch, char *argument, int cmd)
     {
       tmp_obj = obj->next;
       if (obj_index[obj->item_number].virt == CONSECRATE_OBJ_NUMBER)
-        if (ch == (char_data *)(obj->obj_flags.origin))
+        if (ch == (Character *)(obj->obj_flags.origin))
           extract_obj(obj);
     }
   }
@@ -1733,7 +1733,7 @@ int do_quit(char_data *ch, char *argument, int cmd)
   return eSUCCESS | eCH_DIED;
 }
 
-command_return_t char_data::save(int cmd)
+command_return_t Character::save(int cmd)
 {
   // With the cmd numbers
   // 666 = save quietly
@@ -1774,7 +1774,7 @@ command_return_t char_data::save(int cmd)
 //        that save after every other kill don't actually do it, but it
 //        pretends that it does.  That way we can start reducing the amount
 //        of writing we're doing.
-command_return_t char_data::do_save(QStringList &arguments, int cmd)
+command_return_t Character::do_save(QStringList &arguments, int cmd)
 {
   if (IS_IMMORTAL(this))
   {
@@ -1792,7 +1792,7 @@ command_return_t char_data::do_save(QStringList &arguments, int cmd)
   return save(cmd);
 }
 
-int do_home(char_data *ch, char *argument, int cmd)
+int do_home(Character *ch, char *argument, int cmd)
 {
   clan_data *clan;
   struct clan_room_data *room;
@@ -1843,7 +1843,7 @@ int do_home(char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_not_here(char_data *ch, char *argument, int cmd)
+int do_not_here(Character *ch, char *argument, int cmd)
 {
   switch (cmd)
   {
@@ -1862,7 +1862,7 @@ int do_not_here(char_data *ch, char *argument, int cmd)
 }
 
 // Used for debugging with dmalloc
-int do_memoryleak(char_data *ch, char *argument, int cmd)
+int do_memoryleak(Character *ch, char *argument, int cmd)
 {
   if (GET_LEVEL(ch) < OVERSEER)
   {
@@ -1889,7 +1889,7 @@ void cause_leak()
   }
 }
 
-int do_beep(char_data *ch, char *argument, int cmd)
+int do_beep(Character *ch, char *argument, int cmd)
 {
   send_to_char("Beep!\a\r\n", ch);
   return eSUCCESS;
@@ -1981,7 +1981,7 @@ bool check_valid_and_convert(int &value, char *buf)
 }
 
 // modified for new SETBIT et al. commands
-void parse_bitstrings_into_int(const char *bits[], string remainder_args, char_data *ch, uint value[])
+void parse_bitstrings_into_int(const char *bits[], string remainder_args, Character *ch, uint value[])
 {
   bool found = false;
 
@@ -2031,13 +2031,13 @@ void parse_bitstrings_into_int(const char *bits[], string remainder_args, char_d
   }
 }
 
-void parse_bitstrings_into_int(const char *bits[], const char *remainder_args, char_data *ch, uint value[])
+void parse_bitstrings_into_int(const char *bits[], const char *remainder_args, Character *ch, uint value[])
 {
   return parse_bitstrings_into_int(bits, string(remainder_args), ch, value);
 }
 
 // calls below uint32_t version
-void parse_bitstrings_into_int(const char *bits[], string remainder_args, char_data *ch, uint16_t &value)
+void parse_bitstrings_into_int(const char *bits[], string remainder_args, Character *ch, uint16_t &value)
 {
   int found = false;
 
@@ -2088,7 +2088,7 @@ void parse_bitstrings_into_int(const char *bits[], string remainder_args, char_d
   }
 }
 
-void parse_bitstrings_into_int(const char *bits[], const char *remainder_args, char_data *ch, uint16_t &value)
+void parse_bitstrings_into_int(const char *bits[], const char *remainder_args, Character *ch, uint16_t &value)
 {
   return parse_bitstrings_into_int(bits, string(remainder_args), ch, value);
 }
@@ -2097,7 +2097,7 @@ void parse_bitstrings_into_int(const char *bits[], const char *remainder_args, c
 // Finds the bits[] strings listed in "strings" and toggles the bit in "value"
 // Informs 'ch' of what has happened
 //
-void parse_bitstrings_into_int(const char *bits[], string remainder_args, char_data *ch, uint32_t &value)
+void parse_bitstrings_into_int(const char *bits[], string remainder_args, Character *ch, uint32_t &value)
 {
   bool found = false;
 
@@ -2147,14 +2147,14 @@ void parse_bitstrings_into_int(const char *bits[], string remainder_args, char_d
     send_to_char("No matching bits found.\n\n", ch);
 }
 
-void parse_bitstrings_into_int(const char *bits[], const char *remainder_args, char_data *ch, uint32_t &value)
+void parse_bitstrings_into_int(const char *bits[], const char *remainder_args, Character *ch, uint32_t &value)
 {
   return parse_bitstrings_into_int(bits, string(remainder_args), ch, value);
 }
 
 // Display a \n terminated list to the character
 //
-void display_string_list(const char *list[], char_data *ch)
+void display_string_list(const char *list[], Character *ch)
 {
   char buf[MAX_STRING_LENGTH];
   *buf = '\0';
@@ -2281,7 +2281,7 @@ int random_percent_change(int from, int to, int value)
   return round((number(from, to) / 100.0) * value) + value;
 }
 
-bool is_in_game(char_data *ch)
+bool is_in_game(Character *ch)
 {
   // Bug in code if this happens
   if (ch == 0)
@@ -2491,7 +2491,7 @@ void remove_familiars(char *name, BACKUP_TYPE backup)
 
 bool check_make_camp(int room)
 {
-  char_data *i, *next_i;
+  Character *i, *next_i;
   bool campok = false;
 
   for (i = world[room].people; i; i = next_i)
@@ -2509,9 +2509,9 @@ bool check_make_camp(int room)
   return campok;
 }
 
-int get_leadership_bonus(char_data *ch)
+int get_leadership_bonus(Character *ch)
 {
-  char_data *leader;
+  Character *leader;
   struct follow_type *f, *next_f;
   int highlevel = 0, bonus = 0;
 
@@ -2562,7 +2562,7 @@ void update_make_camp_and_leadership(void)
   auto &character_list = DC::getInstance()->character_list;
 
   for_each(character_list.begin(), character_list.end(),
-           [&af, &bonus](char_data *i)
+           [&af, &bonus](Character *i)
            {
              if (!i->fighting)
              {
@@ -2643,7 +2643,7 @@ void update_make_camp_and_leadership(void)
            });
 }
 
-void unique_scan(char_data *victim)
+void unique_scan(Character *victim)
 {
   if (!victim)
     return;
@@ -2971,12 +2971,12 @@ string get_isr_string(uint32_t isr, int8_t loc)
   }
 }
 
-bool isDead(char_data *ch)
+bool isDead(Character *ch)
 {
   return (ch && ch->position == POSITION_DEAD);
 }
 
-bool isNowhere(char_data *ch)
+bool isNowhere(Character *ch)
 {
   return (ch && ch->in_room == NOWHERE);
 }
@@ -3015,7 +3015,7 @@ bool char_file_exists(string name)
   return file_exists(filename);
 }
 
-void char_data::setPOSFighting(void)
+void Character::setPOSFighting(void)
 {
   if (position != POSITION_FIGHTING)
   {
@@ -3028,7 +3028,7 @@ void char_data::setPOSFighting(void)
   }
 }
 
-void char_data::setPlayerLastMob(vnum_t mob_vnum)
+void Character::setPlayerLastMob(vnum_t mob_vnum)
 {
   string buffer;
   if (this->pcdata == nullptr)
@@ -3113,7 +3113,7 @@ void special_log(char *arg)
   fclose(fl);
 }
 
-void char_data::swapSkill(skill_t origSkill, skill_t newSkill)
+void Character::swapSkill(skill_t origSkill, skill_t newSkill)
 {
   if (skills.contains(origSkill))
   {
@@ -3123,7 +3123,7 @@ void char_data::swapSkill(skill_t origSkill, skill_t newSkill)
   }
 }
 
-void char_data::setSkillMin(skill_t skillnum, int minimum_learned)
+void Character::setSkillMin(skill_t skillnum, int minimum_learned)
 {
   if (skills.contains(skillnum))
   {
@@ -3131,7 +3131,7 @@ void char_data::setSkillMin(skill_t skillnum, int minimum_learned)
   }
 }
 
-char_skill_data &char_data::getSkill(skill_t skillnum)
+char_skill_data &Character::getSkill(skill_t skillnum)
 {
   if (skills.contains(skillnum))
   {
@@ -3143,13 +3143,13 @@ char_skill_data &char_data::getSkill(skill_t skillnum)
   return empty;
 }
 
-void char_data::setSkill(skill_t skillnum, int learned)
+void Character::setSkill(skill_t skillnum, int learned)
 {
   skills[skillnum].skillnum = skillnum;
   skills[skillnum].learned = learned;
 }
 
-void char_data::upSkill(skill_t skillnum, int learned)
+void Character::upSkill(skill_t skillnum, int learned)
 {
   skills[skillnum].skillnum = skillnum;
   skills[skillnum].learned += learned;

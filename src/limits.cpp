@@ -70,7 +70,7 @@ int graf(int age, int p0, int p1, int p2, int p3, int p4, int p5, int p6)
 
 /* The three MAX functions define a characters Effective maximum */
 /* Which is NOT the same as the ch->max_xxxx !!!          */
-int32_t mana_limit(char_data *ch)
+int32_t mana_limit(Character *ch)
 {
 	int max;
 
@@ -83,12 +83,12 @@ int32_t mana_limit(char_data *ch)
 }
 
 // Previously any NPC got 0 returned.
-int32_t ki_limit(char_data *ch)
+int32_t ki_limit(Character *ch)
 {
 	return ch->max_ki;
 }
 
-int32_t hit_limit(char_data *ch)
+int32_t hit_limit(Character *ch)
 {
 	int max;
 
@@ -104,7 +104,7 @@ int32_t hit_limit(char_data *ch)
 	return (max);
 }
 
-int32_t move_limit(char_data *ch)
+int32_t move_limit(Character *ch)
 {
 	int max;
 
@@ -124,7 +124,7 @@ int32_t move_limit(char_data *ch)
 const int mana_regens[] = {0, 13, 13, 1, 1, 10, 9, 1, 1, 9, 1, 13, 0, 0};
 
 /* manapoint gain pr. game hour */
-int mana_gain(char_data *ch)
+int mana_gain(Character *ch)
 {
 	int gain = 0;
 	int divisor = 1;
@@ -194,7 +194,7 @@ int mana_gain(char_data *ch)
 const int hit_regens[] = {0, 7, 7, 9, 10, 8, 9, 12, 9, 8, 8, 7, 0, 0};
 
 /* Hitpoint gain pr. game hour */
-int hit_gain(char_data *ch, int position)
+int hit_gain(Character *ch, int position)
 {
 
 	int gain = 1;
@@ -284,12 +284,12 @@ int hit_gain(char_data *ch, int position)
 	return MAX(1, gain);
 }
 
-int hit_gain(char_data *ch)
+int hit_gain(Character *ch)
 {
 	return hit_gain(ch, GET_POS(ch));
 }
 
-int move_gain(char_data *ch, int extra)
+int move_gain(Character *ch, int extra)
 /* move gain pr. game hour */
 {
 	int gain;
@@ -356,7 +356,7 @@ int move_gain(char_data *ch, int extra)
 	return MAX(1, gain);
 }
 
-void redo_hitpoints(char_data *ch)
+void redo_hitpoints(Character *ch)
 {
 	/*struct affected_type *af;*/
 	int i, j, bonus = 0;
@@ -388,7 +388,7 @@ void redo_hitpoints(char_data *ch)
 	add_totem_stats(ch, APPLY_HIT);
 }
 
-void redo_mana(char_data *ch)
+void redo_mana(Character *ch)
 
 {
 	/*struct affected_type *af;*/
@@ -430,7 +430,7 @@ void redo_mana(char_data *ch)
 	add_totem_stats(ch, APPLY_MANA);
 }
 
-void redo_ki(char_data *ch)
+void redo_ki(Character *ch)
 {
 	int i, j;
 	ch->max_ki = ch->raw_ki;
@@ -461,7 +461,7 @@ void redo_ki(char_data *ch)
 }
 
 /* Gain maximum in various */
-void advance_level(char_data *ch, int is_conversion)
+void advance_level(Character *ch, int is_conversion)
 {
 	int add_hp = 0;
 	int add_mana = 1;
@@ -640,7 +640,7 @@ void advance_level(char_data *ch, int is_conversion)
 		send_to_char("The protective covenant of your corpse weakens, upon death players may steal 1 item from you. (See help LOOT for details)\r\n", ch);
 }
 
-void gain_exp(char_data *ch, int64_t gain)
+void gain_exp(Character *ch, int64_t gain)
 {
 	int x = 0;
 	int64_t y;
@@ -662,7 +662,7 @@ void gain_exp(char_data *ch, int64_t gain)
 	if (GET_EXP(ch) < 0)
 		GET_EXP(ch) = 0;
 
-	void golem_gain_exp(char_data * ch);
+	void golem_gain_exp(Character * ch);
 
 	if (!IS_NPC(ch) && ch->pcdata->golem && ch->in_room == ch->pcdata->golem->in_room) // Golems get mage's exp, when they're in the same room
 		gain_exp(ch->pcdata->golem, gain);
@@ -684,7 +684,7 @@ void gain_exp(char_data *ch, int64_t gain)
 	return;
 }
 
-void gain_exp_regardless(char_data *ch, int gain)
+void gain_exp_regardless(Character *ch, int gain)
 {
 	GET_EXP(ch) += (int64_t)gain;
 
@@ -704,7 +704,7 @@ void gain_exp_regardless(char_data *ch, int gain)
 	return;
 }
 
-void gain_condition(char_data *ch, int condition, int value)
+void gain_condition(Character *ch, int condition, int value)
 {
 	bool intoxicated;
 
@@ -757,10 +757,10 @@ void gain_condition(char_data *ch, int condition, int value)
 
 void food_update(void)
 {
-	struct obj_data *bring_type_to_front(char_data * ch, int item_type);
-	int do_eat(char_data * ch, char *argument, int cmd);
-	int do_drink(char_data * ch, char *argument, int cmd);
-	int FOUNTAINisPresent(char_data * ch);
+	struct obj_data *bring_type_to_front(Character * ch, int item_type);
+	int do_eat(Character * ch, char *argument, int cmd);
+	int do_drink(Character * ch, char *argument, int cmd);
+	int FOUNTAINisPresent(Character * ch);
 
 	struct obj_data *food = nullptr;
 
@@ -821,7 +821,7 @@ void point_update(void)
 			continue;
 
 		int a;
-		char_data *temp;
+		Character *temp;
 		if (!IS_NPC(i) && ISSET(i->affected_by, AFF_HIDE) && (a = has_skill(i, SKILL_HIDE)))
 		{
 			int o;
@@ -935,7 +935,7 @@ void update_corpses_and_portals(void)
 
 							if (IS_SET(oo->obj_flags.more_flags, ITEM_NO_TRADE))
 							{
-								log_sacrifice((char_data *)j, oo, true);
+								log_sacrifice((Character *)j, oo, true);
 								extract_obj(oo);
 							}
 						}
@@ -948,7 +948,7 @@ void update_corpses_and_portals(void)
 								next_thing = jj->next;
 							while (next_thing && next_thing->in_obj == jj)
 								next_thing = next_thing->next;
-							log_sacrifice((char_data *)j, jj, true);
+							log_sacrifice((Character *)j, jj, true);
 							extract_obj(jj);
 						}
 						else
@@ -962,7 +962,7 @@ void update_corpses_and_portals(void)
 								next_thing = jj->next;
 							while (next_thing->in_obj == jj)
 								next_thing = next_thing->next;
-							log_sacrifice((char_data *)j, jj, true);
+							log_sacrifice((Character *)j, jj, true);
 							extract_obj(jj);
 						}
 						else
@@ -976,7 +976,7 @@ void update_corpses_and_portals(void)
 								next_thing = jj->next;
 							while (next_thing && next_thing->in_obj == jj)
 								next_thing = next_thing->next;
-							log_sacrifice((char_data *)j, jj, true);
+							log_sacrifice((Character *)j, jj, true);
 							extract_obj(jj);
 						}
 						else
@@ -1008,7 +1008,7 @@ void update_corpses_and_portals(void)
 	// process_portals();
 }
 
-void prepare_character_for_sixty(char_data *ch)
+void prepare_character_for_sixty(Character *ch)
 {
 	if (!IS_NPC(ch) && MAX_MORTAL == 60)
 	{

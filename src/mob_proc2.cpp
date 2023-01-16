@@ -39,10 +39,10 @@ using namespace std;
 
 extern struct obj_data *object_list;
 extern struct index_data *obj_index;
-extern int class_restricted(char_data *ch, struct obj_data *obj);
-extern int size_restricted(char_data *ch, struct obj_data *obj);
+extern int class_restricted(Character *ch, struct obj_data *obj);
+extern int size_restricted(Character *ch, struct obj_data *obj);
 
-void repair_shop_fix_eq(char_data *ch, char_data *owner, int price, obj_data *obj)
+void repair_shop_fix_eq(Character *ch, Character *owner, int price, obj_data *obj)
 {
 	char buf[256];
 
@@ -57,7 +57,7 @@ void repair_shop_fix_eq(char_data *ch, char_data *owner, int price, obj_data *ob
 	act("$N gives $n $p.", ch, obj, owner, TO_ROOM, INVIS_NULL);
 }
 
-void repair_shop_complain_no_cash(char_data *ch, char_data *owner, int price, obj_data *obj)
+void repair_shop_complain_no_cash(Character *ch, Character *owner, int price, obj_data *obj)
 {
 	char buf[256];
 
@@ -68,7 +68,7 @@ void repair_shop_complain_no_cash(char_data *ch, char_data *owner, int price, ob
 	act("$N gives $n $p.", ch, obj, owner, TO_ROOM, INVIS_NULL);
 }
 
-void repair_shop_price_check(char_data *ch, char_data *owner, int price, obj_data *obj)
+void repair_shop_price_check(Character *ch, Character *owner, int price, obj_data *obj)
 {
 	char buf[256];
 
@@ -78,7 +78,7 @@ void repair_shop_price_check(char_data *ch, char_data *owner, int price, obj_dat
 	act("$N gives $n $p.", ch, obj, owner, TO_ROOM, INVIS_NULL);
 }
 
-int repair_guy(char_data *ch, struct obj_data *obj, int cmd, const char *arg, char_data *owner)
+int repair_guy(Character *ch, struct obj_data *obj, int cmd, const char *arg, Character *owner)
 {
 	char item[256];
 	int value0, cost, price;
@@ -156,7 +156,7 @@ int repair_guy(char_data *ch, struct obj_data *obj, int cmd, const char *arg, ch
 	return eSUCCESS;
 }
 
-int super_repair_guy(char_data *ch, struct obj_data *obj, int cmd, const char *arg, char_data *owner)
+int super_repair_guy(Character *ch, struct obj_data *obj, int cmd, const char *arg, Character *owner)
 {
 	char item[256];
 	int value0, value2, cost, price;
@@ -257,7 +257,7 @@ int super_repair_guy(char_data *ch, struct obj_data *obj, int cmd, const char *a
 }
 
 // Fingers
-int repair_shop(char_data *ch, struct obj_data *obj, int cmd, const char *arg, char_data *owner)
+int repair_shop(Character *ch, struct obj_data *obj, int cmd, const char *arg, Character *owner)
 {
 	char item[256];
 	int value0, value2, cost, price;
@@ -360,7 +360,7 @@ int repair_shop(char_data *ch, struct obj_data *obj, int cmd, const char *arg, c
 	}
 }
 
-int corpse_cost(char_data *ch)
+int corpse_cost(Character *ch)
 {
 	int cost = 0;
 	obj_data *curr_cont;
@@ -408,7 +408,7 @@ int corpse_cost(obj_data *obj)
 	return cost;
 }
 
-int mortician(char_data *ch, struct obj_data *obj, int cmd, const char *arg, char_data *owner)
+int mortician(Character *ch, struct obj_data *obj, int cmd, const char *arg, Character *owner)
 {
 	int x = 0, cost = 0, which;
 	int count = 0;
@@ -509,7 +509,7 @@ int mortician(char_data *ch, struct obj_data *obj, int cmd, const char *arg, cha
 	return eSUCCESS;
 }
 
-char *gl_item(obj_data *obj, int number, char_data *ch, bool platinum = true)
+char *gl_item(obj_data *obj, int number, Character *ch, bool platinum = true)
 {
 	string buf = {}, buf2 = {}, buf3 = {};
 	size_t length = {};
@@ -664,7 +664,7 @@ const struct platsmith platsmith_list[] = {{10019, {512, 513, 514, 515, 537, 538
 										   {0, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}}};
 
 // Apoc enjoys the dirty mooselove. Honest.
-int godload_sales(char_data *ch, struct obj_data *obj, int cmd, const char *arg, char_data *owner)
+int godload_sales(Character *ch, struct obj_data *obj, int cmd, const char *arg, Character *owner)
 {
 	extern struct index_data *mob_index;
 	int mobvnum = mob_index[owner->mobdata->nr].virt;
@@ -799,7 +799,7 @@ int godload_sales(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
 }
 
 // gl_repair_guy
-int gl_repair_shop(char_data *ch, struct obj_data *obj, int cmd, const char *arg, char_data *owner)
+int gl_repair_shop(Character *ch, struct obj_data *obj, int cmd, const char *arg, Character *owner)
 {
 	char item[256];
 	int value0, value2, cost, price;

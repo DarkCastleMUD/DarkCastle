@@ -74,8 +74,8 @@ extern struct index_data *obj_index;
 int spl_lvl(int lev);
 
 // Extern procedures
-void make_dust(char_data *ch);
-int say_spell(char_data *ch, int si, int room = 0);
+void make_dust(Character *ch);
+int say_spell(Character *ch, int si, int room = 0);
 extern struct index_data *mob_index;
 
 #if (0)
@@ -893,7 +893,7 @@ const char *spells[] =
         "ethereal focus",
         "\n"};
 
-bool canPerform(char_data *const &ch, const int_fast32_t &skillType,
+bool canPerform(Character *const &ch, const int_fast32_t &skillType,
                 string failMessage)
 {
   if (IS_PC(ch) && has_skill(ch, skillType) == 0 && GET_LEVEL(ch) < ARCHANGEL)
@@ -920,7 +920,7 @@ int dam_percent(int learned, int damage)
   return (int)((float)damage * (float)percent / 100.0);
 }
 
-int use_mana(char_data *ch, int sn)
+int use_mana(Character *ch, int sn)
 {
   int base = spell_info[sn].min_usesmana;
 
@@ -959,7 +959,7 @@ int use_mana(char_data *ch, int sn)
 void affect_update(int32_t duration_type)
 {
   static struct affected_type *af, *next_af_dude;
-  void update_char_objects(char_data * ch); /* handler.c */
+  void update_char_objects(Character * ch); /* handler.c */
 
   if (duration_type != PULSE_REGEN && duration_type != PULSE_TIMER && duration_type != PULSE_VIOLENCE && duration_type != PULSE_TIME) // Default
     return;
@@ -993,8 +993,8 @@ void affect_update(int32_t duration_type)
           af->modifier = 0 - af->duration;
         if (!(af->caster).empty()) // means bard song
         {
-          char_data *get_pc_room_vis_exact(char_data * ch, const char *name);
-          char_data *bard = get_pc_room_vis_exact(i, (af->caster).c_str());
+          Character *get_pc_room_vis_exact(Character * ch, const char *name);
+          Character *bard = get_pc_room_vis_exact(i, (af->caster).c_str());
           if (!bard || !ARE_GROUPED(i, bard))
           {
             send_to_char("Away from the music, the effect weakens...\r\n", i);
@@ -1044,7 +1044,7 @@ void affect_update(int32_t duration_type)
 }
 
 // Sets any ISR's that go with a spell..  (ISR's arent saved)
-void isr_set(char_data *ch)
+void isr_set(Character *ch)
 {
   // char buf[100];
   static struct affected_type *afisr;
@@ -1068,7 +1068,7 @@ void isr_set(char_data *ch)
   }
 }
 
-bool many_charms(char_data *ch)
+bool many_charms(Character *ch)
 {
   struct follow_type *k;
   for (k = ch->followers; k; k = k->next)
@@ -1080,9 +1080,9 @@ bool many_charms(char_data *ch)
   return false;
 }
 /* Stop the familiar without a master floods*/
-void extractFamiliar(char_data *ch)
+void extractFamiliar(Character *ch)
 {
-  char_data *victim = nullptr;
+  Character *victim = nullptr;
   for (struct follow_type *k = ch->followers; k; k = k->next)
     if (IS_MOB(k->follower) && IS_AFFECTED(k->follower, AFF_FAMILIAR))
     {
@@ -1097,7 +1097,7 @@ void extractFamiliar(char_data *ch)
   extract_char(victim, true);
 }
 
-bool any_charms(char_data *ch)
+bool any_charms(Character *ch)
 {
   return many_charms(ch);
   /*
@@ -1118,9 +1118,9 @@ bool any_charms(char_data *ch)
 
 // check if making ch follow victim will create an illegal
 // follow "Loop/circle"
-bool circle_follow(char_data *ch, char_data *victim)
+bool circle_follow(Character *ch, Character *victim)
 {
-  char_data *k;
+  Character *k;
 
   for (k = victim; k; k = k->master)
   {
@@ -1133,7 +1133,7 @@ bool circle_follow(char_data *ch, char_data *victim)
 
 // Called when stop following persons, or stopping charm
 // This will NOT do if a character quits/dies!!
-void stop_follower(char_data *ch, int cmd)
+void stop_follower(Character *ch, int cmd)
 {
   struct follow_type *j, *k;
 
@@ -1232,10 +1232,10 @@ void stop_follower(char_data *ch, int cmd)
 }
 
 /* Called when a character that follows/is followed dies */
-void die_follower(char_data *ch)
+void die_follower(Character *ch)
 {
   struct follow_type *j, *k;
-  char_data *zombie;
+  Character *zombie;
 
   if (ch->master)
     stop_follower(ch, STOP_FOLLOW);
@@ -1266,7 +1266,7 @@ void die_follower(char_data *ch)
 
 /* Do NOT call ths before having checked if a circle of followers */
 /* will arise. CH will follow leader                               */
-void add_follower(char_data *ch, char_data *leader, int cmd)
+void add_follower(Character *ch, Character *leader, int cmd)
 {
   struct follow_type *k;
 
@@ -1301,13 +1301,13 @@ void add_follower(char_data *ch, char_data *leader, int cmd)
   }
 }
 
-int say_spell(char_data *ch, int si, int room)
+int say_spell(Character *ch, int si, int room)
 {
   char buf[MAX_STRING_LENGTH], splwd[MAX_BUF_LENGTH];
   char buf2[MAX_STRING_LENGTH];
 
   int j, offs, retval = 0;
-  char_data *temp_char;
+  Character *temp_char;
 
   struct syllable
   {
@@ -1387,7 +1387,7 @@ int say_spell(char_data *ch, int si, int room)
   sprintf(buf2, "$n utters the words, '%s'", buf);
   sprintf(buf, "$n utters the words, '%s'", spells[si - 1]);
 
-  char_data *people;
+  Character *people;
   if (room > 0)
   {
     people = world[room].people;
@@ -1426,7 +1426,7 @@ int say_spell(char_data *ch, int si, int room)
 // returns 0 or positive if saving throw is made. The more, the higher it was made.
 // return -number of failure.   The lower, the more it was failed.
 //
-int saves_spell(char_data *ch, char_data *vict, int spell_base, int16_t save_type)
+int saves_spell(Character *ch, Character *vict, int spell_base, int16_t save_type)
 {
   double save = 0;
 
@@ -1491,7 +1491,7 @@ char *skip_spaces(char *string)
 /*
     Release command.
 */
-int do_release(char_data *ch, char *argument, int cmd)
+int do_release(Character *ch, char *argument, int cmd)
 {
   struct affected_type *aff, *aff_next;
   bool printed = false;
@@ -1594,7 +1594,7 @@ int do_release(char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int skill_value(char_data *ch, int skillnum, int min = 33)
+int skill_value(Character *ch, int skillnum, int min = 33)
 {
   if (ch->skills.contains(skillnum))
   {
@@ -1608,7 +1608,7 @@ int stat_mod[] = {
     0, -5, -5, -4, -4, -3, -3, -2, -2, -1, -1,
     0, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7,
     7, 8, 9, 10};
-extern int skillmax(char_data *ch, int skill, int eh);
+extern int skillmax(Character *ch, int skill, int eh);
 
 int get_difficulty(int skillnum)
 {
@@ -1626,11 +1626,11 @@ int get_difficulty(int skillnum)
   return 0;
 }
 
-bool skill_success(char_data *ch, char_data *victim, int skillnum, int mod)
+bool skill_success(Character *ch, Character *victim, int skillnum, int mod)
 {
   //  extern int stat_mod[];
   //  int modifier = 0;
-  extern int get_stat(char_data * ch, int stat);
+  extern int get_stat(Character * ch, int stat);
   // struct class_skill_defines *t;
   int stat = 0;
 
@@ -1786,7 +1786,7 @@ bool skill_success(char_data *ch, char_data *victim, int skillnum, int mod)
   }
 }
 
-void set_conc_loss(char_data *ch, int spl)
+void set_conc_loss(Character *ch, int spl)
 {
   struct affected_type af;
   af.type = CONC_LOSS_FIXER;
@@ -1798,7 +1798,7 @@ void set_conc_loss(char_data *ch, int spl)
   affect_to_char(ch, &af);
   return;
 }
-bool check_conc_loss(char_data *ch, int spl)
+bool check_conc_loss(Character *ch, int spl)
 {
   struct affected_type *af;
   int afspl;
@@ -1816,10 +1816,10 @@ bool check_conc_loss(char_data *ch, int spl)
 }
 
 // Assumes that *argument does start with first letter of chopped string
-int do_cast(char_data *ch, char *argument, int cmd)
+int do_cast(Character *ch, char *argument, int cmd)
 {
   struct obj_data *tar_obj;
-  char_data *tar_char;
+  Character *tar_char;
   char name[MAX_STRING_LENGTH], filter[MAX_STRING_LENGTH];
   int qend, spl, i, learned;
   bool target_ok;
@@ -2417,7 +2417,7 @@ int do_cast(char_data *ch, char *argument, int cmd)
           chance += int_app[GET_INT(ch)].conc_bonus;
         else
           chance += wis_app[GET_WIS(ch)].conc_bonus;
-        extern int get_max(char_data * ch, int skill);
+        extern int get_max(Character * ch, int skill);
 
         if (GET_RACE(ch) == RACE_HUMAN)
           chance = MIN(95, chance);
@@ -2463,7 +2463,7 @@ int do_cast(char_data *ch, char *argument, int cmd)
 
         if (group_spell)
         {
-          char_data *leader;
+          Character *leader;
           if (ch->master)
             leader = ch->master;
           else
@@ -2710,7 +2710,7 @@ int do_cast(char_data *ch, char *argument, int cmd)
   return eFAILURE;
 }
 
-int do_skills(char_data *ch, char *arg, int cmd)
+int do_skills(Character *ch, char *arg, int cmd)
 {
   char buf[16384];
   char buf2[MAX_STRING_LENGTH], buf3[MAX_STRING_LENGTH];
@@ -2931,7 +2931,7 @@ int do_skills(char_data *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-int do_songs(char_data *ch, char *arg, int cmd)
+int do_songs(Character *ch, char *arg, int cmd)
 {
   char buf[16384];
 
@@ -2958,7 +2958,7 @@ int do_songs(char_data *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-int do_spells(char_data *ch, char *arg, int cmd)
+int do_spells(Character *ch, char *arg, int cmd)
 {
   char buf[16384];
   char buf2[MAX_STRING_LENGTH], buf3[MAX_STRING_LENGTH];
@@ -3100,7 +3100,7 @@ int spl_lvl(int lev)
 // search through a character's list to see if they have a particular skill
 // if so, return their level of knowledge
 // if not, return 0
-int has_skill(char_data *ch, skill_t skill)
+int has_skill(Character *ch, skill_t skill)
 {
   struct obj_data *o;
   int bonus = 0;

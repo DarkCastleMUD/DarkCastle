@@ -52,8 +52,8 @@ typedef struct txt_q
 
 struct snoop_data
 {
-  char_data *snooping;
-  char_data *snoop_by;
+  Character *snooping;
+  Character *snoop_by;
 };
 
 struct msg_type
@@ -90,17 +90,17 @@ struct SVoteData
 class CVoteData
 {
 public:
-  void SetQuestion(char_data *ch, std::string question);
-  void AddAnswer(char_data *ch, std::string answer);
-  void RemoveAnswer(char_data *ch, unsigned int answer);
-  void StartVote(char_data *ch);
-  void EndVote(char_data *ch);
-  void Reset(char_data *ch);
+  void SetQuestion(Character *ch, std::string question);
+  void AddAnswer(Character *ch, std::string answer);
+  void RemoveAnswer(Character *ch, unsigned int answer);
+  void StartVote(Character *ch);
+  void EndVote(Character *ch);
+  void Reset(Character *ch);
   void OutToFile();
-  bool HasVoted(char_data *ch);
-  bool Vote(char_data *ch, unsigned int vote);
-  void DisplayVote(char_data *ch);
-  void DisplayResults(char_data *ch);
+  bool HasVoted(Character *ch);
+  bool Vote(Character *ch, unsigned int vote);
+  void DisplayVote(Character *ch);
+  void DisplayResults(Character *ch);
   bool IsActive() { return active; }
   CVoteData();
   ~CVoteData();

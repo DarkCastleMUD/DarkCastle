@@ -13,10 +13,10 @@
 #include "returnvals.h"
 #include "spells.h"
 
-int do_archive(char_data *ch, char *argument, int cmd)
+int do_archive(Character *ch, char *argument, int cmd)
 {
   char name[50];
-  char_data *victim;
+  Character *victim;
 
   argument = one_argument(argument, name);
 
@@ -50,7 +50,7 @@ int do_archive(char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_unarchive(char_data *ch, char *argument, int cmd)
+int do_unarchive(Character *ch, char *argument, int cmd)
 {
   char name[50];
   argument = one_argument(argument, name);
@@ -59,10 +59,10 @@ int do_unarchive(char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_pview(char_data *ch, char *argument, int cmd)
+int do_pview(Character *ch, char *argument, int cmd)
 {
   char name[200];
-  char_data *victim;
+  Character *victim;
   string tprompt;
 
   argument = one_argument(argument, name);
@@ -87,10 +87,10 @@ int do_pview(char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_snoop(char_data *ch, char *argument, int cmd)
+int do_snoop(Character *ch, char *argument, int cmd)
 {
   char arg[MAX_STRING_LENGTH];
-  char_data *victim;
+  Character *victim;
   char buf[100];
 
   if (!ch->desc)
@@ -173,7 +173,7 @@ int do_snoop(char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_stealth(char_data *ch, char *argument, int cmd)
+int do_stealth(Character *ch, char *argument, int cmd)
 {
   if (IS_NPC(ch))
     return eFAILURE;
@@ -197,10 +197,10 @@ int do_stealth(char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_send(char_data *ch, char *argument, int cmd)
+int do_send(Character *ch, char *argument, int cmd)
 {
 
-  char_data *vict;
+  Character *vict;
   char name[100], message[200], buf[350];
 
   half_chop(argument, name, message);

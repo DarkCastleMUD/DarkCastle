@@ -30,10 +30,10 @@ std::map<int,int> fill_skill_cost();
 
 const std::map<int,int> skill_cost = fill_skill_cost();
 
-void extractFamiliar(char_data *ch);
+void extractFamiliar(Character *ch);
 
-bool skill_success(char_data *ch, char_data *victim, int skillnum, int mod=0);
-bool canPerform(char_data * const &ch, const int_fast32_t &learned, std::string failMessage = std::string());
+bool skill_success(Character *ch, Character *victim, int skillnum, int mod=0);
+bool canPerform(Character * const &ch, const int_fast32_t &learned, std::string failMessage = std::string());
 
 /* New skill quest thingy. */
 struct skill_quest
@@ -51,11 +51,11 @@ struct skill_stuff
   int difficulty;
 };
 
-void barb_magic_resist(char_data *ch, int old, int nw);
+void barb_magic_resist(Character *ch, int old, int nw);
 struct skill_quest *find_sq(int sq);
 struct skill_quest *find_sq(char *);
 int dam_percent(int learned, int damage);
-void check_maxes(char_data *ch);
+void check_maxes(Character *ch);
 
 /*
  * Spell numbers are well known.
@@ -641,9 +641,9 @@ void check_maxes(char_data *ch);
 
 
 
-typedef	int	SPELL_FUN	( uint8_t level, char_data *ch,
+typedef	int	SPELL_FUN	( uint8_t level, Character *ch,
 				  char *arg, int type,
-				  char_data *tar_ch,
+				  Character *tar_ch,
 				  struct obj_data *tar_obj,
                                   int skill );
 
@@ -740,6 +740,6 @@ struct attack_hit_type
   #define HASTE_VNUM 6312
   #define true_VNUM 6305
 
-int has_skill(char_data *ch, skill_t skill);
+int has_skill(Character *ch, skill_t skill);
 
 #endif

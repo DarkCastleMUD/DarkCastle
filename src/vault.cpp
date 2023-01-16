@@ -74,10 +74,10 @@ int get_line(FILE *fl, char *buf);
 void item_remove(obj_data *obj, struct vault_data *vault);
 void item_add(int vnum, struct vault_data *vault);
 
-char_data *find_owner(const char *name);
-void vault_log(char_data *ch, char *owner);
+Character *find_owner(const char *name);
+void vault_log(Character *ch, char *owner);
 char *clanVName(int c);
-void vault_search_usage(char_data *ch);
+void vault_search_usage(Character *ch);
 
 extern struct index_data *obj_index;
 extern struct obj_data *object_list;
@@ -89,7 +89,7 @@ struct vault_data *has_vault(const char *name)
   for (vault = vault_table; vault; vault = vault->next)
     if (vault && vault->owner && !strcasecmp(vault->owner, name))
       return vault;
-  char_data *ch = find_owner(name);
+  Character *ch = find_owner(name);
   if (ch && GET_LEVEL(ch) >= 10)
   {
     add_new_vault(GET_NAME(ch), 0);
@@ -132,7 +132,7 @@ void save_vault(char *name)
   if (!(vault = has_vault(name)))
     return;
 
-  char_data *ch = find_owner(name);
+  Character *ch = find_owner(name);
   if (ch)
     if (vault->size < (unsigned)(GET_LEVEL(ch) * 10))
       vault->size = GET_LEVEL(ch) * 10;
@@ -167,7 +167,7 @@ void save_vault(char *name)
   fclose(fl);
 }
 
-void vault_access(char_data *ch, char *who)
+void vault_access(Character *ch, char *who)
 {
   struct vault_access_data *access;
   struct vault_data *vault = nullptr;
@@ -192,7 +192,7 @@ void vault_access(char_data *ch, char *who)
     add_vault_access(ch, who, vault);
 }
 
-void vault_myaccess(char_data *ch, char arg[MAX_INPUT_LENGTH])
+void vault_myaccess(Character *ch, char arg[MAX_INPUT_LENGTH])
 {
   struct vault_data *vault;
 
@@ -219,7 +219,7 @@ void vault_myaccess(char_data *ch, char arg[MAX_INPUT_LENGTH])
       csendf(ch, "%s\r\n", vault->owner);
 }
 
-void vault_balance(char_data *ch, char *owner)
+void vault_balance(Character *ch, char *owner)
 {
   struct vault_data *vault;
   int self = 0;
@@ -258,7 +258,7 @@ char *vault_usage = "Syntax: vault <list | balance> [vault owner]\r\n"
 
 char *imm_vault_usage = "        vault <stats> [name]\r\n";
 
-int do_vault(char_data *ch, char *argument, int cmd)
+int do_vault(Character *ch, char *argument, int cmd)
 {
   char arg[MAX_INPUT_LENGTH], arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 
@@ -447,7 +447,7 @@ int do_vault(char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-void vault_stats(char_data *ch, char *name)
+void vault_stats(Character *ch, char *name)
 {
   struct vault_data *vault = nullptr;
   struct vault_items_data *item;
@@ -950,7 +950,7 @@ void load_vaults(void)
   fclose(index);
 }
 
-void add_vault_access(char_data *ch, char *name, struct vault_data *vault)
+void add_vault_access(Character *ch, char *name, struct vault_data *vault)
 {
   struct vault_access_data *access;
   struct descriptor_data d;
@@ -965,7 +965,7 @@ void add_vault_access(char_data *ch, char *name, struct vault_data *vault)
 
   // must be done to clear out "d" before it is used
 
-  extern char_data *get_pc(char *name);
+  extern Character *get_pc(char *name);
 
   if (!get_pc(name))
     if (!(load_char_obj(&d, name)))
@@ -993,7 +993,7 @@ void add_vault_access(char_data *ch, char *name, struct vault_data *vault)
     free_char(d.character, Trace("add_vault_access 2"));
 }
 
-void remove_vault_access(char_data *ch, char *name, struct vault_data *vault)
+void remove_vault_access(Character *ch, char *name, struct vault_data *vault)
 {
 
   name[0] = UPPER(name[0]);
@@ -1076,7 +1076,7 @@ char *clanVName(int c)
 int has_vault_access(char *who, struct vault_data *vault)
 {
   struct vault_access_data *access;
-  char_data *ch;
+  Character *ch;
 
   if ((ch = find_owner(who)) && GET_LEVEL(ch) >= 108)
     return 1;
@@ -1212,7 +1212,7 @@ struct obj_data *exists_in_vault(struct vault_data *vault, obj_data *obj)
   return 0;
 }
 
-void vault_get(char_data *ch, char *object, char *owner)
+void vault_get(Character *ch, char *object, char *owner)
 {
   std::string sbuf;
   char obj_list[50][100];
@@ -1502,7 +1502,7 @@ int search_vault_by_vnum(int vnum, struct vault_data *vault)
   return 0;
 }
 
-void vault_deposit(char_data *ch, unsigned int amount, char *owner)
+void vault_deposit(Character *ch, unsigned int amount, char *owner)
 {
   struct vault_data *vault;
   char buf[MAX_INPUT_LENGTH];
@@ -1555,7 +1555,7 @@ void vault_deposit(char_data *ch, unsigned int amount, char *owner)
   }
 }
 
-void vault_withdraw(char_data *ch, unsigned int amount, char *owner)
+void vault_withdraw(Character *ch, unsigned int amount, char *owner)
 {
   struct vault_data *vault;
   char buf[MAX_INPUT_LENGTH];
@@ -1612,7 +1612,7 @@ void vault_withdraw(char_data *ch, unsigned int amount, char *owner)
   }
 }
 
-int can_put_in_vault(struct obj_data *obj, int self, struct vault_data *vault, char_data *ch)
+int can_put_in_vault(struct obj_data *obj, int self, struct vault_data *vault, Character *ch)
 {
   //  struct obj_data *tmp_obj;
 
@@ -1678,7 +1678,7 @@ int can_put_in_vault(struct obj_data *obj, int self, struct vault_data *vault, c
   return 1;
 }
 
-void vault_put(char_data *ch, char *object, char *owner)
+void vault_put(Character *ch, char *object, char *owner)
 {
   struct obj_data *obj, *tmp_obj;
   struct vault_data *vault;
@@ -1868,7 +1868,7 @@ void sort_vault(const vault_data &vault, sorted_vault &sv)
   }
 }
 
-void vault_list(char_data *ch, char *owner)
+void vault_list(Character *ch, char *owner)
 {
   struct vault_items_data *items;
   struct vault_data *vault;
@@ -2006,7 +2006,7 @@ void add_new_vault(char *name, int indexonly)
 
   // now create a new vault for the player
 
-  char_data *ch = find_owner(name);
+  Character *ch = find_owner(name);
 
   sprintf(fname, "../vaults/%c/%s.vault", UPPER(*name), name);
   if (!(pvfl = fopen(fname, "w")))
@@ -2045,7 +2045,7 @@ void add_new_vault(char *name, int indexonly)
   save_vault(name);
 }
 
-char_data *find_owner(const char *name)
+Character *find_owner(const char *name)
 {
   const auto &character_list = DC::getInstance()->character_list;
   const auto &result = find_if(character_list.begin(), character_list.end(), [&name](const auto &ch)
@@ -2068,7 +2068,7 @@ char_data *find_owner(const char *name)
   return nullptr;
 }
 
-void vault_log(char_data *ch, char *owner)
+void vault_log(Character *ch, char *owner)
 {
   char buf[MAX_STRING_LENGTH];
   char fname[256];
@@ -2181,8 +2181,8 @@ void vlog(const char *message, const char *name)
   // system(cmd);
 }
 
-int sleazy_vault_guy(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
-                     char_data *owner)
+int sleazy_vault_guy(Character *ch, struct obj_data *obj, int cmd, const char *arg,
+                     Character *owner)
 {
   if (cmd != 59 && cmd != 56)
     return eFAILURE;
@@ -2311,7 +2311,7 @@ int sleazy_vault_guy(char_data *ch, struct obj_data *obj, int cmd, const char *a
   return eFAILURE;
 }
 
-void vault_search_usage(char_data *ch)
+void vault_search_usage(Character *ch)
 {
   send_to_char("Usage: vault search [ keyword <keyword> ] | [ level <levels> ] | ...\r\n", ch);
   send_to_char("keyword <keyword>  -  Single word keyword. Can be used multiple times.\r\n", ch);
@@ -2323,7 +2323,7 @@ void vault_search_usage(char_data *ch)
   send_to_char("vault search keyword staff level 40-60.\r\n\r\n", ch);
 }
 
-int vault_search(char_data *ch, const char *args)
+int vault_search(Character *ch, const char *args)
 {
   int objects = 0;
   bool owner_shown = false;

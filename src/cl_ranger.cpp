@@ -38,8 +38,8 @@ extern CWorld world;
 extern struct obj_data *object_list;
 extern int rev_dir[];
 
-int saves_spell(char_data *ch, char_data *vict, int spell_base, int16_t save_type);
-void check_eq(char_data *ch);
+int saves_spell(Character *ch, Character *vict, int spell_base, int16_t save_type);
+void check_eq(Character *ch);
 extern struct index_data *mob_index;
 int get_difficulty(int);
 
@@ -58,7 +58,7 @@ int charm_space(int level)
   return 1;
 }
 
-int charm_levels(char_data *ch)
+int charm_levels(Character *ch)
 {
   int i = GET_LEVEL(ch) / 5;
   int z = 3;
@@ -74,11 +74,11 @@ int charm_levels(char_data *ch)
   return i;
 }
 
-int do_free_animal(char_data *ch, char *arg, int cmd)
+int do_free_animal(Character *ch, char *arg, int cmd)
 {
-  char_data *victim = nullptr;
+  Character *victim = nullptr;
   char buf[MAX_INPUT_LENGTH];
-  void stop_follower(char_data * ch, int cmd);
+  void stop_follower(Character * ch, int cmd);
 
   if (!has_skill(ch, SKILL_FREE_ANIMAL))
   {
@@ -123,10 +123,10 @@ int do_free_animal(char_data *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-int do_tame(char_data *ch, char *arg, int cmd)
+int do_tame(Character *ch, char *arg, int cmd)
 {
   struct affected_type af;
-  char_data *victim;
+  Character *victim;
   char buf[MAX_INPUT_LENGTH];
 
   while (*arg == ' ')
@@ -180,7 +180,7 @@ int do_tame(char_data *ch, char *arg, int cmd)
   {
     send_to_char("How you plan on controlling so many followers?\n\r", ch);
     return eFAILURE;
-    /*   char_data * vict = nullptr;
+    /*   Character * vict = nullptr;
        for(struct follow_type *k = ch->followers; k; k = k->next)
          if(IS_MOB(k->follower) && affected_by_spell(k->follower, SPELL_CHARM_PERSON))
          {
@@ -245,7 +245,7 @@ int do_tame(char_data *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-int do_track(char_data *ch, char *argument, int cmd)
+int do_track(Character *ch, char *argument, int cmd)
 {
   int x, y;
   int retval, how_deep, learned;
@@ -255,10 +255,10 @@ int do_track(char_data *ch, char *argument, int cmd)
   char condition[60];
   char weight[40];
   char victim[MAX_INPUT_LENGTH];
-  char_data *quarry;
-  char_data *tmp_ch = nullptr; // For checking room stuff
+  Character *quarry;
+  Character *tmp_ch = nullptr; // For checking room stuff
   room_track_data *pScent = 0;
-  void swap_hate_memory(char_data * ch);
+  void swap_hate_memory(Character * ch);
 
   one_argument(argument, victim);
 
@@ -511,7 +511,7 @@ int do_track(char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_ambush(char_data *ch, char *arg, int cmd)
+int do_ambush(Character *ch, char *arg, int cmd)
 {
   char buf[MAX_STRING_LENGTH];
 
@@ -744,7 +744,7 @@ struct forage_lookup forage_lookup_table[SECT_MAX_SECT + 1][6] = {
      {28301, {36, 34, 32, 30}}},
 };
 
-int do_forage(char_data *ch, char *arg, int cmd)
+int do_forage(Character *ch, char *arg, int cmd)
 {
   int learned;
   struct obj_data *new_obj = 0;
@@ -851,7 +851,7 @@ int do_forage(char_data *ch, char *arg, int cmd)
    also, checks level to make sure char is high enough
    return 0 for failure */
 
-int parse_arrow(char_data *ch, char *arrow)
+int parse_arrow(Character *ch, char *arrow)
 {
 
   if (GET_CLASS(ch) != CLASS_RANGER && GET_LEVEL(ch) < 100)
@@ -892,7 +892,7 @@ struct obj_data *find_arrow(struct obj_data *quiver)
   return target;
 }
 
-void do_arrow_miss(char_data *ch, char_data *victim, int dir, struct obj_data *found)
+void do_arrow_miss(Character *ch, Character *victim, int dir, struct obj_data *found)
 {
   char buf[200];
 
@@ -966,7 +966,7 @@ void do_arrow_miss(char_data *ch, char_data *victim, int dir, struct obj_data *f
   }
 }
 
-int mob_arrow_response(char_data *ch, char_data *victim,
+int mob_arrow_response(Character *ch, Character *victim,
                        int dir)
 {
   int dir2 = 0;
@@ -1059,14 +1059,14 @@ int mob_arrow_response(char_data *ch, char_data *victim,
 }
 
 /* no need anymore
-int do_arrow_damage(char_data *ch, char_data *victim,
+int do_arrow_damage(Character *ch, Character *victim,
                      int dir, int dam, int artype,
                      struct obj_data *found)
 {
   char buf[200];
   int retval;
 
-  void inform_victim(char_data *, char_data *, int);
+  void inform_victim(Character *, Character *, int);
 
   buf[199] = '\0'; // just cause I'm paranoid
 
@@ -1147,9 +1147,9 @@ int do_arrow_damage(char_data *ch, char_data *victim,
 }
 */
 
-int do_fire(char_data *ch, char *arg, int cmd)
+int do_fire(Character *ch, char *arg, int cmd)
 {
-  char_data *victim;
+  Character *victim;
   int dam, dir = -1, artype, cost, retval, victroom;
   struct obj_data *found;
   unsigned cur_room, new_room = 0;
@@ -1783,10 +1783,10 @@ int do_fire(char_data *ch, char *arg, int cmd)
   return retval;
 }
 
-int do_mind_delve(char_data *ch, char *arg, int cmd)
+int do_mind_delve(Character *ch, char *arg, int cmd)
 {
   char buf[1000];
-  char_data *target = nullptr;
+  Character *target = nullptr;
   //  int learned, specialization;
 
   if (!*arg)
@@ -1840,7 +1840,7 @@ int do_mind_delve(char_data *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-void check_eq(char_data *ch)
+void check_eq(Character *ch)
 {
   int pos;
 
@@ -1851,7 +1851,7 @@ void check_eq(char_data *ch)
   }
 }
 
-int do_natural_selection(char_data *ch, char *arg, int cmd)
+int do_natural_selection(Character *ch, char *arg, int cmd)
 {
   int i;
   char buf[MAX_STRING_LENGTH];

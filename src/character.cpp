@@ -7,7 +7,7 @@ char_file_u4::char_file_u4()
 {
 }
 
-QString char_data::getSetting(QString key, QString defaultValue)
+QString Character::getSetting(QString key, QString defaultValue)
 {
     if (pcdata != nullptr)
     {
@@ -133,17 +133,17 @@ player_config_t::const_iterator PlayerConfig::constEnd() const
     return config.constEnd();
 }
 
-bool char_data::isMortal(void)
+bool Character::isMortal(void)
 {
     return GET_LEVEL(this) < IMMORTAL;
 }
 
-bool char_data::isImmortal(void)
+bool Character::isImmortal(void)
 {
     return GET_LEVEL(this) >= IMMORTAL;
 }
 
-bool char_data::isImplementer(void)
+bool Character::isImplementer(void)
 {
     return GET_LEVEL(this) == IMPLEMENTER;
 }

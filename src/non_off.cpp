@@ -41,7 +41,7 @@ extern struct index_data *obj_index;
 extern CVoteData *DCVote;
 
 // decay variable means it's from a decaying corpse, not a player
-void log_sacrifice(char_data *ch, obj_data *obj, bool decay = false)
+void log_sacrifice(Character *ch, obj_data *obj, bool decay = false)
 {
 
   if (GET_OBJ_RNUM(obj) == NOWHERE)
@@ -65,7 +65,7 @@ void log_sacrifice(char_data *ch, obj_data *obj, bool decay = false)
   }
 }
 
-int do_sacrifice(char_data *ch, char *argument, int cmd)
+int do_sacrifice(Character *ch, char *argument, int cmd)
 {
   struct obj_data *obj;
   char name[MAX_INPUT_LENGTH + 1];
@@ -155,7 +155,7 @@ int do_sacrifice(char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_visible(char_data *ch, char *argument, int cmd)
+int do_visible(Character *ch, char *argument, int cmd)
 {
   if (affected_by_spell(ch, SPELL_INVISIBLE))
   {
@@ -176,7 +176,7 @@ int do_visible(char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_donate(char_data *ch, char *argument, int cmd)
+int do_donate(Character *ch, char *argument, int cmd)
 {
   struct obj_data *obj;
   char name[MAX_INPUT_LENGTH + 1];
@@ -337,7 +337,7 @@ int do_donate(char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_title(char_data *ch, char *argument, int cmd)
+int do_title(Character *ch, char *argument, int cmd)
 {
   char buf[100];
   int ctr;
@@ -410,7 +410,7 @@ char *toggle_txt[] = {
     "nodupekeys",
     ""};
 
-int do_toggle(char_data *ch, char *arg, int cmd)
+int do_toggle(Character *ch, char *arg, int cmd)
 {
   int x;
   char buf[MAX_STRING_LENGTH];
@@ -631,7 +631,7 @@ int do_toggle(char_data *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-int char_data::do_config(QStringList &arguments, int cmd)
+int Character::do_config(QStringList &arguments, int cmd)
 {
   if (pcdata->config == nullptr)
   {
@@ -791,7 +791,7 @@ int char_data::do_config(QStringList &arguments, int cmd)
   return eFAILURE;
 }
 
-int do_brief(char_data *ch, char *argument, int cmd)
+int do_brief(Character *ch, char *argument, int cmd)
 {
   if (IS_NPC(ch))
     return eFAILURE;
@@ -809,7 +809,7 @@ int do_brief(char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_ansi(char_data *ch, char *argument, int cmd)
+int do_ansi(Character *ch, char *argument, int cmd)
 {
   if (IS_NPC(ch))
     return eFAILURE;
@@ -827,7 +827,7 @@ int do_ansi(char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_vt100(char_data *ch, char *argument, int cmd)
+int do_vt100(Character *ch, char *argument, int cmd)
 {
   if (IS_NPC(ch))
     return eFAILURE;
@@ -845,7 +845,7 @@ int do_vt100(char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_compact(char_data *ch, char *argument, int cmd)
+int do_compact(Character *ch, char *argument, int cmd)
 {
   if (IS_NPC(ch))
     return eFAILURE;
@@ -863,7 +863,7 @@ int do_compact(char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_summon_toggle(char_data *ch, char *argument, int cmd)
+int do_summon_toggle(Character *ch, char *argument, int cmd)
 {
   if (IS_NPC(ch))
     return eFAILURE;
@@ -883,7 +883,7 @@ int do_summon_toggle(char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_lfg_toggle(char_data *ch, char *argument, int cmd)
+int do_lfg_toggle(Character *ch, char *argument, int cmd)
 {
   if (IS_NPC(ch))
     return eFAILURE;
@@ -901,7 +901,7 @@ int do_lfg_toggle(char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_guide_toggle(char_data *ch, char *argument, int cmd)
+int do_guide_toggle(Character *ch, char *argument, int cmd)
 {
   if (IS_NPC(ch))
     return eFAILURE;
@@ -925,7 +925,7 @@ int do_guide_toggle(char_data *ch, char *argument, int cmd)
 
   return eSUCCESS;
 }
-int do_news_toggle(char_data *ch, char *argument, int cmd)
+int do_news_toggle(Character *ch, char *argument, int cmd)
 {
   if (IS_NPC(ch))
     return eFAILURE;
@@ -944,7 +944,7 @@ int do_news_toggle(char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_ascii_toggle(char_data *ch, char *argument, int cmd)
+int do_ascii_toggle(Character *ch, char *argument, int cmd)
 {
   if (IS_NPC(ch))
     return eFAILURE;
@@ -963,7 +963,7 @@ int do_ascii_toggle(char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_damage_toggle(char_data *ch, char *argument, int cmd)
+int do_damage_toggle(Character *ch, char *argument, int cmd)
 {
   if (IS_NPC(ch))
     return eFAILURE;
@@ -982,7 +982,7 @@ int do_damage_toggle(char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_notax_toggle(char_data *ch, char *argument, int cmd)
+int do_notax_toggle(Character *ch, char *argument, int cmd)
 {
   if (IS_NPC(ch))
     return eFAILURE;
@@ -1001,7 +1001,7 @@ int do_notax_toggle(char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_charmiejoin_toggle(char_data *ch, char *argument, int cmd)
+int do_charmiejoin_toggle(Character *ch, char *argument, int cmd)
 {
   if (IS_NPC(ch))
     return eFAILURE;
@@ -1020,7 +1020,7 @@ int do_charmiejoin_toggle(char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_autoeat(char_data *ch, char *argument, int cmd)
+int do_autoeat(Character *ch, char *argument, int cmd)
 {
   if (IS_NPC(ch))
     return eFAILURE;
@@ -1038,7 +1038,7 @@ int do_autoeat(char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_anonymous(char_data *ch, char *argument, int cmd)
+int do_anonymous(Character *ch, char *argument, int cmd)
 {
   if (ch == 0)
   {
@@ -1063,7 +1063,7 @@ int do_anonymous(char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_wimpy(char_data *ch, char *argument, int cmd)
+int do_wimpy(Character *ch, char *argument, int cmd)
 {
   if (IS_SET(ch->pcdata->toggles, PLR_WIMPY))
   {
@@ -1079,7 +1079,7 @@ int do_wimpy(char_data *ch, char *argument, int cmd)
 
 // Remember that his is "no-pager".  So if it's set, we don't page
 // If it's not set, we do.
-int do_pager(char_data *ch, char *argument, int cmd)
+int do_pager(Character *ch, char *argument, int cmd)
 {
   if (IS_SET(ch->pcdata->toggles, PLR_PAGER))
   {
@@ -1093,7 +1093,7 @@ int do_pager(char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_bard_song_toggle(char_data *ch, char *argument, int cmd)
+int do_bard_song_toggle(Character *ch, char *argument, int cmd)
 {
   if (IS_SET(ch->pcdata->toggles, PLR_BARD_SONG))
   {
@@ -1107,7 +1107,7 @@ int do_bard_song_toggle(char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_nodupekeys_toggle(char_data *ch, char *argument, int cmd)
+int do_nodupekeys_toggle(Character *ch, char *argument, int cmd)
 {
   if (IS_SET(ch->pcdata->toggles, PLR_NODUPEKEYS))
   {
@@ -1121,7 +1121,7 @@ int do_nodupekeys_toggle(char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_beep_set(char_data *ch, char *arg, int cmd)
+int do_beep_set(Character *ch, char *arg, int cmd)
 {
   if (IS_NPC(ch))
     return eFAILURE;
@@ -1138,7 +1138,7 @@ int do_beep_set(char_data *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-int do_stand(char_data *ch, char *argument, int cmd)
+int do_stand(Character *ch, char *argument, int cmd)
 {
   switch (GET_POS(ch))
   {
@@ -1187,7 +1187,7 @@ int do_stand(char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_sit(char_data *ch, char *argument, int cmd)
+int do_sit(Character *ch, char *argument, int cmd)
 {
 
   if (IS_SET(world[ch->in_room].room_flags, QUIET))
@@ -1241,7 +1241,7 @@ int do_sit(char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_rest(char_data *ch, char *argument, int cmd)
+int do_rest(Character *ch, char *argument, int cmd)
 {
 
   if (IS_SET(world[ch->in_room].room_flags, QUIET))
@@ -1293,7 +1293,7 @@ int do_rest(char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_sleep(char_data *ch, char *argument, int cmd)
+int do_sleep(Character *ch, char *argument, int cmd)
 {
   struct affected_type *paf;
   if (IS_SET(world[ch->in_room].room_flags, QUIET))
@@ -1361,9 +1361,9 @@ int do_sleep(char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_wake(char_data *ch, char *argument, int cmd)
+int do_wake(Character *ch, char *argument, int cmd)
 {
-  char_data *tmp_char;
+  Character *tmp_char;
   char arg[MAX_STRING_LENGTH];
   struct affected_type *af;
 
@@ -1467,12 +1467,12 @@ int do_wake(char_data *ch, char *argument, int cmd)
 }
 
 // global tag var
-char_data *tagged_person;
+Character *tagged_person;
 
-int do_tag(char_data *ch, char *argument, int cmd)
+int do_tag(Character *ch, char *argument, int cmd)
 {
   char name[MAX_INPUT_LENGTH];
-  char_data *victim;
+  Character *victim;
 
   one_argument(name, argument);
 
@@ -1485,7 +1485,7 @@ int do_tag(char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-void CVoteData::DisplayVote(char_data *ch)
+void CVoteData::DisplayVote(Character *ch)
 {
   char buf[MAX_STRING_LENGTH];
   std::vector<SVoteData>::iterator answer_it;
@@ -1505,7 +1505,7 @@ void CVoteData::DisplayVote(char_data *ch)
   ch->send("\n\r");
 }
 
-void CVoteData::RemoveAnswer(char_data *ch, unsigned int answer)
+void CVoteData::RemoveAnswer(Character *ch, unsigned int answer)
 {
   if (active)
   {
@@ -1527,7 +1527,7 @@ void CVoteData::RemoveAnswer(char_data *ch, unsigned int answer)
   send_to_char("Answer removed!\n\r", ch);
 }
 
-void CVoteData::StartVote(char_data *ch)
+void CVoteData::StartVote(Character *ch)
 {
   if (active)
   {
@@ -1553,7 +1553,7 @@ void CVoteData::StartVote(char_data *ch)
   return;
 }
 
-void CVoteData::EndVote(char_data *ch)
+void CVoteData::EndVote(Character *ch)
 {
   if (!active)
   {
@@ -1566,7 +1566,7 @@ void CVoteData::EndVote(char_data *ch)
   send_info("\n\r##The vote has ended! Type \"Vote Results\" to see the results!\n\r");
 }
 
-void CVoteData::AddAnswer(char_data *ch, std::string answer)
+void CVoteData::AddAnswer(Character *ch, std::string answer)
 {
   if (active)
   {
@@ -1580,12 +1580,12 @@ void CVoteData::AddAnswer(char_data *ch, std::string answer)
   answers.push_back(tmp);
 }
 
-bool CVoteData::HasVoted(char_data *ch)
+bool CVoteData::HasVoted(Character *ch)
 {
   return (ip_voted[ch->desc->host] || char_voted[GET_NAME(ch)]);
 }
 
-bool CVoteData::Vote(char_data *ch, unsigned int vote)
+bool CVoteData::Vote(Character *ch, unsigned int vote)
 {
   if (!ch->desc)
   {
@@ -1615,7 +1615,7 @@ bool CVoteData::Vote(char_data *ch, unsigned int vote)
   return true;
 }
 
-void CVoteData::DisplayResults(char_data *ch)
+void CVoteData::DisplayResults(Character *ch)
 {
   if (active && GET_LEVEL(ch) > 39 && !ip_voted[ch->desc->host] && GET_LEVEL(ch) < IMMORTAL)
   {
@@ -1647,7 +1647,7 @@ void CVoteData::DisplayResults(char_data *ch)
   csendf(ch, "\n\r");
 }
 
-void CVoteData::Reset(char_data *ch)
+void CVoteData::Reset(Character *ch)
 {
   if (active)
   {
@@ -1712,7 +1712,7 @@ void CVoteData::OutToFile()
   return;
 }
 
-void CVoteData::SetQuestion(char_data *ch, std::string question)
+void CVoteData::SetQuestion(Character *ch, std::string question)
 {
   if (active)
   {
@@ -1823,7 +1823,7 @@ CVoteData::~CVoteData()
 {
 }
 
-int do_vote(char_data *ch, char *arg, int cmd)
+int do_vote(Character *ch, char *arg, int cmd)
 {
   char buf[MAX_STRING_LENGTH];
   int vote;
@@ -1859,7 +1859,7 @@ int do_vote(char_data *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-int do_random(char_data *ch, char *argument, int cmd)
+int do_random(Character *ch, char *argument, int cmd)
 {
   char buf[MAX_STRING_LENGTH];
   int i = 0;

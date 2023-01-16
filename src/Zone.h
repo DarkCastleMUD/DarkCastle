@@ -118,7 +118,7 @@ public:
     void setRealTop(int room_key);
 
     void write(FILE *fl);
-    int show_info(char_data *ch);
+    int show_info(Character *ch);
 
 private:
     zone_t id = {};

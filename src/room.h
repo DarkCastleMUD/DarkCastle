@@ -113,7 +113,7 @@ struct room_direction_data
     char *general_description; /* When look DIR.                  */
     char *keyword;             /* for open/close                  */
     int16_t exit_info;         /* Exit info                       */
-    char_data *bracee;         /* This is who is bracing the door */
+    Character *bracee;         /* This is who is bracing the door */
     int16_t key;               /* Key's number (-1 for no key)    */
     int16_t to_room;           /* Where direction leeds (NOWHERE) */
 };
@@ -154,10 +154,10 @@ public:
     uint32_t temp_room_flags = {};                  // A second bitvector for flags that do NOT get saved.  These are temporary runtime flags.
     int16_t light = {};                             // Light factor of room
 
-    int (*funct)(char_data *, int, char *) = {}; // special procedure
+    int (*funct)(Character *, int, char *) = {}; // special procedure
 
     struct obj_data *contents = {}; // List of items in room
-    char_data *people = {};         // List of NPC / PC in room
+    Character *people = {};         // List of NPC / PC in room
 
     int nTracks = {};                 // number of tracks in the room
     room_track_data *tracks = {};     // beginning of the list of scents

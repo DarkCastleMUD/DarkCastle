@@ -61,7 +61,7 @@ int load_debug = 0;
 
 using namespace std;
 
-int load_new_help(FILE *fl, int reload, char_data *ch);
+int load_new_help(FILE *fl, int reload, Character *ch);
 void load_vaults();
 void load_auction_tickets();
 void load_corpses(void);
@@ -182,7 +182,7 @@ struct index_data *generate_obj_indices(int *top, struct index_data *index);
 void fix_shopkeepers_inventory();
 int file_to_string(const char *name, char *buf);
 void reset_time(void);
-void clear_char(char_data *ch);
+void clear_char(Character *ch);
 
 // MOBprogram locals
 int mprog_name_to_type(char *name);
@@ -259,7 +259,7 @@ room_track_data *room_data::TrackItem(int nIndex)
 	return 0;
 }
 
-void add_to_bard_list(char_data *ch)
+void add_to_bard_list(Character *ch)
 {
 	pulse_data *curr = nullptr;
 
@@ -279,7 +279,7 @@ void add_to_bard_list(char_data *ch)
 	bard_list = curr;
 }
 
-void remove_from_bard_list(char_data *ch)
+void remove_from_bard_list(Character *ch)
 {
 	pulse_data *curr = nullptr;
 	pulse_data *last = nullptr;
@@ -415,7 +415,7 @@ void funny_boot_message()
  It checks if ch exists everywhere it is used,
  so this can be called from other places without
  a character attached. */
-int do_write_skillquest(char_data *ch, char *argument, int cmd)
+int do_write_skillquest(Character *ch, char *argument, int cmd)
 {
 	struct skill_quest *curr;
 	FILE *fl;
@@ -682,7 +682,7 @@ void DC::boot_db(void)
 }
 
 /*
- int do_motdload(char_data *ch, char *argument, int cmd)
+ int do_motdload(Character *ch, char *argument, int cmd)
  {
  file_to_string(MOTD_FILE, motd);
  file_to_string(IMOTD_FILE, imotd);
@@ -771,7 +771,7 @@ void write_wizlist(const char filename[])
 	fclose(fl);
 }
 
-void update_wizlist(char_data *ch)
+void update_wizlist(Character *ch)
 {
 	int x;
 
@@ -815,7 +815,7 @@ void update_wizlist(char_data *ch)
 	write_wizlist(ssbuffer.str().c_str());
 }
 
-int do_wizlist(char_data *ch, char *argument, int cmd)
+int do_wizlist(Character *ch, char *argument, int cmd)
 {
 	char buf[MAX_STRING_LENGTH], lines[500], space[80];
 	int x, current_level, z = 1;
@@ -1061,7 +1061,7 @@ index_data *generate_mob_indices(int *top, struct index_data *index)
 					index[i].mobspec = nullptr;
 					index[i].progtypes = 0;
 					curr_virtno = index[i].virt;
-					if (!(index[i].item = (char_data *)read_mobile(i, fl)))
+					if (!(index[i].item = (Character *)read_mobile(i, fl)))
 					{
 
 						sprintf(log_buf, "Unable to load mobile %d!\n\r",
@@ -1106,7 +1106,7 @@ void add_mobspec(int i)
 	if (i < 0)
 		return;
 
-	char_data *a = (char_data *)mob_index[i].item;
+	Character *a = (Character *)mob_index[i].item;
 	if (!a)
 		return;
 	if (!a->c_class)
@@ -1257,14 +1257,14 @@ void add_mobspec(int i)
 
 		for (int j = 0; j < ACT_MAX / ASIZE + 1; j++)
 		{
-			SET_BIT(((char_data *)mob_index[i].item)->mobdata->actflags[j],
-					((char_data *)mob_index[real_mobile(mob)].item)->mobdata->actflags[j]);
+			SET_BIT(((Character *)mob_index[i].item)->mobdata->actflags[j],
+					((Character *)mob_index[real_mobile(mob)].item)->mobdata->actflags[j]);
 		}
 
 		for (int j = 0; j < AFF_MAX / ASIZE + 1; j++)
 		{
-			SET_BIT(((char_data *)mob_index[i].item)->affected_by[j],
-					((char_data *)mob_index[real_mobile(mob)].item)->affected_by[j]);
+			SET_BIT(((Character *)mob_index[i].item)->affected_by[j],
+					((Character *)mob_index[real_mobile(mob)].item)->affected_by[j]);
 		}
 	}
 
@@ -1278,7 +1278,7 @@ void remove_all_mobs_from_world()
 	auto &character_list = DC::getInstance()->character_list;
 
 	for_each(character_list.begin(), character_list.end(),
-			 [](char_data *const &curr)
+			 [](Character *const &curr)
 			 {
 				 if (IS_NPC(curr))
 					 extract_char(curr, true);
@@ -1665,7 +1665,7 @@ QString read_next_worldfile_name(FILE *flWorldIndex)
 	return filename;
 }
 
-bool can_modify_this_room(char_data *ch, int32_t vnum)
+bool can_modify_this_room(Character *ch, int32_t vnum)
 {
 	if (has_skill(ch, COMMAND_RANGE))
 		return true;
@@ -1679,7 +1679,7 @@ bool can_modify_this_room(char_data *ch, int32_t vnum)
 	return true;
 }
 
-bool can_modify_room(char_data *ch, int32_t vnum)
+bool can_modify_room(Character *ch, int32_t vnum)
 {
 	if (has_skill(ch, COMMAND_RANGE))
 		return true;
@@ -1693,7 +1693,7 @@ bool can_modify_room(char_data *ch, int32_t vnum)
 	return true;
 }
 
-bool can_modify_this_mobile(char_data *ch, int32_t vnum)
+bool can_modify_this_mobile(Character *ch, int32_t vnum)
 {
 	if (has_skill(ch, COMMAND_RANGE))
 		return true;
@@ -1707,12 +1707,12 @@ bool can_modify_this_mobile(char_data *ch, int32_t vnum)
 	return true;
 }
 
-bool can_modify_mobile(char_data *ch, int32_t mob)
+bool can_modify_mobile(Character *ch, int32_t mob)
 {
 	return can_modify_this_mobile(ch, mob);
 }
 
-bool can_modify_this_object(char_data *ch, int32_t vnum)
+bool can_modify_this_object(Character *ch, int32_t vnum)
 {
 	if (has_skill(ch, COMMAND_RANGE))
 		return true;
@@ -1726,7 +1726,7 @@ bool can_modify_this_object(char_data *ch, int32_t vnum)
 	return true;
 }
 
-bool can_modify_object(char_data *ch, int32_t obj)
+bool can_modify_object(Character *ch, int32_t obj)
 {
 	return can_modify_this_object(ch, obj);
 }
@@ -1876,11 +1876,11 @@ void free_world_from_memory()
 
 void free_mobs_from_memory()
 {
-	char_data *curr = nullptr;
+	Character *curr = nullptr;
 
 	for (int i = 0; i <= top_of_mobt; i++)
 	{
-		if ((curr = (char_data *)mob_index[i].item))
+		if ((curr = (Character *)mob_index[i].item))
 		{
 			free_char(curr, Trace("free_mobs_from_memory"));
 			mob_index[i].item = nullptr;
@@ -2077,7 +2077,7 @@ void setup_dir(FILE *fl, int room, int dir)
 }
 
 // return true for success
-int create_one_room(char_data *ch, int vnum)
+int create_one_room(Character *ch, int vnum)
 {
 	class room_data *rp;
 	int x;
@@ -2614,17 +2614,17 @@ void DC::boot_zones(void)
  *********************************************************************** */
 
 /* read a mobile from MOB_FILE */
-char_data *read_mobile(int nr, FILE *fl)
+Character *read_mobile(int nr, FILE *fl)
 {
 	char buf[200];
 	int i, j;
 	int32_t tmp, tmp2, tmp3;
-	char_data *mob;
+	Character *mob;
 	char letter;
 
 	i = nr;
 
-	mob = new char_data;
+	mob = new Character;
 	auto &free_list = DC::getInstance()->free_list;
 	free_list.erase(mob);
 
@@ -2887,7 +2887,7 @@ void write_mprog_recur(ofstream &fl, mob_prog_data *mprg, bool mob)
 // Write a mob to file
 // Assume valid mob, and file open for writing
 //
-void write_mobile(char_data *mob, FILE *fl)
+void write_mobile(Character *mob, FILE *fl)
 {
 	int i = 0;
 
@@ -2974,7 +2974,7 @@ void write_mobile(char_data *mob, FILE *fl)
 // If a mob is set to 0d0 we need to give it hps depending upon it's level
 // and class.  And then since it's a mob, a bonus:)
 //
-void handle_automatic_mob_damdice(char_data *mob)
+void handle_automatic_mob_damdice(Character *mob)
 {
 	int nodice = 1;
 	int sizedice = 1;
@@ -3076,7 +3076,7 @@ void handle_automatic_mob_damdice(char_data *mob)
 	mob->mobdata->damsizedice = sizedice;
 }
 
-void handle_automatic_mob_hitpoints(char_data *mob)
+void handle_automatic_mob_hitpoints(Character *mob)
 {
 	int base;
 
@@ -3138,7 +3138,7 @@ void handle_automatic_mob_hitpoints(char_data *mob)
 }
 
 // currently hit and dam are the same
-void handle_automatic_mob_hitdamroll(char_data *mob)
+void handle_automatic_mob_hitdamroll(Character *mob)
 {
 	int curhit;
 
@@ -3172,7 +3172,7 @@ void handle_automatic_mob_hitdamroll(char_data *mob)
 	mob->damroll = curhit;
 }
 
-void handle_automatic_mob_settings(char_data *mob)
+void handle_automatic_mob_settings(Character *mob)
 {
 	extern struct mob_matrix_data mob_matrix[];
 	// New matrix is handled here.
@@ -3326,20 +3326,20 @@ void handle_automatic_mob_settings(char_data *mob)
 	mob->max_hit = mob->raw_hit = mob->hit = mob_matrix[baselevel].hitpoints + ((mob_matrix[baselevel].hitpoints / 100) * percent);
 }
 
-char_data *clone_mobile(int nr)
+Character *clone_mobile(int nr)
 {
 	int i;
-	char_data *mob, *old;
+	Character *mob, *old;
 
 	if (nr < 0)
 		return 0;
 
-	mob = new char_data;
+	mob = new Character;
 	auto &free_list = DC::getInstance()->free_list;
 	free_list.erase(mob);
 
 	clear_char(mob);
-	old = ((char_data *)(mob_index[nr].item)); /* cast void pointer */
+	old = ((Character *)(mob_index[nr].item)); /* cast void pointer */
 
 	*mob = *old;
 
@@ -3498,7 +3498,7 @@ int create_blank_item(int nr)
 //  Hack of create_blank_item.. Uriz
 int create_blank_mobile(int nr)
 {
-	char_data *mob;
+	Character *mob;
 	int cur_index = 0;
 
 	// check if room available in index
@@ -3521,9 +3521,9 @@ int create_blank_mobile(int nr)
 		// create
 
 #ifdef LEAK_CHECK
-	mob = (char_data *)calloc(1, sizeof(char_data));
+	mob = (Character *)calloc(1, sizeof(Character));
 #else
-	mob = (char_data *)dc_alloc(1, sizeof(char_data));
+	mob = (Character *)dc_alloc(1, sizeof(Character));
 #endif
 
 	clear_char(mob);
@@ -3597,7 +3597,7 @@ int create_blank_mobile(int nr)
 	// update index of all mobiles in game
 	auto &character_list = DC::getInstance()->character_list;
 	for_each(character_list.begin(), character_list.end(),
-			 [&cur_index](char_data *const &curr)
+			 [&cur_index](Character *const &curr)
 			 {
 				 if (IS_MOB(curr))
 					 if (curr->mobdata->nr >= cur_index)
@@ -3606,7 +3606,7 @@ int create_blank_mobile(int nr)
 
 	// update index of all the mob prototypes
 	for (i = cur_index + 1; i <= top_of_mobt; i++)
-		((char_data *)mob_index[i].item)->mobdata->nr++;
+		((Character *)mob_index[i].item)->mobdata->nr++;
 
 	// update obj file indices
 	world_file_list_item *wcurr = nullptr;
@@ -3665,7 +3665,7 @@ void delete_mob_from_index(int nr)
 	// update index of all mobiles in game - these store rnums
 	auto &character_list = DC::getInstance()->character_list;
 	for_each(character_list.begin(), character_list.end(),
-			 [&nr](char_data *const &curr)
+			 [&nr](Character *const &curr)
 			 {
 				 if (IS_NPC(curr) && curr->mobdata->nr >= nr)
 					 curr->mobdata->nr--;
@@ -3673,7 +3673,7 @@ void delete_mob_from_index(int nr)
 
 	// update index of all the mob prototypes
 	for (i = nr; i <= top_of_mobt; i++)
-		((char_data *)mob_index[i].item)->mobdata->nr--;
+		((Character *)mob_index[i].item)->mobdata->nr--;
 
 	// update mob file indices - these store rnums
 	world_file_list_item *wcurr = nullptr;
@@ -4577,7 +4577,7 @@ void Zone::reset(ResetType reset_type)
 
 	int cmd_no, last_cmd, last_mob, last_obj, last_percent;
 	int last_no;
-	char_data *mob = nullptr;
+	Character *mob = nullptr;
 	struct obj_data *obj, *obj_to;
 	last_cmd = last_mob = last_obj = last_percent = -1;
 
@@ -5562,7 +5562,7 @@ char fread_char(FILE *fl)
 }
 
 /* release memory allocated for a char struct */
-void free_char(char_data *ch, Trace trace)
+void free_char(Character *ch, Trace trace)
 {
 	int iWear;
 	//  struct affected_type *af;
@@ -5577,17 +5577,17 @@ void free_char(char_data *ch, Trace trace)
 		Trace trace = free_list.at(ch);
 		stringstream ss;
 		ss << trace;
-		logf(IMMORTAL, LogChannels::LOG_BUG, "free_char: previously freed char_data %p found in free_list from %s", ch, ss.str().c_str());
+		logf(IMMORTAL, LogChannels::LOG_BUG, "free_char: previously freed Character %p found in free_list from %s", ch, ss.str().c_str());
 
 		if (character_list.contains(ch))
 		{
-			logf(IMMORTAL, LogChannels::LOG_BUG, "free_char: previously freed char_data %p found in character_list", ch);
+			logf(IMMORTAL, LogChannels::LOG_BUG, "free_char: previously freed Character %p found in character_list", ch);
 		}
 
 		auto &shooting_list = DC::getInstance()->shooting_list;
 		if (shooting_list.contains(ch))
 		{
-			logf(IMMORTAL, LogChannels::LOG_BUG, "free_char: previously freed char_data %p found in shooting_list", ch);
+			logf(IMMORTAL, LogChannels::LOG_BUG, "free_char: previously freed Character %p found in shooting_list", ch);
 		}
 
 		produce_coredump(ch);
@@ -5759,7 +5759,7 @@ int file_to_string(const char *name, char *buf)
 }
 
 /* clear some of the the working variables of a char */
-void reset_char(char_data *ch)
+void reset_char(Character *ch)
 {
 	int i;
 
@@ -5859,7 +5859,7 @@ void reset_char(char_data *ch)
 /*
  * Clear but do not de-alloc.
  */
-void clear_char(char_data *ch)
+void clear_char(Character *ch)
 {
 	if (ch == nullptr)
 	{
@@ -5911,7 +5911,7 @@ void clear_object(struct obj_data *obj)
 }
 
 // Roll up the random modifiers to saving throw for new character
-void apply_initial_saves(char_data *ch)
+void apply_initial_saves(Character *ch)
 {
 	for (int i = 0; i <= SAVE_TYPE_MAX; i++)
 		if (number(0, 1))
@@ -5920,7 +5920,7 @@ void apply_initial_saves(char_data *ch)
 			ch->pcdata->saves_mods[i] = 0;
 }
 
-void init_char(char_data *ch)
+void init_char(Character *ch)
 {
 	GET_TITLE(ch) = str_dup("is still a virgin.");
 
@@ -6122,9 +6122,9 @@ int mob_in_index(char *name, int index)
 	int i, j;
 
 	for (i = 0, j = 1; (i < MAX_INDEX) && (j <= index) &&
-					   ((char_data *)(mob_index[i].item));
+					   ((Character *)(mob_index[i].item));
 		 i++)
-		if (isname(name, GET_NAME(((char_data *)(mob_index[i].item)))))
+		if (isname(name, GET_NAME(((Character *)(mob_index[i].item)))))
 		{
 			if (j == index)
 				return i;

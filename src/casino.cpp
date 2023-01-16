@@ -49,7 +49,7 @@ struct table_data;
 void addtimer(struct timer_data *add);
 int hand_number(struct player_data *plr);
 int hands(struct player_data *plr);
-bool charExists(char_data *ch);
+bool charExists(Character *ch);
 void reel_spin(void *, void *, void *);
 
 /*
@@ -60,7 +60,7 @@ struct player_data
 {
    struct player_data *next;
    struct table_data *table;
-   char_data *ch;
+   Character *ch;
    int hand_data[21];
    // theoretical cardmax is lower than 21, but whatever
    int bet;
@@ -85,7 +85,7 @@ struct table_data
    struct player_data *cr; // current
    bool gold;
    int options;
-   char_data *dealer;
+   Character *dealer;
    int hand_data[21]; // dealer
    int handnr;
    int state;
@@ -191,7 +191,7 @@ void send_to_table(const string msg, struct table_data *tbl, struct player_data 
       send_to_room(msg, tbl->obj->in_room, true, plrSilent ? plrSilent->ch : 0);
 }
 
-bool charExists(char_data *ch)
+bool charExists(Character *ch)
 {
    auto &character_list = DC::getInstance()->character_list;
 
@@ -208,11 +208,11 @@ bool charExists(char_data *ch)
 bool verify(struct player_data *plr)
 {
    // make sure player didn't quit, die, or whatever
-   // char_data *ch;
+   // Character *ch;
 
    auto &character_list = DC::getInstance()->character_list;
 
-   auto result = find_if(character_list.begin(), character_list.end(), [&plr](char_data *const &ch)
+   auto result = find_if(character_list.begin(), character_list.end(), [&plr](Character *const &ch)
                          {
 	  if (ch == plr->ch) {
 		  return true;
@@ -343,7 +343,7 @@ bool canSplit(struct player_data *plr)
    return false;
 }
 
-struct player_data *createPlayer(char_data *ch, struct table_data *tbl, int noadd = 0)
+struct player_data *createPlayer(Character *ch, struct table_data *tbl, int noadd = 0)
 {
    struct player_data *plr;
 #ifdef LEAK_CHECK
@@ -500,7 +500,7 @@ void check_active(void *arg1, void *arg2, void *arg3)
    if ((uint64_t)arg2 == (((plr->table->handnr + 100) * 2 + 100) * 2))
    { // inactive
       struct table_data *tbl = plr->table;
-      char_data *ch = plr->ch;
+      Character *ch = plr->ch;
 
       char buf[MAX_STRING_LENGTH];
       sprintf(buf, "Security removes a sleepy %s from the table.\r\n", GET_NAME(plr->ch));
@@ -950,7 +950,7 @@ void destroy_table(struct table_data *tbl)
    dc_free(tbl);
 }
 
-bool playing(char_data *ch, struct table_data *tbl)
+bool playing(Character *ch, struct table_data *tbl)
 {
    struct player_data *plr;
    for (plr = tbl->plr; plr; plr = plr->next)
@@ -960,7 +960,7 @@ bool playing(char_data *ch, struct table_data *tbl)
    return false;
 }
 
-struct player_data *getPlayer(char_data *ch, struct table_data *tbl)
+struct player_data *getPlayer(Character *ch, struct table_data *tbl)
 {
    struct player_data *plr;
    if (tbl->cr && tbl->cr->ch == ch)
@@ -1050,7 +1050,7 @@ int hand_number(struct player_data *plr)
    }
    return i;
 }
-void blackjack_prompt(char_data *ch, string &prompt, bool ascii)
+void blackjack_prompt(Character *ch, string &prompt, bool ascii)
 {
    if (ch->in_room < 21902 || ch->in_room > 21905)
       if (ch->in_room != 44)
@@ -1200,8 +1200,8 @@ void blackjack_prompt(char_data *ch, string &prompt, bool ascii)
    }
 }
 
-int blackjack_table(char_data *ch, struct obj_data *obj, int cmd, const char *arg,
-                    char_data *invoker)
+int blackjack_table(Character *ch, struct obj_data *obj, int cmd, const char *arg,
+                    Character *invoker)
 {
    char arg1[MAX_INPUT_LENGTH];
    arg = one_argument(arg, arg1);
@@ -1294,7 +1294,7 @@ int blackjack_table(char_data *ch, struct obj_data *obj, int cmd, const char *ar
       send_to_table(buf, obj->table, plr);
       if (obj->table->state == 0)
       {
-         char_data *tmpch;
+         Character *tmpch;
          int i = 0;
          for (tmpch = world[ch->in_room].people; tmpch;
               tmpch = tmpch->next_in_room)
@@ -1308,7 +1308,7 @@ int blackjack_table(char_data *ch, struct obj_data *obj, int cmd, const char *ar
       }
       else
       {
-         char_data *tmpch;
+         Character *tmpch;
          int i = 0;
          for (tmpch = world[ch->in_room].people; tmpch;
               tmpch = tmpch->next_in_room)
@@ -1879,7 +1879,7 @@ int handcompare(int hand1[5], int hand2[5])
    return -1;
 }
 
-int do_testhand(char_data *ch, char *argument, int cmd)
+int do_testhand(Character *ch, char *argument, int cmd)
 {
    char arg[MAX_INPUT_LENGTH];
    one_argument(argument, arg);
@@ -1995,8 +1995,8 @@ void pulse_holdem(struct ttbl *tbl)
 struct machine_data
 {
    obj_data *obj;
-   char_data *prch;
-   char_data *ch;
+   Character *prch;
+   Character *ch;
    uint cost;
    uint lastwin;
    int bet;
@@ -2326,7 +2326,7 @@ void reel_spin(void *arg1, void *arg2, void *arg3)
    save_slot_machines();
 }
 
-int slot_machine(char_data *ch, obj_data *obj, int cmd, const char *arg, char_data *invoker)
+int slot_machine(Character *ch, obj_data *obj, int cmd, const char *arg, Character *invoker)
 {
    char buf[MAX_STRING_LENGTH];
 
@@ -2462,7 +2462,7 @@ char *roulette_display[] = {
 
 struct roulette_player
 {
-   char_data *ch;
+   Character *ch;
    uint32_t bet_array[48];
 };
 
@@ -2499,7 +2499,7 @@ void create_wheel(obj_data *obj)
    obj->wheel = wheel;
 }
 
-void send_wheel_bets(char_data *ch, struct wheel_data *wheel)
+void send_wheel_bets(Character *ch, struct wheel_data *wheel)
 {
    int i, j;
    bool found = false;
@@ -2756,7 +2756,7 @@ void pulse_countdown(void *arg1, void *arg2, void *arg3)
    }
 }
 
-int roulette_table(char_data *ch, struct obj_data *obj, int cmd, const char *arg, char_data *invoker)
+int roulette_table(Character *ch, struct obj_data *obj, int cmd, const char *arg, Character *invoker)
 {
    char arg1[MAX_INPUT_LENGTH], arg2[MAX_STRING_LENGTH], buf[MAX_STRING_LENGTH];
    uint32_t bet = 0;

@@ -32,7 +32,7 @@ extern CWorld world;
 * Figures out if a fountain is present in the room                       *
 *************************************************************************/
 
-int FOUNTAINisPresent (char_data *ch)
+int FOUNTAINisPresent (Character *ch)
 {
   struct obj_data *tmp;
   bool found = false;
@@ -52,7 +52,7 @@ int FOUNTAINisPresent (char_data *ch)
 *  Fill skins and any other drink containers.                           *
 ************************************************************************/
 
-int do_fill(char_data *ch, char *argument, int cmd)
+int do_fill(Character *ch, char *argument, int cmd)
 {
   char buf[MAX_STRING_LENGTH];
   struct obj_data *to_obj;

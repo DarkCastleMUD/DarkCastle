@@ -14,7 +14,7 @@ extern "C"
 #include "returnvals.h"
 #include "interp.h"
 
-int do_alias(char_data *ch, char *arg, int cmd)
+int do_alias(Character *ch, char *arg, int cmd)
 {
   int x,y;
   int z=0;

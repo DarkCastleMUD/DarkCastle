@@ -28,8 +28,8 @@ private:
 public:
   class Path *next; // main Path list
 
-  char *determineRoute(char_data *, int, int); // ch, from, to
-  void addRoom(char_data *, int, bool);        // ch, room, IgnoreConnectingIssues
+  char *determineRoute(Character *, int, int); // ch, from, to
+  void addRoom(Character *, int, bool);        // ch, room, IgnoreConnectingIssues
 
   bool isRoomPathed(int room);
   bool isRoomConnected(int room);

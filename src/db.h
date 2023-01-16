@@ -106,22 +106,22 @@ void set_zone_modified_mob(int32_t room);
 void set_zone_saved_mob(int32_t room);
 void set_zone_modified_obj(int32_t room);
 void set_zone_saved_obj(int32_t room);
-bool can_modify_this_room(char_data *ch, int32_t room);
-bool can_modify_room(char_data *ch, int32_t room);
-bool can_modify_mobile(char_data *ch, int32_t room);
-bool can_modify_object(char_data *ch, int32_t room);
+bool can_modify_this_room(Character *ch, int32_t room);
+bool can_modify_room(Character *ch, int32_t room);
+bool can_modify_mobile(Character *ch, int32_t room);
+bool can_modify_object(Character *ch, int32_t room);
 
 void write_one_room(FILE *fl, int nr);
-void write_mobile(char_data *mob, FILE *fl);
+void write_mobile(Character *mob, FILE *fl);
 void write_object(obj_data *obj, FILE *fl);
 void load_emoting_objects(void);
 int create_entry(char *name);
 void zone_update(void);
-void init_char(char_data *ch);
-void clear_char(char_data *ch);
+void init_char(Character *ch);
+void clear_char(Character *ch);
 void clear_object(struct obj_data *obj);
-void reset_char(char_data *ch);
-void free_char(char_data *ch, Trace trace = Trace("Unknown"));
+void reset_char(Character *ch);
+void free_char(Character *ch, Trace trace = Trace("Unknown"));
 room_t real_room(room_t virt);
 char *fread_string(FILE *fl, int hasher);
 char *fread_string(ifstream &in, int hasher);
@@ -147,9 +147,9 @@ extern index_data mob_index_array[MAX_INDEX];
 #define VIRTUAL 1
 
 struct obj_data *read_object(int nr, FILE *fl, bool zz);
-char_data *read_mobile(int nr, FILE *fl);
+Character *read_mobile(int nr, FILE *fl);
 struct obj_data *clone_object(int nr);
-char_data *clone_mobile(int nr);
+Character *clone_mobile(int nr);
 void randomize_object(obj_data *obj);
 void string_to_file(FILE *f, char *string);
 void string_to_file(ofstream &f, char *string);
@@ -170,7 +170,7 @@ extern time_t start_time; /* mud start time */
 
 struct pulse_data
 { /* list for keeping tract of 'pulsing' chars */
-  char_data *thechar;
+  Character *thechar;
   pulse_data *next;
 };
 
@@ -185,7 +185,7 @@ struct reset_com
   char *comment; /* Any comments that went with the command */
   int active;    // is it active? alot aren't on the builders' port
   time_t last;   // when was it last reset
-  char_data *lastPop;
+  Character *lastPop;
   time_t lastSuccess;
   uint64_t attempts;
   uint64_t successes;
@@ -207,8 +207,8 @@ struct index_data
 {
   int virt;                                                                               /* virt number of ths mob/obj           */
   int number;                                                                             /* number of existing units of ths mob/obj */
-  int (*non_combat_func)(char_data *, struct obj_data *, int, const char *, char_data *); // non Combat special proc
-  int (*combat_func)(char_data *, struct obj_data *, int, const char *, char_data *);     // combat special proc
+  int (*non_combat_func)(Character *, struct obj_data *, int, const char *, Character *); // non Combat special proc
+  int (*combat_func)(Character *, struct obj_data *, int, const char *, Character *);     // combat special proc
   void *item;                                                                             /* the mobile/object itself                 */
 
   mob_prog_data *mobprogs;

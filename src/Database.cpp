@@ -124,7 +124,7 @@ int Database::createPlayerID(char *name)
   return player_id;
 }
 
-void Database::save(char_data *ch, char_file_u4 *st)
+void Database::save(Character *ch, char_file_u4 *st)
 {
   if (ch == 0 || st == 0 || IS_NPC(ch))
     return;
@@ -227,7 +227,7 @@ void Database::save(char_data *ch, char_file_u4 *st)
   }
 }
 
-char_data *Database::load(void)
+Character *Database::load(void)
 {
 
   return 0;

@@ -1,7 +1,7 @@
 
 #ifndef CHARACTER_H_
 #define CHARACTER_H_
-struct char_data;
+struct Character;
 /******************************************************************************
 | $Id: character.h,v 1.85 2014/07/26 23:21:23 jhhudso Exp $
 | Description: This file contains the header information for the character
@@ -35,7 +35,7 @@ struct char_data;
 #include "interp.h"
 #include "utility.h"
 
-struct char_data;
+struct Character;
 
 struct strcasecmp_compare
 {
@@ -143,7 +143,7 @@ struct mob_prog_act_list
 {
     mob_prog_act_list *next;
     char *buf;
-    char_data *ch;
+    Character *ch;
     obj_data *obj;
     void *vo;
 };
@@ -210,13 +210,13 @@ struct affected_type
     int32_t bitvector = {}; /* Tells which bits to set (AFF_XXX)       */
     string caster = {};
     struct affected_type *next = {};
-    char_data *origin = {};
-    char_data *victim = {};
+    Character *origin = {};
+    Character *victim = {};
 };
 
 struct follow_type
 {
-    char_data *follower;
+    Character *follower;
     struct follow_type *next;
 };
 
@@ -286,9 +286,9 @@ struct pc_data
 
     bool possesing = {};   /*  is the person possessing? */
     bool unjoinable = {};  // Do NOT autojoin
-    char_data *golem = {}; // CURRENT golem.
+    Character *golem = {}; // CURRENT golem.
     bool hide[MAX_HIDE] = {};
-    char_data *hiding_from[MAX_HIDE] = {};
+    Character *hiding_from[MAX_HIDE] = {};
     std::queue<string> *away_msgs = {};
     history_t *tell_history = {};
     history_t *gtell_history = {};
@@ -357,11 +357,11 @@ private:
     obj_data *object = {};
 };
 
-// char_data, char_data
+// Character, Character
 // This contains all memory items for a player/mob
 // All non-specific data is held in this structure
 // PC/MOB specific data are held in the appropriate pointed-to structs
-struct char_data
+struct Character
 {
     struct mob_data *mobdata = nullptr;
     struct pc_data *pcdata = nullptr;
@@ -473,20 +473,20 @@ struct char_data
     char *hunting = {}; // Name of "track" target
     char *ambush = {};  // Name of "ambush" target
 
-    char_data *guarding = {};     // Pointer to who I am guarding
+    Character *guarding = {};     // Pointer to who I am guarding
     follow_type *guarded_by = {}; // List of people guarding me
 
     uint32_t affected_by[AFF_MAX / ASIZE + 1] = {}; // Quick reference bitvector for spell affects
     uint32_t combat = {};                           // Bitvector for combat related flags (bash, stun, shock)
     uint32_t misc = {};                             // Bitvector for IS_MOB/logs/channels.  So possessed mobs can channel
 
-    char_data *fighting = {};      /* Opponent     */
-    char_data *next = {};          /* Next anywhere in game */
-    char_data *next_in_room = {};  /* Next in room */
-    char_data *next_fighting = {}; /* Next fighting */
+    Character *fighting = {};      /* Opponent     */
+    Character *next = {};          /* Next anywhere in game */
+    Character *next_in_room = {};  /* Next in room */
+    Character *next_fighting = {}; /* Next fighting */
     obj_data *altar = {};
     struct follow_type *followers = {}; /* List of followers */
-    char_data *master = {};             /* Who is char following? */
+    Character *master = {};             /* Who is char following? */
     char *group_name = {};              /* Name of group */
 
     int32_t timer = {};           // Timer for update
@@ -513,8 +513,8 @@ struct char_data
     int spec = {};
 
     struct room_direction_data *brace_at, *brace_exit; // exits affected by brace
-    void tell_history(char_data *sender, string message);
-    void gtell_history(char_data *sender, string message);
+    void tell_history(Character *sender, string message);
+    void gtell_history(Character *sender, string message);
     time_t first_damage = {};
     uint64_t damage_done = {};
     uint64_t damages = {};
@@ -522,17 +522,17 @@ struct char_data
     uint64_t damage_per_second = {};
     void setPOSFighting();
     int32_t getHP(void);
-    void setHP(int hp, char_data *causer = nullptr);
-    void addHP(int hp, char_data *causer = nullptr);
-    void removeHP(int dam, char_data *causer = nullptr);
+    void setHP(int hp, Character *causer = nullptr);
+    void addHP(int hp, Character *causer = nullptr);
+    void removeHP(int dam, Character *causer = nullptr);
     void fillHP(void);
     void fillHPLimit(void);
     void send(const char *buffer);
     void send(string buffer);
     void send(QString buffer);
-    command_return_t tell(char_data *, string);
+    command_return_t tell(Character *, string);
     void sendRaw(string);
-    vector<char_data *> getFollowers(void);
+    vector<Character *> getFollowers(void);
     void setPlayerLastMob(u_int64_t mobvnum);
 
     void swapSkill(skill_t oldSkill, skill_t newSkill);
@@ -552,8 +552,8 @@ struct char_data
     command_return_t do_identify(QStringList &arguments, int cmd);
     command_return_t do_cdeposit(QStringList &arguments, int cmd);
     command_return_t save(int cmd = CMD_DEFAULT);
-    char_data *getVisiblePlayer(QString name);
-    char_data *getVisibleCharacter(QString name);
+    Character *getVisiblePlayer(QString name);
+    Character *getVisibleCharacter(QString name);
     obj_data *getVisibleObject(QString name);
     bool isMortal(void);
     bool isImmortal(void);
@@ -563,7 +563,7 @@ struct char_data
 class communication
 {
 public:
-    communication(char_data *ch, string message);
+    communication(Character *ch, string message);
     string sender;
     bool sender_ispc;
     string message;
@@ -705,8 +705,8 @@ struct profession
 };
 
 void clear_hunt(void *arg1, void *arg2, void *arg3);
-void clear_hunt(char *arg1, char_data *arg2, void *arg3);
-void prepare_character_for_sixty(char_data *ch);
-bool isPaused(char_data *mob);
+void clear_hunt(char *arg1, Character *arg2, void *arg3);
+void prepare_character_for_sixty(Character *ch);
+bool isPaused(Character *mob);
 
 #endif

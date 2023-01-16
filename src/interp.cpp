@@ -53,8 +53,8 @@ using namespace fmt;
 
 #define SKILL_HIDE 337
 
-int clan_guard(char_data *ch, struct obj_data *obj, int cmd, const char *arg, char_data *owner);
-int check_ethereal_focus(char_data *ch, int trigger_type); // class/cl_mage.cpp
+int clan_guard(Character *ch, struct obj_data *obj, int cmd, const char *arg, Character *owner);
+int check_ethereal_focus(Character *ch, int trigger_type); // class/cl_mage.cpp
 
 extern struct index_data *mob_index;
 extern struct index_data *obj_index;
@@ -68,10 +68,10 @@ string last_char_name = {};
 int last_char_room = {};
 unsigned int cmd_size = 0;
 
-void update_wizlist(char_data *ch);
+void update_wizlist(Character *ch);
 // int system(const char *);
 
-bool can_use_command(char_data *ch, int cmdnum);
+bool can_use_command(Character *ch, int cmdnum);
 
 void add_command_to_radix(struct command_info *cmd);
 
@@ -135,7 +135,7 @@ struct command_info cmd_info[] =
         {"alias", do_alias, nullptr, nullptr, POSITION_DEAD, 0, CMD_DEFAULT, 0, 1, CommandType::all},
         {"toggle", do_toggle, nullptr, nullptr, POSITION_DEAD, 0, CMD_DEFAULT, 0, 1, CommandType::all},
         {"consider", do_consider, nullptr, nullptr, POSITION_RESTING, 0, CMD_DEFAULT, 0, 1, CommandType::all},
-        {"configure", nullptr, nullptr, &char_data::do_config, POSITION_DEAD, 0, CMD_DEFAULT, 0, 1, CommandType::players_only},
+        {"configure", nullptr, nullptr, &Character::do_config, POSITION_DEAD, 0, CMD_DEFAULT, 0, 1, CommandType::players_only},
         {"credits", do_credits, nullptr, nullptr, POSITION_DEAD, 0, CMD_DEFAULT, 0, 1, CommandType::all},
         {"equipment", do_equipment, nullptr, nullptr, POSITION_DEAD, 0, CMD_DEFAULT, 0, 1, CommandType::all},
         {"ohelp", do_help, nullptr, nullptr, POSITION_DEAD, 0, CMD_DEFAULT, 0, 1, CommandType::all},
@@ -157,9 +157,9 @@ struct command_info cmd_info[] =
         {"index", do_index, nullptr, nullptr, POSITION_DEAD, 0, CMD_DEFAULT, 0, 1, CommandType::all},
         {"areas", do_areas, nullptr, nullptr, POSITION_DEAD, 0, CMD_DEFAULT, 0, 1, CommandType::all},
         {"commands", do_new_help, nullptr, nullptr, POSITION_DEAD, 0, CMD_DEFAULT, 0, 1, CommandType::all},
-        {"experience", nullptr, nullptr, &char_data::do_experience, POSITION_DEAD, 0, CMD_DEFAULT, 0, 1, CommandType::players_only},
+        {"experience", nullptr, nullptr, &Character::do_experience, POSITION_DEAD, 0, CMD_DEFAULT, 0, 1, CommandType::players_only},
         {"version", do_version, nullptr, nullptr, POSITION_DEAD, 0, CMD_DEFAULT, 0, 0, CommandType::all},
-        {"identify", nullptr, nullptr, &char_data::do_identify, POSITION_DEAD, 0, CMD_DEFAULT, COM_CHARMIE_OK, 0, CommandType::all},
+        {"identify", nullptr, nullptr, &Character::do_identify, POSITION_DEAD, 0, CMD_DEFAULT, COM_CHARMIE_OK, 0, CommandType::all},
 
         // Communication commands
         {"ask", do_ask, nullptr, nullptr, POSITION_RESTING, 0, CMD_DEFAULT, COM_CHARMIE_OK, 0, CommandType::all},
@@ -287,7 +287,7 @@ struct command_info cmd_info[] =
         {"whoclan", do_whoclan, nullptr, nullptr, POSITION_DEAD, 0, CMD_DEFAULT, 0, 1, CommandType::all},
         {"cpromote", do_cpromote, nullptr, nullptr, POSITION_RESTING, 0, CMD_DEFAULT, 0, 1, CommandType::all},
         {"clans", do_clans, nullptr, nullptr, POSITION_SLEEPING, 0, CMD_DEFAULT, 0, 1, CommandType::all},
-        {"clanarea", nullptr, nullptr, &char_data::do_clanarea, POSITION_RESTING, 11, CMD_DEFAULT, 0, 1, CommandType::all},
+        {"clanarea", nullptr, nullptr, &Character::do_clanarea, POSITION_RESTING, 11, CMD_DEFAULT, 0, 1, CommandType::all},
         {"cinfo", do_cinfo, nullptr, nullptr, POSITION_SLEEPING, 0, CMD_DEFAULT, 0, 1, CommandType::all},
         {"ambush", do_ambush, nullptr, nullptr, POSITION_RESTING, 0, CMD_DEFAULT, 0, 1, CommandType::all},
         {"whoarena", do_whoarena, nullptr, nullptr, POSITION_SLEEPING, 0, CMD_DEFAULT, 0, 1, CommandType::all},
@@ -324,10 +324,10 @@ struct command_info cmd_info[] =
         {"free animal", do_free_animal, nullptr, nullptr, POSITION_RESTING, 0, CMD_DEFAULT, 0, 0, CommandType::all},
         {"prompt", do_prompt, nullptr, nullptr, POSITION_DEAD, 0, CMD_DEFAULT, 0, 1, CommandType::all},
         {"lastprompt", do_lastprompt, nullptr, nullptr, POSITION_DEAD, 0, CMD_DEFAULT, 0, 1, CommandType::all},
-        {"save", nullptr, nullptr, &char_data::do_save, POSITION_DEAD, 0, CMD_DEFAULT, 0, 1, CommandType::all},
+        {"save", nullptr, nullptr, &Character::do_save, POSITION_DEAD, 0, CMD_DEFAULT, 0, 1, CommandType::all},
         {"sneak", do_sneak, nullptr, nullptr, POSITION_STANDING, 1, CMD_DEFAULT, 0, 0, CommandType::all},
         {"home", do_home, nullptr, nullptr, POSITION_DEAD, 0, CMD_DEFAULT, 0, 1, CommandType::all},
-        {"split", nullptr, nullptr, &char_data::do_split, POSITION_RESTING, 0, CMD_SPLIT, 0, 0, CommandType::all},
+        {"split", nullptr, nullptr, &Character::do_split, POSITION_RESTING, 0, CMD_SPLIT, 0, 0, CommandType::all},
         {"spells", do_spells, nullptr, nullptr, POSITION_SLEEPING, 0, CMD_DEFAULT, 0, 1, CommandType::all},
         {"skills", do_skills, nullptr, nullptr, POSITION_SLEEPING, 0, CMD_DEFAULT, 0, 1, CommandType::all},
         {"songs", do_songs, nullptr, nullptr, POSITION_SLEEPING, 0, CMD_DEFAULT, 0, 1, CommandType::all},
@@ -336,7 +336,7 @@ struct command_info cmd_info[] =
         {"motd", do_motd, nullptr, nullptr, POSITION_DEAD, 0, CMD_DEFAULT, 0, 1, CommandType::all},
         {"cmotd", do_cmotd, nullptr, nullptr, POSITION_DEAD, 0, CMD_DEFAULT, 0, 1, CommandType::all},
         {"cbalance", do_cbalance, nullptr, nullptr, POSITION_STANDING, 0, CMD_DEFAULT, 0, 0, CommandType::all},
-        {"cdeposit", nullptr, nullptr, &char_data::do_cdeposit, POSITION_STANDING, 0, CMD_DEFAULT, 0, 0, CommandType::all},
+        {"cdeposit", nullptr, nullptr, &Character::do_cdeposit, POSITION_STANDING, 0, CMD_DEFAULT, 0, 0, CommandType::all},
         {"cwithdraw", do_cwithdraw, nullptr, nullptr, POSITION_STANDING, 0, CMD_DEFAULT, 0, 0, CommandType::all},
         {"ctax", do_ctax, nullptr, nullptr, POSITION_STANDING, 0, CMD_DEFAULT, 0, 1, CommandType::all},
         {"where", do_where, nullptr, nullptr, POSITION_RESTING, 0, CMD_DEFAULT, 0, 1, CommandType::all},
@@ -430,7 +430,7 @@ struct command_info cmd_info[] =
         {"disconnect", do_disconnect, nullptr, nullptr, POSITION_DEAD, 106, CMD_DEFAULT, 0, 1, CommandType::all},
         {"force", nullptr, do_force, nullptr, POSITION_DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1, CommandType::all},
         {"pardon", do_pardon, nullptr, nullptr, POSITION_DEAD, OVERSEER, CMD_DEFAULT, 0, 1, CommandType::all},
-        {"goto", nullptr, nullptr, &char_data::do_goto, POSITION_DEAD, 102, CMD_DEFAULT, 0, 1, CommandType::immortals_only},
+        {"goto", nullptr, nullptr, &Character::do_goto, POSITION_DEAD, 102, CMD_DEFAULT, 0, 1, CommandType::immortals_only},
         {"restore", do_restore, nullptr, nullptr, POSITION_DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1, CommandType::all},
         {"purloin", do_purloin, nullptr, nullptr, POSITION_DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1, CommandType::all},
         {"set", do_set, nullptr, nullptr, POSITION_DEAD, GIFTED_COMMAND, CMD_DEFAULT, 0, 1, CommandType::all},
@@ -478,7 +478,7 @@ struct command_info cmd_info[] =
         {"teleport", do_teleport, nullptr, nullptr, POSITION_DEAD, DEITY, CMD_DEFAULT, 0, 1, CommandType::all},
         {"purge", do_purge, nullptr, nullptr, POSITION_DEAD, 103, CMD_DEFAULT, 0, 1, CommandType::all},
         {"show", do_show, nullptr, nullptr, POSITION_DEAD, ANGEL, CMD_DEFAULT, 0, 1, CommandType::all},
-        {"search", nullptr, nullptr, &char_data::do_search, POSITION_DEAD, 0, CMD_DEFAULT, 0, 1, CommandType::all},
+        {"search", nullptr, nullptr, &Character::do_search, POSITION_DEAD, 0, CMD_DEFAULT, 0, 1, CommandType::all},
         {"fighting", do_fighting, nullptr, nullptr, POSITION_DEAD, 104, CMD_DEFAULT, 0, 1, CommandType::all},
         {"peace", do_peace, nullptr, nullptr, POSITION_DEAD, ANGEL, CMD_DEFAULT, 0, 1, CommandType::all},
         {"check", do_check, nullptr, nullptr, POSITION_DEAD, 105, CMD_DEFAULT, 0, 1, CommandType::all},
@@ -494,7 +494,7 @@ struct command_info cmd_info[] =
         {"rdelete", do_rdelete, nullptr, nullptr, POSITION_DEAD, ANGEL, CMD_DEFAULT, 0, 1, CommandType::all},
         {"oneway", do_oneway, nullptr, nullptr, POSITION_DEAD, ANGEL, 1, 0, 1, CommandType::all},
         {"twoway", do_oneway, nullptr, nullptr, POSITION_DEAD, ANGEL, 2, 0, 1, CommandType::all},
-        {"zsave", nullptr, nullptr, &char_data::do_zsave, POSITION_DEAD, ANGEL, CMD_DEFAULT, 0, 1, CommandType::all},
+        {"zsave", nullptr, nullptr, &Character::do_zsave, POSITION_DEAD, ANGEL, CMD_DEFAULT, 0, 1, CommandType::all},
         {"rsave", do_rsave, nullptr, nullptr, POSITION_DEAD, ANGEL, CMD_DEFAULT, 0, 1, CommandType::all},
         {"msave", do_msave, nullptr, nullptr, POSITION_DEAD, ANGEL, CMD_DEFAULT, 0, 1, CommandType::all},
         {"osave", do_osave, nullptr, nullptr, POSITION_DEAD, ANGEL, CMD_DEFAULT, 0, 1, CommandType::all},
@@ -682,7 +682,7 @@ struct command_info *find_cmd_in_radix(const char *arg)
   return 0;
 }
 
-int do_motd(char_data *ch, char *arg, int cmd)
+int do_motd(Character *ch, char *arg, int cmd)
 {
   extern char motd[];
 
@@ -690,7 +690,7 @@ int do_motd(char_data *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-int do_imotd(char_data *ch, char *arg, int cmd)
+int do_imotd(Character *ch, char *arg, int cmd)
 {
   extern char imotd[];
 
@@ -698,7 +698,7 @@ int do_imotd(char_data *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-int command_interpreter(char_data *ch, string pcomm, bool procced)
+int command_interpreter(Character *ch, string pcomm, bool procced)
 {
   CommandStack cstack;
 
@@ -1129,7 +1129,7 @@ int search_blocknolow(char *arg, const char **list, bool exact)
   return (-1);
 }
 
-int do_boss(char_data *ch, char *arg, int cmd)
+int do_boss(Character *ch, char *arg, int cmd)
 {
   char buf[200];
   int x;
@@ -1589,10 +1589,10 @@ void chop_half(char *string, char *arg1, char *arg2)
   arg2[i] = '\0';
 }
 
-int special(char_data *ch, int cmd, char *arg)
+int special(Character *ch, int cmd, char *arg)
 {
   struct obj_data *i;
-  char_data *k;
+  Character *k;
   int j;
   int retval;
 
@@ -1628,7 +1628,7 @@ int special(char_data *ch, int cmd, char *arg)
   {
     if (IS_MOB(k))
     {
-      if (((char_data *)mob_index[k->mobdata->nr].item)->mobdata->mob_flags.type == MOB_CLAN_GUARD)
+      if (((Character *)mob_index[k->mobdata->nr].item)->mobdata->mob_flags.type == MOB_CLAN_GUARD)
       {
         retval = clan_guard(ch, 0, cmd, arg, k);
         if (IS_SET(retval, eCH_DIED) || IS_SET(retval, eSUCCESS))
@@ -1657,7 +1657,7 @@ int special(char_data *ch, int cmd, char *arg)
   return eFAILURE;
 }
 
-void add_command_lag(char_data *ch, int cmdnum, int lag)
+void add_command_lag(Character *ch, int cmdnum, int lag)
 {
   if (!ch)
     return;
@@ -1677,7 +1677,7 @@ void add_command_lag(char_data *ch, int cmdnum, int lag)
   cmdl->lag = lag;
 }
 
-bool can_use_command(char_data *ch, int cmdnum)
+bool can_use_command(Character *ch, int cmdnum)
 {
   struct command_lag *cmdl;
   for (cmdl = command_lag_list; cmdl; cmdl = cmdl->next)

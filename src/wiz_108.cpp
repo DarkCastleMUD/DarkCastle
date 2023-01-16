@@ -19,7 +19,7 @@ using namespace std;
 
 int get_number(char **name);
 
-int do_zoneexits(char_data *ch, char *argument, int cmd)
+int do_zoneexits(Character *ch, char *argument, int cmd)
 {
   //  try
   // {
@@ -167,7 +167,7 @@ int do_zoneexits(char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_purloin(char_data *ch, char *argument, int cmd)
+int do_purloin(Character *ch, char *argument, int cmd)
 {
   char bufName[200], *pBuf;
   struct obj_data *k;
@@ -229,7 +229,7 @@ int do_purloin(char_data *ch, char *argument, int cmd)
 
     if (j == nIndex)
     {
-      char_data *vict = nullptr;
+      Character *vict = nullptr;
       if (k->carried_by)
       {
         vict = k->carried_by;
@@ -279,17 +279,17 @@ int do_purloin(char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_set(char_data *ch, char *argument, int cmd)
+int do_set(Character *ch, char *argument, int cmd)
 {
   //   renamed the command "setup" so don't need this anymore
-  //    void do_mortal_set(char_data *ch, char *argument, int cmd);
+  //    void do_mortal_set(Character *ch, char *argument, int cmd);
   //
   //    if(GET_LEVEL(ch) < IMMORTAL || IS_NPC(ch)) {
   //      do_mortal_set(ch, argument, cmd);
   //      return;
   //    }
 
-  void add_to_bard_list(char_data * ch);
+  void add_to_bard_list(Character * ch);
 
   /* from spell_parser.c */
 
@@ -299,7 +299,7 @@ int do_set(char_data *ch, char *argument, int cmd)
       "sessions", "alignment", "thirst", "drunk", "full", "race",
       "bank", "platinum", "ki", "clan", "saves_base", "hpmeta",
       "manameta", "movemeta", "armor", "profession", "\n"};
-  char_data *vict;
+  Character *vict;
   char name[100], buf2[100], buf[100], help[MAX_STRING_LENGTH];
   int skill, value, i, x;
 

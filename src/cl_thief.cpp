@@ -33,14 +33,14 @@ extern struct index_data *mob_index;
 extern struct index_data *obj_index;
 extern int top_of_world;
 
-int find_door(char_data *ch, char *type, char *dir);
+int find_door(Character *ch, char *type, char *dir);
 int get_weapon_damage_type(struct obj_data *wielded);
-int check_autojoiners(char_data *ch, int skill = 0);
-int check_joincharmie(char_data *ch, int skill = 0);
+int check_autojoiners(Character *ch, int skill = 0);
+int check_joincharmie(Character *ch, int skill = 0);
 
-int do_eyegouge(char_data *ch, char *argument, int cmd)
+int do_eyegouge(Character *ch, char *argument, int cmd)
 {
-  char_data *victim;
+  Character *victim;
   char name[256];
   int level = has_skill(ch, SKILL_EYEGOUGE);
 
@@ -119,9 +119,9 @@ int do_eyegouge(char_data *ch, char *argument, int cmd)
   return retval | eSUCCESS;
 }
 
-int do_backstab(char_data *ch, char *argument, int cmd)
+int do_backstab(Character *ch, char *argument, int cmd)
 {
-  char_data *victim;
+  Character *victim;
   char name[256];
   int was_in = 0;
   int retval;
@@ -296,7 +296,7 @@ int do_backstab(char_data *ch, char *argument, int cmd)
   {
     return retval;
   }
-  extern bool charExists(char_data * ch);
+  extern bool charExists(Character * ch);
   if (!charExists(victim)) // heh
   {
     return eSUCCESS | eVICT_DIED;
@@ -338,9 +338,9 @@ int do_backstab(char_data *ch, char *argument, int cmd)
   return retval;
 }
 
-int do_circle(char_data *ch, char *argument, int cmd)
+int do_circle(Character *ch, char *argument, int cmd)
 {
-  char_data *victim;
+  Character *victim;
   int retval;
 
   if (!canPerform(ch, SKILL_CIRCLE))
@@ -502,9 +502,9 @@ int do_circle(char_data *ch, char *argument, int cmd)
   return retval;
 }
 
-int do_trip(char_data *ch, char *argument, int cmd)
+int do_trip(Character *ch, char *argument, int cmd)
 {
-  char_data *victim = 0;
+  Character *victim = 0;
   char name[256];
   int retval;
 
@@ -614,7 +614,7 @@ int do_trip(char_data *ch, char *argument, int cmd)
   return retval;
 }
 
-int do_sneak(char_data *ch, char *argument, int cmd)
+int do_sneak(Character *ch, char *argument, int cmd)
 {
   affected_type af;
 
@@ -660,10 +660,10 @@ int do_sneak(char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_stalk(char_data *ch, char *argument, int cmd)
+int do_stalk(Character *ch, char *argument, int cmd)
 {
   char name[MAX_STRING_LENGTH];
-  char_data *leader;
+  Character *leader;
 
   if (!canPerform(ch, SKILL_STALK))
   {
@@ -720,7 +720,7 @@ int do_stalk(char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_hide(char_data *ch, char *argument, int cmd)
+int do_hide(Character *ch, char *argument, int cmd)
 {
 
   if (!canPerform(ch, SKILL_HIDE))
@@ -737,7 +737,7 @@ int do_hide(char_data *ch, char *argument, int cmd)
     return eFAILURE;
   }
 
-  for (char_data *curr = world[ch->in_room].people;
+  for (Character *curr = world[ch->in_room].people;
        curr;
        curr = curr->next_in_room)
   {
@@ -758,7 +758,7 @@ int do_hide(char_data *ch, char *argument, int cmd)
     SETBIT(ch->affected_by, AFF_HIDE);
   /* See how well it worked on those currently in the room. */
   int a, i;
-  char_data *temp;
+  Character *temp;
   if (!IS_NPC(ch) && (a = has_skill(ch, SKILL_HIDE)))
   {
     for (i = 0; i < MAX_HIDE; i++)
@@ -785,7 +785,7 @@ int do_hide(char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int max_level(char_data *ch)
+int max_level(Character *ch)
 {
   int i = 0, lvl = 0;
   for (; i < MAX_WEAR; i++)
@@ -798,9 +798,9 @@ int max_level(char_data *ch)
 }
 
 // steal an ITEM... not gold
-int do_steal(char_data *ch, char *argument, int cmd)
+int do_steal(Character *ch, char *argument, int cmd)
 {
-  char_data *victim;
+  Character *victim;
   struct obj_data *obj, *loop_obj, *next_obj;
   struct affected_type pthiefaf, *paf;
   char victim_name[240];
@@ -1269,9 +1269,9 @@ int do_steal(char_data *ch, char *argument, int cmd)
 }
 
 // Steal gold
-int do_pocket(char_data *ch, char *argument, int cmd)
+int do_pocket(Character *ch, char *argument, int cmd)
 {
-  char_data *victim;
+  Character *victim;
   struct affected_type pthiefaf;
   char victim_name[240];
   char buf[240];
@@ -1452,13 +1452,13 @@ int do_pocket(char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_pick(char_data *ch, char *argument, int cmd)
+int do_pick(Character *ch, char *argument, int cmd)
 {
   int door, other_room, j;
   char type[MAX_INPUT_LENGTH], dir[MAX_INPUT_LENGTH];
   struct room_direction_data *back;
   struct obj_data *obj;
-  char_data *victim;
+  Character *victim;
   bool has_lockpicks = false;
 
   argument_interpreter(argument, type, dir);
@@ -1593,12 +1593,12 @@ int do_pick(char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_slip(char_data *ch, char *argument, int cmd)
+int do_slip(Character *ch, char *argument, int cmd)
 {
   char obj_name[200], vict_name[200], buf[200];
   char arg[MAX_INPUT_LENGTH];
   int amount;
-  char_data *vict;
+  Character *vict;
   struct obj_data *obj, *tmp_object, *container;
 
   extern int weight_in(obj_data *);
@@ -1913,7 +1913,7 @@ int do_slip(char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_vitalstrike(char_data *ch, char *argument, int cmd)
+int do_vitalstrike(Character *ch, char *argument, int cmd)
 {
   struct affected_type af;
 
@@ -1972,7 +1972,7 @@ int do_vitalstrike(char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_deceit(char_data *ch, char *argument, int cmd)
+int do_deceit(Character *ch, char *argument, int cmd)
 {
   struct affected_type af;
 
@@ -1994,7 +1994,7 @@ int do_deceit(char_data *ch, char *argument, int cmd)
   }
 
   int grpsize = 0;
-  for (char_data *tmp_char = world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
+  for (Character *tmp_char = world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
   {
     if (tmp_char == ch)
       continue;
@@ -2023,7 +2023,7 @@ int do_deceit(char_data *ch, char *argument, int cmd)
     af.bitvector = -1;
     affect_to_char(ch, &af);
 
-    for (char_data *tmp_char = world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
+    for (Character *tmp_char = world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
     {
       if (tmp_char == ch)
         continue;
@@ -2052,7 +2052,7 @@ int do_deceit(char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_jab(char_data *ch, char *argument, int cmd)
+int do_jab(Character *ch, char *argument, int cmd)
 {
   int retval = eFAILURE, learned;
 
@@ -2076,7 +2076,7 @@ int do_jab(char_data *ch, char *argument, int cmd)
 
   char arg[MAX_INPUT_LENGTH];
   one_argument(argument, arg);
-  char_data *victim;
+  Character *victim;
 
   if (!*arg && ch->fighting)
     victim = ch->fighting;
@@ -2202,9 +2202,9 @@ int do_jab(char_data *ch, char *argument, int cmd)
   }
 }
 
-int do_appraise(char_data *ch, char *argument, int cmd)
+int do_appraise(Character *ch, char *argument, int cmd)
 {
-  char_data *victim;
+  Character *victim;
   obj_data *obj;
   char name[MAX_STRING_LENGTH], buf[MAX_STRING_LENGTH];
   char item[MAX_STRING_LENGTH];
@@ -2337,9 +2337,9 @@ int do_appraise(char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_cripple(char_data *ch, char *argument, int cmd)
+int do_cripple(Character *ch, char *argument, int cmd)
 {
-  char_data *vict;
+  Character *vict;
   char name[MAX_STRING_LENGTH];
   int skill;
 

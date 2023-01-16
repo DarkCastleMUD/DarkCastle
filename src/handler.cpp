@@ -68,15 +68,15 @@ int strncasecmp(char *s1, const char *s2, int len);
 #endif
 
 /* External procedures */
-int do_fall(char_data *ch, short dir);
+int do_fall(Character *ch, short dir);
 
 // TIMERS
 
-bool isTimer(char_data *ch, int spell)
+bool isTimer(Character *ch, int spell)
 {
 	return affected_by_spell(ch, BASE_TIMERS + spell);
 }
-int timerLeft(char_data *ch, int spell)
+int timerLeft(Character *ch, int spell)
 {
 	struct affected_type *af = affected_by_spell(ch, BASE_TIMERS + spell);
 	if (af == nullptr)
@@ -84,7 +84,7 @@ int timerLeft(char_data *ch, int spell)
 	else
 		return af->duration;
 }
-void addTimer(char_data *ch, int spell, int ticks)
+void addTimer(Character *ch, int spell, int ticks)
 {
 
 	struct affected_type af;
@@ -98,7 +98,7 @@ void addTimer(char_data *ch, int spell, int ticks)
 }
 // END TIMERS
 
-bool is_wearing(char_data *ch, obj_data *item)
+bool is_wearing(Character *ch, obj_data *item)
 {
 	int i;
 	for (i = 0; i < MAX_WEAR; i++)
@@ -263,7 +263,7 @@ int isname(const char *str, const char *namelist)
 	return 0;
 }
 
-int get_max_stat(char_data *ch, uint8_t stat)
+int get_max_stat(Character *ch, uint8_t stat)
 {
 	switch (GET_RACE(ch))
 	{
@@ -403,7 +403,7 @@ int get_max_stat(char_data *ch, uint8_t stat)
 	return 0;
 }
 
-bool still_affected_by_poison(char_data *ch)
+bool still_affected_by_poison(Character *ch)
 {
 	struct affected_type *af = ch->affected;
 
@@ -523,7 +523,7 @@ const struct set_data set_list[] = {
 	 "\n",
 	 "\n"}};
 
-void add_set_stats(char_data *ch, obj_data *obj, int flag, int pos)
+void add_set_stats(Character *ch, obj_data *obj, int flag, int pos)
 {
 	// obj has just been worn
 	int obj_vnum = obj_index[obj->item_number].virt;
@@ -794,7 +794,7 @@ void add_set_stats(char_data *ch, obj_data *obj, int flag, int pos)
 			}
 }
 
-void remove_set_stats(char_data *ch, obj_data *obj, int flag)
+void remove_set_stats(Character *ch, obj_data *obj, int flag)
 {
 	// obj has just been removed
 	int obj_vnum = obj_index[obj->item_number].virt;
@@ -837,7 +837,7 @@ void remove_set_stats(char_data *ch, obj_data *obj, int flag)
 			}
 }
 
-void check_weapon_weights(char_data *ch)
+void check_weapon_weights(Character *ch)
 {
 	struct obj_data *weapon;
 
@@ -880,7 +880,7 @@ void check_weapon_weights(char_data *ch)
 	}
 }
 
-void affect_modify(char_data *ch, int32_t loc, int32_t mod, int32_t bitv, bool add, int flag)
+void affect_modify(Character *ch, int32_t loc, int32_t mod, int32_t bitv, bool add, int flag)
 {
 	char log_buf[256];
 	int i;
@@ -1601,7 +1601,7 @@ void affect_modify(char_data *ch, int32_t loc, int32_t mod, int32_t bitv, bool a
 // that could be on both eq as well as on spells.
 // Stat (con, str, etc) stuff is handled in affect_modify
 
-void affect_total(char_data *ch)
+void affect_total(Character *ch)
 {
 	struct affected_type *af;
 	struct affected_type *tmp_af;
@@ -1646,9 +1646,9 @@ void affect_total(char_data *ch)
 	redo_ki(ch);
 }
 
-/* Insert an affect_type in a char_data structure
+/* Insert an affect_type in a Character structure
  Automatically sets apropriate bits and apply's */
-void affect_to_char(char_data *ch, struct affected_type *af, int32_t duration_type)
+void affect_to_char(Character *ch, struct affected_type *af, int32_t duration_type)
 {
 	//    bool secFix;
 	struct affected_type *affected_alloc;
@@ -1672,7 +1672,7 @@ void affect_to_char(char_data *ch, struct affected_type *af, int32_t duration_ty
 /* Remove an affected_type structure from a char (called when duration
  reaches zero). Pointer *af must never be NIL! Frees mem and calls
  affect_location_apply                                                */
-void affect_remove(char_data *ch, struct affected_type *af, int flags)
+void affect_remove(Character *ch, struct affected_type *af, int flags)
 {
 	struct affected_type *hjp;
 	char buf[200];
@@ -2139,7 +2139,7 @@ void affect_remove(char_data *ch, struct affected_type *af, int flags)
 }
 
 /* Call affect_remove with every spell of spelltype "skill" */
-void affect_from_char(char_data *ch, int skill, int flags)
+void affect_from_char(Character *ch, int skill, int flags)
 {
 	struct affected_type *hjp, *afc, *recheck;
 	//    bool aff2Fix;
@@ -2164,7 +2164,7 @@ void affect_from_char(char_data *ch, int skill, int flags)
  * Return if a char is affected by a spell (SPELL_XXX), nullptr indicates
  * not affected.
  */
-affected_type *affected_by_spell(char_data *ch, int skill)
+affected_type *affected_by_spell(Character *ch, int skill)
 {
 	struct affected_type *curr;
 
@@ -2178,7 +2178,7 @@ affected_type *affected_by_spell(char_data *ch, int skill)
 	return nullptr;
 }
 
-affected_type *affected_by_random(char_data *ch)
+affected_type *affected_by_random(Character *ch)
 {
 	if (ch->affected == 0)
 		return 0;
@@ -2201,7 +2201,7 @@ affected_type *affected_by_random(char_data *ch)
 	return 0;
 }
 
-void affect_join(char_data *ch, struct affected_type *af, bool avg_dur, bool avg_mod)
+void affect_join(Character *ch, struct affected_type *af, bool avg_dur, bool avg_mod)
 {
 	struct affected_type *hjp;
 	bool found = false;
@@ -2228,16 +2228,16 @@ void affect_join(char_data *ch, struct affected_type *af, bool avg_dur, bool avg
 		affect_to_char(ch, af);
 }
 
-int char_from_room(char_data *ch)
+int char_from_room(Character *ch)
 {
 	return char_from_room(ch, true);
 }
 
 /* move a player out of a room */
 /* Returns 0 on failure, non-zero otherwise */
-int char_from_room(char_data *ch, bool stop_all_fighting)
+int char_from_room(Character *ch, bool stop_all_fighting)
 {
-	char_data *i, *fighter, *next_char;
+	Character *i, *fighter, *next_char;
 	bool Other = false, More = false, kimore = false;
 
 	if (ch->in_room == NOWHERE)
@@ -2312,7 +2312,7 @@ int char_from_room(char_data *ch, bool stop_all_fighting)
 	return (1);
 }
 
-bool is_hiding(char_data *ch, char_data *vict)
+bool is_hiding(Character *ch, Character *vict)
 {
 	if (IS_NPC(ch))
 		return (number(1, 101) > 70);
@@ -2331,9 +2331,9 @@ bool is_hiding(char_data *ch, char_data *vict)
 
 /* place a character in a room */
 /* Returns zero on failure, and one on success */
-int char_to_room(char_data *ch, room_t room, bool stop_all_fighting)
+int char_to_room(Character *ch, room_t room, bool stop_all_fighting)
 {
-	char_data *temp;
+	Character *temp;
 	if (room == NOWHERE)
 		return (0);
 
@@ -2420,7 +2420,7 @@ int char_to_room(char_data *ch, room_t room, bool stop_all_fighting)
 }
 
 /* Return the effect of a piece of armor in position eq_pos */
-int apply_ac(char_data *ch, int eq_pos)
+int apply_ac(Character *ch, int eq_pos)
 {
 	int value;
 	assert(ch->equipment[eq_pos]);
@@ -2442,7 +2442,7 @@ int apply_ac(char_data *ch, int eq_pos)
 
 // return 0 on failure
 // 1 on success
-int equip_char(char_data *ch, struct obj_data *obj, int pos, int flag)
+int equip_char(Character *ch, struct obj_data *obj, int pos, int flag)
 {
 	int j;
 
@@ -2582,7 +2582,7 @@ int equip_char(char_data *ch, struct obj_data *obj, int pos, int flag)
 	return 1;
 }
 
-struct obj_data *unequip_char(char_data *ch, int pos, int flag)
+struct obj_data *unequip_char(Character *ch, int pos, int flag)
 {
 	int j;
 	struct obj_data *obj;
@@ -2810,10 +2810,10 @@ struct obj_data *get_obj_num(int nr)
 }
 
 /* search a room for a char, and return a pointer if found..  */
-char_data *get_char_room(char *name, int room, bool careful)
+Character *get_char_room(char *name, int room, bool careful)
 {
-	char_data *i;
-	char_data *partial_match;
+	Character *i;
+	Character *partial_match;
 	int j, number;
 	char tmpname[MAX_INPUT_LENGTH];
 	char *tmp;
@@ -2859,9 +2859,9 @@ char_data *get_char_room(char *name, int room, bool careful)
 }
 
 /* search all over the world for a char, and return a pointer if found */
-char_data *get_char(string name)
+Character *get_char(string name)
 {
-	char_data *partial_match = nullptr;
+	Character *partial_match = nullptr;
 	int j = 0, number = 0;
 	string tmpname = {}, tmp = {};
 
@@ -2871,7 +2871,7 @@ char_data *get_char(string name)
 		return (0);
 
 	auto &character_list = DC::getInstance()->character_list;
-	auto result = find_if(character_list.begin(), character_list.end(), [&name, &partial_match, &number, &j, &tmp](char_data *const &i)
+	auto result = find_if(character_list.begin(), character_list.end(), [&name, &partial_match, &number, &j, &tmp](Character *const &i)
 						  {
 		if (number == 0 && IS_NPC(i)) return false;
 		if (number == 1 || number == 0)
@@ -2909,10 +2909,10 @@ char_data *get_char(string name)
 }
 
 /* search all over the world for a mob, and return a pointer if found */
-char_data *get_mob(char *name)
+Character *get_mob(char *name)
 {
 	auto &character_list = DC::getInstance()->character_list;
-	auto result = find_if(character_list.begin(), character_list.end(), [&name](char_data *const &i)
+	auto result = find_if(character_list.begin(), character_list.end(), [&name](Character *const &i)
 						  {
 		if(!IS_MOB(i)) {
 			return false;
@@ -2931,10 +2931,10 @@ char_data *get_mob(char *name)
 }
 
 /* search all over the world for a char num, and return a pointer if found */
-char_data *get_char_num(int nr)
+Character *get_char_num(int nr)
 {
 	auto &character_list = DC::getInstance()->character_list;
-	auto result = find_if(character_list.begin(), character_list.end(), [&nr](char_data *const &i)
+	auto result = find_if(character_list.begin(), character_list.end(), [&nr](Character *const &i)
 						  {
 		if (IS_MOB(i) && i->mobdata->nr == nr) {
 			return true;
@@ -2955,7 +2955,7 @@ int move_obj(obj_data *obj, int dest)
 {
 	int obj_in_room = NOWHERE;
 	obj_data *contained_by = 0;
-	char_data *carried_by = 0;
+	Character *carried_by = 0;
 
 	if (!obj)
 	{
@@ -3040,7 +3040,7 @@ int move_obj(obj_data *obj, obj_data *dest_obj)
 {
 	int obj_in_room = NOWHERE;
 	obj_data *contained_by = 0;
-	char_data *carried_by = 0;
+	Character *carried_by = 0;
 
 	if (!obj)
 	{
@@ -3121,11 +3121,11 @@ int move_obj(obj_data *obj, obj_data *dest_obj)
 
 // move an object from its current location into the inventory of the
 // character specified by ch.
-int move_obj(obj_data *obj, char_data *ch)
+int move_obj(obj_data *obj, Character *ch)
 {
 	int obj_in_room = NOWHERE;
 	obj_data *contained_by = 0;
-	char_data *carried_by = 0;
+	Character *carried_by = 0;
 
 	//  char buffer[300];
 
@@ -3224,7 +3224,7 @@ int move_obj(obj_data *obj, char_data *ch)
 
 // give an object to a char
 // 1 if success, 0 if failure
-int obj_to_char(struct obj_data *object, char_data *ch)
+int obj_to_char(struct obj_data *object, Character *ch)
 {
 	// struct obj_data *obj;
 	/*
@@ -3240,7 +3240,7 @@ int obj_to_char(struct obj_data *object, char_data *ch)
 	IS_CARRYING_W(ch) += GET_OBJ_WEIGHT(object);
 	IS_CARRYING_N(ch)
 	++;
-	extern void pick_up_item(char_data * ch, struct obj_data * obj);
+	extern void pick_up_item(Character * ch, struct obj_data * obj);
 
 	pick_up_item(ch, object);
 	return 1;
@@ -3516,7 +3516,7 @@ int obj_from_obj(struct obj_data *obj)
 }
 
 // Set all carried_by to point to new_new owner
-void object_list_new_new_owner(struct obj_data *list, char_data *ch)
+void object_list_new_new_owner(struct obj_data *list, Character *ch)
 {
 	if (list)
 	{
@@ -3546,7 +3546,7 @@ void extract_obj(struct obj_data *obj)
 	if (obj->equipped_by)
 	{
 		int iEq;
-		char_data *vict = obj->equipped_by;
+		Character *vict = obj->equipped_by;
 		for (iEq = 0; iEq < MAX_WEAR; iEq++)
 			if (vict->equipment[iEq] == obj)
 			{
@@ -3628,7 +3628,7 @@ void update_object(struct obj_data *obj, int use)
 		update_object(obj->next_content, use);
 }
 
-void update_char_objects(char_data *ch)
+void update_char_objects(Character *ch)
 {
 	int i;
 
@@ -3672,16 +3672,16 @@ void update_char_objects(char_data *ch)
 }
 
 /* Extract a ch completely from the world, and leave his stuff behind */
-void extract_char(char_data *ch, bool pull, Trace t)
+void extract_char(Character *ch, bool pull, Trace t)
 {
-	char_data *k, *next_char;
+	Character *k, *next_char;
 	struct descriptor_data *t_desc;
 	int l, was_in;
-	/*char_data *i;*/
+	/*Character *i;*/
 	bool isGolem = false;
 
 	struct obj_data *i;
-	char_data *omast = nullptr;
+	Character *omast = nullptr;
 	int ret = eSUCCESS;
 	if (!IS_NPC(ch) && !ch->desc)
 		for (t_desc = descriptor_list; t_desc; t_desc = t_desc->next)
@@ -3703,8 +3703,8 @@ void extract_char(char_data *ch, bool pull, Trace t)
 	remove_totem_stats(ch);
 	if (!IS_NPC(ch))
 	{
-		void shatter_message(char_data * ch);
-		void release_message(char_data * ch);
+		void shatter_message(Character * ch);
+		void release_message(Character * ch);
 		if (ch->pcdata->golem)
 		{
 			if (ch->pcdata->golem->in_room)
@@ -3879,7 +3879,7 @@ void extract_char(char_data *ch, bool pull, Trace t)
 		{
 			stringstream ss;
 			ss << "extract_char: " << t << endl;
-			logf(IMMORTAL, LogChannels::LOG_BUG, "extract_char: death_list already contained char_data %p from %s.", ch, ss.str().c_str());
+			logf(IMMORTAL, LogChannels::LOG_BUG, "extract_char: death_list already contained Character %p from %s.", ch, ss.str().c_str());
 			produce_coredump(ch);
 		}
 		else
@@ -3900,9 +3900,9 @@ void extract_char(char_data *ch, bool pull, Trace t)
  *
  * Remember that this function can return nullptr!
  */
-char_data *get_rand_other_char_room_vis(char_data *ch)
+Character *get_rand_other_char_room_vis(Character *ch)
 {
-	char_data *vict = nullptr;
+	Character *vict = nullptr;
 	int count = 0;
 
 	// Count the number of players in room
@@ -3936,10 +3936,10 @@ char_data *get_rand_other_char_room_vis(char_data *ch)
 	return nullptr;
 }
 
-void lastseen_targeted(char_data *ch, char_data *victim)
+void lastseen_targeted(Character *ch, Character *victim)
 {
-	static char_data *last_ch;
-	static char_data *last_victim;
+	static Character *last_ch;
+	static Character *last_victim;
 
 	// Check if we just ran this function already
 	if (last_ch == ch && last_victim == victim)
@@ -3978,16 +3978,16 @@ void lastseen_targeted(char_data *ch, char_data *victim)
 	return;
 }
 
-char_data *get_char_room_vis(char_data *ch, string name)
+Character *get_char_room_vis(Character *ch, string name)
 {
 	return get_char_room_vis(ch, name.c_str());
 }
 
-char_data *get_char_room_vis(char_data *ch, const char *name)
+Character *get_char_room_vis(Character *ch, const char *name)
 {
-	char_data *i;
-	char_data *partial_match;
-	char_data *rnd;
+	Character *i;
+	Character *partial_match;
+	Character *rnd;
 	int j, number;
 	char tmpname[MAX_INPUT_LENGTH];
 	char *tmp;
@@ -4057,10 +4057,10 @@ char_data *get_char_room_vis(char_data *ch, const char *name)
 	return (partial_match);
 }
 
-char_data *get_mob_room_vis(char_data *ch, char *name)
+Character *get_mob_room_vis(Character *ch, char *name)
 {
-	char_data *i;
-	char_data *partial_match;
+	Character *i;
+	Character *partial_match;
 	int j, number;
 	char tmpname[MAX_INPUT_LENGTH];
 	char *tmp;
@@ -4105,9 +4105,9 @@ char_data *get_mob_room_vis(char_data *ch, char *name)
 	return (partial_match);
 }
 
-char_data *get_pc_room_vis_exact(char_data *ch, const char *name)
+Character *get_pc_room_vis_exact(Character *ch, const char *name)
 {
-	char_data *i;
+	Character *i;
 
 	for (i = world[ch->in_room].people; i; i = i->next_in_room)
 	{
@@ -4117,10 +4117,10 @@ char_data *get_pc_room_vis_exact(char_data *ch, const char *name)
 	return nullptr;
 }
 
-char_data *get_mob_vis(char_data *ch, char *name)
+Character *get_mob_vis(Character *ch, char *name)
 {
-	char_data *i;
-	char_data *partial_match;
+	Character *i;
+	Character *partial_match;
 	int j = 0, number = 0;
 	char tmpname[MAX_INPUT_LENGTH];
 	char *tmp;
@@ -4137,7 +4137,7 @@ char_data *get_mob_vis(char_data *ch, char *name)
 		return (0);
 
 	auto &character_list = DC::getInstance()->character_list;
-	auto result = find_if(character_list.begin(), character_list.end(), [&ch, &name, &partial_match, &number, &j, &tmp](char_data *const &i)
+	auto result = find_if(character_list.begin(), character_list.end(), [&ch, &name, &partial_match, &number, &j, &tmp](Character *const &i)
 						  {
 		if (number == 1)
 		{
@@ -4182,7 +4182,7 @@ obj_data *get_obj_vnum(int vnum)
 	return nullptr;
 }
 
-char_data *get_random_mob_vnum(int vnum)
+Character *get_random_mob_vnum(int vnum)
 {
 	int num = real_mobile(vnum);
 	int total = mob_index[num].number;
@@ -4190,7 +4190,7 @@ char_data *get_random_mob_vnum(int vnum)
 
 	auto &character_list = DC::getInstance()->character_list;
 
-	auto result = find_if(character_list.begin(), character_list.end(), [&total, &which, &num](char_data *const &i)
+	auto result = find_if(character_list.begin(), character_list.end(), [&total, &which, &num](Character *const &i)
 						  {
 		if(IS_NPC(i) && i->mobdata->nr == num)
 		{
@@ -4210,12 +4210,12 @@ char_data *get_random_mob_vnum(int vnum)
 	return nullptr;
 }
 
-char_data *get_mob_vnum(int vnum)
+Character *get_mob_vnum(int vnum)
 {
 	int number = real_mobile(vnum);
 	auto &character_list = DC::getInstance()->character_list;
 
-	auto result = find_if(character_list.begin(), character_list.end(), [&number](char_data *const &i)
+	auto result = find_if(character_list.begin(), character_list.end(), [&number](Character *const &i)
 						  {
 		if(IS_NPC(i) && i->mobdata->nr == number) {
 			return true;
@@ -4227,15 +4227,15 @@ char_data *get_mob_vnum(int vnum)
 	}
 	return nullptr;
 }
-char_data *get_char_vis(char_data *ch, const string &name)
+Character *get_char_vis(Character *ch, const string &name)
 {
 	return get_char_vis(ch, name.c_str());
 }
 
-char_data *get_char_vis(char_data *ch, const char *name)
+Character *get_char_vis(Character *ch, const char *name)
 {
-	char_data *i;
-	char_data *partial_match;
+	Character *i;
+	Character *partial_match;
 
 	int j = 0, number = 0;
 	char tmpname[MAX_INPUT_LENGTH];
@@ -4253,7 +4253,7 @@ char_data *get_char_vis(char_data *ch, const char *name)
 		return (0);
 
 	auto &character_list = DC::getInstance()->character_list;
-	auto result = find_if(character_list.begin(), character_list.end(), [&number, &tmp, &ch, &partial_match, &j](char_data *const &i)
+	auto result = find_if(character_list.begin(), character_list.end(), [&number, &tmp, &ch, &partial_match, &j](Character *const &i)
 						  {
 		if (i->in_room == NOWHERE)
 		{
@@ -4299,11 +4299,11 @@ char_data *get_char_vis(char_data *ch, const char *name)
 	return partial_match;
 }
 
-char_data *
+Character *
 get_pc(char *name)
 {
 	auto &character_list = DC::getInstance()->character_list;
-	auto result = find_if(character_list.begin(), character_list.end(), [&name](char_data *const &i)
+	auto result = find_if(character_list.begin(), character_list.end(), [&name](Character *const &i)
 						  {
 		if(!IS_NPC(i) && isname(name, GET_NAME(i)))
 		return true;
@@ -4318,11 +4318,11 @@ get_pc(char *name)
 	return 0;
 }
 
-char_data *
+Character *
 get_active_pc(const char *name)
 {
-	char_data *i;
-	char_data *partial_match;
+	Character *i;
+	Character *partial_match;
 	struct descriptor_data *d;
 	extern struct descriptor_data *descriptor_list;
 
@@ -4350,9 +4350,9 @@ get_active_pc(const char *name)
 	return (partial_match);
 }
 
-char_data *get_all_pc(char *name)
+Character *get_all_pc(char *name)
 {
-	char_data *i;
+	Character *i;
 	struct descriptor_data *d;
 	extern struct descriptor_data *descriptor_list;
 
@@ -4372,32 +4372,32 @@ char_data *get_all_pc(char *name)
 	return 0;
 }
 
-char_data *char_data::getVisiblePlayer(QString name)
+Character *Character::getVisiblePlayer(QString name)
 {
 	return get_pc_vis(this, name.toStdString().c_str());
 }
 
-char_data *char_data::getVisibleCharacter(QString name)
+Character *Character::getVisibleCharacter(QString name)
 {
 	return get_char_vis(this, name.toStdString());
 }
 
-obj_data *char_data::getVisibleObject(QString name)
+obj_data *Character::getVisibleObject(QString name)
 {
 	return get_obj_vis(this, name.toStdString());
 }
 
-char_data *get_pc_vis(char_data *ch, string name)
+Character *get_pc_vis(Character *ch, string name)
 {
 	return get_pc_vis(ch, name.c_str());
 }
 
-char_data *get_pc_vis(char_data *ch, const char *name)
+Character *get_pc_vis(Character *ch, const char *name)
 {
-	char_data *partial_match = 0;
+	Character *partial_match = 0;
 
 	auto &character_list = DC::getInstance()->character_list;
-	auto result = find_if(character_list.begin(), character_list.end(), [&ch, &name, &partial_match](char_data *const &i)
+	auto result = find_if(character_list.begin(), character_list.end(), [&ch, &name, &partial_match](Character *const &i)
 						  {
 		if(!IS_NPC(i) && CAN_SEE(ch, i))
 		{
@@ -4424,10 +4424,10 @@ char_data *get_pc_vis(char_data *ch, const char *name)
 	return partial_match;
 }
 
-char_data *get_pc_vis_exact(char_data *ch, const char *name)
+Character *get_pc_vis_exact(Character *ch, const char *name)
 {
 	auto &character_list = DC::getInstance()->character_list;
-	auto result = find_if(character_list.begin(), character_list.end(), [&ch, &name](char_data *const &i)
+	auto result = find_if(character_list.begin(), character_list.end(), [&ch, &name](Character *const &i)
 						  {
 		if(!IS_NPC(i) && CAN_SEE(ch, i))
 		{
@@ -4444,10 +4444,10 @@ char_data *get_pc_vis_exact(char_data *ch, const char *name)
 	return 0;
 }
 
-char_data *get_active_pc_vis(char_data *ch, const char *name)
+Character *get_active_pc_vis(Character *ch, const char *name)
 {
-	char_data *i;
-	char_data *partial_match;
+	Character *i;
+	Character *partial_match;
 	struct descriptor_data *d;
 	extern struct descriptor_data *descriptor_list;
 
@@ -4481,7 +4481,7 @@ char_data *get_active_pc_vis(char_data *ch, const char *name)
 }
 
 // search by item number
-struct obj_data *get_obj_in_list_vis(char_data *ch, int item_num, struct obj_data *list, bool blindfighting)
+struct obj_data *get_obj_in_list_vis(Character *ch, int item_num, struct obj_data *list, bool blindfighting)
 {
 	struct obj_data *i;
 	int number = real_object(item_num);
@@ -4497,7 +4497,7 @@ struct obj_data *get_obj_in_list_vis(char_data *ch, int item_num, struct obj_dat
 	return nullptr;
 }
 
-struct obj_data *get_obj_in_list_vis(char_data *ch, const char *name, struct obj_data *list, bool blindfighting)
+struct obj_data *get_obj_in_list_vis(Character *ch, const char *name, struct obj_data *list, bool blindfighting)
 {
 	struct obj_data *i;
 	int j, number;
@@ -4520,14 +4520,14 @@ struct obj_data *get_obj_in_list_vis(char_data *ch, const char *name, struct obj
 	return (0);
 }
 
-struct obj_data *get_obj_vis(char_data *ch, string name, bool loc)
+struct obj_data *get_obj_vis(Character *ch, string name, bool loc)
 {
 	/*search the entire world for an object, and return a pointer  */
 	return get_obj_vis(ch, name.c_str(), loc);
 }
 
 /*search the entire world for an object, and return a pointer  */
-struct obj_data *get_obj_vis(char_data *ch, const char *name, bool loc)
+struct obj_data *get_obj_vis(Character *ch, const char *name, bool loc)
 {
 	struct obj_data *i;
 	int j, number;
@@ -4632,7 +4632,7 @@ struct obj_data *create_money(int amount)
 /* The routine returns a pointer to the next word in *arg (just like the  */
 /* one_argument routine).                                                 */
 
-int generic_find(const char *arg, int bitvector, char_data *ch, char_data **tar_ch, struct obj_data **tar_obj, bool verbose)
+int generic_find(const char *arg, int bitvector, Character *ch, Character **tar_ch, struct obj_data **tar_obj, bool verbose)
 {
 	static const char *ignore[] = {"the", "in", "\n"};
 
@@ -4820,7 +4820,7 @@ int generic_find(const char *arg, int bitvector, char_data *ch, char_data **tar_
 // Return a "somewhat" random person from the mobs hate list
 // For now, just return the first one.  You can use "swap_hate_memory"
 // to get a new one from 'get_random_hate'
-char *get_random_hate(char_data *ch)
+char *get_random_hate(Character *ch)
 {
 	char buf[128];
 	char *name = nullptr;
@@ -4842,7 +4842,7 @@ char *get_random_hate(char_data *ch)
 }
 
 // Take the first name on the list, and swap it to the end.
-void swap_hate_memory(char_data *ch)
+void swap_hate_memory(Character *ch)
 {
 	char *curr;
 	char temp[32];
@@ -4860,7 +4860,7 @@ void swap_hate_memory(char_data *ch)
 	strcpy(ch->mobdata->hatred, buf);
 }
 
-int hates_someone(char_data *ch)
+int hates_someone(Character *ch)
 {
 	if (!IS_MOB(ch))
 		return 0;
@@ -4868,7 +4868,7 @@ int hates_someone(char_data *ch)
 	return (ch->mobdata->hatred != nullptr);
 }
 
-int fears_someone(char_data *ch)
+int fears_someone(Character *ch)
 {
 	if (!IS_MOB(ch))
 		return 0;
@@ -4876,7 +4876,7 @@ int fears_someone(char_data *ch)
 	return (ch->mobdata->fears != nullptr);
 }
 
-void remove_memory(char_data *ch, char type, char_data *vict)
+void remove_memory(Character *ch, char type, Character *vict)
 {
 	char *temp = nullptr;
 	char *curr = nullptr;
@@ -4935,11 +4935,11 @@ void remove_memory(char_data *ch, char type, char_data *vict)
 		ch->mobdata->fears = 0;
 }
 
-void room_mobs_only_hate(char_data *ch)
+void room_mobs_only_hate(Character *ch)
 {
 	auto &character_list = DC::getInstance()->character_list;
 
-	for_each(character_list.begin(), character_list.end(), [&ch](char_data *vict)
+	for_each(character_list.begin(), character_list.end(), [&ch](Character *vict)
 			 {
 		if ((!ARE_GROUPED(ch, vict)) && (ch->in_room == vict->in_room) &&
 				(vict != ch) && !IS_SET(world[ch->in_room].room_flags, SAFE)) {
@@ -4948,7 +4948,7 @@ void room_mobs_only_hate(char_data *ch)
 		} });
 }
 
-void remove_memory(char_data *ch, char type)
+void remove_memory(Character *ch, char type)
 {
 	if (type == 't')
 		ch->hunting = 0;
@@ -4966,7 +4966,7 @@ void remove_memory(char_data *ch, char type)
 		ch->mobdata->fears = 0;
 }
 
-void add_memory(char_data *ch, char *victim, char type)
+void add_memory(Character *ch, char *victim, char type)
 {
 	char *buf = nullptr;
 
@@ -5005,7 +5005,7 @@ void add_memory(char_data *ch, char *victim, char type)
 }
 
 // function for charging moves, to make it easier to have skills that impact ALL(such as vigor)
-bool charge_moves(char_data *ch, int skill, double modifier)
+bool charge_moves(Character *ch, int skill, double modifier)
 {
 	int i = 0;
 	int amt = skill_cost.find(skill)->second * modifier;

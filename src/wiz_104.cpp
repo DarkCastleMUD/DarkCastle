@@ -49,7 +49,7 @@ int count_rooms(int start, int end)
 	return count;
 }
 
-int do_thunder(char_data *ch, char *argument, int cmd)
+int do_thunder(Character *ch, char *argument, int cmd)
 {
 	char buf1[MAX_STRING_LENGTH];
 	char buf2[MAX_STRING_LENGTH];
@@ -97,7 +97,7 @@ int do_thunder(char_data *ch, char *argument, int cmd)
 	return eSUCCESS;
 }
 
-int do_incognito(char_data *ch, char *argument, int cmd)
+int do_incognito(Character *ch, char *argument, int cmd)
 {
 	if (IS_MOB(ch))
 		return eFAILURE;
@@ -117,7 +117,7 @@ int do_incognito(char_data *ch, char *argument, int cmd)
 	return eSUCCESS;
 }
 
-int do_load(char_data *ch, char *arg, int cmd)
+int do_load(Character *ch, char *arg, int cmd)
 {
 	char type[MAX_INPUT_LENGTH] = {0};
 	char name[MAX_INPUT_LENGTH] = {0};
@@ -329,9 +329,9 @@ int do_load(char_data *ch, char *arg, int cmd)
 	return eSUCCESS;
 }
 
-int do_purge(char_data *ch, char *argument, int cmd)
+int do_purge(Character *ch, char *argument, int cmd)
 {
-	char_data *vict, *next_v;
+	Character *vict, *next_v;
 	struct obj_data *obj, *next_o;
 
 	char name[100], buf[300];
@@ -437,7 +437,7 @@ char *dirNumToChar(int dir)
 	return "ERROR";
 }
 
-int Zone::show_info(char_data *ch)
+int Zone::show_info(Character *ch)
 {
 	char buf[MAX_STRING_LENGTH];
 
@@ -484,7 +484,7 @@ int Zone::show_info(char_data *ch)
 	return eSUCCESS;
 }
 
-int show_zone_commands(char_data *ch, int zone_key, int start)
+int show_zone_commands(Character *ch, int zone_key, int start)
 {
 	char buf[MAX_STRING_LENGTH];
 	int k = 0;
@@ -758,7 +758,7 @@ int find_file(world_file_list_item *itm, int high)
 	return -1;
 }
 
-void show_legacy_files(char_data *ch, world_file_list_item *head)
+void show_legacy_files(Character *ch, world_file_list_item *head)
 {
 	world_file_list_item *curr = head;
 	uint64_t i = 0;
@@ -794,7 +794,7 @@ void show_legacy_files(char_data *ch, world_file_list_item *head)
 	}
 }
 
-int do_show(char_data *ch, char *argument, int cmd)
+int do_show(Character *ch, char *argument, int cmd)
 {
 	char name[MAX_INPUT_LENGTH], buf[200];
 	char beginrange[MAX_INPUT_LENGTH];
@@ -880,8 +880,8 @@ int do_show(char_data *ch, char *argument, int cmd)
 				if ((nr = real_mobile(begin)) >= 0)
 				{
 					sprintf(buf, "[  1] [%5d] [%2d] %s\n\r", begin,
-							((char_data *)(mob_index[nr].item))->level,
-							((char_data *)(mob_index[nr].item))->short_desc);
+							((Character *)(mob_index[nr].item))->level,
+							((Character *)(mob_index[nr].item))->short_desc);
 					send_to_char(buf, ch);
 				}
 			}
@@ -895,8 +895,8 @@ int do_show(char_data *ch, char *argument, int cmd)
 
 					count++;
 					sprintf(buf, "[%3d] [%5d] [%2d] %s\n\r", count, i,
-							((char_data *)(mob_index[nr].item))->level,
-							((char_data *)(mob_index[nr].item))->short_desc);
+							((Character *)(mob_index[nr].item))->level,
+							((Character *)(mob_index[nr].item))->short_desc);
 					send_to_char(buf, ch);
 
 					if (count > 200)
@@ -920,12 +920,12 @@ int do_show(char_data *ch, char *argument, int cmd)
 					continue;
 
 				if (isname(name,
-						   ((char_data *)(mob_index[nr].item))->name))
+						   ((Character *)(mob_index[nr].item))->name))
 				{
 					count++;
 					sprintf(buf, "[%3d] [%5d] [%2d] %s\n\r", count, i,
-							((char_data *)(mob_index[nr].item))->level,
-							((char_data *)(mob_index[nr].item))->short_desc);
+							((Character *)(mob_index[nr].item))->level,
+							((Character *)(mob_index[nr].item))->short_desc);
 					send_to_char(buf, ch);
 
 					if (count > 200)
@@ -1381,42 +1381,42 @@ int do_show(char_data *ch, char *argument, int cmd)
 			if ((nr = real_mobile(c)) < 0)
 				continue;
 			if (race > -1)
-				if (((char_data *)(mob_index[nr].item))->race != race)
+				if (((Character *)(mob_index[nr].item))->race != race)
 					continue;
 			if (align)
 			{
-				if (align == 1 && ((char_data *)(mob_index[nr].item))->alignment < 350)
+				if (align == 1 && ((Character *)(mob_index[nr].item))->alignment < 350)
 					continue;
-				else if (align == 2 && (((char_data *)(mob_index[nr].item))->alignment < -350 || ((char_data *)(mob_index[nr].item))->alignment > 350))
+				else if (align == 2 && (((Character *)(mob_index[nr].item))->alignment < -350 || ((Character *)(mob_index[nr].item))->alignment > 350))
 					continue;
-				else if (align == 3 && ((char_data *)(mob_index[nr].item))->alignment > -350)
+				else if (align == 3 && ((Character *)(mob_index[nr].item))->alignment > -350)
 					continue;
 			}
 			if (immune)
-				if (!IS_SET(((char_data *)(mob_index[nr].item))->immune,
+				if (!IS_SET(((Character *)(mob_index[nr].item))->immune,
 							immune))
 					continue;
 			if (clas)
-				if (((char_data *)(mob_index[nr].item))->c_class != clas)
+				if (((Character *)(mob_index[nr].item))->c_class != clas)
 					continue;
 			if (levlow != -555)
-				if (((char_data *)(mob_index[nr].item))->level < levlow)
+				if (((Character *)(mob_index[nr].item))->level < levlow)
 					continue;
 			if (levhigh != -555)
-				if (((char_data *)(mob_index[nr].item))->level > levhigh)
+				if (((Character *)(mob_index[nr].item))->level > levhigh)
 					continue;
 			if (*act)
 				for (i = 0; i < ACT_MAX; i++)
 					if (ISSET(act, i))
 						if (!ISSET(
-								((char_data *)(mob_index[nr].item))->mobdata->actflags,
+								((Character *)(mob_index[nr].item))->mobdata->actflags,
 								i + 1))
 							goto eheh;
 			if (*affect)
 				for (i = 0; i < AFF_MAX; i++)
 					if (ISSET(affect, i))
 						if (!ISSET(
-								((char_data *)(mob_index[nr].item))->affected_by,
+								((Character *)(mob_index[nr].item))->affected_by,
 								i + 1))
 							goto eheh;
 			count++;
@@ -1426,8 +1426,8 @@ int do_show(char_data *ch, char *argument, int cmd)
 				break;
 			}
 			sprintf(buf, "[%3d] [%5d] [%2d] %s\n\r", count, c,
-					((char_data *)(mob_index[nr].item))->level,
-					((char_data *)(mob_index[nr].item))->short_desc);
+					((Character *)(mob_index[nr].item))->level,
+					((Character *)(mob_index[nr].item))->short_desc);
 			send_to_char(buf, ch);
 		eheh:
 			continue;
@@ -1806,7 +1806,7 @@ int do_show(char_data *ch, char *argument, int cmd)
 	return eSUCCESS;
 }
 
-command_return_t do_transfer(char_data *ch, string arguments, int cmd)
+command_return_t do_transfer(Character *ch, string arguments, int cmd)
 {
 	if (IS_NPC(ch) || ch == nullptr)
 	{
@@ -1828,7 +1828,7 @@ command_return_t do_transfer(char_data *ch, string arguments, int cmd)
 		return eFAILURE;
 	}
 
-	char_data *victim = nullptr;
+	Character *victim = nullptr;
 	room_t source_room = {};
 	descriptor_data *i = nullptr;
 	if (arg1 == "all")
@@ -1877,9 +1877,9 @@ command_return_t do_transfer(char_data *ch, string arguments, int cmd)
 	return eSUCCESS;
 }
 
-int do_teleport(char_data *ch, char *argument, int cmd)
+int do_teleport(Character *ch, char *argument, int cmd)
 {
-	char_data *victim, *target_mob, *pers;
+	Character *victim, *target_mob, *pers;
 	char person[MAX_INPUT_LENGTH], room[MAX_INPUT_LENGTH];
 	int target;
 	int loop;
@@ -1974,10 +1974,10 @@ int do_teleport(char_data *ch, char *argument, int cmd)
 	return eSUCCESS;
 } /* do_teleport */
 
-int do_gtrans(char_data *ch, char *argument, int cmd)
+int do_gtrans(Character *ch, char *argument, int cmd)
 {
 	// struct descriptor_data *i;
-	char_data *victim;
+	Character *victim;
 	char buf[100];
 	int target;
 	struct follow_type *k, *next_dude;
@@ -2064,7 +2064,7 @@ char *oprog_type_to_name(int type)
 	}
 }
 
-void opstat(char_data *ch, int vnum)
+void opstat(Character *ch, int vnum)
 {
 	int num = real_object(vnum);
 	obj_data *obj;
@@ -2102,7 +2102,7 @@ void opstat(char_data *ch, int vnum)
 	}
 }
 
-int do_opstat(char_data *ch, char *argument, int cmd)
+int do_opstat(Character *ch, char *argument, int cmd)
 {
 	char buf[MAX_STRING_LENGTH];
 	int vnum = -1;
@@ -2144,7 +2144,7 @@ void update_objprog_bits(int num)
 	}
 }
 
-int do_opedit(char_data *ch, char *argument, int cmd)
+int do_opedit(Character *ch, char *argument, int cmd)
 {
 	int num = -1, vnum = -1, i = -1, a = -1;
 	char arg[MAX_INPUT_LENGTH];
@@ -2406,7 +2406,7 @@ int do_opedit(char_data *ch, char *argument, int cmd)
 	return eSUCCESS;
 }
 
-int do_oclone(char_data *ch, char *argument, int cmd)
+int do_oclone(Character *ch, char *argument, int cmd)
 {
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 	argument = one_argument(argument, arg1);
@@ -2484,7 +2484,7 @@ int do_oclone(char_data *ch, char *argument, int cmd)
 	return eSUCCESS;
 }
 
-int do_mclone(char_data *ch, char *argument, int cmd)
+int do_mclone(Character *ch, char *argument, int cmd)
 {
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 	argument = one_argument(argument, arg1);
@@ -2494,7 +2494,7 @@ int do_mclone(char_data *ch, char *argument, int cmd)
 		send_to_char("Syntax: mclone <source vnum> <destination vnum>\n\r", ch);
 		return eFAILURE;
 	}
-	char_data *mob;
+	Character *mob;
 	int vdst = atoi(arg2), vsrc = atoi(arg1);
 	int dst = real_mobile(vdst), src = real_mobile(vsrc);
 	if (src < 0)
@@ -2541,7 +2541,7 @@ int do_mclone(char_data *ch, char *argument, int cmd)
 	mob->mobdata->nr = dst;
 
 	// Find old mobile in world and remove
-	char_data *old_mob = (char_data *)mob_index[dst].item;
+	Character *old_mob = (Character *)mob_index[dst].item;
 	if (old_mob && old_mob->mobdata)
 	{
 		auto &character_list = DC::getInstance()->character_list;
@@ -2555,8 +2555,8 @@ int do_mclone(char_data *ch, char *argument, int cmd)
 	}
 
 	csendf(ch, "Ok.\n\rYou copied mob %d (%s) and replaced mob %d (%s).\r\n",
-		   vsrc, ((char_data *)mob_index[src].item)->short_desc,
-		   vdst, ((char_data *)mob_index[dst].item)->short_desc);
+		   vsrc, ((Character *)mob_index[src].item)->short_desc,
+		   vdst, ((Character *)mob_index[dst].item)->short_desc);
 
 	// Overwrite old mob with new mob
 	mob_index[dst].item = (void *)mob;

@@ -144,8 +144,8 @@ void short_activity();
 void skip_spaces(char **string);
 char *any_one_arg(char *argument, char *first_arg);
 char *calc_color(int hit, int max_hit);
-string generate_prompt(char_data *ch);
-// string generate_prompt(char_data *ch);
+string generate_prompt(Character *ch);
+// string generate_prompt(Character *ch);
 string get_from_q(queue<string> &input_queue);
 void signal_setup(void);
 int new_descriptor(int s);
@@ -409,7 +409,7 @@ void finish_hotboot()
   struct descriptor_data *d;
   char buf[MAX_STRING_LENGTH];
 
-  void do_on_login_stuff(char_data * ch);
+  void do_on_login_stuff(Character * ch);
 
   for (d = descriptor_list; d; d = d->next)
   {
@@ -1171,7 +1171,7 @@ void telnet_ga(descriptor_data *d)
   SEND_TO_Q(go_ahead, d);
 }
 
-int do_lastprompt(char_data *ch, char *arg, int cmd)
+int do_lastprompt(Character *ch, char *arg, int cmd)
 {
   if (GET_LAST_PROMPT(ch))
     csendf(ch, "Last prompt: %s\n\r", GET_LAST_PROMPT(ch));
@@ -1181,7 +1181,7 @@ int do_lastprompt(char_data *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-int do_prompt(char_data *ch, char *arg, int cmd)
+int do_prompt(Character *ch, char *arg, int cmd)
 {
   while (*arg == ' ')
     arg++;
@@ -1300,7 +1300,7 @@ char *cond_colorcodes[] = {
     BOLD GREY,
 };
 
-string calc_name(char_data *ch, bool colour = false)
+string calc_name(Character *ch, bool colour = false)
 {
   int percent;
   string name;
@@ -1338,7 +1338,7 @@ string calc_name(char_data *ch, bool colour = false)
   return name;
 }
 
-char *calc_condition(char_data *ch, bool colour = false)
+char *calc_condition(Character *ch, bool colour = false)
 {
   int percent;
   char *cond_txt[8]; // = cond_txtz;
@@ -1425,7 +1425,7 @@ void make_prompt(struct descriptor_data *d, string &prompt)
   }
 }
 
-char_data *get_charmie(char_data *ch)
+Character *get_charmie(Character *ch)
 {
   if (!ch)
     return 0;
@@ -1439,9 +1439,9 @@ char_data *get_charmie(char_data *ch)
   return nullptr;
 }
 
-string generate_prompt(char_data *ch)
+string generate_prompt(Character *ch)
 {
-  char_data *charmie = nullptr;
+  Character *charmie = nullptr;
   char *source = nullptr;
   char *pro = nullptr;
   char *prompt = nullptr;
@@ -1493,7 +1493,7 @@ string generate_prompt(char_data *ch)
     case 'b':
       try
       {
-        char_data *peer = ch->getFollowers().at(0);
+        Character *peer = ch->getFollowers().at(0);
         if (peer != nullptr)
         {
           if (CAN_SEE(ch, peer))
@@ -1514,7 +1514,7 @@ string generate_prompt(char_data *ch)
     case 'B':
       try
       {
-        char_data *peer = ch->getFollowers().at(0);
+        Character *peer = ch->getFollowers().at(0);
         if (peer != nullptr)
         {
           sprintf(pro, "%s%d%s", calc_color(peer->getHP(), GET_MAX_HIT(peer)), peer->getHP(), NTEXT);
@@ -1552,7 +1552,7 @@ string generate_prompt(char_data *ch)
     case 'e':
       try
       {
-        char_data *peer = ch->getFollowers().at(1);
+        Character *peer = ch->getFollowers().at(1);
         if (peer != nullptr)
         {
           if (CAN_SEE(ch, peer))
@@ -1573,7 +1573,7 @@ string generate_prompt(char_data *ch)
     case 'E':
       try
       {
-        char_data *peer = ch->getFollowers().at(1);
+        Character *peer = ch->getFollowers().at(1);
         if (peer != nullptr)
         {
           sprintf(pro, "%s%d%s", calc_color(peer->getHP(), GET_MAX_HIT(peer)), peer->getHP(), NTEXT);
@@ -1622,7 +1622,7 @@ string generate_prompt(char_data *ch)
     case 'j':
       try
       {
-        char_data *peer = ch->getFollowers().at(2);
+        Character *peer = ch->getFollowers().at(2);
         if (peer != nullptr)
         {
           if (CAN_SEE(ch, peer))
@@ -1642,7 +1642,7 @@ string generate_prompt(char_data *ch)
     case 'J':
       try
       {
-        char_data *peer = ch->getFollowers().at(2);
+        Character *peer = ch->getFollowers().at(2);
         if (peer != nullptr)
         {
           sprintf(pro, "%s%d%s", calc_color(peer->getHP(), GET_MAX_HIT(peer)), peer->getHP(), NTEXT);
@@ -1763,7 +1763,7 @@ string generate_prompt(char_data *ch)
     case 'u':
       try
       {
-        char_data *peer = ch->getFollowers().at(3);
+        Character *peer = ch->getFollowers().at(3);
         if (peer != nullptr)
         {
           if (CAN_SEE(ch, peer))
@@ -1783,7 +1783,7 @@ string generate_prompt(char_data *ch)
     case 'U':
       try
       {
-        char_data *peer = ch->getFollowers().at(3);
+        Character *peer = ch->getFollowers().at(3);
         if (peer != nullptr)
         {
           sprintf(pro, "%s%d%s", calc_color(peer->getHP(), GET_MAX_HIT(peer)), peer->getHP(), NTEXT);
@@ -2702,7 +2702,7 @@ int close_socket(struct descriptor_data *d)
     {
       save_char_obj(d->character);
       // clan area stuff
-      extern void check_quitter(char_data * ch);
+      extern void check_quitter(Character * ch);
       check_quitter(d->character);
 
       // end any performances
@@ -2759,8 +2759,8 @@ int close_socket(struct descriptor_data *d)
     // if there is NOONE on (everyone got disconnected) loop through and
     // boot all of the linkdeads.  That way if the mud's link is cut, the
     // first person back on can't RK everyone
-    char_data * next_i;
-    for(char_data * i = character_list; i; i = next_i) {
+    Character * next_i;
+    for(Character * i = character_list; i; i = next_i) {
        next_i = i->next;
        if(IS_NPC(i))
          continue;
@@ -3022,7 +3022,7 @@ void signal_setup(void)
  *       Public routines for system-to-player-communication        *
  **************************************************************** */
 
-void send_to_char_regardless(string messg, char_data *ch)
+void send_to_char_regardless(string messg, Character *ch)
 {
   if (ch->desc && !messg.empty())
   {
@@ -3030,19 +3030,19 @@ void send_to_char_regardless(string messg, char_data *ch)
   }
 }
 
-void send_to_char_nosp(const char *messg, char_data *ch)
+void send_to_char_nosp(const char *messg, Character *ch)
 {
   char *tmp = str_nospace(messg);
   send_to_char(tmp, ch);
   dc_free(tmp);
 }
 
-void send_to_char_nosp(QString messg, char_data *ch)
+void send_to_char_nosp(QString messg, Character *ch)
 {
   send_to_char_nosp(messg.toStdString().c_str(), ch);
 }
 
-void record_msg(string messg, char_data *ch)
+void record_msg(string messg, Character *ch)
 {
   if (messg.empty() || IS_NPC(ch) || GET_LEVEL(ch) < IMMORTAL)
     return;
@@ -3058,7 +3058,7 @@ void record_msg(string messg, char_data *ch)
   }
 }
 
-int do_awaymsgs(char_data *ch, char *argument, int cmd)
+int do_awaymsgs(Character *ch, char *argument, int cmd)
 {
   int lines = 0;
   string tmp;
@@ -3090,7 +3090,7 @@ int do_awaymsgs(char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-void check_for_awaymsgs(char_data *ch)
+void check_for_awaymsgs(Character *ch)
 {
   if (!ch)
     return;
@@ -3107,17 +3107,17 @@ void check_for_awaymsgs(char_data *ch)
   send_to_char("Type awaymsgs to view them.\r\n", ch);
 }
 
-void send_to_char(const char *mesg, char_data *ch)
+void send_to_char(const char *mesg, Character *ch)
 {
   send_to_char(string(mesg), ch);
 }
 
-void send_to_char(QString messg, char_data *ch)
+void send_to_char(QString messg, Character *ch)
 {
   send_to_char(messg.toStdString(), ch);
 }
 
-void send_to_char(string messg, char_data *ch)
+void send_to_char(string messg, Character *ch)
 {
   if (IS_NPC(ch) && !ch->desc && MOBtrigger && !messg.empty())
     mprog_act_trigger(messg, ch, 0, 0, 0);
@@ -3140,7 +3140,7 @@ void send_to_all(char *messg)
         SEND_TO_Q(messg, i);
 }
 
-void ansi_color(char *txt, char_data *ch)
+void ansi_color(char *txt, Character *ch)
 {
   // mobs don't have toggles, so they automatically get ansi on
   if (txt != nullptr && ch->desc != nullptr)
@@ -3207,9 +3207,9 @@ void send_to_zone(char *messg, int zone)
   }
 }
 
-void send_to_room(string messg, int room, bool awakeonly, char_data *nta)
+void send_to_room(string messg, int room, bool awakeonly, Character *nta)
 {
-  char_data *i = nullptr;
+  Character *i = nullptr;
 
   // If a megaphone goes off when in someone's inventory this happens
   if (room == NOWHERE)
@@ -3226,7 +3226,7 @@ void send_to_room(string messg, int room, bool awakeonly, char_data *nta)
           SEND_TO_Q(messg, i->desc);
 }
 
-int is_busy(char_data *ch)
+int is_busy(Character *ch)
 {
 
   if (ch->desc &&
@@ -3291,7 +3291,7 @@ char *any_one_arg(char *argument, char *first_arg)
   return argument;
 }
 
-bool is_multi(char_data *ch)
+bool is_multi(Character *ch)
 {
   for (descriptor_data *d = descriptor_list; d; d = d->next)
   {
@@ -3306,7 +3306,7 @@ bool is_multi(char_data *ch)
   return false;
 }
 
-void warn_if_duplicate_ip(char_data *ch)
+void warn_if_duplicate_ip(Character *ch)
 {
   char buf[256];
   int highlev = 51;
@@ -3349,7 +3349,7 @@ void warn_if_duplicate_ip(char_data *ch)
   }
 }
 
-int do_editor(char_data *ch, char *argument, int cmd)
+int do_editor(Character *ch, char *argument, int cmd)
 {
   char arg1[MAX_INPUT_LENGTH];
   if (argument == 0)

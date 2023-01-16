@@ -23,10 +23,10 @@
 using namespace std;
 
 void load_char_obj_error(FILE *fpsave, char strsave[MAX_INPUT_LENGTH]);
-void store_to_char(struct char_file_u4 *st, char_data *ch);
-int store_to_char_variable_data(char_data *ch, FILE *fpsave);
-struct obj_data *my_obj_store_to_char(char_data *ch, FILE *fpsave, struct obj_data *last_cont);
-int read_pc_or_mob_data(char_data *ch, FILE *fpsave);
+void store_to_char(struct char_file_u4 *st, Character *ch);
+int store_to_char_variable_data(Character *ch, FILE *fpsave);
+struct obj_data *my_obj_store_to_char(Character *ch, FILE *fpsave, struct obj_data *last_cont);
+int read_pc_or_mob_data(Character *ch, FILE *fpsave);
 void init_random();
 void load_vaults();
 
@@ -40,7 +40,7 @@ bool verbose_mode = false;
 void test_handle_ansi(string test)
 {
   cout << "Testing '" << test << "'" << endl;
-  char_data *ch = new char_data;
+  Character *ch = new Character;
   ch->pcdata = new pc_data;
   SET_BIT(ch->pcdata->toggles, PLR_ANSI);
   GET_LEVEL(ch) = 1;
@@ -165,7 +165,7 @@ void showObjectVault(const char *owner, obj_data *obj)
   cout << " " << obj->short_description << " in " << owner << "'s vault." << endl;
 }
 
-void showObject(char_data *ch, obj_data *obj)
+void showObject(Character *ch, obj_data *obj)
 {
   cout << obj_index[obj->item_number].virt << ":";
   char buf[255];
@@ -280,7 +280,7 @@ int main(int argc, char **argv)
   }
 
   d = new descriptor_data;
-  char_data *ch = new char_data;
+  Character *ch = new Character;
   ch->name = strdup("DebugIMP");
   ch->pcdata = new pc_data;
 
@@ -327,7 +327,7 @@ int main(int argc, char **argv)
 
             if (argv[1] == string("all"))
             {
-              char_data *ch = d->character;
+              Character *ch = d->character;
               for (int iWear = 0; iWear < MAX_WEAR; iWear++)
               {
                 if (ch->equipment[iWear])
@@ -445,7 +445,7 @@ int main(int argc, char **argv)
         d->character->save();
       }
 
-      char_data *ch = d->character;
+      Character *ch = d->character;
       for (int iWear = 0; iWear < MAX_WEAR; iWear++)
       {
         if (ch->equipment[iWear])

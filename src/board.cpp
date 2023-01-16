@@ -78,7 +78,7 @@ struct message
 
 struct BOARD_INFO
 {
-  char_data *locked_for;
+  Character *locked_for;
   bool lock;
   int min_read_level;
   int min_write_level;
@@ -91,15 +91,15 @@ struct BOARD_INFO
 
 // These are the binary files in which to save/load messages
 
-void board_write_msg(char_data *ch, const char *arg, std::map<std::string, BOARD_INFO>::iterator board);
-int board_display_msg(char_data *ch, const char *arg, std::map<std::string, BOARD_INFO>::iterator board);
+void board_write_msg(Character *ch, const char *arg, std::map<std::string, BOARD_INFO>::iterator board);
+int board_display_msg(Character *ch, const char *arg, std::map<std::string, BOARD_INFO>::iterator board);
 char *fread_string(FILE *fl, int hasher);
-int board_remove_msg(char_data *ch, const char *arg, std::map<std::string, BOARD_INFO>::iterator board);
+int board_remove_msg(Character *ch, const char *arg, std::map<std::string, BOARD_INFO>::iterator board);
 void board_save_board(std::map<std::string, BOARD_INFO>::iterator board);
 void board_load_board();
-int board_show_board(char_data *ch, const char *arg, std::map<std::string, BOARD_INFO>::iterator board);
+int board_show_board(Character *ch, const char *arg, std::map<std::string, BOARD_INFO>::iterator board);
 int fwrite_string(char *buf, FILE *fl);
-void new_edit_board_unlock_board(char_data *ch, int abort);
+void new_edit_board_unlock_board(Character *ch, int abort);
 
 #define ANY_BOARD 0
 #define CLASS_BOARD 1
@@ -147,7 +147,7 @@ struct RESERVATION_DATA
 };
 
 // map to hold callback information for writing
-std::map<char_data *, RESERVATION_DATA *> wait_for_write;
+std::map<Character *, RESERVATION_DATA *> wait_for_write;
 
 /*
 Function to populate the board_db with all of the current clan info
@@ -604,7 +604,7 @@ int save_boards()
 Entry function called from assign_proc.
 handles commands and calls appropriate functions
 */
-int board(char_data *ch, struct obj_data *obj, int cmd, const char *arg, char_data *invoker)
+int board(Character *ch, struct obj_data *obj, int cmd, const char *arg, Character *invoker)
 {
   static int has_loaded = 0;
 
@@ -689,7 +689,7 @@ function call new_add_string()
 It notifies us when the user is done writing the post
 and we can copy the string to the board
 */
-void new_edit_board_unlock_board(char_data *ch, int abort)
+void new_edit_board_unlock_board(Character *ch, int abort)
 {
   RESERVATION_DATA *reserve = wait_for_write[ch];
   message new_msg;
@@ -713,7 +713,7 @@ void new_edit_board_unlock_board(char_data *ch, int abort)
   delete reserve;
 }
 
-void board_write_msg(char_data *ch, const char *arg, std::map<string, BOARD_INFO>::iterator board)
+void board_write_msg(Character *ch, const char *arg, std::map<string, BOARD_INFO>::iterator board)
 {
   char buf[MAX_STRING_LENGTH];
   time_t timep; // clock time
@@ -792,7 +792,7 @@ void board_write_msg(char_data *ch, const char *arg, std::map<string, BOARD_INFO
   ch->desc->max_str = MAX_MESSAGE_LENGTH;
 }
 
-int board_remove_msg(char_data *ch, const char *arg, std::map<std::string, BOARD_INFO>::iterator board)
+int board_remove_msg(Character *ch, const char *arg, std::map<std::string, BOARD_INFO>::iterator board)
 {
   unsigned int ind, tmessage;
   char buf[256], number[MAX_INPUT_LENGTH + 1];
@@ -974,7 +974,7 @@ void board_load_board()
   }
 }
 
-int board_display_msg(char_data *ch, const char *arg, std::map<std::string, BOARD_INFO>::iterator board)
+int board_display_msg(Character *ch, const char *arg, std::map<std::string, BOARD_INFO>::iterator board)
 {
   char buf[MAX_STRING_LENGTH], number[MAX_INPUT_LENGTH + 1];
   std::string board_msg;
@@ -1074,7 +1074,7 @@ int board_display_msg(char_data *ch, const char *arg, std::map<std::string, BOAR
   return eSUCCESS;
 }
 
-int board_show_board(char_data *ch, const char *arg, std::map<std::string, BOARD_INFO>::iterator board)
+int board_show_board(Character *ch, const char *arg, std::map<std::string, BOARD_INFO>::iterator board)
 {
   int i;
   std::string board_msg;

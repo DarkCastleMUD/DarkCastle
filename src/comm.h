@@ -67,12 +67,12 @@ struct pulse_info
 // void     write_to_output(const char *txt, struct descriptor_data *d);
 void write_to_output(string txt, struct descriptor_data *d);
 void scramble_text(char *txt);
-void warn_if_duplicate_ip(struct char_data *ch);
-void record_msg(string messg, char_data *ch);
+void warn_if_duplicate_ip(struct Character *ch);
+void record_msg(string messg, Character *ch);
 int write_hotboot_file(char **argv);
 void send_info(string messg);
 void send_info(const char *messg);
-bool is_multi(char_data *ch);
+bool is_multi(Character *ch);
 void new_string_add(struct descriptor_data *d, char *str);
 void telnet_ga(descriptor_data *d);
 void telnet_sga(descriptor_data *d);

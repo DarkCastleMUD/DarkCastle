@@ -40,9 +40,9 @@
 extern bool MOBtrigger;
 
 /* extern functions */
-int is_busy(char_data *ch);
+int is_busy(Character *ch);
 
-int do_report(char_data *ch, char *argument, int cmd)
+int do_report(Character *ch, char *argument, int cmd)
 {
   char buf[256];
   char report[200];
@@ -232,7 +232,7 @@ int send_to_gods(QString message, int god_level, LogChannels type)
   return (1);
 }
 
-int do_channel(char_data *ch, char *arg, int cmd)
+int do_channel(Character *ch, char *arg, int cmd)
 {
   int x;
   int y = 0;
@@ -374,7 +374,7 @@ int do_channel(char_data *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-command_return_t do_ignore(char_data *ch, string args, int cmd)
+command_return_t do_ignore(Character *ch, string args, int cmd)
 {
   if (ch == nullptr)
   {
@@ -438,7 +438,7 @@ command_return_t do_ignore(char_data *ch, string args, int cmd)
   return eSUCCESS;
 }
 
-int is_ignoring(const char_data *const ch, const char_data *const i)
+int is_ignoring(const Character *const ch, const Character *const i)
 {
   if (IS_MOB(ch) || (GET_LEVEL(i) >= IMMORTAL && IS_PC(i)) || ch->pcdata->ignoring.empty())
   {
@@ -475,7 +475,7 @@ int is_ignoring(const char_data *const ch, const char_data *const i)
 
 #define MAX_NOTE_LENGTH 1000 /* arbitrary */
 
-int do_write(char_data *ch, char *argument, int cmd)
+int do_write(Character *ch, char *argument, int cmd)
 {
   struct obj_data *paper = 0, *pen = 0;
   char papername[MAX_INPUT_LENGTH], penname[MAX_INPUT_LENGTH],
@@ -577,11 +577,11 @@ int do_write(char_data *ch, char *argument, int cmd)
 }
 
 // TODO - Add a bunch of insults to this for the hell of it.
-int do_insult(char_data *ch, char *argument, int cmd)
+int do_insult(Character *ch, char *argument, int cmd)
 {
   char buf[100];
   char arg[MAX_STRING_LENGTH];
-  char_data *victim;
+  Character *victim;
 
   one_argument(argument, arg);
 
@@ -633,7 +633,7 @@ int do_insult(char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_emote(char_data *ch, char *argument, int cmd)
+int do_emote(Character *ch, char *argument, int cmd)
 {
   int i;
   char buf[MAX_STRING_LENGTH];

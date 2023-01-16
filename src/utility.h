@@ -102,8 +102,8 @@ char *index(char *buf, char op);
 #define SKILL_INCREASE_HARD 300
 void check_timer();
 
-void skill_increase_check(char_data *ch, int skill, int learned, int difficulty);
-bool is_hiding(char_data *ch, char_data *vict);
+void skill_increase_check(Character *ch, int skill, int learned, int difficulty);
+bool is_hiding(Character *ch, Character *vict);
 
 // End defines for gradual skill increase code
 
@@ -335,7 +335,7 @@ bool IS_DARK(int room);
 
 #define IS_ANONYMOUS(ch) (IS_MOB(ch) ? 1 : ((GET_LEVEL(ch) >= 101) ? 0 : IS_SET((ch)->pcdata->toggles, PLR_ANONYMOUS)))
 /*
-inline const short IS_ANONYMOUS(char_data *ch)
+inline const short IS_ANONYMOUS(Character *ch)
 {
   if (IS_MOB(ch))
      // this should really never be called on mobs
@@ -420,9 +420,9 @@ bool ishashed(char *);
 void double_dollars(char *destination, char *source);
 string double_dollars(string source);
 
-void clan_death(char *b, char_data *ch);
+void clan_death(char *b, Character *ch);
 
-int move_char(char_data *ch, int dest, bool stop_all_fighting = true);
+int move_char(Character *ch, int dest, bool stop_all_fighting = true);
 int number(int from, int to);
 int dice(int number, int size);
 int str_cmp(const char *arg1, const char *arg2);
@@ -433,7 +433,7 @@ MatchType str_n_nosp_cmp_begin(string arg1, string arg2);
 char *str_nospace(const char *stri);
 char *str_dup(const char *str);
 char *str_dup0(const char *str);
-void logentry(QString str, int god_level = 0, LogChannels type = LogChannels::LOG_MISC, char_data *vict = nullptr);
+void logentry(QString str, int god_level = 0, LogChannels type = LogChannels::LOG_MISC, Character *vict = nullptr);
 void logf(int level, LogChannels type, const char *arg, ...);
 int send_to_gods(QString message, int god_level, LogChannels type);
 
@@ -455,26 +455,26 @@ const char *constindex(int index, const char *names[]);
 struct time_info_data
 mud_time_passed(time_t t2, time_t t1);
 struct time_info_data
-age(char_data *ch);
-bool circle_follow(char_data *ch, char_data *victim);
-bool ARE_GROUPED(char_data *sub, char_data *obj);
-bool ARE_CLANNED(char_data *sub, char_data *obj);
+age(Character *ch);
+bool circle_follow(Character *ch, Character *victim);
+bool ARE_GROUPED(Character *sub, Character *obj);
+bool ARE_CLANNED(Character *sub, Character *obj);
 // bool is_number(const char *str);
 bool is_number(QString str);
-void gain_condition(char_data *ch, int condition, int value);
-void set_fighting(char_data *ch, char_data *vict);
-void stop_fighting(char_data *ch, int clearlag = 1);
-int do_simple_move(char_data *ch, int cmd, int following);
-// int	attempt_move	(char_data *ch, int cmd, int is_retreat = 0);
-int32_t move_limit(char_data *ch);
-int32_t mana_limit(char_data *ch);
-int32_t ki_limit(char_data *ch);
-int32_t hit_limit(char_data *ch);
+void gain_condition(Character *ch, int condition, int value);
+void set_fighting(Character *ch, Character *vict);
+void stop_fighting(Character *ch, int clearlag = 1);
+int do_simple_move(Character *ch, int cmd, int following);
+// int	attempt_move	(Character *ch, int cmd, int is_retreat = 0);
+int32_t move_limit(Character *ch);
+int32_t mana_limit(Character *ch);
+int32_t ki_limit(Character *ch);
+int32_t hit_limit(Character *ch);
 typedef int16_t skill_t;
-int has_skill(char_data *ch, skill_t skill);
+int has_skill(Character *ch, skill_t skill);
 const char *get_skill_name(int skillnum);
-void gain_exp_regardless(char_data *ch, int gain);
-void advance_level(char_data *ch, int is_conversion);
+void gain_exp_regardless(Character *ch, int gain);
+void advance_level(Character *ch, int is_conversion);
 int close_socket(struct descriptor_data *d);
 int isname(string arg, string namelist);
 int isname(string arg, const char *namelist);
@@ -486,142 +486,142 @@ int isname(const char *arg, string namelist);
 int isname(const char *arg, joining_t &namelist);
 void page_string(struct descriptor_data *d, const char *str,
                  int keep_internal);
-void gain_exp(char_data *ch, int64_t gain);
-void redo_hitpoints(char_data *ch); /* Rua's put in  */
-void redo_mana(char_data *ch);      /* Rua's put in  */
-void redo_ki(char_data *ch);        /* And Urizen*/
+void gain_exp(Character *ch, int64_t gain);
+void redo_hitpoints(Character *ch); /* Rua's put in  */
+void redo_mana(Character *ch);      /* Rua's put in  */
+void redo_ki(Character *ch);        /* And Urizen*/
 void assign_rooms(void);
 void assign_objects(void);
 void assign_mobiles(void);
 void free_obj(struct obj_data *obj);
 
-int char_from_room(char_data *ch, bool stop_fighting);
-int char_from_room(char_data *ch);
-void do_start(char_data *ch);
+int char_from_room(Character *ch, bool stop_fighting);
+int char_from_room(Character *ch);
+void do_start(Character *ch);
 
-void update_pos(char_data *victim);
+void update_pos(Character *victim);
 void clear_object(struct obj_data *obj);
-void death_cry(char_data *ch);
+void death_cry(Character *ch);
 std::vector<std::string> splitstring(std::string splitme, std::string delims, bool ignore_empty = false);
 std::string joinstring(std::vector<std::string> joinme, std::string delims, bool ignore_empty = false);
 
-void add_follower(char_data *ch, char_data *leader, int cmd);
+void add_follower(Character *ch, Character *leader, int cmd);
 void send_to_outdoor(char *messg);
 void send_to_zone(char *messg, int zone);
 void weather_and_time(int mode);
 void night_watchman(void);
-int special(char_data *ch, int cmd, char *arg);
+int special(Character *ch, int cmd, char *arg);
 int process_output(struct descriptor_data *t);
 int file_to_string(const char *name, char *buf);
 bool load_char_obj(struct descriptor_data *d, const char *name);
-void save_char_obj(char_data *ch);
+void save_char_obj(Character *ch);
 
 #ifdef USE_SQL
-void save_char_obj_db(char_data *ch);
+void save_char_obj_db(Character *ch);
 #endif
 
-void unique_scan(char_data *victim);
-void char_to_store(char_data *ch, struct char_file_u4 *st, struct time_data &tmpage);
-bool obj_to_store(struct obj_data *obj, char_data *ch, FILE *fpsave, int wear_pos);
-void check_idling(char_data *ch);
-void stop_follower(char_data *ch, int cmd);
-bool CAN_SEE(char_data *sub, char_data *obj, bool noprog = false);
+void unique_scan(Character *victim);
+void char_to_store(Character *ch, struct char_file_u4 *st, struct time_data &tmpage);
+bool obj_to_store(struct obj_data *obj, Character *ch, FILE *fpsave, int wear_pos);
+void check_idling(Character *ch);
+void stop_follower(Character *ch, int cmd);
+bool CAN_SEE(Character *sub, Character *obj, bool noprog = false);
 int SWAP_CH_VICT(int value);
 bool SOMEONE_DIED(int value);
-bool CAN_SEE_OBJ(char_data *sub, struct obj_data *obj, bool bf = false);
-bool check_blind(char_data *ch);
-void raw_kill(char_data *ch, char_data *victim);
-void check_killer(char_data *ch, char_data *victim);
-int map_eq_level(char_data *mob);
-void disarm(char_data *ch, char_data *victim);
-int shop_keeper(char_data *ch, struct obj_data *obj, int cmd, const char *arg, char_data *invoker);
+bool CAN_SEE_OBJ(Character *sub, struct obj_data *obj, bool bf = false);
+bool check_blind(Character *ch);
+void raw_kill(Character *ch, Character *victim);
+void check_killer(Character *ch, Character *victim);
+int map_eq_level(Character *mob);
+void disarm(Character *ch, Character *victim);
+int shop_keeper(Character *ch, struct obj_data *obj, int cmd, const char *arg, Character *invoker);
 void send_to_all(char *messg);
-void ansi_color(char *txt, char_data *ch);
-void send_to_char(QString messg, char_data *ch);
-void send_to_char(string messg, char_data *ch);
-void send_to_char(const char *messg, char_data *ch);
-void send_to_char_nosp(const char *messg, char_data *ch);
-void send_to_char_nosp(QString messg, char_data *ch);
-void send_to_room(string messg, int room, bool awakeonly = false, char_data *nta = nullptr);
-void record_track_data(char_data *ch, int cmd);
+void ansi_color(char *txt, Character *ch);
+void send_to_char(QString messg, Character *ch);
+void send_to_char(string messg, Character *ch);
+void send_to_char(const char *messg, Character *ch);
+void send_to_char_nosp(const char *messg, Character *ch);
+void send_to_char_nosp(QString messg, Character *ch);
+void send_to_room(string messg, int room, bool awakeonly = false, Character *nta = nullptr);
+void record_track_data(Character *ch, int cmd);
 int write_to_descriptor(int desc, string txt);
 int write_to_descriptor_fd(int desc, char *txt);
 void write_to_q(const string txt, queue<string> &queue);
-int use_mana(char_data *ch, int sn);
+int use_mana(Character *ch, int sn);
 void automail(char *name);
 bool file_exists(const char *);
-void util_archive(const char *, char_data *);
-void util_unarchive(char *, char_data *);
-int is_busy(char_data *ch);
-int is_ignoring(const char_data *const ch, const char_data *const i);
-void colorCharSend(char *s, char_data *ch);
-void send_to_char_regardless(string messg, char_data *ch);
-int csendf(char_data *ch, const char *arg, ...);
+void util_archive(const char *, Character *);
+void util_unarchive(char *, Character *);
+int is_busy(Character *ch);
+int is_ignoring(const Character *const ch, const Character *const i);
+void colorCharSend(char *s, Character *ch);
+void send_to_char_regardless(string messg, Character *ch);
+int csendf(Character *ch, const char *arg, ...);
 bool check_range_valid_and_convert(int &value, const char *buf, int begin, int end);
 bool check_valid_and_convert(int &value, char *buf);
-void parse_bitstrings_into_int(const char *bits[], const char *strings, char_data *ch, uint32_t value[]);
-void parse_bitstrings_into_int(const char *bits[], const char *strings, char_data *ch, uint32_t &value);
-void parse_bitstrings_into_int(const char *bits[], const char *strings, char_data *ch, uint16_t &value);
-void parse_bitstrings_into_int(const char *bits[], string strings, char_data *ch, uint32_t value[]);
-void parse_bitstrings_into_int(const char *bits[], string strings, char_data *ch, uint32_t &value);
-void parse_bitstrings_into_int(const char *bits[], string strings, char_data *ch, uint16_t &value);
-void display_string_list(const char *list[], char_data *ch);
+void parse_bitstrings_into_int(const char *bits[], const char *strings, Character *ch, uint32_t value[]);
+void parse_bitstrings_into_int(const char *bits[], const char *strings, Character *ch, uint32_t &value);
+void parse_bitstrings_into_int(const char *bits[], const char *strings, Character *ch, uint16_t &value);
+void parse_bitstrings_into_int(const char *bits[], string strings, Character *ch, uint32_t value[]);
+void parse_bitstrings_into_int(const char *bits[], string strings, Character *ch, uint32_t &value);
+void parse_bitstrings_into_int(const char *bits[], string strings, Character *ch, uint16_t &value);
+void display_string_list(const char *list[], Character *ch);
 int contains_no_trade_item(obj_data *obj);
-int contents_cause_unique_problem(obj_data *obj, char_data *vict);
+int contents_cause_unique_problem(obj_data *obj, Character *vict);
 bool check_make_camp(int);
-int get_leadership_bonus(char_data *);
+int get_leadership_bonus(Character *);
 void update_make_camp_and_leadership(void);
 int _parse_name(const char *arg, char *name);
 
-void mob_suprised_sayings(char_data *ch, char_data *aggressor);
+void mob_suprised_sayings(Character *ch, Character *aggressor);
 
 // MOBProgs prototypes
-int mprog_wordlist_check(const char *arg, char_data *mob,
-                         char_data *actor, obj_data *object,
+int mprog_wordlist_check(const char *arg, Character *mob,
+                         Character *actor, obj_data *object,
                          void *vo, int type, bool reverse = false);
-void mprog_percent_check(char_data *mob, char_data *actor,
+void mprog_percent_check(Character *mob, Character *actor,
                          obj_data *object, void *vo,
                          int type);
-int mprog_act_trigger(string buf, char_data *mob,
-                      char_data *ch, obj_data *obj,
+int mprog_act_trigger(string buf, Character *mob,
+                      Character *ch, obj_data *obj,
                       void *vo);
-int mprog_bribe_trigger(char_data *mob, char_data *ch,
+int mprog_bribe_trigger(Character *mob, Character *ch,
                         int amount);
-int mprog_entry_trigger(char_data *mob);
-int mprog_give_trigger(char_data *mob, char_data *ch,
+int mprog_entry_trigger(Character *mob);
+int mprog_give_trigger(Character *mob, Character *ch,
                        obj_data *obj);
-int mprog_greet_trigger(char_data *mob);
-int mprog_fight_trigger(char_data *mob, char_data *ch);
-int mprog_hitprcnt_trigger(char_data *mob, char_data *ch);
-int mprog_death_trigger(char_data *mob, char_data *killer);
-int mprog_random_trigger(char_data *mob);
-int mprog_arandom_trigger(char_data *mob);
-int mprog_speech_trigger(const char *txt, char_data *mob);
-int mprog_catch_trigger(char_data *mob, int catch_num, char *var, int opt, char_data *actor, obj_data *obj, void *vo, char_data *rndm);
-int mprog_attack_trigger(char_data *mob, char_data *ch);
-int mprog_load_trigger(char_data *mob);
-int mprog_can_see_trigger(char_data *ch, char_data *mob);
-int mprog_damage_trigger(char_data *mob, char_data *ch, int amount);
+int mprog_greet_trigger(Character *mob);
+int mprog_fight_trigger(Character *mob, Character *ch);
+int mprog_hitprcnt_trigger(Character *mob, Character *ch);
+int mprog_death_trigger(Character *mob, Character *killer);
+int mprog_random_trigger(Character *mob);
+int mprog_arandom_trigger(Character *mob);
+int mprog_speech_trigger(const char *txt, Character *mob);
+int mprog_catch_trigger(Character *mob, int catch_num, char *var, int opt, Character *actor, obj_data *obj, void *vo, Character *rndm);
+int mprog_attack_trigger(Character *mob, Character *ch);
+int mprog_load_trigger(Character *mob);
+int mprog_can_see_trigger(Character *ch, Character *mob);
+int mprog_damage_trigger(Character *mob, Character *ch, int amount);
 
-int oprog_catch_trigger(obj_data *obj, int catch_num, char *var, int opt, char_data *actor, obj_data *obj2, void *vo, char_data *rndm);
-int oprog_act_trigger(const char *txt, char_data *ch);
-int oprog_speech_trigger(const char *txt, char_data *ch);
-int oprog_command_trigger(const char *txt, char_data *ch, char *arg);
-int oprog_weapon_trigger(char_data *ch, obj_data *item);
-int oprog_armour_trigger(char_data *ch, obj_data *item);
+int oprog_catch_trigger(obj_data *obj, int catch_num, char *var, int opt, Character *actor, obj_data *obj2, void *vo, Character *rndm);
+int oprog_act_trigger(const char *txt, Character *ch);
+int oprog_speech_trigger(const char *txt, Character *ch);
+int oprog_command_trigger(const char *txt, Character *ch, char *arg);
+int oprog_weapon_trigger(Character *ch, obj_data *item);
+int oprog_armour_trigger(Character *ch, obj_data *item);
 int oprog_rand_trigger(obj_data *item);
 int oprog_arand_trigger(obj_data *item);
-int oprog_greet_trigger(char_data *ch);
+int oprog_greet_trigger(Character *ch);
 int oprog_load_trigger(obj_data *item);
-int oprog_can_see_trigger(char_data *ch, obj_data *item);
-bool is_in_game(char_data *ch);
-int get_stat(char_data *ch, int stat);
+int oprog_can_see_trigger(Character *ch, obj_data *item);
+bool is_in_game(Character *ch);
+int get_stat(Character *ch, int stat);
 char *pluralize(int qty, char ending[] = "s");
 size_t nocolor_strlen(const char *s);
 size_t nocolor_strlen(QString str);
 void make_prompt(struct descriptor_data *d, string &prompt);
 string remove_all_codes(string input);
-void prog_error(char_data *mob, char *format, ...);
+void prog_error(Character *mob, char *format, ...);
 bool str_prefix(const char *astr, const char *bstr);
 bool str_infix(const char *astr, const char *bstr);
 
@@ -644,13 +644,13 @@ struct mprog_throw_type
    mprog_throw_type *next;
    bool mob;  // Mob or object.
    char *var; // temporary variable
-   char_data *actor;
+   Character *actor;
    obj_data *obj;
    void *vo;
-   char_data *rndm; // $r
+   Character *rndm; // $r
 
    // new mppause crap below..
-   char_data *tMob;   // it should NOT throw it to another similar mob :P
+   Character *tMob;   // it should NOT throw it to another similar mob :P
    int ifchecks[256]; // Let's hope noone nests more ifs than that.
    int startPos;
    int cPos;
@@ -668,7 +668,7 @@ struct mprog_variable_data
    char *program;
 };
 
-int handle_poisoned_weapon_attack(char_data *ch, char_data *vict, int percent);
+int handle_poisoned_weapon_attack(Character *ch, Character *vict, int percent);
 
 enum BACKUP_TYPE
 {
@@ -692,22 +692,22 @@ std::string get_isr_string(uint32_t, int8_t);
 
 void produce_coredump(void *ptr = 0);
 
-bool isDead(char_data *ch);
-bool isNowhere(char_data *ch);
+bool isDead(Character *ch);
+bool isNowhere(Character *ch);
 bool file_exists(string filename);
 bool char_file_exists(string name);
-void show_obj_class_size_mini(obj_data *obj, char_data *ch);
+void show_obj_class_size_mini(obj_data *obj, Character *ch);
 const char *item_condition(struct obj_data *obj);
 int random_percent_change(uint percentage, int value);
 int random_percent_change(int from, int to, int value);
-bool identify(char_data *ch, obj_data *obj);
-extern void end_oproc(char_data *ch, Trace trace = Trace("unknown"));
-void undo_race_saves(char_data *ch);
-string handle_ansi(string s, char_data *ch);
-char *handle_ansi_(char *s, char_data *ch);
-void blackjack_prompt(char_data *ch, string &prompt, bool ascii);
+bool identify(Character *ch, obj_data *obj);
+extern void end_oproc(Character *ch, Trace trace = Trace("unknown"));
+void undo_race_saves(Character *ch);
+string handle_ansi(string s, Character *ch);
+char *handle_ansi_(char *s, Character *ch);
+void blackjack_prompt(Character *ch, string &prompt, bool ascii);
 void show_string(struct descriptor_data *d, const char *input);
 void special_log(char *arg);
-int check_social(char_data *ch, string pcomm, int length);
+int check_social(Character *ch, string pcomm, int length);
 
 #endif /* UTILITY_H_ */

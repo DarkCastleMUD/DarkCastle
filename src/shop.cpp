@@ -58,7 +58,7 @@ map<string, reroll_t> reroll_sessions = {};
 /*
  * See if a shop keeper wants to trade.
  */
-int is_ok(char_data *keeper, char_data *ch, int shop_nr)
+int is_ok(Character *keeper, Character *ch, int shop_nr)
 {
   char buf[240];
 
@@ -145,7 +145,7 @@ int unlimited_supply(struct obj_data *item, int shop_nr)
   return false;
 }
 
-void restock_keeper(char_data *keeper, int shop_nr)
+void restock_keeper(Character *keeper, int shop_nr)
 {
   struct obj_data *obj, *obj2;
   char buf[50];
@@ -163,8 +163,8 @@ void restock_keeper(char_data *keeper, int shop_nr)
 /*
  * Buy an item from a shop.
  */
-void shopping_buy(const char *arg, char_data *ch,
-                  char_data *keeper, int shop_nr)
+void shopping_buy(const char *arg, Character *ch,
+                  Character *keeper, int shop_nr)
 {
   char buf[MAX_STRING_LENGTH];
   char argm[MAX_INPUT_LENGTH + 1];
@@ -275,8 +275,8 @@ void shopping_buy(const char *arg, char_data *ch,
 /*
  * Sell an item to a shop keeper.
  */
-void shopping_sell(const char *arg, char_data *ch,
-                   char_data *keeper, int shop_nr)
+void shopping_sell(const char *arg, Character *ch,
+                   Character *keeper, int shop_nr)
 {
   char buf[MAX_STRING_LENGTH];
   char argm[MAX_INPUT_LENGTH + 1];
@@ -388,8 +388,8 @@ void shopping_sell(const char *arg, char_data *ch,
 /*
  * Value an item.
  */
-void shopping_value(const char *arg, char_data *ch,
-                    char_data *keeper, int shop_nr)
+void shopping_value(const char *arg, Character *ch,
+                    Character *keeper, int shop_nr)
 {
   char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH];
   char argm[MAX_INPUT_LENGTH + 1];
@@ -625,8 +625,8 @@ void shopping_value(const char *arg, char_data *ch,
 /*
  * List available items.
  */
-void shopping_list(const char *arg, char_data *ch,
-                   char_data *keeper, int shop_nr)
+void shopping_list(const char *arg, Character *ch,
+                   Character *keeper, int shop_nr)
 {
   char buf[MAX_STRING_LENGTH];
   struct obj_data *obj, *tobj;
@@ -695,9 +695,9 @@ void shopping_list(const char *arg, char_data *ch,
 
 // Spec proc for shop keepers.
 // TODO - Remove goto's from this....I hate goto's.  This is C, not BASIC....
-int shop_keeper(char_data *ch, struct obj_data *obj, int cmd, const char *arg, char_data *invoker)
+int shop_keeper(Character *ch, struct obj_data *obj, int cmd, const char *arg, Character *invoker)
 {
-  char_data *keeper;
+  Character *keeper;
   int shop_nr;
 
   /*
@@ -898,7 +898,7 @@ void fix_shopkeepers_inventory()
 {
   int shop_nr;
 
-  char_data *keeper = 0;
+  Character *keeper = 0;
   struct obj_data *obj, *last_obj, *cloned;
 
   // set up the unlimited supply items. Those the shop_keeper has on start up.
@@ -1106,7 +1106,7 @@ void boot_player_shops()
   fclose(fp);
 }
 
-player_shop *find_player_shop(char_data *keeper)
+player_shop *find_player_shop(Character *keeper)
 {
   player_shop *shop = g_playershops;
 
@@ -1118,7 +1118,7 @@ player_shop *find_player_shop(char_data *keeper)
 }
 
 // put an item up for sale
-void player_shopping_stock(const char *arg, char_data *ch, char_data *keeper)
+void player_shopping_stock(const char *arg, Character *ch, Character *keeper)
 {
   player_shop *shop = find_player_shop(keeper);
   if (!shop)
@@ -1188,7 +1188,7 @@ void player_shopping_stock(const char *arg, char_data *ch, char_data *keeper)
   write_one_player_shop(shop);
 }
 
-void player_shopping_buy(const char *arg, char_data *ch, char_data *keeper)
+void player_shopping_buy(const char *arg, Character *ch, Character *keeper)
 {
   player_shop *shop = find_player_shop(keeper);
   if (!shop)
@@ -1265,7 +1265,7 @@ void player_shopping_buy(const char *arg, char_data *ch, char_data *keeper)
   write_one_player_shop(shop);
 }
 
-void player_shopping_withdraw(const char *arg, char_data *ch, char_data *keeper)
+void player_shopping_withdraw(const char *arg, Character *ch, Character *keeper)
 {
   player_shop *shop = find_player_shop(keeper);
   if (!shop)
@@ -1309,7 +1309,7 @@ void player_shopping_withdraw(const char *arg, char_data *ch, char_data *keeper)
   write_one_player_shop(shop);
 }
 
-void player_shopping_design(const char *arg, char_data *ch, char_data *keeper)
+void player_shopping_design(const char *arg, Character *ch, Character *keeper)
 {
   char select[MAX_INPUT_LENGTH];
   char text[MAX_INPUT_LENGTH];
@@ -1412,17 +1412,17 @@ void player_shopping_design(const char *arg, char_data *ch, char_data *keeper)
   }
 }
 
-void player_shopping_sell(const char *arg, char_data *ch, char_data *keeper)
+void player_shopping_sell(const char *arg, Character *ch, Character *keeper)
 {
   send_to_char("These shop keeper's don't buy stuff.\r\n", ch);
 }
 
-void player_shopping_value(const char *arg, char_data *ch, char_data *keeper)
+void player_shopping_value(const char *arg, Character *ch, Character *keeper)
 {
   send_to_char("These shop keeper's don't buy stuff.\r\n", ch);
 }
 
-void player_shopping_list(const char *arg, char_data *ch, char_data *keeper)
+void player_shopping_list(const char *arg, Character *ch, Character *keeper)
 {
   int count = 0;
   int robj;
@@ -1454,9 +1454,9 @@ void player_shopping_list(const char *arg, char_data *ch, char_data *keeper)
     csendf(ch, "\r\nYour shop has %ld cash in the till.\r\n", shop->money_on_hand);
 }
 
-int player_shop_keeper(char_data *ch, struct obj_data *obj, int cmd, const char *arg, char_data *invoker)
+int player_shop_keeper(Character *ch, struct obj_data *obj, int cmd, const char *arg, Character *invoker)
 {
-  char_data *keeper;
+  Character *keeper;
 
   if (!(keeper = invoker))
   {
@@ -1497,7 +1497,7 @@ int player_shop_keeper(char_data *ch, struct obj_data *obj, int cmd, const char 
   return eSUCCESS;
 }
 /*
-int do_pshopedit(char_data * ch, char * arg, int cmd)
+int do_pshopedit(Character * ch, char * arg, int cmd)
 {
   char buf[MAX_STRING_LENGTH];
   char select[MAX_INPUT_LENGTH];
@@ -1661,7 +1661,7 @@ obj_exchange eddie[MAX_EDDIE_ITEMS] = {
     {1, OBJ_APOCALYPSE, 2, OBJ_MEATBALL, 0, 0},
     {1, OBJ_BROWNIE, 10, OBJ_CLOVERLEAF, 0, 0}};
 
-int eddie_shopkeeper(char_data *ch, struct obj_data *obj, int cmd, const char *arg, char_data *owner)
+int eddie_shopkeeper(Character *ch, struct obj_data *obj, int cmd, const char *arg, Character *owner)
 {
   if (cmd != CMD_LIST && cmd != CMD_BUY)
     return eFAILURE;
@@ -1881,7 +1881,7 @@ int eddie_shopkeeper(char_data *ch, struct obj_data *obj, int cmd, const char *a
   return eSUCCESS;
 }
 
-int reroll_trader(char_data *ch, obj_data *obj, int cmd, const char *arg, char_data *owner)
+int reroll_trader(Character *ch, obj_data *obj, int cmd, const char *arg, Character *owner)
 {
   if (ch == nullptr || IS_MOB(ch))
   {

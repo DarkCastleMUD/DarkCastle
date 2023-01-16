@@ -28,7 +28,7 @@
 #include <twitcurl.h>
 #endif
 
-int getRealSpellDamage(char_data *ch);
+int getRealSpellDamage(Character *ch);
 
 int number_or_name(char **name, int *num)
 {
@@ -92,9 +92,9 @@ int number_or_name(char **name, int *num)
 }
 #endif
 
-void do_mload(char_data *ch, int rnum, int cnt)
+void do_mload(Character *ch, int rnum, int cnt)
 {
-  char_data *mob = nullptr;
+  Character *mob = nullptr;
   char buf[MAX_STRING_LENGTH];
   int i;
   if (cnt == 0)
@@ -153,7 +153,7 @@ void do_mload(char_data *ch, int rnum, int cnt)
   }
 }
 
-obj_list_t oload(char_data *ch, int rnum, int cnt, bool random)
+obj_list_t oload(Character *ch, int rnum, int cnt, bool random)
 {
   obj_data *obj = nullptr;
   obj_list_t obj_list = {};
@@ -203,7 +203,7 @@ obj_list_t oload(char_data *ch, int rnum, int cnt, bool random)
   return obj_list;
 }
 
-void do_oload(char_data *ch, int rnum, int cnt, bool random)
+void do_oload(Character *ch, int rnum, int cnt, bool random)
 {
   struct obj_data *obj = nullptr;
   char buf[MAX_STRING_LENGTH];
@@ -270,7 +270,7 @@ void do_oload(char_data *ch, int rnum, int cnt, bool random)
  * k, the mob or player that is being stated.  It prints it in a format similar to score.
  *  -- Borodin  Dec 23 2001 */
 
-void boro_mob_stat(char_data *ch, char_data *k)
+void boro_mob_stat(Character *ch, Character *k)
 {
   int i, i2;
   char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH];
@@ -574,7 +574,7 @@ void boro_mob_stat(char_data *ch, char_data *k)
   send_to_char(buf, ch);
 }
 
-void mob_stat(char_data *ch, char_data *k)
+void mob_stat(Character *ch, Character *k)
 {
 
   int i;
@@ -957,7 +957,7 @@ void mob_stat(char_data *ch, char_data *k)
   }
 }
 
-void obj_stat(char_data *ch, struct obj_data *j)
+void obj_stat(Character *ch, struct obj_data *j)
 {
   struct obj_data *j2 = 0;
   char buf[MAX_STRING_LENGTH];
@@ -1340,7 +1340,7 @@ void obj_stat(char_data *ch, struct obj_data *j)
   return;
 }
 
-void do_start(char_data *ch)
+void do_start(Character *ch)
 {
   char buf[256];
 
@@ -1407,7 +1407,7 @@ void do_start(char_data *ch)
   ch->pcdata->time.logon = time(0);
 }
 
-command_return_t do_repop(char_data *ch, string arguments, int cmd)
+command_return_t do_repop(Character *ch, string arguments, int cmd)
 {
   if (GET_LEVEL(ch) < DEITY && !can_modify_room(ch, ch->in_room))
   {
@@ -1436,7 +1436,7 @@ command_return_t do_repop(char_data *ch, string arguments, int cmd)
   return eSUCCESS;
 }
 
-int do_clear(char_data *ch, char *argument, int cmd)
+int do_clear(Character *ch, char *argument, int cmd)
 {
   char buf[MAX_STRING_LENGTH];
   int zone = world[ch->in_room].zone;
@@ -1483,7 +1483,7 @@ int do_clear(char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_linkdead(char_data *ch, char *arg, int cmd)
+int do_linkdead(Character *ch, char *arg, int cmd)
 {
   int x = 0;
   char buf[100];
@@ -1510,11 +1510,11 @@ int do_linkdead(char_data *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-int do_echo(char_data *ch, char *argument, int cmd)
+int do_echo(Character *ch, char *argument, int cmd)
 {
   int i;
   char buf[MAX_STRING_LENGTH];
-  char_data *vict;
+  Character *vict;
 
   if (IS_NPC(ch))
     return eFAILURE;
@@ -1534,13 +1534,13 @@ int do_echo(char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_restore(char_data *ch, char *argument, int cmd)
+int do_restore(Character *ch, char *argument, int cmd)
 {
-  char_data *victim;
+  Character *victim;
   char buf[100];
   struct descriptor_data *i;
 
-  void update_pos(char_data * victim);
+  void update_pos(Character * victim);
 
   if (!has_skill(ch, COMMAND_RESTORE))
   {
@@ -1737,7 +1737,7 @@ void check_end_of_hunt(struct hunt_data *h, bool forced = false)
   }
 }
 
-int do_huntclear(char_data *ch, char *arg, int cmd)
+int do_huntclear(Character *ch, char *arg, int cmd)
 {
   char arg1[MAX_INPUT_LENGTH];
   arg = one_argument(arg, arg1);
@@ -1899,7 +1899,7 @@ void begin_hunt(int item, int duration, int amount, char *huntname)
   for (int i = 0; i < amount; i++)
   {
     int mob = -1;
-    char_data *vict;
+    Character *vict;
     while (1)
     {
       mob = number(1, top_of_mobt);
@@ -1942,7 +1942,7 @@ void begin_hunt(int item, int duration, int amount, char *huntname)
   }
 }
 
-void pick_up_item(char_data *ch, struct obj_data *obj)
+void pick_up_item(Character *ch, struct obj_data *obj)
 {
   struct hunt_items *i, *p = nullptr, *in;
   char buf[MAX_STRING_LENGTH];
@@ -2068,7 +2068,7 @@ void pulse_hunts()
   }
 }
 
-int do_showhunt(char_data *ch, char *arg, int cmd)
+int do_showhunt(Character *ch, char *arg, int cmd)
 {
   string buf;
   struct hunt_data *h;
@@ -2116,7 +2116,7 @@ int do_showhunt(char_data *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-int do_huntstart(char_data *ch, char *argument, int cmd)
+int do_huntstart(Character *ch, char *argument, int cmd)
 {
   char arg[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH], buf[MAX_INPUT_LENGTH];
 #ifdef TWITTER

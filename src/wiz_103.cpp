@@ -22,9 +22,9 @@ using namespace fmt;
 #include "race.h"
 #include "const.h"
 
-int do_boot(char_data *ch, char *arg, int cmd)
+int do_boot(Character *ch, char *arg, int cmd)
 {
-  char_data *victim;
+  Character *victim;
   char name[MAX_INPUT_LENGTH], type[MAX_INPUT_LENGTH], buf[500];
 
   half_chop(arg, name, type);
@@ -160,7 +160,7 @@ int do_boot(char_data *ch, char *arg, int cmd)
   return eSUCCESS;
 }
 
-int do_disconnect(char_data *ch, char *argument, int cmd)
+int do_disconnect(Character *ch, char *argument, int cmd)
 {
   char arg[MAX_STRING_LENGTH];
   char buf[MAX_STRING_LENGTH];
@@ -203,9 +203,9 @@ int do_disconnect(char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_fsave(char_data *ch, string argument, int cmd)
+int do_fsave(Character *ch, string argument, int cmd)
 {
-  char_data *vict = {};
+  Character *vict = {};
   string name = {}, buf = {};
 
   if (IS_NPC(ch))
@@ -240,10 +240,10 @@ int do_fsave(char_data *ch, string argument, int cmd)
   return eSUCCESS;
 }
 
-int do_fighting(char_data *ch, char *argument, int cmd)
+int do_fighting(Character *ch, char *argument, int cmd)
 {
   const int CLANTAG_LEN = MAX_CLAN_LEN + 3; // "[Foobar]"
-  char_data *i;
+  Character *i;
   bool arenaONLY = false;
   int countFighters = 0;
   char buf[80];
@@ -297,9 +297,9 @@ int do_fighting(char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_peace(char_data *ch, char *argument, int cmd)
+int do_peace(Character *ch, char *argument, int cmd)
 {
-  char_data *rch;
+  Character *rch;
 
   for (rch = world[ch->in_room].people; rch != nullptr; rch = rch->next_in_room)
   {
@@ -313,7 +313,7 @@ int do_peace(char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_matrixinfo(char_data *ch, char *argument, int cmd)
+int do_matrixinfo(Character *ch, char *argument, int cmd)
 {
   char buf[MAX_STRING_LENGTH];
   int i = 0;
@@ -338,7 +338,7 @@ int do_matrixinfo(char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int lookupClass(char_data *ch, char *str)
+int lookupClass(Character *ch, char *str)
 {
   int c_class;
 
@@ -367,7 +367,7 @@ int lookupClass(char_data *ch, char *str)
   return -1;
 }
 
-int lookupRoom(char_data *ch, char *str)
+int lookupRoom(Character *ch, char *str)
 {
   if (str == 0)
     return -1;
@@ -387,7 +387,7 @@ int lookupRoom(char_data *ch, char *str)
   return room;
 }
 
-int do_guild(char_data *ch, char *argument, int cmd)
+int do_guild(Character *ch, char *argument, int cmd)
 {
   int c_class = 0, room = 0, old_room = 0;
   char arg1[MAX_STRING_LENGTH] = {0};

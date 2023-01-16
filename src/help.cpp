@@ -42,15 +42,15 @@ void help_string_to_file(FILE *f, char *string);
 struct help_index_element_new *find_help(char *keyword);
 int strn_cmp(char *arg1, char *arg2, int n);
 int count_hash_records(FILE *fl);
-void show_hedit_usage(char_data *ch);
-void save_help(char_data *ch);
+void show_hedit_usage(Character *ch);
+void save_help(Character *ch);
 int get_line_with_space(FILE *fl, char *buf);
-int show_one_help_entry(int entry, char_data *ch, int count);
-void show_help_header(char_data *ch);
-void show_help_bar(char_data *ch);
+int show_one_help_entry(int entry, Character *ch, int count);
+void show_help_header(Character *ch);
+void show_help_bar(Character *ch);
 
 // da functions
-int do_mortal_help(char_data *ch, char *argument, int cmd)
+int do_mortal_help(Character *ch, char *argument, int cmd)
 {
   extern char new_help[MAX_STRING_LENGTH];
   send_to_char(new_help, ch);
@@ -99,7 +99,7 @@ int levenshtein(const char *s, const char *t)
   return d[m][n];
 }
 
-int do_new_help(char_data *ch, char *argument, int cmd)
+int do_new_help(Character *ch, char *argument, int cmd)
 {
   char buf[256];
   extern char new_help[MAX_STRING_LENGTH];
@@ -294,7 +294,7 @@ struct help_index_element_new *find_help(char *keyword)
 
 #define ENTRY_MAX 32384
 
-int load_new_help(FILE *fl, int reload, char_data *ch)
+int load_new_help(FILE *fl, int reload, Character *ch)
 {
   char entry[ENTRY_MAX], line[READ_SIZE + 1], tmpentry[ENTRY_MAX], buf[256], tmpbuffer[ENTRY_MAX];
   struct help_index_element_new new_help;
@@ -390,7 +390,7 @@ int load_new_help(FILE *fl, int reload, char_data *ch)
   return eSUCCESS;
 }
 
-int do_areas(char_data *ch, char *arg, int cmd)
+int do_areas(Character *ch, char *arg, int cmd)
 {
   strcpy(arg, "areas");
   return do_new_help(ch, arg, cmd);
@@ -398,7 +398,7 @@ int do_areas(char_data *ch, char *arg, int cmd)
 
 char help_buf[MAX_STRING_LENGTH * 4];
 
-int do_hindex(char_data *ch, char *argument, int cmd)
+int do_hindex(Character *ch, char *argument, int cmd)
 {
   int i, minlen, count = 0;
   char arg[256];
@@ -543,7 +543,7 @@ int do_hindex(char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_index(char_data *ch, char *argument, int cmd)
+int do_index(Character *ch, char *argument, int cmd)
 {
   int i, minlen, count = 0;
   char arg[256];
@@ -626,7 +626,7 @@ int do_index(char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int show_one_help_entry(int entry, char_data *ch, int count)
+int show_one_help_entry(int entry, Character *ch, int count)
 {
 
   csendf(ch, "$B$6%3d $7- $5%3d $7[$3%-20.20s$7] [$3%-20.20s$B$7] [$3%-20.20s$B$7] "
@@ -641,7 +641,7 @@ int show_one_help_entry(int entry, char_data *ch, int count)
   return ++count;
 }
 
-void show_help_header(char_data *ch)
+void show_help_header(Character *ch)
 {
   send_to_char("$B$6ID# $B$7- $RLVL $3 Keyword 1              Keyword 2              Keyword 3"
                "              Keyword 4              Keyword 5\r\n",
@@ -649,7 +649,7 @@ void show_help_header(char_data *ch)
   show_help_bar(ch);
 }
 
-void show_help_bar(char_data *ch)
+void show_help_bar(Character *ch)
 {
   send_to_char("$B$7--------------------------------------------------------------------------"
                "--------------------------------------------------\r\n$R",
@@ -676,7 +676,7 @@ int strn_cmp(char *arg1, char *arg2, int n)
   return (0);
 }
 
-int do_reload_help(char_data *ch, char *argument, int cmd)
+int do_reload_help(Character *ch, char *argument, int cmd)
 {
 
   FILE *new_help_fl;
@@ -716,7 +716,7 @@ int do_reload_help(char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int do_hedit(char_data *ch, char *argument, int cmd)
+int do_hedit(Character *ch, char *argument, int cmd)
 {
   char buf[200], buf2[200], field[200], buf3[200], value[200];
   struct help_index_element_new new_help;
@@ -895,7 +895,7 @@ int do_hedit(char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-void show_hedit_usage(char_data *ch)
+void show_hedit_usage(Character *ch)
 {
 
   send_to_char("$3Syntax$R: hedit <id#> <field> [arg] [value]\r\n"
@@ -907,7 +907,7 @@ void show_hedit_usage(char_data *ch)
                ch);
 }
 
-void save_help(char_data *ch)
+void save_help(Character *ch)
 {
   FILE *f;
   int i;

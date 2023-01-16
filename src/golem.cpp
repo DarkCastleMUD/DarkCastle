@@ -29,17 +29,17 @@ using namespace std;
 #include "const.h"
 
 // Locals
-void advance_golem_level(char_data *golem);
+void advance_golem_level(Character *golem);
 
 // save.cpp
-int store_worn_eq(char_data *ch, FILE *fpsave);
-struct obj_data *obj_store_to_char(char_data *ch, FILE *fpsave, struct obj_data *last_cont);
+int store_worn_eq(Character *ch, FILE *fpsave);
+struct obj_data *obj_store_to_char(Character *ch, FILE *fpsave, struct obj_data *last_cont);
 
 // limits.cpp
-extern int hit_gain(char_data *ch);
-extern int mana_gain(char_data *ch);
-extern int ki_gain(char_data *ch);
-extern int move_gain(char_data *ch, int extra);
+extern int hit_gain(Character *ch);
+extern int mana_gain(Character *ch);
+extern int ki_gain(Character *ch);
+extern int move_gain(Character *ch, int extra);
 
 struct golem_data
 { // This is how a golem looks.
@@ -64,18 +64,18 @@ const struct golem_data golem_list[] = {
     {"iron", "iron golem enchanted", "an enchanted iron golem", "A powerfully enchanted iron golem stands here, guarding its master.\r\n", "The iron golem is bound by its master's magics.  A mindless automaton,\r\nthe iron golem is one of the most powerful forces available in \r\na wizard's arsenal.  Nearly a full 8 feet tall and weighing several\r\ntons, this behemoth of pure iron is absolutely loyal to its master and\r\nsilently follows commands without fail.\r\n", 1000, 15, 5, 25, 50, {107, 108, 109, 0, 7004}, AFF_LIGHTNINGSHIELD, 0, -100, "There is a grinding and shrieking of metal as an iron golem is slowly formed.\r\n", "Unable to sustain further damage, the iron golem falls into unrecoverable scrap.", "As the magic binding it is released, the iron golem rusts to pieces."},
     {"stone", "stone enchanted golem", "an enchanted stone golem", "A powerfully enchanted stone golem stands here, guarding its master.\r\n", "The stone golem is bound by its caster's magics.  A mindless automaton,\r\nthe stone golem is one of the sturdiest and most resilliant creatures\r\nknown in the realms.  Nearly a full 8 feet tall and weighing several\r\ntons, this mountain of rock is absolutely loyal to its master and\r\nsilently follows orders without fail.\r\n", 2000, 5, 5, 25, 50, {104, 105, 106, 0, 7003}, -1, ISR_PIERCE, -100, "There is a deep rumbling as a stone golem slowly rises from the ground.\r\n", "Unable to sustain further damage, the stone golem shatters to pieces.", "As the magic binding it is released, the golem crumbles to dust."}};
 
-void shatter_message(char_data *ch)
+void shatter_message(Character *ch)
 {
   int golemtype = !IS_AFFECTED(ch, AFF_GOLEM); // 0 or 1
   act(golem_list[golemtype].shatter_message, ch, 0, 0, TO_ROOM, 0);
 }
-void release_message(char_data *ch)
+void release_message(Character *ch)
 {
   int golemtype = !IS_AFFECTED(ch, AFF_GOLEM);
   act(golem_list[golemtype].release_message, ch, 0, 0, TO_ROOM, 0);
 }
 
-void golem_gain_exp(char_data *ch)
+void golem_gain_exp(Character *ch)
 {
   //  extern int exp_table[~];
   int level = 19 + ch->level;
@@ -91,7 +91,7 @@ void golem_gain_exp(char_data *ch)
   }
 }
 
-int verify_existing_components(char_data *ch, int golemtype)
+int verify_existing_components(Character *ch, int golemtype)
 {
   int retval = 0;
 
@@ -156,7 +156,7 @@ int verify_existing_components(char_data *ch, int golemtype)
   return retval;
 }
 
-void save_golem_data(char_data *ch)
+void save_golem_data(Character *ch)
 {
   char file[200];
   FILE *fpfile = nullptr;
@@ -170,7 +170,7 @@ void save_golem_data(char_data *ch)
     logentry("Error while opening file in save_golem_data[golem.cpp].", ANGEL, LogChannels::LOG_BUG);
     return;
   }
-  char_data *golem = ch->pcdata->golem; // Just to make the code below cleaner.
+  Character *golem = ch->pcdata->golem; // Just to make the code below cleaner.
   fwrite(&(golem->level), sizeof(golem->level), 1, fpfile);
   fwrite(&(golem->exp), sizeof(golem->exp), 1, fpfile);
   // Use previously defined functions after this.
@@ -179,7 +179,7 @@ void save_golem_data(char_data *ch)
   fclose(fpfile);
 }
 
-void save_charmie_data(char_data *ch)
+void save_charmie_data(Character *ch)
 {
   char file[200];
   FILE *fpfile = nullptr;
@@ -191,7 +191,7 @@ void save_charmie_data(char_data *ch)
 
   for (follow_type *followers = ch->followers; followers != nullptr; followers = followers->next)
   {
-    char_data *follower = followers->follower;
+    Character *follower = followers->follower;
 
     if (follower == nullptr || IS_PC(follower) || follower->master == nullptr || !IS_AFFECTED(follower, AFF_CHARM))
     {
@@ -211,7 +211,7 @@ void save_charmie_data(char_data *ch)
   }
 }
 
-void advance_golem_level(char_data *golem)
+void advance_golem_level(Character *golem)
 {
   int golemtype = !IS_AFFECTED(golem, AFF_GOLEM); // 0 or 1
   golem->max_hit = golem->raw_hit = (golem->raw_hit + (golem_list[golemtype].max_hp / 20));
@@ -223,7 +223,7 @@ void advance_golem_level(char_data *golem)
   redo_hitpoints(golem);
 }
 
-void set_golem(char_data *golem, int golemtype)
+void set_golem(Character *golem, int golemtype)
 { // Set the basics.
   GET_RACE(golem) = RACE_GOLEM;
   golem->short_desc = str_hsh(golem_list[golemtype].short_desc);
@@ -259,11 +259,11 @@ void set_golem(char_data *golem, int golemtype)
   golem->weight = 255; // Was 530, ditto
 }
 
-void load_golem_data(char_data *ch, int golemtype)
+void load_golem_data(Character *ch, int golemtype)
 {
   char file[200];
   FILE *fpfile = nullptr;
-  char_data *golem;
+  Character *golem;
   if (IS_NPC(ch) || (GET_CLASS(ch) != CLASS_MAGIC_USER && GET_LEVEL(ch) < OVERSEER) || ch->pcdata->golem)
     return;
   if (golemtype < 0 || golemtype > 1)
@@ -293,9 +293,9 @@ void load_golem_data(char_data *ch, int golemtype)
   fclose(fpfile);
 }
 
-int cast_create_golem(uint8_t level, char_data *ch, char *arg, int type, char_data *tar_ch, struct obj_data *tar_obj, int skill)
+int cast_create_golem(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, struct obj_data *tar_obj, int skill)
 {
-  char_data *golem;
+  Character *golem;
   int i;
   char buf[MAX_INPUT_LENGTH];
   arg = one_argument(arg, buf);
@@ -346,13 +346,13 @@ int cast_create_golem(uint8_t level, char_data *ch, char *arg, int type, char_da
 
 extern char frills[];
 
-int do_golem_score(char_data *ch, char *argument, int cmd)
+int do_golem_score(Character *ch, char *argument, int cmd)
 { /* Pretty much a rip of score */
   char race[100];
   char buf[MAX_STRING_LENGTH], scratch;
   int level = 0;
   int to_dam, to_hit;
-  char_data *master = ch;
+  Character *master = ch;
   if (IS_NPC(ch))
     return eFAILURE;
   if (!ch->pcdata->golem)
@@ -553,7 +553,7 @@ int do_golem_score(char_data *ch, char *argument, int cmd)
   return eSUCCESS;
 }
 
-int spell_release_golem(uint8_t level, char_data *ch, char *arg, int type, char_data *tar_ch, struct obj_data *tar_obj, int skill)
+int spell_release_golem(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, struct obj_data *tar_obj, int skill)
 {
   struct follow_type *fol;
   for (fol = ch->followers; fol; fol = fol->next)

@@ -10,7 +10,7 @@
 #include "structs.h" // uint8_t
 #include "class.h"
 /************************************************************************
-| char_data.misc vector
+| Character.misc vector
 |  These should probably not be combined, and they probably shouldn't
 |  be here, but they are.  Morc XXX
 |  I really shouldn't have the flag here to differentiate mob's from PC's
@@ -30,7 +30,7 @@
 
 /************************************************************************
 | Player vectors
-| char_data->pcdata->toggles
+| Character->pcdata->toggles
 */
 #define PLR_BRIEF 1U
 #define PLR_COMPACT 1U << 1
@@ -284,6 +284,6 @@ extern const struct str_app_type str_app[];
 extern const struct wis_app_type wis_app[];
 
 /* Various function declarations */
-int get_saves(char_data *ch, int savetype);
+int get_saves(Character *ch, int savetype);
 
 #endif

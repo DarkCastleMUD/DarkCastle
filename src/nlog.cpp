@@ -114,7 +114,7 @@ void logf(int level, LogChannels type, const char *arg, ...)
   logentry(s, level, type);
 }
 
-int csendf(char_data *ch, const char *arg, ...)
+int csendf(Character *ch, const char *arg, ...)
 {
   va_list args;
   char s[MAX_STRING_LENGTH];
@@ -129,7 +129,7 @@ int csendf(char_data *ch, const char *arg, ...)
   return (1);
 }
 
-char *handle_ansi_(char *s, char_data *ch)
+char *handle_ansi_(char *s, Character *ch)
 {
   char *t;
   char *tp, *sp, *i;
@@ -252,7 +252,7 @@ char *handle_ansi_(char *s, char_data *ch)
   return t;
 }
 
-string handle_ansi(string haystack, char_data *ch)
+string handle_ansi(string haystack, Character *ch)
 {
   map<size_t, bool> ignore;
   map<char, string> rep;

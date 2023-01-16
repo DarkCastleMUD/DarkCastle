@@ -18,7 +18,7 @@ extern "C"
 // DarkCastle header files
 #include "db.h"
 #include "room.h"
-#include "character.h" // char_data
+#include "character.h" // Character
 #include "obj.h"       // obj_data
 #include "levels.h"    // MIN_GOD
 #include "utility.h"   // GET_SHORT, GET_LEVEL, &c
@@ -142,7 +142,7 @@ void TokenList::Next()
 |   Zero is returned (0) if the string should not be sent -- either
 |   the send_to is asleep or the INVIS_NULL flag was used (for example).
 */
-string TokenList::Interpret(char_data *from, obj_data *obj, void *vict_obj, char_data *send_to, int flags)
+string TokenList::Interpret(Character *from, obj_data *obj, void *vict_obj, Character *send_to, int flags)
 {
 
   // Reset the string
@@ -169,7 +169,7 @@ string TokenList::Interpret(char_data *from, obj_data *obj, void *vict_obj, char
     return "";
   if (IS_SET(world[send_to->in_room].room_flags, QUIET) && !(flags & FORCE))
     return "";
-  if ((send_to == (char_data *)vict_obj) && (flags & NOTVICT))
+  if ((send_to == (Character *)vict_obj) && (flags & NOTVICT))
     return "";
   if ((GET_LEVEL(send_to) < MIN_GOD) && (flags & GODS))
     return "";
@@ -287,26 +287,26 @@ string TokenList::Interpret(char_data *from, obj_data *obj, void *vict_obj, char
         }
         break;
       case 'N':
-        if (vict_obj == nullptr || GET_SHORT((char_data *)vict_obj) == nullptr)
+        if (vict_obj == nullptr || GET_SHORT((Character *)vict_obj) == nullptr)
         {
           break;
         }
-        if (!CAN_SEE(send_to, (char_data *)vict_obj, true))
+        if (!CAN_SEE(send_to, (Character *)vict_obj, true))
         {
           if (flags & INVIS_NULL)
             return {};
           else if (flags & INVIS_VISIBLE)
-            interp += GET_SHORT((char_data *)vict_obj);
+            interp += GET_SHORT((Character *)vict_obj);
           else
             interp += "someone";
         }
         else
         {
-          if (vict_obj == nullptr || GET_SHORT((char_data *)vict_obj) == nullptr)
+          if (vict_obj == nullptr || GET_SHORT((Character *)vict_obj) == nullptr)
           {
             break;
           }
-          interp += GET_SHORT((char_data *)vict_obj);
+          interp += GET_SHORT((Character *)vict_obj);
         }
         break;
       case 'm':
@@ -321,7 +321,7 @@ string TokenList::Interpret(char_data *from, obj_data *obj, void *vict_obj, char
         {
           break;
         }
-        interp += HMHR((char_data *)vict_obj);
+        interp += HMHR((Character *)vict_obj);
         break;
       case 's':
         if (from == nullptr)
@@ -335,7 +335,7 @@ string TokenList::Interpret(char_data *from, obj_data *obj, void *vict_obj, char
         {
           break;
         }
-        interp += HSHR((char_data *)vict_obj);
+        interp += HSHR((Character *)vict_obj);
         break;
       case 'e':
         if (from == nullptr)
@@ -349,7 +349,7 @@ string TokenList::Interpret(char_data *from, obj_data *obj, void *vict_obj, char
         {
           break;
         }
-        interp += HSSH((char_data *)vict_obj);
+        interp += HSSH((Character *)vict_obj);
         break;
       case 'o':
         if (send_to == nullptr || obj == nullptr || obj->name == nullptr)

@@ -100,8 +100,8 @@ struct descriptor_data {
   string output = {}; /* queue of strings to send	*/
   string inbuf = {};
   queue<string> input = {}; /* queue of unprocessed input	*/
-  struct char_data *character = {}; /* linked to char		*/
-  char_data *original = {}; /* for switch / return		*/
+  struct Character *character = {}; /* linked to char		*/
+  Character *original = {}; /* for switch / return		*/
   struct descriptor_data *snooping = {}; /* Who is this char snooping       */
   struct descriptor_data *snoop_by = {}; /* And who is snooping this char   */
   struct descriptor_data *next = {}; /* link to next descriptor	*/

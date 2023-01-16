@@ -21,21 +21,21 @@ typedef struct  event_brief   eventBrief;
 typedef struct  event_bucket  eventBucket;
 typedef struct  event_handler eventHandler;
 typedef void                  (*eventFunc)(eventParams*);
-typedef int                   (*eventKiller)(struct char_data*, eventData*);
+typedef int                   (*eventKiller)(struct Character*, eventData*);
 
 #define EVT_NORMAL       0
 #define EVT_DEAD         1
 
-struct event_brief {          /* Stick ths in a char_data                 */
+struct event_brief {          /* Stick ths in a Character                 */
    eventKiller killfunc;      /* Function to call event dies unexpectedly  */
    eventData*  event;
    eventBrief* next;
 };
 
 struct event_params {
-   char_data*   ch;
+   Character*   ch;
    obj_data*    obj;
-   char_data*   vict;
+   Character*   vict;
    char        str[1024];
    int         num;
    void*       extra;
@@ -66,9 +66,9 @@ eventData* getNewEvent();
 void initHandler();
 void queueEvent(eventData* event, int time);
 void processEvents();
-void killBrief(char_data* ch, eventFunc func);
-eventBrief* addBrief(char_data* ch, eventData* event);
-eventBrief* foundBrief(char_data* ch, eventFunc func);
-void killCharEvents(char_data* ch);
+void killBrief(Character* ch, eventFunc func);
+eventBrief* addBrief(Character* ch, eventData* event);
+eventBrief* foundBrief(Character* ch, eventFunc func);
+void killCharEvents(Character* ch);
 
 #endif

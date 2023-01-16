@@ -43,7 +43,7 @@ const struct spec_data spec_list[] =
         {"Blah", "Blehe", 1, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}},
         {nullptr, nullptr, 0, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}}};
 
-int do_spec(char_data *ch, char *argument, int cmd)
+int do_spec(Character *ch, char *argument, int cmd)
 {
   char buf[MAX_STRING_LENGTH];
   char arg[MAX_INPUT_LENGTH];
