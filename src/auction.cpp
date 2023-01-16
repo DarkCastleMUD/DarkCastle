@@ -327,12 +327,12 @@ void AuctionHouse::DoModify(Character *ch, unsigned int ticket, unsigned int new
   {
     unsigned int difference = new_price - Item_it->second.price;
     unsigned int fee = (unsigned int)((double)difference * 0.025);
-    if (GET_GOLD(ch) < fee)
+    if (ch->getGold() < fee)
     {
       csendf(ch, "Increasing the items price by %u costs %u, you don't have enough.\r\n", difference, fee);
       return;
     }
-    GET_GOLD(ch) -= fee;
+    ch->removeGold(fee);
     csendf(ch, "The broker collects %u coins for increasing the price by %u.\r\n", fee, difference);
     ch->save();
   }
@@ -515,7 +515,7 @@ void AuctionHouse::Identify(Character *ch, unsigned int ticket)
     return;
   }
 
-  if (GET_GOLD(ch) < 6000)
+  if (ch->getGold() < 6000)
   {
     send_to_char("The broker charges 6000 $B$5gold$R to identify items.\r\n", ch);
     return;
@@ -1157,7 +1157,7 @@ void AuctionHouse::BuyItem(Character *ch, unsigned int ticket)
     return;
   }
 
-  if (GET_GOLD(ch) < Item_it->second.price)
+  if (ch->getGold() < Item_it->second.price)
   {
     csendf(ch, "Ticket number %d costs %d coins, you can't afford that!\n\r",
            ticket, Item_it->second.price);
@@ -1229,7 +1229,7 @@ void AuctionHouse::BuyItem(Character *ch, unsigned int ticket)
   ItemsActive -= 1;
   Revenue += Item_it->second.price;
   UncollectedGold += Item_it->second.price;
-  GET_GOLD(ch) -= Item_it->second.price;
+  ch->removeGold(Item_it->second.price);
 
   if ((vict = get_active_pc(Item_it->second.seller.c_str())))
     csendf(vict, "%s just purchased your ticket of %s for %u coins.\r\n", GET_NAME(ch), Item_it->second.item_name.c_str(), Item_it->second.price);
@@ -1394,7 +1394,7 @@ void AuctionHouse::RemoveTicket(Character *ch, unsigned int ticket)
     TaxCollected += fee;
     Revenue -= fee;
     UncollectedGold -= Item_it->second.price;
-    GET_GOLD(ch) += (Item_it->second.price - fee);
+    ch->addGold(Item_it->second.price - fee);
     char log_buf[MAX_STRING_LENGTH] = {};
     sprintf(log_buf, "VEND: %s just collected %u coins from their sale of %s (ticket %u).\r\n",
             GET_NAME(ch), Item_it->second.price, Item_it->second.item_name.c_str(), ticket);
@@ -1742,13 +1742,13 @@ void AuctionHouse::AddItem(Character *ch, obj_data *obj, unsigned int price, str
   // Private sales cost money now
   if (buf[0] != 0)
   {
-    if (GET_GOLD(ch) < 500000)
+    if (ch->getGold() < 500000)
     {
       send_to_char("You do not have the 500,000 $B$5gold$R required to sell an item privately.\r\n", ch);
       return;
     }
 
-    GET_GOLD(ch) -= 500000;
+    ch->removeGold(500000);
     send_to_char("The Consignment Broker takes 500,000 $B$5gold$R from you as a cost for selling something privately.\r\n", ch);
   }
 
