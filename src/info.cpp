@@ -3651,7 +3651,6 @@ command_return_t char_data::do_search(QStringList &arguments, int cmd)
       else if (arguments[i].contains('>') && !arguments[i].contains(">="))
       {
          QStringList equal_buffer = arguments[i].split('>');
-         qDebug() << equal_buffer;
          arg1 = equal_buffer.at(0);
          arg2 = equal_buffer.at(1);
          greater = true;
