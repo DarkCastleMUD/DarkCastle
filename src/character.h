@@ -22,7 +22,6 @@ class Character;
 #include <QString>
 #include <QMap>
 
-#include "DC.h"
 #include "affect.h"   /* MAX_AFFECTS, etc.. */
 #include "alias.h"    /* struct char_player_alias, MAX_ALIASES, etc.. */
 #include "structs.h"  /* uint8_t, uint8_t, int16_t, etc.. */
@@ -404,9 +403,9 @@ public:
     uint8_t height = {}; /* PC/NPC's height */
 
     int16_t hometown = {}; /* PC/NPC home town */
-    uint64_t gold = {};    /* Money carried                           */
-    uint32_t plat = {};    /* Platinum                                */
-    int64_t exp = {};      /* The experience of the player            */
+
+    uint32_t plat = {}; /* Platinum                                */
+    int64_t exp = {};   /* The experience of the player            */
     int32_t in_room = {};
 
     uint32_t immune = {};                  // Bitvector of damage types I'm immune to
@@ -559,6 +558,13 @@ public:
     bool isMortal(void);
     bool isImmortal(void);
     bool isImplementer(void);
+    uint64_t getGold(void);
+    void setGold(uint64_t);
+    bool addGold(uint64_t);
+    bool removeGold(uint64_t));
+
+private:
+    uint64_t gold_ = {}; /* Money carried                           */
 };
 
 class communication

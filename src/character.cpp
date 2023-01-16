@@ -147,3 +147,35 @@ bool Character::isImplementer(void)
 {
     return GET_LEVEL(this) == IMPLEMENTER;
 }
+
+uint64_t Character::getGold(void)
+{
+    return gold;
+}
+
+void Character::setGold(uint64_t gold)
+{
+    gold_ = gold;
+}
+
+bool Character::addGold(uint64_t gold)
+{
+    if (gold_ + gold < gold)
+    {
+        return false;
+    }
+
+    gold_ += gold;
+    return true;
+}
+
+bool Character::removeGold(uint64_t gold)
+{
+    if (gold > gold_)
+    {
+        return false;
+    }
+
+    gold_ -= gold;
+    return true;
+}
