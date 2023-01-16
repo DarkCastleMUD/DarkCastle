@@ -209,19 +209,21 @@ struct extra_descr_data
 
 #define OBJ_NOTIMER -7000000
 
+typedef uint8_t object_type_t;
+
 struct obj_flag_data
 {
-    int32_t value[4] = {};     /* Values of the item (see list)    */
-    uint8_t type_flag = {};    /* Type of item                     */
-    uint32_t wear_flags = {};  /* Where you can wear it            */
-    uint16_t size = {};        /* Race restrictions                */
-    uint32_t extra_flags = {}; /* If it hums, glows etc            */
-    int16_t weight = {};       /* Weight what else                 */
-    int32_t cost = {};         /* Value when sold (gp.)            */
-    uint32_t more_flags = {};  /* A second bitvector (extra_flags2)*/
-    int16_t eq_level = {};     /* Min level to use it for eq       */
-    int16_t timer = {};        /* Timer for object                 */
-    Character *origin = {};    /* Creator of object, previously was stored at value[3] */
+    int32_t value[4] = {};        /* Values of the item (see list)    */
+    object_type_t type_flag = {}; /* Type of item                     */
+    uint32_t wear_flags = {};     /* Where you can wear it            */
+    uint16_t size = {};           /* Race restrictions                */
+    uint32_t extra_flags = {};    /* If it hums, glows etc            */
+    int16_t weight = {};          /* Weight what else                 */
+    int32_t cost = {};            /* Value when sold (gp.)            */
+    uint32_t more_flags = {};     /* A second bitvector (extra_flags2)*/
+    int16_t eq_level = {};        /* Min level to use it for eq       */
+    int16_t timer = {};           /* Timer for object                 */
+    Character *origin = {};       /* Creator of object, previously was stored at value[3] */
 };
 
 struct obj_affected_type
