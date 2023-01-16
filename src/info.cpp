@@ -3639,7 +3639,7 @@ command_return_t char_data::do_search(QStringList &arguments, int cmd)
    bool equals = false, greater = false, greater_equals = false, lesser = false, lesser_equals = false;
    for (auto i = 0; i < arguments.size(); ++i)
    {
-      struct search so;
+      struct search so = {};
       // ch->send(fmt::format("{} [{}]\r\n", i, parsables[i]));
       if (arguments[i].contains('=') && !arguments[i].contains(">=") && !arguments[i].contains("<="))
       {
@@ -3712,66 +3712,61 @@ command_return_t char_data::do_search(QStringList &arguments, int cmd)
          }
          else
          {
-            try
-            {
-               // #-#
-               // #-
-               if (arg2.contains('-'))
-               {
-                  QStringList equal_buffer = arg2.split('-');
-                  arg1 = equal_buffer.at(0);
-                  arg2 = equal_buffer.at(1);
-                  if (!arg1.isEmpty())
-                  {
-                     so.o_min_level = arg1.toULongLong();
-                     if (!arg2.isEmpty())
-                     {
-                        so.o_max_level = arg2.toULongLong();
-                     }
-                     else
-                     {
-                        so.o_max_level = -1;
-                     }
 
-                     sl.push_back(so);
-                  }
-               }
-               else // #
+            // #-#
+            // #-
+            if (arg2.contains('-'))
+            {
+               QStringList equal_buffer = arg2.split('-');
+               arg1 = equal_buffer.at(0);
+               arg2 = equal_buffer.at(1);
+               if (!arg1.isEmpty())
                {
+                  so.o_min_level = arg1.toULongLong();
                   if (!arg2.isEmpty())
                   {
-                     if (greater)
-                     {
-                        so.o_min_level = arg2.toULongLong() + 1;
-                        so.o_max_level = -1;
-                     }
-                     else if (greater_equals)
-                     {
-                        so.o_min_level = arg2.toULongLong();
-                        so.o_max_level = -1;
-                     }
-                     else if (lesser)
-                     {
-                        so.o_min_level = 0;
-                        so.o_max_level = arg2.toULongLong() - 1;
-                     }
-                     else if (lesser_equals)
-                     {
-                        so.o_min_level = 0;
-                        so.o_max_level = arg2.toULongLong();
-                     }
-                     else
-                     {
-                        so.o_min_level = arg2.toULongLong();
-                        so.o_max_level = arg2.toULongLong();
-                     }
-
-                     sl.push_back(so);
+                     so.o_max_level = arg2.toULongLong();
                   }
+                  else
+                  {
+                     so.o_max_level = -1;
+                  }
+
+                  sl.push_back(so);
                }
-            } // catch exceptions from invalid stoul conversions
-            catch (...)
+            }
+            else // #
             {
+               if (!arg2.isEmpty())
+               {
+                  if (greater)
+                  {
+                     so.o_min_level = arg2.toULongLong() + 1;
+                     so.o_max_level = -1;
+                  }
+                  else if (greater_equals)
+                  {
+                     so.o_min_level = arg2.toULongLong();
+                     so.o_max_level = -1;
+                  }
+                  else if (lesser)
+                  {
+                     so.o_min_level = 0;
+                     so.o_max_level = arg2.toULongLong() - 1;
+                  }
+                  else if (lesser_equals)
+                  {
+                     so.o_min_level = 0;
+                     so.o_max_level = arg2.toULongLong();
+                  }
+                  else
+                  {
+                     so.o_min_level = arg2.toULongLong();
+                     so.o_max_level = arg2.toULongLong();
+                  }
+
+                  sl.push_back(so);
+               }
             }
          }
       }
@@ -3833,6 +3828,7 @@ command_return_t char_data::do_search(QStringList &arguments, int cmd)
          {
             so.type = search::types::LIMIT;
             so.limit_output = arg2.toULongLong();
+            sl.push_back(so);
          }
       }
       else
@@ -3868,15 +3864,18 @@ command_return_t char_data::do_search(QStringList &arguments, int cmd)
       }
 
       bool matches = false;
+
       for (auto i = 0; i < sl.size(); ++i)
       {
+         if (sl[i].type == search::types::LIMIT)
+         {
+            limit_output = sl[i].limit_output;
+            continue;
+         }
+
          if (sl[i] == obj)
          {
             matches = true;
-         }
-         else if (sl[i].type == search::types::LIMIT)
-         {
-            limit_output = sl[i].limit_output;
          }
          else
          {
@@ -3898,6 +3897,7 @@ command_return_t char_data::do_search(QStringList &arguments, int cmd)
    }
 
    bool showed_ranges = false;
+
    for (auto &s : sl)
    {
       if (s.show_range)
@@ -3931,7 +3931,7 @@ command_return_t char_data::do_search(QStringList &arguments, int cmd)
 
    if (limit_output)
    {
-      send(QString("Searching %1 objects...%2 matches found. Limiting output to %3 matches.\r\n").arg(top_of_objt).arg(obj_results.size()));
+      send(QString("Searching %1 objects...%2 matches found. Limiting output to %3 matches.\r\n").arg(top_of_objt).arg(obj_results.size()).arg(limit_output));
    }
    else
    {
@@ -3941,8 +3941,13 @@ command_return_t char_data::do_search(QStringList &arguments, int cmd)
    QString header;
    qsizetype max_keyword_size = 0, max_short_description_size = 0;
 
+   uint64_t result_nr = {};
    for (auto obj : obj_results)
    {
+      if (limit_output > 0 && ++result_nr > limit_output)
+      {
+         break;
+      }
       if (QString(obj->name).size() > max_keyword_size)
       {
          max_keyword_size = QString(obj->name).size();
@@ -3953,7 +3958,6 @@ command_return_t char_data::do_search(QStringList &arguments, int cmd)
          max_short_description_size = nocolor_strlen(obj->short_description);
       }
    }
-   qDebug() << max_short_description_size;
 
    if (count_if(sl.begin(), sl.end(), [](struct search search_item)
                 { return (search_item.type == search::types::O_NAME); }))
@@ -3969,14 +3973,22 @@ command_return_t char_data::do_search(QStringList &arguments, int cmd)
 
    send(QString("$7$B[ VNUM] [ LV]%1$R\r\n").arg(header));
 
+   result_nr = 0;
    for (auto obj : obj_results)
    {
+      if (limit_output > 0 && ++result_nr > limit_output)
+      {
+         break;
+      }
       QString custom_columns;
+
       if (count_if(sl.begin(), sl.end(), [](struct search search_item)
                    { return (search_item.type == search::types::O_NAME); }))
       {
          custom_columns += QString(" [%1]").arg(obj->name, -max_keyword_size);
       }
+
+      // For now short description is always shown
       if (true ||
           count_if(sl.begin(), sl.end(), [](struct search search_item)
                    { return (search_item.type == search::types::O_SHORT_DESCRIPTION); }))
@@ -3991,4 +4003,4 @@ command_return_t char_data::do_search(QStringList &arguments, int cmd)
    return eSUCCESS;
 }
 
-// search o level=1 wear=about name="cape woodbey" type=armor
+// search type = armor woodbey level = ?
