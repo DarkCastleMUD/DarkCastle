@@ -4131,24 +4131,6 @@ void write_object(obj_data *obj, FILE *fl)
 	fprintf(fl, "S\n");
 }
 
-ofstream &operator<<(ofstream &out, const char *str)
-{
-	out << str;
-	return out;
-}
-
-ofstream &operator<<(ofstream &out, char *str)
-{
-	out << str;
-	return out;
-}
-
-ofstream &operator<<(ofstream &out, QString str)
-{
-	out << str.toStdString();
-	return out;
-}
-
 ofstream &operator<<(ofstream &out, obj_data *obj)
 {
 	out << "#" << obj_index[obj->item_number].virt << "\n";
@@ -4259,7 +4241,7 @@ void write_object_csv(obj_data *obj, ofstream &fout)
 		fout << "\"" << quotequotes(obj->short_description) << "\",";
 		fout << "\"" << quotequotes(obj->description) << "\",";
 		fout << "\"" << quotequotes(obj->action_description) << "\",";
-		fout << item_types[obj->obj_flags.type_flag] << ",";
+		fout << item_types[obj->obj_flags.type_flag].toStdString() << ",";
 		fout << obj->obj_flags.size << ",";
 		fout << obj->obj_flags.value[0] << ",";
 		fout << obj->obj_flags.value[1] << ",";
