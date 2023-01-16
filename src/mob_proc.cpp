@@ -2252,7 +2252,7 @@ int pet_shops(Character *ch, int cmd, char *arg)
       return eSUCCESS;
     }
 
-    if (GET_GOLD(ch) < (uint32_t)(GET_EXP(pet) * 3))
+    if (ch->getGold() < (uint32_t)(GET_EXP(pet) * 3))
     {
       send_to_char("You don't have enough gold!\n\r", ch);
       return eSUCCESS;
@@ -2263,7 +2263,7 @@ int pet_shops(Character *ch, int cmd, char *arg)
       return eSUCCESS;
     }
 
-    GET_GOLD(ch) -= GET_EXP(pet) * 3;
+    ch->removeGold(GET_EXP(pet) * 3);
 
     /*
      * Should be some code here to defend against weird monsters

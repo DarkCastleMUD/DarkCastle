@@ -214,7 +214,7 @@ void shopping_buy(const char *arg, Character *ch,
   if (cost < 1)
     cost = 1;
 
-  if (GET_GOLD(ch) < cost)
+  if (ch->getGold() < cost)
   {
     sprintf(buf, shop_index[shop_nr].missing_cash2, GET_NAME(ch));
     do_tell(keeper, buf, 0);
@@ -247,11 +247,11 @@ void shopping_buy(const char *arg, Character *ch,
   do_tell(keeper, buf, 0);
   sprintf(buf, "You now have %s.\r\n", obj->short_description);
   send_to_char(buf, ch);
-  GET_GOLD(ch) -= cost;
-  GET_GOLD(keeper) += cost;
+  ch->removeGold(cost);
+  keeper->addGold(cost);
 
-  if (GET_GOLD(keeper) > 3000000)
-    GET_GOLD(keeper) = 3000000;
+  if (keeper->getGold() > 3000000)
+    keeper->setGold(3000000);
 
   // Wormhole to map_eq_level
   /*
@@ -356,7 +356,7 @@ void shopping_sell(const char *arg, Character *ch,
   }
 
   cost = (int)(obj->obj_flags.cost * shop_index[shop_nr].profit_sell);
-  if (GET_GOLD(keeper) < cost)
+  if (keeper->getGold() < cost)
   {
     sprintf(buf, shop_index[shop_nr].missing_cash1, GET_NAME(ch));
     do_tell(keeper, buf, 0);
@@ -368,8 +368,8 @@ void shopping_sell(const char *arg, Character *ch,
   do_tell(keeper, buf, 0);
   sprintf(buf, "The shopkeeper now has %s.\r\n", obj->short_description);
   send_to_char(buf, ch);
-  GET_GOLD(ch) += cost;
-  GET_GOLD(keeper) -= cost;
+  ch->addGold(cost);
+  keeper->removeGold(cost);
 
   strcpy(argm, obj->name);
 
@@ -1219,7 +1219,7 @@ void player_shopping_buy(const char *arg, Character *ch, Character *keeper)
   }
 
   // make sure they can afford it
-  if (GET_GOLD(ch) < item->price)
+  if (ch->getGold() < item->price)
   {
     send_to_char("You can't afford that!\r\n", ch);
     return;
@@ -1235,7 +1235,7 @@ void player_shopping_buy(const char *arg, Character *ch, Character *keeper)
   // give it to them, thank them, take the money
   obj_data *obj = clone_object(robj);
   obj_to_char(obj, ch);
-  GET_GOLD(ch) -= item->price;
+  ch->removeGold(item->price);
   shop->money_on_hand += item->price;
 
   if (*shop->sell_message)
@@ -1304,7 +1304,7 @@ void player_shopping_withdraw(const char *arg, Character *ch, Character *keeper)
   }
 
   shop->money_on_hand -= value;
-  GET_GOLD(ch) += value;
+  ch->addGold(value);
   csendf(ch, "You take %ld $B$5gold$R out of the till.\r\n", value);
   write_one_player_shop(shop);
 }

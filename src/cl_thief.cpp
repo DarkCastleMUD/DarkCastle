@@ -1388,12 +1388,12 @@ int do_pocket(Character *ch, char *argument, int cmd)
     int percent = 7 + (learned > 40) + (learned > 60) + (learned > 80);
 
     // Steal some gold coins
-    gold = (int)((float)(GET_GOLD(victim)) * (float)((float)percent / 100.0));
+    gold = (int)((float)(victim->getGold()) * (float)((float)percent / 100.0));
     gold = MIN(10000000, gold);
     if (gold > 0)
     {
-      GET_GOLD(ch) += gold;
-      GET_GOLD(victim) -= gold;
+      ch->addGold(gold);
+      victim->removeGold(gold);
       _exp = gold / 100 * GET_LEVEL(victim) / 5;
       if (!IS_NPC(victim))
         _exp = 0;
@@ -1641,7 +1641,7 @@ int do_slip(Character *ch, char *argument, int cmd)
       send_to_char("Sorry, you can't do that!\n\r", ch);
       return eFAILURE;
     }
-    if ((GET_GOLD(ch) < (uint32_t)amount) && (GET_LEVEL(ch) < DEITY))
+    if ((ch->getGold() < (uint32_t)amount) && (GET_LEVEL(ch) < DEITY))
     {
       send_to_char("You haven't got that many coins!\n\r", ch);
       return eFAILURE;
@@ -1686,7 +1686,7 @@ int do_slip(Character *ch, char *argument, int cmd)
           ch, 0, vict, TO_ROOM, NOTVICT);
 
       if (IS_NPC(ch) || (GET_LEVEL(ch) < DEITY))
-        GET_GOLD(ch) -= amount;
+        ch->removeGold(amount);
 
       tmp_object = create_money(amount);
       obj_to_room(tmp_object, ch->in_room);
@@ -1715,9 +1715,9 @@ int do_slip(Character *ch, char *argument, int cmd)
       logentry(buf, IMPLEMENTER, LogChannels::LOG_OBJECTS);
 
       if (IS_NPC(ch) || (GET_LEVEL(ch) < DEITY))
-        GET_GOLD(ch) -= amount;
+        ch->removeGold(amount);
 
-      GET_GOLD(vict) += amount;
+      vict->addGold(amount);
 
       // If a mob is given gold, we disable its ability to receive a gold bonus. This keeps
       // the mob from turning into an interest bearing savings account. :)
@@ -2287,7 +2287,7 @@ int do_appraise(Character *ch, char *argument, int cmd)
     }
 
     if (!found)
-      appraised = GET_GOLD(victim);
+      appraised = victim->getGold();
   }
 
   if (!weight)

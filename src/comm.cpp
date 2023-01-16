@@ -109,12 +109,12 @@ void check_silence_beacons(void);
 
 /* local globals */
 struct descriptor_data *descriptor_list = nullptr; /* master desc list */
-struct txt_block *bufpool = 0;                  /* pool of large output buffers */
-int buf_largecount = 0;                         /* # of large buffers which exist */
-int buf_overflows = 0;                          /* # of overflows of output */
-int buf_switches = 0;                           /* # of switches from small to large buf */
-int _shutdown = 0;                              /* clean shutdown */
-int tics = 0;                                   /* for extern checkpointing */
+struct txt_block *bufpool = 0;                     /* pool of large output buffers */
+int buf_largecount = 0;                            /* # of large buffers which exist */
+int buf_overflows = 0;                             /* # of overflows of output */
+int buf_switches = 0;                              /* # of switches from small to large buf */
+int _shutdown = 0;                                 /* clean shutdown */
+int tics = 0;                                      /* for extern checkpointing */
 // int nameserver_is_slow = 0;	/* see config.c */
 // extern int auto_save;		/* see config.c */
 // extern int autosave_time;	/* see config.c */
@@ -1598,10 +1598,10 @@ string generate_prompt(Character *ch)
         sprintf(pro, " ");
       break;
     case 'g':
-      sprintf(pro, "%lld", GET_GOLD(ch));
+      sprintf(pro, "%llu", ch->getGold());
       break;
     case 'G':
-      sprintf(pro, "%d", (int32_t)(GET_GOLD(ch) / 20000));
+      sprintf(pro, "%u", (int32_t)(ch->getGold() / 20000));
       break;
     case 'h':
       sprintf(pro, "%d", ch->getHP());

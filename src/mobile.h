@@ -19,7 +19,7 @@ using namespace std;
 
 void rebuild_rnum_references(int startAt, int type);
 void mprog_driver(char *com_list, Character *mob,
-                  Character *actor, obj_data *obj,
+                  Character *actor, struct obj_data *obj,
                   void *vo, struct mprog_throw_type *thrw, Character *rndm);
 char *mprog_next_command(char *clist);
 

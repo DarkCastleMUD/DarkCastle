@@ -1493,13 +1493,13 @@ int do_recall(Character *ch, char *argument, int cmd)
       cost *= 2;
     }
 
-    if (GET_GOLD(ch) < (uint32_t)cost)
+    if (ch->getGold() < (uint32_t)cost)
     {
       csendf(ch, "You don't have %d gold!\n\r", cost);
       return eFAILURE;
     }
 
-    GET_GOLD(ch) -= cost;
+    ch->removeGold(cost);
   }
 
   if (IS_AFFECTED(victim, AFF_CURSE) || IS_AFFECTED(victim, AFF_SOLIDITY))

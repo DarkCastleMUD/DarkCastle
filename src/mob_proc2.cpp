@@ -46,7 +46,7 @@ void repair_shop_fix_eq(Character *ch, Character *owner, int price, obj_data *ob
 {
 	char buf[256];
 
-	GET_GOLD(ch) -= price;
+	ch->removeGold(price);
 	eq_remove_damage(obj);
 	sprintf(buf, "It will cost you %d coins to repair %s.", price, obj->short_description);
 	do_say(owner, buf, CMD_DEFAULT);
@@ -146,7 +146,7 @@ int repair_guy(Character *ch, struct obj_data *obj, int cmd, const char *arg, Ch
 		return eSUCCESS;
 	}
 
-	if (GET_GOLD(ch) < (uint32_t)price)
+	if (ch->getGold() < (uint32_t)price)
 	{
 		repair_shop_complain_no_cash(ch, owner, price, obj);
 		return eSUCCESS;
@@ -242,7 +242,7 @@ int super_repair_guy(Character *ch, struct obj_data *obj, int cmd, const char *a
 		return eSUCCESS;
 	}
 
-	if (GET_GOLD(ch) < (uint32_t)price)
+	if (ch->getGold() < (uint32_t)price)
 	{
 		repair_shop_complain_no_cash(ch, owner, price, obj);
 		return eSUCCESS;
@@ -348,7 +348,7 @@ int repair_shop(Character *ch, struct obj_data *obj, int cmd, const char *arg, C
 		return eSUCCESS;
 	}
 
-	if (GET_GOLD(ch) < (uint32_t)price)
+	if (ch->getGold() < (uint32_t)price)
 	{
 		repair_shop_complain_no_cash(ch, owner, price, obj);
 		return eSUCCESS;
@@ -895,7 +895,7 @@ int gl_repair_shop(Character *ch, struct obj_data *obj, int cmd, const char *arg
 		return eSUCCESS;
 	}
 
-	if (GET_GOLD(ch) < (uint32_t)price)
+	if (ch->getGold() < (uint32_t)price)
 	{
 		repair_shop_complain_no_cash(ch, owner, price, obj);
 		return eSUCCESS;

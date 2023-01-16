@@ -46,7 +46,7 @@
 
  */
 int64_t new_meta_platinum_cost(int start, int end)
-{	// This is the laziest function ever. I didn't feel like
+{ // This is the laziest function ever. I didn't feel like
 	// figuring out a formulae to work with the ranges, so I didn't.
 	int64_t platcost = 0;
 	if (end <= start || end < 0 || start < 0)
@@ -79,7 +79,7 @@ int64_t new_meta_platinum_cost(int start, int end)
 }
 
 int r_new_meta_platinum_cost(int start, int64_t plats)
-{	// This is a copy of the laziest function ever. I didn't feel like
+{ // This is a copy of the laziest function ever. I didn't feel like
 	// figuring out a formulae to work with the ranges, so I didn't.
 	int64_t platcost = 0;
 	if (plats <= 0 || start < 0)
@@ -1107,12 +1107,12 @@ int meta_dude(Character *ch, struct obj_data *obj, int cmd, const char *arg,
 				send_to_char("$B$2The Meta-physician tells you, 'You cannot do this because of your criminal actions!'$R\r\n", ch);
 				return eSUCCESS;
 			}
-			if (GET_GOLD(ch) < 20000)
+			if (ch->getGold() < 20000)
 			{
 				send_to_char("$B$2The Meta-physician tells you, 'You can't afford that.  SCRAM!'$R\n\r", ch);
 				return eSUCCESS;
 			}
-			GET_GOLD(ch) -= 20000;
+			ch->removeGold(20000);
 			GET_PLATINUM(ch) += 1;
 			send_to_char("Ok.\r\n", ch);
 			return eSUCCESS;
@@ -1124,13 +1124,13 @@ int meta_dude(Character *ch, struct obj_data *obj, int cmd, const char *arg,
 				send_to_char("$B$2The Meta-physician tells you, 'You cannot do this because of your criminal actions!'$R\r\n", ch);
 				return eSUCCESS;
 			}
-			if (GET_GOLD(ch) < 100000)
+			if (ch->getGold() < 100000)
 			{
 				send_to_char("$B$2The Meta-physician tells you, 'You can't afford that.  SCRAM!'$R\n\r", ch);
 				return eSUCCESS;
 			}
 
-			GET_GOLD(ch) -= 100000;
+			ch->removeGold(100000);
 			GET_PLATINUM(ch) += 5;
 			send_to_char("Ok.\r\n", ch);
 			return eSUCCESS;
@@ -1143,13 +1143,13 @@ int meta_dude(Character *ch, struct obj_data *obj, int cmd, const char *arg,
 				return eSUCCESS;
 			}
 
-			if (GET_GOLD(ch) < 5000000)
+			if (ch->getGold() < 5000000)
 			{
 				send_to_char("$B$2The Meta-physician tells you, 'You can't afford that.  SCRAM!'$R\n\r", ch);
 				return eSUCCESS;
 			}
 			GET_PLATINUM(ch) += 250;
-			GET_GOLD(ch) -= 5000000;
+			ch->removeGold(5000000);
 			send_to_char("Ok.\r\n", ch);
 			return eSUCCESS;
 		}
@@ -1161,7 +1161,7 @@ int meta_dude(Character *ch, struct obj_data *obj, int cmd, const char *arg,
 				return eSUCCESS;
 			}
 			GET_PLATINUM(ch) -= 5;
-			GET_GOLD(ch) += 100000;
+			ch->addGold(100000);
 			send_to_char("Ok.\r\n", ch);
 			return eSUCCESS;
 		}
@@ -1174,7 +1174,7 @@ int meta_dude(Character *ch, struct obj_data *obj, int cmd, const char *arg,
 				return eSUCCESS;
 			}
 			GET_PLATINUM(ch) -= 250;
-			GET_GOLD(ch) += 5000000;
+			ch->addGold(5000000);
 			send_to_char("Ok.\r\n", ch);
 			return eSUCCESS;
 		}
@@ -1192,7 +1192,7 @@ int meta_dude(Character *ch, struct obj_data *obj, int cmd, const char *arg,
 			}
 
 			GET_EXP(ch) -= 100000000;
-			GET_GOLD(ch) += 500000;
+			ch->addGold(500000);
 
 			act("The Meta-physician touches $n.", ch, 0, 0, TO_ROOM, 0);
 			act("The Meta-physician touches you.", ch, 0, 0, TO_CHAR, 0);

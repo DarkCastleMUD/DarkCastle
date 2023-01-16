@@ -559,9 +559,13 @@ public:
     bool isImmortal(void);
     bool isImplementer(void);
     uint64_t getGold(void);
-    void setGold(uint64_t);
-    bool addGold(uint64_t);
-    bool removeGold(uint64_t));
+    uint64_t &getGoldReference(void);
+    void setGold(uint64_t gold);
+    bool addGold(uint64_t gold);
+    bool multiplyGold(double mult);
+    bool removeGold(uint64_t gold);
+    int store_to_char_variable_data(FILE *fpsave);
+    int char_to_store_variable_data(FILE *fpsave);
 
 private:
     uint64_t gold_ = {}; /* Money carried                           */
@@ -585,8 +589,8 @@ public:
 // Note, any "strings" are done afterwards in the functions.  Since these
 // are variable length, we can't do them with a single write
 
-// This structure was created as a replacement for char_file_u4 so that it
-// would be portable between 32-bit and 64-bit code unlike char_file_u4.
+// This structure was created as a replacement for char_file_u so that it
+// would be portable between 32-bit and 64-bit code.
 struct char_file_u4
 {
     char_file_u4();

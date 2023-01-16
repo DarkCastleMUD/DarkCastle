@@ -1539,10 +1539,10 @@ void vault_deposit(Character *ch, unsigned int amount, char *owner)
     return;
   }
 
-  if (GET_GOLD(ch) >= amount)
+  if (ch->getGold() >= amount)
   {
     vault->gold += amount;
-    GET_GOLD(ch) -= amount;
+    ch->removeGold(amount);
     save_char_obj(ch);
     save_vault(owner);
     sprintf(buf, "%s added %d gold to %s's vault.", GET_NAME(ch), amount, owner);
@@ -1551,7 +1551,7 @@ void vault_deposit(Character *ch, unsigned int amount, char *owner)
   }
   else
   {
-    csendf(ch, "But you only have %lld $B$5gold$R coins!\r\n", GET_GOLD(ch));
+    csendf(ch, "But you only have %lld $B$5gold$R coins!\r\n", ch->getGold());
   }
 }
 
@@ -1594,12 +1594,12 @@ void vault_withdraw(Character *ch, unsigned int amount, char *owner)
 
   if (vault->gold >= (uint64_t)amount)
   {
-    /*    if (amount + GET_GOLD(ch) > 2000000000) {
-          csendf(ch, "You can't hold that much gold.  The most you could get is %ld.\r\n", 2000000000 - GET_GOLD(ch));
+    /*    if (amount + ch->getGold() > 2000000000) {
+          csendf(ch, "You can't hold that much gold.  The most you could get is %ld.\r\n", 2000000000 - ch->getGold());
           return;
         }*/
     vault->gold -= amount;
-    GET_GOLD(ch) += amount;
+    ch->addGold(amount);
     save_char_obj(ch);
     save_vault(owner);
     sprintf(buf, "%s removed %d gold from %s's vault.", GET_NAME(ch), amount, owner);

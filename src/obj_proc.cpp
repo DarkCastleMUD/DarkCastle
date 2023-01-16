@@ -782,7 +782,7 @@ int bank(Character *ch, struct obj_data *obj, int cmd, const char *arg,
       send_to_char("Deposit what?\n\r", ch);
       return eSUCCESS;
     }
-    if ((uint32_t)x > GET_GOLD(ch))
+    if ((uint32_t)x > ch->getGold())
     {
       send_to_char("You don't have that much gold!\n\r", ch);
       return eSUCCESS;
@@ -792,7 +792,7 @@ int bank(Character *ch, struct obj_data *obj, int cmd, const char *arg,
       send_to_char("That would bring you over your account maximum!\r\n", ch);
       return eSUCCESS;
     }
-    GET_GOLD(ch) -= x;
+    ch->removeGold(x);
     GET_BANK(ch) += x;
     ch->send(fmt::format(locale("en_US.UTF-8"), "You deposit {:L} $B$5gold$R coins.\r\n", x));
     ch->save();
@@ -811,7 +811,7 @@ int bank(Character *ch, struct obj_data *obj, int cmd, const char *arg,
     send_to_char("You don't have that much $B$5gold$R in the bank!\n\r", ch);
     return eSUCCESS;
   }
-  GET_GOLD(ch) += x;
+  ch->addGold(x);
   GET_BANK(ch) -= x;
   ch->send(fmt::format(locale("en_US.UTF-8"), "You withdraw {:L} $B$5gold$R coins.\r\n", x));
   ch->save();
@@ -853,7 +853,7 @@ int casino_atm(Character *ch, struct obj_data *obj, int cmd, const char *arg,
     send_to_char("You don't have that much $B$5gold$R in the bank!\n\r", ch);
     return eSUCCESS;
   }
-  GET_GOLD(ch) += x;
+  ch->addGold(x);
   GET_BANK(ch) -= x;
   ch->send(fmt::format(locale("en_US.UTF-8"), "You withdraw {:L} $B$5gold$R coins.\r\n", x));
   ch->save();

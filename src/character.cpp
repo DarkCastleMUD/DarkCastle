@@ -150,7 +150,7 @@ bool Character::isImplementer(void)
 
 uint64_t Character::getGold(void)
 {
-    return gold;
+    return gold_;
 }
 
 void Character::setGold(uint64_t gold)
@@ -178,4 +178,20 @@ bool Character::removeGold(uint64_t gold)
 
     gold_ -= gold;
     return true;
+}
+
+bool Character::multiplyGold(double mult)
+{
+    if (gold_ * mult < gold_)
+    {
+        return false;
+    }
+
+    gold_ *= mult;
+    return true;
+}
+
+uint64_t &Character::getGoldReference(void)
+{
+    return gold_;
 }

@@ -149,7 +149,7 @@ int do_sacrifice(Character *ch, char *argument, int cmd)
 
   act("$n sacrifices $p to $s god.", ch, obj, 0, TO_ROOM, 0);
   act("You sacrifice $p to the gods and receive one $B$5gold$R coin.", ch, obj, 0, TO_CHAR, 0);
-  GET_GOLD(ch) += 1;
+  ch->addGold(1);
   log_sacrifice(ch, obj);
   extract_obj(obj);
   return eSUCCESS;
@@ -1675,7 +1675,7 @@ void CVoteData::OutToFile()
   if (!the_file)
   {
     logentry("Unable to open/create save file for vote data", ANGEL,
-        LogChannels::LOG_BUG);
+             LogChannels::LOG_BUG);
     return;
   }
 

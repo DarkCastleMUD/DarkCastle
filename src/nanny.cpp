@@ -1774,7 +1774,7 @@ void nanny(struct descriptor_data *d, string arg)
             }
          }
          unique_scan(ch);
-         if (GET_GOLD(ch) > 1000000000)
+         if (ch->getGold() > 1000000000)
          {
             sprintf(log_buf, "%s has more than a billion gold. Bugged?", GET_NAME(ch));
             logentry(log_buf, 100, LogChannels::LOG_WARNINGS);

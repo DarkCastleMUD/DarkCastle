@@ -833,7 +833,7 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
 			if (!target)
 				tError = true;
 			else
-				ullval = &target->gold;
+				ullval = &target->getGoldReference();
 		}
 		else if (!str_cmp(right, "glowfactor"))
 		{
@@ -4194,7 +4194,7 @@ int mprog_bribe_trigger(Character *mob, Character *ch, int amount)
 
 	if (IS_NPC(mob) && (mob_index[mob->mobdata->nr].progtypes & BRIBE_PROG) && isPaused(mob) == false)
 	{
-		mob->gold -= amount;
+		mob->removeGold(amount);
 
 		mprg = mob_index[mob->mobdata->nr].mobprogs;
 		if (!mprg)

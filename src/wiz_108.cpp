@@ -596,7 +596,7 @@ int do_set(Character *ch, char *argument, int cmd)
     value = atoi(buf);
     logentry(buf2, IMPLEMENTER, LogChannels::LOG_GOD);
     /* set original gold of victim */
-    vict->gold = value;
+    vict->setGold(value);
   }
   break;
   case 13: /* exp */

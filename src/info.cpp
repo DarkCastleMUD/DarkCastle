@@ -2010,22 +2010,33 @@ int do_score(Character *ch, char *argument, int cmd)
 
    if (!IS_NPC(ch)) // mobs can't view this part
    {
+      QString experience_needed;
+      if (ch->isImplementer())
+      {
+         experience_needed = "0";
+      }
+      else
+      {
+         experience_needed = QString("%L1").arg(exp_needed);
+      }
+
       sprintf(buf,
               "($5:$7)=============================($5:$7)===($5:$7)===================================($5:$7)\n\r"
               "|/| $2Combat Statistics:$7                |\\| $2Equipment and Valuables:$7          |o|\n\r"
               "|o|  $3Armor$7:   %5d   $3Pkills$7:  %5d  |~|  $3Items Carried$7:  %-3d/(%-3d)        |/|\n\r"
               "|\\|  $3BonusHit$7: %+4d   $3PDeaths$7: %5d  |/|  $3Weight Carried$7: %-3d/(%-4d)       |~|\n\r"
-              "|~|  $3BonusDam$7: %+4d   $3SplDam$7:  %+5d  |o|  $3Experience$7:     %-10lld       |\\|\n\r"
-              "|/|  $B$4FIRE$R[%+3d]  $B$3COLD$R[%+3d]  $B$5NRGY$R[%+3d]  |\\|  $3ExpTillLevel$7:   %-10lld       |o|\n\r"
-              "|o|  $B$2ACID$R[%+3d]  $B$7MAGK$R[%+3d]  $2POIS$7[%+3d]  |~|  $3Gold$7: %-10lld $3Platinum$7: %-5d |/|\n\r"
-              "|\\|  $3MELE$R[%+3d]  $3SPEL$R[%+3d]   $3KI$R [%+3d]  |/|  $3Bank$7: %-10d $3QPoints$7:  %-5d |-|\n\r"
+              "|~|  $3BonusDam$7: %+4d   $3SplDam$7:  %+5d  |o|  $3Experience$7:   %-18s |\\|\n\r"
+              "|/|  $B$4FIRE$R[%+3d]  $B$3COLD$R[%+3d]  $B$5NRGY$R[%+3d]  |\\|  $3ExpTillLevel$7: %-18s |o|\n\r"
+              "|o|  $B$2ACID$R[%+3d]  $B$7MAGK$R[%+3d]  $2POIS$7[%+3d]  |~|  $3Gold$7: %-25s  |/|\n\r"
+              "|\\|  $3MELE$R[%+3d]  $3SPEL$R[%+3d]   $3KI$R [%+3d]  |/|  $3Bank$7: %-25s  |-|\n\r"
+              "|-|                                   |o|  $3Platinum$7: %-6d  $3QPoints$7: %-6d|/|\r\n"
               "($5:$7)===================================($5:$7)===================================($5:$7)\n\r",
               GET_ARMOR(ch), GET_PKILLS(ch), IS_CARRYING_N(ch), CAN_CARRY_N(ch),
               to_hit, GET_PDEATHS(ch), IS_CARRYING_W(ch), CAN_CARRY_W(ch),
-              to_dam, spell_dam, GET_EXP(ch),
-              get_saves(ch, SAVE_TYPE_FIRE), get_saves(ch, SAVE_TYPE_COLD), get_saves(ch, SAVE_TYPE_ENERGY), GET_LEVEL(ch) == IMPLEMENTER ? 0 : exp_needed,
-              get_saves(ch, SAVE_TYPE_ACID), get_saves(ch, SAVE_TYPE_MAGIC), get_saves(ch, SAVE_TYPE_POISON), GET_GOLD(ch), (int)GET_PLATINUM(ch),
-              ch->melee_mitigation, ch->spell_mitigation, ch->song_mitigation, (int)GET_BANK(ch), GET_QPOINTS(ch));
+              to_dam, spell_dam, QString("%L1").arg(GET_EXP(ch)).toStdString().c_str(),
+              get_saves(ch, SAVE_TYPE_FIRE), get_saves(ch, SAVE_TYPE_COLD), get_saves(ch, SAVE_TYPE_ENERGY), experience_needed.toStdString().c_str(),
+              get_saves(ch, SAVE_TYPE_ACID), get_saves(ch, SAVE_TYPE_MAGIC), get_saves(ch, SAVE_TYPE_POISON), QString("%L1").arg(ch->getGold()).toStdString().c_str(),
+              ch->melee_mitigation, ch->spell_mitigation, ch->song_mitigation, QString("%L1").arg(GET_BANK(ch)).toStdString().c_str(), (int)GET_PLATINUM(ch), GET_QPOINTS(ch));
 
       send_to_char(buf, ch);
    }

@@ -624,18 +624,18 @@ int store_worn_eq(Character *ch, FILE *fpsave)
   return 1;
 }
 
-int char_to_store_variable_data(Character *ch, FILE *fpsave)
+int Character::char_to_store_variable_data(FILE *fpsave)
 {
-  fwrite_var_string(ch->name, fpsave);
-  fwrite_var_string(ch->short_desc, fpsave);
-  fwrite_var_string(ch->long_desc, fpsave);
-  fwrite_var_string(ch->description, fpsave);
-  fwrite_var_string(ch->title, fpsave);
+  fwrite_var_string(this->name, fpsave);
+  fwrite_var_string(this->short_desc, fpsave);
+  fwrite_var_string(this->long_desc, fpsave);
+  fwrite_var_string(this->description, fpsave);
+  fwrite_var_string(this->title, fpsave);
 
-  if (!has_skill(ch, NEW_SAVE)) // New save.
-    learn_skill(ch, NEW_SAVE, 1, 100);
+  if (!has_skill(this, NEW_SAVE)) // New save.
+    learn_skill(this, NEW_SAVE, 1, 100);
 
-  for (auto &skill : ch->skills)
+  for (auto &skill : this->skills)
   {
     fwrite("SKL", sizeof(char), 3, fpsave);
     fwrite(&(skill.first), sizeof(skill.first), 1, fpsave);
@@ -647,14 +647,14 @@ int char_to_store_variable_data(Character *ch, FILE *fpsave)
   struct affected_type *af;
   int16_t aff_count = 0; // do not change from int16_t
 
-  for (af = ch->affected; af; af = af->next)
+  for (af = this->affected; af; af = af->next)
     aff_count++;
 
   if (aff_count)
   {
     fwrite("AFS", sizeof(char), 3, fpsave);
     fwrite(&aff_count, sizeof(aff_count), 1, fpsave);
-    for (af = ch->affected; af; af = af->next)
+    for (af = this->affected; af; af = af->next)
     {
       fwrite(&(af->type), sizeof(af->type), 1, fpsave);
       fwrite(&(af->duration), sizeof(af->duration), 1, fpsave);
@@ -665,7 +665,7 @@ int char_to_store_variable_data(Character *ch, FILE *fpsave)
   }
 
   struct tempvariable *mpv;
-  for (mpv = ch->tempVariable; mpv; mpv = mpv->next)
+  for (mpv = this->tempVariable; mpv; mpv = mpv->next)
   {
     if (!mpv->save)
       continue;
@@ -675,7 +675,7 @@ int char_to_store_variable_data(Character *ch, FILE *fpsave)
   }
 
   fwrite("GLD", sizeof(char), 3, fpsave);
-  fwrite(&ch->gold, sizeof(ch->gold), 1, fpsave);
+  fwrite(&this->gold_, sizeof(this->gold_), 1, fpsave);
 
   // Any future additions to this save file will need to be placed LAST here with a 3 letter code
   // and appropriate strcmp statement in the read_mob_data object
@@ -715,22 +715,22 @@ void read_skill(Character *ch, FILE *fpsave)
   ch->skills[curr.skillnum] = curr;
 }
 
-int store_to_char_variable_data(Character *ch, FILE *fpsave)
+int Character::store_to_char_variable_data(FILE *fpsave)
 {
   char typeflag[4];
 
-  ch->name = fread_var_string(fpsave);
-  ch->short_desc = fread_var_string(fpsave);
-  ch->long_desc = fread_var_string(fpsave);
-  ch->description = fread_var_string(fpsave);
-  ch->title = fread_var_string(fpsave);
+  this->name = fread_var_string(fpsave);
+  this->short_desc = fread_var_string(fpsave);
+  this->long_desc = fread_var_string(fpsave);
+  this->description = fread_var_string(fpsave);
+  this->title = fread_var_string(fpsave);
 
   typeflag[3] = '\0';
   fread(&typeflag, sizeof(char), 3, fpsave);
 
   while (strcmp(typeflag, "END"))
   {
-    read_skill(ch, fpsave);
+    read_skill(this, fpsave);
     fread(&typeflag, sizeof(char), 3, fpsave);
   }
 
@@ -740,13 +740,13 @@ int store_to_char_variable_data(Character *ch, FILE *fpsave)
   {
     int16_t aff_count; // do not change form int16_t
     fread(&aff_count, sizeof(aff_count), 1, fpsave);
-    ch->affected = nullptr;
+    this->affected = nullptr;
     for (int16_t i = 0; i < aff_count; i++)
     {
       affected_type *af = new (nothrow) affected_type;
       af->duration_type = 0;
-      af->next = ch->affected;
-      ch->affected = af;
+      af->next = this->affected;
+      this->affected = af;
 
       fread(&(af->type), sizeof(af->type), 1, fpsave);
       fread(&(af->duration), sizeof(af->duration), 1, fpsave);
@@ -754,13 +754,13 @@ int store_to_char_variable_data(Character *ch, FILE *fpsave)
       fread(&(af->location), sizeof(af->location), 1, fpsave);
       fread(&(af->bitvector), sizeof(af->bitvector), 1, fpsave);
 
-      affect_modify(ch, af->location, af->modifier, af->bitvector, true); // re-affect the char
+      affect_modify(this, af->location, af->modifier, af->bitvector, true); // re-affect the char
     }
     fread(&typeflag, sizeof(char), 3, fpsave);
   }
 
   while (!strcmp(typeflag, "MPV"))
-  { // MobProgVars
+  { // MobProgVars6
     struct tempvariable *mpv;
 #ifdef LEAK_CHECK
     mpv = (struct tempvariable *)calloc(1, sizeof(struct tempvariable));
@@ -770,13 +770,13 @@ int store_to_char_variable_data(Character *ch, FILE *fpsave)
     mpv->name = fread_var_string(fpsave);
     mpv->data = fread_var_string(fpsave);
     mpv->save = 1;
-    mpv->next = ch->tempVariable;
-    ch->tempVariable = mpv;
+    mpv->next = this->tempVariable;
+    this->tempVariable = mpv;
     fread(&typeflag, sizeof(char), 3, fpsave);
   }
   if (!strcmp(typeflag, "GLD"))
   {
-    fread(&(ch->gold), sizeof(ch->gold), 1, fpsave);
+    fread(&(this->gold_), sizeof(this->gold_), 1, fpsave);
     fread(&typeflag, sizeof(char), 3, fpsave);
   }
   // Add new items in this format
@@ -800,7 +800,7 @@ void save_char_obj_db(Character *ch)
     return;
 
   // so weapons stop falling off
-  SETBIT(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT);
+  SETBIT(this->affected_by, AFF_IGNORE_WEAPON_WEIGHT);
 
   char_file_u4 uchar;
   time_data tmpage;
@@ -812,8 +812,8 @@ void save_char_obj_db(Character *ch)
   // if they're in a safe room, save them there.
   // if they're a god, send 'em home
   // otherwise save them in tavern
-  if (IS_SET(world[ch->in_room].room_flags, SAFE))
-    uchar.load_room = world[ch->in_room].number;
+  if (IS_SET(world[this->in_room].room_flags, SAFE))
+    uchar.load_room = world[this->in_room].number;
   else
     uchar.load_room = real_room(GET_HOME(ch));
 
@@ -831,7 +831,7 @@ void save_char_obj_db(Character *ch)
   if((fwrite(&uchar, sizeof(uchar), 1, fpsave))               &&
      (char_to_store_variable_data(ch, fpsave))                &&
      (save_pc_or_mob_data(ch, fpsave, tmpage))                &&
-     (obj_to_store (ch->carrying, ch, fpsave, -1))            &&
+     (obj_to_store (this->carrying, ch, fpsave, -1))            &&
      (store_worn_eq(ch, fpsave))
     )
   {
@@ -850,7 +850,7 @@ void save_char_obj_db(Character *ch)
     logentry(log_buf, ANGEL, LogChannels::LOG_BUG);
   }
 
-  REMBIT(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT);
+  REMBIT(this->affected_by, AFF_IGNORE_WEAPON_WEIGHT);
   struct vault_data *vault;
   if ((vault = has_vault(GET_NAME(ch))))
     save_vault(vault->owner);
@@ -923,7 +923,7 @@ void save_char_obj(Character *ch)
   }
 
   if ((fwrite(&uchar, sizeof(uchar), 1, fpsave)) &&
-      (char_to_store_variable_data(ch, fpsave)) &&
+      (ch->char_to_store_variable_data(fpsave)) &&
       (save_pc_or_mob_data(ch, fpsave, tmpage)) &&
       (obj_to_store(ch->carrying, ch, fpsave, -1)) &&
       (store_worn_eq(ch, fpsave)))
@@ -1015,7 +1015,7 @@ bool load_char_obj(struct descriptor_data *d, const char *name)
   reset_char(ch);
 
   store_to_char(&uchar, ch);
-  store_to_char_variable_data(ch, fpsave);
+  ch->store_to_char_variable_data(fpsave);
   read_pc_or_mob_data(ch, fpsave);
 
   if (!IS_NPC(ch) && ch->pcdata->time.logon < 1117527906)
@@ -1587,7 +1587,7 @@ void store_to_char(struct char_file_u4 *st, Character *ch)
 
   ch->weight = st->weight;
   ch->height = st->height;
-  ch->gold = st->gold;
+  ch->setGold(st->gold);
   ch->plat = st->plat;
   ch->exp = st->exp;
   ch->immune = st->immune;
@@ -1699,7 +1699,7 @@ void char_to_store(Character *ch, struct char_file_u4 *st, struct time_data &tmp
   //  gets set outside
   //  st->load_room = world[ch->in_room].number;
 
-  //  st->gold      = GET_GOLD(ch);
+  //  st->gold      = ch->getGold();
   st->gold = 0; // Moved
   st->plat = GET_PLATINUM(ch);
   st->exp = GET_EXP(ch);

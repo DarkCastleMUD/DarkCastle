@@ -248,7 +248,7 @@ void set_golem(Character *golem, int golemtype)
   golem->raw_hit = golem->max_hit = golem->hit = golem_list[golemtype].max_hp / 20;
   golem->mobdata->damnodice = golem_list[golemtype].roll1;
   golem->mobdata->damsizedice = golem_list[golemtype].roll2;
-  golem->gold = 0;
+  golem->setGold(0);
   golem->plat = 0;
   golem->move = golem->max_move = golem->mana = golem->max_mana = 100;
   golem->mobdata->last_room = 0;
@@ -408,14 +408,14 @@ int do_golem_score(Character *ch, char *argument, int cmd)
           "|\\|  $3BonusHit$7: %+4d   $3PDeaths$7: %5d  |/|  $3Weight Carried$7: %-3d/(%-4d)       |~|\n\r"
           "|~|  $3BonusDam$7: %+4d   $3RDeaths$7: %5d  |o|  $3Experience$7:     %-10lld       |\\|\n\r"
           "|/|  $B$4FIRE$R[%+3d]  $B$3COLD$R[%+3d]  $B$5NRGY$R[%+3d]  |\\|  $3ExpTillLevel$7:   %-10lld       |o|\n\r"
-          "|o|  $B$2ACID$R[%+3d]  $B$7MAGK$R[%+3d]  $2POIS$7[%+3d]  |~|  $3Gold$7: %-10d $3Platinum$7: %-5d |/|\n\r"
+          "|o|  $B$2ACID$R[%+3d]  $B$7MAGK$R[%+3d]  $2POIS$7[%+3d]  |~|  $3Gold$7: %-10llu $3Platinum$7: %-5d |/|\n\r"
           "|\\|  $3MELE$R[%+3d]  $3SPEL$R[%+3d]   $3KI$R [%+3d]  |/|  $3Bank$7: %-10d                 |-|\n\r"
           "($5:$7)===================================($5:$7)===================================($5:$7)\n\r",
           GET_ARMOR(ch), 0, IS_CARRYING_N(ch), CAN_CARRY_N(ch),
           to_hit, 0, IS_CARRYING_W(ch), CAN_CARRY_W(ch),
           to_dam, 0, GET_EXP(ch),
           get_saves(ch, SAVE_TYPE_FIRE), get_saves(ch, SAVE_TYPE_COLD), get_saves(ch, SAVE_TYPE_ENERGY), GET_LEVEL(ch) == 50 ? 0 : exp_needed,
-          get_saves(ch, SAVE_TYPE_ACID), get_saves(ch, SAVE_TYPE_MAGIC), get_saves(ch, SAVE_TYPE_POISON), (int)GET_GOLD(ch), (int)GET_PLATINUM(ch),
+          get_saves(ch, SAVE_TYPE_ACID), get_saves(ch, SAVE_TYPE_MAGIC), get_saves(ch, SAVE_TYPE_POISON), (int)ch->getGold(), (int)GET_PLATINUM(ch),
           ch->melee_mitigation, ch->spell_mitigation, ch->song_mitigation, 0);
   send_to_char(buf, master);
 

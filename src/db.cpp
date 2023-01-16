@@ -2708,7 +2708,7 @@ Character *read_mobile(int nr, FILE *fl)
 	mob->ki = mob->max_ki;
 	mob->raw_ki = mob->max_ki;
 
-	mob->gold = fread_int(fl, 0, 2147483467);
+	mob->setGold(fread_int(fl, 0, 2147483467));
 	mob->plat = 0;
 	GET_EXP(mob) = (int64_t)fread_int(fl, -2147483467, 2147483467);
 
@@ -2929,7 +2929,7 @@ void write_mobile(Character *mob, FILE *fl)
 			mob->mobdata->damsizedice,
 			mob->damroll,
 
-			mob->gold,
+			mob->getGold(),
 			GET_EXP(mob),
 
 			mob->position,
@@ -3299,8 +3299,8 @@ void handle_automatic_mob_settings(Character *mob)
 	if (IS_AFFECTED(mob, AFF_NO_REGEN))
 		alevel += 3.0;
 
-	if (mob->gold != 0)
-		mob->gold = mob_matrix[baselevel].gold + number(0 - (mob_matrix[baselevel].gold / 10), mob_matrix[baselevel].gold / 10);
+	if (mob->getGold() != 0)
+		mob->setGold(mob_matrix[baselevel].gold + number(0 - (mob_matrix[baselevel].gold / 10), mob_matrix[baselevel].gold / 10));
 	mob->exp = mob_matrix[baselevel].experience + ((mob_matrix[baselevel].experience / 100) * percent);
 
 	mob->alignment = (int)((float)mob->alignment * (1 + (((float)number(0, 30) - 15) / 100)));
@@ -5000,7 +5000,7 @@ void Zone::reset(ResetType reset_type)
 			}
 			if (IS_NPC(tmp_victim) && !ISSET(tmp_victim->mobdata->actflags, ACT_NO_GOLD_BONUS) && world[tmp_victim->in_room].zone == id)
 			{
-				tmp_victim->gold *= 1.10;
+				tmp_victim->multiplyGold(1.10);
 				tmp_victim->exp *= 1.10;
 			}
 		}

@@ -157,7 +157,7 @@ command_return_t Character::do_split(QStringList &arguments, int cmd)
   QString number = arguments.at(0);
 
   bool ok = false;
-  quint64 amount = number.toULongLong(&ok);
+  const qulonglong amount = number.toULongLong(&ok);
   if (ok == false)
   {
     send("Invalid value.\r\n");
@@ -171,7 +171,7 @@ command_return_t Character::do_split(QStringList &arguments, int cmd)
     return eSUCCESS;
   }
 
-  if (gold < (uint32_t)amount)
+  if (getGold() < amount)
   {
     send("You don't have that much gold!\r\n");
     return eFAILURE;
@@ -209,11 +209,11 @@ command_return_t Character::do_split(QStringList &arguments, int cmd)
 
   share = amount / no_members;
   extra = amount % no_members;
-  gold -= amount;
+  removeGold(amount);
   save(666);
 
   send(QString("You split %L1 $B$5gold$R coins. Your share is %L2 gold coins.\r\n").arg(amount).arg(share + extra));
-  gold += share + extra;
+  addGold(share + extra);
 
   if (k != this && k->in_room == in_room)
   {
@@ -227,7 +227,7 @@ command_return_t Character::do_split(QStringList &arguments, int cmd)
       get_clan(k)->cdeposit(lost);
       save_clans();
     }
-    GET_GOLD(k) += (share - lost);
+    k->addGold(share - lost);
   }
   for (f = k->followers; f; f = f->next)
   {
@@ -246,7 +246,7 @@ command_return_t Character::do_split(QStringList &arguments, int cmd)
         get_clan(f->follower)->cdeposit(lost);
         save_clans();
       }
-      GET_GOLD(f->follower) += (share - lost);
+      f->follower->addGold(share - lost);
     }
   }
   return eSUCCESS;

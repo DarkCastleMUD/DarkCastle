@@ -26,8 +26,6 @@ using namespace std;
 // FILE * fopen(const char *filename, const char *type);
 // int fclose(FILE * fl);
 
-typedef struct obj_data obj_data;
-
 const size_t MAX_INPUT_LENGTH = 160;
 const size_t MAX_MESSAGES = 150;
 const size_t MAX_OBJ_SDESC_LENGTH = 100;

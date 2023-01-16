@@ -23,11 +23,6 @@
 #include "inventory.h"
 #include <fmt/format.h>
 
-#ifdef TWITTER
-#include <curl.h>
-#include <twitcurl.h>
-#endif
-
 int getRealSpellDamage(Character *ch);
 
 int number_or_name(char **name, int *num)
@@ -498,7 +493,7 @@ void boro_mob_stat(Character *ch, Character *k)
 
   if (!IS_MOB(k))
   {
-    sprintf(buf, "$3Coins$R:[%lld]  $3Bank$R:[%d]\n\r", GET_GOLD(k),
+    sprintf(buf, "$3Coins$R:[%lld]  $3Bank$R:[%d]\n\r", k->getGold(),
             k->pcdata->bank);
     send_to_char(buf, ch);
   }
@@ -706,7 +701,7 @@ void mob_stat(Character *ch, Character *k)
   send_to_char(buf, ch);
 
   sprintf(buf, "$3AC$R:[%d]  $3Exp$R:[%lld]  $3Hitroll$R:[%d]  $3Damroll$R:[%d]  $3Gold$R: [$B$5%lld$R]\n\r",
-          GET_ARMOR(k), GET_EXP(k), GET_REAL_HITROLL(k), GET_REAL_DAMROLL(k), GET_GOLD(k));
+          GET_ARMOR(k), GET_EXP(k), GET_REAL_HITROLL(k), GET_REAL_DAMROLL(k), k->getGold());
   send_to_char(buf, ch);
 
   if (!IS_MOB(k))
@@ -2022,7 +2017,7 @@ void pick_up_item(Character *ch, struct obj_data *obj)
                 obj->short_description, gold);
         send_to_char(buf, ch);
 
-        GET_GOLD(ch) += gold;
+        ch->addGold(gold);
         obj_from_char(obj);
         obj_to_room(obj, 6345);
         break;

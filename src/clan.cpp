@@ -2862,14 +2862,14 @@ command_return_t Character::do_cdeposit(QStringList &arguments, int cmd)
     return eFAILURE;
   }
 
-  if (GET_GOLD(this) < dep)
+  if (getGold() < dep)
   {
     send(QString("You don't have %L1 $B$5gold$R coins to deposit into your clan account.\r\n").arg(dep));
-    send(QString("You only have %L1 $B$5gold$R coins on you.\r\n").arg(GET_GOLD(this)));
+    send(QString("You only have %L1 $B$5gold$R coins on you.\r\n").arg(getGold()));
     return eFAILURE;
   }
 
-  GET_GOLD(this) -= dep;
+  removeGold(dep);
   save(666);
   get_clan(clan)->cdeposit(dep);
   save_clans();
@@ -2922,7 +2922,7 @@ int do_cwithdraw(Character *ch, char *arg, int cmd)
     send_to_char("Your clan lacks the funds.\r\n", ch);
     return eFAILURE;
   }
-  GET_GOLD(ch) += (int)wdraw;
+  ch->addGold(wdraw);
   get_clan(ch)->cwithdraw(wdraw);
   if (wdraw == 1)
   {

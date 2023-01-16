@@ -4473,10 +4473,10 @@ void make_corpse(Character *ch)
       if (ch->equipment[i])
         obj_to_char(unequip_char(ch, i), ch);
 
-    if (GET_GOLD(ch) > 0)
+    if (ch->getGold() > 0)
     {
-      money = create_money(GET_GOLD(ch));
-      GET_GOLD(ch) = 0;
+      money = create_money(ch->getGold());
+      ch->setGold(0);
       obj_to_obj(money, corpse);
     }
 
@@ -4603,10 +4603,10 @@ void make_dust(Character *ch)
     if (ch->equipment[i])
       obj_to_char(unequip_char(ch, i), ch);
 
-  if (GET_GOLD(ch) > 0)
+  if (ch->getGold() > 0)
   {
-    money = create_money(GET_GOLD(ch));
-    GET_GOLD(ch) = 0;
+    money = create_money(ch->getGold());
+    ch->setGold(0);
     obj_to_room(money, ch->in_room);
   }
 
@@ -5473,11 +5473,11 @@ void raw_kill(Character *ch, Character *victim)
   }
   if (affected_by_spell(victim, FUCK_GTHIEF))
   {
-    if (GET_GOLD(victim) > 0)
+    if (victim->getGold() > 0)
     {
       act("$n drops $s stolen booty!", victim, 0, 0, TO_ROOM, 0);
-      obj_to_room(create_money(GET_GOLD(victim)), victim->in_room);
-      GET_GOLD(victim) = 0;
+      obj_to_room(create_money(victim->getGold()), victim->in_room);
+      victim->setGold(0);
       save_char_obj(victim);
     }
   }
@@ -5874,7 +5874,7 @@ void group_gain(Character *ch, Character *victim)
     // this loops the followers (cut and pasted above)
     tmp_ch = loop_followers(&f);
   } while (tmp_ch);
-  getAreaData(world[victim->in_room].zone, mob_index[victim->mobdata->nr].virt, total_share, GET_GOLD(victim));
+  getAreaData(world[victim->in_room].zone, mob_index[victim->mobdata->nr].virt, total_share, victim->getGold());
 }
 
 /* find the highest level present at the kill */
@@ -6440,11 +6440,11 @@ void do_pkill(Character *ch, Character *victim, int type, bool vict_is_attacker)
   if (affected_by_spell(victim, FUCK_GTHIEF))
   {
     GET_MOVE(victim) = 2;
-    if (GET_GOLD(victim) > 0)
+    if (victim->getGold() > 0)
     {
       act("$N drops $S stolen booty!", ch, 0, victim, TO_ROOM, NOTVICT);
-      obj_to_room(create_money(GET_GOLD(victim)), victim->in_room);
-      GET_GOLD(victim) = 0;
+      obj_to_room(create_money(victim->getGold()), victim->in_room);
+      victim->setGold(0);
       save_char_obj(victim);
     }
   }

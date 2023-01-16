@@ -234,7 +234,7 @@ void get(Character *ch, struct obj_data *obj_object, struct obj_data *sub_object
     {
       int cgold = (int)((float)(obj_object->obj_flags.value[0]) * (float)((float)(get_clan(ch)->tax) / 100.0));
       obj_object->obj_flags.value[0] -= cgold;
-      GET_GOLD(ch) += obj_object->obj_flags.value[0];
+      ch->addGold(obj_object->obj_flags.value[0]);
       get_clan(ch)->cdeposit(cgold);
       if (!IS_MOB(ch) && IS_SET(ch->pcdata->toggles, PLR_BRIEF))
       {
@@ -248,7 +248,7 @@ void get(Character *ch, struct obj_data *obj_object, struct obj_data *sub_object
       save_clans();
     }
     else
-      GET_GOLD(ch) += obj_object->obj_flags.value[0];
+      ch->addGold(obj_object->obj_flags.value[0]);
 
     // If a mob gets gold, we disable its ability to receive a gold bonus. This keeps
     // the mob from turning into an interest bearing savings account. :)
@@ -1137,7 +1137,7 @@ int do_drop(Character *ch, char *argument, int cmd)
       send_to_char("Sorry, you can't do that!\r\n", ch);
       return eFAILURE;
     }
-    if (GET_GOLD(ch) < (uint32_t)amount)
+    if (ch->getGold() < (uint32_t)amount)
     {
       send_to_char("You haven't got that many coins!\r\n", ch);
       return eFAILURE;
@@ -1149,7 +1149,7 @@ int do_drop(Character *ch, char *argument, int cmd)
     act("$n drops some gold.", ch, 0, 0, TO_ROOM, 0);
     tmp_object = create_money(amount);
     obj_to_room(tmp_object, ch->in_room);
-    GET_GOLD(ch) -= amount;
+    ch->removeGold(amount);
     if (GET_LEVEL(ch) >= IMMORTAL)
     {
       sprintf(buffer, "%s dropped %d coins.", GET_NAME(ch), amount);
@@ -1640,7 +1640,7 @@ int do_give(Character *ch, char *argument, int cmd)
       send_to_char("Sorry, you can't do that!\r\n", ch);
       return eFAILURE;
     }
-    if (GET_GOLD(ch) < amount && GET_LEVEL(ch) < DEITY)
+    if (ch->getGold() < amount && GET_LEVEL(ch) < DEITY)
     {
       send_to_char("You haven't got that many coins!\r\n", ch);
       return eFAILURE;
@@ -1664,7 +1664,7 @@ int do_give(Character *ch, char *argument, int cmd)
       return eFAILURE;
     }
     /*
-          if(GET_GOLD(vict) > 2000000000) {
+          if(vict->getGold() > 2000000000) {
              send_to_char("They can't hold that much gold!\r\n", ch);
              return eFAILURE;
           }
@@ -1681,7 +1681,7 @@ int do_give(Character *ch, char *argument, int cmd)
     act(buf, ch, 0, vict, TO_VICT, INVIS_NULL);
     act("$n gives some gold to $N.", ch, 0, vict, TO_ROOM, INVIS_NULL | NOTVICT);
 
-    GET_GOLD(ch) -= amount;
+    ch->removeGold(amount);
 
     if (IS_NPC(ch) && (!IS_AFFECTED(ch, AFF_CHARM) || GET_LEVEL(ch) > 50))
     {
@@ -1690,9 +1690,9 @@ int do_give(Character *ch, char *argument, int cmd)
       special_log(buf);
     }
 
-    if (GET_GOLD(ch) < 0)
+    if (ch->getGold() < 0)
     {
-      GET_GOLD(ch) = 0;
+      ch->setGold(0);
       send_to_char("Warning:  You are giving out more $B$5gold$R than you had.\r\n", ch);
       if (GET_LEVEL(ch) < IMPLEMENTER)
       {
@@ -1701,7 +1701,7 @@ int do_give(Character *ch, char *argument, int cmd)
         special_log(buf);
       }
     }
-    GET_GOLD(vict) += amount;
+    vict->addGold(amount);
 
     // If a mob is given gold, we disable its ability to receive a gold bonus. This keeps
     // the mob from turning into an interest bearing savings account. :)
@@ -2744,7 +2744,7 @@ int palm(Character *ch, struct obj_data *obj_object, struct obj_data *sub_object
       DC::getInstance()->zones.value(world[ch->in_room].zone).addGold(cgold);
     }
 
-    GET_GOLD(ch) += obj_object->obj_flags.value[0];
+    ch->addGold(obj_object->obj_flags.value[0]);
     extract_obj(obj_object);
   }
   return eSUCCESS;

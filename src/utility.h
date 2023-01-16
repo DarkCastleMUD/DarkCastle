@@ -312,7 +312,7 @@ bool IS_DARK(int room);
 #define GET_KI(ch) ((ch)->ki)
 #define GET_RAW_KI(ch) ((ch)->raw_ki)
 #define GET_MAX_KI(ch) ((ch)->max_ki)
-#define GET_GOLD(ch) ((ch)->gold)
+
 #define GET_PLATINUM(ch) ((ch)->plat)
 #define GET_BANK(ch) ((ch)->pcdata->bank)
 #define GET_CLAN(ch) ((ch)->clan)
