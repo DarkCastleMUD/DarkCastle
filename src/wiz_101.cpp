@@ -162,65 +162,57 @@ command_return_t Character::do_goto(QStringList &arguments, int cmd)
     }
     QString arg2 = arguments.at(1);
 
-    try
+    zone_t zone_key = arg2.toULongLong(&ok);
+    auto &zones = DC::getInstance()->zones;
+    if (ok == false || zones.contains(zone_key) == false)
     {
-      zone_t zone_key = arg2.toULongLong(&ok);
-      auto &zones = DC::getInstance()->zones;
-      if (ok == false || zones.contains(zone_key) == false)
+      if (zones.isEmpty())
       {
-        if (zones.isEmpty())
+        send(QString("Invalid zone %1 specified. No zones loaded.\r\n").arg(zone_key));
+        return eFAILURE;
+      }
+
+      auto last_zone_nr = zones.lastKey();
+      send(QString("Invalid zone %1 specified. Valid values are 1-%2\r\n").arg(zone_key).arg(last_zone_nr));
+      return eFAILURE;
+    }
+    auto &zone = zones[zone_key];
+
+    if (zone_key == 0)
+    {
+      loc_nr = 1;
+    }
+    else
+    {
+      loc_nr = zone.getRealBottom();
+    }
+
+    send(format("Going to room {} in zone #{} [{}]\r\n", loc_nr, zone_key, ltrim(string(DC::getInstance()->zones.value(zone_key).name))));
+
+    if (loc_nr > top_of_world || loc_nr < 0)
+    {
+      send("No room exists with that number.\r\n");
+      return eFAILURE;
+    }
+
+    if (world_array[loc_nr])
+    {
+      location = loc_nr;
+    }
+    else
+    {
+      if (can_modify_this_room(this, loc_nr))
+      {
+        if (create_one_room(this, loc_nr))
         {
-          send(QString("Invalid zone %1 specified. No zones loaded.\r\n").arg(zone_key));
-          return eFAILURE;
+          send("You form order out of chaos.\r\n");
+          location = loc_nr;
         }
-
-        auto last_zone_nr = zones.lastKey();
-        send(QString("Invalid zone %1 specified. Valid values are 1-%2\r\n").arg(zone_key).arg(last_zone_nr));
-        return eFAILURE;
-      }
-      auto &zone = zones[zone_key];
-
-      if (zone_key == 0)
-      {
-        loc_nr = 1;
-      }
-      else
-      {
-        loc_nr = zone.getRealBottom();
-      }
-
-      send(format("Going to room {} in zone #{} [{}]\r\n", loc_nr, zone_key, ltrim(string(DC::getInstance()->zones.value(zone_key).name))));
-
-      if (loc_nr > top_of_world || loc_nr < 0)
-      {
-        send("No room exists with that number.\r\n");
-        return eFAILURE;
-      }
-
-      if (world_array[loc_nr])
-      {
-        location = loc_nr;
-      }
-      else
-      {
-        if (can_modify_this_room(this, loc_nr))
-        {
-          if (create_one_room(this, loc_nr))
-          {
-            send("You form order out of chaos.\r\n");
-            location = loc_nr;
-          }
-        }
-      }
-      if (location == -1)
-      {
-        send("No room exists with that number.\r\n");
-        return eFAILURE;
       }
     }
-    catch (...)
+    if (location == -1)
     {
-      send("Invalid zone number specified.\r\n");
+      send("No room exists with that number.\r\n");
       return eFAILURE;
     }
   }
@@ -232,16 +224,19 @@ command_return_t Character::do_goto(QStringList &arguments, int cmd)
       if ((target_mob = getVisiblePlayer(arg1)))
       {
         location = target_mob->in_room;
+        send(QString("Going to player %1 in room %2.\r\n").arg(GET_NAME(target_mob)).arg(location));
       }
       else if ((target_mob = getVisibleCharacter(arg1)))
       {
         location = target_mob->in_room;
+        send(QString("Going to character %1 in room %2.\r\n").arg(GET_NAME(target_mob)).arg(location));
       }
       else if ((target_obj = getVisibleObject(arg1)))
       {
         if (target_obj->in_room != NOWHERE)
         {
           location = target_obj->in_room;
+          send(QString("Going to object %1 in room %2.\r\n").arg(GET_NAME(target_obj)).arg(location));
         }
         else
         {
@@ -249,44 +244,51 @@ command_return_t Character::do_goto(QStringList &arguments, int cmd)
           return eFAILURE;
         }
       }
-    }
-
-    if (loc_nr > top_of_world || loc_nr < 0)
-    {
-      send("No room exists with that number.\r\n");
-      return eFAILURE;
-    }
-
-    if (world_array[loc_nr])
-      location = loc_nr;
-    else
-    {
-      if (can_modify_this_room(this, loc_nr))
+      else
       {
-        if (create_one_room(this, loc_nr))
-        {
-          send("You form order out of chaos.\n\r\n\r");
-          location = loc_nr;
-        }
+        send("No such creature or object around.\r\n");
+        return eFAILURE;
       }
     }
-    if (location == -1)
+    else
     {
-      send("No room exists with that number.\r\n");
-      return eFAILURE;
+      if (loc_nr > top_of_world || loc_nr < 0)
+      {
+        send("No room exists with that number.\r\n");
+        return eFAILURE;
+      }
+
+      if (world_array[loc_nr])
+        location = loc_nr;
+      else
+      {
+        if (can_modify_this_room(this, loc_nr))
+        {
+          if (create_one_room(this, loc_nr))
+          {
+            send("You form order out of chaos.\n\r\n\r");
+            location = loc_nr;
+          }
+        }
+        else
+        {
+          send(QString("You can't modify room %1").arg(loc_nr));
+          return eFAILURE;
+        }
+      }
+      if (location == -1)
+      {
+        send("No room exists with that number.\r\n");
+        return eFAILURE;
+      }
     }
-  }
-  else
-  {
-    send("No such creature or object around.\r\n");
-    return eFAILURE;
   }
 
   /* a location has been found. */
   if (IS_SET(world[location].room_flags, IMP_ONLY) &&
       GET_LEVEL(this) < OVERSEER)
   {
-    send("No.\r\n");
+    send("That room is for implementers only.\r\n");
     return eFAILURE;
   }
 
