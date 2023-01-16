@@ -2829,7 +2829,7 @@ command_return_t char_data::do_cdeposit(QStringList &arguments, int cmd)
 {
   QString arg1;
 
-  if (clan == 0)
+  if (clan == 0 || get_clan(clan) == nullptr)
   {
     send("You are not a member of a clan.\r\n");
     return eFAILURE;
@@ -2871,7 +2871,7 @@ command_return_t char_data::do_cdeposit(QStringList &arguments, int cmd)
 
   GET_GOLD(this) -= dep;
   save(666);
-  get_clan(this)->cdeposit(dep);
+  get_clan(clan)->cdeposit(dep);
   save_clans();
 
   QString coin = "coin";
