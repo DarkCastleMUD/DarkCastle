@@ -3660,7 +3660,7 @@ command_return_t Character::do_clanarea(QStringList &arguments, int cmd)
   return eSUCCESS;
 }
 
-bool others_clan_room(Character *ch, room_data *room)
+bool others_clan_room(Character *ch, Room *room)
 {
   // Passed null values
   if (ch == 0 || room == 0)

@@ -11,7 +11,7 @@
 
 #include <string.h>
 
-#include "room.h"   // room_data
+#include "room.h"   // Room
 #include "db.h"     // real_room()
 #include "interp.h" // do_look()
 #include "character.h"

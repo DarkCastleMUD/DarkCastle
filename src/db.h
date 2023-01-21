@@ -240,7 +240,7 @@ struct world_file_list_item
 class CWorld : public ErrorHandler
 {
 public:
-  room_data &operator[](int rnum);
+  Room &operator[](int rnum);
 };
 
 #endif

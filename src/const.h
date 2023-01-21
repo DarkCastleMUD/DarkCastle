@@ -70,7 +70,7 @@ extern const char *size_bitfields[];
 extern char *strs_damage_types[];
 extern char *obj_types[];
 extern std::vector<std::string> continent_names;
-extern class room_data **world_array;
+extern class Room **world_array;
 extern int top_of_objt;
 extern world_file_list_item *obj_file_list;
 extern const char *drinks[];

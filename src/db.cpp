@@ -87,7 +87,7 @@ world_file_list_item *world_file_list = 0; // List of the world files
 world_file_list_item *mob_file_list = 0;   // List of the mob files
 world_file_list_item *obj_file_list = 0;   // List of the obj files
 
-class room_data **world_array = 0; // array of rooms
+class Room **world_array = 0; // array of rooms
 int top_of_world = 0;			   // index of last room in world
 int top_of_world_alloc = 0;		   // index of last alloc'd memory in world
 
@@ -95,9 +95,9 @@ class Object *object_list = 0; /* the global linked list of obj's */
 
 pulse_data *bard_list = 0; /* global l-list of bards          */
 
-room_data &CWorld::operator[](int rnum)
+Room &CWorld::operator[](int rnum)
 {
-	static room_data generic_room = {};
+	static Room generic_room = {};
 
 	if (rnum > top_of_world || rnum < 0 || world_array[rnum] == nullptr)
 	{
@@ -200,10 +200,10 @@ void boot_social_messages(void);
 void boot_clans(void);
 void assign_clan_rooms(void);
 struct help_index_element *build_help_index(FILE *fl, int *num);
-// The room_data implementation
+// The Room implementation
 // -Sadus 9/1/96
 
-void room_data::FreeTracks()
+void Room::FreeTracks()
 {
 	room_track_data *curr;
 
@@ -220,7 +220,7 @@ void room_data::FreeTracks()
 
 // add new tracks to the head of the list. When the list
 // gets longer than 11, remove the tail and delete it.
-void room_data::AddTrackItem(room_track_data *newTrack)
+void Room::AddTrackItem(room_track_data *newTrack)
 {
 	if (!tracks)
 	{
@@ -246,7 +246,7 @@ void room_data::AddTrackItem(room_track_data *newTrack)
 	}
 }
 
-room_track_data *room_data::TrackItem(int nIndex)
+room_track_data *Room::TrackItem(int nIndex)
 {
 	int nr;
 	room_track_data *pScent;
@@ -572,7 +572,7 @@ void DC::boot_db(void)
 
 	logentry("Loading the world.", 0, LogChannels::LOG_MISC);
 	// start world off with 2000 rooms of alloc'd space
-	world_array = (room_data **)realloc(world_array, 2000 * sizeof(room_data *));
+	world_array = (Room **)realloc(world_array, 2000 * sizeof(Room *));
 	top_of_world_alloc = 2000;
 	// clear it (realloc = malloc, not calloc)
 	for (int counter = 0; counter < top_of_world_alloc; counter++)
@@ -1496,7 +1496,7 @@ int DC::read_one_room(FILE *fl, int &room_nr)
 
 		if (room_nr >= top_of_world_alloc)
 		{
-			world_array = (room_data **)realloc(world_array, (room_nr + 200) * sizeof(room_data *));
+			world_array = (Room **)realloc(world_array, (room_nr + 200) * sizeof(Room *));
 			for (int counter = top_of_world_alloc; counter < room_nr + 200; counter++)
 				world_array[counter] = 0;
 			top_of_world_alloc = room_nr + 200;
@@ -1512,7 +1512,7 @@ int DC::read_one_room(FILE *fl, int &room_nr)
 		if (top_of_world < room_nr)
 			top_of_world = room_nr;
 
-		world_array[room_nr] = (room_data *)calloc(1, sizeof(room_data));
+		world_array[room_nr] = (Room *)calloc(1, sizeof(Room));
 
 		world[room_nr].paths = 0;
 		world[room_nr].number = room_nr;
@@ -2079,7 +2079,7 @@ void setup_dir(FILE *fl, int room, int dir)
 // return true for success
 int create_one_room(Character *ch, int vnum)
 {
-	class room_data *rp;
+	class Room *rp;
 	int x;
 
 	char buf[256];
@@ -2096,7 +2096,7 @@ int create_one_room(Character *ch, int vnum)
 	if (top_of_world + 1 >= top_of_world_alloc)
 	{
 
-		world_array = (room_data **)realloc(world_array, (top_of_world + 200) * sizeof(room_data *));
+		world_array = (Room **)realloc(world_array, (top_of_world + 200) * sizeof(Room *));
 		for (int counter = top_of_world_alloc; counter < top_of_world + 200; counter++)
 			world_array[counter] = 0;
 		top_of_world_alloc = top_of_world + 200;
@@ -2108,7 +2108,7 @@ int create_one_room(Character *ch, int vnum)
 		}
 	}
 
-	world_array[vnum] = (room_data *)calloc(1, sizeof(room_data));
+	world_array[vnum] = (Room *)calloc(1, sizeof(Room));
 
 	rp = &world[vnum];
 

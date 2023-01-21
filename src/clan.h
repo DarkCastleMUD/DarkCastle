@@ -86,7 +86,7 @@ void add_totem(Object *altar, Object *totem);
 void remove_totem(Object *altar, Object *totem);
 void add_totem_stats(Character *ch, int stat = 0);
 void remove_totem_stats(Character *ch, int stat = 0);
-bool others_clan_room(Character *ch, room_data *room);
+bool others_clan_room(Character *ch, Room *room);
 void clan_login(Character *ch);
 void clan_logout(Character *ch);
 int has_right(Character *ch, uint32_t bit);

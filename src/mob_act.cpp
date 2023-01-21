@@ -248,7 +248,7 @@ void mobile_activity(void)
           logf(IMMORTAL, LogChannels::LOG_BUG, "Error: Room %d has exit %d to room %d", ch->in_room, door, room_nr_past_door);
           continue;
         }
-        room_data room_past_door = world[room_nr_past_door];
+        Room room_past_door = world[room_nr_past_door];
         if (!IS_SET(room_past_door.room_flags, NO_MOB) && !IS_SET(room_past_door.room_flags, CLAN_ROOM) && (IS_AFFECTED(ch, AFF_FLYING) || !IS_SET(room_past_door.room_flags, (FALL_UP | FALL_SOUTH | FALL_NORTH | FALL_EAST | FALL_WEST | FALL_DOWN))) && (!ISSET(ch->mobdata->actflags, ACT_STAY_ZONE) || room_past_door.zone == world[ch->in_room].zone))
         {
           if (!is_r_denied(ch, EXIT(ch, door)->to_room) && ch->mobdata->last_direction == door)

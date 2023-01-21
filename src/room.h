@@ -11,7 +11,7 @@
 #include "MobActivity.h" // struct path_data
 #include "player.h"      // CLASS_MAX
 
-// The following defs are for room_data
+// The following defs are for Room
 
 const unsigned int NOWHERE = 0;
 
@@ -138,7 +138,7 @@ struct deny_data
 };
 
 // ========================= Structure for room ==========================
-class room_data
+class Room
 {
 public:
     int16_t number = {}; // Rooms number

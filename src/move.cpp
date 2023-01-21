@@ -543,7 +543,7 @@ int do_simple_move(Character *ch, int cmd, int following)
 		return eFAILURE;
 	}
 
-	class room_data *rm = &(world[world[ch->in_room].dir_option[cmd]->to_room]);
+	class Room *rm = &(world[world[ch->in_room].dir_option[cmd]->to_room]);
 
 	if (rm->sector_type != world[ch->in_room].sector_type && ch->desc && ch->desc->original && ch->desc->original->level <= MAX_MORTAL)
 	{

@@ -1201,7 +1201,7 @@ int song_revealing_stacato(uint8_t level, Character *ch, char *arg, Character *v
 int execute_song_revealing_stacato(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
 {
 	Character *i;
-	class room_data *room;
+	class Room *room;
 	char buf[MAX_STRING_LENGTH];
 	char *direction[] = {
 		"to the North",

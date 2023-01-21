@@ -98,7 +98,7 @@ extern CWorld world; /* In db.c */
 extern const char *sector_types[];
 extern char *time_look[];
 extern char *sky_look[];
-extern class room_data **world_array;
+extern class Room **world_array;
 extern string last_char_name;
 extern string last_processed_cmd;
 extern struct index_data *obj_index;
@@ -1448,7 +1448,7 @@ string generate_prompt(Character *ch)
   pro = prompt = new char[MAX_STRING_LENGTH];
   memset(pro, 0, sizeof(pro));
   char *mobprompt = "HP: %i/%H %f >";
-  room_data *rm = nullptr;
+  Room *rm = nullptr;
   try
   {
     rm = &world[ch->in_room];

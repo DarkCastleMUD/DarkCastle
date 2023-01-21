@@ -31,7 +31,7 @@ queue<string> imp_history;
 
 #define MAX_MESSAGE_LENGTH 4096
 
-extern class room_data **world_array;
+extern class Room **world_array;
 
 int do_wizhelp(Character *ch, char *argument, int cmd_arg)
 {

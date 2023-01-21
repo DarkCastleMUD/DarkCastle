@@ -5284,7 +5284,7 @@ int do_rstat(Character *ch, char *argument, int cmd)
   char arg1[MAX_STRING_LENGTH];
   char buf[MAX_STRING_LENGTH * 2];
   char buf2[MAX_STRING_LENGTH];
-  class room_data *rm = 0;
+  class Room *rm = 0;
   Character *k = 0;
   class Object *j = 0;
   struct extra_descr_data *desc;

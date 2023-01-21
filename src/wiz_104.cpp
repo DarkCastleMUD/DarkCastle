@@ -1171,7 +1171,7 @@ int do_show(Character *ch, char *argument, int cmd)
 			return eSUCCESS;
 		}
 		zon = atoi(arg1);
-		//     room_data
+		//     Room
 		//   zone
 		//   sector_type
 		// room_flags

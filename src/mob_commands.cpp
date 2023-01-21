@@ -75,7 +75,7 @@ extern Object *activeObj;
 extern void *activeVo;
 
 extern int top_of_world;
-extern room_data **world_array;
+extern Room **world_array;
 extern struct index_data *obj_index;
 extern int mprog_line_num;    // From mob_prog.cpp
 extern int mprog_command_num; // From mob_prog.cpp
@@ -777,7 +777,7 @@ int do_mpgoto(Character *ch, char *argument, int cmd)
   }
   if (location == ch->in_room)
     return eFAILURE; // zz
-  extern room_data **world_array;
+  extern Room **world_array;
   extern int top_of_world;
   if (location > top_of_world || !world_array[location])
     location = 0;
@@ -830,7 +830,7 @@ int do_mpat(Character *ch, char *argument, int cmd)
     prog_error(ch, "Mpat - No such location.");
     return eFAILURE | eINTERNAL_ERROR;
   }
-  extern room_data **world_array;
+  extern Room **world_array;
   extern int top_of_world;
   if (location > top_of_world || !world_array[location])
     location = 0;

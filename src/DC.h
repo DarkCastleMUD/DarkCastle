@@ -152,7 +152,7 @@ private:
 extern struct descriptor_data *descriptor_list;
 extern vector<string> continent_names;
 extern class CVoteData *DCVote;
-extern class room_data **world_array;
+extern class Room **world_array;
 extern class Object *object_list;
 extern struct spell_info_type spell_info[];
 void renum_world(void);

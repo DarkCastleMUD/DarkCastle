@@ -69,7 +69,7 @@ extern struct index_data *mob_index;
 extern struct index_data *obj_index;
 Character *rndm2;
 extern class Object *object_list;
-extern class room_data **world_array;
+extern class Room **world_array;
 int activeProgs = 0; // loop protection
 
 Character *activeActor = nullptr;
